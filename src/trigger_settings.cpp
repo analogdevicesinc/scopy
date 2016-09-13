@@ -229,11 +229,11 @@ void TriggerSettings::on_cmb_trigg_source_currentIndexChanged(int index)
 	trigger_ab_enabled_update(triggerA_new_state, triggerB_new_state);
 	if (triggerA_new_state != triggerA_en) {
 		triggerA_en = triggerA_new_state;
-		emit triggerAenabled(triggerA_new_state);
+		Q_EMIT triggerAenabled(triggerA_new_state);
 	}
 	if (triggerB_new_state != triggerB_en) {
 		triggerB_en = triggerB_new_state;
-		emit triggerBenabled(triggerB_new_state);
+		Q_EMIT triggerBenabled(triggerB_new_state);
 	}
 }
 
@@ -261,19 +261,19 @@ void TriggerSettings::on_cmb_trigg_B_currentIndexChanged(int index)
 
 void TriggerSettings::onSpinboxTriggerDelayChanged(double value)
 {
-	emit delayChanged(value);
+	Q_EMIT delayChanged(value);
 	trigg_delay_write_hardware(value);
 }
 
 void TriggerSettings::onSpinboxTriggerAlevelChanged(double value)
 {
-	emit levelAChanged(value);
+	Q_EMIT levelAChanged(value);
 	triggA_level_write_hardware(value);
 }
 
 void TriggerSettings::onSpinboxTriggerBlevelChanged(double value)
 {
-	emit levelBChanged(value);
+	Q_EMIT levelBChanged(value);
 	triggB_level_write_hardware(value);
 }
 

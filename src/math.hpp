@@ -34,14 +34,14 @@ namespace adiscope {
 		explicit Math(QWidget *parent = nullptr,
 				unsigned int num_inputs = 1);
 
-	public slots:
+	public Q_SLOTS:
 		void setFunction(const QString& function);
 
-	signals:
+	Q_SIGNALS:
 		void functionValid(const QString& function);
 		void stateReseted();
 
-	private slots:
+	private Q_SLOTS:
 		void handleButton();
 		void handleMenuButton(QAction *action);
 		void handleMenuButtonT(QAction *action);

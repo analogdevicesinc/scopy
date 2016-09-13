@@ -92,6 +92,8 @@ qt5_add_resources(m2kscope_RESOURCES ${M2KSCOPE_RESOURCES})
 
 set(RESOURCES resources/icon.rc)
 
+add_definitions(-DQT_NO_KEYWORDS)
+
 add_executable(${PROJECT_NAME} WIN32
 		${SRC_LIST}
 		${RESOURCES}

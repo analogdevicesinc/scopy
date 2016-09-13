@@ -36,10 +36,10 @@ namespace adiscope
 		explicit ConnectDialog(QWidget *widget);
 		~ConnectDialog();
 
-	signals:
+	Q_SIGNALS:
 		void newContext(const QString& uri);
 
-	private slots:
+	private Q_SLOTS:
 		void btnClicked();
 		void validateInput();
 		void discardSettings();

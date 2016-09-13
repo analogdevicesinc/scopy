@@ -71,13 +71,13 @@ namespace adiscope {
 				QWidget *parent = 0);
 		~Oscilloscope();
 
-	signals:
+	Q_SIGNALS:
 		void triggerALevelChanged(double);
 		void triggerBLevelChanged(double);
 		void triggerDelayChanged(double);
 		void selectedChannelChanged(int);
 
-	private slots:
+	private Q_SLOTS:
 		void on_actionClose_triggered();
 		void onCursorsToggled(bool on);
 		void onMeasureToggled(bool on);

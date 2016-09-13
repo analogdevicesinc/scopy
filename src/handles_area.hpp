@@ -32,7 +32,7 @@ class HandlesArea: public QWidget
 public:
 	HandlesArea(QWidget *parent);
 
-signals:
+Q_SIGNALS:
 	void sizeChanged(QSize);
 
 protected:

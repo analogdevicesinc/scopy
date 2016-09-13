@@ -51,19 +51,19 @@ namespace adiscope {
 		bool levelB_enabled();
 		void setPlotNumSamples(int);
 
-	signals:
+	Q_SIGNALS:
 		void delayChanged(double);
 		void levelAChanged(double);
 		void levelBChanged(double);
 		void triggerAenabled(bool);
 		void triggerBenabled(bool);
 
-	public slots:
+	public Q_SLOTS:
 		void setDelay(double);
 		void setTriggerLevelA(double);
 		void setTriggerLevelB(double);
 
-	private slots:
+	private Q_SLOTS:
 		void on_cmb_trigg_source_currentIndexChanged(int);
 		void on_cmb_trigg_A_currentIndexChanged(int);
 		void on_cmb_trigg_B_currentIndexChanged(int);

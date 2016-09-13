@@ -36,16 +36,16 @@ namespace adiscope {
 				unsigned int timeout_ms = 3000);
 		~AutoScaler();
 
-	signals:
+	Q_SIGNALS:
 		void updateScale(const QwtScaleDiv);
 
-	public slots:
+	public Q_SLOTS:
 		void setValue(double val);
 		void startTimer();
 		void stopTimer();
 		void setTimeout(int timeout_ms);
 
-	private slots:
+	private Q_SLOTS:
 		void timeout();
 
 	private:

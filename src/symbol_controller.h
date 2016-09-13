@@ -48,7 +48,7 @@ public:
 
 	virtual bool eventFilter(QObject *, QEvent *);
 
-public slots:
+public Q_SLOTS:
 	void updateOverlay();
 
 private:

@@ -71,7 +71,7 @@ void AutoScaler::setValue(double val)
 void AutoScaler::changeScaleDiv(const QwtScaleDiv *div)
 {
 	current_div = div;
-	emit updateScale(*div);
+	Q_EMIT updateScale(*div);
 }
 
 void AutoScaler::startTimer()

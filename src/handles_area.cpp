@@ -69,7 +69,7 @@ void HandlesArea::resizeEvent(QResizeEvent *event)
 {
 	resizeMask(event->size());
 
-	emit sizeChanged(event->size());
+	Q_EMIT sizeChanged(event->size());
 }
 
 /*

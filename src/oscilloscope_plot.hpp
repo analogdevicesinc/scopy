@@ -91,12 +91,12 @@ namespace adiscope {
 		double measuredPosDuty();
 		double measuredNegDuty();
 
-	signals:
+	Q_SIGNALS:
 		void timeTriggerValueChanged(double);
 		void channelOffsetChanged(double);
 		void measurementsAvailable();
 
-	public slots:
+	public Q_SLOTS:
 		void setTriggerAEnabled(bool en);
 		void setTriggerBEnabled(bool en);
 		void setMeasurementCursorsEnabled(bool en);
@@ -108,7 +108,7 @@ namespace adiscope {
 		void setPeriodDetectLevel(double lvl);
 		void setPeriodDetectHyst(double hyst);
 
-	private slots:
+	private Q_SLOTS:
 		void onChannelAdded(int);
 		void onNewDataReceived();
 

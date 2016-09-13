@@ -45,7 +45,7 @@ namespace adiscope {
 				QPushButton *runButton, QWidget *parent = 0);
 		~PowerController();
 
-	public slots:
+	public Q_SLOTS:
 		void dac1_set_enabled(bool enabled);
 		void dac2_set_enabled(bool enabled);
 		void dac1_set_value(double value);
@@ -53,7 +53,7 @@ namespace adiscope {
 		void update_lcd();
 		void sync_enabled(bool enabled);
 
-	private slots:
+	private Q_SLOTS:
 		void startStop(bool start);
 		void ratioChanged(int percent);
 

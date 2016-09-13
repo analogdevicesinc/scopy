@@ -54,7 +54,7 @@ namespace adiscope {
 		double getSampleRate() const;
 		void setSampleRate(double rate);
 
-	public slots:
+	public Q_SLOTS:
 		void plot(double sample);
 		void reset();
 		void setColor(const QColor& color);

@@ -139,10 +139,10 @@ public:
 		return m_divUpperLimit;
 	}
 
-signals:
+Q_SIGNALS:
 	void divisionChanged(double division);
 
-public slots:
+public Q_SLOTS:
 	void moveToNextDivision()
 	{
 		std::vector<double>::iterator templateStep;
@@ -191,7 +191,7 @@ private:
 	void updateDivision()
 	{
 		m_currentDiv = (*m_currentStep) * pow(m_magnitude_step, m_power);
-		emit divisionChanged(m_currentDiv);
+		Q_EMIT divisionChanged(m_currentDiv);
 	}
 
 	double division(std::vector<double>::iterator step, int power)
@@ -360,7 +360,7 @@ public:
   // class:
   // void PlotNewData(...);
 
-public slots:
+public Q_SLOTS:
   virtual void disableLegend();
   virtual void setYaxis(double min, double max);
   virtual void setXaxis(double min, double max);
@@ -466,7 +466,7 @@ public slots:
   unsigned int xAxisNumDiv();
   unsigned int yAxisNumDiv();
 
-signals:
+Q_SIGNALS:
   void horizScaleDivisionChanged(double);
   void vertScaleDivisionChanged(double);
   void horizScaleOffsetChanged(double);
@@ -474,7 +474,7 @@ signals:
 
   void plotPointSelected(const QPointF p);
 
-protected slots:
+protected Q_SLOTS:
   virtual void legendEntryChecked(QwtPlotItem *plotItem, bool on);
   virtual void legendEntryChecked(const QVariant &plotItem, bool on, int index);
 

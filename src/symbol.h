@@ -78,13 +78,13 @@ public:
 	virtual void draw(QPainter *painter) const = 0;
 	virtual bool moveWith(double plotDeltaX, double plotDeltaY) = 0;
 
-signals:
+Q_SIGNALS:
 	void positionChanged(double x, double y);
 	void pixelPositionChanged(int x, int y);
 	void selected(bool selected);
 	void visibilityChanged(bool en);
 
-protected slots:
+protected Q_SLOTS:
 	void onFixedScaleChanged();
 	void onMobileScaleChanged();
 
@@ -119,15 +119,15 @@ public:
 
 	virtual bool moveWith(double plotDeltaX, double plotDeltaY);
 
-signals:
+Q_SIGNALS:
 	void positionChanged(double);
 	void pixelPositionChanged(int);
 
-public slots:
+public Q_SLOTS:
 	void setPosition(double vertPos);
 	void setPixelPosition(int vertPos);
 
-private slots:
+private Q_SLOTS:
 	void onBasePositionChanged(double, double);
 	void onBasePixelPositionChanged(int, int);
 
@@ -145,15 +145,15 @@ public:
 
 	virtual bool moveWith(double plotDeltaX, double plotDeltaY);
 
-signals:
+Q_SIGNALS:
 	void positionChanged(double);
 	void pixelPositionChanged(int);
 
-public slots:
+public Q_SLOTS:
 	void setPosition(double horizPos);
 	void setPixelPosition(int horizPos);
 
-private slots:
+private Q_SLOTS:
 	void onBasePositionChanged(double, double);
 	void onBasePixelPositionChanged(int, int);
 };

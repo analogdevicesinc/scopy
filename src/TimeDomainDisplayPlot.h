@@ -112,11 +112,11 @@ public:
 	unsigned long long channelsDataLength, bool curvesAttached = true);
   bool unregisterSink(std::string sinkName);
 
-signals:
+Q_SIGNALS:
   void channelAdded(int);
   void newData();
 
-public slots:
+public Q_SLOTS:
   void setSampleRate(double sr, double units,
 		     const std::string &strunits);
 
@@ -156,7 +156,7 @@ public slots:
 protected:
   virtual void configureAxis(int axisPos, int axisIdx);
 
-private slots:
+private Q_SLOTS:
   void newData(const QEvent*);
 
 protected:

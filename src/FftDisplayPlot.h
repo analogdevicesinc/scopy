@@ -47,7 +47,7 @@ namespace adiscope {
 
 		void replot();
 
-	public slots:
+	public Q_SLOTS:
 		void setSampleRate(double sr, double units,
 			const std::string &strunits);
 		void customEvent(QEvent *e);

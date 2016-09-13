@@ -58,14 +58,14 @@ namespace adiscope {
 		iio_manager::port_id configureMode(bool is_ac, unsigned int ch);
 		int numSamplesFromIdx(int idx);
 
-	public slots:
+	public Q_SLOTS:
 		void updateValuesList();
 
 		void toggleTimer(bool start);
 		void toggleAC1(bool enable);
 		void toggleAC2(bool enable);
 
-	private slots:
+	private Q_SLOTS:
 		void setHistorySizeCh1(int idx);
 		void setHistorySizeCh2(int idx);
 	};

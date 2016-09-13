@@ -417,7 +417,7 @@ TimeDomainDisplayPlot::plotNewData(const std::string sender,
 
       replot();
 
-      emit newData();
+      Q_EMIT newData();
 
     }
   }
@@ -807,7 +807,7 @@ bool TimeDomainDisplayPlot::registerSink(std::string sinkUniqueNme, unsigned int
 			if (curvesAttached)
 				d_plot_curve[n]->attach(this);
 
-			emit channelAdded(n);
+			Q_EMIT channelAdded(n);
 		}
 		d_nplots += numChannels;
 		_resetXAxisPoints(d_xdata[sinkIndex], channelsDataLength, d_sample_rate);

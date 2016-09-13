@@ -894,7 +894,7 @@ DisplayPlot::onPickerPointSelected(const QwtDoublePoint & p)
 {
   QPointF point = p;
   //fprintf(stderr,"onPickerPointSelected %f %f\n", point.x(), point.y());
-  emit plotPointSelected(point);
+  Q_EMIT plotPointSelected(point);
 }
 
 void
@@ -902,7 +902,7 @@ DisplayPlot::onPickerPointSelected6(const QPointF & p)
 {
   QPointF point = p;
   //fprintf(stderr,"onPickerPointSelected %f %f\n", point.x(), point.y());
-  emit plotPointSelected(point);
+  Q_EMIT plotPointSelected(point);
 }
 
 void DisplayPlot::zoomBaseUpdate()
@@ -968,7 +968,7 @@ void DisplayPlot::setVertUnitsPerDiv(double upd, int axisIdx)
 		min = (d_yAxisMin * upd) + offset;
 		max = (d_yAxisMax * upd) + offset;
 		setAxisScale(QwtAxisId(QwtPlot::yLeft, axisIdx), min, max, upd);
-		emit vertScaleDivisionChanged(upd);
+		Q_EMIT vertScaleDivisionChanged(upd);
 	}
 }
 
@@ -988,7 +988,7 @@ void DisplayPlot::setHorizUnitsPerDiv(double upd)
 		min = (d_xAxisMin * upd) + offset;
 		max = (d_xAxisMax * upd) + offset;
 		setAxisScale(QwtPlot::xBottom, min, max, upd);
-		emit horizScaleDivisionChanged(upd);
+		Q_EMIT horizScaleDivisionChanged(upd);
 	}
 }
 
@@ -1097,7 +1097,7 @@ void DisplayPlot::onHorizAxisOffsetDecrease()
 
 	this->setHorizOffset(offset);
 	this->replot();
-	emit horizScaleOffsetChanged(offset);
+	Q_EMIT horizScaleOffsetChanged(offset);
 }
 
 void DisplayPlot::onHorizAxisOffsetIncrease()
@@ -1113,7 +1113,7 @@ void DisplayPlot::onHorizAxisOffsetIncrease()
 
 	this->setHorizOffset(offset);
 	this->replot();
-	emit horizScaleOffsetChanged(offset);
+	Q_EMIT horizScaleOffsetChanged(offset);
 }
 
 void DisplayPlot::onVertAxisOffsetDecrease()
@@ -1133,7 +1133,7 @@ void DisplayPlot::onVertAxisOffsetDecrease()
 
 	this->setVertOffset(offset, osc_adj->axisId().id);
 	this->replot();
-	emit vertScaleOffsetChanged(offset);
+	Q_EMIT vertScaleOffsetChanged(offset);
 }
 
 void DisplayPlot::onVertAxisOffsetIncrease()
@@ -1155,7 +1155,7 @@ void DisplayPlot::onVertAxisOffsetIncrease()
 	this->setVertOffset(offset, osc_adj->axisId().id);
 	this->replot();
 
-	emit vertScaleOffsetChanged(offset);
+	Q_EMIT vertScaleOffsetChanged(offset);
 }
 
 void DisplayPlot::_onXbottomAxisWidgetScaleDivChanged()

@@ -47,7 +47,7 @@ ConnectDialog::~ConnectDialog()
 void ConnectDialog::btnClicked()
 {
 	if (connected)
-		emit newContext(uri);
+		Q_EMIT newContext(uri);
 	else
 		validateInput();
 }

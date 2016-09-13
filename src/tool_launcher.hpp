@@ -50,10 +50,10 @@ namespace adiscope {
 		explicit ToolLauncher(QWidget *parent = 0);
 		~ToolLauncher();
 
-	signals:
+	Q_SIGNALS:
 		void calibrationDone(float gain_ch1, float gain_ch2);
 
-	private slots:
+	private Q_SLOTS:
 		void on_btnOscilloscope_clicked();
 		void on_btnSignalGenerator_clicked();
 		void on_btnDMM_clicked();

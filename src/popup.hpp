@@ -66,7 +66,7 @@ private:
 protected:
 	void showEvent(QShowEvent *e);
 
-signals:
+Q_SIGNALS:
 	void closed();
 
 private:

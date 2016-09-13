@@ -162,8 +162,8 @@ void OscAdjuster::widgetMouseWheelEvent(QWheelEvent *wheelEvent)
 	// TO DO: Check if this works for touch screens and fix if necessary
 	if (y != 0) {
 		if (y > 0)
-			emit wheelUp(y);
+			Q_EMIT wheelUp(y);
 		else
-			emit wheelDown(y);
+			Q_EMIT wheelDown(y);
 	}
 }

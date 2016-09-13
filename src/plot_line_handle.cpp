@@ -70,7 +70,7 @@ void PlotLineHandle::setGrabbed(bool grabbed)
 {
 	if (m_grabbed != grabbed) {
 		m_grabbed = grabbed;
-		emit grabbedChanged(grabbed);
+		Q_EMIT grabbedChanged(grabbed);
 	}
 }
 
@@ -88,7 +88,7 @@ PlotLineHandleH::PlotLineHandleH(const QPixmap &handleIcon, QWidget *parent,
 
 void PlotLineHandleH::triggerMove()
 {
-	emit positionChanged(m_current_pos);
+	Q_EMIT positionChanged(m_current_pos);
 }
 
 void PlotLineHandleH::setPosition(int pos)
@@ -124,7 +124,7 @@ void PlotLineHandleH::moveWithinParent(int x, int y)
 		move(x, this->y());
 
 		if (!m_enable_silent_move)
-			emit positionChanged(centerPos);
+			Q_EMIT positionChanged(centerPos);
 	}
 	m_enable_silent_move = false;
 	m_current_pos = centerPos;
@@ -181,7 +181,7 @@ PlotLineHandleV::PlotLineHandleV(const QPixmap &handleIcon, QWidget *parent,
 
 void PlotLineHandleV::triggerMove()
 {
-	emit positionChanged(m_current_pos);
+	Q_EMIT positionChanged(m_current_pos);
 }
 
 void PlotLineHandleV::setPosition(int pos)
@@ -216,7 +216,7 @@ void PlotLineHandleV::moveWithinParent(int x, int y)
 	if (centerPos != oldCenterPos) {
 		move(this->x(), y);
 		if (!m_enable_silent_move)
-			emit positionChanged(centerPos);
+			Q_EMIT positionChanged(centerPos);
 	}
 	m_enable_silent_move = false;
 	m_current_pos = centerPos;
@@ -295,7 +295,7 @@ void FreePlotLineHandleH::moveWithinParent(int x, int y)
 		move(x, this->y());
 
 		if (!m_enable_silent_move) {
-			emit positionChanged(centerPos);
+			Q_EMIT positionChanged(centerPos);
 			this->update();
 		}
 		m_current_pos = centerPos;
@@ -367,7 +367,7 @@ void FreePlotLineHandleV::moveWithinParent(int x, int y)
 		move(this->x(), y);
 
 		if (!m_enable_silent_move) {
-			emit positionChanged(centerPos);
+			Q_EMIT positionChanged(centerPos);
 			this->update();
 		}
 		m_current_pos = centerPos;

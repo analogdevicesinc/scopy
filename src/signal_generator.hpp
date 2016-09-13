@@ -94,7 +94,7 @@ namespace adiscope {
 		gr::basic_block_sptr getSource(QWidget *obj,
 				gr::top_block_sptr top);
 
-	private slots:
+	private Q_SLOTS:
 		void constantValueChanged(double val);
 		void amplitudeChanged(double val);
 		void offsetChanged(double val);

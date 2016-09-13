@@ -62,12 +62,12 @@ public:
 		double ymin, double ymax);
   void set_pen_size(int size);
 
-public slots:
+public Q_SLOTS:
   void setAutoScale(bool state);
 
   void customEvent(QEvent * e);
 
-private slots:
+private Q_SLOTS:
   void newData(const QEvent*);
 
 private:

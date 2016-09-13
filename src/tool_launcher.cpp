@@ -320,7 +320,7 @@ void adiscope::ToolLauncher::calibrate()
 	ui->btnDMM->setText(old_dmm_text);
 	ui->btnOscilloscope->setText(old_osc_text);
 
-	emit calibrationDone(gain_ch1, gain_ch2);
+	Q_EMIT calibrationDone(gain_ch1, gain_ch2);
 }
 
 void adiscope::ToolLauncher::enableCalibTools(float gain_ch1, float gain_ch2)

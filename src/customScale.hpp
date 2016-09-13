@@ -33,12 +33,12 @@ namespace adiscope {
 			explicit CustomScale(QWidget *parent = nullptr);
 			~CustomScale();
 
-		public slots:
+		public Q_SLOTS:
 			void setValue(double);
 			void start();
 			void stop();
 
-		private slots:
+		private Q_SLOTS:
 			void updateScale(const QwtScaleDiv);
 
 		private:

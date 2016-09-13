@@ -98,10 +98,10 @@ void MenuAnim::setMinimumSize(QSize size)
 
 void MenuAnim::closeAnimFinished()
 {
-	emit finished(false);
+	Q_EMIT finished(false);
 }
 
 void MenuAnim::openAnimFinished()
 {
-	emit finished(true);
+	Q_EMIT finished(true);
 }

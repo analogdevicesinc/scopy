@@ -235,7 +235,7 @@ void SpinBoxA::setValue(double value)
 	}
 
 	if (emitValueChanged)
-		emit valueChanged(m_value);
+		Q_EMIT valueChanged(m_value);
 }
 
 double SpinBoxA::minValue()

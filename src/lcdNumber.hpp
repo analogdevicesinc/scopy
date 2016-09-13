@@ -32,7 +32,7 @@ namespace adiscope {
 					unsigned precision = 3);
 			~LcdNumber() {}
 
-		public slots:
+		public Q_SLOTS:
 			void display(double num);
 
 		private:

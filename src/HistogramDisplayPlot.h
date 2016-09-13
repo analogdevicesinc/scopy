@@ -49,7 +49,7 @@ public:
 
   void replot();
 
-public slots:
+public Q_SLOTS:
   void setAutoScale(bool state);
   void setAutoScaleX();
   void setSemilogx(bool en);
@@ -65,7 +65,7 @@ public slots:
 
   void customEvent(QEvent * e);
 
-private slots:
+private Q_SLOTS:
   void newData(const QEvent*);
 
 private:

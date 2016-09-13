@@ -80,17 +80,17 @@ public:
 
 	bool isInFineMode();
 
-public slots:
+public Q_SLOTS:
 	void setValue(double);
 	void setFineMode(bool);
 
 	virtual void stepUp() = 0;
 	virtual void stepDown() = 0;
 
-signals:
+Q_SIGNALS:
 	void valueChanged(double);
 
-protected slots:
+protected Q_SLOTS:
 	void onUpButtonPressed();
 	void onDownButtonPressed();
 	void onComboboxIndexChanged(int);
@@ -125,7 +125,7 @@ public:
 	void setMinValue(double);
 	void setMaxValue(double);
 
-public slots:
+public Q_SLOTS:
 	void stepUp();
 	void stepDown();
 
@@ -147,7 +147,7 @@ public:
 	double step();
 	void setStep(double);
 
-public slots:
+public Q_SLOTS:
 	void stepUp();
 	void stepDown();
 

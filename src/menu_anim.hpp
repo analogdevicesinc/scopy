@@ -35,13 +35,13 @@ namespace adiscope {
 
 		void setMinimumSize(QSize size);
 
-	signals:
+	Q_SIGNALS:
 		void finished(bool opened);
 
-	public slots:
+	public Q_SLOTS:
 		void toggleMenu(bool open);
 
-	private slots:
+	private Q_SLOTS:
 		void closeAnimFinished();
 		void openAnimFinished();
 

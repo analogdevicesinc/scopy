@@ -92,7 +92,7 @@ void Symbol::setPlotCoord(const QPointF &pos)
 		d_plotCoord = pos;
 		updateSurfacePos();
 
-		emit positionChanged(d_plotCoord.x(), d_plotCoord.y());
+		Q_EMIT positionChanged(d_plotCoord.x(), d_plotCoord.y());
 	}
 }
 
@@ -104,7 +104,7 @@ QPointF Symbol::plotCoord()
 void Symbol::setSelected(bool sel)
 {
 	d_selected = sel;
-	emit selected(sel);
+	Q_EMIT selected(sel);
 }
 
 bool Symbol::isSelected()
@@ -174,7 +174,7 @@ void Symbol::setVisible(bool en)
 {
 	if (d_visible != en) {
 		d_visible = en;
-		emit visibilityChanged(en);
+		Q_EMIT visibilityChanged(en);
 	}
 }
 
@@ -235,7 +235,7 @@ void Symbol::updateSurfacePos()
 
 	pixelPos = transform(plotCoord).toPoint();
 	d_surface.moveTo(pixelPos - d_anchor);
-	emit pixelPositionChanged(pixelPos.x(), pixelPos.y());
+	Q_EMIT pixelPositionChanged(pixelPos.x(), pixelPos.y());
 }
 
 void Symbol::updatePlotCoordFromSurfacePos()
@@ -363,14 +363,14 @@ void VertDebugSymbol::onBasePositionChanged(double x, double y)
 {
 	Q_UNUSED(x);
 
-	emit positionChanged(y);
+	Q_EMIT positionChanged(y);
 }
 
 void VertDebugSymbol::onBasePixelPositionChanged(int x, int y)
 {
 	Q_UNUSED(x);
 
-	emit pixelPositionChanged(y);
+	Q_EMIT pixelPositionChanged(y);
 }
 
 /*
@@ -428,7 +428,7 @@ bool HorizDebugSymbol::moveWith(double plotDeltaX, double plotDeltaY)
 	}
 
 	if (canMove)
-		emit positionChanged(deltaPoint.x());
+		Q_EMIT positionChanged(deltaPoint.x());
 
 	return canMove;
 }
@@ -454,14 +454,14 @@ void HorizDebugSymbol::onBasePositionChanged(double x, double y)
 {
 	Q_UNUSED(y);
 
-	emit positionChanged(x);
+	Q_EMIT positionChanged(x);
 }
 
 void HorizDebugSymbol::onBasePixelPositionChanged(int x, int y)
 {
 	Q_UNUSED(y);
 
-	emit pixelPositionChanged(x);
+	Q_EMIT pixelPositionChanged(x);
 }
 
 /*

@@ -41,7 +41,7 @@ public:
 	void setPen(const QPen&);
 	const QPen& pen();
 
-signals:
+Q_SIGNALS:
 	void positionChanged(int);
 	void grabbedChanged(bool);
 

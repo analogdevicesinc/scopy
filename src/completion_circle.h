@@ -39,11 +39,11 @@ public:
 	void setMaximumDouble(double);
 	void setIsLogScale(bool);
 
-public slots:
+public Q_SLOTS:
 	void setValueDouble(double);
 	void setToggled(bool);
 
-signals:
+Q_SIGNALS:
 	void toggled(bool);
 
 protected:

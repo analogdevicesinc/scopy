@@ -946,7 +946,7 @@ void Oscilloscope::onTriggerSettingsDelayChanged(double value)
 {
 	if (triggerDelay != value) {
 		triggerDelay = value;
-		emit triggerDelayChanged(value);
+		Q_EMIT triggerDelayChanged(value);
 	}
 }
 
@@ -956,7 +956,7 @@ void Oscilloscope::onTimeTriggerDelayChanged(double value)
 
 	if (triggerDelay != delay) {
 		triggerDelay = delay;
-		emit triggerDelayChanged(delay);
+		Q_EMIT triggerDelayChanged(delay);
 	}
 }
 
@@ -1077,7 +1077,7 @@ void adiscope::Oscilloscope::channel_name_checked(bool checked)
 		id = selBtn->property("id").toUInt();
 	if (selectedChannel != id) {
 		selectedChannel = id;
-		emit selectedChannelChanged(id);
+		Q_EMIT selectedChannelChanged(id);
 	}
 
 	if (checked && plot.measurementsEnabled() && id != -1) {

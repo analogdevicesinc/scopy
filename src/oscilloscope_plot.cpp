@@ -512,7 +512,7 @@ void CapturePlot::onTimeTriggerHandlePosChanged(int pos)
 
 	xMap.setScaleInterval(min, max);
 	double time = xMap.invTransform(pos);
-	emit timeTriggerValueChanged(-time);
+	Q_EMIT timeTriggerValueChanged(-time);
 }
 
 
@@ -568,7 +568,7 @@ void CapturePlot::onChannelAdded(int chnIdx)
 			this->setVertOffset(-offset, chnIdx);
 			this->replot();
 
-			emit channelOffsetChanged(-offset);
+			Q_EMIT channelOffsetChanged(-offset);
 		});
 	/* When bar position changes due to plot resizes update the handle */
 	connect(chOffsetBar, &HorizBar::pixelPositionChanged,
@@ -614,7 +614,7 @@ void CapturePlot::onNewDataReceived()
 
 	measure(d_chnToMeasure);
 
-	emit measurementsAvailable();
+	Q_EMIT measurementsAvailable();
 }
 
 double CapturePlot::measuredPeriod()

@@ -52,7 +52,7 @@ public:
 
 	virtual bool eventFilter(QObject *object, QEvent *event);
 
-signals:
+Q_SIGNALS:
 	void wheelUp(int);
 	void wheelDown(int);
 
@@ -87,7 +87,7 @@ public:
 
 	}
 
-signals:
+Q_SIGNALS:
 	void upMovement(double);
 	void downMovement(double);
 
@@ -99,9 +99,9 @@ protected:
 			return;
 
 		if (factor > 1.0)
-			emit upMovement(factor);
+			Q_EMIT upMovement(factor);
 		else
-			emit downMovement(factor);
+			Q_EMIT downMovement(factor);
 	}
 	virtual void widgetMouseMoveEvent(QMouseEvent *mouseEvent)
 	{
@@ -136,7 +136,7 @@ public:
 
 	}
 
-signals:
+Q_SIGNALS:
 	void leftMovement(double);
 	void rightMovement(double);
 
@@ -148,9 +148,9 @@ protected:
 			return;
 
 		if (factor > 1.0)
-			emit leftMovement(factor);
+			Q_EMIT leftMovement(factor);
 		else
-			emit rightMovement(factor);
+			Q_EMIT rightMovement(factor);
 	}
 
 	virtual void widgetMouseMoveEvent(QMouseEvent *mouseEvent)

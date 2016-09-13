@@ -117,7 +117,7 @@ void CompletionCircle::mousePressEvent(QMouseEvent *e)
 		if (pointInsideCircle(e->pos(), m_xc, m_yc, m_radius - 2)) {
 			m_pressed = !m_pressed;
 			repaint();
-			emit toggled(m_pressed);
+			Q_EMIT toggled(m_pressed);
 		}
 	}
 }
@@ -173,7 +173,7 @@ void CompletionCircle::setToggled(bool on)
 {
 	if (m_pressed != on) {
 		m_pressed = on;
-		emit toggled(on);
+		Q_EMIT toggled(on);
 	}
 }
 

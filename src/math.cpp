@@ -170,7 +170,7 @@ void Math::validateFunction()
 	try {
 		gr::iio::iio_math::make(function.toStdString(), num_inputs);
 
-		emit functionValid(function);
+		Q_EMIT functionValid(function);
 
 		setDynamicProperty(ui.function, "valid", true);
 		setDynamicProperty(ui.btnApply, "valid", true);
@@ -187,7 +187,7 @@ void Math::resetState()
 	setDynamicProperty(ui.function, "invalid", false);
 	setDynamicProperty(ui.btnApply, "invalid", false);
 
-	emit stateReseted();
+	Q_EMIT stateReseted();
 }
 
 void Math::setFunction(const QString& function)
