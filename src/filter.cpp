@@ -34,6 +34,7 @@ static const std::string tool_names[] = {
 	"signal-generator",
 	"voltmeter",
 	"power-controller",
+	"logic-analyzer-rx"
 };
 
 Filter::Filter(const struct iio_context *ctx)

@@ -1,26 +1,40 @@
 /*
- * Shamelessly stolen from the PulseView project.
+ * This file is part of the PulseView project.
  *
  * Copyright (C) 2013 Joel Holdsworth <joel@airwebreathe.org.uk>
  *
- * License: GPLv2+
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
-#include "popup.hpp"
 
 #include <algorithm>
 
 #include <assert.h>
 
+#include <QtGui>
 #include <QApplication>
 #include <QDesktopWidget>
-#include <QMouseEvent>
-#include <QPainter>
+#include <QLineEdit>
+
+#include "popup.hpp"
 
 using std::max;
 using std::min;
 
-using namespace adiscope;
+namespace pv {
+namespace widgets {
 
 const unsigned int Popup::ArrowLength = 10;
 const unsigned int Popup::ArrowOverlap = 3;
@@ -28,54 +42,95 @@ const unsigned int Popup::MarginWidth = 6;
 
 Popup::Popup(QWidget *parent) :
 	QWidget(parent, Qt::Popup | Qt::FramelessWindowHint),
-	_point(),
-	_pos(Left)
+	point_(),
+	pos_(Left)
 {
 }
 
 const QPoint& Popup::point() const
 {
-	return _point;
+	return point_;
 }
 
 Popup::Position Popup::position() const
 {
-	return _pos;
+	return pos_;
 }
 
 void Popup::set_position(const QPoint point, Position pos)
 {
-	_point = point, _pos = pos;
+	point_ = point, pos_ = pos;
 
 	setContentsMargins(
 		MarginWidth + ((pos == Right) ? ArrowLength : 0),
 		MarginWidth + ((pos == Bottom) ? ArrowLength : 0),
 		MarginWidth + ((pos == Left) ? ArrowLength : 0),
 		MarginWidth + ((pos == Top) ? ArrowLength : 0));
+}
 
+bool Popup::eventFilter(QObject *obj, QEvent *event)
+{
+	QKeyEvent *keyEvent;
+
+	(void)obj;
+
+	if (event->type() == QEvent::KeyPress) {
+		keyEvent = static_cast<QKeyEvent*>(event);
+		if (keyEvent->key() == Qt::Key_Enter ||
+		    keyEvent->key() == Qt::Key_Return) {
+			close();
+			return true;
+		}
+	}
+
+	return false;
+}
+
+void Popup::show()
+{
+	QLineEdit* le;
+
+	QWidget::show();
+
+	// We want to close the popup when the Enter key was
+	// pressed and the first editable widget had focus.
+	if ((le = this->findChild<QLineEdit*>())) {
+
+		// For combo boxes we need to hook into the parent of
+		// the line edit (i.e. the QComboBox). For edit boxes
+		// we hook into the widget directly.
+		if (le->parent()->metaObject()->className() ==
+				this->metaObject()->className())
+			le->installEventFilter(this);
+		else
+			le->parent()->installEventFilter(this);
+
+		le->selectAll();
+		le->setFocus();
+	}
 }
 
 bool Popup::space_for_arrow() const
 {
 	// Check if there is room for the arrow
-	switch (_pos) {
+	switch (pos_) {
 	case Right:
-		if (_point.x() > x())
+		if (point_.x() > x())
 			return false;
 		return true;
 
 	case Bottom:
-		if (_point.y() > y())
+		if (point_.y() > y())
 			return false;
-		return true;
+		return true;		
 
 	case Left:
-		if (_point.x() < (x() + width()))
+		if (point_.x() < (x() + width()))
 			return false;
 		return true;
 
 	case Top:
-		if (_point.y() < (y() + height()))
+		if (point_.y() < (y() + height()))
 			return false;
 		return true;
 	}
@@ -87,11 +142,10 @@ QPolygon Popup::arrow_polygon() const
 {
 	QPolygon poly;
 
-	const QPoint p = mapFromGlobal(_point);
-	const int l = ArrowLength + ArrowOverlap;
+	const QPoint p = mapFromGlobal(point_);
+	const int l = ArrowLength + ArrowOverlap; 
 
-	switch (_pos)
-        {
+	switch (pos_) {
 	case Right:
 		poly << QPoint(p.x() + l, p.y() - l);
 		break;
@@ -100,7 +154,7 @@ QPolygon Popup::arrow_polygon() const
 		poly << QPoint(p.x() - l, p.y() + l);
 		break;
 
-        case Left:
+	case Left:
 	case Top:
 		poly << QPoint(p.x() - l, p.y() - l);
 		break;
@@ -108,17 +162,16 @@ QPolygon Popup::arrow_polygon() const
 
 	poly << p;
 
-	switch (_pos)
-        {
+	switch (pos_) {
 	case Right:
 	case Bottom:
 		poly << QPoint(p.x() + l, p.y() + l);
 		break;
 
-        case Left:
+	case Left:
 		poly << QPoint(p.x() - l, p.y() + l);
 		break;
-
+		
 	case Top:
 		poly << QPoint(p.x() + l, p.y() - l);
 		break;
@@ -135,11 +188,11 @@ QRegion Popup::arrow_region() const
 QRect Popup::bubble_rect() const
 {
 	return QRect(
-		QPoint((_pos == Right) ? ArrowLength : 0,
-			(_pos == Bottom) ? ArrowLength : 0),
-		QSize(width() - ((_pos == Left || _pos == Right) ?
+		QPoint((pos_ == Right) ? ArrowLength : 0,
+			(pos_ == Bottom) ? ArrowLength : 0),
+		QSize(width() - ((pos_ == Left || pos_ == Right) ?
 				ArrowLength : 0),
-			height() - ((_pos == Top || _pos == Bottom) ?
+			height() - ((pos_ == Top || pos_ == Bottom) ?
 				ArrowLength : 0)));
 }
 
@@ -174,19 +227,19 @@ void Popup::reposition_widget()
 	QPoint o;
 
 	const QRect screen_rect = QApplication::desktop()->availableGeometry(
-		QApplication::desktop()->screenNumber(_point));
+		QApplication::desktop()->screenNumber(point_));
 
-	if (_pos == Right || _pos == Left)
+	if (pos_ == Right || pos_ == Left)
 		o.ry() = -height() / 2;
 	else
 		o.rx() = -width() / 2;
 
-	if (_pos == Left)
+	if (pos_ == Left)
 		o.rx() = -width();
-	else if(_pos == Top)
+	else if (pos_ == Top)
 		o.ry() = -height();
 
-	o += _point;
+	o += point_;
 	move(max(min(o.x(), screen_rect.right() - width()),
 			screen_rect.left()),
 		max(min(o.y(), screen_rect.bottom() - height()),
@@ -225,7 +278,7 @@ void Popup::paintEvent(QPaintEvent*)
 
 	const QRegion a(arrow_region());
 	const QRegion arrow_outline = a.subtracted(
-		a.translated(ArrowOffsets[_pos]));
+		a.translated(ArrowOffsets[pos_]));
 
 	painter.setClipRegion(bubble_outline.subtracted(a).united(
 		arrow_outline));
@@ -239,13 +292,13 @@ void Popup::resizeEvent(QResizeEvent*)
 	setMask(popup_region());
 }
 
-void Popup::mouseReleaseEvent(QMouseEvent *e)
+void Popup::mouseReleaseEvent(QMouseEvent *event)
 {
-	assert(e);
+	assert(event);
 
 	// We need our own out-of-bounds click handler because QWidget counts
 	// the drop-shadow region as inside the widget
-	if(!bubble_rect().contains(e->pos()))
+	if (!bubble_rect().contains(event->pos()))
 		close();
 }
 
@@ -253,3 +306,6 @@ void Popup::showEvent(QShowEvent*)
 {
 	reposition_widget();
 }
+
+} // namespace widgets
+} // namespace pv

@@ -37,7 +37,8 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	QMainWindow(parent),
 	ui(new Ui::ToolLauncher), ctx(nullptr),
 	power_control(nullptr), dmm(nullptr), signal_generator(nullptr),
-	oscilloscope(nullptr), current(nullptr), filter(nullptr)
+	oscilloscope(nullptr), current(nullptr), filter(nullptr),
+	logic_analyzer(nullptr)
 {
 	struct iio_context_info **info;
 	unsigned int nb_contexts;
@@ -94,7 +95,7 @@ ToolLauncher::~ToolLauncher()
 
 void ToolLauncher::destroyPopup()
 {
-	Popup *popup = static_cast<Popup *>(QObject::sender());
+	auto *popup = static_cast<pv::widgets::Popup *>(QObject::sender());
 
 	popup->deleteLater();
 }
@@ -117,13 +118,13 @@ void ToolLauncher::addContext(const QString& uri)
 
 void ToolLauncher::addRemoteContext()
 {
-	Popup *popup = new Popup(ui->homeWidget);
+	pv::widgets::Popup *popup = new pv::widgets::Popup(ui->homeWidget);
 	connect(popup, SIGNAL(closed()), this, SLOT(destroyPopup()));
 
 	QPoint pos = ui->groupBox->mapToGlobal(ui->btnAdd->pos());
 	pos += QPoint(ui->btnAdd->width() / 2, ui->btnAdd->height());
 
-	popup->set_position(pos, Popup::Bottom);
+	popup->set_position(pos, pv::widgets::Popup::Bottom);
 	popup->show();
 
 	ConnectDialog *dialog = new ConnectDialog(popup);
@@ -163,6 +164,11 @@ void ToolLauncher::on_btnDMM_clicked()
 void ToolLauncher::on_btnPowerControl_clicked()
 {
 	swapMenu(static_cast<QWidget *>(power_control));
+}
+
+void ToolLauncher::on_btnLogicAnalyzer_clicked()
+{
+	swapMenu(static_cast<QWidget *>(logic_analyzer));
 }
 
 void ToolLauncher::window_destroyed()
@@ -263,6 +269,7 @@ void adiscope::ToolLauncher::destroyContext()
 	ui->signalGenerator->setDisabled(true);
 	ui->dmm->setDisabled(true);
 	ui->powerControl->setDisabled(true);
+	ui->logicAnalyzer->setDisabled(true);
 
 	for (auto it = windows.begin(); it != windows.end(); ++it)
 		delete *it;
@@ -286,6 +293,11 @@ void adiscope::ToolLauncher::destroyContext()
 	if (oscilloscope) {
 		delete oscilloscope;
 		oscilloscope = nullptr;
+	}
+
+	if(logic_analyzer) {
+		delete logic_analyzer;
+		logic_analyzer = nullptr;
 	}
 
 	if (filter) {
@@ -367,6 +379,14 @@ bool adiscope::ToolLauncher::switchContext(QString &uri)
 				ui->stopPowerControl, this);
 		power_control->setVisible(false);
 		ui->powerControl->setEnabled(true);
+	}
+
+
+	if (filter->compatible(TOOL_LOGIC_ANALYZER)) {
+		logic_analyzer = new LogicAnalyzer(ctx, filter,
+				ui->stopLogicAnalyzer, this);
+		logic_analyzer->setVisible(false);
+		ui->logicAnalyzer->setEnabled(true);
 	}
 
 	QtConcurrent::run(std::bind(&ToolLauncher::calibrate, this));

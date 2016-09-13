@@ -789,20 +789,52 @@ background-image: url(:/menu/play.png);
            </widget>
           </item>
           <item>
-           <spacer name="horizontalSpacer_7">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+           <widget class="QPushButton" name="stopLogicAnalyzer">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
             </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Fixed</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
+            <property name="minimumSize">
              <size>
               <width>32</width>
-              <height>0</height>
+              <height>32</height>
              </size>
             </property>
-           </spacer>
+            <property name="maximumSize">
+             <size>
+              <width>32</width>
+              <height>32</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QPushButton {
+background-repeat: no-repeat;
+background-position: center center;
+}
+
+QPushButton:enabled {
+background-image: url(:/menu/stop.png);
+}
+
+QPushButton:checked {
+background-image: url(:/menu/play.png);
+}</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>8</width>
+              <height>10</height>
+             </size>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -1088,7 +1120,7 @@ font-weight: bold;
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>90</width>
+                  <width>102</width>
                   <height>64</height>
                  </size>
                 </property>
@@ -1209,7 +1241,7 @@ background-color: red;
           </widget>
          </item>
          <item>
-          <widget class="QWebView" name="webView">
+          <widget class="QWebView" name="webView" native="true">
            <property name="minimumSize">
             <size>
              <width>880</width>
@@ -1219,12 +1251,12 @@ background-color: red;
            <property name="styleSheet">
             <string notr="true">background-color: white;</string>
            </property>
-           <property name="url">
+           <property name="url" stdset="0">
             <url>
              <string>https://wiki.analog.com/doku.php</string>
             </url>
            </property>
-           <property name="zoomFactor">
+           <property name="zoomFactor" stdset="0">
             <double>0.800000011920929</double>
            </property>
           </widget>

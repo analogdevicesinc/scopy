@@ -60,11 +60,42 @@ find_package(Gnuradio PATHS "c:/Program Files/gnuradio/lib/cmake/gnuradio" REQUI
 GR_MODULE(IIO gnuradio-iio gnuradio/iio/api.h gnuradio-iio)
 
 add_definitions(-DBOOST_ALL_DYN_LINK)
-find_package(Boost "1.58" COMPONENTS system REQUIRED)
+find_package(Boost "1.58" COMPONENTS system filesystem thread REQUIRED)
 
 set(VC_PATH "$ENV{VS120COMNTOOLS}/../../VC")
 find_library(IIO_LIBRARIES NAMES iio libiio PATHS ${VC_PATH}/lib ${VC_PATH}/lib/amd64)
 find_path(IIO_INCLUDE_DIRS iio.h PATHS ${VC_PATH}/include)
+
+include(GNUInstallDirs)
+
+find_library(GLIB_LIBRARIES glib-2.0)
+find_library(GLIBMM_LIBRARIES NAMES glibmm-2.4 glibmm-2.44)
+find_library(SIGCPP_LIBRARIES sigc-2.4)
+find_library(LIBSIGROK_LIBRARIES sigrok)
+find_library(LIBSIGROKCXX_LIBRARIES sigrokcxx)
+find_library(LIBSIGROK_DECODE_LIBRARIES sigrokdecode)
+
+if (WIN32)
+	find_library(PYTHON_LIBRARIES python36)
+	find_path(GLIB_INCLUDE_DIRS glib.h PATH_SUFFIXES glib-2.0)
+	find_path(GLIBCONFIG_INCLUDE_DIRS glibconfig.h PATH_SUFFIXES ../lib/glib-2.0/include)
+	find_path(GLIBMM_INCLUDE_DIRS glibmm.h PATH_SUFFIXES glibmm-2.44)
+	find_path(GLIBMMCONFIG_INCLUDE_DIRS glibmmconfig.h PATH_SUFFIXES ../lib/glibmm-2.44/include)
+	find_path(SIGCPP_INCLUDE_DIRS sigc++/sigc++.h PATH_SUFFIXES sigc++-2.4)
+	find_path(SIGCPPCONFIG_INCLUDE_DIRS sigc++config.h PATH_SUFFIXES ../lib/sigc++-2.4/include)
+	find_path(LIBSIGROK_INCLUDE_DIRS libsigrok/libsigrok.h)
+	find_path(LIBSIGROKCXX_INCLUDE_DIRS libsigrokcxx/libsigrokcxx.hpp)
+	find_path(LIBSIGROK_DECODE_INCLUDE_DIRS libsigrokdecode/libsigrokdecode.h)
+else (WIN32)
+	find_package(PkgConfig)
+	pkg_check_modules(PYTHON REQUIRED python3)
+	pkg_check_modules(GLIB REQUIRED glib-2.0)
+	pkg_check_modules(GLIBMM REQUIRED glibmm-2.4)
+	pkg_check_modules(SIGCPP REQUIRED sigc++-2.0)
+	pkg_check_modules(LIBSIGROK REQUIRED libsigrok)
+	pkg_check_modules(LIBSIGROKCXX REQUIRED libsigrokcxx)
+	pkg_check_modules(LIBSIGROK_DECODE REQUIRED libsigrokdecode)
+endif (WIN32)
 
 include_directories(
 	${GNURADIO_ALL_INCLUDE_DIRS}
@@ -74,6 +105,15 @@ include_directories(
 	${Qt5Concurrent_INCLUDE_DIRS}
 	${QWT_INCLUDE_DIRS}
 	${IIO_INCLUDE_DIRS}
+	${LIBSIGROK_DECODE_INCLUDE_DIRS}
+	${LIBSIGROKCXX_INCLUDE_DIRS}
+	${LIBSIGROK_INCLUDE_DIRS}
+	${GLIB_INCLUDE_DIRS}
+	${GLIBCONFIG_INCLUDE_DIRS}
+	${GLIBMM_INCLUDE_DIRS}
+	${GLIBMMCONFIG_INCLUDE_DIRS}
+	${SIGCPP_INCLUDE_DIRS}
+	${SIGCPPCONFIG_INCLUDE_DIRS}
 	${CMAKE_SOURCE_DIR}/src
 )
 
@@ -82,9 +122,22 @@ link_directories(
 	${GNURADIO_RUNTIME_LIBRARY_DIRS}
 )
 
-FILE(GLOB SRC_LIST src/*.cpp src/*.cc)
+FILE(GLOB SRC_LIST  src/*.cpp src/*.cc
+	src/pulseview/*.cpp
+	src/pulseview/pv/*.cpp
+	src/pulseview/pv/binding/*.cpp
+	src/pulseview/pv/data/*.cpp
+	src/pulseview/pv/data/decode/*.cpp
+	src/pulseview/pv/devices/*.cpp
+	src/pulseview/pv/dialogs/*.cpp
+	src/pulseview/pv/popups/*.cpp
+	src/pulseview/pv/prop/*.cpp
+	src/pulseview/pv/toolbars/*.cpp
+	src/pulseview/pv/view/*.cpp
+	src/pulseview/pv/widgets/*.cpp
+)
 
-FILE(GLOB M2KSCOPE_UIS ui/*.ui)
+FILE(GLOB M2KSCOPE_UIS ui/*.ui src/pulseview/pv/dialogs/*.ui)
 qt5_wrap_ui (m2kscope_FORMS_HEADERS ${M2KSCOPE_UIS})
 
 FILE(GLOB M2KSCOPE_RESOURCES resources/*.qrc)
@@ -101,6 +154,11 @@ add_executable(${PROJECT_NAME} WIN32
 		${m2kscope_FORMS_HEADERS}
 )
 
+link_directories(
+	${Boost_LIBRARY_DIRS}
+	${GNURADIO_RUNTIME_LIBRARY_DIRS}
+)
+
 target_link_libraries(${PROJECT_NAME} LINK_PRIVATE
 		${Qt5Widgets_LIBRARIES}
 		${Qt5WebKitWidgets_LIBRARIES}
@@ -109,6 +167,13 @@ target_link_libraries(${PROJECT_NAME} LINK_PRIVATE
 		${Boost_LIBRARIES}
 		${QWT_LIBRARIES}
 		${IIO_LIBRARIES}
+		${PYTHON_LIBRARIES}
+		${LIBSIGROK_LIBRARIES}
+		${LIBSIGROKCXX_LIBRARIES}
+		${LIBSIGROK_DECODE_LIBRARIES}
+		${GLIBMM_LIBRARIES}
+		${SIGCPP_LIBRARIES}
+		${GLIB_LIBRARIES}
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
