@@ -515,8 +515,8 @@ void CapturePlot::onChannelAdded(int chnIdx)
 	connect(chOffsetHdl, &RoundedHandleV::positionChanged,
 		[=](int pos) {
 			QwtScaleMap yMap = this->canvasMap(QwtAxisId(QwtPlot::yLeft, chnIdx));
-			double min = -(yAxisNumDiv() / 2.0) * VertUnitsPerDiv();
-			double max = (yAxisNumDiv() / 2.0) * VertUnitsPerDiv();
+			double min = -(yAxisNumDiv() / 2.0) * VertUnitsPerDiv(chnIdx);
+			double max = (yAxisNumDiv() / 2.0) * VertUnitsPerDiv(chnIdx);
 
 			yMap.setScaleInterval(min, max);
 			double offset = yMap.invTransform(pos);
