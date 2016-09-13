@@ -1,0 +1,12 @@
+QwtPlot {
+  background-color: #141416
+}
+
+QwtPlotCanvas {
+  background-color: #141416
+}
+
+QwtScaleWidget {
+  color: #6E6E6F;
+  background-color: #141416
+}

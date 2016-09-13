@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 39.1 (31720) - http://www.bohemiancoding.com/sketch -->
+    <title>Group</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="main" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="network-analyzer-HD" transform="translate(-1220.000000, -300.000000)">
+            <g id="Group" transform="translate(1220.000000, 300.000000)">
+                <rect id="Rounded_Rectangle_1_copy_12" fill="#FFFFFF" x="0" y="0" width="30" height="30" rx="4"></rect>
+                <polygon id="Rectangle_6_copy_12-3" fill="#4A64FF" points="20 14 15 18.99 10 14 11 13 15 17 19 13"></polygon>
+            </g>
+        </g>
+    </g>
+</svg>
