@@ -112,6 +112,9 @@ public:
 	unsigned long long channelsDataLength, bool curvesAttached = true);
   bool unregisterSink(std::string sinkName);
 
+signals:
+  void channelAdded(int);
+
 public slots:
   void setSampleRate(double sr, double units,
 		     const std::string &strunits);

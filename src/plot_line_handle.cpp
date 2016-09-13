@@ -400,3 +400,43 @@ void FreePlotLineHandleV::paintEvent(QPaintEvent *)
 		p.drawPixmap(imageTopLeft, m_image);
 	}
 }
+
+RoundedHandleV::RoundedHandleV(const QPixmap &handleIcon,
+			const QPixmap &beyondTopIcon,
+			const QPixmap &beyondBottomIcon,
+			QWidget *parent, bool facingRight):
+		FreePlotLineHandleV(handleIcon, beyondTopIcon, beyondBottomIcon,
+			 parent, facingRight)
+{
+	m_innerSpacing = m_image.height();
+	m_width = m_innerSpacing +  m_image.width()  + m_outerSpacing;
+	m_height = m_image.height();
+	setMinimumSize(m_width, m_height);
+	setMaximumSize(m_width, m_height);
+}
+
+QColor RoundedHandleV::roundRectColor()
+{
+	return m_roundRectColor;
+}
+
+void RoundedHandleV::setRoundRectColor(const QColor &newColor)
+{
+	if (m_roundRectColor != newColor) {
+		m_roundRectColor = newColor;
+		this->update();
+	}
+}
+
+void RoundedHandleV::paintEvent(QPaintEvent *pv)
+{
+	QPainter p(this);
+	QRect rect(0, 0, m_image.width() - 1, m_image.height() - 1);
+
+	p.setPen(QPen(m_roundRectColor, 1, Qt::SolidLine));
+	p.setBrush(m_roundRectColor);
+	p.setRenderHint(QPainter::Antialiasing);
+	p.drawRoundedRect(rect, 30, 30, Qt::RelativeSize);
+
+	FreePlotLineHandleV::paintEvent(pv);
+}

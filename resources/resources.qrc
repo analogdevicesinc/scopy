@@ -47,6 +47,9 @@
 		<file>icons/time_trigger_handle.svg</file>
 		<file>icons/time_trigger_left.svg</file>
 		<file>icons/time_trigger_right.svg</file>
+		<file>icons/handle_down_arrow.svg</file>
+		<file>icons/handle_right_arrow.svg</file>
+		<file>icons/handle_up_arrow.svg</file>
 		<file>icons/close.svg</file>
 		<file>icons/close_hovered.svg</file>
 		<file>icons/gear_wheel.svg</file>

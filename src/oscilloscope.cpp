@@ -245,7 +245,6 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 
 	/* Default plot settings */
 
-	plot.setLeftVertAxesCount(nb_channels);
 	plot.setActiveVertAxis(0);
 
 	for (unsigned int i = 0; i < nb_channels; i++) {
@@ -370,6 +369,9 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 		SLOT(onHorizOffsetValueChanged(double)));
 	connect(voltsPosition, SIGNAL(valueChanged(double)),
 		SLOT(onVertOffsetValueChanged(double)));
+
+	connect(&plot, SIGNAL(channelOffsetChanged(double)),
+		SLOT(onChannelOffsetChanged(double)));
 
 	// Connections with Trigger Settings
 	connect(&trigger_settings, SIGNAL(triggerAenabled(bool)),
@@ -575,8 +577,6 @@ void Oscilloscope::add_math_channel(const std::string& function)
 
 	settings_group->addButton(channel_ui.btn);
 
-	plot.setLeftVertAxesCount(nb_channels + nb_math_channels);
-
 	plot.Curve(curve_id)->setAxes(
 			QwtAxisId(QwtPlot::xBottom, 0),
 			QwtAxisId(QwtPlot::yLeft, curve_id));
@@ -631,6 +631,9 @@ void Oscilloscope::del_math_channel()
 	int current_axis = plot.activeVertAxis();
 	if (current_axis > curve_id)
 		plot.setActiveVertAxis(current_axis - 1);
+
+	/* Before removing the axis, remove the offset widgets */
+	plot.removeOffsetWidgets(curve_id);
 
 	/* Remove the axis that corresponds to the curve we drop */
 	plot.removeLeftVertAxis(curve_id);
@@ -1090,4 +1093,9 @@ void Oscilloscope::settings_panel_size_adjust()
 		widget->setSizePolicy(policy, policy);
 	}
 	ui->stackedWidget->adjustSize();
+}
+
+void Oscilloscope::onChannelOffsetChanged(double value)
+{
+	voltsPosition->setValue(plot.VertOffset(plot.activeVertAxis()));
 }

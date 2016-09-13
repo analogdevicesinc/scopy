@@ -263,6 +263,10 @@ CapturePlot::CapturePlot(QWidget *parent,
 			SLOT(onVoltageCursor1Moved(double)));
 	connect(d_hBar2, SIGNAL(positionChanged(double)),
 			SLOT(onVoltageCursor2Moved(double)));
+
+	/* Add offset widgets for each new channel */
+	connect(this, SIGNAL(channelAdded(int)),
+		SLOT(onChannelAdded(int)));
 }
 
 CapturePlot::~CapturePlot()
@@ -483,4 +487,59 @@ void CapturePlot::onTriggerBHandleGrabbed(bool grabbed)
 	else
 		d_levelTriggerBBar->setPen(d_trigBinactiveLinePen);
 	d_symbolCtrl->updateOverlay();
+}
+
+void CapturePlot::onChannelAdded(int chnIdx)
+{
+	setLeftVertAxesCount(chnIdx + 1);
+	QColor chnColor = getLineColor(chnIdx);
+
+	/* Channel offset widget */
+	HorizBar *chOffsetBar = new HorizBar(this);
+	d_symbolCtrl->attachSymbol(chOffsetBar);
+	chOffsetBar->setCanLeavePlot(true);
+	chOffsetBar->setVisible(false);
+	chOffsetBar->setMobileAxis(QwtAxisId(QwtPlot::yLeft, chnIdx));
+	d_offsetBars.push_back(chOffsetBar);
+
+	RoundedHandleV *chOffsetHdl = new RoundedHandleV(
+				QPixmap(":/icons/handle_right_arrow.svg"),
+				QPixmap(":/icons/handle_up_arrow.svg"),
+				QPixmap(":/icons/handle_down_arrow.svg"),
+				d_leftHandlesArea, true);
+	chOffsetHdl->setRoundRectColor(chnColor);
+	chOffsetHdl->setPen(QPen(chnColor, 2, Qt::SolidLine));
+	chOffsetHdl->setVisible(true);
+	d_offsetHandles.push_back(chOffsetHdl);
+
+	connect(chOffsetHdl, &RoundedHandleV::positionChanged,
+		[=](int pos) {
+			QwtScaleMap yMap = this->canvasMap(QwtAxisId(QwtPlot::yLeft, chnIdx));
+			double min = -(yAxisNumDiv() / 2.0) * VertUnitsPerDiv();
+			double max = (yAxisNumDiv() / 2.0) * VertUnitsPerDiv();
+
+			yMap.setScaleInterval(min, max);
+			double offset = yMap.invTransform(pos);
+			this->setVertOffset(-offset, chnIdx);
+			this->replot();
+
+			emit channelOffsetChanged(-offset);
+		});
+	/* When bar position changes due to plot resizes update the handle */
+	connect(chOffsetBar, &HorizBar::pixelPositionChanged,
+		[=](int pos) {
+			chOffsetHdl->setPositionSilenty(pos);
+		});
+}
+
+void CapturePlot::removeOffsetWidgets(int chnIdx)
+{
+	if (chnIdx < 0 || chnIdx >= d_offsetHandles.size())
+		return;
+
+	HorizBar *bar = d_offsetBars.takeAt(chnIdx);
+	bar->setMobileAxis(QwtAxisId(QwtPlot::yLeft, 0));
+	d_symbolCtrl->detachSymbol(bar);
+	delete bar;
+	delete(d_offsetHandles.takeAt(chnIdx));
 }

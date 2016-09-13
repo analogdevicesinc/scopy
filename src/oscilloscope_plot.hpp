@@ -62,8 +62,11 @@ namespace adiscope {
 		bool vertCursorsEnabled();
 		bool horizCursorsEnabled();
 
+		void removeOffsetWidgets(int chnIdx);
+
 	signals:
 		void timeTriggerValueChanged(double);
+		void channelOffsetChanged(double);
 
 	public slots:
 		void setTriggerAEnabled(bool en);
@@ -73,6 +76,8 @@ namespace adiscope {
 		void setHorizCursorsEnabled(bool en);
 
 	private slots:
+		void onChannelAdded(int);
+
 		void onHbar1PixelPosChanged(int);
 		void onHbar2PixelPosChanged(int);
 		void onVbar1PixelPosChanged(int);
@@ -101,6 +106,9 @@ namespace adiscope {
 		HorizHandlesArea *d_bottomHandlesArea;
 		VertHandlesArea *d_leftHandlesArea;
 		VertHandlesArea *d_rightHandlesArea;
+
+		QList<HorizBar*> d_offsetBars;
+		QList<RoundedHandleV*> d_offsetHandles;
 
 		PlotLineHandleV *d_vCursorHandle1;
 		PlotLineHandleV *d_vCursorHandle2;

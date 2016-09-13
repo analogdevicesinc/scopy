@@ -95,6 +95,8 @@ namespace adiscope {
 		void onVertOffsetValueChanged(double value);
 		void onHorizOffsetValueChanged(double value);
 
+		void onChannelOffsetChanged(double value);
+
 		void on_comboBox_currentIndexChanged(const QString &arg1);
 
 		void channel_box_toggled(bool);

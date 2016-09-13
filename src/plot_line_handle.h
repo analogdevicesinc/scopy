@@ -142,4 +142,22 @@ private:
 	bool m_isBeyondBottom;
 };
 
+class RoundedHandleV: public FreePlotLineHandleV
+{
+public:
+	RoundedHandleV(const QPixmap &handleIcon,
+			const QPixmap &beyondTopIcon,
+			const QPixmap &beyondBottomIcon,
+			QWidget *parent = 0, bool facingRight = false);
+
+	QColor roundRectColor();
+	void setRoundRectColor(const QColor &);
+
+protected:
+	void paintEvent(QPaintEvent *event);
+
+private:
+	QColor m_roundRectColor;
+};
+
 #endif // PLOT_LINE_HANDLE_H

@@ -809,6 +809,8 @@ bool TimeDomainDisplayPlot::registerSink(std::string sinkUniqueNme, unsigned int
 
 			if (curvesAttached)
 				d_plot_curve[n]->attach(this);
+
+			emit channelAdded(n);
 		}
 		d_nplots += numChannels;
 		_resetXAxisPoints(d_xdata[sinkIndex], channelsDataLength, d_sample_rate);

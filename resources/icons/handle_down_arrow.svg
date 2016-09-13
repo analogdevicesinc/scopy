@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="svg2"
+   version="1.1"
+   viewBox="0 0 30 30"
+   height="30"
+   width="30">
+  <metadata
+     id="metadata15">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>Rectangle_6_copy_12 Copy</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <!-- Generator: Sketch 39.1 (31720) - http://www.bohemiancoding.com/sketch -->
+  <title
+     id="title4">Rectangle_6_copy_12 Copy</title>
+  <desc
+     id="desc6">Created with Sketch.</desc>
+  <defs
+     id="defs8" />
+  <g
+     transform="translate(10,12)"
+     style="fill:none;fill-rule:evenodd;stroke:none;stroke-width:1"
+     id="main">
+    <g
+       style="fill:#ffffff"
+       transform="translate(-200,-797)"
+       id="network-analyzer-HD">
+      <polygon
+         points="200,801.99 205,797 210,801.99 209,802.99 205,798.99 201,802.99 "
+         transform="matrix(1,0,0,-1,0,1599.99)"
+         id="Rectangle_6_copy_12-Copy" />
+    </g>
+  </g>
+</svg>
