@@ -824,42 +824,6 @@ void adiscope::Oscilloscope::onCursorsToggled(bool on)
 	plot.setMeasurementCursorsEnabled(on);
 }
 
-void adiscope::Oscilloscope::onTimePlotHorizScaleDivChanged(double scaleDivision)
-{
-	timeBase->setValue(scaleDivision);
-
-	bool started = iio->started();
-	if (started)
-		iio->lock();
-	double newSampleCount = scaleDivision * plot.xAxisNumDiv() * 100E6;
-	this->qt_time_block->set_nsamps(newSampleCount);
-	qDebug() << "requesting: " << newSampleCount << " samples";
-
-	trigger_settings.setPlotNumSamples(newSampleCount);
-
-	for (unsigned int i = 0; i < nb_channels; i++)
-		iio->set_buffer_size(ids[i], newSampleCount);
-
-	if (started)
-		iio->unlock();
-
-}
-
-void adiscope::Oscilloscope::onTimePlotVertScaleDivChanged(double scaleDivision)
-{
-	voltsPerDiv->setValue(scaleDivision);
-}
-
-void adiscope::Oscilloscope::onTimePlotHorizScaleOffsetChanged(double scaleOffset)
-{
-	timePosition->setValue(scaleOffset);
-}
-
-void adiscope::Oscilloscope::onTimePlotVertScaleOffsetChanged(double scaleOffset)
-{
-	voltsPosition->setValue(scaleOffset);
-}
-
 void Oscilloscope::updateTriggerSpinbox(double value)
 {
 	trigger_settings.setDelay(value);

@@ -79,11 +79,6 @@ namespace adiscope {
 		void onHistogram_view_toggled(bool visible);
 		void onXY_view_toggled(bool visible);
 
-		void onTimePlotHorizScaleDivChanged(double);
-		void onTimePlotVertScaleDivChanged(double);
-		void onTimePlotHorizScaleOffsetChanged(double);
-		void onTimePlotVertScaleOffsetChanged(double);
-
 		void onTriggerSettingsDelayChanged(double);
 		void onTimeTriggerDelayChanged(double);
 
