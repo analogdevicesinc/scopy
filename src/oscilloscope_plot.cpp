@@ -37,7 +37,6 @@ OscilloscopePlot::OscilloscopePlot(QWidget *parent,
 	setMaxXaxisDivision(1E-3); // A maximum division of 1 milli second - until adding decimation
 	setMinYaxisDivision(1E-6); // A minimum division of 1 micro Volts
 	setMaxYaxisDivision(10.0); // A maximum division of 10 Volts
-	setSampleRate(100E6, 1, "");
 
 	QFile file(":/stylesheets/stylesheets/plot.qss");
 	file.open(QFile::ReadOnly);

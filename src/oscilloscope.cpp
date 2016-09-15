@@ -45,27 +45,16 @@ using namespace adiscope;
 using namespace gr;
 using namespace std;
 
-unsigned int Oscilloscope::get_nb_channels(struct iio_device *dev)
-{
-	unsigned int nb = 0;
-
-	for (unsigned int i = 0; i < iio_device_get_channels_count(dev); i++) {
-		struct iio_channel *chn = iio_device_get_channel(dev, i);
-
-		if (!iio_channel_is_output(chn) &&
-				iio_channel_is_scan_element(chn))
-			nb++;
-	}
-
-	return nb;
-}
+const unsigned long Oscilloscope::maxBufferSize = 32768;
 
 Oscilloscope::Oscilloscope(struct iio_context *ctx,
 		Filter *filt, QPushButton *runButton,
 		float gain_ch1, float gain_ch2, QWidget *parent) :
 	QWidget(parent),
-	dev(filt->find_device(ctx, TOOL_OSCILLOSCOPE)),
-	nb_channels(Oscilloscope::get_nb_channels(dev)),
+	adc(ctx, filt),
+	nb_channels(Oscilloscope::adc.numChannels()),
+	sampling_rates(adc.availSamplRates()),
+	active_sample_rate(adc.sampleRate()),
 	nb_math_channels(0),
 	ui(new Ui::Oscilloscope),
 	trigger_settings(ctx),
@@ -90,14 +79,15 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 
 	/* Gnuradio Blocks */
 
-	int num_samples = plot.axisInterval(QwtPlot::xBottom).width() * 100E6;
+	int num_samples = plot.axisInterval(QwtPlot::xBottom).width() *
+				adc.sampleRate();
 
 	this->qt_time_block = adiscope::scope_sink_f::make(
 			num_samples,
-			100E6, "Osc Time", nb_channels, (QObject *)&plot);
+			adc.sampleRate(), "Osc Time", nb_channels, (QObject *)&plot);
 	trigger_settings.setPlotNumSamples(num_samples);
 
-	this->qt_fft_block = adiscope::scope_sink_f::make(fft_size, 100E6,
+	this->qt_fft_block = adiscope::scope_sink_f::make(fft_size, adc.sampleRate(),
 			"Osc Frequency", nb_channels, (QObject *)&fft_plot);
 
 	this->qt_hist_block = adiscope::histogram_sink_f::make(1024, 100, 0, 20,
@@ -113,7 +103,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	iio_context_set_timeout(ctx, UINT_MAX);
 
 	plot.registerSink(qt_time_block->name(), nb_channels,
-			plot.axisInterval(QwtPlot::xBottom).width() * 100E6);
+			plot.axisInterval(QwtPlot::xBottom).width() *
+			adc.sampleRate());
 	plot.disableLegend();
 
 	iio = iio_manager::get_instance(ctx,
@@ -121,6 +112,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	gr::hier_block2_sptr hier = iio->to_hier_block2();
 	qDebug() << "Manager created:\n" << gr::dot_graph(hier).c_str();
 
+	struct iio_device *dev = adc.iio_adc();
 	unsigned int chIdx = 0;
 	for (unsigned int i = 0; i < iio_device_get_channels_count(dev); i++) {
 		struct iio_channel *chn = iio_device_get_channel(dev, i);
@@ -244,7 +236,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	ui->gridLayoutPlot->addWidget(plot.bottomHandlesArea(), 2, 0, 1, 3);
 
 	/* Default plot settings */
-
+	plot.setSampleRate(adc.sampleRate(), 1, "");
 	plot.setActiveVertAxis(0);
 
 	for (unsigned int i = 0; i < nb_channels; i++) {
@@ -298,7 +290,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 				{"μs", 1E-6},
 				{"ms", 1E-3},
 				{"s", 1E0}
-				}, "Time Base", 100e-9, 100e-6);
+				}, "Time Base", 100e-9, 1E0);
 	timePosition = new PositionSpinButton({
 				{"ns", 1E-9},
 				{"μs", 1E-6},
@@ -524,8 +516,8 @@ void Oscilloscope::add_math_channel(const std::string& function)
 	std::string name = qname.toStdString();
 
 	auto math_sink = adiscope::scope_sink_f::make(
-			plot.axisInterval(QwtPlot::xBottom).width() * 100E6,
-			100E6, name, 1, (QObject *)&plot);
+			plot.axisInterval(QwtPlot::xBottom).width() * adc.sampleRate(),
+			adc.sampleRate(), name, 1, (QObject *)&plot);
 
 	/* Add the math block and the math scope sink into a container, so that
 	 * we can disconnect them when removing the math channel later */
@@ -546,7 +538,8 @@ void Oscilloscope::add_math_channel(const std::string& function)
 		iio->unlock();
 
 	plot.registerSink(name, 1,
-			plot.axisInterval(QwtPlot::xBottom).width() * 100E6);
+			plot.axisInterval(QwtPlot::xBottom).width() *
+			adc.sampleRate());
 
 	QWidget *channel_widget = new QWidget(this);
 	Ui::ChannelMath channel_ui;
@@ -668,6 +661,8 @@ void Oscilloscope::runStopToggled(bool checked)
 
 	if (checked) {
 		btn->setText("Stop");
+
+		plot.setSampleRate(active_sample_rate, 1, "");
 
 		for (unsigned int i = 0; i < nb_channels; i++)
 			iio->start(ids[i]);
@@ -955,16 +950,22 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 		plot.setHorizUnitsPerDiv(value);
 		plot.replot();
 	}
+
 	timePosition->setStep(value / 10);
+
+	double plotTimeSpan = value * plot.xAxisNumDiv();
+	double newSampleRate = pickSampleRateFor(plotTimeSpan, maxBufferSize);
+	double newSampleCount = plotTimeSpan * newSampleRate;
+	active_sample_rate = newSampleRate;
 
 	/* Reconfigure the GNU Radio block to receive a different number of samples  */
 	bool started = iio->started();
 	if (started)
 		iio->lock();
-	double newSampleCount = value * plot.xAxisNumDiv() * 100E6;
 	this->qt_time_block->set_nsamps(newSampleCount);
-	qDebug() << "requesting: " << newSampleCount << " samples";
-
+	adc.setSampleRate(newSampleRate);
+	if (started)
+		plot.setSampleRate(newSampleRate, 1, "");
 	trigger_settings.setPlotNumSamples(newSampleCount);
 
 	for (unsigned int i = 0; i < nb_channels; i++)
@@ -1062,4 +1063,21 @@ void Oscilloscope::settings_panel_size_adjust()
 void Oscilloscope::onChannelOffsetChanged(double value)
 {
 	voltsPosition->setValue(plot.VertOffset(plot.activeVertAxis()));
+}
+
+double Oscilloscope::pickSampleRateFor(double timeSpanSecs, double desiredBufferSize)
+{
+	double idealSampleRate = desiredBufferSize / timeSpanSecs;
+	int srIdx = 0;
+
+	// Pick the highest sample rate that we can set, that is lower or equal to
+	// the idealSampleRate.
+	for (int i = 0; i < sampling_rates.size(); i++) {
+		if (idealSampleRate >= sampling_rates[i])
+			srIdx = i;
+	}
+
+	idealSampleRate = sampling_rates[srIdx];
+
+	return idealSampleRate;
 }

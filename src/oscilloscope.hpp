@@ -47,6 +47,7 @@
 #include "HistogramDisplayPlot.h"
 #include "spinbox_a.hpp"
 #include "trigger_settings.hpp"
+#include "osc_adc.h"
 
 namespace Ui {
 	class Channel;
@@ -104,8 +105,10 @@ namespace adiscope {
 		void del_math_channel();
 
 	private:
-		struct iio_device *dev;
+		OscADC adc;
 		unsigned int nb_channels, nb_math_channels;
+		QList<double> sampling_rates;
+		double active_sample_rate;
 		Ui::Oscilloscope *ui;
 		Ui::OscGeneralSettings *gsettings_ui;
 		adiscope::TriggerSettings trigger_settings;
@@ -151,6 +154,8 @@ namespace adiscope {
 		QPushButton *active_settings_btn;
 		QPushButton *menuRunButton;
 
+		static const unsigned long maxBufferSize;
+
 		void comboBoxUpdateToValue(QComboBox *box, double value, std::vector<double>list);
 
 		void trigger_delay_write_hardware(double value);
@@ -164,7 +169,8 @@ namespace adiscope {
 
 		void updateRunButton(bool ch_enabled);
 
-		static unsigned int get_nb_channels(struct iio_device *dev);
+		double pickSampleRateFor(double timeSpanSecs,
+					double desiredBufferSize);
 	};
 }
 
