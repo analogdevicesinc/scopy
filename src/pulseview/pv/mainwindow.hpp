@@ -99,6 +99,7 @@ public:
 	void run_stop();
 
 
+    std::shared_ptr<sigrok::InputFormat> get_format_from_string(const std::string &format);
 	void select_device(std::shared_ptr<devices::Device> device);
 
 public Q_SLOTS:

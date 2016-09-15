@@ -38,7 +38,7 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	ui(new Ui::ToolLauncher), ctx(nullptr),
 	power_control(nullptr), dmm(nullptr), signal_generator(nullptr),
 	oscilloscope(nullptr), current(nullptr), filter(nullptr),
-	logic_analyzer(nullptr)
+	logic_analyzer(nullptr), pattern_generator(nullptr)
 {
 	struct iio_context_info **info;
 	unsigned int nb_contexts;
@@ -171,6 +171,11 @@ void ToolLauncher::on_btnLogicAnalyzer_clicked()
 	swapMenu(static_cast<QWidget *>(logic_analyzer));
 }
 
+void adiscope::ToolLauncher::on_btnPatternGenerator_clicked()
+{
+	swapMenu(static_cast<QWidget *>(pattern_generator));
+}
+
 void ToolLauncher::window_destroyed()
 {
 	windows.removeOne(static_cast<QMainWindow *>(QObject::sender()));
@@ -270,6 +275,7 @@ void adiscope::ToolLauncher::destroyContext()
 	ui->dmm->setDisabled(true);
 	ui->powerControl->setDisabled(true);
 	ui->logicAnalyzer->setDisabled(true);
+	ui->patternGenerator->setDisabled(true);
 
 	for (auto it = windows.begin(); it != windows.end(); ++it)
 		delete *it;
@@ -298,6 +304,11 @@ void adiscope::ToolLauncher::destroyContext()
 	if(logic_analyzer) {
 		delete logic_analyzer;
 		logic_analyzer = nullptr;
+	}
+
+	if(pattern_generator) {
+		delete pattern_generator;
+		pattern_generator = nullptr;
 	}
 
 	if (filter) {
@@ -388,6 +399,15 @@ bool adiscope::ToolLauncher::switchContext(QString &uri)
 		logic_analyzer->setVisible(false);
 		ui->logicAnalyzer->setEnabled(true);
 	}
+
+
+	if (filter->compatible((TOOL_PATTERN_GENERATOR))) {
+		pattern_generator = new PatternGenerator (ctx, filter,
+				ui->stopPatternGenerator, this);
+		pattern_generator->setVisible(false);
+		ui->patternGenerator->setEnabled(true);
+	}
+
 
 	QtConcurrent::run(std::bind(&ToolLauncher::calibrate, this));
 

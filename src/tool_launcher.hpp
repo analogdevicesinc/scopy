@@ -32,6 +32,7 @@
 #include "power_controller.hpp"
 #include "signal_generator.hpp"
 #include "logic_analyzer.hpp"
+#include "pattern_generator.hpp"
 
 extern "C" {
 	struct iio_context;
@@ -60,6 +61,7 @@ namespace adiscope {
 		void on_btnDMM_clicked();
 		void on_btnPowerControl_clicked();
 		void on_btnLogicAnalyzer_clicked();
+		void on_btnPatternGenerator_clicked();
 
 		void window_destroyed();
 
@@ -84,6 +86,7 @@ namespace adiscope {
 		SignalGenerator *signal_generator;
 		Oscilloscope *oscilloscope;
 		LogicAnalyzer *logic_analyzer;
+		PatternGenerator *pattern_generator;
 		QWidget *current;
 
 		Filter *filter;

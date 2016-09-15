@@ -559,7 +559,25 @@ void MainWindow::select_init_device()
 	settings.endGroup();
 }
 
+shared_ptr<InputFormat>  MainWindow::get_format_from_string(const std::string &format)
+{
+    shared_ptr<InputFormat> input_format;
 
+    if (!format.empty()) {
+        const map<string, shared_ptr<InputFormat> > formats =
+            device_manager_.context()->input_formats();
+        const auto iter = find_if(formats.begin(), formats.end(),
+            [&](const pair<string, shared_ptr<InputFormat> > f) {
+                return f.first == format; });
+        if (iter == formats.end()) {
+            cerr << "Unexpected input format: " << format << endl;
+            return nullptr;
+        }
+
+        input_format = (*iter).second;
+    }
+    return input_format;
+}
 
 void MainWindow::select_init_device(const char* driver_name)
 {

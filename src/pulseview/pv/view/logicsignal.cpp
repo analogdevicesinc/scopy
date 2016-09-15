@@ -63,9 +63,9 @@ namespace view {
 
 const float LogicSignal::Oversampling = 2.0f;
 
-//const QColor LogicSignal::EdgeColour(0x80, 0x80, 0x80);
-//const QColor LogicSignal::HighColour(0, 0, 255, 127);//(0x00, 0xC0, 0x00);
-//const QColor LogicSignal::LowColour(0xC0, 0x00, 0x00);
+const QColor LogicSignal::EdgeColour(0x80, 0x80, 0x80);
+const QColor LogicSignal::HighColour(0x00, 0xC0, 0x00);
+const QColor LogicSignal::LowColour(0xC0, 0x00, 0x00);
 
 const QColor LogicSignal::SignalColours[10] = {
 	QColor(0x16, 0x19, 0x1A),	// Black
@@ -115,6 +115,7 @@ LogicSignal::LogicSignal(
 	shared_ptr<Trigger> trigger;
 
 	set_colour(SignalColours[channel->index() % countof(SignalColours)]);
+
 	/* Populate this channel's trigger setting with whatever we
 	 * find in the current session trigger, if anything. */
 	trigger_match_ = nullptr;
@@ -218,21 +219,20 @@ void LogicSignal::paint_mid(QPainter &p, const ViewItemPaintParams &pp)
 		*line++ = QLineF(x, high_offset, x, low_offset);
 	}
 
-//	p.setPen(EdgeColour);
-    p.setPen(colour());
-	p.drawLines(edge_lines, edge_count);
+	p.setPen(EdgeColour);
+    p.drawLines(edge_lines, edge_count);
 	delete[] edge_lines;
 
 	// Paint the caps
 	const unsigned int max_cap_line_count = edges.size();
 	QLineF *const cap_lines = new QLineF[max_cap_line_count];
 
-//    p.setPen(colour());
+    p.setPen(HighColour);
 	paint_caps(p, cap_lines, edges, true, samples_per_pixel,
 		pixels_offset, pp.left(), high_offset);
-//	p.setPen(LowColour);
+	p.setPen(LowColour);
 	paint_caps(p, cap_lines, edges, false, samples_per_pixel,
-		pixels_offset, pp.left(), low_offset);
+        pixels_offset, pp.left(), low_offset);
 
 	delete[] cap_lines;
 }
@@ -266,9 +266,9 @@ void LogicSignal::paint_fore(QPainter &p, const ViewItemPaintParams &pp)
 
 		p.setPen(QPen(TriggerMarkerBackgroundColour.darker()));
 		p.setBrush(TriggerMarkerBackgroundColour);
-		p.drawRoundedRect(QRectF(point, size).adjusted(
-			-pad, -pad, pad, pad), pad, pad);
-		p.drawPixmap(point, *pixmap);
+        p.drawRoundedRect(QRectF(point, size).adjusted(
+            -pad, -pad, pad, pad), pad, pad);
+        p.drawPixmap(point, *pixmap);
 
 		break;
 	}

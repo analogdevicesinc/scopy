@@ -161,7 +161,7 @@ MainBar::MainBar(Session &session, MainWindow &main_window) :
 	// Setup the toolbar
     addAction(main_window.action_view_zoom_in());
     addAction(main_window.action_view_zoom_out());
-//    addAction(main_window.action_view_zoom_fit());
+    addAction(main_window.action_view_zoom_fit());
 //    addAction(main_window.action_view_zoom_one_to_one());
     addAction(main_window.action_view_show_cursors());
 
