@@ -29,8 +29,10 @@ adc_sample_conv::adc_sample_conv(int nconnections, bool inverse) :
 	d_nconnections(nconnections),
 	inverse(inverse)
 {
-	for (int i = 0; i < d_nconnections; i++)
-		d_correction_gains.push_back(1.0); // default Gain = 1
+	for (int i = 0; i < d_nconnections; i++) {
+		d_correction_gains.push_back(1.0);
+		d_filter_compensations.push_back(1.0);
+	}
 }
 
 adc_sample_conv::~adc_sample_conv()
@@ -38,17 +40,19 @@ adc_sample_conv::~adc_sample_conv()
 }
 
 float adc_sample_conv::convSampleToVolts(float sample,
-		float correctionGain)
+		float correctionGain, float filterCompensation)
 {
 	// TO DO: explain this formula and add methods to change gain and offset
-	return ((sample * 0.78) / ((1 << 11) * 1.3 * 0.02) * correctionGain);
+	return ((sample * 0.78) / ((1 << 11) * 1.3 * 0.02) * correctionGain *
+			filterCompensation);
 }
 
 float adc_sample_conv::convVoltsToSample(float voltage,
-		float correctionGain)
+		float correctionGain, float filterCompensation)
 {
 	// TO DO: explain this formula and add methods to change gain and offset
-	return (voltage * correctionGain * (2048 * 1.3 * 0.02) / 0.78);
+	return (voltage * correctionGain * filterCompensation *
+			(2048 * 1.3 * 0.02) / 0.78);
 }
 
 int adc_sample_conv::work(int noutput_items,
@@ -61,10 +65,14 @@ int adc_sample_conv::work(int noutput_items,
 
 		if (inverse)
 			for (unsigned int j = 0; j < noutput_items; j++)
-				out[j] = convVoltsToSample(in[j], d_correction_gains[i]);
+				out[j] = convVoltsToSample(in[j],
+						d_correction_gains[i],
+						d_filter_compensations[i]);
 		else
 			for (unsigned int j = 0; j < noutput_items; j++)
-				out[j] = convSampleToVolts(in[j], d_correction_gains[i]);
+				out[j] = convSampleToVolts(in[j],
+					d_correction_gains[i],
+					d_filter_compensations[i]);
 	}
 
 	return noutput_items;
@@ -85,6 +93,25 @@ float adc_sample_conv::correctionGain(int connection)
 {
 	if (connection >= 0 && connection < d_nconnections)
 		return d_correction_gains[connection];
+
+	return 0.0;
+}
+
+void adc_sample_conv::setFilterCompensation(int connection, float val)
+{
+	if (connection < 0 || connection >= d_nconnections)
+		return;
+
+	if (d_filter_compensations[connection] != val) {
+		gr::thread::scoped_lock lock(d_setlock);
+		d_filter_compensations[connection] = val;
+	}
+}
+
+float adc_sample_conv::filterCompensation(int connection)
+{
+	if (connection >= 0 && connection < d_nconnections)
+		return d_filter_compensations[connection];
 
 	return 0.0;
 }

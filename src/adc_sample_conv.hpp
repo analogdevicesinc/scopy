@@ -29,18 +29,24 @@ namespace adiscope {
 		int d_nconnections;
 		bool inverse;
 		std::vector<float> d_correction_gains;
+		std::vector<float> d_filter_compensations;
 
 	public:
 		explicit adc_sample_conv(int nconnections, bool inverse = false);
 		~adc_sample_conv();
 
 		static float convSampleToVolts(float sample,
-				float correctionGain = 1);
+				float correctionGain = 1,
+				float filterCompensation = 1);
 		static float convVoltsToSample(float sample,
-				float correctionGain = 1);
+				float correctionGain = 1,
+				float filterCompensation = 1);
 
 		void setCorrectionGain(int connection, float gain);
 		float correctionGain(int connection);
+
+		void setFilterCompensation(int connection, float val);
+		float filterCompensation(int connection);
 
 		int work(int noutput_items,
 				gr_vector_const_void_star &input_items,

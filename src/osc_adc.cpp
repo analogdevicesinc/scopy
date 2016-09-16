@@ -22,6 +22,15 @@ OscADC::OscADC(struct iio_context *ctx, const Filter *filt):
 	setSampleRate(samplRate);
 
 	m_numChannels = get_nb_channels(m_adc);
+
+	// Filters applied while decimating affect the amplitude of the received data
+	// Use 1.0 value for now, until we do more testing
+	m_filt_comp_table[1E8] = 1.0;
+	m_filt_comp_table[1E7] = 1.0;
+	m_filt_comp_table[1E6] = 1.0;
+	m_filt_comp_table[1E5] = 1.0;
+	m_filt_comp_table[1E4] = 1.0;
+	m_filt_comp_table[1E3] = 1.0;
 }
 
 OscADC::~OscADC()
@@ -56,6 +65,11 @@ unsigned int OscADC::numChannels()
 struct iio_device* OscADC::iio_adc()
 {
 	return m_adc;
+}
+
+double OscADC::compTable(double samplRate)
+{
+	return m_filt_comp_table[samplRate];
 }
 
 unsigned int OscADC::get_nb_channels(struct iio_device *dev)

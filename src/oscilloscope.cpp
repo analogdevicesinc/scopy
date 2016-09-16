@@ -953,6 +953,7 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 
 	timePosition->setStep(value / 10);
 
+	double old_sample_rate = active_sample_rate;
 	double plotTimeSpan = value * plot.xAxisNumDiv();
 	double newSampleRate = pickSampleRateFor(plotTimeSpan, maxBufferSize);
 	double newSampleCount = plotTimeSpan * newSampleRate;
@@ -963,6 +964,15 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 	if (started)
 		iio->lock();
 	this->qt_time_block->set_nsamps(newSampleCount);
+
+	// Apply amplitude corrections when using different sample rates
+	if (newSampleRate != old_sample_rate) {
+		boost::shared_ptr<adc_sample_conv> block =
+			dynamic_pointer_cast<adc_sample_conv>(adc_samp_conv_block);
+		block->setFilterCompensation(0, adc.compTable(newSampleRate));
+		block->setFilterCompensation(1, adc.compTable(newSampleRate));
+	}
+
 	adc.setSampleRate(newSampleRate);
 	if (started)
 		plot.setSampleRate(newSampleRate, 1, "");

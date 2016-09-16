@@ -3,6 +3,7 @@
 
 #include <QList>
 #include <QStringList>
+#include <map>
 
 extern "C" {
 	struct iio_context;
@@ -27,6 +28,8 @@ namespace adiscope {
 
 		struct iio_device *iio_adc();
 
+		double compTable(double samplRate);
+
 	private:
 		static unsigned int get_nb_channels(struct iio_device *dev);
 		static QStringList get_avail_options_list(struct iio_device *dev,
@@ -38,6 +41,8 @@ namespace adiscope {
 		double m_sampleRate;
 		QList<double > m_availSampRates;
 		unsigned int m_numChannels;
+
+		std::map<double, double> m_filt_comp_table;
 	};
 }
 
