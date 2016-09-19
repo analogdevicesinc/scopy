@@ -410,7 +410,7 @@ DisplayPlot::DisplayPlot(int nplots, QWidget* parent,
 			 unsigned int xNumDivs, unsigned int yNumDivs)
   : QwtPlot(parent), d_nplots(nplots), d_stop(false)
 {
-  d_CurveColors << QColor(Qt::blue) << QColor(Qt::red) << QColor(Qt::green)
+  d_CurveColors << QColor("#ff7200") << QColor("#9013fe") << QColor(Qt::green)
        << QColor(Qt::cyan) << QColor(Qt::magenta)
        << QColor(Qt::yellow) << QColor(Qt::gray) << QColor(Qt::darkRed)
        << QColor(Qt::darkGreen) << QColor(Qt::darkBlue) << QColor(Qt::darkGray)
