@@ -96,10 +96,12 @@ public:
  
 	QMenu* menu_decoder_add() const;
 
-	void run_stop();
-
+    void run_stop();
+    /* Scopy stuff */
 
     std::shared_ptr<sigrok::InputFormat> get_format_from_string(const std::string &format);
+    /* *********** */
+
 	void select_device(std::shared_ptr<devices::Device> device);
 
 public Q_SLOTS:

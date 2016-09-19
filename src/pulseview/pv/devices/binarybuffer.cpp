@@ -32,7 +32,7 @@ const std::streamsize BinaryBuffer::BufferSize = 16384;
 
 BinaryBuffer::BinaryBuffer(const std::shared_ptr<sigrok::Context> &context,
     short *data,
-    uint64_t number_of_samples,
+    uint64_t *number_of_samples,
     std::shared_ptr<sigrok::InputFormat> format,
     const std::map<std::string, Glib::VariantBase> &options) :
 
@@ -40,8 +40,8 @@ BinaryBuffer::BinaryBuffer(const std::shared_ptr<sigrok::Context> &context,
     data_(data),
     no_samples_(number_of_samples),
     format_(format),
-    options_(options),
-    interrupt_(false)
+    options_(options)
+
 {
     qDebug("PatternGeneratorDevice created");
 }
@@ -65,16 +65,11 @@ void BinaryBuffer::open()
 
     // open() should add the input device to the session but
     // we can't open the device without sending some data first
-    /*f = new std::ifstream(file_name_, std::ios::binary);
 
-    char buffer[BufferSize];
-    f->read(buffer, BufferSize);
-    //data_.
-    const std::streamsize size = f->gcount();*/
-    if (no_samples_ == 0)
+    if ((*no_samples_) == 0)
         return;
 
-    input_->send(data_, no_samples_);
+    input_->send(data_, 1);
 
     try {
         device_ = input_->device();
@@ -112,36 +107,17 @@ void BinaryBuffer::run()
 {
     char buffer[BufferSize];
 
-/*    if (!f) {
-        // Previous call to run() processed the entire file already
-        f = new std::ifstream(file_name_, std::ios::binary);
-        input_->reset();
-    }*/
     input_->reset();
 
-    interrupt_ = false;
-    input_->send(data_, no_samples_);
-    /*while (!interrupt_ && !f->eof()) {
-        /*f->read(buffer, BufferSize);
-        const std::streamsize size = f->gcount();
-        if (size == 0)
-            break;
-
-
-
-        if (size != BufferSize)
-            break;
-    }*/
-
+    /*TODO: break down in multiple  data chunks */
+    input_->send(data_, (*no_samples_));
     input_->end();
 
-    //delete f;
-    //f = nullptr;
+
 }
 
 void BinaryBuffer::stop()
 {
-    interrupt_ = true;
     qDebug("PatternGeneratorDevice stopped");
 }
 

@@ -727,6 +727,7 @@ void MainWindow::on_actionConnect_triggered()
 	update_device_list();
 }
 
+
 void MainWindow::on_actionQuit_triggered()
 {
 	close();

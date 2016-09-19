@@ -935,7 +935,7 @@ void View::signals_changed()
 	if (!session_.device()) {
 		reset_scroll();
 	} else {
-		assert(sr_dev);
+        //assert(sr_dev);
 		sr_dev = session_.device()->device();
 		channels = sr_dev->channels();
 	}

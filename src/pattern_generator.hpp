@@ -11,6 +11,12 @@
 #include "streams_to_short.h"
 #include <gnuradio/blocks/file_descriptor_sink.h>
 
+extern "C" {
+  struct iio_context;
+  struct iio_device;
+  struct iio_channel;
+  struct iio_buffer;
+}
 
 namespace pv {
     class MainWindow;
@@ -43,6 +49,9 @@ public:
 
 private Q_SLOTS:
     void startStop(bool start);
+    void singleRun();
+    void singleRunStop();
+    void toggleRightMenu();
 
 private:
 //    pv::devices::PatternGenerator *pattern_generator_device;
@@ -55,28 +64,31 @@ private:
     iio_manager::port_id* ids;
     struct iio_context *ctx;
     struct iio_device *dev;
-    unsigned int no_channels;
-    unsigned int itemsize;
+    struct iio_device *channel_manager_dev;
+    struct iio_buffer *txbuf;
+    int no_channels;
+    bool buffer_created;
+    uint16_t channel_enable_mask;
+    uint64_t sample_rate;
 
     std::map<std::string, Glib::VariantBase> options;
 
-    short buffer[65536];
-    int fd;
-    adiscope::streams_to_short::sptr sink_streams_to_short;
-    gr::blocks::file_descriptor_sink::sptr sink_fd_block;
-    pv::MainWindow* main_win;
+    #define BUFFER_SIZE 65535
+    short buffer[BUFFER_SIZE];
 
-    void disconnectAll();
-    static unsigned int get_no_channels(struct iio_device *dev);
-    void create_fifo();
+    uint64_t number_of_samples;
+    uint64_t buffersize;
+    bool startPatternGeneration(bool cyclic);
+    void stopPatternGeneration();
+    void dataChanged();
+
+    pv::MainWindow* main_win;
 
     void toggleRightMenu(QPushButton *btn);
     bool menuOpened;
 
     static QStringList digital_trigger_conditions;
 
-private Q_SLOTS:
-    void toggleRightMenu();
 };
 } /* namespace adiscope */
 
