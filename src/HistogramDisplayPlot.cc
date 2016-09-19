@@ -159,12 +159,6 @@ HistogramDisplayPlot::HistogramDisplayPlot(int nplots, QWidget* parent)
   //setYaxis(-2.0, d_bins);
   //setAxisTitle(QwtPlot::yLeft, "Count");
 
-  QList<QColor> colors;
-  colors << QColor(Qt::blue) << QColor(Qt::red) << QColor(Qt::green)
-	 << QColor(Qt::black) << QColor(Qt::cyan) << QColor(Qt::magenta)
-	 << QColor(Qt::yellow) << QColor(Qt::gray) << QColor(Qt::darkRed)
-	 << QColor(Qt::darkGreen) << QColor(Qt::darkBlue) << QColor(Qt::darkGray);
-
   // Setup dataPoints and plot vectors
   // Automatically deleted when parent is deleted
   for(int i = 0; i < d_nplots; i++) {
@@ -173,16 +167,17 @@ HistogramDisplayPlot::HistogramDisplayPlot(int nplots, QWidget* parent)
 
     d_plot_curve.push_back(new QwtPlotCurve(QString("Data %1").arg(i)));
     d_plot_curve[i]->attach(this);
-    d_plot_curve[i]->setPen(QPen(colors[i]));
+    d_plot_curve[i]->setPen(QPen(d_CurveColors[i]));
     d_plot_curve[i]->setRenderHint(QwtPlotItem::RenderAntialiased);
 
     // Adjust color's transparency for the brush
-    colors[i].setAlpha(127 / d_nplots);
-    d_plot_curve[i]->setBrush(QBrush(colors[i]));
+    d_CurveColors[i].setAlpha(127 / d_nplots);
+    d_plot_curve[i]->setBrush(QBrush(d_CurveColors[i]));
 
-    colors[i].setAlpha(255 / d_nplots);
-    QwtSymbol *symbol = new QwtSymbol(QwtSymbol::NoSymbol, QBrush(colors[i]),
-				      QPen(colors[i]), QSize(7,7));
+    d_CurveColors[i].setAlpha(255 / d_nplots);
+    QwtSymbol *symbol = new QwtSymbol(QwtSymbol::NoSymbol,
+				      QBrush(d_CurveColors[i]),
+				      QPen(d_CurveColors[i]), QSize(7,7));
 
 #if QWT_VERSION < 0x060000
     d_plot_curve[i]->setRawData(d_xdata, d_ydata[i], d_bins);

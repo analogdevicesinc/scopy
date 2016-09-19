@@ -28,18 +28,10 @@ FftDisplayPlot::FftDisplayPlot(int nplots, QWidget *parent) :
 	d_start_frequency(0),
 	d_stop_frequency(1000)
 {
-	QList<QColor> colors;
-
-	colors << QColor(Qt::blue) << QColor(Qt::red) << QColor(Qt::green)
-		<< QColor(Qt::black) << QColor(Qt::cyan) << QColor(Qt::magenta)
-		<< QColor(Qt::yellow) << QColor(Qt::gray) << QColor(Qt::darkRed)
-		<< QColor(Qt::darkGreen) << QColor(Qt::darkBlue)
-		<< QColor(Qt::darkGray);
-
 	for (unsigned int i = 0; i < nplots; i++) {
 		auto plot = new QwtPlotCurve(QString("Data %1").arg(i));
 
-		plot->setPen(QPen(colors[i]));
+		plot->setPen(QPen(d_CurveColors[i]));
 		plot->attach(this);
 
 		d_plot_curve.push_back(plot);

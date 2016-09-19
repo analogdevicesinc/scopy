@@ -152,12 +152,6 @@ int SinkManager::sinkFirstChannelPos(const std::string& name)
 TimeDomainDisplayPlot::TimeDomainDisplayPlot(QWidget* parent, unsigned int xNumDivs, unsigned int yNumDivs)
   : DisplayPlot(0, parent, xNumDivs, yNumDivs)
 {
-  d_CurveColors << QColor(Qt::blue) << QColor(Qt::red) << QColor(Qt::green)
-       << QColor(Qt::cyan) << QColor(Qt::magenta)
-       << QColor(Qt::yellow) << QColor(Qt::gray) << QColor(Qt::darkRed)
-       << QColor(Qt::darkGreen) << QColor(Qt::darkBlue) << QColor(Qt::darkGray)
-       << QColor(Qt::black);
-
   d_tag_text_color = Qt::black;
   d_tag_background_color = Qt::white;
   d_tag_background_style = Qt::NoBrush;

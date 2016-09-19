@@ -180,7 +180,6 @@ private:
   MetricPrefixFormatter d_metricFormatter;
   TimePrefixFormatter d_timeFormatter;
 
-  QList<QColor> d_CurveColors;
   QColor d_tag_text_color;
   QColor d_tag_background_color;
   Qt::BrushStyle d_tag_background_style;

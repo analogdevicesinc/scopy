@@ -515,7 +515,7 @@ protected:
 
   bool d_stop;
 
-  QList<QColor> d_trace_colors;
+  QList<QColor> d_CurveColors;
 
   bool d_autoscale_state;
   int d_activeVertAxis;

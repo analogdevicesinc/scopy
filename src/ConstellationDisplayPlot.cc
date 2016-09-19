@@ -96,12 +96,6 @@ ConstellationDisplayPlot::ConstellationDisplayPlot(int nplots, QWidget* parent)
 //  setAxisTitle(QwtPlot::yLeft, "Quadrature");
   updateAxes();
 
-  QList<QColor> colors;
-  colors << QColor(Qt::blue) << QColor(Qt::red) << QColor(Qt::green)
-	 << QColor(Qt::black) << QColor(Qt::cyan) << QColor(Qt::magenta)
-	 << QColor(Qt::yellow) << QColor(Qt::gray) << QColor(Qt::darkRed)
-	 << QColor(Qt::darkGreen) << QColor(Qt::darkBlue) << QColor(Qt::darkGray);
-
   // Setup dataPoints and plot vectors
   // Automatically deleted when parent is deleted
   for(int i = 0; i < d_nplots; i++) {
@@ -112,10 +106,11 @@ ConstellationDisplayPlot::ConstellationDisplayPlot(int nplots, QWidget* parent)
 
     d_plot_curve.push_back(new QwtPlotCurve(QString("Data %1").arg(i)));
     d_plot_curve[i]->attach(this);
-    d_plot_curve[i]->setPen(QPen(colors[i]));
+    d_plot_curve[i]->setPen(QPen(d_CurveColors[i]));
 
-    QwtSymbol *symbol = new QwtSymbol(QwtSymbol::NoSymbol, QBrush(colors[i]),
-                                      QPen(colors[i]), QSize(7,7));
+    QwtSymbol *symbol = new QwtSymbol(QwtSymbol::NoSymbol,
+				      QBrush(d_CurveColors[i]),
+                                      QPen(d_CurveColors[i]), QSize(7,7));
 
 #if QWT_VERSION < 0x060000
     d_plot_curve[i]->setRawData(d_real_data[i], d_imag_data[i], d_numPoints);
