@@ -1,0 +1,57 @@
+clone_depth: 1
+
+os: Visual Studio 2013
+
+install:
+    # Install Boost dependencies
+    - cd c:\
+    - appveyor-retry nuget install boost_atomic-vc120 -Version 1.61.0
+    - appveyor-retry nuget install boost_system-vc120 -Version 1.61.0
+    - appveyor-retry nuget install boost_filesystem-vc120 -Version 1.61.0
+    - appveyor-retry nuget install boost_chrono-vc120 -Version 1.61.0
+    - appveyor-retry nuget install boost_date_time-vc120 -Version 1.61.0
+    - appveyor-retry nuget install boost_thread-vc120 -Version 1.61.0
+
+    # Install libiio
+    - appveyor-retry appveyor DownloadFile https://ci.appveyor.com/api/projects/analogdevicesinc/libiio/artifacts/libiio-win64.zip?branch=master
+    - 7z x libiio-win64.zip > nul
+
+    # Install qwt-multiaxes
+    - appveyor-retry appveyor DownloadFile http://swdownloads.analog.com/cse/build/qwt-multiaxes.zip
+    - 7z x qwt-multiaxes.zip > nul
+
+    # Install libvolk
+    - cd "c:\Program Files"
+    - appveyor-retry appveyor DownloadFile https://ci.appveyor.com/api/projects/analogdevicesinc/volk/artifacts/libvolk-x64.zip?branch=master
+    - 7z x libvolk-x64.zip > nul
+
+    # Install gnuradio / gr-iio
+    - appveyor-retry appveyor DownloadFile https://ci.appveyor.com/api/projects/analogdevicesinc/gr-iio/artifacts/gnuradio-x64.zip?branch=master
+    - 7z x gnuradio-x64.zip > nul
+
+build_script:
+    - mkdir c:\projects\scopy\build
+    - cd c:\projects\scopy\build
+
+    # Without this directory in the %PATH%, compiler tests fail because of missing DLLs
+    - set PATH=%PATH%;C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin
+
+    - cmake -G "Visual Studio 12 Win64" -DCMAKE_BUILD_TYPE:STRING=Release \
+        -DCMAKE_INSTALL_PREFIX:PATH="c:/Program Files/gnuradio" \
+        -DCMAKE_BUILD_TYPE:STRING=Release \
+        -DCMAKE_SYSTEM_PREFIX_PATH="C:" \
+        -DBoost_SYSTEM_LIBRARY_RELEASE:FILEPATH=c:/boost_system-vc120.1.61.0.0/lib/native/address-model-64/lib/boost_system-vc120-mt-1_61.lib \
+        -DBoost_LIBRARY_DIR_RELEASE:PATH=c:/boost_chrono-vc120.1.61.0.0/lib/native/address-model-64/lib;c:/boost_date_time-vc120.1.61.0.0/lib/native/address-model-64/lib;c:/boost_thread-vc120.1.61.0.0/lib/native/address-model-64/lib;c:/boost_system-vc120.1.61.0.0/lib/native/address-model-64/lib;c:/boost_filesystem-vc120.1.61.0.0/lib/native/address-model-64/lib \
+        -DBoost_INCLUDE_DIR:PATH=c:/boost.1.61.0.0/lib/native/include \
+        -DIIO_INCLUDE_DIRS:PATH=c:/libiio-win64 \
+        -DIIO_LIBRARIES:FILEPATH=c:/libiio-win64/libiio.lib \
+        -DGnuradio_DIR:PATH="c:/Program Files/gnuradio/lib/cmake/gnuradio" \
+        -DQt5Widgets_DIR:PATH="c:/Qt/5.5/msvc2013_64/lib/cmake/Qt5Widgets" \
+        -DQt5WebKitWidgets_DIR:PATH="c:/Qt/5.5/msvc2013_64/lib/cmake/Qt5WebKitWidgets" \
+        -DQt5Concurrent_DIR:PATH="c:/Qt/5.5/msvc2013_64/lib/cmake/Qt5Concurrent" \
+        -DQWT_LIBRARIES:FILEPATH="c:/qwt-multiaxes/lib/qwt.lib" \
+        -DQWT_INCLUDE_DIRS:PATH="c:/qwt-multiaxes/include/qwt" \
+        ..
+    - cmake --build . --config Release
+
+    - appveyor PushArtifact c:\projects\scopy\build\Release\scopy.exe
