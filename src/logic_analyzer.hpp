@@ -37,6 +37,7 @@
 #include "pulseview/pv/toolbars/mainbar.hpp"
 #include "pulseview/pv/devicemanager.hpp"
 #include "pulseview/pv/mainwindow.hpp"
+#include "spinbox_a.hpp"
 
 using namespace pv;
 using namespace pv::toolbars;
@@ -63,11 +64,16 @@ namespace adiscope {
 	private Q_SLOTS:
 		void startStop(bool start);
 		void toggleRightMenu();
+		void rightMenuFinished(bool opened);
 
 	private:
 		Ui::LogicAnalyzer *ui;
 		QButtonGroup *settings_group;
+		QPushButton *active_settings_btn;
 		QPushButton *menuRunButton;
+
+		ScaleSpinButton *timeBase;
+		PositionSpinButton *timePosition;
 
 		boost::shared_ptr<iio_manager> manager;
 		iio_manager::port_id* ids;
@@ -84,7 +90,9 @@ namespace adiscope {
 		static unsigned int get_no_channels(struct iio_device *dev);
 		void create_fifo();
 
+		void settings_panel_update(int id);
 		void toggleRightMenu(QPushButton *btn);
+
 		bool menuOpened;
 	};
 }

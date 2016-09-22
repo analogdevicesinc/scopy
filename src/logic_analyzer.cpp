@@ -36,6 +36,7 @@
 #include "pulseview/pv/toolbars/mainbar.hpp"
 #include "streams_to_short.h"
 #include "logic_analyzer.hpp"
+#include "spinbox_a.hpp"
 
 /* Sigrok includes */
 #include "libsigrokcxx/libsigrokcxx.hpp"
@@ -64,12 +65,13 @@ using namespace pv::widgets;
 using sigrok::Context;
 using namespace Glibmm;
 
-LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, Filter *filt, QPushButton *runBtn, QWidget *parent) :
+LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, Filter *filt,
+			QPushButton *runBtn, QWidget *parent) :
 	QWidget(parent),
 	ctx(ctx),
 	itemsize(sizeof(uint16_t)),
 	dev(iio_context_find_device(ctx, "m2k-logic-analyzer-rx")),
-	menuOpened(true),
+	menuOpened(false),
 	fd(-1),
 	settings_group(new QButtonGroup(this)),
 	menuRunButton(runBtn),
@@ -94,17 +96,19 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, Filter *filt, QPushButton 
 	srd_decoder_load_all();
 
 	pv::DeviceManager device_manager(context);
-	pv::MainWindow* w = new pv::MainWindow(device_manager, open_file, open_file_format, parent);
+	pv::MainWindow* w = new pv::MainWindow(device_manager, open_file,
+						open_file_format, parent);
 
 	/* Gnuradio Blocks */
 	manager = iio_manager::get_instance(ctx, "m2k-logic-analyzer-rx");
-	this->sink_streams_to_short = adiscope::streams_to_short::make(itemsize, no_channels);
+	sink_streams_to_short = adiscope::streams_to_short::make(itemsize,
+								no_channels);
 	ids = new iio_manager::port_id[no_channels];
 
 	/* setup view */
 	main_win = w;
 	ui->verticalLayout_8->removeWidget(ui->centralWidget);
-	ui->verticalLayout_8->insertWidget(1, static_cast<QWidget* >(main_win));
+	ui->verticalLayout_8->insertWidget(1, static_cast<QWidget*>(main_win));
 
 	/* setup toolbar */
 	/*
@@ -118,13 +122,46 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, Filter *filt, QPushButton 
 
 	ui->rightWidget->setMaximumWidth(0);
 
+	/* General settings */
+	settings_group->addButton(ui->btnSettings);
+	int settings_panel = ui->stackedWidget->indexOf(ui->generalSettings);
+	ui->btnSettings->setProperty("id", QVariant(-settings_panel));
+
+	// Controls for scale/division and position
+	timeBase = new ScaleSpinButton({
+					       {"ns", 1E-9},
+					       {"μs", 1E-6},
+					       {"ms", 1E-3},
+					       {"s", 1E0}
+				       }, "Time Base", 100e-9, 100e-6);
+	timePosition = new PositionSpinButton({
+						      {"ns", 1E-9},
+						      {"μs", 1E-6},
+						      {"ms", 1E-3},
+						      {"s", 1E0}
+					      }, "Position",
+					      -timeBase->maxValue() * 5,
+					      timeBase->maxValue() * 5);
+	QVBoxLayout *vLayout = new QVBoxLayout();
+	vLayout->insertWidget(1, timeBase, 0, Qt::AlignLeft);
+	vLayout->insertWidget(2, timePosition, 0, Qt::AlignLeft);
+	vLayout->insertSpacerItem(-1, new QSpacerItem(0, 0,
+						QSizePolicy::Minimum,
+						QSizePolicy::Expanding));
+	ui->generalSettings->setLayout(vLayout);
+
 	int ret = mkfifo(DATA_PIPE, 0666);
 
-	connect(ui->btnRunStop, SIGNAL(toggled(bool)), this, SLOT(startStop(bool)));
-	connect(runBtn, SIGNAL(toggled(bool)), ui->btnRunStop, SLOT(setChecked(bool)));
-	connect(ui->btnRunStop, SIGNAL(toggled(bool)), runBtn, SLOT(setChecked(bool)));
+	connect(ui->btnRunStop, SIGNAL(toggled(bool)),
+			this, SLOT(startStop(bool)));
+	connect(runBtn, SIGNAL(toggled(bool)), ui->btnRunStop,
+			SLOT(setChecked(bool)));
+	connect(ui->btnRunStop, SIGNAL(toggled(bool)), runBtn,
+			SLOT(setChecked(bool)));
 	connect(ui->btnSettings, SIGNAL(pressed()),
 			this, SLOT(toggleRightMenu()));
+	connect(ui->rightWidget, SIGNAL(finished(bool)),
+			this, SLOT(rightMenuFinished(bool)));
 }
 
 LogicAnalyzer::~LogicAnalyzer()
@@ -230,12 +267,39 @@ void LogicAnalyzer::create_fifo()
 
 void LogicAnalyzer::toggleRightMenu(QPushButton *btn)
 {
+	int id = btn->property("id").toInt();
+	bool btn_old_state = btn->isChecked();
 	bool open = !menuOpened;
+
+	active_settings_btn = btn;
+	settings_group->setExclusive(!btn_old_state);
+
+	if (open)
+		settings_panel_update(id);
+
 	ui->rightWidget->toggleMenu(open);
-	this->menuOpened = open;
+}
+
+void LogicAnalyzer::settings_panel_update(int id)
+{
+	if (id >= 0)
+		ui->stackedWidget->setCurrentIndex(0);
+	else
+		ui->stackedWidget->setCurrentIndex(-id);
 }
 
 void LogicAnalyzer::toggleRightMenu()
 {
 	toggleRightMenu(static_cast<QPushButton *>(QObject::sender()));
+}
+
+void LogicAnalyzer::rightMenuFinished(bool opened)
+{
+	menuOpened = opened;
+
+	if (!opened && active_settings_btn && active_settings_btn->isChecked()) {
+		int id = active_settings_btn->property("id").toInt();
+		settings_panel_update(id);
+		ui->rightWidget->toggleMenu(true);
+	}
 }
