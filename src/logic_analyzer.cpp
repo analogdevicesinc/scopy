@@ -107,16 +107,16 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, Filter *filt, QPushButton 
 	ui->verticalLayout_8->insertWidget(1, static_cast<QWidget* >(main_win));
 
 	/* setup toolbar */
+	/*
 	pv::toolbars::MainBar* main_bar = main_win->main_bar_;
 	QPushButton *btnDecoder = new QPushButton();
 	btnDecoder->setIcon(QIcon::fromTheme("add-decoder", QIcon(":/icons/add-decoder.svg")));
 	btnDecoder->setMenu(main_win->menu_decoder_add());
 	ui->gridLayout->addWidget(btnDecoder);
 	ui->gridLayout->addWidget(static_cast<QWidget *>(main_bar));
+	*/
 
-	QPushButton *btn = new QPushButton();
-	ui->verticalLayout_8->removeWidget(ui->captureInfo);
-	ui->verticalLayout_8->insertWidget(0, btn);
+	ui->rightWidget->setMaximumWidth(0);
 
 	int ret = mkfifo(DATA_PIPE, 0666);
 
