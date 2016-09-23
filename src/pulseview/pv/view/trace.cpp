@@ -42,12 +42,11 @@ const QPen Trace::AxisPen(QColor(0, 0, 0, 30*256/100));
 const int Trace::LabelHitPadding = 2;
 
 const int Trace::ColourBGAlpha = 8*256/100;
-const QColor Trace::BrightGrayBGColour = QColor(0, 0, 0, 10*255/100);
-const QColor Trace::DarkGrayBGColour = QColor(0, 0, 0, 15*255/100);
+const QColor Trace::BGColour = QColor(39, 39, 48, 0);
 
 Trace::Trace(QString name) :
 	name_(name),
-	coloured_bg_(true), // Default setting is set in MainWindow::setup_ui()
+	coloured_bg_(false), // Default setting is set in MainWindow::setup_ui()
 	popup_(nullptr),
 	popup_form_(nullptr)
 {
@@ -178,13 +177,8 @@ QRectF Trace::label_rect(const QRectF &rect) const
 
 void Trace::paint_back(QPainter &p, const ViewItemPaintParams &pp)
 {
-	if (coloured_bg_)
-		p.setBrush(bgcolour_);
-	else
-		p.setBrush(bgcolour_state_ ? BrightGrayBGColour : DarkGrayBGColour);
-
+	p.setBrush(BGColour);
 	p.setPen(QPen(Qt::NoPen));
-
 	const std::pair<int, int> extents = v_extents();
 
 	const int x = 0;

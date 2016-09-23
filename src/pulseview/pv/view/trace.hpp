@@ -50,8 +50,7 @@ private:
 	static const int LabelHitPadding;
 
 	static const int ColourBGAlpha;
-	static const QColor BrightGrayBGColour;
-	static const QColor DarkGrayBGColour;
+	static const QColor BGColour;
 
 protected:
 	Trace(QString name);

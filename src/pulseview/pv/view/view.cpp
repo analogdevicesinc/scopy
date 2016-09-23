@@ -118,6 +118,8 @@ View::View(Session &session, QWidget *parent) :
 	trigger_markers_(),
 	hover_point_(-1, -1)
 {
+	setFrameShape(QFrame::NoFrame);
+
 	connect(horizontalScrollBar(), SIGNAL(valueChanged(int)),
 		this, SLOT(h_scroll_value_changed(int)));
 	connect(verticalScrollBar(), SIGNAL(valueChanged(int)),
@@ -722,7 +724,7 @@ void View::set_scroll_default()
 void View::update_layout()
 {
 	setViewportMargins(
-		header_->sizeHint().width() - pv::view::Header::BaselineOffset,
+		header_->sizeHint().width() - pv::view::Header::BaselineOffset + 50,
 		ruler_->sizeHint().height(), 0, 0);
 	ruler_->setGeometry(viewport_->x(), 0,
 		viewport_->width(), ruler_->extended_size_hint().height());

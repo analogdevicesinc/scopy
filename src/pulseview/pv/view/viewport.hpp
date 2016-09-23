@@ -37,6 +37,7 @@ namespace pv {
 namespace view {
 
 class View;
+class ViewItemPaintParams;
 
 class Viewport : public ViewWidget
 {
@@ -89,8 +90,12 @@ private:
 	 */
 	bool touch_event(QTouchEvent *event);
 
+	int visible_data_count;
+
 private:
 	void paintEvent(QPaintEvent *event);
+	void paint_grid(QPainter &p, const ViewItemPaintParams &pp);
+	void paint_axis(QPainter &p, const ViewItemPaintParams &pp, int y);
 
 	void mouseDoubleClickEvent(QMouseEvent *event);
 	void wheelEvent(QWheelEvent *event);

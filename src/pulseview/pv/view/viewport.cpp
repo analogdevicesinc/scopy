@@ -182,6 +182,8 @@ void Viewport::paintEvent(QPaintEvent*)
 	for (const shared_ptr<RowItem> r : row_items)
 		r->paint_mid(p, pp);
 
+	paint_grid(p, pp);
+
 	for (const shared_ptr<RowItem> r : row_items)
 		r->paint_fore(p, pp);
 
@@ -190,6 +192,47 @@ void Viewport::paintEvent(QPaintEvent*)
 		t->paint_fore(p, pp);
 
 	p.end();
+}
+
+void Viewport::paint_grid(QPainter &p, const ViewItemPaintParams &pp)
+{
+	const int x = pp.left();
+	const int w = pp.right() -pp.left();
+	const int h = pp.height();
+	const int y = pp.top();
+
+	int division_count = 10;
+	int division_width = w / division_count;
+	int division_height = 50;
+	int row_count = h / division_height;
+
+	QPointF p1, p2;
+
+	p.setRenderHint(QPainter::Antialiasing, false);
+	QPen pen = QPen(QColor(255, 255, 255, 30*256/100));
+	for (int i = 0; i <= division_count; i++) {
+		pen.setStyle((i % 2) ? Qt::SolidLine : Qt::DashLine);
+		p.setPen(pen);
+
+		p1 = QPointF(x + i * division_width, y);
+		p2 = QPointF(x + i * division_width, y + h * row_count);
+		p.drawLine(p1, p2);
+	}
+
+	p.setRenderHint(QPainter::Antialiasing, true);
+	for (int i = 0; i <= row_count; i++) {
+		paint_axis(p, pp, y + division_height * i);
+	}
+}
+
+void Viewport::paint_axis(QPainter &p, const ViewItemPaintParams &pp, int y)
+{
+	p.setRenderHint(QPainter::Antialiasing, false);
+
+	p.setPen(QPen(QColor(255, 255, 255, 30*256/100)));
+	p.drawLine(QPointF(pp.left(), y), QPointF(pp.right(), y));
+
+	p.setRenderHint(QPainter::Antialiasing, true);
 }
 
 void Viewport::mouseDoubleClickEvent(QMouseEvent *event)
