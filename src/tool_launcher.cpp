@@ -136,13 +136,6 @@ void ToolLauncher::addRemoteContext()
 			});
 }
 
-
-bool ToolLauncher::is_m2k(const struct iio_context *ctx)
-{
-	return  !!iio_context_find_device(ctx, "m2k-adc") &&
-		!!iio_context_find_device(ctx, "m2k-dac");
-}
-
 void ToolLauncher::swapMenu(QWidget *menu)
 {
 	current->setVisible(false);
@@ -351,12 +344,10 @@ bool adiscope::ToolLauncher::switchContext(QString &uri)
 	if (!ctx)
 		return false;
 
-	if (is_m2k(ctx)) {
-		filter = new Filter("m2k");
+	filter = new Filter(ctx);
+
+	if (filter->hw_name().compare("M2K") == 0)
 		apply_m2k_fixes(ctx);
-	} else {
-		filter = new Filter("generic");
-	}
 
 	if (filter->compatible(TOOL_SIGNAL_GENERATOR)) {
 		signal_generator = new SignalGenerator(ctx, filter,

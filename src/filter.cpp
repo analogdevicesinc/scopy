@@ -36,33 +36,65 @@ static const std::string tool_names[] = {
 	"power-controller",
 };
 
-Filter::Filter(const std::string &id)
+Filter::Filter(const struct iio_context *ctx)
 {
-	QString dev_id = QString::fromStdString(id);
 	QFile file(":/filter.json");
 
 	file.open(QIODevice::ReadOnly | QIODevice::Text);
 
 	auto doc = QJsonDocument::fromJson(file.readAll());
+	auto obj = doc.object();
 
-	if (!doc.object().contains(dev_id)) {
-		fprintf(stderr, "Unable to find device in filter file\n");
-		no_filter = true;
-	} else {
-		this->root = doc.object()[dev_id].toObject();
-		no_filter = false;
+	auto keys = obj.keys();
+
+	for (auto it = keys.constBegin(); it != keys.constEnd(); ++it) {
+		auto child = obj[*it].toObject();
+
+		if (!child.contains("compatible-devices"))
+			continue;
+
+		auto compatible_devices = child["compatible-devices"];
+		if (!compatible_devices.isArray())
+			continue;
+
+		auto dev_list = compatible_devices.toArray();
+		bool compatible = true;
+
+		for (auto it2 = dev_list.constBegin(); compatible &&
+				it2 != dev_list.constEnd(); ++it2) {
+			if (!it2->isString()) {
+				compatible = false;
+				break;
+			}
+
+			auto str = it2->toString().toStdString();
+			compatible &= !!iio_context_find_device(
+					ctx, str.c_str());
+		}
+
+		if (compatible) {
+			this->root = child;
+			hwname = *it;
+			return;
+		}
 	}
+
+	fprintf(stderr, "Unable to find device in filter file\n");
+	this->root = obj["generic"].toObject();
+	hwname = "generic";
 }
 
 Filter::~Filter()
 {
 }
 
+QString& Filter::hw_name()
+{
+	return hwname;
+}
+
 bool Filter::compatible(enum tool tool) const
 {
-	if (no_filter)
-		return true;
-
 	auto hdl = root["compatible"];
 	if (!hdl.isArray())
 		return false;
@@ -73,9 +105,6 @@ bool Filter::compatible(enum tool tool) const
 
 bool Filter::usable(enum tool tool, const std::string &dev) const
 {
-	if (no_filter)
-		return true;
-
 	auto hdl = root[QString::fromStdString(tool_names[tool] + "-devices")];
 	if (hdl.isNull())
 		return true;
@@ -87,9 +116,6 @@ bool Filter::usable(enum tool tool, const std::string &dev) const
 
 const std::string Filter::device_name(enum tool tool) const
 {
-	if (no_filter)
-		throw std::runtime_error("No XML filter file");
-
 	auto hdl = root[QString::fromStdString(tool_names[tool] + "-device")];
 	if (!hdl.isString())
 		throw std::runtime_error("Tool not compatible");

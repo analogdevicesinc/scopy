@@ -1,12 +1,11 @@
 {
 	"generic": {
-		"name": "Generic libiio-compatible device",
 		"compatible": [ "signal-generator", "voltmeter" ]
 	},
 
-	"m2k": {
-		"name": "M2K",
+	"M2K": {
 		"compatible": [ "signal-generator", "voltmeter", "power-controller", "oscilloscope" ],
+		"compatible-devices": [ "m2k-adc", "m2k-dac" ],
 		"oscilloscope-device": "m2k-adc",
 		"voltmeter-device": "m2k-adc",
 		"signal-generator-device": "m2k-dac"

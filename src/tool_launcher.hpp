@@ -93,7 +93,6 @@ namespace adiscope {
 		void addContext(const QString &name, const QString& hostname);
 
 		static void apply_m2k_fixes(struct iio_context *ctx);
-		static bool is_m2k(const struct iio_context *ctx);
 	};
 }
 

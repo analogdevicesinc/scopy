@@ -23,6 +23,7 @@
 #include <string>
 
 #include <QJsonObject>
+#include <QString>
 
 extern "C" {
 	struct iio_context;
@@ -42,11 +43,13 @@ namespace adiscope {
 	{
 	private:
 		QJsonObject root;
-		bool no_filter;
+		QString hwname;
 
 	public:
-		Filter(const std::string &id);
+		Filter(const struct iio_context *ctx);
 		~Filter();
+
+		QString& hw_name();
 
 		bool compatible(enum tool tool) const;
 		bool usable(enum tool tool, const std::string &dev) const;
