@@ -105,7 +105,7 @@ void BinaryBuffer::start()
 
 void BinaryBuffer::run()
 {
-    char buffer[BufferSize];
+    //char buffer[BufferSize];
 
     input_->reset();
 

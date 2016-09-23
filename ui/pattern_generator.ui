@@ -406,14 +406,14 @@ background-color: #F45000;
         </property>
         <property name="minimumSize">
          <size>
-          <width>62</width>
-          <height>42</height>
+          <width>60</width>
+          <height>40</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>62</width>
-          <height>42</height>
+          <width>60</width>
+          <height>40</height>
          </size>
         </property>
         <property name="styleSheet">
@@ -507,7 +507,7 @@ QPushButton:!checked {
         <property name="styleSheet">
          <string notr="true"/>
         </property>
-        <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0,0,0,0,0,0,0">
+        <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
          <property name="topMargin">
           <number>9</number>
          </property>
@@ -517,66 +517,6 @@ QPushButton:!checked {
          <property name="spacing">
           <number>6</number>
          </property>
-         <item row="7" column="0">
-          <widget class="QWidget" name="verticalWidget" native="true">
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>0</height>
-            </size>
-           </property>
-           <layout class="QVBoxLayout" name="verticalLayout_5">
-            <property name="spacing">
-             <number>1</number>
-            </property>
-            <property name="leftMargin">
-             <number>0</number>
-            </property>
-            <property name="topMargin">
-             <number>9</number>
-            </property>
-            <property name="rightMargin">
-             <number>0</number>
-            </property>
-            <property name="bottomMargin">
-             <number>9</number>
-            </property>
-            <item>
-             <widget class="QLabel" name="label_4">
-              <property name="text">
-               <string>Show</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QComboBox" name="comboBox_4">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="Line" name="line">
-           <property name="styleSheet">
-            <string notr="true">QFrame { color:  rgb(73, 99, 255); }</string>
-           </property>
-           <property name="frameShadow">
-            <enum>QFrame::Plain</enum>
-           </property>
-           <property name="lineWidth">
-            <number>2</number>
-           </property>
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-          </widget>
-         </item>
          <item row="4" column="0" rowspan="2">
           <widget class="QWidget" name="horizontalWidget" native="true">
            <property name="minimumSize">
@@ -826,6 +766,69 @@ QPushButton:!checked {
            </layout>
           </widget>
          </item>
+         <item row="7" column="0">
+          <widget class="QWidget" name="verticalWidget" native="true">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_5">
+            <property name="spacing">
+             <number>1</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>9</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>9</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="label_4">
+              <property name="text">
+               <string>Show</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="comboBox_4">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="Line" name="line">
+           <property name="styleSheet">
+            <string notr="true">QFrame { color:  rgb(73, 99, 255); }</string>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Plain</enum>
+           </property>
+           <property name="lineWidth">
+            <number>2</number>
+           </property>
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="9" column="0">
+          <widget class="QLineEdit" name="generation_data"/>
+         </item>
          <item row="0" column="0">
           <widget class="QLabel" name="settings_label">
            <property name="sizePolicy">
@@ -947,6 +950,19 @@ QPushButton:!checked {
            </property>
           </widget>
          </item>
+         <item row="13" column="0">
+          <widget class="QLineEdit" name="UARTFormat"/>
+         </item>
+         <item row="10" column="0">
+          <widget class="QLineEdit" name="sampleRate"/>
+         </item>
+         <item row="11" column="0">
+          <widget class="QPushButton" name="BinaryCounter">
+           <property name="text">
+            <string>BinaryCounter</string>
+           </property>
+          </widget>
+         </item>
          <item row="6" column="0">
           <widget class="QWidget" name="verticalWidget" native="true">
            <property name="minimumSize">
@@ -1011,6 +1027,13 @@ QPushButton:!checked {
              </widget>
             </item>
            </layout>
+          </widget>
+         </item>
+         <item row="12" column="0">
+          <widget class="QPushButton" name="UART">
+           <property name="text">
+            <string>UART</string>
+           </property>
           </widget>
          </item>
          <item row="8" column="0">
@@ -1102,7 +1125,7 @@ QPushButton:!checked {
            </layout>
           </widget>
          </item>
-         <item row="9" column="0">
+         <item row="15" column="0">
           <spacer name="verticalSpacer">
            <property name="orientation">
             <enum>Qt::Vertical</enum>
@@ -1114,6 +1137,9 @@ QPushButton:!checked {
             </size>
            </property>
           </spacer>
+         </item>
+         <item row="14" column="0">
+          <widget class="QLineEdit" name="holdOff"/>
          </item>
         </layout>
        </widget>

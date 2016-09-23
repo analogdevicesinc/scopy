@@ -118,7 +118,8 @@ MainWindow::MainWindow(DeviceManager &device_manager,
 	if (open_file_name.empty())
 		select_init_device("M2K");
 	else
-		load_init_file(open_file_name, open_file_format);
+        if(open_file_name!="pattern_generator")
+            load_init_file(open_file_name, open_file_format);
 }
 
 QAction* MainWindow::action_open() const

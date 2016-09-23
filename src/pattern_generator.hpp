@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QPushButton>
 #include <vector>
+#include <libserialport.h>
 
 #include "src/pulseview/pv/devices/binarybuffer.hpp"
 #include "iio_manager.hpp"
@@ -53,10 +54,14 @@ private Q_SLOTS:
     void singleRunStop();
     void toggleRightMenu();
 
+    void on_BinaryCounter_clicked();
+    void on_UART_clicked();
+
 private:
 //    pv::devices::PatternGenerator *pattern_generator_device;
-
+    std::shared_ptr<sigrok::Context> context;
     std::shared_ptr<pv::devices::BinaryBuffer> pattern_generator_ptr;
+    std::shared_ptr<sigrok::InputFormat> binary_format;
     Ui::PatternGenerator *ui;
     QButtonGroup *settings_group;
     QPushButton *menuRunButton;
@@ -73,8 +78,7 @@ private:
 
     std::map<std::string, Glib::VariantBase> options;
 
-    #define BUFFER_SIZE 65535
-    short buffer[BUFFER_SIZE];
+    short *buffer;
 
     uint64_t number_of_samples;
     uint64_t buffersize;
@@ -84,6 +88,14 @@ private:
 
     pv::MainWindow* main_win;
 
+
+    static int parseParamsUart(const char *params,
+            unsigned int *baud_rate, unsigned int *bits,
+            enum sp_parity *parity,  unsigned int *stop_bits);
+    void createBinaryCounter(int maxCount, uint64_t sampleRate);
+    void createUart(const char *str, uint16_t str_length, const char *params, uint64_t sample_rate_, uint32_t holdoff_time, uint16_t channel = 0, bool msb_first = 0);
+    void createBinaryBuffer();
+    uint16_t encapsulateUartFrame(char chr, uint16_t *bits_per_frame, uint16_t data_bits_per_frame, sp_parity parity, uint16_t stop_bits, bool msb_first);
     void toggleRightMenu(QPushButton *btn);
     bool menuOpened;
 
