@@ -90,7 +90,7 @@ namespace adiscope {
 		bool switchContext(QString &uri);
 		void resetStylesheets();
 		void calibrate();
-		void addContext(const QString &name, const QString& hostname);
+		void addContext(const QString& hostname);
 
 		static void apply_m2k_fixes(struct iio_context *ctx);
 	};

@@ -66,8 +66,7 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 		if (!QString(uri).startsWith("usb:"))
 			continue;
 
-		/* TODO: add a proper name/description */
-		addContext("M2K", QString(uri));
+		addContext(QString(uri));
 	}
 
 	iio_context_info_list_free(info);
@@ -100,12 +99,11 @@ void ToolLauncher::destroyPopup()
 	popup->deleteLater();
 }
 
-void ToolLauncher::addContext(const QString& name, const QString& uri)
+void ToolLauncher::addContext(const QString& uri)
 {
 	auto pair = new QPair<QWidget, Ui::Device>;
 	pair->second.setupUi(&pair->first);
 
-	pair->second.name->setText(name);
 	pair->second.description->setText(uri);
 
 	ui->devicesList->addWidget(&pair->first);
@@ -131,7 +129,7 @@ void ToolLauncher::addRemoteContext()
 	ConnectDialog *dialog = new ConnectDialog(popup);
 	connect(dialog, &ConnectDialog::newContext,
 			[=](const QString& uri) {
-				addContext("IP", uri);
+				addContext(uri);
 				popup->close();
 			});
 }
@@ -231,10 +229,14 @@ void adiscope::ToolLauncher::on_btnConnect_clicked(bool pressed)
 	}
 
 	QPushButton *btn = nullptr;
+	QLabel *label = nullptr;
 
-	for (auto it = devices.begin(); !btn && it != devices.end(); ++it)
-		if ((*it)->second.btn->isChecked())
+	for (auto it = devices.begin(); !btn && it != devices.end(); ++it) {
+		if ((*it)->second.btn->isChecked()) {
 			btn = (*it)->second.btn;
+			label = (*it)->second.name;
+		}
+	}
 
 	if (!btn)
 		throw std::runtime_error("No enabled device!");
@@ -245,6 +247,9 @@ void adiscope::ToolLauncher::on_btnConnect_clicked(bool pressed)
 		ui->btnConnect->setText("Connected!");
 		setDynamicProperty(ui->btnConnect, "connected", true);
 		setDynamicProperty(btn, "connected", true);
+
+		if (label)
+			label->setText(filter->hw_name());
 	} else {
 		ui->btnConnect->setText("Failed!");
 		setDynamicProperty(ui->btnConnect, "failed", true);
