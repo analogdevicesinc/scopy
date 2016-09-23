@@ -3,6 +3,14 @@
 		"compatible": [ "signal-generator", "voltmeter" ]
 	},
 
+	"FMComms2-4": {
+		"compatible": [ "signal-generator", "voltmeter", "oscilloscope" ],
+		"compatible-devices": [ "cf-ad9361-lpc", "cf-ad9361-dds-core-lpc", "ad9361-phy" ],
+		"oscilloscope-device": "cf-ad9361-lpc",
+		"voltmeter-device": "cf-ad9361-lpc",
+		"signal-generator-device": "cf-ad9361-dds-core-lpc"
+	},
+
 	"M2K": {
 		"compatible": [ "signal-generator", "voltmeter", "power-controller", "oscilloscope" ],
 		"compatible-devices": [ "m2k-adc", "m2k-dac" ],
