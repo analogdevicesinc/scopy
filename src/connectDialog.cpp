@@ -65,8 +65,8 @@ void ConnectDialog::discardSettings()
 void ConnectDialog::validateInput()
 {
 	QString new_uri = "ip:" + ui->hostname->text();
-	const char *uri_c = new_uri.toStdString().c_str();
-	struct iio_context *ctx = iio_create_context_from_uri(uri_c);
+	struct iio_context *ctx = iio_create_context_from_uri(
+			new_uri.toStdString().c_str());
 
 	this->connected = !!ctx;
 	if (!!ctx) {
