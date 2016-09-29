@@ -38,6 +38,7 @@
 #include "ui_channel_settings.h"
 #include "ui_cursors_settings.h"
 #include "ui_osc_general_settings.h"
+#include "ui_measure_settings.h"
 #include "ui_oscilloscope.h"
 #include "ui_trigger.h"
 
@@ -185,6 +186,28 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 				this, SLOT(toggleRightMenu()));
 	connect(cursor_ui.box, SIGNAL(toggled(bool)), this,
 			SLOT(onCursorsToggled(bool)));
+
+	/* Measurements Settings */
+	int measure_panel = ui->stackedWidget->indexOf(ui->measureSettings);
+
+	Ui::MeasureSettings *msettings_ui = new Ui::MeasureSettings();
+	msettings_ui->setupUi(ui->measureSettings);
+
+	QWidget *measure_widget = new QWidget(this);
+	Ui::Channel measure_ui;
+
+	measure_ui.setupUi(measure_widget);
+	ui->measure_settings->addWidget(measure_widget);
+	settings_group->addButton(measure_ui.btn);
+	measure_ui.btn->setProperty("id", QVariant(-measure_panel));
+	measure_ui.box->setText("Measure");
+	measure_ui.box->setChecked(false);
+	measure_ui.box->setStyleSheet(stylesheet);
+
+	connect(measure_ui.btn, SIGNAL(pressed()),
+				this, SLOT(toggleRightMenu()));
+	connect(measure_ui.box, SIGNAL(toggled(bool)), this,
+			SLOT(onMeasureToggled(bool)));
 
 	/* Trigger Settings */
 	QWidget *trig_widget = new QWidget(this);
@@ -817,6 +840,20 @@ void adiscope::Oscilloscope::onCursorsToggled(bool on)
 	}
 
 	plot.setMeasurementCursorsEnabled(on);
+}
+
+void adiscope::Oscilloscope::onMeasureToggled(bool on)
+{
+	QCheckBox *box = static_cast<QCheckBox *>(QObject::sender());
+	QPushButton *btn = box->parentWidget()->findChild<QPushButton *>("btn");
+
+	if (!on) {
+		if (btn->isChecked()) {
+			settings_group->setExclusive(false);
+			btn->setChecked(false);
+			toggleRightMenu(btn);
+		}
+	}
 }
 
 void Oscilloscope::updateTriggerSpinbox(double value)

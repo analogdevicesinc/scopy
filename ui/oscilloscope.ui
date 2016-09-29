@@ -349,6 +349,7 @@ QPushButton:!checked {
           </property>
           <widget class="QWidget" name="channelSettings"/>
           <widget class="QWidget" name="cursorsSettings"/>
+          <widget class="QWidget" name="measureSettings"/>
           <widget class="QWidget" name="generalSettings"/>
          </widget>
         </item>
@@ -397,6 +398,9 @@ QPushButton:!checked {
      </item>
      <item>
       <layout class="QHBoxLayout" name="cursors_settings"/>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="measure_settings"/>
      </item>
      <item>
       <layout class="QHBoxLayout" name="trigger_settings"/>

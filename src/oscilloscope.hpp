@@ -75,6 +75,7 @@ namespace adiscope {
 	private slots:
 		void on_actionClose_triggered();
 		void onCursorsToggled(bool on);
+		void onMeasureToggled(bool on);
 
 		void onFFT_view_toggled(bool visible);
 		void onHistogram_view_toggled(bool visible);
