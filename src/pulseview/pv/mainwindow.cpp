@@ -116,7 +116,7 @@ MainWindow::MainWindow(DeviceManager &device_manager,
 
     setup_ui();
 	if (open_file_name.empty())
-		select_init_device();
+		select_init_device("M2K");
 	else
 		load_init_file(open_file_name, open_file_format);
 }
@@ -556,9 +556,24 @@ void MainWindow::select_init_device()
 	}
 
 	select_device(device);
-//	update_device_list();
-
 	settings.endGroup();
+}
+
+
+
+void MainWindow::select_init_device(const char* driver_name)
+{
+	map<string, string> dev_info;
+	shared_ptr<devices::HardwareDevice> device;
+
+	for (shared_ptr<devices::HardwareDevice> dev : device_manager_.devices()) {
+		if ( dev->hardware_device()->driver()->name() == driver_name )
+		{
+			device = dev;
+			break;
+		}
+	}
+	select_device(device);
 }
 
 void MainWindow::load_init_file(const std::string &file_name,

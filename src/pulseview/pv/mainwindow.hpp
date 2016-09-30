@@ -111,6 +111,8 @@ private:
 
 	void select_init_device();
 
+	void select_init_device(const char* driver_name);
+
 	void load_init_file(const std::string &file_name,
 		const std::string &format);
 
