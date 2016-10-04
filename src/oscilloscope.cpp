@@ -39,6 +39,7 @@
 #include "ui_cursors_settings.h"
 #include "ui_osc_general_settings.h"
 #include "ui_measure_settings.h"
+#include "ui_measure_panel.h"
 #include "ui_oscilloscope.h"
 #include "ui_trigger.h"
 
@@ -208,6 +209,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 				this, SLOT(toggleRightMenu()));
 	connect(measure_ui.box, SIGNAL(toggled(bool)), this,
 			SLOT(onMeasureToggled(bool)));
+	connect(measure_ui.box, SIGNAL(toggled(bool)),
+		&plot, SLOT(setMeasuremensEnabled(bool)));
 
 	/* Trigger Settings */
 	QWidget *trig_widget = new QWidget(this);
@@ -248,15 +251,25 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	if (started)
 		iio->unlock();
 
+	/* Measure panel */
+	measurePanel = new QWidget(this);
+	measure_panel_ui = new Ui::MeasurementsPanel();
+	measure_panel_ui->setupUi(measurePanel);
+	measurePanel->hide();
+
+	connect(&plot, SIGNAL(measurementsAvailable()),
+		SLOT(onMeasuremetsAvailable()));
+
 	/* Plot layout */
 
 	/* Top transparent widget */
 
-	ui->gridLayoutPlot->addWidget(plot.topArea(), 0, 0, 1, 3);
-	ui->gridLayoutPlot->addWidget(plot.leftHandlesArea(), 0, 0, 3, 1);
-	ui->gridLayoutPlot->addWidget(&plot, 1, 1, 1, 1);
-	ui->gridLayoutPlot->addWidget(plot.rightHandlesArea(), 0, 2, 3, 1);
-	ui->gridLayoutPlot->addWidget(plot.bottomHandlesArea(), 2, 0, 1, 3);
+	ui->gridLayoutPlot->addWidget(measurePanel, 0, 1, 1, 1);
+	ui->gridLayoutPlot->addWidget(plot.topArea(), 1, 0, 1, 3);
+	ui->gridLayoutPlot->addWidget(plot.leftHandlesArea(), 1, 0, 3, 1);
+	ui->gridLayoutPlot->addWidget(&plot, 2, 1, 1, 1);
+	ui->gridLayoutPlot->addWidget(plot.rightHandlesArea(), 1, 2, 3, 1);
+	ui->gridLayoutPlot->addWidget(plot.bottomHandlesArea(), 3, 0, 1, 3);
 
 	/* Default plot settings */
 	plot.setSampleRate(adc.sampleRate(), 1, "");
@@ -465,6 +478,7 @@ Oscilloscope::~Oscilloscope()
 	delete[] fft_ids;
 	delete[] ids;
 	delete gsettings_ui;
+	delete measure_panel_ui;
 	delete ui;
 }
 
@@ -854,6 +868,7 @@ void adiscope::Oscilloscope::onMeasureToggled(bool on)
 			toggleRightMenu(btn);
 		}
 	}
+	measurePanel->setVisible(on);
 }
 
 void Oscilloscope::updateTriggerSpinbox(double value)
@@ -1127,4 +1142,70 @@ double Oscilloscope::pickSampleRateFor(double timeSpanSecs, double desiredBuffer
 	idealSampleRate = sampling_rates[srIdx];
 
 	return idealSampleRate;
+}
+
+void Oscilloscope::onMeasuremetsAvailable()
+{
+	TimePrefixFormatter *hf = &horizMeasureFormat;
+	MetricPrefixFormatter *vf = &vertMeasureFormat;
+
+	measure_panel_ui->label_period_val->setText(
+		hf->format(plot.measuredPeriod(), "", 3));
+
+	measure_panel_ui->label_freq_val->setText(
+		vf->format(plot.measuredFreq(), "Hz", 3));
+
+	measure_panel_ui->label_min_val->setText(
+		vf->format(plot.measuredMin(), "V", 3));
+
+	measure_panel_ui->label_max_val->setText(
+		vf->format(plot.measuredMax(), "V", 3));
+
+	measure_panel_ui->label_ppeak_val->setText(
+		vf->format(plot.measuredPkToPk(), "V", 3));
+
+	measure_panel_ui->label_mean_val->setText(
+		vf->format(plot.measuredMean(), "V", 3));
+
+	measure_panel_ui->label_rms_val->setText(
+		vf->format(plot.measuredRms(), "V", 3));
+
+	measure_panel_ui->label_ac_rms_val->setText(
+		vf->format(plot.measuredRmsAC(), "V", 3));
+
+	measure_panel_ui->label_ampl_val->setText(
+		vf->format(plot.measuredAmplitude(), "V", 3));
+
+	measure_panel_ui->label_low_val->setText(
+		vf->format(plot.measuredLow(), "V", 3));
+
+	measure_panel_ui->label_high_val->setText(
+		vf->format(plot.measuredHigh(), "V", 3));
+
+	measure_panel_ui->label_middle_val->setText(
+		vf->format(plot.measuredMiddle(), "V", 3));
+
+	measure_panel_ui->label_overshoot_p_val->setText(
+		vf->format(plot.measuredPosOvershoot(), "", 2) + "%");
+
+	measure_panel_ui->label_overshoot_n_val->setText(
+		vf->format(plot.measuredNegOvershoot(), "", 2) + "%");
+
+	measure_panel_ui->label_rise_val->setText(
+		hf->format(plot.measuredRiseTime(), "", 3));
+
+	measure_panel_ui->label_fall_val->setText(
+		hf->format(plot.measuredFallTime(), "", 3));
+
+	measure_panel_ui->label_width_p_val->setText(
+		hf->format(plot.measuredPosWidth(), "", 3));
+
+	measure_panel_ui->label_width_n_val->setText(
+		hf->format(plot.measuredNegWidth(), "", 3));
+
+	measure_panel_ui->label_duty_p_val->setText(
+		vf->format(plot.measuredPosDuty(), "", 2) + "%");
+
+	measure_panel_ui->label_duty_n_val->setText(
+		vf->format(plot.measuredNegDuty(), "", 2) + "%");
 }

@@ -48,11 +48,13 @@
 #include "spinbox_a.hpp"
 #include "trigger_settings.hpp"
 #include "osc_adc.h"
+#include "plot_utils.hpp"
 
 namespace Ui {
 	class Channel;
 	class Oscilloscope;
 	class OscGeneralSettings;
+	class MeasurementsPanel;
 }
 
 namespace adiscope {
@@ -105,6 +107,8 @@ namespace adiscope {
 
 		void del_math_channel();
 
+		void onMeasuremetsAvailable();
+
 	private:
 		OscADC adc;
 		unsigned int nb_channels, nb_math_channels;
@@ -117,6 +121,8 @@ namespace adiscope {
 		FftDisplayPlot fft_plot;
 		ConstellationDisplayPlot xy_plot;
 		HistogramDisplayPlot hist_plot;
+		Ui::MeasurementsPanel *measure_panel_ui;
+		QWidget *measurePanel;
 
 		adiscope::scope_sink_f::sptr qt_time_block;
 		adiscope::scope_sink_f::sptr qt_fft_block;
@@ -146,6 +152,9 @@ namespace adiscope {
 
 		NumberSeries voltsPerDivList;
 		NumberSeries secPerDivList;
+
+		MetricPrefixFormatter vertMeasureFormat;
+		TimePrefixFormatter horizMeasureFormat;
 
 		bool menuOpened;
 		unsigned int current_channel;
