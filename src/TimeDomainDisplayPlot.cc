@@ -416,6 +416,9 @@ TimeDomainDisplayPlot::plotNewData(const std::string sender,
 //      }
 
       replot();
+
+      emit newData();
+
     }
   }
 }

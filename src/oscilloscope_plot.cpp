@@ -57,7 +57,9 @@ CapturePlot::CapturePlot(QWidget *parent,
 	OscilloscopePlot(parent, xNumDivs, yNumDivs),
 	d_triggerAEnabled(false),
 	d_triggerBEnabled(false),
-	d_measurementEnabled(false)
+	d_measurementEnabled(false),
+	d_measurementsEnabled(false),
+	d_chnToMeasure(0)
 {
 	/* Initial colors scheme */
 	d_trigAactiveLinePen = QPen(QColor(255, 255, 255), 2, Qt::SolidLine);
@@ -263,6 +265,10 @@ CapturePlot::CapturePlot(QWidget *parent,
 	connect(d_hBar2, SIGNAL(positionChanged(double)),
 			SLOT(onVoltageCursor2Moved(double)));
 
+	/* Apply measurements for every new batch of data */
+	connect(this, SIGNAL(newData()),
+		SLOT(onNewDataReceived()));
+
 	/* Add offset widgets for each new channel */
 	connect(this, SIGNAL(channelAdded(int)),
 		SLOT(onChannelAdded(int)));
@@ -458,6 +464,26 @@ bool CapturePlot::horizCursorsEnabled()
 	return d_horizCursorsEnabled;
 }
 
+void CapturePlot::setMeasuremensEnabled(bool en)
+{
+	d_measurementsEnabled = en;
+}
+
+bool CapturePlot::measurementsEnabled()
+{
+	return d_measurementsEnabled;
+}
+
+void CapturePlot::setChannelToMeasure(int chnIdx)
+{
+	d_chnToMeasure = chnIdx;
+}
+
+int CapturePlot::channelToMeasure()
+{
+	return d_chnToMeasure;
+}
+
 void CapturePlot::onTimeTriggerHandlePosChanged(int pos)
 {
 	QwtScaleMap xMap = this->canvasMap(QwtAxisId(QwtPlot::xBottom, 0));
@@ -541,4 +567,124 @@ void CapturePlot::removeOffsetWidgets(int chnIdx)
 	d_symbolCtrl->detachSymbol(bar);
 	delete bar;
 	delete(d_offsetHandles.takeAt(chnIdx));
+}
+
+void CapturePlot::measure(int chnIdx)
+{
+	d_measure.setDataSource(d_ydata[chnIdx], Curve(chnIdx)->data()->size());
+	d_measure.setSampleRate(this->sampleRate());
+	d_measure.setHysteresisSpan(0.2);
+	d_measure.setCrossLevel(1.0);
+	d_measure.setAdcBitCount(12);
+	d_measure.measure();
+}
+
+void CapturePlot::onNewDataReceived()
+{
+	if (!d_measurementsEnabled)
+		return;
+
+	measure(d_chnToMeasure);
+
+	emit measurementsAvailable();
+}
+
+double CapturePlot::measuredPeriod()
+{
+	return d_measure.period();
+}
+
+double CapturePlot::measuredFreq()
+{
+	return d_measure.frequency();
+}
+
+double CapturePlot::measuredMin()
+{
+	return d_measure.min();
+}
+
+double CapturePlot::measuredMax()
+{
+	return d_measure.max();
+}
+
+double CapturePlot::measuredPkToPk()
+{
+	return d_measure.peakToPeak();
+}
+
+double CapturePlot::measuredMean()
+{
+	return d_measure.mean();
+}
+
+double CapturePlot::measuredRms()
+{
+	return d_measure.rms();
+}
+
+double CapturePlot::measuredRmsAC()
+{
+	return d_measure.rmsAC();
+}
+
+double CapturePlot::measuredLow()
+{
+	return d_measure.low();
+}
+
+double CapturePlot::measuredMiddle()
+{
+	return d_measure.middle();
+}
+
+double CapturePlot::measuredHigh()
+{
+	return d_measure.high();
+}
+
+double CapturePlot::measuredAmplitude()
+{
+	return d_measure.amplitude();
+}
+
+double CapturePlot::measuredPosOvershoot()
+{
+	return d_measure.positiveOvershoot();
+}
+
+double CapturePlot::measuredNegOvershoot()
+{
+	return d_measure.negativeOvershoot();
+}
+
+double CapturePlot::measuredRiseTime()
+{
+	return d_measure.riseTime();
+}
+
+double CapturePlot::measuredFallTime()
+{
+	return d_measure.fallTime();
+}
+
+double CapturePlot::measuredPosWidth()
+{
+	return d_measure.posWidth();
+}
+
+double CapturePlot::measuredNegWidth()
+{
+	return d_measure.negWidth();
+}
+
+double CapturePlot::measuredPosDuty()
+{
+	return d_measure.posDuty();
+}
+
+double CapturePlot::measuredNegDuty()
+{
+	return d_measure.negDuty();
 }

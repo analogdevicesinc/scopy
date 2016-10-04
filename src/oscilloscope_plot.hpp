@@ -25,6 +25,7 @@
 #include "handles_area.hpp"
 #include "plot_line_handle.h"
 #include "cursor_readouts.h"
+#include "measure.h"
 
 namespace adiscope {
 	class PlotWidget;
@@ -61,12 +62,37 @@ namespace adiscope {
 		bool measurementCursorsEnabled();
 		bool vertCursorsEnabled();
 		bool horizCursorsEnabled();
+		bool measurementsEnabled();
+		int channelToMeasure();
 
 		void removeOffsetWidgets(int chnIdx);
+
+		void measure(int chnIdx);
+		double measuredPeriod();
+		double measuredFreq();
+		double measuredMin();
+		double measuredMax();
+		double measuredPkToPk();
+		double measuredMean();
+		double measuredRms();
+		double measuredRmsAC();
+		double measuredLow();
+		double measuredMiddle();
+		double measuredHigh();
+		double measuredAmplitude();
+		double measuredPosOvershoot();
+		double measuredNegOvershoot();
+		double measuredRiseTime();
+		double measuredFallTime();
+		double measuredPosWidth();
+		double measuredNegWidth();
+		double measuredPosDuty();
+		double measuredNegDuty();
 
 	signals:
 		void timeTriggerValueChanged(double);
 		void channelOffsetChanged(double);
+		void measurementsAvailable();
 
 	public slots:
 		void setTriggerAEnabled(bool en);
@@ -74,9 +100,13 @@ namespace adiscope {
 		void setMeasurementCursorsEnabled(bool en);
 		void setVertCursorsEnabled(bool en);
 		void setHorizCursorsEnabled(bool en);
+		void setMeasuremensEnabled(bool en);
+		void setChannelToMeasure(int chnIdx);
 
 	private slots:
 		void onChannelAdded(int);
+		void onNewDataReceived();
+
 
 		void onHbar1PixelPosChanged(int);
 		void onHbar2PixelPosChanged(int);
@@ -101,6 +131,7 @@ namespace adiscope {
 		bool d_measurementEnabled;
 		bool d_vertCursorsEnabled;
 		bool d_horizCursorsEnabled;
+		bool d_measurementsEnabled;
 
 		QWidget *d_topWidget;
 		HorizHandlesArea *d_bottomHandlesArea;
@@ -136,6 +167,8 @@ namespace adiscope {
 	        QPen d_trigBactiveLinePen;
 	        QPen d_trigBinactiveLinePen;
 
+	        Measure d_measure;
+	        int d_chnToMeasure;
 	};
 }
 

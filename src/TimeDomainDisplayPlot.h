@@ -114,6 +114,7 @@ public:
 
 signals:
   void channelAdded(int);
+  void newData();
 
 public slots:
   void setSampleRate(double sr, double units,
@@ -158,12 +159,13 @@ protected:
 private slots:
   void newData(const QEvent*);
 
+protected:
+  std::vector<double*> d_ydata;
+  std::vector<double*> d_xdata;
+
 private:
   void _resetXAxisPoints(double*& xAxis, unsigned long long numPoints, double sampleRate);
   void _autoScale(double bottom, double top);
-
-  std::vector<double*> d_ydata;
-  std::vector<double*>d_xdata;
 
   double d_sample_rate;
   double d_delay;
