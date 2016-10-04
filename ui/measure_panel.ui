@@ -1,0 +1,429 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MeasurementsPanel</class>
+ <widget class="QWidget" name="MeasurementsPanel">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>757</width>
+    <height>75</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="2" column="13">
+    <widget class="QLabel" name="label_overshoot_n">
+     <property name="text">
+      <string>-Over:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="14">
+    <widget class="QLabel" name="label_overshoot_n_val">
+     <property name="text">
+      <string>0</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="14">
+    <widget class="QLabel" name="label_overshoot_p_val">
+     <property name="text">
+      <string>0</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="10">
+    <widget class="QLabel" name="label_ampl">
+     <property name="text">
+      <string>Amplitude:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="14">
+    <widget class="QLabel" name="label_middle_val">
+     <property name="text">
+      <string>0</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="13">
+    <widget class="QLabel" name="label_middle">
+     <property name="text">
+      <string>Middle:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="21">
+    <widget class="QLabel" name="label_width_n_val">
+     <property name="text">
+      <string>0</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="20">
+    <widget class="QLabel" name="label_duty_p">
+     <property name="text">
+      <string>+Duty:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="21">
+    <widget class="QLabel" name="label_duty_p_val">
+     <property name="text">
+      <string>0</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="20">
+    <widget class="QLabel" name="label_duty_n">
+     <property name="text">
+      <string>-Duty:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="21">
+    <widget class="QLabel" name="label_duty_n_val">
+     <property name="text">
+      <string>0</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QLabel" name="label_period_val">
+     <property name="text">
+      <string>0</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="8">
+    <widget class="QLabel" name="label_rms_val">
+     <property name="text">
+      <string>0</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="3">
+    <widget class="QLabel" name="label_max">
+     <property name="text">
+      <string>Max:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="11">
+    <widget class="QLabel" name="label_ampl_val">
+     <property name="text">
+      <string>0</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="10">
+    <widget class="QLabel" name="label_high">
+     <property name="text">
+      <string>High:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="3">
+    <widget class="QLabel" name="label_ppeak">
+     <property name="text">
+      <string>Peak-peak:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_freq">
+     <property name="text">
+      <string>Frequency:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="6">
+    <widget class="QLabel" name="label_ac_rms">
+     <property name="text">
+      <string>AC RMS:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="11">
+    <widget class="QLabel" name="label_low_val">
+     <property name="text">
+      <string>0</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="10">
+    <widget class="QLabel" name="label_low">
+     <property name="text">
+      <string>Low:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="label_period">
+     <property name="text">
+      <string>Period:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="11">
+    <widget class="QLabel" name="label_high_val">
+     <property name="text">
+      <string>0</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="5">
+    <spacer name="horizontalSpacer_3">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>0</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="0" column="8">
+    <widget class="QLabel" name="label_mean_val">
+     <property name="text">
+      <string>0</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="4">
+    <widget class="QLabel" name="label_ppeak_val">
+     <property name="text">
+      <string>0</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="6">
+    <widget class="QLabel" name="label_mean">
+     <property name="text">
+      <string>Mean:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="4">
+    <widget class="QLabel" name="label_min_val">
+     <property name="text">
+      <string>0</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="8">
+    <widget class="QLabel" name="label_ac_rms_val">
+     <property name="text">
+      <string>0</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="6">
+    <widget class="QLabel" name="label_rms">
+     <property name="text">
+      <string>RMS:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QLabel" name="label_freq_val">
+     <property name="text">
+      <string>0</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="22">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="0" column="3">
+    <widget class="QLabel" name="label_min">
+     <property name="text">
+      <string>Min:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="9">
+    <spacer name="horizontalSpacer_4">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>0</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="0" column="2">
+    <spacer name="horizontalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>0</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="8" column="0">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="0" column="12">
+    <spacer name="horizontalSpacer_5">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>0</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="1" column="13">
+    <widget class="QLabel" name="label_overshoot_p">
+     <property name="text">
+      <string>+Over</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="4">
+    <widget class="QLabel" name="label_max_val">
+     <property name="text">
+      <string>0</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="15">
+    <spacer name="horizontalSpacer_7">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>0</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="0" column="16">
+    <widget class="QLabel" name="label_rise">
+     <property name="text">
+      <string>Rise:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="18">
+    <widget class="QLabel" name="label_rise_val">
+     <property name="text">
+      <string>0</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="16">
+    <widget class="QLabel" name="label_fall">
+     <property name="text">
+      <string>Fall:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="18">
+    <widget class="QLabel" name="label_fall_val">
+     <property name="text">
+      <string>0</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="20">
+    <widget class="QLabel" name="label_width_n">
+     <property name="text">
+      <string>-Width:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="16">
+    <widget class="QLabel" name="label_width_p">
+     <property name="text">
+      <string>+Width:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="18">
+    <widget class="QLabel" name="label_width_p_val">
+     <property name="text">
+      <string>0</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="19">
+    <spacer name="horizontalSpacer_6">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>0</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
