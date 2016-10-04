@@ -531,6 +531,14 @@ void CapturePlot::onChannelAdded(int chnIdx)
 		});
 }
 
+void CapturePlot::setOffsetWidgetVisible(int chnIdx, bool visible)
+{
+	if (chnIdx < 0 || chnIdx >= d_offsetHandles.size())
+		return;
+
+	d_offsetHandles[chnIdx]->setVisible(visible);
+}
+
 void CapturePlot::removeOffsetWidgets(int chnIdx)
 {
 	if (chnIdx < 0 || chnIdx >= d_offsetHandles.size())

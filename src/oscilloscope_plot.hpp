@@ -62,6 +62,7 @@ namespace adiscope {
 		bool vertCursorsEnabled();
 		bool horizCursorsEnabled();
 
+		void setOffsetWidgetVisible(int chnIdx, bool visible);
 		void removeOffsetWidgets(int chnIdx);
 
 	signals:

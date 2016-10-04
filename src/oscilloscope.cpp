@@ -931,6 +931,8 @@ void adiscope::Oscilloscope::channel_box_toggled(bool checked)
 		plot.DetachCurve(id);
 	}
 
+	plot.setOffsetWidgetVisible(id, checked);
+
 	plot.replot();
 	updateRunButton(checked);
 }
