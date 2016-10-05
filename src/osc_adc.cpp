@@ -24,13 +24,12 @@ OscADC::OscADC(struct iio_context *ctx, const Filter *filt):
 	m_numChannels = get_nb_channels(m_adc);
 
 	// Filters applied while decimating affect the amplitude of the received data
-	// Use 1.0 value for now, until we do more testing
-	m_filt_comp_table[1E8] = 1.0;
-	m_filt_comp_table[1E7] = 1.0;
-	m_filt_comp_table[1E6] = 1.0;
-	m_filt_comp_table[1E5] = 1.0;
-	m_filt_comp_table[1E4] = 1.0;
-	m_filt_comp_table[1E3] = 1.0;
+	m_filt_comp_table[1E8] = 1.00;
+	m_filt_comp_table[1E7] = 1.05;
+	m_filt_comp_table[1E6] = 1.10;
+	m_filt_comp_table[1E5] = 1.15;
+	m_filt_comp_table[1E4] = 1.20;
+	m_filt_comp_table[1E3] = 1.26;
 }
 
 OscADC::~OscADC()
