@@ -61,6 +61,7 @@ namespace adiscope {
 		bool measurementCursorsEnabled();
 		bool vertCursorsEnabled();
 		bool horizCursorsEnabled();
+		int selectedChannel();
 
 		void setOffsetWidgetVisible(int chnIdx, bool visible);
 		void removeOffsetWidgets(int chnIdx);
@@ -75,6 +76,7 @@ namespace adiscope {
 		void setMeasurementCursorsEnabled(bool en);
 		void setVertCursorsEnabled(bool en);
 		void setHorizCursorsEnabled(bool en);
+		void setSelectedChannel(int id);
 
 	private slots:
 		void onChannelAdded(int);
@@ -102,6 +104,8 @@ namespace adiscope {
 		bool d_measurementEnabled;
 		bool d_vertCursorsEnabled;
 		bool d_horizCursorsEnabled;
+
+		int d_selected_channel;
 
 		QWidget *d_topWidget;
 		HorizHandlesArea *d_bottomHandlesArea;

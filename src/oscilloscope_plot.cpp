@@ -57,7 +57,8 @@ CapturePlot::CapturePlot(QWidget *parent,
 	OscilloscopePlot(parent, xNumDivs, yNumDivs),
 	d_triggerAEnabled(false),
 	d_triggerBEnabled(false),
-	d_measurementEnabled(false)
+	d_measurementEnabled(false),
+	d_selected_channel(-1)
 {
 	/* Initial colors scheme */
 	d_trigAactiveLinePen = QPen(QColor(255, 255, 255), 2, Qt::SolidLine);
@@ -456,6 +457,23 @@ void CapturePlot::setHorizCursorsEnabled(bool en)
 bool CapturePlot::horizCursorsEnabled()
 {
 	return d_horizCursorsEnabled;
+}
+
+void CapturePlot::setSelectedChannel(int id)
+{
+	if (d_selected_channel != id)  {
+		d_selected_channel = id;
+
+		if (id > -1) {
+			d_hBar1->setMobileAxis(QwtAxisId(QwtPlot::yLeft, id));
+			d_hBar2->setMobileAxis(QwtAxisId(QwtPlot::yLeft, id));
+		}
+	}
+}
+
+int CapturePlot::selectedChannel()
+{
+	return d_selected_channel;
 }
 
 void CapturePlot::onTimeTriggerHandlePosChanged(int pos)

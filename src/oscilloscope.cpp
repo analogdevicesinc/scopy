@@ -374,6 +374,9 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	connect(&plot, SIGNAL(channelOffsetChanged(double)),
 		SLOT(onChannelOffsetChanged(double)));
 
+	connect(this, SIGNAL(selectedChannelChanged(int)),
+		&plot, SLOT(setSelectedChannel(int)));
+
 	// Connections with Trigger Settings
 	connect(&trigger_settings, SIGNAL(triggerAenabled(bool)),
 		&plot, SLOT(setTriggerAEnabled(bool)));
