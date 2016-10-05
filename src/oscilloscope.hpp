@@ -71,6 +71,7 @@ namespace adiscope {
 		void triggerALevelChanged(double);
 		void triggerBLevelChanged(double);
 		void triggerDelayChanged(double);
+		void selectedChannelChanged(int);
 
 	private slots:
 		void on_actionClose_triggered();
@@ -96,6 +97,7 @@ namespace adiscope {
 		void on_comboBox_currentIndexChanged(const QString &arg1);
 
 		void channel_box_toggled(bool);
+		void channel_name_checked(bool);
 
 		void rightMenuFinished(bool opened);
 		void toggleRightMenu();
@@ -142,6 +144,7 @@ namespace adiscope {
 		int fft_size;
 
 		double triggerDelay;
+		int selectedChannel;
 
 		NumberSeries voltsPerDivList;
 		NumberSeries secPerDivList;
@@ -151,6 +154,8 @@ namespace adiscope {
 		unsigned int math_chn_counter;
 
 		QButtonGroup *settings_group;
+		QButtonGroup *channels_group; // selected state of each channel
+
 		QPushButton *active_settings_btn;
 		QPushButton *menuRunButton;
 

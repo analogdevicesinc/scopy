@@ -30,6 +30,7 @@
 #include "adc_sample_conv.hpp"
 #include "math.hpp"
 #include "oscilloscope.hpp"
+#include "dynamicWidget.hpp"
 
 /* Generated UI */
 #include "ui_math_panel.h"
@@ -68,8 +69,11 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	xy_ids(new iio_manager::port_id[nb_channels & ~1]),
 	fft_is_visible(false), hist_is_visible(false), xy_is_visible(false),
 	triggerDelay(0),
+	selectedChannel(-1),
 	menuOpened(false), current_channel(0), math_chn_counter(0),
-	settings_group(new QButtonGroup(this)), menuRunButton(runButton)
+	settings_group(new QButtonGroup(this)),
+	channels_group(new QButtonGroup(this)),
+	menuRunButton(runButton)
 {
 	ui->setupUi(this);
 	int triggers_panel = ui->stackedWidget->insertWidget(-1, &trigger_settings);
@@ -132,7 +136,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 		Ui::Channel channel_ui;
 
 		channel_ui.setupUi(ch_widget);
-		channel_ui.box->setText(id);
+		channel_ui.name->setText(id);
 
 		QString stylesheet(channel_ui.box->styleSheet());
 		stylesheet += QString("\nQCheckBox::indicator {\nborder-color: %1;\n}\nQCheckBox::indicator:checked {\nbackground-color: %1;\n}\n"
@@ -142,9 +146,12 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 
 		channel_ui.box->setProperty("id", QVariant(chIdx));
 		channel_ui.btn->setProperty("id", QVariant(chIdx));
+		channel_ui.name->setProperty("id", QVariant(chIdx));
 
 		connect(channel_ui.box, SIGNAL(toggled(bool)), this,
 				SLOT(channel_box_toggled(bool)));
+		connect(channel_ui.name, SIGNAL(toggled(bool)),
+				SLOT(channel_name_checked(bool)));
 
 		/* For now, we only have one menu - only the channel1 options
 		 * icon can open it */
@@ -154,9 +161,11 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 		ui->channelsList->addWidget(ch_widget);
 
 		settings_group->addButton(channel_ui.btn);
+		channels_group->addButton(channel_ui.name);
 
 		chIdx++;
 	}
+
 
 	connect(ui->rightMenu, SIGNAL(finished(bool)), this,
 			SLOT(rightMenuFinished(bool)));
@@ -170,7 +179,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 
 	settings_group->addButton(cursor_ui.btn);
 	cursor_ui.btn->setProperty("id", QVariant(-1));
-	cursor_ui.box->setText("Cursors");
+	cursor_ui.name->setText("Cursors");
 	cursor_ui.box->setChecked(false);
 	QString stylesheet(cursor_ui.box->styleSheet());
 	stylesheet += QString("\nQCheckBox::indicator {"
@@ -545,7 +554,7 @@ void Oscilloscope::add_math_channel(const std::string& function)
 	Ui::ChannelMath channel_ui;
 
 	channel_ui.setupUi(channel_widget);
-	channel_ui.box->setText(QString("Math %1").arg(curve_number + 1));
+	channel_ui.name->setText(QString("Math %1").arg(curve_number + 1));
 
 	QString stylesheet(channel_ui.box->styleSheet());
 	stylesheet += QString("\nQCheckBox::indicator {\nborder-color: %1;\n}\nQCheckBox::indicator:checked {\nbackground-color: %1;\n}\n"
@@ -555,6 +564,7 @@ void Oscilloscope::add_math_channel(const std::string& function)
 	channel_widget->setProperty("curve_nb", QVariant(curve_number));
 	channel_ui.box->setProperty("id", QVariant(curve_id));
 	channel_ui.btn->setProperty("id", QVariant(curve_id));
+	channel_ui.name->setProperty("id", QVariant(curve_id));
 	channel_ui.delBtn->setProperty("curve_name", QVariant(qname));
 
 	connect(channel_ui.box, SIGNAL(toggled(bool)), this,
@@ -563,12 +573,16 @@ void Oscilloscope::add_math_channel(const std::string& function)
 	connect(channel_ui.btn, SIGNAL(pressed()),
 			this, SLOT(toggleRightMenu()));
 
+	connect(channel_ui.name, SIGNAL(toggled(bool)),
+				SLOT(channel_name_checked(bool)));
+
 	connect(channel_ui.delBtn, SIGNAL(pressed()),
 			this, SLOT(del_math_channel()));
 
 	ui->channelsList->addWidget(channel_widget);
 
 	settings_group->addButton(channel_ui.btn);
+	channels_group->addButton(channel_ui.name);
 
 	plot.Curve(curve_id)->setAxes(
 			QwtAxisId(QwtPlot::xBottom, 0),
@@ -915,11 +929,15 @@ void adiscope::Oscilloscope::channel_box_toggled(bool checked)
 {
 	QCheckBox *box = static_cast<QCheckBox *>(QObject::sender());
 	QPushButton *btn = box->parentWidget()->findChild<QPushButton *>("btn");
+	QPushButton *name = box->parentWidget()->findChild<QPushButton *>("name");
 	unsigned int id = box->property("id").toUInt();
 
 	if (checked) {
 		qDebug() << "Attaching curve" << id;
 		plot.AttachCurve(id);
+		channels_group->addButton(name);
+		name->setChecked(true);
+
 	} else {
 		if (btn->isChecked()) {
 			settings_group->setExclusive(false);
@@ -929,12 +947,40 @@ void adiscope::Oscilloscope::channel_box_toggled(bool checked)
 
 		qDebug() << "Detaching curve" << id;
 		plot.DetachCurve(id);
+
+		channels_group->removeButton(name);
+		name->setChecked(false);
+		if (channels_group->buttons().size() > 0)
+			channels_group->buttons()[0]->setChecked(true);
 	}
 
 	plot.setOffsetWidgetVisible(id, checked);
 
 	plot.replot();
 	updateRunButton(checked);
+}
+
+void adiscope::Oscilloscope::channel_name_checked(bool checked)
+{
+	QPushButton *name = static_cast<QPushButton *>(QObject::sender());
+	QCheckBox *box = name->parentWidget()->findChild<QCheckBox *>("box");
+
+	setDynamicProperty(name->parentWidget(), "selected", checked);
+
+	if (checked && !box->checkState())
+		box->setChecked(true);
+
+	// Get the channel that is curently selected
+	QAbstractButton *selBtn = channels_group->checkedButton();
+	int id;
+	if (!selBtn)
+		id = -1;
+	else
+		id = selBtn->property("id").toUInt();
+	if (selectedChannel != id) {
+		selectedChannel = id;
+		emit selectedChannelChanged(id);
+	}
 }
 
 void adiscope::Oscilloscope::onVertScaleValueChanged(double value)

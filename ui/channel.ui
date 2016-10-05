@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>165</width>
+    <width>162</width>
     <height>38</height>
    </rect>
   </property>
@@ -27,10 +27,9 @@
   border-radius: 6px;
 }
 
-QWidget:hover {
+QWidget[selected=true] {
   background-color: rbga(20, 20, 22, 153);
-}
-</string>
+}</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <property name="spacing">
@@ -52,7 +51,7 @@ QWidget:hover {
     <widget class="QCheckBox" name="box">
      <property name="styleSheet">
       <string notr="true">QCheckBox{
-  spacing: 12px;
+  spacing: 0px;
   background-color: transparent;
 }
 QCheckBox::indicator {
@@ -67,9 +66,30 @@ QCheckBox::indicator:unchecked {
 }</string>
      </property>
      <property name="text">
-      <string>CheckBox</string>
+      <string/>
      </property>
      <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="name">
+     <property name="styleSheet">
+      <string notr="true">QPushButton {
+  font-size: 14px;
+  font-weight: bold;
+
+  background-color: rgba(0, 0, 0, 0);
+}</string>
+     </property>
+     <property name="text">
+      <string>Channel</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="flat">
       <bool>true</bool>
      </property>
     </widget>
