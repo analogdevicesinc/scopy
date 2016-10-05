@@ -53,6 +53,7 @@ namespace Ui {
 	class Channel;
 	class Oscilloscope;
 	class OscGeneralSettings;
+	class ChannelSettings;
 }
 
 namespace adiscope {
@@ -113,6 +114,7 @@ namespace adiscope {
 		double active_sample_rate;
 		Ui::Oscilloscope *ui;
 		Ui::OscGeneralSettings *gsettings_ui;
+		Ui::ChannelSettings *ch_ui;
 		adiscope::TriggerSettings trigger_settings;
 		CapturePlot plot;
 		FftDisplayPlot fft_plot;
@@ -171,6 +173,8 @@ namespace adiscope {
 		void create_math_panel();
 		void add_math_channel(const std::string& function);
 		unsigned int find_curve_number();
+		QWidget *channelWidgetAtId(int id);
+		void update_chn_settings_panel(int id, QWidget *chn_widget = NULL);
 
 		void updateRunButton(bool ch_enabled);
 

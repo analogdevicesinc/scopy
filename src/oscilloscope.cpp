@@ -321,12 +321,13 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 				-voltsPerDiv->maxValue() * 5,
 				voltsPerDiv->maxValue() * 5);
 
-	Ui::ChannelSettings ch_ui;
-	ch_ui.setupUi(ui->channelSettings);
-	ch_ui.vLayout->insertWidget(1, timeBase, 0, Qt::AlignLeft);
-	ch_ui.vLayout->insertWidget(2, timePosition, 0, Qt::AlignLeft);
-	ch_ui.vLayout->insertWidget(4, voltsPerDiv, 0, Qt::AlignLeft);
-	ch_ui.vLayout->insertWidget(5, voltsPosition, 0, Qt::AlignLeft);
+	ch_ui = new Ui::ChannelSettings();
+	ch_ui->setupUi(ui->channelSettings);
+
+	ch_ui->horizontal->insertWidget(1, timeBase, 0, Qt::AlignLeft);
+	ch_ui->horizontal->insertWidget(2, timePosition, 0, Qt::AlignLeft);
+	ch_ui->vertical->insertWidget(1, voltsPerDiv, 0, Qt::AlignLeft);
+	ch_ui->vertical->insertWidget(2, voltsPosition, 0, Qt::AlignLeft);
 
 	timeBase->setValue(plot.HorizUnitsPerDiv());
 	voltsPerDiv->setValue(plot.VertUnitsPerDiv());
@@ -453,6 +454,7 @@ Oscilloscope::~Oscilloscope()
 	delete[] hist_ids;
 	delete[] fft_ids;
 	delete[] ids;
+	delete ch_ui;
 	delete gsettings_ui;
 	delete ui;
 }
@@ -1060,8 +1062,7 @@ void adiscope::Oscilloscope::rightMenuFinished(bool opened)
 		int id = active_settings_btn->property("id").toInt();
 		settings_panel_update(id);
 		if (id >= 0) {
-			voltsPerDiv->setValue(plot.VertUnitsPerDiv(current_channel));
-			voltsPosition->setValue(plot.VertOffset(current_channel));
+			update_chn_settings_panel(id);
 		}
 		ui->rightMenu->toggleMenu(true);
 	}
@@ -1084,8 +1085,7 @@ void adiscope::Oscilloscope::toggleRightMenu(QPushButton *btn)
 		current_channel = id;
 		plot.setActiveVertAxis(id);
 		if (open) {
-			voltsPerDiv->setValue(plot.VertUnitsPerDiv(id));
-			voltsPosition->setValue(plot.VertOffset(id));
+			update_chn_settings_panel(id, btn->parentWidget());
 		}
 	}
 
@@ -1141,4 +1141,38 @@ double Oscilloscope::pickSampleRateFor(double timeSpanSecs, double desiredBuffer
 	idealSampleRate = sampling_rates[srIdx];
 
 	return idealSampleRate;
+}
+
+QWidget * Oscilloscope::channelWidgetAtId(int id)
+{
+	QWidget *w = NULL;
+	QPushButton *btn;
+	bool found = false;
+
+	for (unsigned int i = 0; !found &&
+				i < nb_channels + nb_math_channels; i++) {
+
+			w = ui->channelsList->itemAt(i)->widget();
+			btn = w->findChild<QPushButton *>("btn");
+			found = btn->property("id").toUInt() == id;
+		}
+
+	return w;
+}
+
+void Oscilloscope::update_chn_settings_panel(int id, QWidget *chn_widget)
+{
+	if (!chn_widget)
+		chn_widget = channelWidgetAtId(id);
+	if (!chn_widget)
+		return;
+
+	voltsPerDiv->setValue(plot.VertUnitsPerDiv(id));
+	voltsPosition->setValue(plot.VertOffset(id));
+
+	QPushButton *name = chn_widget->findChild<QPushButton *>("name");
+	ch_ui->label_channelName->setText(name->text());
+	QString stylesheet = QString("border: 2px solid %1"
+					).arg(plot.getLineColor(id).name());
+	ch_ui->line_channelColor->setStyleSheet(stylesheet);
 }
