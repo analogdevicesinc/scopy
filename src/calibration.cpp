@@ -56,11 +56,11 @@ bool RxCalibration::initialize()
 	if (!m2k_ad5625)
 		return false;
 
-	m_adc_channel0 = iio_device_find_channel(m_m2k_adc, "voltage1", false);  // Channels are swapped in hardware. Keep this software swap until hardware gets fixed
+	m_adc_channel0 = iio_device_find_channel(m_m2k_adc, "voltage0", false);
 	if (!m_adc_channel0)
 		return false;
 
-	m_adc_channel1 = iio_device_find_channel(m_m2k_adc, "voltage0", false);  // Channels are swapped in hardware. Keep this software swap until hardware gets fixed
+	m_adc_channel1 = iio_device_find_channel(m_m2k_adc, "voltage1", false);
 	if (!m_adc_channel1)
 		return false;
 
