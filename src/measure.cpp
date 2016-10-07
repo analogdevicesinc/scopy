@@ -62,6 +62,11 @@ namespace adiscope {
 		{
 		}
 
+		bool isBetweenThresholds()
+		{
+			return m_is_between_trholds;
+		}
+
 		virtual inline bool updateState(enum crossEvents crsEvent) = 0;
 
 		static inline enum crossEvents
@@ -183,8 +188,7 @@ namespace adiscope {
 			m_level(level),
 			m_hysteresis_span(hysteresis_span),
 			m_low_level(level - hysteresis_span / 2),
-			m_high_level(level + hysteresis_span / 2),
-			m_negSampleFound(false)
+			m_high_level(level + hysteresis_span / 2)
 		{
 		}
 
@@ -221,41 +225,77 @@ namespace adiscope {
 			return m_detectedCrossings;
 		}
 
+		inline void store_closest_val_to_cross_lvl(double *data, size_t i, size_t &point)
+		{
+			double diff1 = qAbs(data[i - 1] - m_level);
+			double diff2 = qAbs(data[i] - m_level);
+			double diff;
+			size_t idx;
+
+			if (diff1 < diff2) {
+				idx = i - 1;
+				diff = diff1;
+			} else {
+				idx = i;
+				diff = diff2;
+			}
+
+			double old_diff = qAbs(data[point] - m_level);
+			if (diff < old_diff)
+				point = idx;
+		}
+
+		inline void store_first_closest_val_to_cross_lvl(double *data, size_t i, size_t &point)
+		{
+			double diff1 = qAbs(data[i - 1] - m_level);
+			double diff2 = qAbs(data[i] - m_level);
+
+			if (diff1 < diff2)
+				point = i - 1;
+			else
+				point = i;
+		}
+
 		inline void crossDetectStep(double *data, size_t i)
 		{
 			auto cross_type = HystLevelCross::get_crossing_type(data[i],
 						data[i - 1], m_low_level, m_high_level);
 
+			if (m_posCross.isBetweenThresholds())
+				store_closest_val_to_cross_lvl(data, i, m_posCrossPoint);
+			if (m_negCross.isBetweenThresholds())
+				store_closest_val_to_cross_lvl(data, i, m_negCrossPoint);
+
 			if (cross_type != HystLevelCross::NO_CROSS) {
 				if (!m_posCrossFound) {
+					bool old_between_thresh = m_posCross.isBetweenThresholds();
 					m_crossed = m_posCross.updateState(cross_type);
+					if (!old_between_thresh && m_posCross.isBetweenThresholds())
+						store_first_closest_val_to_cross_lvl(data, i, m_posCrossPoint);
+
 					if (m_crossed) {
 						m_posCrossFound = true;
 						m_negCrossFound = false;
 						m_negCross.resetState();
+						if (cross_type == HystLevelCross::POS_CROSS_FULL)
+							m_posCrossPoint = i;
 						m_detectedCrossings.push_back(
-							CrossPoint(data[i], i, true));
+							CrossPoint(data[m_posCrossPoint], m_posCrossPoint, true));
 					}
 				}
 				if (!m_negCrossFound) {
+					bool old_between_thresh = m_negCross.isBetweenThresholds();
 					m_crossed = m_negCross.updateState(cross_type);
+					if (!old_between_thresh && m_negCross.isBetweenThresholds())
+						store_first_closest_val_to_cross_lvl(data, i, m_negCrossPoint);
 					if (m_crossed) {
 						m_negCrossFound = true;
 						m_posCrossFound = false;
 						m_posCross.resetState();
-						size_t idx;
-						if (m_negSampleFound) {
-							idx = m_negSampleIdx;
-							m_negSampleFound = false;
-						} else {
-							idx = i - 1;
-						}
+						if (cross_type == HystLevelCross::NEG_CROSS_FULL)
+							m_negCrossPoint = i - 1;
 						m_detectedCrossings.push_back(
-							CrossPoint(data[idx], idx, false));
-					}
-					if (cross_type == HystLevelCross::NEG_CROSS_HIGH) {
-						m_negSampleIdx = i;
-						m_negSampleFound = true;
+							CrossPoint(data[m_negCrossPoint], m_negCrossPoint, false));
 					}
 				}
 			}
@@ -274,8 +314,8 @@ namespace adiscope {
 		double m_low_level;
 		double m_high_level;
 
-		size_t m_negSampleIdx; // Stores the sample at a negative high threshold cross
-		bool m_negSampleFound;
+		size_t m_posCrossPoint;
+		size_t m_negCrossPoint;
 
 		QList<CrossPoint> m_detectedCrossings;
 	};
