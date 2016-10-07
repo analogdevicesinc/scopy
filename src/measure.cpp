@@ -28,10 +28,12 @@ namespace adiscope {
 	class CrossPoint
 	{
 		public:
-		CrossPoint(float value, size_t bufIndex, bool onRising):
+		CrossPoint(float value, size_t bufIndex, bool onRising, QString name):
 			m_value(value),
 			m_bufIdx(bufIndex),
-			m_onRising(onRising)
+			m_onRising(onRising),
+			m_name(name)
+
 
 		{
 		}
@@ -40,6 +42,7 @@ namespace adiscope {
 		float m_value;
 		size_t m_bufIdx;
 		bool m_onRising;
+		QString m_name;
 	};
 
 	class HystLevelCross
@@ -182,13 +185,16 @@ namespace adiscope {
 	class CrossingDetection
 	{
 	public:
-		CrossingDetection(double level, double hysteresis_span):
+		CrossingDetection(double level, double hysteresis_span,
+				const QString &name):
 			m_posCrossFound(false),
 			m_negCrossFound(false),
 			m_level(level),
 			m_hysteresis_span(hysteresis_span),
 			m_low_level(level - hysteresis_span / 2),
-			m_high_level(level + hysteresis_span / 2)
+			m_high_level(level + hysteresis_span / 2),
+			m_name(name),
+			m_externList(NULL)
 		{
 		}
 
@@ -218,6 +224,11 @@ namespace adiscope {
 				m_low_level = m_level - span / 2;
 				m_high_level = m_level + span / 2;
 			}
+		}
+
+		void setExternalList(QList<CrossPoint> *externList)
+		{
+			m_externList = externList;
 		}
 
 		QList<CrossPoint> detectedCrossings()
@@ -280,7 +291,10 @@ namespace adiscope {
 						if (cross_type == HystLevelCross::POS_CROSS_FULL)
 							m_posCrossPoint = i;
 						m_detectedCrossings.push_back(
-							CrossPoint(data[m_posCrossPoint], m_posCrossPoint, true));
+							CrossPoint(data[m_posCrossPoint], m_posCrossPoint,
+								true, m_name + "R"));
+						if (m_externList)
+							m_externList->push_back(m_detectedCrossings.last());
 					}
 				}
 				if (!m_negCrossFound) {
@@ -295,7 +309,10 @@ namespace adiscope {
 						if (cross_type == HystLevelCross::NEG_CROSS_FULL)
 							m_negCrossPoint = i - 1;
 						m_detectedCrossings.push_back(
-							CrossPoint(data[m_negCrossPoint], m_negCrossPoint, false));
+							CrossPoint(data[m_negCrossPoint], m_negCrossPoint,
+								false, m_name + "F"));
+						if (m_externList)
+							m_externList->push_back(m_detectedCrossings.last());
 					}
 				}
 			}
@@ -318,6 +335,9 @@ namespace adiscope {
 		size_t m_negCrossPoint;
 
 		QList<CrossPoint> m_detectedCrossings;
+		QList<CrossPoint> *m_externList;
+
+		QString m_name;
 	};
 }
 
@@ -438,7 +458,8 @@ void Measure::measure()
 	m_min = data[0];
 	m_sum = data[0];
 	m_sqr_sum = data[0] * data[0];
-	m_cross_detect = new CrossingDetection(m_cross_level, m_hysteresis_span);
+	m_cross_detect = new CrossingDetection(m_cross_level, m_hysteresis_span,
+			"P");
 	if (using_histogram_method)
 		m_histogram = new int[adc_span]{};
 
@@ -537,72 +558,77 @@ void Measure::measure()
 		double midRef = m_low + (0.5 * m_amplitude);
 		double highRef = m_low + (0.9 * m_amplitude);
 
-		CrossingDetection cdLow(lowRef, 0.2);
-		CrossingDetection cdMid(midRef, 0.2);
-		CrossingDetection cdHigh(highRef, 0.2);
+		CrossingDetection cdLow(lowRef, 0.2, "L");
+		CrossingDetection cdMid(midRef, 0.2, "M");
+		CrossingDetection cdHigh(highRef, 0.2, "H");
+
+		QList<CrossPoint> crossSequence;
+		cdLow.setExternalList(&crossSequence);
+		cdMid.setExternalList(&crossSequence);
+		cdHigh.setExternalList(&crossSequence);
 
 		size_t period_start = periodPoints[0].m_bufIdx;
 		size_t period_end = periodPoints[2].m_bufIdx;
 		size_t length = period_end - period_start + 1;
 
-		qDebug() << "start:" << period_start;
-		qDebug() << "end:" << period_end;
-		qDebug() << "lowRef:" << lowRef;
-		qDebug() << "midRef:" << midRef;
-		qDebug() << "highRef:" << highRef;
+		for (size_t i = period_start + 1; i <= period_start + 2 * length; i++) {
+			size_t idx = period_start + (i  % length);
 
-		for (size_t i = period_start + 1; i <= period_end; i++) {
-			cdLow.crossDetectStep(data, i);
-			cdMid.crossDetectStep(data, i);
-			cdHigh.crossDetectStep(data, i);
+			cdLow.crossDetectStep(data, idx);
+			cdMid.crossDetectStep(data, idx);
+			cdHigh.crossDetectStep(data, idx);
 		}
 
-		QList<CrossPoint> lowPoints = cdLow.detectedCrossings();
-		QList<CrossPoint> midPoints = cdMid.detectedCrossings();
-		QList<CrossPoint> highPoints = cdHigh.detectedCrossings();
+		for (int i = 1; i < crossSequence.size(); i++) {
+			CrossPoint &p0 = crossSequence[i - 1];
+			CrossPoint &p1 = crossSequence[i];
+			if (p1.m_bufIdx == p1.m_bufIdx && p1.m_onRising == p0.m_onRising) {
+				if (p0.m_name == "MR" && p1.m_name == "LR" ||
+						p0.m_name == "HR" && p1.m_name == "MR")
+					crossSequence.swap(i, i - 1);
+				else if (p0.m_name == "MF" && p1.m_name == "HF" ||
+						p0.m_name == "LF" && p1.m_name == "MF")
+					crossSequence.swap(i, i - 1);
+			}
+		}
 
-		qDebug() << "Low Crossings";
-		for (int i = 0; i < lowPoints.size(); i++)
-			qDebug() << "val:" << lowPoints[i].m_value << " idx:" << lowPoints[i].m_bufIdx << " rise:" << lowPoints[i].m_onRising;
+		QString sequence = "";
+		for (int i = 0; i < crossSequence.size(); i++)
+			sequence += crossSequence[i].m_name;
 
-		qDebug() << "Middle Crossings";
-		for (int i = 0; i < midPoints.size(); i++)
-			qDebug() << "val:" << midPoints[i].m_value << " idx:" << midPoints[i].m_bufIdx << " rise:" << midPoints[i].m_onRising;
+		QString periodSequence = "LRMRHRHFMFLF";
+		int pos = sequence.indexOf(periodSequence);
 
-		qDebug() << "High Crossings";
-		for (int i = 0; i < highPoints.size(); i++)
-			qDebug() << "val:" << highPoints[i].m_value << " idx:" << highPoints[i].m_bufIdx << " rise:" << highPoints[i].m_onRising;
-
-		if (lowPoints.size() < 2 || midPoints.size() < 2 || highPoints.size() < 2) {
+		if (pos < 0) {
 			qDebug() << "Unable to find 2 transitions for each of the 10%, 50%, 90% levels";
 		} else {
-			if (!lowPoints[0].m_onRising)
-				lowPoints.swap(0, 1);
-			if (!midPoints[0].m_onRising)
-				midPoints.swap(0, 1);
-			if (!highPoints[0].m_onRising)
-				highPoints.swap(0, 1);
+			pos /= 2;
+			CrossPoint &lowRising = crossSequence[pos];
+			CrossPoint &midRising = crossSequence[pos + 1];
+			CrossPoint &highRising = crossSequence[pos + 2];
+			CrossPoint &highFalling = crossSequence[pos + 3];
+			CrossPoint &midFalling = crossSequence[pos + 4];
+			CrossPoint &lowFalling = crossSequence[pos + 5];
 
 			// Rise Time
-			long long rise = (long long)(highPoints[0].m_bufIdx -
-					lowPoints[0].m_bufIdx);
+			long long rise = (long long)(highRising.m_bufIdx -
+					lowRising.m_bufIdx);
 			if (rise < 0)
 				rise += length;
 			m_rise_time = rise / m_sample_rate;
 
 			// Fall Time
-			long long fall = (long long)(lowPoints[1].m_bufIdx -
-					highPoints[1].m_bufIdx);
+			long long fall = (long long)(lowFalling.m_bufIdx -
+					highFalling.m_bufIdx);
 			if (fall < 0)
 				fall += length;
 			m_fall_time = fall / m_sample_rate;
 
 			// Positive Width
-			long long posWidth = (long long)(midPoints[1].m_bufIdx -
-					midPoints[0].m_bufIdx);
+			long long posWidth = (long long)(midFalling.m_bufIdx -
+					midRising.m_bufIdx);
 			if (posWidth < 0)
 				posWidth += length;
-
 			m_width_p = posWidth / m_sample_rate;
 
 			// Negative Width
