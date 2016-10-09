@@ -212,6 +212,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 			ch_name = s.c_str();
 		}
 		pair->second.box->setText(ch_name);
+		pair->second.name->setVisible(false);
 
 		pair->second.box->setProperty("id", QVariant(nb_channels));
 		pair->second.btn->setProperty("id", QVariant(nb_channels));
@@ -258,9 +259,8 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 	 * plot->getLineColor(i) returns black. */
 	for (unsigned int i = 0; i < nb_channels; i++) {
 		QString stylesheet(channels[i]->second.box->styleSheet());
-		stylesheet += QString("\nQCheckBox::indicator {\nborder-color: %1;\n}\nQCheckBox::indicator:checked {\nbackground-color: %1;\n}\n"
+		stylesheet += QString("\nQCheckBox{spacing: 12px;\n}\nQCheckBox::indicator {\nborder-color: %1;\n}\nQCheckBox::indicator:checked {\nbackground-color: %1;\n}\n"
 				).arg(plot->getLineColor(i).name());
-
 		channels[i]->second.box->setStyleSheet(stylesheet);
 	}
 
