@@ -167,12 +167,6 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 
 		chIdx++;
 	}
-	QWidget *chn0_widget = channelWidgetAtId(0);
-	if (chn0_widget) {
-		QPushButton *name = chn0_widget->findChild<QPushButton *>("name");
-		name->setChecked(true);
-	}
-
 
 	connect(ui->rightMenu, SIGNAL(finished(bool)), this,
 			SLOT(rightMenuFinished(bool)));
@@ -418,6 +412,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 
 	connect(this, SIGNAL(selectedChannelChanged(int)),
 		&plot, SLOT(setSelectedChannel(int)));
+	connect(this, SIGNAL(selectedChannelChanged(int)),
+		&plot, SLOT(setChannelToMeasure(int)));
 
 	// Connections with Trigger Settings
 	connect(&trigger_settings, SIGNAL(triggerAenabled(bool)),
@@ -453,6 +449,12 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 
 	if (nb_channels < 2)
 		gsettings_ui->XY_view->hide();
+
+	QWidget *chn0_widget = channelWidgetAtId(0);
+	if (chn0_widget) {
+		QPushButton *name = chn0_widget->findChild<QPushButton *>("name");
+		name->setChecked(true);
+	}
 }
 
 Oscilloscope::~Oscilloscope()
@@ -891,6 +893,8 @@ void adiscope::Oscilloscope::onMeasureToggled(bool on)
 			btn->setChecked(false);
 			toggleRightMenu(btn);
 		}
+	} else {
+		update_measure_for_channel(selectedChannel);
 	}
 	measurePanel->setVisible(on);
 }
@@ -1042,6 +1046,10 @@ void adiscope::Oscilloscope::channel_name_checked(bool checked)
 	if (selectedChannel != id) {
 		selectedChannel = id;
 		emit selectedChannelChanged(id);
+	}
+
+	if (plot.measurementsEnabled() && id != -1) {
+		update_measure_for_channel(id);
 	}
 }
 
@@ -1298,4 +1306,13 @@ void Oscilloscope::onMeasuremetsAvailable()
 
 	measure_panel_ui->label_duty_n_val->setText(
 		vf->format(plot.measuredNegDuty(), "", 2) + "%");
+}
+
+void Oscilloscope::update_measure_for_channel(int ch_idx)
+{
+	plot.measure(ch_idx);
+	onMeasuremetsAvailable();
+	QString stylesheet = QString("font-size: 14px; color: %1;"
+				).arg(plot.getLineColor(ch_idx).name());
+	measurePanel->setStyleSheet(stylesheet);
 }

@@ -185,6 +185,7 @@ namespace adiscope {
 		unsigned int find_curve_number();
 		QWidget *channelWidgetAtId(int id);
 		void update_chn_settings_panel(int id, QWidget *chn_widget = NULL);
+		void update_measure_for_channel(int ch_idx);
 
 		void updateRunButton(bool ch_enabled);
 
