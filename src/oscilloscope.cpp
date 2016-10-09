@@ -215,7 +215,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	ui->measure_settings->addWidget(measure_widget);
 	settings_group->addButton(measure_ui.btn);
 	measure_ui.btn->setProperty("id", QVariant(-measure_panel));
-	measure_ui.box->setText("Measure");
+	measure_ui.name->setText("Measure");
 	measure_ui.box->setChecked(false);
 	measure_ui.box->setStyleSheet(stylesheet);
 
