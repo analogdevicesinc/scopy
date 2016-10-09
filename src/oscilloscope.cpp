@@ -165,6 +165,11 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 
 		chIdx++;
 	}
+	QWidget *chn0_widget = channelWidgetAtId(0);
+	if (chn0_widget) {
+		QPushButton *name = chn0_widget->findChild<QPushButton *>("name");
+		name->setChecked(true);
+	}
 
 
 	connect(ui->rightMenu, SIGNAL(finished(bool)), this,
