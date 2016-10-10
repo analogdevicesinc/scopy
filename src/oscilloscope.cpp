@@ -377,6 +377,9 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	int gsettings_panel = ui->stackedWidget->indexOf(ui->generalSettings);
 	ui->btnGeneralSettings->setProperty("id", QVariant(-gsettings_panel));
 
+	gsettings_ui->Histogram_view->hide();
+	gsettings_ui->XY_view->hide();
+
 	connect(gsettings_ui->FFT_view, SIGNAL(toggled(bool)),
 		SLOT(onFFT_view_toggled(bool)));
 	connect(gsettings_ui->XY_view, SIGNAL(toggled(bool)),
