@@ -1049,7 +1049,7 @@ void adiscope::Oscilloscope::channel_name_checked(bool checked)
 		emit selectedChannelChanged(id);
 	}
 
-	if (plot.measurementsEnabled() && id != -1) {
+	if (checked && plot.measurementsEnabled() && id != -1) {
 		update_measure_for_channel(id);
 	}
 }
