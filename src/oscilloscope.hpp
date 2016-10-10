@@ -55,6 +55,7 @@ namespace Ui {
 	class Oscilloscope;
 	class OscGeneralSettings;
 	class ChannelSettings;
+	class MeasureSettings;
 	class MeasurementsPanel;
 }
 
@@ -120,6 +121,7 @@ namespace adiscope {
 		Ui::Oscilloscope *ui;
 		Ui::OscGeneralSettings *gsettings_ui;
 		Ui::ChannelSettings *ch_ui;
+		Ui::MeasureSettings *msettings_ui;
 		adiscope::TriggerSettings trigger_settings;
 		CapturePlot plot;
 		FftDisplayPlot fft_plot;

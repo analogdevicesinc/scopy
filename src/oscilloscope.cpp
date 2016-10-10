@@ -199,7 +199,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	/* Measurements Settings */
 	int measure_panel = ui->stackedWidget->indexOf(ui->measureSettings);
 
-	Ui::MeasureSettings *msettings_ui = new Ui::MeasureSettings();
+	msettings_ui = new Ui::MeasureSettings();
 	msettings_ui->setupUi(ui->measureSettings);
 
 	QWidget *measure_widget = new QWidget(this);
@@ -499,6 +499,7 @@ Oscilloscope::~Oscilloscope()
 	delete[] ids;
 	delete ch_ui;
 	delete gsettings_ui;
+	delete msettings_ui;
 	delete measure_panel_ui;
 	delete ui;
 }
@@ -1315,4 +1316,12 @@ void Oscilloscope::update_measure_for_channel(int ch_idx)
 	QString stylesheet = QString("font-size: 14px; color: %1;"
 				).arg(plot.getLineColor(ch_idx).name());
 	measurePanel->setStyleSheet(stylesheet);
+
+	QWidget *chn_widget = channelWidgetAtId(ch_idx);
+	QPushButton *name = chn_widget->findChild<QPushButton *>("name");
+
+	stylesheet = QString("border: 2px solid %1;"
+				).arg(plot.getLineColor(ch_idx).name());
+	msettings_ui->lblChanName->setText(name->text());
+	msettings_ui->line->setStyleSheet(stylesheet);
 }
