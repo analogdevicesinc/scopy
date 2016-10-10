@@ -213,6 +213,16 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	measure_ui.box->setChecked(false);
 	measure_ui.box->setStyleSheet(stylesheet);
 
+	/* TO DO: make these UI elements visible when implementing their functionality */
+	msettings_ui->pushButton->hide();
+	msettings_ui->pushButton_2->hide();
+	msettings_ui->pushButton_3->hide();
+	msettings_ui->pushButton_4->hide();
+	msettings_ui->pushButton_5->hide();
+	msettings_ui->label_2->hide();
+	msettings_ui->label_3->hide();
+	msettings_ui->label_4->hide();
+
 	connect(measure_ui.btn, SIGNAL(pressed()),
 				this, SLOT(toggleRightMenu()));
 	connect(measure_ui.box, SIGNAL(toggled(bool)), this,
