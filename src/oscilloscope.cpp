@@ -428,6 +428,11 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	connect(this, SIGNAL(selectedChannelChanged(int)),
 		&plot, SLOT(setChannelToMeasure(int)));
 
+	connect(voltsPerDiv, &SpinBoxA::valueChanged,
+		[=](double scale) {
+			plot.setPeriodDetectHyst(scale / 5);
+		});
+
 	// Connections with Trigger Settings
 	connect(&trigger_settings, SIGNAL(triggerAenabled(bool)),
 		&plot, SLOT(setTriggerAEnabled(bool)));
@@ -441,6 +446,11 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 		plot.levelTriggerB(), SLOT(setPosition(double)));
 	connect(plot.levelTriggerB(), SIGNAL(positionChanged(double)),
 		&trigger_settings, SLOT(setTriggerLevelB(double)));
+
+	connect(&trigger_settings, SIGNAL(levelAChanged(double)),
+		&plot, SLOT(setPeriodDetectLevel(double)));
+	connect(&trigger_settings, SIGNAL(levelBChanged(double)),
+		&plot, SLOT(setPeriodDetectLevel(double)));
 
 	// Trigger Delay
 	connect(&trigger_settings, SIGNAL(delayChanged(double)),

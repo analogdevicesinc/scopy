@@ -105,6 +105,8 @@ namespace adiscope {
 		void setSelectedChannel(int id);
 		void setMeasuremensEnabled(bool en);
 		void setChannelToMeasure(int chnIdx);
+		void setPeriodDetectLevel(double lvl);
+		void setPeriodDetectHyst(double hyst);
 
 	private slots:
 		void onChannelAdded(int);
@@ -174,6 +176,8 @@ namespace adiscope {
 
 	        Measure d_measure;
 	        int d_chnToMeasure;
+	        double d_period_cross_level;
+	        double d_cross_hyst_window;
 	};
 }
 

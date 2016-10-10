@@ -60,7 +60,9 @@ CapturePlot::CapturePlot(QWidget *parent,
 	d_measurementEnabled(false),
 	d_selected_channel(-1),
 	d_measurementsEnabled(false),
-	d_chnToMeasure(0)
+	d_chnToMeasure(0),
+	d_period_cross_level(0),
+	d_cross_hyst_window(0.2)
 {
 	/* Initial colors scheme */
 	d_trigAactiveLinePen = QPen(QColor(255, 255, 255), 2, Qt::SolidLine);
@@ -599,8 +601,8 @@ void CapturePlot::measure(int chnIdx)
 {
 	d_measure.setDataSource(d_ydata[chnIdx], Curve(chnIdx)->data()->size());
 	d_measure.setSampleRate(this->sampleRate());
-	d_measure.setHysteresisSpan(0.2);
-	d_measure.setCrossLevel(1.0);
+	d_measure.setHysteresisSpan(d_cross_hyst_window);
+	d_measure.setCrossLevel(d_period_cross_level);
 	d_measure.setAdcBitCount(12);
 	d_measure.measure();
 }
@@ -713,4 +715,13 @@ double CapturePlot::measuredPosDuty()
 double CapturePlot::measuredNegDuty()
 {
 	return d_measure.negDuty();
+}
+void CapturePlot::setPeriodDetectLevel(double lvl)
+{
+	d_period_cross_level = lvl;
+}
+
+void CapturePlot::setPeriodDetectHyst(double hyst)
+{
+	d_cross_hyst_window = hyst;
 }
