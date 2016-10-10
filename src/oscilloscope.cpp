@@ -689,6 +689,14 @@ void Oscilloscope::del_math_channel()
 	if (current_axis > curve_id)
 		plot.setActiveVertAxis(current_axis - 1);
 
+	/* Before removing the axis make sure cursors are not sing it */
+	QWidget *chn_widget = channelWidgetAtId(curve_id);
+	QPushButton *name = chn_widget->findChild<QPushButton *>("name");
+	channels_group->removeButton(name);
+	name->setChecked(false);
+	if (channels_group->buttons().size() > 0)
+		channels_group->buttons()[0]->setChecked(true);
+
 	/* Before removing the axis, remove the offset widgets */
 	plot.removeOffsetWidgets(curve_id);
 
