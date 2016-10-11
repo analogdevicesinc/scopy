@@ -43,6 +43,8 @@
 #define NB_POINTS	32768
 #define SAMPLE_RATE	750000
 #define NB_BUFFERS	4
+#define DAC_BIT_COUNT   12
+#define INTERP_BY_100_CORR 1.168 // correction value at an interpolation by 100
 
 #define AMPLITUDE_VOLTS	5.0
 
@@ -453,11 +455,12 @@ void SignalGenerator::start()
 	for (auto it = channels.begin(); it != channels.end(); ++it) {
 		if ((*it)->second.box->isChecked()) {
 			auto source = getSource(&(*it)->first, top_block);
-			// Multiplying voltage with -375.3666 converts volts to DAC raw data.
+			// DAC_RAW = (-Vout * 2^11) / 5V
 			// Multiplying with 16 because the HDL considers the DAC data as 16 bit
 			// instead of 12 bit(data is shifted to the left).
 			auto f2s = blocks::float_to_short::make(1,
-					-375.3666 * 16);
+					-1 * (1 << (DAC_BIT_COUNT - 1)) /
+					AMPLITUDE_VOLTS * 16 / INTERP_BY_100_CORR);
 			top_block->connect(source, 0, f2s, 0);
 			top_block->connect(f2s, 0, sink, channel++);
 		}
