@@ -32,7 +32,7 @@ const std::streamsize BinaryBuffer::BufferSize = 16384;
 
 BinaryBuffer::BinaryBuffer(const std::shared_ptr<sigrok::Context> &context,
     short *data,
-    uint64_t *number_of_samples,
+    uint32_t *number_of_samples,
     std::shared_ptr<sigrok::InputFormat> format,
     const std::map<std::string, Glib::VariantBase> &options) :
 

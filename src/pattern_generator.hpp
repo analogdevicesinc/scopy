@@ -3,7 +3,11 @@
 
 #include <QWidget>
 #include <QPushButton>
+#include <QJsonArray>
+#include <QIntValidator>
+#include <QtQml/QJSEngine>
 #include <vector>
+#include <string>
 #include <libserialport.h>
 
 #include "src/pulseview/pv/devices/binarybuffer.hpp"
@@ -31,15 +35,140 @@ namespace sigrok {
     class Context;
 }
 
-namespace Glibmm {
-
-}
-
 namespace Ui {
     class PatternGenerator;
+    class BinaryCounterPatternUI;
+    class UARTPatternUI;
 }
 
 namespace adiscope {
+
+// http://stackoverflow.com/questions/32040101/qjsengine-print-to-console
+class JSConsole : public QObject // for logging purposes in QJSEngine
+{
+    Q_OBJECT
+public:
+    explicit JSConsole(QObject *parent = 0);
+    Q_INVOKABLE void log(QString msg);
+};
+
+
+class Pattern
+{
+private:
+    std::string name;
+    std::string description;
+protected: // temp
+    short *buffer;
+    uint32_t sample_rate;
+    uint32_t number_of_samples;
+    uint16_t number_of_channels;
+
+public:
+
+    Pattern(/*string name_, string description_*/);
+    ~Pattern();
+    std::string get_name();
+    void set_name(std::string name_);
+    std::string get_description();
+    void set_description(std::string description_);
+    void set_sample_rate(uint32_t sample_rate_);
+    void set_number_of_samples(uint32_t number_of_samples_);
+    void set_number_of_channels(uint16_t number_of_channels_);
+    short* get_buffer();
+    void delete_buffer();
+    virtual uint8_t generate_pattern() = 0;
+};
+
+class PatternUI : public QWidget, public virtual Pattern
+{
+    Q_OBJECT
+public:
+    PatternUI(QWidget *parent = 0);
+    ~PatternUI();
+    virtual void build_ui(QWidget *parent = 0);
+    virtual void destroy_ui();
+};
+
+class BinaryCounterPattern : virtual public Pattern
+{
+public:
+    BinaryCounterPattern();
+    uint8_t generate_pattern();
+};
+
+class UARTPattern : virtual public Pattern
+{
+protected:
+    std::string str;
+    bool msb_first;
+    unsigned int baud_rate;
+    unsigned int data_bits;
+    unsigned int stop_bits;
+    enum sp_parity parity;
+
+
+public:
+    UARTPattern();
+    void set_string(std::string str_);
+    int set_params(std::string params_);
+    void set_msb_first(bool msb_first_);
+    uint16_t encapsulateUartFrame(char chr, uint16_t *bits_per_frame);
+    uint8_t generate_pattern();
+};
+
+class JSPattern : public QObject, virtual public Pattern
+{
+    Q_OBJECT
+private:
+
+    QJSEngine qEngine;
+    QJsonObject obj;
+public:
+
+    JSPattern(QJsonObject obj_);
+    Q_INVOKABLE quint32 get_nr_of_samples();
+    Q_INVOKABLE quint32 get_nr_of_channels();
+    Q_INVOKABLE quint32 get_sample_rate();
+    Q_INVOKABLE void JSErrorDialog(QString errorMessage);
+    Q_INVOKABLE void commitBuffer(QJSValue jsBufferValue, QJSValue jsBufferSize);
+    uint8_t generate_pattern();
+};
+
+class UARTPatternUI : public PatternUI, public UARTPattern
+{
+    Q_OBJECT
+    Ui::UARTPatternUI *ui;
+    QWidget *parent_;
+public:
+    UARTPatternUI(QWidget *parent = 0);
+    ~UARTPatternUI();
+    void build_ui(QWidget *parent = 0);
+    void destroy_ui();
+private Q_SLOTS:
+    void on_setUARTParameters_clicked();
+};
+
+class BinaryCounterPatternUI : public PatternUI, public BinaryCounterPattern
+{
+    Ui::BinaryCounterPatternUI *ui;
+    QWidget *parent_;
+public:
+    BinaryCounterPatternUI(QWidget *parent = 0);
+    ~BinaryCounterPatternUI();
+    void build_ui(QWidget *parent = 0);
+    void destroy_ui();
+};
+
+class JSPatternUI : public PatternUI, public JSPattern
+{
+public:
+    JSPatternUI(QJsonObject obj_, QWidget *parent = 0);
+    ~JSPatternUI();
+    void build_ui(QWidget *parent = 0);
+    void destroy_ui();
+};
+
 class PatternGenerator : public QWidget
 {
     Q_OBJECT
@@ -48,61 +177,80 @@ public:
     explicit PatternGenerator(struct iio_context *ctx, Filter* filt, QPushButton *runButton, QWidget *parent = 0);
     ~PatternGenerator();
 
+    uint32_t get_nr_of_samples();
+    uint32_t get_nr_of_channels();
+    uint32_t get_sample_rate();
+    short convert_jsbuffer(uint8_t *mapping, uint32_t val);
+    void commitBuffer(short *bufferPtr);
+
+
 private Q_SLOTS:
     void startStop(bool start);
     void singleRun();
     void singleRunStop();
     void toggleRightMenu();
 
-    void on_BinaryCounter_clicked();
-    void on_UART_clicked();
+    void on_sampleRateCombo_activated(const QString &arg1);
+    void on_generateScript_clicked();
+    void on_clearButton_clicked();
+    void on_generateUI_clicked();
 
 private:
-//    pv::devices::PatternGenerator *pattern_generator_device;
-    std::shared_ptr<sigrok::Context> context;
-    std::shared_ptr<pv::devices::BinaryBuffer> pattern_generator_ptr;
-    std::shared_ptr<sigrok::InputFormat> binary_format;
+
+    // UI
     Ui::PatternGenerator *ui;
     QButtonGroup *settings_group;
     QPushButton *menuRunButton;
-    boost::shared_ptr<iio_manager> manager;
-    iio_manager::port_id* ids;
+   // QWidget *current;
+    PatternUI *currentUI;
+    QIntValidator *sampleRateValidator;
+    uint16_t channel_group;
+
+    // Buffer
+    short *buffer;
+    bool buffer_created;
+    uint32_t start_sample;
+    uint32_t last_sample;
+    uint32_t number_of_samples;
+    uint32_t buffersize;
+
+    // Device parameters
+
+    uint16_t channel_enable_mask;
+    uint32_t sample_rate;
+    int no_channels;
+
+    // IIO
+
     struct iio_context *ctx;
     struct iio_device *dev;
     struct iio_device *channel_manager_dev;
     struct iio_buffer *txbuf;
-    int no_channels;
-    bool buffer_created;
-    uint16_t channel_enable_mask;
-    uint64_t sample_rate;
 
+
+    // PV and Sigrok
+
+    std::shared_ptr<sigrok::Context> context;
+    std::shared_ptr<pv::devices::BinaryBuffer> pattern_generator_ptr;
+    std::shared_ptr<sigrok::InputFormat> binary_format;
     std::map<std::string, Glib::VariantBase> options;
+    pv::MainWindow* main_win;
 
-    short *buffer;
-
-    uint64_t number_of_samples;
-    uint64_t buffersize;
     bool startPatternGeneration(bool cyclic);
     void stopPatternGeneration();
     void dataChanged();
 
-    pv::MainWindow* main_win;
-
-
-    static int parseParamsUart(const char *params,
-            unsigned int *baud_rate, unsigned int *bits,
-            enum sp_parity *parity,  unsigned int *stop_bits);
-    void createBinaryCounter(int maxCount, uint64_t sampleRate);
-    void createUart(const char *str, uint16_t str_length, const char *params, uint64_t sample_rate_, uint32_t holdoff_time, uint16_t channel = 0, bool msb_first = 0);
     void createBinaryBuffer();
-    uint16_t encapsulateUartFrame(char chr, uint16_t *bits_per_frame, uint16_t data_bits_per_frame, sp_parity parity, uint16_t stop_bits, bool msb_first);
     void toggleRightMenu(QPushButton *btn);
+
     bool menuOpened;
 
+    std::vector<PatternUI*> patterns;
     static QStringList digital_trigger_conditions;
-
+    static QStringList possibleSampleRates;
 };
 } /* namespace adiscope */
+
 
 #endif // LOGIC_ANALYZER_H
 

@@ -53,6 +53,7 @@ find_package(Qt5Widgets REQUIRED)
 find_package(Qt5WebKitWidgets REQUIRED)
 find_package(Qt5Concurrent REQUIRED)
 find_package(Qwt REQUIRED)
+find_package(Qt5Qml REQUIRED)
 
 set(GR_REQUIRED_COMPONENTS RUNTIME ANALOG BLOCKS FFT FILTER IIO VOLK PMT)
 find_package(Gnuradio PATHS "c:/Program Files/gnuradio/lib/cmake/gnuradio" REQUIRED)
@@ -103,6 +104,7 @@ include_directories(
 	${Qt5Widgets_INCLUDE_DIRS}
 	${Qt5WebKitWidgets_INCLUDE_DIRS}
 	${Qt5Concurrent_INCLUDE_DIRS}
+	${Qt5Qml_INCLUDE_DIRS}
 	${QWT_INCLUDE_DIRS}
 	${IIO_INCLUDE_DIRS}
 	${LIBSIGROK_DECODE_INCLUDE_DIRS}
@@ -163,6 +165,7 @@ target_link_libraries(${PROJECT_NAME} LINK_PRIVATE
 		${Qt5Widgets_LIBRARIES}
 		${Qt5WebKitWidgets_LIBRARIES}
 		${Qt5Concurrent_LIBRARIES}
+		${Qt5Qml_LIBRARIES}
 		${GNURADIO_ALL_LIBRARIES}
 		${Boost_LIBRARIES}
 		${QWT_LIBRARIES}

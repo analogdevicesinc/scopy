@@ -38,7 +38,7 @@ private:
 public:    
     BinaryBuffer(const std::shared_ptr<sigrok::Context> &context,
                      short *data,
-                     uint64_t *number_of_samples,
+                     uint32_t *number_of_samples,
         std::shared_ptr<sigrok::InputFormat> format,
         const std::map<std::string, Glib::VariantBase> &options);
     ~BinaryBuffer();
@@ -68,7 +68,7 @@ private:
     const std::shared_ptr<sigrok::InputFormat> format_;
     const std::map<std::string, Glib::VariantBase> options_;
     short *data_;
-    uint64_t *no_samples_;
+    uint32_t *no_samples_;
     std::shared_ptr<sigrok::Input> input_;
 };
 
