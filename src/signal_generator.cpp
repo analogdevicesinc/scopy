@@ -41,7 +41,7 @@
 #include <iio.h>
 
 #define NB_POINTS	32768
-#define SAMPLE_RATE	1000000
+#define SAMPLE_RATE	750000
 #define NB_BUFFERS	4
 
 #define AMPLITUDE_VOLTS	5.0
@@ -156,9 +156,9 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 	/* Max amplitude by default */
 	amplitude->setValue(amplitude->maxValue());
 
-	/* (SAMPLE_RATE / 1000) frequency by default */
-	frequency->setValue(SAMPLE_RATE / 1000.0);
-	mathFrequency->setValue(SAMPLE_RATE / 1000.0);
+	/* (lowest freq * 100 * 1000) frequency by default */
+	frequency->setValue(frequency->minValue() * 100 * 1000.0);
+	mathFrequency->setValue(mathFrequency->minValue() * 100 * 1000.0);
 
 	ui->waveformGrid->addWidget(amplitude, 0, 0, Qt::AlignLeft);
 	ui->waveformGrid->addWidget(offset, 0, 1, Qt::AlignLeft);
