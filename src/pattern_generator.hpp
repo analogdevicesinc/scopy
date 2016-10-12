@@ -16,6 +16,13 @@
 #include "streams_to_short.h"
 #include <gnuradio/blocks/file_descriptor_sink.h>
 
+// Generated UI
+#include "ui_pattern_generator.h"
+#include "ui_binarycounterpatternui.h"
+#include "ui_uartpatternui.h"
+#include "ui_lfsrpatternui.h"
+
+
 extern "C" {
   struct iio_context;
   struct iio_device;
@@ -39,6 +46,7 @@ namespace Ui {
     class PatternGenerator;
     class BinaryCounterPatternUI;
     class UARTPatternUI;
+    class LFSRPatternUI;
 }
 
 namespace adiscope {
@@ -97,6 +105,17 @@ public:
     uint8_t generate_pattern();
 };
 
+class BinaryCounterPatternUI : public PatternUI, public BinaryCounterPattern
+{
+    Ui::BinaryCounterPatternUI *ui;
+    QWidget *parent_;
+public:
+    BinaryCounterPatternUI(QWidget *parent = 0);
+    ~BinaryCounterPatternUI();
+    void build_ui(QWidget *parent = 0);
+    void destroy_ui();
+};
+
 class UARTPattern : virtual public Pattern
 {
 protected:
@@ -117,6 +136,20 @@ public:
     uint8_t generate_pattern();
 };
 
+class UARTPatternUI : public PatternUI, public UARTPattern
+{
+    Q_OBJECT
+    Ui::UARTPatternUI *ui;
+    QWidget *parent_;
+public:
+    UARTPatternUI(QWidget *parent = 0);
+    ~UARTPatternUI();
+    void build_ui(QWidget *parent = 0);
+    void destroy_ui();
+private Q_SLOTS:
+    void on_setUARTParameters_clicked();
+};
+
 class JSPattern : public QObject, virtual public Pattern
 {
     Q_OBJECT
@@ -135,31 +168,6 @@ public:
     uint8_t generate_pattern();
 };
 
-class UARTPatternUI : public PatternUI, public UARTPattern
-{
-    Q_OBJECT
-    Ui::UARTPatternUI *ui;
-    QWidget *parent_;
-public:
-    UARTPatternUI(QWidget *parent = 0);
-    ~UARTPatternUI();
-    void build_ui(QWidget *parent = 0);
-    void destroy_ui();
-private Q_SLOTS:
-    void on_setUARTParameters_clicked();
-};
-
-class BinaryCounterPatternUI : public PatternUI, public BinaryCounterPattern
-{
-    Ui::BinaryCounterPatternUI *ui;
-    QWidget *parent_;
-public:
-    BinaryCounterPatternUI(QWidget *parent = 0);
-    ~BinaryCounterPatternUI();
-    void build_ui(QWidget *parent = 0);
-    void destroy_ui();
-};
-
 class JSPatternUI : public PatternUI, public JSPattern
 {
 public:
@@ -168,6 +176,47 @@ public:
     void build_ui(QWidget *parent = 0);
     void destroy_ui();
 };
+
+class LFSRPattern : virtual public Pattern
+{
+private:
+
+    uint32_t lfsr_poly;
+    uint16_t start_state;
+    uint32_t lfsr_period;
+public:
+    LFSRPattern();
+    uint8_t generate_pattern();
+
+    uint32_t compute_period();
+    uint32_t get_lfsr_poly() const;
+    void set_lfsr_poly(const uint32_t &value);
+    uint16_t get_start_state() const;
+    void set_start_state(const uint16_t &value);
+    uint32_t get_lfsr_period() const;
+};
+
+class LFSRPatternUI : public PatternUI, public LFSRPattern
+{
+    Q_OBJECT
+    Ui::LFSRPatternUI *ui;
+    QWidget *parent_;
+public:
+    LFSRPatternUI(QWidget *parent = 0) : PatternUI(parent)
+    {
+        qDebug()<<"LFSRPatternUI created";
+        ui = new Ui::LFSRPatternUI();
+        ui->setupUi(this);
+        setVisible(false);
+    }
+    ~LFSRPatternUI();
+    void build_ui(QWidget *parent = 0);
+    void destroy_ui();
+private Q_SLOTS:
+    void on_setLFSRParameters_clicked();
+};
+
+
 
 class PatternGenerator : public QWidget
 {

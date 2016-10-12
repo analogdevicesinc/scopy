@@ -22,6 +22,8 @@
 #include "boost/thread.hpp"
 #include <libserialport.h>
 
+#include "pattern_generator.hpp"
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <stdio.h>
@@ -39,13 +41,6 @@
 #endif
 
 #include <boost/thread.hpp>
-
-#include "pattern_generator.hpp"
-
-// Generated UI
-#include "ui_pattern_generator.h"
-#include "ui_binarycounterpatternui.h"
-#include "ui_uartpatternui.h"
 
 
 
@@ -142,12 +137,16 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt, QPushB
 
     BinaryCounterPatternUI *bcpu = new BinaryCounterPatternUI(this);
     UARTPatternUI *upu = new UARTPatternUI(this);
+    LFSRPatternUI *ppu = new LFSRPatternUI(this);
     patterns.push_back(dynamic_cast<PatternUI*>(bcpu));
     patterns.push_back(dynamic_cast<PatternUI*>(upu));
+    patterns.push_back(dynamic_cast<PatternUI*>(ppu));
 
     for(auto &var : patterns)
     {
         ui->scriptCombo->addItem(QString::fromStdString(var->get_name()));
+        ui->scriptCombo->setItemData(i,QString::fromStdString(var->get_description()),Qt::ToolTipRole);
+        i++;
     }
 
 
@@ -352,10 +351,6 @@ void PatternGenerator::toggleRightMenu()
     toggleRightMenu(static_cast<QPushButton *>(QObject::sender()));
 }
 
-
-} /* namespace adiscope */
-
-
 void adiscope::PatternGenerator::on_sampleRateCombo_activated(const QString &arg1)
 {
     sample_rate = arg1.toInt();
@@ -365,7 +360,7 @@ void adiscope::PatternGenerator::on_generateScript_clicked()
 {
 
     bool ok;
-    channel_group = ui->ChannelsToGenerate->text().toShort(&ok,16);
+    channel_group = ui->ChannelsToGenerate->text().toUShort(&ok,16);
     if(!ok) {qDebug()<< "could not convert to hex";return;}
     number_of_samples = ui->numberOfSamples->text().toLong();
     last_sample = number_of_samples-100;
@@ -387,7 +382,8 @@ void adiscope::PatternGenerator::on_generateScript_clicked()
     current->set_number_of_samples(get_nr_of_samples());
     current->set_sample_rate(sample_rate);
     if(current->generate_pattern() != 0) {qDebug()<<"Pattern Generation failed";return;} //ERROR TEMPORARY
-
+    /*if(current->number_of_samples>(last_sample-start_sample)) {qDebug()<<"Warning! not enough buffer space to generate whole pattern";}
+    else {last_sample = current->number_of_samples+start_sample;}*/
     commitBuffer(current->get_buffer());
     createBinaryBuffer();
     current->delete_buffer();
@@ -833,6 +829,16 @@ void UARTPatternUI::destroy_ui(){
     delete ui;
 }
 
+
+void adiscope::UARTPatternUI::on_setUARTParameters_clicked()
+{
+    ui->paramsOut->setText(ui->baudCombo->currentText() + "/8" +ui->parityCombo->currentText()[0] + ui->stopCombo->currentText());
+    qDebug()<<ui->paramsOut->text();
+    set_params(ui->paramsOut->text().toStdString());
+    qDebug()<<ui->dataEdit->text();
+    set_string(ui->dataEdit->text().toStdString());
+}
+
 JSPattern::JSPattern(QJsonObject obj_) : obj(obj_){
     qDebug()<<"JSPattern created";
 }
@@ -932,11 +938,97 @@ void JSPatternUI::destroy_ui(){}
 
 
 
-void adiscope::UARTPatternUI::on_setUARTParameters_clicked()
+uint32_t LFSRPattern::get_lfsr_period() const
 {
-    ui->paramsOut->setText(ui->baudCombo->currentText() + "/8" +ui->parityCombo->currentText()[0] + ui->stopCombo->currentText());
-    qDebug()<<ui->paramsOut->text();
-    set_params(ui->paramsOut->text().toStdString());
-    qDebug()<<ui->dataEdit->text();
-    set_string(ui->dataEdit->text().toStdString());
+    return lfsr_period;
 }
+
+uint32_t LFSRPattern::get_lfsr_poly() const
+{
+    return lfsr_poly;
+}
+
+void LFSRPattern::set_lfsr_poly(const uint32_t &value)
+{
+    lfsr_poly = value;
+}
+
+uint16_t LFSRPattern::get_start_state() const
+{
+    return start_state;
+}
+
+void LFSRPattern::set_start_state(const uint16_t &value)
+{
+    start_state = value;
+}
+
+LFSRPattern::LFSRPattern()
+{
+    lfsr_poly = 0x01;
+    start_state = 0x01;
+    lfsr_period = 0;
+    set_name("LFSR");
+    set_description("Linear Feedback Shift Register sequence generated using Galois method");
+}
+
+uint8_t LFSRPattern::generate_pattern()
+{
+    uint16_t lfsr = start_state;
+    int i=0;
+    delete_buffer();
+    buffer = new short[number_of_samples];
+    do
+     {
+         unsigned lsb = lfsr & 1;   /* Get LSB (i.e., the output bit). */
+         lfsr >>= 1;                /* Shift register */
+         if (lsb) {                 /* If the output bit is 1, apply toggle mask. */
+             lfsr ^= lfsr_poly;
+         }
+         buffer[i] = lfsr;
+         i++;       
+     } while (i < number_of_samples);
+    return 0;
+}
+
+uint32_t LFSRPattern::compute_period()
+{
+    uint16_t lfsr = start_state;
+    unsigned period = 0;
+
+    do
+    {
+        unsigned lsb = lfsr & 1;   /* Get LSB (i.e., the output bit). */
+        lfsr >>= 1;                /* Shift register */
+        if (lsb) {                 /* If the output bit is 1, apply toggle mask. */
+            lfsr ^= lfsr_poly;
+        }
+        ++period;
+    } while (lfsr != start_state);
+    lfsr_period = period;
+    return period;
+}
+
+LFSRPatternUI::~LFSRPatternUI(){
+    qDebug()<<"LFSRPatternUI destroyed";
+}
+void LFSRPatternUI::build_ui(QWidget *parent){
+    parent_ = parent;
+    parent->layout()->addWidget(this);
+}
+void LFSRPatternUI::destroy_ui(){
+    parent_->layout()->removeWidget(this);
+    delete ui;
+}
+
+void LFSRPatternUI::on_setLFSRParameters_clicked()
+{
+    bool ok=0;
+    set_lfsr_poly(ui->genPoly->text().toULong(&ok,16));
+    if(!ok) qDebug()<<"LFSR Poly cannot be converted to int";
+    set_start_state(ui->startState->text().toULong(&ok,16));
+
+    ui->polyPeriod->setText(QString::number(compute_period()));
+
+}
+} /* namespace adiscope */
