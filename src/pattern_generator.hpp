@@ -21,6 +21,7 @@
 #include "ui_binarycounterpatternui.h"
 #include "ui_uartpatternui.h"
 #include "ui_lfsrpatternui.h"
+#include "ui_clockpatternui.h"
 
 
 extern "C" {
@@ -47,6 +48,7 @@ namespace Ui {
     class BinaryCounterPatternUI;
     class UARTPatternUI;
     class LFSRPatternUI;
+    class ClockPatternUI;
 }
 
 namespace adiscope {
@@ -202,13 +204,7 @@ class LFSRPatternUI : public PatternUI, public LFSRPattern
     Ui::LFSRPatternUI *ui;
     QWidget *parent_;
 public:
-    LFSRPatternUI(QWidget *parent = 0) : PatternUI(parent)
-    {
-        qDebug()<<"LFSRPatternUI created";
-        ui = new Ui::LFSRPatternUI();
-        ui->setupUi(this);
-        setVisible(false);
-    }
+    LFSRPatternUI(QWidget *parent = 0);
     ~LFSRPatternUI();
     void build_ui(QWidget *parent = 0);
     void destroy_ui();
@@ -216,6 +212,32 @@ private Q_SLOTS:
     void on_setLFSRParameters_clicked();
 };
 
+class ClockPattern : virtual public Pattern
+{
+    float frequency;
+    float duty_cycle;
+public:
+    ClockPattern();
+    uint8_t generate_pattern();
+    float get_frequency() const;
+    void set_frequency(float value);
+    float get_duty_cycle() const;
+    void set_duty_cycle(float value);
+};
+
+class ClockPatternUI : public PatternUI, public ClockPattern
+{
+    Q_OBJECT
+    Ui::ClockPatternUI *ui;
+    QWidget *parent_;
+public:
+    ClockPatternUI(QWidget *parent = 0);
+    ~ClockPatternUI();
+    void build_ui(QWidget *parent = 0);
+    void destroy_ui();
+private Q_SLOTS:
+    void on_setClockParams_clicked();
+};
 
 
 class PatternGenerator : public QWidget

@@ -962,7 +962,7 @@ QPushButton:!checked {
             </layout>
            </widget>
           </item>
-          <item row="18" column="0">
+          <item row="16" column="0">
            <widget class="QLineEdit" name="numberOfSamples"/>
           </item>
           <item row="7" column="0">
@@ -1009,14 +1009,17 @@ QPushButton:!checked {
             </layout>
            </widget>
           </item>
-          <item row="13" column="0">
+          <item row="11" column="0">
            <widget class="QPushButton" name="generateScript">
             <property name="text">
              <string>Generate Pattern</string>
             </property>
            </widget>
           </item>
-          <item row="14" column="0">
+          <item row="9" column="0">
+           <widget class="QLineEdit" name="ChannelsToGenerate"/>
+          </item>
+          <item row="12" column="0">
            <widget class="QPushButton" name="clearButton">
             <property name="text">
              <string>Clear Buffer</string>
@@ -1036,15 +1039,12 @@ QPushButton:!checked {
             </property>
            </spacer>
           </item>
-          <item row="19" column="0">
+          <item row="17" column="0">
            <widget class="QLabel" name="label_9">
             <property name="text">
              <string>Starting Sample</string>
             </property>
            </widget>
-          </item>
-          <item row="11" column="0">
-           <widget class="QLineEdit" name="ChannelsToGenerate"/>
           </item>
           <item row="1" column="0">
            <widget class="Line" name="line">
@@ -1062,47 +1062,47 @@ QPushButton:!checked {
             </property>
            </widget>
           </item>
-          <item row="8" column="0">
-           <widget class="QLabel" name="label_5">
-            <property name="text">
-             <string>XML Data</string>
-            </property>
-           </widget>
-          </item>
-          <item row="16" column="0">
+          <item row="14" column="0">
            <widget class="QLineEdit" name="ChannelEnableMask"/>
           </item>
-          <item row="17" column="0">
+          <item row="15" column="0">
            <widget class="QLabel" name="label_8">
             <property name="text">
              <string>Number Of Samples</string>
             </property>
            </widget>
           </item>
-          <item row="15" column="0">
+          <item row="13" column="0">
            <widget class="QLabel" name="label_7">
             <property name="text">
              <string>ChannelEnableMask</string>
             </property>
            </widget>
           </item>
-          <item row="9" column="0">
-           <widget class="QLineEdit" name="generation_data"/>
+          <item row="18" column="0">
+           <widget class="QLineEdit" name="startingSample"/>
           </item>
-          <item row="10" column="0">
+          <item row="8" column="0">
            <widget class="QLabel" name="label_6">
             <property name="text">
              <string>ChannelsToGenerate</string>
             </property>
            </widget>
           </item>
-          <item row="20" column="0">
-           <widget class="QLineEdit" name="startingSample"/>
-          </item>
-          <item row="12" column="0">
+          <item row="10" column="0">
            <widget class="QPushButton" name="generateUI">
             <property name="text">
              <string>Generate UI</string>
+            </property>
+           </widget>
+          </item>
+          <item row="20" column="0">
+           <widget class="QLineEdit" name="lastSample"/>
+          </item>
+          <item row="19" column="0">
+           <widget class="QLabel" name="label_5">
+            <property name="text">
+             <string>Last Sample</string>
             </property>
            </widget>
           </item>
@@ -1122,5 +1122,22 @@ QPushButton:!checked {
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>numberOfSamples</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>lastSample</receiver>
+   <slot>setText(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1210</x>
+     <y>571</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1210</x>
+     <y>667</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

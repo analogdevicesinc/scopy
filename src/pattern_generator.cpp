@@ -42,9 +42,6 @@
 
 #include <boost/thread.hpp>
 
-
-
-
 using namespace std;
 using namespace adiscope;
 
@@ -136,9 +133,11 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt, QPushB
     int i = 0;
 
     BinaryCounterPatternUI *bcpu = new BinaryCounterPatternUI(this);
+    ClockPatternUI *cpu = new ClockPatternUI(this);
     UARTPatternUI *upu = new UARTPatternUI(this);
     LFSRPatternUI *ppu = new LFSRPatternUI(this);
     patterns.push_back(dynamic_cast<PatternUI*>(bcpu));
+    patterns.push_back(dynamic_cast<PatternUI*>(cpu));
     patterns.push_back(dynamic_cast<PatternUI*>(upu));
     patterns.push_back(dynamic_cast<PatternUI*>(ppu));
 
@@ -363,7 +362,7 @@ void adiscope::PatternGenerator::on_generateScript_clicked()
     channel_group = ui->ChannelsToGenerate->text().toUShort(&ok,16);
     if(!ok) {qDebug()<< "could not convert to hex";return;}
     number_of_samples = ui->numberOfSamples->text().toLong();
-    last_sample = number_of_samples-100;
+    last_sample = ui->lastSample->text().toLong();// number_of_samples;//-100;
     start_sample = ui->startingSample->text().toLong();
     if(buffersize != number_of_samples * 2 && buffer != nullptr){
         delete buffer;
@@ -1009,6 +1008,14 @@ uint32_t LFSRPattern::compute_period()
     return period;
 }
 
+LFSRPatternUI::LFSRPatternUI(QWidget *parent) : PatternUI(parent)
+{
+    qDebug()<<"LFSRPatternUI created";
+    ui = new Ui::LFSRPatternUI();
+    ui->setupUi(this);
+    setVisible(false);
+}
+
 LFSRPatternUI::~LFSRPatternUI(){
     qDebug()<<"LFSRPatternUI destroyed";
 }
@@ -1031,4 +1038,87 @@ void LFSRPatternUI::on_setLFSRParameters_clicked()
     ui->polyPeriod->setText(QString::number(compute_period()));
 
 }
+
+float ClockPattern::get_duty_cycle() const
+{
+    return duty_cycle;
+}
+
+void ClockPattern::set_duty_cycle(float value)
+{
+    if(value>100) value = 100;
+    duty_cycle = value;
+}
+
+float ClockPattern::get_frequency() const
+{
+    return frequency;
+}
+
+void ClockPattern::set_frequency(float value)
+{
+    frequency = value;
+}
+
+ClockPattern::ClockPattern()
+{
+    set_name("Clock");
+    set_description("Clock pattern");
+}
+
+uint8_t ClockPattern::generate_pattern()
+{
+    float period_number_of_samples = (float)sample_rate/frequency;
+    qDebug()<<"period_number_of_samples - "<<period_number_of_samples;
+    float number_of_periods = number_of_samples / period_number_of_samples;
+    qDebug()<<"number_of_periods - " << number_of_periods;
+    float low_number_of_samples = (period_number_of_samples * (100-duty_cycle)) / 100;
+    qDebug()<<"low_number_of_samples - " << low_number_of_samples;
+    float high_number_of_samples = period_number_of_samples - low_number_of_samples;
+    qDebug()<<"high_number_of_samples - " << high_number_of_samples;
+
+    delete_buffer();
+    buffer = new short[number_of_samples];
+    int i=0;
+    while(i<number_of_samples)
+    {
+        if(i % ((int)period_number_of_samples) < low_number_of_samples)
+            buffer[i] = 0;
+        else
+            buffer[i] = 0xffff;
+        //buffer[i] = (number_of_samples % period_number_of_samples) ;
+        i++;
+    }
+    return 0;
+}
+
+ClockPatternUI::ClockPatternUI(QWidget *parent) : PatternUI(parent)
+{
+    qDebug()<<"ClockPatternUI created";
+    ui = new Ui::ClockPatternUI();
+    ui->setupUi(this);
+    setVisible(false);
+}
+
+ClockPatternUI::~ClockPatternUI(){
+    qDebug()<<"ClockPatternUI destroyed";
+}
+void ClockPatternUI::build_ui(QWidget *parent){
+    parent_ = parent;
+    parent->layout()->addWidget(this);
+}
+void ClockPatternUI::destroy_ui(){
+    parent_->layout()->removeWidget(this);
+    delete ui;
+}
+
+void ClockPatternUI::on_setClockParams_clicked()
+{
+    bool ok =0;
+    set_frequency(ui->frequencyEdit->text().toFloat(&ok));
+    if(!ok) qDebug()<<"Cannot set frequency, not a float";
+    set_duty_cycle(ui->dutyEdit->text().toFloat(&ok));
+    if(!ok) qDebug()<<"Cannot set duty, not a float";
+}
+
 } /* namespace adiscope */
