@@ -12,6 +12,7 @@
 #include <QHBoxLayout>
 
 ///* pulseview and sigrok */
+#include <boost/math/common_factor.hpp>
 #include "pulseview/pv/mainwindow.hpp"
 #include "pulseview/pv/devices/binarybuffer.hpp"
 #include "pulseview/pv/devicemanager.hpp"
@@ -380,6 +381,14 @@ void adiscope::PatternGenerator::on_generateScript_clicked()
     current->set_number_of_channels(get_nr_of_channels());
     current->set_number_of_samples(get_nr_of_samples());
     current->set_sample_rate(sample_rate);
+
+
+    qDebug()<<"minimum sampling frequency"<<current->get_min_sampling_freq(); // least common multiplier
+    current->set_sample_rate(current->get_min_sampling_freq()); // TEMP
+    qDebug()<<"minimum number of samples"<<current->get_required_nr_of_samples(); // if not periodic, verify minimum, else least common multiplier with least common freq
+    current->set_sample_rate(sample_rate);
+
+
     if(current->generate_pattern() != 0) {qDebug()<<"Pattern Generation failed";return;} //ERROR TEMPORARY
     /*if(current->number_of_samples>(last_sample-start_sample)) {qDebug()<<"Warning! not enough buffer space to generate whole pattern";}
     else {last_sample = current->number_of_samples+start_sample;}*/
@@ -538,6 +547,16 @@ void Pattern::set_number_of_channels(uint16_t number_of_channels_)
     number_of_channels = number_of_channels_;
 }
 
+bool Pattern::is_periodic()
+{
+    return periodic;
+}
+
+void Pattern::set_periodic(bool periodic_)
+{
+    periodic=periodic_;
+}
+
 short* Pattern::get_buffer()
 {
     return buffer;
@@ -550,6 +569,16 @@ void Pattern::delete_buffer()
     buffer=nullptr;
 }
 
+uint32_t Pattern::get_min_sampling_freq()
+{
+    return 1; // minimum 1 hertz if not specified otherwise
+}
+
+uint32_t Pattern::get_required_nr_of_samples()
+{
+    return 0; // 0 samples required
+}
+
 PatternUI::PatternUI(QWidget *parent) : QWidget(parent){
     qDebug()<<"PatternUICreated";
 }
@@ -559,22 +588,93 @@ PatternUI::~PatternUI(){
 void PatternUI::build_ui(QWidget *parent){}
 void PatternUI::destroy_ui(){}
 
+
+uint32_t BinaryCounterPattern::get_min_sampling_freq()
+{
+    return frequency;
+}
+
+uint32_t BinaryCounterPattern::get_required_nr_of_samples()
+{
+    // greatest common divider duty cycle and 1000;0;
+    return ((float)sample_rate/(float)frequency) * (1<<number_of_channels);
+}
+
+
+uint32_t BinaryCounterPattern::get_frequency() const
+{
+    return frequency;
+}
+
+void BinaryCounterPattern::set_frequency(const uint32_t &value)
+{
+    frequency = value;
+}
+
+uint16_t BinaryCounterPattern::get_start_value() const
+{
+    return start_value;
+}
+
+void BinaryCounterPattern::set_start_value(const uint16_t &value)
+{
+    start_value = value;
+}
+
+uint16_t BinaryCounterPattern::get_end_value() const
+{
+    return end_value;
+}
+
+void BinaryCounterPattern::set_end_value(const uint16_t &value)
+{
+    end_value = value;
+}
+
+uint16_t BinaryCounterPattern::get_increment() const
+{
+    return increment;
+}
+
+void BinaryCounterPattern::set_increment(const uint16_t &value)
+{
+    increment = value;
+}
+
 BinaryCounterPattern::BinaryCounterPattern()
 {
     qDebug()<<"BinaryCounterPatternCreated";
     set_name("BinaryCounter");
     set_description("BinaryCounterDescription");
+    set_periodic(true);
 }
 
 uint8_t BinaryCounterPattern::generate_pattern()
 {
     delete_buffer();
     buffer = new short[number_of_samples];
-    for(auto i=0;i<number_of_samples;i++)
+    auto samples_per_count = ((float)sample_rate/(float)frequency);
+    auto i=start_value;
+    auto j=0;
+    while(j<number_of_samples)
     {
-        buffer[i] = i % (1<<number_of_channels);
+        for(auto k=0;k<samples_per_count;k++,j++)
+        {
+            if(j>=number_of_samples)break;
+            buffer[j] = i;
+        }
+        if(i<end_value)
+        {
+            i=i+increment;
+        }
+        else
+        {
+            i=start_value;
+        }
     }
     return 0;
+
+
 }
 
 BinaryCounterPatternUI::BinaryCounterPatternUI(QWidget *parent) : PatternUI(parent){
@@ -604,6 +704,7 @@ UARTPattern::UARTPattern()
     baud_rate = 9600;
     data_bits = 8;
     msb_first=false;
+    set_periodic(false);
     set_name("UART");
     set_description("UARTDescription");
 
@@ -666,7 +767,10 @@ int UARTPattern::set_params(std::string params_)
         return -EINVAL;
 
     return 0;
+
+
 }
+
 
 void UARTPattern::set_msb_first(bool msb_first_)
 {
@@ -749,7 +853,21 @@ uint16_t UARTPattern::encapsulateUartFrame(char chr, uint16_t *bits_per_frame)
 
 }
 
+uint32_t UARTPattern::get_min_sampling_freq()
+{
+    return baud_rate;
+}
 
+uint32_t UARTPattern::get_required_nr_of_samples()
+{
+    uint16_t number_of_frames = str.length();
+    uint32_t samples_per_bit = sample_rate/baud_rate;
+    uint16_t bits_per_frame;
+    encapsulateUartFrame(*(str.c_str()), &bits_per_frame);
+    uint32_t samples_per_frame = samples_per_bit * bits_per_frame;
+    number_of_samples = samples_per_frame*(number_of_frames + 1/* padding */);
+    return number_of_samples;
+}
 
 uint8_t UARTPattern::generate_pattern()
 {
@@ -758,6 +876,7 @@ uint8_t UARTPattern::generate_pattern()
 
     uint16_t number_of_frames = str.length();
     uint32_t samples_per_bit = sample_rate/baud_rate;
+    qDebug()<< "samples_per_bit - "<<(float)sample_rate/(float)baud_rate;
     uint16_t bits_per_frame;
     encapsulateUartFrame(*(str.c_str()), &bits_per_frame);
     uint32_t samples_per_frame = samples_per_bit * bits_per_frame;
@@ -1039,6 +1158,19 @@ void LFSRPatternUI::on_setLFSRParameters_clicked()
 
 }
 
+
+uint32_t ClockPattern::get_min_sampling_freq()
+{
+    return frequency * (duty_cycle_granularity);
+}
+
+uint32_t ClockPattern::get_required_nr_of_samples()
+{
+    // greatest common divider duty cycle and 1000;0;
+    return duty_cycle_granularity;
+}
+
+
 float ClockPattern::get_duty_cycle() const
 {
     return duty_cycle;
@@ -1046,7 +1178,9 @@ float ClockPattern::get_duty_cycle() const
 
 void ClockPattern::set_duty_cycle(float value)
 {
-    if(value>100) value = 100;
+    if(value>100) value = 100;    
+
+//    value = (value / (100/duty_cycle_granularity)) * (100/duty_cycle_granularity);
     duty_cycle = value;
 }
 
@@ -1058,6 +1192,12 @@ float ClockPattern::get_frequency() const
 void ClockPattern::set_frequency(float value)
 {
     frequency = value;
+    if(frequency>40000000) frequency = 40000000;
+    if(frequency>20000000) duty_cycle_granularity = 2;
+    if(frequency>10000000 && frequency <= 20000000) duty_cycle_granularity = 4;
+    if(frequency>5000000 && frequency <= 10000000) duty_cycle_granularity = 8;
+    if(frequency>2000000 && frequency <= 5000000) duty_cycle_granularity = 16;
+    if(frequency<2000000) duty_cycle_granularity = 20;
 }
 
 ClockPattern::ClockPattern()
@@ -1122,3 +1262,17 @@ void ClockPatternUI::on_setClockParams_clicked()
 }
 
 } /* namespace adiscope */
+
+void adiscope::BinaryCounterPatternUI::on_setBinaryCounterParams_clicked()
+{
+    bool ok = false;
+    set_frequency(ui->frequencyEdit->text().toULong(&ok));
+    if(!ok) qDebug()<<"Cannot set frequency, not a uint32";
+    set_start_value(ui->startEdit->text().toUInt(&ok));
+    if(!ok) qDebug()<<"Cannot set frequency, not a uint16";
+    set_end_value(ui->endEdit->text().toUInt(&ok));
+    if(!ok) qDebug()<<"Cannot set frequency, not a uint16";
+    set_increment(ui->incrementEdit->text().toUInt(&ok));
+    if(!ok) qDebug()<<"Cannot set frequency, not a uint16";
+
+}

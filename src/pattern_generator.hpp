@@ -68,6 +68,7 @@ class Pattern
 private:
     std::string name;
     std::string description;
+    bool periodic;
 protected: // temp
     short *buffer;
     uint32_t sample_rate;
@@ -85,8 +86,12 @@ public:
     void set_sample_rate(uint32_t sample_rate_);
     void set_number_of_samples(uint32_t number_of_samples_);
     void set_number_of_channels(uint16_t number_of_channels_);
+    bool is_periodic();
+    void set_periodic(bool periodic_);
     short* get_buffer();
     void delete_buffer();
+    virtual uint32_t get_min_sampling_freq();
+    virtual uint32_t get_required_nr_of_samples();
     virtual uint8_t generate_pattern() = 0;
 };
 
@@ -102,13 +107,28 @@ public:
 
 class BinaryCounterPattern : virtual public Pattern
 {
+    uint32_t frequency;
+    uint16_t start_value;
+    uint16_t end_value;
+    uint16_t increment;
 public:
     BinaryCounterPattern();
     uint8_t generate_pattern();
+    uint32_t get_frequency() const;
+    void set_frequency(const uint32_t &value);
+    uint32_t get_min_sampling_freq();
+    uint32_t get_required_nr_of_samples();
+    uint16_t get_start_value() const;
+    void set_start_value(const uint16_t &value);
+    uint16_t get_end_value() const;
+    void set_end_value(const uint16_t &value);
+    uint16_t get_increment() const;
+    void set_increment(const uint16_t &value);
 };
 
 class BinaryCounterPatternUI : public PatternUI, public BinaryCounterPattern
 {
+    Q_OBJECT
     Ui::BinaryCounterPatternUI *ui;
     QWidget *parent_;
 public:
@@ -116,6 +136,8 @@ public:
     ~BinaryCounterPatternUI();
     void build_ui(QWidget *parent = 0);
     void destroy_ui();
+private Q_SLOTS:
+    void on_setBinaryCounterParams_clicked();
 };
 
 class UARTPattern : virtual public Pattern
@@ -135,6 +157,8 @@ public:
     int set_params(std::string params_);
     void set_msb_first(bool msb_first_);
     uint16_t encapsulateUartFrame(char chr, uint16_t *bits_per_frame);
+    uint32_t get_min_sampling_freq();
+    uint32_t get_required_nr_of_samples();
     uint8_t generate_pattern();
 };
 
@@ -214,6 +238,7 @@ private Q_SLOTS:
 
 class ClockPattern : virtual public Pattern
 {
+    int duty_cycle_granularity = 20;
     float frequency;
     float duty_cycle;
 public:
@@ -223,6 +248,8 @@ public:
     void set_frequency(float value);
     float get_duty_cycle() const;
     void set_duty_cycle(float value);
+    uint32_t get_min_sampling_freq();
+    uint32_t get_required_nr_of_samples();
 };
 
 class ClockPatternUI : public PatternUI, public ClockPattern
