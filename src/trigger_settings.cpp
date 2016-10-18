@@ -499,54 +499,26 @@ void TriggerSettings::trigger_all_widgets_update()
 
 void TriggerSettings::ui_reconf_on_triggerA_mode_changed(int index)
 {
-	bool on;
+	bool on = index != 1;
 
-	switch (index) {
-	case 0:
-	case 1:
-		on = (index == 0);
-		ui->cmb_triggA_cond->setEnabled(on);
-		ui->lbl_triggA_cond->setEnabled(on);
-		ui_triggerAlevel->setEnabled(on);
-		ui_triggerAHyst->setEnabled(on);
-		ui->lbl_triggA_ext_cond->setDisabled(on);
-		ui->cmb_triggA_ext_cond->setDisabled(on);
-		break;
-	default:
-		ui->cmb_triggA_cond->setEnabled(true);
-		ui->lbl_triggA_cond->setEnabled(true);
-		ui_triggerAlevel->setEnabled(true);
-		ui_triggerAHyst->setEnabled(true);
-		ui->lbl_triggA_ext_cond->setEnabled(true);
-		ui->cmb_triggA_ext_cond->setEnabled(true);
-		break;
-	}
+	ui->cmb_triggA_cond->setEnabled(on);
+	ui->lbl_triggA_cond->setEnabled(on);
+	ui_triggerAlevel->setEnabled(on);
+	ui_triggerAHyst->setEnabled(on);
+	ui->lbl_triggA_ext_cond->setDisabled(on);
+	ui->cmb_triggA_ext_cond->setDisabled(on);
 }
 
 void TriggerSettings::ui_reconf_on_triggerB_mode_changed(int index)
 {
-	bool on;
+	bool on = index != 1;
 
-	switch (index) {
-	case 0:
-	case 1:
-		on = (index == 0);
-		ui->cmb_triggB_cond->setEnabled(on);
-		ui->lbl_triggB_cond->setEnabled(on);
-		ui_triggerBlevel->setEnabled(on);
-		ui_triggerBHyst->setEnabled(on);
-		ui->lbl_triggB_ext_cond->setDisabled(on);
-		ui->cmb_triggB_ext_cond->setDisabled(on);
-		break;
-	default:
-		ui->cmb_triggB_cond->setEnabled(true);
-		ui->lbl_triggB_cond->setEnabled(true);
-		ui_triggerBlevel->setEnabled(true);
-		ui_triggerBHyst->setEnabled(true);
-		ui->lbl_triggB_ext_cond->setEnabled(true);
-		ui->cmb_triggB_ext_cond->setEnabled(true);
-		break;
-	}
+	ui->cmb_triggB_cond->setEnabled(on);
+	ui->lbl_triggB_cond->setEnabled(on);
+	ui_triggerBlevel->setEnabled(on);
+	ui_triggerBHyst->setEnabled(on);
+	ui->lbl_triggB_ext_cond->setDisabled(on);
+	ui->cmb_triggB_ext_cond->setDisabled(on);
 }
 
 void TriggerSettings::ui_reconf_on_triggerA_cond_changed(int index)
