@@ -66,7 +66,7 @@ vector<string> TriggerSettings::lut_digital_trigger_conditions = {
 TriggerSettings::TriggerSettings(struct iio_context *ctx, QWidget *parent) :
 	QWidget(parent), ui(new Ui::TriggerSettings),
 	triggerA_en(false), triggerB_en(false),
-	plot_num_samples(0)
+	temporarily_disabled(false), plot_num_samples(0)
 {
 	ui->setupUi(this);
 
@@ -163,10 +163,16 @@ TriggerSettings::TriggerSettings(struct iio_context *ctx, QWidget *parent) :
 		SLOT(onSpinboxTriggerAhystChanged(double)));
 	connect(ui_triggerBHyst, SIGNAL(valueChanged(double)),
 		SLOT(onSpinboxTriggerBhystChanged(double)));
+
+	connect(ui->btnNormal, SIGNAL(clicked()), this,
+			SLOT(autoTriggerEnable()));
 }
 
 TriggerSettings::~TriggerSettings()
 {
+	/* Restore the trigger setting if we're in auto-trigger mode */
+	autoTriggerEnable();
+
 	delete ui;
 }
 
@@ -653,4 +659,28 @@ void adiscope::TriggerSettings::on_btn_noise_reject_toggled(bool checked)
 void TriggerSettings::setPlotNumSamples(int numSamples)
 {
 	plot_num_samples = numSamples;
+}
+
+void TriggerSettings::autoTriggerDisable()
+{
+	if (ui->btnAuto->isChecked()) {
+		iio_channel_attr_write(this->trigger0Mode, "mode", "always");
+		iio_channel_attr_write(this->trigger1Mode, "mode", "always");
+		temporarily_disabled = true;
+	}
+}
+
+void TriggerSettings::autoTriggerEnable()
+{
+	if (temporarily_disabled) {
+		int indexA = ui->cmb_trigg_A->currentIndex() + 1;
+		iio_channel_attr_write(this->trigger0Mode, "mode",
+				lut_triggerX_types[indexA].c_str());
+
+		int indexB = ui->cmb_trigg_B->currentIndex() + 1;
+		iio_channel_attr_write(this->trigger1Mode, "mode",
+				lut_triggerX_types[indexB].c_str());
+
+		temporarily_disabled = false;
+	}
 }

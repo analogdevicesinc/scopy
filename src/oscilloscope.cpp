@@ -470,6 +470,11 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	connect(cr_ui.hCursorsEnanble, SIGNAL(toggled(bool)),
 		&plot, SLOT(setHorizCursorsEnabled(bool)));
 
+	connect(&*iio, SIGNAL(timeout()),
+			&trigger_settings, SLOT(autoTriggerDisable()));
+	connect(&plot, SIGNAL(newData()),
+			&trigger_settings, SLOT(autoTriggerEnable()));
+
 	if (nb_channels < 2)
 		gsettings_ui->XY_view->hide();
 
