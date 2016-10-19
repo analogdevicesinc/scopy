@@ -1,0 +1,65 @@
+adiscope--DropdownSwitchList {
+  height: 30px;
+  color: rgba(255, 255, 255, 102);
+  border: 0px;
+  font-size: 18px;
+  border-radius: 4px;
+  padding-left: 20px;
+}
+
+adiscope--DropdownSwitchList:editable{
+  background-color: #141416;
+  color: white;
+}
+
+adiscope--DropdownSwitchList::drop-down {
+  subcontrol-position: center right;
+  width: 10px;
+  height: 6px;
+  border-image: url(:/icons/sba_cmb_box_arrow.svg);
+  margin-right: 20px;
+}
+
+adiscope--DropdownSwitchList QAbstractItemView {
+  border: 0px;
+  background-color: #141416;
+  font-size: 18px;
+  outline: 0px;
+}
+
+adiscope--DropdownSwitchList QAbstractItemView::item {
+  color: #ffffff;
+  height: 60px;
+}
+
+adiscope--DropdownSwitchList QAbstractItemView::item:hover {
+  background-color: #141416;
+}
+
+QHeaderView {
+  padding-left: 10px;
+}
+
+QHeaderView:section {
+  color: rgba(255, 255, 255, 153);
+  background-color: #141416;
+  border: 0px;
+  font: 14px;
+}
+
+QCheckBox {
+  background-color: #141416;
+}
+
+QCheckBox::indicator {
+  border: 2px solid rgb(74, 100, 255);
+  border-radius: 4px;
+  width: 16px;
+  height: 16px;
+  background-color: #272730;
+  subcontrol-position: center;
+}
+
+QCheckBox::indicator:checked {
+  background-color: rgb(74, 100, 255);
+}

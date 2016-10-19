@@ -58,5 +58,6 @@
 	<qresource prefix="/stylesheets">
 		<file>stylesheets/plot.qss</file>
 		<file>stylesheets/spinbox_type_a.qss</file>
+		<file>stylesheets/dropdown_switch_list.qss</file>
 	</qresource>
 </RCC>
