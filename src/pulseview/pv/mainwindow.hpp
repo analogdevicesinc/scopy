@@ -40,6 +40,10 @@ class InputFormat;
 class OutputFormat;
 }
 
+namespace adiscope {
+class Filter;
+}
+
 namespace pv {
 
 class DeviceManager;
@@ -76,6 +80,7 @@ private:
 
 public:
 	explicit MainWindow(DeviceManager &device_manager,
+		adiscope::Filter *filt,
 		std::string open_file_name = std::string(),
 		std::string open_file_format = std::string(),
 		QWidget *parent = 0);

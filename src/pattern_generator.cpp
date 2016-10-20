@@ -114,7 +114,7 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt, QPushB
     //sigrok and sigrokdecode initialisation
     context = sigrok::Context::create();
     pv::DeviceManager device_manager(context);
-    pv::MainWindow* w = new pv::MainWindow(device_manager, "pattern_generator", "",parent);
+    pv::MainWindow* w = new pv::MainWindow(device_manager, filt, "pattern_generator", "",parent);
     binary_format = w->get_format_from_string("binary");
 
 

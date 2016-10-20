@@ -97,7 +97,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, Filter *filt,
 	srd_decoder_load_all();
 
 	pv::DeviceManager device_manager(context);
-	pv::MainWindow* w = new pv::MainWindow(device_manager, open_file,
+	pv::MainWindow* w = new pv::MainWindow(device_manager, filt, open_file,
 						open_file_format, parent);
 
 	/* Gnuradio Blocks */

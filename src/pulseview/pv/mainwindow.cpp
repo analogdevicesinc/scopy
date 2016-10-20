@@ -61,6 +61,8 @@
 #include "widgets/decodermenu.hpp"
 #include "widgets/hidingmenubar.hpp"
 
+#include "../../filter.hpp"
+
 #include <inttypes.h>
 #include <stdint.h>
 #include <stdarg.h>
@@ -93,6 +95,7 @@ const char *MainWindow::SettingOpenDirectory = "MainWindow/OpenDirectory";
 const char *MainWindow::SettingSaveDirectory = "MainWindow/SaveDirectory";
 
 MainWindow::MainWindow(DeviceManager &device_manager,
+	adiscope::Filter *filt,
 	string open_file_name, string open_file_format,
 	QWidget *parent) :
     QWidget(parent),
@@ -116,7 +119,7 @@ MainWindow::MainWindow(DeviceManager &device_manager,
 
     setup_ui();
 	if (open_file_name.empty())
-		select_init_device("M2K");
+		select_init_device(filt->hw_name().toStdString().c_str());
 	else
         if(open_file_name!="pattern_generator")
             load_init_file(open_file_name, open_file_format);
