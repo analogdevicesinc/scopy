@@ -6,6 +6,7 @@
 #include <QJsonArray>
 #include <QIntValidator>
 #include <QtQml/QJSEngine>
+#include <QtUiTools/QUiLoader>
 #include <vector>
 #include <string>
 #include <libserialport.h>
@@ -22,6 +23,7 @@
 #include "ui_uartpatternui.h"
 #include "ui_lfsrpatternui.h"
 #include "ui_clockpatternui.h"
+#include "ui_genericjspatternui.h"
 
 
 extern "C" {
@@ -49,6 +51,7 @@ namespace Ui {
     class UARTPatternUI;
     class LFSRPatternUI;
     class ClockPatternUI;
+    class GenericJSPatternUI;
 }
 
 namespace adiscope {
@@ -85,14 +88,17 @@ public:
     void set_description(std::string description_);
     void set_sample_rate(uint32_t sample_rate_);
     void set_number_of_samples(uint32_t number_of_samples_);
-    void set_number_of_channels(uint16_t number_of_channels_);
-    bool is_periodic();
+    void set_number_of_channels(uint16_t number_of_channels_);    
     void set_periodic(bool periodic_);
     short* get_buffer();
     void delete_buffer();
+    virtual void init();
+    virtual uint8_t pre_generate();
+    virtual bool is_periodic();
     virtual uint32_t get_min_sampling_freq();
     virtual uint32_t get_required_nr_of_samples();
     virtual uint8_t generate_pattern() = 0;
+    virtual void deinit();
 };
 
 class PatternUI : public QWidget, public virtual Pattern
@@ -102,6 +108,8 @@ public:
     PatternUI(QWidget *parent = 0);
     ~PatternUI();
     virtual void build_ui(QWidget *parent = 0);
+    virtual void post_load_ui();
+    virtual void parse_ui();
     virtual void destroy_ui();
 };
 
@@ -134,10 +142,11 @@ class BinaryCounterPatternUI : public PatternUI, public BinaryCounterPattern
 public:
     BinaryCounterPatternUI(QWidget *parent = 0);
     ~BinaryCounterPatternUI();
+    void parse_ui();
     void build_ui(QWidget *parent = 0);
     void destroy_ui();
-private Q_SLOTS:
-    void on_setBinaryCounterParams_clicked();
+/*private Q_SLOTS:
+    void on_setBinaryCounterParams_clicked();*/
 };
 
 class UARTPattern : virtual public Pattern
@@ -172,34 +181,67 @@ public:
     ~UARTPatternUI();
     void build_ui(QWidget *parent = 0);
     void destroy_ui();
+    void parse_ui();
+    /*
 private Q_SLOTS:
-    void on_setUARTParameters_clicked();
+    void on_setUARTParameters_clicked();*/
 };
 
 class JSPattern : public QObject, virtual public Pattern
 {
     Q_OBJECT
 private:
-
-    QJSEngine qEngine;
+protected:
+    QJSEngine *qEngine;
+    JSConsole *console;
+    QWidget *ui_form;
     QJsonObject obj;
 public:
 
     JSPattern(QJsonObject obj_);
     Q_INVOKABLE quint32 get_nr_of_samples();
     Q_INVOKABLE quint32 get_nr_of_channels();
-    Q_INVOKABLE quint32 get_sample_rate();
-    Q_INVOKABLE void JSErrorDialog(QString errorMessage);
-    Q_INVOKABLE void commitBuffer(QJSValue jsBufferValue, QJSValue jsBufferSize);
+    Q_INVOKABLE quint32 get_sample_rate();    
+    /*Q_INVOKABLE*/ void JSErrorDialog(QString errorMessage);
+    /*Q_INVOKABLE*/ void commitBuffer(QJSValue jsBufferValue, QJSValue jsBufferSize);
+    bool is_periodic();
+    uint32_t get_min_sampling_freq();
+    uint32_t get_required_nr_of_samples();
+    void init();
+    uint8_t pre_generate();
     uint8_t generate_pattern();
+    void deinit();
+    virtual bool handle_result(QJSValue result,QString str = "");
 };
 
-class JSPatternUI : public PatternUI, public JSPattern
+class JSPatternUIStatusWindow : public QObject
 {
+    Q_OBJECT
+    QTextEdit *con;
+public:
+    JSPatternUIStatusWindow(QTextEdit *textedit);
+    Q_INVOKABLE void clear();
+    Q_INVOKABLE void print(QString str);
+};
+
+
+class JSPatternUI : public PatternUI, public JSPattern
+{    
+    QUiLoader *loader;
+    Ui::GenericJSPatternUI *ui;
+    //QWidget *ui_form;
+    QString form_name;    
+    QWidget *parent_;
+    JSPatternUIStatusWindow *textedit;
 public:
     JSPatternUI(QJsonObject obj_, QWidget *parent = 0);
     ~JSPatternUI();
+
+    bool handle_result(QJSValue result,QString str = "");
+
     void build_ui(QWidget *parent = 0);
+    void post_load_ui();
+    void parse_ui();
     void destroy_ui();
 };
 
@@ -231,9 +273,10 @@ public:
     LFSRPatternUI(QWidget *parent = 0);
     ~LFSRPatternUI();
     void build_ui(QWidget *parent = 0);
+    void parse_ui();
     void destroy_ui();
-private Q_SLOTS:
-    void on_setLFSRParameters_clicked();
+/*private Q_SLOTS:
+    void on_setLFSRParameters_clicked();*/
 };
 
 class ClockPattern : virtual public Pattern
@@ -260,10 +303,11 @@ class ClockPatternUI : public PatternUI, public ClockPattern
 public:
     ClockPatternUI(QWidget *parent = 0);
     ~ClockPatternUI();
+    void parse_ui();
     void build_ui(QWidget *parent = 0);
     void destroy_ui();
-private Q_SLOTS:
-    void on_setClockParams_clicked();
+/*private Q_SLOTS:
+    void on_setClockParams_clicked();*/
 };
 
 
