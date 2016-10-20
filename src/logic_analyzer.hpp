@@ -75,6 +75,8 @@ namespace adiscope {
 		ScaleSpinButton *timeBase;
 		PositionSpinButton *timePosition;
 
+		const std::string& dev_name;
+
 		boost::shared_ptr<iio_manager> manager;
 		iio_manager::port_id* ids;
 		struct iio_context *ctx;

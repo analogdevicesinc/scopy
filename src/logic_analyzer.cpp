@@ -68,9 +68,10 @@ using namespace Glibmm;
 LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, Filter *filt,
 			QPushButton *runBtn, QWidget *parent) :
 	QWidget(parent),
+	dev_name(filt->device_name(TOOL_LOGIC_ANALYZER)),
 	ctx(ctx),
 	itemsize(sizeof(uint16_t)),
-	dev(iio_context_find_device(ctx, "m2k-logic-analyzer-rx")),
+	dev(iio_context_find_device(ctx, dev_name.c_str())),
 	menuOpened(false),
 	fd(-1),
 	settings_group(new QButtonGroup(this)),
@@ -100,7 +101,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, Filter *filt,
 						open_file_format, parent);
 
 	/* Gnuradio Blocks */
-	manager = iio_manager::get_instance(ctx, "m2k-logic-analyzer-rx");
+	manager = iio_manager::get_instance(ctx, dev_name);
 	sink_streams_to_short = adiscope::streams_to_short::make(itemsize,
 								no_channels);
 	ids = new iio_manager::port_id[no_channels];
