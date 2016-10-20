@@ -20,6 +20,8 @@
 #ifndef IIO_MANAGER_HPP
 #define IIO_MANAGER_HPP
 
+#include <QObject>
+
 #include <gnuradio/top_block.h>
 #include <gnuradio/iio/device_source.h>
 #include <gnuradio/blocks/copy.h>
@@ -31,8 +33,10 @@
 #define IIO_BUFFER_SIZE 0x400
 
 namespace adiscope {
-	class iio_manager : public gr::top_block
+	class iio_manager : public QObject, public gr::top_block
 	{
+		Q_OBJECT
+
 	public:
 		typedef boost::weak_ptr<iio_manager> map_entry;
 		typedef gr::blocks::copy::sptr port_id;
@@ -120,6 +124,12 @@ namespace adiscope {
 		void del_connection(gr::basic_block_sptr block);
 
 		void set_buffer_size_unlocked(unsigned long size);
+
+	private Q_SLOTS:
+		void got_timeout();
+
+	Q_SIGNALS:
+		void timeout();
 	};
 }
 

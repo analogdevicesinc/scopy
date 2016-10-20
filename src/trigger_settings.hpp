@@ -63,6 +63,9 @@ namespace adiscope {
 		void setTriggerLevelA(double);
 		void setTriggerLevelB(double);
 
+		void autoTriggerDisable();
+		void autoTriggerEnable();
+
 	private Q_SLOTS:
 		void on_cmb_trigg_source_currentIndexChanged(int);
 		void on_cmb_trigg_A_currentIndexChanged(int);
@@ -118,6 +121,7 @@ namespace adiscope {
 
 		bool triggerA_en;
 		bool triggerB_en;
+		bool temporarily_disabled;
 
 		double hystA_last_val;
 		double hystB_last_val;

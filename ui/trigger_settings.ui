@@ -91,6 +91,22 @@ QComboBox:disabled
 QLabel:disabled
 {
   color: rgb(85, 85, 85);
+}
+
+QRadioButton {
+color: white;
+spacing: 12px;
+background-color: transparent;
+}
+QRadioButton::indicator {
+width: 14px;
+height: 14px;
+border: 2px solid;
+border-radius: 9px;
+border-color: rgb(73, 99, 255);
+}
+QRadioButton::indicator:checked {
+background-color: rgb(73, 99, 255);
 }</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -177,13 +193,13 @@ QLabel:disabled
        <item>
         <layout class="QVBoxLayout" name="verticalLayout_11">
          <property name="spacing">
-          <number>0</number>
+          <number>10</number>
          </property>
          <property name="leftMargin">
           <number>0</number>
          </property>
          <property name="topMargin">
-          <number>0</number>
+          <number>10</number>
          </property>
          <property name="rightMargin">
           <number>0</number>
@@ -192,20 +208,57 @@ QLabel:disabled
           <number>0</number>
          </property>
          <item>
-          <spacer name="verticalSpacer_4">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>Trigger mode</string>
            </property>
-           <property name="sizeType">
-            <enum>QSizePolicy::Fixed</enum>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <property name="spacing">
+            <number>20</number>
            </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>0</width>
-             <height>5</height>
-            </size>
+           <property name="bottomMargin">
+            <number>10</number>
            </property>
-          </spacer>
+           <item>
+            <widget class="QRadioButton" name="btnAuto">
+             <property name="text">
+              <string>Auto</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+             <attribute name="buttonGroup">
+              <string notr="true">buttonGroup</string>
+             </attribute>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="btnNormal">
+             <property name="text">
+              <string>Normal</string>
+             </property>
+             <attribute name="buttonGroup">
+              <string notr="true">buttonGroup</string>
+             </attribute>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>0</width>
+               <height>0</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
          </item>
          <item>
           <widget class="QLabel" name="lbl_trigg_source">
@@ -219,22 +272,6 @@ QLabel:disabled
             <string>Source</string>
            </property>
           </widget>
-         </item>
-         <item>
-          <spacer name="verticalSpacer_24">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-           <property name="sizeType">
-            <enum>QSizePolicy::Fixed</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>0</width>
-             <height>10</height>
-            </size>
-           </property>
-          </spacer>
          </item>
          <item>
           <widget class="QComboBox" name="cmb_trigg_source">
@@ -1479,4 +1516,7 @@ QPushButton:!checked {
  </widget>
  <resources/>
  <connections/>
+ <buttongroups>
+  <buttongroup name="buttonGroup"/>
+ </buttongroups>
 </ui>

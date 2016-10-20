@@ -18,6 +18,7 @@
  */
 
 #include "iio_manager.hpp"
+#include "timeout_block.hpp"
 
 #include <QDebug>
 
@@ -35,6 +36,7 @@ unsigned iio_manager::_id = 0;
 iio_manager::iio_manager(unsigned int block_id,
 		struct iio_context *ctx, const std::string &_dev,
 		unsigned long _buffer_size) :
+	QObject(nullptr),
 	top_block("IIO Manager " + std::to_string(block_id)),
 	id(block_id), _started(false), buffer_size(_buffer_size)
 {
@@ -61,6 +63,12 @@ iio_manager::iio_manager(unsigned int block_id,
 	}
 
 	dummy_copy->set_enabled(true);
+
+	auto timeout_b = gnuradio::get_initial_sptr(new timeout_block("msg"));
+	hier_block2::msg_connect(iio_block, "msg", timeout_b, "msg");
+
+	QObject::connect(&*timeout_b, SIGNAL(timeout()), this,
+			SLOT(got_timeout()));
 }
 
 iio_manager::~iio_manager()
@@ -115,16 +123,16 @@ iio_manager::port_id iio_manager::connect(basic_block_sptr dst,
 
 	/* Connect the IIO block to the valve, and the valve to the
 	 * destination block */
-	connect(iio_block, src_port, copy, 0);
+	iio_manager::connect(iio_block, src_port, copy, 0);
 
 	/* TODO: Find a way to share one short_to_float block per channel,
 	 * instead of having each client instanciate its own */
 	if (use_float) {
 		auto s2f = blocks::short_to_float::make();
-		connect(copy, 0, s2f, 0);
-		connect(s2f, 0, dst, dst_port);
+		iio_manager::connect(copy, 0, s2f, 0);
+		iio_manager::connect(s2f, 0, dst, dst_port);
 	} else {
-		connect(copy, 0, dst, dst_port);
+		iio_manager::connect(copy, 0, dst, dst_port);
 	}
 
 	buffer_mutex.lock();
@@ -298,4 +306,9 @@ void iio_manager::set_buffer_size(iio_manager::port_id copy, unsigned long size)
 	buffer_sizes[pos - copy_blocks.begin()] = size;
 
 	buffer_mutex.unlock();
+}
+
+void iio_manager::got_timeout()
+{
+	Q_EMIT timeout();
 }
