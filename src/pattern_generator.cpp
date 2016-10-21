@@ -1158,6 +1158,23 @@ void JSPatternUI::destroy_ui()
  //   delete ui;
 }
 
+void JSPatternUI::find_all_children(QObject* parent, QJSValue property)
+{
+
+    if(parent->children().count() == 0){ return;}
+    for(auto child: parent->children())
+    {
+        if(child->objectName()!="")
+        {
+            QJSValue jschild = qEngine->newQObject(child);
+            property.setProperty(child->objectName(),jschild);
+            QQmlEngine::setObjectOwnership(child, QQmlEngine::CppOwnership);
+
+            find_all_children(child, property.property(child->objectName()));
+        }
+    }
+}
+
 void JSPatternUI::post_load_ui()
 {
     QString fileName(obj["filepath"].toString() + obj["ui_script"].toString());
@@ -1187,19 +1204,7 @@ void JSPatternUI::post_load_ui()
 
     qEngine->evaluate("ui_elements = [];");
 
-    if(ui->ui_form->children().count() > 0){
-        // need recursive implementation to hit all widgets
-    for(auto child : ui->ui_form->findChild<QObject*>(form_name)->children())
-    {
-       if(child->objectName()!="")
-       {
-            qDebug()<<child->objectName();
-            QJSValue jschild = qEngine->newQObject(child);
-            qEngine->globalObject().property("ui_elements").setProperty(child->objectName(),jschild);
-            QQmlEngine::setObjectOwnership(/*(QObject*)*/child, QQmlEngine::CppOwnership);
-       }
-    }
-    }
+    find_all_children(ui->ui_form->findChild<QObject*>(form_name), qEngine->globalObject().property("ui_elements"));
 
     qEngine->evaluate("pg.buffer = [];").toString();
     qEngine->evaluate("pg.buffersize = 0;").toString();

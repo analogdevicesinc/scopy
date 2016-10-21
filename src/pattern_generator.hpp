@@ -238,7 +238,7 @@ public:
     ~JSPatternUI();
 
     bool handle_result(QJSValue result,QString str = "");
-
+    void find_all_children(QObject* parent, QJSValue property);
     void build_ui(QWidget *parent = 0);
     void post_load_ui();
     void parse_ui();
