@@ -31,6 +31,7 @@
 #include "math.hpp"
 #include "oscilloscope.hpp"
 #include "dynamicWidget.hpp"
+#include "measurement_gui.h"
 
 /* Generated UI */
 #include "ui_math_panel.h"
@@ -478,6 +479,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 		QPushButton *name = chn0_widget->findChild<QPushButton *>("name");
 		name->setChecked(true);
 	}
+
+	measureGuiInit();
 }
 
 Oscilloscope::~Oscilloscope()
@@ -1276,68 +1279,7 @@ void Oscilloscope::update_chn_settings_panel(int id, QWidget *chn_widget)
 
 void Oscilloscope::onMeasuremetsAvailable()
 {
-	TimePrefixFormatter *hf = &horizMeasureFormat;
-	MetricPrefixFormatter *vf = &vertMeasureFormat;
-
-	measure_panel_ui->label_period_val->setText(
-		hf->format(plot.measuredPeriod(), "", 3));
-
-	measure_panel_ui->label_freq_val->setText(
-		vf->format(plot.measuredFreq(), "Hz", 3));
-
-	measure_panel_ui->label_min_val->setText(
-		vf->format(plot.measuredMin(), "V", 3));
-
-	measure_panel_ui->label_max_val->setText(
-		vf->format(plot.measuredMax(), "V", 3));
-
-	measure_panel_ui->label_ppeak_val->setText(
-		vf->format(plot.measuredPkToPk(), "V", 3));
-
-	measure_panel_ui->label_mean_val->setText(
-		vf->format(plot.measuredMean(), "V", 3));
-
-	measure_panel_ui->label_rms_val->setText(
-		vf->format(plot.measuredRms(), "V", 3));
-
-	measure_panel_ui->label_ac_rms_val->setText(
-		vf->format(plot.measuredRmsAC(), "V", 3));
-
-	measure_panel_ui->label_ampl_val->setText(
-		vf->format(plot.measuredAmplitude(), "V", 3));
-
-	measure_panel_ui->label_low_val->setText(
-		vf->format(plot.measuredLow(), "V", 3));
-
-	measure_panel_ui->label_high_val->setText(
-		vf->format(plot.measuredHigh(), "V", 3));
-
-	measure_panel_ui->label_middle_val->setText(
-		vf->format(plot.measuredMiddle(), "V", 3));
-
-	measure_panel_ui->label_overshoot_p_val->setText(
-		vf->format(plot.measuredPosOvershoot(), "", 2) + "%");
-
-	measure_panel_ui->label_overshoot_n_val->setText(
-		vf->format(plot.measuredNegOvershoot(), "", 2) + "%");
-
-	measure_panel_ui->label_rise_val->setText(
-		hf->format(plot.measuredRiseTime(), "", 3));
-
-	measure_panel_ui->label_fall_val->setText(
-		hf->format(plot.measuredFallTime(), "", 3));
-
-	measure_panel_ui->label_width_p_val->setText(
-		hf->format(plot.measuredPosWidth(), "", 3));
-
-	measure_panel_ui->label_width_n_val->setText(
-		hf->format(plot.measuredNegWidth(), "", 3));
-
-	measure_panel_ui->label_duty_p_val->setText(
-		vf->format(plot.measuredPosDuty(), "", 2) + "%");
-
-	measure_panel_ui->label_duty_n_val->setText(
-		vf->format(plot.measuredNegDuty(), "", 2) + "%");
+	measureUpdateValues();
 }
 
 void Oscilloscope::update_measure_for_channel(int ch_idx)
@@ -1355,4 +1297,105 @@ void Oscilloscope::update_measure_for_channel(int ch_idx)
 				).arg(plot.getLineColor(ch_idx).name());
 	msettings_ui->lblChanName->setText(name->text());
 	msettings_ui->line->setStyleSheet(stylesheet);
+}
+
+void Oscilloscope::measureGuiInit()
+{
+	const QList<MeasurementData> &measurements_data = plot.measurements();
+
+	for (int i = 0; i < measurements_data.size(); i++) {
+		std::shared_ptr<MeasurementGui> p;
+
+		switch(measurements_data[i].unitType()) {
+
+		case MeasurementData::METRIC:
+			p = std::make_shared<MetricMeasurementGui>();
+			break;
+		case MeasurementData::TIME:
+			p = std::make_shared<TimeMeasurementGui>();
+			break;
+		case MeasurementData::PERCENTAGE:
+			p = std::make_shared<PercentageMeasurementGui>();
+			break;
+		case MeasurementData::DIMENSIONLESS:
+			p = std::make_shared<DimensionlessMeasurementGui>();
+			break;
+		default:
+			break;
+		}
+
+		if (p)
+			measurements_gui.push_back(p);
+
+		// enable all measurements by default
+		plot.setMeasurementEnabled(i, true);
+	}
+
+	measureLabelsRearrange();
+}
+
+void Oscilloscope::measureLabelsRearrange()
+{
+	QWidget *container = measure_panel_ui->measurements->
+					findChild<QWidget *>("container");
+
+	if (container) {
+		measure_panel_ui->measurements->layout()->removeWidget(container);
+		delete container;
+	}
+
+	container = new QWidget();
+	container->setObjectName("container");
+	if (!measure_panel_ui->measurements->layout()) {
+		QVBoxLayout *measurementsLayout = new
+				QVBoxLayout(measure_panel_ui->measurements);
+		measurementsLayout->addWidget(container);
+	} else {
+		measure_panel_ui->measurements->layout()->addWidget(container);
+	}
+
+	QGridLayout*gLayout = new QGridLayout(container);
+	gLayout->setContentsMargins(0, 0, 0, 0);
+	gLayout->setVerticalSpacing(5);
+	gLayout->setHorizontalSpacing(5);
+	int max_rows = 3;
+	int nb_meas_added = 0;
+
+	const QList<MeasurementData> &measurements_data = plot.measurements();
+
+	for (int i = 0; i < measurements_data.size(); i++) {
+
+		if (!measurements_data[i].enabled())
+			continue;
+
+		QLabel *name = new QLabel();
+		QLabel *value = new QLabel();
+
+		int row = nb_meas_added % max_rows;
+		int col = nb_meas_added / max_rows;
+
+		gLayout->addWidget(name, row, 2 * col);
+
+		QHBoxLayout *value_layout = new QHBoxLayout();
+		value_layout->setContentsMargins(0, 0, 10, 0);
+		value_layout->addWidget(value);
+		gLayout->addLayout(value_layout, row, 2 * col + 1);
+
+		measurements_gui[i]->init(name, value);
+		measurements_gui[i]->update(measurements_data[i]);
+
+		nb_meas_added++;
+	}
+}
+
+void Oscilloscope::measureUpdateValues()
+{
+	const QList<MeasurementData> &measurements_data = plot.measurements();
+
+	for (int i = 0; i < measurements_data.size(); i++) {
+		if (!measurements_data[i].enabled())
+			continue;
+
+		measurements_gui[i]->update(measurements_data[i]);
+	}
 }

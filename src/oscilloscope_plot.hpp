@@ -70,26 +70,8 @@ namespace adiscope {
 		void removeOffsetWidgets(int chnIdx);
 
 		void measure(int chnIdx);
-		double measuredPeriod();
-		double measuredFreq();
-		double measuredMin();
-		double measuredMax();
-		double measuredPkToPk();
-		double measuredMean();
-		double measuredRms();
-		double measuredRmsAC();
-		double measuredLow();
-		double measuredMiddle();
-		double measuredHigh();
-		double measuredAmplitude();
-		double measuredPosOvershoot();
-		double measuredNegOvershoot();
-		double measuredRiseTime();
-		double measuredFallTime();
-		double measuredPosWidth();
-		double measuredNegWidth();
-		double measuredPosDuty();
-		double measuredNegDuty();
+		const QList<MeasurementData> & measurements();
+		void setMeasurementEnabled(int measure_idx, bool en);
 
 	Q_SIGNALS:
 		void timeTriggerValueChanged(double);

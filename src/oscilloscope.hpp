@@ -60,6 +60,10 @@ namespace Ui {
 }
 
 namespace adiscope {
+
+	class MeasurementData;
+	class MeasurementGui;
+
 	class Oscilloscope : public QWidget
 	{
 	    Q_OBJECT
@@ -173,6 +177,8 @@ namespace adiscope {
 		QPushButton *active_settings_btn;
 		QPushButton *menuRunButton;
 
+		QList<std::shared_ptr<MeasurementGui>> measurements_gui;
+
 		static const unsigned long maxBufferSize;
 
 		void comboBoxUpdateToValue(QComboBox *box, double value, std::vector<double>list);
@@ -193,6 +199,10 @@ namespace adiscope {
 
 		double pickSampleRateFor(double timeSpanSecs,
 					double desiredBufferSize);
+
+		void measureGuiInit();
+		void measureLabelsRearrange();
+		void measureUpdateValues();
 	};
 }
 

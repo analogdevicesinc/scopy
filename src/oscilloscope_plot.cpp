@@ -617,105 +617,16 @@ void CapturePlot::onNewDataReceived()
 	Q_EMIT measurementsAvailable();
 }
 
-double CapturePlot::measuredPeriod()
+const QList<MeasurementData> & CapturePlot::measurements()
 {
-	return d_measure.period();
+	return d_measure.measurements();
 }
 
-double CapturePlot::measuredFreq()
+void CapturePlot::setMeasurementEnabled(int measure_idx, bool en)
 {
-	return d_measure.frequency();
+	d_measure.setMeasurementEnabled(measure_idx, en);
 }
 
-double CapturePlot::measuredMin()
-{
-	return d_measure.min();
-}
-
-double CapturePlot::measuredMax()
-{
-	return d_measure.max();
-}
-
-double CapturePlot::measuredPkToPk()
-{
-	return d_measure.peakToPeak();
-}
-
-double CapturePlot::measuredMean()
-{
-	return d_measure.mean();
-}
-
-double CapturePlot::measuredRms()
-{
-	return d_measure.rms();
-}
-
-double CapturePlot::measuredRmsAC()
-{
-	return d_measure.rmsAC();
-}
-
-double CapturePlot::measuredLow()
-{
-	return d_measure.low();
-}
-
-double CapturePlot::measuredMiddle()
-{
-	return d_measure.middle();
-}
-
-double CapturePlot::measuredHigh()
-{
-	return d_measure.high();
-}
-
-double CapturePlot::measuredAmplitude()
-{
-	return d_measure.amplitude();
-}
-
-double CapturePlot::measuredPosOvershoot()
-{
-	return d_measure.positiveOvershoot();
-}
-
-double CapturePlot::measuredNegOvershoot()
-{
-	return d_measure.negativeOvershoot();
-}
-
-double CapturePlot::measuredRiseTime()
-{
-	return d_measure.riseTime();
-}
-
-double CapturePlot::measuredFallTime()
-{
-	return d_measure.fallTime();
-}
-
-double CapturePlot::measuredPosWidth()
-{
-	return d_measure.posWidth();
-}
-
-double CapturePlot::measuredNegWidth()
-{
-	return d_measure.negWidth();
-}
-
-double CapturePlot::measuredPosDuty()
-{
-	return d_measure.posDuty();
-}
-
-double CapturePlot::measuredNegDuty()
-{
-	return d_measure.negDuty();
-}
 void CapturePlot::setPeriodDetectLevel(double lvl)
 {
 	d_period_cross_level = lvl;

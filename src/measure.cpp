@@ -347,44 +347,41 @@ Measure::Measure(double *buffer, size_t length):
 	m_sample_rate(1.0),
 	m_adc_bit_count(0),
 	m_cross_level(0),
-	m_hysteresis_span(0),
-	m_sum(0),
-	m_sqr_sum(0),
-	m_period(0),
-	m_frequency(0),
-	m_rise_time(0),
-	m_fall_time(0),
-	m_width_p(0),
-	m_width_n(0),
-	m_duty_p(0),
-	m_duty_n(0),
-	m_peak_to_peak(0),
-	m_min(0),
-	m_max(0),
-	m_amplitude(0),
-	m_high(0),
-	m_middle(0),
-	m_low(0),
-	m_overshoot_p(0),
-	m_overshoot_n(0),
-	m_mean(0),
-	m_cycle_mean(0),
-	m_rms(0),
-	m_cycle_rms(0),
-	m_rms_ac(0),
-	m_cycle_rms_ac(0)
+	m_hysteresis_span(0)
 {
+	// Create a set of measurements
+	m_measurements.push_back(MeasurementData("Period", "s"));
+	m_measurements.push_back(MeasurementData("Frequency", "Hz"));
+	m_measurements.push_back(MeasurementData("Min", "V"));
+	m_measurements.push_back(MeasurementData("Max", "V"));
+	m_measurements.push_back(MeasurementData("Peak-peak", "V"));
+	m_measurements.push_back(MeasurementData("Mean", "V"));
+	m_measurements.push_back(MeasurementData("RMS", "V"));
+	m_measurements.push_back(MeasurementData("AC RMS", "V"));
+	m_measurements.push_back(MeasurementData("Low", "V"));
+	m_measurements.push_back(MeasurementData("High", "V"));
+	m_measurements.push_back(MeasurementData("Amplitude", "V"));
+	m_measurements.push_back(MeasurementData("Middle", "V"));
+	m_measurements.push_back(MeasurementData("+Over", "%"));
+	m_measurements.push_back(MeasurementData("-Over", "%"));
+	m_measurements.push_back(MeasurementData("Rise", "s"));
+	m_measurements.push_back(MeasurementData("Fall", "s"));
+	m_measurements.push_back(MeasurementData("+Width", "s"));
+	m_measurements.push_back(MeasurementData("-Width", "s"));
+	m_measurements.push_back(MeasurementData("+Duty", "%"));
+	m_measurements.push_back(MeasurementData("-Duty", "%"));
 }
 
-bool Measure::highLowFromHistogram(double &low, double &high)
+bool Measure::highLowFromHistogram(double &low, double &high,
+		double min, double max)
 {
 	bool success = false;
 	int *hist = m_histogram;
 	int adc_span = 1 << m_adc_bit_count;
 	int hlf_scale = adc_span / 2;
 
-	int minRaw = adc_sample_conv::convVoltsToSample(m_min) + hlf_scale;
-	int maxRaw = adc_sample_conv::convVoltsToSample(m_max) + hlf_scale;
+	int minRaw = adc_sample_conv::convVoltsToSample(min) + hlf_scale;
+	int maxRaw = adc_sample_conv::convVoltsToSample(max) + hlf_scale;
 	int middleRaw = minRaw + (maxRaw - minRaw)  / 2;
 
 	auto lowIt = std::max_element(hist + minRaw, hist + middleRaw + 1);
@@ -409,29 +406,8 @@ bool Measure::highLowFromHistogram(double &low, double &high)
 
 void Measure::clearMeasurements()
 {
-	 m_period = 0;
-	 m_frequency = 0;
-	 m_rise_time = 0;
-	 m_fall_time = 0;
-	 m_width_p = 0;
-	 m_width_n = 0;
-	 m_duty_p = 0;
-	 m_duty_n = 0;
-	 m_peak_to_peak = 0;
-	 m_min = 0;
-	 m_max = 0;
-	 m_amplitude = 0;
-	 m_high = 0;
-	 m_middle = 0;
-	 m_low = 0;
-	 m_overshoot_p = 0;
-	 m_overshoot_n = 0;
-	 m_mean = 0;
-	 m_cycle_mean = 0;
-	 m_rms = 0;
-	 m_cycle_rms = 0;
-	 m_rms_ac = 0;
-	 m_cycle_rms_ac = 0;
+	 for (int i = 0; i < m_measurements.size(); i++)
+		m_measurements[i].setMeasured(false);
 }
 
 void Measure::setDataSource(double *buffer, size_t length)
@@ -447,6 +423,32 @@ void Measure::measure()
 	if (!m_buffer || m_buf_length == 0)
 		return;
 
+	double period;
+	double frequency;
+	double rise_time;
+	double fall_time;
+	double width_p;
+	double width_n;
+	double duty_p;
+	double duty_n;
+	double peak_to_peak;
+	double min;
+	double max;
+	double amplitude;
+	double high;
+	double middle;
+	double low;
+	double overshoot_p;
+	double overshoot_n;
+	double mean;
+	double cycle_mean;
+	double rms;
+	double cycle_rms;
+	double rms_ac;
+	double cycle_rms_ac;
+	double sum;
+	double sqr_sum;
+
 	// Cache buffer address, length, ADC bit count
 	double *data = m_buffer;
 	size_t data_length = m_buf_length;
@@ -454,10 +456,10 @@ void Measure::measure()
 	int hlf_scale = adc_span / 2;
 	bool using_histogram_method = (adc_span > 1);
 
-	m_max = data[0];
-	m_min = data[0];
-	m_sum = data[0];
-	m_sqr_sum = data[0] * data[0];
+	max = data[0];
+	min = data[0];
+	sum = data[0];
+	sqr_sum = data[0] * data[0];
 	m_cross_detect = new CrossingDetection(m_cross_level, m_hysteresis_span,
 			"P");
 	if (using_histogram_method)
@@ -469,18 +471,18 @@ void Measure::measure()
 		m_cross_detect->crossDetectStep(data, i);
 
 		// Min
-		if (data[i] < m_min)
-			m_min = data[i];
+		if (data[i] < min)
+			min = data[i];
 
 		// Max
-		if (data[i] > m_max)
-			m_max = data[i];
+		if (data[i] > max)
+			max = data[i];
 
 		// Sum of values
-		m_sum += data[i];
+		sum += data[i];
 
 		// Sum of the squares of values
-		m_sqr_sum += data[i] * data[i];
+		sqr_sum += data[i] * data[i];
 
 		// Build histogram
 		if (using_histogram_method) {
@@ -491,34 +493,48 @@ void Measure::measure()
 		}
 	}
 
+	m_measurements[MIN].setValue(min);
+	m_measurements[MAX].setValue(max);
+
 	// Peak-to-Peak
-	m_peak_to_peak = qAbs(m_max - m_min);
+	peak_to_peak = qAbs(max - min);
+	m_measurements[PEAK_PEAK].setValue(peak_to_peak);
 
 	// Mean
-	m_mean = m_sum / data_length;
+	mean = sum / data_length;
+	m_measurements[MEAN].setValue(mean);
 
 	// RMS
-	m_rms = sqrt(m_sqr_sum / data_length);
+	rms = sqrt(sqr_sum / data_length);
+	m_measurements[RMS].setValue(rms);
 
 	// AC RMS
-	m_rms_ac = sqrt((m_sqr_sum - 2 * m_mean * m_sum +
-		data_length *  m_mean * m_mean) / data_length);
+	rms_ac = sqrt((sqr_sum - 2 * mean * sum +
+		data_length *  mean * mean) / data_length);
+	m_measurements[AC_RMS].setValue(rms_ac);
 
-
-	double low = m_min;
-	double high = m_max;
+	low = min;
+	high = max;
 
 	// Try to use Histogram method
 	if (using_histogram_method)
-		highLowFromHistogram(low, high);
+		highLowFromHistogram(low, high, min, max);
 
 	// Low, High, Middle, Amplitude, Overshoot positive/negative
-	m_low = low;
-	m_high = high;
-	m_middle = m_low + (m_high - m_low) / 2.0;
-	m_amplitude = m_high - m_low;
-	m_overshoot_p = (m_max - m_high) / m_amplitude * 100;
-	m_overshoot_n = (m_low - m_min) / m_amplitude * 100;
+	m_measurements[LOW].setValue(low);
+	m_measurements[HIGH].setValue(high);
+
+	middle = low + (high - low) / 2.0;
+	m_measurements[MIDDLE].setValue(middle);
+
+	amplitude = high - low;
+	m_measurements[AMPLITUDE].setValue(amplitude);
+
+	overshoot_p = (max - high) / amplitude * 100;
+	m_measurements[P_OVER].setValue(overshoot_p);
+
+	overshoot_n = (low - min) / amplitude * 100;
+	m_measurements[N_OVER].setValue(overshoot_n);
 
 	if (m_histogram != NULL) {
 		delete[] m_histogram;
@@ -550,13 +566,16 @@ void Measure::measure()
 
 		sample_period = first_hlf_cycl / (n / 2) +
 				secnd_hlf_cycl / ((n + 1) / 2 - 1);
-		m_period = sample_period * (1 / m_sample_rate);
-		m_frequency = 1 / m_period;
+		period = sample_period * (1 / m_sample_rate);
+		m_measurements[PERIOD].setValue(period);
+
+		frequency = 1 / period;
+		m_measurements[FREQUENCY].setValue(frequency);
 
 		// Find level crossings (10%, 50%, 90%)
-		double lowRef = m_low + (0.1 * m_amplitude);
-		double midRef = m_low + (0.5 * m_amplitude);
-		double highRef = m_low + (0.9 * m_amplitude);
+		double lowRef = low + (0.1 * amplitude);
+		double midRef = low + (0.5 * amplitude);
+		double highRef = low + (0.9 * amplitude);
 
 		CrossingDetection cdLow(lowRef, 0.2, "L");
 		CrossingDetection cdMid(midRef, 0.2, "M");
@@ -615,30 +634,36 @@ void Measure::measure()
 					lowRising.m_bufIdx);
 			if (rise < 0)
 				rise += length;
-			m_rise_time = rise / m_sample_rate;
+			rise_time = rise / m_sample_rate;
+			m_measurements[RISE].setValue(rise_time);
 
 			// Fall Time
 			long long fall = (long long)(lowFalling.m_bufIdx -
 					highFalling.m_bufIdx);
 			if (fall < 0)
 				fall += length;
-			m_fall_time = fall / m_sample_rate;
+			fall_time = fall / m_sample_rate;
+			m_measurements[FALL].setValue(fall_time);
 
 			// Positive Width
 			long long posWidth = (long long)(midFalling.m_bufIdx -
 					midRising.m_bufIdx);
 			if (posWidth < 0)
 				posWidth += length;
-			m_width_p = posWidth / m_sample_rate;
+			width_p = posWidth / m_sample_rate;
+			m_measurements[P_WIDTH].setValue(width_p);
 
 			// Negative Width
-			m_width_n = m_period - m_width_p;
+			width_n = period - width_p;
+			m_measurements[N_WIDTH].setValue(width_n);
 
 			// Positive Duty
-			m_duty_p = m_width_p / m_period * 100;
+			duty_p = width_p / period * 100;
+			m_measurements[P_DUTY].setValue(duty_p);
 
 			// Negative Duty
-			m_duty_n = m_width_n / m_period * 100;
+			duty_n = width_n / period * 100;
+			m_measurements[N_DUTY].setValue(duty_n);
 		}
 	}
 
@@ -687,102 +712,83 @@ void Measure::setHysteresisSpan(double value)
 	m_hysteresis_span = value;
 }
 
-double Measure::period()
+const QList<MeasurementData>& Measure::measurements()
 {
-	return m_period;
+	return m_measurements;
 }
 
-double Measure::frequency()
+void Measure::setMeasurementEnabled(int measure_idx, bool en)
 {
-	return m_frequency;
+	if (measure_idx < 0 || measure_idx >= m_measurements.size())
+		return;
+
+	m_measurements[measure_idx].setEnabled(en);
 }
 
-double Measure::min()
+/*
+ * Class MeasurementData implementation
+ */
+
+MeasurementData::MeasurementData(const QString& name, const QString& unit):
+	m_name(name),
+	m_value(0),
+	m_measured(false),
+	m_enabled(false),
+	m_unit(unit),
+	m_unitType(DIMENSIONLESS)
 {
-	return m_min;
+	if (unit.isEmpty())
+		m_unitType = DIMENSIONLESS;
+	else if (unit == "%")
+		m_unitType = PERCENTAGE;
+	else if (unit.toLower() == "s" || unit.toLower() == "seconds")
+		m_unitType = TIME;
+	else
+		m_unitType = METRIC;
 }
 
-double Measure::max()
+QString MeasurementData::name() const
 {
-	return m_max;
+	return m_name;
 }
 
-double Measure::peakToPeak()
+double MeasurementData::value() const
 {
-	return m_peak_to_peak;
+	return m_value;
 }
 
-double Measure::mean()
+void MeasurementData::setValue(double value)
 {
-	return m_mean;
+	m_value = value;
+	m_measured = true;
 }
 
-double Measure::rms()
+bool MeasurementData::measured() const
 {
-	return m_rms;
+	return m_measured;
 }
 
-double Measure::rmsAC()
+void MeasurementData::setMeasured(bool state)
 {
-	return m_rms_ac;
+	m_measured = state;
 }
 
-double Measure::low()
+bool MeasurementData::enabled() const
 {
-	return m_low;
+	return m_enabled;
 }
 
-double Measure::middle()
+void MeasurementData::setEnabled(bool en)
 {
-	return m_middle;
+	m_enabled = en;
 }
 
-double Measure::high()
+QString MeasurementData::unit() const
 {
-	return m_high;
+	return m_unit;
 }
 
-double Measure::amplitude()
+MeasurementData::unitTypes MeasurementData::unitType() const
 {
-	return m_amplitude;
-}
-
-double Measure::positiveOvershoot()
-{
-	return m_overshoot_p;
-}
-
-double Measure::negativeOvershoot()
-{
-	return m_overshoot_n;
-}
-
-double Measure::riseTime()
-{
-	return m_rise_time;
-}
-
-double Measure::fallTime()
-{
-	return m_fall_time;
-}
-
-double Measure::posWidth()
-{
-	return m_width_p;
-}
-
-double Measure::negWidth()
-{
-	return m_width_n;
-}
-
-double Measure::posDuty()
-{
-	return m_duty_p;
-}
-
-double Measure::negDuty()
-{
-	return m_duty_n;
+	return m_unitType;
 }

@@ -25,9 +25,64 @@
 namespace adiscope {
 	class CrossingDetection;
 
+	class MeasurementData
+	{
+	public:
+		enum unitTypes {
+			METRIC,
+			TIME,
+			PERCENTAGE,
+			DIMENSIONLESS
+		};
+
+		MeasurementData(const QString& name, const QString& unit = "");
+
+		QString name() const;
+		double value() const;
+		void setValue(double value);
+		bool measured() const;
+		void setMeasured(bool state);
+		bool enabled() const;
+		void setEnabled(bool en);
+		QString unit() const;
+		enum unitTypes unitType() const;
+
+	private:
+		QString m_name;
+		double m_value;
+		bool m_measured;
+		bool m_enabled;
+		QString m_unit;
+		enum unitTypes m_unitType;
+	};
+
 	class Measure
 	{
 	public:
+		enum defaultMeasurements {
+			PERIOD = 0,
+			FREQUENCY,
+			MIN,
+			MAX,
+			PEAK_PEAK,
+			MEAN,
+			RMS,
+			AC_RMS,
+			LOW,
+			HIGH,
+			AMPLITUDE,
+			MIDDLE,
+			P_OVER,
+			N_OVER,
+			RISE,
+			FALL,
+			P_WIDTH,
+			N_WIDTH,
+			P_DUTY,
+			N_DUTY,
+			DEFAULT_MEASUMENET_COUNT
+		};
+
 		Measure(double *buffer = NULL, size_t length = 0);
 
 		void setDataSource(double *buffer, size_t length);
@@ -41,29 +96,12 @@ namespace adiscope {
 		double hysteresisSpan();
 		void setHysteresisSpan(double);
 
-		double period();
-		double frequency();
-		double min();
-		double max();
-		double peakToPeak();
-		double mean();
-		double rms();
-		double rmsAC();
-		double low();
-		double middle();
-		double high();
-		double amplitude();
-		double positiveOvershoot();
-		double negativeOvershoot();
-		double riseTime();
-		double fallTime();
-		double posWidth();
-		double negWidth();
-		double posDuty();
-		double negDuty();
+		const QList<MeasurementData>& measurements();
+		void setMeasurementEnabled(int measure_idx, bool en);
 
 	private:
-		bool highLowFromHistogram(double &low, double &high);
+		bool highLowFromHistogram(double &low, double &high,
+			double min, double max);
 		void clearMeasurements();
 
 	private:
@@ -74,34 +112,10 @@ namespace adiscope {
 		double m_cross_level;
 		double m_hysteresis_span;
 
-		double m_sum;
-		double m_sqr_sum;
 		int *m_histogram;
 		CrossingDetection *m_cross_detect;
 
-		double m_period;
-		double m_frequency;
-		double m_rise_time;
-		double m_fall_time;
-		double m_width_p;
-		double m_width_n;
-		double m_duty_p;
-		double m_duty_n;
-		double m_peak_to_peak;
-		double m_min;
-		double m_max;
-		double m_amplitude;
-		double m_high;
-		double m_middle;
-		double m_low;
-		double m_overshoot_p;
-		double m_overshoot_n;
-		double m_mean;
-		double m_cycle_mean;
-		double m_rms;
-		double m_cycle_rms;
-		double m_rms_ac;
-		double m_cycle_rms_ac;
+		QList<MeasurementData> m_measurements;
 	};
 }
 
