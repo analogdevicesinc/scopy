@@ -333,7 +333,7 @@ private Q_SLOTS:
     void toggleRightMenu();
 
     void on_sampleRateCombo_activated(const QString &arg1);
-    void on_generateScript_clicked();
+    void on_generatePattern_clicked();
     void on_clearButton_clicked();
     void on_generateUI_clicked();
 

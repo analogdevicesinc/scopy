@@ -354,7 +354,7 @@ void adiscope::PatternGenerator::on_sampleRateCombo_activated(const QString &arg
     sample_rate = arg1.toInt();
 }
 
-void adiscope::PatternGenerator::on_generateScript_clicked()
+void adiscope::PatternGenerator::on_generatePattern_clicked()
 {
 
     bool ok;

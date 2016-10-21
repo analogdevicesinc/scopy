@@ -14,54 +14,26 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="5" column="1">
-    <widget class="QComboBox" name="parityCombo">
-     <item>
-      <property name="text">
-       <string>NONE</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>ODD</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>EVEN</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>MARK</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>SPACE</string>
-      </property>
-     </item>
-    </widget>
+   <item row="7" column="1">
+    <widget class="QLineEdit" name="dataEdit"/>
    </item>
-   <item row="6" column="1">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Data to Send</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="1">
-    <widget class="QLabel" name="label_4">
-     <property name="text">
-      <string>Baud</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="1">
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>Stop</string>
-     </property>
+   <item row="3" column="1">
+    <widget class="QComboBox" name="stopCombo">
+     <item>
+      <property name="text">
+       <string>1</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>2</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>3</string>
+      </property>
+     </item>
     </widget>
    </item>
    <item row="9" column="1">
@@ -70,16 +42,6 @@
       <bool>true</bool>
      </property>
     </widget>
-   </item>
-   <item row="4" column="1">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Parity</string>
-     </property>
-    </widget>
-   </item>
-   <item row="7" column="1">
-    <widget class="QLineEdit" name="dataEdit"/>
    </item>
    <item row="8" column="1">
     <spacer name="verticalSpacer">
@@ -162,29 +124,60 @@
      </item>
     </widget>
    </item>
-   <item row="3" column="1">
-    <widget class="QComboBox" name="stopCombo">
+   <item row="5" column="1">
+    <widget class="QComboBox" name="parityCombo">
      <item>
       <property name="text">
-       <string>1</string>
+       <string>NONE</string>
       </property>
      </item>
      <item>
       <property name="text">
-       <string>2</string>
+       <string>ODD</string>
       </property>
      </item>
      <item>
       <property name="text">
-       <string>3</string>
+       <string>EVEN</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>MARK</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>SPACE</string>
       </property>
      </item>
     </widget>
    </item>
-   <item row="10" column="1">
-    <widget class="QPushButton" name="setUARTParameters">
+   <item row="6" column="1">
+    <widget class="QLabel" name="label">
      <property name="text">
-      <string>Set Parameters</string>
+      <string>Data to Send</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Parity</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Baud</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Stop</string>
      </property>
     </widget>
    </item>

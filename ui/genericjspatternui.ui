@@ -27,10 +27,7 @@
     <number>0</number>
    </property>
    <item row="0" column="0">
-    <widget class="QWidget" name="ui_form" native="true">
-     <zorder>clearconsole</zorder>
-     <zorder>jsstatus</zorder>
-    </widget>
+    <widget class="QWidget" name="ui_form" native="true"/>
    </item>
    <item row="1" column="0">
     <widget class="QTextEdit" name="jsstatus">

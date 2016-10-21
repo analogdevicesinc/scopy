@@ -895,7 +895,7 @@ QPushButton:!checked {
            </widget>
           </item>
           <item row="6" column="0">
-           <widget class="QWidget" name="verticalWidget" native="true">
+           <widget class="QWidget" name="verticalWidget_3" native="true">
             <property name="minimumSize">
              <size>
               <width>0</width>
@@ -966,7 +966,7 @@ QPushButton:!checked {
            <widget class="QLineEdit" name="numberOfSamples"/>
           </item>
           <item row="7" column="0">
-           <widget class="QWidget" name="verticalWidget" native="true">
+           <widget class="QWidget" name="verticalWidget_4" native="true">
             <property name="minimumSize">
              <size>
               <width>0</width>
@@ -1010,7 +1010,7 @@ QPushButton:!checked {
            </widget>
           </item>
           <item row="11" column="0">
-           <widget class="QPushButton" name="generateScript">
+           <widget class="QPushButton" name="generatePattern">
             <property name="text">
              <string>Generate Pattern</string>
             </property>
