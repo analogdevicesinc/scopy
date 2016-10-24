@@ -24,6 +24,7 @@
 #include <QFile>
 #include <QJsonArray>
 #include <QJsonDocument>
+#include <QStringList>
 
 #include <iio.h>
 
