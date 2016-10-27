@@ -69,9 +69,8 @@ namespace adiscope {
 		void setOffsetWidgetVisible(int chnIdx, bool visible);
 		void removeOffsetWidgets(int chnIdx);
 
-		void measure(int chnIdx);
-		const QList<MeasurementData> & measurements();
-		void setMeasurementEnabled(int measure_idx, bool en);
+		void measure();
+		QList<MeasurementData>* measurements(int chnIdx) const;
 
 	Q_SIGNALS:
 		void timeTriggerValueChanged(double);
@@ -86,9 +85,14 @@ namespace adiscope {
 		void setHorizCursorsEnabled(bool en);
 		void setSelectedChannel(int id);
 		void setMeasuremensEnabled(bool en);
-		void setChannelToMeasure(int chnIdx);
-		void setPeriodDetectLevel(double lvl);
-		void setPeriodDetectHyst(double hyst);
+		void setPeriodDetectLevel(int chnIdx, double lvl);
+		void setPeriodDetectHyst(int chnIdx, double hyst);
+
+	protected:
+		virtual void cleanUpJustBeforeChannelRemoval(int chnIdx);
+
+	private:
+		Measure* measureOfChannel(int chnIdx) const;
 
 	private Q_SLOTS:
 		void onChannelAdded(int);
@@ -156,10 +160,7 @@ namespace adiscope {
 	        QPen d_trigBactiveLinePen;
 	        QPen d_trigBinactiveLinePen;
 
-	        Measure d_measure;
-	        int d_chnToMeasure;
-	        double d_period_cross_level;
-	        double d_cross_hyst_window;
+	        QList<Measure *> d_measureObjs;
 	};
 }
 

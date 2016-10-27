@@ -5,6 +5,7 @@
 #include <QString>
 
 class QLabel;
+class QColor;
 
 namespace adiscope {
 
@@ -18,6 +19,7 @@ public:
 
 	QString name() const;
 	QString value() const;
+	void setLabelsColor(const QColor& color);
 	virtual void init(QLabel *name, QLabel *value);
 	virtual void update(const MeasurementData& data) = 0;
 

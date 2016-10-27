@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>278</width>
-    <height>421</height>
+    <width>280</width>
+    <height>516</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -159,39 +159,6 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton">
-       <property name="styleSheet">
-        <string notr="true">QPushButton {
-  min-height: 30px;
-  max-height: 30px;
-  min-width: 240px;
-  max-width: 240px;
-
-  border: 0px;
-  border-radius: 4px;
-
-  background-color: #4a64ff;
-  color: #ffffff;
-
-  font-size: 14px;
-}
-
-QPushButton:pressed {
-  background-color: #2a44df;
-}</string>
-       </property>
-       <property name="text">
-        <string>Clear All</string>
-       </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
-       <property name="checked">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
       <layout class="QGridLayout" name="gLayout_Measurements">
        <property name="topMargin">
         <number>16</number>
@@ -206,7 +173,7 @@ QPushButton:pressed {
         <number>16</number>
        </property>
        <item row="1" column="0">
-        <widget class="QPushButton" name="pushButton_2">
+        <widget class="QPushButton" name="button_MeasurementsEn">
          <property name="styleSheet">
           <string notr="true">QPushButton {
   min-height: 30px;
@@ -234,6 +201,9 @@ QPushButton:!checked:disabled {
           <string/>
          </property>
          <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="checked">
           <bool>true</bool>
          </property>
         </widget>
@@ -264,12 +234,12 @@ QPushButton:!checked:disabled {
 </string>
          </property>
          <property name="text">
-          <string>Display all</string>
+          <string>Measurements</string>
          </property>
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QPushButton" name="pushButton_3">
+        <widget class="QPushButton" name="button_Counter">
          <property name="styleSheet">
           <string notr="true">QPushButton {
   min-height: 30px;
@@ -318,7 +288,7 @@ QPushButton:!checked:disabled {
         <number>16</number>
        </property>
        <item row="1" column="0">
-        <widget class="QPushButton" name="pushButton_4">
+        <widget class="QPushButton" name="button_StatisticsEn">
          <property name="styleSheet">
           <string notr="true">QPushButton {
   min-height: 30px;
@@ -351,7 +321,7 @@ QPushButton:!checked:disabled {
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QPushButton" name="pushButton_5">
+        <widget class="QPushButton" name="button_StatisticsReset">
          <property name="styleSheet">
           <string notr="true">QPushButton {
   min-height: 30px;
@@ -395,6 +365,70 @@ QPushButton:pressed {
          </property>
         </widget>
        </item>
+       <item row="0" column="1">
+        <widget class="QLabel" name="label_5">
+         <property name="styleSheet">
+          <string notr="true">QLabel {
+  font-weight: normal;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 153);
+}
+</string>
+         </property>
+         <property name="text">
+          <string>Statistics</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <spacer name="verticalSpacer_4">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Fixed</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>0</width>
+         <height>24</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="hLayout_hMeasurements">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+      </layout>
+     </item>
+     <item>
+      <spacer name="verticalSpacer_5">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Fixed</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>0</width>
+         <height>44</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="hLayout_vMeasurements">
+       <property name="spacing">
+        <number>0</number>
+       </property>
       </layout>
      </item>
      <item>

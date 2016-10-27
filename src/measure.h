@@ -35,7 +35,13 @@ namespace adiscope {
 			DIMENSIONLESS
 		};
 
-		MeasurementData(const QString& name, const QString& unit = "");
+		enum axisType {
+			HORIZONTAL,
+			VERTICAL
+		};
+
+		MeasurementData(const QString& name, axisType axis,
+				const QString& unit = "", int channel = -1);
 
 		QString name() const;
 		double value() const;
@@ -46,6 +52,8 @@ namespace adiscope {
 		void setEnabled(bool en);
 		QString unit() const;
 		enum unitTypes unitType() const;
+		int channel() const;
+		enum axisType axis() const;
 
 	private:
 		QString m_name;
@@ -54,6 +62,8 @@ namespace adiscope {
 		bool m_enabled;
 		QString m_unit;
 		enum unitTypes m_unitType;
+		int m_channel;
+		enum axisType m_axis;
 	};
 
 	class Measure
@@ -83,7 +93,7 @@ namespace adiscope {
 			DEFAULT_MEASUMENET_COUNT
 		};
 
-		Measure(double *buffer = NULL, size_t length = 0);
+		Measure(int channel, double *buffer = NULL, size_t length = 0);
 
 		void setDataSource(double *buffer, size_t length);
 		void measure();
@@ -95,9 +105,11 @@ namespace adiscope {
 		void setCrossLevel(double);
 		double hysteresisSpan();
 		void setHysteresisSpan(double);
+		int channel() const;
 
-		const QList<MeasurementData>& measurements();
+		QList<MeasurementData>* measurements();
 		void setMeasurementEnabled(int measure_idx, bool en);
+		int activeMeasurementsCount() const;
 
 	private:
 		bool highLowFromHistogram(double &low, double &high,
@@ -105,6 +117,7 @@ namespace adiscope {
 		void clearMeasurements();
 
 	private:
+		int m_channel;
 		double *m_buffer;
 		size_t m_buf_length;
 		double m_sample_rate;

@@ -831,8 +831,10 @@ bool TimeDomainDisplayPlot::unregisterSink(std::string sinkName)
 		// Remove Y axes corresponding to each channel of the sink
 		int offset = d_sinkManager.sinkFirstChannelPos(sinkName);
 		int numChannels = d_sinkManager.sink(sinkIndex)->numChannels();
-		for (int i = offset; i < offset + numChannels; i++)
+		for (int i = offset; i < offset + numChannels; i++) {
+			cleanUpJustBeforeChannelRemoval(offset);
 			delete [] d_ydata[i];
+		}
 		d_ydata.erase(d_ydata.begin() + offset, d_ydata.begin() + offset + numChannels);
 
 		/* Remove the QwtPlotCurve */
@@ -883,6 +885,10 @@ void TimeDomainDisplayPlot::configureAxis(int axisPos, int axisIdx)
 	OscScaleDraw *scaleDraw = new OscScaleDraw(prefixFormatter, unit);
 	scaleDraw->setFloatPrecision(floatPrecision);
 	this->setAxisScaleDraw(axis, scaleDraw);
+}
+
+void TimeDomainDisplayPlot::cleanUpJustBeforeChannelRemoval(int)
+{
 }
 
 void TimeDomainDisplayPlot::cancelZoom()

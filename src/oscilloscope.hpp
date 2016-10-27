@@ -55,7 +55,6 @@ namespace Ui {
 	class Oscilloscope;
 	class OscGeneralSettings;
 	class ChannelSettings;
-	class MeasureSettings;
 	class MeasurementsPanel;
 }
 
@@ -63,6 +62,7 @@ namespace adiscope {
 
 	class MeasurementData;
 	class MeasurementGui;
+	class MeasureSettings;
 
 	class Oscilloscope : public QWidget
 	{
@@ -117,6 +117,8 @@ namespace adiscope {
 
 		void onMeasuremetsAvailable();
 
+		void onMeasurementActivated(const QString& name, bool en);
+
 	private:
 		OscADC adc;
 		unsigned int nb_channels, nb_math_channels;
@@ -125,8 +127,8 @@ namespace adiscope {
 		Ui::Oscilloscope *ui;
 		Ui::OscGeneralSettings *gsettings_ui;
 		Ui::ChannelSettings *ch_ui;
-		Ui::MeasureSettings *msettings_ui;
 		adiscope::TriggerSettings trigger_settings;
+		adiscope::MeasureSettings *measure_settings;
 		CapturePlot plot;
 		FftDisplayPlot fft_plot;
 		ConstellationDisplayPlot xy_plot;
@@ -177,6 +179,7 @@ namespace adiscope {
 		QPushButton *active_settings_btn;
 		QPushButton *menuRunButton;
 
+		QList<MeasurementData *> measurements_data;
 		QList<std::shared_ptr<MeasurementGui>> measurements_gui;
 
 		static const unsigned long maxBufferSize;
@@ -200,9 +203,11 @@ namespace adiscope {
 		double pickSampleRateFor(double timeSpanSecs,
 					double desiredBufferSize);
 
-		void measureGuiInit();
 		void measureLabelsRearrange();
 		void measureUpdateValues();
+		void measureCreateAndAppendGuiFrom(const MeasurementData&);
+		void measureCleanupChnMeasurements(int chnIdx);
+		void setMeasurementsActiveForChn(int chnIdx,bool en);
 	};
 }
 

@@ -341,7 +341,8 @@ namespace adiscope {
 	};
 }
 
-Measure::Measure(double *buffer, size_t length):
+Measure::Measure(int channel, double *buffer, size_t length):
+	m_channel(channel),
 	m_buffer(buffer),
 	m_buf_length(length),
 	m_sample_rate(1.0),
@@ -350,26 +351,46 @@ Measure::Measure(double *buffer, size_t length):
 	m_hysteresis_span(0)
 {
 	// Create a set of measurements
-	m_measurements.push_back(MeasurementData("Period", "s"));
-	m_measurements.push_back(MeasurementData("Frequency", "Hz"));
-	m_measurements.push_back(MeasurementData("Min", "V"));
-	m_measurements.push_back(MeasurementData("Max", "V"));
-	m_measurements.push_back(MeasurementData("Peak-peak", "V"));
-	m_measurements.push_back(MeasurementData("Mean", "V"));
-	m_measurements.push_back(MeasurementData("RMS", "V"));
-	m_measurements.push_back(MeasurementData("AC RMS", "V"));
-	m_measurements.push_back(MeasurementData("Low", "V"));
-	m_measurements.push_back(MeasurementData("High", "V"));
-	m_measurements.push_back(MeasurementData("Amplitude", "V"));
-	m_measurements.push_back(MeasurementData("Middle", "V"));
-	m_measurements.push_back(MeasurementData("+Over", "%"));
-	m_measurements.push_back(MeasurementData("-Over", "%"));
-	m_measurements.push_back(MeasurementData("Rise", "s"));
-	m_measurements.push_back(MeasurementData("Fall", "s"));
-	m_measurements.push_back(MeasurementData("+Width", "s"));
-	m_measurements.push_back(MeasurementData("-Width", "s"));
-	m_measurements.push_back(MeasurementData("+Duty", "%"));
-	m_measurements.push_back(MeasurementData("-Duty", "%"));
+	m_measurements.push_back(MeasurementData("Period",
+		MeasurementData::HORIZONTAL, "s",  channel));
+	m_measurements.push_back(MeasurementData("Frequency",
+		MeasurementData::HORIZONTAL, "Hz", channel));
+	m_measurements.push_back(MeasurementData("Min",
+		MeasurementData::VERTICAL, "V", channel));
+	m_measurements.push_back(MeasurementData("Max",
+		MeasurementData::VERTICAL, "V", channel));
+	m_measurements.push_back(MeasurementData("Peak-peak",
+		MeasurementData::VERTICAL, "V", channel));
+	m_measurements.push_back(MeasurementData("Mean",
+		MeasurementData::VERTICAL, "V", channel));
+	m_measurements.push_back(MeasurementData("RMS",
+		MeasurementData::VERTICAL, "V", channel));
+	m_measurements.push_back(MeasurementData("AC RMS",
+		MeasurementData::VERTICAL, "V", channel));
+	m_measurements.push_back(MeasurementData("Low",
+		MeasurementData::VERTICAL, "V", channel));
+	m_measurements.push_back(MeasurementData("High",
+		MeasurementData::VERTICAL, "V", channel));
+	m_measurements.push_back(MeasurementData("Amplitude",
+		MeasurementData::VERTICAL, "V", channel));
+	m_measurements.push_back(MeasurementData("Middle",
+		MeasurementData::VERTICAL, "V", channel));
+	m_measurements.push_back(MeasurementData("+Over",
+		MeasurementData::VERTICAL, "%", channel));
+	m_measurements.push_back(MeasurementData("-Over",
+		MeasurementData::VERTICAL, "%", channel));
+	m_measurements.push_back(MeasurementData("Rise",
+		MeasurementData::HORIZONTAL, "s", channel));
+	m_measurements.push_back(MeasurementData("Fall",
+		MeasurementData::HORIZONTAL, "s", channel));
+	m_measurements.push_back(MeasurementData("+Width",
+		MeasurementData::HORIZONTAL, "s", channel));
+	m_measurements.push_back(MeasurementData("-Width",
+		MeasurementData::HORIZONTAL, "s", channel));
+	m_measurements.push_back(MeasurementData("+Duty",
+		MeasurementData::HORIZONTAL, "%", channel));
+	m_measurements.push_back(MeasurementData("-Duty",
+		MeasurementData::HORIZONTAL, "%", channel));
 }
 
 bool Measure::highLowFromHistogram(double &low, double &high,
@@ -712,9 +733,14 @@ void Measure::setHysteresisSpan(double value)
 	m_hysteresis_span = value;
 }
 
-const QList<MeasurementData>& Measure::measurements()
+int Measure::channel() const
 {
-	return m_measurements;
+	return m_channel;
+}
+
+QList<MeasurementData>* Measure::measurements()
+{
+	return &m_measurements;
 }
 
 void Measure::setMeasurementEnabled(int measure_idx, bool en)
@@ -725,17 +751,31 @@ void Measure::setMeasurementEnabled(int measure_idx, bool en)
 	m_measurements[measure_idx].setEnabled(en);
 }
 
+int Measure::activeMeasurementsCount() const
+{
+	int count = 0;
+
+	for (int i = 0; i < m_measurements.size(); i++)
+		if (m_measurements[i].enabled())
+			count++;
+
+	return count;
+}
+
 /*
  * Class MeasurementData implementation
  */
 
-MeasurementData::MeasurementData(const QString& name, const QString& unit):
+MeasurementData::MeasurementData(const QString& name, axisType axis,
+		const QString& unit, int channel):
 	m_name(name),
 	m_value(0),
 	m_measured(false),
 	m_enabled(false),
 	m_unit(unit),
-	m_unitType(DIMENSIONLESS)
+	m_unitType(DIMENSIONLESS),
+	m_channel(channel),
+	m_axis(axis)
 {
 	if (unit.isEmpty())
 		m_unitType = DIMENSIONLESS;
@@ -791,4 +831,14 @@ QString MeasurementData::unit() const
 MeasurementData::unitTypes MeasurementData::unitType() const
 {
 	return m_unitType;
+}
+
+int MeasurementData::channel() const
+{
+	return m_channel;
+}
+
+MeasurementData::axisType MeasurementData::axis() const
+{
+	return m_axis;
 }

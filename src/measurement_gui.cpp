@@ -31,11 +31,21 @@ QString MeasurementGui::value() const
 	return m_value;
 }
 
+void MeasurementGui::setLabelsColor(const QColor& color)
+{
+	QString stylesheet = QString("color: %1;").arg(color.name());
+	if (m_nameLabel)
+		m_nameLabel->setStyleSheet(stylesheet);
+	if (m_valueLabel)
+		m_valueLabel->setStyleSheet(stylesheet);
+}
+
 void MeasurementGui::init(QLabel *name, QLabel *value)
 {
 	m_nameLabel = name;
 	m_valueLabel = value;
 }
+
 
 /*
  * Class MetricMeasurementGui implementation
@@ -61,7 +71,7 @@ void MetricMeasurementGui::init(QLabel *name, QLabel *value)
 void MetricMeasurementGui::update(const MeasurementData& data)
 {
 	m_name = data.name() + ":";
-	if (data.measured())
+	if (data.measured() && data.enabled())
 		m_value = m_formatter.format(data.value(), data.unit(), 3);
 	else
 		m_value = "--";
@@ -95,7 +105,7 @@ void TimeMeasurementGui::update(const MeasurementData& data)
 {
 	m_name = data.name() + ":";
 
-	if (data.measured())
+	if (data.measured() && data.enabled())
 		m_value = m_formatter.format(data.value(), "", 3);
 	else
 		m_value = "--";
@@ -129,7 +139,7 @@ void PercentageMeasurementGui::update(const MeasurementData& data)
 {
 	m_name = data.name() + ":";
 
-	if (data.measured()) {
+	if (data.measured() && data.enabled()) {
 		m_value.setNum(data.value(), 'f', 2);
 		m_value += "%";
 	} else {
@@ -153,7 +163,7 @@ void DimensionlessMeasurementGui::update(const MeasurementData& data)
 {
 	m_name = data.name() + ":";
 
-	if (data.measured())
+	if (data.measured() && data.enabled())
 		m_value.setNum(data.value(), 'f', 3);
 	else
 		m_value = "--";

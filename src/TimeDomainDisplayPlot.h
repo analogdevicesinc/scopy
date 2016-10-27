@@ -155,6 +155,7 @@ public Q_SLOTS:
 
 protected:
   virtual void configureAxis(int axisPos, int axisIdx);
+  virtual void cleanUpJustBeforeChannelRemoval(int chnIdx);
 
 private Q_SLOTS:
   void newData(const QEvent*);

@@ -59,10 +59,7 @@ CapturePlot::CapturePlot(QWidget *parent,
 	d_triggerBEnabled(false),
 	d_measurementEnabled(false),
 	d_selected_channel(-1),
-	d_measurementsEnabled(false),
-	d_chnToMeasure(0),
-	d_period_cross_level(0),
-	d_cross_hyst_window(0.2)
+	d_measurementsEnabled(false)
 {
 	/* Initial colors scheme */
 	d_trigAactiveLinePen = QPen(QColor(255, 255, 255), 2, Qt::SolidLine);
@@ -494,16 +491,6 @@ bool CapturePlot::measurementsEnabled()
 	return d_measurementsEnabled;
 }
 
-void CapturePlot::setChannelToMeasure(int chnIdx)
-{
-	d_chnToMeasure = chnIdx;
-}
-
-int CapturePlot::channelToMeasure()
-{
-	return d_chnToMeasure;
-}
-
 void CapturePlot::onTimeTriggerHandlePosChanged(int pos)
 {
 	QwtScaleMap xMap = this->canvasMap(QwtAxisId(QwtPlot::xBottom, 0));
@@ -532,6 +519,18 @@ void CapturePlot::onTriggerBHandleGrabbed(bool grabbed)
 	else
 		d_levelTriggerBBar->setPen(d_trigBinactiveLinePen);
 	d_symbolCtrl->updateOverlay();
+}
+
+Measure* CapturePlot::measureOfChannel(int chnIdx) const
+{
+	Measure *measure = nullptr;
+
+	auto it = std::find_if(d_measureObjs.begin(), d_measureObjs.end(),
+		[&](Measure *m) { return m->channel() == chnIdx; });
+	if (it != d_measureObjs.end())
+		measure = *it;
+
+	return measure;
 }
 
 void CapturePlot::onChannelAdded(int chnIdx)
@@ -575,6 +574,21 @@ void CapturePlot::onChannelAdded(int chnIdx)
 		[=](int pos) {
 			chOffsetHdl->setPositionSilenty(pos);
 		});
+
+	/* Add Measure ojbect that handles all channel measurements */
+	Measure *measure = new Measure(chnIdx, d_ydata[chnIdx],
+		Curve(chnIdx)->data()->size());
+	measure->setAdcBitCount(12);
+	d_measureObjs.push_back(measure);
+}
+
+void CapturePlot::cleanUpJustBeforeChannelRemoval(int chnIdx)
+{
+	Measure *measure = measureOfChannel(chnIdx);
+	if (measure) {
+		d_measureObjs.removeOne(measure);
+		delete measure;
+	}
 }
 
 void CapturePlot::setOffsetWidgetVisible(int chnIdx, bool visible)
@@ -597,14 +611,15 @@ void CapturePlot::removeOffsetWidgets(int chnIdx)
 	delete(d_offsetHandles.takeAt(chnIdx));
 }
 
-void CapturePlot::measure(int chnIdx)
+void CapturePlot::measure()
 {
-	d_measure.setDataSource(d_ydata[chnIdx], Curve(chnIdx)->data()->size());
-	d_measure.setSampleRate(this->sampleRate());
-	d_measure.setHysteresisSpan(d_cross_hyst_window);
-	d_measure.setCrossLevel(d_period_cross_level);
-	d_measure.setAdcBitCount(12);
-	d_measure.measure();
+	for (int i = 0; i < d_measureObjs.size(); i++) {
+		Measure *measure = d_measureObjs[i];
+		if (measure->activeMeasurementsCount() > 0) {
+			measure->setSampleRate(this->sampleRate());
+			measure->measure();
+		}
+	}
 }
 
 void CapturePlot::onNewDataReceived()
@@ -612,27 +627,38 @@ void CapturePlot::onNewDataReceived()
 	if (!d_measurementsEnabled)
 		return;
 
-	measure(d_chnToMeasure);
+	for (int i = 0; i < d_measureObjs.size(); i++) {
+		Measure *measure = d_measureObjs[i];
+		if (measure->activeMeasurementsCount() > 0) {
+			measure->setSampleRate(this->sampleRate());
+			measure->measure();
+		}
+	}
 
 	Q_EMIT measurementsAvailable();
 }
 
-const QList<MeasurementData> & CapturePlot::measurements()
+QList<MeasurementData>* CapturePlot::measurements(int chnIdx) const
 {
-	return d_measure.measurements();
+	QList<MeasurementData> *measurements = nullptr;
+	Measure *measure = measureOfChannel(chnIdx);
+
+	if (measure)
+		measurements = measure->measurements();
+
+	return measurements;
 }
 
-void CapturePlot::setMeasurementEnabled(int measure_idx, bool en)
+void CapturePlot::setPeriodDetectLevel(int chnIdx, double lvl)
 {
-	d_measure.setMeasurementEnabled(measure_idx, en);
+	Measure *measure = measureOfChannel(chnIdx);
+	if (measure)
+		measure->setCrossLevel(lvl);
 }
 
-void CapturePlot::setPeriodDetectLevel(double lvl)
+void CapturePlot::setPeriodDetectHyst(int chnIdx, double hyst)
 {
-	d_period_cross_level = lvl;
-}
-
-void CapturePlot::setPeriodDetectHyst(double hyst)
-{
-	d_cross_hyst_window = hyst;
+	Measure *measure = measureOfChannel(chnIdx);
+	if (measure)
+		measure->setHysteresisSpan(hyst);
 }
