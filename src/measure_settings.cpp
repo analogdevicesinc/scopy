@@ -15,7 +15,8 @@ MeasureSettings::MeasureSettings(QWidget *parent) :
 	m_horizMeasurements(new DropdownSwitchList(1, this)),
 	m_vertMeasurements(new DropdownSwitchList(1, this)),
 	m_emitActivated(true),
-	m_emitStatsChanged(true)
+	m_emitStatsChanged(true),
+	m_emitDeleteAll(true)
 {
 	QTreeView *treeView;
 
@@ -138,6 +139,11 @@ void MeasureSettings::onMeasurementPropertyChanged(QStandardItem *item)
 	else if (item->column() == 2)
 		if (m_emitStatsChanged)
 			Q_EMIT measurementStatsChanged(name, en);
+
+	if (m_emitActivated && m_ui->button_measDeleteAll->isChecked()) {
+		m_emitDeleteAll = false;
+		m_ui->button_measDeleteAll->setChecked(false);
+	}
 }
 
 void MeasureSettings::setColumnData(QStandardItemModel *model, int column,
@@ -163,4 +169,18 @@ void MeasureSettings::setAllMeasurements(int col, bool en)
 void MeasureSettings::on_button_MeasurementsEn_toggled(bool checked)
 {
 	setAllMeasurements(1, checked);
+}
+
+void MeasureSettings::on_button_measDeleteAll_toggled(bool checked)
+{
+	QPushButton *button = static_cast<QPushButton*>(QObject::sender());
+	if (checked)
+		button->setText("Recover");
+	else
+		button->setText("Delete All");
+
+	if (!m_emitDeleteAll)
+		m_emitDeleteAll = true;
+	else
+		Q_EMIT measurementDeleteAllOrRecover(checked);
 }

@@ -41,10 +41,12 @@ public:
 Q_SIGNALS:
 	void measurementActiveChanged(const QString& name, bool en);
 	void measurementStatsChanged(const QString& name, bool en);
+	void measurementDeleteAllOrRecover(bool);
 
 private Q_SLOTS:
 	void onMeasurementPropertyChanged(QStandardItem *item);
 	void on_button_MeasurementsEn_toggled(bool checked);
+	void on_button_measDeleteAll_toggled(bool checked);
 
 private:
 	void setColumnData(QStandardItemModel *model, int column, bool en);
@@ -58,6 +60,7 @@ private:
 	DropdownSwitchList *m_vertMeasurements;
 	bool m_emitActivated;
 	bool m_emitStatsChanged;
+	bool m_emitDeleteAll;
 
 };
 } // namespace adiscope

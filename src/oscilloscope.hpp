@@ -118,6 +118,7 @@ namespace adiscope {
 		void onMeasuremetsAvailable();
 
 		void onMeasurementActivated(const QString& name, bool en);
+		void onMeasurementDeleteAll(bool);
 
 	private:
 		OscADC adc;
@@ -180,6 +181,7 @@ namespace adiscope {
 		QPushButton *menuRunButton;
 
 		QList<MeasurementData *> measurements_data;
+		QList<MeasurementData *> measurements_data_backup;
 		QList<std::shared_ptr<MeasurementGui>> measurements_gui;
 
 		static const unsigned long maxBufferSize;

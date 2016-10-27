@@ -205,6 +205,10 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 		SIGNAL(measurementActiveChanged(const QString&, bool)),
 		SLOT(onMeasurementActivated(const QString&, bool)));
 
+	connect(measure_settings,
+		SIGNAL(measurementDeleteAllOrRecover(bool)),
+		SLOT(onMeasurementDeleteAll(bool)));
+
 	QWidget *measure_widget = new QWidget(this);
 	Ui::Channel measure_ui;
 
@@ -1431,6 +1435,45 @@ void Oscilloscope::onMeasurementActivated(const QString &name, bool en)
 		}
 		measureLabelsRearrange();
 	}
+}
+
+void Oscilloscope::onMeasurementDeleteAll(bool deleteAll)
+{
+	if (deleteAll) {
+		for (int i = 0; i < measurements_data.size(); i++)
+			measurements_data[i]->setEnabled(false);
+
+		measurements_data_backup = measurements_data;
+		measurements_data.clear();
+		measurements_gui.clear();
+	} else {
+		measurements_data = measurements_data_backup;
+		for (int i = 0; i < measurements_data.size(); i++) {
+			int chn_idx = measurements_data[i]->channel();
+			QWidget *chn_widget = channelWidgetAtId(chn_idx);
+			QCheckBox *box = chn_widget->findChild<QCheckBox *>("box");
+			if (box->checkState())
+				measurements_data[i]->setEnabled(true);
+			measureCreateAndAppendGuiFrom(*measurements_data[i]);
+		}
+	}
+
+	QList<MeasurementData> *m = plot.measurements(current_channel);
+	int h_idx = 0;
+	int v_idx = 0;
+	measure_settings->setEmitActivated(false);
+	for (int i = 0; i < m->size(); i++) {
+		bool meas_state = m->at(i).enabled();
+		if (m->at(i).axis() == MeasurementData::HORIZONTAL)
+			measure_settings->setHorizMeasurementActive(h_idx++,
+				meas_state);
+		else if (m->at(i).axis() == MeasurementData::VERTICAL)
+			measure_settings->setVertMeasurementActive(v_idx++,
+				meas_state);
+	}
+	measure_settings->setEmitActivated(true);
+
+	measureLabelsRearrange();
 }
 
 void Oscilloscope::measureCleanupChnMeasurements(int chnIdx)
