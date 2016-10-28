@@ -69,11 +69,15 @@ private Q_SLOTS:
     void singleRun();
     void singleRunStop();
     void toggleRightMenu();
-
+    void update_ui();
     void on_sampleRateCombo_activated(const QString &arg1);
     void on_generatePattern_clicked();
     void on_clearButton_clicked();
     void on_generateUI_clicked();
+
+    void on_save_PB_clicked();
+
+    void on_load_PB_clicked();
 
 private:
 

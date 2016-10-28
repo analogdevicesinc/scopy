@@ -16,6 +16,7 @@
 #include <QtQml/QQmlEngine>
 #include <QDirIterator>
 #include <QPushButton>
+#include <QFileDialog>
 
 ///* pulseview and sigrok */
 #include <boost/math/common_factor.hpp>
@@ -195,6 +196,8 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt, QPushB
 
     connect(ui->btnSingleRun, SIGNAL(pressed()), this, SLOT(singleRun()));
     connect(ui->btnSettings , SIGNAL(pressed()), this, SLOT(toggleRightMenu()));
+
+    buffer = new short[1];
 }
 
 PatternGenerator::~PatternGenerator()
@@ -483,3 +486,75 @@ void adiscope::PatternGenerator::on_generateUI_clicked()
 }
 
 } /* namespace adiscope */
+
+void adiscope::PatternGenerator::on_save_PB_clicked()
+{
+    QFileDialog qfd;
+    qfd.setDefaultSuffix("json");
+
+    QString filename = qfd.getSaveFileName(this,tr("Save buffer"),".json",tr("Session buffer file (*.json)"));
+    if(filename == 0)
+        return;
+    QFile savedsession( filename );
+
+    savedsession.open( QIODevice::WriteOnly);
+    QJsonObject obj;
+    QJsonArray jsbuffer;
+    for(auto i=0;i<number_of_samples;i++){
+        jsbuffer.append(QJsonValue(buffer[i]));
+    }
+    obj.insert("buffer",jsbuffer);
+    obj.insert("channel_enable_mask",QJsonValue(channel_enable_mask));
+    obj.insert("sample_rate",QJsonValue((int)sample_rate));
+    obj.insert("no_channels",QJsonValue(no_channels));
+    obj.insert("number_of_samples",QJsonValue((int)number_of_samples));
+
+    QJsonDocument doc(obj);
+
+    savedsession.write(doc.toJson(QJsonDocument::Compact));
+    savedsession.close();
+
+}
+
+void adiscope::PatternGenerator::update_ui()
+{
+    ui->ChannelEnableMask->setText("0x"+QString::number(channel_enable_mask,16));
+    ui->sampleRateCombo->setCurrentText(QString::number(sample_rate));
+    ui->numberOfSamples->setText(QString::number(number_of_samples));
+}
+
+void adiscope::PatternGenerator::on_load_PB_clicked()
+{
+    QFileDialog qfd;
+    qfd.setDefaultSuffix("json");
+
+    QString filename = qfd.getOpenFileName(this,tr("Load buffer"),".json",tr("Session buffer file (*.json)"));
+    if(filename == 0)
+        return;
+    QFile file( filename );
+
+    file.open( QIODevice::ReadOnly);
+    QJsonArray jsbuffer;
+
+    file.open(QIODevice::ReadOnly | QIODevice::Text);
+    QJsonDocument d = QJsonDocument::fromJson(file.readAll());
+    file.close();
+    QJsonObject obj(d.object());
+
+    channel_enable_mask = obj["channel_enable_mask"].toInt();
+    sample_rate = obj["sample_rate"].toInt();
+    no_channels = obj["no_channels"].toInt();
+    number_of_samples = obj["number_of_samples"].toInt();
+    delete buffer;
+    buffer = new short[number_of_samples];
+
+    buffersize = 2 * number_of_samples;
+    for(auto i=0;i<number_of_samples;i++){
+        buffer[i] = obj["buffer"].toArray()[i].toInt();
+    }
+    update_ui();
+    createBinaryBuffer();
+    dataChanged();
+    main_win->action_view_zoom_fit()->trigger();
+
+}
