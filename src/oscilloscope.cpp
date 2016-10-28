@@ -687,6 +687,8 @@ void Oscilloscope::del_math_channel()
 	unsigned int curve_id = btn->property("id").toUInt();
 	QString qname = delBtn->property("curve_name").toString();
 
+	measureCleanupChnMeasurements(curve_id);
+
 	plot.unregisterSink(qname.toStdString());
 
 	nb_math_channels--;
@@ -723,8 +725,6 @@ void Oscilloscope::del_math_channel()
 	int current_axis = plot.activeVertAxis();
 	if (current_axis > curve_id)
 		plot.setActiveVertAxis(current_axis - 1);
-
-	measureCleanupChnMeasurements(curve_id);
 
 	/* Before removing the axis make sure cursors are not sing it */
 	QWidget *chn_widget = channelWidgetAtId(curve_id);
@@ -1448,6 +1448,7 @@ void Oscilloscope::onMeasurementDeleteAll(bool deleteAll)
 		measurements_gui.clear();
 	} else {
 		measurements_data = measurements_data_backup;
+		measurements_data_backup.clear();
 		for (int i = 0; i < measurements_data.size(); i++) {
 			int chn_idx = measurements_data[i]->channel();
 			QWidget *chn_widget = channelWidgetAtId(chn_idx);
@@ -1479,6 +1480,9 @@ void Oscilloscope::onMeasurementDeleteAll(bool deleteAll)
 void Oscilloscope::measureCleanupChnMeasurements(int chnIdx)
 {
 	QMutableListIterator<MeasurementData *>i(measurements_data);
+
+	if (measurements_data.size() == 0)
+		i = measurements_data_backup;
 
 	int g = 0;
 	while (i.hasNext()) {
