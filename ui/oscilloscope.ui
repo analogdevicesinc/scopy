@@ -49,7 +49,7 @@
        <property name="styleSheet">
         <string notr="true">QPushButton {
 color: white;
-background-color: orange;
+background-color: #27b34f;
 font-family: &quot;monospace&quot;;
 font-weight: bold;
 height: 30px;
