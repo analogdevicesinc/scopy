@@ -70,7 +70,9 @@ namespace adiscope {
 		void removeOffsetWidgets(int chnIdx);
 
 		void measure();
-		QList<MeasurementData>* measurements(int chnIdx) const;
+		int activeMeasurementsCount(int chnIdx);
+		QList<std::shared_ptr<MeasurementData>> measurements(int chnIdx);
+		std::shared_ptr<MeasurementData> measurement(int id, int chnIdx);
 
 	Q_SIGNALS:
 		void timeTriggerValueChanged(double);

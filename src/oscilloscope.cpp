@@ -62,7 +62,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	nb_math_channels(0),
 	ui(new Ui::Oscilloscope),
 	trigger_settings(ctx),
-	measure_settings(new MeasureSettings(this)),
+	measure_settings(nullptr),
 	plot(parent, 16, 10),
 	fft_plot(nb_channels, parent),
 	xy_plot(nb_channels / 2, parent),
@@ -82,6 +82,9 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	ui->setupUi(this);
 	int triggers_panel = ui->stackedWidget->insertWidget(-1, &trigger_settings);
 	settings_group->setExclusive(true);
+
+	/* Measurements Settings */
+	measure_settings_init();
 
 	fft_size = 1024;
 
@@ -198,34 +201,6 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	connect(cursor_ui.box, SIGNAL(toggled(bool)), this,
 			SLOT(onCursorsToggled(bool)));
 
-	/* Measurements Settings */
-	int measure_panel = ui->stackedWidget->insertWidget(-1, measure_settings);
-
-	connect(measure_settings,
-		SIGNAL(measurementActiveChanged(const QString&, bool)),
-		SLOT(onMeasurementActivated(const QString&, bool)));
-
-	connect(measure_settings,
-		SIGNAL(measurementDeleteAllOrRecover(bool)),
-		SLOT(onMeasurementDeleteAll(bool)));
-
-	QWidget *measure_widget = new QWidget(this);
-	Ui::Channel measure_ui;
-
-	measure_ui.setupUi(measure_widget);
-	ui->measure_settings->addWidget(measure_widget);
-	settings_group->addButton(measure_ui.btn);
-	measure_ui.btn->setProperty("id", QVariant(-measure_panel));
-	measure_ui.name->setText("Measure");
-	measure_ui.box->setChecked(false);
-	measure_ui.box->setStyleSheet(stylesheet);
-
-	connect(measure_ui.btn, SIGNAL(pressed()),
-				this, SLOT(toggleRightMenu()));
-	connect(measure_ui.box, SIGNAL(toggled(bool)), this,
-			SLOT(onMeasureToggled(bool)));
-	connect(measure_ui.box, SIGNAL(toggled(bool)),
-		&plot, SLOT(setMeasuremensEnabled(bool)));
 
 	/* Trigger Settings */
 	QWidget *trig_widget = new QWidget(this);
@@ -473,18 +448,6 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 		name->setChecked(true);
 	}
 
-	// Populate the MeasureSettings dropdowns with available measurements
-	if (nb_channels >= 0) {
-		QList<MeasurementData> *m = plot.measurements(0);
-		for (int i = 0; i < m->size(); i++)
-			if (m->at(i).axis() == MeasurementData::HORIZONTAL)
-				measure_settings->addHorizontalMeasurement(
-					m->at(i).name());
-			else if (m->at(i).axis() == MeasurementData::VERTICAL)
-				measure_settings->addVerticalMeasurement(
-					m->at(i).name());
-	}
-
 	// Default hysteresis levels for measurements
 	for (int i = 0; i < nb_channels; i++)
 		plot.setPeriodDetectHyst(i, 1.0 / 5);
@@ -687,7 +650,7 @@ void Oscilloscope::del_math_channel()
 	unsigned int curve_id = btn->property("id").toUInt();
 	QString qname = delBtn->property("curve_name").toString();
 
-	measureCleanupChnMeasurements(curve_id);
+	measure_settings->onChannelRemoved(curve_id);
 
 	plot.unregisterSink(qname.toStdString());
 
@@ -1068,9 +1031,6 @@ void adiscope::Oscilloscope::channel_box_toggled(bool checked)
 
 	plot.setOffsetWidgetVisible(id, checked);
 
-	setMeasurementsActiveForChn(id, checked);
-	measureUpdateValues();
-
 	plot.replot();
 	updateRunButton(checked);
 }
@@ -1301,30 +1261,11 @@ void Oscilloscope::onMeasuremetsAvailable()
 
 void Oscilloscope::update_measure_for_channel(int ch_idx)
 {
-	plot.measure();
-	onMeasuremetsAvailable();
-
 	QWidget *chn_widget = channelWidgetAtId(ch_idx);
 	QPushButton *name = chn_widget->findChild<QPushButton *>("name");
 
 	measure_settings->setChannelName(name->text());
 	measure_settings->setChannelUnderlineColor(plot.getLineColor(ch_idx));
-
-	QList<MeasurementData> *m = plot.measurements(ch_idx);
-	int h_idx = 0;
-	int v_idx = 0;
-
-	measure_settings->setEmitActivated(false);
-	for (int i = 0; i < m->size(); i++) {
-		bool meas_state = m->at(i).enabled();
-		if (m->at(i).axis() == MeasurementData::HORIZONTAL)
-			measure_settings->setHorizMeasurementActive(h_idx++,
-				meas_state);
-		else if (m->at(i).axis() == MeasurementData::VERTICAL)
-			measure_settings->setVertMeasurementActive(v_idx++,
-				meas_state);
-	}
-	measure_settings->setEmitActivated(true);
 }
 
 void Oscilloscope::measureCreateAndAppendGuiFrom(const MeasurementData&
@@ -1409,96 +1350,112 @@ void Oscilloscope::measureUpdateValues()
 		measurements_gui[i]->update(*(measurements_data[i]));
 }
 
-void Oscilloscope::onMeasurementActivated(const QString &name, bool en)
+void Oscilloscope::measure_settings_init()
 {
-	QList<MeasurementData> *measurements;
+	measure_settings = new MeasureSettings(&plot, this);
 
-	if (selectedChannel >= 0)
-		measurements = plot.measurements(selectedChannel);
-	else
-		return;
+	int measure_panel = ui->stackedWidget->insertWidget(-1, measure_settings);
 
-	auto it = find_if(measurements->begin(), measurements->end(),
-		[&](MeasurementData md)
-		{ return md.name() == name; });
+	connect(measure_settings,
+		SIGNAL(measurementActivated(int, int)),
+		SLOT(onMeasurementActivated(int,int)));
 
-	if (it != measurements->end()) {
-		MeasurementData *md = &(*it);
-		md->setEnabled(en);
-		if (en) {
-			measurements_data.push_back(md);
-			measureCreateAndAppendGuiFrom(*it);
-		} else {
-			int idx = measurements_data.indexOf(md);
-			measurements_data.removeAt(idx);
-			measurements_gui.removeAt(idx);
-		}
+	connect(measure_settings,
+		SIGNAL(measurementDeactivated(int, int)),
+		SLOT(onMeasurementDeactivated(int,int)));
+
+	connect(measure_settings,
+		SIGNAL(measurementSelectionListChanged()),
+		SLOT(onMeasurementSelectionListChanged()));
+
+	connect(&plot, SIGNAL(channelAdded(int)),
+		measure_settings, SLOT(onChannelAdded(int)));
+
+	connect(this, SIGNAL(selectedChannelChanged(int)),
+		measure_settings, SLOT(setSelectedChannel(int)));
+
+	QWidget *measure_widget = new QWidget(this);
+	Ui::Channel measure_ui;
+
+	measure_ui.setupUi(measure_widget);
+	ui->measure_settings->addWidget(measure_widget);
+	settings_group->addButton(measure_ui.btn);
+	measure_ui.btn->setProperty("id", QVariant(-measure_panel));
+	measure_ui.name->setText("Measure");
+	measure_ui.box->setChecked(false);
+	QString stylesheet(measure_ui.box->styleSheet());
+	stylesheet += QString("\nQCheckBox::indicator {"
+				"border-color: rgb(74, 100, 255);"
+				"border-radius: 4px;"
+				"}"
+				"QCheckBox::indicator:checked {"
+				"background-color: rgb(74, 100, 255);"
+				"}");
+	measure_ui.box->setStyleSheet(stylesheet);
+
+	connect(measure_ui.btn, SIGNAL(pressed()),
+				this, SLOT(toggleRightMenu()));
+	connect(measure_ui.box, SIGNAL(toggled(bool)), this,
+			SLOT(onMeasureToggled(bool)));
+	connect(measure_ui.box, SIGNAL(toggled(bool)),
+		&plot, SLOT(setMeasuremensEnabled(bool)));
+}
+
+void Oscilloscope::onMeasurementActivated(int id, int chnIdx)
+{
+	int oldActiveMeasCount = plot.activeMeasurementsCount(chnIdx);
+
+	auto mList = plot.measurements(chnIdx);
+	mList[id]->setEnabled(true);
+	measurements_data.push_back(mList[id]);
+	measureCreateAndAppendGuiFrom(*mList[id]);
+
+	// Even if a measurement had been added after data was captured, it
+	// should display the measurement value corresponding to that data
+	if (oldActiveMeasCount == 0) {
+		plot.measure();
+	}
+
+	measureLabelsRearrange();
+}
+
+void Oscilloscope::onMeasurementDeactivated(int id, int chnIdx)
+{
+	auto mList = plot.measurements(chnIdx);
+	QString name = mList[id]->name();
+
+	mList[id]->setEnabled(false);
+
+	auto it = find_if(measurements_data.begin(), measurements_data.end(),
+		[&](std::shared_ptr<MeasurementData> const& p)
+		{ return  (p->name() == name) && (p->channel() == chnIdx); });
+	if (it != measurements_data.end()) {
+		int i = it - measurements_data.begin();
+		measurements_data.removeAt(i);
+		measurements_gui.removeAt(i);
 		measureLabelsRearrange();
 	}
 }
 
-void Oscilloscope::onMeasurementDeleteAll(bool deleteAll)
+void Oscilloscope::onMeasurementSelectionListChanged()
 {
-	if (deleteAll) {
-		for (int i = 0; i < measurements_data.size(); i++)
-			measurements_data[i]->setEnabled(false);
-
-		measurements_data_backup = measurements_data;
-		measurements_data.clear();
-		measurements_gui.clear();
-	} else {
-		measurements_data = measurements_data_backup;
-		measurements_data_backup.clear();
-		for (int i = 0; i < measurements_data.size(); i++) {
-			int chn_idx = measurements_data[i]->channel();
-			QWidget *chn_widget = channelWidgetAtId(chn_idx);
-			QCheckBox *box = chn_widget->findChild<QCheckBox *>("box");
-			if (box->checkState())
-				measurements_data[i]->setEnabled(true);
-			measureCreateAndAppendGuiFrom(*measurements_data[i]);
-		}
-	}
-
-	QList<MeasurementData> *m = plot.measurements(current_channel);
-	int h_idx = 0;
-	int v_idx = 0;
-	measure_settings->setEmitActivated(false);
-	for (int i = 0; i < m->size(); i++) {
-		bool meas_state = m->at(i).enabled();
-		if (m->at(i).axis() == MeasurementData::HORIZONTAL)
-			measure_settings->setHorizMeasurementActive(h_idx++,
-				meas_state);
-		else if (m->at(i).axis() == MeasurementData::VERTICAL)
-			measure_settings->setVertMeasurementActive(v_idx++,
-				meas_state);
-	}
-	measure_settings->setEmitActivated(true);
-
-	measureLabelsRearrange();
-}
-
-void Oscilloscope::measureCleanupChnMeasurements(int chnIdx)
-{
-	QMutableListIterator<MeasurementData *>i(measurements_data);
-
-	if (measurements_data.size() == 0)
-		i = measurements_data_backup;
-
-	int g = 0;
-	while (i.hasNext()) {
-		if (i.next()->channel() == chnIdx) {
-			i.remove();
-			measurements_gui.removeAt(g);
-		}
-		g++;
-	}
-	measureLabelsRearrange();
-}
-
-void Oscilloscope::setMeasurementsActiveForChn(int chnIdx, bool en)
-{
+	// Clear all measurements in list
 	for (int i = 0; i < measurements_data.size(); i++) {
-		if (measurements_data[i]->channel() == chnIdx)
-			measurements_data[i]->setEnabled(en);
+		measurements_data[i]->setEnabled(false);
 	}
+	measurements_data.clear();
+	measurements_gui.clear();
+
+	// Use the new list from MeasureSettings
+	auto newList = measure_settings->measurementSelection();
+	for (int i = 0; i < newList.size(); i++) {
+		auto pMeasurement = plot.measurement(newList[i].id(),
+			newList[i].channel_id());
+		if (pMeasurement) {
+			pMeasurement->setEnabled(true);
+			measurements_data.push_back(pMeasurement);
+			measureCreateAndAppendGuiFrom(*pMeasurement);
+		}
+	}
+	measureLabelsRearrange();
 }

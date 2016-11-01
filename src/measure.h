@@ -21,6 +21,7 @@
 #define MEASURE_H
 
 #include <QList>
+#include <memory>
 
 namespace adiscope {
 	class CrossingDetection;
@@ -90,7 +91,7 @@ namespace adiscope {
 			N_WIDTH,
 			P_DUTY,
 			N_DUTY,
-			DEFAULT_MEASUMENET_COUNT
+			DEFAULT_MEASUREMENT_COUNT
 		};
 
 		Measure(int channel, double *buffer = NULL, size_t length = 0);
@@ -107,8 +108,8 @@ namespace adiscope {
 		void setHysteresisSpan(double);
 		int channel() const;
 
-		QList<MeasurementData>* measurements();
-		void setMeasurementEnabled(int measure_idx, bool en);
+		QList<std::shared_ptr<MeasurementData>> measurments();
+		std::shared_ptr<MeasurementData> measurement(int id);
 		int activeMeasurementsCount() const;
 
 	private:
@@ -128,7 +129,7 @@ namespace adiscope {
 		int *m_histogram;
 		CrossingDetection *m_cross_detect;
 
-		QList<MeasurementData> m_measurements;
+		QList<std::shared_ptr<MeasurementData>> m_measurements;
 	};
 }
 

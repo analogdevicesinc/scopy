@@ -198,7 +198,7 @@
 </string>
          </property>
          <property name="text">
-          <string>Measurements</string>
+          <string>Display All</string>
          </property>
         </widget>
        </item>
@@ -236,7 +236,7 @@ QPushButton:!checked:disabled {
         </widget>
        </item>
        <item row="1" column="0">
-        <widget class="QPushButton" name="button_MeasurementsEn">
+        <widget class="QPushButton" name="button_measDisplayAll">
          <property name="styleSheet">
           <string notr="true">QPushButton {
   min-height: 30px;
@@ -267,7 +267,7 @@ QPushButton:!checked:disabled {
           <bool>true</bool>
          </property>
          <property name="checked">
-          <bool>true</bool>
+          <bool>false</bool>
          </property>
         </widget>
        </item>
@@ -291,6 +291,10 @@ QPushButton:!checked:disabled {
 
 QPushButton:pressed {
   background-color: #2a44df;
+}
+
+QPushButton:disabled {
+  background-color:  #727273;
 }</string>
          </property>
          <property name="text">

@@ -622,6 +622,17 @@ void CapturePlot::measure()
 	}
 }
 
+int CapturePlot::activeMeasurementsCount(int chnIdx)
+{
+	int count = -1;
+	Measure *measure = measureOfChannel(chnIdx);
+
+	if (measure)
+		count = measure->activeMeasurementsCount();
+
+	return count;
+}
+
 void CapturePlot::onNewDataReceived()
 {
 	if (!d_measurementsEnabled)
@@ -638,15 +649,23 @@ void CapturePlot::onNewDataReceived()
 	Q_EMIT measurementsAvailable();
 }
 
-QList<MeasurementData>* CapturePlot::measurements(int chnIdx) const
+QList<std::shared_ptr<MeasurementData>> CapturePlot::measurements(int chnIdx)
 {
-	QList<MeasurementData> *measurements = nullptr;
 	Measure *measure = measureOfChannel(chnIdx);
 
 	if (measure)
-		measurements = measure->measurements();
+		return measure->measurments();
+	else
+		return QList<std::shared_ptr<MeasurementData>>();
+}
 
-	return measurements;
+std::shared_ptr<MeasurementData> CapturePlot::measurement(int id, int chnIdx)
+{
+	Measure *measure = measureOfChannel(chnIdx);
+	if (measure)
+		return measure->measurement(id);
+	else
+		return std::shared_ptr<MeasurementData>();
 }
 
 void CapturePlot::setPeriodDetectLevel(int chnIdx, double lvl)

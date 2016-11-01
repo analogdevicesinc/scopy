@@ -117,8 +117,9 @@ namespace adiscope {
 
 		void onMeasuremetsAvailable();
 
-		void onMeasurementActivated(const QString& name, bool en);
-		void onMeasurementDeleteAll(bool);
+		void onMeasurementActivated(int id, int chnIdx);
+		void onMeasurementDeactivated(int id, int chnIdx);
+		void onMeasurementSelectionListChanged();
 
 	private:
 		OscADC adc;
@@ -180,8 +181,10 @@ namespace adiscope {
 		QPushButton *active_settings_btn;
 		QPushButton *menuRunButton;
 
-		QList<MeasurementData *> measurements_data;
+		QList<std::shared_ptr<MeasurementData>> measurements_data;
 		QList<MeasurementData *> measurements_data_backup;
+		QList<MeasurementData *> meas_displayall_backup;
+		QList<bool> meas_states_before_displayall;
 		QList<std::shared_ptr<MeasurementGui>> measurements_gui;
 
 		static const unsigned long maxBufferSize;
@@ -205,11 +208,10 @@ namespace adiscope {
 		double pickSampleRateFor(double timeSpanSecs,
 					double desiredBufferSize);
 
+		void measure_settings_init();
 		void measureLabelsRearrange();
 		void measureUpdateValues();
 		void measureCreateAndAppendGuiFrom(const MeasurementData&);
-		void measureCleanupChnMeasurements(int chnIdx);
-		void setMeasurementsActiveForChn(int chnIdx,bool en);
 	};
 }
 

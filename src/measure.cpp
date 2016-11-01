@@ -350,46 +350,47 @@ Measure::Measure(int channel, double *buffer, size_t length):
 	m_cross_level(0),
 	m_hysteresis_span(0)
 {
+
 	// Create a set of measurements
-	m_measurements.push_back(MeasurementData("Period",
+	m_measurements.push_back(std::make_shared<MeasurementData>("Period",
 		MeasurementData::HORIZONTAL, "s",  channel));
-	m_measurements.push_back(MeasurementData("Frequency",
+	m_measurements.push_back(std::make_shared<MeasurementData>("Frequency",
 		MeasurementData::HORIZONTAL, "Hz", channel));
-	m_measurements.push_back(MeasurementData("Min",
+	m_measurements.push_back(std::make_shared<MeasurementData>("Min",
 		MeasurementData::VERTICAL, "V", channel));
-	m_measurements.push_back(MeasurementData("Max",
+	m_measurements.push_back(std::make_shared<MeasurementData>("Max",
 		MeasurementData::VERTICAL, "V", channel));
-	m_measurements.push_back(MeasurementData("Peak-peak",
+	m_measurements.push_back(std::make_shared<MeasurementData>("Peak-peak",
 		MeasurementData::VERTICAL, "V", channel));
-	m_measurements.push_back(MeasurementData("Mean",
+	m_measurements.push_back(std::make_shared<MeasurementData>("Mean",
 		MeasurementData::VERTICAL, "V", channel));
-	m_measurements.push_back(MeasurementData("RMS",
+	m_measurements.push_back(std::make_shared<MeasurementData>("RMS",
 		MeasurementData::VERTICAL, "V", channel));
-	m_measurements.push_back(MeasurementData("AC RMS",
+	m_measurements.push_back(std::make_shared<MeasurementData>("AC RMS",
 		MeasurementData::VERTICAL, "V", channel));
-	m_measurements.push_back(MeasurementData("Low",
+	m_measurements.push_back(std::make_shared<MeasurementData>("Low",
 		MeasurementData::VERTICAL, "V", channel));
-	m_measurements.push_back(MeasurementData("High",
+	m_measurements.push_back(std::make_shared<MeasurementData>("High",
 		MeasurementData::VERTICAL, "V", channel));
-	m_measurements.push_back(MeasurementData("Amplitude",
+	m_measurements.push_back(std::make_shared<MeasurementData>("Amplitude",
 		MeasurementData::VERTICAL, "V", channel));
-	m_measurements.push_back(MeasurementData("Middle",
+	m_measurements.push_back(std::make_shared<MeasurementData>("Middle",
 		MeasurementData::VERTICAL, "V", channel));
-	m_measurements.push_back(MeasurementData("+Over",
+	m_measurements.push_back(std::make_shared<MeasurementData>("+Over",
 		MeasurementData::VERTICAL, "%", channel));
-	m_measurements.push_back(MeasurementData("-Over",
+	m_measurements.push_back(std::make_shared<MeasurementData>("-Over",
 		MeasurementData::VERTICAL, "%", channel));
-	m_measurements.push_back(MeasurementData("Rise",
+	m_measurements.push_back(std::make_shared<MeasurementData>("Rise",
 		MeasurementData::HORIZONTAL, "s", channel));
-	m_measurements.push_back(MeasurementData("Fall",
+	m_measurements.push_back(std::make_shared<MeasurementData>("Fall",
 		MeasurementData::HORIZONTAL, "s", channel));
-	m_measurements.push_back(MeasurementData("+Width",
+	m_measurements.push_back(std::make_shared<MeasurementData>("+Width",
 		MeasurementData::HORIZONTAL, "s", channel));
-	m_measurements.push_back(MeasurementData("-Width",
+	m_measurements.push_back(std::make_shared<MeasurementData>("-Width",
 		MeasurementData::HORIZONTAL, "s", channel));
-	m_measurements.push_back(MeasurementData("+Duty",
+	m_measurements.push_back(std::make_shared<MeasurementData>("+Duty",
 		MeasurementData::HORIZONTAL, "%", channel));
-	m_measurements.push_back(MeasurementData("-Duty",
+	m_measurements.push_back(std::make_shared<MeasurementData>("-Duty",
 		MeasurementData::HORIZONTAL, "%", channel));
 }
 
@@ -428,7 +429,7 @@ bool Measure::highLowFromHistogram(double &low, double &high,
 void Measure::clearMeasurements()
 {
 	 for (int i = 0; i < m_measurements.size(); i++)
-		m_measurements[i].setMeasured(false);
+		m_measurements[i]->setMeasured(false);
 }
 
 void Measure::setDataSource(double *buffer, size_t length)
@@ -514,25 +515,25 @@ void Measure::measure()
 		}
 	}
 
-	m_measurements[MIN].setValue(min);
-	m_measurements[MAX].setValue(max);
+	m_measurements[MIN]->setValue(min);
+	m_measurements[MAX]->setValue(max);
 
 	// Peak-to-Peak
 	peak_to_peak = qAbs(max - min);
-	m_measurements[PEAK_PEAK].setValue(peak_to_peak);
+	m_measurements[PEAK_PEAK]->setValue(peak_to_peak);
 
 	// Mean
 	mean = sum / data_length;
-	m_measurements[MEAN].setValue(mean);
+	m_measurements[MEAN]->setValue(mean);
 
 	// RMS
 	rms = sqrt(sqr_sum / data_length);
-	m_measurements[RMS].setValue(rms);
+	m_measurements[RMS]->setValue(rms);
 
 	// AC RMS
 	rms_ac = sqrt((sqr_sum - 2 * mean * sum +
 		data_length *  mean * mean) / data_length);
-	m_measurements[AC_RMS].setValue(rms_ac);
+	m_measurements[AC_RMS]->setValue(rms_ac);
 
 	low = min;
 	high = max;
@@ -542,20 +543,20 @@ void Measure::measure()
 		highLowFromHistogram(low, high, min, max);
 
 	// Low, High, Middle, Amplitude, Overshoot positive/negative
-	m_measurements[LOW].setValue(low);
-	m_measurements[HIGH].setValue(high);
+	m_measurements[LOW]->setValue(low);
+	m_measurements[HIGH]->setValue(high);
 
 	middle = low + (high - low) / 2.0;
-	m_measurements[MIDDLE].setValue(middle);
+	m_measurements[MIDDLE]->setValue(middle);
 
 	amplitude = high - low;
-	m_measurements[AMPLITUDE].setValue(amplitude);
+	m_measurements[AMPLITUDE]->setValue(amplitude);
 
 	overshoot_p = (max - high) / amplitude * 100;
-	m_measurements[P_OVER].setValue(overshoot_p);
+	m_measurements[P_OVER]->setValue(overshoot_p);
 
 	overshoot_n = (low - min) / amplitude * 100;
-	m_measurements[N_OVER].setValue(overshoot_n);
+	m_measurements[N_OVER]->setValue(overshoot_n);
 
 	if (m_histogram != NULL) {
 		delete[] m_histogram;
@@ -588,10 +589,10 @@ void Measure::measure()
 		sample_period = first_hlf_cycl / (n / 2) +
 				secnd_hlf_cycl / ((n + 1) / 2 - 1);
 		period = sample_period * (1 / m_sample_rate);
-		m_measurements[PERIOD].setValue(period);
+		m_measurements[PERIOD]->setValue(period);
 
 		frequency = 1 / period;
-		m_measurements[FREQUENCY].setValue(frequency);
+		m_measurements[FREQUENCY]->setValue(frequency);
 
 		// Find level crossings (10%, 50%, 90%)
 		double lowRef = low + (0.1 * amplitude);
@@ -656,7 +657,7 @@ void Measure::measure()
 			if (rise < 0)
 				rise += length;
 			rise_time = rise / m_sample_rate;
-			m_measurements[RISE].setValue(rise_time);
+			m_measurements[RISE]->setValue(rise_time);
 
 			// Fall Time
 			long long fall = (long long)(lowFalling.m_bufIdx -
@@ -664,7 +665,7 @@ void Measure::measure()
 			if (fall < 0)
 				fall += length;
 			fall_time = fall / m_sample_rate;
-			m_measurements[FALL].setValue(fall_time);
+			m_measurements[FALL]->setValue(fall_time);
 
 			// Positive Width
 			long long posWidth = (long long)(midFalling.m_bufIdx -
@@ -672,19 +673,19 @@ void Measure::measure()
 			if (posWidth < 0)
 				posWidth += length;
 			width_p = posWidth / m_sample_rate;
-			m_measurements[P_WIDTH].setValue(width_p);
+			m_measurements[P_WIDTH]->setValue(width_p);
 
 			// Negative Width
 			width_n = period - width_p;
-			m_measurements[N_WIDTH].setValue(width_n);
+			m_measurements[N_WIDTH]->setValue(width_n);
 
 			// Positive Duty
 			duty_p = width_p / period * 100;
-			m_measurements[P_DUTY].setValue(duty_p);
+			m_measurements[P_DUTY]->setValue(duty_p);
 
 			// Negative Duty
 			duty_n = width_n / period * 100;
-			m_measurements[N_DUTY].setValue(duty_n);
+			m_measurements[N_DUTY]->setValue(duty_n);
 		}
 	}
 
@@ -738,17 +739,14 @@ int Measure::channel() const
 	return m_channel;
 }
 
-QList<MeasurementData>* Measure::measurements()
+QList<std::shared_ptr<MeasurementData>> Measure::measurments()
 {
-	return &m_measurements;
+	return m_measurements;
 }
 
-void Measure::setMeasurementEnabled(int measure_idx, bool en)
+std::shared_ptr<MeasurementData> Measure::measurement(int id)
 {
-	if (measure_idx < 0 || measure_idx >= m_measurements.size())
-		return;
-
-	m_measurements[measure_idx].setEnabled(en);
+	return m_measurements[id];
 }
 
 int Measure::activeMeasurementsCount() const
@@ -756,7 +754,7 @@ int Measure::activeMeasurementsCount() const
 	int count = 0;
 
 	for (int i = 0; i < m_measurements.size(); i++)
-		if (m_measurements[i].enabled())
+		if (m_measurements[i]->enabled())
 			count++;
 
 	return count;
