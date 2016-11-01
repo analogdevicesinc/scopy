@@ -140,6 +140,14 @@ void DropdownSwitchList::addDropdownElement(const QIcon& icon,
 	m_rows++;
 }
 
+void DropdownSwitchList::addDropdownElement(const QIcon& icon,
+		const QString& name, const QVariant& user_data)
+{
+	addDropdownElement(icon, name);
+	QModelIndex index = m_model->index(m_rows - 1, 0, QModelIndex());
+	m_model->setData(index, user_data, Qt::UserRole);
+}
+
 void DropdownSwitchList::resetIndex(int)
 {
 	setCurrentIndex(-1);

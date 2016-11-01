@@ -42,6 +42,8 @@ namespace adiscope {
 		int switchColumnCount() const;
 
 		void addDropdownElement(const QIcon&, const QString&);
+		void addDropdownElement(const QIcon&, const QString&,
+			const QVariant& user_data);
 
 	private Q_SLOTS:
 		void resetIndex(int);
