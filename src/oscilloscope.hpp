@@ -182,9 +182,6 @@ namespace adiscope {
 		QPushButton *menuRunButton;
 
 		QList<std::shared_ptr<MeasurementData>> measurements_data;
-		QList<MeasurementData *> measurements_data_backup;
-		QList<MeasurementData *> meas_displayall_backup;
-		QList<bool> meas_states_before_displayall;
 		QList<std::shared_ptr<MeasurementGui>> measurements_gui;
 
 		static const unsigned long maxBufferSize;
