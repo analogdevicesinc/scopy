@@ -7,6 +7,8 @@
 
 #include <libserialport.h>
 
+#include <QJsonDocument>
+
 #include "pg_patterns.hpp"
 
 using namespace std;
@@ -108,6 +110,16 @@ uint8_t Pattern::pre_generate()
     return 0;
 }
 
+std::string Pattern::toString()
+{
+    return "";
+}
+
+bool Pattern::fromString(std::string from)
+{
+    return 0;
+}
+
 uint32_t Pattern::get_min_sampling_freq()
 {
     return 1; // minimum 1 hertz if not specified otherwise
@@ -128,6 +140,10 @@ void PatternUI::build_ui(QWidget *parent){}
 void PatternUI::post_load_ui(){}
 void PatternUI::parse_ui(){}
 void PatternUI::destroy_ui(){}
+static PatternUI *create_ui(int index, QWidget *parent = 0)
+{
+
+}
 
 uint32_t BinaryCounterPattern::get_min_sampling_freq()
 {
@@ -191,6 +207,35 @@ void BinaryCounterPattern::set_init_value(const uint16_t &value)
     init_value = value;
 }
 
+std::string BinaryCounterPattern::toString()
+{/*
+    return "\""+get_name()+"\":" + "{" + "\"frequency\":" + std::to_string(frequency)
+            + ",\"start_value\":" + std::to_string(start_value)
+            + ",\"end_value\":" + std::to_string(end_value)
+            + ",\"increment\":" + std::to_string(increment)
+            + ",\"init_value\":" + std::to_string(init_value) + "}";*/
+ /*   QJsonObject obj;
+
+    obj.insert("frequency",QJsonValue((qint32)frequency));
+    obj.insert("start_value",QJsonValue(start_value));
+    obj.insert("end_value",QJsonValue(end_value));
+    obj.insert("increment",QJsonValue(increment));
+    obj.insert("init_value",QJsonValue(init_value));
+    QJsonObject container;
+    container.insert(QString::fromStdString(get_name()),obj);
+    QJsonDocument doc(container);
+    QString strJson(doc.toJson(QJsonDocument::Compact));
+    return strJson.toStdString();*/
+
+    //return frequency << start_value << end_value << increment << init_value;
+}
+
+bool BinaryCounterPattern::fromString(std::string from)
+{
+
+   //from >>
+}
+
 BinaryCounterPattern::BinaryCounterPattern()
 {
     qDebug()<<"BinaryCounterPatternCreated";
@@ -205,7 +250,7 @@ uint8_t BinaryCounterPattern::generate_pattern()
     buffer = new short[number_of_samples];
     auto samples_per_count = ((float)sample_rate/(float)frequency);
     auto i=init_value;
-    auto j=0;
+    auto j=0;    
     while(j<number_of_samples)
     {
         for(auto k=0;k<samples_per_count;k++,j++)
@@ -1111,8 +1156,8 @@ void ConstantPattern::set_constant(bool value)
 
 ConstantPattern::ConstantPattern()
 {
-    set_name("Constant pattern");
-    set_description("Constant pattern");
+    set_name(ConstantPatternName);
+    set_description(ConstantPatternDescription);
     set_periodic(false);
 }
 uint8_t ConstantPattern::generate_pattern()
@@ -1168,8 +1213,8 @@ void NumberPattern::set_nr(const uint16_t &value)
 
 NumberPattern::NumberPattern()
 {
-    set_name("Number pattern");
-    set_description("Number pattern");
+    set_name(NumberPatternName);
+    set_description(NumberPatternDescription);
     set_periodic(false);
 }
 uint8_t NumberPattern::generate_pattern()
@@ -1213,8 +1258,8 @@ void NumberPatternUI::parse_ui()
 
 RandomPattern::RandomPattern()
 {
-    set_name("Random Pattern");
-    set_description("Random pattern at a selected frequency");
+    set_name(RandomPatternName);
+    set_description(RandomPatternDescription);
     set_periodic(false);
 }
 
@@ -1290,8 +1335,8 @@ void RandomPatternUI::destroy_ui()
 
 PulsePattern::PulsePattern()
 {
-    set_name("PulsePattern");
-    set_description("PulsePattern");
+    set_name(PulsePatternName);
+    set_description(PulsePatternDescription);
     set_periodic(true);
 }
 
@@ -1414,8 +1459,8 @@ void PulsePatternUI::destroy_ui()
 
 JohnsonCounterPattern::JohnsonCounterPattern()
 {
-    set_name("Johnson counter");
-    set_description("Twisted ring counter, also known as Johnson counter");
+    set_name(JohnsonCounterPatternName);
+    set_description(JohnsonCounterPatternDescription);
     set_periodic(true);
 }
 
@@ -1533,8 +1578,8 @@ void WalkingPattern::set_level(bool value)
 
 WalkingPattern::WalkingPattern()
 {
-    set_name("Walking counter");
-    set_description("Walking counter");
+    set_name(WalkingCounterPatternName);
+    set_description(WalkingCounterPatternDescription);
     set_periodic(1);
 }
 

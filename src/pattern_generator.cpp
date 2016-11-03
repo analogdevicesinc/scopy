@@ -119,62 +119,13 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt, QPushB
 
     int i = 0;
 
-    ConstantPatternUI *cp = new ConstantPatternUI(this);
-    NumberPatternUI *np = new NumberPatternUI(this);
-    BinaryCounterPatternUI *bcpu = new BinaryCounterPatternUI(this);
-    GrayCounterPatternUI *gcpu = new GrayCounterPatternUI(this);
-    ClockPatternUI *cpu = new ClockPatternUI(this);
-    PulsePatternUI *pu = new PulsePatternUI(this);
-    RandomPatternUI *rp = new RandomPatternUI(this);
-    UARTPatternUI *upu = new UARTPatternUI(this);
-    LFSRPatternUI *ppu = new LFSRPatternUI(this);
-    WalkingPatternUI *wpu = new WalkingPatternUI(this);
-    JohnsonCounterPatternUI *jcpu = new JohnsonCounterPatternUI(this);
-    patterns.push_back(dynamic_cast<PatternUI*>(cp));
-    patterns.push_back(dynamic_cast<PatternUI*>(np));
-    patterns.push_back(dynamic_cast<PatternUI*>(cpu));
-    patterns.push_back(dynamic_cast<PatternUI*>(pu));
-    patterns.push_back(dynamic_cast<PatternUI*>(bcpu));
-    patterns.push_back(dynamic_cast<PatternUI*>(gcpu));
-    patterns.push_back(dynamic_cast<PatternUI*>(rp));
-    patterns.push_back(dynamic_cast<PatternUI*>(jcpu));
-    patterns.push_back(dynamic_cast<PatternUI*>(upu));
-    patterns.push_back(dynamic_cast<PatternUI*>(ppu));
-    patterns.push_back(dynamic_cast<PatternUI*>(wpu));
+    PatternUIFactory::init();
 
-    for(auto &var : patterns)
+    for(auto var : PatternUIFactory::get_ui_list())
     {
-        ui->scriptCombo->addItem(QString::fromStdString(var->get_name()));
-        ui->scriptCombo->setItemData(i,QString::fromStdString(var->get_description()),Qt::ToolTipRole);
+        ui->scriptCombo->addItem(var);
+        ui->scriptCombo->setItemData(i, (PatternUIFactory::get_description_list())[i],Qt::ToolTipRole);
         i++;
-    }
-
-    QString searchPattern = "generator.json";
-    QDirIterator it("patterngenerator", QStringList() << searchPattern, QDir::Files, QDirIterator::Subdirectories);
-    while (it.hasNext())
-    {
-        QFile file;
-        QString filename = it.next();
-
-        file.setFileName(filename);
-        file.open(QIODevice::ReadOnly | QIODevice::Text);
-        QJsonDocument d = QJsonDocument::fromJson(file.readAll());
-        file.close();        
-        QJsonObject obj(d.object());
-
-        filename.chop(searchPattern.length());
-        obj.insert("filepath",filename);
-
-        if(obj["enabled"] == true)
-        {
-            ui->scriptCombo->addItem(obj["name"].toString());
-            if(obj.contains("description"))
-                ui->scriptCombo->setItemData(i,obj["description"].toString(),Qt::ToolTipRole);
-            i++;
-            JSPatternUI *jspu = new JSPatternUI(obj, this);
-            patterns.push_back(dynamic_cast<PatternUI*>(jspu));
-        }
-        qDebug()<<obj;
     }
 
     ui->sampleRateCombo->addItems(possibleSampleRates);
@@ -198,6 +149,7 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt, QPushB
     connect(ui->btnSettings , SIGNAL(pressed()), this, SLOT(toggleRightMenu()));
 
     buffer = new short[1];
+
 }
 
 PatternGenerator::~PatternGenerator()
@@ -341,7 +293,7 @@ void PatternGenerator::singleRunStop()
 void PatternGenerator::toggleRightMenu(QPushButton *btn)
 {
     bool open = !menuOpened;
- //   ui->rightWidget->toggleMenu(open); TEMP
+    //   ui->rightWidget->toggleMenu(open); TEMP
     this->menuOpened = open;
 }
 
@@ -376,28 +328,29 @@ void adiscope::PatternGenerator::on_generatePattern_clicked()
     }
 
     PatternUI *current;
-    current = patterns[ui->scriptCombo->currentIndex()];
-    current->parse_ui();
-    current->set_number_of_channels(get_nr_of_channels());
-    current->set_number_of_samples(get_nr_of_samples());
-    current->set_sample_rate(sample_rate);
+    current = currentUI;// patterns[ui->scriptCombo->currentIndex()];
+    if(current!=nullptr){
+        current->parse_ui();
+        current->set_number_of_channels(get_nr_of_channels());
+        current->set_number_of_samples(get_nr_of_samples());
+        current->set_sample_rate(sample_rate);
 
-    qDebug()<<"pregenerate status: "<<current->pre_generate();
-    qDebug()<<"minimum sampling frequency"<<current->get_min_sampling_freq(); // least common multiplier
-    current->set_sample_rate(current->get_min_sampling_freq()); // TEMP
-    qDebug()<<"minimum number of samples"<<current->get_required_nr_of_samples(); // if not periodic, verify minimum, else least common multiplier with least common freq
-    current->set_sample_rate(sample_rate);
+        qDebug()<<"pregenerate status: "<<current->pre_generate();
+        qDebug()<<"minimum sampling frequency"<<current->get_min_sampling_freq(); // least common multiplier
+        current->set_sample_rate(current->get_min_sampling_freq()); // TEMP
+        qDebug()<<"minimum number of samples"<<current->get_required_nr_of_samples(); // if not periodic, verify minimum, else least common multiplier with least common freq
+        current->set_sample_rate(sample_rate);
 
 
-    if(current->generate_pattern() != 0) {qDebug()<<"Pattern Generation failed";return;} //ERROR TEMPORARY
-    /*if(current->number_of_samples>(last_sample-start_sample)) {qDebug()<<"Warning! not enough buffer space to generate whole pattern";}
+        if(current->generate_pattern() != 0) {qDebug()<<"Pattern Generation failed";return;} //ERROR TEMPORARY
+        /*if(current->number_of_samples>(last_sample-start_sample)) {qDebug()<<"Warning! not enough buffer space to generate whole pattern";}
     else {last_sample = current->number_of_samples+start_sample;}*/
-    commitBuffer(current->get_buffer());
-    createBinaryBuffer();
-    current->delete_buffer();
-    dataChanged();
-    main_win->action_view_zoom_fit()->trigger();
-
+        commitBuffer(current->get_buffer());
+        createBinaryBuffer();
+        current->delete_buffer();
+        dataChanged();
+        main_win->action_view_zoom_fit()->trigger();
+    }
 }
 
 uint32_t adiscope::PatternGenerator::get_nr_of_samples()
@@ -476,16 +429,17 @@ void adiscope::PatternGenerator::on_generateUI_clicked()
     {
         currentUI->deinit();
         currentUI->setVisible(false);
-        currentUI->destroy_ui(); 
+        currentUI->destroy_ui();
+        delete currentUI;
+        currentUI = nullptr;
     }
-    currentUI = patterns[ui->scriptCombo->currentIndex()];
+    currentUI = PatternUIFactory::create_ui(ui->scriptCombo->currentIndex());
+
     currentUI->build_ui(ui->rightWidgetPage2);
     currentUI->init();
     currentUI->post_load_ui();
     currentUI->setVisible(true);
 }
-
-} /* namespace adiscope */
 
 void adiscope::PatternGenerator::on_save_PB_clicked()
 {
@@ -513,7 +467,6 @@ void adiscope::PatternGenerator::on_save_PB_clicked()
 
     savedsession.write(doc.toJson(QJsonDocument::Compact));
     savedsession.close();
-
 }
 
 void adiscope::PatternGenerator::update_ui()
@@ -557,4 +510,173 @@ void adiscope::PatternGenerator::on_load_PB_clicked()
     dataChanged();
     main_win->action_view_zoom_fit()->trigger();
 
+}
+
+
+int PatternUIFactory::static_ui_limit = 0;
+QStringList PatternUIFactory::ui_list = {};
+QStringList PatternUIFactory::description_list = {};
+QJsonObject PatternUIFactory::patterns = {};
+
+
+void PatternUIFactory::init()
+{
+    QJsonObject pattern_object;
+
+    ui_list.clear();
+    ui_list.append(ConstantPatternName);
+    description_list.append(ConstantPatternDescription);
+    ui_list.append(NumberPatternName);
+    description_list.append(NumberPatternDescription);
+    ui_list.append(ClockPatternName);
+    description_list.append(ClockPatternDescription);
+    ui_list.append(PulsePatternName);
+    description_list.append(PulsePatternDescription);
+    ui_list.append(RandomPatternName);
+    description_list.append(RandomPatternDescription);
+    ui_list.append(BinaryCounterPatternName);
+    description_list.append(BinaryCounterPatternDescription);
+    ui_list.append(GrayCounterPatternName);
+    description_list.append(GrayCounterPatternDescription);
+    ui_list.append(JohnsonCounterPatternName);
+    description_list.append(JohnsonCounterPatternDescription);
+    ui_list.append(WalkingCounterPatternName);
+    description_list.append(WalkingCounterPatternDescription);
+
+    static_ui_limit = ui_list.count();
+    QString searchPattern = "generator.json";
+    QDirIterator it("patterngenerator", QStringList() << searchPattern, QDir::Files, QDirIterator::Subdirectories);
+    int i = 0;
+    while (it.hasNext())
+    {
+        QFile file;
+        QString filename = it.next();
+
+        file.setFileName(filename);
+        file.open(QIODevice::ReadOnly | QIODevice::Text);
+        QJsonDocument d = QJsonDocument::fromJson(file.readAll());
+        file.close();
+        QJsonObject obj(d.object());
+
+        filename.chop(searchPattern.length());
+        obj.insert("filepath",filename);
+
+        if(obj["enabled"] == true)
+        {
+            ui_list.append(obj["name"].toString());
+            description_list.append(obj["description"].toString());
+            pattern_object.insert(QString::number(i),QJsonValue(obj));
+            i++;
+        }
+
+    }
+    patterns = pattern_object;
+    qDebug()<<patterns;
+}
+
+PatternUI* PatternUIFactory::create_ui(int index, QWidget *parent)
+{
+    switch(index){
+    case 0: return new ConstantPatternUI(parent);
+    case 1: return new NumberPatternUI(parent);
+    case 2: return new ClockPatternUI(parent);
+    case 3: return new PulsePatternUI(parent);
+    case 4: return new RandomPatternUI(parent);
+    case 5: return new BinaryCounterPatternUI(parent);
+    case 6: return new GrayCounterPatternUI(parent);
+    case 7: return new JohnsonCounterPatternUI(parent);
+    case 8: return new WalkingPatternUI(parent);
+    default:
+        if(index>=static_ui_limit)
+        {
+            return new JSPatternUI(patterns[QString::number(static_ui_limit-index)].toObject(), parent);
+        }
+        else
+        {
+            return nullptr;
+        }
+    }
+}
+
+QStringList PatternUIFactory::get_ui_list()
+{
+    return ui_list;
+}
+
+QStringList PatternUIFactory::get_description_list()
+{
+    return description_list;
+}
+
+ChannelManager::ChannelManager()
+{
+    for(auto i=0;i<16;i++)
+    {
+    channel_group.push_back(ChannelGroup(ChannelGroup::Channel(1<<i)));
+    }
+}
+
+void ChannelManager::split(int index)
+{
+    auto it = std::next(channel_group.begin(), index);
+    channel_group.insert(it + 1,channel_group[index].channels.begin(),channel_group[index].channels.end());
+    it = std::next(channel_group.begin(), index);
+    channel_group.erase(it);
+}
+
+void ChannelManager::join(std::vector<int> index)
+{
+    for(auto i=1;i<index.size();i++){
+        auto it = std::next(channel_group.begin(), index[i]);
+        channel_group[index[0]].append(channel_group[index[i]]);
+        channel_group.erase(it);
+        for(auto j=0;j<index.size();j++)
+        {
+            if(index[i] < index[j]) index[j]--;
+        }
+    }
+}
+
+ChannelManager::ChannelGroup::ChannelGroup(Channel ch)
+{
+    channels.push_back(ch);
+}
+
+uint16_t ChannelManager::ChannelGroup::get_mask()
+{
+    uint16_t mask = 0;
+    for(auto i=0;i<channels.size();i++)
+    {
+        mask = mask | channels[i].get_mask();
+    }
+    return mask;
+}
+
+void ChannelManager::ChannelGroup::append(ChannelGroup tojoin)
+{
+    for(auto i=0;i<tojoin.channels.size();i++)
+        channels.push_back(tojoin.channels[i]);
+}
+
+
+ChannelManager::ChannelGroup::Channel::Channel(uint16_t mask_)
+{
+    mask = mask_;
+}
+
+uint16_t ChannelManager::ChannelGroup::Channel::get_mask()
+{
+    return mask;
+}
+
+} /* namespace adiscope */
+
+void adiscope::PatternGenerator::on_CreateGroup_clicked()
+{
+    chm.join({3,2,5,7});
+}
+
+void adiscope::PatternGenerator::on_pushButton_clicked()
+{
+    chm.split(2);
 }

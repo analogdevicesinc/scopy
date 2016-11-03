@@ -39,6 +39,26 @@ namespace Ui {
 
 namespace adiscope {
 
+
+#define ConstantPatternName  "Constant Pattern"
+#define ConstantPatternDescription "Samples a constant 0 or 1 on the active channels"
+#define NumberPatternName "Number Pattern"
+#define NumberPatternDescription "Samples a constant number over the active channels"
+#define ClockPatternName "Clock Pattern"
+#define ClockPatternDescription "Clock pattern generator"
+#define PulsePatternName "Pulse Pattern"
+#define PulsePatternDescription "Pulse pattern generator"
+#define RandomPatternName "Random Pattern"
+#define RandomPatternDescription "Random pattern generator"
+#define BinaryCounterPatternName "Binary Counter Pattern"
+#define BinaryCounterPatternDescription "Binary counter pattern generator"
+#define GrayCounterPatternName "Gray Counter Pattern"
+#define GrayCounterPatternDescription "Gray counter pattern generator"
+#define JohnsonCounterPatternName "Johnson Counter Pattern"
+#define JohnsonCounterPatternDescription "Johnson counter pattern generator"
+#define WalkingCounterPatternName "Walking Counter Pattern"
+#define WalkingCounterPatternDescription "Walking counter pattern generator"
+
 // http://stackoverflow.com/questions/32040101/qjsengine-print-to-console
 class JSConsole : public QObject // for logging purposes in QJSEngine
 {
@@ -47,7 +67,6 @@ public:
     explicit JSConsole(QObject *parent = 0);
     Q_INVOKABLE void log(QString msg);
 };
-
 
 class Pattern
 {
@@ -82,6 +101,10 @@ public:
     virtual uint32_t get_required_nr_of_samples();
     virtual uint8_t generate_pattern() = 0;
     virtual void deinit();
+
+    virtual std::string toString();
+    virtual bool fromString(std::string from);
+
 };
 
 /*
@@ -108,14 +131,15 @@ class PatternUI : public QWidget, public virtual Pattern
 {
     Q_OBJECT
 public:
+
     PatternUI(QWidget *parent = 0);
     ~PatternUI();
+    //static PatternUI *create_ui(int index, QWidget *parent = 0);
     virtual void build_ui(QWidget *parent = 0);
     virtual void post_load_ui();
     virtual void parse_ui();
     virtual void destroy_ui();
 };
-
 
 /*
  * How to derive PatternUI
@@ -159,6 +183,10 @@ public:
     void set_increment(const uint16_t &value);
     uint16_t get_init_value() const;
     void set_init_value(const uint16_t &value);
+
+    std::string toString();
+    bool fromString(std::string from);
+
 };
 
 class BinaryCounterPatternUI : public PatternUI, public BinaryCounterPattern
