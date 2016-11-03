@@ -56,6 +56,7 @@ namespace Ui {
 	class OscGeneralSettings;
 	class ChannelSettings;
 	class MeasurementsPanel;
+	class CursorReadouts;
 }
 
 namespace adiscope {
@@ -121,6 +122,8 @@ namespace adiscope {
 		void onMeasurementDeactivated(int id, int chnIdx);
 		void onMeasurementSelectionListChanged();
 
+		void onCursorReadoutsChanged(struct cursorReadoutsText);
+
 	private:
 		OscADC adc;
 		unsigned int nb_channels, nb_math_channels;
@@ -137,6 +140,8 @@ namespace adiscope {
 		HistogramDisplayPlot hist_plot;
 		Ui::MeasurementsPanel *measure_panel_ui;
 		QWidget *measurePanel;
+		Ui::CursorReadouts *cursor_readouts_ui;
+		QWidget *cursorReadouts;
 
 		adiscope::scope_sink_f::sptr qt_time_block;
 		adiscope::scope_sink_f::sptr qt_fft_block;
@@ -205,6 +210,9 @@ namespace adiscope {
 		double pickSampleRateFor(double timeSpanSecs,
 					double desiredBufferSize);
 
+		void fillCursorReadouts(const struct cursorReadoutsText&);
+
+		void measure_panel_init();
 		void measure_settings_init();
 		void measureLabelsRearrange();
 		void measureUpdateValues();

@@ -42,6 +42,7 @@
 #include "ui_cursors_settings.h"
 #include "ui_osc_general_settings.h"
 #include "ui_measure_panel.h"
+#include "ui_cursor_readouts.h"
 #include "ui_oscilloscope.h"
 #include "ui_trigger.h"
 
@@ -242,13 +243,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 		iio->unlock();
 
 	/* Measure panel */
-	measurePanel = new QWidget(this);
-	measure_panel_ui = new Ui::MeasurementsPanel();
-	measure_panel_ui->setupUi(measurePanel);
-	measurePanel->hide();
-
-	connect(&plot, SIGNAL(measurementsAvailable()),
-		SLOT(onMeasuremetsAvailable()));
+	measure_panel_init();
 
 	/* Plot layout */
 
@@ -398,6 +393,10 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	connect(this, SIGNAL(selectedChannelChanged(int)),
 		&plot, SLOT(setSelectedChannel(int)));
 
+	connect(&plot,
+		SIGNAL(cursorReadoutsChanged(struct cursorReadoutsText)),
+		SLOT(onCursorReadoutsChanged(struct cursorReadoutsText)));
+
 	// Connections with Trigger Settings
 	connect(&trigger_settings, SIGNAL(triggerAenabled(bool)),
 		&plot, SLOT(setTriggerAEnabled(bool)));
@@ -434,10 +433,17 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 
 	Ui::CursorsSettings cr_ui;
 	cr_ui.setupUi(ui->cursorsSettings);
-	connect(cr_ui.vCursorsEnanble, SIGNAL(toggled(bool)),
-		&plot, SLOT(setVertCursorsEnabled(bool)));
 	connect(cr_ui.hCursorsEnanble, SIGNAL(toggled(bool)),
+		&plot, SLOT(setVertCursorsEnabled(bool)));
+	connect(cr_ui.vCursorsEnanble, SIGNAL(toggled(bool)),
 		&plot, SLOT(setHorizCursorsEnabled(bool)));
+
+	connect(cr_ui.hCursorsEnanble, SIGNAL(toggled(bool)),
+		cursor_readouts_ui->TimeCursors,
+		SLOT(setVisible(bool)));
+	connect(cr_ui.vCursorsEnanble, SIGNAL(toggled(bool)),
+		cursor_readouts_ui->VoltageCursors,
+		SLOT(setVisible(bool)));
 
 	if (nb_channels < 2)
 		gsettings_ui->XY_view->hide();
@@ -496,6 +502,7 @@ Oscilloscope::~Oscilloscope()
 	delete ch_ui;
 	delete gsettings_ui;
 	delete measure_panel_ui;
+	delete cursor_readouts_ui;
 	delete ui;
 }
 
@@ -889,6 +896,13 @@ void adiscope::Oscilloscope::onCursorsToggled(bool on)
 	}
 
 	plot.setMeasurementCursorsEnabled(on);
+
+	// Set the visibility of the cursor readouts owned by the Oscilloscope
+	QCheckBox *mbox = ui->measure_settings->itemAt(0)->widget()->
+		findChild<QCheckBox *>("box");
+	if (on)
+		plot.setCursorReadoutsVisible(!mbox->isChecked());
+	cursorReadouts->setVisible(on);
 }
 
 void adiscope::Oscilloscope::onMeasureToggled(bool on)
@@ -906,6 +920,10 @@ void adiscope::Oscilloscope::onMeasureToggled(bool on)
 		update_measure_for_channel(selectedChannel);
 	}
 	measurePanel->setVisible(on);
+
+	// Set the visibility of the cursor readouts owned by the plot
+	if (plot.measurementCursorsEnabled())
+		plot.setCursorReadoutsVisible(!on);
 }
 
 void Oscilloscope::updateTriggerSpinbox(double value)
@@ -1458,4 +1476,78 @@ void Oscilloscope::onMeasurementSelectionListChanged()
 		}
 	}
 	measureLabelsRearrange();
+}
+
+void Oscilloscope::onCursorReadoutsChanged(struct cursorReadoutsText data)
+{
+	fillCursorReadouts(data);
+}
+
+void Oscilloscope::fillCursorReadouts(const struct cursorReadoutsText& data)
+{
+	cursor_readouts_ui->cursorT1->setText(data.t1);
+	cursor_readouts_ui->cursorT2->setText(data.t2);
+	cursor_readouts_ui->timeDelta->setText(data.tDelta);
+	cursor_readouts_ui->frequencyDelta->setText(data.freq);
+	cursor_readouts_ui->cursorV1->setText(data.v1);
+	cursor_readouts_ui->cursorV2->setText(data.v2);
+	cursor_readouts_ui->voltageDelta->setText(data.vDelta);
+}
+
+void Oscilloscope::measure_panel_init()
+{
+	measurePanel = new QWidget(this);
+	measure_panel_ui = new Ui::MeasurementsPanel();
+	measure_panel_ui->setupUi(measurePanel);
+	measurePanel->hide();
+
+	connect(&plot, SIGNAL(measurementsAvailable()),
+		SLOT(onMeasuremetsAvailable()));
+
+	// The second CursorReadouts belongs to the Measure panel. The first
+	// one is drawn on top of the plot canvas.
+	cursorReadouts = new QWidget(measure_panel_ui->cursorReadouts);
+	cursor_readouts_ui = new Ui::CursorReadouts();
+	cursor_readouts_ui->setupUi(cursorReadouts);
+	cursor_readouts_ui->horizontalSpacer->changeSize(15, 0,
+		QSizePolicy::Fixed, QSizePolicy::Fixed);
+	cursor_readouts_ui->horizontalSpacer_2->changeSize(0, 0,
+		QSizePolicy::Fixed, QSizePolicy::Fixed);
+	cursor_readouts_ui->horizontalSpacer_3->changeSize(10, 0,
+		QSizePolicy::Fixed, QSizePolicy::Fixed);
+	cursor_readouts_ui->horizontalSpacer_4->changeSize(0, 0,
+		QSizePolicy::Fixed, QSizePolicy::Fixed);
+
+	cursor_readouts_ui->TimeCursors->setStyleSheet("QWidget {"
+		"background-color: transparent;"
+		"color: white;}");
+	cursor_readouts_ui->VoltageCursors->setStyleSheet("QWidget {"
+		"background-color: transparent;"
+		"color: white;}");
+
+	// Avoid labels jumping around to left or right by imposing a min width
+	QLabel *label = new QLabel(this);
+	label->setStyleSheet("font-size: 14px");
+	label->setText("-999.999 ns");
+	double minWidth = label->minimumSizeHint().width();
+	cursor_readouts_ui->cursorT1->setMinimumWidth(minWidth);
+	cursor_readouts_ui->cursorT2->setMinimumWidth(minWidth);
+	cursor_readouts_ui->timeDelta->setMinimumWidth(minWidth);
+	label->setText("-999.999 MHz");
+	minWidth = label->minimumSizeHint().width();
+	cursor_readouts_ui->frequencyDelta->setMinimumWidth(minWidth);
+	label->setText("-999.999 mV");
+	minWidth = label->minimumSizeHint().width();
+	cursor_readouts_ui->cursorV1->setMinimumWidth(minWidth);
+	cursor_readouts_ui->cursorV2->setMinimumWidth(minWidth);
+	cursor_readouts_ui->voltageDelta->setMinimumWidth(minWidth);
+	delete label;
+
+	QHBoxLayout *hLayout = static_cast<QHBoxLayout *>(
+		measure_panel_ui->cursorReadouts->layout());
+	if (hLayout)
+		hLayout->insertWidget(0, cursorReadouts);
+
+	fillCursorReadouts(plot.allCursorReadouts());
+	cursorReadouts->hide();
 }

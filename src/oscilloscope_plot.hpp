@@ -40,6 +40,16 @@ namespace adiscope {
 		~OscilloscopePlot();
 	};
 
+	struct cursorReadoutsText {
+		QString t1;
+		QString t2;
+		QString tDelta;
+		QString freq;
+		QString v1;
+		QString v2;
+		QString vDelta;
+	};
+
 	class CapturePlot: public OscilloscopePlot
 	{
 		Q_OBJECT
@@ -65,6 +75,7 @@ namespace adiscope {
 		int selectedChannel();
 		bool measurementsEnabled();
 		int channelToMeasure();
+		struct cursorReadoutsText allCursorReadouts() const;
 
 		void setOffsetWidgetVisible(int chnIdx, bool visible);
 		void removeOffsetWidgets(int chnIdx);
@@ -78,6 +89,7 @@ namespace adiscope {
 		void timeTriggerValueChanged(double);
 		void channelOffsetChanged(double);
 		void measurementsAvailable();
+		void cursorReadoutsChanged(struct cursorReadoutsText);
 
 	public Q_SLOTS:
 		void setTriggerAEnabled(bool en);
@@ -89,6 +101,7 @@ namespace adiscope {
 		void setMeasuremensEnabled(bool en);
 		void setPeriodDetectLevel(int chnIdx, double lvl);
 		void setPeriodDetectHyst(int chnIdx, double hyst);
+		void setCursorReadoutsVisible(bool en);
 
 	protected:
 		virtual void cleanUpJustBeforeChannelRemoval(int chnIdx);
@@ -156,6 +169,8 @@ namespace adiscope {
 		CursorReadouts *d_cursorReadouts;
 		MetricPrefixFormatter d_cursorMetricFormatter;
 	        TimePrefixFormatter d_cursorTimeFormatter;
+	        struct cursorReadoutsText d_cursorReadoutsText;
+	        bool d_cursorReadoutsVisible;
 
 	        QPen d_trigAactiveLinePen;
 	        QPen d_trigAinactiveLinePen;

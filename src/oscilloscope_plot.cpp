@@ -59,7 +59,8 @@ CapturePlot::CapturePlot(QWidget *parent,
 	d_triggerBEnabled(false),
 	d_measurementEnabled(false),
 	d_selected_channel(-1),
-	d_measurementsEnabled(false)
+	d_measurementsEnabled(false),
+	d_cursorReadoutsVisible(false)
 {
 	/* Initial colors scheme */
 	d_trigAactiveLinePen = QPen(QColor(255, 255, 255), 2, Qt::SolidLine);
@@ -314,16 +315,22 @@ void CapturePlot::onTimeCursor1Moved(double value)
 
 	text = d_cursorTimeFormatter.format(value, "", 3);
 	d_cursorReadouts->setTimeCursor1Text(text);
+	d_cursorReadoutsText.t1 = text;
 
 	double diff = value - d_vBar2->plotCoord().x();
 	text = d_cursorTimeFormatter.format(diff, "", 3);
 	d_cursorReadouts->setTimeDeltaText(text);
+	d_cursorReadoutsText.tDelta = text;
 
 	if (diff !=0 )
 		text = d_cursorMetricFormatter.format(1 / diff, "Hz", 3);
 	else
 		text = "Infinity";
 	d_cursorReadouts->setFreqDeltaText(text);
+	d_cursorReadoutsText.freq = text;
+
+	Q_EMIT cursorReadoutsChanged(d_cursorReadoutsText);
+
 }
 
 void CapturePlot::onTimeCursor2Moved(double value)
@@ -332,16 +339,21 @@ void CapturePlot::onTimeCursor2Moved(double value)
 
 	text = d_cursorTimeFormatter.format(value, "", 3);
 	d_cursorReadouts->setTimeCursor2Text(text);
+	d_cursorReadoutsText.t2 = text;
 
 	double diff = d_vBar1->plotCoord().x() - value;
 	text = d_cursorTimeFormatter.format(diff, "", 3);
 	d_cursorReadouts->setTimeDeltaText(text);
+	d_cursorReadoutsText.tDelta = text;
 
 	if (diff !=0 )
 		text = d_cursorMetricFormatter.format(1 / diff, "Hz", 3);
 	else
 		text = "Infinity";
 	d_cursorReadouts->setFreqDeltaText(text);
+	d_cursorReadoutsText.freq = text;
+
+	Q_EMIT cursorReadoutsChanged(d_cursorReadoutsText);
 }
 
 void CapturePlot::onVoltageCursor1Moved(double value)
@@ -350,10 +362,14 @@ void CapturePlot::onVoltageCursor1Moved(double value)
 
 	text = d_cursorMetricFormatter.format(value, "V", 3);
 	d_cursorReadouts->setVoltageCursor1Text(text);
+	d_cursorReadoutsText.v1 = text;
 
 	double diff = value - d_hBar2->plotCoord().y();
 	text = d_cursorMetricFormatter.format(diff, "V", 3);
 	d_cursorReadouts->setVoltageDeltaText(text);
+	d_cursorReadoutsText.vDelta = text;
+
+	Q_EMIT cursorReadoutsChanged(d_cursorReadoutsText);
 }
 
 void CapturePlot::onVoltageCursor2Moved(double value)
@@ -362,10 +378,14 @@ void CapturePlot::onVoltageCursor2Moved(double value)
 
 	text = d_cursorMetricFormatter.format(value, "V", 3);
 	d_cursorReadouts->setVoltageCursor2Text(text);
+	d_cursorReadoutsText.v2 = text;
 
 	double diff = d_hBar1->plotCoord().y() - value;
 	text = d_cursorMetricFormatter.format(diff, "V", 3);
 	d_cursorReadouts->setVoltageDeltaText(text);
+	d_cursorReadoutsText.vDelta = text;
+
+	Q_EMIT cursorReadoutsChanged(d_cursorReadoutsText);
 }
 
 QWidget * CapturePlot::topArea()
@@ -438,7 +458,8 @@ void CapturePlot::setVertCursorsEnabled(bool en)
 		d_vBar2->setVisible(en);
 		d_hCursorHandle1->setVisible(en);
 		d_hCursorHandle2->setVisible(en);
-		d_cursorReadouts->setTimeReadoutVisible(en);
+		d_cursorReadouts->setTimeReadoutVisible(en &&
+			d_cursorReadoutsVisible);
 	}
 }
 
@@ -455,13 +476,25 @@ void CapturePlot::setHorizCursorsEnabled(bool en)
 		d_hBar2->setVisible(en);
 		d_vCursorHandle1->setVisible(en);
 		d_vCursorHandle2->setVisible(en);
-		d_cursorReadouts->setVoltageReadoutVisible(en);
+		d_cursorReadouts->setVoltageReadoutVisible(en &&
+			d_cursorReadoutsVisible);
 	}
 }
 
 bool CapturePlot::horizCursorsEnabled()
 {
 	return d_horizCursorsEnabled;
+}
+
+void CapturePlot::setCursorReadoutsVisible(bool en)
+{
+	if (d_cursorReadoutsVisible != en) {
+		d_cursorReadoutsVisible = en;
+		d_cursorReadouts->setVoltageReadoutVisible(en &&
+			d_vertCursorsEnabled);
+		d_cursorReadouts->setTimeReadoutVisible(en &&
+			d_horizCursorsEnabled);
+	}
 }
 
 void CapturePlot::setSelectedChannel(int id)
@@ -680,4 +713,9 @@ void CapturePlot::setPeriodDetectHyst(int chnIdx, double hyst)
 	Measure *measure = measureOfChannel(chnIdx);
 	if (measure)
 		measure->setHysteresisSpan(hyst);
+}
+
+struct cursorReadoutsText CapturePlot::allCursorReadouts() const
+{
+	return d_cursorReadoutsText;
 }
