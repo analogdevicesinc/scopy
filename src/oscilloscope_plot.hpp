@@ -74,7 +74,6 @@ namespace adiscope {
 		bool horizCursorsEnabled();
 		int selectedChannel();
 		bool measurementsEnabled();
-		int channelToMeasure();
 		struct cursorReadoutsText allCursorReadouts() const;
 
 		void setOffsetWidgetVisible(int chnIdx, bool visible);
