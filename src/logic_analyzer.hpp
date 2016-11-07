@@ -20,24 +20,18 @@
 #ifndef LOGIC_ANALYZER_H
 #define LOGIC_ANALYZER_H
 
-#include <vector>
-
 /* Qt includes */
 #include <QWidget>
 #include <QPushButton>
 
-/* GNU Radio includes */
-#include <gnuradio/blocks/file_descriptor_sink.h>
-
 /* Local includes */
-#include "iio_manager.hpp"
 #include "filter.hpp"
-#include "streams_to_short.h"
 #include "pulseview/pv/widgets/sweeptimingwidget.hpp"
 #include "pulseview/pv/toolbars/mainbar.hpp"
 #include "pulseview/pv/devicemanager.hpp"
 #include "pulseview/pv/mainwindow.hpp"
 #include "spinbox_a.hpp"
+#include "pulseview/pv/devices/binarystream.hpp"
 
 using namespace pv;
 using namespace pv::toolbars;
@@ -57,8 +51,11 @@ namespace adiscope {
 		Q_OBJECT
 
 	public:
-		explicit LogicAnalyzer(struct iio_context *ctx, Filter* filt,
-				QPushButton *runButton, QWidget *parent = 0);
+		explicit LogicAnalyzer(struct iio_context *ctx,
+				Filter* filt,
+				QPushButton *runButton,
+				QWidget *parent = 0,
+				unsigned int sample_rate = 200000);
 		~LogicAnalyzer();
 
 	private Q_SLOTS:
@@ -77,25 +74,23 @@ namespace adiscope {
 
 		const std::string& dev_name;
 
-		boost::shared_ptr<iio_manager> manager;
-		iio_manager::port_id* ids;
 		struct iio_context *ctx;
 		struct iio_device *dev;
 		unsigned int no_channels;
 		unsigned int itemsize;
-		int fd;
-		adiscope::streams_to_short::sptr sink_streams_to_short;
-		gr::blocks::file_descriptor_sink::sptr sink_fd_block;
 		pv::MainWindow* main_win;
 
 		void disconnectAll();
 		static unsigned int get_no_channels(struct iio_device *dev);
-		void create_fifo();
 
 		void settings_panel_update(int id);
 		void toggleRightMenu(QPushButton *btn);
 
 		bool menuOpened;
+
+		std::map<std::string, Glib::VariantBase> options;
+		std::shared_ptr<pv::devices::BinaryStream> logic_analyzer_ptr;
+		struct iio_buffer *data_;
 	};
 }
 

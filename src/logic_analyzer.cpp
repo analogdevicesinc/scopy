@@ -48,15 +48,6 @@
 /* Boost includes */
 #include <boost/thread.hpp>
 
-#if _UNIX
-	#include <unistd.h>
-#endif
-#if _WIN32
-	#include <windows.h>
-	#include <io.h>
-#endif
-#define DATA_PIPE "/tmp/myfifo"
-
 using namespace std;
 using namespace adiscope;
 using namespace pv;
@@ -65,15 +56,17 @@ using namespace pv::widgets;
 using sigrok::Context;
 using namespace Glibmm;
 
-LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, Filter *filt,
-			QPushButton *runBtn, QWidget *parent) :
+LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
+		Filter *filt,
+		QPushButton *runBtn,
+		QWidget *parent,
+		unsigned int sample_rate) :
 	QWidget(parent),
 	dev_name(filt->device_name(TOOL_LOGIC_ANALYZER)),
 	ctx(ctx),
 	itemsize(sizeof(uint16_t)),
 	dev(iio_context_find_device(ctx, dev_name.c_str())),
 	menuOpened(false),
-	fd(-1),
 	settings_group(new QButtonGroup(this)),
 	menuRunButton(runBtn),
 	ui(new Ui::LogicAnalyzer)
@@ -100,11 +93,38 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, Filter *filt,
 	pv::MainWindow* w = new pv::MainWindow(device_manager, filt, open_file,
 						open_file_format, parent);
 
-	/* Gnuradio Blocks */
-	manager = iio_manager::get_instance(ctx, dev_name);
-	sink_streams_to_short = adiscope::streams_to_short::make(itemsize,
-								no_channels);
-	ids = new iio_manager::port_id[no_channels];
+	options["numchannels"] = Glib::Variant<gint32>(
+			g_variant_new_int32(no_channels),true);
+	options["samplerate"] = Glib::Variant<guint64>(
+			g_variant_new_uint64(sample_rate),true);
+
+
+	for(unsigned int j = 0; j < iio_device_get_channels_count(dev); j++) {
+		struct iio_channel *chn = iio_device_get_channel(dev, j);
+		if (!iio_channel_is_output(chn) &&
+				iio_channel_is_scan_element(chn))
+			iio_channel_enable(chn);
+	}
+
+	iio_device_attr_write_longlong(dev, "sampling_frequency", sample_rate);
+
+	/* 10 buffers, 10ms each -> 250ms before we lose data */
+	iio_device_set_kernel_buffers_count(dev, 25);
+
+	/* sample_rate / 100 -> 10ms */
+	data_ = iio_device_create_buffer(dev, sample_rate / 100, false);
+
+	if (!data_) {
+		printf("Could not create RX buffer");
+		printf("errno - %d ", errno);
+	}
+
+	auto logic_analyzer_ptr = std::make_shared<pv::devices::BinaryStream>(
+			device_manager.context(), data_,
+			w->get_format_from_string("binary"),
+			options);
+	w->select_device(logic_analyzer_ptr);
+
 
 	/* setup view */
 	main_win = w;
@@ -151,8 +171,6 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, Filter *filt,
 						QSizePolicy::Expanding));
 	ui->generalSettings->setLayout(vLayout);
 
-	int ret = mkfifo(DATA_PIPE, 0666);
-
 	connect(ui->btnRunStop, SIGNAL(toggled(bool)),
 			this, SLOT(startStop(bool)));
 	connect(runBtn, SIGNAL(toggled(bool)), ui->btnRunStop,
@@ -167,14 +185,6 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, Filter *filt,
 
 LogicAnalyzer::~LogicAnalyzer()
 {
-	if(manager)
-		this->startStop(false);
-	delete[] ids;
-	#ifdef _WIN32
-		system("pause");
-	#else
-		unlink(DATA_PIPE);
-	#endif
 	delete ui;
 	/* Destroy libsigrokdecode */
 	srd_exit();
@@ -182,41 +192,12 @@ LogicAnalyzer::~LogicAnalyzer()
 
 void LogicAnalyzer::startStop(bool start)
 {
+	main_win->run_stop();
+
 	if (start)
-	{
-		std::thread thr1 = std::thread(
-			&LogicAnalyzer::create_fifo, this);
-		main_win->run_stop();
-
-		if(thr1.joinable()) {
-			thr1.join();
-		}
-
-		this->sink_fd_block = gr::blocks::file_descriptor_sink::make(itemsize, fd);
-
-		/* connect the manager to the sink block: streams to short */
-		for (int i = 0; i < no_channels; i++) {
-			ids[i] = manager->connect(sink_streams_to_short, i, i, false);
-		}
-
-		/* connect the streams to short block to the file descriptor block */
-		manager->connect(sink_streams_to_short, 0, sink_fd_block, 0);
-
-		for ( int i = 0; i < no_channels; i++) {
-			manager->start(ids[i]);
-		}
 		ui->btnRunStop->setText("Stop");
-	}
 	else
-	{
-		if (manager->started()){
-			main_win->run_stop();
-			manager->stop_all();
-			manager->wait();
-			manager->disconnect_all();
-		}
 		ui->btnRunStop->setText("Run");
-	}
 }
 
 unsigned int LogicAnalyzer::get_no_channels(struct iio_device *dev)
@@ -231,39 +212,6 @@ unsigned int LogicAnalyzer::get_no_channels(struct iio_device *dev)
 		nb++;
 	}
 	return nb;
-}
-
-void LogicAnalyzer::create_fifo()
-{
-	#ifdef _WIN32
-		LPTSTR name = TEXT( "\\\\.\\pipe\\myfifo");
-		HANDLE pipe = CreateNamedPipe(
-			name, // name of the pipe
-			PIPE_ACCESS_OUTBOUND, // 1-way pipe -- send only
-			PIPE_TYPE_BYTE, // send data as a byte stream
-			1, // only allow 1 instance of this pipe
-			0, // no outbound buffer
-			0, // no inbound buffer
-			0, // use default wait time
-			NULL // use default security attributes
-		);
-
-		fd = _open_osfhandle((long)pipe, O_WRONLY);
-
-		if (pipe == NULL || pipe == INVALID_HANDLE_VALUE) {
-			printf("Failed to create outbound pipe instance.");
-			system("pause");
-		}
-
-		BOOL result = ConnectNamedPipe(pipe, NULL);
-		if (!result) {
-			printf("Failed to make connection on named pipe.");
-			CloseHandle(pipe); // close the pipe
-			system("pause");
-		}
-	#else
-		fd = open(DATA_PIPE, O_WRONLY);
-	#endif
 }
 
 void LogicAnalyzer::toggleRightMenu(QPushButton *btn)
