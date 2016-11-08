@@ -25,16 +25,16 @@
 
 
 namespace Ui {
-    class BinaryCounterPatternUI;
-    class UARTPatternUI;
-    class LFSRPatternUI;
-    class ClockPatternUI;
-    class GenericJSPatternUI;
-    class ConstantPatternUI;
-    class NumberPatternUI;
-    class FrequencyPatternUI;
-    class PulsePatternUI;
-    class WalkingPatternUI;
+class BinaryCounterPatternUI;
+class UARTPatternUI;
+class LFSRPatternUI;
+class ClockPatternUI;
+class GenericJSPatternUI;
+class ConstantPatternUI;
+class NumberPatternUI;
+class FrequencyPatternUI;
+class PulsePatternUI;
+class WalkingPatternUI;
 }
 
 namespace adiscope {
@@ -252,6 +252,22 @@ public:
 
 class UARTPattern : virtual public Pattern
 {
+
+    /** Parity settings. */
+    enum sp_parity {
+        /** Special value to indicate setting should be left alone. */
+        SP_PARITY_INVALID = -1,
+        /** No parity. */
+        SP_PARITY_NONE = 0,
+        /** Odd parity. */
+        SP_PARITY_ODD = 1,
+        /** Even parity. */
+        SP_PARITY_EVEN = 2,
+        /** Mark parity. */
+        SP_PARITY_MARK = 3,
+        /** Space parity. */
+        SP_PARITY_SPACE = 4
+    };
 protected:
     std::string str;
     bool msb_first;
@@ -376,7 +392,7 @@ public:
     void build_ui(QWidget *parent = 0);
     void parse_ui();
     void destroy_ui();
-/*private Q_SLOTS:
+    /*private Q_SLOTS:
     void on_setLFSRParameters_clicked();*/
 };
 

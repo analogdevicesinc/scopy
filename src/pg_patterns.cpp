@@ -5,7 +5,6 @@
 #include <QtQml/QQmlEngine>
 #include <QPushButton>
 
-#include <libserialport.h>
 
 #include <QJsonDocument>
 
@@ -15,7 +14,6 @@ using namespace std;
 using namespace adiscope;
 
 namespace adiscope {
-
 
 JSConsole::JSConsole(QObject *parent) :
     QObject(parent)
