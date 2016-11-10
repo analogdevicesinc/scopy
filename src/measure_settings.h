@@ -45,6 +45,12 @@ private:
 	int m_chn_id;
 };
 
+struct StatisticSelection {
+	DropdownSwitchList *dropdown;
+	int posInDropdown;
+	MeasurementItem measurementItem;
+};
+
 class MeasureSettings : public QWidget
 {
 	Q_OBJECT
@@ -67,12 +73,18 @@ public:
 	void setEmitStatsChanged(bool en);
 
 	QList<MeasurementItem> measurementSelection();
+	QList<MeasurementItem> statisticSelection();
 
 Q_SIGNALS:
-	void measurementStatsChanged(const QString& name, bool en);
 	void measurementActivated(int id, int chIdx);
 	void measurementDeactivated(int id, int chIdx);
 	void measurementSelectionListChanged();
+
+	void statisticActivated(int id, int chIdx);
+	void statisticDeactivated(int id, int chIdx);
+	void statisticSelectionListChanged();
+	void statisticsEnabled(bool en);
+	void statisticsReset();
 
 public Q_SLOTS:
 	void onChannelAdded(int);
@@ -84,6 +96,11 @@ private Q_SLOTS:
 	void on_button_measDisplayAll_toggled(bool checked);
 	void on_button_measDeleteAll_toggled(bool checked);
 	void onMeasurementActivated(int id, bool en);
+	void onStatisticActivated(DropdownSwitchList *dropdown, int pos, int id,
+		 bool en);
+	void on_button_StatisticsEn_toggled(bool checked);
+	void on_button_StatisticsReset_pressed();
+	void on_button_statsDeleteAll_toggled(bool checked);
 
 private:
 	void addHorizontalMeasurement(const QString& name, int measurement_id);
@@ -94,6 +111,15 @@ private:
 	void recoverAllMeasurements();
 	void displayAllMeasurements();
 	void disableDisplayAllMeasurements();
+	void loadStatisticStatesForChannel(int chnIdx);
+	void setColumnData(QStandardItemModel *model, int column, bool en);
+	void setAllMeasurements(int col, bool en);
+	void deleteMeasurementsOfChannel(QList<MeasurementItem>& list,
+		int chnIdx);
+	void deleteStatisticsOfChannel(QList<struct StatisticSelection>&
+		list, int chnIdx);
+	void deleteAllStatistics();
+	void recoverAllStatistics();
 
 private:
 	Ui::MeasureSettings *m_ui;
@@ -104,6 +130,7 @@ private:
 	bool m_emitActivated;
 	bool m_emitStatsChanged;
 	bool m_emitDeleteAll;
+	bool m_emitStatsDeleteAll;
 	bool m_are_dropdowns_filled;
 
 	CapturePlot* m_plot;
@@ -111,6 +138,9 @@ private:
 	QList<MeasurementItem> m_selectedMeasurements;
 	QList<MeasurementItem> m_deleteAllBackup;
 	QList<MeasurementItem> m_displayAllBackup;
+
+	QList<struct StatisticSelection> m_selectedStatistics;
+	QList<struct StatisticSelection> m_statsDeleteAllBackup;
 };
 } // namespace adiscope
 
