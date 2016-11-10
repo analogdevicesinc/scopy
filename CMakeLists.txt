@@ -125,7 +125,6 @@ link_directories(
 )
 
 FILE(GLOB SRC_LIST  src/*.cpp src/*.cc
-	src/pulseview/*.cpp
 	src/pulseview/pv/*.cpp
 	src/pulseview/pv/binding/*.cpp
 	src/pulseview/pv/data/*.cpp
