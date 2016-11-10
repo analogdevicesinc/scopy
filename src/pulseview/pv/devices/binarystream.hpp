@@ -38,7 +38,8 @@ class BinaryStream final : public Device
 
 public:
 	BinaryStream(const std::shared_ptr<sigrok::Context> &context,
-		     struct iio_buffer *data,
+		     struct iio_device *data,
+		     size_t buffersize,
 		     std::shared_ptr<sigrok::InputFormat> format,
 		     const std::map<std::string, Glib::VariantBase> &options);
 	~BinaryStream();
@@ -70,9 +71,11 @@ private:
 	const std::map<std::string, Glib::VariantBase> options_;
 	std::shared_ptr<sigrok::Input> input_;
 	struct iio_buffer *data_;
+	struct iio_device *dev_;
 	void shutdown();
 	std::ifstream *f;
 	std::atomic<bool> interrupt_;
+	size_t buffersize_;
 };
 
 } // namespace devices

@@ -90,7 +90,6 @@ namespace adiscope {
 
 		std::map<std::string, Glib::VariantBase> options;
 		std::shared_ptr<pv::devices::BinaryStream> logic_analyzer_ptr;
-		struct iio_buffer *data_;
 	};
 }
 

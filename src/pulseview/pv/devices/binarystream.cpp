@@ -30,16 +30,19 @@ namespace pv {
 namespace devices {
 
 BinaryStream::BinaryStream(const std::shared_ptr<sigrok::Context> &context,
-			   struct iio_buffer *data,
+			   struct iio_device *dev,
+			   size_t buffersize,
 			   std::shared_ptr<sigrok::InputFormat> format,
 			   const std::map<std::string, Glib::VariantBase> &options) :
 	context_(context),
-	data_(data),
+	dev_(dev),
 	format_(format),
 	options_(options),
-	interrupt_(false)
+	interrupt_(false),
+	buffersize_(buffersize)
 {
-
+	/* 10 buffers, 10ms each -> 250ms before we lose data */
+	iio_device_set_kernel_buffers_count(dev_, 25);
 }
 
 BinaryStream::~BinaryStream() {
@@ -93,7 +96,12 @@ std::string BinaryStream::display_name(const DeviceManager&) const
 
 void BinaryStream::start()
 {
-	qDebug() << "binary stream started\n";
+	/* sample_rate / 100 -> 10ms */
+	data_ = iio_device_create_buffer(dev_, buffersize_, false);
+
+	if (!data_) {
+		throw std::runtime_error("Could not create RX buffer");
+	}
 }
 
 void BinaryStream::run()
@@ -126,6 +134,7 @@ void BinaryStream::shutdown() {
 void BinaryStream::stop()
 {
 	interrupt_ = true;
+	iio_buffer_destroy(data_);
 	qDebug() << "binary stream stopped\n";
 }
 

@@ -108,19 +108,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 
 	iio_device_attr_write_longlong(dev, "sampling_frequency", sample_rate);
 
-	/* 10 buffers, 10ms each -> 250ms before we lose data */
-	iio_device_set_kernel_buffers_count(dev, 25);
-
-	/* sample_rate / 100 -> 10ms */
-	data_ = iio_device_create_buffer(dev, sample_rate / 100, false);
-
-	if (!data_) {
-		printf("Could not create RX buffer");
-		printf("errno - %d ", errno);
-	}
-
 	auto logic_analyzer_ptr = std::make_shared<pv::devices::BinaryStream>(
-			device_manager.context(), data_,
+			device_manager.context(), dev, sample_rate / 100,
 			w->get_format_from_string("binary"),
 			options);
 	w->select_device(logic_analyzer_ptr);
