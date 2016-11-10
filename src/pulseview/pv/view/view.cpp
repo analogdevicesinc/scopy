@@ -674,15 +674,15 @@ void View::update_scroll()
 	updating_scroll_ = false;
 
 	// Set the vertical scrollbar
-	verticalScrollBar()->setPageStep(areaSize.height());
-	verticalScrollBar()->setSingleStep(areaSize.height() / 8);
+	verticalScrollBar()->setPageStep(viewport_->height());
+	verticalScrollBar()->setSingleStep(viewport_->height() / 8);
 
 	const pair<int, int> extents = v_extents();
 
 	// Don't change the scrollbar range if there are no traces
 	if (extents.first != extents.second)
-		verticalScrollBar()->setRange(extents.first - areaSize.height(),
-			extents.second);
+		verticalScrollBar()->setRange(extents.first,
+			extents.second - viewport_->height() + 10);
 
 	if (scroll_needs_defaults)
 		set_scroll_default();
