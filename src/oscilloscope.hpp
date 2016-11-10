@@ -56,6 +56,7 @@ namespace Ui {
 	class OscGeneralSettings;
 	class ChannelSettings;
 	class MeasurementsPanel;
+	class StatisticsPanel;
 	class CursorReadouts;
 }
 
@@ -122,6 +123,12 @@ namespace adiscope {
 		void onMeasurementDeactivated(int id, int chnIdx);
 		void onMeasurementSelectionListChanged();
 
+		void onStatisticActivated(int id, int chnIdx);
+		void onStatisticDeactivated(int id, int chnIdx);
+		void onStatisticSelectionListChanged();
+		void onStatisticsEnabled(bool on);
+		void onStatisticsReset();
+
 		void onCursorReadoutsChanged(struct cursorReadoutsText);
 
 	private:
@@ -142,6 +149,8 @@ namespace adiscope {
 		QWidget *measurePanel;
 		Ui::CursorReadouts *cursor_readouts_ui;
 		QWidget *cursorReadouts;
+		Ui::StatisticsPanel *statistics_panel_ui;
+		QWidget *statisticsPanel;
 
 		adiscope::scope_sink_f::sptr qt_time_block;
 		adiscope::scope_sink_f::sptr qt_fft_block;
@@ -164,6 +173,7 @@ namespace adiscope {
 		PositionSpinButton *voltsPosition;
 
 		bool fft_is_visible, hist_is_visible, xy_is_visible;
+		bool statistics_enabled;
 
 		int fft_size;
 
@@ -188,6 +198,9 @@ namespace adiscope {
 
 		QList<std::shared_ptr<MeasurementData>> measurements_data;
 		QList<std::shared_ptr<MeasurementGui>> measurements_gui;
+
+		QList<QPair<std::shared_ptr<MeasurementData>,
+			Statistic>> statistics_data;
 
 		static const unsigned long maxBufferSize;
 
@@ -217,6 +230,13 @@ namespace adiscope {
 		void measureLabelsRearrange();
 		void measureUpdateValues();
 		void measureCreateAndAppendGuiFrom(const MeasurementData&);
+
+		void statistics_panel_init();
+		void statisticsUpdateValues();
+		void statisticsReset();
+		void statisticsUpdateGui();
+		void statisticsUpdateGuiTitleColor();
+		void statisticsUpdateGuiPosIndex();
 	};
 }
 

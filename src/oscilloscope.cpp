@@ -33,6 +33,7 @@
 #include "dynamicWidget.hpp"
 #include "measurement_gui.h"
 #include "measure_settings.h"
+#include "statistic_widget.h"
 
 /* Generated UI */
 #include "ui_math_panel.h"
@@ -42,6 +43,7 @@
 #include "ui_cursors_settings.h"
 #include "ui_osc_general_settings.h"
 #include "ui_measure_panel.h"
+#include "ui_statistics_panel.h"
 #include "ui_cursor_readouts.h"
 #include "ui_oscilloscope.h"
 #include "ui_trigger.h"
@@ -73,6 +75,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	hist_ids(new iio_manager::port_id[nb_channels]),
 	xy_ids(new iio_manager::port_id[nb_channels & ~1]),
 	fft_is_visible(false), hist_is_visible(false), xy_is_visible(false),
+	statistics_enabled(false),
 	triggerDelay(0),
 	selectedChannel(-1),
 	menuOpened(false), current_channel(0), math_chn_counter(0),
@@ -245,6 +248,9 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	/* Measure panel */
 	measure_panel_init();
 
+	/* Statistics panel */
+	statistics_panel_init();
+
 	/* Plot layout */
 
 	/* Top transparent widget */
@@ -255,6 +261,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	ui->gridLayoutPlot->addWidget(&plot, 2, 1, 1, 1);
 	ui->gridLayoutPlot->addWidget(plot.rightHandlesArea(), 1, 2, 3, 1);
 	ui->gridLayoutPlot->addWidget(plot.bottomHandlesArea(), 3, 0, 1, 3);
+	ui->gridLayoutPlot->addWidget(statisticsPanel, 4, 1, 1, 1);
 
 	/* Default plot settings */
 	plot.setSampleRate(adc.sampleRate(), 1, "");
@@ -1275,6 +1282,11 @@ void Oscilloscope::update_chn_settings_panel(int id, QWidget *chn_widget)
 void Oscilloscope::onMeasuremetsAvailable()
 {
 	measureUpdateValues();
+
+	if (statistics_enabled) {
+		statisticsUpdateValues();
+		statisticsUpdateGui();
+	}
 }
 
 void Oscilloscope::update_measure_for_channel(int ch_idx)
@@ -1376,21 +1388,38 @@ void Oscilloscope::measure_settings_init()
 
 	connect(measure_settings,
 		SIGNAL(measurementActivated(int, int)),
-		SLOT(onMeasurementActivated(int,int)));
+		SLOT(onMeasurementActivated(int, int)));
 
 	connect(measure_settings,
 		SIGNAL(measurementDeactivated(int, int)),
-		SLOT(onMeasurementDeactivated(int,int)));
+		SLOT(onMeasurementDeactivated(int, int)));
 
 	connect(measure_settings,
 		SIGNAL(measurementSelectionListChanged()),
 		SLOT(onMeasurementSelectionListChanged()));
+
+	connect(measure_settings,
+		SIGNAL(statisticActivated(int, int)),
+		SLOT(onStatisticActivated(int, int)));
+	connect(measure_settings,
+		SIGNAL(statisticDeactivated(int, int)),
+		SLOT(onStatisticDeactivated(int, int)));
+
+	connect(measure_settings, SIGNAL(statisticsEnabled(bool)),
+		SLOT(onStatisticsEnabled(bool)));
+
+	connect(measure_settings, SIGNAL(statisticsReset()),
+		SLOT(onStatisticsReset()));
 
 	connect(&plot, SIGNAL(channelAdded(int)),
 		measure_settings, SLOT(onChannelAdded(int)));
 
 	connect(this, SIGNAL(selectedChannelChanged(int)),
 		measure_settings, SLOT(setSelectedChannel(int)));
+
+	connect(measure_settings,
+		SIGNAL(statisticSelectionListChanged()),
+		SLOT(onStatisticSelectionListChanged()));
 
 	QWidget *measure_widget = new QWidget(this);
 	Ui::Channel measure_ui;
@@ -1550,4 +1579,158 @@ void Oscilloscope::measure_panel_init()
 
 	fillCursorReadouts(plot.allCursorReadouts());
 	cursorReadouts->hide();
+}
+
+void Oscilloscope::statistics_panel_init()
+{
+	statisticsPanel = new QWidget(this);
+	statistics_panel_ui = new Ui::StatisticsPanel();
+	statistics_panel_ui->setupUi(statisticsPanel);
+	QHBoxLayout *hLayout = new QHBoxLayout(statistics_panel_ui->statistics);
+	hLayout->setContentsMargins(0, 0, 0, 0);
+	hLayout->setSpacing(25);
+	statisticsPanel->hide();
+}
+
+void Oscilloscope::statisticsUpdateValues()
+{
+	for (int i = 0; i < statistics_data.size(); i++) {
+		if (!statistics_data[i].first->enabled())
+			continue;
+		double meas_data = statistics_data[i].first->value();
+		statistics_data[i].second.pushNewData(meas_data);
+	}
+}
+
+void Oscilloscope::statisticsReset()
+{
+	for (int i = 0; i < statistics_data.size(); i++)
+		statistics_data[i].second.clear();
+}
+
+void Oscilloscope::statisticsUpdateGui()
+{
+	QList<StatisticWidget *>statistics = statistics_panel_ui->
+		statistics->findChildren<StatisticWidget *>(
+			QString("Statistic"), Qt::FindDirectChildrenOnly);
+	for (int i = 0; i < statistics.size(); i++)
+		statistics[i]->updateStatistics(statistics_data[i].second);
+}
+
+void Oscilloscope::statisticsUpdateGuiTitleColor()
+{
+	QList<StatisticWidget *>statistics = statistics_panel_ui->
+		statistics->findChildren<StatisticWidget *>(
+			QString("Statistic"), Qt::FindDirectChildrenOnly);
+	for (int i = 0; i < statistics.size(); i++)
+		statistics[i]->setTitleColor(plot.getLineColor(
+			statistics[i]->channelId()));
+}
+
+void Oscilloscope::statisticsUpdateGuiPosIndex()
+{
+	QList<StatisticWidget *>statistics = statistics_panel_ui->
+		statistics->findChildren<StatisticWidget *>(
+			QString("Statistic"), Qt::FindDirectChildrenOnly);
+	for (int i = 0; i < statistics.size(); i++)
+		statistics[i]->setPositionIndex(i + 1);
+}
+
+void Oscilloscope::onStatisticActivated(int id, int chnIdx)
+{
+	std::shared_ptr<MeasurementData> pmd = plot.measurement(id, chnIdx);
+	if (!pmd)
+		return;
+
+	statistics_data.push_back(QPair<std::shared_ptr<MeasurementData>,
+		Statistic>(pmd, Statistic()));
+
+	/* Add a widget for the new statistic */
+	QWidget *statisticContainer = statistics_panel_ui->statistics;
+	QHBoxLayout *hLayout = static_cast<QHBoxLayout *>
+		(statisticContainer->layout());
+
+	StatisticWidget *statistic = new StatisticWidget(statisticContainer);
+	statistic->initForMeasurement(*pmd);
+	statistic->setTitleColor(plot.getLineColor(chnIdx));
+	statistic->setPositionIndex(statistics_data.size());
+	statistic->updateStatistics(statistics_data.last().second);
+	hLayout->addWidget(statistic);
+}
+
+void Oscilloscope::onStatisticDeactivated(int id, int chnIdx)
+{
+	std::shared_ptr<MeasurementData> pmd = plot.measurement(id, chnIdx);
+	if (!pmd)
+		return;
+
+	QString name = pmd->name();
+
+	auto it = std::find_if(statistics_data.begin(), statistics_data.end(),
+		[&](QPair<std::shared_ptr<MeasurementData>, Statistic> pair) {
+			return pair.first->name() == name &&
+				pair.first->channel() == chnIdx;
+		});
+	if (it != statistics_data.end()) {
+		statistics_data.erase(it);
+	}
+
+	/* remove the widget corresponding to the statistic we deleted */
+	QList<StatisticWidget *>statistics = statistics_panel_ui->statistics->
+		findChildren<StatisticWidget *>(QString("Statistic"),
+		Qt::FindDirectChildrenOnly);
+
+	auto stat_it = std::find_if(statistics.begin(), statistics.end(),
+		[=](StatisticWidget *statistic){
+			return statistic->title() == name &&
+				statistic->channelId() == chnIdx;
+		});
+	if (stat_it != statistics.end()) {
+		QWidget *w = static_cast<QWidget *> (*stat_it);
+		statisticsPanel->hide(); // Avoid flickers
+		statistics_panel_ui->statistics->layout()->removeWidget(w);
+		delete w;
+		statisticsPanel->show();
+
+		statisticsUpdateGuiPosIndex();
+	}
+}
+
+void Oscilloscope::onStatisticSelectionListChanged()
+{
+	// Clear all statistics in list
+	statistics_data.clear();
+
+	QList<StatisticWidget *>statistics = statistics_panel_ui->statistics->
+		findChildren<StatisticWidget *>(QString("Statistic"),
+		Qt::FindDirectChildrenOnly);
+	for (int i = 0; i < statistics.size(); i++) {
+		statistics_panel_ui->statistics->layout()->removeWidget(
+			statistics[i]);
+		delete statistics[i];
+	}
+
+	// Use the new list from MeasureSettings
+	auto newList = measure_settings->statisticSelection();
+	for (int i = 0; i < newList.size(); i++)
+		onStatisticActivated(newList[i].id(), newList[i].channel_id());
+	statisticsUpdateGui();
+
+}
+
+void Oscilloscope::onStatisticsEnabled(bool on)
+{
+	statistics_enabled = on;
+	statisticsPanel->setVisible(on);
+
+	if (!on)
+		statisticsReset();
+	else
+		statisticsUpdateGui();
+}
+
+void Oscilloscope::onStatisticsReset()
+{
+	statisticsReset();
+	statisticsUpdateGui();
 }
