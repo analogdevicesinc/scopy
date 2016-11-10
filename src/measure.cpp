@@ -840,3 +840,63 @@ MeasurementData::axisType MeasurementData::axis() const
 {
 	return m_axis;
 }
+
+/*
+ * Class Statistic implementation
+ */
+
+Statistic::Statistic():
+	m_sum(0),
+	m_min(0),
+	m_max(0),
+	m_dataCount(0),
+	m_average(0)
+{
+}
+
+void Statistic::pushNewData(double data)
+{
+	m_sum += data;
+
+	if (!m_dataCount) {
+		m_min = data;
+		m_max = data;
+	} else {
+		if (data < m_min)
+			m_min = data;
+		else if (data > m_max)
+			m_max = data;
+	}
+
+	m_dataCount += 1;
+	m_average = m_sum / m_dataCount;
+}
+
+void Statistic::clear()
+{
+	m_sum = 0;
+	m_min = 0;
+	m_max = 0;
+	m_dataCount = 0;
+	m_average = 0;
+}
+
+double Statistic::average() const
+{
+	return m_average;
+}
+
+double Statistic::min() const
+{
+	return m_min;
+}
+
+double Statistic::max() const
+{
+	return m_max;
+}
+
+double Statistic::numPushedData() const
+{
+	return m_dataCount;
+}

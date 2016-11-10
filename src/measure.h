@@ -131,6 +131,27 @@ namespace adiscope {
 
 		QList<std::shared_ptr<MeasurementData>> m_measurements;
 	};
+
+	class Statistic
+	{
+	public:
+		Statistic();
+
+		void pushNewData(double data);
+		void clear();
+
+		double average() const;
+		double min() const;
+		double max() const;
+		double numPushedData() const;
+
+	private:
+		double m_sum;
+		double m_min;
+		double m_max;
+		double m_dataCount;
+		double m_average;
+	};
 }
 
 #endif // MEASURE_H
