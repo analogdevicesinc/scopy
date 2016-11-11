@@ -21,13 +21,6 @@
      </property>
     </widget>
    </item>
-   <item row="7" column="0">
-    <widget class="QPushButton" name="setLFSRParameters">
-     <property name="text">
-      <string>Set LFSR Parameters</string>
-     </property>
-    </widget>
-   </item>
    <item row="6" column="0">
     <widget class="QLineEdit" name="polyPeriod">
      <property name="readOnly">
