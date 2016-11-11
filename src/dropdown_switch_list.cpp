@@ -78,10 +78,10 @@ DropdownSwitchList::DropdownSwitchList(int switchColCount, QWidget *parent):
 	m_treeView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	m_treeView->header()->setStretchLastSection(false);
 	m_treeView->setAllColumnsShowFocus(false);
-	m_treeView->setRootIsDecorated(true);
+	m_treeView->setRootIsDecorated(false);
 	m_treeView->setUniformRowHeights(true);
 	m_treeView->header()->setSectionResizeMode(0, QHeaderView::Fixed);
-	m_treeView->header()->setDefaultAlignment(Qt::AlignLeft);
+	m_treeView->header()->setDefaultAlignment(Qt::AlignCenter);
 
 	QFile file(":stylesheets/stylesheets/dropdown_switch_list.qss");
 	file.open(QFile::ReadOnly);

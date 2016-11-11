@@ -8,6 +8,29 @@
 
 using namespace adiscope;
 
+static const std::map<int, QString> icons_lut = {
+	{Measure::PERIOD, "://icons/measurements/period.svg"},
+	{Measure::FREQUENCY, "://icons/measurements/frequency.svg"},
+	{Measure::MIN, "://icons/measurements/min.svg"},
+	{Measure::MAX, "://icons/measurements/max.svg"},
+	{Measure::PEAK_PEAK, "://icons/measurements/peak_to_peak.svg"},
+	{Measure::MEAN, "://icons/measurements/mean.svg"},
+	{Measure::RMS, "://icons/measurements/rms.svg"},
+	{Measure::AC_RMS, "://icons/measurements/rms.svg"},
+	{Measure::LOW, "://icons/measurements/low.svg"},
+	{Measure::HIGH, "://icons/measurements/high.svg"},
+	{Measure::AMPLITUDE, "://icons/measurements/amplitude.svg"},
+	{Measure::MIDDLE, "://icons/measurements/middle.svg"},
+	{Measure::P_OVER, "://icons/measurements/p_overshoot.svg"},
+	{Measure::N_OVER, "://icons/measurements/n_overshoot.svg"},
+	{Measure::RISE, "://icons/measurements/rise_time.svg"},
+	{Measure::FALL, "://icons/measurements/fall_time.svg"},
+	{Measure::P_WIDTH, "://icons/measurements/p_width.svg"},
+	{Measure::N_WIDTH, "://icons/measurements/n_width.svg"},
+	{Measure::P_DUTY, "://icons/measurements/p_duty.svg"},
+	{Measure::N_DUTY, "://icons/measurements/n_duty.svg"},
+};
+
 MeasureSettings::MeasureSettings(CapturePlot *plot, QWidget *parent) :
 	QWidget(parent),
 	m_ui(new Ui::MeasureSettings),
@@ -35,8 +58,8 @@ MeasureSettings::MeasureSettings(CapturePlot *plot, QWidget *parent) :
 	m_horizMeasurements->setColumnTitle(2, "Stats");
 	m_horizMeasurements->setMaxVisibleItems(4);
 	treeView = static_cast<QTreeView *>(m_horizMeasurements->view());
-	treeView->header()->resizeSection(0, 115);
-	treeView->setIconSize(QSize(24, 24));
+	treeView->header()->resizeSection(0, 122);
+	treeView->setIconSize(QSize(30, 20));
 
 	connect(m_horizMeasurements->model(),
 		SIGNAL(itemChanged(QStandardItem*)),
@@ -48,8 +71,8 @@ MeasureSettings::MeasureSettings(CapturePlot *plot, QWidget *parent) :
 	m_vertMeasurements->setColumnTitle(2, "Stats");
 	m_vertMeasurements->setMaxVisibleItems(4);
 	treeView = static_cast<QTreeView *>(m_vertMeasurements->view());
-	treeView->header()->resizeSection(0, 115);
-	treeView->setIconSize(QSize(24, 24));
+	treeView->header()->resizeSection(0, 122);
+	treeView->setIconSize(QSize(30, 20));
 
 	connect(m_vertMeasurements->model(),
 		SIGNAL(itemChanged(QStandardItem*)),
@@ -85,8 +108,8 @@ void MeasureSettings::addHorizontalMeasurement(const QString& name,
 	int measurement_id)
 {
 	setEmitActivated(false);
-	m_horizMeasurements->addDropdownElement(QIcon(), name,
-		QVariant(measurement_id));
+	m_horizMeasurements->addDropdownElement(QIcon(icons_lut.at(
+		measurement_id)), name, QVariant(measurement_id));
 	setEmitActivated(true);
 }
 
@@ -94,8 +117,8 @@ void MeasureSettings::addVerticalMeasurement(const QString& name,
 	int measurement_id)
 {
 	setEmitActivated(false);
-	m_vertMeasurements->addDropdownElement(QIcon(), name,
-		QVariant(measurement_id));
+	m_vertMeasurements->addDropdownElement(QIcon(icons_lut.at(
+		measurement_id)), name, QVariant(measurement_id));
 	setEmitActivated(true);
 }
 

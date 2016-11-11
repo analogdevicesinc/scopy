@@ -25,6 +25,9 @@ adiscope--DropdownSwitchList QAbstractItemView {
   background-color: #141416;
   font-size: 18px;
   outline: 0px;
+
+  /* Add left space. Color should match background-color*/
+  border-left: 0px solid #141416; /* setting to 0 for now */
 }
 
 adiscope--DropdownSwitchList QAbstractItemView::item {
@@ -37,7 +40,10 @@ adiscope--DropdownSwitchList QAbstractItemView::item:hover {
 }
 
 QHeaderView {
-  padding-left: 10px;
+  /* Cancel the effect of the QAbstractItemView border-left property. It's
+  necessary because the border (or padding) of the QAbstractItemView applies to
+  this element as well. */
+  padding-left: -0px;
 }
 
 QHeaderView:section {
@@ -62,4 +68,24 @@ QCheckBox::indicator {
 
 QCheckBox::indicator:checked {
   background-color: rgb(74, 100, 255);
+}
+
+QScrollBar:vertical {
+  background: #262628;
+  max-width: 8px;
+}
+
+QScrollBar::handle:vertical {
+  background: #4a4a4b;
+  border: 0;
+  border-radius: 3px;
+}
+
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+    background: none;
+}
+
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+  border: none;
+  background: none;
 }

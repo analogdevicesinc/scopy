@@ -54,6 +54,25 @@
 		<file>icons/close_hovered.svg</file>
 		<file>icons/gear_wheel.svg</file>
 		<file>icons/gear_wheel_pressed.svg</file>
+		<file>icons/measurements/amplitude.svg</file>
+		<file>icons/measurements/fall_time.svg</file>
+		<file>icons/measurements/frequency.svg</file>
+		<file>icons/measurements/high.svg</file>
+		<file>icons/measurements/low.svg</file>
+		<file>icons/measurements/max.svg</file>
+		<file>icons/measurements/mean.svg</file>
+		<file>icons/measurements/middle.svg</file>
+		<file>icons/measurements/min.svg</file>
+		<file>icons/measurements/n_duty.svg</file>
+		<file>icons/measurements/n_overshoot.svg</file>
+		<file>icons/measurements/n_width.svg</file>
+		<file>icons/measurements/p_duty.svg</file>
+		<file>icons/measurements/p_overshoot.svg</file>
+		<file>icons/measurements/p_width.svg</file>
+		<file>icons/measurements/peak_to_peak.svg</file>
+		<file>icons/measurements/period.svg</file>
+		<file>icons/measurements/rise_time.svg</file>
+		<file>icons/measurements/rms.svg</file>
 	</qresource>
 	<qresource prefix="/stylesheets">
 		<file>stylesheets/plot.qss</file>

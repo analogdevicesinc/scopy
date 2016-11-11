@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="30px" height="20px" viewBox="0 0 30 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 41 (35326) - http://www.bohemiancoding.com/sketch -->
+    <title>frequency</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="main" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="gating-icons-HD" transform="translate(-1790.000000, -470.000000)">
+            <g id="frequency" transform="translate(1791.000000, 471.000000)">
+                <polyline id="Line-Copy-8" stroke="#727273" stroke-width="2" stroke-linecap="square" points="0 18 4 18 4 0 10 0 10 18 20 18 20 0 28 0"></polyline>
+                <rect id="Rectangle_2_copy_122-Copy-18" fill="#4A64FF" x="17" y="8" width="6" height="2"></rect>
+                <rect id="Rectangle_2_copy_122-Copy-17" fill="#4A64FF" x="1" y="8" width="6" height="2"></rect>
+            </g>
+        </g>
+    </g>
+</svg>
