@@ -15,8 +15,8 @@
 #  the Free Software Foundation, Inc., 51 Franklin Street,
 #  Boston, MA 02110-1301, USA.
 
-project(scopy)
 cmake_minimum_required(VERSION 3.1.3)
+project(scopy LANGUAGES CXX VERSION 0.1)
 
 if (MSVC)
 	# http://www.suodenjoki.dk/us/archive/2010/min-max.htm
