@@ -167,3 +167,5 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 		CXX_STANDARD_REQUIRED ON
 		CXX_EXTENSIONS OFF
 )
+
+configure_file(scopy.iss.cmakein ${CMAKE_CURRENT_BINARY_DIR}/scopy.iss @ONLY)
