@@ -909,7 +909,7 @@ void adiscope::Oscilloscope::onCursorsToggled(bool on)
 		findChild<QCheckBox *>("box");
 	if (on)
 		plot.setCursorReadoutsVisible(!mbox->isChecked());
-	cursorReadouts->setVisible(on);
+	measure_panel_ui->cursorReadouts->setVisible(on);
 }
 
 void adiscope::Oscilloscope::onMeasureToggled(bool on)
@@ -1578,7 +1578,7 @@ void Oscilloscope::measure_panel_init()
 		hLayout->insertWidget(0, cursorReadouts);
 
 	fillCursorReadouts(plot.allCursorReadouts());
-	cursorReadouts->hide();
+	measure_panel_ui->cursorReadouts->hide();
 }
 
 void Oscilloscope::statistics_panel_init()
