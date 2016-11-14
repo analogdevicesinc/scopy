@@ -14,6 +14,9 @@ install:
     # Hack: Qt5Qml CMake script throws errors when loading its plugins. So let's just drop those plugins.
     - C:\msys64\usr\bin\bash -lc "rm -f /mingw64/lib/cmake/Qt5Qml/*Factory.cmake"
 
+    # Install Inno Setup
+    - choco install InnoSetup
+
 build_script:
     - set PATH=C:\msys64\mingw64\bin;%PATH%
     - C:\msys64\usr\bin\bash -lc "mkdir /c/build ; cd /c/build ; cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DPKG_CONFIG_EXECUTABLE=/mingw64/bin/pkg-config.exe -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc.exe -DCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++.exe /c/projects/scopy && ninja"
@@ -29,3 +32,8 @@ build_script:
 
     - 7z a "c:\scopy.zip" c:\scopy
     - appveyor PushArtifact c:\scopy.zip
+
+    # Build the installer
+    - set PATH=%PATH%;"C:\Program Files (x86)\Inno Setup 5"
+    - ISCC C:\build\scopy.iss
+    - appveyor PushArtifact C:\scopy-setup.exe
