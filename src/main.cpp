@@ -18,6 +18,7 @@
  */
 
 #include <QApplication>
+#include <QtGlobal>
 
 #include "src/tool_launcher.hpp"
 
@@ -26,6 +27,10 @@ using namespace adiscope;
 int main(int argc, char **argv)
 {
 	QApplication app(argc, argv);
+
+	auto pythonpath = qgetenv("SCOPY_PYTHONPATH");
+	if (!pythonpath.isNull())
+		qputenv("PYTHONPATH", pythonpath);
 
 	ToolLauncher launcher;
 	launcher.show();

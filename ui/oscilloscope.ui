@@ -49,7 +49,7 @@
        <property name="styleSheet">
         <string notr="true">QPushButton {
 color: white;
-background-color: orange;
+background-color: #27b34f;
 font-family: &quot;monospace&quot;;
 font-weight: bold;
 height: 30px;
@@ -66,6 +66,34 @@ background-color: #F45000;
        </property>
        <property name="text">
         <string>Run</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButtonSingle">
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+color: white;
+background-color: orange;
+font-family: &quot;monospace&quot;;
+font-weight: bold;
+height: 30px;
+border-width: 0px;
+border-radius: 3px;
+min-width: 6em;
+}
+QPushButton:disabled {
+background-color: grey;
+}
+QPushButton:checked {
+background-color: #F45000;
+}</string>
+       </property>
+       <property name="text">
+        <string>Single</string>
        </property>
        <property name="checkable">
         <bool>true</bool>
@@ -425,5 +453,38 @@ QPushButton:!checked {
  <resources>
   <include location="../resources/resources.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>pushButtonSingle</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>pushButtonRunStop</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>999</x>
+     <y>29</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>885</x>
+     <y>29</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButtonRunStop</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>pushButtonSingle</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>885</x>
+     <y>29</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>999</x>
+     <y>29</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

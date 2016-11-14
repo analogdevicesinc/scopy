@@ -378,6 +378,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 			SLOT(runStopToggled(bool)));
 	connect(ui->pushButtonRunStop, SIGNAL(toggled(bool)), this,
 			SLOT(runStopToggled(bool)));
+	connect(ui->pushButtonSingle, SIGNAL(toggled(bool)), this,
+			SLOT(runStopToggled(bool)));
 	connect(runButton, SIGNAL(toggled(bool)), ui->pushButtonRunStop,
 			SLOT(setChecked(bool)));
 	connect(ui->pushButtonRunStop, SIGNAL(toggled(bool)), runButton,
@@ -452,6 +454,12 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 		cursor_readouts_ui->VoltageCursors,
 		SLOT(setVisible(bool)));
 
+	connect(&*iio, SIGNAL(timeout()),
+			&trigger_settings, SLOT(autoTriggerDisable()));
+	connect(&plot, SIGNAL(newData()),
+			&trigger_settings, SLOT(autoTriggerEnable()));
+	connect(&plot, SIGNAL(newData()), this, SLOT(singleCaptureDone()));
+
 	if (nb_channels < 2)
 		gsettings_ui->XY_view->hide();
 
@@ -464,6 +472,11 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	// Default hysteresis levels for measurements
 	for (int i = 0; i < nb_channels; i++)
 		plot.setPeriodDetectHyst(i, 1.0 / 5);
+
+	ui->pushButtonRunStop->setProperty("normal_text",
+			QVariant(ui->pushButtonRunStop->text()));
+	ui->pushButtonSingle->setProperty("normal_text",
+			QVariant(ui->pushButtonSingle->text()));
 }
 
 Oscilloscope::~Oscilloscope()
@@ -743,7 +756,10 @@ void Oscilloscope::on_actionClose_triggered()
 
 void Oscilloscope::runStopToggled(bool checked)
 {
-	QPushButton *btn = ui->pushButtonRunStop;
+	QPushButton *btn = static_cast<QPushButton *>(QObject::sender());
+
+	if (btn == menuRunButton)
+		btn = ui->pushButtonRunStop;
 
 	if (checked) {
 		btn->setText("Stop");
@@ -762,7 +778,7 @@ void Oscilloscope::runStopToggled(bool checked)
 			for (unsigned int i = 0; i < (nb_channels & ~1); i++)
 				iio->start(xy_ids[i]);
 	} else {
-		btn->setText("Run");
+		btn->setText(btn->property("normal_text").toString());
 
 		for (unsigned int i = 0; i < nb_channels; i++)
 			iio->stop(ids[i]);
@@ -1734,4 +1750,9 @@ void Oscilloscope::onStatisticsReset()
 {
 	statisticsReset();
 	statisticsUpdateGui();
+}
+
+void Oscilloscope::singleCaptureDone()
+{
+	ui->pushButtonSingle->setChecked(false);
 }

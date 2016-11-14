@@ -24,6 +24,7 @@
 #include <QFile>
 #include <QJsonArray>
 #include <QJsonDocument>
+#include <QStringList>
 
 #include <iio.h>
 
@@ -34,6 +35,8 @@ static const std::string tool_names[] = {
 	"signal-generator",
 	"voltmeter",
 	"power-controller",
+	"logic-analyzer-rx",
+	"logic-analyzer-tx"
 };
 
 Filter::Filter(const struct iio_context *ctx)

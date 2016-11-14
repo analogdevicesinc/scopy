@@ -37,6 +37,8 @@ namespace adiscope {
 		TOOL_SIGNAL_GENERATOR = 1,
 		TOOL_DMM = 2,
 		TOOL_POWER_CONTROLLER = 3,
+		TOOL_LOGIC_ANALYZER = 4,
+		TOOL_PATTERN_GENERATOR = 5,
 	};
 
 	class Filter

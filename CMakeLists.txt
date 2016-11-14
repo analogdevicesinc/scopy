@@ -15,8 +15,8 @@
 #  the Free Software Foundation, Inc., 51 Franklin Street,
 #  Boston, MA 02110-1301, USA.
 
-project(scopy)
 cmake_minimum_required(VERSION 3.1.3)
+project(scopy LANGUAGES CXX VERSION 0.1)
 
 if (MSVC)
 	# http://www.suodenjoki.dk/us/archive/2010/min-max.htm
@@ -53,6 +53,9 @@ find_package(Qt5Widgets REQUIRED)
 find_package(Qt5WebKitWidgets REQUIRED)
 find_package(Qt5Concurrent REQUIRED)
 find_package(Qwt REQUIRED)
+find_package(Qt5Qml REQUIRED)
+find_package(Qt5Svg REQUIRED)
+find_package(Qt5UiTools REQUIRED)
 
 set(GR_REQUIRED_COMPONENTS RUNTIME ANALOG BLOCKS FFT FILTER IIO VOLK PMT)
 find_package(Gnuradio PATHS "c:/Program Files/gnuradio/lib/cmake/gnuradio" REQUIRED)
@@ -60,11 +63,20 @@ find_package(Gnuradio PATHS "c:/Program Files/gnuradio/lib/cmake/gnuradio" REQUI
 GR_MODULE(IIO gnuradio-iio gnuradio/iio/api.h gnuradio-iio)
 
 add_definitions(-DBOOST_ALL_DYN_LINK)
-find_package(Boost "1.58" COMPONENTS system REQUIRED)
+find_package(Boost "1.58" COMPONENTS system filesystem thread REQUIRED)
 
 set(VC_PATH "$ENV{VS120COMNTOOLS}/../../VC")
 find_library(IIO_LIBRARIES NAMES iio libiio PATHS ${VC_PATH}/lib ${VC_PATH}/lib/amd64)
 find_path(IIO_INCLUDE_DIRS iio.h PATHS ${VC_PATH}/include)
+
+find_package(PkgConfig)
+pkg_check_modules(PYTHON REQUIRED python3)
+pkg_check_modules(GLIB REQUIRED glib-2.0)
+pkg_check_modules(GLIBMM REQUIRED glibmm-2.4)
+pkg_check_modules(SIGCPP REQUIRED sigc++-2.0)
+pkg_check_modules(LIBSIGROK REQUIRED libsigrok)
+pkg_check_modules(LIBSIGROKCXX REQUIRED libsigrokcxx)
+pkg_check_modules(LIBSIGROK_DECODE REQUIRED libsigrokdecode)
 
 include_directories(
 	${GNURADIO_ALL_INCLUDE_DIRS}
@@ -72,8 +84,20 @@ include_directories(
 	${Qt5Widgets_INCLUDE_DIRS}
 	${Qt5WebKitWidgets_INCLUDE_DIRS}
 	${Qt5Concurrent_INCLUDE_DIRS}
+	${Qt5Qml_INCLUDE_DIRS}
+	${Qt5UiTools_INCLUDE_DIRS}
 	${QWT_INCLUDE_DIRS}
+	${Qt5Svg_INCLUDE_DIRS}
 	${IIO_INCLUDE_DIRS}
+	${LIBSIGROK_DECODE_INCLUDE_DIRS}
+	${LIBSIGROKCXX_INCLUDE_DIRS}
+	${LIBSIGROK_INCLUDE_DIRS}
+	${GLIB_INCLUDE_DIRS}
+	${GLIBCONFIG_INCLUDE_DIRS}
+	${GLIBMM_INCLUDE_DIRS}
+	${GLIBMMCONFIG_INCLUDE_DIRS}
+	${SIGCPP_INCLUDE_DIRS}
+	${SIGCPPCONFIG_INCLUDE_DIRS}
 	${CMAKE_SOURCE_DIR}/src
 )
 
@@ -82,9 +106,21 @@ link_directories(
 	${GNURADIO_RUNTIME_LIBRARY_DIRS}
 )
 
-FILE(GLOB SRC_LIST src/*.cpp src/*.cc)
+FILE(GLOB SRC_LIST  src/*.cpp src/*.cc
+	src/pulseview/pv/*.cpp
+	src/pulseview/pv/binding/*.cpp
+	src/pulseview/pv/data/*.cpp
+	src/pulseview/pv/data/decode/*.cpp
+	src/pulseview/pv/devices/*.cpp
+	src/pulseview/pv/dialogs/*.cpp
+	src/pulseview/pv/popups/*.cpp
+	src/pulseview/pv/prop/*.cpp
+	src/pulseview/pv/toolbars/*.cpp
+	src/pulseview/pv/view/*.cpp
+	src/pulseview/pv/widgets/*.cpp
+)
 
-FILE(GLOB M2KSCOPE_UIS ui/*.ui)
+FILE(GLOB M2KSCOPE_UIS ui/*.ui src/pulseview/pv/dialogs/*.ui)
 qt5_wrap_ui (m2kscope_FORMS_HEADERS ${M2KSCOPE_UIS})
 
 FILE(GLOB M2KSCOPE_RESOURCES resources/*.qrc)
@@ -101,14 +137,29 @@ add_executable(${PROJECT_NAME} WIN32
 		${m2kscope_FORMS_HEADERS}
 )
 
+link_directories(
+	${Boost_LIBRARY_DIRS}
+	${GNURADIO_RUNTIME_LIBRARY_DIRS}
+)
+
 target_link_libraries(${PROJECT_NAME} LINK_PRIVATE
 		${Qt5Widgets_LIBRARIES}
 		${Qt5WebKitWidgets_LIBRARIES}
 		${Qt5Concurrent_LIBRARIES}
+		${Qt5Qml_LIBRARIES}
+		${Qt5UiTools_LIBRARIES}
 		${GNURADIO_ALL_LIBRARIES}
 		${Boost_LIBRARIES}
 		${QWT_LIBRARIES}
+		${Qt5Svg_LIBRARIES}
 		${IIO_LIBRARIES}
+		${PYTHON_LIBRARIES}
+		${LIBSIGROK_LIBRARIES}
+		${LIBSIGROKCXX_LIBRARIES}
+		${LIBSIGROK_DECODE_LIBRARIES}
+		${GLIBMM_LIBRARIES}
+		${SIGCPP_LIBRARIES}
+		${GLIB_LIBRARIES}
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
@@ -116,3 +167,5 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 		CXX_STANDARD_REQUIRED ON
 		CXX_EXTENSIONS OFF
 )
+
+configure_file(scopy.iss.cmakein ${CMAKE_CURRENT_BINARY_DIR}/scopy.iss @ONLY)

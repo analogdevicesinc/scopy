@@ -1,57 +1,39 @@
 clone_depth: 1
 
-os: Visual Studio 2013
-
 install:
-    # Install Boost dependencies
-    - cd c:\
-    - appveyor-retry nuget install boost_atomic-vc120 -Version 1.61.0
-    - appveyor-retry nuget install boost_system-vc120 -Version 1.61.0
-    - appveyor-retry nuget install boost_filesystem-vc120 -Version 1.61.0
-    - appveyor-retry nuget install boost_chrono-vc120 -Version 1.61.0
-    - appveyor-retry nuget install boost_date_time-vc120 -Version 1.61.0
-    - appveyor-retry nuget install boost_thread-vc120 -Version 1.61.0
+    # Remove dependencies that prevent us from upgrading to GCC 6.2
+    - C:\msys64\usr\bin\bash -lc "pacman -Rs --noconfirm mingw-w64-x86_64-gcc-ada mingw-w64-x86_64-gcc-fortran mingw-w64-x86_64-gcc-libgfortran mingw-w64-x86_64-gcc-objc"
 
-    # Install libiio
-    - appveyor-retry appveyor DownloadFile https://ci.appveyor.com/api/projects/analogdevicesinc/libiio/artifacts/libiio-win64.zip?branch=master
-    - 7z x libiio-win64.zip > nul
+    # Update to GCC 6.2 and install dependencies
+    - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -Sy mingw-w64-x86_64-gcc mingw-w64-x86_64-qt5 mingw-w64-x86_64-libusb mingw-w64-x86_64-boost mingw-w64-x86_64-python3 mingw-w64-x86_64-fftw mingw-w64-x86_64-libzip mingw-w64-x86_64-glibmm mingw-w64-x86_64-ninja"
 
-    # Install qwt-multiaxes
-    - appveyor-retry appveyor DownloadFile http://swdownloads.analog.com/cse/build/qwt-multiaxes.zip
-    - 7z x qwt-multiaxes.zip > nul
+    # Install pre-compiled libraries
+    - appveyor DownloadFile http://swdownloads.analog.com/cse/build/msys64.tar.xz -FileName C:\msys64.tar.xz
+    - C:\msys64\usr\bin\bash -lc "cd /c ; tar xJf msys64.tar.xz"
 
-    # Install libvolk
-    - cd "c:\Program Files"
-    - appveyor-retry appveyor DownloadFile https://ci.appveyor.com/api/projects/analogdevicesinc/volk/artifacts/libvolk-x64.zip?branch=master
-    - 7z x libvolk-x64.zip > nul
+    # Hack: Qt5Qml CMake script throws errors when loading its plugins. So let's just drop those plugins.
+    - C:\msys64\usr\bin\bash -lc "rm -f /mingw64/lib/cmake/Qt5Qml/*Factory.cmake"
 
-    # Install gnuradio / gr-iio
-    - appveyor-retry appveyor DownloadFile https://ci.appveyor.com/api/projects/analogdevicesinc/gr-iio/artifacts/gnuradio-x64.zip?branch=master
-    - 7z x gnuradio-x64.zip > nul
+    # Install Inno Setup
+    - choco install InnoSetup
 
 build_script:
-    - mkdir c:\projects\scopy\build
-    - cd c:\projects\scopy\build
+    - set PATH=C:\msys64\mingw64\bin;%PATH%
+    - C:\msys64\usr\bin\bash -lc "mkdir /c/build ; cd /c/build ; cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DPKG_CONFIG_EXECUTABLE=/mingw64/bin/pkg-config.exe -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc.exe -DCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++.exe /c/projects/scopy && ninja"
+    - appveyor PushArtifact c:\build\scopy.exe
 
-    # Without this directory in the %PATH%, compiler tests fail because of missing DLLs
-    - set PATH=%PATH%;C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin
+    # Copy the dependencies
+    - mkdir c:\scopy
+    - copy c:\build\scopy.exe c:\scopy\
+    - c:\msys64\mingw64\bin\windeployqt.exe --dir c:\scopy --release --no-system-d3d-compiler --no-compiler-runtime --no-quick-import c:\build\scopy.exe
 
-    - cmake -G "Visual Studio 12 Win64" -DCMAKE_BUILD_TYPE:STRING=Release \
-        -DCMAKE_INSTALL_PREFIX:PATH="c:/Program Files/gnuradio" \
-        -DCMAKE_BUILD_TYPE:STRING=Release \
-        -DCMAKE_SYSTEM_PREFIX_PATH="C:" \
-        -DBoost_SYSTEM_LIBRARY_RELEASE:FILEPATH=c:/boost_system-vc120.1.61.0.0/lib/native/address-model-64/lib/boost_system-vc120-mt-1_61.lib \
-        -DBoost_LIBRARY_DIR_RELEASE:PATH=c:/boost_chrono-vc120.1.61.0.0/lib/native/address-model-64/lib;c:/boost_date_time-vc120.1.61.0.0/lib/native/address-model-64/lib;c:/boost_thread-vc120.1.61.0.0/lib/native/address-model-64/lib;c:/boost_system-vc120.1.61.0.0/lib/native/address-model-64/lib;c:/boost_filesystem-vc120.1.61.0.0/lib/native/address-model-64/lib \
-        -DBoost_INCLUDE_DIR:PATH=c:/boost.1.61.0.0/lib/native/include \
-        -DIIO_INCLUDE_DIRS:PATH=c:/libiio-win64 \
-        -DIIO_LIBRARIES:FILEPATH=c:/libiio-win64/libiio.lib \
-        -DGnuradio_DIR:PATH="c:/Program Files/gnuradio/lib/cmake/gnuradio" \
-        -DQt5Widgets_DIR:PATH="c:/Qt/5.5/msvc2013_64/lib/cmake/Qt5Widgets" \
-        -DQt5WebKitWidgets_DIR:PATH="c:/Qt/5.5/msvc2013_64/lib/cmake/Qt5WebKitWidgets" \
-        -DQt5Concurrent_DIR:PATH="c:/Qt/5.5/msvc2013_64/lib/cmake/Qt5Concurrent" \
-        -DQWT_LIBRARIES:FILEPATH="c:/qwt-multiaxes/lib/qwt.lib" \
-        -DQWT_INCLUDE_DIRS:PATH="c:/qwt-multiaxes/include/qwt" \
-        ..
-    - cmake --build . --config Release
+    - C:\msys64\usr\bin\bash -lc "tar -C /c/scopy --strip-components=3 -xJf /c/msys64.tar.xz msys64/mingw64/bin"
+    - C:\msys64\usr\bin\bash -lc "cd /mingw64/bin ; cp -r libwinpthread-1.dll libgcc_s_seh-1.dll libstdc++-6.dll libboost_{system,filesystem,atomic,program_options,regex,thread}-*.dll libglib-2.0-0.dll libintl-8.dll libiconv-2.dll libpcre-1.dll libpcre16-0.dll libglibmm-2.4-1.dll libgmodule-2.0-0.dll libgobject-2.0-0.dll libffi-6.dll libsigc-2.0-0.dll libfftw3f-3.dll libicu{in,uc,dt}57.dll zlib1.dll libharfbuzz-0.dll libfreetype-6.dll libbz2-1.dll libpng16-16.dll libgraphite2.dll libjpeg-8.dll libsqlite3-0.dll libwebp-6.dll libxml2-2.dll liblzma-5.dll libxslt-1.dll libzip-4.dll libpython3.5m.dll libeay32.dll ssleay32.dll libusb-1.0.dll /mingw64/lib/python3.5 /c/scopy/"
 
-    - appveyor PushArtifact c:\projects\scopy\build\Release\scopy.exe
+    - 7z a "c:\scopy.zip" c:\scopy
+    - appveyor PushArtifact c:\scopy.zip
+
+    # Build the installer
+    - set PATH=%PATH%;"C:\Program Files (x86)\Inno Setup 5"
+    - ISCC C:\build\scopy.iss
+    - appveyor PushArtifact C:\scopy-setup.exe

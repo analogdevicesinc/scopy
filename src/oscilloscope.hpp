@@ -114,6 +114,7 @@ namespace adiscope {
 		void toggleRightMenu();
 
 		void runStopToggled(bool);
+		void singleCaptureDone();
 
 		void del_math_channel();
 
