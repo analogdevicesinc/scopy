@@ -1340,6 +1340,7 @@ void Oscilloscope::measureLabelsRearrange()
 		QVBoxLayout *measurementsLayout = new
 				QVBoxLayout(measure_panel_ui->measurements);
 		measurementsLayout->addWidget(container);
+		measurementsLayout->setContentsMargins(0, 0, 0, 0);
 	} else {
 		measure_panel_ui->measurements->layout()->addWidget(container);
 	}
@@ -1348,7 +1349,7 @@ void Oscilloscope::measureLabelsRearrange()
 	gLayout->setContentsMargins(0, 0, 0, 0);
 	gLayout->setVerticalSpacing(5);
 	gLayout->setHorizontalSpacing(5);
-	int max_rows = 3;
+	int max_rows = 4;
 	int nb_meas_added = 0;
 
 	for (int i = 0; i < measurements_data.size(); i++) {
