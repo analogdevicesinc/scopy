@@ -674,6 +674,9 @@ void CapturePlot::onNewDataReceived()
 	for (int i = 0; i < d_measureObjs.size(); i++) {
 		Measure *measure = d_measureObjs[i];
 		if (measure->activeMeasurementsCount() > 0) {
+			int chn = measure->channel();
+			measure->setDataSource(d_ydata[chn],
+				Curve(chn)->data()->size());
 			measure->setSampleRate(this->sampleRate());
 			measure->measure();
 		}
