@@ -22,6 +22,9 @@
 #include "handles_area.hpp"
 #include "plot_line_handle.h"
 
+#include <QHBoxLayout>
+#include <QLabel>
+
 using namespace adiscope;
 
 /*
@@ -89,6 +92,20 @@ CapturePlot::CapturePlot(QWidget *parent,
 	d_rightHandlesArea->setMinimumWidth(50);
 	d_bottomHandlesArea->setLargestChildWidth(60);
 	d_rightHandlesArea->setLargestChildHeight(60);
+
+	/* Add content to the top area of the plot */
+	d_timeBaseLabel = new QLabel();
+	QHBoxLayout *topWidgetLayout = new QHBoxLayout(d_topWidget);
+	topWidgetLayout->setContentsMargins(d_leftHandlesArea->minimumWidth(),
+		0, 0, 5);
+	topWidgetLayout->setSpacing(10);
+	topWidgetLayout->insertWidget(0, d_timeBaseLabel, 0, Qt::AlignLeft |
+		Qt::AlignBottom);
+	d_topWidget->setLayout(topWidgetLayout);
+	d_timeBaseLabel->setStyleSheet("QLabel {"
+		"color: #4a64ff;"
+		"font-weight: bold;"
+		"}");
 
 	/* Time trigger widget */
 	d_timeTriggerBar = new VertBar(this);
@@ -721,4 +738,10 @@ void CapturePlot::setPeriodDetectHyst(int chnIdx, double hyst)
 struct cursorReadoutsText CapturePlot::allCursorReadouts() const
 {
 	return d_cursorReadoutsText;
+}
+
+void CapturePlot::setTimeBaseLabelValue(double value)
+{
+	QString text = d_cursorTimeFormatter.format(value, "", 3);
+	d_timeBaseLabel->setText(text + "/div");
 }

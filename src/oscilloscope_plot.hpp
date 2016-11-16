@@ -27,6 +27,8 @@
 #include "cursor_readouts.h"
 #include "measure.h"
 
+class QLabel;
+
 namespace adiscope {
 	class PlotWidget;
 
@@ -101,6 +103,7 @@ namespace adiscope {
 		void setPeriodDetectLevel(int chnIdx, double lvl);
 		void setPeriodDetectHyst(int chnIdx, double hyst);
 		void setCursorReadoutsVisible(bool en);
+		void setTimeBaseLabelValue(double timebase);
 
 	protected:
 		virtual void cleanUpJustBeforeChannelRemoval(int chnIdx);
@@ -144,6 +147,8 @@ namespace adiscope {
 		HorizHandlesArea *d_bottomHandlesArea;
 		VertHandlesArea *d_leftHandlesArea;
 		VertHandlesArea *d_rightHandlesArea;
+
+		QLabel *d_timeBaseLabel;
 
 		QList<HorizBar*> d_offsetBars;
 		QList<RoundedHandleV*> d_offsetHandles;

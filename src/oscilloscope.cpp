@@ -353,6 +353,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	timePosition->setStep(timeBase->value() / 10);
 	voltsPosition->setStep(voltsPerDiv->value() / 10);
 
+	plot.setTimeBaseLabelValue(timeBase->value());
+
 	/* General Settings Menu */
 	gsettings_ui = new Ui::OscGeneralSettings();
 	gsettings_ui->setupUi(ui->generalSettings);
@@ -395,6 +397,10 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 		SLOT(onHorizOffsetValueChanged(double)));
 	connect(voltsPosition, SIGNAL(valueChanged(double)),
 		SLOT(onVertOffsetValueChanged(double)));
+
+	/* Update Timebase label each time the oscilloscope timebase changes */
+	connect(timeBase, SIGNAL(valueChanged(double)),
+		&plot, SLOT(setTimeBaseLabelValue(double)));
 
 	connect(&plot, SIGNAL(channelOffsetChanged(double)),
 		SLOT(onChannelOffsetChanged(double)));
