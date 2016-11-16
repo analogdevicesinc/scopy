@@ -76,6 +76,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	xy_ids(new iio_manager::port_id[nb_channels & ~1]),
 	fft_is_visible(false), hist_is_visible(false), xy_is_visible(false),
 	statistics_enabled(false),
+	trigger_is_forced(false),
+	new_data_is_triggered(false),
 	triggerDelay(0),
 	selectedChannel(-1),
 	menuOpened(false), current_channel(0), math_chn_counter(0),
@@ -465,6 +467,11 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	connect(&plot, SIGNAL(newData()),
 			&trigger_settings, SLOT(autoTriggerEnable()));
 	connect(&plot, SIGNAL(newData()), this, SLOT(singleCaptureDone()));
+
+	connect(&*iio, SIGNAL(timeout()),
+			SLOT(onIioDataRefillTimeout()));
+	connect(&plot, SIGNAL(newData()), this, SLOT(onPlotNewData()));
+
 
 	if (nb_channels < 2)
 		gsettings_ui->XY_view->hide();
@@ -1761,4 +1768,23 @@ void Oscilloscope::onStatisticsReset()
 void Oscilloscope::singleCaptureDone()
 {
 	ui->pushButtonSingle->setChecked(false);
+}
+
+void Oscilloscope::onIioDataRefillTimeout()
+{
+	trigger_is_forced = true;
+}
+
+void Oscilloscope::onPlotNewData()
+{
+	// Flag the new received data as Triggered or Untriggered.
+	bool triggerOn = trigger_settings.triggerIsArmed();
+
+	if (triggerOn && !trigger_is_forced)
+		new_data_is_triggered = true;
+	else
+		new_data_is_triggered = false;
+
+	// Reset the Forced Trigger flag.
+	trigger_is_forced = false;
 }

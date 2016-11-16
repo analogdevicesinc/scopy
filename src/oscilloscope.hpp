@@ -132,6 +132,9 @@ namespace adiscope {
 
 		void onCursorReadoutsChanged(struct cursorReadoutsText);
 
+		void onIioDataRefillTimeout();
+		void onPlotNewData();
+
 	private:
 		OscADC adc;
 		unsigned int nb_channels, nb_math_channels;
@@ -175,6 +178,9 @@ namespace adiscope {
 
 		bool fft_is_visible, hist_is_visible, xy_is_visible;
 		bool statistics_enabled;
+
+		bool trigger_is_forced;
+		bool new_data_is_triggered;
 
 		int fft_size;
 
