@@ -50,6 +50,7 @@ namespace adiscope {
 		bool levelA_enabled();
 		bool levelB_enabled();
 		void setPlotNumSamples(int);
+		bool triggerIsArmed() const;
 
 	Q_SIGNALS:
 		void delayChanged(double);

@@ -684,3 +684,17 @@ void TriggerSettings::autoTriggerEnable()
 		temporarily_disabled = false;
 	}
 }
+
+bool TriggerSettings::triggerIsArmed() const
+{
+	int tr_a = (ui->cmb_triggA_cond->currentText() != "None" ? 1 : 0) << 0;
+	int tr_b = (ui->cmb_triggB_cond->currentText() != "None" ? 1 : 0) << 1;
+
+	int i = ui->cmb_trigg_source->currentIndex();
+	if (i > 1)
+		i = 3; // Both trigger are used as source
+	else
+		i++; // Trigger A on bit 0 and Trigger B on bit 1
+
+	return (i & (tr_a | tr_b));
+}
