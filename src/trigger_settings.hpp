@@ -51,6 +51,7 @@ namespace adiscope {
 		bool levelB_enabled();
 		void setPlotNumSamples(int);
 		bool triggerIsArmed() const;
+		int triggerMode() const;
 
 	Q_SIGNALS:
 		void delayChanged(double);
@@ -58,6 +59,7 @@ namespace adiscope {
 		void levelBChanged(double);
 		void triggerAenabled(bool);
 		void triggerBenabled(bool);
+		void triggerModeChanged(int);
 
 	public Q_SLOTS:
 		void setDelay(double);
@@ -83,6 +85,7 @@ namespace adiscope {
 		void on_trigg_A_extern_en_toggled(bool);
 		void on_trigg_B_extern_en_toggled(bool);
 		void on_btn_noise_reject_toggled(bool);
+		void on_btnAuto_toggled(bool);
 
 	private:
 		void trigger_all_widgets_update();
@@ -123,6 +126,7 @@ namespace adiscope {
 		bool triggerA_en;
 		bool triggerB_en;
 		bool temporarily_disabled;
+		bool trigger_auto_mode;
 
 		double hystA_last_val;
 		double hystB_last_val;

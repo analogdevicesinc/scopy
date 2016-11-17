@@ -70,6 +70,8 @@ TriggerSettings::TriggerSettings(struct iio_context *ctx, QWidget *parent) :
 {
 	ui->setupUi(this);
 
+	trigger_auto_mode = ui->btnAuto->isChecked();
+
 	ui_triggerDelay = new PositionSpinButton({
 				{"ns", 1E-9},
 				{"μs", 1E-6},
@@ -697,4 +699,17 @@ bool TriggerSettings::triggerIsArmed() const
 		i++; // Trigger A on bit 0 and Trigger B on bit 1
 
 	return (i & (tr_a | tr_b));
+}
+
+void TriggerSettings::on_btnAuto_toggled(bool checked)
+{
+	trigger_auto_mode = checked;
+	int mode = checked ? 1 : 0;
+
+	Q_EMIT triggerModeChanged(mode);
+}
+
+int TriggerSettings::triggerMode() const
+{
+	return (ui->btnAuto->isChecked() ? 1 : 0);
 }
