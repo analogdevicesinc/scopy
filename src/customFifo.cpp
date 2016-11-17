@@ -101,4 +101,6 @@ T * CustomFifo<T>::data()
 		return vector->data();
 }
 
-template class CustomFifo<double>;
+namespace adiscope {
+	template class CustomFifo<double>;
+}

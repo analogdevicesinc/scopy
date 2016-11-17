@@ -46,8 +46,10 @@ int peek_sample<T>::work(int noutput_items,
 	return 0;
 }
 
-template class peek_sample<char>;
-template class peek_sample<short>;
-template class peek_sample<int>;
-template class peek_sample<float>;
-template class peek_sample<gr_complex>;
+namespace adiscope {
+	template class peek_sample<char>;
+	template class peek_sample<short>;
+	template class peek_sample<int>;
+	template class peek_sample<float>;
+	template class peek_sample<gr_complex>;
+}
