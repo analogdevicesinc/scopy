@@ -34,6 +34,7 @@
 #include "measurement_gui.h"
 #include "measure_settings.h"
 #include "statistic_widget.h"
+#include "state_updater.h"
 
 /* Generated UI */
 #include "ui_math_panel.h"
@@ -78,6 +79,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	statistics_enabled(false),
 	trigger_is_forced(false),
 	new_data_is_triggered(false),
+	triggerUpdater(new StateUpdater(250, this)),
 	triggerDelay(0),
 	selectedChannel(-1),
 	menuOpened(false), current_channel(0), math_chn_counter(0),
@@ -218,6 +220,12 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	trig_ui.btn->setProperty("id", QVariant(-triggers_panel));
 	connect(trig_ui.btn, SIGNAL(pressed()),
 				this, SLOT(toggleRightMenu()));
+
+	/* Trigger Status Updater */
+	triggerUpdater->setOffState(CapturePlot::Stop);
+	onTriggerModeChanged(trigger_settings.triggerMode());
+	connect(triggerUpdater, SIGNAL(outputChanged(int)),
+		&plot, SLOT(setTriggerState(int)));
 
 	plot.setZoomerEnabled(true);
 
@@ -436,6 +444,9 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 		[=](double level) {
 			plot.setPeriodDetectLevel(1, level);
 		});
+
+	connect(&trigger_settings, SIGNAL(triggerModeChanged(int)),
+		this, SLOT(onTriggerModeChanged(int)));
 
 	// Trigger Delay
 	connect(&trigger_settings, SIGNAL(delayChanged(double)),
@@ -805,6 +816,9 @@ void Oscilloscope::runStopToggled(bool checked)
 			for (unsigned int i = 0; i < (nb_channels & ~1); i++)
 				iio->stop(xy_ids[i]);
 	}
+
+	// Update trigger status
+	triggerUpdater->setEnabled(checked);
 }
 
 void Oscilloscope::onFFT_view_toggled(bool visible)
@@ -1787,4 +1801,21 @@ void Oscilloscope::onPlotNewData()
 
 	// Reset the Forced Trigger flag.
 	trigger_is_forced = false;
+
+	// Update trigger status
+	if (new_data_is_triggered)
+		triggerUpdater->setInput(CapturePlot::Triggered);
+	else
+		triggerUpdater->setInput(CapturePlot::Auto);
+}
+
+void Oscilloscope::onTriggerModeChanged(int mode)
+{
+	if (mode == 0) { // normal
+		triggerUpdater->setIdleState(CapturePlot::Waiting);
+		triggerUpdater->setInput(CapturePlot::Waiting);
+	} else if (mode == 1) { // auto
+		triggerUpdater->setIdleState(CapturePlot::Auto);
+		triggerUpdater->setInput(CapturePlot::Auto);
+	}
 }

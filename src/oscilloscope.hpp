@@ -65,6 +65,7 @@ namespace adiscope {
 	class MeasurementData;
 	class MeasurementGui;
 	class MeasureSettings;
+	class StateUpdater;
 
 	class Oscilloscope : public QWidget
 	{
@@ -94,6 +95,7 @@ namespace adiscope {
 
 		void onTriggerSettingsDelayChanged(double);
 		void onTimeTriggerDelayChanged(double);
+		void onTriggerModeChanged(int);
 
 		void updateTriggerSpinbox(double);
 		void updatePlotHorizDelay(double);
@@ -181,6 +183,8 @@ namespace adiscope {
 
 		bool trigger_is_forced;
 		bool new_data_is_triggered;
+		CapturePlot::TriggerState trigger_state;
+		StateUpdater *triggerUpdater;
 
 		int fft_size;
 
