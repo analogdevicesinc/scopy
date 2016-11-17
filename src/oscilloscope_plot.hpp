@@ -57,6 +57,14 @@ namespace adiscope {
 		Q_OBJECT
 
 	public:
+		enum TriggerState {
+			Waiting,
+			Triggered,
+			Stop,
+			Auto,
+		};
+
+	public:
 		CapturePlot(QWidget *parent, unsigned int xNumDivs = 10,
 			    unsigned int yNumDivs = 10);
 		~CapturePlot();
@@ -104,6 +112,7 @@ namespace adiscope {
 		void setPeriodDetectHyst(int chnIdx, double hyst);
 		void setCursorReadoutsVisible(bool en);
 		void setTimeBaseLabelValue(double timebase);
+		void setTriggerState(int triggerState);
 
 	protected:
 		virtual void cleanUpJustBeforeChannelRemoval(int chnIdx);
@@ -149,6 +158,7 @@ namespace adiscope {
 		VertHandlesArea *d_rightHandlesArea;
 
 		QLabel *d_timeBaseLabel;
+		QLabel *d_triggerStateLabel;
 
 		QList<HorizBar*> d_offsetBars;
 		QList<RoundedHandleV*> d_offsetHandles;

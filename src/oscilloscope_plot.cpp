@@ -94,18 +94,29 @@ CapturePlot::CapturePlot(QWidget *parent,
 	d_rightHandlesArea->setLargestChildHeight(60);
 
 	/* Add content to the top area of the plot */
+	// Time Base
 	d_timeBaseLabel = new QLabel();
-	QHBoxLayout *topWidgetLayout = new QHBoxLayout(d_topWidget);
-	topWidgetLayout->setContentsMargins(d_leftHandlesArea->minimumWidth(),
-		0, 0, 5);
-	topWidgetLayout->setSpacing(10);
-	topWidgetLayout->insertWidget(0, d_timeBaseLabel, 0, Qt::AlignLeft |
-		Qt::AlignBottom);
-	d_topWidget->setLayout(topWidgetLayout);
 	d_timeBaseLabel->setStyleSheet("QLabel {"
 		"color: #4a64ff;"
 		"font-weight: bold;"
 		"}");
+	// Trigger State
+	d_triggerStateLabel = new QLabel();
+	d_triggerStateLabel->setStyleSheet("QLabel {"
+		"color: #ffffff;"
+		"}");
+
+	// Top area layout
+	QHBoxLayout *topWidgetLayout = new QHBoxLayout(d_topWidget);
+	topWidgetLayout->setContentsMargins(d_leftHandlesArea->minimumWidth(),
+		0, d_rightHandlesArea->minimumWidth(), 5);
+	topWidgetLayout->setSpacing(10);
+	topWidgetLayout->insertWidget(0, d_timeBaseLabel, 0, Qt::AlignLeft |
+		Qt::AlignBottom);
+	topWidgetLayout->insertWidget(1, d_triggerStateLabel, 0, Qt::AlignRight |
+		Qt::AlignBottom);
+	d_topWidget->setLayout(topWidgetLayout);
+
 
 	/* Time trigger widget */
 	d_timeTriggerBar = new VertBar(this);
@@ -744,4 +755,26 @@ void CapturePlot::setTimeBaseLabelValue(double value)
 {
 	QString text = d_cursorTimeFormatter.format(value, "", 3);
 	d_timeBaseLabel->setText(text + "/div");
+}
+
+void CapturePlot::setTriggerState(int triggerState)
+{
+	d_triggerStateLabel->hide();
+	switch (triggerState) {
+	case Waiting:
+		d_triggerStateLabel->setText("Waiting");
+		break;
+	case Triggered:
+		d_triggerStateLabel->setText("Triggered");
+		break;
+	case Stop:
+		d_triggerStateLabel->setText("Stop");
+		break;
+	case Auto:
+		d_triggerStateLabel->setText("Auto");
+		break;
+	default:
+		break;
+	};
+	d_triggerStateLabel->show();
 }
