@@ -501,6 +501,9 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 			QVariant(ui->pushButtonRunStop->text()));
 	ui->pushButtonSingle->setProperty("normal_text",
 			QVariant(ui->pushButtonSingle->text()));
+
+	// Calculate initial sample count and sample rate
+	onHorizScaleValueChanged(timeBase->value());
 }
 
 Oscilloscope::~Oscilloscope()
@@ -1154,7 +1157,7 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 	double old_sample_rate = active_sample_rate;
 	double plotTimeSpan = value * plot.xAxisNumDiv();
 	double newSampleRate = pickSampleRateFor(plotTimeSpan, maxBufferSize);
-	double newSampleCount = plotTimeSpan * newSampleRate;
+	int newSampleCount = (plotTimeSpan * newSampleRate + 0.5);
 	active_sample_rate = newSampleRate;
 
 	/* Reconfigure the GNU Radio block to receive a different number of samples  */
@@ -1175,6 +1178,8 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 	if (started)
 		plot.setSampleRate(newSampleRate, 1, "");
 	trigger_settings.setPlotNumSamples(newSampleCount);
+	plot.setBufferSizeLabelValue(newSampleCount);
+	plot.setSampleRatelabelValue(newSampleRate);
 
 	for (unsigned int i = 0; i < nb_channels; i++)
 		iio->set_buffer_size(ids[i], newSampleCount);

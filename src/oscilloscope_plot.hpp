@@ -112,6 +112,8 @@ namespace adiscope {
 		void setPeriodDetectHyst(int chnIdx, double hyst);
 		void setCursorReadoutsVisible(bool en);
 		void setTimeBaseLabelValue(double timebase);
+		void setBufferSizeLabelValue(int numSamples);
+		void setSampleRatelabelValue(double sampleRate);
 		void setTriggerState(int triggerState);
 
 	protected:
@@ -119,6 +121,7 @@ namespace adiscope {
 
 	private:
 		Measure* measureOfChannel(int chnIdx) const;
+		void updateBufferSizeSampleRateLabel(int nsamples, double sr);
 
 	private Q_SLOTS:
 		void onChannelAdded(int);
@@ -158,7 +161,11 @@ namespace adiscope {
 		VertHandlesArea *d_rightHandlesArea;
 
 		QLabel *d_timeBaseLabel;
+		QLabel *d_sampleRateLabel;
 		QLabel *d_triggerStateLabel;
+
+		int d_bufferSizeLabelVal;
+		double d_sampleRateLabelVal;
 
 		QList<HorizBar*> d_offsetBars;
 		QList<RoundedHandleV*> d_offsetHandles;
