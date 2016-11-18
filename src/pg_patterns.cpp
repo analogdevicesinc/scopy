@@ -24,6 +24,8 @@
 #include <QPushButton>
 #include <QJsonDocument>
 
+#include <errno.h>
+
 #include "pg_patterns.hpp"
 
 using namespace std;
