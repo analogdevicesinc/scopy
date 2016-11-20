@@ -57,7 +57,6 @@ namespace Glibmm {
 
 namespace adiscope {
 
-
 /*QStringList PatternGenerator::digital_trigger_conditions = QStringList()
         << "edge-rising"
         << "edge-falling"
@@ -106,8 +105,8 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt, QPushB
 
     /* setup PV plot view */
     main_win = w;
-    ui->horizontalLayout->removeWidget(ui->centralWidget);
-    ui->horizontalLayout->insertWidget(0, static_cast<QWidget* >(main_win));
+  //  ui->horizontalLayout->removeWidget(ui->centralWidget);
+    ui->centralWidgetLayout->insertWidget(0, static_cast<QWidget* >(main_win));
 
     /* setup toolbar */
     pv::toolbars::MainBar* main_bar = main_win->main_bar_;
@@ -119,12 +118,12 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt, QPushB
 
     int i = 0;
 
-    PatternUIFactory::init();
+    PatternFactory::init();
 
-    for(auto var : PatternUIFactory::get_ui_list())
+    for(auto var : PatternFactory::get_ui_list())
     {
         ui->scriptCombo->addItem(var);
-        ui->scriptCombo->setItemData(i, (PatternUIFactory::get_description_list())[i],Qt::ToolTipRole);
+        ui->scriptCombo->setItemData(i, (PatternFactory::get_description_list())[i],Qt::ToolTipRole);
         i++;
     }
 
@@ -149,6 +148,11 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt, QPushB
     connect(ui->btnSettings , SIGNAL(pressed()), this, SLOT(toggleRightMenu()));
 
     buffer = new short[1];
+    chmui = new PatternGeneratorChannelManagerUI(0,main_win,&chm,this);
+    ui->leftWidgetLayout->addWidget(chmui);
+    chmui->update_ui();
+    chmui->setVisible(true);
+
 
 }
 
@@ -311,8 +315,8 @@ void adiscope::PatternGenerator::on_generatePattern_clicked()
 {
 
     bool ok;
-    channel_group = ui->ChannelsToGenerate->text().toUShort(&ok,16);
-    if(!ok) {qDebug()<< "could not convert to hex";return;}
+    channel_group = selected_channel_group->get_mask();
+    ui->ChannelsToGenerate->setText("0x"+QString().number(channel_group,16));
     number_of_samples = ui->numberOfSamples->text().toLong();
     last_sample = ui->lastSample->text().toLong();// number_of_samples;//-100;
     start_sample = ui->startingSample->text().toLong();
@@ -329,28 +333,30 @@ void adiscope::PatternGenerator::on_generatePattern_clicked()
 
     PatternUI *current;
     current = currentUI;// patterns[ui->scriptCombo->currentIndex()];
-    if(current!=nullptr){
-        current->parse_ui();
-        current->set_number_of_channels(get_nr_of_channels());
-        current->set_number_of_samples(get_nr_of_samples());
-        current->set_sample_rate(sample_rate);
 
-        qDebug()<<"pregenerate status: "<<current->pre_generate();
-        qDebug()<<"minimum sampling frequency"<<current->get_min_sampling_freq(); // least common multiplier
-        current->set_sample_rate(current->get_min_sampling_freq()); // TEMP
-        qDebug()<<"minimum number of samples"<<current->get_required_nr_of_samples(); // if not periodic, verify minimum, else least common multiplier with least common freq
-        current->set_sample_rate(sample_rate);
+   if(current!=nullptr){
+        //current->parse_ui();
+        current->get_pattern()->set_number_of_channels(get_nr_of_channels());
+        current->get_pattern()->set_number_of_samples(get_nr_of_samples());
+        current->get_pattern()->set_sample_rate(sample_rate);
+
+        qDebug()<<"pregenerate status: "<<current->get_pattern()->pre_generate();
+        qDebug()<<"minimum sampling frequency"<<current->get_pattern()->get_min_sampling_freq(); // least common multiplier
+        current->get_pattern()->set_sample_rate(current->get_pattern()->get_min_sampling_freq()); // TEMP
+        qDebug()<<"minimum number of samples"<<current->get_pattern()->get_required_nr_of_samples(); // if not periodic, verify minimum, else least common multiplier with least common freq
+        current->get_pattern()->set_sample_rate(sample_rate);
 
 
-        if(current->generate_pattern() != 0) {qDebug()<<"Pattern Generation failed";return;} //ERROR TEMPORARY
+        if(current->get_pattern()->generate_pattern() != 0) {qDebug()<<"Pattern Generation failed";return;} //ERROR TEMPORARY
         /*if(current->number_of_samples>(last_sample-start_sample)) {qDebug()<<"Warning! not enough buffer space to generate whole pattern";}
     else {last_sample = current->number_of_samples+start_sample;}*/
-        commitBuffer(current->get_buffer());
+        commitBuffer(current->get_pattern()->get_buffer());
         createBinaryBuffer();
-        current->delete_buffer();
+        current->get_pattern()->delete_buffer();
         dataChanged();
         main_win->action_view_zoom_fit()->trigger();
     }
+
 }
 
 uint32_t adiscope::PatternGenerator::get_nr_of_samples()
@@ -427,18 +433,18 @@ void adiscope::PatternGenerator::on_generateUI_clicked()
 {
     if(currentUI!=nullptr)
     {
-        currentUI->deinit();
+        currentUI->get_pattern()->deinit();
         currentUI->setVisible(false);
         currentUI->destroy_ui();
         delete currentUI;
         currentUI = nullptr;
     }
-    currentUI = PatternUIFactory::create_ui(ui->scriptCombo->currentIndex());
+    /*currentUI = PatternFactory::create_ui(ui->scriptCombo->currentIndex());
 
     currentUI->build_ui(ui->rightWidgetPage2);
-    currentUI->init();
+    currentUI->get_pattern()->init();
     currentUI->post_load_ui();
-    currentUI->setVisible(true);
+    cu=rrentUI->setVisible(true);*/
 }
 
 void adiscope::PatternGenerator::on_save_PB_clicked()
@@ -512,28 +518,68 @@ void adiscope::PatternGenerator::on_load_PB_clicked()
 
 }
 
+void adiscope::PatternGenerator::createRightPatternWidget(PatternUI* pattern_ui)
+{
 
-int PatternUIFactory::static_ui_limit = 0;
-QStringList PatternUIFactory::ui_list = {};
-QStringList PatternUIFactory::description_list = {};
-QJsonObject PatternUIFactory::patterns = {};
+    if(currentUI!=nullptr)
+    {
+       // currentUI->get_pattern()->deinit();
+        currentUI->setVisible(false);
+        currentUI->destroy_ui();
+        delete currentUI;
+        currentUI = nullptr;
+    }
+    currentUI = pattern_ui;
+
+    currentUI->build_ui(ui->rightWidgetPage2);
+    currentUI->get_pattern()->init();
+    currentUI->post_load_ui();
+    currentUI->setVisible(true);
+    selected_channel_group = static_cast<PatternGeneratorChannelGroupUI*>(QObject::sender())->getChannelGroup();
+    connect(currentUI,SIGNAL(generate_buffer()),this,SLOT(on_generatePattern_clicked()));
+}
+
+void adiscope::PatternGenerator::onChannelEnabledChanged()
+{
+    uint16_t mask = chm.get_enabled_mask();
+    ui->ChannelEnableMask->setText("0x"+QString().number(mask,16));
+
+}
 
 
-void PatternUIFactory::init()
+void adiscope::PatternGenerator::onChannelSelectedChanged()
+{
+    uint16_t mask = chm.get_selected_mask();
+    ui->ChannelsToGenerate->setText("0x"+QString().number(mask,16));
+
+}
+
+
+int PatternFactory::static_ui_limit = 0;
+QStringList PatternFactory::ui_list = {};
+QStringList PatternFactory::description_list = {};
+QJsonObject PatternFactory::patterns = {};
+
+
+void PatternFactory::init()
 {
     QJsonObject pattern_object;
 
     ui_list.clear();
+
+    ui_list.append(ClockPatternName);
+    description_list.append(ClockPatternDescription);
+    ui_list.append(RandomPatternName);
+    description_list.append(RandomPatternDescription);
+
+    /*
     ui_list.append(ConstantPatternName);
     description_list.append(ConstantPatternDescription);
     ui_list.append(NumberPatternName);
     description_list.append(NumberPatternDescription);
-    ui_list.append(ClockPatternName);
-    description_list.append(ClockPatternDescription);
+
     ui_list.append(PulsePatternName);
     description_list.append(PulsePatternDescription);
-    ui_list.append(RandomPatternName);
-    description_list.append(RandomPatternDescription);
     ui_list.append(BinaryCounterPatternName);
     description_list.append(BinaryCounterPatternDescription);
     ui_list.append(GrayCounterPatternName);
@@ -542,9 +588,10 @@ void PatternUIFactory::init()
     description_list.append(JohnsonCounterPatternDescription);
     ui_list.append(WalkingCounterPatternName);
     description_list.append(WalkingCounterPatternDescription);
-
+*/
     static_ui_limit = ui_list.count();
-    QString searchPattern = "generator.json";
+
+    /*QString searchPattern = "generator.json";
     QDirIterator it("patterngenerator", QStringList() << searchPattern, QDir::Files, QDirIterator::Subdirectories);
     int i = 0;
     while (it.hasNext())
@@ -570,18 +617,48 @@ void PatternUIFactory::init()
         }
 
     }
-    patterns = pattern_object;
+    patterns = pattern_object;*/
     qDebug()<<patterns;
 }
 
-PatternUI* PatternUIFactory::create_ui(int index, QWidget *parent)
+
+Pattern* PatternFactory::create(int index)
 {
     switch(index){
-    case 0: return new ConstantPatternUI(parent);
+    case 0: return new ClockPattern();
+    case 1: return new RandomPattern();
+   /* case 0: return new ConstantPattern();
+    case 1: return new NumberPattern();
+
+    case 3: return new PulsePattern();
+
+    case 5: return new BinaryCounterPattern();
+    case 6: return new GrayCounterPattern();
+    case 7: return new JohnsonCounterPattern();
+    case 8: return new WalkingPattern();
+    default:
+        if(index>=static_ui_limit)
+        {
+            return new JSPattern(patterns[QString::number(static_ui_limit-index)].toObject());
+        }
+        else
+        {
+            return nullptr;
+        }
+        */
+    }
+}
+
+PatternUI* PatternFactory::create_ui(Pattern* pattern, int index, QWidget *parent)
+{
+    switch(index){
+    case 0: return new ClockPatternUI(dynamic_cast<ClockPattern*>(pattern),parent);
+    case 1: return new RandomPatternUI(dynamic_cast<RandomPattern*>(pattern),parent);
+        /*
     case 1: return new NumberPatternUI(parent);
-    case 2: return new ClockPatternUI(parent);
+    case 0: return new ConstantPatternUI(parent);
     case 3: return new PulsePatternUI(parent);
-    case 4: return new RandomPatternUI(parent);
+
     case 5: return new BinaryCounterPatternUI(parent);
     case 6: return new GrayCounterPatternUI(parent);
     case 7: return new JohnsonCounterPatternUI(parent);
@@ -595,88 +672,23 @@ PatternUI* PatternUIFactory::create_ui(int index, QWidget *parent)
         {
             return nullptr;
         }
+        */
     }
 }
 
-QStringList PatternUIFactory::get_ui_list()
+
+
+QStringList PatternFactory::get_ui_list()
 {
     return ui_list;
 }
 
-QStringList PatternUIFactory::get_description_list()
+QStringList PatternFactory::get_description_list()
 {
     return description_list;
 }
 
-ChannelManager::ChannelManager()
-{
-    for(auto i=0;i<16;i++)
-    {
-    channel_group.push_back(ChannelGroup(ChannelGroup::Channel(1<<i)));
-    }
-}
 
-void ChannelManager::split(int index)
-{
-    auto it = std::next(channel_group.begin(), index);
-    channel_group.insert(it + 1,channel_group[index].channels.begin(),channel_group[index].channels.end());
-    it = std::next(channel_group.begin(), index);
-    channel_group.erase(it);
-}
-
-void ChannelManager::join(std::vector<int> index)
-{
-    for(auto i=1;i<index.size();i++){
-        auto it = std::next(channel_group.begin(), index[i]);
-        channel_group[index[0]].append(channel_group[index[i]]);
-        channel_group.erase(it);
-        for(auto j=0;j<index.size();j++)
-        {
-            if(index[i] < index[j]) index[j]--;
-        }
-    }
-}
-
-ChannelManager::ChannelGroup::ChannelGroup(Channel ch)
-{
-    channels.push_back(ch);
-}
-
-uint16_t ChannelManager::ChannelGroup::get_mask()
-{
-    uint16_t mask = 0;
-    for(auto i=0;i<channels.size();i++)
-    {
-        mask = mask | channels[i].get_mask();
-    }
-    return mask;
-}
-
-void ChannelManager::ChannelGroup::append(ChannelGroup tojoin)
-{
-    for(auto i=0;i<tojoin.channels.size();i++)
-        channels.push_back(tojoin.channels[i]);
-}
-
-
-ChannelManager::ChannelGroup::Channel::Channel(uint16_t mask_)
-{
-    mask = mask_;
-}
-
-uint16_t ChannelManager::ChannelGroup::Channel::get_mask()
-{
-    return mask;
-}
 
 } /* namespace adiscope */
 
-void adiscope::PatternGenerator::on_CreateGroup_clicked()
-{
-    chm.join({3,2,5,7});
-}
-
-void adiscope::PatternGenerator::on_pushButton_clicked()
-{
-    chm.split(2);
-}

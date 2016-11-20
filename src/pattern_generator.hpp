@@ -14,6 +14,7 @@
 #include "filter.hpp"
 
 #include "pg_patterns.hpp"
+#include "pg_channel_manager.hpp"
 
 // Generated UI
 #include "ui_pattern_generator.h"
@@ -48,7 +49,7 @@ class PatternGenerator;
 
 namespace adiscope {
 
-class PatternUIFactory
+class PatternFactory
 {
     static QStringList ui_list;
     static QStringList description_list;
@@ -56,44 +57,13 @@ class PatternUIFactory
     static QJsonObject patterns;
 public:
     static void init();
-    static PatternUI *create_ui(int index,QWidget *parent = 0);
+    static Pattern *create(int index);
+    static PatternUI *create_ui(Pattern* pattern, int index, QWidget *parent = 0);
     static QStringList get_ui_list();
     static QStringList get_description_list();
 private:
-    PatternUIFactory() {}
+    PatternFactory() {}
 };
-
-class ChannelManager
-{
-    class ChannelGroup
-    {
-    private:
-    public:
-        class Channel
-        {
-        private:
-            uint16_t mask;
-        public:
-            Channel(uint16_t mask);
-            uint16_t get_mask();
-        };
-
-        std::vector<Channel> channels;
-        ChannelGroup(Channel ch);
-        void append(ChannelGroup tojoin);
-        uint16_t get_mask();
-    };
-
-    std::vector<ChannelGroup> channel_group;
-public:
-
-    ChannelManager();
-    void split(int index);
-    void join(std::vector<int> index);
-};
-
-
-
 
 class PatternGenerator : public QWidget
 {
@@ -112,8 +82,13 @@ public:
     short remap_buffer(uint8_t *mapping, uint32_t val);
     void commitBuffer(short *bufferPtr);
 
+Q_SIGNALS:
+    void generate_pattern();
 
 private Q_SLOTS:
+
+    void onChannelEnabledChanged();
+    void onChannelSelectedChanged();
     void startStop(bool start);
     void singleRun();
     void singleRunStop();
@@ -127,10 +102,7 @@ private Q_SLOTS:
     void on_save_PB_clicked();
 
     void on_load_PB_clicked();
-
-    void on_CreateGroup_clicked();
-
-    void on_pushButton_clicked();
+    void createRightPatternWidget(PatternUI* patternui);
 private:
 
     // UI
@@ -142,8 +114,12 @@ private:
     QIntValidator *sampleRateValidator;
     uint16_t channel_group;
 
+    PatternGeneratorChannelGroup *selected_channel_group;
+    PatternGeneratorChannelManager chm;
+    PatternGeneratorChannelManagerUI *chmui;
+
     // Buffer
-    ChannelManager chm;
+
     short *buffer;
     bool buffer_created;
     uint32_t start_sample;
@@ -186,6 +162,8 @@ private:
     static QStringList digital_trigger_conditions;
     static QStringList possibleSampleRates;
 };
+
+
 } /* namespace adiscope */
 
 

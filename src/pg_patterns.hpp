@@ -10,6 +10,7 @@
 #include <QtUiTools/QUiLoader>
 #include <vector>
 #include <string>
+#include <memory>
 
 // Generated UI
 #include "ui_binarycounterpatternui.h"
@@ -59,6 +60,8 @@ namespace adiscope {
 #define WalkingCounterPatternName "Walking Counter Pattern"
 #define WalkingCounterPatternDescription "Walking counter pattern generator"
 
+
+
 // http://stackoverflow.com/questions/32040101/qjsengine-print-to-console
 class JSConsole : public QObject // for logging purposes in QJSEngine
 {
@@ -83,7 +86,7 @@ protected: // temp
 public:
 
     Pattern(/*string name_, string description_*/);
-    ~Pattern();
+    virtual ~Pattern();
     std::string get_name();
     void set_name(std::string name_);
     std::string get_description();
@@ -127,15 +130,15 @@ public:
  }
 */
 
-class PatternUI : public QWidget, public virtual Pattern
+class PatternUI : public QWidget
 {
     Q_OBJECT
 public:
-
     PatternUI(QWidget *parent = 0);
-    ~PatternUI();
+    virtual ~PatternUI();
     //static PatternUI *create_ui(int index, QWidget *parent = 0);
     virtual void build_ui(QWidget *parent = 0);
+    virtual Pattern* get_pattern() = 0;
     virtual void post_load_ui();
     virtual void parse_ui();
     virtual void destroy_ui();
@@ -159,6 +162,81 @@ public:
 
 */
 
+
+class ClockPattern : virtual public Pattern
+{
+    int duty_cycle_granularity = 20;
+    float frequency;
+    float duty_cycle;
+    int phase;
+public:
+    ClockPattern();
+    virtual ~ClockPattern();
+    uint8_t generate_pattern();
+    float get_frequency() const;
+    void set_frequency(float value);
+    float get_duty_cycle() const;
+    void set_duty_cycle(float value);
+    int get_phase() const;
+    void set_phase(int value);
+    uint32_t get_min_sampling_freq();
+    uint32_t get_required_nr_of_samples();
+
+};
+
+class ClockPatternUI : public PatternUI
+{
+    Q_OBJECT
+    Ui::ClockPatternUI *ui;
+    QWidget *parent_;
+    ClockPattern *pattern;
+public:
+    ClockPatternUI(ClockPattern *pattern, QWidget *parent = 0);
+    virtual ~ClockPatternUI();
+    Pattern* get_pattern();
+    void build_ui(QWidget *parent = 0);
+    void destroy_ui();
+Q_SIGNALS:
+    void generate_buffer();
+public Q_SLOTS:
+    void parse_ui();
+};
+
+
+
+class RandomPattern : virtual public Pattern
+{
+protected:
+    uint32_t frequency;
+public:
+    RandomPattern();
+    virtual ~RandomPattern();
+    uint32_t get_min_sampling_freq();
+    uint32_t get_required_nr_of_samples();
+    uint32_t get_frequency() const;
+    void set_frequency(const uint32_t &value);
+    uint8_t generate_pattern();
+
+};
+
+class RandomPatternUI : public PatternUI
+{
+    Q_OBJECT
+    Ui::FrequencyPatternUI *ui;
+    QWidget *parent_;
+    RandomPattern* pattern;
+public:
+    RandomPatternUI(RandomPattern *pattern, QWidget *parent = 0);
+    ~RandomPatternUI();
+    Pattern* get_pattern();
+    void build_ui(QWidget *parent = 0);
+    void destroy_ui();
+Q_SIGNALS:
+    void generate_buffer();
+public Q_SLOTS:
+    void parse_ui();
+};
+#if 0
 
 class BinaryCounterPattern : virtual public Pattern
 {
@@ -189,14 +267,15 @@ public:
 
 };
 
-class BinaryCounterPatternUI : public PatternUI, public BinaryCounterPattern
+class BinaryCounterPatternUI : public PatternUI
 {
     Q_OBJECT
     Ui::BinaryCounterPatternUI *ui;
     QWidget *parent_;
 public:
-    BinaryCounterPatternUI(QWidget *parent = 0);
+    BinaryCounterPatternUI(BinaryCounterPattern *pattern, QWidget *parent = 0);
     ~BinaryCounterPatternUI();
+    BinaryCounterPattern* pattern;
     void parse_ui();
     void build_ui(QWidget *parent = 0);
     void destroy_ui();
@@ -210,41 +289,15 @@ public:
     uint8_t generate_pattern();
 };
 
-class RandomPattern : virtual public Pattern
-{
-protected:
-    uint32_t frequency;
-public:
-    RandomPattern();
-    uint32_t get_min_sampling_freq();
-    uint32_t get_required_nr_of_samples();
-    uint32_t get_frequency() const;
-    void set_frequency(const uint32_t &value);
-    uint8_t generate_pattern();
-};
-
-class RandomPatternUI : public PatternUI, public RandomPattern
-{
-    Q_OBJECT
-    Ui::FrequencyPatternUI *ui;
-    QWidget *parent_;
-public:
-    RandomPatternUI(QWidget *parent = 0);
-    ~RandomPatternUI();
-    void parse_ui();
-    void build_ui(QWidget *parent = 0);
-    void destroy_ui();
-};
-
-
-class GrayCounterPatternUI : public PatternUI, public GrayCounterPattern
+class GrayCounterPatternUI : public PatternUI
 {
     Q_OBJECT
     Ui::BinaryCounterPatternUI *ui;
     QWidget *parent_;
 public:
-    GrayCounterPatternUI(QWidget *parent = 0);
+    GrayCounterPatternUI(GrayCounterPattern *pattern, QWidget *parent = 0);
     ~GrayCounterPatternUI();
+    GrayCounterPattern* pattern;
     void parse_ui();
     void build_ui(QWidget *parent = 0);
     void destroy_ui();
@@ -288,14 +341,15 @@ public:
     uint8_t generate_pattern();
 };
 
-class UARTPatternUI : public PatternUI, public UARTPattern
+class UARTPatternUI : public PatternUI
 {
     Q_OBJECT
     Ui::UARTPatternUI *ui;
     QWidget *parent_;
 public:
-    UARTPatternUI(QWidget *parent = 0);
+    UARTPatternUI(UARTPattern *pattern, QWidget *parent = 0);
     ~UARTPatternUI();
+    UARTPattern* pattern;
     void build_ui(QWidget *parent = 0);
     void destroy_ui();
     void parse_ui();
@@ -394,39 +448,6 @@ public:
     void destroy_ui();
     /*private Q_SLOTS:
     void on_setLFSRParameters_clicked();*/
-};
-
-class ClockPattern : virtual public Pattern
-{
-    int duty_cycle_granularity = 20;
-    float frequency;
-    float duty_cycle;
-    int phase;
-public:
-    ClockPattern();
-    uint8_t generate_pattern();
-    float get_frequency() const;
-    void set_frequency(float value);
-    float get_duty_cycle() const;
-    void set_duty_cycle(float value);
-    int get_phase() const;
-    void set_phase(int value);
-    uint32_t get_min_sampling_freq();
-    uint32_t get_required_nr_of_samples();
-
-};
-
-class ClockPatternUI : public PatternUI, public ClockPattern
-{
-    Q_OBJECT
-    Ui::ClockPatternUI *ui;
-    QWidget *parent_;
-public:
-    ClockPatternUI(QWidget *parent = 0);
-    ~ClockPatternUI();
-    void parse_ui();
-    void build_ui(QWidget *parent = 0);
-    void destroy_ui();
 };
 
 class ConstantPattern : virtual public Pattern
@@ -581,6 +602,7 @@ public:
     void build_ui(QWidget *parent = 0);
     void destroy_ui();
 };
+#endif
 
 }
 #endif

@@ -138,11 +138,250 @@ void PatternUI::build_ui(QWidget *parent){}
 void PatternUI::post_load_ui(){}
 void PatternUI::parse_ui(){}
 void PatternUI::destroy_ui(){}
-static PatternUI *create_ui(int index, QWidget *parent = 0)
+
+
+
+uint32_t ClockPattern::get_min_sampling_freq()
+{
+    return frequency * (duty_cycle_granularity);
+}
+
+uint32_t ClockPattern::get_required_nr_of_samples()
+{
+    // greatest common divider duty cycle and 1000;0;
+    return duty_cycle_granularity;
+}
+
+
+float ClockPattern::get_duty_cycle() const
+{
+    return duty_cycle;
+}
+
+void ClockPattern::set_duty_cycle(float value)
+{
+    if(value>100) value = 100;
+
+    //    value = (value / (100/duty_cycle_granularity)) * (100/duty_cycle_granularity);
+    duty_cycle = value;
+}
+
+float ClockPattern::get_frequency() const
+{
+    return frequency;
+}
+
+void ClockPattern::set_frequency(float value)
+{
+    frequency = value;
+    if(frequency>40000000) frequency = 40000000;
+    if(frequency>20000000) duty_cycle_granularity = 2;
+    if(frequency>10000000 && frequency <= 20000000) duty_cycle_granularity = 4;
+    if(frequency>5000000 && frequency <= 10000000) duty_cycle_granularity = 8;
+    if(frequency>2000000 && frequency <= 5000000) duty_cycle_granularity = 16;
+    if(frequency<2000000) duty_cycle_granularity = 20;
+}
+
+int ClockPattern::get_phase() const
+{
+    return phase;
+}
+
+void ClockPattern::set_phase(int value)
+{
+    phase = value;
+    if(phase>360) phase = phase%360;
+    if(phase<0) phase = 360-(abs(phase)%360);
+
+}
+
+ClockPattern::ClockPattern()
+{
+    set_name("Clock");
+    set_description("Clock pattern");
+    set_periodic(true);
+    set_frequency(5000);
+    set_duty_cycle(50);
+    set_phase(0);
+}
+ClockPattern::~ClockPattern()
 {
 
 }
 
+
+uint8_t ClockPattern::generate_pattern()
+{
+    float period_number_of_samples = (float)sample_rate/frequency;
+    qDebug()<<"period_number_of_samples - "<<period_number_of_samples;
+    float number_of_periods = number_of_samples / period_number_of_samples;
+    qDebug()<<"number_of_periods - " << number_of_periods;
+    float low_number_of_samples = (period_number_of_samples * (100-duty_cycle)) / 100;
+    qDebug()<<"low_number_of_samples - " << low_number_of_samples;
+    float high_number_of_samples = period_number_of_samples - low_number_of_samples;
+    qDebug()<<"high_number_of_samples - " << high_number_of_samples;
+
+    delete_buffer();
+    buffer = new short[number_of_samples];
+    int i=0;
+
+    // phased samples
+    int phased = (period_number_of_samples * phase/360);
+
+    while(i<number_of_samples)
+    {
+        if((i+phased) % ((int)period_number_of_samples) < low_number_of_samples)
+            buffer[i] = 0;
+        else
+            buffer[i] = 0xffff;
+        //buffer[i] = (number_of_samples % period_number_of_samples) ;
+        i++;
+    }
+    return 0;
+}
+
+ClockPatternUI::ClockPatternUI(ClockPattern *pattern, QWidget *parent) : PatternUI(parent), pattern(pattern)
+{
+    qDebug()<<"ClockPatternUI created";
+    ui = new Ui::ClockPatternUI();
+    ui->setupUi(this);
+    setVisible(false);
+}
+
+ClockPatternUI::~ClockPatternUI(){
+    qDebug()<<"ClockPatternUI destroyed";
+}
+
+Pattern* ClockPatternUI::get_pattern()
+{
+    return pattern;
+}
+
+void ClockPatternUI::build_ui(QWidget *parent){
+    parent_ = parent;
+    parent->layout()->addWidget(this);
+    ui->frequency_LE->setText(QString().number(pattern->get_frequency()));
+    ui->duty_LE->setText(QString().number(pattern->get_duty_cycle()));
+    ui->phase_LE->setText(QString().number(pattern->get_phase()));
+    connect(ui->duty_LE,SIGNAL(textChanged(QString)),this,SLOT(parse_ui()));
+    connect(ui->frequency_LE,SIGNAL(textChanged(QString)),this,SLOT(parse_ui()));
+    connect(ui->phase_LE,SIGNAL(textChanged(QString)),this,SLOT(parse_ui()));
+
+
+}
+void ClockPatternUI::destroy_ui(){
+    parent_->layout()->removeWidget(this);
+}
+
+void ClockPatternUI::parse_ui()
+{
+    bool ok =0;
+    pattern->set_frequency(ui->frequency_LE->text().toFloat(&ok));
+    if(!ok) qDebug()<<"Cannot set frequency, not a float";
+    pattern->set_duty_cycle(ui->duty_LE->text().toFloat(&ok));
+    if(!ok) qDebug()<<"Cannot set duty, not a float";
+    pattern->set_phase(ui->phase_LE->text().toFloat(&ok));
+    if(!ok) qDebug()<<"Cannot set phase, not a float";
+    Q_EMIT generate_buffer();
+
+}
+
+
+RandomPattern::RandomPattern()
+{
+    set_name(RandomPatternName);
+    set_description(RandomPatternDescription);
+    set_periodic(false);
+    set_frequency(5000);
+}
+
+RandomPattern::~RandomPattern()
+{
+}
+
+
+uint32_t RandomPattern::get_min_sampling_freq()
+{
+    return frequency;
+}
+
+uint32_t RandomPattern::get_required_nr_of_samples()
+{
+    return 1;
+}
+
+uint32_t RandomPattern::get_frequency() const
+{
+    return frequency;
+}
+
+void RandomPattern::set_frequency(const uint32_t &value)
+{
+    frequency = value;
+}
+
+uint8_t RandomPattern::generate_pattern()
+{
+    delete_buffer();
+    buffer = new short[number_of_samples];
+    auto samples_per_count = ((float)sample_rate/(float)frequency);
+    int j=0;
+    while(j<number_of_samples)
+    {
+        uint16_t random_value = rand() % (1<<number_of_channels);
+        for(auto k=0;k<samples_per_count;k++,j++)
+        {
+            if(j>=number_of_samples)break;
+            buffer[j] = random_value;
+        }
+
+    }
+    return 0;
+}
+
+RandomPatternUI::RandomPatternUI(RandomPattern *pattern, QWidget *parent): pattern(pattern)
+{
+    qDebug()<<"RandomPatternUI created";
+    ui = new Ui::FrequencyPatternUI();
+    ui->setupUi(this);
+    setVisible(false);
+}
+RandomPatternUI::~RandomPatternUI()
+{
+    qDebug()<<"NumberPatternUI destroyed";
+}
+
+Pattern* RandomPatternUI::get_pattern()
+{
+    return pattern;
+}
+
+
+void RandomPatternUI::parse_ui()
+{
+    bool ok =0;
+    pattern->set_frequency(ui->frequency_LE->text().toInt(&ok,10));
+    if(!ok) qDebug()<<"Cannot set frequency, not an int";
+    Q_EMIT generate_buffer();
+}
+
+void RandomPatternUI::build_ui(QWidget *parent)
+{
+    parent_ = parent;
+    parent->layout()->addWidget(this);
+    ui->frequency_LE->setText(QString().number(pattern->get_frequency()));
+    connect(ui->frequency_LE,SIGNAL(textChanged(QString)),this,SLOT(parse_ui()));
+
+}
+
+void RandomPatternUI::destroy_ui()
+{
+    parent_->layout()->removeWidget(this);
+}
+
+
+
+#if 0
 uint32_t BinaryCounterPattern::get_min_sampling_freq()
 {
     return frequency;
@@ -268,12 +507,13 @@ uint8_t BinaryCounterPattern::generate_pattern()
     return 0;
 }
 
-BinaryCounterPatternUI::BinaryCounterPatternUI(QWidget *parent) : PatternUI(parent){
+BinaryCounterPatternUI::BinaryCounterPatternUI(BinaryCounterPattern *pattern, QWidget *parent) : PatternUI(parent), pattern(pattern){
     qDebug()<<"BinaryCounterPatternUI Created";
     ui = new Ui::BinaryCounterPatternUI();
     ui->setupUi(this);
     setVisible(false);
 }
+
 BinaryCounterPatternUI::~BinaryCounterPatternUI(){
     qDebug()<<"BinaryCounterPatternUI Destroyed";
 }
@@ -290,16 +530,16 @@ void BinaryCounterPatternUI::destroy_ui(){
 void BinaryCounterPatternUI::parse_ui()
 {
     bool ok = false;
-    set_frequency(ui->frequencyEdit->text().toULong(&ok));
+    pattern->set_frequency(ui->frequencyEdit->text().toULong(&ok));
     if(!ok) qDebug()<<"Cannot set frequency, not a uint32";
-    set_init_value(ui->inittval_LE->text().toULong(&ok));
+    pattern->set_init_value(ui->inittval_LE->text().toULong(&ok));
     if(!ok) qDebug()<<"Cannot set_init_value, not a uint32";
 
-    set_start_value(ui->startEdit->text().toUInt(&ok));
+    pattern->set_start_value(ui->startEdit->text().toUInt(&ok));
     if(!ok) qDebug()<<"Cannot set frequency, not a uint16";
-    set_end_value(ui->endEdit->text().toUInt(&ok));
+    pattern->set_end_value(ui->endEdit->text().toUInt(&ok));
     if(!ok) qDebug()<<"Cannot set frequency, not a uint16";
-    set_increment(ui->incrementEdit->text().toUInt(&ok));
+    pattern->set_increment(ui->incrementEdit->text().toUInt(&ok));
     if(!ok) qDebug()<<"Cannot set frequency, not a uint16";
 }
 
@@ -337,7 +577,7 @@ uint8_t GrayCounterPattern::generate_pattern()
     return 0;
 }
 
-GrayCounterPatternUI::GrayCounterPatternUI(QWidget *parent) : PatternUI(parent){
+GrayCounterPatternUI::GrayCounterPatternUI(GrayCounterPattern *pattern, QWidget *parent) : PatternUI(parent), pattern(pattern){
     qDebug()<<"GrayCounterPatternUI Created";
     ui = new Ui::BinaryCounterPatternUI();
     ui->setupUi(this);
@@ -346,6 +586,7 @@ GrayCounterPatternUI::GrayCounterPatternUI(QWidget *parent) : PatternUI(parent){
 GrayCounterPatternUI::~GrayCounterPatternUI(){
     qDebug()<<"BinaryCounterPatternUI Destroyed";
 }
+
 void GrayCounterPatternUI::build_ui(QWidget *parent){
     parent_ = parent;
     parent->layout()->addWidget(this);
@@ -359,13 +600,13 @@ void GrayCounterPatternUI::destroy_ui(){
 void GrayCounterPatternUI::parse_ui()
 {
     bool ok = false;
-    set_frequency(ui->frequencyEdit->text().toULong(&ok));
+    pattern->set_frequency(ui->frequencyEdit->text().toULong(&ok));
     if(!ok) qDebug()<<"Cannot set frequency, not a uint32";
-    set_start_value(ui->startEdit->text().toUInt(&ok));
+    pattern->set_start_value(ui->startEdit->text().toUInt(&ok));
     if(!ok) qDebug()<<"Cannot set frequency, not a uint16";
-    set_end_value(ui->endEdit->text().toUInt(&ok));
+    pattern->set_end_value(ui->endEdit->text().toUInt(&ok));
     if(!ok) qDebug()<<"Cannot set frequency, not a uint16";
-    set_increment(ui->incrementEdit->text().toUInt(&ok));
+    pattern->set_increment(ui->incrementEdit->text().toUInt(&ok));
     if(!ok) qDebug()<<"Cannot set frequency, not a uint16";
 }
 
@@ -594,11 +835,11 @@ uint8_t UARTPattern::generate_pattern()
     return 0;
 }
 
-UARTPatternUI::UARTPatternUI(QWidget *parent) : PatternUI(parent)
+UARTPatternUI::UARTPatternUI(UARTPattern *pattern, QWidget *parent) : PatternUI(parent), pattern(pattern)
 {
     qDebug()<<"UARTPatternUI created";
-    set_params("9600/8N1");
-    set_string("hello World");
+    pattern->set_params("9600/8N1");
+    pattern->set_string("hello World");
 
     ui = new Ui::UARTPatternUI();
     ui->setupUi(this);
@@ -608,6 +849,7 @@ UARTPatternUI::UARTPatternUI(QWidget *parent) : PatternUI(parent)
 UARTPatternUI::~UARTPatternUI(){
     qDebug()<<"UARTPatternUI destroyed";
 }
+
 void UARTPatternUI::build_ui(QWidget *parent){
     parent_ = parent;
     parent->layout()->addWidget(this);
@@ -622,9 +864,9 @@ void UARTPatternUI::parse_ui()
 {
     ui->paramsOut->setText(ui->baudCombo->currentText() + "/8" +ui->parityCombo->currentText()[0] + ui->stopCombo->currentText());
     qDebug()<<ui->paramsOut->text();
-    set_params(ui->paramsOut->text().toStdString());
+    pattern->set_params(ui->paramsOut->text().toStdString());
     qDebug()<<ui->dataEdit->text();
-    set_string(ui->dataEdit->text().toStdString());
+    pattern->set_string(ui->dataEdit->text().toStdString());
 }
 /*
 void adiscope::UARTPatternUI::on_setUARTParameters_clicked()
@@ -1021,126 +1263,6 @@ void LFSRPatternUI::parse_ui()
 }*/
 
 
-uint32_t ClockPattern::get_min_sampling_freq()
-{
-    return frequency * (duty_cycle_granularity);
-}
-
-uint32_t ClockPattern::get_required_nr_of_samples()
-{
-    // greatest common divider duty cycle and 1000;0;
-    return duty_cycle_granularity;
-}
-
-
-float ClockPattern::get_duty_cycle() const
-{
-    return duty_cycle;
-}
-
-void ClockPattern::set_duty_cycle(float value)
-{
-    if(value>100) value = 100;
-
-    //    value = (value / (100/duty_cycle_granularity)) * (100/duty_cycle_granularity);
-    duty_cycle = value;
-}
-
-float ClockPattern::get_frequency() const
-{
-    return frequency;
-}
-
-void ClockPattern::set_frequency(float value)
-{
-    frequency = value;
-    if(frequency>40000000) frequency = 40000000;
-    if(frequency>20000000) duty_cycle_granularity = 2;
-    if(frequency>10000000 && frequency <= 20000000) duty_cycle_granularity = 4;
-    if(frequency>5000000 && frequency <= 10000000) duty_cycle_granularity = 8;
-    if(frequency>2000000 && frequency <= 5000000) duty_cycle_granularity = 16;
-    if(frequency<2000000) duty_cycle_granularity = 20;
-}
-
-int ClockPattern::get_phase() const
-{
-    return phase;
-}
-
-void ClockPattern::set_phase(int value)
-{
-    phase = value;
-    if(phase>360) phase = phase%360;
-    if(phase<0) phase = 360-(abs(phase)%360);
-
-}
-
-ClockPattern::ClockPattern()
-{
-    set_name("Clock");
-    set_description("Clock pattern");
-    set_periodic(true);
-}
-
-uint8_t ClockPattern::generate_pattern()
-{
-    float period_number_of_samples = (float)sample_rate/frequency;
-    qDebug()<<"period_number_of_samples - "<<period_number_of_samples;
-    float number_of_periods = number_of_samples / period_number_of_samples;
-    qDebug()<<"number_of_periods - " << number_of_periods;
-    float low_number_of_samples = (period_number_of_samples * (100-duty_cycle)) / 100;
-    qDebug()<<"low_number_of_samples - " << low_number_of_samples;
-    float high_number_of_samples = period_number_of_samples - low_number_of_samples;
-    qDebug()<<"high_number_of_samples - " << high_number_of_samples;
-
-    delete_buffer();
-    buffer = new short[number_of_samples];
-    int i=0;
-
-    // phased samples
-    int phased = (period_number_of_samples * phase/360);
-
-    while(i<number_of_samples)
-    {
-        if((i+phased) % ((int)period_number_of_samples) < low_number_of_samples)
-            buffer[i] = 0;
-        else
-            buffer[i] = 0xffff;
-        //buffer[i] = (number_of_samples % period_number_of_samples) ;
-        i++;
-    }
-    return 0;
-}
-
-ClockPatternUI::ClockPatternUI(QWidget *parent) : PatternUI(parent)
-{
-    qDebug()<<"ClockPatternUI created";
-    ui = new Ui::ClockPatternUI();
-    ui->setupUi(this);
-    setVisible(false);
-}
-
-ClockPatternUI::~ClockPatternUI(){
-    qDebug()<<"ClockPatternUI destroyed";
-}
-void ClockPatternUI::build_ui(QWidget *parent){
-    parent_ = parent;
-    parent->layout()->addWidget(this);
-}
-void ClockPatternUI::destroy_ui(){
-    parent_->layout()->removeWidget(this);
-}
-
-void ClockPatternUI::parse_ui()
-{
-    bool ok =0;
-    set_frequency(ui->frequencyEdit->text().toFloat(&ok));
-    if(!ok) qDebug()<<"Cannot set frequency, not a float";
-    set_duty_cycle(ui->dutyEdit->text().toFloat(&ok));
-    if(!ok) qDebug()<<"Cannot set duty, not a float";
-    set_phase(ui->phaseLineEdit->text().toFloat(&ok));
-    if(!ok) qDebug()<<"Cannot set phase, not a float";
-}
 
 bool ConstantPattern::get_constant() const
 {
@@ -1254,81 +1376,6 @@ void NumberPatternUI::parse_ui()
     if(!ok) qDebug()<<"Cannot set frequency, not an int";
 }
 
-RandomPattern::RandomPattern()
-{
-    set_name(RandomPatternName);
-    set_description(RandomPatternDescription);
-    set_periodic(false);
-}
-
-uint32_t RandomPattern::get_min_sampling_freq()
-{
-    return frequency;
-}
-
-uint32_t RandomPattern::get_required_nr_of_samples()
-{
-    return 1;
-}
-
-uint32_t RandomPattern::get_frequency() const
-{
-    return frequency;
-}
-
-void RandomPattern::set_frequency(const uint32_t &value)
-{
-    frequency = value;
-}
-
-uint8_t RandomPattern::generate_pattern()
-{
-    delete_buffer();
-    buffer = new short[number_of_samples];
-    auto samples_per_count = ((float)sample_rate/(float)frequency);
-    int j=0;
-    while(j<number_of_samples)
-    {
-        uint16_t random_value = rand() % (1<<number_of_channels);
-        for(auto k=0;k<samples_per_count;k++,j++)
-        {
-            if(j>=number_of_samples)break;
-            buffer[j] = random_value;
-        }
-
-    }
-    return 0;
-}
-
-RandomPatternUI::RandomPatternUI(QWidget *parent)
-{
-    qDebug()<<"RandomPatternUI created";
-    ui = new Ui::FrequencyPatternUI();
-    ui->setupUi(this);
-    setVisible(false);
-}
-RandomPatternUI::~RandomPatternUI()
-{
-    qDebug()<<"NumberPatternUI destroyed";
-}
-
-void RandomPatternUI::parse_ui()
-{
-    bool ok =0;
-    set_frequency(ui->frequencyLineEdit->text().toInt(&ok,10));
-    if(!ok) qDebug()<<"Cannot set frequency, not an int";
-}
-
-void RandomPatternUI::build_ui(QWidget *parent)
-{
-    parent_ = parent;
-    parent->layout()->addWidget(this);
-}
-
-void RandomPatternUI::destroy_ui()
-{
-    parent_->layout()->removeWidget(this);
-}
 
 
 PulsePattern::PulsePattern()
@@ -1660,5 +1707,5 @@ void WalkingPatternUI::destroy_ui()
     parent_->layout()->removeWidget(this);
 }
 
-
+#endif
 }
