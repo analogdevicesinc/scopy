@@ -54,6 +54,7 @@ namespace adiscope {
 		SG_SQR_WAVE = gr::analog::GR_SQR_WAVE,
 		SG_TRI_WAVE = gr::analog::GR_TRI_WAVE,
 		SG_SAW_WAVE = gr::analog::GR_SAW_WAVE,
+		SG_INV_SAW_WAVE,
 	};
 
 	class SignalGenerator : public QWidget

@@ -33,6 +33,7 @@
 #include <gnuradio/blocks/float_to_short.h>
 #include <gnuradio/blocks/head.h>
 #include <gnuradio/blocks/int_to_float.h>
+#include <gnuradio/blocks/multiply_const_ff.h>
 #include <gnuradio/blocks/nop.h>
 #include <gnuradio/blocks/skiphead.h>
 #include <gnuradio/iio/device_sink.h>
@@ -367,6 +368,7 @@ void SignalGenerator::waveformTypeChanged(int val)
 		SG_SQR_WAVE,
 		SG_TRI_WAVE,
 		SG_SAW_WAVE,
+		SG_INV_SAW_WAVE,
 	};
 
 	auto ptr = getCurrentData();
@@ -504,6 +506,8 @@ void SignalGenerator::setFunction(const QString& function)
 basic_block_sptr SignalGenerator::getSignalSource(
 		gr::top_block_sptr top, struct signal_generator_data &data)
 {
+	bool inv_saw_wave = data.waveform == SG_INV_SAW_WAVE;
+	analog::gr_waveform_t waveform;
 	double amplitude;
 	float offset;
 
@@ -515,8 +519,12 @@ basic_block_sptr SignalGenerator::getSignalSource(
 		offset = data.offset - (float) data.amplitude;
 	}
 
-	auto src = analog::sig_source_f::make(SAMPLE_RATE,
-			static_cast<analog::gr_waveform_t>(data.waveform),
+	if (inv_saw_wave)
+		waveform = analog::GR_SAW_WAVE;
+	else
+		waveform = static_cast<analog::gr_waveform_t>(data.waveform);
+
+	auto src = analog::sig_source_f::make(SAMPLE_RATE, waveform,
 			data.frequency, amplitude, offset);
 	auto delay = blocks::delay::make(sizeof(float),
 			SAMPLE_RATE * data.phase / (data.frequency * 360.0));
@@ -526,7 +534,15 @@ basic_block_sptr SignalGenerator::getSignalSource(
 
 	top->connect(src, 0, delay, 0);
 	top->connect(delay, 0, skip_head, 0);
-	return skip_head;
+
+	if (!inv_saw_wave) {
+		return skip_head;
+	} else {
+		auto mult = blocks::multiply_const_ff::make(-1.0);
+		top->connect(skip_head, 0, mult, 0);
+
+		return mult;
+	}
 }
 
 gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
