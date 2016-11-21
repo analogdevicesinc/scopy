@@ -74,7 +74,7 @@ struct adiscope::signal_generator_data {
 	double frequency;
 	double math_freq;
 	double phase;
-	analog::gr_waveform_t waveform;
+	enum sg_waveform waveform;
 	QString file;
 	QString function;
 };
@@ -197,7 +197,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 		ptr->frequency = frequency->value();
 		ptr->constant = constantValue->value();
 		ptr->phase = phase->value();
-		ptr->waveform = analog::GR_SIN_WAVE;
+		ptr->waveform = SG_SIN_WAVE;
 		ptr->math_freq = mathFrequency->value();
 
 		ptr->type = SIGNAL_TYPE_CONSTANT;
@@ -362,11 +362,11 @@ void SignalGenerator::phaseChanged(double value)
 
 void SignalGenerator::waveformTypeChanged(int val)
 {
-	analog::gr_waveform_t types[] = {
-		analog::GR_SIN_WAVE,
-		analog::GR_SQR_WAVE,
-		analog::GR_TRI_WAVE,
-		analog::GR_SAW_WAVE,
+	enum sg_waveform types[] = {
+		SG_SIN_WAVE,
+		SG_SQR_WAVE,
+		SG_TRI_WAVE,
+		SG_SAW_WAVE,
 	};
 
 	auto ptr = getCurrentData();
@@ -504,8 +504,20 @@ void SignalGenerator::setFunction(const QString& function)
 basic_block_sptr SignalGenerator::getSignalSource(
 		gr::top_block_sptr top, struct signal_generator_data &data)
 {
-	auto src = analog::sig_source_f::make(SAMPLE_RATE, data.waveform,
-			data.frequency, data.amplitude, data.offset);
+	double amplitude;
+	float offset;
+
+	if (data.waveform == SG_SIN_WAVE) {
+		amplitude = data.amplitude;
+		offset = data.offset;
+	} else {
+		amplitude = data.amplitude * 2.0;
+		offset = data.offset - (float) data.amplitude;
+	}
+
+	auto src = analog::sig_source_f::make(SAMPLE_RATE,
+			static_cast<analog::gr_waveform_t>(data.waveform),
+			data.frequency, amplitude, offset);
 	auto delay = blocks::delay::make(sizeof(float),
 			SAMPLE_RATE * data.phase / (data.frequency * 360.0));
 

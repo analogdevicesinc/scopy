@@ -20,6 +20,7 @@
 #ifndef M2K_SIGNAL_GENERATOR_H
 #define M2K_SIGNAL_GENERATOR_H
 
+#include <gnuradio/analog/sig_source_waveform.h>
 #include <gnuradio/top_block.h>
 
 #include <QButtonGroup>
@@ -47,6 +48,13 @@ namespace Ui {
 namespace adiscope {
 	struct signal_generator_data;
 	struct time_block_data;
+
+	enum sg_waveform {
+		SG_SIN_WAVE = gr::analog::GR_SIN_WAVE,
+		SG_SQR_WAVE = gr::analog::GR_SQR_WAVE,
+		SG_TRI_WAVE = gr::analog::GR_TRI_WAVE,
+		SG_SAW_WAVE = gr::analog::GR_SAW_WAVE,
+	};
 
 	class SignalGenerator : public QWidget
 	{
