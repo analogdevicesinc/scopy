@@ -70,7 +70,6 @@ find_library(IIO_LIBRARIES NAMES iio libiio PATHS ${VC_PATH}/lib ${VC_PATH}/lib/
 find_path(IIO_INCLUDE_DIRS iio.h PATHS ${VC_PATH}/include)
 
 find_package(PkgConfig)
-pkg_check_modules(PYTHON REQUIRED python3)
 pkg_check_modules(GLIB REQUIRED glib-2.0)
 pkg_check_modules(GLIBMM REQUIRED glibmm-2.4)
 pkg_check_modules(SIGCPP REQUIRED sigc++-2.0)
@@ -153,7 +152,6 @@ target_link_libraries(${PROJECT_NAME} LINK_PRIVATE
 		${QWT_LIBRARIES}
 		${Qt5Svg_LIBRARIES}
 		${IIO_LIBRARIES}
-		${PYTHON_LIBRARIES}
 		${LIBSIGROK_LIBRARIES}
 		${LIBSIGROKCXX_LIBRARIES}
 		${LIBSIGROK_DECODE_LIBRARIES}
