@@ -22,6 +22,9 @@
 #include "handles_area.hpp"
 #include "plot_line_handle.h"
 
+#include <QHBoxLayout>
+#include <QLabel>
+
 using namespace adiscope;
 
 /*
@@ -60,7 +63,9 @@ CapturePlot::CapturePlot(QWidget *parent,
 	d_measurementEnabled(false),
 	d_selected_channel(-1),
 	d_measurementsEnabled(false),
-	d_cursorReadoutsVisible(false)
+	d_cursorReadoutsVisible(false),
+	d_bufferSizeLabelVal(0),
+	d_sampleRateLabelVal(1.0)
 {
 	/* Initial colors scheme */
 	d_trigAactiveLinePen = QPen(QColor(255, 255, 255), 2, Qt::SolidLine);
@@ -89,6 +94,54 @@ CapturePlot::CapturePlot(QWidget *parent,
 	d_rightHandlesArea->setMinimumWidth(50);
 	d_bottomHandlesArea->setLargestChildWidth(60);
 	d_rightHandlesArea->setLargestChildHeight(60);
+
+	/* Add content to the top area of the plot */
+	// Time Base
+	d_timeBaseLabel = new QLabel(this);
+	d_timeBaseLabel->setStyleSheet("QLabel {"
+		"color: #4a64ff;"
+		"font-weight: bold;"
+		"}");
+
+	// Call to minimumSizeHint() is required. Otherwise font properties from
+	// stylesheet will be ignored when calculating width using FontMetrics
+	int width = d_timeBaseLabel->minimumSizeHint().width();
+	QFontMetrics fm = d_timeBaseLabel->fontMetrics();
+	width = fm.width("999.999 ms/div");
+	d_timeBaseLabel->setMinimumWidth(width);
+
+	// Sample Rate and Buffer Size
+	d_sampleRateLabel = new QLabel("", this);
+	d_sampleRateLabel->setStyleSheet("QLabel {"
+		"color: #ffffff;"
+		"}");
+
+	// Trigger State
+	d_triggerStateLabel = new QLabel(this);
+	d_triggerStateLabel->setStyleSheet("QLabel {"
+		"color: #ffffff;"
+		"}");
+
+	// Top area layout
+	QHBoxLayout *topWidgetLayout = new QHBoxLayout(d_topWidget);
+	topWidgetLayout->setContentsMargins(d_leftHandlesArea->minimumWidth(),
+		0, d_rightHandlesArea->minimumWidth(), 5);
+
+	topWidgetLayout->setSpacing(10);
+
+	topWidgetLayout->insertWidget(0, d_timeBaseLabel, 0, Qt::AlignLeft |
+		Qt::AlignBottom);
+	topWidgetLayout->insertWidget(1, d_sampleRateLabel, 0, Qt::AlignLeft |
+		Qt::AlignBottom);
+	topWidgetLayout->insertWidget(2, d_triggerStateLabel, 0, Qt::AlignRight |
+		Qt::AlignBottom);
+
+	QSpacerItem *spacerItem = new QSpacerItem(0, 0, QSizePolicy::Expanding,
+		QSizePolicy::Fixed);
+	topWidgetLayout->insertSpacerItem(2, spacerItem);
+
+	d_topWidget->setLayout(topWidgetLayout);
+
 
 	/* Time trigger widget */
 	d_timeTriggerBar = new VertBar(this);
@@ -721,4 +774,53 @@ void CapturePlot::setPeriodDetectHyst(int chnIdx, double hyst)
 struct cursorReadoutsText CapturePlot::allCursorReadouts() const
 {
 	return d_cursorReadoutsText;
+}
+
+void CapturePlot::setTimeBaseLabelValue(double value)
+{
+	QString text = d_cursorTimeFormatter.format(value, "", 3);
+	d_timeBaseLabel->setText(text + "/div");
+}
+
+void CapturePlot::setBufferSizeLabelValue(int numSamples)
+{
+	d_bufferSizeLabelVal = numSamples;
+	updateBufferSizeSampleRateLabel(numSamples, d_sampleRateLabelVal);
+}
+
+void CapturePlot::setSampleRatelabelValue(double sampleRate)
+{
+	d_sampleRateLabelVal = sampleRate;
+	updateBufferSizeSampleRateLabel(d_bufferSizeLabelVal, sampleRate);
+}
+
+void CapturePlot::setTriggerState(int triggerState)
+{
+	d_triggerStateLabel->hide();
+	switch (triggerState) {
+	case Waiting:
+		d_triggerStateLabel->setText("Waiting");
+		break;
+	case Triggered:
+		d_triggerStateLabel->setText("Triggered");
+		break;
+	case Stop:
+		d_triggerStateLabel->setText("Stop");
+		break;
+	case Auto:
+		d_triggerStateLabel->setText("Auto");
+		break;
+	default:
+		break;
+	};
+	d_triggerStateLabel->show();
+}
+
+void CapturePlot::updateBufferSizeSampleRateLabel(int nsamples, double sr)
+{
+	QString txtSampleRate = d_cursorMetricFormatter.format(sr, "Hz", 0);
+	QString txtSamplingPeriod = d_cursorTimeFormatter.format(1 / sr, "", 0);
+	QString text = QString("%1 Samples at ").arg(nsamples) + txtSampleRate +
+		"/" + txtSamplingPeriod;
+	d_sampleRateLabel->setText(text);
 }
