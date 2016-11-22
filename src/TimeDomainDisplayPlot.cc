@@ -694,6 +694,13 @@ bool TimeDomainDisplayPlot::isZoomerEnabled()
 	return d_zoomer->isEnabled();
 }
 
+void TimeDomainDisplayPlot::setZoomerVertAxis(int index)
+{
+	if (index > -1 && index < axesCount(QwtPlot::yLeft))
+		d_zoomer->setAxes(QwtAxisId(QwtPlot::xBottom, 0),
+			QwtAxisId(QwtPlot::yLeft, index));
+}
+
 void TimeDomainDisplayPlot::setSymmetricDataEnabled(bool en)
 {
 	d_symmetric_data = en;

@@ -417,6 +417,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 
 	connect(this, SIGNAL(selectedChannelChanged(int)),
 		&plot, SLOT(setSelectedChannel(int)));
+	connect(this, SIGNAL(selectedChannelChanged(int)),
+		&plot, SLOT(setZoomerVertAxis(int)));
 
 	connect(&plot,
 		SIGNAL(cursorReadoutsChanged(struct cursorReadoutsText)),
