@@ -83,7 +83,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	context = sigrok::Context::create();
 
 	/* Initialise libsigrokdecode */
-	if (srd_init(nullptr) != SRD_OK) {
+	QString path = QCoreApplication::applicationDirPath() + "/decoders";
+	if (srd_init(path.toStdString().c_str()) != SRD_OK) {
 		qDebug() << "ERROR: libsigrokdecode init failed.";
 	}
 	/* Load the protocol decoders */
