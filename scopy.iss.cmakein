@@ -55,6 +55,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 Source: "c:\scopy\*"; DestDir: "{app}"; Flags: recursesubdirs createallsubdirs
+Source: "c:\projects\scopy\resources\decoders\*"; DestDir: "{app}\decoders"; Flags: recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{group}\{#AppName}"; Filename: "{app}\{#AppExeName}"
