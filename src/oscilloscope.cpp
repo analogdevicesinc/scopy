@@ -1791,7 +1791,8 @@ void Oscilloscope::singleCaptureDone()
 
 void Oscilloscope::onIioDataRefillTimeout()
 {
-	trigger_is_forced = true;
+	if (trigger_settings.triggerMode() == TriggerSettings::AUTO)
+		trigger_is_forced = true;
 }
 
 void Oscilloscope::onPlotNewData()

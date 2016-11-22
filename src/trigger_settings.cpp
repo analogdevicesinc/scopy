@@ -704,12 +704,12 @@ bool TriggerSettings::triggerIsArmed() const
 void TriggerSettings::on_btnAuto_toggled(bool checked)
 {
 	trigger_auto_mode = checked;
-	int mode = checked ? 1 : 0;
+	int mode = checked ? AUTO : NORMAL;
 
 	Q_EMIT triggerModeChanged(mode);
 }
 
-int TriggerSettings::triggerMode() const
+TriggerSettings::TriggerMode TriggerSettings::triggerMode() const
 {
-	return (ui->btnAuto->isChecked() ? 1 : 0);
+	return ui->btnAuto->isChecked() ? AUTO : NORMAL;
 }

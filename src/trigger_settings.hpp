@@ -41,6 +41,12 @@ namespace adiscope {
 		Q_OBJECT
 
 	public:
+
+		enum TriggerMode {
+			NORMAL,
+			AUTO
+		};
+
 		explicit TriggerSettings(struct iio_context *ctx,
 					QWidget *parent = nullptr);
 		~TriggerSettings();
@@ -51,7 +57,7 @@ namespace adiscope {
 		bool levelB_enabled();
 		void setPlotNumSamples(int);
 		bool triggerIsArmed() const;
-		int triggerMode() const;
+		enum TriggerMode triggerMode() const;
 
 	Q_SIGNALS:
 		void delayChanged(double);
