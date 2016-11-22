@@ -151,14 +151,58 @@ set(RESOURCES resources/icon.rc)
 
 add_definitions(-DQT_NO_KEYWORDS)
 
-add_executable(${PROJECT_NAME} WIN32
+if (APPLE)
+	option(ENABLE_APPLICATION_BUNDLE "Enable application bundle for OSX" ON)
+endif(APPLE)
+
+if (ENABLE_APPLICATION_BUNDLE)
+	set(PKGINFO ${CMAKE_BINARY_DIR}/PkgInfo)
+	file(WRITE ${PKGINFO} "APPLScopy")
+	set_source_files_properties(${PKGINFO} PROPERTIES MACOSX_PACKAGE_LOCATION .)
+
+	set(QT_CONF ${CMAKE_BINARY_DIR}/qt.conf)
+	file(WRITE ${QT_CONF} "")
+	set_source_files_properties(${QT_CONF} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+
+	set(CMAKE_EXE_LINKER_FLAGS "-Wl,-headerpad_max_install_names -Wl,-search_paths_first ${CMAKE_EXE_LINKER_FLAGS}")
+
+	foreach(plugin ${Qt5Gui_PLUGINS} ${Qt5Svg_PLUGINS})
+		get_target_property(_loc ${plugin} LOCATION)
+		get_filename_component(_name ${_loc} NAME)
+		get_filename_component(_dir ${_loc} DIRECTORY)
+		get_filename_component(_dir ${_dir} NAME)
+
+		set_source_files_properties(${_loc} PROPERTIES MACOSX_PACKAGE_LOCATION plugins/${_dir})
+		set(QT_PLUGINS ${QT_PLUGINS} ${_loc})
+		set(BUNDLED_QT_PLUGINS ${BUNDLED_QT_PLUGINS} ${CMAKE_BINARY_DIR}/Scopy.app/Contents/plugins/${_dir}/${_name})
+	endforeach()
+
+	file(GLOB_RECURSE DECODERS ${CMAKE_SOURCE_DIR}/resources/decoders/*.py)
+	foreach(_decoder ${DECODERS})
+		file(RELATIVE_PATH _file ${CMAKE_SOURCE_DIR}/resources ${_decoder})
+		get_filename_component(_path ${_file} DIRECTORY)
+		set_source_files_properties(${_decoder} PROPERTIES MACOSX_PACKAGE_LOCATION MacOS/${_path})
+	endforeach()
+
+	install(CODE "
+		set(BU_CHMOD_BUNDLE_ITEMS ON)
+		include(BundleUtilities)
+		fixup_bundle(\"${CMAKE_BINARY_DIR}/Scopy.app\" \"${BUNDLED_QT_PLUGINS}\" \"${CMAKE_SOURCE_DIR}\")"
+	)
+
+	set(OSX_BUNDLE MACOSX_BUNDLE)
+	set(EXTRA_BUNDLE_FILES ${QT_PLUGINS} ${PKGINFO} ${QT_CONF} ${DECODERS})
+endif()
+
+add_executable(${PROJECT_NAME} WIN32 ${OSX_BUNDLE}
 		${SRC_LIST}
 		${RESOURCES}
 		${m2kscope_RESOURCES}
 		${m2kscope_FORMS_HEADERS}
+		${EXTRA_BUNDLE_FILES}
 )
 
-if (WIN32)
+if (WIN32 OR ENABLE_APPLICATION_BUNDLE)
 	set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME Scopy)
 endif()
 
@@ -185,10 +229,13 @@ target_link_libraries(${PROJECT_NAME} LINK_PRIVATE
 		${GLIB_LIBRARIES}
 )
 
+configure_file(Info.plist.cmakein ${CMAKE_CURRENT_BINARY_DIR}/Info.plist @ONLY)
+
 set_target_properties(${PROJECT_NAME} PROPERTIES
 		CXX_STANDARD 11
 		CXX_STANDARD_REQUIRED ON
 		CXX_EXTENSIONS OFF
+		MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_BINARY_DIR}/Info.plist
 )
 
 configure_file(scopy.iss.cmakein ${CMAKE_CURRENT_BINARY_DIR}/scopy.iss @ONLY)

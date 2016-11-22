@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleExecutable</key>
+	<string>Scopy</string>
+	<key>CFBundleGetInfoString</key>
+	<string>@VERSION@, Copyright 2016 Analog Devices Inc.</string>
+	<!-- <key>CFBundleIconFile</key>
+	<string>Scopy.icns</string> -->
+	<key>CFBundleIdentifier</key>
+	<string>org.adi.Scopy</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>@VERSION@</string>
+	<key>CFBundleSignature</key>
+	<string>Scopy</string>
+	<key>CFBundleVersion</key>
+	<string>@PROJECT_VERSION@</string>
+	<key>NSHumanReadableCopyright</key>
+	<string>Copyright 2016 Analog Devices Inc., GNU GPLv3+.</string>
+	<key>NSPrincipalClass</key>
+	<string>NSApplication</string>
+	<key>NSHighResolutionCapable</key>
+	<true/>
+	<key>LSMinimumSystemVersion</key>
+	<string>10.6</string>
+</dict>
+</plist>
