@@ -158,6 +158,10 @@ add_executable(${PROJECT_NAME} WIN32
 		${m2kscope_FORMS_HEADERS}
 )
 
+if (WIN32)
+	set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME Scopy)
+endif()
+
 link_directories(
 	${Boost_LIBRARY_DIRS}
 	${GNURADIO_RUNTIME_LIBRARY_DIRS}
