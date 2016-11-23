@@ -674,15 +674,15 @@ void View::update_scroll()
 	updating_scroll_ = false;
 
 	// Set the vertical scrollbar
-	verticalScrollBar()->setPageStep(areaSize.height());
-	verticalScrollBar()->setSingleStep(areaSize.height() / 8);
+	verticalScrollBar()->setPageStep(viewport_->height());
+	verticalScrollBar()->setSingleStep(viewport_->height() / 8);
 
 	const pair<int, int> extents = v_extents();
 
 	// Don't change the scrollbar range if there are no traces
 	if (extents.first != extents.second)
-		verticalScrollBar()->setRange(extents.first - areaSize.height(),
-			extents.second);
+		verticalScrollBar()->setRange(extents.first,
+			extents.second - viewport_->height() + 10);
 
 	if (scroll_needs_defaults)
 		set_scroll_default();
@@ -1023,30 +1023,13 @@ void View::signals_changed()
 			}
 		}
 
-	// Enqueue the remaining logic channels in a group
-	vector< shared_ptr<Channel> > logic_channels;
-	copy_if(channels.begin(), channels.end(), back_inserter(logic_channels),
-		[](const shared_ptr<Channel>& c) {
-			return c->type() == sigrok::ChannelType::LOGIC; });
-
-	const vector< shared_ptr<Trace> > non_grouped_logic_signals =
-		extract_new_traces_for_channels(logic_channels,	signal_map, add_traces);
-
-	if (non_grouped_logic_signals.size() > 0) {
-		const shared_ptr<TraceGroup> non_grouped_trace_group(
-			make_shared<TraceGroup>());
-		for (shared_ptr<Trace> trace : non_grouped_logic_signals)
-			non_grouped_trace_group->add_child_item(trace);
-
-		non_grouped_trace_group->restack_items();
-		new_top_level_items.push_back(non_grouped_trace_group);
-	}
-
 	// Enqueue the remaining channels as free ungrouped traces
 	const vector< shared_ptr<Trace> > new_top_level_signals =
 		extract_new_traces_for_channels(channels, signal_map, add_traces);
 	new_top_level_items.insert(new_top_level_items.end(),
 		new_top_level_signals.begin(), new_top_level_signals.end());
+
+	restack_items();
 
 	// Enqueue any remaining traces i.e. decode traces
 	new_top_level_items.insert(new_top_level_items.end(),

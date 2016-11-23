@@ -130,6 +130,36 @@ bool TraceTreeItemOwner::reassign_bgcolour_states(bool next_bgcolour_state)
 
 void TraceTreeItemOwner::restack_items()
 {
+	vector<shared_ptr<TraceTreeItem>> items(list_by_type<TraceTreeItem>());
+
+	// Sort by the centre line of the extents
+	stable_sort(items.begin(), items.end(),
+		[](const shared_ptr<TraceTreeItem> &a, const shared_ptr<TraceTreeItem> &b) {
+			const auto aext = a->v_extents();
+			const auto bext = b->v_extents();
+			return a->layout_v_offset() +
+					(aext.first + aext.second) / 2 <
+				b->layout_v_offset() +
+					(bext.first + bext.second) / 2;
+		});
+
+	int total_offset = 0;
+	for (shared_ptr<TraceTreeItem> r : items) {
+		const pair<int, int> extents = r->v_extents();
+		if (extents.first == 0 && extents.second == 0)
+			continue;
+
+		// We position disabled traces, so that they are close to the
+		// animation target positon should they be re-enabled
+		if (r->enabled())
+			total_offset += -extents.first;
+
+		if (!r->dragging())
+			r->set_layout_v_offset(total_offset);
+
+		if (r->enabled())
+			total_offset += extents.second;
+	}
 }
 
 } // view
