@@ -8,8 +8,8 @@
 	<string>Scopy</string>
 	<key>CFBundleGetInfoString</key>
 	<string>@VERSION@, Copyright 2016 Analog Devices Inc.</string>
-	<!-- <key>CFBundleIconFile</key>
-	<string>Scopy.icns</string> -->
+	<key>CFBundleIconFile</key>
+	<string>Scopy.icns</string>
 	<key>CFBundleIdentifier</key>
 	<string>org.adi.Scopy</string>
 	<key>CFBundleInfoDictionaryVersion</key>

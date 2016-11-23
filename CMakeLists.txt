@@ -164,6 +164,9 @@ if (ENABLE_APPLICATION_BUNDLE)
 	file(WRITE ${QT_CONF} "")
 	set_source_files_properties(${QT_CONF} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
 
+	set(ICON_FILE ${CMAKE_SOURCE_DIR}/resources/Scopy.icns)
+	set_source_files_properties(${ICON_FILE} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+
 	set(CMAKE_EXE_LINKER_FLAGS "-Wl,-headerpad_max_install_names -Wl,-search_paths_first ${CMAKE_EXE_LINKER_FLAGS}")
 
 	foreach(plugin ${Qt5Gui_PLUGINS} ${Qt5Svg_PLUGINS})
@@ -191,7 +194,7 @@ if (ENABLE_APPLICATION_BUNDLE)
 	)
 
 	set(OSX_BUNDLE MACOSX_BUNDLE)
-	set(EXTRA_BUNDLE_FILES ${QT_PLUGINS} ${PKGINFO} ${QT_CONF} ${DECODERS})
+	set(EXTRA_BUNDLE_FILES ${QT_PLUGINS} ${ICON_FILE} ${PKGINFO} ${QT_CONF} ${DECODERS})
 endif()
 
 add_executable(${PROJECT_NAME} WIN32 ${OSX_BUNDLE}
