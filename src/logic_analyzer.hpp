@@ -62,6 +62,8 @@ namespace adiscope {
 		void startStop(bool start);
 		void toggleRightMenu();
 		void rightMenuFinished(bool opened);
+		void toggleLeftMenu();
+		void leftMenuFinished(bool opened);
 
 	private:
 		Ui::LogicAnalyzer *ui;

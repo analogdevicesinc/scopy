@@ -117,8 +117,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 
 	/* setup view */
 	main_win = w;
-	ui->verticalLayout_8->removeWidget(ui->centralWidget);
-	ui->verticalLayout_8->insertWidget(1, static_cast<QWidget*>(main_win));
+	ui->horizontalLayout_3->removeWidget(ui->centralWidget);
+	ui->horizontalLayout_3->insertWidget(1, static_cast<QWidget*>(main_win));
 
 	/* setup toolbar */
 	/*
@@ -131,6 +131,9 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	*/
 
 	ui->rightWidget->setMaximumWidth(0);
+	ui->leftWidget->setMaximumWidth(350);
+	ui->scrollArea_expanded->setFrameShape(QFrame::NoFrame);
+	ui->scrollArea_collapsed->setFrameShape(QFrame::NoFrame);
 
 	/* General settings */
 	settings_group->addButton(ui->btnSettings);
@@ -170,6 +173,10 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 			this, SLOT(toggleRightMenu()));
 	connect(ui->rightWidget, SIGNAL(finished(bool)),
 			this, SLOT(rightMenuFinished(bool)));
+	connect(ui->btnShowHideMenu, SIGNAL(pressed()),
+		this, SLOT(toggleLeftMenu()));
+	connect(ui->leftWidget, SIGNAL(finished(bool)),
+		this, SLOT(leftMenuFinished(bool)));
 }
 
 LogicAnalyzer::~LogicAnalyzer()
@@ -231,6 +238,11 @@ void LogicAnalyzer::toggleRightMenu()
 	toggleRightMenu(static_cast<QPushButton *>(QObject::sender()));
 }
 
+void LogicAnalyzer::toggleLeftMenu()
+{
+	ui->leftWidget->toggleMenu(!ui->btnShowHideMenu->isChecked());
+}
+
 void LogicAnalyzer::rightMenuFinished(bool opened)
 {
 	menuOpened = opened;
@@ -239,5 +251,23 @@ void LogicAnalyzer::rightMenuFinished(bool opened)
 		int id = active_settings_btn->property("id").toInt();
 		settings_panel_update(id);
 		ui->rightWidget->toggleMenu(true);
+	}
+}
+
+void LogicAnalyzer::leftMenuFinished(bool opened)
+{
+	if(ui->btnShowHideMenu->isChecked() && opened)
+	{
+		ui->btnGroupChannels->hide();
+		ui->btnShowChannels->hide();
+		ui->btnShowHideMenu->setText(">");
+		ui->leftStackedWidget->setCurrentIndex(1);
+	}
+	else
+	{
+		ui->btnGroupChannels->show();
+		ui->btnShowChannels->show();
+		ui->btnShowHideMenu->setText("<");
+		ui->leftStackedWidget->setCurrentIndex(0);
 	}
 }
