@@ -36,6 +36,10 @@ namespace Ui {
 }
 
 namespace adiscope {
+	class OscADC;
+}
+
+namespace adiscope {
 	class TriggerSettings : public QWidget
 	{
 		Q_OBJECT
@@ -48,6 +52,7 @@ namespace adiscope {
 		};
 
 		explicit TriggerSettings(struct iio_context *ctx,
+					const OscADC& adc,
 					QWidget *parent = nullptr);
 		~TriggerSettings();
 
@@ -116,6 +121,8 @@ namespace adiscope {
 		PositionSpinButton *ui_triggerAHyst;
 		PositionSpinButton *ui_triggerBHyst;
 		PositionSpinButton *ui_triggerHoldoff;
+
+		const OscADC& osc_adc;
 
 		struct iio_channel *trigger0;
 		struct iio_channel *trigger1;

@@ -20,6 +20,7 @@
 #include "trigger_settings.hpp"
 #include "adc_sample_conv.hpp"
 #include "spinbox_a.hpp"
+#include "osc_adc.h"
 
 #include "ui_trigger_settings.h"
 
@@ -63,8 +64,10 @@ vector<string> TriggerSettings::lut_digital_trigger_conditions = {
 	"level-high",
 };
 
-TriggerSettings::TriggerSettings(struct iio_context *ctx, QWidget *parent) :
+TriggerSettings::TriggerSettings(struct iio_context *ctx, const OscADC& adc,
+		QWidget *parent) :
 	QWidget(parent), ui(new Ui::TriggerSettings),
+	osc_adc(adc),
 	triggerA_en(false), triggerB_en(false),
 	temporarily_disabled(false), plot_num_samples(0)
 {
@@ -601,8 +604,7 @@ void TriggerSettings::trigger_ab_enabled_update(bool &a_en, bool &b_en)
 
 void TriggerSettings::trigg_delay_write_hardware(double delay)
 {
-	int sampleWorthOfTime = delay * 1e9  // Convert from seconds to ns
-					/ 10; // Each sample is 10 ns distant from each other.
+	int sampleWorthOfTime = delay * osc_adc.sampleRate();
 
 	/* Sync the hardware trigger delay with the trigger point of the plot */
 	sampleWorthOfTime -= plot_num_samples / 2;
