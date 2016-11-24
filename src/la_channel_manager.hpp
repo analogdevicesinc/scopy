@@ -4,6 +4,9 @@
 #include <QDebug>
 #include "digitalchannel_manager.hpp"
 
+namespace Ui {
+	class LAChannelManager;
+}
 
 namespace adiscope {
 	class LogicAnalyzerChannel : public Channel
@@ -87,16 +90,20 @@ namespace adiscope {
 				pv::MainWindow *main_win_,
 				LogicAnalyzerChannelManager *chm);
 		LogicAnalyzerChannelManager *chm;
-		Ui::PGChannelManager *ui;
+		Ui::LAChannelManager *ui;
 		void update_ui();
 		void collapse();
 		void expand();
 
 	public Q_SLOTS:
-		void changeStuff(int value);
+		void update_position(int value);
 
 	private Q_SLOTS:
 		void on_groupSplit_clicked();
+		void on_hideInactive_clicked(bool hide);
+
+	private:
+		bool hidden;
 	};
 }
 #endif // LA_CHANNEL_MANAGER_HPP

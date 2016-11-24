@@ -82,111 +82,16 @@ QPushButton:disabled
     <number>0</number>
    </property>
    <item>
-    <widget class="QPushButton" name="btnEnableChannel">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>44</width>
-       <height>24</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>44</width>
-       <height>24</height>
-      </size>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">QPushButton {
-  min-height: 20px;
-  max-height: 20px;
-  min-width: 40px;
-  max-width: 40px;
-}
-
-QPushButton:checked {
-  border-image: url(:/icons/logic_switch_on.svg);
-}
-QPushButton:!checked {
-  border-image: url(:/icons/logic_switch_off.svg);
-}
-
-</string>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="checkable">
-      <bool>true</bool>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item>
     <spacer name="spacer1">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="sizeType">
-      <enum>QSizePolicy::Maximum</enum>
+      <enum>QSizePolicy::Fixed</enum>
      </property>
      <property name="sizeHint" stdset="0">
       <size>
        <width>50</width>
-       <height>0</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item>
-    <widget class="QPushButton" name="btnRemChannel">
-     <property name="styleSheet">
-      <string notr="true">QPushButton {
-  min-height: 13.8px;
-  max-height: 13.8px;
-  min-width: 13.9px;
-  max-width: 13.9px;
-}
-
-QPushButton:checked {
-  border-image: url(:/icons/close_hovered.svg);
-}
-QPushButton:!checked {
-  border-image: url(:/icons/close_hovered.svg);
-
-}
-
-</string>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="checkable">
-      <bool>true</bool>
-     </property>
-     <property name="checked">
-      <bool>false</bool>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <spacer name="spacer2">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Maximum</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>40</width>
        <height>0</height>
       </size>
      </property>
@@ -218,16 +123,16 @@ QPushButton:!checked {
     </widget>
    </item>
    <item>
-    <spacer name="spacer3">
+    <spacer name="spacer2">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="sizeType">
-      <enum>QSizePolicy::MinimumExpanding</enum>
+      <enum>QSizePolicy::Fixed</enum>
      </property>
      <property name="sizeHint" stdset="0">
       <size>
-       <width>10</width>
+       <width>40</width>
        <height>0</height>
       </size>
      </property>
@@ -241,16 +146,16 @@ QPushButton:!checked {
     </widget>
    </item>
    <item>
-    <spacer name="spacer4">
+    <spacer name="spacer3">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="sizeType">
-      <enum>QSizePolicy::MinimumExpanding</enum>
+      <enum>QSizePolicy::Fixed</enum>
      </property>
      <property name="sizeHint" stdset="0">
       <size>
-       <width>10</width>
+       <width>50</width>
        <height>0</height>
       </size>
      </property>
@@ -282,6 +187,22 @@ QPushButton:!checked {
       <bool>true</bool>
      </property>
     </widget>
+   </item>
+   <item>
+    <spacer name="spacer4">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::MinimumExpanding</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>10</width>
+       <height>0</height>
+      </size>
+     </property>
+    </spacer>
    </item>
    <item>
     <spacer name="spacer5">
@@ -553,31 +474,32 @@ QPushButton:!checked {
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="sizeType">
-      <enum>QSizePolicy::MinimumExpanding</enum>
+      <enum>QSizePolicy::Fixed</enum>
      </property>
      <property name="sizeHint" stdset="0">
       <size>
-       <width>20</width>
+       <width>30</width>
        <height>0</height>
       </size>
      </property>
     </spacer>
    </item>
    <item>
-    <widget class="QPushButton" name="btnSelectChannel">
+    <widget class="QPushButton" name="btnRemChannel">
      <property name="styleSheet">
       <string notr="true">QPushButton {
-  min-height: 20px;
-  max-height: 20px;
-  min-width: 20px;
-  max-width: 20px;
+  min-height: 13.8px;
+  max-height: 13.8px;
+  min-width: 13.9px;
+  max-width: 13.9px;
 }
 
 QPushButton:checked {
-  border-image: url(:/icons/blue_box_enabled.svg);
+  border-image: url(:/icons/close_hovered.svg);
 }
 QPushButton:!checked {
-  border-image: url(:/icons/blue_box_disabled.svg);
+  border-image: url(:/icons/close_hovered.svg);
+
 }
 
 </string>
@@ -587,6 +509,9 @@ QPushButton:!checked {
      </property>
      <property name="checkable">
       <bool>true</bool>
+     </property>
+     <property name="checked">
+      <bool>false</bool>
      </property>
     </widget>
    </item>

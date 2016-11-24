@@ -184,6 +184,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 
 	connect(ui->btnGroupChannels, SIGNAL(pressed()),
 		chm_ui, SLOT(on_groupSplit_clicked()));
+	connect(ui->btnShowChannels, SIGNAL(clicked(bool)),
+		chm_ui, SLOT(on_hideInactive_clicked(bool)));
 
 }
 

@@ -4,11 +4,8 @@
 #include "la_channel_manager.hpp"
 #include "ui_la_channel_group.h"
 #include "ui_la_channel.h"
-#include "ui_pg_channel_manager.h"
-
-namespace Ui {
-	class PGChannelManager;
-}
+#include "ui_la_channel_manager.h"
+#include <QScrollBar>
 
 namespace pv {
 	class MainWindow;
@@ -173,12 +170,14 @@ LogicAnalyzerChannelManagerUI::LogicAnalyzerChannelManagerUI(QWidget *parent,
 		pv::MainWindow *main_win_,
 		LogicAnalyzerChannelManager *chm) :
 	QWidget(parent),
-	ui(new Ui::PGChannelManager)
+	ui(new Ui::LAChannelManager)
 {
 	ui->setupUi(this);
 	main_win = main_win_;
 	this->chm = chm;
 
+	connect(ui->scrollArea->verticalScrollBar(), SIGNAL(valueChanged(int)),
+		this, SLOT(update_position(int)));
 	// update_ui();
 }
 
@@ -221,8 +220,6 @@ void invalidateLayout(QLayout *layout)
 
 void LogicAnalyzerChannelManagerUI::update_ui()
 {
-	ui->groupSplit->hide();
-
 	for (auto ch : chg_ui) {
 		delete ch;
 	}
@@ -233,62 +230,67 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 	auto offset = 0;
 
 	for (auto&& ch : *(chm->get_channel_groups())) {
-		chg_ui.push_back(new LogicAnalyzerChannelGroupUI(
-			static_cast<LogicAnalyzerChannelGroup *>(ch), 0));
+		if((ch->is_enabled() && hidden) || !hidden) {
 
-		Ui::LA_channel_group *lachannelgroup =
+			chg_ui.push_back(new LogicAnalyzerChannelGroupUI(
+				static_cast<LogicAnalyzerChannelGroup *>(ch), 0));
+
+			Ui::LA_channel_group *lachannelgroup =
 				new Ui::LA_channel_group;
-		lachannelgroup->setupUi(chg_ui.back());
-		ui->verticalLayout->insertWidget(chg_ui.size(),chg_ui.back());
-		lachannelgroup->groupName->setText(
+			lachannelgroup->setupUi(chg_ui.back());
+			ui->verticalLayout->insertWidget(chg_ui.size() - 1,
+				chg_ui.back());
+			lachannelgroup->groupName->setText(
 				QString().fromStdString(ch->get_label()));
+			lachannelgroup->btnEnableChannel->setChecked(ch->is_enabled());
 
-		int i = 0;
-		connect(lachannelgroup->selectCheckBox, SIGNAL(toggled(bool)),
-			chg_ui.back(), SLOT(select(bool)));
+			int i = 0;
+			connect(lachannelgroup->selectCheckBox, SIGNAL(toggled(bool)),
+				chg_ui.back(), SLOT(select(bool)));
+			connect(lachannelgroup->btnEnableChannel, SIGNAL(toggled(bool)),
+				chg_ui.back(), SLOT(enable(bool)));
 
-		offset+=(chg_ui.back()->geometry().bottomRight().y()-10);
+			offset+=(chg_ui.back()->geometry().bottomRight().y()-10);
 
-		if (ch->is_grouped()) { // create subwidgets
-			chg_ui.back()->set_id_pvItem(
-				main_win->view_->add_decoder());
-			auto trace = main_win->view_->get_trace_by_id(
-				chg_ui.back()->get_id_pvItem());
-			trace->force_to_v_offset(offset);
-
-
-			for (auto i=0; i<ch->get_channel_count(); i++) {
-				Ui::LA_channel *lachannelui =
-					new Ui::LA_channel;
-				LogicAnalyzerChannelUI *p =
-					new LogicAnalyzerChannelUI(
-						static_cast<LogicAnalyzerChannel*>(
-							ch->get_channel(i)));
-				lachannelui->setupUi(p);
-				lachannelgroup->layoutChildren->insertWidget(i,p);
-
-				auto str = QString().fromStdString(
-					ch->get_channel(i)->get_label());
-				lachannelui->channelName->setText(str);
-				str = QString().number(ch->get_channel(i)->get_id());
-				lachannelui->channelIndex->setText(str);
-				auto index = ch->get_channel(i)->get_id();
-				auto trace = main_win->view_->get_clone_of(index);
-				p->set_id_pvItem(trace->getIdentifier());
-
-				forceUpdate(p);
-				offset+=p->geometry().bottomRight().y();
-				trace->force_to_v_offset(offset);
-			}
-		}
-		else {
-			auto index = ch->get_channel(0)->get_id();
-			auto trace = main_win->view_->get_clone_of(index);
-
-			if (trace) {
-				trace->force_to_v_offset(offset);
+			if (ch->is_grouped()) { // create subwidgets
 				chg_ui.back()->set_id_pvItem(
-					trace->getIdentifier());
+					main_win->view_->add_decoder());
+				auto trace = main_win->view_->get_trace_by_id(
+					chg_ui.back()->get_id_pvItem());
+				trace->force_to_v_offset(offset);
+
+				for (auto i=0; i<ch->get_channel_count(); i++) {
+					Ui::LA_channel *lachannelui =
+						new Ui::LA_channel;
+					LogicAnalyzerChannelUI *p =
+						new LogicAnalyzerChannelUI(
+						static_cast<LogicAnalyzerChannel*>(
+						ch->get_channel(i)));
+					lachannelui->setupUi(p);
+					lachannelgroup->layoutChildren->insertWidget(i,p);
+
+					auto str = QString().fromStdString(
+						ch->get_channel(i)->get_label());
+					lachannelui->channelName->setText(str);
+					str = QString().number(ch->get_channel(i)->get_id());
+					lachannelui->channelIndex->setText(str);
+					auto index = ch->get_channel(i)->get_id();
+					auto trace = main_win->view_->get_clone_of(index);
+					p->set_id_pvItem(trace->getIdentifier());
+
+					forceUpdate(p);
+					offset+=p->geometry().bottomRight().y();
+					trace->force_to_v_offset(offset);
+				}
+			}
+			else {
+				auto index = ch->get_channel(0)->get_id();
+				auto trace = main_win->view_->get_clone_of(index);
+				if (trace) {
+					trace->force_to_v_offset(offset);
+					chg_ui.back()->set_id_pvItem(
+						trace->getIdentifier());
+				}
 			}
 		}
 	}
@@ -328,8 +330,15 @@ void LogicAnalyzerChannelManagerUI::on_groupSplit_clicked()
 	update_ui();
 }
 
-void LogicAnalyzerChannelManagerUI::changeStuff(int value)
+void LogicAnalyzerChannelManagerUI::on_hideInactive_clicked(bool hide)
 {
+	hidden = hide;
 	update_ui();
 }
+
+void LogicAnalyzerChannelManagerUI::update_position(int value)
+{
+	//WIP
+}
+
 }

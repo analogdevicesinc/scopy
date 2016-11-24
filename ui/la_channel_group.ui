@@ -140,58 +140,11 @@ QPushButton:!checked {
         <enum>Qt::Horizontal</enum>
        </property>
        <property name="sizeType">
-        <enum>QSizePolicy::MinimumExpanding</enum>
+        <enum>QSizePolicy::Fixed</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
-         <width>10</width>
-         <height>0</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="btnRemGroup">
-       <property name="styleSheet">
-        <string notr="true">QPushButton {
-  min-height: 13.8px;
-  max-height: 13.8px;
-  min-width: 13.9px;
-  max-width: 13.9px;
-}
-
-QPushButton:checked {
-  border-image: url(:/icons/close_hovered.svg);
-}
-QPushButton:!checked {
-  border-image: url(:/icons/close_hovered.svg);
-
-}
-
-</string>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
-       <property name="checked">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_2">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeType">
-        <enum>QSizePolicy::MinimumExpanding</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>10</width>
+         <width>40</width>
          <height>0</height>
         </size>
        </property>
@@ -383,7 +336,7 @@ QPushButton:!checked {
       </widget>
      </item>
      <item>
-      <spacer name="horizontalSpacer_3">
+      <spacer name="horizontalSpacer_2">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
@@ -399,9 +352,12 @@ QPushButton:!checked {
       </spacer>
      </item>
      <item>
-      <spacer name="horizontalSpacer_4">
+      <spacer name="horizontalSpacer_5">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::MinimumExpanding</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -439,13 +395,13 @@ QPushButton:!checked {
       </widget>
      </item>
      <item>
-      <spacer name="horizontalSpacer_5">
+      <spacer name="horizontalSpacer_4">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
-         <width>40</width>
+         <width>10</width>
          <height>0</height>
         </size>
        </property>
@@ -707,6 +663,53 @@ QPushButton:!checked {
        <property name="sizeHint" stdset="0">
         <size>
          <width>40</width>
+         <height>0</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnRemGroup">
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+  min-height: 13.8px;
+  max-height: 13.8px;
+  min-width: 13.9px;
+  max-width: 13.9px;
+}
+
+QPushButton:checked {
+  border-image: url(:/icons/close_hovered.svg);
+}
+QPushButton:!checked {
+  border-image: url(:/icons/close_hovered.svg);
+
+}
+
+</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::MinimumExpanding</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>10</width>
          <height>0</height>
         </size>
        </property>
