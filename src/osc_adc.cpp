@@ -36,7 +36,7 @@ OscADC::~OscADC()
 {
 }
 
-double OscADC::sampleRate()
+double OscADC::sampleRate() const
 {
 	return m_sampleRate;
 }
@@ -51,24 +51,24 @@ void OscADC::setSampleRate(double newSr)
 	iio_device_attr_write_longlong(m_adc, "sampling_frequency", newSr);
 }
 
-QList<double>& OscADC::availSamplRates()
+QList<double> OscADC::availSamplRates() const
 {
 	return m_availSampRates;
 }
 
-unsigned int OscADC::numChannels()
+unsigned int OscADC::numChannels() const
 {
 	return m_numChannels;
 }
 
-struct iio_device* OscADC::iio_adc()
+struct iio_device* OscADC::iio_adc() const
 {
 	return m_adc;
 }
 
-double OscADC::compTable(double samplRate)
+double OscADC::compTable(double samplRate) const
 {
-	return m_filt_comp_table[samplRate];
+	return m_filt_comp_table.at(samplRate);
 }
 
 unsigned int OscADC::get_nb_channels(struct iio_device *dev)

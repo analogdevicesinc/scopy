@@ -21,14 +21,14 @@ namespace adiscope {
 		OscADC(struct iio_context *, const Filter *);
 		~OscADC();
 
-		double sampleRate();
+		double sampleRate() const;
 		void setSampleRate(double);
-		QList<double>& availSamplRates();
-		unsigned int numChannels();
+		QList<double> availSamplRates() const;
+		unsigned int numChannels() const;
 
-		struct iio_device *iio_adc();
+		struct iio_device *iio_adc() const;
 
-		double compTable(double samplRate);
+		double compTable(double samplRate) const;
 
 	private:
 		static unsigned int get_nb_channels(struct iio_device *dev);
