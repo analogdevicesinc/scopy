@@ -18,6 +18,32 @@
 cmake_minimum_required(VERSION 3.1.3)
 project(scopy LANGUAGES CXX VERSION 0.1)
 
+# Get the GIT hash of the latest commit
+include(FindGit OPTIONAL)
+if (GIT_FOUND)
+	execute_process(
+		COMMAND ${GIT_EXECUTABLE} rev-parse --show-toplevel
+		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+		OUTPUT_VARIABLE SCOPY_GIT_REPO
+		OUTPUT_STRIP_TRAILING_WHITESPACE
+	)
+
+	if (${SCOPY_GIT_REPO} MATCHES ${CMAKE_CURRENT_SOURCE_DIR})
+		execute_process(
+			COMMAND ${GIT_EXECUTABLE} rev-parse --short HEAD
+			WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+			OUTPUT_VARIABLE SCOPY_VERSION_GIT
+			OUTPUT_STRIP_TRAILING_WHITESPACE
+		)
+	endif()
+endif()
+
+if (NOT SCOPY_VERSION_GIT)
+	set(SCOPY_VERSION_GIT v${VERSION})
+endif()
+
+add_definitions(-DSCOPY_VERSION_GIT=${SCOPY_VERSION_GIT})
+
 if (MSVC)
 	# http://www.suodenjoki.dk/us/archive/2010/min-max.htm
 	add_definitions(-DNOMINMAX)
