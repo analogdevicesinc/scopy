@@ -218,6 +218,13 @@ ChannelGroup::ChannelGroup(Channel* ch)
     enable(true);
 }
 
+ChannelGroup::ChannelGroup()
+{
+	group(false);
+	select(false);
+	enable(true);
+}
+
 ChannelGroup::~ChannelGroup()
 {
     qDebug()<<"ChannelGroup destroyed";

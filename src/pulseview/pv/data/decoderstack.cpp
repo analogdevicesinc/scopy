@@ -75,8 +75,14 @@ DecoderStack::DecoderStack(pv::Session &session,
 	connect(&session_, SIGNAL(frame_ended()),
 		this, SLOT(on_frame_ended()));
 
-	stack_.push_back(shared_ptr<decode::Decoder>(
-		new decode::Decoder(dec)));
+	if (dec)
+	{
+		stack_.push_back(shared_ptr<decode::Decoder>(
+			new decode::Decoder(dec)));
+		name_ = stack_.front()->decoder()->name;
+	}
+	else
+		name_ = "GroupName";
 }
 
 DecoderStack::~DecoderStack()
@@ -86,6 +92,11 @@ DecoderStack::~DecoderStack()
 		input_cond_.notify_one();
 		decode_thread_.join();
 	}
+}
+
+QString DecoderStack::name()
+{
+	return name_;
 }
 
 const std::list< std::shared_ptr<decode::Decoder> >&

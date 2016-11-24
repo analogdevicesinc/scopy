@@ -129,6 +129,13 @@ public:
 
 	void remove_decode_signal(view::DecodeTrace *signal);
 
+	std::shared_ptr<pv::view::DecodeTrace> add_decoder();
+
+	void remove_decode_clones();
+
+	void remove_signal_clones();
+
+	void add_signal(std::shared_ptr<view::LogicSignal> sig);
 
 private:
 	void set_capture_state(capture_state state);

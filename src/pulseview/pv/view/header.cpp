@@ -51,7 +51,7 @@ using std::vector;
 namespace pv {
 namespace view {
 
-const int Header::Padding = 12;
+const int Header::Padding = 0;
 const int Header::BaselineOffset = 5;
 
 static bool item_selected(shared_ptr<TraceTreeItem> r)

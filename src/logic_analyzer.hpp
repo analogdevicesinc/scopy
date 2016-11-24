@@ -32,6 +32,7 @@
 #include "pulseview/pv/mainwindow.hpp"
 #include "spinbox_a.hpp"
 #include "pulseview/pv/devices/binarystream.hpp"
+#include "la_channel_manager.hpp"
 
 using namespace pv;
 using namespace pv::toolbars;
@@ -43,6 +44,7 @@ namespace Glibmm {
 
 namespace Ui {
 	class LogicAnalyzer;
+	class Channel;
 }
 
 namespace adiscope {
@@ -92,6 +94,9 @@ namespace adiscope {
 
 		std::map<std::string, Glib::VariantBase> options;
 		std::shared_ptr<pv::devices::BinaryStream> logic_analyzer_ptr;
+
+		LogicAnalyzerChannelManager chm;
+		LogicAnalyzerChannelManagerUI *chm_ui;
 	};
 }
 

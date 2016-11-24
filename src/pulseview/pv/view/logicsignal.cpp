@@ -126,6 +126,16 @@ LogicSignal::LogicSignal(
 					trigger_match_ = match->type();
 }
 
+LogicSignal::LogicSignal(LogicSignal& obj):
+	LogicSignal(*obj.session(), obj.device(),
+		obj.channel(), obj.logic_data())
+{}
+
+shared_ptr<devices::Device> LogicSignal::device() const
+{
+	return device_;
+}
+
 shared_ptr<pv::data::SignalData> LogicSignal::data() const
 {
 	return data_;

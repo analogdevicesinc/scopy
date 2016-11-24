@@ -130,8 +130,7 @@ const QColor DecodeTrace::OutlineColours[16] = {
 
 DecodeTrace::DecodeTrace(pv::Session &session,
 	std::shared_ptr<pv::data::DecoderStack> decoder_stack, int index) :
-	Trace(QString::fromUtf8(
-		decoder_stack->stack().front()->decoder()->name)),
+	Trace(decoder_stack->name()),
 	session_(session),
 	decoder_stack_(decoder_stack),
 	row_height_(0),

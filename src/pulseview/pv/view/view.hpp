@@ -296,6 +296,10 @@ public:
 	void time_item_appearance_changed(bool label, bool content);
 
 	void extents_changed(bool horz, bool vert);
+	std::shared_ptr<TraceTreeItem> get_trace_by_id(int id);
+	std::shared_ptr<TraceTreeItem> get_clone_of(int id);
+	uint16_t add_decoder();
+	void remove_trace_clones();
 
 private Q_SLOTS:
 

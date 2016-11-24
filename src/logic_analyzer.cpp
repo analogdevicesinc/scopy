@@ -132,8 +132,6 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 
 	ui->rightWidget->setMaximumWidth(0);
 	ui->leftWidget->setMaximumWidth(350);
-	ui->scrollArea_expanded->setFrameShape(QFrame::NoFrame);
-	ui->scrollArea_collapsed->setFrameShape(QFrame::NoFrame);
 
 	/* General settings */
 	settings_group->addButton(ui->btnSettings);
@@ -177,6 +175,16 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 		this, SLOT(toggleLeftMenu()));
 	connect(ui->leftWidget, SIGNAL(finished(bool)),
 		this, SLOT(leftMenuFinished(bool)));
+
+	chm_ui = new LogicAnalyzerChannelManagerUI(0, main_win, &chm);
+//	ui->layout_scrollA_exp->addWidget(chm_ui);
+	ui->expandedLayout->addWidget(chm_ui);
+	chm_ui->update_ui();
+	chm_ui->setVisible(true);
+
+	connect(ui->btnGroupChannels, SIGNAL(pressed()),
+		chm_ui, SLOT(on_groupSplit_clicked()));
+
 }
 
 LogicAnalyzer::~LogicAnalyzer()
@@ -262,6 +270,7 @@ void LogicAnalyzer::leftMenuFinished(bool opened)
 		ui->btnShowChannels->hide();
 		ui->btnShowHideMenu->setText(">");
 		ui->leftStackedWidget->setCurrentIndex(1);
+		chm_ui->collapse();
 	}
 	else
 	{
@@ -269,5 +278,6 @@ void LogicAnalyzer::leftMenuFinished(bool opened)
 		ui->btnShowChannels->show();
 		ui->btnShowHideMenu->setText("<");
 		ui->leftStackedWidget->setCurrentIndex(0);
+		chm_ui->expand();
 	}
 }

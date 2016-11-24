@@ -27,12 +27,30 @@
 namespace pv {
 namespace view {
 
+std::atomic<int> TraceTreeItem::seed(0);
+
 TraceTreeItem::TraceTreeItem() :
 	owner_(nullptr),
 	layout_v_offset_(0),
 	visual_v_offset_(0),
 	v_offset_animation_(this, "visual_v_offset")
 {
+	identifier_ = createIdentifier();
+}
+
+int TraceTreeItem::createIdentifier()
+{
+   return std::atomic_fetch_add(&seed, 1);
+}
+
+void TraceTreeItem::setIdentifier(int id)
+{
+   identifier_ = id;
+}
+
+int TraceTreeItem::getIdentifier()
+{
+   return identifier_;
 }
 
 void TraceTreeItem::select(bool select)

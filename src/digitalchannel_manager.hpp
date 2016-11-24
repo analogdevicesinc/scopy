@@ -93,6 +93,7 @@ protected:
 
 public:
     ChannelGroup(Channel* ch);
+    ChannelGroup();
     virtual ~ChannelGroup();
     std::string label;
     void set_label(std::string label);

@@ -22,6 +22,7 @@
 #define PULSEVIEW_PV_VIEW_TRACETREEITEM_HPP
 
 #include <memory>
+#include <atomic>
 
 #include <QPropertyAnimation>
 
@@ -124,6 +125,10 @@ public:
 	 */
 	virtual std::pair<int, int> v_extents() const = 0;
 
+	int getIdentifier();
+
+	void setIdentifier(int id);
+
 protected:
 	TraceTreeItemOwner *owner_;
 
@@ -131,6 +136,10 @@ protected:
 	int visual_v_offset_;
 
 	bool bgcolour_state_;
+	int identifier_;
+
+	static std::atomic<int> seed;
+	int createIdentifier();
 
 private:
 	QPropertyAnimation v_offset_animation_;
