@@ -149,24 +149,21 @@ void Ruler::paintEvent(QPaintEvent*)
 
 	const int text_height = calculate_text_height();
 	const int ruler_height = RulerHeight * text_height;
-	const int major_tick_y1 = text_height + ValueMargin * 2;
+	const int major_tick_y1 = text_height + ValueMargin;
 	const int minor_tick_y1 = (major_tick_y1 + ruler_height) / 2;
 
 	QPainter p(this);
 
 	// Draw the tick marks
-	p.setPen(palette().color(foregroundRole()));
-
+	QPen pen = QPen(QColor(255, 255, 255, 30*256/100));
 	for (const auto& tick: tick_position_cache_->major) {
-		p.drawText(tick.first, ValueMargin, 0, text_height,
-				AlignCenter | AlignTop | TextDontClip, tick.second);
-		p.drawLine(QPointF(tick.first, major_tick_y1),
-			QPointF(tick.first, ruler_height));
-	}
+		p.setPen(pen);
+		p.drawLine(QPointF(tick.first, 0),
+			QPointF(tick.first, major_tick_y1));
 
-	for (const auto& tick: tick_position_cache_->minor) {
-		p.drawLine(QPointF(tick, minor_tick_y1),
-				QPointF(tick, ruler_height));
+		p.setPen(palette().color(foregroundRole()));
+		p.drawText(tick.first, major_tick_y1 + ValueMargin, 0, text_height,
+			AlignCenter | AlignBottom | TextDontClip, tick.second);
 	}
 
 	// Draw the hover mark

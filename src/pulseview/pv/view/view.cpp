@@ -725,8 +725,8 @@ void View::update_layout()
 {
 	setViewportMargins(
 		header_->sizeHint().width() - pv::view::Header::BaselineOffset + 50,
-		ruler_->sizeHint().height(), 0, 0);
-	ruler_->setGeometry(viewport_->x(), 0,
+		0, 0, ruler_->sizeHint().height());
+	ruler_->setGeometry(viewport_->x(), viewport_->y() + viewport_->height(),
 		viewport_->width(), ruler_->extended_size_hint().height());
 	header_->setGeometry(0, viewport_->y(),
 		header_->extended_size_hint().width(), viewport_->height());
