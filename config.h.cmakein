@@ -1,0 +1,4 @@
+#ifndef CONFIG_H_CMAKEIN
+#define CONFIG_H_CMAKEIN
+
+#endif // CONFIG_H_CMAKEIN
