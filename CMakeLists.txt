@@ -42,8 +42,6 @@ if (NOT SCOPY_VERSION_GIT)
 	set(SCOPY_VERSION_GIT v${PROJECT_VERSION})
 endif()
 
-add_definitions(-DSCOPY_VERSION_GIT=${SCOPY_VERSION_GIT})
-
 if (MSVC)
 	# http://www.suodenjoki.dk/us/archive/2010/min-max.htm
 	add_definitions(-DNOMINMAX)
