@@ -47,6 +47,9 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 
 	setWindowIcon(QIcon(":/icon.ico"));
 
+	// TO DO: remove this when the About menu becomes available
+	setWindowTitle(QString("Scopy - ") + QString(SCOPY_VERSION_GIT));
+
 	struct iio_scan_context *scan_ctx = iio_create_scan_context("usb", 0);
 	if (!scan_ctx) {
 		std::cerr << "Unable to create scan context!" << std::endl;
