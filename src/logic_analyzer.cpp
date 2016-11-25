@@ -177,7 +177,6 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 		this, SLOT(leftMenuFinished(bool)));
 
 	chm_ui = new LogicAnalyzerChannelManagerUI(0, main_win, &chm);
-//	ui->layout_scrollA_exp->addWidget(chm_ui);
 	ui->expandedLayout->addWidget(chm_ui);
 	chm_ui->update_ui();
 	chm_ui->setVisible(true);
@@ -250,7 +249,7 @@ void LogicAnalyzer::toggleRightMenu()
 
 void LogicAnalyzer::toggleLeftMenu()
 {
-	ui->leftWidget->toggleMenu(!ui->btnShowHideMenu->isChecked());
+	ui->leftWidget->toggleMenu(ui->btnShowHideMenu->isChecked());
 }
 
 void LogicAnalyzer::rightMenuFinished(bool opened)
@@ -264,22 +263,20 @@ void LogicAnalyzer::rightMenuFinished(bool opened)
 	}
 }
 
-void LogicAnalyzer::leftMenuFinished(bool opened)
+void LogicAnalyzer::leftMenuFinished(bool closed)
 {
-	if(ui->btnShowHideMenu->isChecked() && opened)
+	if(ui->btnShowHideMenu->isChecked() && !closed)
 	{
 		ui->btnGroupChannels->hide();
 		ui->btnShowChannels->hide();
 		ui->btnShowHideMenu->setText(">");
-		ui->leftStackedWidget->setCurrentIndex(1);
-		chm_ui->collapse();
+		chm_ui->collapse(true);
 	}
 	else
 	{
 		ui->btnGroupChannels->show();
 		ui->btnShowChannels->show();
 		ui->btnShowHideMenu->setText("<");
-		ui->leftStackedWidget->setCurrentIndex(0);
-		chm_ui->expand();
+		chm_ui->collapse(false);
 	}
 }

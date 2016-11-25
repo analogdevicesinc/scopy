@@ -92,8 +92,7 @@ namespace adiscope {
 		LogicAnalyzerChannelManager *chm;
 		Ui::LAChannelManager *ui;
 		void update_ui();
-		void collapse();
-		void expand();
+		void collapse(bool);
 
 	public Q_SLOTS:
 		void update_position(int value);
@@ -104,6 +103,7 @@ namespace adiscope {
 
 	private:
 		bool hidden;
+		bool collapsed;
 	};
 }
 #endif // LA_CHANNEL_MANAGER_HPP

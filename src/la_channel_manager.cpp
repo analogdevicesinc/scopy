@@ -170,7 +170,9 @@ LogicAnalyzerChannelManagerUI::LogicAnalyzerChannelManagerUI(QWidget *parent,
 		pv::MainWindow *main_win_,
 		LogicAnalyzerChannelManager *chm) :
 	QWidget(parent),
-	ui(new Ui::LAChannelManager)
+	ui(new Ui::LAChannelManager),
+	hidden(false),
+	collapsed(false)
 {
 	ui->setupUi(this);
 	main_win = main_win_;
@@ -244,6 +246,15 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 				QString().fromStdString(ch->get_label()));
 			lachannelgroup->btnEnableChannel->setChecked(ch->is_enabled());
 
+			if (collapsed)
+			{
+				lachannelgroup->btnEnableChannel->hide();
+				lachannelgroup->btnRemGroup->hide();
+				lachannelgroup->btnSettings->hide();
+				lachannelgroup->comboBox->hide();
+				lachannelgroup->selectCheckBox->hide();
+			}
+
 			int i = 0;
 			connect(lachannelgroup->selectCheckBox, SIGNAL(toggled(bool)),
 				chg_ui.back(), SLOT(select(bool)));
@@ -268,6 +279,13 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 						ch->get_channel(i)));
 					lachannelui->setupUi(p);
 					lachannelgroup->layoutChildren->insertWidget(i,p);
+
+					if (collapsed)
+					{
+						lachannelui->btnRemChannel->hide();
+						lachannelui->btnSettings->hide();
+						lachannelui->comboBox->hide();
+					}
 
 					auto str = QString().fromStdString(
 						ch->get_channel(i)->get_label());
@@ -296,12 +314,10 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 	}
 }
 
-void LogicAnalyzerChannelManagerUI::collapse()
+void LogicAnalyzerChannelManagerUI::collapse(bool check)
 {
-}
-
-void LogicAnalyzerChannelManagerUI::expand()
-{
+	collapsed = check;
+	update_ui();
 }
 
 
