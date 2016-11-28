@@ -55,10 +55,11 @@ namespace adiscope {
 
 		bool compatible(enum tool tool) const;
 		bool usable(enum tool tool, const std::string &dev) const;
-		const std::string device_name(enum tool tool) const;
+		const std::string device_name(enum tool tool,
+				unsigned int idx = 0) const;
 
 		struct iio_device * find_device(const struct iio_context *ctx,
-				enum tool tool) const;
+				enum tool tool, unsigned int idx = 0) const;
 	};
 }
 

@@ -117,17 +117,21 @@ bool Filter::usable(enum tool tool, const std::string &dev) const
 	return hdl.toArray().contains(QString::fromStdString(dev));
 }
 
-const std::string Filter::device_name(enum tool tool) const
+const std::string Filter::device_name(enum tool tool, unsigned int idx) const
 {
-	auto hdl = root[QString::fromStdString(tool_names[tool] + "-device")];
-	if (!hdl.isString())
+	auto hdl = root[QString::fromStdString(tool_names[tool] + "-devices")];
+	if (hdl.isNull() || !hdl.isArray())
 		throw std::runtime_error("Tool not compatible");
 
-	return hdl.toString().toStdString();
+	auto array = hdl.toArray();
+	if (idx >= array.size())
+		throw std::runtime_error("Invalid IDX");
+
+	return array[idx].toString().toStdString();
 }
 
 struct iio_device * Filter::find_device(const struct iio_context *ctx,
-		enum tool tool) const
+		enum tool tool, unsigned int idx) const
 {
-	return iio_context_find_device(ctx, device_name(tool).c_str());
+	return iio_context_find_device(ctx, device_name(tool, idx).c_str());
 }
