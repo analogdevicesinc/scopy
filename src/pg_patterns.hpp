@@ -604,5 +604,21 @@ public:
 };
 #endif
 
+class PatternFactory
+{
+    static QStringList ui_list;
+    static QStringList description_list;
+    static int static_ui_limit;
+    static QJsonObject patterns;
+public:
+    static void init();
+    static Pattern *create(int index);
+    static PatternUI *create_ui(Pattern* pattern, int index, QWidget *parent = 0);
+    static QStringList get_ui_list();
+    static QStringList get_description_list();
+private:
+    PatternFactory() {}
+};
+
 }
 #endif

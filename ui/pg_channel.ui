@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>235</width>
-    <height>22</height>
+    <width>640</width>
+    <height>40</height>
    </rect>
   </property>
   <property name="maximumSize">
@@ -36,18 +36,75 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QCheckBox" name="checkBox">
+    <spacer name="alignmentSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QLabel" name="ChannelLabel">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-       <horstretch>1</horstretch>
+      <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+       <horstretch>3</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="maximumSize">
+     <property name="styleSheet">
+      <string notr="true">QLabel
+{  
+  font-family: ArialMT;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  text-align: left;
+  color: #ffffff;
+background-color:red;
+border: 0px solid red;
+margin:0px;
+padding:0px;
+}</string>
+     </property>
+     <property name="text">
+      <string>TextLabel</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <spacer name="horizontalSpacer_3">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
       <size>
-       <width>16777215</width>
-       <height>16777215</height>
+       <width>60</width>
+       <height>20</height>
       </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QLabel" name="DioLabel">
+     <property name="styleSheet">
+      <string notr="true">QLabel
+{  
+  font-family: ArialMT;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  text-align: left;
+  color: #ffffff;
+background-color:red;
+border: 0px solid red;
+margin:0px;
+padding:0px;
+}</string>
      </property>
      <property name="text">
       <string/>
@@ -55,17 +112,17 @@
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="ChannelLabel">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-       <horstretch>3</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
+    <spacer name="horizontalSpacer_4">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
-     <property name="text">
-      <string>TextLabel</string>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
      </property>
-    </widget>
+    </spacer>
    </item>
    <item>
     <widget class="QPushButton" name="pushButton">
@@ -75,8 +132,32 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
+     <property name="styleSheet">
+      <string notr="true">QPushButton {
+  min-height: 20px;
+  max-height: 20px;
+  min-width: 40px;
+  max-width: 40px;
+}
+
+QPushButton:checked {
+  border-image: url(:/icons/setup_btn_checked.svg);
+}
+
+QPushButton:hover:checked {
+  border-image: url(:/icons/setup_btn_checked_hover.svg);
+}
+
+QPushButton:hover:!checked {
+  border-image: url(:/icons/setup_btn_hover.svg);
+}
+
+QPushButton:!checked {
+  border-image: url(:/icons/setup_btn_unchecked.svg);
+}</string>
+     </property>
      <property name="text">
-      <string>S</string>
+      <string/>
      </property>
     </widget>
    </item>
@@ -88,6 +169,35 @@
      <property name="sizeHint" stdset="0">
       <size>
        <width>120</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QPushButton" name="pushButton_2">
+     <property name="styleSheet">
+      <string notr="true">QPushButton {
+  min-height: 14px;
+  min-width: 14px;
+  max-width: 14px;
+  max-height: 14px;
+  border-image: url(:/icons/redX.svg);
+}</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <spacer name="horizontalSpacer_5">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
        <height>20</height>
       </size>
      </property>

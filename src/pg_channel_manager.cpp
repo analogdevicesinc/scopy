@@ -13,7 +13,6 @@ namespace Ui {
 class PGChannelGroup;
 class PGChannel;
 class PGChannelManager;
-
 }
 
 namespace pv
@@ -55,9 +54,13 @@ void PatternGeneratorChannel::setChannel_role(const std::string &value)
     channel_role = value;
 }
 ///////////////////////// CHANNEL UI
-PatternGeneratorChannelUI::PatternGeneratorChannelUI(PatternGeneratorChannel* ch, QWidget *parent) : ChannelUI(ch,parent)
+PatternGeneratorChannelUI::PatternGeneratorChannelUI(PatternGeneratorChannel* ch, PatternGeneratorChannelGroup* chg, PatternGeneratorChannelManagerUI* managerUi, QWidget *parent) : ChannelUI(ch,parent), managerUi(managerUi), chg(chg)
 {
-    this->lch = ch;
+    this->ch = ch;
+    qDebug()<<"PGChannelUI created";
+}
+PatternGeneratorChannelUI::~PatternGeneratorChannelUI(){
+    qDebug()<<"PGChannelUI destroyed";
 }
 
 /////////////////////// CHANNEL GROUP
@@ -74,6 +77,7 @@ void PatternGeneratorChannelGroup::setDecoder(const std::string &value)
 PatternGeneratorChannelGroup::PatternGeneratorChannelGroup(PatternGeneratorChannel* ch) : ChannelGroup(ch)
 {
     created_index = 0;
+    collapsed = false;
     pattern=PatternFactory::create(0);
 }
 
@@ -88,6 +92,16 @@ PatternGeneratorChannelGroup::~PatternGeneratorChannelGroup()
 
 }
 
+bool PatternGeneratorChannelGroup::isCollapsed()
+{
+    return collapsed;
+}
+
+void PatternGeneratorChannelGroup::collapse(bool val)
+{
+    collapsed = val;
+}
+
 void PatternGeneratorChannelGroup::append(PatternGeneratorChannelGroup* tojoin)
 {
     for(auto i=0;i<tojoin->channels.size();i++)
@@ -96,32 +110,38 @@ void PatternGeneratorChannelGroup::append(PatternGeneratorChannelGroup* tojoin)
 
 
 ////////////////////////// CHANNEL GROUP UI
-PatternGeneratorChannelGroupUI::PatternGeneratorChannelGroupUI(PatternGeneratorChannelGroup* chg, QWidget *parent) : ChannelGroupUI(chg,parent)
+PatternGeneratorChannelManagerUI *PatternGeneratorChannelGroupUI::getManagerUi() const
 {
-this->lchg = chg;
+    return managerUi;
+}
+
+PatternGeneratorChannelGroupUI::PatternGeneratorChannelGroupUI(PatternGeneratorChannelGroup* chg, PatternGeneratorChannelManagerUI* managerUi, QWidget *parent) : ChannelGroupUI(chg,parent), managerUi(managerUi)
+{
+this->chg = chg;
 }
 
 PatternGeneratorChannelGroup* PatternGeneratorChannelGroupUI::getChannelGroup()
 {
-    return this->lchg;
+    return static_cast<PatternGeneratorChannelGroup*>(this->chg);
 }
 
 void PatternGeneratorChannelGroupUI::set_decoder(std::string value)
 {
-    static_cast<PatternGeneratorChannelGroup*>(get_group())->setDecoder(value);
-    qDebug()<<QString().fromStdString(lchg->getDecoder());
+    getChannelGroup()->setDecoder(value);
+    qDebug()<<QString().fromStdString(getChannelGroup()->getDecoder());
 }
 
 void PatternGeneratorChannelGroupUI::patternChanged(int index)
 {
-    delete lchg->pattern;
-    lchg->created_index=index;
-    lchg->pattern = PatternFactory::create(index);
-}
-
-void PatternGeneratorChannelGroupUI::createPatternUI()
-{
-    Q_EMIT changeRightPatternWidget(PatternFactory::create_ui(lchg->pattern,lchg->created_index));
+    getChannelGroup()->pattern->deinit();
+    delete getChannelGroup()->pattern;
+    getChannelGroup()->created_index=index;
+    getChannelGroup()->pattern = PatternFactory::create(index);
+    if(getChannelGroup()==getManagerUi()->getSelectedChannelGroup())
+    {
+        getManagerUi()->deleteSettingsWidget();
+        getManagerUi()->createSettingsWidget();
+    }
 }
 
 void PatternGeneratorChannelGroupUI::select(bool selected)
@@ -130,10 +150,54 @@ void PatternGeneratorChannelGroupUI::select(bool selected)
     Q_EMIT channel_selected();
 }
 
+void PatternGeneratorChannelGroupUI::collapse()
+{
+    bool val = !getChannelGroup()->isCollapsed();
+    getChannelGroup()->collapse(val);
+    findChild<MenuAnim*>("subChannelWidget")->setVisible(!val);
+    //findChild<MenuAnim*>("subChannelWidget")->toggleMenu(val);
+}
+
+void PatternGeneratorChannelUI::split()
+{
+    //getManagerUi()->chm->deselect_all();
+
+
+    managerUi->chm->splitChannel(2,1);
+   /* getManagerUi()->chm->deselect_all();
+    select(true);
+    getManagerUi()->ui->groupSplit->click();*/
+
+}
+
+void PatternGeneratorChannelGroupUI::split()
+{
+    getManagerUi()->chm->deselect_all();
+    select(true);
+    getManagerUi()->ui->groupSplit->click();
+}
+
+void PatternGeneratorChannelGroupUI::enableControls(bool enabled)
+{
+    findChild<QLabel*>("ChannelGroupLabel")->setEnabled(enabled);
+    findChild<QLabel*>("DioLabel")->setEnabled(enabled);
+    findChild<QComboBox*>("patternCombo")->setEnabled(enabled);
+    findChild<QComboBox*>("outputCombo")->setEnabled(enabled);
+    findChild<QWidget*>("subChannelWidget")->setEnabled(enabled);
+}
+
 void PatternGeneratorChannelGroupUI::enable(bool enabled)
 {
     ChannelGroupUI::enable(enabled);
+    enableControls(enabled);
     Q_EMIT channel_enabled();
+}
+
+void PatternGeneratorChannelGroupUI::settingsButtonHandler()
+{
+    getManagerUi()->deleteSettingsWidget();
+    getManagerUi()->selectChannelGroup(this);
+    getManagerUi()->createSettingsWidget();
 }
 
 
@@ -172,6 +236,16 @@ PatternGeneratorChannelManager::~PatternGeneratorChannelManager()
     }
 }
 
+PatternGeneratorChannelGroup* PatternGeneratorChannelManager::get_channel_group(int index)
+{
+    return static_cast<PatternGeneratorChannelGroup*>(channel_group[index]);
+}
+
+/*std::vector<PatternGeneratorChannelGroup*>* PatternGeneratorChannelManager::getChannelGroups()
+{
+    return static_cast<std::vector<PatternGeneratorChannelGroup*>*>(&channel_group);
+}*/
+
 void PatternGeneratorChannelManager::join(std::vector<int> index)
 {
     for(auto i=1;i<index.size();i++){
@@ -185,7 +259,7 @@ void PatternGeneratorChannelManager::join(std::vector<int> index)
         }
     }
     channel_group[index[0]]->group(true);
-    channel_group[index[0]]->set_label("GROUP");
+    channel_group[index[0]]->set_label("Group name");
 }
 
 void PatternGeneratorChannelManager::split(int index)
@@ -201,34 +275,110 @@ void PatternGeneratorChannelManager::split(int index)
     delete *it;
     channel_group.erase(it);
 }
+
+void PatternGeneratorChannelManager::splitChannel(int chgIndex, int chIndex)
+{
+    auto it = std::next(channel_group.begin(), chgIndex);
+    it++;
+    auto subch = channel_group[chgIndex]->get_channel(chIndex);
+    channel_group.insert(it,new PatternGeneratorChannelGroup(static_cast<PatternGeneratorChannel*>(subch)));
+/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+    channel_group[chgIndex]->get_channels().erase(channel_group[chgIndex]->get_channels().begin()+chIndex);
+    if(channel_group[chgIndex]->get_channel_count()==0)
+/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+    {
+        delete channel_group[chgIndex];
+        channel_group.erase(it);
+    }
+
+
+}
+
 ////////////////////////////////////// CHANNEL MANAGER UI
-PatternGeneratorChannelManagerUI::PatternGeneratorChannelManagerUI(QWidget *parent, pv::MainWindow *main_win_, PatternGeneratorChannelManager *chm, PatternGenerator* pg)  : QWidget(parent),  ui(new Ui::PGChannelManager)
+QWidget *PatternGeneratorChannelManagerUI::getSettingsWidget() const
+{
+    return settingsWidget;
+}
+
+PatternGeneratorChannelGroup *PatternGeneratorChannelManagerUI::getSelectedChannelGroup() const
+{
+    return selectedChannelGroup;
+}
+
+void PatternGeneratorChannelManagerUI::setSelectedChannelGroup(PatternGeneratorChannelGroup *value)
+{
+    selectedChannelGroup = value;
+}
+
+PatternGeneratorChannelManagerUI::PatternGeneratorChannelManagerUI(QWidget *parent, pv::MainWindow *main_win_, PatternGeneratorChannelManager *chm, QWidget *settingsWidget, PatternGenerator* pg)  : QWidget(parent),  ui(new Ui::PGChannelManager), settingsWidget(settingsWidget)
 {
     ui->setupUi(this);
     main_win = main_win_;
     this->chm = chm;
     this->pg = pg;
+    currentUI = nullptr;
+    selectedChannelGroup = chm->get_channel_group(0);
+    selectedChannelGroupUi = nullptr;
+    channelButtonGroup = new QButtonGroup(this);
 
    // update_ui();
 }
-
-void PatternGeneratorChannelManagerUI::update_ui()
+PatternGeneratorChannelManagerUI::~PatternGeneratorChannelManagerUI()
 {
+
+}
+
+void PatternGeneratorChannelManagerUI::retainWidgetSizeWhenHidden(QWidget *w)
+{
+    QSizePolicy sp_retain = w->sizePolicy();
+    sp_retain.setRetainSizeWhenHidden(true);
+    w->setSizePolicy(sp_retain);
+}
+
+void PatternGeneratorChannelManagerUI::setWidgetMinimumNrOfChars(QWidget *w, int nrOfChars)
+{
+    QFontMetrics labelm(w->font());
+    auto label_min_width = labelm.width(QString(nrOfChars,'X'));
+    w->setMinimumWidth(label_min_width);
+}
+
+void PatternGeneratorChannelManagerUI::updateUi()
+{
+    static const int channelGroupLabelMaxLength = 10;
+    static const int dioLabelMaxLength = 2;
+    static const int channelComboMaxLength = 15;
+    static const int outputComboMaxLength = 5;
+
     for(auto ch : chg_ui)
     {
         delete ch;
     }
+
     chg_ui.erase(chg_ui.begin(),chg_ui.end());
 
     auto offset = 0;
     for(auto&& ch : *(chm->get_channel_groups()))
     {
-        chg_ui.push_back(new PatternGeneratorChannelGroupUI(static_cast<PatternGeneratorChannelGroup*>(ch),0)); // create widget for channelgroup
+        chg_ui.push_back(new PatternGeneratorChannelGroupUI(static_cast<PatternGeneratorChannelGroup*>(ch),this, 0)); // create widget for channelgroup
+        PatternGeneratorChannelGroupUI* currentChannelGroupUI = chg_ui.back();
 
         Ui::PGChannelGroup *pgchannelgroupui = new Ui::PGChannelGroup;
         pgchannelgroupui->setupUi(chg_ui.back());
         ui->verticalLayout->insertWidget(chg_ui.size(),chg_ui.back());
-        pgchannelgroupui->ChannelGroupLabel->setText(QString().fromStdString(ch->get_label()));
+
+        setWidgetMinimumNrOfChars(pgchannelgroupui->ChannelGroupLabel, channelGroupLabelMaxLength);
+
+        QString channelGroupLabel = QString().fromStdString(ch->get_label());
+        if(channelGroupLabel.length()>channelGroupLabelMaxLength)
+        {
+            channelGroupLabel.truncate(channelGroupLabelMaxLength-2);
+            channelGroupLabel+="..";
+        }
+        pgchannelgroupui->ChannelGroupLabel->setText(channelGroupLabel);
+
+        setWidgetMinimumNrOfChars(pgchannelgroupui->DioLabel, dioLabelMaxLength);
+        setWidgetMinimumNrOfChars(pgchannelgroupui->patternCombo, channelComboMaxLength);
+        setWidgetMinimumNrOfChars(pgchannelgroupui->outputCombo, outputComboMaxLength);
 
         int i = 0;
         for(auto var : PatternFactory::get_ui_list())
@@ -238,59 +388,141 @@ void PatternGeneratorChannelManagerUI::update_ui()
             i++;
         }
 
-        pgchannelgroupui->enablebox->setChecked(ch->is_enabled());
-        connect(pgchannelgroupui->enablebox,SIGNAL(toggled(bool)),chg_ui.back(),SLOT(enable(bool)));
-        connect(static_cast<PatternGeneratorChannelGroupUI*>(chg_ui.back()),SIGNAL(changeRightPatternWidget(PatternUI*)),pg,SLOT(createRightPatternWidget(PatternUI*)));
+        pgchannelgroupui->enableBox->setChecked(ch->is_enabled());
+        currentChannelGroupUI->enableControls(ch->is_enabled());
+
+        channelButtonGroup->addButton(pgchannelgroupui->pushButton);
+        channelButtonGroup->setExclusive(true);
+
+        connect(pgchannelgroupui->enableBox,SIGNAL(toggled(bool)),chg_ui.back(),SLOT(enable(bool)));
         connect(static_cast<PatternGeneratorChannelGroupUI*>(chg_ui.back()),SIGNAL(channel_selected()),pg,SLOT(onChannelSelectedChanged())); // TEMP
         connect(static_cast<PatternGeneratorChannelGroupUI*>(chg_ui.back()),SIGNAL(channel_enabled()),pg,SLOT(onChannelEnabledChanged())); // TEMP
-        connect(pgchannelgroupui->pushButton,SIGNAL(clicked()),static_cast<PatternGeneratorChannelGroupUI*>(chg_ui.back()),SLOT(createPatternUI()));
-        connect(pgchannelgroupui->selectbox,SIGNAL(toggled(bool)),static_cast<PatternGeneratorChannelGroupUI*>(chg_ui.back()),SLOT(select(bool)));
+        connect(pgchannelgroupui->pushButton,SIGNAL(clicked()),static_cast<PatternGeneratorChannelGroupUI*>(chg_ui.back()),SLOT(settingsButtonHandler()));
+        connect(pgchannelgroupui->pushButton,SIGNAL(clicked()),pg,SLOT(toggleRightMenu()));
+        connect(pgchannelgroupui->selectBox,SIGNAL(toggled(bool)),static_cast<PatternGeneratorChannelGroupUI*>(chg_ui.back()),SLOT(select(bool)));
         connect(pgchannelgroupui->patternCombo,SIGNAL(currentIndexChanged(int)),chg_ui.back(),SLOT(patternChanged(int)));
 
 
+        retainWidgetSizeWhenHidden(pgchannelgroupui->splitBtn);
+        retainWidgetSizeWhenHidden(pgchannelgroupui->collapseBtn);
+        retainWidgetSizeWhenHidden(pgchannelgroupui->line);
+        retainWidgetSizeWhenHidden(pgchannelgroupui->line_2);
 
+        //chg_ui.back()->setStyleSheet("QWidget\n{\nborder-top:1px solid red;\nborder-bottom:1px solid red;\n }\n");
 
         offset+=(chg_ui.back()->geometry().bottomRight().y()-10);
         if(ch->is_grouped()) // create subwidgets
         {
+            pgchannelgroupui->DioLabel->setText("");
+
+            connect(pgchannelgroupui->collapseBtn,SIGNAL(clicked()),chg_ui.back(),SLOT(collapse()));
+            connect(pgchannelgroupui->splitBtn,SIGNAL(clicked()),chg_ui.back(),SLOT(split()));
+
+            qDebug()<<pgchannelgroupui->DioLabel->isEnabled();
             for(auto i=0;i<ch->get_channel_count();i++)
+                {
+                    Ui::PGChannelGroup *pgchannelui = new Ui::PGChannelGroup;
+
+                    currentChannelGroupUI->ch_ui.push_back(new PatternGeneratorChannelUI(static_cast<PatternGeneratorChannel*>(ch->get_channel(i)), static_cast<PatternGeneratorChannelGroup*>(ch), this, 0)); // create widget for channelgroup
+                    PatternGeneratorChannelUI* currentChannelUI = currentChannelGroupUI->ch_ui.back();
+                    //QWidget *p = new QWidget(chg_ui.back());
+                    pgchannelui->setupUi(currentChannelUI);
+                    pgchannelgroupui->subChannelLayout->insertWidget(i,currentChannelUI);
+
+                    retainWidgetSizeWhenHidden(pgchannelui->enableBox);
+                    retainWidgetSizeWhenHidden(pgchannelui->collapseBtn);
+                    retainWidgetSizeWhenHidden(pgchannelui->patternCombo);
+                    retainWidgetSizeWhenHidden(pgchannelui->outputCombo);
+                    retainWidgetSizeWhenHidden(pgchannelui->selectBox);
+                    retainWidgetSizeWhenHidden(pgchannelui->line);
+                    retainWidgetSizeWhenHidden(pgchannelui->line_2);
+
+                    pgchannelui->line->setVisible(false);
+                    pgchannelui->line_2->setVisible(false);
+
+                    setWidgetMinimumNrOfChars(pgchannelui->ChannelGroupLabel, channelGroupLabelMaxLength);
+                    setWidgetMinimumNrOfChars(pgchannelui->DioLabel, dioLabelMaxLength);
+                    setWidgetMinimumNrOfChars(pgchannelui->patternCombo, channelComboMaxLength);
+                    setWidgetMinimumNrOfChars(pgchannelui->outputCombo, outputComboMaxLength);
+
+                    pgchannelui->enableBox->setVisible(false);
+                    pgchannelui->collapseBtn->setVisible(false);
+                    pgchannelui->patternCombo->setVisible(false);
+                    pgchannelui->outputCombo->setVisible(false);
+                    pgchannelui->selectBox->setVisible(false);
+
+                    connect(pgchannelui->splitBtn,SIGNAL(clicked()),currentChannelUI,SLOT(split()));
+
+                    auto str = QString().fromStdString(ch->get_channel(i)->get_label());
+                    pgchannelui->ChannelGroupLabel->setText(str);
+                    str = QString().number(ch->get_channel(i)->get_id());
+                    pgchannelui->DioLabel->setText(str);
+                    auto x = pgchannelgroupui->ChannelGroupLabel->geometry().x();
+
+                    //auto index = ch->get_channel(i)->get_id();
+                    //offset+=p->geometry().bottomRight().y();
+
+                }
+            if(static_cast<PatternGeneratorChannelGroup*>(ch)->isCollapsed())
             {
-                Ui::PGChannel *pgchannelui = new Ui::PGChannel;
-                QWidget *p = new QWidget();
-                pgchannelui->setupUi(p);
-                pgchannelgroupui->subChannelLayout->insertWidget(i,p);
-
-                auto str = QString().fromStdString(ch->get_channel(i)->get_label());
-                pgchannelui->ChannelLabel->setText(str);
-                str = QString().number(ch->get_channel(i)->get_id());
-                //pgchannelui->channelIndex->setText(str);
-                auto index = ch->get_channel(i)->get_id();
-               // auto trace = main_win->view_->get_trace_by_id(index);
-
-                /*p->setAttribute(Qt::WA_DontShowOnScreen);
-                p->show();
-                p->setAttribute(Qt::WA_DontShowOnScreen,false);*/
-                //forceUpdate(p);
-                offset+=p->geometry().bottomRight().y();
-                /*auto offset = p->geometry().bottomRight().y();
-                auto offset2 = chg_ui.back()->pos().y();*/
-           //     trace->force_to_v_offset(offset);
-            }            
+                pgchannelgroupui->collapseBtn->setChecked(true);
+                pgchannelgroupui->subChannelWidget->setVisible(false);
+            }
         }
         else
         {
-            auto index = ch->get_channel()->get_id();
-           // auto trace = main_win->view_->get_trace_by_id(index);
-        //    trace->force_to_v_offset(offset);
+
+
+            auto index = ch->get_channel()->get_id();            
+            pgchannelgroupui->DioLabel->setText(QString().number(ch->get_channel()->get_id()));            
+            pgchannelgroupui->splitBtn->setVisible(false);
+            pgchannelgroupui->collapseBtn->setVisible(false);
+            pgchannelgroupui->line->setVisible(false);
+            pgchannelgroupui->line_2->setVisible(false);
+
         }
+    }
+
+}
+
+void PatternGeneratorChannelManagerUI::deleteSettingsWidget()
+{
+    if(currentUI!=nullptr)
+    {
+        currentUI->setVisible(false);
+        currentUI->destroy_ui();
+        delete currentUI;
+        currentUI = nullptr;
     }
 }
 
 
+void PatternGeneratorChannelManagerUI::createSettingsWidget()
+{    
+    currentUI = PatternFactory::create_ui(selectedChannelGroup->pattern,selectedChannelGroup->created_index);
+    currentUI->build_ui(settingsWidget);
+    currentUI->get_pattern()->init();
+    currentUI->post_load_ui();
+    currentUI->setVisible(true);        
+}
+
+
+void PatternGeneratorChannelManagerUI::selectChannelGroup(PatternGeneratorChannelGroupUI* selected)
+{
+    // remove black outline from prev selected
+    if(selectedChannelGroupUi)
+        selectedChannelGroupUi->findChild<QWidget*>("widget")->setStyleSheet("");
+    // select channel
+    selectedChannelGroupUi = selected;
+    selectedChannelGroup=selected->getChannelGroup();
+    selectedChannelGroupUi->findChild<QWidget*>("widget")->setStyleSheet("QWidget {background-color: rgb(0, 0, 0);}");
+    // apply black outline to currently selected channel
+}
+
 void PatternGeneratorChannelManagerUI::on_groupSplit_clicked()
 {
     std::vector<int> selection = chm->get_selected_indexes();
-    if(selection.size() == 0) {update_ui();return;}
+    if(selection.size() == 0) {updateUi();return;}
     if(selection.size() == 1)
     {
         if(chm->get_channel_group(selection.back())->is_grouped())
@@ -308,7 +540,7 @@ void PatternGeneratorChannelManagerUI::on_groupSplit_clicked()
         chm->join(selection);
         chm->deselect_all();
     }
-    update_ui();
+    updateUi();
 }
 }
 

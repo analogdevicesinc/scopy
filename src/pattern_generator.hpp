@@ -18,6 +18,7 @@
 
 // Generated UI
 #include "ui_pattern_generator.h"
+#include "ui_pg_settings.h"
 
 extern "C" {
 struct iio_context;
@@ -40,6 +41,7 @@ class Context;
 
 namespace Ui {
 class PatternGenerator;
+class PGSettings;
 /*    class BinaryCounterPatternUI;
     class UARTPatternUI;
     class LFSRPatternUI;
@@ -49,21 +51,6 @@ class PatternGenerator;
 
 namespace adiscope {
 
-class PatternFactory
-{
-    static QStringList ui_list;
-    static QStringList description_list;
-    static int static_ui_limit;
-    static QJsonObject patterns;
-public:
-    static void init();
-    static Pattern *create(int index);
-    static PatternUI *create_ui(Pattern* pattern, int index, QWidget *parent = 0);
-    static QStringList get_ui_list();
-    static QStringList get_description_list();
-private:
-    PatternFactory() {}
-};
 
 class PatternGenerator : public QWidget
 {
@@ -100,15 +87,28 @@ private Q_SLOTS:
     void on_generateUI_clicked();
 
     void on_save_PB_clicked();
-
     void on_load_PB_clicked();
     void createRightPatternWidget(PatternUI* patternui);
+
+    void rightMenuFinished(bool opened);
 private:
 
     // UI
     Ui::PatternGenerator *ui;
+    Ui::PGSettings *pgSettings;
     QButtonGroup *settings_group;
     QPushButton *menuRunButton;
+
+
+    typedef enum rightMenuState_t
+    {
+        CLOSED,
+        OPENED_PG,
+        OPENED_CG
+    } rightMenuState;
+
+
+
     // QWidget *current;
     PatternUI *currentUI;
     QIntValidator *sampleRateValidator;
@@ -155,8 +155,6 @@ private:
 
     void createBinaryBuffer();
     void toggleRightMenu(QPushButton *btn);
-
-    bool menuOpened;
 
     std::vector<PatternUI*> patterns;
     static QStringList digital_trigger_conditions;

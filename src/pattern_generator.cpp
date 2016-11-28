@@ -29,6 +29,7 @@
 
 #include "pattern_generator.hpp"
 
+
 using namespace std;
 using namespace adiscope;
 
@@ -44,15 +45,10 @@ class MainBar;
 namespace widgets {
 class DeviceToolButton;
 }
-
 }
 
 namespace sigrok {
 class Context;
-}
-
-namespace Glibmm {
-
 }
 
 namespace adiscope {
@@ -82,9 +78,9 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt, QPushB
     ctx(ctx),
     dev(iio_context_find_device(ctx, "m2k-logic-analyzer-tx")),
     channel_manager_dev(iio_context_find_device(ctx, "m2k-logic-analyzer")),
-    menuOpened(true),
     settings_group(new QButtonGroup(this)), menuRunButton(runBtn),
     ui(new Ui::PatternGenerator),
+    pgSettings(new Ui::PGSettings),
     txbuf(0), sample_rate(100000), channel_enable_mask(0xffff),buffer(nullptr),
     buffer_created(0), currentUI(nullptr)
 {
@@ -92,6 +88,8 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt, QPushB
     ui->setupUi(this);
     this->setAttribute(Qt::WA_DeleteOnClose, true);
     this->settings_group->setExclusive(true);
+    settings_group->addButton(ui->btnChSettings);
+    settings_group->addButton(ui->btnPGSettings);
 
     // IIO
     this->no_channels = iio_device_get_channels_count(channel_manager_dev);
@@ -113,21 +111,21 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt, QPushB
     QPushButton *btnDecoder = new QPushButton();
     btnDecoder->setIcon(QIcon::fromTheme("add-decoder", QIcon(":/icons/add-decoder.svg")));
     btnDecoder->setMenu(main_win->menu_decoder_add());
-    ui->gridLayout->addWidget(btnDecoder);
-    ui->gridLayout->addWidget(static_cast<QWidget *>(main_bar));
+ /*   ui->gridLayout->addWidget(btnDecoder);
+    ui->gridLayout->addWidget(static_cast<QWidget *>(main_bar));*/
 
     int i = 0;
 
     PatternFactory::init();
 
-    for(auto var : PatternFactory::get_ui_list())
+  /*  for(auto var : PatternFactory::get_ui_list())
     {
         ui->scriptCombo->addItem(var);
         ui->scriptCombo->setItemData(i, (PatternFactory::get_description_list())[i],Qt::ToolTipRole);
         i++;
-    }
+    }*/
 
-    ui->sampleRateCombo->addItems(possibleSampleRates);
+   /* ui->sampleRateCombo->addItems(possibleSampleRates);
     for(i=0;i<possibleSampleRates.length()-1;i++)
         if(sample_rate <= possibleSampleRates[i].toInt() && sample_rate > possibleSampleRates[i+1].toInt())
             break;
@@ -145,13 +143,18 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt, QPushB
     connect(ui->btnRunStop, SIGNAL(toggled(bool)), runBtn, SLOT(setChecked(bool)));
 
     connect(ui->btnSingleRun, SIGNAL(pressed()), this, SLOT(singleRun()));
-    connect(ui->btnSettings , SIGNAL(pressed()), this, SLOT(toggleRightMenu()));
+    buffer = new short[1];*/
 
-    buffer = new short[1];
-    chmui = new PatternGeneratorChannelManagerUI(0,main_win,&chm,this);
+    pgSettings->setupUi(ui->pgSettings);
+
+    connect(ui->btnChSettings, SIGNAL(pressed()), this, SLOT(toggleRightMenu()));
+    connect(ui->btnPGSettings, SIGNAL(pressed()), this, SLOT(toggleRightMenu()));
+    ui->rightMenu->setMaximumWidth(0);
+    chmui = new PatternGeneratorChannelManagerUI(ui->leftWidget,main_win,&chm,ui->cgSettings,this);
     ui->leftWidgetLayout->addWidget(chmui);
-    chmui->update_ui();
+    chmui->updateUi();
     chmui->setVisible(true);
+    chmui->createSettingsWidget();
 
 
 }
@@ -165,10 +168,142 @@ PatternGenerator::~PatternGenerator()
         delete var;
     }
     delete ui;
-    delete sampleRateValidator;
+   // delete sampleRateValidator;
     // Destroy libsigrokdecode
     srd_exit();
 }
+
+void PatternGenerator::toggleRightMenu(QPushButton *btn)
+{
+    static rightMenuState rightMenuStatus=CLOSED;
+
+    /*switch(rightMenuStatus)
+    {
+    case CLOSED:
+        if(btn==ui->btnPGSettings)
+        {
+            ui->rightWidget->setCurrentIndex(0);
+            ui->btnPGSettings->setChecked(true);
+            rightMenuStatus = OPENED_PG;
+        }
+        else
+        {
+            ui->rightWidget->setCurrentIndex(1);
+            ui->btnChSettings->setChecked(true);
+            rightMenuStatus = OPENED_CG;
+        }
+        ui->rightMenu->toggleMenu(true);
+        break;
+    case OPENED_CG:
+        if(btn==ui->btnPGSettings)
+        {
+            ui->rightWidget->setCurrentIndex(0);
+            ui->btnPGSettings->setChecked(true);
+            rightMenuStatus = OPENED_PG;
+        }
+        else if(btn==ui->btnChSettings)
+        {
+            rightMenuStatus = CLOSED;
+            ui->btnChSettings->setChecked(false);
+            ui->rightMenu->toggleMenu(false);
+        }
+        else
+        {
+            // nothing to do
+        }
+        break;
+    case OPENED_PG:
+        if(btn==ui->btnPGSettings)
+        {
+
+            rightMenuStatus = CLOSED;
+            ui->btnPGSettings->setChecked(false);
+            ui->rightMenu->toggleMenu(false);
+        }
+        else
+        {
+            ui->rightWidget->setCurrentIndex(1);
+            ui->btnChSettings->setChecked(true);
+            rightMenuStatus = OPENED_CG;
+        }
+        break;
+    default:
+        break;
+
+    }*/
+    static QPushButton *prevButton;
+    static bool prevMenuOpened = false;
+    static bool menuOpened = false;
+    static bool pgSettingsCheck = false;
+    static bool chSettingsCheck = false;
+
+
+    if(btn==ui->btnPGSettings)
+    {
+        ui->rightWidget->setCurrentIndex(0);
+    }
+    else
+    {
+        ui->rightWidget->setCurrentIndex(1);
+    }
+
+    if(prevButton==btn)
+    {
+        menuOpened = !menuOpened;
+    }
+    else
+    {
+        menuOpened = true;
+    }
+
+    if(menuOpened==false)
+    {
+        settings_group->setExclusive(false);
+        ui->btnChSettings->setChecked(false);
+        ui->btnPGSettings->setChecked(false);
+        settings_group->setExclusive(true);
+    }
+
+    if(prevMenuOpened!=menuOpened)
+    {
+        ui->rightMenu->toggleMenu(menuOpened);
+    }
+    prevMenuOpened = menuOpened;
+    prevButton=btn;
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 void PatternGenerator::createBinaryBuffer()
 {
@@ -294,12 +429,6 @@ void PatternGenerator::singleRunStop()
     ui->btnSingleRun->setChecked(false);
 }
 
-void PatternGenerator::toggleRightMenu(QPushButton *btn)
-{
-    bool open = !menuOpened;
-    //   ui->rightWidget->toggleMenu(open); TEMP
-    this->menuOpened = open;
-}
 
 void PatternGenerator::toggleRightMenu()
 {
@@ -313,7 +442,7 @@ void adiscope::PatternGenerator::on_sampleRateCombo_activated(const QString &arg
 
 void adiscope::PatternGenerator::on_generatePattern_clicked()
 {
-
+#if 0
     bool ok;
     channel_group = selected_channel_group->get_mask();
     ui->ChannelsToGenerate->setText("0x"+QString().number(channel_group,16));
@@ -356,6 +485,7 @@ void adiscope::PatternGenerator::on_generatePattern_clicked()
         dataChanged();
         main_win->action_view_zoom_fit()->trigger();
     }
+#endif
 
 }
 
@@ -477,9 +607,9 @@ void adiscope::PatternGenerator::on_save_PB_clicked()
 
 void adiscope::PatternGenerator::update_ui()
 {
-    ui->ChannelEnableMask->setText("0x"+QString::number(channel_enable_mask,16));
+    /*ui->ChannelEnableMask->setText("0x"+QString::number(channel_enable_mask,16));
     ui->sampleRateCombo->setCurrentText(QString::number(sample_rate));
-    ui->numberOfSamples->setText(QString::number(number_of_samples));
+    ui->numberOfSamples->setText(QString::number(number_of_samples));*/
 }
 
 void adiscope::PatternGenerator::on_load_PB_clicked()
@@ -521,28 +651,13 @@ void adiscope::PatternGenerator::on_load_PB_clicked()
 void adiscope::PatternGenerator::createRightPatternWidget(PatternUI* pattern_ui)
 {
 
-    if(currentUI!=nullptr)
-    {
-       // currentUI->get_pattern()->deinit();
-        currentUI->setVisible(false);
-        currentUI->destroy_ui();
-        delete currentUI;
-        currentUI = nullptr;
-    }
-    currentUI = pattern_ui;
 
-    currentUI->build_ui(ui->rightWidgetPage2);
-    currentUI->get_pattern()->init();
-    currentUI->post_load_ui();
-    currentUI->setVisible(true);
-    selected_channel_group = static_cast<PatternGeneratorChannelGroupUI*>(QObject::sender())->getChannelGroup();
-    connect(currentUI,SIGNAL(generate_buffer()),this,SLOT(on_generatePattern_clicked()));
 }
 
 void adiscope::PatternGenerator::onChannelEnabledChanged()
 {
     uint16_t mask = chm.get_enabled_mask();
-    ui->ChannelEnableMask->setText("0x"+QString().number(mask,16));
+ //   ui->ChannelEnableMask->setText("0x"+QString().number(mask,16));
 
 }
 
@@ -550,144 +665,14 @@ void adiscope::PatternGenerator::onChannelEnabledChanged()
 void adiscope::PatternGenerator::onChannelSelectedChanged()
 {
     uint16_t mask = chm.get_selected_mask();
-    ui->ChannelsToGenerate->setText("0x"+QString().number(mask,16));
+  //  ui->ChannelsToGenerate->setText("0x"+QString().number(mask,16));
 
 }
 
-
-int PatternFactory::static_ui_limit = 0;
-QStringList PatternFactory::ui_list = {};
-QStringList PatternFactory::description_list = {};
-QJsonObject PatternFactory::patterns = {};
-
-
-void PatternFactory::init()
+void adiscope::PatternGenerator::rightMenuFinished(bool opened)
 {
-    QJsonObject pattern_object;
 
-    ui_list.clear();
-
-    ui_list.append(ClockPatternName);
-    description_list.append(ClockPatternDescription);
-    ui_list.append(RandomPatternName);
-    description_list.append(RandomPatternDescription);
-
-    /*
-    ui_list.append(ConstantPatternName);
-    description_list.append(ConstantPatternDescription);
-    ui_list.append(NumberPatternName);
-    description_list.append(NumberPatternDescription);
-
-    ui_list.append(PulsePatternName);
-    description_list.append(PulsePatternDescription);
-    ui_list.append(BinaryCounterPatternName);
-    description_list.append(BinaryCounterPatternDescription);
-    ui_list.append(GrayCounterPatternName);
-    description_list.append(GrayCounterPatternDescription);
-    ui_list.append(JohnsonCounterPatternName);
-    description_list.append(JohnsonCounterPatternDescription);
-    ui_list.append(WalkingCounterPatternName);
-    description_list.append(WalkingCounterPatternDescription);
-*/
-    static_ui_limit = ui_list.count();
-
-    /*QString searchPattern = "generator.json";
-    QDirIterator it("patterngenerator", QStringList() << searchPattern, QDir::Files, QDirIterator::Subdirectories);
-    int i = 0;
-    while (it.hasNext())
-    {
-        QFile file;
-        QString filename = it.next();
-
-        file.setFileName(filename);
-        file.open(QIODevice::ReadOnly | QIODevice::Text);
-        QJsonDocument d = QJsonDocument::fromJson(file.readAll());
-        file.close();
-        QJsonObject obj(d.object());
-
-        filename.chop(searchPattern.length());
-        obj.insert("filepath",filename);
-
-        if(obj["enabled"] == true)
-        {
-            ui_list.append(obj["name"].toString());
-            description_list.append(obj["description"].toString());
-            pattern_object.insert(QString::number(i),QJsonValue(obj));
-            i++;
-        }
-
-    }
-    patterns = pattern_object;*/
-    qDebug()<<patterns;
 }
-
-
-Pattern* PatternFactory::create(int index)
-{
-    switch(index){
-    case 0: return new ClockPattern();
-    case 1: return new RandomPattern();
-   /* case 0: return new ConstantPattern();
-    case 1: return new NumberPattern();
-
-    case 3: return new PulsePattern();
-
-    case 5: return new BinaryCounterPattern();
-    case 6: return new GrayCounterPattern();
-    case 7: return new JohnsonCounterPattern();
-    case 8: return new WalkingPattern();
-    default:
-        if(index>=static_ui_limit)
-        {
-            return new JSPattern(patterns[QString::number(static_ui_limit-index)].toObject());
-        }
-        else
-        {
-            return nullptr;
-        }
-        */
-    }
-}
-
-PatternUI* PatternFactory::create_ui(Pattern* pattern, int index, QWidget *parent)
-{
-    switch(index){
-    case 0: return new ClockPatternUI(dynamic_cast<ClockPattern*>(pattern),parent);
-    case 1: return new RandomPatternUI(dynamic_cast<RandomPattern*>(pattern),parent);
-        /*
-    case 1: return new NumberPatternUI(parent);
-    case 0: return new ConstantPatternUI(parent);
-    case 3: return new PulsePatternUI(parent);
-
-    case 5: return new BinaryCounterPatternUI(parent);
-    case 6: return new GrayCounterPatternUI(parent);
-    case 7: return new JohnsonCounterPatternUI(parent);
-    case 8: return new WalkingPatternUI(parent);
-    default:
-        if(index>=static_ui_limit)
-        {
-            return new JSPatternUI(patterns[QString::number(static_ui_limit-index)].toObject(), parent);
-        }
-        else
-        {
-            return nullptr;
-        }
-        */
-    }
-}
-
-
-
-QStringList PatternFactory::get_ui_list()
-{
-    return ui_list;
-}
-
-QStringList PatternFactory::get_description_list()
-{
-    return description_list;
-}
-
 
 
 } /* namespace adiscope */

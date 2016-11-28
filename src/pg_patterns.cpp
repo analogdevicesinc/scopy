@@ -1708,4 +1708,141 @@ void WalkingPatternUI::destroy_ui()
 }
 
 #endif
+
+
+
+int PatternFactory::static_ui_limit = 0;
+QStringList PatternFactory::ui_list = {};
+QStringList PatternFactory::description_list = {};
+QJsonObject PatternFactory::patterns = {};
+
+
+void PatternFactory::init()
+{
+    QJsonObject pattern_object;
+
+    ui_list.clear();
+
+    ui_list.append(ClockPatternName);
+    description_list.append(ClockPatternDescription);
+    ui_list.append(RandomPatternName);
+    description_list.append(RandomPatternDescription);
+
+    /*
+    ui_list.append(ConstantPatternName);
+    description_list.append(ConstantPatternDescription);
+    ui_list.append(NumberPatternName);
+    description_list.append(NumberPatternDescription);
+
+    ui_list.append(PulsePatternName);
+    description_list.append(PulsePatternDescription);
+    ui_list.append(BinaryCounterPatternName);
+    description_list.append(BinaryCounterPatternDescription);
+    ui_list.append(GrayCounterPatternName);
+    description_list.append(GrayCounterPatternDescription);
+    ui_list.append(JohnsonCounterPatternName);
+    description_list.append(JohnsonCounterPatternDescription);
+    ui_list.append(WalkingCounterPatternName);
+    description_list.append(WalkingCounterPatternDescription);
+*/
+    static_ui_limit = ui_list.count();
+
+    /*QString searchPattern = "generator.json";
+    QDirIterator it("patterngenerator", QStringList() << searchPattern, QDir::Files, QDirIterator::Subdirectories);
+    int i = 0;
+    while (it.hasNext())
+    {
+        QFile file;
+        QString filename = it.next();
+
+        file.setFileName(filename);
+        file.open(QIODevice::ReadOnly | QIODevice::Text);
+        QJsonDocument d = QJsonDocument::fromJson(file.readAll());
+        file.close();
+        QJsonObject obj(d.object());
+
+        filename.chop(searchPattern.length());
+        obj.insert("filepath",filename);
+
+        if(obj["enabled"] == true)
+        {
+            ui_list.append(obj["name"].toString());
+            description_list.append(obj["description"].toString());
+            pattern_object.insert(QString::number(i),QJsonValue(obj));
+            i++;
+        }
+
+    }
+    patterns = pattern_object;*/
+    qDebug()<<patterns;
+}
+
+
+Pattern* PatternFactory::create(int index)
+{
+    switch(index){
+    case 0: return new ClockPattern();
+    case 1: return new RandomPattern();
+   /* case 0: return new ConstantPattern();
+    case 1: return new NumberPattern();
+
+    case 3: return new PulsePattern();
+
+    case 5: return new BinaryCounterPattern();
+    case 6: return new GrayCounterPattern();
+    case 7: return new JohnsonCounterPattern();
+    case 8: return new WalkingPattern();
+    default:
+        if(index>=static_ui_limit)
+        {
+            return new JSPattern(patterns[QString::number(static_ui_limit-index)].toObject());
+        }
+        else
+        {
+            return nullptr;
+        }
+        */
+    }
+}
+
+PatternUI* PatternFactory::create_ui(Pattern* pattern, int index, QWidget *parent)
+{
+    switch(index){
+    case 0: return new ClockPatternUI(dynamic_cast<ClockPattern*>(pattern),parent);
+    case 1: return new RandomPatternUI(dynamic_cast<RandomPattern*>(pattern),parent);
+        /*
+    case 1: return new NumberPatternUI(parent);
+    case 0: return new ConstantPatternUI(parent);
+    case 3: return new PulsePatternUI(parent);
+
+    case 5: return new BinaryCounterPatternUI(parent);
+    case 6: return new GrayCounterPatternUI(parent);
+    case 7: return new JohnsonCounterPatternUI(parent);
+    case 8: return new WalkingPatternUI(parent);
+    default:
+        if(index>=static_ui_limit)
+        {
+            return new JSPatternUI(patterns[QString::number(static_ui_limit-index)].toObject(), parent);
+        }
+        else
+        {
+            return nullptr;
+        }
+        */
+    }
+}
+
+
+
+QStringList PatternFactory::get_ui_list()
+{
+    return ui_list;
+}
+
+QStringList PatternFactory::get_description_list()
+{
+    return description_list;
+}
+
+
 }
