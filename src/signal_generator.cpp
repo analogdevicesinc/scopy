@@ -43,7 +43,6 @@
 
 #define NB_POINTS	32768
 #define SAMPLE_RATE	750000
-#define NB_BUFFERS	4
 #define DAC_BIT_COUNT   12
 #define INTERP_BY_100_CORR 1.168 // correction value at an interpolation by 100
 
@@ -84,8 +83,6 @@ Q_DECLARE_METATYPE(QSharedPointer<signal_generator_data>);
 struct adiscope::time_block_data {
 	scope_sink_f::sptr time_block;
 	unsigned long nb_channels;
-	unsigned long nb_points;
-	unsigned long sample_rate;
 };
 
 SignalGenerator::SignalGenerator(struct iio_context *_ctx,
@@ -93,7 +90,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 	QWidget(parent), ui(new Ui::SignalGenerator),
 	ctx(_ctx), dev(filt->find_device(ctx, TOOL_SIGNAL_GENERATOR)),
 	time_block_data(new adiscope::time_block_data),
-	menuOpened(true), currentChannel(0),
+	menuOpened(true), currentChannel(0), sample_rate(SAMPLE_RATE),
 	settings_group(new QButtonGroup(this)), menuRunButton(runButton)
 {
 	ui->setupUi(this);
@@ -137,7 +134,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 #if SAMPLE_RATE > 1000000
 				{"MHz", 1E6},
 #endif
-			}, "Frequency", 0.001, (SAMPLE_RATE / 2) - 1);
+			}, "Frequency", 0.001, (sample_rate / 2) - 1);
 
 	mathFrequency = new ScaleSpinButton({
 				{"mHz", 1E-3},
@@ -148,7 +145,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 #if SAMPLE_RATE > 1000000
 				{"MHz", 1E6},
 #endif
-			}, "Frequency", 0.001, (SAMPLE_RATE / 2) - 1);
+			}, "Frequency", 0.001, (sample_rate / 2) - 1);
 
 	/* Max amplitude by default */
 	amplitude->setValue(amplitude->maxValue());
@@ -240,11 +237,9 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 		nb_channels++;
 	}
 
-	time_block_data->nb_points = NB_POINTS;
-	time_block_data->sample_rate = SAMPLE_RATE;
 	time_block_data->nb_channels = nb_channels;
 	time_block_data->time_block = scope_sink_f::make(
-			NB_POINTS, SAMPLE_RATE,
+			NB_POINTS, sample_rate,
 			"Signal Generator", nb_channels,
 			static_cast<QWidget *>(plot));
 
@@ -270,9 +265,9 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 	plot->setVertUnitsPerDiv(AMPLITUDE_VOLTS * 2.0 / 10.0);
 
 	plot->setHorizUnitsPerDiv((double) NB_POINTS /
-			((double) SAMPLE_RATE * 10.0));
+			((double) sample_rate * 10.0));
 	plot->setHorizOffset((double) NB_POINTS /
-			((double) SAMPLE_RATE * 2.0));
+			((double) sample_rate * 2.0));
 
 	ui->plot->addWidget(plot, 0, 0);
 
@@ -399,7 +394,7 @@ void SignalGenerator::updatePreview()
 		basic_block_sptr source;
 
 		if ((*it)->second.box->isChecked())
-			source = getSource(&(*it)->first, top);
+			source = getSource(&(*it)->first, sample_rate, top);
 		else
 			source = blocks::nop::make(sizeof(float));
 
@@ -450,7 +445,7 @@ void SignalGenerator::start()
 	unsigned int channel = 0;
 	for (auto it = channels.begin(); it != channels.end(); ++it) {
 		if ((*it)->second.box->isChecked()) {
-			auto source = getSource(&(*it)->first, top_block);
+			auto source = getSource(&(*it)->first, sample_rate, top_block);
 			// DAC_RAW = (-Vout * 2^11) / 5V
 			// Multiplying with 16 because the HDL considers the DAC data as 16 bit
 			// instead of 12 bit(data is shifted to the left).
@@ -497,8 +492,8 @@ void SignalGenerator::setFunction(const QString& function)
 	updatePreview();
 }
 
-basic_block_sptr SignalGenerator::getSignalSource(
-		gr::top_block_sptr top, struct signal_generator_data &data)
+basic_block_sptr SignalGenerator::getSignalSource(gr::top_block_sptr top,
+		unsigned long samp_rate, struct signal_generator_data &data)
 {
 	bool inv_saw_wave = data.waveform == SG_INV_SAW_WAVE;
 	analog::gr_waveform_t waveform;
@@ -518,13 +513,13 @@ basic_block_sptr SignalGenerator::getSignalSource(
 	else
 		waveform = static_cast<analog::gr_waveform_t>(data.waveform);
 
-	auto src = analog::sig_source_f::make(SAMPLE_RATE, waveform,
+	auto src = analog::sig_source_f::make(samp_rate, waveform,
 			data.frequency, amplitude, offset);
 	auto delay = blocks::delay::make(sizeof(float),
-			SAMPLE_RATE * data.phase / (data.frequency * 360.0));
+			samp_rate * data.phase / (data.frequency * 360.0));
 
 	auto skip_head = blocks::skiphead::make(sizeof(float),
-			SAMPLE_RATE / data.frequency);
+			samp_rate / data.frequency);
 
 	top->connect(src, 0, delay, 0);
 	top->connect(delay, 0, skip_head, 0);
@@ -540,18 +535,18 @@ basic_block_sptr SignalGenerator::getSignalSource(
 }
 
 gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
-		gr::top_block_sptr top)
+		unsigned long samp_rate, gr::top_block_sptr top)
 {
 	auto ptr = getData(obj);
 	enum SIGNAL_TYPE type = ptr->type;
 
 	switch (type) {
 	case SIGNAL_TYPE_CONSTANT:
-		return analog::sig_source_f::make(SAMPLE_RATE,
+		return analog::sig_source_f::make(samp_rate,
 				analog::GR_CONST_WAVE, 0, 0,
 				ptr->constant);
 	case SIGNAL_TYPE_WAVEFORM:
-		return getSignalSource(top, *ptr);
+		return getSignalSource(top, samp_rate, *ptr);
 	case SIGNAL_TYPE_BUFFER:
 		if (!ptr->file.isNull()) {
 			auto str = ptr->file.toStdString();
@@ -564,7 +559,7 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
 		if (!ptr->function.isNull()) {
 			auto str = ptr->function.toStdString();
 
-			return iio::iio_math_gen::make(SAMPLE_RATE,
+			return iio::iio_math_gen::make(samp_rate,
 					ptr->math_freq, str);
 		}
 	default:

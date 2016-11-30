@@ -77,6 +77,7 @@ namespace adiscope {
 
 		bool menuOpened;
 		unsigned int currentChannel;
+		unsigned long sample_rate;
 
 		QButtonGroup *settings_group;
 		QPushButton *menuRunButton;
@@ -97,10 +98,13 @@ namespace adiscope {
 		void updatePreview();
 		void toggleRightMenu(QPushButton *btn);
 
-		gr::basic_block_sptr getSignalSource(gr::top_block_sptr top,
+		gr::basic_block_sptr getSignalSource(
+				gr::top_block_sptr top,
+				unsigned long sample_rate,
 				struct signal_generator_data &data);
 
 		gr::basic_block_sptr getSource(QWidget *obj,
+				unsigned long sample_rate,
 				gr::top_block_sptr top);
 
 	private Q_SLOTS:
