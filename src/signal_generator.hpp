@@ -37,6 +37,7 @@
 #include "ui_channel.h"
 
 extern "C" {
+	struct iio_buffer;
 	struct iio_context;
 	struct iio_device;
 }
@@ -67,12 +68,13 @@ namespace adiscope {
 				QWidget *parent = 0);
 		~SignalGenerator();
 
+		const size_t min_buffer_size = 1024;
+
 	private:
 		Ui::SignalGenerator *ui;
 		OscilloscopePlot *plot;
 		gr::top_block_sptr top_block;
 		struct iio_context *ctx;
-		struct iio_device *dev;
 		struct time_block_data *time_block_data;
 
 		bool menuOpened;
@@ -81,6 +83,8 @@ namespace adiscope {
 
 		QButtonGroup *settings_group;
 		QPushButton *menuRunButton;
+
+		QVector<struct iio_buffer *> buffers;
 
 		PositionSpinButton *constantValue;
 		PositionSpinButton *amplitude, *offset, *phase;
@@ -107,7 +111,20 @@ namespace adiscope {
 				unsigned long sample_rate,
 				gr::top_block_sptr top);
 
+		static unsigned long get_best_sample_rate(
+				const struct iio_device *dev,
+				unsigned long frequency);
+
+		static size_t gcd(size_t a, size_t b);
+		static size_t lcm(size_t a, size_t b);
+
+		size_t get_samples_count(const struct iio_device *dev,
+				unsigned long sample_rate);
+		unsigned long get_best_sample_rate(
+				const struct iio_device *dev);
 		unsigned long get_max_sample_rate(const struct iio_device *dev);
+		int set_sample_rate(const struct iio_device *dev,
+				unsigned long sample_rate);
 
 	private Q_SLOTS:
 		void constantValueChanged(double val);

@@ -36,6 +36,7 @@
 #include <gnuradio/blocks/multiply_const_ff.h>
 #include <gnuradio/blocks/nop.h>
 #include <gnuradio/blocks/skiphead.h>
+#include <gnuradio/blocks/vector_sink_s.h>
 #include <gnuradio/iio/device_sink.h>
 #include <gnuradio/iio/math.h>
 
@@ -87,8 +88,7 @@ struct adiscope::time_block_data {
 SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 		Filter *filt, QPushButton *runButton, QWidget *parent) :
 	QWidget(parent), ui(new Ui::SignalGenerator),
-	ctx(_ctx), dev(filt->find_device(ctx, TOOL_SIGNAL_GENERATOR)),
-	time_block_data(new adiscope::time_block_data),
+	ctx(_ctx), time_block_data(new adiscope::time_block_data),
 	menuOpened(true), currentChannel(0), sample_rate(0),
 	settings_group(new QButtonGroup(this)), menuRunButton(runButton)
 {
@@ -99,6 +99,8 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 
 	settings_group->setExclusive(true);
 
+	QVector<struct iio_channel *> iio_channels;
+
 	for (unsigned int dev_id = 0; ; dev_id++) {
 		struct iio_device *dev;
 		try {
@@ -108,9 +110,19 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 			break;
 		}
 
+		unsigned int nb = iio_device_get_channels_count(dev);
 		unsigned long dev_sample_rate = get_max_sample_rate(dev);
+
 		if (dev_sample_rate > sample_rate)
 			sample_rate = dev_sample_rate;
+
+		for (unsigned int i = 0; i < nb; i++) {
+			struct iio_channel *ch = iio_device_get_channel(dev, i);
+
+			if (iio_channel_is_output(ch) &&
+					iio_channel_is_scan_element(ch))
+				iio_channels.append(ch);
+		}
 	}
 
 	/* Setup right menu */
@@ -177,15 +189,10 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 			this, SLOT(phaseChanged(double)));
 
 
-	unsigned int channels_count = iio_device_get_channels_count(dev);
-	unsigned int nb_channels = 0;
+	unsigned int nb_channels = iio_channels.size();
 
-	for (unsigned int i = 0; i < channels_count; i++) {
-		struct iio_channel *chn = iio_device_get_channel(dev, i);
-
-		if (!iio_channel_is_output(chn) ||
-				!iio_channel_is_scan_element(chn))
-			continue;
+	for (unsigned int i = 0; i < nb_channels; i++) {
+		struct iio_channel *chn = iio_channels[i];
 
 		auto ptr = QSharedPointer<signal_generator_data>(
 				new signal_generator_data);
@@ -198,7 +205,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 		ptr->math_freq = mathFrequency->value();
 
 		ptr->type = SIGNAL_TYPE_CONSTANT;
-		ptr->id = nb_channels;
+		ptr->id = i;
 
 		auto pair = new QPair<QWidget, Ui::Channel>;
 		pair->second.setupUi(&pair->first);
@@ -207,23 +214,22 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 		const char *ch_name = iio_channel_get_name(chn);
 		std::string s = "Channel ";
 		if (!ch_name) {
-			s += std::to_string(nb_channels + 1);
+			s += std::to_string(i + 1);
 			ch_name = s.c_str();
 		}
 		pair->second.box->setText(ch_name);
 		pair->second.name->setVisible(false);
 
-		pair->second.box->setProperty("id", QVariant(nb_channels));
-		pair->second.btn->setProperty("id", QVariant(nb_channels));
+		pair->second.box->setProperty("id", QVariant(i));
+		pair->second.btn->setProperty("id", QVariant(i));
 
 		pair->first.setProperty("signal_generator_data",
 				QVariant::fromValue(ptr));
 		pair->first.setProperty("channel_name",
 				QVariant(QString(ch_name)));
-
-		const char *ch_id = iio_channel_get_id(chn);
-		pair->first.setProperty("channel_id",
-				QVariant(QString(ch_id)));
+		pair->first.setProperty("channel",
+				qVariantFromValue((void *) chn));
+		iio_channel_set_data(chn, &pair->first);
 
 		if (i == 0)
 			pair->second.btn->setChecked(true);
@@ -239,7 +245,6 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 		settings_group->addButton(pair->second.btn);
 
 		channels.append(pair);
-		nb_channels++;
 	}
 
 	time_block_data->nb_channels = nb_channels;
@@ -429,52 +434,104 @@ void SignalGenerator::loadFile()
 
 void SignalGenerator::start()
 {
-	top_block = gr::make_top_block("Signal Generator Output");
+	QVector<struct iio_channel *> enabled_channels;
 
-	std::vector<std::string> channel_names;
+	/* Avoid from being started twice */
+	if (buffers.size() > 0)
+		return;
 
 	for (auto it = channels.begin(); it != channels.end(); ++it) {
-		if ((*it)->second.box->isChecked()) {
-			QVariant var = (*it)->first.property("channel_id");
-			channel_names.push_back(var.toString().toStdString());
-		}
+		if (!(*it)->second.box->isChecked())
+			continue;
+
+		void *ptr = (*it)->first.property("channel").value<void *>();
+		enabled_channels.append(static_cast<struct iio_channel *>(ptr));
 	}
 
-	const char *dev_name = iio_device_get_name(dev);
-	if (!dev_name)
-		dev_name = iio_device_get_id(dev);
+	do {
+		const struct iio_device *dev =
+			iio_channel_get_device(enabled_channels[0]);
 
-	auto sink = iio::device_sink::make_from(ctx, dev_name, channel_names,
-			dev_name, std::vector<std::string>(), NB_POINTS);
+		/* First, disable all the channels of this device */
+		unsigned int nb = iio_device_get_channels_count(dev);
+		for (unsigned int i; i < nb; i++)
+			iio_channel_disable(iio_device_get_channel(dev, i));
 
-	unsigned int channel = 0;
-	for (auto it = channels.begin(); it != channels.end(); ++it) {
-		if ((*it)->second.box->isChecked()) {
-			auto source = getSource(&(*it)->first, sample_rate, top_block);
+		/* Then enable the channels that we want */
+		for (auto each : enabled_channels) {
+			if (dev == iio_channel_get_device(each))
+				iio_channel_enable(each);
+		}
+
+		unsigned long best_rate = get_best_sample_rate(dev);
+		size_t samples_count = get_samples_count(dev, best_rate);
+
+		/* Create the IIO buffer */
+		struct iio_buffer *buf = iio_device_create_buffer(
+				dev, samples_count, true);
+		if (!buf)
+			throw std::runtime_error("Unable to create buffer");
+
+		qDebug() << QString("Created buffer with %1 samples at %2 SPS for device %3")
+			.arg(samples_count).arg(best_rate).arg(
+					iio_device_get_name(dev) ?:
+					iio_device_get_id(dev));
+
+		for (auto each : enabled_channels) {
+			if (dev != iio_channel_get_device(each))
+				continue;
+
+			enabled_channels.removeOne(each);
+
+			top_block = gr::make_top_block("Signal Generator");
+
+			void *ptr = iio_channel_get_data(each);
+			QWidget *w = static_cast<QWidget *>(ptr);
+			auto source = getSource(w, best_rate, top_block);
+
 			// DAC_RAW = (-Vout * 2^11) / 5V
 			// Multiplying with 16 because the HDL considers the DAC data as 16 bit
 			// instead of 12 bit(data is shifted to the left).
 			auto f2s = blocks::float_to_short::make(1,
 					-1 * (1 << (DAC_BIT_COUNT - 1)) /
 					AMPLITUDE_VOLTS * 16 / INTERP_BY_100_CORR);
-			top_block->connect(source, 0, f2s, 0);
-			top_block->connect(f2s, 0, sink, channel++);
-		}
-	}
 
-	top_block->start();
+			auto head = blocks::head::make(
+					sizeof(short), samples_count);
+
+			auto vector = blocks::vector_sink_s::make();
+
+			top_block->connect(source, 0, f2s, 0);
+			top_block->connect(f2s, 0, head, 0);
+			top_block->connect(head, 0, vector, 0);
+
+			top_block->run();
+
+			const std::vector<short> &samples = vector->data();
+			const short *data = samples.data();
+
+			iio_channel_write(each, buf, data,
+					samples_count * sizeof(short));
+		}
+
+		set_sample_rate(dev, best_rate);
+
+		qDebug() << "Pushed cyclic buffer";
+
+		iio_buffer_push_partial(buf, samples_count);
+		buffers.append(buf);
+
+	} while (!enabled_channels.empty());
 
 	ui->run_button->setText("Stop");
 }
 
 void SignalGenerator::stop()
 {
-	if (top_block) {
-		top_block->stop();
-		top_block->wait();
-		top_block->disconnect_all();
-		top_block.reset();
-	}
+	for (auto each : buffers)
+		iio_buffer_destroy(each);
+
+	buffers.clear();
 
 	ui->run_button->setText("Run");
 }
@@ -687,6 +744,49 @@ void adiscope::SignalGenerator::toggleRightMenu()
 	toggleRightMenu(static_cast<QPushButton *>(QObject::sender()));
 }
 
+unsigned long SignalGenerator::get_best_sample_rate(
+		const struct iio_device *dev)
+{
+	QVector<unsigned long> values;
+	char buf[1024];
+	int ret;
+
+	ret = iio_device_attr_read(dev, "sampling_frequency_available",
+			buf, sizeof(buf));
+	if (ret > 0) {
+		QStringList list = QString::fromUtf8(buf).split(' ');
+
+		for (auto it = list.cbegin(); it != list.cend(); ++it)
+			values.append(it->toULong());
+	}
+
+	if (values.empty()) {
+		ret = iio_device_attr_read(dev, "sampling_frequency",
+				buf, sizeof(buf));
+		if (ret < 0)
+			return 0;
+		else
+			return QString::fromUtf8(buf).toULong();
+	} else {
+		unsigned long min_rate = 0;
+
+		qSort(values.begin(), values.end(), qGreater<unsigned long>());
+
+		/* Return the highest sample rate that we can create a buffer
+		 * for */
+		for (unsigned long rate : values) {
+			size_t buf_size = get_samples_count(dev, rate);
+			if (buf_size)
+				return rate;
+
+			qDebug() << QString("Rate %1 too high, trying lower")
+				.arg(rate);
+		}
+	}
+
+	throw std::runtime_error("Unable to calculate best sample rate");
+}
+
 unsigned long SignalGenerator::get_max_sample_rate(const struct iio_device *dev)
 {
 	QVector<unsigned long> values;
@@ -710,4 +810,75 @@ unsigned long SignalGenerator::get_max_sample_rate(const struct iio_device *dev)
 		return 0;
 	else
 		return QString::fromUtf8(buf).toULong();
+}
+
+int SignalGenerator::set_sample_rate(const struct iio_device *dev,
+		unsigned long rate)
+{
+	return iio_device_attr_write_longlong(dev, "sampling_frequency", rate);
+}
+
+size_t SignalGenerator::gcd(size_t a, size_t b)
+{
+    for (;;) {
+	    if (!a)
+		    return b;
+	    b %= a;
+
+	    if (!b)
+		    return a;
+	    a %= b;
+    }
+}
+
+size_t SignalGenerator::lcm(size_t a, size_t b)
+{
+	size_t temp = gcd(a, b);
+
+	return temp ? (a / temp * b) : 0;
+}
+
+size_t SignalGenerator::get_samples_count(const struct iio_device *dev,
+		unsigned long rate)
+{
+	size_t max_buffer_size = 4 * 1024 * 1024 /
+		(size_t) iio_device_get_sample_size(dev);
+	size_t size = 1;
+
+	for (unsigned int i = 0; i < iio_device_get_channels_count(dev); i++) {
+		struct iio_channel *chn = iio_device_get_channel(dev, i);
+
+		if (!iio_channel_is_enabled(chn))
+			continue;
+
+		QWidget *w = static_cast<QWidget *>(iio_channel_get_data(chn));
+		auto ptr = getData(w);
+		size_t ratio;
+
+		switch (ptr->type) {
+		case SIGNAL_TYPE_WAVEFORM:
+			size = lcm(size, rate / ptr->frequency);
+			break;
+		case SIGNAL_TYPE_MATH:
+			size = lcm(size, rate / ptr->math_freq);
+			break;
+		case SIGNAL_TYPE_CONSTANT:
+		case SIGNAL_TYPE_BUFFER:
+		default:
+			break;
+		}
+	}
+
+	/* The buffer size must be a multiple of 4 */
+	while (size & 0x3)
+		size <<= 1;
+
+	/* The buffer size shouldn't be too small */
+	while (size < min_buffer_size)
+		size <<= 1;
+
+	if (size > max_buffer_size)
+		return 0;
+
+	return size;
 }
