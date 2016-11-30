@@ -13,10 +13,10 @@
 
 	"M2K": {
 		"compatible": [ "signal-generator", "voltmeter", "power-controller", "oscilloscope", "logic-analyzer-rx", "logic-analyzer-tx" ],
-		"compatible-devices": [ "m2k-adc", "m2k-dac", "m2k-logic-analyzer-rx", "m2k-logic-analyzer-tx" ],
+		"compatible-devices": [ "m2k-adc", "m2k-dac-a", "m2k-dac-b", "m2k-logic-analyzer-rx", "m2k-logic-analyzer-tx" ],
 		"oscilloscope-devices": [ "m2k-adc" ],
 		"voltmeter-devices": [ "m2k-adc" ],
-		"signal-generator-devices": [ "m2k-dac" ],
+		"signal-generator-devices": [ "m2k-dac-a", "m2k-dac-b" ],
 		"logic-analyzer-rx-devices": [ "m2k-logic-analyzer-rx" ],
 		"logic-analyzer-tx-device": [ "m2k-logic-analyzer-tx" ]
 	}
