@@ -137,9 +137,6 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 #if SAMPLE_RATE > 1000000
 				{"MHz", 1E6},
 #endif
-#if SAMPLE_RATE > 1000000000
-				{"GHz", 1E9},
-#endif
 			}, "Frequency", 0.001, (SAMPLE_RATE / 2) - 1);
 
 	mathFrequency = new ScaleSpinButton({
@@ -150,9 +147,6 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 #endif
 #if SAMPLE_RATE > 1000000
 				{"MHz", 1E6},
-#endif
-#if SAMPLE_RATE > 1000000000
-				{"GHz", 1E9},
 #endif
 			}, "Frequency", 0.001, (SAMPLE_RATE / 2) - 1);
 
