@@ -107,6 +107,8 @@ namespace adiscope {
 				unsigned long sample_rate,
 				gr::top_block_sptr top);
 
+		unsigned long get_max_sample_rate(const struct iio_device *dev);
+
 	private Q_SLOTS:
 		void constantValueChanged(double val);
 		void amplitudeChanged(double val);

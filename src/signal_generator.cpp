@@ -42,7 +42,6 @@
 #include <iio.h>
 
 #define NB_POINTS	32768
-#define SAMPLE_RATE	750000
 #define DAC_BIT_COUNT   12
 #define INTERP_BY_100_CORR 1.168 // correction value at an interpolation by 100
 
@@ -90,7 +89,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 	QWidget(parent), ui(new Ui::SignalGenerator),
 	ctx(_ctx), dev(filt->find_device(ctx, TOOL_SIGNAL_GENERATOR)),
 	time_block_data(new adiscope::time_block_data),
-	menuOpened(true), currentChannel(0), sample_rate(SAMPLE_RATE),
+	menuOpened(true), currentChannel(0), sample_rate(0),
 	settings_group(new QButtonGroup(this)), menuRunButton(runButton)
 {
 	ui->setupUi(this);
@@ -99,6 +98,20 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 	this->plot = new OscilloscopePlot(parent);
 
 	settings_group->setExclusive(true);
+
+	for (unsigned int dev_id = 0; ; dev_id++) {
+		struct iio_device *dev;
+		try {
+			dev = filt->find_device(ctx,
+					TOOL_SIGNAL_GENERATOR, dev_id);
+		} catch (std::exception &ex) {
+			break;
+		}
+
+		unsigned long dev_sample_rate = get_max_sample_rate(dev);
+		if (dev_sample_rate > sample_rate)
+			sample_rate = dev_sample_rate;
+	}
 
 	/* Setup right menu */
 	constantValue = new PositionSpinButton({
@@ -128,23 +141,15 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 	frequency = new ScaleSpinButton({
 				{"mHz", 1E-3},
 				{"Hz", 1E0},
-#if SAMPLE_RATE > 1000
 				{"kHz", 1E3},
-#endif
-#if SAMPLE_RATE > 1000000
 				{"MHz", 1E6},
-#endif
 			}, "Frequency", 0.001, (sample_rate / 2) - 1);
 
 	mathFrequency = new ScaleSpinButton({
 				{"mHz", 1E-3},
 				{"Hz", 1E0},
-#if SAMPLE_RATE > 1000
 				{"kHz", 1E3},
-#endif
-#if SAMPLE_RATE > 1000000
 				{"MHz", 1E6},
-#endif
 			}, "Frequency", 0.001, (sample_rate / 2) - 1);
 
 	/* Max amplitude by default */
@@ -680,4 +685,29 @@ void adiscope::SignalGenerator::toggleRightMenu(QPushButton *btn)
 void adiscope::SignalGenerator::toggleRightMenu()
 {
 	toggleRightMenu(static_cast<QPushButton *>(QObject::sender()));
+}
+
+unsigned long SignalGenerator::get_max_sample_rate(const struct iio_device *dev)
+{
+	QVector<unsigned long> values;
+	char buf[1024];
+	int ret;
+
+	ret = iio_device_attr_read(dev, "sampling_frequency_available",
+			buf, sizeof(buf));
+	if (ret > 0) {
+		QStringList list = QString::fromUtf8(buf).split(' ');
+
+		for (auto it = list.cbegin(); it != list.cend(); ++it)
+			values.append(it->toULong());
+	}
+
+	if (!values.empty())
+		return values.takeLast();
+
+	ret = iio_device_attr_read(dev, "sampling_frequency", buf, sizeof(buf));
+	if (ret < 0)
+		return 0;
+	else
+		return QString::fromUtf8(buf).toULong();
 }
