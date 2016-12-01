@@ -125,6 +125,7 @@ namespace adiscope {
 		unsigned long get_max_sample_rate(const struct iio_device *dev);
 		int set_sample_rate(const struct iio_device *dev,
 				unsigned long sample_rate);
+		bool use_oversampling(const struct iio_device *dev);
 
 	private Q_SLOTS:
 		void constantValueChanged(double val);

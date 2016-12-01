@@ -755,6 +755,33 @@ void adiscope::SignalGenerator::toggleRightMenu()
 	toggleRightMenu(static_cast<QPushButton *>(QObject::sender()));
 }
 
+bool SignalGenerator::use_oversampling(const struct iio_device *dev)
+{
+	if (!iio_device_find_attr(dev, "oversampling_ratio"))
+		return false;
+
+	for (unsigned int i = 0; i < iio_device_get_channels_count(dev); i++) {
+		struct iio_channel *chn = iio_device_get_channel(dev, i);
+
+		if (!iio_channel_is_enabled(chn))
+			continue;
+
+		QWidget *w = static_cast<QWidget *>(iio_channel_get_data(chn));
+		auto ptr = getData(w);
+
+		switch (ptr->type) {
+		case SIGNAL_TYPE_WAVEFORM:
+			/* We only want oversampling for square waveforms */
+			if (ptr->waveform == SG_SQR_WAVE)
+				return true;
+		default:
+			break;
+		}
+	}
+
+	return false;
+}
+
 unsigned long SignalGenerator::get_best_sample_rate(
 		const struct iio_device *dev)
 {
@@ -781,10 +808,16 @@ unsigned long SignalGenerator::get_best_sample_rate(
 	} else {
 		unsigned long min_rate = 0;
 
-		qSort(values.begin(), values.end(), qGreater<unsigned long>());
+		/* When using oversampling, we actually want to generate the
+		 * signal with the lowest sample rate possible. */
+		if (use_oversampling(dev))
+			qSort(values.begin(), values.end(),
+					qLess<unsigned long>());
+		else
+			qSort(values.begin(), values.end(),
+					qGreater<unsigned long>());
 
-		/* Return the highest sample rate that we can create a buffer
-		 * for */
+		/* Return the best sample rate that we can create a buffer for */
 		for (unsigned long rate : values) {
 			size_t buf_size = get_samples_count(dev, rate);
 			if (buf_size)
@@ -826,6 +859,27 @@ unsigned long SignalGenerator::get_max_sample_rate(const struct iio_device *dev)
 int SignalGenerator::set_sample_rate(const struct iio_device *dev,
 		unsigned long rate)
 {
+	if (use_oversampling(dev)) {
+		/* We assume that the rate requested here will always be a
+		 * divider of the max sample rate */
+		unsigned int ratio = sample_rate / rate;
+
+		int ret = iio_device_attr_write_longlong(
+				dev, "oversampling_ratio", ratio);
+		if (ret < 0)
+			return ret;
+
+		rate = sample_rate;
+		qDebug() << QString("Using oversampling with a ratio of %1")
+			.arg(ratio);
+	} else {
+		int ret = iio_device_attr_write_longlong(
+				dev, "oversampling_ratio", 1);
+		if (ret < 0)
+			return ret;
+	}
+
+set_sample_rate:
 	return iio_device_attr_write_longlong(dev, "sampling_frequency", rate);
 }
 
@@ -868,10 +922,18 @@ size_t SignalGenerator::get_samples_count(const struct iio_device *dev,
 
 		switch (ptr->type) {
 		case SIGNAL_TYPE_WAVEFORM:
-			size = lcm(size, rate / ptr->frequency);
+			ratio = rate / ptr->frequency;
+			if (ratio < 2)
+				return 0; /* rate too low */
+
+			size = lcm(size, ratio);
 			break;
 		case SIGNAL_TYPE_MATH:
-			size = lcm(size, rate / ptr->math_freq);
+			ratio = rate / ptr->math_freq;
+			if (ratio < 2)
+				return 0; /* rate too low */
+
+			size = lcm(size, ratio);
 			break;
 		case SIGNAL_TYPE_CONSTANT:
 		case SIGNAL_TYPE_BUFFER:
