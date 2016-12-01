@@ -463,6 +463,9 @@ void SignalGenerator::start()
 				iio_channel_enable(each);
 		}
 
+		/* Enable the (optional) DMA sync */
+		iio_device_attr_write_bool(dev, "dma_sync", true);
+
 		unsigned long best_rate = get_best_sample_rate(dev);
 		size_t samples_count = get_samples_count(dev, best_rate);
 
@@ -522,6 +525,14 @@ void SignalGenerator::start()
 		buffers.append(buf);
 
 	} while (!enabled_channels.empty());
+
+	/* Now that we pushed all the buffers, disable the (optional) DMA sync
+	 * for the devices that support it. */
+	for (auto buf : buffers) {
+		const struct iio_device *dev = iio_buffer_get_device(buf);
+
+		iio_device_attr_write_bool(dev, "dma_sync", false);
+	}
 
 	ui->run_button->setText("Stop");
 }
