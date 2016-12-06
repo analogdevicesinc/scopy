@@ -90,7 +90,7 @@ QLabel
   font-style: normal;
   text-align: left;
   color: #ffffff;
-/*background-color:red;*/
+/*  background-color:green;*/
   border: 0px solid red;
   margin:0px;
   padding:0px;
@@ -228,7 +228,7 @@ QPushButton:!checked {
          <enum>Qt::Horizontal</enum>
         </property>
         <property name="sizeType">
-         <enum>QSizePolicy::MinimumExpanding</enum>
+         <enum>QSizePolicy::Preferred</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
@@ -241,7 +241,7 @@ QPushButton:!checked {
       <item>
        <widget class="QPushButton" name="collapseBtn">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+         <sizepolicy hsizetype="Fixed" vsizetype="Maximum">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -291,7 +291,7 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
       <item>
        <widget class="QLabel" name="ChannelGroupLabel">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -323,7 +323,7 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
       <item>
        <widget class="QLabel" name="DioLabel">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>

@@ -102,7 +102,7 @@ public:
     uint16_t get_mask();
     std::vector<uint16_t> get_ids();
     size_t get_channel_count();
-    std::vector<Channel*> get_channels() const;
+    std::vector<Channel*>* get_channels();
     Channel* get_channel(int index=0);
 
     bool is_selected() const;

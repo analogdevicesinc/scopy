@@ -170,9 +170,9 @@ std::string Channel::get_label()
     return label;
 }
 
-std::vector<Channel*> ChannelGroup::get_channels() const
+std::vector<Channel*>* ChannelGroup::get_channels()
 {
-    return channels;
+    return &channels;
 }
 
 Channel* ChannelGroup::get_channel(int index)
@@ -256,7 +256,7 @@ size_t ChannelGroup::get_channel_count()
 std::vector<uint16_t> ChannelGroup::get_ids()
 {
     std::vector<uint16_t> ret;
-    for(auto ch: get_channels())
+    for(auto ch: (*get_channels()))
         ret.push_back(ch->get_id());
     return ret;
 }

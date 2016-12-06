@@ -150,8 +150,9 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt, QPushB
     connect(ui->btnChSettings, SIGNAL(pressed()), this, SLOT(toggleRightMenu()));
     connect(ui->btnPGSettings, SIGNAL(pressed()), this, SLOT(toggleRightMenu()));
     ui->rightMenu->setMaximumWidth(0);
-    chmui = new PatternGeneratorChannelManagerUI(ui->leftWidget,main_win,&chm,ui->cgSettings,this);
-    ui->leftWidgetLayout->addWidget(chmui);
+    chmui = new PatternGeneratorChannelManagerUI(ui->channelManagerWidget,main_win,&chm,ui->cgSettings,this);
+    ui->channelManagerWidgetLayout->addWidget(chmui);
+    qDebug()<<chmui->parent();
     chmui->updateUi();
     chmui->setVisible(true);
     chmui->createSettingsWidget();
@@ -677,3 +678,43 @@ void adiscope::PatternGenerator::rightMenuFinished(bool opened)
 
 } /* namespace adiscope */
 
+
+void adiscope::PatternGenerator::on_btnHideInactive_clicked()
+{
+    if(chmui->isDisabledShown())
+    {
+        chmui->hideDisabled();
+        ui->btnHideInactive->setText("Show All");
+    }
+    else
+    {
+        chmui->showDisabled();
+        ui->btnHideInactive->setText("Hide Inactive");
+
+    }
+    chmui->updateUi();
+}
+
+void adiscope::PatternGenerator::on_btnGroupWithSelected_clicked()
+{
+    chmui->groupSplitSelected();
+    chmui->updateUi();
+}
+
+void adiscope::PatternGenerator::on_extendChannelManager_PB_clicked()
+{
+    if(chmui->areDetailsShown())
+    {
+        chmui->hideDetails();
+        ui->btnGroupWithSelected->setVisible(false);
+        chmui->updateUi();
+      //  ui->channelManagerWidget->toggleMenu(true);
+    }
+    else
+    {
+        chmui->showDetails();
+        ui->btnGroupWithSelected->setVisible(true);
+        chmui->updateUi();
+      //  ui->channelManagerWidget->toggleMenu(true);
+    }
+}

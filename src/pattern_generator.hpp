@@ -91,6 +91,12 @@ private Q_SLOTS:
     void createRightPatternWidget(PatternUI* patternui);
 
     void rightMenuFinished(bool opened);
+    void on_btnHideInactive_clicked();
+
+    void on_btnGroupWithSelected_clicked();
+
+    void on_extendChannelManager_PB_clicked();
+
 private:
 
     // UI

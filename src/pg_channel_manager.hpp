@@ -104,6 +104,8 @@ class PatternGeneratorChannelManagerUI : public QWidget
     PatternGeneratorChannelGroup *selectedChannelGroup;
     PatternUI* currentUI; // pointer to currently drawn patternUI.
     QButtonGroup *channelButtonGroup;
+    bool disabledShown;
+    bool detailsShown;
 public:
 
     pv::MainWindow* main_win;
@@ -122,18 +124,24 @@ public:
     void createSettingsWidget();
     QWidget *getSettingsWidget() const;
 
+    bool isDisabledShown();
+    void showDisabled();
+    void hideDisabled();
+
+    bool areDetailsShown();
+    void showDetails();
+    void hideDetails();
+
+    void groupSplitSelected();
+
     PatternGeneratorChannelGroup *getSelectedChannelGroup() const;
     void setSelectedChannelGroup(PatternGeneratorChannelGroup *value);
 
 private Q_SLOTS:
 
-    /*void select_channel(bool checked);
-    void on_pushButton_2_clicked();*/
-    void on_groupSplit_clicked();
-
 private:
     void retainWidgetSizeWhenHidden(QWidget *w);
-    void setWidgetMinimumNrOfChars(QWidget *w, int nrOfChars);
+    void setWidgetMinimumNrOfChars(QWidget *w, int nrOfChars, QFont* font=nullptr);
 };
 
 
