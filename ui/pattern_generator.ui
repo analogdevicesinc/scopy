@@ -806,9 +806,6 @@ QPushButton:hover
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
-             <property name="styleSheet">
-              <string notr="true">/*background-color: rgb(0, 255, 127);*/</string>
-             </property>
              <layout class="QVBoxLayout" name="centralWidgetLayout">
               <property name="spacing">
                <number>0</number>

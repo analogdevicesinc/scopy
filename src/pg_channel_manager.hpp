@@ -100,6 +100,7 @@ class PatternGeneratorChannelManagerUI : public QWidget
 {
     Q_OBJECT
     QWidget* settingsWidget; // pointer to settingspage in stacked widget in main pg ui
+    QWidget* channelManagerHeaderWiget;
     PatternGeneratorChannelGroupUI *selectedChannelGroupUi;
     PatternGeneratorChannelGroup *selectedChannelGroup;
     PatternUI* currentUI; // pointer to currently drawn patternUI.
@@ -112,7 +113,6 @@ public:
     std::vector<PatternGeneratorChannelGroupUI*> chg_ui;
     PatternGeneratorChannelManagerUI(QWidget *parent, pv::MainWindow* main_win_, PatternGeneratorChannelManager* chm, QWidget *settingsWidget,PatternGenerator* pg);
     ~PatternGeneratorChannelManagerUI();
-
 
     PatternGeneratorChannelManager* chm;
     PatternGenerator *pg;
@@ -141,7 +141,7 @@ private Q_SLOTS:
 
 private:
     void retainWidgetSizeWhenHidden(QWidget *w);
-    void setWidgetMinimumNrOfChars(QWidget *w, int nrOfChars, QFont* font=nullptr);
+    void setWidgetNrOfChars(QWidget *w, int minNrOfChars, int maxNrOfChars=0);
 };
 
 

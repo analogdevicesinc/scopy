@@ -6,6 +6,7 @@
 
 #include "ui_pg_channel_group.h"
 #include "ui_pg_channel_manager.h"
+#include "ui_pg_channel_header.h"
 #include "ui_pg_channel.h"
 
 
@@ -13,6 +14,7 @@ namespace Ui {
 class PGChannelGroup;
 class PGChannel;
 class PGChannelManager;
+class PGChannelManagerHeader;
 }
 
 namespace pv
@@ -128,7 +130,6 @@ PatternGeneratorChannelGroup* PatternGeneratorChannelGroupUI::getChannelGroup()
 void PatternGeneratorChannelGroupUI::set_decoder(std::string value)
 {
     getChannelGroup()->setDecoder(value);
-    qDebug()<<QString().fromStdString(getChannelGroup()->getDecoder());
 }
 
 void PatternGeneratorChannelGroupUI::patternChanged(int index)
@@ -219,15 +220,9 @@ PatternGeneratorChannelManager::PatternGeneratorChannelManager() : ChannelManage
     for(auto i=0;i<16;i++)
     {
         std::string temp = "DIO" + std::to_string(i);
-        //LogicAnalyzerChannel ch_temp(i,temp);
-        channel.push_back(new PatternGeneratorChannel(i,temp));
+       channel.push_back(new PatternGeneratorChannel(i,temp));
     }
-    /*logic_channel = channel;
-    qDebug()<< logic_channel->back()->getChannel_role();*/
-
     auto temp = static_cast<PatternGeneratorChannel*>(channel.back());
-
-    qDebug()<< QString().fromStdString(temp->getChannel_role());
     for(auto&& ch : channel)
     {
         channel_group.push_back(new PatternGeneratorChannelGroup(static_cast<PatternGeneratorChannel*>(ch)));
@@ -337,6 +332,7 @@ PatternGeneratorChannelManagerUI::PatternGeneratorChannelManagerUI(QWidget *pare
     channelButtonGroup = new QButtonGroup(this);
     disabledShown = true;
     detailsShown = true;
+    channelManagerHeaderWiget = nullptr;
 
    // update_ui();
 }
@@ -352,16 +348,17 @@ void PatternGeneratorChannelManagerUI::retainWidgetSizeWhenHidden(QWidget *w)
     w->setSizePolicy(sp_retain);
 }
 
-void PatternGeneratorChannelManagerUI::setWidgetMinimumNrOfChars(QWidget *w, int nrOfChars, QFont* font)
+void PatternGeneratorChannelManagerUI::setWidgetNrOfChars(QWidget *w, int minNrOfChars, int maxNrOfChars)
 {
-    const QFont* fontmetric;
-    if(font == nullptr) fontmetric = &w->font();
-    else fontmetric = font;
-    QFontMetrics labelm(*fontmetric);
+    QFontMetrics labelm(w->font());
 
-    qDebug()<<w->font();
-    auto label_min_width = labelm.width(QString(nrOfChars,'X'));
+    auto label_min_width = labelm.width(QString(minNrOfChars,'X'));
     w->setMinimumWidth(label_min_width);
+    if(maxNrOfChars!=0)
+    {
+        auto label_max_width = labelm.width(QString(maxNrOfChars,'X'));
+        w->setMaximumWidth(label_max_width);
+    }
 }
 
 void PatternGeneratorChannelManagerUI::updateUi()
@@ -379,45 +376,32 @@ void PatternGeneratorChannelManagerUI::updateUi()
 
     chg_ui.erase(chg_ui.begin(),chg_ui.end());
 
+    if(channelManagerHeaderWiget != nullptr)
+    {
+        delete channelManagerHeaderWiget;
+        channelManagerHeaderWiget = nullptr;
+    }
+
+    channelManagerHeaderWiget = new QWidget(ui->chmHeaderSlot);
+    Ui::PGChannelManagerHeader *chmHeader = new Ui::PGChannelManagerHeader();
+    chmHeader->setupUi(channelManagerHeaderWiget);
+    ui->chmHeaderSlotLayout->addWidget(channelManagerHeaderWiget);
+
     auto offset = 0;
-    ensurePolished();    
-    setWidgetMinimumNrOfChars(ui->labelName, channelGroupLabelMaxLength);
-    setWidgetMinimumNrOfChars(ui->labelDIO, dioLabelMaxLength);
-    setWidgetMinimumNrOfChars(ui->labelType, channelComboMaxLength);
-    setWidgetMinimumNrOfChars(ui->labelOutput, outputComboMaxLength);
-    ui->labelView->setMinimumWidth(40);
-    ui->labelSelect->setMinimumWidth(40);
+    ensurePolished();
+    setWidgetNrOfChars(chmHeader->labelName, channelGroupLabelMaxLength);
+    setWidgetNrOfChars(chmHeader->labelDIO, dioLabelMaxLength);
+    setWidgetNrOfChars(chmHeader->labelType, channelComboMaxLength);
+    setWidgetNrOfChars(chmHeader->labelOutput, outputComboMaxLength);
+    chmHeader->labelView->setMinimumWidth(40);
+    chmHeader->labelSelect->setMinimumWidth(40);
 
     if(!detailsShown)
     {
-        ui->labelOutput->setVisible(false);
-        ui->labelSelect->setVisible(false);
-        ui->labelType->setVisible(false);
-        ui->labelView->setVisible(false);
-
-        ui->horizontalSpacer->changeSize(0,0);
-        ui->horizontalSpacer_2->changeSize(0,0);
-        ui->horizontalSpacer_3->changeSize(0,0);
-        ui->horizontalSpacer_4->changeSize(0,0);
-        ui->horizontalSpacer_5->changeSize(0,0);
-        ui->horizontalSpacer_6->changeSize(0,0);
-        ui->horizontalSpacer_7->changeSize(0,0);
-        ui->horizontalSpacer_8->changeSize(0,0);
-        ui->horizontalSpacer_9->changeSize(0,0);
-        ui->horizontalSpacer_10->changeSize(0,0);
-        ui->horizontalSpacer_11->changeSize(0,0);
-        ui->horizontalSpacer_12->changeSize(0,0);
-
+        chmHeader->wgHeaderEnableGroup->setVisible(false);
+        chmHeader->wgHeaderSettingsGroup->setVisible(false);
+        chmHeader->wgHeaderSelectionGroup->setVisible(false);
     }
-    else
-    {
-        ui->labelOutput->setVisible(true);
-        ui->labelSelect->setVisible(true);
-        ui->labelType->setVisible(true);
-        ui->labelView->setVisible(true);
-    }
-
-
 
     for(auto&& ch : *(chm->get_channel_groups()))
     {
@@ -426,38 +410,28 @@ void PatternGeneratorChannelManagerUI::updateUi()
         chg_ui.push_back(new PatternGeneratorChannelGroupUI(static_cast<PatternGeneratorChannelGroup*>(ch),this, 0)); // create widget for channelgroup
         PatternGeneratorChannelGroupUI* currentChannelGroupUI = chg_ui.back();
 
-        Ui::PGChannelGroup *pgchannelgroupui = new Ui::PGChannelGroup;
+        Ui::PGChannelGroup *pgchannelgroupui = new Ui::PGChannelGroup();
         pgchannelgroupui->setupUi(chg_ui.back());
         ui->verticalLayout->insertWidget(chg_ui.size(),chg_ui.back());
+        currentChannelGroupUI->ensurePolished();
+
+        retainWidgetSizeWhenHidden(pgchannelgroupui->collapseBtn);
+        retainWidgetSizeWhenHidden(pgchannelgroupui->line);
+        retainWidgetSizeWhenHidden(pgchannelgroupui->line_2);
 
         if(!detailsShown)
         {
-            pgchannelgroupui->enableBox->setVisible(false);
-            pgchannelgroupui->outputCombo->setVisible(false);
-            pgchannelgroupui->patternCombo->setVisible(false);
-            pgchannelgroupui->collapseBtn->setVisible(false);
-            pgchannelgroupui->selectBox->setVisible(false);
-            pgchannelgroupui->pushButton->setVisible(false);
-            pgchannelgroupui->splitBtn->setVisible(false);
-            pgchannelgroupui->horizontalSpacer->changeSize(0,0);
-            pgchannelgroupui->horizontalSpacer_2->changeSize(0,0);
-            pgchannelgroupui->horizontalSpacer_3->changeSize(0,0);
-            pgchannelgroupui->horizontalSpacer_4->changeSize(0,0);
-            pgchannelgroupui->horizontalSpacer_5->changeSize(0,0);
-            pgchannelgroupui->horizontalSpacer_6->changeSize(0,0);
-            pgchannelgroupui->horizontalSpacer_7->changeSize(0,0);
-            pgchannelgroupui->horizontalSpacer_8->changeSize(0,0);
-            pgchannelgroupui->horizontalSpacer_9->changeSize(0,0);
+            pgchannelgroupui->wgChannelEnableGroup->setVisible(false);
+            pgchannelgroupui->wgChannelSelectionGroup->setVisible(false);
+            pgchannelgroupui->wgChannelSettingsGroup->setVisible(false);
         }
         else
         {
             retainWidgetSizeWhenHidden(pgchannelgroupui->splitBtn);
-            retainWidgetSizeWhenHidden(pgchannelgroupui->collapseBtn);
-            retainWidgetSizeWhenHidden(pgchannelgroupui->line);
-            retainWidgetSizeWhenHidden(pgchannelgroupui->line_2);
         }
 
-        setWidgetMinimumNrOfChars(pgchannelgroupui->ChannelGroupLabel, channelGroupLabelMaxLength);
+
+        setWidgetNrOfChars(pgchannelgroupui->ChannelGroupLabel, channelGroupLabelMaxLength);
 
         QString channelGroupLabel = QString().fromStdString(ch->get_label());
         if(channelGroupLabel.length()>channelGroupLabelMaxLength)
@@ -467,9 +441,9 @@ void PatternGeneratorChannelManagerUI::updateUi()
         }
         pgchannelgroupui->ChannelGroupLabel->setText(channelGroupLabel);
 
-        setWidgetMinimumNrOfChars(pgchannelgroupui->DioLabel, dioLabelMaxLength);
-        setWidgetMinimumNrOfChars(pgchannelgroupui->patternCombo, channelComboMaxLength);
-        setWidgetMinimumNrOfChars(pgchannelgroupui->outputCombo, outputComboMaxLength);
+        setWidgetNrOfChars(pgchannelgroupui->DioLabel, dioLabelMaxLength);
+        setWidgetNrOfChars(pgchannelgroupui->patternCombo, channelComboMaxLength);
+        setWidgetNrOfChars(pgchannelgroupui->outputCombo, outputComboMaxLength);
 
         int i = 0;
         for(auto var : PatternFactory::get_ui_list())
@@ -481,14 +455,14 @@ void PatternGeneratorChannelManagerUI::updateUi()
 
         pgchannelgroupui->enableBox->setChecked(ch->is_enabled());
         currentChannelGroupUI->enableControls(ch->is_enabled());
-        channelButtonGroup->addButton(pgchannelgroupui->pushButton);
+//        channelButtonGroup->addButton(pgchannelgroupui->pushButton);
         channelButtonGroup->setExclusive(true);
 
         connect(pgchannelgroupui->enableBox,SIGNAL(toggled(bool)),chg_ui.back(),SLOT(enable(bool)));
         connect(static_cast<PatternGeneratorChannelGroupUI*>(chg_ui.back()),SIGNAL(channel_selected()),pg,SLOT(onChannelSelectedChanged())); // TEMP
         connect(static_cast<PatternGeneratorChannelGroupUI*>(chg_ui.back()),SIGNAL(channel_enabled()),pg,SLOT(onChannelEnabledChanged())); // TEMP
-        connect(pgchannelgroupui->pushButton,SIGNAL(clicked()),static_cast<PatternGeneratorChannelGroupUI*>(chg_ui.back()),SLOT(settingsButtonHandler()));
-        connect(pgchannelgroupui->pushButton,SIGNAL(clicked()),pg,SLOT(toggleRightMenu()));
+//        connect(pgchannelgroupui->pushButton,SIGNAL(clicked()),static_cast<PatternGeneratorChannelGroupUI*>(chg_ui.back()),SLOT(settingsButtonHandler()));
+//        connect(pgchannelgroupui->pushButton,SIGNAL(clicked()),pg,SLOT(toggleRightMenu()));
         connect(pgchannelgroupui->selectBox,SIGNAL(toggled(bool)),static_cast<PatternGeneratorChannelGroupUI*>(chg_ui.back()),SLOT(select(bool)));
         connect(pgchannelgroupui->patternCombo,SIGNAL(currentIndexChanged(int)),chg_ui.back(),SLOT(patternChanged(int)));
 
@@ -503,57 +477,45 @@ void PatternGeneratorChannelManagerUI::updateUi()
             connect(pgchannelgroupui->collapseBtn,SIGNAL(clicked()),chg_ui.back(),SLOT(collapse()));
             connect(pgchannelgroupui->splitBtn,SIGNAL(clicked()),chg_ui.back(),SLOT(split()));
 
-            qDebug()<<pgchannelgroupui->DioLabel->isEnabled();
             for(auto i=0;i<ch->get_channel_count();i++)
                 {
-                    Ui::PGChannelGroup *pgchannelui = new Ui::PGChannelGroup;
+                    Ui::PGChannelGroup *pgchannelui = new Ui::PGChannelGroup();
 
                     currentChannelGroupUI->ch_ui.push_back(new PatternGeneratorChannelUI(static_cast<PatternGeneratorChannel*>(ch->get_channel(i)), static_cast<PatternGeneratorChannelGroup*>(ch), this, 0)); // create widget for channelgroup
                     PatternGeneratorChannelUI* currentChannelUI = currentChannelGroupUI->ch_ui.back();
                     //QWidget *p = new QWidget(chg_ui.back());
                     pgchannelui->setupUi(currentChannelUI);
                     pgchannelgroupui->subChannelLayout->insertWidget(i,currentChannelUI);
+                    currentChannelGroupUI->ensurePolished();
+
+                    retainWidgetSizeWhenHidden(pgchannelui->collapseBtn);
+                    retainWidgetSizeWhenHidden(pgchannelui->line);
+                    retainWidgetSizeWhenHidden(pgchannelui->line_2);
 
                     if(!detailsShown)
                     {
-                        pgchannelui->pushButton->setVisible(false);
-                        pgchannelui->splitBtn->setVisible(false);
-
-
-                        pgchannelui->horizontalSpacer->changeSize(0,0);
-                        pgchannelui->horizontalSpacer_2->changeSize(0,0);
-                        pgchannelui->horizontalSpacer_3->changeSize(0,0);
-                        pgchannelui->horizontalSpacer_4->changeSize(0,0);
-                        pgchannelui->horizontalSpacer_5->changeSize(0,0);
-                        pgchannelui->horizontalSpacer_6->changeSize(0,0);
-                        pgchannelui->horizontalSpacer_7->changeSize(0,0);
-                        pgchannelui->horizontalSpacer_8->changeSize(0,0);
-                        pgchannelui->horizontalSpacer_9->changeSize(0,0);
-
+                        pgchannelui->wgChannelSelectionGroup->setVisible(false);
                     }
                     else
                     {
-                        retainWidgetSizeWhenHidden(pgchannelui->enableBox);
-                        retainWidgetSizeWhenHidden(pgchannelui->collapseBtn);
-                        retainWidgetSizeWhenHidden(pgchannelui->patternCombo);
+                        //retainWidgetSizeWhenHidden(pgchannelui->enableBox);
+                        retainWidgetSizeWhenHidden(pgchannelui->wgChannelSettingsGroup);
+                        retainWidgetSizeWhenHidden(pgchannelui->wgChannelEnableGroup);
                         retainWidgetSizeWhenHidden(pgchannelui->outputCombo);
                         retainWidgetSizeWhenHidden(pgchannelui->selectBox);
-                        retainWidgetSizeWhenHidden(pgchannelui->line);
-                        retainWidgetSizeWhenHidden(pgchannelui->line_2);
                     }
 
                     pgchannelui->line->setVisible(false);
                     pgchannelui->line_2->setVisible(false);
 
-                    setWidgetMinimumNrOfChars(pgchannelui->ChannelGroupLabel, channelGroupLabelMaxLength);
-                    setWidgetMinimumNrOfChars(pgchannelui->DioLabel, dioLabelMaxLength);
-                    setWidgetMinimumNrOfChars(pgchannelui->patternCombo, channelComboMaxLength);
-                    setWidgetMinimumNrOfChars(pgchannelui->outputCombo, outputComboMaxLength);
+                    setWidgetNrOfChars(pgchannelui->ChannelGroupLabel, channelGroupLabelMaxLength);
+                    setWidgetNrOfChars(pgchannelui->DioLabel, dioLabelMaxLength);
+                    setWidgetNrOfChars(pgchannelui->patternCombo, channelComboMaxLength);
+                    setWidgetNrOfChars(pgchannelui->outputCombo, outputComboMaxLength);
 
-                    pgchannelui->enableBox->setVisible(false);
+                    pgchannelui->wgChannelEnableGroup->setVisible(false);
+                    pgchannelui->wgChannelSettingsGroup->setVisible(false);
                     pgchannelui->collapseBtn->setVisible(false);
-                    pgchannelui->patternCombo->setVisible(false);
-                    pgchannelui->outputCombo->setVisible(false);
                     pgchannelui->selectBox->setVisible(false);
 
                     connect(pgchannelui->splitBtn,SIGNAL(clicked()),currentChannelUI,SLOT(split()));
