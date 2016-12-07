@@ -6,6 +6,18 @@
 #include "pg_patterns.hpp"
 //#include "pattern_generator.hpp"
 #include "digitalchannel_manager.hpp"
+#include "ui_pg_channel_group.h"
+#include "ui_pg_channel_manager.h"
+#include "ui_pg_channel_header.h"
+#include "ui_pg_channel.h"
+
+
+namespace Ui {
+class PGChannelGroup;
+class PGChannel;
+class PGChannelManager;
+class PGChannelManagerHeader;
+}
 
 
 namespace adiscope {
@@ -33,6 +45,7 @@ class PatternGeneratorChannelUI : public ChannelUI
     PatternGeneratorChannelGroup *chg;
     PatternGeneratorChannel *ch;
 public:
+    Ui::PGChannelGroup *ui;
     PatternGeneratorChannelUI(PatternGeneratorChannel* ch, PatternGeneratorChannelGroup* chg, PatternGeneratorChannelManagerUI* managerUi, QWidget *parent = 0);
     ~PatternGeneratorChannelUI();
 private Q_SLOTS:
@@ -61,15 +74,18 @@ class PatternGeneratorChannelGroupUI : public ChannelGroupUI
     Q_OBJECT
     Q_PROPERTY(int checked READ isChecked WRITE check)
     int checked;
-
     PatternGeneratorChannelManagerUI *managerUi;
     int isChecked();
     void check(int val);
+
 public:
+    Ui::PGChannelGroup *ui;
     std::vector<PatternGeneratorChannelUI*> ch_ui;
     PatternGeneratorChannelGroupUI(PatternGeneratorChannelGroup* chg, PatternGeneratorChannelManagerUI* managerUi, QWidget *parent = 0);
     PatternGeneratorChannelGroup* getChannelGroup();
     PatternGeneratorChannelManagerUI *getManagerUi() const;
+
+
     void enableControls(bool enabled);
 
 Q_SIGNALS:
