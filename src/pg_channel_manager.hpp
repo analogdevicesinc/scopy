@@ -59,7 +59,12 @@ public:
 class PatternGeneratorChannelGroupUI : public ChannelGroupUI
 {
     Q_OBJECT
-    PatternGeneratorChannelManagerUI *managerUi;    
+    Q_PROPERTY(int checked READ isChecked WRITE check)
+    int checked;
+
+    PatternGeneratorChannelManagerUI *managerUi;
+    int isChecked();
+    void check(int val);
 public:
     std::vector<PatternGeneratorChannelUI*> ch_ui;
     PatternGeneratorChannelGroupUI(PatternGeneratorChannelGroup* chg, PatternGeneratorChannelManagerUI* managerUi, QWidget *parent = 0);
@@ -78,7 +83,9 @@ private Q_SLOTS:
     void enable(bool enabled);
     void split();
     void collapse();
-    void settingsButtonHandler();
+    void settingsButtonHandler();    
+    void mousePressEvent(QMouseEvent*) override;
+    //void paintEvent(QPaintEvent *) override;
 
 };
 

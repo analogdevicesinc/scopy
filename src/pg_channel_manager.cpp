@@ -3,6 +3,7 @@
 #include "pulseview/pv/view/tracetreeitem.hpp"
 #include "pg_channel_manager.hpp"
 #include "pattern_generator.hpp"
+#include "dynamicWidget.hpp"
 
 #include "ui_pg_channel_group.h"
 #include "ui_pg_channel_manager.h"
@@ -119,7 +120,8 @@ PatternGeneratorChannelManagerUI *PatternGeneratorChannelGroupUI::getManagerUi()
 
 PatternGeneratorChannelGroupUI::PatternGeneratorChannelGroupUI(PatternGeneratorChannelGroup* chg, PatternGeneratorChannelManagerUI* managerUi, QWidget *parent) : ChannelGroupUI(chg,parent), managerUi(managerUi)
 {
-this->chg = chg;
+    this->chg = chg;
+    checked = false;
 }
 
 PatternGeneratorChannelGroup* PatternGeneratorChannelGroupUI::getChannelGroup()
@@ -212,6 +214,27 @@ void PatternGeneratorChannelGroupUI::settingsButtonHandler()
     getManagerUi()->createSettingsWidget();
 }
 
+int PatternGeneratorChannelGroupUI::isChecked()
+{
+    return checked;
+}
+
+void PatternGeneratorChannelGroupUI::check(int val)
+{
+    checked = val;
+}
+
+void PatternGeneratorChannelGroupUI::mousePressEvent(QMouseEvent*)
+{
+    bool checked = property("checked").toBool();
+    setProperty("checked", !checked);
+
+    setDynamicProperty(findChild<QWidget*>("widget_2"),"selected",checked);
+    style()->unpolish(this);
+    style()->polish(this);
+    update();
+}
+
 
 
 /////////////////////////// CHANNEL MANAGER
@@ -220,7 +243,7 @@ PatternGeneratorChannelManager::PatternGeneratorChannelManager() : ChannelManage
     for(auto i=0;i<16;i++)
     {
         std::string temp = "DIO" + std::to_string(i);
-       channel.push_back(new PatternGeneratorChannel(i,temp));
+        channel.push_back(new PatternGeneratorChannel(i,temp));
     }
     auto temp = static_cast<PatternGeneratorChannel*>(channel.back());
     for(auto&& ch : channel)
