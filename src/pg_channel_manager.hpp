@@ -50,12 +50,14 @@ public:
     ~PatternGeneratorChannelUI();
 private Q_SLOTS:
     void split();
+    void mousePressEvent(QMouseEvent*) override;
+
 //    void set_decoder(std::string value);
 };
 
 class PatternGeneratorChannelGroup : public ChannelGroup
 {
-    std::string decoder;
+
     bool collapsed;    
 public:
     PatternGeneratorChannelGroup(PatternGeneratorChannel* ch);
@@ -65,8 +67,6 @@ public:
     bool isCollapsed();
     void collapse(bool val);
     void append(PatternGeneratorChannelGroup* tojoin);
-    std::string getDecoder() const;
-    void setDecoder(const std::string &value);
 };
 
 class PatternGeneratorChannelGroupUI : public ChannelGroupUI
@@ -82,6 +82,7 @@ public:
     Ui::PGChannelGroup *ui;
     std::vector<PatternGeneratorChannelUI*> ch_ui;
     PatternGeneratorChannelGroupUI(PatternGeneratorChannelGroup* chg, PatternGeneratorChannelManagerUI* managerUi, QWidget *parent = 0);
+    ~PatternGeneratorChannelGroupUI();
     PatternGeneratorChannelGroup* getChannelGroup();
     PatternGeneratorChannelManagerUI *getManagerUi() const;
 
@@ -93,7 +94,6 @@ Q_SIGNALS:
     void channel_enabled();
     void channelGroupSelected(PatternGeneratorChannelGroupUI* select);
 private Q_SLOTS:
-    void set_decoder(std::string value);
     void patternChanged(int index);    
     void select(bool selected);
     void enable(bool enabled);
@@ -126,8 +126,7 @@ class PatternGeneratorChannelManagerUI : public QWidget
     QWidget* channelManagerHeaderWiget;
     PatternGeneratorChannelGroupUI *selectedChannelGroupUi;
     PatternGeneratorChannelGroup *selectedChannelGroup;
-    PatternUI* currentUI; // pointer to currently drawn patternUI.
-    QButtonGroup *channelButtonGroup;
+    PatternUI* currentUI; // pointer to currently drawn patternUI.    
     bool disabledShown;
     bool detailsShown;
 public:

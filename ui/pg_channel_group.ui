@@ -79,9 +79,13 @@
 background: black;
 }
 
-QWidget
+QWidget 
 {
 background: transparent;
+}
+QListView
+{
+background:black;
 }
 
 QWidget#widget_2:hover
@@ -137,60 +141,7 @@ border:1px solid rgb(65,155,249);
          </size>
         </property>
         <property name="styleSheet">
-         <string notr="true">QComboBox
-{
-  height: 19px;
-  border: 0px;
-  border-bottom: 1px solid rgba(255, 255, 255, 102);
-  font-family: ArialMT;
-  font-size: 16px;
-  font-weight: normal;
-  font-style: normal;
-  text-align: left;
-  color: #ffffff;
-
-}
-QComboBox::drop-down
-{
-  subcontrol-position: center right;
-  width: 10px;
-  height: 6px;
-  border-image: url(:/icons/sba_cmb_box_arrow.svg);
-  font-family: ArialMT;
-  font-size: 16px;
-  font-weight: normal;
-  font-style: normal;
-  text-align: left;
-  color: #e0e0e0;
-}
-QComboBox QAbstractItemView {
-  border: 0px;
-  selection-background-color: rgba(25, 25, 25);
-  outline: 0px;
-}
-QComboBox:disabled
-{
-  color: rgb(85, 85, 85);
-}
-
-/* Color of the selected list item. */
-QComboBox::item:selected {
-  font-family: ArialMT;
-  font-size: 16px;
-  font-weight: normal;
-  font-style: normal;
-  text-align: left;
-  color: #ffffff;
-  border-bottom: 0px solid rgba(255, 255, 255, 102);
- 
-}
-/* Indicator will shine through the label text if you don't make it hidden. */
-QComboBox::indicator{
-    background-color:transparent;
-    selection-background-color:transparent;
-    color:transparent;
-    selection-color:transparent;
-}
+         <string notr="true">
 
 QLabel
 {  
@@ -468,6 +419,72 @@ border-right:0px solid transparent;</string>
          </item>
          <item>
           <widget class="QWidget" name="wgChannelSettingsGroup" native="true">
+           <property name="styleSheet">
+            <string notr="true">QComboBox
+{
+  height: 19px;
+  border: 0px;
+  border-bottom: 1px solid rgba(255, 255, 255, 102);
+  font-family: ArialMT;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  text-align: left;
+  color: #ffffff;
+ padding: 1px 0px 1px 3px; /*This makes text colour work*/
+
+}
+QComboBox::drop-down
+{
+  subcontrol-position: center right;
+  width: 10px;
+  height: 6px;
+  border-image: url(:/icons/sba_cmb_box_arrow.svg);
+  font-family: ArialMT;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  text-align: left;
+}
+
+QComboBox QAbstractItemView {
+  border: 0px;
+  selection-background-color: rgba(25, 25, 25);
+  outline: 0px;
+  /*background:black;*/
+ padding: 1px 0px 1px 3px; /*This makes text colour work*/
+}
+QComboBox:disabled
+{
+  color: rgb(85, 85, 85);
+}
+
+/* Color of the selected list item. */
+QComboBox::item:selected {
+  font-family: ArialMT;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  text-align: left;
+  color: #ffffff;
+  border-bottom: 0px solid rgba(255, 255, 255, 102);
+ 
+}
+/* Indicator will shine through the label text if you don't make it hidden. */
+QComboBox::indicator{
+    background-color:transparent;
+    selection-background-color:transparent;
+    color:transparent;
+    selection-color:transparent;
+}
+
+/*QComboBox QListView
+{
+background-color: rgb(39, 39, 48);;
+}*/
+
+</string>
+           </property>
            <layout class="QHBoxLayout" name="horizontalLayout_4">
             <property name="spacing">
              <number>0</number>

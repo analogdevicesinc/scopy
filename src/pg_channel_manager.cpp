@@ -63,21 +63,22 @@ PatternGeneratorChannelUI::PatternGeneratorChannelUI(PatternGeneratorChannel* ch
     qDebug()<<"currentChannelUI->ui created";
     ui = new Ui::PGChannelGroup();
 }
+
+
+void PatternGeneratorChannelUI::mousePressEvent(QMouseEvent*)
+{
+    bool checked = property("checked").toBool();
+    setProperty("checked", !checked);
+    setDynamicProperty(ui->widget_2,"selected",checked);
+}
+
+
 PatternGeneratorChannelUI::~PatternGeneratorChannelUI(){
+    delete ui;
     qDebug()<<"currentChannelUI->ui destroyed";
 }
 
 /////////////////////// CHANNEL GROUP
-std::string PatternGeneratorChannelGroup::getDecoder() const
-{
-    return decoder;
-}
-
-void PatternGeneratorChannelGroup::setDecoder(const std::string &value)
-{
-    decoder = value;
-}
-
 PatternGeneratorChannelGroup::PatternGeneratorChannelGroup(PatternGeneratorChannel* ch) : ChannelGroup(ch)
 {
     created_index = 0;
@@ -124,16 +125,16 @@ PatternGeneratorChannelGroupUI::PatternGeneratorChannelGroupUI(PatternGeneratorC
     this->chg = chg;
     checked = false;
     ui = new Ui::PGChannelGroup();
+    //setDynamicProperty(ui->widget_2,"selected",false);
+}
+PatternGeneratorChannelGroupUI::~PatternGeneratorChannelGroupUI()
+{
+    delete ui;
 }
 
 PatternGeneratorChannelGroup* PatternGeneratorChannelGroupUI::getChannelGroup()
 {
     return static_cast<PatternGeneratorChannelGroup*>(this->chg);
-}
-
-void PatternGeneratorChannelGroupUI::set_decoder(std::string value)
-{
-    getChannelGroup()->setDecoder(value);
 }
 
 void PatternGeneratorChannelGroupUI::patternChanged(int index)
@@ -227,13 +228,8 @@ void PatternGeneratorChannelGroupUI::check(int val)
 
 void PatternGeneratorChannelGroupUI::mousePressEvent(QMouseEvent*)
 {
-    bool checked = property("checked").toBool();
-    setProperty("checked", !checked);
 
-    ui->widget_2->setProperty("selected",checked);
-    style()->unpolish(this);
-    style()->polish(this);
-    update();
+    //setDynamicProperty(ui->widget_2,"selected",checked);
 }
 
 
@@ -270,11 +266,6 @@ PatternGeneratorChannelGroup* PatternGeneratorChannelManager::get_channel_group(
 {
     return static_cast<PatternGeneratorChannelGroup*>(channel_group[index]);
 }
-
-/*std::vector<PatternGeneratorChannelGroup*>* PatternGeneratorChannelManager::getChannelGroups()
-{
-    return static_cast<std::vector<PatternGeneratorChannelGroup*>*>(&channel_group);
-}*/
 
 void PatternGeneratorChannelManager::join(std::vector<int> index)
 {
@@ -352,8 +343,7 @@ PatternGeneratorChannelManagerUI::PatternGeneratorChannelManagerUI(QWidget *pare
     this->pg = pg;
     currentUI = nullptr;
     selectedChannelGroup = chm->get_channel_group(0);
-    selectedChannelGroupUi = nullptr;
-    channelButtonGroup = new QButtonGroup(this);
+    selectedChannelGroupUi = nullptr;    
     disabledShown = true;
     detailsShown = true;
     channelManagerHeaderWiget = nullptr;
@@ -479,8 +469,6 @@ void PatternGeneratorChannelManagerUI::updateUi()
 
         currentChannelGroupUI->ui->enableBox->setChecked(ch->is_enabled());
         currentChannelGroupUI->enableControls(ch->is_enabled());
-//        channelButtonGroup->addButton(currentChannelGroupUI->ui->pushButton);
-        channelButtonGroup->setExclusive(true);
 
         connect(currentChannelGroupUI->ui->enableBox,SIGNAL(toggled(bool)),chg_ui.back(),SLOT(enable(bool)));
         connect(static_cast<PatternGeneratorChannelGroupUI*>(chg_ui.back()),SIGNAL(channel_selected()),pg,SLOT(onChannelSelectedChanged())); // TEMP
@@ -503,7 +491,6 @@ void PatternGeneratorChannelManagerUI::updateUi()
 
             for(auto i=0;i<ch->get_channel_count();i++)
                 {
-
 
                     currentChannelGroupUI->ch_ui.push_back(new PatternGeneratorChannelUI(static_cast<PatternGeneratorChannel*>(ch->get_channel(i)), static_cast<PatternGeneratorChannelGroup*>(ch), this, 0)); // create widget for channelgroup
                     PatternGeneratorChannelUI* currentChannelUI = currentChannelGroupUI->ch_ui.back();
@@ -550,9 +537,6 @@ void PatternGeneratorChannelManagerUI::updateUi()
                     str = QString().number(ch->get_channel(i)->get_id());
                     currentChannelUI->ui->DioLabel->setText(str);
                     auto x = currentChannelGroupUI->ui->ChannelGroupLabel->geometry().x();
-
-                    //auto index = ch->get_channel(i)->get_id();
-                    //offset+=p->geometry().bottomRight().y();
 
                 }
             if(static_cast<PatternGeneratorChannelGroup*>(ch)->isCollapsed())
