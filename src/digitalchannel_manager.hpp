@@ -10,7 +10,6 @@
 #include <QtUiTools/QUiLoader>
 #include <vector>
 #include <string>
-#include <libserialport.h>
 
 #include "src/pulseview/pv/devices/binarybuffer.hpp"
 #include "filter.hpp"
