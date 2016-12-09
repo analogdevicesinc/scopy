@@ -40,21 +40,16 @@ enum class TimeUnit {
 
 enum class SIPrefix {
 	unspecified = -1,
-	yocto, zepto,
-	atto, femto, pico,
-	nano, micro, milli,
-	none,
-	kilo, mega, giga,
-	tera, peta, exa,
-	zetta, yotta
+	pico, nano, micro,
+	milli, none
 };
 
 /// Returns the exponent that corresponds to a given prefix.
 int exponent(SIPrefix prefix);
 
-/// Timestamp type providing yoctosecond resolution.
+/// Timestamp type providing picosecond resolution.
 typedef boost::multiprecision::number<
-	boost::multiprecision::cpp_dec_float<24>,
+	boost::multiprecision::cpp_dec_float<12>,
 	boost::multiprecision::et_off> Timestamp;
 
 /**

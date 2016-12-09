@@ -37,6 +37,7 @@
 #include <QFontMetrics>
 #include <QMouseEvent>
 #include <QScrollBar>
+#include <QHBoxLayout>
 
 #include <libsigrokcxx/libsigrokcxx.hpp>
 
@@ -89,8 +90,9 @@ using std::weak_ptr;
 namespace pv {
 namespace view {
 
-const Timestamp View::MaxScale("1e9");
-const Timestamp View::MinScale("1e-12");
+const Timestamp View::MaxScale("1e0");
+const Timestamp View::MinScale("100e-12");
+const int View::DivisionCount = 10;
 
 const int View::MaxScrollValue = INT_MAX / 2;
 const int View::MaxViewAutoUpdateRate = 25; // No more than 25 Hz with sticky scrolling
@@ -102,14 +104,16 @@ View::View(Session &session, QWidget *parent) :
 	session_(session),
 	viewport_(new Viewport(*this)),
 	ruler_(new Ruler(*this)),
-	header_(new Header(*this)),
+//	header_(new Header(*this)),
+	status_bar_(new QWidget(this)),
 	scale_(1e-3),
+	backup_scale_(scale_),
 	offset_(0),
 	updating_scroll_(false),
 	sticky_scrolling_(false), // Default setting is set in MainWindow::setup_ui()
 	always_zoom_to_fit_(false),
-	tick_period_(0),
-	tick_prefix_(pv::util::SIPrefix::yocto),
+	tick_period_(scale_),
+	tick_prefix_(pv::util::SIPrefix::milli),
 	tick_precision_(0),
 	time_unit_(util::TimeUnit::Time),
 	show_cursors_(false),
@@ -134,13 +138,13 @@ View::View(Session &session, QWidget *parent) :
 	connect(&session_, SIGNAL(frame_ended()),
 		this, SLOT(data_updated()));
 
-	connect(header_, SIGNAL(selection_changed()),
-		ruler_, SLOT(clear_selection()));
-	connect(ruler_, SIGNAL(selection_changed()),
-		header_, SLOT(clear_selection()));
+//	connect(header_, SIGNAL(selection_changed()),
+//		ruler_, SLOT(clear_selection()));
+//	connect(ruler_, SIGNAL(selection_changed()),
+//		header_, SLOT(clear_selection()));
 
-	connect(header_, SIGNAL(selection_changed()),
-		this, SIGNAL(selection_changed()));
+//	connect(header_, SIGNAL(selection_changed()),
+//		this, SIGNAL(selection_changed()));
 	connect(ruler_, SIGNAL(selection_changed()),
 		this, SIGNAL(selection_changed()));
 
@@ -160,7 +164,7 @@ View::View(Session &session, QWidget *parent) :
 
 	viewport_->installEventFilter(this);
 	ruler_->installEventFilter(this);
-	header_->installEventFilter(this);
+//	header_->installEventFilter(this);
 
 	// Trigger the initial event manually. The default device has signals
 	// which were created before this object came into being
@@ -168,7 +172,17 @@ View::View(Session &session, QWidget *parent) :
 
 	// make sure the transparent widgets are on the top
 	ruler_->raise();
-	header_->raise();
+//	header_->raise();
+
+	QHBoxLayout *hLayout = new QHBoxLayout(status_bar_);
+	zoom_label_ = new QLabel("");
+	zoom_label_->setFixedWidth(200);
+	timebase_label_ = new QLabel(QString::number(backup_scale_));
+	hLayout->insertSpacerItem(0, new QSpacerItem(100, 0, QSizePolicy::MinimumExpanding, QSizePolicy::Minimum));
+	hLayout->insertWidget(1, timebase_label_);
+	hLayout->insertSpacerItem(2, new QSpacerItem(10, 0, QSizePolicy::MinimumExpanding, QSizePolicy::Minimum));
+	hLayout->insertWidget(3, zoom_label_);
+	status_bar_->setLayout(hLayout);
 
 	// Update the zoom state
 	calculate_tick_spacing();
@@ -252,7 +266,7 @@ int View::owner_visual_v_offset() const
 void View::set_v_offset(int offset)
 {
 	verticalScrollBar()->setSliderPosition(offset);
-	header_->update();
+//	header_->update();
 	viewport_->update();
 }
 
@@ -478,7 +492,7 @@ void View::show_cursors(bool show)
 
 void View::centre_cursors()
 {
-	const double time_width = scale_ * viewport_->width();
+	const double time_width = scale_ * DivisionCount;
 	cursors_->first()->set_time(offset_ + time_width * 0.4);
 	cursors_->second()->set_time(offset_ + time_width * 0.6);
 	ruler_->update();
@@ -560,8 +574,10 @@ void View::trigger_event(util::Timestamp location)
 void View::get_scroll_layout(double &length, Timestamp &offset) const
 {
 	const pair<Timestamp, Timestamp> extents = get_time_extents();
-	length = ((extents.second - extents.first) / scale_).convert_to<double>();
+	length = ((extents.second - extents.first) / scale_  ).convert_to<double>();
 	offset = offset_ / scale_;
+//	length = ((extents.second - extents.first) / (scale_  / (viewport_->width() / DivisionCount))).convert_to<double>();
+//	offset = offset_ / (scale_  / (viewport_->width() / DivisionCount));
 }
 
 void View::set_zoom(double scale, int offset)
@@ -573,6 +589,13 @@ void View::set_zoom(double scale, int offset)
 	const Timestamp cursor_offset = offset_ + scale_ * offset;
 	const Timestamp new_scale = max(min(Timestamp(scale), MaxScale), MinScale);
 	const Timestamp new_offset = cursor_offset - new_scale * offset;
+
+	scale = new_scale.convert_to<double>();
+	if (scale == backup_scale_)
+		zoom_label_->setText("");
+	else
+		zoom_label_->setText("Zoom@ " +  QString::number(scale));
+
 	set_scale_offset(new_scale.convert_to<double>(), new_offset);
 }
 
@@ -584,7 +607,7 @@ void View::calculate_tick_spacing()
 	// Figure out the highest numeric value visible on a label
 	const QSize areaSize = viewport_->size();
 	const Timestamp max_time = max(fabs(offset_),
-		fabs(offset_ + scale_ * areaSize.width()));
+		fabs(offset_ + scale_ * DivisionCount));
 
 	double min_width = SpacingIncrement;
 	double label_width, tick_period_width;
@@ -598,49 +621,47 @@ void View::calculate_tick_spacing()
 	pv::util::SIPrefix tick_prefix = tick_prefix_;
 	unsigned tick_precision = tick_precision_;
 
-	do {
-		const double min_period = scale_ * min_width;
+	const double min_period = scale_ * min_width;
 
-		const int order = (int)floorf(log10f(min_period));
-		const pv::util::Timestamp order_decimal =
+	const int order = (int)floorf(log10f(scale_));
+	const pv::util::Timestamp order_decimal =
 			pow(pv::util::Timestamp(10), order);
 
-		// Allow for a margin of error so that a scale unit of 1 can be used.
-		// Otherwise, for a SU of 1 the tick period will almost always be below
-		// the min_period by a small amount - and thus skipped in favor of 2.
-		// Note: margin assumes that SU[0] and SU[1] contain the smallest values
-		double tp_margin = (ScaleUnits[0] + ScaleUnits[1]) / 2.0;
-		double tp_with_margin;
-		unsigned int unit = 0;
+	// Allow for a margin of error so that a scale unit of 1 can be used.
+	// Otherwise, for a SU of 1 the tick period will almost always be below
+	// the min_period by a small amount - and thus skipped in favor of 2.
+	// Note: margin assumes that SU[0] and SU[1] contain the smallest values
+	double tp_margin = (ScaleUnits[0] + ScaleUnits[1]) / 2.0;
+	double tp_with_margin;
+	unsigned int unit = 0;
 
-		do {
-			tp_with_margin = order_decimal.convert_to<double>() *
+	do {
+		tp_with_margin = order_decimal.convert_to<double>() *
 				(ScaleUnits[unit++] + tp_margin);
-		} while (tp_with_margin < min_period && unit < countof(ScaleUnits));
+	} while (tp_with_margin < min_period && unit < countof(ScaleUnits));
 
-		tick_period = order_decimal * ScaleUnits[unit - 1];
-		tick_prefix = static_cast<pv::util::SIPrefix>(
-			(order - pv::util::exponent(pv::util::SIPrefix::yocto)) / 3);
+	tick_period = order_decimal * ScaleUnits[unit - 1];
+	tick_prefix = static_cast<pv::util::SIPrefix>(
+				(order - pv::util::exponent(pv::util::SIPrefix::pico)) / 3);
 
-		// Precision is the number of fractional digits required, not
-		// taking the prefix into account (and it must never be negative)
-		tick_precision = std::max(ceil(log10(1 / tick_period)).convert_to<int>(), 0);
+	// Precision is the number of fractional digits required, not
+	// taking the prefix into account (and it must never be negative)
+	tick_precision = std::max(ceil(log10(1 / tick_period)).convert_to<int>(), 0);
 
-		tick_period_width = (tick_period / scale_).convert_to<double>();
+	tick_period_width = (tick_period / scale_).convert_to<double>();
 
-		const QString label_text = Ruler::format_time_with_distance(
-			tick_period, max_time, tick_prefix, time_unit_, tick_precision);
+	const QString label_text = Ruler::format_time_with_distance(
+				tick_period, max_time, tick_prefix, time_unit_, tick_precision);
 
-		label_width = m.boundingRect(0, 0, INT_MAX, INT_MAX,
-			Qt::AlignLeft | Qt::AlignTop, label_text).width() +
-				MinValueSpacing;
+	label_width = m.boundingRect(0, 0, INT_MAX, INT_MAX,
+				     Qt::AlignLeft | Qt::AlignTop, label_text).width() +
+			MinValueSpacing;
 
-		min_width += SpacingIncrement;
-	} while (tick_period_width < label_width);
+	min_width += SpacingIncrement;
 
-	set_tick_period(tick_period);
+	set_tick_period(scale_);
 	set_tick_prefix(tick_prefix);
-	set_tick_precision(tick_precision);
+//	set_tick_precision(tick_precision);
 }
 
 void View::update_scroll()
@@ -655,7 +676,8 @@ void View::update_scroll()
 	get_scroll_layout(length, offset);
 	length = max(length - areaSize.width(), 0.0);
 
-	int major_tick_distance = (tick_period_ / scale_).convert_to<int>();
+//	int major_tick_distance = (tick_period_ / scale_).convert_to<int>();
+	int major_tick_distance = scale_;
 
 	horizontalScrollBar()->setPageStep(areaSize.width() / 2);
 	horizontalScrollBar()->setSingleStep(major_tick_distance);
@@ -668,7 +690,7 @@ void View::update_scroll()
 	} else {
 		horizontalScrollBar()->setRange(0, MaxScrollValue);
 		horizontalScrollBar()->setSliderPosition(
-			(offset_ * MaxScrollValue / (scale_ * length)).convert_to<double>());
+			(offset_ * MaxScrollValue / ((scale_  / (viewport_->width() / DivisionCount)) * length)).convert_to<double>());
 	}
 
 	updating_scroll_ = false;
@@ -724,12 +746,14 @@ void View::set_scroll_default()
 void View::update_layout()
 {
 	setViewportMargins(
-		header_->sizeHint().width() - pv::view::Header::BaselineOffset + 50,
-		0, 0, ruler_->sizeHint().height());
+		50,
+		status_bar_->height(), 0, ruler_->sizeHint().height());
+	status_bar_->setGeometry(viewport_->x(), 0, viewport()->width(),
+		status_bar_->height());
 	ruler_->setGeometry(viewport_->x(), viewport_->y() + viewport_->height(),
 		viewport_->width(), ruler_->extended_size_hint().height());
-	header_->setGeometry(0, viewport_->y(),
-		header_->extended_size_hint().width(), viewport_->height());
+//	header_->setGeometry(0, viewport_->y(),
+//		header_->extended_size_hint().width(), viewport_->height());
 	update_scroll();
 }
 
@@ -826,8 +850,8 @@ bool View::eventFilter(QObject *object, QEvent *event)
 			hover_point_ = mouse_event->pos();
 		else if (object == ruler_)
 			hover_point_ = QPoint(mouse_event->x(), 0);
-		else if (object == header_)
-			hover_point_ = QPoint(0, mouse_event->y());
+//		else if (object == header_)
+//			hover_point_ = QPoint(0, mouse_event->y());
 		else
 			hover_point_ = QPoint(-1, -1);
 
@@ -866,8 +890,8 @@ void View::resizeEvent(QResizeEvent*)
 
 void View::row_item_appearance_changed(bool label, bool content)
 {
-	if (label)
-		header_->update();
+//	if (label)
+//		header_->update();
 	if (content)
 		viewport_->update();
 }
@@ -902,12 +926,12 @@ void View::h_scroll_value_changed(int value)
 
 	const int range = horizontalScrollBar()->maximum();
 	if (range < MaxScrollValue)
-		set_offset(scale_ * value);
+		set_offset((scale_  / (viewport_->width() / DivisionCount)) * value);
 	else {
 		double length = 0;
 		Timestamp offset;
 		get_scroll_layout(length, offset);
-		set_offset(scale_ * length * value / MaxScrollValue);
+		set_offset((scale_  / (viewport_->width() / DivisionCount)) * length * value / MaxScrollValue);
 	}
 
 	ruler_->update();
@@ -916,7 +940,7 @@ void View::h_scroll_value_changed(int value)
 
 void View::v_scroll_value_changed()
 {
-	header_->update();
+//	header_->update();
 	viewport_->update();
 }
 
@@ -1068,7 +1092,7 @@ void View::signals_changed()
 
 	update_layout();
 
-	header_->update();
+//	header_->update();
 	viewport_->update();
 
 	if (reset_scrollbar)
@@ -1191,6 +1215,23 @@ void View::remove_trace_clones()
 {
 	session_.remove_signal_clones();
 	session_.remove_decode_clones();
+}
+
+void View::set_timebase(double value)
+{
+	set_scale_offset(value, offset_);
+	backup_scale_ = scale_;
+	timebase_label_->setText(QString::number(value) + " s/div");
+}
+
+int View::divisionCount()
+{
+	return DivisionCount;
+}
+
+QSize View::viewport_height()
+{
+	return viewport_->size();
 }
 
 } // namespace view

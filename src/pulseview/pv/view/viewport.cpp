@@ -57,7 +57,7 @@ Viewport::Viewport(View &parent) :
 
 shared_ptr<ViewItem> Viewport::get_mouse_over_item(const QPoint &pt)
 {
-	const ViewItemPaintParams pp(rect(), view_.scale(), view_.offset());
+	const ViewItemPaintParams pp(rect(), view_.scale(), view_.offset(), view_.divisionCount());
 	const vector< shared_ptr<ViewItem> > items(this->items());
 	for (auto i = items.rbegin(); i != items.rend(); i++)
 		if ((*i)->enabled() &&
@@ -170,7 +170,7 @@ void Viewport::paintEvent(QPaintEvent*)
 	QPainter p(this);
 	p.setRenderHint(QPainter::Antialiasing);
 
-	const ViewItemPaintParams pp(rect(), view_.scale(), view_.offset());
+	const ViewItemPaintParams pp(rect(), view_.scale(), view_.offset(), view_.divisionCount());
 
 	for (const shared_ptr<TimeItem> t : time_items)
 		t->paint_back(p, pp);

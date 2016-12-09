@@ -164,6 +164,8 @@ private:
 		const int width,
 		std::function<QString(const pv::util::Timestamp&)> format_function);
 
+	static int divisionCount_;
+
 protected:
 	void resizeEvent(QResizeEvent*) override;
 

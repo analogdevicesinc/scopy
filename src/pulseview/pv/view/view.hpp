@@ -32,6 +32,7 @@
 #include <QAbstractScrollArea>
 #include <QSizeF>
 #include <QTimer>
+#include <QLabel>
 
 #include "../data/signaldata.hpp"
 #include "../util.hpp"
@@ -69,6 +70,7 @@ private:
 private:
 	static const pv::util::Timestamp MaxScale;
 	static const pv::util::Timestamp MinScale;
+	static const int DivisionCount;
 
 	static const int MaxScrollValue;
 	static const int MaxViewAutoUpdateRate;
@@ -216,6 +218,10 @@ public:
 
 	void restack_all_trace_tree_items();
 
+	int divisionCount();
+
+	QSize viewport_height();
+
 Q_SIGNALS:
 	void hover_point_changed();
 
@@ -245,6 +251,8 @@ Q_SIGNALS:
 
 public Q_SLOTS:
 	void trigger_event(util::Timestamp location);
+
+	void set_timebase(double value);
 
 private:
 	void get_scroll_layout(double &length, pv::util::Timestamp &offset) const;
@@ -358,9 +366,13 @@ private:
 	Viewport *viewport_;
 	Ruler *ruler_;
 	Header *header_;
+	QWidget *status_bar_;
+	QLabel *zoom_label_;
+	QLabel *timebase_label_;
 
-	/// The view time scale in seconds per pixel.
+	/// The view time scale
 	double scale_;
+	double backup_scale_;
 
 	/// The view time offset in seconds.
 	pv::util::Timestamp offset_;

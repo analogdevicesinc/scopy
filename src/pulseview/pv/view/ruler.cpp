@@ -36,7 +36,8 @@ namespace pv {
 namespace view {
 
 const float Ruler::RulerHeight = 2.5f; // x Text Height
-const int Ruler::MinorTickSubdivision = 4;
+const int Ruler::MinorTickSubdivision = 1;
+int Ruler::divisionCount_ = 10;
 
 const float Ruler::HoverArrowSize = 0.5f; // x Text Height
 
@@ -203,10 +204,11 @@ Ruler::TickPositions Ruler::calculate_tick_positions(
 		first_major_division * MinorTickSubdivision)).convert_to<int>() - 1;
 
 	double x;
+	double width_division = width / divisionCount_;
 
 	do {
 		pv::util::Timestamp t = t0 + division * minor_period;
-		x = ((t - offset) / scale).convert_to<double>();
+		x = ((t - offset) * width_division / scale).convert_to<double>();
 
 		if (division % MinorTickSubdivision == 0) {
 			// Recalculate 't' without using 'minor_period' which is a fraction
@@ -217,7 +219,7 @@ Ruler::TickPositions Ruler::calculate_tick_positions(
 		}
 
 		division++;
-	} while (x < width);
+	} while (x < width && division <= divisionCount_);
 
 	return tp;
 }
