@@ -89,12 +89,12 @@ void LogicAnalyzerChannelUI::remove()
 	chm_ui->update_ui();
 }
 
-std::string LogicAnalyzerChannelGroup::getDecoder() const
+const srd_decoder* LogicAnalyzerChannelGroup::getDecoder()
 {
 	return decoder;
 }
 
-void LogicAnalyzerChannelGroup::setDecoder(const std::string& value)
+void LogicAnalyzerChannelGroup::setDecoder(const srd_decoder *value)
 {
 	decoder = value;
 }
@@ -121,6 +121,15 @@ LogicAnalyzerChannelGroup::LogicAnalyzerChannelGroup():
 	collapsed = false;
 }
 
+LogicAnalyzerChannelGroup::~LogicAnalyzerChannelGroup()
+{
+	if(decoder)
+	{
+		delete decoder;
+		decoder = nullptr;
+	}
+}
+
 
 LogicAnalyzerChannelGroupUI::LogicAnalyzerChannelGroupUI(
 		LogicAnalyzerChannelGroup *chg,
@@ -136,8 +145,8 @@ LogicAnalyzerChannelGroupUI::LogicAnalyzerChannelGroupUI(
 
 void LogicAnalyzerChannelGroupUI::set_decoder(std::string value)
 {
-	static_cast<LogicAnalyzerChannelGroup *>(chg)->setDecoder(value);
-	qDebug()<<QString().fromStdString(lchg->getDecoder());
+//	static_cast<LogicAnalyzerChannelGroup *>(chg)->setDecoder(value);
+//	qDebug()<<QString().fromUtf8(lchg->getDecoder()->name);
 }
 
 uint16_t LogicAnalyzerChannelGroupUI::get_id_pvItem()
@@ -172,6 +181,13 @@ void LogicAnalyzerChannelGroupUI::collapse_group()
 	bool value = !getChannelGroup()->isCollapsed();
 	getChannelGroup()->collapse(value);
 	findChild<QWidget*>("subChannelWidget")->setVisible(!value);
+}
+
+void LogicAnalyzerChannelGroupUI::decoderChanged(const QString text)
+{
+	static_cast<LogicAnalyzerChannelGroup *>(chg)->setDecoder(
+		chm_ui->chm->get_decoder_from_name(
+			text.toStdString().c_str()));
 }
 
 LogicAnalyzerChannelGroup* LogicAnalyzerChannelGroupUI::getChannelGroup()
@@ -249,6 +265,39 @@ void LogicAnalyzerChannelManager::remove(int index)
 	it = channel_group.erase(it);
 }
 
+void LogicAnalyzerChannelManager::initDecoderList(bool first_level_decode)
+{
+	GSList *dL = g_slist_sort(g_slist_copy(
+		(GSList*)srd_decoder_list()), decoder_name_cmp);
+	for(; dL; dL = dL->next)
+	{
+		const srd_decoder *const d = (srd_decoder*)dL->data;
+		decoderList.push_back(d);
+		nameDecoderList << QString::fromUtf8(d->name);
+	}
+}
+
+QStringList LogicAnalyzerChannelManager::get_name_decoder_list()
+{
+	return nameDecoderList;
+}
+
+const srd_decoder* LogicAnalyzerChannelManager::get_decoder_from_name(const char* name)
+{
+	for(auto var : decoderList)
+	{
+		if (strcmp(var->name, name) == 0)
+			return var;
+	}
+	return NULL;
+}
+
+int LogicAnalyzerChannelManager::decoder_name_cmp(const void *a, const void *b)
+{
+	return strcmp(((const srd_decoder*)a)->name,
+		((const srd_decoder*)b)->name);
+}
+
 LogicAnalyzerChannelManagerUI::LogicAnalyzerChannelManagerUI(QWidget *parent,
 		pv::MainWindow *main_win_,
 		LogicAnalyzerChannelManager *chm,
@@ -264,6 +313,7 @@ LogicAnalyzerChannelManagerUI::LogicAnalyzerChannelManagerUI(QWidget *parent,
 	main_win = main_win_;
 	this->chm = chm;
 	this->la = la;
+	this->chm->initDecoderList();
 	connect(ui->scrollArea->verticalScrollBar(), SIGNAL(valueChanged(int)),
 		this, SLOT(update_position(int)));
 	// update_ui();
@@ -395,11 +445,17 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 					chg_ui.back()->get_id_pvItem());
 				trace->force_to_v_offset(offset);
 
-				connect(lachannelgroupUI->ui->collapseGroupBtn, SIGNAL(clicked()),
-					chg_ui.back(), SLOT(collapse_group()));
-
 				setWidgetMinimumNrOfChars(lachannelgroupUI->ui->decoderCombo, 5);
-				lachannelgroupUI->ui->decoderCombo->setVisible(false);
+				for(auto var : chm->get_name_decoder_list())
+				{
+					lachannelgroupUI->ui->decoderCombo->addItem(var);
+				}
+
+				connect(lachannelgroupUI->ui->collapseGroupBtn, SIGNAL(clicked()),
+					lachannelgroupUI, SLOT(collapse_group()));
+				connect(lachannelgroupUI->ui->decoderCombo, SIGNAL(currentIndexChanged(const QString&)),
+					lachannelgroupUI, SLOT(decoderChanged(const QString&)));
+
 				lachannelgroupUI->ui->indexLabel->setVisible(false);
 
 				for (auto i=0; i<ch->get_channel_count(); i++) {	// create subwidgets

@@ -3,6 +3,7 @@
 
 #include <QDebug>
 #include "digitalchannel_manager.hpp"
+#include "libsigrokdecode/libsigrokdecode.h"
 
 namespace Ui {
 	class LAChannelManager;
@@ -56,12 +57,13 @@ namespace adiscope {
 	{
 	private:
 		bool collapsed;
-		std::string decoder;
+		const srd_decoder* decoder;
 	public:
 		LogicAnalyzerChannelGroup(LogicAnalyzerChannel *ch);
 		LogicAnalyzerChannelGroup();
-		std::string getDecoder() const;
-		void setDecoder(const std::string& value);
+		~LogicAnalyzerChannelGroup();
+		const srd_decoder* getDecoder();
+		void setDecoder(const srd_decoder *value);
 		bool isCollapsed();
 		void collapse(bool val);
 	};
@@ -84,6 +86,7 @@ namespace adiscope {
 	private Q_SLOTS:
 		void set_decoder(std::string value);
 		void collapse_group();
+		void decoderChanged(const QString);
 	protected:
 
 	private:
@@ -107,7 +110,15 @@ namespace adiscope {
 		void split(int index);
 		void remove(int index);
 		void removeChannel(int grIndex, int chIndex);
+		void initDecoderList(bool first_level_decoder=true);
+		QStringList get_name_decoder_list();
+		const srd_decoder *get_decoder_from_name(const char*);
+	private:
+		std::vector<const srd_decoder*> decoderList;
+		QStringList nameDecoderList;
+		static int decoder_name_cmp(const void *a, const void *b);
 	};
+
 
 
 	class LogicAnalyzerChannelManagerUI : public QWidget
