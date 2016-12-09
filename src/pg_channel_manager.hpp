@@ -23,6 +23,7 @@ class PGChannelManagerHeader;
 namespace adiscope {
 class PatternGenerator;
 class PatternGeneratorChannelGroup;
+class PatternGeneratorChannelGroupUI;
 class PatternGeneratorChannelManagerUI;
 
 class PatternGeneratorChannel : public Channel
@@ -42,12 +43,16 @@ class PatternGeneratorChannelUI : public ChannelUI
 {
     Q_OBJECT
     PatternGeneratorChannelManagerUI *managerUi;
+    PatternGeneratorChannelGroupUI *chgui;
     PatternGeneratorChannelGroup *chg;
     PatternGeneratorChannel *ch;
 public:
     Ui::PGChannelGroup *ui;
-    PatternGeneratorChannelUI(PatternGeneratorChannel* ch, PatternGeneratorChannelGroup* chg, PatternGeneratorChannelManagerUI* managerUi, QWidget *parent = 0);
+    PatternGeneratorChannelUI(PatternGeneratorChannel* ch, PatternGeneratorChannelGroup* chg, PatternGeneratorChannelGroupUI *chgui, PatternGeneratorChannelManagerUI* managerUi, QWidget *parent = 0);
     ~PatternGeneratorChannelUI();
+    PatternGeneratorChannelManagerUI *getManagerUi() const;
+    PatternGeneratorChannel* getChannel();
+    PatternGeneratorChannelGroup* getChannelGroup();
 private Q_SLOTS:
     void split();
     void mousePressEvent(QMouseEvent*) override;
@@ -108,11 +113,17 @@ private Q_SLOTS:
 
 class PatternGeneratorChannelManager : public ChannelManager
 {
+    PatternGeneratorChannelGroup *highlightedChannelGroup;
+    PatternGeneratorChannel *highlightedChannel;
 public:
+
+    void highlightChannel(PatternGeneratorChannelGroup *chg, PatternGeneratorChannel *ch = nullptr);
+    PatternGeneratorChannelGroup* getHighlightedChannelGroup();
+    PatternGeneratorChannel* getHighlightedChannel();
     PatternGeneratorChannelManager();
-    ~PatternGeneratorChannelManager();
+    ~PatternGeneratorChannelManager();    
     PatternGeneratorChannelGroup* get_channel_group(int index);
-    std::vector<PatternGeneratorChannelGroup*>* getChannelGroups();
+
     void join(std::vector<int> index);
     void split(int index);
     void splitChannel(int chgIndex, int chIndex);
@@ -124,18 +135,22 @@ class PatternGeneratorChannelManagerUI : public QWidget
     Q_OBJECT
     QWidget* settingsWidget; // pointer to settingspage in stacked widget in main pg ui
     QWidget* channelManagerHeaderWiget;
-    PatternGeneratorChannelGroupUI *selectedChannelGroupUi;
-    PatternGeneratorChannelGroup *selectedChannelGroup;
-    PatternUI* currentUI; // pointer to currently drawn patternUI.    
+
+    PatternUI* currentUI; // pointer to currently drawn patternUI.
     bool disabledShown;
     bool detailsShown;
+    bool highlightShown;
+
 public:
 
     pv::MainWindow* main_win;
     std::vector<PatternGeneratorChannelGroupUI*> chg_ui;
+
     PatternGeneratorChannelManagerUI(QWidget *parent, pv::MainWindow* main_win_, PatternGeneratorChannelManager* chm, QWidget *settingsWidget,PatternGenerator* pg);
     ~PatternGeneratorChannelManagerUI();
 
+    PatternGeneratorChannelGroupUI *findUiByChannelGroup(PatternGeneratorChannelGroup* toFind);
+    PatternGeneratorChannelUI* findUiByChannel(PatternGeneratorChannel* toFind);
     PatternGeneratorChannelManager* chm;
     PatternGenerator *pg;
     Ui::PGChannelManager *ui;
@@ -154,8 +169,9 @@ public:
     void showDetails();
     void hideDetails();
 
-    void groupSplitSelected();
+    void showHighlight(bool val);
 
+    void groupSplitSelected();
     PatternGeneratorChannelGroup *getSelectedChannelGroup() const;
     void setSelectedChannelGroup(PatternGeneratorChannelGroup *value);
 

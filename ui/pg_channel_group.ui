@@ -74,7 +74,7 @@
       </sizepolicy>
      </property>
      <property name="styleSheet">
-      <string notr="true">QWidget[selected=true]
+      <string notr="true">QWidget[highlighted=true]
 {
 background: black;
 }

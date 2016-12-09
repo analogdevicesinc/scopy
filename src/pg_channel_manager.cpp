@@ -57,7 +57,7 @@ void PatternGeneratorChannel::setChannel_role(const std::string &value)
     channel_role = value;
 }
 ///////////////////////// CHANNEL UI
-PatternGeneratorChannelUI::PatternGeneratorChannelUI(PatternGeneratorChannel* ch, PatternGeneratorChannelGroup* chg, PatternGeneratorChannelManagerUI* managerUi, QWidget *parent) : ChannelUI(ch,parent), managerUi(managerUi), chg(chg)
+PatternGeneratorChannelUI::PatternGeneratorChannelUI(PatternGeneratorChannel* ch, PatternGeneratorChannelGroup* chg, PatternGeneratorChannelGroupUI *chgui, PatternGeneratorChannelManagerUI* managerUi, QWidget *parent) : ChannelUI(ch,parent), managerUi(managerUi), chg(chg),chgui(chgui)
 {
     this->ch = ch;
     qDebug()<<"currentChannelUI->ui created";
@@ -67,15 +67,30 @@ PatternGeneratorChannelUI::PatternGeneratorChannelUI(PatternGeneratorChannel* ch
 
 void PatternGeneratorChannelUI::mousePressEvent(QMouseEvent*)
 {
-    bool checked = property("checked").toBool();
-    setProperty("checked", !checked);
-    setDynamicProperty(ui->widget_2,"selected",checked);
+    getManagerUi()->showHighlight(false);
+    getManagerUi()->chm->highlightChannel(this->chgui->getChannelGroup(), this->getChannel());
+    getManagerUi()->showHighlight(true);
 }
 
 
 PatternGeneratorChannelUI::~PatternGeneratorChannelUI(){
     delete ui;
     qDebug()<<"currentChannelUI->ui destroyed";
+}
+
+PatternGeneratorChannelManagerUI *PatternGeneratorChannelUI::getManagerUi() const
+{
+    return managerUi;
+}
+
+PatternGeneratorChannel* PatternGeneratorChannelUI::getChannel()
+{
+    return static_cast<PatternGeneratorChannel*>(ch);
+}
+
+PatternGeneratorChannelGroup* PatternGeneratorChannelUI::getChannelGroup()
+{
+    return static_cast<PatternGeneratorChannelGroup*>(chg);
 }
 
 /////////////////////// CHANNEL GROUP
@@ -125,7 +140,6 @@ PatternGeneratorChannelGroupUI::PatternGeneratorChannelGroupUI(PatternGeneratorC
     this->chg = chg;
     checked = false;
     ui = new Ui::PGChannelGroup();
-    //setDynamicProperty(ui->widget_2,"selected",false);
 }
 PatternGeneratorChannelGroupUI::~PatternGeneratorChannelGroupUI()
 {
@@ -139,7 +153,7 @@ PatternGeneratorChannelGroup* PatternGeneratorChannelGroupUI::getChannelGroup()
 
 void PatternGeneratorChannelGroupUI::patternChanged(int index)
 {
-    getChannelGroup()->pattern->deinit();
+    /*getChannelGroup()->pattern->deinit();
     delete getChannelGroup()->pattern;
     getChannelGroup()->created_index=index;
     getChannelGroup()->pattern = PatternFactory::create(index);
@@ -147,7 +161,7 @@ void PatternGeneratorChannelGroupUI::patternChanged(int index)
     {
         getManagerUi()->deleteSettingsWidget();
         getManagerUi()->createSettingsWidget();
-    }
+    }*/
 }
 
 void PatternGeneratorChannelGroupUI::select(bool selected)
@@ -165,14 +179,14 @@ void PatternGeneratorChannelGroupUI::collapse()
 
 void PatternGeneratorChannelUI::split()
 {
-    auto channelGroups = managerUi->chm->get_channel_groups();
+    auto channelGroups = getManagerUi()->chm->get_channel_groups();
     auto chgIter = std::find(channelGroups->begin(),channelGroups->end(),chg);
     if(chgIter == channelGroups->end())
     {
         return;
     }
     auto chgIndex = chgIter-channelGroups->begin();
-    auto channels = *(managerUi->chm->get_channel_group(chgIndex)->get_channels());
+    auto channels = *(getManagerUi()->chm->get_channel_group(chgIndex)->get_channels());
     auto chIter = std::find(channels.begin(),channels.end(),ch);
     if(chIter==channels.end())
     {
@@ -180,8 +194,20 @@ void PatternGeneratorChannelUI::split()
     }
     auto chIndex = chIter-channels.begin();
 
-    managerUi->chm->splitChannel(chgIndex,chIndex);
-    managerUi->updateUi();
+    bool changeHighlight = false;
+    if(*chIter == getManagerUi()->chm->getHighlightedChannel() ||
+            (getManagerUi()->chm->get_channel_group(chgIndex) == getManagerUi()->chm->getHighlightedChannelGroup() &&
+             getManagerUi()->chm->getHighlightedChannel() == nullptr))
+    {
+        changeHighlight = true;
+    }
+    getManagerUi()->chm->splitChannel(chgIndex,chIndex);
+
+    if(changeHighlight)
+        getManagerUi()->chm->highlightChannel(getManagerUi()->chm->get_channel_group(chgIndex));
+
+
+    getManagerUi()->updateUi();
 
 }
 
@@ -212,7 +238,7 @@ void PatternGeneratorChannelGroupUI::enable(bool enabled)
 void PatternGeneratorChannelGroupUI::settingsButtonHandler()
 {
     getManagerUi()->deleteSettingsWidget();
-    getManagerUi()->selectChannelGroup(this);
+    //getManagerUi()->selectChannelGroup(this);
     getManagerUi()->createSettingsWidget();
 }
 
@@ -228,11 +254,10 @@ void PatternGeneratorChannelGroupUI::check(int val)
 
 void PatternGeneratorChannelGroupUI::mousePressEvent(QMouseEvent*)
 {
-
-    //setDynamicProperty(ui->widget_2,"selected",checked);
+    getManagerUi()->showHighlight(false);
+    getManagerUi()->chm->highlightChannel(this->getChannelGroup());
+    getManagerUi()->showHighlight(true);
 }
-
-
 
 /////////////////////////// CHANNEL MANAGER
 PatternGeneratorChannelManager::PatternGeneratorChannelManager() : ChannelManager()
@@ -247,6 +272,8 @@ PatternGeneratorChannelManager::PatternGeneratorChannelManager() : ChannelManage
     {
         channel_group.push_back(new PatternGeneratorChannelGroup(static_cast<PatternGeneratorChannel*>(ch)));
     }
+    highlightedChannel = nullptr;
+    highlightedChannelGroup = static_cast<PatternGeneratorChannelGroup*>(channel_group[0]);
 
 }
 
@@ -269,7 +296,8 @@ PatternGeneratorChannelGroup* PatternGeneratorChannelManager::get_channel_group(
 
 void PatternGeneratorChannelManager::join(std::vector<int> index)
 {
-    for(auto i=1;i<index.size();i++){
+    PatternGeneratorChannelGroup* ret;
+    for(auto i=1;i<index.size();i++) {
         auto it = std::next(channel_group.begin(), index[i]);
         static_cast<PatternGeneratorChannelGroup*>(channel_group[index[0]])->append(static_cast<PatternGeneratorChannelGroup*>(channel_group[index[i]]));
         delete *it;
@@ -319,21 +347,29 @@ void PatternGeneratorChannelManager::splitChannel(int chgIndex, int chIndex)
 
 }
 
+void PatternGeneratorChannelManager::highlightChannel(PatternGeneratorChannelGroup *chg, PatternGeneratorChannel *ch)
+{
+    highlightedChannel = ch;
+    highlightedChannelGroup = chg;
+}
+
+PatternGeneratorChannelGroup* PatternGeneratorChannelManager::getHighlightedChannelGroup()
+{
+    return highlightedChannelGroup;
+}
+
+PatternGeneratorChannel* PatternGeneratorChannelManager::getHighlightedChannel()
+{
+    return highlightedChannel;
+}
+
+
 ////////////////////////////////////// CHANNEL MANAGER UI
 QWidget *PatternGeneratorChannelManagerUI::getSettingsWidget() const
 {
     return settingsWidget;
 }
 
-PatternGeneratorChannelGroup *PatternGeneratorChannelManagerUI::getSelectedChannelGroup() const
-{
-    return selectedChannelGroup;
-}
-
-void PatternGeneratorChannelManagerUI::setSelectedChannelGroup(PatternGeneratorChannelGroup *value)
-{
-    selectedChannelGroup = value;
-}
 
 PatternGeneratorChannelManagerUI::PatternGeneratorChannelManagerUI(QWidget *parent, pv::MainWindow *main_win_, PatternGeneratorChannelManager *chm, QWidget *settingsWidget, PatternGenerator* pg)  : QWidget(parent),  ui(new Ui::PGChannelManager), settingsWidget(settingsWidget)
 {
@@ -342,17 +378,16 @@ PatternGeneratorChannelManagerUI::PatternGeneratorChannelManagerUI(QWidget *pare
     this->chm = chm;
     this->pg = pg;
     currentUI = nullptr;
-    selectedChannelGroup = chm->get_channel_group(0);
-    selectedChannelGroupUi = nullptr;    
     disabledShown = true;
     detailsShown = true;
+    highlightShown = true;
     channelManagerHeaderWiget = nullptr;
-
+    chm->highlightChannel(chm->get_channel_group(0));
    // update_ui();
 }
 PatternGeneratorChannelManagerUI::~PatternGeneratorChannelManagerUI()
 {
-
+    delete ui;
 }
 
 void PatternGeneratorChannelManagerUI::retainWidgetSizeWhenHidden(QWidget *w)
@@ -492,7 +527,7 @@ void PatternGeneratorChannelManagerUI::updateUi()
             for(auto i=0;i<ch->get_channel_count();i++)
                 {
 
-                    currentChannelGroupUI->ch_ui.push_back(new PatternGeneratorChannelUI(static_cast<PatternGeneratorChannel*>(ch->get_channel(i)), static_cast<PatternGeneratorChannelGroup*>(ch), this, 0)); // create widget for channelgroup
+                    currentChannelGroupUI->ch_ui.push_back(new PatternGeneratorChannelUI(static_cast<PatternGeneratorChannel*>(ch->get_channel(i)), static_cast<PatternGeneratorChannelGroup*>(ch), currentChannelGroupUI, this, 0)); // create widget for channelgroup
                     PatternGeneratorChannelUI* currentChannelUI = currentChannelGroupUI->ch_ui.back();
                     //QWidget *p = new QWidget(chg_ui.back());
 
@@ -556,6 +591,8 @@ void PatternGeneratorChannelManagerUI::updateUi()
 
         }
     }
+    if(highlightShown)
+        showHighlight(true);
 
 }
 
@@ -573,24 +610,38 @@ void PatternGeneratorChannelManagerUI::deleteSettingsWidget()
 
 void PatternGeneratorChannelManagerUI::createSettingsWidget()
 {    
-    currentUI = PatternFactory::create_ui(selectedChannelGroup->pattern,selectedChannelGroup->created_index);
+    /*currentUI = PatternFactory::create_ui(getSelectedChannelGroup()->pattern,getSelectedChannelGroup()->created_index);
     currentUI->build_ui(settingsWidget);
     currentUI->get_pattern()->init();
     currentUI->post_load_ui();
-    currentUI->setVisible(true);        
+    currentUI->setVisible(true);        */
 }
 
 
-void PatternGeneratorChannelManagerUI::selectChannelGroup(PatternGeneratorChannelGroupUI* selected)
+PatternGeneratorChannelGroupUI* PatternGeneratorChannelManagerUI::findUiByChannelGroup(PatternGeneratorChannelGroup* toFind)
 {
-    // remove black outline from prev selected
-    if(selectedChannelGroupUi)
-        selectedChannelGroupUi->findChild<QWidget*>("widget")->setStyleSheet("");
-    // select channel
-    selectedChannelGroupUi = selected;
-    selectedChannelGroup=selected->getChannelGroup();
-    selectedChannelGroupUi->findChild<QWidget*>("widget")->setStyleSheet("QWidget {background-color: rgb(0, 0, 0);}");
-    // apply black outline to currently selected channel
+    for(auto &&ui : chg_ui)
+    {
+        if(ui->getChannelGroup() == toFind)
+            return ui;
+    }
+    return nullptr;
+}
+
+PatternGeneratorChannelUI* PatternGeneratorChannelManagerUI::findUiByChannel(PatternGeneratorChannel* toFind)
+{
+    for(auto &&ui : chg_ui)
+    {
+        if(ui->ch_ui.size()!=0)
+        {
+            for(auto &&chUi : ui->ch_ui)
+            {
+                if(chUi->getChannel() == toFind)
+                    return chUi;
+            }
+        }
+    }
+    return nullptr;
 }
 
 bool PatternGeneratorChannelManagerUI::isDisabledShown()
@@ -627,6 +678,19 @@ void PatternGeneratorChannelManagerUI::hideDetails()
 void PatternGeneratorChannelManagerUI::groupSplitSelected()
 {
     std::vector<int> selection = chm->get_selected_indexes();
+    bool changeHighlight = false;
+    auto highlightedIter = std::find(chm->get_channel_groups()->begin(),chm->get_channel_groups()->end(),chm->getHighlightedChannelGroup());
+    if(highlightedIter != chm->get_channel_groups()->end())
+    {
+    auto highlightedIndex = highlightedIter -chm->get_channel_groups()->begin();
+
+    if(std::find(selection.begin(),selection.end(),highlightedIndex)!= selection.end())
+    {
+        changeHighlight = true;
+    }
+    }
+
+
     if(selection.size() == 0) {return;}
     if(selection.size() == 1)
     {
@@ -645,7 +709,27 @@ void PatternGeneratorChannelManagerUI::groupSplitSelected()
         chm->join(selection);
         chm->deselect_all();
     }
+
+    if(changeHighlight)
+        chm->highlightChannel(chm->get_channel_group(selection[0]));
 }
+
+void PatternGeneratorChannelManagerUI::showHighlight(bool val)
+{
+    PatternGeneratorChannelGroupUI *uiChg = findUiByChannelGroup(chm->getHighlightedChannelGroup());
+    PatternGeneratorChannelUI *uiCh = findUiByChannel(chm->getHighlightedChannel());
+    if(uiCh!=nullptr)
+    {
+        setDynamicProperty(uiCh->ui->widget_2,"highlighted",val);
+        return;
+    }
+    if(uiChg!=nullptr)
+    {
+        setDynamicProperty(uiChg->ui->widget_2,"highlighted",val);
+    }
+
+}
+
 }
 
 
