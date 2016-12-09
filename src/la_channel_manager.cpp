@@ -4,7 +4,6 @@
 #include "la_channel_manager.hpp"
 #include "logic_analyzer.hpp"
 #include "ui_la_channel_group.h"
-#include "ui_la_channel.h"
 #include "ui_la_channel_manager.h"
 #include "ui_la_manager_header.h"
 #include <QScrollBar>
