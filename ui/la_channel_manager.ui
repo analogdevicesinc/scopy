@@ -13,6 +13,9 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout_1">
    <property name="spacing">
     <number>0</number>
@@ -30,29 +33,36 @@
     <number>0</number>
    </property>
    <item>
-    <layout class="QHBoxLayout" name="layoutTableHeader">
-     <item>
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>DIO</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
+    <widget class="QWidget" name="headerWidget" native="true"/>
    </item>
    <item>
     <widget class="QScrollArea" name="scrollArea">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="maximumSize">
       <size>
-       <width>350</width>
+       <width>680</width>
        <height>16777215</height>
       </size>
+     </property>
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
      <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
      </property>
      <property name="verticalScrollBarPolicy">
       <enum>Qt::ScrollBarAlwaysOff</enum>
+     </property>
+     <property name="horizontalScrollBarPolicy">
+      <enum>Qt::ScrollBarAlwaysOff</enum>
+     </property>
+     <property name="sizeAdjustPolicy">
+      <enum>QAbstractScrollArea::AdjustToContents</enum>
      </property>
      <property name="widgetResizable">
       <bool>true</bool>
@@ -66,8 +76,17 @@
         <x>0</x>
         <y>0</y>
         <width>235</width>
-        <height>483</height>
+        <height>492</height>
        </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
        <property name="spacing">
@@ -96,7 +115,7 @@
          <property name="sizeHint" stdset="0">
           <size>
            <width>0</width>
-           <height>5</height>
+           <height>0</height>
           </size>
          </property>
         </spacer>

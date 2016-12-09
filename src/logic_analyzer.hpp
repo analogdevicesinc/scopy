@@ -45,6 +45,7 @@ namespace Glibmm {
 namespace Ui {
 	class LogicAnalyzer;
 	class Channel;
+	class LChannelSettings;
 }
 
 namespace adiscope {
@@ -64,8 +65,11 @@ namespace adiscope {
 		void startStop(bool start);
 		void toggleRightMenu();
 		void rightMenuFinished(bool opened);
-		void toggleLeftMenu();
+		void toggleLeftMenu(bool val);
 		void leftMenuFinished(bool opened);
+
+	public Q_SLOTS:
+		void settings_pressed(LogicAnalyzerChannelGroupUI* btn);
 
 	private:
 		Ui::LogicAnalyzer *ui;
@@ -97,6 +101,9 @@ namespace adiscope {
 
 		LogicAnalyzerChannelManager chm;
 		LogicAnalyzerChannelManagerUI *chm_ui;
+		Ui::LChannelSettings *lachannelsettings;
+
+		void clearLayout(QLayout *layout);
 	};
 }
 

@@ -676,6 +676,9 @@ background-color: grey;
         </item>
         <item>
          <widget class="QWidget" name="widget" native="true">
+          <property name="styleSheet">
+           <string notr="true"/>
+          </property>
           <layout class="QHBoxLayout" name="horizontalLayout_3">
            <property name="spacing">
             <number>5</number>
@@ -687,20 +690,29 @@ background-color: grey;
             <number>0</number>
            </property>
            <item>
-            <widget class="adiscope::MenuAnim" name="leftWidget" native="true">
+            <widget class="QWidget" name="leftWidget" native="true">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="minimumSize">
               <size>
-               <width>250</width>
+               <width>0</width>
                <height>0</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>250</width>
+               <width>16777215</width>
                <height>16777215</height>
               </size>
              </property>
-             <layout class="QVBoxLayout" name="verticalLayout_2">
+             <property name="styleSheet">
+              <string notr="true"/>
+             </property>
+             <layout class="QVBoxLayout" name="leftLayout">
               <property name="spacing">
                <number>0</number>
               </property>
@@ -716,60 +728,13 @@ background-color: grey;
               <property name="bottomMargin">
                <number>0</number>
               </property>
-              <item>
-               <widget class="QStackedWidget" name="leftStackedWidget">
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>350</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-                <property name="currentIndex">
-                 <number>0</number>
-                </property>
-                <widget class="QWidget" name="expanded">
-                 <property name="maximumSize">
-                  <size>
-                   <width>350</width>
-                   <height>16777215</height>
-                  </size>
-                 </property>
-                 <property name="styleSheet">
-                  <string notr="true"/>
-                 </property>
-                 <layout class="QHBoxLayout" name="expandedLayout">
-                  <property name="spacing">
-                   <number>0</number>
-                  </property>
-                  <property name="leftMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="topMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="rightMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="bottomMargin">
-                   <number>0</number>
-                  </property>
-                 </layout>
-                </widget>
-               </widget>
-              </item>
              </layout>
             </widget>
            </item>
            <item>
             <widget class="QWidget" name="centralWidget" native="true">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
@@ -850,7 +815,15 @@ background-color: grey;
            </property>
            <widget class="QWidget" name="cursorSettings"/>
            <widget class="QWidget" name="generalSettings"/>
-           <widget class="QWidget" name="colorSettings"/>
+           <widget class="QWidget" name="colorSettings">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_3"/>
+           </widget>
           </widget>
          </item>
         </layout>
