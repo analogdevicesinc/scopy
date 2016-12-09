@@ -100,6 +100,7 @@ public:
     std::string get_label();
 
     void add_channel(Channel* channel);
+    void remove_channel(int channelIndex);
     uint16_t get_mask();
     std::vector<uint16_t> get_ids();
     size_t get_channel_count();

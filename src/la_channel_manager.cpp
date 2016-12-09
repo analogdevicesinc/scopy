@@ -237,8 +237,7 @@ void LogicAnalyzerChannelManager::removeChannel(int grIndex, int chIndex)
 {
 	auto grIt = std::next(channel_group.begin(), grIndex);
 	auto channels = (*grIt)->get_channels();
-	auto chIt = std::next(channels.begin(), chIndex);
-	(*grIt)->get_channels().erase(chIt);
+	(*grIt)->remove_channel(chIndex);
 	if((*grIt)->get_channel_count() == 0)
 		channel_group.erase(grIt);
 
@@ -492,9 +491,12 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 		}
 	}
 
-	ui->scrollArea->verticalScrollBar()->setPageStep(chg_ui.front()->sizeHint().height());
-	ui->scrollArea->verticalScrollBar()->setSingleStep(chg_ui.front()->sizeHint().height());
-	ui->scrollArea->verticalScrollBar()->setRange(0, ui->scrollAreaWidgetContents->height() - chg_ui.front()->sizeHint().height());
+	if(chg_ui.size() != 0)
+	{
+		ui->scrollArea->verticalScrollBar()->setPageStep(chg_ui.front()->sizeHint().height());
+		ui->scrollArea->verticalScrollBar()->setSingleStep(chg_ui.front()->sizeHint().height());
+		ui->scrollArea->verticalScrollBar()->setRange(0, ui->scrollAreaWidgetContents->height() - chg_ui.front()->sizeHint().height());
+	}
 }
 
 void LogicAnalyzerChannelManagerUI::collapse(bool check)

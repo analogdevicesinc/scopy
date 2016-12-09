@@ -255,6 +255,11 @@ void ChannelGroup::add_channel(Channel *channel)
     channels.push_back(channel);
 }
 
+void ChannelGroup::remove_channel(int chIndex)
+{
+	channels.erase(channels.begin() + chIndex);
+}
+
 size_t ChannelGroup::get_channel_count()
 {
     return channels.size();
