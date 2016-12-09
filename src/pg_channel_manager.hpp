@@ -104,10 +104,7 @@ private Q_SLOTS:
     void enable(bool enabled);
     void split();
     void collapse();
-    void settingsButtonHandler();    
     void mousePressEvent(QMouseEvent*) override;
-    //void paintEvent(QPaintEvent *) override;
-
 };
 
 

@@ -155,9 +155,6 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt, QPushB
     qDebug()<<chmui->parent();
     chmui->updateUi();
     chmui->setVisible(true);
-    //chmui->createSettingsWidget();
-
-
 }
 
 PatternGenerator::~PatternGenerator()
@@ -264,7 +261,6 @@ void PatternGenerator::toggleRightMenu(QPushButton *btn)
         ui->btnChSettings->setChecked(false);
         ui->btnPGSettings->setChecked(false);
         settings_group->setExclusive(true);
-
     }
 
     if(prevMenuOpened!=menuOpened)

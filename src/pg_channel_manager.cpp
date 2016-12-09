@@ -153,15 +153,15 @@ PatternGeneratorChannelGroup* PatternGeneratorChannelGroupUI::getChannelGroup()
 
 void PatternGeneratorChannelGroupUI::patternChanged(int index)
 {
-    /*getChannelGroup()->pattern->deinit();
+    getChannelGroup()->pattern->deinit();
     delete getChannelGroup()->pattern;
     getChannelGroup()->created_index=index;
     getChannelGroup()->pattern = PatternFactory::create(index);
-    if(getChannelGroup()==getManagerUi()->getSelectedChannelGroup())
+    if(getChannelGroup()==getManagerUi()->chm->getHighlightedChannelGroup())
     {
         getManagerUi()->deleteSettingsWidget();
         getManagerUi()->createSettingsWidget();
-    }*/
+    }
 }
 
 void PatternGeneratorChannelGroupUI::select(bool selected)
@@ -235,13 +235,6 @@ void PatternGeneratorChannelGroupUI::enable(bool enabled)
     Q_EMIT channel_enabled();
 }
 
-void PatternGeneratorChannelGroupUI::settingsButtonHandler()
-{
-    getManagerUi()->deleteSettingsWidget();
-    //getManagerUi()->selectChannelGroup(this);
-    getManagerUi()->createSettingsWidget();
-}
-
 int PatternGeneratorChannelGroupUI::isChecked()
 {
     return checked;
@@ -251,6 +244,7 @@ void PatternGeneratorChannelGroupUI::check(int val)
 {
     checked = val;
 }
+
 
 void PatternGeneratorChannelGroupUI::mousePressEvent(QMouseEvent*)
 {
@@ -383,7 +377,6 @@ PatternGeneratorChannelManagerUI::PatternGeneratorChannelManagerUI(QWidget *pare
     highlightShown = true;
     channelManagerHeaderWiget = nullptr;
     chm->highlightChannel(chm->get_channel_group(0));
-   // update_ui();
 }
 PatternGeneratorChannelManagerUI::~PatternGeneratorChannelManagerUI()
 {
@@ -502,14 +495,14 @@ void PatternGeneratorChannelManagerUI::updateUi()
             i++;
         }
 
+        currentChannelGroupUI->ui->patternCombo->setCurrentIndex(static_cast<PatternGeneratorChannelGroup*>(ch)->created_index);
+
         currentChannelGroupUI->ui->enableBox->setChecked(ch->is_enabled());
         currentChannelGroupUI->enableControls(ch->is_enabled());
 
         connect(currentChannelGroupUI->ui->enableBox,SIGNAL(toggled(bool)),chg_ui.back(),SLOT(enable(bool)));
         connect(static_cast<PatternGeneratorChannelGroupUI*>(chg_ui.back()),SIGNAL(channel_selected()),pg,SLOT(onChannelSelectedChanged())); // TEMP
         connect(static_cast<PatternGeneratorChannelGroupUI*>(chg_ui.back()),SIGNAL(channel_enabled()),pg,SLOT(onChannelEnabledChanged())); // TEMP
-//        connect(currentChannelGroupUI->ui->pushButton,SIGNAL(clicked()),static_cast<PatternGeneratorChannelGroupUI*>(chg_ui.back()),SLOT(settingsButtonHandler()));
-//        connect(currentChannelGroupUI->ui->pushButton,SIGNAL(clicked()),pg,SLOT(toggleRightMenu()));
         connect(currentChannelGroupUI->ui->selectBox,SIGNAL(toggled(bool)),static_cast<PatternGeneratorChannelGroupUI*>(chg_ui.back()),SLOT(select(bool)));
         connect(currentChannelGroupUI->ui->patternCombo,SIGNAL(currentIndexChanged(int)),chg_ui.back(),SLOT(patternChanged(int)));
 
@@ -545,7 +538,6 @@ void PatternGeneratorChannelManagerUI::updateUi()
                     }
                     else
                     {
-                        //retainWidgetSizeWhenHidden(currentChannelUI->ui->enableBox);
                         retainWidgetSizeWhenHidden(currentChannelUI->ui->wgChannelSettingsGroup);
                         retainWidgetSizeWhenHidden(currentChannelUI->ui->wgChannelEnableGroup);
                         retainWidgetSizeWhenHidden(currentChannelUI->ui->outputCombo);
@@ -610,11 +602,11 @@ void PatternGeneratorChannelManagerUI::deleteSettingsWidget()
 
 void PatternGeneratorChannelManagerUI::createSettingsWidget()
 {    
-    /*currentUI = PatternFactory::create_ui(getSelectedChannelGroup()->pattern,getSelectedChannelGroup()->created_index);
+    currentUI = PatternFactory::create_ui(chm->getHighlightedChannelGroup()->pattern,chm->getHighlightedChannelGroup()->created_index);
     currentUI->build_ui(settingsWidget);
     currentUI->get_pattern()->init();
     currentUI->post_load_ui();
-    currentUI->setVisible(true);        */
+    currentUI->setVisible(true);
 }
 
 
@@ -728,6 +720,15 @@ void PatternGeneratorChannelManagerUI::showHighlight(bool val)
         setDynamicProperty(uiChg->ui->widget_2,"highlighted",val);
     }
 
+    if(val)
+    {
+        deleteSettingsWidget();
+        createSettingsWidget();
+    }
+    else
+    {
+        highlightShown = false;
+    }
 }
 
 }
