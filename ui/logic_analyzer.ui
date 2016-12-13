@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1323</width>
+    <width>1419</width>
     <height>654</height>
    </rect>
   </property>
@@ -435,6 +435,9 @@ QPushButton:!checked {
         <property name="checkable">
          <bool>true</bool>
         </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
        </widget>
       </item>
       <item>
@@ -449,6 +452,74 @@ QPushButton:!checked {
          <size>
           <width>20</width>
           <height>0</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnChSettings">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>60</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>60</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton {
+  min-height: 40px;
+  max-height: 40px;
+  min-width: 60px;
+  max-width: 60px;
+}
+
+QPushButton:checked {
+  border-image: url(:/icons/setup3_checked.svg);
+}
+
+QPushButton:checked:hover {
+  border-image: url(:/icons/setup3_checked_hover.svg);
+}
+
+QPushButton:!checked {
+  border-image: url(:/icons/setup3_unchecked.svg);
+}
+
+QPushButton:!checked:hover {
+  border-image: url(:/icons/setup3_unchecked_hover.svg);
+}</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_9">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>20</height>
          </size>
         </property>
        </spacer>
@@ -515,7 +586,7 @@ QPushButton:!checked {
               <string notr="true">QPushButton {
 color: white;
 background-color: rgb(74, 100, 255);
-font-family: &quot;monospace&quot;;
+font-family: &quot;ArialMT&quot;;
 font-size: 14px;
 width: 240px;
 height: 30px;
@@ -578,7 +649,7 @@ background-color: #F45000;
               <string notr="true">QPushButton {
 color: white;
 background-color: rgb(74, 100, 255);
-font-family: &quot;monospace&quot;;
+font-family: &quot;ArialMT&quot;;
 font-size: 14px;
 width: 240px;
 height: 30px;
@@ -822,7 +893,23 @@ background-color: grey;
               <height>0</height>
              </size>
             </property>
-            <layout class="QVBoxLayout" name="verticalLayout_3"/>
+            <layout class="QVBoxLayout" name="colorSettingsLayout">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+            </layout>
            </widget>
           </widget>
          </item>

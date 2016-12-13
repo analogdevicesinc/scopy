@@ -67,9 +67,7 @@ namespace adiscope {
 		void rightMenuFinished(bool opened);
 		void toggleLeftMenu(bool val);
 		void leftMenuFinished(bool opened);
-
-	public Q_SLOTS:
-		void settings_pressed(LogicAnalyzerChannelGroupUI* btn);
+		void on_btnShowChannelsClicked(bool check);
 
 	private:
 		Ui::LogicAnalyzer *ui;

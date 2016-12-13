@@ -140,6 +140,11 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	int settings_panel = ui->stackedWidget->indexOf(ui->generalSettings);
 	ui->btnSettings->setProperty("id", QVariant(-settings_panel));
 
+	/* Channel settings */
+	settings_group->addButton(ui->btnChSettings);
+	int ch_settings_panel = ui->stackedWidget->indexOf(ui->colorSettings);
+	ui->btnChSettings->setProperty("id", QVariant(-ch_settings_panel));
+
 	// Controls for scale/division and position
 	timeBase = new ScaleSpinButton({
 					{"ps", 1E-12},
@@ -172,6 +177,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 			SLOT(setChecked(bool)));
 	connect(ui->btnSettings, SIGNAL(pressed()),
 			this, SLOT(toggleRightMenu()));
+	connect(ui->btnChSettings, SIGNAL(pressed()),
+			this, SLOT(toggleRightMenu()));
 	connect(ui->rightWidget, SIGNAL(finished(bool)),
 			this, SLOT(rightMenuFinished(bool)));
 	connect(ui->btnShowHideMenu, SIGNAL(clicked(bool)),
@@ -182,7 +189,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	timeBase->setValue(1e-3);
 	timeBase->valueChanged(timeBase->value());
 
-	chm_ui = new LogicAnalyzerChannelManagerUI(0, main_win, &chm, this);
+	chm_ui = new LogicAnalyzerChannelManagerUI(0, main_win, &chm, ui->colorSettings, this);
 	ui->leftLayout->addWidget(chm_ui);
 	chm_ui->update_ui();
 	chm_ui->setVisible(true);
@@ -192,6 +199,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 		chm_ui, SLOT(on_groupSplit_clicked()));
 	connect(ui->btnShowChannels, SIGNAL(clicked(bool)),
 		chm_ui, SLOT(on_hideInactive_clicked(bool)));
+	connect(ui->btnShowChannels, SIGNAL(clicked(bool)),
+		this, SLOT(on_btnShowChannelsClicked(bool)));
 }
 
 LogicAnalyzer::~LogicAnalyzer()
@@ -225,24 +234,6 @@ unsigned int LogicAnalyzer::get_no_channels(struct iio_device *dev)
 	return nb;
 }
 
-void LogicAnalyzer::settings_pressed(LogicAnalyzerChannelGroupUI* chg_ui)
-{
-//	QLineEdit *channelName = new QLineEdit(this);
-//	QComboBox *channelColor = new QComboBox(this);
-//	channelName->setText(QString::fromStdString(chg_ui->get_group()->get_label()));
-//	ui->colorSettingsLayout->insertWidget(0, channelName);
-//	Ui::LChannelSettings * lachannelsettings =
-//		new Ui::LChannelSettings;
-//	clearLayout(ui->colorSettings->layout());
-//	lachannelsettings->setupUi(ui->colorSettings);
-//	ui->colorSettings->setLayout(lachannelsettings->verticalLayout_2);
-//	lachannelsettings->channelName->setText(QString::fromStdString(chg_ui->get_group()->get_label()));
-
-
-	ui->stackedWidget->setCurrentIndex(ui->stackedWidget->indexOf(ui->colorSettings));
-	ui->rightWidget->toggleMenu(true);
-}
-
 void LogicAnalyzer::clearLayout(QLayout *layout)
 {
 	for(int i = 0 ; i < layout->children().size(); )
@@ -256,15 +247,41 @@ void LogicAnalyzer::toggleRightMenu(QPushButton *btn)
 {
 	int id = btn->property("id").toInt();
 	bool btn_old_state = btn->isChecked();
-	bool open = !menuOpened;
+	bool open; //= !menuOpened;
 
+	if(active_settings_btn != btn)
+	{
+		open = !menuOpened;
+	}
+	else
+	{
+		open = true;
+	}
+
+	if(!open)
+	{
+		settings_group->setExclusive(false);
+		ui->btnChSettings->setChecked(false);
+		ui->btnSettings->setChecked(false);
+		settings_group->setExclusive(true);
+	}
+
+	if(menuOpened != open)
+	{
+		ui->rightWidget->toggleMenu(open);
+	}
+	menuOpened = open;
 	active_settings_btn = btn;
-	settings_group->setExclusive(!btn_old_state);
 
 	if (open)
+	{
 		settings_panel_update(id);
-
-	ui->rightWidget->toggleMenu(open);
+		chm_ui->showHighlight(true);
+	}
+	else
+	{
+		chm_ui->showHighlight(false);
+	}
 }
 
 void LogicAnalyzer::settings_panel_update(int id)
@@ -273,13 +290,14 @@ void LogicAnalyzer::settings_panel_update(int id)
 		ui->stackedWidget->setCurrentIndex(-id);
 	else
 	{
-		clearLayout(ui->colorSettings->layout());
-		lachannelsettings->setupUi(ui->colorSettings);
-		LogicAnalyzerChannelGroupUI* chg_ui = chm_ui->get_current_channelGroup();
-		lachannelsettings->channelName->setText(QString::fromStdString(chg_ui->get_group()->get_label()));
-		connect(lachannelsettings->channelName, SIGNAL(textChanged(const QString&)),
-			chm_ui, SLOT(changeChannelName(const QString&)));
-		ui->stackedWidget->setCurrentIndex(ui->stackedWidget->indexOf(ui->colorSettings));
+		ui->stackedWidget->setCurrentIndex(id);
+//		clearLayout(ui->colorSettings->layout());
+//		lachannelsettings->setupUi(ui->colorSettings);
+//		LogicAnalyzerChannelGroup* chg_ui = chm_ui->chm->getHighlightedChannelGroup();
+//		lachannelsettings->channelName->setText(QString::fromStdString(chg_ui->get_label()));
+//		connect(lachannelsettings->channelName, SIGNAL(textChanged(const QString&)),
+//			chm_ui, SLOT(changeChannelName(const QString&)));
+//		ui->stackedWidget->setCurrentIndex(ui->stackedWidget->indexOf(ui->colorSettings));
 	}
 }
 
@@ -332,5 +350,17 @@ void LogicAnalyzer::leftMenuFinished(bool closed)
 		ui->btnShowChannels->show();
 		ui->btnShowHideMenu->setText("<");
 		chm_ui->collapse(false);
+	}
+}
+
+void LogicAnalyzer::on_btnShowChannelsClicked(bool check)
+{
+	if(check)
+	{
+		ui->btnShowChannels->setText("Show all");
+	}
+	else
+	{
+		ui->btnShowChannels->setText("Hide inactive");
 	}
 }

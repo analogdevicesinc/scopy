@@ -100,6 +100,10 @@
         <file>icons/measurements/rms.svg</file>
         <file>icons/logic_switch_off.svg</file>
         <file>icons/logic_switch_on.svg</file>
+        <file>icons/setup3_unchecked_hover.svg</file>
+        <file>icons/setup3_unchecked.svg</file>
+        <file>icons/setup3_checked_hover.svg</file>
+        <file>icons/setup3_checked.svg</file>
     </qresource>
     <qresource prefix="/stylesheets">
         <file>stylesheets/plot.qss</file>

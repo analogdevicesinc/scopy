@@ -7,7 +7,9 @@
 
 namespace Ui {
 	class LAChannelManager;
-	class LA_channel_group;
+	class LAChannelGroup;
+	class LASettingsWidget;
+	class LARequiredChannel;
 }
 
 namespace adiscope {
@@ -40,7 +42,9 @@ namespace adiscope {
 					QWidget *parent = 0);
 		uint16_t get_id_pvItem();
 		void set_id_pvItem(uint16_t id);
-		Ui::LA_channel_group *ui;
+		Ui::LAChannelGroup *ui;
+		void mousePressEvent(QMouseEvent *event);
+		LogicAnalyzerChannel* getChannel();
 
 	private Q_SLOTS:
 		void remove();
@@ -82,7 +86,9 @@ namespace adiscope {
 		uint16_t get_id_pvItem();
 		void set_id_pvItem(uint16_t id);
 		LogicAnalyzerChannelGroup* getChannelGroup();
-		Ui::LA_channel_group *ui;
+		std::vector<LogicAnalyzerChannelUI *> ch_ui;
+		Ui::LAChannelGroup *ui;
+		void enableControls(bool enabled);
 	private Q_SLOTS:
 		void set_decoder(std::string value);
 		void collapse_group();
@@ -94,6 +100,7 @@ namespace adiscope {
 	public Q_SLOTS:
 		void remove();
 		void settingsHandler();
+		void enable(bool enabled);
 	Q_SIGNALS:
 		void remove(int index);
 	protected:
@@ -113,10 +120,16 @@ namespace adiscope {
 		void initDecoderList(bool first_level_decoder=true);
 		QStringList get_name_decoder_list();
 		const srd_decoder *get_decoder_from_name(const char*);
+		void highlightChannel(LogicAnalyzerChannelGroup *chg,
+				LogicAnalyzerChannel *ch=nullptr);
+		LogicAnalyzerChannelGroup* getHighlightedChannelGroup();
+		LogicAnalyzerChannel* getHighlightedChannel();
 	private:
 		std::vector<const srd_decoder*> decoderList;
 		QStringList nameDecoderList;
 		static int decoder_name_cmp(const void *a, const void *b);
+		LogicAnalyzerChannelGroup* highlightedChannelGroup;
+		LogicAnalyzerChannel* highlightedChannel;
 	};
 
 
@@ -127,22 +140,31 @@ namespace adiscope {
 	public:
 		pv::MainWindow *main_win;
 		std::vector<LogicAnalyzerChannelGroupUI *> chg_ui;
+		QWidget *managerHeaderWidget;
+		QWidget *locationSettingsWidget;
+		QWidget *currentSettingsWidget;
+		Ui::LASettingsWidget *settingsUI;
 		LogicAnalyzerChannelManagerUI(QWidget *parent,
 				pv::MainWindow *main_win_,
 				LogicAnalyzerChannelManager *chm,
+				QWidget *locationSettingsWidget,
 				LogicAnalyzer* la);
 		LogicAnalyzerChannelManager *chm;
 		LogicAnalyzer *la;
 		Ui::LAChannelManager *ui;
 		void update_ui();
 		void collapse(bool);
-		void set_current_channelGroup(LogicAnalyzerChannelGroupUI*);
-		LogicAnalyzerChannelGroupUI* get_current_channelGroup();
+		void showHighlight(bool check);
+		LogicAnalyzerChannelGroupUI* getUiFromChGroup(
+				LogicAnalyzerChannelGroup*);
+		LogicAnalyzerChannelUI* getUiFromCh(LogicAnalyzerChannel*);
+		void createSettingsWidget();
+		void deleteSettingsWidget();
 
 	public Q_SLOTS:
 		void update_position(int value);
 		void remove();
-		void changeChannelName(const QString&);
+		void set_label(QString);
 
 	private Q_SLOTS:
 		void on_groupSplit_clicked();
@@ -153,7 +175,6 @@ namespace adiscope {
 		bool collapsed;
 		std::vector<int> visibleItemsIndexes;
 		QButtonGroup* settings_exclusive_group;
-		LogicAnalyzerChannelGroupUI *current_channelGroup;
 		void retainWidgetSizeWhenHidden(QWidget *w);
 		void setWidgetMinimumNrOfChars(QWidget *w, int nrOfChars);
 	};

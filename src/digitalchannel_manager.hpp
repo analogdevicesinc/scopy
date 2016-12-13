@@ -67,6 +67,7 @@ public:
     uint16_t get_mask();
     virtual uint16_t get_id();
     std::string get_label();
+	void set_label(std::string);
 };
 
 class ChannelUI :  public QWidget

@@ -170,6 +170,11 @@ std::string Channel::get_label()
     return label;
 }
 
+void Channel::set_label(std::string label)
+{
+    this->label = label;
+}
+
 std::vector<Channel*> ChannelGroup::get_channels() const
 {
     return channels;

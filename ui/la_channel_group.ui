@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>LA_channel_group</class>
- <widget class="QWidget" name="LA_channel_group">
+ <class>LAChannelGroup</class>
+ <widget class="QWidget" name="LAChannelGroup">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -148,7 +148,10 @@ QLabel:disabled
       </size>
      </property>
      <property name="styleSheet">
-      <string notr="true">
+      <string notr="true">QWidget[highlight=true]
+{
+background:black;
+}
 QWidget 
 {
 background: transparent;
@@ -215,9 +218,15 @@ QLabel
   font-style: normal;
   text-align: left;
   color: #ffffff;
+/*background-color:red;*/
   border: 0px solid red;
   margin:0px;
   padding:0px;
+}
+
+QComboBox
+{
+/*	background-color:green;*/
 }
 
 QLabel:disabled
@@ -335,6 +344,12 @@ QPushButton:!checked {
          </item>
          <item>
           <widget class="QWidget" name="centralWidget" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="styleSheet">
             <string notr="true"/>
            </property>
@@ -666,11 +681,11 @@ padding:0px;
                <enum>Qt::Horizontal</enum>
               </property>
               <property name="sizeType">
-               <enum>QSizePolicy::Preferred</enum>
+               <enum>QSizePolicy::Fixed</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>10</width>
+                <width>0</width>
                 <height>20</height>
                </size>
               </property>
@@ -711,22 +726,6 @@ padding:0px;
               </property>
              </widget>
             </item>
-            <item>
-             <spacer name="horizontalSpacer_4">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeType">
-               <enum>QSizePolicy::Preferred</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>28</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
            </layout>
           </widget>
          </item>
@@ -748,6 +747,22 @@ padding:0px;
             <property name="bottomMargin">
              <number>0</number>
             </property>
+            <item>
+             <spacer name="horizontalSpacer_4">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Maximum</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>28</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
             <item>
              <widget class="QComboBox" name="comboBox_2">
               <property name="sizePolicy">
