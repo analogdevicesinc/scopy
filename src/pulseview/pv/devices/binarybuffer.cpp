@@ -110,7 +110,7 @@ void BinaryBuffer::run()
     input_->reset();
 
     /*TODO: break down in multiple  data chunks */
-    input_->send(data_, (*no_samples_));
+    input_->send(data_, ((*no_samples_)*sizeof(short)));
     input_->end();
 
 

@@ -15,6 +15,7 @@
 
 #include "pg_patterns.hpp"
 #include "pg_channel_manager.hpp"
+#include "pg_buffer_manager.hpp"
 
 // Generated UI
 #include "ui_pattern_generator.h"
@@ -57,7 +58,7 @@ class PatternGenerator : public QWidget
     Q_OBJECT
 
 public:
-    explicit PatternGenerator(struct iio_context *ctx, Filter* filt, QPushButton *runButton, QWidget *parent = 0);
+    explicit PatternGenerator(struct iio_context *ctx, Filter* filt, QPushButton *runButton, QWidget *parent = 0, bool offline_mode = 0);
     ~PatternGenerator();
 
     uint32_t get_nr_of_samples();
@@ -69,11 +70,9 @@ public:
     short remap_buffer(uint8_t *mapping, uint32_t val);
     void commitBuffer(short *bufferPtr);
 
-Q_SIGNALS:
-    void generate_pattern();
-
 private Q_SLOTS:
 
+    void generatePattern();
     void onChannelEnabledChanged();
     void onChannelSelectedChanged();
     void startStop(bool start);
@@ -117,12 +116,14 @@ private:
 
     // QWidget *current;
     PatternUI *currentUI;
-    QIntValidator *sampleRateValidator;
     uint16_t channel_group;
+    bool offline_mode;
 
     PatternGeneratorChannelGroup *selected_channel_group;
     PatternGeneratorChannelManager chm;
     PatternGeneratorChannelManagerUI *chmui;
+    PatternGeneratorBufferManager *bufman;
+    PatternGeneratorBufferManagerUi *bufui;
 
     // Buffer
 
@@ -149,11 +150,13 @@ private:
 
     // PV and Sigrok
 
+
     std::shared_ptr<sigrok::Context> context;
     std::shared_ptr<pv::devices::BinaryBuffer> pattern_generator_ptr;
     std::shared_ptr<sigrok::InputFormat> binary_format;
     std::map<std::string, Glib::VariantBase> options;
     pv::MainWindow* main_win;
+
 
     bool startPatternGeneration(bool cyclic);
     void stopPatternGeneration();

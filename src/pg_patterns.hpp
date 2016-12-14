@@ -79,9 +79,9 @@ private:
     bool periodic;
 protected: // temp
     short *buffer;
-    uint32_t sample_rate;
+ /*   uint32_t sample_rate;
     uint32_t number_of_samples;
-    uint16_t number_of_channels;
+    uint16_t number_of_channels;*/
 
 public:
 
@@ -91,9 +91,6 @@ public:
     void set_name(std::string name_);
     std::string get_description();
     void set_description(std::string description_);
-    void set_sample_rate(uint32_t sample_rate_);
-    void set_number_of_samples(uint32_t number_of_samples_);
-    void set_number_of_channels(uint16_t number_of_channels_);
     void set_periodic(bool periodic_);
     short* get_buffer();
     void delete_buffer();
@@ -101,8 +98,8 @@ public:
     virtual uint8_t pre_generate();
     virtual bool is_periodic();
     virtual uint32_t get_min_sampling_freq();
-    virtual uint32_t get_required_nr_of_samples();
-    virtual uint8_t generate_pattern() = 0;
+    virtual uint32_t get_required_nr_of_samples(uint32_t sample_rate);
+    virtual uint8_t generate_pattern(uint32_t sample_rate, uint32_t number_of_samples, uint16_t number_of_channels) = 0;
     virtual void deinit();
 
     virtual std::string toString();
@@ -142,6 +139,8 @@ public:
     virtual void post_load_ui();
     virtual void parse_ui();
     virtual void destroy_ui();
+Q_SIGNALS:
+    void patternChanged();
 };
 
 /*
@@ -172,7 +171,7 @@ class ClockPattern : virtual public Pattern
 public:
     ClockPattern();
     virtual ~ClockPattern();
-    uint8_t generate_pattern();
+    uint8_t generate_pattern(uint32_t sample_rate, uint32_t number_of_samples, uint16_t number_of_channels);
     float get_frequency() const;
     void set_frequency(float value);
     float get_duty_cycle() const;
@@ -180,7 +179,7 @@ public:
     int get_phase() const;
     void set_phase(int value);
     uint32_t get_min_sampling_freq();
-    uint32_t get_required_nr_of_samples();
+    uint32_t get_required_nr_of_samples(uint32_t  sample_rate);
 
 };
 
@@ -196,8 +195,7 @@ public:
     Pattern* get_pattern();
     void build_ui(QWidget *parent = 0);
     void destroy_ui();
-Q_SIGNALS:
-    void generate_buffer();
+
 public Q_SLOTS:
     void parse_ui();
 };
@@ -212,10 +210,10 @@ public:
     RandomPattern();
     virtual ~RandomPattern();
     uint32_t get_min_sampling_freq();
-    uint32_t get_required_nr_of_samples();
+    uint32_t get_required_nr_of_samples(uint32_t sample_rate);
     uint32_t get_frequency() const;
     void set_frequency(const uint32_t &value);
-    uint8_t generate_pattern();
+    uint8_t generate_pattern(uint32_t sample_rate, uint32_t number_of_samples, uint16_t number_of_channels);
 
 };
 

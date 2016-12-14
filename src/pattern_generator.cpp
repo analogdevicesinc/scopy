@@ -73,7 +73,7 @@ QStringList PatternGenerator::possibleSampleRates = QStringList()
         << "50"         << "20"        << "10"
         << "5"          << "2"         << "1";
 
-PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt, QPushButton *runBtn, QWidget *parent) :
+PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt, QPushButton *runBtn, QWidget *parent, bool offline_mode) :
     QWidget(parent),
     ctx(ctx),
     dev(iio_context_find_device(ctx, "m2k-logic-analyzer-tx")),
@@ -82,8 +82,16 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt, QPushB
     ui(new Ui::PatternGenerator),
     pgSettings(new Ui::PGSettings),
     txbuf(0), sample_rate(100000), channel_enable_mask(0xffff),buffer(nullptr),
-    buffer_created(0), currentUI(nullptr)
+    buffer_created(0), currentUI(nullptr), offline_mode(offline_mode)
 {
+
+    // IIO
+    if(!offline_mode){
+        dev = iio_context_find_device(ctx, "m2k-logic-analyzer-tx");
+        channel_manager_dev = iio_context_find_device(ctx, "m2k-logic-analyzer");
+        this->no_channels = iio_device_get_channels_count(channel_manager_dev);
+    }
+
     // UI
     ui->setupUi(this);
     this->setAttribute(Qt::WA_DeleteOnClose, true);
@@ -91,71 +99,36 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt, QPushB
     settings_group->addButton(ui->btnChSettings);
     settings_group->addButton(ui->btnPGSettings);
 
-    // IIO
-    this->no_channels = iio_device_get_channels_count(channel_manager_dev);
-
-    //sigrok and sigrokdecode initialisation
-    context = sigrok::Context::create();
-    pv::DeviceManager device_manager(context);
-    pv::MainWindow* w = new pv::MainWindow(device_manager, filt, "pattern_generator", "",parent);
-    binary_format = w->get_format_from_string("binary");
-
-
-    /* setup PV plot view */
-    main_win = w;
-  //  ui->horizontalLayout->removeWidget(ui->centralWidget);
-    ui->centralWidgetLayout->insertWidget(0, static_cast<QWidget* >(main_win));
-
-    /* setup toolbar */
-    pv::toolbars::MainBar* main_bar = main_win->main_bar_;
-    QPushButton *btnDecoder = new QPushButton();
-    btnDecoder->setIcon(QIcon::fromTheme("add-decoder", QIcon(":/icons/add-decoder.svg")));
-    btnDecoder->setMenu(main_win->menu_decoder_add());
- /*   ui->gridLayout->addWidget(btnDecoder);
-    ui->gridLayout->addWidget(static_cast<QWidget *>(main_bar));*/
-
-    int i = 0;
-
     PatternFactory::init();
 
-  /*  for(auto var : PatternFactory::get_ui_list())
-    {
-        ui->scriptCombo->addItem(var);
-        ui->scriptCombo->setItemData(i, (PatternFactory::get_description_list())[i],Qt::ToolTipRole);
-        i++;
-    }*/
-
-   /* ui->sampleRateCombo->addItems(possibleSampleRates);
-    for(i=0;i<possibleSampleRates.length()-1;i++)
-        if(sample_rate <= possibleSampleRates[i].toInt() && sample_rate > possibleSampleRates[i+1].toInt())
-            break;
-    ui->sampleRateCombo->setCurrentIndex(i);
-    sampleRateValidator = new QIntValidator(1,80000000,this);
-    ui->sampleRateCombo->setValidator(sampleRateValidator);
-
-    ui->ChannelEnableMask->setText("0xffff");
-    ui->ChannelsToGenerate->setText("0x0001");
-    ui->numberOfSamples->setText("2048");
-
-
-    connect(ui->btnRunStop, SIGNAL(toggled(bool)), this, SLOT(startStop(bool)));
-    connect(runBtn, SIGNAL(toggled(bool)), ui->btnRunStop, SLOT(setChecked(bool)));
-    connect(ui->btnRunStop, SIGNAL(toggled(bool)), runBtn, SLOT(setChecked(bool)));
-
-    connect(ui->btnSingleRun, SIGNAL(pressed()), this, SLOT(singleRun()));
-    buffer = new short[1];*/
-
     pgSettings->setupUi(ui->pgSettings);
-
     connect(ui->btnChSettings, SIGNAL(pressed()), this, SLOT(toggleRightMenu()));
     connect(ui->btnPGSettings, SIGNAL(pressed()), this, SLOT(toggleRightMenu()));
-    ui->rightMenu->setMaximumWidth(0);
-    chmui = new PatternGeneratorChannelManagerUI(ui->channelManagerWidget,main_win,&chm,ui->cgSettings,this);
+
+    chmui = new PatternGeneratorChannelManagerUI(ui->channelManagerWidget,&chm,ui->cgSettings,this);
+    //connect(chmui,SIGNAL(requestGeneratePattern),this,SLOT(generatePattern));
+
     ui->channelManagerWidgetLayout->addWidget(chmui);
-    qDebug()<<chmui->parent();
     chmui->updateUi();
     chmui->setVisible(true);
+    ui->rightWidget->setCurrentIndex(1);
+
+    bufman = new PatternGeneratorBufferManager(&chm);
+    bufui = new PatternGeneratorBufferManagerUi(ui->centralWidget,bufman,ui->pgSettings,this);
+
+
+    //connect(pgSettings->generatePattern,SIGNAL(pressed()),bufui,SLOT(updateUi()));
+    connect(chmui,SIGNAL(channelsChanged()),bufui,SLOT(updateUi()));
+    /*
+        connect(ui->btnRunStop, SIGNAL(toggled(bool)), this, SLOT(startStop(bool)));
+        connect(runBtn, SIGNAL(toggled(bool)), ui->btnRunStop, SLOT(setChecked(bool)));
+        connect(ui->btnRunStop, SIGNAL(toggled(bool)), runBtn, SLOT(setChecked(bool)));
+        connect(ui->btnSingleRun, SIGNAL(pressed()), this, SLOT(singleRun()));
+*/
+    bufui->updateUi();
 }
+
+
 
 PatternGenerator::~PatternGenerator()
 {
@@ -166,9 +139,13 @@ PatternGenerator::~PatternGenerator()
         delete var;
     }
     delete ui;
-   // delete sampleRateValidator;
-    // Destroy libsigrokdecode
+    delete bufman;
     srd_exit();
+}
+
+void PatternGenerator::generatePattern()
+{
+    bufman->update();
 }
 
 void PatternGenerator::toggleRightMenu(QPushButton *btn)
@@ -230,10 +207,10 @@ void PatternGenerator::toggleRightMenu(QPushButton *btn)
 
     }*/
     static QPushButton *prevButton;
-    static bool prevMenuOpened = false;
-    static bool menuOpened = false;
+    static bool prevMenuOpened = true;
+    static bool menuOpened = true;
     static bool pgSettingsCheck = false;
-    static bool chSettingsCheck = false;
+    static bool chSettingsCheck = true;
 
 
     if(btn==ui->btnPGSettings)
@@ -451,13 +428,13 @@ void adiscope::PatternGenerator::on_sampleRateCombo_activated(const QString &arg
 
 void adiscope::PatternGenerator::on_generatePattern_clicked()
 {
-#if 0
+
     bool ok;
     channel_group = selected_channel_group->get_mask();
-    ui->ChannelsToGenerate->setText("0x"+QString().number(channel_group,16));
-    number_of_samples = ui->numberOfSamples->text().toLong();
-    last_sample = ui->lastSample->text().toLong();// number_of_samples;//-100;
-    start_sample = ui->startingSample->text().toLong();
+    pgSettings->ChannelsToGenerate->setText("0x"+QString().number(channel_group,16));
+    number_of_samples = pgSettings->numberOfSamples->text().toLong();
+    last_sample = pgSettings->lastSample->text().toLong();// number_of_samples;//-100;
+    start_sample = pgSettings->startingSample->text().toLong();
     if(buffersize != number_of_samples * 2 && buffer != nullptr){
         delete buffer;
         buffer=nullptr;
@@ -471,17 +448,17 @@ void adiscope::PatternGenerator::on_generatePattern_clicked()
 
     PatternUI *current;
     current = currentUI;// patterns[ui->scriptCombo->currentIndex()];
-
+#if 0
    if(current!=nullptr){
         //current->parse_ui();
-        current->get_pattern()->set_number_of_channels(get_nr_of_channels());
+        /*current->get_pattern()->set_number_of_channels(get_nr_of_channels());
         current->get_pattern()->set_number_of_samples(get_nr_of_samples());
         current->get_pattern()->set_sample_rate(sample_rate);
 
         qDebug()<<"pregenerate status: "<<current->get_pattern()->pre_generate();
         qDebug()<<"minimum sampling frequency"<<current->get_pattern()->get_min_sampling_freq(); // least common multiplier
         current->get_pattern()->set_sample_rate(current->get_pattern()->get_min_sampling_freq()); // TEMP
-        qDebug()<<"minimum number of samples"<<current->get_pattern()->get_required_nr_of_samples(); // if not periodic, verify minimum, else least common multiplier with least common freq
+        qDebug()<<"minimum number of samples"<<current->get_pattern()->get_required_nr_of_samples(sample_rate); // if not periodic, verify minimum, else least common multiplier with least common freq
         current->get_pattern()->set_sample_rate(sample_rate);
 
 
@@ -495,7 +472,6 @@ void adiscope::PatternGenerator::on_generatePattern_clicked()
         main_win->action_view_zoom_fit()->trigger();
     }
 #endif
-
 }
 
 uint32_t adiscope::PatternGenerator::get_nr_of_samples()
@@ -666,7 +642,7 @@ void adiscope::PatternGenerator::createRightPatternWidget(PatternUI* pattern_ui)
 void adiscope::PatternGenerator::onChannelEnabledChanged()
 {
     uint16_t mask = chm.get_enabled_mask();
- //   ui->ChannelEnableMask->setText("0x"+QString().number(mask,16));
+    pgSettings->ChannelEnableMask->setText("0x"+QString().number(mask,16));
 
 }
 
@@ -674,7 +650,7 @@ void adiscope::PatternGenerator::onChannelEnabledChanged()
 void adiscope::PatternGenerator::onChannelSelectedChanged()
 {
     uint16_t mask = chm.get_selected_mask();
-  //  ui->ChannelsToGenerate->setText("0x"+QString().number(mask,16));
+    pgSettings->ChannelsToGenerate->setText("0x"+QString().number(mask,16));
 
 }
 
