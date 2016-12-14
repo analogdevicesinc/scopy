@@ -495,22 +495,16 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 			setWidgetMinimumNrOfChars(lachannelgroupUI->ui->indexLabel, 5);
 			setWidgetMinimumNrOfChars(lachannelgroupUI->ui->comboBox, 5);
 			setWidgetMinimumNrOfChars(lachannelgroupUI->ui->comboBox_2, 5);
-			setWidgetMinimumNrOfChars(lachannelgroupUI->ui->decoderCombo, 5);
 
-
+			retainWidgetSizeWhenHidden(lachannelgroupUI->ui->collapseGroupBtn);
 			if (collapsed)
 			{
 				lachannelgroupUI->ui->leftWidget->setVisible(false);
 				lachannelgroupUI->ui->rightWidget->setVisible(false);
+				lachannelgroupUI->ui->stackedWidget->setCurrentIndex(0);
 
 			}
-			else
-			{
-				retainWidgetSizeWhenHidden(lachannelgroupUI->ui->collapseGroupBtn);
-//				retainWidgetSizeWhenHidden(lachannelgroupUI->ui->comboBox_2);
-			}
 
-			lachannelgroupUI->ui->comboBox_2->setVisible(false);
 			lachannelgroupUI->ui->btnEnableChannel->setChecked(ch->is_enabled());
 			lachannelgroupUI->enableControls(ch->is_enabled());
 
@@ -530,7 +524,7 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 					chg_ui.back()->get_id_pvItem());
 				trace->force_to_v_offset(offset);
 
-				setWidgetMinimumNrOfChars(lachannelgroupUI->ui->decoderCombo, 5);
+				setWidgetMinimumNrOfChars(lachannelgroupUI->ui->decoderCombo, 15);
 				lachannelgroupUI->ui->decoderCombo->addItem("None");
 				for(auto var : chm->get_name_decoder_list())
 				{
@@ -547,13 +541,15 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 					lachannelgroupUI->ui->decoderCombo->setCurrentIndex(0);
 				}
 
+				lachannelgroupUI->ui->comboBox->setVisible(false);
+
 
 				connect(lachannelgroupUI->ui->collapseGroupBtn, SIGNAL(clicked()),
 					lachannelgroupUI, SLOT(collapse_group()));
 				connect(lachannelgroupUI->ui->decoderCombo, SIGNAL(currentIndexChanged(const QString&)),
 					lachannelgroupUI, SLOT(decoderChanged(const QString&)));
 
-				lachannelgroupUI->ui->indexLabel->setVisible(false);
+				lachannelgroupUI->ui->stackedWidget->setCurrentIndex(1);
 
 				for (auto i=0; i<ch->get_channel_count(); i++) {	// create subwidgets
 					LogicAnalyzerChannelUI *lachannelUI =
@@ -568,30 +564,31 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 						ch->get_channel(i)->get_label());
 					lachannelUI->ui->groupName->setText(str);
 					setWidgetMinimumNrOfChars(lachannelUI->ui->groupName, 8);
+					setWidgetMinimumNrOfChars(lachannelUI->ui->indexLabel2, 5);
 					setWidgetMinimumNrOfChars(lachannelUI->ui->indexLabel, 5);
 					setWidgetMinimumNrOfChars(lachannelUI->ui->comboBox, 5);
-					setWidgetMinimumNrOfChars(lachannelUI->ui->comboBox_2, 5);
+					setWidgetMinimumNrOfChars(lachannelUI->ui->comboBox_2, 8);
 
+					retainWidgetSizeWhenHidden(lachannelUI->ui->collapseGroupBtn);
+					lachannelUI->ui->stackedWidget->setCurrentIndex(2);
 					if (collapsed)
 					{
 						lachannelUI->ui->leftWidget->setVisible(false);
 						lachannelUI->ui->rightWidget->setVisible(false);
+						lachannelUI->ui->stackedWidget->setCurrentIndex(0);
 					}
 					else
 					{
 						retainWidgetSizeWhenHidden(lachannelUI->ui->btnEnableChannel);
 						retainWidgetSizeWhenHidden(lachannelUI->ui->selectCheckBox);
-						retainWidgetSizeWhenHidden(lachannelUI->ui->collapseGroupBtn);
 						retainWidgetSizeWhenHidden(lachannelUI->ui->line);
 						retainWidgetSizeWhenHidden(lachannelUI->ui->line_2);
-						retainWidgetSizeWhenHidden(lachannelUI->ui->indexLabel);
 					}
 					lachannelUI->ui->line->setVisible(false);
 					lachannelUI->ui->line_2->setVisible(false);
 					lachannelUI->ui->btnEnableChannel->setVisible(false);
 					lachannelUI->ui->selectCheckBox->setVisible(false);
 					lachannelUI->ui->collapseGroupBtn->setVisible(false);
-					lachannelUI->ui->decoderCombo->setVisible(false);
 
 					lachannelgroupUI->ui->layoutChildren->insertWidget(i,lachannelUI);
 
@@ -603,6 +600,7 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 
 
 					str = QString().number(ch->get_channel(i)->get_id());
+					lachannelUI->ui->indexLabel2->setText(str);
 					lachannelUI->ui->indexLabel->setText(str);
 					auto index = ch->get_channel(i)->get_id();
 					auto trace = main_win->view_->get_clone_of(index);
@@ -621,7 +619,7 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 			}
 			else {
 				auto index = ch->get_channel(0)->get_id();
-
+				lachannelgroupUI->ui->stackedWidget->setCurrentIndex(0);
 				if(!collapsed)
 				{
 					retainWidgetSizeWhenHidden(lachannelgroupUI->ui->btnRemGroup);
