@@ -111,6 +111,14 @@ void DecoderStack::push(std::shared_ptr<decode::Decoder> decoder)
 	stack_.push_back(decoder);
 }
 
+void DecoderStack::push_front(const srd_decoder *decoder)
+{
+	assert(decoder);
+	const srd_decoder *const dec = decoder;
+	stack_.push_front(shared_ptr<decode::Decoder>(
+			new decode::Decoder(dec)));
+}
+
 void DecoderStack::remove(int index)
 {
 	assert(index >= 0);
@@ -155,6 +163,7 @@ std::vector<Row> DecoderStack::get_visible_rows() const
 		const srd_decoder *const decc = dec->decoder();
 		assert(dec->decoder());
 
+		std::cout << "NAME " <<  decc->name << std::endl;
 		// Add a row for the decoder if it doesn't have a row list
 		if (!decc->annotation_rows)
 			rows.push_back(Row(decc));

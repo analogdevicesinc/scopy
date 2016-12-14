@@ -1211,6 +1211,16 @@ uint16_t View::add_decoder()
 	return decode_trace->getIdentifier();
 }
 
+void View::set_decoder_to_group(uint16_t id, const srd_decoder* decoder)
+{
+	shared_ptr<DecodeTrace> d = dynamic_pointer_cast<DecodeTrace>(
+		get_trace_by_id(id));
+	if(d)
+	{
+		d->set_decoder(decoder);
+	}
+}
+
 void View::remove_trace_clones()
 {
 	session_.remove_signal_clones();

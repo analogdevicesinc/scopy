@@ -234,6 +234,10 @@ void LogicAnalyzerChannelGroupUI::decoderChanged(const QString text)
 			text.toStdString().c_str());
 	}
 	static_cast<LogicAnalyzerChannelGroup *>(chg)->setDecoder(decoder);
+	if(decoder)
+	{
+		chm_ui->set_pv_decoder(this, get_id_pvItem());
+	}
 	chm_ui->deleteSettingsWidget();
 	chm_ui->chm->highlightChannel(getChannelGroup());
 	chm_ui->createSettingsWidget();
@@ -533,8 +537,9 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 				if(lachannelgroupUI->getChannelGroup()->getDecoder())
 				{
 					QString name = QString::fromUtf8(lachannelgroupUI->getChannelGroup()->getDecoder()->name);
-					lachannelgroupUI->ui->decoderCombo->setCurrentIndex(
-						chm->get_name_decoder_list().indexOf(name)+1);
+					int decIndex =chm->get_name_decoder_list().indexOf(name)+1;
+					lachannelgroupUI->ui->decoderCombo->setCurrentIndex(decIndex);
+					set_pv_decoder(lachannelgroupUI, lachannelgroupUI->get_id_pvItem());
 				}
 				else
 				{
@@ -605,6 +610,7 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 					auto index = ch->get_channel(i)->get_id();
 					auto trace = main_win->view_->get_clone_of(index);
 					lachannelUI->set_id_pvItem(trace->getIdentifier());
+//					main_win->view_->add_channel_to_group
 
 					forceUpdate(lachannelUI);
 					offset+=lachannelUI->geometry().bottomRight().y();
@@ -783,7 +789,6 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 					reqChUI->roleCombo->addItem(QString::number(ch->get_id()));
 				}
 				currentSettingsWidget->layout()->addWidget(r);
-//				r->setVisible(true);
 			}
 			free(reqCh);
 		}
@@ -828,6 +833,11 @@ void LogicAnalyzerChannelManagerUI::set_label(QString text)
 		chm->getHighlightedChannel()->set_label(text.toStdString());
 	}
 	update_ui();
+}
+
+void LogicAnalyzerChannelManagerUI::set_pv_decoder(LogicAnalyzerChannelGroupUI* chGroup, uint16_t id)
+{
+	main_win->view_->set_decoder_to_group(id, chGroup->getChannelGroup()->getDecoder());
 }
 
 }

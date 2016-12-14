@@ -160,6 +160,7 @@ namespace adiscope {
 		LogicAnalyzerChannelUI* getUiFromCh(LogicAnalyzerChannel*);
 		void createSettingsWidget();
 		void deleteSettingsWidget();
+		void set_pv_decoder(LogicAnalyzerChannelGroupUI *channelgroup, uint16_t id);
 
 	public Q_SLOTS:
 		void update_position(int value);
