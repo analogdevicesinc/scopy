@@ -890,7 +890,7 @@ QPushButton:hover
                </spacer>
               </item>
               <item>
-               <widget class="QPushButton" name="extendChannelManager_PB">
+               <widget class="QPushButton" name="btnExtendChannelManager">
                 <property name="styleSheet">
                  <string notr="true">QPushButton{
   width: 40px;
@@ -1217,7 +1217,6 @@ QPushButton:hover
           </widget>
          </item>
         </layout>
-        <zorder>leftWidget</zorder>
         <zorder>leftWidget</zorder>
         <zorder>widget_2</zorder>
         <zorder>widget_3</zorder>

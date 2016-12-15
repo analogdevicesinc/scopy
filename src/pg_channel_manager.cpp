@@ -472,11 +472,11 @@ uint32_t PatternGeneratorChannelManager::computeSuggestedBufferSize(uint32_t sam
     {
         if(chg->is_enabled())
         {
-            auto patternBufferSize = static_cast<PatternGeneratorChannelGroup*>(chg)->pattern->get_required_nr_of_samples(sample_rate);
+            auto patternBufferSize = static_cast<PatternGeneratorChannelGroup*>(chg)->pattern->get_required_nr_of_samples(sample_rate, chg->get_channel_count());
             if(static_cast<PatternGeneratorChannelGroup*>(chg)->pattern->is_periodic())
             {
                 bufferSize = boost::math::lcm(patternBufferSize, bufferSize);
-                qDebug()<<static_cast<PatternGeneratorChannelGroup*>(chg)->pattern->get_required_nr_of_samples(sample_rate);
+                qDebug()<<static_cast<PatternGeneratorChannelGroup*>(chg)->pattern->get_required_nr_of_samples(sample_rate, chg->get_channel_count());
 
             }
             else

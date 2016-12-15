@@ -116,6 +116,9 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt, QPushB
 
 
     connect(chmui,SIGNAL(channelsChanged()),bufui,SLOT(updateUi()));
+   /* connect(ui->btnGroupWithSelected,SIGNAL(clicked()),this,SLOT(on_btnGroupWithSelected_clicked()));
+    connect(ui->btnHideInactive,SIGNAL(clicked()),this,SLOT(on_btnHideInactive_clicked()));
+    connect(ui->btnExtendChannelManager,SIGNAL(clicked()),this,SLOT(on_extendChannelManager_PB_clicked()));*/
     /*
         connect(ui->btnRunStop, SIGNAL(toggled(bool)), this, SLOT(startStop(bool)));
         connect(runBtn, SIGNAL(toggled(bool)), ui->btnRunStop, SLOT(setChecked(bool)));
@@ -348,5 +351,45 @@ void PatternGenerator::singleRunStop()
 void PatternGenerator::toggleRightMenu()
 {
     toggleRightMenu(static_cast<QPushButton *>(QObject::sender()));
+}
+
+void PatternGenerator::on_btnHideInactive_clicked()
+{
+    if(chmui->isDisabledShown())
+    {
+        chmui->hideDisabled();
+        ui->btnHideInactive->setText("Show All");
+    }
+    else
+    {
+        chmui->showDisabled();
+        ui->btnHideInactive->setText("Hide Inactive");
+
+    }
+    chmui->updateUi();
+}
+
+void PatternGenerator::on_btnGroupWithSelected_clicked()
+{
+    chmui->groupSplitSelected();
+    chmui->updateUi();
+}
+
+void PatternGenerator::on_btnExtendChannelManager_clicked()
+{
+    if(chmui->areDetailsShown())
+    {
+        chmui->hideDetails();
+        ui->btnGroupWithSelected->setVisible(false);
+        chmui->updateUi();
+      //  ui->channelManagerWidget->toggleMenu(true);
+    }
+    else
+    {
+        chmui->showDetails();
+        ui->btnGroupWithSelected->setVisible(true);
+        chmui->updateUi();
+      //  ui->channelManagerWidget->toggleMenu(true);
+    }
 }
 }

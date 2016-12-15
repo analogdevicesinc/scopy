@@ -28,9 +28,6 @@ namespace sigrok {
 class Context;
 }
 
-
-
-
 namespace adiscope
 {
 
@@ -44,12 +41,6 @@ class PatternGeneratorBufferManager
 
     uint32_t sampleRate;
     PatternGeneratorChannelManager *chm;
-
-  /*  std::shared_ptr<sigrok::Context> context;
-    std::shared_ptr<pv::devices::BinaryBuffer> pattern_generator_ptr;
-    std::shared_ptr<sigrok::InputFormat> binary_format;
-    std::map<std::string, Glib::VariantBase> options;
-    pv::MainWindow* main_win;*/
 
 public:
     PatternGeneratorBufferManager(PatternGeneratorChannelManager *chman);

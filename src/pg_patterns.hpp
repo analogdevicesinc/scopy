@@ -51,7 +51,7 @@ namespace adiscope {
 #define PulsePatternDescription "Pulse pattern generator"
 #define RandomPatternName "Random Pattern"
 #define RandomPatternDescription "Random pattern generator"
-#define BinaryCounterPatternName "Binary Counter Pattern"
+#define BinaryCounterPatternName "Binary Counter"
 #define BinaryCounterPatternDescription "Binary counter pattern generator"
 #define GrayCounterPatternName "Gray Counter Pattern"
 #define GrayCounterPatternDescription "Gray counter pattern generator"
@@ -98,7 +98,7 @@ public:
     virtual uint8_t pre_generate();
     virtual bool is_periodic();
     virtual uint32_t get_min_sampling_freq();
-    virtual uint32_t get_required_nr_of_samples(uint32_t sample_rate);
+    virtual uint32_t get_required_nr_of_samples(uint32_t sample_rate, uint32_t number_of_channels);
     virtual uint8_t generate_pattern(uint32_t sample_rate, uint32_t number_of_samples, uint16_t number_of_channels) = 0;
     virtual void deinit();
 
@@ -179,7 +179,7 @@ public:
     int get_phase() const;
     void set_phase(int value);
     uint32_t get_min_sampling_freq();
-    uint32_t get_required_nr_of_samples(uint32_t  sample_rate);
+    uint32_t get_required_nr_of_samples(uint32_t  sample_rate, uint32_t number_of_channels);
 
 };
 
@@ -210,10 +210,11 @@ public:
     RandomPattern();
     virtual ~RandomPattern();
     uint32_t get_min_sampling_freq();
-    uint32_t get_required_nr_of_samples(uint32_t sample_rate);
+    uint32_t get_required_nr_of_samples(uint32_t sample_rate, uint32_t number_of_channels);
+    uint8_t generate_pattern(uint32_t sample_rate, uint32_t number_of_samples, uint16_t number_of_channels);
+
     uint32_t get_frequency() const;
     void set_frequency(const uint32_t &value);
-    uint8_t generate_pattern(uint32_t sample_rate, uint32_t number_of_samples, uint16_t number_of_channels);
 
 };
 
@@ -234,7 +235,7 @@ Q_SIGNALS:
 public Q_SLOTS:
     void parse_ui();
 };
-#if 0
+
 
 class BinaryCounterPattern : virtual public Pattern
 {
@@ -246,11 +247,13 @@ protected:
     uint16_t init_value;
 public:
     BinaryCounterPattern();
-    virtual uint8_t generate_pattern();
-    uint32_t get_frequency() const;
-    void set_frequency(const uint32_t &value);
+    virtual ~BinaryCounterPattern();
+    virtual uint8_t generate_pattern(uint32_t sample_rate, uint32_t number_of_samples, uint16_t number_of_channels);
     uint32_t get_min_sampling_freq();
-    uint32_t get_required_nr_of_samples();
+    uint32_t get_required_nr_of_samples(uint32_t sample_rate, uint32_t number_of_channels);
+
+    uint32_t get_frequency() const;
+    void set_frequency(const uint32_t &value);    
     uint16_t get_start_value() const;
     void set_start_value(const uint16_t &value);
     uint16_t get_end_value() const;
@@ -260,9 +263,6 @@ public:
     uint16_t get_init_value() const;
     void set_init_value(const uint16_t &value);
 
-    std::string toString();
-    bool fromString(std::string from);
-
 };
 
 class BinaryCounterPatternUI : public PatternUI
@@ -270,15 +270,19 @@ class BinaryCounterPatternUI : public PatternUI
     Q_OBJECT
     Ui::BinaryCounterPatternUI *ui;
     QWidget *parent_;
+    BinaryCounterPattern* pattern;
 public:
     BinaryCounterPatternUI(BinaryCounterPattern *pattern, QWidget *parent = 0);
     ~BinaryCounterPatternUI();
-    BinaryCounterPattern* pattern;
-    void parse_ui();
+    Pattern* get_pattern();
     void build_ui(QWidget *parent = 0);
     void destroy_ui();
+Q_SIGNALS:
+    void generate_buffer();
+public Q_SLOTS:
+    void parse_ui();
 };
-
+#if 0
 
 class GrayCounterPattern : virtual public BinaryCounterPattern
 {
