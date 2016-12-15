@@ -220,7 +220,7 @@ ChannelGroup::ChannelGroup(Channel* ch)
 
 ChannelGroup::~ChannelGroup()
 {
-    qDebug()<<"ChannelGroup destroyed";
+    //qDebug()<<"ChannelGroup destroyed";
 }
 
 void ChannelGroup::set_label(std::string label)

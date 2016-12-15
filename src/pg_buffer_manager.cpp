@@ -116,7 +116,7 @@ void PatternGeneratorBufferManagerUi::updateUi()
 
 PatternGeneratorBufferManagerUi::~PatternGeneratorBufferManagerUi()
 {
-    qDebug()<<"PGBufman destroyed";
+//    qDebug()<<"PGBufman destroyed";
 }
 
 void PatternGeneratorBufferManagerUi::createBinaryBuffer()

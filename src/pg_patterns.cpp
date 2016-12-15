@@ -27,13 +27,13 @@ void JSConsole::log(QString msg)
 
 Pattern::Pattern()
 {
-    qDebug()<<"PatternCreated";
+   // qDebug()<<"PatternCreated";
     buffer = nullptr;
 }
 
 Pattern::~Pattern()
 {
-    qDebug()<<"PatternDestroyed";
+    //qDebug()<<"PatternDestroyed";
     delete_buffer();
 }
 
@@ -230,14 +230,14 @@ uint8_t ClockPattern::generate_pattern(uint32_t sample_rate, uint32_t number_of_
 
 ClockPatternUI::ClockPatternUI(ClockPattern *pattern, QWidget *parent) : PatternUI(parent), pattern(pattern)
 {
-    qDebug()<<"ClockPatternUI created";
+    //qDebug()<<"ClockPatternUI created";
     ui = new Ui::ClockPatternUI();
     ui->setupUi(this);
     setVisible(false);
 }
 
 ClockPatternUI::~ClockPatternUI(){
-    qDebug()<<"ClockPatternUI destroyed";
+    //qDebug()<<"ClockPatternUI destroyed";
 }
 
 Pattern* ClockPatternUI::get_pattern()
@@ -331,14 +331,14 @@ uint8_t RandomPattern::generate_pattern(uint32_t sample_rate, uint32_t number_of
 
 RandomPatternUI::RandomPatternUI(RandomPattern *pattern, QWidget *parent): pattern(pattern)
 {
-    qDebug()<<"RandomPatternUI created";
+    //qDebug()<<"RandomPatternUI created";
     ui = new Ui::FrequencyPatternUI();
     ui->setupUi(this);
     setVisible(false);
 }
 RandomPatternUI::~RandomPatternUI()
 {
-    qDebug()<<"NumberPatternUI destroyed";
+    //qDebug()<<"NumberPatternUI destroyed";
 }
 
 Pattern* RandomPatternUI::get_pattern()

@@ -82,7 +82,7 @@ void PatternGeneratorChannelUI::mousePressEvent(QMouseEvent*)
 
 PatternGeneratorChannelUI::~PatternGeneratorChannelUI(){
     delete ui;
-    qDebug()<<"currentChannelUI->ui destroyed";
+    //qDebug()<<"currentChannelUI->ui destroyed";
 }
 
 PatternGeneratorChannelManagerUI *PatternGeneratorChannelUI::getManagerUi() const
@@ -111,7 +111,7 @@ PatternGeneratorChannelGroup::PatternGeneratorChannelGroup(PatternGeneratorChann
 
 PatternGeneratorChannelGroup::~PatternGeneratorChannelGroup()
 {
-    qDebug()<<"pgchannelgroupdestroyed";
+    //qDebug()<<"pgchannelgroupdestroyed";
     if(pattern)
     {
             delete pattern;
@@ -636,7 +636,7 @@ void PatternGeneratorChannelManagerUI::updateUi()
         currentChannelGroupUI->ui->patternCombo->setCurrentIndex(static_cast<PatternGeneratorChannelGroup*>(ch)->created_index);
 
         connect(currentChannelGroupUI->ui->enableBox,SIGNAL(toggled(bool)),chg_ui.back(),SLOT(enable(bool)));
-        connect(static_cast<PatternGeneratorChannelGroupUI*>(chg_ui.back()),SIGNAL(channel_selected()),pg,SLOT(onChannelSelectedChanged())); // TEMP
+//        connect(static_cast<PatternGeneratorChannelGroupUI*>(chg_ui.back()),SIGNAL(channel_selected()),pg,SLOT(onChannelSelectedChanged())); // TEMP
         connect(static_cast<PatternGeneratorChannelGroupUI*>(chg_ui.back()),SIGNAL(channel_enabled()),this,SIGNAL(channelsChanged())); // TEMP
         connect(currentChannelGroupUI->ui->selectBox,SIGNAL(toggled(bool)),static_cast<PatternGeneratorChannelGroupUI*>(chg_ui.back()),SLOT(select(bool)));
         connect(currentChannelGroupUI->ui->patternCombo,SIGNAL(currentIndexChanged(int)),chg_ui.back(),SLOT(patternChanged(int)));

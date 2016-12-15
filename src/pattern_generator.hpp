@@ -61,40 +61,32 @@ public:
     explicit PatternGenerator(struct iio_context *ctx, Filter* filt, QPushButton *runButton, QWidget *parent = 0, bool offline_mode = 0);
     ~PatternGenerator();
 
-    uint32_t get_nr_of_samples();
-    uint32_t get_nr_of_channels();
-    uint32_t get_sample_rate();
-
-    //std::vector channel_groups;
-
-    short remap_buffer(uint8_t *mapping, uint32_t val);
-    void commitBuffer(short *bufferPtr);
 
 private Q_SLOTS:
 
     void generatePattern();
-    void onChannelEnabledChanged();
-    void onChannelSelectedChanged();
+//    void onChannelEnabledChanged();
+//    void onChannelSelectedChanged();
     void startStop(bool start);
     void singleRun();
     void singleRunStop();
     void toggleRightMenu();
-    void update_ui();
-    void on_sampleRateCombo_activated(const QString &arg1);
-    void on_generatePattern_clicked();
-    void on_clearButton_clicked();
-    void on_generateUI_clicked();
+//    void update_ui();
+//    void on_sampleRateCombo_activated(const QString &arg1);
+//    void on_generatePattern_clicked();
+//    void on_clearButton_clicked();
+//    void on_generateUI_clicked();
 
-    void on_save_PB_clicked();
-    void on_load_PB_clicked();
-    void createRightPatternWidget(PatternUI* patternui);
+//    void on_save_PB_clicked();
+  //  void on_load_PB_clicked();
+  //  void createRightPatternWidget(PatternUI* patternui);
 
-    void rightMenuFinished(bool opened);
-    void on_btnHideInactive_clicked();
+  //  void rightMenuFinished(bool opened);
+  //  void on_btnHideInactive_clicked();
 
-    void on_btnGroupWithSelected_clicked();
+  //  void on_btnGroupWithSelected_clicked();
 
-    void on_extendChannelManager_PB_clicked();
+  //  void on_extendChannelManager_PB_clicked();
 
 private:
 
