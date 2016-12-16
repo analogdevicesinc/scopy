@@ -5,8 +5,10 @@ namespace adiscope
 
 PatternGeneratorBufferManager::PatternGeneratorBufferManager(PatternGeneratorChannelManager *chman) : chm(chman)
 {
-    buffer = new short[1];
+    bufferSize = 1;
+    buffer = new short[bufferSize];
     sampleRate = 1;
+
 
 }
 PatternGeneratorBufferManager::~PatternGeneratorBufferManager()
@@ -104,6 +106,9 @@ PatternGeneratorBufferManagerUi::PatternGeneratorBufferManagerUi(QWidget *parent
     btnDecoder->setMenu(main_win->menu_decoder_add());
     settingsWidget->layout()->addWidget(btnDecoder);
     settingsWidget->layout()->addWidget(static_cast<QWidget *>(main_bar));
+
+    createBinaryBuffer();
+    dataChanged();
 }
 
 void PatternGeneratorBufferManagerUi::updateUi()
@@ -111,7 +116,7 @@ void PatternGeneratorBufferManagerUi::updateUi()
     bufman->update();
     createBinaryBuffer();
     dataChanged();
-    main_win->action_view_zoom_fit()->trigger();
+    //main_win->action_view_zoom_fit()->trigger();
 }
 
 PatternGeneratorBufferManagerUi::~PatternGeneratorBufferManagerUi()
@@ -126,6 +131,13 @@ void PatternGeneratorBufferManagerUi::createBinaryBuffer()
     std::shared_ptr<pv::devices::BinaryBuffer> patern_generator_ptr( new pv::devices::BinaryBuffer(context,bufman->buffer,&bufman->bufferSize,binary_format,options));
     main_win->select_device(patern_generator_ptr);
 
+}
+
+
+pv::MainWindow* PatternGeneratorBufferManagerUi::getPVWindow()
+
+{
+    return main_win;
 }
 
 void PatternGeneratorBufferManagerUi::dataChanged()

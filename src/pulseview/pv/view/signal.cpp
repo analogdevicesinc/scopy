@@ -69,7 +69,8 @@ Signal::Signal(pv::Session &session,
 	name_widget_(nullptr)
 {
 	assert(channel_);
-	if (getIdentifier() <= 32 && getIdentifier() != channel_->index())
+ //   if(session.signals().size() < 16 )
+    if (getIdentifier() <= 32 && getIdentifier() != channel_->index())
 		setIdentifier(channel_->index());
 }
 

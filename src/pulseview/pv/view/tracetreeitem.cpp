@@ -36,7 +36,7 @@ TraceTreeItem::TraceTreeItem() :
 	v_offset_animation_(this, "visual_v_offset"),
 	highlight_(false)
 {
-	identifier_ = createIdentifier();
+          identifier_ = createIdentifier();
 }
 
 int TraceTreeItem::createIdentifier()

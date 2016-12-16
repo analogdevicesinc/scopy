@@ -65,6 +65,21 @@ PatternGeneratorChannelUI::PatternGeneratorChannelUI(PatternGeneratorChannel* ch
     ui = new Ui::PGChannelGroup();
 }
 
+uint16_t PatternGeneratorChannelUI::get_id_pvItem()
+{
+    return id_pvItem;
+}
+
+void PatternGeneratorChannelUI::set_id_pvItem(uint16_t id)
+{
+    id_pvItem = id;
+}
+
+void PatternGeneratorChannelUI::setTrace(std::shared_ptr<pv::view::TraceTreeItem> item)
+{
+    trace = item;
+}
+
 void PatternGeneratorChannelUI::enableControls(bool val)
 {
     ui->DioLabel->setEnabled(val);
@@ -253,6 +268,21 @@ int PatternGeneratorChannelGroupUI::isChecked()
 void PatternGeneratorChannelGroupUI::check(int val)
 {
     checked = val;
+}
+
+uint16_t PatternGeneratorChannelGroupUI::get_id_pvItem()
+{
+    return id_pvItem;
+}
+
+void PatternGeneratorChannelGroupUI::set_id_pvItem(uint16_t id)
+{
+    id_pvItem = id;
+}
+
+void PatternGeneratorChannelGroupUI::setTrace(std::shared_ptr<pv::view::TraceTreeItem> item)
+{
+    trace = item;
 }
 
 
@@ -504,7 +534,7 @@ QWidget *PatternGeneratorChannelManagerUI::getSettingsWidget() const
 }
 
 
-PatternGeneratorChannelManagerUI::PatternGeneratorChannelManagerUI(QWidget *parent, PatternGeneratorChannelManager *chm, QWidget *settingsWidget, PatternGenerator* pg)  : QWidget(parent),  ui(new Ui::PGChannelManager), settingsWidget(settingsWidget)
+PatternGeneratorChannelManagerUI::PatternGeneratorChannelManagerUI(QWidget *parent, pv::MainWindow *main_win_, PatternGeneratorChannelManager *chm, QWidget *settingsWidget, PatternGenerator* pg)  : QWidget(parent),  ui(new Ui::PGChannelManager), settingsWidget(settingsWidget), main_win(main_win_)
 {
     ui->setupUi(this);
     this->chm = chm;
@@ -561,6 +591,8 @@ void PatternGeneratorChannelManagerUI::updateUi()
         delete channelManagerHeaderWiget;
         channelManagerHeaderWiget = nullptr;
     }
+
+    main_win->view_->remove_trace_clones();
 
     channelManagerHeaderWiget = new QWidget(ui->chmHeaderSlot);
     Ui::PGChannelManagerHeader *chmHeader = new Ui::PGChannelManagerHeader();
@@ -696,7 +728,13 @@ void PatternGeneratorChannelManagerUI::updateUi()
 
                     auto str = QString().fromStdString(ch->get_channel(i)->get_label());
                     currentChannelUI->ui->ChannelGroupLabel->setText(str);
-                    str = QString().number(ch->get_channel(i)->get_id());
+
+                    auto index = ch->get_channel(i)->get_id();
+                    auto trace = main_win->view_->get_clone_of(index);
+                    currentChannelUI->set_id_pvItem(trace->getIdentifier());
+                    currentChannelUI->setTrace(trace);
+
+                    str = QString().number(index);
                     currentChannelUI->ui->DioLabel->setText(str);
                     auto x = currentChannelGroupUI->ui->ChannelGroupLabel->geometry().x();
 
@@ -710,6 +748,11 @@ void PatternGeneratorChannelManagerUI::updateUi()
         else
         {
             auto index = ch->get_channel()->get_id();
+            auto trace = main_win->view_->get_clone_of(index);
+            currentChannelGroupUI->set_id_pvItem(trace->getIdentifier());
+            currentChannelGroupUI->setTrace(trace);
+
+
             currentChannelGroupUI->ui->DioLabel->setText(QString().number(ch->get_channel()->get_id()));
             currentChannelGroupUI->ui->splitBtn->setVisible(false);
             currentChannelGroupUI->ui->collapseBtn->setVisible(false);
@@ -857,11 +900,13 @@ void PatternGeneratorChannelManagerUI::showHighlight(bool val)
     if(uiCh!=nullptr)
     {
         setDynamicProperty(uiCh->ui->widget_2,"highlighted",val);
+        uiCh->trace->set_highlight(val);
         return;
     }
     if(uiChg!=nullptr)
     {
         setDynamicProperty(uiChg->ui->widget_2,"highlighted",val);
+        uiChg->trace->set_highlight(val);
     }
 
     if(val)

@@ -68,9 +68,11 @@ class PatternGeneratorBufferManagerUi : public QWidget
 
 public:
     PatternGeneratorBufferManagerUi(QWidget *parent, PatternGeneratorBufferManager *bufmananger, QWidget *settingsWidget, PatternGenerator* pg);
+
     ~PatternGeneratorBufferManagerUi();
     void createBinaryBuffer();
     void dataChanged();
+    pv::MainWindow* getPVWindow();
 
 public Q_SLOTS:
     void updateUi();

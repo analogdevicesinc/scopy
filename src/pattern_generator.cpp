@@ -104,15 +104,19 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt, QPushB
     pgSettings->setupUi(ui->pgSettings);
     connect(ui->btnChSettings, SIGNAL(pressed()), this, SLOT(toggleRightMenu()));
     connect(ui->btnPGSettings, SIGNAL(pressed()), this, SLOT(toggleRightMenu()));
+    bufman = new PatternGeneratorBufferManager(&chm);
 
-    chmui = new PatternGeneratorChannelManagerUI(ui->channelManagerWidget,&chm,ui->cgSettings,this);
+    bufui = new PatternGeneratorBufferManagerUi(ui->centralWidget,bufman,ui->pgSettings,this);
+    main_win = bufui->getPVWindow();
+    chmui = new PatternGeneratorChannelManagerUI(ui->channelManagerWidget, main_win, &chm,ui->cgSettings,this);
+
     ui->channelManagerWidgetLayout->addWidget(chmui);
     chmui->updateUi();
     chmui->setVisible(true);
     ui->rightWidget->setCurrentIndex(1);
 
-    bufman = new PatternGeneratorBufferManager(&chm);
-    bufui = new PatternGeneratorBufferManagerUi(ui->centralWidget,bufman,ui->pgSettings,this);
+
+
 
 
     connect(chmui,SIGNAL(channelsChanged()),bufui,SLOT(updateUi()));

@@ -358,7 +358,7 @@ void View::zoom_fit(bool gui_state)
 	if (w <= 0)
 		return;
 
-	const Timestamp scale = max(min(delta / w, MaxScale), MinScale);
+    const Timestamp scale = max(min(delta / DivisionCount, MaxScale), MinScale);
 	set_scale_offset(scale.convert_to<double>(), extents.first);
 }
 
@@ -1185,22 +1185,23 @@ shared_ptr<TraceTreeItem> View::get_trace_by_id(int id)
 		if( t->getIdentifier() == id)
 			return t;
 }
-
 shared_ptr<TraceTreeItem> View::get_clone_of(int id)
 {
-	shared_ptr<TraceTreeItem> trace = get_trace_by_id(id);
-	shared_ptr<LogicSignal> logic =
-		dynamic_pointer_cast<LogicSignal>(trace);
-	if (logic) {
-		shared_ptr<LogicSignal> clone =
-			std::make_shared<LogicSignal>(*(logic.get()));
-		clone->setInitial(false);
-		session_.add_signal(clone);
-		return clone;
-	}
-	return NULL;
-}
+//    shared_ptr<TraceTreeItem> trace = get_trace_by_id(id);
+//    shared_ptr<LogicSignal> logic =
+//        dynamic_pointer_cast<LogicSignal>(trace);
+//    if (logic) {
+//        shared_ptr<LogicSignal> clone =
+//            std::make_shared<LogicSignal>(*(logic.get()));
+//        clone->setInitial(false);
+////        session_.add_signal(clone);
+//        return clone;
+//    }
+//    return NULL;
 
+    shared_ptr<Signal> logicsig = session_.create_signal_from_id(id);
+    return logicsig;
+}
 uint16_t View::add_decoder()
 {
 	vector<shared_ptr<LogicSignal> > selected;

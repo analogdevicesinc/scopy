@@ -83,6 +83,12 @@ void LogicAnalyzerChannelUI::mousePressEvent(QMouseEvent *event)
 	chm_ui->showHighlight(true);
 }
 
+
+void LogicAnalyzerChannelUI::setTrace(std::shared_ptr<pv::view::TraceTreeItem> item)
+{
+    trace = item;
+}
+
 LogicAnalyzerChannel* LogicAnalyzerChannelUI::getChannel()
 {
     return static_cast<LogicAnalyzerChannel*>(this->lch);
@@ -175,6 +181,12 @@ uint16_t LogicAnalyzerChannelGroupUI::get_id_pvItem()
 void LogicAnalyzerChannelGroupUI::set_id_pvItem(uint16_t id)
 {
 	id_pvItem = id;
+}
+
+
+void LogicAnalyzerChannelGroupUI::setTrace(std::shared_ptr<pv::view::TraceTreeItem> item)
+{
+    trace = item;
 }
 
 void LogicAnalyzerChannelGroupUI::remove()
@@ -608,8 +620,9 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 					lachannelUI->ui->indexLabel2->setText(str);
 					lachannelUI->ui->indexLabel->setText(str);
 					auto index = ch->get_channel(i)->get_id();
-					auto trace = main_win->view_->get_clone_of(index);
+					auto trace = main_win->view_->get_clone_of(index);                    
 					lachannelUI->set_id_pvItem(trace->getIdentifier());
+                    lachannelgroupUI->setTrace(trace);
 //					main_win->view_->add_channel_to_group
 
 					forceUpdate(lachannelUI);
@@ -640,6 +653,7 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 				lachannelgroupUI->ui->decoderCombo->setVisible(false);
 				lachannelgroupUI->ui->indexLabel->setText(QString::number(index));
 				auto trace = main_win->view_->get_clone_of(index);
+                lachannelgroupUI->setTrace(trace);
 				if (trace) {
 					trace->force_to_v_offset(offset);
 					chg_ui.back()->set_id_pvItem(

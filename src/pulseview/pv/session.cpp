@@ -289,10 +289,7 @@ void Session::remove_decode_clones()
 void Session::remove_signal_clones()
 {
 	for (auto item = signals_.begin(); item != signals_.end(); )
-		if ( !(*item)->isInitial())
-			item = signals_.erase(item);
-		else
-			++item;
+        item = signals_.erase(item);
 	signals_changed();
 }
 
@@ -383,6 +380,32 @@ void Session::set_capture_state(capture_state state)
 	if (changed)
 		capture_state_changed(state);
 }
+
+shared_ptr<view::Signal> Session::create_signal_from_id(int index)
+{
+    const shared_ptr<sigrok::Device> sr_dev = device_->device();
+    if (!sr_dev) {
+        signals_.clear();
+        logic_data_.reset();
+        return nullptr;
+    }
+
+    shared_ptr<view::Signal> signal;
+    for (shared_ptr<sigrok::Channel> channel : sr_dev->channels()) {
+        if(channel->index() == index){
+            signal = shared_ptr<view::Signal>(
+                new view::LogicSignal(*this,
+                    device_, channel,
+                    logic_data_));
+            break;
+        }
+    }
+    assert(signal);
+    signals_.insert(signal);
+    signals_changed();
+    return signal;
+}
+
 
 void Session::update_signals()
 {

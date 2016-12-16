@@ -119,7 +119,9 @@ MainWindow::MainWindow(DeviceManager &device_manager,
 
     setup_ui();
 	if (open_file_name.empty())
-		select_init_device(filt->hw_name().toStdString().c_str());
+{	//	select_init_device(filt->hw_name().toStdString().c_str());
+
+    }
 	else
         if(open_file_name!="pattern_generator")
             load_init_file(open_file_name, open_file_format);

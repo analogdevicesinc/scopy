@@ -45,7 +45,7 @@ public:
 	/**
 	 * Constructor.
 	 */
-	TraceTreeItem();
+    TraceTreeItem();
 
 	/**
 	 * Gets the owner of this item in the view item hierachy.
@@ -140,7 +140,7 @@ protected:
 	bool bgcolour_state_;
 	int identifier_;
 
-	static std::atomic<int> seed;
+    static std::atomic<int> seed;
 	int createIdentifier();
 	bool highlight_;
 
