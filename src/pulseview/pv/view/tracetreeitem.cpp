@@ -33,7 +33,8 @@ TraceTreeItem::TraceTreeItem() :
 	owner_(nullptr),
 	layout_v_offset_(0),
 	visual_v_offset_(0),
-	v_offset_animation_(this, "visual_v_offset")
+	v_offset_animation_(this, "visual_v_offset"),
+	highlight_(false)
 {
 	identifier_ = createIdentifier();
 }
@@ -159,6 +160,12 @@ QPoint TraceTreeItem::point(const QRect &rect) const
 void TraceTreeItem::set_bgcolour_state(bool state)
 {
        bgcolour_state_ = state;
+}
+
+void TraceTreeItem::set_highlight(bool check)
+{
+	highlight_ = check;
+	owner_->row_item_appearance_changed(false, true);
 }
 
 } // namespace view

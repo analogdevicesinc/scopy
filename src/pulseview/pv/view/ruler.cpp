@@ -158,9 +158,9 @@ void Ruler::paintEvent(QPaintEvent*)
 	// Draw the tick marks
 	QPen pen = QPen(QColor(255, 255, 255, 30*256/100));
 	for (const auto& tick: tick_position_cache_->major) {
-		p.setPen(pen);
-		p.drawLine(QPointF(tick.first, 0),
-			QPointF(tick.first, major_tick_y1));
+//		p.setPen(pen);
+//		p.drawLine(QPointF(tick.first, 0),
+//			QPointF(tick.first, major_tick_y1));
 
 		p.setPen(palette().color(foregroundRole()));
 		p.drawText(tick.first, major_tick_y1 + ValueMargin, 0, text_height,

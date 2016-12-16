@@ -129,6 +129,8 @@ public:
 
 	void setIdentifier(int id);
 
+	void set_highlight(bool check);
+
 protected:
 	TraceTreeItemOwner *owner_;
 
@@ -140,6 +142,7 @@ protected:
 
 	static std::atomic<int> seed;
 	int createIdentifier();
+	bool highlight_;
 
 private:
 	QPropertyAnimation v_offset_animation_;

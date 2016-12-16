@@ -722,10 +722,12 @@ void LogicAnalyzerChannelManagerUI::showHighlight(bool check)
 	if(chGroupUi != nullptr)
 	{
 		setDynamicProperty(chGroupUi->ui->baseWidget, "highlight", check);
+		main_win->view_->get_trace_by_id(chGroupUi->get_id_pvItem())->set_highlight(check);
 	}
 	if(chUi != nullptr)
 	{
 		setDynamicProperty(chUi->ui->baseWidget, "highlight", check);
+		main_win->view_->get_trace_by_id(chUi->get_id_pvItem())->set_highlight(check);
 	}
 	deleteSettingsWidget();
 	createSettingsWidget();

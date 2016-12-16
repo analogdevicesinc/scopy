@@ -102,7 +102,7 @@ LogicSignal::LogicSignal(
 	shared_ptr<Channel> channel,
 	shared_ptr<data::Logic> data) :
 	Signal(session, channel),
-	signal_height_(QFontMetrics(QApplication::font()).height() * 2),
+	signal_height_(QFontMetrics(QApplication::font()).height() * 1.5),
 	device_(device),
 	data_(data),
 	trigger_none_(nullptr),
@@ -243,6 +243,13 @@ void LogicSignal::paint_mid(QPainter &p, const ViewItemPaintParams &pp)
 	p.setPen(LowColour);
 	paint_caps(p, cap_lines, edges, false, samples_per_pixel,
         pixels_offset, pp.left(), low_offset);
+
+
+//	const int signal_margin =
+//		QFontMetrics(QApplication::font()).height() / 2;
+//	p.setPen(QPen(QColor(255, 255, 255, 30*256/100)));
+//	paint_axis(p, pp, low_offset + signal_margin);
+//	paint_axis(p, pp, high_offset - signal_margin);
 
 	delete[] cap_lines;
 }
