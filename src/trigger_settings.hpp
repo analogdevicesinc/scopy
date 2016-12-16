@@ -60,12 +60,11 @@ namespace adiscope {
 		double levelB_value();
 		bool levelA_enabled();
 		bool levelB_enabled();
-		void setPlotNumSamples(int);
 		bool triggerIsArmed() const;
 		enum TriggerMode triggerMode() const;
+		long long triggerDelay() const;
 
 	Q_SIGNALS:
-		void delayChanged(double);
 		void levelAChanged(double);
 		void levelBChanged(double);
 		void triggerAenabled(bool);
@@ -73,7 +72,7 @@ namespace adiscope {
 		void triggerModeChanged(int);
 
 	public Q_SLOTS:
-		void setDelay(double);
+		void setTriggerDelay(long long);
 		void setTriggerLevelA(double);
 		void setTriggerLevelB(double);
 
@@ -84,7 +83,6 @@ namespace adiscope {
 		void on_cmb_trigg_source_currentIndexChanged(int);
 		void on_cmb_trigg_A_currentIndexChanged(int);
 		void on_cmb_trigg_B_currentIndexChanged(int);
-		void onSpinboxTriggerDelayChanged(double);
 		void onSpinboxTriggerAlevelChanged(double);
 		void onSpinboxTriggerBlevelChanged(double);
 		void onSpinboxTriggerAhystChanged(double);
@@ -109,13 +107,12 @@ namespace adiscope {
 		void ui_reconf_on_triggerA_extern_changed(bool);
 		void ui_reconf_on_triggerB_extern_changed(bool);
 
-		void trigg_delay_write_hardware(double value);
+		void trigg_delay_write_hardware(int raw_delay);
 		void triggA_level_write_hardware(double value);
 		void triggB_level_write_hardware(double value);
 
 	private:
 		Ui::TriggerSettings *ui;
-		PositionSpinButton *ui_triggerDelay;
 		PositionSpinButton *ui_triggerAlevel;
 		PositionSpinButton *ui_triggerBlevel;
 		PositionSpinButton *ui_triggerAHyst;
@@ -141,10 +138,9 @@ namespace adiscope {
 		bool temporarily_disabled;
 		bool trigger_auto_mode;
 
+		long long trigger_raw_delay;
 		double hystA_last_val;
 		double hystB_last_val;
-
-		double plot_num_samples;
 	};
 
 }
