@@ -76,7 +76,7 @@
      <property name="styleSheet">
       <string notr="true">QWidget[highlighted=true]
 {
-background: black;
+background: #1b1b21;
 }
 
 QWidget 
@@ -85,7 +85,8 @@ background: transparent;
 }
 QListView
 {
-background:black;
+background: #272730;
+border-color:transparent;
 }
 
 QWidget#widget_2:hover
@@ -254,7 +255,7 @@ QPushButton:!checked {
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>50</width>
+                <width>40</width>
                 <height>20</height>
                </size>
               </property>
@@ -281,6 +282,22 @@ QPushButton:!checked {
             <property name="bottomMargin">
              <number>0</number>
             </property>
+            <item>
+             <spacer name="horizontalSpacer_3">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Preferred</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>10</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
             <item>
              <widget class="QPushButton" name="collapseBtn">
               <property name="sizePolicy">
@@ -650,7 +667,7 @@ background-color: rgb(39, 39, 48);;
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>15</width>
+                <width>20</width>
                 <height>20</height>
                </size>
               </property>

@@ -53,6 +53,7 @@ public:
     PatternGeneratorChannelManagerUI *getManagerUi() const;
     PatternGeneratorChannel* getChannel();
     PatternGeneratorChannelGroup* getChannelGroup();
+    void enableControls(bool val);
 private Q_SLOTS:
     void split();
     void mousePressEvent(QMouseEvent*) override;
@@ -65,7 +66,7 @@ class PatternGeneratorChannelGroup : public ChannelGroup
 
     bool collapsed;    
 public:
-    PatternGeneratorChannelGroup(PatternGeneratorChannel* ch);
+    PatternGeneratorChannelGroup(PatternGeneratorChannel* ch, bool en);
     ~PatternGeneratorChannelGroup();
     int created_index;
     Pattern *pattern;
@@ -124,6 +125,14 @@ public:
     void join(std::vector<int> index);
     void split(int index);
     void splitChannel(int chgIndex, int chIndex);
+    void preGenerate();
+    void generatePatterns(short *mainbuffer, uint32_t sampleRate, uint32_t bufferSize);
+    void commitBuffer(PatternGeneratorChannelGroup *chg, short *mainBuffer, uint32_t bufferSize);
+    short remap_buffer(uint8_t *mapping, uint32_t val);
+
+    uint32_t computeSuggestedSampleRate();
+    uint32_t computeSuggestedBufferSize(uint32_t sample_rate);
+
 };
 
 
@@ -140,10 +149,9 @@ class PatternGeneratorChannelManagerUI : public QWidget
 
 public:
 
-    pv::MainWindow* main_win;
     std::vector<PatternGeneratorChannelGroupUI*> chg_ui;
 
-    PatternGeneratorChannelManagerUI(QWidget *parent, pv::MainWindow* main_win_, PatternGeneratorChannelManager* chm, QWidget *settingsWidget,PatternGenerator* pg);
+    PatternGeneratorChannelManagerUI(QWidget *parent, PatternGeneratorChannelManager* chm, QWidget *settingsWidget,PatternGenerator* pg);
     ~PatternGeneratorChannelManagerUI();
 
     PatternGeneratorChannelGroupUI *findUiByChannelGroup(PatternGeneratorChannelGroup* toFind);
@@ -171,6 +179,10 @@ public:
     void groupSplitSelected();
     PatternGeneratorChannelGroup *getSelectedChannelGroup() const;
     void setSelectedChannelGroup(PatternGeneratorChannelGroup *value);
+
+Q_SIGNALS:
+    void channelsChanged();
+
 
 private Q_SLOTS:
 

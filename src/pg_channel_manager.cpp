@@ -4,6 +4,7 @@
 #include "pg_channel_manager.hpp"
 #include "pattern_generator.hpp"
 #include "dynamicWidget.hpp"
+#include "boost/math/common_factor.hpp"
 
 #include "ui_pg_channel_group.h"
 #include "ui_pg_channel_manager.h"
@@ -64,6 +65,12 @@ PatternGeneratorChannelUI::PatternGeneratorChannelUI(PatternGeneratorChannel* ch
     ui = new Ui::PGChannelGroup();
 }
 
+void PatternGeneratorChannelUI::enableControls(bool val)
+{
+    ui->DioLabel->setEnabled(val);
+    ui->ChannelGroupLabel->setEnabled(val);
+}
+
 
 void PatternGeneratorChannelUI::mousePressEvent(QMouseEvent*)
 {
@@ -75,7 +82,7 @@ void PatternGeneratorChannelUI::mousePressEvent(QMouseEvent*)
 
 PatternGeneratorChannelUI::~PatternGeneratorChannelUI(){
     delete ui;
-    qDebug()<<"currentChannelUI->ui destroyed";
+    //qDebug()<<"currentChannelUI->ui destroyed";
 }
 
 PatternGeneratorChannelManagerUI *PatternGeneratorChannelUI::getManagerUi() const
@@ -94,16 +101,17 @@ PatternGeneratorChannelGroup* PatternGeneratorChannelUI::getChannelGroup()
 }
 
 /////////////////////// CHANNEL GROUP
-PatternGeneratorChannelGroup::PatternGeneratorChannelGroup(PatternGeneratorChannel* ch) : ChannelGroup(ch)
+PatternGeneratorChannelGroup::PatternGeneratorChannelGroup(PatternGeneratorChannel* ch, bool en) : ChannelGroup(ch)
 {
     created_index = 0;
     collapsed = false;
+    enabled = false;
     pattern=PatternFactory::create(0);
 }
 
 PatternGeneratorChannelGroup::~PatternGeneratorChannelGroup()
 {
-    qDebug()<<"pgchannelgroupdestroyed";
+    //qDebug()<<"pgchannelgroupdestroyed";
     if(pattern)
     {
             delete pattern;
@@ -223,9 +231,11 @@ void PatternGeneratorChannelGroupUI::enableControls(bool enabled)
 {
     ui->ChannelGroupLabel->setEnabled(enabled);
     ui->DioLabel->setEnabled(enabled);
-    ui->patternCombo->setEnabled(enabled);
-    ui->outputCombo->setEnabled(enabled);
-    ui->subChannelWidget->setEnabled(enabled);
+
+    for(auto &&ch : ch_ui)
+    {
+        ch->enableControls(enabled);
+    }
 }
 
 void PatternGeneratorChannelGroupUI::enable(bool enabled)
@@ -264,7 +274,7 @@ PatternGeneratorChannelManager::PatternGeneratorChannelManager() : ChannelManage
     auto temp = static_cast<PatternGeneratorChannel*>(channel.back());
     for(auto&& ch : channel)
     {
-        channel_group.push_back(new PatternGeneratorChannelGroup(static_cast<PatternGeneratorChannel*>(ch)));
+        channel_group.push_back(new PatternGeneratorChannelGroup(static_cast<PatternGeneratorChannel*>(ch), false));
     }
     highlightedChannel = nullptr;
     highlightedChannelGroup = static_cast<PatternGeneratorChannelGroup*>(channel_group[0]);
@@ -303,15 +313,18 @@ void PatternGeneratorChannelManager::join(std::vector<int> index)
     }
     channel_group[index[0]]->group(true);
     channel_group[index[0]]->set_label("Group name");
+
+    qDebug()<<"Final sample rate "<<computeSuggestedSampleRate();
 }
 
 void PatternGeneratorChannelManager::split(int index)
 {
     auto it = std::next(channel_group.begin(), index);
+    bool chgState = (*it)->is_enabled();
     it++;
     for(auto&& subch : *(channel_group[index]->get_channels()))
     {
-        channel_group.insert(it,new PatternGeneratorChannelGroup(static_cast<PatternGeneratorChannel*>(subch)));
+        channel_group.insert(it,new PatternGeneratorChannelGroup(static_cast<PatternGeneratorChannel*>(subch), chgState));
         it++;
     }
     it = std::next(channel_group.begin(), index);
@@ -326,7 +339,8 @@ void PatternGeneratorChannelManager::splitChannel(int chgIndex, int chIndex)
     // auto it = channel_group.begin()+chgIndex; // Use this to insert split channel before channelgroup
     auto subch = channel_group[chgIndex]->get_channel(chIndex);
     auto chIt = channel_group[chgIndex]->get_channels()->begin()+chIndex;
-    channel_group.insert(it, new PatternGeneratorChannelGroup(static_cast<PatternGeneratorChannel*>(subch)));
+    bool chgState = (*it)->is_enabled();
+    channel_group.insert(it, new PatternGeneratorChannelGroup(static_cast<PatternGeneratorChannel*>(subch), chgState));
 
     auto newChgIndex = chgIndex; // Use this to insert split channel after channelgroup
     // auto newChgIndex = chgIndex; // Use this to insert split channel before channelgroup
@@ -358,6 +372,131 @@ PatternGeneratorChannel* PatternGeneratorChannelManager::getHighlightedChannel()
 }
 
 
+void PatternGeneratorChannelManager::preGenerate()
+{
+    for(auto&& chg : channel_group)
+    {
+        static_cast<PatternGeneratorChannelGroup*>(chg)->pattern->pre_generate();
+    }
+}
+
+void PatternGeneratorChannelManager::generatePatterns(short *mainBuffer, uint32_t sampleRate, uint32_t bufferSize)
+{
+    for(auto&& chg : channel_group)
+    {
+        PatternGeneratorChannelGroup *pgchg = static_cast<PatternGeneratorChannelGroup*>(chg);
+        if(pgchg->is_enabled())
+        {
+            pgchg->pattern->generate_pattern(sampleRate,bufferSize,pgchg->get_channel_count());
+            commitBuffer(pgchg, mainBuffer, bufferSize);
+            pgchg->pattern->delete_buffer();
+        }
+    }
+}
+
+
+
+short PatternGeneratorChannelManager::remap_buffer(uint8_t *mapping, uint32_t val)
+{
+    short ret=0;
+    int i=0;
+    while(val)
+    {
+        if(val&0x01)
+        {
+            ret = ret | (1<<mapping[i]);
+        }
+        i++;
+        val>>=1;
+    }
+    return ret;
+}
+
+void PatternGeneratorChannelManager::commitBuffer(PatternGeneratorChannelGroup *chg, short *buffer, uint32_t bufferSize)
+{
+    uint8_t channel_mapping[16];
+    memset(channel_mapping,0x00,16*sizeof(uint8_t));
+    short *bufferPtr = chg->pattern->get_buffer();
+    int i=0,j=0;
+    auto channel_enable_mask_temp = chg->get_mask();
+    auto buffer_channel_mask = (1<<chg->get_channel_count())-1;
+    while(channel_enable_mask_temp)
+    {
+        if(channel_enable_mask_temp & 0x01) {
+            channel_mapping[j] = i;
+            j++;
+        }
+        channel_enable_mask_temp>>=1;
+        i++;
+    }
+
+    for(auto i=0;i< bufferSize;i++)
+    {
+        auto val = (bufferPtr[i] & buffer_channel_mask);
+        buffer[i] = (buffer[i] & ~(chg->get_mask())) | remap_buffer(channel_mapping, val);
+    }
+}
+
+
+uint32_t PatternGeneratorChannelManager::computeSuggestedSampleRate()
+{
+    qDebug()<<"suggested sampleRates:";
+    //uint32_t sampleRate = 1;
+    uint32_t sampleDivider=0;
+    for(auto &&chg : channel_group)
+    {
+        if(chg->is_enabled())
+        {
+            auto patternSamplingFrequency = static_cast<PatternGeneratorChannelGroup*>(chg)->pattern->get_min_sampling_freq();
+            uint32_t val = 80000000 / patternSamplingFrequency;
+
+            //sampleRate = boost::math::lcm(patternSamplingFrequency, sampleRate);
+            sampleDivider = boost::math::gcd(sampleDivider,val);
+//            qDebug()<<static_cast<PatternGeneratorChannelGroup*>(chg)->pattern->get_min_sampling_freq();
+            qDebug()<<80000000.0/val;
+
+        }
+    }
+    qDebug()<<"final samplerate: "<<80000000.0/sampleDivider;
+    if(!sampleDivider)
+        sampleDivider = 1;
+    return 80000000/sampleDivider;
+}
+
+uint32_t PatternGeneratorChannelManager::computeSuggestedBufferSize(uint32_t sample_rate)
+{
+    uint32_t bufferSize = 1;
+    uint32_t maxNonPeriodic = 1;
+    qDebug()<<"suggested buffersizes";
+    for(auto &&chg : channel_group)
+    {
+        if(chg->is_enabled())
+        {
+            auto patternBufferSize = static_cast<PatternGeneratorChannelGroup*>(chg)->pattern->get_required_nr_of_samples(sample_rate, chg->get_channel_count());
+            if(static_cast<PatternGeneratorChannelGroup*>(chg)->pattern->is_periodic())
+            {
+                bufferSize = boost::math::lcm(patternBufferSize, bufferSize);
+                qDebug()<<static_cast<PatternGeneratorChannelGroup*>(chg)->pattern->get_required_nr_of_samples(sample_rate, chg->get_channel_count());
+
+            }
+            else
+            {
+                if(maxNonPeriodic<patternBufferSize)
+                    maxNonPeriodic = patternBufferSize; // get maximum nonperiodic buffer
+            }
+        }
+    }
+
+    // if buffersize not big enough, create a buffer that is big enough and will fit maximum nonperiodic pattern
+    // TBD if correct
+    if(maxNonPeriodic > bufferSize)
+    {
+        bufferSize = boost::math::lcm(maxNonPeriodic, bufferSize);
+    }
+    qDebug()<<"final buffersize"<<bufferSize;
+    return bufferSize;
+}
+
 ////////////////////////////////////// CHANNEL MANAGER UI
 QWidget *PatternGeneratorChannelManagerUI::getSettingsWidget() const
 {
@@ -365,10 +504,9 @@ QWidget *PatternGeneratorChannelManagerUI::getSettingsWidget() const
 }
 
 
-PatternGeneratorChannelManagerUI::PatternGeneratorChannelManagerUI(QWidget *parent, pv::MainWindow *main_win_, PatternGeneratorChannelManager *chm, QWidget *settingsWidget, PatternGenerator* pg)  : QWidget(parent),  ui(new Ui::PGChannelManager), settingsWidget(settingsWidget)
+PatternGeneratorChannelManagerUI::PatternGeneratorChannelManagerUI(QWidget *parent, PatternGeneratorChannelManager *chm, QWidget *settingsWidget, PatternGenerator* pg)  : QWidget(parent),  ui(new Ui::PGChannelManager), settingsWidget(settingsWidget)
 {
     ui->setupUi(this);
-    main_win = main_win_;
     this->chm = chm;
     this->pg = pg;
     currentUI = nullptr;
@@ -497,17 +635,14 @@ void PatternGeneratorChannelManagerUI::updateUi()
 
         currentChannelGroupUI->ui->patternCombo->setCurrentIndex(static_cast<PatternGeneratorChannelGroup*>(ch)->created_index);
 
-        currentChannelGroupUI->ui->enableBox->setChecked(ch->is_enabled());
-        currentChannelGroupUI->enableControls(ch->is_enabled());
-
         connect(currentChannelGroupUI->ui->enableBox,SIGNAL(toggled(bool)),chg_ui.back(),SLOT(enable(bool)));
-        connect(static_cast<PatternGeneratorChannelGroupUI*>(chg_ui.back()),SIGNAL(channel_selected()),pg,SLOT(onChannelSelectedChanged())); // TEMP
-        connect(static_cast<PatternGeneratorChannelGroupUI*>(chg_ui.back()),SIGNAL(channel_enabled()),pg,SLOT(onChannelEnabledChanged())); // TEMP
+//        connect(static_cast<PatternGeneratorChannelGroupUI*>(chg_ui.back()),SIGNAL(channel_selected()),pg,SLOT(onChannelSelectedChanged())); // TEMP
+        connect(static_cast<PatternGeneratorChannelGroupUI*>(chg_ui.back()),SIGNAL(channel_enabled()),this,SIGNAL(channelsChanged())); // TEMP
         connect(currentChannelGroupUI->ui->selectBox,SIGNAL(toggled(bool)),static_cast<PatternGeneratorChannelGroupUI*>(chg_ui.back()),SLOT(select(bool)));
         connect(currentChannelGroupUI->ui->patternCombo,SIGNAL(currentIndexChanged(int)),chg_ui.back(),SLOT(patternChanged(int)));
+        connect(currentChannelGroupUI->ui->patternCombo,SIGNAL(currentIndexChanged(int)),this,SIGNAL(channelsChanged())); // TEMP
+        //connect(currentChannelGroupUI->getChannelGroup()->pattern, SIGNAL(generate_pattern),pg,SLOT())
 
-
-        //chg_ui.back()->setStyleSheet("QWidget\n{\nborder-top:1px solid red;\nborder-bottom:1px solid red;\n }\n");
 
         offset+=(chg_ui.back()->geometry().bottomRight().y()-10);
         if(ch->is_grouped()) // create subwidgets
@@ -582,10 +717,16 @@ void PatternGeneratorChannelManagerUI::updateUi()
             currentChannelGroupUI->ui->line_2->setVisible(false);
 
         }
+
+        // only enable channelgroup controls after all channelgroup subchannels have been created
+        currentChannelGroupUI->ui->enableBox->setChecked(ch->is_enabled());
+        currentChannelGroupUI->enableControls(ch->is_enabled());
     }
+
     if(highlightShown)
         showHighlight(true);
 
+    Q_EMIT channelsChanged();
 }
 
 void PatternGeneratorChannelManagerUI::deleteSettingsWidget()
@@ -604,9 +745,10 @@ void PatternGeneratorChannelManagerUI::createSettingsWidget()
 {    
     currentUI = PatternFactory::create_ui(chm->getHighlightedChannelGroup()->pattern,chm->getHighlightedChannelGroup()->created_index);
     currentUI->build_ui(settingsWidget);
-    currentUI->get_pattern()->init();
+    currentUI->get_pattern()->init();    
     currentUI->post_load_ui();
     currentUI->setVisible(true);
+    connect(currentUI,SIGNAL(patternChanged()),this,SIGNAL(channelsChanged()));
 }
 
 
@@ -704,6 +846,8 @@ void PatternGeneratorChannelManagerUI::groupSplitSelected()
 
     if(changeHighlight)
         chm->highlightChannel(chm->get_channel_group(selection[0]));
+
+    Q_EMIT channelsChanged();
 }
 
 void PatternGeneratorChannelManagerUI::showHighlight(bool val)
@@ -724,6 +868,7 @@ void PatternGeneratorChannelManagerUI::showHighlight(bool val)
     {
         deleteSettingsWidget();
         createSettingsWidget();
+        highlightShown = true;
     }
     else
     {
