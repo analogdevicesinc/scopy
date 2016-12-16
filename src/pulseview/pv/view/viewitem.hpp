@@ -161,6 +161,10 @@ public:
 
 	virtual void delete_pressed();
 
+	bool isInitial();
+
+	void setInitial(bool);
+
 protected:
 	static QPen highlight_pen();
 
@@ -170,6 +174,7 @@ protected:
 
 private:
 	bool selected_;
+	bool initial_;
 };
 
 } // namespace view

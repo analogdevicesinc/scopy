@@ -69,9 +69,13 @@ public:
 		std::shared_ptr<sigrok::Channel> channel,
 		std::shared_ptr<pv::data::Logic> data);
 
+	LogicSignal(LogicSignal& obj);
+
 	virtual ~LogicSignal() = default;
 
 	std::shared_ptr<pv::data::SignalData> data() const;
+
+	std::shared_ptr<devices::Device> device() const;
 
 	std::shared_ptr<pv::data::Logic> logic_data() const;
 

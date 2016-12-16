@@ -94,6 +94,8 @@ pair<int, int> TraceTreeItemOwner::v_extents() const
 		assert(t);
 		if (!t->enabled())
 			continue;
+		if(t->isInitial())
+			continue;
 
 		has_children = true;
 

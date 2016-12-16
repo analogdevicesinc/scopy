@@ -83,7 +83,7 @@ const QColor DecodeTrace::DecodeColours[4] = {
 };
 
 const QColor DecodeTrace::ErrorBgColour = QColor(0xEF, 0x29, 0x29);
-const QColor DecodeTrace::NoDecodeColour = QColor(0x88, 0x8A, 0x85);
+const QColor DecodeTrace::NoDecodeColour = QColor(0xEF, 0x29, 0x29);// QColor(0x88, 0x8A, 0x85);
 
 const int DecodeTrace::ArrowSize = 4;
 const double DecodeTrace::EndCapWidth = 5;
@@ -130,8 +130,7 @@ const QColor DecodeTrace::OutlineColours[16] = {
 
 DecodeTrace::DecodeTrace(pv::Session &session,
 	std::shared_ptr<pv::data::DecoderStack> decoder_stack, int index) :
-	Trace(QString::fromUtf8(
-		decoder_stack->stack().front()->decoder()->name)),
+	Trace(decoder_stack->name()),
 	session_(session),
 	decoder_stack_(decoder_stack),
 	row_height_(0),
@@ -158,6 +157,13 @@ DecodeTrace::DecodeTrace(pv::Session &session,
 bool DecodeTrace::enabled() const
 {
 	return true;
+}
+
+void DecodeTrace::set_decoder(const srd_decoder* decoder)
+{
+	if(decoder_stack_->stack().size() != 0)
+		decoder_stack_->remove(0);
+	decoder_stack_->push_front(decoder);
 }
 
 const std::shared_ptr<pv::data::DecoderStack>& DecodeTrace::decoder() const

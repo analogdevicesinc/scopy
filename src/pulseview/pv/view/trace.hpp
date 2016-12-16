@@ -51,6 +51,7 @@ private:
 
 	static const int ColourBGAlpha;
 	static const QColor BGColour;
+	static const QColor HighlightBGColour;
 
 protected:
 	Trace(QString name);
@@ -99,6 +100,7 @@ public:
 	 * @return Returns the rectangle of the signal label.
 	 */
 	QRectF label_rect(const QRectF &rect) const;
+
 
 protected:
 	/**

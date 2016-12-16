@@ -43,6 +43,7 @@ const int Trace::LabelHitPadding = 2;
 
 const int Trace::ColourBGAlpha = 8*256/100;
 const QColor Trace::BGColour = QColor(39, 39, 48, 0);
+const QColor Trace::HighlightBGColour = QColor(0x16, 0x19, 0x1A);//QColor(0xCC, 0x00, 0x00);
 
 Trace::Trace(QString name) :
 	name_(name),
@@ -87,6 +88,9 @@ void Trace::paint_label(QPainter &p, const QRect &rect, bool hover)
 	p.setBrush(colour_);
 
 	if (!enabled())
+		return;
+
+	if (isInitial())
 		return;
 
 	const QRectF r = label_rect(rect);
@@ -177,7 +181,14 @@ QRectF Trace::label_rect(const QRectF &rect) const
 
 void Trace::paint_back(QPainter &p, const ViewItemPaintParams &pp)
 {
-	p.setBrush(BGColour);
+	if(highlight_)
+	{
+		p.setBrush(HighlightBGColour);
+	}
+	else
+	{
+		p.setBrush(BGColour);
+	}
 	p.setPen(QPen(Qt::NoPen));
 	const std::pair<int, int> extents = v_extents();
 
@@ -198,6 +209,8 @@ void Trace::paint_axis(QPainter &p, const ViewItemPaintParams &pp, int y)
 
 	p.setRenderHint(QPainter::Antialiasing, true);
 }
+
+
 
 void Trace::add_colour_option(QWidget *parent, QFormLayout *form)
 {

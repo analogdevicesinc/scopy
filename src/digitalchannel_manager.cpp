@@ -170,6 +170,11 @@ std::string Channel::get_label()
     return label;
 }
 
+void Channel::set_label(std::string label)
+{
+    this->label = label;
+}
+
 std::vector<Channel*>* ChannelGroup::get_channels()
 {
     return &channels;
@@ -218,6 +223,13 @@ ChannelGroup::ChannelGroup(Channel* ch)
     enable(true);
 }
 
+ChannelGroup::ChannelGroup()
+{
+	group(false);
+	select(false);
+	enable(true);
+}
+
 ChannelGroup::~ChannelGroup()
 {
     qDebug()<<"ChannelGroup destroyed";
@@ -246,6 +258,11 @@ uint16_t ChannelGroup::get_mask()
 void ChannelGroup::add_channel(Channel *channel)
 {
     channels.push_back(channel);
+}
+
+void ChannelGroup::remove_channel(int chIndex)
+{
+	channels.erase(channels.begin() + chIndex);
 }
 
 size_t ChannelGroup::get_channel_count()

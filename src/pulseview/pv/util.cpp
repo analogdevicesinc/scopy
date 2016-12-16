@@ -38,22 +38,10 @@ namespace util {
 static QTextStream& operator<<(QTextStream& stream, SIPrefix prefix)
 {
 	switch (prefix) {
-	case SIPrefix::yocto: return stream << 'y';
-	case SIPrefix::zepto: return stream << 'z';
-	case SIPrefix::atto:  return stream << 'a';
-	case SIPrefix::femto: return stream << 'f';
 	case SIPrefix::pico:  return stream << 'p';
 	case SIPrefix::nano:  return stream << 'n';
 	case SIPrefix::micro: return stream << QChar(0x03BC);
 	case SIPrefix::milli: return stream << 'm';
-	case SIPrefix::kilo:  return stream << 'k';
-	case SIPrefix::mega:  return stream << 'M';
-	case SIPrefix::giga:  return stream << 'G';
-	case SIPrefix::tera:  return stream << 'T';
-	case SIPrefix::peta:  return stream << 'P';
-	case SIPrefix::exa:   return stream << 'E';
-	case SIPrefix::zetta: return stream << 'Z';
-	case SIPrefix::yotta: return stream << 'Y';
 
 	default: return stream;
 	}
@@ -66,7 +54,7 @@ int exponent(SIPrefix prefix)
 
 static SIPrefix successor(SIPrefix prefix)
 {
-	assert(prefix != SIPrefix::yotta);
+	assert(prefix != SIPrefix::none);
 	return static_cast<SIPrefix>(static_cast<int>(prefix) + 1);
 }
 
@@ -117,18 +105,18 @@ QString format_time_si(
 		if (v.is_zero()) {
 			prefix = SIPrefix::none;
 		} else {
-			int exp = exponent(SIPrefix::yotta);
-			prefix = SIPrefix::yocto;
+			int exp = exponent(SIPrefix::milli);
+			prefix = SIPrefix::pico;
 			while ((fabs(v) * pow(Timestamp(10), exp)) > 999 &&
-					prefix < SIPrefix::yotta) {
+					prefix < SIPrefix::milli) {
 				prefix = successor(prefix);
 				exp -= 3;
 			}
 		}
 	}
 
-	assert(prefix >= SIPrefix::yocto);
-	assert(prefix <= SIPrefix::yotta);
+	assert(prefix >= SIPrefix::pico);
+	assert(prefix <= SIPrefix::milli);
 
 	const Timestamp multiplier = pow(Timestamp(10), -exponent(prefix));
 

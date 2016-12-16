@@ -258,6 +258,49 @@ const unordered_set< shared_ptr<view::Signal> > Session::signals() const
 	return signals_;
 }
 
+shared_ptr<pv::view::DecodeTrace> Session::add_decoder()
+{
+	shared_ptr<data::DecoderStack> decoder_stack;
+	try {
+		/* Create the decoder */
+		decoder_stack = shared_ptr<data::DecoderStack>(
+			new data::DecoderStack(*this));
+
+		/* Create an empty decoder stack */
+		shared_ptr<view::DecodeTrace> d(
+			new view::DecodeTrace(*this, decoder_stack,
+				decode_traces_.size()));
+		decode_traces_.push_back(d);
+
+		signals_changed();
+	} catch (std::runtime_error e) {
+		return NULL;
+	}
+	return decode_traces_.back();
+}
+
+void Session::remove_decode_clones()
+{
+	for (auto item = decode_traces_.begin(); item != decode_traces_.end(); )
+		item = decode_traces_.erase(item);
+	signals_changed();
+}
+
+void Session::remove_signal_clones()
+{
+	for (auto item = signals_.begin(); item != signals_.end(); )
+		if ( !(*item)->isInitial())
+			item = signals_.erase(item);
+		else
+			++item;
+	signals_changed();
+}
+
+void Session::add_signal(shared_ptr<view::LogicSignal> sig)
+{
+	signals_.insert((shared_ptr<view::Signal>)(sig));
+	signals_changed();
+}
  
 bool Session::add_decoder(srd_decoder *const dec)
 {

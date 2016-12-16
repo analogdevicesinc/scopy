@@ -69,6 +69,8 @@ Signal::Signal(pv::Session &session,
 	name_widget_(nullptr)
 {
 	assert(channel_);
+	if (getIdentifier() <= 32 && getIdentifier() != channel_->index())
+		setIdentifier(channel_->index());
 }
 
 void Signal::set_name(QString name)
@@ -99,6 +101,11 @@ void Signal::enable(bool enable)
 shared_ptr<Channel> Signal::channel() const
 {
 	return channel_;
+}
+
+pv::Session* Signal::session()
+{
+	return &session_;
 }
 
 const ViewItemOwner::item_list& Signal::child_items() const

@@ -32,6 +32,7 @@
 
 /* Local includes */
 #include "pulseview/pv/mainwindow.hpp"
+#include "pulseview/pv/view/view.hpp"
 #include "pulseview/pv/devicemanager.hpp"
 #include "pulseview/pv/toolbars/mainbar.hpp"
 #include "streams_to_short.h"
@@ -44,6 +45,7 @@
 
 /* Generated UI */
 #include "ui_logic_analyzer.h"
+#include "ui_logic_channel_settings.h"
 
 /* Boost includes */
 #include <boost/thread.hpp>
@@ -117,8 +119,9 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 
 	/* setup view */
 	main_win = w;
-	ui->verticalLayout_8->removeWidget(ui->centralWidget);
-	ui->verticalLayout_8->insertWidget(1, static_cast<QWidget*>(main_win));
+//	ui->horizontalLayout_3->removeWidget(ui->centralWidget);
+	main_win->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	ui->centralWidgetLayout->insertWidget(0, static_cast<QWidget*>(main_win));
 
 	/* setup toolbar */
 	/*
@@ -137,13 +140,19 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	int settings_panel = ui->stackedWidget->indexOf(ui->generalSettings);
 	ui->btnSettings->setProperty("id", QVariant(-settings_panel));
 
+	/* Channel settings */
+	settings_group->addButton(ui->btnChSettings);
+	int ch_settings_panel = ui->stackedWidget->indexOf(ui->colorSettings);
+	ui->btnChSettings->setProperty("id", QVariant(-ch_settings_panel));
+
 	// Controls for scale/division and position
 	timeBase = new ScaleSpinButton({
-					       {"ns", 1E-9},
-					       {"μs", 1E-6},
-					       {"ms", 1E-3},
-					       {"s", 1E0}
-				       }, "Time Base", 100e-9, 100e-6);
+					{"ps", 1E-12},
+					{"ns", 1E-9},
+					{"μs", 1E-6},
+					{"ms", 1E-3},
+					{"s", 1E0}
+				       }, "Time Base", 100e-12, 1e0);
 	timePosition = new PositionSpinButton({
 						      {"ns", 1E-9},
 						      {"μs", 1E-6},
@@ -152,7 +161,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 					      }, "Position",
 					      -timeBase->maxValue() * 5,
 					      timeBase->maxValue() * 5);
-	QVBoxLayout *vLayout = new QVBoxLayout();
+	QVBoxLayout *vLayout = new QVBoxLayout(ui->generalSettings);
 	vLayout->insertWidget(1, timeBase, 0, Qt::AlignLeft);
 	vLayout->insertWidget(2, timePosition, 0, Qt::AlignLeft);
 	vLayout->insertSpacerItem(-1, new QSpacerItem(0, 0,
@@ -168,8 +177,30 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 			SLOT(setChecked(bool)));
 	connect(ui->btnSettings, SIGNAL(pressed()),
 			this, SLOT(toggleRightMenu()));
+	connect(ui->btnChSettings, SIGNAL(pressed()),
+			this, SLOT(toggleRightMenu()));
 	connect(ui->rightWidget, SIGNAL(finished(bool)),
 			this, SLOT(rightMenuFinished(bool)));
+	connect(ui->btnShowHideMenu, SIGNAL(clicked(bool)),
+		this, SLOT(toggleLeftMenu(bool)));
+	connect(timeBase, SIGNAL(valueChanged(double)),
+		main_win->view_, SLOT(set_timebase(double)));
+
+	timeBase->setValue(1e-3);
+	timeBase->valueChanged(timeBase->value());
+
+	chm_ui = new LogicAnalyzerChannelManagerUI(0, main_win, &chm, ui->colorSettings, this);
+	ui->leftLayout->addWidget(chm_ui);
+	chm_ui->update_ui();
+	chm_ui->setVisible(true);
+	lachannelsettings = new Ui::LChannelSettings;
+
+	connect(ui->btnGroupChannels, SIGNAL(pressed()),
+		chm_ui, SLOT(on_groupSplit_clicked()));
+	connect(ui->btnShowChannels, SIGNAL(clicked(bool)),
+		chm_ui, SLOT(on_hideInactive_clicked(bool)));
+	connect(ui->btnShowChannels, SIGNAL(clicked(bool)),
+		this, SLOT(on_btnShowChannelsClicked(bool)));
 }
 
 LogicAnalyzer::~LogicAnalyzer()
@@ -203,32 +234,94 @@ unsigned int LogicAnalyzer::get_no_channels(struct iio_device *dev)
 	return nb;
 }
 
+void LogicAnalyzer::clearLayout(QLayout *layout)
+{
+	for(int i = 0 ; i < layout->children().size(); )
+	{
+		delete layout->takeAt(i);
+	}
+	delete layout;
+}
+
 void LogicAnalyzer::toggleRightMenu(QPushButton *btn)
 {
 	int id = btn->property("id").toInt();
 	bool btn_old_state = btn->isChecked();
-	bool open = !menuOpened;
+	bool open; //= !menuOpened;
 
+	if(active_settings_btn != btn)
+	{
+		open = !menuOpened;
+	}
+	else
+	{
+		open = true;
+	}
+
+	if(!open)
+	{
+		settings_group->setExclusive(false);
+		ui->btnChSettings->setChecked(false);
+		ui->btnSettings->setChecked(false);
+		settings_group->setExclusive(true);
+	}
+
+	if(menuOpened != open)
+	{
+		ui->rightWidget->toggleMenu(open);
+	}
+	menuOpened = open;
 	active_settings_btn = btn;
-	settings_group->setExclusive(!btn_old_state);
 
 	if (open)
+	{
 		settings_panel_update(id);
-
-	ui->rightWidget->toggleMenu(open);
+		chm_ui->showHighlight(true);
+	}
+	else
+	{
+		chm_ui->showHighlight(false);
+	}
 }
 
 void LogicAnalyzer::settings_panel_update(int id)
 {
-	if (id >= 0)
-		ui->stackedWidget->setCurrentIndex(0);
-	else
+	if (id < 0)
 		ui->stackedWidget->setCurrentIndex(-id);
+	else
+	{
+		ui->stackedWidget->setCurrentIndex(id);
+//		clearLayout(ui->colorSettings->layout());
+//		lachannelsettings->setupUi(ui->colorSettings);
+//		LogicAnalyzerChannelGroup* chg_ui = chm_ui->chm->getHighlightedChannelGroup();
+//		lachannelsettings->channelName->setText(QString::fromStdString(chg_ui->get_label()));
+//		connect(lachannelsettings->channelName, SIGNAL(textChanged(const QString&)),
+//			chm_ui, SLOT(changeChannelName(const QString&)));
+//		ui->stackedWidget->setCurrentIndex(ui->stackedWidget->indexOf(ui->colorSettings));
+	}
 }
 
 void LogicAnalyzer::toggleRightMenu()
 {
 	toggleRightMenu(static_cast<QPushButton *>(QObject::sender()));
+}
+
+void LogicAnalyzer::toggleLeftMenu(bool val)
+{
+	if(val)
+	{
+		ui->btnGroupChannels->hide();
+		ui->btnShowChannels->hide();
+		ui->btnShowHideMenu->setText(">");
+		chm_ui->collapse(true);
+	}
+	else
+	{
+		ui->btnGroupChannels->show();
+		ui->btnShowChannels->show();
+		ui->btnShowHideMenu->setText("<");
+		chm_ui->collapse(false);
+	}
 }
 
 void LogicAnalyzer::rightMenuFinished(bool opened)
@@ -239,5 +332,35 @@ void LogicAnalyzer::rightMenuFinished(bool opened)
 		int id = active_settings_btn->property("id").toInt();
 		settings_panel_update(id);
 		ui->rightWidget->toggleMenu(true);
+	}
+}
+
+void LogicAnalyzer::leftMenuFinished(bool closed)
+{
+	if(ui->btnShowHideMenu->isChecked() && !closed)
+	{
+		ui->btnGroupChannels->hide();
+		ui->btnShowChannels->hide();
+		ui->btnShowHideMenu->setText(">");
+		chm_ui->collapse(true);
+	}
+	else
+	{
+		ui->btnGroupChannels->show();
+		ui->btnShowChannels->show();
+		ui->btnShowHideMenu->setText("<");
+		chm_ui->collapse(false);
+	}
+}
+
+void LogicAnalyzer::on_btnShowChannelsClicked(bool check)
+{
+	if(check)
+	{
+		ui->btnShowChannels->setText("Show all");
+	}
+	else
+	{
+		ui->btnShowChannels->setText("Hide inactive");
 	}
 }

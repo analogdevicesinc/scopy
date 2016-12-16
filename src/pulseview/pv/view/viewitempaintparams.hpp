@@ -33,7 +33,9 @@ class ViewItemPaintParams
 {
 public:
 	ViewItemPaintParams(
-		const QRect &rect, double scale, const pv::util::Timestamp& offset);
+		const QRect &rect, double scale,
+		const pv::util::Timestamp& offset,
+		int divisionCount);
 
 	QRect rect() const {
 		return rect_;
