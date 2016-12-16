@@ -51,7 +51,7 @@ float adc_sample_conv::convVoltsToSample(float voltage,
 		float correctionGain, float filterCompensation)
 {
 	// TO DO: explain this formula and add methods to change gain and offset
-	return (voltage * correctionGain * filterCompensation *
+	return (voltage / (correctionGain * filterCompensation) *
 			(2048 * 1.3 * 0.02) / 0.78);
 }
 
