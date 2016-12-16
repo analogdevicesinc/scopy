@@ -23,6 +23,10 @@ OscADC::OscADC(struct iio_context *ctx, const Filter *filt):
 
 	m_numChannels = get_nb_channels(m_adc);
 
+	// Channel default gains
+	for (int i = 0; i < m_numChannels; i++)
+		m_channel_gain_list.push_back(1.0);
+
 	// Filters applied while decimating affect the amplitude of the received data
 	m_filt_comp_table[1E8] = 1.00;
 	m_filt_comp_table[1E7] = 1.05;
@@ -59,6 +63,22 @@ QList<double> OscADC::availSamplRates() const
 unsigned int OscADC::numChannels() const
 {
 	return m_numChannels;
+}
+
+double OscADC::channelGain(unsigned int chnIdx) const
+{
+	double gain = 0;
+
+	if (chnIdx < m_numChannels)
+		gain = m_channel_gain_list[chnIdx];
+
+	return gain;
+}
+
+void OscADC::setChannelGain(unsigned int chnIdx, double gain)
+{
+	if (chnIdx < m_numChannels)
+		m_channel_gain_list[chnIdx] = gain;
 }
 
 struct iio_device* OscADC::iio_adc() const

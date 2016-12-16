@@ -22,13 +22,14 @@ namespace adiscope {
 		~OscADC();
 
 		double sampleRate() const;
-		void setSampleRate(double);
 		QList<double> availSamplRates() const;
 		unsigned int numChannels() const;
-
+		double channelGain(unsigned int chnIdx) const;
 		struct iio_device *iio_adc() const;
-
 		double compTable(double samplRate) const;
+
+		void setSampleRate(double);
+		void setChannelGain(unsigned int, double);
 
 	private:
 		static unsigned int get_nb_channels(struct iio_device *dev);
@@ -43,6 +44,7 @@ namespace adiscope {
 		unsigned int m_numChannels;
 
 		std::map<double, double> m_filt_comp_table;
+		QList<double> m_channel_gain_list;
 	};
 }
 
