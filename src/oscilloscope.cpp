@@ -94,6 +94,9 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	symmBufferMode->setTriggerBufferMaxSize(8192); // 8192 is what hardware supports
 	symmBufferMode->setTimeDivisionCount(plot.xAxisNumDiv());
 
+	adc.setChannelGain(0, gain_ch1);
+	adc.setChannelGain(1, gain_ch2);
+
 	/* Measurements Settings */
 	measure_settings_init();
 

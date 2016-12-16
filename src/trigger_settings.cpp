@@ -601,7 +601,8 @@ void TriggerSettings::triggA_level_write_hardware(double value)
 	if (!this->trigger0)
 		return;
 
-	int rawValue = adc_sample_conv::convVoltsToSample(value);
+	int rawValue = adc_sample_conv::convVoltsToSample(value,
+		osc_adc.channelGain(0), osc_adc.compTable(osc_adc.sampleRate()));
 	QString s = QString::number(rawValue);
 
 	iio_channel_attr_write(this->trigger0, "trigger_level",
@@ -613,7 +614,8 @@ void TriggerSettings::triggB_level_write_hardware(double value)
 	if (!this->trigger1)
 		return;
 
-	int rawValue = adc_sample_conv::convVoltsToSample(value);
+	int rawValue = adc_sample_conv::convVoltsToSample(value,
+		osc_adc.channelGain(1), osc_adc.compTable(osc_adc.sampleRate()));
 	QString s = QString::number(rawValue);
 
 	iio_channel_attr_write(this->trigger1, "trigger_level",
