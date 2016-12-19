@@ -89,6 +89,11 @@ void LogicAnalyzerChannelUI::setTrace(std::shared_ptr<pv::view::TraceTreeItem> i
     trace = item;
 }
 
+std::shared_ptr<pv::view::TraceTreeItem> LogicAnalyzerChannelUI::getTrace()
+{
+    return trace;
+}
+
 LogicAnalyzerChannel* LogicAnalyzerChannelUI::getChannel()
 {
     return static_cast<LogicAnalyzerChannel*>(this->lch);
@@ -187,6 +192,11 @@ void LogicAnalyzerChannelGroupUI::set_id_pvItem(uint16_t id)
 void LogicAnalyzerChannelGroupUI::setTrace(std::shared_ptr<pv::view::TraceTreeItem> item)
 {
     trace = item;
+}
+
+std::shared_ptr<pv::view::TraceTreeItem> LogicAnalyzerChannelGroupUI::getTrace()
+{
+    return trace;
 }
 
 void LogicAnalyzerChannelGroupUI::remove()
@@ -714,19 +724,8 @@ void LogicAnalyzerChannelManagerUI::on_hideInactive_clicked(bool hide)
 
 void LogicAnalyzerChannelManagerUI::update_position(int value)
 {
-	visibleItemsIndexes.clear();
-	/* print visible indexes  */
-	int viewportHeight = ui->scrollArea->viewport()->height();
-	int itemHeight = chg_ui.front()->sizeHint().height();
-	double noOfVisibleItems = floor(viewportHeight / itemHeight);
-	double minRange, maxRange;
-	minRange = ceil(value / itemHeight);
-//	maxRange = minRange + noOfVisibleItems - 1;
-//	for(auto it = chg_ui.begin()+minRange; it != chg_ui.begin() + minRange + noOfVisibleItems; it++)
-//		visibleItemsIndexes.push_back(it->get_id_pvItem);
-	for(int i = minRange; i < minRange + noOfVisibleItems; i++)
-		visibleItemsIndexes.push_back(i);
-//	update_trace_positions(minRange, minRange + noOfVisibleItems);
+	main_win->view_->verticalScrollBar()->valueChanged(value);
+
 }
 
 void LogicAnalyzerChannelManagerUI::showHighlight(bool check)
@@ -736,12 +735,12 @@ void LogicAnalyzerChannelManagerUI::showHighlight(bool check)
 	if(chGroupUi != nullptr)
 	{
 		setDynamicProperty(chGroupUi->ui->baseWidget, "highlight", check);
-		main_win->view_->get_trace_by_id(chGroupUi->get_id_pvItem())->set_highlight(check);
+		chGroupUi->getTrace()->set_highlight(check);
 	}
 	if(chUi != nullptr)
 	{
 		setDynamicProperty(chUi->ui->baseWidget, "highlight", check);
-		main_win->view_->get_trace_by_id(chUi->get_id_pvItem())->set_highlight(check);
+		chUi->getTrace()->set_highlight(check);
 	}
 	deleteSettingsWidget();
 	createSettingsWidget();

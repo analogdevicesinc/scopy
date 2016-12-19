@@ -695,11 +695,12 @@ void View::update_scroll()
 
 	updating_scroll_ = false;
 
-	// Set the vertical scrollbar
-	verticalScrollBar()->setPageStep(viewport_->height());
-	verticalScrollBar()->setSingleStep(viewport_->height() / 8);
 
 	const pair<int, int> extents = v_extents();
+	const int trace_height = extents.second - extents.first;
+	// Set the vertical scrollbar
+	verticalScrollBar()->setPageStep(trace_height);
+	verticalScrollBar()->setSingleStep(trace_height);
 
 	// Don't change the scrollbar range if there are no traces
 	if (extents.first != extents.second)

@@ -45,7 +45,8 @@ namespace adiscope {
 		Ui::LAChannelGroup *ui;
 		void mousePressEvent(QMouseEvent *event);
 		LogicAnalyzerChannel* getChannel();
-        void setTrace(std::shared_ptr<pv::view::TraceTreeItem> item);
+		void setTrace(std::shared_ptr<pv::view::TraceTreeItem> item);
+		std::shared_ptr<pv::view::TraceTreeItem> getTrace();
 
 	private Q_SLOTS:
 		void remove();
@@ -91,7 +92,8 @@ namespace adiscope {
 		std::vector<LogicAnalyzerChannelUI *> ch_ui;
 		Ui::LAChannelGroup *ui;
 		void enableControls(bool enabled);        
-        void setTrace(std::shared_ptr<pv::view::TraceTreeItem> item);
+		void setTrace(std::shared_ptr<pv::view::TraceTreeItem> item);
+		std::shared_ptr<pv::view::TraceTreeItem> getTrace();
 
 	private Q_SLOTS:
 		void set_decoder(std::string value);
