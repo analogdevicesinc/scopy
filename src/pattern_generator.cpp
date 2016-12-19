@@ -75,9 +75,7 @@ QStringList PatternGenerator::possibleSampleRates = QStringList()
 
 PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt, QPushButton *runBtn, QWidget *parent, bool offline_mode) :
     QWidget(parent),
-    ctx(ctx),
-    dev(iio_context_find_device(ctx, "m2k-logic-analyzer-tx")),
-    channel_manager_dev(iio_context_find_device(ctx, "m2k-logic-analyzer")),
+    ctx(ctx),    
     settings_group(new QButtonGroup(this)), menuRunButton(runBtn),
     ui(new Ui::PatternGenerator),
     pgSettings(new Ui::PGSettings),
@@ -136,7 +134,8 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt, QPushB
 
 PatternGenerator::~PatternGenerator()
 {
-    stopPatternGeneration();
+    if(!offline_mode)
+        stopPatternGeneration();
 
     for(auto var : patterns)
     {

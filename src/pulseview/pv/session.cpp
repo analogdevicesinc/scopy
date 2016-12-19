@@ -401,6 +401,7 @@ shared_ptr<view::Signal> Session::create_signal_from_id(int index)
         }
     }
     assert(signal);
+    //assert(signal->owner());
     signals_.insert(signal);
     signals_changed();
     return signal;

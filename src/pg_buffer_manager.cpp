@@ -114,7 +114,8 @@ PatternGeneratorBufferManagerUi::PatternGeneratorBufferManagerUi(QWidget *parent
 void PatternGeneratorBufferManagerUi::updateUi()
 {
     bufman->update();
-    createBinaryBuffer();
+    //createBinaryBuffer();
+    setSampleRate();
     dataChanged();
     //main_win->action_view_zoom_fit()->trigger();
 }
@@ -124,12 +125,23 @@ PatternGeneratorBufferManagerUi::~PatternGeneratorBufferManagerUi()
 //    qDebug()<<"PGBufman destroyed";
 }
 
+
+void PatternGeneratorBufferManagerUi::setSampleRate()
+{
+    pattern_generator_ptr->close();
+    options["samplerate"] = Glib::Variant<guint64>(g_variant_new_uint64(bufman->getSampleRate()),true);//(Glib::VariantBase)(gint64(1000000));
+    pattern_generator_ptr->options_ = options;
+    pattern_generator_ptr->open();
+
+
+}
+
 void PatternGeneratorBufferManagerUi::createBinaryBuffer()
 {
     options["numchannels"] = Glib::Variant<gint32>(g_variant_new_int32(16),true);//(Glib::VariantBase)(gint32(16));
     options["samplerate"] = Glib::Variant<guint64>(g_variant_new_uint64(bufman->getSampleRate()),true);//(Glib::VariantBase)(gint64(1000000));
-    std::shared_ptr<pv::devices::BinaryBuffer> patern_generator_ptr( new pv::devices::BinaryBuffer(context,bufman->buffer,&bufman->bufferSize,binary_format,options));
-    main_win->select_device(patern_generator_ptr);
+    pattern_generator_ptr = std::make_shared<pv::devices::BinaryBuffer>(context,bufman->buffer,&bufman->bufferSize,binary_format,options);
+    main_win->select_device(pattern_generator_ptr);
 
 }
 
@@ -142,6 +154,9 @@ pv::MainWindow* PatternGeneratorBufferManagerUi::getPVWindow()
 
 void PatternGeneratorBufferManagerUi::dataChanged()
 {
+    pattern_generator_ptr->close();
+    pattern_generator_ptr->data_ = bufman->buffer;
+    pattern_generator_ptr->open();
     main_win->run_stop();
 }
 

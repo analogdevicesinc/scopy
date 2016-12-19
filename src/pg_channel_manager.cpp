@@ -676,7 +676,7 @@ void PatternGeneratorChannelManagerUI::updateUi()
         //connect(currentChannelGroupUI->getChannelGroup()->pattern, SIGNAL(generate_pattern),pg,SLOT())
 
 
-        offset+=(chg_ui.back()->geometry().bottomRight().y()-10);
+        offset+=(currentChannelGroupUI->geometry().bottomRight().y());
         if(ch->is_grouped()) // create subwidgets
         {
             currentChannelGroupUI->ui->DioLabel->setText("");
@@ -733,10 +733,12 @@ void PatternGeneratorChannelManagerUI::updateUi()
                     auto trace = main_win->view_->get_clone_of(index);
                     currentChannelUI->set_id_pvItem(trace->getIdentifier());
                     currentChannelUI->setTrace(trace);
+                    currentChannelUI->trace->force_to_v_offset(offset);
+
 
                     str = QString().number(index);
                     currentChannelUI->ui->DioLabel->setText(str);
-                    auto x = currentChannelGroupUI->ui->ChannelGroupLabel->geometry().x();
+                    offset+=(currentChannelUI->geometry().bottomRight().y());
 
                 }
             if(static_cast<PatternGeneratorChannelGroup*>(ch)->isCollapsed())
@@ -751,6 +753,8 @@ void PatternGeneratorChannelManagerUI::updateUi()
             auto trace = main_win->view_->get_clone_of(index);
             currentChannelGroupUI->set_id_pvItem(trace->getIdentifier());
             currentChannelGroupUI->setTrace(trace);
+            qDebug()<<currentChannelGroupUI->pos();
+            currentChannelGroupUI->trace->force_to_v_offset(offset);
 
 
             currentChannelGroupUI->ui->DioLabel->setText(QString().number(ch->get_channel()->get_id()));
@@ -900,13 +904,15 @@ void PatternGeneratorChannelManagerUI::showHighlight(bool val)
     if(uiCh!=nullptr)
     {
         setDynamicProperty(uiCh->ui->widget_2,"highlighted",val);
-        uiCh->trace->set_highlight(val);
+        if(uiCh->trace)
+            uiCh->trace->set_highlight(val);
         return;
     }
     if(uiChg!=nullptr)
     {
         setDynamicProperty(uiChg->ui->widget_2,"highlighted",val);
-        uiChg->trace->set_highlight(val);
+        if(uiChg->trace)
+            uiChg->trace->set_highlight(val);
     }
 
     if(val)

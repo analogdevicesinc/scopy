@@ -115,8 +115,8 @@ QString format_time_si(
 		}
 	}
 
-	assert(prefix >= SIPrefix::pico);
-	assert(prefix <= SIPrefix::milli);
+    assert(prefix >= SIPrefix::pico);
+    assert(prefix <= SIPrefix::milli);
 
 	const Timestamp multiplier = pow(Timestamp(10), -exponent(prefix));
 

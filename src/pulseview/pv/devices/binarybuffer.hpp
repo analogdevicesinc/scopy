@@ -63,11 +63,13 @@ public:
 
     void stop();
 
+    std::map<std::string, Glib::VariantBase> options_;
+    short *data_;
 private:
     const std::shared_ptr<sigrok::Context> context_;
     const std::shared_ptr<sigrok::InputFormat> format_;
-    const std::map<std::string, Glib::VariantBase> options_;
-    short *data_;
+
+
     uint32_t *no_samples_;
     std::shared_ptr<sigrok::Input> input_;
 };

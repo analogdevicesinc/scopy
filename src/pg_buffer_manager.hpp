@@ -26,6 +26,7 @@ class MainBar;
 
 namespace sigrok {
 class Context;
+class ConfigKey;
 }
 
 namespace adiscope
@@ -70,6 +71,7 @@ public:
     PatternGeneratorBufferManagerUi(QWidget *parent, PatternGeneratorBufferManager *bufmananger, QWidget *settingsWidget, PatternGenerator* pg);
 
     ~PatternGeneratorBufferManagerUi();
+    void setSampleRate();
     void createBinaryBuffer();
     void dataChanged();
     pv::MainWindow* getPVWindow();
