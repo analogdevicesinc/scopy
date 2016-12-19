@@ -695,11 +695,12 @@ void View::update_scroll()
 
 	updating_scroll_ = false;
 
-	// Set the vertical scrollbar
-	verticalScrollBar()->setPageStep(viewport_->height());
-	verticalScrollBar()->setSingleStep(viewport_->height() / 8);
 
 	const pair<int, int> extents = v_extents();
+	const int trace_height = extents.second - extents.first;
+	// Set the vertical scrollbar
+	verticalScrollBar()->setPageStep(trace_height);
+	verticalScrollBar()->setSingleStep(trace_height);
 
 	// Don't change the scrollbar range if there are no traces
 	if (extents.first != extents.second)
@@ -1177,45 +1178,25 @@ void View::on_hover_point_changed()
 		r->hover_point_changed();
 }
 
-shared_ptr<TraceTreeItem> View::get_trace_by_id(int id)
-{
-	const vector<shared_ptr<TraceTreeItem>> trace_tree_items(
-		list_by_type<TraceTreeItem>());
-	for (shared_ptr<TraceTreeItem> t : trace_tree_items)
-		if( t->getIdentifier() == id)
-			return t;
-}
 shared_ptr<TraceTreeItem> View::get_clone_of(int id)
 {
-//    shared_ptr<TraceTreeItem> trace = get_trace_by_id(id);
-//    shared_ptr<LogicSignal> logic =
-//        dynamic_pointer_cast<LogicSignal>(trace);
-//    if (logic) {
-//        shared_ptr<LogicSignal> clone =
-//            std::make_shared<LogicSignal>(*(logic.get()));
-//        clone->setInitial(false);
-////        session_.add_signal(clone);
-//        return clone;
-//    }
-//    return NULL;
-
     shared_ptr<Signal> logicsig = session_.create_signal_from_id(id);
     return logicsig;
 }
-uint16_t View::add_decoder()
+shared_ptr<TraceTreeItem> View::add_decoder()
 {
 	vector<shared_ptr<LogicSignal> > selected;
 	vector<int> results;
 	shared_ptr<pv::view::DecodeTrace> decode_trace =
 			session_.add_decoder();
 	decode_trace->setInitial(false);
-	return decode_trace->getIdentifier();
+	return decode_trace;
 }
 
-void View::set_decoder_to_group(uint16_t id, const srd_decoder* decoder)
+void View::set_decoder_to_group(shared_ptr<TraceTreeItem> trace, const srd_decoder* decoder)
 {
 	shared_ptr<DecodeTrace> d = dynamic_pointer_cast<DecodeTrace>(
-		get_trace_by_id(id));
+		trace);
 	if(d)
 	{
 		d->set_decoder(decoder);

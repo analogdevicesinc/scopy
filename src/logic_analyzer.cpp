@@ -56,6 +56,7 @@ using namespace pv;
 using namespace pv::toolbars;
 using namespace pv::widgets;
 using sigrok::Context;
+using sigrok::ConfigKey;
 using namespace Glibmm;
 
 LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
@@ -110,7 +111,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 
 	iio_device_attr_write_longlong(dev, "sampling_frequency", sample_rate);
 
-	auto logic_analyzer_ptr = std::make_shared<pv::devices::BinaryStream>(
+	logic_analyzer_ptr = std::make_shared<pv::devices::BinaryStream>(
 			device_manager.context(), dev, sample_rate / 100,
 			w->get_format_from_string("binary"),
 			options);
@@ -202,6 +203,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	connect(ui->btnShowChannels, SIGNAL(clicked(bool)),
 		this, SLOT(on_btnShowChannelsClicked(bool)));
 }
+
 
 LogicAnalyzer::~LogicAnalyzer()
 {

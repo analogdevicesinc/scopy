@@ -154,7 +154,7 @@ void LogicSignal::set_logic_data(std::shared_ptr<pv::data::Logic> data)
 std::pair<int, int> LogicSignal::v_extents() const
 {
 	const int signal_margin =
-		QFontMetrics(QApplication::font()).height() / 2;
+		QFontMetrics(QApplication::font()).height() / 3;
 	return make_pair(-signal_height_ - signal_margin, signal_margin);
 }
 

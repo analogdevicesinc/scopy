@@ -46,7 +46,6 @@ class PatternGeneratorChannelUI : public ChannelUI
     PatternGeneratorChannelGroupUI *chgui;
     PatternGeneratorChannelGroup *chg;
     PatternGeneratorChannel *ch;
-    uint16_t id_pvItem;
 public:
     Ui::PGChannelGroup *ui;
     PatternGeneratorChannelUI(PatternGeneratorChannel* ch, PatternGeneratorChannelGroup* chg, PatternGeneratorChannelGroupUI *chgui, PatternGeneratorChannelManagerUI* managerUi, QWidget *parent = 0);
@@ -56,8 +55,6 @@ public:
     PatternGeneratorChannelGroup* getChannelGroup();
     void enableControls(bool val);
 
-    void set_id_pvItem(uint16_t id);
-    uint16_t get_id_pvItem();
     void setTrace(std::shared_ptr<pv::view::TraceTreeItem> item);
     std::shared_ptr<pv::view::TraceTreeItem> trace;
 
@@ -90,7 +87,6 @@ class PatternGeneratorChannelGroupUI : public ChannelGroupUI
     PatternGeneratorChannelManagerUI *managerUi;
     int isChecked();
     void check(int val);
-    uint16_t id_pvItem;    
 
 public:
     Ui::PGChannelGroup *ui;
@@ -99,8 +95,6 @@ public:
     ~PatternGeneratorChannelGroupUI();
     PatternGeneratorChannelGroup* getChannelGroup();
     PatternGeneratorChannelManagerUI *getManagerUi() const;
-    void set_id_pvItem(uint16_t id);
-    uint16_t get_id_pvItem();
     void setTrace(std::shared_ptr<pv::view::TraceTreeItem> item);
     std::shared_ptr<pv::view::TraceTreeItem> trace;
     void enableControls(bool enabled);
