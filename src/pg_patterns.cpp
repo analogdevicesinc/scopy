@@ -354,7 +354,7 @@ void RandomPatternUI::parse_ui()
     bool ok =0;
     pattern->set_frequency(ui->frequency_LE->text().toInt(&ok,10));
     if(!ok) qDebug()<<"Cannot set frequency, not an int";
-    Q_EMIT generate_buffer();
+    Q_EMIT patternChanged();
 }
 
 void RandomPatternUI::build_ui(QWidget *parent)
@@ -524,7 +524,7 @@ void BinaryCounterPatternUI::parse_ui()
     if(!ok) qDebug()<<"Cannot set frequency, not a uint16";
     pattern->set_increment(ui->incrementEdit->text().toUInt(&ok));
     if(!ok) qDebug()<<"Cannot set frequency, not a uint16";*/
-    Q_EMIT generate_buffer();
+    Q_EMIT patternChanged();
 }
 #if 0
 GrayCounterPattern::GrayCounterPattern()

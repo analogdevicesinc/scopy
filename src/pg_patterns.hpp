@@ -230,8 +230,7 @@ public:
     Pattern* get_pattern();
     void build_ui(QWidget *parent = 0);
     void destroy_ui();
-Q_SIGNALS:
-    void generate_buffer();
+
 public Q_SLOTS:
     void parse_ui();
 };
@@ -277,8 +276,7 @@ public:
     Pattern* get_pattern();
     void build_ui(QWidget *parent = 0);
     void destroy_ui();
-Q_SIGNALS:
-    void generate_buffer();
+
 public Q_SLOTS:
     void parse_ui();
 };
