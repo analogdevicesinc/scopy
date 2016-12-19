@@ -304,10 +304,9 @@ public:
 	void time_item_appearance_changed(bool label, bool content);
 
 	void extents_changed(bool horz, bool vert);
-	std::shared_ptr<TraceTreeItem> get_trace_by_id(int id);
 	std::shared_ptr<TraceTreeItem> get_clone_of(int id);
-	uint16_t add_decoder();
-	void set_decoder_to_group(uint16_t id, const srd_decoder* decoder);
+	std::shared_ptr<TraceTreeItem> add_decoder();
+	void set_decoder_to_group(std::shared_ptr<TraceTreeItem> trace, const srd_decoder* decoder);
 	void remove_trace_clones();
 
 private Q_SLOTS:

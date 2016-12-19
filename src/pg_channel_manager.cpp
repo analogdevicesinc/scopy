@@ -65,16 +65,6 @@ PatternGeneratorChannelUI::PatternGeneratorChannelUI(PatternGeneratorChannel* ch
     ui = new Ui::PGChannelGroup();
 }
 
-uint16_t PatternGeneratorChannelUI::get_id_pvItem()
-{
-    return id_pvItem;
-}
-
-void PatternGeneratorChannelUI::set_id_pvItem(uint16_t id)
-{
-    id_pvItem = id;
-}
-
 void PatternGeneratorChannelUI::setTrace(std::shared_ptr<pv::view::TraceTreeItem> item)
 {
     trace = item;
@@ -268,16 +258,6 @@ int PatternGeneratorChannelGroupUI::isChecked()
 void PatternGeneratorChannelGroupUI::check(int val)
 {
     checked = val;
-}
-
-uint16_t PatternGeneratorChannelGroupUI::get_id_pvItem()
-{
-    return id_pvItem;
-}
-
-void PatternGeneratorChannelGroupUI::set_id_pvItem(uint16_t id)
-{
-    id_pvItem = id;
 }
 
 void PatternGeneratorChannelGroupUI::setTrace(std::shared_ptr<pv::view::TraceTreeItem> item)
@@ -731,7 +711,6 @@ void PatternGeneratorChannelManagerUI::updateUi()
 
                     auto index = ch->get_channel(i)->get_id();
                     auto trace = main_win->view_->get_clone_of(index);
-                    currentChannelUI->set_id_pvItem(trace->getIdentifier());
                     currentChannelUI->setTrace(trace);
 
                     str = QString().number(index);
@@ -749,7 +728,6 @@ void PatternGeneratorChannelManagerUI::updateUi()
         {
             auto index = ch->get_channel()->get_id();
             auto trace = main_win->view_->get_clone_of(index);
-            currentChannelGroupUI->set_id_pvItem(trace->getIdentifier());
             currentChannelGroupUI->setTrace(trace);
 
 

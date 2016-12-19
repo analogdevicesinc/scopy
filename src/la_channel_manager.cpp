@@ -66,16 +66,6 @@ LogicAnalyzerChannelUI::LogicAnalyzerChannelUI(LogicAnalyzerChannel *ch,
 	this->chm_ui = chm_ui;
 }
 
-uint16_t LogicAnalyzerChannelUI::get_id_pvItem()
-{
-	return id_pvItem;
-}
-
-void LogicAnalyzerChannelUI::set_id_pvItem(uint16_t id)
-{
-	id_pvItem = id;
-}
-
 void LogicAnalyzerChannelUI::mousePressEvent(QMouseEvent *event)
 {
 	chm_ui->showHighlight(false);
@@ -178,17 +168,6 @@ void LogicAnalyzerChannelGroupUI::set_decoder(std::string value)
 //	qDebug()<<QString().fromUtf8(lchg->getDecoder()->name);
 }
 
-uint16_t LogicAnalyzerChannelGroupUI::get_id_pvItem()
-{
-	return id_pvItem;
-}
-
-void LogicAnalyzerChannelGroupUI::set_id_pvItem(uint16_t id)
-{
-	id_pvItem = id;
-}
-
-
 void LogicAnalyzerChannelGroupUI::setTrace(std::shared_ptr<pv::view::TraceTreeItem> item)
 {
     trace = item;
@@ -258,7 +237,7 @@ void LogicAnalyzerChannelGroupUI::decoderChanged(const QString text)
 	static_cast<LogicAnalyzerChannelGroup *>(chg)->setDecoder(decoder);
 	if(decoder)
 	{
-		chm_ui->set_pv_decoder(this, get_id_pvItem());
+		chm_ui->set_pv_decoder(this);
 	}
 	chm_ui->deleteSettingsWidget();
 	chm_ui->chm->highlightChannel(getChannelGroup());
@@ -541,14 +520,13 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 			connect(lachannelgroupUI->ui->btnEnableChannel, SIGNAL(toggled(bool)),
 				lachannelgroupUI, SLOT(enable(bool)));
 
-			offset+=(chg_ui.back()->geometry().bottomRight().y()-10);
+//			offset+=(chg_ui.back()->geometry().bottomRight().y()-10);
 
 			if (ch->is_grouped()) {			// grouped widget
-				chg_ui.back()->set_id_pvItem(
-					main_win->view_->add_decoder());
-				auto trace = main_win->view_->get_trace_by_id(
-					chg_ui.back()->get_id_pvItem());
+				auto trace = main_win->view_->add_decoder();
+				lachannelgroupUI->setTrace(trace);
 				trace->force_to_v_offset(offset);
+
 
 				setWidgetMinimumNrOfChars(lachannelgroupUI->ui->decoderCombo, 15);
 				lachannelgroupUI->ui->decoderCombo->addItem("None");
@@ -561,7 +539,7 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 					QString name = QString::fromUtf8(lachannelgroupUI->getChannelGroup()->getDecoder()->name);
 					int decIndex =chm->get_name_decoder_list().indexOf(name)+1;
 					lachannelgroupUI->ui->decoderCombo->setCurrentIndex(decIndex);
-					set_pv_decoder(lachannelgroupUI, lachannelgroupUI->get_id_pvItem());
+					set_pv_decoder(lachannelgroupUI);
 				}
 				else
 				{
@@ -630,14 +608,11 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 					lachannelUI->ui->indexLabel2->setText(str);
 					lachannelUI->ui->indexLabel->setText(str);
 					auto index = ch->get_channel(i)->get_id();
-					auto trace = main_win->view_->get_clone_of(index);                    
-					lachannelUI->set_id_pvItem(trace->getIdentifier());
-                    lachannelgroupUI->setTrace(trace);
-//					main_win->view_->add_channel_to_group
-
-					forceUpdate(lachannelUI);
-					offset+=lachannelUI->geometry().bottomRight().y();
+					auto trace = main_win->view_->get_clone_of(index);
+					lachannelUI->setTrace(trace);
 					trace->force_to_v_offset(offset);
+					forceUpdate(lachannelUI);
+//					offset+=lachannelUI->geometry().bottomRight().y();
 				}
 
 				if(static_cast<LogicAnalyzerChannelGroup*>(ch)->isCollapsed())
@@ -648,6 +623,9 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 			}
 			else {
 				auto index = ch->get_channel(0)->get_id();
+				auto trace = main_win->view_->get_clone_of(index);
+				lachannelgroupUI->setTrace(trace);
+				trace->force_to_v_offset(offset);
 				lachannelgroupUI->ui->stackedWidget->setCurrentIndex(0);
 				if(!collapsed)
 				{
@@ -662,13 +640,7 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 				lachannelgroupUI->ui->line_2->setVisible(false);
 				lachannelgroupUI->ui->decoderCombo->setVisible(false);
 				lachannelgroupUI->ui->indexLabel->setText(QString::number(index));
-				auto trace = main_win->view_->get_clone_of(index);
-                lachannelgroupUI->setTrace(trace);
-				if (trace) {
-					trace->force_to_v_offset(offset);
-					chg_ui.back()->set_id_pvItem(
-						trace->getIdentifier());
-				}
+
 			}
 		}
 	}
@@ -797,13 +769,17 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
  				Ui::LARequiredChannel *reqChUI = new Ui::LARequiredChannel();
 				QWidget *r = new QWidget(currentSettingsWidget);
 				reqChUI->setupUi(r);
-				reqChUI->labelRole->setText(QString::fromUtf8(rqch->desc));
+				reqChUI->labelRole->setText(QString::fromUtf8(rqch->name));
 
 				for(auto&& ch : *(chGroup->get_channels()))
 				{
 					reqChUI->roleCombo->addItem(QString::number(ch->get_id()));
 				}
 				currentSettingsWidget->layout()->addWidget(r);
+//				 connect(reqChUI->roleCombo, &QComboBox::currentIndexChanged,
+//						[reqChUI->roleCombo, this](int value) {
+//				});
+
 			}
 			free(reqCh);
 		}
@@ -850,9 +826,9 @@ void LogicAnalyzerChannelManagerUI::set_label(QString text)
 	update_ui();
 }
 
-void LogicAnalyzerChannelManagerUI::set_pv_decoder(LogicAnalyzerChannelGroupUI* chGroup, uint16_t id)
+void LogicAnalyzerChannelManagerUI::set_pv_decoder(LogicAnalyzerChannelGroupUI* chGroup)
 {
-	main_win->view_->set_decoder_to_group(id, chGroup->getChannelGroup()->getDecoder());
+	main_win->view_->set_decoder_to_group(chGroup->getTrace(), chGroup->getChannelGroup()->getDecoder());
 }
 
 }

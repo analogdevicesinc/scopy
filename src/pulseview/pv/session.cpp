@@ -289,7 +289,7 @@ void Session::remove_decode_clones()
 void Session::remove_signal_clones()
 {
 	for (auto item = signals_.begin(); item != signals_.end(); )
-        item = signals_.erase(item);
+		item = signals_.erase(item);
 	signals_changed();
 }
 

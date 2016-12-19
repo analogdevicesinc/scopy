@@ -40,8 +40,6 @@ namespace adiscope {
 					LogicAnalyzerChannelGroup *chgroup,
 					LogicAnalyzerChannelManagerUI *chm_ui,
 					QWidget *parent = 0);
-		uint16_t get_id_pvItem();
-		void set_id_pvItem(uint16_t id);
 		Ui::LAChannelGroup *ui;
 		void mousePressEvent(QMouseEvent *event);
 		LogicAnalyzerChannel* getChannel();
@@ -55,8 +53,7 @@ namespace adiscope {
 	private:
 		LogicAnalyzerChannelManagerUI *chm_ui;
 		LogicAnalyzerChannelGroup *chgroup;
-		uint16_t id_pvItem;
-        std::shared_ptr<pv::view::TraceTreeItem> trace;
+		std::shared_ptr<pv::view::TraceTreeItem> trace;
 	};
 
 
@@ -86,8 +83,6 @@ namespace adiscope {
 		LogicAnalyzerChannelGroupUI(LogicAnalyzerChannelGroup *chg,
 				LogicAnalyzerChannelManagerUI *chm_ui,
 				QWidget *parent = 0);
-		uint16_t get_id_pvItem();
-		void set_id_pvItem(uint16_t id);
 		LogicAnalyzerChannelGroup* getChannelGroup();
 		std::vector<LogicAnalyzerChannelUI *> ch_ui;
 		Ui::LAChannelGroup *ui;
@@ -102,8 +97,7 @@ namespace adiscope {
 	protected:
 
 	private:
-		uint16_t id_pvItem;
-        std::shared_ptr<pv::view::TraceTreeItem> trace;
+		std::shared_ptr<pv::view::TraceTreeItem> trace;
 	public Q_SLOTS:
 		void remove();
 		void settingsHandler();
@@ -167,7 +161,7 @@ namespace adiscope {
 		LogicAnalyzerChannelUI* getUiFromCh(LogicAnalyzerChannel*);
 		void createSettingsWidget();
 		void deleteSettingsWidget();
-		void set_pv_decoder(LogicAnalyzerChannelGroupUI *channelgroup, uint16_t id);
+		void set_pv_decoder(LogicAnalyzerChannelGroupUI *channelgroup);
 
 	public Q_SLOTS:
 		void update_position(int value);

@@ -125,10 +125,6 @@ public:
 	 */
 	virtual std::pair<int, int> v_extents() const = 0;
 
-	int getIdentifier();
-
-	void setIdentifier(int id);
-
 	void set_highlight(bool check);
 
 protected:
@@ -138,10 +134,6 @@ protected:
 	int visual_v_offset_;
 
 	bool bgcolour_state_;
-	int identifier_;
-
-    static std::atomic<int> seed;
-	int createIdentifier();
 	bool highlight_;
 
 private:
