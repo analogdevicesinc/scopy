@@ -60,10 +60,10 @@ using sigrok::ConfigKey;
 using namespace Glibmm;
 
 LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
-		Filter *filt,
-		QPushButton *runBtn,
-		QWidget *parent,
-		unsigned int sample_rate) :
+                             Filter *filt,
+                             QPushButton *runBtn,
+                             QWidget *parent,
+                             unsigned int sample_rate) :
 	QWidget(parent),
 	dev_name(filt->device_name(TOOL_LOGIC_ANALYZER)),
 	ctx(ctx),
@@ -89,32 +89,35 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	if (srd_init(nullptr) != SRD_OK) {
 		qDebug() << "ERROR: libsigrokdecode init failed.";
 	}
+
 	/* Load the protocol decoders */
 	srd_decoder_load_all();
 
 	pv::DeviceManager device_manager(context);
-	pv::MainWindow* w = new pv::MainWindow(device_manager, filt, open_file,
-						open_file_format, parent);
+	pv::MainWindow *w = new pv::MainWindow(device_manager, filt, open_file,
+	                                       open_file_format, parent);
 
 	options["numchannels"] = Glib::Variant<gint32>(
-			g_variant_new_int32(no_channels),true);
+	                                 g_variant_new_int32(no_channels),true);
 	options["samplerate"] = Glib::Variant<guint64>(
-			g_variant_new_uint64(sample_rate),true);
+	                                g_variant_new_uint64(sample_rate),true);
 
 
-	for(unsigned int j = 0; j < iio_device_get_channels_count(dev); j++) {
+	for (unsigned int j = 0; j < iio_device_get_channels_count(dev); j++) {
 		struct iio_channel *chn = iio_device_get_channel(dev, j);
+
 		if (!iio_channel_is_output(chn) &&
-				iio_channel_is_scan_element(chn))
+		    iio_channel_is_scan_element(chn)) {
 			iio_channel_enable(chn);
+		}
 	}
 
 	iio_device_attr_write_longlong(dev, "sampling_frequency", sample_rate);
 
 	logic_analyzer_ptr = std::make_shared<pv::devices::BinaryStream>(
-			device_manager.context(), dev, sample_rate / 100,
-			w->get_format_from_string("binary"),
-			options);
+	                             device_manager.context(), dev, sample_rate / 100,
+	                             w->get_format_from_string("binary"),
+	                             options);
 	w->select_device(logic_analyzer_ptr);
 
 
@@ -122,7 +125,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	main_win = w;
 //	ui->horizontalLayout_3->removeWidget(ui->centralWidget);
 	main_win->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	ui->centralWidgetLayout->insertWidget(0, static_cast<QWidget*>(main_win));
+	ui->centralWidgetLayout->insertWidget(0, static_cast<QWidget *>(main_win));
 
 	/* setup toolbar */
 	/*
@@ -148,60 +151,61 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 
 	// Controls for scale/division and position
 	timeBase = new ScaleSpinButton({
-					{"ps", 1E-12},
-					{"ns", 1E-9},
-					{"μs", 1E-6},
-					{"ms", 1E-3},
-					{"s", 1E0}
-				       }, "Time Base", 100e-12, 1e0);
+		{"ps", 1E-12},
+		{"ns", 1E-9},
+		{"μs", 1E-6},
+		{"ms", 1E-3},
+		{"s", 1E0}
+	}, "Time Base", 100e-12, 1e0);
 	timePosition = new PositionSpinButton({
-						      {"ns", 1E-9},
-						      {"μs", 1E-6},
-						      {"ms", 1E-3},
-						      {"s", 1E0}
-					      }, "Position",
-					      -timeBase->maxValue() * 5,
-					      timeBase->maxValue() * 5);
+		{"ns", 1E-9},
+		{"μs", 1E-6},
+		{"ms", 1E-3},
+		{"s", 1E0}
+	}, "Position",
+	-timeBase->maxValue() * 5,
+	timeBase->maxValue() * 5);
 	QVBoxLayout *vLayout = new QVBoxLayout(ui->generalSettings);
 	vLayout->insertWidget(1, timeBase, 0, Qt::AlignLeft);
 	vLayout->insertWidget(2, timePosition, 0, Qt::AlignLeft);
 	vLayout->insertSpacerItem(-1, new QSpacerItem(0, 0,
-						QSizePolicy::Minimum,
-						QSizePolicy::Expanding));
+	                          QSizePolicy::Minimum,
+	                          QSizePolicy::Expanding));
 	ui->generalSettings->setLayout(vLayout);
 
 	connect(ui->btnRunStop, SIGNAL(toggled(bool)),
-			this, SLOT(startStop(bool)));
+	        this, SLOT(startStop(bool)));
 	connect(runBtn, SIGNAL(toggled(bool)), ui->btnRunStop,
-			SLOT(setChecked(bool)));
+	        SLOT(setChecked(bool)));
 	connect(ui->btnRunStop, SIGNAL(toggled(bool)), runBtn,
-			SLOT(setChecked(bool)));
+	        SLOT(setChecked(bool)));
 	connect(ui->btnSettings, SIGNAL(pressed()),
-			this, SLOT(toggleRightMenu()));
+	        this, SLOT(toggleRightMenu()));
 	connect(ui->btnChSettings, SIGNAL(pressed()),
-			this, SLOT(toggleRightMenu()));
+	        this, SLOT(toggleRightMenu()));
 	connect(ui->rightWidget, SIGNAL(finished(bool)),
-			this, SLOT(rightMenuFinished(bool)));
+	        this, SLOT(rightMenuFinished(bool)));
 	connect(ui->btnShowHideMenu, SIGNAL(clicked(bool)),
-		this, SLOT(toggleLeftMenu(bool)));
+	        this, SLOT(toggleLeftMenu(bool)));
 	connect(timeBase, SIGNAL(valueChanged(double)),
-		main_win->view_, SLOT(set_timebase(double)));
+	        main_win->view_, SLOT(set_timebase(double)));
 
 	timeBase->setValue(1e-3);
 	timeBase->valueChanged(timeBase->value());
 
-	chm_ui = new LogicAnalyzerChannelManagerUI(0, main_win, &chm, ui->colorSettings, this);
+	chm_ui = new LogicAnalyzerChannelManagerUI(0, main_win, &chm, ui->colorSettings,
+	                this);
 	ui->leftLayout->addWidget(chm_ui);
 	chm_ui->update_ui();
 	chm_ui->setVisible(true);
 	lachannelsettings = new Ui::LChannelSettings;
 
 	connect(ui->btnGroupChannels, SIGNAL(pressed()),
-		chm_ui, SLOT(on_groupSplit_clicked()));
+	        chm_ui, SLOT(on_groupSplit_clicked()));
 	connect(ui->btnShowChannels, SIGNAL(clicked(bool)),
-		chm_ui, SLOT(on_hideInactive_clicked(bool)));
+	        chm_ui, SLOT(on_hideInactive_clicked(bool)));
 	connect(ui->btnShowChannels, SIGNAL(clicked(bool)),
-		this, SLOT(on_btnShowChannelsClicked(bool)));
+	        this, SLOT(on_btnShowChannelsClicked(bool)));
 }
 
 
@@ -216,10 +220,11 @@ void LogicAnalyzer::startStop(bool start)
 {
 	main_win->run_stop();
 
-	if (start)
+	if (start) {
 		ui->btnRunStop->setText("Stop");
-	else
+	} else {
 		ui->btnRunStop->setText("Run");
+	}
 }
 
 unsigned int LogicAnalyzer::get_no_channels(struct iio_device *dev)
@@ -230,18 +235,20 @@ unsigned int LogicAnalyzer::get_no_channels(struct iio_device *dev)
 		struct iio_channel *chn = iio_device_get_channel(dev, i);
 
 		if (!iio_channel_is_output(chn) &&
-		iio_channel_is_scan_element(chn))
-		nb++;
+		    iio_channel_is_scan_element(chn)) {
+			nb++;
+		}
 	}
+
 	return nb;
 }
 
 void LogicAnalyzer::clearLayout(QLayout *layout)
 {
-	for(int i = 0 ; i < layout->children().size(); )
-	{
+	for (int i = 0 ; i < layout->children().size();) {
 		delete layout->takeAt(i);
 	}
+
 	delete layout;
 }
 
@@ -251,47 +258,39 @@ void LogicAnalyzer::toggleRightMenu(QPushButton *btn)
 	bool btn_old_state = btn->isChecked();
 	bool open; //= !menuOpened;
 
-	if(active_settings_btn != btn)
-	{
+	if (active_settings_btn != btn) {
 		open = !menuOpened;
-	}
-	else
-	{
+	} else {
 		open = true;
 	}
 
-	if(!open)
-	{
+	if (!open) {
 		settings_group->setExclusive(false);
 		ui->btnChSettings->setChecked(false);
 		ui->btnSettings->setChecked(false);
 		settings_group->setExclusive(true);
 	}
 
-	if(menuOpened != open)
-	{
+	if (menuOpened != open) {
 		ui->rightWidget->toggleMenu(open);
 	}
+
 	menuOpened = open;
 	active_settings_btn = btn;
 
-	if (open)
-	{
+	if (open) {
 		settings_panel_update(id);
 		chm_ui->showHighlight(true);
-	}
-	else
-	{
+	} else {
 		chm_ui->showHighlight(false);
 	}
 }
 
 void LogicAnalyzer::settings_panel_update(int id)
 {
-	if (id < 0)
+	if (id < 0) {
 		ui->stackedWidget->setCurrentIndex(-id);
-	else
-	{
+	} else {
 		ui->stackedWidget->setCurrentIndex(id);
 //		clearLayout(ui->colorSettings->layout());
 //		lachannelsettings->setupUi(ui->colorSettings);
@@ -310,15 +309,12 @@ void LogicAnalyzer::toggleRightMenu()
 
 void LogicAnalyzer::toggleLeftMenu(bool val)
 {
-	if(val)
-	{
+	if (val) {
 		ui->btnGroupChannels->hide();
 		ui->btnShowChannels->hide();
 		ui->btnShowHideMenu->setText(">");
 		chm_ui->collapse(true);
-	}
-	else
-	{
+	} else {
 		ui->btnGroupChannels->show();
 		ui->btnShowChannels->show();
 		ui->btnShowHideMenu->setText("<");
@@ -339,15 +335,12 @@ void LogicAnalyzer::rightMenuFinished(bool opened)
 
 void LogicAnalyzer::leftMenuFinished(bool closed)
 {
-	if(ui->btnShowHideMenu->isChecked() && !closed)
-	{
+	if (ui->btnShowHideMenu->isChecked() && !closed) {
 		ui->btnGroupChannels->hide();
 		ui->btnShowChannels->hide();
 		ui->btnShowHideMenu->setText(">");
 		chm_ui->collapse(true);
-	}
-	else
-	{
+	} else {
 		ui->btnGroupChannels->show();
 		ui->btnShowChannels->show();
 		ui->btnShowHideMenu->setText("<");
@@ -357,12 +350,9 @@ void LogicAnalyzer::leftMenuFinished(bool closed)
 
 void LogicAnalyzer::on_btnShowChannelsClicked(bool check)
 {
-	if(check)
-	{
+	if (check) {
 		ui->btnShowChannels->setText("Show all");
-	}
-	else
-	{
+	} else {
 		ui->btnShowChannels->setText("Hide inactive");
 	}
 }

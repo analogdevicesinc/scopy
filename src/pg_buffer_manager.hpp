@@ -29,55 +29,56 @@ class Context;
 class ConfigKey;
 }
 
-namespace adiscope
-{
+namespace adiscope {
 
 class PatternGeneratorBufferManager
 {
 
-    bool buffer_created;
-    uint32_t start_sample;
-    uint32_t last_sample;
-    uint32_t number_of_samples;
+	bool buffer_created;
+	uint32_t start_sample;
+	uint32_t last_sample;
+	uint32_t number_of_samples;
 
-    uint32_t sampleRate;
-    PatternGeneratorChannelManager *chm;
+	uint32_t sampleRate;
+	PatternGeneratorChannelManager *chm;
 
 public:
-    PatternGeneratorBufferManager(PatternGeneratorChannelManager *chman);
-    ~PatternGeneratorBufferManager();
-    void update(PatternGeneratorChannelGroup *chg = nullptr);
-    uint32_t adjustSampleRate(uint32_t suggestedSampleRate);
-    uint32_t adjustBufferSize(uint32_t suggestedBufferSize);
-    uint32_t getSampleRate();
-    uint32_t bufferSize;
-    short *buffer;
-    //uint32_t getBufferSize();
+	PatternGeneratorBufferManager(PatternGeneratorChannelManager *chman);
+	~PatternGeneratorBufferManager();
+	void update(PatternGeneratorChannelGroup *chg = nullptr);
+	uint32_t adjustSampleRate(uint32_t suggestedSampleRate);
+	uint32_t adjustBufferSize(uint32_t suggestedBufferSize);
+	uint32_t getSampleRate();
+	uint32_t bufferSize;
+	short *buffer;
+	//uint32_t getBufferSize();
 
 };
 
 class PatternGeneratorBufferManagerUi : public QWidget
 {
-    Q_OBJECT
-    QWidget* settingsWidget;
-    PatternGeneratorBufferManager *bufman;
-    std::shared_ptr<sigrok::Context> context;
-    std::shared_ptr<pv::devices::BinaryBuffer> pattern_generator_ptr;
-    std::shared_ptr<sigrok::InputFormat> binary_format;
-    std::map<std::string, Glib::VariantBase> options;
-    pv::MainWindow* main_win;
+	Q_OBJECT
+	QWidget *settingsWidget;
+	PatternGeneratorBufferManager *bufman;
+	std::shared_ptr<sigrok::Context> context;
+	std::shared_ptr<pv::devices::BinaryBuffer> pattern_generator_ptr;
+	std::shared_ptr<sigrok::InputFormat> binary_format;
+	std::map<std::string, Glib::VariantBase> options;
+	pv::MainWindow *main_win;
 
 public:
-    PatternGeneratorBufferManagerUi(QWidget *parent, PatternGeneratorBufferManager *bufmananger, QWidget *settingsWidget, PatternGenerator* pg);
+	PatternGeneratorBufferManagerUi(QWidget *parent,
+	                                PatternGeneratorBufferManager *bufmananger, QWidget *settingsWidget,
+	                                PatternGenerator *pg);
 
-    ~PatternGeneratorBufferManagerUi();
-    void setSampleRate();
-    void createBinaryBuffer();
-    void dataChanged();
-    pv::MainWindow* getPVWindow();
+	~PatternGeneratorBufferManagerUi();
+	void setSampleRate();
+	void createBinaryBuffer();
+	void dataChanged();
+	pv::MainWindow *getPVWindow();
 
 public Q_SLOTS:
-    void updateUi();
+	void updateUi();
 };
 
 
