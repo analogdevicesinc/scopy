@@ -32,9 +32,9 @@
 
 /* Local includes */
 #include "pulseview/pv/mainwindow.hpp"
+#include "pulseview/pv/toolbars/mainbar.hpp"
 #include "pulseview/pv/view/view.hpp"
 #include "pulseview/pv/devicemanager.hpp"
-#include "pulseview/pv/toolbars/mainbar.hpp"
 #include "streams_to_short.h"
 #include "logic_analyzer.hpp"
 #include "spinbox_a.hpp"
@@ -118,26 +118,15 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	                             device_manager.context(), dev, sample_rate / 100,
 	                             w->get_format_from_string("binary"),
 	                             options);
-	w->select_device(logic_analyzer_ptr);
-
 
 	/* setup view */
 	main_win = w;
-//	ui->horizontalLayout_3->removeWidget(ui->centralWidget);
 	main_win->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	ui->centralWidgetLayout->insertWidget(0, static_cast<QWidget *>(main_win));
-
-	/* setup toolbar */
-	/*
-	pv::toolbars::MainBar* main_bar = main_win->main_bar_;
-	QPushButton *btnDecoder = new QPushButton();
-	btnDecoder->setIcon(QIcon::fromTheme("add-decoder", QIcon(":/icons/add-decoder.svg")));
-	btnDecoder->setMenu(main_win->menu_decoder_add());
-	ui->gridLayout->addWidget(btnDecoder);
-	ui->gridLayout->addWidget(static_cast<QWidget *>(main_bar));
-	*/
+	ui->centralWidgetLayout->addWidget(static_cast<QWidget * >(main_win));
+	main_win->select_device(logic_analyzer_ptr);
 
 	ui->rightWidget->setMaximumWidth(0);
+	static_cast<QWidget *>(main_win->main_bar_)->setVisible(false);
 
 	/* General settings */
 	settings_group->addButton(ui->btnSettings);

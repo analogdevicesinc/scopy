@@ -481,16 +481,18 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 	managerHeaderUI->setupUi(managerHeaderWidget);
 	ui->headerWidgetLayout->addWidget(managerHeaderWidget);
 
+	ensurePolished();
 	setWidgetMinimumNrOfChars(managerHeaderUI->labelName, 8);
-	setWidgetMinimumNrOfChars(managerHeaderUI->label, 8);
-	setWidgetMinimumNrOfChars(managerHeaderUI->labelView, 5);
+//	setWidgetMinimumNrOfChars(managerHeaderUI->label, 8);
+//	setWidgetMinimumNrOfChars(managerHeaderUI->labelView, 5);
 	setWidgetMinimumNrOfChars(managerHeaderUI->labelOutput, 8);
 	setWidgetMinimumNrOfChars(managerHeaderUI->indexLabel, 5);
+	managerHeaderUI->label->setMinimumWidth(40);
+	managerHeaderUI->labelView->setMinimumWidth(40);
 
 	if (collapsed) {
 		managerHeaderUI->rightWidget->setVisible(false);
 		managerHeaderUI->leftWidget->setVisible(false);
-		managerHeaderUI->line->setVisible(false);
 	}
 
 	main_win->view_->remove_trace_clones();

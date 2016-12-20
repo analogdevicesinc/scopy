@@ -752,7 +752,7 @@ background-color: grey;
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout_3">
            <property name="spacing">
-            <number>5</number>
+            <number>0</number>
            </property>
            <property name="topMargin">
             <number>0</number>
@@ -803,7 +803,7 @@ background-color: grey;
             </widget>
            </item>
            <item>
-            <widget class="QWidget" name="centralWidget" native="true">
+            <widget class="QWidget" name="plotCentralWidget" native="true">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                <horstretch>0</horstretch>
@@ -813,7 +813,7 @@ background-color: grey;
              <property name="styleSheet">
               <string notr="true"/>
              </property>
-             <layout class="QHBoxLayout" name="centralWidgetLayout">
+             <layout class="QVBoxLayout" name="verticalLayout_2">
               <property name="spacing">
                <number>0</number>
               </property>
@@ -829,6 +829,79 @@ background-color: grey;
               <property name="bottomMargin">
                <number>0</number>
               </property>
+              <item>
+               <widget class="QWidget" name="plotStatusWidget" native="true">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true"/>
+                </property>
+                <layout class="QHBoxLayout" name="horizontalLayout_4">
+                 <property name="spacing">
+                  <number>0</number>
+                 </property>
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <spacer name="verticalSpacer">
+                   <property name="orientation">
+                    <enum>Qt::Vertical</enum>
+                   </property>
+                   <property name="sizeType">
+                    <enum>QSizePolicy::Fixed</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>0</width>
+                     <height>37</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QWidget" name="centralWidget" native="true">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <layout class="QVBoxLayout" name="centralWidgetLayout">
+                 <property name="spacing">
+                  <number>0</number>
+                 </property>
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
+                </layout>
+               </widget>
+              </item>
              </layout>
             </widget>
            </item>

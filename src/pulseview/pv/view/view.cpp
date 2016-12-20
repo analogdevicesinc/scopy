@@ -104,8 +104,6 @@ View::View(Session &session, QWidget *parent) :
 	session_(session),
 	viewport_(new Viewport(*this)),
 	ruler_(new Ruler(*this)),
-//	header_(new Header(*this)),
-	status_bar_(new QWidget(this)),
 	scale_(1e-3),
 	backup_scale_(scale_),
 	offset_(0),
@@ -137,14 +135,6 @@ View::View(Session &session, QWidget *parent) :
 		this, SLOT(data_updated()));
 	connect(&session_, SIGNAL(frame_ended()),
 		this, SLOT(data_updated()));
-
-//	connect(header_, SIGNAL(selection_changed()),
-//		ruler_, SLOT(clear_selection()));
-//	connect(ruler_, SIGNAL(selection_changed()),
-//		header_, SLOT(clear_selection()));
-
-//	connect(header_, SIGNAL(selection_changed()),
-//		this, SIGNAL(selection_changed()));
 	connect(ruler_, SIGNAL(selection_changed()),
 		this, SIGNAL(selection_changed()));
 
@@ -164,7 +154,6 @@ View::View(Session &session, QWidget *parent) :
 
 	viewport_->installEventFilter(this);
 	ruler_->installEventFilter(this);
-//	header_->installEventFilter(this);
 
 	// Trigger the initial event manually. The default device has signals
 	// which were created before this object came into being
@@ -172,17 +161,6 @@ View::View(Session &session, QWidget *parent) :
 
 	// make sure the transparent widgets are on the top
 	ruler_->raise();
-//	header_->raise();
-
-	QHBoxLayout *hLayout = new QHBoxLayout(status_bar_);
-	zoom_label_ = new QLabel("");
-	zoom_label_->setFixedWidth(200);
-	timebase_label_ = new QLabel(QString::number(backup_scale_));
-	hLayout->insertSpacerItem(0, new QSpacerItem(100, 0, QSizePolicy::MinimumExpanding, QSizePolicy::Minimum));
-	hLayout->insertWidget(1, timebase_label_);
-	hLayout->insertSpacerItem(2, new QSpacerItem(10, 0, QSizePolicy::MinimumExpanding, QSizePolicy::Minimum));
-	hLayout->insertWidget(3, zoom_label_);
-	status_bar_->setLayout(hLayout);
 
 	// Update the zoom state
 	calculate_tick_spacing();
@@ -746,15 +724,10 @@ void View::set_scroll_default()
 
 void View::update_layout()
 {
-	setViewportMargins(
-		50,
-		status_bar_->height(), 0, ruler_->sizeHint().height());
-	status_bar_->setGeometry(viewport_->x(), 0, viewport()->width(),
-		status_bar_->height());
+	setViewportMargins(0, 0,
+			0, ruler_->sizeHint().height());
 	ruler_->setGeometry(viewport_->x(), viewport_->y() + viewport_->height(),
 		viewport_->width(), ruler_->extended_size_hint().height());
-//	header_->setGeometry(0, viewport_->y(),
-//		header_->extended_size_hint().width(), viewport_->height());
 	update_scroll();
 }
 
@@ -1213,7 +1186,7 @@ void View::set_timebase(double value)
 {
 	set_scale_offset(value, offset_);
 	backup_scale_ = scale_;
-	timebase_label_->setText(QString::number(value) + " s/div");
+//	timebase_label_->setText(QString::number(value) + " s/div");
 }
 
 int View::divisionCount()

@@ -27,7 +27,6 @@
 /* Local includes */
 #include "filter.hpp"
 #include "pulseview/pv/widgets/sweeptimingwidget.hpp"
-#include "pulseview/pv/toolbars/mainbar.hpp"
 #include "pulseview/pv/devicemanager.hpp"
 #include "pulseview/pv/mainwindow.hpp"
 #include "spinbox_a.hpp"
