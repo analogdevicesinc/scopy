@@ -40,6 +40,7 @@ namespace adiscope {
 		TOOL_POWER_CONTROLLER = 3,
 		TOOL_LOGIC_ANALYZER = 4,
 		TOOL_PATTERN_GENERATOR = 5,
+		TOOL_NETWORK_ANALYZER = 6,
 	};
 
 	class Filter

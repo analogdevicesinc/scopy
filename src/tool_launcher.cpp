@@ -39,7 +39,8 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	ui(new Ui::ToolLauncher), ctx(nullptr),
 	power_control(nullptr), dmm(nullptr), signal_generator(nullptr),
 	oscilloscope(nullptr), current(nullptr), filter(nullptr),
-	logic_analyzer(nullptr), pattern_generator(nullptr)
+	logic_analyzer(nullptr), pattern_generator(nullptr),
+	network_analyzer(nullptr)
 {
 	struct iio_context_info **info;
 	unsigned int nb_contexts;
@@ -180,6 +181,11 @@ void adiscope::ToolLauncher::on_btnPatternGenerator_clicked()
 	swapMenu(static_cast<QWidget *>(pattern_generator));
 }
 
+void adiscope::ToolLauncher::on_btnNetworkAnalyzer_clicked()
+{
+	swapMenu(static_cast<QWidget *>(network_analyzer));
+}
+
 void ToolLauncher::window_destroyed()
 {
 	windows.removeOne(static_cast<QMainWindow *>(QObject::sender()));
@@ -310,6 +316,11 @@ void adiscope::ToolLauncher::destroyContext()
 		pattern_generator = nullptr;
 	}
 
+	if(network_analyzer) {
+		delete network_analyzer;
+		network_analyzer = nullptr;
+	}
+
 	if (filter) {
 		delete filter;
 		filter = nullptr;
@@ -405,6 +416,14 @@ bool adiscope::ToolLauncher::switchContext(QString &uri)
 				ui->stopPatternGenerator, this);
 		pattern_generator->setVisible(false);
 		ui->patternGenerator->setEnabled(true);
+	}
+
+
+	if (filter->compatible((TOOL_NETWORK_ANALYZER))) {
+		network_analyzer = new NetworkAnalyzer(ctx, filter,
+				ui->stopNetworkAnalyzer, this);
+		network_analyzer->setVisible(false);
+		ui->networkAnalyzer->setEnabled(true);
 	}
 
 

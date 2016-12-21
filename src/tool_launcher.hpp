@@ -33,6 +33,7 @@
 #include "signal_generator.hpp"
 #include "logic_analyzer.hpp"
 #include "pattern_generator.hpp"
+#include "network_analyzer.hpp"
 
 extern "C" {
 	struct iio_context;
@@ -62,6 +63,7 @@ namespace adiscope {
 		void on_btnPowerControl_clicked();
 		void on_btnLogicAnalyzer_clicked();
 		void on_btnPatternGenerator_clicked();
+		void on_btnNetworkAnalyzer_clicked();
 
 		void window_destroyed();
 
@@ -87,6 +89,7 @@ namespace adiscope {
 		Oscilloscope *oscilloscope;
 		LogicAnalyzer *logic_analyzer;
 		PatternGenerator *pattern_generator;
+		NetworkAnalyzer *network_analyzer;
 		QWidget *current;
 
 		Filter *filter;
