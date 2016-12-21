@@ -37,6 +37,7 @@
 #include "ui_channel.h"
 
 extern "C" {
+	struct iio_buffer;
 	struct iio_context;
 	struct iio_device;
 }
@@ -67,19 +68,26 @@ namespace adiscope {
 				QWidget *parent = 0);
 		~SignalGenerator();
 
+		static const size_t min_buffer_size = 1024;
+
+		static QVector<unsigned long> get_available_sample_rates(
+				const struct iio_device *dev);
+
 	private:
 		Ui::SignalGenerator *ui;
 		OscilloscopePlot *plot;
 		gr::top_block_sptr top_block;
 		struct iio_context *ctx;
-		struct iio_device *dev;
 		struct time_block_data *time_block_data;
 
 		bool menuOpened;
 		unsigned int currentChannel;
+		unsigned long sample_rate;
 
 		QButtonGroup *settings_group;
 		QPushButton *menuRunButton;
+
+		QVector<struct iio_buffer *> buffers;
 
 		PositionSpinButton *constantValue;
 		PositionSpinButton *amplitude, *offset, *phase;
@@ -97,11 +105,27 @@ namespace adiscope {
 		void updatePreview();
 		void toggleRightMenu(QPushButton *btn);
 
-		gr::basic_block_sptr getSignalSource(gr::top_block_sptr top,
+		gr::basic_block_sptr getSignalSource(
+				gr::top_block_sptr top,
+				unsigned long sample_rate,
 				struct signal_generator_data &data);
 
 		gr::basic_block_sptr getSource(QWidget *obj,
+				unsigned long sample_rate,
 				gr::top_block_sptr top);
+
+		static size_t gcd(size_t a, size_t b);
+		static size_t lcm(size_t a, size_t b);
+
+		size_t get_samples_count(const struct iio_device *dev,
+				unsigned long sample_rate);
+		unsigned long get_best_sample_rate(
+				const struct iio_device *dev);
+		static unsigned long get_max_sample_rate(
+				const struct iio_device *dev);
+		int set_sample_rate(const struct iio_device *dev,
+				unsigned long sample_rate);
+		bool use_oversampling(const struct iio_device *dev);
 
 	private Q_SLOTS:
 		void constantValueChanged(double val);

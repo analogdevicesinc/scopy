@@ -196,11 +196,6 @@ void adiscope::ToolLauncher::apply_m2k_fixes(struct iio_context *ctx)
 	iio_device_reg_write(dev, 0x6C, 0x0C);
 	iio_device_reg_write(dev, 0x6A, 0x27);
 	iio_device_reg_write(dev, 0x6D, 0x27);
-
-	/* Set the DAC to 1 MSPS */
-	struct iio_device *dac = iio_context_find_device(ctx, "m2k-dac");
-	struct iio_channel *ch = iio_device_find_channel(dac, "voltage0", true);
-	iio_channel_attr_write_longlong(ch, "sampling_frequency", 1000000);
 }
 
 void adiscope::ToolLauncher::on_btnHome_clicked()
