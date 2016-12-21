@@ -8,7 +8,7 @@
 		"compatible-devices": [ "cf-ad9361-lpc", "cf-ad9361-dds-core-lpc", "ad9361-phy" ],
 		"oscilloscope-devices": [ "cf-ad9361-lpc" ],
 		"voltmeter-devices": [ "cf-ad9361-lpc" ],
-		"signal-generator-device": [ "cf-ad9361-dds-core-lpc" ]
+		"signal-generator-devices": [ "cf-ad9361-dds-core-lpc" ]
 	},
 
 	"M2K": {
@@ -18,6 +18,6 @@
 		"voltmeter-devices": [ "m2k-adc" ],
 		"signal-generator-devices": [ "m2k-dac-a", "m2k-dac-b" ],
 		"logic-analyzer-rx-devices": [ "m2k-logic-analyzer-rx" ],
-		"logic-analyzer-tx-device": [ "m2k-logic-analyzer-tx" ]
+		"logic-analyzer-tx-devices": [ "m2k-logic-analyzer-tx" ]
 	}
 }
