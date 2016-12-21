@@ -782,7 +782,7 @@ bool SignalGenerator::use_oversampling(const struct iio_device *dev)
 	return false;
 }
 
-unsigned long SignalGenerator::get_best_sample_rate(
+QVector<unsigned long> SignalGenerator::get_available_sample_rates(
 		const struct iio_device *dev)
 {
 	QVector<unsigned long> values;
@@ -801,31 +801,33 @@ unsigned long SignalGenerator::get_best_sample_rate(
 	if (values.empty()) {
 		ret = iio_device_attr_read(dev, "sampling_frequency",
 				buf, sizeof(buf));
-		if (ret < 0)
-			return 0;
-		else
-			return QString::fromUtf8(buf).toULong();
-	} else {
-		unsigned long min_rate = 0;
+		if (!ret)
+			values.append(QString::fromUtf8(buf).toULong());
+	}
 
-		/* When using oversampling, we actually want to generate the
-		 * signal with the lowest sample rate possible. */
-		if (use_oversampling(dev))
-			qSort(values.begin(), values.end(),
-					qLess<unsigned long>());
-		else
-			qSort(values.begin(), values.end(),
-					qGreater<unsigned long>());
+	qSort(values.begin(), values.end(), qGreater<unsigned long>());
 
-		/* Return the best sample rate that we can create a buffer for */
-		for (unsigned long rate : values) {
-			size_t buf_size = get_samples_count(dev, rate);
-			if (buf_size)
-				return rate;
+	return values;
+}
 
-			qDebug() << QString("Rate %1 too high, trying lower")
-				.arg(rate);
-		}
+unsigned long SignalGenerator::get_best_sample_rate(
+		const struct iio_device *dev)
+{
+	QVector<unsigned long> values = get_available_sample_rates(dev);
+
+	/* When using oversampling, we actually want to generate the
+	 * signal with the lowest sample rate possible. */
+	if (use_oversampling(dev))
+		qSort(values.begin(), values.end(), qLess<unsigned long>());
+
+	/* Return the best sample rate that we can create a buffer for */
+	for (unsigned long rate : values) {
+		size_t buf_size = get_samples_count(dev, rate);
+		if (buf_size)
+			return rate;
+
+		qDebug() << QString("Rate %1 too high, trying lower")
+			.arg(rate);
 	}
 
 	throw std::runtime_error("Unable to calculate best sample rate");
@@ -833,27 +835,9 @@ unsigned long SignalGenerator::get_best_sample_rate(
 
 unsigned long SignalGenerator::get_max_sample_rate(const struct iio_device *dev)
 {
-	QVector<unsigned long> values;
-	char buf[1024];
-	int ret;
+	QVector<unsigned long> values = get_available_sample_rates(dev);
 
-	ret = iio_device_attr_read(dev, "sampling_frequency_available",
-			buf, sizeof(buf));
-	if (ret > 0) {
-		QStringList list = QString::fromUtf8(buf).split(' ');
-
-		for (auto it = list.cbegin(); it != list.cend(); ++it)
-			values.append(it->toULong());
-	}
-
-	if (!values.empty())
-		return values.takeLast();
-
-	ret = iio_device_attr_read(dev, "sampling_frequency", buf, sizeof(buf));
-	if (ret < 0)
-		return 0;
-	else
-		return QString::fromUtf8(buf).toULong();
+	return values.takeLast();
 }
 
 int SignalGenerator::set_sample_rate(const struct iio_device *dev,

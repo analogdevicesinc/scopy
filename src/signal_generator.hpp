@@ -70,6 +70,9 @@ namespace adiscope {
 
 		const size_t min_buffer_size = 1024;
 
+		static QVector<unsigned long> get_available_sample_rates(
+				const struct iio_device *dev);
+
 	private:
 		Ui::SignalGenerator *ui;
 		OscilloscopePlot *plot;
@@ -111,10 +114,6 @@ namespace adiscope {
 				unsigned long sample_rate,
 				gr::top_block_sptr top);
 
-		static unsigned long get_best_sample_rate(
-				const struct iio_device *dev,
-				unsigned long frequency);
-
 		static size_t gcd(size_t a, size_t b);
 		static size_t lcm(size_t a, size_t b);
 
@@ -122,7 +121,8 @@ namespace adiscope {
 				unsigned long sample_rate);
 		unsigned long get_best_sample_rate(
 				const struct iio_device *dev);
-		unsigned long get_max_sample_rate(const struct iio_device *dev);
+		static unsigned long get_max_sample_rate(
+				const struct iio_device *dev);
 		int set_sample_rate(const struct iio_device *dev,
 				unsigned long sample_rate);
 		bool use_oversampling(const struct iio_device *dev);
