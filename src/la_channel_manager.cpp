@@ -405,6 +405,7 @@ LogicAnalyzerChannelManagerUI::LogicAnalyzerChannelManagerUI(QWidget *parent,
 	this->chm = chm;
 	this->la = la;
 	this->chm->initDecoderList();
+	ui->scrollArea->setWidgetResizable(true);
 	connect(ui->scrollArea->verticalScrollBar(), SIGNAL(valueChanged(int)),
 	        this, SLOT(update_position(int)));
 	// update_ui();
@@ -483,8 +484,6 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 
 	ensurePolished();
 	setWidgetMinimumNrOfChars(managerHeaderUI->labelName, 8);
-//	setWidgetMinimumNrOfChars(managerHeaderUI->label, 8);
-//	setWidgetMinimumNrOfChars(managerHeaderUI->labelView, 5);
 	setWidgetMinimumNrOfChars(managerHeaderUI->labelOutput, 8);
 	setWidgetMinimumNrOfChars(managerHeaderUI->indexLabel, 5);
 	managerHeaderUI->label->setMinimumWidth(40);
@@ -494,6 +493,7 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 		managerHeaderUI->rightWidget->setVisible(false);
 		managerHeaderUI->leftWidget->setVisible(false);
 	}
+	ensurePolished();
 
 	main_win->view_->remove_trace_clones();
 	chg_ui.erase(chg_ui.begin(),chg_ui.end());
@@ -524,6 +524,7 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 				lachannelgroupUI->ui->leftWidget->setVisible(false);
 				lachannelgroupUI->ui->rightWidget->setVisible(false);
 				lachannelgroupUI->ui->stackedWidget->setCurrentIndex(0);
+				setWidgetMinimumNrOfChars(lachannelgroupUI->ui->decoderCombo, 10);
 
 			}
 
@@ -544,8 +545,10 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 				lachannelgroupUI->setTrace(trace);
 				trace->force_to_v_offset(offset);
 
-
-				setWidgetMinimumNrOfChars(lachannelgroupUI->ui->decoderCombo, 15);
+				if(!collapsed)
+				{
+					setWidgetMinimumNrOfChars(lachannelgroupUI->ui->decoderCombo, 15);
+				}
 				lachannelgroupUI->ui->decoderCombo->addItem("None");
 
 				for (auto var : chm->get_name_decoder_list()) {
@@ -668,6 +671,7 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 		ui->scrollArea->verticalScrollBar()->setRange(0,
 		                ui->scrollAreaWidgetContents->height() - chg_ui.front()->sizeHint().height());
 	}
+	ui->scrollArea->setMaximumWidth(chg_ui.back()->sizeHint().width());
 }
 
 void LogicAnalyzerChannelManagerUI::collapse(bool check)

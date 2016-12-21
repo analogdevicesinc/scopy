@@ -572,7 +572,7 @@ QPushButton:!checked:hover {
              </property>
              <property name="minimumSize">
               <size>
-               <width>240</width>
+               <width>0</width>
                <height>30</height>
               </size>
              </property>
@@ -583,22 +583,24 @@ QPushButton:!checked:hover {
               </size>
              </property>
              <property name="styleSheet">
-              <string notr="true">QPushButton {
-color: white;
-background-color: rgb(74, 100, 255);
-font-family: &quot;ArialMT&quot;;
-font-size: 14px;
-width: 240px;
-height: 30px;
-border-width: 0px;
-border-radius: 4px;
-min-width: 6em;
+              <string notr="true">QPushButton
+{
+  width: 240px;
+  height: 30px;
+  border-radius: 4px;
+  background-color: #4a64ff;
+
+  font-family: ArialMT;
+  font-size: 14px;
+  font-weight: normal;
+  font-style: normal;
+  text-align: center;
+  color: #ffffff;
 }
-QPushButton:disabled {
-background-color: grey;
-}
-QPushButton:checked {
-background-color: #F45000;
+
+QPushButton:hover
+{
+	 background-color: #4a34ff;
 }</string>
              </property>
              <property name="text">
@@ -635,7 +637,7 @@ background-color: #F45000;
              </property>
              <property name="minimumSize">
               <size>
-               <width>240</width>
+               <width>0</width>
                <height>30</height>
               </size>
              </property>
@@ -646,22 +648,23 @@ background-color: #F45000;
               </size>
              </property>
              <property name="styleSheet">
-              <string notr="true">QPushButton {
-color: white;
-background-color: rgb(74, 100, 255);
-font-family: &quot;ArialMT&quot;;
-font-size: 14px;
-width: 240px;
-height: 30px;
-border-width: 0px;
-border-radius: 4px;
-min-width: 6em;
+              <string notr="true">QPushButton{
+  width: 240px;
+  height: 30px;
+  border-radius: 4px;
+  background-color: #4a64ff;
+  font-family: ArialMT;
+  font-size: 14px;
+  font-weight: normal;
+  font-style: normal;
+  text-align: center;
+  color: #ffffff;
 }
-QPushButton:disabled {
-background-color: grey;
-}
-QPushButton:checked {
-background-color: #F45000;
+
+
+QPushButton:hover
+{
+	 background-color: #4a34ff;
 }</string>
              </property>
              <property name="text">
@@ -706,19 +709,23 @@ background-color: #F45000;
               </size>
              </property>
              <property name="styleSheet">
-              <string notr="true">QPushButton {
-color: white;
-background-color: rgb(74, 100, 255);;
-font-family: &quot;monospace&quot;;
-font-size: 14px;
-font-weight: bold;
-height: 30px;
-width: 40px;
-border-width: 0px;
-border-radius: 4px;
+              <string notr="true">QPushButton{
+  width: 240px;
+  height: 30px;
+  border-radius: 4px;
+  background-color: #4a64ff;
+  font-family: ArialMT;
+  font-size: 14px;
+  font-weight: normal;
+  font-style: normal;
+  text-align: center;
+  color: #ffffff;
 }
-QPushButton:disabled {
-background-color: grey;
+
+
+QPushButton:hover
+{
+	 background-color: #4a34ff;
 }</string>
              </property>
              <property name="text">
