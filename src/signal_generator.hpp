@@ -68,7 +68,7 @@ namespace adiscope {
 				QWidget *parent = 0);
 		~SignalGenerator();
 
-		const size_t min_buffer_size = 1024;
+		static const size_t min_buffer_size = 1024;
 
 		static QVector<unsigned long> get_available_sample_rates(
 				const struct iio_device *dev);
