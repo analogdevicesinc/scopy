@@ -291,16 +291,15 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 			this, SLOT(tabChanged(int)));
 
 	connect(ui->load_file, SIGNAL(pressed()), this, SLOT(loadFile()));
-	connect(ui->run_button, SIGNAL(toggled(bool)),
-			this, SLOT(startStop(bool)));
-	connect(runButton, SIGNAL(toggled(bool)), this, SLOT(startStop(bool)));
 	connect(ui->mathWidget, SIGNAL(functionValid(const QString&)),
 			this, SLOT(setFunction(const QString&)));
 
+	connect(ui->run_button, SIGNAL(clicked(bool)), runButton,
+			SLOT(setChecked(bool)));
 	connect(runButton, SIGNAL(toggled(bool)), ui->run_button,
 			SLOT(setChecked(bool)));
-	connect(ui->run_button, SIGNAL(toggled(bool)), runButton,
-			SLOT(setChecked(bool)));
+	connect(runButton, SIGNAL(toggled(bool)),
+			this, SLOT(startStop(bool)));
 }
 
 SignalGenerator::~SignalGenerator()
