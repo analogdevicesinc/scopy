@@ -75,8 +75,14 @@ DecoderStack::DecoderStack(pv::Session &session,
 	connect(&session_, SIGNAL(frame_ended()),
 		this, SLOT(on_frame_ended()));
 
-	stack_.push_back(shared_ptr<decode::Decoder>(
-		new decode::Decoder(dec)));
+	if (dec)
+	{
+		stack_.push_back(shared_ptr<decode::Decoder>(
+			new decode::Decoder(dec)));
+		name_ = stack_.front()->decoder()->name;
+	}
+	else
+		name_ = "GroupName";
 }
 
 DecoderStack::~DecoderStack()
@@ -86,6 +92,11 @@ DecoderStack::~DecoderStack()
 		input_cond_.notify_one();
 		decode_thread_.join();
 	}
+}
+
+QString DecoderStack::name()
+{
+	return name_;
 }
 
 const std::list< std::shared_ptr<decode::Decoder> >&
@@ -98,6 +109,14 @@ void DecoderStack::push(std::shared_ptr<decode::Decoder> decoder)
 {
 	assert(decoder);
 	stack_.push_back(decoder);
+}
+
+void DecoderStack::push_front(const srd_decoder *decoder)
+{
+	assert(decoder);
+	const srd_decoder *const dec = decoder;
+	stack_.push_front(shared_ptr<decode::Decoder>(
+			new decode::Decoder(dec)));
 }
 
 void DecoderStack::remove(int index)
@@ -144,6 +163,7 @@ std::vector<Row> DecoderStack::get_visible_rows() const
 		const srd_decoder *const decc = dec->decoder();
 		assert(dec->decoder());
 
+		std::cout << "NAME " <<  decc->name << std::endl;
 		// Add a row for the decoder if it doesn't have a row list
 		if (!decc->annotation_rows)
 			rows.push_back(Row(decc));

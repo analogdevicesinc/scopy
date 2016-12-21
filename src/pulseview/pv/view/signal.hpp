@@ -71,6 +71,8 @@ public:
 
 	std::shared_ptr<sigrok::Channel> channel() const;
 
+	pv::Session* session();
+
 	/**
 	 * Returns a list of row items owned by this object.
 	 */

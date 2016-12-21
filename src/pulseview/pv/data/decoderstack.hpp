@@ -79,12 +79,14 @@ private:
 	static const unsigned int DecodeNotifyPeriod;
 
 public:
-	DecoderStack(pv::Session &session, const srd_decoder *const dec);
+	DecoderStack(pv::Session &session,
+		const srd_decoder *const dec = NULL);
 
 	virtual ~DecoderStack();
 
 	const std::list< std::shared_ptr<decode::Decoder> >& stack() const;
 	void push(std::shared_ptr<decode::Decoder> decoder);
+	void push_front(const srd_decoder *decoder);
 	void remove(int index);
 
 	double samplerate() const;
@@ -110,6 +112,8 @@ public:
 	uint64_t max_sample_count() const;
 
 	void begin_decode();
+
+	QString name();
 
 private:
 	boost::optional<int64_t> wait_for_data() const;
@@ -168,6 +172,8 @@ private:
 	std::atomic<bool> interrupt_;
 
 	friend struct DecoderStackTest::TwoDecoderStack;
+
+	QString name_;
 };
 
 } // namespace data

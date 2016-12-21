@@ -94,6 +94,8 @@ pair<int, int> TraceTreeItemOwner::v_extents() const
 		assert(t);
 		if (!t->enabled())
 			continue;
+		if(t->isInitial())
+			continue;
 
 		has_children = true;
 
@@ -130,6 +132,40 @@ bool TraceTreeItemOwner::reassign_bgcolour_states(bool next_bgcolour_state)
 
 void TraceTreeItemOwner::restack_items()
 {
+	vector<shared_ptr<TraceTreeItem>> items(list_by_type<TraceTreeItem>());
+	int traceSpacing = 5;
+
+	// Sort by the centre line of the extents
+	stable_sort(items.begin(), items.end(),
+		[](const shared_ptr<TraceTreeItem> &a, const shared_ptr<TraceTreeItem> &b) {
+			const auto aext = a->v_extents();
+			const auto bext = b->v_extents();
+			return a->layout_v_offset() +
+					(aext.first + aext.second) / 2 <
+				b->layout_v_offset() +
+					(bext.first + bext.second) / 2;
+		});
+
+	int total_offset = traceSpacing;
+	for (shared_ptr<TraceTreeItem> r : items) {
+		const pair<int, int> extents = r->v_extents();
+		if (extents.first == 0 && extents.second == 0)
+			continue;
+
+		// We position disabled traces, so that they are close to the
+		// animation target positon should they be re-enabled
+		if (r->enabled())
+			total_offset += -extents.first;
+
+		if (!r->dragging())
+			r->set_layout_v_offset(total_offset);
+
+		if (r->enabled())
+		{
+			total_offset += extents.second;
+			total_offset += traceSpacing;
+		}
+	}
 }
 
 } // view

@@ -169,8 +169,6 @@ private Q_SLOTS:
 
 	void on_actionViewShowCursors_triggered();
 
-//	void on_actionAbout_triggered();
-
 	void add_decoder(srd_decoder *decoder);
 
 	void capture_state_changed(int state);
@@ -183,15 +181,14 @@ private Q_SLOTS:
 private:
 	DeviceManager &device_manager_;
 
-    Session session_;
-
-	pv::view::View *view_;
-
-    QWidget *central_widget_;
-    QHBoxLayout *vertical_layout_;
+	Session session_;
+	QWidget *central_widget_;
+	QHBoxLayout *vertical_layout_;
 
 public:
 	toolbars::MainBar *main_bar_;
+	pv::view::View *view_;
+
 private:
 	QAction *const action_open_;
 	QAction *const action_save_as_;
@@ -204,7 +201,7 @@ private:
 	QAction *const action_view_zoom_one_to_one_;
 	QAction *const action_view_sticky_scrolling_;
 	QAction *const action_view_coloured_bg_;
-    QAction *const action_view_show_cursors_;
+	QAction *const action_view_show_cursors_;
 
 
 	QMenu *const menu_decoders_add_;

@@ -35,8 +35,19 @@ const int ViewItem::HighlightRadius = 3;
 ViewItem::ViewItem() :
 	context_parent_(nullptr),
 	drag_point_(INT_MIN, INT_MIN),
-	selected_(false)
+	selected_(false),
+	initial_(true)
 {
+}
+
+bool ViewItem::isInitial()
+{
+	return initial_;
+}
+
+void ViewItem::setInitial(bool check)
+{
+	initial_ = check;
 }
 
 bool ViewItem::selected() const

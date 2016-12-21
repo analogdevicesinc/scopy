@@ -42,14 +42,14 @@
     </spacer>
    </item>
    <item row="1" column="1">
-    <widget class="QLineEdit" name="frequencyEdit">
+    <widget class="QLineEdit" name="frequency_LE">
      <property name="text">
       <string>50</string>
      </property>
     </widget>
    </item>
    <item row="3" column="1">
-    <widget class="QLineEdit" name="dutyEdit">
+    <widget class="QLineEdit" name="duty_LE">
      <property name="text">
       <string>50</string>
      </property>
@@ -63,7 +63,7 @@
     </widget>
    </item>
    <item row="5" column="1">
-    <widget class="QLineEdit" name="phaseLineEdit">
+    <widget class="QLineEdit" name="phase_LE">
      <property name="text">
       <string>0</string>
      </property>

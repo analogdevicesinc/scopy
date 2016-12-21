@@ -27,11 +27,11 @@
 /* Local includes */
 #include "filter.hpp"
 #include "pulseview/pv/widgets/sweeptimingwidget.hpp"
-#include "pulseview/pv/toolbars/mainbar.hpp"
 #include "pulseview/pv/devicemanager.hpp"
 #include "pulseview/pv/mainwindow.hpp"
 #include "spinbox_a.hpp"
 #include "pulseview/pv/devices/binarystream.hpp"
+#include "la_channel_manager.hpp"
 
 using namespace pv;
 using namespace pv::toolbars;
@@ -42,55 +42,66 @@ namespace Glibmm {
 }
 
 namespace Ui {
-	class LogicAnalyzer;
+class LogicAnalyzer;
+class Channel;
+class LChannelSettings;
 }
 
 namespace adiscope {
-	class LogicAnalyzer : public QWidget
-	{
-		Q_OBJECT
+class LogicAnalyzer : public QWidget
+{
+	Q_OBJECT
 
-	public:
-		explicit LogicAnalyzer(struct iio_context *ctx,
-				Filter* filt,
-				QPushButton *runButton,
-				QWidget *parent = 0,
-				unsigned int sample_rate = 200000);
-		~LogicAnalyzer();
+public:
+	explicit LogicAnalyzer(struct iio_context *ctx,
+	                       Filter *filt,
+	                       QPushButton *runButton,
+	                       QWidget *parent = 0,
+	                       unsigned int sample_rate = 200000);
+	~LogicAnalyzer();
 
-	private Q_SLOTS:
-		void startStop(bool start);
-		void toggleRightMenu();
-		void rightMenuFinished(bool opened);
+private Q_SLOTS:
+	void startStop(bool start);
+	void toggleRightMenu();
+	void rightMenuFinished(bool opened);
+	void toggleLeftMenu(bool val);
+	void leftMenuFinished(bool opened);
+	void on_btnShowChannelsClicked(bool check);
 
-	private:
-		Ui::LogicAnalyzer *ui;
-		QButtonGroup *settings_group;
-		QPushButton *active_settings_btn;
-		QPushButton *menuRunButton;
+private:
+	Ui::LogicAnalyzer *ui;
+	QButtonGroup *settings_group;
+	QPushButton *active_settings_btn;
+	QPushButton *menuRunButton;
 
-		ScaleSpinButton *timeBase;
-		PositionSpinButton *timePosition;
+	ScaleSpinButton *timeBase;
+	PositionSpinButton *timePosition;
 
-		const std::string& dev_name;
+	const std::string& dev_name;
 
-		struct iio_context *ctx;
-		struct iio_device *dev;
-		unsigned int no_channels;
-		unsigned int itemsize;
-		pv::MainWindow* main_win;
+	struct iio_context *ctx;
+	struct iio_device *dev;
+	unsigned int no_channels;
+	unsigned int itemsize;
+	pv::MainWindow *main_win;
 
-		void disconnectAll();
-		static unsigned int get_no_channels(struct iio_device *dev);
+	void disconnectAll();
+	static unsigned int get_no_channels(struct iio_device *dev);
 
-		void settings_panel_update(int id);
-		void toggleRightMenu(QPushButton *btn);
+	void settings_panel_update(int id);
+	void toggleRightMenu(QPushButton *btn);
 
-		bool menuOpened;
+	bool menuOpened;
 
-		std::map<std::string, Glib::VariantBase> options;
-		std::shared_ptr<pv::devices::BinaryStream> logic_analyzer_ptr;
-	};
+	std::map<std::string, Glib::VariantBase> options;
+	std::shared_ptr<pv::devices::BinaryStream> logic_analyzer_ptr;
+
+	LogicAnalyzerChannelManager chm;
+	LogicAnalyzerChannelManagerUI *chm_ui;
+	Ui::LChannelSettings *lachannelsettings;
+
+	void clearLayout(QLayout *layout);
+};
 }
 
 #endif // LOGIC_ANALYZER_H

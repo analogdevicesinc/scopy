@@ -22,6 +22,7 @@
 #define PULSEVIEW_PV_VIEW_TRACETREEITEM_HPP
 
 #include <memory>
+#include <atomic>
 
 #include <QPropertyAnimation>
 
@@ -44,7 +45,7 @@ public:
 	/**
 	 * Constructor.
 	 */
-	TraceTreeItem();
+    TraceTreeItem();
 
 	/**
 	 * Gets the owner of this item in the view item hierachy.
@@ -124,6 +125,8 @@ public:
 	 */
 	virtual std::pair<int, int> v_extents() const = 0;
 
+	void set_highlight(bool check);
+
 protected:
 	TraceTreeItemOwner *owner_;
 
@@ -131,6 +134,7 @@ protected:
 	int visual_v_offset_;
 
 	bool bgcolour_state_;
+	bool highlight_;
 
 private:
 	QPropertyAnimation v_offset_animation_;

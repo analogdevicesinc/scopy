@@ -119,10 +119,15 @@ MainWindow::MainWindow(DeviceManager &device_manager,
 
     setup_ui();
 	if (open_file_name.empty())
-		select_init_device(filt->hw_name().toStdString().c_str());
+{	//	select_init_device(filt->hw_name().toStdString().c_str());
+
+    }
 	else
         if(open_file_name!="pattern_generator")
             load_init_file(open_file_name, open_file_format);
+
+	setContentsMargins(0, 0, 0, 0);
+	this->setStyleSheet("border: 0px; padding: 0px; margin 0px;");
 }
 
 QAction* MainWindow::action_open() const
@@ -345,6 +350,9 @@ void MainWindow::setup_ui()
 	// Setup the central widget
     central_widget_ = new QWidget(this);
     vertical_layout_ = new QHBoxLayout();
+
+    vertical_layout_->setContentsMargins(0,0,0,0);
+    vertical_layout_->setSpacing(0);
 
     vertical_layout_->addWidget(central_widget_);
     this->setLayout(vertical_layout_);

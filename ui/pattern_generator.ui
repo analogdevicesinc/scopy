@@ -14,7 +14,7 @@
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+   <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -26,8 +26,20 @@
    <string>Scopy Pattern Generator</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">
-/* QComboBoxes*/
+   <string notr="true">/* QComboBoxes*/
+QPushButton
+{
+  outline:none;
+}
+QCheckBox
+{
+  outline:none;
+}
+QLineEdit
+{
+   outline:none;
+}
+
 QComboBox
 {
   height: 24px;
@@ -36,6 +48,7 @@ QComboBox
   font-size: 14px;
   border-bottom: 1px solid rgba(255, 255, 255, 102);
   padding-bottom: 4px;
+  outline:none;
 }
 QComboBox::drop-down
 {
@@ -397,7 +410,7 @@ background-color: #F45000;
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="btnSettings">
+       <widget class="QPushButton" name="btnPGSettings">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -441,6 +454,58 @@ QPushButton:!checked {
        </widget>
       </item>
       <item>
+       <widget class="QPushButton" name="btnChSettings">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>60</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>60</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton {
+  min-height: 40px;
+  max-height: 40px;
+  min-width: 60px;
+  max-width: 60px;
+}
+
+QPushButton:checked {
+  border-image: url(:/icons/setup3_checked.svg);
+}
+
+QPushButton:!checked {
+  border-image: url(:/icons/setup3_unchecked.svg);
+}
+
+QPushButton:!checked:hover {
+  border-image: url(:/icons/setup3_unchecked_hover.svg);
+}
+
+QPushButton:checked:hover {
+  border-image: url(:/icons/setup3_checked_hover.svg);
+}</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
        <spacer name="horizontalSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -462,881 +527,773 @@ QPushButton:!checked {
    <item>
     <widget class="QWidget" name="plotWidget" native="true">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
       <property name="topMargin">
-       <number>9</number>
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
       </property>
       <item>
-       <widget class="QWidget" name="centralWidget" native="true">
+       <widget class="QWidget" name="widget" native="true">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QTabWidget" name="rightWidget">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>250</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="toolTipDuration">
-         <number>0</number>
         </property>
         <property name="styleSheet">
          <string notr="true"/>
         </property>
-        <property name="currentIndex">
-         <number>0</number>
-        </property>
-        <widget class="QWidget" name="rightWidgetPage1">
-         <attribute name="title">
-          <string>General</string>
-         </attribute>
-         <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
-          <property name="topMargin">
-           <number>9</number>
-          </property>
-          <property name="bottomMargin">
-           <number>9</number>
-          </property>
-          <property name="spacing">
-           <number>6</number>
-          </property>
-          <item row="12" column="0">
-           <widget class="QPushButton" name="clearButton">
-            <property name="text">
-             <string>Clear Buffer</string>
-            </property>
-           </widget>
-          </item>
-          <item row="9" column="0">
-           <widget class="QLineEdit" name="ChannelsToGenerate"/>
-          </item>
-          <item row="1" column="0">
-           <widget class="Line" name="line">
-            <property name="styleSheet">
-             <string notr="true">QFrame { color:  rgb(73, 99, 255); }</string>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Plain</enum>
-            </property>
-            <property name="lineWidth">
-             <number>2</number>
-            </property>
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="13" column="0">
-           <widget class="QLabel" name="label_7">
-            <property name="text">
-             <string>ChannelEnableMask</string>
-            </property>
-           </widget>
-          </item>
-          <item row="22" column="0">
-           <layout class="QHBoxLayout" name="horizontalLayout_4">
-            <property name="topMargin">
-             <number>10</number>
-            </property>
-            <item>
-             <widget class="QPushButton" name="save_PB">
-              <property name="text">
-               <string>Save Buffer</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="load_PB">
-              <property name="text">
-               <string>Load Buffer</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item row="15" column="0">
-           <widget class="QLabel" name="label_8">
-            <property name="text">
-             <string>Number Of Samples</string>
-            </property>
-           </widget>
-          </item>
-          <item row="14" column="0">
-           <widget class="QLineEdit" name="ChannelEnableMask"/>
-          </item>
-          <item row="24" column="0">
-           <spacer name="verticalSpacer">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>0</width>
-              <height>5</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="settings_label">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="palette">
-             <palette>
-              <active>
-               <colorrole role="WindowText">
-                <brush brushstyle="SolidPattern">
-                 <color alpha="255">
-                  <red>255</red>
-                  <green>255</green>
-                  <blue>255</blue>
-                 </color>
-                </brush>
-               </colorrole>
-               <colorrole role="Text">
-                <brush brushstyle="SolidPattern">
-                 <color alpha="255">
-                  <red>255</red>
-                  <green>255</green>
-                  <blue>255</blue>
-                 </color>
-                </brush>
-               </colorrole>
-               <colorrole role="ButtonText">
-                <brush brushstyle="SolidPattern">
-                 <color alpha="255">
-                  <red>255</red>
-                  <green>255</green>
-                  <blue>255</blue>
-                 </color>
-                </brush>
-               </colorrole>
-              </active>
-              <inactive>
-               <colorrole role="WindowText">
-                <brush brushstyle="SolidPattern">
-                 <color alpha="255">
-                  <red>255</red>
-                  <green>255</green>
-                  <blue>255</blue>
-                 </color>
-                </brush>
-               </colorrole>
-               <colorrole role="Text">
-                <brush brushstyle="SolidPattern">
-                 <color alpha="255">
-                  <red>255</red>
-                  <green>255</green>
-                  <blue>255</blue>
-                 </color>
-                </brush>
-               </colorrole>
-               <colorrole role="ButtonText">
-                <brush brushstyle="SolidPattern">
-                 <color alpha="255">
-                  <red>255</red>
-                  <green>255</green>
-                  <blue>255</blue>
-                 </color>
-                </brush>
-               </colorrole>
-              </inactive>
-              <disabled>
-               <colorrole role="WindowText">
-                <brush brushstyle="SolidPattern">
-                 <color alpha="255">
-                  <red>255</red>
-                  <green>255</green>
-                  <blue>255</blue>
-                 </color>
-                </brush>
-               </colorrole>
-               <colorrole role="Text">
-                <brush brushstyle="SolidPattern">
-                 <color alpha="255">
-                  <red>255</red>
-                  <green>255</green>
-                  <blue>255</blue>
-                 </color>
-                </brush>
-               </colorrole>
-               <colorrole role="ButtonText">
-                <brush brushstyle="SolidPattern">
-                 <color alpha="255">
-                  <red>255</red>
-                  <green>255</green>
-                  <blue>255</blue>
-                 </color>
-                </brush>
-               </colorrole>
-              </disabled>
-             </palette>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">QLabel {
-	color: white;
-}</string>
-            </property>
-            <property name="midLineWidth">
+        <layout class="QGridLayout" name="gridLayout">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <item row="0" column="1" rowspan="2">
+          <widget class="QWidget" name="widget_3" native="true">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0 y2:1, stop:0 rgba(33,33,39,50) , stop:1 rgba(38,38,46,50) );</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_5">
+            <property name="spacing">
              <number>0</number>
             </property>
-            <property name="text">
-             <string>Settings</string>
+            <property name="leftMargin">
+             <number>0</number>
             </property>
-            <property name="alignment">
-             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+            <property name="topMargin">
+             <number>0</number>
             </property>
-           </widget>
-          </item>
-          <item row="7" column="0">
-           <widget class="QWidget" name="verticalWidget_4" native="true">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>0</height>
-             </size>
+            <property name="rightMargin">
+             <number>0</number>
             </property>
-            <layout class="QVBoxLayout" name="verticalLayout_5">
-             <property name="spacing">
-              <number>1</number>
-             </property>
-             <property name="leftMargin">
-              <number>0</number>
-             </property>
-             <property name="topMargin">
-              <number>0</number>
-             </property>
-             <property name="rightMargin">
-              <number>0</number>
-             </property>
-             <property name="bottomMargin">
-              <number>0</number>
-             </property>
-             <item>
-              <widget class="QWidget" name="verticalWidget_3" native="true">
-               <property name="minimumSize">
-                <size>
-                 <width>0</width>
-                 <height>0</height>
-                </size>
-               </property>
-               <layout class="QVBoxLayout" name="verticalLayout_4">
-                <property name="spacing">
-                 <number>1</number>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <spacer name="verticalSpacer_3">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QWidget" name="widget_2" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1 y2:0, stop:0 rgba(33,33,39,50) , stop:1 rgba(38,38,46,50) );</string>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_4">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <spacer name="horizontalSpacer_7">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Preferred</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="3" column="2">
+          <widget class="QWidget" name="widget_5" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">background-color: qlineargradient(spread:pad, x1:1, y1:0, x2:0 y2:0, stop:0 rgba(33,33,39,50) , stop:1 rgba(38,38,46,50) );</string>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_6">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <spacer name="horizontalSpacer_9">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Preferred</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QWidget" name="widget_4" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">background-color: qlineargradient(spread:pad, x1:0, y1:1, x2:0 y2:0, stop:0 rgba(33,33,39,50) , stop:1 rgba(38,38,46,50) );</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_2">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <spacer name="verticalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QWidget" name="leftWidget" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">gridline-color: rgb(170, 85, 127);</string>
+           </property>
+           <layout class="QVBoxLayout" name="leftWidgetLayout">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_3">
+              <property name="spacing">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QPushButton" name="btnHideInactive">
+                <property name="styleSheet">
+                 <string notr="true">QPushButton
+{
+  width: 240px;
+  height: 30px;
+  border-radius: 4px;
+  background-color: #4a64ff;
+
+  font-family: ArialMT;
+  font-size: 14px;
+  font-weight: normal;
+  font-style: normal;
+  text-align: center;
+  color: #ffffff;
+
+}
+
+
+QPushButton:hover
+{
+	 background-color: #4a34ff;
+}</string>
                 </property>
+                <property name="text">
+                 <string>Hide inactive</string>
+                </property>
+                <property name="checkable">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_5">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeType">
+                 <enum>QSizePolicy::Preferred</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QPushButton" name="btnGroupWithSelected">
+                <property name="styleSheet">
+                 <string notr="true">QPushButton{
+  width: 240px;
+  height: 30px;
+  border-radius: 4px;
+  background-color: #4a64ff;
+  font-family: ArialMT;
+  font-size: 14px;
+  font-weight: normal;
+  font-style: normal;
+  text-align: center;
+  color: #ffffff;
+}
+
+
+QPushButton:hover
+{
+	 background-color: #4a34ff;
+}</string>
+                </property>
+                <property name="text">
+                 <string>Group with selected</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_6">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeType">
+                 <enum>QSizePolicy::Preferred</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>80</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QPushButton" name="btnExtendChannelManager">
+                <property name="styleSheet">
+                 <string notr="true">QPushButton{
+  width: 40px;
+  height: 30px;
+  border-radius: 4px;
+  background-color: #4a64ff;
+  font-family: ArialMT;
+  font-size: 14px;
+  font-weight: normal;
+  font-style: normal;
+  text-align: center;
+
+}
+
+QPushButton:checked {
+  background-image: url(:/icons/ico-expand.svg);
+  background-repeat: none;
+  background-position:center;
+}
+
+QPushButton:!checked {
+  background-image: url(:/icons/ico-collapse.svg);
+  background-repeat: none;
+  background-position:center;
+}
+
+QPushButton:hover
+{
+	 background-color: #4a34ff;
+}</string>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="checkable">
+                 <bool>true</bool>
+                </property>
+                <property name="checked">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_8">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeType">
+                 <enum>QSizePolicy::MinimumExpanding</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>45</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_5">
+              <property name="spacing">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <layout class="QVBoxLayout" name="verticalLayout_4">
                 <property name="leftMargin">
                  <number>0</number>
                 </property>
                 <property name="topMargin">
                  <number>0</number>
                 </property>
-                <property name="rightMargin">
-                 <number>0</number>
-                </property>
-                <property name="bottomMargin">
-                 <number>0</number>
-                </property>
                 <item>
-                 <widget class="QLabel" name="label_3">
+                 <widget class="adiscope::MenuAnim" name="channelManagerWidget" native="true">
                   <property name="sizePolicy">
-                   <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                   <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
-                  <property name="maximumSize">
+                  <layout class="QVBoxLayout" name="channelManagerWidgetLayout">
+                   <property name="spacing">
+                    <number>0</number>
+                   </property>
+                   <property name="leftMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="topMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="rightMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="bottomMargin">
+                    <number>0</number>
+                   </property>
+                  </layout>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="verticalSpacer">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
                    <size>
-                    <width>16777215</width>
-                    <height>35</height>
+                    <width>20</width>
+                    <height>40</height>
                    </size>
                   </property>
-                  <property name="styleSheet">
-                   <string notr="true"/>
-                  </property>
-                  <property name="text">
-                   <string>Sample Rate</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QComboBox" name="sampleRateCombo">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="inputMethodHints">
-                   <set>Qt::ImhDigitsOnly</set>
-                  </property>
-                  <property name="editable">
-                   <bool>true</bool>
-                  </property>
-                  <property name="currentText">
-                   <string/>
-                  </property>
-                  <property name="maxVisibleItems">
-                   <number>5</number>
-                  </property>
-                  <property name="sizeAdjustPolicy">
-                   <enum>QComboBox::AdjustToContentsOnFirstShow</enum>
-                  </property>
-                  <property name="frame">
-                   <bool>true</bool>
-                  </property>
-                 </widget>
+                 </spacer>
                 </item>
                </layout>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_4">
-               <property name="text">
-                <string>Script</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QComboBox" name="scriptCombo">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item row="20" column="0">
-           <widget class="QLineEdit" name="lastSample"/>
-          </item>
-          <item row="16" column="0">
-           <widget class="QLineEdit" name="numberOfSamples"/>
-          </item>
-          <item row="10" column="0">
-           <widget class="QPushButton" name="generateUI">
-            <property name="text">
-             <string>Generate UI</string>
-            </property>
-           </widget>
-          </item>
-          <item row="17" column="0">
-           <widget class="QLabel" name="label_9">
-            <property name="text">
-             <string>Starting Sample</string>
-            </property>
-           </widget>
-          </item>
-          <item row="18" column="0">
-           <widget class="QLineEdit" name="startingSample"/>
-          </item>
-          <item row="4" column="0" rowspan="2">
-           <widget class="QWidget" name="horizontalWidget" native="true">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>50</height>
-             </size>
-            </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_3">
-             <property name="spacing">
-              <number>20</number>
-             </property>
-             <property name="leftMargin">
-              <number>0</number>
-             </property>
-             <property name="topMargin">
-              <number>0</number>
-             </property>
-             <property name="rightMargin">
-              <number>0</number>
-             </property>
-             <property name="bottomMargin">
-              <number>0</number>
-             </property>
-             <item>
-              <widget class="QWidget" name="verticalWidget" native="true">
-               <layout class="QVBoxLayout" name="verticalLayout_2">
-                <property name="spacing">
-                 <number>1</number>
+              </item>
+              <item>
+               <widget class="QWidget" name="centralWidget" native="true">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
                 </property>
-                <property name="leftMargin">
-                 <number>0</number>
-                </property>
-                <property name="topMargin">
-                 <number>0</number>
-                </property>
-                <property name="rightMargin">
-                 <number>9</number>
-                </property>
-                <property name="bottomMargin">
-                 <number>0</number>
-                </property>
-                <item>
-                 <widget class="QLabel" name="label">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="styleSheet">
-                   <string notr="true"/>
-                  </property>
-                  <property name="text">
-                   <string>Trigger</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QComboBox" name="trigger_combobox">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="styleSheet">
-                   <string notr="true"/>
-                  </property>
-                  <property name="currentIndex">
-                   <number>0</number>
-                  </property>
-                  <property name="sizeAdjustPolicy">
-                   <enum>QComboBox::AdjustToContentsOnFirstShow</enum>
-                  </property>
-                  <item>
-                   <property name="text">
-                    <string>Analyzer</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>Scope</string>
-                   </property>
-                  </item>
-                 </widget>
-                </item>
-               </layout>
-              </widget>
-             </item>
-             <item>
-              <widget class="QWidget" name="verticalWidget_2" native="true">
-               <layout class="QVBoxLayout" name="verticalLayout_3">
-                <property name="spacing">
-                 <number>1</number>
-                </property>
-                <property name="topMargin">
-                 <number>0</number>
-                </property>
-                <property name="rightMargin">
-                 <number>0</number>
-                </property>
-                <property name="bottomMargin">
-                 <number>0</number>
-                </property>
-                <item>
-                 <widget class="QLabel" name="label_2">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="styleSheet">
-                   <string notr="true"/>
-                  </property>
-                  <property name="text">
-                   <string>Wait</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QComboBox" name="comboBox">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="palette">
-                   <palette>
-                    <active>
-                     <colorrole role="WindowText">
-                      <brush brushstyle="SolidPattern">
-                       <color alpha="255">
-                        <red>255</red>
-                        <green>255</green>
-                        <blue>255</blue>
-                       </color>
-                      </brush>
-                     </colorrole>
-                     <colorrole role="Dark">
-                      <brush brushstyle="SolidPattern">
-                       <color alpha="255">
-                        <red>201</red>
-                        <green>200</green>
-                        <blue>199</blue>
-                       </color>
-                      </brush>
-                     </colorrole>
-                     <colorrole role="Text">
-                      <brush brushstyle="SolidPattern">
-                       <color alpha="255">
-                        <red>255</red>
-                        <green>255</green>
-                        <blue>255</blue>
-                       </color>
-                      </brush>
-                     </colorrole>
-                     <colorrole role="ButtonText">
-                      <brush brushstyle="SolidPattern">
-                       <color alpha="255">
-                        <red>255</red>
-                        <green>255</green>
-                        <blue>255</blue>
-                       </color>
-                      </brush>
-                     </colorrole>
-                    </active>
-                    <inactive>
-                     <colorrole role="WindowText">
-                      <brush brushstyle="SolidPattern">
-                       <color alpha="255">
-                        <red>255</red>
-                        <green>255</green>
-                        <blue>255</blue>
-                       </color>
-                      </brush>
-                     </colorrole>
-                     <colorrole role="Dark">
-                      <brush brushstyle="SolidPattern">
-                       <color alpha="255">
-                        <red>201</red>
-                        <green>200</green>
-                        <blue>199</blue>
-                       </color>
-                      </brush>
-                     </colorrole>
-                     <colorrole role="Text">
-                      <brush brushstyle="SolidPattern">
-                       <color alpha="255">
-                        <red>255</red>
-                        <green>255</green>
-                        <blue>255</blue>
-                       </color>
-                      </brush>
-                     </colorrole>
-                     <colorrole role="ButtonText">
-                      <brush brushstyle="SolidPattern">
-                       <color alpha="255">
-                        <red>255</red>
-                        <green>255</green>
-                        <blue>255</blue>
-                       </color>
-                      </brush>
-                     </colorrole>
-                    </inactive>
-                    <disabled>
-                     <colorrole role="WindowText">
-                      <brush brushstyle="SolidPattern">
-                       <color alpha="255">
-                        <red>85</red>
-                        <green>85</green>
-                        <blue>85</blue>
-                       </color>
-                      </brush>
-                     </colorrole>
-                     <colorrole role="Dark">
-                      <brush brushstyle="SolidPattern">
-                       <color alpha="255">
-                        <red>201</red>
-                        <green>200</green>
-                        <blue>199</blue>
-                       </color>
-                      </brush>
-                     </colorrole>
-                     <colorrole role="Text">
-                      <brush brushstyle="SolidPattern">
-                       <color alpha="255">
-                        <red>85</red>
-                        <green>85</green>
-                        <blue>85</blue>
-                       </color>
-                      </brush>
-                     </colorrole>
-                     <colorrole role="ButtonText">
-                      <brush brushstyle="SolidPattern">
-                       <color alpha="255">
-                        <red>85</red>
-                        <green>85</green>
-                        <blue>85</blue>
-                       </color>
-                      </brush>
-                     </colorrole>
-                    </disabled>
-                   </palette>
-                  </property>
-                  <property name="currentText">
-                   <string/>
-                  </property>
-                  <property name="sizeAdjustPolicy">
-                   <enum>QComboBox::AdjustToContentsOnFirstShow</enum>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item row="19" column="0">
-           <widget class="QLabel" name="label_5">
-            <property name="text">
-             <string>Last Sample</string>
+                <layout class="QVBoxLayout" name="centralWidgetLayout">
+                 <property name="spacing">
+                  <number>0</number>
+                 </property>
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
+                </layout>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QWidget" name="widget_6" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1 y2:1, stop:0 rgba(33,33,39,50) , stop:1 rgba(38,38,46,50) );</string>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_7">
+            <property name="spacing">
+             <number>0</number>
             </property>
-           </widget>
-          </item>
-          <item row="11" column="0">
-           <widget class="QPushButton" name="generatePattern">
-            <property name="text">
-             <string>Generate Pattern</string>
+            <property name="leftMargin">
+             <number>0</number>
             </property>
-           </widget>
-          </item>
-          <item row="8" column="0">
-           <widget class="QLabel" name="label_6">
-            <property name="text">
-             <string>ChannelsToGenerate</string>
+            <property name="topMargin">
+             <number>0</number>
             </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="rightWidgetPage2">
-         <attribute name="title">
-          <string>Pattern</string>
-         </attribute>
-         <layout class="QGridLayout" name="gridLayout_2"/>
-        </widget>
-        <widget class="QWidget" name="rightWidgetPage3">
-         <attribute name="title">
-          <string>ChGroup</string>
-         </attribute>
-         <layout class="QGridLayout" name="gridLayout_3">
-          <item row="15" column="1">
-           <widget class="QLineEdit" name="lineEdit_14"/>
-          </item>
-          <item row="18" column="0" colspan="2">
-           <widget class="QPushButton" name="pushButton">
-            <property name="text">
-             <string>Split</string>
+            <property name="rightMargin">
+             <number>0</number>
             </property>
-           </widget>
-          </item>
-          <item row="7" column="0">
-           <widget class="QCheckBox" name="checkBox6">
-            <property name="text">
-             <string>6</string>
+            <property name="bottomMargin">
+             <number>0</number>
             </property>
-           </widget>
-          </item>
-          <item row="8" column="0">
-           <widget class="QCheckBox" name="checkBox7">
-            <property name="text">
-             <string>7</string>
+            <item>
+             <spacer name="horizontalSpacer_10">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Preferred</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QWidget" name="widget_7" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">background-color: qlineargradient(spread:pad, x1:0, y1:1, x2:1 y2:0, stop:0 rgba(33,33,39,50) , stop:1 rgba(38,38,46,50) );</string>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_10">
+            <property name="spacing">
+             <number>0</number>
             </property>
-           </widget>
-          </item>
-          <item row="11" column="0">
-           <widget class="QCheckBox" name="checkBox10">
-            <property name="text">
-             <string>10</string>
+            <property name="leftMargin">
+             <number>0</number>
             </property>
-           </widget>
-          </item>
-          <item row="13" column="1">
-           <widget class="QLineEdit" name="lineEdit_12"/>
-          </item>
-          <item row="12" column="0">
-           <widget class="QCheckBox" name="checkBox11">
-            <property name="text">
-             <string>11</string>
+            <property name="topMargin">
+             <number>0</number>
             </property>
-           </widget>
-          </item>
-          <item row="13" column="0">
-           <widget class="QCheckBox" name="checkBox12">
-            <property name="text">
-             <string>12</string>
+            <property name="rightMargin">
+             <number>0</number>
             </property>
-           </widget>
-          </item>
-          <item row="14" column="0">
-           <widget class="QCheckBox" name="checkBox13">
-            <property name="text">
-             <string>13</string>
+            <property name="bottomMargin">
+             <number>0</number>
             </property>
-           </widget>
-          </item>
-          <item row="15" column="0">
-           <widget class="QCheckBox" name="checkBox14">
-            <property name="text">
-             <string>14</string>
+            <item>
+             <spacer name="horizontalSpacer_13">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="4" column="2">
+          <widget class="QWidget" name="widget_8" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">background-color: qlineargradient(spread:pad, x1:1, y1:1, x2:0 y2:0, stop:0 rgba(33,33,39,50) , stop:1 rgba(38,38,46,50) );</string>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_9">
+            <property name="spacing">
+             <number>0</number>
             </property>
-           </widget>
-          </item>
-          <item row="16" column="0">
-           <widget class="QCheckBox" name="checkBox15">
-            <property name="text">
-             <string>15</string>
+            <property name="leftMargin">
+             <number>0</number>
             </property>
-           </widget>
-          </item>
-          <item row="8" column="1">
-           <widget class="QLineEdit" name="lineEdit_7"/>
-          </item>
-          <item row="9" column="0">
-           <widget class="QCheckBox" name="checkBox8">
-            <property name="text">
-             <string>8</string>
+            <property name="topMargin">
+             <number>0</number>
             </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QCheckBox" name="checkBox1">
-            <property name="text">
-             <string>1</string>
+            <property name="rightMargin">
+             <number>0</number>
             </property>
-           </widget>
-          </item>
-          <item row="10" column="0">
-           <widget class="QCheckBox" name="checkBox9">
-            <property name="text">
-             <string>9</string>
+            <property name="bottomMargin">
+             <number>0</number>
             </property>
-           </widget>
-          </item>
-          <item row="5" column="0">
-           <widget class="QCheckBox" name="checkBox4">
-            <property name="text">
-             <string>4</string>
+            <item>
+             <spacer name="horizontalSpacer_12">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="0" column="2">
+          <widget class="QWidget" name="widget_9" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">background-color: qlineargradient(spread:pad, x1:1, y1:0, x2:0 y2:1, stop:0 rgba(33,33,39,50) , stop:1 rgba(38,38,46,50) );</string>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_8">
+            <property name="spacing">
+             <number>0</number>
             </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QCheckBox" name="checkBox2">
-            <property name="text">
-             <string>2</string>
+            <property name="leftMargin">
+             <number>0</number>
             </property>
-           </widget>
-          </item>
-          <item row="4" column="0">
-           <widget class="QCheckBox" name="checkBox3">
-            <property name="text">
-             <string>3</string>
+            <property name="topMargin">
+             <number>0</number>
             </property>
-           </widget>
-          </item>
-          <item row="6" column="0">
-           <widget class="QCheckBox" name="checkBox5">
-            <property name="text">
-             <string>5</string>
+            <property name="rightMargin">
+             <number>0</number>
             </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QCheckBox" name="checkBox0">
-            <property name="text">
-             <string>0</string>
+            <property name="bottomMargin">
+             <number>0</number>
             </property>
+            <item>
+             <spacer name="horizontalSpacer_11">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+        <zorder>leftWidget</zorder>
+        <zorder>widget_2</zorder>
+        <zorder>widget_3</zorder>
+        <zorder>widget_4</zorder>
+        <zorder>widget_5</zorder>
+        <zorder>widget_6</zorder>
+        <zorder>widget_7</zorder>
+        <zorder>widget_8</zorder>
+        <zorder>widget_9</zorder>
+       </widget>
+      </item>
+      <item>
+       <widget class="adiscope::MenuAnim" name="rightMenu" native="true">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_6">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QStackedWidget" name="rightWidget">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>1677215</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="toolTipDuration">
+            <number>0</number>
+           </property>
+           <property name="styleSheet">
+            <string notr="true"/>
+           </property>
+           <property name="currentIndex">
+            <number>0</number>
+           </property>
+           <widget class="QWidget" name="pgSettings"/>
+           <widget class="QWidget" name="cgSettings">
+            <layout class="QVBoxLayout" name="verticalLayout_3"/>
            </widget>
-          </item>
-          <item row="11" column="1">
-           <widget class="QLineEdit" name="lineEdit_10"/>
-          </item>
-          <item row="7" column="1">
-           <widget class="QLineEdit" name="lineEdit_6"/>
-          </item>
-          <item row="16" column="1">
-           <widget class="QLineEdit" name="lineEdit_15"/>
-          </item>
-          <item row="9" column="1">
-           <widget class="QLineEdit" name="lineEdit_8"/>
-          </item>
-          <item row="4" column="1">
-           <widget class="QLineEdit" name="lineEdit_4"/>
-          </item>
-          <item row="12" column="1">
-           <widget class="QLineEdit" name="lineEdit_11"/>
-          </item>
-          <item row="10" column="1">
-           <widget class="QLineEdit" name="lineEdit_9"/>
-          </item>
-          <item row="14" column="1">
-           <widget class="QLineEdit" name="lineEdit_13"/>
-          </item>
-          <item row="3" column="1">
-           <widget class="QLineEdit" name="lineEdit_2"/>
-          </item>
-          <item row="6" column="1">
-           <widget class="QLineEdit" name="lineEdit_5"/>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLineEdit" name="lineEdit"/>
-          </item>
-          <item row="0" column="1">
-           <widget class="QLineEdit" name="lineEdit_0"/>
-          </item>
-          <item row="5" column="1">
-           <widget class="QLineEdit" name="lineEdit_3"/>
-          </item>
-          <item row="17" column="0" colspan="2">
-           <widget class="QPushButton" name="CreateGroup">
-            <property name="text">
-             <string>Create Group</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
      </layout>
@@ -1344,23 +1301,14 @@ QPushButton:!checked {
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>adiscope::MenuAnim</class>
+   <extends>QWidget</extends>
+   <header>menu_anim.hpp</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
- <connections>
-  <connection>
-   <sender>numberOfSamples</sender>
-   <signal>textChanged(QString)</signal>
-   <receiver>lastSample</receiver>
-   <slot>setText(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1210</x>
-     <y>571</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1210</x>
-     <y>667</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

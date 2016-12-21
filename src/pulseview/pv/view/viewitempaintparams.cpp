@@ -29,9 +29,11 @@ namespace pv {
 namespace view {
 
 ViewItemPaintParams::ViewItemPaintParams(
-	const QRect &rect, double scale, const pv::util::Timestamp& offset) :
+		const QRect &rect, double scale,
+		const pv::util::Timestamp& offset,
+		int divisionCount):
 	rect_(rect),
-	scale_(scale),
+	scale_(scale / (rect_.width() / divisionCount)),
 	offset_(offset)
 {
 	assert(scale > 0.0);

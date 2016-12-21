@@ -101,6 +101,11 @@ shared_ptr<Channel> Signal::channel() const
 	return channel_;
 }
 
+pv::Session* Signal::session()
+{
+	return &session_;
+}
+
 const ViewItemOwner::item_list& Signal::child_items() const
 {
 	return items_;

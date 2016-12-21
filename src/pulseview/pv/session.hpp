@@ -104,7 +104,7 @@ public:
 	/**
 	 * Sets device instance that will be used in the next capture session.
 	 */
-	void set_device(std::shared_ptr<devices::Device> device);
+    void set_device(std::shared_ptr<devices::Device> device);
 
 	void set_default_device();
 
@@ -129,6 +129,15 @@ public:
 
 	void remove_decode_signal(view::DecodeTrace *signal);
 
+	std::shared_ptr<pv::view::DecodeTrace> add_decoder();
+
+	void remove_decode_clones();
+
+	void remove_signal_clones();
+
+	void add_signal(std::shared_ptr<view::LogicSignal> sig);
+
+    std::shared_ptr<view::Signal> create_signal_from_id(int index);
 
 private:
 	void set_capture_state(capture_state state);
