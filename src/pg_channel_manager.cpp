@@ -631,7 +631,6 @@ void PatternGeneratorChannelManagerUI::updateUi()
 	chmHeader->setupUi(channelManagerHeaderWiget);
 	ui->chmHeaderSlotLayout->addWidget(channelManagerHeaderWiget);
 
-
     channelManagerHeaderWiget->ensurePolished();
 	ensurePolished();
 
@@ -648,6 +647,9 @@ void PatternGeneratorChannelManagerUI::updateUi()
 		chmHeader->wgHeaderSettingsGroup->setVisible(false);
 		chmHeader->wgHeaderSelectionGroup->setVisible(false);
     }
+
+    ui->scrollArea->setWidget(ui->scrollAreaWidgetContents);
+
 
 	for (auto&& ch : *(chm->get_channel_groups())) {
 		if (disabledShown==false && !ch->is_enabled()) {
@@ -837,6 +839,14 @@ void PatternGeneratorChannelManagerUI::updateUi()
     main_win->view_->viewport()->setDivisionCount(6);
     main_win->view_->viewport()->setDivisionOffset(5);
 
+    QScrollBar* chmVertScrollArea = ui->scrollArea->verticalScrollBar();
+    connect(chmVertScrollArea, SIGNAL(valueChanged(int)),this,SLOT(chmScrollChanged(int)));
+}
+
+void PatternGeneratorChannelManagerUI::chmScrollChanged(int val)
+{
+    // check for user interaction ... tracking()
+    main_win->view_->set_v_offset(val);
 }
 
 void PatternGeneratorChannelManagerUI::deleteSettingsWidget()

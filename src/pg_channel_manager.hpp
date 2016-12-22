@@ -3,6 +3,9 @@
 
 #include <QDebug>
 #include <QGroupBox>
+#include <QScrollArea>
+#include <QScrollBar>
+
 #include "pg_patterns.hpp"
 //#include "pattern_generator.hpp"
 #include "digitalchannel_manager.hpp"
@@ -198,7 +201,7 @@ Q_SIGNALS:
 
 
 private Q_SLOTS:
-
+    void chmScrollChanged(int val);
 private:
 	void retainWidgetSizeWhenHidden(QWidget *w);
 	void setWidgetNrOfChars(QWidget *w, int minNrOfChars, int maxNrOfChars=0);
