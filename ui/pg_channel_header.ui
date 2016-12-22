@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>600</width>
+    <width>550</width>
     <height>36</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+   <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -20,9 +20,8 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">QLabel{
-/*  background-color: rgb(170, 0, 0);*/
-
+   <string notr="true">/*  background-color: rgb(170, 0, 0);*/
+QLabel{
   font-family: ArialMT;
   font-size: 16px;
   font-weight: normal;
@@ -228,7 +227,7 @@
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>20</width>
+             <width>14</width>
              <height>20</height>
             </size>
            </property>
@@ -257,7 +256,7 @@
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>49</width>
+             <width>27</width>
              <height>20</height>
             </size>
            </property>
@@ -301,7 +300,7 @@
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>25</width>
+             <width>22</width>
              <height>20</height>
             </size>
            </property>
@@ -324,7 +323,7 @@
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>39</width>
+             <width>25</width>
              <height>20</height>
             </size>
            </property>
@@ -406,7 +405,7 @@
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>50</width>
+             <width>30</width>
              <height>20</height>
             </size>
            </property>

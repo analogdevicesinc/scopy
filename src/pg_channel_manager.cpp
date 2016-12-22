@@ -616,32 +616,36 @@ void PatternGeneratorChannelManagerUI::updateUi()
 
 	chg_ui.erase(chg_ui.begin(),chg_ui.end());
 
-	if (channelManagerHeaderWiget != nullptr) {
+    auto offset = 0;
+    if (channelManagerHeaderWiget != nullptr) {
 		delete channelManagerHeaderWiget;
 		channelManagerHeaderWiget = nullptr;
 	}
 
 	main_win->view_->remove_trace_clones();
 
-	channelManagerHeaderWiget = new QWidget(ui->chmHeaderSlot);
-	Ui::PGChannelManagerHeader *chmHeader = new Ui::PGChannelManagerHeader();
+    channelManagerHeaderWiget = new QWidget(ui->chmHeaderSlot);
+    Ui::PGChannelManagerHeader *chmHeader = new Ui::PGChannelManagerHeader();
 	chmHeader->setupUi(channelManagerHeaderWiget);
 	ui->chmHeaderSlotLayout->addWidget(channelManagerHeaderWiget);
 
-	auto offset = 0;
+
+    channelManagerHeaderWiget->ensurePolished();
 	ensurePolished();
+
 	setWidgetNrOfChars(chmHeader->labelName, channelGroupLabelMaxLength);
 	setWidgetNrOfChars(chmHeader->labelDIO, dioLabelMaxLength);
 	setWidgetNrOfChars(chmHeader->labelType, channelComboMaxLength);
 	setWidgetNrOfChars(chmHeader->labelOutput, outputComboMaxLength);
-	chmHeader->labelView->setMinimumWidth(40);
+
+    chmHeader->labelView->setMinimumWidth(40);
 	chmHeader->labelSelect->setMinimumWidth(40);
 
 	if (!detailsShown) {
 		chmHeader->wgHeaderEnableGroup->setVisible(false);
 		chmHeader->wgHeaderSettingsGroup->setVisible(false);
 		chmHeader->wgHeaderSelectionGroup->setVisible(false);
-	}
+    }
 
 	for (auto&& ch : *(chm->get_channel_groups())) {
 		if (disabledShown==false && !ch->is_enabled()) {
@@ -655,17 +659,18 @@ void PatternGeneratorChannelManagerUI::updateUi()
 
 		currentChannelGroupUI->ui->setupUi(chg_ui.back());
 
-		ui->verticalLayout->insertWidget(chg_ui.size(),chg_ui.back());
+        ui->verticalLayout->insertWidget(chg_ui.size()-1,chg_ui.back());
 		currentChannelGroupUI->ensurePolished();
 
 		retainWidgetSizeWhenHidden(currentChannelGroupUI->ui->collapseBtn);
 		retainWidgetSizeWhenHidden(currentChannelGroupUI->ui->line);
 		retainWidgetSizeWhenHidden(currentChannelGroupUI->ui->line_2);
 
+     //   currentChannelGroupUI->ui->header->setVisible(false);
 		if (!detailsShown) {
 			currentChannelGroupUI->ui->wgChannelEnableGroup->setVisible(false);
 			currentChannelGroupUI->ui->wgChannelSelectionGroup->setVisible(false);
-			currentChannelGroupUI->ui->wgChannelSettingsGroup->setVisible(false);
+			currentChannelGroupUI->ui->wgChannelSettingsGroup->setVisible(false);           
 		} else {
 			retainWidgetSizeWhenHidden(currentChannelGroupUI->ui->splitBtn);
 		}
@@ -719,6 +724,10 @@ void PatternGeneratorChannelManagerUI::updateUi()
 		offset+=(currentChannelGroupUI->geometry().bottomRight().y());
 
 		if (ch->is_grouped()) { // create subwidgets
+           /* auto trace = main_win->view_->add_decoder();
+            currentChannelGroupUI->setTrace(trace);
+            trace->force_to_v_offset(offset);*/
+
 			currentChannelGroupUI->ui->DioLabel->setText("");
 
 			connect(currentChannelGroupUI->ui->collapseBtn,SIGNAL(clicked()),chg_ui.back(),
@@ -811,11 +820,18 @@ void PatternGeneratorChannelManagerUI::updateUi()
 		currentChannelGroupUI->enableControls(ch->is_enabled());
 	}
 
+ //   ui->scrollAreaWidgetContents->updateGeometry();
+
 	if (highlightShown) {
 		showHighlight(true);
 	}
 
 	Q_EMIT channelsChanged();
+
+    //pg->setPlotStatusHeight(channelManagerHeaderWiget->sizeHint().height());
+
+        ui->scrollArea->setMaximumWidth(channelManagerHeaderWiget->sizeHint().width());
+
 }
 
 void PatternGeneratorChannelManagerUI::deleteSettingsWidget()

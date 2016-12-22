@@ -192,6 +192,7 @@ public:
 	PatternGeneratorChannelGroup *getSelectedChannelGroup() const;
 	void setSelectedChannelGroup(PatternGeneratorChannelGroup *value);
 
+
 Q_SIGNALS:
 	void channelsChanged();
 
