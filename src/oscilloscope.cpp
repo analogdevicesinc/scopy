@@ -35,6 +35,7 @@
 #include "measure_settings.h"
 #include "statistic_widget.h"
 #include "state_updater.h"
+#include "osc_capture_params.hpp"
 
 /* Generated UI */
 #include "ui_math_panel.h"
@@ -53,8 +54,6 @@ using namespace adiscope;
 using namespace gr;
 using namespace std;
 
-const unsigned long Oscilloscope::maxBufferSize = 32768;
-
 Oscilloscope::Oscilloscope(struct iio_context *ctx,
 		Filter *filt, QPushButton *runButton,
 		float gain_ch1, float gain_ch2, QWidget *parent) :
@@ -65,7 +64,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	active_sample_rate(adc.sampleRate()),
 	nb_math_channels(0),
 	ui(new Ui::Oscilloscope),
-	trigger_settings(ctx),
+	trigger_settings(ctx, adc),
 	measure_settings(nullptr),
 	plot(parent, 16, 10),
 	fft_plot(nb_channels, parent),
@@ -80,7 +79,6 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	trigger_is_forced(false),
 	new_data_is_triggered(false),
 	triggerUpdater(new StateUpdater(250, this)),
-	triggerDelay(0),
 	selectedChannel(-1),
 	menuOpened(false), current_channel(0), math_chn_counter(0),
 	settings_group(new QButtonGroup(this)),
@@ -90,6 +88,14 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	ui->setupUi(this);
 	int triggers_panel = ui->stackedWidget->insertWidget(-1, &trigger_settings);
 	settings_group->setExclusive(true);
+	symmBufferMode = make_shared<SymmetricBufferMode>();
+	symmBufferMode->setSampleRates(adc.availSamplRates().toVector().toStdVector());
+	symmBufferMode->setEntireBufferMaxSize(500000); // max 0.5 mega-samples
+	symmBufferMode->setTriggerBufferMaxSize(8192); // 8192 is what hardware supports
+	symmBufferMode->setTimeDivisionCount(plot.xAxisNumDiv());
+
+	adc.setChannelGain(0, gain_ch1);
+	adc.setChannelGain(1, gain_ch2);
 
 	/* Measurements Settings */
 	measure_settings_init();
@@ -104,7 +110,6 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	this->qt_time_block = adiscope::scope_sink_f::make(
 			num_samples,
 			adc.sampleRate(), "Osc Time", nb_channels, (QObject *)&plot);
-	trigger_settings.setPlotNumSamples(num_samples);
 
 	this->qt_fft_block = adiscope::scope_sink_f::make(fft_size, adc.sampleRate(),
 			"Osc Frequency", nb_channels, (QObject *)&fft_plot);
@@ -404,9 +409,15 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	connect(voltsPerDiv, SIGNAL(valueChanged(double)),
 		SLOT(onVertScaleValueChanged(double)));
 	connect(timePosition, SIGNAL(valueChanged(double)),
-		SLOT(onHorizOffsetValueChanged(double)));
+		SLOT(onTimePositionChanged(double)));
 	connect(voltsPosition, SIGNAL(valueChanged(double)),
 		SLOT(onVertOffsetValueChanged(double)));
+
+	/* Sync timePosition with plot time trigger bar */
+	connect(&plot, SIGNAL(timeTriggerValueChanged(double)),
+		this, SLOT(onTimeTriggerDelayChanged(double)));
+	connect(this, SIGNAL(triggerPositionChanged(double)),
+		timePosition, SLOT(setValue(double)));
 
 	/* Update Timebase label each time the oscilloscope timebase changes */
 	connect(timeBase, SIGNAL(valueChanged(double)),
@@ -449,17 +460,6 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 
 	connect(&trigger_settings, SIGNAL(triggerModeChanged(int)),
 		this, SLOT(onTriggerModeChanged(int)));
-
-	// Trigger Delay
-	connect(&trigger_settings, SIGNAL(delayChanged(double)),
-			SLOT(onTriggerSettingsDelayChanged(double)));
-	connect(&plot, SIGNAL(timeTriggerValueChanged(double)),
-			SLOT(onTimeTriggerDelayChanged(double)));
-
-	connect(this, SIGNAL(triggerDelayChanged(double)), this,
-			SLOT(updateTriggerSpinbox(double)));
-	connect(this, SIGNAL(triggerDelayChanged(double)), this,
-			SLOT(updatePlotHorizDelay(double)));
 
 	Ui::CursorsSettings cr_ui;
 	cr_ui.setupUi(ui->cursorsSettings);
@@ -506,6 +506,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 
 	// Calculate initial sample count and sample rate
 	onHorizScaleValueChanged(timeBase->value());
+	onTimePositionChanged(timePosition->value());
 }
 
 Oscilloscope::~Oscilloscope()
@@ -794,6 +795,18 @@ void Oscilloscope::runStopToggled(bool checked)
 		btn->setText("Stop");
 
 		plot.setSampleRate(active_sample_rate, 1, "");
+		plot.setBufferSizeLabelValue(active_sample_count);
+		plot.setSampleRatelabelValue(active_sample_rate);
+
+		if (active_sample_rate != adc.sampleRate())
+			adc.setSampleRate(active_sample_rate);
+
+		if (active_trig_sample_count != trigger_settings.triggerDelay())
+			trigger_settings.setTriggerDelay(
+				active_trig_sample_count);
+
+		if (timePosition->value() != active_time_pos)
+			timePosition->setValue(active_time_pos);
 
 		for (unsigned int i = 0; i < nb_channels; i++)
 			iio->start(ids[i]);
@@ -981,33 +994,10 @@ void adiscope::Oscilloscope::onMeasureToggled(bool on)
 		plot.setCursorReadoutsVisible(!on);
 }
 
-void Oscilloscope::updateTriggerSpinbox(double value)
-{
-	trigger_settings.setDelay(value);
-}
-
-void Oscilloscope::updatePlotHorizDelay(double value)
-{
-	plot.setHorizDelay(value);
-	plot.updateAxes();
-}
-
-void Oscilloscope::onTriggerSettingsDelayChanged(double value)
-{
-	if (triggerDelay != value) {
-		triggerDelay = value;
-		Q_EMIT triggerDelayChanged(value);
-	}
-}
-
 void Oscilloscope::onTimeTriggerDelayChanged(double value)
 {
-	double delay = value;
-
-	if (triggerDelay != delay) {
-		triggerDelay = delay;
-		Q_EMIT triggerDelayChanged(delay);
-	}
+	if (timePosition->value() != value)
+		Q_EMIT triggerPositionChanged(value);
 }
 
 void Oscilloscope::comboBoxUpdateToValue(QComboBox *box, double value, std::vector<double>list)
@@ -1149,45 +1139,54 @@ void adiscope::Oscilloscope::onVertScaleValueChanged(double value)
 
 void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 {
-	if (value != plot.HorizUnitsPerDiv()) {
-		plot.setHorizUnitsPerDiv(value);
-		plot.replot();
-	}
+	symmBufferMode->setTimeBase(value);
+	SymmetricBufferMode::capture_parameters params = symmBufferMode->captureParameters();
+	active_sample_rate = params.sampleRate;
+	active_sample_count = params.entireBufferSize;
+	active_trig_sample_count = -params.triggerBufferSize;
+	active_time_pos = -params.timePos;
 
-	timePosition->setStep(value / 10);
-
-	double old_sample_rate = active_sample_rate;
-	double plotTimeSpan = value * plot.xAxisNumDiv();
-	double newSampleRate = pickSampleRateFor(plotTimeSpan, maxBufferSize);
-	int newSampleCount = (plotTimeSpan * newSampleRate + 0.5);
-	active_sample_rate = newSampleRate;
+	// Realign plot data based on the new sample count and trigger position
+	plot.setHorizUnitsPerDiv(value);
+	plot.replot();
+	plot.setDataStartingPoint(active_trig_sample_count);
+	plot.resetXaxisOnNextReceivedData();
 
 	/* Reconfigure the GNU Radio block to receive a different number of samples  */
 	bool started = iio->started();
 	if (started)
 		iio->lock();
-	this->qt_time_block->set_nsamps(newSampleCount);
+	this->qt_time_block->set_nsamps(active_sample_count);
 
 	// Apply amplitude corrections when using different sample rates
-	if (newSampleRate != old_sample_rate) {
+	if (active_sample_rate != adc.sampleRate()) {
 		boost::shared_ptr<adc_sample_conv> block =
 			dynamic_pointer_cast<adc_sample_conv>(adc_samp_conv_block);
-		block->setFilterCompensation(0, adc.compTable(newSampleRate));
-		block->setFilterCompensation(1, adc.compTable(newSampleRate));
+		block->setFilterCompensation(0, adc.compTable(active_sample_rate));
+		block->setFilterCompensation(1, adc.compTable(active_sample_rate));
 	}
 
-	adc.setSampleRate(newSampleRate);
-	if (started)
-		plot.setSampleRate(newSampleRate, 1, "");
-	trigger_settings.setPlotNumSamples(newSampleCount);
-	plot.setBufferSizeLabelValue(newSampleCount);
-	plot.setSampleRatelabelValue(newSampleRate);
+	if (started) {
+		plot.setSampleRate(active_sample_rate, 1, "");
+		plot.setBufferSizeLabelValue(active_sample_count);
+		plot.setSampleRatelabelValue(active_sample_rate);
+
+		adc.setSampleRate(active_sample_rate);
+		trigger_settings.setTriggerDelay(active_trig_sample_count);
+
+		// Time base changes can limit the time position value
+		if (timePosition->value() != -params.timePos)
+			timePosition->setValue(-params.timePos);
+	}
 
 	for (unsigned int i = 0; i < nb_channels; i++)
-		iio->set_buffer_size(ids[i], newSampleCount);
+		iio->set_buffer_size(ids[i], active_sample_count);
 
 	if (started)
 		iio->unlock();
+
+	// Change the sensitivity of time position control
+	timePosition->setStep(value / 10);
 }
 
 void adiscope::Oscilloscope::onVertOffsetValueChanged(double value)
@@ -1198,12 +1197,50 @@ void adiscope::Oscilloscope::onVertOffsetValueChanged(double value)
 	}
 }
 
-void adiscope::Oscilloscope::onHorizOffsetValueChanged(double value)
+void adiscope::Oscilloscope::onTimePositionChanged(double value)
 {
-	if (value != plot.HorizOffset()) {
-		plot.setHorizOffset(value);
-		plot.replot();
+	bool started = iio->started();
+
+	unsigned long oldSampleCount = symmBufferMode->captureParameters().entireBufferSize;
+	symmBufferMode->setTriggerPos(-value);
+	SymmetricBufferMode::capture_parameters params = symmBufferMode->captureParameters();
+	active_sample_rate = params.sampleRate;
+	active_sample_count = params.entireBufferSize;
+	active_trig_sample_count = -params.triggerBufferSize;
+	active_time_pos = -params.timePos;
+
+	// Realign plot data based on the new time position
+	plot.setHorizOffset(value);
+	plot.replot();
+	plot.setDataStartingPoint(active_trig_sample_count);
+	plot.resetXaxisOnNextReceivedData();
+
+	if (started) {
+		trigger_settings.setTriggerDelay(active_trig_sample_count);
 	}
+
+	if (active_sample_rate == adc.sampleRate() &&
+			(active_sample_count == oldSampleCount))
+		return;
+
+	/* Reconfigure the GNU Radio block to receive a different number of samples  */
+	if (started)
+		iio->lock();
+	this->qt_time_block->set_nsamps(active_sample_count);
+
+	if (started) {
+		plot.setSampleRate(active_sample_rate, 1, "");
+		plot.setBufferSizeLabelValue(active_sample_count);
+		plot.setSampleRatelabelValue(active_sample_rate);
+
+		adc.setSampleRate(active_sample_rate);
+	}
+
+	for (unsigned int i = 0; i < nb_channels; i++)
+		iio->set_buffer_size(ids[i], active_sample_count);
+
+	if (started)
+		iio->unlock();
 }
 
 void adiscope::Oscilloscope::rightMenuFinished(bool opened)
@@ -1276,23 +1313,6 @@ void Oscilloscope::settings_panel_size_adjust()
 void Oscilloscope::onChannelOffsetChanged(double value)
 {
 	voltsPosition->setValue(plot.VertOffset(plot.activeVertAxis()));
-}
-
-double Oscilloscope::pickSampleRateFor(double timeSpanSecs, double desiredBufferSize)
-{
-	double idealSampleRate = desiredBufferSize / timeSpanSecs;
-	int srIdx = 0;
-
-	// Pick the highest sample rate that we can set, that is lower or equal to
-	// the idealSampleRate.
-	for (int i = 0; i < sampling_rates.size(); i++) {
-		if (idealSampleRate >= sampling_rates[i])
-			srIdx = i;
-	}
-
-	idealSampleRate = sampling_rates[srIdx];
-
-	return idealSampleRate;
 }
 
 QWidget * Oscilloscope::channelWidgetAtId(int id)

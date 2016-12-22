@@ -20,6 +20,7 @@
 #include "trigger_settings.hpp"
 #include "adc_sample_conv.hpp"
 #include "spinbox_a.hpp"
+#include "osc_adc.h"
 
 #include "ui_trigger_settings.h"
 
@@ -63,24 +64,16 @@ vector<string> TriggerSettings::lut_digital_trigger_conditions = {
 	"level-high",
 };
 
-TriggerSettings::TriggerSettings(struct iio_context *ctx, QWidget *parent) :
+TriggerSettings::TriggerSettings(struct iio_context *ctx, const OscADC& adc,
+		QWidget *parent) :
 	QWidget(parent), ui(new Ui::TriggerSettings),
+	osc_adc(adc),
 	triggerA_en(false), triggerB_en(false),
-	temporarily_disabled(false), plot_num_samples(0)
+	temporarily_disabled(false)
 {
 	ui->setupUi(this);
 
 	trigger_auto_mode = ui->btnAuto->isChecked();
-
-	ui_triggerDelay = new PositionSpinButton({
-				{"ns", 1E-9},
-				{"μs", 1E-6},
-				{"ms", 1E-3},
-				{"s", 1E0}
-				}, "Position",
-				-1E3,
-				1E3);
-	ui_triggerDelay->setStep(1E-6);
 
 	ui_triggerAlevel = new PositionSpinButton({
 						{"μVolts", 1E-6},
@@ -121,7 +114,6 @@ TriggerSettings::TriggerSettings(struct iio_context *ctx, QWidget *parent) :
 						0, 1,
 						false);
 
-	ui->triggerDelay_container->addWidget(ui_triggerDelay, 0, Qt::AlignLeft);
 	ui->triggerAlevel_container->addWidget(ui_triggerAlevel, 0, Qt::AlignLeft);
 	ui->triggerBlevel_container->addWidget(ui_triggerBlevel, 0, Qt::AlignLeft);
 	ui->hysterezisA_container->addWidget(ui_triggerAHyst);
@@ -155,8 +147,6 @@ TriggerSettings::TriggerSettings(struct iio_context *ctx, QWidget *parent) :
 		}
 	}
 
-	connect(ui_triggerDelay, SIGNAL(valueChanged(double)),
-		SLOT(onSpinboxTriggerDelayChanged(double)));
 	connect(ui_triggerAlevel, SIGNAL(valueChanged(double)),
 		SLOT(onSpinboxTriggerAlevelChanged(double)));
 	connect(ui_triggerBlevel, SIGNAL(valueChanged(double)),
@@ -198,13 +188,16 @@ bool TriggerSettings::levelB_enabled()
 	return triggerB_en;
 }
 
-void TriggerSettings::setDelay(double seconds)
+long long TriggerSettings::triggerDelay() const
 {
-	double current_delay = ui_triggerDelay->value();
+	return trigger_raw_delay;
+}
 
-	if (current_delay != seconds) {
-		ui_triggerDelay->setValue(seconds);
-		trigg_delay_write_hardware(seconds);
+void TriggerSettings::setTriggerDelay(long long raw_delay)
+{
+	if (trigger_raw_delay != raw_delay) {
+		trigger_raw_delay = raw_delay;
+		trigg_delay_write_hardware(raw_delay);
 	}
 }
 
@@ -265,12 +258,6 @@ void TriggerSettings::on_cmb_trigg_B_currentIndexChanged(int index)
 	}
 
 	ui_reconf_on_triggerB_mode_changed(index);
-}
-
-void TriggerSettings::onSpinboxTriggerDelayChanged(double value)
-{
-	Q_EMIT delayChanged(value);
-	trigg_delay_write_hardware(value);
 }
 
 void TriggerSettings::onSpinboxTriggerAlevelChanged(double value)
@@ -501,7 +488,8 @@ void TriggerSettings::trigger_all_widgets_update()
 		}
 		trigger_ab_enabled_update(triggerA_en, triggerB_en);
 
-		trigg_delay_write_hardware(0.0);
+		iio_channel_attr_read_longlong(this->timeTrigger, "delay",
+			&trigger_raw_delay);
 	}
 }
 
@@ -599,18 +587,12 @@ void TriggerSettings::trigger_ab_enabled_update(bool &a_en, bool &b_en)
 		a_en = false;
 }
 
-void TriggerSettings::trigg_delay_write_hardware(double delay)
+void TriggerSettings::trigg_delay_write_hardware(int raw_delay)
 {
-	int sampleWorthOfTime = delay * 1e9  // Convert from seconds to ns
-					/ 10; // Each sample is 10 ns distant from each other.
-
-	/* Sync the hardware trigger delay with the trigger point of the plot */
-	sampleWorthOfTime -= plot_num_samples / 2;
-
-	QString s = QString::number(sampleWorthOfTime);
 	if (this->timeTrigger) {
+		QString s = QString::number(raw_delay);
 		iio_channel_attr_write(this->timeTrigger, "delay",
-				      s.toLocal8Bit().QByteArray::constData());
+			s.toLocal8Bit().QByteArray::constData());
 	}
 }
 
@@ -619,7 +601,8 @@ void TriggerSettings::triggA_level_write_hardware(double value)
 	if (!this->trigger0)
 		return;
 
-	int rawValue = adc_sample_conv::convVoltsToSample(value);
+	int rawValue = adc_sample_conv::convVoltsToSample(value,
+		osc_adc.channelGain(0), osc_adc.compTable(osc_adc.sampleRate()));
 	QString s = QString::number(rawValue);
 
 	iio_channel_attr_write(this->trigger0, "trigger_level",
@@ -631,7 +614,8 @@ void TriggerSettings::triggB_level_write_hardware(double value)
 	if (!this->trigger1)
 		return;
 
-	int rawValue = adc_sample_conv::convVoltsToSample(value);
+	int rawValue = adc_sample_conv::convVoltsToSample(value,
+		osc_adc.channelGain(1), osc_adc.compTable(osc_adc.sampleRate()));
 	QString s = QString::number(rawValue);
 
 	iio_channel_attr_write(this->trigger1, "trigger_level",
@@ -656,11 +640,6 @@ void adiscope::TriggerSettings::on_btn_noise_reject_toggled(bool checked)
 		ui_triggerAHyst->setEnabled(false);
 		ui_triggerBHyst->setEnabled(false);
 	}
-}
-
-void TriggerSettings::setPlotNumSamples(int numSamples)
-{
-	plot_num_samples = numSamples;
 }
 
 void TriggerSettings::autoTriggerDisable()

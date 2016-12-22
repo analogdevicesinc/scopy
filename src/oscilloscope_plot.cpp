@@ -74,8 +74,6 @@ CapturePlot::CapturePlot(QWidget *parent,
 	d_trigBinactiveLinePen = QPen(QColor(175, 175, 175), 2, Qt::DashLine);
 	/* End of: Initial colors scheme */
 
-	setSymmetricDataEnabled(true);
-
 	d_symbolCtrl = new SymbolController(this);
 
 	setHorizUnitsPerDiv(1E-6);

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>296</width>
-    <height>581</height>
+    <height>628</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -180,16 +180,6 @@ background-color: rgb(73, 99, 255);
        <property name="bottomMargin">
         <number>50</number>
        </property>
-       <item>
-        <layout class="QVBoxLayout" name="triggerDelay_container">
-         <property name="spacing">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>10</number>
-         </property>
-        </layout>
-       </item>
        <item>
         <layout class="QVBoxLayout" name="verticalLayout_11">
          <property name="spacing">
