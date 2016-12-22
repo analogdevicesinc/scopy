@@ -90,8 +90,8 @@ void Trace::paint_label(QPainter &p, const QRect &rect, bool hover)
 	if (!enabled())
 		return;
 
-	if (isInitial())
-		return;
+    /*if (isInitial())
+        return;*/
 
 	const QRectF r = label_rect(rect);
 

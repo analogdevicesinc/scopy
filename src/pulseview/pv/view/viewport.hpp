@@ -46,9 +46,17 @@ class Viewport : public ViewWidget
 public:
 	explicit Viewport(View &parent);
 
+    int getDivisionHeight() const;
+    void setDivisionHeight(int value);
+    int getDivisionCount() const;
+    void setDivisionCount(int value);
+
+    int getDivisionOffset() const;
+    void setDivisionOffset(int value);
+
 private:
-	/**
-	 * Indicates when a view item is being hovered over.
+    /**
+     * Indicates when a view item is being hovered over.
 	 * @param item The item that is being hovered over, or @c nullptr
 	 * if no view item is being hovered over.
 	 */
@@ -107,6 +115,11 @@ private:
 	double pinch_offset0_;
 	double pinch_offset1_;
 	bool pinch_zoom_active_;
+
+    int divisionHeight = 50;
+    int divisionCount = 10;
+    int divisionOffset = 3;
+
 };
 
 } // namespace view

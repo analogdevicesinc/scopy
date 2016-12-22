@@ -202,12 +202,14 @@ void Viewport::paint_grid(QPainter &p, const ViewItemPaintParams &pp)
 	const int x = pp.left();
 	const int w = pp.right() -pp.left();
 	const int h = pp.height();
-	const int y = pp.top();
+    const int y = view_.owner_visual_v_offset();//pp.top();
 
-	int division_count = 10;
-	int division_width = w / division_count;
-	int division_height = 50;
-	int row_count = h / division_height;
+    int division_height = divisionHeight;
+    int division_count = divisionCount;
+    int division_offset = divisionOffset;
+
+	int division_width = w / division_count;    
+    int row_count = view_.height() / division_height;
 
 	QPointF p1, p2;
 
@@ -222,9 +224,11 @@ void Viewport::paint_grid(QPainter &p, const ViewItemPaintParams &pp)
 		p.drawLine(p1, p2);
 	}
 
-	p.setRenderHint(QPainter::Antialiasing, true);
-	for (int i = 0; i <= row_count; i++) {
-		paint_axis(p, pp, y + division_height * i);
+	p.setRenderHint(QPainter::Antialiasing, true);    
+    paint_axis(p,pp,pp.top());
+    for (int i = 0; i <= row_count; i++) {
+        if(y + divisionOffset+ division_height * i != 0)
+            paint_axis(p, pp, y + divisionOffset + division_height * i);
 	}
 }
 
@@ -267,6 +271,36 @@ void Viewport::wheelEvent(QWheelEvent *event)
 		view_.set_scale_offset(view_.scale(),
 			event->delta() * view_.scale() + view_.offset());
 	}
+}
+
+int Viewport::getDivisionOffset() const
+{
+    return divisionOffset;
+}
+
+void Viewport::setDivisionOffset(int value)
+{
+    divisionOffset = value;
+}
+
+int Viewport::getDivisionCount() const
+{
+    return divisionCount;
+}
+
+void Viewport::setDivisionCount(int value)
+{
+    divisionCount = value;
+}
+
+int Viewport::getDivisionHeight() const
+{
+    return divisionHeight;
+}
+
+void Viewport::setDivisionHeight(int value)
+{
+    divisionHeight = value;
 }
 
 } // namespace view

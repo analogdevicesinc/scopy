@@ -94,8 +94,8 @@ pair<int, int> TraceTreeItemOwner::v_extents() const
 		assert(t);
 		if (!t->enabled())
 			continue;
-		if(t->isInitial())
-			continue;
+        /*if(t->isInitial())
+            continue;*/
 
 		has_children = true;
 
@@ -132,7 +132,7 @@ bool TraceTreeItemOwner::reassign_bgcolour_states(bool next_bgcolour_state)
 
 void TraceTreeItemOwner::restack_items()
 {
-	vector<shared_ptr<TraceTreeItem>> items(list_by_type<TraceTreeItem>());
+    vector<shared_ptr<TraceTreeItem>> items(list_by_type<TraceTreeItem>());
 	int traceSpacing = 5;
 
 	// Sort by the centre line of the extents
@@ -165,7 +165,7 @@ void TraceTreeItemOwner::restack_items()
 			total_offset += extents.second;
 			total_offset += traceSpacing;
 		}
-	}
+    }
 }
 
 } // view

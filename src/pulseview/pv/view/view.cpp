@@ -154,6 +154,7 @@ View::View(Session &session, QWidget *parent) :
 
 	viewport_->installEventFilter(this);
 	ruler_->installEventFilter(this);
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
 	// Trigger the initial event manually. The default device has signals
 	// which were created before this object came into being
@@ -654,10 +655,10 @@ void View::update_scroll()
 	get_scroll_layout(length, offset);
 	length = max(length - areaSize.width(), 0.0);
 
-//	int major_tick_distance = (tick_period_ / scale_).convert_to<int>();
-	int major_tick_distance = scale_;
+    int major_tick_distance = (tick_period_ / scale_).convert_to<int>();
+//	int major_tick_distance = scale_;
 
-	horizontalScrollBar()->setPageStep(areaSize.width() / 2);
+    horizontalScrollBar()->setPageStep(areaSize.width() / 2);
 	horizontalScrollBar()->setSingleStep(major_tick_distance);
 
 	updating_scroll_ = true;
@@ -675,11 +676,13 @@ void View::update_scroll()
 
 
 	const pair<int, int> extents = v_extents();
-	const int trace_height = extents.second - extents.first;
+    const int trace_height = extents.second - extents.first;
 	// Set the vertical scrollbar
-	verticalScrollBar()->setPageStep(trace_height);
-	verticalScrollBar()->setSingleStep(trace_height);
+//    verticalScrollBar()->setPageStep(viewport_->height());
+//	verticalScrollBar()->setSingleStep(trace_height);
 
+    verticalScrollBar()->setPageStep(viewport_->height());
+    verticalScrollBar()->setSingleStep(viewport_->height() / 8);
 	// Don't change the scrollbar range if there are no traces
 	if (extents.first != extents.second)
 		verticalScrollBar()->setRange(extents.first,

@@ -1,5 +1,6 @@
 #include "pulseview/pv/mainwindow.hpp"
 #include "pulseview/pv/view/view.hpp"
+#include "pulseview/pv/view/viewport.hpp"
 #include "pulseview/pv/view/tracetreeitem.hpp"
 #include "pg_channel_manager.hpp"
 #include "pattern_generator.hpp"
@@ -23,6 +24,7 @@ namespace pv {
 class MainWindow;
 namespace view {
 class View;
+class Viewport;
 class TraceTreeItem;
 }
 }
@@ -762,8 +764,8 @@ void PatternGeneratorChannelManagerUI::updateUi()
 					retainWidgetSizeWhenHidden(currentChannelUI->ui->selectBox);
 				}
 
-				currentChannelUI->ui->line->setVisible(false);
-				currentChannelUI->ui->line_2->setVisible(false);
+                currentChannelUI->ui->line->setVisible(false);
+                currentChannelUI->ui->line_2->setVisible(false);
 
 				setWidgetNrOfChars(currentChannelUI->ui->ChannelGroupLabel,
 				                   channelGroupLabelMaxLength);
@@ -829,8 +831,11 @@ void PatternGeneratorChannelManagerUI::updateUi()
 	Q_EMIT channelsChanged();
 
     //pg->setPlotStatusHeight(channelManagerHeaderWiget->sizeHint().height());
+    ui->scrollArea->setMaximumWidth(channelManagerHeaderWiget->sizeHint().width());
 
-        ui->scrollArea->setMaximumWidth(channelManagerHeaderWiget->sizeHint().width());
+    main_win->view_->viewport()->setDivisionHeight(44);
+    main_win->view_->viewport()->setDivisionCount(6);
+    main_win->view_->viewport()->setDivisionOffset(5);
 
 }
 
