@@ -18,6 +18,30 @@
 cmake_minimum_required(VERSION 3.1.3)
 project(scopy LANGUAGES CXX VERSION 0.1)
 
+# Get the GIT hash of the latest commit
+include(FindGit OPTIONAL)
+if (GIT_FOUND)
+	execute_process(
+		COMMAND ${GIT_EXECUTABLE} rev-parse --show-toplevel
+		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+		OUTPUT_VARIABLE SCOPY_GIT_REPO
+		OUTPUT_STRIP_TRAILING_WHITESPACE
+	)
+
+	if (${SCOPY_GIT_REPO} MATCHES ${CMAKE_CURRENT_SOURCE_DIR})
+		execute_process(
+			COMMAND ${GIT_EXECUTABLE} rev-parse --short HEAD
+			WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+			OUTPUT_VARIABLE SCOPY_VERSION_GIT
+			OUTPUT_STRIP_TRAILING_WHITESPACE
+		)
+	endif()
+endif()
+
+if (NOT SCOPY_VERSION_GIT)
+	set(SCOPY_VERSION_GIT v${PROJECT_VERSION})
+endif()
+
 if (MSVC)
 	# http://www.suodenjoki.dk/us/archive/2010/min-max.htm
 	add_definitions(-DNOMINMAX)
@@ -70,7 +94,6 @@ find_library(IIO_LIBRARIES NAMES iio libiio PATHS ${VC_PATH}/lib ${VC_PATH}/lib/
 find_path(IIO_INCLUDE_DIRS iio.h PATHS ${VC_PATH}/include)
 
 find_package(PkgConfig)
-pkg_check_modules(PYTHON REQUIRED python3)
 pkg_check_modules(GLIB REQUIRED glib-2.0)
 pkg_check_modules(GLIBMM REQUIRED glibmm-2.4)
 pkg_check_modules(SIGCPP REQUIRED sigc++-2.0)
@@ -153,7 +176,6 @@ target_link_libraries(${PROJECT_NAME} LINK_PRIVATE
 		${QWT_LIBRARIES}
 		${Qt5Svg_LIBRARIES}
 		${IIO_LIBRARIES}
-		${PYTHON_LIBRARIES}
 		${LIBSIGROK_LIBRARIES}
 		${LIBSIGROKCXX_LIBRARIES}
 		${LIBSIGROK_DECODE_LIBRARIES}
@@ -169,3 +191,4 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 )
 
 configure_file(scopy.iss.cmakein ${CMAKE_CURRENT_BINARY_DIR}/scopy.iss @ONLY)
+configure_file(config.h.cmakein ${CMAKE_CURRENT_BINARY_DIR}/config.h @ONLY)

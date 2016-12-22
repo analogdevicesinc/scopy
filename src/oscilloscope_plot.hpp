@@ -27,6 +27,8 @@
 #include "cursor_readouts.h"
 #include "measure.h"
 
+class QLabel;
+
 namespace adiscope {
 	class PlotWidget;
 
@@ -53,6 +55,14 @@ namespace adiscope {
 	class CapturePlot: public OscilloscopePlot
 	{
 		Q_OBJECT
+
+	public:
+		enum TriggerState {
+			Waiting,
+			Triggered,
+			Stop,
+			Auto,
+		};
 
 	public:
 		CapturePlot(QWidget *parent, unsigned int xNumDivs = 10,
@@ -101,12 +111,17 @@ namespace adiscope {
 		void setPeriodDetectLevel(int chnIdx, double lvl);
 		void setPeriodDetectHyst(int chnIdx, double hyst);
 		void setCursorReadoutsVisible(bool en);
+		void setTimeBaseLabelValue(double timebase);
+		void setBufferSizeLabelValue(int numSamples);
+		void setSampleRatelabelValue(double sampleRate);
+		void setTriggerState(int triggerState);
 
 	protected:
 		virtual void cleanUpJustBeforeChannelRemoval(int chnIdx);
 
 	private:
 		Measure* measureOfChannel(int chnIdx) const;
+		void updateBufferSizeSampleRateLabel(int nsamples, double sr);
 
 	private Q_SLOTS:
 		void onChannelAdded(int);
@@ -144,6 +159,13 @@ namespace adiscope {
 		HorizHandlesArea *d_bottomHandlesArea;
 		VertHandlesArea *d_leftHandlesArea;
 		VertHandlesArea *d_rightHandlesArea;
+
+		QLabel *d_timeBaseLabel;
+		QLabel *d_sampleRateLabel;
+		QLabel *d_triggerStateLabel;
+
+		int d_bufferSizeLabelVal;
+		double d_sampleRateLabelVal;
 
 		QList<HorizBar*> d_offsetBars;
 		QList<RoundedHandleV*> d_offsetHandles;

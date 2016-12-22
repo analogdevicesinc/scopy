@@ -225,7 +225,12 @@ QTabBar::tab:!selected {
                  </item>
                  <item>
                   <property name="text">
-                   <string>Sawtooth</string>
+                   <string>Rising Ramp Sawtooth</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Falling Ramp Sawtooth</string>
                   </property>
                  </item>
                 </widget>

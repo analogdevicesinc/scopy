@@ -142,6 +142,7 @@ public Q_SLOTS:
 
   void setZoomerEnabled(bool en);
   bool isZoomerEnabled();
+  void setZoomerVertAxis(int index);
 
   void setSymmetricDataEnabled(bool en);
   bool isSymmetricDataEnabled();

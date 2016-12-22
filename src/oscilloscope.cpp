@@ -34,6 +34,7 @@
 #include "measurement_gui.h"
 #include "measure_settings.h"
 #include "statistic_widget.h"
+#include "state_updater.h"
 
 /* Generated UI */
 #include "ui_math_panel.h"
@@ -76,6 +77,9 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	xy_ids(new iio_manager::port_id[nb_channels & ~1]),
 	fft_is_visible(false), hist_is_visible(false), xy_is_visible(false),
 	statistics_enabled(false),
+	trigger_is_forced(false),
+	new_data_is_triggered(false),
+	triggerUpdater(new StateUpdater(250, this)),
 	triggerDelay(0),
 	selectedChannel(-1),
 	menuOpened(false), current_channel(0), math_chn_counter(0),
@@ -217,6 +221,12 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	connect(trig_ui.btn, SIGNAL(pressed()),
 				this, SLOT(toggleRightMenu()));
 
+	/* Trigger Status Updater */
+	triggerUpdater->setOffState(CapturePlot::Stop);
+	onTriggerModeChanged(trigger_settings.triggerMode());
+	connect(triggerUpdater, SIGNAL(outputChanged(int)),
+		&plot, SLOT(setTriggerState(int)));
+
 	plot.setZoomerEnabled(true);
 
 	create_math_panel();
@@ -353,6 +363,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	timePosition->setStep(timeBase->value() / 10);
 	voltsPosition->setStep(voltsPerDiv->value() / 10);
 
+	plot.setTimeBaseLabelValue(timeBase->value());
+
 	/* General Settings Menu */
 	gsettings_ui = new Ui::OscGeneralSettings();
 	gsettings_ui->setupUi(ui->generalSettings);
@@ -396,11 +408,17 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	connect(voltsPosition, SIGNAL(valueChanged(double)),
 		SLOT(onVertOffsetValueChanged(double)));
 
+	/* Update Timebase label each time the oscilloscope timebase changes */
+	connect(timeBase, SIGNAL(valueChanged(double)),
+		&plot, SLOT(setTimeBaseLabelValue(double)));
+
 	connect(&plot, SIGNAL(channelOffsetChanged(double)),
 		SLOT(onChannelOffsetChanged(double)));
 
 	connect(this, SIGNAL(selectedChannelChanged(int)),
 		&plot, SLOT(setSelectedChannel(int)));
+	connect(this, SIGNAL(selectedChannelChanged(int)),
+		&plot, SLOT(setZoomerVertAxis(int)));
 
 	connect(&plot,
 		SIGNAL(cursorReadoutsChanged(struct cursorReadoutsText)),
@@ -428,6 +446,9 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 		[=](double level) {
 			plot.setPeriodDetectLevel(1, level);
 		});
+
+	connect(&trigger_settings, SIGNAL(triggerModeChanged(int)),
+		this, SLOT(onTriggerModeChanged(int)));
 
 	// Trigger Delay
 	connect(&trigger_settings, SIGNAL(delayChanged(double)),
@@ -460,6 +481,11 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 			&trigger_settings, SLOT(autoTriggerEnable()));
 	connect(&plot, SIGNAL(newData()), this, SLOT(singleCaptureDone()));
 
+	connect(&*iio, SIGNAL(timeout()),
+			SLOT(onIioDataRefillTimeout()));
+	connect(&plot, SIGNAL(newData()), this, SLOT(onPlotNewData()));
+
+
 	if (nb_channels < 2)
 		gsettings_ui->XY_view->hide();
 
@@ -477,6 +503,9 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 			QVariant(ui->pushButtonRunStop->text()));
 	ui->pushButtonSingle->setProperty("normal_text",
 			QVariant(ui->pushButtonSingle->text()));
+
+	// Calculate initial sample count and sample rate
+	onHorizScaleValueChanged(timeBase->value());
 }
 
 Oscilloscope::~Oscilloscope()
@@ -792,6 +821,9 @@ void Oscilloscope::runStopToggled(bool checked)
 			for (unsigned int i = 0; i < (nb_channels & ~1); i++)
 				iio->stop(xy_ids[i]);
 	}
+
+	// Update trigger status
+	triggerUpdater->setEnabled(checked);
 }
 
 void Oscilloscope::onFFT_view_toggled(bool visible)
@@ -1127,7 +1159,7 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 	double old_sample_rate = active_sample_rate;
 	double plotTimeSpan = value * plot.xAxisNumDiv();
 	double newSampleRate = pickSampleRateFor(plotTimeSpan, maxBufferSize);
-	double newSampleCount = plotTimeSpan * newSampleRate;
+	int newSampleCount = (plotTimeSpan * newSampleRate + 0.5);
 	active_sample_rate = newSampleRate;
 
 	/* Reconfigure the GNU Radio block to receive a different number of samples  */
@@ -1148,6 +1180,8 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 	if (started)
 		plot.setSampleRate(newSampleRate, 1, "");
 	trigger_settings.setPlotNumSamples(newSampleCount);
+	plot.setBufferSizeLabelValue(newSampleCount);
+	plot.setSampleRatelabelValue(newSampleRate);
 
 	for (unsigned int i = 0; i < nb_channels; i++)
 		iio->set_buffer_size(ids[i], newSampleCount);
@@ -1755,4 +1789,41 @@ void Oscilloscope::onStatisticsReset()
 void Oscilloscope::singleCaptureDone()
 {
 	ui->pushButtonSingle->setChecked(false);
+}
+
+void Oscilloscope::onIioDataRefillTimeout()
+{
+	if (trigger_settings.triggerMode() == TriggerSettings::AUTO)
+		trigger_is_forced = true;
+}
+
+void Oscilloscope::onPlotNewData()
+{
+	// Flag the new received data as Triggered or Untriggered.
+	bool triggerOn = trigger_settings.triggerIsArmed();
+
+	if (triggerOn && !trigger_is_forced)
+		new_data_is_triggered = true;
+	else
+		new_data_is_triggered = false;
+
+	// Reset the Forced Trigger flag.
+	trigger_is_forced = false;
+
+	// Update trigger status
+	if (new_data_is_triggered)
+		triggerUpdater->setInput(CapturePlot::Triggered);
+	else
+		triggerUpdater->setInput(CapturePlot::Auto);
+}
+
+void Oscilloscope::onTriggerModeChanged(int mode)
+{
+	if (mode == 0) { // normal
+		triggerUpdater->setIdleState(CapturePlot::Waiting);
+		triggerUpdater->setInput(CapturePlot::Waiting);
+	} else if (mode == 1) { // auto
+		triggerUpdater->setIdleState(CapturePlot::Auto);
+		triggerUpdater->setInput(CapturePlot::Auto);
+	}
 }

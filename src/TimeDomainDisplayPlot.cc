@@ -168,6 +168,9 @@ TimeDomainDisplayPlot::TimeDomainDisplayPlot(QWidget* parent, unsigned int xNumD
 
   d_zoomer = new TimeDomainDisplayZoomer(canvas());
 
+  QFont font("DejaVu Sans", 10, 75);
+  d_zoomer->setTrackerFont(font);
+
 #if QWT_VERSION < 0x060000
   d_zoomer->setSelectionFlags(QwtPicker::RectSelection | QwtPicker::DragSelection);
 #endif
@@ -177,7 +180,7 @@ TimeDomainDisplayPlot::TimeDomainDisplayPlot(QWidget* parent, unsigned int xNumD
   d_zoomer->setMousePattern(QwtEventPattern::MouseSelect3,
 			   Qt::RightButton);
 
-  const QColor c(Qt::darkRed);
+  const QColor c("#999999");
   d_zoomer->setRubberBandPen(c);
   d_zoomer->setTrackerPen(c);
 
@@ -689,6 +692,13 @@ void TimeDomainDisplayPlot::setZoomerEnabled(bool en)
 bool TimeDomainDisplayPlot::isZoomerEnabled()
 {
 	return d_zoomer->isEnabled();
+}
+
+void TimeDomainDisplayPlot::setZoomerVertAxis(int index)
+{
+	if (index > -1 && index < axesCount(QwtPlot::yLeft))
+		d_zoomer->setAxes(QwtAxisId(QwtPlot::xBottom, 0),
+			QwtAxisId(QwtPlot::yLeft, index));
 }
 
 void TimeDomainDisplayPlot::setSymmetricDataEnabled(bool en)
