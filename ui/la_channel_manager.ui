@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -41,7 +41,7 @@
    <item>
     <widget class="QWidget" name="headerWidget" native="true">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+      <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -53,7 +53,7 @@
       </size>
      </property>
      <property name="styleSheet">
-      <string notr="true">QLabel{\n/*  background-color: rgb(170, 0, 0);*/\n\n  font-family: ArialMT;\n  font-size: 16px;\n  font-weight: normal;\n  font-style: normal;\n  text-align: left;\n  color: rgba(255,255,255,140)\n}</string>
+      <string notr="true">QLabel{\n\n  font-family: ArialMT;\n  font-size: 16px;\n  font-weight: normal;\n  font-style: normal;\n  text-align: left;\n  color: rgba(255,255,255,140)\n}</string>
      </property>
      <layout class="QHBoxLayout" name="headerWidgetLayout">
       <property name="spacing">

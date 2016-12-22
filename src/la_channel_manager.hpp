@@ -20,11 +20,11 @@ class LogicAnalyzerChannel : public Channel
 {
 public:
 	LogicAnalyzerChannel(uint16_t id_, std::string label_);
-	std::string channel_role;
+	const srd_channel *channel_role;
 	std::string trigger;
 
-	std::string getChannel_role() const;
-	void setChannel_role(const std::string& value);
+	const srd_channel *getChannel_role();
+	void setChannel_role(const srd_channel *value);
 	std::string getTrigger() const;
 	void setTrigger(const std::string& value);
 };
@@ -48,6 +48,8 @@ public:
 
 private Q_SLOTS:
 	void remove();
+public Q_SLOTS:
+	void channelRoleChanged(const QString);
 	//    void set_decoder(std::string value);
 
 private:
@@ -62,6 +64,8 @@ class LogicAnalyzerChannelGroup : public ChannelGroup
 private:
 	bool collapsed;
 	const srd_decoder *decoder;
+	QStringList decoderRolesNameList;
+	std::vector<const srd_channel *> decoderRolesList;
 public:
 	LogicAnalyzerChannelGroup(LogicAnalyzerChannel *ch);
 	LogicAnalyzerChannelGroup();
@@ -70,6 +74,9 @@ public:
 	void setDecoder(const srd_decoder *value);
 	bool isCollapsed();
 	void collapse(bool val);
+	QStringList get_decoder_roles_list();
+	const srd_channel *get_srd_channel_from_name(const char*);
+	LogicAnalyzerChannel* getChannelById(int id);
 };
 
 
@@ -94,14 +101,13 @@ private Q_SLOTS:
 	void set_decoder(std::string value);
 	void collapse_group();
 	void decoderChanged(const QString);
-protected:
-
 private:
 	std::shared_ptr<pv::view::TraceTreeItem> trace;
 public Q_SLOTS:
 	void remove();
 	void settingsHandler();
 	void enable(bool enabled);
+	void rolesChanged(const QString);
 Q_SIGNALS:
 	void remove(int index);
 protected:
@@ -162,6 +168,8 @@ public:
 	void createSettingsWidget();
 	void deleteSettingsWidget();
 	void set_pv_decoder(LogicAnalyzerChannelGroupUI *channelgroup);
+	void set_pv_decoder_role(LogicAnalyzerChannelGroupUI *channelgroup,
+			LogicAnalyzerChannel *channel);
 
 public Q_SLOTS:
 	void update_position(int value);

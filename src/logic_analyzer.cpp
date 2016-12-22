@@ -69,10 +69,11 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	ctx(ctx),
 	itemsize(sizeof(uint16_t)),
 	dev(iio_context_find_device(ctx, dev_name.c_str())),
-	menuOpened(false),
+	menuOpened(true),
 	settings_group(new QButtonGroup(this)),
 	menuRunButton(runBtn),
-	ui(new Ui::LogicAnalyzer)
+	ui(new Ui::LogicAnalyzer),
+	active_settings_btn(nullptr)
 {
 	ui->setupUi(this);
 	this->setAttribute(Qt::WA_DeleteOnClose, true);
@@ -245,11 +246,13 @@ void LogicAnalyzer::clearLayout(QLayout *layout)
 void LogicAnalyzer::toggleRightMenu(QPushButton *btn)
 {
 	int id = btn->property("id").toInt();
-	bool btn_old_state = btn->isChecked();
-	bool open; //= !menuOpened;
+	bool open = true; //= !menuOpened;
 
-	if (active_settings_btn != btn) {
+	settings_panel_update(id);
+
+	if (active_settings_btn == btn) {
 		open = !menuOpened;
+		ui->rightWidget->toggleMenu(false);
 	} else {
 		open = true;
 	}
@@ -261,15 +264,14 @@ void LogicAnalyzer::toggleRightMenu(QPushButton *btn)
 		settings_group->setExclusive(true);
 	}
 
-	if (menuOpened != open) {
-		ui->rightWidget->toggleMenu(open);
-	}
+//	if (menuOpened != open) {
+//		ui->rightWidget->toggleMenu(open);
+//	}
 
 	menuOpened = open;
 	active_settings_btn = btn;
 
 	if (open) {
-		settings_panel_update(id);
 		chm_ui->showHighlight(true);
 	} else {
 		chm_ui->showHighlight(false);
@@ -280,15 +282,9 @@ void LogicAnalyzer::settings_panel_update(int id)
 {
 	if (id < 0) {
 		ui->stackedWidget->setCurrentIndex(-id);
-	} else {
+	}
+	else {
 		ui->stackedWidget->setCurrentIndex(id);
-//		clearLayout(ui->colorSettings->layout());
-//		lachannelsettings->setupUi(ui->colorSettings);
-//		LogicAnalyzerChannelGroup* chg_ui = chm_ui->chm->getHighlightedChannelGroup();
-//		lachannelsettings->channelName->setText(QString::fromStdString(chg_ui->get_label()));
-//		connect(lachannelsettings->channelName, SIGNAL(textChanged(const QString&)),
-//			chm_ui, SLOT(changeChannelName(const QString&)));
-//		ui->stackedWidget->setCurrentIndex(ui->stackedWidget->indexOf(ui->colorSettings));
 	}
 }
 
@@ -301,12 +297,10 @@ void LogicAnalyzer::toggleLeftMenu(bool val)
 {
 	if (val) {
 		ui->btnGroupChannels->hide();
-		ui->btnShowChannels->hide();
 		ui->btnShowHideMenu->setText(">");
 		chm_ui->collapse(true);
 	} else {
 		ui->btnGroupChannels->show();
-		ui->btnShowChannels->show();
 		ui->btnShowHideMenu->setText("<");
 		chm_ui->collapse(false);
 	}
