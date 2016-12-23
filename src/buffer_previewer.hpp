@@ -24,6 +24,8 @@
 #include <QFrame>
 #include <QColor>
 
+namespace adiscope{
+
 class BufferPreviewer: public QFrame
 {
 	Q_OBJECT
@@ -89,5 +91,7 @@ public:
 protected:
 	virtual void buildFullWaveform(QPointF *wavePoints, int numPts);
 };
+
+} // namespace adiscope
 
 #endif // BUFFER_PREVIEWER_H
