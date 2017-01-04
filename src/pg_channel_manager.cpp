@@ -471,15 +471,10 @@ void PatternGeneratorChannelManager::commitBuffer(PatternGeneratorChannelGroup
 	auto channel_enable_mask_temp = chg->get_mask();
 	auto buffer_channel_mask = (1<<chg->get_channel_count())-1;
 
-	while (channel_enable_mask_temp) {
-		if (channel_enable_mask_temp & 0x01) {
-			channel_mapping[j] = i;
-			j++;
-		}
-
-		channel_enable_mask_temp>>=1;
-		i++;
-	}
+    for(i=0;i<chg->get_channel_count();i++)
+    {
+        channel_mapping[i] = chg->get_channel(i)->get_id();
+    }
 
 	for (auto i=0; i< bufferSize; i++) {
 		auto val = (bufferPtr[i] & buffer_channel_mask);
@@ -725,7 +720,7 @@ void PatternGeneratorChannelManagerUI::updateUi()
 		//connect(currentChannelGroupUI->getChannelGroup()->pattern, SIGNAL(generate_pattern),pg,SLOT())
 
 
-		offset+=(currentChannelGroupUI->geometry().bottomRight().y());
+        offset+=(currentChannelGroupUI->geometry().bottomRight().y());
 
 		if (ch->is_grouped()) { // create subwidgets
            /* auto trace = main_win->view_->add_decoder();
@@ -794,7 +789,7 @@ void PatternGeneratorChannelManagerUI::updateUi()
 
 				str = QString().number(index);
 				currentChannelUI->ui->DioLabel->setText(str);
-				offset+=(currentChannelUI->geometry().bottomRight().y());
+                offset+=(currentChannelUI->geometry().bottomRight().y());
 
 			}
 
