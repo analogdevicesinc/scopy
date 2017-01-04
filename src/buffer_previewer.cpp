@@ -189,7 +189,7 @@ void BufferPreviewer::setCursorColor(QColor color)
 void BufferPreviewer::paintEvent(QPaintEvent *)
 {
 	QPainter p(this);
-	QPen defaultPen = p.pen();
+
 	p.translate(contentsRect().topLeft());
 	int w = contentsRect().width();
 	int h = contentsRect().height();
@@ -208,42 +208,44 @@ void BufferPreviewer::paintEvent(QPaintEvent *)
 	if (wave_start + wave_width > w)
 		wave_width = w - wave_start;
 
-	// Draw the highlight rectangle
-	QPen pen = p.pen();
-	pen.setStyle(Qt::NoPen);
-	p.setPen(pen);
-	p.setBrush(m_highlightBgColor);
-	p.drawRect(hlight_start, 0, hlight_width, h);
-
-	//Draw Cursor
-	int cur_head_w = 8;
-	int cur_head_h = 4;
-	pen = defaultPen;
-	pen.setStyle(Qt::NoPen);
-	p.setPen(pen);
-	p.setBrush(m_cursorColor);
-	p.drawRect((cursor_start - 1) - cur_head_w / 2 + 1, 0, cur_head_w, cur_head_h);
-	p.drawRect((cursor_start - 1), cur_head_h, 2, h - cur_head_h);
-
 	// Get intersection between the visible wave and the highlight rectangle
 	int hlightedWaveStartPos = qMax(hlight_start, wave_start);
 	int hlightedWaveEndPos = qMin((hlight_start + hlight_width),
 		(wave_start + wave_width));
 	int hlightedWaveWidth = hlightedWaveEndPos - hlightedWaveStartPos;
 
-	// Drawing settings for both lines
-	p.setRenderHint(QPainter::Antialiasing, true);
-	pen = defaultPen;
-	pen.setWidthF(1.5);
+	/* Start drawing */
+	QPen rectPen = p.pen();
+	QPen linePen = p.pen();
+
+	rectPen.setStyle(Qt::NoPen);
+	linePen.setWidthF(1.5);
 
 	// Draw the visible part of the entire wave
-	p.setPen(pen);
+	p.setRenderHint(QPainter::Antialiasing, true);
+	p.setPen(linePen);
 	p.drawPolyline(m_fullWavePoints + wave_start, wave_width);
 
+	// Draw the highlight rectangle
+	p.setRenderHint(QPainter::Antialiasing, false);
+	p.setPen(rectPen);
+	p.setBrush(m_highlightBgColor);
+	p.drawRect(hlight_start, 0, hlight_width, h);
+
 	// Highlight the visible wave that intersects the highlight rectangle
-	pen.setColor(m_highlightFgColor);
-	p.setPen(pen);
+	p.setRenderHint(QPainter::Antialiasing, true);
+	linePen.setColor(m_highlightFgColor);
+	p.setPen(linePen);
 	p.drawPolyline(m_fullWavePoints + hlightedWaveStartPos , hlightedWaveWidth);
+
+	//Draw Cursor
+	p.setRenderHint(QPainter::Antialiasing, false);
+	int cur_head_w = 8;
+	int cur_head_h = 4;
+	p.setPen(rectPen);
+	p.setBrush(m_cursorColor);
+	p.drawRect((cursor_start - 1) - cur_head_w / 2 + 1, 0, cur_head_w, cur_head_h);
+	p.drawRect((cursor_start - 1), cur_head_h, 2, h - cur_head_h);
 }
 
 void BufferPreviewer::resizeEvent(QResizeEvent *)
