@@ -7,11 +7,11 @@
     <x>0</x>
     <y>0</y>
     <width>600</width>
-    <height>44</height>
+    <height>38</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Maximum" vsizetype="Minimum">
+   <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -126,6 +126,12 @@ QLabel:disabled
    </property>
    <item>
     <widget class="Line" name="line_2">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="styleSheet">
       <string notr="true">QFrame{
   color: rgba(255,255,255,50);
@@ -141,6 +147,12 @@ QLabel:disabled
    </item>
    <item>
     <widget class="QWidget" name="baseWidget" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="minimumSize">
       <size>
        <width>0</width>
@@ -150,15 +162,17 @@ QLabel:disabled
      <property name="styleSheet">
       <string notr="true">QWidget[highlight=true]
 {
-background:black;
+background: #1b1b21;
 }
+
 QWidget 
 {
 background: transparent;
 }
 QListView
 {
-background:black;
+background: #272730;
+border-color:transparent;
 }
 
 QWidget#baseWidget:hover
@@ -172,13 +186,13 @@ border:1px solid rgb(65,155,249);
        <number>0</number>
       </property>
       <property name="leftMargin">
-       <number>0</number>
+       <number>1</number>
       </property>
       <property name="topMargin">
        <number>0</number>
       </property>
       <property name="rightMargin">
-       <number>0</number>
+       <number>1</number>
       </property>
       <property name="bottomMargin">
        <number>0</number>
@@ -1815,6 +1829,12 @@ QCheckBox::indicator:!checked {
    </item>
    <item>
     <widget class="Line" name="line">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="styleSheet">
       <string notr="true">QFrame{
   color: rgba(255,255,255,50);

@@ -570,10 +570,10 @@ void View::set_zoom(double scale, int offset)
 	const Timestamp new_offset = cursor_offset - new_scale * offset;
 
 	scale = new_scale.convert_to<double>();
-	if (scale == backup_scale_)
-		zoom_label_->setText("");
-	else
-		zoom_label_->setText("Zoom@ " +  QString::number(scale));
+//	if (scale == backup_scale_)
+//		zoom_label_->setText("");
+//	else
+//		zoom_label_->setText("Zoom@ " +  QString::number(scale));
 
 	set_scale_offset(new_scale.convert_to<double>(), new_offset);
 }

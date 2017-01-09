@@ -172,7 +172,7 @@ public:
 			LogicAnalyzerChannel *channel);
 
 public Q_SLOTS:
-	void update_position(int value);
+	void chmScrollChanged(int value);
 	void remove();
 	void set_label(QString);
 
