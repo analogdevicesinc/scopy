@@ -163,7 +163,6 @@ std::vector<Row> DecoderStack::get_visible_rows() const
 		const srd_decoder *const decc = dec->decoder();
 		assert(dec->decoder());
 
-		std::cout << "NAME " <<  decc->name << std::endl;
 		// Add a row for the decoder if it doesn't have a row list
 		if (!decc->annotation_rows)
 			rows.push_back(Row(decc));

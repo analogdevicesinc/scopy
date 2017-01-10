@@ -88,12 +88,14 @@ void LogicAnalyzerChannelUI::channelRoleChanged(const QString text)
 	if (channel_role) {
 //		chm_ui->set_pv_decoder(this);
 	}
-
-	chm_ui->deleteSettingsWidget();
-	chm_ui->chm->highlightChannel(chgroup);
-	chm_ui->createSettingsWidget();
 }
 
+void LogicAnalyzerChannelUI::rolesChangedLHS(const QString text)
+{
+	channelRoleChanged(text);
+	chm_ui->deleteSettingsWidget();
+	chm_ui->createSettingsWidget();
+}
 
 void LogicAnalyzerChannelUI::setTrace(std::shared_ptr<pv::view::TraceTreeItem>
                                       item)
@@ -114,6 +116,9 @@ LogicAnalyzerChannel *LogicAnalyzerChannelUI::getChannel()
 void LogicAnalyzerChannelUI::remove()
 {
 	auto channelGroups = chm_ui->chm->get_channel_groups();
+	auto highlightedItem = chm_ui->chm->getHighlightedChannel();
+	bool changeHighlight = (highlightedItem == this->lch);
+
 	auto chGroupIt = std::find(channelGroups->begin(), channelGroups->end(),
 	                           chgroup);
 
@@ -131,6 +136,14 @@ void LogicAnalyzerChannelUI::remove()
 
 	auto chIndex = chIt - channels->begin();
 	chm_ui->chm->removeChannel(chGroupIndex, chIndex);
+
+	if( changeHighlight )
+	{
+		auto it = chm_ui->chg_ui.begin();
+		chm_ui->chm->highlightChannel((*it)->getChannelGroup());
+		chm_ui->deleteSettingsWidget();
+		chm_ui->createSettingsWidget();
+	}
 	chm_ui->update_ui();
 }
 
@@ -266,14 +279,18 @@ std::shared_ptr<pv::view::TraceTreeItem> LogicAnalyzerChannelGroupUI::getTrace()
 
 void LogicAnalyzerChannelGroupUI::remove()
 {
+	auto highlightedItem = chm_ui->chm->getHighlightedChannelGroup();
+
+	if( highlightedItem == this->lchg )
+	{
+		auto it = chm_ui->chg_ui.begin();
+		chm_ui->chm->highlightChannel((*it)->getChannelGroup());
+		chm_ui->deleteSettingsWidget();
+		chm_ui->createSettingsWidget();
+	}
+
 	lchg->select(true);
 	chm_ui->remove();
-}
-
-void LogicAnalyzerChannelGroupUI::settingsHandler()
-{
-//	chm_ui->set_current_channelGroup(this);
-
 }
 
 void LogicAnalyzerChannelGroupUI::mousePressEvent(QMouseEvent *event)
@@ -308,6 +325,19 @@ void LogicAnalyzerChannelGroupUI::enable(bool enabled)
 	enableControls(enabled);
 }
 
+LogicAnalyzerChannelUI*
+	LogicAnalyzerChannelGroupUI::findChannelWithRole(const QString role)
+{
+	for(auto var : ch_ui)
+	{
+		if( var->getChannel()->getChannel_role()->name == role)
+		{
+			return var;
+		}
+	}
+	return nullptr;
+}
+
 void LogicAnalyzerChannelGroupUI::decoderChanged(const QString text)
 {
 	const srd_decoder *decoder;
@@ -325,31 +355,11 @@ void LogicAnalyzerChannelGroupUI::decoderChanged(const QString text)
 		chm_ui->set_pv_decoder(this);
 	}
 
-	chm_ui->deleteSettingsWidget();
-	chm_ui->chm->highlightChannel(getChannelGroup());
-	chm_ui->createSettingsWidget();
-}
-
-void LogicAnalyzerChannelGroupUI::rolesChanged(const QString text)
-{
-	if ( text == "-" )
+	if(getChannelGroup() == chm_ui->chm->getHighlightedChannelGroup())
 	{
-		return; //TBD
+		chm_ui->deleteSettingsWidget();
+		chm_ui->createSettingsWidget();
 	}
-
-	srd_channel *channel_role;
-	int channel_id = text.toInt();
-	QComboBox *comboSender = (static_cast<QComboBox *>(QObject::sender()));
-	const QString role_name = comboSender->property("name").toString();
-
-	for(LogicAnalyzerChannelUI *var : ch_ui)
-	{
-		if(var->get_channel()->get_id() == channel_id)
-		{
-			var->channelRoleChanged(role_name);
-		}
-	}
-	chm_ui->update_ui();
 }
 
 LogicAnalyzerChannelGroup *LogicAnalyzerChannelGroupUI::getChannelGroup()
@@ -500,7 +510,8 @@ LogicAnalyzerChannelManagerUI::LogicAnalyzerChannelManagerUI(QWidget *parent,
 	managerHeaderWidget(nullptr),
 	locationSettingsWidget(settingsWidget),
 	settingsUI(nullptr),
-	currentSettingsWidget(nullptr)
+	currentSettingsWidget(nullptr),
+	highlightShown(true)
 {
 	ui->setupUi(this);
 	main_win = main_win_;
@@ -736,7 +747,7 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 					        lachannelUI, SLOT(remove()));
 					connect(lachannelUI->ui->comboBox_2,
 						SIGNAL(currentIndexChanged(const QString&)),
-						lachannelUI, SLOT(channelRoleChanged(const QString&)));
+						lachannelUI, SLOT(rolesChangedLHS(const QString&)));
 
 
 					str = QString().number(ch->get_channel(i)->get_id());
@@ -779,6 +790,11 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 		}
 	}
 
+	if(highlightShown)
+	{
+		showHighlight(true);
+	}
+
 	if (chg_ui.size() != 0) {
 		ui->scrollArea->verticalScrollBar()->setPageStep(
 		        chg_ui.front()->sizeHint().height());
@@ -789,7 +805,7 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 	}
 	ui->scrollArea->setMaximumWidth(managerHeaderWidget->sizeHint().width());
 	main_win->view_->viewport()->setDivisionHeight(44);
-	main_win->view_->viewport()->setDivisionCount(6);
+	main_win->view_->viewport()->setDivisionCount(10);
 	main_win->view_->viewport()->setDivisionOffset(5);
 	connect(ui->scrollArea->verticalScrollBar(), SIGNAL(valueChanged(int)),
 	        this, SLOT(chmScrollChanged(int)));
@@ -848,7 +864,7 @@ void LogicAnalyzerChannelManagerUI::on_hideInactive_clicked(bool hide)
 void LogicAnalyzerChannelManagerUI::showHighlight(bool check)
 {
 	LogicAnalyzerChannelGroupUI *chGroupUi = getUiFromChGroup(
-	                        chm->getHighlightedChannelGroup());
+				chm->getHighlightedChannelGroup());
 	LogicAnalyzerChannelUI *chUi = getUiFromCh(chm->getHighlightedChannel());
 
 	if (chGroupUi != nullptr) {
@@ -866,8 +882,17 @@ void LogicAnalyzerChannelManagerUI::showHighlight(bool check)
 			chUi->getTrace()->set_highlight(check);
 		}
 	}
-	deleteSettingsWidget();
-	createSettingsWidget();
+	if (check)
+	{
+		deleteSettingsWidget();
+		createSettingsWidget();
+		highlightShown = true;
+	}
+	else
+	{
+		highlightShown = false;
+	}
+
 }
 
 LogicAnalyzerChannelGroupUI *LogicAnalyzerChannelManagerUI::getUiFromChGroup(
@@ -893,6 +918,47 @@ LogicAnalyzerChannelUI *LogicAnalyzerChannelManagerUI::getUiFromCh(
 
 	return nullptr;
 }
+
+/**
+ * @brief LogicAnalyzerChannelManagerUI::rolesChangedRHS
+ * If the combo boxes from the right menu are connected to a ChannelGroupUI,
+ * the connection is lost once update_ui() is called. So, they will be connected
+ * to a ChannelManagerUI, which is not affected by the update.
+ * @param text
+ */
+void LogicAnalyzerChannelManagerUI::rolesChangedRHS(const QString text)
+{
+	QComboBox *comboSender = (static_cast<QComboBox *>(QObject::sender()));
+	const QString role_name = comboSender->property("name").toString();
+
+	auto chGroup = chm->getHighlightedChannelGroup();
+	if( chGroup )
+	{
+		auto chgroupUI = getUiFromChGroup(chGroup);
+		if( text == "-" )
+		{
+			auto prevChannel = chgroupUI->findChannelWithRole(role_name);
+			if( prevChannel )
+			{
+				prevChannel->channelRoleChanged("None");
+			}
+		}
+		else
+		{
+			int channel_id = text.toInt();
+			for(LogicAnalyzerChannelUI *var : chgroupUI->ch_ui)
+			{
+				if(var->get_channel()->get_id() == channel_id)
+				{
+					var->channelRoleChanged(role_name);
+				}
+			}
+		}
+		highlightShown = false;
+		update_ui();
+	}
+}
+
 
 void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 {
@@ -947,7 +1013,7 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 
 				connect(reqChUI->roleCombo,
 				        SIGNAL(currentIndexChanged(const QString&)),
-				        getUiFromChGroup(chGroup), SLOT(rolesChanged(const QString&)));
+				        this, SLOT(rolesChangedRHS(const QString&)));
 
 			}
 			free(reqCh);
@@ -965,6 +1031,7 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 				optChUI->setupUi(r);
 				optChUI->labelRole->setText(QString::fromUtf8(optch->name));
 
+				/* Add all the available channels + "none" to the list */
 				optChUI->roleCombo->addItem("-");
 				for (auto&& ch : *(chGroup->get_channels())) {
 					optChUI->roleCombo->addItem(QString::number(ch->get_id()));
@@ -981,7 +1048,7 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 
 				connect(optChUI->roleCombo,
 				        SIGNAL(currentIndexChanged(const QString&)),
-				        getUiFromChGroup(chGroup), SLOT(rolesChanged(const QString&)));
+				        this, SLOT(rolesChangedRHS(const QString&)));
 			}
 			free(optChannels);
 		}

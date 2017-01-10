@@ -45,13 +45,12 @@ public:
 	LogicAnalyzerChannel *getChannel();
 	void setTrace(std::shared_ptr<pv::view::TraceTreeItem> item);
 	std::shared_ptr<pv::view::TraceTreeItem> getTrace();
-
+	void channelRoleChanged(const QString);
 private Q_SLOTS:
 	void remove();
 public Q_SLOTS:
-	void channelRoleChanged(const QString);
 	//    void set_decoder(std::string value);
-
+	void rolesChangedLHS(const QString text);
 private:
 	LogicAnalyzerChannelManagerUI *chm_ui;
 	LogicAnalyzerChannelGroup *chgroup;
@@ -96,6 +95,7 @@ public:
 	void enableControls(bool enabled);
 	void setTrace(std::shared_ptr<pv::view::TraceTreeItem> item);
 	std::shared_ptr<pv::view::TraceTreeItem> getTrace();
+	LogicAnalyzerChannelUI* findChannelWithRole(const QString role);
 
 private Q_SLOTS:
 	void set_decoder(std::string value);
@@ -105,9 +105,7 @@ private:
 	std::shared_ptr<pv::view::TraceTreeItem> trace;
 public Q_SLOTS:
 	void remove();
-	void settingsHandler();
 	void enable(bool enabled);
-	void rolesChanged(const QString);
 Q_SIGNALS:
 	void remove(int index);
 protected:
@@ -151,6 +149,7 @@ public:
 	QWidget *locationSettingsWidget;
 	QWidget *currentSettingsWidget;
 	Ui::LASettingsWidget *settingsUI;
+	bool highlightShown;
 	LogicAnalyzerChannelManagerUI(QWidget *parent,
 	                              pv::MainWindow *main_win_,
 	                              LogicAnalyzerChannelManager *chm,
@@ -175,6 +174,7 @@ public Q_SLOTS:
 	void chmScrollChanged(int value);
 	void remove();
 	void set_label(QString);
+	void rolesChangedRHS(const QString);
 
 private Q_SLOTS:
 	void on_groupSplit_clicked();
