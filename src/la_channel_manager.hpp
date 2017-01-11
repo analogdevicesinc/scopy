@@ -65,6 +65,8 @@ private:
 	const srd_decoder *decoder;
 	QStringList decoderRolesNameList;
 	std::vector<const srd_channel *> decoderRolesList;
+	std::map<const srd_channel*,
+		std::shared_ptr<pv::view::TraceTreeItem> > channels_;
 public:
 	LogicAnalyzerChannelGroup(LogicAnalyzerChannel *ch);
 	LogicAnalyzerChannelGroup();
@@ -76,6 +78,10 @@ public:
 	QStringList get_decoder_roles_list();
 	const srd_channel *get_srd_channel_from_name(const char*);
 	LogicAnalyzerChannel* getChannelById(int id);
+	void setChannelForDecoder(const srd_channel*,
+		std::shared_ptr<pv::view::TraceTreeItem>);
+	std::map<const srd_channel*,
+		std::shared_ptr<pv::view::TraceTreeItem> > get_decoder_channels();
 };
 
 
@@ -167,8 +173,6 @@ public:
 	void createSettingsWidget();
 	void deleteSettingsWidget();
 	void set_pv_decoder(LogicAnalyzerChannelGroupUI *channelgroup);
-	void set_pv_decoder_role(LogicAnalyzerChannelGroupUI *channelgroup,
-			LogicAnalyzerChannel *channel);
 
 public Q_SLOTS:
 	void chmScrollChanged(int value);

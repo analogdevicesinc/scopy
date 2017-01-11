@@ -86,7 +86,7 @@ void LogicAnalyzerChannelUI::channelRoleChanged(const QString text)
 	}
 	static_cast<LogicAnalyzerChannel *>(lch)->setChannel_role(channel_role);
 	if (channel_role) {
-//		chm_ui->set_pv_decoder(this);
+		chgroup->setChannelForDecoder(channel_role, getTrace());
 	}
 }
 
@@ -95,6 +95,9 @@ void LogicAnalyzerChannelUI::rolesChangedLHS(const QString text)
 	channelRoleChanged(text);
 	chm_ui->deleteSettingsWidget();
 	chm_ui->createSettingsWidget();
+	chm_ui->main_win->view_->commit_decoder_channels(
+		chm_ui->getUiFromChGroup(chgroup)->getTrace(),
+		chgroup->get_decoder_channels());
 }
 
 void LogicAnalyzerChannelUI::setTrace(std::shared_ptr<pv::view::TraceTreeItem>
@@ -156,6 +159,7 @@ void LogicAnalyzerChannelGroup::setDecoder(const srd_decoder *value)
 {
 	decoderRolesNameList.clear();
 	decoderRolesList.clear();
+	channels_.clear();
 	decoder = value;
 
 	GSList *reqCh = g_slist_copy(decoder->channels);
@@ -217,6 +221,8 @@ LogicAnalyzerChannelGroup::LogicAnalyzerChannelGroup(LogicAnalyzerChannel *ch):
 {
 	collapsed = false;
 	decoder = nullptr;
+	channels_ = std::map<const srd_channel*,
+		std::shared_ptr<pv::view::TraceTreeItem> >();
 }
 
 LogicAnalyzerChannelGroup::LogicAnalyzerChannelGroup():
@@ -224,6 +230,30 @@ LogicAnalyzerChannelGroup::LogicAnalyzerChannelGroup():
 {
 	collapsed = false;
 	decoder = nullptr;
+	channels_ = std::map<const srd_channel*,
+		std::shared_ptr<pv::view::TraceTreeItem> >();
+}
+
+void LogicAnalyzerChannelGroup::setChannelForDecoder(const srd_channel* ch,
+		std::shared_ptr<pv::view::TraceTreeItem> trace)
+{
+	if(!channels_.empty()){
+		auto it = channels_.find(ch);
+		if( it != channels_.end() )
+		{
+			channels_.at(ch) = trace;
+		}
+	}
+	else
+	{
+		channels_.insert(std::pair<const srd_channel*, std::shared_ptr<pv::view::TraceTreeItem> >(ch, trace));
+	}
+}
+
+std::map<const srd_channel*, std::shared_ptr<pv::view::TraceTreeItem> >
+	LogicAnalyzerChannelGroup::get_decoder_channels()
+{
+	return channels_;
 }
 
 LogicAnalyzerChannelGroup::~LogicAnalyzerChannelGroup()
@@ -235,6 +265,8 @@ LogicAnalyzerChannelGroup::~LogicAnalyzerChannelGroup()
 	for(auto var : decoderRolesList) {
 		delete var;
 	}
+	channels_.clear();
+	delete &channels_;
 }
 
 const srd_channel* LogicAnalyzerChannelGroup::get_srd_channel_from_name(const char* name)
@@ -653,6 +685,8 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 				auto trace = main_win->view_->add_decoder();
 				lachannelgroupUI->setTrace(trace);
 				trace->force_to_v_offset(offset);
+				main_win->view_->commit_decoder_channels(trace,
+					lachannelgroupUI->getChannelGroup()->get_decoder_channels());
 
 				if(!collapsed)
 				{
@@ -733,7 +767,6 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 									lachannelUI->getChannel()->getChannel_role()->name);
 						int decIndex = lachannelgroupUI->getChannelGroup()->get_decoder_roles_list().indexOf(name)+1;
 						lachannelUI->ui->comboBox_2->setCurrentIndex(decIndex);
-//						set_pv_decoder(lachannelgroupUI);
 					} else {
 						lachannelUI->ui->comboBox_2->setCurrentIndex(0);
 					}
@@ -1109,13 +1142,4 @@ void LogicAnalyzerChannelManagerUI::set_pv_decoder(LogicAnalyzerChannelGroupUI
 	main_win->view_->set_decoder_to_group(chGroup->getTrace(),
 	                                      chGroup->getChannelGroup()->getDecoder());
 }
-
-void LogicAnalyzerChannelManagerUI::set_pv_decoder_role(LogicAnalyzerChannelGroupUI
-                *chGroup, LogicAnalyzerChannel *channel)
-{
-				//TBD
-//       main_win->view_->set_role_to_decoder(chGroup->getTrace(), channel->get_id(), channel->getChannel_role());
-}
-
-
 }

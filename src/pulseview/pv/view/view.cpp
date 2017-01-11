@@ -1161,11 +1161,8 @@ shared_ptr<TraceTreeItem> View::get_clone_of(int id)
 }
 shared_ptr<TraceTreeItem> View::add_decoder()
 {
-	vector<shared_ptr<LogicSignal> > selected;
-	vector<int> results;
 	shared_ptr<pv::view::DecodeTrace> decode_trace =
 			session_.add_decoder();
-	decode_trace->setInitial(false);
 	return decode_trace;
 }
 
@@ -1200,6 +1197,18 @@ int View::divisionCount()
 QSize View::viewport_height()
 {
 	return viewport_->size();
+}
+
+void View::commit_decoder_channels(std::shared_ptr<TraceTreeItem> trace,
+		std::map<const srd_channel*,
+		std::shared_ptr<pv::view::TraceTreeItem> > channelMap)
+{
+	shared_ptr<DecodeTrace> d = dynamic_pointer_cast<DecodeTrace>(
+		trace);
+	if(d && !channelMap.empty())
+	{
+		d->set_channel_map(channelMap);
+	}
 }
 
 } // namespace view

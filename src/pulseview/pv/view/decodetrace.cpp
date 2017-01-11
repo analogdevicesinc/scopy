@@ -920,6 +920,29 @@ void DecodeTrace::commit_channels()
 	decoder_stack_->begin_decode();
 }
 
+void DecodeTrace::set_channel_map(std::map<const srd_channel*,
+		std::shared_ptr<pv::view::TraceTreeItem> > channelMap)
+{
+	std::map<const srd_channel*,
+		std::shared_ptr<pv::view::LogicSignal> > logicChannelMap;
+
+	shared_ptr<data::decode::Decoder> dec = (*decoder_stack_->stack().begin());
+	for(auto iter : channelMap)
+	{
+		shared_ptr<LogicSignal> l = dynamic_pointer_cast<LogicSignal>(
+			iter.second);
+		if(l)
+		{
+			logicChannelMap[iter.first] = l;
+		}
+	}
+	if( !logicChannelMap.empty() )
+	{
+		dec->set_channels(logicChannelMap);
+		decoder_stack_->begin_decode();
+	}
+}
+
 void DecodeTrace::on_new_decode_data()
 {
 	if (owner_)

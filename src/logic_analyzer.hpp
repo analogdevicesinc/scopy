@@ -76,6 +76,7 @@ private:
 
 	ScaleSpinButton *timeBase;
 	PositionSpinButton *timePosition;
+	QPushButton *allDecodersVisible;
 
 	const std::string& dev_name;
 

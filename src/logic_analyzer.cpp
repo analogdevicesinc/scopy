@@ -156,9 +156,17 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	}, "Position",
 	-timeBase->maxValue() * 5,
 	timeBase->maxValue() * 5);
+
+//	allDecodersVisible = new QPushButton(this);
+//	allDecodersVisible->setIcon(QIcon::fromTheme("switch_off",
+//	                                     QIcon(":/icons/switch_off.png")));
+//	allDecodersVisible->setCheckable(true);
+//	allDecodersVisible->setChecked(false);
+
 	QVBoxLayout *vLayout = new QVBoxLayout(ui->generalSettings);
 	vLayout->insertWidget(1, timeBase, 0, Qt::AlignLeft);
 	vLayout->insertWidget(2, timePosition, 0, Qt::AlignLeft);
+//	vLayout->insertWidget(3, allDecodersVisible, 0, Qt::AlignLeft);
 	vLayout->insertSpacerItem(-1, new QSpacerItem(0, 0,
 	                          QSizePolicy::Minimum,
 	                          QSizePolicy::Expanding));
@@ -197,6 +205,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	        chm_ui, SLOT(on_hideInactive_clicked(bool)));
 	connect(ui->btnShowChannels, SIGNAL(clicked(bool)),
 	        this, SLOT(on_btnShowChannelsClicked(bool)));
+//	connect(allDecodersVisible, SIGNAL(toggled(bool)),
+//		chm_ui, SLOT(on_displayAllDecoders(bool)));
 }
 
 

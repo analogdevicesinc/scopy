@@ -127,6 +127,9 @@ public:
 
 	void set_decoder(const srd_decoder*);
 
+	void set_channel_map(std::map<const srd_channel*,
+		std::shared_ptr<pv::view::TraceTreeItem> > channelMap);
+
 private:
 	void draw_annotations(std::vector<pv::data::decode::Annotation> annotations,
 		QPainter &p, int h, const ViewItemPaintParams &pp, int y,

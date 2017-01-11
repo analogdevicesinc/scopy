@@ -222,6 +222,10 @@ public:
 
 	QSize viewport_height();
 
+	void commit_decoder_channels(std::shared_ptr<TraceTreeItem> trace,
+		std::map<const srd_channel*,
+		std::shared_ptr<pv::view::TraceTreeItem> > channelMap);
+
 Q_SIGNALS:
 	void hover_point_changed();
 
