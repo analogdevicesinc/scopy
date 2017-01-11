@@ -107,12 +107,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 
 	/* Gnuradio Blocks */
 
-	int num_samples = plot.axisInterval(QwtPlot::xBottom).width() *
-				adc.sampleRate();
-
-	this->qt_time_block = adiscope::scope_sink_f::make(
-			num_samples,
-			adc.sampleRate(), "Osc Time", nb_channels, (QObject *)&plot);
+	this->qt_time_block = adiscope::scope_sink_f::make(0, adc.sampleRate(),
+		"Osc Time", nb_channels, (QObject *)&plot);
 
 	this->qt_fft_block = adiscope::scope_sink_f::make(fft_size, adc.sampleRate(),
 			"Osc Frequency", nb_channels, (QObject *)&fft_plot);
@@ -129,9 +125,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	// Prevent the application from hanging while waiting for a trigger condition
 	iio_context_set_timeout(ctx, UINT_MAX);
 
-	plot.registerSink(qt_time_block->name(), nb_channels,
-			plot.axisInterval(QwtPlot::xBottom).width() *
-			adc.sampleRate());
+	plot.registerSink(qt_time_block->name(), nb_channels, 0);
 	plot.disableLegend();
 
 	iio = iio_manager::get_instance(ctx,
