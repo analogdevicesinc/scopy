@@ -165,6 +165,7 @@ public:
 	LogicAnalyzer *la;
 	Ui::LAChannelManager *ui;
 	void update_ui();
+	void update_ui_children(LogicAnalyzerChannelGroupUI*);
 	void collapse(bool);
 	void showHighlight(bool check);
 	LogicAnalyzerChannelGroupUI *getUiFromChGroup(
