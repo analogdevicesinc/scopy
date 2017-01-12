@@ -256,7 +256,7 @@ QPushButton:!checked {
              <number>25</number>
             </property>
             <property name="bottomMargin">
-             <number>25</number>
+             <number>0</number>
             </property>
             <property name="spacing">
              <number>0</number>
