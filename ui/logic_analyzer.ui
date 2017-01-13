@@ -541,8 +541,17 @@ QPushButton:!checked:hover {
       </property>
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_8">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
         <property name="topMargin">
          <number>10</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
         </property>
         <item>
          <widget class="QWidget" name="captureInfo" native="true">
@@ -761,6 +770,9 @@ QPushButton:hover
            <property name="spacing">
             <number>0</number>
            </property>
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
            <property name="topMargin">
             <number>0</number>
            </property>
@@ -820,10 +832,7 @@ QPushButton:hover
              <property name="styleSheet">
               <string notr="true"/>
              </property>
-             <layout class="QVBoxLayout" name="verticalLayout_2">
-              <property name="spacing">
-               <number>0</number>
-              </property>
+             <layout class="QGridLayout" name="gridLayout">
               <property name="leftMargin">
                <number>0</number>
               </property>
@@ -836,7 +845,10 @@ QPushButton:hover
               <property name="bottomMargin">
                <number>0</number>
               </property>
-              <item>
+              <property name="spacing">
+               <number>0</number>
+              </property>
+              <item row="0" column="0">
                <widget class="QWidget" name="plotStatusWidget" native="true">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -882,7 +894,7 @@ QPushButton:hover
                 </layout>
                </widget>
               </item>
-              <item>
+              <item row="1" column="0">
                <widget class="QWidget" name="centralWidget" native="true">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
@@ -912,6 +924,36 @@ QPushButton:hover
              </layout>
             </widget>
            </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QWidget" name="areaTimeTrigger" native="true">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true"/>
+          </property>
+          <layout class="QGridLayout" name="areaTimeTriggerLayout">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <property name="spacing">
+            <number>0</number>
+           </property>
           </layout>
          </widget>
         </item>

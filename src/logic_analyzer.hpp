@@ -29,14 +29,23 @@
 #include "pulseview/pv/widgets/sweeptimingwidget.hpp"
 #include "pulseview/pv/devicemanager.hpp"
 #include "pulseview/pv/mainwindow.hpp"
-#include "spinbox_a.hpp"
+#include "pulseview/pv/view/viewport.hpp"
 #include "pulseview/pv/devices/binarystream.hpp"
 #include "la_channel_manager.hpp"
+#include "handles_area.hpp"
+#include "plot_line_handle.h"
+#include "spinbox_a.hpp"
 
 using namespace pv;
 using namespace pv::toolbars;
 using namespace pv::widgets;
 using sigrok::Context;
+
+namespace pv {
+namespace view {
+class Viewport;
+}
+}
 
 namespace Glibmm {
 }
@@ -59,6 +68,7 @@ public:
 	                       QWidget *parent = 0,
 	                       unsigned int sample_rate = 200000);
 	~LogicAnalyzer();
+	void updateAreaTimeTriggerPadding();
 
 private Q_SLOTS:
 	void startStop(bool start);
@@ -68,6 +78,9 @@ private Q_SLOTS:
 	void leftMenuFinished(bool opened);
 	void on_btnShowChannelsClicked(bool check);
 
+public Q_SLOTS:
+	void onTimeTriggerHandlePosChanged(int);
+
 private:
 	Ui::LogicAnalyzer *ui;
 	QButtonGroup *settings_group;
@@ -76,7 +89,6 @@ private:
 
 	ScaleSpinButton *timeBase;
 	PositionSpinButton *timePosition;
-	QPushButton *allDecodersVisible;
 
 	const std::string& dev_name;
 
@@ -102,6 +114,10 @@ private:
 	Ui::LChannelSettings *lachannelsettings;
 
 	void clearLayout(QLayout *layout);
+
+	HorizHandlesArea *d_bottomHandlesArea;
+	FreePlotLineHandleH *d_timeTriggerHandle;
+	QWidget* bottomHandlesArea();
 };
 }
 

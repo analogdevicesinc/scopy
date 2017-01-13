@@ -54,6 +54,9 @@ public:
     int getDivisionOffset() const;
     void setDivisionOffset(int value);
 
+	int getTimeTriggerPos() const;
+	void setTimeTriggerPos(int value);
+
 private:
     /**
      * Indicates when a view item is being hovered over.
@@ -104,6 +107,7 @@ private:
 	void paintEvent(QPaintEvent *event);
 	void paint_grid(QPainter &p, const ViewItemPaintParams &pp);
 	void paint_axis(QPainter &p, const ViewItemPaintParams &pp, int y);
+	void paint_time_trigger_line(QPainter &p, const ViewItemPaintParams &pp, int pos);
 
 	void mouseDoubleClickEvent(QMouseEvent *event);
 	void wheelEvent(QWheelEvent *event);
@@ -119,6 +123,8 @@ private:
     int divisionHeight = 50;
     int divisionCount = 10;
     int divisionOffset = 3;
+
+	int timeTriggerPos;
 
 };
 

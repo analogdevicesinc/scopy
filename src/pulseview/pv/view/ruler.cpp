@@ -26,6 +26,7 @@
 
 #include "ruler.hpp"
 #include "view.hpp"
+#include "viewport.hpp"
 
 using namespace Qt;
 
@@ -34,6 +35,7 @@ using std::vector;
 
 namespace pv {
 namespace view {
+class Viewport;
 
 const float Ruler::RulerHeight = 2.5f; // x Text Height
 const int Ruler::MinorTickSubdivision = 1;
@@ -153,8 +155,18 @@ void Ruler::paintEvent(QPaintEvent*)
 	const int major_tick_y1 = text_height + ValueMargin;
 	const int minor_tick_y1 = (major_tick_y1 + ruler_height) / 2;
 
-	QPainter p(this);
 
+	QPainter p(this);
+	if( view_.viewport()->getTimeTriggerPos() != 0 )
+	{
+		int pos = view_.viewport()->getTimeTriggerPos();
+		QPen pen = QPen(QColor(74, 100, 255));
+		p.setPen(pen);
+
+		QPoint p1 = QPoint(pos, 0);
+		QPoint p2 = QPoint(pos, ruler_height);
+		p.drawLine(p1, p2);
+	}
 	// Draw the tick marks
 	QPen pen = QPen(QColor(255, 255, 255, 30*256/100));
 	for (const auto& tick: tick_position_cache_->major) {

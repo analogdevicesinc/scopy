@@ -78,6 +78,25 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	ui->setupUi(this);
 	this->setAttribute(Qt::WA_DeleteOnClose, true);
 
+	/* Time position widget */
+	this->d_bottomHandlesArea = new HorizHandlesArea(this);
+	this->d_bottomHandlesArea->setMinimumHeight(50);
+	this->d_bottomHandlesArea->setLeftPadding(20);
+	this->d_bottomHandlesArea->setRightPadding(20);
+
+	d_timeTriggerHandle = new FreePlotLineHandleH(
+					QPixmap(":/icons/time_trigger_handle.svg"),
+					QPixmap(":/icons/time_trigger_left.svg"),
+					QPixmap(":/icons/time_trigger_right.svg"),
+					d_bottomHandlesArea);
+
+	d_timeTriggerHandle->setPen(QPen(QColor(74, 100, 255)));
+	d_timeTriggerHandle->setInnerSpacing(0);
+	d_timeTriggerHandle->hide();
+
+	connect(d_timeTriggerHandle, SIGNAL(positionChanged(int)),
+		this, SLOT(onTimeTriggerHandlePosChanged(int)));
+
 	this->settings_group->setExclusive(true);
 	this->no_channels = get_no_channels(dev);
 
@@ -157,16 +176,9 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	-timeBase->maxValue() * 5,
 	timeBase->maxValue() * 5);
 
-//	allDecodersVisible = new QPushButton(this);
-//	allDecodersVisible->setIcon(QIcon::fromTheme("switch_off",
-//	                                     QIcon(":/icons/switch_off.png")));
-//	allDecodersVisible->setCheckable(true);
-//	allDecodersVisible->setChecked(false);
-
 	QVBoxLayout *vLayout = new QVBoxLayout(ui->generalSettings);
 	vLayout->insertWidget(1, timeBase, 0, Qt::AlignLeft);
 	vLayout->insertWidget(2, timePosition, 0, Qt::AlignLeft);
-//	vLayout->insertWidget(3, allDecodersVisible, 0, Qt::AlignLeft);
 	vLayout->insertSpacerItem(-1, new QSpacerItem(0, 0,
 	                          QSizePolicy::Minimum,
 	                          QSizePolicy::Expanding));
@@ -205,8 +217,9 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	        chm_ui, SLOT(on_hideInactive_clicked(bool)));
 	connect(ui->btnShowChannels, SIGNAL(clicked(bool)),
 	        this, SLOT(on_btnShowChannelsClicked(bool)));
-//	connect(allDecodersVisible, SIGNAL(toggled(bool)),
-//		chm_ui, SLOT(on_displayAllDecoders(bool)));
+
+	ui->areaTimeTriggerLayout->addWidget(this->bottomHandlesArea(), 0, 1, -1, -1);
+	updateAreaTimeTriggerPadding();
 }
 
 
@@ -215,6 +228,23 @@ LogicAnalyzer::~LogicAnalyzer()
 	delete ui;
 	/* Destroy libsigrokdecode */
 	srd_exit();
+}
+
+void LogicAnalyzer::updateAreaTimeTriggerPadding()
+{
+	ui->areaTimeTriggerLayout->setContentsMargins(
+		chm_ui->sizeHint().width() - 20, 0, 0, 0);
+
+}
+
+QWidget* LogicAnalyzer::bottomHandlesArea()
+{
+	return d_bottomHandlesArea;
+}
+
+void LogicAnalyzer::onTimeTriggerHandlePosChanged(int pos)
+{
+	main_win->view_->viewport()->setTimeTriggerPos(pos);
 }
 
 void LogicAnalyzer::startStop(bool start)
@@ -314,6 +344,7 @@ void LogicAnalyzer::toggleLeftMenu(bool val)
 		ui->btnShowHideMenu->setText("<");
 		chm_ui->collapse(false);
 	}
+	updateAreaTimeTriggerPadding();
 }
 
 void LogicAnalyzer::rightMenuFinished(bool opened)

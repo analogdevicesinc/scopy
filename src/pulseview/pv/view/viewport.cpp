@@ -49,7 +49,8 @@ namespace view {
 
 Viewport::Viewport(View &parent) :
 	ViewWidget(parent),
-	pinch_zoom_active_(false)
+	pinch_zoom_active_(false),
+	timeTriggerPos(0)
 {
 	setAutoFillBackground(true);
 	setBackgroundRole(QPalette::Base);
@@ -194,7 +195,36 @@ void Viewport::paintEvent(QPaintEvent*)
 	for (const shared_ptr<TimeItem> t : time_items)
 		t->paint_fore(p, pp);
 
+	if( timeTriggerPos != 0 )
+	{
+		paint_time_trigger_line(p, pp, timeTriggerPos);
+	}
+
 	p.end();
+}
+
+void Viewport::setTimeTriggerPos(int value)
+{
+	timeTriggerPos = value;
+	view_.time_item_appearance_changed(true, true);
+}
+
+int Viewport::getTimeTriggerPos() const
+{
+	return timeTriggerPos;
+}
+
+void Viewport::paint_time_trigger_line(QPainter &p, const ViewItemPaintParams &pp, int pos)
+{
+	QPen pen = QPen(QColor(74, 100, 255));
+	p.setPen(pen);
+	const int y = view_.owner_visual_v_offset();
+	const int h = pp.height();
+	int row_count = view_.height() / divisionHeight;
+
+	QPoint p1 = QPoint(pos, y);
+	QPoint p2 = QPoint(pos, y + h * row_count);
+	p.drawLine(p1, p2);
 }
 
 void Viewport::paint_grid(QPainter &p, const ViewItemPaintParams &pp)

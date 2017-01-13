@@ -103,6 +103,11 @@ void PlotLineHandleH::setPositionSilenty(int pos)
 		moveSilently(QPoint(centerPosToOrigin(pos), 0));
 }
 
+void PlotLineHandleH::setInnerSpacing(int value)
+{
+	m_innerSpacing = value;
+}
+
 void PlotLineHandleH::moveWithinParent(int x, int y)
 {
 	Q_UNUSED(y);

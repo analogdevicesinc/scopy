@@ -73,6 +73,7 @@ public:
 	void setPosition(int);
 	void setPositionSilenty(int);
 	void moveWithinParent(int x, int y);
+	void setInnerSpacing(int value);
 
 protected:
 	void paintEvent(QPaintEvent *event);

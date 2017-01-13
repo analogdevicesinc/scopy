@@ -264,7 +264,6 @@ LogicAnalyzerChannelGroup::~LogicAnalyzerChannelGroup()
 		delete var;
 	}
 	channels_.clear();
-	delete &channels_;
 }
 
 const srd_channel* LogicAnalyzerChannelGroup::get_srd_channel_from_name(const char* name)
@@ -876,7 +875,7 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 	ui->scrollArea->setMaximumWidth(managerHeaderWidget->sizeHint().width());
 	main_win->view_->viewport()->setDivisionHeight(44);
 	main_win->view_->viewport()->setDivisionCount(10);
-	main_win->view_->viewport()->setDivisionOffset(5);
+	main_win->view_->viewport()->setDivisionOffset(0);
 	connect(ui->scrollArea->verticalScrollBar(), SIGNAL(valueChanged(int)),
 	        this, SLOT(chmScrollChanged(int)));
 }
