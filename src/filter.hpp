@@ -26,6 +26,7 @@
 #include <QString>
 
 extern "C" {
+	struct iio_channel;
 	struct iio_context;
 	struct iio_device;
 }
@@ -60,6 +61,9 @@ namespace adiscope {
 
 		struct iio_device * find_device(const struct iio_context *ctx,
 				enum tool tool, unsigned int idx = 0) const;
+		struct iio_channel * find_channel(const struct iio_context *ctx,
+				enum tool tool, unsigned int idx = 0,
+				bool output = false) const;
 	};
 }
 

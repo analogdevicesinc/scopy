@@ -135,3 +135,20 @@ struct iio_device * Filter::find_device(const struct iio_context *ctx,
 {
 	return iio_context_find_device(ctx, device_name(tool, idx).c_str());
 }
+
+struct iio_channel * Filter::find_channel(const struct iio_context *ctx,
+		enum tool tool, unsigned int idx, bool output) const
+{
+	QString name = QString::fromStdString(device_name(tool, idx));
+
+	if (!name.contains(':'))
+		throw std::runtime_error("Filter entry not iio_channel");
+
+	struct iio_device *dev = iio_context_find_device(ctx,
+			name.section(':', 0, 0).toStdString().c_str());
+	if (!dev)
+		return nullptr;
+
+	return iio_device_find_channel(dev,
+			name.section(':', 1, 1).toStdString().c_str(), output);
+}
