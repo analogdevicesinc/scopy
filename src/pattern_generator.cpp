@@ -99,7 +99,7 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 	settings_group(new QButtonGroup(this)), menuRunButton(runBtn),
 	ui(new Ui::PatternGenerator),
 	pgSettings(new Ui::PGSettings),
-	txbuf(0), sample_rate(100000), channel_enable_mask(0xffff),buffer(nullptr),
+    txbuf(0), sample_rate(100000), channel_enable_mask(0xffff),buffer(nullptr),
 	buffer_created(0), currentUI(nullptr), offline_mode(offline_mode)
 {
 
@@ -120,7 +120,7 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 	PatternFactory::init();
 
 	pgSettings->setupUi(ui->pgSettings);
-	connect(ui->btnChSettings, SIGNAL(pressed()), this, SLOT(toggleRightMenu()));
+    connect(ui->btnChSettings, SIGNAL(pressed()), this, SLOT(toggleRightMenu()));
 	connect(ui->btnPGSettings, SIGNAL(pressed()), this, SLOT(toggleRightMenu()));
 	bufman = new PatternGeneratorBufferManager(&chm);
 

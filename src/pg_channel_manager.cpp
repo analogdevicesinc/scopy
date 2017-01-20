@@ -65,8 +65,8 @@ PatternGeneratorChannelUI::PatternGeneratorChannelUI(PatternGeneratorChannel
 	                                parent), managerUi(managerUi), chg(chg),chgui(chgui)
 {
 	this->ch = ch;
-	qDebug()<<"currentChannelUI->ui created";
 	ui = new Ui::PGChannelGroup();
+    setAcceptDrops(true);
 }
 
 void PatternGeneratorChannelUI::setTrace(
@@ -82,19 +82,177 @@ void PatternGeneratorChannelUI::enableControls(bool val)
 }
 
 
-void PatternGeneratorChannelUI::mousePressEvent(QMouseEvent *)
+
+void PatternGeneratorChannelUI::mousePressEvent(QMouseEvent *event)
 {
-	getManagerUi()->showHighlight(false);
-	getManagerUi()->chm->highlightChannel(this->chgui->getChannelGroup(),
-	                                      this->getChannel());
-	getManagerUi()->showHighlight(true);
+    if (event->button() == Qt::LeftButton)
+            dragStartPosition = event->pos();
+
+    getManagerUi()->showHighlight(false);
+    getManagerUi()->chm->highlightChannel(this->chgui->getChannelGroup(),
+                                          this->getChannel());
+    getManagerUi()->showHighlight(true);
+
 }
+
+void PatternGeneratorChannelUI::mouseMoveEvent(QMouseEvent *event)
+{
+    if (!(event->buttons() & Qt::LeftButton))
+        return;
+    if ((event->pos() - dragStartPosition).manhattanLength()
+         < QApplication::startDragDistance())
+    {
+        return;
+    }
+
+    QDrag *drag = new QDrag(this);
+    QMimeData *mimeData = new QMimeData;
+
+    QByteArray itemData;
+    QDataStream dataStream(&itemData, QIODevice::WriteOnly);
+
+    auto channelGroups = getManagerUi()->chm->get_channel_groups();
+    auto chgIter = std::find(channelGroups->begin(),channelGroups->end(),chg);
+    auto chgIndex = chgIter-channelGroups->begin();
+
+    auto channels = (*chgIter)->get_channels();
+    auto chIter = std::find(channels->begin(),channels->end(),ch);
+    auto chIndex = chIter-(channels->begin());
+
+    dataStream << (short)chgIndex<<(short)chIndex;
+
+    mimeData->setData("patterngenerator/channel", itemData);
+
+    if(getManagerUi()->pixmapEnable)
+    {
+        QPixmap pix;
+        pix = this->grab().scaled(this->geometry().width()/getManagerUi()->pixmapScale,this->geometry().height()/getManagerUi()->pixmapScale);
+        this->setVisible(!getManagerUi()->pixmapGrab);
+        if(getManagerUi()->pixmapRetainSize)
+            getManagerUi()->retainWidgetSizeWhenHidden(this);
+        drag->setPixmap(pix);
+    }
+
+    drag->setMimeData(mimeData);
+    Qt::DropAction dropAction = drag->exec( Qt::MoveAction);
+    this->setVisible(true);
+
+}
+
+void PatternGeneratorChannelUI::dragEnterEvent(QDragEnterEvent *event)
+{
+   event->accept();
+
+   topDragbox.setRect(0,0,this->geometry().width()+1,this->geometry().height()/2+1);
+   botDragbox.setRect(0,this->geometry().height()/2,this->geometry().width()+1,this->geometry().height()/2+1);
+
+   if(event->mimeData()->hasFormat("patterngenerator/channelgroup"))
+   {
+       short from = (short)event->mimeData()->data("patterngenerator/channelgroup")[1];
+       auto channelGroups = getManagerUi()->chm->get_channel_groups();
+       auto chgIter = std::find(channelGroups->begin(),channelGroups->end(),chg);
+       auto chgIndex = chgIter-channelGroups->begin();
+
+       if(from == chgIndex)
+           event->ignore();
+   }
+
+ }
+
+
+void PatternGeneratorChannelUI::dragMoveEvent(QDragMoveEvent *event)
+{
+    if(event->answerRect().intersects(botDragbox))
+    {
+        ui->line->setVisible(true);
+        ui->line_2->setVisible(false);
+    }
+    else
+    {
+        ui->line->setVisible(false);
+        ui->line_2->setVisible(true);
+    }
+
+   event->accept();
+}
+
+
+
+void PatternGeneratorChannelUI::dragLeaveEvent(QDragLeaveEvent *event)
+{
+    ui->line->setVisible(false);
+    ui->line_2->setVisible(false);
+    event->accept();
+}
+
+
+
+void PatternGeneratorChannelUI::dropEvent(QDropEvent *event)
+{
+    ui->line->setVisible(false);
+    ui->line_2->setVisible(false);
+
+    if (event->source() == this && event->possibleActions() & Qt::MoveAction)
+        return;
+
+
+    auto channelGroups = getManagerUi()->chm->get_channel_groups();
+    auto chgIter = std::find(channelGroups->begin(),channelGroups->end(),chg);
+    auto chgIndex = chgIter-channelGroups->begin();
+
+    auto toNrOfChannels = (*chgIter)->get_channel_count();
+
+    auto channels = (*chgIter)->get_channels();
+    auto chIter = std::find(channels->begin(),channels->end(),ch);
+    auto chIndex = chIter-(channels->begin());
+
+    bool dropAfter = botDragbox.contains(event->pos());
+    if(event->mimeData()->hasFormat("patterngenerator/channelgroup"))
+    {
+        short from = (short)event->mimeData()->data("patterngenerator/channelgroup")[1];
+        auto fromNrOfChannels = getManagerUi()->chm->get_channel_group(from)->get_channel_count();
+        getManagerUi()->chm->join({(int)chgIndex,from});
+        getManagerUi()->chm->highlightChannel(getManagerUi()->chm->get_channel_group(chgIndex));
+        chgIndex = chgIndex + (chgIndex > from ? -1 : 0);
+        auto chgIter = std::find(channelGroups->begin(),channelGroups->end(),chg);
+        auto j=0;
+        for(auto i=fromNrOfChannels;i>0;i--)
+        {
+            getManagerUi()->chm->moveChannel(chgIndex, (*chgIter)->get_channel_count()-i, chIndex+j,dropAfter);
+            j++;
+        }
+    }
+
+    if(event->mimeData()->hasFormat("patterngenerator/channel"))
+    {
+        short fromChg = (short)event->mimeData()->data("patterngenerator/channel")[1];
+        short fromCh  = (short)event->mimeData()->data("patterngenerator/channel")[3];
+
+        auto fromNrOfChannels = getManagerUi()->chm->get_channel_group(fromChg)->get_channel_count();
+
+        getManagerUi()->chm->splitChannel(fromChg, fromCh);
+        if(fromNrOfChannels != 1)
+        {
+            fromChg++;
+            chgIndex = chgIndex + (chgIndex > fromChg ? 1 : 0);
+        }
+
+        getManagerUi()->chm->join({(int)chgIndex,fromChg});
+
+        chgIndex = chgIndex + (chgIndex > fromChg ? -1 : 0);
+        auto chgIter = std::find(channelGroups->begin(),channelGroups->end(),chg);
+        //getManagerUi()->chm->move(fromChg, chgIndex + ((fromChg)>chgIndex ? 0 : 1),dropAfter);
+        getManagerUi()->chm->moveChannel(chgIndex, (*chgIter)->get_channel_count()-1, chIndex,dropAfter);
+    }
+
+    Q_EMIT requestUpdateUi();
+}
+
 
 
 PatternGeneratorChannelUI::~PatternGeneratorChannelUI()
 {
 	delete ui;
-	//qDebug()<<"currentChannelUI->ui destroyed";
 }
 
 PatternGeneratorChannelManagerUI *PatternGeneratorChannelUI::getManagerUi()
@@ -125,12 +283,10 @@ PatternGeneratorChannelGroup::PatternGeneratorChannelGroup(
 
 PatternGeneratorChannelGroup::~PatternGeneratorChannelGroup()
 {
-	//qDebug()<<"pgchannelgroupdestroyed";
 	if (pattern) {
 		delete pattern;
 		pattern = nullptr;
 	}
-
 }
 
 bool PatternGeneratorChannelGroup::isCollapsed()
@@ -165,7 +321,11 @@ PatternGeneratorChannelGroupUI::PatternGeneratorChannelGroupUI(
 	this->chg = chg;
 	checked = false;
 	ui = new Ui::PGChannelGroup();
+    setAcceptDrops(true);
+    //setDragEnabled(true);
+    //setDropIndicatorShown(true);
 }
+
 PatternGeneratorChannelGroupUI::~PatternGeneratorChannelGroupUI()
 {
 	delete ui;
@@ -221,7 +381,6 @@ void PatternGeneratorChannelUI::split()
 	}
 
 	auto chIndex = chIter-channels.begin();
-
 	bool changeHighlight = false;
 
 	if (*chIter == getManagerUi()->chm->getHighlightedChannel() ||
@@ -232,12 +391,10 @@ void PatternGeneratorChannelUI::split()
 	}
 
 	getManagerUi()->chm->splitChannel(chgIndex,chIndex);
-
 	if (changeHighlight) {
 		getManagerUi()->chm->highlightChannel(getManagerUi()->chm->get_channel_group(
 		                chgIndex));
 	}
-
 
 	getManagerUi()->updateUi();
 
@@ -248,7 +405,7 @@ void PatternGeneratorChannelGroupUI::split()
 	getManagerUi()->chm->deselect_all();
 	select(true);
 	getManagerUi()->groupSplitSelected();
-	getManagerUi()->updateUi();
+    Q_EMIT requestUpdateUi();
 }
 
 void PatternGeneratorChannelGroupUI::enableControls(bool enabled)
@@ -284,12 +441,129 @@ void PatternGeneratorChannelGroupUI::setTrace(
 	trace = item;
 }
 
-
-void PatternGeneratorChannelGroupUI::mousePressEvent(QMouseEvent *)
+void PatternGeneratorChannelGroupUI::mousePressEvent(QMouseEvent *event)
 {
+    if (event->button() == Qt::LeftButton)
+            dragStartPosition = event->pos();
+
 	getManagerUi()->showHighlight(false);
 	getManagerUi()->chm->highlightChannel(this->getChannelGroup());
 	getManagerUi()->showHighlight(true);
+}
+
+void PatternGeneratorChannelGroupUI::mouseMoveEvent(QMouseEvent *event)
+{
+    if (!(event->buttons() & Qt::LeftButton))
+        return;
+    if ((event->pos() - dragStartPosition).manhattanLength()
+         < QApplication::startDragDistance())
+    {
+        return;
+    }
+
+    QDrag *drag = new QDrag(this);
+    QMimeData *mimeData = new QMimeData;
+
+    QByteArray itemData;
+    QDataStream dataStream(&itemData, QIODevice::WriteOnly);
+
+    auto channelGroups = getManagerUi()->chm->get_channel_groups();
+    auto chgIter = std::find(channelGroups->begin(),channelGroups->end(),chg);
+    auto chgIndex = chgIter-channelGroups->begin();
+
+    dataStream << (short)chgIndex;
+
+    mimeData->setData("patterngenerator/channelgroup", itemData);
+    drag->setMimeData(mimeData);
+
+    if(getManagerUi()->pixmapEnable)
+    {
+        QPixmap pix;
+        pix = this->grab().scaled(this->geometry().width()/getManagerUi()->pixmapScale,this->geometry().height()/getManagerUi()->pixmapScale);
+        this->setVisible(!getManagerUi()->pixmapGrab);
+        if(getManagerUi()->pixmapRetainSize)
+            getManagerUi()->retainWidgetSizeWhenHidden(this);
+        drag->setPixmap(pix);
+    }
+
+    Qt::DropAction dropAction = drag->exec( Qt::MoveAction);    
+    this->setVisible(true);
+
+}
+
+void PatternGeneratorChannelGroupUI::dragEnterEvent(QDragEnterEvent *event)
+{
+   topDragbox.setRect(0,0,ui->widget_2->geometry().width()+1,ui->widget_2->geometry().height()/2+1);
+   botDragbox.setRect(0,ui->widget_2->geometry().height()/2,ui->widget_2->geometry().width()+1,ui->widget_2->geometry().height()/2+1);
+   event->accept();
+ }
+
+
+void PatternGeneratorChannelGroupUI::dragMoveEvent(QDragMoveEvent *event)
+{    
+    if(event->answerRect().intersects(botDragbox))
+    {
+        ui->line->setVisible(true);
+        ui->line_2->setVisible(false);
+        event->accept();
+    }
+    else if(event->answerRect().intersects(topDragbox))
+    {
+        ui->line->setVisible(false);
+        ui->line_2->setVisible(true);
+        event->accept();
+    }
+    else
+    {
+        event->ignore();
+    }
+
+
+}
+
+
+
+void PatternGeneratorChannelGroupUI::dragLeaveEvent(QDragLeaveEvent *event)
+{
+    ui->line->setVisible(false);
+    ui->line_2->setVisible(false);
+    event->accept();
+}
+
+void PatternGeneratorChannelGroupUI::dropEvent(QDropEvent *event)
+{
+    ui->line->setVisible(false);
+    ui->line_2->setVisible(false);
+
+    if (event->source() == this && event->possibleActions() & Qt::MoveAction)
+        return;
+
+    auto channelGroups = getManagerUi()->chm->get_channel_groups();
+    auto chgIter = std::find(channelGroups->begin(),channelGroups->end(),chg);
+    auto chgIndex = chgIter-channelGroups->begin();
+
+    bool dropAfter = botDragbox.contains(event->pos());
+    if(event->mimeData()->hasFormat("patterngenerator/channelgroup"))
+    {
+        short from = (short)event->mimeData()->data("patterngenerator/channelgroup")[1];
+        getManagerUi()->chm->move(from,chgIndex,dropAfter);
+    }
+
+    if(event->mimeData()->hasFormat("patterngenerator/channel"))
+    {
+        short fromChg = (short)event->mimeData()->data("patterngenerator/channel")[1];
+        short fromCh  = (short)event->mimeData()->data("patterngenerator/channel")[3];
+        auto fromNrOfChannels = getManagerUi()->chm->get_channel_group(fromChg)->get_channel_count();
+        getManagerUi()->chm->splitChannel(fromChg, fromCh);
+        if(fromNrOfChannels != 1)
+        {
+            fromChg++;
+            chgIndex = chgIndex + ((fromChg) > chgIndex ? 0 : 1);
+        }
+        getManagerUi()->chm->move(fromChg, chgIndex, dropAfter);
+    }
+
+    Q_EMIT requestUpdateUi();
 }
 
 /////////////////////////// CHANNEL MANAGER
@@ -350,9 +624,8 @@ void PatternGeneratorChannelManager::join(std::vector<int> index)
 	}
 
 	channel_group[index[0]]->group(true);
-	channel_group[index[0]]->set_label("Group name");
+    channel_group[index[0]]->set_label("Group name");
 
-	qDebug()<<"Final sample rate "<<computeSuggestedSampleRate();
 }
 
 void PatternGeneratorChannelManager::split(int index)
@@ -370,8 +643,34 @@ void PatternGeneratorChannelManager::split(int index)
 
 	it = std::next(channel_group.begin(), index);
 	delete static_cast<PatternGeneratorChannelGroup *>(*it);
-	channel_group.erase(it);
+    channel_group.erase(it);
 }
+
+void PatternGeneratorChannelManager::move(int from, int to, bool after)
+{
+    if(from == to)
+        return;
+    auto fromElement = channel_group[from];
+    channel_group.erase(channel_group.begin() + from);
+    channel_group.insert(channel_group.begin() + to + ((after) ? 1 : 0) + ((from<to) ? -1 : 0), fromElement);
+}
+
+
+void PatternGeneratorChannelManager::moveChannel(int fromChgIndex, int from, int to, bool after)
+{
+    if(from == to)
+        return;
+    auto fromChg = channel_group[fromChgIndex];
+    auto fromElement = fromChg->get_channel(from);
+
+
+    /*channel_group.erase(channel_group.begin() + from);
+    channel_group.insert(channel_group.begin() + to + ((after) ? 1 : 0) + ((from<to) ? -1 : 0), fromElement);*/
+
+    fromChg->get_channels()->erase(fromChg->get_channels()->begin()+from);
+    fromChg->get_channels()->insert(fromChg->get_channels()->begin()+to+((after) ? 1 : 0) + ((from<to) ? -1 : 0),fromElement);
+}
+
 
 void PatternGeneratorChannelManager::splitChannel(int chgIndex, int chIndex)
 {
@@ -487,30 +786,32 @@ void PatternGeneratorChannelManager::commitBuffer(PatternGeneratorChannelGroup
 uint32_t PatternGeneratorChannelManager::computeSuggestedSampleRate()
 {
 	qDebug()<<"suggested sampleRates:";
-	//uint32_t sampleRate = 1;
-	uint32_t sampleDivider=0;
+    uint32_t sampleRate = 1;
+    //uint32_t sampleDivider=0;
 
 	for (auto &&chg : channel_group) {
 		if (chg->is_enabled()) {
 			auto patternSamplingFrequency = static_cast<PatternGeneratorChannelGroup *>
 			                                (chg)->pattern->get_min_sampling_freq();
-			uint32_t val = 80000000 / patternSamplingFrequency;
+        //	uint32_t val = 80000000 / patternSamplingFrequency;
 
-			//sampleRate = boost::math::lcm(patternSamplingFrequency, sampleRate);
-			sampleDivider = boost::math::gcd(sampleDivider,val);
-//            qDebug()<<static_cast<PatternGeneratorChannelGroup*>(chg)->pattern->get_min_sampling_freq();
-			qDebug()<<80000000.0/val;
+            sampleRate = boost::math::lcm(patternSamplingFrequency, sampleRate);
+            //sampleDivider = boost::math::gcd(sampleDivider,val);
+            qDebug()<<static_cast<PatternGeneratorChannelGroup*>(chg)->pattern->get_min_sampling_freq();
+//			qDebug()<<80000000.0/val;
 
 		}
 	}
 
-	qDebug()<<"final samplerate: "<<80000000.0/sampleDivider;
+    //qDebug()<<"final samplerate: "<<80000000.0/sampleDivider;
+    qDebug()<<"final samplerate: "<<sampleRate;
 
-	if (!sampleDivider) {
+    /*if (!sampleDivider) {
 		sampleDivider = 1;
-	}
+    }
 
-	return 80000000/sampleDivider;
+    return 80000000/sampleDivider;*/
+    return sampleRate;
 }
 
 uint32_t PatternGeneratorChannelManager::computeSuggestedBufferSize(
@@ -608,7 +909,7 @@ void PatternGeneratorChannelManagerUI::updateUi()
 
 
 	for (auto ch : chg_ui) {
-		delete ch;
+        ch->deleteLater();
 	}
 
 	chg_ui.erase(chg_ui.begin(),chg_ui.end());
@@ -658,6 +959,7 @@ void PatternGeneratorChannelManagerUI::updateUi()
 
 		currentChannelGroupUI->ui->setupUi(chg_ui.back());
 
+
         ui->verticalLayout->insertWidget(chg_ui.size()-1,chg_ui.back());
 		currentChannelGroupUI->ensurePolished();
 
@@ -705,11 +1007,9 @@ void PatternGeneratorChannelManagerUI::updateUi()
 		currentChannelGroupUI->ui->patternCombo->setCurrentIndex(
 		        static_cast<PatternGeneratorChannelGroup *>(ch)->created_index);
 
-		connect(currentChannelGroupUI->ui->enableBox,SIGNAL(toggled(bool)),
-		        chg_ui.back(),SLOT(enable(bool)));
 //        connect(static_cast<PatternGeneratorChannelGroupUI*>(chg_ui.back()),SIGNAL(channel_selected()),pg,SLOT(onChannelSelectedChanged())); // TEMP
-		connect(static_cast<PatternGeneratorChannelGroupUI *>(chg_ui.back()),
-		        SIGNAL(channel_enabled()),this,SIGNAL(channelsChanged())); // TEMP
+        connect(static_cast<PatternGeneratorChannelGroupUI *>(chg_ui.back()),
+                SIGNAL(channel_enabled()),this,SIGNAL(channelsChanged())); // TEMP
 		connect(currentChannelGroupUI->ui->selectBox,SIGNAL(toggled(bool)),
 		        static_cast<PatternGeneratorChannelGroupUI *>(chg_ui.back()),
 		        SLOT(select(bool)));
@@ -717,6 +1017,7 @@ void PatternGeneratorChannelManagerUI::updateUi()
 		        SIGNAL(currentIndexChanged(int)),chg_ui.back(),SLOT(patternChanged(int)));
 		connect(currentChannelGroupUI->ui->patternCombo,
 		        SIGNAL(currentIndexChanged(int)),this,SIGNAL(channelsChanged())); // TEMP
+        connect(currentChannelGroupUI,SIGNAL(requestUpdateUi()),this,SLOT(triggerUpdateUi()));
 		//connect(currentChannelGroupUI->getChannelGroup()->pattern, SIGNAL(generate_pattern),pg,SLOT())
 
 
@@ -777,6 +1078,7 @@ void PatternGeneratorChannelManagerUI::updateUi()
 
 				connect(currentChannelUI->ui->splitBtn,SIGNAL(clicked()),currentChannelUI,
 				        SLOT(split()));
+                connect(currentChannelUI,SIGNAL(requestUpdateUi()),this,SLOT(triggerUpdateUi()));
 
 				auto str = QString().fromStdString(ch->get_channel(i)->get_label());
 				currentChannelUI->ui->ChannelGroupLabel->setText(str);
@@ -801,7 +1103,6 @@ void PatternGeneratorChannelManagerUI::updateUi()
 			auto index = ch->get_channel()->get_id();
 			auto trace = main_win->view_->get_clone_of(index);
 			currentChannelGroupUI->setTrace(trace);
-			qDebug()<<currentChannelGroupUI->pos();
 			currentChannelGroupUI->trace->force_to_v_offset(offset);
 
 
@@ -809,14 +1110,15 @@ void PatternGeneratorChannelManagerUI::updateUi()
 			                        ch->get_channel()->get_id()));
 			currentChannelGroupUI->ui->splitBtn->setVisible(false);
 			currentChannelGroupUI->ui->collapseBtn->setVisible(false);
-			currentChannelGroupUI->ui->line->setVisible(false);
-			currentChannelGroupUI->ui->line_2->setVisible(false);
+            currentChannelGroupUI->ui->line->setVisible(false);
+            currentChannelGroupUI->ui->line_2->setVisible(false);
 
 		}
 
 		// only enable channelgroup controls after all channelgroup subchannels have been created
 		currentChannelGroupUI->ui->enableBox->setChecked(ch->is_enabled());
 		currentChannelGroupUI->enableControls(ch->is_enabled());
+        connect(currentChannelGroupUI->ui->enableBox,SIGNAL(toggled(bool)), chg_ui.back(),SLOT(enable(bool)));
 	}
 
  //   ui->scrollAreaWidgetContents->updateGeometry();
@@ -842,6 +1144,12 @@ void PatternGeneratorChannelManagerUI::chmScrollChanged(int val)
 {
     // check for user interaction ... tracking()
     main_win->view_->set_v_offset(val);
+}
+
+
+void PatternGeneratorChannelManagerUI::triggerUpdateUi()
+{
+    updateUi();
 }
 
 void PatternGeneratorChannelManagerUI::deleteSettingsWidget()
