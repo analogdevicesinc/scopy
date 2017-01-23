@@ -39,7 +39,8 @@ BinaryStream::BinaryStream(const std::shared_ptr<sigrok::Context> &context,
 	format_(format),
 	options_(options),
 	interrupt_(false),
-	buffersize_(buffersize)
+	buffersize_(buffersize),
+	single_(false)
 {
 	/* 10 buffers, 10ms each -> 250ms before we lose data */
 	iio_device_set_kernel_buffers_count(dev_, 25);
@@ -70,11 +71,6 @@ void BinaryStream::open()
 	}
 
 	session_->add_device(device_);
-
-	auto trigger = session()->context()->create_trigger("pulseview");
-	trigger->stages();
-	session_->set_trigger(session_->context()->create_trigger("pulseview"));
-	printf("'added some trigger\n");
 }
 
 void BinaryStream::close()
@@ -120,8 +116,31 @@ void BinaryStream::run()
 		}
 		nrx += nbytes_rx / 2;
 		input_->send(iio_buffer_start(data_), (size_t)(nbytes_rx));
+		if( single_ )
+			interrupt_ = true;
 	}
 	input_->end();
+	interrupt_ = false;
+	single_ = false;
+}
+
+void BinaryStream::set_buffersize(size_t value)
+{
+	close();
+	buffersize_ = value;
+	open();
+}
+
+void BinaryStream::set_single(bool check)
+{
+	single_ = check;
+}
+
+void BinaryStream::set_options(std::map<std::string, Glib::VariantBase> opt)
+{
+	close();
+	options_ = opt;
+	open();
 }
 
 /* cleanup and exit */

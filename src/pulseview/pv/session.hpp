@@ -137,7 +137,13 @@ public:
 
 	void add_signal(std::shared_ptr<view::LogicSignal> sig);
 
-    std::shared_ptr<view::Signal> create_signal_from_id(int index);
+	std::shared_ptr<view::Signal> create_signal_from_id(int index);
+
+	void set_buffersize(size_t value);
+
+	void set_timeSpan(double value);
+
+	void set_timespanLimit(double value);
 
 private:
 	void set_capture_state(capture_state state);
@@ -188,6 +194,12 @@ private:
 	std::thread sampling_thread_;
 
 	bool out_of_memory_;
+
+	size_t buffersize_;
+
+	double timeSpan;
+
+	double timespanLimitStream;
 
 Q_SIGNALS:
 	void capture_state_changed(int state);

@@ -65,10 +65,16 @@ public:
 
 	void stop();
 
+	void set_buffersize(size_t value);
+
+	void set_options(std::map<std::string, Glib::VariantBase> opt);
+
+	void set_single(bool);
+
 private:
 	const std::shared_ptr<sigrok::Context> context_;
 	const std::shared_ptr<sigrok::InputFormat> format_;
-	const std::map<std::string, Glib::VariantBase> options_;
+	std::map<std::string, Glib::VariantBase> options_;
 	std::shared_ptr<sigrok::Input> input_;
 	struct iio_buffer *data_;
 	struct iio_device *dev_;
@@ -76,6 +82,7 @@ private:
 	std::ifstream *f;
 	std::atomic<bool> interrupt_;
 	size_t buffersize_;
+	bool single_;
 };
 
 } // namespace devices

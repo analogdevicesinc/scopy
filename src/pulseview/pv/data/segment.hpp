@@ -73,6 +73,7 @@ public:
 
 protected:
 	void append_data(void *data, uint64_t samples);
+	void add_data(void *data, uint64_t samples, size_t buffersize);
 
 protected:
 	mutable std::recursive_mutex mutex_;

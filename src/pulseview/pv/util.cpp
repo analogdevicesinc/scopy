@@ -42,6 +42,7 @@ static QTextStream& operator<<(QTextStream& stream, SIPrefix prefix)
 	case SIPrefix::nano:  return stream << 'n';
 	case SIPrefix::micro: return stream << QChar(0x03BC);
 	case SIPrefix::milli: return stream << 'm';
+//	case SIPrefix::kilo: return stream << 'k';
 
 	default: return stream;
 	}

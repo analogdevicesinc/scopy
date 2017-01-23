@@ -153,6 +153,21 @@ void LogicSegment::append_payload(shared_ptr<Logic> logic)
 	append_payload_to_mipmap();
 }
 
+void LogicSegment::add_payload(shared_ptr<Logic> logic, size_t buffersize)
+{
+	assert(unit_size_ == logic->unit_size());
+	assert((logic->data_length() % unit_size_) == 0);
+
+	lock_guard<recursive_mutex> lock(mutex_);
+
+	add_data(logic->data_pointer(),
+		logic->data_length() / unit_size_, buffersize);
+
+	// Generate the first mip-map from the data
+	append_payload_to_mipmap();
+}
+
+
 void LogicSegment::get_samples(uint8_t *const data,
 	int64_t start_sample, int64_t end_sample) const
 {
@@ -425,8 +440,16 @@ void LogicSegment::get_subsampled_edges(
 			break;
 
 		// Store the final state
-		const bool final_sample =
-			(get_sample(final_index - 1) & sig_mask) != 0;
+		bool final_sample;
+		if( final_index - 1 < sample_count_ - 1 )
+		{
+			final_sample =
+				(get_sample(final_index - 1) & sig_mask) != 0;
+		}
+		else {
+			final_sample =
+				(get_sample(sample_count_ - 1) & sig_mask) != 0;
+		}
 		edges.push_back(pair<int64_t, bool>(index, final_sample));
 
 		index = final_index;

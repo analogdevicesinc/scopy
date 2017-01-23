@@ -45,6 +45,7 @@ namespace pv {
 namespace view {
 class Viewport;
 }
+class Session;
 }
 
 namespace Glibmm {
@@ -65,8 +66,7 @@ public:
 	explicit LogicAnalyzer(struct iio_context *ctx,
 	                       Filter *filt,
 	                       QPushButton *runButton,
-	                       QWidget *parent = 0,
-	                       unsigned int sample_rate = 200000);
+	                       QWidget *parent = 0);
 	~LogicAnalyzer();
 	void updateAreaTimeTriggerPadding();
 
@@ -77,6 +77,9 @@ private Q_SLOTS:
 	void toggleLeftMenu(bool val);
 	void leftMenuFinished(bool opened);
 	void on_btnShowChannelsClicked(bool check);
+	void onHorizScaleValueChanged(double value);
+	void setTimebaseLabel(double value);
+	void singleRun();
 
 public Q_SLOTS:
 	void onTimeTriggerHandlePosChanged(int);
@@ -101,6 +104,14 @@ private:
 	void disconnectAll();
 	static unsigned int get_no_channels(struct iio_device *dev);
 
+	static const unsigned long maxBuffersize;
+	static const unsigned long maxSampleRate;
+	double active_sampleRate;
+	unsigned long active_sampleCount;
+	unsigned long custom_sampleCount;
+	double pickSampleRateFor(double timeSpanSecs,
+		double desiredBufferSize);
+
 	void settings_panel_update(int id);
 	void toggleRightMenu(QPushButton *btn);
 
@@ -118,6 +129,20 @@ private:
 	HorizHandlesArea *d_bottomHandlesArea;
 	FreePlotLineHandleH *d_timeTriggerHandle;
 	QWidget* bottomHandlesArea();
+
+	MetricPrefixFormatter d_cursorMetricFormatter;
+	TimePrefixFormatter d_cursorTimeFormatter;
+
+	void updateBuffersizeSamplerateLabel(int samples, double samplerate);
+	void setBuffersizeLabelValue(double value);
+	void setSamplerateLabelValue(double value);
+	int d_bufferSizeLabelVal;
+	double d_sampleRateLabelVal;
+
+	bool running = false;
+	void setSampleRate();
+	double plotRefreshRate;
+	int timespanLimitStream;
 };
 }
 

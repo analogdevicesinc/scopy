@@ -49,7 +49,6 @@ public:
 private Q_SLOTS:
 	void remove();
 public Q_SLOTS:
-	//    void set_decoder(std::string value);
 	void rolesChangedLHS(const QString text);
 private:
 	LogicAnalyzerChannelManagerUI *chm_ui;

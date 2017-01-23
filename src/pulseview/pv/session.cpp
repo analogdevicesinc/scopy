@@ -93,7 +93,10 @@ namespace pv {
 Session::Session(DeviceManager &device_manager) :
 	device_manager_(device_manager),
 	capture_state_(Stopped),
-	cur_samplerate_(0)
+	cur_samplerate_(0),
+	buffersize_(0),
+	timeSpan(0),
+	timespanLimitStream(0)
 {
 }
 
@@ -381,6 +384,21 @@ void Session::set_capture_state(capture_state state)
 		capture_state_changed(state);
 }
 
+void Session::set_buffersize(size_t value)
+{
+	buffersize_ = value;
+}
+
+void Session::set_timeSpan(double value)
+{
+	timeSpan = value;
+}
+
+void Session::set_timespanLimit(double value)
+{
+	timespanLimitStream = value;
+}
+
 shared_ptr<view::Signal> Session::create_signal_from_id(int index)
 {
     const shared_ptr<sigrok::Device> sr_dev = device_->device();
@@ -634,7 +652,19 @@ void Session::feed_in_logic(shared_ptr<Logic> logic)
 		frame_began();
 	} else {
 		// Append to the existing data segment
-		cur_logic_segment_->append_payload(logic);
+		if( buffersize_ != 0 )
+		{
+			if( timeSpan >= timespanLimitStream)
+			{
+				cur_logic_segment_->append_payload(logic);
+			}
+			else {
+				cur_logic_segment_->add_payload(logic, buffersize_);
+			}
+		}
+		else {
+			cur_logic_segment_->append_payload(logic);
+		}
 	}
 
 	data_received();

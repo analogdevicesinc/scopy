@@ -181,13 +181,13 @@ private Q_SLOTS:
 private:
 	DeviceManager &device_manager_;
 
-	Session session_;
 	QWidget *central_widget_;
 	QHBoxLayout *vertical_layout_;
 
 public:
 	toolbars::MainBar *main_bar_;
 	pv::view::View *view_;
+	Session session_;
 
 private:
 	QAction *const action_open_;

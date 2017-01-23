@@ -303,6 +303,8 @@ private:
 
 	void resizeEvent(QResizeEvent *event);
 
+	void session_error(const QString text, const QString info_text);
+
 public:
 	void row_item_appearance_changed(bool label, bool content);
 	void time_item_appearance_changed(bool label, bool content);

@@ -1184,9 +1184,29 @@ void View::remove_trace_clones()
 
 void View::set_timebase(double value)
 {
-	set_scale_offset(value, offset_);
+
+	if( session_.get_capture_state() == Session::Running )
+	{
+		session_.stop_capture();
+		set_scale_offset(value, offset_);
+		session_.set_timeSpan(value * DivisionCount);
+		session_.start_capture([&](QString message) {
+			session_error("Capture failed", message); });
+	}
+	else
+	{
+		set_scale_offset(value, offset_);
+		session_.set_timeSpan(value * DivisionCount);
+	}
 	backup_scale_ = scale_;
-//	timebase_label_->setText(QString::number(value) + " s/div");
+}
+
+void View::session_error(
+	const QString text, const QString info_text)
+{
+	QMetaObject::invokeMethod(this, "show_session_error",
+		Qt::QueuedConnection, Q_ARG(QString, text),
+		Q_ARG(QString, info_text));
 }
 
 int View::divisionCount()

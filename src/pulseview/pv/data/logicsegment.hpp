@@ -68,6 +68,7 @@ public:
 	virtual ~LogicSegment();
 
 	void append_payload(std::shared_ptr<sigrok::Logic> logic);
+	void add_payload(std::shared_ptr<sigrok::Logic> logic, size_t buffersize);
 
 	void get_samples(uint8_t *const data,
 		int64_t start_sample, int64_t end_sample) const;

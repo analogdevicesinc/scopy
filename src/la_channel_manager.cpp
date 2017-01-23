@@ -869,8 +869,8 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 		        chg_ui.front()->sizeHint().height());
 		ui->scrollArea->verticalScrollBar()->setSingleStep(
 		        chg_ui.front()->sizeHint().height());
-//		ui->scrollArea->verticalScrollBar()->setRange(0,
-//		                ui->scrollAreaWidgetContents->height() - chg_ui.front()->sizeHint().height());
+		ui->scrollArea->verticalScrollBar()->setRange(0,
+		                ui->scrollAreaWidgetContents->height() - chg_ui.front()->sizeHint().height());
 	}
 	ui->scrollArea->setMaximumWidth(managerHeaderWidget->sizeHint().width());
 	main_win->view_->viewport()->setDivisionHeight(44);
