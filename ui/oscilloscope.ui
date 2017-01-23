@@ -165,174 +165,229 @@ QPushButton:!checked {
      <property name="spacing">
       <number>0</number>
      </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
      <item>
-      <widget class="QWidget" name="widgetPlotContainer" native="true">
-       <property name="styleSheet">
-        <string notr="true">QWidget {
+      <layout class="QVBoxLayout" name="plot_and_buffPreviewer">
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <layout class="QHBoxLayout" name="hLayout_buffPreview">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <spacer name="horizontalSpacer_4">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>50</width>
+             <height>10</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>50</width>
+             <height>10</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QWidget" name="widgetPlotContainer" native="true">
+         <property name="styleSheet">
+          <string notr="true">QWidget {
   background-color: black;
 }</string>
-       </property>
-       <layout class="QGridLayout" name="gridLayout_5">
-        <property name="leftMargin">
-         <number>0</number>
-        </property>
-        <property name="topMargin">
-         <number>0</number>
-        </property>
-        <property name="rightMargin">
-         <number>25</number>
-        </property>
-        <property name="bottomMargin">
-         <number>0</number>
-        </property>
-        <property name="spacing">
-         <number>0</number>
-        </property>
-        <item row="0" column="1">
-         <layout class="QGridLayout" name="gridLayoutHist"/>
-        </item>
-        <item row="0" column="0">
-         <layout class="QGridLayout" name="gridLayoutPlot">
+         </property>
+         <layout class="QGridLayout" name="gridLayout_5">
           <property name="leftMargin">
-           <number>25</number>
+           <number>0</number>
           </property>
           <property name="topMargin">
            <number>0</number>
           </property>
           <property name="rightMargin">
-           <number>25</number>
+           <number>0</number>
           </property>
           <property name="bottomMargin">
-           <number>25</number>
+           <number>0</number>
           </property>
           <property name="spacing">
            <number>0</number>
           </property>
-         </layout>
-        </item>
-        <item row="1" column="1">
-         <layout class="QGridLayout" name="gridLayout_XY"/>
-        </item>
-        <item row="1" column="0">
-         <widget class="QWidget" name="container_fft_plot" native="true">
-          <layout class="QGridLayout" name="gridLayoutFFT">
-           <property name="leftMargin">
-            <number>0</number>
-           </property>
-           <property name="topMargin">
-            <number>0</number>
-           </property>
-           <property name="rightMargin">
-            <number>0</number>
-           </property>
-           <property name="bottomMargin">
-            <number>0</number>
-           </property>
-           <property name="horizontalSpacing">
-            <number>10</number>
-           </property>
-           <property name="verticalSpacing">
-            <number>0</number>
-           </property>
-           <item row="0" column="1">
-            <layout class="QVBoxLayout" name="vlayout_fft_size">
+          <item row="0" column="1">
+           <layout class="QGridLayout" name="gridLayoutHist"/>
+          </item>
+          <item row="0" column="0">
+           <layout class="QGridLayout" name="gridLayoutPlot">
+            <property name="leftMargin">
+             <number>25</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>25</number>
+            </property>
+            <property name="bottomMargin">
+             <number>25</number>
+            </property>
+            <property name="spacing">
+             <number>0</number>
+            </property>
+           </layout>
+          </item>
+          <item row="1" column="1">
+           <layout class="QGridLayout" name="gridLayout_XY"/>
+          </item>
+          <item row="1" column="0">
+           <widget class="QWidget" name="container_fft_plot" native="true">
+            <layout class="QGridLayout" name="gridLayoutFFT">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
              <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <property name="horizontalSpacing">
               <number>10</number>
              </property>
-             <item>
-              <widget class="QLabel" name="label_7">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
+             <property name="verticalSpacing">
+              <number>0</number>
+             </property>
+             <item row="0" column="1">
+              <layout class="QVBoxLayout" name="vlayout_fft_size">
+               <property name="rightMargin">
+                <number>10</number>
                </property>
-               <property name="text">
-                <string>FFT Size:</string>
-               </property>
-              </widget>
+               <item>
+                <widget class="QLabel" name="label_7">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="text">
+                  <string>FFT Size:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QComboBox" name="comboBox">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="currentText">
+                  <string>256</string>
+                 </property>
+                 <item>
+                  <property name="text">
+                   <string>256</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>512</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>1024</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>2048</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>4096</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>8192</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>16384</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>32768</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>65536</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+               <item>
+                <spacer name="verticalSpacer">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>0</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
              </item>
-             <item>
-              <widget class="QComboBox" name="comboBox">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="currentText">
-                <string>256</string>
-               </property>
-               <item>
-                <property name="text">
-                 <string>256</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>512</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>1024</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>2048</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>4096</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>8192</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>16384</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>32768</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>65536</string>
-                </property>
-               </item>
-              </widget>
-             </item>
-             <item>
-              <spacer name="verticalSpacer">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>0</width>
-                 <height>0</height>
-                </size>
-               </property>
-              </spacer>
+             <item row="0" column="0">
+              <layout class="QHBoxLayout" name="hlayout_fft"/>
              </item>
             </layout>
-           </item>
-           <item row="0" column="0">
-            <layout class="QHBoxLayout" name="hlayout_fft"/>
-           </item>
-          </layout>
-         </widget>
-        </item>
-       </layout>
-      </widget>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
      </item>
      <item>
       <widget class="adiscope::MenuAnim" name="rightMenu" native="true">
