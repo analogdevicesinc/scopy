@@ -68,6 +68,7 @@ namespace adiscope {
 	class MeasurementGui;
 	class MeasureSettings;
 	class StateUpdater;
+	class AnalogBufferPreviewer;
 
 	class Oscilloscope : public QWidget
 	{
@@ -143,6 +144,9 @@ namespace adiscope {
 		unsigned long active_sample_count;
 		long long active_trig_sample_count;
 		double active_time_pos;
+		double last_set_time_pos;
+		unsigned long last_set_sample_count;
+
 		Ui::Oscilloscope *ui;
 		Ui::OscGeneralSettings *gsettings_ui;
 		Ui::ChannelSettings *ch_ui;
@@ -158,6 +162,7 @@ namespace adiscope {
 		QWidget *cursorReadouts;
 		Ui::StatisticsPanel *statistics_panel_ui;
 		QWidget *statisticsPanel;
+		AnalogBufferPreviewer *buffer_previewer;
 
 		std::shared_ptr<SymmetricBufferMode> symmBufferMode;
 
@@ -243,6 +248,8 @@ namespace adiscope {
 		void statisticsUpdateGui();
 		void statisticsUpdateGuiTitleColor();
 		void statisticsUpdateGuiPosIndex();
+
+		void updateBufferPreviewer();
 	};
 }
 

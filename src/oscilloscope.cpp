@@ -25,6 +25,7 @@
 #include <QtWidgets>
 #include <QDebug>
 #include <QVBoxLayout>
+#include <QtWidgets/QSpacerItem>
 
 /* Local includes */
 #include "adc_sample_conv.hpp"
@@ -36,6 +37,7 @@
 #include "statistic_widget.h"
 #include "state_updater.h"
 #include "osc_capture_params.hpp"
+#include "buffer_previewer.hpp"
 
 /* Generated UI */
 #include "ui_math_panel.h"
@@ -101,15 +103,13 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	measure_settings_init();
 
 	fft_size = 1024;
+	last_set_sample_count = 0;
+	last_set_time_pos = 0;
 
 	/* Gnuradio Blocks */
 
-	int num_samples = plot.axisInterval(QwtPlot::xBottom).width() *
-				adc.sampleRate();
-
-	this->qt_time_block = adiscope::scope_sink_f::make(
-			num_samples,
-			adc.sampleRate(), "Osc Time", nb_channels, (QObject *)&plot);
+	this->qt_time_block = adiscope::scope_sink_f::make(0, adc.sampleRate(),
+		"Osc Time", nb_channels, (QObject *)&plot);
 
 	this->qt_fft_block = adiscope::scope_sink_f::make(fft_size, adc.sampleRate(),
 			"Osc Frequency", nb_channels, (QObject *)&fft_plot);
@@ -126,9 +126,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	// Prevent the application from hanging while waiting for a trigger condition
 	iio_context_set_timeout(ctx, UINT_MAX);
 
-	plot.registerSink(qt_time_block->name(), nb_channels,
-			plot.axisInterval(QwtPlot::xBottom).width() *
-			adc.sampleRate());
+	plot.registerSink(qt_time_block->name(), nb_channels, 0);
 	plot.disableLegend();
 
 	iio = iio_manager::get_instance(ctx,
@@ -266,9 +264,30 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	/* Statistics panel */
 	statistics_panel_init();
 
+	/* Buffer Previewer widget */
+	buffer_previewer = new AnalogBufferPreviewer(40, M_PI / 2);
+
+	buffer_previewer->setVerticalSpacing(6);
+	buffer_previewer->setMinimumHeight(20);
+	buffer_previewer->setMaximumHeight(20);
+	buffer_previewer->setMinimumWidth(480);
+	buffer_previewer->setMaximumWidth(480);
+	buffer_previewer->setHighlightBgColor(QColor("#141416"));
+	buffer_previewer->setHighlightFgColor(QColor("#ff7200"));
+	buffer_previewer->setCursorColor(QColor("#4A64FF"));
+	stylesheet = "adiscope--BufferPreviewer {"
+			"background-color: #272730;"
+			"color: #ffffff;"
+			"border: 1px solid #7092be;"
+		"}";
+	buffer_previewer->setStyleSheet(stylesheet);
+	ui->hLayout_buffPreview->insertWidget(1, buffer_previewer);
+	buffer_previewer->setCursorPos(0.5);
+
 	/* Plot layout */
 
-	/* Top transparent widget */
+	QSpacerItem *plotSpacer = new QSpacerItem(0, 25,
+		QSizePolicy::Fixed, QSizePolicy::Fixed);
 
 	ui->gridLayoutPlot->addWidget(measurePanel, 0, 1, 1, 1);
 	ui->gridLayoutPlot->addWidget(plot.topArea(), 1, 0, 1, 3);
@@ -276,7 +295,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	ui->gridLayoutPlot->addWidget(&plot, 2, 1, 1, 1);
 	ui->gridLayoutPlot->addWidget(plot.rightHandlesArea(), 1, 2, 3, 1);
 	ui->gridLayoutPlot->addWidget(plot.bottomHandlesArea(), 3, 0, 1, 3);
-	ui->gridLayoutPlot->addWidget(statisticsPanel, 4, 1, 1, 1);
+	ui->gridLayoutPlot->addItem(plotSpacer, 4, 0, 1, 3);
+	ui->gridLayoutPlot->addWidget(statisticsPanel, 5, 1, 1, 1);
 
 	/* Default plot settings */
 	plot.setSampleRate(adc.sampleRate(), 1, "");
@@ -798,12 +818,17 @@ void Oscilloscope::runStopToggled(bool checked)
 		plot.setBufferSizeLabelValue(active_sample_count);
 		plot.setSampleRatelabelValue(active_sample_rate);
 
+		last_set_sample_count = active_sample_count;
+
 		if (active_sample_rate != adc.sampleRate())
 			adc.setSampleRate(active_sample_rate);
 
-		if (active_trig_sample_count != trigger_settings.triggerDelay())
+		if (active_trig_sample_count !=
+				trigger_settings.triggerDelay()) {
 			trigger_settings.setTriggerDelay(
 				active_trig_sample_count);
+			last_set_time_pos = active_time_pos;
+		}
 
 		if (timePosition->value() != active_time_pos)
 			timePosition->setValue(active_time_pos);
@@ -1143,7 +1168,7 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 	SymmetricBufferMode::capture_parameters params = symmBufferMode->captureParameters();
 	active_sample_rate = params.sampleRate;
 	active_sample_count = params.entireBufferSize;
-	active_trig_sample_count = -params.triggerBufferSize;
+	active_trig_sample_count = -(long long)params.triggerBufferSize;
 	active_time_pos = -params.timePos;
 
 	// Realign plot data based on the new sample count and trigger position
@@ -1171,8 +1196,11 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 		plot.setBufferSizeLabelValue(active_sample_count);
 		plot.setSampleRatelabelValue(active_sample_rate);
 
+		last_set_sample_count = active_sample_count;
+
 		adc.setSampleRate(active_sample_rate);
 		trigger_settings.setTriggerDelay(active_trig_sample_count);
+		last_set_time_pos = active_time_pos;
 
 		// Time base changes can limit the time position value
 		if (timePosition->value() != -params.timePos)
@@ -1187,6 +1215,8 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 
 	// Change the sensitivity of time position control
 	timePosition->setStep(value / 10);
+
+	updateBufferPreviewer();
 }
 
 void adiscope::Oscilloscope::onVertOffsetValueChanged(double value)
@@ -1206,7 +1236,7 @@ void adiscope::Oscilloscope::onTimePositionChanged(double value)
 	SymmetricBufferMode::capture_parameters params = symmBufferMode->captureParameters();
 	active_sample_rate = params.sampleRate;
 	active_sample_count = params.entireBufferSize;
-	active_trig_sample_count = -params.triggerBufferSize;
+	active_trig_sample_count = -(long long)params.triggerBufferSize;
 	active_time_pos = -params.timePos;
 
 	// Realign plot data based on the new time position
@@ -1217,7 +1247,10 @@ void adiscope::Oscilloscope::onTimePositionChanged(double value)
 
 	if (started) {
 		trigger_settings.setTriggerDelay(active_trig_sample_count);
+		last_set_time_pos = active_time_pos;
 	}
+
+	updateBufferPreviewer();
 
 	if (active_sample_rate == adc.sampleRate() &&
 			(active_sample_count == oldSampleCount))
@@ -1232,6 +1265,8 @@ void adiscope::Oscilloscope::onTimePositionChanged(double value)
 		plot.setSampleRate(active_sample_rate, 1, "");
 		plot.setBufferSizeLabelValue(active_sample_count);
 		plot.setSampleRatelabelValue(active_sample_rate);
+
+		last_set_sample_count = active_sample_count;
 
 		adc.setSampleRate(active_sample_rate);
 	}
@@ -1660,6 +1695,13 @@ void Oscilloscope::statistics_panel_init()
 	QHBoxLayout *hLayout = new QHBoxLayout(statistics_panel_ui->statistics);
 	hLayout->setContentsMargins(0, 0, 0, 0);
 	hLayout->setSpacing(25);
+
+	// Make sure the scroll area knows beforehand the height of the content
+	// that will be added to the statistics widget
+	StatisticWidget *dummyStat = new StatisticWidget();
+	statistics_panel_ui->statistics->setMinimumHeight(dummyStat->height());
+	delete dummyStat;
+
 	statisticsPanel->hide();
 }
 
@@ -1835,6 +1877,8 @@ void Oscilloscope::onPlotNewData()
 		triggerUpdater->setInput(CapturePlot::Triggered);
 	else
 		triggerUpdater->setInput(CapturePlot::Auto);
+
+	updateBufferPreviewer();
 }
 
 void Oscilloscope::onTriggerModeChanged(int mode)
@@ -1846,4 +1890,48 @@ void Oscilloscope::onTriggerModeChanged(int mode)
 		triggerUpdater->setIdleState(CapturePlot::Auto);
 		triggerUpdater->setInput(CapturePlot::Auto);
 	}
+}
+
+void Oscilloscope::updateBufferPreviewer()
+{
+	// Time interval within the plot canvas
+	QwtInterval plotInterval = plot.axisInterval(QwtPlot::xBottom);
+
+	// Time interval that represents the captured data
+	QwtInterval dataInterval(0.0, 0.0);
+	long long triggerSamples = trigger_settings.triggerDelay();
+	long long totalSamples = last_set_sample_count;
+
+	if (totalSamples > 0) {
+		dataInterval.setMinValue(triggerSamples / adc.sampleRate());
+		dataInterval.setMaxValue((triggerSamples + totalSamples)
+			/ adc.sampleRate());
+	}
+
+	// Use the two intervals to determine the width and position of the
+	// waveform and of the highlighted area
+	QwtInterval fullInterval = plotInterval | dataInterval;
+	double wPos = 1 - (fullInterval.maxValue() - dataInterval.minValue()) /
+		fullInterval.width();
+	double wWidth = dataInterval.width() / fullInterval.width();
+
+	double hPos = 1 - (fullInterval.maxValue() - plotInterval.minValue()) /
+		fullInterval.width();
+	double hWidth = plotInterval.width() / fullInterval.width();
+
+	// Determine the cursor position
+	QwtInterval containerInterval = (totalSamples > 0) ? dataInterval :
+		fullInterval;
+	double containerWidth = (totalSamples > 0) ? wWidth : 1;
+	double containerPos = (totalSamples > 0) ? wPos : 0;
+	double cPosInContainer = 1 - (containerInterval.maxValue() - 0) /
+		containerInterval.width();
+	double cPos = cPosInContainer * containerWidth + containerPos;
+
+	// Update the widget
+	buffer_previewer->setWaveformWidth(wWidth);
+	buffer_previewer->setWaveformPos(wPos);
+	buffer_previewer->setHighlightWidth(hWidth);
+	buffer_previewer->setHighlightPos(hPos);
+	buffer_previewer->setCursorPos(cPos);
 }
