@@ -132,8 +132,8 @@ bool TraceTreeItemOwner::reassign_bgcolour_states(bool next_bgcolour_state)
 
 void TraceTreeItemOwner::restack_items()
 {
-    vector<shared_ptr<TraceTreeItem>> items(list_by_type<TraceTreeItem>());
-	int traceSpacing = 5;
+    /*vector<shared_ptr<TraceTreeItem>> items(list_by_type<TraceTreeItem>());
+    int traceSpacing = 5;
 
 	// Sort by the centre line of the extents
 	stable_sort(items.begin(), items.end(),
@@ -165,7 +165,7 @@ void TraceTreeItemOwner::restack_items()
 			total_offset += extents.second;
 			total_offset += traceSpacing;
 		}
-    }
+    }*/
 }
 
 } // view
