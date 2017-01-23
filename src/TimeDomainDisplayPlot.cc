@@ -157,14 +157,13 @@ TimeDomainDisplayPlot::TimeDomainDisplayPlot(QWidget* parent, unsigned int xNumD
   d_tag_background_style = Qt::NoBrush;
 
   d_sample_rate = 1;
-  d_delay = 0.0;
+  d_data_starting_point = 0.0;
+  d_reset_x_axis_points = false;
 
   // Reconfigure the bottom horizontal axis that was created by the base class
   configureAxis(QwtPlot::xBottom, 0);
 
   d_yAxisUnit = "";
-
-  d_symmetric_data = false;
 
   d_zoomer = new TimeDomainDisplayZoomer(canvas());
 
@@ -257,6 +256,9 @@ TimeDomainDisplayPlot::plotNewData(const std::string sender,
 	}
 
 	_resetXAxisPoints(d_xdata[sinkIndex], numDataPoints, d_sample_rate);
+      } else if (d_reset_x_axis_points) {
+          _resetXAxisPoints(d_xdata[sinkIndex], numDataPoints, d_sample_rate);
+          d_reset_x_axis_points = false;
       }
 
       for(int i = 0; i < sinkNumChannels; i++) {
@@ -479,15 +481,11 @@ TimeDomainDisplayPlot::legendEntryChecked(const QVariant &plotItem, bool on, int
 void
 TimeDomainDisplayPlot::_resetXAxisPoints(double*& xAxis, unsigned long long numPoints, double sampleRate)
 {
-  double delt = 1.0/sampleRate;
-  long long startPos = 0;
-  double offset = HorizOffset();
+  double delt = 1.0 / sampleRate;
 
-  if (d_symmetric_data)
-    startPos = -(long long)numPoints / 2;
+  for (long loc = 0; loc < numPoints; loc++)
+    xAxis[loc] = (d_data_starting_point + loc) * delt;
 
-  for(long loc = 0; loc < numPoints; loc++)
-    xAxis[loc] = (startPos + loc) * delt + d_delay;
 
   // Set up zoomer base for maximum unzoom x-axis
   // and reset to maximum unzoom level
@@ -701,17 +699,6 @@ void TimeDomainDisplayPlot::setZoomerVertAxis(int index)
 			QwtAxisId(QwtPlot::yLeft, index));
 }
 
-void TimeDomainDisplayPlot::setSymmetricDataEnabled(bool en)
-{
-	d_symmetric_data = en;
-}
-
-bool TimeDomainDisplayPlot::isSymmetricDataEnabled()
-{
-	return d_symmetric_data;
-}
-
-
 QString TimeDomainDisplayPlot::timeScaleValueFormat(double value, int precision) const
 {
 	return d_timeFormatter.format(value, "", precision);
@@ -907,20 +894,19 @@ void TimeDomainDisplayPlot::cancelZoom()
 	zoomer->cancel();
 }
 
-void TimeDomainDisplayPlot::setHorizOffset(double offset)
+long TimeDomainDisplayPlot::dataStartingPoint() const
 {
-	DisplayPlot::setHorizOffset(offset + d_delay);
+	return d_data_starting_point;
 }
 
-void TimeDomainDisplayPlot::setHorizDelay(double delay)
+void TimeDomainDisplayPlot::resetXaxisOnNextReceivedData()
 {
-	DisplayPlot::setHorizOffset(HorizOffset() - d_delay + delay);
-	d_delay = delay;
+	d_reset_x_axis_points = true;
+}
 
-	for (unsigned int i = 0; i < d_sinkManager.sinkListLength(); i++)
-		_resetXAxisPoints(d_xdata[i],
-				d_sinkManager.sink(i)->channelsDataLength(),
-				d_sample_rate);
+void TimeDomainDisplayPlot::setDataStartingPoint(long pos)
+{
+	d_data_starting_point = pos;
 }
 
 #endif /* TIME_DOMAIN_DISPLAY_PLOT_C */

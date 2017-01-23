@@ -50,6 +50,8 @@
 #include "osc_adc.h"
 #include "plot_utils.hpp"
 
+class SymmetricBufferMode;
+
 namespace Ui {
 	class Channel;
 	class Oscilloscope;
@@ -81,7 +83,7 @@ namespace adiscope {
 	Q_SIGNALS:
 		void triggerALevelChanged(double);
 		void triggerBLevelChanged(double);
-		void triggerDelayChanged(double);
+		void triggerPositionChanged(double);
 		void selectedChannelChanged(int);
 
 	private Q_SLOTS:
@@ -93,17 +95,13 @@ namespace adiscope {
 		void onHistogram_view_toggled(bool visible);
 		void onXY_view_toggled(bool visible);
 
-		void onTriggerSettingsDelayChanged(double);
 		void onTimeTriggerDelayChanged(double);
 		void onTriggerModeChanged(int);
-
-		void updateTriggerSpinbox(double);
-		void updatePlotHorizDelay(double);
 
 		void onVertScaleValueChanged(double value);
 		void onHorizScaleValueChanged(double value);
 		void onVertOffsetValueChanged(double value);
-		void onHorizOffsetValueChanged(double value);
+		void onTimePositionChanged(double value);
 
 		void onChannelOffsetChanged(double value);
 
@@ -142,6 +140,9 @@ namespace adiscope {
 		unsigned int nb_channels, nb_math_channels;
 		QList<double> sampling_rates;
 		double active_sample_rate;
+		unsigned long active_sample_count;
+		long long active_trig_sample_count;
+		double active_time_pos;
 		Ui::Oscilloscope *ui;
 		Ui::OscGeneralSettings *gsettings_ui;
 		Ui::ChannelSettings *ch_ui;
@@ -157,6 +158,8 @@ namespace adiscope {
 		QWidget *cursorReadouts;
 		Ui::StatisticsPanel *statistics_panel_ui;
 		QWidget *statisticsPanel;
+
+		std::shared_ptr<SymmetricBufferMode> symmBufferMode;
 
 		adiscope::scope_sink_f::sptr qt_time_block;
 		adiscope::scope_sink_f::sptr qt_fft_block;
@@ -188,7 +191,6 @@ namespace adiscope {
 
 		int fft_size;
 
-		double triggerDelay;
 		int selectedChannel;
 
 		NumberSeries voltsPerDivList;
@@ -213,11 +215,7 @@ namespace adiscope {
 		QList<QPair<std::shared_ptr<MeasurementData>,
 			Statistic>> statistics_data;
 
-		static const unsigned long maxBufferSize;
-
 		void comboBoxUpdateToValue(QComboBox *box, double value, std::vector<double>list);
-
-		void trigger_delay_write_hardware(double value);
 
 		void settings_panel_update(int id);
 		void settings_panel_size_adjust();
@@ -230,9 +228,6 @@ namespace adiscope {
 		void update_measure_for_channel(int ch_idx);
 
 		void updateRunButton(bool ch_enabled);
-
-		double pickSampleRateFor(double timeSpanSecs,
-					double desiredBufferSize);
 
 		void fillCursorReadouts(const struct cursorReadoutsText&);
 

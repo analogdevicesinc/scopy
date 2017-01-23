@@ -112,6 +112,8 @@ public:
 	unsigned long long channelsDataLength, bool curvesAttached = true);
   bool unregisterSink(std::string sinkName);
 
+  long dataStartingPoint() const;
+
 Q_SIGNALS:
   void channelAdded(int);
   void newData();
@@ -144,15 +146,12 @@ public Q_SLOTS:
   bool isZoomerEnabled();
   void setZoomerVertAxis(int index);
 
-  void setSymmetricDataEnabled(bool en);
-  bool isSymmetricDataEnabled();
-
   void customEvent(QEvent * e);
 
   void cancelZoom();
 
-  void setHorizOffset(double offset);
-  void setHorizDelay(double delay);
+  void setDataStartingPoint(long pos);
+  void resetXaxisOnNextReceivedData();
 
 protected:
   virtual void configureAxis(int axisPos, int axisIdx);
@@ -171,8 +170,8 @@ private:
 
   double d_sample_rate;
   double d_delay;
-
-  bool d_symmetric_data;
+  long d_data_starting_point;
+  bool d_reset_x_axis_points;
 
   bool d_semilogx;
   bool d_semilogy;
