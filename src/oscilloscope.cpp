@@ -25,6 +25,7 @@
 #include <QtWidgets>
 #include <QDebug>
 #include <QVBoxLayout>
+#include <QtWidgets/QSpacerItem>
 
 /* Local includes */
 #include "adc_sample_conv.hpp"
@@ -107,12 +108,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 
 	/* Gnuradio Blocks */
 
-	int num_samples = plot.axisInterval(QwtPlot::xBottom).width() *
-				adc.sampleRate();
-
-	this->qt_time_block = adiscope::scope_sink_f::make(
-			num_samples,
-			adc.sampleRate(), "Osc Time", nb_channels, (QObject *)&plot);
+	this->qt_time_block = adiscope::scope_sink_f::make(0, adc.sampleRate(),
+		"Osc Time", nb_channels, (QObject *)&plot);
 
 	this->qt_fft_block = adiscope::scope_sink_f::make(fft_size, adc.sampleRate(),
 			"Osc Frequency", nb_channels, (QObject *)&fft_plot);
@@ -129,9 +126,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	// Prevent the application from hanging while waiting for a trigger condition
 	iio_context_set_timeout(ctx, UINT_MAX);
 
-	plot.registerSink(qt_time_block->name(), nb_channels,
-			plot.axisInterval(QwtPlot::xBottom).width() *
-			adc.sampleRate());
+	plot.registerSink(qt_time_block->name(), nb_channels, 0);
 	plot.disableLegend();
 
 	iio = iio_manager::get_instance(ctx,
@@ -291,7 +286,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 
 	/* Plot layout */
 
-	/* Top transparent widget */
+	QSpacerItem *plotSpacer = new QSpacerItem(0, 25,
+		QSizePolicy::Fixed, QSizePolicy::Fixed);
 
 	ui->gridLayoutPlot->addWidget(measurePanel, 0, 1, 1, 1);
 	ui->gridLayoutPlot->addWidget(plot.topArea(), 1, 0, 1, 3);
@@ -299,7 +295,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	ui->gridLayoutPlot->addWidget(&plot, 2, 1, 1, 1);
 	ui->gridLayoutPlot->addWidget(plot.rightHandlesArea(), 1, 2, 3, 1);
 	ui->gridLayoutPlot->addWidget(plot.bottomHandlesArea(), 3, 0, 1, 3);
-	ui->gridLayoutPlot->addWidget(statisticsPanel, 4, 1, 1, 1);
+	ui->gridLayoutPlot->addItem(plotSpacer, 4, 0, 1, 3);
+	ui->gridLayoutPlot->addWidget(statisticsPanel, 5, 1, 1, 1);
 
 	/* Default plot settings */
 	plot.setSampleRate(adc.sampleRate(), 1, "");
@@ -1698,6 +1695,13 @@ void Oscilloscope::statistics_panel_init()
 	QHBoxLayout *hLayout = new QHBoxLayout(statistics_panel_ui->statistics);
 	hLayout->setContentsMargins(0, 0, 0, 0);
 	hLayout->setSpacing(25);
+
+	// Make sure the scroll area knows beforehand the height of the content
+	// that will be added to the statistics widget
+	StatisticWidget *dummyStat = new StatisticWidget();
+	statistics_panel_ui->statistics->setMinimumHeight(dummyStat->height());
+	delete dummyStat;
+
 	statisticsPanel->hide();
 }
 

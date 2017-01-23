@@ -32,6 +32,9 @@
    <property name="horizontalSpacing">
     <number>6</number>
    </property>
+   <property name="verticalSpacing">
+    <number>0</number>
+   </property>
    <item row="2" column="0">
     <widget class="QLabel" name="label_avg_field">
      <property name="sizePolicy">
