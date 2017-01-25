@@ -65,6 +65,8 @@ namespace adiscope {
 		struct iio_channel * find_channel(const struct iio_context *ctx,
 				enum tool tool, unsigned int idx = 0,
 				bool output = false) const;
+
+		static const std::string& tool_name(enum tool tool);
 	};
 }
 

@@ -97,6 +97,11 @@ QString& Filter::hw_name()
 	return hwname;
 }
 
+const std::string& Filter::tool_name(enum tool tool)
+{
+	return tool_names[tool];
+}
+
 bool Filter::compatible(enum tool tool) const
 {
 	auto hdl = root["compatible"];
