@@ -140,6 +140,8 @@ void DMM::toggleTimer(bool start)
 		manager->stop(id_ch1);
 		manager->stop(id_ch2);
 	}
+
+	ui->run_button->setChecked(start);
 }
 
 iio_manager::port_id DMM::configureMode(bool is_ac, unsigned int ch)
@@ -198,6 +200,10 @@ void DMM::toggleAC1(bool enable)
 	}
 
 	ui->labelCh1->setText(enable ? "VRMS" : "VDC");
+	if (enable)
+		ui->btn_ch1_ac->setChecked(true);
+	else
+		ui->btn_ch1_dc->setChecked(true);
 }
 
 void DMM::toggleAC2(bool enable)
@@ -217,6 +223,10 @@ void DMM::toggleAC2(bool enable)
 	}
 
 	ui->labelCh2->setText(enable ? "VRMS" : "VDC");
+	if (enable)
+		ui->btn_ch2_ac->setChecked(true);
+	else
+		ui->btn_ch2_dc->setChecked(true);
 }
 
 int DMM::numSamplesFromIdx(int idx)
