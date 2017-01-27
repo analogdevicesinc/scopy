@@ -199,6 +199,32 @@ QPushButton:!checked {
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="btnSettings">
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+  min-height: 40px;
+  max-height: 40px;
+  min-width: 60px;
+  max-width: 60px;
+}
+
+QPushButton:checked {
+  border-image: url(:/icons/setup3_checked_hover.svg);
+}
+
+QPushButton:!checked {
+  border-image: url(:/icons/setup3_unchecked.svg);
+}</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>

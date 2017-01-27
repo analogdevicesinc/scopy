@@ -136,6 +136,8 @@ namespace adiscope {
 		void onIioDataRefillTimeout();
 		void onPlotNewData();
 
+		void on_btnSettings_toggled(bool checked);
+
 	private:
 		OscADC adc;
 		unsigned int nb_channels, nb_math_channels;
@@ -212,6 +214,7 @@ namespace adiscope {
 		QButtonGroup *channels_group; // selected state of each channel
 
 		QPushButton *active_settings_btn;
+		QPushButton *last_non_general_settings_btn;
 		QPushButton *menuRunButton;
 
 		QList<std::shared_ptr<MeasurementData>> measurements_data;

@@ -26,6 +26,7 @@
 #include <QDebug>
 #include <QVBoxLayout>
 #include <QtWidgets/QSpacerItem>
+#include <QSignalBlocker>
 
 /* Local includes */
 #include "adc_sample_conv.hpp"
@@ -85,6 +86,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	menuOpened(false), current_channel(0), math_chn_counter(0),
 	settings_group(new QButtonGroup(this)),
 	channels_group(new QButtonGroup(this)),
+	active_settings_btn(nullptr),
+	last_non_general_settings_btn(nullptr),
 	menuRunButton(runButton)
 {
 	ui->setupUi(this);
@@ -750,9 +753,9 @@ void Oscilloscope::del_math_channel()
 	/* Close the right menu if it shows the actual channel */
 	if (btn == settings_group->checkedButton()) {
 		settings_group->setExclusive(false);
-		btn->setChecked(false);
+		ui->btnSettings->setChecked(false);
 		active_settings_btn = nullptr;
-		ui->rightMenu->toggleMenu(false);
+		last_non_general_settings_btn = active_settings_btn;
 	}
 
 	/* Remove the math channel from the bottom list of channels */
@@ -983,8 +986,7 @@ void adiscope::Oscilloscope::onCursorsToggled(bool on)
 	if (!on) {
 		if (btn->isChecked()) {
 			settings_group->setExclusive(false);
-			btn->setChecked(false);
-			toggleRightMenu(btn);
+			ui->btnSettings->setChecked(false);
 		}
 	}
 
@@ -1006,8 +1008,7 @@ void adiscope::Oscilloscope::onMeasureToggled(bool on)
 	if (!on) {
 		if (btn->isChecked()) {
 			settings_group->setExclusive(false);
-			btn->setChecked(false);
-			toggleRightMenu(btn);
+			ui->btnSettings->setChecked(false);
 		}
 	} else {
 		update_measure_for_channel(selectedChannel);
@@ -1104,8 +1105,7 @@ void adiscope::Oscilloscope::channel_box_toggled(bool checked)
 	} else {
 		if (btn->isChecked()) {
 			settings_group->setExclusive(false);
-			btn->setChecked(false);
-			toggleRightMenu(btn);
+			ui->btnSettings->setChecked(false);
 		}
 
 		qDebug() << "Detaching curve" << id;
@@ -1299,6 +1299,8 @@ void adiscope::Oscilloscope::toggleRightMenu(QPushButton *btn)
 	bool open = !menuOpened;
 
 	active_settings_btn = btn;
+	if (id != -ui->stackedWidget->indexOf(ui->generalSettings))
+		last_non_general_settings_btn = active_settings_btn;
 
 	settings_group->setExclusive(!btn_old_state);
 
@@ -1318,7 +1320,19 @@ void adiscope::Oscilloscope::toggleRightMenu(QPushButton *btn)
 
 void adiscope::Oscilloscope::toggleRightMenu()
 {
-	toggleRightMenu(static_cast<QPushButton *>(QObject::sender()));
+	QPushButton *btn = static_cast<QPushButton *>(QObject::sender());
+
+	toggleRightMenu(btn);
+
+	int id = btn->property("id").toInt();
+	bool settingsState = !btn->isChecked();
+
+	if (id == -ui->stackedWidget->indexOf(ui->generalSettings) &&
+			settingsState) {
+		settingsState = false;
+	}
+	const QSignalBlocker blocker(ui->btnSettings);
+		ui->btnSettings->setChecked(settingsState);
 }
 
 void Oscilloscope::settings_panel_update(int id)
@@ -1934,4 +1948,32 @@ void Oscilloscope::updateBufferPreviewer()
 	buffer_previewer->setHighlightWidth(hWidth);
 	buffer_previewer->setHighlightPos(hPos);
 	buffer_previewer->setCursorPos(cPos);
+}
+
+void Oscilloscope::on_btnSettings_toggled(bool checked)
+{
+	QPushButton *btn = nullptr;
+
+	if (checked) {
+		if (last_non_general_settings_btn) {
+			btn = last_non_general_settings_btn;
+		} else { // search for the button of the first channel
+			auto buttons = settings_group->buttons();
+			for (int i = 0; i < buttons.size(); i++) {
+				if (buttons[i]->property("id").toInt() == 0) {
+					btn = static_cast<QPushButton *>(
+					buttons[i]);
+					break;
+				}
+			}
+		}
+	} else {
+		btn = static_cast<QPushButton *>(
+			settings_group->checkedButton());
+	}
+
+	if (btn) {
+		toggleRightMenu(btn);
+		btn->setChecked(checked);
+	}
 }
