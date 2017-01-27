@@ -564,17 +564,13 @@ void View::set_zoom(double scale, int offset)
 	// Reset the "always zoom to fit" feature as the user changed the zoom
 	always_zoom_to_fit_ = false;
 	always_zoom_to_fit_changed(false);
+	int pixelsPerDivision = viewport()->width() / DivisionCount;
 
-	const Timestamp cursor_offset = offset_ + scale_ * offset;
+	const Timestamp cursor_offset = offset_ + scale_ / pixelsPerDivision * offset;
 	const Timestamp new_scale = max(min(Timestamp(scale), MaxScale), MinScale);
-	const Timestamp new_offset = cursor_offset - new_scale * offset;
+	const Timestamp new_offset = cursor_offset - new_scale / pixelsPerDivision * offset;
 
 	scale = new_scale.convert_to<double>();
-//	if (scale == backup_scale_)
-//		zoom_label_->setText("");
-//	else
-//		zoom_label_->setText("Zoom@ " +  QString::number(scale));
-
 	set_scale_offset(new_scale.convert_to<double>(), new_offset);
 }
 
