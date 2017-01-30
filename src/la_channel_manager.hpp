@@ -4,6 +4,10 @@
 #include <QDebug>
 #include "digitalchannel_manager.hpp"
 #include "libsigrokdecode/libsigrokdecode.h"
+#include <QMimeData>
+#include <QMimeType>
+#include <QDrag>
+#include <QBitmap>
 
 namespace Ui {
 class LAChannelManager;
@@ -41,15 +45,25 @@ public:
 	                       LogicAnalyzerChannelManagerUI *chm_ui,
 	                       QWidget *parent = 0);
 	Ui::LAChannelGroup *ui;
-	void mousePressEvent(QMouseEvent *event);
 	LogicAnalyzerChannel *getChannel();
 	void setTrace(std::shared_ptr<pv::view::TraceTreeItem> item);
 	std::shared_ptr<pv::view::TraceTreeItem> getTrace();
 	void channelRoleChanged(const QString);
+	QPoint dragStartPosition;
+	QRect topDragbox;
+	QRect botDragbox;
 private Q_SLOTS:
 	void remove();
+	 void mousePressEvent(QMouseEvent *) override;
+	 void mouseMoveEvent(QMouseEvent *) override;
+	 void dragEnterEvent(QDragEnterEvent *event);
+	 void dragLeaveEvent(QDragLeaveEvent *event);
+	 void dragMoveEvent(QDragMoveEvent *event);
+	 void dropEvent(QDropEvent *event);
 public Q_SLOTS:
 	void rolesChangedLHS(const QString text);
+Q_SIGNALS:
+	void requestUpdateUI();
 private:
 	LogicAnalyzerChannelManagerUI *chm_ui;
 	LogicAnalyzerChannelGroup *chgroup;
@@ -65,7 +79,7 @@ private:
 	QStringList decoderRolesNameList;
 	std::vector<const srd_channel *> decoderRolesList;
 	std::map<const srd_channel*,
-		std::shared_ptr<pv::view::TraceTreeItem> > channels_;
+	std::shared_ptr<pv::view::TraceTreeItem> > channels_;
 public:
 	LogicAnalyzerChannelGroup(LogicAnalyzerChannel *ch);
 	LogicAnalyzerChannelGroup();
@@ -101,11 +115,20 @@ public:
 	void setTrace(std::shared_ptr<pv::view::TraceTreeItem> item);
 	std::shared_ptr<pv::view::TraceTreeItem> getTrace();
 	LogicAnalyzerChannelUI* findChannelWithRole(const QString role);
+	QPoint dragStartPosition;
+	QRect topDragbox;
+	QRect botDragbox;
 
 private Q_SLOTS:
 	void set_decoder(std::string value);
 	void collapse_group();
 	void decoderChanged(const QString);
+	void mousePressEvent(QMouseEvent *) override;
+	void mouseMoveEvent(QMouseEvent *) override;
+	void dragEnterEvent(QDragEnterEvent *event);
+	void dragLeaveEvent(QDragLeaveEvent *event);
+	void dragMoveEvent(QDragMoveEvent *event);
+	void dropEvent(QDropEvent *event);
 private:
 	std::shared_ptr<pv::view::TraceTreeItem> trace;
 public Q_SLOTS:
@@ -113,8 +136,7 @@ public Q_SLOTS:
 	void enable(bool enabled);
 Q_SIGNALS:
 	void remove(int index);
-protected:
-	void mousePressEvent(QMouseEvent *event);
+	void requestUpdateUI();
 };
 
 
@@ -134,6 +156,10 @@ public:
 	                      LogicAnalyzerChannel *ch=nullptr);
 	LogicAnalyzerChannelGroup *getHighlightedChannelGroup();
 	LogicAnalyzerChannel *getHighlightedChannel();
+	void moveChannel(int fromChgIndex, int from, int to, bool after = true);
+	void move(int from, int to, bool after = true);
+	void splitChannel(int chgIndex, int chIndex);
+	LogicAnalyzerChannelGroup *get_channel_group(int index);
 private:
 	std::vector<const srd_decoder *> decoderList;
 	QStringList nameDecoderList;
@@ -155,6 +181,10 @@ public:
 	QWidget *currentSettingsWidget;
 	Ui::LASettingsWidget *settingsUI;
 	bool highlightShown;
+	const bool pixmapEnable = true;
+	const bool pixmapGrab = true;
+	const bool pixmapRetainSize = true;
+	const int  pixmapScale = 1;
 	LogicAnalyzerChannelManagerUI(QWidget *parent,
 	                              pv::MainWindow *main_win_,
 	                              LogicAnalyzerChannelManager *chm,
@@ -173,12 +203,14 @@ public:
 	void createSettingsWidget();
 	void deleteSettingsWidget();
 	void set_pv_decoder(LogicAnalyzerChannelGroupUI *channelgroup);
+	void retainWidgetSizeWhenHidden(QWidget *w);
 
 public Q_SLOTS:
 	void chmScrollChanged(int value);
 	void remove();
 	void set_label(QString);
 	void rolesChangedRHS(const QString);
+	void triggerUpdateUi();
 
 private Q_SLOTS:
 	void on_groupSplit_clicked();
@@ -189,7 +221,6 @@ private:
 	bool collapsed;
 	std::vector<int> visibleItemsIndexes;
 	QButtonGroup *settings_exclusive_group;
-	void retainWidgetSizeWhenHidden(QWidget *w);
 	void setWidgetMinimumNrOfChars(QWidget *w, int nrOfChars);
 };
 }
