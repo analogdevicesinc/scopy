@@ -26,7 +26,13 @@ font: 75 10pt &quot;DejaVu Sans&quot;;</string>
     </sizepolicy>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout_3">
+    <property name="topMargin">
+     <number>0</number>
+    </property>
     <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
      <number>0</number>
     </property>
     <item>
@@ -1184,7 +1190,7 @@ font-weight: bold;
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>102</width>
+                  <width>96</width>
                   <height>64</height>
                  </size>
                 </property>
@@ -1359,15 +1365,15 @@ background-color: red;
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>QWebView</class>
-   <extends>QWidget</extends>
-   <header>QtWebKitWidgets/QWebView</header>
-  </customwidget>
-  <customwidget>
    <class>adiscope::MenuAnim</class>
    <extends>QWidget</extends>
    <header>menu_anim.hpp</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QWebView</class>
+   <extends>QWidget</extends>
+   <header>QtWebKitWidgets/QWebView</header>
   </customwidget>
   <customwidget>
    <class>adiscope::CustomPushButton</class>

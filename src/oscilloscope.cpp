@@ -284,7 +284,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 			"border: 1px solid #7092be;"
 		"}";
 	buffer_previewer->setStyleSheet(stylesheet);
-	ui->hLayout_buffPreview->insertWidget(1, buffer_previewer);
+	ui->vLayoutBufferSlot->addWidget(buffer_previewer);
+
 	buffer_previewer->setCursorPos(0.5);
 
 	/* Plot layout */
