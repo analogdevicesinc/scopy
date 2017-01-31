@@ -38,6 +38,7 @@ static const std::string tool_names[] = {
 	"logic",
 	"pattern",
 	"network",
+	"launcher",
 };
 
 Filter::Filter(const struct iio_context *ctx)
