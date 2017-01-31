@@ -237,7 +237,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	connect(ui->btnShowChannels, SIGNAL(clicked(bool)),
 	        this, SLOT(on_btnShowChannelsClicked(bool)));
 
-	ui->areaTimeTriggerLayout->addWidget(this->bottomHandlesArea(), 0, 1, -1, -1);
+	ui->areaTimeTriggerLayout->addWidget(this->bottomHandlesArea(), 0, 1, 1, 3);
 	updateAreaTimeTriggerPadding();
 }
 
