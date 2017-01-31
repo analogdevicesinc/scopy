@@ -18,6 +18,7 @@
  */
 
 #include <QApplication>
+#include <QSettings>
 #include <QtGlobal>
 
 #include "src/tool_launcher.hpp"
@@ -31,6 +32,11 @@ int main(int argc, char **argv)
 	auto pythonpath = qgetenv("SCOPY_PYTHONPATH");
 	if (!pythonpath.isNull())
 		qputenv("PYTHONPATH", pythonpath);
+
+	QCoreApplication::setOrganizationName("ADI");
+	QCoreApplication::setOrganizationDomain("analog.com");
+	QCoreApplication::setApplicationName("Scopy");
+	QSettings::setDefaultFormat(QSettings::IniFormat);
 
 	ToolLauncher launcher;
 	launcher.show();
