@@ -35,7 +35,7 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, QPushButton *runButton,
 	peek_block_ch1(gnuradio::get_initial_sptr(new peek_sample<float>)),
 	peek_block_ch2(gnuradio::get_initial_sptr(new peek_sample<float>)),
 	mode_ac_ch1(false), mode_ac_ch2(false),
-	gain_ch1(gain_ch1), gain_ch2(gain_ch2)
+	gain_ch1(gain_ch1), gain_ch2(gain_ch2), dmm_api(new DMM_API(this))
 {
 	ui->setupUi(this);
 
@@ -76,6 +76,8 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, QPushButton *runButton,
 
 	if (started)
 		manager->unlock();
+
+	dmm_api->load();
 }
 
 void DMM::disconnectAll()
@@ -95,6 +97,10 @@ DMM::~DMM()
 {
 	timer.stop();
 	disconnectAll();
+
+	dmm_api->save();
+	delete dmm_api;
+
 	delete ui;
 }
 

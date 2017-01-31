@@ -24,6 +24,7 @@
 #include <QTimer>
 #include <QWidget>
 
+#include "apiObject.hpp"
 #include "filter.hpp"
 #include "iio_manager.hpp"
 #include "peek_sample.hpp"
@@ -33,8 +34,12 @@ namespace Ui {
 }
 
 namespace adiscope {
+	class DMM_API;
+
 	class DMM : public QWidget
 	{
+		friend class DMM_API;
+
 		Q_OBJECT
 
 	public:
@@ -53,6 +58,8 @@ namespace adiscope {
 		bool mode_ac_ch1, mode_ac_ch2;
 		float gain_ch1, gain_ch2;
 
+		DMM_API *dmm_api;
+
 		void disconnectAll();
 		void configureMode(bool is_ac);
 		iio_manager::port_id configureMode(bool is_ac, unsigned int ch);
@@ -68,6 +75,28 @@ namespace adiscope {
 	private Q_SLOTS:
 		void setHistorySizeCh1(int idx);
 		void setHistorySizeCh2(int idx);
+	};
+
+	class DMM_API : public ApiObject
+	{
+		Q_OBJECT
+
+		Q_PROPERTY(bool mode_ac_ch1
+				READ get_mode_ac_ch1 WRITE set_mode_ac_ch1);
+		Q_PROPERTY(bool mode_ac_ch2
+				READ get_mode_ac_ch2 WRITE set_mode_ac_ch2);
+
+	public:
+		bool get_mode_ac_ch1() const { return dmm->mode_ac_ch1; }
+		bool get_mode_ac_ch2() const { return dmm->mode_ac_ch2; }
+		void set_mode_ac_ch1(bool en) { dmm->toggleAC1(en); }
+		void set_mode_ac_ch2(bool en) { dmm->toggleAC2(en); }
+
+		explicit DMM_API(DMM *dmm) : ApiObject(TOOL_DMM), dmm(dmm) {}
+		~DMM_API() {}
+
+	private:
+		DMM *dmm;
 	};
 }
 
