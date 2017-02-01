@@ -90,11 +90,17 @@ namespace adiscope {
 				READ get_mode_ac_ch2 WRITE set_mode_ac_ch2);
 		Q_PROPERTY(bool running READ running WRITE run STORED false);
 
+		Q_PROPERTY(double value_ch1 READ read_ch1);
+		Q_PROPERTY(double value_ch2 READ read_ch2);
+
 	public:
 		bool get_mode_ac_ch1() const { return dmm->mode_ac_ch1; }
 		bool get_mode_ac_ch2() const { return dmm->mode_ac_ch2; }
 		void set_mode_ac_ch1(bool en) { dmm->toggleAC1(en); }
 		void set_mode_ac_ch2(bool en) { dmm->toggleAC2(en); }
+
+		double read_ch1() const;
+		double read_ch2() const;
 
 		bool running() const;
 		void run(bool en);

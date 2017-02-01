@@ -276,3 +276,13 @@ void DMM_API::run(bool en)
 {
 	dmm->ui->run_button->setChecked(en);
 }
+
+double DMM_API::read_ch1() const
+{
+	return dmm->ui->lcdCh1->value();
+}
+
+double DMM_API::read_ch2() const
+{
+	return dmm->ui->lcdCh2->value();
+}
