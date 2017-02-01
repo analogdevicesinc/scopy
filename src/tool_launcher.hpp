@@ -110,10 +110,10 @@ namespace adiscope {
 
 		void swapMenu(QWidget *menu);
 		void destroyContext();
-		bool switchContext(QString &uri);
+		bool switchContext(const QString &uri);
 		void resetStylesheets();
 		void calibrate();
-		void addContext(const QString& hostname);
+		QPushButton * addContext(const QString& hostname);
 
 		static void apply_m2k_fixes(struct iio_context *ctx);
 	};
@@ -132,6 +132,8 @@ namespace adiscope {
 
 		bool menu_opened() const;
 		void open_menu(bool open);
+
+		Q_INVOKABLE bool connect(const QString& uri);
 
 	private:
 		ToolLauncher *tl;

@@ -118,7 +118,7 @@ void ToolLauncher::destroyPopup()
 	popup->deleteLater();
 }
 
-void ToolLauncher::addContext(const QString& uri)
+QPushButton * ToolLauncher::addContext(const QString& uri)
 {
 	auto pair = new QPair<QWidget, Ui::Device>;
 	pair->second.setupUi(&pair->first);
@@ -132,6 +132,8 @@ void ToolLauncher::addContext(const QString& uri)
 
 	pair->second.btn->setProperty("uri", QVariant(uri));
 	devices.append(pair);
+
+	return pair->second.btn;
 }
 
 void ToolLauncher::addRemoteContext()
@@ -241,6 +243,9 @@ void adiscope::ToolLauncher::device_btn_clicked(bool pressed)
 		for (auto it = devices.begin(); it != devices.end(); ++it)
 			if ((*it)->second.btn != sender())
 				(*it)->second.btn->setChecked(false);
+
+		if (ui->btnConnect->property("connected").toBool())
+			ui->btnConnect->click();
 	} else {
 		destroyContext();
 	}
@@ -387,7 +392,7 @@ void adiscope::ToolLauncher::enableCalibTools(float gain_ch1, float gain_ch2)
 	}
 }
 
-bool adiscope::ToolLauncher::switchContext(QString &uri)
+bool adiscope::ToolLauncher::switchContext(const QString &uri)
 {
 	destroyContext();
 
@@ -480,4 +485,23 @@ bool ToolLauncher_API::menu_opened() const
 void ToolLauncher_API::open_menu(bool open)
 {
 	tl->ui->btnMenu->setChecked(open);
+}
+
+bool ToolLauncher_API::connect(const QString& uri)
+{
+	QPushButton *btn = nullptr;
+
+	for (auto it = tl->devices.begin();
+			!btn && it != tl->devices.end(); ++it) {
+		QPushButton *tmp = (*it)->second.btn;
+
+		if (tmp->property("uri").toString().compare(uri) == 0)
+			btn = tmp;
+	}
+
+	if (!btn)
+		btn = tl->addContext(uri);
+
+	btn->click();
+	tl->ui->btnConnect->click();
 }
