@@ -26,9 +26,12 @@
 #include <gnuradio/blocks/short_to_float.h>
 #include <gnuradio/blocks/sub_ff.h>
 
+#include <QJSEngine>
+
 using namespace adiscope;
 
 DMM::DMM(struct iio_context *ctx, Filter *filt, QPushButton *runButton,
+		QJSEngine *engine,
 		float gain_ch1, float gain_ch2, QWidget *parent) :
 	QWidget(parent), ui(new Ui::DMM), timer(this),
 	manager(iio_manager::get_instance(ctx, filt->device_name(TOOL_DMM))),
@@ -78,6 +81,7 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, QPushButton *runButton,
 		manager->unlock();
 
 	dmm_api->load();
+	dmm_api->js_register(engine);
 }
 
 void DMM::disconnectAll()

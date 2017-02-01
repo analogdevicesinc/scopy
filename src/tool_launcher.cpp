@@ -380,7 +380,7 @@ void adiscope::ToolLauncher::enableCalibTools(float gain_ch1, float gain_ch2)
 	}
 
 	if (filter->compatible(TOOL_DMM)) {
-		dmm = new DMM(ctx, filter, ui->stopDMM,
+		dmm = new DMM(ctx, filter, ui->stopDMM, &js_engine,
 				gain_ch1, gain_ch2, this);
 		dmm->setVisible(false);
 		ui->dmm->setEnabled(true);

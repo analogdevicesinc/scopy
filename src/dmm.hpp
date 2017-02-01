@@ -33,6 +33,8 @@ namespace Ui {
 	class DMM;
 }
 
+class QJSEngine;
+
 namespace adiscope {
 	class DMM_API;
 
@@ -44,8 +46,9 @@ namespace adiscope {
 
 	public:
 		explicit DMM(struct iio_context *ctx, Filter *filt,
-				QPushButton *runButton, float gain_ch1,
-				float gain_ch2, QWidget *parent = 0);
+				QPushButton *runButton, QJSEngine *engine,
+				float gain_ch1, float gain_ch2,
+				QWidget *parent = nullptr);
 		~DMM();
 
 	private:
