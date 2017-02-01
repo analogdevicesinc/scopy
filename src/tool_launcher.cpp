@@ -40,7 +40,8 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	power_control(nullptr), dmm(nullptr), signal_generator(nullptr),
 	oscilloscope(nullptr), current(nullptr), filter(nullptr),
 	logic_analyzer(nullptr), pattern_generator(nullptr),
-	network_analyzer(nullptr), tl_api(new ToolLauncher_API(this))
+	network_analyzer(nullptr), tl_api(new ToolLauncher_API(this)),
+	notifier(STDIN_FILENO, QSocketNotifier::Read)
 {
 	struct iio_context_info **info;
 	unsigned int nb_contexts;
@@ -90,6 +91,9 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 
 	/* Show a smooth opening when the app starts */
 	ui->menu->toggleMenu(true);
+
+	js_engine.installExtensions(QJSEngine::ConsoleExtension);
+	connect(&notifier, SIGNAL(activated(int)), this, SLOT(hasText()));
 }
 
 ToolLauncher::~ToolLauncher()
@@ -437,6 +441,33 @@ bool adiscope::ToolLauncher::switchContext(QString &uri)
 	QtConcurrent::run(std::bind(&ToolLauncher::calibrate, this));
 
 	return true;
+}
+
+void ToolLauncher::hasText()
+{
+	QTextStream in(stdin);
+	QTextStream out(stdout);
+
+	js_cmd.append(in.readLine());
+
+	unsigned int nb_open_braces = js_cmd.count(QChar('{'));
+	unsigned int nb_closing_braces = js_cmd.count(QChar('}'));
+
+	if (nb_open_braces == nb_closing_braces) {
+		QJSValue val = js_engine.evaluate(js_cmd);
+		if (val.isError())
+			out << "Exception:" << val.toString() << endl;
+		else if (!val.isUndefined())
+			out << val.toString() << endl;
+
+		js_cmd.clear();
+		out << "scopy > ";
+	} else {
+		js_cmd.append(QChar('\n'));
+
+		out << "> ";
+	}
+	out.flush();
 }
 
 bool ToolLauncher_API::menu_opened() const

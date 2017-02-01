@@ -20,8 +20,10 @@
 #ifndef M2K_TOOL_LAUNCHER_H
 #define M2K_TOOL_LAUNCHER_H
 
+#include <QJSEngine>
 #include <QMainWindow>
 #include <QPair>
+#include <QSocketNotifier>
 #include <QVector>
 
 #include "apiObject.hpp"
@@ -81,6 +83,8 @@ namespace adiscope {
 
 		void enableCalibTools(float gain_ch1, float gain_ch2);
 
+		void hasText();
+
 	private:
 		Ui::ToolLauncher *ui;
 		QList<QMainWindow *> windows;
@@ -99,6 +103,10 @@ namespace adiscope {
 
 		Filter *filter;
 		ToolLauncher_API *tl_api;
+
+		QJSEngine js_engine;
+		QString js_cmd;
+		QSocketNotifier notifier;
 
 		void swapMenu(QWidget *menu);
 		void destroyContext();
