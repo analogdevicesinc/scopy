@@ -87,6 +87,9 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	connect(ui->btnAdd, SIGNAL(clicked()), this, SLOT(addRemoteContext()));
 
 	tl_api->load();
+
+	/* Show a smooth opening when the app starts */
+	ui->menu->toggleMenu(true);
 }
 
 ToolLauncher::~ToolLauncher()
