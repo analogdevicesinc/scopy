@@ -93,6 +93,8 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	ui->menu->toggleMenu(true);
 
 	js_engine.installExtensions(QJSEngine::ConsoleExtension);
+	tl_api->js_register(&js_engine);
+
 	connect(&notifier, SIGNAL(activated(int)), this, SLOT(hasText()));
 }
 
