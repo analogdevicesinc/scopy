@@ -31,13 +31,13 @@
 using namespace adiscope;
 
 static const std::string tool_names[] = {
-	"oscilloscope",
-	"signal-generator",
-	"voltmeter",
-	"power-controller",
-	"logic-analyzer-rx",
-	"logic-analyzer-tx",
-	"network-analyzer",
+	"osc",
+	"siggen",
+	"dmm",
+	"power",
+	"logic",
+	"pattern",
+	"network",
 };
 
 Filter::Filter(const struct iio_context *ctx)
