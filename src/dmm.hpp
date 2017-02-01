@@ -88,12 +88,16 @@ namespace adiscope {
 				READ get_mode_ac_ch1 WRITE set_mode_ac_ch1);
 		Q_PROPERTY(bool mode_ac_ch2
 				READ get_mode_ac_ch2 WRITE set_mode_ac_ch2);
+		Q_PROPERTY(bool running READ running WRITE run STORED false);
 
 	public:
 		bool get_mode_ac_ch1() const { return dmm->mode_ac_ch1; }
 		bool get_mode_ac_ch2() const { return dmm->mode_ac_ch2; }
 		void set_mode_ac_ch1(bool en) { dmm->toggleAC1(en); }
 		void set_mode_ac_ch2(bool en) { dmm->toggleAC2(en); }
+
+		bool running() const;
+		void run(bool en);
 
 		explicit DMM_API(DMM *dmm) : ApiObject(TOOL_DMM), dmm(dmm) {}
 		~DMM_API() {}

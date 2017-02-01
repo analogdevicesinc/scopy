@@ -266,3 +266,13 @@ void DMM::setHistorySizeCh2(int idx)
 
 	ui->sismograph_ch2->setNumSamples(num_samples);
 }
+
+bool DMM_API::running() const
+{
+	return dmm->ui->run_button->isChecked();
+}
+
+void DMM_API::run(bool en)
+{
+	dmm->ui->run_button->setChecked(en);
+}
