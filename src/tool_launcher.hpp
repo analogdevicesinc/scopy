@@ -24,6 +24,7 @@
 #include <QPair>
 #include <QVector>
 
+#include "apiObject.hpp"
 #include "dmm.hpp"
 #include "filter.hpp"
 #include "calibration.hpp"
@@ -45,9 +46,13 @@ namespace Ui {
 }
 
 namespace adiscope {
+	class ToolLauncher_API;
+
 	class ToolLauncher : public QMainWindow
 	{
-	    Q_OBJECT
+		friend class ToolLauncher_API;
+
+		Q_OBJECT
 
 	public:
 		explicit ToolLauncher(QWidget *parent = 0);
@@ -93,6 +98,7 @@ namespace adiscope {
 		QWidget *current;
 
 		Filter *filter;
+		ToolLauncher_API *tl_api;
 
 		void swapMenu(QWidget *menu);
 		void destroyContext();
@@ -102,6 +108,25 @@ namespace adiscope {
 		void addContext(const QString& hostname);
 
 		static void apply_m2k_fixes(struct iio_context *ctx);
+	};
+
+	class ToolLauncher_API: public ApiObject
+	{
+		Q_OBJECT
+
+		Q_PROPERTY(bool menu_opened READ menu_opened WRITE open_menu
+				STORED false);
+
+	public:
+		explicit ToolLauncher_API(ToolLauncher *tl) :
+			ApiObject(TOOL_LAUNCHER), tl(tl) {}
+		~ToolLauncher_API() {}
+
+		bool menu_opened() const;
+		void open_menu(bool open);
+
+	private:
+		ToolLauncher *tl;
 	};
 }
 

@@ -40,7 +40,7 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	power_control(nullptr), dmm(nullptr), signal_generator(nullptr),
 	oscilloscope(nullptr), current(nullptr), filter(nullptr),
 	logic_analyzer(nullptr), pattern_generator(nullptr),
-	network_analyzer(nullptr)
+	network_analyzer(nullptr), tl_api(new ToolLauncher_API(this))
 {
 	struct iio_context_info **info;
 	unsigned int nb_contexts;
@@ -85,6 +85,8 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	connect(this, SIGNAL(calibrationDone(float, float)),
 			this, SLOT(enableCalibTools(float, float)));
 	connect(ui->btnAdd, SIGNAL(clicked()), this, SLOT(addRemoteContext()));
+
+	tl_api->load();
 }
 
 ToolLauncher::~ToolLauncher()
@@ -95,6 +97,8 @@ ToolLauncher::~ToolLauncher()
 		delete *it;
 	devices.clear();
 
+	tl_api->save();
+	delete tl_api;
 	delete ui;
 }
 
@@ -430,4 +434,14 @@ bool adiscope::ToolLauncher::switchContext(QString &uri)
 	QtConcurrent::run(std::bind(&ToolLauncher::calibrate, this));
 
 	return true;
+}
+
+bool ToolLauncher_API::menu_opened() const
+{
+	return tl->ui->btnMenu->isChecked();
+}
+
+void ToolLauncher_API::open_menu(bool open)
+{
+	tl->ui->btnMenu->setChecked(open);
 }
