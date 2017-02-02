@@ -122,6 +122,8 @@ namespace adiscope {
 		Q_PROPERTY(bool menu_opened READ menu_opened WRITE open_menu
 				STORED false);
 
+		Q_PROPERTY(bool hidden READ hidden WRITE hide STORED false);
+
 	public:
 		explicit ToolLauncher_API(ToolLauncher *tl) :
 			ApiObject(TOOL_LAUNCHER), tl(tl) {}
@@ -129,6 +131,9 @@ namespace adiscope {
 
 		bool menu_opened() const;
 		void open_menu(bool open);
+
+		bool hidden() const;
+		void hide(bool hide);
 
 		Q_INVOKABLE bool connect(const QString& uri);
 

@@ -478,6 +478,16 @@ void ToolLauncher_API::open_menu(bool open)
 	tl->ui->btnMenu->setChecked(open);
 }
 
+bool ToolLauncher_API::hidden() const
+{
+	return !tl->isVisible();
+}
+
+void ToolLauncher_API::hide(bool hide)
+{
+	tl->setVisible(!hide);
+}
+
 bool ToolLauncher_API::connect(const QString& uri)
 {
 	QPushButton *btn = nullptr;
