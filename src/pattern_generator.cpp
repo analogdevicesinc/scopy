@@ -92,6 +92,13 @@ QStringList PatternGenerator::possibleSampleRates = QStringList()
                 << "50"         << "20"        << "10"
                 << "5"          << "2"         << "1";
 
+const char* PatternGenerator::channelNames[] = {
+        "voltage0", "voltage1", "voltage2", "voltage3",
+        "voltage4", "voltage5", "voltage6", "voltage7",
+        "voltage8", "voltage9", "voltage10", "voltage11",
+        "voltage12", "voltage13", "voltage14", "voltage15"
+};
+
 PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
                                    QPushButton *runBtn, QWidget *parent, bool offline_mode) :
 	QWidget(parent),
@@ -135,24 +142,13 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 	chmui->setVisible(true);
 	ui->rightWidget->setCurrentIndex(1);
 
-
-
-
-
 	connect(chmui,SIGNAL(channelsChanged()),bufui,SLOT(updateUi()));
-	/* connect(ui->btnGroupWithSelected,SIGNAL(clicked()),this,SLOT(on_btnGroupWithSelected_clicked()));
-	 connect(ui->btnHideInactive,SIGNAL(clicked()),this,SLOT(on_btnHideInactive_clicked()));
-	 connect(ui->btnExtendChannelManager,SIGNAL(clicked()),this,SLOT(on_extendChannelManager_PB_clicked()));*/
-	/*
-	    connect(ui->btnRunStop, SIGNAL(toggled(bool)), this, SLOT(startStop(bool)));
-	    connect(runBtn, SIGNAL(toggled(bool)), ui->btnRunStop, SLOT(setChecked(bool)));
-	    connect(ui->btnRunStop, SIGNAL(toggled(bool)), runBtn, SLOT(setChecked(bool)));
-	    connect(ui->btnSingleRun, SIGNAL(pressed()), this, SLOT(singleRun()));
-	*/
-	bufui->updateUi();
+    connect(ui->btnRunStop, SIGNAL(toggled(bool)), this, SLOT(startStop(bool)));
+    connect(runBtn, SIGNAL(toggled(bool)), ui->btnRunStop, SLOT(setChecked(bool)));
+    connect(ui->btnRunStop, SIGNAL(toggled(bool)), runBtn, SLOT(setChecked(bool)));
+    connect(ui->btnSingleRun, SIGNAL(pressed()), this, SLOT(singleRun()));
+    bufui->updateUi();
 }
-
-
 
 PatternGenerator::~PatternGenerator()
 {
@@ -217,9 +213,6 @@ void PatternGenerator::toggleRightMenu(QPushButton *btn)
 	} else {
 		chmui->showHighlight(false);
 	}
-
-
-
 }
 
 
@@ -254,39 +247,37 @@ void PatternGenerator::toggleRightMenu(QPushButton *btn)
 
 bool PatternGenerator::startPatternGeneration(bool cyclic)
 {
-
 	/* Enable Tx channels*/
-	char temp_buffer[12];
+    //char temp_buffer[12];
 
 	if (!channel_manager_dev || !dev) {
 		qDebug("Devices not found");
 		return false;
 	}
 
-	qDebug("Setting channel direction");
+    qDebug("Enabling channels");
+    for (int j = 0; j < no_channels; j++) {
+        auto ch = iio_device_find_channel(dev, channelNames[j], true);
+        iio_channel_enable(ch);
+    }
+    channel_enable_mask = chm.get_enabled_mask();
 
+    qDebug("Setting channel direction");
 	for (int j = 0; j < no_channels; j++) {
 		if (channel_enable_mask & (1<<j)) {
-			auto ch = iio_device_get_channel(channel_manager_dev, j);
-			iio_channel_attr_write(ch, "direction", "out");
+            //auto ch = iio_device_get_channel(channel_manager_dev, j);
+            auto ch = iio_device_find_channel(channel_manager_dev,channelNames[j],false);
+            qDebug()<<iio_channel_attr_write(ch, "direction", "out");
 		}
 	}
 
-	qDebug("Setting sample rate");
-	/* Set sample rate   */
-
+    qDebug("Setting sample rate");
+    sample_rate = bufman->getSampleRate();
 	iio_device_attr_write(dev, "sampling_frequency",
 	                      std::to_string(sample_rate).c_str());
-	qDebug("Enabling channels");
 
-	for (int j = 0; j < no_channels; j++) {
-		auto ch = iio_device_get_channel(dev, j);
-		iio_channel_enable(ch);
-	}
-
-	/* Create buffer     */
 	qDebug("Creating buffer");
-	txbuf = iio_device_create_buffer(dev, number_of_samples, cyclic);
+    txbuf = iio_device_create_buffer(dev, bufman->getBufferSize(), cyclic);
 
 	if (!txbuf) {
 		qDebug("Could not create buffer - errno: %d - %s", errno, strerror(errno));
@@ -297,11 +288,10 @@ bool PatternGenerator::startPatternGeneration(bool cyclic)
 	short *p_dat;
 	ptrdiff_t p_inc;
 
-	int i = 0;
-
-	for (p_dat = (short *)iio_buffer_start(txbuf); (p_dat < iio_buffer_end(txbuf));
+    int i = 0;
+    for (p_dat = (short *)iio_buffer_start(txbuf); (p_dat < iio_buffer_end(txbuf));
 	     (uint16_t *)p_dat++,i++) {
-		*p_dat = buffer[i];
+        *p_dat = bufman->buffer[i];
 	}
 
 	/* Push buffer       */
@@ -319,17 +309,21 @@ void PatternGenerator::stopPatternGeneration()
 	}
 
 	/* Reset Tx Channls*/
-	auto nb_channels = iio_device_get_channels_count(channel_manager_dev);
-
-	for (int j = 0; j < nb_channels; j++) {
-		auto ch = iio_device_get_channel(channel_manager_dev, j);
+    for (int j = 0; j < no_channels; j++) {
+        auto ch = iio_device_find_channel(channel_manager_dev, channelNames[j], false);
 		iio_channel_attr_write(ch, "direction", "in");
 	}
+
+    for (int j = 0; j < no_channels; j++) {
+        auto ch = iio_device_find_channel(dev, channelNames[j], true);
+        iio_channel_disable(ch);
+    }
+
 }
 
 void PatternGenerator::startStop(bool start)
 {
-	main_win->action_view_zoom_fit()->trigger();
+//	main_win->action_view_zoom_fit()->trigger();
 
 	if (start) {
 		if (startPatternGeneration(true)) {
