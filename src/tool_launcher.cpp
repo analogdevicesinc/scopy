@@ -294,6 +294,7 @@ void adiscope::ToolLauncher::destroyContext()
 	ui->powerControl->setDisabled(true);
 	ui->logicAnalyzer->setDisabled(true);
 	ui->patternGenerator->setDisabled(true);
+	ui->networkAnalyzer->setDisabled(true);
 
 	if (dmm) {
 		delete dmm;
