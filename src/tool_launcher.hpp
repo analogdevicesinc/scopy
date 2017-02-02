@@ -72,8 +72,6 @@ namespace adiscope {
 		void on_btnPatternGenerator_clicked();
 		void on_btnNetworkAnalyzer_clicked();
 
-		void window_destroyed();
-
 		void on_btnHome_clicked();
 		void on_btnConnect_clicked(bool pressed);
 
@@ -87,7 +85,6 @@ namespace adiscope {
 
 	private:
 		Ui::ToolLauncher *ui;
-		QList<QMainWindow *> windows;
 		struct iio_context *ctx;
 
 		QVector<QPair<QWidget, Ui::Device> *> devices;

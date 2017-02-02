@@ -201,11 +201,6 @@ void adiscope::ToolLauncher::on_btnNetworkAnalyzer_clicked()
 	swapMenu(static_cast<QWidget *>(network_analyzer));
 }
 
-void ToolLauncher::window_destroyed()
-{
-	windows.removeOne(static_cast<QMainWindow *>(QObject::sender()));
-}
-
 void adiscope::ToolLauncher::apply_m2k_fixes(struct iio_context *ctx)
 {
 	struct iio_device *dev = iio_context_find_device(ctx, "ad9963");
@@ -299,10 +294,6 @@ void adiscope::ToolLauncher::destroyContext()
 	ui->powerControl->setDisabled(true);
 	ui->logicAnalyzer->setDisabled(true);
 	ui->patternGenerator->setDisabled(true);
-
-	for (auto it = windows.begin(); it != windows.end(); ++it)
-		delete *it;
-	windows.clear();
 
 	if (dmm) {
 		delete dmm;
