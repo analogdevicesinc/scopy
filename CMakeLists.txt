@@ -74,7 +74,6 @@ if (NOT "${OUT_CONSTEXPR}" STREQUAL "-1")
 endif()
 
 find_package(Qt5Widgets REQUIRED)
-find_package(Qt5WebKitWidgets REQUIRED)
 find_package(Qt5Concurrent REQUIRED)
 find_package(Qwt REQUIRED)
 find_package(Qt5Qml REQUIRED)
@@ -105,7 +104,6 @@ include_directories(
 	${GNURADIO_ALL_INCLUDE_DIRS}
 	${Boost_INCLUDE_DIRS}
 	${Qt5Widgets_INCLUDE_DIRS}
-	${Qt5WebKitWidgets_INCLUDE_DIRS}
 	${Qt5Concurrent_INCLUDE_DIRS}
 	${Qt5Qml_INCLUDE_DIRS}
 	${Qt5UiTools_INCLUDE_DIRS}
@@ -167,7 +165,6 @@ link_directories(
 
 target_link_libraries(${PROJECT_NAME} LINK_PRIVATE
 		${Qt5Widgets_LIBRARIES}
-		${Qt5WebKitWidgets_LIBRARIES}
 		${Qt5Concurrent_LIBRARIES}
 		${Qt5Qml_LIBRARIES}
 		${Qt5UiTools_LIBRARIES}
