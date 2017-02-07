@@ -101,10 +101,11 @@ background: #272730;
 border-color:transparent;
 }
 
-QWidget#widget_2:hover
+QWidget[hover-property=true]
 {
 border:1px solid rgb(65,155,249);
 }
+
 </string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
