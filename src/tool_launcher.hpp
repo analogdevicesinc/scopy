@@ -20,10 +20,13 @@
 #ifndef M2K_TOOL_LAUNCHER_H
 #define M2K_TOOL_LAUNCHER_H
 
+#include <QJSEngine>
 #include <QMainWindow>
 #include <QPair>
+#include <QSocketNotifier>
 #include <QVector>
 
+#include "apiObject.hpp"
 #include "dmm.hpp"
 #include "filter.hpp"
 #include "calibration.hpp"
@@ -45,9 +48,13 @@ namespace Ui {
 }
 
 namespace adiscope {
+	class ToolLauncher_API;
+
 	class ToolLauncher : public QMainWindow
 	{
-	    Q_OBJECT
+		friend class ToolLauncher_API;
+
+		Q_OBJECT
 
 	public:
 		explicit ToolLauncher(QWidget *parent = 0);
@@ -65,8 +72,6 @@ namespace adiscope {
 		void on_btnPatternGenerator_clicked();
 		void on_btnNetworkAnalyzer_clicked();
 
-		void window_destroyed();
-
 		void on_btnHome_clicked();
 		void on_btnConnect_clicked(bool pressed);
 
@@ -76,9 +81,10 @@ namespace adiscope {
 
 		void enableCalibTools(float gain_ch1, float gain_ch2);
 
+		void hasText();
+
 	private:
 		Ui::ToolLauncher *ui;
-		QList<QMainWindow *> windows;
 		struct iio_context *ctx;
 
 		QVector<QPair<QWidget, Ui::Device> *> devices;
@@ -93,15 +99,46 @@ namespace adiscope {
 		QWidget *current;
 
 		Filter *filter;
+		ToolLauncher_API *tl_api;
+
+		QJSEngine js_engine;
+		QString js_cmd;
+		QSocketNotifier notifier;
 
 		void swapMenu(QWidget *menu);
 		void destroyContext();
-		bool switchContext(QString &uri);
+		bool switchContext(const QString &uri);
 		void resetStylesheets();
 		void calibrate();
-		void addContext(const QString& hostname);
+		QPushButton * addContext(const QString& hostname);
 
 		static void apply_m2k_fixes(struct iio_context *ctx);
+	};
+
+	class ToolLauncher_API: public ApiObject
+	{
+		Q_OBJECT
+
+		Q_PROPERTY(bool menu_opened READ menu_opened WRITE open_menu
+				STORED false);
+
+		Q_PROPERTY(bool hidden READ hidden WRITE hide STORED false);
+
+	public:
+		explicit ToolLauncher_API(ToolLauncher *tl) :
+			ApiObject(TOOL_LAUNCHER), tl(tl) {}
+		~ToolLauncher_API() {}
+
+		bool menu_opened() const;
+		void open_menu(bool open);
+
+		bool hidden() const;
+		void hide(bool hide);
+
+		Q_INVOKABLE bool connect(const QString& uri);
+
+	private:
+		ToolLauncher *tl;
 	};
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Analog Devices, Inc.
+ * Copyright 2017 Analog Devices, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,29 +17,32 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#include <QApplication>
-#include <QSettings>
-#include <QtGlobal>
+#ifndef APIOBJECT_HPP
+#define APIOBJECT_HPP
 
-#include "src/tool_launcher.hpp"
+#include <QObject>
 
-using namespace adiscope;
+#include "filter.hpp"
 
-int main(int argc, char **argv)
-{
-	QApplication app(argc, argv);
+class QJSEngine;
 
-	auto pythonpath = qgetenv("SCOPY_PYTHONPATH");
-	if (!pythonpath.isNull())
-		qputenv("PYTHONPATH", pythonpath);
+namespace adiscope {
+	class ApiObject : public QObject
+	{
+		Q_OBJECT
 
-	QCoreApplication::setOrganizationName("ADI");
-	QCoreApplication::setOrganizationDomain("analog.com");
-	QCoreApplication::setApplicationName("Scopy");
-	QSettings::setDefaultFormat(QSettings::IniFormat);
+	public:
+		explicit ApiObject(enum tool tool);
+		~ApiObject();
 
-	ToolLauncher launcher;
-	launcher.show();
+		void load();
+		void save();
 
-	return app.exec();
+		void js_register(QJSEngine *engine);
+
+	private:
+		enum tool tool;
+	};
 }
+
+#endif /* APIOBJECT_HPP */

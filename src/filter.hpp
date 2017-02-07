@@ -41,6 +41,7 @@ namespace adiscope {
 		TOOL_LOGIC_ANALYZER = 4,
 		TOOL_PATTERN_GENERATOR = 5,
 		TOOL_NETWORK_ANALYZER = 6,
+		TOOL_LAUNCHER = 7,
 	};
 
 	class Filter
@@ -65,6 +66,8 @@ namespace adiscope {
 		struct iio_channel * find_channel(const struct iio_context *ctx,
 				enum tool tool, unsigned int idx = 0,
 				bool output = false) const;
+
+		static const std::string& tool_name(enum tool tool);
 	};
 }
 

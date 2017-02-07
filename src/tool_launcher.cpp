@@ -40,7 +40,8 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	power_control(nullptr), dmm(nullptr), signal_generator(nullptr),
 	oscilloscope(nullptr), current(nullptr), filter(nullptr),
 	logic_analyzer(nullptr), pattern_generator(nullptr),
-	network_analyzer(nullptr)
+	network_analyzer(nullptr), tl_api(new ToolLauncher_API(this)),
+	notifier(STDIN_FILENO, QSocketNotifier::Read)
 {
 	struct iio_context_info **info;
 	unsigned int nb_contexts;
@@ -85,6 +86,16 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	connect(this, SIGNAL(calibrationDone(float, float)),
 			this, SLOT(enableCalibTools(float, float)));
 	connect(ui->btnAdd, SIGNAL(clicked()), this, SLOT(addRemoteContext()));
+
+	tl_api->load();
+
+	/* Show a smooth opening when the app starts */
+	ui->menu->toggleMenu(true);
+
+	js_engine.installExtensions(QJSEngine::ConsoleExtension);
+	tl_api->js_register(&js_engine);
+
+	connect(&notifier, SIGNAL(activated(int)), this, SLOT(hasText()));
 }
 
 ToolLauncher::~ToolLauncher()
@@ -95,6 +106,8 @@ ToolLauncher::~ToolLauncher()
 		delete *it;
 	devices.clear();
 
+	tl_api->save();
+	delete tl_api;
 	delete ui;
 }
 
@@ -105,7 +118,7 @@ void ToolLauncher::destroyPopup()
 	popup->deleteLater();
 }
 
-void ToolLauncher::addContext(const QString& uri)
+QPushButton * ToolLauncher::addContext(const QString& uri)
 {
 	auto pair = new QPair<QWidget, Ui::Device>;
 	pair->second.setupUi(&pair->first);
@@ -119,6 +132,8 @@ void ToolLauncher::addContext(const QString& uri)
 
 	pair->second.btn->setProperty("uri", QVariant(uri));
 	devices.append(pair);
+
+	return pair->second.btn;
 }
 
 void ToolLauncher::addRemoteContext()
@@ -186,11 +201,6 @@ void adiscope::ToolLauncher::on_btnNetworkAnalyzer_clicked()
 	swapMenu(static_cast<QWidget *>(network_analyzer));
 }
 
-void ToolLauncher::window_destroyed()
-{
-	windows.removeOne(static_cast<QMainWindow *>(QObject::sender()));
-}
-
 void adiscope::ToolLauncher::apply_m2k_fixes(struct iio_context *ctx)
 {
 	struct iio_device *dev = iio_context_find_device(ctx, "ad9963");
@@ -228,6 +238,9 @@ void adiscope::ToolLauncher::device_btn_clicked(bool pressed)
 		for (auto it = devices.begin(); it != devices.end(); ++it)
 			if ((*it)->second.btn != sender())
 				(*it)->second.btn->setChecked(false);
+
+		if (ui->btnConnect->property("connected").toBool())
+			ui->btnConnect->click();
 	} else {
 		destroyContext();
 	}
@@ -281,10 +294,7 @@ void adiscope::ToolLauncher::destroyContext()
 	ui->powerControl->setDisabled(true);
 	ui->logicAnalyzer->setDisabled(true);
 	ui->patternGenerator->setDisabled(true);
-
-	for (auto it = windows.begin(); it != windows.end(); ++it)
-		delete *it;
-	windows.clear();
+	ui->networkAnalyzer->setDisabled(true);
 
 	if (dmm) {
 		delete dmm;
@@ -367,14 +377,14 @@ void adiscope::ToolLauncher::enableCalibTools(float gain_ch1, float gain_ch2)
 	}
 
 	if (filter->compatible(TOOL_DMM)) {
-		dmm = new DMM(ctx, filter, ui->stopDMM,
+		dmm = new DMM(ctx, filter, ui->stopDMM, &js_engine,
 				gain_ch1, gain_ch2, this);
 		dmm->setVisible(false);
 		ui->dmm->setEnabled(true);
 	}
 }
 
-bool adiscope::ToolLauncher::switchContext(QString &uri)
+bool adiscope::ToolLauncher::switchContext(const QString &uri)
 {
 	destroyContext();
 
@@ -430,4 +440,70 @@ bool adiscope::ToolLauncher::switchContext(QString &uri)
 	QtConcurrent::run(std::bind(&ToolLauncher::calibrate, this));
 
 	return true;
+}
+
+void ToolLauncher::hasText()
+{
+	QTextStream in(stdin);
+	QTextStream out(stdout);
+
+	js_cmd.append(in.readLine());
+
+	unsigned int nb_open_braces = js_cmd.count(QChar('{'));
+	unsigned int nb_closing_braces = js_cmd.count(QChar('}'));
+
+	if (nb_open_braces == nb_closing_braces) {
+		QJSValue val = js_engine.evaluate(js_cmd);
+		if (val.isError())
+			out << "Exception:" << val.toString() << endl;
+		else if (!val.isUndefined())
+			out << val.toString() << endl;
+
+		js_cmd.clear();
+		out << "scopy > ";
+	} else {
+		js_cmd.append(QChar('\n'));
+
+		out << "> ";
+	}
+	out.flush();
+}
+
+bool ToolLauncher_API::menu_opened() const
+{
+	return tl->ui->btnMenu->isChecked();
+}
+
+void ToolLauncher_API::open_menu(bool open)
+{
+	tl->ui->btnMenu->setChecked(open);
+}
+
+bool ToolLauncher_API::hidden() const
+{
+	return !tl->isVisible();
+}
+
+void ToolLauncher_API::hide(bool hide)
+{
+	tl->setVisible(!hide);
+}
+
+bool ToolLauncher_API::connect(const QString& uri)
+{
+	QPushButton *btn = nullptr;
+
+	for (auto it = tl->devices.begin();
+			!btn && it != tl->devices.end(); ++it) {
+		QPushButton *tmp = (*it)->second.btn;
+
+		if (tmp->property("uri").toString().compare(uri) == 0)
+			btn = tmp;
+	}
+
+	if (!btn)
+		btn = tl->addContext(uri);
+
+	btn->click();
+	tl->ui->btnConnect->click();
 }

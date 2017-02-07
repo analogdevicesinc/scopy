@@ -31,13 +31,14 @@
 using namespace adiscope;
 
 static const std::string tool_names[] = {
-	"oscilloscope",
-	"signal-generator",
-	"voltmeter",
-	"power-controller",
-	"logic-analyzer-rx",
-	"logic-analyzer-tx",
-	"network-analyzer",
+	"osc",
+	"siggen",
+	"dmm",
+	"power",
+	"logic",
+	"pattern",
+	"network",
+	"launcher",
 };
 
 Filter::Filter(const struct iio_context *ctx)
@@ -95,6 +96,11 @@ Filter::~Filter()
 QString& Filter::hw_name()
 {
 	return hwname;
+}
+
+const std::string& Filter::tool_name(enum tool tool)
+{
+	return tool_names[tool];
 }
 
 bool Filter::compatible(enum tool tool) const

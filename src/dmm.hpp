@@ -24,6 +24,7 @@
 #include <QTimer>
 #include <QWidget>
 
+#include "apiObject.hpp"
 #include "filter.hpp"
 #include "iio_manager.hpp"
 #include "peek_sample.hpp"
@@ -32,15 +33,22 @@ namespace Ui {
 	class DMM;
 }
 
+class QJSEngine;
+
 namespace adiscope {
+	class DMM_API;
+
 	class DMM : public QWidget
 	{
+		friend class DMM_API;
+
 		Q_OBJECT
 
 	public:
 		explicit DMM(struct iio_context *ctx, Filter *filt,
-				QPushButton *runButton, float gain_ch1,
-				float gain_ch2, QWidget *parent = 0);
+				QPushButton *runButton, QJSEngine *engine,
+				float gain_ch1, float gain_ch2,
+				QWidget *parent = nullptr);
 		~DMM();
 
 	private:
@@ -52,6 +60,8 @@ namespace adiscope {
 		iio_manager::port_id id_ch1, id_ch2;
 		bool mode_ac_ch1, mode_ac_ch2;
 		float gain_ch1, gain_ch2;
+
+		DMM_API *dmm_api;
 
 		void disconnectAll();
 		void configureMode(bool is_ac);
@@ -68,6 +78,38 @@ namespace adiscope {
 	private Q_SLOTS:
 		void setHistorySizeCh1(int idx);
 		void setHistorySizeCh2(int idx);
+	};
+
+	class DMM_API : public ApiObject
+	{
+		Q_OBJECT
+
+		Q_PROPERTY(bool mode_ac_ch1
+				READ get_mode_ac_ch1 WRITE set_mode_ac_ch1);
+		Q_PROPERTY(bool mode_ac_ch2
+				READ get_mode_ac_ch2 WRITE set_mode_ac_ch2);
+		Q_PROPERTY(bool running READ running WRITE run STORED false);
+
+		Q_PROPERTY(double value_ch1 READ read_ch1);
+		Q_PROPERTY(double value_ch2 READ read_ch2);
+
+	public:
+		bool get_mode_ac_ch1() const { return dmm->mode_ac_ch1; }
+		bool get_mode_ac_ch2() const { return dmm->mode_ac_ch2; }
+		void set_mode_ac_ch1(bool en) { dmm->toggleAC1(en); }
+		void set_mode_ac_ch2(bool en) { dmm->toggleAC2(en); }
+
+		double read_ch1() const;
+		double read_ch2() const;
+
+		bool running() const;
+		void run(bool en);
+
+		explicit DMM_API(DMM *dmm) : ApiObject(TOOL_DMM), dmm(dmm) {}
+		~DMM_API() {}
+
+	private:
+		DMM *dmm;
 	};
 }
 

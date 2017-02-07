@@ -26,16 +26,19 @@
 #include <gnuradio/blocks/short_to_float.h>
 #include <gnuradio/blocks/sub_ff.h>
 
+#include <QJSEngine>
+
 using namespace adiscope;
 
 DMM::DMM(struct iio_context *ctx, Filter *filt, QPushButton *runButton,
+		QJSEngine *engine,
 		float gain_ch1, float gain_ch2, QWidget *parent) :
 	QWidget(parent), ui(new Ui::DMM), timer(this),
 	manager(iio_manager::get_instance(ctx, filt->device_name(TOOL_DMM))),
 	peek_block_ch1(gnuradio::get_initial_sptr(new peek_sample<float>)),
 	peek_block_ch2(gnuradio::get_initial_sptr(new peek_sample<float>)),
 	mode_ac_ch1(false), mode_ac_ch2(false),
-	gain_ch1(gain_ch1), gain_ch2(gain_ch2)
+	gain_ch1(gain_ch1), gain_ch2(gain_ch2), dmm_api(new DMM_API(this))
 {
 	ui->setupUi(this);
 
@@ -76,6 +79,9 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, QPushButton *runButton,
 
 	if (started)
 		manager->unlock();
+
+	dmm_api->load();
+	dmm_api->js_register(engine);
 }
 
 void DMM::disconnectAll()
@@ -95,6 +101,10 @@ DMM::~DMM()
 {
 	timer.stop();
 	disconnectAll();
+
+	dmm_api->save();
+	delete dmm_api;
+
 	delete ui;
 }
 
@@ -140,6 +150,8 @@ void DMM::toggleTimer(bool start)
 		manager->stop(id_ch1);
 		manager->stop(id_ch2);
 	}
+
+	ui->run_button->setChecked(start);
 }
 
 iio_manager::port_id DMM::configureMode(bool is_ac, unsigned int ch)
@@ -198,6 +210,10 @@ void DMM::toggleAC1(bool enable)
 	}
 
 	ui->labelCh1->setText(enable ? "VRMS" : "VDC");
+	if (enable)
+		ui->btn_ch1_ac->setChecked(true);
+	else
+		ui->btn_ch1_dc->setChecked(true);
 }
 
 void DMM::toggleAC2(bool enable)
@@ -217,6 +233,10 @@ void DMM::toggleAC2(bool enable)
 	}
 
 	ui->labelCh2->setText(enable ? "VRMS" : "VDC");
+	if (enable)
+		ui->btn_ch2_ac->setChecked(true);
+	else
+		ui->btn_ch2_dc->setChecked(true);
 }
 
 int DMM::numSamplesFromIdx(int idx)
@@ -245,4 +265,24 @@ void DMM::setHistorySizeCh2(int idx)
 	int num_samples = numSamplesFromIdx(idx);
 
 	ui->sismograph_ch2->setNumSamples(num_samples);
+}
+
+bool DMM_API::running() const
+{
+	return dmm->ui->run_button->isChecked();
+}
+
+void DMM_API::run(bool en)
+{
+	dmm->ui->run_button->setChecked(en);
+}
+
+double DMM_API::read_ch1() const
+{
+	return dmm->ui->lcdCh1->value();
+}
+
+double DMM_API::read_ch2() const
+{
+	return dmm->ui->lcdCh2->value();
 }
