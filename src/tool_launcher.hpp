@@ -71,8 +71,9 @@ namespace adiscope {
 		void on_btnLogicAnalyzer_clicked();
 		void on_btnPatternGenerator_clicked();
 		void on_btnNetworkAnalyzer_clicked();
-
 		void on_btnHome_clicked();
+		void setButtonBackground(bool on);
+
 		void on_btnConnect_clicked(bool pressed);
 
 		void device_btn_clicked(bool pressed);

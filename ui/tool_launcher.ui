@@ -68,6 +68,10 @@ background-color: none;
 
 QWidget:hover {
 background-color: rgb(27, 27, 33);
+}
+
+QWidget[selected=true] {
+background-color: rgb(27, 27, 33);
 }</string>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -204,9 +208,15 @@ color: rgb(255, 255, 255);
               <height>32</height>
              </size>
             </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
             <property name="flat">
              <bool>true</bool>
             </property>
+            <attribute name="buttonGroup">
+             <string notr="true">buttonGroup_2</string>
+            </attribute>
            </widget>
           </item>
           <item>
@@ -280,9 +290,15 @@ color: rgb(255, 255, 255);
               <height>32</height>
              </size>
             </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
             <property name="flat">
              <bool>true</bool>
             </property>
+            <attribute name="buttonGroup">
+             <string notr="true">buttonGroup_2</string>
+            </attribute>
            </widget>
           </item>
           <item>
@@ -343,9 +359,15 @@ color: rgb(255, 255, 255);
               <height>32</height>
              </size>
             </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
             <property name="flat">
              <bool>true</bool>
             </property>
+            <attribute name="buttonGroup">
+             <string notr="true">buttonGroup_2</string>
+            </attribute>
            </widget>
           </item>
           <item>
@@ -438,9 +460,15 @@ background-image: url(:/menu/play.png);
               <height>32</height>
              </size>
             </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
             <property name="flat">
              <bool>true</bool>
             </property>
+            <attribute name="buttonGroup">
+             <string notr="true">buttonGroup_2</string>
+            </attribute>
            </widget>
           </item>
           <item>
@@ -533,9 +561,15 @@ background-image: url(:/menu/play.png);
               <height>32</height>
              </size>
             </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
             <property name="flat">
              <bool>true</bool>
             </property>
+            <attribute name="buttonGroup">
+             <string notr="true">buttonGroup_2</string>
+            </attribute>
            </widget>
           </item>
           <item>
@@ -622,9 +656,15 @@ background-image: url(:/menu/play.png);
               <height>32</height>
              </size>
             </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
             <property name="flat">
              <bool>true</bool>
             </property>
+            <attribute name="buttonGroup">
+             <string notr="true">buttonGroup_2</string>
+            </attribute>
            </widget>
           </item>
           <item>
@@ -732,9 +772,15 @@ background-image: url(:/menu/play.png);
               <height>32</height>
              </size>
             </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
             <property name="flat">
              <bool>true</bool>
             </property>
+            <attribute name="buttonGroup">
+             <string notr="true">buttonGroup_2</string>
+            </attribute>
            </widget>
           </item>
           <item>
@@ -821,9 +867,15 @@ background-image: url(:/menu/play.png);
               <height>32</height>
              </size>
             </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
             <property name="flat">
              <bool>true</bool>
             </property>
+            <attribute name="buttonGroup">
+             <string notr="true">buttonGroup_2</string>
+            </attribute>
            </widget>
           </item>
           <item>
@@ -916,9 +968,15 @@ background-image: url(:/menu/play.png);
               <height>32</height>
              </size>
             </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
             <property name="flat">
              <bool>true</bool>
             </property>
+            <attribute name="buttonGroup">
+             <string notr="true">buttonGroup_2</string>
+            </attribute>
            </widget>
           </item>
           <item>
@@ -1014,9 +1072,15 @@ background-image: url(:/menu/play.png);
               <height>32</height>
              </size>
             </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
             <property name="flat">
              <bool>true</bool>
             </property>
+            <attribute name="buttonGroup">
+             <string notr="true">buttonGroup_2</string>
+            </attribute>
            </widget>
           </item>
           <item>
@@ -1402,5 +1466,6 @@ background-color: red;
  </connections>
  <buttongroups>
   <buttongroup name="buttonGroup"/>
+  <buttongroup name="buttonGroup_2"/>
  </buttongroups>
 </ui>

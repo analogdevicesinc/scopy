@@ -92,6 +92,21 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	/* Show a smooth opening when the app starts */
 	ui->menu->toggleMenu(true);
 
+	connect(ui->btnOscilloscope, SIGNAL(toggled(bool)), this,
+			SLOT(setButtonBackground(bool)));
+	connect(ui->btnSignalGenerator, SIGNAL(toggled(bool)), this,
+			SLOT(setButtonBackground(bool)));
+	connect(ui->btnDMM, SIGNAL(toggled(bool)), this,
+			SLOT(setButtonBackground(bool)));
+	connect(ui->btnPowerControl, SIGNAL(toggled(bool)), this,
+			SLOT(setButtonBackground(bool)));
+	connect(ui->btnLogicAnalyzer, SIGNAL(toggled(bool)), this,
+			SLOT(setButtonBackground(bool)));
+	connect(ui->btnPatternGenerator, SIGNAL(toggled(bool)), this,
+			SLOT(setButtonBackground(bool)));
+	connect(ui->btnNetworkAnalyzer, SIGNAL(toggled(bool)), this,
+			SLOT(setButtonBackground(bool)));
+
 	js_engine.installExtensions(QJSEngine::ConsoleExtension);
 	tl_api->js_register(&js_engine);
 
@@ -164,6 +179,13 @@ void ToolLauncher::swapMenu(QWidget *menu)
 
 	ui->centralLayout->addWidget(current);
 	current->setVisible(true);
+}
+
+void ToolLauncher::setButtonBackground(bool on)
+{
+	auto *btn = static_cast<QPushButton *>(QObject::sender());
+
+	setDynamicProperty(btn->parentWidget(), "selected", on);
 }
 
 void ToolLauncher::on_btnOscilloscope_clicked()
