@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>filter.json</file>
+        <file>scopy.html</file>
         <file>icon.ico</file>
         <file>icons/trigger_delay.png</file>
         <file>icons/trigger_level.png</file>
