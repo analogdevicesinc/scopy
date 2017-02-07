@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>988</width>
-    <height>806</height>
+    <width>1280</width>
+    <height>720</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>1280</width>
+    <height>720</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Scopy</string>
@@ -72,9 +78,6 @@ background-color: rgb(27, 27, 33);
         <number>0</number>
        </property>
        <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
         <number>0</number>
        </property>
        <item>
@@ -1190,7 +1193,7 @@ font-weight: bold;
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>96</width>
+                  <width>90</width>
                   <height>64</height>
                  </size>
                 </property>
@@ -1311,7 +1314,13 @@ background-color: red;
           </widget>
          </item>
          <item>
-          <widget class="QWebView" name="webView" native="true">
+          <widget class="QWebView" name="webView">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Ignored">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="minimumSize">
             <size>
              <width>880</width>
@@ -1321,12 +1330,12 @@ background-color: red;
            <property name="styleSheet">
             <string notr="true">background-color: white;</string>
            </property>
-           <property name="url" stdset="0">
+           <property name="url">
             <url>
              <string>https://wiki.analog.com/doku.php</string>
             </url>
            </property>
-           <property name="zoomFactor" stdset="0">
+           <property name="zoomFactor">
             <double>0.800000011920929</double>
            </property>
           </widget>
@@ -1365,15 +1374,15 @@ background-color: red;
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
+   <class>QWebView</class>
+   <extends>QWidget</extends>
+   <header>QtWebKitWidgets/QWebView</header>
+  </customwidget>
+  <customwidget>
    <class>adiscope::MenuAnim</class>
    <extends>QWidget</extends>
    <header>menu_anim.hpp</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QWebView</class>
-   <extends>QWidget</extends>
-   <header>QtWebKitWidgets/QWebView</header>
   </customwidget>
   <customwidget>
    <class>adiscope::CustomPushButton</class>
