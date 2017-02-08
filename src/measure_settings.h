@@ -53,7 +53,10 @@ struct StatisticSelection {
 
 class MeasureSettings : public QWidget
 {
+	friend class Oscilloscope_API;
+
 	Q_OBJECT
+
 public:
 	explicit MeasureSettings(CapturePlot *plot, QWidget *parent = 0);
 

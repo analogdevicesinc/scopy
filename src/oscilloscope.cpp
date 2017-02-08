@@ -48,6 +48,7 @@
 #include "ui_cursors_settings.h"
 #include "ui_osc_general_settings.h"
 #include "ui_measure_panel.h"
+#include "ui_measure_settings.h"
 #include "ui_statistics_panel.h"
 #include "ui_cursor_readouts.h"
 #include "ui_oscilloscope.h"
@@ -2004,4 +2005,14 @@ bool Oscilloscope_API::hasMeasure() const
 void Oscilloscope_API::setMeasure(bool en)
 {
 	osc->measure_ui->box->setChecked(en);
+}
+
+bool Oscilloscope_API::measureAll() const
+{
+	return osc->measure_settings->m_ui->button_measDisplayAll->isChecked();
+}
+
+void Oscilloscope_API::setMeasureAll(bool en)
+{
+	osc->measure_settings->m_ui->button_measDisplayAll->setChecked(en);
 }
