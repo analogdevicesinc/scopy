@@ -82,6 +82,9 @@ namespace adiscope {
 		Q_OBJECT
 
 		Q_PROPERTY(bool sync READ syncEnabled WRITE enableSync);
+		Q_PROPERTY(int tracking_percent
+				READ getTrackingPercent
+				WRITE setTrackingPercent);
 
 	public:
 		explicit PowerController_API(PowerController *pw) :
@@ -90,6 +93,9 @@ namespace adiscope {
 
 		bool syncEnabled() const;
 		void enableSync(bool en);
+
+		int getTrackingPercent() const;
+		void setTrackingPercent(int percent);
 
 	private:
 		PowerController *pw;

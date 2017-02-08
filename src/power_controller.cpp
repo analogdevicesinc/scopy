@@ -214,3 +214,13 @@ void PowerController_API::enableSync(bool en)
 	else
 		pw->ui->notSync->click();
 }
+
+int PowerController_API::getTrackingPercent() const
+{
+	return pw->ui->trackingRatio->value();
+}
+
+void PowerController_API::setTrackingPercent(int percent)
+{
+	pw->ui->trackingRatio->setValue(percent);
+}
