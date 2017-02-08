@@ -192,16 +192,15 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 
 	/* Cursors Settings */
 	QWidget *cursor_widget = new QWidget(this);
-	Ui::Channel cursor_ui;
-
-	cursor_ui.setupUi(cursor_widget);
+	cursor_ui = new Ui::Channel();
+	cursor_ui->setupUi(cursor_widget);
 	ui->cursors_settings->addWidget(cursor_widget);
 
-	settings_group->addButton(cursor_ui.btn);
-	cursor_ui.btn->setProperty("id", QVariant(-1));
-	cursor_ui.name->setText("Cursors");
-	cursor_ui.box->setChecked(false);
-	QString stylesheet(cursor_ui.box->styleSheet());
+	settings_group->addButton(cursor_ui->btn);
+	cursor_ui->btn->setProperty("id", QVariant(-1));
+	cursor_ui->name->setText("Cursors");
+	cursor_ui->box->setChecked(false);
+	QString stylesheet(cursor_ui->box->styleSheet());
 	stylesheet += QString("\nQCheckBox::indicator {"
 				"border-color: rgb(74, 100, 255);"
 				"border-radius: 4px;"
@@ -209,10 +208,10 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 				"QCheckBox::indicator:checked {"
 				"background-color: rgb(74, 100, 255);"
 				"}");
-	cursor_ui.box->setStyleSheet(stylesheet);
-	connect(cursor_ui.btn, SIGNAL(pressed()),
+	cursor_ui->box->setStyleSheet(stylesheet);
+	connect(cursor_ui->btn, SIGNAL(pressed()),
 				this, SLOT(toggleRightMenu()));
-	connect(cursor_ui.box, SIGNAL(toggled(bool)), this,
+	connect(cursor_ui->box, SIGNAL(toggled(bool)), this,
 			SLOT(onCursorsToggled(bool)));
 
 
@@ -579,6 +578,7 @@ Oscilloscope::~Oscilloscope()
 	delete[] hist_ids;
 	delete[] fft_ids;
 	delete[] ids;
+	delete cursor_ui;
 	delete ch_ui;
 	delete gsettings_ui;
 	delete measure_panel_ui;
@@ -1983,4 +1983,14 @@ void Oscilloscope::on_btnSettings_toggled(bool checked)
 		toggleRightMenu(btn);
 		btn->setChecked(checked);
 	}
+}
+
+bool Oscilloscope_API::hasCursors() const
+{
+	return osc->cursor_ui->box->isChecked();
+}
+
+void Oscilloscope_API::setCursors(bool en)
+{
+	osc->cursor_ui->box->setChecked(en);
 }
