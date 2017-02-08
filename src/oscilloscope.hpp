@@ -157,7 +157,7 @@ namespace adiscope {
 		Ui::Oscilloscope *ui;
 		Ui::OscGeneralSettings *gsettings_ui;
 		Ui::ChannelSettings *ch_ui;
-		Ui::Channel *cursor_ui;
+		Ui::Channel *cursor_ui, *measure_ui;
 		adiscope::TriggerSettings trigger_settings;
 		adiscope::MeasureSettings *measure_settings;
 		CapturePlot plot;
@@ -268,6 +268,7 @@ namespace adiscope {
 		Q_OBJECT
 
 		Q_PROPERTY(bool cursors READ hasCursors WRITE setCursors);
+		Q_PROPERTY(bool measure READ hasMeasure WRITE setMeasure);
 
 	public:
 		explicit Oscilloscope_API(Oscilloscope *osc) :
@@ -276,6 +277,9 @@ namespace adiscope {
 
 		bool hasCursors() const;
 		void setCursors(bool en);
+
+		bool hasMeasure() const;
+		void setMeasure(bool en);
 
 	private:
 		Oscilloscope *osc;

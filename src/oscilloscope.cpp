@@ -578,6 +578,7 @@ Oscilloscope::~Oscilloscope()
 	delete[] hist_ids;
 	delete[] fft_ids;
 	delete[] ids;
+	delete measure_ui;
 	delete cursor_ui;
 	delete ch_ui;
 	delete gsettings_ui;
@@ -1549,15 +1550,15 @@ void Oscilloscope::measure_settings_init()
 		SLOT(onStatisticSelectionListChanged()));
 
 	QWidget *measure_widget = new QWidget(this);
-	Ui::Channel measure_ui;
 
-	measure_ui.setupUi(measure_widget);
+	measure_ui = new Ui::Channel();
+	measure_ui->setupUi(measure_widget);
 	ui->measure_settings->addWidget(measure_widget);
-	settings_group->addButton(measure_ui.btn);
-	measure_ui.btn->setProperty("id", QVariant(-measure_panel));
-	measure_ui.name->setText("Measure");
-	measure_ui.box->setChecked(false);
-	QString stylesheet(measure_ui.box->styleSheet());
+	settings_group->addButton(measure_ui->btn);
+	measure_ui->btn->setProperty("id", QVariant(-measure_panel));
+	measure_ui->name->setText("Measure");
+	measure_ui->box->setChecked(false);
+	QString stylesheet(measure_ui->box->styleSheet());
 	stylesheet += QString("\nQCheckBox::indicator {"
 				"border-color: rgb(74, 100, 255);"
 				"border-radius: 4px;"
@@ -1565,13 +1566,13 @@ void Oscilloscope::measure_settings_init()
 				"QCheckBox::indicator:checked {"
 				"background-color: rgb(74, 100, 255);"
 				"}");
-	measure_ui.box->setStyleSheet(stylesheet);
+	measure_ui->box->setStyleSheet(stylesheet);
 
-	connect(measure_ui.btn, SIGNAL(pressed()),
+	connect(measure_ui->btn, SIGNAL(pressed()),
 				this, SLOT(toggleRightMenu()));
-	connect(measure_ui.box, SIGNAL(toggled(bool)), this,
+	connect(measure_ui->box, SIGNAL(toggled(bool)), this,
 			SLOT(onMeasureToggled(bool)));
-	connect(measure_ui.box, SIGNAL(toggled(bool)),
+	connect(measure_ui->box, SIGNAL(toggled(bool)),
 		&plot, SLOT(setMeasuremensEnabled(bool)));
 }
 
@@ -1993,4 +1994,14 @@ bool Oscilloscope_API::hasCursors() const
 void Oscilloscope_API::setCursors(bool en)
 {
 	osc->cursor_ui->box->setChecked(en);
+}
+
+bool Oscilloscope_API::hasMeasure() const
+{
+	return osc->measure_ui->box->isChecked();
+}
+
+void Oscilloscope_API::setMeasure(bool en)
+{
+	osc->measure_ui->box->setChecked(en);
 }
