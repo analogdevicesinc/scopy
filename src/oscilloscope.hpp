@@ -35,6 +35,7 @@
 #include <QButtonGroup>
 
 /* Local includes */
+#include "apiObject.hpp"
 #include "oscilloscope_plot.hpp"
 #include "iio_manager.hpp"
 #include "filter.hpp"
@@ -50,6 +51,7 @@
 #include "osc_adc.h"
 #include "plot_utils.hpp"
 
+class QJSEngine;
 class SymmetricBufferMode;
 
 namespace Ui {
@@ -63,7 +65,7 @@ namespace Ui {
 }
 
 namespace adiscope {
-
+	class Oscilloscope_API;
 	class MeasurementData;
 	class MeasurementGui;
 	class MeasureSettings;
@@ -72,11 +74,14 @@ namespace adiscope {
 
 	class Oscilloscope : public QWidget
 	{
-	    Q_OBJECT
+		friend class Oscilloscope_API;
+
+		Q_OBJECT
 
 	public:
 		explicit Oscilloscope(struct iio_context *ctx,
 				Filter *filt, QPushButton *runButton,
+				QJSEngine *engine,
 				float gain_ch1, float gain_ch2,
 				QWidget *parent = 0);
 		~Oscilloscope();
@@ -217,6 +222,8 @@ namespace adiscope {
 		QPushButton *last_non_general_settings_btn;
 		QPushButton *menuRunButton;
 
+		Oscilloscope_API *osc_api;
+
 		QList<std::shared_ptr<MeasurementData>> measurements_data;
 		QList<std::shared_ptr<MeasurementGui>> measurements_gui;
 
@@ -253,6 +260,19 @@ namespace adiscope {
 		void statisticsUpdateGuiPosIndex();
 
 		void updateBufferPreviewer();
+	};
+
+	class Oscilloscope_API : public ApiObject
+	{
+		Q_OBJECT
+
+	public:
+		explicit Oscilloscope_API(Oscilloscope *osc) :
+			ApiObject(TOOL_OSCILLOSCOPE), osc(osc) {}
+		~Oscilloscope_API() {}
+
+	private:
+		Oscilloscope *osc;
 	};
 }
 

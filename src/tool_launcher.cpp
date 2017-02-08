@@ -392,7 +392,7 @@ void adiscope::ToolLauncher::enableCalibTools(float gain_ch1, float gain_ch2)
 {
 	if (filter->compatible(TOOL_OSCILLOSCOPE)) {
 		oscilloscope = new Oscilloscope(ctx, filter,
-				ui->stopOscilloscope,
+				ui->stopOscilloscope, &js_engine,
 				gain_ch1, gain_ch2, this);
 
 		ui->oscilloscope->setEnabled(true);

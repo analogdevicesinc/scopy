@@ -58,7 +58,7 @@ using namespace gr;
 using namespace std;
 
 Oscilloscope::Oscilloscope(struct iio_context *ctx,
-		Filter *filt, QPushButton *runButton,
+		Filter *filt, QPushButton *runButton, QJSEngine *engine,
 		float gain_ch1, float gain_ch2, QWidget *parent) :
 	QWidget(parent),
 	adc(ctx, filt),
@@ -88,7 +88,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	channels_group(new QButtonGroup(this)),
 	active_settings_btn(nullptr),
 	last_non_general_settings_btn(nullptr),
-	menuRunButton(runButton)
+	menuRunButton(runButton), osc_api(new Oscilloscope_API(this))
 {
 	ui->setupUi(this);
 	int triggers_panel = ui->stackedWidget->insertWidget(-1, &trigger_settings);
@@ -531,6 +531,9 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	// Calculate initial sample count and sample rate
 	onHorizScaleValueChanged(timeBase->value());
 	onTimePositionChanged(timePosition->value());
+
+	osc_api->load();
+	osc_api->js_register(engine);
 }
 
 Oscilloscope::~Oscilloscope()
@@ -568,6 +571,9 @@ Oscilloscope::~Oscilloscope()
 
 	gr::hier_block2_sptr hier = iio->to_hier_block2();
 	qDebug() << "OSC disconnected:\n" << gr::dot_graph(hier).c_str();
+
+	osc_api->save();
+	delete osc_api;
 
 	delete[] xy_ids;
 	delete[] hist_ids;
