@@ -201,3 +201,16 @@ void PowerController::startStop(bool start)
 	dac2_set_enabled(start);
 	ui->dac2->setChecked(start);
 }
+
+bool PowerController_API::syncEnabled() const
+{
+	return pw->ui->sync->isChecked();
+}
+
+void PowerController_API::enableSync(bool en)
+{
+	if (en)
+		pw->ui->sync->click();
+	else
+		pw->ui->notSync->click();
+}

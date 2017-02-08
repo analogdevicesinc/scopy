@@ -81,10 +81,15 @@ namespace adiscope {
 	{
 		Q_OBJECT
 
+		Q_PROPERTY(bool sync READ syncEnabled WRITE enableSync);
+
 	public:
 		explicit PowerController_API(PowerController *pw) :
 			ApiObject(TOOL_POWER_CONTROLLER), pw(pw) {}
 		~PowerController_API() {}
+
+		bool syncEnabled() const;
+		void enableSync(bool en);
 
 	private:
 		PowerController *pw;
