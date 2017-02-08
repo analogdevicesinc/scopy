@@ -90,6 +90,13 @@ namespace adiscope {
 				READ get_mode_ac_ch2 WRITE set_mode_ac_ch2);
 		Q_PROPERTY(bool running READ running WRITE run STORED false);
 
+		Q_PROPERTY(bool histogram_ch1
+				READ get_histogram_ch1
+				WRITE set_histogram_ch1);
+		Q_PROPERTY(bool histogram_ch2
+				READ get_histogram_ch2
+				WRITE set_histogram_ch2);
+
 		Q_PROPERTY(double value_ch1 READ read_ch1);
 		Q_PROPERTY(double value_ch2 READ read_ch2);
 
@@ -98,6 +105,11 @@ namespace adiscope {
 		bool get_mode_ac_ch2() const { return dmm->mode_ac_ch2; }
 		void set_mode_ac_ch1(bool en) { dmm->toggleAC1(en); }
 		void set_mode_ac_ch2(bool en) { dmm->toggleAC2(en); }
+
+		bool get_histogram_ch1() const;
+		bool get_histogram_ch2() const;
+		void set_histogram_ch1(bool en);
+		void set_histogram_ch2(bool en);
 
 		double read_ch1() const;
 		double read_ch2() const;

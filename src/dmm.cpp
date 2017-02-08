@@ -286,3 +286,23 @@ double DMM_API::read_ch2() const
 {
 	return dmm->ui->lcdCh2->value();
 }
+
+bool DMM_API::get_histogram_ch1() const
+{
+	return dmm->ui->histogramCh1->isChecked();
+}
+
+void DMM_API::set_histogram_ch1(bool en)
+{
+	dmm->ui->histogramCh1->setChecked(en);
+}
+
+void DMM_API::set_histogram_ch2(bool en)
+{
+	dmm->ui->histogramCh2->setChecked(en);
+}
+
+bool DMM_API::get_histogram_ch2() const
+{
+	return dmm->ui->histogramCh2->isChecked();
+}
