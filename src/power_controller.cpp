@@ -224,3 +224,24 @@ void PowerController_API::setTrackingPercent(int percent)
 {
 	pw->ui->trackingRatio->setValue(percent);
 }
+
+double PowerController_API::valueDac1() const
+{
+	return pw->valuePos->value();
+}
+
+void PowerController_API::setValueDac1(double value)
+{
+	pw->valuePos->setValue(value);
+}
+
+double PowerController_API::valueDac2() const
+{
+	return pw->valueNeg->value();
+}
+
+void PowerController_API::setValueDac2(double value)
+{
+	if (!syncEnabled())
+		pw->valueNeg->setValue(value);
+}

@@ -85,6 +85,8 @@ namespace adiscope {
 		Q_PROPERTY(int tracking_percent
 				READ getTrackingPercent
 				WRITE setTrackingPercent);
+		Q_PROPERTY(double dac1_value READ valueDac1 WRITE setValueDac1);
+		Q_PROPERTY(double dac2_value READ valueDac2 WRITE setValueDac2);
 
 	public:
 		explicit PowerController_API(PowerController *pw) :
@@ -96,6 +98,12 @@ namespace adiscope {
 
 		int getTrackingPercent() const;
 		void setTrackingPercent(int percent);
+
+		double valueDac1() const;
+		void setValueDac1(double value);
+
+		double valueDac2() const;
+		void setValueDac2(double value);
 
 	private:
 		PowerController *pw;
