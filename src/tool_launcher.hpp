@@ -130,6 +130,8 @@ namespace adiscope {
 		Q_PROPERTY(QString previous_ip READ getPreviousIp WRITE addIp
 				SCRIPTABLE false);
 
+		Q_PROPERTY(bool maximized READ maximized WRITE setMaximized);
+
 	public:
 		explicit ToolLauncher_API(ToolLauncher *tl) :
 			ApiObject(TOOL_LAUNCHER), tl(tl) {}
@@ -143,6 +145,14 @@ namespace adiscope {
 
 		const QString& getPreviousIp() { return tl->previousIp; }
 		void addIp(const QString& ip);
+
+		bool maximized() { return tl->isMaximized(); }
+		void setMaximized(bool m) {
+			if (m)
+				tl->showMaximized();
+			else
+				tl->showNormal();
+		}
 
 		Q_INVOKABLE bool connect(const QString& uri);
 
