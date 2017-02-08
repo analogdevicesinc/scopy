@@ -432,7 +432,7 @@ bool adiscope::ToolLauncher::switchContext(const QString &uri)
 
 	if (filter->compatible(TOOL_POWER_CONTROLLER)) {
 		power_control = new PowerController(ctx,
-				ui->stopPowerControl, this);
+				ui->stopPowerControl, &js_engine, this);
 		power_control->setVisible(false);
 		ui->powerControl->setEnabled(true);
 	}

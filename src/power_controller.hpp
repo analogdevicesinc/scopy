@@ -24,6 +24,7 @@
 #include <QWidget>
 #include <QTimer>
 
+#include "apiObject.hpp"
 #include "spinbox_a.hpp"
 
 extern "C" {
@@ -35,14 +36,21 @@ namespace Ui {
 	class PowerController;
 }
 
+class QJSEngine;
+
 namespace adiscope {
+	class PowerController_API;
+
 	class PowerController : public QWidget
 	{
+		friend class PowerController_API;
+
 		Q_OBJECT
 
 	public:
 		explicit PowerController(struct iio_context *ctx,
-				QPushButton *runButton, QWidget *parent = 0);
+				QPushButton *runButton, QJSEngine *engine,
+				QWidget *parent = 0);
 		~PowerController();
 
 	public Q_SLOTS:
@@ -65,6 +73,21 @@ namespace adiscope {
 		QPushButton *menuRunButton;
 
 		PositionSpinButton *valuePos, *valueNeg;
+
+		PowerController_API *pw_api;
+	};
+
+	class PowerController_API : public ApiObject
+	{
+		Q_OBJECT
+
+	public:
+		explicit PowerController_API(PowerController *pw) :
+			ApiObject(TOOL_POWER_CONTROLLER), pw(pw) {}
+		~PowerController_API() {}
+
+	private:
+		PowerController *pw;
 	};
 }
 
