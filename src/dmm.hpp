@@ -97,6 +97,13 @@ namespace adiscope {
 				READ get_histogram_ch2
 				WRITE set_histogram_ch2);
 
+		Q_PROPERTY(int history_ch1_size_idx
+				READ get_history_ch1_size_idx
+				WRITE set_history_ch1_size_idx);
+		Q_PROPERTY(int history_ch2_size_idx
+				READ get_history_ch2_size_idx
+				WRITE set_history_ch2_size_idx);
+
 		Q_PROPERTY(double value_ch1 READ read_ch1);
 		Q_PROPERTY(double value_ch2 READ read_ch2);
 
@@ -110,6 +117,11 @@ namespace adiscope {
 		bool get_histogram_ch2() const;
 		void set_histogram_ch1(bool en);
 		void set_histogram_ch2(bool en);
+
+		int get_history_ch1_size_idx() const;
+		int get_history_ch2_size_idx() const;
+		void set_history_ch1_size_idx(int idx);
+		void set_history_ch2_size_idx(int idx);
 
 		double read_ch1() const;
 		double read_ch2() const;

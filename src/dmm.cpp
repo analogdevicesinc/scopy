@@ -306,3 +306,23 @@ bool DMM_API::get_histogram_ch2() const
 {
 	return dmm->ui->histogramCh2->isChecked();
 }
+
+int DMM_API::get_history_ch1_size_idx() const
+{
+	return dmm->ui->historySizeCh1->currentIndex();
+}
+
+int DMM_API::get_history_ch2_size_idx() const
+{
+	return dmm->ui->historySizeCh2->currentIndex();
+}
+
+void DMM_API::set_history_ch1_size_idx(int index)
+{
+	dmm->ui->historySizeCh1->setCurrentIndex(index);
+}
+
+void DMM_API::set_history_ch2_size_idx(int index)
+{
+	dmm->ui->historySizeCh2->setCurrentIndex(index);
+}
