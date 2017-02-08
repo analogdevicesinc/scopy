@@ -410,6 +410,9 @@ bool adiscope::ToolLauncher::switchContext(const QString &uri)
 {
 	destroyContext();
 
+	if (uri.startsWith("ip:"))
+		previousIp = uri.mid(3);
+
 	ctx = iio_create_context_from_uri(uri.toStdString().c_str());
 	if (!ctx)
 		return false;
@@ -491,6 +494,20 @@ void ToolLauncher::hasText()
 	out.flush();
 }
 
+void ToolLauncher::checkIp(const QString& ip)
+{
+	if (iio_create_network_context(ip.toStdString().c_str())) {
+		previousIp = ip;
+
+		QString uri = "ip:" + ip;
+		QMetaObject::invokeMethod(this, "addContext",
+				Qt::QueuedConnection,
+				Q_ARG(const QString&, uri));
+	} else {
+		previousIp = "";
+	}
+}
+
 bool ToolLauncher_API::menu_opened() const
 {
 	return tl->ui->btnMenu->isChecked();
@@ -528,4 +545,10 @@ bool ToolLauncher_API::connect(const QString& uri)
 
 	btn->click();
 	tl->ui->btnConnect->click();
+}
+
+void ToolLauncher_API::addIp(const QString& ip)
+{
+	if (!ip.isEmpty())
+		QtConcurrent::run(std::bind(&ToolLauncher::checkIp, tl, ip));
 }

@@ -105,13 +105,15 @@ namespace adiscope {
 		QJSEngine js_engine;
 		QString js_cmd;
 		QSocketNotifier notifier;
+		QString previousIp;
 
 		void swapMenu(QWidget *menu);
 		void destroyContext();
 		bool switchContext(const QString &uri);
 		void resetStylesheets();
 		void calibrate();
-		QPushButton * addContext(const QString& hostname);
+		void checkIp(const QString& ip);
+		Q_INVOKABLE QPushButton * addContext(const QString& hostname);
 
 		static void apply_m2k_fixes(struct iio_context *ctx);
 	};
@@ -125,6 +127,9 @@ namespace adiscope {
 
 		Q_PROPERTY(bool hidden READ hidden WRITE hide STORED false);
 
+		Q_PROPERTY(QString previous_ip READ getPreviousIp WRITE addIp
+				SCRIPTABLE false);
+
 	public:
 		explicit ToolLauncher_API(ToolLauncher *tl) :
 			ApiObject(TOOL_LAUNCHER), tl(tl) {}
@@ -135,6 +140,9 @@ namespace adiscope {
 
 		bool hidden() const;
 		void hide(bool hide);
+
+		const QString& getPreviousIp() { return tl->previousIp; }
+		void addIp(const QString& ip);
 
 		Q_INVOKABLE bool connect(const QString& uri);
 
