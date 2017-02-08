@@ -314,6 +314,8 @@ public:
 	std::shared_ptr<TraceTreeItem> add_decoder();
 	void set_decoder_to_group(std::shared_ptr<TraceTreeItem> trace, const srd_decoder* decoder);
 	void remove_trace_clones();
+	Ruler *ruler_;
+	void set_offset(double timePos, double timeSpan, bool running);
 
 private Q_SLOTS:
 
@@ -370,7 +372,6 @@ private:
 	Session &session_;
 
 	Viewport *viewport_;
-	Ruler *ruler_;
 	Header *header_;
 	QWidget *status_bar_;
 	QLabel *zoom_label_;
@@ -379,6 +380,7 @@ private:
 	/// The view time scale
 	double scale_;
 	double backup_scale_;
+	double start_plot_offset_;
 
 	/// The view time offset in seconds.
 	pv::util::Timestamp offset_;

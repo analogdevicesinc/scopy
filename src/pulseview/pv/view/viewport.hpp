@@ -55,7 +55,7 @@ public:
     void setDivisionOffset(int value);
 
 	int getTimeTriggerPos() const;
-	void setTimeTriggerPos(int value);
+	void setTimeTriggerPos(double value);
 
 private:
     /**
@@ -124,7 +124,10 @@ private:
     int divisionCount = 10;
     int divisionOffset = 3;
 
-	int timeTriggerPos;
+	double timeTriggerPos;
+
+Q_SIGNALS:
+	void requestTriggerPos(int);
 
 };
 

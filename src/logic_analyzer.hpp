@@ -35,6 +35,7 @@
 #include "handles_area.hpp"
 #include "plot_line_handle.h"
 #include "spinbox_a.hpp"
+#include "la_capture_params.hpp"
 
 using namespace pv;
 using namespace pv::toolbars;
@@ -44,6 +45,7 @@ using sigrok::Context;
 namespace pv {
 namespace view {
 class Viewport;
+class Ruler;
 }
 class Session;
 }
@@ -69,7 +71,9 @@ public:
 	                       QWidget *parent = 0);
 	~LogicAnalyzer();
 	void updateAreaTimeTriggerPadding();
-
+	void set_trigger_to_device(int chid, std::string trigger_val);
+	std::string get_trigger_from_device(int chid);
+	void set_triggered_status(bool value);
 private Q_SLOTS:
 	void startStop(bool start);
 	void toggleRightMenu();
@@ -83,6 +87,8 @@ private Q_SLOTS:
 
 public Q_SLOTS:
 	void onTimeTriggerHandlePosChanged(int);
+	void onTimePositionSpinboxChanged(double value);
+	void refreshTriggerPos();
 
 private:
 	Ui::LogicAnalyzer *ui;
@@ -106,9 +112,12 @@ private:
 
 	static const unsigned long maxBuffersize;
 	static const unsigned long maxSampleRate;
+	static const unsigned long maxTriggerBufferSize;
 	double active_sampleRate;
 	unsigned long active_sampleCount;
 	unsigned long custom_sampleCount;
+	long long active_triggerSampleCount;
+	double active_timePos;
 	double pickSampleRateFor(double timeSpanSecs,
 		double desiredBufferSize);
 
@@ -141,8 +150,16 @@ private:
 
 	bool running = false;
 	void setSampleRate();
+	void setTriggerDelay();
+	void setHWTriggerDelay(long long delay);
 	double plotRefreshRate;
 	int timespanLimitStream;
+
+	double pixelToTime(int pix);
+	int timeToPixel(double time);
+
+	std::shared_ptr<LogicAnalyzerSymmetricBufferMode> symmBufferMode;
+
 };
 }
 

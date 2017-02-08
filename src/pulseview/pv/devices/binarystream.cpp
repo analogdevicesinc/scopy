@@ -25,6 +25,7 @@
 #include "binarystream.hpp"
 #include <iio.h>
 #include <iostream>
+#include "logic_analyzer.hpp"
 
 namespace pv {
 namespace devices {
@@ -33,14 +34,17 @@ BinaryStream::BinaryStream(const std::shared_ptr<sigrok::Context> &context,
 			   struct iio_device *dev,
 			   size_t buffersize,
 			   std::shared_ptr<sigrok::InputFormat> format,
-			   const std::map<std::string, Glib::VariantBase> &options) :
+			   const std::map<std::string, Glib::VariantBase> &options,
+			   adiscope::LogicAnalyzer* parent) :
 	context_(context),
 	dev_(dev),
 	format_(format),
 	options_(options),
 	interrupt_(false),
 	buffersize_(buffersize),
-	single_(false)
+	single_(false),
+	running(false),
+	la(parent)
 {
 	/* 10 buffers, 10ms each -> 250ms before we lose data */
 	iio_device_set_kernel_buffers_count(dev_, 25);
@@ -102,6 +106,7 @@ void BinaryStream::start()
 
 void BinaryStream::run()
 {
+	running = true;
 	size_t nrx = 0;
 	input_->reset();
 	interrupt_ = false;
@@ -112,12 +117,23 @@ void BinaryStream::run()
 		if (nbytes_rx < 0)
 		{
 			printf("Error refilling buf %d\n", (int)nbytes_rx);
-			shutdown();
+			la->set_triggered_status(false);
+			input_->send(data_, 0);
+			if( running )
+			{
+				stop();
+				interrupt_ = false;
+				start();
+			}
 		}
-		nrx += nbytes_rx / 2;
-		input_->send(iio_buffer_start(data_), (size_t)(nbytes_rx));
-		if( single_ )
-			interrupt_ = true;
+		else{
+			nrx += nbytes_rx / 2;
+			input_->send(iio_buffer_start(data_), (size_t)(nbytes_rx));
+			la->set_triggered_status(true);
+			if( single_ )
+				interrupt_ = true;
+
+		}
 	}
 	input_->end();
 	interrupt_ = false;
@@ -145,16 +161,18 @@ void BinaryStream::set_options(std::map<std::string, Glib::VariantBase> opt)
 
 /* cleanup and exit */
 void BinaryStream::shutdown() {
-	printf("SHUTDOWN");
 	getchar();
 	exit(0);
 }
 
 void BinaryStream::stop()
 {
+	running = false;
 	interrupt_ = true;
-	iio_buffer_destroy(data_);
-	qDebug() << "binary stream stopped\n";
+	if( data_ )
+	{
+		iio_buffer_destroy(data_);
+	}
 }
 
 } // namespace devices

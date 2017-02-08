@@ -25,9 +25,13 @@
 #include <libsigrokcxx/libsigrokcxx.hpp>
 #include "device.hpp"
 
+
 extern "C" {
 	struct iio_device;
 	struct iio_buffer;
+}
+namespace adiscope {
+	class LogicAnalyzer;
 }
 
 namespace pv {
@@ -41,7 +45,8 @@ public:
 		     struct iio_device *data,
 		     size_t buffersize,
 		     std::shared_ptr<sigrok::InputFormat> format,
-		     const std::map<std::string, Glib::VariantBase> &options);
+		     const std::map<std::string, Glib::VariantBase> &options,
+		     adiscope::LogicAnalyzer* parent);
 	~BinaryStream();
 
 	void open();
@@ -83,6 +88,8 @@ private:
 	std::atomic<bool> interrupt_;
 	size_t buffersize_;
 	bool single_;
+	bool running;
+	adiscope::LogicAnalyzer* la;
 };
 
 } // namespace devices

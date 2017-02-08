@@ -29,8 +29,7 @@ namespace adiscope {
 LogicAnalyzerChannel::LogicAnalyzerChannel(uint16_t id_,
                 std::string label_) :
 	Channel(id_,label_),
-	channel_role(nullptr),
-	trigger("rising")
+	channel_role(nullptr)
 {
 }
 
@@ -428,6 +427,14 @@ const srd_channel* LogicAnalyzerChannelGroup::get_srd_channel_from_name(const ch
 	return nullptr;
 }
 
+std::vector<std::string> LogicAnalyzerChannelGroupUI::trigger_mapping = {
+		"none",
+		"edge-any",
+		"edge-rising",
+		"edge-falling",
+		"level-low",
+		"level-high",
+};
 
 LogicAnalyzerChannelGroupUI::LogicAnalyzerChannelGroupUI(
         LogicAnalyzerChannelGroup *chg,
@@ -440,6 +447,22 @@ LogicAnalyzerChannelGroupUI::LogicAnalyzerChannelGroupUI(
 	this->lchg = chg;
 	this->chm_ui = chm_ui;
 	setAcceptDrops(true);
+
+	/* Set triggerCombo index according to the device */
+	LogicAnalyzerChannel *ch;
+	if( !lchg->is_grouped() )
+	{
+		ch = static_cast<LogicAnalyzerChannel*>(lchg->get_channel());
+		std::string trigger_val = chm_ui->la->get_trigger_from_device(ch->get_id());
+		for(int i = 0; i < trigger_mapping.size(); i++)
+		{
+			if( trigger_val == trigger_mapping[i] )
+			{
+				ch->setTrigger(trigger_val);
+				ui->comboBox->setCurrentIndex(i);
+			}
+		}
+	}
 }
 
 void LogicAnalyzerChannelGroupUI::set_decoder(std::string value)
@@ -669,6 +692,21 @@ void LogicAnalyzerChannelGroupUI::decoderChanged(const QString text)
 		chm_ui->createSettingsWidget();
 	}
 	chm_ui->update_ui_children(this);
+}
+
+void LogicAnalyzerChannelGroupUI::triggerChanged(int index)
+{
+	LogicAnalyzerChannel *ch;
+	if( !lchg->is_grouped() )
+	{
+		ch = static_cast<LogicAnalyzerChannel*>(lchg->get_channel());
+		std::string trigger_val = trigger_mapping[index];
+		if( trigger_val != ch->getTrigger() )
+		{
+			ch->setTrigger(trigger_val);
+			chm_ui->la->set_trigger_to_device(ch->get_id(), trigger_val);
+		}
+	}
 }
 
 LogicAnalyzerChannelGroup *LogicAnalyzerChannelGroupUI::getChannelGroup()
@@ -1200,6 +1238,10 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 				lachannelgroupUI->ui->line_2->setVisible(false);
 				lachannelgroupUI->ui->decoderCombo->setVisible(false);
 				lachannelgroupUI->ui->indexLabel->setText(QString::number(index));
+
+				connect(lachannelgroupUI->ui->comboBox,
+				        SIGNAL(currentIndexChanged(int)),
+				        lachannelgroupUI, SLOT(triggerChanged(int)));
 
 			}
 		}

@@ -62,6 +62,9 @@ Ruler::Ruler(View &parent) :
 		this, SLOT(invalidate_tick_position_cache()));
 	connect(&view_, SIGNAL(time_unit_changed()),
 		this, SLOT(invalidate_tick_position_cache()));
+
+	ruler_offset = pv::util::Timestamp(0);
+	timeTriggerPx = 0;
 }
 
 QSize Ruler::sizeHint() const
@@ -139,10 +142,10 @@ void Ruler::paintEvent(QPaintEvent*)
 				this->view_.time_unit(),
 				this->view_.tick_precision());
 		};
-
+		pv::util::Timestamp offset_used = (ruler_offset != 0) ? ruler_offset : view_.offset();
 		tick_position_cache_ = calculate_tick_positions(
 			view_.tick_period(),
-			view_.offset(),
+			offset_used,
 			view_.scale(),
 			width(),
 			ffunc);
@@ -159,12 +162,16 @@ void Ruler::paintEvent(QPaintEvent*)
 	QPainter p(this);
 	if( view_.viewport()->getTimeTriggerPos() != 0 )
 	{
-		int pos = view_.viewport()->getTimeTriggerPos();
+		int perc = view_.viewport()->getTimeTriggerPos();
+		int valuePx = view_.viewport()->geometry().width() * perc / 100;
+		if( valuePx != timeTriggerPx )
+			Q_EMIT repaintTriggerHandle();
+		timeTriggerPx = valuePx;
 		QPen pen = QPen(QColor(74, 100, 255));
 		p.setPen(pen);
 
-		QPoint p1 = QPoint(pos, 0);
-		QPoint p2 = QPoint(pos, ruler_height);
+		QPoint p1 = QPoint(valuePx, 0);
+		QPoint p2 = QPoint(valuePx, ruler_height);
 		p.drawLine(p1, p2);
 	}
 	// Draw the tick marks
@@ -196,6 +203,18 @@ void Ruler::paintEvent(QPaintEvent*)
 			i->label_rect(r).contains(mouse_point_);
 		i->paint_label(p, r, highlight);
 	}
+}
+
+
+void Ruler::set_offset(double value)
+{
+	pv::util::Timestamp new_offset = pv::util::Timestamp(value);
+	ruler_offset = new_offset;
+}
+
+double Ruler::get_offset()
+{
+	return ruler_offset.convert_to<double>();
 }
 
 Ruler::TickPositions Ruler::calculate_tick_positions(

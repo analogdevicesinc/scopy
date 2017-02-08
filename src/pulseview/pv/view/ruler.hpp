@@ -105,6 +105,10 @@ public:
 		unsigned precision = 0,
 		bool sign = true);
 
+	void set_offset(double val);
+
+	double get_offset();
+
 private:
 	/**
 	 * Gets the time items.
@@ -166,6 +170,8 @@ private:
 
 	static int divisionCount_;
 
+	pv::util::Timestamp ruler_offset;
+	int timeTriggerPx;
 protected:
 	void resizeEvent(QResizeEvent*) override;
 
@@ -174,6 +180,8 @@ private Q_SLOTS:
 
 	// Resets the 'tick_position_cache_'.
 	void invalidate_tick_position_cache();
+Q_SIGNALS:
+	void repaintTriggerHandle();
 };
 
 } // namespace view

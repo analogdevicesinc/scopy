@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>600</width>
-    <height>38</height>
+    <height>40</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -719,7 +719,7 @@ padding:0px;
             <string notr="true"/>
            </property>
            <property name="currentIndex">
-            <number>2</number>
+            <number>0</number>
            </property>
            <widget class="QWidget" name="pageChannel">
             <property name="sizePolicy">
@@ -1165,18 +1165,20 @@ border-right:0px solid transparent;</string>
               </property>
               <property name="iconSize">
                <size>
-                <width>16</width>
-                <height>16</height>
+                <width>30</width>
+                <height>30</height>
                </size>
+              </property>
+              <property name="frame">
+               <bool>false</bool>
               </property>
               <item>
                <property name="text">
-                <string/>
+                <string extracomment="any edge"/>
                </property>
                <property name="icon">
-                <iconset>
-                 <normalon>:/icons/trigger-marker-rising.svg</normalon>
-                </iconset>
+                <iconset resource="../resources/resources.qrc">
+                 <normaloff>:/icons/trigger-any.svg</normaloff>:/icons/trigger-any.svg</iconset>
                </property>
               </item>
               <item>
@@ -1184,9 +1186,8 @@ border-right:0px solid transparent;</string>
                 <string/>
                </property>
                <property name="icon">
-                <iconset>
-                 <normalon>:/icons/trigger-marker-falling.svg</normalon>
-                </iconset>
+                <iconset resource="../resources/resources.qrc">
+                 <normaloff>:/icons/trigger-falling.svg</normaloff>:/icons/trigger-falling.svg</iconset>
                </property>
               </item>
               <item>
@@ -1194,9 +1195,8 @@ border-right:0px solid transparent;</string>
                 <string/>
                </property>
                <property name="icon">
-                <iconset>
-                 <normalon>:/icons/trigger-high.svg</normalon>
-                </iconset>
+                <iconset resource="../resources/resources.qrc">
+                 <normaloff>:/icons/trigger-rising.svg</normaloff>:/icons/trigger-rising.svg</iconset>
                </property>
               </item>
               <item>
@@ -1204,9 +1204,8 @@ border-right:0px solid transparent;</string>
                 <string/>
                </property>
                <property name="icon">
-                <iconset>
-                 <normalon>:/icons/trigger-low.svg</normalon>
-                </iconset>
+                <iconset resource="../resources/resources.qrc">
+                 <normaloff>:/icons/trigger-low.svg</normaloff>:/icons/trigger-low.svg</iconset>
                </property>
               </item>
               <item>
@@ -1214,19 +1213,8 @@ border-right:0px solid transparent;</string>
                 <string/>
                </property>
                <property name="icon">
-                <iconset>
-                 <normalon>:/icons/trigger-none.svg</normalon>
-                </iconset>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset>
-                 <normalon>:/icons/trigger-marker-change.svg</normalon>
-                </iconset>
+                <iconset resource="../resources/resources.qrc">
+                 <normaloff>:/icons/trigger-high.svg</normaloff>:/icons/trigger-high.svg</iconset>
                </property>
               </item>
              </widget>
@@ -1862,6 +1850,8 @@ QCheckBox::indicator:!checked {
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../resources/resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

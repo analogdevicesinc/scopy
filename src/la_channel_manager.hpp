@@ -123,6 +123,7 @@ private Q_SLOTS:
 	void set_decoder(std::string value);
 	void collapse_group();
 	void decoderChanged(const QString);
+	void triggerChanged(int);
 	void mousePressEvent(QMouseEvent *) override;
 	void mouseMoveEvent(QMouseEvent *) override;
 	void dragEnterEvent(QDragEnterEvent *event);
@@ -131,6 +132,7 @@ private Q_SLOTS:
 	void dropEvent(QDropEvent *event);
 private:
 	std::shared_ptr<pv::view::TraceTreeItem> trace;
+	static std::vector<std::string> trigger_mapping;
 public Q_SLOTS:
 	void remove();
 	void enable(bool enabled);

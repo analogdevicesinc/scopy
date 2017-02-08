@@ -36,6 +36,7 @@
 #include "pulseview/pv/view/view.hpp"
 #include "pulseview/pv/devicemanager.hpp"
 #include "pulseview/pv/session.hpp"
+#include "pulseview/pv/view/ruler.hpp"
 #include "streams_to_short.h"
 #include "logic_analyzer.hpp"
 #include "spinbox_a.hpp"
@@ -62,6 +63,7 @@ using namespace Glibmm;
 
 const unsigned long LogicAnalyzer::maxBuffersize = 16000;
 const unsigned long LogicAnalyzer::maxSampleRate = 80000000;
+const unsigned long LogicAnalyzer::maxTriggerBufferSize = 8192;
 
 LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
                              Filter *filt,
@@ -78,10 +80,21 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	ui(new Ui::LogicAnalyzer),
 	active_settings_btn(nullptr),
 	timespanLimitStream(1),
-	plotRefreshRate(100)
+	plotRefreshRate(100),
+	active_sampleRate(0.0),
+	active_sampleCount(0),
+	active_triggerSampleCount(0),
+	active_timePos(0)
 {
 	ui->setupUi(this);
 	this->setAttribute(Qt::WA_DeleteOnClose, true);
+	iio_context_set_timeout(ctx, UINT_MAX);
+
+	symmBufferMode = make_shared<LogicAnalyzerSymmetricBufferMode>();
+	symmBufferMode->setMaxSampleRate(80000000);
+	symmBufferMode->setEntireBufferMaxSize(500000); // max 0.5 mega-samples
+	symmBufferMode->setTriggerBufferMaxSize(8192); // 8192 is what hardware supports
+	symmBufferMode->setTimeDivisionCount(10);
 
 	/* Time position widget */
 	this->d_bottomHandlesArea = new HorizHandlesArea(this);
@@ -97,7 +110,6 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 
 	d_timeTriggerHandle->setPen(QPen(QColor(74, 100, 255)));
 	d_timeTriggerHandle->setInnerSpacing(0);
-	d_timeTriggerHandle->hide();
 
 	connect(d_timeTriggerHandle, SIGNAL(positionChanged(int)),
 		this, SLOT(onTimeTriggerHandlePosChanged(int)));
@@ -166,17 +178,12 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	                          QSizePolicy::Expanding));
 	ui->generalSettings->setLayout(vLayout);
 
-	timeBase->setValue(1e-3);
-	setTimebaseLabel(timeBase->value());
-	onHorizScaleValueChanged(timeBase->value());
-	setBuffersizeLabelValue(active_sampleCount);
-	setSamplerateLabelValue(active_sampleRate);
 	options["numchannels"] = Glib::Variant<gint32>(
 			g_variant_new_int32(no_channels),true);
 	logic_analyzer_ptr = std::make_shared<pv::devices::BinaryStream>(
 	                             device_manager.context(), dev, maxBuffersize,
 	                             w->get_format_from_string("binary"),
-	                             options);
+	                             options, this);
 
 	/* setup view */
 	main_win = w;
@@ -222,6 +229,10 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 		this, SLOT(onHorizScaleValueChanged(double)));
 	connect(timeBase, SIGNAL(valueChanged(double)),
 		this, SLOT(setTimebaseLabel(double)));
+	connect(timePosition, SIGNAL(valueChanged(double)),
+		this, SLOT(onTimePositionSpinboxChanged(double)));
+	connect(main_win->view_->ruler_, SIGNAL(repaintTriggerHandle()),
+		this, SLOT(refreshTriggerPos()));
 
 	chm_ui = new LogicAnalyzerChannelManagerUI(0, main_win, &chm, ui->colorSettings,
 	                this);
@@ -239,6 +250,17 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 
 	ui->areaTimeTriggerLayout->addWidget(this->bottomHandlesArea(), 0, 1, 1, 3);
 	updateAreaTimeTriggerPadding();
+	ui->triggerStateLabel->setText("Stop");
+
+	this->ensurePolished();
+	timeBase->setValue(1e-3);
+	setTimebaseLabel(timeBase->value());
+	onHorizScaleValueChanged(timeBase->value());
+	setBuffersizeLabelValue(active_sampleCount);
+	setSamplerateLabelValue(active_sampleRate);
+
+	timePosition->setValue(0);
+	timePosition->valueChanged(timePosition->value());
 }
 
 
@@ -270,14 +292,25 @@ double LogicAnalyzer::pickSampleRateFor(double timeSpanSecs, double desiredBuffe
 	return idealSamplerate;
 }
 
+void LogicAnalyzer::set_triggered_status(bool value)
+{
+	if( !value )
+		ui->triggerStateLabel->setText("Waiting");
+	else
+		ui->triggerStateLabel->setText("Trig'd");
+}
+
 void LogicAnalyzer::onHorizScaleValueChanged(double value)
 {
-	double old_samplerate = active_sampleRate;
+	symmBufferMode->setTimeBase(value);
+	LogicAnalyzerSymmetricBufferMode::capture_parameters params = symmBufferMode->captureParameters();
+	active_sampleRate = params.sampleRate;
+	active_sampleCount = params.entireBufferSize;
+	active_triggerSampleCount = -(long long)params.triggerBufferSize;
+	active_timePos = -params.timePos;
+
 	double plotTimeSpan = value * 10; //Hdivision count
-	double newSampleRate = pickSampleRateFor(plotTimeSpan, maxBuffersize);
-	int newSampleCount = newSampleRate * plotTimeSpan + 0.5;
-	active_sampleRate = newSampleRate;
-	active_sampleCount = newSampleCount;
+
 	custom_sampleCount = maxBuffersize / plotRefreshRate;
 
 	if( running )
@@ -285,15 +318,25 @@ void LogicAnalyzer::onHorizScaleValueChanged(double value)
 		setSampleRate();
 		setBuffersizeLabelValue(active_sampleCount);
 		setSamplerateLabelValue(active_sampleRate);
+		setHWTriggerDelay(active_triggerSampleCount);
+
+		if( timePosition->value() != -params.timePos ) {
+			timePosition->setValue(-params.timePos);
+		}
 	}
+	setTriggerDelay();
 	if( plotTimeSpan >= timespanLimitStream )
 	{
 		logic_analyzer_ptr->set_buffersize(custom_sampleCount);
 	}
 	else if( logic_analyzer_ptr )
 	{
-		logic_analyzer_ptr->set_buffersize(maxBuffersize);
+		logic_analyzer_ptr->set_buffersize(active_sampleCount);
+		main_win->session_.set_buffersize(active_sampleCount);
 	}
+
+	// Change the sensitivity of time position control
+	timePosition->setStep(value / 10);
 }
 
 void LogicAnalyzer::setSampleRate()
@@ -349,9 +392,76 @@ QWidget* LogicAnalyzer::bottomHandlesArea()
 	return d_bottomHandlesArea;
 }
 
+void LogicAnalyzer::refreshTriggerPos()
+{
+	d_timeTriggerHandle->setPositionSilenty(timeToPixel(-timePosition->value()));
+}
+
+void LogicAnalyzer::onTimePositionSpinboxChanged(double value)
+{
+	symmBufferMode->setTriggerPos(-value);
+	SymmetricBufferMode::capture_parameters params = symmBufferMode->captureParameters();
+	active_sampleRate = params.sampleRate;
+	active_sampleCount = params.entireBufferSize;
+	active_triggerSampleCount = -(long long)params.triggerBufferSize;
+	active_timePos = -params.timePos;
+
+	int pix = timeToPixel(-value);
+	if( pix != d_timeTriggerHandle->position() )
+	{
+		d_timeTriggerHandle->setPositionSilenty(pix);
+	}
+
+	int width = bottomHandlesArea()->geometry().width() -
+			d_bottomHandlesArea->leftPadding() -
+			d_bottomHandlesArea->rightPadding();
+	double perc = pix * 100 / width;
+	main_win->view_->viewport()->setTimeTriggerPos(perc);
+	if( running )
+	{
+		setHWTriggerDelay(active_triggerSampleCount);
+		setSampleRate();
+		setBuffersizeLabelValue(active_sampleCount);
+		setSamplerateLabelValue(active_sampleRate);
+	}
+	setTriggerDelay();
+}
+
 void LogicAnalyzer::onTimeTriggerHandlePosChanged(int pos)
 {
-	main_win->view_->viewport()->setTimeTriggerPos(pos);
+	int width = bottomHandlesArea()->geometry().width() -
+			d_bottomHandlesArea->leftPadding() -
+			d_bottomHandlesArea->rightPadding();
+	double perc = pos * 100 / width;
+	main_win->view_->viewport()->setTimeTriggerPos(perc);
+	double time = pixelToTime(pos);
+	if( (time + timeBase->value() * 10 / 2) != timePosition->value() )
+	{
+		timePosition->setValue(time + timeBase->value() * 10 / 2);
+	}
+	else {
+		setTriggerDelay();
+	}
+}
+
+double LogicAnalyzer::pixelToTime(int pix)
+{
+	double timeSpan = timeBase->value() * 10;
+	int width = bottomHandlesArea()->geometry().width() -
+		d_bottomHandlesArea->leftPadding() -
+		d_bottomHandlesArea->rightPadding();
+	double timestamp = timeSpan * pix / width;
+	return -timestamp;
+}
+
+int LogicAnalyzer::timeToPixel(double time)
+{
+	double timeSpan = timeBase->value() * 10;
+	int width = bottomHandlesArea()->geometry().width() -
+		d_bottomHandlesArea->leftPadding() -
+		d_bottomHandlesArea->rightPadding();
+	int pix = width * time / timeSpan + width / 2;
+	return pix;
 }
 
 void LogicAnalyzer::startStop(bool start)
@@ -362,11 +472,31 @@ void LogicAnalyzer::startStop(bool start)
 		running = true;
 		setSampleRate();
 		ui->btnRunStop->setText("Stop");
+		setHWTriggerDelay(active_triggerSampleCount);
+		setTriggerDelay();
+		if (timePosition->value() != active_timePos)
+			timePosition->setValue(active_timePos);
 	} else {
 		running = false;
 		ui->btnRunStop->setText("Run");
+		ui->triggerStateLabel->setText("Stop");
 	}
 	main_win->run_stop();
+	setTriggerDelay();
+}
+
+void LogicAnalyzer::setTriggerDelay()
+{
+	main_win->view_->set_offset(timePosition->value(), timeBase->value() * 10, running);
+}
+
+void LogicAnalyzer::setHWTriggerDelay(long long delay)
+{
+	std::string name = "voltage0";
+	struct iio_channel *triggerch = iio_device_find_channel(dev, name.c_str(), false);
+	QString s = QString::number(delay);
+	iio_channel_attr_write(triggerch, "trigger_delay",
+		s.toLocal8Bit().QByteArray::constData());
 }
 
 void LogicAnalyzer::singleRun()
@@ -454,6 +584,28 @@ void LogicAnalyzer::settings_panel_update(int id)
 void LogicAnalyzer::toggleRightMenu()
 {
 	toggleRightMenu(static_cast<QPushButton *>(QObject::sender()));
+}
+
+void LogicAnalyzer::set_trigger_to_device(int chid, std::string trigger_val)
+{
+	std::string name = "voltage" + to_string(chid);
+	struct iio_channel *triggerch = iio_device_find_channel(dev, name.c_str(), false);
+
+	if( !triggerch )
+		return;
+	iio_channel_attr_write(triggerch, "trigger", trigger_val.c_str());
+}
+
+std::string LogicAnalyzer::get_trigger_from_device(int chid)
+{
+	std::string name = "voltage" + to_string(chid);
+	struct iio_channel *triggerch = iio_device_find_channel(dev, name.c_str(), false);
+	if( !triggerch )
+		return "";
+	char trigger_val[4096];
+	iio_channel_attr_read(triggerch, "trigger", trigger_val, sizeof(trigger_val));
+	string res(trigger_val);
+	return res;
 }
 
 void LogicAnalyzer::toggleLeftMenu(bool val)

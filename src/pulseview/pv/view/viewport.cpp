@@ -27,6 +27,7 @@
 #include "view.hpp"
 #include "viewitempaintparams.hpp"
 #include "viewport.hpp"
+#include "ruler.hpp"
 
 #include "../session.hpp"
 
@@ -197,16 +198,19 @@ void Viewport::paintEvent(QPaintEvent*)
 
 	if( timeTriggerPos != 0 )
 	{
-		paint_time_trigger_line(p, pp, timeTriggerPos);
+		int valuePx = view_.viewport()->geometry().width() * timeTriggerPos / 100;
+		paint_time_trigger_line(p, pp, valuePx);
 	}
-
 	p.end();
 }
 
-void Viewport::setTimeTriggerPos(int value)
+void Viewport::setTimeTriggerPos(double perc)
 {
-	timeTriggerPos = value;
-	view_.time_item_appearance_changed(true, true);
+	if( perc != timeTriggerPos )
+	{
+		timeTriggerPos = perc;
+		view_.time_item_appearance_changed(true, true);
+	}
 }
 
 int Viewport::getTimeTriggerPos() const

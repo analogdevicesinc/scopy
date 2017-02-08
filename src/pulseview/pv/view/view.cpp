@@ -118,7 +118,8 @@ View::View(Session &session, QWidget *parent) :
 	cursors_(new CursorPair(*this)),
 	next_flag_text_('A'),
 	trigger_markers_(),
-	hover_point_(-1, -1)
+	hover_point_(-1, -1),
+	start_plot_offset_(0)
 {
 	setFrameShape(QFrame::NoFrame);
 
@@ -1195,6 +1196,37 @@ void View::set_timebase(double value)
 		session_.set_timeSpan(value * DivisionCount);
 	}
 	backup_scale_ = scale_;
+}
+
+void View::set_offset(double timePos, double timeSpan, bool running)
+{
+	double value = -(timeSpan / 2 - timePos);
+	double plot_value = -(start_plot_offset_ - value);
+	Timestamp plot_offset = Timestamp(plot_value);
+	Timestamp new_offset = Timestamp(value);
+	if( running )
+	{
+		if( session_.get_capture_state() == Session::Running)
+		{
+			session_.stop_capture();
+			set_scale_offset(scale_, Timestamp(0));
+			ruler_->set_offset(value);
+			start_plot_offset_ = value;
+			session_.start_capture([&](QString message) {
+				session_error("Capture failed", message); });
+		} else {
+			set_scale_offset(scale_, Timestamp(0));
+			ruler_->set_offset(value);
+			start_plot_offset_ = value;
+		}
+
+	}
+	else
+	{
+		ruler_->set_offset(value);
+		set_scale_offset(scale_, plot_offset);
+	}
+	time_item_appearance_changed(true, true);
 }
 
 void View::session_error(
