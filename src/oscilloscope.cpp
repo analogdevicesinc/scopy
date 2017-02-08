@@ -2016,3 +2016,13 @@ void Oscilloscope_API::setMeasureAll(bool en)
 {
 	osc->measure_settings->m_ui->button_measDisplayAll->setChecked(en);
 }
+
+bool Oscilloscope_API::hasCounter() const
+{
+	return osc->measure_settings->m_ui->button_Counter->isChecked();
+}
+
+void Oscilloscope_API::setCounter(bool en)
+{
+	osc->measure_settings->m_ui->button_Counter->setChecked(en);
+}

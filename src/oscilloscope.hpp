@@ -271,6 +271,7 @@ namespace adiscope {
 		Q_PROPERTY(bool measure READ hasMeasure WRITE setMeasure);
 		Q_PROPERTY(bool measure_all
 				READ measureAll WRITE setMeasureAll);
+		Q_PROPERTY(bool counter READ hasCounter WRITE setCounter);
 
 	public:
 		explicit Oscilloscope_API(Oscilloscope *osc) :
@@ -285,6 +286,9 @@ namespace adiscope {
 
 		bool measureAll() const;
 		void setMeasureAll(bool en);
+
+		bool hasCounter() const;
+		void setCounter(bool en);
 
 	private:
 		Oscilloscope *osc;
