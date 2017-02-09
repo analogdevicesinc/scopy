@@ -273,6 +273,11 @@ namespace adiscope {
 				READ measureAll WRITE setMeasureAll);
 		Q_PROPERTY(bool counter READ hasCounter WRITE setCounter);
 
+		Q_PROPERTY(double cursor_v1 READ cursorV1 WRITE setCursorV1);
+		Q_PROPERTY(double cursor_v2 READ cursorV2 WRITE setCursorV2);
+		Q_PROPERTY(double cursor_h1 READ cursorH1 WRITE setCursorH1);
+		Q_PROPERTY(double cursor_h2 READ cursorH2 WRITE setCursorH2);
+
 	public:
 		explicit Oscilloscope_API(Oscilloscope *osc) :
 			ApiObject(TOOL_OSCILLOSCOPE), osc(osc) {}
@@ -289,6 +294,15 @@ namespace adiscope {
 
 		bool hasCounter() const;
 		void setCounter(bool en);
+
+		double cursorV1() const;
+		double cursorV2() const;
+		double cursorH1() const;
+		double cursorH2() const;
+		void setCursorV1(double val);
+		void setCursorV2(double val);
+		void setCursorH1(double val);
+		void setCursorH2(double val);
 
 	private:
 		Oscilloscope *osc;

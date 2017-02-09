@@ -380,8 +380,8 @@ void CapturePlot::onTimeCursor1Moved(double value)
 	d_cursorReadouts->setFreqDeltaText(text);
 	d_cursorReadoutsText.freq = text;
 
+	value_v1 = value;
 	Q_EMIT cursorReadoutsChanged(d_cursorReadoutsText);
-
 }
 
 void CapturePlot::onTimeCursor2Moved(double value)
@@ -404,6 +404,7 @@ void CapturePlot::onTimeCursor2Moved(double value)
 	d_cursorReadouts->setFreqDeltaText(text);
 	d_cursorReadoutsText.freq = text;
 
+	value_v2 = value;
 	Q_EMIT cursorReadoutsChanged(d_cursorReadoutsText);
 }
 
@@ -420,6 +421,7 @@ void CapturePlot::onVoltageCursor1Moved(double value)
 	d_cursorReadouts->setVoltageDeltaText(text);
 	d_cursorReadoutsText.vDelta = text;
 
+	value_h1 = value;
 	Q_EMIT cursorReadoutsChanged(d_cursorReadoutsText);
 }
 
@@ -436,6 +438,7 @@ void CapturePlot::onVoltageCursor2Moved(double value)
 	d_cursorReadouts->setVoltageDeltaText(text);
 	d_cursorReadoutsText.vDelta = text;
 
+	value_h2 = value;
 	Q_EMIT cursorReadoutsChanged(d_cursorReadoutsText);
 }
 

@@ -2026,3 +2026,43 @@ void Oscilloscope_API::setCounter(bool en)
 {
 	osc->measure_settings->m_ui->button_Counter->setChecked(en);
 }
+
+double Oscilloscope_API::cursorV1() const
+{
+	return osc->plot.value_v1;
+}
+
+double Oscilloscope_API::cursorV2() const
+{
+	return osc->plot.value_v2;
+}
+
+double Oscilloscope_API::cursorH1() const
+{
+	return osc->plot.value_h1;
+}
+
+double Oscilloscope_API::cursorH2() const
+{
+	return osc->plot.value_h2;
+}
+
+void Oscilloscope_API::setCursorV1(double val)
+{
+	osc->plot.d_vBar1->setPosition(val);
+}
+
+void Oscilloscope_API::setCursorV2(double val)
+{
+	osc->plot.d_vBar2->setPosition(val);
+}
+
+void Oscilloscope_API::setCursorH1(double val)
+{
+	osc->plot.d_hBar1->setPosition(val);
+}
+
+void Oscilloscope_API::setCursorH2(double val)
+{
+	osc->plot.d_hBar2->setPosition(val);
+}

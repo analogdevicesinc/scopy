@@ -30,6 +30,7 @@
 class QLabel;
 
 namespace adiscope {
+	class Oscilloscope_API;
 	class PlotWidget;
 
 	class OscilloscopePlot : public TimeDomainDisplayPlot
@@ -54,6 +55,8 @@ namespace adiscope {
 
 	class CapturePlot: public OscilloscopePlot
 	{
+		friend class Oscilloscope_API;
+
 		Q_OBJECT
 
 	public:
@@ -199,6 +202,8 @@ namespace adiscope {
 	        QPen d_trigBinactiveLinePen;
 
 	        QList<Measure *> d_measureObjs;
+
+		double value_v1, value_v2, value_h1, value_h2;
 	};
 }
 
