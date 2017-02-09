@@ -52,11 +52,11 @@ class PatternGeneratorChannelUI : public ChannelUI
 	PatternGeneratorChannelGroupUI *chgui;
 	PatternGeneratorChannelGroup *chg;
 	PatternGeneratorChannel *ch;
-    QPoint dragStartPosition;
+	QPoint dragStartPosition;
 
-    QRect topDragbox;
-    QRect centerDragbox;
-    QRect botDragbox;
+	QRect topDragbox;
+	QRect centerDragbox;
+	QRect botDragbox;
 
 public:
 	Ui::PGChannelGroup *ui;
@@ -71,6 +71,11 @@ public:
 
 	void setTrace(std::shared_ptr<pv::view::TraceTreeItem> item);
 	std::shared_ptr<pv::view::TraceTreeItem> trace;
+	QFrame *topSep,*botSep;
+
+	void highlightTopSeparator();
+	void highlightBotSeparator();
+	void resetSeparatorHighlight(bool force = false);
 Q_SIGNALS:
     void requestUpdateUi();
 private Q_SLOTS:
@@ -83,6 +88,7 @@ private Q_SLOTS:
     void dropEvent(QDropEvent *event);
     void enterEvent(QEvent *event);
     void leaveEvent(QEvent *event);
+
 
 //    void set_decoder(std::string value);
 };
@@ -108,10 +114,10 @@ class PatternGeneratorChannelGroupUI : public ChannelGroupUI
 	PatternGeneratorChannelManagerUI *managerUi;
 	int isChecked();
 	void check(int val);
-    QPoint dragStartPosition;
-    QRect centerDragbox;
-    QRect topDragbox;
-    QRect botDragbox;
+	QPoint dragStartPosition;
+	QRect centerDragbox;
+	QRect topDragbox;
+	QRect botDragbox;
 
 public:
 	Ui::PGChannelGroup *ui;
@@ -124,6 +130,10 @@ public:
 	void setTrace(std::shared_ptr<pv::view::TraceTreeItem> item);
 	std::shared_ptr<pv::view::TraceTreeItem> trace;
 	void enableControls(bool enabled);
+	QFrame *topSep,*botSep;
+	void highlightTopSeparator();
+	void highlightBotSeparator();
+	void resetSeparatorHighlight(bool force = false);
 
 
 Q_SIGNALS:
@@ -139,6 +149,7 @@ private Q_SLOTS:
 	void split();
 	void collapse();
 
+private:
     void enterEvent(QEvent *event);
     void leaveEvent(QEvent *event);
 
@@ -148,6 +159,7 @@ private Q_SLOTS:
     void dragLeaveEvent(QDragLeaveEvent *event);
     void dragMoveEvent(QDragMoveEvent *event);
     void dropEvent(QDropEvent *event);
+
 };
 
 
@@ -241,6 +253,8 @@ public:
     void retainWidgetSizeWhenHidden(QWidget *w);
     void setWidgetNrOfChars(QWidget *w, int minNrOfChars, int maxNrOfChars=0);
 
+private:
+    QFrame* addSeparator(QVBoxLayout *lay, int pos);
 
 Q_SIGNALS:
 	void channelsChanged();
@@ -248,8 +262,6 @@ Q_SIGNALS:
 private Q_SLOTS:
     void chmScrollChanged(int val);
     void triggerUpdateUi();
-
-private:
 
 };
 
