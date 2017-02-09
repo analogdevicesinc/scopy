@@ -88,7 +88,7 @@ void Viewport::drag_by(const QPoint &delta)
 		return;
 
 	view_.set_scale_offset(view_.scale(),
-		(*drag_offset_ - delta.x() * view_.scale()));
+			       (*drag_offset_ - delta.x() * view_.scale() / (geometry().width() / divisionCount)));
 
 	view_.set_v_offset(-drag_v_offset_ - delta.y());
 }
