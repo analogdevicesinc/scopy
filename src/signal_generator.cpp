@@ -836,7 +836,7 @@ unsigned long SignalGenerator::get_max_sample_rate(const struct iio_device *dev)
 {
 	QVector<unsigned long> values = get_available_sample_rates(dev);
 
-	return values.takeLast();
+	return values.takeFirst();
 }
 
 int SignalGenerator::set_sample_rate(const struct iio_device *dev,
