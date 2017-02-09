@@ -49,7 +49,7 @@ public:
 	uint32_t adjustSampleRate(uint32_t suggestedSampleRate);
 	uint32_t adjustBufferSize(uint32_t suggestedBufferSize);
 	uint32_t getSampleRate();
-    uint32_t getBufferSize();
+	uint32_t getBufferSize();
 
 	uint32_t bufferSize;
 	short *buffer;

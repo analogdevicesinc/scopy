@@ -145,8 +145,8 @@ private:
 
 	// Device parameters
 
-    uint16_t channel_enable_mask;
-    uint32_t sample_rate;
+	uint16_t channel_enable_mask;
+	uint32_t sample_rate;
 	int no_channels;
 
 	// IIO
@@ -177,7 +177,7 @@ private:
 	std::vector<PatternUI *> patterns;
 	static QStringList digital_trigger_conditions;
 	static QStringList possibleSampleRates;
-    static const char* channelNames[];
+	static const char *channelNames[];
 };
 
 

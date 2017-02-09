@@ -47,7 +47,7 @@ void PatternGeneratorBufferManager::update(PatternGeneratorChannelGroup *chg)
 		buffer = new short[bufferSize];
 	}
 
-    memset(buffer, 0x0000, (bufferSize)*sizeof(short));
+	memset(buffer, 0x0000, (bufferSize)*sizeof(short));
 	chm->generatePatterns(buffer, sampleRate, bufferSize);
 
 	if (sampleRateChanged || bufferSizeChanged) {
@@ -84,7 +84,7 @@ uint32_t PatternGeneratorBufferManager::getSampleRate()
 
 uint32_t PatternGeneratorBufferManager::getBufferSize()
 {
-    return bufferSize;
+	return bufferSize;
 }
 
 PatternGeneratorBufferManagerUi::PatternGeneratorBufferManagerUi(

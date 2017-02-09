@@ -77,17 +77,17 @@ public:
 	void highlightBotSeparator();
 	void resetSeparatorHighlight(bool force = false);
 Q_SIGNALS:
-    void requestUpdateUi();
+	void requestUpdateUi();
 private Q_SLOTS:
 	void split();
-    void mousePressEvent(QMouseEvent *) override;
-    void mouseMoveEvent(QMouseEvent *) override;
-    void dragEnterEvent(QDragEnterEvent *event);
-    void dragLeaveEvent(QDragLeaveEvent *event);
-    void dragMoveEvent(QDragMoveEvent *event);
-    void dropEvent(QDropEvent *event);
-    void enterEvent(QEvent *event);
-    void leaveEvent(QEvent *event);
+	void mousePressEvent(QMouseEvent *) override;
+	void mouseMoveEvent(QMouseEvent *) override;
+	void dragEnterEvent(QDragEnterEvent *event);
+	void dragLeaveEvent(QDragLeaveEvent *event);
+	void dragMoveEvent(QDragMoveEvent *event);
+	void dropEvent(QDropEvent *event);
+	void enterEvent(QEvent *event);
+	void leaveEvent(QEvent *event);
 
 
 //    void set_decoder(std::string value);
@@ -139,7 +139,7 @@ public:
 Q_SIGNALS:
 	void channel_selected();
 	void channel_enabled();
-    void requestUpdateUi();
+	void requestUpdateUi();
 
 private Q_SLOTS:
 
@@ -150,15 +150,15 @@ private Q_SLOTS:
 	void collapse();
 
 private:
-    void enterEvent(QEvent *event);
-    void leaveEvent(QEvent *event);
+	void enterEvent(QEvent *event);
+	void leaveEvent(QEvent *event);
 
-    void mousePressEvent(QMouseEvent *) override;
-    void mouseMoveEvent(QMouseEvent *) override;
-    void dragEnterEvent(QDragEnterEvent *event);
-    void dragLeaveEvent(QDragLeaveEvent *event);
-    void dragMoveEvent(QDragMoveEvent *event);
-    void dropEvent(QDropEvent *event);
+	void mousePressEvent(QMouseEvent *) override;
+	void mouseMoveEvent(QMouseEvent *) override;
+	void dragEnterEvent(QDragEnterEvent *event);
+	void dragLeaveEvent(QDragLeaveEvent *event);
+	void dragMoveEvent(QDragMoveEvent *event);
+	void dropEvent(QDropEvent *event);
 
 };
 
@@ -175,12 +175,12 @@ public:
 	PatternGeneratorChannel *getHighlightedChannel();
 	PatternGeneratorChannelManager();
 	~PatternGeneratorChannelManager();
-    PatternGeneratorChannelGroup *get_channel_group(int index);
+	PatternGeneratorChannelGroup *get_channel_group(int index);
 
 	void join(std::vector<int> index);
 	void split(int index);
-    void move(int from, int to, bool after=true);
-    void moveChannel(int fromChgIndex, int from, int to, bool after=true);
+	void move(int from, int to, bool after=true);
+	void moveChannel(int fromChgIndex, int from, int to, bool after=true);
 	void splitChannel(int chgIndex, int chIndex);
 	void preGenerate();
 	void generatePatterns(short *mainbuffer, uint32_t sampleRate,
@@ -202,18 +202,18 @@ class PatternGeneratorChannelManagerUI : public QWidget
 	PatternUI *currentUI; // pointer to currently drawn patternUI.
 	bool disabledShown;
 	bool detailsShown;
-	bool highlightShown;    
+	bool highlightShown;
 
 public:
-    const bool pixmapEnable = true;
-    const bool pixmapGrab = true;
-    const bool pixmapRetainSize = true;
-    const int  pixmapScale = 1;
+	const bool pixmapEnable = true;
+	const bool pixmapGrab = true;
+	const bool pixmapRetainSize = true;
+	const int  pixmapScale = 1;
 
 public:
 	pv::MainWindow *main_win;
-    std::vector<PatternGeneratorChannelGroupUI *> chg_ui;
-    std::vector<QFrame*> separators;
+	std::vector<PatternGeneratorChannelGroupUI *> chg_ui;
+	std::vector<QFrame *> separators;
 	PatternGeneratorChannelManagerUI(QWidget *parent, pv::MainWindow *main_win_,
 	                                 PatternGeneratorChannelManager *chm, QWidget *settingsWidget,
 	                                 PatternGenerator *pg);
@@ -223,12 +223,12 @@ public:
 	        PatternGeneratorChannelGroup *toFind);
 	PatternGeneratorChannelUI *findUiByChannel(PatternGeneratorChannel *toFind);
 	PatternGeneratorChannelManager *chm;
-	PatternGenerator *pg;    
+	PatternGenerator *pg;
 	Ui::PGChannelManager *ui;
 
-    QWidget *hoverWidget;
+	QWidget *hoverWidget;
 
-    void updateUi();
+	void updateUi();
 	void selectChannelGroup(PatternGeneratorChannelGroupUI *selected);
 	void deleteSettingsWidget();
 	void createSettingsWidget();
@@ -242,26 +242,26 @@ public:
 	void showDetails();
 	void hideDetails();
 
-	void showHighlight(bool val);    
-    void setHoverWidget(QWidget *hover);
-    void clearHoverWidget();
+	void showHighlight(bool val);
+	void setHoverWidget(QWidget *hover);
+	void clearHoverWidget();
 
 	void groupSplitSelected();
 	PatternGeneratorChannelGroup *getSelectedChannelGroup() const;
 	void setSelectedChannelGroup(PatternGeneratorChannelGroup *value);
 
-    void retainWidgetSizeWhenHidden(QWidget *w);
-    void setWidgetNrOfChars(QWidget *w, int minNrOfChars, int maxNrOfChars=0);
+	void retainWidgetSizeWhenHidden(QWidget *w);
+	void setWidgetNrOfChars(QWidget *w, int minNrOfChars, int maxNrOfChars=0);
 
 private:
-    QFrame* addSeparator(QVBoxLayout *lay, int pos);
+	QFrame *addSeparator(QVBoxLayout *lay, int pos);
 
 Q_SIGNALS:
 	void channelsChanged();
 
 private Q_SLOTS:
-    void chmScrollChanged(int val);
-    void triggerUpdateUi();
+	void chmScrollChanged(int val);
+	void triggerUpdateUi();
 
 };
 
