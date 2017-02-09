@@ -272,6 +272,8 @@ namespace adiscope {
 		Q_PROPERTY(bool measure_all
 				READ measureAll WRITE setMeasureAll);
 		Q_PROPERTY(bool counter READ hasCounter WRITE setCounter);
+		Q_PROPERTY(bool statistics
+				READ hasStatistics WRITE setStatistics);
 
 		Q_PROPERTY(double cursor_v1 READ cursorV1 WRITE setCursorV1);
 		Q_PROPERTY(double cursor_v2 READ cursorV2 WRITE setCursorV2);
@@ -294,6 +296,9 @@ namespace adiscope {
 
 		bool hasCounter() const;
 		void setCounter(bool en);
+
+		bool hasStatistics() const;
+		void setStatistics(bool en);
 
 		double cursorV1() const;
 		double cursorV2() const;

@@ -2027,6 +2027,16 @@ void Oscilloscope_API::setCounter(bool en)
 	osc->measure_settings->m_ui->button_Counter->setChecked(en);
 }
 
+bool Oscilloscope_API::hasStatistics() const
+{
+	return osc->measure_settings->m_ui->button_StatisticsEn->isChecked();
+}
+
+void Oscilloscope_API::setStatistics(bool en)
+{
+	osc->measure_settings->m_ui->button_StatisticsEn->setChecked(en);
+}
+
 double Oscilloscope_API::cursorV1() const
 {
 	return osc->plot.value_v1;
