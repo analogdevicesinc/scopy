@@ -21,6 +21,7 @@
 
 #include <QDebug>
 #include <QJSEngine>
+#include <QList>
 #include <QMetaProperty>
 #include <QSettings>
 
@@ -34,6 +35,34 @@ ApiObject::~ApiObject()
 {
 }
 
+template <typename T> void ApiObject::save(QSettings& settings,
+		const QString& prop, const QList<T>& list)
+{
+	settings.beginWriteArray(prop, list.size());
+
+	for (unsigned int i = 0; i < list.size(); i++) {
+		settings.setArrayIndex(i);
+		settings.setValue("idx", QVariant(list.at(i)));
+	}
+
+	settings.endArray();
+}
+
+template <typename T> QList<T> ApiObject::load(
+		QSettings& settings, const QString& prop)
+{
+	int nb = settings.beginReadArray(prop);
+	QList<T> list;
+
+	for (unsigned int i = 0; i < nb; i++) {
+		settings.setArrayIndex(i);
+		list.append(settings.value("idx").value<T>());
+	}
+
+	settings.endArray();
+	return list;
+}
+
 void ApiObject::load()
 {
 	QSettings settings;
@@ -45,7 +74,21 @@ void ApiObject::load()
 			i < meta->propertyCount(); i++) {
 		auto prop = meta->property(i);
 
-		if (prop.isStored() && prop.isWritable()) {
+		if (!prop.isStored() || !prop.isWritable())
+			continue;
+
+		auto data = prop.read(this);
+
+		if (data.canConvert<QList<int>>()) {
+			auto list = load<int>(settings, prop.name());
+			prop.write(this, QVariant::fromValue(list));
+		} else if (data.canConvert<QList<double>>()) {
+			auto list = load<double>(settings, prop.name());
+			prop.write(this, QVariant::fromValue(list));
+		} else if (data.canConvert<QList<QString>>()) {
+			auto list = load<QString>(settings, prop.name());
+			prop.write(this, QVariant::fromValue(list));
+		} else {
 			auto value = settings.value(prop.name());
 
 			qDebug() << "Loading property"
@@ -72,8 +115,20 @@ void ApiObject::save()
 		auto prop = meta->property(i);
 		auto data = prop.read(this);
 
-		if (prop.isStored() && prop.isReadable() && prop.isWritable()) {
+		if (!prop.isStored() || !prop.isReadable()
+				|| !prop.isWritable())
+			continue;
 
+		if (data.canConvert<QList<int>>()) {
+			save<int>(settings, prop.name(),
+					data.value<QList<int>>());
+		} else if (data.canConvert<QList<double>>()) {
+			save<double>(settings, prop.name(),
+					data.value<QList<double>>());
+		} else if (data.canConvert<QList<QString>>()) {
+			save<QString>(settings, prop.name(),
+					data.value<QList<QString>>());
+		} else {
 			qDebug() << "Saving property"
 				<< prop.name()
 				<< "value" << data;

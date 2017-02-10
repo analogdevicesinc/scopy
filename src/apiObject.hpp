@@ -25,6 +25,8 @@
 #include "filter.hpp"
 
 class QJSEngine;
+class QSettings;
+template <typename T> class QList;
 
 namespace adiscope {
 	class ApiObject : public QObject
@@ -42,6 +44,11 @@ namespace adiscope {
 
 	private:
 		enum tool tool;
+
+		template <typename T> void save(QSettings& settings,
+				const QString& prop, const QList<T>& list);
+		template <typename T> QList<T> load(QSettings& settings,
+				const QString& prop);
 	};
 }
 
