@@ -282,6 +282,8 @@ namespace adiscope {
 
 		Q_PROPERTY(bool auto_trigger
 				READ autoTrigger WRITE setAutoTrigger);
+		Q_PROPERTY(bool external_trigger
+				READ externalTrigger WRITE setExternalTrigger);
 
 	public:
 		explicit Oscilloscope_API(Oscilloscope *osc) :
@@ -314,6 +316,9 @@ namespace adiscope {
 
 		bool autoTrigger() const;
 		void setAutoTrigger(bool en);
+
+		bool externalTrigger() const;
+		void setExternalTrigger(bool en);
 
 	private:
 		Oscilloscope *osc;

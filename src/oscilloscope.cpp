@@ -2090,3 +2090,13 @@ void Oscilloscope_API::setAutoTrigger(bool en)
 	else
 		osc->trigger_settings.ui->btnNormal->setChecked(true);
 }
+
+bool Oscilloscope_API::externalTrigger() const
+{
+	return osc->trigger_settings.ui->trigg_A_extern_en->isChecked();
+}
+
+void Oscilloscope_API::setExternalTrigger(bool en)
+{
+	osc->trigger_settings.ui->trigg_A_extern_en->setChecked(en);
+}
