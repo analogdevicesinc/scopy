@@ -296,6 +296,9 @@ namespace adiscope {
 		Q_PROPERTY(QList<double> volts_per_div
 				READ getVoltsPerDiv WRITE setVoltsPerDiv);
 
+		Q_PROPERTY(QList<double> v_offset
+				READ getVOffset WRITE setVOffset);
+
 	public:
 		explicit Oscilloscope_API(Oscilloscope *osc) :
 			ApiObject(TOOL_OSCILLOSCOPE), osc(osc) {}
@@ -336,6 +339,9 @@ namespace adiscope {
 
 		QList<double> getVoltsPerDiv() const;
 		void setVoltsPerDiv(const QList<double>& list);
+
+		QList<double> getVOffset() const;
+		void setVOffset(const QList<double>& list);
 
 		QList<QString> getMathChannels() const;
 		void setMathChannels(const QList<QString>& list);

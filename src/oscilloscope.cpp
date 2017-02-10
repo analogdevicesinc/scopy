@@ -2152,3 +2152,24 @@ void Oscilloscope_API::setMathChannels(const QList<QString>& list)
 	for (unsigned int i = 0; i < list.size(); i++)
 		osc->add_math_channel(list.at(i).toStdString());
 }
+
+QList<double> Oscilloscope_API::getVOffset() const
+{
+	QList<double> list;
+	unsigned int i;
+
+	for (i = 0; i < osc->nb_channels + osc->nb_math_channels; i++)
+		list.append(osc->plot.VertOffset(i));
+
+	return list;
+}
+
+void Oscilloscope_API::setVOffset(const QList<double>& list)
+{
+	unsigned int i;
+
+	for (i = 0; i < osc->nb_channels + osc->nb_math_channels; i++)
+		osc->plot.setVertOffset(list.at(i), i);
+
+	osc->voltsPosition->setValue(osc->plot.VertOffset());
+}
