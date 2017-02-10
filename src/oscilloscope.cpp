@@ -697,6 +697,8 @@ void Oscilloscope::add_math_channel(const std::string& function)
 	channel_ui.box->setStyleSheet(stylesheet);
 
 	channel_widget->setProperty("curve_nb", QVariant(curve_number));
+	channel_widget->setProperty("function",
+			QVariant(QString::fromStdString(function)));
 	channel_ui.box->setProperty("id", QVariant(curve_id));
 	channel_ui.btn->setProperty("id", QVariant(curve_id));
 	channel_ui.name->setProperty("id", QVariant(curve_id));
@@ -2109,4 +2111,23 @@ int Oscilloscope_API::triggerSource() const
 void Oscilloscope_API::setTriggerSource(int idx)
 {
 	osc->trigger_settings.ui->cmb_trigg_source->setCurrentIndex(idx);
+}
+
+QList<QString> Oscilloscope_API::getMathChannels() const
+{
+	QList<QString> list;
+
+	for (unsigned int i = 0; i < osc->nb_math_channels; i++) {
+		QWidget *obj = osc->ui->channelsList->itemAt(
+				osc->nb_channels + i)->widget();
+		list.append(obj->property("function").toString());
+	}
+
+	return list;
+}
+
+void Oscilloscope_API::setMathChannels(const QList<QString>& list)
+{
+	for (unsigned int i = 0; i < list.size(); i++)
+		osc->add_math_channel(list.at(i).toStdString());
 }

@@ -288,6 +288,10 @@ namespace adiscope {
 		Q_PROPERTY(int trigger_source
 				READ triggerSource WRITE setTriggerSource);
 
+		Q_PROPERTY(QList<QString> math_channels
+				READ getMathChannels WRITE setMathChannels
+				SCRIPTABLE false /* too complex for now */);
+
 	public:
 		explicit Oscilloscope_API(Oscilloscope *osc) :
 			ApiObject(TOOL_OSCILLOSCOPE), osc(osc) {}
@@ -325,6 +329,9 @@ namespace adiscope {
 
 		int triggerSource() const;
 		void setTriggerSource(int idx);
+
+		QList<QString> getMathChannels() const;
+		void setMathChannels(const QList<QString>& list);
 
 	private:
 		Oscilloscope *osc;
