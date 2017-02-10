@@ -299,6 +299,9 @@ namespace adiscope {
 		Q_PROPERTY(QList<double> v_offset
 				READ getVOffset WRITE setVOffset);
 
+		Q_PROPERTY(double time_position
+				READ getTimePos WRITE setTimePos);
+
 	public:
 		explicit Oscilloscope_API(Oscilloscope *osc) :
 			ApiObject(TOOL_OSCILLOSCOPE), osc(osc) {}
@@ -345,6 +348,9 @@ namespace adiscope {
 
 		QList<QString> getMathChannels() const;
 		void setMathChannels(const QList<QString>& list);
+
+		double getTimePos() const;
+		void setTimePos(double pos);
 
 	private:
 		Oscilloscope *osc;

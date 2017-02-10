@@ -2173,3 +2173,13 @@ void Oscilloscope_API::setVOffset(const QList<double>& list)
 
 	osc->voltsPosition->setValue(osc->plot.VertOffset());
 }
+
+double Oscilloscope_API::getTimePos() const
+{
+	return osc->timePosition->value();
+}
+
+void Oscilloscope_API::setTimePos(double value)
+{
+	osc->timePosition->setValue(value);
+}
