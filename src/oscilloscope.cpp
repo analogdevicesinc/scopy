@@ -2100,3 +2100,13 @@ void Oscilloscope_API::setExternalTrigger(bool en)
 {
 	osc->trigger_settings.ui->trigg_A_extern_en->setChecked(en);
 }
+
+int Oscilloscope_API::triggerSource() const
+{
+	return osc->trigger_settings.ui->cmb_trigg_source->currentIndex();
+}
+
+void Oscilloscope_API::setTriggerSource(int idx)
+{
+	osc->trigger_settings.ui->cmb_trigg_source->setCurrentIndex(idx);
+}
