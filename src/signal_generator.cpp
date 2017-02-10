@@ -132,7 +132,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 				}, "Value", -5e0, 5e0);
 
 	auto layout = static_cast<QBoxLayout *>(ui->tabConstant->layout());
-	layout->insertWidget(0, constantValue, 0, Qt::AlignLeft);
+	layout->insertWidget(0, constantValue, 0);
 
 	connect(constantValue, SIGNAL(valueChanged(double)),
 			SLOT(constantValueChanged(double)));
