@@ -280,6 +280,9 @@ namespace adiscope {
 		Q_PROPERTY(double cursor_h1 READ cursorH1 WRITE setCursorH1);
 		Q_PROPERTY(double cursor_h2 READ cursorH2 WRITE setCursorH2);
 
+		Q_PROPERTY(bool auto_trigger
+				READ autoTrigger WRITE setAutoTrigger);
+
 	public:
 		explicit Oscilloscope_API(Oscilloscope *osc) :
 			ApiObject(TOOL_OSCILLOSCOPE), osc(osc) {}
@@ -308,6 +311,9 @@ namespace adiscope {
 		void setCursorV2(double val);
 		void setCursorH1(double val);
 		void setCursorH2(double val);
+
+		bool autoTrigger() const;
+		void setAutoTrigger(bool en);
 
 	private:
 		Oscilloscope *osc;

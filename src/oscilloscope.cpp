@@ -53,6 +53,7 @@
 #include "ui_cursor_readouts.h"
 #include "ui_oscilloscope.h"
 #include "ui_trigger.h"
+#include "ui_trigger_settings.h"
 
 using namespace adiscope;
 using namespace gr;
@@ -2075,4 +2076,17 @@ void Oscilloscope_API::setCursorH1(double val)
 void Oscilloscope_API::setCursorH2(double val)
 {
 	osc->plot.d_hBar2->setPosition(val);
+}
+
+bool Oscilloscope_API::autoTrigger() const
+{
+	return osc->trigger_settings.ui->btnAuto->isChecked();
+}
+
+void Oscilloscope_API::setAutoTrigger(bool en)
+{
+	if (en)
+		osc->trigger_settings.ui->btnAuto->setChecked(true);
+	else
+		osc->trigger_settings.ui->btnNormal->setChecked(true);
 }
