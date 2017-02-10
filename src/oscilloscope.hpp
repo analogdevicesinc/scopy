@@ -268,6 +268,8 @@ namespace adiscope {
 	{
 		Q_OBJECT
 
+		Q_PROPERTY(bool running READ running WRITE run STORED false);
+
 		Q_PROPERTY(bool cursors READ hasCursors WRITE setCursors);
 		Q_PROPERTY(bool measure READ hasMeasure WRITE setMeasure);
 		Q_PROPERTY(bool measure_all
@@ -307,6 +309,9 @@ namespace adiscope {
 		explicit Oscilloscope_API(Oscilloscope *osc) :
 			ApiObject(TOOL_OSCILLOSCOPE), osc(osc) {}
 		~Oscilloscope_API() {}
+
+		bool running() const;
+		void run(bool en);
 
 		bool hasCursors() const;
 		void setCursors(bool en);

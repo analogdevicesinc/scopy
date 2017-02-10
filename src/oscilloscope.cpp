@@ -2193,3 +2193,13 @@ void Oscilloscope_API::setTimeBase(double value)
 {
 	osc->timeBase->setValue(value);
 }
+
+bool Oscilloscope_API::running() const
+{
+	return osc->ui->pushButtonRunStop->isChecked();
+}
+
+void Oscilloscope_API::run(bool en)
+{
+	osc->ui->pushButtonRunStop->setChecked(en);
+}
