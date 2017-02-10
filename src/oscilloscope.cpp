@@ -2183,3 +2183,13 @@ void Oscilloscope_API::setTimePos(double value)
 {
 	osc->timePosition->setValue(value);
 }
+
+double Oscilloscope_API::getTimeBase() const
+{
+	return osc->timeBase->value();
+}
+
+void Oscilloscope_API::setTimeBase(double value)
+{
+	osc->timeBase->setValue(value);
+}

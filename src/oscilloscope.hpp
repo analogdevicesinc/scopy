@@ -301,6 +301,7 @@ namespace adiscope {
 
 		Q_PROPERTY(double time_position
 				READ getTimePos WRITE setTimePos);
+		Q_PROPERTY(double time_base READ getTimeBase WRITE setTimeBase);
 
 	public:
 		explicit Oscilloscope_API(Oscilloscope *osc) :
@@ -351,6 +352,9 @@ namespace adiscope {
 
 		double getTimePos() const;
 		void setTimePos(double pos);
+
+		double getTimeBase() const;
+		void setTimeBase(double base);
 
 	private:
 		Oscilloscope *osc;
