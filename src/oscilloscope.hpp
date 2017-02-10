@@ -30,6 +30,7 @@
 /* Qt includes */
 #include <QPair>
 #include <QPushButton>
+#include <QStringList>
 #include <QVector>
 #include <QWidget>
 #include <QButtonGroup>
@@ -292,6 +293,9 @@ namespace adiscope {
 				READ getMathChannels WRITE setMathChannels
 				SCRIPTABLE false /* too complex for now */);
 
+		Q_PROPERTY(QList<double> volts_per_div
+				READ getVoltsPerDiv WRITE setVoltsPerDiv);
+
 	public:
 		explicit Oscilloscope_API(Oscilloscope *osc) :
 			ApiObject(TOOL_OSCILLOSCOPE), osc(osc) {}
@@ -329,6 +333,9 @@ namespace adiscope {
 
 		int triggerSource() const;
 		void setTriggerSource(int idx);
+
+		QList<double> getVoltsPerDiv() const;
+		void setVoltsPerDiv(const QList<double>& list);
 
 		QList<QString> getMathChannels() const;
 		void setMathChannels(const QList<QString>& list);

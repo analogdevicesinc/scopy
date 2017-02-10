@@ -2113,6 +2113,27 @@ void Oscilloscope_API::setTriggerSource(int idx)
 	osc->trigger_settings.ui->cmb_trigg_source->setCurrentIndex(idx);
 }
 
+QList<double> Oscilloscope_API::getVoltsPerDiv() const
+{
+	QList<double> list;
+	unsigned int i;
+
+	for (i = 0; i < osc->nb_channels + osc->nb_math_channels; i++)
+		list.append(osc->plot.VertUnitsPerDiv(i));
+
+	return list;
+}
+
+void Oscilloscope_API::setVoltsPerDiv(const QList<double>& list)
+{
+	unsigned int i;
+
+	for (i = 0; i < osc->nb_channels + osc->nb_math_channels; i++)
+		osc->plot.setVertUnitsPerDiv(list.at(i), i);
+
+	osc->voltsPerDiv->setValue(osc->plot.VertUnitsPerDiv());
+}
+
 QList<QString> Oscilloscope_API::getMathChannels() const
 {
 	QList<QString> list;
