@@ -960,3 +960,30 @@ void SignalGenerator_API::run(bool en)
 {
 	gen->ui->run_button->setChecked(en);
 }
+
+QList<int> SignalGenerator_API::getMode() const
+{
+	QList<int> list;
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(&gen->channels[i]->first);
+
+		list.append(static_cast<int>(ptr->type));
+	}
+
+	return list;
+}
+
+void SignalGenerator_API::setMode(const QList<int>& list)
+{
+	if (list.size() != gen->channels.size())
+		return;
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(&gen->channels[i]->first);
+
+		ptr->type = static_cast<enum SIGNAL_TYPE>(list.at(i));
+	}
+
+	gen->ui->tabWidget->setCurrentIndex(gen->getCurrentData()->type);
+}
