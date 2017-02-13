@@ -85,12 +85,13 @@ struct adiscope::time_block_data {
 	unsigned long nb_channels;
 };
 
-SignalGenerator::SignalGenerator(struct iio_context *_ctx,
-		Filter *filt, QPushButton *runButton, QWidget *parent) :
+SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
+		QPushButton *runButton, QJSEngine *engine, QWidget *parent) :
 	QWidget(parent), ui(new Ui::SignalGenerator),
 	ctx(_ctx), time_block_data(new adiscope::time_block_data),
 	menuOpened(true), currentChannel(0), sample_rate(0),
-	settings_group(new QButtonGroup(this)), menuRunButton(runButton)
+	settings_group(new QButtonGroup(this)), menuRunButton(runButton),
+	sg_api(new SignalGenerator_API(this))
 {
 	ui->setupUi(this);
 	this->setAttribute(Qt::WA_DeleteOnClose, true);
@@ -134,9 +135,6 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 	auto layout = static_cast<QBoxLayout *>(ui->tabConstant->layout());
 	layout->insertWidget(0, constantValue, 0);
 
-	connect(constantValue, SIGNAL(valueChanged(double)),
-			SLOT(constantValueChanged(double)));
-
 	amplitude = new PositionSpinButton({
 				{"µVolts", 1E-6},
 				{"mVolts", 1E-3},
@@ -178,15 +176,6 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 
 	layout = static_cast<QBoxLayout *>(ui->tabMath->layout());
 	layout->insertWidget(0, mathFrequency, 0);
-
-	connect(amplitude, SIGNAL(valueChanged(double)),
-			this, SLOT(amplitudeChanged(double)));
-	connect(offset, SIGNAL(valueChanged(double)),
-			this, SLOT(offsetChanged(double)));
-	connect(frequency, SIGNAL(valueChanged(double)),
-			this, SLOT(frequencyChanged(double)));
-	connect(phase, SIGNAL(valueChanged(double)),
-			this, SLOT(phaseChanged(double)));
 
 
 	unsigned int nb_channels = iio_channels.size();
@@ -266,9 +255,6 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 		channels[i]->second.box->setStyleSheet(stylesheet);
 	}
 
-	connect(ui->rightMenu, SIGNAL(finished(bool)), this,
-			SLOT(rightMenuFinished(bool)));
-
 	plot->disableLegend();
 	plot->setPaletteColor(QColor("black"));
 
@@ -280,6 +266,24 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 			((double) sample_rate * 2.0));
 
 	ui->plot->addWidget(plot, 0, 0);
+
+	sg_api->load();
+	sg_api->js_register(engine);
+
+	connect(ui->rightMenu, SIGNAL(finished(bool)), this,
+			SLOT(rightMenuFinished(bool)));
+
+	connect(constantValue, SIGNAL(valueChanged(double)),
+			SLOT(constantValueChanged(double)));
+
+	connect(amplitude, SIGNAL(valueChanged(double)),
+			this, SLOT(amplitudeChanged(double)));
+	connect(offset, SIGNAL(valueChanged(double)),
+			this, SLOT(offsetChanged(double)));
+	connect(frequency, SIGNAL(valueChanged(double)),
+			this, SLOT(frequencyChanged(double)));
+	connect(phase, SIGNAL(valueChanged(double)),
+			this, SLOT(phaseChanged(double)));
 
 	connect(mathFrequency, SIGNAL(valueChanged(double)),
 			this, SLOT(mathFreqChanged(double)));
@@ -300,11 +304,16 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 			SLOT(setChecked(bool)));
 	connect(runButton, SIGNAL(toggled(bool)),
 			this, SLOT(startStop(bool)));
+
+	updatePreview();
 }
 
 SignalGenerator::~SignalGenerator()
 {
 	stop();
+
+	sg_api->save();
+	delete sg_api;
 
 	delete plot;
 	delete ui;

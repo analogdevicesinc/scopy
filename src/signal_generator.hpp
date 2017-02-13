@@ -29,6 +29,7 @@
 #include <QSharedPointer>
 #include <QWidget>
 
+#include "apiObject.hpp"
 #include "filter.hpp"
 #include "oscilloscope_plot.hpp"
 #include "scope_sink_f.h"
@@ -46,9 +47,12 @@ namespace Ui {
 	class SignalGenerator;
 }
 
+class QJSEngine;
+
 namespace adiscope {
 	struct signal_generator_data;
 	struct time_block_data;
+	class SignalGenerator_API;
 
 	enum sg_waveform {
 		SG_SIN_WAVE = gr::analog::GR_SIN_WAVE,
@@ -60,12 +64,14 @@ namespace adiscope {
 
 	class SignalGenerator : public QWidget
 	{
-	    Q_OBJECT
+		friend class SignalGenerator_API;
+
+		Q_OBJECT
 
 	public:
 		explicit SignalGenerator(struct iio_context *ctx,
 				Filter *filt, QPushButton *runButton,
-				QWidget *parent = 0);
+				QJSEngine *engine, QWidget *parent = 0);
 		~SignalGenerator();
 
 		static const size_t min_buffer_size = 1024;
@@ -94,6 +100,8 @@ namespace adiscope {
 		ScaleSpinButton *frequency, *mathFrequency;
 
 		QVector<QPair<QWidget, Ui::Channel> *> channels;
+
+		SignalGenerator_API *sg_api;
 
 		QSharedPointer<signal_generator_data> getData(QWidget *obj);
 		QSharedPointer<signal_generator_data> getCurrentData();
@@ -144,6 +152,19 @@ namespace adiscope {
 
 		void startStop(bool start);
 		void setFunction(const QString& function);
+	};
+
+	class SignalGenerator_API : public ApiObject
+	{
+		Q_OBJECT
+
+	public:
+		explicit SignalGenerator_API(SignalGenerator *gen) :
+			ApiObject(TOOL_SIGNAL_GENERATOR), gen(gen) {}
+		~SignalGenerator_API() {}
+
+	private:
+		SignalGenerator *gen;
 	};
 }
 

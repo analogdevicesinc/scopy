@@ -424,7 +424,7 @@ bool adiscope::ToolLauncher::switchContext(const QString &uri)
 
 	if (filter->compatible(TOOL_SIGNAL_GENERATOR)) {
 		signal_generator = new SignalGenerator(ctx, filter,
-				ui->stopSignalGenerator, this);
+				ui->stopSignalGenerator, &js_engine, this);
 		signal_generator->setVisible(false);
 		ui->signalGenerator->setEnabled(true);
 	}
