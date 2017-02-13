@@ -987,3 +987,30 @@ void SignalGenerator_API::setMode(const QList<int>& list)
 
 	gen->ui->tabWidget->setCurrentIndex(gen->getCurrentData()->type);
 }
+
+QList<double> SignalGenerator_API::getConstantValue() const
+{
+	QList<double> list;
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(&gen->channels[i]->first);
+
+		list.append(static_cast<double>(ptr->constant));
+	}
+
+	return list;
+}
+
+void SignalGenerator_API::setConstantValue(const QList<double>& list)
+{
+	if (list.size() != gen->channels.size())
+		return;
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(&gen->channels[i]->first);
+
+		ptr->constant = static_cast<float>(list.at(i));
+	}
+
+	gen->constantValue->setValue(gen->getCurrentData()->constant);
+}
