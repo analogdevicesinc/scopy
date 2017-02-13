@@ -158,7 +158,12 @@ namespace adiscope {
 	{
 		Q_OBJECT
 
+		Q_PROPERTY(bool running READ running WRITE run STORED false);
+
 	public:
+		bool running() const;
+		void run(bool en);
+
 		explicit SignalGenerator_API(SignalGenerator *gen) :
 			ApiObject(TOOL_SIGNAL_GENERATOR), gen(gen) {}
 		~SignalGenerator_API() {}

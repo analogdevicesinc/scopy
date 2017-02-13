@@ -298,7 +298,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 	connect(ui->mathWidget, SIGNAL(functionValid(const QString&)),
 			this, SLOT(setFunction(const QString&)));
 
-	connect(ui->run_button, SIGNAL(clicked(bool)), runButton,
+	connect(ui->run_button, SIGNAL(toggled(bool)), runButton,
 			SLOT(setChecked(bool)));
 	connect(runButton, SIGNAL(toggled(bool)), ui->run_button,
 			SLOT(setChecked(bool)));
@@ -949,4 +949,14 @@ size_t SignalGenerator::get_samples_count(const struct iio_device *dev,
 		return 0;
 
 	return size;
+}
+
+bool SignalGenerator_API::running() const
+{
+	return gen->ui->run_button->isChecked();
+}
+
+void SignalGenerator_API::run(bool en)
+{
+	gen->ui->run_button->setChecked(en);
 }
