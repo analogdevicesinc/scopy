@@ -105,9 +105,11 @@ public:
 		unsigned precision = 0,
 		bool sign = true);
 
-	void set_offset(double val);
-
 	double get_offset();
+	void set_offset(double value);
+
+	int getTimeTriggerPx() const;
+	void setTimeTriggerPx(int value);
 
 private:
 	/**
@@ -180,8 +182,6 @@ private Q_SLOTS:
 
 	// Resets the 'tick_position_cache_'.
 	void invalidate_tick_position_cache();
-Q_SIGNALS:
-	void repaintTriggerHandle();
 };
 
 } // namespace view

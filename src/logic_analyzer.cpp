@@ -34,6 +34,7 @@
 #include "pulseview/pv/mainwindow.hpp"
 #include "pulseview/pv/toolbars/mainbar.hpp"
 #include "pulseview/pv/view/view.hpp"
+#include "pulseview/pv/view/viewport.hpp"
 #include "pulseview/pv/devicemanager.hpp"
 #include "pulseview/pv/session.hpp"
 #include "pulseview/pv/view/ruler.hpp"
@@ -231,8 +232,10 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 		this, SLOT(setTimebaseLabel(double)));
 	connect(timePosition, SIGNAL(valueChanged(double)),
 		this, SLOT(onTimePositionSpinboxChanged(double)));
-	connect(main_win->view_->ruler_, SIGNAL(repaintTriggerHandle()),
-		this, SLOT(refreshTriggerPos()));
+	connect(main_win->view_, SIGNAL(repaintTriggerHandle(double, bool)),
+		this, SLOT(onRulerChanged(double, bool)));
+	connect(main_win->view_->viewport(), SIGNAL(repaintTriggerHandle(int)),
+		this, SLOT(refreshTriggerPos(int)));
 
 	chm_ui = new LogicAnalyzerChannelManagerUI(0, main_win, &chm, ui->colorSettings,
 	                this);
@@ -248,6 +251,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	connect(ui->btnShowChannels, SIGNAL(clicked(bool)),
 	        this, SLOT(on_btnShowChannelsClicked(bool)));
 
+	main_win->view_->viewport()->setTimeTriggerPosActive(true);
 	ui->areaTimeTriggerLayout->addWidget(this->bottomHandlesArea(), 0, 1, 1, 3);
 	updateAreaTimeTriggerPadding();
 	ui->triggerStateLabel->setText("Stop");
@@ -261,6 +265,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 
 	timePosition->setValue(0);
 	timePosition->valueChanged(timePosition->value());
+	main_win->view_->viewport()->setTimeTriggerSample(-active_triggerSampleCount);
 }
 
 
@@ -308,10 +313,24 @@ void LogicAnalyzer::onHorizScaleValueChanged(double value)
 	active_sampleCount = params.entireBufferSize;
 	active_triggerSampleCount = -(long long)params.triggerBufferSize;
 	active_timePos = -params.timePos;
+	active_plot_timebase = value;
 
 	double plotTimeSpan = value * 10; //Hdivision count
 
 	custom_sampleCount = maxBuffersize / plotRefreshRate;
+
+	enableTrigger(true);
+	if( plotTimeSpan >= timespanLimitStream )
+	{
+		logic_analyzer_ptr->set_buffersize(custom_sampleCount);
+		enableTrigger(false);
+		active_triggerSampleCount = 0;
+	}
+	else if( logic_analyzer_ptr )
+	{
+		logic_analyzer_ptr->set_buffersize(active_sampleCount);
+		main_win->session_.set_buffersize(active_sampleCount);
+	}
 
 	if( running )
 	{
@@ -325,18 +344,19 @@ void LogicAnalyzer::onHorizScaleValueChanged(double value)
 		}
 	}
 	setTriggerDelay();
-	if( plotTimeSpan >= timespanLimitStream )
-	{
-		logic_analyzer_ptr->set_buffersize(custom_sampleCount);
-	}
-	else if( logic_analyzer_ptr )
-	{
-		logic_analyzer_ptr->set_buffersize(active_sampleCount);
-		main_win->session_.set_buffersize(active_sampleCount);
-	}
 
 	// Change the sensitivity of time position control
 	timePosition->setStep(value / 10);
+}
+
+void LogicAnalyzer::enableTrigger(bool value)
+{
+	if( !value )
+		d_timeTriggerHandle->hide();
+	else
+		d_timeTriggerHandle->show();
+	main_win->view_->viewport()->setTimeTriggerPosActive(value);
+	main_win->view_->time_item_appearance_changed(true, true);
 }
 
 void LogicAnalyzer::setSampleRate()
@@ -387,14 +407,31 @@ void LogicAnalyzer::updateAreaTimeTriggerPadding()
 
 }
 
+
+void LogicAnalyzer::onRulerChanged(double ruler_value, bool silent)
+{
+	double timePos = ruler_value + active_plot_timebase * 10 / 2;
+	if(!silent)
+		if(timePosition->value() != timePos)
+			timePosition->setValue(timePos);
+	else{
+		active_plot_timebase = main_win->view_->scale();
+		int pix = timeToPixel(-timePos);
+		if( pix != d_timeTriggerHandle->position() )
+		{
+			d_timeTriggerHandle->setPositionSilenty(pix);
+		}
+	}
+}
+
 QWidget* LogicAnalyzer::bottomHandlesArea()
 {
 	return d_bottomHandlesArea;
 }
 
-void LogicAnalyzer::refreshTriggerPos()
+void LogicAnalyzer::refreshTriggerPos(int px)
 {
-	d_timeTriggerHandle->setPositionSilenty(timeToPixel(-timePosition->value()));
+	d_timeTriggerHandle->setPositionSilenty(px);
 }
 
 void LogicAnalyzer::onTimePositionSpinboxChanged(double value)
@@ -409,14 +446,8 @@ void LogicAnalyzer::onTimePositionSpinboxChanged(double value)
 	int pix = timeToPixel(-value);
 	if( pix != d_timeTriggerHandle->position() )
 	{
-		d_timeTriggerHandle->setPositionSilenty(pix);
+		d_timeTriggerHandle->setPosition(pix);
 	}
-
-	int width = bottomHandlesArea()->geometry().width() -
-			d_bottomHandlesArea->leftPadding() -
-			d_bottomHandlesArea->rightPadding();
-	double perc = pix * 100 / width;
-	main_win->view_->viewport()->setTimeTriggerPos(perc);
 	if( running )
 	{
 		setHWTriggerDelay(active_triggerSampleCount);
@@ -432,21 +463,23 @@ void LogicAnalyzer::onTimeTriggerHandlePosChanged(int pos)
 	int width = bottomHandlesArea()->geometry().width() -
 			d_bottomHandlesArea->leftPadding() -
 			d_bottomHandlesArea->rightPadding();
-	double perc = pos * 100 / width;
-	main_win->view_->viewport()->setTimeTriggerPos(perc);
 	double time = pixelToTime(pos);
-	if( (time + timeBase->value() * 10 / 2) != timePosition->value() )
+	if( (time + active_plot_timebase * 10 / 2) != active_plot_timebase )
 	{
-		timePosition->setValue(time + timeBase->value() * 10 / 2);
+		timePosition->setValue(time + active_plot_timebase * 10 / 2);
 	}
+	if(running)
+		main_win->view_->viewport()->setTimeTriggerSample(
+			-active_triggerSampleCount);
 	else {
 		setTriggerDelay();
 	}
+	main_win->view_->set_offset(timePosition->value(), active_plot_timebase * 10, running);
 }
 
 double LogicAnalyzer::pixelToTime(int pix)
 {
-	double timeSpan = timeBase->value() * 10;
+	double timeSpan = active_plot_timebase * 10;
 	int width = bottomHandlesArea()->geometry().width() -
 		d_bottomHandlesArea->leftPadding() -
 		d_bottomHandlesArea->rightPadding();
@@ -456,7 +489,7 @@ double LogicAnalyzer::pixelToTime(int pix)
 
 int LogicAnalyzer::timeToPixel(double time)
 {
-	double timeSpan = timeBase->value() * 10;
+	double timeSpan = active_plot_timebase * 10;
 	int width = bottomHandlesArea()->geometry().width() -
 		d_bottomHandlesArea->leftPadding() -
 		d_bottomHandlesArea->rightPadding();
@@ -474,6 +507,8 @@ void LogicAnalyzer::startStop(bool start)
 		ui->btnRunStop->setText("Stop");
 		setHWTriggerDelay(active_triggerSampleCount);
 		setTriggerDelay();
+		main_win->view_->viewport()->setTimeTriggerSample(
+			-active_triggerSampleCount);
 		if (timePosition->value() != active_timePos)
 			timePosition->setValue(active_timePos);
 	} else {
@@ -485,9 +520,14 @@ void LogicAnalyzer::startStop(bool start)
 	setTriggerDelay();
 }
 
-void LogicAnalyzer::setTriggerDelay()
+void LogicAnalyzer::setTriggerDelay(bool silent)
 {
-	main_win->view_->set_offset(timePosition->value(), timeBase->value() * 10, running);
+	if( !silent ) {
+		main_win->view_->set_offset(timePosition->value(), active_plot_timebase * 10, running);
+		if( running )
+			main_win->view_->viewport()->setTimeTriggerSample(
+				-active_triggerSampleCount);
+	}
 }
 
 void LogicAnalyzer::setHWTriggerDelay(long long delay)

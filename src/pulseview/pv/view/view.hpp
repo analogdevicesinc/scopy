@@ -253,11 +253,14 @@ Q_SIGNALS:
 	/// Emitted when the time_unit changed.
 	void time_unit_changed();
 
+	void repaintTriggerHandle(double, bool);
+
 public Q_SLOTS:
 	void trigger_event(util::Timestamp location);
 
 	void set_timebase(double value);
 
+	void onPlotChanged(bool);
 private:
 	void get_scroll_layout(double &length, pv::util::Timestamp &offset) const;
 
@@ -316,6 +319,7 @@ public:
 	void remove_trace_clones();
 	Ruler *ruler_;
 	void set_offset(double timePos, double timeSpan, bool running);
+	double start_plot_offset();
 
 private Q_SLOTS:
 

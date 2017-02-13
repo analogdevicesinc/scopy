@@ -148,6 +148,10 @@ View::View(Session &session, QWidget *parent) :
 
 	connect(&delayed_view_updater_, SIGNAL(timeout()),
 		this, SLOT(perform_delayed_view_update()));
+
+	connect(viewport_, SIGNAL(plotChanged(bool)),
+		this, SLOT(onPlotChanged(bool)));
+
 	delayed_view_updater_.setSingleShot(true);
 	delayed_view_updater_.setInterval(1000 / MaxViewAutoUpdateRate);
 
@@ -556,8 +560,6 @@ void View::get_scroll_layout(double &length, Timestamp &offset) const
 	const pair<Timestamp, Timestamp> extents = get_time_extents();
 	length = ((extents.second - extents.first) / scale_  ).convert_to<double>();
 	offset = offset_ / scale_;
-//	length = ((extents.second - extents.first) / (scale_  / (viewport_->width() / DivisionCount))).convert_to<double>();
-//	offset = offset_ / (scale_  / (viewport_->width() / DivisionCount));
 }
 
 void View::set_zoom(double scale, int offset)
@@ -573,6 +575,8 @@ void View::set_zoom(double scale, int offset)
 
 	scale = new_scale.convert_to<double>();
 	set_scale_offset(new_scale.convert_to<double>(), new_offset);
+	if( viewport_->getTimeTriggerActive() )
+		onPlotChanged(true);
 }
 
 void View::calculate_tick_spacing()
@@ -1198,6 +1202,11 @@ void View::set_timebase(double value)
 	backup_scale_ = scale_;
 }
 
+double View::start_plot_offset()
+{
+	return start_plot_offset_;
+}
+
 void View::set_offset(double timePos, double timeSpan, bool running)
 {
 	double value = -(timeSpan / 2 - timePos);
@@ -1226,7 +1235,14 @@ void View::set_offset(double timePos, double timeSpan, bool running)
 		ruler_->set_offset(value);
 		set_scale_offset(scale_, plot_offset);
 	}
-	time_item_appearance_changed(true, true);
+}
+
+void View::onPlotChanged(bool silent)
+{
+	double plot_offset = offset_.convert_to<double>();
+	double ruler_value = start_plot_offset_ + plot_offset;
+	ruler_->set_offset(ruler_value);
+	Q_EMIT repaintTriggerHandle(ruler_value, silent);
 }
 
 void View::session_error(

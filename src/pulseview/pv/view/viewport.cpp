@@ -51,10 +51,22 @@ namespace view {
 Viewport::Viewport(View &parent) :
 	ViewWidget(parent),
 	pinch_zoom_active_(false),
-	timeTriggerPos(0)
+	timeTriggerSample(0),
+	timeTriggerPixel(0),
+	timeTriggerActive(false)
 {
 	setAutoFillBackground(true);
 	setBackgroundRole(QPalette::Base);
+}
+
+void Viewport::setTimeTriggerPosActive(bool active)
+{
+	timeTriggerActive = active;
+}
+
+bool Viewport::getTimeTriggerActive()
+{
+	return timeTriggerActive;
 }
 
 shared_ptr<ViewItem> Viewport::get_mouse_over_item(const QPoint &pt)
@@ -89,9 +101,11 @@ void Viewport::drag_by(const QPoint &delta)
 		return;
 
 	view_.set_scale_offset(view_.scale(),
-		(*drag_offset_ - delta.x() * view_.scale()));
-
+		(*drag_offset_ - delta.x() * view_.scale() / (geometry().width() / divisionCount)));
 	view_.set_v_offset(-drag_v_offset_ - delta.y());
+	update();
+	if( getTimeTriggerActive() )
+		Q_EMIT plotChanged(false);
 }
 
 void Viewport::drag_release()
@@ -196,38 +210,50 @@ void Viewport::paintEvent(QPaintEvent*)
 	for (const shared_ptr<TimeItem> t : time_items)
 		t->paint_fore(p, pp);
 
-	if( timeTriggerPos != 0 )
+	if( timeTriggerActive )
 	{
-		int valuePx = view_.viewport()->geometry().width() * timeTriggerPos / 100;
-		paint_time_trigger_line(p, pp, valuePx);
+		paint_time_trigger_line(p, pp, timeTriggerSample);
 	}
 	p.end();
 }
 
-void Viewport::setTimeTriggerPos(double perc)
+void Viewport::setTimeTriggerSample(int sample)
 {
-	if( perc != timeTriggerPos )
+	if( sample != timeTriggerSample )
 	{
-		timeTriggerPos = perc;
+		timeTriggerSample = sample;
 		view_.time_item_appearance_changed(true, true);
 	}
 }
 
-int Viewport::getTimeTriggerPos() const
+int Viewport::getTimeTriggerSample() const
 {
-	return timeTriggerPos;
+	return timeTriggerSample;
 }
 
-void Viewport::paint_time_trigger_line(QPainter &p, const ViewItemPaintParams &pp, int pos)
+void Viewport::paint_time_trigger_line(QPainter &p, const ViewItemPaintParams &pp, int sample_index)
 {
+	double samplerate = view_.session().get_samplerate();
+	if( samplerate != 1 )
+	{
+		const double samples_per_pixel = samplerate * pp.scale();
+		const double pixels_offset = pp.pixels_offset();
+		int px = (sample_index / samples_per_pixel - pixels_offset) + pp.left();
+		if( px != timeTriggerPixel)
+		{
+			timeTriggerPixel = px;
+			repaintTriggerHandle(timeTriggerPixel);
+		}
+	}
+
 	QPen pen = QPen(QColor(74, 100, 255));
 	p.setPen(pen);
 	const int y = view_.owner_visual_v_offset();
 	const int h = pp.height();
 	int row_count = view_.height() / divisionHeight;
 
-	QPoint p1 = QPoint(pos, y);
-	QPoint p2 = QPoint(pos, y + h * row_count);
+	QPoint p1 = QPoint(timeTriggerPixel, y);
+	QPoint p2 = QPoint(timeTriggerPixel, y + h * row_count);
 	p.drawLine(p1, p2);
 }
 
@@ -307,14 +333,24 @@ void Viewport::wheelEvent(QWheelEvent *event)
 	}
 }
 
+int Viewport::getTimeTriggerPixel() const
+{
+	return timeTriggerPixel;
+}
+
+void Viewport::setTimeTriggerPixel(int value)
+{
+	timeTriggerPixel = value;
+}
+
 int Viewport::getDivisionOffset() const
 {
-    return divisionOffset;
+	return divisionOffset;
 }
 
 void Viewport::setDivisionOffset(int value)
 {
-    divisionOffset = value;
+	divisionOffset = value;
 }
 
 int Viewport::getDivisionCount() const

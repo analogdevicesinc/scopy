@@ -84,11 +84,12 @@ private Q_SLOTS:
 	void onHorizScaleValueChanged(double value);
 	void setTimebaseLabel(double value);
 	void singleRun();
+	void onRulerChanged(double, bool);
 
 public Q_SLOTS:
 	void onTimeTriggerHandlePosChanged(int);
 	void onTimePositionSpinboxChanged(double value);
-	void refreshTriggerPos();
+	void refreshTriggerPos(int);
 
 private:
 	Ui::LogicAnalyzer *ui;
@@ -150,7 +151,7 @@ private:
 
 	bool running = false;
 	void setSampleRate();
-	void setTriggerDelay();
+	void setTriggerDelay(bool silent = false);
 	void setHWTriggerDelay(long long delay);
 	double plotRefreshRate;
 	int timespanLimitStream;
@@ -160,6 +161,8 @@ private:
 
 	std::shared_ptr<LogicAnalyzerSymmetricBufferMode> symmBufferMode;
 
+	double active_plot_timebase;
+	void enableTrigger(bool value);
 };
 }
 

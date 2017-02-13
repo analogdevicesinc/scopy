@@ -54,11 +54,16 @@ public:
     int getDivisionOffset() const;
     void setDivisionOffset(int value);
 
-	int getTimeTriggerPos() const;
-	void setTimeTriggerPos(double value);
+	int getTimeTriggerSample() const;
+	void setTimeTriggerSample(int value);
+	void setTimeTriggerPosActive(bool active);
+	bool getTimeTriggerActive();
+
+	int getTimeTriggerPixel() const;
+	void setTimeTriggerPixel(int value);
 
 private:
-    /**
+	/**
      * Indicates when a view item is being hovered over.
 	 * @param item The item that is being hovered over, or @c nullptr
 	 * if no view item is being hovered over.
@@ -102,6 +107,9 @@ private:
 	bool touch_event(QTouchEvent *event);
 
 	int visible_data_count;
+Q_SIGNALS:
+	void plotChanged(bool);
+	void repaintTriggerHandle(int);
 
 private:
 	void paintEvent(QPaintEvent *event);
@@ -120,14 +128,13 @@ private:
 	double pinch_offset1_;
 	bool pinch_zoom_active_;
 
-    int divisionHeight = 50;
-    int divisionCount = 10;
-    int divisionOffset = 3;
+	int divisionHeight = 50;
+	int divisionCount = 10;
+	int divisionOffset = 3;
 
-	double timeTriggerPos;
-
-Q_SIGNALS:
-	void requestTriggerPos(int);
+	int timeTriggerSample;
+	int timeTriggerPixel;
+	bool timeTriggerActive;
 
 };
 

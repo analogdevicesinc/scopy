@@ -63,7 +63,7 @@ Ruler::Ruler(View &parent) :
 	connect(&view_, SIGNAL(time_unit_changed()),
 		this, SLOT(invalidate_tick_position_cache()));
 
-	ruler_offset = pv::util::Timestamp(0);
+	ruler_offset = pv::util::Timestamp(-0.005);
 	timeTriggerPx = 0;
 }
 
@@ -160,18 +160,16 @@ void Ruler::paintEvent(QPaintEvent*)
 
 
 	QPainter p(this);
-	if( view_.viewport()->getTimeTriggerPos() != 0 )
+	if( view_.viewport()->getTimeTriggerActive() )
 	{
-		int perc = view_.viewport()->getTimeTriggerPos();
-		int valuePx = view_.viewport()->geometry().width() * perc / 100;
+		int valuePx = view_.viewport()->getTimeTriggerPixel();
 		if( valuePx != timeTriggerPx )
-			Q_EMIT repaintTriggerHandle();
-		timeTriggerPx = valuePx;
+			timeTriggerPx = valuePx;
 		QPen pen = QPen(QColor(74, 100, 255));
 		p.setPen(pen);
 
-		QPoint p1 = QPoint(valuePx, 0);
-		QPoint p2 = QPoint(valuePx, ruler_height);
+		QPoint p1 = QPoint(timeTriggerPx, 0);
+		QPoint p2 = QPoint(timeTriggerPx, ruler_height);
 		p.drawLine(p1, p2);
 	}
 	// Draw the tick marks
@@ -205,11 +203,11 @@ void Ruler::paintEvent(QPaintEvent*)
 	}
 }
 
-
 void Ruler::set_offset(double value)
 {
 	pv::util::Timestamp new_offset = pv::util::Timestamp(value);
-	ruler_offset = new_offset;
+	if(ruler_offset != new_offset)
+		ruler_offset = new_offset;
 }
 
 double Ruler::get_offset()
@@ -253,6 +251,17 @@ Ruler::TickPositions Ruler::calculate_tick_positions(
 	} while (x < width && division <= divisionCount_);
 
 	return tp;
+}
+
+int Ruler::getTimeTriggerPx() const
+{
+	return timeTriggerPx;
+}
+
+void Ruler::setTimeTriggerPx(int value)
+{
+	timeTriggerPx = value;
+	view_.time_item_appearance_changed(true, false);
 }
 
 void Ruler::mouseDoubleClickEvent(QMouseEvent *event)
