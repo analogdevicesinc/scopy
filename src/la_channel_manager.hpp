@@ -44,11 +44,13 @@ public:
 	                       LogicAnalyzerChannelGroup *chgroup,
 	                       LogicAnalyzerChannelManagerUI *chm_ui,
 	                       QWidget *parent = 0);
+	~LogicAnalyzerChannelUI();
 	Ui::LAChannelGroup *ui;
 	LogicAnalyzerChannel *getChannel();
 	void setTrace(std::shared_ptr<pv::view::TraceTreeItem> item);
 	std::shared_ptr<pv::view::TraceTreeItem> getTrace();
 	void channelRoleChanged(const QString);
+	LogicAnalyzerChannelGroup* getChannelGroup();
 	QPoint dragStartPosition;
 	QRect topDragbox;
 	QRect botDragbox;
@@ -108,6 +110,7 @@ public:
 	LogicAnalyzerChannelGroupUI(LogicAnalyzerChannelGroup *chg,
 	                            LogicAnalyzerChannelManagerUI *chm_ui,
 	                            QWidget *parent = 0);
+	~LogicAnalyzerChannelGroupUI();
 	LogicAnalyzerChannelGroup *getChannelGroup();
 	std::vector<LogicAnalyzerChannelUI *> ch_ui;
 	Ui::LAChannelGroup *ui;
@@ -192,6 +195,7 @@ public:
 	                              LogicAnalyzerChannelManager *chm,
 	                              QWidget *locationSettingsWidget,
 	                              LogicAnalyzer *la);
+	~LogicAnalyzerChannelManagerUI();
 	LogicAnalyzerChannelManager *chm;
 	LogicAnalyzer *la;
 	Ui::LAChannelManager *ui;
@@ -213,6 +217,8 @@ public Q_SLOTS:
 	void set_label(QString);
 	void rolesChangedRHS(const QString);
 	void triggerUpdateUi();
+	void highlightNext();
+	void highlightPrevious();
 
 private Q_SLOTS:
 	void on_groupSplit_clicked();

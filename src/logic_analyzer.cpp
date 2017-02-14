@@ -271,7 +271,9 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 
 LogicAnalyzer::~LogicAnalyzer()
 {
+	delete chm_ui;
 	delete ui;
+
 	/* Destroy libsigrokdecode */
 	srd_exit();
 }

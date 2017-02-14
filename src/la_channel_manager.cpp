@@ -68,6 +68,11 @@ LogicAnalyzerChannelUI::LogicAnalyzerChannelUI(LogicAnalyzerChannel *ch,
 	setAcceptDrops(true);
 }
 
+LogicAnalyzerChannelUI::~LogicAnalyzerChannelUI()
+{
+	delete ui;
+}
+
 void LogicAnalyzerChannelUI::mousePressEvent(QMouseEvent *event)
 {
 	if (event->button() == Qt::LeftButton)
@@ -239,6 +244,11 @@ void LogicAnalyzerChannelUI::channelRoleChanged(const QString text)
 	if (channel_role) {
 		chgroup->setChannelForDecoder(channel_role, getTrace());
 	}
+}
+
+LogicAnalyzerChannelGroup* LogicAnalyzerChannelUI::getChannelGroup()
+{
+	return chgroup;
 }
 
 void LogicAnalyzerChannelUI::rolesChangedLHS(const QString text)
@@ -463,6 +473,11 @@ LogicAnalyzerChannelGroupUI::LogicAnalyzerChannelGroupUI(
 			}
 		}
 	}
+}
+
+LogicAnalyzerChannelGroupUI::~LogicAnalyzerChannelGroupUI()
+{
+	delete ui;
 }
 
 void LogicAnalyzerChannelGroupUI::set_decoder(std::string value)
@@ -744,9 +759,6 @@ LogicAnalyzerChannelManager::~LogicAnalyzerChannelManager()
 	for (auto ch : channel) {
 		delete ch;
 	}
-	for (auto dec : decoderList) {
-		delete dec;
-	}
 }
 
 LogicAnalyzerChannelGroup *LogicAnalyzerChannelManager::get_channel_group(
@@ -933,7 +945,10 @@ LogicAnalyzerChannelManagerUI::LogicAnalyzerChannelManagerUI(QWidget *parent,
 	this->chm->initDecoderList();
 }
 
-
+LogicAnalyzerChannelManagerUI::~LogicAnalyzerChannelManagerUI()
+{
+	delete ui;
+}
 
 void invalidateLayout(QLayout *layout);
 
@@ -1268,7 +1283,6 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 	        this, SLOT(chmScrollChanged(int)));
 }
 
-
 void LogicAnalyzerChannelManagerUI::chmScrollChanged(int value)
 {
 	main_win->view_->set_v_offset(value);
@@ -1430,23 +1444,39 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 	settingsUI->setupUi(currentSettingsWidget);
 	locationSettingsWidget->layout()->addWidget(currentSettingsWidget);
 	ensurePolished();
+	connect(settingsUI->btnNext, SIGNAL(pressed()),
+		this, SLOT(highlightNext()));
+	connect(settingsUI->btnPrevious, SIGNAL(pressed()),
+		this, SLOT(highlightPrevious()));
 
 	if (chm->getHighlightedChannelGroup()) {
 		LogicAnalyzerChannelGroup *chGroup = chm->getHighlightedChannelGroup();
 		settingsUI->nameLineEdit->setText(QString::fromStdString(chGroup->get_label()));
-		connect(settingsUI->nameLineEdit, SIGNAL(textChanged(QString)),
-		        this, SLOT(set_label(QString)));
+		connect(settingsUI->nameLineEdit, &QLineEdit::editingFinished,
+			[=]() {
+				QString text = settingsUI->nameLineEdit->text();
+				getUiFromChGroup(chm->getHighlightedChannelGroup())->
+					ui->groupName->setText(text);
+				set_label(text);
+			});
 
 		if (chGroup->is_grouped()) {
 			const srd_decoder *decoder = chGroup->getDecoder();
 
 			if (!decoder) {
+				settingsUI->requiredChn->hide();
+				settingsUI->optionalChn->hide();
 				locationSettingsWidget->setVisible(true);
 				return;
 			}
 
 			/* Create widgets for required channels */
 			GSList *reqCh = g_slist_copy(decoder->channels);
+			if( g_slist_length(reqCh) > 0 )
+				settingsUI->requiredChn->show();
+			else
+				settingsUI->requiredChn->hide();
+
 			for (; reqCh; reqCh = reqCh->next) {
 				const srd_channel *const rqch = (const srd_channel *)reqCh->data;
 
@@ -1458,6 +1488,7 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 				QWidget *r = new QWidget(currentSettingsWidget);
 				reqChUI->setupUi(r);
 				reqChUI->labelRole->setText(QString::fromUtf8(rqch->name));
+				reqChUI->stackedWidget->setCurrentIndex(0);
 
 				reqChUI->roleCombo->addItem("-");
 				for (auto&& ch : *(chGroup->get_channels())) {
@@ -1471,7 +1502,8 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 				}
 				reqChUI->roleCombo->setProperty("id", QVariant(rqch->id));
 				reqChUI->roleCombo->setProperty("name", QVariant(rqch->name));
-				currentSettingsWidget->layout()->addWidget(r);
+				settingsUI->scrollAreaWidgetLayout->insertWidget(
+					settingsUI->scrollAreaWidgetLayout->count() - 2, r);
 
 				connect(reqChUI->roleCombo,
 				        SIGNAL(currentIndexChanged(const QString&)),
@@ -1479,8 +1511,14 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 
 			}
 			free(reqCh);
+
 			/* Create widgets for optional channels */
 			GSList *optChannels = g_slist_copy(decoder->opt_channels);
+			if( g_slist_length(optChannels) > 0)
+				settingsUI->optionalChn->show();
+			else
+				settingsUI->optionalChn->hide();
+
 			for (; optChannels; optChannels = optChannels->next) {
 				const srd_channel *const optch = (const srd_channel *)optChannels->data;
 
@@ -1492,6 +1530,7 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 				QWidget *r = new QWidget(currentSettingsWidget);
 				optChUI->setupUi(r);
 				optChUI->labelRole->setText(QString::fromUtf8(optch->name));
+				optChUI->stackedWidget->setCurrentIndex(0);
 
 				/* Add all the available channels + "none" to the list */
 				optChUI->roleCombo->addItem("-");
@@ -1506,7 +1545,8 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 				}
 				optChUI->roleCombo->setProperty("id", QVariant(optch->id));
 				optChUI->roleCombo->setProperty("name", QVariant(optch->name));
-				currentSettingsWidget->layout()->addWidget(r);
+				settingsUI->scrollAreaWidgetLayout->insertWidget(
+					settingsUI->scrollAreaWidgetLayout->count() - 1, r);
 
 				connect(optChUI->roleCombo,
 				        SIGNAL(currentIndexChanged(const QString&)),
@@ -1514,28 +1554,41 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 			}
 			free(optChannels);
 		}
+		else {
+			settingsUI->requiredChn->hide();
+			settingsUI->optionalChn->hide();
+		}
 
 	}
 
 	if (chm->getHighlightedChannel()) {
+		settingsUI->requiredChn->hide();
+		settingsUI->optionalChn->hide();
 		LogicAnalyzerChannel *ch = chm->getHighlightedChannel();
 		settingsUI->nameLineEdit->setText(QString::fromStdString(ch->get_label()));
-		connect(settingsUI->nameLineEdit, SIGNAL(textChanged(QString)),
-		        this, SLOT(set_label(QString)));
+		connect(settingsUI->nameLineEdit, &QLineEdit::editingFinished,
+			[=]() {
+			QString text = settingsUI->nameLineEdit->text();
+			getUiFromCh(chm->getHighlightedChannel())->
+				ui->groupName->setText(text);
+			set_label(text);
+		});
 
 		QWidget *r = new QWidget(currentSettingsWidget);
 		Ui::LARequiredChannel *roleChUI = new Ui::LARequiredChannel();
 		roleChUI->setupUi(r);
 		if(ch->getChannel_role())
 		{
-			roleChUI->labelRole->setText(QString::fromUtf8(ch->getChannel_role()->name));
+			roleChUI->labelChRole->setText(QString::fromUtf8(ch->getChannel_role()->name));
 		}
 		else
 		{
-			roleChUI->labelRole->setText("-");
+			roleChUI->labelChRole->setText("-");
 		}
+		roleChUI->stackedWidget->setCurrentIndex(1);
 
-		currentSettingsWidget->layout()->addWidget(r);
+		settingsUI->scrollAreaWidgetLayout->insertWidget(
+			settingsUI->scrollAreaWidgetLayout->count() - 1, r);
 	}
 
 	locationSettingsWidget->setVisible(true);
@@ -1552,6 +1605,78 @@ void LogicAnalyzerChannelManagerUI::deleteSettingsWidget()
 	}
 }
 
+void LogicAnalyzerChannelManagerUI::highlightPrevious()
+{
+	bool update = false;
+	if( chm->getHighlightedChannelGroup() ) {
+		auto chgroup = chm->getHighlightedChannelGroup();
+		auto chgIter = std::find(chm->get_channel_groups()->begin(),
+			chm->get_channel_groups()->end(), chgroup);
+		auto chgIndex = chgIter - chm->get_channel_groups()->begin();
+		if( chgIter != chm->get_channel_groups()->end() ) {
+			if( chgIndex - 1 >= 0 ) {
+				auto prevChgroup = chm->get_channel_group(chgIndex - 1);
+				chm->highlightChannel(prevChgroup);
+				update = true;
+			}
+		}
+	}
+	if( chm->getHighlightedChannel() ) {
+		auto ch = chm->getHighlightedChannel();
+		auto chUI = getUiFromCh(ch);
+		auto chgroup = chUI->getChannelGroup();
+		auto chIter = std::find(chgroup->get_channels()->begin(),
+			chgroup->get_channels()->end(), ch);
+		auto chIndex = chIter - chgroup->get_channels()->begin();
+		if( chIter != chgroup->get_channels()->end() ) {
+			if( chIndex - 1 >= 0 ) {
+				auto prevCh = chgroup->get_channel(chIndex - 1);
+				chm->highlightChannel(nullptr,
+					static_cast<LogicAnalyzerChannel*>(prevCh));
+				update = true;
+			}
+		}
+	}
+	if(update)
+		update_ui();
+}
+
+void LogicAnalyzerChannelManagerUI::highlightNext()
+{
+	bool update = false;
+	if( chm->getHighlightedChannelGroup() ) {
+		auto chgroup = chm->getHighlightedChannelGroup();
+		auto chgIter = std::find(chm->get_channel_groups()->begin(),
+			chm->get_channel_groups()->end(), chgroup);
+		auto chgIndex = chgIter - chm->get_channel_groups()->begin();
+		if( chgIter != chm->get_channel_groups()->end() ) {
+			if( chgIndex + 1 < chm->get_channel_groups()->size() ) {
+				auto nextChgroup = chm->get_channel_group(chgIndex + 1);
+				chm->highlightChannel(nextChgroup);
+				update = true;
+			}
+		}
+	}
+	if( chm->getHighlightedChannel() ) {
+		auto ch = chm->getHighlightedChannel();
+		auto chUI = getUiFromCh(ch);
+		auto chgroup = chUI->getChannelGroup();
+		auto chIter = std::find(chgroup->get_channels()->begin(),
+			chgroup->get_channels()->end(), ch);
+		auto chIndex = chIter - chgroup->get_channels()->begin();
+		if( chIter != chgroup->get_channels()->end() ) {
+			if( chIndex + 1 < chgroup->get_channel_count() ) {
+				auto prevCh = chgroup->get_channel(chIndex + 1);
+				chm->highlightChannel(nullptr,
+					static_cast<LogicAnalyzerChannel*>(prevCh));
+				update = true;
+			}
+		}
+	}
+	if(update)
+		update_ui();
+}
+
 void LogicAnalyzerChannelManagerUI::set_label(QString text)
 {
 	if (chm->getHighlightedChannelGroup()) {
@@ -1561,8 +1686,6 @@ void LogicAnalyzerChannelManagerUI::set_label(QString text)
 	if (chm->getHighlightedChannel()) {
 		chm->getHighlightedChannel()->set_label(text.toStdString());
 	}
-
-	update_ui();
 }
 
 void LogicAnalyzerChannelManagerUI::set_pv_decoder(LogicAnalyzerChannelGroupUI
