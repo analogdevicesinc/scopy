@@ -1104,3 +1104,30 @@ void SignalGenerator_API::setWaveformFreq(const QList<double>& list)
 
 	gen->frequency->setValue(gen->getCurrentData()->frequency);
 }
+
+QList<double> SignalGenerator_API::getWaveformOfft() const
+{
+	QList<double> list;
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(&gen->channels[i]->first);
+
+		list.append(static_cast<double>(ptr->offset));
+	}
+
+	return list;
+}
+
+void SignalGenerator_API::setWaveformOfft(const QList<double>& list)
+{
+	if (list.size() != gen->channels.size())
+		return;
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(&gen->channels[i]->first);
+
+		ptr->offset = static_cast<float>(list.at(i));
+	}
+
+	gen->offset->setValue(gen->getCurrentData()->offset);
+}
