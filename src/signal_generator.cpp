@@ -1131,3 +1131,30 @@ void SignalGenerator_API::setWaveformOfft(const QList<double>& list)
 
 	gen->offset->setValue(gen->getCurrentData()->offset);
 }
+
+QList<double> SignalGenerator_API::getWaveformPhase() const
+{
+	QList<double> list;
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(&gen->channels[i]->first);
+
+		list.append(ptr->phase);
+	}
+
+	return list;
+}
+
+void SignalGenerator_API::setWaveformPhase(const QList<double>& list)
+{
+	if (list.size() != gen->channels.size())
+		return;
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(&gen->channels[i]->first);
+
+		ptr->phase = list.at(i);
+	}
+
+	gen->phase->setValue(gen->getCurrentData()->phase);
+}
