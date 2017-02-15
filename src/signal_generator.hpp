@@ -163,6 +163,8 @@ namespace adiscope {
 		Q_PROPERTY(QList<int> mode READ getMode WRITE setMode);
 		Q_PROPERTY(QList<double> constant_volts
 				READ getConstantValue WRITE setConstantValue);
+		Q_PROPERTY(QList<int> waveform_type
+				READ getWaveformType WRITE setWaveformType);
 
 	public:
 		bool running() const;
@@ -173,6 +175,9 @@ namespace adiscope {
 
 		QList<double> getConstantValue() const;
 		void setConstantValue(const QList<double>& list);
+
+		QList<int> getWaveformType() const;
+		void setWaveformType(const QList<int>& list);
 
 		explicit SignalGenerator_API(SignalGenerator *gen) :
 			ApiObject(TOOL_SIGNAL_GENERATOR), gen(gen) {}

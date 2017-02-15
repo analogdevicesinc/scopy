@@ -1014,3 +1014,39 @@ void SignalGenerator_API::setConstantValue(const QList<double>& list)
 
 	gen->constantValue->setValue(gen->getCurrentData()->constant);
 }
+
+QList<int> SignalGenerator_API::getWaveformType() const
+{
+	QList<int> list;
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(&gen->channels[i]->first);
+
+		list.append(SignalGenerator::sg_waveform_to_idx(ptr->waveform));
+	}
+
+	return list;
+}
+
+void SignalGenerator_API::setWaveformType(const QList<int>& list)
+{
+	if (list.size() != gen->channels.size())
+		return;
+
+	enum sg_waveform types[] = {
+		SG_SIN_WAVE,
+		SG_SQR_WAVE,
+		SG_TRI_WAVE,
+		SG_SAW_WAVE,
+		SG_INV_SAW_WAVE,
+	};
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(&gen->channels[i]->first);
+
+		ptr->waveform = types[list.at(i)];
+
+		if (i == gen->currentChannel)
+			gen->ui->type->setCurrentIndex(list.at(i));
+	}
+}
