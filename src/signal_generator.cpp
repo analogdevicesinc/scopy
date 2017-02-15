@@ -1050,3 +1050,30 @@ void SignalGenerator_API::setWaveformType(const QList<int>& list)
 			gen->ui->type->setCurrentIndex(list.at(i));
 	}
 }
+
+QList<double> SignalGenerator_API::getWaveformAmpl() const
+{
+	QList<double> list;
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(&gen->channels[i]->first);
+
+		list.append(ptr->amplitude);
+	}
+
+	return list;
+}
+
+void SignalGenerator_API::setWaveformAmpl(const QList<double>& list)
+{
+	if (list.size() != gen->channels.size())
+		return;
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(&gen->channels[i]->first);
+
+		ptr->amplitude = list.at(i);
+	}
+
+	gen->amplitude->setValue(gen->getCurrentData()->amplitude);
+}
