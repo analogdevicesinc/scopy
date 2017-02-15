@@ -116,6 +116,7 @@ namespace adiscope {
 
 		static size_t gcd(size_t a, size_t b);
 		static size_t lcm(size_t a, size_t b);
+		static int sg_waveform_to_idx(enum sg_waveform wave);
 
 		size_t get_samples_count(const struct iio_device *dev,
 				unsigned long sample_rate);

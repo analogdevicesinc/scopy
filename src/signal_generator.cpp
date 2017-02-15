@@ -680,6 +680,23 @@ void adiscope::SignalGenerator::renameConfigPanel()
 	ui->config_panel->setTitle(QString("Configuration for %1").arg(name));
 }
 
+int SignalGenerator::sg_waveform_to_idx(enum sg_waveform wave)
+{
+	switch (wave) {
+	case SG_SIN_WAVE:
+	default:
+		return 0;
+	case SG_SQR_WAVE:
+		return 1;
+	case SG_TRI_WAVE:
+		return 2;
+	case SG_SAW_WAVE:
+		return 3;
+	case SG_INV_SAW_WAVE:
+		return 4;
+	}
+}
+
 void adiscope::SignalGenerator::rightMenuFinished(bool opened)
 {
 	if (opened) {
@@ -705,21 +722,7 @@ void adiscope::SignalGenerator::rightMenuFinished(bool opened)
 			ui->label_size->setText("");
 		}
 
-		switch (ptr->waveform) {
-		case analog::GR_SIN_WAVE:
-		default:
-			ui->type->setCurrentIndex(0);
-			break;
-		case analog::GR_SQR_WAVE:
-			ui->type->setCurrentIndex(1);
-			break;
-		case analog::GR_TRI_WAVE:
-			ui->type->setCurrentIndex(2);
-			break;
-		case analog::GR_SAW_WAVE:
-			ui->type->setCurrentIndex(3);
-			break;
-		}
+		ui->type->setCurrentIndex(sg_waveform_to_idx(ptr->waveform));
 
 		renameConfigPanel();
 		ui->tabWidget->setCurrentIndex((int) ptr->type);
