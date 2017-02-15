@@ -1185,3 +1185,33 @@ void SignalGenerator_API::setMathFreq(const QList<double>& list)
 
 	gen->mathFrequency->setValue(gen->getCurrentData()->math_freq);
 }
+
+QList<QString> SignalGenerator_API::getMathFunction() const
+{
+	QList<QString> list;
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(&gen->channels[i]->first);
+
+		list.append(ptr->function);
+	}
+
+	return list;
+}
+
+void SignalGenerator_API::setMathFunction(const QList<QString>& list)
+{
+	if (list.size() != gen->channels.size())
+		return;
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(&gen->channels[i]->first);
+
+		ptr->function = list.at(i);
+	}
+
+	if (gen->getCurrentData()->type == SIGNAL_TYPE_MATH) {
+		gen->ui->mathWidget->setFunction(
+				gen->getCurrentData()->function);
+	}
+}

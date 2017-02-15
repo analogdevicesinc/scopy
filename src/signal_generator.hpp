@@ -175,6 +175,8 @@ namespace adiscope {
 				READ getWaveformPhase WRITE setWaveformPhase);
 		Q_PROPERTY(QList<double> math_frequency
 				READ getMathFreq WRITE setMathFreq);
+		Q_PROPERTY(QList<QString> math_function
+				READ getMathFunction WRITE setMathFunction);
 
 	public:
 		bool running() const;
@@ -203,6 +205,9 @@ namespace adiscope {
 
 		QList<double> getMathFreq() const;
 		void setMathFreq(const QList<double>& list);
+
+		QList<QString> getMathFunction() const;
+		void setMathFunction(const QList<QString>& list);
 
 		explicit SignalGenerator_API(SignalGenerator *gen) :
 			ApiObject(TOOL_SIGNAL_GENERATOR), gen(gen) {}
