@@ -1158,3 +1158,30 @@ void SignalGenerator_API::setWaveformPhase(const QList<double>& list)
 
 	gen->phase->setValue(gen->getCurrentData()->phase);
 }
+
+QList<double> SignalGenerator_API::getMathFreq() const
+{
+	QList<double> list;
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(&gen->channels[i]->first);
+
+		list.append(ptr->math_freq);
+	}
+
+	return list;
+}
+
+void SignalGenerator_API::setMathFreq(const QList<double>& list)
+{
+	if (list.size() != gen->channels.size())
+		return;
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(&gen->channels[i]->first);
+
+		ptr->math_freq = list.at(i);
+	}
+
+	gen->mathFrequency->setValue(gen->getCurrentData()->math_freq);
+}
