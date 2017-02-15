@@ -1072,6 +1072,7 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 			setWidgetMinimumNrOfChars(lachannelgroupUI->ui->groupName, 8);
 			setWidgetMinimumNrOfChars(lachannelgroupUI->ui->indexLabel, 5);
 			setWidgetMinimumNrOfChars(lachannelgroupUI->ui->comboBox, 5);
+			lachannelgroupUI->ui->comboBox->setIconSize(QSize(30,20));
 			setWidgetMinimumNrOfChars(lachannelgroupUI->ui->comboBox_2, 5);
 			retainWidgetSizeWhenHidden(lachannelgroupUI->ui->collapseGroupBtn);
 
@@ -1164,6 +1165,7 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 					setWidgetMinimumNrOfChars(lachannelUI->ui->indexLabel2, 5);
 					setWidgetMinimumNrOfChars(lachannelUI->ui->indexLabel, 5);
 					setWidgetMinimumNrOfChars(lachannelUI->ui->comboBox, 5);
+					lachannelUI->ui->comboBox->setIconSize(QSize(30, 20));
 					setWidgetMinimumNrOfChars(lachannelUI->ui->comboBox_2, 8);
 
 					retainWidgetSizeWhenHidden(lachannelUI->ui->collapseGroupBtn);

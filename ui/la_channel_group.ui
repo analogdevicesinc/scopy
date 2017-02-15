@@ -66,6 +66,15 @@ QComboBox QAbstractItemView {
   selection-background-color: rgba(25, 25, 25);
   outline: 0px;
 }
+
+QComboBox QAbstractItemView::item {
+width:30px;
+hieght:20px;
+margin-top: 0px;
+border:0px;
+padding:0px;
+}
+
 QComboBox:disabled
 {
   color: rgb(85, 85, 85);
@@ -1163,10 +1172,13 @@ border-right:0px solid transparent;</string>
                 </disabled>
                </palette>
               </property>
+              <property name="sizeAdjustPolicy">
+               <enum>QComboBox::AdjustToMinimumContentsLengthWithIcon</enum>
+              </property>
               <property name="iconSize">
                <size>
                 <width>30</width>
-                <height>30</height>
+                <height>20</height>
                </size>
               </property>
               <property name="frame">
@@ -1174,11 +1186,7 @@ border-right:0px solid transparent;</string>
               </property>
               <item>
                <property name="text">
-                <string extracomment="any edge"/>
-               </property>
-               <property name="icon">
-                <iconset resource="../resources/resources.qrc">
-                 <normaloff>:/icons/trigger-any.svg</normaloff>:/icons/trigger-any.svg</iconset>
+                <string>None</string>
                </property>
               </item>
               <item>
@@ -1187,7 +1195,10 @@ border-right:0px solid transparent;</string>
                </property>
                <property name="icon">
                 <iconset resource="../resources/resources.qrc">
-                 <normaloff>:/icons/trigger-falling.svg</normaloff>:/icons/trigger-falling.svg</iconset>
+                 <normaloff>:/icons/trigger_any_enabled.svg</normaloff>
+                 <normalon>:/icons/trigger_any_enabled.svg</normalon>
+                 <disabledoff>:/icons/trigger_any_disabled.svg</disabledoff>
+                 <disabledon>:/icons/trigger_any_disabled.svg</disabledon>:/icons/trigger_any_enabled.svg</iconset>
                </property>
               </item>
               <item>
@@ -1196,7 +1207,10 @@ border-right:0px solid transparent;</string>
                </property>
                <property name="icon">
                 <iconset resource="../resources/resources.qrc">
-                 <normaloff>:/icons/trigger-rising.svg</normaloff>:/icons/trigger-rising.svg</iconset>
+                 <normaloff>:/icons/trigger_rising_enabled.svg</normaloff>
+                 <normalon>:/icons/trigger_rising_enabled.svg</normalon>
+                 <disabledoff>:/icons/trigger_rising_disabled.svg</disabledoff>
+                 <disabledon>:/icons/trigger_rising_disabled.svg</disabledon>:/icons/trigger_rising_enabled.svg</iconset>
                </property>
               </item>
               <item>
@@ -1205,7 +1219,10 @@ border-right:0px solid transparent;</string>
                </property>
                <property name="icon">
                 <iconset resource="../resources/resources.qrc">
-                 <normaloff>:/icons/trigger-low.svg</normaloff>:/icons/trigger-low.svg</iconset>
+                 <normaloff>:/icons/trigger_falling_enabled.svg</normaloff>
+                 <normalon>:/icons/trigger_falling_enabled.svg</normalon>
+                 <disabledoff>:/icons/trigger_falling_disabled.svg</disabledoff>
+                 <disabledon>:/icons/trigger_falling_disabled.svg</disabledon>:/icons/trigger_falling_enabled.svg</iconset>
                </property>
               </item>
               <item>
@@ -1214,7 +1231,22 @@ border-right:0px solid transparent;</string>
                </property>
                <property name="icon">
                 <iconset resource="../resources/resources.qrc">
-                 <normaloff>:/icons/trigger-high.svg</normaloff>:/icons/trigger-high.svg</iconset>
+                 <normaloff>:/icons/trigger_low_enabled.svg</normaloff>
+                 <normalon>:/icons/trigger_low_enabled.svg</normalon>
+                 <disabledoff>:/icons/trigger_low_disabled.svg</disabledoff>
+                 <disabledon>:/icons/trigger_low_disabled.svg</disabledon>:/icons/trigger_low_enabled.svg</iconset>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="../resources/resources.qrc">
+                 <normaloff>:/icons/trigger_high_enabled.svg</normaloff>
+                 <normalon>:/icons/trigger_high_enabled.svg</normalon>
+                 <disabledoff>:/icons/trigger_high_disabled.svg</disabledoff>
+                 <disabledon>:/icons/trigger_high_disabled.svg</disabledon>:/icons/trigger_high_enabled.svg</iconset>
                </property>
               </item>
              </widget>
@@ -1264,10 +1296,10 @@ border-right:0px solid transparent;</string>
 }
 
 QPushButton:checked {
-  border-image: url(:/icons/close_hovered.svg);
+  border-image: url(:/icons/redX.svg);
 }
 QPushButton:!checked {
-  border-image: url(:/icons/close_hovered.svg);
+  border-image: url(:/icons/redX.svg);
 
 }
 </string>

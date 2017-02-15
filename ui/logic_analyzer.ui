@@ -1136,14 +1136,26 @@ QPushButton:hover
   color: #ffffff;
 }
 
-
+/*
 QPushButton:hover
 {
-	 background-color: #4a34ff;
-}</string>
+	color: #4a34ff;
+}*/</string>
              </property>
              <property name="text">
-              <string>&lt;</string>
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset resource="../resources/resources.qrc">
+               <normaloff>:/icons/time_trigger_left.svg</normaloff>
+               <activeon>:/icons/time_trigger_right.svg</activeon>
+               <selectedon>:/icons/time_trigger_right.svg</selectedon>:/icons/time_trigger_left.svg</iconset>
+             </property>
+             <property name="iconSize">
+              <size>
+               <width>40</width>
+               <height>30</height>
+              </size>
              </property>
              <property name="checkable">
               <bool>true</bool>
@@ -1504,6 +1516,8 @@ QPushButton:hover
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../resources/resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

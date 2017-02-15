@@ -654,11 +654,9 @@ void LogicAnalyzer::toggleLeftMenu(bool val)
 {
 	if (val) {
 		ui->btnGroupChannels->hide();
-		ui->btnShowHideMenu->setText(">");
 		chm_ui->collapse(true);
 	} else {
 		ui->btnGroupChannels->show();
-		ui->btnShowHideMenu->setText("<");
 		chm_ui->collapse(false);
 	}
 	updateAreaTimeTriggerPadding();
