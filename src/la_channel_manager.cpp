@@ -12,6 +12,7 @@
 #include "ui_la_decoder_reqChannel.h"
 #include <QScrollBar>
 #include <libsigrokcxx/libsigrokcxx.hpp>
+#include <QPainter>
 
 namespace pv {
 class MainWindow;
@@ -1106,7 +1107,7 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 
 				if(!collapsed)
 				{
-					setWidgetMinimumNrOfChars(lachannelgroupUI->ui->decoderCombo, 15);
+					setWidgetMinimumNrOfChars(lachannelgroupUI->ui->decoderCombo, 17);
 				}
 
 				/* Populate role combo based on parent decoder */
@@ -1695,5 +1696,10 @@ void LogicAnalyzerChannelManagerUI::set_pv_decoder(LogicAnalyzerChannelGroupUI
 {
 	main_win->view_->set_decoder_to_group(chGroup->getTrace(),
 	                                      chGroup->getChannelGroup()->getDecoder());
+}
+
+void LogicAnalyzerChannelManagerUI::paintEvent(QPaintEvent *event)
+{
+	Q_EMIT(widthChanged(geometry().width()));
 }
 }

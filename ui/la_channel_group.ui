@@ -1341,14 +1341,14 @@ QPushButton:!checked {
               </property>
               <property name="minimumSize">
                <size>
-                <width>20</width>
-                <height>20</height>
+                <width>0</width>
+                <height>0</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>20</width>
-                <height>20</height>
+                <width>16777215</width>
+                <height>16777215</height>
                </size>
               </property>
               <property name="palette">
@@ -1769,22 +1769,20 @@ QPushButton:!checked {
               <property name="styleSheet">
                <string notr="true">QCheckBox
 {
-  min-width: 20px;
-  min-height: 20px;
-  max-width: 20px;
-  max-height: 20px;
+  spacing: 0px;
 }
-QCheckBox::indicator {
-		border: 2px solid rgb(74, 100, 255);
-			border-radius: 4px;
+QCheckBox:indicator
+{
+height: 16px;
+width: 16px;
+border-radius:4px;
+border: 2px solid #4a64ff;
 }
-QCheckBox::indicator:checked {
-	background-color: rgb(74, 100, 255);
-}
-QCheckBox::indicator:!checked {
-	background-color: rgb(39, 39, 48);
-}
-</string>
+
+QCheckBox:indicator:checked
+{
+background:#4a64ff;
+}</string>
               </property>
               <property name="text">
                <string/>

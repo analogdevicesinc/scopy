@@ -219,6 +219,7 @@ public Q_SLOTS:
 	void triggerUpdateUi();
 	void highlightNext();
 	void highlightPrevious();
+	void paintEvent(QPaintEvent *event);
 
 private Q_SLOTS:
 	void on_groupSplit_clicked();
@@ -230,6 +231,8 @@ private:
 	std::vector<int> visibleItemsIndexes;
 	QButtonGroup *settings_exclusive_group;
 	void setWidgetMinimumNrOfChars(QWidget *w, int nrOfChars);
+Q_SIGNALS:
+	void widthChanged(int);
 };
 }
 #endif // LA_CHANNEL_MANAGER_HPP

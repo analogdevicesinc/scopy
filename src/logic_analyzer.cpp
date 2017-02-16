@@ -250,6 +250,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	        chm_ui, SLOT(on_hideInactive_clicked(bool)));
 	connect(ui->btnShowChannels, SIGNAL(clicked(bool)),
 	        this, SLOT(on_btnShowChannelsClicked(bool)));
+	connect(chm_ui, SIGNAL(widthChanged(int)),
+		this, SLOT(onChmWidthChanged(int)));
 
 	main_win->view_->viewport()->setTimeTriggerPosActive(true);
 	ui->areaTimeTriggerLayout->addWidget(this->bottomHandlesArea(), 0, 1, 1, 3);
@@ -406,9 +408,7 @@ void LogicAnalyzer::updateAreaTimeTriggerPadding()
 {
 	ui->areaTimeTriggerLayout->setContentsMargins(
 		chm_ui->sizeHint().width() - 20, 0, 0, 0);
-
 }
-
 
 void LogicAnalyzer::onRulerChanged(double ruler_value, bool silent)
 {
@@ -659,7 +659,6 @@ void LogicAnalyzer::toggleLeftMenu(bool val)
 		ui->btnGroupChannels->show();
 		chm_ui->collapse(false);
 	}
-	updateAreaTimeTriggerPadding();
 }
 
 void LogicAnalyzer::rightMenuFinished(bool opened)
@@ -678,12 +677,10 @@ void LogicAnalyzer::leftMenuFinished(bool closed)
 	if (ui->btnShowHideMenu->isChecked() && !closed) {
 		ui->btnGroupChannels->hide();
 		ui->btnShowChannels->hide();
-		ui->btnShowHideMenu->setText(">");
 		chm_ui->collapse(true);
 	} else {
 		ui->btnGroupChannels->show();
 		ui->btnShowChannels->show();
-		ui->btnShowHideMenu->setText("<");
 		chm_ui->collapse(false);
 	}
 }
@@ -695,4 +692,12 @@ void LogicAnalyzer::on_btnShowChannelsClicked(bool check)
 	} else {
 		ui->btnShowChannels->setText("Hide inactive");
 	}
+}
+
+void LogicAnalyzer::onChmWidthChanged(int value)
+{
+	int l, r, b, t;
+	ui->areaTimeTriggerLayout->getContentsMargins(&l, &t, &r, &b);
+	if(l != value - 20 )
+		ui->areaTimeTriggerLayout->setContentsMargins(value - 20, 0, 0, 0);
 }

@@ -90,6 +90,7 @@ public Q_SLOTS:
 	void onTimeTriggerHandlePosChanged(int);
 	void onTimePositionSpinboxChanged(double value);
 	void refreshTriggerPos(int);
+	void onChmWidthChanged(int);
 
 private:
 	Ui::LogicAnalyzer *ui;
