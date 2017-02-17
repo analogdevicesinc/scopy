@@ -720,7 +720,7 @@ void LogicAnalyzerChannelGroupUI::triggerChanged(int index)
 		if( trigger_val != ch->getTrigger() )
 		{
 			ch->setTrigger(trigger_val);
-			chm_ui->la->set_trigger_to_device(ch->get_id(), trigger_val);
+			chm_ui->la->setHWTrigger(ch->get_id(), trigger_val);
 		}
 	}
 }
@@ -944,6 +944,7 @@ LogicAnalyzerChannelManagerUI::LogicAnalyzerChannelManagerUI(QWidget *parent,
 	this->chm = chm;
 	this->la = la;
 	this->chm->initDecoderList();
+	Q_EMIT(widthChanged(geometry().width()));
 }
 
 LogicAnalyzerChannelManagerUI::~LogicAnalyzerChannelManagerUI()

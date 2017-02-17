@@ -49,6 +49,8 @@
 /* Generated UI */
 #include "ui_logic_analyzer.h"
 #include "ui_logic_channel_settings.h"
+#include "ui_trigger.h"
+#include "ui_digital_trigger_settings.h"
 
 /* Boost includes */
 #include <boost/thread.hpp>
@@ -66,6 +68,15 @@ const unsigned long LogicAnalyzer::maxBuffersize = 16000;
 const unsigned long LogicAnalyzer::maxSampleRate = 80000000;
 const unsigned long LogicAnalyzer::maxTriggerBufferSize = 8192;
 
+std::vector<std::string> LogicAnalyzer::trigger_mapping = {
+		"none",
+		"edge-any",
+		"edge-rising",
+		"edge-falling",
+		"level-low",
+		"level-high",
+};
+
 LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
                              Filter *filt,
                              QPushButton *runBtn,
@@ -75,7 +86,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	ctx(ctx),
 	itemsize(sizeof(uint16_t)),
 	dev(iio_context_find_device(ctx, dev_name.c_str())),
-	menuOpened(true),
+	menuOpened(false),
 	settings_group(new QButtonGroup(this)),
 	menuRunButton(runBtn),
 	ui(new Ui::LogicAnalyzer),
@@ -85,7 +96,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	active_sampleRate(0.0),
 	active_sampleCount(0),
 	active_triggerSampleCount(0),
-	active_timePos(0)
+	active_timePos(0),
+	trigger_settings(new QWidget(this))
 {
 	ui->setupUi(this);
 	this->setAttribute(Qt::WA_DeleteOnClose, true);
@@ -208,6 +220,33 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	int ch_settings_panel = ui->stackedWidget->indexOf(ui->colorSettings);
 	ui->btnChSettings->setProperty("id", QVariant(-ch_settings_panel));
 
+	/* Trigger Settings */
+	QWidget *trig_widget = new QWidget(this);
+	Ui::Trigger trig_ui;
+	trig_ui.setupUi(trig_widget);
+	ui->trigger_settings->addWidget(trig_widget);
+	triggerBtn = trig_ui.btn;
+	settings_group->addButton(triggerBtn);
+	int trigger_panel = ui->stackedWidget->indexOf(ui->triggerSettings);
+	trig_ui.btn->setProperty("id", QVariant(-trigger_panel));
+
+	trigger_settings_ui = new Ui::DigitalTriggerSettings;
+	trigger_settings_ui->setupUi(trigger_settings);
+	ui->triggerSettingsLayout->insertWidget(0, trigger_settings);
+	setupTriggerSettingsUI();
+
+	connect(trigger_settings_ui->cmb_trigg_extern_cond_1,
+		SIGNAL(currentIndexChanged(int)),
+		this, SLOT(setExternalTrigger(int)));
+	connect(trigger_settings_ui->cmb_trigg_extern_cond_2,
+		SIGNAL(currentIndexChanged(int)),
+		this, SLOT(setExternalTrigger(int)));
+	connect(trigger_settings_ui->trigg_extern_en, SIGNAL(toggled(bool)),
+		this, SLOT(setupTriggerSettingsUI(bool)));
+	connect(trigger_settings_ui->cmb_trigg_logic, SIGNAL(currentTextChanged(const QString)),
+		this, SLOT(setHWTriggerLogic(const QString)));
+	connect(trig_ui.btn, SIGNAL(pressed()),
+		this, SLOT(toggleRightMenu()));
 	connect(ui->btnRunStop, SIGNAL(toggled(bool)),
 	        this, SLOT(startStop(bool)));
 	connect(ui->btnSingleRun, SIGNAL(pressed()),
@@ -237,6 +276,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	connect(main_win->view_->viewport(), SIGNAL(repaintTriggerHandle(int)),
 		this, SLOT(refreshTriggerPos(int)));
 
+	cleanHWParams();
 	chm_ui = new LogicAnalyzerChannelManagerUI(0, main_win, &chm, ui->colorSettings,
 	                this);
 	ui->leftLayout->addWidget(chm_ui);
@@ -264,6 +304,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	onHorizScaleValueChanged(timeBase->value());
 	setBuffersizeLabelValue(active_sampleCount);
 	setSamplerateLabelValue(active_sampleRate);
+	setSampleRate();
 
 	timePosition->setValue(0);
 	timePosition->valueChanged(timePosition->value());
@@ -466,17 +507,12 @@ void LogicAnalyzer::onTimeTriggerHandlePosChanged(int pos)
 			d_bottomHandlesArea->leftPadding() -
 			d_bottomHandlesArea->rightPadding();
 	double time = pixelToTime(pos);
-	if( (time + active_plot_timebase * 10 / 2) != active_plot_timebase )
+	if( (time + active_plot_timebase * 10 / 2) != active_timePos )
 	{
 		timePosition->setValue(time + active_plot_timebase * 10 / 2);
 	}
-	if(running)
-		main_win->view_->viewport()->setTimeTriggerSample(
-			-active_triggerSampleCount);
-	else {
-		setTriggerDelay();
-	}
-	main_win->view_->set_offset(timePosition->value(), active_plot_timebase * 10, running);
+	main_win->view_->viewport()->setTimeTriggerPixel(pos);
+	setTriggerDelay();
 }
 
 double LogicAnalyzer::pixelToTime(int pix)
@@ -509,8 +545,6 @@ void LogicAnalyzer::startStop(bool start)
 		ui->btnRunStop->setText("Stop");
 		setHWTriggerDelay(active_triggerSampleCount);
 		setTriggerDelay();
-		main_win->view_->viewport()->setTimeTriggerSample(
-			-active_triggerSampleCount);
 		if (timePosition->value() != active_timePos)
 			timePosition->setValue(active_timePos);
 	} else {
@@ -581,36 +615,16 @@ void LogicAnalyzer::clearLayout(QLayout *layout)
 void LogicAnalyzer::toggleRightMenu(QPushButton *btn)
 {
 	int id = btn->property("id").toInt();
-	bool open = true; //= !menuOpened;
+	bool btn_old_state = btn->isChecked();
+	bool open = !menuOpened;
 
-	settings_panel_update(id);
+	settings_group->setExclusive(!btn_old_state);
 
-	if (active_settings_btn == btn) {
-		open = !menuOpened;
-		ui->rightWidget->toggleMenu(false);
-	} else {
-		open = true;
-	}
+	if( open )
+		settings_panel_update(id);
 
-	if (!open) {
-		settings_group->setExclusive(false);
-		ui->btnChSettings->setChecked(false);
-		ui->btnSettings->setChecked(false);
-		settings_group->setExclusive(true);
-	}
-
-//	if (menuOpened != open) {
-//		ui->rightWidget->toggleMenu(open);
-//	}
-
-	menuOpened = open;
 	active_settings_btn = btn;
-
-	if (open) {
-		chm_ui->showHighlight(true);
-	} else {
-		chm_ui->showHighlight(false);
-	}
+	ui->rightWidget->toggleMenu(open);
 }
 
 void LogicAnalyzer::settings_panel_update(int id)
@@ -628,14 +642,22 @@ void LogicAnalyzer::toggleRightMenu()
 	toggleRightMenu(static_cast<QPushButton *>(QObject::sender()));
 }
 
-void LogicAnalyzer::set_trigger_to_device(int chid, std::string trigger_val)
+void LogicAnalyzer::setHWTrigger(int chid, std::string trigger_val)
 {
 	std::string name = "voltage" + to_string(chid);
 	struct iio_channel *triggerch = iio_device_find_channel(dev, name.c_str(), false);
 
 	if( !triggerch )
 		return;
-	iio_channel_attr_write(triggerch, "trigger", trigger_val.c_str());
+	if(!running)
+	{
+		iio_channel_attr_write(triggerch, "trigger", trigger_val.c_str());
+	}
+	else {
+//		main_win->run_stop();
+		iio_channel_attr_write(triggerch, "trigger", trigger_val.c_str());
+		main_win->run_stop();
+	}
 }
 
 std::string LogicAnalyzer::get_trigger_from_device(int chid)
@@ -698,6 +720,53 @@ void LogicAnalyzer::onChmWidthChanged(int value)
 {
 	int l, r, b, t;
 	ui->areaTimeTriggerLayout->getContentsMargins(&l, &t, &r, &b);
-	if(l != value - 20 )
+	if(l != value - 20 ){
 		ui->areaTimeTriggerLayout->setContentsMargins(value - 20, 0, 0, 0);
+		timePosition->valueChanged(timePosition->value());
+	}
+}
+
+void LogicAnalyzer::setHWTriggerLogic(const QString value)
+{
+	std::string name = "voltage0";
+	struct iio_channel *triggerch = iio_device_find_channel(dev, name.c_str(), false);
+	QString s = value.toLower();
+	iio_channel_attr_write(triggerch, "trigger_logic_mode",
+		s.toLocal8Bit().QByteArray::constData());
+}
+
+void LogicAnalyzer::setupTriggerSettingsUI(bool enabled)
+{
+	trigger_settings_ui->cmb_trigg_extern_cond_1->setEnabled(enabled);
+	trigger_settings_ui->cmb_trigg_extern_cond_2->setEnabled(enabled);
+	if( !enabled ) {
+		trigger_settings_ui->cmb_trigg_extern_cond_1->setCurrentIndex(0);
+		trigger_settings_ui->cmb_trigg_extern_cond_2->setCurrentIndex(0);
+		setHWTrigger(16, trigger_mapping[0]);
+		setHWTrigger(17, trigger_mapping[0]);
+	}
+}
+
+void LogicAnalyzer::setExternalTrigger(int index)
+{
+	int ext_1 = trigger_settings_ui->cmb_trigg_extern_cond_1->currentIndex();
+	int ext_2 = trigger_settings_ui->cmb_trigg_extern_cond_2->currentIndex();
+	std::string trigger_val;
+	if( ext_1 == index ) {
+		trigger_val = trigger_mapping[ext_1];
+		setHWTrigger(16, trigger_val);
+	}
+	if( ext_2 == index ) {
+		trigger_val = trigger_mapping[ext_2];
+		setHWTrigger(17, trigger_val);
+	}
+}
+
+void LogicAnalyzer::cleanHWParams()
+{
+	for(int i = 0; i < get_no_channels(dev) + 2; i++) {
+		setHWTrigger(i, trigger_mapping[0]);
+	}
+	setHWTriggerDelay(active_triggerSampleCount);
+	setHWTriggerLogic("or");
 }

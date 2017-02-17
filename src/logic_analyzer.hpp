@@ -57,6 +57,7 @@ namespace Ui {
 class LogicAnalyzer;
 class Channel;
 class LChannelSettings;
+class DigitalTriggerSettings;
 }
 
 namespace adiscope {
@@ -71,7 +72,7 @@ public:
 	                       QWidget *parent = 0);
 	~LogicAnalyzer();
 	void updateAreaTimeTriggerPadding();
-	void set_trigger_to_device(int chid, std::string trigger_val);
+	void setHWTrigger(int chid, std::string trigger_val);
 	std::string get_trigger_from_device(int chid);
 	void set_triggered_status(bool value);
 private Q_SLOTS:
@@ -85,7 +86,9 @@ private Q_SLOTS:
 	void setTimebaseLabel(double value);
 	void singleRun();
 	void onRulerChanged(double, bool);
-
+	void setHWTriggerLogic(const QString value);
+	void setupTriggerSettingsUI(bool enabled = false);
+	void setExternalTrigger(int);
 public Q_SLOTS:
 	void onTimeTriggerHandlePosChanged(int);
 	void onTimePositionSpinboxChanged(double value);
@@ -94,9 +97,13 @@ public Q_SLOTS:
 
 private:
 	Ui::LogicAnalyzer *ui;
+	Ui::DigitalTriggerSettings *trigger_settings_ui;
 	QButtonGroup *settings_group;
 	QPushButton *active_settings_btn;
 	QPushButton *menuRunButton;
+	QPushButton *triggerBtn;
+
+	static std::vector<std::string> trigger_mapping;
 
 	ScaleSpinButton *timeBase;
 	PositionSpinButton *timePosition;
@@ -161,9 +168,10 @@ private:
 	int timeToPixel(double time);
 
 	std::shared_ptr<LogicAnalyzerSymmetricBufferMode> symmBufferMode;
-
+	QWidget* trigger_settings;
 	double active_plot_timebase;
 	void enableTrigger(bool value);
+	void cleanHWParams();
 };
 }
 

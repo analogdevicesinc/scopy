@@ -105,6 +105,7 @@ void Viewport::drag_by(const QPoint &delta)
 	view_.set_v_offset(-drag_v_offset_ - delta.y());
 	update();
 	if( getTimeTriggerActive() )
+
 		Q_EMIT plotChanged(false);
 }
 
@@ -234,13 +235,12 @@ int Viewport::getTimeTriggerSample() const
 void Viewport::paint_time_trigger_line(QPainter &p, const ViewItemPaintParams &pp, int sample_index)
 {
 	double samplerate = view_.session().get_samplerate();
-	if( samplerate != 1 )
-	{
+	int px;
+	if( samplerate != 1 ) {
 		const double samples_per_pixel = samplerate * pp.scale();
 		const double pixels_offset = pp.pixels_offset();
-		int px = (sample_index / samples_per_pixel - pixels_offset) + pp.left();
-		if( px != timeTriggerPixel)
-		{
+		px = (sample_index / samples_per_pixel - pixels_offset) + pp.left();
+		if( px != timeTriggerPixel) {
 			timeTriggerPixel = px;
 			repaintTriggerHandle(timeTriggerPixel);
 		}

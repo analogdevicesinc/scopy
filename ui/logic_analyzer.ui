@@ -1399,7 +1399,7 @@ border-image: url(:/icons/time_trigger_left.svg);
          <item>
           <widget class="QStackedWidget" name="stackedWidget">
            <property name="currentIndex">
-            <number>2</number>
+            <number>3</number>
            </property>
            <widget class="QWidget" name="cursorSettings"/>
            <widget class="QWidget" name="generalSettings"/>
@@ -1426,6 +1426,41 @@ border-image: url(:/icons/time_trigger_left.svg);
              <property name="bottomMargin">
               <number>0</number>
              </property>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="triggerSettings">
+            <layout class="QVBoxLayout" name="triggerSettingsLayout">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <spacer name="verticalSpacer_4">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::MinimumExpanding</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>0</width>
+                 <height>10</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
             </layout>
            </widget>
           </widget>
