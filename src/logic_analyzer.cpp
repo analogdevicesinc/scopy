@@ -62,6 +62,7 @@ using namespace Glibmm;
 LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
                              Filter *filt,
                              QPushButton *runBtn,
+                             QJSEngine *engine,
                              QWidget *parent,
                              unsigned int sample_rate) :
 	QWidget(parent),
@@ -72,7 +73,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	menuOpened(false),
 	settings_group(new QButtonGroup(this)),
 	menuRunButton(runBtn),
-	ui(new Ui::LogicAnalyzer)
+	ui(new Ui::LogicAnalyzer),
+	la_api(new LogicAnalyzer_API(this))
 {
 	ui->setupUi(this);
 	this->setAttribute(Qt::WA_DeleteOnClose, true);
@@ -196,11 +198,17 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	        chm_ui, SLOT(on_hideInactive_clicked(bool)));
 	connect(ui->btnShowChannels, SIGNAL(clicked(bool)),
 	        this, SLOT(on_btnShowChannelsClicked(bool)));
+
+	la_api->load();
+	la_api->js_register(engine);
 }
 
 
 LogicAnalyzer::~LogicAnalyzer()
 {
+	la_api->save();
+	delete la_api;
+
 	delete ui;
 	/* Destroy libsigrokdecode */
 	srd_exit();

@@ -25,6 +25,7 @@
 #include <QPushButton>
 
 /* Local includes */
+#include "apiObject.hpp"
 #include "filter.hpp"
 #include "pulseview/pv/widgets/sweeptimingwidget.hpp"
 #include "pulseview/pv/devicemanager.hpp"
@@ -47,15 +48,22 @@ class Channel;
 class LChannelSettings;
 }
 
+class QJSEngine;
+
 namespace adiscope {
+class LogicAnalyzer_API;
+
 class LogicAnalyzer : public QWidget
 {
+	friend class LogicAnalyzer_API;
+
 	Q_OBJECT
 
 public:
 	explicit LogicAnalyzer(struct iio_context *ctx,
 	                       Filter *filt,
 	                       QPushButton *runButton,
+			       QJSEngine *engine,
 	                       QWidget *parent = 0,
 	                       unsigned int sample_rate = 200000);
 	~LogicAnalyzer();
@@ -85,6 +93,8 @@ private:
 	unsigned int itemsize;
 	pv::MainWindow *main_win;
 
+	LogicAnalyzer_API *la_api;
+
 	void disconnectAll();
 	static unsigned int get_no_channels(struct iio_device *dev);
 
@@ -101,6 +111,19 @@ private:
 	Ui::LChannelSettings *lachannelsettings;
 
 	void clearLayout(QLayout *layout);
+};
+
+class LogicAnalyzer_API : public ApiObject
+{
+	Q_OBJECT
+
+public:
+	explicit LogicAnalyzer_API(LogicAnalyzer *lga) :
+		ApiObject(TOOL_LOGIC_ANALYZER), lga(lga) {}
+	~LogicAnalyzer_API() {}
+
+private:
+	LogicAnalyzer *lga;
 };
 }
 

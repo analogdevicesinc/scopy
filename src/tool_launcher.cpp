@@ -440,7 +440,7 @@ bool adiscope::ToolLauncher::switchContext(const QString &uri)
 
 	if (filter->compatible(TOOL_LOGIC_ANALYZER)) {
 		logic_analyzer = new LogicAnalyzer(ctx, filter,
-				ui->stopLogicAnalyzer, this);
+				ui->stopLogicAnalyzer, &js_engine, this);
 		logic_analyzer->setVisible(false);
 		ui->logicAnalyzer->setEnabled(true);
 	}
