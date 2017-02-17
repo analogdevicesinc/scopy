@@ -486,17 +486,17 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	connect(&trigger_settings, SIGNAL(triggerModeChanged(int)),
 		this, SLOT(onTriggerModeChanged(int)));
 
-	Ui::CursorsSettings cr_ui;
-	cr_ui.setupUi(ui->cursorsSettings);
-	connect(cr_ui.hCursorsEnanble, SIGNAL(toggled(bool)),
+	cr_ui = new Ui::CursorsSettings;
+	cr_ui->setupUi(ui->cursorsSettings);
+	connect(cr_ui->hCursorsEnable, SIGNAL(toggled(bool)),
 		&plot, SLOT(setVertCursorsEnabled(bool)));
-	connect(cr_ui.vCursorsEnanble, SIGNAL(toggled(bool)),
+	connect(cr_ui->vCursorsEnable, SIGNAL(toggled(bool)),
 		&plot, SLOT(setHorizCursorsEnabled(bool)));
 
-	connect(cr_ui.hCursorsEnanble, SIGNAL(toggled(bool)),
+	connect(cr_ui->hCursorsEnable, SIGNAL(toggled(bool)),
 		cursor_readouts_ui->TimeCursors,
 		SLOT(setVisible(bool)));
-	connect(cr_ui.vCursorsEnanble, SIGNAL(toggled(bool)),
+	connect(cr_ui->vCursorsEnable, SIGNAL(toggled(bool)),
 		cursor_readouts_ui->VoltageCursors,
 		SLOT(setVisible(bool)));
 
@@ -586,6 +586,7 @@ Oscilloscope::~Oscilloscope()
 	delete gsettings_ui;
 	delete measure_panel_ui;
 	delete cursor_readouts_ui;
+	delete cr_ui;
 	delete ui;
 }
 
@@ -1002,7 +1003,10 @@ void adiscope::Oscilloscope::onCursorsToggled(bool on)
 		}
 	}
 
-	plot.setMeasurementCursorsEnabled(on);
+	plot.setHorizCursorsEnabled(
+			on ? cr_ui->vCursorsEnable->isChecked() : false);
+	plot.setVertCursorsEnabled(
+			on ? cr_ui->hCursorsEnable->isChecked() : false);
 
 	// Set the visibility of the cursor readouts owned by the Oscilloscope
 	QCheckBox *mbox = ui->measure_settings->itemAt(0)->widget()->
@@ -1028,7 +1032,7 @@ void adiscope::Oscilloscope::onMeasureToggled(bool on)
 	measurePanel->setVisible(on);
 
 	// Set the visibility of the cursor readouts owned by the plot
-	if (plot.measurementCursorsEnabled())
+	if (cursor_ui->box->isChecked())
 		plot.setCursorReadoutsVisible(!on);
 }
 

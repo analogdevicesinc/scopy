@@ -60,7 +60,6 @@ CapturePlot::CapturePlot(QWidget *parent,
 	OscilloscopePlot(parent, xNumDivs, yNumDivs),
 	d_triggerAEnabled(false),
 	d_triggerBEnabled(false),
-	d_measurementEnabled(false),
 	d_selected_channel(-1),
 	d_measurementsEnabled(false),
 	d_cursorReadoutsVisible(false),
@@ -488,20 +487,6 @@ void CapturePlot::setTriggerBEnabled(bool en)
 bool CapturePlot::triggerBEnabled()
 {
 	return d_triggerBEnabled;
-}
-
-void CapturePlot::setMeasurementCursorsEnabled(bool en)
-{
-	if (d_measurementEnabled != en) {
-		d_measurementEnabled = en;
-		setVertCursorsEnabled(en);
-		setHorizCursorsEnabled(en);
-	}
-}
-
-bool CapturePlot::measurementCursorsEnabled()
-{
-	return d_measurementEnabled;
 }
 
 void CapturePlot::setVertCursorsEnabled(bool en)
