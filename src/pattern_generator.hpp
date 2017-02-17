@@ -32,6 +32,7 @@
 #include "src/pulseview/pv/devices/binarybuffer.hpp"
 #include "filter.hpp"
 
+#include "apiObject.hpp"
 #include "pg_patterns.hpp"
 #include "pg_channel_manager.hpp"
 #include "pg_buffer_manager.hpp"
@@ -69,16 +70,22 @@ class PGSettings;
     class GenericJSPatternUI;*/
 }
 
+class QJSEngine;
+
 namespace adiscope {
+class PatternGenerator_API;
 
 
 class PatternGenerator : public QWidget
 {
+	friend class PatternGenerator_API;
+
 	Q_OBJECT
 
 public:
 	explicit PatternGenerator(struct iio_context *ctx, Filter *filt,
-	                          QPushButton *runButton, QWidget *parent = 0, bool offline_mode = 0);
+			QPushButton *runButton, QJSEngine *engine,
+			QWidget *parent = 0, bool offline_mode = 0);
 	~PatternGenerator();
 
 
@@ -127,6 +134,8 @@ private:
 	PatternUI *currentUI;
 	uint16_t channel_group;
 	bool offline_mode;
+
+	PatternGenerator_API *pg_api;
 
 	PatternGeneratorChannelGroup *selected_channel_group;
 	PatternGeneratorChannelManager chm;
@@ -179,6 +188,18 @@ private:
 	static QStringList possibleSampleRates;
 };
 
+class PatternGenerator_API : public ApiObject
+{
+	Q_OBJECT
+
+public:
+	explicit PatternGenerator_API(PatternGenerator *pg) :
+		ApiObject(TOOL_PATTERN_GENERATOR), pg(pg) {}
+	~PatternGenerator_API() {}
+
+private:
+	PatternGenerator *pg;
+};
 
 } /* namespace adiscope */
 

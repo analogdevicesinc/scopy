@@ -93,14 +93,16 @@ QStringList PatternGenerator::possibleSampleRates = QStringList()
                 << "5"          << "2"         << "1";
 
 PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
-                                   QPushButton *runBtn, QWidget *parent, bool offline_mode) :
+		QPushButton *runBtn, QJSEngine *engine,
+		QWidget *parent, bool offline_mode) :
 	QWidget(parent),
 	ctx(ctx),
 	settings_group(new QButtonGroup(this)), menuRunButton(runBtn),
 	ui(new Ui::PatternGenerator),
 	pgSettings(new Ui::PGSettings),
 	txbuf(0), sample_rate(100000), channel_enable_mask(0xffff),buffer(nullptr),
-	buffer_created(0), currentUI(nullptr), offline_mode(offline_mode)
+	buffer_created(0), currentUI(nullptr), offline_mode(offline_mode),
+	pg_api(new PatternGenerator_API(this))
 {
 
 	// IIO
@@ -150,6 +152,9 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 	    connect(ui->btnSingleRun, SIGNAL(pressed()), this, SLOT(singleRun()));
 	*/
 	bufui->updateUi();
+
+	pg_api->load();
+	pg_api->js_register(engine);
 }
 
 
@@ -163,6 +168,9 @@ PatternGenerator::~PatternGenerator()
 	for (auto var : patterns) {
 		delete var;
 	}
+
+	pg_api->save();
+	delete pg_api;
 
 	delete ui;
 	delete bufman;

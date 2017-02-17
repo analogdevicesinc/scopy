@@ -448,7 +448,7 @@ bool adiscope::ToolLauncher::switchContext(const QString &uri)
 
 	if (filter->compatible((TOOL_PATTERN_GENERATOR))) {
 		pattern_generator = new PatternGenerator (ctx, filter,
-				ui->stopPatternGenerator, this);
+				ui->stopPatternGenerator, &js_engine, this);
 		pattern_generator->setVisible(false);
 		ui->patternGenerator->setEnabled(true);
 	}
