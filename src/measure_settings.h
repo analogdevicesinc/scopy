@@ -106,9 +106,6 @@ private Q_SLOTS:
 	void on_button_statsDeleteAll_toggled(bool checked);
 
 private:
-	void addHorizontalMeasurement(const QString& name, int measurement_id);
-	void addVerticalMeasurement(const QString& name, int measurement_id);
-	void buildDropdownElements(int chnIdx);
 	void loadMeasurementStatesFromData();
 	void deleteAllMeasurements();
 	void recoverAllMeasurements();
