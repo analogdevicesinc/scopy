@@ -232,9 +232,11 @@ target_link_libraries(${PROJECT_NAME} LINK_PRIVATE
 		${GLIB_LIBRARIES}
 )
 
-find_library(PTHREAD_LIBRARIES pthread)
-if (PTHREAD_LIBRARIES)
-	target_link_libraries(${PROJECT_NAME} LINK_PRIVATE ${PTHREAD_LIBRARIES})
+if (NOT WIN32)
+	find_library(PTHREAD_LIBRARIES pthread)
+	if (PTHREAD_LIBRARIES)
+		target_link_libraries(${PROJECT_NAME} LINK_PRIVATE ${PTHREAD_LIBRARIES})
+	endif()
 endif()
 
 configure_file(Info.plist.cmakein ${CMAKE_CURRENT_BINARY_DIR}/Info.plist @ONLY)
