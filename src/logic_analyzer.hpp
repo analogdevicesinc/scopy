@@ -117,10 +117,15 @@ class LogicAnalyzer_API : public ApiObject
 {
 	Q_OBJECT
 
+	Q_PROPERTY(bool running READ running WRITE run STORED false);
+
 public:
 	explicit LogicAnalyzer_API(LogicAnalyzer *lga) :
 		ApiObject(TOOL_LOGIC_ANALYZER), lga(lga) {}
 	~LogicAnalyzer_API() {}
+
+	bool running() const;
+	void run(bool en);
 
 private:
 	LogicAnalyzer *lga;

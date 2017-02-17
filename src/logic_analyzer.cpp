@@ -354,3 +354,13 @@ void LogicAnalyzer::on_btnShowChannelsClicked(bool check)
 		ui->btnShowChannels->setText("Hide inactive");
 	}
 }
+
+bool LogicAnalyzer_API::running() const
+{
+	return lga->ui->btnRunStop->isChecked();
+}
+
+void LogicAnalyzer_API::run(bool en)
+{
+	lga->ui->btnRunStop->setChecked(en);
+}
