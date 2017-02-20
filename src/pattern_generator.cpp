@@ -40,6 +40,7 @@
 ///* pulseview and sigrok */
 #include <boost/math/common_factor.hpp>
 #include "pulseview/pv/mainwindow.hpp"
+#include "pulseview/pv/view/viewport.hpp"
 #include "pulseview/pv/devices/binarybuffer.hpp"
 #include "pulseview/pv/devicemanager.hpp"
 #include "pulseview/pv/toolbars/mainbar.hpp"
@@ -148,6 +149,17 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 	connect(ui->btnRunStop, SIGNAL(toggled(bool)), runBtn, SLOT(setChecked(bool)));
 	connect(ui->btnSingleRun, SIGNAL(pressed()), this, SLOT(singleRun()));
 	bufui->updateUi();
+
+	QString path = QCoreApplication::applicationDirPath() + "/decoders";
+	if (srd_init(path.toStdString().c_str()) != SRD_OK) {
+		qDebug() << "ERROR: libsigrokdecode init failed.";
+	}
+	qDebug()<<path;
+
+	//main_win->view_->viewport()->disableDrag();
+
+	/* Load the protocol decoders */
+	srd_decoder_load_all();
 }
 
 PatternGenerator::~PatternGenerator()
