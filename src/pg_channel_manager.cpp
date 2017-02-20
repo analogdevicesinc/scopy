@@ -1575,10 +1575,12 @@ void PatternGeneratorChannelManagerUI::groupSplitSelected()
 	}
 
 	if (changeHighlight) {
+		deleteSettingsWidget();
 		chm->highlightChannel(chm->get_channel_group(selection[0]));
+		createSettingsWidget();
 	}
 
-	Q_EMIT channelsChanged();
+	/*Q_EMIT channelsChanged();*/
 }
 
 void PatternGeneratorChannelManagerUI::showHighlight(bool val)
@@ -1588,21 +1590,12 @@ void PatternGeneratorChannelManagerUI::showHighlight(bool val)
 	PatternGeneratorChannelUI *uiCh = findUiByChannel(chm->getHighlightedChannel());
 
 	if (uiCh!=nullptr) {
-		setDynamicProperty(uiCh->ui->widget_2,"highlighted",val);
-
-		if (uiCh->trace) {
-			uiCh->trace->set_highlight(val);
-		}
-
+		uiCh->highlight(val);
 		return;
 	}
 
 	if (uiChg!=nullptr) {
-		setDynamicProperty(uiChg->ui->widget_2,"highlighted",val);
-
-		if (uiChg->trace) {
-			uiChg->trace->set_highlight(val);
-		}
+		uiChg->highlight(val);
 	}
 
 	if (val) {
