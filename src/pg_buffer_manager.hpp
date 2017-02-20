@@ -14,11 +14,14 @@
 #include "pulseview/pv/devices/binarybuffer.hpp"
 #include "pulseview/pv/devicemanager.hpp"
 #include "pulseview/pv/toolbars/mainbar.hpp"
+#include "pulseview/pv/view/view.hpp"
+#include "pulseview/pv/util.hpp"
 
 
 namespace pv {
 class MainWindow;
 class DeviceManager;
+class View;
 namespace toolbars {
 class MainBar;
 }
