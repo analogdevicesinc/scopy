@@ -310,8 +310,8 @@ public:
 	void time_item_appearance_changed(bool label, bool content);
 
 	void extents_changed(bool horz, bool vert);
-	std::shared_ptr<TraceTreeItem> get_clone_of(int id);
-	std::shared_ptr<TraceTreeItem> add_decoder();
+	std::shared_ptr<LogicSignal> get_clone_of(int id, int height = 0);
+	std::shared_ptr<DecodeTrace> add_decoder();
 	void set_decoder_to_group(std::shared_ptr<TraceTreeItem> trace, const srd_decoder* decoder);
 	void remove_trace_clones();
 

@@ -58,6 +58,7 @@
 #include "../util.hpp"
 
 #include "decodetrace.hpp"
+#include <QDebug>
 
 using boost::shared_lock;
 using boost::shared_mutex;
@@ -154,7 +155,7 @@ View::View(Session &session, QWidget *parent) :
 
 	viewport_->installEventFilter(this);
 	ruler_->installEventFilter(this);
-    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
 	// Trigger the initial event manually. The default device has signals
 	// which were created before this object came into being
@@ -517,7 +518,7 @@ const QPoint& View::hover_point() const
 }
 
 void View::restack_all_trace_tree_items()
-{
+{/*
 	// Make a list of owners that is sorted from deepest first
 	const vector<shared_ptr<TraceTreeItem>> items(
 		list_by_type<TraceTreeItem>());
@@ -541,7 +542,7 @@ void View::restack_all_trace_tree_items()
 
 	// Animate the items to their destination
 	for (const auto &i : items)
-		i->animate_to_layout_v_offset();
+		i->animate_to_layout_v_offset();*/
 }
 
 void View::trigger_event(util::Timestamp location)
@@ -677,12 +678,15 @@ void View::update_scroll()
 //    verticalScrollBar()->setPageStep(viewport_->height());
 //	verticalScrollBar()->setSingleStep(trace_height);
 
+
     verticalScrollBar()->setPageStep(viewport_->height());
     verticalScrollBar()->setSingleStep(viewport_->height() / 8);
 	// Don't change the scrollbar range if there are no traces
-	if (extents.first != extents.second)
+	/*if (extents.first != extents.second)
 		verticalScrollBar()->setRange(extents.first,
-			extents.second - viewport_->height() + 10);
+			extents.second - viewport_->height() /*+ 10);
+		/*verticalScrollBar()->setRange(extents.first - areaSize.height(),
+					extents.second);*/
 
 	if (scroll_needs_defaults)
 		set_scroll_default();
@@ -1150,12 +1154,12 @@ void View::on_hover_point_changed()
 		r->hover_point_changed();
 }
 
-shared_ptr<TraceTreeItem> View::get_clone_of(int id)
+shared_ptr<LogicSignal> View::get_clone_of(int id,int height)
 {
-    shared_ptr<Signal> logicsig = session_.create_signal_from_id(id);
+    shared_ptr<LogicSignal> logicsig = session_.create_signal_from_id(id,height);
     return logicsig;
 }
-shared_ptr<TraceTreeItem> View::add_decoder()
+shared_ptr<DecodeTrace> View::add_decoder()
 {
 	shared_ptr<pv::view::DecodeTrace> decode_trace =
 			session_.add_decoder();
@@ -1176,6 +1180,7 @@ void View::remove_trace_clones()
 {
 	session_.remove_signal_clones();
 	session_.remove_decode_clones();
+	viewport_->update();
 }
 
 void View::set_timebase(double value)

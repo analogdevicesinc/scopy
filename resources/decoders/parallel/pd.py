@@ -1,5 +1,4 @@
-##
-## This file is part of the libsigrokdecode project.
+#### This file is part of the libsigrokdecode project.
 ##
 ## Copyright (C) 2013 Uwe Hermann <uwe@hermann-uwe.de>
 ##
@@ -73,7 +72,7 @@ class Decoder(srd.Decoder):
     license = 'gplv2+'
     inputs = ['logic']
     outputs = ['parallel']
-    optional_channels = channel_list(8)
+    optional_channels = channel_list(16)
     options = (
         {'id': 'clock_edge', 'desc': 'Clock edge to sample on',
             'default': 'rising', 'values': ('rising', 'falling')},
@@ -161,16 +160,16 @@ class Decoder(srd.Decoder):
 
     def find_clk_edge(self, clk, datapins):
         # Ignore sample if the clock pin hasn't changed.
-        if clk == self.oldclk:
-            return
-        self.oldclk = clk
+        #if clk == self.oldclk:
+        #    return
+        #self.oldclk = clk
 
-        # Sample data on rising/falling clock edge (depends on config).
-        c = self.options['clock_edge']
-        if c == 'rising' and clk == 0: # Sample on rising clock edge.
-            return
-        elif c == 'falling' and clk == 1: # Sample on falling clock edge.
-            return
+        ## Sample data on rising/falling clock edge (depends on config).
+        #c = self.options['clock_edge']
+        #if c == 'rising' and clk == 0: # Sample on rising clock edge.
+        #    return
+        #elif c == 'falling' and clk == 1: # Sample on falling clock edge.
+        #    return
 
         # Found the correct clock edge, now get the bits.
         self.handle_bits(datapins)
@@ -190,3 +189,5 @@ class Decoder(srd.Decoder):
                 self.handle_bits(pins[1:])
             else:
                 self.find_clk_edge(pins[0], pins[1:])
+        self.samplenum = self.samplenum+1
+        self.handle_bits(pins[1:])

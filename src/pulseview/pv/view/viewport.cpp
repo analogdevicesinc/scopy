@@ -67,6 +67,16 @@ shared_ptr<ViewItem> Viewport::get_mouse_over_item(const QPoint &pt)
 	return nullptr;
 }
 
+void Viewport::disableDrag()
+{
+	dragEnabled = false;
+}
+
+void Viewport::enableDrag()
+{
+	dragEnabled = true;
+}
+
 void Viewport::item_hover(const shared_ptr<ViewItem> &item)
 {
 	if (item && item->is_draggable())
@@ -78,19 +88,25 @@ void Viewport::item_hover(const shared_ptr<ViewItem> &item)
 
 void Viewport::drag()
 {
-	drag_offset_ = view_.offset();
-	drag_v_offset_ = view_.owner_visual_v_offset();
+	if(dragEnabled)
+	{
+		drag_offset_ = view_.offset();
+		drag_v_offset_ = view_.owner_visual_v_offset();
+	}
 }
 
 void Viewport::drag_by(const QPoint &delta)
 {
-	if (drag_offset_ == boost::none)
-		return;
+	if(dragEnabled)
+	{
+		if (drag_offset_ == boost::none)
+			return;
 
-	view_.set_scale_offset(view_.scale(),
-		(*drag_offset_ - delta.x() * view_.scale()));
+		view_.set_scale_offset(view_.scale(),
+				       (*drag_offset_ - delta.x() * view_.scale() / (geometry().width() / divisionCount)));
 
-	view_.set_v_offset(-drag_v_offset_ - delta.y());
+		view_.set_v_offset(-drag_v_offset_ - delta.y());
+	}
 }
 
 void Viewport::drag_release()
@@ -256,10 +272,10 @@ void Viewport::paint_grid(QPainter &p, const ViewItemPaintParams &pp)
 
 	p.setRenderHint(QPainter::Antialiasing, true);    
     paint_axis(p,pp,pp.top());
-    for (int i = 0; i <= row_count; i++) {
+   /* for (int i = 0; i <= row_count; i++) {
         if(y + divisionOffset+ division_height * i != 0)
             paint_axis(p, pp, y + divisionOffset + division_height * i);
-	}
+	}*/
 }
 
 void Viewport::paint_axis(QPainter &p, const ViewItemPaintParams &pp, int y)

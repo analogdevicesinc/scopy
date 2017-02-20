@@ -85,23 +85,23 @@ public:
 private Q_SLOTS:
 
 	void generatePattern();
-//    void onChannelEnabledChanged();
-//    void onChannelSelectedChanged();
+//  void onChannelEnabledChanged();
+//  void onChannelSelectedChanged();
 	void startStop(bool start);
 	void singleRun();
 	void singleRunStop();
 	void toggleRightMenu();
-//    void update_ui();
-//    void on_sampleRateCombo_activated(const QString &arg1);
-//    void on_generatePattern_clicked();
-//    void on_clearButton_clicked();
-//    void on_generateUI_clicked();
+//  void update_ui();
+//  void on_sampleRateCombo_activated(const QString &arg1);
+//  void on_generatePattern_clicked();
+//  void on_clearButton_clicked();
+//  void on_generateUI_clicked();
 
-//    void on_save_PB_clicked();
-	//  void on_load_PB_clicked();
-	//  void createRightPatternWidget(PatternUI* patternui);
+//  void on_save_PB_clicked();
+//  void on_load_PB_clicked();
+//  void createRightPatternWidget(PatternUI* patternui);
 
-	//  void rightMenuFinished(bool opened);
+//  void rightMenuFinished(bool opened);
 	void on_btnHideInactive_clicked();
 	void on_btnGroupWithSelected_clicked();
 	void on_btnExtendChannelManager_clicked();
@@ -177,6 +177,7 @@ private:
 	std::vector<PatternUI *> patterns;
 	static QStringList digital_trigger_conditions;
 	static QStringList possibleSampleRates;
+	static const char *channelNames[];
 };
 
 

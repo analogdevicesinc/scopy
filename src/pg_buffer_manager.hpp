@@ -14,11 +14,14 @@
 #include "pulseview/pv/devices/binarybuffer.hpp"
 #include "pulseview/pv/devicemanager.hpp"
 #include "pulseview/pv/toolbars/mainbar.hpp"
+#include "pulseview/pv/view/view.hpp"
+#include "pulseview/pv/util.hpp"
 
 
 namespace pv {
 class MainWindow;
 class DeviceManager;
+class View;
 namespace toolbars {
 class MainBar;
 }
@@ -49,9 +52,11 @@ public:
 	uint32_t adjustSampleRate(uint32_t suggestedSampleRate);
 	uint32_t adjustBufferSize(uint32_t suggestedBufferSize);
 	uint32_t getSampleRate();
+	uint32_t getBufferSize();
+
 	uint32_t bufferSize;
 	short *buffer;
-	//uint32_t getBufferSize();
+
 
 };
 

@@ -2,6 +2,8 @@
 #include "pulseview/pv/view/view.hpp"
 #include "pulseview/pv/view/viewport.hpp"
 #include "pulseview/pv/view/tracetreeitem.hpp"
+#include "pulseview/pv/view/decodetrace.hpp"
+#include "pulseview/pv/view/logicsignal.hpp"
 #include "la_channel_manager.hpp"
 #include "logic_analyzer.hpp"
 #include "dynamicWidget.hpp"
@@ -13,12 +15,16 @@
 #include <QScrollBar>
 #include <libsigrokcxx/libsigrokcxx.hpp>
 
+using std::dynamic_pointer_cast;
+
 namespace pv {
 class MainWindow;
 namespace view {
 class View;
 class Viewport;
 class TraceTreeItem;
+class DecodeTrace;
+class LogicSignal;
 }
 }
 
@@ -1046,7 +1052,7 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 			/* Grouped widget */
 			if (ch->is_grouped()) {
 				/* Acquire the new decode trace */
-				auto trace = main_win->view_->add_decoder();
+				auto trace = dynamic_pointer_cast<pv::view::TraceTreeItem>(main_win->view_->add_decoder());
 				lachannelgroupUI->setTrace(trace);
 				trace->force_to_v_offset(offset);
 
@@ -1096,7 +1102,7 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 
 					/* Acquire the new signal trace */
 					auto index = ch->get_channel(i)->get_id();
-					auto trace = main_win->view_->get_clone_of(index);
+					auto trace = dynamic_pointer_cast<pv::view::TraceTreeItem>(main_win->view_->get_clone_of(index));
 					lachannelUI->setTrace(trace);
 					trace->force_to_v_offset(offset);
 					forceUpdate(lachannelUI);
@@ -1182,7 +1188,7 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 					lachannelgroupUI->getChannelGroup()->get_decoder_channels());
 			} else {
 				auto index = ch->get_channel(0)->get_id();
-				auto trace = main_win->view_->get_clone_of(index);
+				auto trace = dynamic_pointer_cast<pv::view::TraceTreeItem>(main_win->view_->get_clone_of(index));
 				lachannelgroupUI->setTrace(trace);
 				trace->force_to_v_offset(offset);
 				lachannelgroupUI->ui->stackedWidget->setCurrentIndex(0);
