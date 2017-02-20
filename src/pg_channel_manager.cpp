@@ -75,7 +75,7 @@ PatternGeneratorChannelUI::PatternGeneratorChannelUI(PatternGeneratorChannel
 }
 
 void PatternGeneratorChannelUI::setTrace(
-	std::shared_ptr<pv::view::LogicSignal> item)
+        std::shared_ptr<pv::view::LogicSignal> item)
 {
 	trace = item;
 }
@@ -313,8 +313,7 @@ void PatternGeneratorChannelUI::dropEvent(QDropEvent *event)
 
 void PatternGeneratorChannelUI::paintEvent(QPaintEvent *event)
 {
-	if(trace==nullptr)
-	{
+	if (trace==nullptr) {
 		auto index = ch->get_id();
 		auto height = geometry().height();
 		auto trace1 = getManagerUi()->main_win->view_->get_clone_of(index,height);
@@ -323,10 +322,10 @@ void PatternGeneratorChannelUI::paintEvent(QPaintEvent *event)
 	}
 
 	auto height = geometry().height();
-	auto v_offset = botSep->geometry().bottomRight().y() - (trace->v_extents().second) + chgui->traceOffset+3;//chgOffset.y();
+	auto v_offset = botSep->geometry().bottomRight().y() -
+	                (trace->v_extents().second) + chgui->traceOffset+3;//chgOffset.y();
 
-	if(traceOffset!=v_offset || traceHeight!=height)
-	{
+	if (traceOffset!=v_offset || traceHeight!=height) {
 		traceHeight = height;
 		traceOffset = v_offset;
 		trace->setSignal_height(traceHeight);
@@ -525,18 +524,21 @@ void PatternGeneratorChannelGroupUI::check(int val)
 }
 
 void PatternGeneratorChannelGroupUI::setTrace(
-	std::shared_ptr<pv::view::LogicSignal> item){
+        std::shared_ptr<pv::view::LogicSignal> item)
+{
 	trace = dynamic_pointer_cast<pv::view::TraceTreeItem>(item);
 	logicTrace = item;
 }
 
 void PatternGeneratorChannelGroupUI::setTrace(
-	std::shared_ptr<pv::view::DecodeTrace> item){
+        std::shared_ptr<pv::view::DecodeTrace> item)
+{
 	trace = dynamic_pointer_cast<pv::view::TraceTreeItem>(item);
 	decodeTrace = item;
 }
 
-std::shared_ptr<pv::view::TraceTreeItem> PatternGeneratorChannelGroupUI::getTrace()
+std::shared_ptr<pv::view::TraceTreeItem>
+PatternGeneratorChannelGroupUI::getTrace()
 {
 	return trace;
 }
@@ -567,6 +569,7 @@ void PatternGeneratorChannelGroupUI::leaveEvent(QEvent *event)
 void PatternGeneratorChannelGroupUI::highlight(bool val)
 {
 	setDynamicProperty(ui->widget_2,"highlighted",val);
+
 	if (trace) {
 		trace->set_highlight(val);
 	}
@@ -694,28 +697,25 @@ void PatternGeneratorChannelGroupUI::dragLeaveEvent(QDragLeaveEvent *event)
 void PatternGeneratorChannelGroupUI::paintEvent(QPaintEvent *event)
 {
 
-	if(trace==nullptr && decodeTrace==nullptr)
-	{
+	if (trace==nullptr && decodeTrace==nullptr) {
 		auto index = chg->get_channel(0)->get_id();
 		auto height = ui->widget_2->normalGeometry().height();
-		if(!chg->is_grouped())
-		{
+
+		if (!chg->is_grouped()) {
 			auto trace1 = getManagerUi()->main_win->view_->get_clone_of(index,height);
 			setTrace(trace1);
-		}
-		else
-		{
+		} else {
 			auto trace1 = getManagerUi()->main_win->view_->add_decoder();
 			setTrace(trace1);
 
 			auto decoder = srd_decoder_get_by_id("parallel");
 			decodeTrace->set_decoder(decoder);
-			std::map<const srd_channel*,
-					std::shared_ptr<pv::view::TraceTreeItem> > channel_map;
+			std::map<const srd_channel *,
+			    std::shared_ptr<pv::view::TraceTreeItem> > channel_map;
 
 			QStringList decoderRolesNameList;
 			std::vector<const srd_channel *> decoderRolesList;
-			const srd_channel* d0;
+			const srd_channel *d0;
 			GSList *reqCh = g_slist_copy(decoder->opt_channels);
 
 			auto i=0;
@@ -728,11 +728,12 @@ void PatternGeneratorChannelGroupUI::paintEvent(QPaintEvent *event)
 				if (rqch == nullptr) {
 					break;
 				}
+
 				decoderRolesNameList << QString::fromUtf8(rqch->name);
 				decoderRolesList.push_back(rqch);
 
-				std::pair<const srd_channel*,
-						std::shared_ptr<pv::view::TraceTreeItem> > chtracepair;
+				std::pair<const srd_channel *,
+				    std::shared_ptr<pv::view::TraceTreeItem> > chtracepair;
 
 				auto index = chg->get_channel(i)->get_id();
 				chtracepair.first = decoderRolesList.back();
@@ -744,6 +745,7 @@ void PatternGeneratorChannelGroupUI::paintEvent(QPaintEvent *event)
 				i++;
 
 			}
+
 			decodeTrace->set_channel_map(channel_map);
 		}
 	}
@@ -753,18 +755,14 @@ void PatternGeneratorChannelGroupUI::paintEvent(QPaintEvent *event)
 	auto v_offset = chgOffset - trace->v_extents().second;
 
 
-	if(traceOffset!=v_offset || traceHeight!=height)
-	{
+	if (traceOffset!=v_offset || traceHeight!=height) {
 		traceHeight = height;
 		traceOffset = v_offset;
 		trace->force_to_v_offset(v_offset);
 
-		if(!chg->is_grouped())
-		{
+		if (!chg->is_grouped()) {
 			logicTrace->setSignal_height(traceHeight);
-		}
-		else
-		{
+		} else {
 			decodeTrace->setDecodeHeight(traceHeight);
 		}
 	}
@@ -1250,6 +1248,7 @@ void PatternGeneratorChannelManagerUI::updateUi()
 
 	QFrame *prevSep = addSeparator(ui->verticalLayout,
 	                               ui->verticalLayout->count()-1);
+
 	for (auto&& ch : *(chm->get_channel_groups())) {
 		if (disabledShown==false && !ch->is_enabled()) {
 			continue;
@@ -1311,22 +1310,22 @@ void PatternGeneratorChannelManagerUI::updateUi()
 
 //        connect(static_cast<PatternGeneratorChannelGroupUI*>(chg_ui.back()),SIGNAL(channel_selected()),pg,SLOT(onChannelSelectedChanged())); // TEMP
 		connect(static_cast<PatternGeneratorChannelGroupUI *>(chg_ui.back()),
-			SIGNAL(channel_enabled()),this,SIGNAL(channelsChanged())); // TEMP
+		        SIGNAL(channel_enabled()),this,SIGNAL(channelsChanged())); // TEMP
 		connect(currentChannelGroupUI->ui->selectBox,SIGNAL(toggled(bool)),
 		        static_cast<PatternGeneratorChannelGroupUI *>(chg_ui.back()),
 		        SLOT(select(bool)));
 		connect(currentChannelGroupUI->ui->patternCombo,
 		        SIGNAL(currentIndexChanged(int)),chg_ui.back(),SLOT(patternChanged(int)));
 		connect(currentChannelGroupUI->ui->patternCombo,
-			SIGNAL(currentIndexChanged(int)),this,SIGNAL(channelsChanged())); // TEMP
+		        SIGNAL(currentIndexChanged(int)),this,SIGNAL(channelsChanged())); // TEMP
 		connect(currentChannelGroupUI,SIGNAL(requestUpdateUi()),this,
 		        SLOT(triggerUpdateUi()));
 		//connect(currentChannelGroupUI->getChannelGroup()->pattern, SIGNAL(generate_pattern),pg,SLOT())
 
 		if (ch->is_grouped()) { // create subwidgets
 			currentChannelGroupUI->chUiSep = addSeparator(
-			                                        currentChannelGroupUI->ui->subChannelLayout,
-			                                        currentChannelGroupUI->ui->subChannelLayout->count());
+			                currentChannelGroupUI->ui->subChannelLayout,
+			                currentChannelGroupUI->ui->subChannelLayout->count());
 			prevSep = currentChannelGroupUI->chUiSep;
 
 			currentChannelGroupUI->ui->DioLabel->setText("");
@@ -1415,7 +1414,7 @@ void PatternGeneratorChannelManagerUI::updateUi()
 		currentChannelGroupUI->ui->enableBox->setChecked(ch->is_enabled());
 		currentChannelGroupUI->enableControls(ch->is_enabled());
 		connect(currentChannelGroupUI->ui->enableBox,SIGNAL(toggled(bool)),
-			chg_ui.back(),SLOT(enable(bool)));
+		        chg_ui.back(),SLOT(enable(bool)));
 	}
 
 //   ui->scrollAreaWidgetContents->updateGeometry();
@@ -1433,7 +1432,8 @@ void PatternGeneratorChannelManagerUI::updateUi()
 
 	QScrollBar *chmVertScrollArea = ui->scrollArea->verticalScrollBar();
 
-	connect(chmVertScrollArea,SIGNAL(rangeChanged(int,int)),this,SLOT(chmRangeChanged(int,int)));
+	connect(chmVertScrollArea,SIGNAL(rangeChanged(int,int)),this,
+	        SLOT(chmRangeChanged(int,int)));
 	connect(chmVertScrollArea, SIGNAL(valueChanged(int)),this,
 	        SLOT(chmScrollChanged(int)));
 }

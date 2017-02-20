@@ -17,10 +17,8 @@
 #include "ui_pg_channel_header.h"
 #include "ui_pg_channel.h"
 
-namespace pv
-{
-namespace view
-{
+namespace pv {
+namespace view {
 class View;
 class LogicSignal;
 class DecodeTrace;

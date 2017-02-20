@@ -125,7 +125,8 @@ void PatternGeneratorBufferManagerUi::updateUi()
 	bufman->getSampleRate();
 	bufman->getBufferSize();
 
-	auto scale = (1/(double)bufman->getSampleRate()) * bufman->getBufferSize() / (double)main_win->view_->divisionCount();
+	auto scale = (1/(double)bufman->getSampleRate()) * bufman->getBufferSize() /
+	             (double)main_win->view_->divisionCount();
 	main_win->view_->set_scale_offset(scale,pv::util::Timestamp(0));
 }
 

@@ -151,9 +151,11 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 	bufui->updateUi();
 
 	QString path = QCoreApplication::applicationDirPath() + "/decoders";
+
 	if (srd_init(path.toStdString().c_str()) != SRD_OK) {
 		qDebug() << "ERROR: libsigrokdecode init failed.";
 	}
+
 	qDebug()<<path;
 
 	//main_win->view_->viewport()->disableDrag();
