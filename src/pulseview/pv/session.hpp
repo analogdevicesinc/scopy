@@ -137,7 +137,7 @@ public:
 
 	void add_signal(std::shared_ptr<view::LogicSignal> sig);
 
-	std::shared_ptr<view::Signal> create_signal_from_id(int index);
+	std::shared_ptr<view::LogicSignal> create_signal_from_id(int index, int height);
 
 	void set_buffersize(size_t value);
 

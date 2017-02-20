@@ -43,6 +43,8 @@ class Viewport : public ViewWidget
 {
 	Q_OBJECT
 
+private:
+	bool dragEnabled = true;
 public:
 	explicit Viewport(View &parent);
 
@@ -56,6 +58,9 @@ public:
 
 	int getTimeTriggerPos() const;
 	void setTimeTriggerPos(int value);
+
+	void disableDrag();
+	void enableDrag();
 
 private:
     /**

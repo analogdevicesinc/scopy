@@ -100,9 +100,10 @@ LogicSignal::LogicSignal(
 	pv::Session &session,
 	shared_ptr<devices::Device> device,
 	shared_ptr<Channel> channel,
-	shared_ptr<data::Logic> data) :
+	shared_ptr<data::Logic> data,
+	int sig_height) :
 	Signal(session, channel),
-	signal_height_(QFontMetrics(QApplication::font()).height() * 1.5),
+	signal_height_((sig_height == 0) ? QFontMetrics(QApplication::font()).height() * 1.5 : sig_height - (QFontMetrics(QApplication::font()).height() / 3) ),
 	device_(device),
 	data_(data),
 	trigger_none_(nullptr),
@@ -508,6 +509,16 @@ void LogicSignal::on_trigger()
 	trigger_match_ = trigger_type_from_action(action);
 
 	modify_trigger();
+}
+
+int LogicSignal::getSignal_height() const
+{
+	return signal_height_ - (QFontMetrics(QApplication::font()).height() / 3) ;
+}
+
+void LogicSignal::setSignal_height(int signal_height)
+{
+	signal_height_ = signal_height - (QFontMetrics(QApplication::font()).height() / 3) ;
 }
 
 } // namespace view

@@ -17,7 +17,15 @@
 #include "ui_pg_channel_header.h"
 #include "ui_pg_channel.h"
 
-
+namespace pv
+{
+namespace view
+{
+class View;
+class LogicSignal;
+class DecodeTrace;
+}
+}
 namespace Ui {
 class PGChannelGroup;
 class PGChannel;
@@ -58,6 +66,10 @@ class PatternGeneratorChannelUI : public ChannelUI
 	QRect centerDragbox;
 	QRect botDragbox;
 
+	int traceOffset;
+	int traceHeight;
+	std::shared_ptr<pv::view::LogicSignal> trace;
+
 public:
 	Ui::PGChannelGroup *ui;
 	PatternGeneratorChannelUI(PatternGeneratorChannel *ch,
@@ -69,8 +81,10 @@ public:
 	PatternGeneratorChannelGroup *getChannelGroup();
 	void enableControls(bool val);
 
-	void setTrace(std::shared_ptr<pv::view::TraceTreeItem> item);
-	std::shared_ptr<pv::view::TraceTreeItem> trace;
+	void setTrace(std::shared_ptr<pv::view::LogicSignal> item);
+	std::shared_ptr<pv::view::LogicSignal> getTrace();
+	void highlight(bool val);
+
 	QFrame *topSep,*botSep;
 
 	void highlightTopSeparator();
@@ -88,6 +102,7 @@ private Q_SLOTS:
 	void dropEvent(QDropEvent *event);
 	void enterEvent(QEvent *event);
 	void leaveEvent(QEvent *event);
+	void paintEvent(QPaintEvent *event);
 
 
 //    void set_decoder(std::string value);
@@ -119,6 +134,10 @@ class PatternGeneratorChannelGroupUI : public ChannelGroupUI
 	QRect topDragbox;
 	QRect botDragbox;
 
+	std::shared_ptr<pv::view::TraceTreeItem> trace;
+	std::shared_ptr<pv::view::LogicSignal> logicTrace;
+	std::shared_ptr<pv::view::DecodeTrace> decodeTrace;
+
 public:
 	Ui::PGChannelGroup *ui;
 	std::vector<PatternGeneratorChannelUI *> ch_ui;
@@ -127,10 +146,15 @@ public:
 	~PatternGeneratorChannelGroupUI();
 	PatternGeneratorChannelGroup *getChannelGroup();
 	PatternGeneratorChannelManagerUI *getManagerUi() const;
-	void setTrace(std::shared_ptr<pv::view::TraceTreeItem> item);
-	std::shared_ptr<pv::view::TraceTreeItem> trace;
+	void setTrace(std::shared_ptr<pv::view::LogicSignal> item);
+	void setTrace(std::shared_ptr<pv::view::DecodeTrace> item);
+	std::shared_ptr<pv::view::TraceTreeItem> getTrace();
 	void enableControls(bool enabled);
-	QFrame *topSep,*botSep;
+	QFrame *topSep,*botSep, *chUiSep;
+	int traceOffset;
+	int traceHeight;
+
+	void highlight(bool val);
 	void highlightTopSeparator();
 	void highlightBotSeparator();
 	void resetSeparatorHighlight(bool force = false);
@@ -159,6 +183,7 @@ private:
 	void dragLeaveEvent(QDragLeaveEvent *event);
 	void dragMoveEvent(QDragMoveEvent *event);
 	void dropEvent(QDropEvent *event);
+	void paintEvent(QPaintEvent *event);
 
 };
 
@@ -261,6 +286,7 @@ Q_SIGNALS:
 
 private Q_SLOTS:
 	void chmScrollChanged(int val);
+	void chmRangeChanged(int min, int max);
 	void triggerUpdateUi();
 
 };

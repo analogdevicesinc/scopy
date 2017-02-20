@@ -83,6 +83,8 @@ private:
 	static const QColor Colours[16];
 	static const QColor OutlineColours[16];
 
+	int decodeHeight;
+
 public:
 	DecodeTrace(pv::Session &session,
 		std::shared_ptr<pv::data::DecoderStack> decoder_stack,
@@ -185,6 +187,9 @@ private:
 
 public:
 	void hover_point_changed();
+
+	int getDecodeHeight() const;
+	void setDecodeHeight(int value);
 
 private Q_SLOTS:
 	void on_new_decode_data();

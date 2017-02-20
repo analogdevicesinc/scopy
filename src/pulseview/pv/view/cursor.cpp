@@ -23,6 +23,7 @@
 #include "ruler.hpp"
 #include "view.hpp"
 #include "../util.hpp"
+#include "viewport.hpp"
 
 #include <QApplication>
 #include <QBrush>
@@ -67,8 +68,8 @@ QRectF Cursor::label_rect(const QRectF &rect) const
 {
 	const shared_ptr<Cursor> other(get_other_cursor());
 	assert(other);
-
-	const float x = ((time_ - view_.offset())/ view_.scale()).convert_to<float>();
+	double scale = view_.scale() /(view_.viewport()->size().width() / view_.divisionCount());
+	const float x = ((time_ - view_.offset())/ scale).convert_to<float>();
 
 	QFontMetrics m(QApplication::font());
 	QSize text_size = m.boundingRect(get_text()).size();
