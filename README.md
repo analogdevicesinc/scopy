@@ -1,4 +1,4 @@
-[![appveyor status](https://ci.appveyor.com/api/projects/status/32r7s2skrgm9ubva/branch/master?svg=true)](https://ci.appveyor.com/project/analogdevicesinc/scopy/branch/master)
+[![appveyor status](https://ci.appveyor.com/api/projects/status/61orx0yhjipv9i7l/branch/master?svg=true)](https://ci.appveyor.com/project/analogdevicesinc/scopy/branch/master)
 
 # Scopy
 Scopy is a software oscilloscope and signal analysis toolset.
