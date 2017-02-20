@@ -2207,3 +2207,50 @@ void Oscilloscope_API::run(bool en)
 {
 	osc->ui->pushButtonRunStop->setChecked(en);
 }
+
+QList<int> Oscilloscope_API::measureEn() const
+{
+	QList<int> list;
+
+	for (unsigned int i = 0; i < osc->nb_channels; i++) {
+		auto measurements = osc->plot.measurements(i);
+		int mask = 0;
+
+		if (measurements.size() > (sizeof(int) * 8))
+			throw std::runtime_error("Too many measurements");
+
+		for (unsigned int j = 0; j < measurements.size(); j++) {
+			if (measurements[j]->enabled())
+				mask |= 1 << j;
+		}
+
+		list.append(mask);
+	}
+
+	return list;
+}
+
+void Oscilloscope_API::setMeasureEn(const QList<int>& list)
+{
+	if (list.size() != osc->nb_channels)
+		return;
+
+	osc->measure_settings->m_selectedMeasurements.clear();
+
+	for (unsigned int i = 0; i < osc->nb_channels; i++) {
+		auto measurements = osc->plot.measurements(i);
+		int mask = list.at(i);
+
+		if (measurements.size() > (sizeof(int) * 8))
+			throw std::runtime_error("Too many measurements");
+
+		for (unsigned int j = 0; j < measurements.size(); j++) {
+			measurements[j]->setEnabled(!!(mask & (1 << j)));
+			osc->measure_settings->onMeasurementActivated(
+					i, j, !!(mask & (1 << j)));
+		}
+	}
+
+	osc->measure_settings->loadMeasurementStatesFromData();
+	osc->onMeasurementSelectionListChanged();
+}

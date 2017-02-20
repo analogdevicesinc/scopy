@@ -98,7 +98,7 @@ private Q_SLOTS:
 	void onMeasurementPropertyChanged(QStandardItem *item);
 	void on_button_measDisplayAll_toggled(bool checked);
 	void on_button_measDeleteAll_toggled(bool checked);
-	void onMeasurementActivated(int id, bool en);
+	void onMeasurementActivated(int chnIdx, int id, bool en);
 	void onStatisticActivated(DropdownSwitchList *dropdown, int pos, int id,
 		 bool en);
 	void on_button_StatisticsEn_toggled(bool checked);

@@ -139,7 +139,7 @@ void MeasureSettings::onMeasurementPropertyChanged(QStandardItem *item)
 
 	if (item->column() == 1) {
 		if (m_emitActivated)
-			onMeasurementActivated(id, en);
+			onMeasurementActivated(m_selectedChannel, id, en);
 	} else if (item->column() == 2) {
 		if (m_emitStatsChanged)
 			onStatisticActivated(dropdown, item->row(), id, en);
@@ -308,12 +308,12 @@ void MeasureSettings::disableDisplayAllMeasurements()
 	loadMeasurementStatesFromData();
 }
 
-void MeasureSettings::onMeasurementActivated(int id, bool en)
+void MeasureSettings::onMeasurementActivated(int chnIdx, int id, bool en)
 {
-	if (m_selectedChannel < 0)
+	if (chnIdx < 0)
 		return;
 
-	auto measurements = m_plot->measurements(m_selectedChannel);
+	auto measurements = m_plot->measurements(chnIdx);
 	MeasurementItem mItem(id, measurements[id]->channel());
 	if (en) {
 		m_selectedMeasurements.push_back(mItem);

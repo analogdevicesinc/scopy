@@ -307,6 +307,9 @@ namespace adiscope {
 				READ getTimePos WRITE setTimePos);
 		Q_PROPERTY(double time_base READ getTimeBase WRITE setTimeBase);
 
+		Q_PROPERTY(QList<int> measure_en
+				READ measureEn WRITE setMeasureEn);
+
 	public:
 		explicit Oscilloscope_API(Oscilloscope *osc) :
 			ApiObject(TOOL_OSCILLOSCOPE), osc(osc) {}
@@ -362,6 +365,9 @@ namespace adiscope {
 
 		double getTimeBase() const;
 		void setTimeBase(double base);
+
+		QList<int> measureEn() const;
+		void setMeasureEn(const QList<int>& list);
 
 	private:
 		Oscilloscope *osc;
