@@ -1204,6 +1204,7 @@ void PatternGeneratorChannelManagerUI::updateUi()
 
 	for (auto ch : chg_ui) {
 		ch->hide();
+		ch->setMouseTracking(false); // prevent hovering after the channel is deleted
 		ch->deleteLater();
 	}
 
