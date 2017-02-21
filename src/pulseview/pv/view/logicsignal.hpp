@@ -64,7 +64,6 @@ private:
 	static const char* TriggerMarkerIcons[8];
 
 public:
-	int signal_height_;
 	LogicSignal(pv::Session &session,
 		std::shared_ptr<devices::Device> device,
 		std::shared_ptr<sigrok::Channel> channel,
@@ -114,7 +113,7 @@ public:
 	 */
 	virtual void paint_fore(QPainter &p, const ViewItemPaintParams &pp);
 
-	int getSignal_height() const;
+	int getSignal_height();
 	void setSignal_height(int signal_height);
 
 private:

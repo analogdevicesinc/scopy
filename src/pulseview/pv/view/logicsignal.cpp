@@ -103,7 +103,6 @@ LogicSignal::LogicSignal(
 	shared_ptr<data::Logic> data,
 	int sig_height) :
 	Signal(session, channel),
-	signal_height_((sig_height == 0) ? QFontMetrics(QApplication::font()).height() * 1.5 : sig_height - (QFontMetrics(QApplication::font()).height() / 3) ),
 	device_(device),
 	data_(data),
 	trigger_none_(nullptr),
@@ -117,6 +116,7 @@ LogicSignal::LogicSignal(
 
 	set_colour(SignalColours[channel->index() % countof(SignalColours)]);
 
+	signal_height_ = ((sig_height == 0) ? QFontMetrics(QApplication::font()).height() * 1.5 : sig_height - (QFontMetrics(QApplication::font()).height() / 3) );
 	/* Populate this channel's trigger setting with whatever we
 	 * find in the current session trigger, if anything. */
 	trigger_match_ = nullptr;
@@ -511,7 +511,7 @@ void LogicSignal::on_trigger()
 	modify_trigger();
 }
 
-int LogicSignal::getSignal_height() const
+int LogicSignal::getSignal_height()
 {
 	return signal_height_ - (QFontMetrics(QApplication::font()).height() / 3) ;
 }

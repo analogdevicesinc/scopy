@@ -150,5 +150,16 @@ void TraceTreeItem::set_highlight(bool check)
 	owner_->row_item_appearance_changed(false, true);
 }
 
+void TraceTreeItem::setSignal_height(int height)
+{
+	signal_height_= height;
+}
+
+int TraceTreeItem::getSignal_height()
+{
+	return signal_height_;
+}
+
+
 } // namespace view
 } // namespace pv

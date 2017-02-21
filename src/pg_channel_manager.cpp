@@ -212,20 +212,20 @@ void PatternGeneratorChannelUI::dragMoveEvent(QDragMoveEvent *event)
 {
 	if (event->answerRect().intersects(botDragbox)) {
 		getManagerUi()->clearHoverWidget();
-		chgui->resetSeparatorHighlight(true);
+		chgui->hideSeparatorHighlight(true);
 		highlightBotSeparator();
 		event->accept();
 	} else if (event->answerRect().intersects(topDragbox)) {
 		getManagerUi()->clearHoverWidget();
-		chgui->resetSeparatorHighlight(true);
+		chgui->hideSeparatorHighlight(true);
 		highlightTopSeparator();
 		event->accept();
 	} else if (event->answerRect().intersects(centerDragbox)) {
 		getManagerUi()->setHoverWidget(this);
-		chgui->resetSeparatorHighlight();
+		chgui->hideSeparatorHighlight();
 		event->accept();
 	} else {
-		chgui->resetSeparatorHighlight();
+		chgui->hideSeparatorHighlight();
 		event->ignore();
 	}
 }
@@ -311,19 +311,17 @@ void PatternGeneratorChannelUI::dropEvent(QDropEvent *event)
 	Q_EMIT requestUpdateUi();
 }
 
-void PatternGeneratorChannelUI::paintEvent(QPaintEvent *event)
+void PatternGeneratorChannelUI::updateTrace()
 {
 	if (trace==nullptr) {
 		auto index = ch->get_id();
-		auto height = geometry().height();
-		auto trace1 = getManagerUi()->main_win->view_->get_clone_of(index,height);
+		auto trace1 = getManagerUi()->main_win->view_->get_clone_of(index);
 		setTrace(trace1);
-
 	}
 
 	auto height = geometry().height();
-	auto v_offset = botSep->geometry().bottomRight().y() -
-	                (trace->v_extents().second) + chgui->traceOffset+3;//chgOffset.y();
+	auto v_offset = topSep->geometry().bottomRight().y() + 3 + height -
+	                (trace->v_extents().second) + chgui->getTraceOffset()+3;//chgOffset.y();
 
 	if (traceOffset!=v_offset || traceHeight!=height) {
 		traceHeight = height;
@@ -333,7 +331,6 @@ void PatternGeneratorChannelUI::paintEvent(QPaintEvent *event)
 	}
 
 }
-
 
 PatternGeneratorChannelUI::~PatternGeneratorChannelUI()
 {
@@ -447,6 +444,7 @@ void PatternGeneratorChannelGroupUI::collapse()
 	bool val = !getChannelGroup()->isCollapsed();
 	getChannelGroup()->collapse(val);
 	ui->subChannelWidget->setVisible(!val);
+	Q_EMIT requestUpdateUi();
 }
 
 void PatternGeneratorChannelUI::split()
@@ -484,7 +482,7 @@ void PatternGeneratorChannelUI::split()
 		                chgIndex));
 	}
 
-	getManagerUi()->updateUi();
+	Q_EMIT requestUpdateUi();
 
 }
 
@@ -494,6 +492,11 @@ void PatternGeneratorChannelGroupUI::split()
 	select(true);
 	getManagerUi()->groupSplitSelected();
 	Q_EMIT requestUpdateUi();
+}
+
+int PatternGeneratorChannelGroupUI::getTraceOffset()
+{
+	return traceOffset;
 }
 
 void PatternGeneratorChannelGroupUI::enableControls(bool enabled)
@@ -577,17 +580,17 @@ void PatternGeneratorChannelGroupUI::highlight(bool val)
 
 void PatternGeneratorChannelGroupUI::highlightTopSeparator()
 {
-	resetSeparatorHighlight(true);
+	hideSeparatorHighlight(true);
 	topSep->setVisible(true);
 }
 
 void PatternGeneratorChannelGroupUI::highlightBotSeparator()
 {
-	resetSeparatorHighlight(true);
+	hideSeparatorHighlight(true);
 	botSep->setVisible(true);
 }
 
-void PatternGeneratorChannelGroupUI::resetSeparatorHighlight(bool force)
+void PatternGeneratorChannelGroupUI::hideSeparatorHighlight(bool force)
 {
 	if (force || (!chg->is_grouped())) {
 		topSep->setVisible(false);
@@ -651,7 +654,6 @@ void PatternGeneratorChannelGroupUI::dragEnterEvent(QDragEnterEvent *event)
 	topDragbox.setRect(0, 0, w, h/3);
 	centerDragbox.setRect(0, h/3, w, h/3);
 	botDragbox.setRect(0,2*h/3,w, h/3);
-	qDebug()<<"top"<<topDragbox<<"center"<<centerDragbox<<"bot"<<botDragbox<<"geo"<<geometry();
 	event->accept();
 }
 
@@ -660,7 +662,7 @@ void PatternGeneratorChannelGroupUI::dragMoveEvent(QDragMoveEvent *event)
 {
 	if (event->answerRect().intersects(botDragbox)) {
 		getManagerUi()->clearHoverWidget();
-		resetSeparatorHighlight(true);
+		hideSeparatorHighlight(true);
 
 		if (chg->is_grouped()) {
 			ch_ui[0]->highlightTopSeparator();
@@ -672,81 +674,82 @@ void PatternGeneratorChannelGroupUI::dragMoveEvent(QDragMoveEvent *event)
 
 	} else if (event->answerRect().intersects(centerDragbox)) {
 		getManagerUi()->setHoverWidget(this);
-		resetSeparatorHighlight();
+		hideSeparatorHighlight();
 		event->accept();
 	} else if (event->answerRect().intersects(topDragbox)) {
 		getManagerUi()->clearHoverWidget();
-		resetSeparatorHighlight(true);
+		hideSeparatorHighlight(true);
 		highlightTopSeparator();
 		event->accept();
 	}
 
 	else {
-		resetSeparatorHighlight();
+		hideSeparatorHighlight();
 		event->ignore();
 	}
 }
 
 void PatternGeneratorChannelGroupUI::dragLeaveEvent(QDragLeaveEvent *event)
 {
-	resetSeparatorHighlight();
+	hideSeparatorHighlight();
 	getManagerUi()->clearHoverWidget();
 	event->accept();
 }
 
-void PatternGeneratorChannelGroupUI::paintEvent(QPaintEvent *event)
+void PatternGeneratorChannelGroupUI::setupParallelDecoder()
 {
+	auto decoder = srd_decoder_get_by_id("parallel");
+	decodeTrace->set_decoder(decoder);
+	std::map<const srd_channel *,
+	    std::shared_ptr<pv::view::TraceTreeItem> > channel_map;
 
+	QStringList decoderRolesNameList;
+	std::vector<const srd_channel *> decoderRolesList;
+	const srd_channel *d0;
+	GSList *reqCh = g_slist_copy(decoder->opt_channels);
+
+	auto i=0;
+	reqCh = reqCh->next; // skip CLK channel
+	auto ch_count = chg->get_channel_count();
+
+	for (; i <  ch_count && reqCh; reqCh = reqCh->next) {
+		const srd_channel *const rqch = (const srd_channel *)reqCh->data;
+
+		if (rqch == nullptr) {
+			break;
+		}
+
+		decoderRolesNameList << QString::fromUtf8(rqch->name);
+		decoderRolesList.push_back(rqch);
+
+		std::pair<const srd_channel *,
+		    std::shared_ptr<pv::view::TraceTreeItem> > chtracepair;
+
+		auto index = chg->get_channel(i)->get_id();
+		chtracepair.first = decoderRolesList.back();
+
+		chtracepair.second = getManagerUi()->main_win->view_->get_clone_of(index);
+		chtracepair.second->force_to_v_offset(-100);
+
+		channel_map.insert(chtracepair);
+		i++;
+	}
+
+	decodeTrace->set_channel_map(channel_map);
+}
+
+void PatternGeneratorChannelGroupUI::updateTrace()
+{
 	if (trace==nullptr && decodeTrace==nullptr) {
-		auto index = chg->get_channel(0)->get_id();
-		auto height = ui->widget_2->normalGeometry().height();
 
 		if (!chg->is_grouped()) {
-			auto trace1 = getManagerUi()->main_win->view_->get_clone_of(index,height);
+			auto index = chg->get_channel(0)->get_id();
+			auto trace1 = getManagerUi()->main_win->view_->get_clone_of(index);
 			setTrace(trace1);
 		} else {
 			auto trace1 = getManagerUi()->main_win->view_->add_decoder();
 			setTrace(trace1);
-
-			auto decoder = srd_decoder_get_by_id("parallel");
-			decodeTrace->set_decoder(decoder);
-			std::map<const srd_channel *,
-			    std::shared_ptr<pv::view::TraceTreeItem> > channel_map;
-
-			QStringList decoderRolesNameList;
-			std::vector<const srd_channel *> decoderRolesList;
-			const srd_channel *d0;
-			GSList *reqCh = g_slist_copy(decoder->opt_channels);
-
-			auto i=0;
-			reqCh = reqCh->next;
-			auto ch_count = chg->get_channel_count();
-
-			for (; i <  ch_count && reqCh; reqCh = reqCh->next) {
-				const srd_channel *const rqch = (const srd_channel *)reqCh->data;
-
-				if (rqch == nullptr) {
-					break;
-				}
-
-				decoderRolesNameList << QString::fromUtf8(rqch->name);
-				decoderRolesList.push_back(rqch);
-
-				std::pair<const srd_channel *,
-				    std::shared_ptr<pv::view::TraceTreeItem> > chtracepair;
-
-				auto index = chg->get_channel(i)->get_id();
-				chtracepair.first = decoderRolesList.back();
-
-				chtracepair.second = getManagerUi()->main_win->view_->get_clone_of(index);
-				chtracepair.second->force_to_v_offset(-100);
-
-				channel_map.insert(chtracepair);
-				i++;
-
-			}
-
-			decodeTrace->set_channel_map(channel_map);
+			setupParallelDecoder();
 		}
 	}
 
@@ -754,24 +757,22 @@ void PatternGeneratorChannelGroupUI::paintEvent(QPaintEvent *event)
 	auto height = ui->widget_2->geometry().height();
 	auto v_offset = chgOffset - trace->v_extents().second;
 
-
 	if (traceOffset!=v_offset || traceHeight!=height) {
 		traceHeight = height;
 		traceOffset = v_offset;
 		trace->force_to_v_offset(v_offset);
-
-		if (!chg->is_grouped()) {
-			logicTrace->setSignal_height(traceHeight);
-		} else {
-			decodeTrace->setDecodeHeight(traceHeight);
-		}
+		trace->setSignal_height(traceHeight);
 	}
+
+	if (chg->is_grouped() && !getChannelGroup()->isCollapsed())
+		for (auto &&ch : ch_ui) {
+			ch->updateTrace();
+		}
 }
 
 void PatternGeneratorChannelGroupUI::dropEvent(QDropEvent *event)
 {
-	resetSeparatorHighlight();
-	qDebug()<<"    DROP   -- "<<event;
+	hideSeparatorHighlight();
 
 	if (event->source() == this && event->possibleActions() & Qt::MoveAction) {
 		return;
@@ -785,7 +786,7 @@ void PatternGeneratorChannelGroupUI::dropEvent(QDropEvent *event)
 	bool formGroup = false;
 
 	if (botDragbox.contains(event->pos())) {
-		if (chg->is_grouped()) {
+		if (chg->is_grouped() && !(getChannelGroup()->isCollapsed())) {
 			formGroup = true;
 		} else {
 			dropAfter = true;
@@ -947,7 +948,6 @@ void PatternGeneratorChannelManager::moveChannel(int fromChgIndex, int from,
 	                                        after) ? 1 : 0) + ((from<to) ? -1 : 0),fromElement);
 }
 
-
 void PatternGeneratorChannelManager::splitChannel(int chgIndex, int chIndex)
 {
 
@@ -991,7 +991,6 @@ PatternGeneratorChannel *PatternGeneratorChannelManager::getHighlightedChannel()
 {
 	return highlightedChannel;
 }
-
 
 void PatternGeneratorChannelManager::preGenerate()
 {
@@ -1150,6 +1149,7 @@ PatternGeneratorChannelManagerUI::PatternGeneratorChannelManagerUI(
 	channelManagerHeaderWiget = nullptr;
 	hoverWidget = nullptr;
 	chm->highlightChannel(chm->get_channel_group(0));
+	ui->scrollAreaWidgetContents->installEventFilter(this);
 }
 PatternGeneratorChannelManagerUI::~PatternGeneratorChannelManagerUI()
 {
@@ -1204,6 +1204,7 @@ void PatternGeneratorChannelManagerUI::updateUi()
 
 	for (auto ch : chg_ui) {
 		ch->hide();
+		ch->setMouseTracking(false); // prevent hovering after the channel is deleted
 		ch->deleteLater();
 	}
 
@@ -1395,8 +1396,18 @@ void PatternGeneratorChannelManagerUI::updateUi()
 				currentChannelGroupUI->ui->subChannelWidget->setVisible(false);
 			}
 
-			currentChannelGroupUI->botSep = prevSep;
-			currentChannelGroupUI->resetSeparatorHighlight();
+
+			// Remove last separator from subchannellayout and add it to the main layout,
+			// so that collapse channelgroup shows both separators correctly
+
+			currentChannelGroupUI->ui->subChannelLayout->removeWidget(prevSep);
+			currentChannelGroupUI->botSep = addSeparator(ui->verticalLayout,
+			                                ui->verticalLayout->count()-1);
+			prevSep = currentChannelGroupUI->botSep;
+			currentChannelGroupUI->ch_ui.back()->botSep = prevSep;
+			prevSep = currentChannelGroupUI->botSep;
+
+			currentChannelGroupUI->hideSeparatorHighlight();
 
 		} else {
 
@@ -1626,6 +1637,23 @@ void PatternGeneratorChannelManagerUI::clearHoverWidget()
 		setDynamicProperty(hoverWidget,"hover-property",false);
 		hoverWidget = nullptr;
 	}
+}
+
+void PatternGeneratorChannelManagerUI::updatePlot()
+{
+	for (auto chgUi : chg_ui) {
+		chgUi->updateTrace();
+	}
+}
+
+bool PatternGeneratorChannelManagerUI::eventFilter(QObject *object,
+                QEvent *event)
+{
+	if (event->type()==QEvent::LayoutRequest) {
+		updatePlot();
+	}
+
+	return false;
 }
 
 }
