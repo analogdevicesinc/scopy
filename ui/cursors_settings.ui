@@ -177,7 +177,7 @@
       <number>15</number>
      </property>
      <item row="1" column="0">
-      <widget class="QPushButton" name="hCursorsEnanble">
+      <widget class="QPushButton" name="hCursorsEnable">
        <property name="styleSheet">
         <string notr="true">QPushButton {
   min-height: 30px;
@@ -312,7 +312,7 @@ QPushButton:!checked:disabled {
       <number>15</number>
      </property>
      <item row="2" column="0">
-      <widget class="QPushButton" name="vCursorsEnanble">
+      <widget class="QPushButton" name="vCursorsEnable">
        <property name="styleSheet">
         <string notr="true">QPushButton {
   min-height: 30px;

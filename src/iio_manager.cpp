@@ -158,7 +158,7 @@ void iio_manager::disconnect(iio_manager::port_id copy)
 	auto pos = std::find(copy_blocks.begin(), copy_blocks.end(), copy);
 	copy_blocks.erase(pos);
 
-	del_connection(copy);
+	del_connection(copy, false);
 	hier_block2::disconnect(copy);
 
 	buffer_mutex.lock();
@@ -248,11 +248,12 @@ void iio_manager::connect(gr::basic_block_sptr src, int src_port,
 }
 
 void iio_manager::disconnect(basic_block_sptr src, int src_port,
-							 basic_block_sptr dst, int dst_port)
+		basic_block_sptr dst, int dst_port)
 {
 	for (auto it = connections.begin(); it != connections.end(); ++it) {
 		if (it->src == src && it->dst == dst &&
-				it->src_port == src_port && it->dst_port == dst_port) {
+				it->src_port == src_port &&
+				it->dst_port == dst_port) {
 			connections.erase(it);
 			break;
 		}
@@ -261,7 +262,7 @@ void iio_manager::disconnect(basic_block_sptr src, int src_port,
 	hier_block2::disconnect(src, src_port, dst, dst_port);
 }
 
-void iio_manager::del_connection(gr::basic_block_sptr block)
+void iio_manager::del_connection(gr::basic_block_sptr block, bool reverse)
 {
 	bool found;
 
@@ -270,10 +271,16 @@ void iio_manager::del_connection(gr::basic_block_sptr block)
 
 		for (auto it = connections.begin();
 				it != connections.end(); ++it) {
-			if (block != it->src)
+			if (reverse) {
+				if (block != it->dst || it->src == iio_block)
+					continue;
+			} else if (block != it->src) {
 				continue;
+			}
 
-			qDebug() << "Removing forward connection between"
+			qDebug() << "Removing" <<
+				(reverse ? "backwards" : "forward")
+				<< "connection between"
 				<< it->src->alias().c_str()
 				<< "port" << it->src_port << "and"
 				<< it->dst->alias().c_str()
@@ -283,11 +290,17 @@ void iio_manager::del_connection(gr::basic_block_sptr block)
 
 			auto src = it->src, dst = it->dst;
 			connections.erase(it);
-			del_connection(dst);
+			if (reverse)
+				del_connection(src, true);
+			else
+				del_connection(dst, true);
 			found = true;
 			break;
 		}
 	} while (found);
+
+	if (reverse)
+		del_connection(block, false);
 }
 
 void iio_manager::set_buffer_size_unlocked(unsigned long size)

@@ -66,7 +66,9 @@ const unsigned long LogicAnalyzer::maxSampleRate = 80000000;
 LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
                              Filter *filt,
                              QPushButton *runBtn,
-                             QWidget *parent) :
+                             QJSEngine *engine,
+                             QWidget *parent,
+                             unsigned int sample_rate) :
 	QWidget(parent),
 	dev_name(filt->device_name(TOOL_LOGIC_ANALYZER)),
 	ctx(ctx),
@@ -78,7 +80,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	ui(new Ui::LogicAnalyzer),
 	active_settings_btn(nullptr),
 	timespanLimitStream(1),
-	plotRefreshRate(100)
+	plotRefreshRate(100),
+	la_api(new LogicAnalyzer_API(this))
 {
 	ui->setupUi(this);
 	this->setAttribute(Qt::WA_DeleteOnClose, true);
@@ -239,11 +242,16 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 
 	ui->areaTimeTriggerLayout->addWidget(this->bottomHandlesArea(), 0, 1, -1, -1);
 	updateAreaTimeTriggerPadding();
+	la_api->load();
+	la_api->js_register(engine);
 }
 
 
 LogicAnalyzer::~LogicAnalyzer()
 {
+	la_api->save();
+	delete la_api;
+
 	delete ui;
 	/* Destroy libsigrokdecode */
 	srd_exit();
@@ -503,4 +511,14 @@ void LogicAnalyzer::on_btnShowChannelsClicked(bool check)
 	} else {
 		ui->btnShowChannels->setText("Hide inactive");
 	}
+}
+
+bool LogicAnalyzer_API::running() const
+{
+	return lga->ui->btnRunStop->isChecked();
+}
+
+void LogicAnalyzer_API::run(bool en)
+{
+	lga->ui->btnRunStop->setChecked(en);
 }

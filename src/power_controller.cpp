@@ -28,9 +28,10 @@
 using namespace adiscope;
 
 PowerController::PowerController(struct iio_context *ctx,
-		QPushButton *runButton, QWidget *parent) :
+		QPushButton *runButton, QJSEngine *engine, QWidget *parent) :
 	QWidget(parent), ui(new Ui::PowerController),
-	in_sync(false), menuRunButton(runButton)
+	in_sync(false), menuRunButton(runButton),
+	pw_api(new PowerController_API(this))
 {
 	ui->setupUi(this);
 
@@ -95,6 +96,9 @@ PowerController::PowerController(struct iio_context *ctx,
 	connect(runButton, SIGNAL(clicked(bool)), this, SLOT(startStop(bool)));
 
 	timer.start(TIMER_TIMEOUT_MS);
+
+	pw_api->load();
+	pw_api->js_register(engine);
 }
 
 PowerController::~PowerController()
@@ -102,6 +106,9 @@ PowerController::~PowerController()
 	/* Power down DACs */
 	iio_channel_attr_write_bool(ch1w, "powerdown", true);
 	iio_channel_attr_write_bool(ch2w, "powerdown", true);
+
+	pw_api->save();
+	delete pw_api;
 
 	delete ui;
 }
@@ -193,4 +200,48 @@ void PowerController::startStop(bool start)
 
 	dac2_set_enabled(start);
 	ui->dac2->setChecked(start);
+}
+
+bool PowerController_API::syncEnabled() const
+{
+	return pw->ui->sync->isChecked();
+}
+
+void PowerController_API::enableSync(bool en)
+{
+	if (en)
+		pw->ui->sync->click();
+	else
+		pw->ui->notSync->click();
+}
+
+int PowerController_API::getTrackingPercent() const
+{
+	return pw->ui->trackingRatio->value();
+}
+
+void PowerController_API::setTrackingPercent(int percent)
+{
+	pw->ui->trackingRatio->setValue(percent);
+}
+
+double PowerController_API::valueDac1() const
+{
+	return pw->valuePos->value();
+}
+
+void PowerController_API::setValueDac1(double value)
+{
+	pw->valuePos->setValue(value);
+}
+
+double PowerController_API::valueDac2() const
+{
+	return pw->valueNeg->value();
+}
+
+void PowerController_API::setValueDac2(double value)
+{
+	if (!syncEnabled())
+		pw->valueNeg->setValue(value);
 }

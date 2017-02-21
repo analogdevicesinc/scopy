@@ -53,7 +53,10 @@ struct StatisticSelection {
 
 class MeasureSettings : public QWidget
 {
+	friend class Oscilloscope_API;
+
 	Q_OBJECT
+
 public:
 	explicit MeasureSettings(CapturePlot *plot, QWidget *parent = 0);
 
@@ -95,7 +98,7 @@ private Q_SLOTS:
 	void onMeasurementPropertyChanged(QStandardItem *item);
 	void on_button_measDisplayAll_toggled(bool checked);
 	void on_button_measDeleteAll_toggled(bool checked);
-	void onMeasurementActivated(int id, bool en);
+	void onMeasurementActivated(int chnIdx, int id, bool en);
 	void onStatisticActivated(DropdownSwitchList *dropdown, int pos, int id,
 		 bool en);
 	void on_button_StatisticsEn_toggled(bool checked);
@@ -103,9 +106,6 @@ private Q_SLOTS:
 	void on_button_statsDeleteAll_toggled(bool checked);
 
 private:
-	void addHorizontalMeasurement(const QString& name, int measurement_id);
-	void addVerticalMeasurement(const QString& name, int measurement_id);
-	void buildDropdownElements(int chnIdx);
 	void loadMeasurementStatesFromData();
 	void deleteAllMeasurements();
 	void recoverAllMeasurements();

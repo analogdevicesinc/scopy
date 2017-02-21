@@ -17,29 +17,29 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#include <QApplication>
-#include <QSettings>
-#include <QtGlobal>
+#ifndef SIGNAL_SAMPLE_HPP
+#define SIGNAL_SAMPLE_HPP
 
-#include "src/tool_launcher.hpp"
+#include <QObject>
 
-using namespace adiscope;
+#include <gnuradio/sync_block.h>
 
-int main(int argc, char **argv)
-{
-	QApplication app(argc, argv);
+namespace adiscope {
+	class signal_sample : public QObject, public gr::sync_block
+	{
+		Q_OBJECT
 
-	auto pythonpath = qgetenv("SCOPY_PYTHONPATH");
-	if (!pythonpath.isNull())
-		qputenv("PYTHONPATH", pythonpath);
+	public:
+		explicit signal_sample();
+		~signal_sample();
 
-	QCoreApplication::setOrganizationName("ADI");
-	QCoreApplication::setOrganizationDomain("analog.com");
-	QCoreApplication::setApplicationName("Scopy");
-	QSettings::setDefaultFormat(QSettings::IniFormat);
+		int work(int noutput_items,
+				gr_vector_const_void_star &input_items,
+				gr_vector_void_star &output_items);
 
-	ToolLauncher launcher;
-	launcher.show();
-
-	return app.exec();
+	Q_SIGNALS:
+		void triggered(const std::vector<float> values);
+	};
 }
+
+#endif

@@ -85,12 +85,13 @@ struct adiscope::time_block_data {
 	unsigned long nb_channels;
 };
 
-SignalGenerator::SignalGenerator(struct iio_context *_ctx,
-		Filter *filt, QPushButton *runButton, QWidget *parent) :
+SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
+		QPushButton *runButton, QJSEngine *engine, QWidget *parent) :
 	QWidget(parent), ui(new Ui::SignalGenerator),
 	ctx(_ctx), time_block_data(new adiscope::time_block_data),
 	menuOpened(true), currentChannel(0), sample_rate(0),
-	settings_group(new QButtonGroup(this)), menuRunButton(runButton)
+	settings_group(new QButtonGroup(this)), menuRunButton(runButton),
+	sg_api(new SignalGenerator_API(this))
 {
 	ui->setupUi(this);
 	this->setAttribute(Qt::WA_DeleteOnClose, true);
@@ -132,10 +133,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 				}, "Value", -5e0, 5e0);
 
 	auto layout = static_cast<QBoxLayout *>(ui->tabConstant->layout());
-	layout->insertWidget(0, constantValue, 0, Qt::AlignLeft);
-
-	connect(constantValue, SIGNAL(valueChanged(double)),
-			SLOT(constantValueChanged(double)));
+	layout->insertWidget(0, constantValue, 0);
 
 	amplitude = new PositionSpinButton({
 				{"µVolts", 1E-6},
@@ -178,15 +176,6 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 
 	layout = static_cast<QBoxLayout *>(ui->tabMath->layout());
 	layout->insertWidget(0, mathFrequency, 0);
-
-	connect(amplitude, SIGNAL(valueChanged(double)),
-			this, SLOT(amplitudeChanged(double)));
-	connect(offset, SIGNAL(valueChanged(double)),
-			this, SLOT(offsetChanged(double)));
-	connect(frequency, SIGNAL(valueChanged(double)),
-			this, SLOT(frequencyChanged(double)));
-	connect(phase, SIGNAL(valueChanged(double)),
-			this, SLOT(phaseChanged(double)));
 
 
 	unsigned int nb_channels = iio_channels.size();
@@ -266,9 +255,6 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 		channels[i]->second.box->setStyleSheet(stylesheet);
 	}
 
-	connect(ui->rightMenu, SIGNAL(finished(bool)), this,
-			SLOT(rightMenuFinished(bool)));
-
 	plot->disableLegend();
 	plot->setPaletteColor(QColor("black"));
 
@@ -280,6 +266,24 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 			((double) sample_rate * 2.0));
 
 	ui->plot->addWidget(plot, 0, 0);
+
+	sg_api->load();
+	sg_api->js_register(engine);
+
+	connect(ui->rightMenu, SIGNAL(finished(bool)), this,
+			SLOT(rightMenuFinished(bool)));
+
+	connect(constantValue, SIGNAL(valueChanged(double)),
+			SLOT(constantValueChanged(double)));
+
+	connect(amplitude, SIGNAL(valueChanged(double)),
+			this, SLOT(amplitudeChanged(double)));
+	connect(offset, SIGNAL(valueChanged(double)),
+			this, SLOT(offsetChanged(double)));
+	connect(frequency, SIGNAL(valueChanged(double)),
+			this, SLOT(frequencyChanged(double)));
+	connect(phase, SIGNAL(valueChanged(double)),
+			this, SLOT(phaseChanged(double)));
 
 	connect(mathFrequency, SIGNAL(valueChanged(double)),
 			this, SLOT(mathFreqChanged(double)));
@@ -294,17 +298,22 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 	connect(ui->mathWidget, SIGNAL(functionValid(const QString&)),
 			this, SLOT(setFunction(const QString&)));
 
-	connect(ui->run_button, SIGNAL(clicked(bool)), runButton,
+	connect(ui->run_button, SIGNAL(toggled(bool)), runButton,
 			SLOT(setChecked(bool)));
 	connect(runButton, SIGNAL(toggled(bool)), ui->run_button,
 			SLOT(setChecked(bool)));
 	connect(runButton, SIGNAL(toggled(bool)),
 			this, SLOT(startStop(bool)));
+
+	updatePreview();
 }
 
 SignalGenerator::~SignalGenerator()
 {
 	stop();
+
+	sg_api->save();
+	delete sg_api;
 
 	delete plot;
 	delete ui;
@@ -680,6 +689,23 @@ void adiscope::SignalGenerator::renameConfigPanel()
 	ui->config_panel->setTitle(QString("Configuration for %1").arg(name));
 }
 
+int SignalGenerator::sg_waveform_to_idx(enum sg_waveform wave)
+{
+	switch (wave) {
+	case SG_SIN_WAVE:
+	default:
+		return 0;
+	case SG_SQR_WAVE:
+		return 1;
+	case SG_TRI_WAVE:
+		return 2;
+	case SG_SAW_WAVE:
+		return 3;
+	case SG_INV_SAW_WAVE:
+		return 4;
+	}
+}
+
 void adiscope::SignalGenerator::rightMenuFinished(bool opened)
 {
 	if (opened) {
@@ -705,21 +731,7 @@ void adiscope::SignalGenerator::rightMenuFinished(bool opened)
 			ui->label_size->setText("");
 		}
 
-		switch (ptr->waveform) {
-		case analog::GR_SIN_WAVE:
-		default:
-			ui->type->setCurrentIndex(0);
-			break;
-		case analog::GR_SQR_WAVE:
-			ui->type->setCurrentIndex(1);
-			break;
-		case analog::GR_TRI_WAVE:
-			ui->type->setCurrentIndex(2);
-			break;
-		case analog::GR_SAW_WAVE:
-			ui->type->setCurrentIndex(3);
-			break;
-		}
+		ui->type->setCurrentIndex(sg_waveform_to_idx(ptr->waveform));
 
 		renameConfigPanel();
 		ui->tabWidget->setCurrentIndex((int) ptr->type);
@@ -836,7 +848,7 @@ unsigned long SignalGenerator::get_max_sample_rate(const struct iio_device *dev)
 {
 	QVector<unsigned long> values = get_available_sample_rates(dev);
 
-	return values.takeLast();
+	return values.takeFirst();
 }
 
 int SignalGenerator::set_sample_rate(const struct iio_device *dev,
@@ -937,4 +949,269 @@ size_t SignalGenerator::get_samples_count(const struct iio_device *dev,
 		return 0;
 
 	return size;
+}
+
+bool SignalGenerator_API::running() const
+{
+	return gen->ui->run_button->isChecked();
+}
+
+void SignalGenerator_API::run(bool en)
+{
+	gen->ui->run_button->setChecked(en);
+}
+
+QList<int> SignalGenerator_API::getMode() const
+{
+	QList<int> list;
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(&gen->channels[i]->first);
+
+		list.append(static_cast<int>(ptr->type));
+	}
+
+	return list;
+}
+
+void SignalGenerator_API::setMode(const QList<int>& list)
+{
+	if (list.size() != gen->channels.size())
+		return;
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(&gen->channels[i]->first);
+
+		ptr->type = static_cast<enum SIGNAL_TYPE>(list.at(i));
+	}
+
+	gen->ui->tabWidget->setCurrentIndex(gen->getCurrentData()->type);
+}
+
+QList<double> SignalGenerator_API::getConstantValue() const
+{
+	QList<double> list;
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(&gen->channels[i]->first);
+
+		list.append(static_cast<double>(ptr->constant));
+	}
+
+	return list;
+}
+
+void SignalGenerator_API::setConstantValue(const QList<double>& list)
+{
+	if (list.size() != gen->channels.size())
+		return;
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(&gen->channels[i]->first);
+
+		ptr->constant = static_cast<float>(list.at(i));
+	}
+
+	gen->constantValue->setValue(gen->getCurrentData()->constant);
+}
+
+QList<int> SignalGenerator_API::getWaveformType() const
+{
+	QList<int> list;
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(&gen->channels[i]->first);
+
+		list.append(SignalGenerator::sg_waveform_to_idx(ptr->waveform));
+	}
+
+	return list;
+}
+
+void SignalGenerator_API::setWaveformType(const QList<int>& list)
+{
+	if (list.size() != gen->channels.size())
+		return;
+
+	enum sg_waveform types[] = {
+		SG_SIN_WAVE,
+		SG_SQR_WAVE,
+		SG_TRI_WAVE,
+		SG_SAW_WAVE,
+		SG_INV_SAW_WAVE,
+	};
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(&gen->channels[i]->first);
+
+		ptr->waveform = types[list.at(i)];
+
+		if (i == gen->currentChannel)
+			gen->ui->type->setCurrentIndex(list.at(i));
+	}
+}
+
+QList<double> SignalGenerator_API::getWaveformAmpl() const
+{
+	QList<double> list;
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(&gen->channels[i]->first);
+
+		list.append(ptr->amplitude);
+	}
+
+	return list;
+}
+
+void SignalGenerator_API::setWaveformAmpl(const QList<double>& list)
+{
+	if (list.size() != gen->channels.size())
+		return;
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(&gen->channels[i]->first);
+
+		ptr->amplitude = list.at(i);
+	}
+
+	gen->amplitude->setValue(gen->getCurrentData()->amplitude);
+}
+
+QList<double> SignalGenerator_API::getWaveformFreq() const
+{
+	QList<double> list;
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(&gen->channels[i]->first);
+
+		list.append(ptr->frequency);
+	}
+
+	return list;
+}
+
+void SignalGenerator_API::setWaveformFreq(const QList<double>& list)
+{
+	if (list.size() != gen->channels.size())
+		return;
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(&gen->channels[i]->first);
+
+		ptr->frequency = list.at(i);
+	}
+
+	gen->frequency->setValue(gen->getCurrentData()->frequency);
+}
+
+QList<double> SignalGenerator_API::getWaveformOfft() const
+{
+	QList<double> list;
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(&gen->channels[i]->first);
+
+		list.append(static_cast<double>(ptr->offset));
+	}
+
+	return list;
+}
+
+void SignalGenerator_API::setWaveformOfft(const QList<double>& list)
+{
+	if (list.size() != gen->channels.size())
+		return;
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(&gen->channels[i]->first);
+
+		ptr->offset = static_cast<float>(list.at(i));
+	}
+
+	gen->offset->setValue(gen->getCurrentData()->offset);
+}
+
+QList<double> SignalGenerator_API::getWaveformPhase() const
+{
+	QList<double> list;
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(&gen->channels[i]->first);
+
+		list.append(ptr->phase);
+	}
+
+	return list;
+}
+
+void SignalGenerator_API::setWaveformPhase(const QList<double>& list)
+{
+	if (list.size() != gen->channels.size())
+		return;
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(&gen->channels[i]->first);
+
+		ptr->phase = list.at(i);
+	}
+
+	gen->phase->setValue(gen->getCurrentData()->phase);
+}
+
+QList<double> SignalGenerator_API::getMathFreq() const
+{
+	QList<double> list;
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(&gen->channels[i]->first);
+
+		list.append(ptr->math_freq);
+	}
+
+	return list;
+}
+
+void SignalGenerator_API::setMathFreq(const QList<double>& list)
+{
+	if (list.size() != gen->channels.size())
+		return;
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(&gen->channels[i]->first);
+
+		ptr->math_freq = list.at(i);
+	}
+
+	gen->mathFrequency->setValue(gen->getCurrentData()->math_freq);
+}
+
+QList<QString> SignalGenerator_API::getMathFunction() const
+{
+	QList<QString> list;
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(&gen->channels[i]->first);
+
+		list.append(ptr->function);
+	}
+
+	return list;
+}
+
+void SignalGenerator_API::setMathFunction(const QList<QString>& list)
+{
+	if (list.size() != gen->channels.size())
+		return;
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(&gen->channels[i]->first);
+
+		ptr->function = list.at(i);
+	}
+
+	if (gen->getCurrentData()->type == SIGNAL_TYPE_MATH) {
+		gen->ui->mathWidget->setFunction(
+				gen->getCurrentData()->function);
+	}
 }
