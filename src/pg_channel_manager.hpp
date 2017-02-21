@@ -155,7 +155,7 @@ public:
 	void highlight(bool val);
 	void highlightTopSeparator();
 	void highlightBotSeparator();
-	void resetSeparatorHighlight(bool force = false);
+	void hideSeparatorHighlight(bool force = false);
 
 
 Q_SIGNALS:

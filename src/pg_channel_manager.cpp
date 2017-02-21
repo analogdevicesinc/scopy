@@ -212,20 +212,20 @@ void PatternGeneratorChannelUI::dragMoveEvent(QDragMoveEvent *event)
 {
 	if (event->answerRect().intersects(botDragbox)) {
 		getManagerUi()->clearHoverWidget();
-		chgui->resetSeparatorHighlight(true);
+		chgui->hideSeparatorHighlight(true);
 		highlightBotSeparator();
 		event->accept();
 	} else if (event->answerRect().intersects(topDragbox)) {
 		getManagerUi()->clearHoverWidget();
-		chgui->resetSeparatorHighlight(true);
+		chgui->hideSeparatorHighlight(true);
 		highlightTopSeparator();
 		event->accept();
 	} else if (event->answerRect().intersects(centerDragbox)) {
 		getManagerUi()->setHoverWidget(this);
-		chgui->resetSeparatorHighlight();
+		chgui->hideSeparatorHighlight();
 		event->accept();
 	} else {
-		chgui->resetSeparatorHighlight();
+		chgui->hideSeparatorHighlight();
 		event->ignore();
 	}
 }
@@ -447,6 +447,7 @@ void PatternGeneratorChannelGroupUI::collapse()
 	bool val = !getChannelGroup()->isCollapsed();
 	getChannelGroup()->collapse(val);
 	ui->subChannelWidget->setVisible(!val);
+	Q_EMIT requestUpdateUi();
 }
 
 void PatternGeneratorChannelUI::split()
@@ -484,7 +485,7 @@ void PatternGeneratorChannelUI::split()
 		                chgIndex));
 	}
 
-	getManagerUi()->updateUi();
+	Q_EMIT requestUpdateUi();
 
 }
 
@@ -577,17 +578,17 @@ void PatternGeneratorChannelGroupUI::highlight(bool val)
 
 void PatternGeneratorChannelGroupUI::highlightTopSeparator()
 {
-	resetSeparatorHighlight(true);
+	hideSeparatorHighlight(true);
 	topSep->setVisible(true);
 }
 
 void PatternGeneratorChannelGroupUI::highlightBotSeparator()
 {
-	resetSeparatorHighlight(true);
+	hideSeparatorHighlight(true);
 	botSep->setVisible(true);
 }
 
-void PatternGeneratorChannelGroupUI::resetSeparatorHighlight(bool force)
+void PatternGeneratorChannelGroupUI::hideSeparatorHighlight(bool force)
 {
 	if (force || (!chg->is_grouped())) {
 		topSep->setVisible(false);
@@ -651,7 +652,6 @@ void PatternGeneratorChannelGroupUI::dragEnterEvent(QDragEnterEvent *event)
 	topDragbox.setRect(0, 0, w, h/3);
 	centerDragbox.setRect(0, h/3, w, h/3);
 	botDragbox.setRect(0,2*h/3,w, h/3);
-	qDebug()<<"top"<<topDragbox<<"center"<<centerDragbox<<"bot"<<botDragbox<<"geo"<<geometry();
 	event->accept();
 }
 
@@ -660,7 +660,7 @@ void PatternGeneratorChannelGroupUI::dragMoveEvent(QDragMoveEvent *event)
 {
 	if (event->answerRect().intersects(botDragbox)) {
 		getManagerUi()->clearHoverWidget();
-		resetSeparatorHighlight(true);
+		hideSeparatorHighlight(true);
 
 		if (chg->is_grouped()) {
 			ch_ui[0]->highlightTopSeparator();
@@ -672,24 +672,24 @@ void PatternGeneratorChannelGroupUI::dragMoveEvent(QDragMoveEvent *event)
 
 	} else if (event->answerRect().intersects(centerDragbox)) {
 		getManagerUi()->setHoverWidget(this);
-		resetSeparatorHighlight();
+		hideSeparatorHighlight();
 		event->accept();
 	} else if (event->answerRect().intersects(topDragbox)) {
 		getManagerUi()->clearHoverWidget();
-		resetSeparatorHighlight(true);
+		hideSeparatorHighlight(true);
 		highlightTopSeparator();
 		event->accept();
 	}
 
 	else {
-		resetSeparatorHighlight();
+		hideSeparatorHighlight();
 		event->ignore();
 	}
 }
 
 void PatternGeneratorChannelGroupUI::dragLeaveEvent(QDragLeaveEvent *event)
 {
-	resetSeparatorHighlight();
+	hideSeparatorHighlight();
 	getManagerUi()->clearHoverWidget();
 	event->accept();
 }
@@ -770,8 +770,7 @@ void PatternGeneratorChannelGroupUI::paintEvent(QPaintEvent *event)
 
 void PatternGeneratorChannelGroupUI::dropEvent(QDropEvent *event)
 {
-	resetSeparatorHighlight();
-	qDebug()<<"    DROP   -- "<<event;
+	hideSeparatorHighlight();
 
 	if (event->source() == this && event->possibleActions() & Qt::MoveAction) {
 		return;
@@ -785,7 +784,7 @@ void PatternGeneratorChannelGroupUI::dropEvent(QDropEvent *event)
 	bool formGroup = false;
 
 	if (botDragbox.contains(event->pos())) {
-		if (chg->is_grouped()) {
+		if (chg->is_grouped() && !(getChannelGroup()->isCollapsed())) {
 			formGroup = true;
 		} else {
 			dropAfter = true;
@@ -1395,8 +1394,18 @@ void PatternGeneratorChannelManagerUI::updateUi()
 				currentChannelGroupUI->ui->subChannelWidget->setVisible(false);
 			}
 
-			currentChannelGroupUI->botSep = prevSep;
-			currentChannelGroupUI->resetSeparatorHighlight();
+
+			// Remove last separator from subchannellayout and add it to the main layout,
+			// so that collapse channelgroup shows both separators correctly
+
+			currentChannelGroupUI->ui->subChannelLayout->removeWidget(prevSep);
+			currentChannelGroupUI->botSep = addSeparator(ui->verticalLayout,
+			                                ui->verticalLayout->count()-1);
+			prevSep = currentChannelGroupUI->botSep;
+			currentChannelGroupUI->ch_ui.back()->botSep = prevSep;
+			prevSep = currentChannelGroupUI->botSep;
+
+			currentChannelGroupUI->hideSeparatorHighlight();
 
 		} else {
 
