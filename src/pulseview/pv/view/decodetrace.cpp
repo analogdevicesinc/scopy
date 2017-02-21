@@ -128,15 +128,6 @@ const QColor DecodeTrace::OutlineColours[16] = {
 	QColor(0x6B, 0x23, 0x37)
 };
 
-int DecodeTrace::getDecodeHeight() const
-{
-	return decodeHeight;
-}
-
-void DecodeTrace::setDecodeHeight(int value)
-{
-	decodeHeight = value;
-}
 
 DecodeTrace::DecodeTrace(pv::Session &session,
 			 std::shared_ptr<pv::data::DecoderStack> decoder_stack, int index) :
@@ -183,7 +174,7 @@ const std::shared_ptr<pv::data::DecoderStack>& DecodeTrace::decoder() const
 
 pair<int, int> DecodeTrace::v_extents() const
 {
-	const int row_height = decodeHeight;//38;//(ViewItemPaintParams::text_height() * 6) / 4;
+	const int row_height = signal_height_;
 
 	// Make an empty decode trace appear symmetrical
 	const int row_count = max(1, max_visible_rows_);

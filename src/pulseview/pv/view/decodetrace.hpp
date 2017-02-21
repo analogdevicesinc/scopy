@@ -83,8 +83,6 @@ private:
 	static const QColor Colours[16];
 	static const QColor OutlineColours[16];
 
-	int decodeHeight;
-
 public:
 	DecodeTrace(pv::Session &session,
 		std::shared_ptr<pv::data::DecoderStack> decoder_stack,

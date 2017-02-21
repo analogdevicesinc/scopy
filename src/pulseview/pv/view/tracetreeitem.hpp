@@ -126,10 +126,13 @@ public:
 	virtual std::pair<int, int> v_extents() const = 0;
 
 	void set_highlight(bool check);
+	virtual void setSignal_height(int height);
+	virtual int getSignal_height();
+
 
 protected:
 	TraceTreeItemOwner *owner_;
-
+	int signal_height_;
 	int layout_v_offset_;
 	int visual_v_offset_;
 

@@ -311,19 +311,17 @@ void PatternGeneratorChannelUI::dropEvent(QDropEvent *event)
 	Q_EMIT requestUpdateUi();
 }
 
-void PatternGeneratorChannelUI::paintEvent(QPaintEvent *event)
+void PatternGeneratorChannelUI::updateTrace()
 {
 	if (trace==nullptr) {
 		auto index = ch->get_id();
-		auto height = geometry().height();
-		auto trace1 = getManagerUi()->main_win->view_->get_clone_of(index,height);
+		auto trace1 = getManagerUi()->main_win->view_->get_clone_of(index);
 		setTrace(trace1);
-
 	}
 
 	auto height = geometry().height();
-	auto v_offset = botSep->geometry().bottomRight().y() -
-	                (trace->v_extents().second) + chgui->traceOffset+3;//chgOffset.y();
+	auto v_offset = topSep->geometry().bottomRight().y() + 3 + height -
+	                (trace->v_extents().second) + chgui->getTraceOffset()+3;//chgOffset.y();
 
 	if (traceOffset!=v_offset || traceHeight!=height) {
 		traceHeight = height;
@@ -333,7 +331,6 @@ void PatternGeneratorChannelUI::paintEvent(QPaintEvent *event)
 	}
 
 }
-
 
 PatternGeneratorChannelUI::~PatternGeneratorChannelUI()
 {
@@ -495,6 +492,11 @@ void PatternGeneratorChannelGroupUI::split()
 	select(true);
 	getManagerUi()->groupSplitSelected();
 	Q_EMIT requestUpdateUi();
+}
+
+int PatternGeneratorChannelGroupUI::getTraceOffset()
+{
+	return traceOffset;
 }
 
 void PatternGeneratorChannelGroupUI::enableControls(bool enabled)
@@ -694,59 +696,60 @@ void PatternGeneratorChannelGroupUI::dragLeaveEvent(QDragLeaveEvent *event)
 	event->accept();
 }
 
-void PatternGeneratorChannelGroupUI::paintEvent(QPaintEvent *event)
+void PatternGeneratorChannelGroupUI::setupParallelDecoder()
 {
+	auto decoder = srd_decoder_get_by_id("parallel");
+	decodeTrace->set_decoder(decoder);
+	std::map<const srd_channel *,
+	    std::shared_ptr<pv::view::TraceTreeItem> > channel_map;
 
+	QStringList decoderRolesNameList;
+	std::vector<const srd_channel *> decoderRolesList;
+	const srd_channel *d0;
+	GSList *reqCh = g_slist_copy(decoder->opt_channels);
+
+	auto i=0;
+	reqCh = reqCh->next; // skip CLK channel
+	auto ch_count = chg->get_channel_count();
+
+	for (; i <  ch_count && reqCh; reqCh = reqCh->next) {
+		const srd_channel *const rqch = (const srd_channel *)reqCh->data;
+
+		if (rqch == nullptr) {
+			break;
+		}
+
+		decoderRolesNameList << QString::fromUtf8(rqch->name);
+		decoderRolesList.push_back(rqch);
+
+		std::pair<const srd_channel *,
+		    std::shared_ptr<pv::view::TraceTreeItem> > chtracepair;
+
+		auto index = chg->get_channel(i)->get_id();
+		chtracepair.first = decoderRolesList.back();
+
+		chtracepair.second = getManagerUi()->main_win->view_->get_clone_of(index);
+		chtracepair.second->force_to_v_offset(-100);
+
+		channel_map.insert(chtracepair);
+		i++;
+	}
+
+	decodeTrace->set_channel_map(channel_map);
+}
+
+void PatternGeneratorChannelGroupUI::updateTrace()
+{
 	if (trace==nullptr && decodeTrace==nullptr) {
-		auto index = chg->get_channel(0)->get_id();
-		auto height = ui->widget_2->normalGeometry().height();
 
 		if (!chg->is_grouped()) {
-			auto trace1 = getManagerUi()->main_win->view_->get_clone_of(index,height);
+			auto index = chg->get_channel(0)->get_id();
+			auto trace1 = getManagerUi()->main_win->view_->get_clone_of(index);
 			setTrace(trace1);
 		} else {
 			auto trace1 = getManagerUi()->main_win->view_->add_decoder();
 			setTrace(trace1);
-
-			auto decoder = srd_decoder_get_by_id("parallel");
-			decodeTrace->set_decoder(decoder);
-			std::map<const srd_channel *,
-			    std::shared_ptr<pv::view::TraceTreeItem> > channel_map;
-
-			QStringList decoderRolesNameList;
-			std::vector<const srd_channel *> decoderRolesList;
-			const srd_channel *d0;
-			GSList *reqCh = g_slist_copy(decoder->opt_channels);
-
-			auto i=0;
-			reqCh = reqCh->next;
-			auto ch_count = chg->get_channel_count();
-
-			for (; i <  ch_count && reqCh; reqCh = reqCh->next) {
-				const srd_channel *const rqch = (const srd_channel *)reqCh->data;
-
-				if (rqch == nullptr) {
-					break;
-				}
-
-				decoderRolesNameList << QString::fromUtf8(rqch->name);
-				decoderRolesList.push_back(rqch);
-
-				std::pair<const srd_channel *,
-				    std::shared_ptr<pv::view::TraceTreeItem> > chtracepair;
-
-				auto index = chg->get_channel(i)->get_id();
-				chtracepair.first = decoderRolesList.back();
-
-				chtracepair.second = getManagerUi()->main_win->view_->get_clone_of(index);
-				chtracepair.second->force_to_v_offset(-100);
-
-				channel_map.insert(chtracepair);
-				i++;
-
-			}
-
-			decodeTrace->set_channel_map(channel_map);
+			setupParallelDecoder();
 		}
 	}
 
@@ -754,18 +757,17 @@ void PatternGeneratorChannelGroupUI::paintEvent(QPaintEvent *event)
 	auto height = ui->widget_2->geometry().height();
 	auto v_offset = chgOffset - trace->v_extents().second;
 
-
 	if (traceOffset!=v_offset || traceHeight!=height) {
 		traceHeight = height;
 		traceOffset = v_offset;
 		trace->force_to_v_offset(v_offset);
-
-		if (!chg->is_grouped()) {
-			logicTrace->setSignal_height(traceHeight);
-		} else {
-			decodeTrace->setDecodeHeight(traceHeight);
-		}
+		trace->setSignal_height(traceHeight);
 	}
+
+	if (chg->is_grouped() && !getChannelGroup()->isCollapsed())
+		for (auto &&ch : ch_ui) {
+			ch->updateTrace();
+		}
 }
 
 void PatternGeneratorChannelGroupUI::dropEvent(QDropEvent *event)
@@ -946,7 +948,6 @@ void PatternGeneratorChannelManager::moveChannel(int fromChgIndex, int from,
 	                                        after) ? 1 : 0) + ((from<to) ? -1 : 0),fromElement);
 }
 
-
 void PatternGeneratorChannelManager::splitChannel(int chgIndex, int chIndex)
 {
 
@@ -990,7 +991,6 @@ PatternGeneratorChannel *PatternGeneratorChannelManager::getHighlightedChannel()
 {
 	return highlightedChannel;
 }
-
 
 void PatternGeneratorChannelManager::preGenerate()
 {
@@ -1149,6 +1149,7 @@ PatternGeneratorChannelManagerUI::PatternGeneratorChannelManagerUI(
 	channelManagerHeaderWiget = nullptr;
 	hoverWidget = nullptr;
 	chm->highlightChannel(chm->get_channel_group(0));
+	ui->scrollAreaWidgetContents->installEventFilter(this);
 }
 PatternGeneratorChannelManagerUI::~PatternGeneratorChannelManagerUI()
 {
@@ -1635,6 +1636,23 @@ void PatternGeneratorChannelManagerUI::clearHoverWidget()
 		setDynamicProperty(hoverWidget,"hover-property",false);
 		hoverWidget = nullptr;
 	}
+}
+
+void PatternGeneratorChannelManagerUI::updatePlot()
+{
+	for (auto chgUi : chg_ui) {
+		chgUi->updateTrace();
+	}
+}
+
+bool PatternGeneratorChannelManagerUI::eventFilter(QObject *object,
+                QEvent *event)
+{
+	if (event->type()==QEvent::LayoutRequest) {
+		updatePlot();
+	}
+
+	return false;
 }
 
 }
