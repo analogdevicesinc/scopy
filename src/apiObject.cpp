@@ -81,13 +81,16 @@ void ApiObject::load()
 
 		if (data.canConvert<QList<int>>()) {
 			auto list = load<int>(settings, prop.name());
-			prop.write(this, QVariant::fromValue(list));
+			if (!list.empty())
+				prop.write(this, QVariant::fromValue(list));
 		} else if (data.canConvert<QList<double>>()) {
 			auto list = load<double>(settings, prop.name());
-			prop.write(this, QVariant::fromValue(list));
+			if (!list.empty())
+				prop.write(this, QVariant::fromValue(list));
 		} else if (data.canConvert<QList<QString>>()) {
 			auto list = load<QString>(settings, prop.name());
-			prop.write(this, QVariant::fromValue(list));
+			if (!list.empty())
+				prop.write(this, QVariant::fromValue(list));
 		} else {
 			auto value = settings.value(prop.name());
 
