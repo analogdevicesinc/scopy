@@ -29,6 +29,7 @@
 #include <QSharedPointer>
 #include <QWidget>
 
+#include "apiObject.hpp"
 #include "filter.hpp"
 #include "oscilloscope_plot.hpp"
 #include "scope_sink_f.h"
@@ -46,9 +47,12 @@ namespace Ui {
 	class SignalGenerator;
 }
 
+class QJSEngine;
+
 namespace adiscope {
 	struct signal_generator_data;
 	struct time_block_data;
+	class SignalGenerator_API;
 
 	enum sg_waveform {
 		SG_SIN_WAVE = gr::analog::GR_SIN_WAVE,
@@ -60,12 +64,14 @@ namespace adiscope {
 
 	class SignalGenerator : public QWidget
 	{
-	    Q_OBJECT
+		friend class SignalGenerator_API;
+
+		Q_OBJECT
 
 	public:
 		explicit SignalGenerator(struct iio_context *ctx,
 				Filter *filt, QPushButton *runButton,
-				QWidget *parent = 0);
+				QJSEngine *engine, QWidget *parent = 0);
 		~SignalGenerator();
 
 		static const size_t min_buffer_size = 1024;
@@ -95,6 +101,8 @@ namespace adiscope {
 
 		QVector<QPair<QWidget, Ui::Channel> *> channels;
 
+		SignalGenerator_API *sg_api;
+
 		QSharedPointer<signal_generator_data> getData(QWidget *obj);
 		QSharedPointer<signal_generator_data> getCurrentData();
 		void renameConfigPanel();
@@ -116,6 +124,7 @@ namespace adiscope {
 
 		static size_t gcd(size_t a, size_t b);
 		static size_t lcm(size_t a, size_t b);
+		static int sg_waveform_to_idx(enum sg_waveform wave);
 
 		size_t get_samples_count(const struct iio_device *dev,
 				unsigned long sample_rate);
@@ -143,6 +152,69 @@ namespace adiscope {
 
 		void startStop(bool start);
 		void setFunction(const QString& function);
+	};
+
+	class SignalGenerator_API : public ApiObject
+	{
+		Q_OBJECT
+
+		Q_PROPERTY(bool running READ running WRITE run STORED false);
+
+		Q_PROPERTY(QList<int> mode READ getMode WRITE setMode);
+		Q_PROPERTY(QList<double> constant_volts
+				READ getConstantValue WRITE setConstantValue);
+		Q_PROPERTY(QList<int> waveform_type
+				READ getWaveformType WRITE setWaveformType);
+		Q_PROPERTY(QList<double> waveform_amplitude
+				READ getWaveformAmpl WRITE setWaveformAmpl);
+		Q_PROPERTY(QList<double> waveform_frequency
+				READ getWaveformFreq WRITE setWaveformFreq);
+		Q_PROPERTY(QList<double> waveform_offset
+				READ getWaveformOfft WRITE setWaveformOfft);
+		Q_PROPERTY(QList<double> waveform_phase
+				READ getWaveformPhase WRITE setWaveformPhase);
+		Q_PROPERTY(QList<double> math_frequency
+				READ getMathFreq WRITE setMathFreq);
+		Q_PROPERTY(QList<QString> math_function
+				READ getMathFunction WRITE setMathFunction);
+
+	public:
+		bool running() const;
+		void run(bool en);
+
+		QList<int> getMode() const;
+		void setMode(const QList<int>& list);
+
+		QList<double> getConstantValue() const;
+		void setConstantValue(const QList<double>& list);
+
+		QList<int> getWaveformType() const;
+		void setWaveformType(const QList<int>& list);
+
+		QList<double> getWaveformAmpl() const;
+		void setWaveformAmpl(const QList<double>& list);
+
+		QList<double> getWaveformFreq() const;
+		void setWaveformFreq(const QList<double>& list);
+
+		QList<double> getWaveformOfft() const;
+		void setWaveformOfft(const QList<double>& list);
+
+		QList<double> getWaveformPhase() const;
+		void setWaveformPhase(const QList<double>& list);
+
+		QList<double> getMathFreq() const;
+		void setMathFreq(const QList<double>& list);
+
+		QList<QString> getMathFunction() const;
+		void setMathFunction(const QList<QString>& list);
+
+		explicit SignalGenerator_API(SignalGenerator *gen) :
+			ApiObject(TOOL_SIGNAL_GENERATOR), gen(gen) {}
+		~SignalGenerator_API() {}
+
+	private:
+		SignalGenerator *gen;
 	};
 }
 

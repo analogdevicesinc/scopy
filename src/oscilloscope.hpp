@@ -30,11 +30,13 @@
 /* Qt includes */
 #include <QPair>
 #include <QPushButton>
+#include <QStringList>
 #include <QVector>
 #include <QWidget>
 #include <QButtonGroup>
 
 /* Local includes */
+#include "apiObject.hpp"
 #include "oscilloscope_plot.hpp"
 #include "iio_manager.hpp"
 #include "filter.hpp"
@@ -50,6 +52,7 @@
 #include "osc_adc.h"
 #include "plot_utils.hpp"
 
+class QJSEngine;
 class SymmetricBufferMode;
 
 namespace Ui {
@@ -60,10 +63,11 @@ namespace Ui {
 	class MeasurementsPanel;
 	class StatisticsPanel;
 	class CursorReadouts;
+	class CursorsSettings;
 }
 
 namespace adiscope {
-
+	class Oscilloscope_API;
 	class MeasurementData;
 	class MeasurementGui;
 	class MeasureSettings;
@@ -72,11 +76,14 @@ namespace adiscope {
 
 	class Oscilloscope : public QWidget
 	{
-	    Q_OBJECT
+		friend class Oscilloscope_API;
+
+		Q_OBJECT
 
 	public:
 		explicit Oscilloscope(struct iio_context *ctx,
 				Filter *filt, QPushButton *runButton,
+				QJSEngine *engine,
 				float gain_ch1, float gain_ch2,
 				QWidget *parent = 0);
 		~Oscilloscope();
@@ -136,6 +143,8 @@ namespace adiscope {
 		void onIioDataRefillTimeout();
 		void onPlotNewData();
 
+		void on_btnSettings_toggled(bool checked);
+
 	private:
 		OscADC adc;
 		unsigned int nb_channels, nb_math_channels;
@@ -150,6 +159,7 @@ namespace adiscope {
 		Ui::Oscilloscope *ui;
 		Ui::OscGeneralSettings *gsettings_ui;
 		Ui::ChannelSettings *ch_ui;
+		Ui::Channel *cursor_ui, *measure_ui;
 		adiscope::TriggerSettings trigger_settings;
 		adiscope::MeasureSettings *measure_settings;
 		CapturePlot plot;
@@ -161,6 +171,7 @@ namespace adiscope {
 		Ui::CursorReadouts *cursor_readouts_ui;
 		QWidget *cursorReadouts;
 		Ui::StatisticsPanel *statistics_panel_ui;
+		Ui::CursorsSettings *cr_ui;
 		QWidget *statisticsPanel;
 		AnalogBufferPreviewer *buffer_previewer;
 
@@ -212,7 +223,10 @@ namespace adiscope {
 		QButtonGroup *channels_group; // selected state of each channel
 
 		QPushButton *active_settings_btn;
+		QPushButton *last_non_general_settings_btn;
 		QPushButton *menuRunButton;
+
+		Oscilloscope_API *osc_api;
 
 		QList<std::shared_ptr<MeasurementData>> measurements_data;
 		QList<std::shared_ptr<MeasurementGui>> measurements_gui;
@@ -250,6 +264,113 @@ namespace adiscope {
 		void statisticsUpdateGuiPosIndex();
 
 		void updateBufferPreviewer();
+	};
+
+	class Oscilloscope_API : public ApiObject
+	{
+		Q_OBJECT
+
+		Q_PROPERTY(bool running READ running WRITE run STORED false);
+
+		Q_PROPERTY(bool cursors READ hasCursors WRITE setCursors);
+		Q_PROPERTY(bool measure READ hasMeasure WRITE setMeasure);
+		Q_PROPERTY(bool measure_all
+				READ measureAll WRITE setMeasureAll);
+		Q_PROPERTY(bool counter READ hasCounter WRITE setCounter);
+		Q_PROPERTY(bool statistics
+				READ hasStatistics WRITE setStatistics);
+
+		Q_PROPERTY(double cursor_v1 READ cursorV1 WRITE setCursorV1);
+		Q_PROPERTY(double cursor_v2 READ cursorV2 WRITE setCursorV2);
+		Q_PROPERTY(double cursor_h1 READ cursorH1 WRITE setCursorH1);
+		Q_PROPERTY(double cursor_h2 READ cursorH2 WRITE setCursorH2);
+
+		Q_PROPERTY(bool auto_trigger
+				READ autoTrigger WRITE setAutoTrigger);
+		Q_PROPERTY(bool external_trigger
+				READ externalTrigger WRITE setExternalTrigger);
+
+		Q_PROPERTY(int trigger_source
+				READ triggerSource WRITE setTriggerSource);
+
+		Q_PROPERTY(QList<QString> math_channels
+				READ getMathChannels WRITE setMathChannels
+				SCRIPTABLE false /* too complex for now */);
+
+		Q_PROPERTY(QList<double> volts_per_div
+				READ getVoltsPerDiv WRITE setVoltsPerDiv);
+
+		Q_PROPERTY(QList<double> v_offset
+				READ getVOffset WRITE setVOffset);
+
+		Q_PROPERTY(double time_position
+				READ getTimePos WRITE setTimePos);
+		Q_PROPERTY(double time_base READ getTimeBase WRITE setTimeBase);
+
+		Q_PROPERTY(QList<int> measure_en
+				READ measureEn WRITE setMeasureEn);
+
+	public:
+		explicit Oscilloscope_API(Oscilloscope *osc) :
+			ApiObject(TOOL_OSCILLOSCOPE), osc(osc) {}
+		~Oscilloscope_API() {}
+
+		bool running() const;
+		void run(bool en);
+
+		bool hasCursors() const;
+		void setCursors(bool en);
+
+		bool hasMeasure() const;
+		void setMeasure(bool en);
+
+		bool measureAll() const;
+		void setMeasureAll(bool en);
+
+		bool hasCounter() const;
+		void setCounter(bool en);
+
+		bool hasStatistics() const;
+		void setStatistics(bool en);
+
+		double cursorV1() const;
+		double cursorV2() const;
+		double cursorH1() const;
+		double cursorH2() const;
+		void setCursorV1(double val);
+		void setCursorV2(double val);
+		void setCursorH1(double val);
+		void setCursorH2(double val);
+
+		bool autoTrigger() const;
+		void setAutoTrigger(bool en);
+
+		bool externalTrigger() const;
+		void setExternalTrigger(bool en);
+
+		int triggerSource() const;
+		void setTriggerSource(int idx);
+
+		QList<double> getVoltsPerDiv() const;
+		void setVoltsPerDiv(const QList<double>& list);
+
+		QList<double> getVOffset() const;
+		void setVOffset(const QList<double>& list);
+
+		QList<QString> getMathChannels() const;
+		void setMathChannels(const QList<QString>& list);
+
+		double getTimePos() const;
+		void setTimePos(double pos);
+
+		double getTimeBase() const;
+		void setTimeBase(double base);
+
+		QList<int> measureEn() const;
+		void setMeasureEn(const QList<int>& list);
+
+	private:
+		Oscilloscope *osc;
 	};
 }
 

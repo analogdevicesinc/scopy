@@ -17,29 +17,38 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#include <QApplication>
-#include <QSettings>
-#include <QtGlobal>
+#include "customPushButton.hpp"
 
-#include "src/tool_launcher.hpp"
+#include <QButtonGroup>
 
 using namespace adiscope;
 
-int main(int argc, char **argv)
+CustomPushButton::CustomPushButton(QWidget *parent) : QPushButton(parent)
 {
-	QApplication app(argc, argv);
+}
 
-	auto pythonpath = qgetenv("SCOPY_PYTHONPATH");
-	if (!pythonpath.isNull())
-		qputenv("PYTHONPATH", pythonpath);
+CustomPushButton::~CustomPushButton()
+{
+}
 
-	QCoreApplication::setOrganizationName("ADI");
-	QCoreApplication::setOrganizationDomain("analog.com");
-	QCoreApplication::setApplicationName("Scopy");
-	QSettings::setDefaultFormat(QSettings::IniFormat);
+void CustomPushButton::mouseReleaseEvent(QMouseEvent *event)
+{
+	QButtonGroup *btnGroup = group();
 
-	ToolLauncher launcher;
-	launcher.show();
+	if(btnGroup->checkedId() == group()->id(this) && isDown())
+		btnGroup->setExclusive(false);
 
-	return app.exec();
+	QPushButton::mouseReleaseEvent(event);
+	btnGroup->setExclusive(true);
+}
+
+void CustomPushButton::setChecked(bool checked)
+{
+	QButtonGroup *btnGroup = group();
+
+	if(btnGroup->checkedId() == group()->id(this) && !checked)
+		btnGroup->setExclusive(false);
+
+	QPushButton::setChecked(checked);
+	btnGroup->setExclusive(true);
 }

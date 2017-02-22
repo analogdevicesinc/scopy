@@ -26,6 +26,7 @@
 #include <QString>
 
 extern "C" {
+	struct iio_channel;
 	struct iio_context;
 	struct iio_device;
 }
@@ -39,6 +40,8 @@ namespace adiscope {
 		TOOL_POWER_CONTROLLER = 3,
 		TOOL_LOGIC_ANALYZER = 4,
 		TOOL_PATTERN_GENERATOR = 5,
+		TOOL_NETWORK_ANALYZER = 6,
+		TOOL_LAUNCHER = 7,
 	};
 
 	class Filter
@@ -60,6 +63,11 @@ namespace adiscope {
 
 		struct iio_device * find_device(const struct iio_context *ctx,
 				enum tool tool, unsigned int idx = 0) const;
+		struct iio_channel * find_channel(const struct iio_context *ctx,
+				enum tool tool, unsigned int idx = 0,
+				bool output = false) const;
+
+		static const std::string& tool_name(enum tool tool);
 	};
 }
 

@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>filter.json</file>
+        <file>scopy.html</file>
         <file>icon.ico</file>
         <file>icons/trigger_delay.png</file>
         <file>icons/trigger_level.png</file>
@@ -110,6 +111,8 @@
         <file>icons/sba_cmb_box_arrow_right.svg</file>
         <file>icons/ico-expand.svg</file>
         <file>icons/ico-collapse.svg</file>
+        <file>icons/ico-oneshot.svg</file>
+        <file>icons/ico-play.svg</file>
     </qresource>
     <qresource prefix="/stylesheets">
         <file>stylesheets/plot.qss</file>

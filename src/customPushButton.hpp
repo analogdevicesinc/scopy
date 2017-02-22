@@ -17,29 +17,32 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#include <QApplication>
-#include <QSettings>
-#include <QtGlobal>
+#ifndef SCOPY_CUSTOM_PUSH_BUTTON_HPP
+#define SCOPY_CUSTOM_PUSH_BUTTON_HPP
 
-#include "src/tool_launcher.hpp"
+#include <QPushButton>
 
-using namespace adiscope;
+class QMouseEvent;
 
-int main(int argc, char **argv)
-{
-	QApplication app(argc, argv);
+namespace adiscope {
+	/* The CustomPushButton class behaves exactly like QPushButton. The only
+	 * difference is, when it's part of a button group and is the active
+	 * button, it is possible to disactivate it by clicking on it. */
 
-	auto pythonpath = qgetenv("SCOPY_PYTHONPATH");
-	if (!pythonpath.isNull())
-		qputenv("PYTHONPATH", pythonpath);
+	class CustomPushButton : public QPushButton
+	{
+		Q_OBJECT
 
-	QCoreApplication::setOrganizationName("ADI");
-	QCoreApplication::setOrganizationDomain("analog.com");
-	QCoreApplication::setApplicationName("Scopy");
-	QSettings::setDefaultFormat(QSettings::IniFormat);
+	public:
+		explicit CustomPushButton(QWidget *parent = Q_NULLPTR);
+		~CustomPushButton();
 
-	ToolLauncher launcher;
-	launcher.show();
+	protected:
+		void mouseReleaseEvent(QMouseEvent *event);
 
-	return app.exec();
+	public Q_SLOTS:
+		void setChecked(bool checked);
+	};
 }
+
+#endif /* SCOPY_CUSTOM_PUSH_BUTTON_HPP */

@@ -31,12 +31,14 @@
 using namespace adiscope;
 
 static const std::string tool_names[] = {
-	"oscilloscope",
-	"signal-generator",
-	"voltmeter",
-	"power-controller",
-	"logic-analyzer-rx",
-	"logic-analyzer-tx"
+	"osc",
+	"siggen",
+	"dmm",
+	"power",
+	"logic",
+	"pattern",
+	"network",
+	"launcher",
 };
 
 Filter::Filter(const struct iio_context *ctx)
@@ -96,6 +98,11 @@ QString& Filter::hw_name()
 	return hwname;
 }
 
+const std::string& Filter::tool_name(enum tool tool)
+{
+	return tool_names[tool];
+}
+
 bool Filter::compatible(enum tool tool) const
 {
 	auto hdl = root["compatible"];
@@ -134,4 +141,21 @@ struct iio_device * Filter::find_device(const struct iio_context *ctx,
 		enum tool tool, unsigned int idx) const
 {
 	return iio_context_find_device(ctx, device_name(tool, idx).c_str());
+}
+
+struct iio_channel * Filter::find_channel(const struct iio_context *ctx,
+		enum tool tool, unsigned int idx, bool output) const
+{
+	QString name = QString::fromStdString(device_name(tool, idx));
+
+	if (!name.contains(':'))
+		throw std::runtime_error("Filter entry not iio_channel");
+
+	struct iio_device *dev = iio_context_find_device(ctx,
+			name.section(':', 0, 0).toStdString().c_str());
+	if (!dev)
+		return nullptr;
+
+	return iio_device_find_channel(dev,
+			name.section(':', 1, 1).toStdString().c_str(), output);
 }

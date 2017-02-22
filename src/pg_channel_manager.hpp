@@ -85,6 +85,7 @@ public:
 
 	QFrame *topSep,*botSep;
 
+	void updateTrace();
 	void highlightTopSeparator();
 	void highlightBotSeparator();
 	void resetSeparatorHighlight(bool force = false);
@@ -100,10 +101,7 @@ private Q_SLOTS:
 	void dropEvent(QDropEvent *event);
 	void enterEvent(QEvent *event);
 	void leaveEvent(QEvent *event);
-	void paintEvent(QPaintEvent *event);
 
-
-//    void set_decoder(std::string value);
 };
 
 class PatternGeneratorChannelGroup : public ChannelGroup
@@ -131,12 +129,14 @@ class PatternGeneratorChannelGroupUI : public ChannelGroupUI
 	QRect centerDragbox;
 	QRect topDragbox;
 	QRect botDragbox;
+	int traceOffset;
+	int traceHeight;
+
+public:
 
 	std::shared_ptr<pv::view::TraceTreeItem> trace;
 	std::shared_ptr<pv::view::LogicSignal> logicTrace;
 	std::shared_ptr<pv::view::DecodeTrace> decodeTrace;
-
-public:
 	Ui::PGChannelGroup *ui;
 	std::vector<PatternGeneratorChannelUI *> ch_ui;
 	PatternGeneratorChannelGroupUI(PatternGeneratorChannelGroup *chg,
@@ -148,14 +148,16 @@ public:
 	void setTrace(std::shared_ptr<pv::view::DecodeTrace> item);
 	std::shared_ptr<pv::view::TraceTreeItem> getTrace();
 	void enableControls(bool enabled);
+	int getTraceOffset();
+
 	QFrame *topSep,*botSep, *chUiSep;
-	int traceOffset;
-	int traceHeight;
+
+	void updateTrace();
 
 	void highlight(bool val);
 	void highlightTopSeparator();
 	void highlightBotSeparator();
-	void resetSeparatorHighlight(bool force = false);
+	void hideSeparatorHighlight(bool force = false);
 
 
 Q_SIGNALS:
@@ -172,16 +174,15 @@ private Q_SLOTS:
 	void collapse();
 
 private:
+	void setupParallelDecoder();
 	void enterEvent(QEvent *event);
 	void leaveEvent(QEvent *event);
-
 	void mousePressEvent(QMouseEvent *) override;
 	void mouseMoveEvent(QMouseEvent *) override;
 	void dragEnterEvent(QDragEnterEvent *event);
 	void dragLeaveEvent(QDragLeaveEvent *event);
 	void dragMoveEvent(QDragMoveEvent *event);
 	void dropEvent(QDropEvent *event);
-	void paintEvent(QPaintEvent *event);
 
 };
 
@@ -275,6 +276,8 @@ public:
 
 	void retainWidgetSizeWhenHidden(QWidget *w);
 	void setWidgetNrOfChars(QWidget *w, int minNrOfChars, int maxNrOfChars=0);
+	bool eventFilter(QObject *object, QEvent *event);
+	void updatePlot();
 
 private:
 	QFrame *addSeparator(QVBoxLayout *lay, int pos);

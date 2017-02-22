@@ -24,6 +24,7 @@
 #include <QWidget>
 #include <QTimer>
 
+#include "apiObject.hpp"
 #include "spinbox_a.hpp"
 
 extern "C" {
@@ -35,14 +36,21 @@ namespace Ui {
 	class PowerController;
 }
 
+class QJSEngine;
+
 namespace adiscope {
+	class PowerController_API;
+
 	class PowerController : public QWidget
 	{
+		friend class PowerController_API;
+
 		Q_OBJECT
 
 	public:
 		explicit PowerController(struct iio_context *ctx,
-				QPushButton *runButton, QWidget *parent = 0);
+				QPushButton *runButton, QJSEngine *engine,
+				QWidget *parent = 0);
 		~PowerController();
 
 	public Q_SLOTS:
@@ -65,6 +73,40 @@ namespace adiscope {
 		QPushButton *menuRunButton;
 
 		PositionSpinButton *valuePos, *valueNeg;
+
+		PowerController_API *pw_api;
+	};
+
+	class PowerController_API : public ApiObject
+	{
+		Q_OBJECT
+
+		Q_PROPERTY(bool sync READ syncEnabled WRITE enableSync);
+		Q_PROPERTY(int tracking_percent
+				READ getTrackingPercent
+				WRITE setTrackingPercent);
+		Q_PROPERTY(double dac1_value READ valueDac1 WRITE setValueDac1);
+		Q_PROPERTY(double dac2_value READ valueDac2 WRITE setValueDac2);
+
+	public:
+		explicit PowerController_API(PowerController *pw) :
+			ApiObject(TOOL_POWER_CONTROLLER), pw(pw) {}
+		~PowerController_API() {}
+
+		bool syncEnabled() const;
+		void enableSync(bool en);
+
+		int getTrackingPercent() const;
+		void setTrackingPercent(int percent);
+
+		double valueDac1() const;
+		void setValueDac1(double value);
+
+		double valueDac2() const;
+		void setValueDac2(double value);
+
+	private:
+		PowerController *pw;
 	};
 }
 

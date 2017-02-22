@@ -30,6 +30,7 @@
 class QLabel;
 
 namespace adiscope {
+	class Oscilloscope_API;
 	class PlotWidget;
 
 	class OscilloscopePlot : public TimeDomainDisplayPlot
@@ -54,6 +55,8 @@ namespace adiscope {
 
 	class CapturePlot: public OscilloscopePlot
 	{
+		friend class Oscilloscope_API;
+
 		Q_OBJECT
 
 	public:
@@ -79,7 +82,6 @@ namespace adiscope {
 
 		bool triggerAEnabled();
 		bool triggerBEnabled();
-		bool measurementCursorsEnabled();
 		bool vertCursorsEnabled();
 		bool horizCursorsEnabled();
 		int selectedChannel();
@@ -103,7 +105,6 @@ namespace adiscope {
 	public Q_SLOTS:
 		void setTriggerAEnabled(bool en);
 		void setTriggerBEnabled(bool en);
-		void setMeasurementCursorsEnabled(bool en);
 		void setVertCursorsEnabled(bool en);
 		void setHorizCursorsEnabled(bool en);
 		void setSelectedChannel(int id);
@@ -148,7 +149,6 @@ namespace adiscope {
 
 		bool d_triggerAEnabled;
 		bool d_triggerBEnabled;
-		bool d_measurementEnabled;
 		bool d_vertCursorsEnabled;
 		bool d_horizCursorsEnabled;
 		bool d_measurementsEnabled;
@@ -199,6 +199,8 @@ namespace adiscope {
 	        QPen d_trigBinactiveLinePen;
 
 	        QList<Measure *> d_measureObjs;
+
+		double value_v1, value_v2, value_h1, value_h2;
 	};
 }
 

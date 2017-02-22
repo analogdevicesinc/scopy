@@ -17,29 +17,38 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#include <QApplication>
-#include <QSettings>
-#include <QtGlobal>
+#include "signal_sample.hpp"
 
-#include "src/tool_launcher.hpp"
+#include <vector>
 
 using namespace adiscope;
 
-int main(int argc, char **argv)
+signal_sample::signal_sample() :
+	gr::sync_block("signal_sample",
+			gr::io_signature::make(1, -1, sizeof(float)),
+			gr::io_signature::make(0, 0, 0)),
+	QObject()
 {
-	QApplication app(argc, argv);
+	set_max_noutput_items(1);
+}
 
-	auto pythonpath = qgetenv("SCOPY_PYTHONPATH");
-	if (!pythonpath.isNull())
-		qputenv("PYTHONPATH", pythonpath);
+signal_sample::~signal_sample()
+{
+}
 
-	QCoreApplication::setOrganizationName("ADI");
-	QCoreApplication::setOrganizationDomain("analog.com");
-	QCoreApplication::setApplicationName("Scopy");
-	QSettings::setDefaultFormat(QSettings::IniFormat);
+int signal_sample::work(int noutput_items,
+		gr_vector_const_void_star &input_items,
+		gr_vector_void_star &output_items)
+{
+	std::vector<float> values;
 
-	ToolLauncher launcher;
-	launcher.show();
+	for (unsigned int i = 0; i < input_items.size(); i++) {
+		const float *vect = (const float *) input_items[i];
+		values.push_back(*vect);
+	}
 
-	return app.exec();
+	Q_EMIT triggered(values);
+
+	consume_each(1);
+	return 0;
 }
