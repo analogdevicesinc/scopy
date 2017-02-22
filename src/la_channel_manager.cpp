@@ -263,6 +263,27 @@ void LogicAnalyzerChannelUI::dropEvent(QDropEvent *event)
 	Q_EMIT requestUpdateUI();
 }
 
+void LogicAnalyzerChannelUI::updateTrace()
+{
+	if (trace==nullptr) {
+		auto index = lch->get_id();
+		auto trace1 = chm_ui->main_win->view_->get_clone_of(index);
+		setTrace(trace1);
+	}
+
+	auto height = geometry().height();
+	auto v_offset = topSep->geometry().bottomRight().y() + 3 + height -
+	                (trace->v_extents().second) + chgroupui->getTraceOffset()+3;//chgOffset.y();
+
+	if (traceOffset!=v_offset || traceHeight!=height) {
+		traceHeight = height;
+		traceOffset = v_offset;
+		trace->setSignal_height(traceHeight);
+		trace->force_to_v_offset(v_offset);
+	}
+
+}
+
 void LogicAnalyzerChannelUI::channelRoleChanged(const QString text)
 {
 	const srd_channel *channel_role;
@@ -273,9 +294,9 @@ void LogicAnalyzerChannelUI::channelRoleChanged(const QString text)
 		                  text.toStdString().c_str());
 	}
 	static_cast<LogicAnalyzerChannel *>(lch)->setChannel_role(channel_role);
-	if (channel_role) {
-		chgroup->setChannelForDecoder(channel_role, getTrace());
-	}
+	if (channel_role)
+		chgroup->setChannelForDecoder(channel_role, getChannel()->get_id());
+	chgroupui->setupDecoder();
 }
 
 void LogicAnalyzerChannelUI::resetSeparatorHighlight(bool force)
@@ -301,18 +322,15 @@ void LogicAnalyzerChannelUI::rolesChangedLHS(const QString text)
 	channelRoleChanged(text);
 	chm_ui->deleteSettingsWidget();
 	chm_ui->createSettingsWidget();
-	chm_ui->main_win->view_->commit_decoder_channels(
-		chm_ui->getUiFromChGroup(chgroup)->getTrace(),
-		chgroup->get_decoder_channels());
 }
 
-void LogicAnalyzerChannelUI::setTrace(std::shared_ptr<pv::view::TraceTreeItem>
-                                      item)
+void LogicAnalyzerChannelUI::setTrace(
+        std::shared_ptr<pv::view::LogicSignal> item)
 {
 	trace = item;
 }
 
-std::shared_ptr<pv::view::TraceTreeItem> LogicAnalyzerChannelUI::getTrace()
+std::shared_ptr<pv::view::LogicSignal> LogicAnalyzerChannelUI::getTrace()
 {
 	return trace;
 }
@@ -428,8 +446,7 @@ LogicAnalyzerChannelGroup::LogicAnalyzerChannelGroup(LogicAnalyzerChannel *ch):
 {
 	collapsed = false;
 	decoder = nullptr;
-	channels_ = std::map<const srd_channel*,
-		std::shared_ptr<pv::view::TraceTreeItem> >();
+	channels_ = std::map<const srd_channel*, uint16_t>();
 }
 
 LogicAnalyzerChannelGroup::LogicAnalyzerChannelGroup():
@@ -437,27 +454,49 @@ LogicAnalyzerChannelGroup::LogicAnalyzerChannelGroup():
 {
 	collapsed = false;
 	decoder = nullptr;
-	channels_ = std::map<const srd_channel*,
-		std::shared_ptr<pv::view::TraceTreeItem> >();
+	channels_ = std::map<const srd_channel*, uint16_t>();
+}
+
+const srd_channel* LogicAnalyzerChannelGroup::findByValue(uint16_t ch_id)
+{
+	for( auto it : channels_ )
+	{
+		if( it.second == ch_id )
+			return it.first;
+	}
+	return nullptr;
 }
 
 void LogicAnalyzerChannelGroup::setChannelForDecoder(const srd_channel* ch,
-		std::shared_ptr<pv::view::TraceTreeItem> trace)
+		uint16_t ch_id)
 {
 	if(!channels_.empty()){
-		auto it = channels_.find(ch);
-		if( it != channels_.end() )
-		{
-			channels_.at(ch) = trace;
+		auto itByKey = channels_.find(ch);
+		auto itByValue = (findByValue(ch_id) == nullptr) ? channels_.end() : channels_.find(findByValue(ch_id));
+		if( itByKey != channels_.end() && itByValue != channels_.end() && itByKey != itByValue) {
+			getChannelById(itByKey->second)->setChannel_role(nullptr);
+			channels_.at(ch) = ch_id;
+			itByValue->second = -1;
+		}
+		else if( itByKey != channels_.end() ) {
+			getChannelById(itByKey->second)->setChannel_role(nullptr);
+			channels_.at(ch) = ch_id;
+		}
+		else if( itByValue != channels_.end() ) {
+			itByValue->second = -1;
+			channels_.insert(std::pair<const srd_channel*, uint16_t>(ch, ch_id));
+		}
+		else {
+			channels_.insert(std::pair<const srd_channel*, uint16_t>(ch, ch_id));
 		}
 	}
 	else
 	{
-		channels_.insert(std::pair<const srd_channel*, std::shared_ptr<pv::view::TraceTreeItem> >(ch, trace));
+		channels_.insert(std::pair<const srd_channel*, uint16_t>(ch, ch_id));
 	}
 }
 
-std::map<const srd_channel*, std::shared_ptr<pv::view::TraceTreeItem> >
+std::map<const srd_channel*, uint16_t>
 	LogicAnalyzerChannelGroup::get_decoder_channels()
 {
 	return channels_;
@@ -497,6 +536,8 @@ LogicAnalyzerChannelGroupUI::LogicAnalyzerChannelGroupUI(
 	this->lchg = chg;
 	this->chm_ui = chm_ui;
 	setAcceptDrops(true);
+	trace = nullptr;
+	decodeTrace = nullptr;
 }
 
 void LogicAnalyzerChannelGroupUI::set_decoder(std::string value)
@@ -506,9 +547,17 @@ void LogicAnalyzerChannelGroupUI::set_decoder(std::string value)
 }
 
 void LogicAnalyzerChannelGroupUI::setTrace(
-        std::shared_ptr<pv::view::TraceTreeItem> item)
+        std::shared_ptr<pv::view::LogicSignal> item)
 {
-	trace = item;
+	trace = dynamic_pointer_cast<pv::view::TraceTreeItem>(item);
+	logicTrace = item;
+}
+
+void LogicAnalyzerChannelGroupUI::setTrace(
+        std::shared_ptr<pv::view::DecodeTrace> item)
+{
+	trace = dynamic_pointer_cast<pv::view::TraceTreeItem>(item);
+	decodeTrace = item;
 }
 
 std::shared_ptr<pv::view::TraceTreeItem> LogicAnalyzerChannelGroupUI::getTrace()
@@ -672,6 +721,67 @@ void LogicAnalyzerChannelGroupUI::dragLeaveEvent(QDragLeaveEvent *event)
 	event->accept();
 }
 
+int LogicAnalyzerChannelGroupUI::getTraceOffset()
+{
+	return traceOffset;
+}
+
+void LogicAnalyzerChannelGroupUI::updateTrace()
+{
+	if (trace==nullptr && decodeTrace==nullptr) {
+
+		if (!chg->is_grouped()) {
+			auto index = chg->get_channel(0)->get_id();
+			auto trace1 = chm_ui->main_win->view_->get_clone_of(index);
+			setTrace(trace1);
+		} else {
+			auto trace1 = chm_ui->main_win->view_->add_decoder();
+			setTrace(trace1);
+			setupDecoder();
+		}
+	}
+
+	auto chgOffset =  geometry().top()+ui->baseWidget->geometry().bottom() + 3;
+	auto height = ui->baseWidget->geometry().height();
+	auto v_offset = chgOffset - trace->v_extents().second;
+
+	if (traceOffset!=v_offset || traceHeight!=height) {
+		traceHeight = height;
+		traceOffset = v_offset;
+		trace->force_to_v_offset(v_offset);
+		trace->setSignal_height(traceHeight);
+	}
+
+	if (chg->is_grouped() && !getChannelGroup()->isCollapsed())
+		for (auto &&ch : ch_ui) {
+			ch->updateTrace();
+		}
+}
+
+void LogicAnalyzerChannelGroupUI::setupDecoder()
+{
+	auto decoder = lchg->getDecoder();
+	if( decoder != nullptr ) {
+		decodeTrace->set_decoder(decoder);
+		std::map<const srd_channel *,
+				std::shared_ptr<pv::view::TraceTreeItem> > channel_map;
+
+		for(auto id : lchg->get_ids()) {
+			LogicAnalyzerChannel* lch = lchg->getChannelById(id);
+			std::pair<const srd_channel *,
+				std::shared_ptr<pv::view::TraceTreeItem> > chtracepair;
+			if( lch->getChannel_role() ) {
+				chtracepair.first = lch->getChannel_role();
+				chtracepair.second = chm_ui->main_win->view_->get_clone_of(id);
+				chtracepair.second->force_to_v_offset(-100);
+				channel_map.insert(chtracepair);
+			}
+
+		}
+		decodeTrace->set_channel_map(channel_map);
+	}
+}
+
 void LogicAnalyzerChannelGroupUI::dropEvent(QDropEvent *event)
 {
 	resetSeparatorHighlight();
@@ -790,10 +900,6 @@ void LogicAnalyzerChannelGroupUI::decoderChanged(const QString text)
 	}
 
 	static_cast<LogicAnalyzerChannelGroup *>(chg)->setDecoder(decoder);
-
-	if (decoder) {
-		chm_ui->set_pv_decoder(this);
-	}
 
 	if(getChannelGroup() == chm_ui->chm->getHighlightedChannelGroup())
 	{
@@ -1026,6 +1132,8 @@ LogicAnalyzerChannelManagerUI::LogicAnalyzerChannelManagerUI(QWidget *parent,
 	this->chm = chm;
 	this->la = la;
 	this->chm->initDecoderList();
+	chm->highlightChannel(chm->get_channel_group(0));
+	ui->scrollAreaWidgetContents->installEventFilter(this);
 }
 
 
@@ -1212,11 +1320,6 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 							lachannelgroupUI->ui->layoutChildren->count() );
 				prevSep = lachannelgroupUI->chUiSep;
 
-				/* Acquire the new decode trace */
-				auto trace = dynamic_pointer_cast<pv::view::TraceTreeItem>(main_win->view_->add_decoder());
-				lachannelgroupUI->setTrace(trace);
-				trace->force_to_v_offset(offset);
-
 				if(!collapsed)
 				{
 					setWidgetMinimumNrOfChars(lachannelgroupUI->ui->decoderCombo, 15);
@@ -1234,8 +1337,6 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 						lachannelgroupUI->getChannelGroup()->getDecoder()->name);
 					int decIndex =chm->get_name_decoder_list().indexOf(name)+1;
 					lachannelgroupUI->ui->decoderCombo->setCurrentIndex(decIndex);
-					/* Update the pv decoder */
-					set_pv_decoder(lachannelgroupUI);
 				} else {
 					lachannelgroupUI->ui->decoderCombo->setCurrentIndex(0);
 				}
@@ -1262,11 +1363,8 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 					lachannelgroupUI->ch_ui.push_back(lachannelUI);
 					lachannelUI->ensurePolished();
 
-					/* Acquire the new signal trace */
 					auto index = ch->get_channel(i)->get_id();
-					auto trace = dynamic_pointer_cast<pv::view::TraceTreeItem>(main_win->view_->get_clone_of(index));
-					lachannelUI->setTrace(trace);
-					trace->force_to_v_offset(offset);
+
 					forceUpdate(lachannelUI);
 					offset+=lachannelUI->geometry().bottomRight().y();
 
@@ -1308,10 +1406,6 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 							lachannelUI->getChannel()->getChannel_role()->name);
 						int roleIndex = lachannelgroupUI->getChannelGroup()->get_decoder_roles_list().indexOf(name)+1;
 						lachannelUI->ui->comboBox_2->setCurrentIndex(roleIndex);
-						/* Update in parent the (role, trace) map */
-						lachannelgroupUI->getChannelGroup()->setChannelForDecoder(
-							lachannelUI->getChannel()->getChannel_role(),
-							lachannelUI->getTrace());
 					} else {
 						lachannelUI->ui->comboBox_2->setCurrentIndex(0);
 					}
@@ -1349,17 +1443,10 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 					lachannelgroupUI->ui->subChannelWidget->setVisible(false);
 				}
 
-				/* Update the channel roles in pv decoder */
-				main_win->view_->commit_decoder_channels(trace,
-					lachannelgroupUI->getChannelGroup()->get_decoder_channels());
-
 				lachannelgroupUI->botSep = prevSep;
 				lachannelgroupUI->resetSeparatorHighlight();
 			} else {
 				auto index = ch->get_channel(0)->get_id();
-				auto trace = dynamic_pointer_cast<pv::view::TraceTreeItem>(main_win->view_->get_clone_of(index));
-				lachannelgroupUI->setTrace(trace);
-				trace->force_to_v_offset(offset);
 				lachannelgroupUI->ui->stackedWidget->setCurrentIndex(0);
 
 				if (!collapsed) {
@@ -1724,4 +1811,23 @@ void LogicAnalyzerChannelManagerUI::clearHoverWidget()
 		hoverWidget = nullptr;
 	}
 }
+
+void LogicAnalyzerChannelManagerUI::updatePlot()
+{
+	for (auto chgUi : chg_ui) {
+		chgUi->updateTrace();
+	}
+}
+
+bool LogicAnalyzerChannelManagerUI::eventFilter(QObject *object,
+                QEvent *event)
+{
+	if (event->type()==QEvent::LayoutRequest) {
+		updatePlot();
+	}
+
+	return false;
+}
+
+
 }

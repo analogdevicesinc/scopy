@@ -17,7 +17,13 @@ class LAChannelGroup;
 class LASettingsWidget;
 class LARequiredChannel;
 }
-
+namespace pv {
+namespace view {
+class View;
+class LogicSignal;
+class DecodeTrace;
+}
+}
 namespace adiscope {
 class LogicAnalyzer;
 class LogicAnalyzerChannelGroup;
@@ -45,11 +51,14 @@ class LogicAnalyzerChannelUI : public ChannelUI
 	LogicAnalyzerChannelManagerUI *chm_ui;
 	LogicAnalyzerChannelGroup *chgroup;
 	LogicAnalyzerChannelGroupUI *chgroupui;
-	std::shared_ptr<pv::view::TraceTreeItem> trace;
+	std::shared_ptr<pv::view::LogicSignal> trace;
 
 	QRect topDragbox;
 	QRect centerDragbox;
 	QRect botDragbox;
+
+	int traceOffset;
+	int traceHeight;
 
 public:
 	LogicAnalyzerChannelUI(LogicAnalyzerChannel *ch,
@@ -59,11 +68,14 @@ public:
 	                       QWidget *parent = 0);
 	Ui::LAChannelGroup *ui;
 	LogicAnalyzerChannel *getChannel();
-	void setTrace(std::shared_ptr<pv::view::TraceTreeItem> item);
-	std::shared_ptr<pv::view::TraceTreeItem> getTrace();
+	void setTrace(std::shared_ptr<pv::view::LogicSignal> item);
+	std::shared_ptr<pv::view::LogicSignal> getTrace();
+
 	void channelRoleChanged(const QString);
 	QPoint dragStartPosition;
 	QFrame *topSep,*botSep;
+
+	void updateTrace();
 
 	void highlightTopSeparator();
 	void highlightBotSeparator();
@@ -92,8 +104,8 @@ private:
 	const srd_decoder *decoder;
 	QStringList decoderRolesNameList;
 	std::vector<const srd_channel *> decoderRolesList;
-	std::map<const srd_channel*,
-	std::shared_ptr<pv::view::TraceTreeItem> > channels_;
+	std::map<const srd_channel*,uint16_t> channels_;
+	const srd_channel* findByValue(uint16_t ch_id);
 public:
 	LogicAnalyzerChannelGroup(LogicAnalyzerChannel *ch);
 	LogicAnalyzerChannelGroup();
@@ -105,10 +117,8 @@ public:
 	QStringList get_decoder_roles_list();
 	const srd_channel *get_srd_channel_from_name(const char*);
 	LogicAnalyzerChannel* getChannelById(int id);
-	void setChannelForDecoder(const srd_channel*,
-		std::shared_ptr<pv::view::TraceTreeItem>);
-	std::map<const srd_channel*,
-		std::shared_ptr<pv::view::TraceTreeItem> > get_decoder_channels();
+	void setChannelForDecoder(const srd_channel*, uint16_t);
+	std::map<const srd_channel*, uint16_t> get_decoder_channels();
 };
 
 
@@ -120,6 +130,8 @@ class LogicAnalyzerChannelGroupUI : public ChannelGroupUI
 	QRect centerDragbox;
 	QRect topDragbox;
 	QRect botDragbox;
+	int traceOffset;
+	int traceHeight;
 public:
 	LogicAnalyzerChannelGroupUI(LogicAnalyzerChannelGroup *chg,
 	                            LogicAnalyzerChannelManagerUI *chm_ui,
@@ -128,11 +140,17 @@ public:
 	std::vector<LogicAnalyzerChannelUI *> ch_ui;
 	Ui::LAChannelGroup *ui;
 	void enableControls(bool enabled);
-	void setTrace(std::shared_ptr<pv::view::TraceTreeItem> item);
+	void setTrace(std::shared_ptr<pv::view::LogicSignal> item);
+	void setTrace(std::shared_ptr<pv::view::DecodeTrace> item);
+
 	std::shared_ptr<pv::view::TraceTreeItem> getTrace();
 	LogicAnalyzerChannelUI* findChannelWithRole(const QString role);
 	QPoint dragStartPosition;
 	QFrame *topSep,*botSep, *chUiSep;
+
+	void updateTrace();
+	int getTraceOffset();
+	void setupDecoder();
 
 	void highlightTopSeparator();
 	void highlightBotSeparator();
@@ -152,6 +170,8 @@ private Q_SLOTS:
 	void leaveEvent(QEvent *event);
 private:
 	std::shared_ptr<pv::view::TraceTreeItem> trace;
+	std::shared_ptr<pv::view::LogicSignal> logicTrace;
+	std::shared_ptr<pv::view::DecodeTrace> decodeTrace;
 public Q_SLOTS:
 	void remove();
 	void enable(bool enabled);
@@ -230,6 +250,8 @@ public:
 	void deleteSettingsWidget();
 	void set_pv_decoder(LogicAnalyzerChannelGroupUI *channelgroup);
 	void retainWidgetSizeWhenHidden(QWidget *w);
+	bool eventFilter(QObject *object, QEvent *event);
+	void updatePlot();
 
 public Q_SLOTS:
 	void chmScrollChanged(int value);
