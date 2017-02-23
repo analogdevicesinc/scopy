@@ -127,6 +127,9 @@ public Q_SLOTS:
   void setSemilogx(bool en);
   void setSemilogy(bool en);
 
+  void setLineWidthF(int which, qreal widthF);
+  qreal getLineWidthF(int which) const;
+
   void legendEntryChecked(QwtPlotItem *plotItem, bool on);
   void legendEntryChecked(const QVariant &plotItem, bool on, int index);
 

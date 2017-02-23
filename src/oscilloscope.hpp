@@ -144,6 +144,7 @@ namespace adiscope {
 		void onPlotNewData();
 
 		void on_btnSettings_toggled(bool checked);
+		void channelLineWidthChanged(int id);
 
 	private:
 		OscADC adc;

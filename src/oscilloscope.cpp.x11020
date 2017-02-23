@@ -438,8 +438,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	connect(voltsPosition, SIGNAL(valueChanged(double)),
 		SLOT(onVertOffsetValueChanged(double)));
 
-	connect(ch_ui->cmbChnLineWidth, SIGNAL(currentIndexChanged(int)),
-		SLOT(channelLineWidthChanged(int)));
+	connect(ch_ui->cmbChnLineWidth, SIGNAL(currentIndexChanged(QString)),
+		SLOT(channelLineWidthChanged(QString)));
 
 	/* Sync timePosition with plot time trigger bar */
 	connect(&plot, SIGNAL(timeTriggerValueChanged(double)),
@@ -1415,8 +1415,6 @@ void Oscilloscope::update_chn_settings_panel(int id, QWidget *chn_widget)
 	QString stylesheet = QString("border: 2px solid %1"
 					).arg(plot.getLineColor(id).name());
 	ch_ui->line_channelColor->setStyleSheet(stylesheet);
-	int cmbIdx = (int)(plot.getLineWidthF(id) / 0.5) - 1;
-	ch_ui->cmbChnLineWidth->setCurrentIndex(cmbIdx);
 }
 
 void Oscilloscope::onMeasuremetsAvailable()
@@ -2260,12 +2258,12 @@ void Oscilloscope_API::setMeasureEn(const QList<int>& list)
 	osc->onMeasurementSelectionListChanged();
 }
 
-void Oscilloscope::channelLineWidthChanged(int id)
+void Oscilloscope::channelLineWidthChanged(const QString &sWidth)
 {
-	qreal width = 0.5 * (id + 1);
+	bool ok;
+	qreal width = sWidth.toFloat(&ok);
 
-	if (width != plot.getLineWidthF(current_channel)) {
-		plot.setLineWidthF(current_channel, width);
-		plot.replot();
+	if (ok) {
+		qDebug() << width;
 	}
 }
