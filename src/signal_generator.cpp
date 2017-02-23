@@ -637,7 +637,7 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
 		}
 		break;
 	case SIGNAL_TYPE_MATH:
-		if (!ptr->function.isNull()) {
+		if (!ptr->function.isEmpty()) {
 			auto str = ptr->function.toStdString();
 
 			return iio::iio_math_gen::make(samp_rate,
