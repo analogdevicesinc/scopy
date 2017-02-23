@@ -371,6 +371,12 @@ PatternGeneratorChannelGroup::~PatternGeneratorChannelGroup()
 	}
 }
 
+PatternGeneratorChannel *PatternGeneratorChannelGroup::get_channel(
+        int index)
+{
+	return static_cast<PatternGeneratorChannel *>(channels[index]);
+}
+
 bool PatternGeneratorChannelGroup::isCollapsed()
 {
 	return collapsed;
@@ -858,15 +864,34 @@ PatternGeneratorChannelManager::PatternGeneratorChannelManager() :
 
 }
 
+PatternGeneratorChannel *PatternGeneratorChannelManager::get_channel(int index)
+{
+	return static_cast<PatternGeneratorChannel *>(channel[index]);
+}
+
+void PatternGeneratorChannelManager::add_channel_group(
+        PatternGeneratorChannelGroup *chg)
+{
+	channel_group.push_back(chg);
+}
+
 PatternGeneratorChannelManager::~PatternGeneratorChannelManager()
+{
+	clearChannelGroups();
+
+	for (auto ch : channel) {
+		delete ch;
+	}
+}
+
+void PatternGeneratorChannelManager::clearChannelGroups()
 {
 	for (auto ch : channel_group) {
 		delete ch;
 	}
 
-	for (auto ch : channel) {
-		delete ch;
-	}
+	channel_group.erase(channel_group.begin(),channel_group.end());
+
 }
 
 PatternGeneratorChannelGroup *PatternGeneratorChannelManager::get_channel_group(

@@ -108,10 +108,12 @@ class PatternGeneratorChannelGroup : public ChannelGroup
 {
 	bool collapsed;
 public:
-	PatternGeneratorChannelGroup(PatternGeneratorChannel *ch, bool en);
+	PatternGeneratorChannelGroup(PatternGeneratorChannel *ch=nullptr,
+	                             bool en=false);
 	~PatternGeneratorChannelGroup();
 	int created_index;
 	Pattern *pattern;
+	PatternGeneratorChannel *get_channel(int index);
 	bool isCollapsed();
 	void collapse(bool val);
 	void append(PatternGeneratorChannelGroup *tojoin);
@@ -215,6 +217,9 @@ public:
 
 	uint32_t computeSuggestedSampleRate();
 	uint32_t computeSuggestedBufferSize(uint32_t sample_rate);
+	void add_channel_group(PatternGeneratorChannelGroup *chg);
+	PatternGeneratorChannel *get_channel(int);
+	void clearChannelGroups();
 };
 
 class PatternGeneratorChannelManagerUI : public QWidget

@@ -101,15 +101,14 @@ const char *PatternGenerator::channelNames[] = {
 };
 
 PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
-		QPushButton *runBtn, QJSEngine *engine,
-		QWidget *parent, bool offline_mode) :
+                                   QPushButton *runBtn, QJSEngine *engine,
+                                   QWidget *parent, bool offline_mode) :
 	QWidget(parent),
 	ctx(ctx),
 	settings_group(new QButtonGroup(this)), menuRunButton(runBtn),
 	ui(new Ui::PatternGenerator),
 	pgSettings(new Ui::PGSettings),
-	txbuf(0), sample_rate(100000), channel_enable_mask(0xffff),buffer(nullptr),
-	buffer_created(0), currentUI(nullptr), offline_mode(offline_mode),
+	txbuf(0), buffer_created(0), currentUI(nullptr), offline_mode(offline_mode),
 	pg_api(new PatternGenerator_API(this))
 {
 
@@ -286,12 +285,10 @@ bool PatternGenerator::startPatternGeneration(bool cyclic)
 		iio_channel_enable(ch);
 	}
 
-	channel_enable_mask = chm.get_enabled_mask();
-
 	qDebug("Setting channel direction");
 
 	for (int j = 0; j < no_channels; j++) {
-		if (channel_enable_mask & (1<<j)) {
+		if (chm.get_enabled_mask() & (1<<j)) {
 			//auto ch = iio_device_get_channel(channel_manager_dev, j);
 			auto ch = iio_device_find_channel(channel_manager_dev,channelNames[j],false);
 			qDebug()<<iio_channel_attr_write(ch, "direction", "out");
@@ -299,9 +296,8 @@ bool PatternGenerator::startPatternGeneration(bool cyclic)
 	}
 
 	qDebug("Setting sample rate");
-	sample_rate = bufman->getSampleRate();
 	iio_device_attr_write(dev, "sampling_frequency",
-	                      std::to_string(sample_rate).c_str());
+	                      std::to_string(bufman->getSampleRate()).c_str());
 
 	qDebug("Creating buffer");
 	txbuf = iio_device_create_buffer(dev, bufman->getBufferSize(), cyclic);
@@ -367,7 +363,7 @@ void PatternGenerator::startStop(bool start)
 
 void PatternGenerator::singleRun()
 {
-	main_win->action_view_zoom_fit()->trigger();
+	/*main_win->action_view_zoom_fit()->trigger();
 	stopPatternGeneration();
 
 	if (startPatternGeneration(false)) {
@@ -380,7 +376,7 @@ void PatternGenerator::singleRun()
 	} else {
 		qDebug("Pattern generation failed");
 		ui->btnSingleRun->setChecked(true);
-	}
+	}*/
 }
 
 void PatternGenerator::singleRunStop()
@@ -430,4 +426,108 @@ void PatternGenerator::on_btnExtendChannelManager_clicked()
 		//  ui->channelManagerWidget->toggleMenu(true);
 	}
 }
+
+QJsonValue PatternGenerator::chmToJson()
+{
+	QJsonObject obj;
+	QJsonArray chgArray;
+
+	for (auto i=0; i<chm.get_channel_group_count(); i++) {
+		QJsonObject chgObj;
+		PatternGeneratorChannelGroup *chg = chm.get_channel_group(i);
+
+		chgObj["label"] = QString::fromStdString(chg->get_label());
+		chgObj["grouped"] = chg->is_grouped();
+		chgObj["enabled"] = chg->is_enabled();
+		chgObj["collapsed"] = chg->isCollapsed();
+		chgObj["pattern"] = QString::fromStdString(chg->pattern->get_name());
+
+		auto chCount = chg->get_channel_count();
+		QJsonArray chArray;
+
+		for (auto j=0; j<chCount; j++) {
+			QJsonObject chObj;
+			chObj["id"] = chg->get_channel(j)->get_id();
+			chObj["label"] = QString::fromStdString(chg->get_channel(j)->get_label());
+			chArray.insert(j,QJsonValue(chObj));
+		}
+
+		chgObj["channels"] = chArray;
+		chgArray.insert(i,chgObj);
+
+	}
+
+	obj["channel_groups"] = chgArray;
+	QJsonValue val(obj);
+	return val;
+}
+
+void PatternGenerator::jsonToChm(QJsonObject obj)
+{
+	chm.clearChannelGroups();
+	QJsonArray chgArray = obj["chm"].toObject()["channel_groups"].toArray();
+
+	for (auto chgRef : chgArray) {
+		auto chg = chgRef.toObject();
+		PatternGeneratorChannelGroup *pgchg = new PatternGeneratorChannelGroup();
+		pgchg->set_label(chg["label"].toString().toStdString());
+		pgchg->group(chg["grouped"].toBool());
+		pgchg->enable(chg["enabled"].toBool());
+		pgchg->collapse(chg["collapsed"].toBool());
+		QJsonArray chArray = chg["channels"].toArray();
+
+		for (auto chRef : chArray) {
+			auto ch = chRef.toObject();
+			int chIndex = ch["id"].toInt();
+			pgchg->add_channel(chm.get_channel(chIndex));
+		}
+
+		chm.add_channel_group(pgchg);
+	}
+}
+
+QString PatternGenerator::toString()
+{
+	QJsonObject obj;
+	obj["chm"] = chmToJson();
+	QJsonDocument doc(obj);
+	QString ret(doc.toJson(QJsonDocument::Compact));
+	return ret;
+}
+
+
+
+void PatternGenerator::fromString(QString val)
+{
+	QJsonObject obj;
+	QJsonDocument doc = QJsonDocument::fromJson(val.toUtf8());
+
+	if (!doc.isNull()) {
+		if (doc.isObject()) {
+			obj = doc.object();
+		} else {
+			qDebug() << "Document is not an object" << endl;
+		}
+	} else {
+		qDebug() << "Invalid JSON...\n";
+	}
+
+	jsonToChm(obj);
+	chmui->showHighlight(false);
+	chmui->updateUi();
+
+}
+
+QString PatternGenerator_API::chm() const
+{
+	QString ret = pg->toString();
+	return ret;
+
+}
+void PatternGenerator_API::setChm(QString val)
+{
+	pg->fromString(val);
+}
+
+
 }

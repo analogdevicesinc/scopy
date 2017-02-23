@@ -59,7 +59,7 @@ class Context;
 namespace adiscope {
 
 ChannelManager::ChannelManager()
-{    
+{
 }
 ChannelManager::~ChannelManager()
 {
@@ -68,159 +68,183 @@ ChannelManager::~ChannelManager()
 
 std::vector<int> ChannelManager::get_selected_indexes()
 {
-    unsigned int i=0;
-    std::vector<int> selection;
-    for(auto ch : channel_group)
-    {
-       if(ch->is_selected()) selection.push_back(i);
-       i++;
-    }
-    return selection;
+	unsigned int i=0;
+	std::vector<int> selection;
+
+	for (auto ch : channel_group) {
+		if (ch->is_selected()) {
+			selection.push_back(i);
+		}
+
+		i++;
+	}
+
+	return selection;
 }
 
 uint16_t ChannelManager::get_enabled_mask()
 {
-    unsigned int i=0;
-    uint16_t ret=0;
-    for(auto ch : channel_group)
-    {
-       if(ch->is_enabled()) ret = ret | ch->get_mask();
-       i++;
-    }
-    return ret;
+	unsigned int i=0;
+	uint16_t ret=0;
+
+	for (auto ch : channel_group) {
+		if (ch->is_enabled()) {
+			ret = ret | ch->get_mask();
+		}
+
+		i++;
+	}
+
+	return ret;
 }
 
-uint16_t ChannelManager::get_selected_mask(){
-    unsigned int i=0;
-    uint16_t ret=0;
-    for(auto ch : channel_group)
-    {
-       if(ch->is_selected()) ret = ret | ch->get_mask();
-       i++;
-    }
-    return ret;
+uint16_t ChannelManager::get_selected_mask()
+{
+	unsigned int i=0;
+	uint16_t ret=0;
+
+	for (auto ch : channel_group) {
+		if (ch->is_selected()) {
+			ret = ret | ch->get_mask();
+		}
+
+		i++;
+	}
+
+	return ret;
 }
 
 std::vector<int> ChannelManager::get_enabled_indexes()
 {
-    unsigned int i=0;
-    std::vector<int> selection;
-    for(auto ch : channel_group)
-    {
-       if(ch->is_enabled()) selection.push_back(i);
-       i++;
-    }
-    return selection;
+	unsigned int i=0;
+	std::vector<int> selection;
+
+	for (auto ch : channel_group) {
+		if (ch->is_enabled()) {
+			selection.push_back(i);
+		}
+
+		i++;
+	}
+
+	return selection;
 }
 
-std::vector<ChannelGroup*>* ChannelManager::get_channel_groups()
+size_t ChannelManager::get_channel_group_count()
 {
-    return &channel_group;
+	return channel_group.size();
 }
 
-ChannelGroup* ChannelManager::get_channel_group(int index)
+std::vector<ChannelGroup *> *ChannelManager::get_channel_groups()
 {
-    return channel_group[index];
+	return &channel_group;
+}
+
+ChannelGroup *ChannelManager::get_channel_group(int index)
+{
+	return channel_group[index];
 }
 
 void ChannelManager::deselect_all()
 {
-    for(auto&& ch : channel_group)
-    {
-        ch->select(false);
-    }
+	for (auto&& ch : channel_group) {
+		ch->select(false);
+	}
 }
 
 
 Channel::Channel(uint16_t id_, std::string label_)
 {
-    label = label_;
-    id =id_;
-    mask = 1<<id_;
+	label = label_;
+	id =id_;
+	mask = 1<<id_;
 }
- Channel::~Channel()
- {
-
- }
-
-ChannelUI::ChannelUI(Channel* ch, QWidget *parent) : QWidget(parent)
+Channel::~Channel()
 {
-    this->ch = ch;
+
+}
+
+ChannelUI::ChannelUI(Channel *ch, QWidget *parent) : QWidget(parent)
+{
+	this->ch = ch;
 }
 ChannelUI::~ChannelUI()
 {}
 
-Channel* ChannelUI::get_channel()
+Channel *ChannelUI::get_channel()
 {
-    return ch;
+	return ch;
 }
 
 uint16_t Channel::get_mask()
 {
-    return mask;
+	return mask;
 }
 
 uint16_t Channel::get_id()
 {
-    return id;
+	return id;
 }
 
 std::string Channel::get_label()
 {
-    return label;
+	return label;
 }
 
 void Channel::set_label(std::string label)
 {
-    this->label = label;
+	this->label = label;
 }
 
-std::vector<Channel*>* ChannelGroup::get_channels()
+std::vector<Channel *> *ChannelGroup::get_channels()
 {
-    return &channels;
+	return &channels;
 }
 
-Channel* ChannelGroup::get_channel(int index)
+Channel *ChannelGroup::get_channel(int index)
 {
-    return channels[index];
+	return channels[index];
 }
 
 bool ChannelGroup::is_selected() const
 {
-    return selected;
+	return selected;
 }
 
 void ChannelGroup::select(bool value)
 {
-    selected = value;
+	selected = value;
 }
 
 void ChannelGroup::group(bool value)
 {
-    this->grouped = value;
+	this->grouped = value;
 }
 void ChannelGroup::enable(bool value)
 {
-    this->enabled  = value;
+	this->enabled  = value;
 }
 
 bool ChannelGroup::is_grouped() const
 {
-    return grouped;
+	return grouped;
 }
 
 bool ChannelGroup::is_enabled() const
 {
-    return enabled;
+	return enabled;
 }
 
-ChannelGroup::ChannelGroup(Channel* ch)
+ChannelGroup::ChannelGroup(Channel *ch)
 {
-    channels.push_back(ch);
-    label = ch->get_label();
-    group(false);
-    select(false);
-    enable(true);
+	if (ch!=nullptr) {
+		channels.push_back(ch);
+		label = ch->get_label();
+	}
+
+	group(false);
+	select(false);
+	enable(true);
 }
 
 ChannelGroup::ChannelGroup()
@@ -232,32 +256,33 @@ ChannelGroup::ChannelGroup()
 
 ChannelGroup::~ChannelGroup()
 {
-    //qDebug()<<"ChannelGroup destroyed";
+	//qDebug()<<"ChannelGroup destroyed";
 }
 
 void ChannelGroup::set_label(std::string label)
 {
-    this->label = label;
+	this->label = label;
 }
 
 std::string ChannelGroup::get_label()
 {
-    return label;
+	return label;
 }
 
 uint16_t ChannelGroup::get_mask()
 {
-    uint16_t mask = 0;
-    for(auto i=0;i<channels.size();i++)
-    {
-        mask = mask | channels[i]->get_mask();
-    }
-    return mask;
+	uint16_t mask = 0;
+
+	for (auto i=0; i<channels.size(); i++) {
+		mask = mask | channels[i]->get_mask();
+	}
+
+	return mask;
 }
 
 void ChannelGroup::add_channel(Channel *channel)
 {
-    channels.push_back(channel);
+	channels.push_back(channel);
 }
 
 void ChannelGroup::remove_channel(int chIndex)
@@ -267,38 +292,42 @@ void ChannelGroup::remove_channel(int chIndex)
 
 size_t ChannelGroup::get_channel_count()
 {
-    return channels.size();
+	return channels.size();
 }
 
 std::vector<uint16_t> ChannelGroup::get_ids()
 {
-    std::vector<uint16_t> ret;
-    for(auto ch: (*get_channels()))
-        ret.push_back(ch->get_id());
-    return ret;
+	std::vector<uint16_t> ret;
+
+	for (auto ch: (*get_channels())) {
+		ret.push_back(ch->get_id());
+	}
+
+	return ret;
 }
 
-ChannelGroupUI::ChannelGroupUI(ChannelGroup* chg, QWidget *parent) : QWidget(parent)
+ChannelGroupUI::ChannelGroupUI(ChannelGroup *chg,
+                               QWidget *parent) : QWidget(parent)
 {
-    this->chg = chg;
+	this->chg = chg;
 }
 ChannelGroupUI::~ChannelGroupUI()
 {
 
 }
 
-ChannelGroup* ChannelGroupUI::get_group()
+ChannelGroup *ChannelGroupUI::get_group()
 {
-    return chg;
+	return chg;
 }
 
 void ChannelGroupUI::select(bool selected)
 {
-    chg->select(selected);
+	chg->select(selected);
 }
 void ChannelGroupUI::enable(bool enabled)
 {
-    chg->enable(enabled);
+	chg->enable(enabled);
 }
 
 }
