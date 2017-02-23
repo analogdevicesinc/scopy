@@ -40,7 +40,7 @@ BinaryStream::BinaryStream(const std::shared_ptr<sigrok::Context> &context,
 	dev_(dev),
 	format_(format),
 	options_(options),
-	interrupt_(false),
+	interrupt_(true),
 	buffersize_(buffersize),
 	single_(false),
 	running(false),
@@ -106,6 +106,8 @@ void BinaryStream::start()
 
 void BinaryStream::run()
 {
+	if( running )
+		stop();
 	running = true;
 	size_t nrx = 0;
 	input_->reset();
@@ -114,26 +116,16 @@ void BinaryStream::run()
 	while (!interrupt_)
 	{
 		nbytes_rx = iio_buffer_refill(data_);
-		if (nbytes_rx < 0)
-		{
-			printf("Error refilling buf %d\n", (int)nbytes_rx);
-			la->set_triggered_status(false);
-			input_->send(data_, 0);
-			if( running )
-			{
-				stop();
-				interrupt_ = false;
-				start();
-			}
-		}
-		else{
-			nrx += nbytes_rx / 2;
-			input_->send(iio_buffer_start(data_), (size_t)(nbytes_rx));
-			la->set_triggered_status(true);
-			if( single_ )
-				interrupt_ = true;
 
+		nrx += nbytes_rx / 2;
+		if( nbytes_rx > 0 )
+			input_->send(iio_buffer_start(data_), (size_t)(nbytes_rx));
+		la->set_triggered_status(true);
+		if( single_ && running ) {
+			interrupt_ = true;
+			stop();
 		}
+
 	}
 	input_->end();
 	interrupt_ = false;
@@ -149,6 +141,8 @@ void BinaryStream::set_buffersize(size_t value)
 
 void BinaryStream::set_single(bool check)
 {
+	if( running )
+		stop();
 	single_ = check;
 }
 
@@ -169,9 +163,13 @@ void BinaryStream::stop()
 {
 	running = false;
 	interrupt_ = true;
+	single_ = false;
+	if(data_ )
+		iio_buffer_cancel(data_);
 	if( data_ )
 	{
 		iio_buffer_destroy(data_);
+		data_ = NULL;
 	}
 }
 

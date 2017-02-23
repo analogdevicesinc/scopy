@@ -260,6 +260,13 @@ void Viewport::paint_time_trigger_line(QPainter &p, const ViewItemPaintParams &p
 			repaintTriggerHandle(timeTriggerPixel);
 		}
 	}
+	else {
+		px = view_.ruler_->getTickZeroPosition();
+		if( px != timeTriggerPixel && px >= 0) {
+			timeTriggerPixel = px;
+			repaintTriggerHandle(timeTriggerPixel);
+		}
+	}
 
 	QPen pen = QPen(QColor(74, 100, 255));
 	p.setPen(pen);

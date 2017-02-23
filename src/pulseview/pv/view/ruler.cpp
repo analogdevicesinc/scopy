@@ -202,6 +202,19 @@ void Ruler::paintEvent(QPaintEvent*)
 		i->paint_label(p, r, highlight);
 	}
 }
+int Ruler::getTickZeroPosition()
+{
+
+
+	if( tick_position_cache_.is_initialized() )
+		for (const auto& tick: tick_position_cache_->major) {
+			if(tick.second == "0") {
+				timeTriggerPx = tick.first;
+				return timeTriggerPx;
+			}
+		}
+	return -1;
+}
 
 void Ruler::set_offset(double value)
 {

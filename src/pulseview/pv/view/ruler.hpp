@@ -111,6 +111,8 @@ public:
 	int getTimeTriggerPx() const;
 	void setTimeTriggerPx(int value);
 
+	int getTickZeroPosition();
+
 private:
 	/**
 	 * Gets the time items.

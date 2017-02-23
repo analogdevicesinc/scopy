@@ -24,6 +24,7 @@
 
 #include <libsigrokcxx/libsigrokcxx.hpp>
 #include "device.hpp"
+#include "boost/thread.hpp"
 
 
 extern "C" {
@@ -88,7 +89,7 @@ private:
 	std::atomic<bool> interrupt_;
 	size_t buffersize_;
 	bool single_;
-	bool running;
+	std::atomic<bool> running;
 	adiscope::LogicAnalyzer* la;
 };
 

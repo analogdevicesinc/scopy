@@ -1084,7 +1084,7 @@ void View::signals_changed()
 void View::capture_state_updated(int state)
 {
 	if (state == Session::Running) {
-		set_time_unit(util::TimeUnit::Samples);
+//		set_time_unit(util::TimeUnit::Samples);
 
 		trigger_markers_.clear();
 	}
@@ -1258,7 +1258,7 @@ void View::session_error(
 		Q_ARG(QString, info_text));
 }
 
-int View::divisionCount()
+int View::divisionCount() const
 {
 	return DivisionCount;
 }

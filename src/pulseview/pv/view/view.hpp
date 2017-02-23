@@ -218,7 +218,7 @@ public:
 
 	void restack_all_trace_tree_items();
 
-	int divisionCount();
+	int divisionCount() const;
 
 	QSize viewport_height();
 

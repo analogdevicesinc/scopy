@@ -503,8 +503,8 @@ void LogicAnalyzer::onTimePositionSpinboxChanged(double value)
 	}
 	if( running )
 	{
-		setHWTriggerDelay(active_triggerSampleCount);
 		setSampleRate();
+		setHWTriggerDelay(active_triggerSampleCount);
 		setBuffersizeLabelValue(active_sampleCount);
 		setSamplerateLabelValue(active_sampleRate);
 	}
@@ -661,15 +661,9 @@ void LogicAnalyzer::setHWTrigger(int chid, std::string trigger_val)
 
 	if( !triggerch )
 		return;
-	if(!running)
-	{
-		iio_channel_attr_write(triggerch, "trigger", trigger_val.c_str());
-	}
-	else {
-//		main_win->run_stop();
-		iio_channel_attr_write(triggerch, "trigger", trigger_val.c_str());
-		main_win->run_stop();
-	}
+
+	iio_channel_attr_write(triggerch, "trigger", trigger_val.c_str());
+
 }
 
 std::string LogicAnalyzer::get_trigger_from_device(int chid)
