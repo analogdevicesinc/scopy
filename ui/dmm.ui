@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>900</width>
-    <height>649</height>
+    <height>720</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -398,7 +398,7 @@ background-color: rgb(73, 99, 255);
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <property name="spacing">
-       <number>12</number>
+       <number>24</number>
       </property>
       <property name="leftMargin">
        <number>25</number>
@@ -471,7 +471,7 @@ background-color: #F45000;
         <property name="sizeHint" stdset="0">
          <size>
           <width>0</width>
-          <height>20</height>
+          <height>24</height>
          </size>
         </property>
        </spacer>
@@ -667,7 +667,7 @@ QComboBox:disabled
         <property name="sizeHint" stdset="0">
          <size>
           <width>0</width>
-          <height>20</height>
+          <height>24</height>
          </size>
         </property>
        </spacer>
