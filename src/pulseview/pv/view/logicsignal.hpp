@@ -67,7 +67,8 @@ public:
 	LogicSignal(pv::Session &session,
 		std::shared_ptr<devices::Device> device,
 		std::shared_ptr<sigrok::Channel> channel,
-		std::shared_ptr<pv::data::Logic> data);
+		std::shared_ptr<pv::data::Logic> data,
+		int sig_height = 0);
 
 	LogicSignal(LogicSignal& obj);
 
@@ -112,9 +113,12 @@ public:
 	 */
 	virtual void paint_fore(QPainter &p, const ViewItemPaintParams &pp);
 
+	int getSignal_height();
+	void setSignal_height(int signal_height);
+
 private:
 	void paint_caps(QPainter &p, QLineF *const lines,
-		std::vector< std::pair<int64_t, bool> > &edges,
+			std::vector< std::pair<int64_t, bool> > &edges,
 		bool level, double samples_per_pixel, double pixels_offset,
 		float x_offset, float y_offset);
 
@@ -134,8 +138,7 @@ private:
 private Q_SLOTS:
 	void on_trigger();
 
-private:
-	int signal_height_;
+private:	
 
 	std::shared_ptr<pv::devices::Device> device_;
 	std::shared_ptr<pv::data::Logic> data_;

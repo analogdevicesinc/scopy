@@ -27,7 +27,7 @@ extern "C" {
 #include <pulseview/extdef.h>
 
 #include <tuple>
-
+#include <QDebug>
 #include <boost/functional/hash.hpp>
 #include <boost/thread/locks.hpp>
 #include <boost/thread/shared_mutex.hpp>
@@ -128,8 +128,9 @@ const QColor DecodeTrace::OutlineColours[16] = {
 	QColor(0x6B, 0x23, 0x37)
 };
 
+
 DecodeTrace::DecodeTrace(pv::Session &session,
-	std::shared_ptr<pv::data::DecoderStack> decoder_stack, int index) :
+			 std::shared_ptr<pv::data::DecoderStack> decoder_stack, int index) :
 	Trace(decoder_stack->name()),
 	session_(session),
 	decoder_stack_(decoder_stack),
@@ -173,12 +174,14 @@ const std::shared_ptr<pv::data::DecoderStack>& DecodeTrace::decoder() const
 
 pair<int, int> DecodeTrace::v_extents() const
 {
-	const int row_height = (ViewItemPaintParams::text_height() * 6) / 4;
+	const int row_height = signal_height_;
 
 	// Make an empty decode trace appear symmetrical
 	const int row_count = max(1, max_visible_rows_);
+	const int signal_margin =
+		QFontMetrics(QApplication::font()).height() / 3;
 
-	return make_pair(-row_height, row_height * row_count);
+	return make_pair(-row_height, signal_margin/*row_height * row_count*/);
 }
 
 void DecodeTrace::paint_back(QPainter &p, const ViewItemPaintParams &pp)
@@ -208,7 +211,7 @@ void DecodeTrace::paint_mid(QPainter &p, const ViewItemPaintParams &pp)
 	p.setPen(Qt::black);
 
 	// Iterate through the rows
-	int y = get_visual_y();
+	int y = get_visual_y() - (-v_extents().first/2) + v_extents().second;
 	pair<uint64_t, uint64_t> sample_range = get_sample_range(
 		pp.left(), pp.right());
 
@@ -287,10 +290,10 @@ void DecodeTrace::paint_fore(QPainter &p, const ViewItemPaintParams &pp)
 
 		// Draw the outline
 		p.setPen(QApplication::palette().color(QPalette::Base));
-		for (int dx = -1; dx <= 1; dx++)
+		/*for (int dx = -1; dx <= 1; dx++)
 			for (int dy = -1; dy <= 1; dy++)
 				if (dx != 0 && dy != 0)
-					p.drawText(r.translated(dx, dy), f, h);
+					p.drawText(r.translated(dx, dy), f, h);*/
 
 		// Draw the text
 		p.setPen(QApplication::palette().color(QPalette::WindowText));
@@ -663,7 +666,7 @@ pair<double, double> DecodeTrace::get_pixels_offset_samples_per_pixel() const
 	const View *view = owner_->view();
 	assert(view);
 
-	const double scale = view->scale();
+	const double scale = view->scale() / (view->viewport()->size().width() /10);
 	assert(scale > 0);
 
 	const double pixels_offset =

@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>988</width>
-    <height>806</height>
+    <width>1280</width>
+    <height>720</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>1280</width>
+    <height>720</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Scopy</string>
@@ -26,7 +32,13 @@ font: 75 10pt &quot;DejaVu Sans&quot;;</string>
     </sizepolicy>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout_3">
+    <property name="topMargin">
+     <number>0</number>
+    </property>
     <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
      <number>0</number>
     </property>
     <item>
@@ -56,6 +68,10 @@ background-color: none;
 
 QWidget:hover {
 background-color: rgb(27, 27, 33);
+}
+
+QWidget[selected=true] {
+background-color: rgb(27, 27, 33);
 }</string>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -66,9 +82,6 @@ background-color: rgb(27, 27, 33);
         <number>0</number>
        </property>
        <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
         <number>0</number>
        </property>
        <item>
@@ -195,9 +208,15 @@ color: rgb(255, 255, 255);
               <height>32</height>
              </size>
             </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
             <property name="flat">
              <bool>true</bool>
             </property>
+            <attribute name="buttonGroup">
+             <string notr="true">buttonGroup_2</string>
+            </attribute>
            </widget>
           </item>
           <item>
@@ -271,9 +290,15 @@ color: rgb(255, 255, 255);
               <height>32</height>
              </size>
             </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
             <property name="flat">
              <bool>true</bool>
             </property>
+            <attribute name="buttonGroup">
+             <string notr="true">buttonGroup_2</string>
+            </attribute>
            </widget>
           </item>
           <item>
@@ -334,9 +359,15 @@ color: rgb(255, 255, 255);
               <height>32</height>
              </size>
             </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
             <property name="flat">
              <bool>true</bool>
             </property>
+            <attribute name="buttonGroup">
+             <string notr="true">buttonGroup_2</string>
+            </attribute>
            </widget>
           </item>
           <item>
@@ -429,9 +460,15 @@ background-image: url(:/menu/play.png);
               <height>32</height>
              </size>
             </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
             <property name="flat">
              <bool>true</bool>
             </property>
+            <attribute name="buttonGroup">
+             <string notr="true">buttonGroup_2</string>
+            </attribute>
            </widget>
           </item>
           <item>
@@ -524,9 +561,15 @@ background-image: url(:/menu/play.png);
               <height>32</height>
              </size>
             </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
             <property name="flat">
              <bool>true</bool>
             </property>
+            <attribute name="buttonGroup">
+             <string notr="true">buttonGroup_2</string>
+            </attribute>
            </widget>
           </item>
           <item>
@@ -613,13 +656,19 @@ background-image: url(:/menu/play.png);
               <height>32</height>
              </size>
             </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
             <property name="flat">
              <bool>true</bool>
             </property>
+            <attribute name="buttonGroup">
+             <string notr="true">buttonGroup_2</string>
+            </attribute>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="stopSignalGenerator">
+           <widget class="adiscope::CustomPushButton" name="stopSignalGenerator">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -664,6 +713,9 @@ background-image: url(:/menu/play.png);
             <property name="checkable">
              <bool>true</bool>
             </property>
+            <attribute name="buttonGroup">
+             <string notr="true">buttonGroup</string>
+            </attribute>
            </widget>
           </item>
          </layout>
@@ -720,9 +772,15 @@ background-image: url(:/menu/play.png);
               <height>32</height>
              </size>
             </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
             <property name="flat">
              <bool>true</bool>
             </property>
+            <attribute name="buttonGroup">
+             <string notr="true">buttonGroup_2</string>
+            </attribute>
            </widget>
           </item>
           <item>
@@ -809,9 +867,15 @@ background-image: url(:/menu/play.png);
               <height>32</height>
              </size>
             </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
             <property name="flat">
              <bool>true</bool>
             </property>
+            <attribute name="buttonGroup">
+             <string notr="true">buttonGroup_2</string>
+            </attribute>
            </widget>
           </item>
           <item>
@@ -904,26 +968,67 @@ background-image: url(:/menu/play.png);
               <height>32</height>
              </size>
             </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
             <property name="flat">
              <bool>true</bool>
             </property>
+            <attribute name="buttonGroup">
+             <string notr="true">buttonGroup_2</string>
+            </attribute>
            </widget>
           </item>
           <item>
-           <spacer name="horizontalSpacer_8">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+           <widget class="adiscope::CustomPushButton" name="stopNetworkAnalyzer">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
             </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Fixed</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
+            <property name="minimumSize">
              <size>
               <width>32</width>
-              <height>0</height>
+              <height>32</height>
              </size>
             </property>
-           </spacer>
+            <property name="maximumSize">
+             <size>
+              <width>32</width>
+              <height>32</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QPushButton {
+background-repeat: no-repeat;
+background-position: center center;
+}
+
+QPushButton:enabled {
+background-image: url(:/menu/stop.png);
+}
+
+QPushButton:checked {
+background-image: url(:/menu/play.png);
+}</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>8</width>
+              <height>10</height>
+             </size>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <attribute name="buttonGroup">
+             <string notr="true">buttonGroup</string>
+            </attribute>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -967,9 +1072,15 @@ background-image: url(:/menu/play.png);
               <height>32</height>
              </size>
             </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
             <property name="flat">
              <bool>true</bool>
             </property>
+            <attribute name="buttonGroup">
+             <string notr="true">buttonGroup_2</string>
+            </attribute>
            </widget>
           </item>
           <item>
@@ -1089,6 +1200,9 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 r
 }</string>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_3">
+         <property name="leftMargin">
+          <number>25</number>
+         </property>
          <item>
           <widget class="QGroupBox" name="groupBox">
            <property name="sizePolicy">
@@ -1146,7 +1260,7 @@ font-weight: bold;
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>102</width>
+                  <width>90</width>
                   <height>64</height>
                  </size>
                 </property>
@@ -1267,23 +1381,20 @@ background-color: red;
           </widget>
          </item>
          <item>
-          <widget class="QWebView" name="webView" native="true">
-           <property name="minimumSize">
-            <size>
-             <width>880</width>
-             <height>400</height>
-            </size>
-           </property>
+          <widget class="QTextBrowser" name="textBrowser">
            <property name="styleSheet">
-            <string notr="true">background-color: white;</string>
+            <string notr="true">background-color: transparent;</string>
            </property>
-           <property name="url" stdset="0">
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
+           </property>
+           <property name="source">
             <url>
-             <string>https://wiki.analog.com/doku.php</string>
+             <string>qrc:/scopy.html</string>
             </url>
            </property>
-           <property name="zoomFactor" stdset="0">
-            <double>0.800000011920929</double>
+           <property name="openExternalLinks">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -1321,15 +1432,15 @@ background-color: red;
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>QWebView</class>
-   <extends>QWidget</extends>
-   <header>QtWebKitWidgets/QWebView</header>
-  </customwidget>
-  <customwidget>
    <class>adiscope::MenuAnim</class>
    <extends>QWidget</extends>
    <header>menu_anim.hpp</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::CustomPushButton</class>
+   <extends>QPushButton</extends>
+   <header>customPushButton.hpp</header>
   </customwidget>
  </customwidgets>
  <resources>
@@ -1353,4 +1464,8 @@ background-color: red;
    </hints>
   </connection>
  </connections>
+ <buttongroups>
+  <buttongroup name="buttonGroup"/>
+  <buttongroup name="buttonGroup_2"/>
+ </buttongroups>
 </ui>

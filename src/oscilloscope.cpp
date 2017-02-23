@@ -26,6 +26,7 @@
 #include <QDebug>
 #include <QVBoxLayout>
 #include <QtWidgets/QSpacerItem>
+#include <QSignalBlocker>
 
 /* Local includes */
 #include "adc_sample_conv.hpp"
@@ -47,17 +48,19 @@
 #include "ui_cursors_settings.h"
 #include "ui_osc_general_settings.h"
 #include "ui_measure_panel.h"
+#include "ui_measure_settings.h"
 #include "ui_statistics_panel.h"
 #include "ui_cursor_readouts.h"
 #include "ui_oscilloscope.h"
 #include "ui_trigger.h"
+#include "ui_trigger_settings.h"
 
 using namespace adiscope;
 using namespace gr;
 using namespace std;
 
 Oscilloscope::Oscilloscope(struct iio_context *ctx,
-		Filter *filt, QPushButton *runButton,
+		Filter *filt, QPushButton *runButton, QJSEngine *engine,
 		float gain_ch1, float gain_ch2, QWidget *parent) :
 	QWidget(parent),
 	adc(ctx, filt),
@@ -85,7 +88,9 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	menuOpened(false), current_channel(0), math_chn_counter(0),
 	settings_group(new QButtonGroup(this)),
 	channels_group(new QButtonGroup(this)),
-	menuRunButton(runButton)
+	active_settings_btn(nullptr),
+	last_non_general_settings_btn(nullptr),
+	menuRunButton(runButton), osc_api(new Oscilloscope_API(this))
 {
 	ui->setupUi(this);
 	int triggers_panel = ui->stackedWidget->insertWidget(-1, &trigger_settings);
@@ -189,16 +194,15 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 
 	/* Cursors Settings */
 	QWidget *cursor_widget = new QWidget(this);
-	Ui::Channel cursor_ui;
-
-	cursor_ui.setupUi(cursor_widget);
+	cursor_ui = new Ui::Channel();
+	cursor_ui->setupUi(cursor_widget);
 	ui->cursors_settings->addWidget(cursor_widget);
 
-	settings_group->addButton(cursor_ui.btn);
-	cursor_ui.btn->setProperty("id", QVariant(-1));
-	cursor_ui.name->setText("Cursors");
-	cursor_ui.box->setChecked(false);
-	QString stylesheet(cursor_ui.box->styleSheet());
+	settings_group->addButton(cursor_ui->btn);
+	cursor_ui->btn->setProperty("id", QVariant(-1));
+	cursor_ui->name->setText("Cursors");
+	cursor_ui->box->setChecked(false);
+	QString stylesheet(cursor_ui->box->styleSheet());
 	stylesheet += QString("\nQCheckBox::indicator {"
 				"border-color: rgb(74, 100, 255);"
 				"border-radius: 4px;"
@@ -206,10 +210,10 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 				"QCheckBox::indicator:checked {"
 				"background-color: rgb(74, 100, 255);"
 				"}");
-	cursor_ui.box->setStyleSheet(stylesheet);
-	connect(cursor_ui.btn, SIGNAL(pressed()),
+	cursor_ui->box->setStyleSheet(stylesheet);
+	connect(cursor_ui->btn, SIGNAL(pressed()),
 				this, SLOT(toggleRightMenu()));
-	connect(cursor_ui.box, SIGNAL(toggled(bool)), this,
+	connect(cursor_ui->box, SIGNAL(toggled(bool)), this,
 			SLOT(onCursorsToggled(bool)));
 
 
@@ -281,7 +285,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 			"border: 1px solid #7092be;"
 		"}";
 	buffer_previewer->setStyleSheet(stylesheet);
-	ui->hLayout_buffPreview->insertWidget(1, buffer_previewer);
+	ui->vLayoutBufferSlot->addWidget(buffer_previewer);
+
 	buffer_previewer->setCursorPos(0.5);
 
 	/* Plot layout */
@@ -481,17 +486,17 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	connect(&trigger_settings, SIGNAL(triggerModeChanged(int)),
 		this, SLOT(onTriggerModeChanged(int)));
 
-	Ui::CursorsSettings cr_ui;
-	cr_ui.setupUi(ui->cursorsSettings);
-	connect(cr_ui.hCursorsEnanble, SIGNAL(toggled(bool)),
+	cr_ui = new Ui::CursorsSettings;
+	cr_ui->setupUi(ui->cursorsSettings);
+	connect(cr_ui->hCursorsEnable, SIGNAL(toggled(bool)),
 		&plot, SLOT(setVertCursorsEnabled(bool)));
-	connect(cr_ui.vCursorsEnanble, SIGNAL(toggled(bool)),
+	connect(cr_ui->vCursorsEnable, SIGNAL(toggled(bool)),
 		&plot, SLOT(setHorizCursorsEnabled(bool)));
 
-	connect(cr_ui.hCursorsEnanble, SIGNAL(toggled(bool)),
+	connect(cr_ui->hCursorsEnable, SIGNAL(toggled(bool)),
 		cursor_readouts_ui->TimeCursors,
 		SLOT(setVisible(bool)));
-	connect(cr_ui.vCursorsEnanble, SIGNAL(toggled(bool)),
+	connect(cr_ui->vCursorsEnable, SIGNAL(toggled(bool)),
 		cursor_readouts_ui->VoltageCursors,
 		SLOT(setVisible(bool)));
 
@@ -527,6 +532,9 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	// Calculate initial sample count and sample rate
 	onHorizScaleValueChanged(timeBase->value());
 	onTimePositionChanged(timePosition->value());
+
+	osc_api->load();
+	osc_api->js_register(engine);
 }
 
 Oscilloscope::~Oscilloscope()
@@ -565,14 +573,20 @@ Oscilloscope::~Oscilloscope()
 	gr::hier_block2_sptr hier = iio->to_hier_block2();
 	qDebug() << "OSC disconnected:\n" << gr::dot_graph(hier).c_str();
 
+	osc_api->save();
+	delete osc_api;
+
 	delete[] xy_ids;
 	delete[] hist_ids;
 	delete[] fft_ids;
 	delete[] ids;
+	delete measure_ui;
+	delete cursor_ui;
 	delete ch_ui;
 	delete gsettings_ui;
 	delete measure_panel_ui;
 	delete cursor_readouts_ui;
+	delete cr_ui;
 	delete ui;
 }
 
@@ -684,6 +698,8 @@ void Oscilloscope::add_math_channel(const std::string& function)
 	channel_ui.box->setStyleSheet(stylesheet);
 
 	channel_widget->setProperty("curve_nb", QVariant(curve_number));
+	channel_widget->setProperty("function",
+			QVariant(QString::fromStdString(function)));
 	channel_ui.box->setProperty("id", QVariant(curve_id));
 	channel_ui.btn->setProperty("id", QVariant(curve_id));
 	channel_ui.name->setProperty("id", QVariant(curve_id));
@@ -750,9 +766,9 @@ void Oscilloscope::del_math_channel()
 	/* Close the right menu if it shows the actual channel */
 	if (btn == settings_group->checkedButton()) {
 		settings_group->setExclusive(false);
-		btn->setChecked(false);
+		ui->btnSettings->setChecked(false);
 		active_settings_btn = nullptr;
-		ui->rightMenu->toggleMenu(false);
+		last_non_general_settings_btn = active_settings_btn;
 	}
 
 	/* Remove the math channel from the bottom list of channels */
@@ -983,12 +999,14 @@ void adiscope::Oscilloscope::onCursorsToggled(bool on)
 	if (!on) {
 		if (btn->isChecked()) {
 			settings_group->setExclusive(false);
-			btn->setChecked(false);
-			toggleRightMenu(btn);
+			ui->btnSettings->setChecked(false);
 		}
 	}
 
-	plot.setMeasurementCursorsEnabled(on);
+	plot.setHorizCursorsEnabled(
+			on ? cr_ui->vCursorsEnable->isChecked() : false);
+	plot.setVertCursorsEnabled(
+			on ? cr_ui->hCursorsEnable->isChecked() : false);
 
 	// Set the visibility of the cursor readouts owned by the Oscilloscope
 	QCheckBox *mbox = ui->measure_settings->itemAt(0)->widget()->
@@ -1006,8 +1024,7 @@ void adiscope::Oscilloscope::onMeasureToggled(bool on)
 	if (!on) {
 		if (btn->isChecked()) {
 			settings_group->setExclusive(false);
-			btn->setChecked(false);
-			toggleRightMenu(btn);
+			ui->btnSettings->setChecked(false);
 		}
 	} else {
 		update_measure_for_channel(selectedChannel);
@@ -1015,7 +1032,7 @@ void adiscope::Oscilloscope::onMeasureToggled(bool on)
 	measurePanel->setVisible(on);
 
 	// Set the visibility of the cursor readouts owned by the plot
-	if (plot.measurementCursorsEnabled())
+	if (cursor_ui->box->isChecked())
 		plot.setCursorReadoutsVisible(!on);
 }
 
@@ -1104,8 +1121,7 @@ void adiscope::Oscilloscope::channel_box_toggled(bool checked)
 	} else {
 		if (btn->isChecked()) {
 			settings_group->setExclusive(false);
-			btn->setChecked(false);
-			toggleRightMenu(btn);
+			ui->btnSettings->setChecked(false);
 		}
 
 		qDebug() << "Detaching curve" << id;
@@ -1299,6 +1315,8 @@ void adiscope::Oscilloscope::toggleRightMenu(QPushButton *btn)
 	bool open = !menuOpened;
 
 	active_settings_btn = btn;
+	if (id != -ui->stackedWidget->indexOf(ui->generalSettings))
+		last_non_general_settings_btn = active_settings_btn;
 
 	settings_group->setExclusive(!btn_old_state);
 
@@ -1318,7 +1336,19 @@ void adiscope::Oscilloscope::toggleRightMenu(QPushButton *btn)
 
 void adiscope::Oscilloscope::toggleRightMenu()
 {
-	toggleRightMenu(static_cast<QPushButton *>(QObject::sender()));
+	QPushButton *btn = static_cast<QPushButton *>(QObject::sender());
+
+	toggleRightMenu(btn);
+
+	int id = btn->property("id").toInt();
+	bool settingsState = !btn->isChecked();
+
+	if (id == -ui->stackedWidget->indexOf(ui->generalSettings) &&
+			settingsState) {
+		settingsState = false;
+	}
+	const QSignalBlocker blocker(ui->btnSettings);
+		ui->btnSettings->setChecked(settingsState);
 }
 
 void Oscilloscope::settings_panel_update(int id)
@@ -1528,15 +1558,15 @@ void Oscilloscope::measure_settings_init()
 		SLOT(onStatisticSelectionListChanged()));
 
 	QWidget *measure_widget = new QWidget(this);
-	Ui::Channel measure_ui;
 
-	measure_ui.setupUi(measure_widget);
+	measure_ui = new Ui::Channel();
+	measure_ui->setupUi(measure_widget);
 	ui->measure_settings->addWidget(measure_widget);
-	settings_group->addButton(measure_ui.btn);
-	measure_ui.btn->setProperty("id", QVariant(-measure_panel));
-	measure_ui.name->setText("Measure");
-	measure_ui.box->setChecked(false);
-	QString stylesheet(measure_ui.box->styleSheet());
+	settings_group->addButton(measure_ui->btn);
+	measure_ui->btn->setProperty("id", QVariant(-measure_panel));
+	measure_ui->name->setText("Measure");
+	measure_ui->box->setChecked(false);
+	QString stylesheet(measure_ui->box->styleSheet());
 	stylesheet += QString("\nQCheckBox::indicator {"
 				"border-color: rgb(74, 100, 255);"
 				"border-radius: 4px;"
@@ -1544,13 +1574,13 @@ void Oscilloscope::measure_settings_init()
 				"QCheckBox::indicator:checked {"
 				"background-color: rgb(74, 100, 255);"
 				"}");
-	measure_ui.box->setStyleSheet(stylesheet);
+	measure_ui->box->setStyleSheet(stylesheet);
 
-	connect(measure_ui.btn, SIGNAL(pressed()),
+	connect(measure_ui->btn, SIGNAL(pressed()),
 				this, SLOT(toggleRightMenu()));
-	connect(measure_ui.box, SIGNAL(toggled(bool)), this,
+	connect(measure_ui->box, SIGNAL(toggled(bool)), this,
 			SLOT(onMeasureToggled(bool)));
-	connect(measure_ui.box, SIGNAL(toggled(bool)),
+	connect(measure_ui->box, SIGNAL(toggled(bool)),
 		&plot, SLOT(setMeasuremensEnabled(bool)));
 }
 
@@ -1934,4 +1964,293 @@ void Oscilloscope::updateBufferPreviewer()
 	buffer_previewer->setHighlightWidth(hWidth);
 	buffer_previewer->setHighlightPos(hPos);
 	buffer_previewer->setCursorPos(cPos);
+}
+
+void Oscilloscope::on_btnSettings_toggled(bool checked)
+{
+	QPushButton *btn = nullptr;
+
+	if (checked) {
+		if (last_non_general_settings_btn) {
+			btn = last_non_general_settings_btn;
+		} else { // search for the button of the first channel
+			auto buttons = settings_group->buttons();
+			for (int i = 0; i < buttons.size(); i++) {
+				if (buttons[i]->property("id").toInt() == 0) {
+					btn = static_cast<QPushButton *>(
+					buttons[i]);
+					break;
+				}
+			}
+		}
+	} else {
+		btn = static_cast<QPushButton *>(
+			settings_group->checkedButton());
+	}
+
+	if (btn) {
+		toggleRightMenu(btn);
+		btn->setChecked(checked);
+	}
+}
+
+bool Oscilloscope_API::hasCursors() const
+{
+	return osc->cursor_ui->box->isChecked();
+}
+
+void Oscilloscope_API::setCursors(bool en)
+{
+	osc->cursor_ui->box->setChecked(en);
+}
+
+bool Oscilloscope_API::hasMeasure() const
+{
+	return osc->measure_ui->box->isChecked();
+}
+
+void Oscilloscope_API::setMeasure(bool en)
+{
+	osc->measure_ui->box->setChecked(en);
+}
+
+bool Oscilloscope_API::measureAll() const
+{
+	return osc->measure_settings->m_ui->button_measDisplayAll->isChecked();
+}
+
+void Oscilloscope_API::setMeasureAll(bool en)
+{
+	osc->measure_settings->m_ui->button_measDisplayAll->setChecked(en);
+}
+
+bool Oscilloscope_API::hasCounter() const
+{
+	return osc->measure_settings->m_ui->button_Counter->isChecked();
+}
+
+void Oscilloscope_API::setCounter(bool en)
+{
+	osc->measure_settings->m_ui->button_Counter->setChecked(en);
+}
+
+bool Oscilloscope_API::hasStatistics() const
+{
+	return osc->measure_settings->m_ui->button_StatisticsEn->isChecked();
+}
+
+void Oscilloscope_API::setStatistics(bool en)
+{
+	osc->measure_settings->m_ui->button_StatisticsEn->setChecked(en);
+}
+
+double Oscilloscope_API::cursorV1() const
+{
+	return osc->plot.value_v1;
+}
+
+double Oscilloscope_API::cursorV2() const
+{
+	return osc->plot.value_v2;
+}
+
+double Oscilloscope_API::cursorH1() const
+{
+	return osc->plot.value_h1;
+}
+
+double Oscilloscope_API::cursorH2() const
+{
+	return osc->plot.value_h2;
+}
+
+void Oscilloscope_API::setCursorV1(double val)
+{
+	osc->plot.d_vBar1->setPosition(val);
+}
+
+void Oscilloscope_API::setCursorV2(double val)
+{
+	osc->plot.d_vBar2->setPosition(val);
+}
+
+void Oscilloscope_API::setCursorH1(double val)
+{
+	osc->plot.d_hBar1->setPosition(val);
+}
+
+void Oscilloscope_API::setCursorH2(double val)
+{
+	osc->plot.d_hBar2->setPosition(val);
+}
+
+bool Oscilloscope_API::autoTrigger() const
+{
+	return osc->trigger_settings.ui->btnAuto->isChecked();
+}
+
+void Oscilloscope_API::setAutoTrigger(bool en)
+{
+	if (en)
+		osc->trigger_settings.ui->btnAuto->setChecked(true);
+	else
+		osc->trigger_settings.ui->btnNormal->setChecked(true);
+}
+
+bool Oscilloscope_API::externalTrigger() const
+{
+	return osc->trigger_settings.ui->trigg_A_extern_en->isChecked();
+}
+
+void Oscilloscope_API::setExternalTrigger(bool en)
+{
+	osc->trigger_settings.ui->trigg_A_extern_en->setChecked(en);
+}
+
+int Oscilloscope_API::triggerSource() const
+{
+	return osc->trigger_settings.ui->cmb_trigg_source->currentIndex();
+}
+
+void Oscilloscope_API::setTriggerSource(int idx)
+{
+	osc->trigger_settings.ui->cmb_trigg_source->setCurrentIndex(idx);
+}
+
+QList<double> Oscilloscope_API::getVoltsPerDiv() const
+{
+	QList<double> list;
+	unsigned int i;
+
+	for (i = 0; i < osc->nb_channels + osc->nb_math_channels; i++)
+		list.append(osc->plot.VertUnitsPerDiv(i));
+
+	return list;
+}
+
+void Oscilloscope_API::setVoltsPerDiv(const QList<double>& list)
+{
+	unsigned int i;
+
+	for (i = 0; i < osc->nb_channels + osc->nb_math_channels; i++)
+		osc->plot.setVertUnitsPerDiv(list.at(i), i);
+
+	osc->voltsPerDiv->setValue(osc->plot.VertUnitsPerDiv());
+}
+
+QList<QString> Oscilloscope_API::getMathChannels() const
+{
+	QList<QString> list;
+
+	for (unsigned int i = 0; i < osc->nb_math_channels; i++) {
+		QWidget *obj = osc->ui->channelsList->itemAt(
+				osc->nb_channels + i)->widget();
+		list.append(obj->property("function").toString());
+	}
+
+	return list;
+}
+
+void Oscilloscope_API::setMathChannels(const QList<QString>& list)
+{
+	for (unsigned int i = 0; i < list.size(); i++)
+		osc->add_math_channel(list.at(i).toStdString());
+}
+
+QList<double> Oscilloscope_API::getVOffset() const
+{
+	QList<double> list;
+	unsigned int i;
+
+	for (i = 0; i < osc->nb_channels + osc->nb_math_channels; i++)
+		list.append(osc->plot.VertOffset(i));
+
+	return list;
+}
+
+void Oscilloscope_API::setVOffset(const QList<double>& list)
+{
+	unsigned int i;
+
+	for (i = 0; i < osc->nb_channels + osc->nb_math_channels; i++)
+		osc->plot.setVertOffset(list.at(i), i);
+
+	osc->voltsPosition->setValue(osc->plot.VertOffset());
+}
+
+double Oscilloscope_API::getTimePos() const
+{
+	return osc->timePosition->value();
+}
+
+void Oscilloscope_API::setTimePos(double value)
+{
+	osc->timePosition->setValue(value);
+}
+
+double Oscilloscope_API::getTimeBase() const
+{
+	return osc->timeBase->value();
+}
+
+void Oscilloscope_API::setTimeBase(double value)
+{
+	osc->timeBase->setValue(value);
+}
+
+bool Oscilloscope_API::running() const
+{
+	return osc->ui->pushButtonRunStop->isChecked();
+}
+
+void Oscilloscope_API::run(bool en)
+{
+	osc->ui->pushButtonRunStop->setChecked(en);
+}
+
+QList<int> Oscilloscope_API::measureEn() const
+{
+	QList<int> list;
+
+	for (unsigned int i = 0; i < osc->nb_channels; i++) {
+		auto measurements = osc->plot.measurements(i);
+		int mask = 0;
+
+		if (measurements.size() > (sizeof(int) * 8))
+			throw std::runtime_error("Too many measurements");
+
+		for (unsigned int j = 0; j < measurements.size(); j++) {
+			if (measurements[j]->enabled())
+				mask |= 1 << j;
+		}
+
+		list.append(mask);
+	}
+
+	return list;
+}
+
+void Oscilloscope_API::setMeasureEn(const QList<int>& list)
+{
+	if (list.size() != osc->nb_channels)
+		return;
+
+	osc->measure_settings->m_selectedMeasurements.clear();
+
+	for (unsigned int i = 0; i < osc->nb_channels; i++) {
+		auto measurements = osc->plot.measurements(i);
+		int mask = list.at(i);
+
+		if (measurements.size() > (sizeof(int) * 8))
+			throw std::runtime_error("Too many measurements");
+
+		for (unsigned int j = 0; j < measurements.size(); j++) {
+			measurements[j]->setEnabled(!!(mask & (1 << j)));
+			osc->measure_settings->onMeasurementActivated(
+					i, j, !!(mask & (1 << j)));
+		}
+	}
+
+	osc->measure_settings->loadMeasurementStatesFromData();
+	osc->onMeasurementSelectionListChanged();
 }

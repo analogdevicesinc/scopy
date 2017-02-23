@@ -43,6 +43,8 @@ class Viewport : public ViewWidget
 {
 	Q_OBJECT
 
+private:
+	bool dragEnabled = true;
 public:
 	explicit Viewport(View &parent);
 
@@ -61,6 +63,9 @@ public:
 
 	int getTimeTriggerPixel() const;
 	void setTimeTriggerPixel(int value);
+
+	void disableDrag();
+	void enableDrag();
 
 private:
 	/**

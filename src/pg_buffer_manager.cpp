@@ -8,9 +8,8 @@ PatternGeneratorBufferManager::PatternGeneratorBufferManager(
 	bufferSize = 1;
 	buffer = new short[bufferSize];
 	sampleRate = 1;
-
-
 }
+
 PatternGeneratorBufferManager::~PatternGeneratorBufferManager()
 {
 	delete buffer;
@@ -49,7 +48,6 @@ void PatternGeneratorBufferManager::update(PatternGeneratorChannelGroup *chg)
 	}
 
 	memset(buffer, 0x0000, (bufferSize)*sizeof(short));
-
 	chm->generatePatterns(buffer, sampleRate, bufferSize);
 
 	if (sampleRateChanged || bufferSizeChanged) {
@@ -57,7 +55,6 @@ void PatternGeneratorBufferManager::update(PatternGeneratorChannelGroup *chg)
 	} else {
 		// only generate current ?
 	}
-
 }
 
 uint32_t PatternGeneratorBufferManager::adjustSampleRate(
@@ -85,11 +82,10 @@ uint32_t PatternGeneratorBufferManager::getSampleRate()
 	return sampleRate;
 }
 
-/*uint32_t PatternGeneratorBufferManager::getBufferSize()
+uint32_t PatternGeneratorBufferManager::getBufferSize()
 {
-    return bufferSize;
-}*/
-
+	return bufferSize;
+}
 
 PatternGeneratorBufferManagerUi::PatternGeneratorBufferManagerUi(
         QWidget *parent, PatternGeneratorBufferManager *bufmanager,
@@ -123,17 +119,20 @@ PatternGeneratorBufferManagerUi::PatternGeneratorBufferManagerUi(
 void PatternGeneratorBufferManagerUi::updateUi()
 {
 	bufman->update();
-	//createBinaryBuffer();
 	setSampleRate();
 	dataChanged();
 	//main_win->action_view_zoom_fit()->trigger();
+	bufman->getSampleRate();
+	bufman->getBufferSize();
+
+	auto scale = (1/(double)bufman->getSampleRate()) * bufman->getBufferSize() /
+	             (double)main_win->view_->divisionCount();
+	main_win->view_->set_scale_offset(scale,pv::util::Timestamp(0));
 }
 
 PatternGeneratorBufferManagerUi::~PatternGeneratorBufferManagerUi()
 {
-//    qDebug()<<"PGBufman destroyed";
 }
-
 
 void PatternGeneratorBufferManagerUi::setSampleRate()
 {
@@ -142,8 +141,6 @@ void PatternGeneratorBufferManagerUi::setSampleRate()
 	                                bufman->getSampleRate()),true);//(Glib::VariantBase)(gint64(1000000));
 	pattern_generator_ptr->options_ = options;
 	pattern_generator_ptr->open();
-
-
 }
 
 void PatternGeneratorBufferManagerUi::createBinaryBuffer()
@@ -155,12 +152,9 @@ void PatternGeneratorBufferManagerUi::createBinaryBuffer()
 	pattern_generator_ptr = std::make_shared<pv::devices::BinaryBuffer>(context,
 	                        bufman->buffer,&bufman->bufferSize,binary_format,options);
 	main_win->select_device(pattern_generator_ptr);
-
 }
 
-
 pv::MainWindow *PatternGeneratorBufferManagerUi::getPVWindow()
-
 {
 	return main_win;
 }

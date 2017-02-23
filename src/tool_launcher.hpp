@@ -20,10 +20,13 @@
 #ifndef M2K_TOOL_LAUNCHER_H
 #define M2K_TOOL_LAUNCHER_H
 
+#include <QJSEngine>
 #include <QMainWindow>
 #include <QPair>
+#include <QSocketNotifier>
 #include <QVector>
 
+#include "apiObject.hpp"
 #include "dmm.hpp"
 #include "filter.hpp"
 #include "calibration.hpp"
@@ -33,6 +36,7 @@
 #include "signal_generator.hpp"
 #include "logic_analyzer.hpp"
 #include "pattern_generator.hpp"
+#include "network_analyzer.hpp"
 
 extern "C" {
 	struct iio_context;
@@ -44,9 +48,13 @@ namespace Ui {
 }
 
 namespace adiscope {
+	class ToolLauncher_API;
+
 	class ToolLauncher : public QMainWindow
 	{
-	    Q_OBJECT
+		friend class ToolLauncher_API;
+
+		Q_OBJECT
 
 	public:
 		explicit ToolLauncher(QWidget *parent = 0);
@@ -62,10 +70,10 @@ namespace adiscope {
 		void on_btnPowerControl_clicked();
 		void on_btnLogicAnalyzer_clicked();
 		void on_btnPatternGenerator_clicked();
-
-		void window_destroyed();
-
+		void on_btnNetworkAnalyzer_clicked();
 		void on_btnHome_clicked();
+		void setButtonBackground(bool on);
+
 		void on_btnConnect_clicked(bool pressed);
 
 		void device_btn_clicked(bool pressed);
@@ -74,9 +82,10 @@ namespace adiscope {
 
 		void enableCalibTools(float gain_ch1, float gain_ch2);
 
+		void hasText();
+
 	private:
 		Ui::ToolLauncher *ui;
-		QList<QMainWindow *> windows;
 		struct iio_context *ctx;
 
 		QVector<QPair<QWidget, Ui::Device> *> devices;
@@ -87,18 +96,68 @@ namespace adiscope {
 		Oscilloscope *oscilloscope;
 		LogicAnalyzer *logic_analyzer;
 		PatternGenerator *pattern_generator;
+		NetworkAnalyzer *network_analyzer;
 		QWidget *current;
 
 		Filter *filter;
+		ToolLauncher_API *tl_api;
+
+		QJSEngine js_engine;
+		QString js_cmd;
+		QSocketNotifier notifier;
+		QString previousIp;
 
 		void swapMenu(QWidget *menu);
 		void destroyContext();
-		bool switchContext(QString &uri);
+		bool switchContext(const QString &uri);
 		void resetStylesheets();
 		void calibrate();
-		void addContext(const QString& hostname);
+		void checkIp(const QString& ip);
+		Q_INVOKABLE QPushButton * addContext(const QString& hostname);
 
 		static void apply_m2k_fixes(struct iio_context *ctx);
+	};
+
+	class ToolLauncher_API: public ApiObject
+	{
+		Q_OBJECT
+
+		Q_PROPERTY(bool menu_opened READ menu_opened WRITE open_menu
+				STORED false);
+
+		Q_PROPERTY(bool hidden READ hidden WRITE hide STORED false);
+
+		Q_PROPERTY(QString previous_ip READ getPreviousIp WRITE addIp
+				SCRIPTABLE false);
+
+		Q_PROPERTY(bool maximized READ maximized WRITE setMaximized);
+
+	public:
+		explicit ToolLauncher_API(ToolLauncher *tl) :
+			ApiObject(TOOL_LAUNCHER), tl(tl) {}
+		~ToolLauncher_API() {}
+
+		bool menu_opened() const;
+		void open_menu(bool open);
+
+		bool hidden() const;
+		void hide(bool hide);
+
+		const QString& getPreviousIp() { return tl->previousIp; }
+		void addIp(const QString& ip);
+
+		bool maximized() { return tl->isMaximized(); }
+		void setMaximized(bool m) {
+			if (m)
+				tl->showMaximized();
+			else
+				tl->showNormal();
+		}
+
+		Q_INVOKABLE bool connect(const QString& uri);
+
+	private:
+		ToolLauncher *tl;
 	};
 }
 

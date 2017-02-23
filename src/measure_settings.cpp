@@ -104,42 +104,6 @@ void MeasureSettings::setChannelUnderlineColor(const QColor& color)
 	m_ui->line->setStyleSheet(stylesheet);
 }
 
-void MeasureSettings::addHorizontalMeasurement(const QString& name,
-	int measurement_id)
-{
-	setEmitActivated(false);
-	m_horizMeasurements->addDropdownElement(QIcon(icons_lut.at(
-		measurement_id)), name, QVariant(measurement_id));
-	setEmitActivated(true);
-}
-
-void MeasureSettings::addVerticalMeasurement(const QString& name,
-	int measurement_id)
-{
-	setEmitActivated(false);
-	m_vertMeasurements->addDropdownElement(QIcon(icons_lut.at(
-		measurement_id)), name, QVariant(measurement_id));
-	setEmitActivated(true);
-}
-
-void MeasureSettings::setHorizMeasurementActive(int idx, bool en)
-{
-	QStandardItemModel *model = static_cast<QStandardItemModel *>(
-					m_horizMeasurements->model());
-	int val = en ? 1 : 0;
-
-	model->item(idx, 1)->setData(QVariant(val), Qt::EditRole);
-}
-
-void MeasureSettings::setVertMeasurementActive(int idx, bool en)
-{
-	QStandardItemModel *model = static_cast<QStandardItemModel *>(
-					m_vertMeasurements->model());
-	int val = en ? 1 : 0;
-
-	model->item(idx, 1)->setData(QVariant(val), Qt::EditRole);
-}
-
 bool MeasureSettings::emitActivated() const
 {
 	return m_emitActivated;
@@ -175,7 +139,7 @@ void MeasureSettings::onMeasurementPropertyChanged(QStandardItem *item)
 
 	if (item->column() == 1) {
 		if (m_emitActivated)
-			onMeasurementActivated(id, en);
+			onMeasurementActivated(m_selectedChannel, id, en);
 	} else if (item->column() == 2) {
 		if (m_emitStatsChanged)
 			onStatisticActivated(dropdown, item->row(), id, en);
@@ -234,10 +198,26 @@ void MeasureSettings::onChannelAdded(int chnIdx)
 {
 	// Use the measurements of the 1st channel to construct the dropdowns.
 	// All channels have the same set of measurements.
-	if (!m_are_dropdowns_filled) {
-		buildDropdownElements(chnIdx);
-		m_are_dropdowns_filled = true;
+	if (m_are_dropdowns_filled)
+		return;
+
+	auto measurements = m_plot->measurements(chnIdx);
+
+	for (int i = 0; i < measurements.size(); i++) {
+		enum MeasurementData::axisType axis = measurements[i]->axis();
+
+		if (axis == MeasurementData::HORIZONTAL) {
+			m_horizMeasurements->addDropdownElement(
+					QIcon(icons_lut.at(i)),
+					measurements[i]->name(), QVariant(i));
+		} else if (axis == MeasurementData::VERTICAL) {
+			m_vertMeasurements->addDropdownElement(
+					QIcon(icons_lut.at(i)),
+					measurements[i]->name(), QVariant(i));
+		}
 	}
+
+	m_are_dropdowns_filled = true;
 }
 
 void MeasureSettings::onChannelRemoved(int chnIdx)
@@ -263,35 +243,33 @@ void MeasureSettings::setSelectedChannel(int chnIdx)
 	}
 }
 
-void MeasureSettings::buildDropdownElements(int chnIdx)
-{
-	auto measurements = m_plot->measurements(chnIdx);
-
-	for (int i = 0; i < measurements.size(); i++) {
-		if (measurements[i]->axis() == MeasurementData::HORIZONTAL)
-			addHorizontalMeasurement(measurements[i]->name(), i);
-		else if (measurements[i]->axis() == MeasurementData::VERTICAL)
-			addVerticalMeasurement(measurements[i]->name(), i);
-	}
-}
-
 void MeasureSettings::loadMeasurementStatesFromData()
 {
 	auto measurements = m_plot->measurements(m_selectedChannel);
 	int h_idx = 0;
 	int v_idx = 0;
 
-	m_emitActivated = false;
+	QStandardItemModel *horiz_model =
+		static_cast<QStandardItemModel *>(m_horizMeasurements->model());
+	QStandardItemModel *vert_model =
+		static_cast<QStandardItemModel *>(m_vertMeasurements->model());
+
+	setEmitActivated(false);
+
 	for (int i = 0; i < measurements.size(); i++) {
 		int axis = measurements[i]->axis();
 		int state = measurements[i]->enabled();
 
-		if (axis == MeasurementData::HORIZONTAL)
-			setHorizMeasurementActive(h_idx++, state);
-		else if (axis == MeasurementData::VERTICAL)
-			setVertMeasurementActive(v_idx++, state);
+		if (axis == MeasurementData::HORIZONTAL) {
+			horiz_model->item(h_idx++, 1)->setData(
+					QVariant((int) state), Qt::EditRole);
+		} else if (axis == MeasurementData::VERTICAL) {
+			vert_model->item(v_idx++, 1)->setData(
+					QVariant((int) state), Qt::EditRole);
+		}
 	}
-	m_emitActivated = true;
+
+	setEmitActivated(true);
 }
 
 void MeasureSettings::deleteAllMeasurements()
@@ -330,12 +308,12 @@ void MeasureSettings::disableDisplayAllMeasurements()
 	loadMeasurementStatesFromData();
 }
 
-void MeasureSettings::onMeasurementActivated(int id, bool en)
+void MeasureSettings::onMeasurementActivated(int chnIdx, int id, bool en)
 {
-	if (m_selectedChannel < 0)
+	if (chnIdx < 0)
 		return;
 
-	auto measurements = m_plot->measurements(m_selectedChannel);
+	auto measurements = m_plot->measurements(chnIdx);
 	MeasurementItem mItem(id, measurements[id]->channel());
 	if (en) {
 		m_selectedMeasurements.push_back(mItem);

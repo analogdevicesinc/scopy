@@ -34,6 +34,7 @@
 
 #include "../widgets/colourbutton.hpp"
 #include "../widgets/popup.hpp"
+#include <QDebug>
 
 namespace pv {
 namespace view {
@@ -193,11 +194,19 @@ void Trace::paint_back(QPainter &p, const ViewItemPaintParams &pp)
 	const std::pair<int, int> extents = v_extents();
 
 	const int x = 0;
-	const int y = get_visual_y() + extents.first;
+	const int y = get_visual_y() + extents.first + extents.second;
 	const int w = pp.right() - pp.left();
-	const int h = extents.second - extents.first;
-
+	const int h = /*-extents.second*/ - extents.first;
 	p.drawRect(x, y, w, h);
+
+	QPen pen = QPen(QColor(255, 255, 255, 30*256/100));
+	pen.setStyle( Qt::SolidLine );
+	pen.setWidth(0);
+	p.setPen(pen);
+	p.setRenderHint(QPainter::Antialiasing, false);
+	const int y2 = get_visual_y() + extents.first ;
+	const int h2 = extents.second - extents.first;
+	p.drawLine(x, y2+h2+1, x+w, y2+h2+1);
 }
 
 void Trace::paint_axis(QPainter &p, const ViewItemPaintParams &pp, int y)

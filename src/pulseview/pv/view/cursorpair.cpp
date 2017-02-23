@@ -23,6 +23,7 @@
 #include "ruler.hpp"
 #include "view.hpp"
 #include "../util.hpp"
+#include "viewport.hpp"
 
 #include <cassert>
 #include <algorithm>
@@ -186,10 +187,11 @@ pair<float, float> CursorPair::get_cursor_offsets() const
 {
 	assert(first_);
 	assert(second_);
+	double scale = view_.scale() /(view_.viewport()->size().width() / view_.divisionCount());
 
 	return pair<float, float>(
-		((first_->time() - view_.offset()) / view_.scale()).convert_to<float>(),
-		((second_->time() - view_.offset()) / view_.scale()).convert_to<float>());
+		((first_->time() - view_.offset()) / scale).convert_to<float>(),
+		((second_->time() - view_.offset()) / scale).convert_to<float>());
 }
 
 } // namespace view

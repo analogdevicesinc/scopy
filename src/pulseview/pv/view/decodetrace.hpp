@@ -186,6 +186,9 @@ private:
 public:
 	void hover_point_changed();
 
+	int getDecodeHeight() const;
+	void setDecodeHeight(int value);
+
 private Q_SLOTS:
 	void on_new_decode_data();
 

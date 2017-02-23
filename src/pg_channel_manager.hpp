@@ -11,14 +11,19 @@
 #include <QBitmap>
 
 #include "pg_patterns.hpp"
-//#include "pattern_generator.hpp"
 #include "digitalchannel_manager.hpp"
 #include "ui_pg_channel_group.h"
 #include "ui_pg_channel_manager.h"
 #include "ui_pg_channel_header.h"
 #include "ui_pg_channel.h"
 
-
+namespace pv {
+namespace view {
+class View;
+class LogicSignal;
+class DecodeTrace;
+}
+}
 namespace Ui {
 class PGChannelGroup;
 class PGChannel;
@@ -53,10 +58,15 @@ class PatternGeneratorChannelUI : public ChannelUI
 	PatternGeneratorChannelGroupUI *chgui;
 	PatternGeneratorChannelGroup *chg;
 	PatternGeneratorChannel *ch;
-    QPoint dragStartPosition;
+	QPoint dragStartPosition;
 
-    QRect topDragbox;
-    QRect botDragbox;
+	QRect topDragbox;
+	QRect centerDragbox;
+	QRect botDragbox;
+
+	int traceOffset;
+	int traceHeight;
+	std::shared_ptr<pv::view::LogicSignal> trace;
 
 public:
 	Ui::PGChannelGroup *ui;
@@ -69,25 +79,33 @@ public:
 	PatternGeneratorChannelGroup *getChannelGroup();
 	void enableControls(bool val);
 
-	void setTrace(std::shared_ptr<pv::view::TraceTreeItem> item);
-	std::shared_ptr<pv::view::TraceTreeItem> trace;
+	void setTrace(std::shared_ptr<pv::view::LogicSignal> item);
+	std::shared_ptr<pv::view::LogicSignal> getTrace();
+	void highlight(bool val);
+
+	QFrame *topSep,*botSep;
+
+	void updateTrace();
+	void highlightTopSeparator();
+	void highlightBotSeparator();
+	void resetSeparatorHighlight(bool force = false);
 Q_SIGNALS:
-    void requestUpdateUi();
+	void requestUpdateUi();
 private Q_SLOTS:
 	void split();
-    void mousePressEvent(QMouseEvent *) override;
-    void mouseMoveEvent(QMouseEvent *) override;
-    void dragEnterEvent(QDragEnterEvent *event);
-    void dragLeaveEvent(QDragLeaveEvent *event);
-    void dragMoveEvent(QDragMoveEvent *event);
-    void dropEvent(QDropEvent *event);
+	void mousePressEvent(QMouseEvent *) override;
+	void mouseMoveEvent(QMouseEvent *) override;
+	void dragEnterEvent(QDragEnterEvent *event);
+	void dragLeaveEvent(QDragLeaveEvent *event);
+	void dragMoveEvent(QDragMoveEvent *event);
+	void dropEvent(QDropEvent *event);
+	void enterEvent(QEvent *event);
+	void leaveEvent(QEvent *event);
 
-//    void set_decoder(std::string value);
 };
 
 class PatternGeneratorChannelGroup : public ChannelGroup
 {
-
 	bool collapsed;
 public:
 	PatternGeneratorChannelGroup(PatternGeneratorChannel *ch, bool en);
@@ -107,12 +125,18 @@ class PatternGeneratorChannelGroupUI : public ChannelGroupUI
 	PatternGeneratorChannelManagerUI *managerUi;
 	int isChecked();
 	void check(int val);
-    QPoint dragStartPosition;
-    QRect topDragbox;
-    QRect botDragbox;
-
+	QPoint dragStartPosition;
+	QRect centerDragbox;
+	QRect topDragbox;
+	QRect botDragbox;
+	int traceOffset;
+	int traceHeight;
 
 public:
+
+	std::shared_ptr<pv::view::TraceTreeItem> trace;
+	std::shared_ptr<pv::view::LogicSignal> logicTrace;
+	std::shared_ptr<pv::view::DecodeTrace> decodeTrace;
 	Ui::PGChannelGroup *ui;
 	std::vector<PatternGeneratorChannelUI *> ch_ui;
 	PatternGeneratorChannelGroupUI(PatternGeneratorChannelGroup *chg,
@@ -120,14 +144,26 @@ public:
 	~PatternGeneratorChannelGroupUI();
 	PatternGeneratorChannelGroup *getChannelGroup();
 	PatternGeneratorChannelManagerUI *getManagerUi() const;
-	void setTrace(std::shared_ptr<pv::view::TraceTreeItem> item);
-	std::shared_ptr<pv::view::TraceTreeItem> trace;
+	void setTrace(std::shared_ptr<pv::view::LogicSignal> item);
+	void setTrace(std::shared_ptr<pv::view::DecodeTrace> item);
+	std::shared_ptr<pv::view::TraceTreeItem> getTrace();
 	void enableControls(bool enabled);
+	int getTraceOffset();
+
+	QFrame *topSep,*botSep, *chUiSep;
+
+	void updateTrace();
+
+	void highlight(bool val);
+	void highlightTopSeparator();
+	void highlightBotSeparator();
+	void hideSeparatorHighlight(bool force = false);
+
 
 Q_SIGNALS:
 	void channel_selected();
 	void channel_enabled();
-    void requestUpdateUi();
+	void requestUpdateUi();
 
 private Q_SLOTS:
 
@@ -136,13 +172,17 @@ private Q_SLOTS:
 	void enable(bool enabled);
 	void split();
 	void collapse();
-	void mousePressEvent(QMouseEvent *) override;
-    void mouseMoveEvent(QMouseEvent *) override;
-    void dragEnterEvent(QDragEnterEvent *event);
-    void dragLeaveEvent(QDragLeaveEvent *event);
-    void dragMoveEvent(QDragMoveEvent *event);
-    void dropEvent(QDropEvent *event);
 
+private:
+	void setupParallelDecoder();
+	void enterEvent(QEvent *event);
+	void leaveEvent(QEvent *event);
+	void mousePressEvent(QMouseEvent *) override;
+	void mouseMoveEvent(QMouseEvent *) override;
+	void dragEnterEvent(QDragEnterEvent *event);
+	void dragLeaveEvent(QDragLeaveEvent *event);
+	void dragMoveEvent(QDragMoveEvent *event);
+	void dropEvent(QDropEvent *event);
 
 };
 
@@ -151,20 +191,20 @@ class PatternGeneratorChannelManager : public ChannelManager
 {
 	PatternGeneratorChannelGroup *highlightedChannelGroup;
 	PatternGeneratorChannel *highlightedChannel;
-public:
 
+public:
 	void highlightChannel(PatternGeneratorChannelGroup *chg,
 	                      PatternGeneratorChannel *ch = nullptr);
 	PatternGeneratorChannelGroup *getHighlightedChannelGroup();
 	PatternGeneratorChannel *getHighlightedChannel();
 	PatternGeneratorChannelManager();
 	~PatternGeneratorChannelManager();
-    PatternGeneratorChannelGroup *get_channel_group(int index);
+	PatternGeneratorChannelGroup *get_channel_group(int index);
 
 	void join(std::vector<int> index);
 	void split(int index);
-    void move(int from, int to, bool after=true);
-    void moveChannel(int fromChgIndex, int from, int to, bool after=true);
+	void move(int from, int to, bool after=true);
+	void moveChannel(int fromChgIndex, int from, int to, bool after=true);
 	void splitChannel(int chgIndex, int chIndex);
 	void preGenerate();
 	void generatePatterns(short *mainbuffer, uint32_t sampleRate,
@@ -175,7 +215,6 @@ public:
 
 	uint32_t computeSuggestedSampleRate();
 	uint32_t computeSuggestedBufferSize(uint32_t sample_rate);
-
 };
 
 class PatternGeneratorChannelManagerUI : public QWidget
@@ -190,15 +229,15 @@ class PatternGeneratorChannelManagerUI : public QWidget
 	bool highlightShown;
 
 public:
-    const bool pixmapEnable = true;
-    const bool pixmapGrab = true;
-    const bool pixmapRetainSize = true;
-    const int  pixmapScale = 1;
+	const bool pixmapEnable = true;
+	const bool pixmapGrab = true;
+	const bool pixmapRetainSize = true;
+	const int  pixmapScale = 1;
 
 public:
-
 	pv::MainWindow *main_win;
 	std::vector<PatternGeneratorChannelGroupUI *> chg_ui;
+	std::vector<QFrame *> separators;
 	PatternGeneratorChannelManagerUI(QWidget *parent, pv::MainWindow *main_win_,
 	                                 PatternGeneratorChannelManager *chm, QWidget *settingsWidget,
 	                                 PatternGenerator *pg);
@@ -210,6 +249,8 @@ public:
 	PatternGeneratorChannelManager *chm;
 	PatternGenerator *pg;
 	Ui::PGChannelManager *ui;
+
+	QWidget *hoverWidget;
 
 	void updateUi();
 	void selectChannelGroup(PatternGeneratorChannelGroupUI *selected);
@@ -226,23 +267,28 @@ public:
 	void hideDetails();
 
 	void showHighlight(bool val);
+	void setHoverWidget(QWidget *hover);
+	void clearHoverWidget();
 
 	void groupSplitSelected();
 	PatternGeneratorChannelGroup *getSelectedChannelGroup() const;
 	void setSelectedChannelGroup(PatternGeneratorChannelGroup *value);
 
-    void retainWidgetSizeWhenHidden(QWidget *w);
-    void setWidgetNrOfChars(QWidget *w, int minNrOfChars, int maxNrOfChars=0);
+	void retainWidgetSizeWhenHidden(QWidget *w);
+	void setWidgetNrOfChars(QWidget *w, int minNrOfChars, int maxNrOfChars=0);
+	bool eventFilter(QObject *object, QEvent *event);
+	void updatePlot();
 
+private:
+	QFrame *addSeparator(QVBoxLayout *lay, int pos);
 
 Q_SIGNALS:
 	void channelsChanged();
 
 private Q_SLOTS:
-    void chmScrollChanged(int val);
-    void triggerUpdateUi();
-
-private:
+	void chmScrollChanged(int val);
+	void chmRangeChanged(int min, int max);
+	void triggerUpdateUi();
 
 };
 

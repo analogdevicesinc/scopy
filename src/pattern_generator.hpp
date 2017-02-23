@@ -32,6 +32,7 @@
 #include "src/pulseview/pv/devices/binarybuffer.hpp"
 #include "filter.hpp"
 
+#include "apiObject.hpp"
 #include "pg_patterns.hpp"
 #include "pg_channel_manager.hpp"
 #include "pg_buffer_manager.hpp"
@@ -69,39 +70,45 @@ class PGSettings;
     class GenericJSPatternUI;*/
 }
 
+class QJSEngine;
+
 namespace adiscope {
+class PatternGenerator_API;
 
 
 class PatternGenerator : public QWidget
 {
+	friend class PatternGenerator_API;
+
 	Q_OBJECT
 
 public:
 	explicit PatternGenerator(struct iio_context *ctx, Filter *filt,
-	                          QPushButton *runButton, QWidget *parent = 0, bool offline_mode = 0);
+			QPushButton *runButton, QJSEngine *engine,
+			QWidget *parent = 0, bool offline_mode = 0);
 	~PatternGenerator();
 
 
 private Q_SLOTS:
 
 	void generatePattern();
-//    void onChannelEnabledChanged();
-//    void onChannelSelectedChanged();
+//  void onChannelEnabledChanged();
+//  void onChannelSelectedChanged();
 	void startStop(bool start);
 	void singleRun();
 	void singleRunStop();
 	void toggleRightMenu();
-//    void update_ui();
-//    void on_sampleRateCombo_activated(const QString &arg1);
-//    void on_generatePattern_clicked();
-//    void on_clearButton_clicked();
-//    void on_generateUI_clicked();
+//  void update_ui();
+//  void on_sampleRateCombo_activated(const QString &arg1);
+//  void on_generatePattern_clicked();
+//  void on_clearButton_clicked();
+//  void on_generateUI_clicked();
 
-//    void on_save_PB_clicked();
-	//  void on_load_PB_clicked();
-	//  void createRightPatternWidget(PatternUI* patternui);
+//  void on_save_PB_clicked();
+//  void on_load_PB_clicked();
+//  void createRightPatternWidget(PatternUI* patternui);
 
-	//  void rightMenuFinished(bool opened);
+//  void rightMenuFinished(bool opened);
 	void on_btnHideInactive_clicked();
 	void on_btnGroupWithSelected_clicked();
 	void on_btnExtendChannelManager_clicked();
@@ -127,6 +134,8 @@ private:
 	PatternUI *currentUI;
 	uint16_t channel_group;
 	bool offline_mode;
+
+	PatternGenerator_API *pg_api;
 
 	PatternGeneratorChannelGroup *selected_channel_group;
 	PatternGeneratorChannelManager chm;
@@ -177,8 +186,21 @@ private:
 	std::vector<PatternUI *> patterns;
 	static QStringList digital_trigger_conditions;
 	static QStringList possibleSampleRates;
+	static const char *channelNames[];
 };
 
+class PatternGenerator_API : public ApiObject
+{
+	Q_OBJECT
+
+public:
+	explicit PatternGenerator_API(PatternGenerator *pg) :
+		ApiObject(TOOL_PATTERN_GENERATOR), pg(pg) {}
+	~PatternGenerator_API() {}
+
+private:
+	PatternGenerator *pg;
+};
 
 } /* namespace adiscope */
 

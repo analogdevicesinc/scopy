@@ -37,11 +37,14 @@ namespace Ui {
 
 namespace adiscope {
 	class OscADC;
+	class Oscilloscope_API;
 }
 
 namespace adiscope {
 	class TriggerSettings : public QWidget
 	{
+		friend class Oscilloscope_API;
+
 		Q_OBJECT
 
 	public:

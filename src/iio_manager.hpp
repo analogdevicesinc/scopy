@@ -121,7 +121,7 @@ namespace adiscope {
 				const std::string &dev,
 				unsigned long buffer_size);
 
-		void del_connection(gr::basic_block_sptr block);
+		void del_connection(gr::basic_block_sptr block, bool reverse);
 
 		void set_buffer_size_unlocked(unsigned long size);
 

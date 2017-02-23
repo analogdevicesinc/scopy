@@ -1008,7 +1008,7 @@ QPushButton:hover
                   <property name="sizeHint" stdset="0">
                    <size>
                     <width>20</width>
-                    <height>40</height>
+                    <height>20</height>
                    </size>
                   </property>
                  </spacer>
@@ -1089,9 +1089,6 @@ QPushButton:hover
                      <horstretch>0</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
-                   </property>
-                   <property name="styleSheet">
-                    <string notr="true"/>
                    </property>
                    <layout class="QVBoxLayout" name="centralWidgetLayout">
                     <property name="spacing">

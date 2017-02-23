@@ -25,6 +25,7 @@
 #include <QPushButton>
 
 /* Local includes */
+#include "apiObject.hpp"
 #include "filter.hpp"
 #include "pulseview/pv/widgets/sweeptimingwidget.hpp"
 #include "pulseview/pv/devicemanager.hpp"
@@ -60,16 +61,24 @@ class LChannelSettings;
 class DigitalTriggerSettings;
 }
 
+class QJSEngine;
+
 namespace adiscope {
+class LogicAnalyzer_API;
+
 class LogicAnalyzer : public QWidget
 {
+	friend class LogicAnalyzer_API;
+
 	Q_OBJECT
 
 public:
 	explicit LogicAnalyzer(struct iio_context *ctx,
 	                       Filter *filt,
 	                       QPushButton *runButton,
-	                       QWidget *parent = 0);
+			       QJSEngine *engine,
+	                       QWidget *parent = 0,
+	                       unsigned int sample_rate = 200000);
 	~LogicAnalyzer();
 	void updateAreaTimeTriggerPadding();
 	void setHWTrigger(int chid, std::string trigger_val);
@@ -115,6 +124,8 @@ private:
 	unsigned int no_channels;
 	unsigned int itemsize;
 	pv::MainWindow *main_win;
+
+	LogicAnalyzer_API *la_api;
 
 	void disconnectAll();
 	static unsigned int get_no_channels(struct iio_device *dev);
@@ -172,6 +183,24 @@ private:
 	double active_plot_timebase;
 	void enableTrigger(bool value);
 	void cleanHWParams();
+};
+
+class LogicAnalyzer_API : public ApiObject
+{
+	Q_OBJECT
+
+	Q_PROPERTY(bool running READ running WRITE run STORED false);
+
+public:
+	explicit LogicAnalyzer_API(LogicAnalyzer *lga) :
+		ApiObject(TOOL_LOGIC_ANALYZER), lga(lga) {}
+	~LogicAnalyzer_API() {}
+
+	bool running() const;
+	void run(bool en);
+
+private:
+	LogicAnalyzer *lga;
 };
 }
 

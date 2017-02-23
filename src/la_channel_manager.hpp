@@ -7,7 +7,9 @@
 #include <QMimeData>
 #include <QMimeType>
 #include <QDrag>
+#include <QFrame>
 #include <QBitmap>
+#include <QVBoxLayout>
 
 namespace Ui {
 class LAChannelManager;
@@ -15,11 +17,19 @@ class LAChannelGroup;
 class LASettingsWidget;
 class LARequiredChannel;
 }
-
+namespace pv {
+namespace view {
+class View;
+class LogicSignal;
+class DecodeTrace;
+}
+}
 namespace adiscope {
 class LogicAnalyzer;
 class LogicAnalyzerChannelGroup;
+class LogicAnalyzerChannelGroupUI;
 class LogicAnalyzerChannelManagerUI;
+
 class LogicAnalyzerChannel : public Channel
 {
 public:
@@ -38,22 +48,40 @@ class LogicAnalyzerChannelUI : public ChannelUI
 {
 	Q_OBJECT
 	LogicAnalyzerChannel *lch;
+	LogicAnalyzerChannelManagerUI *chm_ui;
+	LogicAnalyzerChannelGroup *chgroup;
+	LogicAnalyzerChannelGroupUI *chgroupui;
+	std::shared_ptr<pv::view::LogicSignal> trace;
+
+	QRect topDragbox;
+	QRect centerDragbox;
+	QRect botDragbox;
+
+	int traceOffset;
+	int traceHeight;
 
 public:
 	LogicAnalyzerChannelUI(LogicAnalyzerChannel *ch,
 	                       LogicAnalyzerChannelGroup *chgroup,
+	                       LogicAnalyzerChannelGroupUI *chgroupui,
 	                       LogicAnalyzerChannelManagerUI *chm_ui,
 	                       QWidget *parent = 0);
 	~LogicAnalyzerChannelUI();
 	Ui::LAChannelGroup *ui;
 	LogicAnalyzerChannel *getChannel();
-	void setTrace(std::shared_ptr<pv::view::TraceTreeItem> item);
-	std::shared_ptr<pv::view::TraceTreeItem> getTrace();
+	void setTrace(std::shared_ptr<pv::view::LogicSignal> item);
+	std::shared_ptr<pv::view::LogicSignal> getTrace();
+
 	void channelRoleChanged(const QString);
 	LogicAnalyzerChannelGroup* getChannelGroup();
 	QPoint dragStartPosition;
-	QRect topDragbox;
-	QRect botDragbox;
+	QFrame *topSep,*botSep;
+
+	void updateTrace();
+
+	void highlightTopSeparator();
+	void highlightBotSeparator();
+	void resetSeparatorHighlight(bool force = false);
 private Q_SLOTS:
 	void remove();
 	 void mousePressEvent(QMouseEvent *) override;
@@ -62,14 +90,12 @@ private Q_SLOTS:
 	 void dragLeaveEvent(QDragLeaveEvent *event);
 	 void dragMoveEvent(QDragMoveEvent *event);
 	 void dropEvent(QDropEvent *event);
+	 void enterEvent(QEvent *event);
+	void leaveEvent(QEvent *event);
 public Q_SLOTS:
 	void rolesChangedLHS(const QString text);
 Q_SIGNALS:
 	void requestUpdateUI();
-private:
-	LogicAnalyzerChannelManagerUI *chm_ui;
-	LogicAnalyzerChannelGroup *chgroup;
-	std::shared_ptr<pv::view::TraceTreeItem> trace;
 };
 
 
@@ -80,8 +106,8 @@ private:
 	const srd_decoder *decoder;
 	QStringList decoderRolesNameList;
 	std::vector<const srd_channel *> decoderRolesList;
-	std::map<const srd_channel*,
-	std::shared_ptr<pv::view::TraceTreeItem> > channels_;
+	std::map<const srd_channel*,uint16_t> channels_;
+	const srd_channel* findByValue(uint16_t ch_id);
 public:
 	LogicAnalyzerChannelGroup(LogicAnalyzerChannel *ch);
 	LogicAnalyzerChannelGroup();
@@ -93,19 +119,21 @@ public:
 	QStringList get_decoder_roles_list();
 	const srd_channel *get_srd_channel_from_name(const char*);
 	LogicAnalyzerChannel* getChannelById(int id);
-	void setChannelForDecoder(const srd_channel*,
-		std::shared_ptr<pv::view::TraceTreeItem>);
-	std::map<const srd_channel*,
-		std::shared_ptr<pv::view::TraceTreeItem> > get_decoder_channels();
+	void setChannelForDecoder(const srd_channel*, uint16_t);
+	std::map<const srd_channel*, uint16_t> get_decoder_channels();
 };
 
 
-class LogicAnalyzerChannelManagerUI;
 class LogicAnalyzerChannelGroupUI : public ChannelGroupUI
 {
 	Q_OBJECT
 	LogicAnalyzerChannelGroup *lchg;
 	LogicAnalyzerChannelManagerUI *chm_ui;
+	QRect centerDragbox;
+	QRect topDragbox;
+	QRect botDragbox;
+	int traceOffset;
+	int traceHeight;
 public:
 	LogicAnalyzerChannelGroupUI(LogicAnalyzerChannelGroup *chg,
 	                            LogicAnalyzerChannelManagerUI *chm_ui,
@@ -115,12 +143,21 @@ public:
 	std::vector<LogicAnalyzerChannelUI *> ch_ui;
 	Ui::LAChannelGroup *ui;
 	void enableControls(bool enabled);
-	void setTrace(std::shared_ptr<pv::view::TraceTreeItem> item);
+	void setTrace(std::shared_ptr<pv::view::LogicSignal> item);
+	void setTrace(std::shared_ptr<pv::view::DecodeTrace> item);
+
 	std::shared_ptr<pv::view::TraceTreeItem> getTrace();
 	LogicAnalyzerChannelUI* findChannelWithRole(const QString role);
 	QPoint dragStartPosition;
-	QRect topDragbox;
-	QRect botDragbox;
+	QFrame *topSep,*botSep, *chUiSep;
+
+	void updateTrace();
+	int getTraceOffset();
+	void setupDecoder();
+
+	void highlightTopSeparator();
+	void highlightBotSeparator();
+	void resetSeparatorHighlight(bool force = false);
 
 private Q_SLOTS:
 	void set_decoder(std::string value);
@@ -133,9 +170,13 @@ private Q_SLOTS:
 	void dragLeaveEvent(QDragLeaveEvent *event);
 	void dragMoveEvent(QDragMoveEvent *event);
 	void dropEvent(QDropEvent *event);
+	void enterEvent(QEvent *event);
+	void leaveEvent(QEvent *event);
 private:
 	std::shared_ptr<pv::view::TraceTreeItem> trace;
 	static std::vector<std::string> trigger_mapping;
+	std::shared_ptr<pv::view::LogicSignal> logicTrace;
+	std::shared_ptr<pv::view::DecodeTrace> decodeTrace;
 public Q_SLOTS:
 	void remove();
 	void enable(bool enabled);
@@ -174,7 +215,6 @@ private:
 };
 
 
-
 class LogicAnalyzerChannelManagerUI : public QWidget
 {
 	Q_OBJECT
@@ -190,6 +230,9 @@ public:
 	const bool pixmapGrab = true;
 	const bool pixmapRetainSize = true;
 	const int  pixmapScale = 1;
+	std::vector<QFrame *> separators;
+	QWidget *hoverWidget;
+
 	LogicAnalyzerChannelManagerUI(QWidget *parent,
 	                              pv::MainWindow *main_win_,
 	                              LogicAnalyzerChannelManager *chm,
@@ -203,6 +246,9 @@ public:
 	void update_ui_children(LogicAnalyzerChannelGroupUI*);
 	void collapse(bool);
 	void showHighlight(bool check);
+	void setHoverWidget(QWidget *hover);
+	void clearHoverWidget();
+
 	LogicAnalyzerChannelGroupUI *getUiFromChGroup(
 	        LogicAnalyzerChannelGroup *);
 	LogicAnalyzerChannelUI *getUiFromCh(LogicAnalyzerChannel *);
@@ -210,6 +256,8 @@ public:
 	void deleteSettingsWidget();
 	void set_pv_decoder(LogicAnalyzerChannelGroupUI *channelgroup);
 	void retainWidgetSizeWhenHidden(QWidget *w);
+	bool eventFilter(QObject *object, QEvent *event);
+	void updatePlot();
 
 public Q_SLOTS:
 	void chmScrollChanged(int value);
@@ -224,6 +272,7 @@ public Q_SLOTS:
 private Q_SLOTS:
 	void on_groupSplit_clicked();
 	void on_hideInactive_clicked(bool hide);
+	void chmRangeChanged(int min, int max);
 
 private:
 	bool hidden;
@@ -231,6 +280,7 @@ private:
 	std::vector<int> visibleItemsIndexes;
 	QButtonGroup *settings_exclusive_group;
 	void setWidgetMinimumNrOfChars(QWidget *w, int nrOfChars);
+	QFrame* addSeparator(QVBoxLayout *lay, int pos);
 Q_SIGNALS:
 	void widthChanged(int);
 };

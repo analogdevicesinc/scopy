@@ -273,6 +273,8 @@ shared_ptr<pv::view::DecodeTrace> Session::add_decoder()
 		shared_ptr<view::DecodeTrace> d(
 			new view::DecodeTrace(*this, decoder_stack,
 				decode_traces_.size()));
+
+
 		decode_traces_.push_back(d);
 
 		signals_changed();
@@ -399,7 +401,7 @@ void Session::set_timespanLimit(double value)
 	timespanLimitStream = value;
 }
 
-shared_ptr<view::Signal> Session::create_signal_from_id(int index)
+shared_ptr<view::LogicSignal> Session::create_signal_from_id(int index, int height)
 {
     const shared_ptr<sigrok::Device> sr_dev = device_->device();
     if (!sr_dev) {
@@ -408,13 +410,14 @@ shared_ptr<view::Signal> Session::create_signal_from_id(int index)
         return nullptr;
     }
 
-    shared_ptr<view::Signal> signal;
+    shared_ptr<view::LogicSignal> signal;
     for (shared_ptr<sigrok::Channel> channel : sr_dev->channels()) {
         if(channel->index() == index){
-            signal = shared_ptr<view::Signal>(
+	    signal = shared_ptr<view::LogicSignal>(
                 new view::LogicSignal(*this,
                     device_, channel,
-                    logic_data_));
+		    logic_data_,
+				      height));
             break;
         }
     }

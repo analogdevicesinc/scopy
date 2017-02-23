@@ -80,7 +80,9 @@ std::vector<std::string> LogicAnalyzer::trigger_mapping = {
 LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
                              Filter *filt,
                              QPushButton *runBtn,
-                             QWidget *parent) :
+                             QJSEngine *engine,
+                             QWidget *parent,
+                             unsigned int sample_rate) :
 	QWidget(parent),
 	dev_name(filt->device_name(TOOL_LOGIC_ANALYZER)),
 	ctx(ctx),
@@ -97,7 +99,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	active_sampleCount(0),
 	active_triggerSampleCount(0),
 	active_timePos(0),
-	trigger_settings(new QWidget(this))
+	trigger_settings(new QWidget(this)),
+	la_api(new LogicAnalyzer_API(this))
 {
 	ui->setupUi(this);
 	this->setAttribute(Qt::WA_DeleteOnClose, true);
@@ -309,12 +312,19 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	timePosition->setValue(0);
 	timePosition->valueChanged(timePosition->value());
 	main_win->view_->viewport()->setTimeTriggerSample(-active_triggerSampleCount);
+
+	la_api->load();
+	la_api->js_register(engine);
 }
 
 
 LogicAnalyzer::~LogicAnalyzer()
 {
 	delete chm_ui;
+
+	la_api->save();
+	delete la_api;
+
 	delete ui;
 
 	/* Destroy libsigrokdecode */
@@ -769,4 +779,14 @@ void LogicAnalyzer::cleanHWParams()
 	}
 	setHWTriggerDelay(active_triggerSampleCount);
 	setHWTriggerLogic("or");
+}
+
+bool LogicAnalyzer_API::running() const
+{
+	return lga->ui->btnRunStop->isChecked();
+}
+
+void LogicAnalyzer_API::run(bool en)
+{
+	lga->ui->btnRunStop->setChecked(en);
 }

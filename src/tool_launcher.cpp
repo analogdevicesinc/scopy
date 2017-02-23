@@ -39,7 +39,9 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	ui(new Ui::ToolLauncher), ctx(nullptr),
 	power_control(nullptr), dmm(nullptr), signal_generator(nullptr),
 	oscilloscope(nullptr), current(nullptr), filter(nullptr),
-	logic_analyzer(nullptr), pattern_generator(nullptr)
+	logic_analyzer(nullptr), pattern_generator(nullptr),
+	network_analyzer(nullptr), tl_api(new ToolLauncher_API(this)),
+	notifier(STDIN_FILENO, QSocketNotifier::Read)
 {
 	struct iio_context_info **info;
 	unsigned int nb_contexts;
@@ -84,6 +86,31 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	connect(this, SIGNAL(calibrationDone(float, float)),
 			this, SLOT(enableCalibTools(float, float)));
 	connect(ui->btnAdd, SIGNAL(clicked()), this, SLOT(addRemoteContext()));
+
+	tl_api->load();
+
+	/* Show a smooth opening when the app starts */
+	ui->menu->toggleMenu(true);
+
+	connect(ui->btnOscilloscope, SIGNAL(toggled(bool)), this,
+			SLOT(setButtonBackground(bool)));
+	connect(ui->btnSignalGenerator, SIGNAL(toggled(bool)), this,
+			SLOT(setButtonBackground(bool)));
+	connect(ui->btnDMM, SIGNAL(toggled(bool)), this,
+			SLOT(setButtonBackground(bool)));
+	connect(ui->btnPowerControl, SIGNAL(toggled(bool)), this,
+			SLOT(setButtonBackground(bool)));
+	connect(ui->btnLogicAnalyzer, SIGNAL(toggled(bool)), this,
+			SLOT(setButtonBackground(bool)));
+	connect(ui->btnPatternGenerator, SIGNAL(toggled(bool)), this,
+			SLOT(setButtonBackground(bool)));
+	connect(ui->btnNetworkAnalyzer, SIGNAL(toggled(bool)), this,
+			SLOT(setButtonBackground(bool)));
+
+	js_engine.installExtensions(QJSEngine::ConsoleExtension);
+	tl_api->js_register(&js_engine);
+
+	connect(&notifier, SIGNAL(activated(int)), this, SLOT(hasText()));
 }
 
 ToolLauncher::~ToolLauncher()
@@ -94,6 +121,8 @@ ToolLauncher::~ToolLauncher()
 		delete *it;
 	devices.clear();
 
+	tl_api->save();
+	delete tl_api;
 	delete ui;
 }
 
@@ -104,7 +133,7 @@ void ToolLauncher::destroyPopup()
 	popup->deleteLater();
 }
 
-void ToolLauncher::addContext(const QString& uri)
+QPushButton * ToolLauncher::addContext(const QString& uri)
 {
 	auto pair = new QPair<QWidget, Ui::Device>;
 	pair->second.setupUi(&pair->first);
@@ -118,6 +147,8 @@ void ToolLauncher::addContext(const QString& uri)
 
 	pair->second.btn->setProperty("uri", QVariant(uri));
 	devices.append(pair);
+
+	return pair->second.btn;
 }
 
 void ToolLauncher::addRemoteContext()
@@ -150,6 +181,13 @@ void ToolLauncher::swapMenu(QWidget *menu)
 	current->setVisible(true);
 }
 
+void ToolLauncher::setButtonBackground(bool on)
+{
+	auto *btn = static_cast<QPushButton *>(QObject::sender());
+
+	setDynamicProperty(btn->parentWidget(), "selected", on);
+}
+
 void ToolLauncher::on_btnOscilloscope_clicked()
 {
 	swapMenu(static_cast<QWidget *>(oscilloscope));
@@ -180,9 +218,9 @@ void adiscope::ToolLauncher::on_btnPatternGenerator_clicked()
 	swapMenu(static_cast<QWidget *>(pattern_generator));
 }
 
-void ToolLauncher::window_destroyed()
+void adiscope::ToolLauncher::on_btnNetworkAnalyzer_clicked()
 {
-	windows.removeOne(static_cast<QMainWindow *>(QObject::sender()));
+	swapMenu(static_cast<QWidget *>(network_analyzer));
 }
 
 void adiscope::ToolLauncher::apply_m2k_fixes(struct iio_context *ctx)
@@ -222,6 +260,9 @@ void adiscope::ToolLauncher::device_btn_clicked(bool pressed)
 		for (auto it = devices.begin(); it != devices.end(); ++it)
 			if ((*it)->second.btn != sender())
 				(*it)->second.btn->setChecked(false);
+
+		if (ui->btnConnect->property("connected").toBool())
+			ui->btnConnect->click();
 	} else {
 		destroyContext();
 	}
@@ -275,10 +316,7 @@ void adiscope::ToolLauncher::destroyContext()
 	ui->powerControl->setDisabled(true);
 	ui->logicAnalyzer->setDisabled(true);
 	ui->patternGenerator->setDisabled(true);
-
-	for (auto it = windows.begin(); it != windows.end(); ++it)
-		delete *it;
-	windows.clear();
+	ui->networkAnalyzer->setDisabled(true);
 
 	if (dmm) {
 		delete dmm;
@@ -308,6 +346,11 @@ void adiscope::ToolLauncher::destroyContext()
 	if(pattern_generator) {
 		delete pattern_generator;
 		pattern_generator = nullptr;
+	}
+
+	if(network_analyzer) {
+		delete network_analyzer;
+		network_analyzer = nullptr;
 	}
 
 	if (filter) {
@@ -349,23 +392,26 @@ void adiscope::ToolLauncher::enableCalibTools(float gain_ch1, float gain_ch2)
 {
 	if (filter->compatible(TOOL_OSCILLOSCOPE)) {
 		oscilloscope = new Oscilloscope(ctx, filter,
-				ui->stopOscilloscope,
+				ui->stopOscilloscope, &js_engine,
 				gain_ch1, gain_ch2, this);
 
 		ui->oscilloscope->setEnabled(true);
 	}
 
 	if (filter->compatible(TOOL_DMM)) {
-		dmm = new DMM(ctx, filter, ui->stopDMM,
+		dmm = new DMM(ctx, filter, ui->stopDMM, &js_engine,
 				gain_ch1, gain_ch2, this);
 		dmm->setVisible(false);
 		ui->dmm->setEnabled(true);
 	}
 }
 
-bool adiscope::ToolLauncher::switchContext(QString &uri)
+bool adiscope::ToolLauncher::switchContext(const QString &uri)
 {
 	destroyContext();
+
+	if (uri.startsWith("ip:"))
+		previousIp = uri.mid(3);
 
 	ctx = iio_create_context_from_uri(uri.toStdString().c_str());
 	if (!ctx)
@@ -378,7 +424,7 @@ bool adiscope::ToolLauncher::switchContext(QString &uri)
 
 	if (filter->compatible(TOOL_SIGNAL_GENERATOR)) {
 		signal_generator = new SignalGenerator(ctx, filter,
-				ui->stopSignalGenerator, this);
+				ui->stopSignalGenerator, &js_engine, this);
 		signal_generator->setVisible(false);
 		ui->signalGenerator->setEnabled(true);
 	}
@@ -386,7 +432,7 @@ bool adiscope::ToolLauncher::switchContext(QString &uri)
 
 	if (filter->compatible(TOOL_POWER_CONTROLLER)) {
 		power_control = new PowerController(ctx,
-				ui->stopPowerControl, this);
+				ui->stopPowerControl, &js_engine, this);
 		power_control->setVisible(false);
 		ui->powerControl->setEnabled(true);
 	}
@@ -394,7 +440,7 @@ bool adiscope::ToolLauncher::switchContext(QString &uri)
 
 	if (filter->compatible(TOOL_LOGIC_ANALYZER)) {
 		logic_analyzer = new LogicAnalyzer(ctx, filter,
-				ui->stopLogicAnalyzer, this);
+				ui->stopLogicAnalyzer, &js_engine, this);
 		logic_analyzer->setVisible(false);
 		ui->logicAnalyzer->setEnabled(true);
 	}
@@ -402,13 +448,107 @@ bool adiscope::ToolLauncher::switchContext(QString &uri)
 
 	if (filter->compatible((TOOL_PATTERN_GENERATOR))) {
 		pattern_generator = new PatternGenerator (ctx, filter,
-				ui->stopPatternGenerator, this);
+				ui->stopPatternGenerator, &js_engine, this);
 		pattern_generator->setVisible(false);
 		ui->patternGenerator->setEnabled(true);
+	}
+
+
+	if (filter->compatible((TOOL_NETWORK_ANALYZER))) {
+		network_analyzer = new NetworkAnalyzer(ctx, filter,
+				ui->stopNetworkAnalyzer, this);
+		network_analyzer->setVisible(false);
+		ui->networkAnalyzer->setEnabled(true);
 	}
 
 
 	QtConcurrent::run(std::bind(&ToolLauncher::calibrate, this));
 
 	return true;
+}
+
+void ToolLauncher::hasText()
+{
+	QTextStream in(stdin);
+	QTextStream out(stdout);
+
+	js_cmd.append(in.readLine());
+
+	unsigned int nb_open_braces = js_cmd.count(QChar('{'));
+	unsigned int nb_closing_braces = js_cmd.count(QChar('}'));
+
+	if (nb_open_braces == nb_closing_braces) {
+		QJSValue val = js_engine.evaluate(js_cmd);
+		if (val.isError())
+			out << "Exception:" << val.toString() << endl;
+		else if (!val.isUndefined())
+			out << val.toString() << endl;
+
+		js_cmd.clear();
+		out << "scopy > ";
+	} else {
+		js_cmd.append(QChar('\n'));
+
+		out << "> ";
+	}
+	out.flush();
+}
+
+void ToolLauncher::checkIp(const QString& ip)
+{
+	if (iio_create_network_context(ip.toStdString().c_str())) {
+		previousIp = ip;
+
+		QString uri = "ip:" + ip;
+		QMetaObject::invokeMethod(this, "addContext",
+				Qt::QueuedConnection,
+				Q_ARG(const QString&, uri));
+	} else {
+		previousIp = "";
+	}
+}
+
+bool ToolLauncher_API::menu_opened() const
+{
+	return tl->ui->btnMenu->isChecked();
+}
+
+void ToolLauncher_API::open_menu(bool open)
+{
+	tl->ui->btnMenu->setChecked(open);
+}
+
+bool ToolLauncher_API::hidden() const
+{
+	return !tl->isVisible();
+}
+
+void ToolLauncher_API::hide(bool hide)
+{
+	tl->setVisible(!hide);
+}
+
+bool ToolLauncher_API::connect(const QString& uri)
+{
+	QPushButton *btn = nullptr;
+
+	for (auto it = tl->devices.begin();
+			!btn && it != tl->devices.end(); ++it) {
+		QPushButton *tmp = (*it)->second.btn;
+
+		if (tmp->property("uri").toString().compare(uri) == 0)
+			btn = tmp;
+	}
+
+	if (!btn)
+		btn = tl->addContext(uri);
+
+	btn->click();
+	tl->ui->btnConnect->click();
+}
+
+void ToolLauncher_API::addIp(const QString& ip)
+{
+	if (!ip.isEmpty())
+		QtConcurrent::run(std::bind(&ToolLauncher::checkIp, tl, ip));
 }

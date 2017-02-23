@@ -29,7 +29,7 @@
     <number>30</number>
    </property>
    <property name="topMargin">
-    <number>40</number>
+    <number>0</number>
    </property>
    <property name="rightMargin">
     <number>30</number>
