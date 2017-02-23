@@ -104,7 +104,7 @@ background-color: rgb(27, 27, 33);
             <property name="minimumSize">
              <size>
               <width>32</width>
-              <height>32</height>
+              <height>64</height>
              </size>
             </property>
             <property name="styleSheet">
@@ -195,6 +195,12 @@ color: rgb(255, 255, 255);
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>48</height>
+             </size>
+            </property>
             <property name="text">
              <string>Home</string>
             </property>
@@ -277,6 +283,12 @@ color: rgb(255, 255, 255);
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>48</height>
+             </size>
+            </property>
             <property name="text">
              <string>Digital IO</string>
             </property>
@@ -345,6 +357,12 @@ color: rgb(255, 255, 255);
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>48</height>
+             </size>
             </property>
             <property name="text">
              <string>Voltmeter</string>
@@ -447,6 +465,12 @@ background-image: url(:/menu/play.png);
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>48</height>
+             </size>
+            </property>
             <property name="text">
              <string>Oscilloscope</string>
             </property>
@@ -548,6 +572,12 @@ background-image: url(:/menu/play.png);
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>48</height>
+             </size>
+            </property>
             <property name="text">
              <string>Power Supply</string>
             </property>
@@ -642,6 +672,12 @@ background-image: url(:/menu/play.png);
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>48</height>
+             </size>
             </property>
             <property name="text">
              <string>Signal Generator</string>
@@ -759,6 +795,12 @@ background-image: url(:/menu/play.png);
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>48</height>
+             </size>
+            </property>
             <property name="text">
              <string>Pattern Generator</string>
             </property>
@@ -853,6 +895,12 @@ background-image: url(:/menu/play.png);
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>48</height>
+             </size>
             </property>
             <property name="text">
              <string>Logic Analyzer</string>
@@ -954,6 +1002,12 @@ background-image: url(:/menu/play.png);
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>48</height>
+             </size>
             </property>
             <property name="text">
              <string>Network Analyzer</string>
@@ -1058,6 +1112,12 @@ background-image: url(:/menu/play.png);
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>48</height>
+             </size>
             </property>
             <property name="text">
              <string>Spectrum Analyzer</string>
