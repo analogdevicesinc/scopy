@@ -553,6 +553,7 @@ void LogicAnalyzer::startStop(bool start)
 		running = true;
 		setSampleRate();
 		ui->btnRunStop->setText("Stop");
+		ui->btnSingleRun->setEnabled(false);
 		setHWTriggerDelay(active_triggerSampleCount);
 		setTriggerDelay();
 		if (timePosition->value() != active_timePos)
@@ -560,6 +561,7 @@ void LogicAnalyzer::startStop(bool start)
 	} else {
 		running = false;
 		ui->btnRunStop->setText("Run");
+		ui->btnSingleRun->setEnabled(true);
 		ui->triggerStateLabel->setText("Stop");
 	}
 	main_win->run_stop();
