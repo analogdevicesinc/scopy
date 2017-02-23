@@ -890,7 +890,8 @@ void LogicAnalyzerChannelGroupUI::collapse_group()
 {
 	bool value = !getChannelGroup()->isCollapsed();
 	getChannelGroup()->collapse(value);
-	findChild<QWidget *>("subChannelWidget")->setVisible(!value);
+	ui->subChannelWidget->setVisible(!value);
+	Q_EMIT requestUpdateUI();
 }
 
 void LogicAnalyzerChannelGroupUI::enableControls(bool enabled)
