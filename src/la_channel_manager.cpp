@@ -1183,7 +1183,9 @@ LogicAnalyzerChannelManagerUI::LogicAnalyzerChannelManagerUI(QWidget *parent,
 	this->chm = chm;
 	this->la = la;
 	this->chm->initDecoderList();
+	showHighlight(false);
 	chm->highlightChannel(chm->get_channel_group(0));
+	showHighlight(true);
 	ui->scrollAreaWidgetContents->installEventFilter(this);
 	Q_EMIT(widthChanged(geometry().width()));
 }
@@ -1881,7 +1883,9 @@ void LogicAnalyzerChannelManagerUI::highlightPrevious()
 		if( chgIter != chm->get_channel_groups()->end() ) {
 			if( chgIndex - 1 >= 0 ) {
 				auto prevChgroup = chm->get_channel_group(chgIndex - 1);
+				showHighlight(false);
 				chm->highlightChannel(prevChgroup);
+				showHighlight(true);
 				update = true;
 			}
 		}
@@ -1896,14 +1900,14 @@ void LogicAnalyzerChannelManagerUI::highlightPrevious()
 		if( chIter != chgroup->get_channels()->end() ) {
 			if( chIndex - 1 >= 0 ) {
 				auto prevCh = chgroup->get_channel(chIndex - 1);
+				showHighlight(false);
 				chm->highlightChannel(nullptr,
 					static_cast<LogicAnalyzerChannel*>(prevCh));
+				showHighlight(true);
 				update = true;
 			}
 		}
 	}
-	if(update)
-		update_ui();
 }
 
 void LogicAnalyzerChannelManagerUI::highlightNext()
@@ -1917,7 +1921,9 @@ void LogicAnalyzerChannelManagerUI::highlightNext()
 		if( chgIter != chm->get_channel_groups()->end() ) {
 			if( chgIndex + 1 < chm->get_channel_groups()->size() ) {
 				auto nextChgroup = chm->get_channel_group(chgIndex + 1);
+				showHighlight(false);
 				chm->highlightChannel(nextChgroup);
+				showHighlight(true);
 				update = true;
 			}
 		}
@@ -1932,14 +1938,14 @@ void LogicAnalyzerChannelManagerUI::highlightNext()
 		if( chIter != chgroup->get_channels()->end() ) {
 			if( chIndex + 1 < chgroup->get_channel_count() ) {
 				auto prevCh = chgroup->get_channel(chIndex + 1);
+				showHighlight(false);
 				chm->highlightChannel(nullptr,
 					static_cast<LogicAnalyzerChannel*>(prevCh));
+				showHighlight(true);
 				update = true;
 			}
 		}
 	}
-	if(update)
-		update_ui();
 }
 
 void LogicAnalyzerChannelManagerUI::set_label(QString text)
