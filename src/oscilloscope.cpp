@@ -30,6 +30,7 @@
 
 /* Local includes */
 #include "adc_sample_conv.hpp"
+#include "customPushButton.hpp"
 #include "math.hpp"
 #include "oscilloscope.hpp"
 #include "dynamicWidget.hpp"
@@ -52,7 +53,6 @@
 #include "ui_statistics_panel.h"
 #include "ui_cursor_readouts.h"
 #include "ui_oscilloscope.h"
-#include "ui_trigger.h"
 #include "ui_trigger_settings.h"
 
 using namespace adiscope;
@@ -171,6 +171,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 		channel_ui.btn->setProperty("id", QVariant(chIdx));
 		channel_ui.name->setProperty("id", QVariant(chIdx));
 
+		connect(channel_ui.btn, SIGNAL(toggled(bool)),
+				ui->btnSettings, SLOT(setChecked(bool)));
 		connect(channel_ui.box, SIGNAL(toggled(bool)), this,
 				SLOT(channel_box_toggled(bool)));
 		connect(channel_ui.name, SIGNAL(toggled(bool)),
@@ -193,40 +195,16 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 			SLOT(rightMenuFinished(bool)));
 
 	/* Cursors Settings */
-	QWidget *cursor_widget = new QWidget(this);
-	cursor_ui = new Ui::Channel();
-	cursor_ui->setupUi(cursor_widget);
-	ui->cursors_settings->addWidget(cursor_widget);
-
-	settings_group->addButton(cursor_ui->btn);
-	cursor_ui->btn->setProperty("id", QVariant(-1));
-	cursor_ui->name->setText("Cursors");
-	cursor_ui->box->setChecked(false);
-	QString stylesheet(cursor_ui->box->styleSheet());
-	stylesheet += QString("\nQCheckBox::indicator {"
-				"border-color: rgb(74, 100, 255);"
-				"border-radius: 4px;"
-				"}"
-				"QCheckBox::indicator:checked {"
-				"background-color: rgb(74, 100, 255);"
-				"}");
-	cursor_ui->box->setStyleSheet(stylesheet);
-	connect(cursor_ui->btn, SIGNAL(pressed()),
-				this, SLOT(toggleRightMenu()));
-	connect(cursor_ui->box, SIGNAL(toggled(bool)), this,
-			SLOT(onCursorsToggled(bool)));
-
+	settings_group->addButton(ui->btnCursors);
+	ui->btnCursors->setProperty("id", QVariant(-1));
+	connect(ui->btnCursors, SIGNAL(pressed()),
+			this, SLOT(toggleRightMenu()));
 
 	/* Trigger Settings */
-	QWidget *trig_widget = new QWidget(this);
-	Ui::Trigger trig_ui;
-
-	trig_ui.setupUi(trig_widget);
-	ui->trigger_settings->addWidget(trig_widget);
-	settings_group->addButton(trig_ui.btn);
-	trig_ui.btn->setProperty("id", QVariant(-triggers_panel));
-	connect(trig_ui.btn, SIGNAL(pressed()),
-				this, SLOT(toggleRightMenu()));
+	settings_group->addButton(ui->btnTrigger);
+	ui->btnTrigger->setProperty("id", QVariant(-triggers_panel));
+	connect(ui->btnTrigger, SIGNAL(pressed()),
+			this, SLOT(toggleRightMenu()));
 
 	/* Trigger Status Updater */
 	triggerUpdater->setOffState(CapturePlot::Stop);
@@ -279,7 +257,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	buffer_previewer->setHighlightBgColor(QColor("#141416"));
 	buffer_previewer->setHighlightFgColor(QColor("#ff7200"));
 	buffer_previewer->setCursorColor(QColor("#4A64FF"));
-	stylesheet = "adiscope--BufferPreviewer {"
+	QString stylesheet = "adiscope--BufferPreviewer {"
 			"background-color: #272730;"
 			"color: #ffffff;"
 			"border: 1px solid #7092be;"
@@ -583,8 +561,6 @@ Oscilloscope::~Oscilloscope()
 	delete[] hist_ids;
 	delete[] fft_ids;
 	delete[] ids;
-	delete measure_ui;
-	delete cursor_ui;
 	delete ch_ui;
 	delete gsettings_ui;
 	delete measure_panel_ui;
@@ -771,7 +747,7 @@ void Oscilloscope::del_math_channel()
 		settings_group->setExclusive(false);
 		ui->btnSettings->setChecked(false);
 		active_settings_btn = nullptr;
-		last_non_general_settings_btn = active_settings_btn;
+		last_non_general_settings_btn = nullptr;
 	}
 
 	/* Remove the math channel from the bottom list of channels */
@@ -994,48 +970,31 @@ void Oscilloscope::onXY_view_toggled(bool visible)
 		iio->unlock();
 }
 
-void adiscope::Oscilloscope::onCursorsToggled(bool on)
+void adiscope::Oscilloscope::on_boxCursors_toggled(bool on)
 {
-	QCheckBox *box = static_cast<QCheckBox *>(QObject::sender());
-	QPushButton *btn = box->parentWidget()->findChild<QPushButton *>("btn");
-
-	if (!on) {
-		if (btn->isChecked()) {
-			settings_group->setExclusive(false);
-			ui->btnSettings->setChecked(false);
-		}
-	}
-
 	plot.setHorizCursorsEnabled(
 			on ? cr_ui->vCursorsEnable->isChecked() : false);
 	plot.setVertCursorsEnabled(
 			on ? cr_ui->hCursorsEnable->isChecked() : false);
 
 	// Set the visibility of the cursor readouts owned by the Oscilloscope
-	QCheckBox *mbox = ui->measure_settings->itemAt(0)->widget()->
-		findChild<QCheckBox *>("box");
 	if (on)
-		plot.setCursorReadoutsVisible(!mbox->isChecked());
+		plot.setCursorReadoutsVisible(!ui->boxMeasure->isChecked());
+	else if (ui->btnCursors->isChecked())
+		on_btnSettings_clicked(false);
 	measure_panel_ui->cursorReadouts->setVisible(on);
 }
 
-void adiscope::Oscilloscope::onMeasureToggled(bool on)
+void adiscope::Oscilloscope::on_boxMeasure_toggled(bool on)
 {
-	QCheckBox *box = static_cast<QCheckBox *>(QObject::sender());
-	QPushButton *btn = box->parentWidget()->findChild<QPushButton *>("btn");
-
-	if (!on) {
-		if (btn->isChecked()) {
-			settings_group->setExclusive(false);
-			ui->btnSettings->setChecked(false);
-		}
-	} else {
+	if (on)
 		update_measure_for_channel(selectedChannel);
-	}
+	else if (ui->btnMeasure->isChecked())
+		on_btnSettings_clicked(false);
 	measurePanel->setVisible(on);
 
 	// Set the visibility of the cursor readouts owned by the plot
-	if (cursor_ui->box->isChecked())
+	if (ui->boxCursors->isChecked())
 		plot.setCursorReadoutsVisible(!on);
 }
 
@@ -1111,8 +1070,9 @@ void adiscope::Oscilloscope::updateRunButton(bool ch_enabled)
 void adiscope::Oscilloscope::channel_box_toggled(bool checked)
 {
 	QCheckBox *box = static_cast<QCheckBox *>(QObject::sender());
-	QPushButton *btn = box->parentWidget()->findChild<QPushButton *>("btn");
 	QPushButton *name = box->parentWidget()->findChild<QPushButton *>("name");
+	CustomPushButton *btn = box->parentWidget()
+		->findChild<CustomPushButton *>("btn");
 	unsigned int id = box->property("id").toUInt();
 
 	if (checked) {
@@ -1122,10 +1082,8 @@ void adiscope::Oscilloscope::channel_box_toggled(bool checked)
 		name->setChecked(true);
 
 	} else {
-		if (btn->isChecked()) {
-			settings_group->setExclusive(false);
-			ui->btnSettings->setChecked(false);
-		}
+		if (btn->isChecked())
+			on_btnSettings_clicked(false);
 
 		qDebug() << "Detaching curve" << id;
 		plot.DetachCurve(id);
@@ -1317,11 +1275,9 @@ void adiscope::Oscilloscope::toggleRightMenu(QPushButton *btn)
 	bool btn_old_state = btn->isChecked();
 	bool open = !menuOpened;
 
-	active_settings_btn = btn;
+	active_settings_btn = static_cast<CustomPushButton *>(btn);
 	if (id != -ui->stackedWidget->indexOf(ui->generalSettings))
 		last_non_general_settings_btn = active_settings_btn;
-
-	settings_group->setExclusive(!btn_old_state);
 
 	if (open)
 		settings_panel_update(id);
@@ -1339,19 +1295,7 @@ void adiscope::Oscilloscope::toggleRightMenu(QPushButton *btn)
 
 void adiscope::Oscilloscope::toggleRightMenu()
 {
-	QPushButton *btn = static_cast<QPushButton *>(QObject::sender());
-
-	toggleRightMenu(btn);
-
-	int id = btn->property("id").toInt();
-	bool settingsState = !btn->isChecked();
-
-	if (id == -ui->stackedWidget->indexOf(ui->generalSettings) &&
-			settingsState) {
-		settingsState = false;
-	}
-	const QSignalBlocker blocker(ui->btnSettings);
-		ui->btnSettings->setChecked(settingsState);
+	toggleRightMenu(static_cast<QPushButton *>(QObject::sender()));
 }
 
 void Oscilloscope::settings_panel_update(int id)
@@ -1562,30 +1506,12 @@ void Oscilloscope::measure_settings_init()
 		SIGNAL(statisticSelectionListChanged()),
 		SLOT(onStatisticSelectionListChanged()));
 
-	QWidget *measure_widget = new QWidget(this);
+	settings_group->addButton(ui->btnMeasure);
+	ui->btnMeasure->setProperty("id", QVariant(-measure_panel));
 
-	measure_ui = new Ui::Channel();
-	measure_ui->setupUi(measure_widget);
-	ui->measure_settings->addWidget(measure_widget);
-	settings_group->addButton(measure_ui->btn);
-	measure_ui->btn->setProperty("id", QVariant(-measure_panel));
-	measure_ui->name->setText("Measure");
-	measure_ui->box->setChecked(false);
-	QString stylesheet(measure_ui->box->styleSheet());
-	stylesheet += QString("\nQCheckBox::indicator {"
-				"border-color: rgb(74, 100, 255);"
-				"border-radius: 4px;"
-				"}"
-				"QCheckBox::indicator:checked {"
-				"background-color: rgb(74, 100, 255);"
-				"}");
-	measure_ui->box->setStyleSheet(stylesheet);
-
-	connect(measure_ui->btn, SIGNAL(pressed()),
+	connect(ui->btnMeasure, SIGNAL(pressed()),
 				this, SLOT(toggleRightMenu()));
-	connect(measure_ui->box, SIGNAL(toggled(bool)), this,
-			SLOT(onMeasureToggled(bool)));
-	connect(measure_ui->box, SIGNAL(toggled(bool)),
+	connect(ui->boxMeasure, SIGNAL(toggled(bool)),
 		&plot, SLOT(setMeasuremensEnabled(bool)));
 }
 
@@ -1971,9 +1897,9 @@ void Oscilloscope::updateBufferPreviewer()
 	buffer_previewer->setCursorPos(cPos);
 }
 
-void Oscilloscope::on_btnSettings_toggled(bool checked)
+void Oscilloscope::on_btnSettings_clicked(bool checked)
 {
-	QPushButton *btn = nullptr;
+	CustomPushButton *btn = nullptr;
 
 	if (checked) {
 		if (last_non_general_settings_btn) {
@@ -1982,41 +1908,41 @@ void Oscilloscope::on_btnSettings_toggled(bool checked)
 			auto buttons = settings_group->buttons();
 			for (int i = 0; i < buttons.size(); i++) {
 				if (buttons[i]->property("id").toInt() == 0) {
-					btn = static_cast<QPushButton *>(
-					buttons[i]);
+					btn = static_cast<CustomPushButton *>(
+							buttons[i]);
 					break;
 				}
 			}
 		}
 	} else {
-		btn = static_cast<QPushButton *>(
+		btn = static_cast<CustomPushButton *>(
 			settings_group->checkedButton());
 	}
 
 	if (btn) {
-		toggleRightMenu(btn);
 		btn->setChecked(checked);
+		toggleRightMenu(btn);
 	}
 }
 
 bool Oscilloscope_API::hasCursors() const
 {
-	return osc->cursor_ui->box->isChecked();
+	return osc->ui->boxCursors->isChecked();
 }
 
 void Oscilloscope_API::setCursors(bool en)
 {
-	osc->cursor_ui->box->setChecked(en);
+	osc->ui->boxCursors->setChecked(en);
 }
 
 bool Oscilloscope_API::hasMeasure() const
 {
-	return osc->measure_ui->box->isChecked();
+	return osc->ui->boxMeasure->isChecked();
 }
 
 void Oscilloscope_API::setMeasure(bool en)
 {
-	osc->measure_ui->box->setChecked(en);
+	osc->ui->boxMeasure->setChecked(en);
 }
 
 bool Oscilloscope_API::measureAll() const

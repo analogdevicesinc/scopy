@@ -56,7 +56,6 @@ class QJSEngine;
 class SymmetricBufferMode;
 
 namespace Ui {
-	class Channel;
 	class Oscilloscope;
 	class OscGeneralSettings;
 	class ChannelSettings;
@@ -67,6 +66,7 @@ namespace Ui {
 }
 
 namespace adiscope {
+	class CustomPushButton;
 	class Oscilloscope_API;
 	class MeasurementData;
 	class MeasurementGui;
@@ -96,8 +96,8 @@ namespace adiscope {
 
 	private Q_SLOTS:
 		void on_actionClose_triggered();
-		void onCursorsToggled(bool on);
-		void onMeasureToggled(bool on);
+		void on_boxCursors_toggled(bool on);
+		void on_boxMeasure_toggled(bool on);
 
 		void onFFT_view_toggled(bool visible);
 		void onHistogram_view_toggled(bool visible);
@@ -143,7 +143,7 @@ namespace adiscope {
 		void onIioDataRefillTimeout();
 		void onPlotNewData();
 
-		void on_btnSettings_toggled(bool checked);
+		void on_btnSettings_clicked(bool checked);
 		void channelLineWidthChanged(int id);
 
 	private:
@@ -160,7 +160,6 @@ namespace adiscope {
 		Ui::Oscilloscope *ui;
 		Ui::OscGeneralSettings *gsettings_ui;
 		Ui::ChannelSettings *ch_ui;
-		Ui::Channel *cursor_ui, *measure_ui;
 		adiscope::TriggerSettings trigger_settings;
 		adiscope::MeasureSettings *measure_settings;
 		CapturePlot plot;
@@ -223,8 +222,8 @@ namespace adiscope {
 		QButtonGroup *settings_group;
 		QButtonGroup *channels_group; // selected state of each channel
 
-		QPushButton *active_settings_btn;
-		QPushButton *last_non_general_settings_btn;
+		CustomPushButton *active_settings_btn;
+		CustomPushButton *last_non_general_settings_btn;
 		QPushButton *menuRunButton;
 
 		Oscilloscope_API *osc_api;

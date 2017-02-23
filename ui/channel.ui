@@ -95,7 +95,7 @@ QCheckBox::indicator:unchecked {
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="btn">
+    <widget class="adiscope::CustomPushButton" name="btn">
      <property name="maximumSize">
       <size>
        <width>40</width>
@@ -136,6 +136,13 @@ QPushButton:checked {
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>adiscope::CustomPushButton</class>
+   <extends>QPushButton</extends>
+   <header>customPushButton.hpp</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>
