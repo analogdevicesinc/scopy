@@ -323,8 +323,7 @@
        <item>
         <widget class="QLabel" name="lblLineWidth">
          <property name="styleSheet">
-          <string notr="true">fonst-size: 16px;
-color: rgba(255, 255, 255, 153);</string>
+          <string notr="true">color: rgba(255, 255, 255, 102);</string>
          </property>
          <property name="text">
           <string>CH Thickness</string>
