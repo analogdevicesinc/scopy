@@ -28,7 +28,7 @@ build_script:
     - c:\msys64\mingw64\bin\windeployqt.exe --dir c:\scopy --release --no-system-d3d-compiler --no-compiler-runtime --no-quick-import c:\build\Scopy.exe
 
     - C:\msys64\usr\bin\bash -lc "tar -C /c/scopy --strip-components=3 -xJf /c/msys64.tar.xz msys64/mingw64/bin"
-    - C:\msys64\usr\bin\bash -lc "cd /mingw64/bin ; cp -r libwinpthread-1.dll libgcc_s_seh-1.dll libstdc++-6.dll libboost_{system,filesystem,atomic,program_options,regex,thread}-*.dll libglib-2.0-0.dll libintl-8.dll libiconv-2.dll libpcre-1.dll libpcre16-0.dll libglibmm-2.4-1.dll libgmodule-2.0-0.dll libgobject-2.0-0.dll libffi-6.dll libsigc-2.0-0.dll libfftw3f-3.dll libicu{in,uc,dt}57.dll zlib1.dll libharfbuzz-0.dll libfreetype-6.dll libbz2-1.dll libpng16-16.dll libgraphite2.dll libjpeg-8.dll libsqlite3-0.dll libwebp-6.dll libxml2-2.dll liblzma-5.dll libxslt-1.dll libzip-4.dll libpython3.5m.dll libeay32.dll ssleay32.dll libusb-1.0.dll /mingw64/lib/python3.5 /c/scopy/"
+    - C:\msys64\usr\bin\bash -lc "cd /mingw64/bin ; cp -r libwinpthread-*.dll libgcc_s_seh-*.dll libstdc++-*.dll libboost_{system,filesystem,atomic,program_options,regex,thread}-*.dll libglib-*.dll libintl-*.dll libiconv-*.dll libpcre-*.dll libpcre16-*.dll libglibmm-2.*.dll libgmodule-2.*.dll libgobject-2.*.dll libffi-*.dll libsigc-2.*.dll libfftw3f-*.dll libicu{in,uc,dt}*.dll zlib*.dll libharfbuzz-*.dll libfreetype-*.dll libbz2-*.dll libpng16-*.dll libgraphite2.dll libjpeg-*.dll libsqlite3-*.dll libwebp-*.dll libxml2-*.dll liblzma-*.dll libxslt-*.dll libzip-*.dll libpython3.*.dll libeay32.dll ssleay32.dll libusb-*.dll /mingw64/lib/python3.* /c/scopy/"
 
     - 7z a "c:\scopy.zip" c:\scopy
     - appveyor PushArtifact c:\scopy.zip
