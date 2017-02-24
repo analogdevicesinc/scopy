@@ -2269,3 +2269,22 @@ void Oscilloscope::channelLineWidthChanged(int id)
 		plot.replot();
 	}
 }
+
+QList<double> Oscilloscope_API::getLineThickness() const
+{
+	QList<double> list;
+	unsigned int i;
+
+	for (i = 0; i < osc->nb_channels + osc->nb_math_channels; i++)
+		list.append(osc->plot.getLineWidthF(i));
+
+	return list;
+}
+
+void Oscilloscope_API::setLineThickness(const QList<double>& list)
+{
+	unsigned int i;
+
+	for (i = 0; i < osc->nb_channels + osc->nb_math_channels; i++)
+		osc->plot.setLineWidthF(i, list.at(i));
+}
