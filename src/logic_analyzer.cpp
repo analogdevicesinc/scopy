@@ -54,6 +54,8 @@
 
 /* Boost includes */
 #include <boost/thread.hpp>
+#include <QJsonDocument>
+#include <QJsonValue>
 
 using namespace std;
 using namespace adiscope;
@@ -320,7 +322,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 
 LogicAnalyzer::~LogicAnalyzer()
 {
-	delete chm_ui;
+//	delete chm_ui;
 
 	la_api->save();
 	delete la_api;
@@ -775,6 +777,111 @@ void LogicAnalyzer::cleanHWParams()
 	}
 	setHWTriggerDelay(active_triggerSampleCount);
 	setHWTriggerLogic("or");
+}
+
+QJsonValue LogicAnalyzer::chmToJson()
+{
+	QJsonObject obj;
+	QJsonArray chgArray;
+
+	for (auto i=0; i<chm.get_channel_groups()->size(); i++) {
+		QJsonObject chgObj;
+		LogicAnalyzerChannelGroup *chg = chm.get_channel_group(i);
+
+		chgObj["label"] = QString::fromStdString(chg->get_label());
+		chgObj["grouped"] = chg->is_grouped();
+		chgObj["enabled"] = chg->is_enabled();
+		chgObj["collapsed"] = chg->isCollapsed();
+
+		auto chCount = chg->get_channel_count();
+		QJsonArray chArray;
+
+		for (auto j=0; j<chCount; j++) {
+			QJsonObject chObj;
+			chObj["id"] = chg->get_channel(j)->get_id();
+			chObj["label"] = QString::fromStdString(chg->get_channel(j)->get_label());
+			chArray.insert(j,QJsonValue(chObj));
+		}
+
+		chgObj["channels"] = chArray;
+		if( chg->is_grouped() ) {
+			chgObj["decoder"] = chg->getDecoder()->name;
+		}
+		chgArray.insert(i,chgObj);
+	}
+
+	obj["channel_groups"] = chgArray;
+	QJsonValue val(obj);
+	return val;
+}
+
+void LogicAnalyzer::jsonToChm(QJsonObject obj)
+{
+	chm.clearChannelGroups();
+	QJsonArray chgArray = obj["chm"].toObject()["channel_groups"].toArray();
+
+	for (auto chgRef : chgArray) {
+		auto chg = chgRef.toObject();
+		LogicAnalyzerChannelGroup *lachg = new LogicAnalyzerChannelGroup();
+		lachg->set_label(chg["label"].toString().toStdString());
+		lachg->group(chg["grouped"].toBool());
+		lachg->enable(chg["enabled"].toBool());
+		lachg->collapse(chg["collapsed"].toBool());
+		QJsonArray chArray = chg["channels"].toArray();
+
+		for (auto chRef : chArray) {
+			auto ch = chRef.toObject();
+			int chIndex = ch["id"].toInt();
+			lachg->add_channel(chm.get_channel(chIndex));
+		}
+		if( lachg->is_grouped() ) {
+			lachg->setDecoder(chm.get_decoder_from_name(chg["decoder"].toString().toUtf8()));
+		}
+
+		chm.add_channel_group(lachg);
+	}
+}
+
+QString LogicAnalyzer::toString()
+{
+	QJsonObject obj;
+	obj["chm"] = chmToJson();
+	QJsonDocument doc(obj);
+	QString ret(doc.toJson(QJsonDocument::Compact));
+	return ret;
+}
+
+void LogicAnalyzer::fromString(QString val)
+{
+	QJsonObject obj;
+	QJsonDocument doc = QJsonDocument::fromJson(val.toUtf8());
+
+	if (!doc.isNull()) {
+		if (doc.isObject()) {
+			obj = doc.object();
+		} else {
+			qDebug() << "Document is not an object" << endl;
+		}
+	} else {
+		qDebug() << "Invalid JSON...\n";
+	}
+
+	jsonToChm(obj);
+	chm_ui->showHighlight(false);
+	chm_ui->update_ui();
+
+}
+
+QString LogicAnalyzer_API::chm() const
+{
+	QString ret = lga->toString();
+	return ret;
+
+}
+
+void LogicAnalyzer_API::setChm(QString val)
+{
+	lga->fromString(val);
 }
 
 bool LogicAnalyzer_API::running() const
