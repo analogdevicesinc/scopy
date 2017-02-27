@@ -32,7 +32,7 @@ build_script:
     # Copy the dependencies
     - mkdir c:\scopy_64
     - copy c:\build_64\Scopy.exe c:\scopy_64\
-    - c:\msys64\mingw64\bin\windeployqt.exe --dir c:\scopy_64 --release --no-system-d3d-compiler --no-compiler-runtime --no-quick-import c:\build_64\Scopy.exe
+    - c:\msys64\mingw64\bin\windeployqt.exe --dir c:\scopy_64 --release --no-system-d3d-compiler --no-compiler-runtime --no-quick-import --opengl c:\build_64\Scopy.exe
 
     - C:\msys64\usr\bin\bash -lc "tar -C /c/scopy_64 --strip-components=3 -xJf /c/msys64.tar.xz msys64/mingw64/bin"
     - C:\msys64\usr\bin\bash -lc "cd /mingw64/bin ; cp -r libwinpthread-*.dll libgcc_*.dll libstdc++-*.dll libboost_{system,filesystem,atomic,program_options,regex,thread}-*.dll libglib-*.dll libintl-*.dll libiconv-*.dll libpcre-*.dll libpcre16-*.dll libglibmm-2.*.dll libgmodule-2.*.dll libgobject-2.*.dll libffi-*.dll libsigc-2.*.dll libfftw3f-*.dll libicu{in,uc,dt}*.dll zlib*.dll libharfbuzz-*.dll libfreetype-*.dll libbz2-*.dll libpng16-*.dll libgraphite2.dll libjpeg-*.dll libsqlite3-*.dll libwebp-*.dll libxml2-*.dll liblzma-*.dll libxslt-*.dll libzip-*.dll libpython3.*.dll libeay32.dll ssleay32.dll libusb-*.dll /mingw64/lib/python3.* /c/scopy_64/"
@@ -46,7 +46,7 @@ build_script:
     # Copy the dependencies
     - mkdir c:\scopy_32
     - copy c:\build_32\Scopy.exe c:\scopy_32\
-    - c:\msys64\mingw32\bin\windeployqt.exe --dir c:\scopy_32 --release --no-system-d3d-compiler --no-compiler-runtime --no-quick-import c:\build_32\Scopy.exe
+    - c:\msys64\mingw32\bin\windeployqt.exe --dir c:\scopy_32 --release --no-system-d3d-compiler --no-compiler-runtime --no-quick-import --opengl c:\build_32\Scopy.exe
 
     - C:\msys64\usr\bin\bash -lc "tar -C /c/scopy_32 --strip-components=3 -xJf /c/msys64.tar.xz msys64/mingw32/bin"
     - C:\msys64\usr\bin\bash -lc "cd /mingw32/bin ; cp -r libwinpthread-*.dll libgcc_*.dll libstdc++-*.dll libboost_{system,filesystem,atomic,program_options,regex,thread}-*.dll libglib-*.dll libintl-*.dll libiconv-*.dll libpcre-*.dll libpcre16-*.dll libglibmm-2.*.dll libgmodule-2.*.dll libgobject-2.*.dll libffi-*.dll libsigc-2.*.dll libfftw3f-*.dll libicu{in,uc,dt}*.dll zlib*.dll libharfbuzz-*.dll libfreetype-*.dll libbz2-*.dll libpng16-*.dll libgraphite2.dll libjpeg-*.dll libsqlite3-*.dll libwebp-*.dll libxml2-*.dll liblzma-*.dll libxslt-*.dll libzip-*.dll libpython3.*.dll libeay32.dll ssleay32.dll libusb-*.dll /mingw32/lib/python3.* /c/scopy_32/"
