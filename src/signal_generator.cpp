@@ -589,10 +589,12 @@ basic_block_sptr SignalGenerator::getSignalSource(gr::top_block_sptr top,
 		offset = data.offset - (float) data.amplitude;
 	}
 
-	if (inv_saw_wave)
+	if (inv_saw_wave) {
 		waveform = analog::GR_SAW_WAVE;
-	else
+		offset = -data.offset - (float) data.amplitude;
+	} else {
 		waveform = static_cast<analog::gr_waveform_t>(data.waveform);
+	}
 
 	auto src = analog::sig_source_f::make(samp_rate, waveform,
 			data.frequency, amplitude, offset);
