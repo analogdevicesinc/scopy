@@ -13,6 +13,10 @@ install:
     - appveyor DownloadFile http://swdownloads.analog.com/cse/build/msys64.tar.xz -FileName C:\msys64.tar.xz
     - C:\msys64\usr\bin\bash -lc "cd /c ; tar xJf msys64.tar.xz"
 
+    # Download a 32-bit version of windres.exe
+    - appveyor DownloadFile http://swdownloads.analog.com/cse/build/windres.exe.gz -FileName C:\windres.exe.gz
+    - C:\msys64\usr\bin\bash -lc "cd /c ; gunzip windres.exe.gz"
+
     # Hack: Qt5Qml CMake script throws errors when loading its plugins. So let's just drop those plugins.
     - C:\msys64\usr\bin\bash -lc "rm -f /mingw32/lib/cmake/Qt5Qml/*Factory.cmake"
     - C:\msys64\usr\bin\bash -lc "rm -f /mingw64/lib/cmake/Qt5Qml/*Factory.cmake"
@@ -37,7 +41,7 @@ build_script:
     - appveyor PushArtifact c:\scopy-64bit.zip
 
     - set PATH=C:\msys64\mingw32\bin;%OLD_PATH%
-    - C:\msys64\usr\bin\bash -lc "mkdir /c/build_32 ; cd /c/build_32 ; cmake -G 'Unix Makefiles' -DCMAKE_RC_COMPILER=/c/MinGW/bin/windres.exe -DCMAKE_BUILD_TYPE=Release -DGIT_EXECUTABLE=/c/Program\\ Files/Git/cmd/git.exe -DPKG_CONFIG_EXECUTABLE=/mingw32/bin/pkg-config.exe -DCMAKE_C_COMPILER=i686-w64-mingw32-gcc.exe -DCMAKE_CXX_COMPILER=i686-w64-mingw32-g++.exe /c/projects/scopy && make -j3"
+    - C:\msys64\usr\bin\bash -lc "mkdir /c/build_32 ; cd /c/build_32 ; cmake -G 'Unix Makefiles' -DCMAKE_RC_COMPILER=/c/windres.exe -DCMAKE_BUILD_TYPE=Release -DGIT_EXECUTABLE=/c/Program\\ Files/Git/cmd/git.exe -DPKG_CONFIG_EXECUTABLE=/mingw32/bin/pkg-config.exe -DCMAKE_C_COMPILER=i686-w64-mingw32-gcc.exe -DCMAKE_CXX_COMPILER=i686-w64-mingw32-g++.exe /c/projects/scopy && make -j3"
 
     # Copy the dependencies
     - mkdir c:\scopy_32
