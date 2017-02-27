@@ -56,5 +56,5 @@ build_script:
 
     # Build the installer
     - set PATH=%PATH%;"C:\Program Files (x86)\Inno Setup 5"
-    - ISCC C:\build_32\scopy.iss
+    - ISCC /Q C:\build_32\scopy.iss
     - appveyor PushArtifact C:\scopy-setup.exe
