@@ -47,7 +47,6 @@ private:
 
 struct StatisticSelection {
 	DropdownSwitchList *dropdown;
-	int posInDropdown;
 	MeasurementItem measurementItem;
 };
 
@@ -99,8 +98,8 @@ private Q_SLOTS:
 	void on_button_measDisplayAll_toggled(bool checked);
 	void on_button_measDeleteAll_toggled(bool checked);
 	void onMeasurementActivated(int chnIdx, int id, bool en);
-	void onStatisticActivated(DropdownSwitchList *dropdown, int pos, int id,
-		 bool en);
+	void onStatisticActivated(DropdownSwitchList *dropdown, int id,
+		bool en);
 	void on_button_StatisticsEn_toggled(bool checked);
 	void on_button_StatisticsReset_pressed();
 	void on_button_statsDeleteAll_toggled(bool checked);
@@ -138,6 +137,7 @@ private:
 	QList<MeasurementItem> m_selectedMeasurements;
 	QList<MeasurementItem> m_deleteAllBackup;
 	QList<MeasurementItem> m_displayAllBackup;
+	QList<int> m_measurePosInDropdowns;
 
 	QList<struct StatisticSelection> m_selectedStatistics;
 	QList<struct StatisticSelection> m_statsDeleteAllBackup;

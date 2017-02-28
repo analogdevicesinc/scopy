@@ -142,7 +142,7 @@ void MeasureSettings::onMeasurementPropertyChanged(QStandardItem *item)
 			onMeasurementActivated(m_selectedChannel, id, en);
 	} else if (item->column() == 2) {
 		if (m_emitStatsChanged)
-			onStatisticActivated(dropdown, item->row(), id, en);
+			onStatisticActivated(dropdown, id, en);
 	}
 
 	// Switch from Recover to Delete All if a measurement state gets changed
@@ -202,6 +202,8 @@ void MeasureSettings::onChannelAdded(int chnIdx)
 		return;
 
 	auto measurements = m_plot->measurements(chnIdx);
+	int h = 0;
+	int v = 0;
 
 	for (int i = 0; i < measurements.size(); i++) {
 		enum MeasurementData::axisType axis = measurements[i]->axis();
@@ -210,10 +212,12 @@ void MeasureSettings::onChannelAdded(int chnIdx)
 			m_horizMeasurements->addDropdownElement(
 					QIcon(icons_lut.at(i)),
 					measurements[i]->name(), QVariant(i));
+			m_measurePosInDropdowns.append(h++);
 		} else if (axis == MeasurementData::VERTICAL) {
 			m_vertMeasurements->addDropdownElement(
 					QIcon(icons_lut.at(i)),
 					measurements[i]->name(), QVariant(i));
+			m_measurePosInDropdowns.append(v++);
 		}
 	}
 
@@ -325,7 +329,7 @@ void MeasureSettings::onMeasurementActivated(int chnIdx, int id, bool en)
 }
 
 void MeasureSettings::onStatisticActivated(DropdownSwitchList *dropdown,
-	int pos, int id, bool en)
+	int id, bool en)
 {
 	if (m_selectedChannel < 0)
 		return;
@@ -334,7 +338,6 @@ void MeasureSettings::onStatisticActivated(DropdownSwitchList *dropdown,
 	int ch_id = measurements[id]->channel();
 	struct StatisticSelection selection;
 	selection.dropdown = dropdown;
-	selection.posInDropdown = pos;
 	selection.measurementItem = MeasurementItem(id, ch_id);
 
 	if (en) {
@@ -371,7 +374,10 @@ void MeasureSettings::loadStatisticStatesForChannel(int chnIdx)
 		}
 		QStandardItemModel *model = static_cast<QStandardItemModel *>
 			(m_selectedStatistics[i].dropdown->model());
-		model->item(m_selectedStatistics[i].posInDropdown, stats_col)->
+
+		int measId = m_selectedStatistics[i].measurementItem.id();
+
+		model->item(m_measurePosInDropdowns[measId], stats_col)->
 			setData(QVariant(1), Qt::EditRole);
 	}
 	setEmitStatsChanged(true);
