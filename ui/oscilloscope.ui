@@ -693,7 +693,7 @@ background: qlineargradient(x1: 0 y1: 0, x2:0 y2:1, stop:0 rgba(39, 39, 48, 51),
       </layout>
      </item>
      <item>
-      <widget class="QPushButton" name="btnAddMath">
+      <widget class="adiscope::CustomPushButton" name="btnAddMath">
        <property name="text">
         <string/>
        </property>
@@ -1047,6 +1047,22 @@ QLabel {
    <hints>
     <hint type="sourcelabel">
      <x>743</x>
+     <y>628</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1116</x>
+     <y>40</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnAddMath</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>btnSettings</receiver>
+   <slot>setChecked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>56</x>
      <y>628</y>
     </hint>
     <hint type="destinationlabel">
