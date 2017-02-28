@@ -636,7 +636,7 @@ background: qlineargradient(x1: 0 y1: 0, x2:0 y2:1, stop:0 rgba(20, 20, 22, 51),
            </sizepolicy>
           </property>
           <property name="currentIndex">
-           <number>2</number>
+           <number>3</number>
           </property>
           <widget class="QWidget" name="channelSettings"/>
           <widget class="QWidget" name="cursorsSettings"/>
@@ -776,6 +776,39 @@ QLabel {
 }</string>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_6">
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Channel Settings</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="adiscope::CustomPushButton" name="btnChannel">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_10">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>12</width>
+            <height>0</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
         <item>
          <widget class="QCheckBox" name="boxCursors">
           <property name="text">
@@ -998,6 +1031,22 @@ QLabel {
    <hints>
     <hint type="sourcelabel">
      <x>1157</x>
+     <y>628</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1116</x>
+     <y>40</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnChannel</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>btnSettings</receiver>
+   <slot>setChecked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>743</x>
      <y>628</y>
     </hint>
     <hint type="destinationlabel">

@@ -84,7 +84,6 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	trigger_is_forced(false),
 	new_data_is_triggered(false),
 	triggerUpdater(new StateUpdater(250, this)),
-	selectedChannel(-1),
 	menuOpened(false), current_channel(0), math_chn_counter(0),
 	settings_group(new QButtonGroup(this)),
 	channels_group(new QButtonGroup(this)),
@@ -168,24 +167,19 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 		channel_ui.box->setStyleSheet(stylesheet);
 
 		channel_ui.box->setProperty("id", QVariant(chIdx));
-		channel_ui.btn->setProperty("id", QVariant(chIdx));
 		channel_ui.name->setProperty("id", QVariant(chIdx));
+		ch_widget->setProperty("channel_name", channel_ui.name->text());
 
-		connect(channel_ui.btn, SIGNAL(toggled(bool)),
-				ui->btnSettings, SLOT(setChecked(bool)));
+		/* We don't use the settings button - hide it */
+		channel_ui.btn->hide();
+
 		connect(channel_ui.box, SIGNAL(toggled(bool)), this,
 				SLOT(channel_box_toggled(bool)));
 		connect(channel_ui.name, SIGNAL(toggled(bool)),
 				SLOT(channel_name_checked(bool)));
 
-		/* For now, we only have one menu - only the channel1 options
-		 * icon can open it */
-		connect(channel_ui.btn, SIGNAL(pressed()),
-				this, SLOT(toggleRightMenu()));
-
 		ui->channelsList->addWidget(ch_widget);
 
-		settings_group->addButton(channel_ui.btn);
 		channels_group->addButton(channel_ui.name);
 
 		chIdx++;
@@ -193,6 +187,12 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 
 	connect(ui->rightMenu, SIGNAL(finished(bool)), this,
 			SLOT(rightMenuFinished(bool)));
+
+	/* Channel Settings */
+	settings_group->addButton(ui->btnChannel);
+	ui->btnChannel->setProperty("id", QVariant(0));
+	connect(ui->btnChannel, SIGNAL(pressed()), this,
+			SLOT(toggleRightMenu()));
 
 	/* Cursors Settings */
 	settings_group->addButton(ui->btnCursors);
@@ -491,6 +491,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 			SLOT(onIioDataRefillTimeout()));
 	connect(&plot, SIGNAL(newData()), this, SLOT(onPlotNewData()));
 
+	connect(this, SIGNAL(selectedChannelChanged(int)),
+		this, SLOT(update_chn_settings_panel(int)));
 
 	if (nb_channels < 2)
 		gsettings_ui->XY_view->hide();
@@ -676,19 +678,19 @@ void Oscilloscope::add_math_channel(const std::string& function)
 			).arg(plot.getLineColor(curve_id).name());
 	channel_ui.box->setStyleSheet(stylesheet);
 
+	channel_ui.btn->hide();
+
 	channel_widget->setProperty("curve_nb", QVariant(curve_number));
 	channel_widget->setProperty("function",
 			QVariant(QString::fromStdString(function)));
 	channel_ui.box->setProperty("id", QVariant(curve_id));
-	channel_ui.btn->setProperty("id", QVariant(curve_id));
 	channel_ui.name->setProperty("id", QVariant(curve_id));
+	channel_ui.delBtn->setProperty("id", QVariant(curve_id));
 	channel_ui.delBtn->setProperty("curve_name", QVariant(qname));
+	channel_widget->setProperty("channel_name", channel_ui.name->text());
 
 	connect(channel_ui.box, SIGNAL(toggled(bool)), this,
 			SLOT(channel_box_toggled(bool)));
-
-	connect(channel_ui.btn, SIGNAL(pressed()),
-			this, SLOT(toggleRightMenu()));
 
 	connect(channel_ui.name, SIGNAL(toggled(bool)),
 				SLOT(channel_name_checked(bool)));
@@ -698,7 +700,6 @@ void Oscilloscope::add_math_channel(const std::string& function)
 
 	ui->channelsList->addWidget(channel_widget);
 
-	settings_group->addButton(channel_ui.btn);
 	channels_group->addButton(channel_ui.name);
 
 	plot.Curve(curve_id)->setAxes(
@@ -718,9 +719,8 @@ void Oscilloscope::del_math_channel()
 {
 	QPushButton *delBtn = static_cast<QPushButton *>(QObject::sender());
 	QWidget *parent = delBtn->parentWidget();
-	QPushButton *btn = parent->findChild<QPushButton *>("btn");
-	unsigned int curve_id = btn->property("id").toUInt();
 	QString qname = delBtn->property("curve_name").toString();
+	unsigned int curve_id = delBtn->property("id").toUInt();
 
 	measure_settings->onChannelRemoved(curve_id);
 
@@ -742,16 +742,7 @@ void Oscilloscope::del_math_channel()
 	if (started)
 		iio->unlock();
 
-	/* Close the right menu if it shows the actual channel */
-	if (btn == settings_group->checkedButton()) {
-		settings_group->setExclusive(false);
-		ui->btnSettings->setChecked(false);
-		active_settings_btn = nullptr;
-		last_non_general_settings_btn = nullptr;
-	}
-
 	/* Remove the math channel from the bottom list of channels */
-	settings_group->removeButton(btn);
 	ui->channelsList->removeWidget(parent);
 	delete parent;
 
@@ -778,11 +769,9 @@ void Oscilloscope::del_math_channel()
 	for (unsigned int i = nb_channels;
 			i < nb_channels + nb_math_channels; i++) {
 		QWidget *parent = ui->channelsList->itemAt(i)->widget();
-		QPushButton *btn = parent->findChild<QPushButton *>("btn");
 		QCheckBox *box = parent->findChild<QCheckBox *>("box");
 
 		/* Update the IDs */
-		btn->setProperty("id", QVariant(i));
 		box->setProperty("id", QVariant(i));
 
 		/* Update the curve-to-axis map */
@@ -988,7 +977,7 @@ void adiscope::Oscilloscope::on_boxCursors_toggled(bool on)
 void adiscope::Oscilloscope::on_boxMeasure_toggled(bool on)
 {
 	if (on)
-		update_measure_for_channel(selectedChannel);
+		update_measure_for_channel(current_channel);
 	else if (ui->btnMeasure->isChecked())
 		on_btnSettings_clicked(false);
 	measurePanel->setVisible(on);
@@ -1065,6 +1054,11 @@ void adiscope::Oscilloscope::updateRunButton(bool ch_enabled)
 	if (!ch_enabled) {
 		ui->pushButtonRunStop->setChecked(false);
 		menuRunButton->setChecked(false);
+
+		if (ui->btnChannel->isChecked()) {
+			ui->btnChannel->setChecked(false);
+			toggleRightMenu(ui->btnChannel);
+		}
 	}
 }
 
@@ -1072,8 +1066,6 @@ void adiscope::Oscilloscope::channel_box_toggled(bool checked)
 {
 	QCheckBox *box = static_cast<QCheckBox *>(QObject::sender());
 	QPushButton *name = box->parentWidget()->findChild<QPushButton *>("name");
-	CustomPushButton *btn = box->parentWidget()
-		->findChild<CustomPushButton *>("btn");
 	unsigned int id = box->property("id").toUInt();
 
 	if (checked) {
@@ -1083,14 +1075,12 @@ void adiscope::Oscilloscope::channel_box_toggled(bool checked)
 		name->setChecked(true);
 
 	} else {
-		if (btn->isChecked())
-			on_btnSettings_clicked(false);
-
 		qDebug() << "Detaching curve" << id;
 		plot.DetachCurve(id);
 
 		channels_group->removeButton(name);
 		name->setChecked(false);
+
 		if (channels_group->buttons().size() > 0)
 			channels_group->buttons()[0]->setChecked(true);
 	}
@@ -1118,8 +1108,8 @@ void adiscope::Oscilloscope::channel_name_checked(bool checked)
 		id = -1;
 	else
 		id = selBtn->property("id").toUInt();
-	if (selectedChannel != id) {
-		selectedChannel = id;
+	if (selBtn && current_channel != id) {
+		current_channel = id;
 		Q_EMIT selectedChannelChanged(id);
 	}
 
@@ -1130,8 +1120,8 @@ void adiscope::Oscilloscope::channel_name_checked(bool checked)
 
 void adiscope::Oscilloscope::onVertScaleValueChanged(double value)
 {
-	if (value != plot.VertUnitsPerDiv(plot.activeVertAxis())) {
-		plot.setVertUnitsPerDiv(value, plot.activeVertAxis());
+	if (value != plot.VertUnitsPerDiv(current_channel)) {
+		plot.setVertUnitsPerDiv(value, current_channel);
 		plot.replot();
 	}
 	voltsPosition->setStep(value / 10);
@@ -1199,8 +1189,8 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 
 void adiscope::Oscilloscope::onVertOffsetValueChanged(double value)
 {
-	if (value != plot.VertOffset(plot.activeVertAxis())) {
-		plot.setVertOffset(value, plot.activeVertAxis());
+	if (value != plot.VertOffset(current_channel)) {
+		plot.setVertOffset(value, current_channel);
 		plot.replot();
 	}
 }
@@ -1264,7 +1254,7 @@ void adiscope::Oscilloscope::rightMenuFinished(bool opened)
 		int id = active_settings_btn->property("id").toInt();
 		settings_panel_update(id);
 		if (id >= 0) {
-			update_chn_settings_panel(id);
+			update_chn_settings_panel(current_channel);
 		}
 		ui->rightMenu->toggleMenu(true);
 	}
@@ -1276,6 +1266,9 @@ void adiscope::Oscilloscope::toggleRightMenu(QPushButton *btn)
 	bool btn_old_state = btn->isChecked();
 	bool open = !menuOpened;
 
+	if (id == 0)
+		id = current_channel;
+
 	active_settings_btn = static_cast<CustomPushButton *>(btn);
 	if (id != -ui->stackedWidget->indexOf(ui->generalSettings))
 		last_non_general_settings_btn = active_settings_btn;
@@ -1284,10 +1277,9 @@ void adiscope::Oscilloscope::toggleRightMenu(QPushButton *btn)
 		settings_panel_update(id);
 
 	if (id >= 0) {
-		current_channel = id;
 		plot.setActiveVertAxis(id);
 		if (open) {
-			update_chn_settings_panel(id, btn->parentWidget());
+			update_chn_settings_panel(id);
 		}
 	}
 
@@ -1325,38 +1317,37 @@ void Oscilloscope::settings_panel_size_adjust()
 
 void Oscilloscope::onChannelOffsetChanged(double value)
 {
-	voltsPosition->setValue(plot.VertOffset(plot.activeVertAxis()));
+	voltsPosition->setValue(plot.VertOffset(current_channel));
 }
 
 QWidget * Oscilloscope::channelWidgetAtId(int id)
 {
 	QWidget *w = NULL;
-	QPushButton *btn;
+	QCheckBox *box;
 	bool found = false;
 
 	for (unsigned int i = 0; !found &&
 				i < nb_channels + nb_math_channels; i++) {
 
 			w = ui->channelsList->itemAt(i)->widget();
-			btn = w->findChild<QPushButton *>("btn");
-			found = btn->property("id").toUInt() == id;
+			box = w->findChild<QCheckBox *>("box");
+			found = box->property("id").toUInt() == id;
 		}
 
 	return w;
 }
 
-void Oscilloscope::update_chn_settings_panel(int id, QWidget *chn_widget)
+void Oscilloscope::update_chn_settings_panel(int id)
 {
-	if (!chn_widget)
-		chn_widget = channelWidgetAtId(id);
+	QWidget *chn_widget = channelWidgetAtId(id);
 	if (!chn_widget)
 		return;
 
 	voltsPerDiv->setValue(plot.VertUnitsPerDiv(id));
 	voltsPosition->setValue(plot.VertOffset(id));
 
-	QPushButton *name = chn_widget->findChild<QPushButton *>("name");
-	ch_ui->label_channelName->setText(name->text());
+	QString name = chn_widget->property("channel_name").toString();
+	ch_ui->label_channelName->setText(name);
 	QString stylesheet = QString("border: 2px solid %1"
 					).arg(plot.getLineColor(id).name());
 	ch_ui->line_channelColor->setStyleSheet(stylesheet);
@@ -1902,19 +1893,8 @@ void Oscilloscope::on_btnSettings_clicked(bool checked)
 {
 	CustomPushButton *btn = nullptr;
 
-	if (checked) {
-		if (last_non_general_settings_btn) {
-			btn = last_non_general_settings_btn;
-		} else { // search for the button of the first channel
-			auto buttons = settings_group->buttons();
-			for (int i = 0; i < buttons.size(); i++) {
-				if (buttons[i]->property("id").toInt() == 0) {
-					btn = static_cast<CustomPushButton *>(
-							buttons[i]);
-					break;
-				}
-			}
-		}
+	if (checked && last_non_general_settings_btn) {
+		btn = last_non_general_settings_btn;
 	} else {
 		btn = static_cast<CustomPushButton *>(
 			settings_group->checkedButton());
