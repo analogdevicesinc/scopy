@@ -903,7 +903,10 @@ void LogicAnalyzerChannelGroupUI::enableControls(bool enabled)
 	ui->comboBox_2->setEnabled(enabled);
 	ui->comboBox->setEnabled(enabled);
 	ui->indexLabel->setEnabled(enabled);
-	ui->selectCheckBox->setEnabled(enabled);
+	if( lchg->is_grouped() ) {
+		ui->subChannelWidget->setEnabled(enabled);
+	}
+	chm_ui->updatePlot();
 }
 
 void LogicAnalyzerChannelGroupUI::enable(bool enabled)
