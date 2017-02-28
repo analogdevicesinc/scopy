@@ -2147,6 +2147,45 @@ void Oscilloscope_API::setMeasureEn(const QList<int>& list)
 	osc->onMeasurementSelectionListChanged();
 }
 
+QList<int> Oscilloscope_API::statisticEn() const
+{
+	QList<int> list;
+	auto statistics = osc->measure_settings->statisticSelection();
+
+	for (int i = 0; i < osc->nb_channels; i++) {
+		int mask = 0;
+		list.append(mask);
+	}
+	for (unsigned int i = 0; i < statistics.size(); i++)
+		list[statistics[i].channel_id()] |= 1 << statistics[i].id();
+
+	return list;
+}
+
+void Oscilloscope_API::setStatisticEn(const QList<int>& list)
+{
+	if (list.size() != osc->nb_channels)
+		return;
+
+	osc->measure_settings->deleteAllStatistics();
+	for (unsigned int i = 0; i < osc->nb_channels; i++) {
+		auto measurements = osc->plot.measurements(i);
+		int mask = list.at(i);
+
+		if (measurements.size() > (sizeof(int) * 8))
+			throw std::runtime_error("Too many measurements");
+
+		for (unsigned int j = 0; j < measurements.size(); j++) {
+			if (!!(mask & (1 << j)))
+				osc->measure_settings->addStatistic(j, i);
+		}
+	}
+
+	osc->measure_settings->loadStatisticStatesForChannel(
+		osc->selectedChannel);
+	osc->onStatisticSelectionListChanged();
+}
+
 void Oscilloscope::channelLineWidthChanged(int id)
 {
 	qreal width = 0.5 * (id + 1);

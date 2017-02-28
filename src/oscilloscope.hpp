@@ -308,6 +308,9 @@ namespace adiscope {
 		Q_PROPERTY(QList<int> measure_en
 				READ measureEn WRITE setMeasureEn);
 
+		Q_PROPERTY(QList<int> statistic_en
+				READ statisticEn WRITE setStatisticEn)
+
 		Q_PROPERTY(QList<double> line_thickness
 				READ getLineThickness WRITE setLineThickness);
 
@@ -372,6 +375,9 @@ namespace adiscope {
 
 		QList<int> measureEn() const;
 		void setMeasureEn(const QList<int>& list);
+
+		QList<int> statisticEn() const;
+		void setStatisticEn(const QList<int>& list);
 
 		QList<double> getLineThickness() const;
 		void setLineThickness(const QList<double>& list);

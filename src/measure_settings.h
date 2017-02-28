@@ -119,6 +119,8 @@ private:
 		list, int chnIdx);
 	void deleteAllStatistics();
 	void recoverAllStatistics();
+	void addStatistic(int measure_id, int ch_id);
+	void removeStatistic(int measure_id, int ch_id);
 
 private:
 	Ui::MeasureSettings *m_ui;
