@@ -135,7 +135,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 	auto layout = static_cast<QBoxLayout *>(ui->tabConstant->layout());
 	layout->insertWidget(0, constantValue, 0);
 
-	amplitude = new PositionSpinButton({
+	amplitude = new ScaleSpinButton({
 				{"µVolts", 1E-6},
 				{"mVolts", 1E-3},
 				{"Volts", 1E0},
