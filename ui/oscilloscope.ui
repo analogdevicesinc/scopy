@@ -154,6 +154,9 @@ QPushButton:!checked {
        <property name="checkable">
         <bool>true</bool>
        </property>
+       <attribute name="buttonGroup">
+        <string notr="true">settings_group</string>
+       </attribute>
       </widget>
      </item>
      <item row="1" column="3">
@@ -707,6 +710,9 @@ background: qlineargradient(x1: 0 y1: 0, x2:0 y2:1, stop:0 rgba(39, 39, 48, 51),
        <property name="flat">
         <bool>true</bool>
        </property>
+       <attribute name="buttonGroup">
+        <string notr="true">settings_group</string>
+       </attribute>
       </widget>
      </item>
      <item>
@@ -791,6 +797,9 @@ QLabel {
           <property name="checkable">
            <bool>true</bool>
           </property>
+          <attribute name="buttonGroup">
+           <string notr="true">settings_group</string>
+          </attribute>
          </widget>
         </item>
         <item>
@@ -827,6 +836,9 @@ QLabel {
           <property name="checkable">
            <bool>true</bool>
           </property>
+          <attribute name="buttonGroup">
+           <string notr="true">settings_group</string>
+          </attribute>
          </widget>
         </item>
         <item>
@@ -863,6 +875,9 @@ QLabel {
           <property name="checkable">
            <bool>true</bool>
           </property>
+          <attribute name="buttonGroup">
+           <string notr="true">settings_group</string>
+          </attribute>
          </widget>
         </item>
         <item>
@@ -896,6 +911,9 @@ QLabel {
           <property name="checkable">
            <bool>true</bool>
           </property>
+          <attribute name="buttonGroup">
+           <string notr="true">settings_group</string>
+          </attribute>
          </widget>
         </item>
        </layout>
@@ -1072,4 +1090,7 @@ QLabel {
    </hints>
   </connection>
  </connections>
+ <buttongroups>
+  <buttongroup name="settings_group"/>
+ </buttongroups>
 </ui>

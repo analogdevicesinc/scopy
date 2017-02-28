@@ -219,7 +219,6 @@ namespace adiscope {
 		unsigned int current_channel;
 		unsigned int math_chn_counter;
 
-		QButtonGroup *settings_group;
 		QButtonGroup *channels_group; // selected state of each channel
 
 		CustomPushButton *active_settings_btn;

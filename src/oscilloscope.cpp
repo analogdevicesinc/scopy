@@ -85,7 +85,6 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	new_data_is_triggered(false),
 	triggerUpdater(new StateUpdater(250, this)),
 	menuOpened(false), current_channel(0), math_chn_counter(0),
-	settings_group(new QButtonGroup(this)),
 	channels_group(new QButtonGroup(this)),
 	active_settings_btn(nullptr),
 	last_non_general_settings_btn(nullptr),
@@ -93,7 +92,6 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 {
 	ui->setupUi(this);
 	int triggers_panel = ui->stackedWidget->insertWidget(-1, &trigger_settings);
-	settings_group->setExclusive(true);
 	symmBufferMode = make_shared<SymmetricBufferMode>();
 	symmBufferMode->setSampleRates(adc.availSamplRates().toVector().toStdVector());
 	symmBufferMode->setEntireBufferMaxSize(500000); // max 0.5 mega-samples
@@ -189,19 +187,16 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 			SLOT(rightMenuFinished(bool)));
 
 	/* Channel Settings */
-	settings_group->addButton(ui->btnChannel);
 	ui->btnChannel->setProperty("id", QVariant(0));
 	connect(ui->btnChannel, SIGNAL(pressed()), this,
 			SLOT(toggleRightMenu()));
 
 	/* Cursors Settings */
-	settings_group->addButton(ui->btnCursors);
 	ui->btnCursors->setProperty("id", QVariant(-1));
 	connect(ui->btnCursors, SIGNAL(pressed()),
 			this, SLOT(toggleRightMenu()));
 
 	/* Trigger Settings */
-	settings_group->addButton(ui->btnTrigger);
 	ui->btnTrigger->setProperty("id", QVariant(-triggers_panel));
 	connect(ui->btnTrigger, SIGNAL(pressed()),
 			this, SLOT(toggleRightMenu()));
@@ -376,7 +371,6 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	/* General Settings Menu */
 	gsettings_ui = new Ui::OscGeneralSettings();
 	gsettings_ui->setupUi(ui->generalSettings);
-	settings_group->addButton(ui->btnGeneralSettings);
 
 	int gsettings_panel = ui->stackedWidget->indexOf(ui->generalSettings);
 	ui->btnGeneralSettings->setProperty("id", QVariant(-gsettings_panel));
@@ -574,7 +568,6 @@ Oscilloscope::~Oscilloscope()
 void Oscilloscope::create_math_panel()
 {
 	/* Math stuff */
-    settings_group->addButton(ui->btnAddMath);
     connect(ui->btnAddMath, SIGNAL(pressed()),
 				this, SLOT(toggleRightMenu()));
 
@@ -1498,7 +1491,6 @@ void Oscilloscope::measure_settings_init()
 		SIGNAL(statisticSelectionListChanged()),
 		SLOT(onStatisticSelectionListChanged()));
 
-	settings_group->addButton(ui->btnMeasure);
 	ui->btnMeasure->setProperty("id", QVariant(-measure_panel));
 
 	connect(ui->btnMeasure, SIGNAL(pressed()),
@@ -1897,7 +1889,7 @@ void Oscilloscope::on_btnSettings_clicked(bool checked)
 		btn = last_non_general_settings_btn;
 	} else {
 		btn = static_cast<CustomPushButton *>(
-			settings_group->checkedButton());
+			ui->settings_group->checkedButton());
 	}
 
 	if (btn) {
