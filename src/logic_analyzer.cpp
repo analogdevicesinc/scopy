@@ -186,13 +186,10 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	-timeBase->maxValue() * 5,
 	timeBase->maxValue() * 5);
 
-	QVBoxLayout *vLayout = new QVBoxLayout(ui->generalSettings);
-	vLayout->insertWidget(1, timeBase, 0, Qt::AlignLeft);
-	vLayout->insertWidget(2, timePosition, 0, Qt::AlignLeft);
-	vLayout->insertSpacerItem(-1, new QSpacerItem(0, 0,
-	                          QSizePolicy::Minimum,
-	                          QSizePolicy::Expanding));
-	ui->generalSettings->setLayout(vLayout);
+	ui->generalSettingsLayout->insertWidget(ui->generalSettingsLayout->count() - 2,
+		timeBase, 0, Qt::AlignLeft);
+	ui->generalSettingsLayout->insertWidget(ui->generalSettingsLayout->count() - 1,
+		timePosition, 0, Qt::AlignLeft);
 
 	options["numchannels"] = Glib::Variant<gint32>(
 			g_variant_new_int32(no_channels),true);
@@ -278,6 +275,20 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 		this, SLOT(onRulerChanged(double, bool)));
 	connect(main_win->view_->viewport(), SIGNAL(repaintTriggerHandle(int)),
 		this, SLOT(refreshTriggerPos(int)));
+	connect(main_win->view_, &view::View::onPlotChanged,
+		[=](bool silent) {
+			if(silent) {
+				if( active_plot_timebase != timeBase->value()) {
+					QString text = d_cursorTimeFormatter.format(
+						active_plot_timebase, "", 3);
+					ui->timebaseLabel->setText("Zoom: " + text + "/div");
+				}
+				else {
+					setTimebaseLabel(active_plot_timebase);
+				}
+			}
+
+		});
 
 	cleanHWParams();
 	chm_ui = new LogicAnalyzerChannelManagerUI(0, main_win, &chm, ui->colorSettings,
@@ -352,12 +363,14 @@ double LogicAnalyzer::pickSampleRateFor(double timeSpanSecs, double desiredBuffe
 	return idealSamplerate;
 }
 
-void LogicAnalyzer::set_triggered_status(bool value)
+void LogicAnalyzer::set_triggered_status(std::string value)
 {
-	if( !value )
+	if( value == "awaiting" )
 		ui->triggerStateLabel->setText("Waiting");
-	else
+	else if(value == "running")
 		ui->triggerStateLabel->setText("Trig'd");
+	else if(value == "stopped")
+		ui->triggerStateLabel->setText("Stop");
 }
 
 void LogicAnalyzer::onHorizScaleValueChanged(double value)

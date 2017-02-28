@@ -20,8 +20,7 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">
-QLabel:disabled
+   <string notr="true">QLabel:disabled
 {
 	color:rgb(85,85,85);
 }
@@ -34,9 +33,8 @@ QLineEdit {
 font-family: Arial;
 font-weight:bold;
 border:0px;
-  border-bottom: 1px solid rgba(255, 255, 255, 102);
-}
-</string>
+/*  border-bottom: 1px solid rgba(255, 255, 255, 102); */
+}</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_1">
    <property name="spacing">
@@ -100,21 +98,21 @@ QPushButton:hover
          <number>0</number>
         </property>
         <item>
-         <widget class="QLineEdit" name="nameLineEdit">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
+         <widget class="QLabel" name="nameLineEdit">
           <property name="styleSheet">
-           <string notr="true"/>
+           <string notr="true">QLabel 
+{
+width: 37px;
+height: 17px;
+font-family: Arial;
+font-size: 14px;
+font-weight: bold;
+line-height: 16px;
+color: #FFFFFF;
+}</string>
           </property>
-          <property name="alignment">
-           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-          </property>
-          <property name="clearButtonEnabled">
-           <bool>false</bool>
+          <property name="text">
+           <string/>
           </property>
          </widget>
         </item>
@@ -323,6 +321,9 @@ QComboBox::indicator{
        </property>
        <item>
         <widget class="QWidget" name="requiredChn" native="true">
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <property name="spacing">
            <number>0</number>
@@ -398,6 +399,9 @@ color: rgba(255,255,255,50);
        </item>
        <item>
         <widget class="QWidget" name="optionalChn" native="true">
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
          <layout class="QHBoxLayout" name="horizontalLayout">
           <property name="spacing">
            <number>0</number>

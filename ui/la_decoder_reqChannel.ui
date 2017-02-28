@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -20,44 +20,7 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">
-QComboBox
-{
-  height: 19px;
-  border: 0px;
-  border-bottom: 1px solid rgba(255, 255, 255, 102);
-  font-family: ArialMT;
-  font-size: 16px;
-  font-weight: normal;
-  font-style: normal;
-  text-align: right;
-  color: #ffffff;
-
-}
-QComboBox::drop-down
-{
-  subcontrol-position: center right;
-  width: 10px;
-  height: 6px;
-  border-image: url(:/icons/sba_cmb_box_arrow.svg);
-  font-family: ArialMT;
-  font-size: 16px;
-  font-weight: normal;
-  font-style: normal;
-  text-align: right;
-  color: #e0e0e0;
-}
-QComboBox QAbstractItemView {
-  border: 0px;
-  selection-background-color: rgba(25, 25, 25);
-  outline: 0px;
-}
-QComboBox:disabled
-{
-  color: rgb(85, 85, 85);
-}
-
-/* Color of the selected list item. */
+   <string notr="true">/* Color of the selected list item. */
 QComboBox::item:selected {
   font-family: ArialMT;
   font-size: 16px;
@@ -76,45 +39,16 @@ QComboBox::indicator{
     selection-color:transparent;
 }
 
-QLabel
-{  
-  font-family: ArialMT;
-  font-size: 16px;
-  font-weight: normal;
-  font-style: normal;
-  text-align: left;
-  color: #ffffff;
-  margin:0px;
-  padding:0px;
-}
-
-/*QLabel:disabled
-{
-	color:rgb(85,85,85);
-} */
-
-QComboBox {
-  height: 20px;
-  color: rgba(255, 255, 255, 102);
-  border: 0px;
-  font-size: 12px;
-}
-QComboBox QAbstractItemView {
-  border: 0px;
-  color: rgba(255, 255, 255, 102);
-}
-QComboBox::drop-down {
-  subcontrol-position: center right;
-  width: 10px;
-  height: 6px;
-  border-image: url(:/icons/sba_cmb_box_arrow.svg);
-}
-
 QLabel {
-   color: white;
-   font-size: 14px;
-	border:0px;
+width: 68.2px;
+height: 16.46px;
+opacity: 0.6;
+font-family: Arial;
+font-size: 14px;
+line-height: 16px;
+color: #FFFFFF;
 }
+
 
 </string>
   </property>
@@ -167,7 +101,7 @@ QLabel {
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="channelGroup">
          <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -186,22 +120,6 @@ QLabel {
           <property name="bottomMargin">
            <number>0</number>
           </property>
-          <item>
-           <spacer name="horizontalSpacer_3">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Fixed</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>10</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
           <item>
            <widget class="QLabel" name="labelRole">
             <property name="sizePolicy">

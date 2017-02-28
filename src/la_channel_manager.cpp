@@ -12,6 +12,7 @@
 #include "ui_la_manager_header.h"
 #include "ui_la_settings.h"
 #include "ui_la_decoder_reqChannel.h"
+#include "ui_logic_channel_settings.h"
 #include <QScrollBar>
 #include <libsigrokcxx/libsigrokcxx.hpp>
 #include <QPainter>
@@ -1707,6 +1708,9 @@ void LogicAnalyzerChannelManagerUI::rolesChangedRHS(const QString text)
 void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 {
 	settingsUI = new Ui::LASettingsWidget;
+	Ui::LChannelSettings *generalSettingsUi = new Ui::LChannelSettings;
+	QWidget* generalSettings = new QWidget(locationSettingsWidget);
+	generalSettingsUi->setupUi(generalSettings);
 	settingsUI->setupUi(locationSettingsWidget);
 	currentSettingsWidget = new QWidget(locationSettingsWidget);
 	settingsUI->setupUi(currentSettingsWidget);
@@ -1720,13 +1724,16 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 	if (chm->getHighlightedChannelGroup()) {
 		LogicAnalyzerChannelGroup *chGroup = chm->getHighlightedChannelGroup();
 		settingsUI->nameLineEdit->setText(QString::fromStdString(chGroup->get_label()));
-		connect(settingsUI->nameLineEdit, &QLineEdit::editingFinished,
+		generalSettingsUi->nameLineEdit->setText(QString::fromStdString(chGroup->get_label()));
+		connect(generalSettingsUi->nameLineEdit, &QLineEdit::editingFinished,
 			[=]() {
-				QString text = settingsUI->nameLineEdit->text();
+				QString text = generalSettingsUi->nameLineEdit->text();
 				getUiFromChGroup(chm->getHighlightedChannelGroup())->
 					ui->groupName->setText(text);
 				set_label(text);
 			});
+		settingsUI->scrollAreaWidgetLayout->insertWidget(
+			settingsUI->scrollAreaWidgetLayout->count()-1, generalSettings);
 
 		if (chGroup->is_grouped()) {
 			const srd_decoder *decoder = chGroup->getDecoder();
@@ -1771,7 +1778,7 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 				reqChUI->roleCombo->setProperty("id", QVariant(rqch->id));
 				reqChUI->roleCombo->setProperty("name", QVariant(rqch->name));
 				settingsUI->scrollAreaWidgetLayout->insertWidget(
-					settingsUI->scrollAreaWidgetLayout->count() - 2, r);
+					settingsUI->scrollAreaWidgetLayout->count() - 3, r);
 
 				connect(reqChUI->roleCombo,
 				        SIGNAL(currentIndexChanged(const QString&)),
@@ -1814,7 +1821,7 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 				optChUI->roleCombo->setProperty("id", QVariant(optch->id));
 				optChUI->roleCombo->setProperty("name", QVariant(optch->name));
 				settingsUI->scrollAreaWidgetLayout->insertWidget(
-					settingsUI->scrollAreaWidgetLayout->count() - 1, r);
+					settingsUI->scrollAreaWidgetLayout->count() - 2, r);
 
 				connect(optChUI->roleCombo,
 				        SIGNAL(currentIndexChanged(const QString&)),
@@ -1826,7 +1833,6 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 			settingsUI->requiredChn->hide();
 			settingsUI->optionalChn->hide();
 		}
-
 	}
 
 	if (chm->getHighlightedChannel()) {
@@ -1834,13 +1840,17 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 		settingsUI->optionalChn->hide();
 		LogicAnalyzerChannel *ch = chm->getHighlightedChannel();
 		settingsUI->nameLineEdit->setText(QString::fromStdString(ch->get_label()));
-		connect(settingsUI->nameLineEdit, &QLineEdit::editingFinished,
+		generalSettingsUi->nameLineEdit->setText(QString::fromStdString(ch->get_label()));
+		connect(generalSettingsUi->nameLineEdit, &QLineEdit::editingFinished,
 			[=]() {
-			QString text = settingsUI->nameLineEdit->text();
+			QString text = generalSettingsUi->nameLineEdit->text();
 			getUiFromCh(chm->getHighlightedChannel())->
 				ui->groupName->setText(text);
 			set_label(text);
 		});
+
+		settingsUI->scrollAreaWidgetLayout->insertWidget(
+			settingsUI->scrollAreaWidgetLayout->count()-1, generalSettings);
 
 		QWidget *r = new QWidget(currentSettingsWidget);
 		Ui::LARequiredChannel *roleChUI = new Ui::LARequiredChannel();
@@ -1856,7 +1866,7 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 		roleChUI->stackedWidget->setCurrentIndex(1);
 
 		settingsUI->scrollAreaWidgetLayout->insertWidget(
-			settingsUI->scrollAreaWidgetLayout->count() - 1, r);
+			settingsUI->scrollAreaWidgetLayout->count() - 2, r);
 	}
 
 	locationSettingsWidget->setVisible(true);

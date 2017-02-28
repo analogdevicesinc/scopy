@@ -115,12 +115,12 @@ void BinaryStream::run()
 	ssize_t nbytes_rx;
 	while (!interrupt_)
 	{
+		la->set_triggered_status("awaiting");
 		nbytes_rx = iio_buffer_refill(data_);
-
+		la->set_triggered_status("running");
 		nrx += nbytes_rx / 2;
 		if( nbytes_rx > 0 )
 			input_->send(iio_buffer_start(data_), (size_t)(nbytes_rx));
-		la->set_triggered_status(true);
 		if( single_ && running ) {
 			interrupt_ = true;
 			stop();
@@ -161,6 +161,7 @@ void BinaryStream::shutdown() {
 
 void BinaryStream::stop()
 {
+	la->set_triggered_status("stopped");
 	running = false;
 	interrupt_ = true;
 	single_ = false;
