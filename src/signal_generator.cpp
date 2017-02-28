@@ -407,14 +407,17 @@ void SignalGenerator::updatePreview()
 {
 	gr::top_block_sptr top = make_top_block("Signal Generator Update");
 	unsigned int i = 0;
+	bool enabled = false;
 
 	for (auto it = channels.begin(); it != channels.end(); ++it) {
 		basic_block_sptr source;
 
-		if ((*it)->second.box->isChecked())
+		if ((*it)->second.box->isChecked()) {
 			source = getSource(&(*it)->first, sample_rate, top);
-		else
+			enabled = true;
+		} else {
 			source = blocks::nop::make(sizeof(float));
+		}
 
 		auto head = blocks::head::make(sizeof(float), NB_POINTS);
 		top->connect(source, 0, head, 0);
@@ -424,6 +427,15 @@ void SignalGenerator::updatePreview()
 
 	top->run();
 	top->disconnect_all();
+
+	if (ui->run_button->isChecked()) {
+		if (enabled) {
+			stop();
+			start();
+		} else {
+			ui->run_button->setChecked(false);
+		}
+	}
 }
 
 void SignalGenerator::loadFile()
@@ -557,8 +569,6 @@ void SignalGenerator::stop()
 
 void SignalGenerator::startStop(bool pressed)
 {
-	ui->config_panel->setDisabled(pressed);
-
 	if (pressed)
 		start();
 	else
