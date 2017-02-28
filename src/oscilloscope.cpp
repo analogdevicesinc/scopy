@@ -2214,3 +2214,28 @@ void Oscilloscope_API::setLineThickness(const QList<double>& list)
 	for (i = 0; i < osc->nb_channels + osc->nb_math_channels; i++)
 		osc->plot.setLineWidthF(i, list.at(i));
 }
+
+QList<bool> Oscilloscope_API::channelEn() const
+{
+	QList<bool> list;
+	unsigned int i;
+
+	for (i = 0; i < osc->nb_channels + osc->nb_math_channels; i++) {
+		QWidget *w = osc->channelWidgetAtId(i);
+		QCheckBox *box = w->findChild<QCheckBox *>("box");
+		list.append(box->isChecked());
+	}
+
+	return list;
+}
+
+void Oscilloscope_API::setChannelEn(const QList<bool>& list)
+{
+	unsigned int i;
+
+	for (i = 0; i < osc->nb_channels + osc->nb_math_channels; i++) {
+		QWidget *w = osc->channelWidgetAtId(i);
+		QCheckBox *box = w->findChild<QCheckBox *>("box");
+		box->setChecked(list.at(i));
+	}
+}

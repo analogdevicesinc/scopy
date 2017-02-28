@@ -313,6 +313,9 @@ namespace adiscope {
 		Q_PROPERTY(QList<double> line_thickness
 				READ getLineThickness WRITE setLineThickness);
 
+		Q_PROPERTY(QList<bool> channel_en
+				READ channelEn WRITE setChannelEn);
+
 	public:
 		explicit Oscilloscope_API(Oscilloscope *osc) :
 			ApiObject(TOOL_OSCILLOSCOPE), osc(osc) {}
@@ -374,6 +377,9 @@ namespace adiscope {
 
 		QList<double> getLineThickness() const;
 		void setLineThickness(const QList<double>& list);
+
+		QList<bool> channelEn() const;
+		void setChannelEn(const QList<bool>& list);
 
 	private:
 		Oscilloscope *osc;
