@@ -1531,6 +1531,9 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 				connect(lachannelgroupUI->ui->comboBox,
 				        SIGNAL(currentIndexChanged(int)),
 				        lachannelgroupUI, SLOT(triggerChanged(int)));
+				connect(lachannelgroupUI->ui->comboBox,
+				        SIGNAL(currentIndexChanged(int)),
+				        la, SLOT(triggerChanged(int)));
 
 			}
 		}

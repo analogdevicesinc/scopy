@@ -276,7 +276,7 @@ background-color: rgb(73, 99, 255);
 }</string>
        </property>
        <property name="text">
-        <string>ADDITIONAL TRIGGERS</string>
+        <string>EXTERNAL TRIGGER</string>
        </property>
       </widget>
      </item>

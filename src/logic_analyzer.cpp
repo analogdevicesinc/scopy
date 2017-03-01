@@ -49,7 +49,6 @@
 /* Generated UI */
 #include "ui_logic_analyzer.h"
 #include "ui_logic_channel_settings.h"
-#include "ui_trigger.h"
 #include "ui_digital_trigger_settings.h"
 
 /* Boost includes */
@@ -221,14 +220,10 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	ui->btnChSettings->setProperty("id", QVariant(-ch_settings_panel));
 
 	/* Trigger Settings */
-	QWidget *trig_widget = new QWidget(this);
-	Ui::Trigger trig_ui;
-	trig_ui.setupUi(trig_widget);
-	ui->trigger_settings->addWidget(trig_widget);
-	triggerBtn = trig_ui.btn;
+	triggerBtn = ui->btnTrigger;
 	settings_group->addButton(triggerBtn);
 	int trigger_panel = ui->stackedWidget->indexOf(ui->triggerSettings);
-	trig_ui.btn->setProperty("id", QVariant(-trigger_panel));
+	ui->btnTrigger->setProperty("id", QVariant(-trigger_panel));
 
 	trigger_settings_ui = new Ui::DigitalTriggerSettings;
 	trigger_settings_ui->setupUi(trigger_settings);
@@ -245,7 +240,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 		this, SLOT(setupTriggerSettingsUI(bool)));
 	connect(trigger_settings_ui->cmb_trigg_logic, SIGNAL(currentTextChanged(const QString)),
 		this, SLOT(setHWTriggerLogic(const QString)));
-	connect(trig_ui.btn, SIGNAL(pressed()),
+	connect(ui->btnTrigger, SIGNAL(pressed()),
 		this, SLOT(toggleRightMenu()));
 	connect(ui->btnRunStop, SIGNAL(toggled(bool)),
 	        this, SLOT(startStop(bool)));
@@ -764,6 +759,12 @@ void LogicAnalyzer::setupTriggerSettingsUI(bool enabled)
 		setHWTrigger(16, trigger_mapping[0]);
 		setHWTrigger(17, trigger_mapping[0]);
 	}
+	else {
+		for(int i = 0; i < get_no_channels(dev) + 2; i++) {
+			setHWTrigger(i, trigger_mapping[0]);
+		}
+		chm_ui->update_ui();
+	}
 }
 
 void LogicAnalyzer::setExternalTrigger(int index)
@@ -778,6 +779,13 @@ void LogicAnalyzer::setExternalTrigger(int index)
 	if( ext_2 == index ) {
 		trigger_val = trigger_mapping[ext_2];
 		setHWTrigger(17, trigger_val);
+	}
+}
+
+void LogicAnalyzer::triggerChanged(int index)
+{
+	if(index != 0 && trigger_settings_ui->trigg_extern_en->isChecked() ) {
+		trigger_settings_ui->trigg_extern_en->setChecked(false);
 	}
 }
 
