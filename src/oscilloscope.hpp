@@ -317,6 +317,9 @@ namespace adiscope {
 		Q_PROPERTY(QList<bool> channel_en
 				READ channelEn WRITE setChannelEn);
 
+		Q_PROPERTY(int current_channel READ getCurrentChannel
+				WRITE setCurrentChannel)
+
 	public:
 		explicit Oscilloscope_API(Oscilloscope *osc) :
 			ApiObject(TOOL_OSCILLOSCOPE), osc(osc) {}
@@ -384,6 +387,9 @@ namespace adiscope {
 
 		QList<bool> channelEn() const;
 		void setChannelEn(const QList<bool>& list);
+
+		int getCurrentChannel() const;
+		void setCurrentChannel(int chn_id);
 
 	private:
 		Oscilloscope *osc;

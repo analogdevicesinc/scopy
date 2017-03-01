@@ -2182,7 +2182,7 @@ void Oscilloscope_API::setStatisticEn(const QList<int>& list)
 	}
 
 	osc->measure_settings->loadStatisticStatesForChannel(
-		osc->selectedChannel);
+		osc->current_channel);
 	osc->onStatisticSelectionListChanged();
 }
 
@@ -2238,4 +2238,19 @@ void Oscilloscope_API::setChannelEn(const QList<bool>& list)
 		QCheckBox *box = w->findChild<QCheckBox *>("box");
 		box->setChecked(list.at(i));
 	}
+}
+
+int Oscilloscope_API::getCurrentChannel() const
+{
+	return osc->current_channel;
+}
+
+void Oscilloscope_API::setCurrentChannel(int chn_id)
+{
+	QWidget *chn_widget = osc->channelWidgetAtId(chn_id);
+	if (!chn_widget)
+		return;
+
+	QPushButton *name = chn_widget->findChild<QPushButton *>("name");
+	name->setChecked(true);
 }
