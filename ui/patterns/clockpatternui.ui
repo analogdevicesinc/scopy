@@ -7,44 +7,32 @@
     <x>0</x>
     <y>0</y>
     <width>253</width>
-    <height>407</height>
+    <height>138</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="4" column="1">
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>Phase</string>
-     </property>
-    </widget>
-   </item>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <property name="horizontalSpacing">
+    <number>0</number>
+   </property>
    <item row="2" column="1">
     <widget class="QLabel" name="label_2">
      <property name="text">
       <string>Duty</string>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="1">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="1" column="1">
-    <widget class="QLineEdit" name="frequency_LE">
-     <property name="text">
-      <string>50</string>
      </property>
     </widget>
    </item>
@@ -62,10 +50,27 @@
      </property>
     </widget>
    </item>
+   <item row="4" column="1">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Phase</string>
+     </property>
+    </widget>
+   </item>
    <item row="5" column="1">
     <widget class="QLineEdit" name="phase_LE">
      <property name="text">
       <string>0</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QLineEdit" name="frequency_LE">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="text">
+      <string>50</string>
      </property>
     </widget>
    </item>
