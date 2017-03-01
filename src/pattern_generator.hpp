@@ -41,6 +41,8 @@
 // Generated UI
 #include "ui_pattern_generator.h"
 #include "ui_pg_settings.h"
+#include "ui_pg_cg_settings.h"
+
 
 extern "C" {
 	struct iio_context;
@@ -88,37 +90,27 @@ public:
 	                          QPushButton *runButton, QJSEngine *engine,
 	                          QWidget *parent = 0, bool offline_mode = 0);
 	~PatternGenerator();
+	void updateCGSettings();
 
 
 private Q_SLOTS:
 
 	void generatePattern();
-//  void onChannelEnabledChanged();
-//  void onChannelSelectedChanged();
 	void startStop(bool start);
 	void singleRun();
 	void singleRunStop();
 	void toggleRightMenu();
-//  void update_ui();
-//  void on_sampleRateCombo_activated(const QString &arg1);
-//  void on_generatePattern_clicked();
-//  void on_clearButton_clicked();
-//  void on_generateUI_clicked();
 
-//  void on_save_PB_clicked();
-//  void on_load_PB_clicked();
-//  void createRightPatternWidget(PatternUI* patternui);
-
-//  void rightMenuFinished(bool opened);
 	void on_btnHideInactive_clicked();
 	void on_btnGroupWithSelected_clicked();
-	void on_btnExtendChannelManager_clicked();
 
 private:
 
 	// UI
 	Ui::PatternGenerator *ui;
 	Ui::PGSettings *pgSettings;
+	Ui::PGCGSettings *cgSettings;
+
 	QButtonGroup *settings_group;
 	QPushButton *menuRunButton;
 
@@ -173,6 +165,14 @@ private:
 
 	void fromString(QString);
 	void jsonToChm(QJsonObject obj);
+	void deleteSettingsWidget();
+	void createSettingsWidget();
+
+private Q_SLOTS:
+	void patternChanged(int index);
+	void changeName(QString name);
+	void pushButtonLeft();
+	void pushButtonRight();
 };
 
 class PatternGenerator_API : public ApiObject

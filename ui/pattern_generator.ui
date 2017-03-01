@@ -802,7 +802,7 @@ QPushButton:checked:hover {
                 <property name="styleSheet">
                  <string notr="true">QPushButton
 {
-  width: 240px;
+  width: 175px;
   height: 30px;
   border-radius: 4px;
   background-color: #4a64ff;
@@ -840,7 +840,7 @@ QPushButton:hover
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
-                  <width>20</width>
+                  <width>35</width>
                   <height>20</height>
                  </size>
                 </property>
@@ -850,7 +850,7 @@ QPushButton:hover
                <widget class="QPushButton" name="btnGroupWithSelected">
                 <property name="styleSheet">
                  <string notr="true">QPushButton{
-  width: 240px;
+  width: 175px;
   height: 30px;
   border-radius: 4px;
   background-color: #4a64ff;
@@ -870,66 +870,6 @@ QPushButton:hover
                 </property>
                 <property name="text">
                  <string>Group with selected</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <spacer name="horizontalSpacer_6">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeType">
-                 <enum>QSizePolicy::Preferred</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>80</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item>
-               <widget class="QPushButton" name="btnExtendChannelManager">
-                <property name="styleSheet">
-                 <string notr="true">QPushButton{
-  width: 40px;
-  height: 30px;
-  border-radius: 4px;
-  background-color: #4a64ff;
-  font-family: ArialMT;
-  font-size: 14px;
-  font-weight: normal;
-  font-style: normal;
-  text-align: center;
-
-}
-
-QPushButton:checked {
-  background-image: url(:/icons/ico-expand.svg);
-  background-repeat: none;
-  background-position:center;
-}
-
-QPushButton:!checked {
-  background-image: url(:/icons/ico-collapse.svg);
-  background-repeat: none;
-  background-position:center;
-}
-
-QPushButton:hover
-{
-	 background-color: #4a34ff;
-}</string>
-                </property>
-                <property name="text">
-                 <string/>
-                </property>
-                <property name="checkable">
-                 <bool>true</bool>
-                </property>
-                <property name="checked">
-                 <bool>false</bool>
                 </property>
                </widget>
               </item>
@@ -1361,12 +1301,10 @@ QPushButton:hover
             <string notr="true"/>
            </property>
            <property name="currentIndex">
-            <number>0</number>
+            <number>1</number>
            </property>
            <widget class="QWidget" name="pgSettings"/>
-           <widget class="QWidget" name="cgSettings">
-            <layout class="QVBoxLayout" name="verticalLayout_3"/>
-           </widget>
+           <widget class="QWidget" name="cgSettings"/>
           </widget>
          </item>
         </layout>

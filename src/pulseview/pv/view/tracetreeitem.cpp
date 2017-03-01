@@ -144,6 +144,11 @@ void TraceTreeItem::set_bgcolour_state(bool state)
        bgcolour_state_ = state;
 }
 
+bool TraceTreeItem::get_highlight()
+{
+	return highlight_;
+}
+
 void TraceTreeItem::set_highlight(bool check)
 {
 	highlight_ = check;

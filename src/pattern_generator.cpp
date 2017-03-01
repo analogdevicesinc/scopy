@@ -108,6 +108,7 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 	settings_group(new QButtonGroup(this)), menuRunButton(runBtn),
 	ui(new Ui::PatternGenerator),
 	pgSettings(new Ui::PGSettings),
+	cgSettings(new Ui::PGCGSettings),
 	txbuf(0), buffer_created(0), currentUI(nullptr), offline_mode(offline_mode),
 	pg_api(new PatternGenerator_API(this))
 {
@@ -129,6 +130,20 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 	PatternFactory::init();
 
 	pgSettings->setupUi(ui->pgSettings);
+	cgSettings->setupUi(ui->cgSettings);
+
+	auto i=0;
+
+	for (auto var : PatternFactory::get_ui_list()) {
+		cgSettings->CBPattern->addItem(var);
+		cgSettings->CBPattern->setItemData(i,
+		                                   (PatternFactory::get_description_list())[i],Qt::ToolTipRole);
+		i++;
+	}
+
+
+
+
 	connect(ui->btnChSettings, SIGNAL(pressed()), this, SLOT(toggleRightMenu()));
 	connect(ui->btnPGSettings, SIGNAL(pressed()), this, SLOT(toggleRightMenu()));
 	bufman = new PatternGeneratorBufferManager(&chm);
@@ -137,12 +152,19 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 	                ui->pgSettings,this);
 	main_win = bufui->getPVWindow();
 	chmui = new PatternGeneratorChannelManagerUI(ui->channelManagerWidget, main_win,
-	                &chm,ui->cgSettings,this);
+	                &chm, cgSettings, this);
 
 	ui->channelManagerWidgetLayout->addWidget(chmui);
 	chmui->updateUi();
 	chmui->setVisible(true);
 	ui->rightWidget->setCurrentIndex(1);
+
+	connect(cgSettings->CBPattern,SIGNAL(currentIndexChanged(int)),this,
+	        SLOT(patternChanged(int)));
+	connect(cgSettings->LECHLabel,SIGNAL(textEdited(QString)),this,
+	        SLOT(changeName(QString)));
+	connect(cgSettings->PBLeft,SIGNAL(pressed()),this,SLOT(pushButtonLeft()));
+	connect(cgSettings->PBRight,SIGNAL(pressed()),this,SLOT(pushButtonRight()));
 
 	connect(chmui,SIGNAL(channelsChanged()),bufui,SLOT(updateUi()));
 	connect(ui->btnRunStop, SIGNAL(toggled(bool)), this, SLOT(startStop(bool)));
@@ -238,7 +260,124 @@ void PatternGenerator::toggleRightMenu(QPushButton *btn)
 	}
 }
 
+void PatternGenerator::updateCGSettings()
+{
+	auto chg = chm.getHighlightedChannelGroup();
+	auto ch = chm.getHighlightedChannel();
 
+	QString title;
+	QString name;
+
+	if (ch==nullptr) {
+		name = QString::fromStdString(chg->get_label());
+		title = name;
+
+	} else {
+		name = QString::fromStdString(ch->get_label());
+		auto id = QString::number(ch->get_id());
+		title = "Channel " + id;
+	}
+
+	auto pattern = QString::fromStdString(chg->pattern->get_name());
+
+	cgSettings->LTitle->setText(title);
+	cgSettings->CBPattern->setCurrentText(pattern);
+	cgSettings->LECHLabel->setText(name);
+	cgSettings->LPattern->setText(pattern);
+	deleteSettingsWidget();
+	createSettingsWidget();
+}
+
+void PatternGenerator::patternChanged(int index)
+{
+	auto chg = chm.getHighlightedChannelGroup();
+	chg->pattern->deinit();
+	delete chg->pattern;
+	chg->created_index=index;
+	chg->pattern = PatternFactory::create(index);
+
+	deleteSettingsWidget();
+	createSettingsWidget();
+	bufui->updateUi();
+}
+
+void PatternGenerator::deleteSettingsWidget()
+{
+	if (currentUI!=nullptr) {
+		currentUI->setVisible(false);
+		currentUI->destroy_ui();
+		delete currentUI;
+		currentUI = nullptr;
+	}
+}
+
+void PatternGenerator::createSettingsWidget()
+{
+	auto chg = chm.getHighlightedChannelGroup();
+	cgSettings->LPattern->setText(QString::fromStdString(
+	                                      chg->pattern->get_name()).toUpper());
+	currentUI = PatternFactory::create_ui(
+	                    chg->pattern,
+	                    chg->created_index);
+	currentUI->build_ui(cgSettings->patternSettings);
+	currentUI->get_pattern()->init();
+	currentUI->post_load_ui();
+	currentUI->setVisible(true);
+
+	connect(currentUI,SIGNAL(patternChanged()),bufui,SLOT(updateUi()));
+}
+
+void PatternGenerator::changeName(QString name)
+{
+	auto chg = chm.getHighlightedChannelGroup();
+	auto ch = chm.getHighlightedChannel();
+
+	auto chgui = chmui->findUiByChannelGroup(chg);
+	auto chui = chmui->findUiByChannel(ch);
+
+	if (ch==nullptr) {
+		chg->set_label(name.toStdString());
+		chgui->ui->ChannelGroupLabel->setText(name);
+	} else {
+		ch->set_label(name.toStdString());
+		chui->ui->ChannelGroupLabel->setText(name);
+	}
+
+	updateCGSettings();
+}
+
+void PatternGenerator::pushButtonLeft()
+{
+
+	auto chg = chm.getHighlightedChannelGroup();
+	auto iter = std::find(chm.get_channel_groups()->begin(),
+	                      chm.get_channel_groups()->end(),chg);
+
+	if (iter!=chm.get_channel_groups()->begin()) {
+		iter--;
+	}
+
+	/*if(newHighlight<chm.get_channel_group_count())
+		newHighlight++;*/
+	chmui->showHighlight(false);
+	chmui->highlightChannel(static_cast<PatternGeneratorChannelGroup *>(*iter));
+	chmui->showHighlight(true);
+}
+
+void PatternGenerator::pushButtonRight()
+{
+	auto chg = chm.getHighlightedChannelGroup();
+	auto iter = std::find(chm.get_channel_groups()->begin(),
+	                      chm.get_channel_groups()->end(),chg);
+
+	if (iter+1!=chm.get_channel_groups()->end()) {
+		iter++;
+	}
+
+	chmui->showHighlight(false);
+	chmui->highlightChannel(static_cast<PatternGeneratorChannelGroup *>(*iter));
+	chmui->showHighlight(true);
+}
 
 
 
@@ -412,21 +551,6 @@ void PatternGenerator::on_btnGroupWithSelected_clicked()
 	chmui->updateUi();
 }
 
-void PatternGenerator::on_btnExtendChannelManager_clicked()
-{
-	if (chmui->areDetailsShown()) {
-		chmui->hideDetails();
-		ui->btnGroupWithSelected->setVisible(false);
-		chmui->updateUi();
-		//  ui->channelManagerWidget->toggleMenu(true);
-	} else {
-		chmui->showDetails();
-		ui->btnGroupWithSelected->setVisible(true);
-		chmui->updateUi();
-		//  ui->channelManagerWidget->toggleMenu(true);
-	}
-}
-
 QJsonValue PatternGenerator::chmToJson()
 {
 	QJsonObject obj;
@@ -475,15 +599,21 @@ void PatternGenerator::jsonToChm(QJsonObject obj)
 		pgchg->enable(chg["enabled"].toBool());
 		pgchg->collapse(chg["collapsed"].toBool());
 		QJsonArray chArray = chg["channels"].toArray();
+		int i=0;
 
 		for (auto chRef : chArray) {
 			auto ch = chRef.toObject();
 			int chIndex = ch["id"].toInt();
+			QString chLabel = ch["label"].toString();
 			pgchg->add_channel(chm.get_channel(chIndex));
+			pgchg->get_channel(i)->set_label(chLabel.toStdString());
+			i++;
 		}
 
 		chm.add_channel_group(pgchg);
 	}
+
+	chm.highlightChannel(chm.get_channel_group(0));
 }
 
 QString PatternGenerator::toString()
@@ -513,7 +643,6 @@ void PatternGenerator::fromString(QString val)
 	}
 
 	jsonToChm(obj);
-	chmui->showHighlight(false);
 	chmui->updateUi();
 
 }

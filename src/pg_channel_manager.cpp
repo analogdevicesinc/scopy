@@ -92,8 +92,6 @@ void PatternGeneratorChannelUI::enableControls(bool val)
 	ui->ChannelGroupLabel->setEnabled(val);
 }
 
-
-
 void PatternGeneratorChannelUI::mousePressEvent(QMouseEvent *event)
 {
 	if (event->button() == Qt::LeftButton) {
@@ -101,18 +99,14 @@ void PatternGeneratorChannelUI::mousePressEvent(QMouseEvent *event)
 	}
 
 	getManagerUi()->showHighlight(false);
-	getManagerUi()->chm->highlightChannel(this->chgui->getChannelGroup(),
-	                                      this->getChannel());
+	getManagerUi()->highlightChannel(this->chgui->getChannelGroup(),
+	                                 this->getChannel());
 	getManagerUi()->showHighlight(true);
 }
 
 void PatternGeneratorChannelUI::highlight(bool val)
 {
 	setDynamicProperty(ui->widget_2,"highlighted",val);
-
-	if (trace) {
-		trace->set_highlight(val);
-	}
 }
 
 void PatternGeneratorChannelUI::highlightTopSeparator()
@@ -319,9 +313,17 @@ void PatternGeneratorChannelUI::updateTrace()
 		setTrace(trace1);
 	}
 
+	bool highlighted = (getManagerUi()->findUiByChannel(
+	                            getManagerUi()->chm->getHighlightedChannel()) == this);
+
+	if (highlighted != trace->get_highlight()) {
+		trace->set_highlight(highlighted);
+	}
+
 	auto height = geometry().height();
 	auto v_offset = topSep->geometry().bottomRight().y() + 3 + height -
 	                (trace->v_extents().second) + chgui->getTraceOffset()+3;//chgOffset.y();
+
 
 	if (traceOffset!=v_offset || traceHeight!=height) {
 		traceHeight = height;
@@ -424,19 +426,6 @@ PatternGeneratorChannelGroupUI::~PatternGeneratorChannelGroupUI()
 PatternGeneratorChannelGroup *PatternGeneratorChannelGroupUI::getChannelGroup()
 {
 	return static_cast<PatternGeneratorChannelGroup *>(this->chg);
-}
-
-void PatternGeneratorChannelGroupUI::patternChanged(int index)
-{
-	getChannelGroup()->pattern->deinit();
-	delete getChannelGroup()->pattern;
-	getChannelGroup()->created_index=index;
-	getChannelGroup()->pattern = PatternFactory::create(index);
-
-	if (getChannelGroup()==getManagerUi()->chm->getHighlightedChannelGroup()) {
-		getManagerUi()->deleteSettingsWidget();
-		getManagerUi()->createSettingsWidget();
-	}
 }
 
 void PatternGeneratorChannelGroupUI::select(bool selected)
@@ -559,7 +548,7 @@ void PatternGeneratorChannelGroupUI::mousePressEvent(QMouseEvent *event)
 	}
 
 	getManagerUi()->showHighlight(false);
-	getManagerUi()->chm->highlightChannel(this->getChannelGroup());
+	getManagerUi()->highlightChannel(this->getChannelGroup());
 	getManagerUi()->showHighlight(true);
 }
 
@@ -578,10 +567,6 @@ void PatternGeneratorChannelGroupUI::leaveEvent(QEvent *event)
 void PatternGeneratorChannelGroupUI::highlight(bool val)
 {
 	setDynamicProperty(ui->widget_2,"highlighted",val);
-
-	if (trace) {
-		trace->set_highlight(val);
-	}
 }
 
 void PatternGeneratorChannelGroupUI::highlightTopSeparator()
@@ -762,6 +747,16 @@ void PatternGeneratorChannelGroupUI::updateTrace()
 	auto chgOffset =  geometry().top()+ui->widget_2->geometry().bottom() + 3;
 	auto height = ui->widget_2->geometry().height();
 	auto v_offset = chgOffset - trace->v_extents().second;
+
+	bool highlighted = (getManagerUi()->findUiByChannelGroup(
+	                            getManagerUi()->chm->getHighlightedChannelGroup()) == this) ;
+
+	highlighted &= getManagerUi()->chm->getHighlightedChannel() == nullptr;
+
+	if (highlighted != trace->get_highlight()) {
+		trace->set_highlight(highlighted);
+	}
+
 
 	if (traceOffset!=v_offset || traceHeight!=height) {
 		traceHeight = height;
@@ -1004,6 +999,8 @@ void PatternGeneratorChannelManager::highlightChannel(
 {
 	highlightedChannel = ch;
 	highlightedChannelGroup = chg;
+
+
 }
 
 PatternGeneratorChannelGroup
@@ -1160,17 +1157,15 @@ QWidget *PatternGeneratorChannelManagerUI::getSettingsWidget() const
 
 PatternGeneratorChannelManagerUI::PatternGeneratorChannelManagerUI(
         QWidget *parent, pv::MainWindow *main_win_, PatternGeneratorChannelManager *chm,
-        QWidget *settingsWidget, PatternGenerator *pg)  : QWidget(parent),
-	ui(new Ui::PGChannelManager), settingsWidget(settingsWidget),
+        Ui::PGCGSettings *cgSettings, PatternGenerator *pg)  : QWidget(parent),
+	ui(new Ui::PGChannelManager), cgSettings(cgSettings),
+	settingsWidget(cgSettings->patternSettings),
 	main_win(main_win_)
 {
 	ui->setupUi(this);
 	this->chm = chm;
 	this->pg = pg;
-	currentUI = nullptr;
 	disabledShown = true;
-	detailsShown = true;
-	highlightShown = true;
 	channelManagerHeaderWiget = nullptr;
 	hoverWidget = nullptr;
 	chm->highlightChannel(chm->get_channel_group(0));
@@ -1258,17 +1253,8 @@ void PatternGeneratorChannelManagerUI::updateUi()
 
 	setWidgetNrOfChars(chmHeader->labelName, channelGroupLabelMaxLength);
 	setWidgetNrOfChars(chmHeader->labelDIO, dioLabelMaxLength);
-	setWidgetNrOfChars(chmHeader->labelType, channelComboMaxLength);
-	setWidgetNrOfChars(chmHeader->labelOutput, outputComboMaxLength);
-
 	chmHeader->labelView->setMinimumWidth(40);
 	chmHeader->labelSelect->setMinimumWidth(40);
-
-	if (!detailsShown) {
-		chmHeader->wgHeaderEnableGroup->setVisible(false);
-		chmHeader->wgHeaderSettingsGroup->setVisible(false);
-		chmHeader->wgHeaderSelectionGroup->setVisible(false);
-	}
 
 	ui->scrollArea->setWidget(ui->scrollAreaWidgetContents);
 
@@ -1293,16 +1279,7 @@ void PatternGeneratorChannelManagerUI::updateUi()
 		currentChannelGroupUI->topSep = prevSep;
 
 		retainWidgetSizeWhenHidden(currentChannelGroupUI->ui->collapseBtn);
-
-		//   currentChannelGroupUI->ui->header->setVisible(false);
-		if (!detailsShown) {
-			currentChannelGroupUI->ui->wgChannelEnableGroup->setVisible(false);
-			currentChannelGroupUI->ui->wgChannelSelectionGroup->setVisible(false);
-			currentChannelGroupUI->ui->wgChannelSettingsGroup->setVisible(false);
-		} else {
-			retainWidgetSizeWhenHidden(currentChannelGroupUI->ui->splitBtn);
-		}
-
+		retainWidgetSizeWhenHidden(currentChannelGroupUI->ui->splitBtn);
 
 		setWidgetNrOfChars(currentChannelGroupUI->ui->ChannelGroupLabel,
 		                   channelGroupLabelMaxLength);
@@ -1315,38 +1292,18 @@ void PatternGeneratorChannelManagerUI::updateUi()
 		}
 
 		currentChannelGroupUI->ui->ChannelGroupLabel->setText(channelGroupLabel);
-
 		setWidgetNrOfChars(currentChannelGroupUI->ui->DioLabel, dioLabelMaxLength);
-		setWidgetNrOfChars(currentChannelGroupUI->ui->patternCombo,
-		                   channelComboMaxLength);
-		setWidgetNrOfChars(currentChannelGroupUI->ui->outputCombo,
-		                   outputComboMaxLength);
 
 		int i = 0;
 
-		for (auto var : PatternFactory::get_ui_list()) {
-			currentChannelGroupUI->ui->patternCombo->addItem(var);
-			currentChannelGroupUI->ui->patternCombo->setItemData(i,
-			                (PatternFactory::get_description_list())[i],Qt::ToolTipRole);
-			i++;
-		}
-
-		currentChannelGroupUI->ui->patternCombo->setCurrentIndex(
-		        static_cast<PatternGeneratorChannelGroup *>(ch)->created_index);
-
-//        connect(static_cast<PatternGeneratorChannelGroupUI*>(chg_ui.back()),SIGNAL(channel_selected()),pg,SLOT(onChannelSelectedChanged())); // TEMP
 		connect(static_cast<PatternGeneratorChannelGroupUI *>(chg_ui.back()),
 		        SIGNAL(channel_enabled()),this,SIGNAL(channelsChanged())); // TEMP
 		connect(currentChannelGroupUI->ui->selectBox,SIGNAL(toggled(bool)),
 		        static_cast<PatternGeneratorChannelGroupUI *>(chg_ui.back()),
 		        SLOT(select(bool)));
-		connect(currentChannelGroupUI->ui->patternCombo,
-		        SIGNAL(currentIndexChanged(int)),chg_ui.back(),SLOT(patternChanged(int)));
-		connect(currentChannelGroupUI->ui->patternCombo,
-		        SIGNAL(currentIndexChanged(int)),this,SIGNAL(channelsChanged())); // TEMP
 		connect(currentChannelGroupUI,SIGNAL(requestUpdateUi()),this,
 		        SLOT(triggerUpdateUi()));
-		//connect(currentChannelGroupUI->getChannelGroup()->pattern, SIGNAL(generate_pattern),pg,SLOT())
+
 
 		if (ch->is_grouped()) { // create subwidgets
 			currentChannelGroupUI->chUiSep = addSeparator(
@@ -1382,24 +1339,14 @@ void PatternGeneratorChannelManagerUI::updateUi()
 				prevSep =  currentChannelUI->botSep;
 
 				retainWidgetSizeWhenHidden(currentChannelUI->ui->collapseBtn);
-
-				if (!detailsShown) {
-					currentChannelUI->ui->wgChannelSelectionGroup->setVisible(false);
-				} else {
-					retainWidgetSizeWhenHidden(currentChannelUI->ui->wgChannelSettingsGroup);
-					retainWidgetSizeWhenHidden(currentChannelUI->ui->wgChannelEnableGroup);
-					retainWidgetSizeWhenHidden(currentChannelUI->ui->outputCombo);
-					retainWidgetSizeWhenHidden(currentChannelUI->ui->selectBox);
-				}
+				retainWidgetSizeWhenHidden(currentChannelUI->ui->wgChannelEnableGroup);
+				retainWidgetSizeWhenHidden(currentChannelUI->ui->selectBox);
 
 				setWidgetNrOfChars(currentChannelUI->ui->ChannelGroupLabel,
 				                   channelGroupLabelMaxLength);
 				setWidgetNrOfChars(currentChannelUI->ui->DioLabel, dioLabelMaxLength);
-				setWidgetNrOfChars(currentChannelUI->ui->patternCombo, channelComboMaxLength);
-				setWidgetNrOfChars(currentChannelUI->ui->outputCombo, outputComboMaxLength);
 
 				currentChannelUI->ui->wgChannelEnableGroup->setVisible(false);
-				currentChannelUI->ui->wgChannelSettingsGroup->setVisible(false);
 				currentChannelUI->ui->collapseBtn->setVisible(false);
 				currentChannelUI->ui->selectBox->setVisible(false);
 
@@ -1453,11 +1400,9 @@ void PatternGeneratorChannelManagerUI::updateUi()
 		        chg_ui.back(),SLOT(enable(bool)));
 	}
 
-//   ui->scrollAreaWidgetContents->updateGeometry();
 
-	if (highlightShown) {
-		showHighlight(true);
-	}
+	showHighlight(true);
+	pg->updateCGSettings();
 
 	Q_EMIT channelsChanged();
 
@@ -1492,27 +1437,12 @@ void PatternGeneratorChannelManagerUI::triggerUpdateUi()
 	updateUi();
 }
 
-void PatternGeneratorChannelManagerUI::deleteSettingsWidget()
+void PatternGeneratorChannelManagerUI::highlightChannel(
+        PatternGeneratorChannelGroup *chg,
+        PatternGeneratorChannel *ch)
 {
-	if (currentUI!=nullptr) {
-		currentUI->setVisible(false);
-		currentUI->destroy_ui();
-		delete currentUI;
-		currentUI = nullptr;
-	}
-}
-
-
-void PatternGeneratorChannelManagerUI::createSettingsWidget()
-{
-	currentUI = PatternFactory::create_ui(
-	                    chm->getHighlightedChannelGroup()->pattern,
-	                    chm->getHighlightedChannelGroup()->created_index);
-	currentUI->build_ui(settingsWidget);
-	currentUI->get_pattern()->init();
-	currentUI->post_load_ui();
-	currentUI->setVisible(true);
-	//connect(currentUI,SIGNAL(patternChanged()),this,SIGNAL(channelsChanged()));
+	chm->highlightChannel(chg,ch);
+	pg->updateCGSettings();
 }
 
 
@@ -1560,22 +1490,6 @@ void PatternGeneratorChannelManagerUI::hideDisabled()
 	disabledShown = false;
 }
 
-bool PatternGeneratorChannelManagerUI::areDetailsShown()
-{
-	return detailsShown;
-}
-
-void PatternGeneratorChannelManagerUI::showDetails()
-{
-	detailsShown = true;
-}
-
-void PatternGeneratorChannelManagerUI::hideDetails()
-{
-	detailsShown = false;
-}
-
-
 void PatternGeneratorChannelManagerUI::groupSplitSelected()
 {
 	std::vector<int> selection = chm->get_selected_indexes();
@@ -1611,9 +1525,9 @@ void PatternGeneratorChannelManagerUI::groupSplitSelected()
 	}
 
 	if (changeHighlight) {
-		deleteSettingsWidget();
+
 		chm->highlightChannel(chm->get_channel_group(selection[0]));
-		createSettingsWidget();
+		pg->updateCGSettings();
 	}
 
 	/*Q_EMIT channelsChanged();*/
@@ -1632,14 +1546,6 @@ void PatternGeneratorChannelManagerUI::showHighlight(bool val)
 
 	if (uiChg!=nullptr) {
 		uiChg->highlight(val);
-	}
-
-	if (val) {
-		deleteSettingsWidget();
-		createSettingsWidget();
-		highlightShown = true;
-	} else {
-		highlightShown = false;
 	}
 }
 
