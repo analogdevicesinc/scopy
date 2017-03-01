@@ -113,7 +113,6 @@ PatternGeneratorBufferManagerUi::PatternGeneratorBufferManagerUi(
 	settingsWidget->layout()->addWidget(static_cast<QWidget *>(main_bar));
 
 	createBinaryBuffer();
-	dataChanged();
 }
 
 void PatternGeneratorBufferManagerUi::updateUi()
@@ -121,9 +120,6 @@ void PatternGeneratorBufferManagerUi::updateUi()
 	bufman->update();
 	setSampleRate();
 	dataChanged();
-	//main_win->action_view_zoom_fit()->trigger();
-	bufman->getSampleRate();
-	bufman->getBufferSize();
 
 	auto scale = (1/(double)bufman->getSampleRate()) * bufman->getBufferSize() /
 	             (double)main_win->view_->divisionCount();

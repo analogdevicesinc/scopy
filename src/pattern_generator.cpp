@@ -155,8 +155,6 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 	                &chm, cgSettings, this);
 
 	ui->channelManagerWidgetLayout->addWidget(chmui);
-	chmui->updateUi();
-	chmui->setVisible(true);
 	ui->rightWidget->setCurrentIndex(1);
 
 	connect(cgSettings->CBPattern,SIGNAL(currentIndexChanged(int)),this,
@@ -171,7 +169,6 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 	connect(runBtn, SIGNAL(toggled(bool)), ui->btnRunStop, SLOT(setChecked(bool)));
 	connect(ui->btnRunStop, SIGNAL(toggled(bool)), runBtn, SLOT(setChecked(bool)));
 	connect(ui->btnSingleRun, SIGNAL(pressed()), this, SLOT(singleRun()));
-	bufui->updateUi();
 
 	QString path = QCoreApplication::applicationDirPath() + "/decoders";
 
@@ -181,15 +178,15 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 
 	qDebug()<<path;
 
+	/* Load the protocol decoders */
+	srd_decoder_load_all();
+
 	//main_win->view_->viewport()->disableDrag();
-	bufui->updateUi();
 
 	pg_api->load();
 	pg_api->js_register(engine);
 
-
-	/* Load the protocol decoders */
-	srd_decoder_load_all();
+	chmui->updateUi();
 }
 
 PatternGenerator::~PatternGenerator()
@@ -643,8 +640,6 @@ void PatternGenerator::fromString(QString val)
 	}
 
 	jsonToChm(obj);
-	chmui->updateUi();
-
 }
 
 QString PatternGenerator_API::chm() const
