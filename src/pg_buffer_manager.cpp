@@ -117,15 +117,8 @@ PatternGeneratorBufferManagerUi::PatternGeneratorBufferManagerUi(
 	main_win = w;
 
 	parent->layout()->addWidget(static_cast<QWidget * >(main_win));
-
 	/* setup toolbar */
-	pv::toolbars::MainBar *main_bar = main_win->main_bar_;
-	QPushButton *btnDecoder = new QPushButton();
-	btnDecoder->setIcon(QIcon::fromTheme("add-decoder",
-	                                     QIcon(":/icons/add-decoder.svg")));
-	btnDecoder->setMenu(main_win->menu_decoder_add());
-	settingsWidget->layout()->addWidget(btnDecoder);
-	settingsWidget->layout()->addWidget(static_cast<QWidget *>(main_bar));
+	main_win->main_bar_->setVisible(false);
 
 	createBinaryBuffer();
 }
