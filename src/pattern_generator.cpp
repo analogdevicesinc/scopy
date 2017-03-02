@@ -166,7 +166,7 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 	ui->channelManagerWidgetLayout->addWidget(chmui);
 	ui->rightWidget->setCurrentIndex(1);
 
-	connect(cgSettings->CBPattern,SIGNAL(currentIndexChanged(int)),this,
+	connect(cgSettings->CBPattern,SIGNAL(activated(int)),this,
 	        SLOT(patternChanged(int)));
 	connect(cgSettings->LECHLabel,SIGNAL(textEdited(QString)),this,
 	        SLOT(changeName(QString)));
@@ -703,7 +703,6 @@ void PatternGenerator::resetPGToDefault()
 
 	chm.highlightChannel(chm.get_channel_group(0));
 	chmui->updateUi();
-
 }
 
 QString PatternGenerator_API::chm() const

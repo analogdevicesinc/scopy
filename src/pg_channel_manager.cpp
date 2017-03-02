@@ -307,12 +307,6 @@ void PatternGeneratorChannelUI::dropEvent(QDropEvent *event)
 
 void PatternGeneratorChannelUI::updateTrace()
 {
-	if (trace==nullptr) {
-		auto index = ch->get_id();
-		auto trace1 = getManagerUi()->main_win->view_->get_clone_of(index);
-		setTrace(trace1);
-	}
-
 	bool highlighted = (getManagerUi()->findUiByChannel(
 	                            getManagerUi()->chm->getHighlightedChannel()) == this);
 
@@ -739,19 +733,6 @@ void PatternGeneratorChannelGroupUI::setupParallelDecoder()
 
 void PatternGeneratorChannelGroupUI::updateTrace()
 {
-	if (trace==nullptr && decodeTrace==nullptr) {
-
-		if (!chg->is_grouped()) {
-			auto index = chg->get_channel(0)->get_id();
-			auto trace1 = getManagerUi()->main_win->view_->get_clone_of(index);
-			setTrace(trace1);
-		} else {
-			auto trace1 = getManagerUi()->main_win->view_->add_decoder();
-			setTrace(trace1);
-			setupParallelDecoder();
-		}
-	}
-
 	auto chgOffset =  geometry().top()+ui->widget_2->geometry().bottom() + 3;
 	auto height = ui->widget_2->geometry().height();
 	auto v_offset = chgOffset - trace->v_extents().second;
@@ -1332,6 +1313,10 @@ void PatternGeneratorChannelManagerUI::updateUi()
 			connect(currentChannelGroupUI->ui->splitBtn,SIGNAL(clicked()),chg_ui.back(),
 			        SLOT(split()));
 
+			auto trace1 = main_win->view_->add_decoder();
+			currentChannelGroupUI->setTrace(trace1);
+			currentChannelGroupUI->setupParallelDecoder();
+
 			for (auto i=0; i<ch->get_channel_count(); i++) {
 
 				currentChannelGroupUI->ch_ui.push_back(new PatternGeneratorChannelUI(
@@ -1375,6 +1360,10 @@ void PatternGeneratorChannelManagerUI::updateUi()
 				auto index = ch->get_channel(i)->get_id();
 				str = QString().number(index);
 				currentChannelUI->ui->DioLabel->setText(str);
+
+				auto trace1 = main_win->view_->get_clone_of(index);
+				currentChannelUI->setTrace(trace1);
+
 			}
 
 			if (static_cast<PatternGeneratorChannelGroup *>(ch)->isCollapsed()) {
@@ -1397,6 +1386,9 @@ void PatternGeneratorChannelManagerUI::updateUi()
 
 		} else {
 
+			auto index = currentChannelGroupUI->getChannelGroup()->get_channel(0)->get_id();
+			auto trace1 = main_win->view_->get_clone_of(index);
+			currentChannelGroupUI->setTrace(trace1);
 			currentChannelGroupUI->ui->DioLabel->setText(QString().number(
 			                        ch->get_channel()->get_id()));
 			currentChannelGroupUI->ui->splitBtn->setVisible(false);

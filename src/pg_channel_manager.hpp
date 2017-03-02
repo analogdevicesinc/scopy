@@ -156,7 +156,7 @@ public:
 	QFrame *topSep,*botSep, *chUiSep;
 
 	void updateTrace();
-
+	void setupParallelDecoder();
 	void highlight(bool val);
 	void highlightTopSeparator();
 	void highlightBotSeparator();
@@ -176,7 +176,6 @@ private Q_SLOTS:
 	void collapse();
 
 private:
-	void setupParallelDecoder();
 	void enterEvent(QEvent *event);
 	void leaveEvent(QEvent *event);
 	void mousePressEvent(QMouseEvent *) override;
