@@ -1418,6 +1418,7 @@ height: 30px;
 border-width: 0px;
 border-radius: 3px;
 min-width: 6em;
+qproperty-text: &quot;Connect&quot;;
 }
 QPushButton:disabled {
 background-color: grey;
@@ -1427,13 +1428,12 @@ background-color: #F45000;
 }
 QPushButton[connected=true] {
 background-color: green;
+qproperty-text: &quot;Connected!&quot;;
 }
 QPushButton[failed=true] {
 background-color: red;
+qproperty-text: &quot;Failed!&quot;;
 }</string>
-              </property>
-              <property name="text">
-               <string>Connect</string>
               </property>
              </widget>
             </item>

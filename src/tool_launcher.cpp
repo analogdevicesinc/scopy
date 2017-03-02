@@ -243,7 +243,6 @@ void adiscope::ToolLauncher::on_btnHome_clicked()
 
 void adiscope::ToolLauncher::resetStylesheets()
 {
-	ui->btnConnect->setText("Connect");
 	setDynamicProperty(ui->btnConnect, "connected", false);
 	setDynamicProperty(ui->btnConnect, "failed", false);
 
@@ -295,14 +294,12 @@ void adiscope::ToolLauncher::on_btnConnect_clicked(bool pressed)
 	QString uri = btn->property("uri").toString();
 
 	if (switchContext(uri)) {
-		ui->btnConnect->setText("Connected!");
 		setDynamicProperty(ui->btnConnect, "connected", true);
 		setDynamicProperty(btn, "connected", true);
 
 		if (label)
 			label->setText(filter->hw_name());
 	} else {
-		ui->btnConnect->setText("Failed!");
 		setDynamicProperty(ui->btnConnect, "failed", true);
 		setDynamicProperty(btn, "failed", true);
 	}
