@@ -264,6 +264,7 @@ void DecodeTrace::paint_mid(QPainter &p, const ViewItemPaintParams &pp)
 void DecodeTrace::paint_fore(QPainter &p, const ViewItemPaintParams &pp)
 {
 	using namespace pv::data::decode;
+#if 0
 
 	assert(row_height_);
 
@@ -299,6 +300,7 @@ void DecodeTrace::paint_fore(QPainter &p, const ViewItemPaintParams &pp)
 		p.setPen(QApplication::palette().color(QPalette::WindowText));
 		p.drawText(r, f, h);
 	}
+#endif
 }
 
 void DecodeTrace::populate_popup_form(QWidget *parent, QFormLayout *form)

@@ -90,6 +90,7 @@ void PatternGeneratorChannelUI::enableControls(bool val)
 {
 	ui->DioLabel->setEnabled(val);
 	ui->ChannelGroupLabel->setEnabled(val);
+	trace->visible(val);
 }
 
 void PatternGeneratorChannelUI::mousePressEvent(QMouseEvent *event)
@@ -500,6 +501,7 @@ void PatternGeneratorChannelGroupUI::enableControls(bool enabled)
 {
 	ui->ChannelGroupLabel->setEnabled(enabled);
 	ui->DioLabel->setEnabled(enabled);
+	trace->visible(enabled);
 
 	for (auto &&ch : ch_ui) {
 		ch->enableControls(enabled);

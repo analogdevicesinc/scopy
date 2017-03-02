@@ -198,13 +198,13 @@ void Viewport::paintEvent(QPaintEvent*)
 	for (const shared_ptr<TimeItem> t : time_items)
 		t->paint_mid(p, pp);
 	for (const shared_ptr<RowItem> r : row_items)
-//		if (!r->isInitial())
+		if (r->isVisible())
 			r->paint_mid(p, pp);
 
 	paint_grid(p, pp);
 
 	for (const shared_ptr<RowItem> r : row_items)
-//		if (!r->isInitial())
+		if (r->isVisible())
 			r->paint_fore(p, pp);
 
 	p.setRenderHint(QPainter::Antialiasing, false);
