@@ -881,6 +881,10 @@ PatternGeneratorChannelManager::~PatternGeneratorChannelManager()
 
 void PatternGeneratorChannelManager::clearChannelGroups()
 {
+	for (auto ch : channel){
+		std::string temp = "DIO" + std::to_string(ch->get_id());
+		ch->set_label(temp);
+	}
 	for (auto ch : channel_group) {
 		delete ch;
 	}

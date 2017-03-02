@@ -5,6 +5,7 @@ namespace adiscope {
 PatternGeneratorBufferManager::PatternGeneratorBufferManager(
         PatternGeneratorChannelManager *chman) : chm(chman)
 {
+	autoSet = true;
 	bufferSize = 1;
 	buffer = new short[bufferSize];
 	sampleRate = 1;
@@ -20,16 +21,15 @@ void PatternGeneratorBufferManager::update(PatternGeneratorChannelGroup *chg)
 	bool sampleRateChanged = false;
 
 	chm->preGenerate();
-	uint32_t suggestedSampleRate = chm->computeSuggestedSampleRate();
+	uint32_t suggestedSampleRate = (autoSet) ? chm->computeSuggestedSampleRate() : sampleRate;
 	uint32_t adjustedSampleRate = adjustSampleRate(suggestedSampleRate);
-
 	if (sampleRate != adjustedSampleRate) {
 		sampleRate = adjustedSampleRate;
 		sampleRateChanged = true;
 	}
 
 	bool bufferSizeChanged = false;
-	uint32_t suggestedBufferSize = chm->computeSuggestedBufferSize(sampleRate);
+	uint32_t suggestedBufferSize = (autoSet) ? chm->computeSuggestedBufferSize(sampleRate) : bufferSize;
 	uint32_t adjustedBufferSize = adjustBufferSize(suggestedBufferSize);
 
 	if (bufferSize != adjustedBufferSize) {
@@ -55,6 +55,11 @@ void PatternGeneratorBufferManager::update(PatternGeneratorChannelGroup *chg)
 	} else {
 		// only generate current ?
 	}
+}
+
+void PatternGeneratorBufferManager::enableAutoSet(bool val)
+{
+	autoSet = val;
 }
 
 uint32_t PatternGeneratorBufferManager::adjustSampleRate(
@@ -87,10 +92,20 @@ uint32_t PatternGeneratorBufferManager::getBufferSize()
 	return bufferSize;
 }
 
+void PatternGeneratorBufferManager::setSampleRate(uint32_t val)
+{
+	sampleRate = val;
+}
+
+void PatternGeneratorBufferManager::setBufferSize(uint32_t val)
+{
+	bufferSize = val;
+}
+
 PatternGeneratorBufferManagerUi::PatternGeneratorBufferManagerUi(
         QWidget *parent, PatternGeneratorBufferManager *bufmanager,
         QWidget *settingsWidget, PatternGenerator *pg) : QWidget(parent),
-	settingsWidget(settingsWidget), bufman(bufmanager)
+	settingsWidget(settingsWidget), bufman(bufmanager) , pg(pg)
 {
 	//sigrok and sigrokdecode initialisation
 	context = sigrok::Context::create();
@@ -124,6 +139,8 @@ void PatternGeneratorBufferManagerUi::updateUi()
 	auto scale = (1/(double)bufman->getSampleRate()) * bufman->getBufferSize() /
 	             (double)main_win->view_->divisionCount();
 	main_win->view_->set_scale_offset(scale,pv::util::Timestamp(0));
+	Q_EMIT uiUpdated();
+
 }
 
 PatternGeneratorBufferManagerUi::~PatternGeneratorBufferManagerUi()

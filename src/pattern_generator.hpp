@@ -94,6 +94,7 @@ public:
 	void updateCGSettings();
 
 
+
 private Q_SLOTS:
 
 	void generatePattern();
@@ -101,7 +102,7 @@ private Q_SLOTS:
 	void singleRun();
 	void singleRunStop();
 	void toggleRightMenu();
-
+	void updatePGettings();
 	void on_btnHideInactive_clicked();
 	void on_btnGroupWithSelected_clicked();
 
@@ -135,6 +136,7 @@ private:
 
 	bool buffer_created;
 	int no_channels;
+	pv::MainWindow *main_win;
 
 	// IIO
 
@@ -143,17 +145,8 @@ private:
 	struct iio_device *channel_manager_dev;
 	struct iio_buffer *txbuf;
 
-
-	// PV and Sigrok
-
-	pv::MainWindow *main_win;
-
-
 	bool startPatternGeneration(bool cyclic);
 	void stopPatternGeneration();
-	void dataChanged();
-
-	void createBinaryBuffer();
 	void toggleRightMenu(QPushButton *btn);
 
 	std::vector<PatternUI *> patterns;
@@ -171,9 +164,13 @@ private:
 
 private Q_SLOTS:
 	void patternChanged(int index);
+	void configureAutoSet();
 	void changeName(QString name);
 	void pushButtonLeft();
 	void pushButtonRight();
+	void updateSampleRate();
+	void updateBufferSize();
+	void resetPGToDefault();
 };
 
 class PatternGenerator_API : public ApiObject
