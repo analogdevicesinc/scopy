@@ -336,6 +336,10 @@ void PatternGeneratorChannelUI::updateTrace()
 
 PatternGeneratorChannelUI::~PatternGeneratorChannelUI()
 {
+	if (ui->widget_2==getManagerUi()->hoverWidget) {
+		getManagerUi()->hoverWidget = nullptr;
+	}
+
 	delete ui;
 }
 
@@ -420,6 +424,10 @@ PatternGeneratorChannelGroupUI::PatternGeneratorChannelGroupUI(
 
 PatternGeneratorChannelGroupUI::~PatternGeneratorChannelGroupUI()
 {
+	if (ui->widget_2==getManagerUi()->hoverWidget) {
+		getManagerUi()->hoverWidget = nullptr;
+	}
+
 	delete ui;
 }
 
@@ -881,10 +889,11 @@ PatternGeneratorChannelManager::~PatternGeneratorChannelManager()
 
 void PatternGeneratorChannelManager::clearChannelGroups()
 {
-	for (auto ch : channel){
+	for (auto ch : channel) {
 		std::string temp = "DIO" + std::to_string(ch->get_id());
 		ch->set_label(temp);
 	}
+
 	for (auto ch : channel_group) {
 		delete ch;
 	}
@@ -1223,7 +1232,6 @@ void PatternGeneratorChannelManagerUI::updateUi()
 	static const int channelComboMaxLength = 15;
 	static const int outputComboMaxLength = 5;
 
-	hoverWidget = nullptr;
 	qDebug()<<"updateUI";
 
 	for (auto ch : chg_ui) {
@@ -1231,6 +1239,8 @@ void PatternGeneratorChannelManagerUI::updateUi()
 		ch->setMouseTracking(false); // prevent hovering after the channel is deleted
 		ch->deleteLater();
 	}
+
+	hoverWidget = nullptr;
 
 	chg_ui.erase(chg_ui.begin(),chg_ui.end());
 
@@ -1555,10 +1565,7 @@ void PatternGeneratorChannelManagerUI::showHighlight(bool val)
 
 void PatternGeneratorChannelManagerUI::setHoverWidget(QWidget *hover)
 {
-	if (hoverWidget!=nullptr) {
-		setDynamicProperty(hoverWidget,"hover-property",false);
-	}
-
+	clearHoverWidget();
 	hoverWidget = hover->findChild<QWidget *>("widget_2");
 
 	if (hoverWidget) {
