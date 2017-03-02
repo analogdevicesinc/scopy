@@ -1214,7 +1214,7 @@ QFrame *PatternGeneratorChannelManagerUI::addSeparator(QVBoxLayout *lay,
 
 void PatternGeneratorChannelManagerUI::updateUi()
 {
-	static const int channelGroupLabelMaxLength = 10;
+	static const int channelGroupLabelMaxLength = pg->channelGroupLabelMaxLength;
 	static const int dioLabelMaxLength = 2;
 	static const int channelComboMaxLength = 15;
 	static const int outputComboMaxLength = 5;

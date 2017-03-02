@@ -131,6 +131,7 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 
 	pgSettings->setupUi(ui->pgSettings);
 	cgSettings->setupUi(ui->cgSettings);
+	cgSettings->LECHLabel->setMaxLength(channelGroupLabelMaxLength);
 
 	auto i=0;
 
