@@ -660,7 +660,11 @@ void PatternGeneratorChannelGroupUI::dragMoveEvent(QDragMoveEvent *event)
 		hideSeparatorHighlight(true);
 
 		if (chg->is_grouped()) {
-			ch_ui[0]->highlightTopSeparator();
+			if (getChannelGroup()->isCollapsed()) {
+				highlightBotSeparator();
+			} else {
+				ch_ui[0]->highlightTopSeparator();
+			}
 		} else {
 			highlightBotSeparator();
 		}
@@ -1303,13 +1307,7 @@ void PatternGeneratorChannelManagerUI::updateUi()
 
 
 		if (ch->is_grouped()) { // create subwidgets
-			currentChannelGroupUI->chUiSep = addSeparator(
-			                currentChannelGroupUI->ui->subChannelLayout,
-			                currentChannelGroupUI->ui->subChannelLayout->count());
-			prevSep = currentChannelGroupUI->chUiSep;
-
 			currentChannelGroupUI->ui->DioLabel->setText("");
-
 			connect(currentChannelGroupUI->ui->collapseBtn,SIGNAL(clicked()),chg_ui.back(),
 			        SLOT(collapse()));
 			connect(currentChannelGroupUI->ui->splitBtn,SIGNAL(clicked()),chg_ui.back(),
@@ -1319,70 +1317,76 @@ void PatternGeneratorChannelManagerUI::updateUi()
 			currentChannelGroupUI->setTrace(trace1);
 			currentChannelGroupUI->setupParallelDecoder();
 
-			for (auto i=0; i<ch->get_channel_count(); i++) {
+			if (!currentChannelGroupUI->getChannelGroup()->isCollapsed()) {
+				currentChannelGroupUI->chUiSep = addSeparator(
+				                currentChannelGroupUI->ui->subChannelLayout,
+				                currentChannelGroupUI->ui->subChannelLayout->count());
+				prevSep = currentChannelGroupUI->chUiSep;
 
-				currentChannelGroupUI->ch_ui.push_back(new PatternGeneratorChannelUI(
-				                static_cast<PatternGeneratorChannel *>(ch->get_channel(i)),
-				                static_cast<PatternGeneratorChannelGroup *>(ch), currentChannelGroupUI, this,
-				                0)); // create widget for channelgroup
-				PatternGeneratorChannelUI *currentChannelUI =
-				        currentChannelGroupUI->ch_ui.back();
+				for (auto i=0; i<ch->get_channel_count(); i++) {
 
-				currentChannelUI->ui->setupUi(currentChannelUI);
-				currentChannelGroupUI->ui->subChannelLayout->insertWidget(
-				        currentChannelGroupUI->ui->subChannelLayout->count(),currentChannelUI);
-				currentChannelGroupUI->ensurePolished();
+					currentChannelGroupUI->ch_ui.push_back(new PatternGeneratorChannelUI(
+					                static_cast<PatternGeneratorChannel *>(ch->get_channel(i)),
+					                static_cast<PatternGeneratorChannelGroup *>(ch), currentChannelGroupUI, this,
+					                0)); // create widget for channelgroup
+					PatternGeneratorChannelUI *currentChannelUI =
+					        currentChannelGroupUI->ch_ui.back();
 
-				currentChannelUI->botSep = addSeparator(
-				                                   currentChannelGroupUI->ui->subChannelLayout,
-				                                   currentChannelGroupUI->ui->subChannelLayout->count());
-				currentChannelUI->topSep = prevSep;
-				prevSep =  currentChannelUI->botSep;
+					currentChannelUI->ui->setupUi(currentChannelUI);
+					currentChannelGroupUI->ui->subChannelLayout->insertWidget(
+					        currentChannelGroupUI->ui->subChannelLayout->count(),currentChannelUI);
+					currentChannelGroupUI->ensurePolished();
 
-				retainWidgetSizeWhenHidden(currentChannelUI->ui->collapseBtn);
-				retainWidgetSizeWhenHidden(currentChannelUI->ui->wgChannelEnableGroup);
-				retainWidgetSizeWhenHidden(currentChannelUI->ui->selectBox);
+					currentChannelUI->botSep = addSeparator(
+					                                   currentChannelGroupUI->ui->subChannelLayout,
+					                                   currentChannelGroupUI->ui->subChannelLayout->count());
+					currentChannelUI->topSep = prevSep;
+					prevSep =  currentChannelUI->botSep;
 
-				setWidgetNrOfChars(currentChannelUI->ui->ChannelGroupLabel,
-				                   channelGroupLabelMaxLength);
-				setWidgetNrOfChars(currentChannelUI->ui->DioLabel, dioLabelMaxLength);
+					retainWidgetSizeWhenHidden(currentChannelUI->ui->collapseBtn);
+					retainWidgetSizeWhenHidden(currentChannelUI->ui->wgChannelEnableGroup);
+					retainWidgetSizeWhenHidden(currentChannelUI->ui->selectBox);
 
-				currentChannelUI->ui->wgChannelEnableGroup->setVisible(false);
-				currentChannelUI->ui->collapseBtn->setVisible(false);
-				currentChannelUI->ui->selectBox->setVisible(false);
+					setWidgetNrOfChars(currentChannelUI->ui->ChannelGroupLabel,
+					                   channelGroupLabelMaxLength);
+					setWidgetNrOfChars(currentChannelUI->ui->DioLabel, dioLabelMaxLength);
 
-				connect(currentChannelUI->ui->splitBtn,SIGNAL(clicked()),currentChannelUI,
-				        SLOT(split()));
-				connect(currentChannelUI,SIGNAL(requestUpdateUi()),this,
-				        SLOT(triggerUpdateUi()));
+					currentChannelUI->ui->wgChannelEnableGroup->setVisible(false);
+					currentChannelUI->ui->collapseBtn->setVisible(false);
+					currentChannelUI->ui->selectBox->setVisible(false);
 
-				auto str = QString().fromStdString(ch->get_channel(i)->get_label());
-				currentChannelUI->ui->ChannelGroupLabel->setText(str);
+					connect(currentChannelUI->ui->splitBtn,SIGNAL(clicked()),currentChannelUI,
+					        SLOT(split()));
+					connect(currentChannelUI,SIGNAL(requestUpdateUi()),this,
+					        SLOT(triggerUpdateUi()));
 
-				auto index = ch->get_channel(i)->get_id();
-				str = QString().number(index);
-				currentChannelUI->ui->DioLabel->setText(str);
+					auto str = QString().fromStdString(ch->get_channel(i)->get_label());
+					currentChannelUI->ui->ChannelGroupLabel->setText(str);
 
-				auto trace1 = main_win->view_->get_clone_of(index);
-				currentChannelUI->setTrace(trace1);
+					auto index = ch->get_channel(i)->get_id();
+					str = QString().number(index);
+					currentChannelUI->ui->DioLabel->setText(str);
 
-			}
+					auto trace1 = main_win->view_->get_clone_of(index);
+					currentChannelUI->setTrace(trace1);
 
-			if (static_cast<PatternGeneratorChannelGroup *>(ch)->isCollapsed()) {
+				}
+
+				// Remove last separator from subchannellayout and add it to the main layout,
+				// so that collapse channelgroup shows both separators correctly
+				currentChannelGroupUI->ui->subChannelLayout->removeWidget(prevSep);
+				currentChannelGroupUI->botSep = addSeparator(ui->verticalLayout,
+				                                ui->verticalLayout->count()-1);
+				prevSep = currentChannelGroupUI->botSep;
+				currentChannelGroupUI->ch_ui.back()->botSep = prevSep;
+				prevSep = currentChannelGroupUI->botSep;
+			} else {
+				currentChannelGroupUI->botSep = addSeparator(ui->verticalLayout,
+				                                ui->verticalLayout->count()-1);
+				prevSep = currentChannelGroupUI->botSep;
 				currentChannelGroupUI->ui->collapseBtn->setChecked(true);
 				currentChannelGroupUI->ui->subChannelWidget->setVisible(false);
 			}
-
-
-			// Remove last separator from subchannellayout and add it to the main layout,
-			// so that collapse channelgroup shows both separators correctly
-
-			currentChannelGroupUI->ui->subChannelLayout->removeWidget(prevSep);
-			currentChannelGroupUI->botSep = addSeparator(ui->verticalLayout,
-			                                ui->verticalLayout->count()-1);
-			prevSep = currentChannelGroupUI->botSep;
-			currentChannelGroupUI->ch_ui.back()->botSep = prevSep;
-			prevSep = currentChannelGroupUI->botSep;
 
 			currentChannelGroupUI->hideSeparatorHighlight();
 
