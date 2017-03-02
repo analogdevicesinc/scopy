@@ -388,8 +388,6 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	connect(ui->btnGeneralSettings, SIGNAL(pressed()),
 				this, SLOT(toggleRightMenu()));
 
-	connect(runButton, SIGNAL(toggled(bool)), this,
-			SLOT(runStopToggled(bool)));
 	connect(ui->pushButtonRunStop, SIGNAL(toggled(bool)), this,
 			SLOT(runStopToggled(bool)));
 	connect(ui->pushButtonSingle, SIGNAL(toggled(bool)), this,
@@ -500,11 +498,6 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	// Default hysteresis levels for measurements
 	for (int i = 0; i < nb_channels; i++)
 		plot.setPeriodDetectHyst(i, 1.0 / 5);
-
-	ui->pushButtonRunStop->setProperty("normal_text",
-			QVariant(ui->pushButtonRunStop->text()));
-	ui->pushButtonSingle->setProperty("normal_text",
-			QVariant(ui->pushButtonSingle->text()));
 
 	// Calculate initial sample count and sample rate
 	onHorizScaleValueChanged(timeBase->value());
@@ -784,13 +777,9 @@ void Oscilloscope::on_actionClose_triggered()
 void Oscilloscope::runStopToggled(bool checked)
 {
 	QPushButton *btn = static_cast<QPushButton *>(QObject::sender());
-
-	if (btn == menuRunButton)
-		btn = ui->pushButtonRunStop;
+	setDynamicProperty(btn, "running", checked);
 
 	if (checked) {
-		btn->setText("Stop");
-
 		plot.setSampleRate(active_sample_rate, 1, "");
 		plot.setBufferSizeLabelValue(active_sample_count);
 		plot.setSampleRatelabelValue(active_sample_rate);
@@ -822,8 +811,6 @@ void Oscilloscope::runStopToggled(bool checked)
 			for (unsigned int i = 0; i < (nb_channels & ~1); i++)
 				iio->start(xy_ids[i]);
 	} else {
-		btn->setText(btn->property("normal_text").toString());
-
 		for (unsigned int i = 0; i < nb_channels; i++)
 			iio->stop(ids[i]);
 		if (fft_is_visible)

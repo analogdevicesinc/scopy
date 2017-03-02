@@ -108,18 +108,17 @@ QWidget#mainWidget { background-color: qlineargradient(spread:pad, x1:0, y1:0, x
   text-align: left;
   padding-left: 20px;
   padding-right: 20px;
+  qproperty-text: &quot;Run&quot;;
 }
 
-QPushButton::checked {
+QPushButton[running=true] {
+  qproperty-text: &quot;Stop&quot;;
   background-color: #F45000;
 }
 
 QPushButton:disabled {
-background-color: grey;
+  background-color: grey;
 }</string>
-          </property>
-          <property name="text">
-           <string>Run</string>
           </property>
           <property name="icon">
            <iconset resource="../resources/resources.qrc">
@@ -154,18 +153,17 @@ background-color: grey;
   text-align: left;
   padding-left: 20px;
   padding-right: 20px;
+  qproperty-text: &quot;Single&quot;;
 }
 
-QPushButton::checked {
+QPushButton[running=true] {
+  qproperty-text: &quot;Stop&quot;;
   background-color: #F45000;
 }
 
 QPushButton:disabled {
-background-color: grey;
+  background-color: grey;
 }</string>
-          </property>
-          <property name="text">
-           <string>Single</string>
           </property>
           <property name="icon">
            <iconset>
