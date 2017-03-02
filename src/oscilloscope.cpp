@@ -1936,6 +1936,26 @@ void Oscilloscope_API::setStatistics(bool en)
 	osc->measure_settings->m_ui->button_StatisticsEn->setChecked(en);
 }
 
+bool Oscilloscope_API::horizontalCursors() const
+{
+	osc->cr_ui->hCursorsEnable->isChecked();
+}
+
+void Oscilloscope_API::setHorizontalCursors(bool en)
+{
+	osc->cr_ui->hCursorsEnable->setChecked(en);
+}
+
+bool Oscilloscope_API::verticalCursors() const
+{
+	osc->cr_ui->vCursorsEnable->isChecked();
+}
+
+void Oscilloscope_API::setVerticalCursors(bool en)
+{
+	osc->cr_ui->vCursorsEnable->setChecked(en);
+}
+
 double Oscilloscope_API::cursorV1() const
 {
 	return osc->plot.value_v1;

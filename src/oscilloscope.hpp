@@ -278,6 +278,11 @@ namespace adiscope {
 		Q_PROPERTY(bool statistics
 				READ hasStatistics WRITE setStatistics);
 
+		Q_PROPERTY(bool horizontal_cursors READ horizontalCursors
+				WRITE setHorizontalCursors)
+		Q_PROPERTY(bool vertical_cursors READ verticalCursors
+				WRITE setVerticalCursors)
+
 		Q_PROPERTY(double cursor_v1 READ cursorV1 WRITE setCursorV1);
 		Q_PROPERTY(double cursor_v2 READ cursorV2 WRITE setCursorV2);
 		Q_PROPERTY(double cursor_h1 READ cursorH1 WRITE setCursorH1);
@@ -342,6 +347,12 @@ namespace adiscope {
 
 		bool hasStatistics() const;
 		void setStatistics(bool en);
+
+		bool horizontalCursors() const;
+		void setHorizontalCursors(bool en);
+
+		bool verticalCursors() const;
+		void setVerticalCursors(bool en);
 
 		double cursorV1() const;
 		double cursorV2() const;
