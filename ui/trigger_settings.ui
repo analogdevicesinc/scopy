@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>296</width>
-    <height>628</height>
+    <height>552</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -125,7 +125,7 @@ background-color: rgb(73, 99, 255);
    <property name="bottomMargin">
     <number>0</number>
    </property>
-   <item>
+   <item alignment="Qt::AlignTop">
     <widget class="QTabWidget" name="trigger_basic_advanced">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -166,7 +166,7 @@ background-color: rgb(73, 99, 255);
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <property name="spacing">
-        <number>0</number>
+        <number>20</number>
        </property>
        <property name="leftMargin">
         <number>0</number>
@@ -178,24 +178,15 @@ background-color: rgb(73, 99, 255);
         <number>0</number>
        </property>
        <property name="bottomMargin">
-        <number>50</number>
+        <number>0</number>
        </property>
        <item>
         <layout class="QVBoxLayout" name="verticalLayout_11">
          <property name="spacing">
           <number>10</number>
          </property>
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
          <property name="topMargin">
           <number>10</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
-          <number>0</number>
          </property>
          <item>
           <widget class="QLabel" name="label">
@@ -304,22 +295,6 @@ background-color: rgb(73, 99, 255);
         </layout>
        </item>
        <item>
-        <spacer name="verticalSpacer_12">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Fixed</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>0</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
         <widget class="QTabWidget" name="trigger_ab">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -362,36 +337,20 @@ background-color: rgb(73, 99, 255);
            <item>
             <layout class="QVBoxLayout" name="a_condition_container">
              <property name="spacing">
-              <number>0</number>
+              <number>10</number>
              </property>
              <property name="leftMargin">
               <number>0</number>
              </property>
              <property name="topMargin">
-              <number>0</number>
+              <number>20</number>
              </property>
              <property name="rightMargin">
               <number>0</number>
              </property>
              <property name="bottomMargin">
-              <number>0</number>
+              <number>20</number>
              </property>
-             <item>
-              <spacer name="verticalSpacer_13">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeType">
-                <enum>QSizePolicy::Fixed</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>0</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
              <item>
               <widget class="QLabel" name="lbl_triggA_cond">
                <property name="sizePolicy">
@@ -404,22 +363,6 @@ background-color: rgb(73, 99, 255);
                 <string>Condition</string>
                </property>
               </widget>
-             </item>
-             <item>
-              <spacer name="verticalSpacer_15">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeType">
-                <enum>QSizePolicy::Fixed</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>0</width>
-                 <height>10</height>
-                </size>
-               </property>
-              </spacer>
              </item>
              <item>
               <widget class="QComboBox" name="cmb_triggA_cond">
@@ -459,22 +402,6 @@ background-color: rgb(73, 99, 255);
                </item>
               </widget>
              </item>
-             <item>
-              <spacer name="verticalSpacer_25">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeType">
-                <enum>QSizePolicy::Fixed</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>0</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
             </layout>
            </item>
            <item>
@@ -482,23 +409,10 @@ background-color: rgb(73, 99, 255);
              <property name="spacing">
               <number>0</number>
              </property>
+             <property name="bottomMargin">
+              <number>20</number>
+             </property>
             </layout>
-           </item>
-           <item>
-            <spacer name="verticalSpacer_6">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Fixed</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>0</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
            </item>
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_16">
@@ -571,27 +485,11 @@ background-color: rgb(73, 99, 255);
               <number>0</number>
              </property>
              <property name="topMargin">
-              <number>0</number>
+              <number>15</number>
              </property>
              <property name="rightMargin">
               <number>0</number>
              </property>
-             <item>
-              <spacer name="verticalSpacer_21">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeType">
-                <enum>QSizePolicy::Fixed</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>0</width>
-                 <height>15</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
              <item>
               <widget class="QLabel" name="lbl_external_a_en">
                <property name="sizePolicy">
@@ -1410,8 +1308,8 @@ QPushButton:!checked:disabled {
        </item>
        <item row="0" column="1">
         <layout class="QVBoxLayout" name="verticalLayout_10">
-         <property name="spacing">
-          <number>0</number>
+         <property name="bottomMargin">
+          <number>12</number>
          </property>
          <item>
           <widget class="QLabel" name="label_4">
@@ -1425,22 +1323,6 @@ QPushButton:!checked:disabled {
             <string>Noise Reject</string>
            </property>
           </widget>
-         </item>
-         <item>
-          <spacer name="verticalSpacer_27">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-           <property name="sizeType">
-            <enum>QSizePolicy::Fixed</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>0</width>
-             <height>6</height>
-            </size>
-           </property>
-          </spacer>
          </item>
          <item>
           <widget class="QPushButton" name="btn_noise_reject">
@@ -1467,40 +1349,11 @@ QPushButton:!checked {
            </property>
           </widget>
          </item>
-         <item>
-          <spacer name="verticalSpacer_26">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-           <property name="sizeType">
-            <enum>QSizePolicy::Fixed</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>0</width>
-             <height>12</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
         </layout>
        </item>
       </layout>
      </widget>
     </widget>
-   </item>
-   <item>
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>10</width>
-       <height>0</height>
-      </size>
-     </property>
-    </spacer>
    </item>
   </layout>
  </widget>
