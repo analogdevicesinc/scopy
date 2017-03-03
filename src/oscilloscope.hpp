@@ -216,7 +216,7 @@ namespace adiscope {
 		TimePrefixFormatter horizMeasureFormat;
 
 		bool menuOpened;
-		unsigned int current_channel;
+		int current_channel;
 		unsigned int math_chn_counter;
 
 		QButtonGroup *channels_group; // selected state of each channel

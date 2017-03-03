@@ -84,7 +84,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	trigger_is_forced(false),
 	new_data_is_triggered(false),
 	triggerUpdater(new StateUpdater(250, this)),
-	menuOpened(false), current_channel(0), math_chn_counter(0),
+	menuOpened(false), current_channel(-1), math_chn_counter(0),
 	channels_group(new QButtonGroup(this)),
 	active_settings_btn(nullptr),
 	last_non_general_settings_btn(nullptr),
@@ -489,6 +489,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	if (nb_channels < 2)
 		gsettings_ui->XY_view->hide();
 
+	// Set the first channel to be the selected channel (by default)
 	QWidget *chn0_widget = channelWidgetAtId(0);
 	if (chn0_widget) {
 		QPushButton *name = chn0_widget->findChild<QPushButton *>("name");
@@ -1084,6 +1085,7 @@ void adiscope::Oscilloscope::channel_name_checked(bool checked)
 	// Get the channel that is curently selected
 	QAbstractButton *selBtn = channels_group->checkedButton();
 	int id;
+
 	if (!selBtn)
 		id = -1;
 	else
