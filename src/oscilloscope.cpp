@@ -992,6 +992,7 @@ void adiscope::Oscilloscope::on_boxMeasure_toggled(bool on)
 	else if (ui->btnMeasure->isChecked())
 		on_btnSettings_clicked(false);
 	measurePanel->setVisible(on);
+	statisticsPanel->setVisible(on && statistics_enabled);
 
 	// Set the visibility of the cursor readouts owned by the plot
 	if (ui->boxCursors->isChecked())
