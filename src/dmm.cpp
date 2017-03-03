@@ -19,6 +19,7 @@
 
 #include "adc_sample_conv.hpp"
 #include "dmm.hpp"
+#include "dynamicWidget.hpp"
 #include "ui_dmm.h"
 
 #include <gnuradio/blocks/moving_average_ff.h>
@@ -49,8 +50,6 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, QPushButton *runButton,
 
 	connect(ui->run_button, SIGNAL(toggled(bool)),
 			this, SLOT(toggleTimer(bool)));
-	connect(runButton, SIGNAL(toggled(bool)), this,
-			SLOT(toggleTimer(bool)));
 	connect(ui->run_button, SIGNAL(toggled(bool)),
 			runButton, SLOT(setChecked(bool)));
 	connect(runButton, SIGNAL(toggled(bool)), ui->run_button,
@@ -136,22 +135,18 @@ void DMM::toggleTimer(bool start)
 		manager->start(id_ch2);
 
 		timer.start(100);
-		ui->run_button->setText("Stop");
-
 		ui->scaleCh1->start();
 		ui->scaleCh2->start();
 	} else {
 		ui->scaleCh1->stop();
 		ui->scaleCh2->stop();
-
-		ui->run_button->setText("Run");
 		timer.stop();
 
 		manager->stop(id_ch1);
 		manager->stop(id_ch2);
 	}
 
-	ui->run_button->setChecked(start);
+	setDynamicProperty(ui->run_button, "running", start);
 }
 
 iio_manager::port_id DMM::configureMode(bool is_ac, unsigned int ch)
