@@ -2029,6 +2029,41 @@ void Oscilloscope_API::setTriggerSource(int idx)
 	osc->trigger_settings.ui->cmb_trigg_source->setCurrentIndex(idx);
 }
 
+QList<double> Oscilloscope_API::getTriggerLevel() const
+{
+	QList<double> list;
+	unsigned int i;
+
+
+	// TO DO: Generalize this once we figure out a rule to pair a channel
+	// with a trigger
+	for (i = 0; i < osc->nb_channels; i++) {
+		if (i == 0)
+			list.append(osc->trigger_settings.levelA_value());
+		else if (i == 1)
+			list.append(osc->trigger_settings.levelB_value());
+		else
+			break;
+	}
+
+	return list;
+}
+void Oscilloscope_API::setTriggerLevel(const QList<double>& list)
+{
+	unsigned int i;
+
+	// TO DO: Generalize this once we figure out a rule to pair a channel
+	// with a trigger
+	for (i = 0; i < osc->nb_channels; i++) {
+		if (i == 0)
+			osc->trigger_settings.setTriggerLevelA(list.at(i));
+		else if (i == 1)
+			osc->trigger_settings.setTriggerLevelB(list.at(i));
+		else
+			break;
+	}
+}
+
 QList<double> Oscilloscope_API::getVoltsPerDiv() const
 {
 	QList<double> list;

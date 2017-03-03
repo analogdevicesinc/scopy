@@ -296,6 +296,9 @@ namespace adiscope {
 		Q_PROPERTY(int trigger_source
 				READ triggerSource WRITE setTriggerSource);
 
+		Q_PROPERTY(QList<double> trigger_level
+				READ getTriggerLevel WRITE setTriggerLevel)
+
 		Q_PROPERTY(QList<QString> math_channels
 				READ getMathChannels WRITE setMathChannels
 				SCRIPTABLE false /* too complex for now */);
@@ -371,6 +374,9 @@ namespace adiscope {
 
 		int triggerSource() const;
 		void setTriggerSource(int idx);
+
+		QList<double> getTriggerLevel() const;
+		void setTriggerLevel(const QList<double>& list);
 
 		QList<double> getVoltsPerDiv() const;
 		void setVoltsPerDiv(const QList<double>& list);
