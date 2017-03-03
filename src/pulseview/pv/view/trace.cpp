@@ -182,14 +182,7 @@ QRectF Trace::label_rect(const QRectF &rect) const
 
 void Trace::paint_back(QPainter &p, const ViewItemPaintParams &pp)
 {
-	if(highlight_)
-	{
-		p.setBrush(HighlightBGColour);
-	}
-	else
-	{
-		p.setBrush(BGColour);
-	}
+	p.setBrush(BGColour);
 	p.setPen(QPen(Qt::NoPen));
 	const std::pair<int, int> extents = v_extents();
 
@@ -207,6 +200,16 @@ void Trace::paint_back(QPainter &p, const ViewItemPaintParams &pp)
 	const int y2 = get_visual_y() + extents.first ;
 	const int h2 = extents.second - extents.first;
 	p.drawLine(x, y2+h2+1, x+w, y2+h2+1);
+	if(highlight_)
+	{
+		QPen pen_highlight = QPen(QColor(255, 255, 255,255));
+		pen_highlight.setStyle( Qt::SolidLine );
+		pen_highlight.setWidth(2);
+		p.setRenderHint(QPainter::Antialiasing, false);
+		p.setPen(pen_highlight);
+		p.drawLine(x,y,x,y+h+1);
+		p.drawLine(x+w+1,y,x+w+1,y+h+1);
+	}
 }
 
 void Trace::paint_axis(QPainter &p, const ViewItemPaintParams &pp, int y)
