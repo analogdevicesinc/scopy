@@ -17,6 +17,7 @@
  * Boston, MA 02110-1301, USA.
  */
 
+#include "dynamicWidget.hpp"
 #include "signal_generator.hpp"
 #include "ui_signal_generator.h"
 
@@ -553,8 +554,6 @@ void SignalGenerator::start()
 
 		iio_device_attr_write_bool(dev, "dma_sync", false);
 	}
-
-	ui->run_button->setText("Stop");
 }
 
 void SignalGenerator::stop()
@@ -563,8 +562,6 @@ void SignalGenerator::stop()
 		iio_buffer_destroy(each);
 
 	buffers.clear();
-
-	ui->run_button->setText("Run");
 }
 
 void SignalGenerator::startStop(bool pressed)
@@ -573,6 +570,8 @@ void SignalGenerator::startStop(bool pressed)
 		start();
 	else
 		stop();
+
+	setDynamicProperty(ui->run_button, "running", pressed);
 }
 
 void SignalGenerator::setFunction(const QString& function)

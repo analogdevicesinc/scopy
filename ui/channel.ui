@@ -52,7 +52,9 @@ QWidget[selected=true] {
      <property name="styleSheet">
       <string notr="true">QCheckBox{
   spacing: 0px;
-  background-color: transparent;
+  background-color: none;
+  font-size: 14px;
+  font-weight: bold;
 }
 QCheckBox::indicator {
   width: 14px;
@@ -65,9 +67,6 @@ QCheckBox::indicator:unchecked {
   background-color: transparent;
 }</string>
      </property>
-     <property name="text">
-      <string/>
-     </property>
      <property name="checked">
       <bool>true</bool>
      </property>
@@ -79,8 +78,7 @@ QCheckBox::indicator:unchecked {
       <string notr="true">QPushButton {
   font-size: 14px;
   font-weight: bold;
-
-  background-color: rgba(0, 0, 0, 0);
+  background-color: none;
 }</string>
      </property>
      <property name="text">
