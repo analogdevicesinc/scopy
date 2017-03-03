@@ -1879,10 +1879,11 @@ void Oscilloscope::on_btnSettings_clicked(bool checked)
 			ui->settings_group->checkedButton());
 	}
 
-	if (btn) {
-		btn->setChecked(checked);
-		toggleRightMenu(btn);
-	}
+	if (!btn)
+		btn = ui->btnChannel;
+
+	btn->setChecked(checked);
+	toggleRightMenu(btn);
 }
 
 bool Oscilloscope_API::hasCursors() const
