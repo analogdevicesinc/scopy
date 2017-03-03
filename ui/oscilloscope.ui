@@ -187,7 +187,7 @@ QPushButton:disabled {
            <number>0</number>
           </property>
           <item>
-           <widget class="QPushButton" name="btnGeneralSettings">
+           <widget class="adiscope::CustomPushButton" name="btnGeneralSettings">
             <property name="styleSheet">
              <string notr="true">QPushButton {
   min-height: 40px;
@@ -945,6 +945,22 @@ QLabel {
     <hint type="sourcelabel">
      <x>725</x>
      <y>628</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1116</x>
+     <y>40</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnGeneralSettings</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>btnSettings</receiver>
+   <slot>setChecked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1056</x>
+     <y>40</y>
     </hint>
     <hint type="destinationlabel">
      <x>1116</x>
