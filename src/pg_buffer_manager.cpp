@@ -21,15 +21,18 @@ void PatternGeneratorBufferManager::update(PatternGeneratorChannelGroup *chg)
 	bool sampleRateChanged = false;
 
 	chm->preGenerate();
-	uint32_t suggestedSampleRate = (autoSet) ? chm->computeSuggestedSampleRate() : sampleRate;
+	uint32_t suggestedSampleRate = (autoSet) ? chm->computeSuggestedSampleRate() :
+	                               sampleRate;
 	uint32_t adjustedSampleRate = adjustSampleRate(suggestedSampleRate);
+
 	if (sampleRate != adjustedSampleRate) {
 		sampleRate = adjustedSampleRate;
 		sampleRateChanged = true;
 	}
 
 	bool bufferSizeChanged = false;
-	uint32_t suggestedBufferSize = (autoSet) ? chm->computeSuggestedBufferSize(sampleRate) : bufferSize;
+	uint32_t suggestedBufferSize = (autoSet) ? chm->computeSuggestedBufferSize(
+	                                       sampleRate) : bufferSize;
 	uint32_t adjustedBufferSize = adjustBufferSize(suggestedBufferSize);
 
 	if (bufferSize != adjustedBufferSize) {

@@ -112,7 +112,6 @@ public:
 	PatternGeneratorChannelGroup(PatternGeneratorChannel *ch=nullptr,
 	                             bool en=false);
 	~PatternGeneratorChannelGroup();
-	int created_index;
 	Pattern *pattern;
 	PatternGeneratorChannel *get_channel(int index);
 	bool isCollapsed();

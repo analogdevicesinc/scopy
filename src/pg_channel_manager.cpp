@@ -358,7 +358,6 @@ PatternGeneratorChannelGroup *PatternGeneratorChannelUI::getChannelGroup()
 PatternGeneratorChannelGroup::PatternGeneratorChannelGroup(
         PatternGeneratorChannel *ch, bool en) : ChannelGroup(ch)
 {
-	created_index = 0;
 	collapsed = false;
 	enabled = false;
 	pattern=PatternFactory::create(0);

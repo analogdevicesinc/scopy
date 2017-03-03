@@ -135,20 +135,76 @@ uint32_t Pattern::get_required_nr_of_samples(uint32_t sample_rate,
 	return 0; // 0 samples required
 }
 
+QJsonValue Pattern_API::toJson(Pattern *p)
+{
+	QJsonObject obj;
+	ClockPattern *cp = dynamic_cast<ClockPattern *>(p);
+	RandomPattern *rp = dynamic_cast<RandomPattern *>(p);
+	BinaryCounterPattern *bcp = dynamic_cast<BinaryCounterPattern *>(p);
+
+	if (cp) {
+		obj["name"] = QString::fromStdString(p->get_name());
+		QJsonObject params;
+		params["freq"]  = QJsonValue(cp->get_frequency());
+		params["duty"]  = QJsonValue(cp->get_duty_cycle());
+		params["phase"] = QJsonValue(cp->get_phase());
+		obj["params"] = QJsonValue(params);
+	} else if (rp) {
+		obj["name"] = QString::fromStdString(p->get_name());
+		QJsonObject params;
+		params["freq"]  = QJsonValue((qint64)rp->get_frequency());
+		obj["params"] = QJsonValue(params);
+	} else if (bcp) {
+		obj["name"] = QString::fromStdString(p->get_name());
+		QJsonObject params;
+		params["freq"]  = QJsonValue((qint64)bcp->get_frequency());
+		obj["params"] = QJsonValue(params);
+	} else {
+		obj["name"] = "none";
+	}
+
+	return QJsonValue(obj);;
+}
+
+Pattern *Pattern_API::fromJson(QJsonValue j)
+{
+	QJsonObject obj = j.toObject();
+	Pattern *p = PatternFactory::create(obj["name"].toString());
+
+	ClockPattern *cp = dynamic_cast<ClockPattern *>(p);
+	RandomPattern *rp = dynamic_cast<RandomPattern *>(p);
+	BinaryCounterPattern *bcp = dynamic_cast<BinaryCounterPattern *>(p);
+	QJsonObject params = obj["params"].toObject();
+
+	if (cp) {
+		cp->set_frequency(params["freq"].toDouble());
+		cp->set_duty_cycle(params["duty"].toDouble());
+		cp->set_phase(params["phase"].toInt());
+	} else if (rp) {
+		rp->set_frequency(params["freq"].toInt());
+	} else if (bcp) {
+		bcp->set_frequency(params["freq"].toInt());
+	} else {
+
+	}
+
+	return p;
+}
+
 PatternUI::PatternUI(QWidget *parent) : QWidget(parent)
 {
 	qDebug()<<"PatternUICreated";
 }
+
 PatternUI::~PatternUI()
 {
 	qDebug()<<"PatternUIDestroyed";
 }
+
 void PatternUI::build_ui(QWidget *parent) {}
 void PatternUI::post_load_ui() {}
 void PatternUI::parse_ui() {}
 void PatternUI::destroy_ui() {}
-
-
 
 uint32_t ClockPattern::get_min_sampling_freq()
 {
@@ -159,11 +215,9 @@ uint32_t ClockPattern::get_required_nr_of_samples(uint32_t sample_rate,
                 uint32_t number_of_channels)
 {
 	// greatest common divider duty cycle and 1000;0;
-
 	uint32_t period_number_of_samples = (uint32_t)sample_rate/frequency;
 	return period_number_of_samples;
 }
-
 
 float ClockPattern::get_duty_cycle() const
 {
@@ -2051,6 +2105,18 @@ void PatternFactory::init()
 }
 
 
+Pattern *PatternFactory::create(QString name)
+{
+	int i=0;
+	for (auto str : ui_list) {
+		if (name==str) {
+			return create(i);
+		}
+		i++;
+	}
+	return create(0);
+}
+
 Pattern *PatternFactory::create(int index)
 {
 	switch (index) {
@@ -2082,6 +2148,20 @@ Pattern *PatternFactory::create(int index)
 		     }
 		     */
 	}
+}
+
+PatternUI *PatternFactory::create_ui(Pattern *pattern, QWidget *parent)
+{
+	int i=0;
+	QString name = QString::fromStdString(pattern->get_name());
+
+	for (auto str : ui_list) {
+		if (name==str) {
+			return create_ui(pattern,i,parent);
+		}
+		i++;
+	}
+	return create_ui(pattern,0,parent);
 }
 
 PatternUI *PatternFactory::create_ui(Pattern *pattern, int index,

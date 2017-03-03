@@ -297,7 +297,6 @@ void PatternGenerator::patternChanged(int index)
 	auto chg = chm.getHighlightedChannelGroup();
 	chg->pattern->deinit();
 	delete chg->pattern;
-	chg->created_index=index;
 	chg->pattern = PatternFactory::create(index);
 
 	deleteSettingsWidget();
@@ -320,9 +319,7 @@ void PatternGenerator::createSettingsWidget()
 	auto chg = chm.getHighlightedChannelGroup();
 	cgSettings->LPattern->setText(QString::fromStdString(
 	                                      chg->pattern->get_name()).toUpper());
-	currentUI = PatternFactory::create_ui(
-	                    chg->pattern,
-	                    chg->created_index);
+	currentUI = PatternFactory::create_ui(chg->pattern);
 	currentUI->build_ui(cgSettings->patternSettings);
 	currentUI->get_pattern()->init();
 	currentUI->post_load_ui();
@@ -612,7 +609,7 @@ QJsonValue PatternGenerator::chmToJson()
 		chgObj["grouped"] = chg->is_grouped();
 		chgObj["enabled"] = chg->is_enabled();
 		chgObj["collapsed"] = chg->isCollapsed();
-		chgObj["pattern"] = QString::fromStdString(chg->pattern->get_name());
+		chgObj["pattern"] = Pattern_API::toJson(chg->pattern);
 
 		auto chCount = chg->get_channel_count();
 		QJsonArray chArray;
@@ -646,6 +643,11 @@ void PatternGenerator::jsonToChm(QJsonObject obj)
 		pgchg->group(chg["grouped"].toBool());
 		pgchg->enable(chg["enabled"].toBool());
 		pgchg->collapse(chg["collapsed"].toBool());
+
+		pgchg->pattern->deinit();
+		delete pgchg->pattern;
+		pgchg->pattern = Pattern_API::fromJson(chg["pattern"]);
+
 		QJsonArray chArray = chg["channels"].toArray();
 		int i=0;
 
