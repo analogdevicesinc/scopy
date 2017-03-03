@@ -936,6 +936,22 @@ QLabel {
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>btnChannel</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>btnSettings</receiver>
+   <slot>setChecked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>725</x>
+     <y>628</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1116</x>
+     <y>40</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <buttongroups>
   <buttongroup name="settings_group"/>
