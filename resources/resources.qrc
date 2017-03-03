@@ -19,11 +19,9 @@
         <file>menu/options.png</file>
         <file>menu/oscilloscope.png</file>
         <file>menu/pattern_generator.png</file>
-        <file>menu/play.png</file>
         <file>menu/power_supply.png</file>
         <file>menu/signal_generator.png</file>
         <file>menu/spectrum_analyzer.png</file>
-        <file>menu/stop.png</file>
         <file>icons/floppy.svg</file>
         <file>icons/floppy_hover.svg</file>
         <file>icons/sba_cmb_box_arrow.svg</file>
@@ -113,6 +111,8 @@
         <file>icons/ico-collapse.svg</file>
         <file>icons/ico-oneshot.svg</file>
         <file>icons/ico-play.svg</file>
+        <file>icons/ico-play-green.svg</file>
+        <file>icons/ico-stop.svg</file>
     </qresource>
     <qresource prefix="/stylesheets">
         <file>stylesheets/plot.qss</file>

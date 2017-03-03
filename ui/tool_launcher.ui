@@ -415,21 +415,12 @@ background-position: center center;
 }
 
 QPushButton:enabled {
-background-image: url(:/menu/stop.png);
+background-image: url(:/icons/ico-stop.svg);
 }
 
 QPushButton:checked {
-background-image: url(:/menu/play.png);
+background-image: url(:/icons/ico-play-green.svg);
 }</string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>8</width>
-              <height>10</height>
-             </size>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -522,21 +513,12 @@ background-position: center center;
 }
 
 QPushButton:enabled {
-background-image: url(:/menu/stop.png);
+background-image: url(:/icons/ico-stop.svg);
 }
 
 QPushButton:checked {
-background-image: url(:/menu/play.png);
+background-image: url(:/icons/ico-play-green.svg);
 }</string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>8</width>
-              <height>10</height>
-             </size>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -629,15 +611,12 @@ background-position: center center;
 }
 
 QPushButton:enabled {
-background-image: url(:/menu/stop.png);
+background-image: url(:/icons/ico-stop.svg);
 }
 
 QPushButton:checked {
-background-image: url(:/menu/play.png);
+background-image: url(:/icons/ico-play-green.svg);
 }</string>
-            </property>
-            <property name="text">
-             <string/>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -730,21 +709,12 @@ background-position: center center;
 }
 
 QPushButton:enabled {
-background-image: url(:/menu/stop.png);
+background-image: url(:/icons/ico-stop.svg);
 }
 
 QPushButton:checked {
-background-image: url(:/menu/play.png);
+background-image: url(:/icons/ico-play-green.svg);
 }</string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>8</width>
-              <height>10</height>
-             </size>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -852,15 +822,12 @@ background-position: center center;
 }
 
 QPushButton:enabled {
-background-image: url(:/menu/stop.png);
+background-image: url(:/icons/ico-stop.svg);
 }
 
 QPushButton:checked {
-background-image: url(:/menu/play.png);
+background-image: url(:/icons/ico-play-green.svg);
 }</string>
-            </property>
-            <property name="text">
-             <string/>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -953,21 +920,12 @@ background-position: center center;
 }
 
 QPushButton:enabled {
-background-image: url(:/menu/stop.png);
+background-image: url(:/icons/ico-stop.svg);
 }
 
 QPushButton:checked {
-background-image: url(:/menu/play.png);
+background-image: url(:/icons/ico-play-green.svg);
 }</string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>8</width>
-              <height>10</height>
-             </size>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -1060,21 +1018,12 @@ background-position: center center;
 }
 
 QPushButton:enabled {
-background-image: url(:/menu/stop.png);
+background-image: url(:/icons/ico-stop.svg);
 }
 
 QPushButton:checked {
-background-image: url(:/menu/play.png);
+background-image: url(:/icons/ico-play-green.svg);
 }</string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>8</width>
-              <height>10</height>
-             </size>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -1525,7 +1474,7 @@ qproperty-text: &quot;Failed!&quot;;
   </connection>
  </connections>
  <buttongroups>
-  <buttongroup name="buttonGroup"/>
   <buttongroup name="buttonGroup_2"/>
+  <buttongroup name="buttonGroup"/>
  </buttongroups>
 </ui>
