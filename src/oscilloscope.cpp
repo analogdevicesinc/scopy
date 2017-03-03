@@ -1734,10 +1734,12 @@ void Oscilloscope::onStatisticDeactivated(int id, int chnIdx)
 		});
 	if (stat_it != statistics.end()) {
 		QWidget *w = static_cast<QWidget *> (*stat_it);
-		statisticsPanel->hide(); // Avoid flickers
+		if (statistics_enabled) // Avoid flickers when panel is visible
+			statisticsPanel->hide(); // Avoid flickers
 		statistics_panel_ui->statistics->layout()->removeWidget(w);
+		if (statistics_enabled) // Avoid flickers when panel is visible
+			statisticsPanel->show();
 		delete w;
-		statisticsPanel->show();
 
 		statisticsUpdateGuiPosIndex();
 	}
