@@ -64,11 +64,11 @@ namespace adiscope {
 #define ConstantPatternDescription "Samples a constant 0 or 1 on the active channels"
 #define NumberPatternName "Number Pattern"
 #define NumberPatternDescription "Samples a constant number over the active channels"
-#define ClockPatternName "Clock Pattern"
+#define ClockPatternName "Clock"
 #define ClockPatternDescription "Clock pattern generator"
 #define PulsePatternName "Pulse Pattern"
 #define PulsePatternDescription "Pulse pattern generator"
-#define RandomPatternName "Random Pattern"
+#define RandomPatternName "Random"
 #define RandomPatternDescription "Random pattern generator"
 #define BinaryCounterPatternName "Binary Counter"
 #define BinaryCounterPatternDescription "Binary counter pattern generator"
@@ -98,10 +98,6 @@ private:
 	bool periodic;
 protected: // temp
 	short *buffer;
-	/*   uint32_t sample_rate;
-	   uint32_t number_of_samples;
-	   uint16_t number_of_channels;*/
-
 public:
 
 	Pattern(/*string name_, string description_*/);
@@ -128,25 +124,16 @@ public:
 
 };
 
-/*
- * How to derive Pattern
- class SomePattern : virtual public Pattern
- {
- public:
- SomePattern();
- uint8_t generate_pattern();
- };
 
- SomePattern::SomePattern()
- {
- set_name("SomePattern");
- set_description("SomePatternDescription")
- }
- uint8_t SomePattern::generate_pattern()
- {
- return 0;
- }
-*/
+class Pattern_API : public QObject
+{
+	Q_OBJECT
+public:
+	static QJsonValue toJson(Pattern *p);
+	static Pattern *fromJson(QJsonValue j);
+private:
+	Pattern_API(){}
+};
 
 class PatternUI : public QWidget
 {
@@ -164,23 +151,6 @@ Q_SIGNALS:
 	void patternChanged();
 };
 
-/*
- * How to derive PatternUI
- class SomePatternUI : public PatternUI, public SomePattern
- {
-    Q_OBJECT
-    Ui::SomePatternUI *ui;
-    QWidget *parent_;
- public:
-    SomePatternUI(QWidget *parent = 0);
-    ~SomePatternUI();
-    void parse_ui();
-    void build_ui(QWidget *parent = 0);
-    void destroy_ui();
- };
-
-
-*/
 
 
 class ClockPattern : virtual public Pattern
@@ -222,8 +192,6 @@ public:
 public Q_SLOTS:
 	void parse_ui();
 };
-
-
 
 class RandomPattern : virtual public Pattern
 {
@@ -640,8 +608,10 @@ class PatternFactory
 	static QJsonObject patterns;
 public:
 	static void init();
+	static Pattern *create(QString name);
 	static Pattern *create(int index);
 	static PatternUI *create_ui(Pattern *pattern, int index, QWidget *parent = 0);
+	static PatternUI *create_ui(Pattern *pattern, QWidget *parent=0);
 	static QStringList get_ui_list();
 	static QStringList get_description_list();
 private:

@@ -101,15 +101,15 @@ const char *PatternGenerator::channelNames[] = {
 };
 
 PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
-		QPushButton *runBtn, QJSEngine *engine,
-		QWidget *parent, bool offline_mode) :
+                                   QPushButton *runBtn, QJSEngine *engine,
+                                   QWidget *parent, bool offline_mode) :
 	QWidget(parent),
 	ctx(ctx),
 	settings_group(new QButtonGroup(this)), menuRunButton(runBtn),
 	ui(new Ui::PatternGenerator),
 	pgSettings(new Ui::PGSettings),
-	txbuf(0), sample_rate(100000), channel_enable_mask(0xffff),buffer(nullptr),
-	buffer_created(0), currentUI(nullptr), offline_mode(offline_mode),
+	cgSettings(new Ui::PGCGSettings),
+	txbuf(0), buffer_created(0), currentUI(nullptr), offline_mode(offline_mode),
 	pg_api(new PatternGenerator_API(this))
 {
 
@@ -130,27 +130,54 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 	PatternFactory::init();
 
 	pgSettings->setupUi(ui->pgSettings);
+	cgSettings->setupUi(ui->cgSettings);
+	cgSettings->LECHLabel->setMaxLength(channelGroupLabelMaxLength);
+
+	connect(pgSettings->PB_Autoset,SIGNAL(clicked(bool)),this,
+	        SLOT(configureAutoSet()));
+	connect(pgSettings->LE_BufferSize,SIGNAL(editingFinished()),this,
+	        SLOT(updateBufferSize()));
+	connect(pgSettings->LE_SampleRate,SIGNAL(editingFinished()),this,
+	        SLOT(updateSampleRate()));
+	connect(pgSettings->PB_Reset,SIGNAL(clicked(bool)),this,
+	        SLOT(resetPGToDefault()));
+
+	auto i=0;
+
+	for (auto var : PatternFactory::get_ui_list()) {
+		cgSettings->CBPattern->addItem(var);
+		cgSettings->CBPattern->setItemData(i,
+		                                   (PatternFactory::get_description_list())[i],Qt::ToolTipRole);
+		i++;
+	}
+
 	connect(ui->btnChSettings, SIGNAL(pressed()), this, SLOT(toggleRightMenu()));
 	connect(ui->btnPGSettings, SIGNAL(pressed()), this, SLOT(toggleRightMenu()));
 	bufman = new PatternGeneratorBufferManager(&chm);
 
 	bufui = new PatternGeneratorBufferManagerUi(ui->centralWidget,bufman,
 	                ui->pgSettings,this);
+
+	connect(bufui,SIGNAL(uiUpdated()),this,SLOT(updatePGettings()));
 	main_win = bufui->getPVWindow();
 	chmui = new PatternGeneratorChannelManagerUI(ui->channelManagerWidget, main_win,
-	                &chm,ui->cgSettings,this);
+	                &chm, cgSettings, this);
 
 	ui->channelManagerWidgetLayout->addWidget(chmui);
-	chmui->updateUi();
-	chmui->setVisible(true);
 	ui->rightWidget->setCurrentIndex(1);
+
+	connect(cgSettings->CBPattern,SIGNAL(activated(int)),this,
+	        SLOT(patternChanged(int)));
+	connect(cgSettings->LECHLabel,SIGNAL(textEdited(QString)),this,
+	        SLOT(changeName(QString)));
+	connect(cgSettings->PBLeft,SIGNAL(pressed()),this,SLOT(pushButtonLeft()));
+	connect(cgSettings->PBRight,SIGNAL(pressed()),this,SLOT(pushButtonRight()));
 
 	connect(chmui,SIGNAL(channelsChanged()),bufui,SLOT(updateUi()));
 	connect(ui->btnRunStop, SIGNAL(toggled(bool)), this, SLOT(startStop(bool)));
 	connect(runBtn, SIGNAL(toggled(bool)), ui->btnRunStop, SLOT(setChecked(bool)));
 	connect(ui->btnRunStop, SIGNAL(toggled(bool)), runBtn, SLOT(setChecked(bool)));
 	connect(ui->btnSingleRun, SIGNAL(pressed()), this, SLOT(singleRun()));
-	bufui->updateUi();
 
 	QString path = QCoreApplication::applicationDirPath() + "/decoders";
 
@@ -158,17 +185,15 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 		qDebug() << "ERROR: libsigrokdecode init failed.";
 	}
 
-	qDebug()<<path;
+	/* Load the protocol decoders */
+	srd_decoder_load_all();
 
 	//main_win->view_->viewport()->disableDrag();
-	bufui->updateUi();
 
 	pg_api->load();
 	pg_api->js_register(engine);
 
-
-	/* Load the protocol decoders */
-	srd_decoder_load_all();
+	chmui->updateUi();
 }
 
 PatternGenerator::~PatternGenerator()
@@ -239,7 +264,165 @@ void PatternGenerator::toggleRightMenu(QPushButton *btn)
 	}
 }
 
+void PatternGenerator::updateCGSettings()
+{
+	auto chg = chm.getHighlightedChannelGroup();
+	auto ch = chm.getHighlightedChannel();
 
+	QString title;
+	QString name;
+
+	if (ch==nullptr) {
+		name = QString::fromStdString(chg->get_label());
+		title = name;
+
+	} else {
+		name = QString::fromStdString(ch->get_label());
+		auto id = QString::number(ch->get_id());
+		title = "Channel " + id;
+	}
+
+	auto pattern = QString::fromStdString(chg->pattern->get_name());
+
+	cgSettings->LTitle->setText(title);
+	cgSettings->CBPattern->setCurrentText(pattern);
+	cgSettings->LECHLabel->setText(name);
+	cgSettings->LPattern->setText(pattern);
+	deleteSettingsWidget();
+	createSettingsWidget();
+}
+
+void PatternGenerator::patternChanged(int index)
+{
+	auto chg = chm.getHighlightedChannelGroup();
+	chg->pattern->deinit();
+	delete chg->pattern;
+	chg->pattern = PatternFactory::create(index);
+
+	deleteSettingsWidget();
+	createSettingsWidget();
+	bufui->updateUi();
+}
+
+void PatternGenerator::deleteSettingsWidget()
+{
+	if (currentUI!=nullptr) {
+		currentUI->setVisible(false);
+		currentUI->destroy_ui();
+		delete currentUI;
+		currentUI = nullptr;
+	}
+}
+
+void PatternGenerator::createSettingsWidget()
+{
+	auto chg = chm.getHighlightedChannelGroup();
+	cgSettings->LPattern->setText(QString::fromStdString(
+	                                      chg->pattern->get_name()).toUpper());
+	currentUI = PatternFactory::create_ui(chg->pattern);
+	currentUI->build_ui(cgSettings->patternSettings);
+	currentUI->get_pattern()->init();
+	currentUI->post_load_ui();
+	currentUI->setVisible(true);
+
+	connect(currentUI,SIGNAL(patternChanged()),bufui,SLOT(updateUi()));
+}
+
+void PatternGenerator::changeName(QString name)
+{
+	auto chg = chm.getHighlightedChannelGroup();
+	auto ch = chm.getHighlightedChannel();
+
+	auto chgui = chmui->findUiByChannelGroup(chg);
+	auto chui = chmui->findUiByChannel(ch);
+
+	if (ch==nullptr) {
+		chg->set_label(name.toStdString());
+		chgui->ui->ChannelGroupLabel->setText(name);
+	} else {
+		ch->set_label(name.toStdString());
+		chui->ui->ChannelGroupLabel->setText(name);
+	}
+
+	updateCGSettings();
+}
+
+void PatternGenerator::pushButtonLeft()
+{
+
+	auto chg = chm.getHighlightedChannelGroup();
+	auto iter = std::find(chm.get_channel_groups()->begin(),
+	                      chm.get_channel_groups()->end(),chg);
+
+	if (iter!=chm.get_channel_groups()->begin()) {
+		iter--;
+	}
+
+	/*if(newHighlight<chm.get_channel_group_count())
+		newHighlight++;*/
+	chmui->showHighlight(false);
+	chmui->highlightChannel(static_cast<PatternGeneratorChannelGroup *>(*iter));
+	chmui->showHighlight(true);
+}
+
+void PatternGenerator::pushButtonRight()
+{
+	auto chg = chm.getHighlightedChannelGroup();
+	auto iter = std::find(chm.get_channel_groups()->begin(),
+	                      chm.get_channel_groups()->end(),chg);
+
+	if (iter+1!=chm.get_channel_groups()->end()) {
+		iter++;
+	}
+
+	chmui->showHighlight(false);
+	chmui->highlightChannel(static_cast<PatternGeneratorChannelGroup *>(*iter));
+	chmui->showHighlight(true);
+}
+
+void PatternGenerator::configureAutoSet()
+{
+	QPushButton *autoSetToggle = static_cast<QPushButton *>(QObject::sender());
+	bool autoSet = autoSetToggle->isChecked();
+
+	if (!autoSet) {
+		pgSettings->LE_BufferSize->setEnabled(true);
+		pgSettings->LE_SampleRate->setEnabled(true);
+	} else {
+		pgSettings->LE_BufferSize->setEnabled(false);
+		pgSettings->LE_SampleRate->setEnabled(false);
+	}
+
+	bufman->enableAutoSet(autoSet);
+}
+
+void PatternGenerator::updatePGettings()
+{
+	pgSettings->LE_BufferSize->setText(QString::number(bufman->getBufferSize()));
+	pgSettings->LE_SampleRate->setText(QString::number(bufman->getSampleRate()));
+}
+
+void PatternGenerator::updateSampleRate()
+{
+	bool ok;
+	QString str = static_cast<QLineEdit *>(QObject::sender())->text();
+	uint32_t val = str.toLong(&ok);
+
+	if (ok) {
+		bufman->setSampleRate(val);
+	}
+}
+
+void PatternGenerator::updateBufferSize()
+{
+	bool ok;
+	QString str = static_cast<QLineEdit *>(QObject::sender())->text();
+	uint32_t val = str.toLong(&ok);
+
+	if (ok) {
+		bufman->setBufferSize(val);
+	}
+}
 
 
 
@@ -286,12 +469,10 @@ bool PatternGenerator::startPatternGeneration(bool cyclic)
 		iio_channel_enable(ch);
 	}
 
-	channel_enable_mask = chm.get_enabled_mask();
-
 	qDebug("Setting channel direction");
 
 	for (int j = 0; j < no_channels; j++) {
-		if (channel_enable_mask & (1<<j)) {
+		if (chm.get_enabled_mask() & (1<<j)) {
 			//auto ch = iio_device_get_channel(channel_manager_dev, j);
 			auto ch = iio_device_find_channel(channel_manager_dev,channelNames[j],false);
 			qDebug()<<iio_channel_attr_write(ch, "direction", "out");
@@ -299,9 +480,8 @@ bool PatternGenerator::startPatternGeneration(bool cyclic)
 	}
 
 	qDebug("Setting sample rate");
-	sample_rate = bufman->getSampleRate();
 	iio_device_attr_write(dev, "sampling_frequency",
-	                      std::to_string(sample_rate).c_str());
+	                      std::to_string(bufman->getSampleRate()).c_str());
 
 	qDebug("Creating buffer");
 	txbuf = iio_device_create_buffer(dev, bufman->getBufferSize(), cyclic);
@@ -367,7 +547,7 @@ void PatternGenerator::startStop(bool start)
 
 void PatternGenerator::singleRun()
 {
-	main_win->action_view_zoom_fit()->trigger();
+	/*main_win->action_view_zoom_fit()->trigger();
 	stopPatternGeneration();
 
 	if (startPatternGeneration(false)) {
@@ -380,7 +560,7 @@ void PatternGenerator::singleRun()
 	} else {
 		qDebug("Pattern generation failed");
 		ui->btnSingleRun->setChecked(true);
-	}
+	}*/
 }
 
 void PatternGenerator::singleRunStop()
@@ -416,18 +596,127 @@ void PatternGenerator::on_btnGroupWithSelected_clicked()
 	chmui->updateUi();
 }
 
-void PatternGenerator::on_btnExtendChannelManager_clicked()
+QJsonValue PatternGenerator::chmToJson()
 {
-	if (chmui->areDetailsShown()) {
-		chmui->hideDetails();
-		ui->btnGroupWithSelected->setVisible(false);
-		chmui->updateUi();
-		//  ui->channelManagerWidget->toggleMenu(true);
-	} else {
-		chmui->showDetails();
-		ui->btnGroupWithSelected->setVisible(true);
-		chmui->updateUi();
-		//  ui->channelManagerWidget->toggleMenu(true);
+	QJsonObject obj;
+	QJsonArray chgArray;
+
+	for (auto i=0; i<chm.get_channel_group_count(); i++) {
+		QJsonObject chgObj;
+		PatternGeneratorChannelGroup *chg = chm.get_channel_group(i);
+
+		chgObj["label"] = QString::fromStdString(chg->get_label());
+		chgObj["grouped"] = chg->is_grouped();
+		chgObj["enabled"] = chg->is_enabled();
+		chgObj["collapsed"] = chg->isCollapsed();
+		chgObj["pattern"] = Pattern_API::toJson(chg->pattern);
+
+		auto chCount = chg->get_channel_count();
+		QJsonArray chArray;
+
+		for (auto j=0; j<chCount; j++) {
+			QJsonObject chObj;
+			chObj["id"] = chg->get_channel(j)->get_id();
+			chObj["label"] = QString::fromStdString(chg->get_channel(j)->get_label());
+			chArray.insert(j,QJsonValue(chObj));
+		}
+
+		chgObj["channels"] = chArray;
+		chgArray.insert(i,chgObj);
+
 	}
+
+	obj["channel_groups"] = chgArray;
+	QJsonValue val(obj);
+	return val;
 }
+
+void PatternGenerator::jsonToChm(QJsonObject obj)
+{
+	chm.clearChannelGroups();
+	QJsonArray chgArray = obj["chm"].toObject()["channel_groups"].toArray();
+
+	for (auto chgRef : chgArray) {
+		auto chg = chgRef.toObject();
+		PatternGeneratorChannelGroup *pgchg = new PatternGeneratorChannelGroup();
+		pgchg->set_label(chg["label"].toString().toStdString());
+		pgchg->group(chg["grouped"].toBool());
+		pgchg->enable(chg["enabled"].toBool());
+		pgchg->collapse(chg["collapsed"].toBool());
+
+		pgchg->pattern->deinit();
+		delete pgchg->pattern;
+		pgchg->pattern = Pattern_API::fromJson(chg["pattern"]);
+
+		QJsonArray chArray = chg["channels"].toArray();
+		int i=0;
+
+		for (auto chRef : chArray) {
+			auto ch = chRef.toObject();
+			int chIndex = ch["id"].toInt();
+			QString chLabel = ch["label"].toString();
+			pgchg->add_channel(chm.get_channel(chIndex));
+			pgchg->get_channel(i)->set_label(chLabel.toStdString());
+			i++;
+		}
+
+		chm.add_channel_group(pgchg);
+	}
+
+	chm.highlightChannel(chm.get_channel_group(0));
+}
+
+QString PatternGenerator::toString()
+{
+	QJsonObject obj;
+	obj["chm"] = chmToJson();
+	QJsonDocument doc(obj);
+	QString ret(doc.toJson(QJsonDocument::Compact));
+	return ret;
+}
+
+
+
+void PatternGenerator::fromString(QString val)
+{
+	QJsonObject obj;
+	QJsonDocument doc = QJsonDocument::fromJson(val.toUtf8());
+
+	if (!doc.isNull()) {
+		if (doc.isObject()) {
+			obj = doc.object();
+		} else {
+			qDebug() << "Document is not an object" << endl;
+		}
+	} else {
+		qDebug() << "Invalid JSON...\n";
+	}
+
+	jsonToChm(obj);
+}
+
+void PatternGenerator::resetPGToDefault()
+{
+	chm.clearChannelGroups();
+
+	for (int i=0; i<16; i++) {
+		chm.add_channel_group(new PatternGeneratorChannelGroup(chm.get_channel(i)));
+	}
+
+	chm.highlightChannel(chm.get_channel_group(0));
+	chmui->updateUi();
+}
+
+QString PatternGenerator_API::chm() const
+{
+	QString ret = pg->toString();
+	return ret;
+
+}
+void PatternGenerator_API::setChm(QString val)
+{
+	pg->fromString(val);
+}
+
+
 }

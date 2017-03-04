@@ -38,10 +38,10 @@ class PatternGeneratorBufferManager
 {
 
 	bool buffer_created;
+	bool autoSet;
 	uint32_t start_sample;
 	uint32_t last_sample;
 	uint32_t number_of_samples;
-
 	uint32_t sampleRate;
 	PatternGeneratorChannelManager *chm;
 
@@ -49,8 +49,12 @@ public:
 	PatternGeneratorBufferManager(PatternGeneratorChannelManager *chman);
 	~PatternGeneratorBufferManager();
 	void update(PatternGeneratorChannelGroup *chg = nullptr);
+
+	void enableAutoSet(bool);
 	uint32_t adjustSampleRate(uint32_t suggestedSampleRate);
 	uint32_t adjustBufferSize(uint32_t suggestedBufferSize);
+	void setSampleRate(uint32_t);
+	void setBufferSize(uint32_t);
 	uint32_t getSampleRate();
 	uint32_t getBufferSize();
 
@@ -65,6 +69,7 @@ class PatternGeneratorBufferManagerUi : public QWidget
 	Q_OBJECT
 	QWidget *settingsWidget;
 	PatternGeneratorBufferManager *bufman;
+	PatternGenerator *pg;
 	std::shared_ptr<sigrok::Context> context;
 	std::shared_ptr<pv::devices::BinaryBuffer> pattern_generator_ptr;
 	std::shared_ptr<sigrok::InputFormat> binary_format;
@@ -81,7 +86,8 @@ public:
 	void createBinaryBuffer();
 	void dataChanged();
 	pv::MainWindow *getPVWindow();
-
+Q_SIGNALS:
+	void uiUpdated();
 public Q_SLOTS:
 	void updateUi();
 };

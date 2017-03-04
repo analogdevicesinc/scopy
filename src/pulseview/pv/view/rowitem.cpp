@@ -23,6 +23,16 @@
 namespace pv {
 namespace view {
 
+
+bool RowItem::isVisible()
+{
+	return visible_;
+}
+
+void RowItem::visible(bool check){
+	visible_ = check;
+}
+
 void RowItem::hover_point_changed()
 {
 }

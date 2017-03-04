@@ -58,6 +58,9 @@ Viewport::Viewport(View &parent) :
 	cursorsPixelValues(std::pair<int, int>(0,0))
 {
 	setAutoFillBackground(true);
+	setStyleSheet("background-color:black;\n"
+		      "border:0px;\n"
+		      "margin:0px;\npadding:0px;");
 	setBackgroundRole(QPalette::Base);
 }
 
@@ -215,13 +218,13 @@ void Viewport::paintEvent(QPaintEvent*)
 	for (const shared_ptr<TimeItem> t : time_items)
 		t->paint_mid(p, pp);
 	for (const shared_ptr<RowItem> r : row_items)
-//		if (!r->isInitial())
+		if (r->isVisible())
 			r->paint_mid(p, pp);
 
 	paint_grid(p, pp);
 
 	for (const shared_ptr<RowItem> r : row_items)
-//		if (!r->isInitial())
+		if (r->isVisible())
 			r->paint_fore(p, pp);
 
 	p.setRenderHint(QPainter::Antialiasing, false);
@@ -311,14 +314,14 @@ void Viewport::paint_grid(QPainter &p, const ViewItemPaintParams &pp)
 	const int x = pp.left();
 	const int w = pp.right() -pp.left();
 	const int h = pp.height();
-    const int y = view_.owner_visual_v_offset();//pp.top();
+	const int y = view_.owner_visual_v_offset();//pp.top();
 
-    int division_height = divisionHeight;
-    int division_count = divisionCount;
-    int division_offset = divisionOffset;
+	int division_height = divisionHeight;
+	int division_count = divisionCount;
+	int division_offset = divisionOffset;
 
 	int division_width = w / division_count;    
-    int row_count = view_.height() / division_height;
+	int row_count = view_.height() / division_height;
 
 	QPointF p1, p2;
 
@@ -328,13 +331,15 @@ void Viewport::paint_grid(QPainter &p, const ViewItemPaintParams &pp)
 		pen.setStyle((i % 2) ? Qt::SolidLine : Qt::DashLine);
 		p.setPen(pen);
 
-		p1 = QPointF(x + i * division_width, y);
-		p2 = QPointF(x + i * division_width, y + h * row_count);
+		p1 = QPointF(x + w*i/division_count, y);
+		p2 = QPointF(x + w*i/division_count, y + h * row_count);
+
 		p.drawLine(p1, p2);
 	}
 
 	p.setRenderHint(QPainter::Antialiasing, true);    
-    paint_axis(p,pp,pp.top());
+	paint_axis(p,pp,pp.top());
+	paint_axis(p,pp,pp.bottom());
    /* for (int i = 0; i <= row_count; i++) {
         if(y + divisionOffset+ division_height * i != 0)
             paint_axis(p, pp, y + divisionOffset + division_height * i);

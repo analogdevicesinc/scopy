@@ -12,6 +12,7 @@
 
 #include "pg_patterns.hpp"
 #include "digitalchannel_manager.hpp"
+#include "ui_pg_cg_settings.h"
 #include "ui_pg_channel_group.h"
 #include "ui_pg_channel_manager.h"
 #include "ui_pg_channel_header.h"
@@ -108,10 +109,11 @@ class PatternGeneratorChannelGroup : public ChannelGroup
 {
 	bool collapsed;
 public:
-	PatternGeneratorChannelGroup(PatternGeneratorChannel *ch, bool en);
+	PatternGeneratorChannelGroup(PatternGeneratorChannel *ch=nullptr,
+	                             bool en=false);
 	~PatternGeneratorChannelGroup();
-	int created_index;
 	Pattern *pattern;
+	PatternGeneratorChannel *get_channel(int index);
 	bool isCollapsed();
 	void collapse(bool val);
 	void append(PatternGeneratorChannelGroup *tojoin);
@@ -153,7 +155,7 @@ public:
 	QFrame *topSep,*botSep, *chUiSep;
 
 	void updateTrace();
-
+	void setupParallelDecoder();
 	void highlight(bool val);
 	void highlightTopSeparator();
 	void highlightBotSeparator();
@@ -167,14 +169,12 @@ Q_SIGNALS:
 
 private Q_SLOTS:
 
-	void patternChanged(int index);
 	void select(bool selected);
 	void enable(bool enabled);
 	void split();
 	void collapse();
 
 private:
-	void setupParallelDecoder();
 	void enterEvent(QEvent *event);
 	void leaveEvent(QEvent *event);
 	void mousePressEvent(QMouseEvent *) override;
@@ -215,6 +215,9 @@ public:
 
 	uint32_t computeSuggestedSampleRate();
 	uint32_t computeSuggestedBufferSize(uint32_t sample_rate);
+	void add_channel_group(PatternGeneratorChannelGroup *chg);
+	PatternGeneratorChannel *get_channel(int);
+	void clearChannelGroups();
 };
 
 class PatternGeneratorChannelManagerUI : public QWidget
@@ -223,10 +226,8 @@ class PatternGeneratorChannelManagerUI : public QWidget
 	QWidget *settingsWidget; // pointer to settingspage in stacked widget in main pg ui
 	QWidget *channelManagerHeaderWiget;
 
-	PatternUI *currentUI; // pointer to currently drawn patternUI.
 	bool disabledShown;
-	bool detailsShown;
-	bool highlightShown;
+	Ui::PGCGSettings *cgSettings;
 
 public:
 	const bool pixmapEnable = true;
@@ -239,7 +240,7 @@ public:
 	std::vector<PatternGeneratorChannelGroupUI *> chg_ui;
 	std::vector<QFrame *> separators;
 	PatternGeneratorChannelManagerUI(QWidget *parent, pv::MainWindow *main_win_,
-	                                 PatternGeneratorChannelManager *chm, QWidget *settingsWidget,
+	                                 PatternGeneratorChannelManager *chm, Ui::PGCGSettings *cgSettings,
 	                                 PatternGenerator *pg);
 	~PatternGeneratorChannelManagerUI();
 
@@ -252,19 +253,16 @@ public:
 
 	QWidget *hoverWidget;
 
+	void highlightChannel(PatternGeneratorChannelGroup *chg,
+	                      PatternGeneratorChannel *ch = nullptr);
+
 	void updateUi();
 	void selectChannelGroup(PatternGeneratorChannelGroupUI *selected);
-	void deleteSettingsWidget();
-	void createSettingsWidget();
 	QWidget *getSettingsWidget() const;
 
 	bool isDisabledShown();
 	void showDisabled();
 	void hideDisabled();
-
-	bool areDetailsShown();
-	void showDetails();
-	void hideDetails();
 
 	void showHighlight(bool val);
 	void setHoverWidget(QWidget *hover);

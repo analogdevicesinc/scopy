@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1354</width>
+    <width>1377</width>
     <height>721</height>
    </rect>
   </property>
@@ -69,10 +69,26 @@ QComboBox:disabled
 }
 </string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0">
    <property name="spacing">
     <number>0</number>
    </property>
+   <item>
+    <spacer name="verticalSpacer_5">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>10</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
    <item>
     <widget class="QWidget" name="toolbarWidget" native="true">
      <property name="sizePolicy">
@@ -94,6 +110,21 @@ QComboBox:disabled
       </size>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
       <item>
        <spacer name="horizontalSpacer_3">
         <property name="orientation">
@@ -117,7 +148,7 @@ QComboBox:disabled
         </property>
         <property name="minimumSize">
          <size>
-          <width>84</width>
+          <width>0</width>
           <height>0</height>
          </size>
         </property>
@@ -136,9 +167,9 @@ QComboBox:disabled
            <colorrole role="Button">
             <brush brushstyle="SolidPattern">
              <color alpha="255">
-              <red>0</red>
-              <green>128</green>
-              <blue>0</blue>
+              <red>39</red>
+              <green>179</green>
+              <blue>79</blue>
              </color>
             </brush>
            </colorrole>
@@ -163,18 +194,18 @@ QComboBox:disabled
            <colorrole role="Base">
             <brush brushstyle="SolidPattern">
              <color alpha="255">
-              <red>0</red>
-              <green>128</green>
-              <blue>0</blue>
+              <red>39</red>
+              <green>179</green>
+              <blue>79</blue>
              </color>
             </brush>
            </colorrole>
            <colorrole role="Window">
             <brush brushstyle="SolidPattern">
              <color alpha="255">
-              <red>0</red>
-              <green>128</green>
-              <blue>0</blue>
+              <red>39</red>
+              <green>179</green>
+              <blue>79</blue>
              </color>
             </brush>
            </colorrole>
@@ -192,9 +223,9 @@ QComboBox:disabled
            <colorrole role="Button">
             <brush brushstyle="SolidPattern">
              <color alpha="255">
-              <red>0</red>
-              <green>128</green>
-              <blue>0</blue>
+              <red>39</red>
+              <green>179</green>
+              <blue>79</blue>
              </color>
             </brush>
            </colorrole>
@@ -219,18 +250,18 @@ QComboBox:disabled
            <colorrole role="Base">
             <brush brushstyle="SolidPattern">
              <color alpha="255">
-              <red>0</red>
-              <green>128</green>
-              <blue>0</blue>
+              <red>39</red>
+              <green>179</green>
+              <blue>79</blue>
              </color>
             </brush>
            </colorrole>
            <colorrole role="Window">
             <brush brushstyle="SolidPattern">
              <color alpha="255">
-              <red>0</red>
-              <green>128</green>
-              <blue>0</blue>
+              <red>39</red>
+              <green>179</green>
+              <blue>79</blue>
              </color>
             </brush>
            </colorrole>
@@ -300,30 +331,44 @@ QComboBox:disabled
           <bold>true</bold>
          </font>
         </property>
+        <property name="layoutDirection">
+         <enum>Qt::RightToLeft</enum>
+        </property>
         <property name="styleSheet">
          <string notr="true">QPushButton {
-color: white;
-background-color: green;
-font-family: &quot;monospace&quot;;
-font-weight: bold;
-height: 30px;
-border-width: 0px;
-border-radius: 3px;
-min-width: 6em;
+  width: 80px;
+  height: 40px;
+  border-radius: 4px;
+  background-color: #27b34f;
+  color: white;
+  font-family: &quot;monospace&quot;;
+  font-weight: bold;
+
+  text-align: left;
+  padding-left: 20px;
+  padding-right: 20px;
 }
+
+QPushButton::checked {
+  background-color: #F45000;
+}
+
 QPushButton:disabled {
 background-color: grey;
-}
-QPushButton:checked {
-background-color: #F45000;
 }</string>
         </property>
         <property name="text">
          <string>Run</string>
         </property>
         <property name="icon">
-         <iconset theme="media-playback-start">
-          <normaloff>.</normaloff>.</iconset>
+         <iconset resource="../resources/resources.qrc">
+          <normaloff>:/icons/ico-play.svg</normaloff>:/icons/ico-play.svg</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>8</width>
+          <height>10</height>
+         </size>
         </property>
         <property name="checkable">
          <bool>true</bool>
@@ -340,8 +385,8 @@ background-color: #F45000;
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>20</width>
-          <height>0</height>
+          <width>40</width>
+          <height>10</height>
          </size>
         </property>
        </spacer>
@@ -356,7 +401,7 @@ background-color: #F45000;
         </property>
         <property name="minimumSize">
          <size>
-          <width>84</width>
+          <width>0</width>
           <height>0</height>
          </size>
         </property>
@@ -367,26 +412,44 @@ background-color: #F45000;
           <bold>true</bold>
          </font>
         </property>
+        <property name="layoutDirection">
+         <enum>Qt::RightToLeft</enum>
+        </property>
         <property name="styleSheet">
          <string notr="true">QPushButton {
-color: white;
-background-color: orange;
-font-family: &quot;monospace&quot;;
-font-weight: bold;
-height: 30px;
-border-width: 0px;
-border-radius: 3px;
-min-width: 6em;
+  width: 80px;
+  height: 40px;
+  border-radius: 4px;
+  background-color: #ff7200;
+  color: white;
+  font-family: &quot;monospace&quot;;
+  font-weight: bold;
+
+  text-align: left;
+  padding-left: 20px;
+  padding-right: 20px;
 }
+
+QPushButton::checked {
+  background-color: #F45000;
+}
+
 QPushButton:disabled {
 background-color: grey;
-}
-QPushButton:checked {
-background-color: #F45000;
 }</string>
         </property>
         <property name="text">
          <string>Single</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/resources.qrc">
+          <normaloff>:/icons/ico-oneshot.svg</normaloff>:/icons/ico-oneshot.svg</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>10</width>
+          <height>10</height>
+         </size>
         </property>
         <property name="checkable">
          <bool>true</bool>
@@ -802,7 +865,7 @@ QPushButton:checked:hover {
                 <property name="styleSheet">
                  <string notr="true">QPushButton
 {
-  width: 240px;
+  width: 175px;
   height: 30px;
   border-radius: 4px;
   background-color: #4a64ff;
@@ -840,7 +903,7 @@ QPushButton:hover
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
-                  <width>20</width>
+                  <width>35</width>
                   <height>20</height>
                  </size>
                 </property>
@@ -850,7 +913,7 @@ QPushButton:hover
                <widget class="QPushButton" name="btnGroupWithSelected">
                 <property name="styleSheet">
                  <string notr="true">QPushButton{
-  width: 240px;
+  width: 175px;
   height: 30px;
   border-radius: 4px;
   background-color: #4a64ff;
@@ -870,66 +933,6 @@ QPushButton:hover
                 </property>
                 <property name="text">
                  <string>Group with selected</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <spacer name="horizontalSpacer_6">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeType">
-                 <enum>QSizePolicy::Preferred</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>80</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item>
-               <widget class="QPushButton" name="btnExtendChannelManager">
-                <property name="styleSheet">
-                 <string notr="true">QPushButton{
-  width: 40px;
-  height: 30px;
-  border-radius: 4px;
-  background-color: #4a64ff;
-  font-family: ArialMT;
-  font-size: 14px;
-  font-weight: normal;
-  font-style: normal;
-  text-align: center;
-
-}
-
-QPushButton:checked {
-  background-image: url(:/icons/ico-expand.svg);
-  background-repeat: none;
-  background-position:center;
-}
-
-QPushButton:!checked {
-  background-image: url(:/icons/ico-collapse.svg);
-  background-repeat: none;
-  background-position:center;
-}
-
-QPushButton:hover
-{
-	 background-color: #4a34ff;
-}</string>
-                </property>
-                <property name="text">
-                 <string/>
-                </property>
-                <property name="checkable">
-                 <bool>true</bool>
-                </property>
-                <property name="checked">
-                 <bool>false</bool>
                 </property>
                </widget>
               </item>
@@ -1022,6 +1025,9 @@ QPushButton:hover
                   <horstretch>0</horstretch>
                   <verstretch>0</verstretch>
                  </sizepolicy>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true"/>
                 </property>
                 <layout class="QVBoxLayout" name="centralPlotWidgetLayout">
                  <property name="spacing">
@@ -1361,12 +1367,10 @@ QPushButton:hover
             <string notr="true"/>
            </property>
            <property name="currentIndex">
-            <number>0</number>
+            <number>1</number>
            </property>
            <widget class="QWidget" name="pgSettings"/>
-           <widget class="QWidget" name="cgSettings">
-            <layout class="QVBoxLayout" name="verticalLayout_3"/>
-           </widget>
+           <widget class="QWidget" name="cgSettings"/>
           </widget>
          </item>
         </layout>
@@ -1385,6 +1389,8 @@ QPushButton:hover
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../resources/resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

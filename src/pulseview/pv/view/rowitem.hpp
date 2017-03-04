@@ -29,8 +29,12 @@ namespace view {
 class RowItem : public ViewItem
 {
 	Q_OBJECT
+	bool visible_=false;
 
 public:
+
+	bool isVisible();
+	void visible(bool check);
 	virtual void hover_point_changed();
 };
 

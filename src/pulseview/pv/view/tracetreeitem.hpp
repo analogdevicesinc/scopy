@@ -125,6 +125,7 @@ public:
 	 */
 	virtual std::pair<int, int> v_extents() const = 0;
 
+	bool get_highlight();
 	void set_highlight(bool check);
 	virtual void setSignal_height(int height);
 	virtual int getSignal_height();

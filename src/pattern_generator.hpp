@@ -26,6 +26,7 @@
 #include <QIntValidator>
 #include <QtQml/QJSEngine>
 #include <QtUiTools/QUiLoader>
+#include <QVector>
 #include <vector>
 #include <string>
 
@@ -40,6 +41,8 @@
 // Generated UI
 #include "ui_pattern_generator.h"
 #include "ui_pg_settings.h"
+#include "ui_pg_cg_settings.h"
+
 
 extern "C" {
 	struct iio_context;
@@ -83,44 +86,35 @@ class PatternGenerator : public QWidget
 	Q_OBJECT
 
 public:
+	static const int channelGroupLabelMaxLength = 13;
 	explicit PatternGenerator(struct iio_context *ctx, Filter *filt,
-			QPushButton *runButton, QJSEngine *engine,
-			QWidget *parent = 0, bool offline_mode = 0);
+	                          QPushButton *runButton, QJSEngine *engine,
+	                          QWidget *parent = 0, bool offline_mode = 0);
 	~PatternGenerator();
+	void updateCGSettings();
+
 
 
 private Q_SLOTS:
 
 	void generatePattern();
-//  void onChannelEnabledChanged();
-//  void onChannelSelectedChanged();
 	void startStop(bool start);
 	void singleRun();
 	void singleRunStop();
 	void toggleRightMenu();
-//  void update_ui();
-//  void on_sampleRateCombo_activated(const QString &arg1);
-//  void on_generatePattern_clicked();
-//  void on_clearButton_clicked();
-//  void on_generateUI_clicked();
-
-//  void on_save_PB_clicked();
-//  void on_load_PB_clicked();
-//  void createRightPatternWidget(PatternUI* patternui);
-
-//  void rightMenuFinished(bool opened);
+	void updatePGettings();
 	void on_btnHideInactive_clicked();
 	void on_btnGroupWithSelected_clicked();
-	void on_btnExtendChannelManager_clicked();
 
 private:
 
 	// UI
 	Ui::PatternGenerator *ui;
 	Ui::PGSettings *pgSettings;
+	Ui::PGCGSettings *cgSettings;
+
 	QButtonGroup *settings_group;
 	QPushButton *menuRunButton;
-
 
 	typedef enum rightMenuState_t {
 		CLOSED,
@@ -128,11 +122,7 @@ private:
 		OPENED_CG
 	} rightMenuState;
 
-
-
-	// QWidget *current;
 	PatternUI *currentUI;
-	uint16_t channel_group;
 	bool offline_mode;
 
 	PatternGenerator_API *pg_api;
@@ -143,20 +133,10 @@ private:
 	PatternGeneratorBufferManager *bufman;
 	PatternGeneratorBufferManagerUi *bufui;
 
-	// Buffer
 
-	short *buffer;
 	bool buffer_created;
-	uint32_t start_sample;
-	uint32_t last_sample;
-	uint32_t number_of_samples;
-	uint32_t buffersize;
-
-	// Device parameters
-
-	uint16_t channel_enable_mask;
-	uint32_t sample_rate;
 	int no_channels;
+	pv::MainWindow *main_win;
 
 	// IIO
 
@@ -165,38 +145,46 @@ private:
 	struct iio_device *channel_manager_dev;
 	struct iio_buffer *txbuf;
 
-
-	// PV and Sigrok
-
-
-	/* std::shared_ptr<sigrok::Context> context;
-	 std::shared_ptr<pv::devices::BinaryBuffer> pattern_generator_ptr;
-	 std::shared_ptr<sigrok::InputFormat> binary_format;
-	 std::map<std::string, Glib::VariantBase> options;*/
-	pv::MainWindow *main_win;
-
-
 	bool startPatternGeneration(bool cyclic);
 	void stopPatternGeneration();
-	void dataChanged();
-
-	void createBinaryBuffer();
 	void toggleRightMenu(QPushButton *btn);
 
 	std::vector<PatternUI *> patterns;
 	static QStringList digital_trigger_conditions;
 	static QStringList possibleSampleRates;
 	static const char *channelNames[];
+
+	QString toString();
+	QJsonValue chmToJson();
+
+	void fromString(QString);
+	void jsonToChm(QJsonObject obj);
+	void deleteSettingsWidget();
+	void createSettingsWidget();
+
+private Q_SLOTS:
+	void patternChanged(int index);
+	void configureAutoSet();
+	void changeName(QString name);
+	void pushButtonLeft();
+	void pushButtonRight();
+	void updateSampleRate();
+	void updateBufferSize();
+	void resetPGToDefault();
 };
 
 class PatternGenerator_API : public ApiObject
 {
 	Q_OBJECT
+	Q_PROPERTY(QString chm READ chm WRITE setChm SCRIPTABLE false);
 
 public:
 	explicit PatternGenerator_API(PatternGenerator *pg) :
 		ApiObject(TOOL_PATTERN_GENERATOR), pg(pg) {}
 	~PatternGenerator_API() {}
+
+	QString chm() const;
+	void setChm(QString);
 
 private:
 	PatternGenerator *pg;
@@ -204,6 +192,7 @@ private:
 
 } /* namespace adiscope */
 
+//Q_DECLARE_METATYPE(adiscope::PGChannelGroupStructure)
 
 #endif // LOGIC_ANALYZER_H
 

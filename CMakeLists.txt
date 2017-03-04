@@ -141,7 +141,7 @@ FILE(GLOB SRC_LIST  src/*.cpp src/*.cc
 	src/pulseview/pv/widgets/*.cpp
 )
 
-FILE(GLOB M2KSCOPE_UIS ui/*.ui src/pulseview/pv/dialogs/*.ui)
+FILE(GLOB M2KSCOPE_UIS ui/patterns/*.ui ui/*.ui src/pulseview/pv/dialogs/*.ui)
 qt5_wrap_ui (m2kscope_FORMS_HEADERS ${M2KSCOPE_UIS})
 
 FILE(GLOB M2KSCOPE_RESOURCES resources/*.qrc)
