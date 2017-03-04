@@ -729,6 +729,12 @@ void Oscilloscope::del_math_channel()
 	if (started)
 		iio->unlock();
 
+	/* Exit from group and set another channel as the current channel */
+	QPushButton *name = parent->findChild<QPushButton *>("name");
+	channels_group->removeButton(name);
+	if (channels_group->buttons().size() > 0)
+		channels_group->buttons()[0]->setChecked(true);
+
 	/* Remove the math channel from the bottom list of channels */
 	ui->channelsList->removeWidget(parent);
 	delete parent;
@@ -738,14 +744,6 @@ void Oscilloscope::del_math_channel()
 	int current_axis = plot.activeVertAxis();
 	if (current_axis > curve_id)
 		plot.setActiveVertAxis(current_axis - 1);
-
-	/* Before removing the axis make sure cursors are not sing it */
-	QWidget *chn_widget = channelWidgetAtId(curve_id);
-	QPushButton *name = chn_widget->findChild<QPushButton *>("name");
-	channels_group->removeButton(name);
-	name->setChecked(false);
-	if (channels_group->buttons().size() > 0)
-		channels_group->buttons()[0]->setChecked(true);
 
 	/* Before removing the axis, remove the offset widgets */
 	plot.removeOffsetWidgets(curve_id);
@@ -1304,7 +1302,7 @@ void Oscilloscope::onChannelOffsetChanged(double value)
 
 QWidget * Oscilloscope::channelWidgetAtId(int id)
 {
-	QWidget *w = NULL;
+	QWidget *w = nullptr;
 	QCheckBox *box;
 	bool found = false;
 
@@ -1314,7 +1312,9 @@ QWidget * Oscilloscope::channelWidgetAtId(int id)
 			w = ui->channelsList->itemAt(i)->widget();
 			box = w->findChild<QCheckBox *>("box");
 			found = box->property("id").toUInt() == id;
-		}
+	}
+	if (!found)
+		w = nullptr;
 
 	return w;
 }
