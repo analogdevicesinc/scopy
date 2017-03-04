@@ -67,6 +67,14 @@ public:
 	void disableDrag();
 	void enableDrag();
 
+	std::pair<int, int> getCursorsPixelValues() const;
+	void setCursorsPixelValues(const std::pair<int, int> &value);
+
+	bool getCursorsActive() const;
+	void setCursorsActive(bool value);
+
+	void cursorValueChanged_1(int);
+	void cursorValueChanged_2(int);
 private:
 	/**
      * Indicates when a view item is being hovered over.
@@ -115,12 +123,12 @@ private:
 Q_SIGNALS:
 	void plotChanged(bool);
 	void repaintTriggerHandle(int);
-
 private:
 	void paintEvent(QPaintEvent *event);
 	void paint_grid(QPainter &p, const ViewItemPaintParams &pp);
 	void paint_axis(QPainter &p, const ViewItemPaintParams &pp, int y);
 	void paint_time_trigger_line(QPainter &p, const ViewItemPaintParams &pp, int pos);
+	void paint_cursors(QPainter &p, const ViewItemPaintParams &pp);
 
 	void mouseDoubleClickEvent(QMouseEvent *event);
 	void wheelEvent(QWheelEvent *event);
@@ -141,6 +149,8 @@ private:
 	int timeTriggerPixel;
 	bool timeTriggerActive;
 
+	bool cursorsActive;
+	std::pair<int, int> cursorsPixelValues;
 };
 
 } // namespace view

@@ -99,6 +99,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	active_triggerSampleCount(0),
 	active_timePos(0),
 	trigger_settings(new QWidget(this)),
+	value_cursor1(-0.033),
+	value_cursor2(0.033),
 	la_api(new LogicAnalyzer_API(this))
 {
 	ui->setupUi(this);
@@ -131,6 +133,20 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 
 	d_cursorMetricFormatter.setTwoDecimalMode(false);
 	d_cursorTimeFormatter.setTwoDecimalMode(false);
+
+	/* Cursors */
+	d_hCursorHandle1 = new PlotLineHandleH(
+				QPixmap(":/icons/h_cursor_handle.svg"),
+				d_bottomHandlesArea);
+	d_hCursorHandle2 = new PlotLineHandleH(
+				QPixmap(":/icons/h_cursor_handle.svg"),
+				d_bottomHandlesArea);
+
+	QPen cursorsLinePen = QPen(QColor(155, 155, 155), 1, Qt::DashLine);
+	d_hCursorHandle1->setPen(cursorsLinePen);
+	d_hCursorHandle2->setPen(cursorsLinePen);
+	d_hCursorHandle1->setInnerSpacing(0);
+	d_hCursorHandle2->setInnerSpacing(0);
 
 	// Call to minimumSizeHint() is required. Otherwise font properties from
 	// stylesheet will be ignored when calculating width using FontMetrics
@@ -230,6 +246,11 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	ui->triggerSettingsLayout->insertWidget(0, trigger_settings);
 	setupTriggerSettingsUI();
 
+	/* Cursor Settings */
+	settings_group->addButton(ui->btnCursors);
+	int cursors_panel =  ui->stackedWidget->indexOf(ui->cursorSettings);
+	ui->btnCursors->setProperty("id", QVariant(-cursors_panel));
+
 	connect(trigger_settings_ui->cmb_trigg_extern_cond_1,
 		SIGNAL(currentIndexChanged(int)),
 		this, SLOT(setExternalTrigger(int)));
@@ -241,6 +262,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	connect(trigger_settings_ui->cmb_trigg_logic, SIGNAL(currentTextChanged(const QString)),
 		this, SLOT(setHWTriggerLogic(const QString)));
 	connect(ui->btnTrigger, SIGNAL(pressed()),
+		this, SLOT(toggleRightMenu()));
+	connect(ui->btnCursors, SIGNAL(pressed()),
 		this, SLOT(toggleRightMenu()));
 	connect(ui->btnRunStop, SIGNAL(toggled(bool)),
 	        this, SLOT(startStop(bool)));
@@ -270,20 +293,14 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 		this, SLOT(onRulerChanged(double, bool)));
 	connect(main_win->view_->viewport(), SIGNAL(repaintTriggerHandle(int)),
 		this, SLOT(refreshTriggerPos(int)));
-	connect(main_win->view_, &view::View::onPlotChanged,
-		[=](bool silent) {
-			if(silent) {
-				if( active_plot_timebase != timeBase->value()) {
-					QString text = d_cursorTimeFormatter.format(
-						active_plot_timebase, "", 3);
-					ui->timebaseLabel->setText("Zoom: " + text + "/div");
-				}
-				else {
-					setTimebaseLabel(active_plot_timebase);
-				}
-			}
-
-		});
+	connect(d_hCursorHandle1, SIGNAL(positionChanged(int)),
+		this, SLOT(cursorValueChanged_1(int)));
+	connect(d_hCursorHandle2, SIGNAL(positionChanged(int)),
+		this, SLOT(cursorValueChanged_2(int)));
+	connect(ui->boxCursors, SIGNAL(toggled(bool)),
+		this, SLOT(setCursorsActive(bool)));
+	connect(main_win->view_, SIGNAL(resized()),
+		this, SLOT(resizeEvent()));
 
 	cleanHWParams();
 	chm_ui = new LogicAnalyzerChannelManagerUI(0, main_win, &chm, ui->colorSettings,
@@ -318,11 +335,13 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	timePosition->setValue(0);
 	timePosition->valueChanged(timePosition->value());
 	main_win->view_->viewport()->setTimeTriggerSample(-active_triggerSampleCount);
+	setCursorsActive(false);
+	d_hCursorHandle1->setPosition(main_win->view_->viewport()->width() / 3);
+	d_hCursorHandle2->setPosition(2 * main_win->view_->viewport()->width() / 3);
 
 	la_api->load();
 	la_api->js_register(engine);
 }
-
 
 LogicAnalyzer::~LogicAnalyzer()
 {
@@ -335,6 +354,22 @@ LogicAnalyzer::~LogicAnalyzer()
 
 	/* Destroy libsigrokdecode */
 	srd_exit();
+}
+
+void LogicAnalyzer::resizeEvent()
+{
+	int x1 = timeToPixel(value_cursor1);
+	d_hCursorHandle1->setPositionSilenty(x1);
+	main_win->view_->viewport()->cursorValueChanged_1(x1);
+
+	int x2 = timeToPixel(value_cursor2);
+	d_hCursorHandle2->setPositionSilenty(x2);
+	main_win->view_->viewport()->cursorValueChanged_2(x2);
+
+	int trigX = timeToPixel(-active_timePos);
+	d_timeTriggerHandle->setPositionSilenty(trigX);
+	main_win->view_->viewport()->setTimeTriggerPixel(trigX);
+	main_win->view_->time_item_appearance_changed(true, true);
 }
 
 double LogicAnalyzer::pickSampleRateFor(double timeSpanSecs, double desiredBuffersize)
@@ -408,8 +443,15 @@ void LogicAnalyzer::onHorizScaleValueChanged(double value)
 	}
 	setTriggerDelay();
 
+	int trigX = timeToPixel(-active_timePos);
+	d_timeTriggerHandle->setPositionSilenty(trigX);
+	main_win->view_->viewport()->setTimeTriggerPixel(trigX);
+	main_win->view_->time_item_appearance_changed(true, true);
+
 	// Change the sensitivity of time position control
 	timePosition->setStep(value / 10);
+	cursorValueChanged_1(d_hCursorHandle1->position());
+	cursorValueChanged_2(d_hCursorHandle2->position());
 }
 
 void LogicAnalyzer::enableTrigger(bool value)
@@ -472,17 +514,33 @@ void LogicAnalyzer::updateAreaTimeTriggerPadding()
 void LogicAnalyzer::onRulerChanged(double ruler_value, bool silent)
 {
 	double timePos = ruler_value + active_plot_timebase * 10 / 2;
-	if(!silent)
+	if(!silent) {
 		if(timePosition->value() != timePos)
 			timePosition->setValue(timePos);
-	else{
+	}
+	else {
 		active_plot_timebase = main_win->view_->scale();
 		int pix = timeToPixel(-timePos);
 		if( pix != d_timeTriggerHandle->position() )
 		{
 			d_timeTriggerHandle->setPositionSilenty(pix);
 		}
+		if( active_plot_timebase != timeBase->value()) {
+			QString text = d_cursorTimeFormatter.format(
+						active_plot_timebase, "", 3);
+			ui->timebaseLabel->setText("Zoom: " + text + "/div");
+			cursorValueChanged_1(d_hCursorHandle1->position());
+			cursorValueChanged_2(d_hCursorHandle2->position());
+		}
+		else {
+			setTimebaseLabel(active_plot_timebase);
+		}
 	}
+
+	int trigX = timeToPixel(-active_timePos);
+	d_timeTriggerHandle->setPositionSilenty(trigX);
+	main_win->view_->viewport()->setTimeTriggerPixel(trigX);
+	main_win->view_->time_item_appearance_changed(true, true);
 }
 
 QWidget* LogicAnalyzer::bottomHandlesArea()
@@ -505,10 +563,6 @@ void LogicAnalyzer::onTimePositionSpinboxChanged(double value)
 	active_timePos = -params.timePos;
 
 	int pix = timeToPixel(-value);
-	if( pix != d_timeTriggerHandle->position() )
-	{
-		d_timeTriggerHandle->setPosition(pix);
-	}
 	if( running )
 	{
 		setSampleRate();
@@ -517,6 +571,12 @@ void LogicAnalyzer::onTimePositionSpinboxChanged(double value)
 		setSamplerateLabelValue(active_sampleRate);
 	}
 	setTriggerDelay();
+	int trigX = timeToPixel(-active_timePos);
+	d_timeTriggerHandle->setPositionSilenty(trigX);
+	main_win->view_->viewport()->setTimeTriggerPixel(trigX);
+	main_win->view_->time_item_appearance_changed(true, true);
+	cursorValueChanged_1(d_hCursorHandle1->position());
+	cursorValueChanged_2(d_hCursorHandle2->position());
 }
 
 void LogicAnalyzer::onTimeTriggerHandlePosChanged(int pos)
@@ -796,6 +856,73 @@ void LogicAnalyzer::cleanHWParams()
 	}
 	setHWTriggerDelay(active_triggerSampleCount);
 	setHWTriggerLogic("or");
+}
+
+void LogicAnalyzer::cursorValueChanged_1(int pos)
+{
+	value_cursor1 = -(pixelToTime(pos) + active_plot_timebase * 10 / 2 - active_timePos);
+	if( ui->btnCursorsLock->isChecked() ) {
+		value_cursor2 = value_cursor1 - value_cursors_delta;
+		int pairPos = timeToPixel(value_cursor2);
+		d_hCursorHandle2->setPositionSilenty(pairPos);
+		QString text = d_cursorTimeFormatter.format(value_cursor2, "", 3);
+		ui->lblCursor2->setText(text);
+		main_win->view_->viewport()->cursorValueChanged_2(pairPos);
+	}
+	else {
+		value_cursors_delta = value_cursor1 - value_cursor2;
+	}
+	QString text = d_cursorTimeFormatter.format(value_cursor1, "", 3);
+	ui->lblCursor1->setText(text);
+	main_win->view_->viewport()->cursorValueChanged_1(pos);
+	cursorsFormatDelta();
+}
+
+void LogicAnalyzer::cursorValueChanged_2(int pos)
+{
+	value_cursor2 = -(pixelToTime(pos) + active_plot_timebase * 10 / 2 - active_timePos);
+	if( ui->btnCursorsLock->isChecked() ) {
+		value_cursor1 = value_cursors_delta + value_cursor2;
+		int pairPos = timeToPixel(value_cursor1);
+		d_hCursorHandle1->setPositionSilenty(pairPos);
+		QString text = d_cursorTimeFormatter.format(value_cursor1, "", 3);
+		ui->lblCursor1->setText(text);
+		main_win->view_->viewport()->cursorValueChanged_1(pairPos);
+	}
+	else {
+		value_cursors_delta = value_cursor1 - value_cursor2;
+	}
+	QString text = d_cursorTimeFormatter.format(value_cursor2, "", 3);
+	ui->lblCursor2->setText(text);
+	main_win->view_->viewport()->cursorValueChanged_2(pos);
+	cursorsFormatDelta();
+}
+
+void LogicAnalyzer::cursorsFormatDelta()
+{
+	QString text = d_cursorTimeFormatter.format(value_cursors_delta, "", 3);
+	QString freqDeltaText;
+	if( value_cursors_delta != 0)
+		freqDeltaText = d_cursorMetricFormatter.format(1/value_cursors_delta, "Hz", 3);
+	else
+		freqDeltaText = "Infinity";
+	ui->lblCursorDiff->setText(text);
+	ui->lblCursorDelta->setText(freqDeltaText);
+}
+
+void LogicAnalyzer::setCursorsActive(bool active)
+{
+	main_win->view_->viewport()->setCursorsActive(active);
+	if(active) {
+		d_hCursorHandle1->show();
+		d_hCursorHandle2->show();
+		ui->cursorsStatusWidget->show();
+	}
+	else  {
+		d_hCursorHandle1->hide();
+		d_hCursorHandle2->hide();
+		ui->cursorsStatusWidget->hide();
+	}
 }
 
 bool LogicAnalyzer_API::running() const

@@ -42,7 +42,7 @@ static QTextStream& operator<<(QTextStream& stream, SIPrefix prefix)
 	case SIPrefix::nano:  return stream << 'n';
 	case SIPrefix::micro: return stream << QChar(0x03BC);
 	case SIPrefix::milli: return stream << 'm';
-//	case SIPrefix::kilo: return stream << 'k';
+	case SIPrefix::kilo: return stream << 'k';
 
 	default: return stream;
 	}
@@ -117,7 +117,7 @@ QString format_time_si(
 	}
 
     assert(prefix >= SIPrefix::pico);
-    assert(prefix <= SIPrefix::milli);
+    assert(prefix <= SIPrefix::kilo);
 
 	const Timestamp multiplier = pow(Timestamp(10), -exponent(prefix));
 

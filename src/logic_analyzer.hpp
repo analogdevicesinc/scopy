@@ -98,6 +98,10 @@ private Q_SLOTS:
 	void setHWTriggerLogic(const QString value);
 	void setupTriggerSettingsUI(bool enabled = false);
 	void setExternalTrigger(int);
+	void cursorValueChanged_1(int);
+	void cursorValueChanged_2(int);
+	void setCursorsActive(bool);
+	void resizeEvent();
 public Q_SLOTS:
 	void onTimeTriggerHandlePosChanged(int);
 	void onTimePositionSpinboxChanged(double value);
@@ -163,6 +167,9 @@ private:
 	MetricPrefixFormatter d_cursorMetricFormatter;
 	TimePrefixFormatter d_cursorTimeFormatter;
 
+	PlotLineHandleH *d_hCursorHandle1;
+	PlotLineHandleH *d_hCursorHandle2;
+
 	void updateBuffersizeSamplerateLabel(int samples, double samplerate);
 	void setBuffersizeLabelValue(double value);
 	void setSamplerateLabelValue(double value);
@@ -182,8 +189,13 @@ private:
 	std::shared_ptr<LogicAnalyzerSymmetricBufferMode> symmBufferMode;
 	QWidget* trigger_settings;
 	double active_plot_timebase;
+
+	double value_cursor1;
+	double value_cursor2;
+	double value_cursors_delta;
 	void enableTrigger(bool value);
 	void cleanHWParams();
+	void cursorsFormatDelta();
 };
 
 class LogicAnalyzer_API : public ApiObject

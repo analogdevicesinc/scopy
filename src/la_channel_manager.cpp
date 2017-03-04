@@ -1983,7 +1983,7 @@ void LogicAnalyzerChannelManagerUI::set_pv_decoder(LogicAnalyzerChannelGroupUI
 	                                      chGroup->getChannelGroup()->getDecoder());
 }
 
-void LogicAnalyzerChannelManagerUI::paintEvent(QPaintEvent *event)
+void LogicAnalyzerChannelManagerUI::resizeEvent(QResizeEvent *event)
 {
 	Q_EMIT(widthChanged(geometry().width()));
 }

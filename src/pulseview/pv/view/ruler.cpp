@@ -172,6 +172,20 @@ void Ruler::paintEvent(QPaintEvent*)
 		QPoint p2 = QPoint(timeTriggerPx, ruler_height);
 		p.drawLine(p1, p2);
 	}
+	if( view_.viewport()->getCursorsActive() ) {
+		std::pair<int, int> cursorValues = view_.viewport()->getCursorsPixelValues();
+
+		QPen cursorsLinePen = QPen(QColor(155, 155, 155), 1, Qt::DashLine);
+		p.setPen(cursorsLinePen);
+		QPoint p1 = QPoint(cursorValues.first, 0);
+		QPoint p2 = QPoint(cursorValues.first, ruler_height);
+		p.drawLine(p1, p2);
+
+		p1 = QPoint(cursorValues.second, 0);
+		p2 = QPoint(cursorValues.second, ruler_height);
+		p.drawLine(p1, p2);
+	}
+
 	// Draw the tick marks
 	QPen pen = QPen(QColor(255, 255, 255, 30*256/100));
 	for (const auto& tick: tick_position_cache_->major) {
@@ -204,8 +218,6 @@ void Ruler::paintEvent(QPaintEvent*)
 }
 int Ruler::getTickZeroPosition()
 {
-
-
 	if( tick_position_cache_.is_initialized() )
 		for (const auto& tick: tick_position_cache_->major) {
 			if(tick.second == "0") {
@@ -279,7 +291,7 @@ void Ruler::setTimeTriggerPx(int value)
 
 void Ruler::mouseDoubleClickEvent(QMouseEvent *event)
 {
-	view_.add_flag(view_.offset() + ((double)event->x() + 0.5) * view_.scale());
+//	view_.add_flag(view_.offset() + ((double)event->x() + 0.5) * view_.scale());
 }
 
 void Ruler::draw_hover_mark(QPainter &p, int text_height)

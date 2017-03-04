@@ -868,6 +868,7 @@ bool View::viewportEvent(QEvent *event)
 void View::resizeEvent(QResizeEvent*)
 {
 	update_layout();
+	Q_EMIT resized();
 }
 
 void View::row_item_appearance_changed(bool label, bool content)
@@ -1248,6 +1249,7 @@ void View::onPlotChanged(bool silent)
 	double ruler_value = start_plot_offset_ + plot_offset;
 	ruler_->set_offset(ruler_value);
 	Q_EMIT repaintTriggerHandle(ruler_value, silent);
+//	time_item_appearance_changed(true, true);
 }
 
 void View::session_error(

@@ -53,7 +53,9 @@ Viewport::Viewport(View &parent) :
 	pinch_zoom_active_(false),
 	timeTriggerSample(0),
 	timeTriggerPixel(0),
-	timeTriggerActive(false)
+	timeTriggerActive(false),
+	cursorsActive(false),
+	cursorsPixelValues(std::pair<int, int>(0,0))
 {
 	setAutoFillBackground(true);
 	setBackgroundRole(QPalette::Base);
@@ -226,11 +228,31 @@ void Viewport::paintEvent(QPaintEvent*)
 	for (const shared_ptr<TimeItem> t : time_items)
 		t->paint_fore(p, pp);
 
-	if( timeTriggerActive )
-	{
+	if( timeTriggerActive ){
 		paint_time_trigger_line(p, pp, timeTriggerSample);
 	}
+
+	if( cursorsActive ){
+		paint_cursors(p, pp);
+	}
 	p.end();
+}
+
+void Viewport::paint_cursors(QPainter &p, const ViewItemPaintParams &pp)
+{
+	QPen cursorsLinePen = QPen(QColor(155, 155, 155), 1, Qt::DashLine);
+	p.setPen(cursorsLinePen);
+	const int y = view_.owner_visual_v_offset();
+	const int h = pp.height();
+	int row_count = view_.height() / divisionHeight;
+
+	QPoint p1 = QPoint(cursorsPixelValues.first, y);
+	QPoint p2 = QPoint(cursorsPixelValues.first, y + h * row_count);
+	p.drawLine(p1, p2);
+
+	p1 = QPoint(cursorsPixelValues.second, y);
+	p2 = QPoint(cursorsPixelValues.second, y + h * row_count);
+	p.drawLine(p1, p2);
 }
 
 void Viewport::setTimeTriggerSample(int sample)
@@ -240,6 +262,18 @@ void Viewport::setTimeTriggerSample(int sample)
 		timeTriggerSample = sample;
 		view_.time_item_appearance_changed(true, true);
 	}
+}
+
+void Viewport::cursorValueChanged_1(int pos)
+{
+	cursorsPixelValues.first = pos;
+	view_.time_item_appearance_changed(true, true);
+}
+
+void Viewport::cursorValueChanged_2(int pos)
+{
+	cursorsPixelValues.second = pos;
+	view_.time_item_appearance_changed(true, true);
 }
 
 int Viewport::getTimeTriggerSample() const
@@ -256,13 +290,6 @@ void Viewport::paint_time_trigger_line(QPainter &p, const ViewItemPaintParams &p
 		const double pixels_offset = pp.pixels_offset();
 		px = (sample_index / samples_per_pixel - pixels_offset) + pp.left();
 		if( px != timeTriggerPixel) {
-			timeTriggerPixel = px;
-			repaintTriggerHandle(timeTriggerPixel);
-		}
-	}
-	else {
-		px = view_.ruler_->getTickZeroPosition();
-		if( px != timeTriggerPixel && px >= 0) {
 			timeTriggerPixel = px;
 			repaintTriggerHandle(timeTriggerPixel);
 		}
@@ -353,6 +380,27 @@ void Viewport::wheelEvent(QWheelEvent *event)
 		view_.set_scale_offset(view_.scale(),
 			event->delta() * view_.scale() + view_.offset());
 	}
+}
+
+bool Viewport::getCursorsActive() const
+{
+	return cursorsActive;
+}
+
+void Viewport::setCursorsActive(bool value)
+{
+	cursorsActive = value;
+	view_.time_item_appearance_changed(true, true);
+}
+
+std::pair<int, int> Viewport::getCursorsPixelValues() const
+{
+	return cursorsPixelValues;
+}
+
+void Viewport::setCursorsPixelValues(const std::pair<int, int> &value)
+{
+	cursorsPixelValues = value;
 }
 
 int Viewport::getTimeTriggerPixel() const

@@ -267,7 +267,7 @@ public Q_SLOTS:
 	void triggerUpdateUi();
 	void highlightNext();
 	void highlightPrevious();
-	void paintEvent(QPaintEvent *event);
+	void resizeEvent(QResizeEvent *event);
 
 private Q_SLOTS:
 	void on_groupSplit_clicked();

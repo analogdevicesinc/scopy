@@ -255,6 +255,8 @@ Q_SIGNALS:
 
 	void repaintTriggerHandle(double, bool);
 
+	void resized();
+
 public Q_SLOTS:
 	void trigger_event(util::Timestamp location);
 
