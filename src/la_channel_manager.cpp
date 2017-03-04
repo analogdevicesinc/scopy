@@ -80,6 +80,9 @@ LogicAnalyzerChannelUI::LogicAnalyzerChannelUI(LogicAnalyzerChannel *ch,
 
 LogicAnalyzerChannelUI::~LogicAnalyzerChannelUI()
 {
+	if( ui->baseWidget == chm_ui->hoverWidget ){
+		chm_ui->hoverWidget = nullptr;
+	}
 	delete ui;
 }
 
@@ -271,10 +274,10 @@ void LogicAnalyzerChannelUI::dropEvent(QDropEvent *event)
 
 void LogicAnalyzerChannelUI::updateTrace()
 {
-	if (trace==nullptr) {
-		auto index = lch->get_id();
-		auto trace1 = chm_ui->main_win->view_->get_clone_of(index);
-		setTrace(trace1);
+	bool highlighted = chm_ui->getUiFromCh(
+		chm_ui->chm->getHighlightedChannel()) == this;
+	if(highlighted != trace->get_highlight()) {
+		trace->set_highlight(highlighted);
 	}
 
 	auto height = geometry().height();
@@ -321,6 +324,17 @@ void LogicAnalyzerChannelUI::highlightBotSeparator()
 {
 	resetSeparatorHighlight();
 	botSep->setVisible(true);
+}
+
+void LogicAnalyzerChannelUI::enableControls(bool enabled)
+{
+	ui->btnRemGroup->setEnabled(enabled);
+	ui->groupName->setEnabled(enabled);
+	ui->comboBox_2->setEnabled(enabled);
+	ui->comboBox->setEnabled(enabled);
+	ui->indexLabel->setEnabled(enabled);
+	ui->indexLabel2->setEnabled(enabled);
+	trace->visible(enabled);
 }
 
 LogicAnalyzerChannelGroup* LogicAnalyzerChannelUI::getChannelGroup()
@@ -571,13 +585,17 @@ LogicAnalyzerChannelGroupUI::LogicAnalyzerChannelGroupUI(
 			}
 		}
 	}
+
+	trace = nullptr;
+	decodeTrace = nullptr;
 }
 
 LogicAnalyzerChannelGroupUI::~LogicAnalyzerChannelGroupUI()
 {
+	if( ui->baseWidget == chm_ui->hoverWidget ){
+		chm_ui->hoverWidget = nullptr;
+	}
 	delete ui;
-	trace = nullptr;
-	decodeTrace = nullptr;
 }
 
 void LogicAnalyzerChannelGroupUI::set_decoder(std::string value)
@@ -768,22 +786,18 @@ int LogicAnalyzerChannelGroupUI::getTraceOffset()
 
 void LogicAnalyzerChannelGroupUI::updateTrace()
 {
-	if (trace==nullptr && decodeTrace==nullptr) {
-
-		if (!chg->is_grouped()) {
-			auto index = chg->get_channel(0)->get_id();
-			auto trace1 = chm_ui->main_win->view_->get_clone_of(index);
-			setTrace(trace1);
-		} else {
-			auto trace1 = chm_ui->main_win->view_->add_decoder();
-			setTrace(trace1);
-			setupDecoder();
-		}
-	}
-
 	auto chgOffset =  geometry().top()+ui->baseWidget->geometry().bottom() + 3;
 	auto height = ui->baseWidget->geometry().height();
 	auto v_offset = chgOffset - trace->v_extents().second;
+
+	bool highlighted = (chm_ui->getUiFromChGroup(
+	                            chm_ui->chm->getHighlightedChannelGroup()) == this);
+
+	highlighted &= chm_ui->chm->getHighlightedChannel() == nullptr;
+
+	if (highlighted != trace->get_highlight()) {
+		trace->set_highlight(highlighted);
+	}
 
 	if (traceOffset!=v_offset || traceHeight!=height) {
 		traceHeight = height;
@@ -903,8 +917,9 @@ void LogicAnalyzerChannelGroupUI::enableControls(bool enabled)
 	ui->comboBox_2->setEnabled(enabled);
 	ui->comboBox->setEnabled(enabled);
 	ui->indexLabel->setEnabled(enabled);
-	if( lchg->is_grouped() ) {
-		ui->subChannelWidget->setEnabled(enabled);
+	trace->visible(enabled);
+	for (auto &&ch : ch_ui) {
+		ch->enableControls(enabled);
 	}
 	chm_ui->updatePlot();
 }
@@ -1364,13 +1379,8 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 
 			}
 
-			lachannelgroupUI->ui->btnEnableChannel->setChecked(ch->is_enabled());
-			lachannelgroupUI->enableControls(ch->is_enabled());
-
 			connect(lachannelgroupUI->ui->selectCheckBox, SIGNAL(toggled(bool)),
 			        chg_ui.back(), SLOT(select(bool)));
-			connect(lachannelgroupUI->ui->btnEnableChannel, SIGNAL(toggled(bool)),
-			        lachannelgroupUI, SLOT(enable(bool)));
 			connect(lachannelgroupUI, SIGNAL(requestUpdateUI()),
 				this, SLOT(triggerUpdateUi()));
 
@@ -1387,6 +1397,10 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 				{
 					setWidgetMinimumNrOfChars(lachannelgroupUI->ui->decoderCombo, 17);
 				}
+
+				auto trace1 = main_win->view_->add_decoder();
+				lachannelgroupUI->setTrace(trace1);
+				lachannelgroupUI->setupDecoder();
 
 				/* Populate role combo based on parent decoder */
 				lachannelgroupUI->ui->decoderCombo->addItem("None");
@@ -1427,6 +1441,8 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 					lachannelUI->ensurePolished();
 
 					auto index = ch->get_channel(i)->get_id();
+					auto trace1 = main_win->view_->get_clone_of(index);
+					lachannelUI->setTrace(trace1);
 
 					forceUpdate(lachannelUI);
 					offset+=lachannelUI->geometry().bottomRight().y();
@@ -1511,6 +1527,8 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 				lachannelgroupUI->resetSeparatorHighlight();
 			} else {
 				auto index = ch->get_channel(0)->get_id();
+				auto trace1 = main_win->view_->get_clone_of(index);
+				lachannelgroupUI->setTrace(trace1);
 				lachannelgroupUI->ui->stackedWidget->setCurrentIndex(0);
 
 				if (!collapsed) {
@@ -1536,6 +1554,10 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 				        la, SLOT(triggerChanged(int)));
 
 			}
+			lachannelgroupUI->ui->btnEnableChannel->setChecked(ch->is_enabled());
+			lachannelgroupUI->enableControls(ch->is_enabled());
+			connect(lachannelgroupUI->ui->btnEnableChannel, SIGNAL(toggled(bool)),
+				lachannelgroupUI, SLOT(enable(bool)));
 		}
 	}
 

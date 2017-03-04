@@ -82,6 +82,7 @@ public:
 	void highlightTopSeparator();
 	void highlightBotSeparator();
 	void resetSeparatorHighlight(bool force = false);
+	void enableControls(bool enabled);
 private Q_SLOTS:
 	void remove();
 	 void mousePressEvent(QMouseEvent *) override;
