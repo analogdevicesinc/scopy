@@ -201,9 +201,9 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	-timeBase->maxValue() * 5,
 	timeBase->maxValue() * 5);
 
-	ui->generalSettingsLayout->insertWidget(ui->generalSettingsLayout->count() - 2,
+	ui->generalSettingsLayout->insertWidget(ui->generalSettingsLayout->count() - 3,
 		timeBase, 0, Qt::AlignLeft);
-	ui->generalSettingsLayout->insertWidget(ui->generalSettingsLayout->count() - 1,
+	ui->generalSettingsLayout->insertWidget(ui->generalSettingsLayout->count() - 2,
 		timePosition, 0, Qt::AlignLeft);
 
 	options["numchannels"] = Glib::Variant<gint32>(

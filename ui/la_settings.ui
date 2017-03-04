@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>250</width>
+    <width>334</width>
     <height>500</height>
    </rect>
   </property>
@@ -20,12 +20,7 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">QLabel:disabled
-{
-	color:rgb(85,85,85);
-}
-
-QLineEdit {
+   <string notr="true">QLineEdit {
   height: 20px;
   width: 50px;
   color: white;
@@ -34,6 +29,21 @@ font-family: Arial;
 font-weight:bold;
 border:0px;
 /*  border-bottom: 1px solid rgba(255, 255, 255, 102); */
+}
+
+QLabel
+{
+width: 68.2px;
+height: 16.46px;
+font-family: Arial;
+font-size: 14px;
+line-height: 16px;
+color: rgba(255,255,255,150);
+}
+
+QLabel:disabled
+{
+  color: rgb(85, 85, 85);
 }</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_1">
@@ -115,6 +125,19 @@ color: #FFFFFF;
            <string/>
           </property>
          </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
         </item>
         <item>
          <widget class="QPushButton" name="btnPrevious">
@@ -228,7 +251,7 @@ color: #FFFFFF;
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>210</width>
+        <width>294</width>
         <height>426</height>
        </rect>
       </property>

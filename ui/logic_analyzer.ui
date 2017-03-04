@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1419</width>
-    <height>728</height>
+    <height>738</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -53,10 +53,26 @@ QComboBox:disabled
 }
 </string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0">
    <property name="spacing">
     <number>0</number>
    </property>
+   <item>
+    <spacer name="verticalSpacer_13">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>10</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
    <item>
     <widget class="QWidget" name="toolbarWidget" native="true">
      <property name="sizePolicy">
@@ -93,22 +109,6 @@ QComboBox:disabled
       <property name="spacing">
        <number>0</number>
       </property>
-      <item row="0" column="10">
-       <spacer name="horizontalSpacer_9">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeType">
-         <enum>QSizePolicy::Fixed</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>30</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
       <item row="0" column="0">
        <spacer name="horizontalSpacer_3">
         <property name="orientation">
@@ -386,7 +386,7 @@ background-color: grey;
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>20</width>
+          <width>40</width>
           <height>0</height>
          </size>
         </property>
@@ -1659,7 +1659,7 @@ border-image: url(:/icons/time_trigger_left.svg);
         </property>
         <property name="maximumSize">
          <size>
-          <width>250</width>
+          <width>16777215</width>
           <height>16777215</height>
          </size>
         </property>
@@ -1688,7 +1688,7 @@ border-image: url(:/icons/time_trigger_left.svg);
          <item>
           <widget class="QStackedWidget" name="stackedWidget">
            <property name="currentIndex">
-            <number>0</number>
+            <number>2</number>
            </property>
            <widget class="QWidget" name="cursorSettings">
             <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -1836,6 +1836,23 @@ QPushButton:!checked:disabled {
             </layout>
            </widget>
            <widget class="QWidget" name="generalSettings">
+            <property name="styleSheet">
+             <string notr="true">
+QLabel
+{
+width: 68.2px;
+height: 16.46px;
+font-family: Arial;
+font-size: 14px;
+line-height: 16px;
+color: rgba(255,255,255,150);
+}
+
+QLabel:disabled
+{
+  color: rgb(85, 85, 85);
+}</string>
+            </property>
             <layout class="QVBoxLayout" name="generalSettingsLayout">
              <property name="spacing">
               <number>0</number>
@@ -1935,6 +1952,24 @@ color: #FFFFFF;
                 </size>
                </property>
               </spacer>
+             </item>
+             <item>
+              <widget class="QPushButton" name="btnResetInstrument">
+               <property name="styleSheet">
+                <string notr="true">height:40px;
+background-color: #4A64FF;
+border-radius: 4px;
+
+font-family: Arial;
+font-size: 14px;
+font-weight: bold;
+line-height: 16px;
+color: #FFFFFF;</string>
+               </property>
+               <property name="text">
+                <string>Reset Instrument</string>
+               </property>
+              </widget>
              </item>
             </layout>
            </widget>

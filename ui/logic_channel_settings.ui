@@ -14,14 +14,19 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">QLabel {
+   <string notr="true">QLabel
+{
 width: 68.2px;
 height: 16.46px;
-opacity: 0.6;
 font-family: Arial;
 font-size: 14px;
 line-height: 16px;
-color: #FFFFFF;
+color: rgba(255,255,255,150);
+}
+
+QLabel:disabled
+{
+  color: rgb(85, 85, 85);
 }
 
 /* Color of the selected list item. */
@@ -121,6 +126,22 @@ color: rgba(255,255,255,50);
    </item>
    <item>
     <widget class="QLineEdit" name="nameLineEdit"/>
+   </item>
+   <item>
+    <spacer name="verticalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>10</height>
+      </size>
+     </property>
+    </spacer>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_3">
