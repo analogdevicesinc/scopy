@@ -630,13 +630,17 @@ void CapturePlot::onChannelAdded(int chnIdx)
 
 	connect(chOffsetHdl, &RoundedHandleV::positionChanged,
 		[=](int pos) {
-			QwtScaleMap yMap = this->canvasMap(QwtAxisId(QwtPlot::yLeft, chnIdx));
-			double min = -(yAxisNumDiv() / 2.0) * VertUnitsPerDiv(chnIdx);
-			double max = (yAxisNumDiv() / 2.0) * VertUnitsPerDiv(chnIdx);
+			int chn_id = d_offsetHandles.indexOf(chOffsetHdl);
+			if (chn_id < 0)
+				return;
+
+			QwtScaleMap yMap = this->canvasMap(QwtAxisId(QwtPlot::yLeft, chn_id));
+			double min = -(yAxisNumDiv() / 2.0) * VertUnitsPerDiv(chn_id);
+			double max = (yAxisNumDiv() / 2.0) * VertUnitsPerDiv(chn_id);
 
 			yMap.setScaleInterval(min, max);
 			double offset = yMap.invTransform(pos);
-			this->setVertOffset(-offset, chnIdx);
+			this->setVertOffset(-offset, chn_id);
 			this->replot();
 
 			Q_EMIT channelOffsetChanged(-offset);
@@ -809,4 +813,21 @@ void CapturePlot::updateBufferSizeSampleRateLabel(int nsamples, double sr)
 	QString text = QString("%1 Samples at ").arg(nsamples) + txtSampleRate +
 		"/" + txtSamplingPeriod;
 	d_sampleRateLabel->setText(text);
+}
+
+void CapturePlot::removeLeftVertAxis(unsigned int axis)
+{
+	const unsigned int numAxis = vertAxes.size();
+
+	if (axis >= numAxis)
+		return;
+
+	// Update the mobile axis ID of all symbols
+	for (int i = axis; i < numAxis - 1; i++) {
+		QwtAxisId axisId = d_offsetBars.at(i)->mobileAxis();
+		--axisId.id;
+		d_offsetBars.at(i)->setMobileAxis(axisId);
+	}
+
+	DisplayPlot::removeLeftVertAxis(axis);
 }

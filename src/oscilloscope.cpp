@@ -755,9 +755,13 @@ void Oscilloscope::del_math_channel()
 			i < nb_channels + nb_math_channels; i++) {
 		QWidget *parent = ui->channelsList->itemAt(i)->widget();
 		QCheckBox *box = parent->findChild<QCheckBox *>("box");
+		QPushButton *name = parent->findChild<QPushButton *>("name");
+		QPushButton *del_btn = parent->findChild<QPushButton *>("delBtn");
 
 		/* Update the IDs */
 		box->setProperty("id", QVariant(i));
+		name->setProperty("id", QVariant(i));
+		del_btn->setProperty("id", QVariant(i));
 
 		/* Update the curve-to-axis map */
 		plot.Curve(i)->setAxes(
@@ -766,6 +770,7 @@ void Oscilloscope::del_math_channel()
 	}
 
 	updateRunButton(false);
+	plot.replot();
 }
 
 void Oscilloscope::on_actionClose_triggered()
