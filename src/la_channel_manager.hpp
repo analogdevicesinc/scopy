@@ -206,7 +206,11 @@ public:
 	void moveChannel(int fromChgIndex, int from, int to, bool after = true);
 	void move(int from, int to, bool after = true);
 	void splitChannel(int chgIndex, int chIndex);
+
 	LogicAnalyzerChannelGroup *get_channel_group(int index);
+	void add_channel_group(LogicAnalyzerChannelGroup *chg);
+	LogicAnalyzerChannel *get_channel(int);
+	void clearChannelGroups();
 private:
 	std::vector<const srd_decoder *> decoderList;
 	QStringList nameDecoderList;

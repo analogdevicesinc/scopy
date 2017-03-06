@@ -1051,6 +1051,26 @@ void LogicAnalyzerChannelManager::join(std::vector<int> index)
 	channel_group.push_back(new_ch_group);
 }
 
+LogicAnalyzerChannel *LogicAnalyzerChannelManager::get_channel(int index)
+{
+	return static_cast<LogicAnalyzerChannel *>(channel[index]);
+}
+
+void LogicAnalyzerChannelManager::add_channel_group(
+		LogicAnalyzerChannelGroup *chg)
+{
+	channel_group.push_back(chg);
+}
+
+void LogicAnalyzerChannelManager::clearChannelGroups()
+{
+	for (auto ch : channel_group) {
+		delete ch;
+	}
+
+	channel_group.erase(channel_group.begin(),channel_group.end());
+}
+
 void LogicAnalyzerChannelManager::split(int index)
 {
 	auto it = std::next(channel_group.begin(), index);

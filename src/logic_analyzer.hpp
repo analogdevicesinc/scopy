@@ -196,6 +196,12 @@ private:
 	void enableTrigger(bool value);
 	void cleanHWParams();
 	void cursorsFormatDelta();
+
+	QString toString();
+	QJsonValue chmToJson();
+
+	void fromString(QString);
+	void jsonToChm(QJsonObject obj);
 };
 
 class LogicAnalyzer_API : public ApiObject
@@ -203,6 +209,7 @@ class LogicAnalyzer_API : public ApiObject
 	Q_OBJECT
 
 	Q_PROPERTY(bool running READ running WRITE run STORED false);
+	Q_PROPERTY(QString chm READ chm WRITE setChm SCRIPTABLE false);
 
 public:
 	explicit LogicAnalyzer_API(LogicAnalyzer *lga) :
@@ -211,6 +218,8 @@ public:
 
 	bool running() const;
 	void run(bool en);
+	QString chm() const;
+	void setChm(QString);
 
 private:
 	LogicAnalyzer *lga;
