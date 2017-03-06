@@ -102,6 +102,7 @@ private Q_SLOTS:
 	void cursorValueChanged_2(int);
 	void setCursorsActive(bool);
 	void resizeEvent();
+	void resetInstrumentToDefault();
 public Q_SLOTS:
 	void onTimeTriggerHandlePosChanged(int);
 	void onTimePositionSpinboxChanged(double value);

@@ -303,6 +303,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 		this, SLOT(setCursorsActive(bool)));
 	connect(main_win->view_, SIGNAL(resized()),
 		this, SLOT(resizeEvent()));
+	connect(ui->btnResetInstrument, SIGNAL(clicked(bool)),
+		this, SLOT(resetInstrumentToDefault()));
 
 	cleanHWParams();
 	chm_ui = new LogicAnalyzerChannelManagerUI(0, main_win, &chm, ui->colorSettings,
@@ -400,7 +402,7 @@ void LogicAnalyzer::set_triggered_status(std::string value)
 	if( value == "awaiting" )
 		ui->triggerStateLabel->setText("Waiting");
 	else if(value == "running")
-		ui->triggerStateLabel->setText("Trig'd");
+		ui->triggerStateLabel->setText("Triggered");
 	else if(value == "stopped")
 		ui->triggerStateLabel->setText("Stop");
 }
@@ -632,7 +634,6 @@ void LogicAnalyzer::startStop(bool start)
 		running = false;
 		ui->btnRunStop->setText("Run");
 		ui->btnSingleRun->setEnabled(true);
-		ui->triggerStateLabel->setText("Stop");
 	}
 	main_win->run_stop();
 	setTriggerDelay();
@@ -926,6 +927,18 @@ void LogicAnalyzer::setCursorsActive(bool active)
 		d_hCursorHandle2->hide();
 		ui->cursorsStatusWidget->hide();
 	}
+}
+
+void LogicAnalyzer::resetInstrumentToDefault()
+{
+	chm.clearChannelGroups();
+	for(int i = 0; i < no_channels; i++) {
+		chm.add_channel_group(new LogicAnalyzerChannelGroup(chm.get_channel(i)));
+	}
+	chm.highlightChannel(chm.get_channel_group(0));
+	chm_ui->update_ui();
+	timePosition->setValue(0);
+	timeBase->setValue(1e-3);
 }
 
 QJsonValue LogicAnalyzer::chmToJson()
