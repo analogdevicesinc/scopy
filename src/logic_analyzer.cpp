@@ -1059,3 +1059,33 @@ void LogicAnalyzer_API::run(bool en)
 {
 	lga->ui->btnRunStop->setChecked(en);
 }
+
+double LogicAnalyzer_API::getTimePos() const
+{
+	return lga->timePosition->value();
+}
+
+void LogicAnalyzer_API::setTimePos(double value)
+{
+	lga->timePosition->setValue(value);
+}
+
+double LogicAnalyzer_API::getTimeBase() const
+{
+	return lga->timeBase->value();
+}
+
+void LogicAnalyzer_API::setTimeBase(double value)
+{
+	lga->timeBase->setValue(value);
+}
+
+bool LogicAnalyzer_API::externalTrigger() const
+{
+	return lga->trigger_settings_ui->trigg_extern_en->isChecked();
+}
+
+void LogicAnalyzer_API::setExternalTrigger(bool en)
+{
+	lga->trigger_settings_ui->trigg_extern_en->setChecked(en);
+}

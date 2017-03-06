@@ -211,6 +211,9 @@ class LogicAnalyzer_API : public ApiObject
 
 	Q_PROPERTY(bool running READ running WRITE run STORED false);
 	Q_PROPERTY(QString chm READ chm WRITE setChm SCRIPTABLE false);
+	Q_PROPERTY(double time_position READ getTimePos WRITE setTimePos);
+	Q_PROPERTY(double time_base READ getTimeBase WRITE setTimeBase);
+	Q_PROPERTY(bool external_trigger READ externalTrigger WRITE setExternalTrigger);
 
 public:
 	explicit LogicAnalyzer_API(LogicAnalyzer *lga) :
@@ -221,6 +224,15 @@ public:
 	void run(bool en);
 	QString chm() const;
 	void setChm(QString);
+
+	double getTimePos() const;
+	void setTimePos(double pos);
+
+	double getTimeBase() const;
+	void setTimeBase(double base);
+
+	bool externalTrigger() const;
+	void setExternalTrigger(bool val);
 
 private:
 	LogicAnalyzer *lga;

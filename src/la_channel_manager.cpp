@@ -37,7 +37,8 @@ namespace adiscope {
 LogicAnalyzerChannel::LogicAnalyzerChannel(uint16_t id_,
                 std::string label_) :
 	Channel(id_,label_),
-	channel_role(nullptr)
+	channel_role(nullptr),
+	trigger("none")
 {
 }
 
