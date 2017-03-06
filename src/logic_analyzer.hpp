@@ -36,6 +36,7 @@
 #include "handles_area.hpp"
 #include "plot_line_handle.h"
 #include "spinbox_a.hpp"
+#include "la_capture_params.hpp"
 
 using namespace pv;
 using namespace pv::toolbars;
@@ -45,6 +46,7 @@ using sigrok::Context;
 namespace pv {
 namespace view {
 class Viewport;
+class Ruler;
 }
 class Session;
 }
@@ -56,6 +58,7 @@ namespace Ui {
 class LogicAnalyzer;
 class Channel;
 class LChannelSettings;
+class DigitalTriggerSettings;
 }
 
 class QJSEngine;
@@ -78,7 +81,9 @@ public:
 	                       unsigned int sample_rate = 200000);
 	~LogicAnalyzer();
 	void updateAreaTimeTriggerPadding();
-
+	void setHWTrigger(int chid, std::string trigger_val);
+	std::string get_trigger_from_device(int chid);
+	void set_triggered_status(std::string value);
 private Q_SLOTS:
 	void startStop(bool start);
 	void toggleRightMenu();
@@ -89,15 +94,31 @@ private Q_SLOTS:
 	void onHorizScaleValueChanged(double value);
 	void setTimebaseLabel(double value);
 	void singleRun();
-
+	void onRulerChanged(double, bool);
+	void setHWTriggerLogic(const QString value);
+	void setupTriggerSettingsUI(bool enabled = false);
+	void setExternalTrigger(int);
+	void cursorValueChanged_1(int);
+	void cursorValueChanged_2(int);
+	void setCursorsActive(bool);
+	void resizeEvent();
+	void resetInstrumentToDefault();
 public Q_SLOTS:
 	void onTimeTriggerHandlePosChanged(int);
+	void onTimePositionSpinboxChanged(double value);
+	void refreshTriggerPos(int);
+	void onChmWidthChanged(int);
+	void triggerChanged(int);
 
 private:
 	Ui::LogicAnalyzer *ui;
+	Ui::DigitalTriggerSettings *trigger_settings_ui;
 	QButtonGroup *settings_group;
 	QPushButton *active_settings_btn;
 	QPushButton *menuRunButton;
+	QPushButton *triggerBtn;
+
+	static std::vector<std::string> trigger_mapping;
 
 	ScaleSpinButton *timeBase;
 	PositionSpinButton *timePosition;
@@ -117,9 +138,12 @@ private:
 
 	static const unsigned long maxBuffersize;
 	static const unsigned long maxSampleRate;
+	static const unsigned long maxTriggerBufferSize;
 	double active_sampleRate;
 	unsigned long active_sampleCount;
 	unsigned long custom_sampleCount;
+	long long active_triggerSampleCount;
+	double active_timePos;
 	double pickSampleRateFor(double timeSpanSecs,
 		double desiredBufferSize);
 
@@ -144,6 +168,9 @@ private:
 	MetricPrefixFormatter d_cursorMetricFormatter;
 	TimePrefixFormatter d_cursorTimeFormatter;
 
+	PlotLineHandleH *d_hCursorHandle1;
+	PlotLineHandleH *d_hCursorHandle2;
+
 	void updateBuffersizeSamplerateLabel(int samples, double samplerate);
 	void setBuffersizeLabelValue(double value);
 	void setSamplerateLabelValue(double value);
@@ -152,8 +179,30 @@ private:
 
 	bool running = false;
 	void setSampleRate();
+	void setTriggerDelay(bool silent = false);
+	void setHWTriggerDelay(long long delay);
 	double plotRefreshRate;
 	int timespanLimitStream;
+
+	double pixelToTime(int pix);
+	int timeToPixel(double time);
+
+	std::shared_ptr<LogicAnalyzerSymmetricBufferMode> symmBufferMode;
+	QWidget* trigger_settings;
+	double active_plot_timebase;
+
+	double value_cursor1;
+	double value_cursor2;
+	double value_cursors_delta;
+	void enableTrigger(bool value);
+	void cleanHWParams();
+	void cursorsFormatDelta();
+
+	QString toString();
+	QJsonValue chmToJson();
+
+	void fromString(QString);
+	void jsonToChm(QJsonObject obj);
 };
 
 class LogicAnalyzer_API : public ApiObject
@@ -161,6 +210,10 @@ class LogicAnalyzer_API : public ApiObject
 	Q_OBJECT
 
 	Q_PROPERTY(bool running READ running WRITE run STORED false);
+	Q_PROPERTY(QString chm READ chm WRITE setChm SCRIPTABLE false);
+	Q_PROPERTY(double time_position READ getTimePos WRITE setTimePos);
+	Q_PROPERTY(double time_base READ getTimeBase WRITE setTimeBase);
+	Q_PROPERTY(bool external_trigger READ externalTrigger WRITE setExternalTrigger);
 
 public:
 	explicit LogicAnalyzer_API(LogicAnalyzer *lga) :
@@ -169,6 +222,17 @@ public:
 
 	bool running() const;
 	void run(bool en);
+	QString chm() const;
+	void setChm(QString);
+
+	double getTimePos() const;
+	void setTimePos(double pos);
+
+	double getTimeBase() const;
+	void setTimeBase(double base);
+
+	bool externalTrigger() const;
+	void setExternalTrigger(bool val);
 
 private:
 	LogicAnalyzer *lga;

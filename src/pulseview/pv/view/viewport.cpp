@@ -27,6 +27,7 @@
 #include "view.hpp"
 #include "viewitempaintparams.hpp"
 #include "viewport.hpp"
+#include "ruler.hpp"
 
 #include "../session.hpp"
 
@@ -50,13 +51,27 @@ namespace view {
 Viewport::Viewport(View &parent) :
 	ViewWidget(parent),
 	pinch_zoom_active_(false),
-	timeTriggerPos(0)
+	timeTriggerSample(0),
+	timeTriggerPixel(0),
+	timeTriggerActive(false),
+	cursorsActive(false),
+	cursorsPixelValues(std::pair<int, int>(0,0))
 {
 	setAutoFillBackground(true);
 	setStyleSheet("background-color:black;\n"
 		      "border:0px;\n"
 		      "margin:0px;\npadding:0px;");
 	setBackgroundRole(QPalette::Base);
+}
+
+void Viewport::setTimeTriggerPosActive(bool active)
+{
+	timeTriggerActive = active;
+}
+
+bool Viewport::getTimeTriggerActive()
+{
+	return timeTriggerActive;
 }
 
 shared_ptr<ViewItem> Viewport::get_mouse_over_item(const QPoint &pt)
@@ -106,9 +121,11 @@ void Viewport::drag_by(const QPoint &delta)
 			return;
 
 		view_.set_scale_offset(view_.scale(),
-				       (*drag_offset_ - delta.x() * view_.scale() / (geometry().width() / divisionCount)));
-
+			(*drag_offset_ - delta.x() * view_.scale() / (geometry().width() / divisionCount)));
 		view_.set_v_offset(-drag_v_offset_ - delta.y());
+		update();
+		if( getTimeTriggerActive() )
+			Q_EMIT plotChanged(false);
 	}
 }
 
@@ -214,35 +231,81 @@ void Viewport::paintEvent(QPaintEvent*)
 	for (const shared_ptr<TimeItem> t : time_items)
 		t->paint_fore(p, pp);
 
-	if( timeTriggerPos != 0 )
-	{
-		paint_time_trigger_line(p, pp, timeTriggerPos);
+	if( timeTriggerActive ){
+		paint_time_trigger_line(p, pp, timeTriggerSample);
 	}
 
+	if( cursorsActive ){
+		paint_cursors(p, pp);
+	}
 	p.end();
 }
 
-void Viewport::setTimeTriggerPos(int value)
+void Viewport::paint_cursors(QPainter &p, const ViewItemPaintParams &pp)
 {
-	timeTriggerPos = value;
+	QPen cursorsLinePen = QPen(QColor(155, 155, 155), 1, Qt::DashLine);
+	p.setPen(cursorsLinePen);
+	const int y = view_.owner_visual_v_offset();
+	const int h = pp.height();
+	int row_count = view_.height() / divisionHeight;
+
+	QPoint p1 = QPoint(cursorsPixelValues.first, y);
+	QPoint p2 = QPoint(cursorsPixelValues.first, y + h * row_count);
+	p.drawLine(p1, p2);
+
+	p1 = QPoint(cursorsPixelValues.second, y);
+	p2 = QPoint(cursorsPixelValues.second, y + h * row_count);
+	p.drawLine(p1, p2);
+}
+
+void Viewport::setTimeTriggerSample(int sample)
+{
+	if( sample != timeTriggerSample )
+	{
+		timeTriggerSample = sample;
+		view_.time_item_appearance_changed(true, true);
+	}
+}
+
+void Viewport::cursorValueChanged_1(int pos)
+{
+	cursorsPixelValues.first = pos;
 	view_.time_item_appearance_changed(true, true);
 }
 
-int Viewport::getTimeTriggerPos() const
+void Viewport::cursorValueChanged_2(int pos)
 {
-	return timeTriggerPos;
+	cursorsPixelValues.second = pos;
+	view_.time_item_appearance_changed(true, true);
 }
 
-void Viewport::paint_time_trigger_line(QPainter &p, const ViewItemPaintParams &pp, int pos)
+int Viewport::getTimeTriggerSample() const
 {
+	return timeTriggerSample;
+}
+
+void Viewport::paint_time_trigger_line(QPainter &p, const ViewItemPaintParams &pp, int sample_index)
+{
+	double samplerate = view_.session().get_samplerate();
+	int px;
+	if( samplerate != 1 ) {
+		const double samples_per_pixel = samplerate * pp.scale();
+		const double pixels_offset = pp.pixels_offset();
+		px = (sample_index / samples_per_pixel - pixels_offset) + pp.left();
+		if( px != timeTriggerPixel) {
+			timeTriggerPixel = px;
+			repaintTriggerHandle(timeTriggerPixel);
+		}
+	}
+
 	QPen pen = QPen(QColor(74, 100, 255));
 	p.setPen(pen);
 	const int y = view_.owner_visual_v_offset();
 	const int h = pp.height();
 	int row_count = view_.height() / divisionHeight;
 
-	QPoint p1 = QPoint(pos, y);
-	QPoint p2 = QPoint(pos, y + h * row_count);
+	QPoint p1 = QPoint(timeTriggerPixel, y);
+	QPoint p2 = QPoint(timeTriggerPixel, y + h * row_count);
 	p.drawLine(p1, p2);
 }
 
@@ -324,14 +387,45 @@ void Viewport::wheelEvent(QWheelEvent *event)
 	}
 }
 
+bool Viewport::getCursorsActive() const
+{
+	return cursorsActive;
+}
+
+void Viewport::setCursorsActive(bool value)
+{
+	cursorsActive = value;
+	view_.time_item_appearance_changed(true, true);
+}
+
+std::pair<int, int> Viewport::getCursorsPixelValues() const
+{
+	return cursorsPixelValues;
+}
+
+void Viewport::setCursorsPixelValues(const std::pair<int, int> &value)
+{
+	cursorsPixelValues = value;
+}
+
+int Viewport::getTimeTriggerPixel() const
+{
+	return timeTriggerPixel;
+}
+
+void Viewport::setTimeTriggerPixel(int value)
+{
+	timeTriggerPixel = value;
+}
+
 int Viewport::getDivisionOffset() const
 {
-    return divisionOffset;
+	return divisionOffset;
 }
 
 void Viewport::setDivisionOffset(int value)
 {
-    divisionOffset = value;
+	divisionOffset = value;
 }
 
 int Viewport::getDivisionCount() const

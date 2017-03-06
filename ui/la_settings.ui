@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>250</width>
+    <width>334</width>
     <height>500</height>
    </rect>
   </property>
@@ -20,80 +20,30 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">
-QComboBox
-{
-  height: 19px;
-
-  border: 0px;
-  border-bottom: 1px solid rgba(255, 255, 255, 102);
-  font-family: ArialMT;
-  font-size: 16px;
-  font-weight: normal;
-  font-style: normal;
-  text-align: left;
-  color: #ffffff;
-/*background-color:green;*/
-
-}
-QComboBox::drop-down
-{
-  subcontrol-position: center right;
-  width: 10px;
-  height: 6px;
-  border-image: url(:/icons/sba_cmb_box_arrow.svg);
-  font-family: ArialMT;
-  font-size: 16px;
-  font-weight: normal;
-  font-style: normal;
-  text-align: left;
-  color: #e0e0e0;
-}
-QComboBox QAbstractItemView {
-  border: 0px;
-  selection-background-color: rgba(25, 25, 25);
-  outline: 0px;
-}
-QComboBox:disabled
-{
-  color: rgb(85, 85, 85);
-}
-
-/* Color of the selected list item. */
-QComboBox::item:selected {
-  font-family: ArialMT;
-  font-size: 16px;
-  font-weight: normal;
-  font-style: normal;
-  text-align: left;
-  color: #ffffff;
-  border-bottom: 1px solid rgba(255, 255, 255, 102);
- 
-}
-/* Indicator will shine through the label text if you don't make it hidden. */
-QComboBox::indicator{
-    background-color:transparent;
-    selection-background-color:transparent;
-    color:transparent;
-    selection-color:transparent;
+   <string notr="true">QLineEdit {
+  height: 20px;
+  width: 50px;
+  color: white;
+  font-size: 14px;
+font-family: Arial;
+font-weight:bold;
+border:0px;
+/*  border-bottom: 1px solid rgba(255, 255, 255, 102); */
 }
 
 QLabel
-{  
-  font-family: ArialMT;
-  font-size: 16px;
-  font-weight: normal;
-  font-style: normal;
-  text-align: left;
-  color: #ffffff;
-  border: 0px solid red;
-  margin:0px;
-  padding:0px;
+{
+width: 68.2px;
+height: 16.46px;
+font-family: Arial;
+font-size: 14px;
+line-height: 16px;
+color: rgba(255,255,255,150);
 }
 
 QLabel:disabled
 {
-	color:rgb(85,85,85);
+  color: rgb(85, 85, 85);
 }</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_1">
@@ -101,32 +51,158 @@ QLabel:disabled
     <number>0</number>
    </property>
    <property name="leftMargin">
-    <number>0</number>
+    <number>20</number>
    </property>
    <property name="topMargin">
-    <number>0</number>
+    <number>10</number>
    </property>
    <property name="rightMargin">
-    <number>0</number>
+    <number>20</number>
    </property>
    <property name="bottomMargin">
     <number>0</number>
    </property>
    <item>
     <widget class="QWidget" name="headerWidget" native="true">
+     <property name="styleSheet">
+      <string notr="true">QPushButton{
+  width: 40px;
+  height: 30px;
+  border-radius: 4px;
+  background-color: #4a64ff;
+  font-family: ArialMT;
+  font-size: 14px;
+  font-weight: bold;
+  font-style: normal;
+  text-align: center;
+  color: #ffffff;
+}
+
+/*
+QPushButton:hover
+{
+	 background-color: #4a34ff;
+}*/
+
+</string>
+     </property>
      <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="spacing">
+       <number>10</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>10</number>
+      </property>
       <item>
-       <widget class="QLabel" name="labelType">
-        <property name="styleSheet">
-         <string notr="true"/>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <property name="topMargin">
+         <number>0</number>
         </property>
-        <property name="text">
-         <string>Settings</string>
+        <property name="bottomMargin">
+         <number>0</number>
         </property>
-       </widget>
+        <item>
+         <widget class="QLabel" name="nameLineEdit">
+          <property name="styleSheet">
+           <string notr="true">QLabel 
+{
+width: 37px;
+height: 17px;
+font-family: Arial;
+font-size: 14px;
+font-weight: bold;
+line-height: 16px;
+color: #FFFFFF;
+}</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnPrevious">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normalon>:/icons/time_trigger_left.svg</normalon>
+           </iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>40</width>
+            <height>30</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnNext">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="styleSheet">
+           <string notr="true"/>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normalon>:/icons/time_trigger_right.svg</normalon>
+           </iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>40</width>
+            <height>30</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
        <widget class="Line" name="line">
+        <property name="styleSheet">
+         <string notr="true">color: #4A64FF;</string>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="lineWidth">
+         <number>2</number>
+        </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
@@ -175,8 +251,8 @@ QLabel:disabled
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>250</width>
-        <height>454</height>
+        <width>294</width>
+        <height>426</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -186,11 +262,73 @@ QLabel:disabled
        </sizepolicy>
       </property>
       <property name="styleSheet">
-       <string notr="true"/>
+       <string notr="true">QLabel {
+opacity: 0.2;
+font-family: Arial;
+font-size: 13px;
+line-height: 14px;
+color:red;/* rgba(255,255,255,50);*/
+} 
+
+QComboBox
+{
+  height: 19px;
+  border: 0px;
+  border-bottom: 1px solid rgba(255, 255, 255, 102);
+  font-family: ArialMT;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  text-align: right;
+  color: #ffffff;
+
+}
+QComboBox::drop-down
+{
+  subcontrol-position: center right;
+  width: 10px;
+  height: 6px;
+  border-image: url(:/icons/sba_cmb_box_arrow.svg);
+  font-family: ArialMT;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  text-align: right;
+  color: #e0e0e0;
+}
+QComboBox QAbstractItemView {
+  border: 0px;
+  selection-background-color: rgba(25, 25, 25);
+  outline: 0px;
+}
+QComboBox:disabled
+{
+  color: rgb(85, 85, 85);
+}
+
+/* Color of the selected list item. */
+QComboBox::item:selected {
+  font-family: ArialMT;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  text-align: right;
+  color: #ffffff;
+  border-bottom: 1px solid rgba(255, 255, 255, 102);
+ 
+}
+/* Indicator will shine through the label text if you don't make it hidden. */ 
+QComboBox::indicator{
+    background-color:transparent;
+    selection-background-color:transparent;
+    color:transparent;
+    selection-color:transparent;
+}
+</string>
       </property>
       <layout class="QVBoxLayout" name="scrollAreaWidgetLayout">
        <property name="spacing">
-        <number>0</number>
+        <number>5</number>
        </property>
        <property name="leftMargin">
         <number>0</number>
@@ -205,43 +343,164 @@ QLabel:disabled
         <number>0</number>
        </property>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout">
-         <property name="leftMargin">
-          <number>5</number>
+        <widget class="QWidget" name="requiredChn" native="true">
+         <property name="styleSheet">
+          <string notr="true"/>
          </property>
-         <property name="rightMargin">
-          <number>5</number>
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <layout class="QHBoxLayout" name="requiredChnLayout">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="label_2">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QLabel {
+opacity: 0.2;
+font-family: Arial;
+font-size: 13px;
+line-height: 14px;
+color: rgba(255,255,255,50);
+}</string>
+              </property>
+              <property name="text">
+               <string>REQUIRED</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="Line" name="line_2">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QFrame{
+	opacity: 0.1;
+  color: rgba(255,255,255,50);
+}</string>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Sunken</enum>
+              </property>
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QWidget" name="optionalChn" native="true">
+         <property name="styleSheet">
+          <string notr="true"/>
          </property>
-         <item>
-          <widget class="QLabel" name="label">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>Name</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="nameLineEdit">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="styleSheet">
-            <string notr="true"/>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-        </layout>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <layout class="QHBoxLayout" name="optionalChnLayout">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="label_4">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QLabel {
+opacity: 0.2;
+font-family: Arial;
+font-size: 13px;
+line-height: 14px;
+color: rgba(255,255,255,50);
+}</string>
+              </property>
+              <property name="text">
+               <string>OPTIONAL</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="Line" name="line_4">
+              <property name="styleSheet">
+               <string notr="true">QFrame{
+	opacity: 0.1;
+  color: rgba(255,255,255,50);
+}</string>
+              </property>
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </widget>

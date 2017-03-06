@@ -12,8 +12,10 @@
 #include "ui_la_manager_header.h"
 #include "ui_la_settings.h"
 #include "ui_la_decoder_reqChannel.h"
+#include "ui_logic_channel_settings.h"
 #include <QScrollBar>
 #include <libsigrokcxx/libsigrokcxx.hpp>
+#include <QPainter>
 
 using std::dynamic_pointer_cast;
 
@@ -36,7 +38,7 @@ LogicAnalyzerChannel::LogicAnalyzerChannel(uint16_t id_,
                 std::string label_) :
 	Channel(id_,label_),
 	channel_role(nullptr),
-	trigger("rising")
+	trigger("none")
 {
 }
 
@@ -63,6 +65,7 @@ void LogicAnalyzerChannel::setChannel_role(const srd_channel *value)
 
 LogicAnalyzerChannelUI::LogicAnalyzerChannelUI(LogicAnalyzerChannel *ch,
                 LogicAnalyzerChannelGroup *chgroup,
+                LogicAnalyzerChannelGroupUI *chgroupui,
                 LogicAnalyzerChannelManagerUI *chm_ui,
                 QWidget *parent) :
 	ChannelUI(ch,parent),
@@ -71,8 +74,17 @@ LogicAnalyzerChannelUI::LogicAnalyzerChannelUI(LogicAnalyzerChannel *ch,
 	this->ui->setupUi(this);
 	this->lch = ch;
 	this->chgroup = chgroup;
+	this->chgroupui = chgroupui;
 	this->chm_ui = chm_ui;
 	setAcceptDrops(true);
+}
+
+LogicAnalyzerChannelUI::~LogicAnalyzerChannelUI()
+{
+	if( ui->baseWidget == chm_ui->hoverWidget ){
+		chm_ui->hoverWidget = nullptr;
+	}
+	delete ui;
 }
 
 void LogicAnalyzerChannelUI::mousePressEvent(QMouseEvent *event)
@@ -87,13 +99,18 @@ void LogicAnalyzerChannelUI::mousePressEvent(QMouseEvent *event)
 
 void LogicAnalyzerChannelUI::mouseMoveEvent(QMouseEvent *event)
 {
-	if (!(event->buttons() & Qt::LeftButton))
+	if (!(event->buttons() & Qt::LeftButton)) {
 		return;
+	} else {
+		chm_ui->setHoverWidget(this);
+	}
 	if((event->pos() - dragStartPosition).manhattanLength()
 		< QApplication::startDragDistance())
 		{
 			return;
 		}
+
+	chm_ui->clearHoverWidget();
 
 	QDrag *drag = new QDrag(this);
 	QMimeData *mimeData = new QMimeData;
@@ -131,12 +148,11 @@ void LogicAnalyzerChannelUI::mouseMoveEvent(QMouseEvent *event)
 
 void LogicAnalyzerChannelUI::dragEnterEvent(QDragEnterEvent *event)
 {
-	event->accept();
+	auto w = ui->baseWidget->geometry().width();
+	auto h = ui->baseWidget->geometry().height();
 
-	topDragbox.setRect(0, 0, this->geometry().width() + 1,
-		this->geometry().height()/2 + 1);
-	botDragbox.setRect(0, this->geometry().height()/2,
-		this->geometry().width() + 1, this->geometry().height()/2 + 1);
+	topDragbox.setRect(0, 0, w, h/2);
+	botDragbox.setRect(0, h/2, w, h/2);
 
 	if( event->mimeData()->hasFormat("la/channelgroup"))
 	{
@@ -145,40 +161,59 @@ void LogicAnalyzerChannelUI::dragEnterEvent(QDragEnterEvent *event)
 		auto chgIter = std::find(channelGroups->begin(), channelGroups->end(), chgroup);
 		auto chgIndex = chgIter - channelGroups->begin();
 
-		if( from == chgIndex )
-		{
+		if( from == chgIndex ){
 			event->ignore();
+			return;
 		}
 	}
+	event->accept();
 }
 
 void LogicAnalyzerChannelUI::dragMoveEvent(QDragMoveEvent *event)
 {
-	if( event->answerRect().intersects(botDragbox) )
-	{
-		ui->line->setVisible(true);
-		ui->line_2->setVisible(false);
+	if( event->answerRect().intersects(botDragbox) ) {
+		chm_ui->clearHoverWidget();
+		chgroupui->resetSeparatorHighlight(true);
+		highlightBotSeparator();
+		event->accept();
+	}
+	else if(event->answerRect().intersects(topDragbox)) {
+		chm_ui->clearHoverWidget();
+		chgroupui->resetSeparatorHighlight(true);
+		highlightTopSeparator();
+		event->accept();
+	}
+	else if(event->answerRect().intersects(centerDragbox)) {
+		chm_ui->clearHoverWidget();
+		chgroupui->resetSeparatorHighlight(true);
+		event->accept();
 	}
 	else {
-		ui->line->setVisible(false);
-		ui->line_2->setVisible(true);
+		chgroupui->resetSeparatorHighlight(true);
+		event->ignore();
 	}
-
-	event->accept();
 }
 
 void LogicAnalyzerChannelUI::dragLeaveEvent(QDragLeaveEvent *event)
 {
-	ui->line->setVisible(false);
-	ui->line_2->setVisible(false);
+	resetSeparatorHighlight();
 	event->accept();
+}
+
+void LogicAnalyzerChannelUI::enterEvent(QEvent *event)
+{
+	chm_ui->setHoverWidget(this);
+	QWidget::enterEvent(event);
+}
+
+void LogicAnalyzerChannelUI::leaveEvent(QEvent *event)
+{
+	chm_ui->clearHoverWidget();
+	QWidget::leaveEvent(event);
 }
 
 void LogicAnalyzerChannelUI::dropEvent(QDropEvent *event)
 {
-	ui->line->setVisible(false);
-	ui->line_2->setVisible(false);
-
 	if( event->source() == this && event->possibleActions() & Qt::MoveAction)
 		return;
 
@@ -215,22 +250,48 @@ void LogicAnalyzerChannelUI::dropEvent(QDropEvent *event)
 		short fromCh = (short)event->mimeData()->data("la/channel")[3];
 
 		auto fromNrOfChannels = chm_ui->chm->get_channel_group(fromChg)->get_channel_count();
+		auto fromChannel = chm_ui->chm->get_channel_group(fromChg)->get_channel(fromCh);
+		short fromChGlobal = fromChannel->get_id();
 
-		chm_ui->chm->splitChannel(fromChg, fromCh);
-		if( fromNrOfChannels != 1 )
-		{
-			fromChg++;
-			chgIndex = chgIndex + (chgIndex > fromChg ? 1 : 0);
+		if( fromChg != chgIndex ) {
+
+			chm_ui->chm->splitChannel(fromChg, fromCh);
+			if( fromNrOfChannels == 1 && chgIndex > fromChg)
+				chgIndex--;
+			chm_ui->chm->join({(int)chgIndex, fromChGlobal});
+			chm_ui->chm->split(chgIndex);
+
+			chm_ui->chm->move(chm_ui->chm->get_channel_groups()->size() - 1, chgIndex - 1);
 		}
-
-		chm_ui->chm->join({(int)chgIndex, fromChg});
-		chgIndex = chgIndex + (chgIndex > fromChg ? -1 : 0);
-
-		auto chgIter = std::find(channelGroups->begin(), channelGroups->end(), chgroup);
-		chm_ui->chm->moveChannel(chgIndex, (*chgIter)->get_channel_count() - 1, chIndex, dropAfter);
+		else {
+			chgIndex = chgIndex + (chgIndex > fromChg ? -1 : 0);
+			auto chgIter = std::find(channelGroups->begin(), channelGroups->end(), chgroup);
+			chm_ui->chm->moveChannel(chgIndex, fromCh, chIndex, dropAfter);
+		}
 	}
 
 	Q_EMIT requestUpdateUI();
+}
+
+void LogicAnalyzerChannelUI::updateTrace()
+{
+	bool highlighted = chm_ui->getUiFromCh(
+		chm_ui->chm->getHighlightedChannel()) == this;
+	if(highlighted != trace->get_highlight()) {
+		trace->set_highlight(highlighted);
+	}
+
+	auto height = geometry().height();
+	auto v_offset = topSep->geometry().bottomRight().y() + 3 + height -
+	                (trace->v_extents().second) + chgroupui->getTraceOffset()+3;//chgOffset.y();
+
+	if (traceOffset!=v_offset || traceHeight!=height) {
+		traceHeight = height;
+		traceOffset = v_offset;
+		trace->setSignal_height(traceHeight);
+		trace->force_to_v_offset(v_offset);
+	}
+
 }
 
 void LogicAnalyzerChannelUI::channelRoleChanged(const QString text)
@@ -243,9 +304,43 @@ void LogicAnalyzerChannelUI::channelRoleChanged(const QString text)
 		                  text.toStdString().c_str());
 	}
 	static_cast<LogicAnalyzerChannel *>(lch)->setChannel_role(channel_role);
-	if (channel_role) {
-		chgroup->setChannelForDecoder(channel_role, getTrace());
-	}
+	if (channel_role)
+		chgroup->setChannelForDecoder(channel_role, getChannel()->get_id());
+	chgroupui->setupDecoder();
+}
+
+void LogicAnalyzerChannelUI::resetSeparatorHighlight(bool force)
+{
+	topSep->setVisible(false);
+	botSep->setVisible(false);
+}
+
+void LogicAnalyzerChannelUI::highlightTopSeparator()
+{
+	resetSeparatorHighlight();
+	topSep->setVisible(true);
+}
+
+void LogicAnalyzerChannelUI::highlightBotSeparator()
+{
+	resetSeparatorHighlight();
+	botSep->setVisible(true);
+}
+
+void LogicAnalyzerChannelUI::enableControls(bool enabled)
+{
+	ui->btnRemGroup->setEnabled(enabled);
+	ui->groupName->setEnabled(enabled);
+	ui->comboBox_2->setEnabled(enabled);
+	ui->comboBox->setEnabled(enabled);
+	ui->indexLabel->setEnabled(enabled);
+	ui->indexLabel2->setEnabled(enabled);
+	trace->visible(enabled);
+}
+
+LogicAnalyzerChannelGroup* LogicAnalyzerChannelUI::getChannelGroup()
+{
+	return chgroup;
 }
 
 void LogicAnalyzerChannelUI::rolesChangedLHS(const QString text)
@@ -253,18 +348,15 @@ void LogicAnalyzerChannelUI::rolesChangedLHS(const QString text)
 	channelRoleChanged(text);
 	chm_ui->deleteSettingsWidget();
 	chm_ui->createSettingsWidget();
-	chm_ui->main_win->view_->commit_decoder_channels(
-		chm_ui->getUiFromChGroup(chgroup)->getTrace(),
-		chgroup->get_decoder_channels());
 }
 
-void LogicAnalyzerChannelUI::setTrace(std::shared_ptr<pv::view::TraceTreeItem>
-                                      item)
+void LogicAnalyzerChannelUI::setTrace(
+        std::shared_ptr<pv::view::LogicSignal> item)
 {
 	trace = item;
 }
 
-std::shared_ptr<pv::view::TraceTreeItem> LogicAnalyzerChannelUI::getTrace()
+std::shared_ptr<pv::view::LogicSignal> LogicAnalyzerChannelUI::getTrace()
 {
 	return trace;
 }
@@ -319,6 +411,9 @@ void LogicAnalyzerChannelGroup::setDecoder(const srd_decoder *value)
 	decoderRolesList.clear();
 	channels_.clear();
 	decoder = value;
+
+	if( decoder == nullptr )
+		return;
 
 	GSList *reqCh = g_slist_copy(decoder->channels);
 	for (; reqCh; reqCh = reqCh->next) {
@@ -377,8 +472,7 @@ LogicAnalyzerChannelGroup::LogicAnalyzerChannelGroup(LogicAnalyzerChannel *ch):
 {
 	collapsed = false;
 	decoder = nullptr;
-	channels_ = std::map<const srd_channel*,
-		std::shared_ptr<pv::view::TraceTreeItem> >();
+	channels_ = std::map<const srd_channel*, uint16_t>();
 }
 
 LogicAnalyzerChannelGroup::LogicAnalyzerChannelGroup():
@@ -386,27 +480,49 @@ LogicAnalyzerChannelGroup::LogicAnalyzerChannelGroup():
 {
 	collapsed = false;
 	decoder = nullptr;
-	channels_ = std::map<const srd_channel*,
-		std::shared_ptr<pv::view::TraceTreeItem> >();
+	channels_ = std::map<const srd_channel*, uint16_t>();
+}
+
+const srd_channel* LogicAnalyzerChannelGroup::findByValue(uint16_t ch_id)
+{
+	for( auto it : channels_ )
+	{
+		if( it.second == ch_id )
+			return it.first;
+	}
+	return nullptr;
 }
 
 void LogicAnalyzerChannelGroup::setChannelForDecoder(const srd_channel* ch,
-		std::shared_ptr<pv::view::TraceTreeItem> trace)
+		uint16_t ch_id)
 {
 	if(!channels_.empty()){
-		auto it = channels_.find(ch);
-		if( it != channels_.end() )
-		{
-			channels_.at(ch) = trace;
+		auto itByKey = channels_.find(ch);
+		auto itByValue = (findByValue(ch_id) == nullptr) ? channels_.end() : channels_.find(findByValue(ch_id));
+		if( itByKey != channels_.end() && itByValue != channels_.end() && itByKey != itByValue) {
+			getChannelById(itByKey->second)->setChannel_role(nullptr);
+			channels_.at(ch) = ch_id;
+			itByValue->second = -1;
+		}
+		else if( itByKey != channels_.end() ) {
+			getChannelById(itByKey->second)->setChannel_role(nullptr);
+			channels_.at(ch) = ch_id;
+		}
+		else if( itByValue != channels_.end() ) {
+			itByValue->second = -1;
+			channels_.insert(std::pair<const srd_channel*, uint16_t>(ch, ch_id));
+		}
+		else {
+			channels_.insert(std::pair<const srd_channel*, uint16_t>(ch, ch_id));
 		}
 	}
 	else
 	{
-		channels_.insert(std::pair<const srd_channel*, std::shared_ptr<pv::view::TraceTreeItem> >(ch, trace));
+		channels_.insert(std::pair<const srd_channel*, uint16_t>(ch, ch_id));
 	}
 }
 
-std::map<const srd_channel*, std::shared_ptr<pv::view::TraceTreeItem> >
+std::map<const srd_channel*, uint16_t>
 	LogicAnalyzerChannelGroup::get_decoder_channels()
 {
 	return channels_;
@@ -434,6 +550,14 @@ const srd_channel* LogicAnalyzerChannelGroup::get_srd_channel_from_name(const ch
 	return nullptr;
 }
 
+std::vector<std::string> LogicAnalyzerChannelGroupUI::trigger_mapping = {
+		"none",
+		"edge-any",
+		"edge-rising",
+		"edge-falling",
+		"level-low",
+		"level-high",
+};
 
 LogicAnalyzerChannelGroupUI::LogicAnalyzerChannelGroupUI(
         LogicAnalyzerChannelGroup *chg,
@@ -446,6 +570,33 @@ LogicAnalyzerChannelGroupUI::LogicAnalyzerChannelGroupUI(
 	this->lchg = chg;
 	this->chm_ui = chm_ui;
 	setAcceptDrops(true);
+
+	/* Set triggerCombo index according to the device */
+	LogicAnalyzerChannel *ch;
+	if( !lchg->is_grouped() )
+	{
+		ch = static_cast<LogicAnalyzerChannel*>(lchg->get_channel());
+		std::string trigger_val = chm_ui->la->get_trigger_from_device(ch->get_id());
+		for(int i = 0; i < trigger_mapping.size(); i++)
+		{
+			if( trigger_val == trigger_mapping[i] )
+			{
+				ch->setTrigger(trigger_val);
+				ui->comboBox->setCurrentIndex(i);
+			}
+		}
+	}
+
+	trace = nullptr;
+	decodeTrace = nullptr;
+}
+
+LogicAnalyzerChannelGroupUI::~LogicAnalyzerChannelGroupUI()
+{
+	if( ui->baseWidget == chm_ui->hoverWidget ){
+		chm_ui->hoverWidget = nullptr;
+	}
+	delete ui;
 }
 
 void LogicAnalyzerChannelGroupUI::set_decoder(std::string value)
@@ -455,9 +606,17 @@ void LogicAnalyzerChannelGroupUI::set_decoder(std::string value)
 }
 
 void LogicAnalyzerChannelGroupUI::setTrace(
-        std::shared_ptr<pv::view::TraceTreeItem> item)
+        std::shared_ptr<pv::view::LogicSignal> item)
 {
-	trace = item;
+	trace = dynamic_pointer_cast<pv::view::TraceTreeItem>(item);
+	logicTrace = item;
+}
+
+void LogicAnalyzerChannelGroupUI::setTrace(
+        std::shared_ptr<pv::view::DecodeTrace> item)
+{
+	trace = dynamic_pointer_cast<pv::view::TraceTreeItem>(item);
+	decodeTrace = item;
 }
 
 std::shared_ptr<pv::view::TraceTreeItem> LogicAnalyzerChannelGroupUI::getTrace()
@@ -497,6 +656,41 @@ void LogicAnalyzerChannelGroupUI::mousePressEvent(QMouseEvent *event)
 	chm_ui->showHighlight(true);
 }
 
+void LogicAnalyzerChannelGroupUI::enterEvent(QEvent *event)
+{
+	chm_ui->setHoverWidget(this);
+	QWidget::enterEvent(event);
+}
+
+void LogicAnalyzerChannelGroupUI::leaveEvent(QEvent *event)
+{
+	chm_ui->clearHoverWidget();
+	QWidget::leaveEvent(event);
+}
+
+void LogicAnalyzerChannelGroupUI::highlightTopSeparator()
+{
+	resetSeparatorHighlight(true);
+	topSep->setVisible(true);
+}
+
+void LogicAnalyzerChannelGroupUI::highlightBotSeparator()
+{
+	resetSeparatorHighlight(true);
+	botSep->setVisible(true);
+}
+
+void LogicAnalyzerChannelGroupUI::resetSeparatorHighlight(bool force)
+{
+	if (force || (!chg->is_grouped())) {
+		topSep->setVisible(false);
+		botSep->setVisible(false);
+	} else {
+		topSep->setVisible(true);
+		botSep->setVisible(true);
+	}
+}
+
 void LogicAnalyzerChannelGroupUI::mouseMoveEvent(QMouseEvent *event)
 {
 	if (!(event->buttons() & Qt::LeftButton))
@@ -506,6 +700,8 @@ void LogicAnalyzerChannelGroupUI::mouseMoveEvent(QMouseEvent *event)
 		{
 			return;
 		}
+
+	chm_ui->clearHoverWidget();
 
 	QDrag *drag = new QDrag(this);
 	QMimeData *mimeData = new QMimeData;
@@ -540,44 +736,110 @@ void LogicAnalyzerChannelGroupUI::mouseMoveEvent(QMouseEvent *event)
 
 void LogicAnalyzerChannelGroupUI::dragEnterEvent(QDragEnterEvent *event)
 {
-	topDragbox.setRect(0, 0, ui->baseWidget->geometry().width() + 1,
-		ui->baseWidget->geometry().height()/2 + 1);
-	botDragbox.setRect(0, ui->baseWidget->geometry().height()/2,
-		ui->baseWidget->geometry().width() + 1,
-		ui->baseWidget->geometry().height()/2 + 1);
+	auto w = ui->baseWidget->geometry().width();
+	auto h = ui->baseWidget->geometry().height();
+	topDragbox.setRect(0, 0, w, h/3);
+	botDragbox.setRect(0, 2*h/3, w, h/3);
+	centerDragbox.setRect(0, h/3, w, h/3);
 	event->accept();
 }
 
 void LogicAnalyzerChannelGroupUI::dragMoveEvent(QDragMoveEvent *event)
 {
-	if( event->answerRect().intersects(botDragbox) )
-	{
-		ui->line->setVisible(true);
-		ui->line_2->setVisible(false);
+	if( event->answerRect().intersects(botDragbox) ) {
+		chm_ui->clearHoverWidget();
+		resetSeparatorHighlight(true);
+
+		if( lchg->is_grouped() )
+			ch_ui[0]->highlightTopSeparator();
+		else
+			highlightBotSeparator();
 		event->accept();
 	}
-	else if(event->answerRect().intersects(topDragbox))
-	{
-		ui->line->setVisible(false);
-		ui->line_2->setVisible(true);
+	else if(event->answerRect().intersects(centerDragbox)) {
+		chm_ui->setHoverWidget(this);
+		resetSeparatorHighlight();
+		event->accept();
+	}
+	else if(event->answerRect().intersects(topDragbox)) {
+		chm_ui->clearHoverWidget();
+		resetSeparatorHighlight(true);
+		highlightTopSeparator();
 		event->accept();
 	}
 	else {
+		resetSeparatorHighlight();
 		event->ignore();
 	}
 }
 
 void LogicAnalyzerChannelGroupUI::dragLeaveEvent(QDragLeaveEvent *event)
 {
-	ui->line->setVisible(false);
-	ui->line_2->setVisible(false);
+	resetSeparatorHighlight();
+	chm_ui->clearHoverWidget();
 	event->accept();
+}
+
+int LogicAnalyzerChannelGroupUI::getTraceOffset()
+{
+	return traceOffset;
+}
+
+void LogicAnalyzerChannelGroupUI::updateTrace()
+{
+	auto chgOffset =  geometry().top()+ui->baseWidget->geometry().bottom() + 3;
+	auto height = ui->baseWidget->geometry().height();
+	auto v_offset = chgOffset - trace->v_extents().second;
+
+	bool highlighted = (chm_ui->getUiFromChGroup(
+	                            chm_ui->chm->getHighlightedChannelGroup()) == this);
+
+	highlighted &= chm_ui->chm->getHighlightedChannel() == nullptr;
+
+	if (highlighted != trace->get_highlight()) {
+		trace->set_highlight(highlighted);
+	}
+
+	if (traceOffset!=v_offset || traceHeight!=height) {
+		traceHeight = height;
+		traceOffset = v_offset;
+		trace->force_to_v_offset(v_offset);
+		trace->setSignal_height(traceHeight);
+	}
+
+	if (chg->is_grouped() && !getChannelGroup()->isCollapsed())
+		for (auto &&ch : ch_ui) {
+			ch->updateTrace();
+		}
+}
+
+void LogicAnalyzerChannelGroupUI::setupDecoder()
+{
+	auto decoder = lchg->getDecoder();
+	if( decoder != nullptr ) {
+		decodeTrace->set_decoder(decoder);
+		std::map<const srd_channel *,
+				std::shared_ptr<pv::view::TraceTreeItem> > channel_map;
+
+		for(auto id : lchg->get_ids()) {
+			LogicAnalyzerChannel* lch = lchg->getChannelById(id);
+			std::pair<const srd_channel *,
+				std::shared_ptr<pv::view::TraceTreeItem> > chtracepair;
+			if( lch->getChannel_role() ) {
+				chtracepair.first = lch->getChannel_role();
+				chtracepair.second = chm_ui->main_win->view_->get_clone_of(id);
+				chtracepair.second->force_to_v_offset(-100);
+				channel_map.insert(chtracepair);
+			}
+
+		}
+		decodeTrace->set_channel_map(channel_map);
+	}
 }
 
 void LogicAnalyzerChannelGroupUI::dropEvent(QDropEvent *event)
 {
-	ui->line->setVisible(false);
-	ui->line_2->setVisible(false);
+	resetSeparatorHighlight();
 
 	if( event->source() == this && event->possibleActions() & Qt::MoveAction)
 		return;
@@ -586,25 +848,54 @@ void LogicAnalyzerChannelGroupUI::dropEvent(QDropEvent *event)
 	auto chgIter = std::find(channelGroups->begin(), channelGroups->end(), chg);
 	auto chgIndex = chgIter - channelGroups->begin();
 
-	bool dropAfter = botDragbox.contains(event->pos());
-	if( event->mimeData()->hasFormat("la/channelgroup") )
-	{
-		short from = (short)event->mimeData()->data("la/channelgroup")[1];
-		chm_ui->chm->move(from, chgIndex, dropAfter);
+	bool dropAfter = false;
+	bool formGroup = false;
+
+	if( botDragbox.contains(event->pos())) {
+		if( lchg->is_grouped() ) {
+			formGroup = true;
+		}
+		else {
+			dropAfter = true;
+		}
+	} else if( topDragbox.contains(event->pos())) {
+		dropAfter = false;
+	} else if(centerDragbox.contains(event->pos())) {
+		formGroup = true;
+	} else {
+		Q_EMIT requestUpdateUI();
+		return;
 	}
 
-	if( event->mimeData()->hasFormat("la/channel") )
-	{
-		short fromChg = (short)event->mimeData()->data("la/channel")[1];
-		short fromCh = (short)event->mimeData()->data("la/channel")[3];
-
-		auto fromNrOfChannels = chm_ui->chm->get_channel_group(fromChg)->get_channel_count();
-
-		chm_ui->chm->splitChannel(fromChg, fromCh);
-		if( fromNrOfChannels != 1 )
+	if( formGroup && event->mimeData()->hasFormat("la/channelgroup")) {
+		short from = (short)event->mimeData()->data("la/channelgroup")[1];
+		chm_ui->chm->join({(int)chgIndex, from});
+		chgIndex = chgIndex + ((from < chgIndex) ? -1 : 0);
+		auto chgNOfChannels = chm_ui->chm->get_channel_group(
+			chgIndex)->get_channel_count();
+		chm_ui->chm->moveChannel(chgIndex, chgNOfChannels-1, 0, false);
+		chm_ui->chm->highlightChannel(chm_ui->chm->get_channel_group(chgIndex));
+	}
+	else {
+		if( event->mimeData()->hasFormat("la/channelgroup") )
 		{
-			fromChg++;
-			chgIndex = chgIndex + (fromChg > chgIndex ? 1 : 0);
+			short from = (short)event->mimeData()->data("la/channelgroup")[1];
+			chm_ui->chm->move(from, chgIndex, dropAfter);
+		}
+
+		if( event->mimeData()->hasFormat("la/channel") )
+		{
+			short fromChg = (short)event->mimeData()->data("la/channel")[1];
+			short fromCh = (short)event->mimeData()->data("la/channel")[3];
+
+			auto fromNrOfChannels = chm_ui->chm->get_channel_group(fromChg)->get_channel_count();
+
+			chm_ui->chm->splitChannel(fromChg, fromCh);
+			if( fromNrOfChannels != 1 )
+			{
+				fromChg++;
+				chgIndex = chgIndex + (fromChg > chgIndex ? 1 : 0);
+			}
 		}
 	}
 
@@ -615,7 +906,8 @@ void LogicAnalyzerChannelGroupUI::collapse_group()
 {
 	bool value = !getChannelGroup()->isCollapsed();
 	getChannelGroup()->collapse(value);
-	findChild<QWidget *>("subChannelWidget")->setVisible(!value);
+	ui->subChannelWidget->setVisible(!value);
+	Q_EMIT requestUpdateUI();
 }
 
 void LogicAnalyzerChannelGroupUI::enableControls(bool enabled)
@@ -626,7 +918,11 @@ void LogicAnalyzerChannelGroupUI::enableControls(bool enabled)
 	ui->comboBox_2->setEnabled(enabled);
 	ui->comboBox->setEnabled(enabled);
 	ui->indexLabel->setEnabled(enabled);
-	ui->selectCheckBox->setEnabled(enabled);
+	trace->visible(enabled);
+	for (auto &&ch : ch_ui) {
+		ch->enableControls(enabled);
+	}
+	chm_ui->updatePlot();
 }
 
 void LogicAnalyzerChannelGroupUI::enable(bool enabled)
@@ -665,16 +961,27 @@ void LogicAnalyzerChannelGroupUI::decoderChanged(const QString text)
 
 	static_cast<LogicAnalyzerChannelGroup *>(chg)->setDecoder(decoder);
 
-	if (decoder) {
-		chm_ui->set_pv_decoder(this);
-	}
-
 	if(getChannelGroup() == chm_ui->chm->getHighlightedChannelGroup())
 	{
 		chm_ui->deleteSettingsWidget();
 		chm_ui->createSettingsWidget();
 	}
 	chm_ui->update_ui_children(this);
+}
+
+void LogicAnalyzerChannelGroupUI::triggerChanged(int index)
+{
+	LogicAnalyzerChannel *ch;
+	if( !lchg->is_grouped() )
+	{
+		ch = static_cast<LogicAnalyzerChannel*>(lchg->get_channel());
+		std::string trigger_val = trigger_mapping[index];
+		if( trigger_val != ch->getTrigger() )
+		{
+			ch->setTrigger(trigger_val);
+			chm_ui->la->setHWTrigger(ch->get_id(), trigger_val);
+		}
+	}
 }
 
 LogicAnalyzerChannelGroup *LogicAnalyzerChannelGroupUI::getChannelGroup()
@@ -712,9 +1019,6 @@ LogicAnalyzerChannelManager::~LogicAnalyzerChannelManager()
 	for (auto ch : channel) {
 		delete ch;
 	}
-	for (auto dec : decoderList) {
-		delete dec;
-	}
 }
 
 LogicAnalyzerChannelGroup *LogicAnalyzerChannelManager::get_channel_group(
@@ -746,6 +1050,26 @@ void LogicAnalyzerChannelManager::join(std::vector<int> index)
 	new_ch_group->group(true);
 	new_ch_group->set_label("GROUP");
 	channel_group.push_back(new_ch_group);
+}
+
+LogicAnalyzerChannel *LogicAnalyzerChannelManager::get_channel(int index)
+{
+	return static_cast<LogicAnalyzerChannel *>(channel[index]);
+}
+
+void LogicAnalyzerChannelManager::add_channel_group(
+		LogicAnalyzerChannelGroup *chg)
+{
+	channel_group.push_back(chg);
+}
+
+void LogicAnalyzerChannelManager::clearChannelGroups()
+{
+	for (auto ch : channel_group) {
+		delete ch;
+	}
+
+	channel_group.erase(channel_group.begin(),channel_group.end());
 }
 
 void LogicAnalyzerChannelManager::split(int index)
@@ -892,16 +1216,25 @@ LogicAnalyzerChannelManagerUI::LogicAnalyzerChannelManagerUI(QWidget *parent,
 	locationSettingsWidget(settingsWidget),
 	settingsUI(nullptr),
 	currentSettingsWidget(nullptr),
-	highlightShown(true)
+	highlightShown(true),
+	hoverWidget(nullptr)
 {
 	ui->setupUi(this);
 	main_win = main_win_;
 	this->chm = chm;
 	this->la = la;
 	this->chm->initDecoderList();
+	showHighlight(false);
+	chm->highlightChannel(chm->get_channel_group(0));
+	showHighlight(true);
+	ui->scrollAreaWidgetContents->installEventFilter(this);
+	Q_EMIT(widthChanged(geometry().width()));
 }
 
-
+LogicAnalyzerChannelManagerUI::~LogicAnalyzerChannelManagerUI()
+{
+	delete ui;
+}
 
 void invalidateLayout(QLayout *layout);
 
@@ -946,6 +1279,21 @@ void LogicAnalyzerChannelManagerUI::retainWidgetSizeWhenHidden(QWidget *w)
 	w->setSizePolicy(sp_retain);
 }
 
+QFrame *LogicAnalyzerChannelManagerUI::addSeparator(QVBoxLayout *lay,
+                int pos)
+{
+	separators.push_back(new QFrame(this));
+	QFrame *line = separators.back();
+	line->setFrameShadow(QFrame::Plain);
+	line->setLineWidth(1);
+	line->setFrameShape(QFrame::HLine);
+	line->setStyleSheet("color: rgba(255,255,255,50);");
+	lay->insertWidget(pos,line);
+	retainWidgetSizeWhenHidden(line);
+	line->setVisible(false);
+	return line;
+}
+
 void LogicAnalyzerChannelManagerUI::setWidgetMinimumNrOfChars(QWidget *w,
                 int nrOfChars)
 {
@@ -974,6 +1322,9 @@ void LogicAnalyzerChannelManagerUI::update_ui_children(LogicAnalyzerChannelGroup
 void LogicAnalyzerChannelManagerUI::update_ui()
 {
 	for (auto ch : chg_ui) {
+		ch->hide();
+		// prevent hovering after the channel is deleted
+		ch->setMouseTracking(false);
 		ch->deleteLater();
 	}
 
@@ -982,6 +1333,12 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 		managerHeaderWidget = nullptr;
 	}
 
+	for (auto sep : separators)    {
+		sep->deleteLater();
+	}
+	separators.erase(separators.begin(),separators.end());
+
+	hoverWidget = nullptr;
 	managerHeaderWidget = new QWidget(ui->headerWidget);
 	Ui::LAManagerHeader *managerHeaderUI =
 	        new Ui::LAManagerHeader();
@@ -1004,6 +1361,9 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 
 	main_win->view_->remove_trace_clones();
 	chg_ui.erase(chg_ui.begin(),chg_ui.end());
+
+	QFrame *prevSep = addSeparator(ui->verticalLayout,
+		ui->verticalLayout->count()-1);
 	auto offset = 0;
 
 	for (auto&& ch : *(chm->get_channel_groups())) {
@@ -1015,9 +1375,11 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 
 			chg_ui.push_back(lachannelgroupUI);
 
-			ui->verticalLayout->insertWidget(chg_ui.size() - 1,
+			ui->verticalLayout->insertWidget(ui->verticalLayout->count()-1,
 			                                 chg_ui.back());
 			lachannelgroupUI->ensurePolished();
+			lachannelgroupUI->topSep = prevSep;
+
 			lachannelgroupUI->ui->groupName->setText(
 			        QString::fromStdString(ch->get_label()));
 
@@ -1025,6 +1387,7 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 			setWidgetMinimumNrOfChars(lachannelgroupUI->ui->groupName, 8);
 			setWidgetMinimumNrOfChars(lachannelgroupUI->ui->indexLabel, 5);
 			setWidgetMinimumNrOfChars(lachannelgroupUI->ui->comboBox, 5);
+			lachannelgroupUI->ui->comboBox->setIconSize(QSize(30,20));
 			setWidgetMinimumNrOfChars(lachannelgroupUI->ui->comboBox_2, 5);
 			retainWidgetSizeWhenHidden(lachannelgroupUI->ui->collapseGroupBtn);
 
@@ -1037,13 +1400,8 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 
 			}
 
-			lachannelgroupUI->ui->btnEnableChannel->setChecked(ch->is_enabled());
-			lachannelgroupUI->enableControls(ch->is_enabled());
-
 			connect(lachannelgroupUI->ui->selectCheckBox, SIGNAL(toggled(bool)),
 			        chg_ui.back(), SLOT(select(bool)));
-			connect(lachannelgroupUI->ui->btnEnableChannel, SIGNAL(toggled(bool)),
-			        lachannelgroupUI, SLOT(enable(bool)));
 			connect(lachannelgroupUI, SIGNAL(requestUpdateUI()),
 				this, SLOT(triggerUpdateUi()));
 
@@ -1051,15 +1409,19 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 
 			/* Grouped widget */
 			if (ch->is_grouped()) {
-				/* Acquire the new decode trace */
-				auto trace = dynamic_pointer_cast<pv::view::TraceTreeItem>(main_win->view_->add_decoder());
-				lachannelgroupUI->setTrace(trace);
-				trace->force_to_v_offset(offset);
+				lachannelgroupUI->chUiSep = addSeparator(
+							lachannelgroupUI->ui->layoutChildren,
+							lachannelgroupUI->ui->layoutChildren->count() );
+				prevSep = lachannelgroupUI->chUiSep;
 
 				if(!collapsed)
 				{
-					setWidgetMinimumNrOfChars(lachannelgroupUI->ui->decoderCombo, 15);
+					setWidgetMinimumNrOfChars(lachannelgroupUI->ui->decoderCombo, 17);
 				}
+
+				auto trace1 = main_win->view_->add_decoder();
+				lachannelgroupUI->setTrace(trace1);
+				lachannelgroupUI->setupDecoder();
 
 				/* Populate role combo based on parent decoder */
 				lachannelgroupUI->ui->decoderCombo->addItem("None");
@@ -1073,8 +1435,6 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 						lachannelgroupUI->getChannelGroup()->getDecoder()->name);
 					int decIndex =chm->get_name_decoder_list().indexOf(name)+1;
 					lachannelgroupUI->ui->decoderCombo->setCurrentIndex(decIndex);
-					/* Update the pv decoder */
-					set_pv_decoder(lachannelgroupUI);
 				} else {
 					lachannelgroupUI->ui->decoderCombo->setCurrentIndex(0);
 				}
@@ -1096,15 +1456,15 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 					        static_cast<LogicAnalyzerChannel *>(
 					                ch->get_channel(i)),
 					        lachannelgroupUI->getChannelGroup(),
+					        lachannelgroupUI,
 					        this);
 					lachannelgroupUI->ch_ui.push_back(lachannelUI);
 					lachannelUI->ensurePolished();
 
-					/* Acquire the new signal trace */
 					auto index = ch->get_channel(i)->get_id();
-					auto trace = dynamic_pointer_cast<pv::view::TraceTreeItem>(main_win->view_->get_clone_of(index));
-					lachannelUI->setTrace(trace);
-					trace->force_to_v_offset(offset);
+					auto trace1 = main_win->view_->get_clone_of(index);
+					lachannelUI->setTrace(trace1);
+
 					forceUpdate(lachannelUI);
 					offset+=lachannelUI->geometry().bottomRight().y();
 
@@ -1117,6 +1477,7 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 					setWidgetMinimumNrOfChars(lachannelUI->ui->indexLabel2, 5);
 					setWidgetMinimumNrOfChars(lachannelUI->ui->indexLabel, 5);
 					setWidgetMinimumNrOfChars(lachannelUI->ui->comboBox, 5);
+					lachannelUI->ui->comboBox->setIconSize(QSize(30, 20));
 					setWidgetMinimumNrOfChars(lachannelUI->ui->comboBox_2, 8);
 
 					retainWidgetSizeWhenHidden(lachannelUI->ui->collapseGroupBtn);
@@ -1130,12 +1491,8 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 					} else {
 						retainWidgetSizeWhenHidden(lachannelUI->ui->btnEnableChannel);
 						retainWidgetSizeWhenHidden(lachannelUI->ui->selectCheckBox);
-						retainWidgetSizeWhenHidden(lachannelUI->ui->line);
-						retainWidgetSizeWhenHidden(lachannelUI->ui->line_2);
 					}
 
-					lachannelUI->ui->line->setVisible(false);
-					lachannelUI->ui->line_2->setVisible(false);
 					lachannelUI->ui->btnEnableChannel->setVisible(false);
 					lachannelUI->ui->selectCheckBox->setVisible(false);
 					lachannelUI->ui->collapseGroupBtn->setVisible(false);
@@ -1150,15 +1507,19 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 							lachannelUI->getChannel()->getChannel_role()->name);
 						int roleIndex = lachannelgroupUI->getChannelGroup()->get_decoder_roles_list().indexOf(name)+1;
 						lachannelUI->ui->comboBox_2->setCurrentIndex(roleIndex);
-						/* Update in parent the (role, trace) map */
-						lachannelgroupUI->getChannelGroup()->setChannelForDecoder(
-							lachannelUI->getChannel()->getChannel_role(),
-							lachannelUI->getTrace());
 					} else {
 						lachannelUI->ui->comboBox_2->setCurrentIndex(0);
 					}
 
-					lachannelgroupUI->ui->layoutChildren->insertWidget(i,lachannelUI);
+					lachannelgroupUI->ui->layoutChildren->insertWidget(
+						lachannelgroupUI->ui->layoutChildren->count(), lachannelUI);
+					lachannelgroupUI->ensurePolished();
+
+					lachannelUI->botSep = addSeparator(
+						lachannelgroupUI->ui->layoutChildren,
+						lachannelgroupUI->ui->layoutChildren->count());
+					lachannelUI->topSep = prevSep;
+					prevSep =  lachannelUI->botSep;
 
 
 					connect(lachannelgroupUI->ui->btnRemGroup, SIGNAL(pressed()),
@@ -1183,31 +1544,41 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 					lachannelgroupUI->ui->subChannelWidget->setVisible(false);
 				}
 
-				/* Update the channel roles in pv decoder */
-				main_win->view_->commit_decoder_channels(trace,
-					lachannelgroupUI->getChannelGroup()->get_decoder_channels());
+				lachannelgroupUI->botSep = prevSep;
+				lachannelgroupUI->resetSeparatorHighlight();
 			} else {
 				auto index = ch->get_channel(0)->get_id();
-				auto trace = dynamic_pointer_cast<pv::view::TraceTreeItem>(main_win->view_->get_clone_of(index));
-				lachannelgroupUI->setTrace(trace);
-				trace->force_to_v_offset(offset);
+				auto trace1 = main_win->view_->get_clone_of(index);
+				lachannelgroupUI->setTrace(trace1);
 				lachannelgroupUI->ui->stackedWidget->setCurrentIndex(0);
 
 				if (!collapsed) {
 					retainWidgetSizeWhenHidden(lachannelgroupUI->ui->btnRemGroup);
-					retainWidgetSizeWhenHidden(lachannelgroupUI->ui->line);
-					retainWidgetSizeWhenHidden(lachannelgroupUI->ui->line_2);
 				}
 
 				lachannelgroupUI->ui->btnRemGroup->setVisible(false);
 				lachannelgroupUI->ui->collapseGroupBtn->setVisible(false);
 
-				lachannelgroupUI->ui->line->setVisible(false);
-				lachannelgroupUI->ui->line_2->setVisible(false);
+				lachannelgroupUI->botSep = addSeparator(ui->verticalLayout,
+					ui->verticalLayout->count()-1);
+				prevSep = lachannelgroupUI->botSep;
+				lachannelgroupUI->chUiSep = lachannelgroupUI->botSep;
+
 				lachannelgroupUI->ui->decoderCombo->setVisible(false);
 				lachannelgroupUI->ui->indexLabel->setText(QString::number(index));
 
+				connect(lachannelgroupUI->ui->comboBox,
+				        SIGNAL(currentIndexChanged(int)),
+				        lachannelgroupUI, SLOT(triggerChanged(int)));
+				connect(lachannelgroupUI->ui->comboBox,
+				        SIGNAL(currentIndexChanged(int)),
+				        la, SLOT(triggerChanged(int)));
+
 			}
+			lachannelgroupUI->ui->btnEnableChannel->setChecked(ch->is_enabled());
+			lachannelgroupUI->enableControls(ch->is_enabled());
+			connect(lachannelgroupUI->ui->btnEnableChannel, SIGNAL(toggled(bool)),
+				lachannelgroupUI, SLOT(enable(bool)));
 		}
 	}
 
@@ -1216,26 +1587,23 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 		showHighlight(true);
 	}
 
-	if (chg_ui.size() != 0) {
-		ui->scrollArea->verticalScrollBar()->setPageStep(
-		        chg_ui.front()->sizeHint().height());
-		ui->scrollArea->verticalScrollBar()->setSingleStep(
-		        chg_ui.front()->sizeHint().height());
-		ui->scrollArea->verticalScrollBar()->setRange(0,
-		                ui->scrollAreaWidgetContents->height() - chg_ui.front()->sizeHint().height());
-	}
 	ui->scrollArea->setMaximumWidth(managerHeaderWidget->sizeHint().width());
-	main_win->view_->viewport()->setDivisionHeight(44);
 	main_win->view_->viewport()->setDivisionCount(10);
-	main_win->view_->viewport()->setDivisionOffset(0);
 	connect(ui->scrollArea->verticalScrollBar(), SIGNAL(valueChanged(int)),
 	        this, SLOT(chmScrollChanged(int)));
+	connect(ui->scrollArea->verticalScrollBar(), SIGNAL(rangeChanged(int,int)),
+	        this, SLOT(chmRangeChanged(int,int)));
 }
-
 
 void LogicAnalyzerChannelManagerUI::chmScrollChanged(int value)
 {
 	main_win->view_->set_v_offset(value);
+}
+
+void LogicAnalyzerChannelManagerUI::chmRangeChanged(int min, int max)
+{
+	main_win->view_->verticalScrollBar()->setMinimum(min);
+	main_win->view_->verticalScrollBar()->setMaximum(max);
 }
 
 void LogicAnalyzerChannelManagerUI::triggerUpdateUi()
@@ -1389,28 +1757,50 @@ void LogicAnalyzerChannelManagerUI::rolesChangedRHS(const QString text)
 void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 {
 	settingsUI = new Ui::LASettingsWidget;
+	Ui::LChannelSettings *generalSettingsUi = new Ui::LChannelSettings;
+	QWidget* generalSettings = new QWidget(locationSettingsWidget);
+	generalSettingsUi->setupUi(generalSettings);
 	settingsUI->setupUi(locationSettingsWidget);
 	currentSettingsWidget = new QWidget(locationSettingsWidget);
 	settingsUI->setupUi(currentSettingsWidget);
 	locationSettingsWidget->layout()->addWidget(currentSettingsWidget);
 	ensurePolished();
+	connect(settingsUI->btnNext, SIGNAL(pressed()),
+		this, SLOT(highlightNext()));
+	connect(settingsUI->btnPrevious, SIGNAL(pressed()),
+		this, SLOT(highlightPrevious()));
 
 	if (chm->getHighlightedChannelGroup()) {
 		LogicAnalyzerChannelGroup *chGroup = chm->getHighlightedChannelGroup();
 		settingsUI->nameLineEdit->setText(QString::fromStdString(chGroup->get_label()));
-		connect(settingsUI->nameLineEdit, SIGNAL(textChanged(QString)),
-		        this, SLOT(set_label(QString)));
+		generalSettingsUi->nameLineEdit->setText(QString::fromStdString(chGroup->get_label()));
+		connect(generalSettingsUi->nameLineEdit, &QLineEdit::editingFinished,
+			[=]() {
+				QString text = generalSettingsUi->nameLineEdit->text();
+				getUiFromChGroup(chm->getHighlightedChannelGroup())->
+					ui->groupName->setText(text);
+				set_label(text);
+			});
+		settingsUI->scrollAreaWidgetLayout->insertWidget(
+			settingsUI->scrollAreaWidgetLayout->count()-1, generalSettings);
 
 		if (chGroup->is_grouped()) {
 			const srd_decoder *decoder = chGroup->getDecoder();
 
 			if (!decoder) {
+				settingsUI->requiredChn->hide();
+				settingsUI->optionalChn->hide();
 				locationSettingsWidget->setVisible(true);
 				return;
 			}
 
 			/* Create widgets for required channels */
 			GSList *reqCh = g_slist_copy(decoder->channels);
+			if( g_slist_length(reqCh) > 0 )
+				settingsUI->requiredChn->show();
+			else
+				settingsUI->requiredChn->hide();
+
 			for (; reqCh; reqCh = reqCh->next) {
 				const srd_channel *const rqch = (const srd_channel *)reqCh->data;
 
@@ -1422,6 +1812,7 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 				QWidget *r = new QWidget(currentSettingsWidget);
 				reqChUI->setupUi(r);
 				reqChUI->labelRole->setText(QString::fromUtf8(rqch->name));
+				reqChUI->stackedWidget->setCurrentIndex(0);
 
 				reqChUI->roleCombo->addItem("-");
 				for (auto&& ch : *(chGroup->get_channels())) {
@@ -1435,7 +1826,8 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 				}
 				reqChUI->roleCombo->setProperty("id", QVariant(rqch->id));
 				reqChUI->roleCombo->setProperty("name", QVariant(rqch->name));
-				currentSettingsWidget->layout()->addWidget(r);
+				settingsUI->scrollAreaWidgetLayout->insertWidget(
+					settingsUI->scrollAreaWidgetLayout->count() - 3, r);
 
 				connect(reqChUI->roleCombo,
 				        SIGNAL(currentIndexChanged(const QString&)),
@@ -1443,8 +1835,14 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 
 			}
 			free(reqCh);
+
 			/* Create widgets for optional channels */
 			GSList *optChannels = g_slist_copy(decoder->opt_channels);
+			if( g_slist_length(optChannels) > 0)
+				settingsUI->optionalChn->show();
+			else
+				settingsUI->optionalChn->hide();
+
 			for (; optChannels; optChannels = optChannels->next) {
 				const srd_channel *const optch = (const srd_channel *)optChannels->data;
 
@@ -1456,6 +1854,7 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 				QWidget *r = new QWidget(currentSettingsWidget);
 				optChUI->setupUi(r);
 				optChUI->labelRole->setText(QString::fromUtf8(optch->name));
+				optChUI->stackedWidget->setCurrentIndex(0);
 
 				/* Add all the available channels + "none" to the list */
 				optChUI->roleCombo->addItem("-");
@@ -1470,7 +1869,8 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 				}
 				optChUI->roleCombo->setProperty("id", QVariant(optch->id));
 				optChUI->roleCombo->setProperty("name", QVariant(optch->name));
-				currentSettingsWidget->layout()->addWidget(r);
+				settingsUI->scrollAreaWidgetLayout->insertWidget(
+					settingsUI->scrollAreaWidgetLayout->count() - 2, r);
 
 				connect(optChUI->roleCombo,
 				        SIGNAL(currentIndexChanged(const QString&)),
@@ -1478,28 +1878,44 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 			}
 			free(optChannels);
 		}
-
+		else {
+			settingsUI->requiredChn->hide();
+			settingsUI->optionalChn->hide();
+		}
 	}
 
 	if (chm->getHighlightedChannel()) {
+		settingsUI->requiredChn->hide();
+		settingsUI->optionalChn->hide();
 		LogicAnalyzerChannel *ch = chm->getHighlightedChannel();
 		settingsUI->nameLineEdit->setText(QString::fromStdString(ch->get_label()));
-		connect(settingsUI->nameLineEdit, SIGNAL(textChanged(QString)),
-		        this, SLOT(set_label(QString)));
+		generalSettingsUi->nameLineEdit->setText(QString::fromStdString(ch->get_label()));
+		connect(generalSettingsUi->nameLineEdit, &QLineEdit::editingFinished,
+			[=]() {
+			QString text = generalSettingsUi->nameLineEdit->text();
+			getUiFromCh(chm->getHighlightedChannel())->
+				ui->groupName->setText(text);
+			set_label(text);
+		});
+
+		settingsUI->scrollAreaWidgetLayout->insertWidget(
+			settingsUI->scrollAreaWidgetLayout->count()-1, generalSettings);
 
 		QWidget *r = new QWidget(currentSettingsWidget);
 		Ui::LARequiredChannel *roleChUI = new Ui::LARequiredChannel();
 		roleChUI->setupUi(r);
 		if(ch->getChannel_role())
 		{
-			roleChUI->labelRole->setText(QString::fromUtf8(ch->getChannel_role()->name));
+			roleChUI->labelChRole->setText(QString::fromUtf8(ch->getChannel_role()->name));
 		}
 		else
 		{
-			roleChUI->labelRole->setText("-");
+			roleChUI->labelChRole->setText("-");
 		}
+		roleChUI->stackedWidget->setCurrentIndex(1);
 
-		currentSettingsWidget->layout()->addWidget(r);
+		settingsUI->scrollAreaWidgetLayout->insertWidget(
+			settingsUI->scrollAreaWidgetLayout->count() - 2, r);
 	}
 
 	locationSettingsWidget->setVisible(true);
@@ -1516,6 +1932,82 @@ void LogicAnalyzerChannelManagerUI::deleteSettingsWidget()
 	}
 }
 
+void LogicAnalyzerChannelManagerUI::highlightPrevious()
+{
+	bool update = false;
+	if( chm->getHighlightedChannelGroup() ) {
+		auto chgroup = chm->getHighlightedChannelGroup();
+		auto chgIter = std::find(chm->get_channel_groups()->begin(),
+			chm->get_channel_groups()->end(), chgroup);
+		auto chgIndex = chgIter - chm->get_channel_groups()->begin();
+		if( chgIter != chm->get_channel_groups()->end() ) {
+			if( chgIndex - 1 >= 0 ) {
+				auto prevChgroup = chm->get_channel_group(chgIndex - 1);
+				showHighlight(false);
+				chm->highlightChannel(prevChgroup);
+				showHighlight(true);
+				update = true;
+			}
+		}
+	}
+	if( chm->getHighlightedChannel() ) {
+		auto ch = chm->getHighlightedChannel();
+		auto chUI = getUiFromCh(ch);
+		auto chgroup = chUI->getChannelGroup();
+		auto chIter = std::find(chgroup->get_channels()->begin(),
+			chgroup->get_channels()->end(), ch);
+		auto chIndex = chIter - chgroup->get_channels()->begin();
+		if( chIter != chgroup->get_channels()->end() ) {
+			if( chIndex - 1 >= 0 ) {
+				auto prevCh = chgroup->get_channel(chIndex - 1);
+				showHighlight(false);
+				chm->highlightChannel(nullptr,
+					static_cast<LogicAnalyzerChannel*>(prevCh));
+				showHighlight(true);
+				update = true;
+			}
+		}
+	}
+}
+
+void LogicAnalyzerChannelManagerUI::highlightNext()
+{
+	bool update = false;
+	if( chm->getHighlightedChannelGroup() ) {
+		auto chgroup = chm->getHighlightedChannelGroup();
+		auto chgIter = std::find(chm->get_channel_groups()->begin(),
+			chm->get_channel_groups()->end(), chgroup);
+		auto chgIndex = chgIter - chm->get_channel_groups()->begin();
+		if( chgIter != chm->get_channel_groups()->end() ) {
+			if( chgIndex + 1 < chm->get_channel_groups()->size() ) {
+				auto nextChgroup = chm->get_channel_group(chgIndex + 1);
+				showHighlight(false);
+				chm->highlightChannel(nextChgroup);
+				showHighlight(true);
+				update = true;
+			}
+		}
+	}
+	if( chm->getHighlightedChannel() ) {
+		auto ch = chm->getHighlightedChannel();
+		auto chUI = getUiFromCh(ch);
+		auto chgroup = chUI->getChannelGroup();
+		auto chIter = std::find(chgroup->get_channels()->begin(),
+			chgroup->get_channels()->end(), ch);
+		auto chIndex = chIter - chgroup->get_channels()->begin();
+		if( chIter != chgroup->get_channels()->end() ) {
+			if( chIndex + 1 < chgroup->get_channel_count() ) {
+				auto prevCh = chgroup->get_channel(chIndex + 1);
+				showHighlight(false);
+				chm->highlightChannel(nullptr,
+					static_cast<LogicAnalyzerChannel*>(prevCh));
+				showHighlight(true);
+				update = true;
+			}
+		}
+	}
+}
+
 void LogicAnalyzerChannelManagerUI::set_label(QString text)
 {
 	if (chm->getHighlightedChannelGroup()) {
@@ -1525,8 +2017,6 @@ void LogicAnalyzerChannelManagerUI::set_label(QString text)
 	if (chm->getHighlightedChannel()) {
 		chm->getHighlightedChannel()->set_label(text.toStdString());
 	}
-
-	update_ui();
 }
 
 void LogicAnalyzerChannelManagerUI::set_pv_decoder(LogicAnalyzerChannelGroupUI
@@ -1535,4 +2025,48 @@ void LogicAnalyzerChannelManagerUI::set_pv_decoder(LogicAnalyzerChannelGroupUI
 	main_win->view_->set_decoder_to_group(chGroup->getTrace(),
 	                                      chGroup->getChannelGroup()->getDecoder());
 }
+
+void LogicAnalyzerChannelManagerUI::resizeEvent(QResizeEvent *event)
+{
+	Q_EMIT(widthChanged(geometry().width()));
+}
+
+void LogicAnalyzerChannelManagerUI::setHoverWidget(QWidget *hover)
+{
+	if (hoverWidget!=nullptr) {
+		setDynamicProperty(hoverWidget,"hover-property",false);
+	}
+
+	hoverWidget = hover->findChild<QWidget *>("baseWidget");
+
+	if (hoverWidget) {
+		setDynamicProperty(hoverWidget,"hover-property",true);
+	}
+}
+
+void LogicAnalyzerChannelManagerUI::clearHoverWidget()
+{
+	if (hoverWidget!=nullptr) {
+		setDynamicProperty(hoverWidget,"hover-property",false);
+		hoverWidget = nullptr;
+	}
+}
+
+void LogicAnalyzerChannelManagerUI::updatePlot()
+{
+	for (auto chgUi : chg_ui) {
+		chgUi->updateTrace();
+	}
+}
+
+bool LogicAnalyzerChannelManagerUI::eventFilter(QObject *object,
+                QEvent *event)
+{
+	if (event->type()==QEvent::LayoutRequest) {
+		updatePlot();
+	}
+
+	return false;
+}
+
 }

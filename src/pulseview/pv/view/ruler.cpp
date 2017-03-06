@@ -62,6 +62,9 @@ Ruler::Ruler(View &parent) :
 		this, SLOT(invalidate_tick_position_cache()));
 	connect(&view_, SIGNAL(time_unit_changed()),
 		this, SLOT(invalidate_tick_position_cache()));
+
+	ruler_offset = pv::util::Timestamp(-0.005);
+	timeTriggerPx = 0;
 }
 
 QSize Ruler::sizeHint() const
@@ -139,10 +142,10 @@ void Ruler::paintEvent(QPaintEvent*)
 				this->view_.time_unit(),
 				this->view_.tick_precision());
 		};
-
+		pv::util::Timestamp offset_used = (ruler_offset != 0) ? ruler_offset : view_.offset();
 		tick_position_cache_ = calculate_tick_positions(
 			view_.tick_period(),
-			view_.offset(),
+			offset_used,
 			view_.scale(),
 			width(),
 			ffunc);
@@ -157,16 +160,32 @@ void Ruler::paintEvent(QPaintEvent*)
 
 
 	QPainter p(this);
-	if( view_.viewport()->getTimeTriggerPos() != 0 )
+	if( view_.viewport()->getTimeTriggerActive() )
 	{
-		int pos = view_.viewport()->getTimeTriggerPos();
+		int valuePx = view_.viewport()->getTimeTriggerPixel();
+		if( valuePx != timeTriggerPx )
+			timeTriggerPx = valuePx;
 		QPen pen = QPen(QColor(74, 100, 255));
 		p.setPen(pen);
 
-		QPoint p1 = QPoint(pos, 0);
-		QPoint p2 = QPoint(pos, ruler_height);
+		QPoint p1 = QPoint(timeTriggerPx, 0);
+		QPoint p2 = QPoint(timeTriggerPx, ruler_height);
 		p.drawLine(p1, p2);
 	}
+	if( view_.viewport()->getCursorsActive() ) {
+		std::pair<int, int> cursorValues = view_.viewport()->getCursorsPixelValues();
+
+		QPen cursorsLinePen = QPen(QColor(155, 155, 155), 1, Qt::DashLine);
+		p.setPen(cursorsLinePen);
+		QPoint p1 = QPoint(cursorValues.first, 0);
+		QPoint p2 = QPoint(cursorValues.first, ruler_height);
+		p.drawLine(p1, p2);
+
+		p1 = QPoint(cursorValues.second, 0);
+		p2 = QPoint(cursorValues.second, ruler_height);
+		p.drawLine(p1, p2);
+	}
+
 	// Draw the tick marks
 	QPen pen = QPen(QColor(255, 255, 255, 30*256/100));
 	for (const auto& tick: tick_position_cache_->major) {
@@ -196,6 +215,29 @@ void Ruler::paintEvent(QPaintEvent*)
 			i->label_rect(r).contains(mouse_point_);
 		i->paint_label(p, r, highlight);
 	}
+}
+int Ruler::getTickZeroPosition()
+{
+	if( tick_position_cache_.is_initialized() )
+		for (const auto& tick: tick_position_cache_->major) {
+			if(tick.second == "0") {
+				timeTriggerPx = tick.first;
+				return timeTriggerPx;
+			}
+		}
+	return -1;
+}
+
+void Ruler::set_offset(double value)
+{
+	pv::util::Timestamp new_offset = pv::util::Timestamp(value);
+	if(ruler_offset != new_offset)
+		ruler_offset = new_offset;
+}
+
+double Ruler::get_offset()
+{
+	return ruler_offset.convert_to<double>();
 }
 
 Ruler::TickPositions Ruler::calculate_tick_positions(
@@ -236,9 +278,20 @@ Ruler::TickPositions Ruler::calculate_tick_positions(
 	return tp;
 }
 
+int Ruler::getTimeTriggerPx() const
+{
+	return timeTriggerPx;
+}
+
+void Ruler::setTimeTriggerPx(int value)
+{
+	timeTriggerPx = value;
+	view_.time_item_appearance_changed(true, false);
+}
+
 void Ruler::mouseDoubleClickEvent(QMouseEvent *event)
 {
-	view_.add_flag(view_.offset() + ((double)event->x() + 0.5) * view_.scale());
+//	view_.add_flag(view_.offset() + ((double)event->x() + 0.5) * view_.scale());
 }
 
 void Ruler::draw_hover_mark(QPainter &p, int text_height)

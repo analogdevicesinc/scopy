@@ -218,7 +218,7 @@ public:
 
 	void restack_all_trace_tree_items();
 
-	int divisionCount();
+	int divisionCount() const;
 
 	QSize viewport_height();
 
@@ -253,11 +253,16 @@ Q_SIGNALS:
 	/// Emitted when the time_unit changed.
 	void time_unit_changed();
 
+	void repaintTriggerHandle(double, bool);
+
+	void resized();
+
 public Q_SLOTS:
 	void trigger_event(util::Timestamp location);
 
 	void set_timebase(double value);
 
+	void onPlotChanged(bool);
 private:
 	void get_scroll_layout(double &length, pv::util::Timestamp &offset) const;
 
@@ -314,6 +319,9 @@ public:
 	std::shared_ptr<DecodeTrace> add_decoder();
 	void set_decoder_to_group(std::shared_ptr<TraceTreeItem> trace, const srd_decoder* decoder);
 	void remove_trace_clones();
+	Ruler *ruler_;
+	void set_offset(double timePos, double timeSpan, bool running);
+	double start_plot_offset();
 
 private Q_SLOTS:
 
@@ -370,7 +378,6 @@ private:
 	Session &session_;
 
 	Viewport *viewport_;
-	Ruler *ruler_;
 	Header *header_;
 	QWidget *status_bar_;
 	QLabel *zoom_label_;
@@ -379,6 +386,7 @@ private:
 	/// The view time scale
 	double scale_;
 	double backup_scale_;
+	double start_plot_offset_;
 
 	/// The view time offset in seconds.
 	pv::util::Timestamp offset_;

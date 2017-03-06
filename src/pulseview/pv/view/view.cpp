@@ -119,7 +119,8 @@ View::View(Session &session, QWidget *parent) :
 	cursors_(new CursorPair(*this)),
 	next_flag_text_('A'),
 	trigger_markers_(),
-	hover_point_(-1, -1)
+	hover_point_(-1, -1),
+	start_plot_offset_(0)
 {
 	setFrameShape(QFrame::NoFrame);
 
@@ -148,6 +149,10 @@ View::View(Session &session, QWidget *parent) :
 
 	connect(&delayed_view_updater_, SIGNAL(timeout()),
 		this, SLOT(perform_delayed_view_update()));
+
+	connect(viewport_, SIGNAL(plotChanged(bool)),
+		this, SLOT(onPlotChanged(bool)));
+
 	delayed_view_updater_.setSingleShot(true);
 	delayed_view_updater_.setInterval(1000 / MaxViewAutoUpdateRate);
 
@@ -556,8 +561,6 @@ void View::get_scroll_layout(double &length, Timestamp &offset) const
 	const pair<Timestamp, Timestamp> extents = get_time_extents();
 	length = ((extents.second - extents.first) / scale_  ).convert_to<double>();
 	offset = offset_ / scale_;
-//	length = ((extents.second - extents.first) / (scale_  / (viewport_->width() / DivisionCount))).convert_to<double>();
-//	offset = offset_ / (scale_  / (viewport_->width() / DivisionCount));
 }
 
 void View::set_zoom(double scale, int offset)
@@ -573,6 +576,8 @@ void View::set_zoom(double scale, int offset)
 
 	scale = new_scale.convert_to<double>();
 	set_scale_offset(new_scale.convert_to<double>(), new_offset);
+	if( viewport_->getTimeTriggerActive() )
+		onPlotChanged(true);
 }
 
 void View::calculate_tick_spacing()
@@ -863,6 +868,7 @@ bool View::viewportEvent(QEvent *event)
 void View::resizeEvent(QResizeEvent*)
 {
 	update_layout();
+	Q_EMIT resized();
 }
 
 void View::row_item_appearance_changed(bool label, bool content)
@@ -1079,7 +1085,7 @@ void View::signals_changed()
 void View::capture_state_updated(int state)
 {
 	if (state == Session::Running) {
-		set_time_unit(util::TimeUnit::Samples);
+//		set_time_unit(util::TimeUnit::Samples);
 
 		trigger_markers_.clear();
 	}
@@ -1202,6 +1208,50 @@ void View::set_timebase(double value)
 	backup_scale_ = scale_;
 }
 
+double View::start_plot_offset()
+{
+	return start_plot_offset_;
+}
+
+void View::set_offset(double timePos, double timeSpan, bool running)
+{
+	double value = -(timeSpan / 2 - timePos);
+	double plot_value = -(start_plot_offset_ - value);
+	Timestamp plot_offset = Timestamp(plot_value);
+	Timestamp new_offset = Timestamp(value);
+	if( running )
+	{
+		if( session_.get_capture_state() == Session::Running)
+		{
+			session_.stop_capture();
+			set_scale_offset(scale_, Timestamp(0));
+			ruler_->set_offset(value);
+			start_plot_offset_ = value;
+			session_.start_capture([&](QString message) {
+				session_error("Capture failed", message); });
+		} else {
+			set_scale_offset(scale_, Timestamp(0));
+			ruler_->set_offset(value);
+			start_plot_offset_ = value;
+		}
+
+	}
+	else
+	{
+		ruler_->set_offset(value);
+		set_scale_offset(scale_, plot_offset);
+	}
+}
+
+void View::onPlotChanged(bool silent)
+{
+	double plot_offset = offset_.convert_to<double>();
+	double ruler_value = start_plot_offset_ + plot_offset;
+	ruler_->set_offset(ruler_value);
+	Q_EMIT repaintTriggerHandle(ruler_value, silent);
+//	time_item_appearance_changed(true, true);
+}
+
 void View::session_error(
 	const QString text, const QString info_text)
 {
@@ -1210,7 +1260,7 @@ void View::session_error(
 		Q_ARG(QString, info_text));
 }
 
-int View::divisionCount()
+int View::divisionCount() const
 {
 	return DivisionCount;
 }

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>600</width>
-    <height>38</height>
+    <height>40</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -66,6 +66,15 @@ QComboBox QAbstractItemView {
   selection-background-color: rgba(25, 25, 25);
   outline: 0px;
 }
+
+QComboBox QAbstractItemView::item {
+width:30px;
+hieght:20px;
+margin-top: 0px;
+border:0px;
+padding:0px;
+}
+
 QComboBox:disabled
 {
   color: rgb(85, 85, 85);
@@ -125,33 +134,6 @@ QLabel:disabled
     <number>0</number>
    </property>
    <item>
-    <widget class="Line" name="line_2">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>1</height>
-      </size>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">QFrame{
-  color: rgba(255,255,255,50);
-}</string>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Plain</enum>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item>
     <widget class="QWidget" name="baseWidget" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
@@ -181,10 +163,11 @@ background: #272730;
 border-color:transparent;
 }
 
-QWidget#baseWidget:hover
+QWidget[hover-property=true]
 {
 border:1px solid rgb(65,155,249);
 }
+
 </string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -719,7 +702,7 @@ padding:0px;
             <string notr="true"/>
            </property>
            <property name="currentIndex">
-            <number>2</number>
+            <number>0</number>
            </property>
            <widget class="QWidget" name="pageChannel">
             <property name="sizePolicy">
@@ -1163,20 +1146,21 @@ border-right:0px solid transparent;</string>
                 </disabled>
                </palette>
               </property>
+              <property name="sizeAdjustPolicy">
+               <enum>QComboBox::AdjustToMinimumContentsLengthWithIcon</enum>
+              </property>
               <property name="iconSize">
                <size>
-                <width>16</width>
-                <height>16</height>
+                <width>30</width>
+                <height>20</height>
                </size>
+              </property>
+              <property name="frame">
+               <bool>false</bool>
               </property>
               <item>
                <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset>
-                 <normalon>:/icons/trigger-marker-rising.svg</normalon>
-                </iconset>
+                <string>None</string>
                </property>
               </item>
               <item>
@@ -1184,9 +1168,11 @@ border-right:0px solid transparent;</string>
                 <string/>
                </property>
                <property name="icon">
-                <iconset>
-                 <normalon>:/icons/trigger-marker-falling.svg</normalon>
-                </iconset>
+                <iconset resource="../resources/resources.qrc">
+                 <normaloff>:/icons/trigger_any_enabled.svg</normaloff>
+                 <normalon>:/icons/trigger_any_enabled.svg</normalon>
+                 <disabledoff>:/icons/trigger_any_disabled.svg</disabledoff>
+                 <disabledon>:/icons/trigger_any_disabled.svg</disabledon>:/icons/trigger_any_enabled.svg</iconset>
                </property>
               </item>
               <item>
@@ -1194,9 +1180,11 @@ border-right:0px solid transparent;</string>
                 <string/>
                </property>
                <property name="icon">
-                <iconset>
-                 <normalon>:/icons/trigger-high.svg</normalon>
-                </iconset>
+                <iconset resource="../resources/resources.qrc">
+                 <normaloff>:/icons/trigger_rising_enabled.svg</normaloff>
+                 <normalon>:/icons/trigger_rising_enabled.svg</normalon>
+                 <disabledoff>:/icons/trigger_rising_disabled.svg</disabledoff>
+                 <disabledon>:/icons/trigger_rising_disabled.svg</disabledon>:/icons/trigger_rising_enabled.svg</iconset>
                </property>
               </item>
               <item>
@@ -1204,9 +1192,11 @@ border-right:0px solid transparent;</string>
                 <string/>
                </property>
                <property name="icon">
-                <iconset>
-                 <normalon>:/icons/trigger-low.svg</normalon>
-                </iconset>
+                <iconset resource="../resources/resources.qrc">
+                 <normaloff>:/icons/trigger_falling_enabled.svg</normaloff>
+                 <normalon>:/icons/trigger_falling_enabled.svg</normalon>
+                 <disabledoff>:/icons/trigger_falling_disabled.svg</disabledoff>
+                 <disabledon>:/icons/trigger_falling_disabled.svg</disabledon>:/icons/trigger_falling_enabled.svg</iconset>
                </property>
               </item>
               <item>
@@ -1214,9 +1204,11 @@ border-right:0px solid transparent;</string>
                 <string/>
                </property>
                <property name="icon">
-                <iconset>
-                 <normalon>:/icons/trigger-none.svg</normalon>
-                </iconset>
+                <iconset resource="../resources/resources.qrc">
+                 <normaloff>:/icons/trigger_low_enabled.svg</normaloff>
+                 <normalon>:/icons/trigger_low_enabled.svg</normalon>
+                 <disabledoff>:/icons/trigger_low_disabled.svg</disabledoff>
+                 <disabledon>:/icons/trigger_low_disabled.svg</disabledon>:/icons/trigger_low_enabled.svg</iconset>
                </property>
               </item>
               <item>
@@ -1224,9 +1216,11 @@ border-right:0px solid transparent;</string>
                 <string/>
                </property>
                <property name="icon">
-                <iconset>
-                 <normalon>:/icons/trigger-marker-change.svg</normalon>
-                </iconset>
+                <iconset resource="../resources/resources.qrc">
+                 <normaloff>:/icons/trigger_high_enabled.svg</normaloff>
+                 <normalon>:/icons/trigger_high_enabled.svg</normalon>
+                 <disabledoff>:/icons/trigger_high_disabled.svg</disabledoff>
+                 <disabledon>:/icons/trigger_high_disabled.svg</disabledon>:/icons/trigger_high_enabled.svg</iconset>
                </property>
               </item>
              </widget>
@@ -1276,10 +1270,10 @@ border-right:0px solid transparent;</string>
 }
 
 QPushButton:checked {
-  border-image: url(:/icons/close_hovered.svg);
+  border-image: url(:/icons/redX.svg);
 }
 QPushButton:!checked {
-  border-image: url(:/icons/close_hovered.svg);
+  border-image: url(:/icons/redX.svg);
 
 }
 </string>
@@ -1321,14 +1315,14 @@ QPushButton:!checked {
               </property>
               <property name="minimumSize">
                <size>
-                <width>20</width>
-                <height>20</height>
+                <width>0</width>
+                <height>0</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>20</width>
-                <height>20</height>
+                <width>16777215</width>
+                <height>16777215</height>
                </size>
               </property>
               <property name="palette">
@@ -1749,22 +1743,20 @@ QPushButton:!checked {
               <property name="styleSheet">
                <string notr="true">QCheckBox
 {
-  min-width: 20px;
-  min-height: 20px;
-  max-width: 20px;
-  max-height: 20px;
+  spacing: 0px;
 }
-QCheckBox::indicator {
-		border: 2px solid rgb(74, 100, 255);
-			border-radius: 4px;
+QCheckBox:indicator
+{
+height: 16px;
+width: 16px;
+border-radius:4px;
+border: 2px solid #4a64ff;
 }
-QCheckBox::indicator:checked {
-	background-color: rgb(74, 100, 255);
-}
-QCheckBox::indicator:!checked {
-	background-color: rgb(39, 39, 48);
-}
-</string>
+
+QCheckBox:indicator:checked
+{
+background:#4a64ff;
+}</string>
               </property>
               <property name="text">
                <string/>
@@ -1814,6 +1806,12 @@ QCheckBox::indicator:!checked {
    </item>
    <item>
     <widget class="QWidget" name="subChannelWidget" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <layout class="QVBoxLayout" name="layoutChildren">
       <property name="spacing">
        <number>0</number>
@@ -1833,35 +1831,10 @@ QCheckBox::indicator:!checked {
      </layout>
     </widget>
    </item>
-   <item>
-    <widget class="Line" name="line">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>1</height>
-      </size>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">QFrame{
-  color: rgba(255,255,255,50);
-}</string>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Plain</enum>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../resources/resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

@@ -374,7 +374,7 @@ QLabel:disabled
             <number>0</number>
            </property>
            <property name="text">
-            <string>Output</string>
+            <string>Trigger</string>
            </property>
           </widget>
          </item>

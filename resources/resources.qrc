@@ -3,9 +3,6 @@
         <file>filter.json</file>
         <file>scopy.html</file>
         <file>icon.ico</file>
-        <file>icons/trigger_delay.png</file>
-        <file>icons/trigger_level.png</file>
-        <file>icons/trigger_level_2.png</file>
         <file>menu/add.svg</file>
         <file>menu/menu_button.png</file>
         <file>menu/scopy_title.png</file>
@@ -67,16 +64,6 @@
         <file>icons/status-green.svg</file>
         <file>icons/status-grey.svg</file>
         <file>icons/status-red.svg</file>
-        <file>icons/trigger-change.svg</file>
-        <file>icons/trigger-falling.svg</file>
-        <file>icons/trigger-high.svg</file>
-        <file>icons/trigger-low.svg</file>
-        <file>icons/trigger-marker-change.svg</file>
-        <file>icons/trigger-marker-falling.svg</file>
-        <file>icons/trigger-marker-low.svg</file>
-        <file>icons/trigger-marker-rising.svg</file>
-        <file>icons/trigger-none.svg</file>
-        <file>icons/trigger-rising.svg</file>
         <file>icons/zoom-fit.png</file>
         <file>icons/zoom-in.png</file>
         <file>icons/zoom-original.png</file>
@@ -111,6 +98,16 @@
         <file>icons/sba_cmb_box_arrow_right.svg</file>
         <file>icons/ico-expand.svg</file>
         <file>icons/ico-collapse.svg</file>
+        <file>icons/trigger_rising_enabled.svg</file>
+        <file>icons/trigger_rising_disabled.svg</file>
+        <file>icons/trigger_low_enabled.svg</file>
+        <file>icons/trigger_low_disabled.svg</file>
+        <file>icons/trigger_high_enabled.svg</file>
+        <file>icons/trigger_high_disabled.svg</file>
+        <file>icons/trigger_falling_enabled.svg</file>
+        <file>icons/trigger_falling_disabled.svg</file>
+        <file>icons/trigger_any_enabled.svg</file>
+        <file>icons/trigger_any_disabled.svg</file>
         <file>icons/ico-oneshot.svg</file>
         <file>icons/ico-play.svg</file>
     </qresource>

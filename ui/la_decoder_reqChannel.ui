@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -20,57 +20,18 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">
-QComboBox
-{
-  height: 19px;
-
-  border: 0px;
-  border-bottom: 1px solid rgba(255, 255, 255, 102);
-  font-family: ArialMT;
-  font-size: 16px;
-  font-weight: normal;
-  font-style: normal;
-  text-align: left;
-  color: #ffffff;
-/*background-color:green;*/
-
-}
-QComboBox::drop-down
-{
-  subcontrol-position: center right;
-  width: 10px;
-  height: 6px;
-  border-image: url(:/icons/sba_cmb_box_arrow.svg);
-  font-family: ArialMT;
-  font-size: 16px;
-  font-weight: normal;
-  font-style: normal;
-  text-align: left;
-  color: #e0e0e0;
-}
-QComboBox QAbstractItemView {
-  border: 0px;
-  selection-background-color: rgba(25, 25, 25);
-  outline: 0px;
-}
-QComboBox:disabled
-{
-  color: rgb(85, 85, 85);
-}
-
-/* Color of the selected list item. */
+   <string notr="true">/* Color of the selected list item. */
 QComboBox::item:selected {
   font-family: ArialMT;
   font-size: 16px;
   font-weight: normal;
   font-style: normal;
-  text-align: left;
+  text-align: right;
   color: #ffffff;
   border-bottom: 1px solid rgba(255, 255, 255, 102);
  
 }
-/* Indicator will shine through the label text if you don't make it hidden. */
+/* Indicator will shine through the label text if you don't make it hidden. */ 
 QComboBox::indicator{
     background-color:transparent;
     selection-background-color:transparent;
@@ -78,23 +39,18 @@ QComboBox::indicator{
     selection-color:transparent;
 }
 
-QLabel
-{  
-  font-family: ArialMT;
-  font-size: 16px;
-  font-weight: normal;
-  font-style: normal;
-  text-align: left;
-  color: #ffffff;
-  border: 0px solid red;
-  margin:0px;
-  padding:0px;
+QLabel {
+width: 68.2px;
+height: 16.46px;
+opacity: 0.6;
+font-family: Arial;
+font-size: 14px;
+line-height: 16px;
+color: #FFFFFF;
 }
 
-QLabel:disabled
-{
-	color:rgb(85,85,85);
-}</string>
+
+</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_1">
    <property name="spacing">
@@ -114,31 +70,160 @@ QLabel:disabled
    </property>
    <item>
     <widget class="QWidget" name="reqChannel" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
       <item>
-       <widget class="QLabel" name="labelRole">
+       <widget class="QStackedWidget" name="stackedWidget">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="styleSheet">
-         <string notr="true"/>
+        <property name="currentIndex">
+         <number>0</number>
         </property>
-        <property name="text">
-         <string>Settings</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QComboBox" name="roleCombo">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
+        <widget class="QWidget" name="channelGroup">
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="labelRole">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="styleSheet">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string>Settings</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QComboBox" name="roleCombo">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="channel">
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="label">
+            <property name="styleSheet">
+             <string notr="true">QLabel
+{
+opacity:0.2;
+}</string>
+            </property>
+            <property name="text">
+             <string>Role</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>19</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QLabel" name="labelChRole">
+            <property name="styleSheet">
+             <string notr="true">QLabel {
+ border-bottom: 1px solid rgba(255, 255, 255, 102);
+}</string>
+            </property>
+            <property name="text">
+             <string>Role</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
        </widget>
       </item>
      </layout>

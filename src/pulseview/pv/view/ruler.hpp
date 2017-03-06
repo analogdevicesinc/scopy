@@ -105,6 +105,14 @@ public:
 		unsigned precision = 0,
 		bool sign = true);
 
+	double get_offset();
+	void set_offset(double value);
+
+	int getTimeTriggerPx() const;
+	void setTimeTriggerPx(int value);
+
+	int getTickZeroPosition();
+
 private:
 	/**
 	 * Gets the time items.
@@ -166,6 +174,8 @@ private:
 
 	static int divisionCount_;
 
+	pv::util::Timestamp ruler_offset;
+	int timeTriggerPx;
 protected:
 	void resizeEvent(QResizeEvent*) override;
 

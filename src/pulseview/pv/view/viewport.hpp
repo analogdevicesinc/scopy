@@ -56,14 +56,27 @@ public:
     int getDivisionOffset() const;
     void setDivisionOffset(int value);
 
-	int getTimeTriggerPos() const;
-	void setTimeTriggerPos(int value);
+	int getTimeTriggerSample() const;
+	void setTimeTriggerSample(int value);
+	void setTimeTriggerPosActive(bool active);
+	bool getTimeTriggerActive();
+
+	int getTimeTriggerPixel() const;
+	void setTimeTriggerPixel(int value);
 
 	void disableDrag();
 	void enableDrag();
 
+	std::pair<int, int> getCursorsPixelValues() const;
+	void setCursorsPixelValues(const std::pair<int, int> &value);
+
+	bool getCursorsActive() const;
+	void setCursorsActive(bool value);
+
+	void cursorValueChanged_1(int);
+	void cursorValueChanged_2(int);
 private:
-    /**
+	/**
      * Indicates when a view item is being hovered over.
 	 * @param item The item that is being hovered over, or @c nullptr
 	 * if no view item is being hovered over.
@@ -107,12 +120,15 @@ private:
 	bool touch_event(QTouchEvent *event);
 
 	int visible_data_count;
-
+Q_SIGNALS:
+	void plotChanged(bool);
+	void repaintTriggerHandle(int);
 private:
 	void paintEvent(QPaintEvent *event);
 	void paint_grid(QPainter &p, const ViewItemPaintParams &pp);
 	void paint_axis(QPainter &p, const ViewItemPaintParams &pp, int y);
 	void paint_time_trigger_line(QPainter &p, const ViewItemPaintParams &pp, int pos);
+	void paint_cursors(QPainter &p, const ViewItemPaintParams &pp);
 
 	void mouseDoubleClickEvent(QMouseEvent *event);
 	void wheelEvent(QWheelEvent *event);
@@ -125,12 +141,16 @@ private:
 	double pinch_offset1_;
 	bool pinch_zoom_active_;
 
-    int divisionHeight = 50;
-    int divisionCount = 10;
-    int divisionOffset = 3;
+	int divisionHeight = 50;
+	int divisionCount = 10;
+	int divisionOffset = 3;
 
-	int timeTriggerPos;
+	int timeTriggerSample;
+	int timeTriggerPixel;
+	bool timeTriggerActive;
 
+	bool cursorsActive;
+	std::pair<int, int> cursorsPixelValues;
 };
 
 } // namespace view

@@ -20,6 +20,7 @@
 
 #include "timeitem.hpp"
 #include "view.hpp"
+#include "viewport.hpp"
 
 namespace pv {
 namespace view {
@@ -30,8 +31,9 @@ TimeItem::TimeItem(View &view) :
 
 void TimeItem::drag_by(const QPoint &delta)
 {
+	double scale = view_.scale() /(view_.viewport()->size().width() / view_.divisionCount());
 	set_time(view_.offset() + (drag_point_.x() + delta.x() - 0.5) *
-		view_.scale());
+		scale);
 }
 
 } // namespace view

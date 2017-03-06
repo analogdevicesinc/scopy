@@ -41,7 +41,7 @@ enum class TimeUnit {
 enum class SIPrefix {
 	unspecified = -1,
 	pico, nano, micro,
-	milli, none
+	milli, none, kilo
 };
 
 /// Returns the exponent that corresponds to a given prefix.

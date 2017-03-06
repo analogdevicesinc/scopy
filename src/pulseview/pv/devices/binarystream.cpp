@@ -25,6 +25,7 @@
 #include "binarystream.hpp"
 #include <iio.h>
 #include <iostream>
+#include "logic_analyzer.hpp"
 
 namespace pv {
 namespace devices {
@@ -33,14 +34,17 @@ BinaryStream::BinaryStream(const std::shared_ptr<sigrok::Context> &context,
 			   struct iio_device *dev,
 			   size_t buffersize,
 			   std::shared_ptr<sigrok::InputFormat> format,
-			   const std::map<std::string, Glib::VariantBase> &options) :
+			   const std::map<std::string, Glib::VariantBase> &options,
+			   adiscope::LogicAnalyzer* parent) :
 	context_(context),
 	dev_(dev),
 	format_(format),
 	options_(options),
-	interrupt_(false),
+	interrupt_(true),
 	buffersize_(buffersize),
-	single_(false)
+	single_(false),
+	running(false),
+	la(parent)
 {
 	/* 10 buffers, 10ms each -> 250ms before we lose data */
 	iio_device_set_kernel_buffers_count(dev_, 25);
@@ -102,22 +106,26 @@ void BinaryStream::start()
 
 void BinaryStream::run()
 {
+	if( running )
+		stop();
+	running = true;
 	size_t nrx = 0;
 	input_->reset();
 	interrupt_ = false;
 	ssize_t nbytes_rx;
 	while (!interrupt_)
 	{
+		la->set_triggered_status("awaiting");
 		nbytes_rx = iio_buffer_refill(data_);
-		if (nbytes_rx < 0)
-		{
-			printf("Error refilling buf %d\n", (int)nbytes_rx);
-			shutdown();
-		}
+		la->set_triggered_status("running");
 		nrx += nbytes_rx / 2;
-		input_->send(iio_buffer_start(data_), (size_t)(nbytes_rx));
-		if( single_ )
+		if( nbytes_rx > 0 )
+			input_->send(iio_buffer_start(data_), (size_t)(nbytes_rx));
+		if( single_ && running ) {
 			interrupt_ = true;
+			stop();
+		}
+
 	}
 	input_->end();
 	interrupt_ = false;
@@ -133,6 +141,8 @@ void BinaryStream::set_buffersize(size_t value)
 
 void BinaryStream::set_single(bool check)
 {
+	if( running )
+		stop();
 	single_ = check;
 }
 
@@ -145,16 +155,23 @@ void BinaryStream::set_options(std::map<std::string, Glib::VariantBase> opt)
 
 /* cleanup and exit */
 void BinaryStream::shutdown() {
-	printf("SHUTDOWN");
 	getchar();
 	exit(0);
 }
 
 void BinaryStream::stop()
 {
+	la->set_triggered_status("stopped");
+	running = false;
 	interrupt_ = true;
-	iio_buffer_destroy(data_);
-	qDebug() << "binary stream stopped\n";
+	single_ = false;
+	if(data_ )
+		iio_buffer_cancel(data_);
+	if( data_ )
+	{
+		iio_buffer_destroy(data_);
+		data_ = NULL;
+	}
 }
 
 } // namespace devices
