@@ -70,6 +70,8 @@ namespace adiscope {
 #define PulsePatternDescription "Pulse pattern generator"
 #define RandomPatternName "Random"
 #define RandomPatternDescription "Random pattern generator"
+#define UARTPatternName "UART"
+#define UARTPatternDescription "UART pattern generator"
 #define BinaryCounterPatternName "Binary Counter"
 #define BinaryCounterPatternDescription "Binary counter pattern generator"
 #define GrayCounterPatternName "Gray Counter Pattern"
@@ -78,6 +80,14 @@ namespace adiscope {
 #define JohnsonCounterPatternDescription "Johnson counter pattern generator"
 #define WalkingCounterPatternName "Walking Counter Pattern"
 #define WalkingCounterPatternDescription "Walking counter pattern generator"
+
+enum {
+	ClockPatternId = 0,
+	RandomPatternId,
+	BinaryCounterId,
+	UARTPatternId,
+};
+
 
 
 
@@ -132,7 +142,7 @@ public:
 	static QJsonValue toJson(Pattern *p);
 	static Pattern *fromJson(QJsonValue j);
 private:
-	Pattern_API(){}
+	Pattern_API() {}
 };
 
 class PatternUI : public QWidget
@@ -189,7 +199,7 @@ public:
 	void build_ui(QWidget *parent = 0);
 	void destroy_ui();
 
-public Q_SLOTS:
+private Q_SLOTS:
 	void parse_ui();
 };
 
@@ -224,7 +234,7 @@ public:
 	void build_ui(QWidget *parent = 0);
 	void destroy_ui();
 
-public Q_SLOTS:
+private Q_SLOTS:
 	void parse_ui();
 };
 
@@ -256,7 +266,6 @@ public:
 	void set_increment(const uint16_t& value);
 	uint16_t get_init_value() const;
 	void set_init_value(const uint16_t& value);
-
 };
 
 class BinaryCounterPatternUI : public PatternUI
@@ -272,7 +281,7 @@ public:
 	void build_ui(QWidget *parent = 0);
 	void destroy_ui();
 
-public Q_SLOTS:
+private Q_SLOTS:
 	void parse_ui();
 };
 #if 0
@@ -297,6 +306,7 @@ public:
 	void build_ui(QWidget *parent = 0);
 	void destroy_ui();
 };
+#endif
 
 class UARTPattern : virtual public Pattern
 {
@@ -318,6 +328,7 @@ class UARTPattern : virtual public Pattern
 	};
 protected:
 	std::string str;
+	std::string params;
 	bool msb_first;
 	unsigned int baud_rate;
 	unsigned int data_bits;
@@ -327,13 +338,26 @@ protected:
 
 public:
 	UARTPattern();
+	virtual ~UARTPattern() {}
+
+	virtual uint8_t generate_pattern(uint32_t sample_rate,
+	                                 uint32_t number_of_samples, uint16_t number_of_channels);
+	uint32_t get_min_sampling_freq();
+	uint32_t get_required_nr_of_samples(uint32_t sample_rate,
+	                                    uint32_t number_of_channels);
+
+	unsigned int get_baud_rate();
+	unsigned int get_data_bits();
+	unsigned int get_stop_bits();
+	enum sp_parity get_parity();
+
 	void set_string(std::string str_);
+	std::string get_string();
+	std::string get_params();
 	int set_params(std::string params_);
 	void set_msb_first(bool msb_first_);
 	uint16_t encapsulateUartFrame(char chr, uint16_t *bits_per_frame);
-	uint32_t get_min_sampling_freq();
-	uint32_t get_required_nr_of_samples();
-	uint8_t generate_pattern();
+
 };
 
 class UARTPatternUI : public PatternUI
@@ -341,17 +365,18 @@ class UARTPatternUI : public PatternUI
 	Q_OBJECT
 	Ui::UARTPatternUI *ui;
 	QWidget *parent_;
+	UARTPattern *pattern;
 public:
 	UARTPatternUI(UARTPattern *pattern, QWidget *parent = 0);
 	~UARTPatternUI();
-	UARTPattern *pattern;
+	Pattern *get_pattern();
 	void build_ui(QWidget *parent = 0);
 	void destroy_ui();
+private Q_SLOTS:
 	void parse_ui();
-	/*
-	private Q_SLOTS:
-	void on_setUARTParameters_clicked();*/
 };
+
+#if 0
 
 class JSPattern : public QObject, virtual public Pattern
 {

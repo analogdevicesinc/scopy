@@ -141,25 +141,33 @@ QJsonValue Pattern_API::toJson(Pattern *p)
 	ClockPattern *cp = dynamic_cast<ClockPattern *>(p);
 	RandomPattern *rp = dynamic_cast<RandomPattern *>(p);
 	BinaryCounterPattern *bcp = dynamic_cast<BinaryCounterPattern *>(p);
+	UARTPattern *up = dynamic_cast<UARTPattern *>(p);
+
+	QJsonObject params;
 
 	if (cp) {
 		obj["name"] = QString::fromStdString(p->get_name());
-		QJsonObject params;
 		params["freq"]  = QJsonValue(cp->get_frequency());
 		params["duty"]  = QJsonValue(cp->get_duty_cycle());
 		params["phase"] = QJsonValue(cp->get_phase());
 		obj["params"] = QJsonValue(params);
 	} else if (rp) {
 		obj["name"] = QString::fromStdString(p->get_name());
-		QJsonObject params;
 		params["freq"]  = QJsonValue((qint64)rp->get_frequency());
 		obj["params"] = QJsonValue(params);
 	} else if (bcp) {
 		obj["name"] = QString::fromStdString(p->get_name());
-		QJsonObject params;
 		params["freq"]  = QJsonValue((qint64)bcp->get_frequency());
 		obj["params"] = QJsonValue(params);
-	} else {
+	} else if (up) {
+		obj["name"] = QString::fromStdString(p->get_name());
+		params["uart"] = QString::fromStdString(up->get_params());
+		params["string"] = QString::fromStdString(up->get_string());
+		obj["params"] = QJsonValue(params);
+
+	}
+
+	else {
 		obj["name"] = "none";
 	}
 
@@ -174,6 +182,8 @@ Pattern *Pattern_API::fromJson(QJsonValue j)
 	ClockPattern *cp = dynamic_cast<ClockPattern *>(p);
 	RandomPattern *rp = dynamic_cast<RandomPattern *>(p);
 	BinaryCounterPattern *bcp = dynamic_cast<BinaryCounterPattern *>(p);
+	UARTPattern *up = dynamic_cast<UARTPattern *>(p);
+
 	QJsonObject params = obj["params"].toObject();
 
 	if (cp) {
@@ -184,6 +194,9 @@ Pattern *Pattern_API::fromJson(QJsonValue j)
 		rp->set_frequency(params["freq"].toInt());
 	} else if (bcp) {
 		bcp->set_frequency(params["freq"].toInt());
+	} else if (up) {
+		up->set_string(params["string"].toString().toStdString());
+		up->set_params(params["uart"].toString().toStdString());
 	} else {
 
 	}
@@ -760,21 +773,40 @@ void GrayCounterPatternUI::parse_ui()
 		qDebug()<<"Cannot set frequency, not a uint16";
 	}
 }
-
-
+#endif
 
 UARTPattern::UARTPattern()
 {
-	qDebug()<<"UARTPattern Created";
 	parity = SP_PARITY_NONE;
 	stop_bits = 1;
 	baud_rate = 9600;
 	data_bits = 8;
 	msb_first=false;
 	set_periodic(false);
-	set_name("UART");
-	set_description("UARTDescription");
+	set_name(UARTPatternName);
+	set_description(UARTPatternDescription);
 
+}
+
+
+unsigned int UARTPattern::get_baud_rate()
+{
+	return baud_rate;
+}
+
+unsigned int UARTPattern::get_data_bits()
+{
+	return data_bits;
+}
+
+unsigned int UARTPattern::get_stop_bits()
+{
+	return stop_bits;
+}
+
+enum UARTPattern::sp_parity UARTPattern::get_parity()
+{
+	return parity;
 }
 
 void UARTPattern::set_string(std::string str_)
@@ -782,9 +814,20 @@ void UARTPattern::set_string(std::string str_)
 	str = str_;
 }
 
+std::string UARTPattern::get_string()
+{
+	return str;
+}
+
+std::string UARTPattern::get_params()
+{
+	return params;
+}
+
 int UARTPattern::set_params(std::string params_)
 {
 	// https://github.com/analogdevicesinc/libiio/blob/master/serial.c#L426
+	params = params_;
 	const char *params = params_.c_str();
 	char *end;
 
@@ -940,18 +983,19 @@ uint32_t UARTPattern::get_min_sampling_freq()
 	return baud_rate;
 }
 
-uint32_t UARTPattern::get_required_nr_of_samples()
+uint32_t UARTPattern::get_required_nr_of_samples(uint32_t sample_rate,
+                uint32_t number_of_channels)
 {
 	uint16_t number_of_frames = str.length();
 	uint32_t samples_per_bit = sample_rate/baud_rate;
 	uint16_t bits_per_frame;
 	encapsulateUartFrame(*(str.c_str()), &bits_per_frame);
 	uint32_t samples_per_frame = samples_per_bit * bits_per_frame;
-	number_of_samples = samples_per_frame*(number_of_frames + 1/* padding */);
-	return number_of_samples;
+	return samples_per_frame*(number_of_frames + 1/* padding */);
 }
 
-uint8_t UARTPattern::generate_pattern()
+uint8_t UARTPattern::generate_pattern(uint32_t sample_rate,
+                                      uint32_t number_of_samples, uint16_t number_of_channels)
 {
 	delete_buffer();
 	uint16_t number_of_frames = str.length();
@@ -960,7 +1004,6 @@ uint8_t UARTPattern::generate_pattern()
 	uint16_t bits_per_frame;
 	encapsulateUartFrame(*(str.c_str()), &bits_per_frame);
 	uint32_t samples_per_frame = samples_per_bit * bits_per_frame;
-	number_of_samples = samples_per_frame*(number_of_frames + 1/* padding */);
 
 	buffer = new short[number_of_samples]; // no need to recreate buffer
 	auto buffersize = (number_of_samples)*sizeof(short);
@@ -1001,16 +1044,18 @@ uint8_t UARTPattern::generate_pattern()
 		buf_ptr++;
 	}
 
+	for (; buf_ptr!=(short *)(buffer+number_of_samples); buf_ptr++) {
+		*buf_ptr = 1;
+	}
+
 	return 0;
 }
+
 
 UARTPatternUI::UARTPatternUI(UARTPattern *pattern,
                              QWidget *parent) : PatternUI(parent), pattern(pattern)
 {
 	qDebug()<<"UARTPatternUI created";
-	pattern->set_params("9600/8N1");
-	pattern->set_string("hello World");
-
 	ui = new Ui::UARTPatternUI();
 	ui->setupUi(this);
 	setVisible(false);
@@ -1019,12 +1064,24 @@ UARTPatternUI::UARTPatternUI(UARTPattern *pattern,
 UARTPatternUI::~UARTPatternUI()
 {
 	qDebug()<<"UARTPatternUI destroyed";
+	delete ui;
 }
 
 void UARTPatternUI::build_ui(QWidget *parent)
 {
 	parent_ = parent;
 	parent->layout()->addWidget(this);
+	ui->CB_baud->setCurrentText(QString::number(pattern->get_baud_rate()));
+	ui->CB_Parity->setCurrentIndex(pattern->get_parity());
+	ui->CB_Stop->setCurrentText(QString::number(pattern->get_stop_bits()));
+	ui->LE_Data->setText(QString::fromStdString(pattern->get_string()));
+	connect(ui->CB_baud,SIGNAL(activated(QString)),this,SLOT(parse_ui()));
+	connect(ui->CB_Parity,SIGNAL(activated(QString)),this,SLOT(parse_ui()));
+	connect(ui->CB_Stop,SIGNAL(activated(QString)),this,SLOT(parse_ui()));
+	connect(ui->LE_Data,SIGNAL(textChanged(QString)),this,SLOT(parse_ui()));
+	parse_ui();
+
+
 }
 void UARTPatternUI::destroy_ui()
 {
@@ -1032,16 +1089,28 @@ void UARTPatternUI::destroy_ui()
 	//    delete ui;
 }
 
+Pattern *UARTPatternUI::get_pattern()
+{
+	return pattern;
+}
+
 
 void UARTPatternUI::parse_ui()
 {
-	ui->paramsOut->setText(ui->baudCombo->currentText() + "/8"
-	                       +ui->parityCombo->currentText()[0] + ui->stopCombo->currentText());
-	qDebug()<<ui->paramsOut->text();
-	pattern->set_params(ui->paramsOut->text().toStdString());
-	qDebug()<<ui->dataEdit->text();
-	pattern->set_string(ui->dataEdit->text().toStdString());
+	ui->LE_paramsOut->setText(ui->CB_baud->currentText() + "/8"
+	                          +ui->CB_Parity->currentText()[0] + ui->CB_Stop->currentText());
+	qDebug()<<ui->LE_paramsOut->text();
+	pattern->set_params(ui->LE_paramsOut->text().toStdString());
+	qDebug()<<ui->LE_Data->text();
+	pattern->set_string(ui->LE_Data->text().toStdString());
+
+	Q_EMIT patternChanged();
+
 }
+
+
+
+#if 0
 /*
 void adiscope::UARTPatternUI::on_setUARTParameters_clicked()
 {
@@ -2054,6 +2123,8 @@ void PatternFactory::init()
 	description_list.append(RandomPatternDescription);
 	ui_list.append(BinaryCounterPatternName);
 	description_list.append(BinaryCounterPatternDescription);
+	ui_list.append(UARTPatternName);
+	description_list.append(UARTPatternDescription);
 
 	/*
 	ui_list.append(ConstantPatternName);
@@ -2108,26 +2179,32 @@ void PatternFactory::init()
 Pattern *PatternFactory::create(QString name)
 {
 	int i=0;
+
 	for (auto str : ui_list) {
 		if (name==str) {
 			return create(i);
 		}
+
 		i++;
 	}
+
 	return create(0);
 }
 
 Pattern *PatternFactory::create(int index)
 {
 	switch (index) {
-	case 0:
+	case ClockPatternId:
 		return new ClockPattern();
 
-	case 1:
+	case RandomPatternId:
 		return new RandomPattern();
 
-	case 2:
+	case BinaryCounterId:
 		return new BinaryCounterPattern();
+
+	case UARTPatternId:
+		return new UARTPattern();
 		/* case 0: return new ConstantPattern();
 		 case 1: return new NumberPattern();
 
@@ -2159,8 +2236,10 @@ PatternUI *PatternFactory::create_ui(Pattern *pattern, QWidget *parent)
 		if (name==str) {
 			return create_ui(pattern,i,parent);
 		}
+
 		i++;
 	}
+
 	return create_ui(pattern,0,parent);
 }
 
@@ -2168,15 +2247,19 @@ PatternUI *PatternFactory::create_ui(Pattern *pattern, int index,
                                      QWidget *parent)
 {
 	switch (index) {
-	case 0:
+	case ClockPatternId:
 		return new ClockPatternUI(dynamic_cast<ClockPattern *>(pattern),parent);
 
-	case 1:
+	case RandomPatternId:
 		return new RandomPatternUI(dynamic_cast<RandomPattern *>(pattern),parent);
 
-	case 2:
+	case BinaryCounterId:
 		return new BinaryCounterPatternUI(dynamic_cast<BinaryCounterPattern *>(pattern),
 		                                  parent);
+
+	case UARTPatternId:
+		return new UARTPatternUI(dynamic_cast<UARTPattern *>(pattern),
+		                         parent);
 		/*
 		case 1: return new NumberPatternUI(parent);
 		case 0: return new ConstantPatternUI(parent);
