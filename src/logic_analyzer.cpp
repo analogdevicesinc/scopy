@@ -805,7 +805,10 @@ QJsonValue LogicAnalyzer::chmToJson()
 
 		chgObj["channels"] = chArray;
 		if( chg->is_grouped() ) {
-			chgObj["decoder"] = chg->getDecoder()->name;
+			if(chg->getDecoder())
+				chgObj["decoder"] = chg->getDecoder()->name;
+			else
+				chgObj["decoder"] = "";
 		}
 		chgArray.insert(i,chgObj);
 	}
@@ -835,7 +838,8 @@ void LogicAnalyzer::jsonToChm(QJsonObject obj)
 			lachg->add_channel(chm.get_channel(chIndex));
 		}
 		if( lachg->is_grouped() ) {
-			lachg->setDecoder(chm.get_decoder_from_name(chg["decoder"].toString().toUtf8()));
+			if(chg["decoder"] != "")
+				lachg->setDecoder(chm.get_decoder_from_name(chg["decoder"].toString().toUtf8()));
 		}
 
 		chm.add_channel_group(lachg);
