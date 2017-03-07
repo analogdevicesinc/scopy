@@ -59,7 +59,8 @@ class LogicAnalyzerChannelUI : public ChannelUI
 
 	int traceOffset;
 	int traceHeight;
-
+private:
+	static std::vector<std::string> trigger_mapping;
 public:
 	LogicAnalyzerChannelUI(LogicAnalyzerChannel *ch,
 	                       LogicAnalyzerChannelGroup *chgroup,
@@ -85,14 +86,15 @@ public:
 	void enableControls(bool enabled);
 private Q_SLOTS:
 	void remove();
-	 void mousePressEvent(QMouseEvent *) override;
-	 void mouseMoveEvent(QMouseEvent *) override;
-	 void dragEnterEvent(QDragEnterEvent *event);
-	 void dragLeaveEvent(QDragLeaveEvent *event);
-	 void dragMoveEvent(QDragMoveEvent *event);
-	 void dropEvent(QDropEvent *event);
-	 void enterEvent(QEvent *event);
+	void mousePressEvent(QMouseEvent *) override;
+	void mouseMoveEvent(QMouseEvent *) override;
+	void dragEnterEvent(QDragEnterEvent *event);
+	void dragLeaveEvent(QDragLeaveEvent *event);
+	void dragMoveEvent(QDragMoveEvent *event);
+	void dropEvent(QDropEvent *event);
+	void enterEvent(QEvent *event);
 	void leaveEvent(QEvent *event);
+	void triggerChanged(int);
 public Q_SLOTS:
 	void rolesChangedLHS(const QString text);
 Q_SIGNALS:
@@ -175,9 +177,9 @@ private Q_SLOTS:
 	void leaveEvent(QEvent *event);
 private:
 	std::shared_ptr<pv::view::TraceTreeItem> trace;
-	static std::vector<std::string> trigger_mapping;
 	std::shared_ptr<pv::view::LogicSignal> logicTrace;
 	std::shared_ptr<pv::view::DecodeTrace> decodeTrace;
+	static std::vector<std::string> trigger_mapping;
 public Q_SLOTS:
 	void remove();
 	void enable(bool enabled);
@@ -217,6 +219,8 @@ private:
 	static int decoder_name_cmp(const void *a, const void *b);
 	LogicAnalyzerChannelGroup *highlightedChannelGroup;
 	LogicAnalyzerChannel *highlightedChannel;
+protected:
+	std::vector<LogicAnalyzerChannel *> lchannels;
 };
 
 

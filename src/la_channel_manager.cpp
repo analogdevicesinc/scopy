@@ -62,6 +62,14 @@ void LogicAnalyzerChannel::setChannel_role(const srd_channel *value)
 	channel_role = value;
 }
 
+std::vector<std::string> LogicAnalyzerChannelUI::trigger_mapping = {
+		"none",
+		"edge-any",
+		"edge-rising",
+		"edge-falling",
+		"level-low",
+		"level-high",
+};
 
 LogicAnalyzerChannelUI::LogicAnalyzerChannelUI(LogicAnalyzerChannel *ch,
                 LogicAnalyzerChannelGroup *chgroup,
@@ -77,6 +85,16 @@ LogicAnalyzerChannelUI::LogicAnalyzerChannelUI(LogicAnalyzerChannel *ch,
 	this->chgroupui = chgroupui;
 	this->chm_ui = chm_ui;
 	setAcceptDrops(true);
+
+	std::string trigger_val = chm_ui->chm->get_channel(get_channel()->get_id())->getTrigger();
+	for(int i = 0; i < trigger_mapping.size(); i++)
+	{
+		if( trigger_val == trigger_mapping[i] )
+		{
+			getChannel()->setTrigger(trigger_val);
+			ui->comboBox->setCurrentIndex(i);
+		}
+	}
 }
 
 LogicAnalyzerChannelUI::~LogicAnalyzerChannelUI()
@@ -343,6 +361,17 @@ LogicAnalyzerChannelGroup* LogicAnalyzerChannelUI::getChannelGroup()
 	return chgroup;
 }
 
+void LogicAnalyzerChannelUI::triggerChanged(int index)
+{
+	std::string trigger_val = trigger_mapping[index];
+	if( trigger_val != getChannel()->getTrigger() )
+	{
+		chm_ui->chm->get_channel(get_channel()->get_id())->setTrigger(trigger_val);
+		chm_ui->la->setHWTrigger(get_channel()->get_id(), trigger_val);
+	}
+	Q_EMIT requestUpdateUI();
+}
+
 void LogicAnalyzerChannelUI::rolesChangedLHS(const QString text)
 {
 	channelRoleChanged(text);
@@ -576,7 +605,7 @@ LogicAnalyzerChannelGroupUI::LogicAnalyzerChannelGroupUI(
 	if( !lchg->is_grouped() )
 	{
 		ch = static_cast<LogicAnalyzerChannel*>(lchg->get_channel());
-		std::string trigger_val = chm_ui->la->get_trigger_from_device(ch->get_id());
+		std::string trigger_val = chm_ui->chm->get_channel(ch->get_id())->getTrigger();
 		for(int i = 0; i < trigger_mapping.size(); i++)
 		{
 			if( trigger_val == trigger_mapping[i] )
@@ -978,10 +1007,11 @@ void LogicAnalyzerChannelGroupUI::triggerChanged(int index)
 		std::string trigger_val = trigger_mapping[index];
 		if( trigger_val != ch->getTrigger() )
 		{
-			ch->setTrigger(trigger_val);
+			chm_ui->chm->get_channel(ch->get_id())->setTrigger(trigger_val);
 			chm_ui->la->setHWTrigger(ch->get_id(), trigger_val);
 		}
 	}
+	Q_EMIT requestUpdateUI();
 }
 
 LogicAnalyzerChannelGroup *LogicAnalyzerChannelGroupUI::getChannelGroup()
@@ -1001,6 +1031,7 @@ LogicAnalyzerChannelManager::LogicAnalyzerChannelManager() :
 	auto temp = static_cast<LogicAnalyzerChannel *>(channel.back());
 
 	for (auto&& ch : channel) {
+		lchannels.push_back(static_cast<LogicAnalyzerChannel*>(ch));
 		channel_group.push_back(new LogicAnalyzerChannelGroup(
 		                                static_cast<LogicAnalyzerChannel *>(ch)));
 	}
@@ -1054,7 +1085,8 @@ void LogicAnalyzerChannelManager::join(std::vector<int> index)
 
 LogicAnalyzerChannel *LogicAnalyzerChannelManager::get_channel(int index)
 {
-	return static_cast<LogicAnalyzerChannel *>(channel[index]);
+	return lchannels[index];
+//	return static_cast<LogicAnalyzerChannel *>(channel[index]);
 }
 
 void LogicAnalyzerChannelManager::add_channel_group(
@@ -1519,8 +1551,7 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 						lachannelgroupUI->ui->layoutChildren,
 						lachannelgroupUI->ui->layoutChildren->count());
 					lachannelUI->topSep = prevSep;
-					prevSep =  lachannelUI->botSep;
-
+					prevSep = lachannelUI->botSep;
 
 					connect(lachannelgroupUI->ui->btnRemGroup, SIGNAL(pressed()),
 					        lachannelgroupUI, SLOT(remove()));
@@ -1531,8 +1562,9 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 						lachannelUI, SLOT(rolesChangedLHS(const QString&)));
 					connect(lachannelUI, SIGNAL(requestUpdateUI()),
 						this, SLOT(triggerUpdateUi()));
-
-
+					connect(lachannelUI->ui->comboBox,
+						SIGNAL(currentIndexChanged(int)),
+						lachannelUI, SLOT(triggerChanged(int)));
 
 					str = QString().number(ch->get_channel(i)->get_id());
 					lachannelUI->ui->indexLabel2->setText(str);
