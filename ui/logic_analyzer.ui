@@ -418,14 +418,14 @@ background-color: grey;
         </property>
         <property name="minimumSize">
          <size>
-          <width>60</width>
-          <height>40</height>
+          <width>64</width>
+          <height>48</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>60</width>
-          <height>40</height>
+          <width>64</width>
+          <height>48</height>
          </size>
         </property>
         <property name="styleSheet">
@@ -434,14 +434,28 @@ background-color: grey;
   max-height: 40px;
   min-width: 60px;
   max-width: 60px;
+padding-top:5px;
 }
 
 QPushButton:checked {
-  border-image: url(:/icons/gear_wheel_pressed.svg);
+  image: url(:/icons/gear_wheel_pressed.svg);
+  border-top: 1px solid rgba(255,255,255,150);
 }
 
 QPushButton:!checked {
-  border-image: url(:/icons/gear_wheel.svg);
+  image: url(:/icons/gear_wheel.svg);
+  border-top: 1px solid rgba(255,255,255,0);
+}
+
+
+QPushButton:!checked:hover {
+  image: url(:/icons/gear_wheel_hover.svg);
+  border-top: 1px solid rgba(255,255,255,0);
+}
+
+QPushButton:checked:hover {
+  image: url(:/icons/gear_wheel_pressed.svg);
+  border-top: 1px solid rgba(255,255,255,200);
 }</string>
         </property>
         <property name="text">
@@ -481,14 +495,14 @@ QPushButton:!checked {
         </property>
         <property name="minimumSize">
          <size>
-          <width>60</width>
-          <height>40</height>
+          <width>64</width>
+          <height>48</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>60</width>
-          <height>40</height>
+          <width>64</width>
+          <height>48</height>
          </size>
         </property>
         <property name="styleSheet">
@@ -497,22 +511,27 @@ QPushButton:!checked {
   max-height: 40px;
   min-width: 60px;
   max-width: 60px;
+  padding-top:5px
 }
 
 QPushButton:checked {
-  border-image: url(:/icons/setup3_checked.svg);
-}
-
-QPushButton:checked:hover {
-  border-image: url(:/icons/setup3_checked_hover.svg);
+  image: url(:/icons/setup3_checked_hover.svg);
+  border-top: 1px solid rgba(255,255,255,150);
 }
 
 QPushButton:!checked {
-  border-image: url(:/icons/setup3_unchecked.svg);
+  image: url(:/icons/setup3_unchecked.svg);
+  border-top: 1px solid rgba(255,255,255,0);
 }
 
 QPushButton:!checked:hover {
-  border-image: url(:/icons/setup3_unchecked_hover.svg);
+  image: url(:/icons/setup3_unchecked_hover.svg);
+  border-top: 1px solid rgba(255,255,255,0);
+}
+
+QPushButton:checked:hover {
+  image: url(:/icons/setup3_checked_hover.svg);
+  border-top: 1px solid rgba(255,255,255,200);
 }</string>
         </property>
         <property name="text">
