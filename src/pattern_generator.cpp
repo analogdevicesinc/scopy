@@ -164,6 +164,7 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 	                &chm, cgSettings, this);
 
 	ui->channelManagerWidgetLayout->addWidget(chmui);
+	ui->btnChSettings->setChecked(true);
 	ui->rightWidget->setCurrentIndex(1);
 
 	connect(cgSettings->CBPattern,SIGNAL(activated(int)),this,
@@ -194,6 +195,7 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 	pg_api->js_register(engine);
 
 	chmui->updateUi();
+
 }
 
 PatternGenerator::~PatternGenerator()
@@ -221,47 +223,65 @@ void PatternGenerator::generatePattern()
 
 void PatternGenerator::toggleRightMenu(QPushButton *btn)
 {
-	static rightMenuState rightMenuStatus=CLOSED;
-
-	static QPushButton *prevButton;
-	static bool prevMenuOpened = true;
+	static rightMenuState rightMenuStatus=OPENED_CG;
 	static bool menuOpened = true;
-	static bool pgSettingsCheck = false;
-	static bool chSettingsCheck = true;
+	static bool prevMenuOpened = true;
 
+	settings_group->setExclusive(!btn->isChecked());
 
 	if (btn==ui->btnPGSettings) {
 		ui->rightWidget->setCurrentIndex(0);
 	} else {
 		ui->rightWidget->setCurrentIndex(1);
-
-	}
-
-	if (prevButton==btn) {
-		menuOpened = !menuOpened;
-	} else {
-		menuOpened = true;
-	}
-
-	if (menuOpened==false) {
-		settings_group->setExclusive(false);
-		ui->btnChSettings->setChecked(false);
-		ui->btnPGSettings->setChecked(false);
-		settings_group->setExclusive(true);
-	}
-
-	if (prevMenuOpened!=menuOpened) {
-		ui->rightMenu->toggleMenu(menuOpened);
 	}
 
 	prevMenuOpened = menuOpened;
-	prevButton=btn;
 
-	if (menuOpened == true) {
-		chmui->showHighlight(true);
-	} else {
-		chmui->showHighlight(false);
+	switch (rightMenuStatus) {
+	case CLOSED:
+		if (btn==ui->btnPGSettings) {
+			rightMenuStatus = OPENED_PG;
+		} else {
+			rightMenuStatus = OPENED_CG;
+		}
+
+		break;
+
+	case OPENED_PG:
+		if (btn==ui->btnPGSettings) {
+			rightMenuStatus = CLOSED;
+		} else {
+			rightMenuStatus = OPENED_CG;
+		}
+
+		break;
+
+	case OPENED_CG:
+
+		if (btn==ui->btnChSettings) {
+			rightMenuStatus = CLOSED;
+		} else {
+			rightMenuStatus = OPENED_PG;
+		}
+
+		break;
 	}
+
+	menuOpened = !(rightMenuStatus == CLOSED);
+	chmui->showHighlight(menuOpened)
+	;
+
+	if (prevMenuOpened != menuOpened) {
+		ui->rightMenu->toggleMenu(menuOpened);
+	}
+
+	if (!menuOpened) {
+		settings_group->setExclusive(false);
+		btn->setChecked(true);
+	} else {
+		settings_group->setExclusive(true);
+	}
+
 }
 
 void PatternGenerator::updateCGSettings()
