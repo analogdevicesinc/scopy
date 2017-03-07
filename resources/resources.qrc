@@ -3,9 +3,6 @@
         <file>filter.json</file>
         <file>scopy.html</file>
         <file>icon.ico</file>
-        <file>icons/trigger_delay.png</file>
-        <file>icons/trigger_level.png</file>
-        <file>icons/trigger_level_2.png</file>
         <file>menu/add.svg</file>
         <file>menu/menu_button.png</file>
         <file>menu/scopy_title.png</file>
@@ -31,10 +28,6 @@
         <file>icons/sba_up_btn.svg</file>
         <file>icons/sba_up_btn_hover.svg</file>
         <file>icons/sba_up_btn_pressed.svg</file>
-        <file>icons/switch_off.png</file>
-        <file>icons/switch_on.png</file>
-        <file>icons/switch_off_disabled.png</file>
-        <file>icons/switch_on_disabled.png</file>
         <file>icons/setup_btn_checked.svg</file>
         <file>icons/setup_btn_hover.svg</file>
         <file>icons/setup_btn_unchecked.svg</file>
@@ -105,7 +98,6 @@
         <file>icons/setup_btn_checked_hover.svg</file>
         <file>icons/setup3_checked_hover.svg</file>
         <file>icons/redX.svg</file>
-        <file>icons/transparentDot.svg</file>
         <file>icons/sba_cmb_box_arrow_right.svg</file>
         <file>icons/ico-expand.svg</file>
         <file>icons/ico-collapse.svg</file>
