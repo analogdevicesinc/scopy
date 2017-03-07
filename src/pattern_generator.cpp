@@ -102,14 +102,14 @@ const char *PatternGenerator::channelNames[] = {
 
 PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
                                    QPushButton *runBtn, QJSEngine *engine,
-                                   QWidget *parent, bool offline_mode) :
+				   QWidget *parent, bool offline_mode_) :
 	QWidget(parent),
 	ctx(ctx),
 	settings_group(new QButtonGroup(this)), menuRunButton(runBtn),
 	ui(new Ui::PatternGenerator),
 	pgSettings(new Ui::PGSettings),
 	cgSettings(new Ui::PGCGSettings),
-	txbuf(0), buffer_created(0), currentUI(nullptr), offline_mode(offline_mode),
+	txbuf(0), buffer_created(0), currentUI(nullptr), offline_mode(offline_mode_),
 	pg_api(new PatternGenerator_API(this))
 {
 
@@ -495,7 +495,8 @@ bool PatternGenerator::startPatternGeneration(bool cyclic)
 		if (chm.get_enabled_mask() & (1<<j)) {
 			//auto ch = iio_device_get_channel(channel_manager_dev, j);
 			auto ch = iio_device_find_channel(channel_manager_dev,channelNames[j],false);
-			qDebug()<<iio_channel_attr_write(ch, "direction", "out");
+			auto nr_of_bytes = iio_channel_attr_write(ch, "direction", "out");
+			qDebug()<<nr_of_bytes;
 		}
 	}
 

@@ -89,7 +89,7 @@ public:
 	static const int channelGroupLabelMaxLength = 13;
 	explicit PatternGenerator(struct iio_context *ctx, Filter *filt,
 	                          QPushButton *runButton, QJSEngine *engine,
-	                          QWidget *parent = 0, bool offline_mode = 0);
+				  QWidget *parent = 0, bool offline_mode_ = 0);
 	~PatternGenerator();
 	void updateCGSettings();
 
