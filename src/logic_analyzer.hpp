@@ -214,6 +214,8 @@ class LogicAnalyzer_API : public ApiObject
 	Q_PROPERTY(double time_position READ getTimePos WRITE setTimePos);
 	Q_PROPERTY(double time_base READ getTimeBase WRITE setTimeBase);
 	Q_PROPERTY(bool external_trigger READ externalTrigger WRITE setExternalTrigger);
+	Q_PROPERTY(bool cursors_active READ cursorsActive WRITE setCursorsActive);
+	Q_PROPERTY(bool cursors_locked READ cursorsLocked WRITE setCursorsLocked);
 
 public:
 	explicit LogicAnalyzer_API(LogicAnalyzer *lga) :
@@ -233,6 +235,12 @@ public:
 
 	bool externalTrigger() const;
 	void setExternalTrigger(bool val);
+
+	bool cursorsActive() const;
+	void setCursorsActive(bool en);
+
+	bool cursorsLocked() const;
+	void setCursorsLocked(bool en);
 
 private:
 	LogicAnalyzer *lga;

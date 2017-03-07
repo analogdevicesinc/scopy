@@ -962,6 +962,8 @@ QJsonValue LogicAnalyzer::chmToJson()
 			QJsonObject chObj;
 			chObj["id"] = chg->get_channel(j)->get_id();
 			chObj["label"] = QString::fromStdString(chg->get_channel(j)->get_label());
+			chObj["trigger"] = QString::fromStdString(chm.get_channel(
+				chg->get_channel(j)->get_id())->getTrigger());
 			chArray.insert(j,QJsonValue(chObj));
 		}
 
@@ -997,6 +999,8 @@ void LogicAnalyzer::jsonToChm(QJsonObject obj)
 		for (auto chRef : chArray) {
 			auto ch = chRef.toObject();
 			int chIndex = ch["id"].toInt();
+			auto trigger = ch["trigger"].toString().toStdString();
+			chm.get_channel(chIndex)->setTrigger(trigger);
 			lachg->add_channel(chm.get_channel(chIndex));
 		}
 		if( lachg->is_grouped() ) {
@@ -1088,4 +1092,24 @@ bool LogicAnalyzer_API::externalTrigger() const
 void LogicAnalyzer_API::setExternalTrigger(bool en)
 {
 	lga->trigger_settings_ui->trigg_extern_en->setChecked(en);
+}
+
+bool LogicAnalyzer_API::cursorsActive() const
+{
+	lga->ui->boxCursors->isChecked();
+}
+
+void LogicAnalyzer_API::setCursorsActive(bool en)
+{
+	lga->ui->boxCursors->setChecked(en);
+}
+
+bool LogicAnalyzer_API::cursorsLocked() const
+{
+	lga->ui->btnCursorsLock->isChecked();
+}
+
+void LogicAnalyzer_API::setCursorsLocked(bool en)
+{
+	lga->ui->btnCursorsLock->setChecked(en);
 }
