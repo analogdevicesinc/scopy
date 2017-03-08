@@ -103,7 +103,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	trigger_settings(new QWidget(this)),
 	value_cursor1(-0.033),
 	value_cursor2(0.033),
-	la_api(new LogicAnalyzer_API(this))
+	la_api(new LogicAnalyzer_API(this)),
+	initialised(false)
 {
 	ui->setupUi(this);
 	this->setAttribute(Qt::WA_DeleteOnClose, true);
@@ -323,12 +324,15 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	connect(chm_ui, SIGNAL(widthChanged(int)),
 		this, SLOT(onChmWidthChanged(int)));
 
+	trigger_settings_ui->btnAuto->setDisabled(true);
+	trigger_settings_ui->btnNormal->setChecked(true);
 	main_win->view_->viewport()->setTimeTriggerPosActive(true);
 	ui->areaTimeTriggerLayout->addWidget(this->bottomHandlesArea(), 0, 1, 1, 3);
 	updateAreaTimeTriggerPadding();
 	ui->triggerStateLabel->setText("Stop");
 
-	this->ensurePolished();
+	ensurePolished();
+	main_win->view_->viewport()->ensurePolished();
 	timeBase->setValue(1e-3);
 	setTimebaseLabel(timeBase->value());
 	onHorizScaleValueChanged(timeBase->value());
@@ -340,8 +344,6 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	timePosition->valueChanged(timePosition->value());
 	main_win->view_->viewport()->setTimeTriggerSample(-active_triggerSampleCount);
 	setCursorsActive(false);
-	d_hCursorHandle1->setPosition(main_win->view_->viewport()->width() / 3);
-	d_hCursorHandle2->setPosition(2 * main_win->view_->viewport()->width() / 3);
 
 	la_api->load();
 	la_api->js_register(engine);
@@ -362,6 +364,15 @@ LogicAnalyzer::~LogicAnalyzer()
 
 void LogicAnalyzer::resizeEvent()
 {
+	if(!initialised) {
+		updateAreaTimeTriggerPadding();
+		timePosition->setValue(0);
+		value_cursor1 = -(timeBase->value() * 3 + active_plot_timebase * 10 / 2 - active_timePos);
+		value_cursor2 = -(timeBase->value() * 6 + active_plot_timebase * 10 / 2 - active_timePos);
+		cursorValueChanged_1(timeToPixel(value_cursor1));
+		cursorValueChanged_2(timeToPixel(value_cursor2));
+		initialised = true;
+	}
 	int x1 = timeToPixel(value_cursor1);
 	d_hCursorHandle1->setPositionSilenty(x1);
 	main_win->view_->viewport()->cursorValueChanged_1(x1);
@@ -454,8 +465,7 @@ void LogicAnalyzer::onHorizScaleValueChanged(double value)
 
 	// Change the sensitivity of time position control
 	timePosition->setStep(value / 10);
-	cursorValueChanged_1(d_hCursorHandle1->position());
-	cursorValueChanged_2(d_hCursorHandle2->position());
+	recomputeCursorsValue(true);
 }
 
 void LogicAnalyzer::enableTrigger(bool value)
@@ -533,8 +543,7 @@ void LogicAnalyzer::onRulerChanged(double ruler_value, bool silent)
 			QString text = d_cursorTimeFormatter.format(
 						active_plot_timebase, "", 3);
 			ui->timebaseLabel->setText("Zoom: " + text + "/div");
-			cursorValueChanged_1(d_hCursorHandle1->position());
-			cursorValueChanged_2(d_hCursorHandle2->position());
+			recomputeCursorsValue(true);
 		}
 		else {
 			setTimebaseLabel(active_plot_timebase);
@@ -579,8 +588,7 @@ void LogicAnalyzer::onTimePositionSpinboxChanged(double value)
 	d_timeTriggerHandle->setPositionSilenty(trigX);
 	main_win->view_->viewport()->setTimeTriggerPixel(trigX);
 	main_win->view_->time_item_appearance_changed(true, true);
-	cursorValueChanged_1(d_hCursorHandle1->position());
-	cursorValueChanged_2(d_hCursorHandle2->position());
+	recomputeCursorsValue(false);
 }
 
 void LogicAnalyzer::onTimeTriggerHandlePosChanged(int pos)
@@ -875,17 +883,18 @@ void LogicAnalyzer::cursorValueChanged_1(int pos)
 	}
 	else {
 		value_cursors_delta = value_cursor1 - value_cursor2;
+		cursorsFormatDelta();
 	}
 	QString text = d_cursorTimeFormatter.format(value_cursor1, "", 3);
 	ui->lblCursor1->setText(text);
 	main_win->view_->viewport()->cursorValueChanged_1(pos);
-	cursorsFormatDelta();
 }
 
 void LogicAnalyzer::cursorValueChanged_2(int pos)
 {
 	value_cursor2 = -(pixelToTime(pos) + active_plot_timebase * 10 / 2 - active_timePos);
 	if( ui->btnCursorsLock->isChecked() ) {
+
 		value_cursor1 = value_cursors_delta + value_cursor2;
 		int pairPos = timeToPixel(value_cursor1);
 		d_hCursorHandle1->setPositionSilenty(pairPos);
@@ -895,11 +904,27 @@ void LogicAnalyzer::cursorValueChanged_2(int pos)
 	}
 	else {
 		value_cursors_delta = value_cursor1 - value_cursor2;
+		cursorsFormatDelta();
 	}
 	QString text = d_cursorTimeFormatter.format(value_cursor2, "", 3);
 	ui->lblCursor2->setText(text);
 	main_win->view_->viewport()->cursorValueChanged_2(pos);
-	cursorsFormatDelta();
+}
+
+void LogicAnalyzer::recomputeCursorsValue(bool zoom)
+{
+	int x1 = d_hCursorHandle1->position();
+	int x2 = d_hCursorHandle2->position();
+	value_cursor2 = -(pixelToTime(x1) + active_plot_timebase * 10 / 2 - active_timePos);
+	value_cursor1 = -(pixelToTime(x2) + active_plot_timebase * 10 / 2 - active_timePos);
+	QString text = d_cursorTimeFormatter.format(value_cursor2, "", 3);
+	ui->lblCursor2->setText(text);
+	text = d_cursorTimeFormatter.format(value_cursor1, "", 3);
+	ui->lblCursor1->setText(text);
+	if( zoom ) {
+		value_cursors_delta = value_cursor1 - value_cursor2;
+		cursorsFormatDelta();
+	}
 }
 
 void LogicAnalyzer::cursorsFormatDelta()
@@ -939,6 +964,8 @@ void LogicAnalyzer::resetInstrumentToDefault()
 	chm_ui->update_ui();
 	timePosition->setValue(0);
 	timeBase->setValue(1e-3);
+	ui->btnCursorsLock->setChecked(false);
+	ui->boxCursors->setChecked(false);
 }
 
 QJsonValue LogicAnalyzer::chmToJson()
@@ -962,6 +989,8 @@ QJsonValue LogicAnalyzer::chmToJson()
 			QJsonObject chObj;
 			chObj["id"] = chg->get_channel(j)->get_id();
 			chObj["label"] = QString::fromStdString(chg->get_channel(j)->get_label());
+			chObj["trigger"] = QString::fromStdString(chm.get_channel(
+				chg->get_channel(j)->get_id())->getTrigger());
 			chArray.insert(j,QJsonValue(chObj));
 		}
 
@@ -997,6 +1026,8 @@ void LogicAnalyzer::jsonToChm(QJsonObject obj)
 		for (auto chRef : chArray) {
 			auto ch = chRef.toObject();
 			int chIndex = ch["id"].toInt();
+			auto trigger = ch["trigger"].toString().toStdString();
+			chm.get_channel(chIndex)->setTrigger(trigger);
 			lachg->add_channel(chm.get_channel(chIndex));
 		}
 		if( lachg->is_grouped() ) {
@@ -1088,4 +1119,24 @@ bool LogicAnalyzer_API::externalTrigger() const
 void LogicAnalyzer_API::setExternalTrigger(bool en)
 {
 	lga->trigger_settings_ui->trigg_extern_en->setChecked(en);
+}
+
+bool LogicAnalyzer_API::cursorsActive() const
+{
+	lga->ui->boxCursors->isChecked();
+}
+
+void LogicAnalyzer_API::setCursorsActive(bool en)
+{
+	lga->ui->boxCursors->setChecked(en);
+}
+
+bool LogicAnalyzer_API::cursorsLocked() const
+{
+	lga->ui->btnCursorsLock->isChecked();
+}
+
+void LogicAnalyzer_API::setCursorsLocked(bool en)
+{
+	lga->ui->btnCursorsLock->setChecked(en);
 }
