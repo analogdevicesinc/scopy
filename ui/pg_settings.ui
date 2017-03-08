@@ -276,32 +276,9 @@ color: #FFFFFF;
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="PB_Autoset">
+      <widget class="adiscope::CustomSwitch" name="PB_Autoset">
        <property name="enabled">
         <bool>false</bool>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">QPushButton {
-  min-height: 30px;
-  max-height: 30px;
-  min-width: 100px;
-  max-width: 100px;
-}
-
-QPushButton:checked {
-  border-image: url(:/icons/switch_on.png);
-}
-QPushButton:!checked {
-  border-image: url(:/icons/switch_off.png);
-}
-
-QPushButton:checked:disabled {
-  border-image: url(:/icons/switch_on_disabled.png);
-}
-QPushButton:!checked:disabled {
-  border-image: url(:/icons/switch_off_disabled.png);
-}
-</string>
        </property>
        <property name="text">
         <string/>
@@ -350,32 +327,9 @@ QPushButton:!checked:disabled {
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="PB_ExtClock">
+      <widget class="adiscope::CustomSwitch" name="PB_ExtClock">
        <property name="enabled">
         <bool>false</bool>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">QPushButton {
-  min-height: 30px;
-  max-height: 30px;
-  min-width: 100px;
-  max-width: 100px;
-}
-
-QPushButton:checked {
-  border-image: url(:/icons/switch_on.png);
-}
-QPushButton:!checked {
-  border-image: url(:/icons/switch_off.png);
-}
-
-QPushButton:checked:disabled {
-  border-image: url(:/icons/switch_on_disabled.png);
-}
-QPushButton:!checked:disabled {
-  border-image: url(:/icons/switch_off_disabled.png);
-}
-</string>
        </property>
        <property name="text">
         <string/>
@@ -430,6 +384,13 @@ color: #FFFFFF;</string>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>adiscope::CustomSwitch</class>
+   <extends>QPushButton</extends>
+   <header>customSwitch.hpp</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
