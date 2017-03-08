@@ -199,20 +199,44 @@ color: #FFFFFF;
            </item>
            <item>
             <widget class="QPushButton" name="PBLeft">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>0</height>
+              </size>
+             </property>
              <property name="styleSheet">
-              <string notr="true">width: 40px;
-height: 30px;
-background-color: #4A64FF;
-border-radius: 4px;
-
-font-family: Arial;
-font-size: 14px;
-font-weight: bold;
-line-height: 16px;
-color: #FFFFFF;</string>
+              <string notr="true">  width: 40px;
+  height: 30px;
+  border-radius: 4px;
+  background-color: #4a64ff;
+  font-family: ArialMT;
+  font-size: 14px;
+  font-weight: bold;
+  font-style: normal;
+  text-align: center;
+  color: #ffffff;
+</string>
              </property>
              <property name="text">
-              <string>&lt;</string>
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset>
+               <normalon>:/icons/time_trigger_left.svg</normalon>
+              </iconset>
+             </property>
+             <property name="iconSize">
+              <size>
+               <width>40</width>
+               <height>30</height>
+              </size>
              </property>
             </widget>
            </item>
@@ -235,19 +259,31 @@ color: #FFFFFF;</string>
            <item>
             <widget class="QPushButton" name="PBRight">
              <property name="styleSheet">
-              <string notr="true">width: 40px;
-height: 30px;
-background-color: #4A64FF;
-border-radius: 4px;
-
-font-family: Arial;
-font-size: 14px;
-font-weight: bold;
-line-height: 16px;
-color: #FFFFFF;</string>
+              <string notr="true">  width: 40px;
+  height: 30px;
+  border-radius: 4px;
+  background-color: #4a64ff;
+  font-family: ArialMT;
+  font-size: 14px;
+  font-weight: bold;
+  font-style: normal;
+  text-align: center;
+  color: #ffffff;
+</string>
              </property>
              <property name="text">
-              <string>&gt;</string>
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset>
+               <normalon>:/icons/time_trigger_right.svg</normalon>
+              </iconset>
+             </property>
+             <property name="iconSize">
+              <size>
+               <width>40</width>
+               <height>30</height>
+              </size>
              </property>
             </widget>
            </item>
