@@ -84,7 +84,6 @@ SpinBoxA::SpinBoxA(vector<pair<QString, double> >units, const QString &name,
 		list.append(QString("%1=%2").arg(unit.first).arg(unit.second));
 	setUnits(list);
 
-	m_fine_mode = false;
 	setMinValue(min_value);
 	setMaxValue(max_value);
 
@@ -246,12 +245,12 @@ void SpinBoxA::setMaxValue(double value)
 
 bool SpinBoxA::isInFineMode()
 {
-	return m_fine_mode;
+	return ui->SBA_CompletionCircle->toggledState();
 }
 
 void SpinBoxA::setFineMode(bool en)
 {
-	m_fine_mode = en;
+	ui->SBA_CompletionCircle->setToggled(en);
 }
 
 bool SpinBoxA::eventFilter(QObject *obj, QEvent *event)
@@ -410,7 +409,7 @@ void ScaleSpinButton::stepUp()
 
 	double epsilon = 1E-15;
 
-	if (m_fine_mode)
+	if (isInFineMode())
 		newVal =  (current_val + m_fine_increment) * current_scale;
 	else
 		newVal =  m_steps.getNumberAfter(current_val * current_scale + epsilon);
@@ -426,7 +425,7 @@ void ScaleSpinButton::stepDown()
 
 	double epsilon = 1E-15;
 
-	if (m_fine_mode) {
+	if (isInFineMode()) {
 		newVal = (current_val - m_fine_increment) * current_scale;
 		if ((m_min_value > 0 && newVal <= m_min_value) &&
 					(ui->SBA_Combobox->currentIndex() > 0)) {
@@ -480,7 +479,7 @@ void PositionSpinButton::stepUp()
 	double newVal;
 	double step = m_step;
 
-	if (m_fine_mode)
+	if (isInFineMode())
 		step /= 10;
 
 	newVal =  current_val * current_scale + step;
@@ -495,7 +494,7 @@ void PositionSpinButton::stepDown()
 	double newVal;
 	double step = m_step;
 
-	if (m_fine_mode)
+	if (isInFineMode())
 		step /= 10;
 
 	newVal = current_val * current_scale - step;

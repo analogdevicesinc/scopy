@@ -129,7 +129,6 @@ protected:
 	double m_min_value;
 	double m_max_value;
 	std::vector<std::pair<QString, double> > m_units;
-	bool m_fine_mode;
 	QRegExpValidator *m_validator;
 };
 
