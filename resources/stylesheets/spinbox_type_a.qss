@@ -63,6 +63,6 @@ QComboBox#SBA_Combobox::drop-down {
   border-image: url(:/icons/sba_cmb_box_arrow.svg);
 }
 
-CompletionCircle#SBA_CompletionCircle {
+QDial#SBA_CompletionCircle {
   color: rgb(73, 99, 255);
 }

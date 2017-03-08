@@ -22,6 +22,7 @@
 
 #include <QDial>
 
+namespace adiscope {
 class CompletionCircle : public QDial
 {
 	Q_OBJECT
@@ -75,5 +76,6 @@ private:
 	bool m_log_scale;
 	bool invert_circle;
 };
+}
 
 #endif // COMPLETIONCIRCLE_H

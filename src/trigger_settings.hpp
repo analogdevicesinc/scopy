@@ -29,8 +29,6 @@ extern "C" {
 	struct iio_channel;
 }
 
-class PositionSpinButton;
-
 namespace Ui {
 	class TriggerSettings;
 }
@@ -38,6 +36,7 @@ namespace Ui {
 namespace adiscope {
 	class OscADC;
 	class Oscilloscope_API;
+	class PositionSpinButton;
 }
 
 namespace adiscope {

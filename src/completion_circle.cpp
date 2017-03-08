@@ -25,6 +25,8 @@
 
 #include <QDebug>
 
+using namespace adiscope;
+
 CompletionCircle::CompletionCircle(QWidget *parent, bool invert_circle) :
 	QDial(parent), m_xc(0), m_yc(0), m_radius(24),
 	m_pressed(false), m_log_scale(false), invert_circle(invert_circle)

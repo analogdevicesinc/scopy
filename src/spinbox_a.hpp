@@ -33,11 +33,13 @@ class QLineEdit;
 class QFrame;
 class QComboBox;
 class QRegExpValidator;
-class CompletionCircle;
 
 namespace Ui {
 	class SpinBoxA;
 }
+
+namespace adiscope {
+	class CompletionCircle;
 
 /*
  * SpinBoxA - Is a composite widget which contains the following:
@@ -154,5 +156,6 @@ public Q_SLOTS:
 protected:
 	double m_step;
 };
+}
 
 #endif // SPIN_BOX_A_H
