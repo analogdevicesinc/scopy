@@ -80,12 +80,26 @@ QComboBox QAbstractItemView {
   border: 0px;
   selection-background-color: rgba(25, 25, 25);
   outline: 0px;
+  color:rgba(255,255,255,102);
   /*background:black;*/
  padding: 1px 0px 1px 3px; /*This makes text colour work*/
 }
+
 QComboBox:disabled
 {
   color: rgb(85, 85, 85);
+}
+
+
+QComboBox QAbstractItemView::item {
+  font-family: ArialMT;
+  font-size: 18px;
+  font-weight: normal;
+  font-style: normal;
+  text-align: left;
+  color: rgba(255,255,255,0);
+  border-bottom: 0px solid rgba(255, 255, 255, 102);
+
 }
 
 /* Color of the selected list item. */
