@@ -93,6 +93,7 @@ LogicAnalyzerChannelUI::LogicAnalyzerChannelUI(LogicAnalyzerChannel *ch,
 		{
 			getChannel()->setTrigger(trigger_val);
 			ui->comboBox->setCurrentIndex(i);
+			chm_ui->la->setHWTrigger(get_channel()->get_id(), trigger_val);
 		}
 	}
 }
@@ -612,6 +613,7 @@ LogicAnalyzerChannelGroupUI::LogicAnalyzerChannelGroupUI(
 			{
 				ch->setTrigger(trigger_val);
 				ui->comboBox->setCurrentIndex(i);
+				chm_ui->la->setHWTrigger(ch->get_id(), trigger_val);
 			}
 		}
 	}

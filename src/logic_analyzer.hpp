@@ -203,6 +203,9 @@ private:
 
 	void fromString(QString);
 	void jsonToChm(QJsonObject obj);
+
+	void recomputeCursorsValue(bool zoom);
+	bool initialised;
 };
 
 class LogicAnalyzer_API : public ApiObject
