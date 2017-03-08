@@ -90,6 +90,7 @@ namespace adiscope {
 
 		void setOffsetWidgetVisible(int chnIdx, bool visible);
 		void removeOffsetWidgets(int chnIdx);
+		void removeLeftVertAxis(unsigned int axis);
 
 		void measure();
 		int activeMeasurementsCount(int chnIdx);

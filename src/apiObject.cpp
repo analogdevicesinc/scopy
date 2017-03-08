@@ -79,7 +79,11 @@ void ApiObject::load()
 
 		auto data = prop.read(this);
 
-		if (data.canConvert<QList<int>>()) {
+		if (data.canConvert<QList<bool>>()) {
+			auto list = load<bool>(settings, prop.name());
+			if (!list.empty())
+				prop.write(this, QVariant::fromValue(list));
+		} else if (data.canConvert<QList<int>>()) {
 			auto list = load<int>(settings, prop.name());
 			if (!list.empty())
 				prop.write(this, QVariant::fromValue(list));
@@ -122,7 +126,10 @@ void ApiObject::save()
 				|| !prop.isWritable())
 			continue;
 
-		if (data.canConvert<QList<int>>()) {
+		if (data.canConvert<QList<bool>>()) {
+			save<bool>(settings, prop.name(),
+					data.value<QList<bool>>());
+		} else if (data.canConvert<QList<int>>()) {
 			save<int>(settings, prop.name(),
 					data.value<QList<int>>());
 		} else if (data.canConvert<QList<double>>()) {

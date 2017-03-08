@@ -251,4 +251,6 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 configure_file(scopy.iss.cmakein ${CMAKE_CURRENT_BINARY_DIR}/scopy.iss @ONLY)
 configure_file(config.h.cmakein ${CMAKE_CURRENT_BINARY_DIR}/config.h @ONLY)
 
-install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
+if (NOT ENABLE_APPLICATION_BUNDLE)
+	install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
+endif()

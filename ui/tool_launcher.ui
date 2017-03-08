@@ -104,7 +104,7 @@ background-color: rgb(27, 27, 33);
             <property name="minimumSize">
              <size>
               <width>32</width>
-              <height>32</height>
+              <height>64</height>
              </size>
             </property>
             <property name="styleSheet">
@@ -195,6 +195,12 @@ color: rgb(255, 255, 255);
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>48</height>
+             </size>
+            </property>
             <property name="text">
              <string>Home</string>
             </property>
@@ -277,6 +283,12 @@ color: rgb(255, 255, 255);
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>48</height>
+             </size>
+            </property>
             <property name="text">
              <string>Digital IO</string>
             </property>
@@ -346,6 +358,12 @@ color: rgb(255, 255, 255);
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>48</height>
+             </size>
+            </property>
             <property name="text">
              <string>Voltmeter</string>
             </property>
@@ -397,21 +415,12 @@ background-position: center center;
 }
 
 QPushButton:enabled {
-background-image: url(:/menu/stop.png);
+background-image: url(:/icons/ico-stop.svg);
 }
 
 QPushButton:checked {
-background-image: url(:/menu/play.png);
+background-image: url(:/icons/ico-play-green.svg);
 }</string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>8</width>
-              <height>10</height>
-             </size>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -446,6 +455,12 @@ background-image: url(:/menu/play.png);
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>48</height>
+             </size>
             </property>
             <property name="text">
              <string>Oscilloscope</string>
@@ -498,21 +513,12 @@ background-position: center center;
 }
 
 QPushButton:enabled {
-background-image: url(:/menu/stop.png);
+background-image: url(:/icons/ico-stop.svg);
 }
 
 QPushButton:checked {
-background-image: url(:/menu/play.png);
+background-image: url(:/icons/ico-play-green.svg);
 }</string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>8</width>
-              <height>10</height>
-             </size>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -547,6 +553,12 @@ background-image: url(:/menu/play.png);
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>48</height>
+             </size>
             </property>
             <property name="text">
              <string>Power Supply</string>
@@ -599,15 +611,12 @@ background-position: center center;
 }
 
 QPushButton:enabled {
-background-image: url(:/menu/stop.png);
+background-image: url(:/icons/ico-stop.svg);
 }
 
 QPushButton:checked {
-background-image: url(:/menu/play.png);
+background-image: url(:/icons/ico-play-green.svg);
 }</string>
-            </property>
-            <property name="text">
-             <string/>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -642,6 +651,12 @@ background-image: url(:/menu/play.png);
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>48</height>
+             </size>
             </property>
             <property name="text">
              <string>Signal Generator</string>
@@ -694,21 +709,12 @@ background-position: center center;
 }
 
 QPushButton:enabled {
-background-image: url(:/menu/stop.png);
+background-image: url(:/icons/ico-stop.svg);
 }
 
 QPushButton:checked {
-background-image: url(:/menu/play.png);
+background-image: url(:/icons/ico-play-green.svg);
 }</string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>8</width>
-              <height>10</height>
-             </size>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -758,6 +764,12 @@ background-image: url(:/menu/play.png);
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>48</height>
+             </size>
             </property>
             <property name="text">
              <string>Pattern Generator</string>
@@ -810,15 +822,12 @@ background-position: center center;
 }
 
 QPushButton:enabled {
-background-image: url(:/menu/stop.png);
+background-image: url(:/icons/ico-stop.svg);
 }
 
 QPushButton:checked {
-background-image: url(:/menu/play.png);
+background-image: url(:/icons/ico-play-green.svg);
 }</string>
-            </property>
-            <property name="text">
-             <string/>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -853,6 +862,12 @@ background-image: url(:/menu/play.png);
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>48</height>
+             </size>
             </property>
             <property name="text">
              <string>Logic Analyzer</string>
@@ -905,21 +920,12 @@ background-position: center center;
 }
 
 QPushButton:enabled {
-background-image: url(:/menu/stop.png);
+background-image: url(:/icons/ico-stop.svg);
 }
 
 QPushButton:checked {
-background-image: url(:/menu/play.png);
+background-image: url(:/icons/ico-play-green.svg);
 }</string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>8</width>
-              <height>10</height>
-             </size>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -954,6 +960,12 @@ background-image: url(:/menu/play.png);
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>48</height>
+             </size>
             </property>
             <property name="text">
              <string>Network Analyzer</string>
@@ -1006,21 +1018,12 @@ background-position: center center;
 }
 
 QPushButton:enabled {
-background-image: url(:/menu/stop.png);
+background-image: url(:/icons/ico-stop.svg);
 }
 
 QPushButton:checked {
-background-image: url(:/menu/play.png);
+background-image: url(:/icons/ico-play-green.svg);
 }</string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>8</width>
-              <height>10</height>
-             </size>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -1058,6 +1061,12 @@ background-image: url(:/menu/play.png);
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>48</height>
+             </size>
             </property>
             <property name="text">
              <string>Spectrum Analyzer</string>
@@ -1200,156 +1209,137 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 r
 }</string>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_3">
+         <property name="spacing">
+          <number>0</number>
+         </property>
          <property name="leftMargin">
-          <number>25</number>
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
          </property>
          <item>
-          <widget class="QGroupBox" name="groupBox">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
+          <layout class="QVBoxLayout" name="connect_menu">
+           <property name="leftMargin">
+            <number>25</number>
            </property>
-           <property name="styleSheet">
-            <string notr="true">background-color: transparent;</string>
+           <property name="topMargin">
+            <number>0</number>
            </property>
-           <property name="title">
-            <string>Devices</string>
+           <property name="bottomMargin">
+            <number>10</number>
            </property>
-           <layout class="QHBoxLayout" name="horizontalLayout">
-            <item>
-             <layout class="QHBoxLayout" name="devicesList"/>
-            </item>
-            <item>
-             <layout class="QVBoxLayout" name="verticalLayout_2">
-              <property name="leftMargin">
-               <number>9</number>
-              </property>
-              <property name="topMargin">
-               <number>9</number>
-              </property>
-              <property name="rightMargin">
-               <number>9</number>
-              </property>
-              <property name="bottomMargin">
-               <number>9</number>
-              </property>
-              <item>
-               <widget class="QLabel" name="labelAdd">
-                <property name="styleSheet">
-                 <string notr="true">QLabel {
-qproperty-alignment: AlignCenter;
-color: white;
-font-family: &quot;monospace&quot;;
-font-weight: bold;
-}</string>
-                </property>
-                <property name="text">
-                 <string>Add</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="btnAdd">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Fixed" vsizetype="MinimumExpanding">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>90</width>
-                  <height>64</height>
-                 </size>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true">QPushButton {
-height: 30px;
-border-width: 0px;
-border-radius: 3px;
-min-width: 6em;
-}
-QPushButton:hover {
-background-color: orange;
-}</string>
-                </property>
-                <property name="text">
-                 <string/>
-                </property>
-                <property name="icon">
-                 <iconset resource="../resources/resources.qrc">
-                  <normaloff>:/menu/add.svg</normaloff>:/menu/add.svg</iconset>
-                </property>
-                <property name="iconSize">
-                 <size>
-                  <width>64</width>
-                  <height>64</height>
-                 </size>
-                </property>
-                <property name="flat">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <spacer name="verticalSpacer_3">
-                <property name="orientation">
-                 <enum>Qt::Vertical</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>0</width>
-                  <height>0</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer_2">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <spacer name="verticalSpacer">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>100</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QPushButton" name="btnConnect">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="font">
-               <font>
-                <family>monospace</family>
-                <pointsize>10</pointsize>
-                <weight>75</weight>
-                <italic>false</italic>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">QPushButton {
+           <item>
+            <layout class="QHBoxLayout" name="hLayout_topbar">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>20</number>
+             </property>
+             <property name="rightMargin">
+              <number>40</number>
+             </property>
+             <property name="bottomMargin">
+              <number>20</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="label">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">font-size: 14px;
+color: rgba(255, 255, 255, 204);</string>
+               </property>
+               <property name="text">
+                <string>Select a device</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_5">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>0</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QWidget" name="logo_2" native="true">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>104</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>104</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">background-image: url(:/menu/adi.png);
+background-repeat: no-repeat;
+background-position: left center;
+min-width: 104px;
+min-height: 30px;</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_7">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>0</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QPushButton" name="btnConnect">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="font">
+                <font>
+                 <family>monospace</family>
+                 <pointsize>10</pointsize>
+                 <weight>75</weight>
+                 <italic>false</italic>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">QPushButton {
 color: white;
 background-color: orange;
 font-family: &quot;monospace&quot;;
@@ -1358,6 +1348,7 @@ height: 30px;
 border-width: 0px;
 border-radius: 3px;
 min-width: 6em;
+qproperty-text: &quot;Connect&quot;;
 }
 QPushButton:disabled {
 background-color: grey;
@@ -1367,23 +1358,192 @@ background-color: #F45000;
 }
 QPushButton[connected=true] {
 background-color: green;
+qproperty-text: &quot;Connected&quot;;
 }
 QPushButton[failed=true] {
 background-color: red;
+qproperty-text: &quot;Failed&quot;;
 }</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="Line" name="line_separator">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>1</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>1</height>
+              </size>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">border: 1px solid rgba(255, 255, 255, 16);</string>
+             </property>
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="groupBox">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">background-color: transparent;
+border: 0px;</string>
+             </property>
+             <property name="title">
+              <string/>
+             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout">
+              <property name="leftMargin">
+               <number>0</number>
               </property>
-              <property name="text">
-               <string>Connect</string>
+              <property name="topMargin">
+               <number>0</number>
               </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <layout class="QHBoxLayout" name="devicesList"/>
+              </item>
+              <item>
+               <layout class="QVBoxLayout" name="verticalLayout_2">
+                <property name="leftMargin">
+                 <number>9</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="rightMargin">
+                 <number>9</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>9</number>
+                </property>
+                <item>
+                 <widget class="QLabel" name="labelAdd">
+                  <property name="styleSheet">
+                   <string notr="true">QLabel {
+qproperty-alignment: AlignCenter;
+color: white;
+font-family: &quot;monospace&quot;;
+font-weight: bold;
+}</string>
+                  </property>
+                  <property name="text">
+                   <string>Add</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="btnAdd">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="MinimumExpanding">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>96</width>
+                    <height>64</height>
+                   </size>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">QPushButton {
+height: 30px;
+border-width: 0px;
+border-radius: 3px;
+min-width: 6em;
+}
+QPushButton:hover {
+background-color: orange;
+}</string>
+                  </property>
+                  <property name="text">
+                   <string/>
+                  </property>
+                  <property name="icon">
+                   <iconset resource="../resources/resources.qrc">
+                    <normaloff>:/menu/add.svg</normaloff>:/menu/add.svg</iconset>
+                  </property>
+                  <property name="iconSize">
+                   <size>
+                    <width>64</width>
+                    <height>64</height>
+                   </size>
+                  </property>
+                  <property name="flat">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="verticalSpacer_3">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>0</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_2">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <spacer name="verticalSpacer">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>100</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
          </item>
          <item>
           <widget class="QTextBrowser" name="textBrowser">
            <property name="styleSheet">
-            <string notr="true">background-color: transparent;</string>
+            <string notr="true">background-color: #0e0e0e;</string>
            </property>
            <property name="frameShape">
             <enum>QFrame::NoFrame</enum>
@@ -1465,7 +1625,7 @@ background-color: red;
   </connection>
  </connections>
  <buttongroups>
-  <buttongroup name="buttonGroup"/>
   <buttongroup name="buttonGroup_2"/>
+  <buttongroup name="buttonGroup"/>
  </buttongroups>
 </ui>

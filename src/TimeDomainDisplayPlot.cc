@@ -909,4 +909,21 @@ void TimeDomainDisplayPlot::setDataStartingPoint(long pos)
 	d_data_starting_point = pos;
 }
 
+void TimeDomainDisplayPlot::setLineWidthF(int which, qreal widthF)
+{
+  if (which < d_plot_curve.size()) {
+    QPen pen(d_plot_curve[which]->pen());
+    pen.setWidthF(widthF);
+    d_plot_curve[which]->setPen(pen);
+  }
+}
+
+qreal TimeDomainDisplayPlot::getLineWidthF(int which) const
+{
+  if (which < d_plot_curve.size())
+    return d_plot_curve[which]->pen().widthF();
+  else
+    return 0;
+}
+
 #endif /* TIME_DOMAIN_DISPLAY_PLOT_C */

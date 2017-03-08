@@ -95,9 +95,8 @@ namespace adiscope {
 
 		QVector<struct iio_buffer *> buffers;
 
-		PositionSpinButton *constantValue;
-		PositionSpinButton *amplitude, *offset, *phase;
-		ScaleSpinButton *frequency, *mathFrequency;
+		PositionSpinButton *constantValue, *offset, *phase;
+		ScaleSpinButton *amplitude, *frequency, *mathFrequency;
 
 		QVector<QPair<QWidget, Ui::Channel> *> channels;
 

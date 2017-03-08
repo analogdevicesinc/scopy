@@ -56,7 +56,6 @@ class QJSEngine;
 class SymmetricBufferMode;
 
 namespace Ui {
-	class Channel;
 	class Oscilloscope;
 	class OscGeneralSettings;
 	class ChannelSettings;
@@ -67,6 +66,7 @@ namespace Ui {
 }
 
 namespace adiscope {
+	class CustomPushButton;
 	class Oscilloscope_API;
 	class MeasurementData;
 	class MeasurementGui;
@@ -96,8 +96,8 @@ namespace adiscope {
 
 	private Q_SLOTS:
 		void on_actionClose_triggered();
-		void onCursorsToggled(bool on);
-		void onMeasureToggled(bool on);
+		void on_boxCursors_toggled(bool on);
+		void on_boxMeasure_toggled(bool on);
 
 		void onFFT_view_toggled(bool visible);
 		void onHistogram_view_toggled(bool visible);
@@ -143,7 +143,10 @@ namespace adiscope {
 		void onIioDataRefillTimeout();
 		void onPlotNewData();
 
-		void on_btnSettings_toggled(bool checked);
+		void on_btnSettings_clicked(bool checked);
+		void channelLineWidthChanged(int id);
+
+		void update_chn_settings_panel(int id);
 
 	private:
 		OscADC adc;
@@ -159,7 +162,6 @@ namespace adiscope {
 		Ui::Oscilloscope *ui;
 		Ui::OscGeneralSettings *gsettings_ui;
 		Ui::ChannelSettings *ch_ui;
-		Ui::Channel *cursor_ui, *measure_ui;
 		adiscope::TriggerSettings trigger_settings;
 		adiscope::MeasureSettings *measure_settings;
 		CapturePlot plot;
@@ -207,8 +209,6 @@ namespace adiscope {
 
 		int fft_size;
 
-		int selectedChannel;
-
 		NumberSeries voltsPerDivList;
 		NumberSeries secPerDivList;
 
@@ -216,14 +216,13 @@ namespace adiscope {
 		TimePrefixFormatter horizMeasureFormat;
 
 		bool menuOpened;
-		unsigned int current_channel;
+		int current_channel;
 		unsigned int math_chn_counter;
 
-		QButtonGroup *settings_group;
 		QButtonGroup *channels_group; // selected state of each channel
 
-		QPushButton *active_settings_btn;
-		QPushButton *last_non_general_settings_btn;
+		CustomPushButton *active_settings_btn;
+		CustomPushButton *last_non_general_settings_btn;
 		QPushButton *menuRunButton;
 
 		Oscilloscope_API *osc_api;
@@ -243,7 +242,6 @@ namespace adiscope {
 		void add_math_channel(const std::string& function);
 		unsigned int find_curve_number();
 		QWidget *channelWidgetAtId(int id);
-		void update_chn_settings_panel(int id, QWidget *chn_widget = NULL);
 		void update_measure_for_channel(int ch_idx);
 
 		void updateRunButton(bool ch_enabled);
@@ -280,6 +278,11 @@ namespace adiscope {
 		Q_PROPERTY(bool statistics
 				READ hasStatistics WRITE setStatistics);
 
+		Q_PROPERTY(bool horizontal_cursors READ horizontalCursors
+				WRITE setHorizontalCursors)
+		Q_PROPERTY(bool vertical_cursors READ verticalCursors
+				WRITE setVerticalCursors)
+
 		Q_PROPERTY(double cursor_v1 READ cursorV1 WRITE setCursorV1);
 		Q_PROPERTY(double cursor_v2 READ cursorV2 WRITE setCursorV2);
 		Q_PROPERTY(double cursor_h1 READ cursorH1 WRITE setCursorH1);
@@ -292,6 +295,9 @@ namespace adiscope {
 
 		Q_PROPERTY(int trigger_source
 				READ triggerSource WRITE setTriggerSource);
+
+		Q_PROPERTY(QList<double> trigger_level
+				READ getTriggerLevel WRITE setTriggerLevel)
 
 		Q_PROPERTY(QList<QString> math_channels
 				READ getMathChannels WRITE setMathChannels
@@ -309,6 +315,18 @@ namespace adiscope {
 
 		Q_PROPERTY(QList<int> measure_en
 				READ measureEn WRITE setMeasureEn);
+
+		Q_PROPERTY(QList<int> statistic_en
+				READ statisticEn WRITE setStatisticEn)
+
+		Q_PROPERTY(QList<double> line_thickness
+				READ getLineThickness WRITE setLineThickness);
+
+		Q_PROPERTY(QList<bool> channel_en
+				READ channelEn WRITE setChannelEn);
+
+		Q_PROPERTY(int current_channel READ getCurrentChannel
+				WRITE setCurrentChannel)
 
 	public:
 		explicit Oscilloscope_API(Oscilloscope *osc) :
@@ -333,6 +351,12 @@ namespace adiscope {
 		bool hasStatistics() const;
 		void setStatistics(bool en);
 
+		bool horizontalCursors() const;
+		void setHorizontalCursors(bool en);
+
+		bool verticalCursors() const;
+		void setVerticalCursors(bool en);
+
 		double cursorV1() const;
 		double cursorV2() const;
 		double cursorH1() const;
@@ -351,6 +375,9 @@ namespace adiscope {
 		int triggerSource() const;
 		void setTriggerSource(int idx);
 
+		QList<double> getTriggerLevel() const;
+		void setTriggerLevel(const QList<double>& list);
+
 		QList<double> getVoltsPerDiv() const;
 		void setVoltsPerDiv(const QList<double>& list);
 
@@ -368,6 +395,18 @@ namespace adiscope {
 
 		QList<int> measureEn() const;
 		void setMeasureEn(const QList<int>& list);
+
+		QList<int> statisticEn() const;
+		void setStatisticEn(const QList<int>& list);
+
+		QList<double> getLineThickness() const;
+		void setLineThickness(const QList<double>& list);
+
+		QList<bool> channelEn() const;
+		void setChannelEn(const QList<bool>& list);
+
+		int getCurrentChannel() const;
+		void setCurrentChannel(int chn_id);
 
 	private:
 		Oscilloscope *osc;

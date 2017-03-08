@@ -17,6 +17,7 @@
  * Boston, MA 02110-1301, USA.
  */
 
+#include "dynamicWidget.hpp"
 #include "signal_generator.hpp"
 #include "ui_signal_generator.h"
 
@@ -135,7 +136,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 	auto layout = static_cast<QBoxLayout *>(ui->tabConstant->layout());
 	layout->insertWidget(0, constantValue, 0);
 
-	amplitude = new PositionSpinButton({
+	amplitude = new ScaleSpinButton({
 				{"µVolts", 1E-6},
 				{"mVolts", 1E-3},
 				{"Volts", 1E0},
@@ -407,14 +408,17 @@ void SignalGenerator::updatePreview()
 {
 	gr::top_block_sptr top = make_top_block("Signal Generator Update");
 	unsigned int i = 0;
+	bool enabled = false;
 
 	for (auto it = channels.begin(); it != channels.end(); ++it) {
 		basic_block_sptr source;
 
-		if ((*it)->second.box->isChecked())
+		if ((*it)->second.box->isChecked()) {
 			source = getSource(&(*it)->first, sample_rate, top);
-		else
+			enabled = true;
+		} else {
 			source = blocks::nop::make(sizeof(float));
+		}
 
 		auto head = blocks::head::make(sizeof(float), NB_POINTS);
 		top->connect(source, 0, head, 0);
@@ -424,6 +428,15 @@ void SignalGenerator::updatePreview()
 
 	top->run();
 	top->disconnect_all();
+
+	if (ui->run_button->isChecked()) {
+		if (enabled) {
+			stop();
+			start();
+		} else {
+			ui->run_button->setChecked(false);
+		}
+	}
 }
 
 void SignalGenerator::loadFile()
@@ -541,8 +554,6 @@ void SignalGenerator::start()
 
 		iio_device_attr_write_bool(dev, "dma_sync", false);
 	}
-
-	ui->run_button->setText("Stop");
 }
 
 void SignalGenerator::stop()
@@ -551,18 +562,16 @@ void SignalGenerator::stop()
 		iio_buffer_destroy(each);
 
 	buffers.clear();
-
-	ui->run_button->setText("Run");
 }
 
 void SignalGenerator::startStop(bool pressed)
 {
-	ui->config_panel->setDisabled(pressed);
-
 	if (pressed)
 		start();
 	else
 		stop();
+
+	setDynamicProperty(ui->run_button, "running", pressed);
 }
 
 void SignalGenerator::setFunction(const QString& function)
@@ -589,10 +598,12 @@ basic_block_sptr SignalGenerator::getSignalSource(gr::top_block_sptr top,
 		offset = data.offset - (float) data.amplitude;
 	}
 
-	if (inv_saw_wave)
+	if (inv_saw_wave) {
 		waveform = analog::GR_SAW_WAVE;
-	else
+		offset = -data.offset - (float) data.amplitude;
+	} else {
 		waveform = static_cast<analog::gr_waveform_t>(data.waveform);
+	}
 
 	auto src = analog::sig_source_f::make(samp_rate, waveform,
 			data.frequency, amplitude, offset);
@@ -637,7 +648,7 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
 		}
 		break;
 	case SIGNAL_TYPE_MATH:
-		if (!ptr->function.isNull()) {
+		if (!ptr->function.isEmpty()) {
 			auto str = ptr->function.toStdString();
 
 			return iio::iio_math_gen::make(samp_rate,

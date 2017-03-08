@@ -251,66 +251,14 @@
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QPushButton" name="button_Counter">
-         <property name="styleSheet">
-          <string notr="true">QPushButton {
-  min-height: 30px;
-  max-height: 30px;
-  min-width: 100px;
-  max-width: 100px;
-}
-
-QPushButton:checked {
-  border-image: url(:/icons/switch_on.png);
-}
-QPushButton:!checked {
-  border-image: url(:/icons/switch_off.png);
-}
-
-QPushButton:checked:disabled {
-  border-image: url(:/icons/switch_on_disabled.png);
-}
-QPushButton:!checked:disabled {
-  border-image: url(:/icons/switch_off_disabled.png);
-}
-</string>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
+        <widget class="adiscope::CustomSwitch" name="button_Counter">
          <property name="checkable">
           <bool>true</bool>
          </property>
         </widget>
        </item>
        <item row="1" column="0">
-        <widget class="QPushButton" name="button_measDisplayAll">
-         <property name="styleSheet">
-          <string notr="true">QPushButton {
-  min-height: 30px;
-  max-height: 30px;
-  min-width: 100px;
-  max-width: 100px;
-}
-
-QPushButton:checked {
-  border-image: url(:/icons/switch_on.png);
-}
-QPushButton:!checked {
-  border-image: url(:/icons/switch_off.png);
-}
-
-QPushButton:checked:disabled {
-  border-image: url(:/icons/switch_on_disabled.png);
-}
-QPushButton:!checked:disabled {
-  border-image: url(:/icons/switch_off_disabled.png);
-}
-</string>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
+        <widget class="adiscope::CustomSwitch" name="button_measDisplayAll">
          <property name="checkable">
           <bool>true</bool>
          </property>
@@ -445,33 +393,7 @@ QPushButton:disabled {
         </widget>
        </item>
        <item row="1" column="0">
-        <widget class="QPushButton" name="button_StatisticsEn">
-         <property name="styleSheet">
-          <string notr="true">QPushButton {
-  min-height: 30px;
-  max-height: 30px;
-  min-width: 100px;
-  max-width: 100px;
-}
-
-QPushButton:checked {
-  border-image: url(:/icons/switch_on.png);
-}
-QPushButton:!checked {
-  border-image: url(:/icons/switch_off.png);
-}
-
-QPushButton:checked:disabled {
-  border-image: url(:/icons/switch_on_disabled.png);
-}
-QPushButton:!checked:disabled {
-  border-image: url(:/icons/switch_off_disabled.png);
-}
-</string>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
+        <widget class="adiscope::CustomSwitch" name="button_StatisticsEn">
          <property name="checkable">
           <bool>true</bool>
          </property>
@@ -656,6 +578,13 @@ QPushButton:disabled {
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>adiscope::CustomSwitch</class>
+   <extends>QPushButton</extends>
+   <header>customSwitch.hpp</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

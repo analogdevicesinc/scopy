@@ -71,13 +71,13 @@
     <widget class="Line" name="line">
      <property name="minimumSize">
       <size>
-       <width>0</width>
+       <width>240</width>
        <height>2</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
-       <width>16777215</width>
+       <width>240</width>
        <height>2</height>
       </size>
      </property>
@@ -177,33 +177,7 @@
       <number>15</number>
      </property>
      <item row="1" column="0">
-      <widget class="QPushButton" name="hCursorsEnable">
-       <property name="styleSheet">
-        <string notr="true">QPushButton {
-  min-height: 30px;
-  max-height: 30px;
-  min-width: 100px;
-  max-width: 100px;
-}
-
-QPushButton:checked {
-  border-image: url(:/icons/switch_on.png);
-}
-QPushButton:!checked {
-  border-image: url(:/icons/switch_off.png);
-}
-
-QPushButton:checked:disabled {
-  border-image: url(:/icons/switch_on_disabled.png);
-}
-QPushButton:!checked:disabled {
-  border-image: url(:/icons/switch_off_disabled.png);
-}
-</string>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
+      <widget class="adiscope::CustomSwitch" name="hCursorsEnable">
        <property name="checkable">
         <bool>true</bool>
        </property>
@@ -312,33 +286,7 @@ QPushButton:!checked:disabled {
       <number>15</number>
      </property>
      <item row="2" column="0">
-      <widget class="QPushButton" name="vCursorsEnable">
-       <property name="styleSheet">
-        <string notr="true">QPushButton {
-  min-height: 30px;
-  max-height: 30px;
-  min-width: 100px;
-  max-width: 100px;
-}
-
-QPushButton:checked {
-  border-image: url(:/icons/switch_on.png);
-}
-QPushButton:!checked {
-  border-image: url(:/icons/switch_off.png);
-}
-
-QPushButton:checked:disabled {
-  border-image: url(:/icons/switch_on_disabled.png);
-}
-QPushButton:!checked:disabled {
-  border-image: url(:/icons/switch_off_disabled.png);
-}
-</string>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
+      <widget class="adiscope::CustomSwitch" name="vCursorsEnable">
        <property name="checkable">
         <bool>true</bool>
        </property>
@@ -409,6 +357,13 @@ QPushButton:!checked:disabled {
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>adiscope::CustomSwitch</class>
+   <extends>QPushButton</extends>
+   <header>customSwitch.hpp</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

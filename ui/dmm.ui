@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>900</width>
-    <height>649</height>
+    <height>720</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -398,7 +398,7 @@ background-color: rgb(73, 99, 255);
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <property name="spacing">
-       <number>12</number>
+       <number>24</number>
       </property>
       <property name="leftMargin">
        <number>25</number>
@@ -412,53 +412,59 @@ background-color: rgb(73, 99, 255);
       <property name="bottomMargin">
        <number>25</number>
       </property>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <item>
-         <widget class="QPushButton" name="run_button">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">QPushButton {
-color: white;
-background-color: orange;
-font-family: &quot;monospace&quot;;
-font-weight: bold;
-height: 30px;
-border-width: 0px;
-border-radius: 3px;
-min-width: 6em;
+      <item alignment="Qt::AlignHCenter">
+       <widget class="QPushButton" name="run_button">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="layoutDirection">
+         <enum>Qt::RightToLeft</enum>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton {
+  width: 80px;
+  height: 40px;
+  border-radius: 4px;
+  background-color: #27b34f;
+  color: white;
+  font-family: &quot;monospace&quot;;
+  font-weight: bold;
+
+  text-align: left;
+  padding-left: 20px;
+  padding-right: 20px;
+  qproperty-text: &quot;Run&quot;;
 }
+
+QPushButton[running=true] {
+  qproperty-text: &quot;Stop&quot;;
+  background-color: #F45000;
+}
+
 QPushButton:disabled {
-background-color: grey;
-}
-QPushButton:checked {
-background-color: #F45000;
+  background-color: grey;
 }</string>
-          </property>
-          <property name="text">
-           <string>Run</string>
-          </property>
-          <property name="icon">
-           <iconset theme="media-playback-start">
-            <normaloff>.</normaloff>.</iconset>
-          </property>
-          <property name="iconSize">
-           <size>
-            <width>24</width>
-            <height>24</height>
-           </size>
-          </property>
-          <property name="checkable">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-       </layout>
+        </property>
+        <property name="text">
+         <string>Run</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/resources.qrc">
+          <normaloff>:/icons/ico-play.svg</normaloff>:/icons/ico-play.svg</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>8</width>
+          <height>10</height>
+         </size>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
       <item>
        <spacer name="verticalSpacer_2">
@@ -471,7 +477,7 @@ background-color: #F45000;
         <property name="sizeHint" stdset="0">
          <size>
           <width>0</width>
-          <height>20</height>
+          <height>24</height>
          </size>
         </property>
        </spacer>
@@ -527,7 +533,7 @@ background-color: #F45000;
       <item>
        <widget class="QRadioButton" name="btn_ch1_ac">
         <property name="text">
-         <string>AC (Alternative Current)</string>
+         <string>AC (Alternating Current)</string>
         </property>
         <attribute name="buttonGroup">
          <string notr="true">buttonGroup</string>
@@ -542,13 +548,6 @@ background-color: #F45000;
         <property name="verticalSpacing">
          <number>12</number>
         </property>
-        <item row="0" column="1">
-         <widget class="QLabel" name="label_4">
-          <property name="text">
-           <string>Histogram</string>
-          </property>
-         </widget>
-        </item>
         <item row="0" column="0">
          <widget class="QLabel" name="label_3">
           <property name="text">
@@ -556,33 +555,8 @@ background-color: #F45000;
           </property>
          </widget>
         </item>
-        <item row="1" column="1">
-         <widget class="QPushButton" name="histogramCh1">
-          <property name="styleSheet">
-           <string notr="true">QPushButton {
-  min-height: 30px;
-  max-height: 30px;
-  min-width: 100px;
-  max-width: 100px;
-}
-
-QPushButton:checked {
-  border-image: url(:/icons/switch_on.png);
-}
-QPushButton:!checked {
-  border-image: url(:/icons/switch_off.png);
-}
-
-QPushButton:checked:disabled {
-  border-image: url(:/icons/switch_on_disabled.png);
-}
-QPushButton:!checked:disabled {
-  border-image: url(:/icons/switch_off_disabled.png);
-}</string>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
+        <item row="0" column="1">
+         <widget class="adiscope::CustomSwitch" name="histogramCh1">
           <property name="checkable">
            <bool>true</bool>
           </property>
@@ -591,10 +565,10 @@ QPushButton:!checked:disabled {
           </property>
          </widget>
         </item>
-        <item row="1" column="0">
+        <item row="1" column="0" colspan="2">
          <widget class="QComboBox" name="historySizeCh1">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
@@ -667,7 +641,7 @@ QComboBox:disabled
         <property name="sizeHint" stdset="0">
          <size>
           <width>0</width>
-          <height>20</height>
+          <height>24</height>
          </size>
         </property>
        </spacer>
@@ -723,7 +697,7 @@ QComboBox:disabled
       <item>
        <widget class="QRadioButton" name="btn_ch2_ac">
         <property name="text">
-         <string>AC (Alternative Current)</string>
+         <string>AC (Alternating Current)</string>
         </property>
         <attribute name="buttonGroup">
          <string notr="true">buttonGroup_2</string>
@@ -746,39 +720,7 @@ QComboBox:disabled
          </widget>
         </item>
         <item row="0" column="1">
-         <widget class="QLabel" name="label_6">
-          <property name="text">
-           <string>Histogram</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QPushButton" name="histogramCh2">
-          <property name="styleSheet">
-           <string notr="true">QPushButton {
-  min-height: 30px;
-  max-height: 30px;
-  min-width: 100px;
-  max-width: 100px;
-}
-
-QPushButton:checked {
-  border-image: url(:/icons/switch_on.png);
-}
-QPushButton:!checked {
-  border-image: url(:/icons/switch_off.png);
-}
-
-QPushButton:checked:disabled {
-  border-image: url(:/icons/switch_on_disabled.png);
-}
-QPushButton:!checked:disabled {
-  border-image: url(:/icons/switch_off_disabled.png);
-}</string>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
+         <widget class="adiscope::CustomSwitch" name="histogramCh2">
           <property name="checkable">
            <bool>true</bool>
           </property>
@@ -787,10 +729,10 @@ QPushButton:!checked:disabled {
           </property>
          </widget>
         </item>
-        <item row="1" column="0">
+        <item row="1" column="0" colspan="2">
          <widget class="QComboBox" name="historySizeCh2">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
@@ -877,6 +819,11 @@ QComboBox:disabled
    <header>qwt_thermo.h</header>
   </customwidget>
   <customwidget>
+   <class>adiscope::CustomSwitch</class>
+   <extends>QPushButton</extends>
+   <header>customSwitch.hpp</header>
+  </customwidget>
+  <customwidget>
    <class>adiscope::LcdNumber</class>
    <extends>QLCDNumber</extends>
    <header>lcdNumber.hpp</header>
@@ -893,7 +840,9 @@ QComboBox:disabled
    <header>customScale.hpp</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../resources/resources.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>histogramCh1</sender>

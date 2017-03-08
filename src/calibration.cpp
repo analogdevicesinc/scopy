@@ -146,8 +146,8 @@ bool RxCalibration::calibrateOffset()
 	double gain = 0.026;
 	double range = 3.192;
 
-	m_adc_ch0_offset = (int)((voltage0 * 4096 * gain) / range + 2048);
-	m_adc_ch1_offset = (int)((voltage1 * 4096 * gain) / range + 2048);
+	m_adc_ch0_offset = (int)(2048 - ((voltage0 * 4096 * gain) / range));
+	m_adc_ch1_offset = (int)(2048 - ((voltage1 * 4096 * gain) / range));
 
 	qDebug() << "Before Fine-Tunning";
 	qDebug() << "ADC channel 0 offset(raw):" << m_adc_ch0_offset;
