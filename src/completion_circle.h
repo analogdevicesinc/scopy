@@ -26,6 +26,8 @@ namespace adiscope {
 class CompletionCircle : public QDial
 {
 	Q_OBJECT
+
+	Q_PROPERTY(bool inverted MEMBER invert_circle);
 public:
 	explicit CompletionCircle(QWidget *parent = 0,
 			bool invert_circle = false);

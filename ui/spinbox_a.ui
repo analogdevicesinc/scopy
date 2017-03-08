@@ -130,10 +130,17 @@
     </layout>
    </item>
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout_circle"/>
+    <widget class="adiscope::CompletionCircle" name="SBA_CompletionCircle"/>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>adiscope::CompletionCircle</class>
+   <extends>QDial</extends>
+   <header>completion_circle.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

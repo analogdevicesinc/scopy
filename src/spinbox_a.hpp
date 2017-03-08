@@ -20,6 +20,7 @@
 #ifndef SPIN_BOX_A_H
 #define SPIN_BOX_A_H
 
+#include <QStringList>
 #include <QWidget>
 #include <vector>
 
@@ -39,8 +40,6 @@ namespace Ui {
 }
 
 namespace adiscope {
-	class CompletionCircle;
-
 /*
  * SpinBoxA - Is a composite widget which contains the following:
  *   - a QLineEdit (displays the value of SpinBoxA)
@@ -57,7 +56,17 @@ namespace adiscope {
 class SpinBoxA : public QWidget
 {
 	Q_OBJECT
+
+	Q_PROPERTY(QStringList units MEMBER m_units_list WRITE setUnits);
+	Q_PROPERTY(double min_value READ minValue WRITE setMinValue);
+	Q_PROPERTY(double max_value READ maxValue WRITE setMaxValue);
+	Q_PROPERTY(bool fine_mode READ isInFineMode WRITE setFineMode);
+	Q_PROPERTY(bool invert_circle READ isCircleInverted WRITE invertCircle);
+	Q_PROPERTY(bool show_progress READ progressShown WRITE showProgress);
+	Q_PROPERTY(QString name READ getName WRITE setName);
+
 public:
+	explicit SpinBoxA(QWidget *parent = nullptr);
 	explicit SpinBoxA(std::vector<std::pair<QString, double> >units,
 			const QString &name = "",
 			double min_value = 0.0, double max_value = 0.0,
@@ -75,16 +84,25 @@ public:
 	double value();
 
 	double minValue();
-	virtual void setMinValue(double);
-
 	double maxValue();
-	virtual void setMaxValue(double);
 
 	bool isInFineMode();
+
+	bool isCircleInverted() const;
+	void invertCircle(bool invert);
+
+	bool progressShown() const;
+	void showProgress(bool show);
+
+	QString getName() const;
+	void setName(const QString& name);
 
 public Q_SLOTS:
 	void setValue(double);
 	void setFineMode(bool);
+
+	virtual void setMinValue(double);
+	virtual void setMaxValue(double);
 
 	virtual void stepUp() = 0;
 	virtual void stepDown() = 0;
@@ -101,10 +119,11 @@ protected Q_SLOTS:
 protected:
 	virtual bool eventFilter(QObject *obj, QEvent *event);
 	double findUnitOfValue(double val,int *posInUnitsList = NULL);
+	void setUnits(const QStringList& map);
 
 protected:
 	Ui::SpinBoxA *ui;
-	CompletionCircle *m_SBA_CompCircle;
+	QStringList m_units_list;
 
 	double m_value;
 	double m_min_value;
@@ -118,18 +137,19 @@ class ScaleSpinButton: public SpinBoxA
 {
 	Q_OBJECT
 public:
+	explicit ScaleSpinButton(QWidget *parent = nullptr);
 	explicit ScaleSpinButton(std::vector<std::pair<QString, double> >units,
 			const QString &name = "",
 			double min_value = 0.0, double max_value = 0.0,
 			bool hasProgressWidget = true,
 			bool invertCircle = false, QWidget *parent = 0);
 
-	void setMinValue(double);
-	void setMaxValue(double);
-
 public Q_SLOTS:
 	void stepUp();
 	void stepDown();
+
+	void setMinValue(double);
+	void setMaxValue(double);
 
 protected:
 	adiscope::NumberSeries m_steps;
@@ -140,6 +160,7 @@ class PositionSpinButton: public SpinBoxA
 {
 	Q_OBJECT
 public:
+	explicit PositionSpinButton(QWidget *parent = nullptr);
 	explicit PositionSpinButton(std::vector<std::pair<QString, double> >units,
 			const QString &name = "",
 			double min_value = 0.0, double max_value = 0.0,

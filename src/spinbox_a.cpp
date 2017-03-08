@@ -43,59 +43,17 @@ using namespace adiscope;
  * SpinBoxA class implementation
  */
 
-SpinBoxA::SpinBoxA(vector<pair<QString, double> >units, const QString &name,
-		double min_value, double max_value,
-		bool hasProgressWidget, bool invertCircle, QWidget *parent):
-	QWidget(parent), ui(new Ui::SpinBoxA),
-	m_SBA_CompCircle(nullptr), m_min_value(min_value),
-	m_max_value(max_value), m_units(units), m_fine_mode(false)
+SpinBoxA::SpinBoxA(QWidget *parent) : QWidget(parent),
+	ui(new Ui::SpinBoxA), m_value(0.0), m_min_value(0.0), m_max_value(0.0),
+	m_validator(new QRegExpValidator(this))
 {
-	QString regex;
-	QString sufixes;
-
 	ui->setupUi(this);
-	if (hasProgressWidget) {
-		m_SBA_CompCircle = new CompletionCircle(this, invertCircle);
-		m_SBA_CompCircle->setObjectName("SBA_CompletionCircle");
-		ui->verticalLayout_circle->addWidget(m_SBA_CompCircle);
-		m_SBA_CompCircle->setMinimumDouble(this->minValue());
-		m_SBA_CompCircle->setMaximumDouble(this->maxValue());
-		m_SBA_CompCircle->setValueDouble(this->value());
-	} else {
-		ui->verticalLayout_circle->addSpacerItem(new QSpacerItem(0, 0,
-			QSizePolicy::Expanding, QSizePolicy::Fixed));
-	}
-
-	ui->SBA_Label->setText(name);
-
-	// Configure line edit
-	regex = "^(?!^.{18})(([+,-]?)([0-9]*)([.]?)([0-9]+))";
-	for (auto it = m_units.begin(); it != m_units.end(); ++it) {
-		QString s = (*it).first;
-		if (!s.isEmpty()) {
-			QString newS = s.replace(QRegExp("[μ]"), "u");
-			sufixes += (newS.at(0) + '|');
-		}
-	}
-	if (!sufixes.isEmpty()) {
-		sufixes.chop(1);
-		regex += "([" + sufixes + "]?)";
-	}
-	m_validator = new QRegExpValidator(this);
-	QRegExp rx(regex);
-	m_validator->setRegExp(rx);
 	ui->SBA_LineEdit->setValidator(m_validator);
-
-	// Configure combo box
-	for (auto it = m_units.begin(); it != m_units.end(); it++)
-		ui->SBA_Combobox->addItem((*it).first);
 
 	QFile file(":stylesheets/stylesheets/spinbox_type_a.qss");
 	file.open(QFile::ReadOnly);
 	QString styleSheet = QString::fromLatin1(file.readAll());
 	this->setStyleSheet(styleSheet);
-
-	setValue(0);
 
 	ui->SBA_LineEdit->installEventFilter(this);
 
@@ -107,12 +65,32 @@ SpinBoxA::SpinBoxA(vector<pair<QString, double> >units, const QString &name,
 		SLOT(onUpButtonPressed()));
 	connect(ui->SBA_DownButton, SIGNAL(pressed()),
 		SLOT(onDownButtonPressed()));
-	if (m_SBA_CompCircle) {
-		connect(this, SIGNAL(valueChanged(double)),
-			m_SBA_CompCircle, SLOT(setValueDouble(double)));
-		connect(m_SBA_CompCircle, SIGNAL(toggled(bool)),
+
+	connect(this, SIGNAL(valueChanged(double)),
+			ui->SBA_CompletionCircle, SLOT(setValueDouble(double)));
+	connect(ui->SBA_CompletionCircle, SIGNAL(toggled(bool)),
 			SLOT(setFineMode(bool)));
-	}
+}
+
+SpinBoxA::SpinBoxA(vector<pair<QString, double> >units, const QString &name,
+		double min_value, double max_value, bool hasProgressWidget,
+		bool invertCircle, QWidget *parent) : SpinBoxA(parent)
+{
+	showProgress(hasProgressWidget);
+
+	/* Compat */
+	QStringList list;
+	for (auto unit : units)
+		list.append(QString("%1=%2").arg(unit.first).arg(unit.second));
+	setUnits(list);
+
+	m_fine_mode = false;
+	setMinValue(min_value);
+	setMaxValue(max_value);
+
+	ui->SBA_Label->setText(name);
+
+	setValue(min_value);
 }
 
 SpinBoxA::~SpinBoxA()
@@ -248,8 +226,8 @@ void SpinBoxA::setMinValue(double value)
 	m_min_value = value;
 	if (m_value < m_min_value)
 		setValue(m_min_value);
-	if (m_SBA_CompCircle)
-		m_SBA_CompCircle->setMinimumDouble(value);
+
+	ui->SBA_CompletionCircle->setMinimumDouble(value);
 }
 
 double SpinBoxA::maxValue()
@@ -262,8 +240,8 @@ void SpinBoxA::setMaxValue(double value)
 	m_max_value = value;
 	if (m_value > m_max_value)
 		setValue(m_max_value);
-	if (m_SBA_CompCircle)
-		m_SBA_CompCircle->setMaximumDouble(value);
+
+	ui->SBA_CompletionCircle->setMaximumDouble(value);
 }
 
 bool SpinBoxA::isInFineMode()
@@ -328,9 +306,75 @@ double SpinBoxA::findUnitOfValue(double val, int *posInUnitsList)
 	return m_units[index].second;
 }
 
+bool SpinBoxA::isCircleInverted() const
+{
+	return ui->SBA_CompletionCircle->property("inverted").toBool();
+}
+
+void SpinBoxA::invertCircle(bool invert)
+{
+	ui->SBA_CompletionCircle->setProperty("inverted", QVariant(invert));
+}
+
+bool SpinBoxA::progressShown() const
+{
+	return ui->SBA_CompletionCircle->isVisible();
+}
+
+void SpinBoxA::showProgress(bool show)
+{
+	ui->SBA_CompletionCircle->setVisible(show);
+}
+
+QString SpinBoxA::getName() const
+{
+	return ui->SBA_Label->text();
+}
+
+void SpinBoxA::setName(const QString& name)
+{
+	ui->SBA_Label->setText(name);
+}
+
+void SpinBoxA::setUnits(const QStringList& list)
+{
+	QString regex = "^(?!^.{18})(([+,-]?)([0-9]*)([.]?)([0-9]+))";
+	QString sufixes;
+
+	ui->SBA_Combobox->clear();
+
+	for (auto it = list.begin(); it != list.end(); ++it) {
+		QStringList curr = it->split('=');
+		QString s = curr.at(0);
+		double val = curr.at(1).toDouble();
+
+		QString newS = s.replace(QRegExp("[μ]"), "u");
+		sufixes += (newS.at(0) + '|');
+
+		m_units.push_back(std::pair<QString, double>(s, val));
+		ui->SBA_Combobox->addItem(s);
+	}
+
+	if (!sufixes.isEmpty()) {
+		sufixes.chop(1);
+		regex += "([" + sufixes + "]?)";
+	}
+
+	m_validator->setRegExp(QRegExp(regex));
+
+	m_units_list = list;
+}
+
 /*
  * ScaleSpinButton class implementation
  */
+ScaleSpinButton::ScaleSpinButton(QWidget *parent) : SpinBoxA(parent),
+	m_steps(1E-3, 1E+3, 10, {1, 2, 5}),
+	m_fine_increment(1)
+{
+	ui->SBA_CompletionCircle->setIsLogScale(true);
+}
+
 ScaleSpinButton::ScaleSpinButton(vector<pair<QString, double> >units,
 		const QString &name,
 		double min_value, double max_value,
@@ -340,8 +384,7 @@ ScaleSpinButton::ScaleSpinButton(vector<pair<QString, double> >units,
 	m_steps(1E-3, 1E+3, 10, {1, 2, 5}),
 	m_fine_increment(1)
 {
-	if (m_SBA_CompCircle)
-		m_SBA_CompCircle->setIsLogScale(true);
+	ui->SBA_CompletionCircle->setIsLogScale(true);
 
 	setMinValue(min_value);
 	setMaxValue(max_value);
@@ -405,6 +448,11 @@ void ScaleSpinButton::stepDown()
 /*
  * PositionSpinButton class implementation
  */
+PositionSpinButton::PositionSpinButton(QWidget *parent) : SpinBoxA(parent),
+	m_step(1)
+{
+}
+
 PositionSpinButton::PositionSpinButton(vector<pair<QString, double> >units,
 	const QString &name,
 	double min_value, double max_value,
