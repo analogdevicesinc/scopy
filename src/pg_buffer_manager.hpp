@@ -15,6 +15,8 @@
 #include "pulseview/pv/devicemanager.hpp"
 #include "pulseview/pv/toolbars/mainbar.hpp"
 #include "pulseview/pv/view/view.hpp"
+#include "pulseview/pv/view/viewport.hpp"
+#include "pulseview/pv/view/ruler.hpp"
 #include "pulseview/pv/util.hpp"
 
 
@@ -22,6 +24,12 @@ namespace pv {
 class MainWindow;
 class DeviceManager;
 class View;
+
+namespace view
+{
+class Viewport;
+class Ruler;
+}
 namespace toolbars {
 class MainBar;
 }

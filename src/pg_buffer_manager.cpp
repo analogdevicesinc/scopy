@@ -122,7 +122,8 @@ PatternGeneratorBufferManagerUi::PatternGeneratorBufferManagerUi(
 	parent->layout()->addWidget(static_cast<QWidget * >(main_win));
 	/* setup toolbar */
 	main_win->main_bar_->setVisible(false);
-
+	main_win->view_->ruler_->set_offset(0);
+	main_win->view_->ruler_->update();
 	createBinaryBuffer();
 }
 
