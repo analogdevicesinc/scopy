@@ -33,7 +33,6 @@
 #include "filter.hpp"
 #include "oscilloscope_plot.hpp"
 #include "scope_sink_f.h"
-#include "spinbox_a.hpp"
 
 #include "ui_channel.h"
 
@@ -99,10 +98,6 @@ namespace adiscope {
 		QPushButton *menuRunButton;
 
 		QVector<struct iio_buffer *> buffers;
-
-		PositionSpinButton *constantValue, *offset, *phase;
-		ScaleSpinButton *amplitude, *frequency, *mathFrequency;
-
 		QVector<QPair<QWidget, Ui::Channel> *> channels;
 		QVector<QPair<struct iio_channel *, double>> channels_vlsb;
 

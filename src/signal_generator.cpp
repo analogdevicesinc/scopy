@@ -19,6 +19,7 @@
 
 #include "dynamicWidget.hpp"
 #include "signal_generator.hpp"
+#include "spinbox_a.hpp"
 #include "ui_signal_generator.h"
 
 #include <QBrush>
@@ -126,57 +127,17 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 		}
 	}
 
-	/* Setup right menu */
-	constantValue = new PositionSpinButton({
-				{"mVolts", 1E-3},
-				{"Volts", 1E0}
-				}, "Value", -5e0, 5e0);
-
-	auto layout = static_cast<QBoxLayout *>(ui->tabConstant->layout());
-	layout->insertWidget(0, constantValue, 0);
-
-	amplitude = new ScaleSpinButton({
-				{"µVolts", 1E-6},
-				{"mVolts", 1E-3},
-				{"Volts", 1E0},
-			}, "Amplitude", 1e-6, 5e0);
-	offset = new PositionSpinButton({
-				{"µVolts", 1E-6},
-				{"mVolts", 1E-3},
-				{"Volts", 1E0},
-			}, "Offset", -5e0, 5e0);
-	phase = new PositionSpinButton({
-				{"°", 1E0},
-			}, "Phase", 0.0, 360.0);
-	frequency = new ScaleSpinButton({
-				{"mHz", 1E-3},
-				{"Hz", 1E0},
-				{"kHz", 1E3},
-				{"MHz", 1E6},
-			}, "Frequency", 0.001, (sample_rate / 2) - 1);
-
-	mathFrequency = new ScaleSpinButton({
-				{"mHz", 1E-3},
-				{"Hz", 1E0},
-				{"kHz", 1E3},
-				{"MHz", 1E6},
-			}, "Frequency", 0.001, (sample_rate / 2) - 1);
-
 	/* Max amplitude by default */
-	amplitude->setValue(amplitude->maxValue());
+	ui->amplitude->setValue(ui->amplitude->maxValue());
+
+	/* Set max frequency according to max sample rate */
+	ui->frequency->setMaxValue((sample_rate / 2) - 1);
+	ui->mathFrequency->setMaxValue((sample_rate / 2) - 1);
 
 	/* (lowest freq * 100 * 1000) frequency by default */
-	frequency->setValue(frequency->minValue() * 100 * 1000.0);
-	mathFrequency->setValue(mathFrequency->minValue() * 100 * 1000.0);
-
-	ui->waveformGrid->addWidget(amplitude, 0, 0, Qt::AlignLeft);
-	ui->waveformGrid->addWidget(offset, 0, 1, Qt::AlignLeft);
-	ui->waveformGrid->addWidget(frequency, 1, 0, Qt::AlignLeft);
-	ui->waveformGrid->addWidget(phase, 1, 1, Qt::AlignLeft);
-
-	layout = static_cast<QBoxLayout *>(ui->tabMath->layout());
-	layout->insertWidget(0, mathFrequency, 0);
-
+	ui->frequency->setValue(ui->frequency->minValue() * 100 * 1000.0);
+	ui->mathFrequency->setValue(
+			ui->mathFrequency->minValue() * 100 * 1000.0);
 
 	unsigned int nb_channels = iio_channels.size();
 
@@ -185,13 +146,13 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 
 		auto ptr = QSharedPointer<signal_generator_data>(
 				new signal_generator_data);
-		ptr->amplitude = amplitude->value();
-		ptr->offset = offset->value();
-		ptr->frequency = frequency->value();
-		ptr->constant = constantValue->value();
-		ptr->phase = phase->value();
+		ptr->amplitude = ui->amplitude->value();
+		ptr->offset = ui->offset->value();
+		ptr->frequency = ui->frequency->value();
+		ptr->constant = ui->constantValue->value();
+		ptr->phase = ui->phase->value();
 		ptr->waveform = SG_SIN_WAVE;
-		ptr->math_freq = mathFrequency->value();
+		ptr->math_freq = ui->mathFrequency->value();
 
 		ptr->type = SIGNAL_TYPE_CONSTANT;
 		ptr->id = i;
@@ -274,19 +235,19 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 	connect(ui->rightMenu, SIGNAL(finished(bool)), this,
 			SLOT(rightMenuFinished(bool)));
 
-	connect(constantValue, SIGNAL(valueChanged(double)),
+	connect(ui->constantValue, SIGNAL(valueChanged(double)),
 			SLOT(constantValueChanged(double)));
 
-	connect(amplitude, SIGNAL(valueChanged(double)),
+	connect(ui->amplitude, SIGNAL(valueChanged(double)),
 			this, SLOT(amplitudeChanged(double)));
-	connect(offset, SIGNAL(valueChanged(double)),
+	connect(ui->offset, SIGNAL(valueChanged(double)),
 			this, SLOT(offsetChanged(double)));
-	connect(frequency, SIGNAL(valueChanged(double)),
+	connect(ui->frequency, SIGNAL(valueChanged(double)),
 			this, SLOT(frequencyChanged(double)));
-	connect(phase, SIGNAL(valueChanged(double)),
+	connect(ui->phase, SIGNAL(valueChanged(double)),
 			this, SLOT(phaseChanged(double)));
 
-	connect(mathFrequency, SIGNAL(valueChanged(double)),
+	connect(ui->mathFrequency, SIGNAL(valueChanged(double)),
 			this, SLOT(mathFreqChanged(double)));
 
 	connect(ui->type, SIGNAL(currentIndexChanged(int)),
@@ -742,14 +703,14 @@ void adiscope::SignalGenerator::rightMenuFinished(bool opened)
 	if (!opened && !!settings_group->checkedButton()) {
 		auto ptr = getCurrentData();
 
-		constantValue->setValue(ptr->constant);
-		frequency->setValue(ptr->frequency);
-		offset->setValue(ptr->offset);
-		amplitude->setValue(ptr->amplitude);
-		phase->setValue(ptr->phase);
+		ui->constantValue->setValue(ptr->constant);
+		ui->frequency->setValue(ptr->frequency);
+		ui->offset->setValue(ptr->offset);
+		ui->amplitude->setValue(ptr->amplitude);
+		ui->phase->setValue(ptr->phase);
 		ui->label_path->setText(ptr->file);
 		ui->mathWidget->setFunction(ptr->function);
-		mathFrequency->setValue(ptr->math_freq);
+		ui->mathFrequency->setValue(ptr->math_freq);
 
 		if (!ptr->file.isNull()) {
 			auto info = QFileInfo(ptr->file);
@@ -1092,7 +1053,7 @@ void SignalGenerator_API::setConstantValue(const QList<double>& list)
 		ptr->constant = static_cast<float>(list.at(i));
 	}
 
-	gen->constantValue->setValue(gen->getCurrentData()->constant);
+	gen->ui->constantValue->setValue(gen->getCurrentData()->constant);
 }
 
 QList<int> SignalGenerator_API::getWaveformType() const
@@ -1155,7 +1116,7 @@ void SignalGenerator_API::setWaveformAmpl(const QList<double>& list)
 		ptr->amplitude = list.at(i);
 	}
 
-	gen->amplitude->setValue(gen->getCurrentData()->amplitude);
+	gen->ui->amplitude->setValue(gen->getCurrentData()->amplitude);
 }
 
 QList<double> SignalGenerator_API::getWaveformFreq() const
@@ -1182,7 +1143,7 @@ void SignalGenerator_API::setWaveformFreq(const QList<double>& list)
 		ptr->frequency = list.at(i);
 	}
 
-	gen->frequency->setValue(gen->getCurrentData()->frequency);
+	gen->ui->frequency->setValue(gen->getCurrentData()->frequency);
 }
 
 QList<double> SignalGenerator_API::getWaveformOfft() const
@@ -1209,7 +1170,7 @@ void SignalGenerator_API::setWaveformOfft(const QList<double>& list)
 		ptr->offset = static_cast<float>(list.at(i));
 	}
 
-	gen->offset->setValue(gen->getCurrentData()->offset);
+	gen->ui->offset->setValue(gen->getCurrentData()->offset);
 }
 
 QList<double> SignalGenerator_API::getWaveformPhase() const
@@ -1236,7 +1197,7 @@ void SignalGenerator_API::setWaveformPhase(const QList<double>& list)
 		ptr->phase = list.at(i);
 	}
 
-	gen->phase->setValue(gen->getCurrentData()->phase);
+	gen->ui->phase->setValue(gen->getCurrentData()->phase);
 }
 
 QList<double> SignalGenerator_API::getMathFreq() const
@@ -1263,7 +1224,7 @@ void SignalGenerator_API::setMathFreq(const QList<double>& list)
 		ptr->math_freq = list.at(i);
 	}
 
-	gen->mathFrequency->setValue(gen->getCurrentData()->math_freq);
+	gen->ui->mathFrequency->setValue(gen->getCurrentData()->math_freq);
 }
 
 QList<QString> SignalGenerator_API::getMathFunction() const
