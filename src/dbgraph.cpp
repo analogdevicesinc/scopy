@@ -98,3 +98,51 @@ const QColor& dBgraph::getColor() const
 {
 	return this->color;
 }
+
+QString dBgraph::xTitle() const
+{
+	return axisTitle(QwtPlot::xTop).text();
+}
+
+QString dBgraph::yTitle() const
+{
+	return axisTitle(QwtPlot::yLeft).text();
+}
+
+void dBgraph::setXTitle(const QString& title)
+{
+	setAxisTitle(QwtPlot::xTop, title);
+}
+
+void dBgraph::setYTitle(const QString& title)
+{
+	setAxisTitle(QwtPlot::yLeft, title);
+}
+
+void dBgraph::setXMin(double val)
+{
+	setAxisScale(QwtPlot::xTop, val, xmax);
+	xmin = val;
+	replot();
+}
+
+void dBgraph::setXMax(double val)
+{
+	setAxisScale(QwtPlot::xTop, xmin, val);
+	xmax = val;
+	replot();
+}
+
+void dBgraph::setYMin(double val)
+{
+	setAxisScale(QwtPlot::yLeft, val, ymax);
+	ymin = val;
+	replot();
+}
+
+void dBgraph::setYMax(double val)
+{
+	setAxisScale(QwtPlot::yLeft, ymin, val);
+	ymax = val;
+	replot();
+}

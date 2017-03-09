@@ -40,6 +40,14 @@ namespace adiscope {
 				WRITE setColor
 		)
 
+		Q_PROPERTY(QString xaxis_title READ xTitle WRITE setXTitle);
+		Q_PROPERTY(QString yaxis_title READ yTitle WRITE setYTitle);
+
+		Q_PROPERTY(double xmin MEMBER xmin WRITE setXMin);
+		Q_PROPERTY(double xmax MEMBER xmax WRITE setXMax);
+		Q_PROPERTY(double ymin MEMBER ymin WRITE setYMin);
+		Q_PROPERTY(double ymax MEMBER ymax WRITE setYMax);
+
 	public:
 		explicit dBgraph(QWidget *parent = nullptr);
 		~dBgraph();
@@ -49,18 +57,28 @@ namespace adiscope {
 		void setAxesTitles(const QString& x, const QString& y);
 
 		int getNumSamples() const;
-		void setNumSamples(int num);
 
 		const QColor& getColor() const;
-		void setColor(const QColor& color);
+		QString xTitle() const;
+		QString yTitle() const;
 
 	public Q_SLOTS:
 		void plot(double x, double y);
 		void reset();
 
+		void setNumSamples(int num);
+		void setColor(const QColor& color);
+		void setXTitle(const QString& title);
+		void setYTitle(const QString& title);
+		void setXMin(double val);
+		void setXMax(double val);
+		void setYMin(double val);
+		void setYMax(double val);
+
 	private:
 		QwtPlotCurve curve;
 		unsigned int numSamples;
+		double xmin, xmax, ymin, ymax;
 		QColor color;
 
 		CustomFifo<double> xdata, ydata;
