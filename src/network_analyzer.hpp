@@ -99,10 +99,29 @@ namespace adiscope {
 	{
 		Q_OBJECT
 
+		Q_PROPERTY(double min_freq READ getMinFreq WRITE setMinFreq);
+		Q_PROPERTY(double max_freq READ getMaxFreq WRITE setMaxFreq);
+		Q_PROPERTY(double step_size READ getStepSize WRITE setStepSize);
+		Q_PROPERTY(double amplitude READ getAmplitude
+				WRITE setAmplitude);
+		Q_PROPERTY(double offset READ getOffset WRITE setOffset);
+
 	public:
 		explicit NetworkAnalyzer_API(NetworkAnalyzer *net) :
 			ApiObject(TOOL_NETWORK_ANALYZER), net(net) {}
 		~NetworkAnalyzer_API() {}
+
+		double getMinFreq() const;
+		double getMaxFreq() const;
+		double getStepSize() const;
+		double getAmplitude() const;
+		double getOffset() const;
+
+		void setMinFreq(double freq);
+		void setMaxFreq(double freq);
+		void setStepSize(double step);
+		void setAmplitude(double amp);
+		void setOffset(double offset);
 
 	private:
 		NetworkAnalyzer *net;

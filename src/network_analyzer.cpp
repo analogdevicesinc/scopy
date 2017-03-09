@@ -439,3 +439,53 @@ struct iio_buffer * NetworkAnalyzer::generateSinWave(
 
 	return buf;
 }
+
+double NetworkAnalyzer_API::getMinFreq() const
+{
+	return net->ui->minFreq->value();
+}
+
+double NetworkAnalyzer_API::getMaxFreq() const
+{
+	return net->ui->maxFreq->value();
+}
+
+double NetworkAnalyzer_API::getStepSize() const
+{
+	return net->ui->stepSize->value();
+}
+
+double NetworkAnalyzer_API::getAmplitude() const
+{
+	return net->ui->amplitude->value();
+}
+
+double NetworkAnalyzer_API::getOffset() const
+{
+	return net->ui->offset->value();
+}
+
+void NetworkAnalyzer_API::setMinFreq(double freq)
+{
+	net->ui->minFreq->setValue(freq);
+}
+
+void NetworkAnalyzer_API::setMaxFreq(double freq)
+{
+	net->ui->maxFreq->setValue(freq);
+}
+
+void NetworkAnalyzer_API::setStepSize(double step)
+{
+	net->ui->stepSize->setValue(step);
+}
+
+void NetworkAnalyzer_API::setAmplitude(double amp)
+{
+	net->ui->amplitude->setValue(amp);
+}
+
+void NetworkAnalyzer_API::setOffset(double offset)
+{
+	net->ui->offset->setValue(offset);
+}
