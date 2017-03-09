@@ -82,11 +82,14 @@ namespace adiscope {
 		static struct iio_buffer * generateSinWave(
 				const struct iio_device *dev,
 				double frequency,
+				double amplitude,
+				double offset,
 				unsigned long rate,
 				size_t samples_count);
 
 	private Q_SLOTS:
 		void startStop(bool start);
+		void updateNumSamples();
 
 	Q_SIGNALS:
 		void sweepDone();

@@ -83,6 +83,8 @@ namespace adiscope {
 
 		static QVector<unsigned long> get_available_sample_rates(
 				const struct iio_device *dev);
+		static unsigned long get_max_sample_rate(
+				const struct iio_device *dev);
 
 	private:
 		Ui::SignalGenerator *ui;
@@ -129,8 +131,6 @@ namespace adiscope {
 		size_t get_samples_count(const struct iio_device *dev,
 				unsigned long sample_rate, bool perfect = false);
 		unsigned long get_best_sample_rate(
-				const struct iio_device *dev);
-		static unsigned long get_max_sample_rate(
 				const struct iio_device *dev);
 		int set_sample_rate(const struct iio_device *dev,
 				unsigned long sample_rate);

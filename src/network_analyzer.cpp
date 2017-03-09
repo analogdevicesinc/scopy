@@ -17,8 +17,10 @@
  * Boston, MA 02110-1301, USA.
  */
 
+#include "dynamicWidget.hpp"
 #include "network_analyzer.hpp"
 #include "signal_generator.hpp"
+#include "spinbox_a.hpp"
 #include "ui_network_analyzer.h"
 
 #include <gnuradio/analog/sig_source_c.h>
@@ -81,18 +83,38 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 		ui->run_button->setChecked(false);
 	});
 
-	ui->dbgraph->setNumSamples(150);
-	ui->dbgraph->setColor(QColor("red"));
-	ui->dbgraph->setAxesTitles(QString("Frequency (Hz)"),
-			QString("Magnitude (dB)"));
+	ui->dbgraph->setYMin(-40.0);
+	ui->dbgraph->setYMax(5.0);
+	ui->phasegraph->setYMin(-M_PI);
+	ui->phasegraph->setYMax(M_PI);
 
-	ui->phasegraph->setNumSamples(150);
-	ui->phasegraph->setColor(QColor("blue"));
-	ui->phasegraph->setAxesTitles(QString("Frequency (Hz)"),
-			QString("Phase (°)"));
+	ui->rightMenu->setMaximumWidth(0);
 
-	ui->dbgraph->setAxesScales(50e3, 200e3, -40.0, 5.0);
-	ui->phasegraph->setAxesScales(50e3, 200e3, -M_PI, M_PI);
+	const struct iio_device *dev1 = iio_channel_get_device(dac1);
+	unsigned long max_samplerate1 =
+		SignalGenerator::get_max_sample_rate(dev1);
+
+	const struct iio_device *dev2 = iio_channel_get_device(dac2);
+	unsigned long max_samplerate2 =
+		SignalGenerator::get_max_sample_rate(dev2);
+
+	unsigned long max_samplerate =
+		std::min(max_samplerate1, max_samplerate2);
+
+	ui->maxFreq->setMaxValue(max_samplerate / 2 - 1);
+
+	connect(ui->minFreq, SIGNAL(valueChanged(double)),
+			this, SLOT(updateNumSamples()));
+	connect(ui->maxFreq, SIGNAL(valueChanged(double)),
+			this, SLOT(updateNumSamples()));
+	connect(ui->stepSize, SIGNAL(valueChanged(double)),
+			this, SLOT(updateNumSamples()));
+
+	/* Default values */
+	ui->minFreq->setValue(1e3);
+	ui->maxFreq->setValue(50e3);
+	ui->stepSize->setValue(1e3);
+	ui->amplitude->setValue(1.0);
 
 	net_api->load();
 	net_api->js_register(engine);
@@ -107,6 +129,17 @@ NetworkAnalyzer::~NetworkAnalyzer()
 	delete net_api;
 
 	delete ui;
+}
+
+void NetworkAnalyzer::updateNumSamples()
+{
+	double min = ui->minFreq->value();
+	double max = ui->maxFreq->value();
+	double step = ui->stepSize->value();
+	unsigned int num_samples = 1 + (unsigned int)((max - min) / step);
+
+	ui->dbgraph->setNumSamples(num_samples);
+	ui->phasegraph->setNumSamples(num_samples);
 }
 
 void NetworkAnalyzer::run()
@@ -133,12 +166,15 @@ void NetworkAnalyzer::run()
 			iio_channel_disable(each);
 	}
 
-	for (unsigned int i = 50; !stop && i < 200; i++) {
-		double frequency = i * 1e3;
-
+	for (double frequency = ui->minFreq->value();
+			!stop && frequency <= ui->maxFreq->value();
+			frequency += ui->stepSize->value()) {
 		unsigned long rate = get_best_sin_sample_rate(dac1, frequency);
 		size_t samples_count = get_sin_samples_count(
 				dac1, rate, frequency);
+
+		double amplitude = ui->amplitude->value();
+		double offset = ui->offset->value();
 
 		/* We want at least 8 periods. */
 		size_t in_samples_count = samples_count * 8;
@@ -147,7 +183,8 @@ void NetworkAnalyzer::run()
 			iio_device_attr_write_bool(dev1, "dma_sync", true);
 
 		struct iio_buffer *buf_dac1 = generateSinWave(dev1,
-				frequency, rate, samples_count);
+				frequency, amplitude, offset,
+				rate, samples_count);
 		if (!buf_dac1) {
 			qCritical() << "Unable to create DAC buffer";
 			break;
@@ -156,8 +193,8 @@ void NetworkAnalyzer::run()
 		struct iio_buffer *buf_dac2 = nullptr;
 
 		if (dev1 != dev2) {
-			buf_dac2 = generateSinWave(dev2,
-					frequency, rate, samples_count);
+			buf_dac2 = generateSinWave(dev2, frequency, amplitude,
+					offset, rate, samples_count);
 			if (!buf_dac2) {
 				qCritical() << "Unable to create DAC buffer";
 				break;
@@ -301,6 +338,8 @@ void NetworkAnalyzer::startStop(bool pressed)
 	} else {
 		thd.waitForFinished();
 	}
+
+	setDynamicProperty(ui->run_button, "running", pressed);
 }
 
 size_t NetworkAnalyzer::get_sin_samples_count(const struct iio_channel *chn,
@@ -350,6 +389,7 @@ unsigned long NetworkAnalyzer::get_best_sin_sample_rate(
 
 struct iio_buffer * NetworkAnalyzer::generateSinWave(
 		const struct iio_device *dev, double frequency,
+		double amplitude, double offset,
 		unsigned long rate, size_t samples_count)
 {
 	/* Create the IIO buffer */
@@ -361,7 +401,7 @@ struct iio_buffer * NetworkAnalyzer::generateSinWave(
 	auto top_block = gr::make_top_block("Signal Generator");
 
 	auto src = analog::sig_source_f::make(rate, analog::GR_SIN_WAVE,
-			frequency, 5.0, 0.0);
+			frequency, amplitude, offset);
 
 	// DAC_RAW = (-Vout * 2^11) / 5V
 	// Multiplying with 16 because the HDL considers the DAC data as 16 bit
