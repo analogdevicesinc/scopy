@@ -189,6 +189,8 @@ void CompletionCircle::setMinimumDouble(double value)
 	m_double_minimum = value;
 	if (m_double_value < m_double_minimum)
 		setValueDouble(value);
+
+	repaint();
 }
 
 double CompletionCircle::maximumDouble()
@@ -201,6 +203,8 @@ void CompletionCircle::setMaximumDouble(double value)
 	m_double_maximum = value;
 	if (m_double_value > m_double_maximum)
 		setValueDouble(value);
+
+	repaint();
 }
 
 bool CompletionCircle::isLogScale()
