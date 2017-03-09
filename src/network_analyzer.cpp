@@ -55,10 +55,10 @@
 using namespace adiscope;
 using namespace gr;
 
-NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx,
-		Filter *filt, QPushButton *runButton,
+NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
+		QPushButton *runButton, QJSEngine *engine,
 		QWidget *parent) : QWidget(parent),
-	ui(new Ui::NetworkAnalyzer)
+	ui(new Ui::NetworkAnalyzer), net_api(new NetworkAnalyzer_API(this))
 {
 	const std::string adc = filt->device_name(TOOL_NETWORK_ANALYZER, 2);
 	iio = iio_manager::get_instance(ctx, adc);
@@ -93,12 +93,19 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx,
 
 	ui->dbgraph->setAxesScales(50e3, 200e3, -40.0, 5.0);
 	ui->phasegraph->setAxesScales(50e3, 200e3, -M_PI, M_PI);
+
+	net_api->load();
+	net_api->js_register(engine);
 }
 
 NetworkAnalyzer::~NetworkAnalyzer()
 {
 	stop = true;
 	thd.waitForFinished();
+
+	net_api->save();
+	delete net_api;
+
 	delete ui;
 }
 

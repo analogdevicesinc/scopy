@@ -20,6 +20,7 @@
 #ifndef SCOPY_NETWORK_ANALYZER_HPP
 #define SCOPY_NETWORK_ANALYZER_HPP
 
+#include "apiObject.hpp"
 #include "iio_manager.hpp"
 #include "signal_sample.hpp"
 
@@ -38,17 +39,21 @@ namespace Ui {
 }
 
 class QPushButton;
+class QJSEngine;
 
 namespace adiscope {
+	class NetworkAnalyzer_API;
 	class Filter;
 
 	class NetworkAnalyzer : public QWidget
 	{
+		friend class NetworkAnalyzer_API;
+
 		Q_OBJECT
 
 	public:
-		explicit NetworkAnalyzer(struct iio_context *ctx,
-				Filter *filt, QPushButton *runButton,
+		explicit NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
+				QPushButton *runButton, QJSEngine *engine,
 				QWidget *parent = 0);
 		~NetworkAnalyzer();
 
@@ -60,6 +65,8 @@ namespace adiscope {
 
 		QFuture<void> thd;
 		bool stop;
+
+		NetworkAnalyzer_API *net_api;
 
 		void run();
 
@@ -83,6 +90,19 @@ namespace adiscope {
 
 	Q_SIGNALS:
 		void sweepDone();
+	};
+
+	class NetworkAnalyzer_API : public ApiObject
+	{
+		Q_OBJECT
+
+	public:
+		explicit NetworkAnalyzer_API(NetworkAnalyzer *net) :
+			ApiObject(TOOL_NETWORK_ANALYZER), net(net) {}
+		~NetworkAnalyzer_API() {}
+
+	private:
+		NetworkAnalyzer *net;
 	};
 } /* namespace adiscope */
 
