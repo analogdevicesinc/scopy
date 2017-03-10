@@ -98,6 +98,9 @@ bool RxCalibration::initialize()
 		}
 	}
 
+	// Make sure we calibrate at highest sample rate
+	iio_device_attr_write_longlong(m_m2k_adc, "sampling_frequency", 1E8);
+
 	m_initialized = true;
 
 	return m_initialized;
