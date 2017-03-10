@@ -160,7 +160,8 @@ View::View(Session &session, QWidget *parent) :
 
 	viewport_->installEventFilter(this);
 	ruler_->installEventFilter(this);
-    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
 	// Trigger the initial event manually. The default device has signals
 	// which were created before this object came into being
