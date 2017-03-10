@@ -130,8 +130,7 @@ PatternGeneratorBufferManagerUi::PatternGeneratorBufferManagerUi(
 void PatternGeneratorBufferManagerUi::updateUi()
 {
 	bufman->update();
-	setSampleRate();
-	dataChanged();
+	reloadPVDevice();
 
 	auto scale = (1/(double)bufman->getSampleRate()) * bufman->getBufferSize() /
 	             (double)main_win->view_->divisionCount();
@@ -142,15 +141,6 @@ void PatternGeneratorBufferManagerUi::updateUi()
 
 PatternGeneratorBufferManagerUi::~PatternGeneratorBufferManagerUi()
 {
-}
-
-void PatternGeneratorBufferManagerUi::setSampleRate()
-{
-	pattern_generator_ptr->close();
-	options["samplerate"] = Glib::Variant<guint64>(g_variant_new_uint64(
-	                                bufman->getSampleRate()),true);//(Glib::VariantBase)(gint64(1000000));
-	pattern_generator_ptr->options_ = options;
-	pattern_generator_ptr->open();
 }
 
 void PatternGeneratorBufferManagerUi::createBinaryBuffer()
@@ -169,9 +159,12 @@ pv::MainWindow *PatternGeneratorBufferManagerUi::getPVWindow()
 	return main_win;
 }
 
-void PatternGeneratorBufferManagerUi::dataChanged()
+void PatternGeneratorBufferManagerUi::reloadPVDevice()
 {
 	pattern_generator_ptr->close();
+	options["samplerate"] = Glib::Variant<guint64>(g_variant_new_uint64(
+					bufman->getSampleRate()),true);//(Glib::VariantBase)(gint64(1000000));
+	pattern_generator_ptr->options_ = options;
 	pattern_generator_ptr->data_ = bufman->buffer;
 	pattern_generator_ptr->open();
 	main_win->run_stop();
