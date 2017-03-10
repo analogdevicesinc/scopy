@@ -106,7 +106,7 @@ View::View(Session &session, QWidget *parent) :
 	viewport_(new Viewport(*this)),
 	ruler_(new Ruler(*this)),
 	scale_(1e-3),
-	backup_scale_(scale_),
+	capture_scale(scale_),
 	offset_(0),
 	updating_scroll_(false),
 	sticky_scrolling_(false), // Default setting is set in MainWindow::setup_ui()
@@ -344,7 +344,7 @@ void View::zoom_fit(bool gui_state)
 	if (w <= 0)
 		return;
 
-    const Timestamp scale = max(min(delta / DivisionCount, MaxScale), MinScale);
+	const Timestamp scale = max(min(delta / DivisionCount, MaxScale), MinScale);
 	set_scale_offset(scale.convert_to<double>(), extents.first);
 }
 
@@ -576,9 +576,21 @@ void View::set_zoom(double scale, int offset)
 	const Timestamp new_offset = cursor_offset - new_scale / pixelsPerDivision * offset;
 
 	scale = new_scale.convert_to<double>();
-	set_scale_offset(new_scale.convert_to<double>(), new_offset);
-	if( viewport_->getTimeTriggerActive() )
-		onPlotChanged(true);
+
+
+	if(viewport()->getTimeTriggerActive() &&
+		( session_.get_capture_state() == Session::Running)) {
+		if(scale <= capture_scale) {
+			set_scale_offset(new_scale.convert_to<double>(), new_offset);
+			onPlotChanged(true);
+		}
+	}
+	else {
+		set_scale_offset(new_scale.convert_to<double>(), new_offset);
+		if(viewport()->getTimeTriggerActive())
+			onPlotChanged(true);
+
+	}
 }
 
 void View::calculate_tick_spacing()
@@ -1206,7 +1218,7 @@ void View::set_timebase(double value)
 		set_scale_offset(value, offset_);
 		session_.set_timeSpan(value * DivisionCount);
 	}
-	backup_scale_ = scale_;
+	capture_scale = scale_;
 }
 
 double View::start_plot_offset()
@@ -1225,15 +1237,15 @@ void View::set_offset(double timePos, double timeSpan, bool running)
 		if( session_.get_capture_state() == Session::Running)
 		{
 			session_.stop_capture();
-			set_scale_offset(scale_, Timestamp(0));
 			ruler_->set_offset(value);
 			start_plot_offset_ = value;
 			session_.start_capture([&](QString message) {
 				session_error("Capture failed", message); });
+			Q_EMIT offset_changed();
 		} else {
-			set_scale_offset(scale_, Timestamp(0));
 			ruler_->set_offset(value);
 			start_plot_offset_ = value;
+			Q_EMIT offset_changed();
 		}
 
 	}

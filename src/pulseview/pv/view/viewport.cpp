@@ -95,6 +95,11 @@ void Viewport::enableDrag()
 	dragEnabled = true;
 }
 
+boost::optional<pv::util::Timestamp>  Viewport::getDragOffset()
+{
+	return drag_offset_;
+}
+
 void Viewport::item_hover(const shared_ptr<ViewItem> &item)
 {
 	if (item && item->is_draggable())
@@ -159,8 +164,9 @@ bool Viewport::touch_event(QTouchEvent *event)
 
 	if (!pinch_zoom_active_ ||
 	    (event->touchPointStates() & Qt::TouchPointPressed)) {
-		pinch_offset0_ = (view_.offset() + view_.scale() * touchPoint0.pos().x()).convert_to<double>();
-		pinch_offset1_ = (view_.offset() + view_.scale() * touchPoint1.pos().x()).convert_to<double>();
+		double scale  = view_.scale() /(view_.viewport()->size().width() / view_.divisionCount());
+		pinch_offset0_ = (view_.offset() + scale * touchPoint0.pos().x()).convert_to<double>();
+		pinch_offset1_ = (view_.offset() + scale * touchPoint1.pos().x()).convert_to<double>();
 		pinch_zoom_active_ = true;
 	}
 

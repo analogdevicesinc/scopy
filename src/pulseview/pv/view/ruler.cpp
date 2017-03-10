@@ -233,6 +233,7 @@ void Ruler::set_offset(double value)
 	pv::util::Timestamp new_offset = pv::util::Timestamp(value);
 	if(ruler_offset != new_offset)
 		ruler_offset = new_offset;
+	view_.time_item_appearance_changed(true, false);
 }
 
 double Ruler::get_offset()

@@ -549,7 +549,6 @@ void LogicAnalyzer::onRulerChanged(double ruler_value, bool silent)
 			setTimebaseLabel(active_plot_timebase);
 		}
 	}
-
 	int trigX = timeToPixel(-active_timePos);
 	d_timeTriggerHandle->setPositionSilenty(trigX);
 	main_win->view_->viewport()->setTimeTriggerPixel(trigX);
@@ -628,6 +627,8 @@ int LogicAnalyzer::timeToPixel(double time)
 void LogicAnalyzer::startStop(bool start)
 {
 	if (start) {
+		if(main_win->view_->scale() != timeBase->value())
+			Q_EMIT timeBase->valueChanged(timeBase->value());
 		main_win->view_->viewport()->disableDrag();
 		setBuffersizeLabelValue(active_sampleCount);
 		setSamplerateLabelValue(active_sampleRate);
@@ -675,9 +676,20 @@ void LogicAnalyzer::singleRun()
 		startStop(false);
 		ui->btnRunStop->setChecked(false);
 	}
+	if(main_win->view_->scale() != timeBase->value())
+		Q_EMIT timeBase->valueChanged(timeBase->value());
+	running = true;
 	setSampleRate();
+	setBuffersizeLabelValue(active_sampleCount);
+	setSamplerateLabelValue(active_sampleRate);
+	setHWTriggerDelay(active_triggerSampleCount);
+	setTriggerDelay();
+	if (timePosition->value() != active_timePos)
+		timePosition->setValue(active_timePos);
 	logic_analyzer_ptr->set_single(true);
 	main_win->run_stop();
+	setTriggerDelay();
+	running = false;
 }
 
 unsigned int LogicAnalyzer::get_no_channels(struct iio_device *dev)

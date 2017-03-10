@@ -385,7 +385,7 @@ private:
 
 	/// The view time scale
 	double scale_;
-	double backup_scale_;
+	double capture_scale;
 	double start_plot_offset_;
 
 	/// The view time offset in seconds.

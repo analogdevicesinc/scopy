@@ -75,6 +75,7 @@ public:
 
 	void cursorValueChanged_1(int);
 	void cursorValueChanged_2(int);
+	boost::optional<pv::util::Timestamp> getDragOffset();
 private:
 	/**
      * Indicates when a view item is being hovered over.
