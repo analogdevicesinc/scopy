@@ -90,9 +90,8 @@ public:
 	                                PatternGenerator *pg);
 
 	~PatternGeneratorBufferManagerUi();
-	void setSampleRate();
 	void createBinaryBuffer();
-	void dataChanged();
+	void reloadPVDevice();
 	pv::MainWindow *getPVWindow();
 Q_SIGNALS:
 	void uiUpdated();
