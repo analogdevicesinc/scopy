@@ -336,31 +336,6 @@ QPushButton:!checked {
              <property name="spacing">
               <number>0</number>
              </property>
-             <item row="0" column="1">
-              <layout class="QGridLayout" name="gridLayoutHist"/>
-             </item>
-             <item row="0" column="0">
-              <layout class="QGridLayout" name="gridLayoutPlot">
-               <property name="leftMargin">
-                <number>25</number>
-               </property>
-               <property name="topMargin">
-                <number>0</number>
-               </property>
-               <property name="rightMargin">
-                <number>25</number>
-               </property>
-               <property name="bottomMargin">
-                <number>0</number>
-               </property>
-               <property name="spacing">
-                <number>0</number>
-               </property>
-              </layout>
-             </item>
-             <item row="1" column="1">
-              <layout class="QGridLayout" name="gridLayout_XY"/>
-             </item>
              <item row="1" column="0">
               <widget class="QWidget" name="container_fft_plot" native="true">
                <layout class="QGridLayout" name="gridLayoutFFT">
@@ -478,6 +453,86 @@ QPushButton:!checked {
                 </item>
                </layout>
               </widget>
+             </item>
+             <item row="0" column="1">
+              <layout class="QGridLayout" name="gridLayoutHist"/>
+             </item>
+             <item row="1" column="1">
+              <layout class="QGridLayout" name="gridLayout_XY"/>
+             </item>
+             <item row="2" column="0">
+              <layout class="QVBoxLayout" name="plot_and_scales">
+               <property name="spacing">
+                <number>0</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>0</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
+               <item>
+                <layout class="QGridLayout" name="gridLayoutPlot">
+                 <property name="leftMargin">
+                  <number>25</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>25</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="spacing">
+                  <number>0</number>
+                 </property>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="scales">
+                 <property name="spacing">
+                  <number>0</number>
+                 </property>
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>3</number>
+                 </property>
+                 <item>
+                  <layout class="QHBoxLayout" name="chn_scales">
+                   <property name="spacing">
+                    <number>15</number>
+                   </property>
+                   <property name="leftMargin">
+                    <number>10</number>
+                   </property>
+                  </layout>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>0</width>
+                     <height>15</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </item>
+              </layout>
              </item>
             </layout>
            </widget>

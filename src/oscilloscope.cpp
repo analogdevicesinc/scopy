@@ -180,6 +180,15 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 
 		channels_group->addButton(channel_ui.name);
 
+		QLabel *label= new QLabel(this);
+		label->setText(vertMeasureFormat.format(
+			plot.VertUnitsPerDiv(chIdx), "V", 3));
+		label->setStyleSheet(QString("QLabel {"
+				"color: %1;"
+				"font-weight: bold;"
+				"}").arg(plot.getLineColor(chIdx).name()));
+		ui->chn_scales->addWidget(label);
+
 		chIdx++;
 	}
 
@@ -264,7 +273,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 
 	/* Plot layout */
 
-	QSpacerItem *plotSpacer = new QSpacerItem(0, 25,
+	QSpacerItem *plotSpacer = new QSpacerItem(0, 5,
 		QSizePolicy::Fixed, QSizePolicy::Fixed);
 
 	ui->gridLayoutPlot->addWidget(measurePanel, 0, 1, 1, 1);
@@ -689,6 +698,15 @@ void Oscilloscope::add_math_channel(const std::string& function)
 
 	channels_group->addButton(channel_ui.name);
 
+	QLabel *label= new QLabel(this);
+		label->setText(vertMeasureFormat.format(
+			plot.VertUnitsPerDiv(curve_id), "V", 3));
+		label->setStyleSheet(QString("QLabel {"
+				"color: %1;"
+				"font-weight: bold;"
+				"}").arg(plot.getLineColor(curve_id).name()));
+		ui->chn_scales->addWidget(label);
+
 	plot.Curve(curve_id)->setAxes(
 			QwtAxisId(QwtPlot::xBottom, 0),
 			QwtAxisId(QwtPlot::yLeft, curve_id));
@@ -750,6 +768,11 @@ void Oscilloscope::del_math_channel()
 
 	/* Remove the axis that corresponds to the curve we drop */
 	plot.removeLeftVertAxis(curve_id);
+
+	/* Remove scale label */
+	QWidget *scale_lbl = ui->chn_scales->itemAt(curve_id)->widget();
+	ui->chn_scales->removeWidget(scale_lbl);
+	delete scale_lbl;
 
 	for (unsigned int i = nb_channels;
 			i < nb_channels + nb_math_channels; i++) {
@@ -1113,6 +1136,10 @@ void adiscope::Oscilloscope::onVertScaleValueChanged(double value)
 
 	// Send scale information to the measure object
 	plot.setPeriodDetectHyst(current_channel, value / 5);
+
+	QLabel *label = static_cast<QLabel *>(
+			ui->chn_scales->itemAt(current_channel)->widget());
+	label->setText(vertMeasureFormat.format(value, "V", 3));
 }
 
 void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
