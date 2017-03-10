@@ -628,6 +628,7 @@ int LogicAnalyzer::timeToPixel(double time)
 void LogicAnalyzer::startStop(bool start)
 {
 	if (start) {
+		main_win->view_->viewport()->disableDrag();
 		setBuffersizeLabelValue(active_sampleCount);
 		setSamplerateLabelValue(active_sampleRate);
 		running = true;
@@ -639,6 +640,7 @@ void LogicAnalyzer::startStop(bool start)
 		if (timePosition->value() != active_timePos)
 			timePosition->setValue(active_timePos);
 	} else {
+		main_win->view_->viewport()->enableDrag();
 		running = false;
 		ui->btnRunStop->setText("Run");
 		ui->btnSingleRun->setEnabled(true);
