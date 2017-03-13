@@ -130,6 +130,7 @@ void NetworkAnalyzer::updateNumSamples()
 
 	ui->dbgraph->setNumSamples(num_samples);
 	ui->phasegraph->setNumSamples(num_samples);
+	ui->xygraph->setNumSamples(num_samples);
 }
 
 void NetworkAnalyzer::run()
@@ -303,6 +304,9 @@ void NetworkAnalyzer::run()
 
 		double phase_deg = phase * 180.0 / M_PI;
 
+		double point_x = mag * cos(phase);
+		double point_y = mag * sin(phase);
+
 		QMetaObject::invokeMethod(ui->dbgraph,
 				 "plot",
 				 Qt::QueuedConnection,
@@ -314,6 +318,12 @@ void NetworkAnalyzer::run()
 				 Qt::QueuedConnection,
 				 Q_ARG(double, frequency),
 				 Q_ARG(double, phase_deg));
+
+		QMetaObject::invokeMethod(ui->xygraph,
+				"plot",
+				Qt::QueuedConnection,
+				Q_ARG(double, point_x),
+				Q_ARG(double, point_y));
 	}
 
 	Q_EMIT sweepDone();
@@ -326,6 +336,7 @@ void NetworkAnalyzer::startStop(bool pressed)
 	if (pressed) {
 		ui->dbgraph->reset();
 		ui->phasegraph->reset();
+		ui->xygraph->reset();
 		thd = QtConcurrent::run(this, &NetworkAnalyzer::run);
 	} else {
 		thd.waitForFinished();
