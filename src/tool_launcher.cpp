@@ -153,21 +153,26 @@ QPushButton * ToolLauncher::addContext(const QString& uri)
 
 void ToolLauncher::addRemoteContext()
 {
-	pv::widgets::Popup *popup = new pv::widgets::Popup(ui->homeWidget);
-	connect(popup, SIGNAL(closed()), this, SLOT(destroyPopup()));
+    pv::widgets::Popup *popup = new pv::widgets::Popup(ui->homeWidget);
+    connect(popup, SIGNAL(closed()), this, SLOT(destroyPopup()));
+    //...
 
-	QPoint pos = ui->groupBox->mapToGlobal(ui->btnAdd->pos());
-	pos += QPoint(ui->btnAdd->width() / 2, ui->btnAdd->height());
 
-	popup->set_position(pos, pv::widgets::Popup::Bottom);
-	popup->show();
+    QPoint pos = ui->groupBox->mapToGlobal(ui->btnAdd->pos());
+    pos += QPoint(ui->btnAdd->width() / 2, ui->btnAdd->height());
 
-	ConnectDialog *dialog = new ConnectDialog(popup);
-	connect(dialog, &ConnectDialog::newContext,
-			[=](const QString& uri) {
-				addContext(uri);
-				popup->close();
-			});
+    popup->set_position(pos, pv::widgets::Popup::Bottom);
+    popup->show();
+
+
+    ConnectDialog *dialog = new ConnectDialog(popup);
+
+
+    connect(dialog, &ConnectDialog::newContext,
+            [=](const QString& uri) {
+                addContext(uri);
+                popup->close();
+            });
 }
 
 void ToolLauncher::swapMenu(QWidget *menu)

@@ -87,8 +87,7 @@ void ConnectDialog::validateInput()
 	} else {
 		setDynamicProperty(ui->connectBtn, "failed", true);
 		ui->connectBtn->setText("Failed!");
-        //
-        //ui->hostname->clear();
+     
 	}
 }
 
