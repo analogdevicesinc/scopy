@@ -85,8 +85,8 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	ui->dbgraph->setYMin(-40.0);
 	ui->dbgraph->setYMax(5.0);
-	ui->phasegraph->setYMin(-M_PI);
-	ui->phasegraph->setYMax(M_PI);
+	ui->phasegraph->setYMin(-180.0);
+	ui->phasegraph->setYMax(180.0);
 
 	ui->rightMenu->setMaximumWidth(0);
 
@@ -311,6 +311,8 @@ void NetworkAnalyzer::run()
 		qDebug() << "Frequency:" << frequency << " Mag diff:"
 			<< mag << "Phase diff:" << phase;
 
+		double phase_deg = phase * 180.0 / M_PI;
+
 		QMetaObject::invokeMethod(ui->dbgraph,
 				 "plot",
 				 Qt::QueuedConnection,
@@ -321,7 +323,7 @@ void NetworkAnalyzer::run()
 				 "plot",
 				 Qt::QueuedConnection,
 				 Q_ARG(double, frequency),
-				 Q_ARG(double, phase));
+				 Q_ARG(double, phase_deg));
 	}
 
 	Q_EMIT sweepDone();
