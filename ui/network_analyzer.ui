@@ -353,6 +353,9 @@ QTabBar::tab:!selected {
                <property name="name" stdset="0">
                 <string>Min Freq</string>
                </property>
+               <property name="value" stdset="0">
+                <double>1000.000000000000000</double>
+               </property>
               </widget>
              </item>
              <item row="0" column="1">
@@ -377,6 +380,9 @@ QTabBar::tab:!selected {
                <property name="show_progress" stdset="0">
                 <bool>false</bool>
                </property>
+               <property name="value" stdset="0">
+                <double>50000.000000000000000</double>
+               </property>
               </widget>
              </item>
              <item row="1" column="0">
@@ -400,6 +406,9 @@ QTabBar::tab:!selected {
                </property>
                <property name="show_progress" stdset="0">
                 <bool>false</bool>
+               </property>
+               <property name="value" stdset="0">
+                <double>1000.000000000000000</double>
                </property>
               </widget>
              </item>
@@ -448,6 +457,9 @@ QTabBar::tab:!selected {
                </property>
                <property name="show_progress" stdset="0">
                 <bool>false</bool>
+               </property>
+               <property name="value" stdset="0">
+                <double>1.000000000000000</double>
                </property>
               </widget>
              </item>

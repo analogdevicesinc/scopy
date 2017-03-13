@@ -110,12 +110,6 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	connect(ui->stepSize, SIGNAL(valueChanged(double)),
 			this, SLOT(updateNumSamples()));
 
-	/* Default values */
-	ui->minFreq->setValue(1e3);
-	ui->maxFreq->setValue(50e3);
-	ui->stepSize->setValue(1e3);
-	ui->amplitude->setValue(1.0);
-
 	net_api->load();
 	net_api->js_register(engine);
 }
