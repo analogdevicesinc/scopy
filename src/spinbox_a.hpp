@@ -60,6 +60,7 @@ class SpinBoxA : public QWidget
 	Q_PROPERTY(QStringList units MEMBER m_units_list WRITE setUnits);
 	Q_PROPERTY(double min_value READ minValue WRITE setMinValue);
 	Q_PROPERTY(double max_value READ maxValue WRITE setMaxValue);
+	Q_PROPERTY(double value READ value WRITE setValue NOTIFY valueChanged);
 	Q_PROPERTY(bool fine_mode READ isInFineMode WRITE setFineMode);
 	Q_PROPERTY(bool invert_circle READ isCircleInverted WRITE invertCircle);
 	Q_PROPERTY(bool show_progress READ progressShown WRITE showProgress);
