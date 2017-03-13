@@ -191,6 +191,7 @@ class PatternGeneratorChannelManager : public ChannelManager
 {
 	PatternGeneratorChannelGroup *highlightedChannelGroup;
 	PatternGeneratorChannel *highlightedChannel;
+	const uint32_t maxBufferSize = 1000000;
 
 public:
 	void highlightChannel(PatternGeneratorChannelGroup *chg,

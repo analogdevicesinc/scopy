@@ -1140,7 +1140,13 @@ uint32_t PatternGeneratorChannelManager::computeSuggestedBufferSize(
 	// if buffersize not big enough, create a buffer that is big enough and will fit maximum nonperiodic pattern
 	// TBD if correct
 	if (maxNonPeriodic > bufferSize) {
-		bufferSize = boost::math::lcm(maxNonPeriodic, bufferSize);
+		auto result=1;
+		for(auto i=1;result<maxBufferSize && maxNonPeriodic > result;i++)
+		{
+			result = bufferSize * i;
+		}
+		bufferSize = result;
+
 	}
 
 	qDebug()<<"final buffersize"<<bufferSize;
