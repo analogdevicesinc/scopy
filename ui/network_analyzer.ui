@@ -175,6 +175,14 @@ QTabBar::tab:selected {
 QTabBar::tab:!selected {
   border-bottom: 2px solid rgba(55, 55, 64);
   margin-top: 0px;
+}
+
+QTabWidget#tabWidget QWidget {
+  background-color: none;
+}
+
+QTabWidget#tabWidget QWidget QWidget {
+  background-color: black;
 }</string>
             </property>
             <property name="currentIndex">
