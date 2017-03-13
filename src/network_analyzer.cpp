@@ -83,10 +83,6 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 		ui->run_button->setChecked(false);
 	});
 
-	ui->dbgraph->setYMin(-40.0);
-	ui->dbgraph->setYMax(5.0);
-	ui->phasegraph->setYMin(-180.0);
-	ui->phasegraph->setYMax(180.0);
 
 	ui->rightMenu->setMaximumWidth(0);
 
