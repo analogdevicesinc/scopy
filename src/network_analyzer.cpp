@@ -481,3 +481,43 @@ void NetworkAnalyzer_API::setOffset(double offset)
 {
 	net->ui->offset->setValue(offset);
 }
+
+double NetworkAnalyzer_API::getMinMag() const
+{
+	return net->ui->magMin->value();
+}
+
+double NetworkAnalyzer_API::getMaxMag() const
+{
+	return net->ui->magMax->value();
+}
+
+double NetworkAnalyzer_API::getMinPhase() const
+{
+	return net->ui->phaseMin->value();
+}
+
+double NetworkAnalyzer_API::getMaxPhase() const
+{
+	return net->ui->phaseMax->value();
+}
+
+void NetworkAnalyzer_API::setMinMag(double val)
+{
+	net->ui->magMin->setValue(val);
+}
+
+void NetworkAnalyzer_API::setMaxMag(double val)
+{
+	net->ui->magMax->setValue(val);
+}
+
+void NetworkAnalyzer_API::setMinPhase(double val)
+{
+	net->ui->phaseMin->setValue(val);
+}
+
+void NetworkAnalyzer_API::setMaxPhase(double val)
+{
+	net->ui->phaseMax->setValue(val);
+}

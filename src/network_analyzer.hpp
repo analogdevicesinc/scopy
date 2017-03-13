@@ -106,6 +106,11 @@ namespace adiscope {
 				WRITE setAmplitude);
 		Q_PROPERTY(double offset READ getOffset WRITE setOffset);
 
+		Q_PROPERTY(double min_mag READ getMinMag WRITE setMinMag);
+		Q_PROPERTY(double max_mag READ getMaxMag WRITE setMaxMag);
+		Q_PROPERTY(double min_phase READ getMinPhase WRITE setMinPhase);
+		Q_PROPERTY(double max_phase READ getMaxPhase WRITE setMaxPhase);
+
 	public:
 		explicit NetworkAnalyzer_API(NetworkAnalyzer *net) :
 			ApiObject(TOOL_NETWORK_ANALYZER), net(net) {}
@@ -122,6 +127,16 @@ namespace adiscope {
 		void setStepSize(double step);
 		void setAmplitude(double amp);
 		void setOffset(double offset);
+
+		double getMinMag() const;
+		double getMaxMag() const;
+		double getMinPhase() const;
+		double getMaxPhase() const;
+
+		void setMinMag(double val);
+		void setMaxMag(double val);
+		void setMinPhase(double val);
+		void setMaxPhase(double val);
 
 	private:
 		NetworkAnalyzer *net;
