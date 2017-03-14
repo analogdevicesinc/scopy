@@ -45,7 +45,6 @@
   font-style: normal;
   text-align: left;
   color: #ffffff;
-/*background-color:green;*/
 
 }
 QComboBox::drop-down
@@ -65,14 +64,6 @@ QComboBox QAbstractItemView {
   border: 0px;
   selection-background-color: rgba(25, 25, 25);
   outline: 0px;
-}
-
-QComboBox QAbstractItemView::item {
-width:30px;
-hieght:20px;
-margin-top: 0px;
-border:0px;
-padding:0px;
 }
 
 QComboBox:disabled

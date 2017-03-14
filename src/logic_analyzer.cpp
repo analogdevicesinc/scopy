@@ -55,6 +55,7 @@
 #include <boost/thread.hpp>
 #include <QJsonDocument>
 #include <QJsonValue>
+#include <QListView>
 
 using namespace std;
 using namespace adiscope;
@@ -248,6 +249,12 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	trigger_settings_ui->setupUi(trigger_settings);
 	ui->triggerSettingsLayout->insertWidget(0, trigger_settings);
 	setupTriggerSettingsUI();
+	QAbstractItemView *trigVw = trigger_settings_ui->cmb_trigg_extern_cond_1->view();
+	QListView* listVw = qobject_cast<QListView*>(trigVw);
+	listVw->setSpacing(2);
+	trigVw = trigger_settings_ui->cmb_trigg_extern_cond_2->view();
+	listVw = qobject_cast<QListView*>(trigVw);
+	listVw->setSpacing(2);
 
 	/* Cursor Settings */
 	settings_group->addButton(ui->btnCursors);
