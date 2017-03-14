@@ -62,6 +62,7 @@ namespace adiscope {
 
 	Q_SIGNALS:
 		void calibrationDone(float gain_ch1, float gain_ch2);
+		void dacCalibrationDone(float dacA_vlsb, float dacB_vlsb);
 
 	private Q_SLOTS:
 		void on_btnOscilloscope_clicked();
@@ -81,6 +82,7 @@ namespace adiscope {
 		void destroyPopup();
 
 		void enableCalibTools(float gain_ch1, float gain_ch2);
+		void enableDacBasedTools(float dacA_vlsb, float dacB_vlsb);
 
 		void hasText();
 

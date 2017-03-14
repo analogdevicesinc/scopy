@@ -43,6 +43,7 @@
 
 #include <iio.h>
 
+
 #define NB_POINTS	32768
 #define DAC_BIT_COUNT   12
 #define INTERP_BY_100_CORR 1.168 // correction value at an interpolation by 100
@@ -235,6 +236,8 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 		settings_group->addButton(pair->second.btn);
 
 		channels.append(pair);
+
+		channels_vlsb.append(QPair<struct iio_channel *, double>(chn, 0.0));
 	}
 
 	time_block_data->nb_channels = nb_channels;
@@ -513,12 +516,33 @@ void SignalGenerator::start()
 			QWidget *w = static_cast<QWidget *>(ptr);
 			auto source = getSource(w, best_rate, top_block);
 
-			// DAC_RAW = (-Vout * 2^11) / 5V
-			// Multiplying with 16 because the HDL considers the DAC data as 16 bit
-			// instead of 12 bit(data is shifted to the left).
+			float volts_to_raw_coef;
+			double vlsb = 1;
+			auto pair_it = std::find_if(channels_vlsb.begin(),
+				channels_vlsb.end(),
+				[&each](const QPair<struct iio_channel *,
+				double>& element) {
+					return element.first == each;
+				}
+				);
+			if (pair_it != channels_vlsb.end()) {
+				vlsb = (*pair_it).second;
+			}
+
+			if (vlsb == 0.0) {	// DAC_RAW = (-Vout * 2^11) / 5V
+						// Multiplying with 16 because the HDL considers the DAC data as 16 bit
+						// instead of 12 bit(data is shifted to the left).
+				volts_to_raw_coef = -1 * (1 << (DAC_BIT_COUNT - 1)) /
+					AMPLITUDE_VOLTS * 16 / INTERP_BY_100_CORR;
+			} else {		// DAC_RAW = (-Vout / (voltage corresponding to a LSB));
+						// Multiplying with 16 because the HDL considers the DAC data as 16 bit
+						// instead of 12 bit(data is shifted to the left).
+				volts_to_raw_coef = -1 * (1 / vlsb) * 16;
+			}
+
+
 			auto f2s = blocks::float_to_short::make(1,
-					-1 * (1 << (DAC_BIT_COUNT - 1)) /
-					AMPLITUDE_VOLTS * 16 / INTERP_BY_100_CORR);
+					volts_to_raw_coef);
 
 			auto head = blocks::head::make(
 					sizeof(short), samples_count);
@@ -960,6 +984,41 @@ size_t SignalGenerator::get_samples_count(const struct iio_device *dev,
 		return 0;
 
 	return size;
+}
+
+double SignalGenerator::vlsb_of_channel(const char *channel,
+	const char *dev_parent)
+{
+	double vlsb = -1;
+
+	for (auto it = channels_vlsb.begin(); it != channels_vlsb.end(); ++it) {
+		struct iio_channel *chn = (*it).first;
+		const struct iio_device *dev = iio_channel_get_device(chn);
+
+		if (!strcmp(iio_channel_get_id(chn), channel) &&
+			!strcmp(iio_device_get_name(dev), dev_parent)) {
+			vlsb = (*it).second;
+			break;
+		}
+	}
+
+	return vlsb;
+}
+
+void SignalGenerator::set_vlsb_of_channel(const char *channel,
+	const char *dev_parent, double vlsb)
+{
+	for (auto it = channels_vlsb.begin(); it != channels_vlsb.end(); ++it) {
+		struct iio_channel *chn = (*it).first;
+		const struct iio_device *dev = iio_channel_get_device(chn);
+
+		if (!strcmp(iio_channel_get_id(chn), channel) &&
+			!strcmp(iio_device_get_name(dev), dev_parent)) {
+			(*it).second = vlsb;
+
+			break;
+		}
+	}
 }
 
 bool SignalGenerator_API::running() const
