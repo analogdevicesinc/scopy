@@ -854,6 +854,8 @@ void LogicAnalyzer::setupTriggerSettingsUI(bool enabled)
 	else {
 		for(int i = 0; i < get_no_channels(dev) + 2; i++) {
 			setHWTrigger(i, trigger_mapping[0]);
+			if(i < get_no_channels(dev))
+				chm.get_channel(i)->setTrigger(trigger_mapping[0]);
 		}
 		chm_ui->update_ui();
 	}
