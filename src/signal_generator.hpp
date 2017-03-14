@@ -133,7 +133,7 @@ namespace adiscope {
 		static int sg_waveform_to_idx(enum sg_waveform wave);
 
 		size_t get_samples_count(const struct iio_device *dev,
-				unsigned long sample_rate);
+				unsigned long sample_rate, bool perfect = false);
 		unsigned long get_best_sample_rate(
 				const struct iio_device *dev);
 		static unsigned long get_max_sample_rate(

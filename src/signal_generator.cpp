@@ -868,12 +868,23 @@ unsigned long SignalGenerator::get_best_sample_rate(
 
 	/* Return the best sample rate that we can create a buffer for */
 	for (unsigned long rate : values) {
+		size_t buf_size = get_samples_count(dev, rate, true);
+		if (buf_size)
+			return rate;
+
+		qDebug() << QString("Rate %1 not ideal").arg(rate);
+	}
+
+	/* If we can't find a perfect sample rate, use the highest one */
+	if (use_oversampling(dev))
+		qSort(values.begin(), values.end(), qGreater<unsigned long>());
+
+	for (unsigned long rate : values) {
 		size_t buf_size = get_samples_count(dev, rate);
 		if (buf_size)
 			return rate;
 
-		qDebug() << QString("Rate %1 too high, trying lower")
-			.arg(rate);
+		qDebug() << QString("Rate %1 not possible").arg(rate);
 	}
 
 	throw std::runtime_error("Unable to calculate best sample rate");
@@ -934,7 +945,7 @@ size_t SignalGenerator::lcm(size_t a, size_t b)
 }
 
 size_t SignalGenerator::get_samples_count(const struct iio_device *dev,
-		unsigned long rate)
+		unsigned long rate, bool perfect)
 {
 	size_t max_buffer_size = 4 * 1024 * 1024 /
 		(size_t) iio_device_get_sample_size(dev);
@@ -952,6 +963,9 @@ size_t SignalGenerator::get_samples_count(const struct iio_device *dev,
 
 		switch (ptr->type) {
 		case SIGNAL_TYPE_WAVEFORM:
+			if (perfect && fmod((double) rate, ptr->frequency) != 0)
+				return 0;
+
 			ratio = rate / ptr->frequency;
 			if (ratio < 2)
 				return 0; /* rate too low */
@@ -959,6 +973,9 @@ size_t SignalGenerator::get_samples_count(const struct iio_device *dev,
 			size = lcm(size, ratio);
 			break;
 		case SIGNAL_TYPE_MATH:
+			if (perfect && fmod((double) rate, ptr->math_freq) != 0)
+				return 0;
+
 			ratio = rate / ptr->math_freq;
 			if (ratio < 2)
 				return 0; /* rate too low */
