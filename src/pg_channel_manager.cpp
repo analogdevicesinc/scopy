@@ -1089,7 +1089,7 @@ uint32_t PatternGeneratorChannelManager::computeSuggestedSampleRate()
 			auto patternSamplingFrequency = static_cast<PatternGeneratorChannelGroup *>
 			                                (chg)->pattern->get_min_sampling_freq();
 			//	uint32_t val = 80000000 / patternSamplingFrequency;
-
+			if(patternSamplingFrequency==0) continue;
 			sampleRate = boost::math::lcm(patternSamplingFrequency, sampleRate);
 			//sampleDivider = boost::math::gcd(sampleDivider,val);
 			qDebug()<<static_cast<PatternGeneratorChannelGroup *>
@@ -1122,6 +1122,7 @@ uint32_t PatternGeneratorChannelManager::computeSuggestedBufferSize(
 			auto patternBufferSize = static_cast<PatternGeneratorChannelGroup *>
 			                         (chg)->pattern->get_required_nr_of_samples(sample_rate,
 			                                         chg->get_channel_count());
+			if(patternBufferSize==0) continue;
 
 			if (static_cast<PatternGeneratorChannelGroup *>(chg)->pattern->is_periodic()) {
 				bufferSize = boost::math::lcm(patternBufferSize, bufferSize);
