@@ -94,7 +94,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	menuRunButton(runBtn),
 	ui(new Ui::LogicAnalyzer),
 	active_settings_btn(nullptr),
-	timespanLimitStream(1),
+	timespanLimitStream(11),
 	plotRefreshRate(100),
 	active_sampleRate(0.0),
 	active_sampleCount(0),
@@ -104,9 +104,12 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	value_cursor1(-0.033),
 	value_cursor2(0.033),
 	la_api(new LogicAnalyzer_API(this)),
-	initialised(false)
+	initialised(false),
+	timer(new QTimer(this)),
+	armed(false)
 {
 	ui->setupUi(this);
+	timer->setSingleShot(true);
 	this->setAttribute(Qt::WA_DeleteOnClose, true);
 	iio_context_set_timeout(ctx, UINT_MAX);
 
@@ -115,6 +118,10 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	symmBufferMode->setEntireBufferMaxSize(500000); // max 0.5 mega-samples
 	symmBufferMode->setTriggerBufferMaxSize(8192); // 8192 is what hardware supports
 	symmBufferMode->setTimeDivisionCount(10);
+
+	for(int i=0; i < get_no_channels(dev)+2; i++) {
+		trigger_cache.push_back(trigger_mapping[0]);
+	}
 
 	/* Time position widget */
 	this->d_bottomHandlesArea = new HorizHandlesArea(this);
@@ -306,6 +313,14 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 		this, SLOT(resizeEvent()));
 	connect(ui->btnResetInstrument, SIGNAL(clicked(bool)),
 		this, SLOT(resetInstrumentToDefault()));
+	connect(trigger_settings_ui->btnAuto, SIGNAL(toggled(bool)),
+		this, SLOT(setTimeout(bool)));
+	connect(this, SIGNAL(startRefill()),
+		this, SLOT(startTimeout()));
+	connect(this, SIGNAL(capturedSignal()),
+		this, SLOT(capturedSlot()));
+	connect(timer, &QTimer::timeout,
+		this, &LogicAnalyzer::triggerTimeout);
 
 	cleanHWParams();
 	chm_ui = new LogicAnalyzerChannelManagerUI(0, main_win, &chm, ui->colorSettings,
@@ -324,7 +339,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	connect(chm_ui, SIGNAL(widthChanged(int)),
 		this, SLOT(onChmWidthChanged(int)));
 
-	trigger_settings_ui->btnAuto->setDisabled(true);
+	trigger_settings_ui->btnAuto->setChecked(false);
 	trigger_settings_ui->btnNormal->setChecked(true);
 	main_win->view_->viewport()->setTimeTriggerPosActive(true);
 	ui->areaTimeTriggerLayout->addWidget(this->bottomHandlesArea(), 0, 1, 1, 3);
@@ -345,6 +360,9 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	main_win->view_->viewport()->setTimeTriggerSample(-active_triggerSampleCount);
 	setCursorsActive(false);
 
+	timer->setInterval(timer_timeout_ms);
+	QMetaObject::invokeMethod(timer, "start",Qt::QueuedConnection);
+
 	la_api->load();
 	la_api->js_register(engine);
 }
@@ -352,6 +370,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 LogicAnalyzer::~LogicAnalyzer()
 {
 //	delete chm_ui;
+	timer->stop();
 
 	la_api->save();
 	delete la_api;
@@ -408,14 +427,56 @@ double LogicAnalyzer::pickSampleRateFor(double timeSpanSecs, double desiredBuffe
 	return idealSamplerate;
 }
 
+void LogicAnalyzer::startTimeout()
+{
+	timer->setSingleShot(true);
+	timer->start(timer_timeout_ms);
+}
+
+void LogicAnalyzer::triggerTimeout()
+{
+	if(armed) {
+		armed = false;
+		autoCaptureEnable();
+		timer->setInterval(timer_timeout_ms);
+	}
+}
+
+void LogicAnalyzer::refilling()
+{
+	if(!timer->isActive())
+		Q_EMIT startRefill();
+}
+
+void LogicAnalyzer::captured()
+{
+	Q_EMIT capturedSignal();
+}
+
+void LogicAnalyzer::capturedSlot()
+{
+	if(timer->isActive()) {
+		timer->stop();
+	}
+	else {
+		armed = true;
+		autoCaptureEnable();
+	}
+}
+
 void LogicAnalyzer::set_triggered_status(std::string value)
 {
-	if( value == "awaiting" )
-		ui->triggerStateLabel->setText("Waiting");
-	else if(value == "running")
-		ui->triggerStateLabel->setText("Triggered");
-	else if(value == "stopped")
-		ui->triggerStateLabel->setText("Stop");
+	if(trigger_settings_ui->btnAuto->isChecked()) {
+		ui->triggerStateLabel->setText("Auto");
+	}
+	else {
+		if( value == "awaiting" )
+			ui->triggerStateLabel->setText("Waiting");
+		else if(value == "running")
+			ui->triggerStateLabel->setText("Triggered");
+		else if(value == "stopped")
+			ui->triggerStateLabel->setText("Stop");
+	}
 }
 
 void LogicAnalyzer::onHorizScaleValueChanged(double value)
@@ -429,6 +490,7 @@ void LogicAnalyzer::onHorizScaleValueChanged(double value)
 	active_plot_timebase = value;
 
 	double plotTimeSpan = value * 10; //Hdivision count
+	timer_timeout_ms = plotTimeSpan * 1000  + 100; //transfer time
 
 	custom_sampleCount = maxBuffersize / plotRefreshRate;
 
@@ -640,11 +702,20 @@ void LogicAnalyzer::startStop(bool start)
 		setTriggerDelay();
 		if (timePosition->value() != active_timePos)
 			timePosition->setValue(active_timePos);
+		if(!armed)
+			armed = true;
 	} else {
 		main_win->view_->viewport()->enableDrag();
 		running = false;
 		ui->btnRunStop->setText("Run");
 		ui->btnSingleRun->setEnabled(true);
+		if(timer->isActive()) {
+			timer->stop();
+		}
+		if(!armed && trigger_settings_ui->btnAuto->isChecked()) {
+			armed = true;
+			autoCaptureEnable();
+		}
 	}
 	main_win->run_stop();
 	setTriggerDelay();
@@ -756,7 +827,6 @@ void LogicAnalyzer::setHWTrigger(int chid, std::string trigger_val)
 		return;
 
 	iio_channel_attr_write(triggerch, "trigger", trigger_val.c_str());
-
 }
 
 std::string LogicAnalyzer::get_trigger_from_device(int chid)
@@ -850,6 +920,26 @@ void LogicAnalyzer::setupTriggerSettingsUI(bool enabled)
 		}
 		chm_ui->update_ui();
 	}
+}
+
+void LogicAnalyzer::autoCaptureEnable()
+{
+	if(armed) {
+		for(int i = 0; i < get_no_channels(dev) + 2; i++) {
+			setHWTrigger(i, trigger_cache[i]);
+		}
+	}
+	else {
+		for(int i = 0; i < get_no_channels(dev) + 2; i++) {
+			trigger_cache[i] = get_trigger_from_device(i);
+			setHWTrigger(i, trigger_mapping[0]);
+		}
+	}
+}
+
+void LogicAnalyzer::setTriggerCache(int chid, std::string trigger_value)
+{
+	trigger_cache[chid] = trigger_value;
 }
 
 void LogicAnalyzer::setExternalTrigger(int index)
@@ -982,6 +1072,11 @@ void LogicAnalyzer::resetInstrumentToDefault()
 	ui->boxCursors->setChecked(false);
 }
 
+void LogicAnalyzer::setTimeout(bool checked)
+{
+	logic_analyzer_ptr->set_timeout(checked);
+}
+
 QJsonValue LogicAnalyzer::chmToJson()
 {
 	QJsonObject obj;
@@ -1041,7 +1136,9 @@ void LogicAnalyzer::jsonToChm(QJsonObject obj)
 			auto ch = chRef.toObject();
 			int chIndex = ch["id"].toInt();
 			auto trigger = ch["trigger"].toString().toStdString();
+			trigger_cache[chIndex] = trigger;
 			chm.get_channel(chIndex)->setTrigger(trigger);
+
 			lachg->add_channel(chm.get_channel(chIndex));
 		}
 		if( lachg->is_grouped() ) {

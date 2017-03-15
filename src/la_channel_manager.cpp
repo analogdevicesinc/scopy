@@ -369,6 +369,7 @@ void LogicAnalyzerChannelUI::triggerChanged(int index)
 	{
 		chm_ui->chm->get_channel(get_channel()->get_id())->setTrigger(trigger_val);
 		chm_ui->la->setHWTrigger(get_channel()->get_id(), trigger_val);
+		chm_ui->la->setTriggerCache(get_channel()->get_id(), trigger_val);
 	}
 	Q_EMIT requestUpdateUI();
 }
@@ -1011,6 +1012,7 @@ void LogicAnalyzerChannelGroupUI::triggerChanged(int index)
 		{
 			chm_ui->chm->get_channel(ch->get_id())->setTrigger(trigger_val);
 			chm_ui->la->setHWTrigger(ch->get_id(), trigger_val);
+			chm_ui->la->setTriggerCache(ch->get_id(), trigger_val);
 		}
 	}
 	Q_EMIT requestUpdateUI();

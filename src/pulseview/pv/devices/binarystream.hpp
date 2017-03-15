@@ -77,6 +77,7 @@ public:
 
 	void set_single(bool);
 
+	void set_timeout(bool);
 private:
 	const std::shared_ptr<sigrok::Context> context_;
 	const std::shared_ptr<sigrok::InputFormat> format_;
@@ -91,6 +92,8 @@ private:
 	bool single_;
 	std::atomic<bool> running;
 	adiscope::LogicAnalyzer* la;
+	bool autoTrigger;
+	ssize_t nbytes_rx;
 };
 
 } // namespace devices

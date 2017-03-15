@@ -1,4 +1,4 @@
-/*
+ /*
  * Copyright 2016 Analog Devices, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -23,6 +23,7 @@
 /* Qt includes */
 #include <QWidget>
 #include <QPushButton>
+#include <QTimer>
 
 /* Local includes */
 #include "apiObject.hpp"
@@ -84,6 +85,10 @@ public:
 	void setHWTrigger(int chid, std::string trigger_val);
 	std::string get_trigger_from_device(int chid);
 	void set_triggered_status(std::string value);
+	void refilling();
+	void captured();
+	void setTriggerCache(int chid, std::string trigger_value);
+
 private Q_SLOTS:
 	void startStop(bool start);
 	void toggleRightMenu();
@@ -103,12 +108,19 @@ private Q_SLOTS:
 	void setCursorsActive(bool);
 	void resizeEvent();
 	void resetInstrumentToDefault();
+	void setTimeout(bool);
+	void triggerTimeout();
+	void startTimeout();
+	void capturedSlot();
 public Q_SLOTS:
 	void onTimeTriggerHandlePosChanged(int);
 	void onTimePositionSpinboxChanged(double value);
 	void refreshTriggerPos(int);
 	void onChmWidthChanged(int);
 	void triggerChanged(int);
+Q_SIGNALS:
+	void startRefill();
+	void capturedSignal();
 
 private:
 	Ui::LogicAnalyzer *ui;
@@ -119,6 +131,7 @@ private:
 	QPushButton *triggerBtn;
 
 	static std::vector<std::string> trigger_mapping;
+	std::vector<std::string> trigger_cache;
 
 	ScaleSpinButton *timeBase;
 	PositionSpinButton *timePosition;
@@ -206,6 +219,10 @@ private:
 
 	void recomputeCursorsValue(bool zoom);
 	bool initialised;
+	QTimer *timer;
+	int timer_timeout_ms;
+	std::atomic<bool> armed;
+	void autoCaptureEnable();
 };
 
 class LogicAnalyzer_API : public ApiObject

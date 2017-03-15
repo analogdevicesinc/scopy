@@ -44,7 +44,8 @@ BinaryStream::BinaryStream(const std::shared_ptr<sigrok::Context> &context,
 	buffersize_(buffersize),
 	single_(false),
 	running(false),
-	la(parent)
+	la(parent),
+	autoTrigger(false)
 {
 	/* 10 buffers, 10ms each -> 250ms before we lose data */
 	iio_device_set_kernel_buffers_count(dev_, 25);
@@ -112,15 +113,22 @@ void BinaryStream::run()
 	size_t nrx = 0;
 	input_->reset();
 	interrupt_ = false;
-	ssize_t nbytes_rx;
 	while (!interrupt_)
 	{
+		nbytes_rx = 0;
+		if(autoTrigger) {
+			la->refilling();
+		}
 		la->set_triggered_status("awaiting");
 		nbytes_rx = iio_buffer_refill(data_);
-		la->set_triggered_status("running");
 		nrx += nbytes_rx / 2;
-		if( nbytes_rx > 0 )
+		if( nbytes_rx > 0 ) {
+			la->set_triggered_status("running");
 			input_->send(iio_buffer_start(data_), (size_t)(nbytes_rx));
+			if(autoTrigger) {
+				la->captured();
+			}
+		}
 		if( single_ && running ) {
 			interrupt_ = true;
 			stop();
@@ -130,6 +138,11 @@ void BinaryStream::run()
 	input_->end();
 	interrupt_ = false;
 	single_ = false;
+}
+
+void BinaryStream::set_timeout(bool checked)
+{
+	autoTrigger = checked;
 }
 
 void BinaryStream::set_buffersize(size_t value)
