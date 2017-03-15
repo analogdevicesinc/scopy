@@ -33,7 +33,11 @@
     <number>10</number>
    </property>
    <item row="7" column="1">
-    <widget class="QLineEdit" name="LE_Data"/>
+    <widget class="QLineEdit" name="LE_Data">
+     <property name="maxLength">
+      <number>100</number>
+     </property>
+    </widget>
    </item>
    <item row="3" column="1">
     <widget class="QComboBox" name="CB_Stop">
