@@ -85,6 +85,8 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 
 	connect(this, SIGNAL(calibrationDone(float, float)),
 			this, SLOT(enableCalibTools(float, float)));
+	connect(this, SIGNAL(dacCalibrationDone(float, float)),
+			this, SLOT(enableDacBasedTools(float, float)));
 	connect(ui->btnAdd, SIGNAL(clicked()), this, SLOT(addRemoteContext()));
 
 	tl_api->load();
@@ -228,12 +230,12 @@ void adiscope::ToolLauncher::apply_m2k_fixes(struct iio_context *ctx)
 	struct iio_device *dev = iio_context_find_device(ctx, "ad9963");
 
 	/* Configure TX path */
-	iio_device_reg_write(dev, 0x68, 0x1B);
-	iio_device_reg_write(dev, 0x6B, 0x1B);
-	iio_device_reg_write(dev, 0x69, 0x0C);
-	iio_device_reg_write(dev, 0x6C, 0x0C);
-	iio_device_reg_write(dev, 0x6A, 0x27);
-	iio_device_reg_write(dev, 0x6D, 0x27);
+	iio_device_reg_write(dev, 0x68, 0x1B);  // IGAIN1 +-6db  0.25db steps
+	iio_device_reg_write(dev, 0x6B, 0x1B);  //
+	iio_device_reg_write(dev, 0x69, 0x1C);  // IGAIN2 +-2.5%
+	iio_device_reg_write(dev, 0x6C, 0x1C);
+	iio_device_reg_write(dev, 0x6A, 0x20);  // IRSET +-20%
+	iio_device_reg_write(dev, 0x6D, 0x20);
 }
 
 void adiscope::ToolLauncher::on_btnHome_clicked()
@@ -365,24 +367,24 @@ void adiscope::ToolLauncher::calibrate()
 {
 	auto old_dmm_text = ui->btnDMM->text();
 	auto old_osc_text = ui->btnOscilloscope->text();
+	auto old_siggen_text = ui->btnSignalGenerator->text();
 
 	ui->btnDMM->setText("Calibrating...");
 	ui->btnOscilloscope->setText("Calibrating...");
+	ui->btnSignalGenerator->setText("Calibrating...");
 
-	RxCalibration rxCalib(ctx);
+	Calibration calib(ctx);
 
-	rxCalib.initialize();
-	rxCalib.calibrateOffset();
-	rxCalib.calibrateGain();
-	rxCalib.restoreTriggerSetup();
-
-	float gain_ch1 = rxCalib.adcGainChannel0();
-	float gain_ch2 = rxCalib.adcGainChannel1();
+	calib.initialize();
+	calib.calibrateAll();
+	calib.restoreTriggerSetup();
 
 	ui->btnDMM->setText(old_dmm_text);
 	ui->btnOscilloscope->setText(old_osc_text);
+	ui->btnSignalGenerator->setText(old_siggen_text);
 
-	Q_EMIT calibrationDone(gain_ch1, gain_ch2);
+	Q_EMIT calibrationDone(calib.adcGainChannel0(), calib.adcGainChannel1());
+	Q_EMIT dacCalibrationDone(calib.dacAvlsb(), calib.dacBvlsb());
 }
 
 void adiscope::ToolLauncher::enableCalibTools(float gain_ch1, float gain_ch2)
@@ -403,6 +405,38 @@ void adiscope::ToolLauncher::enableCalibTools(float gain_ch1, float gain_ch2)
 	}
 }
 
+void adiscope::ToolLauncher::enableDacBasedTools(float dacA_vlsb,
+	float dacB_vlsb)
+{
+	if (filter->compatible(TOOL_SIGNAL_GENERATOR)) {
+		signal_generator = new SignalGenerator(ctx, filter,
+				ui->stopSignalGenerator, &js_engine, this);
+
+		struct iio_device *dev = iio_context_find_device(ctx, "m2k-dac-a");
+		if (dev) {
+			struct iio_channel *chn = iio_device_find_channel(dev,
+					"voltage0", true);
+			if (chn)
+				signal_generator->set_vlsb_of_channel(
+					iio_channel_get_id(chn),
+					iio_device_get_name(dev), dacA_vlsb);
+		}
+
+		dev = iio_context_find_device(ctx, "m2k-dac-b");
+		if (dev) {
+			struct iio_channel *chn = iio_device_find_channel(dev,
+					"voltage0", true);
+			if (chn)
+				signal_generator->set_vlsb_of_channel(
+					iio_channel_get_id(chn),
+					iio_device_get_name(dev), dacB_vlsb);
+		}
+
+		signal_generator->setVisible(false);
+		ui->signalGenerator->setEnabled(true);
+	}
+}
+
 bool adiscope::ToolLauncher::switchContext(const QString &uri)
 {
 	destroyContext();
@@ -418,13 +452,6 @@ bool adiscope::ToolLauncher::switchContext(const QString &uri)
 
 	if (filter->hw_name().compare("M2K") == 0)
 		apply_m2k_fixes(ctx);
-
-	if (filter->compatible(TOOL_SIGNAL_GENERATOR)) {
-		signal_generator = new SignalGenerator(ctx, filter,
-				ui->stopSignalGenerator, &js_engine, this);
-		signal_generator->setVisible(false);
-		ui->signalGenerator->setEnabled(true);
-	}
 
 
 	if (filter->compatible(TOOL_POWER_CONTROLLER)) {

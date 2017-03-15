@@ -41,6 +41,7 @@ extern "C" {
 	struct iio_buffer;
 	struct iio_context;
 	struct iio_device;
+	struct iio_channel;
 }
 
 namespace Ui {
@@ -74,6 +75,11 @@ namespace adiscope {
 				QJSEngine *engine, QWidget *parent = 0);
 		~SignalGenerator();
 
+		double vlsb_of_channel(const char *channel,
+			const char *dev_parent);
+		void set_vlsb_of_channel(const char *channel,
+			const char *dev_parent, double vlsb);
+
 		static const size_t min_buffer_size = 1024;
 
 		static QVector<unsigned long> get_available_sample_rates(
@@ -99,6 +105,7 @@ namespace adiscope {
 		ScaleSpinButton *amplitude, *frequency, *mathFrequency;
 
 		QVector<QPair<QWidget, Ui::Channel> *> channels;
+		QVector<QPair<struct iio_channel *, double>> channels_vlsb;
 
 		SignalGenerator_API *sg_api;
 

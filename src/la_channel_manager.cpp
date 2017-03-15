@@ -16,6 +16,7 @@
 #include <QScrollBar>
 #include <libsigrokcxx/libsigrokcxx.hpp>
 #include <QPainter>
+#include <QListView>
 
 using std::dynamic_pointer_cast;
 
@@ -96,6 +97,10 @@ LogicAnalyzerChannelUI::LogicAnalyzerChannelUI(LogicAnalyzerChannel *ch,
 			chm_ui->la->setHWTrigger(get_channel()->get_id(), trigger_val);
 		}
 	}
+
+	QAbstractItemView *trigVw = ui->comboBox->view();
+	QListView* listVw = qobject_cast<QListView*>(trigVw);
+	listVw->setSpacing(2);
 }
 
 LogicAnalyzerChannelUI::~LogicAnalyzerChannelUI()
@@ -620,6 +625,10 @@ LogicAnalyzerChannelGroupUI::LogicAnalyzerChannelGroupUI(
 
 	trace = nullptr;
 	decodeTrace = nullptr;
+
+	QAbstractItemView *trigVw = ui->comboBox->view();
+	QListView* listVw = qobject_cast<QListView*>(trigVw);
+	listVw->setSpacing(2);
 }
 
 LogicAnalyzerChannelGroupUI::~LogicAnalyzerChannelGroupUI()
