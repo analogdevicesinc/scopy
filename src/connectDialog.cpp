@@ -27,8 +27,9 @@
 using namespace adiscope;
 
 ConnectDialog::ConnectDialog(QWidget *widget) : QObject(widget),
-	ui(new Ui::Connect), connected(false)
+    ui(new Ui::Connect), connected(false), signalsBlocked(false)
 {
+    //returnBlocked == false => returnPressed() signal works , otherwise it's blocked
 	ui->setupUi(widget);
 	ui->connectBtn->setText("Connect");
     //We force the cursor on the line edit
@@ -36,7 +37,8 @@ ConnectDialog::ConnectDialog(QWidget *widget) : QObject(widget),
     //We direct the keyboard input to the line edit
     ui->hostname->grabKeyboard();
 
-	connect(ui->connectBtn, SIGNAL(clicked()), this, SLOT(btnClicked()));
+
+    connect(ui->connectBtn, SIGNAL(clicked()), this, SLOT(btnClicked()));
 	connect(ui->hostname, SIGNAL(returnPressed()),
 			this, SLOT(btnClicked()));
 	connect(ui->hostname, SIGNAL(textChanged(const QString&)),
@@ -51,11 +53,16 @@ ConnectDialog::~ConnectDialog()
 }
 
 void ConnectDialog::btnClicked()
-{
-	if (connected)
-		Q_EMIT newContext(uri);
-	else
-		validateInput();
+{   if (!signalsBlocked){
+        if (connected)
+            Q_EMIT newContext(uri);
+        else{
+            //
+            signalsBlocked = true;
+            validateInput();
+            //
+        }
+    }
 }
 
 void ConnectDialog::discardSettings()
@@ -64,8 +71,12 @@ void ConnectDialog::discardSettings()
 	setDynamicProperty(ui->connectBtn, "connected", false);
 	ui->connectBtn->setText("Connect");
 
-	ui->description->setPlainText(QString(""));
+    //when we discard the settings we unlock the signals
+    ui->groupBox->setTitle(QApplication::translate("Connect", "Context info", Q_NULLPTR));
+    ui->description->setPlainText(QString(""));
 	this->connected = false;
+
+    signalsBlocked = false;
 }
 
 void ConnectDialog::validateInput()
@@ -87,14 +98,17 @@ void ConnectDialog::validateInput()
 	} else {
 		setDynamicProperty(ui->connectBtn, "failed", true);
 		ui->connectBtn->setText("Failed!");
-        //
-        //ui->hostname->clear();
+        //Show a warning instead of a Context info when we can't connect
+        ui->groupBox->setTitle(QApplication::translate("Connect", "Warning", Q_NULLPTR));
+        ui->description->setPlainText("Unable to find host: No such host is known!");
 	}
 }
 
-//
- void ConnectDialog::forceFocus(QWidget *widget){
+//Method to focus on a widget
+void ConnectDialog::forceFocus(QWidget *widget){
      widget->activateWindow();
      QFocusEvent *eventFocus = new QFocusEvent(QEvent::FocusIn);
      qApp->postEvent(widget,(QEvent *)eventFocus,Qt::LowEventPriority);
- }
+}
+
+//
