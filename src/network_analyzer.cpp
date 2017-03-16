@@ -108,6 +108,8 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	net_api->load();
 	net_api->js_register(engine);
+
+	updateNumSamples();
 }
 
 NetworkAnalyzer::~NetworkAnalyzer()
