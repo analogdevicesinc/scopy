@@ -559,8 +559,6 @@ public:
 	void updateMetrics() const;
 	void invalidateTheCache();
 
-	virtual void draw( QPainter *, const QPalette & ) const;
-
 private:
 	unsigned int m_floatPrecision;
 	QString m_unit;
