@@ -274,6 +274,9 @@ QTabWidget#tabWidget QWidget QWidget {
                 <property name="yaxis_title" stdset="0">
                  <string>Phase (°)</string>
                 </property>
+                <property name="yunit" stdset="0">
+                 <string>°</string>
+                </property>
                </widget>
               </item>
              </layout>
