@@ -471,11 +471,15 @@ double NetworkAnalyzer_API::getOffset() const
 void NetworkAnalyzer_API::setMinFreq(double freq)
 {
 	net->ui->minFreq->setValue(freq);
+	net->ui->dbgraph->setXMin(freq);
+	net->ui->phasegraph->setXMin(freq);
 }
 
 void NetworkAnalyzer_API::setMaxFreq(double freq)
 {
 	net->ui->maxFreq->setValue(freq);
+	net->ui->dbgraph->setXMax(freq);
+	net->ui->phasegraph->setXMax(freq);
 }
 
 void NetworkAnalyzer_API::setStepSize(double step)
@@ -516,19 +520,23 @@ double NetworkAnalyzer_API::getMaxPhase() const
 void NetworkAnalyzer_API::setMinMag(double val)
 {
 	net->ui->magMin->setValue(val);
+	net->ui->dbgraph->setYMin(val);
 }
 
 void NetworkAnalyzer_API::setMaxMag(double val)
 {
 	net->ui->magMax->setValue(val);
+	net->ui->dbgraph->setYMax(val);
 }
 
 void NetworkAnalyzer_API::setMinPhase(double val)
 {
 	net->ui->phaseMin->setValue(val);
+	net->ui->phasegraph->setYMin(val);
 }
 
 void NetworkAnalyzer_API::setMaxPhase(double val)
 {
 	net->ui->phaseMax->setValue(val);
+	net->ui->phasegraph->setYMax(val);
 }
