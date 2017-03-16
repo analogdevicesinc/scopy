@@ -26,6 +26,9 @@
 #include "customFifo.hpp"
 
 namespace adiscope {
+	class OscScaleDraw;
+	class PrefixFormatter;
+
 	class dBgraph : public QwtPlot
 	{
 		Q_OBJECT
@@ -80,6 +83,9 @@ namespace adiscope {
 		unsigned int numSamples;
 		double xmin, xmax, ymin, ymax;
 		QColor color;
+
+		OscScaleDraw *draw_x, *draw_y;
+		PrefixFormatter *formatter;
 
 		CustomFifo<double> xdata, ydata;
 	};

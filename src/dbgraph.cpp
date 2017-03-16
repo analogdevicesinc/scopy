@@ -18,6 +18,7 @@
  */
 
 #include "dbgraph.hpp"
+#include "DisplayPlot.h"
 
 #include <qwt_plot_layout.h>
 
@@ -36,10 +37,21 @@ dBgraph::dBgraph(QWidget *parent) : QwtPlot(parent),
 
 	curve.attach(this);
 	curve.setXAxis(QwtPlot::xTop);
+
+	formatter = static_cast<PrefixFormatter *>(new MetricPrefixFormatter);
+
+	draw_x = new OscScaleDraw(formatter, "Hz");
+	draw_x->setFloatPrecision(2);
+	setAxisScaleDraw(QwtPlot::xTop, draw_x);
+
+	draw_y = new OscScaleDraw("dB");
+	draw_y->setFloatPrecision(0);
+	setAxisScaleDraw(QwtPlot::yLeft, draw_y);
 }
 
 dBgraph::~dBgraph()
 {
+	delete formatter;
 }
 
 void dBgraph::setAxesScales(double xmin, double xmax, double ymin, double ymax)
@@ -123,6 +135,7 @@ void dBgraph::setXMin(double val)
 {
 	setAxisScale(QwtPlot::xTop, val, xmax);
 	xmin = val;
+	draw_x->updateMetrics();
 	replot();
 }
 
@@ -130,6 +143,7 @@ void dBgraph::setXMax(double val)
 {
 	setAxisScale(QwtPlot::xTop, xmin, val);
 	xmax = val;
+	draw_x->updateMetrics();
 	replot();
 }
 
