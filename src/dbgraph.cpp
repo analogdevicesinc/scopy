@@ -160,3 +160,23 @@ void dBgraph::setYMax(double val)
 	ymax = val;
 	replot();
 }
+
+QString dBgraph::xUnit() const
+{
+	return draw_x->getUnitType();
+}
+
+QString dBgraph::yUnit() const
+{
+	return draw_y->getUnitType();
+}
+
+void dBgraph::setXUnit(const QString& unit)
+{
+	draw_x->setUnitType(unit);
+}
+
+void dBgraph::setYUnit(const QString& unit)
+{
+	draw_y->setUnitType(unit);
+}

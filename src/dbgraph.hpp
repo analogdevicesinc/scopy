@@ -51,6 +51,9 @@ namespace adiscope {
 		Q_PROPERTY(double ymin MEMBER ymin WRITE setYMin);
 		Q_PROPERTY(double ymax MEMBER ymax WRITE setYMax);
 
+		Q_PROPERTY(QString xunit READ xUnit WRITE setXUnit);
+		Q_PROPERTY(QString yunit READ yUnit WRITE setYUnit);
+
 	public:
 		explicit dBgraph(QWidget *parent = nullptr);
 		~dBgraph();
@@ -77,6 +80,11 @@ namespace adiscope {
 		void setXMax(double val);
 		void setYMin(double val);
 		void setYMax(double val);
+
+		QString xUnit() const;
+		QString yUnit() const;
+		void setXUnit(const QString& unit);
+		void setYUnit(const QString& unit);
 
 	private:
 		QwtPlotCurve curve;
