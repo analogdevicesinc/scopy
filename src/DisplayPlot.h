@@ -546,15 +546,15 @@ private:
 class OscScaleDraw: public QwtScaleDraw
 {
 public:
-	OscScaleDraw();
-	OscScaleDraw(PrefixFormatter *, QString);
+	OscScaleDraw(const QString& unit_type = "");
+	OscScaleDraw(PrefixFormatter *, const QString&);
 	QwtText label( double ) const;
 
 	void setFloatPrecision(unsigned int numDigits);
 	unsigned int getFloatPrecison();
 
-	void setUnitType(QString unit);
-	QString getUnitType();
+	void setUnitType(const QString& unit);
+	QString getUnitType() const;
 
 	void updateMetrics() const;
 	void invalidateTheCache();

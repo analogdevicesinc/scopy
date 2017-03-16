@@ -41,27 +41,24 @@ using namespace adiscope;
  * OscScaleDraw class implementation
  */
 
-OscScaleDraw::OscScaleDraw():
+OscScaleDraw::OscScaleDraw(const QString &unit) : QwtScaleDraw(),
 	m_floatPrecision(3),
-	m_unit(""),
+	m_unit(unit),
 	m_metricPrefix(""),
 	m_magnitude(1.0),
 	m_formatter(NULL)
 {
 }
 
-OscScaleDraw::OscScaleDraw(PrefixFormatter *formatter, QString unitType):
-	m_floatPrecision(3),
-	m_unit(unitType),
-	m_metricPrefix(""),
-	m_magnitude(1.0),
-	m_formatter(formatter)
+OscScaleDraw::OscScaleDraw(PrefixFormatter *formatter, const QString& unit) :
+	OscScaleDraw(unit)
 {
-	if (unitType.isEmpty())
-		if (formatter) {
-			double tmp;
-			formatter->getFormatAttributes(1.0, m_metricPrefix, tmp);
-		}
+	m_formatter = formatter;
+
+	if (unit.isEmpty() && formatter) {
+		double tmp;
+		formatter->getFormatAttributes(1.0, m_metricPrefix, tmp);
+	}
 }
 
 void OscScaleDraw::setFloatPrecision(unsigned int numDigits)
@@ -74,7 +71,7 @@ unsigned int OscScaleDraw::getFloatPrecison()
 	return m_floatPrecision;
 }
 
-void OscScaleDraw::setUnitType(QString unit)
+void OscScaleDraw::setUnitType(const QString& unit)
 {
 	if (m_unit != unit) {
 		m_unit = unit;
@@ -84,7 +81,7 @@ void OscScaleDraw::setUnitType(QString unit)
 	}
 }
 
-QString OscScaleDraw::getUnitType()
+QString OscScaleDraw::getUnitType() const
 {
 	return m_unit;
 }
