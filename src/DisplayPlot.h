@@ -556,8 +556,7 @@ public:
 	void setUnitType(const QString& unit);
 	QString getUnitType() const;
 
-	void updateMetrics() const;
-	void invalidateTheCache();
+	void updateMetrics();
 
 private:
 	unsigned int m_floatPrecision;

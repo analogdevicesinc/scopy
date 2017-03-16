@@ -93,7 +93,7 @@ QwtText OscScaleDraw::label( double value ) const
 	return QLocale().toString( value / m_magnitude , 'f', m_floatPrecision) + ' ' + m_metricPrefix + m_unit;
 }
 
-void OscScaleDraw::updateMetrics() const
+void OscScaleDraw::updateMetrics()
 {
 	const QwtScaleDiv scDiv = scaleDiv();
 	double lower = fabs(scDiv.lowerBound());
@@ -102,10 +102,7 @@ void OscScaleDraw::updateMetrics() const
 
 	if (m_formatter)
 		m_formatter->getFormatAttributes(max, m_metricPrefix, m_magnitude);
-}
 
-void OscScaleDraw::invalidateTheCache()
-{
 	invalidateCache();
 }
 
@@ -1073,7 +1070,6 @@ void DisplayPlot::_onXbottomAxisWidgetScaleDivChanged()
 
 	if (scale_draw) {
 		scale_draw->updateMetrics();
-		scale_draw->invalidateTheCache();
 		axis_widget->update();
 	}
 }
@@ -1085,7 +1081,6 @@ void DisplayPlot::_onYleftAxisWidgetScaleDivChanged()
 
 	if (scale_draw) {
 		scale_draw->updateMetrics();
-		scale_draw->invalidateTheCache();
 		axis_widget->update();
 	}
 }
