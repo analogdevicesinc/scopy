@@ -125,6 +125,7 @@ void BinaryStream::run()
 		if( nbytes_rx > 0 ) {
 			la->set_triggered_status("running");
 			input_->send(iio_buffer_start(data_), (size_t)(nbytes_rx));
+			input_->end();
 			if(autoTrigger) {
 				la->captured();
 			}

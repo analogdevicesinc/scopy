@@ -655,19 +655,7 @@ void Session::feed_in_logic(shared_ptr<Logic> logic)
 		frame_began();
 	} else {
 		// Append to the existing data segment
-		if( buffersize_ != 0 )
-		{
-			if( timeSpan >= timespanLimitStream)
-			{
-				cur_logic_segment_->append_payload(logic);
-			}
-			else {
-				cur_logic_segment_->add_payload(logic, buffersize_);
-			}
-		}
-		else {
-			cur_logic_segment_->append_payload(logic);
-		}
+		cur_logic_segment_->append_payload(logic);
 	}
 
 	data_received();
