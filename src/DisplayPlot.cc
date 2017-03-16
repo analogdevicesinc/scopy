@@ -48,6 +48,8 @@ OscScaleDraw::OscScaleDraw(const QString &unit) : QwtScaleDraw(),
 	m_magnitude(1.0),
 	m_formatter(NULL)
 {
+	enableComponent(QwtAbstractScaleDraw::Backbone, false);
+	enableComponent(QwtAbstractScaleDraw::Ticks, false);
 }
 
 OscScaleDraw::OscScaleDraw(PrefixFormatter *formatter, const QString& unit) :
@@ -168,16 +170,6 @@ void OscScaleDraw::draw(QPainter *painter , const QPalette& palette) const
 	painter->restore();
 }
 
-void OscScaleDraw::drawBackbone(QPainter *) const
-{
-	// Skip drawing the baseline of the scale
-}
-
-void OscScaleDraw::drawTick(QPainter *, double, double) const
-{
-	// Skip drawing the tikcs
-}
-
 void OscScaleDraw::updateMetrics() const
 {
 	const QwtScaleDiv scDiv = scaleDiv();
@@ -202,17 +194,13 @@ void OscScaleDraw::invalidateTheCache()
 
 PlotItemScaleDraw::PlotItemScaleDraw(): QwtScaleDraw()
 {
+	enableComponent(QwtAbstractScaleDraw::Backbone, false);
 }
 
 QwtText PlotItemScaleDraw::label(double) const
 {
 	// Skip drawing tick labels
 	return QwtText("");
-}
-
-void PlotItemScaleDraw::drawBackbone( QPainter * ) const
-{
-	// Skip drawing the baseline of the scale
 }
 
 /*

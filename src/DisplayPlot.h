@@ -560,8 +560,6 @@ public:
 	void invalidateTheCache();
 
 	virtual void draw( QPainter *, const QPalette & ) const;
-	void drawBackbone( QPainter * ) const;
-	void drawTick(QPainter *, double val, double len) const;
 
 private:
 	unsigned int m_floatPrecision;
@@ -580,7 +578,6 @@ class PlotItemScaleDraw: public QwtScaleDraw
 public:
 
 	PlotItemScaleDraw();
-	void drawBackbone( QPainter * ) const;
 	QwtText label(double) const;
 };
 
