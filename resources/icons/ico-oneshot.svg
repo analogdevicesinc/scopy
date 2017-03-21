@@ -1,12 +1,1 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg width="10px" height="10px" viewBox="0 0 10 10" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <!-- Generator: Sketch 41.1 (35376) - http://www.bohemiancoding.com/sketch -->
-    <title>ico_play_copy_14-2 copy</title>
-    <desc>Created with Sketch.</desc>
-    <defs></defs>
-    <g id="main" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="states-HD" transform="translate(-1852.000000, -315.000000)" fill="#FFFFFF">
-            <path d="M1860,320 L1852,315 L1852,325 L1860,320 L1860,320 Z M1860,315 L1862,315 L1862,325 L1860,325 L1860,315 L1860,315 Z" id="ico_play_copy_14-2-copy"></path>
-        </g>
-    </g>
-</svg>
+<svg height="10" viewBox="0 0 10 10" width="10" xmlns="http://www.w3.org/2000/svg"><path d="m1860 320-8-5v10zm0-5h2v10h-2z" fill="#fff" fill-rule="evenodd" transform="translate(-1852 -315)"/></svg>

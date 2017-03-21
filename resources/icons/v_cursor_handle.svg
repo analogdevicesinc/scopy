@@ -1,16 +1,1 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg width="30px" height="40px" viewBox="0 0 30 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <!-- Generator: Sketch 39.1 (31720) - http://www.bohemiancoding.com/sketch -->
-    <title>Group 2</title>
-    <desc>Created with Sketch.</desc>
-    <defs></defs>
-    <g id="main" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="cursors-HD" transform="translate(-1540.000000, -630.000000)">
-            <g id="Group-2" transform="translate(1540.000000, 630.000000)">
-                <rect id="Rounded_Rectangle_1_copy_12-Copy-2" fill="#9B9B9B" x="0" y="0" width="30" height="40" rx="4"></rect>
-                <polygon id="Rectangle_6_copy_12-3-Copy-2" fill="#141416" points="20 25 15 29.99 10 25 11 24 15 28 19 24"></polygon>
-                <polygon id="Rectangle_6_copy_12-4-Copy-2" fill="#141416" points="10 14.99 15 10 20 14.99 19 15.99 15 11.99 11 15.99"></polygon>
-            </g>
-        </g>
-    </g>
-</svg>
+<svg height="40" viewBox="0 0 30 40" width="30" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd" transform=""><rect fill="#9b9b9b" height="40" rx="4" width="30"/><path d="m20 25-5 4.99-5-4.99 1-1 4 4 4-4z" fill="#141416"/><path d="m10 14.99 5-4.99 5 4.99-1 1-4-4-4 4z" fill="#141416"/></g></svg>
