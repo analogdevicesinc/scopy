@@ -299,7 +299,7 @@ QTabWidget#tabWidget QWidget QWidget {
                <number>0</number>
               </property>
               <item>
-               <widget class="adiscope::dBgraph" name="xygraph">
+               <widget class="adiscope::NyquistGraph" name="xygraph">
                 <property name="frameShape">
                  <enum>QFrame::StyledPanel</enum>
                 </property>
@@ -313,17 +313,32 @@ QTabWidget#tabWidget QWidget QWidget {
                   <blue>0</blue>
                  </color>
                 </property>
-                <property name="xmin" stdset="0">
-                 <double>-20.000000000000000</double>
+                <property name="bg_color" stdset="0">
+                 <color>
+                  <red>39</red>
+                  <green>39</green>
+                  <blue>48</blue>
+                 </color>
                 </property>
-                <property name="xmax" stdset="0">
-                 <double>20.000000000000000</double>
+                <property name="min" stdset="0">
+                 <double>-80.000000000000000</double>
                 </property>
-                <property name="ymin" stdset="0">
-                 <double>-20.000000000000000</double>
+                <property name="max" stdset="0">
+                 <double>0.000000000000000</double>
                 </property>
-                <property name="ymax" stdset="0">
-                 <double>20.000000000000000</double>
+                <property name="font_azimuth" stdset="0">
+                 <font>
+                  <family>DejaVu Sans</family>
+                  <pointsize>16</pointsize>
+                  <weight>75</weight>
+                  <bold>true</bold>
+                 </font>
+                </property>
+                <property name="font_radius" stdset="0">
+                 <font>
+                  <family>DejaVu Sans</family>
+                  <pointsize>14</pointsize>
+                 </font>
                 </property>
                </widget>
               </item>
@@ -711,6 +726,12 @@ QTabWidget#tabWidget QWidget QWidget {
    <header>spinbox_a.hpp</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>adiscope::NyquistGraph</class>
+   <extends>QFrame</extends>
+   <header>nyquistGraph.hpp</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
  <resources>
   <include location="../resources/resources.qrc"/>
@@ -953,6 +974,38 @@ QTabWidget#tabWidget QWidget QWidget {
     <hint type="destinationlabel">
      <x>460</x>
      <y>519</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>magMin</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>xygraph</receiver>
+   <slot>setMin(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1111</x>
+     <y>317</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>460</x>
+     <y>386</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>magMax</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>xygraph</receiver>
+   <slot>setMax(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>995</x>
+     <y>317</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>460</x>
+     <y>386</y>
     </hint>
    </hints>
   </connection>

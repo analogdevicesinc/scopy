@@ -92,6 +92,12 @@ set(VC_PATH "$ENV{VS120COMNTOOLS}/../../VC")
 find_library(IIO_LIBRARIES NAMES iio libiio PATHS ${VC_PATH}/lib ${VC_PATH}/lib/amd64)
 find_path(IIO_INCLUDE_DIRS iio.h PATHS ${VC_PATH}/include)
 
+find_library(QWTPOLAR_LIBRARIES qwtpolar)
+find_path(QWTPOLAR_INCLUDE_DIRS qwt_polar_plot.h)
+if (NOT QWTPOLAR_LIBRARIES OR NOT QWTPOLAR_INCLUDE_DIRS)
+	message(SEND_ERROR "QwtPolar not found")
+endif()
+
 find_package(PkgConfig)
 pkg_check_modules(GLIB REQUIRED glib-2.0)
 pkg_check_modules(GLIBMM REQUIRED glibmm-2.4)
@@ -108,6 +114,7 @@ include_directories(
 	${Qt5Qml_INCLUDE_DIRS}
 	${Qt5UiTools_INCLUDE_DIRS}
 	${QWT_INCLUDE_DIRS}
+	${QWTPOLAR_INCLUDE_DIRS}
 	${Qt5Svg_INCLUDE_DIRS}
 	${IIO_INCLUDE_DIRS}
 	${LIBSIGROK_DECODE_INCLUDE_DIRS}
@@ -222,6 +229,7 @@ target_link_libraries(${PROJECT_NAME} LINK_PRIVATE
 		${GNURADIO_ALL_LIBRARIES}
 		${Boost_LIBRARIES}
 		${QWT_LIBRARIES}
+		${QWTPOLAR_LIBRARIES}
 		${Qt5Svg_LIBRARIES}
 		${IIO_LIBRARIES}
 		${LIBSIGROK_LIBRARIES}

@@ -306,9 +306,6 @@ void NetworkAnalyzer::run()
 
 		double phase_deg = phase * 180.0 / M_PI;
 
-		double point_x = mag * cos(phase);
-		double point_y = mag * sin(phase);
-
 		QMetaObject::invokeMethod(ui->dbgraph,
 				 "plot",
 				 Qt::QueuedConnection,
@@ -324,8 +321,8 @@ void NetworkAnalyzer::run()
 		QMetaObject::invokeMethod(ui->xygraph,
 				"plot",
 				Qt::QueuedConnection,
-				Q_ARG(double, point_x),
-				Q_ARG(double, point_y));
+				Q_ARG(double, phase_deg),
+				Q_ARG(double, mag));
 	}
 
 	Q_EMIT sweepDone();
@@ -523,12 +520,14 @@ void NetworkAnalyzer_API::setMinMag(double val)
 {
 	net->ui->magMin->setValue(val);
 	net->ui->dbgraph->setYMin(val);
+	net->ui->xygraph->setMin(val);
 }
 
 void NetworkAnalyzer_API::setMaxMag(double val)
 {
 	net->ui->magMax->setValue(val);
 	net->ui->dbgraph->setYMax(val);
+	net->ui->xygraph->setMax(val);
 }
 
 void NetworkAnalyzer_API::setMinPhase(double val)
