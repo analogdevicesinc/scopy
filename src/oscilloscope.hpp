@@ -335,7 +335,7 @@ namespace adiscope {
 
 	public:
 		explicit Oscilloscope_API(Oscilloscope *osc) :
-			ApiObject(TOOL_OSCILLOSCOPE), osc(osc) {}
+			ApiObject(), osc(osc) {}
 		~Oscilloscope_API() {}
 
 		QVariantList getChannels();
@@ -424,7 +424,7 @@ namespace adiscope {
 
 	public:
 		explicit Channel_API(Oscilloscope *osc) :
-			ApiObject(TOOL_OSCILLOSCOPE), osc(osc) {}
+			ApiObject(), osc(osc) {}
 		~Channel_API() {}
 
 		bool channelEn() const;

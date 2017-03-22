@@ -210,7 +210,7 @@ namespace adiscope {
 		void setMathFunction(const QList<QString>& list);
 
 		explicit SignalGenerator_API(SignalGenerator *gen) :
-			ApiObject(TOOL_SIGNAL_GENERATOR), gen(gen) {}
+			ApiObject(), gen(gen) {}
 		~SignalGenerator_API() {}
 
 	private:

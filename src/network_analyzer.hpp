@@ -115,7 +115,7 @@ namespace adiscope {
 
 	public:
 		explicit NetworkAnalyzer_API(NetworkAnalyzer *net) :
-			ApiObject(TOOL_NETWORK_ANALYZER), net(net) {}
+			ApiObject(), net(net) {}
 		~NetworkAnalyzer_API() {}
 
 		double getMinFreq() const;

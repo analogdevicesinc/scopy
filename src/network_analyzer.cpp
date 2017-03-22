@@ -106,6 +106,8 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	connect(ui->stepSize, SIGNAL(valueChanged(double)),
 			this, SLOT(updateNumSamples()));
 
+	net_api->setObjectName(QString::fromStdString(Filter::tool_name(
+			TOOL_NETWORK_ANALYZER)));
 	net_api->load();
 	net_api->js_register(engine);
 

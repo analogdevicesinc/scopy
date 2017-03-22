@@ -229,6 +229,8 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 
 	ui->plot->addWidget(plot, 0, 0);
 
+	sg_api->setObjectName(QString::fromStdString(Filter::tool_name(
+			TOOL_SIGNAL_GENERATOR)));
 	sg_api->load();
 	sg_api->js_register(engine);
 

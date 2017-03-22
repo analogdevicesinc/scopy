@@ -19,6 +19,7 @@
 
 #include "dynamicWidget.hpp"
 #include "power_controller.hpp"
+#include "filter.hpp"
 
 #include "ui_powercontrol.h"
 
@@ -73,6 +74,8 @@ PowerController::PowerController(struct iio_context *ctx,
 
 	connect(runButton, SIGNAL(clicked(bool)), this, SLOT(startStop(bool)));
 
+	pw_api->setObjectName(QString::fromStdString(Filter::tool_name(
+			TOOL_POWER_CONTROLLER)));
 	pw_api->load();
 	pw_api->js_register(engine);
 }

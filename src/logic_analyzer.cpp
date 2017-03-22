@@ -389,6 +389,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	timer->setInterval(timer_timeout_ms);
 	QMetaObject::invokeMethod(timer, "start",Qt::QueuedConnection);
 
+	la_api->setObjectName(QString::fromStdString(Filter::tool_name(
+			TOOL_LOGIC_ANALYZER)));
 	la_api->load();
 	la_api->js_register(engine);
 

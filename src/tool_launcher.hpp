@@ -148,8 +148,7 @@ class ToolLauncher_API: public ApiObject
 	Q_PROPERTY(bool maximized READ maximized WRITE setMaximized);
 
 public:
-	explicit ToolLauncher_API(ToolLauncher *tl) :
-		ApiObject(TOOL_LAUNCHER), tl(tl) {}
+	explicit ToolLauncher_API(ToolLauncher *tl) : ApiObject(), tl(tl) {}
 	~ToolLauncher_API() {}
 
 	bool menu_opened() const;

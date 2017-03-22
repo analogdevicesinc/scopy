@@ -251,7 +251,7 @@ class LogicAnalyzer_API : public ApiObject
 
 public:
 	explicit LogicAnalyzer_API(LogicAnalyzer *lga) :
-		ApiObject(TOOL_LOGIC_ANALYZER), lga(lga) {}
+		ApiObject(), lga(lga) {}
 	~LogicAnalyzer_API() {}
 
 	bool running() const;

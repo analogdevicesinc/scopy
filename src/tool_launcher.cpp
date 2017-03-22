@@ -98,6 +98,8 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 		this, SLOT(enableDacBasedTools(float, float)));
 	connect(ui->btnAdd, SIGNAL(clicked()), this, SLOT(addRemoteContext()));
 
+	tl_api->setObjectName(QString::fromStdString(Filter::tool_name(
+			TOOL_LAUNCHER)));
 	tl_api->load();
 
 	/* Show a smooth opening when the app starts */

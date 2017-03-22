@@ -129,7 +129,7 @@ namespace adiscope {
 		bool running() const;
 		void run(bool en);
 
-		explicit DMM_API(DMM *dmm) : ApiObject(TOOL_DMM), dmm(dmm) {}
+		explicit DMM_API(DMM *dmm) : ApiObject(), dmm(dmm) {}
 		~DMM_API() {}
 
 	private:

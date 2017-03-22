@@ -169,6 +169,8 @@ DigitalIO::DigitalIO(struct iio_context *ctx, Filter *filt, QPushButton *runBtn,
 	connect(ui->pushButton_2,SIGNAL(clicked()),this,SLOT(rightMenuToggle()));
 	connect(poll,SIGNAL(timeout()),this,SLOT(updateUi()));
 
+	dio_api->setObjectName(QString::fromStdString(Filter::tool_name(
+			TOOL_DIGITALIO)));
 	dio_api->load();
 	dio_api->js_register(engine);
 

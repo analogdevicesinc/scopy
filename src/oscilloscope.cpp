@@ -538,6 +538,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	}
 	current_channel = crt_chn_copy;
 
+	osc_api->setObjectName(QString::fromStdString(Filter::tool_name(
+			TOOL_OSCILLOSCOPE)));
 	osc_api->load();
 	osc_api->js_register(engine);
 }

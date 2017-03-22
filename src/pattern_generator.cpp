@@ -226,6 +226,8 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 
 	//main_win->view_->viewport()->disableDrag();
 
+	pg_api->setObjectName(QString::fromStdString(Filter::tool_name(
+			TOOL_PATTERN_GENERATOR)));
 	pg_api->load();
 	pg_api->js_register(engine);
 

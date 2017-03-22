@@ -143,8 +143,7 @@ class DigitalIO_API : public ApiObject
 
 
 public:
-	explicit DigitalIO_API(DigitalIO *dio) :
-		ApiObject(TOOL_DIGITALIO), dio(dio) {}
+	explicit DigitalIO_API(DigitalIO *dio) : ApiObject(), dio(dio) {}
 	~DigitalIO_API() {}
 
 	QList<bool> direction() const;

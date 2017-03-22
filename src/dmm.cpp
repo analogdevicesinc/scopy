@@ -79,6 +79,8 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, QPushButton *runButton,
 	if (started)
 		manager->unlock();
 
+	dmm_api->setObjectName(QString::fromStdString(Filter::tool_name(
+			TOOL_DMM)));
 	dmm_api->load();
 	dmm_api->js_register(engine);
 }
