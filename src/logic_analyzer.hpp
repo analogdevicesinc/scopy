@@ -38,6 +38,7 @@
 #include "plot_line_handle.h"
 #include "spinbox_a.hpp"
 #include "la_capture_params.hpp"
+#include "buffer_previewer.hpp"
 
 using namespace pv;
 using namespace pv::toolbars;
@@ -118,6 +119,7 @@ public Q_SLOTS:
 	void refreshTriggerPos(int);
 	void onChmWidthChanged(int);
 	void triggerChanged(int);
+	void updateBufferPreviewer();
 Q_SIGNALS:
 	void startRefill();
 	void capturedSignal();
@@ -153,9 +155,12 @@ private:
 	static const unsigned long maxSampleRate;
 	static const unsigned long maxTriggerBufferSize;
 	double active_sampleRate;
+	double active_hw_sampleRate;
 	unsigned long active_sampleCount;
+	unsigned long last_set_sample_count;
 	unsigned long custom_sampleCount;
 	long long active_triggerSampleCount;
+	long long active_hw_trigger_sample_count;
 	double active_timePos;
 	double pickSampleRateFor(double timeSpanSecs,
 		double desiredBufferSize);
@@ -223,6 +228,8 @@ private:
 	int timer_timeout_ms;
 	std::atomic<bool> armed;
 	void autoCaptureEnable();
+
+	DigitalBufferPreviewer *buffer_previewer;
 };
 
 class LogicAnalyzer_API : public ApiObject

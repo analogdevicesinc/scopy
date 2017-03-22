@@ -98,8 +98,10 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	timespanLimitStream(11),
 	plotRefreshRate(100),
 	active_sampleRate(0.0),
+	active_hw_sampleRate(0.0),
 	active_sampleCount(0),
 	active_triggerSampleCount(0),
+	active_hw_trigger_sample_count(0),
 	active_timePos(0),
 	trigger_settings(new QWidget(this)),
 	value_cursor1(-0.033),
@@ -119,6 +121,27 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	symmBufferMode->setEntireBufferMaxSize(500000); // max 0.5 mega-samples
 	symmBufferMode->setTriggerBufferMaxSize(8192); // 8192 is what hardware supports
 	symmBufferMode->setTimeDivisionCount(10);
+
+	/* Buffer Previewer widget */
+	buffer_previewer = new DigitalBufferPreviewer(40);
+
+	buffer_previewer->setVerticalSpacing(6);
+	buffer_previewer->setMinimumHeight(20);
+	buffer_previewer->setMaximumHeight(20);
+	buffer_previewer->setMinimumWidth(460);
+	buffer_previewer->setMaximumWidth(460);
+	buffer_previewer->setHighlightBgColor(QColor("#141416"));
+	buffer_previewer->setHighlightFgColor(QColor("#ff7200"));
+	buffer_previewer->setCursorColor(QColor("#4A64FF"));
+	QString stylesheet = "adiscope--BufferPreviewer {"
+			"background-color: #272730;"
+			"color: #ffffff;"
+			"border: 1px solid #7092be;"
+		"}";
+	buffer_previewer->setStyleSheet(stylesheet);
+	ui->vLayoutBufferSlot->addWidget(buffer_previewer);
+
+	buffer_previewer->setCursorPos(0.5);
 
 	for(int i=0; i < get_no_channels(dev)+2; i++) {
 		trigger_cache.push_back(trigger_mapping[0]);
@@ -319,6 +342,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 		this, SLOT(capturedSlot()));
 	connect(timer, &QTimer::timeout,
 		this, &LogicAnalyzer::triggerTimeout);
+	connect(main_win->view_, SIGNAL(data_received()),
+		this, SLOT(updateBufferPreviewer()));
 
 	cleanHWParams();
 	chm_ui = new LogicAnalyzerChannelManagerUI(0, main_win, &chm, ui->colorSettings,
@@ -346,6 +371,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 
 	ensurePolished();
 	main_win->view_->viewport()->ensurePolished();
+	last_set_sample_count = 0;
 	timeBase->setValue(1e-3);
 	setTimebaseLabel(timeBase->value());
 	onHorizScaleValueChanged(timeBase->value());
@@ -381,6 +407,8 @@ LogicAnalyzer::~LogicAnalyzer()
 
 void LogicAnalyzer::resizeEvent()
 {
+	buffer_previewer->setMaximumWidth(main_win->view_->width());
+
 	if(!initialised) {
 		updateAreaTimeTriggerPadding();
 		timePosition->setValue(0);
@@ -507,6 +535,7 @@ void LogicAnalyzer::onHorizScaleValueChanged(double value)
 
 	if( running )
 	{
+		last_set_sample_count = active_sampleCount;
 		setSampleRate();
 		setBuffersizeLabelValue(active_sampleCount);
 		setSamplerateLabelValue(active_sampleRate);
@@ -526,6 +555,7 @@ void LogicAnalyzer::onHorizScaleValueChanged(double value)
 	// Change the sensitivity of time position control
 	timePosition->setStep(value / 10);
 	recomputeCursorsValue(true);
+	updateBufferPreviewer();
 }
 
 void LogicAnalyzer::enableTrigger(bool value)
@@ -550,6 +580,7 @@ void LogicAnalyzer::setSampleRate()
 
 	/* Set IIO device parameters */
 	iio_device_attr_write_longlong(dev, "sampling_frequency", active_sampleRate);
+	active_hw_sampleRate = active_sampleRate;
 }
 
 void LogicAnalyzer::updateBuffersizeSamplerateLabel(int samples, double samplerate)
@@ -613,6 +644,7 @@ void LogicAnalyzer::onRulerChanged(double ruler_value, bool silent)
 	d_timeTriggerHandle->setPositionSilenty(trigX);
 	main_win->view_->viewport()->setTimeTriggerPixel(trigX);
 	main_win->view_->time_item_appearance_changed(true, true);
+	updateBufferPreviewer();
 }
 
 QWidget* LogicAnalyzer::bottomHandlesArea()
@@ -635,8 +667,14 @@ void LogicAnalyzer::onTimePositionSpinboxChanged(double value)
 	active_timePos = -params.timePos;
 
 	int pix = timeToPixel(-value);
+	if( logic_analyzer_ptr )
+	{
+		logic_analyzer_ptr->set_buffersize(active_sampleCount);
+		main_win->session_.set_buffersize(active_sampleCount);
+	}
 	if( running )
 	{
+		last_set_sample_count = active_sampleCount;
 		setSampleRate();
 		setHWTriggerDelay(active_triggerSampleCount);
 		setBuffersizeLabelValue(active_sampleCount);
@@ -648,6 +686,7 @@ void LogicAnalyzer::onTimePositionSpinboxChanged(double value)
 	main_win->view_->viewport()->setTimeTriggerPixel(trigX);
 	main_win->view_->time_item_appearance_changed(true, true);
 	recomputeCursorsValue(false);
+	updateBufferPreviewer();
 }
 
 void LogicAnalyzer::onTimeTriggerHandlePosChanged(int pos)
@@ -687,6 +726,7 @@ int LogicAnalyzer::timeToPixel(double time)
 void LogicAnalyzer::startStop(bool start)
 {
 	if (start) {
+		last_set_sample_count = active_sampleCount;
 		if(main_win->view_->scale() != timeBase->value())
 			Q_EMIT timeBase->valueChanged(timeBase->value());
 		main_win->view_->viewport()->disableDrag();
@@ -716,7 +756,7 @@ void LogicAnalyzer::startStop(bool start)
 		}
 	}
 	main_win->run_stop();
-	setTriggerDelay();
+//	setTriggerDelay();
 }
 
 void LogicAnalyzer::setTriggerDelay(bool silent)
@@ -736,6 +776,7 @@ void LogicAnalyzer::setHWTriggerDelay(long long delay)
 	QString s = QString::number(delay);
 	iio_channel_attr_write(triggerch, "trigger_delay",
 		s.toLocal8Bit().QByteArray::constData());
+	active_hw_trigger_sample_count = delay;
 }
 
 void LogicAnalyzer::singleRun()
@@ -745,6 +786,7 @@ void LogicAnalyzer::singleRun()
 		startStop(false);
 		ui->btnRunStop->setChecked(false);
 	}
+	last_set_sample_count = active_sampleCount;
 	if(main_win->view_->scale() != timeBase->value())
 		Q_EMIT timeBase->valueChanged(timeBase->value());
 	running = true;
@@ -757,7 +799,7 @@ void LogicAnalyzer::singleRun()
 		timePosition->setValue(active_timePos);
 	logic_analyzer_ptr->set_single(true);
 	main_win->run_stop();
-	setTriggerDelay();
+//	setTriggerDelay();
 	running = false;
 }
 
@@ -900,6 +942,57 @@ void LogicAnalyzer::setHWTriggerLogic(const QString value)
 	QString s = value.toLower();
 	iio_channel_attr_write(triggerch, "trigger_logic_mode",
 		s.toLocal8Bit().QByteArray::constData());
+}
+
+void LogicAnalyzer::updateBufferPreviewer()
+{
+	// Time interval within the plot canvas
+	double plotMin = -(active_plot_timebase * 10 / 2 - active_timePos);
+	double plotMax = (active_plot_timebase * 10 / 2 + active_timePos);
+
+	// Time interval that represents the captured data
+	double dataMin = 0;
+	double dataMax = 0;
+	long long triggerSamples = active_hw_trigger_sample_count;
+	long long totalSamples = last_set_sample_count;
+
+	if(totalSamples > 0) {
+		dataMin = triggerSamples / active_hw_sampleRate;
+		dataMax = (triggerSamples + totalSamples) / active_hw_sampleRate;
+	}
+
+	double fullMin, fullMax;
+	if( plotMin < dataMin)
+		fullMin = plotMin;
+	else
+		fullMin = dataMin;
+	if( plotMax > dataMax)
+		fullMax = plotMax;
+	else
+		fullMax = dataMax;
+
+	double wPos = 1 - (fullMax - dataMin) / (fullMax - fullMin);
+	double wWidth = (dataMax - dataMin) / (fullMax - fullMin);
+
+	double hPos = 1 - (fullMax - plotMin) / (fullMax - fullMin);
+	double hWidth = (plotMax - plotMin) / (fullMax - fullMin);
+
+	double containerMin = (totalSamples > 0) ? dataMin : fullMin;
+	double containerMax = (totalSamples > 0) ? dataMax : fullMax;
+	double containerWidth = (totalSamples > 0) ? wWidth : 1;
+	double containerPos = (totalSamples > 0) ? wPos : 0;
+
+	double cPosInContainer = 1 - (containerMax - 0) /
+		(containerMax - containerMin);
+	double cPos = cPosInContainer * containerWidth + containerPos;
+
+	// Update the widget
+	buffer_previewer->setWaveformWidth(wWidth);
+	buffer_previewer->setWaveformPos(wPos);
+	buffer_previewer->setHighlightWidth(hWidth);
+	buffer_previewer->setHighlightPos(hPos);
+	buffer_previewer->setCursorPos(cPos);
+
 }
 
 void LogicAnalyzer::setupTriggerSettingsUI(bool enabled)

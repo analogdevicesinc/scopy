@@ -257,6 +257,8 @@ Q_SIGNALS:
 
 	void resized();
 
+	void data_received();
+
 public Q_SLOTS:
 	void trigger_event(util::Timestamp location);
 

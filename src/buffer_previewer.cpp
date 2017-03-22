@@ -282,3 +282,35 @@ void AnalogBufferPreviewer::buildFullWaveform(QPointF *wavePoints, int numPts)
 		wavePoints[i] = QPointF(i, y);
 	}
 }
+
+/*
+ * Class DigitalBufferPreviewer implementation
+ */
+
+DigitalBufferPreviewer::DigitalBufferPreviewer(QWidget *parent):
+	BufferPreviewer(parent)
+{
+}
+
+DigitalBufferPreviewer::DigitalBufferPreviewer(int pixelsPerPeriod,
+	QWidget *parent):
+	BufferPreviewer(pixelsPerPeriod, M_PI / 2, parent)
+{
+}
+
+void DigitalBufferPreviewer::buildFullWaveform(QPointF *wavePoints, int numPts)
+{
+	int middle = contentsRect().height() / 2;
+	int amplitude = middle - verticalSpacing() / 2;
+
+	for (int i = 0; i < numPts; i++) {
+		qreal y = middle + amplitude * qSin(2 * M_PI * i /
+			pixelsPerPeriod() + wavePhase());
+		if(y > middle)
+			y = verticalSpacing() / 2;
+		else
+			y = contentsRect().height() - verticalSpacing() / 2;
+		wavePoints[i] = QPointF(i, y);
+	}
+}
+

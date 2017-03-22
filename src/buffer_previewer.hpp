@@ -92,6 +92,16 @@ protected:
 	virtual void buildFullWaveform(QPointF *wavePoints, int numPts);
 };
 
+class DigitalBufferPreviewer: public BufferPreviewer
+{
+public:
+	explicit DigitalBufferPreviewer(QWidget *parent = 0);
+	explicit DigitalBufferPreviewer(int pixelsPerPeriod, QWidget *parent = 0);
+
+protected:
+	virtual void buildFullWaveform(QPointF *wavePoints, int numPts);
+};
+
 } // namespace adiscope
 
 #endif // BUFFER_PREVIEWER_H
