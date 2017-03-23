@@ -68,6 +68,7 @@ namespace Ui {
 namespace adiscope {
 	class CustomPushButton;
 	class Oscilloscope_API;
+	class Channel_API;
 	class MeasurementData;
 	class MeasurementGui;
 	class MeasureSettings;
@@ -77,6 +78,7 @@ namespace adiscope {
 	class Oscilloscope : public QWidget
 	{
 		friend class Oscilloscope_API;
+		friend class Channel_API;
 
 		Q_OBJECT
 
@@ -237,6 +239,7 @@ namespace adiscope {
 		QPushButton *menuRunButton;
 
 		Oscilloscope_API *osc_api;
+		QList<Channel_API *> channels_api;
 
 		QList<std::shared_ptr<MeasurementData>> measurements_data;
 		QList<std::shared_ptr<MeasurementGui>> measurements_gui;
@@ -280,6 +283,8 @@ namespace adiscope {
 	{
 		Q_OBJECT
 
+		Q_PROPERTY(QVariantList channels READ getChannels);
+
 		Q_PROPERTY(bool running READ running WRITE run STORED false);
 
 		Q_PROPERTY(bool cursors READ hasCursors WRITE setCursors);
@@ -315,12 +320,6 @@ namespace adiscope {
 				READ getMathChannels WRITE setMathChannels
 				SCRIPTABLE false /* too complex for now */);
 
-		Q_PROPERTY(QList<double> volts_per_div
-				READ getVoltsPerDiv WRITE setVoltsPerDiv);
-
-		Q_PROPERTY(QList<double> v_offset
-				READ getVOffset WRITE setVOffset);
-
 		Q_PROPERTY(double time_position
 				READ getTimePos WRITE setTimePos);
 		Q_PROPERTY(double time_base READ getTimeBase WRITE setTimeBase);
@@ -331,12 +330,6 @@ namespace adiscope {
 		Q_PROPERTY(QList<int> statistic_en
 				READ statisticEn WRITE setStatisticEn)
 
-		Q_PROPERTY(QList<double> line_thickness
-				READ getLineThickness WRITE setLineThickness);
-
-		Q_PROPERTY(QList<bool> channel_en
-				READ channelEn WRITE setChannelEn);
-
 		Q_PROPERTY(int current_channel READ getCurrentChannel
 				WRITE setCurrentChannel)
 
@@ -344,6 +337,8 @@ namespace adiscope {
 		explicit Oscilloscope_API(Oscilloscope *osc) :
 			ApiObject(TOOL_OSCILLOSCOPE), osc(osc) {}
 		~Oscilloscope_API() {}
+
+		QVariantList getChannels();
 
 		bool running() const;
 		void run(bool en);
@@ -390,12 +385,6 @@ namespace adiscope {
 		QList<double> getTriggerLevel() const;
 		void setTriggerLevel(const QList<double>& list);
 
-		QList<double> getVoltsPerDiv() const;
-		void setVoltsPerDiv(const QList<double>& list);
-
-		QList<double> getVOffset() const;
-		void setVOffset(const QList<double>& list);
-
 		QList<QString> getMathChannels() const;
 		void setMathChannels(const QList<QString>& list);
 
@@ -411,14 +400,44 @@ namespace adiscope {
 		QList<int> statisticEn() const;
 		void setStatisticEn(const QList<int>& list);
 
-		QList<double> getLineThickness() const;
-		void setLineThickness(const QList<double>& list);
-
-		QList<bool> channelEn() const;
-		void setChannelEn(const QList<bool>& list);
-
 		int getCurrentChannel() const;
 		void setCurrentChannel(int chn_id);
+
+	private:
+		Oscilloscope *osc;
+	};
+
+	class Channel_API : public ApiObject
+	{
+		Q_OBJECT
+
+		Q_PROPERTY(bool enabled READ channelEn WRITE setChannelEn)
+
+		Q_PROPERTY(double volts_per_div
+				READ getVoltsPerDiv WRITE setVoltsPerDiv)
+
+		Q_PROPERTY(double v_offset READ getVOffset WRITE setVOffset)
+
+		Q_PROPERTY(double line_thickness
+				READ getLineThickness WRITE setLineThickness)
+
+
+	public:
+		explicit Channel_API(Oscilloscope *osc) :
+			ApiObject(TOOL_OSCILLOSCOPE), osc(osc) {}
+		~Channel_API() {}
+
+		bool channelEn() const;
+		void setChannelEn(bool en);
+
+		double getVoltsPerDiv() const;
+		void setVoltsPerDiv(double val);
+
+		double getVOffset() const;
+		void setVOffset(double val);
+
+		double getLineThickness() const;
+		void setLineThickness(double val);
 
 	private:
 		Oscilloscope *osc;
