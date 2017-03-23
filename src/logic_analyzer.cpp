@@ -128,8 +128,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	buffer_previewer->setVerticalSpacing(6);
 	buffer_previewer->setMinimumHeight(20);
 	buffer_previewer->setMaximumHeight(20);
-	buffer_previewer->setMinimumWidth(460);
-	buffer_previewer->setMaximumWidth(460);
+	buffer_previewer->setMinimumWidth(380);
+	buffer_previewer->setMaximumWidth(380);
 	buffer_previewer->setHighlightBgColor(QColor("#141416"));
 	buffer_previewer->setHighlightFgColor(QColor("#ff7200"));
 	buffer_previewer->setCursorColor(QColor("#4A64FF"));
@@ -407,8 +407,6 @@ LogicAnalyzer::~LogicAnalyzer()
 
 void LogicAnalyzer::resizeEvent()
 {
-	buffer_previewer->setMaximumWidth(main_win->view_->width());
-
 	if(!initialised) {
 		updateAreaTimeTriggerPadding();
 		timePosition->setValue(0);

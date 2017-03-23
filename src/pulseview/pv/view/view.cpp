@@ -1249,12 +1249,17 @@ void View::set_offset(double timePos, double timeSpan, bool running)
 			start_plot_offset_ = value;
 			Q_EMIT offset_changed();
 		}
+		if(value > 0 ){
+			start_plot_offset_ = 0;
+			set_scale_offset(scale_, Timestamp(0));
+		}
 
 	}
 	else
 	{
 		ruler_->set_offset(value);
 		set_scale_offset(scale_, plot_offset);
+
 	}
 }
 

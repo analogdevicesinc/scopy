@@ -237,7 +237,7 @@ void Viewport::paintEvent(QPaintEvent*)
 	for (const shared_ptr<TimeItem> t : time_items)
 		t->paint_fore(p, pp);
 
-	if( timeTriggerActive ){
+	if( timeTriggerActive && view_.ruler_->get_offset() <= 0){
 		paint_time_trigger_line(p, pp, timeTriggerSample);
 	}
 

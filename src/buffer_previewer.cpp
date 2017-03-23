@@ -300,16 +300,15 @@ DigitalBufferPreviewer::DigitalBufferPreviewer(int pixelsPerPeriod,
 
 void DigitalBufferPreviewer::buildFullWaveform(QPointF *wavePoints, int numPts)
 {
-	int middle = contentsRect().height() / 2;
-	int amplitude = middle - verticalSpacing() / 2;
-
 	for (int i = 0; i < numPts; i++) {
-		qreal y = middle + amplitude * qSin(2 * M_PI * i /
-			pixelsPerPeriod() + wavePhase());
-		if(y > middle)
-			y = verticalSpacing() / 2;
-		else
+		qreal y;
+		int pos = i % pixelsPerPeriod();
+		if( pos < pixelsPerPeriod() / 2) {
 			y = contentsRect().height() - verticalSpacing() / 2;
+		}
+		else {
+			y = verticalSpacing() / 2;
+		}
 		wavePoints[i] = QPointF(i, y);
 	}
 }
