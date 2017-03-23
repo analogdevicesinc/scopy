@@ -133,6 +133,7 @@ void NetworkAnalyzer::updateNumSamples()
 	ui->dbgraph->setNumSamples(num_samples);
 	ui->phasegraph->setNumSamples(num_samples);
 	ui->xygraph->setNumSamples(num_samples);
+	ui->nicholsgraph->setNumSamples(num_samples);
 }
 
 void NetworkAnalyzer::run()
@@ -323,6 +324,12 @@ void NetworkAnalyzer::run()
 				Qt::QueuedConnection,
 				Q_ARG(double, phase_deg),
 				Q_ARG(double, mag));
+
+		QMetaObject::invokeMethod(ui->nicholsgraph,
+				 "plot",
+				 Qt::QueuedConnection,
+				 Q_ARG(double, phase_deg),
+				 Q_ARG(double, mag));
 	}
 
 	Q_EMIT sweepDone();
@@ -336,6 +343,7 @@ void NetworkAnalyzer::startStop(bool pressed)
 		ui->dbgraph->reset();
 		ui->phasegraph->reset();
 		ui->xygraph->reset();
+		ui->nicholsgraph->reset();
 		thd = QtConcurrent::run(this, &NetworkAnalyzer::run);
 	} else {
 		thd.waitForFinished();
@@ -521,6 +529,7 @@ void NetworkAnalyzer_API::setMinMag(double val)
 	net->ui->magMin->setValue(val);
 	net->ui->dbgraph->setYMin(val);
 	net->ui->xygraph->setMin(val);
+	net->ui->nicholsgraph->setYMin(val);
 }
 
 void NetworkAnalyzer_API::setMaxMag(double val)
@@ -528,16 +537,19 @@ void NetworkAnalyzer_API::setMaxMag(double val)
 	net->ui->magMax->setValue(val);
 	net->ui->dbgraph->setYMax(val);
 	net->ui->xygraph->setMax(val);
+	net->ui->nicholsgraph->setYMax(val);
 }
 
 void NetworkAnalyzer_API::setMinPhase(double val)
 {
 	net->ui->phaseMin->setValue(val);
 	net->ui->phasegraph->setYMin(val);
+	net->ui->nicholsgraph->setXMin(val);
 }
 
 void NetworkAnalyzer_API::setMaxPhase(double val)
 {
 	net->ui->phaseMax->setValue(val);
 	net->ui->phasegraph->setYMax(val);
+	net->ui->nicholsgraph->setXMax(val);
 }

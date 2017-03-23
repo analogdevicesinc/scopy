@@ -348,6 +348,46 @@ QTabWidget#tabWidget QWidget QWidget {
              <attribute name="title">
               <string>Nichols</string>
              </attribute>
+             <layout class="QVBoxLayout" name="verticalLayout_7">
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="adiscope::dBgraph" name="nicholsgraph">
+                <property name="frameShape">
+                 <enum>QFrame::StyledPanel</enum>
+                </property>
+                <property name="frameShadow">
+                 <enum>QFrame::Raised</enum>
+                </property>
+                <property name="color" stdset="0">
+                 <color>
+                  <red>255</red>
+                  <green>114</green>
+                  <blue>0</blue>
+                 </color>
+                </property>
+                <property name="xaxis_title" stdset="0">
+                 <string>Phase (°)</string>
+                </property>
+                <property name="yaxis_title" stdset="0">
+                 <string>Magnitude (dB)</string>
+                </property>
+                <property name="xunit" stdset="0">
+                 <string>°</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </widget>
            </widget>
           </item>
@@ -1002,6 +1042,70 @@ QTabWidget#tabWidget QWidget QWidget {
     <hint type="sourcelabel">
      <x>995</x>
      <y>317</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>460</x>
+     <y>386</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>magMin</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>nicholsgraph</receiver>
+   <slot>setYMin(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1111</x>
+     <y>317</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>460</x>
+     <y>386</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>magMax</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>nicholsgraph</receiver>
+   <slot>setYMax(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>995</x>
+     <y>317</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>460</x>
+     <y>386</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>phaseMin</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>nicholsgraph</receiver>
+   <slot>setXMin(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1111</x>
+     <y>323</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>460</x>
+     <y>386</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>phaseMax</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>nicholsgraph</receiver>
+   <slot>setXMax(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>995</x>
+     <y>323</y>
     </hint>
     <hint type="destinationlabel">
      <x>460</x>
