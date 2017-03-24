@@ -39,7 +39,8 @@ LogicAnalyzerChannel::LogicAnalyzerChannel(uint16_t id_,
                 std::string label_) :
 	Channel(id_,label_),
 	channel_role(nullptr),
-	trigger("none")
+	trigger("none"),
+	ch_thickness(1.0)
 {
 }
 
@@ -51,6 +52,16 @@ std::string LogicAnalyzerChannel::getTrigger() const
 void LogicAnalyzerChannel::setTrigger(const std::string& value)
 {
 	trigger = value;
+}
+
+qreal LogicAnalyzerChannel::getCh_thickness() const
+{
+	return ch_thickness;
+}
+
+void LogicAnalyzerChannel::setCh_thickness(qreal value)
+{
+	ch_thickness = value;
 }
 
 const srd_channel *LogicAnalyzerChannel::getChannel_role()
@@ -509,6 +520,7 @@ LogicAnalyzerChannelGroup::LogicAnalyzerChannelGroup(LogicAnalyzerChannel *ch):
 	collapsed = false;
 	decoder = nullptr;
 	channels_ = std::map<const srd_channel*, uint16_t>();
+	ch_thickness = 1.0;
 }
 
 LogicAnalyzerChannelGroup::LogicAnalyzerChannelGroup():
@@ -527,6 +539,16 @@ const srd_channel* LogicAnalyzerChannelGroup::findByValue(uint16_t ch_id)
 			return it.first;
 	}
 	return nullptr;
+}
+
+qreal LogicAnalyzerChannelGroup::getCh_thickness() const
+{
+	return ch_thickness;
+}
+
+void LogicAnalyzerChannelGroup::setCh_thickness(qreal value)
+{
+	ch_thickness = value;
 }
 
 void LogicAnalyzerChannelGroup::setChannelForDecoder(const srd_channel* ch,
@@ -1798,6 +1820,37 @@ void LogicAnalyzerChannelManagerUI::rolesChangedRHS(const QString text)
 	}
 }
 
+void LogicAnalyzerChannelManagerUI::chThicknessChanged(QString text)
+{
+	bool ok;
+	double value = text.toDouble(&ok);
+	if( !ok )
+		return;
+	auto chg = chm->getHighlightedChannelGroup();
+	auto ch = chm->getHighlightedChannel();
+
+	auto chgui = getUiFromChGroup(chg);
+	auto chui = getUiFromCh(ch);
+
+	if( chg) {
+		chg->setCh_thickness(value);
+		if(chg->is_grouped()) {
+			for(LogicAnalyzerChannelUI* c : chgui->ch_ui){
+				c->getChannel()->setCh_thickness(value);
+				c->getTrace()->setCh_thickness(value);
+			}
+		}
+		else {
+			chgui->getTrace()->setCh_thickness(value);
+		}
+	}
+	else {
+		ch->setCh_thickness(value);
+		chui->getTrace()->setCh_thickness(value);
+	}
+	main_win->view_->time_item_appearance_changed(false, true);
+}
+
 
 void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 {
@@ -1814,11 +1867,15 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 		this, SLOT(highlightNext()));
 	connect(settingsUI->btnPrevious, SIGNAL(pressed()),
 		this, SLOT(highlightPrevious()));
+	connect(generalSettingsUi->cmbThickness, SIGNAL(currentTextChanged(QString)),
+		this, SLOT(chThicknessChanged(QString)));
 
 	if (chm->getHighlightedChannelGroup()) {
 		LogicAnalyzerChannelGroup *chGroup = chm->getHighlightedChannelGroup();
 		settingsUI->nameLineEdit->setText(QString::fromStdString(chGroup->get_label()));
 		generalSettingsUi->nameLineEdit->setText(QString::fromStdString(chGroup->get_label()));
+		QString ch_thickness = QString::number(chGroup->getCh_thickness());
+		generalSettingsUi->cmbThickness->setCurrentText(ch_thickness);
 		connect(generalSettingsUi->nameLineEdit, &QLineEdit::editingFinished,
 			[=]() {
 				QString text = generalSettingsUi->nameLineEdit->text();
@@ -1935,6 +1992,9 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 		LogicAnalyzerChannel *ch = chm->getHighlightedChannel();
 		settingsUI->nameLineEdit->setText(QString::fromStdString(ch->get_label()));
 		generalSettingsUi->nameLineEdit->setText(QString::fromStdString(ch->get_label()));
+		QString ch_thickness = QString::number(ch->getCh_thickness());
+		generalSettingsUi->cmbThickness->setCurrentText(ch_thickness);
+
 		connect(generalSettingsUi->nameLineEdit, &QLineEdit::editingFinished,
 			[=]() {
 			QString text = generalSettingsUi->nameLineEdit->text();

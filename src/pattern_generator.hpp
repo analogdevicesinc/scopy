@@ -166,6 +166,7 @@ private Q_SLOTS:
 	void patternChanged(int index);
 	void configureAutoSet();
 	void changeName(QString name);
+	void changeChannelThickness(QString);
 	void pushButtonLeft();
 	void pushButtonRight();
 	void updateSampleRate();

@@ -130,6 +130,8 @@ public:
 	virtual void setSignal_height(int height);
 	virtual int getSignal_height();
 
+	virtual qreal getCh_thickness() const;
+	virtual void setCh_thickness(qreal value);
 
 protected:
 	TraceTreeItemOwner *owner_;
@@ -139,6 +141,7 @@ protected:
 
 	bool bgcolour_state_;
 	bool highlight_;
+	qreal ch_thickness;
 
 private:
 	QPropertyAnimation v_offset_animation_;

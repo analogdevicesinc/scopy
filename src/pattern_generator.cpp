@@ -173,6 +173,8 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 	        SLOT(changeName(QString)));
 	connect(cgSettings->PBLeft,SIGNAL(pressed()),this,SLOT(pushButtonLeft()));
 	connect(cgSettings->PBRight,SIGNAL(pressed()),this,SLOT(pushButtonRight()));
+	connect(cgSettings->cmb_thickness, SIGNAL(currentTextChanged(QString)),
+		this, SLOT(changeChannelThickness(QString)));
 
 	connect(chmui,SIGNAL(channelsChanged()),bufui,SLOT(updateUi()));
 	connect(ui->btnRunStop, SIGNAL(toggled(bool)), this, SLOT(startStop(bool)));
@@ -282,15 +284,18 @@ void PatternGenerator::updateCGSettings()
 
 	QString title;
 	QString name;
+	qreal thickness;
 
 	if (ch==nullptr) {
 		name = QString::fromStdString(chg->get_label());
 		title = name;
+		thickness = chg->getCh_thickness();
 
 	} else {
 		name = QString::fromStdString(ch->get_label());
 		auto id = QString::number(ch->get_id());
 		title = "Channel " + id;
+		thickness = ch->getCh_thickness();
 	}
 
 	auto pattern = QString::fromStdString(chg->pattern->get_name());
@@ -299,6 +304,8 @@ void PatternGenerator::updateCGSettings()
 	cgSettings->CBPattern->setCurrentText(pattern);
 	cgSettings->LECHLabel->setText(name);
 	cgSettings->LPattern->setText(pattern);
+	cgSettings->cmb_thickness->setCurrentText(QString::number(thickness));
+
 	deleteSettingsWidget();
 	createSettingsWidget();
 }
@@ -337,6 +344,34 @@ void PatternGenerator::createSettingsWidget()
 	currentUI->setVisible(true);
 
 	connect(currentUI,SIGNAL(patternChanged()),bufui,SLOT(updateUi()));
+}
+
+void PatternGenerator::changeChannelThickness(QString text)
+{
+	bool ok;
+	double value = text.toDouble(&ok);
+	if( !ok )
+		return;
+
+	auto chg = chm.getHighlightedChannelGroup();
+	auto ch = chm.getHighlightedChannel();
+
+	auto chgui = chmui->findUiByChannelGroup(chg);
+	auto chui = chmui->findUiByChannel(ch);
+
+	if (ch==nullptr) {
+		chg->setCh_thickness(value);
+		if(chg->is_grouped()) {
+			for(auto c : chgui->ch_ui)
+				c->updateTrace();
+		}
+		else {
+			chgui->updateTrace();
+		}
+	} else {
+		ch->setCh_thickness(value);
+		chui->updateTrace();
+	}
 }
 
 void PatternGenerator::changeName(QString name)

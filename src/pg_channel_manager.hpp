@@ -50,6 +50,11 @@ public:
 	void setChannel_role(const std::string& value);
 	std::string getTrigger() const;
 	void setTrigger(const std::string& value);
+	qreal getCh_thickness() const;
+	void setCh_thickness(const qreal value);
+
+private:
+	qreal ch_thickness;
 };
 
 class PatternGeneratorChannelUI : public ChannelUI
@@ -117,6 +122,11 @@ public:
 	bool isCollapsed();
 	void collapse(bool val);
 	void append(PatternGeneratorChannelGroup *tojoin);
+	qreal getCh_thickness() const;
+	void setCh_thickness(const qreal value);
+
+private:
+	qreal ch_thickness;
 };
 
 class PatternGeneratorChannelGroupUI : public ChannelGroupUI

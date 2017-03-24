@@ -32,7 +32,8 @@ TraceTreeItem::TraceTreeItem() :
 	layout_v_offset_(0),
 	visual_v_offset_(0),
 	v_offset_animation_(this, "visual_v_offset"),
-	highlight_(false)
+	highlight_(false),
+	ch_thickness(1.0)
 {
 }
 
@@ -163,6 +164,16 @@ void TraceTreeItem::setSignal_height(int height)
 int TraceTreeItem::getSignal_height()
 {
 	return signal_height_;
+}
+
+qreal TraceTreeItem::getCh_thickness() const
+{
+	return ch_thickness;
+}
+
+void TraceTreeItem::setCh_thickness(qreal value)
+{
+	ch_thickness = value;
 }
 
 

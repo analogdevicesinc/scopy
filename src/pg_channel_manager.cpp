@@ -40,7 +40,8 @@ namespace adiscope {
 //////////////////////// CHANNEL
 PatternGeneratorChannel::PatternGeneratorChannel(uint16_t id_,
                 std::string label_) : Channel(id_,label_), channel_role("None"),
-	trigger("rising")
+	trigger("rising"),
+	ch_thickness(1.0)
 {
 
 }
@@ -52,6 +53,16 @@ std::string PatternGeneratorChannel::getTrigger() const
 void PatternGeneratorChannel::setTrigger(const std::string& value)
 {
 	trigger = value;
+}
+
+qreal PatternGeneratorChannel::getCh_thickness() const
+{
+	return ch_thickness;
+}
+
+void PatternGeneratorChannel::setCh_thickness(const qreal value)
+{
+	ch_thickness = value;
 }
 
 std::string PatternGeneratorChannel::getChannel_role() const
@@ -315,6 +326,11 @@ void PatternGeneratorChannelUI::updateTrace()
 		trace->set_highlight(highlighted);
 	}
 
+	if(ch->getCh_thickness() != trace->getCh_thickness()) {
+		trace->setCh_thickness(ch->getCh_thickness());
+		getManagerUi()->main_win->view_->time_item_appearance_changed(false, true);
+	}
+
 	auto height = geometry().height();
 	auto v_offset = topSep->geometry().bottomRight().y() + 3 + height -
 	                (trace->v_extents().second) + chgui->getTraceOffset()+3;//chgOffset.y();
@@ -361,6 +377,7 @@ PatternGeneratorChannelGroup::PatternGeneratorChannelGroup(
 	collapsed = false;
 	enabled = false;
 	pattern=PatternFactory::create(0);
+	ch_thickness = 1.0;
 }
 
 PatternGeneratorChannelGroup::~PatternGeneratorChannelGroup()
@@ -391,6 +408,21 @@ void PatternGeneratorChannelGroup::append(PatternGeneratorChannelGroup *tojoin)
 {
 	for (auto i=0; i<tojoin->channels.size(); i++) {
 		channels.push_back(tojoin->channels[i]);
+	}
+}
+
+qreal PatternGeneratorChannelGroup::getCh_thickness() const
+{
+	return ch_thickness;
+}
+
+void PatternGeneratorChannelGroup::setCh_thickness(const qreal value)
+{
+	ch_thickness = value;
+	if(is_grouped()) {
+		for(int i=0; i<get_channel_count(); i++) {
+			get_channel(i)->setCh_thickness(value);
+		}
 	}
 }
 
@@ -753,6 +785,10 @@ void PatternGeneratorChannelGroupUI::updateTrace()
 		trace->set_highlight(highlighted);
 	}
 
+	if(getChannelGroup()->getCh_thickness() != trace->getCh_thickness()) {
+		trace->setCh_thickness(getChannelGroup()->getCh_thickness());
+		getManagerUi()->main_win->view_->time_item_appearance_changed(false, true);
+	}
 
 	if (traceOffset!=v_offset || traceHeight!=height) {
 		traceHeight = height;

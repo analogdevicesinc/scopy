@@ -41,6 +41,11 @@ public:
 	void setChannel_role(const srd_channel *value);
 	std::string getTrigger() const;
 	void setTrigger(const std::string& value);
+	qreal getCh_thickness() const;
+	void setCh_thickness(qreal value);
+
+private:
+	qreal ch_thickness;
 };
 
 
@@ -111,6 +116,7 @@ private:
 	std::vector<const srd_channel *> decoderRolesList;
 	std::map<const srd_channel*,uint16_t> channels_;
 	const srd_channel* findByValue(uint16_t ch_id);
+	qreal ch_thickness;
 public:
 	LogicAnalyzerChannelGroup(LogicAnalyzerChannel *ch);
 	LogicAnalyzerChannelGroup();
@@ -124,6 +130,8 @@ public:
 	LogicAnalyzerChannel* getChannelById(int id);
 	void setChannelForDecoder(const srd_channel*, uint16_t);
 	std::map<const srd_channel*, uint16_t> get_decoder_channels();
+	qreal getCh_thickness() const;
+	void setCh_thickness(qreal value);
 };
 
 
@@ -277,6 +285,7 @@ public Q_SLOTS:
 	void highlightNext();
 	void highlightPrevious();
 	void resizeEvent(QResizeEvent *event);
+	void chThicknessChanged(QString text);
 
 private Q_SLOTS:
 	void on_groupSplit_clicked();
