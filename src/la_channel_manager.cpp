@@ -1283,7 +1283,6 @@ LogicAnalyzerChannelManagerUI::LogicAnalyzerChannelManagerUI(QWidget *parent,
 	locationSettingsWidget(settingsWidget),
 	settingsUI(nullptr),
 	currentSettingsWidget(nullptr),
-	highlightShown(true),
 	hoverWidget(nullptr)
 {
 	ui->setupUi(this);
@@ -1649,10 +1648,7 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 		}
 	}
 
-	if(highlightShown)
-	{
-		showHighlight(true);
-	}
+	showHighlight(true);
 
 	ui->scrollArea->setMaximumWidth(managerHeaderWidget->sizeHint().width());
 	main_win->view_->viewport()->setDivisionCount(10);
@@ -1747,13 +1743,7 @@ void LogicAnalyzerChannelManagerUI::showHighlight(bool check)
 	{
 		deleteSettingsWidget();
 		createSettingsWidget();
-		highlightShown = true;
 	}
-	else
-	{
-		highlightShown = false;
-	}
-
 }
 
 LogicAnalyzerChannelGroupUI *LogicAnalyzerChannelManagerUI::getUiFromChGroup(
@@ -1815,7 +1805,6 @@ void LogicAnalyzerChannelManagerUI::rolesChangedRHS(const QString text)
 				}
 			}
 		}
-		highlightShown = false;
 		update_ui();
 	}
 }

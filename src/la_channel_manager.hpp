@@ -242,7 +242,6 @@ public:
 	QWidget *locationSettingsWidget;
 	QWidget *currentSettingsWidget;
 	Ui::LASettingsWidget *settingsUI;
-	bool highlightShown;
 	const bool pixmapEnable = true;
 	const bool pixmapGrab = true;
 	const bool pixmapRetainSize = true;
