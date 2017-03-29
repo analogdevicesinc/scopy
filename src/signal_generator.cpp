@@ -91,7 +91,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 		QPushButton *runButton, QJSEngine *engine, QWidget *parent) :
 	QWidget(parent), ui(new Ui::SignalGenerator),
 	ctx(_ctx), time_block_data(new adiscope::time_block_data),
-	menuOpened(true), currentChannel(0), sample_rate(0),
+	currentChannel(0), sample_rate(0),
 	settings_group(new QButtonGroup(this)), menuRunButton(runButton),
 	sg_api(new SignalGenerator_API(this))
 {
@@ -99,8 +99,6 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 	this->setAttribute(Qt::WA_DeleteOnClose, true);
 
 	this->plot = new OscilloscopePlot(parent);
-
-	settings_group->setExclusive(true);
 
 	QVector<struct iio_channel *> iio_channels;
 
@@ -222,9 +220,6 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 				qVariantFromValue((void *) chn));
 		iio_channel_set_data(chn, &pair->first);
 
-		if (i == 0)
-			pair->second.btn->setChecked(true);
-
 		ui->channelsList->addWidget(&pair->first);
 
 		connect(pair->second.box, SIGNAL(toggled(bool)), this,
@@ -234,6 +229,8 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 				this, SLOT(toggleRightMenu()));
 
 		settings_group->addButton(pair->second.btn);
+		if (i == 0)
+			pair->second.btn->setChecked(true);
 
 		channels.append(pair);
 
@@ -694,7 +691,6 @@ void adiscope::SignalGenerator::channel_box_toggled(bool checked)
 		plot->AttachCurve(id);
 	} else {
 		if (channels[id]->second.btn->isChecked()) {
-			settings_group->setExclusive(false);
 			channels[id]->second.btn->setChecked(false);
 			toggleRightMenu(channels[id]->second.btn);
 		}
@@ -743,9 +739,7 @@ int SignalGenerator::sg_waveform_to_idx(enum sg_waveform wave)
 
 void adiscope::SignalGenerator::rightMenuFinished(bool opened)
 {
-	if (opened) {
-		menuOpened = true;
-	} else if (menuOpened) {
+	if (!opened && !!settings_group->checkedButton()) {
 		auto ptr = getCurrentData();
 
 		constantValue->setValue(ptr->constant);
@@ -779,13 +773,7 @@ void adiscope::SignalGenerator::rightMenuFinished(bool opened)
 void adiscope::SignalGenerator::toggleRightMenu(QPushButton *btn)
 {
 	unsigned int id = btn->property("id").toUInt();
-	bool open = !menuOpened;
-
-	settings_group->setExclusive(!btn->isChecked());
-
-	/* Keep the right menu closed */
-	if (menuOpened && currentChannel == id)
-		menuOpened = false;
+	bool open = !settings_group->checkedButton();
 
 	currentChannel = id;
 

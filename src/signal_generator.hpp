@@ -92,7 +92,6 @@ namespace adiscope {
 		struct iio_context *ctx;
 		struct time_block_data *time_block_data;
 
-		bool menuOpened;
 		unsigned int currentChannel;
 		unsigned long sample_rate;
 
