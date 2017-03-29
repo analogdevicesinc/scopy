@@ -240,6 +240,18 @@ QTabWidget#tabWidget QWidget QWidget {
                 <property name="yaxis_title" stdset="0">
                  <string>Magnitude (dB)</string>
                 </property>
+                <property name="xmin" stdset="0">
+                 <double>1000.000000000000000</double>
+                </property>
+                <property name="xmax" stdset="0">
+                 <double>50000.000000000000000</double>
+                </property>
+                <property name="ymin" stdset="0">
+                 <double>-90.000000000000000</double>
+                </property>
+                <property name="ymax" stdset="0">
+                 <double>10.000000000000000</double>
+                </property>
                </widget>
               </item>
               <item>
@@ -276,6 +288,18 @@ QTabWidget#tabWidget QWidget QWidget {
                 </property>
                 <property name="yunit" stdset="0">
                  <string>°</string>
+                </property>
+                <property name="xmin" stdset="0">
+                 <double>1000.000000000000000</double>
+                </property>
+                <property name="xmax" stdset="0">
+                 <double>50000.000000000000000</double>
+                </property>
+                <property name="ymin" stdset="0">
+                 <double>-180.000000000000000</double>
+                </property>
+                <property name="ymax" stdset="0">
+                 <double>180.000000000000000</double>
                 </property>
                </widget>
               </item>
@@ -321,10 +345,10 @@ QTabWidget#tabWidget QWidget QWidget {
                  </color>
                 </property>
                 <property name="min" stdset="0">
-                 <double>-80.000000000000000</double>
+                 <double>-90.000000000000000</double>
                 </property>
                 <property name="max" stdset="0">
-                 <double>0.000000000000000</double>
+                 <double>10.000000000000000</double>
                 </property>
                 <property name="font_azimuth" stdset="0">
                  <font>
@@ -384,6 +408,18 @@ QTabWidget#tabWidget QWidget QWidget {
                 </property>
                 <property name="xunit" stdset="0">
                  <string>°</string>
+                </property>
+                <property name="xmin" stdset="0">
+                 <double>-180.000000000000000</double>
+                </property>
+                <property name="xmax" stdset="0">
+                 <double>180.000000000000000</double>
+                </property>
+                <property name="ymin" stdset="0">
+                 <double>-90.000000000000000</double>
+                </property>
+                <property name="ymax" stdset="0">
+                 <string>10</string>
                 </property>
                </widget>
               </item>
