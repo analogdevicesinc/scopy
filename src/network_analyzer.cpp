@@ -30,7 +30,6 @@
 #include <gnuradio/blocks/complex_to_mag_squared.h>
 #include <gnuradio/blocks/float_to_short.h>
 #include <gnuradio/blocks/head.h>
-#include <gnuradio/blocks/keep_m_in_n.h>
 #include <gnuradio/blocks/moving_average_cc.h>
 #include <gnuradio/blocks/multiply_cc.h>
 #include <gnuradio/blocks/multiply_conjugate_cc.h>
@@ -238,26 +237,26 @@ void NetworkAnalyzer::run()
 
 		auto avg1 = blocks::moving_average_cc::make(in_samples_count,
 				2.0 / in_samples_count, in_samples_count);
-		auto keep_one1 = blocks::keep_m_in_n::make(sizeof(gr_complex),
-				1, in_samples_count, in_samples_count - 1);
+		auto skiphead3 = blocks::skiphead::make(sizeof(gr_complex),
+				in_samples_count - 1);
 		auto c2m1 = blocks::complex_to_mag_squared::make();
 
 		iio->connect(mult1, 0, avg1, 0);
-		iio->connect(avg1, 0, keep_one1, 0);
-		iio->connect(keep_one1, 0, c2m1, 0);
-		iio->connect(keep_one1, 0, conj, 0);
+		iio->connect(avg1, 0, skiphead3, 0);
+		iio->connect(skiphead3, 0, c2m1, 0);
+		iio->connect(skiphead3, 0, conj, 0);
 		iio->connect(c2m1, 0, signal, 0);
 
 		auto avg2 = blocks::moving_average_cc::make(in_samples_count,
 				2.0 / in_samples_count, in_samples_count);
-		auto keep_one2 = blocks::keep_m_in_n::make(sizeof(gr_complex),
-				1, in_samples_count, in_samples_count - 1);
+		auto skiphead4 = blocks::skiphead::make(sizeof(gr_complex),
+				in_samples_count - 1);
 		auto c2m2 = blocks::complex_to_mag_squared::make();
 
 		iio->connect(mult2, 0, avg2, 0);
-		iio->connect(avg2, 0, keep_one2, 0);
-		iio->connect(keep_one2, 0, c2m2, 0);
-		iio->connect(keep_one2, 0, conj, 1);
+		iio->connect(avg2, 0, skiphead4, 0);
+		iio->connect(skiphead4, 0, c2m2, 0);
+		iio->connect(skiphead4, 0, conj, 1);
 		iio->connect(c2m2, 0, signal, 1);
 
 		auto c2a = blocks::complex_to_arg::make();
