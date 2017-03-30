@@ -102,6 +102,15 @@ public:
 	QRectF label_rect(const QRectF &rect) const;
 
 
+	QColor bgcolour() const;
+	void setBgcolour(const QColor &bgcolour);
+	QColor edgecolour() const;
+	void setEdgecolour(const QColor &edgecolour);
+	void setLowcolour(const QColor &edgecolour);
+	QColor lowcolour() const;
+	void setHighcolour(const QColor &edgecolour);
+	QColor highcolour() const;
+
 protected:
 	/**
 	 * Paints the background layer of the signal with a QPainter.
@@ -133,7 +142,8 @@ private Q_SLOTS:
 
 protected:
 	QString name_;
-	QColor colour_, bgcolour_;
+	QColor colour_, bgcolour_, edgecolour_;
+	QColor highcolour_, lowcolour_;
 	bool coloured_bg_, coloured_bg_state_;
 
 private:

@@ -335,6 +335,12 @@ void PatternGeneratorChannelUI::updateTrace()
 	auto v_offset = topSep->geometry().bottomRight().y() + 3 + height -
 	                (trace->v_extents().second) + chgui->getTraceOffset()+3;//chgOffset.y();
 
+	if(trace) {
+		trace->setBgcolour(get_channel()->getBgcolor());
+		trace->setEdgecolour(get_channel()->getEdgecolor());
+		trace->setHighcolour(get_channel()->getHighcolor());
+		trace->setLowcolour(get_channel()->getLowcolor());
+	}
 
 	if (traceOffset!=v_offset || traceHeight!=height) {
 		traceHeight = height;
@@ -342,6 +348,7 @@ void PatternGeneratorChannelUI::updateTrace()
 		trace->setSignal_height(traceHeight);
 		trace->force_to_v_offset(v_offset);
 	}
+	getManagerUi()->main_win->view_->time_item_appearance_changed(true, true);
 
 }
 
@@ -790,6 +797,16 @@ void PatternGeneratorChannelGroupUI::updateTrace()
 		getManagerUi()->main_win->view_->time_item_appearance_changed(false, true);
 	}
 
+	if(logicTrace) {
+		logicTrace->setEdgecolour(chg->getEdgecolor());
+		logicTrace->setHighcolour(chg->getHighcolor());
+		logicTrace->setLowcolour(chg->getLowcolor());
+		logicTrace->setBgcolour(chg->getBgcolor());
+	}
+	if(decodeTrace) {
+		decodeTrace->setBgcolour(chg->getBgcolor());
+	}
+
 	if (traceOffset!=v_offset || traceHeight!=height) {
 		traceHeight = height;
 		traceOffset = v_offset;
@@ -801,6 +818,7 @@ void PatternGeneratorChannelGroupUI::updateTrace()
 		for (auto &&ch : ch_ui) {
 			ch->updateTrace();
 		}
+	getManagerUi()->main_win->view_->time_item_appearance_changed(true, true);
 }
 
 void PatternGeneratorChannelGroupUI::dropEvent(QDropEvent *event)

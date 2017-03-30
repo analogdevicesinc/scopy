@@ -351,7 +351,6 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	ui->leftLayout->addWidget(chm_ui);
 	chm_ui->update_ui();
 	chm_ui->setVisible(true);
-	lachannelsettings = new Ui::LChannelSettings;
 
 	connect(ui->btnGroupChannels, SIGNAL(pressed()),
 	        chm_ui, SLOT(on_groupSplit_clicked()));

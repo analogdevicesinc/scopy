@@ -42,7 +42,7 @@ namespace view {
 const QPen Trace::AxisPen(QColor(0, 0, 0, 30*256/100));
 const int Trace::LabelHitPadding = 2;
 
-const int Trace::ColourBGAlpha = 8*256/100;
+const int Trace::ColourBGAlpha = 50;
 const QColor Trace::BGColour = QColor(39, 39, 48, 0);
 const QColor Trace::HighlightBGColour = QColor(0x16, 0x19, 0x1A);//QColor(0xCC, 0x00, 0x00);
 
@@ -72,9 +72,6 @@ QColor Trace::colour() const
 void Trace::set_colour(QColor colour)
 {
 	colour_ = colour;
-
-	bgcolour_ = colour;
-	bgcolour_.setAlpha(ColourBGAlpha);
 }
 
 void Trace::set_coloured_bg(bool state)
@@ -182,7 +179,11 @@ QRectF Trace::label_rect(const QRectF &rect) const
 
 void Trace::paint_back(QPainter &p, const ViewItemPaintParams &pp)
 {
-	p.setBrush(BGColour);
+	if(bgcolour_.isValid())
+		p.setBrush(bgcolour_);
+	else
+		p.setBrush(BGColour);
+
 	p.setPen(QPen(Qt::NoPen));
 	const std::pair<int, int> extents = v_extents();
 
@@ -271,6 +272,20 @@ void Trace::on_popup_closed()
 	popup_form_ = nullptr;
 }
 
+QColor Trace::bgcolour() const
+{
+	return bgcolour_;
+}
+
+void Trace::setBgcolour(const QColor &bgcolour)
+{
+	bgcolour_ = bgcolour;
+	if(bgcolour_.isValid()) {
+		bgcolour_.setAlpha(ColourBGAlpha);
+		set_coloured_bg(true);
+	}
+}
+
 void Trace::on_text_changed(const QString &text)
 {
 	set_name(text);
@@ -285,6 +300,36 @@ void Trace::on_colour_changed(const QColor &colour)
 
 	if (owner_)
 		owner_->row_item_appearance_changed(true, true);
+}
+
+QColor Trace::edgecolour() const
+{
+	return edgecolour_;
+}
+
+QColor Trace::highcolour() const
+{
+	return highcolour_;
+}
+
+QColor Trace::lowcolour() const
+{
+	return lowcolour_;
+}
+
+void Trace::setEdgecolour(const QColor &edgecolour)
+{
+	edgecolour_ = edgecolour;
+}
+
+void Trace::setHighcolour(const QColor &highcolour)
+{
+	highcolour_ = highcolour;
+}
+
+void Trace::setLowcolour(const QColor &lowcolour)
+{
+	lowcolour_ = lowcolour;
 }
 
 } // namespace view

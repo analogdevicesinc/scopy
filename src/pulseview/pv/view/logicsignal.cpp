@@ -114,8 +114,6 @@ LogicSignal::LogicSignal(
 {
 	shared_ptr<Trigger> trigger;
 
-	set_colour(SignalColours[channel->index() % countof(SignalColours)]);
-
 	signal_height_ = ((sig_height == 0) ? QFontMetrics(QApplication::font()).height() * 1.5 : sig_height - (QFontMetrics(QApplication::font()).height() / 3) );
 	/* Populate this channel's trigger setting with whatever we
 	 * find in the current session trigger, if anything. */
@@ -174,6 +172,7 @@ void LogicSignal::scale_handle_dragged(int offset)
 void LogicSignal::paint_mid(QPainter &p, const ViewItemPaintParams &pp)
 {
 	QLineF *line;
+	QColor penColor;
 
 	vector< pair<int64_t, bool> > edges;
 
@@ -231,7 +230,8 @@ void LogicSignal::paint_mid(QPainter &p, const ViewItemPaintParams &pp)
 		*line++ = QLineF(x, high_offset, x, low_offset);
 	}
 
-	p.setPen(QPen(EdgeColour, getCh_thickness()));
+	penColor = edgecolour().isValid() ? edgecolour() : EdgeColour;
+	p.setPen(QPen(penColor, getCh_thickness()));
 	p.drawLines(edge_lines, edge_count);
 	delete[] edge_lines;
 
@@ -239,11 +239,13 @@ void LogicSignal::paint_mid(QPainter &p, const ViewItemPaintParams &pp)
 	const unsigned int max_cap_line_count = edges.size();
 	QLineF *const cap_lines = new QLineF[max_cap_line_count];
 
-	p.setPen(QPen(HighColour,getCh_thickness()));
+	penColor = highcolour().isValid() ? highcolour() : HighColour;
+	p.setPen(QPen(penColor, getCh_thickness()));
 	paint_caps(p, cap_lines, edges, true, samples_per_pixel,
 		pixels_offset, pp.left(), high_offset);
 
-	p.setPen(QPen(LowColour,getCh_thickness()));
+	penColor = lowcolour().isValid() ? lowcolour() : LowColour;
+	p.setPen(QPen(penColor, getCh_thickness()));
 	paint_caps(p, cap_lines, edges, false, samples_per_pixel,
         pixels_offset, pp.left(), low_offset);
 

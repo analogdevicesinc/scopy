@@ -59,6 +59,10 @@ private:
 	uint16_t mask;
 	uint16_t id;
 	std::string label;
+	QColor edgecolor;
+	QColor highcolor;
+	QColor lowcolor;
+	QColor bgcolor;
 public:
 	Channel(uint16_t id_, std::string label_);
 	virtual ~Channel();
@@ -66,6 +70,14 @@ public:
 	virtual uint16_t get_id();
 	std::string get_label();
 	void set_label(std::string);
+	QColor getBgcolor() const;
+	void setBgcolor(const QColor &value);
+	QColor getEdgecolor() const;
+	void setEdgecolor(const QColor &value);
+	QColor getHighcolor() const;
+	void setHighcolor(const QColor &value);
+	QColor getLowcolor() const;
+	void setLowcolor(const QColor &value);
 };
 
 class ChannelUI :  public QWidget
@@ -89,6 +101,10 @@ protected:
 	bool grouped;
 	bool enabled;
 	std::vector<Channel *> channels;
+	QColor edgecolor;
+	QColor highcolor;
+	QColor lowcolor;
+	QColor bgcolor;
 
 public:
 	ChannelGroup(Channel *ch);
@@ -112,8 +128,14 @@ public:
 	virtual void select(bool value);
 	virtual void group(bool value);
 	virtual void enable(bool value);
-
-
+	QColor getBgcolor() const;
+	void setBgcolor(const QColor &value);
+	QColor getHighcolor() const;
+	void setHighcolor(const QColor &value);
+	QColor getLowcolor() const;
+	void setLowcolor(const QColor &value);
+	QColor getEdgecolor() const;
+	void setEdgecolor(const QColor &value);
 };
 
 
@@ -138,7 +160,6 @@ public Q_SLOTS:
 
 class ChannelManager
 {
-
 protected:
 	std::vector<Channel *> channel;
 	std::vector<ChannelGroup *> channel_group;

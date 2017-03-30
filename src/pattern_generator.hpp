@@ -1,4 +1,4 @@
-/*
+ /*
  * Copyright 2016 Analog Devices, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -31,6 +31,7 @@
 #include <string>
 
 #include "src/pulseview/pv/devices/binarybuffer.hpp"
+#include "pulseview/pv/widgets/colourbutton.hpp"
 #include "filter.hpp"
 
 #include "apiObject.hpp"
@@ -56,6 +57,12 @@ class MainWindow;
 class DeviceManager;
 namespace toolbars {
 class MainBar;
+}
+namespace view {
+class TracePalette;
+}
+namespace widgets {
+class ColourButton;
 }
 }
 
@@ -105,6 +112,7 @@ private Q_SLOTS:
 	void updatePGettings();
 	void on_btnHideInactive_clicked();
 	void on_btnGroupWithSelected_clicked();
+	void colorChanged(QColor);
 
 private:
 
@@ -116,6 +124,10 @@ private:
 
 	QButtonGroup *settings_group;
 	QPushButton *menuRunButton;
+
+	pv::widgets::ColourButton *colour_button_edge,
+		*colour_button_high, *colour_button_BG,
+		*colour_button_low;
 
 	typedef enum rightMenuState_t {
 		CLOSED,
@@ -161,6 +173,7 @@ private:
 	void jsonToChm(QJsonObject obj);
 	void deleteSettingsWidget();
 	void createSettingsWidget();
+	void showColorSettings(bool check);
 
 private Q_SLOTS:
 	void patternChanged(int index);

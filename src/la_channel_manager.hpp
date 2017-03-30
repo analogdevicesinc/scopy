@@ -23,6 +23,9 @@ class View;
 class LogicSignal;
 class DecodeTrace;
 }
+namespace widgets{
+class ColourButton;
+}
 }
 namespace adiscope {
 class LogicAnalyzer;
@@ -290,12 +293,14 @@ private Q_SLOTS:
 	void on_groupSplit_clicked();
 	void on_hideInactive_clicked(bool hide);
 	void chmRangeChanged(int min, int max);
-
+	void colorChanged(QColor color);
 private:
 	bool hidden;
 	bool collapsed;
 	std::vector<int> visibleItemsIndexes;
 	QButtonGroup *settings_exclusive_group;
+	pv::widgets::ColourButton *colour_button_edge, *colour_button_BG,
+		*colour_button_low, *colour_button_high;
 	void setWidgetMinimumNrOfChars(QWidget *w, int nrOfChars);
 	QFrame* addSeparator(QVBoxLayout *lay, int pos);
 Q_SIGNALS:

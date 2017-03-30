@@ -23,7 +23,10 @@
    <string>Scopy Logic Analyzer</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">
+   <string notr="true">QWidget 
+{
+	outline:none;
+}
 /* QComboBoxes*/
 QComboBox
 {

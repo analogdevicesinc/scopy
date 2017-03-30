@@ -13,10 +13,13 @@
 #include "ui_la_settings.h"
 #include "ui_la_decoder_reqChannel.h"
 #include "ui_logic_channel_settings.h"
+#include "ui_color_settings.h"
 #include <QScrollBar>
 #include <libsigrokcxx/libsigrokcxx.hpp>
 #include <QPainter>
 #include <QListView>
+#include "pulseview/pv/widgets/colourbutton.hpp"
+#include "pulseview/pv/view/tracepalette.hpp"
 
 using std::dynamic_pointer_cast;
 
@@ -28,6 +31,7 @@ class Viewport;
 class TraceTreeItem;
 class DecodeTrace;
 class LogicSignal;
+class TracePalette;
 }
 }
 
@@ -320,13 +324,20 @@ void LogicAnalyzerChannelUI::updateTrace()
 	auto v_offset = topSep->geometry().bottomRight().y() + 3 + height -
 	                (trace->v_extents().second) + chgroupui->getTraceOffset()+3;//chgOffset.y();
 
+	if(trace) {
+		trace->setBgcolour(get_channel()->getBgcolor());
+		trace->setEdgecolour(get_channel()->getEdgecolor());
+		trace->setHighcolour(get_channel()->getHighcolor());
+		trace->setLowcolour(get_channel()->getLowcolor());
+	}
+
 	if (traceOffset!=v_offset || traceHeight!=height) {
 		traceHeight = height;
 		traceOffset = v_offset;
 		trace->setSignal_height(traceHeight);
 		trace->force_to_v_offset(v_offset);
 	}
-
+	chm_ui->main_win->view_->time_item_appearance_changed(true, true);
 }
 
 void LogicAnalyzerChannelUI::channelRoleChanged(const QString text)
@@ -529,6 +540,7 @@ LogicAnalyzerChannelGroup::LogicAnalyzerChannelGroup():
 	collapsed = false;
 	decoder = nullptr;
 	channels_ = std::map<const srd_channel*, uint16_t>();
+	ch_thickness = 1.0;
 }
 
 const srd_channel* LogicAnalyzerChannelGroup::findByValue(uint16_t ch_id)
@@ -863,6 +875,16 @@ void LogicAnalyzerChannelGroupUI::updateTrace()
 		trace->set_highlight(highlighted);
 	}
 
+	if(logicTrace) {
+		logicTrace->setEdgecolour(chg->getEdgecolor());
+		logicTrace->setHighcolour(chg->getHighcolor());
+		logicTrace->setLowcolour(chg->getLowcolor());
+		logicTrace->setBgcolour(chg->getBgcolor());
+	}
+	if(decodeTrace) {
+		decodeTrace->setBgcolour(chg->getBgcolor());
+	}
+
 	if (traceOffset!=v_offset || traceHeight!=height) {
 		traceHeight = height;
 		traceOffset = v_offset;
@@ -874,6 +896,7 @@ void LogicAnalyzerChannelGroupUI::updateTrace()
 		for (auto &&ch : ch_ui) {
 			ch->updateTrace();
 		}
+	chm_ui->main_win->view_->time_item_appearance_changed(true, true);
 }
 
 void LogicAnalyzerChannelGroupUI::setupDecoder()
@@ -1739,7 +1762,7 @@ void LogicAnalyzerChannelManagerUI::showHighlight(bool check)
 			chUi->getTrace()->set_highlight(check);
 		}
 	}
-	if (check)
+	if (check && (chUi || chGroupUi))
 	{
 		deleteSettingsWidget();
 		createSettingsWidget();
@@ -1840,6 +1863,57 @@ void LogicAnalyzerChannelManagerUI::chThicknessChanged(QString text)
 	main_win->view_->time_item_appearance_changed(false, true);
 }
 
+void LogicAnalyzerChannelManagerUI::colorChanged(QColor color)
+{
+	auto ch = chm->getHighlightedChannel();
+	auto chg = chm->getHighlightedChannelGroup();
+
+	auto chgui = getUiFromChGroup(chg);
+	auto chui = getUiFromCh(ch);
+
+	QPushButton* sender = static_cast<QPushButton *>(QObject::sender());
+	QString type = sender->property("type").toString();
+	if( type == "background") {
+		if(!ch) {
+			chg->setBgcolor(color);
+			chgui->updateTrace();
+		}
+		else {
+			ch->setBgcolor(color);
+			chui->updateTrace();
+		}
+	}
+	else if( type == "edge") {
+		if(!ch) {
+			chg->setEdgecolor(color);
+			chgui->updateTrace();
+		}
+		else {
+			ch->setEdgecolor(color);
+			chui->updateTrace();
+		}
+	}
+	else if( type == "low") {
+		if(!ch) {
+			chg->setLowcolor(color);
+			chgui->updateTrace();
+		}
+		else {
+			ch->setLowcolor(color);
+			chui->updateTrace();
+		}
+	}
+	else if( type == "high") {
+		if(!ch) {
+			chg->setHighcolor(color);
+			chgui->updateTrace();
+		}
+		else {
+			ch->setHighcolor(color);
+			chui->updateTrace();
+		}
+	}
+}
 
 void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 {
@@ -1847,17 +1921,60 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 	Ui::LChannelSettings *generalSettingsUi = new Ui::LChannelSettings;
 	QWidget* generalSettings = new QWidget(locationSettingsWidget);
 	generalSettingsUi->setupUi(generalSettings);
+
 	settingsUI->setupUi(locationSettingsWidget);
 	currentSettingsWidget = new QWidget(locationSettingsWidget);
 	settingsUI->setupUi(currentSettingsWidget);
 	locationSettingsWidget->layout()->addWidget(currentSettingsWidget);
 	ensurePolished();
+
+	/*Add color buttons */
+	colour_button_edge = new ColourButton(
+		pv::view::TracePalette::Rows, pv::view::TracePalette::Cols,
+		generalSettingsUi->colorEdge);
+	colour_button_edge->set_palette(pv::view::TracePalette::Colours);
+	colour_button_edge->setProperty("type", QVariant("edge"));
+
+	colour_button_BG = new ColourButton(
+		pv::view::TracePalette::Rows, pv::view::TracePalette::Cols,
+		generalSettingsUi->colorBG);
+	colour_button_BG->set_palette(pv::view::TracePalette::Colours);
+	colour_button_BG->setProperty("type", QVariant("background"));
+
+	colour_button_low = new ColourButton(
+		pv::view::TracePalette::Rows, pv::view::TracePalette::Cols,
+		generalSettingsUi->colorLow);
+	colour_button_low->set_palette(pv::view::TracePalette::Colours);
+	colour_button_low->setProperty("type", QVariant("low"));
+
+	colour_button_high = new ColourButton(
+		pv::view::TracePalette::Rows, pv::view::TracePalette::Cols,
+		generalSettingsUi->colorHigh);
+	colour_button_high->set_palette(pv::view::TracePalette::Colours);
+	colour_button_high->setProperty("type", QVariant("high"));
+
 	connect(settingsUI->btnNext, SIGNAL(pressed()),
 		this, SLOT(highlightNext()));
 	connect(settingsUI->btnPrevious, SIGNAL(pressed()),
 		this, SLOT(highlightPrevious()));
 	connect(generalSettingsUi->cmbThickness, SIGNAL(currentTextChanged(QString)),
 		this, SLOT(chThicknessChanged(QString)));
+	connect(generalSettingsUi->btnCollapse, &QPushButton::clicked,
+		[=](bool check) {
+			if(check)
+				generalSettingsUi->widget->hide();
+			else
+				generalSettingsUi->widget->show();
+		});
+
+	connect(colour_button_edge, SIGNAL(selected(const QColor)),
+		this, SLOT(colorChanged(QColor)));
+	connect(colour_button_BG, SIGNAL(selected(const QColor)),
+		this, SLOT(colorChanged(QColor)));
+	connect(colour_button_low, SIGNAL(selected(const QColor)),
+		this, SLOT(colorChanged(QColor)));
+	connect(colour_button_high, SIGNAL(selected(const QColor)),
+		this, SLOT(colorChanged(QColor)));
 
 	if (chm->getHighlightedChannelGroup()) {
 		LogicAnalyzerChannelGroup *chGroup = chm->getHighlightedChannelGroup();
@@ -1865,6 +1982,11 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 		generalSettingsUi->nameLineEdit->setText(QString::fromStdString(chGroup->get_label()));
 		QString ch_thickness = QString::number(chGroup->getCh_thickness());
 		generalSettingsUi->cmbThickness->setCurrentText(ch_thickness);
+		colour_button_BG->set_colour(chGroup->getBgcolor());
+		colour_button_edge->set_colour(chGroup->getEdgecolor());
+		colour_button_high->set_colour(chGroup->getHighcolor());
+		colour_button_low->set_colour(chGroup->getLowcolor());
+
 		connect(generalSettingsUi->nameLineEdit, &QLineEdit::editingFinished,
 			[=]() {
 				QString text = generalSettingsUi->nameLineEdit->text();
@@ -1876,6 +1998,12 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 			settingsUI->scrollAreaWidgetLayout->count()-1, generalSettings);
 
 		if (chGroup->is_grouped()) {
+			generalSettingsUi->colorEdge->hide();
+			generalSettingsUi->colorLow->hide();
+			generalSettingsUi->colorHigh->hide();
+			generalSettingsUi->lblEdge->hide();
+			generalSettingsUi->lblLow->hide();
+			generalSettingsUi->lblHigh->hide();
 			const srd_decoder *decoder = chGroup->getDecoder();
 
 			if (!decoder) {
@@ -1983,6 +2111,11 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 		generalSettingsUi->nameLineEdit->setText(QString::fromStdString(ch->get_label()));
 		QString ch_thickness = QString::number(ch->getCh_thickness());
 		generalSettingsUi->cmbThickness->setCurrentText(ch_thickness);
+
+		colour_button_BG->set_colour(ch->getBgcolor());
+		colour_button_edge->set_colour(ch->getEdgecolor());
+		colour_button_high->set_colour(ch->getHighcolor());
+		colour_button_low->set_colour(ch->getLowcolor());
 
 		connect(generalSettingsUi->nameLineEdit, &QLineEdit::editingFinished,
 			[=]() {

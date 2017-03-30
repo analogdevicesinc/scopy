@@ -46,6 +46,7 @@
 #include "pulseview/pv/toolbars/mainbar.hpp"
 #include "libsigrokcxx/libsigrokcxx.hpp"
 #include "libsigrokdecode/libsigrokdecode.h"
+#include "pulseview/pv/view/tracepalette.hpp"
 
 #include "pattern_generator.hpp"
 
@@ -64,6 +65,7 @@ class MainBar;
 
 namespace widgets {
 class DeviceToolButton;
+class ColourButton;
 }
 }
 
@@ -133,6 +135,31 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 	cgSettings->setupUi(ui->cgSettings);
 	cgSettings->LECHLabel->setMaxLength(channelGroupLabelMaxLength);
 
+	/*Add color buttons */
+	colour_button_edge = new pv::widgets::ColourButton(
+		pv::view::TracePalette::Rows, pv::view::TracePalette::Cols,
+		cgSettings->colorEdge);
+	colour_button_edge->set_palette(pv::view::TracePalette::Colours);
+	colour_button_edge->setProperty("type", QVariant("edge"));
+
+	colour_button_BG = new pv::widgets::ColourButton(
+		pv::view::TracePalette::Rows, pv::view::TracePalette::Cols,
+		cgSettings->colorBG);
+	colour_button_BG->set_palette(pv::view::TracePalette::Colours);
+	colour_button_BG->setProperty("type", QVariant("background"));
+
+	colour_button_low = new pv::widgets::ColourButton(
+		pv::view::TracePalette::Rows, pv::view::TracePalette::Cols,
+		cgSettings->colorLow);
+	colour_button_low->set_palette(pv::view::TracePalette::Colours);
+	colour_button_low->setProperty("type", QVariant("low"));
+
+	colour_button_high = new pv::widgets::ColourButton(
+		pv::view::TracePalette::Rows, pv::view::TracePalette::Cols,
+		cgSettings->colorHigh);
+	colour_button_high->set_palette(pv::view::TracePalette::Colours);
+	colour_button_high->setProperty("type", QVariant("high"));
+
 	connect(pgSettings->PB_Autoset,SIGNAL(clicked(bool)),this,
 	        SLOT(configureAutoSet()));
 	connect(pgSettings->LE_BufferSize,SIGNAL(editingFinished()),this,
@@ -175,6 +202,21 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 	connect(cgSettings->PBRight,SIGNAL(pressed()),this,SLOT(pushButtonRight()));
 	connect(cgSettings->cmb_thickness, SIGNAL(currentTextChanged(QString)),
 		this, SLOT(changeChannelThickness(QString)));
+	connect(cgSettings->btnCollapse, &QPushButton::clicked,
+		[=](bool check) {
+			if(check)
+				cgSettings->widget_2->hide();
+			else
+				cgSettings->widget_2->show();
+		});
+	connect(colour_button_edge, SIGNAL(selected(const QColor)),
+		this, SLOT(colorChanged(QColor)));
+	connect(colour_button_BG, SIGNAL(selected(const QColor)),
+		this, SLOT(colorChanged(QColor)));
+	connect(colour_button_low, SIGNAL(selected(const QColor)),
+		this, SLOT(colorChanged(QColor)));
+	connect(colour_button_high, SIGNAL(selected(const QColor)),
+		this, SLOT(colorChanged(QColor)));
 
 	connect(chmui,SIGNAL(channelsChanged()),bufui,SLOT(updateUi()));
 	connect(ui->btnRunStop, SIGNAL(toggled(bool)), this, SLOT(startStop(bool)));
@@ -277,6 +319,26 @@ void PatternGenerator::toggleRightMenu(QPushButton *btn)
 
 }
 
+void PatternGenerator::showColorSettings(bool check)
+{
+	if(check) {
+		cgSettings->colorEdge->show();
+		cgSettings->colorLow->show();
+		cgSettings->colorHigh->show();
+		cgSettings->lblEdge->show();
+		cgSettings->lblLow->show();
+		cgSettings->lblHigh->show();
+	}
+	else {
+		cgSettings->colorEdge->hide();
+		cgSettings->colorLow->hide();
+		cgSettings->colorHigh->hide();
+		cgSettings->lblEdge->hide();
+		cgSettings->lblLow->hide();
+		cgSettings->lblHigh->hide();
+	}
+}
+
 void PatternGenerator::updateCGSettings()
 {
 	auto chg = chm.getHighlightedChannelGroup();
@@ -290,12 +352,27 @@ void PatternGenerator::updateCGSettings()
 		name = QString::fromStdString(chg->get_label());
 		title = name;
 		thickness = chg->getCh_thickness();
+		if(chg->is_grouped()) {
+			showColorSettings(false);
+		}
+		else {
+			showColorSettings(true);
+		}
+		colour_button_BG->set_colour(chg->getBgcolor());
+		colour_button_edge->set_colour(chg->getEdgecolor());
+		colour_button_high->set_colour(chg->getHighcolor());
+		colour_button_low->set_colour(chg->getLowcolor());
 
 	} else {
 		name = QString::fromStdString(ch->get_label());
 		auto id = QString::number(ch->get_id());
 		title = "Channel " + id;
 		thickness = ch->getCh_thickness();
+		showColorSettings(true);
+		colour_button_BG->set_colour(ch->getBgcolor());
+		colour_button_edge->set_colour(ch->getEdgecolor());
+		colour_button_high->set_colour(ch->getHighcolor());
+		colour_button_low->set_colour(ch->getLowcolor());
 	}
 
 	auto pattern = QString::fromStdString(chg->pattern->get_name());
@@ -305,6 +382,7 @@ void PatternGenerator::updateCGSettings()
 	cgSettings->LECHLabel->setText(name);
 	cgSettings->LPattern->setText(pattern);
 	cgSettings->cmb_thickness->setCurrentText(QString::number(thickness));
+
 
 	deleteSettingsWidget();
 	createSettingsWidget();
@@ -344,6 +422,58 @@ void PatternGenerator::createSettingsWidget()
 	currentUI->setVisible(true);
 
 	connect(currentUI,SIGNAL(patternChanged()),bufui,SLOT(updateUi()));
+}
+
+void PatternGenerator::colorChanged(QColor color)
+{
+	auto chg = chm.getHighlightedChannelGroup();
+	auto ch = chm.getHighlightedChannel();
+
+	auto chgui = chmui->findUiByChannelGroup(chg);
+	auto chui = chmui->findUiByChannel(ch);
+
+	QPushButton* sender = static_cast<QPushButton *>(QObject::sender());
+	QString type = sender->property("type").toString();
+	if( type == "background") {
+		if(!ch) {
+			chg->setBgcolor(color);
+			chgui->updateTrace();
+		}
+		else {
+			ch->setBgcolor(color);
+			chui->updateTrace();
+		}
+	}
+	else if( type == "edge") {
+		if(!ch) {
+			chg->setEdgecolor(color);
+			chgui->updateTrace();
+		}
+		else {
+			ch->setEdgecolor(color);
+			chui->updateTrace();
+		}
+	}
+	else if( type == "low") {
+		if(!ch) {
+			chg->setLowcolor(color);
+			chgui->updateTrace();
+		}
+		else {
+			ch->setLowcolor(color);
+			chui->updateTrace();
+		}
+	}
+	else if( type == "high") {
+		if(!ch) {
+			chg->setHighcolor(color);
+			chgui->updateTrace();
+		}
+		else {
+			ch->setHighcolor(color);
+			chui->updateTrace();
+		}
+	}
 }
 
 void PatternGenerator::changeChannelThickness(QString text)

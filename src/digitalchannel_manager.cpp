@@ -152,12 +152,55 @@ void ChannelManager::deselect_all()
 	}
 }
 
+QColor Channel::getBgcolor() const
+{
+	return bgcolor;
+}
+
+void Channel::setBgcolor(const QColor &value)
+{
+	bgcolor = value;
+}
+
+QColor Channel::getEdgecolor() const
+{
+	return edgecolor;
+}
+
+void Channel::setEdgecolor(const QColor &value)
+{
+	edgecolor = value;
+}
+
+QColor Channel::getHighcolor() const
+{
+	return highcolor;
+}
+
+void Channel::setHighcolor(const QColor &value)
+{
+	highcolor = value;
+}
+
+QColor Channel::getLowcolor() const
+{
+	return lowcolor;
+}
+
+void Channel::setLowcolor(const QColor &value)
+{
+	lowcolor = value;
+}
 
 Channel::Channel(uint16_t id_, std::string label_)
 {
 	label = label_;
 	id =id_;
 	mask = 1<<id_;
+	lowcolor = QColor(0xC0, 0x00, 0x00);
+	highcolor = QColor(0x00, 0xC0, 0x00);
+	edgecolor = QColor(0x80, 0x80, 0x80);
+	bgcolor = QColor();
 }
 Channel::~Channel()
 {
@@ -206,6 +249,16 @@ Channel *ChannelGroup::get_channel(int index)
 	return channels[index];
 }
 
+QColor ChannelGroup::getBgcolor() const
+{
+	return bgcolor;
+}
+
+void ChannelGroup::setBgcolor(const QColor &value)
+{
+	bgcolor = value;
+}
+
 bool ChannelGroup::is_selected() const
 {
 	return selected;
@@ -235,6 +288,36 @@ bool ChannelGroup::is_enabled() const
 	return enabled;
 }
 
+QColor ChannelGroup::getHighcolor() const
+{
+	return highcolor;
+}
+
+void ChannelGroup::setHighcolor(const QColor &value)
+{
+	highcolor = value;
+}
+
+QColor ChannelGroup::getLowcolor() const
+{
+	return lowcolor;
+}
+
+void ChannelGroup::setLowcolor(const QColor &value)
+{
+	lowcolor = value;
+}
+
+QColor ChannelGroup::getEdgecolor() const
+{
+	return edgecolor;
+}
+
+void ChannelGroup::setEdgecolor(const QColor &value)
+{
+	edgecolor = value;
+}
+
 ChannelGroup::ChannelGroup(Channel *ch)
 {
 	if (ch!=nullptr) {
@@ -245,6 +328,10 @@ ChannelGroup::ChannelGroup(Channel *ch)
 	group(false);
 	select(false);
 	enable(true);
+	lowcolor = QColor(0xC0, 0x00, 0x00);
+	highcolor = QColor(0x00, 0xC0, 0x00);
+	edgecolor = QColor(0x80, 0x80, 0x80);
+	bgcolor = QColor();
 }
 
 ChannelGroup::ChannelGroup()
@@ -252,6 +339,10 @@ ChannelGroup::ChannelGroup()
 	group(false);
 	select(false);
 	enable(true);
+	lowcolor = QColor(0xC0, 0x00, 0x00);
+	highcolor = QColor(0x00, 0xC0, 0x00);
+	edgecolor = QColor(0x80, 0x80, 0x80);
+	bgcolor = QColor();
 }
 
 ChannelGroup::~ChannelGroup()
