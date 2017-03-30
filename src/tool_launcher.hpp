@@ -111,6 +111,7 @@ namespace adiscope {
 
 		void swapMenu(QWidget *menu);
 		void destroyContext();
+		bool loadDecoders(QString path);
 		bool switchContext(const QString &uri);
 		void resetStylesheets();
 		void calibrate();

@@ -29,6 +29,7 @@
 #include <QDebug>
 #include <QtConcurrentRun>
 #include <QSignalTransition>
+#include <QMessageBox>
 
 #include <iio.h>
 
@@ -363,6 +364,32 @@ void adiscope::ToolLauncher::destroyContext()
 	}
 }
 
+bool ToolLauncher::loadDecoders(QString path)
+{
+	static bool srd_loaded = false;
+	if(srd_loaded)
+	{
+		srd_exit();
+	}
+
+	if (srd_init(path.toStdString().c_str()) != SRD_OK) {
+		qDebug() << "ERROR: libsigrokdecode init failed.";
+		return false;
+	}
+	else
+	{
+		srd_loaded = true;
+		/* Load the protocol decoders */
+		srd_decoder_load_all();
+		auto decoder = srd_decoder_get_by_id("parallel");
+		if(decoder == nullptr)
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
 void adiscope::ToolLauncher::calibrate()
 {
 	auto old_dmm_text = ui->btnDMM->text();
@@ -454,13 +481,28 @@ bool adiscope::ToolLauncher::switchContext(const QString &uri)
 		apply_m2k_fixes(ctx);
 
 
+	if (filter->compatible(TOOL_LOGIC_ANALYZER) || filter->compatible(TOOL_PATTERN_GENERATOR))
+	{
+		bool success = loadDecoders(QCoreApplication::applicationDirPath() + "/decoders");
+		if(!success)
+		{
+			QMessageBox *error = new QMessageBox(this);
+			error->setWindowFlags(Qt::FramelessWindowHint);
+			error->setText("There was a problem initializing libsigrokdecode. Some features may be missing");
+			QFile file(":/stylesheets/stylesheets/dialogbox.qss");
+			file.open(QFile::ReadOnly);
+			QString stylesheet = QString::fromLatin1(file.readAll());
+			error->setStyleSheet(stylesheet);
+			error->exec();
+			delete error;
+		}
+	}
 	if (filter->compatible(TOOL_POWER_CONTROLLER)) {
 		power_control = new PowerController(ctx,
 				ui->stopPowerControl, &js_engine, this);
 		power_control->setVisible(false);
 		ui->powerControl->setEnabled(true);
 	}
-
 
 	if (filter->compatible(TOOL_LOGIC_ANALYZER)) {
 		logic_analyzer = new LogicAnalyzer(ctx, filter,

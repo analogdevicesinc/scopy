@@ -174,15 +174,6 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	std::string open_file, open_file_format;
 	context = sigrok::Context::create();
 
-	/* Initialise libsigrokdecode */
-	QString path = QCoreApplication::applicationDirPath() + "/decoders";
-	if (srd_init(path.toStdString().c_str()) != SRD_OK) {
-		qDebug() << "ERROR: libsigrokdecode init failed.";
-	}
-
-	/* Load the protocol decoders */
-	srd_decoder_load_all();
-
 	pv::DeviceManager device_manager(context);
 	pv::MainWindow *w = new pv::MainWindow(device_manager, filt, open_file,
 	                                       open_file_format, parent);

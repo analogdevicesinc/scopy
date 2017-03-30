@@ -180,15 +180,6 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 	connect(ui->btnRunStop, SIGNAL(toggled(bool)), runBtn, SLOT(setChecked(bool)));
 	connect(ui->btnSingleRun, SIGNAL(pressed()), this, SLOT(singleRun()));
 
-	QString path = QCoreApplication::applicationDirPath() + "/decoders";
-
-	if (srd_init(path.toStdString().c_str()) != SRD_OK) {
-		qDebug() << "ERROR: libsigrokdecode init failed.";
-	}
-
-	/* Load the protocol decoders */
-	srd_decoder_load_all();
-
 	//main_win->view_->viewport()->disableDrag();
 
 	pg_api->load();

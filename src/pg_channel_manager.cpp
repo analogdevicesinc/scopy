@@ -697,6 +697,8 @@ void PatternGeneratorChannelGroupUI::dragLeaveEvent(QDragLeaveEvent *event)
 void PatternGeneratorChannelGroupUI::setupParallelDecoder()
 {
 	auto decoder = srd_decoder_get_by_id("parallel");
+	if(decoder==nullptr)
+		return;
 	decodeTrace->set_decoder(decoder);
 	std::map<const srd_channel *,
 	    std::shared_ptr<pv::view::TraceTreeItem> > channel_map;
