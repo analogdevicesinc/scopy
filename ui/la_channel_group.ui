@@ -1286,11 +1286,11 @@ QPushButton:!checked {
                <enum>Qt::Horizontal</enum>
               </property>
               <property name="sizeType">
-               <enum>QSizePolicy::Preferred</enum>
+               <enum>QSizePolicy::Minimum</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>15</width>
+                <width>10</width>
                 <height>20</height>
                </size>
               </property>

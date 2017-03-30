@@ -388,6 +388,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 
 	la_api->load();
 	la_api->js_register(engine);
+
+	chm_ui->setWidgetMinimumNrOfChars(ui->triggerStateLabel, 9);
 }
 
 LogicAnalyzer::~LogicAnalyzer()
@@ -929,6 +931,7 @@ void LogicAnalyzer::onChmWidthChanged(int value)
 	if(l != value - 20 ){
 		ui->areaTimeTriggerLayout->setContentsMargins(value - 20, 0, 0, 0);
 		timePosition->valueChanged(timePosition->value());
+
 	}
 }
 

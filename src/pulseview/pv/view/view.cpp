@@ -1236,19 +1236,9 @@ void View::set_offset(double timePos, double timeSpan, bool running)
 	Timestamp new_offset = Timestamp(value);
 	if( running )
 	{
-		if( session_.get_capture_state() == Session::Running)
-		{
-			session_.stop_capture();
-			ruler_->set_offset(value);
-			start_plot_offset_ = value;
-			session_.start_capture([&](QString message) {
-				session_error("Capture failed", message); });
-			Q_EMIT offset_changed();
-		} else {
-			ruler_->set_offset(value);
-			start_plot_offset_ = value;
-			Q_EMIT offset_changed();
-		}
+		ruler_->set_offset(value);
+		start_plot_offset_ = value;
+		Q_EMIT offset_changed();
 		if(value > 0 ){
 			start_plot_offset_ = 0;
 			set_scale_offset(scale_, Timestamp(0));

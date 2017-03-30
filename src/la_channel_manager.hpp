@@ -277,6 +277,7 @@ public:
 	void retainWidgetSizeWhenHidden(QWidget *w);
 	bool eventFilter(QObject *object, QEvent *event);
 	void updatePlot();
+	void setWidgetMinimumNrOfChars(QWidget *w, int nrOfChars);
 
 public Q_SLOTS:
 	void chmScrollChanged(int value);
@@ -301,7 +302,6 @@ private:
 	QButtonGroup *settings_exclusive_group;
 	pv::widgets::ColourButton *colour_button_edge, *colour_button_BG,
 		*colour_button_low, *colour_button_high;
-	void setWidgetMinimumNrOfChars(QWidget *w, int nrOfChars);
 	QFrame* addSeparator(QVBoxLayout *lay, int pos);
 Q_SIGNALS:
 	void widthChanged(int);
