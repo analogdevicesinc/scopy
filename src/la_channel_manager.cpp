@@ -13,7 +13,6 @@
 #include "ui_la_settings.h"
 #include "ui_la_decoder_reqChannel.h"
 #include "ui_logic_channel_settings.h"
-#include "ui_color_settings.h"
 #include <QScrollBar>
 #include <libsigrokcxx/libsigrokcxx.hpp>
 #include <QPainter>
