@@ -45,6 +45,8 @@ namespace adiscope
 		void discardSettings();
 
 	private:
+        bool signalsBlocked;
+        void forceFocus(QWidget *widget);
 		Ui::Connect *ui;
 		QString uri;
 		bool connected;
