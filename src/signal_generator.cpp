@@ -959,7 +959,8 @@ size_t SignalGenerator::get_samples_count(const struct iio_device *dev,
 				return 0; /* rate too low */
 
 			/* The ratio must be even for square waveforms */
-			if ((ptr->waveform == SG_SQR_WAVE) && (ratio & 0x1))
+			if (perfect && (ptr->waveform == SG_SQR_WAVE)
+					&& (ratio & 0x1))
 				return 0;
 
 			size = lcm(size, ratio);
