@@ -566,18 +566,6 @@ private:
 	PrefixFormatter *m_formatter;
 };
 
-/*
- * PlotItemScaleDraw class can be used to skip the drawing of labels and the
- *                   backbone line of the axis.
- */
-class PlotItemScaleDraw: public QwtScaleDraw
-{
-public:
-
-	PlotItemScaleDraw();
-	QwtText label(double) const;
-};
-
 class OscPlotZoomer: public QwtPlotZoomer
 {
 public:

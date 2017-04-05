@@ -106,23 +106,6 @@ void OscScaleDraw::updateMetrics()
 	invalidateCache();
 }
 
-
-/*
- * PlotItemScaleDraw class implementation
- */
-
-
-PlotItemScaleDraw::PlotItemScaleDraw(): QwtScaleDraw()
-{
-	enableComponent(QwtAbstractScaleDraw::Backbone, false);
-}
-
-QwtText PlotItemScaleDraw::label(double) const
-{
-	// Skip drawing tick labels
-	return QwtText("");
-}
-
 /*
  * EdgelessPlotScaleItem class implementation
  */
@@ -376,54 +359,23 @@ DisplayPlot::DisplayPlot(int nplots, QWidget* parent,
 
   plotLayout()->setAlignCanvasToScales(true);
 
-  // Use PlotItems to construct the plot axis
-  EdgelessPlotScaleItem *scaleItem_r = new EdgelessPlotScaleItem(QwtScaleDraw::LeftScale);
-  PlotItemScaleDraw *yLscaleDraw = new PlotItemScaleDraw();
-  yLscaleDraw->setAlignment(QwtScaleDraw::LeftScale);
-  scaleItem_r->setScaleDraw(yLscaleDraw);
-  scaleItem_r->setFont(this->axisWidget(QwtPlot::yLeft)->font());
-  QPalette palette_r = scaleItem_r->palette();
-  palette_r.setBrush(QPalette::Foreground, QColor("#6E6E6F"));
-  palette_r.setBrush(QPalette::Text, QColor("#6E6E6F"));
-  scaleItem_r->setPalette(palette_r);
-  scaleItem_r->setBorderDistance(0);
-  scaleItem_r->attach(this);
+  for (unsigned int i = 0; i < 4; i++) {
+	QwtScaleDraw::Alignment scale =
+		static_cast<QwtScaleDraw::Alignment>(i);
+	auto scaleItem = new EdgelessPlotScaleItem(scale);
 
-  EdgelessPlotScaleItem *scaleItem_l = new EdgelessPlotScaleItem(QwtScaleDraw::RightScale);
-  PlotItemScaleDraw *yRscaleDraw = new PlotItemScaleDraw();
-  yRscaleDraw->setAlignment(QwtScaleDraw::RightScale);
-  scaleItem_l->setScaleDraw(yRscaleDraw);
-  scaleItem_l->setFont(this->axisWidget(QwtPlot::yLeft)->font());
-  QPalette palette_l = scaleItem_l->palette();
-  palette_l.setBrush(QPalette::Foreground, QColor("#6E6E6F"));
-  palette_l.setBrush(QPalette::Text, QColor("#6E6E6F"));
-  scaleItem_l->setPalette(palette_l);
-  scaleItem_l->setBorderDistance(0);
-  scaleItem_l->attach(this);
+	scaleItem->scaleDraw()->setAlignment(scale);
+	scaleItem->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Backbone, false);
+	scaleItem->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Labels, false);
+	scaleItem->setFont(this->axisWidget(QwtPlot::yLeft)->font());
 
-  EdgelessPlotScaleItem *scaleItem_t = new EdgelessPlotScaleItem(QwtScaleDraw::BottomScale);
-  PlotItemScaleDraw *xBscaleDraw = new PlotItemScaleDraw();
-  xBscaleDraw->setAlignment(QwtScaleDraw::BottomScale);
-  scaleItem_t->setScaleDraw(xBscaleDraw);
-  scaleItem_t->setFont(this->axisWidget(QwtPlot::yLeft)->font());
-  QPalette palette_t = scaleItem_t->palette();
-  palette_t.setBrush(QPalette::Foreground, QColor("#6E6E6F"));
-  palette_t.setBrush(QPalette::Text, QColor("#6E6E6F"));
-  scaleItem_t->setPalette(palette_t);
-  scaleItem_t->setBorderDistance(0);
-  scaleItem_t->attach(this);
-
-  EdgelessPlotScaleItem *scaleItem_b = new EdgelessPlotScaleItem(QwtScaleDraw::TopScale);
-  PlotItemScaleDraw *xTscaleDraw = new PlotItemScaleDraw();
-  xTscaleDraw->setAlignment(QwtScaleDraw::TopScale);
-  scaleItem_b->setScaleDraw(xTscaleDraw);
-  scaleItem_b->setFont(this->axisWidget(QwtPlot::yLeft)->font());
-  QPalette palette_b = scaleItem_b->palette();
-  palette_b.setBrush(QPalette::Foreground, QColor("#6E6E6F"));
-  palette_b.setBrush(QPalette::Text, QColor("#6E6E6F"));
-  scaleItem_b->setPalette(palette_b);
-  scaleItem_b->setBorderDistance(0);
-  scaleItem_b->attach(this);
+	QPalette palette = scaleItem->palette();
+	palette.setBrush(QPalette::Foreground, QColor("#6E6E6F"));
+	palette.setBrush(QPalette::Text, QColor("#6E6E6F"));
+	scaleItem->setPalette(palette);
+	scaleItem->setBorderDistance(0);
+	scaleItem->attach(this);
+  }
 
   this->plotLayout()->setCanvasMargin(0, QwtPlot::yLeft);
   this->plotLayout()->setCanvasMargin(0, QwtPlot::yRight);
