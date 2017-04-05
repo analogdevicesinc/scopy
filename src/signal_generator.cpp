@@ -612,16 +612,16 @@ basic_block_sptr SignalGenerator::getSignalSource(gr::top_block_sptr top,
 	float offset;
 
 	if (data.waveform == SG_SIN_WAVE) {
-		amplitude = data.amplitude;
+		amplitude = data.amplitude / 2.0;
 		offset = data.offset;
 	} else {
-		amplitude = data.amplitude * 2.0;
-		offset = data.offset - (float) data.amplitude;
+		amplitude = data.amplitude;
+		offset = data.offset - (float) data.amplitude / 2.0;
 	}
 
 	if (inv_saw_wave) {
 		waveform = analog::GR_SAW_WAVE;
-		offset = -data.offset - (float) data.amplitude;
+		offset = -data.offset - (float) data.amplitude / 2.0;
 	} else {
 		waveform = static_cast<analog::gr_waveform_t>(data.waveform);
 	}
