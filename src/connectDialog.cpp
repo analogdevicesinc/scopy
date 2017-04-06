@@ -19,10 +19,13 @@
 
 #include "connectDialog.hpp"
 #include "dynamicWidget.hpp"
+#include <QtConcurrentRun>
+#include <functional>
 
 #include "ui_connect.h"
 
 #include <iio.h>
+#include <iostream>
 
 using namespace adiscope;
 
@@ -31,12 +34,19 @@ ConnectDialog::ConnectDialog(QWidget *widget) : QObject(widget),
 {
 	ui->setupUi(widget);
 	ui->connectBtn->setText("Connect");
+	//The connect button will be disabled untill we write something in the hostname line edit
+	ui->connectBtn->setDisabled(true);
 
 	connect(ui->connectBtn, SIGNAL(clicked()), this, SLOT(btnClicked()));
 	connect(ui->hostname, SIGNAL(returnPressed()),
 	        this, SLOT(btnClicked()));
 	connect(ui->hostname, SIGNAL(textChanged(const QString&)),
 	        this, SLOT(discardSettings()));
+	connect(this,SIGNAL(finished(struct iio_context *)),this,
+	        SLOT(updatePopUp(struct iio_context *)));
+	ui->hostname->activateWindow();
+	ui->hostname->setFocus();
+
 }
 
 ConnectDialog::~ConnectDialog()
@@ -46,8 +56,15 @@ ConnectDialog::~ConnectDialog()
 
 void ConnectDialog::btnClicked()
 {
+	if (!ui->connectBtn->isEnabled()) {
+		return;
+	} else {
+		ui->groupBox->setTitle("Waiting for connection...");
+	}
+
 	if (connected) {
-		Q_EMIT newContext(uri);
+		QString new_uri = "ip:" + ui->hostname->text();
+		Q_EMIT newContext(new_uri);
 	} else {
 		validateInput();
 	}
@@ -55,6 +72,13 @@ void ConnectDialog::btnClicked()
 
 void ConnectDialog::discardSettings()
 {
+	if (!ui->hostname->text().isEmpty()) {
+		ui->connectBtn->setDisabled(false);
+	} else {
+		ui->connectBtn->setDisabled(true);
+	}
+
+	ui->groupBox->setTitle(QString("Context info"));
 	setDynamicProperty(ui->connectBtn, "failed", false);
 	setDynamicProperty(ui->connectBtn, "connected", false);
 	ui->connectBtn->setText("Connect");
@@ -65,23 +89,53 @@ void ConnectDialog::discardSettings()
 
 void ConnectDialog::validateInput()
 {
-	QString new_uri = "ip:" + ui->hostname->text();
-	struct iio_context *ctx = iio_create_context_from_uri(
-	                                  new_uri.toStdString().c_str());
+	ui->connectBtn->setDisabled(true);
 
+	QString new_uri = "ip:" + ui->hostname->text();
+	QtConcurrent::run(std::bind(&ConnectDialog::createContext,this,new_uri));
+}
+
+void ConnectDialog::createContext(const QString& uri)
+{
+
+	this->parent()->installEventFilter(this);
+	this->ui->hostname->setDisabled(true);
+
+	struct iio_context *ctx_from_uri = iio_create_context_from_uri(
+	                uri.toStdString().c_str());
+
+	this->parent()->removeEventFilter(this);
+	this->ui->hostname->setDisabled(false);
+	Q_EMIT finished(ctx_from_uri);
+
+}
+void ConnectDialog::updatePopUp(struct iio_context *ctx)
+{
 	this->connected = !!ctx;
 
 	if (!!ctx) {
+		ui->connectBtn->setDisabled(false);
 		QString description(iio_context_get_description(ctx));
 		ui->description->setPlainText(description);
-
+		ui->groupBox->setTitle(QString("Context info"));
 		setDynamicProperty(ui->connectBtn, "connected", true);
 		ui->connectBtn->setText("Add");
-		this->uri = new_uri;
 
 		iio_context_destroy(ctx);
 	} else {
 		setDynamicProperty(ui->connectBtn, "failed", true);
 		ui->connectBtn->setText("Failed!");
+		ui->groupBox->setTitle(QString("Warning"));
+		ui->description->setPlainText("Error: Unable to find host: No such host is known!");
 	}
+}
+bool ConnectDialog::eventFilter(QObject *watched, QEvent *event)
+{
+	if (event->type() == QEvent::MouseButtonPress ||
+	    event->type() == QEvent::MouseButtonDblClick ||
+	    event->type() == QEvent::MouseButtonRelease) {
+		return true;
+	}
+
+	return false;
 }

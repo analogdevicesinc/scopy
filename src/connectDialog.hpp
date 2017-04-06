@@ -22,6 +22,10 @@
 
 #include <QWidget>
 
+extern "C" {
+	struct iio_context;
+}
+
 namespace Ui {
 class Connect;
 }
@@ -37,16 +41,21 @@ public:
 
 Q_SIGNALS:
 	void newContext(const QString& uri);
+	void finished(struct iio_context *ctx);
+
 
 private Q_SLOTS:
 	void btnClicked();
 	void validateInput();
 	void discardSettings();
+	void updatePopUp(struct iio_context *ctx);
+
 
 private:
 	Ui::Connect *ui;
-	QString uri;
 	bool connected;
+	void createContext(const QString& uri);
+	bool eventFilter(QObject *watched, QEvent *event);
 };
 }
 
