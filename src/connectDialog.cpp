@@ -34,9 +34,9 @@ ConnectDialog::ConnectDialog(QWidget *widget) : QObject(widget),
 
 	connect(ui->connectBtn, SIGNAL(clicked()), this, SLOT(btnClicked()));
 	connect(ui->hostname, SIGNAL(returnPressed()),
-			this, SLOT(btnClicked()));
+	        this, SLOT(btnClicked()));
 	connect(ui->hostname, SIGNAL(textChanged(const QString&)),
-			this, SLOT(discardSettings()));
+	        this, SLOT(discardSettings()));
 }
 
 ConnectDialog::~ConnectDialog()
@@ -46,10 +46,11 @@ ConnectDialog::~ConnectDialog()
 
 void ConnectDialog::btnClicked()
 {
-	if (connected)
+	if (connected) {
 		Q_EMIT newContext(uri);
-	else
+	} else {
 		validateInput();
+	}
 }
 
 void ConnectDialog::discardSettings()
@@ -66,9 +67,10 @@ void ConnectDialog::validateInput()
 {
 	QString new_uri = "ip:" + ui->hostname->text();
 	struct iio_context *ctx = iio_create_context_from_uri(
-			new_uri.toStdString().c_str());
+	                                  new_uri.toStdString().c_str());
 
 	this->connected = !!ctx;
+
 	if (!!ctx) {
 		QString description(iio_context_get_description(ctx));
 		ui->description->setPlainText(description);

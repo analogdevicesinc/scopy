@@ -23,32 +23,31 @@
 #include <QWidget>
 
 namespace Ui {
-	class Connect;
+class Connect;
 }
 
-namespace adiscope
+namespace adiscope {
+class ConnectDialog : public QObject
 {
-	class ConnectDialog : public QObject
-	{
-		Q_OBJECT
+	Q_OBJECT
 
-	public:
-		explicit ConnectDialog(QWidget *widget);
-		~ConnectDialog();
+public:
+	explicit ConnectDialog(QWidget *widget);
+	~ConnectDialog();
 
-	Q_SIGNALS:
-		void newContext(const QString& uri);
+Q_SIGNALS:
+	void newContext(const QString& uri);
 
-	private Q_SLOTS:
-		void btnClicked();
-		void validateInput();
-		void discardSettings();
+private Q_SLOTS:
+	void btnClicked();
+	void validateInput();
+	void discardSettings();
 
-	private:
-		Ui::Connect *ui;
-		QString uri;
-		bool connected;
-	};
+private:
+	Ui::Connect *ui;
+	QString uri;
+	bool connected;
+};
 }
 
 #endif /* CONNECTDIALOG_HPP */
