@@ -364,10 +364,18 @@ Measure::Measure(int channel, double *buffer, size_t length):
 		MeasurementData::VERTICAL, "V", channel));
 	m_measurements.push_back(std::make_shared<MeasurementData>("Mean",
 		MeasurementData::VERTICAL, "V", channel));
+	m_measurements.push_back(std::make_shared<MeasurementData>("Cycle Mean",
+		MeasurementData::VERTICAL, "V", channel));
 	m_measurements.push_back(std::make_shared<MeasurementData>("RMS",
+		MeasurementData::VERTICAL, "V", channel));
+	m_measurements.push_back(std::make_shared<MeasurementData>("Cycle RMS",
 		MeasurementData::VERTICAL, "V", channel));
 	m_measurements.push_back(std::make_shared<MeasurementData>("AC RMS",
 		MeasurementData::VERTICAL, "V", channel));
+	m_measurements.push_back(std::make_shared<MeasurementData>("Area",
+		MeasurementData::VERTICAL, "Vs", channel));
+	m_measurements.push_back(std::make_shared<MeasurementData>("Cycle Area",
+		MeasurementData::VERTICAL, "Vs", channel));
 	m_measurements.push_back(std::make_shared<MeasurementData>("Low",
 		MeasurementData::VERTICAL, "V", channel));
 	m_measurements.push_back(std::make_shared<MeasurementData>("High",
@@ -392,6 +400,7 @@ Measure::Measure(int channel, double *buffer, size_t length):
 		MeasurementData::HORIZONTAL, "%", channel));
 	m_measurements.push_back(std::make_shared<MeasurementData>("-Duty",
 		MeasurementData::HORIZONTAL, "%", channel));
+
 }
 
 bool Measure::highLowFromHistogram(double &low, double &high,
@@ -468,6 +477,8 @@ void Measure::measure()
 	double cycle_rms;
 	double rms_ac;
 	double cycle_rms_ac;
+	double area;
+	double cycle_area;
 	double sum;
 	double sqr_sum;
 
@@ -612,12 +623,20 @@ void Measure::measure()
 		size_t period_end = periodPoints[2].m_bufIdx;
 		size_t length = period_end - period_start + 1;
 
+		double period_sum = data[period_start];
+		double period_sqr_sum = data[period_start] * data[period_start];
+
 		for (size_t i = period_start + 1; i <= period_start + 2 * length; i++) {
 			size_t idx = period_start + (i  % length);
 
 			cdLow.crossDetectStep(data, idx);
 			cdMid.crossDetectStep(data, idx);
 			cdHigh.crossDetectStep(data, idx);
+		}
+
+		for (size_t i = period_start + 1; i <= period_end; i++) {
+			period_sum += data[i];
+			period_sqr_sum += data[i] * data[i];
 		}
 
 		for (int i = 1; i < crossSequence.size(); i++) {
@@ -650,6 +669,22 @@ void Measure::measure()
 			CrossPoint &highFalling = crossSequence[pos + 3];
 			CrossPoint &midFalling = crossSequence[pos + 4];
 			CrossPoint &lowFalling = crossSequence[pos + 5];
+
+			//Cycle Mean
+			cycle_mean = period_sum / length;
+			m_measurements[CYCLE_MEAN]->setValue(cycle_mean);
+
+			//Cycle RMS
+			cycle_rms = sqrt(period_sqr_sum / length);
+			m_measurements[CYCLE_RMS]->setValue(cycle_rms);
+
+			//Area
+			area = sum * (1 / m_sample_rate);
+			m_measurements[AREA]->setValue(area);
+
+			//Cycle Area
+			cycle_area = period_sum * (1 / m_sample_rate);
+			m_measurements[CYCLE_AREA]->setValue(cycle_area);
 
 			// Rise Time
 			long long rise = (long long)(highRising.m_bufIdx -
