@@ -1188,8 +1188,10 @@ QwtScaleDiv adiscope::getEdgelessScaleDiv(const QwtScaleDiv& from_scaleDiv)
 	minorTicks = from_scaleDiv.ticks(QwtScaleDiv::MinorTick);
 	mediumTicks = from_scaleDiv.ticks(QwtScaleDiv::MediumTick);
 	majorTicks = from_scaleDiv.ticks(QwtScaleDiv::MajorTick);
-	majorTicks.erase(majorTicks.begin());
-	majorTicks.erase(majorTicks.end() - 1);
+	if (!majorTicks.empty()) {
+		majorTicks.erase(majorTicks.begin());
+		majorTicks.erase(majorTicks.end() - 1);
+	}
 	return QwtScaleDiv(lowerBound, upperBound, minorTicks, mediumTicks, majorTicks);
 }
 
