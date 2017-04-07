@@ -19,6 +19,7 @@
 
 #include "dbgraph.hpp"
 #include "DisplayPlot.h"
+#include "osc_scale_engine.h"
 
 #include <qwt_plot_layout.h>
 
@@ -33,20 +34,68 @@ dBgraph::dBgraph(QWidget *parent) : QwtPlot(parent),
 	setAxisAutoScale(QwtPlot::yLeft, false);
 	setAxisAutoScale(QwtPlot::xTop, false);
 
+	EdgelessPlotGrid *grid = new EdgelessPlotGrid;
+	grid->setMajorPen(QColor("#353537"), 1.0, Qt::DashLine);
+	grid->setXAxis(QwtPlot::xTop);
+	grid->attach(this);
+
 	plotLayout()->setAlignCanvasToScales(true);
 
 	curve.attach(this);
 	curve.setXAxis(QwtPlot::xTop);
+	curve.setYAxis(QwtPlot::yLeft);
 
+	OscScaleEngine *scaleTop = new OscScaleEngine;
+	scaleTop->setMajorTicksCount(8);
+	this->setAxisScaleEngine(QwtPlot::xTop,
+			static_cast<QwtScaleEngine *>(scaleTop));
+
+	OscScaleEngine *scaleLeft = new OscScaleEngine;
+	scaleLeft->setMajorTicksCount(6);
+	this->setAxisScaleEngine(QwtPlot::yLeft,
+			static_cast<QwtScaleEngine *>(scaleLeft));
+
+	/* draw_x / draw_y: Outmost X / Y scales. Only draw the labels */
 	formatter = static_cast<PrefixFormatter *>(new MetricPrefixFormatter);
-
 	draw_x = new OscScaleDraw(formatter, "Hz");
 	draw_x->setFloatPrecision(2);
+	draw_x->enableComponent(QwtAbstractScaleDraw::Ticks, false);
+	draw_x->enableComponent(QwtAbstractScaleDraw::Backbone, false);
 	setAxisScaleDraw(QwtPlot::xTop, draw_x);
 
 	draw_y = new OscScaleDraw("dB");
 	draw_y->setFloatPrecision(0);
+	draw_y->enableComponent(QwtAbstractScaleDraw::Ticks, false);
+	draw_y->enableComponent(QwtAbstractScaleDraw::Backbone, false);
 	setAxisScaleDraw(QwtPlot::yLeft, draw_y);
+
+	/* Create 4 scales within the plot itself. Only draw the ticks */
+	for (unsigned int i = 0; i < 4; i++) {
+		EdgelessPlotScaleItem *scaleItem = new EdgelessPlotScaleItem(
+				static_cast<QwtScaleDraw::Alignment>(i));
+
+		/* Top/bottom scales must be sync'd to xTop; left/right scales
+		 * must be sync'd to yLeft */
+		if (i < 2)
+			scaleItem->setXAxis(QwtPlot::xTop);
+		else
+			scaleItem->setYAxis(QwtPlot::yLeft);
+
+		scaleItem->scaleDraw()->enableComponent(
+				QwtAbstractScaleDraw::Backbone, false);
+		scaleItem->scaleDraw()->enableComponent(
+				QwtAbstractScaleDraw::Labels, false);
+
+		QPalette palette = scaleItem->palette();
+		palette.setBrush(QPalette::Foreground, QColor("#6E6E6F"));
+		palette.setBrush(QPalette::Text, QColor("#6E6E6F"));
+		scaleItem->setPalette(palette);
+		scaleItem->setBorderDistance(0);
+		scaleItem->attach(this);
+	}
+
+	static_cast<QFrame *>(canvas())->setLineWidth(0);
+	setContentsMargins(10, 10, 20, 20);
 }
 
 dBgraph::~dBgraph()
