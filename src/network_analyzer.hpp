@@ -87,6 +87,8 @@ namespace adiscope {
 				unsigned long rate,
 				size_t samples_count);
 
+		unsigned long get_best_adc_rate(double frequency);
+
 	private Q_SLOTS:
 		void startStop(bool start);
 		void updateNumSamples();

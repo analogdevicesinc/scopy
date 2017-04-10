@@ -61,9 +61,10 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 		QWidget *parent) : QWidget(parent),
 	ui(new Ui::NetworkAnalyzer), net_api(new NetworkAnalyzer_API(this))
 {
-	const std::string adc = filt->device_name(TOOL_NETWORK_ANALYZER, 2);
-	iio = iio_manager::get_instance(ctx, adc);
+	iio = iio_manager::get_instance(ctx,
+			filt->device_name(TOOL_NETWORK_ANALYZER, 2));
 
+	adc = filt->find_device(ctx, TOOL_NETWORK_ANALYZER, 2);
 	dac1 = filt->find_channel(ctx, TOOL_NETWORK_ANALYZER, 0, true);
 	dac2 = filt->find_channel(ctx, TOOL_NETWORK_ANALYZER, 1, true);
 	if (!dac1 || !dac2)
@@ -165,6 +166,7 @@ void NetworkAnalyzer::run()
 		unsigned long rate = get_best_sin_sample_rate(dac1, frequency);
 		size_t samples_count = get_sin_samples_count(
 				dac1, rate, frequency);
+		unsigned long adc_rate;
 
 		double amplitude = ui->amplitude->value();
 		double offset = ui->offset->value();
@@ -196,6 +198,10 @@ void NetworkAnalyzer::run()
 			iio_device_attr_write_bool(dev1, "dma_sync", false);
 		}
 
+		adc_rate = get_best_adc_rate(frequency);
+		iio_device_attr_write_longlong(adc,
+				"sampling_frequency", adc_rate);
+
 		/* Lock the flowgraph if we are already started */
 		bool started = iio->started();
 		if (started)
@@ -211,6 +217,14 @@ void NetworkAnalyzer::run()
 		auto id2 = iio->connect(skiphead2, 1, 0, true,
 				in_samples_count);
 
+		/* We want at least 8 periods */
+		unsigned long buffer_size = 8.0 * (double) adc_rate / frequency;
+		iio->set_buffer_size(id1, buffer_size);
+		iio->set_buffer_size(id2, buffer_size);
+
+		qDebug() << "Scanning frequency" << frequency << "Hz at" <<
+			adc_rate << "SPS," << buffer_size << "samples";
+
 		auto f2c1 = blocks::float_to_complex::make();
 		auto f2c2 = blocks::float_to_complex::make();
 		iio->connect(skiphead1, 0, f2c1, 0);
@@ -220,8 +234,8 @@ void NetworkAnalyzer::run()
 		iio->connect(null, 0, f2c1, 1);
 		iio->connect(null, 0, f2c2, 1);
 
-		/* XXX: FIXME: Don't hardcode the ADC rate */
-		auto cosine = analog::sig_source_c::make((unsigned int) 100e6,
+		auto cosine = analog::sig_source_c::make(
+				(unsigned int) adc_rate,
 				gr::analog::GR_COS_WAVE, -frequency, 1.0);
 
 		auto mult1 = blocks::multiply_cc::make();
@@ -394,6 +408,23 @@ unsigned long NetworkAnalyzer::get_best_sin_sample_rate(
 	}
 
 	throw std::runtime_error("Unable to calculate best sample rate");
+}
+
+unsigned long NetworkAnalyzer::get_best_adc_rate(double frequency)
+{
+	QVector<unsigned long> values =
+		SignalGenerator::get_available_sample_rates(adc);
+
+	/* Return the smallest rate that is at least twice the frequency */
+	qSort(values.begin(), values.end(), qLess<unsigned long>());
+
+	for (unsigned long rate : values) {
+		if ((double) rate > 2.0 * frequency)
+			return rate;
+	}
+
+	/* Or return the fastest one */
+	return values.takeLast();
 }
 
 struct iio_buffer * NetworkAnalyzer::generateSinWave(
