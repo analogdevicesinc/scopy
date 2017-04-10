@@ -217,9 +217,7 @@ QTabWidget#tabWidget QWidget QWidget {
                  </sizepolicy>
                 </property>
                 <property name="styleSheet">
-                 <string notr="true">QWidget {
-  background-color: black;
-}</string>
+                 <string notr="true">QwtPlotCanvas { background-color: #141416; }</string>
                 </property>
                 <property name="frameShape">
                  <enum>QFrame::NoFrame</enum>
@@ -263,9 +261,7 @@ QTabWidget#tabWidget QWidget QWidget {
                  </sizepolicy>
                 </property>
                 <property name="styleSheet">
-                 <string notr="true">QWidget {
-  background-color: black;
-}</string>
+                 <string notr="true">QwtPlotCanvas { background-color: #141416; }</string>
                 </property>
                 <property name="frameShape">
                  <enum>QFrame::NoFrame</enum>
@@ -387,6 +383,9 @@ QTabWidget#tabWidget QWidget QWidget {
               </property>
               <item>
                <widget class="adiscope::dBgraph" name="nicholsgraph">
+                <property name="styleSheet">
+                 <string notr="true">QwtPlotCanvas { background-color: #141416; }</string>
+                </property>
                 <property name="frameShape">
                  <enum>QFrame::StyledPanel</enum>
                 </property>
