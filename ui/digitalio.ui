@@ -258,7 +258,7 @@ QPushButton:checked:hover {
      <item>
       <widget class="adiscope::MenuAnim" name="rightMenu" native="true">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
