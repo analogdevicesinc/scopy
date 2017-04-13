@@ -191,8 +191,8 @@ void DigitalIO::updateUi()
 {
 	if (!offline_mode) {
 		auto gpi = diom->getGpi();
-		auto grp1 = gpi & 0xff;
-		auto grp2 = (gpi & 0xff00) >> 8;
+		auto gpigrp1 = gpi & 0xff;
+		auto gpigrp2 = (gpi & 0xff00) >> 8;
 
 		for (auto i=0; i<16; i++) {
 			Ui::dioChannel *chui = findIndividualUi(i)->second;
@@ -215,11 +215,11 @@ void DigitalIO::updateUi()
 		}
 
 		if (groups[0]->ui->inout->isChecked()) {
-			groups[0]->ui->horizontalSlider->setValue(grp1);
+			groups[0]->ui->horizontalSlider->setValue(gpigrp1);
 		}
 
 		if (groups[1]->ui->inout->isChecked()) {
-			groups[1]->ui->horizontalSlider->setValue(grp2);
+			groups[1]->ui->horizontalSlider->setValue(gpigrp2);
 		}
 	}
 }
