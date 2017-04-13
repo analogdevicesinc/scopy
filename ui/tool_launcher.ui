@@ -263,6 +263,9 @@ color: rgb(255, 255, 255);
           <bool>false</bool>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_10">
+          <property name="spacing">
+           <number>0</number>
+          </property>
           <property name="leftMargin">
            <number>0</number>
           </property>
@@ -314,20 +317,43 @@ color: rgb(255, 255, 255);
            </widget>
           </item>
           <item>
-           <spacer name="horizontalSpacer_6">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+           <widget class="QPushButton" name="stopDIO">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
             </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Fixed</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
+            <property name="minimumSize">
              <size>
               <width>32</width>
-              <height>0</height>
+              <height>32</height>
              </size>
             </property>
-           </spacer>
+            <property name="maximumSize">
+             <size>
+              <width>32</width>
+              <height>32</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QPushButton {
+background-repeat: no-repeat;
+background-position: center center;
+}
+
+QPushButton:enabled {
+background-image: url(:/icons/ico-stop.svg);
+}
+
+QPushButton:checked {
+background-image: url(:/icons/ico-play-green.svg);
+}</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -1461,7 +1487,7 @@ font-weight: bold;
                   </property>
                   <property name="minimumSize">
                    <size>
-                    <width>96</width>
+                    <width>90</width>
                     <height>64</height>
                    </size>
                   </property>
@@ -1625,7 +1651,7 @@ background-color: orange;
   </connection>
  </connections>
  <buttongroups>
-  <buttongroup name="buttonGroup_2"/>
   <buttongroup name="buttonGroup"/>
+  <buttongroup name="buttonGroup_2"/>
  </buttongroups>
 </ui>

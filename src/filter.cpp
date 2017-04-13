@@ -31,6 +31,7 @@
 using namespace adiscope;
 
 static const std::string tool_names[] = {
+	"dio",
 	"osc",
 	"siggen",
 	"dmm",

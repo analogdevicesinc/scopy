@@ -106,6 +106,10 @@
         <file>icons/gear_wheel_hover.svg</file>
         <file>icons/ico-play-green.svg</file>
         <file>icons/ico-stop.svg</file>
+        <file>icons/in-out-in.svg</file>
+        <file>icons/in-out-out.svg</file>
+        <file>icons/dio100.svg</file>
+        <file>icons/dio101.svg</file>
     </qresource>
     <qresource prefix="/stylesheets">
         <file>stylesheets/plot.qss</file>

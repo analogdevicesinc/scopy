@@ -102,7 +102,7 @@ const char *PatternGenerator::channelNames[] = {
 
 PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
                                    QPushButton *runBtn, QJSEngine *engine,
-				   QWidget *parent, bool offline_mode_) :
+				   DIOManager* diom, QWidget *parent, bool offline_mode_) :
 	QWidget(parent),
 	ctx(ctx),
 	settings_group(new QButtonGroup(this)), menuRunButton(runBtn),
@@ -110,14 +110,14 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 	pgSettings(new Ui::PGSettings),
 	cgSettings(new Ui::PGCGSettings),
 	txbuf(0), buffer_created(0), currentUI(nullptr), offline_mode(offline_mode_),
-	pg_api(new PatternGenerator_API(this))
+	pg_api(new PatternGenerator_API(this)),
+	diom(diom)
 {
-
 	// IIO
 	if (!offline_mode) {
-		dev = iio_context_find_device(ctx, "m2k-logic-analyzer-tx");
-		channel_manager_dev = iio_context_find_device(ctx, "m2k-logic-analyzer");
-		this->no_channels = iio_device_get_channels_count(channel_manager_dev);
+		dev = filt->find_device(ctx,TOOL_PATTERN_GENERATOR);
+		this->no_channels = iio_device_get_channels_count(dev);
+
 	}
 
 	// UI
@@ -468,7 +468,7 @@ bool PatternGenerator::startPatternGeneration(bool cyclic)
 	/* Enable Tx channels*/
 	//char temp_buffer[12];
 
-	if (!channel_manager_dev || !dev) {
+	if (!dev) {
 		qDebug("Devices not found");
 		return false;
 	}
@@ -476,20 +476,16 @@ bool PatternGenerator::startPatternGeneration(bool cyclic)
 	qDebug("Enabling channels");
 
 	for (int j = 0; j < no_channels; j++) {
-		auto ch = iio_device_find_channel(dev, channelNames[j], true);
-		iio_channel_enable(ch);
+		if (chm.get_enabled_mask() & (1<<j))
+		{
+			qDebug()<<"enabled channel - "<<j<<"\n";
+			auto ch = iio_device_find_channel(dev, channelNames[j], true);
+			iio_channel_enable(ch);
+		}
 	}
 
 	qDebug("Setting channel direction");
-
-	for (int j = 0; j < no_channels; j++) {
-		if (chm.get_enabled_mask() & (1<<j)) {
-			//auto ch = iio_device_get_channel(channel_manager_dev, j);
-			auto ch = iio_device_find_channel(channel_manager_dev,channelNames[j],false);
-			auto nr_of_bytes = iio_channel_attr_write(ch, "direction", "out");
-			qDebug()<<nr_of_bytes;
-		}
-	}
+	diom->lock(chm.get_enabled_mask());
 
 	qDebug("Setting sample rate");
 	iio_device_attr_write(dev, "sampling_frequency",
@@ -529,10 +525,7 @@ void PatternGenerator::stopPatternGeneration()
 	}
 
 	/* Reset Tx Channls*/
-	for (int j = 0; j < no_channels; j++) {
-		auto ch = iio_device_find_channel(channel_manager_dev, channelNames[j], false);
-		iio_channel_attr_write(ch, "direction", "in");
-	}
+	diom->unlock();
 
 	for (int j = 0; j < no_channels; j++) {
 		auto ch = iio_device_find_channel(dev, channelNames[j], true);

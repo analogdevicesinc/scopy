@@ -162,6 +162,46 @@ public:
 	ChannelGroup *get_channel_group(int index);
 };
 
+class DIOManager : public QObject
+{
+	Q_OBJECT
+	int direction;
+	int lockMask;
+	int nrOfChannels;
+	int gpo;
+	int gpi;
+	bool outputEnabled;
+	static const char *channelNames[];
+	iio_context *ctx;
+	iio_device *dev;
+
+public:
+	void init();
+	DIOManager(iio_context *ctx, Filter *filt);
+	~DIOManager();
+	bool getOutputEnabled();
+	void enableOutput(bool output);
+	int getGpo();
+	void setOutRaw(int ch, bool val);
+	bool getOutRaw(int ch);
+	int getGpi();
+	bool getInRaw(int ch);
+	void setDeviceOutRaw(int ch);
+
+	void setDirection(int ch, bool output);
+	bool getDirection(int ch);
+	void setDeviceDirection(int ch, bool force);
+	iio_channel *getChannel(int ch);
+	void lock(int mask);
+	int getLockMask();
+	bool isLocked(int ch);
+	void unlock();
+
+Q_SIGNALS:
+	void locked();
+	void unlocked();
+};
+
 }
 
 #endif // PG_CHANNEL_MANAGER_H

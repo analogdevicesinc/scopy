@@ -88,7 +88,7 @@ class PatternGenerator : public QWidget
 public:
 	static const int channelGroupLabelMaxLength = 13;
 	explicit PatternGenerator(struct iio_context *ctx, Filter *filt,
-	                          QPushButton *runButton, QJSEngine *engine,
+				  QPushButton *runButton, QJSEngine *engine, DIOManager* diom,
 				  QWidget *parent = 0, bool offline_mode_ = 0);
 	~PatternGenerator();
 	void updateCGSettings();
@@ -109,6 +109,7 @@ private Q_SLOTS:
 private:
 
 	// UI
+	static const char *channelNames[];
 	Ui::PatternGenerator *ui;
 	Ui::PGSettings *pgSettings;
 	Ui::PGCGSettings *cgSettings;
@@ -133,7 +134,6 @@ private:
 	PatternGeneratorBufferManager *bufman;
 	PatternGeneratorBufferManagerUi *bufui;
 
-
 	bool buffer_created;
 	int no_channels;
 	pv::MainWindow *main_win;
@@ -144,6 +144,7 @@ private:
 	struct iio_device *dev;
 	struct iio_device *channel_manager_dev;
 	struct iio_buffer *txbuf;
+	DIOManager* diom;
 
 	bool startPatternGeneration(bool cyclic);
 	void stopPatternGeneration();
@@ -152,7 +153,6 @@ private:
 	std::vector<PatternUI *> patterns;
 	static QStringList digital_trigger_conditions;
 	static QStringList possibleSampleRates;
-	static const char *channelNames[];
 
 	QString toString();
 	QJsonValue chmToJson();

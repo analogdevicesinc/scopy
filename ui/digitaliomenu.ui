@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DigitalIoMenu</class>
+ <widget class="QWidget" name="DigitalIoMenu">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>240</width>
+    <height>320</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QLineEdit
+{
+  font-family: Arial;
+  font-size: 18px;
+  line-height: 21px;
+  color: #FFFFFF;
+  border: 0px;
+  border-bottom: 1px solid rgba(255,255,255,100);
+}
+
+QLineEdit:disabled
+{
+  color: rgb(85, 85, 85);
+}
+</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>PollingRate</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLineEdit" name="lineEdit">
+     <property name="text">
+      <string>1000</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="enableOutputs_PB">
+     <property name="styleSheet">
+      <string notr="true">QPushButton {
+  width: 80px;
+  height: 40px;
+  border-radius: 4px;
+  background-color: #27b34f;
+  color: white;
+  font-family: &quot;monospace&quot;;
+  font-weight: bold;
+
+  text-align: left;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+QPushButton::checked {
+  background-color: #F45000;
+}
+
+QPushButton:disabled {
+background-color: grey;
+}</string>
+     </property>
+     <property name="text">
+      <string>Enable Outputs</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

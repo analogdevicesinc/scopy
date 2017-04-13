@@ -40,7 +40,7 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	ui(new Ui::ToolLauncher), ctx(nullptr),
 	power_control(nullptr), dmm(nullptr), signal_generator(nullptr),
 	oscilloscope(nullptr), current(nullptr), filter(nullptr),
-	logic_analyzer(nullptr), pattern_generator(nullptr),
+	logic_analyzer(nullptr), pattern_generator(nullptr), dio(nullptr),
 	network_analyzer(nullptr), tl_api(new ToolLauncher_API(this)),
 	notifier(STDIN_FILENO, QSocketNotifier::Read)
 {
@@ -226,6 +226,11 @@ void adiscope::ToolLauncher::on_btnNetworkAnalyzer_clicked()
 	swapMenu(static_cast<QWidget *>(network_analyzer));
 }
 
+void adiscope::ToolLauncher::on_btnDigitalIO_clicked()
+{
+	swapMenu(static_cast<QWidget *>(dio));
+}
+
 void adiscope::ToolLauncher::apply_m2k_fixes(struct iio_context *ctx)
 {
 	struct iio_device *dev = iio_context_find_device(ctx, "ad9963");
@@ -310,6 +315,7 @@ void adiscope::ToolLauncher::on_btnConnect_clicked(bool pressed)
 
 void adiscope::ToolLauncher::destroyContext()
 {
+	ui->digitalIO->setDisabled(true);
 	ui->oscilloscope->setDisabled(true);
 	ui->signalGenerator->setDisabled(true);
 	ui->dmm->setDisabled(true);
@@ -317,6 +323,11 @@ void adiscope::ToolLauncher::destroyContext()
 	ui->logicAnalyzer->setDisabled(true);
 	ui->patternGenerator->setDisabled(true);
 	ui->networkAnalyzer->setDisabled(true);
+
+	if (dio) {
+		delete dio;
+		dio = nullptr;
+	}
 
 	if (dmm) {
 		delete dmm;
@@ -481,6 +492,12 @@ bool adiscope::ToolLauncher::switchContext(const QString &uri)
 		apply_m2k_fixes(ctx);
 
 
+	if (filter->compatible(TOOL_PATTERN_GENERATOR) || filter->compatible(TOOL_DIGITALIO))
+	{
+		dioManager = new DIOManager(ctx,filter);
+
+	}
+
 	if (filter->compatible(TOOL_LOGIC_ANALYZER) || filter->compatible(TOOL_PATTERN_GENERATOR))
 	{
 		bool success = loadDecoders(QCoreApplication::applicationDirPath() + "/decoders");
@@ -497,6 +514,14 @@ bool adiscope::ToolLauncher::switchContext(const QString &uri)
 			delete error;
 		}
 	}
+
+	if (filter->compatible(TOOL_DIGITALIO)) {
+		dio = new DigitalIO(ctx, filter, ui->stopDIO, dioManager, &js_engine, this);
+		dio->setVisible(false);
+		ui->digitalIO->setEnabled(true);
+	}
+
+
 	if (filter->compatible(TOOL_POWER_CONTROLLER)) {
 		power_control = new PowerController(ctx,
 				ui->stopPowerControl, &js_engine, this);
@@ -514,7 +539,7 @@ bool adiscope::ToolLauncher::switchContext(const QString &uri)
 
 	if (filter->compatible((TOOL_PATTERN_GENERATOR))) {
 		pattern_generator = new PatternGenerator (ctx, filter,
-				ui->stopPatternGenerator, &js_engine, this);
+				ui->stopPatternGenerator, &js_engine,dioManager, this);
 		pattern_generator->setVisible(false);
 		ui->patternGenerator->setEnabled(true);
 	}

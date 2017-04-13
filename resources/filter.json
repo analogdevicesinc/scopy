@@ -12,8 +12,9 @@
 	},
 
 	"M2K": {
-		"compatible": [ "siggen", "dmm", "power", "osc", "logic", "pattern", "network" ],
-		"compatible-devices": [ "m2k-adc", "m2k-dac-a", "m2k-dac-b", "m2k-logic-analyzer-rx", "m2k-logic-analyzer-tx" ],
+		"compatible": ["dio", "siggen", "dmm", "power", "osc", "logic", "pattern", "network" ],
+		"compatible-devices": [ "m2k-adc", "m2k-dac-a", "m2k-dac-b", "m2k-logic-analyzer-rx", "m2k-logic-analyzer-tx", "m2k-logic-analyzer" ],
+		"dio-devices": ["m2k-logic-analyzer"],
 		"osc-devices": [ "m2k-adc" ],
 		"dmm-devices": [ "m2k-adc" ],
 		"siggen-devices": [ "m2k-dac-a", "m2k-dac-b" ],

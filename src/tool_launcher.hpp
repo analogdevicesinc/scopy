@@ -37,6 +37,7 @@
 #include "logic_analyzer.hpp"
 #include "pattern_generator.hpp"
 #include "network_analyzer.hpp"
+#include "digitalio.hpp"
 
 extern "C" {
 	struct iio_context;
@@ -86,6 +87,7 @@ namespace adiscope {
 
 		void hasText();
 
+		void on_btnDigitalIO_clicked();
 	private:
 		Ui::ToolLauncher *ui;
 		struct iio_context *ctx;
@@ -97,6 +99,8 @@ namespace adiscope {
 		SignalGenerator *signal_generator;
 		Oscilloscope *oscilloscope;
 		LogicAnalyzer *logic_analyzer;
+		DigitalIO *dio;
+		DIOManager *dioManager;
 		PatternGenerator *pattern_generator;
 		NetworkAnalyzer *network_analyzer;
 		QWidget *current;

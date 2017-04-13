@@ -330,4 +330,193 @@ void ChannelGroupUI::enable(bool enabled)
 	chg->enable(enabled);
 }
 
+void DIOManager::init()
+{
+
+}
+
+const char *DIOManager::channelNames[] = {
+	"voltage0", "voltage1", "voltage2", "voltage3",
+	"voltage4", "voltage5", "voltage6", "voltage7",
+	"voltage8", "voltage9", "voltage10", "voltage11",
+	"voltage12", "voltage13", "voltage14", "voltage15"
+};
+
+DIOManager::DIOManager(iio_context *ctx, Filter *filt) : ctx(ctx)
+{
+	dev = filt->find_device(ctx,TOOL_DIGITALIO);
+	nrOfChannels = iio_device_get_channels_count(dev);
+	outputEnabled = false;
+
+	for (auto i=0; i<nrOfChannels; i++) {
+		auto ch = getChannel(i);
+		iio_channel_attr_write(ch, "direction", "in");
+		iio_channel_attr_write(ch, "raw", "0");
+	}
+
+	direction = gpo = lockMask = outputEnabled = 0x00;
+}
+
+DIOManager::~DIOManager()
+{
+
+}
+
+iio_channel *DIOManager::getChannel(int ch)
+{
+	return iio_device_find_channel(dev,channelNames[ch],0);
+}
+
+
+void DIOManager::setDeviceDirection(int chid, bool force)
+{
+
+	auto ch = getChannel(chid);
+
+	if (force) {
+		qDebug()<<"direction out channel - "<<chid<<"\n";
+		iio_channel_attr_write(ch, "direction", "out");
+		return;
+	}
+
+
+	if (!isLocked(chid)) {
+		if (outputEnabled && getDirection(chid)) {
+			qDebug()<<"direction out channel" <<chid;
+			iio_channel_attr_write(ch, "direction", "out");
+		} else {
+			qDebug()<<"direction in channel" <<chid;
+			iio_channel_attr_write(ch, "direction", "in");
+		}
+	}
+}
+
+int DIOManager::getGpo()
+{
+	return gpo;
+}
+
+void DIOManager::setOutRaw(int ch, bool val)
+{
+	if (val) {
+		gpo|=1<<ch;
+	} else {
+		gpo&=(~(1<<ch));
+	}
+
+	setDeviceOutRaw(ch);
+}
+
+bool DIOManager::getOutRaw(int ch)
+{
+	return gpo & (1<<ch);
+}
+
+void DIOManager::setDeviceOutRaw(int ch)
+{
+	if (outputEnabled) {
+		auto channel = getChannel(ch);
+
+		if (getOutRaw(ch)) {
+			iio_channel_attr_write(channel, "raw", "1");
+		} else {
+			iio_channel_attr_write(channel, "raw", "0");
+		}
+	}
+}
+
+int DIOManager::getGpi()
+{
+	gpi = 0;
+
+	for (auto i=0; i<nrOfChannels; i++) {
+		gpi|= (getInRaw(i) << i);
+	}
+
+	return gpi;
+}
+
+bool DIOManager::getInRaw(int ch)
+{
+	auto channel = getChannel(ch);
+	char buf[10];
+	iio_channel_attr_read(channel,"raw",buf,10);
+
+	if (buf[0]=='1') {
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
+void DIOManager::setDirection(int ch, bool output)
+{
+	if (output) {
+		direction|=(1<<ch);
+	} else {
+		direction&=(~(1<<ch));
+	}
+
+	setDeviceDirection(ch,false);
+}
+
+bool DIOManager::getDirection(int ch)
+{
+	return direction&(1<<ch);
+}
+
+void DIOManager::lock(int mask)
+{
+	lockMask = mask;
+	int i=0;
+
+	while (mask) {
+		if (mask&0x01) {
+			setDeviceDirection(i,true);
+		}
+
+		mask=mask>>1;
+		i++;
+	}
+
+	Q_EMIT locked();
+}
+bool DIOManager::isLocked(int ch)
+{
+	return lockMask & (1<<ch);
+}
+
+int DIOManager::getLockMask()
+{
+	return lockMask;
+}
+
+void DIOManager::unlock()
+{
+	lockMask = 0;
+
+	for (auto i=0; i<nrOfChannels; i++) {
+		setDeviceDirection(i,false);
+	}
+
+	Q_EMIT unlocked();
+}
+
+bool DIOManager::getOutputEnabled()
+{
+	return outputEnabled;
+}
+
+void DIOManager::enableOutput(bool output)
+{
+	if (outputEnabled != output) {
+		outputEnabled = output;
+
+		for (auto i=0; i<nrOfChannels; i++) {
+			setDeviceDirection(i,false);
+			setDeviceOutRaw(i);
+		}
+	}
+}
+
 }
