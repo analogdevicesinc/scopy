@@ -838,7 +838,7 @@ color: white;
               <string notr="true">color: rgba(255, 255, 255, 153);</string>
              </property>
              <property name="text">
-              <string>ΔX =</string>
+              <string>Δt =</string>
              </property>
             </widget>
            </item>
@@ -883,7 +883,7 @@ color: white;
               <string notr="true">color: rgba(255, 255, 255, 153);</string>
              </property>
              <property name="text">
-              <string>1/ΔX =</string>
+              <string>1/Δt =</string>
              </property>
             </widget>
            </item>
