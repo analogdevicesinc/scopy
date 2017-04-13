@@ -142,7 +142,7 @@
          <string notr="true">color: rgba(255, 255, 255, 153);</string>
         </property>
         <property name="text">
-         <string>1/ΔX =</string>
+         <string>1/Δt =</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -174,7 +174,7 @@
          <string notr="true">color: rgba(255, 255, 255, 153);</string>
         </property>
         <property name="text">
-         <string>ΔX =</string>
+         <string>Δt =</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -387,7 +387,7 @@
          <string notr="true">color: rgba(255, 255, 255, 153);</string>
         </property>
         <property name="text">
-         <string>ΔX =</string>
+         <string>ΔV =</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
