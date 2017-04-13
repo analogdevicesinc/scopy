@@ -84,8 +84,10 @@ public:
 	               QWidget *parent=0);
 	~DigitalIoGroup();
 	Ui::dioElement *ui;
-
 	QList<QPair<QWidget *,Ui::dioChannel *>*> chui;
+
+Q_SIGNALS:
+	void slider(int val);
 	/*QList<Ui::dioChannel*> chui;
 	QList<QWidget*> chWidget;*/
 
@@ -127,6 +129,7 @@ public Q_SLOTS:
 	void enableOutputs();
 	void setDirection();
 	void setOutput();
+	void setSlider(int val);
 	void lockUi();
 	void on_btnRunStop_clicked();
 };

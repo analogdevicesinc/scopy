@@ -64,6 +64,7 @@ DigitalIoGroup::DigitalIoGroup(QString label, int ch_mask,int io_mask,
 		j++;
 	}
 
+	connect(this,SIGNAL(slider(int)),dio,SLOT(setSlider(int)));
 	ui->label_2->setText(label);
 	auto max = (1<<nr_of_channels) -1;
 	ui->lineEdit->setValidator(new QIntValidator(0, max, this));
@@ -95,7 +96,21 @@ void DigitalIO::setOutput(int ch, int out)
 {
 	if (!offline_mode) {
 		diom->setOutRaw(ch,out);
-		updateUi();
+		//updateUi();
+	}
+}
+
+void DigitalIO::setSlider(int val)
+{
+	auto grp = static_cast<DigitalIoGroup *>(QObject::sender());
+	auto v = groups.indexOf(grp);
+	auto tempval = val;
+
+	for (auto i=0; i<8; i++) {
+		auto output = tempval & 1;
+		tempval>>=1;
+		setOutput(i+v*8, output);
+		findIndividualUi(i+v*8)->second->output->setChecked(output);
 	}
 }
 
@@ -132,9 +147,9 @@ DigitalIO::DigitalIO(struct iio_context *ctx, Filter *filt, QPushButton *runBtn,
 	ui->setupUi(this);
 
 
-	groups.append(new DigitalIoGroup("DIO 0-7",0xff,0xff,this,ui->dioContainer));
+	groups.append(new DigitalIoGroup("DIO 0 - 7 ",0xff,0xff,this,ui->dioContainer));
 	ui->containerLayout->addWidget(groups.last());
-	groups.append(new DigitalIoGroup("DIO 8-15",0xff00,0xff00,this,
+	groups.append(new DigitalIoGroup("DIO 8 - 15",0xff00,0xff00,this,
 	                                 ui->dioContainer));
 	ui->containerLayout->addWidget(groups.last());
 
@@ -241,10 +256,21 @@ void adiscope::DigitalIoGroup::on_inout_clicked()
 	ui->lineEdit->setEnabled(!chk);
 	ui->horizontalSlider->setEnabled(!chk);
 
+	auto val = 0;
+	auto i=0;
+
 	for (auto ch:chui) {
 		ch->second->inout->setChecked(!chk);
 		auto channel = ch->first->property("dio").toInt();
 		dio->setDirection(channel,!chk);
+		auto bit = ch->second->output->isChecked();
+		val = val | (bit << i);
+		i++;
+
+	}
+
+	if (!chk) {
+		ui->horizontalSlider->setValue(val);
 	}
 }
 
@@ -254,6 +280,12 @@ void adiscope::DigitalIoGroup::on_horizontalSlider_valueChanged(int value)
 
 	if (ui->horizontalSlider->hasTracking()) {
 		ui->lineEdit->setText(QString::number(value));
+
+		if (!ui->inout->isChecked() && ui->inout->isEnabled()) {
+			auto val = ui->lineEdit->text().toInt();
+			Q_EMIT slider(val);
+
+		}
 	}
 }
 
@@ -276,6 +308,24 @@ void adiscope::DigitalIO::rightMenuToggle()
 void adiscope::DigitalIO::lockUi()
 {
 	auto lockmask = diom->getLockMask();
+	bool g0Lock = false;
+	bool g1Lock = false;
+
+	if (lockmask&0xff) {
+		g0Lock = true;
+	}
+
+	groups[0]->ui->inout->setDisabled(g0Lock);
+	groups[0]->ui->horizontalSlider->setDisabled(g0Lock);
+	setDynamicProperty(groups[0]->ui->stackedWidgetPage1,"locked",g0Lock);
+
+	if (lockmask&0xff00) {
+		g1Lock = true;
+	}
+
+	groups[1]->ui->inout->setDisabled(g1Lock);
+	groups[1]->ui->horizontalSlider->setDisabled(g1Lock);
+	setDynamicProperty(groups[1]->ui->stackedWidgetPage1,"locked",g1Lock);
 
 	for (auto i=0; i<16; i++) {
 		auto wid = findIndividualUi(i)->first;
@@ -285,6 +335,7 @@ void adiscope::DigitalIO::lockUi()
 		wid->setDisabled(locked);
 		lockmask>>=1;
 	}
+
 }
 
 void adiscope::DigitalIO::on_btnRunStop_clicked()
@@ -293,6 +344,8 @@ void adiscope::DigitalIO::on_btnRunStop_clicked()
 		poll->start(menu->lineEdit->text().toInt());
 	} else {
 		poll->stop();
+		menu->enableOutputs_PB->setChecked(false);
+		diom->enableOutput(false);
 	}
 }
 

@@ -377,6 +377,11 @@ border-radius: 12px;
 background-color: #141416;
 }
 
+QWidget#stackedWidgetPage1[locked=true]
+{
+border:1px solid red;
+}
+
 QPushButton
 {
 width:100px;
