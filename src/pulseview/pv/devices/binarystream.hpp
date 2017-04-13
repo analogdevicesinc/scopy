@@ -73,7 +73,11 @@ public:
 
 	void set_buffersize(size_t value);
 
+	size_t get_buffersize();
+
 	void set_options(std::map<std::string, Glib::VariantBase> opt);
+
+	std::map<std::string, Glib::VariantBase> get_options();
 
 	void set_single(bool);
 

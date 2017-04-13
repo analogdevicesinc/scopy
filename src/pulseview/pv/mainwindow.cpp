@@ -363,7 +363,7 @@ void MainWindow::setup_ui()
 
 
     // File Menu
-    QMenu *const menu_file = new QMenu;
+    QMenu *const menu_file = new QMenu(this);
     menu_file->setTitle(tr("&File"));
 
     action_open_->setText(tr("&Open..."));
@@ -421,7 +421,7 @@ void MainWindow::setup_ui()
     menu_file->addAction(action_quit_);
 
     // View Menu
-    QMenu *menu_view = new QMenu;
+    QMenu *menu_view = new QMenu(this);
     menu_view->setTitle(tr("&View"));
 
     action_view_zoom_in_->setText(tr("Zoom &In"));

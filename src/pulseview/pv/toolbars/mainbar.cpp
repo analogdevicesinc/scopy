@@ -138,13 +138,13 @@ MainBar::MainBar(Session &session, MainWindow &main_window) :
     // Setup the burger menu
 	QMenu *const menu = new QMenu(this);
 
-	QMenu *const menu_view = new QMenu;
+	QMenu *const menu_view = new QMenu(this);
 	menu_view->setTitle(tr("&View"));
 	menu_view->addAction(main_window.action_view_sticky_scrolling());
 	menu_view->addSeparator();
 	menu_view->addAction(main_window.action_view_coloured_bg());
 
-	QMenu *const menu_help = new QMenu;
+	QMenu *const menu_help = new QMenu(this);
 	menu_help->setTitle(tr("&Help"));
 
 	menu->addAction(menu_view->menuAction());

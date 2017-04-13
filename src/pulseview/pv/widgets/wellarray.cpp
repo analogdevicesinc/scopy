@@ -114,6 +114,12 @@ WellArray::WellArray(int rows, int cols, QWidget *parent)
     selRow = -1;
 }
 
+WellArray::~WellArray()
+{
+	delete d;
+	d = nullptr;
+}
+
 QSize WellArray::sizeHint() const
 {
     ensurePolished();
@@ -231,7 +237,7 @@ void WellArray::focusInEvent(QFocusEvent*)
 void WellArray::setCellBrush(int row, int col, const QBrush &b)
 {
     if (!d) {
-        d = new WellArrayData;
+        d = new WellArrayData();
         int i = numRows()*numCols();
         d->brush = new QBrush[i];
     }

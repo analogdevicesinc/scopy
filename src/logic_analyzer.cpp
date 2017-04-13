@@ -123,7 +123,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	symmBufferMode->setTimeDivisionCount(10);
 
 	/* Buffer Previewer widget */
-	buffer_previewer = new DigitalBufferPreviewer(40);
+	buffer_previewer = new DigitalBufferPreviewer(40, this);
 
 	buffer_previewer->setVerticalSpacing(6);
 	buffer_previewer->setMinimumHeight(20);
@@ -193,7 +193,6 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	this->no_channels = get_no_channels(dev);
 
 	/* sigrok and sigrokdecode initialisation */
-	std::shared_ptr<sigrok::Context> context;
 	std::string open_file, open_file_format;
 	context = sigrok::Context::create();
 
@@ -234,7 +233,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	options["numchannels"] = Glib::Variant<gint32>(
 			g_variant_new_int32(no_channels),true);
 	logic_analyzer_ptr = std::make_shared<pv::devices::BinaryStream>(
-	                             device_manager.context(), dev, maxBuffersize,
+	                            context, dev, maxBuffersize,
 	                             w->get_format_from_string("binary"),
 	                             options, this);
 
@@ -266,7 +265,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	int trigger_panel = ui->stackedWidget->indexOf(ui->triggerSettings);
 	ui->btnTrigger->setProperty("id", QVariant(-trigger_panel));
 
-	trigger_settings_ui = new Ui::DigitalTriggerSettings;
+	trigger_settings_ui = new Ui::DigitalTriggerSettings();
 	trigger_settings_ui->setupUi(trigger_settings);
 	ui->triggerSettingsLayout->insertWidget(0, trigger_settings);
 	setupTriggerSettingsUI();
@@ -346,8 +345,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 		this, SLOT(updateBufferPreviewer()));
 
 	cleanHWParams();
-	chm_ui = new LogicAnalyzerChannelManagerUI(0, main_win, &chm, ui->colorSettings,
-	                this);
+	chm_ui = new LogicAnalyzerChannelManagerUI(0, main_win, &chm, ui->scrollAreaWidgetContents,
+			ui->scrollAreaLayout, this);
 	ui->leftLayout->addWidget(chm_ui);
 	chm_ui->update_ui();
 	chm_ui->setVisible(true);
@@ -394,16 +393,16 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 
 LogicAnalyzer::~LogicAnalyzer()
 {
-//	delete chm_ui;
+	if(running)
+		startStop(false);
+	logic_analyzer_ptr.reset();
+	context.reset();
 	timer->stop();
 
 	la_api->save();
 	delete la_api;
-
+	delete trigger_settings_ui;
 	delete ui;
-
-	/* Destroy libsigrokdecode */
-	srd_exit();
 }
 
 void LogicAnalyzer::resizeEvent()
@@ -491,6 +490,8 @@ void LogicAnalyzer::capturedSlot()
 
 void LogicAnalyzer::set_triggered_status(std::string value)
 {
+	if(!trigger_settings_ui)
+		return;
 	if(trigger_settings_ui->btnAuto->isChecked()) {
 		ui->triggerStateLabel->setText("Auto");
 	}
@@ -522,14 +523,19 @@ void LogicAnalyzer::onHorizScaleValueChanged(double value)
 	enableTrigger(true);
 	if( plotTimeSpan >= timespanLimitStream )
 	{
-		logic_analyzer_ptr->set_buffersize(custom_sampleCount);
+		if(logic_analyzer_ptr->get_buffersize() != custom_sampleCount) {
+			logic_analyzer_ptr->set_buffersize(custom_sampleCount);
+		}
 		enableTrigger(false);
 		active_triggerSampleCount = 0;
 	}
 	else if( logic_analyzer_ptr )
 	{
-		logic_analyzer_ptr->set_buffersize(active_sampleCount);
-		main_win->session_.set_buffersize(active_sampleCount);
+		if(logic_analyzer_ptr->get_buffersize() != active_sampleCount)
+		{
+			logic_analyzer_ptr->set_buffersize(active_sampleCount);
+			main_win->session_.set_buffersize(active_sampleCount);
+		}
 	}
 
 	if( running )
@@ -571,10 +577,13 @@ void LogicAnalyzer::setSampleRate()
 {
 	options["samplerate"] = Glib::Variant<guint64>(
 	                  g_variant_new_uint64(active_sampleRate),true);
+	Glib::VariantBase tmp = logic_analyzer_ptr->get_options()["samplerate"];
 
 	if( logic_analyzer_ptr )
 	{
-		logic_analyzer_ptr->set_options(options);
+		if(!tmp.equal(options["samplerate"])) {
+			logic_analyzer_ptr->set_options(options);
+		}
 	}
 
 	/* Set IIO device parameters */
@@ -668,8 +677,11 @@ void LogicAnalyzer::onTimePositionSpinboxChanged(double value)
 	int pix = timeToPixel(-value);
 	if( logic_analyzer_ptr )
 	{
-		logic_analyzer_ptr->set_buffersize(active_sampleCount);
-		main_win->session_.set_buffersize(active_sampleCount);
+		if(logic_analyzer_ptr->get_buffersize() != active_sampleCount)
+		{
+			logic_analyzer_ptr->set_buffersize(active_sampleCount);
+			main_win->session_.set_buffersize(active_sampleCount);
+		}
 	}
 	if( running )
 	{

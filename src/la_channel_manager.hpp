@@ -16,6 +16,8 @@ class LAChannelManager;
 class LAChannelGroup;
 class LASettingsWidget;
 class LARequiredChannel;
+class LChannelSettings;
+class LAManagerHeader;
 }
 namespace pv {
 namespace view {
@@ -116,7 +118,6 @@ private:
 	bool collapsed;
 	const srd_decoder *decoder;
 	QStringList decoderRolesNameList;
-	std::vector<const srd_channel *> decoderRolesList;
 	std::map<const srd_channel*,uint16_t> channels_;
 	const srd_channel* findByValue(uint16_t ch_id);
 	qreal ch_thickness;
@@ -135,6 +136,8 @@ public:
 	std::map<const srd_channel*, uint16_t> get_decoder_channels();
 	qreal getCh_thickness() const;
 	void setCh_thickness(qreal value);
+	std::vector<const srd_channel *> decoderOptChannels;
+	std::vector<const srd_channel *> decoderReqChannels;
 };
 
 
@@ -243,8 +246,13 @@ public:
 	std::vector<LogicAnalyzerChannelGroupUI *> chg_ui;
 	QWidget *managerHeaderWidget;
 	QWidget *locationSettingsWidget;
+	QVBoxLayout *locationSettingsLayout;
 	QWidget *currentSettingsWidget;
+	QWidget *generalSettings;
 	Ui::LASettingsWidget *settingsUI;
+	Ui::LChannelSettings *generalSettingsUi;
+	Ui::LAManagerHeader *managerHeaderUI;
+	std::vector<Ui::LARequiredChannel*> decChannelsUi;
 	const bool pixmapEnable = true;
 	const bool pixmapGrab = true;
 	const bool pixmapRetainSize = true;
@@ -256,6 +264,7 @@ public:
 	                              pv::MainWindow *main_win_,
 	                              LogicAnalyzerChannelManager *chm,
 	                              QWidget *locationSettingsWidget,
+	                              QVBoxLayout *locationSettingsLayout,
 	                              LogicAnalyzer *la);
 	~LogicAnalyzerChannelManagerUI();
 	LogicAnalyzerChannelManager *chm;
@@ -303,6 +312,8 @@ private:
 	pv::widgets::ColourButton *colour_button_edge, *colour_button_BG,
 		*colour_button_low, *colour_button_high;
 	QFrame* addSeparator(QVBoxLayout *lay, int pos);
+	void createColorButtons();
+	void showColorSettings(bool);
 Q_SIGNALS:
 	void widthChanged(int);
 };

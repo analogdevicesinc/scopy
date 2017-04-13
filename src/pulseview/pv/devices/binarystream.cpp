@@ -52,6 +52,10 @@ BinaryStream::BinaryStream(const std::shared_ptr<sigrok::Context> &context,
 }
 
 BinaryStream::~BinaryStream() {
+	if (session_)
+		close();
+	input_.reset();
+
 	qDebug() << "binary stream destroyed\n";
 }
 
@@ -123,9 +127,11 @@ void BinaryStream::run()
 		nbytes_rx = iio_buffer_refill(data_);
 		nrx += nbytes_rx / 2;
 		if( nbytes_rx > 0 ) {
+
 			la->set_triggered_status("running");
 			input_->send(iio_buffer_start(data_), (size_t)(nbytes_rx));
 			input_->end();
+
 			if(autoTrigger) {
 				la->captured();
 			}
@@ -153,6 +159,11 @@ void BinaryStream::set_buffersize(size_t value)
 	open();
 }
 
+size_t BinaryStream::get_buffersize()
+{
+	return buffersize_;
+}
+
 void BinaryStream::set_single(bool check)
 {
 	if( running )
@@ -167,6 +178,12 @@ void BinaryStream::set_options(std::map<std::string, Glib::VariantBase> opt)
 	open();
 }
 
+std::map<std::string, Glib::VariantBase> BinaryStream::get_options()
+{
+	return options_;
+}
+
+
 /* cleanup and exit */
 void BinaryStream::shutdown() {
 	getchar();
@@ -175,6 +192,8 @@ void BinaryStream::shutdown() {
 
 void BinaryStream::stop()
 {
+	assert(session_);
+	session_->stop();
 	la->set_triggered_status("stopped");
 	running = false;
 	interrupt_ = true;

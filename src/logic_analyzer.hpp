@@ -125,6 +125,7 @@ Q_SIGNALS:
 	void capturedSignal();
 
 private:
+	std::shared_ptr<sigrok::Context> context;
 	Ui::LogicAnalyzer *ui;
 	Ui::DigitalTriggerSettings *trigger_settings_ui;
 	QButtonGroup *settings_group;

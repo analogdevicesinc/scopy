@@ -465,7 +465,8 @@ const srd_decoder *LogicAnalyzerChannelGroup::getDecoder()
 void LogicAnalyzerChannelGroup::setDecoder(const srd_decoder *value)
 {
 	decoderRolesNameList.clear();
-	decoderRolesList.clear();
+	decoderReqChannels.clear();
+	decoderOptChannels.clear();
 	channels_.clear();
 	decoder = value;
 
@@ -480,9 +481,9 @@ void LogicAnalyzerChannelGroup::setDecoder(const srd_decoder *value)
 			break;
 		}
 		decoderRolesNameList << QString::fromUtf8(rqch->name);
-		decoderRolesList.push_back(rqch);
+		decoderReqChannels.push_back(rqch);
 	}
-	free(reqCh);
+	g_slist_free(reqCh);
 
 	GSList *optChannels = g_slist_copy(decoder->opt_channels);
 	for (; optChannels; optChannels = optChannels->next) {
@@ -492,9 +493,9 @@ void LogicAnalyzerChannelGroup::setDecoder(const srd_decoder *value)
 			break;
 		}
 		decoderRolesNameList << QString::fromUtf8(optch->name);
-		decoderRolesList.push_back(optch);
+		decoderOptChannels.push_back(optch);
 	}
-	free(optChannels);
+	g_slist_free(optChannels);
 }
 
 LogicAnalyzerChannel* LogicAnalyzerChannelGroup::getChannelById(int id)
@@ -599,19 +600,17 @@ std::map<const srd_channel*, uint16_t>
 
 LogicAnalyzerChannelGroup::~LogicAnalyzerChannelGroup()
 {
-	if (decoder) {
-		delete decoder;
-		decoder = nullptr;
-	}
-	for(auto var : decoderRolesList) {
-		delete var;
-	}
 	channels_.clear();
 }
 
 const srd_channel* LogicAnalyzerChannelGroup::get_srd_channel_from_name(const char* name)
 {
-	for (auto var : decoderRolesList) {
+	for (auto var : decoderOptChannels) {
+		if (strcmp(var->name, name) == 0) {
+			return var;
+		}
+	}
+	for (auto var : decoderReqChannels) {
 		if (strcmp(var->name, name) == 0) {
 			return var;
 		}
@@ -1190,13 +1189,14 @@ void LogicAnalyzerChannelManager::remove(int index)
 void LogicAnalyzerChannelManager::initDecoderList(bool first_level_decode)
 {
 	GSList *dL = g_slist_sort(g_slist_copy(
-	                                  (GSList *)srd_decoder_list()), decoder_name_cmp);
+			(GSList *)srd_decoder_list()), decoder_name_cmp);
 
 	for (; dL; dL = dL->next) {
 		const srd_decoder *const d = (srd_decoder *)dL->data;
 		decoderList.push_back(d);
 		nameDecoderList << QString::fromUtf8(d->name);
 	}
+	g_slist_free(dL);
 }
 
 QStringList LogicAnalyzerChannelManager::get_name_decoder_list()
@@ -1295,6 +1295,7 @@ LogicAnalyzerChannelManagerUI::LogicAnalyzerChannelManagerUI(QWidget *parent,
                 pv::MainWindow *main_win_,
                 LogicAnalyzerChannelManager *chm,
                 QWidget *settingsWidget,
+                QVBoxLayout *settingsLayout,
                 LogicAnalyzer *la) :
 	QWidget(parent),
 	ui(new Ui::LAChannelManager),
@@ -1305,13 +1306,16 @@ LogicAnalyzerChannelManagerUI::LogicAnalyzerChannelManagerUI(QWidget *parent,
 	locationSettingsWidget(settingsWidget),
 	settingsUI(nullptr),
 	currentSettingsWidget(nullptr),
-	hoverWidget(nullptr)
+	hoverWidget(nullptr),
+	generalSettings(nullptr),
+	locationSettingsLayout(settingsLayout)
 {
 	ui->setupUi(this);
 	main_win = main_win_;
 	this->chm = chm;
 	this->la = la;
 	this->chm->initDecoderList();
+	createColorButtons();
 	showHighlight(false);
 	chm->highlightChannel(chm->get_channel_group(0));
 	showHighlight(true);
@@ -1319,9 +1323,85 @@ LogicAnalyzerChannelManagerUI::LogicAnalyzerChannelManagerUI(QWidget *parent,
 	Q_EMIT(widthChanged(geometry().width()));
 }
 
+void LogicAnalyzerChannelManagerUI::createColorButtons()
+{
+	generalSettingsUi = new Ui::LChannelSettings();
+	generalSettings = new QWidget(locationSettingsWidget);
+	generalSettingsUi->setupUi(generalSettings);
+	locationSettingsLayout->insertWidget(locationSettingsLayout->count()-1, generalSettings);
+
+	/*Add color buttons */
+	colour_button_edge = new ColourButton(
+		pv::view::TracePalette::Rows, pv::view::TracePalette::Cols,
+		generalSettingsUi->colorEdge);
+	colour_button_edge->set_palette(pv::view::TracePalette::Colours);
+	colour_button_edge->setProperty("type", QVariant("edge"));
+
+	colour_button_BG = new ColourButton(
+		pv::view::TracePalette::Rows, pv::view::TracePalette::Cols,
+		generalSettingsUi->colorBG);
+	colour_button_BG->set_palette(pv::view::TracePalette::Colours);
+	colour_button_BG->setProperty("type", QVariant("background"));
+
+	colour_button_low = new ColourButton(
+		pv::view::TracePalette::Rows, pv::view::TracePalette::Cols,
+		generalSettingsUi->colorLow);
+	colour_button_low->set_palette(pv::view::TracePalette::Colours);
+	colour_button_low->setProperty("type", QVariant("low"));
+
+	colour_button_high = new ColourButton(
+		pv::view::TracePalette::Rows, pv::view::TracePalette::Cols,
+		generalSettingsUi->colorHigh);
+	colour_button_high->set_palette(pv::view::TracePalette::Colours);
+	colour_button_high->setProperty("type", QVariant("high"));
+
+	connect(generalSettingsUi->cmbThickness, SIGNAL(currentTextChanged(QString)),
+		this, SLOT(chThicknessChanged(QString)));
+	connect(generalSettingsUi->btnCollapse, &QPushButton::clicked,
+		[=](bool check) {
+			if(check)
+				generalSettingsUi->widget->hide();
+			else
+				generalSettingsUi->widget->show();
+		});
+
+	connect(colour_button_edge, SIGNAL(selected(const QColor)),
+		this, SLOT(colorChanged(QColor)));
+	connect(colour_button_BG, SIGNAL(selected(const QColor)),
+		this, SLOT(colorChanged(QColor)));
+	connect(colour_button_low, SIGNAL(selected(const QColor)),
+		this, SLOT(colorChanged(QColor)));
+	connect(colour_button_high, SIGNAL(selected(const QColor)),
+		this, SLOT(colorChanged(QColor)));
+
+	connect(generalSettingsUi->nameLineEdit, &QLineEdit::editingFinished,
+		[=]() {
+		QString text = generalSettingsUi->nameLineEdit->text();
+		if(chm->getHighlightedChannel()) {
+			getUiFromCh(chm->getHighlightedChannel())->
+				ui->groupName->setText(text);
+		}
+		else if(chm->getHighlightedChannelGroup()) {
+			getUiFromChGroup(chm->getHighlightedChannelGroup())->
+				ui->groupName->setText(text);
+		}
+		set_label(text);
+	});
+}
+
 LogicAnalyzerChannelManagerUI::~LogicAnalyzerChannelManagerUI()
 {
 	delete ui;
+	for (auto ch : decChannelsUi) {
+		delete ch;
+	}
+	decChannelsUi.erase(decChannelsUi.begin(),decChannelsUi.end());
+	if(settingsUI)
+		delete settingsUI;
+	if(generalSettingsUi)
+		delete generalSettingsUi;
+	if(managerHeaderUI)
+		delete managerHeaderUI;
 }
 
 void invalidateLayout(QLayout *layout);
@@ -1419,6 +1499,8 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 	if (managerHeaderWidget) {
 		delete managerHeaderWidget;
 		managerHeaderWidget = nullptr;
+		delete managerHeaderUI;
+		managerHeaderUI = nullptr;
 	}
 
 	for (auto sep : separators)    {
@@ -1428,8 +1510,7 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 
 	hoverWidget = nullptr;
 	managerHeaderWidget = new QWidget(ui->headerWidget);
-	Ui::LAManagerHeader *managerHeaderUI =
-	        new Ui::LAManagerHeader();
+	managerHeaderUI = new Ui::LAManagerHeader();
 	managerHeaderUI->setupUi(managerHeaderWidget);
 	ui->headerWidgetLayout->addWidget(managerHeaderWidget);
 
@@ -1614,7 +1695,7 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 					connect(lachannelUI->ui->btnRemGroup, SIGNAL(pressed()),
 					        lachannelUI, SLOT(remove()));
 					connect(lachannelUI->ui->comboBox_2,
-						SIGNAL(currentIndexChanged(const QString&)),
+						SIGNAL(currentTextChanged(const QString&)),
 						lachannelUI, SLOT(rolesChangedLHS(const QString&)));
 					connect(lachannelUI, SIGNAL(requestUpdateUI()),
 						this, SLOT(triggerUpdateUi()));
@@ -1824,10 +1905,17 @@ void LogicAnalyzerChannelManagerUI::rolesChangedRHS(const QString text)
 				if(var->get_channel()->get_id() == channel_id)
 				{
 					var->channelRoleChanged(role_name);
+					disconnect(var->ui->comboBox_2,
+						SIGNAL(currentTextChanged(const QString&)),
+						var, SLOT(rolesChangedLHS(const QString&)));
+					var->ui->comboBox_2->setCurrentText(role_name);
+					connect(var->ui->comboBox_2,
+						SIGNAL(currentTextChanged(const QString&)),
+						var, SLOT(rolesChangedLHS(const QString&)));
+					return;
 				}
 			}
 		}
-		update_ui();
 	}
 }
 
@@ -1914,66 +2002,39 @@ void LogicAnalyzerChannelManagerUI::colorChanged(QColor color)
 	}
 }
 
+void LogicAnalyzerChannelManagerUI::showColorSettings(bool check)
+{
+	if(check) {
+		generalSettingsUi->colorEdge->show();
+		generalSettingsUi->colorLow->show();
+		generalSettingsUi->colorHigh->show();
+		generalSettingsUi->lblEdge->show();
+		generalSettingsUi->lblLow->show();
+		generalSettingsUi->lblHigh->show();
+	}
+	else {
+		generalSettingsUi->colorEdge->hide();
+		generalSettingsUi->colorLow->hide();
+		generalSettingsUi->colorHigh->hide();
+		generalSettingsUi->lblEdge->hide();
+		generalSettingsUi->lblLow->hide();
+		generalSettingsUi->lblHigh->hide();
+	}
+}
+
 void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 {
-	settingsUI = new Ui::LASettingsWidget;
-	Ui::LChannelSettings *generalSettingsUi = new Ui::LChannelSettings;
-	QWidget* generalSettings = new QWidget(locationSettingsWidget);
-	generalSettingsUi->setupUi(generalSettings);
-
-	settingsUI->setupUi(locationSettingsWidget);
+	settingsUI = new Ui::LASettingsWidget();
 	currentSettingsWidget = new QWidget(locationSettingsWidget);
+	locationSettingsLayout->insertWidget(locationSettingsLayout->count()-2,
+		currentSettingsWidget);
 	settingsUI->setupUi(currentSettingsWidget);
-	locationSettingsWidget->layout()->addWidget(currentSettingsWidget);
 	ensurePolished();
-
-	/*Add color buttons */
-	colour_button_edge = new ColourButton(
-		pv::view::TracePalette::Rows, pv::view::TracePalette::Cols,
-		generalSettingsUi->colorEdge);
-	colour_button_edge->set_palette(pv::view::TracePalette::Colours);
-	colour_button_edge->setProperty("type", QVariant("edge"));
-
-	colour_button_BG = new ColourButton(
-		pv::view::TracePalette::Rows, pv::view::TracePalette::Cols,
-		generalSettingsUi->colorBG);
-	colour_button_BG->set_palette(pv::view::TracePalette::Colours);
-	colour_button_BG->setProperty("type", QVariant("background"));
-
-	colour_button_low = new ColourButton(
-		pv::view::TracePalette::Rows, pv::view::TracePalette::Cols,
-		generalSettingsUi->colorLow);
-	colour_button_low->set_palette(pv::view::TracePalette::Colours);
-	colour_button_low->setProperty("type", QVariant("low"));
-
-	colour_button_high = new ColourButton(
-		pv::view::TracePalette::Rows, pv::view::TracePalette::Cols,
-		generalSettingsUi->colorHigh);
-	colour_button_high->set_palette(pv::view::TracePalette::Colours);
-	colour_button_high->setProperty("type", QVariant("high"));
 
 	connect(settingsUI->btnNext, SIGNAL(pressed()),
 		this, SLOT(highlightNext()));
 	connect(settingsUI->btnPrevious, SIGNAL(pressed()),
 		this, SLOT(highlightPrevious()));
-	connect(generalSettingsUi->cmbThickness, SIGNAL(currentTextChanged(QString)),
-		this, SLOT(chThicknessChanged(QString)));
-	connect(generalSettingsUi->btnCollapse, &QPushButton::clicked,
-		[=](bool check) {
-			if(check)
-				generalSettingsUi->widget->hide();
-			else
-				generalSettingsUi->widget->show();
-		});
-
-	connect(colour_button_edge, SIGNAL(selected(const QColor)),
-		this, SLOT(colorChanged(QColor)));
-	connect(colour_button_BG, SIGNAL(selected(const QColor)),
-		this, SLOT(colorChanged(QColor)));
-	connect(colour_button_low, SIGNAL(selected(const QColor)),
-		this, SLOT(colorChanged(QColor)));
-	connect(colour_button_high, SIGNAL(selected(const QColor)),
-		this, SLOT(colorChanged(QColor)));
 
 	if (chm->getHighlightedChannelGroup()) {
 		LogicAnalyzerChannelGroup *chGroup = chm->getHighlightedChannelGroup();
@@ -1985,24 +2046,9 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 		colour_button_edge->set_colour(chGroup->getEdgecolor());
 		colour_button_high->set_colour(chGroup->getHighcolor());
 		colour_button_low->set_colour(chGroup->getLowcolor());
-
-		connect(generalSettingsUi->nameLineEdit, &QLineEdit::editingFinished,
-			[=]() {
-				QString text = generalSettingsUi->nameLineEdit->text();
-				getUiFromChGroup(chm->getHighlightedChannelGroup())->
-					ui->groupName->setText(text);
-				set_label(text);
-			});
-		settingsUI->scrollAreaWidgetLayout->insertWidget(
-			settingsUI->scrollAreaWidgetLayout->count()-1, generalSettings);
+		showColorSettings(!chGroup->is_grouped());
 
 		if (chGroup->is_grouped()) {
-			generalSettingsUi->colorEdge->hide();
-			generalSettingsUi->colorLow->hide();
-			generalSettingsUi->colorHigh->hide();
-			generalSettingsUi->lblEdge->hide();
-			generalSettingsUi->lblLow->hide();
-			generalSettingsUi->lblHigh->hide();
 			const srd_decoder *decoder = chGroup->getDecoder();
 
 			if (!decoder) {
@@ -2013,20 +2059,19 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 			}
 
 			/* Create widgets for required channels */
-			GSList *reqCh = g_slist_copy(decoder->channels);
-			if( g_slist_length(reqCh) > 0 )
+			if(chGroup->decoderReqChannels.size() > 0)
 				settingsUI->requiredChn->show();
 			else
 				settingsUI->requiredChn->hide();
 
-			for (; reqCh; reqCh = reqCh->next) {
-				const srd_channel *const rqch = (const srd_channel *)reqCh->data;
+			for (auto rqch : chGroup->decoderReqChannels) {
 
 				if (rqch == nullptr) {
 					break;
 				}
 
-				Ui::LARequiredChannel *reqChUI = new Ui::LARequiredChannel();
+				decChannelsUi.push_back(new Ui::LARequiredChannel());
+				auto reqChUI = decChannelsUi.back();
 				QWidget *r = new QWidget(currentSettingsWidget);
 				reqChUI->setupUi(r);
 				reqChUI->labelRole->setText(QString::fromUtf8(rqch->name));
@@ -2044,31 +2089,28 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 				}
 				reqChUI->roleCombo->setProperty("id", QVariant(rqch->id));
 				reqChUI->roleCombo->setProperty("name", QVariant(rqch->name));
-				settingsUI->scrollAreaWidgetLayout->insertWidget(
-					settingsUI->scrollAreaWidgetLayout->count() - 3, r);
+				settingsUI->verticalLayout_1->insertWidget(
+					settingsUI->verticalLayout_1->count() - 1, r);
 
 				connect(reqChUI->roleCombo,
 				        SIGNAL(currentIndexChanged(const QString&)),
 				        this, SLOT(rolesChangedRHS(const QString&)));
-
 			}
-			free(reqCh);
 
 			/* Create widgets for optional channels */
-			GSList *optChannels = g_slist_copy(decoder->opt_channels);
-			if( g_slist_length(optChannels) > 0)
+			if(chGroup->decoderOptChannels.size() > 0)
 				settingsUI->optionalChn->show();
 			else
 				settingsUI->optionalChn->hide();
 
-			for (; optChannels; optChannels = optChannels->next) {
-				const srd_channel *const optch = (const srd_channel *)optChannels->data;
+			for (auto optch : chGroup->decoderOptChannels) {
 
 				if (optch == nullptr) {
 					break;
 				}
 
-				Ui::LARequiredChannel *optChUI = new Ui::LARequiredChannel();
+				decChannelsUi.push_back(new Ui::LARequiredChannel());
+				auto optChUI = decChannelsUi.back();
 				QWidget *r = new QWidget(currentSettingsWidget);
 				optChUI->setupUi(r);
 				optChUI->labelRole->setText(QString::fromUtf8(optch->name));
@@ -2087,14 +2129,13 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 				}
 				optChUI->roleCombo->setProperty("id", QVariant(optch->id));
 				optChUI->roleCombo->setProperty("name", QVariant(optch->name));
-				settingsUI->scrollAreaWidgetLayout->insertWidget(
-					settingsUI->scrollAreaWidgetLayout->count() - 2, r);
+				settingsUI->verticalLayout_1->insertWidget(
+					settingsUI->verticalLayout_1->count(), r);
 
 				connect(optChUI->roleCombo,
 				        SIGNAL(currentIndexChanged(const QString&)),
 				        this, SLOT(rolesChangedRHS(const QString&)));
 			}
-			free(optChannels);
 		}
 		else {
 			settingsUI->requiredChn->hide();
@@ -2110,25 +2151,16 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 		generalSettingsUi->nameLineEdit->setText(QString::fromStdString(ch->get_label()));
 		QString ch_thickness = QString::number(ch->getCh_thickness());
 		generalSettingsUi->cmbThickness->setCurrentText(ch_thickness);
+		showColorSettings(true);
 
 		colour_button_BG->set_colour(ch->getBgcolor());
 		colour_button_edge->set_colour(ch->getEdgecolor());
 		colour_button_high->set_colour(ch->getHighcolor());
 		colour_button_low->set_colour(ch->getLowcolor());
 
-		connect(generalSettingsUi->nameLineEdit, &QLineEdit::editingFinished,
-			[=]() {
-			QString text = generalSettingsUi->nameLineEdit->text();
-			getUiFromCh(chm->getHighlightedChannel())->
-				ui->groupName->setText(text);
-			set_label(text);
-		});
-
-		settingsUI->scrollAreaWidgetLayout->insertWidget(
-			settingsUI->scrollAreaWidgetLayout->count()-1, generalSettings);
-
+		decChannelsUi.push_back(new Ui::LARequiredChannel());
+		auto roleChUI = decChannelsUi.back();
 		QWidget *r = new QWidget(currentSettingsWidget);
-		Ui::LARequiredChannel *roleChUI = new Ui::LARequiredChannel();
 		roleChUI->setupUi(r);
 		if(ch->getChannel_role())
 		{
@@ -2140,8 +2172,8 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 		}
 		roleChUI->stackedWidget->setCurrentIndex(1);
 
-		settingsUI->scrollAreaWidgetLayout->insertWidget(
-			settingsUI->scrollAreaWidgetLayout->count() - 2, r);
+		settingsUI->verticalLayout_1->insertWidget(
+			settingsUI->verticalLayout_1->count() - 1, r);
 	}
 
 	locationSettingsWidget->setVisible(true);
@@ -2151,10 +2183,15 @@ void LogicAnalyzerChannelManagerUI::deleteSettingsWidget()
 {
 	if (settingsUI) {
 		locationSettingsWidget->setVisible(false);
+		locationSettingsWidget->layout()->removeWidget(currentSettingsWidget);
 		delete currentSettingsWidget;
 		currentSettingsWidget = nullptr;
 		delete settingsUI;
 		settingsUI = nullptr;
+		for (auto ch : decChannelsUi) {
+			delete ch;
+		}
+		decChannelsUi.erase(decChannelsUi.begin(),decChannelsUi.end());
 	}
 }
 
