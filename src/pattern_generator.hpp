@@ -1,21 +1,21 @@
- /*
- * Copyright 2016 Analog Devices, Inc.
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3, or (at your option)
- * any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with GNU Radio; see the file LICENSE.  If not, write to
- * the Free Software Foundation, Inc., 51 Franklin Street,
- * Boston, MA 02110-1301, USA.
- */
+/*
+* Copyright 2016 Analog Devices, Inc.
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 3, or (at your option)
+* any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with GNU Radio; see the file LICENSE.  If not, write to
+* the Free Software Foundation, Inc., 51 Franklin Street,
+* Boston, MA 02110-1301, USA.
+*/
 
 #ifndef PATTERN_GENERATOR_H
 #define PATTERN_GENERATOR_H
@@ -96,8 +96,8 @@ class PatternGenerator : public QWidget
 public:
 	static const int channelGroupLabelMaxLength = 13;
 	explicit PatternGenerator(struct iio_context *ctx, Filter *filt,
-				  QPushButton *runButton, QJSEngine *engine, DIOManager* diom,
-				  QWidget *parent = 0, bool offline_mode_ = 0);
+	                          QPushButton *runButton, QJSEngine *engine, DIOManager *diom,
+	                          QWidget *parent = 0, bool offline_mode_ = 0);
 	~PatternGenerator();
 	void updateCGSettings();
 
@@ -127,8 +127,8 @@ private:
 	QPushButton *menuRunButton;
 
 	pv::widgets::ColourButton *colour_button_edge,
-		*colour_button_high, *colour_button_BG,
-		*colour_button_low;
+	*colour_button_high, *colour_button_BG,
+	*colour_button_low;
 
 	typedef enum rightMenuState_t {
 		CLOSED,
@@ -157,7 +157,7 @@ private:
 	struct iio_device *dev;
 	struct iio_device *channel_manager_dev;
 	struct iio_buffer *txbuf;
-	DIOManager* diom;
+	DIOManager *diom;
 
 	bool startPatternGeneration(bool cyclic);
 	void stopPatternGeneration();

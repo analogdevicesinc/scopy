@@ -104,7 +104,7 @@ const char *PatternGenerator::channelNames[] = {
 
 PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
                                    QPushButton *runBtn, QJSEngine *engine,
-				   DIOManager* diom, QWidget *parent, bool offline_mode_) :
+                                   DIOManager *diom, QWidget *parent, bool offline_mode_) :
 	QWidget(parent),
 	ctx(ctx),
 	settings_group(new QButtonGroup(this)), menuRunButton(runBtn),
@@ -137,26 +137,26 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 
 	/*Add color buttons */
 	colour_button_edge = new pv::widgets::ColourButton(
-		pv::view::TracePalette::Rows, pv::view::TracePalette::Cols,
-		cgSettings->colorEdge);
+	        pv::view::TracePalette::Rows, pv::view::TracePalette::Cols,
+	        cgSettings->colorEdge);
 	colour_button_edge->set_palette(pv::view::TracePalette::Colours);
 	colour_button_edge->setProperty("type", QVariant("edge"));
 
 	colour_button_BG = new pv::widgets::ColourButton(
-		pv::view::TracePalette::Rows, pv::view::TracePalette::Cols,
-		cgSettings->colorBG);
+	        pv::view::TracePalette::Rows, pv::view::TracePalette::Cols,
+	        cgSettings->colorBG);
 	colour_button_BG->set_palette(pv::view::TracePalette::Colours);
 	colour_button_BG->setProperty("type", QVariant("background"));
 
 	colour_button_low = new pv::widgets::ColourButton(
-		pv::view::TracePalette::Rows, pv::view::TracePalette::Cols,
-		cgSettings->colorLow);
+	        pv::view::TracePalette::Rows, pv::view::TracePalette::Cols,
+	        cgSettings->colorLow);
 	colour_button_low->set_palette(pv::view::TracePalette::Colours);
 	colour_button_low->setProperty("type", QVariant("low"));
 
 	colour_button_high = new pv::widgets::ColourButton(
-		pv::view::TracePalette::Rows, pv::view::TracePalette::Cols,
-		cgSettings->colorHigh);
+	        pv::view::TracePalette::Rows, pv::view::TracePalette::Cols,
+	        cgSettings->colorHigh);
 	colour_button_high->set_palette(pv::view::TracePalette::Colours);
 	colour_button_high->setProperty("type", QVariant("high"));
 
@@ -201,22 +201,23 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 	connect(cgSettings->PBLeft,SIGNAL(pressed()),this,SLOT(pushButtonLeft()));
 	connect(cgSettings->PBRight,SIGNAL(pressed()),this,SLOT(pushButtonRight()));
 	connect(cgSettings->cmb_thickness, SIGNAL(currentTextChanged(QString)),
-		this, SLOT(changeChannelThickness(QString)));
+	        this, SLOT(changeChannelThickness(QString)));
 	connect(cgSettings->btnCollapse, &QPushButton::clicked,
-		[=](bool check) {
-			if(check)
-				cgSettings->widget_2->hide();
-			else
-				cgSettings->widget_2->show();
-		});
+	[=](bool check) {
+		if (check) {
+			cgSettings->widget_2->hide();
+		} else {
+			cgSettings->widget_2->show();
+		}
+	});
 	connect(colour_button_edge, SIGNAL(selected(const QColor)),
-		this, SLOT(colorChanged(QColor)));
+	        this, SLOT(colorChanged(QColor)));
 	connect(colour_button_BG, SIGNAL(selected(const QColor)),
-		this, SLOT(colorChanged(QColor)));
+	        this, SLOT(colorChanged(QColor)));
 	connect(colour_button_low, SIGNAL(selected(const QColor)),
-		this, SLOT(colorChanged(QColor)));
+	        this, SLOT(colorChanged(QColor)));
 	connect(colour_button_high, SIGNAL(selected(const QColor)),
-		this, SLOT(colorChanged(QColor)));
+	        this, SLOT(colorChanged(QColor)));
 
 	connect(chmui,SIGNAL(channelsChanged()),bufui,SLOT(updateUi()));
 	connect(ui->btnRunStop, SIGNAL(toggled(bool)), this, SLOT(startStop(bool)));
@@ -323,15 +324,14 @@ void PatternGenerator::toggleRightMenu(QPushButton *btn)
 
 void PatternGenerator::showColorSettings(bool check)
 {
-	if(check) {
+	if (check) {
 		cgSettings->colorEdge->show();
 		cgSettings->colorLow->show();
 		cgSettings->colorHigh->show();
 		cgSettings->lblEdge->show();
 		cgSettings->lblLow->show();
 		cgSettings->lblHigh->show();
-	}
-	else {
+	} else {
 		cgSettings->colorEdge->hide();
 		cgSettings->colorLow->hide();
 		cgSettings->colorHigh->hide();
@@ -354,12 +354,13 @@ void PatternGenerator::updateCGSettings()
 		name = QString::fromStdString(chg->get_label());
 		title = name;
 		thickness = chg->getCh_thickness();
-		if(chg->is_grouped()) {
+
+		if (chg->is_grouped()) {
 			showColorSettings(false);
-		}
-		else {
+		} else {
 			showColorSettings(true);
 		}
+
 		colour_button_BG->set_colour(chg->getBgcolor());
 		colour_button_edge->set_colour(chg->getEdgecolor());
 		colour_button_high->set_colour(chg->getHighcolor());
@@ -434,44 +435,38 @@ void PatternGenerator::colorChanged(QColor color)
 	auto chgui = chmui->findUiByChannelGroup(chg);
 	auto chui = chmui->findUiByChannel(ch);
 
-	QPushButton* sender = static_cast<QPushButton *>(QObject::sender());
+	QPushButton *sender = static_cast<QPushButton *>(QObject::sender());
 	QString type = sender->property("type").toString();
-	if( type == "background") {
-		if(!ch) {
+
+	if (type == "background") {
+		if (!ch) {
 			chg->setBgcolor(color);
 			chgui->updateTrace();
-		}
-		else {
+		} else {
 			ch->setBgcolor(color);
 			chui->updateTrace();
 		}
-	}
-	else if( type == "edge") {
-		if(!ch) {
+	} else if (type == "edge") {
+		if (!ch) {
 			chg->setEdgecolor(color);
 			chgui->updateTrace();
-		}
-		else {
+		} else {
 			ch->setEdgecolor(color);
 			chui->updateTrace();
 		}
-	}
-	else if( type == "low") {
-		if(!ch) {
+	} else if (type == "low") {
+		if (!ch) {
 			chg->setLowcolor(color);
 			chgui->updateTrace();
-		}
-		else {
+		} else {
 			ch->setLowcolor(color);
 			chui->updateTrace();
 		}
-	}
-	else if( type == "high") {
-		if(!ch) {
+	} else if (type == "high") {
+		if (!ch) {
 			chg->setHighcolor(color);
 			chgui->updateTrace();
-		}
-		else {
+		} else {
 			ch->setHighcolor(color);
 			chui->updateTrace();
 		}
@@ -482,8 +477,10 @@ void PatternGenerator::changeChannelThickness(QString text)
 {
 	bool ok;
 	double value = text.toDouble(&ok);
-	if( !ok )
+
+	if (!ok) {
 		return;
+	}
 
 	auto chg = chm.getHighlightedChannelGroup();
 	auto ch = chm.getHighlightedChannel();
@@ -493,11 +490,12 @@ void PatternGenerator::changeChannelThickness(QString text)
 
 	if (ch==nullptr) {
 		chg->setCh_thickness(value);
-		if(chg->is_grouped()) {
-			for(auto c : chgui->ch_ui)
+
+		if (chg->is_grouped()) {
+			for (auto c : chgui->ch_ui) {
 				c->updateTrace();
-		}
-		else {
+			}
+		} else {
 			chgui->updateTrace();
 		}
 	} else {
@@ -635,8 +633,10 @@ bool PatternGenerator::startPatternGeneration(bool cyclic)
 	/* Enable Tx channels*/
 	//char temp_buffer[12];
 
-	if (offline_mode)
+	if (offline_mode) {
 		return true;
+	}
+
 	if (!dev) {
 		qDebug("Devices not found");
 		return false;
@@ -645,8 +645,7 @@ bool PatternGenerator::startPatternGeneration(bool cyclic)
 	qDebug("Enabling channels");
 
 	for (int j = 0; j < no_channels; j++) {
-		if (chm.get_enabled_mask() & (1<<j))
-		{
+		if (chm.get_enabled_mask() & (1<<j)) {
 			qDebug()<<"enabled channel - "<<j<<"\n";
 			auto ch = iio_device_find_channel(dev, channelNames[j], true);
 			iio_channel_enable(ch);
@@ -688,8 +687,7 @@ bool PatternGenerator::startPatternGeneration(bool cyclic)
 void PatternGenerator::stopPatternGeneration()
 {
 	/* Destroy buffer */
-	if(!offline_mode)
-	{
+	if (!offline_mode) {
 		if (buffer_created == true) {
 			iio_buffer_destroy(txbuf);
 			buffer_created = false;
@@ -728,8 +726,9 @@ void PatternGenerator::singleRun()
 	stopPatternGeneration();
 
 	if (startPatternGeneration(false)) {
-		uint32_t time_until_buffer_destroy = 500 + (uint32_t)(((bufman->getBufferSize()/2)/((
-				float)bufman->getSampleRate()))*1000.0);
+		uint32_t time_until_buffer_destroy = 500 + (uint32_t)(((
+		                bufman->getBufferSize()/2)/((
+		                                float)bufman->getSampleRate()))*1000.0);
 		qDebug("Time until buffer destroy %d", time_until_buffer_destroy);
 		QTimer::singleShot(time_until_buffer_destroy, this, SLOT(singleRunStop()));
 		qDebug("Pattern generation single started");

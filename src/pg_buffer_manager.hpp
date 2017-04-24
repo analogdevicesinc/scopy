@@ -25,8 +25,7 @@ class MainWindow;
 class DeviceManager;
 class View;
 
-namespace view
-{
+namespace view {
 class Viewport;
 class Ruler;
 }
@@ -49,7 +48,6 @@ class PatternGeneratorBufferManager
 	bool autoSet;
 	uint32_t start_sample;
 	uint32_t last_sample;
-	uint32_t number_of_samples;
 	uint32_t sampleRate;
 	PatternGeneratorChannelManager *chm;
 

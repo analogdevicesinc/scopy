@@ -326,7 +326,7 @@ void PatternGeneratorChannelUI::updateTrace()
 		trace->set_highlight(highlighted);
 	}
 
-	if(ch->getCh_thickness() != trace->getCh_thickness()) {
+	if (ch->getCh_thickness() != trace->getCh_thickness()) {
 		trace->setCh_thickness(ch->getCh_thickness());
 		getManagerUi()->main_win->view_->time_item_appearance_changed(false, true);
 	}
@@ -335,7 +335,7 @@ void PatternGeneratorChannelUI::updateTrace()
 	auto v_offset = topSep->geometry().bottomRight().y() + 3 + height -
 	                (trace->v_extents().second) + chgui->getTraceOffset()+3;//chgOffset.y();
 
-	if(trace) {
+	if (trace) {
 		trace->setBgcolour(get_channel()->getBgcolor());
 		trace->setEdgecolour(get_channel()->getEdgecolor());
 		trace->setHighcolour(get_channel()->getHighcolor());
@@ -348,6 +348,7 @@ void PatternGeneratorChannelUI::updateTrace()
 		trace->setSignal_height(traceHeight);
 		trace->force_to_v_offset(v_offset);
 	}
+
 	getManagerUi()->main_win->view_->time_item_appearance_changed(true, true);
 
 }
@@ -426,8 +427,9 @@ qreal PatternGeneratorChannelGroup::getCh_thickness() const
 void PatternGeneratorChannelGroup::setCh_thickness(const qreal value)
 {
 	ch_thickness = value;
-	if(is_grouped()) {
-		for(int i=0; i<get_channel_count(); i++) {
+
+	if (is_grouped()) {
+		for (int i=0; i<get_channel_count(); i++) {
 			get_channel(i)->setCh_thickness(value);
 		}
 	}
@@ -736,8 +738,11 @@ void PatternGeneratorChannelGroupUI::dragLeaveEvent(QDragLeaveEvent *event)
 void PatternGeneratorChannelGroupUI::setupParallelDecoder()
 {
 	auto decoder = srd_decoder_get_by_id("parallel");
-	if(decoder==nullptr)
+
+	if (decoder==nullptr) {
 		return;
+	}
+
 	decodeTrace->set_decoder(decoder);
 	std::map<const srd_channel *,
 	    std::shared_ptr<pv::view::TraceTreeItem> > channel_map;
@@ -792,18 +797,19 @@ void PatternGeneratorChannelGroupUI::updateTrace()
 		trace->set_highlight(highlighted);
 	}
 
-	if(getChannelGroup()->getCh_thickness() != trace->getCh_thickness()) {
+	if (getChannelGroup()->getCh_thickness() != trace->getCh_thickness()) {
 		trace->setCh_thickness(getChannelGroup()->getCh_thickness());
 		getManagerUi()->main_win->view_->time_item_appearance_changed(false, true);
 	}
 
-	if(logicTrace) {
+	if (logicTrace) {
 		logicTrace->setEdgecolour(chg->getEdgecolor());
 		logicTrace->setHighcolour(chg->getHighcolor());
 		logicTrace->setLowcolour(chg->getLowcolor());
 		logicTrace->setBgcolour(chg->getBgcolor());
 	}
-	if(decodeTrace) {
+
+	if (decodeTrace) {
 		decodeTrace->setBgcolour(chg->getBgcolor());
 	}
 
@@ -818,6 +824,7 @@ void PatternGeneratorChannelGroupUI::updateTrace()
 		for (auto &&ch : ch_ui) {
 			ch->updateTrace();
 		}
+
 	getManagerUi()->main_win->view_->time_item_appearance_changed(true, true);
 }
 
@@ -1144,8 +1151,12 @@ uint32_t PatternGeneratorChannelManager::computeSuggestedSampleRate()
 		if (chg->is_enabled()) {
 			auto patternSamplingFrequency = static_cast<PatternGeneratorChannelGroup *>
 			                                (chg)->pattern->get_min_sampling_freq();
+
 			//	uint32_t val = 80000000 / patternSamplingFrequency;
-			if(patternSamplingFrequency==0) continue;
+			if (patternSamplingFrequency==0) {
+				continue;
+			}
+
 			sampleRate = boost::math::lcm(patternSamplingFrequency, sampleRate);
 			//sampleDivider = boost::math::gcd(sampleDivider,val);
 			qDebug()<<static_cast<PatternGeneratorChannelGroup *>
@@ -1178,7 +1189,10 @@ uint32_t PatternGeneratorChannelManager::computeSuggestedBufferSize(
 			auto patternBufferSize = static_cast<PatternGeneratorChannelGroup *>
 			                         (chg)->pattern->get_required_nr_of_samples(sample_rate,
 			                                         chg->get_channel_count());
-			if(patternBufferSize==0) continue;
+
+			if (patternBufferSize==0) {
+				continue;
+			}
 
 			if (static_cast<PatternGeneratorChannelGroup *>(chg)->pattern->is_periodic()) {
 				bufferSize = boost::math::lcm(patternBufferSize, bufferSize);
@@ -1198,10 +1212,11 @@ uint32_t PatternGeneratorChannelManager::computeSuggestedBufferSize(
 	// TBD if correct
 	if (maxNonPeriodic > bufferSize) {
 		auto result=1;
-		for(auto i=1;result<maxBufferSize && maxNonPeriodic > result;i++)
-		{
+
+		for (auto i=1; result<maxBufferSize && maxNonPeriodic > result; i++) {
 			result = bufferSize * i;
 		}
+
 		bufferSize = result;
 
 	}
