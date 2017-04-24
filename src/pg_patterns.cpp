@@ -352,9 +352,18 @@ uint8_t ClockPattern::generate_pattern(uint32_t sample_rate,
 ClockPatternUI::ClockPatternUI(ClockPattern *pattern,
                                QWidget *parent) : PatternUI(parent), pattern(pattern)
 {
-	//qDebug()<<"ClockPatternUI created";
-	ui = new Ui::ClockPatternUI();
+	ui = new Ui::EmptyPatternUI();
 	ui->setupUi(this);
+	frequencySpinButton = new ScaleSpinButton({
+		{"Hz", 1E0},
+		{"kHz", 1E+3},
+		{"MHz", 1E+6}
+	}, "Frequency", 1e0, 40e+6,true,false,this);
+	ui->verticalLayout->addWidget(frequencySpinButton);
+	phaseSpinButton = new PhaseSpinButton(this);
+	ui->verticalLayout->addWidget(phaseSpinButton);
+	dutySpinButton = new PositionSpinButton({{"%",1}},"Duty",0,100,true,false,this);
+	ui->verticalLayout->addWidget(dutySpinButton);
 	setVisible(false);
 }
 
@@ -373,12 +382,13 @@ void ClockPatternUI::build_ui(QWidget *parent)
 {
 	parent_ = parent;
 	parent->layout()->addWidget(this);
-	ui->frequency_LE->setText(QString().number(pattern->get_frequency()));
-	ui->duty_LE->setText(QString().number(pattern->get_duty_cycle()));
-	ui->phase_LE->setText(QString().number(pattern->get_phase()));
-	connect(ui->duty_LE,SIGNAL(editingFinished()),this,SLOT(parse_ui()));
-	connect(ui->frequency_LE,SIGNAL(editingFinished()),this,SLOT(parse_ui()));
-	connect(ui->phase_LE,SIGNAL(editingFinished()),this,SLOT(parse_ui()));
+	frequencySpinButton->setValue(pattern->get_frequency());
+	//phaseSpinButton->setValue(pattern->get_phase());
+	dutySpinButton->setValue(pattern->get_duty_cycle());
+
+	connect(frequencySpinButton,SIGNAL(valueChanged(double)),this,SLOT(parse_ui()));
+	connect(phaseSpinButton,SIGNAL(valueChanged(double)),this,SLOT(parse_ui()));
+	connect(dutySpinButton,SIGNAL(valueChanged(double)),this,SLOT(parse_ui()));
 
 
 }
@@ -390,23 +400,9 @@ void ClockPatternUI::destroy_ui()
 void ClockPatternUI::parse_ui()
 {
 	bool ok =0;
-	pattern->set_frequency(ui->frequency_LE->text().toFloat(&ok));
-
-	if (!ok) {
-		qDebug()<<"Cannot set frequency, not a float";
-	}
-
-	pattern->set_duty_cycle(ui->duty_LE->text().toFloat(&ok));
-
-	if (!ok) {
-		qDebug()<<"Cannot set duty, not a float";
-	}
-
-	pattern->set_phase(ui->phase_LE->text().toFloat(&ok));
-
-	if (!ok) {
-		qDebug()<<"Cannot set phase, not a float";
-	}
+	pattern->set_frequency(frequencySpinButton->value());
+	pattern->set_phase(phaseSpinButton->value());
+	pattern->set_duty_cycle(dutySpinButton->value());
 
 	Q_EMIT patternChanged();
 
@@ -477,9 +473,15 @@ RandomPatternUI::RandomPatternUI(RandomPattern *pattern,
                                  QWidget *parent): pattern(pattern)
 {
 	//qDebug()<<"RandomPatternUI created";
-	ui = new Ui::FrequencyPatternUI();
+	ui = new Ui::EmptyPatternUI();
 	ui->setupUi(this);
 	setVisible(false);
+	frequencySpinButton = new ScaleSpinButton({
+		{"Hz", 1E0},
+		{"kHz", 1E+3},
+		{"MHz", 1E+6}
+	}, "Frequency", 1e0, 40e+6,true,false,this);
+	ui->verticalLayout->addWidget(frequencySpinButton);
 }
 RandomPatternUI::~RandomPatternUI()
 {
@@ -495,13 +497,7 @@ Pattern *RandomPatternUI::get_pattern()
 
 void RandomPatternUI::parse_ui()
 {
-	bool ok =0;
-	pattern->set_frequency(ui->frequency_LE->text().toInt(&ok,10));
-
-	if (!ok) {
-		qDebug()<<"Cannot set frequency, not an int";
-	}
-
+	pattern->set_frequency(frequencySpinButton->value());
 	Q_EMIT patternChanged();
 }
 
@@ -509,8 +505,8 @@ void RandomPatternUI::build_ui(QWidget *parent)
 {
 	parent_ = parent;
 	parent->layout()->addWidget(this);
-	ui->frequency_LE->setText(QString().number(pattern->get_frequency()));
-	connect(ui->frequency_LE,SIGNAL(editingFinished()),this,SLOT(parse_ui()));
+	frequencySpinButton->setValue(pattern->get_frequency());
+	connect(frequencySpinButton,SIGNAL(valueChanged(double)),this,SLOT(parse_ui()));
 
 }
 
@@ -633,10 +629,16 @@ uint8_t BinaryCounterPattern::generate_pattern(uint32_t sample_rate,
 BinaryCounterPatternUI::BinaryCounterPatternUI(BinaryCounterPattern *pattern,
                 QWidget *parent) : PatternUI(parent), pattern(pattern)
 {
-	qDebug()<<"BinaryCounterPatternUI Created";
-	ui = new Ui::BinaryCounterPatternUI();
+	//qDebug()<<"BinaryCounterPatternUI Created";
+	ui = new Ui::EmptyPatternUI();
 	ui->setupUi(this);
 	setVisible(false);
+	frequencySpinButton = new ScaleSpinButton({
+		{"Hz", 1E0},
+		{"kHz", 1E+3},
+		{"MHz", 1E+6}
+	}, "Frequency", 1e0, 40e+6,true,false,this);
+	ui->verticalLayout->addWidget(frequencySpinButton);
 }
 
 BinaryCounterPatternUI::~BinaryCounterPatternUI()
@@ -649,8 +651,9 @@ void BinaryCounterPatternUI::build_ui(QWidget *parent)
 {
 	parent_ = parent;
 	parent->layout()->addWidget(this);
-	ui->frequency_LE->setText(QString().number(pattern->get_frequency()));
-	connect(ui->frequency_LE,SIGNAL(editingFinished()),this,SLOT(parse_ui()));
+	frequencySpinButton->setValue(pattern->get_frequency());
+	connect(frequencySpinButton,SIGNAL(valueChanged(double)), this,
+	        SLOT(parse_ui()));
 }
 
 void BinaryCounterPatternUI::destroy_ui()
@@ -669,11 +672,9 @@ Pattern *BinaryCounterPatternUI::get_pattern()
 void BinaryCounterPatternUI::parse_ui()
 {
 	bool ok = false;
-	pattern->set_frequency(ui->frequency_LE->text().toULong(&ok));
+	pattern->set_frequency(frequencySpinButton->value());
 
-	if (!ok) {
-		qDebug()<<"Cannot set frequency, not a uint32";
-	}
+
 
 	/*pattern->set_init_value(ui->inittval_LE->text().toULong(&ok));
 	if(!ok) qDebug()<<"Cannot set_init_value, not a uint32";

@@ -30,12 +30,13 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include "spinbox_a.hpp"
 
 // Generated UI
 #include "ui_binarycounterpatternui.h"
 #include "ui_uartpatternui.h"
 #include "ui_lfsrpatternui.h"
-#include "ui_clockpatternui.h"
+#include "ui_emptypatternui.h"
 #include "ui_genericjspatternui.h"
 #include "ui_constantpattern.h"
 #include "ui_numberpattern.h"
@@ -48,7 +49,7 @@ namespace Ui {
 class BinaryCounterPatternUI;
 class UARTPatternUI;
 class LFSRPatternUI;
-class ClockPatternUI;
+class EmptyPatternUI;
 class GenericJSPatternUI;
 class ConstantPatternUI;
 class NumberPatternUI;
@@ -189,9 +190,12 @@ public:
 class ClockPatternUI : public PatternUI
 {
 	Q_OBJECT
-	Ui::ClockPatternUI *ui;
+	Ui::EmptyPatternUI *ui;
 	QWidget *parent_;
 	ClockPattern *pattern;
+	ScaleSpinButton *frequencySpinButton;
+	PhaseSpinButton *phaseSpinButton;
+	PositionSpinButton *dutySpinButton;
 public:
 	ClockPatternUI(ClockPattern *pattern, QWidget *parent = 0);
 	virtual ~ClockPatternUI();
@@ -224,9 +228,10 @@ public:
 class RandomPatternUI : public PatternUI
 {
 	Q_OBJECT
-	Ui::FrequencyPatternUI *ui;
+	Ui::EmptyPatternUI *ui;
 	QWidget *parent_;
 	RandomPattern *pattern;
+	ScaleSpinButton *frequencySpinButton;
 public:
 	RandomPatternUI(RandomPattern *pattern, QWidget *parent = 0);
 	~RandomPatternUI();
@@ -271,9 +276,10 @@ public:
 class BinaryCounterPatternUI : public PatternUI
 {
 	Q_OBJECT
-	Ui::BinaryCounterPatternUI *ui;
+	Ui::EmptyPatternUI *ui;
 	QWidget *parent_;
 	BinaryCounterPattern *pattern;
+	ScaleSpinButton *frequencySpinButton;
 public:
 	BinaryCounterPatternUI(BinaryCounterPattern *pattern, QWidget *parent = 0);
 	~BinaryCounterPatternUI();

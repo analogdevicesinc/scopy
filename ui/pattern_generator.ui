@@ -1368,7 +1368,7 @@ QPushButton:hover
          <item>
           <widget class="QStackedWidget" name="rightWidget">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -1394,8 +1394,22 @@ QPushButton:hover
            <property name="currentIndex">
             <number>1</number>
            </property>
-           <widget class="QWidget" name="pgSettings"/>
-           <widget class="QWidget" name="cgSettings"/>
+           <widget class="QWidget" name="pgSettings">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+           <widget class="QWidget" name="cgSettings">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
           </widget>
          </item>
         </layout>
