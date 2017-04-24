@@ -635,6 +635,8 @@ bool PatternGenerator::startPatternGeneration(bool cyclic)
 	/* Enable Tx channels*/
 	//char temp_buffer[12];
 
+	if (offline_mode)
+		return true;
 	if (!dev) {
 		qDebug("Devices not found");
 		return false;
@@ -686,17 +688,20 @@ bool PatternGenerator::startPatternGeneration(bool cyclic)
 void PatternGenerator::stopPatternGeneration()
 {
 	/* Destroy buffer */
-	if (buffer_created == true) {
-		iio_buffer_destroy(txbuf);
-		buffer_created = false;
-	}
+	if(!offline_mode)
+	{
+		if (buffer_created == true) {
+			iio_buffer_destroy(txbuf);
+			buffer_created = false;
+		}
 
-	/* Reset Tx Channls*/
-	diom->unlock();
+		/* Reset Tx Channls*/
+		diom->unlock();
 
-	for (int j = 0; j < no_channels; j++) {
-		auto ch = iio_device_find_channel(dev, channelNames[j], true);
-		iio_channel_disable(ch);
+		for (int j = 0; j < no_channels; j++) {
+			auto ch = iio_device_find_channel(dev, channelNames[j], true);
+			iio_channel_disable(ch);
+		}
 	}
 
 }
@@ -719,12 +724,12 @@ void PatternGenerator::startStop(bool start)
 
 void PatternGenerator::singleRun()
 {
-	/*main_win->action_view_zoom_fit()->trigger();
+	main_win->action_view_zoom_fit()->trigger();
 	stopPatternGeneration();
 
 	if (startPatternGeneration(false)) {
-		uint32_t time_until_buffer_destroy = 1000 + (uint32_t)((number_of_samples/((
-		                float)sample_rate))*1000.0);
+		uint32_t time_until_buffer_destroy = 500 + (uint32_t)(((bufman->getBufferSize()/2)/((
+				float)bufman->getSampleRate()))*1000.0);
 		qDebug("Time until buffer destroy %d", time_until_buffer_destroy);
 		QTimer::singleShot(time_until_buffer_destroy, this, SLOT(singleRunStop()));
 		qDebug("Pattern generation single started");
@@ -732,7 +737,7 @@ void PatternGenerator::singleRun()
 	} else {
 		qDebug("Pattern generation failed");
 		ui->btnSingleRun->setChecked(true);
-	}*/
+	}
 }
 
 void PatternGenerator::singleRunStop()
