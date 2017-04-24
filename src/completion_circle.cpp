@@ -29,7 +29,7 @@ using namespace adiscope;
 
 CompletionCircle::CompletionCircle(QWidget *parent, bool invert_circle) :
 	QDial(parent), m_xc(0), m_yc(0), m_radius(24),
-	m_pressed(false), m_log_scale(false), invert_circle(invert_circle)
+	m_pressed(false), m_log_scale(false), invert_circle(invert_circle), m_origin(90)
 {
 	setWrapping(true);
 	setMinimumSize(50, 50);
@@ -61,9 +61,13 @@ void CompletionCircle::paintEvent(QPaintEvent *)
 		max = log(maximumDouble());
 		val = log(valueDouble());
 	}
+
 	completeRatio = qAbs((val - min) / (max - min));
-	if (invert_circle)
+
+	if (invert_circle) {
 		completeRatio = 1.0 - completeRatio;
+	}
+
 	angle = completeRatio * 360;
 
 	QColor qss_bgcolor(p.background().color());
@@ -80,7 +84,7 @@ void CompletionCircle::paintEvent(QPaintEvent *)
 	p.setPen(qss_color);
 	p.setBrush(qss_color);
 	QRectF rect(xc - r, yc - r, 2* r, 2 * r);
-	p.drawPie(rect, 90 * 16, angle * 16);
+	p.drawPie(rect, m_origin * 16, angle * 16);
 
 	p.setPen(qss_bgcolor);
 	p.setBrush(qss_bgcolor);
@@ -89,16 +93,18 @@ void CompletionCircle::paintEvent(QPaintEvent *)
 	// The center dot
 	QColor centerDotColor(Qt::black);
 
-	if (m_pressed)
+	if (m_pressed) {
 		centerDotColor = QColor(255, 114, 0);
+	}
+
 	p.setPen(centerDotColor);
 	p.setBrush(centerDotColor);
 	p.drawEllipse(QPoint(xc, yc), 3, 3);
 
 	// The dash
-	angle = angle + 90;
+	angle = angle + m_origin;
 
-	double rad_angle = qDegreesToRadians(angle );
+	double rad_angle = qDegreesToRadians(angle);
 
 	int x1 = (r - 11) * qCos(rad_angle);
 	int y1 = (r - 11) * qSin(rad_angle);
@@ -155,10 +161,11 @@ double CompletionCircle::valueDouble()
 
 void CompletionCircle::setValueDouble(double value)
 {
-	if (value < m_double_minimum)
+	if (value < m_double_minimum) {
 		value = m_double_minimum;
-	else if (value > m_double_maximum)
+	} else if (value > m_double_maximum) {
 		value = m_double_maximum;
+	}
 
 	if (m_double_value != value) {
 		m_double_value = value;
@@ -184,11 +191,18 @@ double CompletionCircle::minimumDouble()
 	return m_double_minimum;
 }
 
+void CompletionCircle::setOrigin(double value)
+{
+	m_origin = value;
+}
+
 void CompletionCircle::setMinimumDouble(double value)
 {
 	m_double_minimum = value;
-	if (m_double_value < m_double_minimum)
+
+	if (m_double_value < m_double_minimum) {
 		setValueDouble(value);
+	}
 
 	repaint();
 }
@@ -201,8 +215,10 @@ double CompletionCircle::maximumDouble()
 void CompletionCircle::setMaximumDouble(double value)
 {
 	m_double_maximum = value;
-	if (m_double_value > m_double_maximum)
+
+	if (m_double_value > m_double_maximum) {
 		setValueDouble(value);
+	}
 
 	repaint();
 }

@@ -30,7 +30,7 @@ class CompletionCircle : public QDial
 	Q_PROPERTY(bool inverted MEMBER invert_circle);
 public:
 	explicit CompletionCircle(QWidget *parent = 0,
-			bool invert_circle = false);
+	                          bool invert_circle = false);
 
 	double valueDouble();
 	double minimumDouble();
@@ -38,6 +38,7 @@ public:
 	bool toggledState();
 	bool isLogScale();
 
+	void setOrigin(double);
 	void setMinimumDouble(double);
 	void setMaximumDouble(double);
 	void setIsLogScale(bool);
@@ -52,8 +53,8 @@ Q_SIGNALS:
 protected:
 	void paintEvent(QPaintEvent *event);
 	void mousePressEvent(QMouseEvent *me);
-        void mouseReleaseEvent(QMouseEvent *me);
-        void mouseMoveEvent(QMouseEvent *me);
+	void mouseReleaseEvent(QMouseEvent *me);
+	void mouseMoveEvent(QMouseEvent *me);
 	void keyPressEvent(QKeyEvent *ev);
 	void wheelEvent(QWheelEvent *e);
 
@@ -71,6 +72,7 @@ private:
 	double m_double_value;
 	double m_double_minimum;
 	double m_double_maximum;
+	double m_origin;
 	int m_xc;
 	int m_yc;
 	int m_radius;

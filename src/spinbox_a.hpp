@@ -36,7 +36,7 @@ class QComboBox;
 class QRegExpValidator;
 
 namespace Ui {
-	class SpinBoxA;
+class SpinBoxA;
 }
 
 namespace adiscope {
@@ -69,17 +69,17 @@ class SpinBoxA : public QWidget
 public:
 	explicit SpinBoxA(QWidget *parent = nullptr);
 	explicit SpinBoxA(std::vector<std::pair<QString, double> >units,
-			const QString &name = "",
-			double min_value = 0.0, double max_value = 0.0,
-			bool hasProgressWidget = true,
-			bool invertCircle = false, QWidget *parent = 0);
+	                  const QString& name = "",
+	                  double min_value = 0.0, double max_value = 0.0,
+	                  bool hasProgressWidget = true,
+	                  bool invertCircle = false, QWidget *parent = 0);
 	~SpinBoxA();
 
-	QPushButton * upButton();
-	QPushButton * downButton();
-	QLabel * nameLabel();
-	QLineEdit * lineEdit();
-	QFrame * line();
+	QPushButton *upButton();
+	QPushButton *downButton();
+	QLabel *nameLabel();
+	QLineEdit *lineEdit();
+	QFrame *line();
 	QComboBox *comboBox();
 
 	double value();
@@ -99,7 +99,7 @@ public:
 	void setName(const QString& name);
 
 public Q_SLOTS:
-	void setValue(double);
+	virtual void setValue(double);
 	void setFineMode(bool);
 
 	virtual void setMinValue(double);
@@ -114,7 +114,7 @@ Q_SIGNALS:
 protected Q_SLOTS:
 	void onUpButtonPressed();
 	void onDownButtonPressed();
-	void onComboboxIndexChanged(int);
+	virtual void onComboboxIndexChanged(int);
 	void onLineEditTextEdited();
 
 protected:
@@ -139,10 +139,10 @@ class ScaleSpinButton: public SpinBoxA
 public:
 	explicit ScaleSpinButton(QWidget *parent = nullptr);
 	explicit ScaleSpinButton(std::vector<std::pair<QString, double> >units,
-			const QString &name = "",
-			double min_value = 0.0, double max_value = 0.0,
-			bool hasProgressWidget = true,
-			bool invertCircle = false, QWidget *parent = 0);
+	                         const QString& name = "",
+	                         double min_value = 0.0, double max_value = 0.0,
+	                         bool hasProgressWidget = true,
+	                         bool invertCircle = false, QWidget *parent = 0);
 
 public Q_SLOTS:
 	void stepUp();
@@ -162,10 +162,10 @@ class PositionSpinButton: public SpinBoxA
 public:
 	explicit PositionSpinButton(QWidget *parent = nullptr);
 	explicit PositionSpinButton(std::vector<std::pair<QString, double> >units,
-			const QString &name = "",
-			double min_value = 0.0, double max_value = 0.0,
-			bool hasProgressWidget = true,
-			bool invertCircle = false, QWidget *parent = 0);
+	                            const QString& name = "",
+	                            double min_value = 0.0, double max_value = 0.0,
+	                            bool hasProgressWidget = true,
+	                            bool invertCircle = false, QWidget *parent = 0);
 
 	double step();
 	void setStep(double);
@@ -177,6 +177,28 @@ public Q_SLOTS:
 protected:
 	double m_step;
 };
+
+
+class PhaseSpinButton: public SpinBoxA
+{
+	Q_OBJECT
+public:
+	explicit PhaseSpinButton(QWidget *parent = nullptr);
+
+public Q_SLOTS:
+	void stepUp();
+	void stepDown();
+
+	void setValue(double value);
+	void onComboboxIndexChanged(int index);
+
+protected:
+	std::vector<std::vector<double>> m_unit;
+	double m_step;
+	double m_fine_increment;
+
+};
+
 }
 
 #endif // SPIN_BOX_A_H
