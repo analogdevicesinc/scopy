@@ -86,7 +86,7 @@ find_package(Gnuradio PATHS "c:/Program Files/gnuradio/lib/cmake/gnuradio" REQUI
 GR_MODULE(IIO gnuradio-iio gnuradio/iio/api.h gnuradio-iio)
 
 add_definitions(-DBOOST_ALL_DYN_LINK)
-find_package(Boost "1.58" COMPONENTS system filesystem thread REQUIRED)
+find_package(Boost "1.55" COMPONENTS system filesystem thread REQUIRED)
 
 set(VC_PATH "$ENV{VS120COMNTOOLS}/../../VC")
 find_library(IIO_LIBRARIES NAMES iio libiio PATHS ${VC_PATH}/lib ${VC_PATH}/lib/amd64)
