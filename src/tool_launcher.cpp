@@ -110,7 +110,9 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	connect(ui->btnNetworkAnalyzer, SIGNAL(toggled(bool)), this,
 			SLOT(setButtonBackground(bool)));
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
 	js_engine.installExtensions(QJSEngine::ConsoleExtension);
+#endif
 	tl_api->js_register(&js_engine);
 
 	connect(&notifier, SIGNAL(activated(int)), this, SLOT(hasText()));
