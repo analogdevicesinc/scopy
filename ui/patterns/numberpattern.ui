@@ -35,10 +35,13 @@
    <item row="1" column="0" colspan="2">
     <widget class="QLineEdit" name="numberLineEdit">
      <property name="inputMask">
-      <string>00000</string>
+      <string/>
      </property>
      <property name="text">
-      <string>0</string>
+      <string/>
+     </property>
+     <property name="maxLength">
+      <number>5</number>
      </property>
     </widget>
    </item>

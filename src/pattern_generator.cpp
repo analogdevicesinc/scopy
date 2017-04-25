@@ -419,7 +419,7 @@ void PatternGenerator::createSettingsWidget()
 	cgSettings->LPattern->setText(QString::fromStdString(
 	                                      chg->pattern->get_name()).toUpper());
 	currentUI = PatternFactory::create_ui(chg->pattern);
-	currentUI->build_ui(cgSettings->patternSettings);
+	currentUI->build_ui(cgSettings->patternSettings,chg->get_channel_count());
 	currentUI->get_pattern()->init();
 	currentUI->post_load_ui();
 	currentUI->setVisible(true);

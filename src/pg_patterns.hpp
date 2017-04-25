@@ -75,7 +75,7 @@ namespace adiscope {
 #define UARTPatternDescription "UART pattern generator"
 #define BinaryCounterPatternName "Binary Counter"
 #define BinaryCounterPatternDescription "Binary counter pattern generator"
-#define GrayCounterPatternName "Gray Counter Pattern"
+#define GrayCounterPatternName "Gray Counter"
 #define GrayCounterPatternDescription "Gray counter pattern generator"
 #define JohnsonCounterPatternName "Johnson Counter Pattern"
 #define JohnsonCounterPatternDescription "Johnson counter pattern generator"
@@ -84,9 +84,11 @@ namespace adiscope {
 
 enum {
 	ClockPatternId = 0,
+	NumberPatternId,
 	RandomPatternId,
 	BinaryCounterId,
 	UARTPatternId,
+	GrayCounterId,
 };
 
 
@@ -153,7 +155,7 @@ public:
 	PatternUI(QWidget *parent = 0);
 	virtual ~PatternUI();
 	//static PatternUI *create_ui(int index, QWidget *parent = 0);
-	virtual void build_ui(QWidget *parent = 0);
+	virtual void build_ui(QWidget *parent = 0,uint16_t number_of_channels=0);
 	virtual Pattern *get_pattern() = 0;
 	virtual void post_load_ui();
 	virtual void parse_ui();
@@ -200,7 +202,7 @@ public:
 	ClockPatternUI(ClockPattern *pattern, QWidget *parent = 0);
 	virtual ~ClockPatternUI();
 	Pattern *get_pattern();
-	void build_ui(QWidget *parent = 0);
+	void build_ui(QWidget *parent = 0,uint16_t number_of_channels=0);
 	void destroy_ui();
 
 private Q_SLOTS:
@@ -236,7 +238,7 @@ public:
 	RandomPatternUI(RandomPattern *pattern, QWidget *parent = 0);
 	~RandomPatternUI();
 	Pattern *get_pattern();
-	void build_ui(QWidget *parent = 0);
+	void build_ui(QWidget *parent = 0,uint16_t number_of_channels=0);
 	void destroy_ui();
 
 private Q_SLOTS:
@@ -284,35 +286,41 @@ public:
 	BinaryCounterPatternUI(BinaryCounterPattern *pattern, QWidget *parent = 0);
 	~BinaryCounterPatternUI();
 	Pattern *get_pattern();
-	void build_ui(QWidget *parent = 0);
+	void build_ui(QWidget *parent = 0,uint16_t number_of_channels=0);
 	void destroy_ui();
 
 private Q_SLOTS:
 	void parse_ui();
 };
-#if 0
+
 
 class GrayCounterPattern : virtual public BinaryCounterPattern
 {
 public:
 	GrayCounterPattern();
-	uint8_t generate_pattern();
+	virtual ~GrayCounterPattern() {}
+	uint8_t generate_pattern(uint32_t sample_rate,
+	                         uint32_t number_of_samples, uint16_t number_of_channels);
 };
 
 class GrayCounterPatternUI : public PatternUI
 {
 	Q_OBJECT
-	Ui::BinaryCounterPatternUI *ui;
+	Ui::EmptyPatternUI *ui;
 	QWidget *parent_;
+	GrayCounterPattern *pattern;
+	ScaleSpinButton *frequencySpinButton;
 public:
 	GrayCounterPatternUI(GrayCounterPattern *pattern, QWidget *parent = 0);
 	~GrayCounterPatternUI();
-	GrayCounterPattern *pattern;
-	void parse_ui();
-	void build_ui(QWidget *parent = 0);
+	Pattern *get_pattern();
+	void build_ui(QWidget *parent = 0,uint16_t number_of_channels=0);
 	void destroy_ui();
+
+private Q_SLOTS:
+	void parse_ui();
 };
-#endif
+
 
 class UARTPattern : virtual public Pattern
 {
@@ -376,11 +384,43 @@ public:
 	UARTPatternUI(UARTPattern *pattern, QWidget *parent = 0);
 	~UARTPatternUI();
 	Pattern *get_pattern();
-	void build_ui(QWidget *parent = 0);
+	void build_ui(QWidget *parent = 0,uint16_t number_of_channels=0);
 	void destroy_ui();
 private Q_SLOTS:
 	void parse_ui();
 };
+
+
+class NumberPattern : virtual public Pattern
+{
+private:
+	uint16_t nr;
+public:
+	NumberPattern();
+	virtual ~NumberPattern() {}
+	virtual uint8_t generate_pattern(uint32_t sample_rate,
+	                                 uint32_t number_of_samples, uint16_t number_of_channels);
+	uint16_t get_nr() const;
+	void set_nr(const uint16_t& value);
+};
+
+class NumberPatternUI : public PatternUI
+{
+	Q_OBJECT
+	Ui::NumberPatternUI *ui;
+	QWidget *parent_;
+	NumberPattern *pattern;
+	uint16_t max;
+public:
+	NumberPatternUI(NumberPattern *pattern, QWidget *parent = 0);
+	~NumberPatternUI();
+	Pattern *get_pattern();
+	void build_ui(QWidget *parent = 0,uint16_t number_of_channels=0);
+	void destroy_ui();
+private Q_SLOTS:
+	void parse_ui();
+};
+
 
 #if 0
 
@@ -500,32 +540,6 @@ public:
 	void build_ui(QWidget *parent = 0);
 	void destroy_ui();
 };
-
-class NumberPattern : virtual public Pattern
-{
-private:
-	uint16_t nr;
-public:
-	NumberPattern();
-	uint8_t generate_pattern();
-
-	uint16_t get_nr() const;
-	void set_nr(const uint16_t& value);
-};
-
-class NumberPatternUI : public PatternUI, public NumberPattern
-{
-	Q_OBJECT
-	Ui::NumberPatternUI *ui;
-	QWidget *parent_;
-public:
-	NumberPatternUI(QWidget *parent = 0);
-	~NumberPatternUI();
-	void parse_ui();
-	void build_ui(QWidget *parent = 0);
-	void destroy_ui();
-};
-
 
 class PulsePattern : virtual public Pattern
 {
