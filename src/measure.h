@@ -21,6 +21,7 @@
 #define MEASURE_H
 
 #include <QList>
+#include <QString>
 #include <memory>
 
 namespace adiscope {
