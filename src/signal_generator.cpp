@@ -466,7 +466,7 @@ void SignalGenerator::start()
 			if (dev != iio_channel_get_device(each))
 				continue;
 
-			enabled_channels.removeOne(each);
+			enabled_channels.remove(enabled_channels.indexOf(each));
 
 			top_block = gr::make_top_block("Signal Generator");
 
