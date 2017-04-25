@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1026</width>
+    <width>1027</width>
     <height>582</height>
    </rect>
   </property>
@@ -702,6 +702,25 @@ QSlider::handle:disabled {
        </widget>
       </item>
       <item>
+       <widget class="adiscope::PositionSpinButton" name="valuePos" native="true">
+        <property name="units" stdset="0">
+         <stringlist>
+          <string>mVolts=1e-3</string>
+          <string>Volts=1e0</string>
+         </stringlist>
+        </property>
+        <property name="name" stdset="0">
+         <string>Value</string>
+        </property>
+        <property name="min_value" stdset="0">
+         <double>0.000000000000000</double>
+        </property>
+        <property name="max_value" stdset="0">
+         <double>5.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="dac1">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -709,30 +728,46 @@ QSlider::handle:disabled {
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="layoutDirection">
+         <enum>Qt::RightToLeft</enum>
+        </property>
         <property name="styleSheet">
          <string notr="true">QPushButton {
-color: white;
-background-color: orange;
-font-family: &quot;monospace&quot;;
-font-weight: bold;
-height: 30px;
-border-width: 0px;
-border-radius: 3px;
-min-width: 6em;
+  width: 80px;
+  height: 40px;
+  border-radius: 4px;
+  background-color: #27b34f;
+  color: white;
+  font-family: &quot;monospace&quot;;
+  font-weight: bold;
+
+  text-align: left;
+  padding-left: 20px;
+  padding-right: 20px;
+  qproperty-text: &quot;Enable&quot;;
 }
-QPushButton:checked {
-background-color: #F45000;
+
+QPushButton[running=true] {
+  qproperty-text: &quot;Disable&quot;;
+  background-color: #F45000;
 }
+
 QPushButton:disabled {
-background-color: grey;
+  background-color: grey;
 }</string>
         </property>
         <property name="text">
          <string>Enable</string>
         </property>
         <property name="icon">
-         <iconset theme="media-playback-start">
-          <normaloff>.</normaloff>.</iconset>
+         <iconset resource="../resources/resources.qrc">
+          <normaloff>:/icons/ico-play.svg</normaloff>:/icons/ico-play.svg</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>8</width>
+          <height>10</height>
+         </size>
         </property>
         <property name="checkable">
          <bool>true</bool>
@@ -794,6 +829,25 @@ background-color: grey;
        </widget>
       </item>
       <item>
+       <widget class="adiscope::PositionSpinButton" name="valueNeg" native="true">
+        <property name="units" stdset="0">
+         <stringlist>
+          <string>mVolts=1e-3</string>
+          <string>Volts=1e0</string>
+         </stringlist>
+        </property>
+        <property name="name" stdset="0">
+         <string>Value</string>
+        </property>
+        <property name="min_value" stdset="0">
+         <double>-5.000000000000000</double>
+        </property>
+        <property name="max_value" stdset="0">
+         <double>0.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="dac2">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -801,30 +855,46 @@ background-color: grey;
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="layoutDirection">
+         <enum>Qt::RightToLeft</enum>
+        </property>
         <property name="styleSheet">
          <string notr="true">QPushButton {
-color: white;
-background-color: orange;
-font-family: &quot;monospace&quot;;
-font-weight: bold;
-height: 30px;
-border-width: 0px;
-border-radius: 3px;
-min-width: 6em;
+  width: 80px;
+  height: 40px;
+  border-radius: 4px;
+  background-color: #27b34f;
+  color: white;
+  font-family: &quot;monospace&quot;;
+  font-weight: bold;
+
+  text-align: left;
+  padding-left: 20px;
+  padding-right: 20px;
+  qproperty-text: &quot;Enable&quot;;
 }
-QPushButton:checked {
-background-color: #F45000;
+
+QPushButton[running=true] {
+  qproperty-text: &quot;Disable&quot;;
+  background-color: #F45000;
 }
+
 QPushButton:disabled {
-background-color: grey;
+  background-color: grey;
 }</string>
         </property>
         <property name="text">
          <string>Enable</string>
         </property>
         <property name="icon">
-         <iconset theme="media-playback-start">
-          <normaloff>.</normaloff>.</iconset>
+         <iconset resource="../resources/resources.qrc">
+          <normaloff>:/icons/ico-play.svg</normaloff>:/icons/ico-play.svg</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>8</width>
+          <height>10</height>
+         </size>
         </property>
         <property name="checkable">
          <bool>true</bool>
@@ -860,8 +930,16 @@ background-color: grey;
    <extends>QLCDNumber</extends>
    <header>lcdNumber.hpp</header>
   </customwidget>
+  <customwidget>
+   <class>adiscope::PositionSpinButton</class>
+   <extends>QWidget</extends>
+   <header>spinbox_a.hpp</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../resources/resources.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>sync</sender>
@@ -908,6 +986,38 @@ background-color: grey;
     <hint type="destinationlabel">
      <x>903</x>
      <y>115</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>valuePos</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>lcd1_set</receiver>
+   <slot>display(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>917</x>
+     <y>233</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>281</x>
+     <y>105</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>valueNeg</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>lcd2_set</receiver>
+   <slot>display(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>917</x>
+     <y>380</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>260</x>
+     <y>335</y>
     </hint>
    </hints>
   </connection>

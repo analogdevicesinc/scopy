@@ -17,6 +17,7 @@
  * Boston, MA 02110-1301, USA.
  */
 
+#include "dynamicWidget.hpp"
 #include "power_controller.hpp"
 
 #include "ui_powercontrol.h"
@@ -63,33 +64,10 @@ PowerController::PowerController(struct iio_context *ctx,
 			SLOT(dac2_set_enabled(bool)));
 	connect(ui->sync, SIGNAL(toggled(bool)), this,
 			SLOT(sync_enabled(bool)));
-
-	auto layout = static_cast<QVBoxLayout *>(ui->rightMenu->layout());
-
-	valuePos = new PositionSpinButton({
-			{"mVolts", 1E-3},
-			{"Volts", 1E0}
-			}, "Value", 0.0, 5e0);
-	layout->insertWidget(8, valuePos, 0, Qt::AlignLeft);
-
-	connect(valuePos, SIGNAL(valueChanged(double)), this,
+	connect(ui->valuePos, SIGNAL(valueChanged(double)), this,
 			SLOT(dac1_set_value(double)));
-	connect(valuePos, SIGNAL(valueChanged(double)), ui->lcd1_set,
-			SLOT(display(double)));
-
-	valueNeg = new PositionSpinButton({
-			{"mVolts", 1E-3},
-			{"Volts", 1E0}
-			}, "Value", -5e0, 0.0, true, true);
-	layout->insertWidget(13, valueNeg, 0, Qt::AlignLeft);
-
-	connect(ui->sync, SIGNAL(toggled(bool)), valueNeg,
-			SLOT(setDisabled(bool)));
-	connect(valueNeg, SIGNAL(valueChanged(double)), this,
+	connect(ui->valueNeg, SIGNAL(valueChanged(double)), this,
 			SLOT(dac2_set_value(double)));
-	connect(valueNeg, SIGNAL(valueChanged(double)), ui->lcd2_set,
-			SLOT(display(double)));
-
 	connect(ui->trackingRatio, SIGNAL(valueChanged(int)), this,
 			SLOT(ratioChanged(int)));
 
@@ -121,7 +99,7 @@ void PowerController::dac1_set_value(double value)
 
 	if (in_sync) {
 		value = -value * ui->trackingRatio->value() / 100.0;
-		valueNeg->setValue(value);
+		ui->valueNeg->setValue(value);
 		dac2_set_value(value);
 	}
 }
@@ -144,6 +122,8 @@ void PowerController::dac1_set_enabled(bool enabled)
 		menuRunButton->setChecked(true);
 	else if (!ui->dac2->isChecked())
 		menuRunButton->setChecked(false);
+
+	setDynamicProperty(ui->dac1, "running", enabled);
 }
 
 void PowerController::dac2_set_enabled(bool enabled)
@@ -154,6 +134,8 @@ void PowerController::dac2_set_enabled(bool enabled)
 		menuRunButton->setChecked(true);
 	else if (!ui->dac1->isChecked())
 		menuRunButton->setChecked(false);
+
+	setDynamicProperty(ui->dac2, "running", enabled);
 }
 
 void PowerController::sync_enabled(bool enabled)
@@ -164,14 +146,14 @@ void PowerController::sync_enabled(bool enabled)
 	}
 
 	in_sync = enabled;
-	valueNeg->setDisabled(enabled);
-	valueNeg->setValue(-valuePos->value() *
+	ui->valueNeg->setDisabled(enabled);
+	ui->valueNeg->setValue(-ui->valuePos->value() *
 			(double) ui->trackingRatio->value() / 100.0);
 }
 
 void PowerController::ratioChanged(int percent)
 {
-	valueNeg->setValue(-valuePos->value() *
+	ui->valueNeg->setValue(-ui->valuePos->value() *
 			(double) percent / 100.0);
 }
 
@@ -227,21 +209,21 @@ void PowerController_API::setTrackingPercent(int percent)
 
 double PowerController_API::valueDac1() const
 {
-	return pw->valuePos->value();
+	return pw->ui->valuePos->value();
 }
 
 void PowerController_API::setValueDac1(double value)
 {
-	pw->valuePos->setValue(value);
+	pw->ui->valuePos->setValue(value);
 }
 
 double PowerController_API::valueDac2() const
 {
-	return pw->valueNeg->value();
+	return pw->ui->valueNeg->value();
 }
 
 void PowerController_API::setValueDac2(double value)
 {
 	if (!syncEnabled())
-		pw->valueNeg->setValue(value);
+		pw->ui->valueNeg->setValue(value);
 }
