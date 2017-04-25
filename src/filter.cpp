@@ -51,36 +51,34 @@ Filter::Filter(const struct iio_context *ctx)
 	auto doc = QJsonDocument::fromJson(file.readAll());
 	auto obj = doc.object();
 
-	auto keys = obj.keys();
-
-	for (auto it = keys.constBegin(); it != keys.constEnd(); ++it) {
-		auto child = obj[*it].toObject();
+	for (const auto &key : obj.keys()) {
+		const auto child = obj[key].toObject();
 
 		if (!child.contains("compatible-devices"))
 			continue;
 
-		auto compatible_devices = child["compatible-devices"];
+		const auto compatible_devices = child["compatible-devices"];
 		if (!compatible_devices.isArray())
 			continue;
 
-		auto dev_list = compatible_devices.toArray();
 		bool compatible = true;
 
-		for (auto it2 = dev_list.constBegin(); compatible &&
-				it2 != dev_list.constEnd(); ++it2) {
-			if (!it2->isString()) {
+		for (const auto &value : compatible_devices.toArray()) {
+			if (!value.isString()) {
 				compatible = false;
 				break;
 			}
 
-			auto str = it2->toString().toStdString();
-			compatible &= !!iio_context_find_device(
+			const auto str = value.toString().toStdString();
+			compatible = !!iio_context_find_device(
 					ctx, str.c_str());
+			if (!compatible)
+				break;
 		}
 
 		if (compatible) {
 			this->root = child;
-			hwname = *it;
+			hwname = key;
 			return;
 		}
 	}
