@@ -1201,8 +1201,8 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 
 void adiscope::Oscilloscope::onVertOffsetValueChanged(double value)
 {
-	if (value != plot.VertOffset(current_channel)) {
-		plot.setVertOffset(value, current_channel);
+	if (value != -plot.VertOffset(current_channel)) {
+		plot.setVertOffset(-value, current_channel);
 		plot.replot();
 	}
 }
@@ -1329,7 +1329,7 @@ void Oscilloscope::settings_panel_size_adjust()
 
 void Oscilloscope::onChannelOffsetChanged(double value)
 {
-	voltsPosition->setValue(plot.VertOffset(current_channel));
+	voltsPosition->setValue(-plot.VertOffset(current_channel));
 }
 
 QWidget * Oscilloscope::channelWidgetAtId(int id)
@@ -1358,7 +1358,7 @@ void Oscilloscope::update_chn_settings_panel(int id)
 		return;
 
 	voltsPerDiv->setValue(plot.VertUnitsPerDiv(id));
-	voltsPosition->setValue(plot.VertOffset(id));
+	voltsPosition->setValue(-plot.VertOffset(id));
 
 	QString name = chn_widget->property("channel_name").toString();
 	ch_ui->label_channelName->setText(name);
