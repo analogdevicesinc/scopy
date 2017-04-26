@@ -142,8 +142,6 @@ void NetworkAnalyzer::updateNumSamples()
 
 void NetworkAnalyzer::run()
 {
-	const struct iio_device *dev = iio_channel_get_device(dac1);
-
 	const struct iio_device *dev1 = iio_channel_get_device(dac1);
 	for (unsigned int i = 0; i < iio_device_get_channels_count(dev1); i++) {
 		struct iio_channel *each = iio_device_get_channel(dev1, i);
@@ -174,9 +172,6 @@ void NetworkAnalyzer::run()
 
 		double amplitude = ui->amplitude->value();
 		double offset = ui->offset->value();
-
-		/* We want at least 8 periods. */
-		size_t in_samples_count = samples_count * 8;
 
 		if (dev1 != dev2)
 			iio_device_attr_write_bool(dev1, "dma_sync", true);
@@ -211,28 +206,30 @@ void NetworkAnalyzer::run()
 		if (started)
 			iio->lock();
 
-		/* Skip some data to make sure we'll get the waveform */
-		auto skiphead1 = blocks::skiphead::make(sizeof(float),
-				in_samples_count);
-		auto skiphead2 = blocks::skiphead::make(sizeof(float),
-				in_samples_count);
-		auto id1 = iio->connect(skiphead1, 0, 0, true,
-				in_samples_count);
-		auto id2 = iio->connect(skiphead2, 1, 0, true,
-				in_samples_count);
+		/* We want at least 64 periods */
+		double ratio = (double) adc_rate / frequency;
 
-		/* We want at least 8 periods */
-		unsigned long buffer_size = 8.0 * (double) adc_rate / frequency;
-		iio->set_buffer_size(id1, buffer_size);
-		iio->set_buffer_size(id2, buffer_size);
-
-		qDebug() << "Scanning frequency" << frequency << "Hz at" <<
-			adc_rate << "SPS," << buffer_size << "samples";
+		unsigned long buffer_size;
+		if (ratio <= 5.0)
+			buffer_size = 128.0 * ratio;
+		else if (ratio <= 10.0)
+			buffer_size = 64.0 * ratio;
+		else if (ratio <= 15.0)
+			buffer_size = 32.0 * ratio;
+		else if (ratio <= 20.0)
+			buffer_size = 16.0 * ratio;
+		else
+			buffer_size = 8.0 * ratio;
 
 		auto f2c1 = blocks::float_to_complex::make();
 		auto f2c2 = blocks::float_to_complex::make();
-		iio->connect(skiphead1, 0, f2c1, 0);
-		iio->connect(skiphead2, 0, f2c2, 0);
+		auto id1 = iio->connect(f2c1, 0, 0, true,
+				buffer_size);
+		auto id2 = iio->connect(f2c2, 1, 0, true,
+				buffer_size);
+
+		iio->set_buffer_size(id1, buffer_size);
+		iio->set_buffer_size(id2, buffer_size);
 
 		auto null = blocks::null_source::make(sizeof(float));
 		iio->connect(null, 0, f2c1, 1);
@@ -253,10 +250,10 @@ void NetworkAnalyzer::run()
 		auto signal = boost::make_shared<signal_sample>();
 		auto conj = blocks::multiply_conjugate_cc::make();
 
-		auto avg1 = blocks::moving_average_cc::make(in_samples_count,
-				2.0 / in_samples_count, in_samples_count);
+		auto avg1 = blocks::moving_average_cc::make(buffer_size,
+				2.0 / buffer_size, buffer_size);
 		auto skiphead3 = blocks::skiphead::make(sizeof(gr_complex),
-				in_samples_count - 1);
+				buffer_size - 1);
 		auto c2m1 = blocks::complex_to_mag_squared::make();
 
 		iio->connect(mult1, 0, avg1, 0);
@@ -265,10 +262,10 @@ void NetworkAnalyzer::run()
 		iio->connect(skiphead3, 0, conj, 0);
 		iio->connect(c2m1, 0, signal, 0);
 
-		auto avg2 = blocks::moving_average_cc::make(in_samples_count,
-				2.0 / in_samples_count, in_samples_count);
+		auto avg2 = blocks::moving_average_cc::make(buffer_size,
+				2.0 / buffer_size, buffer_size);
 		auto skiphead4 = blocks::skiphead::make(sizeof(gr_complex),
-				in_samples_count - 1);
+				buffer_size - 1);
 		auto c2m2 = blocks::complex_to_mag_squared::make();
 
 		iio->connect(mult2, 0, avg2, 0);
@@ -319,8 +316,9 @@ void NetworkAnalyzer::run()
 
 
 		double mag = 10.0 * log10(mag1) - 10.0 * log10(mag2);
-		qDebug() << "Frequency:" << frequency << " Mag diff:"
-			<< mag << "Phase diff:" << phase;
+		qDebug() << "Frequency" << frequency << "Hz," <<
+			adc_rate << "SPS," << buffer_size << "samples," <<
+			mag << "Mag," << phase << "Deg, ratio" << ratio;
 
 		double phase_deg = phase * 180.0 / M_PI;
 
@@ -419,11 +417,11 @@ unsigned long NetworkAnalyzer::get_best_adc_rate(double frequency)
 	QVector<unsigned long> values =
 		SignalGenerator::get_available_sample_rates(adc);
 
-	/* Return the smallest rate that is at least twice the frequency */
+	/* Return the smallest rate that is at least 10 times the frequency */
 	qSort(values.begin(), values.end(), qLess<unsigned long>());
 
 	for (unsigned long rate : values) {
-		if ((double) rate > 2.0 * frequency)
+		if ((double) rate >= 10.0 * frequency)
 			return rate;
 	}
 
