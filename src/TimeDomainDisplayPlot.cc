@@ -159,6 +159,7 @@ TimeDomainDisplayPlot::TimeDomainDisplayPlot(QWidget* parent, unsigned int xNumD
   d_sample_rate = 1;
   d_data_starting_point = 0.0;
   d_reset_x_axis_points = false;
+  d_curves_hidden = false;
 
   // Reconfigure the bottom horizontal axis that was created by the base class
   configureAxis(QwtPlot::xBottom, 0);
@@ -270,6 +271,10 @@ TimeDomainDisplayPlot::plotNewData(const std::string sender,
 	  memcpy(d_ydata[start + i], dataPoints[i], numDataPoints*sizeof(double));
 	}
       }
+
+      for (int i = 0; i < d_plot_curve.size(); i++)
+		d_plot_curve.at(i)->show();
+      d_curves_hidden = false;
 
 //      // Detach and delete any tags that were plotted last time
 //      for(int n = 0; n < d_nplots; n++) {
@@ -924,6 +929,13 @@ qreal TimeDomainDisplayPlot::getLineWidthF(int which) const
     return d_plot_curve[which]->pen().widthF();
   else
     return 0;
+}
+
+void TimeDomainDisplayPlot::hideCurvesUntilNewData()
+{
+	for (int i = 0; i < d_plot_curve.size(); i++)
+		d_plot_curve.at(i)->hide();
+	d_curves_hidden = true;
 }
 
 #endif /* TIME_DOMAIN_DISPLAY_PLOT_C */

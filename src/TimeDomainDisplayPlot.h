@@ -155,6 +155,7 @@ public Q_SLOTS:
 
   void setDataStartingPoint(long pos);
   void resetXaxisOnNextReceivedData();
+  void hideCurvesUntilNewData();
 
 protected:
   virtual void configureAxis(int axisPos, int axisIdx);
@@ -193,6 +194,8 @@ private:
   QwtPlotMarker *d_trigger_lines[2];
 
   SinkManager d_sinkManager;
+
+  bool d_curves_hidden;
 
   QColor getChannelColor();
 };
