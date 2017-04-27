@@ -22,6 +22,7 @@
 #include <QDebug>
 #include <QtGlobal>
 #include <iio.h>
+#include <QThread>
 
 using namespace adiscope;
 
@@ -154,6 +155,9 @@ bool Calibration::calibrateADCoffset()
 	// Set DAC channels to middle scale
 	iio_channel_attr_write_longlong(m_ad5625_channel2, "raw", 2048);
 	iio_channel_attr_write_longlong(m_ad5625_channel3, "raw", 2048);
+
+	// Allow some time for the voltage to settle
+	QThread::msleep(50);
 
 	const unsigned int num_samples = 1e5;
 	int16_t dataCh0[num_samples];
@@ -420,6 +424,9 @@ bool Calibration::fine_tune(size_t span, int16_t centerVal0, int16_t centerVal1,
 		offset0++;
 		offset1++;
 
+		// Allow some time for the voltage to settle
+		QThread::msleep(5);
+
 		ret = adc_data_capture(dataCh0, dataCh1, num_samples);
 
 		if (!ret) {
@@ -510,6 +517,9 @@ bool Calibration::calibrateDACoffset()
 	dacAOutputDC(0);
 	dacBOutputDC(0);
 
+	// Allow some time for the voltage to settle
+	QThread::msleep(50);
+
 	const unsigned int num_samples = 1e5;
 	int16_t dataCh0[num_samples];
 	int16_t dataCh1[num_samples];
@@ -574,6 +584,9 @@ bool Calibration::calibrateDACgain()
 	// Use the positive half scale point for gain calibration
 	dacAOutputDC(1024);
 	dacBOutputDC(1024);
+
+	// Allow some time for the voltage to settle
+	QThread::msleep(50);
 
 	const unsigned int num_samples = 1e5;
 	int16_t dataCh0[num_samples];
