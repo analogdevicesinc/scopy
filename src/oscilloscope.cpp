@@ -101,6 +101,19 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	adc.setChannelGain(0, gain_ch1);
 	adc.setChannelGain(1, gain_ch2);
 
+	struct iio_device *ad5625 = iio_context_find_device(ctx, "ad5625");
+	offset_channels.push_back(iio_device_find_channel(ad5625, "voltage2",
+		true));
+	offset_channels.push_back(iio_device_find_channel(ad5625, "voltage3",
+		true));
+
+	long long val;
+	iio_channel_attr_read_longlong(offset_channels[0], "raw", &val);
+	ch_midscale_offset.push_back((long long)val);
+
+	iio_channel_attr_read_longlong(offset_channels[1], "raw", &val);
+	ch_midscale_offset.push_back((long long)val);
+
 	/* Measurements Settings */
 	measure_settings_init();
 
@@ -359,8 +372,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 				{"mVolts", 1E-3},
 				{"Volts", 1E0}
 				}, "Position",
-				-voltsPerDiv->maxValue() * 5,
-				voltsPerDiv->maxValue() * 5);
+				-25,
+				25);
 
 	ch_ui = new Ui::ChannelSettings();
 	ch_ui->setupUi(ui->channelSettings);
@@ -801,6 +814,35 @@ void Oscilloscope::on_actionClose_triggered()
 	this->close();
 }
 
+void Oscilloscope::toggle_blockchain_flow(bool en)
+{
+	if (en) {
+		for (unsigned int i = 0; i < nb_channels; i++)
+			iio->start(ids[i]);
+		if (fft_is_visible)
+			for (unsigned int i = 0; i < nb_channels; i++)
+				iio->start(fft_ids[i]);
+		if (hist_is_visible)
+			for (unsigned int i = 0; i < nb_channels; i++)
+				iio->start(hist_ids[i]);
+		if (xy_is_visible)
+			for (unsigned int i = 0; i < (nb_channels & ~1); i++)
+				iio->start(xy_ids[i]);
+	} else {
+		for (unsigned int i = 0; i < nb_channels; i++)
+			iio->stop(ids[i]);
+		if (fft_is_visible)
+			for (unsigned int i = 0; i < nb_channels; i++)
+				iio->stop(fft_ids[i]);
+		if (hist_is_visible)
+			for (unsigned int i = 0; i < nb_channels; i++)
+				iio->stop(hist_ids[i]);
+		if (xy_is_visible)
+			for (unsigned int i = 0; i < (nb_channels & ~1); i++)
+				iio->stop(xy_ids[i]);
+	}
+}
+
 void Oscilloscope::runStopToggled(bool checked)
 {
 	QPushButton *btn = static_cast<QPushButton *>(QObject::sender());
@@ -826,29 +868,9 @@ void Oscilloscope::runStopToggled(bool checked)
 		if (timePosition->value() != active_time_pos)
 			timePosition->setValue(active_time_pos);
 
-		for (unsigned int i = 0; i < nb_channels; i++)
-			iio->start(ids[i]);
-		if (fft_is_visible)
-			for (unsigned int i = 0; i < nb_channels; i++)
-				iio->start(fft_ids[i]);
-		if (hist_is_visible)
-			for (unsigned int i = 0; i < nb_channels; i++)
-				iio->start(hist_ids[i]);
-		if (xy_is_visible)
-			for (unsigned int i = 0; i < (nb_channels & ~1); i++)
-				iio->start(xy_ids[i]);
+		toggle_blockchain_flow(true);
 	} else {
-		for (unsigned int i = 0; i < nb_channels; i++)
-			iio->stop(ids[i]);
-		if (fft_is_visible)
-			for (unsigned int i = 0; i < nb_channels; i++)
-				iio->stop(fft_ids[i]);
-		if (hist_is_visible)
-			for (unsigned int i = 0; i < nb_channels; i++)
-				iio->stop(hist_ids[i]);
-		if (xy_is_visible)
-			for (unsigned int i = 0; i < (nb_channels & ~1); i++)
-				iio->stop(xy_ids[i]);
+		toggle_blockchain_flow(false);
 	}
 
 	// Update trigger status
@@ -1204,6 +1226,34 @@ void adiscope::Oscilloscope::onVertOffsetValueChanged(double value)
 	if (value != -plot.VertOffset(current_channel)) {
 		plot.setVertOffset(-value, current_channel);
 		plot.replot();
+
+		bool hw_offset_support = true; // Future devices might not have
+		                               // hardware offset support
+		if (hw_offset_support) {
+			if (ui->pushButtonRunStop->isChecked())
+				toggle_blockchain_flow(false);
+
+			// Write offset to hardware
+			double gain = 1.3;
+			double gain_mode = 0.02;
+			double vref = 1.2;
+			int raw_offset = (int)(value * (1 << 12) * gain_mode *
+				gain / 2.693 / vref) +
+				ch_midscale_offset[current_channel];
+
+			iio_channel_attr_write_double(
+				offset_channels[current_channel], "raw",
+				raw_offset);
+
+			// Compensate the offset set in hardware
+			boost::shared_ptr<adc_sample_conv> block =
+				dynamic_pointer_cast<adc_sample_conv>(
+							adc_samp_conv_block);
+			block->setOffset(current_channel, -value);
+
+			if (ui->pushButtonRunStop->isChecked())
+				toggle_blockchain_flow(true);
+		}
 	}
 }
 

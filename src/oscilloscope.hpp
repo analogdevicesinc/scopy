@@ -121,6 +121,7 @@ namespace adiscope {
 		void rightMenuFinished(bool opened);
 		void toggleRightMenu();
 
+		void toggle_blockchain_flow(bool);
 		void runStopToggled(bool);
 		void singleCaptureDone();
 
@@ -193,6 +194,10 @@ namespace adiscope {
 		iio_manager::port_id *fft_ids;
 		iio_manager::port_id *hist_ids;
 		iio_manager::port_id *xy_ids;
+
+		QList<struct iio_channel *>offset_channels;
+		QList<int> ch_midscale_offset;
+
 
 		ScaleSpinButton *timeBase;
 		PositionSpinButton *timePosition;
