@@ -20,6 +20,7 @@
 #include "dbgraph.hpp"
 #include "DisplayPlot.h"
 #include "osc_scale_engine.h"
+#include "osc_scale_zoomer.h"
 
 #include <qwt_plot_layout.h>
 
@@ -93,6 +94,8 @@ dBgraph::dBgraph(QWidget *parent) : QwtPlot(parent),
 		scaleItem->setBorderDistance(0);
 		scaleItem->attach(this);
 	}
+
+	zoomer = new OscScaleZoomer(canvas());
 
 	static_cast<QFrame *>(canvas())->setLineWidth(0);
 	setContentsMargins(10, 10, 20, 20);
@@ -185,6 +188,9 @@ void dBgraph::setXMin(double val)
 	setAxisScale(QwtPlot::xTop, val, xmax);
 	xmin = val;
 	draw_x->updateMetrics();
+
+	zoomer->cancel();
+	zoomer->setZoomBase();
 	replot();
 }
 
@@ -193,6 +199,9 @@ void dBgraph::setXMax(double val)
 	setAxisScale(QwtPlot::xTop, xmin, val);
 	xmax = val;
 	draw_x->updateMetrics();
+
+	zoomer->cancel();
+	zoomer->setZoomBase();
 	replot();
 }
 
@@ -200,6 +209,9 @@ void dBgraph::setYMin(double val)
 {
 	setAxisScale(QwtPlot::yLeft, val, ymax);
 	ymin = val;
+
+	zoomer->cancel();
+	zoomer->setZoomBase();
 	replot();
 }
 
@@ -207,6 +219,9 @@ void dBgraph::setYMax(double val)
 {
 	setAxisScale(QwtPlot::yLeft, ymin, val);
 	ymax = val;
+
+	zoomer->cancel();
+	zoomer->setZoomBase();
 	replot();
 }
 

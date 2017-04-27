@@ -28,6 +28,7 @@
 namespace adiscope {
 	class OscScaleDraw;
 	class PrefixFormatter;
+	class OscScaleZoomer;
 
 	class dBgraph : public QwtPlot
 	{
@@ -94,6 +95,7 @@ namespace adiscope {
 
 		OscScaleDraw *draw_x, *draw_y;
 		PrefixFormatter *formatter;
+		OscScaleZoomer *zoomer;
 
 		CustomFifo<double> xdata, ydata;
 	};
