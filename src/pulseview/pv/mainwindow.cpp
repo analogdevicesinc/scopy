@@ -209,6 +209,14 @@ void MainWindow::run_stop()
 	}
 }
 
+void MainWindow::restart_acquisition()
+{
+	if(session_.get_capture_state() == Session::Running) {
+		session_.start_capture([&](QString message) {
+			session_error("Capture failed", message); });
+	}
+}
+
 
 void MainWindow::select_device(shared_ptr<devices::Device> device)
 {

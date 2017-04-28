@@ -116,6 +116,7 @@ WellArray::WellArray(int rows, int cols, QWidget *parent)
 
 WellArray::~WellArray()
 {
+	delete [] d->brush;
 	delete d;
 	d = nullptr;
 }

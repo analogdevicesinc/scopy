@@ -57,6 +57,10 @@ void Analog::clear()
 	segments_.clear();
 }
 
+void Analog::clear_old_data()
+{
+}
+
 uint64_t Analog::max_sample_count() const
 {
 	uint64_t l = 0;

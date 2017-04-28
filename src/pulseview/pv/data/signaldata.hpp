@@ -41,6 +41,8 @@ public:
 
 	virtual void clear() = 0;
 
+	virtual void clear_old_data() = 0;
+
 	virtual uint64_t max_sample_count() const = 0;
 };
 

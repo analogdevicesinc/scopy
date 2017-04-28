@@ -141,6 +141,8 @@ public:
 
 	void set_buffersize(size_t value);
 
+	void set_samplerate(double value);
+
 	void set_timeSpan(double value);
 
 	void set_timespanLimit(double value);

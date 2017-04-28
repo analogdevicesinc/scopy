@@ -222,6 +222,10 @@ void Session::stop_capture()
 	// Check that sampling stopped
 	if (sampling_thread_.joinable())
 		sampling_thread_.join();
+
+	// Clear signal data
+	for (const shared_ptr<data::SignalData> d : get_data())
+		d->clear_old_data();
 }
 
 set< shared_ptr<data::SignalData> > Session::get_data() const
@@ -391,6 +395,11 @@ void Session::set_buffersize(size_t value)
 	buffersize_ = value;
 }
 
+void Session::set_samplerate(double value)
+{
+	cur_samplerate_ = value;
+}
+
 void Session::set_timeSpan(double value)
 {
 	timeSpan = value;
@@ -545,7 +554,8 @@ void Session::sample_thread_proc(shared_ptr<devices::Device> device,
 
 	(void)device;
 
-	cur_samplerate_ = device_->read_config<uint64_t>(ConfigKey::SAMPLERATE);
+	if(cur_samplerate_ == 0)
+		cur_samplerate_ = device_->read_config<uint64_t>(ConfigKey::SAMPLERATE);
 
 	out_of_memory_ = false;
 
@@ -574,7 +584,8 @@ void Session::sample_thread_proc(shared_ptr<devices::Device> device,
 
 void Session::feed_in_header()
 {
-	cur_samplerate_ = device_->read_config<uint64_t>(ConfigKey::SAMPLERATE);
+	if(cur_samplerate_ == 0)
+		cur_samplerate_ = device_->read_config<uint64_t>(ConfigKey::SAMPLERATE);
 }
 
 void Session::feed_in_meta(shared_ptr<Meta> meta)

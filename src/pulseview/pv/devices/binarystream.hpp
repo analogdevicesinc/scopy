@@ -24,7 +24,9 @@
 
 #include <libsigrokcxx/libsigrokcxx.hpp>
 #include "device.hpp"
-#include "boost/thread.hpp"
+#include <thread>
+#include <mutex>
+#include <memory>
 
 
 extern "C" {
@@ -98,6 +100,7 @@ private:
 	adiscope::LogicAnalyzer* la;
 	bool autoTrigger;
 	ssize_t nbytes_rx;
+	mutable std::recursive_mutex data_mutex_;
 };
 
 } // namespace devices

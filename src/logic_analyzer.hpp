@@ -110,6 +110,7 @@ private Q_SLOTS:
 	void resizeEvent();
 	void resetInstrumentToDefault();
 	void setTimeout(bool);
+	void triggerStateTimeout();
 	void triggerTimeout();
 	void startTimeout();
 	void capturedSlot();
@@ -229,8 +230,11 @@ private:
 	int timer_timeout_ms;
 	std::atomic<bool> armed;
 	void autoCaptureEnable();
+	QString trigger_state;
+	QTimer *state_timer;
 
 	DigitalBufferPreviewer *buffer_previewer;
+	void set_buffersize();
 };
 
 class LogicAnalyzer_API : public ApiObject

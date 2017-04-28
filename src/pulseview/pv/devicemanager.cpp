@@ -61,8 +61,6 @@ namespace pv {
 DeviceManager::DeviceManager(shared_ptr<Context> context) :
 	context_(context)
 {
-	for (auto entry : context->drivers())
-		driver_scan(entry.second, map<const ConfigKey *, VariantBase>());
 }
 
 const std::shared_ptr<sigrok::Context>& DeviceManager::context() const

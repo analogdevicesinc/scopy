@@ -109,7 +109,9 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	la_api(new LogicAnalyzer_API(this)),
 	initialised(false),
 	timer(new QTimer(this)),
-	armed(false)
+	armed(false),
+	state_timer(new QTimer(this)),
+	trigger_state("Stop")
 {
 	ui->setupUi(this);
 	timer->setSingleShot(true);
@@ -243,7 +245,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	ui->centralWidgetLayout->addWidget(static_cast<QWidget * >(main_win));
 	main_win->select_device(logic_analyzer_ptr);
 
-	main_win->session_.set_buffersize(maxBuffersize);
+	set_buffersize();
 	main_win->session_.set_timespanLimit(timespanLimitStream);
 
 	ui->rightWidget->setMaximumWidth(0);
@@ -341,6 +343,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 		this, SLOT(capturedSlot()));
 	connect(timer, &QTimer::timeout,
 		this, &LogicAnalyzer::triggerTimeout);
+	connect(state_timer, &QTimer::timeout,
+		this, &LogicAnalyzer::triggerStateTimeout);
 	connect(main_win->view_, SIGNAL(data_received()),
 		this, SLOT(updateBufferPreviewer()));
 
@@ -389,6 +393,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	la_api->js_register(engine);
 
 	chm_ui->setWidgetMinimumNrOfChars(ui->triggerStateLabel, 9);
+	state_timer->setInterval(2);
 }
 
 LogicAnalyzer::~LogicAnalyzer()
@@ -403,6 +408,15 @@ LogicAnalyzer::~LogicAnalyzer()
 	delete la_api;
 	delete trigger_settings_ui;
 	delete ui;
+}
+
+void LogicAnalyzer::set_buffersize()
+{
+	main_win->view_->session().set_buffersize(logic_analyzer_ptr->get_buffersize());
+	if(running) {
+		//restart acquisition to recreate buffer
+		main_win->restart_acquisition();
+	}
 }
 
 void LogicAnalyzer::resizeEvent()
@@ -466,6 +480,11 @@ void LogicAnalyzer::triggerTimeout()
 	}
 }
 
+void LogicAnalyzer::triggerStateTimeout()
+{
+	ui->triggerStateLabel->setText(trigger_state);
+}
+
 void LogicAnalyzer::refilling()
 {
 	if(!timer->isActive())
@@ -493,15 +512,16 @@ void LogicAnalyzer::set_triggered_status(std::string value)
 	if(!trigger_settings_ui)
 		return;
 	if(trigger_settings_ui->btnAuto->isChecked()) {
+		state_timer->stop();
 		ui->triggerStateLabel->setText("Auto");
 	}
 	else {
 		if( value == "awaiting" )
-			ui->triggerStateLabel->setText("Waiting");
+			trigger_state = "Waiting";
 		else if(value == "running")
-			ui->triggerStateLabel->setText("Triggered");
+			trigger_state = "Triggered";
 		else if(value == "stopped")
-			ui->triggerStateLabel->setText("Stop");
+			trigger_state = "Stop";
 	}
 }
 
@@ -525,6 +545,7 @@ void LogicAnalyzer::onHorizScaleValueChanged(double value)
 	{
 		if(logic_analyzer_ptr->get_buffersize() != custom_sampleCount) {
 			logic_analyzer_ptr->set_buffersize(custom_sampleCount);
+			set_buffersize();
 		}
 		enableTrigger(false);
 		active_triggerSampleCount = 0;
@@ -534,7 +555,7 @@ void LogicAnalyzer::onHorizScaleValueChanged(double value)
 		if(logic_analyzer_ptr->get_buffersize() != active_sampleCount)
 		{
 			logic_analyzer_ptr->set_buffersize(active_sampleCount);
-			main_win->session_.set_buffersize(active_sampleCount);
+			set_buffersize();
 		}
 	}
 
@@ -582,6 +603,7 @@ void LogicAnalyzer::setSampleRate()
 	if( logic_analyzer_ptr )
 	{
 		if(!tmp.equal(options["samplerate"])) {
+			main_win->view_->session().set_samplerate(active_sampleRate);
 			logic_analyzer_ptr->set_options(options);
 		}
 	}
@@ -680,7 +702,7 @@ void LogicAnalyzer::onTimePositionSpinboxChanged(double value)
 		if(logic_analyzer_ptr->get_buffersize() != active_sampleCount)
 		{
 			logic_analyzer_ptr->set_buffersize(active_sampleCount);
-			main_win->session_.set_buffersize(active_sampleCount);
+			set_buffersize();
 		}
 	}
 	if( running )
@@ -743,8 +765,8 @@ void LogicAnalyzer::startStop(bool start)
 		main_win->view_->viewport()->disableDrag();
 		setBuffersizeLabelValue(active_sampleCount);
 		setSamplerateLabelValue(active_sampleRate);
-		running = true;
 		setSampleRate();
+		running = true;
 		ui->btnRunStop->setText("Stop");
 		ui->btnSingleRun->setEnabled(false);
 		setHWTriggerDelay(active_triggerSampleCount);
@@ -753,6 +775,7 @@ void LogicAnalyzer::startStop(bool start)
 			timePosition->setValue(active_timePos);
 		if(!armed)
 			armed = true;
+		state_timer->start(2);
 	} else {
 		main_win->view_->viewport()->enableDrag();
 		running = false;
@@ -800,8 +823,8 @@ void LogicAnalyzer::singleRun()
 	last_set_sample_count = active_sampleCount;
 	if(main_win->view_->scale() != timeBase->value())
 		Q_EMIT timeBase->valueChanged(timeBase->value());
-	running = true;
 	setSampleRate();
+	running = true;
 	setBuffersizeLabelValue(active_sampleCount);
 	setSamplerateLabelValue(active_sampleRate);
 	setHWTriggerDelay(active_triggerSampleCount);

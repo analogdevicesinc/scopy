@@ -27,6 +27,9 @@
 #include <iostream>
 #include "logic_analyzer.hpp"
 
+using std::recursive_mutex;
+using std::lock_guard;
+
 namespace pv {
 namespace devices {
 
@@ -45,7 +48,8 @@ BinaryStream::BinaryStream(const std::shared_ptr<sigrok::Context> &context,
 	single_(false),
 	running(false),
 	la(parent),
-	autoTrigger(false)
+	autoTrigger(false),
+	data_(nullptr)
 {
 	/* 10 buffers, 10ms each -> 250ms before we lose data */
 	iio_device_set_kernel_buffers_count(dev_, 25);
@@ -124,7 +128,9 @@ void BinaryStream::run()
 			la->refilling();
 		}
 		la->set_triggered_status("awaiting");
-		nbytes_rx = iio_buffer_refill(data_);
+		lock_guard<recursive_mutex> lock(data_mutex_);
+		if(data_)
+			nbytes_rx = iio_buffer_refill(data_);
 		nrx += nbytes_rx / 2;
 		if( nbytes_rx > 0 ) {
 
@@ -154,9 +160,7 @@ void BinaryStream::set_timeout(bool checked)
 
 void BinaryStream::set_buffersize(size_t value)
 {
-	close();
 	buffersize_ = value;
-	open();
 }
 
 size_t BinaryStream::get_buffersize()
@@ -173,9 +177,7 @@ void BinaryStream::set_single(bool check)
 
 void BinaryStream::set_options(std::map<std::string, Glib::VariantBase> opt)
 {
-	close();
 	options_ = opt;
-	open();
 }
 
 std::map<std::string, Glib::VariantBase> BinaryStream::get_options()
@@ -198,12 +200,13 @@ void BinaryStream::stop()
 	running = false;
 	interrupt_ = true;
 	single_ = false;
+	lock_guard<recursive_mutex> lock(data_mutex_);
 	if(data_ )
 		iio_buffer_cancel(data_);
 	if( data_ )
 	{
 		iio_buffer_destroy(data_);
-		data_ = NULL;
+		data_ = nullptr;
 	}
 }
 

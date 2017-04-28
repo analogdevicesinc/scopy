@@ -65,6 +65,13 @@ void Logic::clear()
 	segments_.clear();
 }
 
+void Logic::clear_old_data()
+{
+	if(segments_.size() > 1) {
+		segments_.erase(segments_.begin()+1, segments_.end());
+	}
+}
+
 uint64_t Logic::max_sample_count() const
 {
 	uint64_t l = 0;

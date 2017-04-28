@@ -46,6 +46,8 @@ public:
 
 	void clear();
 
+	void clear_old_data();
+
 	uint64_t max_sample_count() const;
 
 private:
