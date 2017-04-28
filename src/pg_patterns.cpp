@@ -135,6 +135,11 @@ uint32_t Pattern::get_required_nr_of_samples(uint32_t sample_rate,
 	return 0; // 0 samples required
 }
 
+uint32_t changeBit(uint32_t number,uint8_t n, bool x)
+{
+	number ^= (-x ^ number) & (1 << n);
+	return number;
+}
 QJsonValue Pattern_API::toJson(Pattern *p)
 {
 	QJsonObject obj;
@@ -144,6 +149,7 @@ QJsonValue Pattern_API::toJson(Pattern *p)
 	BinaryCounterPattern *bcp = dynamic_cast<BinaryCounterPattern *>(p);
 	GrayCounterPattern *gcp = dynamic_cast<GrayCounterPattern *>(p);
 	UARTPattern *up = dynamic_cast<UARTPattern *>(p);
+	SPIPattern *sp = dynamic_cast<SPIPattern *>(p);
 
 	QJsonObject params;
 
@@ -174,8 +180,27 @@ QJsonValue Pattern_API::toJson(Pattern *p)
 		params["uart"] = QString::fromStdString(up->get_params());
 		params["string"] = QString::fromStdString(up->get_string());
 		obj["params"] = QJsonValue(params);
+	} else if (sp) {
+		obj["name"] = QString::fromStdString(p->get_name());
+		params["BPF"]=sp->getBytesPerFrame();
+		params["IFS"]=sp->getWaitClocks();
+		params["freq"]= QJsonValue((qint64)sp->getClkFrequency());
+		params["CPHA"]=sp->getCPHA();
+		params["CPOL"]=sp->getCPOL();
+		params["CS"]=sp->getCSEnabled();
+		params["MSB"]=sp->getMsbFirst();
 
+		QJsonArray spi;
+
+		for (auto val : sp->v) {
+			spi.append(val);
+		}
+
+		params["v"]=spi;
+
+		obj["params"] = QJsonValue(params);
 	}
+
 
 	else {
 		obj["name"] = "none";
@@ -195,6 +220,7 @@ Pattern *Pattern_API::fromJson(QJsonValue j)
 	BinaryCounterPattern *bcp = dynamic_cast<BinaryCounterPattern *>(p);
 	BinaryCounterPattern *gcp = dynamic_cast<GrayCounterPattern *>(p);
 	UARTPattern *up = dynamic_cast<UARTPattern *>(p);
+	SPIPattern *sp = dynamic_cast<SPIPattern *>(p);
 
 	QJsonObject params = obj["params"].toObject();
 
@@ -213,7 +239,18 @@ Pattern *Pattern_API::fromJson(QJsonValue j)
 	} else if (up) {
 		up->set_string(params["string"].toString().toStdString());
 		up->set_params(params["uart"].toString().toStdString());
-	} else {
+	} else if (sp) {
+		sp->setBytesPerFrame(params["BPF"].toInt());
+		sp->setClkFrequency(params["freq"].toInt());
+		sp->setWaitClocks(params["IFS"].toInt());
+		sp->setCPHA(params["CPHA"].toBool());
+		sp->setCPOL(params["CPOL"].toBool());
+		sp->setCSEnabled(params["CS"].toBool());
+		sp->setMsbFirst(params["MSB"].toBool());
+
+		for (auto val : params["v"].toArray()) {
+			sp->v.push_front(val.toInt());
+		}
 
 	}
 
@@ -1226,14 +1263,323 @@ void UARTPatternUI::parse_ui()
 }
 
 
+bool SPIPattern::getMsbFirst() const
+{
+	return msbFirst;
+}
 
-#if 0
-/*
-void adiscope::UARTPatternUI::on_setUARTParameters_clicked()
+void SPIPattern::setMsbFirst(bool value)
+{
+	msbFirst = value;
+}
+
+SPIPattern::SPIPattern()
+{
+	CPOL=false;
+	CPHA = false;
+	clkFrequency=5000;
+	bytesPerFrame=2;
+	waitClocks=3;
+	msbFirst = true;
+
+	set_periodic(false);
+	set_name(SPIPatternName);
+	set_description(SPIPatternDescription);
+}
+
+uint32_t SPIPattern::get_min_sampling_freq()
+{
+	return clkFrequency * (2);
+}
+
+uint32_t SPIPattern::get_required_nr_of_samples(uint32_t sample_rate,
+                uint32_t number_of_channels)
 {
 
-}*/
+	auto samples_per_bit = 2*(sample_rate/clkFrequency);
+	auto IFS=waitClocks*samples_per_bit;
 
+	return v.size()*samples_per_bit*8 + 2*IFS + IFS *(v.size()/bytesPerFrame);
+
+}
+
+
+uint8_t SPIPattern::getWaitClocks() const
+{
+	return waitClocks;
+}
+
+void SPIPattern::setWaitClocks(const uint8_t& value)
+{
+	waitClocks = value;
+}
+
+uint8_t SPIPattern::getBytesPerFrame() const
+{
+	return bytesPerFrame;
+}
+
+void SPIPattern::setBytesPerFrame(const uint8_t& value)
+{
+	bytesPerFrame = value;
+}
+
+uint8_t SPIPattern::generate_pattern(uint32_t sample_rate,
+                                     uint32_t number_of_samples, uint16_t number_of_channels)
+{
+	delete_buffer();
+
+	buffer = new short[number_of_samples]; // no need to recreate buffer
+	auto buffersize = (number_of_samples)*sizeof(short);
+
+	auto clkActiveBit = 0;
+	auto outputBit = 1;
+
+	if (CSEnabled) {
+		clkActiveBit = 1;
+		outputBit=2;
+		memset(buffer, (CPOL) ? 0xffff : 0xfffd, (number_of_samples)*sizeof(short));
+	} else {
+		memset(buffer, (CPOL) ? 0xffff : 0xfffe, (number_of_samples)*sizeof(short));
+	}
+
+	short *buf_ptr = buffer;
+
+	auto samples_per_bit = 2*(sample_rate/clkFrequency);
+	buf_ptr+=waitClocks*samples_per_bit;
+	auto k=0;
+
+	for (std::deque<uint8_t>::reverse_iterator it = v.rbegin(); it != v.rend();
+	     ++it) {
+		uint8_t val = *it;
+		bool oldbit;
+		//buf_ptr+=samples_per_bit;
+		k++;
+
+		for (auto j=0; j<8; j++) {
+			bool bit;
+
+			if (msbFirst) {
+				bit = (val & 0x80) >> 7;
+				val = val << 1;
+			} else {
+				bit = (val & 0x01);
+				val = val >> 1;
+			}
+
+			for (auto i=0; i<samples_per_bit/2; i++,buf_ptr++) {
+				if (CSEnabled) {
+					*buf_ptr = changeBit(*buf_ptr,0,0);
+				}
+
+				*buf_ptr = changeBit(*buf_ptr,clkActiveBit,CPOL);
+
+				if (CPHA) {
+					*buf_ptr = changeBit(*buf_ptr,outputBit,oldbit);
+				} else {
+					*buf_ptr = changeBit(*buf_ptr,outputBit,bit);
+				}
+			}
+
+			for (auto i=samples_per_bit/2; i<samples_per_bit; i++,buf_ptr++) {
+				if (CSEnabled) {
+					*buf_ptr = changeBit(*buf_ptr,0,0);
+				}
+
+				*buf_ptr = changeBit(*buf_ptr,clkActiveBit,!CPOL);
+				*buf_ptr = changeBit(*buf_ptr,outputBit,bit);
+			}
+
+			oldbit = bit;
+		}
+
+		if (k==bytesPerFrame) {
+			k=0;
+			buf_ptr+=waitClocks*samples_per_bit;
+		}
+
+	}
+
+	return 0;
+}
+
+
+bool SPIPattern::getCPOL() const
+{
+	return CPOL;
+}
+
+void SPIPattern::setCPOL(bool value)
+{
+	CPOL = value;
+}
+
+bool SPIPattern::getCPHA() const
+{
+	return CPHA;
+}
+
+void SPIPattern::setCPHA(bool value)
+{
+	CPHA = value;
+}
+
+uint32_t SPIPattern::getClkFrequency() const
+{
+	return clkFrequency;
+}
+
+void SPIPattern::setClkFrequency(const uint32_t& value)
+{
+	clkFrequency = value;
+}
+
+bool SPIPattern::getCSEnabled() const
+{
+	return CSEnabled;
+}
+
+void SPIPattern::setCSEnabled(bool value)
+{
+	CSEnabled = value;
+}
+
+
+
+SPIPatternUI::SPIPatternUI(SPIPattern *pattern,
+                           QWidget *parent) : PatternUI(parent), pattern(pattern)
+{
+	qDebug()<<"UARTPatternUI created";
+	ui = new Ui::SPIPatternUI();
+	ui->setupUi(this);
+	frequencySpinButton = new ScaleSpinButton({
+		{"Hz", 1E0},
+		{"kHz", 1E+3},
+		{"MHz", 1E+6}
+	}, "Frequency", 1e0, 40e+6,true,false,this);
+	ui->verticalLayout->insertWidget(0,frequencySpinButton);
+	setVisible(false);
+}
+
+SPIPatternUI::~SPIPatternUI()
+{
+	qDebug()<<"UARTPatternUI destroyed";
+	delete ui;
+}
+
+void SPIPatternUI::build_ui(QWidget *parent,uint16_t number_of_channels)
+{
+	parent_ = parent;
+	parent->layout()->addWidget(this);
+	frequencySpinButton->setValue(pattern->getClkFrequency());
+	ui->PB_CPHA->setChecked(pattern->getCPHA());
+	ui->PB_CPOL->setChecked(pattern->getCPOL());
+	ui->PB_CS->setChecked(pattern->getCSEnabled());
+	ui->PB_MSB->setChecked(pattern->getMsbFirst());
+	ui->LE_IFS->setText(QString::number(pattern->getWaitClocks()));
+	ui->LE_BPF->setText(QString::number(pattern->getBytesPerFrame()));
+	QString buf;
+
+	for (auto val:pattern->v) {
+		buf.append(QString::number(val,16));
+		buf.append(" ");
+	}
+
+	ui->LE_toSend->setText(buf);
+
+	//ui->LE_toSend->setText(QString::fromStdString(pattern->get_string()));
+	connect(frequencySpinButton,SIGNAL(valueChanged(double)),this,SLOT(parse_ui()));
+
+	connect(ui->PB_CPHA,SIGNAL(clicked()),this,SLOT(parse_ui()));
+	connect(ui->PB_CPOL,SIGNAL(clicked()),this,SLOT(parse_ui()));
+	connect(ui->PB_CS,SIGNAL(clicked()),this,SLOT(parse_ui()));
+	connect(ui->PB_MSB,SIGNAL(clicked()),this,SLOT(parse_ui()));
+
+	connect(ui->LE_BPF,SIGNAL(textChanged(QString)),this,SLOT(parse_ui()));
+	connect(ui->LE_IFS,SIGNAL(textChanged(QString)),this,SLOT(parse_ui()));
+
+
+	connect(ui->LE_toSend,SIGNAL(textChanged(QString)),this,SLOT(parse_ui()));
+	parse_ui();
+
+
+}
+void SPIPatternUI::destroy_ui()
+{
+	parent_->layout()->removeWidget(this);
+	//    delete ui;
+}
+
+Pattern *SPIPatternUI::get_pattern()
+{
+	return pattern;
+}
+
+
+void SPIPatternUI::parse_ui()
+{
+	bool ok;
+	pattern->setClkFrequency(frequencySpinButton->value());
+
+	auto BPF = ui->LE_BPF->text().toInt(&ok);
+
+	if (ok && BPF>0) {
+		pattern->setBytesPerFrame(ui->LE_BPF->text().toInt());
+	}
+
+	auto IFS = ui->LE_IFS->text().toInt(&ok);
+
+	if (ok && IFS>0) {
+		pattern->setWaitClocks(IFS);
+	}
+
+	pattern->setCPHA(ui->PB_CPHA->isChecked());
+	pattern->setCPOL(ui->PB_CPOL->isChecked());
+	pattern->setCSEnabled(ui->PB_CS->isChecked());
+	pattern->setMsbFirst(ui->PB_MSB->isChecked());
+	QStringList strList = ui->LE_toSend->text().split(' ',QString::SkipEmptyParts);
+	pattern->v.clear();
+
+	bool fail = false;
+
+	std::deque<uint8_t> buf;
+
+	for (QString str: strList) {
+		uint64_t val;
+		bool ok;
+		val = str.toULongLong(&ok,16);
+
+		buf.clear();
+
+		if (ok) {
+			while (val) {
+				auto u8val = val & 0xff;
+				val = val >> 8;
+				buf.push_front(u8val);
+			}
+
+			for (auto b: buf) {
+				pattern->v.push_front(b);
+			}
+		} else {
+			fail = true;
+			/* add str*/
+		}
+	}
+
+	if (fail) {
+		ui->LE_toSend->setStyleSheet("color:red");
+	} else {
+		ui->LE_toSend->setStyleSheet("color:white");
+	}
+
+
+	Q_EMIT patternChanged();
+
+}
+
+
+#if 0
 JSPattern::JSPattern(QJsonObject obj_) : obj(obj_)
 {
 	qDebug()<<"JSPattern created";
@@ -2176,6 +2522,8 @@ void PatternFactory::init()
 	description_list.append(BinaryCounterPatternDescription);
 	ui_list.append(UARTPatternName);
 	description_list.append(UARTPatternDescription);
+	ui_list.append(SPIPatternName);
+	description_list.append(SPIPatternDescription);
 	ui_list.append(GrayCounterPatternName);
 	description_list.append(GrayCounterPatternDescription);
 	/*
@@ -2263,6 +2611,9 @@ Pattern *PatternFactory::create(int index)
 
 	case GrayCounterId:
 		return new GrayCounterPattern();
+
+	case SPIPatternId:
+		return new SPIPattern();
 		/* case 0: return new ConstantPattern();
 		 case 1: return new NumberPattern();
 
@@ -2326,6 +2677,10 @@ PatternUI *PatternFactory::create_ui(Pattern *pattern, int index,
 	case GrayCounterId:
 		return new GrayCounterPatternUI(dynamic_cast<GrayCounterPattern *>(pattern),
 		                                parent);
+
+	case SPIPatternId:
+		return new SPIPatternUI(dynamic_cast<SPIPattern *>(pattern),
+		                        parent);
 		/*
 		case 0: return new ConstantPatternUI(parent);
 		case 3: return new PulsePatternUI(parent);
@@ -2358,6 +2713,7 @@ QStringList PatternFactory::get_description_list()
 {
 	return description_list;
 }
+
 
 
 }

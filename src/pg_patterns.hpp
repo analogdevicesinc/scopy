@@ -28,6 +28,7 @@
 #include <QtQml/QJSEngine>
 #include <QtUiTools/QUiLoader>
 #include <vector>
+#include <deque>
 #include <string>
 #include <memory>
 #include "spinbox_a.hpp"
@@ -43,6 +44,7 @@
 #include "ui_frequencypattern.h"
 #include "ui_pulsepattern.h"
 #include "ui_walkingpattern.h"
+#include "ui_spipatternui.h"
 
 
 namespace Ui {
@@ -56,6 +58,7 @@ class NumberPatternUI;
 class FrequencyPatternUI;
 class PulsePatternUI;
 class WalkingPatternUI;
+class SPIPatternUI;
 }
 
 namespace adiscope {
@@ -71,6 +74,8 @@ namespace adiscope {
 #define PulsePatternDescription "Pulse pattern generator"
 #define RandomPatternName "Random"
 #define RandomPatternDescription "Random pattern generator"
+#define SPIPatternName "SPI"
+#define SPIPatternDescription "SPI pattern generator"
 #define UARTPatternName "UART"
 #define UARTPatternDescription "UART pattern generator"
 #define BinaryCounterPatternName "Binary Counter"
@@ -88,6 +93,7 @@ enum {
 	RandomPatternId,
 	BinaryCounterId,
 	UARTPatternId,
+	SPIPatternId,
 	GrayCounterId,
 };
 
@@ -137,7 +143,7 @@ public:
 
 };
 
-
+uint32_t changeBit(uint32_t number,uint8_t n, bool x);
 class Pattern_API : public QObject
 {
 	Q_OBJECT
@@ -390,6 +396,64 @@ private Q_SLOTS:
 	void parse_ui();
 };
 
+
+class SPIPattern : virtual public Pattern
+{
+private:
+	bool CSEnabled;
+	uint8_t bytesPerFrame;
+	uint32_t clkFrequency;
+	uint8_t waitClocks;
+	bool msbFirst;
+	bool CPOL;
+	bool CPHA;
+
+public:
+	std::deque<uint8_t> v;
+	SPIPattern();
+	virtual ~SPIPattern() {}
+	virtual uint8_t generate_pattern(uint32_t sample_rate,
+	                                 uint32_t number_of_samples, uint16_t number_of_channels);
+	uint32_t get_min_sampling_freq();
+	uint32_t get_required_nr_of_samples(uint32_t sample_rate,
+	                                    uint32_t number_of_channels);
+
+
+
+	bool getCSEnabled() const;
+	void setCSEnabled(bool value);
+	bool getCPOL() const;
+	void setCPOL(bool value);
+	bool getCPHA() const;
+	void setCPHA(bool value);
+	uint32_t getClkFrequency() const;
+	void setClkFrequency(const uint32_t& value);
+	uint8_t getWaitClocks() const;
+	void setWaitClocks(const uint8_t& value);
+	uint8_t getBytesPerFrame() const;
+	void setBytesPerFrame(const uint8_t& value);
+	bool getMsbFirst() const;
+	void setMsbFirst(bool value);
+};
+
+
+
+class SPIPatternUI : public PatternUI
+{
+	Q_OBJECT
+	Ui::SPIPatternUI *ui;
+	QWidget *parent_;
+	SPIPattern *pattern;
+	ScaleSpinButton *frequencySpinButton;
+public:
+	SPIPatternUI(SPIPattern *pattern, QWidget *parent = 0);
+	~SPIPatternUI();
+	Pattern *get_pattern();
+	void build_ui(QWidget *parent = 0,uint16_t number_of_channels=0);
+	void destroy_ui();
+private Q_SLOTS:
+	void parse_ui();
+};
 
 class NumberPattern : virtual public Pattern
 {
