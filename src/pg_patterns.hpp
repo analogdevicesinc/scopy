@@ -45,6 +45,7 @@
 #include "ui_pulsepattern.h"
 #include "ui_walkingpattern.h"
 #include "ui_spipatternui.h"
+#include "ui_i2cpatternui.h"
 
 
 namespace Ui {
@@ -59,6 +60,7 @@ class FrequencyPatternUI;
 class PulsePatternUI;
 class WalkingPatternUI;
 class SPIPatternUI;
+class I2CPatternUI;
 }
 
 namespace adiscope {
@@ -76,6 +78,8 @@ namespace adiscope {
 #define RandomPatternDescription "Random pattern generator"
 #define SPIPatternName "SPI"
 #define SPIPatternDescription "SPI pattern generator"
+#define I2CPatternName "I2C"
+#define I2CPatternDescription "I2C pattern generator"
 #define UARTPatternName "UART"
 #define UARTPatternDescription "UART pattern generator"
 #define BinaryCounterPatternName "Binary Counter"
@@ -94,6 +98,7 @@ enum {
 	BinaryCounterId,
 	UARTPatternId,
 	SPIPatternId,
+	I2CPatternId,
 	GrayCounterId,
 };
 
@@ -396,6 +401,71 @@ private Q_SLOTS:
 	void parse_ui();
 };
 
+class I2CPattern: virtual public Pattern
+{
+	bool tenbit;
+	uint8_t address;
+	bool read;
+	bool msbFirst;
+
+	uint32_t clkFrequency;
+	uint32_t samples_per_bit;
+	uint8_t interFrameSpace;
+	uint8_t bytesPerFrame;
+
+	short *buf_ptr;
+
+	const int SDA = 1;
+	const int SCL = 0;
+
+	void sample_bit(bool bit);
+	void sample_start_bit();
+	void sample_address();
+	void sample_ack();
+	void sample_payload();
+	void sample_stop();
+public:
+	std::deque<uint8_t> v;
+	I2CPattern();
+	virtual ~I2CPattern() {}
+	virtual uint8_t generate_pattern(uint32_t sample_rate,
+	                                 uint32_t number_of_samples, uint16_t number_of_channels);
+	uint32_t get_min_sampling_freq();
+	uint32_t get_required_nr_of_samples(uint32_t sample_rate,
+	                                    uint32_t number_of_channels);
+	bool getTenbit() const;
+	void setTenbit(bool value);
+	uint8_t getAddress() const;
+	void setAddress(const uint8_t& value);
+	bool getWrite() const;
+	void setWrite(bool value);
+	bool getMsbFirst() const;
+	void setMsbFirst(bool value);
+	uint8_t getInterFrameSpace() const;
+	void setInterFrameSpace(const uint8_t& value);
+	uint32_t getClkFrequency() const;
+	void setClkFrequency(const uint32_t& value);
+	uint8_t getBytesPerFrame() const;
+	void setBytesPerFrame(const uint8_t& value);
+};
+
+class I2CPatternUI : public PatternUI
+{
+	Q_OBJECT
+	Ui::I2CPatternUI *ui;
+	QWidget *parent_;
+	I2CPattern *pattern;
+	ScaleSpinButton *frequencySpinButton;
+public:
+	I2CPatternUI(I2CPattern *pattern, QWidget *parent = 0);
+	~I2CPatternUI();
+	Pattern *get_pattern();
+	void build_ui(QWidget *parent = 0,uint16_t number_of_channels=0);
+	void destroy_ui();
+private Q_SLOTS:
+	void parse_ui();
+};
+
 
 class SPIPattern : virtual public Pattern
 {
@@ -417,8 +487,6 @@ public:
 	uint32_t get_min_sampling_freq();
 	uint32_t get_required_nr_of_samples(uint32_t sample_rate,
 	                                    uint32_t number_of_channels);
-
-
 
 	bool getCSEnabled() const;
 	void setCSEnabled(bool value);

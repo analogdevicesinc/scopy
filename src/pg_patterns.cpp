@@ -150,6 +150,7 @@ QJsonValue Pattern_API::toJson(Pattern *p)
 	GrayCounterPattern *gcp = dynamic_cast<GrayCounterPattern *>(p);
 	UARTPattern *up = dynamic_cast<UARTPattern *>(p);
 	SPIPattern *sp = dynamic_cast<SPIPattern *>(p);
+	I2CPattern *ip = dynamic_cast<I2CPattern *>(p);
 
 	QJsonObject params;
 
@@ -199,6 +200,24 @@ QJsonValue Pattern_API::toJson(Pattern *p)
 		params["v"]=spi;
 
 		obj["params"] = QJsonValue(params);
+	} else if (ip) {
+		obj["name"] = QString::fromStdString(p->get_name());
+		params["BPF"]=ip->getBytesPerFrame();
+		params["IFS"]=ip->getInterFrameSpace();
+		params["freq"]= QJsonValue((qint64)ip->getClkFrequency());
+		params["MSB"]=ip->getMsbFirst();
+		params["write"]=ip->getWrite();
+		params["address"]=ip->getAddress();
+
+		QJsonArray i2c;
+
+		for (auto val : ip->v) {
+			i2c.append(val);
+		}
+
+		params["v"]=i2c;
+
+		obj["params"] = QJsonValue(params);
 	}
 
 
@@ -221,6 +240,7 @@ Pattern *Pattern_API::fromJson(QJsonValue j)
 	BinaryCounterPattern *gcp = dynamic_cast<GrayCounterPattern *>(p);
 	UARTPattern *up = dynamic_cast<UARTPattern *>(p);
 	SPIPattern *sp = dynamic_cast<SPIPattern *>(p);
+	I2CPattern *ip = dynamic_cast<I2CPattern *>(p);
 
 	QJsonObject params = obj["params"].toObject();
 
@@ -251,7 +271,17 @@ Pattern *Pattern_API::fromJson(QJsonValue j)
 		for (auto val : params["v"].toArray()) {
 			sp->v.push_front(val.toInt());
 		}
+	} else if (ip) {
+		ip->setBytesPerFrame(params["BPF"].toInt());
+		ip->setClkFrequency(params["freq"].toInt());
+		ip->setInterFrameSpace(params["IFS"].toInt());
+		ip->setAddress(params["address"].toInt());
+		ip->setMsbFirst(params["MSB"].toBool());
+		ip->setWrite(params["write"].toBool());
 
+		for (auto val : params["v"].toArray()) {
+			ip->v.push_front(val.toInt());
+		}
 	}
 
 	return p;
@@ -1261,6 +1291,378 @@ void UARTPatternUI::parse_ui()
 	Q_EMIT patternChanged();
 
 }
+
+
+
+uint8_t I2CPattern::getAddress() const
+{
+	return address;
+}
+
+void I2CPattern::setAddress(const uint8_t& value)
+{
+	address = value;
+}
+
+bool I2CPattern::getWrite() const
+{
+	return read;
+}
+
+void I2CPattern::setWrite(bool value)
+{
+	read = value;
+}
+
+bool I2CPattern::getMsbFirst() const
+{
+	return msbFirst;
+}
+
+void I2CPattern::setMsbFirst(bool value)
+{
+	msbFirst = value;
+}
+
+uint8_t I2CPattern::getInterFrameSpace() const
+{
+	return interFrameSpace;
+}
+
+void I2CPattern::setInterFrameSpace(const uint8_t& value)
+{
+	interFrameSpace = value;
+}
+
+uint32_t I2CPattern::getClkFrequency() const
+{
+	return clkFrequency;
+}
+
+void I2CPattern::setClkFrequency(const uint32_t& value)
+{
+	clkFrequency = value;
+}
+
+uint8_t I2CPattern::getBytesPerFrame() const
+{
+	return bytesPerFrame;
+}
+
+void I2CPattern::setBytesPerFrame(const uint8_t& value)
+{
+	bytesPerFrame = value;
+}
+
+bool I2CPattern::getTenbit() const
+{
+	return tenbit;
+}
+
+void I2CPattern::setTenbit(bool value)
+{
+	tenbit = value;
+}
+
+I2CPattern::I2CPattern()
+{
+	clkFrequency=5000;
+	msbFirst=true;
+	address=0x72;
+	interFrameSpace=3;
+	bytesPerFrame=2;
+	read=false;
+	tenbit=false;
+	set_periodic(false);
+	set_name(I2CPatternName);
+	set_description(I2CPatternDescription);
+}
+
+uint32_t I2CPattern::get_min_sampling_freq()
+{
+	return clkFrequency * (2);
+}
+
+uint32_t I2CPattern::get_required_nr_of_samples(uint32_t sample_rate,
+                uint32_t number_of_channels)
+{
+	auto samples_per_bit = 2*(sample_rate/clkFrequency);
+	auto IFS=interFrameSpace*samples_per_bit;
+//	return v.size()*samples_per_bit*8 + 2*IFS + IFS *(v.size()/bytesPerFrame);
+//	return 500;
+	return samples_per_bit * (interFrameSpace+1+7+1+v.size()*9+2+interFrameSpace);
+}
+
+
+void I2CPattern::sample_bit(bool bit)
+{
+	for (auto i=0; i<samples_per_bit/2; i++,buf_ptr++) {
+		*buf_ptr = changeBit(*buf_ptr,SDA,bit);
+		*buf_ptr = changeBit(*buf_ptr,SCL,1);
+	}
+
+	for (auto i=0; i<samples_per_bit/2; i++,buf_ptr++) {
+		*buf_ptr = changeBit(*buf_ptr,SDA,bit);
+		*buf_ptr = changeBit(*buf_ptr,SCL,0);
+	}
+}
+
+void I2CPattern::sample_start_bit()
+{
+	for (auto i=0; i<samples_per_bit; i++,buf_ptr++) {
+		*buf_ptr = changeBit(*buf_ptr,SDA,0);
+	}
+
+	for (auto i=0; i<samples_per_bit; i++,buf_ptr++) {
+		*buf_ptr = changeBit(*buf_ptr,SDA,0);
+		*buf_ptr = changeBit(*buf_ptr,SCL,0);
+	}
+}
+
+void I2CPattern::sample_address()
+{
+	auto tmpaddress = address;
+
+	for (auto i=0; i<7; i++) {
+		sample_bit((tmpaddress&0x40)>>6);
+		tmpaddress<<=1;
+	}
+
+	sample_bit(read);
+
+}
+
+void I2CPattern::sample_ack()
+{
+	sample_bit(0);
+}
+
+void I2CPattern::sample_payload()
+{
+	for (std::deque<uint8_t>::reverse_iterator it = v.rbegin(); it != v.rend();
+	     ++it) {
+		uint8_t val;
+
+		if (read) {
+			val = 0xff;
+		} else {
+			val = *it;
+		}
+
+		bool oldbit;
+
+		for (auto j=0; j<8; j++) {
+			bool bit;
+
+			if (msbFirst) {
+				bit = (val & 0x80) >> 7;
+				val = val << 1;
+			} else {
+				bit = (val & 0x01);
+				val = val >> 1;
+			}
+
+			sample_bit(bit);
+		}
+
+		sample_ack();
+	}
+}
+
+void I2CPattern::sample_stop()
+{
+	for (auto i=0; i<samples_per_bit; i++,buf_ptr++) {
+		*buf_ptr = changeBit(*buf_ptr,SDA,0);
+	}
+
+	for (auto i=0; i<samples_per_bit; i++,buf_ptr++) {
+		*buf_ptr = changeBit(*buf_ptr,SDA,1);
+	}
+}
+
+uint8_t I2CPattern::generate_pattern(uint32_t sample_rate,
+                                     uint32_t number_of_samples, uint16_t number_of_channels)
+{
+	delete_buffer();
+
+	buffer = new short[number_of_samples]; // no need to recreate buffer
+	buf_ptr = buffer;
+	auto buffersize = (number_of_samples)*sizeof(short);
+	memset(buffer, (0xffff), (number_of_samples)*sizeof(short));
+
+	samples_per_bit = 2*(sample_rate/clkFrequency);
+	buf_ptr+=interFrameSpace*samples_per_bit;
+
+
+	sample_start_bit();
+	sample_address();
+	sample_ack();
+	sample_payload();
+	sample_stop();
+
+	/*for (std::deque<uint8_t>::reverse_iterator it = v.rbegin(); it != v.rend();
+	     ++it) {
+		uint8_t val = *it;
+		bool oldbit;
+		//buf_ptr+=samples_per_bit;
+		k++;
+
+		for (auto j=0; j<8; j++) {
+			bool bit;
+
+			if (msbFirst) {
+				bit = (val & 0x80) >> 7;
+				val = val << 1;
+			} else {
+				bit = (val & 0x01);
+				val = val >> 1;
+			}
+
+			for (auto i=0; i<samples_per_bit/2; i++,buf_ptr++) {
+
+			}
+
+			for (auto i=samples_per_bit/2; i<samples_per_bit; i++,buf_ptr++) {
+
+			}
+
+		}
+
+		if (k==bytesPerFrame) {
+			k=0;
+			buf_ptr+=waitClocks*samples_per_bit;
+		}
+
+	}*/
+
+	return 0;
+}
+
+
+
+I2CPatternUI::I2CPatternUI(I2CPattern *pattern,
+                           QWidget *parent) : PatternUI(parent), pattern(pattern)
+{
+	qDebug()<<"UARTPatternUI created";
+	ui = new Ui::I2CPatternUI();
+	ui->setupUi(this);
+	frequencySpinButton = new ScaleSpinButton({
+		{"Hz", 1E0},
+		{"kHz", 1E+3},
+		{"MHz", 1E+6}
+	}, "Frequency", 1e0, 40e+6,true,false,this);
+	ui->verticalLayout->insertWidget(0,frequencySpinButton);
+	setVisible(false);
+}
+
+I2CPatternUI::~I2CPatternUI()
+{
+	qDebug()<<"UARTPatternUI destroyed";
+	delete ui;
+}
+
+void I2CPatternUI::build_ui(QWidget *parent,uint16_t number_of_channels)
+{
+	parent_ = parent;
+	parent->layout()->addWidget(this);
+	frequencySpinButton->setValue(pattern->getClkFrequency());
+	ui->PB_MSB->setChecked(pattern->getMsbFirst());
+	ui->LE_IFS->setText(QString::number(pattern->getInterFrameSpace()));
+	ui->LE_address->setText(QString::number(pattern->getAddress(),16));
+	ui->PB_readWrite->setChecked(pattern->getWrite());
+
+	//ui->LE_BPF->setText(QString::number(pattern->getBytesPerFrame()));
+	QString buf;
+
+	for (auto val:pattern->v) {
+		buf.append(QString::number(val,16));
+		buf.append(" ");
+	}
+
+	ui->LE_toSend->setText(buf);
+
+	//ui->LE_toSend->setText(QString::fromStdString(pattern->get_string()));
+	connect(frequencySpinButton,SIGNAL(valueChanged(double)),this,SLOT(parse_ui()));
+	connect(ui->PB_MSB,SIGNAL(clicked()),this,SLOT(parse_ui()));
+	connect(ui->PB_readWrite,SIGNAL(clicked()),this,SLOT(parse_ui()));
+	connect(ui->LE_IFS,SIGNAL(textChanged(QString)),this,SLOT(parse_ui()));
+	connect(ui->LE_address,SIGNAL(textChanged(QString)),this,SLOT(parse_ui()));
+	connect(ui->LE_toSend,SIGNAL(textChanged(QString)),this,SLOT(parse_ui()));
+	parse_ui();
+
+
+}
+void I2CPatternUI::destroy_ui()
+{
+	parent_->layout()->removeWidget(this);
+	//    delete ui;
+}
+
+Pattern *I2CPatternUI::get_pattern()
+{
+	return pattern;
+}
+
+
+void I2CPatternUI::parse_ui()
+{
+	bool ok;
+	pattern->setClkFrequency(frequencySpinButton->value());
+
+	auto address = ui->LE_address->text().toInt(&ok,16);
+
+	if (ok && address>=0 && address<=0x7f) {
+		pattern->setAddress(address);
+	}
+
+	auto IFS = ui->LE_IFS->text().toInt(&ok);
+
+	if (ok && IFS>0) {
+		pattern->setInterFrameSpace(IFS);
+	}
+
+	pattern->setMsbFirst(ui->PB_MSB->isChecked());
+	pattern->setWrite(ui->PB_readWrite->isChecked());
+	QStringList strList = ui->LE_toSend->text().split(' ',QString::SkipEmptyParts);
+	pattern->v.clear();
+
+	bool fail = false;
+	std::deque<uint8_t> buf;
+
+	for (QString str: strList) {
+		uint64_t val;
+		bool ok;
+		val = str.toULongLong(&ok,16);
+
+		buf.clear();
+
+		if (ok) {
+			while (val) {
+				auto u8val = val & 0xff;
+				val = val >> 8;
+				buf.push_front(u8val);
+			}
+
+			for (auto b: buf) {
+				pattern->v.push_front(b);
+			}
+		} else {
+			fail = true;
+			/* add str*/
+		}
+	}
+
+	if (fail) {
+		ui->LE_toSend->setStyleSheet("color:red");
+	} else {
+		ui->LE_toSend->setStyleSheet("color:white");
+	}
+
+
+	Q_EMIT patternChanged();
+
+}
+
 
 
 bool SPIPattern::getMsbFirst() const
@@ -2524,6 +2926,8 @@ void PatternFactory::init()
 	description_list.append(UARTPatternDescription);
 	ui_list.append(SPIPatternName);
 	description_list.append(SPIPatternDescription);
+	ui_list.append(I2CPatternName);
+	description_list.append(I2CPatternDescription);
 	ui_list.append(GrayCounterPatternName);
 	description_list.append(GrayCounterPatternDescription);
 	/*
@@ -2614,6 +3018,9 @@ Pattern *PatternFactory::create(int index)
 
 	case SPIPatternId:
 		return new SPIPattern();
+
+	case I2CPatternId:
+		return new I2CPattern();
 		/* case 0: return new ConstantPattern();
 		 case 1: return new NumberPattern();
 
@@ -2681,6 +3088,10 @@ PatternUI *PatternFactory::create_ui(Pattern *pattern, int index,
 	case SPIPatternId:
 		return new SPIPatternUI(dynamic_cast<SPIPattern *>(pattern),
 		                        parent);
+
+	case I2CPatternId:
+		return new I2CPatternUI(dynamic_cast<I2CPattern *>(pattern),
+		                        parent);
 		/*
 		case 0: return new ConstantPatternUI(parent);
 		case 3: return new PulsePatternUI(parent);
@@ -2713,7 +3124,6 @@ QStringList PatternFactory::get_description_list()
 {
 	return description_list;
 }
-
 
 
 }
