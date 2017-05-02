@@ -277,7 +277,9 @@ void TriggerSettings::onSpinboxTriggerAhystChanged(double value)
 	if (!this->trigger0)
 		return;
 
-	int rawValue = adc_sample_conv::convVoltsToSample(value);
+	int rawValue = adc_sample_conv::convVoltsToSample(value,
+		osc_adc.channelGain(0), osc_adc.compTable(osc_adc.sampleRate()),
+		0, osc_adc.channelHwGain(0));
 	QString s = QString::number(rawValue);
 
 	iio_channel_attr_write(this->trigger0, "trigger_hysteresis",
@@ -289,7 +291,9 @@ void TriggerSettings::onSpinboxTriggerBhystChanged(double value)
 	if (!this->trigger1)
 		return;
 
-	int rawValue = adc_sample_conv::convVoltsToSample(value);
+	int rawValue = adc_sample_conv::convVoltsToSample(value,
+		osc_adc.channelGain(1), osc_adc.compTable(osc_adc.sampleRate()),
+		0, osc_adc.channelHwGain(1));
 	QString s = QString::number(rawValue);
 
 	iio_channel_attr_write(this->trigger1, "trigger_hysteresis",
@@ -380,13 +384,20 @@ void TriggerSettings::trigger_all_widgets_update()
 
 		ret = iio_channel_attr_read(this->trigger0, "trigger_level", buf, sizeof(buf));
 		if (ret >= 0) {
-			double val = adc_sample_conv::convSampleToVolts(QString(buf).toDouble());
+			double val = adc_sample_conv::convSampleToVolts(
+				QString(buf).toDouble(), osc_adc.channelGain(0),
+				osc_adc.compTable(osc_adc.sampleRate()),
+				-osc_adc.channelHwOffset(0),
+				osc_adc.channelHwGain(0));
 			ui_triggerAlevel->setValue(val);
 		}
 
 		ret = iio_channel_attr_read(this->trigger0, "trigger_hysteresis", buf, sizeof(buf));
 		if (ret >= 0) {
-			double val = adc_sample_conv::convSampleToVolts(QString(buf).toDouble());
+			double val = adc_sample_conv::convSampleToVolts(
+				QString(buf).toDouble(), osc_adc.channelGain(0),
+				osc_adc.compTable(osc_adc.sampleRate()), 0,
+				osc_adc.channelHwGain(0));
 			ui_triggerAHyst->setValue(val);
 		}
 	}
@@ -404,13 +415,20 @@ void TriggerSettings::trigger_all_widgets_update()
 
 		ret = iio_channel_attr_read(this->trigger1, "trigger_level", buf, sizeof(buf));
 		if (ret >= 0) {
-			double val = adc_sample_conv::convSampleToVolts(QString(buf).toDouble());
+			double val = adc_sample_conv::convSampleToVolts(
+				QString(buf).toDouble(), osc_adc.channelGain(1),
+				osc_adc.compTable(osc_adc.sampleRate()),
+				-osc_adc.channelHwOffset(1),
+				osc_adc.channelHwGain(1));
 			ui_triggerBlevel->setValue(val);
 		}
 
 		ret = iio_channel_attr_read(this->trigger1, "trigger_hysteresis", buf, sizeof(buf));
 		if (ret >= 0) {
-			double val = adc_sample_conv::convSampleToVolts(QString(buf).toDouble());
+			double val = adc_sample_conv::convSampleToVolts(
+				QString(buf).toDouble(), osc_adc.channelGain(1),
+				osc_adc.compTable(osc_adc.sampleRate()), 0,
+				osc_adc.channelHwGain(1));
 			ui_triggerBHyst->setValue(val);
 		}
 	}
@@ -602,7 +620,8 @@ void TriggerSettings::triggA_level_write_hardware(double value)
 		return;
 
 	int rawValue = adc_sample_conv::convVoltsToSample(value,
-		osc_adc.channelGain(0), osc_adc.compTable(osc_adc.sampleRate()));
+		osc_adc.channelGain(0), osc_adc.compTable(osc_adc.sampleRate()),
+		-osc_adc.channelHwOffset(0), osc_adc.channelHwGain(0));
 	QString s = QString::number(rawValue);
 
 	iio_channel_attr_write(this->trigger0, "trigger_level",
@@ -615,7 +634,8 @@ void TriggerSettings::triggB_level_write_hardware(double value)
 		return;
 
 	int rawValue = adc_sample_conv::convVoltsToSample(value,
-		osc_adc.channelGain(1), osc_adc.compTable(osc_adc.sampleRate()));
+		osc_adc.channelGain(1), osc_adc.compTable(osc_adc.sampleRate()),
+		-osc_adc.channelHwOffset(1), osc_adc.channelHwGain(1));
 	QString s = QString::number(rawValue);
 
 	iio_channel_attr_write(this->trigger1, "trigger_level",
@@ -691,4 +711,13 @@ void TriggerSettings::on_btnAuto_toggled(bool checked)
 TriggerSettings::TriggerMode TriggerSettings::triggerMode() const
 {
 	return ui->btnAuto->isChecked() ? AUTO : NORMAL;
+}
+
+void TriggerSettings::updateHwVoltLevels()
+{
+	triggA_level_write_hardware(ui_triggerAlevel->value());
+	triggB_level_write_hardware(ui_triggerBlevel->value());
+
+	onSpinboxTriggerAhystChanged(hystA_last_val);
+	onSpinboxTriggerBhystChanged(hystB_last_val);
 }

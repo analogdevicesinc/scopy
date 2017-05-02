@@ -81,6 +81,8 @@ namespace adiscope {
 		void autoTriggerDisable();
 		void autoTriggerEnable();
 
+		void updateHwVoltLevels();
+
 	private Q_SLOTS:
 		void on_cmb_trigg_source_currentIndexChanged(int);
 		void on_cmb_trigg_A_currentIndexChanged(int);

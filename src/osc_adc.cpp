@@ -24,8 +24,11 @@ OscADC::OscADC(struct iio_context *ctx, const Filter *filt):
 	m_numChannels = get_nb_channels(m_adc);
 
 	// Channel default gains
-	for (int i = 0; i < m_numChannels; i++)
+	for (int i = 0; i < m_numChannels; i++) {
 		m_channel_gain_list.push_back(1.0);
+		m_channel_hw_gain_list.push_back(0.02);
+		m_channel_hw_offset_list.push_back(0.0);
+	}
 
 	// Filters applied while decimating affect the amplitude of the received data
 	m_filt_comp_table[1E8] = 1.00;
@@ -79,6 +82,38 @@ void OscADC::setChannelGain(unsigned int chnIdx, double gain)
 {
 	if (chnIdx < m_numChannels)
 		m_channel_gain_list[chnIdx] = gain;
+}
+
+double OscADC::channelHwGain(unsigned int chnIdx) const
+{
+	double gain = 0;
+
+	if (chnIdx < m_numChannels)
+		gain = m_channel_hw_gain_list[chnIdx];
+
+	return gain;
+}
+
+void OscADC::setChannelHwGain(unsigned int chnIdx, double gain)
+{
+	if (chnIdx < m_numChannels)
+		m_channel_hw_gain_list[chnIdx] = gain;
+}
+
+double OscADC::channelHwOffset(unsigned int chnIdx) const
+{
+	double offset = 0;
+
+	if (chnIdx < m_numChannels)
+		offset = m_channel_hw_offset_list[chnIdx];
+
+	return offset;
+}
+
+void OscADC::setChannelHwOffset(unsigned int chnIdx, double offset)
+{
+	if (chnIdx < m_numChannels)
+		m_channel_hw_offset_list[chnIdx] = offset;
 }
 
 struct iio_device* OscADC::iio_adc() const

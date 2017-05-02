@@ -107,6 +107,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	offset_channels.push_back(iio_device_find_channel(ad5625, "voltage3",
 		true));
 
+	m2k_fabric = iio_context_find_device(ctx, "m2k-fabric");
+
 	long long val;
 	iio_channel_attr_read_longlong(offset_channels[0], "raw", &val);
 	ch_midscale_offset.push_back((long long)val);
@@ -201,6 +203,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 				"font-weight: bold;"
 				"}").arg(plot.getLineColor(chIdx).name()));
 		ui->chn_scales->addWidget(label);
+
+		high_gain_modes.push_back(false);
 
 		chIdx++;
 	}
@@ -525,6 +529,13 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	// Calculate initial sample count and sample rate
 	onHorizScaleValueChanged(timeBase->value());
 	onTimePositionChanged(timePosition->value());
+
+	int crt_chn_copy = current_channel;
+	for (int i = 0; i < nb_channels; i++) {
+		current_channel = i;
+		updateGainMode();
+	}
+	current_channel = crt_chn_copy;
 
 	osc_api->load();
 	osc_api->js_register(engine);
@@ -1162,6 +1173,20 @@ void adiscope::Oscilloscope::onVertScaleValueChanged(double value)
 	QLabel *label = static_cast<QLabel *>(
 			ui->chn_scales->itemAt(current_channel)->widget());
 	label->setText(vertMeasureFormat.format(value, "V", 3));
+
+	bool hw_gain_support = true; // Future devices might not have
+					// hardware gain support
+	if (!hw_gain_support)
+		return;
+
+	// Switch between high and low gain modes only for regular channels
+	if (current_channel >= nb_channels)
+		return;
+
+	updateGainMode();
+	setChannelHwOffset(current_channel, voltsPosition->value());
+	trigger_settings.updateHwVoltLevels();
+
 }
 
 void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
@@ -1228,28 +1253,13 @@ void adiscope::Oscilloscope::onVertOffsetValueChanged(double value)
 		plot.replot();
 
 		bool hw_offset_support = true; // Future devices might not have
-		                               // hardware offset support
+						// hardware offset support
 		if (hw_offset_support) {
 			if (ui->pushButtonRunStop->isChecked())
 				toggle_blockchain_flow(false);
 
-			// Write offset to hardware
-			double gain = 1.3;
-			double gain_mode = 0.02;
-			double vref = 1.2;
-			int raw_offset = (int)(value * (1 << 12) * gain_mode *
-				gain / 2.693 / vref) +
-				ch_midscale_offset[current_channel];
-
-			iio_channel_attr_write_double(
-				offset_channels[current_channel], "raw",
-				raw_offset);
-
-			// Compensate the offset set in hardware
-			boost::shared_ptr<adc_sample_conv> block =
-				dynamic_pointer_cast<adc_sample_conv>(
-							adc_samp_conv_block);
-			block->setOffset(current_channel, -value);
+			updateGainMode();
+			setChannelHwOffset(current_channel, value);
 
 			if (ui->pushButtonRunStop->isChecked())
 				toggle_blockchain_flow(true);
@@ -1970,6 +1980,81 @@ void Oscilloscope::on_btnSettings_clicked(bool checked)
 
 	btn->setChecked(checked);
 	toggleRightMenu(btn);
+}
+
+void Oscilloscope::updateGainMode()
+{
+	QwtInterval hw_input_itv(-2.5, 2.5);
+	QwtInterval plot_vert_itv = plot.axisScaleDiv(
+		QwtAxisId(QwtPlot::yLeft, current_channel)).interval();
+
+	// If max signal span that can be captured is smaller than the plot
+	// screen try to increase the range (switch to low gain mode)
+	if (plot_vert_itv.minValue() < hw_input_itv.minValue() ||
+		plot_vert_itv.maxValue() > hw_input_itv.maxValue()) {
+		if (high_gain_modes[current_channel]) {
+			high_gain_modes[current_channel] = false;
+			bool running = ui->pushButtonRunStop->isChecked();
+
+			if (running)
+				toggle_blockchain_flow(false);
+			setGainMode(current_channel, false);
+			if (running)
+				toggle_blockchain_flow(true);
+		}
+	} else {
+		if (!high_gain_modes[current_channel]) {
+			high_gain_modes[current_channel] = true;
+			bool running = ui->pushButtonRunStop->isChecked();
+
+			if (running)
+				toggle_blockchain_flow(false);
+			setGainMode(current_channel, true);
+			if (running)
+				toggle_blockchain_flow(true);
+		}
+	}
+}
+
+void Oscilloscope::setGainMode(uint chnIdx, bool high_gain)
+{
+	float hw_gain = high_gain ? 0.212 : 0.02;
+	const char *gain_mode = high_gain ? "high" : "low";
+
+	struct iio_channel *ch;
+	if (chnIdx == 0)
+		ch = iio_device_find_channel(m2k_fabric, "voltage0", false);
+	else
+		ch = iio_device_find_channel(m2k_fabric, "voltage1", false);
+	iio_channel_attr_write_raw(ch, "gain", gain_mode, strlen(gain_mode));
+
+	boost::shared_ptr<adc_sample_conv> block =
+	dynamic_pointer_cast<adc_sample_conv>(
+					adc_samp_conv_block);
+	block->setHardwareGain(chnIdx, hw_gain);
+	adc.setChannelHwGain(chnIdx, hw_gain);
+	trigger_settings.updateHwVoltLevels();
+}
+
+void Oscilloscope::setChannelHwOffset(uint chnIdx, double offset)
+{
+	// Write offset to hardware
+	double gain = 1.3;
+	double vref = 1.2;
+	int raw_offset = (int)(offset * (1 << 12) * adc.channelHwGain(chnIdx) *
+		gain / 2.693 / vref) +
+		ch_midscale_offset[current_channel];
+
+	iio_channel_attr_write_double(
+		offset_channels[current_channel], "raw",
+		raw_offset);
+
+	// Compensate the offset set in hardware
+	boost::shared_ptr<adc_sample_conv> block =
+		dynamic_pointer_cast<adc_sample_conv>(
+					adc_samp_conv_block);
+	block->setOffset(current_channel, -offset);
+	adc.setChannelHwOffset(current_channel, offset);
 }
 
 bool Oscilloscope_API::hasCursors() const

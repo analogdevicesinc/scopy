@@ -149,8 +149,13 @@ namespace adiscope {
 
 		void update_chn_settings_panel(int id);
 
+		void updateGainMode();
+		void setGainMode(uint chnIdx, bool high_gain);
+		void setChannelHwOffset(uint chnIdx, double offset);
+
 	private:
 		OscADC adc;
+		struct iio_device *m2k_fabric;
 		unsigned int nb_channels, nb_math_channels;
 		QList<double> sampling_rates;
 		double active_sample_rate;
@@ -206,6 +211,7 @@ namespace adiscope {
 
 		bool fft_is_visible, hist_is_visible, xy_is_visible;
 		bool statistics_enabled;
+		QList<bool> high_gain_modes;
 
 		bool trigger_is_forced;
 		bool new_data_is_triggered;
