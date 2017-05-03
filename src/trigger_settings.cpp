@@ -721,3 +721,15 @@ void TriggerSettings::updateHwVoltLevels()
 	onSpinboxTriggerAhystChanged(hystA_last_val);
 	onSpinboxTriggerBhystChanged(hystB_last_val);
 }
+
+void TriggerSettings::setTriggerARange(const QPair<double, double>& range)
+{
+	ui_triggerAlevel->setMinValue(range.first);
+	ui_triggerAlevel->setMaxValue(range.second);
+}
+
+void TriggerSettings::setTriggerBRange(const QPair<double, double>& range)
+{
+	ui_triggerBlevel->setMinValue(range.first);
+	ui_triggerBlevel->setMaxValue(range.second);
+}

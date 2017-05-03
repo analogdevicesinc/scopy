@@ -2001,6 +2001,12 @@ void Oscilloscope::updateGainMode()
 			setGainMode(current_channel, false);
 			if (running)
 				toggle_blockchain_flow(true);
+
+			auto range = adc.inputRange(OscADC::LOW_GAIN_MODE);
+			if (current_channel == 0)
+				trigger_settings.setTriggerARange(range);
+			else if (current_channel == 1)
+				trigger_settings.setTriggerBRange(range);
 		}
 	} else {
 		if (!high_gain_modes[current_channel]) {
@@ -2012,6 +2018,12 @@ void Oscilloscope::updateGainMode()
 			setGainMode(current_channel, true);
 			if (running)
 				toggle_blockchain_flow(true);
+
+			auto range = adc.inputRange(OscADC::HIGH_GAIN_MODE);
+			if (current_channel == 0)
+				trigger_settings.setTriggerARange(range);
+			else if (current_channel == 1)
+				trigger_settings.setTriggerBRange(range);
 		}
 	}
 }

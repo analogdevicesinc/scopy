@@ -156,3 +156,13 @@ QStringList OscADC::get_avail_options_list(struct iio_device *dev,
 
 	return list;
 }
+
+QPair<double, double> OscADC::inputRange(GainMode gain_mode) const
+{
+	if (gain_mode == LOW_GAIN_MODE)
+		return QPair<double, double>(-25.0, 25.0);
+	else if (gain_mode == HIGH_GAIN_MODE)
+		return QPair<double, double>(-2.5, 2.5);
+	else
+		return QPair<double, double>(0, 0);
+}

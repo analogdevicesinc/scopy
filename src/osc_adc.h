@@ -3,6 +3,7 @@
 
 #include <QList>
 #include <QStringList>
+#include <Qpair>
 #include <map>
 
 extern "C" {
@@ -18,6 +19,12 @@ namespace adiscope {
 	class OscADC
 	{
 	public:
+
+		enum GainMode {
+			LOW_GAIN_MODE = 0,
+			HIGH_GAIN_MODE = 1,
+		};
+
 		OscADC(struct iio_context *, const Filter *);
 		~OscADC();
 
@@ -29,6 +36,7 @@ namespace adiscope {
 		double channelHwOffset(unsigned int chnIdx) const;
 		struct iio_device *iio_adc() const;
 		double compTable(double samplRate) const;
+		QPair<double, double> inputRange(GainMode gain_mode) const;
 
 		void setSampleRate(double);
 		void setChannelGain(unsigned int, double);

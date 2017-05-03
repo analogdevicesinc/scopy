@@ -81,6 +81,9 @@ namespace adiscope {
 		void autoTriggerDisable();
 		void autoTriggerEnable();
 
+		void setTriggerARange(const QPair<double, double>&);
+		void setTriggerBRange(const QPair<double, double>&);
+
 		void updateHwVoltLevels();
 
 	private Q_SLOTS:
