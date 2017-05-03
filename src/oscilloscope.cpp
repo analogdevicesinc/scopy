@@ -1251,19 +1251,19 @@ void adiscope::Oscilloscope::onVertOffsetValueChanged(double value)
 	if (value != -plot.VertOffset(current_channel)) {
 		plot.setVertOffset(-value, current_channel);
 		plot.replot();
+	}
 
-		bool hw_offset_support = true; // Future devices might not have
-						// hardware offset support
-		if (hw_offset_support) {
-			if (ui->pushButtonRunStop->isChecked())
-				toggle_blockchain_flow(false);
+	bool hw_offset_support = true; // Future devices might not have
+					// hardware offset support
+	if (hw_offset_support) {
+		if (ui->pushButtonRunStop->isChecked())
+			toggle_blockchain_flow(false);
 
-			updateGainMode();
-			setChannelHwOffset(current_channel, value);
+		updateGainMode();
+		setChannelHwOffset(current_channel, value);
 
-			if (ui->pushButtonRunStop->isChecked())
-				toggle_blockchain_flow(true);
-		}
+		if (ui->pushButtonRunStop->isChecked())
+			toggle_blockchain_flow(true);
 	}
 }
 
