@@ -3,7 +3,7 @@
 
 #include <QList>
 #include <QStringList>
-#include <Qpair>
+#include <QPair>
 #include <map>
 
 extern "C" {
