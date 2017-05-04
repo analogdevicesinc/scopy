@@ -62,6 +62,10 @@
         <file>icons/zoom-in.png</file>
         <file>icons/zoom-original.png</file>
         <file>icons/measurements/amplitude.svg</file>
+        <file>icons/measurements/area.svg</file>
+        <file>icons/measurements/cycle_area.svg</file>
+        <file>icons/measurements/cycle_mean.svg</file>
+        <file>icons/measurements/cycle_rms.svg</file>
         <file>icons/measurements/fall_time.svg</file>
         <file>icons/measurements/frequency.svg</file>
         <file>icons/measurements/high.svg</file>
