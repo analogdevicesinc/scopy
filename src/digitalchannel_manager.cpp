@@ -246,7 +246,9 @@ std::vector<Channel *> *ChannelGroup::get_channels()
 
 Channel *ChannelGroup::get_channel(int index)
 {
-	return channels[index];
+	if(index < channels.size())
+		return channels[index];
+	return nullptr;
 }
 
 QColor ChannelGroup::getBgcolor() const

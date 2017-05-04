@@ -1124,7 +1124,10 @@ LogicAnalyzerChannelManager::~LogicAnalyzerChannelManager()
 LogicAnalyzerChannelGroup *LogicAnalyzerChannelManager::get_channel_group(
         int index)
 {
-	return static_cast<LogicAnalyzerChannelGroup *>(channel_group[index]);
+	if(index < channel_group.size())
+		return static_cast<LogicAnalyzerChannelGroup *>(
+			channel_group[index]);
+	return nullptr;
 }
 
 void LogicAnalyzerChannelManager::join(std::vector<int> index)
@@ -1154,7 +1157,9 @@ void LogicAnalyzerChannelManager::join(std::vector<int> index)
 
 LogicAnalyzerChannel *LogicAnalyzerChannelManager::get_channel(int index)
 {
-	return lchannels[index];
+	if(index < lchannels.size())
+		return lchannels[index];
+	return nullptr;
 //	return static_cast<LogicAnalyzerChannel *>(channel[index]);
 }
 
@@ -1780,6 +1785,7 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 	        this, SLOT(chmScrollChanged(int)));
 	connect(ui->scrollArea->verticalScrollBar(), SIGNAL(rangeChanged(int,int)),
 	        this, SLOT(chmRangeChanged(int,int)));
+	la->get_channel_groups_api();
 }
 
 void LogicAnalyzerChannelManagerUI::chmScrollChanged(int value)

@@ -53,8 +53,6 @@
 
 /* Boost includes */
 #include <boost/thread.hpp>
-#include <QJsonDocument>
-#include <QJsonValue>
 #include <QListView>
 
 using namespace std;
@@ -396,20 +394,27 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 
 	chm_ui->setWidgetMinimumNrOfChars(ui->triggerStateLabel, 9);
 	state_timer->setInterval(2);
+	chm_ui->update_ui();
 }
 
 LogicAnalyzer::~LogicAnalyzer()
 {
+	la_api->save();
+	delete la_api;
+
 	if(running)
 		startStop(false);
 	logic_analyzer_ptr.reset();
 	context.reset();
 	timer->stop();
 
-	la_api->save();
-	delete la_api;
 	delete trigger_settings_ui;
 	delete ui;
+
+	/* Destroy libsigrokdecode */
+	srd_exit();
+	qDeleteAll(channel_groups_api);
+	channel_groups_api.clear();
 }
 
 void LogicAnalyzer::set_buffersize()
@@ -418,6 +423,15 @@ void LogicAnalyzer::set_buffersize()
 	if(running) {
 		//restart acquisition to recreate buffer
 		main_win->restart_acquisition();
+	}
+}
+
+void LogicAnalyzer::get_channel_groups_api()
+{
+	qDeleteAll(channel_groups_api);
+	channel_groups_api.clear();
+	for(int i=0; i < chm.get_channel_group_count(); i++) {
+		channel_groups_api.append(new ChannelGroup_API(this, i, false));
 	}
 }
 
@@ -1207,124 +1221,40 @@ void LogicAnalyzer::setTimeout(bool checked)
 	logic_analyzer_ptr->set_timeout(checked);
 }
 
-QJsonValue LogicAnalyzer::chmToJson()
-{
-	QJsonObject obj;
-	QJsonArray chgArray;
+/*
+ * class LogicAnalyzer_API
+ */
 
-	for (auto i=0; i<chm.get_channel_groups()->size(); i++) {
-		QJsonObject chgObj;
-		LogicAnalyzerChannelGroup *chg = chm.get_channel_group(i);
-
-		chgObj["label"] = QString::fromStdString(chg->get_label());
-		chgObj["grouped"] = chg->is_grouped();
-		chgObj["enabled"] = chg->is_enabled();
-		chgObj["collapsed"] = chg->isCollapsed();
-
-		auto chCount = chg->get_channel_count();
-		QJsonArray chArray;
-
-		for (auto j=0; j<chCount; j++) {
-			QJsonObject chObj;
-			chObj["id"] = chg->get_channel(j)->get_id();
-			chObj["label"] = QString::fromStdString(chg->get_channel(j)->get_label());
-			chObj["trigger"] = QString::fromStdString(chm.get_channel(
-				chg->get_channel(j)->get_id())->getTrigger());
-			chArray.insert(j,QJsonValue(chObj));
-		}
-
-		chgObj["channels"] = chArray;
-		if( chg->is_grouped() ) {
-			if(chg->getDecoder())
-				chgObj["decoder"] = chg->getDecoder()->name;
-			else
-				chgObj["decoder"] = "";
-		}
-		chgArray.insert(i,chgObj);
-	}
-
-	obj["channel_groups"] = chgArray;
-	QJsonValue val(obj);
-	return val;
-}
-
-void LogicAnalyzer::jsonToChm(QJsonObject obj)
-{
-	chm.clearChannelGroups();
-	QJsonArray chgArray = obj["chm"].toObject()["channel_groups"].toArray();
-
-	for (auto chgRef : chgArray) {
-		auto chg = chgRef.toObject();
-		LogicAnalyzerChannelGroup *lachg = new LogicAnalyzerChannelGroup();
-		lachg->set_label(chg["label"].toString().toStdString());
-		lachg->group(chg["grouped"].toBool());
-		lachg->enable(chg["enabled"].toBool());
-		lachg->collapse(chg["collapsed"].toBool());
-		QJsonArray chArray = chg["channels"].toArray();
-
-		for (auto chRef : chArray) {
-			auto ch = chRef.toObject();
-			int chIndex = ch["id"].toInt();
-			auto trigger = ch["trigger"].toString().toStdString();
-			trigger_cache[chIndex] = trigger;
-			chm.get_channel(chIndex)->setTrigger(trigger);
-
-			lachg->add_channel(chm.get_channel(chIndex));
-		}
-		if( lachg->is_grouped() ) {
-			if(chg["decoder"] != "")
-				lachg->setDecoder(chm.get_decoder_from_name(chg["decoder"].toString().toUtf8()));
-		}
-
-		chm.add_channel_group(lachg);
-	}
-}
-
-QString LogicAnalyzer::toString()
-{
-	QJsonObject obj;
-	obj["chm"] = chmToJson();
-	QJsonDocument doc(obj);
-	QString ret(doc.toJson(QJsonDocument::Compact));
-	return ret;
-}
-
-void LogicAnalyzer::fromString(QString val)
-{
-	QJsonObject obj;
-	QJsonDocument doc = QJsonDocument::fromJson(val.toUtf8());
-
-	if (!doc.isNull()) {
-		if (doc.isObject()) {
-			obj = doc.object();
-		} else {
-			qDebug() << "Document is not an object" << endl;
-		}
-	} else {
-		qDebug() << "Invalid JSON...\n";
-	}
-
-	jsonToChm(obj);
-	chm_ui->showHighlight(false);
-	chm_ui->update_ui();
-
-}
-
-QString LogicAnalyzer_API::chm() const
-{
-	QString ret = lga->toString();
-	return ret;
-
-}
-
-void LogicAnalyzer_API::setChm(QString val)
-{
-	lga->fromString(val);
-}
 
 bool LogicAnalyzer_API::running() const
 {
 	return lga->ui->btnRunStop->isChecked();
+}
+
+int LogicAnalyzer_API::channel_groups_list_size() const
+{
+	return lga->channel_groups_api.size();
+}
+void LogicAnalyzer_API::setChannelGroupsListSize(int size)
+{
+	qDeleteAll(lga->channel_groups_api);
+	lga->channel_groups_api.clear();
+
+	lga->chm.clearChannelGroups();
+	for (int i = 0; i < size; i++) {
+			lga->channel_groups_api.append(new ChannelGroup_API(lga, i));
+			lga->chm.add_channel_group(new LogicAnalyzerChannelGroup());
+	}
+}
+
+QList<ChannelGroup_API*> LogicAnalyzer_API::getChannelGroupsForStoring()
+{
+	return lga->channel_groups_api;
+}
+
+QQmlListProperty<ChannelGroup_API> LogicAnalyzer_API::getChannelGroupsForScripting()
+{
+	return QQmlListProperty<ChannelGroup_API>(this, lga->channel_groups_api);
 }
 
 void LogicAnalyzer_API::run(bool en)
@@ -1380,4 +1310,175 @@ bool LogicAnalyzer_API::cursorsLocked() const
 void LogicAnalyzer_API::setCursorsLocked(bool en)
 {
 	lga->ui->btnCursorsLock->setChecked(en);
+}
+
+bool LogicAnalyzer_API::inactiveHidden() const
+{
+	return lga->ui->btnShowChannels->isChecked();
+}
+
+void LogicAnalyzer_API::setInactiveHidden(bool en)
+{
+	lga->ui->btnShowChannels->clicked(en);
+}
+
+
+/*
+ * ChannelGroup_API
+ */
+bool ChannelGroup_API::chEnabled() const
+{
+	if( lga->chm.get_channel_group(getIndex()) )
+		return lga->chm.get_channel_group(getIndex())->is_enabled();
+	return false;
+}
+
+void ChannelGroup_API::setChEnabled(bool en)
+{
+	lga->chm.get_channel_group(getIndex())->enable(en);
+}
+
+bool ChannelGroup_API::chGrouped() const
+{
+	return lga->chm.get_channel_group(getIndex())->is_grouped();
+}
+
+void ChannelGroup_API::setChGrouped(bool en)
+{
+	lga->chm.get_channel_group(getIndex())->group(en);
+}
+
+QString ChannelGroup_API::getTrigger() const
+{
+	if(!chGrouped()) {
+		auto ch_group = lga->chm.get_channel_group(getIndex());
+		auto ch = ch_group->get_channel();
+		if(ch)
+			return QString::fromStdString(lga->chm.get_channel(
+				ch->get_id())->getTrigger());
+	}
+	return "none";
+}
+
+void ChannelGroup_API::setTrigger(QString val)
+{
+	if(!chGrouped()) {
+		auto ch_group = lga->chm.get_channel_group(getIndex());
+		auto ch = ch_group->get_channel();
+		if(ch)
+			lga->chm.get_channel(ch->get_id())->setTrigger(
+				val.toStdString());
+	}
+}
+
+QString ChannelGroup_API::getName() const
+{
+	auto ch_group = lga->chm.get_channel_group(getIndex());
+	if( ch_group ) {
+		return QString::fromStdString(ch_group->get_label());
+	}
+	return "";
+}
+
+void ChannelGroup_API::setName(QString val)
+{
+	lga->chm.get_channel_group(getIndex())->set_label(val.toStdString());
+}
+
+bool ChannelGroup_API::getChCollapsed() const
+{
+	return lga->chm.get_channel_group(this->getIndex())->isCollapsed();
+}
+
+void ChannelGroup_API::setChCollapsed(bool en)
+{
+	lga->chm.get_channel_group(this->getIndex())->collapse(en);
+}
+
+int ChannelGroup_API::getIndex() const
+{
+	if(index == -1) {
+		return lga->channel_groups_api.indexOf(
+			const_cast<ChannelGroup_API*>(this));
+	}
+	return index;
+}
+
+int ChannelGroup_API::channels_list_size() const
+{
+	return channels_api.size();
+}
+void ChannelGroup_API::setChannelsListSize(int size)
+{
+	qDeleteAll(channels_api);
+	channels_api.clear();
+	for (int i = 0; i < size; i++) {
+		channels_api.append(new LogicChannel_API(lga, this));
+	}
+}
+
+QList<LogicChannel_API*> ChannelGroup_API::getChannelsForStoring()
+{
+	return channels_api;
+}
+
+QQmlListProperty<LogicChannel_API> ChannelGroup_API::getChannelsForScripting()
+{
+	return QQmlListProperty<LogicChannel_API>(this, channels_api);
+}
+
+void ChannelGroup_API::set_channels_api()
+{
+	qDeleteAll(channels_api);
+	channels_api.clear();
+	auto ch_group = lga->chm.get_channel_group(index);
+	if( ch_group ) {
+		int size = ch_group->get_channel_count();
+		int ch_index;
+		for(int i=0; i < size; i++) {
+			if(ch_group->get_channel(i)) {
+				ch_index = ch_group->get_channel(i)->get_id();
+				channels_api.append(
+					new LogicChannel_API(lga, this, ch_index));
+			}
+		}
+	}
+}
+
+/*
+ * Channel_API
+ */
+
+QString LogicChannel_API::getTrigger() const
+{
+	return QString::fromStdString(lga->chm.get_channel(
+	      getIndex())->getTrigger());
+}
+
+void LogicChannel_API::setTrigger(QString val)
+{
+	lga->chm.get_channel(getIndex())->setTrigger(val.toStdString());
+}
+
+QString LogicChannel_API::getName() const
+{
+	return QString::fromStdString(lga->chm.get_channel(
+		getIndex())->get_label());
+}
+
+void LogicChannel_API::setName(QString val)
+{
+	lga->chm.get_channel(getIndex())->set_label(val.toStdString());
+}
+
+int LogicChannel_API::getIndex() const
+{
+	return index;
+}
+
+void LogicChannel_API::setIndex(int val)
+{
+	index = val;
+	lga->chm.get_channel_group(lchg->getIndex())->add_channel(
+		lga->chm.get_channel(val));
 }

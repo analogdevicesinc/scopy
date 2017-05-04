@@ -24,6 +24,7 @@
 #include <QWidget>
 #include <QPushButton>
 #include <QTimer>
+#include <QQmlListProperty>
 
 /* Local includes */
 #include "apiObject.hpp"
@@ -67,11 +68,15 @@ class QJSEngine;
 
 namespace adiscope {
 class LogicAnalyzer_API;
+class ChannelGroup_API;
+class LogicChannel_API;
 
 class LogicAnalyzer : public QWidget
 {
 	friend class LogicAnalyzer_API;
 	friend class ToolLauncher_API;
+	friend class ChannelGroup_API;
+	friend class LogicChannel_API;
 
 	Q_OBJECT
 
@@ -90,6 +95,7 @@ public:
 	void refilling();
 	void captured();
 	void setTriggerCache(int chid, std::string trigger_value);
+	void get_channel_groups_api();
 
 private Q_SLOTS:
 	void startStop(bool start);
@@ -150,6 +156,9 @@ private:
 	pv::MainWindow *main_win;
 
 	LogicAnalyzer_API *la_api;
+	QList<ChannelGroup_API *> channel_groups_api;
+	LogicAnalyzerChannelManager chm;
+	LogicAnalyzerChannelManagerUI *chm_ui;
 
 	void disconnectAll();
 	static unsigned int get_no_channels(struct iio_device *dev);
@@ -176,8 +185,6 @@ private:
 	std::map<std::string, Glib::VariantBase> options;
 	std::shared_ptr<pv::devices::BinaryStream> logic_analyzer_ptr;
 
-	LogicAnalyzerChannelManager chm;
-	LogicAnalyzerChannelManagerUI *chm_ui;
 	Ui::LChannelSettings *lachannelsettings;
 
 	void clearLayout(QLayout *layout);
@@ -219,12 +226,6 @@ private:
 	void cleanHWParams();
 	void cursorsFormatDelta();
 
-	QString toString();
-	QJsonValue chmToJson();
-
-	void fromString(QString);
-	void jsonToChm(QJsonObject obj);
-
 	void recomputeCursorsValue(bool zoom);
 	bool initialised;
 	QTimer *timer;
@@ -241,24 +242,33 @@ private:
 class LogicAnalyzer_API : public ApiObject
 {
 	Q_OBJECT
-
-	Q_PROPERTY(bool running READ running WRITE run STORED false);
-	Q_PROPERTY(QString chm READ chm WRITE setChm SCRIPTABLE false);
-	Q_PROPERTY(double time_position READ getTimePos WRITE setTimePos);
-	Q_PROPERTY(double time_base READ getTimeBase WRITE setTimeBase);
-	Q_PROPERTY(bool external_trigger READ externalTrigger WRITE setExternalTrigger);
-	Q_PROPERTY(bool cursors_active READ cursorsActive WRITE setCursorsActive);
-	Q_PROPERTY(bool cursors_locked READ cursorsLocked WRITE setCursorsLocked);
+	Q_PROPERTY(int channel_groups_list_size READ channel_groups_list_size WRITE
+		setChannelGroupsListSize SCRIPTABLE false)
+	Q_PROPERTY(QList<ChannelGroup_API*> channel_groups_list READ getChannelGroupsForStoring
+		SCRIPTABLE false)
+	Q_PROPERTY(QQmlListProperty<ChannelGroup_API> channel_groups READ
+		getChannelGroupsForScripting STORED false)
+	Q_PROPERTY(bool running READ running WRITE run STORED false)
+	Q_PROPERTY(double time_position READ getTimePos WRITE setTimePos)
+	Q_PROPERTY(double time_base READ getTimeBase WRITE setTimeBase)
+	Q_PROPERTY(bool external_trigger READ externalTrigger WRITE setExternalTrigger)
+	Q_PROPERTY(bool cursors_active READ cursorsActive WRITE setCursorsActive)
+	Q_PROPERTY(bool cursors_locked READ cursorsLocked WRITE setCursorsLocked)
+	Q_PROPERTY(bool inactive_hidden READ inactiveHidden WRITE setInactiveHidden)
 
 public:
 	explicit LogicAnalyzer_API(LogicAnalyzer *lga) :
 		ApiObject(), lga(lga) {}
 	~LogicAnalyzer_API() {}
 
+	int channel_groups_list_size() const;
+	void setChannelGroupsListSize(int size);
+
+	QList<ChannelGroup_API*> getChannelGroupsForStoring();
+	QQmlListProperty<ChannelGroup_API> getChannelGroupsForScripting();
+
 	bool running() const;
 	void run(bool en);
-	QString chm() const;
-	void setChm(QString);
 
 	double getTimePos() const;
 	void setTimePos(double pos);
@@ -275,8 +285,99 @@ public:
 	bool cursorsLocked() const;
 	void setCursorsLocked(bool en);
 
+	bool inactiveHidden() const;
+	void setInactiveHidden(bool en);
+
 private:
 	LogicAnalyzer *lga;
+};
+
+class ChannelGroup_API : public ApiObject
+{
+	friend class LogicChannel_API;
+	Q_OBJECT
+	Q_PROPERTY(int channels_list_size READ channels_list_size WRITE
+		   setChannelsListSize SCRIPTABLE false)
+	Q_PROPERTY(QList<LogicChannel_API*> channels_list READ getChannelsForStoring
+		   SCRIPTABLE false)
+	Q_PROPERTY(QQmlListProperty<LogicChannel_API> channels READ
+		getChannelsForScripting STORED false)
+	Q_PROPERTY(bool ch_enabled READ chEnabled WRITE setChEnabled)
+	Q_PROPERTY(bool ch_grouped READ chGrouped WRITE setChGrouped)
+	Q_PROPERTY(QString trigger READ getTrigger WRITE setTrigger)
+	Q_PROPERTY(QString name READ getName WRITE setName)
+	Q_PROPERTY(bool ch_collapsed READ getChCollapsed WRITE setChCollapsed)
+
+public:
+	explicit ChannelGroup_API(LogicAnalyzer *lga, int index = -1,
+				bool load = true) :
+		ApiObject(), lga(lga), index(index)
+		{
+			setObjectName("channel_group");
+			if(!load)
+				set_channels_api();
+		}
+	~ChannelGroup_API() {
+		qDeleteAll(channels_api);
+		channels_api.clear();
+	}
+	bool chEnabled() const;
+	void setChEnabled(bool en);
+
+	bool chGrouped() const;
+	void setChGrouped(bool val);
+
+	QString getTrigger() const;
+	void setTrigger(QString val);
+
+	QString getName() const;
+	void setName(QString val);
+
+	bool getChCollapsed() const;
+	void setChCollapsed(bool val);
+
+	int channels_list_size() const;
+	void setChannelsListSize(int size);
+
+	QList<LogicChannel_API*> getChannelsForStoring();
+	QQmlListProperty<LogicChannel_API> getChannelsForScripting();
+
+	int getIndex() const;
+	void set_channels_api();
+private:
+	LogicAnalyzer *lga;
+	QList<LogicChannel_API *> channels_api;
+	int index;
+};
+
+class LogicChannel_API : public ApiObject
+{
+	Q_OBJECT
+	Q_PROPERTY(int index READ getIndex WRITE setIndex)
+	Q_PROPERTY(QString trigger READ getTrigger WRITE setTrigger)
+	Q_PROPERTY(QString name READ getName WRITE setName)
+
+public:
+	explicit LogicChannel_API(LogicAnalyzer *lga,
+			ChannelGroup_API *chg, int index=-1) :
+		ApiObject(), lga(lga), lchg(chg), index(index)
+		{
+			setObjectName("channel");
+		}
+	~LogicChannel_API() { }
+
+	QString getTrigger() const;
+	void setTrigger(QString val);
+
+	QString getName() const;
+	void setName(QString val);
+
+	int getIndex() const;
+	void setIndex(int);
+private:
+	LogicAnalyzer *lga;
+	ChannelGroup_API *lchg;
+	int index;
 };
 }
 
