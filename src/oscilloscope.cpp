@@ -2264,6 +2264,8 @@ void Oscilloscope_API::setVoltsPerDiv(const QList<double>& list)
 
 	for (i = 0; i < osc->nb_channels + osc->nb_math_channels; i++)
 		osc->plot.setVertUnitsPerDiv(list.at(i), i);
+	// Make sure the new vertical units per div apply
+	osc->plot.updateAxes();
 
 	osc->voltsPerDiv->setValue(osc->plot.VertUnitsPerDiv());
 }
