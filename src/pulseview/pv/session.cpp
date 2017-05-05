@@ -554,7 +554,7 @@ void Session::sample_thread_proc(shared_ptr<devices::Device> device,
 
 	(void)device;
 
-	if(cur_samplerate_ == 0)
+	if(timespanLimitStream == 0)
 		cur_samplerate_ = device_->read_config<uint64_t>(ConfigKey::SAMPLERATE);
 
 	out_of_memory_ = false;
@@ -584,7 +584,7 @@ void Session::sample_thread_proc(shared_ptr<devices::Device> device,
 
 void Session::feed_in_header()
 {
-	if(cur_samplerate_ == 0)
+	if(timespanLimitStream == 0)
 		cur_samplerate_ = device_->read_config<uint64_t>(ConfigKey::SAMPLERATE);
 }
 
