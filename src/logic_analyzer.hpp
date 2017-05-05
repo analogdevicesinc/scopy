@@ -304,7 +304,6 @@ class ChannelGroup_API : public ApiObject
 		getChannelsForScripting STORED false)
 	Q_PROPERTY(bool ch_enabled READ chEnabled WRITE setChEnabled)
 	Q_PROPERTY(bool ch_grouped READ chGrouped WRITE setChGrouped)
-	Q_PROPERTY(QString trigger READ getTrigger WRITE setTrigger)
 	Q_PROPERTY(QString name READ getName WRITE setName)
 	Q_PROPERTY(bool ch_collapsed READ getChCollapsed WRITE setChCollapsed)
 
@@ -326,9 +325,6 @@ public:
 
 	bool chGrouped() const;
 	void setChGrouped(bool val);
-
-	QString getTrigger() const;
-	void setTrigger(QString val);
 
 	QString getName() const;
 	void setName(QString val);

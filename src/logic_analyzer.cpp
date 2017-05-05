@@ -1348,29 +1348,6 @@ void ChannelGroup_API::setChGrouped(bool en)
 	lga->chm.get_channel_group(getIndex())->group(en);
 }
 
-QString ChannelGroup_API::getTrigger() const
-{
-	if(!chGrouped()) {
-		auto ch_group = lga->chm.get_channel_group(getIndex());
-		auto ch = ch_group->get_channel();
-		if(ch)
-			return QString::fromStdString(lga->chm.get_channel(
-				ch->get_id())->getTrigger());
-	}
-	return "none";
-}
-
-void ChannelGroup_API::setTrigger(QString val)
-{
-	if(!chGrouped()) {
-		auto ch_group = lga->chm.get_channel_group(getIndex());
-		auto ch = ch_group->get_channel();
-		if(ch)
-			lga->chm.get_channel(ch->get_id())->setTrigger(
-				val.toStdString());
-	}
-}
-
 QString ChannelGroup_API::getName() const
 {
 	auto ch_group = lga->chm.get_channel_group(getIndex());
