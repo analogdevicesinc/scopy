@@ -1253,6 +1253,11 @@ void adiscope::Oscilloscope::onVertOffsetValueChanged(double value)
 		plot.replot();
 	}
 
+
+	// Hardware gain and offset apply only to regular channels
+	if (current_channel >= nb_channels)
+		return;
+
 	bool hw_offset_support = true; // Future devices might not have
 					// hardware offset support
 	if (hw_offset_support) {
