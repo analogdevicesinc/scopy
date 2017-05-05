@@ -1208,7 +1208,7 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 	bool started = iio->started();
 	if (started)
 		iio->lock();
-	this->qt_time_block->set_nsamps(active_sample_count);
+	setAllSinksSampleCount(active_sample_count);
 
 	// Apply amplitude corrections when using different sample rates
 	if (active_sample_rate != adc.sampleRate()) {
@@ -1304,7 +1304,7 @@ void adiscope::Oscilloscope::onTimePositionChanged(double value)
 	/* Reconfigure the GNU Radio block to receive a different number of samples  */
 	if (started)
 		iio->lock();
-	this->qt_time_block->set_nsamps(active_sample_count);
+	setAllSinksSampleCount(active_sample_count);
 
 	if (started) {
 		plot.setSampleRate(active_sample_rate, 1, "");
@@ -2072,6 +2072,19 @@ void Oscilloscope::setChannelHwOffset(uint chnIdx, double offset)
 					adc_samp_conv_block);
 	block->setOffset(current_channel, -offset);
 	adc.setChannelHwOffset(current_channel, offset);
+}
+
+void Oscilloscope::setAllSinksSampleCount(unsigned long sample_count)
+{
+	this->qt_time_block->set_nsamps(sample_count);
+
+	auto it = math_sinks.constBegin();
+	while (it != math_sinks.constEnd()) {
+		scope_sink_f::sptr math_sink = dynamic_pointer_cast<
+				scope_sink_f>(it.value().second);
+		math_sink->set_nsamps(sample_count);
+		++it;
+	}
 }
 
 bool Oscilloscope_API::hasCursors() const

@@ -175,7 +175,7 @@ private:
   double d_sample_rate;
   double d_delay;
   long d_data_starting_point;
-  bool d_reset_x_axis_points;
+  std::vector<bool> d_sink_reset_x_axis_pts;
 
   bool d_semilogx;
   bool d_semilogy;

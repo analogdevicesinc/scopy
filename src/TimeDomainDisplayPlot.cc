@@ -158,7 +158,6 @@ TimeDomainDisplayPlot::TimeDomainDisplayPlot(QWidget* parent, unsigned int xNumD
 
   d_sample_rate = 1;
   d_data_starting_point = 0.0;
-  d_reset_x_axis_points = false;
   d_curves_hidden = false;
 
   // Reconfigure the bottom horizontal axis that was created by the base class
@@ -241,6 +240,7 @@ TimeDomainDisplayPlot::plotNewData(const std::string sender,
       int start = d_sinkManager.sinkFirstChannelPos(sender);
       unsigned int sinkNumChannels = sink->numChannels();
       unsigned long long sinkNumPoints = sink->channelsDataLength();
+      bool reset_x_axis_points = d_sink_reset_x_axis_pts[sinkIndex];
 
       if(numDataPoints != sinkNumPoints){
 	sinkNumPoints = numDataPoints;
@@ -257,9 +257,9 @@ TimeDomainDisplayPlot::plotNewData(const std::string sender,
 	}
 
 	_resetXAxisPoints(d_xdata[sinkIndex], numDataPoints, d_sample_rate);
-      } else if (d_reset_x_axis_points) {
+      } else if (reset_x_axis_points) {
           _resetXAxisPoints(d_xdata[sinkIndex], numDataPoints, d_sample_rate);
-          d_reset_x_axis_points = false;
+          reset_x_axis_points = false;
       }
 
       for(int i = 0; i < sinkNumChannels; i++) {
@@ -814,6 +814,8 @@ bool TimeDomainDisplayPlot::registerSink(std::string sinkUniqueNme, unsigned int
 		d_nplots += numChannels;
 		_resetXAxisPoints(d_xdata[sinkIndex], channelsDataLength, d_sample_rate);
 		d_tag_markers.resize(d_nplots);
+
+		d_sink_reset_x_axis_pts.push_back(false);
 	}
 
 	return ret;
@@ -853,6 +855,9 @@ bool TimeDomainDisplayPlot::unregisterSink(std::string sinkName)
 
 		d_nplots -= numChannels;
 		d_tag_markers.resize(d_nplots);
+
+		d_sink_reset_x_axis_pts.erase(d_sink_reset_x_axis_pts.begin() +
+			sinkIndex);
 	}
 
 	return ret;
@@ -906,7 +911,8 @@ long TimeDomainDisplayPlot::dataStartingPoint() const
 
 void TimeDomainDisplayPlot::resetXaxisOnNextReceivedData()
 {
-	d_reset_x_axis_points = true;
+	for (int i = 0; i < d_sink_reset_x_axis_pts.size(); i++)
+		d_sink_reset_x_axis_pts[i] = true;
 }
 
 void TimeDomainDisplayPlot::setDataStartingPoint(long pos)
