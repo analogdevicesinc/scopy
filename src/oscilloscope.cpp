@@ -664,7 +664,6 @@ void Oscilloscope::add_math_channel(const std::string& function)
 	auto math_sink = adiscope::scope_sink_f::make(
 			plot.axisInterval(QwtPlot::xBottom).width() * adc.sampleRate(),
 			adc.sampleRate(), name, 1, (QObject *)&plot);
-
 	/* Add the math block and the math scope sink into a container, so that
 	 * we can disconnect them when removing the math channel later */
 	auto math_pair = QPair<gr::basic_block_sptr, gr::basic_block_sptr>(
@@ -675,6 +674,8 @@ void Oscilloscope::add_math_channel(const std::string& function)
 	bool started = iio->started();
 	if (started)
 		iio->lock();
+
+	math_sink->set_trigger_mode(TRIG_MODE_TAG, 0, "buffer_start");
 
 	for (unsigned int i = 0; i < nb_channels; i++)
 		iio->connect(adc_samp_conv_block, i, math, i);
