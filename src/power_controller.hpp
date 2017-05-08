@@ -37,6 +37,8 @@ namespace Ui {
 }
 
 class QJSEngine;
+class QShowEvent;
+class QHideEvent;
 
 namespace adiscope {
 	class PowerController_API;
@@ -75,6 +77,9 @@ namespace adiscope {
 		PositionSpinButton *valuePos, *valueNeg;
 
 		PowerController_API *pw_api;
+
+		void showEvent(QShowEvent *event);
+		void hideEvent(QHideEvent *event);
 	};
 
 	class PowerController_API : public ApiObject

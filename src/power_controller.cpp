@@ -73,8 +73,6 @@ PowerController::PowerController(struct iio_context *ctx,
 
 	connect(runButton, SIGNAL(clicked(bool)), this, SLOT(startStop(bool)));
 
-	timer.start(TIMER_TIMEOUT_MS);
-
 	pw_api->load();
 	pw_api->js_register(engine);
 }
@@ -89,6 +87,16 @@ PowerController::~PowerController()
 	delete pw_api;
 
 	delete ui;
+}
+
+void PowerController::showEvent(QShowEvent *event)
+{
+	timer.start(TIMER_TIMEOUT_MS);
+}
+
+void PowerController::hideEvent(QHideEvent *event)
+{
+	timer.stop();
 }
 
 void PowerController::dac1_set_value(double value)
