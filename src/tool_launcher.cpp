@@ -440,7 +440,6 @@ void adiscope::ToolLauncher::enableCalibTools(float gain_ch1, float gain_ch2)
 	if (filter->compatible(TOOL_DMM)) {
 		dmm = new DMM(ctx, filter, ui->stopDMM, &js_engine,
 				gain_ch1, gain_ch2, this);
-		dmm->setVisible(false);
 		ui->dmm->setEnabled(true);
 	}
 }
@@ -472,7 +471,6 @@ void adiscope::ToolLauncher::enableDacBasedTools(float dacA_vlsb,
 					iio_device_get_name(dev), dacB_vlsb);
 		}
 
-		signal_generator->setVisible(false);
 		ui->signalGenerator->setEnabled(true);
 	}
 }
@@ -519,7 +517,6 @@ bool adiscope::ToolLauncher::switchContext(const QString &uri)
 
 	if (filter->compatible(TOOL_DIGITALIO)) {
 		dio = new DigitalIO(ctx, filter, ui->stopDIO, dioManager, &js_engine, this);
-		dio->setVisible(false);
 		ui->digitalIO->setEnabled(true);
 	}
 
@@ -527,14 +524,12 @@ bool adiscope::ToolLauncher::switchContext(const QString &uri)
 	if (filter->compatible(TOOL_POWER_CONTROLLER)) {
 		power_control = new PowerController(ctx,
 				ui->stopPowerControl, &js_engine, this);
-		power_control->setVisible(false);
 		ui->powerControl->setEnabled(true);
 	}
 
 	if (filter->compatible(TOOL_LOGIC_ANALYZER)) {
 		logic_analyzer = new LogicAnalyzer(ctx, filter,
 				ui->stopLogicAnalyzer, &js_engine, this);
-		logic_analyzer->setVisible(false);
 		ui->logicAnalyzer->setEnabled(true);
 	}
 
@@ -542,7 +537,6 @@ bool adiscope::ToolLauncher::switchContext(const QString &uri)
 	if (filter->compatible((TOOL_PATTERN_GENERATOR))) {
 		pattern_generator = new PatternGenerator (ctx, filter,
 				ui->stopPatternGenerator, &js_engine,dioManager, this);
-		pattern_generator->setVisible(false);
 		ui->patternGenerator->setEnabled(true);
 	}
 
@@ -550,7 +544,6 @@ bool adiscope::ToolLauncher::switchContext(const QString &uri)
 	if (filter->compatible((TOOL_NETWORK_ANALYZER))) {
 		network_analyzer = new NetworkAnalyzer(ctx, filter,
 				ui->stopNetworkAnalyzer, &js_engine, this);
-		network_analyzer->setVisible(false);
 		ui->networkAnalyzer->setEnabled(true);
 	}
 
