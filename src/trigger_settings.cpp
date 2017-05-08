@@ -64,10 +64,11 @@ vector<string> TriggerSettings::lut_digital_trigger_conditions = {
 	"level-high",
 };
 
-TriggerSettings::TriggerSettings(struct iio_context *ctx, const OscADC& adc,
+TriggerSettings::TriggerSettings(struct iio_context *ctx,
+		std::shared_ptr<GenericAdc> adc,
 		QWidget *parent) :
 	QWidget(parent), ui(new Ui::TriggerSettings),
-	osc_adc(adc),
+	adc(adc),
 	triggerA_en(false), triggerB_en(false),
 	temporarily_disabled(false)
 {
@@ -277,9 +278,7 @@ void TriggerSettings::onSpinboxTriggerAhystChanged(double value)
 	if (!this->trigger0)
 		return;
 
-	int rawValue = adc_sample_conv::convVoltsToSample(value,
-		osc_adc.channelGain(0), osc_adc.compTable(osc_adc.sampleRate()),
-		0, osc_adc.channelHwGain(0));
+	int rawValue = (int)adc->convVoltsDiffToSampleDiff(0, value);
 	QString s = QString::number(rawValue);
 
 	iio_channel_attr_write(this->trigger0, "trigger_hysteresis",
@@ -291,9 +290,7 @@ void TriggerSettings::onSpinboxTriggerBhystChanged(double value)
 	if (!this->trigger1)
 		return;
 
-	int rawValue = adc_sample_conv::convVoltsToSample(value,
-		osc_adc.channelGain(1), osc_adc.compTable(osc_adc.sampleRate()),
-		0, osc_adc.channelHwGain(1));
+	int rawValue = (int)adc->convVoltsDiffToSampleDiff(1, value);
 	QString s = QString::number(rawValue);
 
 	iio_channel_attr_write(this->trigger1, "trigger_hysteresis",
@@ -384,20 +381,15 @@ void TriggerSettings::trigger_all_widgets_update()
 
 		ret = iio_channel_attr_read(this->trigger0, "trigger_level", buf, sizeof(buf));
 		if (ret >= 0) {
-			double val = adc_sample_conv::convSampleToVolts(
-				QString(buf).toDouble(), osc_adc.channelGain(0),
-				osc_adc.compTable(osc_adc.sampleRate()),
-				-osc_adc.channelHwOffset(0),
-				osc_adc.channelHwGain(0));
+			double val = adc->convSampleToVolts(0,
+				QString(buf).toDouble());
 			ui_triggerAlevel->setValue(val);
 		}
 
 		ret = iio_channel_attr_read(this->trigger0, "trigger_hysteresis", buf, sizeof(buf));
 		if (ret >= 0) {
-			double val = adc_sample_conv::convSampleToVolts(
-				QString(buf).toDouble(), osc_adc.channelGain(0),
-				osc_adc.compTable(osc_adc.sampleRate()), 0,
-				osc_adc.channelHwGain(0));
+			double val = adc->convSampleDiffToVoltsDiff(0,
+				QString(buf).toDouble());
 			ui_triggerAHyst->setValue(val);
 		}
 	}
@@ -415,20 +407,15 @@ void TriggerSettings::trigger_all_widgets_update()
 
 		ret = iio_channel_attr_read(this->trigger1, "trigger_level", buf, sizeof(buf));
 		if (ret >= 0) {
-			double val = adc_sample_conv::convSampleToVolts(
-				QString(buf).toDouble(), osc_adc.channelGain(1),
-				osc_adc.compTable(osc_adc.sampleRate()),
-				-osc_adc.channelHwOffset(1),
-				osc_adc.channelHwGain(1));
+			double val = adc->convSampleToVolts(1,
+				QString(buf).toDouble());
 			ui_triggerBlevel->setValue(val);
 		}
 
 		ret = iio_channel_attr_read(this->trigger1, "trigger_hysteresis", buf, sizeof(buf));
 		if (ret >= 0) {
-			double val = adc_sample_conv::convSampleToVolts(
-				QString(buf).toDouble(), osc_adc.channelGain(1),
-				osc_adc.compTable(osc_adc.sampleRate()), 0,
-				osc_adc.channelHwGain(1));
+			double val = adc->convSampleDiffToVoltsDiff(1,
+				QString(buf).toDouble());
 			ui_triggerBHyst->setValue(val);
 		}
 	}
@@ -619,9 +606,7 @@ void TriggerSettings::triggA_level_write_hardware(double value)
 	if (!this->trigger0)
 		return;
 
-	int rawValue = adc_sample_conv::convVoltsToSample(value,
-		osc_adc.channelGain(0), osc_adc.compTable(osc_adc.sampleRate()),
-		-osc_adc.channelHwOffset(0), osc_adc.channelHwGain(0));
+	int rawValue = (int)adc->convVoltsToSample(0, value);
 	QString s = QString::number(rawValue);
 
 	iio_channel_attr_write(this->trigger0, "trigger_level",
@@ -633,9 +618,7 @@ void TriggerSettings::triggB_level_write_hardware(double value)
 	if (!this->trigger1)
 		return;
 
-	int rawValue = adc_sample_conv::convVoltsToSample(value,
-		osc_adc.channelGain(1), osc_adc.compTable(osc_adc.sampleRate()),
-		-osc_adc.channelHwOffset(1), osc_adc.channelHwGain(1));
+	int rawValue = (int)adc->convVoltsToSample(1, value);
 	QString s = QString::number(rawValue);
 
 	iio_channel_attr_write(this->trigger1, "trigger_level",

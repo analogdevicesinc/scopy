@@ -155,14 +155,13 @@ namespace adiscope {
 		void update_chn_settings_panel(int id);
 
 		void updateGainMode();
-		void setGainMode(uint chnIdx, bool high_gain);
+		void setGainMode(uint chnIdx, M2kAdc::GainMode gain_mode);
 		void setChannelHwOffset(uint chnIdx, double offset);
 
 	private:
-		OscADC adc;
-		struct iio_device *m2k_fabric;
+		std::shared_ptr<GenericAdc> adc;
+		std::shared_ptr<M2kAdc> m2k_adc;
 		unsigned int nb_channels, nb_math_channels;
-		QList<double> sampling_rates;
 		double active_sample_rate;
 		unsigned long active_sample_count;
 		long long active_trig_sample_count;
@@ -205,10 +204,6 @@ namespace adiscope {
 		iio_manager::port_id *hist_ids;
 		iio_manager::port_id *xy_ids;
 
-		QList<struct iio_channel *>offset_channels;
-		QList<int> ch_midscale_offset;
-
-
 		ScaleSpinButton *timeBase;
 		PositionSpinButton *timePosition;
 		ScaleSpinButton *voltsPerDiv;
@@ -249,6 +244,9 @@ namespace adiscope {
 
 		QList<QPair<std::shared_ptr<MeasurementData>,
 			Statistic>> statistics_data;
+
+		std::shared_ptr<GenericAdc> newAdcDevice(struct iio_context *,
+			Filter *);
 
 		void comboBoxUpdateToValue(QComboBox *box, double value, std::vector<double>list);
 

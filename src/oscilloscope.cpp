@@ -63,10 +63,10 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 		Filter *filt, QPushButton *runButton, QJSEngine *engine,
 		float gain_ch1, float gain_ch2, QWidget *parent) :
 	QWidget(parent),
-	adc(ctx, filt),
-	nb_channels(Oscilloscope::adc.numChannels()),
-	sampling_rates(adc.availSamplRates()),
-	active_sample_rate(adc.sampleRate()),
+	adc(newAdcDevice(ctx, filt)),
+	m2k_adc(dynamic_pointer_cast<M2kAdc>(adc)),
+	nb_channels(Oscilloscope::adc->numAdcChannels()),
+	active_sample_rate(adc->sampleRate()),
 	nb_math_channels(0),
 	ui(new Ui::Oscilloscope),
 	trigger_settings(ctx, adc),
@@ -92,29 +92,18 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 {
 	ui->setupUi(this);
 	int triggers_panel = ui->stackedWidget->insertWidget(-1, &trigger_settings);
-	symmBufferMode = make_shared<SymmetricBufferMode>();
-	symmBufferMode->setSampleRates(adc.availSamplRates().toVector().toStdVector());
-	symmBufferMode->setEntireBufferMaxSize(500000); // max 0.5 mega-samples
-	symmBufferMode->setTriggerBufferMaxSize(8192); // 8192 is what hardware supports
-	symmBufferMode->setTimeDivisionCount(plot.xAxisNumDiv());
 
-	adc.setChannelGain(0, gain_ch1);
-	adc.setChannelGain(1, gain_ch2);
+	if (m2k_adc) {
+		symmBufferMode = make_shared<SymmetricBufferMode>();
+		symmBufferMode->setSampleRates(
+			m2k_adc->availSamplRates().toVector().toStdVector());
+		symmBufferMode->setEntireBufferMaxSize(500000); // max 0.5 mega-samples
+		symmBufferMode->setTriggerBufferMaxSize(8192); // 8192 is what hardware supports
+		symmBufferMode->setTimeDivisionCount(plot.xAxisNumDiv());
 
-	struct iio_device *ad5625 = iio_context_find_device(ctx, "ad5625");
-	offset_channels.push_back(iio_device_find_channel(ad5625, "voltage2",
-		true));
-	offset_channels.push_back(iio_device_find_channel(ad5625, "voltage3",
-		true));
-
-	m2k_fabric = iio_context_find_device(ctx, "m2k-fabric");
-
-	long long val;
-	iio_channel_attr_read_longlong(offset_channels[0], "raw", &val);
-	ch_midscale_offset.push_back((long long)val);
-
-	iio_channel_attr_read_longlong(offset_channels[1], "raw", &val);
-	ch_midscale_offset.push_back((long long)val);
+		m2k_adc->setChnCorrectionGain(0, gain_ch1);
+		m2k_adc->setChnCorrectionGain(1, gain_ch2);
+	}
 
 	/* Measurements Settings */
 	measure_settings_init();
@@ -125,10 +114,10 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 
 	/* Gnuradio Blocks */
 
-	this->qt_time_block = adiscope::scope_sink_f::make(0, adc.sampleRate(),
+	this->qt_time_block = adiscope::scope_sink_f::make(0, adc->sampleRate(),
 		"Osc Time", nb_channels, (QObject *)&plot);
 
-	this->qt_fft_block = adiscope::scope_sink_f::make(fft_size, adc.sampleRate(),
+	this->qt_fft_block = adiscope::scope_sink_f::make(fft_size, adc->sampleRate(),
 			"Osc Frequency", nb_channels, (QObject *)&fft_plot);
 
 	this->qt_hist_block = adiscope::histogram_sink_f::make(1024, 100, 0, 20,
@@ -151,19 +140,12 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	gr::hier_block2_sptr hier = iio->to_hier_block2();
 	qDebug() << "Manager created:\n" << gr::dot_graph(hier).c_str();
 
-	struct iio_device *dev = adc.iio_adc();
-	unsigned int chIdx = 0;
-	for (unsigned int i = 0; i < iio_device_get_channels_count(dev); i++) {
-		struct iio_channel *chn = iio_device_get_channel(dev, i);
-
-		if (iio_channel_is_output(chn) ||
-				!iio_channel_is_scan_element(chn))
-			continue;
-
-		const char *id = iio_channel_get_name(chn);
+	auto adc_channels = adc->adcChannelList();
+	for (unsigned int i = 0; i < adc_channels.size(); i++) {
+		const char *id = iio_channel_get_name(adc_channels[i]);
 		string s = "Channel ";
 		if (!id) {
-			s += to_string(chIdx + 1);
+			s += to_string(i + 1);
 			id = s.c_str();
 		}
 
@@ -175,12 +157,12 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 
 		QString stylesheet(channel_ui.box->styleSheet());
 		stylesheet += QString("\nQCheckBox::indicator {\nborder-color: %1;\n}\nQCheckBox::indicator:checked {\nbackground-color: %1;\n}\n"
-				).arg(plot.getLineColor(chIdx).name());
+				).arg(plot.getLineColor(i).name());
 
 		channel_ui.box->setStyleSheet(stylesheet);
 
-		channel_ui.box->setProperty("id", QVariant(chIdx));
-		channel_ui.name->setProperty("id", QVariant(chIdx));
+		channel_ui.box->setProperty("id", QVariant(i));
+		channel_ui.name->setProperty("id", QVariant(i));
 		ch_widget->setProperty("channel_name", channel_ui.name->text());
 
 		/* We don't use the settings button - hide it */
@@ -197,17 +179,16 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 
 		QLabel *label= new QLabel(this);
 		label->setText(vertMeasureFormat.format(
-			plot.VertUnitsPerDiv(chIdx), "V", 3));
+			plot.VertUnitsPerDiv(i), "V", 3));
 		label->setStyleSheet(QString("QLabel {"
 				"color: %1;"
 				"font-weight: bold;"
-				"}").arg(plot.getLineColor(chIdx).name()));
+				"}").arg(plot.getLineColor(i).name()));
 		ui->chn_scales->addWidget(label);
 
 		high_gain_modes.push_back(false);
-		channels_api.append(new Channel_API(this));
 
-		chIdx++;
+		channels_api.append(new Channel_API(this));
 	}
 
 	connect(ui->rightMenu, SIGNAL(finished(bool)), this,
@@ -304,7 +285,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	ui->gridLayoutPlot->addWidget(statisticsPanel, 5, 1, 1, 1);
 
 	/* Default plot settings */
-	plot.setSampleRate(adc.sampleRate(), 1, "");
+	plot.setSampleRate(adc->sampleRate(), 1, "");
 	plot.setActiveVertAxis(0);
 
 	for (unsigned int i = 0; i < nb_channels; i++) {
@@ -535,12 +516,14 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 	onHorizScaleValueChanged(timeBase->value());
 	onTimePositionChanged(timePosition->value());
 
-	int crt_chn_copy = current_channel;
-	for (int i = 0; i < nb_channels; i++) {
-		current_channel = i;
-		updateGainMode();
+	if (m2k_adc) {
+		int crt_chn_copy = current_channel;
+		for (int i = 0; i < nb_channels; i++) {
+			current_channel = i;
+			updateGainMode();
+		}
+		current_channel = crt_chn_copy;
 	}
-	current_channel = crt_chn_copy;
 
 	osc_api->setObjectName(QString::fromStdString(Filter::tool_name(
 			TOOL_OSCILLOSCOPE)));
@@ -659,8 +642,10 @@ void Oscilloscope::add_math_channel(const std::string& function)
 	std::string name = qname.toStdString();
 
 	auto math_sink = adiscope::scope_sink_f::make(
-			plot.axisInterval(QwtPlot::xBottom).width() * adc.sampleRate(),
-			adc.sampleRate(), name, 1, (QObject *)&plot);
+
+	plot.axisInterval(QwtPlot::xBottom).width() * adc->sampleRate(),
+	adc->sampleRate(), name, 1, (QObject *)&plot);
+
 	/* Add the math block and the math scope sink into a container, so that
 	 * we can disconnect them when removing the math channel later */
 	auto math_pair = QPair<gr::basic_block_sptr, gr::basic_block_sptr>(
@@ -683,7 +668,7 @@ void Oscilloscope::add_math_channel(const std::string& function)
 
 	plot.registerSink(name, 1,
 			plot.axisInterval(QwtPlot::xBottom).width() *
-			adc.sampleRate());
+			adc->sampleRate());
 
 	QWidget *channel_widget = new QWidget(this);
 	Ui::ChannelMath channel_ui;
@@ -864,8 +849,8 @@ void Oscilloscope::runStopToggled(bool checked)
 
 		last_set_sample_count = active_sample_count;
 
-		if (active_sample_rate != adc.sampleRate())
-			adc.setSampleRate(active_sample_rate);
+		if (active_sample_rate != adc->sampleRate())
+			adc->setSampleRate(active_sample_rate);
 
 		if (active_trig_sample_count !=
 				trigger_settings.triggerDelay()) {
@@ -1172,19 +1157,13 @@ void adiscope::Oscilloscope::onVertScaleValueChanged(double value)
 			ui->chn_scales->itemAt(current_channel)->widget());
 	label->setText(vertMeasureFormat.format(value, "V", 3));
 
-	bool hw_gain_support = true; // Future devices might not have
-					// hardware gain support
-	if (!hw_gain_support)
-		return;
-
-	// Switch between high and low gain modes only for regular channels
-	if (current_channel >= nb_channels)
-		return;
-
-	updateGainMode();
-	setChannelHwOffset(current_channel, voltsPosition->value());
-	trigger_settings.updateHwVoltLevels(current_channel);
-
+	// Switch between high and low gain modes only for the M2K channels
+	if (m2k_adc && current_channel < nb_channels) {
+		updateGainMode();
+		setChannelHwOffset(current_channel,
+			voltsPosition->value());
+		trigger_settings.updateHwVoltLevels(current_channel);
+	}
 }
 
 void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
@@ -1209,11 +1188,13 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 	setAllSinksSampleCount(active_sample_count);
 
 	// Apply amplitude corrections when using different sample rates
-	if (active_sample_rate != adc.sampleRate()) {
+	if (m2k_adc && active_sample_rate != adc->sampleRate()) {
 		boost::shared_ptr<adc_sample_conv> block =
 			dynamic_pointer_cast<adc_sample_conv>(adc_samp_conv_block);
-		block->setFilterCompensation(0, adc.compTable(active_sample_rate));
-		block->setFilterCompensation(1, adc.compTable(active_sample_rate));
+		block->setFilterCompensation(0,
+			m2k_adc->compTable(active_sample_rate));
+		block->setFilterCompensation(1,
+			m2k_adc->compTable(active_sample_rate));
 	}
 
 	if (started) {
@@ -1223,7 +1204,7 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 
 		last_set_sample_count = active_sample_count;
 
-		adc.setSampleRate(active_sample_rate);
+		adc->setSampleRate(active_sample_rate);
 		trigger_settings.setTriggerDelay(active_trig_sample_count);
 		last_set_time_pos = active_time_pos;
 
@@ -1251,14 +1232,8 @@ void adiscope::Oscilloscope::onVertOffsetValueChanged(double value)
 		plot.replot();
 	}
 
-
-	// Hardware gain and offset apply only to regular channels
-	if (current_channel >= nb_channels)
-		return;
-
-	bool hw_offset_support = true; // Future devices might not have
-					// hardware offset support
-	if (hw_offset_support) {
+	// Switch between high and low gain modes only for the M2K channels
+	if (m2k_adc && current_channel < nb_channels) {
 		if (ui->pushButtonRunStop->isChecked())
 			toggle_blockchain_flow(false);
 
@@ -1297,7 +1272,7 @@ void adiscope::Oscilloscope::onTimePositionChanged(double value)
 
 	updateBufferPreviewer();
 
-	if (active_sample_rate == adc.sampleRate() &&
+	if (active_sample_rate == adc->sampleRate() &&
 			(active_sample_count == oldSampleCount))
 		return;
 
@@ -1313,7 +1288,7 @@ void adiscope::Oscilloscope::onTimePositionChanged(double value)
 
 		last_set_sample_count = active_sample_count;
 
-		adc.setSampleRate(active_sample_rate);
+		adc->setSampleRate(active_sample_rate);
 	}
 
 	for (unsigned int i = 0; i < nb_channels; i++)
@@ -1936,9 +1911,9 @@ void Oscilloscope::updateBufferPreviewer()
 	long long totalSamples = last_set_sample_count;
 
 	if (totalSamples > 0) {
-		dataInterval.setMinValue(triggerSamples / adc.sampleRate());
+		dataInterval.setMinValue(triggerSamples / adc->sampleRate());
 		dataInterval.setMaxValue((triggerSamples + totalSamples)
-			/ adc.sampleRate());
+			/ adc->sampleRate());
 	}
 
 	// Use the two intervals to determine the width and position of the
@@ -2003,11 +1978,11 @@ void Oscilloscope::updateGainMode()
 
 			if (running)
 				toggle_blockchain_flow(false);
-			setGainMode(current_channel, false);
+			setGainMode(current_channel, M2kAdc::LOW_GAIN_MODE);
 			if (running)
 				toggle_blockchain_flow(true);
 
-			auto range = adc.inputRange(OscADC::LOW_GAIN_MODE);
+			auto range = m2k_adc->inputRange(M2kAdc::LOW_GAIN_MODE);
 			if (current_channel == 0)
 				trigger_settings.setTriggerARange(range);
 			else if (current_channel == 1)
@@ -2020,11 +1995,11 @@ void Oscilloscope::updateGainMode()
 
 			if (running)
 				toggle_blockchain_flow(false);
-			setGainMode(current_channel, true);
+			setGainMode(current_channel, M2kAdc::HIGH_GAIN_MODE);
 			if (running)
 				toggle_blockchain_flow(true);
 
-			auto range = adc.inputRange(OscADC::HIGH_GAIN_MODE);
+			auto range = m2k_adc->inputRange(M2kAdc::HIGH_GAIN_MODE);
 			if (current_channel == 0)
 				trigger_settings.setTriggerARange(range);
 			else if (current_channel == 1)
@@ -2033,45 +2008,38 @@ void Oscilloscope::updateGainMode()
 	}
 }
 
-void Oscilloscope::setGainMode(uint chnIdx, bool high_gain)
+void Oscilloscope::setGainMode(uint chnIdx, M2kAdc::GainMode gain_mode)
 {
-	float hw_gain = high_gain ? 0.212 : 0.02;
-	const char *gain_mode = high_gain ? "high" : "low";
-
-	struct iio_channel *ch;
-	if (chnIdx == 0)
-		ch = iio_device_find_channel(m2k_fabric, "voltage0", false);
-	else
-		ch = iio_device_find_channel(m2k_fabric, "voltage1", false);
-	iio_channel_attr_write_raw(ch, "gain", gain_mode, strlen(gain_mode));
+	m2k_adc->setChnHwGainMode(chnIdx, gain_mode);
 
 	boost::shared_ptr<adc_sample_conv> block =
 	dynamic_pointer_cast<adc_sample_conv>(
 					adc_samp_conv_block);
-	block->setHardwareGain(chnIdx, hw_gain);
-	adc.setChannelHwGain(chnIdx, hw_gain);
+
+	block->setHardwareGain(chnIdx, m2k_adc->gainAt(gain_mode));
 	trigger_settings.updateHwVoltLevels(chnIdx);
 }
 
 void Oscilloscope::setChannelHwOffset(uint chnIdx, double offset)
 {
-	// Write offset to hardware
-	double gain = 1.3;
-	double vref = 1.2;
-	int raw_offset = (int)(offset * (1 << 12) * adc.channelHwGain(chnIdx) *
-		gain / 2.693 / vref) +
-		ch_midscale_offset[current_channel];
-
-	iio_channel_attr_write_double(
-		offset_channels[current_channel], "raw",
-		raw_offset);
+	m2k_adc->setChnHwOffset(chnIdx, offset);
 
 	// Compensate the offset set in hardware
 	boost::shared_ptr<adc_sample_conv> block =
 		dynamic_pointer_cast<adc_sample_conv>(
 					adc_samp_conv_block);
-	block->setOffset(current_channel, -offset);
-	adc.setChannelHwOffset(current_channel, offset);
+	block->setOffset(chnIdx, -offset);
+}
+
+std::shared_ptr<GenericAdc> Oscilloscope::newAdcDevice(
+	struct iio_context *ctx, Filter *filt)
+{
+	struct iio_device *adc_dev = filt->find_device(ctx, TOOL_OSCILLOSCOPE);
+
+	if (filt->hw_name().compare("M2K") == 0)
+		return std::make_shared<M2kAdc>(ctx, adc_dev);
+	else
+		return std::make_shared<GenericAdc>(ctx, adc_dev);
 }
 
 void Oscilloscope::setAllSinksSampleCount(unsigned long sample_count)

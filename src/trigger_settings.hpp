@@ -22,6 +22,7 @@
 
 #include <QWidget>
 #include <string>
+#include <memory>
 
 extern "C" {
 	struct iio_context;
@@ -34,7 +35,7 @@ namespace Ui {
 }
 
 namespace adiscope {
-	class OscADC;
+	class GenericAdc;
 	class Oscilloscope_API;
 	class PositionSpinButton;
 }
@@ -54,7 +55,7 @@ namespace adiscope {
 		};
 
 		explicit TriggerSettings(struct iio_context *ctx,
-					const OscADC& adc,
+					std::shared_ptr<GenericAdc> adc,
 					QWidget *parent = nullptr);
 		~TriggerSettings();
 
@@ -126,7 +127,7 @@ namespace adiscope {
 		PositionSpinButton *ui_triggerBHyst;
 		PositionSpinButton *ui_triggerHoldoff;
 
-		const OscADC& osc_adc;
+		std::shared_ptr<GenericAdc> adc;
 
 		struct iio_channel *trigger0;
 		struct iio_channel *trigger1;
