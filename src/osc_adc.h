@@ -5,6 +5,7 @@
 #include <QStringList>
 #include <QPair>
 #include <map>
+#include <memory>
 
 extern "C" {
 	struct iio_context;
@@ -66,6 +67,8 @@ public:
 	M2kAdc(struct iio_context *, struct iio_device *adc_dev);
 	~M2kAdc();
 
+	void apply_m2k_fixes();
+
 	double chnCorrectionOffset(uint chnIdx) const;
 	void setChnCorrectionOffset(uint chnIdx, double offset);
 
@@ -99,6 +102,24 @@ private:
 	QList<double> m_chn_corr_gains;
 	QList<double> m_chn_hw_offsets;
 	QList<GainMode> m_chn_hw_gain_modes;
+};
+
+class AdcBuilder
+{
+public:
+	enum AdcType {
+		GENERIC = 0,
+		M2K = 1,
+	};
+
+	static std::shared_ptr<GenericAdc> newAdc(AdcType adc_type,
+		struct iio_context *ctx, struct iio_device *adc)
+	{
+		switch (adc_type) {
+		case GENERIC: return std::make_shared<GenericAdc>(ctx, adc);
+		case M2K: return std::make_shared<M2kAdc>(ctx, adc);
+		}
+	}
 };
 
 } /* namespace adiscope */

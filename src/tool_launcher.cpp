@@ -63,8 +63,8 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 
 	ui->menu->setMinimumSize(ui->menu->sizeHint());
 
-	connect(this, SIGNAL(calibrationDone(float, float)),
-		this, SLOT(enableCalibTools(float, float)));
+	connect(this, SIGNAL(adcCalibrationDone()),
+		this, SLOT(enableAdcBasedTools()));
 	connect(this, SIGNAL(dacCalibrationDone(float, float)),
 		this, SLOT(enableDacBasedTools(float, float)));
 	connect(ui->btnAdd, SIGNAL(clicked()), this, SLOT(addRemoteContext()));
@@ -311,19 +311,6 @@ void adiscope::ToolLauncher::on_btnDigitalIO_clicked()
 	swapMenu(static_cast<QWidget *>(dio));
 }
 
-void adiscope::ToolLauncher::apply_m2k_fixes(struct iio_context *ctx)
-{
-	struct iio_device *dev = iio_context_find_device(ctx, "ad9963");
-
-	/* Configure TX path */
-	iio_device_reg_write(dev, 0x68, 0x1B);  // IGAIN1 +-6db  0.25db steps
-	iio_device_reg_write(dev, 0x6B, 0x1B);  //
-	iio_device_reg_write(dev, 0x69, 0x1C);  // IGAIN2 +-2.5%
-	iio_device_reg_write(dev, 0x6C, 0x1C);
-	iio_device_reg_write(dev, 0x6A, 0x20);  // IRSET +-20%
-	iio_device_reg_write(dev, 0x6D, 0x20);
-}
-
 void adiscope::ToolLauncher::on_btnHome_clicked()
 {
 	swapMenu(ui->homeWidget);
@@ -518,31 +505,36 @@ void adiscope::ToolLauncher::calibrate()
 	calib.calibrateAll();
 	calib.restoreTriggerSetup();
 
+	auto m2k_adc = std::dynamic_pointer_cast<M2kAdc>(adc);
+	if (m2k_adc) {
+		m2k_adc->setChnCorrectionOffset(0, calib.adcOffsetChannel0());
+		m2k_adc->setChnCorrectionOffset(1, calib.adcOffsetChannel1());
+		m2k_adc->setChnCorrectionGain(0, calib.adcGainChannel0());
+		m2k_adc->setChnCorrectionGain(1, calib.adcGainChannel1());
+	}
+
 	ui->btnDMM->setText(old_dmm_text);
 	ui->btnOscilloscope->setText(old_osc_text);
 	ui->btnSignalGenerator->setText(old_siggen_text);
 
-	Q_EMIT calibrationDone(calib.adcGainChannel0(), calib.adcGainChannel1());
+	Q_EMIT adcCalibrationDone();
 	Q_EMIT dacCalibrationDone(calib.dacAvlsb(), calib.dacBvlsb());
 }
 
-void adiscope::ToolLauncher::enableCalibTools(float gain_ch1, float gain_ch2)
+void adiscope::ToolLauncher::enableAdcBasedTools()
 {
 	if (filter->compatible(TOOL_OSCILLOSCOPE)) {
-		oscilloscope = new Oscilloscope(ctx, filter,
-						ui->stopOscilloscope, &js_engine,
-						gain_ch1, gain_ch2, this);
+		oscilloscope = new Oscilloscope(ctx, filter, adc,
+						ui->stopOscilloscope,
+						&js_engine, this);
 		connect(oscilloscope, SIGNAL(appShouldStop()),
 				this, SLOT(disconnect()));
-
 		ui->oscilloscope->setEnabled(true);
 	}
 
 	if (filter->compatible(TOOL_DMM)) {
-		dmm = new DMM(ctx, filter, ui->stopDMM, &js_engine,
-				gain_ch1, gain_ch2, this);
+		dmm = new DMM(ctx, filter, adc, ui->stopDMM, &js_engine, this);
 		connect(dmm, SIGNAL(appShouldStop()), this, SLOT(disconnect()));
-
 		ui->dmm->setEnabled(true);
 	}
 }
@@ -599,9 +591,12 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 	filter = new Filter(ctx);
 
 	if (filter->hw_name().compare("M2K") == 0) {
-		apply_m2k_fixes(ctx);
+		adc = AdcBuilder::newAdc(AdcBuilder::M2K, ctx,
+			filter->find_device(ctx, TOOL_OSCILLOSCOPE));
+	} else {
+		adc = AdcBuilder::newAdc(AdcBuilder::GENERIC, ctx,
+			filter->find_device(ctx, TOOL_OSCILLOSCOPE));
 	}
-
 
 	if (filter->compatible(TOOL_PATTERN_GENERATOR)
 	    || filter->compatible(TOOL_DIGITALIO)) {
@@ -758,8 +753,8 @@ bool ToolLauncher_API::connect(const QString& uri)
 			done = true;
 	});
 
-	tl->connect(tl, &ToolLauncher::calibrationDone,
-			[&](float, float) {
+	tl->connect(tl, &ToolLauncher::adcCalibrationDone,
+			[&]() {
 		did_connect = true;
 		done = true;
 	});

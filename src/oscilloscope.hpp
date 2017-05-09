@@ -84,10 +84,9 @@ namespace adiscope {
 		Q_OBJECT
 
 	public:
-		explicit Oscilloscope(struct iio_context *ctx,
-				Filter *filt, QPushButton *runButton,
-				QJSEngine *engine,
-				float gain_ch1, float gain_ch2,
+		explicit Oscilloscope(struct iio_context *ctx, Filter *filt,
+				std::shared_ptr<GenericAdc> adc,
+				QPushButton *runButton, QJSEngine *engine,
 				QWidget *parent = 0);
 		~Oscilloscope();
 
@@ -244,9 +243,6 @@ namespace adiscope {
 
 		QList<QPair<std::shared_ptr<MeasurementData>,
 			Statistic>> statistics_data;
-
-		std::shared_ptr<GenericAdc> newAdcDevice(struct iio_context *,
-			Filter *);
 
 		void comboBoxUpdateToValue(QComboBox *box, double value, std::vector<double>list);
 

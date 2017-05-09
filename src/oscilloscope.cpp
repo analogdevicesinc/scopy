@@ -59,14 +59,14 @@ using namespace adiscope;
 using namespace gr;
 using namespace std;
 
-Oscilloscope::Oscilloscope(struct iio_context *ctx,
-		Filter *filt, QPushButton *runButton, QJSEngine *engine,
-		float gain_ch1, float gain_ch2, QWidget *parent) :
+Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
+		std::shared_ptr<GenericAdc> adc, QPushButton *runButton,
+		 QJSEngine *engine, QWidget *parent) :
 	QWidget(parent),
-	adc(newAdcDevice(ctx, filt)),
+	adc(adc),
 	m2k_adc(dynamic_pointer_cast<M2kAdc>(adc)),
 	nb_channels(Oscilloscope::adc->numAdcChannels()),
-	active_sample_rate(adc->sampleRate()),
+	active_sample_rate(adc->readSampleRate()),
 	nb_math_channels(0),
 	ui(new Ui::Oscilloscope),
 	trigger_settings(ctx, adc),
@@ -100,9 +100,6 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 		symmBufferMode->setEntireBufferMaxSize(500000); // max 0.5 mega-samples
 		symmBufferMode->setTriggerBufferMaxSize(8192); // 8192 is what hardware supports
 		symmBufferMode->setTimeDivisionCount(plot.xAxisNumDiv());
-
-		m2k_adc->setChnCorrectionGain(0, gain_ch1);
-		m2k_adc->setChnCorrectionGain(1, gain_ch2);
 	}
 
 	/* Measurements Settings */
@@ -228,8 +225,12 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 
 	auto adc_samp_conv = gnuradio::get_initial_sptr(
 			new adc_sample_conv(nb_channels));
-	adc_samp_conv->setCorrectionGain(0, gain_ch1);
-	adc_samp_conv->setCorrectionGain(1, gain_ch2);
+	if (m2k_adc) {
+		adc_samp_conv->setCorrectionGain(0,
+			m2k_adc->chnCorrectionGain(0));
+		adc_samp_conv->setCorrectionGain(1,
+			m2k_adc->chnCorrectionGain(1));
+	}
 
 	for (unsigned int i = 0; i < nb_channels; i++) {
 		ids[i] = iio->connect(adc_samp_conv, i, i,
@@ -2029,17 +2030,6 @@ void Oscilloscope::setChannelHwOffset(uint chnIdx, double offset)
 		dynamic_pointer_cast<adc_sample_conv>(
 					adc_samp_conv_block);
 	block->setOffset(chnIdx, -offset);
-}
-
-std::shared_ptr<GenericAdc> Oscilloscope::newAdcDevice(
-	struct iio_context *ctx, Filter *filt)
-{
-	struct iio_device *adc_dev = filt->find_device(ctx, TOOL_OSCILLOSCOPE);
-
-	if (filt->hw_name().compare("M2K") == 0)
-		return std::make_shared<M2kAdc>(ctx, adc_dev);
-	else
-		return std::make_shared<GenericAdc>(ctx, adc_dev);
 }
 
 void Oscilloscope::setAllSinksSampleCount(unsigned long sample_count)

@@ -154,6 +154,8 @@ double GenericAdc::convVoltsDiffToSampleDiff(uint chnIdx, double v) const
 M2kAdc::M2kAdc(struct iio_context *ctx, struct iio_device *adc_dev):
 	GenericAdc(ctx, adc_dev)
 {
+	apply_m2k_fixes();
+
 	// Hardware gain channels
 	struct iio_device *m2k_fabric = iio_context_find_device(ctx,
 		"m2k-fabric");
@@ -191,16 +193,25 @@ M2kAdc::M2kAdc(struct iio_context *ctx, struct iio_device *adc_dev):
 		m_chn_corr_gains.push_back(1.0);
 		m_chn_hw_offsets.push_back(0.0);
 		m_chn_hw_gain_modes.push_back(GainMode::LOW_GAIN_MODE);
-
-		long long val;
-		iio_channel_attr_read_longlong(m_offset_channels[i], "raw",
-			&val);
-		m_chn_corr_offsets[i] = (double)val;
 	}
 }
 
 M2kAdc::~M2kAdc()
 {
+}
+
+void M2kAdc::apply_m2k_fixes()
+{
+	struct iio_device *dev = iio_context_find_device(iio_context(),
+		"ad9963");
+
+	/* Configure TX path */
+	iio_device_reg_write(dev, 0x68, 0x1B);  // IGAIN1 +-6db  0.25db steps
+	iio_device_reg_write(dev, 0x6B, 0x1B);  //
+	iio_device_reg_write(dev, 0x69, 0x1C);  // IGAIN2 +-2.5%
+	iio_device_reg_write(dev, 0x6C, 0x1C);
+	iio_device_reg_write(dev, 0x6A, 0x20);  // IRSET +-20%
+	iio_device_reg_write(dev, 0x6D, 0x20);
 }
 
 double M2kAdc::chnCorrectionOffset(uint chnIdx) const

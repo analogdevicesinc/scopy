@@ -37,6 +37,7 @@ class QJSEngine;
 
 namespace adiscope {
 	class DMM_API;
+	class GenericAdc;
 
 	class DMM : public QWidget
 	{
@@ -47,8 +48,8 @@ namespace adiscope {
 
 	public:
 		explicit DMM(struct iio_context *ctx, Filter *filt,
+				std::shared_ptr<GenericAdc> adc,
 				QPushButton *runButton, QJSEngine *engine,
-				float gain_ch1, float gain_ch2,
 				QWidget *parent = nullptr);
 		~DMM();
 
@@ -59,8 +60,8 @@ namespace adiscope {
 		boost::shared_ptr<peek_sample<float>>
 			peek_block_ch1, peek_block_ch2;
 		iio_manager::port_id id_ch1, id_ch2;
+		std::shared_ptr<GenericAdc> adc;
 		bool mode_ac_ch1, mode_ac_ch2;
-		float gain_ch1, gain_ch2;
 
 		DMM_API *dmm_api;
 

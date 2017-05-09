@@ -48,6 +48,7 @@ extern "C" {
 namespace Ui {
 class ToolLauncher;
 class Device;
+class GenericAdc;
 }
 
 namespace adiscope {
@@ -65,7 +66,7 @@ public:
 
 Q_SIGNALS:
 	void connectionDone(bool success);
-	void calibrationDone(float gain_ch1, float gain_ch2);
+	void adcCalibrationDone();
 	void dacCalibrationDone(float dacA_vlsb, float dacB_vlsb);
 
 private Q_SLOTS:
@@ -90,7 +91,7 @@ private Q_SLOTS:
 	void addRemoteContext();
 	void destroyPopup();
 
-	void enableCalibTools(float gain_ch1, float gain_ch2);
+	void enableAdcBasedTools();
 	void enableDacBasedTools(float dacA_vlsb, float dacB_vlsb);
 
 	void hasText();
@@ -117,6 +118,8 @@ private:
 	NetworkAnalyzer *network_analyzer;
 	QWidget *current;
 
+	std::shared_ptr<GenericAdc> adc;
+
 	Filter *filter;
 	ToolLauncher_API *tl_api;
 
@@ -136,8 +139,6 @@ private:
 	Q_INVOKABLE QPushButton *addContext(const QString& hostname);
 
 	void updateListOfDevices(const QVector<QString>& uris);
-
-	static void apply_m2k_fixes(struct iio_context *ctx);
 };
 
 class ToolLauncher_API: public ApiObject

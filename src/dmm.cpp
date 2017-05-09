@@ -17,7 +17,7 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#include "adc_sample_conv.hpp"
+#include "osc_adc.h"
 #include "dmm.hpp"
 #include "dynamicWidget.hpp"
 #include "ui_dmm.h"
@@ -31,15 +31,14 @@
 
 using namespace adiscope;
 
-DMM::DMM(struct iio_context *ctx, Filter *filt, QPushButton *runButton,
-		QJSEngine *engine,
-		float gain_ch1, float gain_ch2, QWidget *parent) :
+DMM::DMM(struct iio_context *ctx, Filter *filt, std::shared_ptr<GenericAdc> adc,
+		QPushButton *runButton, QJSEngine *engine, QWidget *parent) :
 	QWidget(parent), ui(new Ui::DMM), timer(this),
 	manager(iio_manager::get_instance(ctx, filt->device_name(TOOL_DMM))),
 	peek_block_ch1(gnuradio::get_initial_sptr(new peek_sample<float>)),
 	peek_block_ch2(gnuradio::get_initial_sptr(new peek_sample<float>)),
 	mode_ac_ch1(false), mode_ac_ch2(false),
-	gain_ch1(gain_ch1), gain_ch2(gain_ch2), dmm_api(new DMM_API(this))
+	adc(adc), dmm_api(new DMM_API(this))
 {
 	ui->setupUi(this);
 
@@ -118,11 +117,8 @@ void DMM::updateValuesList()
 	float value_ch1 = peek_block_ch1->peek_value();
 	float value_ch2 = peek_block_ch2->peek_value();
 
-	/* XXX: This is M2K specific! */
-	float volts_ch1 = adc_sample_conv::convSampleToVolts(
-			(float) value_ch1, gain_ch1);
-	float volts_ch2 = adc_sample_conv::convSampleToVolts(
-			(float) value_ch2, gain_ch2);
+	double volts_ch1 = adc->convSampleToVolts(0, (double) value_ch1);
+	double volts_ch2 = adc->convSampleToVolts(1, (double) value_ch2);
 
 	ui->lcdCh1->display(volts_ch1);
 	ui->lcdCh2->display(volts_ch2);
