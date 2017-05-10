@@ -29,6 +29,15 @@ public:
 class GenericAdc
 {
 public:
+	struct Settings {
+		double sample_rate;
+
+		virtual ~Settings() {}
+	};
+
+	typedef std::unique_ptr<GenericAdc::Settings> settings_uptr;
+
+public:
 	GenericAdc(struct iio_context *ctx, struct iio_device *adc_dev);
 	virtual ~GenericAdc();
 
@@ -47,6 +56,9 @@ public:
 	virtual double convSampleDiffToVoltsDiff(uint chnIdx, double smpl)const;
 	virtual double convVoltsDiffToSampleDiff(uint chnIdx, double v) const;
 
+	virtual std::unique_ptr<Settings> getCurrentHwSettings();
+	virtual void setHwSettings(Settings *settings);
+
 private:
 	struct iio_context *m_ctx;
 	struct iio_device *m_adc;
@@ -58,11 +70,17 @@ private:
 class M2kAdc: public GenericAdc
 {
 public:
-
 	enum GainMode {
-			LOW_GAIN_MODE = 0,
-			HIGH_GAIN_MODE = 1,
-		};
+		LOW_GAIN_MODE = 0,
+		HIGH_GAIN_MODE = 1,
+	};
+
+	struct M2KSettings: public Settings {
+		QList<GainMode> channel_hw_gain_mode;
+		QList<double> channel_hw_offset;
+	};
+
+public:
 
 	M2kAdc(struct iio_context *, struct iio_device *adc_dev);
 	~M2kAdc();
@@ -91,6 +109,9 @@ public:
 	virtual double convVoltsToSample(uint chnIdx, double volts) const;
 	virtual double convSampleDiffToVoltsDiff(uint chnIdx, double smp) const;
 	virtual double convVoltsDiffToSampleDiff(uint chnIdx, double v) const;
+
+	virtual std::unique_ptr<struct Settings> getCurrentHwSettings();
+	virtual void setHwSettings(struct Settings *settings);
 
 private:
 	QList<struct iio_channel *> m_offset_channels;

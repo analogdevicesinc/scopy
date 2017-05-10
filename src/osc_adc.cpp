@@ -147,6 +147,20 @@ double GenericAdc::convVoltsDiffToSampleDiff(uint chnIdx, double v) const
 	return v;
 }
 
+GenericAdc::settings_uptr GenericAdc::getCurrentHwSettings()
+{
+	settings_uptr settings_uptr(new Settings);
+
+	settings_uptr->sample_rate = readSampleRate();
+
+	return settings_uptr;
+}
+
+void GenericAdc::setHwSettings(GenericAdc::Settings *settings)
+{
+	setSampleRate(settings->sample_rate);
+}
+
 /*
  * Class M2kAdc
  */
@@ -333,4 +347,33 @@ double M2kAdc::convVoltsDiffToSampleDiff(uint chnIdx, double v) const
 	return v / (m_chn_corr_gains[chnIdx] *
 		m_filt_comp_table.at(sampleRate())) * ((1 << (numAdcBits() - 1))
 		* 1.3 * hw_gain) / 0.78;
+}
+
+GenericAdc::settings_uptr M2kAdc::getCurrentHwSettings()
+{
+	settings_uptr gsettings_uptr = GenericAdc::getCurrentHwSettings();
+
+	M2KSettings *m2k_settings = new M2KSettings;
+	*(Settings *)m2k_settings = *gsettings_uptr;
+
+	for (int i = 0; i < numAdcChannels(); i++) {
+		m2k_settings->channel_hw_gain_mode.push_back(chnHwGainMode(i));
+		m2k_settings->channel_hw_offset.push_back(chnHwOffset(i));
+	}
+
+	return std::unique_ptr<Settings>(m2k_settings);
+}
+
+void M2kAdc::setHwSettings(GenericAdc::Settings *settings)
+{
+	GenericAdc::setHwSettings(settings);
+
+	M2KSettings *m2k_settings = dynamic_cast<M2KSettings *>(settings);
+	if (m2k_settings) {
+		for (int i = 0; i < numAdcChannels(); i++) {
+			setChnHwGainMode(i,
+				m2k_settings->channel_hw_gain_mode[i]);
+			setChnHwOffset(i, m2k_settings->channel_hw_offset[i]);
+		}
+	}
 }
