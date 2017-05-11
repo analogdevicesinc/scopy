@@ -30,8 +30,13 @@
 #include <QtConcurrentRun>
 #include <QSignalTransition>
 #include <QMessageBox>
+#include <QTimer>
+#include <QFutureWatcher>
+#include <QFuture>
 
 #include <iio.h>
+
+#define TIMER_TIMEOUT_MS 5000
 
 using namespace adiscope;
 
@@ -119,7 +124,113 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	tl_api->js_register(&js_engine);
 
 	connect(&notifier, SIGNAL(activated(int)), this, SLOT(hasText()));
+
+	watcher = new QFutureWatcher<QPair<iio_context_info **, int>>();
+	search_timer = new QTimer();
+	connect(search_timer, SIGNAL(timeout()), this, SLOT(search()));
+	connect(watcher, SIGNAL(finished()), this, SLOT(update()));
+	search_timer->start(TIMER_TIMEOUT_MS);
 }
+
+void ToolLauncher::search()
+{
+	search_timer->stop();
+	future = QtConcurrent::run(this,searchDevices);
+	watcher->setFuture(future);
+}
+
+QPair<iio_context_info **, int> ToolLauncher::searchDevices()
+{
+	struct iio_context_info **info;
+	unsigned int nb_contexts;
+
+
+	struct iio_scan_context *scan_ctx = iio_create_scan_context("usb", 0);
+
+	if (!scan_ctx) {
+		std::cerr << "Unable to create scan context!" << std::endl;
+		return QPair<iio_context_info **, int> (nullptr,0);
+	}
+
+	ssize_t ret = iio_scan_context_get_info_list(scan_ctx, &info);
+
+	if (ret < 0) {
+		std::cerr << "Unable to scan!" << std::endl;
+		return QPair<iio_context_info **, int> (nullptr,0);
+	}
+
+	nb_contexts = static_cast<unsigned int>(ret);
+
+	QPair<iio_context_info **, int> new_devices = QPair<iio_context_info **, int>
+			(info, nb_contexts);
+
+	iio_scan_context_destroy(scan_ctx);
+
+	return new_devices;
+}
+
+void ToolLauncher::update()
+{
+	QPair<iio_context_info **, unsigned int> new_devices = watcher->result();
+
+	//Delete devices that are in the devices list but not found anymore when scanning
+
+	int index = 0;
+
+	for (auto it = devices.begin(); it != devices.end(); ++it) {
+		if (!QString((
+				     *it)->second.btn->property("uri").toString()).startsWith("usb:")) {
+			continue;
+		}
+
+		bool found = false;
+
+		for (unsigned int i = 0; i < new_devices.second; i++) {
+			const char *uri = iio_context_info_get_uri(new_devices.first[i]);
+
+			if ((*it)->second.btn->property("uri").toString() == uri) {
+				found = true;
+			}
+
+			break;
+		}
+
+		if (!found) {
+			delete *it;
+			devices.remove(index);
+			break;
+		} else {
+			index++;
+		}
+
+	}
+
+	for (unsigned int i = 0; i < new_devices.second; i++) {
+		const char *uri = iio_context_info_get_uri(new_devices.first[i]);
+
+		if (!QString(uri).startsWith("usb:")) {
+			continue;
+		}
+
+		bool found = false;
+
+		for (auto it = devices.begin(); it != devices.end(); ++it)
+			if ((*it)->second.btn->property("uri").toString() == uri) {
+				found = true;
+				break;
+			}
+
+		if (!found) {
+			addContext(QString(uri));
+		}
+	}
+
+
+	iio_context_info_list_free(new_devices.first);
+	search_timer->start(TIMER_TIMEOUT_MS);
+
+}
+
 
 ToolLauncher::~ToolLauncher()
 {
@@ -130,6 +241,9 @@ ToolLauncher::~ToolLauncher()
 	}
 
 	devices.clear();
+
+	delete search_timer;
+	delete watcher;
 
 	tl_api->save();
 	delete tl_api;
@@ -281,6 +395,7 @@ void adiscope::ToolLauncher::device_btn_clicked(bool pressed)
 		}
 	} else {
 		destroyContext();
+		search_timer->start(TIMER_TIMEOUT_MS);
 	}
 
 	resetStylesheets();
@@ -292,6 +407,7 @@ void adiscope::ToolLauncher::on_btnConnect_clicked(bool pressed)
 	if (ctx) {
 		destroyContext();
 		resetStylesheets();
+		search_timer->start(TIMER_TIMEOUT_MS);
 		return;
 	}
 
@@ -314,6 +430,7 @@ void adiscope::ToolLauncher::on_btnConnect_clicked(bool pressed)
 	if (switchContext(uri)) {
 		setDynamicProperty(ui->btnConnect, "connected", true);
 		setDynamicProperty(btn, "connected", true);
+		search_timer->stop();
 
 		if (label) {
 			label->setText(filter->hw_name());
@@ -520,6 +637,7 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 					"/decoders");
 
 		if (!success) {
+			search_timer->stop();
 			QMessageBox *error = new QMessageBox(this);
 			//	error->setWindowFlags(Qt::FramelessWindowHint);
 			error->setText("There was a problem initializing libsigrokdecode. Some features may be missing");

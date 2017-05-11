@@ -66,6 +66,9 @@ Q_SIGNALS:
 	void dacCalibrationDone(float dacA_vlsb, float dacB_vlsb);
 
 private Q_SLOTS:
+	void search();
+	void update();
+
 	void on_btnOscilloscope_clicked();
 	void on_btnSignalGenerator_clicked();
 	void on_btnDMM_clicked();
@@ -93,6 +96,11 @@ private:
 	struct iio_context *ctx;
 
 	QVector<QPair<QWidget, Ui::Device> *> devices;
+
+	QTimer *search_timer;
+	QFutureWatcher<QPair<iio_context_info **, int>> *watcher;
+	QFuture<QPair<iio_context_info **, int>> future;
+	QPair<iio_context_info **, int> searchDevices();
 
 	DMM *dmm;
 	PowerController *power_control;
