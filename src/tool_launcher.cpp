@@ -530,12 +530,14 @@ void adiscope::ToolLauncher::enableAdcBasedTools()
 		connect(oscilloscope, SIGNAL(appShouldStop()),
 				this, SLOT(disconnect()));
 		ui->oscilloscope->setEnabled(true);
+		adc_users_group.addButton(ui->stopOscilloscope);
 	}
 
 	if (filter->compatible(TOOL_DMM)) {
 		dmm = new DMM(ctx, filter, adc, ui->stopDMM, &js_engine, this);
 		connect(dmm, SIGNAL(appShouldStop()), this, SLOT(disconnect()));
 		ui->dmm->setEnabled(true);
+		adc_users_group.addButton(ui->stopDMM);
 	}
 }
 

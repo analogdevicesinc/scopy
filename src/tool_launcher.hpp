@@ -27,6 +27,7 @@
 #include <QPair>
 #include <QSocketNotifier>
 #include <QVector>
+#include <QButtonGroup>
 
 #include "apiObject.hpp"
 #include "dmm.hpp"
@@ -117,6 +118,8 @@ private:
 	PatternGenerator *pattern_generator;
 	NetworkAnalyzer *network_analyzer;
 	QWidget *current;
+
+	QButtonGroup adc_users_group;
 
 	std::shared_ptr<GenericAdc> adc;
 

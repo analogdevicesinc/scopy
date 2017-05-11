@@ -65,6 +65,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	QWidget(parent),
 	adc(adc),
 	m2k_adc(dynamic_pointer_cast<M2kAdc>(adc)),
+	adc_setup(adc->getCurrentHwSettings()),
 	nb_channels(Oscilloscope::adc->numAdcChannels()),
 	active_sample_rate(adc->readSampleRate()),
 	nb_math_channels(0),
@@ -844,6 +845,8 @@ void Oscilloscope::runStopToggled(bool checked)
 	setDynamicProperty(btn, "running", checked);
 
 	if (checked) {
+		adc->setHwSettings(adc_setup.release());
+
 		plot.setSampleRate(active_sample_rate, 1, "");
 		plot.setBufferSizeLabelValue(active_sample_count);
 		plot.setSampleRatelabelValue(active_sample_rate);
@@ -866,6 +869,8 @@ void Oscilloscope::runStopToggled(bool checked)
 		toggle_blockchain_flow(true);
 	} else {
 		toggle_blockchain_flow(false);
+
+		adc_setup = adc->getCurrentHwSettings();
 	}
 
 	// Update trigger status

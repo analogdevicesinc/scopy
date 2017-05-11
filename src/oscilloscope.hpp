@@ -160,6 +160,7 @@ namespace adiscope {
 	private:
 		std::shared_ptr<GenericAdc> adc;
 		std::shared_ptr<M2kAdc> m2k_adc;
+		GenericAdc::settings_uptr adc_setup;
 		unsigned int nb_channels, nb_math_channels;
 		double active_sample_rate;
 		unsigned long active_sample_count;

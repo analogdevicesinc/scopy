@@ -17,7 +17,6 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#include "osc_adc.h"
 #include "dmm.hpp"
 #include "dynamicWidget.hpp"
 #include "ui_dmm.h"
@@ -38,7 +37,8 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, std::shared_ptr<GenericAdc> adc,
 	peek_block_ch1(gnuradio::get_initial_sptr(new peek_sample<float>)),
 	peek_block_ch2(gnuradio::get_initial_sptr(new peek_sample<float>)),
 	mode_ac_ch1(false), mode_ac_ch2(false),
-	adc(adc), dmm_api(new DMM_API(this))
+	adc(adc), adc_setup(adc->getCurrentHwSettings()),
+	dmm_api(new DMM_API(this))
 {
 	ui->setupUi(this);
 
@@ -133,6 +133,8 @@ void DMM::updateValuesList()
 void DMM::toggleTimer(bool start)
 {
 	if (start) {
+		adc->setHwSettings(adc_setup.release());
+
 		manager->start(id_ch1);
 		manager->start(id_ch2);
 
@@ -146,6 +148,8 @@ void DMM::toggleTimer(bool start)
 
 		manager->stop(id_ch1);
 		manager->stop(id_ch2);
+
+		adc_setup = adc->getCurrentHwSettings();
 	}
 
 	setDynamicProperty(ui->run_button, "running", start);

@@ -415,7 +415,7 @@ background-image: url(:/icons/ico-play-green.svg);
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="stopDMM">
+           <widget class="adiscope::CustomPushButton" name="stopDMM">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -513,7 +513,7 @@ background-image: url(:/icons/ico-play-green.svg);
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="stopOscilloscope">
+           <widget class="adiscope::CustomPushButton" name="stopOscilloscope">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -1487,7 +1487,7 @@ font-weight: bold;
                   </property>
                   <property name="minimumSize">
                    <size>
-                    <width>90</width>
+                    <width>96</width>
                     <height>64</height>
                    </size>
                   </property>
