@@ -135,7 +135,7 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 void ToolLauncher::search()
 {
 	search_timer->stop();
-	future = QtConcurrent::run(this,searchDevices);
+	future = QtConcurrent::run(this, &ToolLauncher::searchDevices);
 	watcher->setFuture(future);
 }
 
