@@ -100,6 +100,7 @@ public:
 	                          QWidget *parent = 0, bool offline_mode_ = 0);
 	~PatternGenerator();
 	void updateCGSettings();
+	PatternUI *getCurrentPatternUI();
 
 
 

@@ -1,12 +1,16 @@
 #include "pulseview/pv/mainwindow.hpp"
+#include "pulseview/pv/data/decode/decoder.hpp"
+#include "pulseview/pv/data/decoderstack.hpp"
 #include "pulseview/pv/view/view.hpp"
 #include "pulseview/pv/view/viewport.hpp"
 #include "pulseview/pv/view/tracetreeitem.hpp"
 #include "pulseview/pv/view/logicsignal.hpp"
 #include "pulseview/pv/view/decodetrace.hpp"
+#include "pg_patterns.hpp"
 #include "pg_channel_manager.hpp"
 #include "pattern_generator.hpp"
 #include "dynamicWidget.hpp"
+#include <glib.h>
 #include "boost/math/common_factor.hpp"
 #include "libsigrokdecode/libsigrokdecode.h"
 
@@ -16,7 +20,6 @@
 #include "ui_pg_channel.h"
 
 using std::dynamic_pointer_cast;
-
 namespace Ui {
 class PGChannelGroup;
 class PGChannel;
@@ -32,6 +35,13 @@ class Viewport;
 class TraceTreeItem;
 class LogicSignal;
 class DecodeTrace;
+}
+namespace data {
+class Decoder;
+namespace decoder {
+class Decoder;
+}
+class DecoderStack;
 }
 }
 
@@ -735,6 +745,90 @@ void PatternGeneratorChannelGroupUI::dragLeaveEvent(QDragLeaveEvent *event)
 	event->accept();
 }
 
+void PatternGeneratorChannelGroupUI::setupUARTDecoder()
+{
+	auto decoder = srd_decoder_get_by_id("uart");
+	decodeTrace->set_decoder(decoder);
+	std::map<const srd_channel *,
+	    std::shared_ptr<pv::view::TraceTreeItem> > channel_map;
+
+	QStringList decoderRolesNameList;
+	std::vector<const srd_channel *> decoderRolesList;
+
+
+	GSList *reqCh = g_slist_copy(decoder->opt_channels);
+	GSList *options = g_slist_copy(decoder->options);
+
+
+	auto i=0;
+	auto ch_count = chg->get_channel_count();
+
+	for (; i <  ch_count && reqCh; reqCh = reqCh->next) {
+		const srd_channel *rqch = (const srd_channel *)reqCh->data;
+
+		if (rqch == nullptr) {
+			break;
+		}
+
+		decoderRolesNameList << QString::fromUtf8(rqch->name);
+		decoderRolesList.push_back(rqch);
+
+		std::pair<const srd_channel *,
+		    std::shared_ptr<pv::view::TraceTreeItem> > chtracepair;
+
+		auto index = chg->get_channel(i)->get_id();
+		chtracepair.first = decoderRolesList.back();
+
+		chtracepair.second = getManagerUi()->main_win->view_->get_clone_of(index);
+		chtracepair.second->force_to_v_offset(-100);
+
+		channel_map.insert(chtracepair);
+		i++;
+	}
+
+	auto uartdecoder = decodeTrace->decoder()->stack().front();
+	uartdecoder->set_option("baudrate",
+	                        g_variant_new_int64(dynamic_cast<UARTPattern *>
+	                                        (getChannelGroup()->pattern)->get_baud_rate()));
+	uartdecoder->set_option("num_data_bits",g_variant_new_int64(8));
+	GVariant *parityStr;
+	auto par = dynamic_cast<UARTPattern *>
+	           (getChannelGroup()->pattern)->get_parity();
+
+	switch (par) {
+
+	case UARTPattern::SP_PARITY_NONE:
+		parityStr = g_variant_new_string("none");
+		uartdecoder->set_option("parity_check",g_variant_new_string("no"));
+		break;
+
+	case UARTPattern::SP_PARITY_ODD:
+		parityStr = g_variant_new_string("odd");
+		break;
+
+	case UARTPattern::SP_PARITY_EVEN:
+		parityStr = g_variant_new_string("even");
+		break;
+
+	case UARTPattern::SP_PARITY_MARK:
+		parityStr = g_variant_new_string("mark");
+		break;
+
+	case UARTPattern::SP_PARITY_SPACE:
+		parityStr = g_variant_new_string("space");
+		break;
+	}
+
+	uartdecoder->set_option("parity_type",parityStr);
+	uartdecoder->set_option("num_stop_bits",
+	                        g_variant_new_double(dynamic_cast<UARTPattern *>
+	                                        (getChannelGroup()->pattern)->get_stop_bits()));
+	//uartdecoder->set_option("bit_order",g_variant_new_string(dynamic_cast<UARTPattern*>(getChannelGroup()->pattern)->get()));
+	decodeTrace->set_channel_map(channel_map);
+
+
+}
+
 void PatternGeneratorChannelGroupUI::setupParallelDecoder()
 {
 	auto decoder = srd_decoder_get_by_id("parallel");
@@ -749,7 +843,6 @@ void PatternGeneratorChannelGroupUI::setupParallelDecoder()
 
 	QStringList decoderRolesNameList;
 	std::vector<const srd_channel *> decoderRolesList;
-	const srd_channel *d0;
 	GSList *reqCh = g_slist_copy(decoder->opt_channels);
 
 	auto i=0;
@@ -813,6 +906,8 @@ void PatternGeneratorChannelGroupUI::updateTrace()
 		decodeTrace->setBgcolour(chg->getBgcolor());
 	}
 
+
+
 	if (traceOffset!=v_offset || traceHeight!=height) {
 		traceHeight = height;
 		traceOffset = v_offset;
@@ -822,6 +917,7 @@ void PatternGeneratorChannelGroupUI::updateTrace()
 
 	if (chg->is_grouped() && !getChannelGroup()->isCollapsed())
 		for (auto &&ch : ch_ui) {
+
 			ch->updateTrace();
 		}
 
@@ -1296,6 +1392,8 @@ void PatternGeneratorChannelManagerUI::updateUi()
 	static const int channelComboMaxLength = 15;
 	static const int outputComboMaxLength = 5;
 
+	disconnect(pg->getCurrentPatternUI(),SIGNAL(decoderChanged()),this,
+	           SLOT(triggerUpdateUi()));
 	qDebug()<<"updateUI";
 
 	for (auto ch : chg_ui) {
@@ -1392,7 +1490,14 @@ void PatternGeneratorChannelManagerUI::updateUi()
 
 			auto trace1 = main_win->view_->add_decoder();
 			currentChannelGroupUI->setTrace(trace1);
-			currentChannelGroupUI->setupParallelDecoder();
+
+			if (dynamic_cast<UARTPattern *>(static_cast<PatternGeneratorChannelGroup *>
+			                                (ch)->pattern)) {
+				currentChannelGroupUI->setupUARTDecoder();
+			} else {
+				currentChannelGroupUI->setupParallelDecoder();
+			}
+
 
 			if (!currentChannelGroupUI->getChannelGroup()->isCollapsed()) {
 				currentChannelGroupUI->chUiSep = addSeparator(
@@ -1506,6 +1611,8 @@ void PatternGeneratorChannelManagerUI::updateUi()
 	        SLOT(chmRangeChanged(int,int)));
 	connect(chmVertScrollArea, SIGNAL(valueChanged(int)),this,
 	        SLOT(chmScrollChanged(int)));
+	connect(pg->getCurrentPatternUI(),SIGNAL(decoderChanged()),this,
+	        SLOT(triggerUpdateUi()));
 }
 
 void PatternGeneratorChannelManagerUI::chmScrollChanged(int val)
@@ -1658,7 +1765,7 @@ void PatternGeneratorChannelManagerUI::clearHoverWidget()
 
 void PatternGeneratorChannelManagerUI::updatePlot()
 {
-	for (auto chgUi : chg_ui) {
+	for (PatternGeneratorChannelGroupUI *chgUi : chg_ui) {
 		chgUi->updateTrace();
 	}
 }

@@ -1164,7 +1164,7 @@ uint16_t UARTPattern::encapsulateUartFrame(char chr, uint16_t *bits_per_frame)
 
 uint32_t UARTPattern::get_min_sampling_freq()
 {
-	return baud_rate;
+	return baud_rate*2;
 }
 
 uint32_t UARTPattern::get_required_nr_of_samples(uint32_t sample_rate,
@@ -1281,14 +1281,21 @@ Pattern *UARTPatternUI::get_pattern()
 
 void UARTPatternUI::parse_ui()
 {
-	ui->LE_paramsOut->setText(ui->CB_baud->currentText() + "/8"
-	                          +ui->CB_Parity->currentText()[0] + ui->CB_Stop->currentText());
+
+	auto oldStr = ui->LE_paramsOut->text();
+	auto newStr = ui->CB_baud->currentText() + "/8"
+			+ui->CB_Parity->currentText()[0] + ui->CB_Stop->currentText();
+	ui->LE_paramsOut->setText(newStr);
 	qDebug()<<ui->LE_paramsOut->text();
 	pattern->set_params(ui->LE_paramsOut->text().toStdString());
 	qDebug()<<ui->LE_Data->text();
 	pattern->set_string(ui->LE_Data->text().toStdString());
 
 	Q_EMIT patternChanged();
+	if(oldStr != newStr)
+	{
+		Q_EMIT decoderChanged();
+	}
 
 }
 

@@ -173,6 +173,7 @@ public:
 	virtual void destroy_ui();
 Q_SIGNALS:
 	void patternChanged();
+	void decoderChanged();
 };
 
 
@@ -336,6 +337,7 @@ private Q_SLOTS:
 class UARTPattern : virtual public Pattern
 {
 
+public:
 	/** Parity settings. */
 	enum sp_parity {
 		/** Special value to indicate setting should be left alone. */
@@ -351,17 +353,6 @@ class UARTPattern : virtual public Pattern
 		/** Space parity. */
 		SP_PARITY_SPACE = 4
 	};
-protected:
-	std::string str;
-	std::string params;
-	bool msb_first;
-	unsigned int baud_rate;
-	unsigned int data_bits;
-	unsigned int stop_bits;
-	enum sp_parity parity;
-
-
-public:
 	UARTPattern();
 	virtual ~UARTPattern() {}
 
@@ -382,6 +373,15 @@ public:
 	int set_params(std::string params_);
 	void set_msb_first(bool msb_first_);
 	uint16_t encapsulateUartFrame(char chr, uint16_t *bits_per_frame);
+
+protected:
+	std::string str;
+	std::string params;
+	bool msb_first;
+	unsigned int baud_rate;
+	unsigned int data_bits;
+	unsigned int stop_bits;
+	enum sp_parity parity;
 
 };
 

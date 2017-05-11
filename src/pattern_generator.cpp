@@ -341,6 +341,12 @@ void PatternGenerator::showColorSettings(bool check)
 	}
 }
 
+
+PatternUI *PatternGenerator::getCurrentPatternUI()
+{
+	return currentUI;
+}
+
 void PatternGenerator::updateCGSettings()
 {
 	auto chg = chm.getHighlightedChannelGroup();
@@ -408,7 +414,7 @@ void PatternGenerator::deleteSettingsWidget()
 	if (currentUI!=nullptr) {
 		currentUI->setVisible(false);
 		currentUI->destroy_ui();
-		delete currentUI;
+		currentUI->deleteLater();
 		currentUI = nullptr;
 	}
 }
@@ -424,6 +430,7 @@ void PatternGenerator::createSettingsWidget()
 	currentUI->post_load_ui();
 	currentUI->setVisible(true);
 
+	connect(currentUI,SIGNAL(decoderChanged()),chmui,SLOT(triggerUpdateUi()));
 	connect(currentUI,SIGNAL(patternChanged()),bufui,SLOT(updateUi()));
 }
 

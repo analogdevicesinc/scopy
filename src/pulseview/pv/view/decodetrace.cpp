@@ -140,7 +140,6 @@ DecodeTrace::DecodeTrace(pv::Session &session,
 	show_hide_mapper_(this)
 {
 	assert(decoder_stack_);
-
 	// Determine shortest string we want to see displayed in full
 	QFontMetrics m(QApplication::font());
 	min_useful_label_width_ = m.width("XX"); // e.g. two hex characters
@@ -747,6 +746,11 @@ const QString DecodeTrace::get_annotation_at_point(const QPoint &point)
 
 	return (annotations.empty()) ?
 		QString() : annotations[0].annotations().front();
+}
+
+int DecodeTrace::getDecodeHeight() const
+{
+	return row_height_*max_visible_rows_;
 }
 
 void DecodeTrace::hover_point_changed()

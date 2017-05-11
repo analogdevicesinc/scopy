@@ -10,6 +10,7 @@
 #include <QDrag>
 #include <QBitmap>
 
+#include "libsigrokdecode/libsigrokdecode.h"
 #include "pg_patterns.hpp"
 #include "digitalchannel_manager.hpp"
 #include "ui_pg_cg_settings.h"
@@ -144,6 +145,7 @@ class PatternGeneratorChannelGroupUI : public ChannelGroupUI
 	int traceOffset;
 	int traceHeight;
 
+
 public:
 
 	std::shared_ptr<pv::view::TraceTreeItem> trace;
@@ -165,6 +167,7 @@ public:
 	QFrame *topSep,*botSep, *chUiSep;
 
 	void updateTrace();
+	void setupUARTDecoder();
 	void setupParallelDecoder();
 	void highlight(bool val);
 	void highlightTopSeparator();
@@ -297,6 +300,7 @@ Q_SIGNALS:
 private Q_SLOTS:
 	void chmScrollChanged(int val);
 	void chmRangeChanged(int min, int max);
+public Q_SLOTS:
 	void triggerUpdateUi();
 
 };
