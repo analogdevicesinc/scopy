@@ -53,8 +53,7 @@ QComboBox QAbstractItemView {
 QComboBox:disabled
 {
   color: rgb(85, 85, 85);
-}
-</string>
+}</string>
   </property>
   <layout class="QVBoxLayout" name="scrollAreaWidgetContentsLayout" stretch="0,0,0,0">
    <property name="spacing">
@@ -2013,13 +2012,13 @@ color: #FFFFFF;</string>
               <number>0</number>
              </property>
              <property name="leftMargin">
-              <number>20</number>
+              <number>0</number>
              </property>
              <property name="topMargin">
               <number>0</number>
              </property>
              <property name="rightMargin">
-              <number>10</number>
+              <number>8</number>
              </property>
              <property name="bottomMargin">
               <number>0</number>
@@ -2043,7 +2042,7 @@ color: #FFFFFF;</string>
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>103</width>
+                  <width>125</width>
                   <height>615</height>
                  </rect>
                 </property>

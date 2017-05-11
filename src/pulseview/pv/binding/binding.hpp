@@ -51,7 +51,7 @@ public:
 	void commit();
 
 	void add_properties_to_form(QFormLayout *layout,
-		bool auto_commit = false) const;
+		bool auto_commit = false, QWidget* parent = nullptr) const;
 
 	QWidget* get_property_form(QWidget *parent,
 		bool auto_commit = false) const;

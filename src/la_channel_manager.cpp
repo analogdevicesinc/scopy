@@ -17,8 +17,10 @@
 #include <libsigrokcxx/libsigrokcxx.hpp>
 #include <QPainter>
 #include <QListView>
+#include <QFormLayout>
 #include "pulseview/pv/widgets/colourbutton.hpp"
 #include "pulseview/pv/view/tracepalette.hpp"
+#include "pulseview/pv/binding/decoder.hpp"
 
 using std::dynamic_pointer_cast;
 
@@ -31,6 +33,9 @@ class TraceTreeItem;
 class DecodeTrace;
 class LogicSignal;
 class TracePalette;
+}
+namespace binding {
+class Decoder;
 }
 }
 
@@ -468,6 +473,7 @@ void LogicAnalyzerChannelGroup::setDecoder(const srd_decoder *value)
 	decoderReqChannels.clear();
 	decoderOptChannels.clear();
 	channels_.clear();
+	properties_.clear();
 	decoder = value;
 
 	if( decoder == nullptr )
@@ -601,6 +607,7 @@ std::map<const srd_channel*, uint16_t>
 LogicAnalyzerChannelGroup::~LogicAnalyzerChannelGroup()
 {
 	channels_.clear();
+	properties_.clear();
 }
 
 const srd_channel* LogicAnalyzerChannelGroup::get_srd_channel_from_name(const char* name)
@@ -751,6 +758,11 @@ void LogicAnalyzerChannelGroupUI::highlightBotSeparator()
 {
 	resetSeparatorHighlight(true);
 	botSep->setVisible(true);
+}
+
+std::shared_ptr<pv::view::DecodeTrace> LogicAnalyzerChannelGroupUI::getDecodeTrace()
+{
+	return decodeTrace;
 }
 
 void LogicAnalyzerChannelGroupUI::resetSeparatorHighlight(bool force)
@@ -1051,12 +1063,6 @@ void LogicAnalyzerChannelGroupUI::decoderChanged(const QString text)
 	}
 
 	static_cast<LogicAnalyzerChannelGroup *>(chg)->setDecoder(decoder);
-
-	if(getChannelGroup() == chm_ui->chm->getHighlightedChannelGroup())
-	{
-		chm_ui->deleteSettingsWidget();
-		chm_ui->createSettingsWidget();
-	}
 	chm_ui->update_ui_children(this);
 }
 
@@ -2053,6 +2059,7 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 
 	if (chm->getHighlightedChannelGroup()) {
 		LogicAnalyzerChannelGroup *chGroup = chm->getHighlightedChannelGroup();
+		LogicAnalyzerChannelGroupUI *chGroupUI = getUiFromChGroup(chGroup);
 		settingsUI->nameLineEdit->setText(QString::fromStdString(chGroup->get_label()));
 		generalSettingsUi->nameLineEdit->setText(QString::fromStdString(chGroup->get_label()));
 		QString ch_thickness = QString::number(chGroup->getCh_thickness());
@@ -2069,6 +2076,7 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 			if (!decoder) {
 				settingsUI->requiredChn->hide();
 				settingsUI->optionalChn->hide();
+				settingsUI->options->hide();
 				locationSettingsWidget->setVisible(true);
 				return;
 			}
@@ -2105,7 +2113,7 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 				reqChUI->roleCombo->setProperty("id", QVariant(rqch->id));
 				reqChUI->roleCombo->setProperty("name", QVariant(rqch->name));
 				settingsUI->verticalLayout_1->insertWidget(
-					settingsUI->verticalLayout_1->count() - 1, r);
+					settingsUI->verticalLayout_1->count() - 2, r);
 
 				connect(reqChUI->roleCombo,
 				        SIGNAL(currentIndexChanged(const QString&)),
@@ -2145,16 +2153,40 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 				optChUI->roleCombo->setProperty("id", QVariant(optch->id));
 				optChUI->roleCombo->setProperty("name", QVariant(optch->name));
 				settingsUI->verticalLayout_1->insertWidget(
-					settingsUI->verticalLayout_1->count(), r);
+					settingsUI->verticalLayout_1->count()-1, r);
 
 				connect(optChUI->roleCombo,
 				        SIGNAL(currentIndexChanged(const QString&)),
 				        this, SLOT(rolesChangedRHS(const QString&)));
 			}
+
+			/* Create widgets for options */
+			if(!decoder->options) {
+				settingsUI->options->hide();
+			}
+			else {
+				if(chGroup->properties_.size() > 0) {
+					binding_ = std::make_shared<binding::Decoder>(
+								chGroupUI->getDecodeTrace()->decoder(),
+								chGroupUI->getDecodeTrace()->pv_decoder());
+				}
+				else {
+					binding_ = std::make_shared<binding::Decoder>(
+								chGroupUI->getDecodeTrace()->decoder(),
+								chGroupUI->getDecodeTrace()->pv_decoder());
+				}
+				QFormLayout *layOpt = new QFormLayout(settingsUI->options);
+				chGroup->properties_ = binding_->properties();
+				binding_->add_properties_to_form(layOpt, true, settingsUI->options);
+				layOpt->setMargin(0);
+				settingsUI->verticalLayout_1->insertLayout(
+					settingsUI->verticalLayout_1->count(), layOpt);
+			}
 		}
 		else {
 			settingsUI->requiredChn->hide();
 			settingsUI->optionalChn->hide();
+			settingsUI->options->hide();
 		}
 	}
 
@@ -2189,6 +2221,7 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 
 		settingsUI->verticalLayout_1->insertWidget(
 			settingsUI->verticalLayout_1->count() - 1, r);
+		settingsUI->options->hide();
 	}
 
 	locationSettingsWidget->setVisible(true);

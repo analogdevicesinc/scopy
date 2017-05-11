@@ -21,6 +21,7 @@
 #include <cassert>
 
 #include <QFormLayout>
+#include <QLabel>
 
 #include "../prop/property.hpp"
 
@@ -44,20 +45,26 @@ void Binding::commit()
 	}
 }
 
+
 void Binding::add_properties_to_form(QFormLayout *layout,
-	bool auto_commit) const
+	bool auto_commit, QWidget* parent) const
 {
 	assert(layout);
-
+	if(!parent)
+		parent = layout->parentWidget();
 	for (shared_ptr<pv::prop::Property> p : properties_) {
 		assert(p);
-
-		QWidget *const widget = p->get_widget(layout->parentWidget(),
+		QWidget *const widget = p->get_widget(parent,
 			auto_commit);
 		if (p->labeled_widget())
 			layout->addRow(widget);
-		else
-			layout->addRow(p->name(), widget);
+		else {
+			QLabel *lbl = new QLabel(p->name(), parent);
+			lbl->setWordWrap(true);
+			layout->addRow(lbl);
+			layout->addRow(widget);
+			layout->setSpacing(10);
+		}
 	}
 }
 

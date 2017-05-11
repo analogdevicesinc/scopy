@@ -167,6 +167,15 @@ void DecodeTrace::set_decoder(const srd_decoder* decoder)
 	decoder_stack_->push_front(decoder);
 }
 
+std::shared_ptr<pv::data::decode::Decoder> DecodeTrace::pv_decoder()
+{
+	if(decoder_stack_->stack().size() != 0)
+	{
+		return decoder_stack_->get_decoder(0);
+	}
+	return nullptr;
+}
+
 const std::shared_ptr<pv::data::DecoderStack>& DecodeTrace::decoder() const
 {
 	return decoder_stack_;

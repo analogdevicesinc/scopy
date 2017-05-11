@@ -88,6 +88,7 @@ public:
 	void push(std::shared_ptr<decode::Decoder> decoder);
 	void push_front(const srd_decoder *decoder);
 	void remove(int index);
+	std::shared_ptr<decode::Decoder> get_decoder(int index);
 
 	double samplerate() const;
 

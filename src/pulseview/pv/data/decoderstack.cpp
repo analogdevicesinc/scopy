@@ -133,6 +133,14 @@ void DecoderStack::remove(int index)
 	stack_.erase(iter);
 }
 
+std::shared_ptr<decode::Decoder> DecoderStack::get_decoder(int index)
+{
+	assert(index >= 0);
+	assert(index < (int)stack_.size());
+	return stack_.front();
+}
+
+
 double DecoderStack::samplerate() const
 {
 	return samplerate_;

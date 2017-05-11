@@ -28,6 +28,12 @@ class DecodeTrace;
 namespace widgets{
 class ColourButton;
 }
+namespace binding {
+class Decoder;
+}
+namespace prop {
+class Property;
+}
 }
 namespace adiscope {
 class LogicAnalyzer;
@@ -138,6 +144,7 @@ public:
 	void setCh_thickness(qreal value);
 	std::vector<const srd_channel *> decoderOptChannels;
 	std::vector<const srd_channel *> decoderReqChannels;
+	std::vector< std::shared_ptr<pv::prop::Property> > properties_;
 };
 
 
@@ -175,6 +182,7 @@ public:
 	void highlightTopSeparator();
 	void highlightBotSeparator();
 	void resetSeparatorHighlight(bool force = false);
+	std::shared_ptr<pv::view::DecodeTrace> getDecodeTrace();
 
 private Q_SLOTS:
 	void set_decoder(std::string value);
@@ -287,6 +295,7 @@ public:
 	bool eventFilter(QObject *object, QEvent *event);
 	void updatePlot();
 	void setWidgetMinimumNrOfChars(QWidget *w, int nrOfChars);
+	std::shared_ptr<pv::binding::Decoder> binding_;
 
 public Q_SLOTS:
 	void chmScrollChanged(int value);
