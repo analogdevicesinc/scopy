@@ -44,128 +44,136 @@ extern "C" {
 }
 
 namespace Ui {
-	class ToolLauncher;
-	class Device;
+class ToolLauncher;
+class Device;
 }
 
 namespace adiscope {
-	class ToolLauncher_API;
+class ToolLauncher_API;
 
-	class ToolLauncher : public QMainWindow
+class ToolLauncher : public QMainWindow
+{
+	friend class ToolLauncher_API;
+
+	Q_OBJECT
+
+public:
+	explicit ToolLauncher(QWidget *parent = 0);
+	~ToolLauncher();
+
+Q_SIGNALS:
+	void calibrationDone(float gain_ch1, float gain_ch2);
+	void dacCalibrationDone(float dacA_vlsb, float dacB_vlsb);
+
+private Q_SLOTS:
+	void on_btnOscilloscope_clicked();
+	void on_btnSignalGenerator_clicked();
+	void on_btnDMM_clicked();
+	void on_btnPowerControl_clicked();
+	void on_btnLogicAnalyzer_clicked();
+	void on_btnPatternGenerator_clicked();
+	void on_btnNetworkAnalyzer_clicked();
+	void on_btnHome_clicked();
+	void setButtonBackground(bool on);
+
+	void on_btnConnect_clicked(bool pressed);
+
+	void device_btn_clicked(bool pressed);
+	void addRemoteContext();
+	void destroyPopup();
+
+	void enableCalibTools(float gain_ch1, float gain_ch2);
+	void enableDacBasedTools(float dacA_vlsb, float dacB_vlsb);
+
+	void hasText();
+
+	void on_btnDigitalIO_clicked();
+private:
+	Ui::ToolLauncher *ui;
+	struct iio_context *ctx;
+
+	QVector<QPair<QWidget, Ui::Device> *> devices;
+
+	DMM *dmm;
+	PowerController *power_control;
+	SignalGenerator *signal_generator;
+	Oscilloscope *oscilloscope;
+	LogicAnalyzer *logic_analyzer;
+	DigitalIO *dio;
+	DIOManager *dioManager;
+	PatternGenerator *pattern_generator;
+	NetworkAnalyzer *network_analyzer;
+	QWidget *current;
+
+	Filter *filter;
+	ToolLauncher_API *tl_api;
+
+	QJSEngine js_engine;
+	QString js_cmd;
+	QSocketNotifier notifier;
+	QString previousIp;
+
+	void swapMenu(QWidget *menu);
+	void destroyContext();
+	bool loadDecoders(QString path);
+	bool switchContext(const QString& uri);
+	void resetStylesheets();
+	void calibrate();
+	void checkIp(const QString& ip);
+	Q_INVOKABLE QPushButton *addContext(const QString& hostname);
+
+	static void apply_m2k_fixes(struct iio_context *ctx);
+};
+
+class ToolLauncher_API: public ApiObject
+{
+	Q_OBJECT
+
+	Q_PROPERTY(bool menu_opened READ menu_opened WRITE open_menu
+	           STORED false);
+
+	Q_PROPERTY(bool hidden READ hidden WRITE hide STORED false);
+
+	Q_PROPERTY(QString previous_ip READ getPreviousIp WRITE addIp
+	           SCRIPTABLE false);
+
+	Q_PROPERTY(bool maximized READ maximized WRITE setMaximized);
+
+public:
+	explicit ToolLauncher_API(ToolLauncher *tl) :
+		ApiObject(TOOL_LAUNCHER), tl(tl) {}
+	~ToolLauncher_API() {}
+
+	bool menu_opened() const;
+	void open_menu(bool open);
+
+	bool hidden() const;
+	void hide(bool hide);
+
+	const QString& getPreviousIp()
 	{
-		friend class ToolLauncher_API;
+		return tl->previousIp;
+	}
+	void addIp(const QString& ip);
 
-		Q_OBJECT
-
-	public:
-		explicit ToolLauncher(QWidget *parent = 0);
-		~ToolLauncher();
-
-	Q_SIGNALS:
-		void calibrationDone(float gain_ch1, float gain_ch2);
-		void dacCalibrationDone(float dacA_vlsb, float dacB_vlsb);
-
-	private Q_SLOTS:
-		void on_btnOscilloscope_clicked();
-		void on_btnSignalGenerator_clicked();
-		void on_btnDMM_clicked();
-		void on_btnPowerControl_clicked();
-		void on_btnLogicAnalyzer_clicked();
-		void on_btnPatternGenerator_clicked();
-		void on_btnNetworkAnalyzer_clicked();
-		void on_btnHome_clicked();
-		void setButtonBackground(bool on);
-
-		void on_btnConnect_clicked(bool pressed);
-
-		void device_btn_clicked(bool pressed);
-		void addRemoteContext();
-		void destroyPopup();
-
-		void enableCalibTools(float gain_ch1, float gain_ch2);
-		void enableDacBasedTools(float dacA_vlsb, float dacB_vlsb);
-
-		void hasText();
-
-		void on_btnDigitalIO_clicked();
-	private:
-		Ui::ToolLauncher *ui;
-		struct iio_context *ctx;
-
-		QVector<QPair<QWidget, Ui::Device> *> devices;
-
-		DMM *dmm;
-		PowerController *power_control;
-		SignalGenerator *signal_generator;
-		Oscilloscope *oscilloscope;
-		LogicAnalyzer *logic_analyzer;
-		DigitalIO *dio;
-		DIOManager *dioManager;
-		PatternGenerator *pattern_generator;
-		NetworkAnalyzer *network_analyzer;
-		QWidget *current;
-
-		Filter *filter;
-		ToolLauncher_API *tl_api;
-
-		QJSEngine js_engine;
-		QString js_cmd;
-		QSocketNotifier notifier;
-		QString previousIp;
-
-		void swapMenu(QWidget *menu);
-		void destroyContext();
-		bool loadDecoders(QString path);
-		bool switchContext(const QString &uri);
-		void resetStylesheets();
-		void calibrate();
-		void checkIp(const QString& ip);
-		Q_INVOKABLE QPushButton * addContext(const QString& hostname);
-
-		static void apply_m2k_fixes(struct iio_context *ctx);
-	};
-
-	class ToolLauncher_API: public ApiObject
+	bool maximized()
 	{
-		Q_OBJECT
-
-		Q_PROPERTY(bool menu_opened READ menu_opened WRITE open_menu
-				STORED false);
-
-		Q_PROPERTY(bool hidden READ hidden WRITE hide STORED false);
-
-		Q_PROPERTY(QString previous_ip READ getPreviousIp WRITE addIp
-				SCRIPTABLE false);
-
-		Q_PROPERTY(bool maximized READ maximized WRITE setMaximized);
-
-	public:
-		explicit ToolLauncher_API(ToolLauncher *tl) :
-			ApiObject(TOOL_LAUNCHER), tl(tl) {}
-		~ToolLauncher_API() {}
-
-		bool menu_opened() const;
-		void open_menu(bool open);
-
-		bool hidden() const;
-		void hide(bool hide);
-
-		const QString& getPreviousIp() { return tl->previousIp; }
-		void addIp(const QString& ip);
-
-		bool maximized() { return tl->isMaximized(); }
-		void setMaximized(bool m) {
-			if (m)
-				tl->showMaximized();
-			else
-				tl->showNormal();
+		return tl->isMaximized();
+	}
+	void setMaximized(bool m)
+	{
+		if (m) {
+			tl->showMaximized();
+		} else {
+			tl->showNormal();
 		}
+	}
 
-		Q_INVOKABLE bool connect(const QString& uri);
+	Q_INVOKABLE bool connect(const QString& uri);
 
-	private:
-		ToolLauncher *tl;
-	};
+private:
+	ToolLauncher *tl;
+};
 }
 
 #endif // M2K_TOOL_LAUNCHER_H

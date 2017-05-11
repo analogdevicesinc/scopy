@@ -55,12 +55,14 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	setWindowTitle(QString("Scopy - ") + QString(SCOPY_VERSION_GIT));
 
 	struct iio_scan_context *scan_ctx = iio_create_scan_context("usb", 0);
+
 	if (!scan_ctx) {
 		std::cerr << "Unable to create scan context!" << std::endl;
 		return;
 	}
 
 	ssize_t ret = iio_scan_context_get_info_list(scan_ctx, &info);
+
 	if (ret < 0) {
 		std::cerr << "Unable to scan!" << std::endl;
 		return;
@@ -71,8 +73,9 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	for (unsigned int i = 0; i < nb_contexts; i++) {
 		const char *uri = iio_context_info_get_uri(info[i]);
 
-		if (!QString(uri).startsWith("usb:"))
+		if (!QString(uri).startsWith("usb:")) {
 			continue;
+		}
 
 		addContext(QString(uri));
 	}
@@ -85,9 +88,9 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	ui->menu->setMinimumSize(ui->menu->sizeHint());
 
 	connect(this, SIGNAL(calibrationDone(float, float)),
-			this, SLOT(enableCalibTools(float, float)));
+		this, SLOT(enableCalibTools(float, float)));
 	connect(this, SIGNAL(dacCalibrationDone(float, float)),
-			this, SLOT(enableDacBasedTools(float, float)));
+		this, SLOT(enableDacBasedTools(float, float)));
 	connect(ui->btnAdd, SIGNAL(clicked()), this, SLOT(addRemoteContext()));
 
 	tl_api->load();
@@ -96,19 +99,19 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	ui->menu->toggleMenu(true);
 
 	connect(ui->btnOscilloscope, SIGNAL(toggled(bool)), this,
-			SLOT(setButtonBackground(bool)));
+		SLOT(setButtonBackground(bool)));
 	connect(ui->btnSignalGenerator, SIGNAL(toggled(bool)), this,
-			SLOT(setButtonBackground(bool)));
+		SLOT(setButtonBackground(bool)));
 	connect(ui->btnDMM, SIGNAL(toggled(bool)), this,
-			SLOT(setButtonBackground(bool)));
+		SLOT(setButtonBackground(bool)));
 	connect(ui->btnPowerControl, SIGNAL(toggled(bool)), this,
-			SLOT(setButtonBackground(bool)));
+		SLOT(setButtonBackground(bool)));
 	connect(ui->btnLogicAnalyzer, SIGNAL(toggled(bool)), this,
-			SLOT(setButtonBackground(bool)));
+		SLOT(setButtonBackground(bool)));
 	connect(ui->btnPatternGenerator, SIGNAL(toggled(bool)), this,
-			SLOT(setButtonBackground(bool)));
+		SLOT(setButtonBackground(bool)));
 	connect(ui->btnNetworkAnalyzer, SIGNAL(toggled(bool)), this,
-			SLOT(setButtonBackground(bool)));
+		SLOT(setButtonBackground(bool)));
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
 	js_engine.installExtensions(QJSEngine::ConsoleExtension);
@@ -122,8 +125,10 @@ ToolLauncher::~ToolLauncher()
 {
 	destroyContext();
 
-	for (auto it = devices.begin(); it != devices.end(); ++it)
+	for (auto it = devices.begin(); it != devices.end(); ++it) {
 		delete *it;
+	}
+
 	devices.clear();
 
 	tl_api->save();
@@ -138,7 +143,7 @@ void ToolLauncher::destroyPopup()
 	popup->deleteLater();
 }
 
-QPushButton * ToolLauncher::addContext(const QString& uri)
+QPushButton *ToolLauncher::addContext(const QString& uri)
 {
 	auto pair = new QPair<QWidget, Ui::Device>;
 	pair->second.setupUi(&pair->first);
@@ -148,7 +153,7 @@ QPushButton * ToolLauncher::addContext(const QString& uri)
 	ui->devicesList->addWidget(&pair->first);
 
 	connect(pair->second.btn, SIGNAL(clicked(bool)),
-			this, SLOT(device_btn_clicked(bool)));
+	        this, SLOT(device_btn_clicked(bool)));
 
 	pair->second.btn->setProperty("uri", QVariant(uri));
 	devices.append(pair);
@@ -169,10 +174,10 @@ void ToolLauncher::addRemoteContext()
 
 	ConnectDialog *dialog = new ConnectDialog(popup);
 	connect(dialog, &ConnectDialog::newContext,
-			[=](const QString& uri) {
-				addContext(uri);
-				popup->close();
-			});
+	[=](const QString& uri) {
+		addContext(uri);
+		popup->close();
+	});
 }
 
 void ToolLauncher::swapMenu(QWidget *menu)
@@ -267,11 +272,13 @@ void adiscope::ToolLauncher::device_btn_clicked(bool pressed)
 {
 	if (pressed) {
 		for (auto it = devices.begin(); it != devices.end(); ++it)
-			if ((*it)->second.btn != sender())
+			if ((*it)->second.btn != sender()) {
 				(*it)->second.btn->setChecked(false);
+			}
 
-		if (ui->btnConnect->property("connected").toBool())
+		if (ui->btnConnect->property("connected").toBool()) {
 			ui->btnConnect->click();
+		}
 	} else {
 		destroyContext();
 	}
@@ -298,8 +305,9 @@ void adiscope::ToolLauncher::on_btnConnect_clicked(bool pressed)
 		}
 	}
 
-	if (!btn)
+	if (!btn) {
 		throw std::runtime_error("No enabled device!");
+	}
 
 	QString uri = btn->property("uri").toString();
 
@@ -307,8 +315,9 @@ void adiscope::ToolLauncher::on_btnConnect_clicked(bool pressed)
 		setDynamicProperty(ui->btnConnect, "connected", true);
 		setDynamicProperty(btn, "connected", true);
 
-		if (label)
+		if (label) {
 			label->setText(filter->hw_name());
+		}
 	} else {
 		setDynamicProperty(ui->btnConnect, "failed", true);
 		setDynamicProperty(btn, "failed", true);
@@ -351,17 +360,17 @@ void adiscope::ToolLauncher::destroyContext()
 		oscilloscope = nullptr;
 	}
 
-	if(logic_analyzer) {
+	if (logic_analyzer) {
 		delete logic_analyzer;
 		logic_analyzer = nullptr;
 	}
 
-	if(pattern_generator) {
+	if (pattern_generator) {
 		delete pattern_generator;
 		pattern_generator = nullptr;
 	}
 
-	if(network_analyzer) {
+	if (network_analyzer) {
 		delete network_analyzer;
 		network_analyzer = nullptr;
 	}
@@ -380,26 +389,25 @@ void adiscope::ToolLauncher::destroyContext()
 bool ToolLauncher::loadDecoders(QString path)
 {
 	static bool srd_loaded = false;
-	if(srd_loaded)
-	{
+
+	if (srd_loaded) {
 		srd_exit();
 	}
 
 	if (srd_init(path.toStdString().c_str()) != SRD_OK) {
 		qDebug() << "ERROR: libsigrokdecode init failed.";
 		return false;
-	}
-	else
-	{
+	} else {
 		srd_loaded = true;
 		/* Load the protocol decoders */
 		srd_decoder_load_all();
 		auto decoder = srd_decoder_get_by_id("parallel");
-		if(decoder == nullptr)
-		{
+
+		if (decoder == nullptr) {
 			return false;
 		}
 	}
+
 	return true;
 }
 
@@ -431,8 +439,8 @@ void adiscope::ToolLauncher::enableCalibTools(float gain_ch1, float gain_ch2)
 {
 	if (filter->compatible(TOOL_OSCILLOSCOPE)) {
 		oscilloscope = new Oscilloscope(ctx, filter,
-				ui->stopOscilloscope, &js_engine,
-				gain_ch1, gain_ch2, this);
+						ui->stopOscilloscope, &js_engine,
+						gain_ch1, gain_ch2, this);
 
 		ui->oscilloscope->setEnabled(true);
 	}
@@ -445,16 +453,18 @@ void adiscope::ToolLauncher::enableCalibTools(float gain_ch1, float gain_ch2)
 }
 
 void adiscope::ToolLauncher::enableDacBasedTools(float dacA_vlsb,
-	float dacB_vlsb)
+                float dacB_vlsb)
 {
 	if (filter->compatible(TOOL_SIGNAL_GENERATOR)) {
 		signal_generator = new SignalGenerator(ctx, filter,
-				ui->stopSignalGenerator, &js_engine, this);
+							ui->stopSignalGenerator, &js_engine, this);
 
 		struct iio_device *dev = iio_context_find_device(ctx, "m2k-dac-a");
+
 		if (dev) {
 			struct iio_channel *chn = iio_device_find_channel(dev,
-					"voltage0", true);
+							"voltage0", true);
+
 			if (chn)
 				signal_generator->set_vlsb_of_channel(
 					iio_channel_get_id(chn),
@@ -462,9 +472,11 @@ void adiscope::ToolLauncher::enableDacBasedTools(float dacA_vlsb,
 		}
 
 		dev = iio_context_find_device(ctx, "m2k-dac-b");
+
 		if (dev) {
 			struct iio_channel *chn = iio_device_find_channel(dev,
-					"voltage0", true);
+						"voltage0", true);
+
 			if (chn)
 				signal_generator->set_vlsb_of_channel(
 					iio_channel_get_id(chn),
@@ -475,36 +487,41 @@ void adiscope::ToolLauncher::enableDacBasedTools(float dacA_vlsb,
 	}
 }
 
-bool adiscope::ToolLauncher::switchContext(const QString &uri)
+bool adiscope::ToolLauncher::switchContext(const QString& uri)
 {
 	destroyContext();
 
-	if (uri.startsWith("ip:"))
+	if (uri.startsWith("ip:")) {
 		previousIp = uri.mid(3);
+	}
 
 	ctx = iio_create_context_from_uri(uri.toStdString().c_str());
-	if (!ctx)
+
+	if (!ctx) {
 		return false;
+	}
 
 	filter = new Filter(ctx);
 
-	if (filter->hw_name().compare("M2K") == 0)
+	if (filter->hw_name().compare("M2K") == 0) {
 		apply_m2k_fixes(ctx);
+	}
 
 
-	if (filter->compatible(TOOL_PATTERN_GENERATOR) || filter->compatible(TOOL_DIGITALIO))
-	{
+	if (filter->compatible(TOOL_PATTERN_GENERATOR)
+	    || filter->compatible(TOOL_DIGITALIO)) {
 		dioManager = new DIOManager(ctx,filter);
 
 	}
 
-	if (filter->compatible(TOOL_LOGIC_ANALYZER) || filter->compatible(TOOL_PATTERN_GENERATOR))
-	{
-		bool success = loadDecoders(QCoreApplication::applicationDirPath() + "/decoders");
-		if(!success)
-		{
+	if (filter->compatible(TOOL_LOGIC_ANALYZER)
+	    || filter->compatible(TOOL_PATTERN_GENERATOR)) {
+		bool success = loadDecoders(QCoreApplication::applicationDirPath() +
+					"/decoders");
+
+		if (!success) {
 			QMessageBox *error = new QMessageBox(this);
-		//	error->setWindowFlags(Qt::FramelessWindowHint);
+			//	error->setWindowFlags(Qt::FramelessWindowHint);
 			error->setText("There was a problem initializing libsigrokdecode. Some features may be missing");
 			QFile file(":/stylesheets/stylesheets/dialogbox.qss");
 			file.open(QFile::ReadOnly);
@@ -523,27 +540,27 @@ bool adiscope::ToolLauncher::switchContext(const QString &uri)
 
 	if (filter->compatible(TOOL_POWER_CONTROLLER)) {
 		power_control = new PowerController(ctx,
-				ui->stopPowerControl, &js_engine, this);
+		                                    ui->stopPowerControl, &js_engine, this);
 		ui->powerControl->setEnabled(true);
 	}
 
 	if (filter->compatible(TOOL_LOGIC_ANALYZER)) {
 		logic_analyzer = new LogicAnalyzer(ctx, filter,
-				ui->stopLogicAnalyzer, &js_engine, this);
+		                                   ui->stopLogicAnalyzer, &js_engine, this);
 		ui->logicAnalyzer->setEnabled(true);
 	}
 
 
 	if (filter->compatible((TOOL_PATTERN_GENERATOR))) {
-		pattern_generator = new PatternGenerator (ctx, filter,
-				ui->stopPatternGenerator, &js_engine,dioManager, this);
+		pattern_generator = new PatternGenerator(ctx, filter,
+		                ui->stopPatternGenerator, &js_engine,dioManager, this);
 		ui->patternGenerator->setEnabled(true);
 	}
 
 
 	if (filter->compatible((TOOL_NETWORK_ANALYZER))) {
 		network_analyzer = new NetworkAnalyzer(ctx, filter,
-				ui->stopNetworkAnalyzer, &js_engine, this);
+		                                       ui->stopNetworkAnalyzer, &js_engine, this);
 		ui->networkAnalyzer->setEnabled(true);
 	}
 
@@ -565,10 +582,12 @@ void ToolLauncher::hasText()
 
 	if (nb_open_braces == nb_closing_braces) {
 		QJSValue val = js_engine.evaluate(js_cmd);
-		if (val.isError())
+
+		if (val.isError()) {
 			out << "Exception:" << val.toString() << endl;
-		else if (!val.isUndefined())
+		} else if (!val.isUndefined()) {
 			out << val.toString() << endl;
+		}
 
 		js_cmd.clear();
 		out << "scopy > ";
@@ -577,6 +596,7 @@ void ToolLauncher::hasText()
 
 		out << "> ";
 	}
+
 	out.flush();
 }
 
@@ -587,8 +607,8 @@ void ToolLauncher::checkIp(const QString& ip)
 
 		QString uri = "ip:" + ip;
 		QMetaObject::invokeMethod(this, "addContext",
-				Qt::QueuedConnection,
-				Q_ARG(const QString&, uri));
+					Qt::QueuedConnection,
+					Q_ARG(const QString&, uri));
 	} else {
 		previousIp = "";
 	}
@@ -619,15 +639,17 @@ bool ToolLauncher_API::connect(const QString& uri)
 	QPushButton *btn = nullptr;
 
 	for (auto it = tl->devices.begin();
-			!btn && it != tl->devices.end(); ++it) {
+	     !btn && it != tl->devices.end(); ++it) {
 		QPushButton *tmp = (*it)->second.btn;
 
-		if (tmp->property("uri").toString().compare(uri) == 0)
+		if (tmp->property("uri").toString().compare(uri) == 0) {
 			btn = tmp;
+		}
 	}
 
-	if (!btn)
+	if (!btn) {
 		btn = tl->addContext(uri);
+	}
 
 	btn->click();
 	tl->ui->btnConnect->click();
@@ -635,6 +657,7 @@ bool ToolLauncher_API::connect(const QString& uri)
 
 void ToolLauncher_API::addIp(const QString& ip)
 {
-	if (!ip.isEmpty())
+	if (!ip.isEmpty()) {
 		QtConcurrent::run(std::bind(&ToolLauncher::checkIp, tl, ip));
+	}
 }
