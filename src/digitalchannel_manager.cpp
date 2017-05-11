@@ -157,7 +157,7 @@ QColor Channel::getBgcolor() const
 	return bgcolor;
 }
 
-void Channel::setBgcolor(const QColor &value)
+void Channel::setBgcolor(const QColor& value)
 {
 	bgcolor = value;
 }
@@ -167,7 +167,7 @@ QColor Channel::getEdgecolor() const
 	return edgecolor;
 }
 
-void Channel::setEdgecolor(const QColor &value)
+void Channel::setEdgecolor(const QColor& value)
 {
 	edgecolor = value;
 }
@@ -177,7 +177,7 @@ QColor Channel::getHighcolor() const
 	return highcolor;
 }
 
-void Channel::setHighcolor(const QColor &value)
+void Channel::setHighcolor(const QColor& value)
 {
 	highcolor = value;
 }
@@ -187,7 +187,7 @@ QColor Channel::getLowcolor() const
 	return lowcolor;
 }
 
-void Channel::setLowcolor(const QColor &value)
+void Channel::setLowcolor(const QColor& value)
 {
 	lowcolor = value;
 }
@@ -256,7 +256,7 @@ QColor ChannelGroup::getBgcolor() const
 	return bgcolor;
 }
 
-void ChannelGroup::setBgcolor(const QColor &value)
+void ChannelGroup::setBgcolor(const QColor& value)
 {
 	bgcolor = value;
 }
@@ -295,7 +295,7 @@ QColor ChannelGroup::getHighcolor() const
 	return highcolor;
 }
 
-void ChannelGroup::setHighcolor(const QColor &value)
+void ChannelGroup::setHighcolor(const QColor& value)
 {
 	highcolor = value;
 }
@@ -305,7 +305,7 @@ QColor ChannelGroup::getLowcolor() const
 	return lowcolor;
 }
 
-void ChannelGroup::setLowcolor(const QColor &value)
+void ChannelGroup::setLowcolor(const QColor& value)
 {
 	lowcolor = value;
 }
@@ -315,7 +315,7 @@ QColor ChannelGroup::getEdgecolor() const
 	return edgecolor;
 }
 
-void ChannelGroup::setEdgecolor(const QColor &value)
+void ChannelGroup::setEdgecolor(const QColor& value)
 {
 	edgecolor = value;
 }

@@ -71,13 +71,13 @@ public:
 	std::string get_label();
 	void set_label(std::string);
 	QColor getBgcolor() const;
-	void setBgcolor(const QColor &value);
+	void setBgcolor(const QColor& value);
 	QColor getEdgecolor() const;
-	void setEdgecolor(const QColor &value);
+	void setEdgecolor(const QColor& value);
 	QColor getHighcolor() const;
-	void setHighcolor(const QColor &value);
+	void setHighcolor(const QColor& value);
 	QColor getLowcolor() const;
-	void setLowcolor(const QColor &value);
+	void setLowcolor(const QColor& value);
 };
 
 class ChannelUI :  public QWidget
@@ -129,13 +129,13 @@ public:
 	virtual void group(bool value);
 	virtual void enable(bool value);
 	QColor getBgcolor() const;
-	void setBgcolor(const QColor &value);
+	void setBgcolor(const QColor& value);
 	QColor getHighcolor() const;
-	void setHighcolor(const QColor &value);
+	void setHighcolor(const QColor& value);
 	QColor getLowcolor() const;
-	void setLowcolor(const QColor &value);
+	void setLowcolor(const QColor& value);
 	QColor getEdgecolor() const;
-	void setEdgecolor(const QColor &value);
+	void setEdgecolor(const QColor& value);
 };
 
 
