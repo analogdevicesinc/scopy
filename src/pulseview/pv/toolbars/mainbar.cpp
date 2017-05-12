@@ -155,8 +155,8 @@ MainBar::MainBar(Session &session, MainWindow &main_window) :
 
 	menu_button_.setMenu(menu);
 	menu_button_.setPopupMode(QToolButton::InstantPopup);
-	menu_button_.setIcon(QIcon::fromTheme("menu",
-		QIcon(":/icons/menu.svg")));
+/*	menu_button_.setIcon(QIcon::fromTheme("menu",
+		QIcon(":/icons/menu.svg"))); */
 
 	// Setup the toolbar
     addAction(main_window.action_view_zoom_in());
