@@ -1816,7 +1816,7 @@ void LogicAnalyzerChannelManagerUI::remove()
 	update_ui();
 }
 
-void LogicAnalyzerChannelManagerUI::on_groupSplit_clicked()
+void LogicAnalyzerChannelManagerUI::groupSplit_clicked()
 {
 	std::vector<int> selection = chm->get_selected_indexes();
 
@@ -1836,7 +1836,7 @@ void LogicAnalyzerChannelManagerUI::on_groupSplit_clicked()
 	update_ui();
 }
 
-void LogicAnalyzerChannelManagerUI::on_hideInactive_clicked(bool hide)
+void LogicAnalyzerChannelManagerUI::hideInactive_clicked(bool hide)
 {
 	hidden = hide;
 	update_ui();

@@ -309,8 +309,8 @@ public Q_SLOTS:
 	void chThicknessChanged(QString text);
 
 private Q_SLOTS:
-	void on_groupSplit_clicked();
-	void on_hideInactive_clicked(bool hide);
+	void groupSplit_clicked();
+	void hideInactive_clicked(bool hide);
 	void chmRangeChanged(int min, int max);
 	void colorChanged(QColor color);
 private:

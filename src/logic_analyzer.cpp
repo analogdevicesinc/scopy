@@ -356,9 +356,9 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	chm_ui->setVisible(true);
 
 	connect(ui->btnGroupChannels, SIGNAL(pressed()),
-	        chm_ui, SLOT(on_groupSplit_clicked()));
+	        chm_ui, SLOT(groupSplit_clicked()));
 	connect(ui->btnShowChannels, SIGNAL(clicked(bool)),
-	        chm_ui, SLOT(on_hideInactive_clicked(bool)));
+	        chm_ui, SLOT(hideInactive_clicked(bool)));
 	connect(ui->btnShowChannels, SIGNAL(clicked(bool)),
 	        this, SLOT(on_btnShowChannelsClicked(bool)));
 	connect(chm_ui, SIGNAL(widthChanged(int)),
