@@ -396,20 +396,26 @@ void adiscope::ToolLauncher::device_btn_clicked(bool pressed)
 			ui->btnConnect->click();
 		}
 	} else {
-		destroyContext();
-		search_timer->start(TIMER_TIMEOUT_MS);
+		disconnect();
 	}
 
 	resetStylesheets();
 	ui->btnConnect->setEnabled(pressed);
 }
 
-void adiscope::ToolLauncher::on_btnConnect_clicked(bool pressed)
+void adiscope::ToolLauncher::disconnect()
 {
 	if (ctx) {
 		destroyContext();
 		resetStylesheets();
 		search_timer->start(TIMER_TIMEOUT_MS);
+	}
+}
+
+void adiscope::ToolLauncher::on_btnConnect_clicked(bool pressed)
+{
+	if (ctx) {
+		disconnect();
 		return;
 	}
 
@@ -795,6 +801,11 @@ bool ToolLauncher_API::connect(const QString& uri)
 		QThread::msleep(10);
 	} while (!done);
 	return did_connect;
+}
+
+void ToolLauncher_API::disconnect()
+{
+	tl->disconnect();
 }
 
 void ToolLauncher_API::addIp(const QString& ip)

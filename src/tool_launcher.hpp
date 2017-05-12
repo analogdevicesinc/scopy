@@ -129,6 +129,7 @@ private:
 	void resetStylesheets();
 	void calibrate();
 	void checkIp(const QString& ip);
+	void disconnect();
 	Q_INVOKABLE QPushButton *addContext(const QString& hostname);
 
 	static void apply_m2k_fixes(struct iio_context *ctx);
@@ -178,6 +179,7 @@ public:
 	}
 
 	Q_INVOKABLE bool connect(const QString& uri);
+	Q_INVOKABLE void disconnect();
 
 private:
 	ToolLauncher *tl;
