@@ -713,13 +713,15 @@ TriggerSettings::TriggerMode TriggerSettings::triggerMode() const
 	return ui->btnAuto->isChecked() ? AUTO : NORMAL;
 }
 
-void TriggerSettings::updateHwVoltLevels()
+void TriggerSettings::updateHwVoltLevels(int chnIdx)
 {
-	triggA_level_write_hardware(ui_triggerAlevel->value());
-	triggB_level_write_hardware(ui_triggerBlevel->value());
-
-	onSpinboxTriggerAhystChanged(hystA_last_val);
-	onSpinboxTriggerBhystChanged(hystB_last_val);
+	if (chnIdx == 0) {
+		triggA_level_write_hardware(ui_triggerAlevel->value());
+		onSpinboxTriggerAhystChanged(hystA_last_val);
+	} else if (chnIdx == 1) {
+		triggB_level_write_hardware(ui_triggerBlevel->value());
+		onSpinboxTriggerBhystChanged(hystB_last_val);
+	}
 }
 
 void TriggerSettings::setTriggerARange(const QPair<double, double>& range)

@@ -84,7 +84,7 @@ namespace adiscope {
 		void setTriggerARange(const QPair<double, double>&);
 		void setTriggerBRange(const QPair<double, double>&);
 
-		void updateHwVoltLevels();
+		void updateHwVoltLevels(int chnIdx);
 
 	private Q_SLOTS:
 		void on_cmb_trigg_source_currentIndexChanged(int);

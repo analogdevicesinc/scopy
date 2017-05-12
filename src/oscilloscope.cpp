@@ -1186,7 +1186,7 @@ void adiscope::Oscilloscope::onVertScaleValueChanged(double value)
 
 	updateGainMode();
 	setChannelHwOffset(current_channel, voltsPosition->value());
-	trigger_settings.updateHwVoltLevels();
+	trigger_settings.updateHwVoltLevels(current_channel);
 
 }
 
@@ -1267,6 +1267,8 @@ void adiscope::Oscilloscope::onVertOffsetValueChanged(double value)
 
 		updateGainMode();
 		setChannelHwOffset(current_channel, value);
+
+		trigger_settings.updateHwVoltLevels(current_channel);
 
 		if (ui->pushButtonRunStop->isChecked())
 			toggle_blockchain_flow(true);
@@ -2051,7 +2053,7 @@ void Oscilloscope::setGainMode(uint chnIdx, bool high_gain)
 					adc_samp_conv_block);
 	block->setHardwareGain(chnIdx, hw_gain);
 	adc.setChannelHwGain(chnIdx, hw_gain);
-	trigger_settings.updateHwVoltLevels();
+	trigger_settings.updateHwVoltLevels(chnIdx);
 }
 
 void Oscilloscope::setChannelHwOffset(uint chnIdx, double offset)
