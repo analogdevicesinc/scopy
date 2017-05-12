@@ -429,7 +429,8 @@ void adiscope::ToolLauncher::on_btnConnect_clicked(bool pressed)
 
 	QString uri = btn->property("uri").toString();
 
-	if (switchContext(uri)) {
+	bool success = switchContext(uri);
+	if (success) {
 		setDynamicProperty(ui->btnConnect, "connected", true);
 		setDynamicProperty(btn, "connected", true);
 		search_timer->stop();
@@ -441,6 +442,8 @@ void adiscope::ToolLauncher::on_btnConnect_clicked(bool pressed)
 		setDynamicProperty(ui->btnConnect, "failed", true);
 		setDynamicProperty(btn, "failed", true);
 	}
+
+	Q_EMIT connectionDone(success);
 }
 
 void adiscope::ToolLauncher::destroyContext()
@@ -757,6 +760,8 @@ void ToolLauncher_API::hide(bool hide)
 bool ToolLauncher_API::connect(const QString& uri)
 {
 	QPushButton *btn = nullptr;
+	bool did_connect = false;
+	bool done = false;
 
 	for (auto it = tl->devices.begin();
 	     !btn && it != tl->devices.end(); ++it) {
@@ -771,8 +776,25 @@ bool ToolLauncher_API::connect(const QString& uri)
 		btn = tl->addContext(uri);
 	}
 
+	tl->connect(tl, &ToolLauncher::connectionDone,
+			[&](bool success) {
+		if (!success)
+			done = true;
+	});
+
+	tl->connect(tl, &ToolLauncher::calibrationDone,
+			[&](float, float) {
+		did_connect = true;
+		done = true;
+	});
+
 	btn->click();
 	tl->ui->btnConnect->click();
+
+	do {
+		QThread::msleep(10);
+	} while (!done);
+	return did_connect;
 }
 
 void ToolLauncher_API::addIp(const QString& ip)

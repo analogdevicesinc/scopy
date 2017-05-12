@@ -62,6 +62,7 @@ public:
 	~ToolLauncher();
 
 Q_SIGNALS:
+	void connectionDone(bool success);
 	void calibrationDone(float gain_ch1, float gain_ch2);
 	void dacCalibrationDone(float dacA_vlsb, float dacB_vlsb);
 
