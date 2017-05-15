@@ -273,7 +273,7 @@ QLabel:disabled
              <number>0</number>
             </property>
             <item>
-             <widget class="QPushButton" name="btnEnableChannel">
+             <widget class="adiscope::SmallOnOffSwitch" name="btnEnableChannel">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -291,26 +291,6 @@ QLabel:disabled
                 <width>40</width>
                 <height>20</height>
                </size>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">QPushButton {
-  min-height: 20px;
-  max-height: 20px;
-  min-width: 40px;
-  max-width: 40px;
-}
-
-QPushButton:checked {
-  border-image: url(:/icons/logic_switch_on.svg);
-}
-QPushButton:!checked {
-  border-image: url(:/icons/logic_switch_off.svg);
-}
-
-</string>
-              </property>
-              <property name="text">
-               <string/>
               </property>
               <property name="checkable">
                <bool>true</bool>
@@ -1824,6 +1804,13 @@ background:#4a64ff;
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>adiscope::SmallOnOffSwitch</class>
+   <extends>QPushButton</extends>
+   <header>smallOnOffSwitch.hpp</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../resources/resources.qrc"/>
  </resources>

@@ -84,8 +84,6 @@
         <file>icons/measurements/period.svg</file>
         <file>icons/measurements/rise_time.svg</file>
         <file>icons/measurements/rms.svg</file>
-        <file>icons/logic_switch_off.svg</file>
-        <file>icons/logic_switch_on.svg</file>
         <file>icons/setup3_unchecked.svg</file>
         <file>icons/setup3_checked.svg</file>
         <file>icons/setup3_unchecked_hover.svg</file>
