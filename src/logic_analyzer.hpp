@@ -71,6 +71,7 @@ class LogicAnalyzer_API;
 class LogicAnalyzer : public QWidget
 {
 	friend class LogicAnalyzer_API;
+	friend class ToolLauncher_API;
 
 	Q_OBJECT
 

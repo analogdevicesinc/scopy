@@ -33,6 +33,7 @@
 #include <QTimer>
 #include <QFutureWatcher>
 #include <QFuture>
+#include <QSettings>
 
 #include <iio.h>
 
@@ -100,7 +101,7 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 
 	tl_api->setObjectName(QString::fromStdString(Filter::tool_name(
 			TOOL_LAUNCHER)));
-	tl_api->load();
+	tl_api->ApiObject::load();
 
 	/* Show a smooth opening when the app starts */
 	ui->menu->toggleMenu(true);
@@ -247,7 +248,7 @@ ToolLauncher::~ToolLauncher()
 	delete search_timer;
 	delete watcher;
 
-	tl_api->save();
+	tl_api->ApiObject::save();
 	delete tl_api;
 	delete ui;
 }
@@ -813,4 +814,52 @@ void ToolLauncher_API::addIp(const QString& ip)
 	if (!ip.isEmpty()) {
 		QtConcurrent::run(std::bind(&ToolLauncher::checkIp, tl, ip));
 	}
+}
+
+void ToolLauncher_API::load(const QString& file)
+{
+	QSettings settings(file, QSettings::IniFormat);
+
+	this->ApiObject::load(settings);
+
+	if (tl->oscilloscope)
+		tl->oscilloscope->osc_api->load(settings);
+	if (tl->dmm)
+		tl->dmm->dmm_api->load(settings);
+	if (tl->power_control)
+		tl->power_control->pw_api->load(settings);
+	if (tl->signal_generator)
+		tl->signal_generator->sg_api->load(settings);
+	if (tl->logic_analyzer)
+		tl->logic_analyzer->la_api->load(settings);
+	if (tl->dio)
+		tl->dio->dio_api->load(settings);
+	if (tl->pattern_generator)
+		tl->pattern_generator->pg_api->load(settings);
+	if (tl->network_analyzer)
+		tl->network_analyzer->net_api->load(settings);
+}
+
+void ToolLauncher_API::save(const QString& file)
+{
+	QSettings settings(file, QSettings::IniFormat);
+
+	this->ApiObject::save(settings);
+
+	if (tl->oscilloscope)
+		tl->oscilloscope->osc_api->save(settings);
+	if (tl->dmm)
+		tl->dmm->dmm_api->save(settings);
+	if (tl->power_control)
+		tl->power_control->pw_api->save(settings);
+	if (tl->signal_generator)
+		tl->signal_generator->sg_api->save(settings);
+	if (tl->logic_analyzer)
+		tl->logic_analyzer->la_api->save(settings);
+	if (tl->dio)
+		tl->dio->dio_api->save(settings);
+	if (tl->pattern_generator)
+		tl->pattern_generator->pg_api->save(settings);
+	if (tl->network_analyzer)
+		tl->network_analyzer->net_api->save(settings);
 }

@@ -89,6 +89,7 @@ class PatternGenerator_API;
 class PatternGenerator : public QWidget
 {
 	friend class PatternGenerator_API;
+	friend class ToolLauncher_API;
 
 	Q_OBJECT
 

@@ -48,6 +48,7 @@ namespace adiscope {
 	class NetworkAnalyzer : public QWidget
 	{
 		friend class NetworkAnalyzer_API;
+		friend class ToolLauncher_API;
 
 		Q_OBJECT
 

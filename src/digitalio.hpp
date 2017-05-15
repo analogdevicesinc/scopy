@@ -102,7 +102,11 @@ private Q_SLOTS:
 class DigitalIO : public QWidget
 {
 	friend class DigitalIO_API;
+	friend class ToolLauncher_API;
+
 	Q_OBJECT
+
+private:
 	Ui::DigitalIO *ui;
 	Filter *filt;
 	bool offline_mode;

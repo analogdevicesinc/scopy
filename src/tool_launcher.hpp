@@ -181,6 +181,9 @@ public:
 	Q_INVOKABLE bool connect(const QString& uri);
 	Q_INVOKABLE void disconnect();
 
+	Q_INVOKABLE void load(const QString& file);
+	Q_INVOKABLE void save(const QString& file);
+
 private:
 	ToolLauncher *tl;
 };

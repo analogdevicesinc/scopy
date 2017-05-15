@@ -46,6 +46,7 @@ namespace adiscope {
 	class PowerController : public QWidget
 	{
 		friend class PowerController_API;
+		friend class ToolLauncher_API;
 
 		Q_OBJECT
 

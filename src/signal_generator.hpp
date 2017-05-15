@@ -65,6 +65,7 @@ namespace adiscope {
 	class SignalGenerator : public QWidget
 	{
 		friend class SignalGenerator_API;
+		friend class ToolLauncher_API;
 
 		Q_OBJECT
 

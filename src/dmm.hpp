@@ -41,6 +41,7 @@ namespace adiscope {
 	class DMM : public QWidget
 	{
 		friend class DMM_API;
+		friend class ToolLauncher_API;
 
 		Q_OBJECT
 
@@ -82,6 +83,8 @@ namespace adiscope {
 
 	class DMM_API : public ApiObject
 	{
+		friend class ToolLauncher_API;
+
 		Q_OBJECT
 
 		Q_PROPERTY(bool mode_ac_ch1
