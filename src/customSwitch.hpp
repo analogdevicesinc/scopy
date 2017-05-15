@@ -25,7 +25,7 @@
 #include <QPushButton>
 #include <QWidget>
 
-class QResizeEvent;
+class QShowEvent;
 
 namespace adiscope {
 	class CustomSwitch : public QPushButton
@@ -47,7 +47,7 @@ namespace adiscope {
 
 		void setDuration(int ms);
 
-		void resizeEvent(QResizeEvent *event);
+		void showEvent(QShowEvent *event);
 
 	private Q_SLOTS:
 		void toggleAnim(bool enabled);

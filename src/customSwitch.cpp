@@ -72,7 +72,10 @@ void CustomSwitch::toggleAnim(bool enabled)
 	anim.start();
 }
 
-void CustomSwitch::resizeEvent(QResizeEvent *event)
+void CustomSwitch::showEvent(QShowEvent *event)
 {
-	toggleAnim(isChecked());
+	if (isChecked()) {
+		handle.setGeometry(QRect(width() - handle.width(), handle.y(),
+					handle.width(), handle.height()));
+	}
 }
