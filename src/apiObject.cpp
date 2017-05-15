@@ -186,10 +186,8 @@ void ApiObject::save_nogroup(ApiObject *obj, QSettings& settings)
 	}
 }
 
-void ApiObject::load()
+void ApiObject::load(QSettings& settings)
 {
-	QSettings settings;
-
 	settings.beginGroup(objectName());
 
 	load_nogroup(this, settings);
@@ -197,15 +195,28 @@ void ApiObject::load()
 	settings.endGroup();
 }
 
-void ApiObject::save()
+void ApiObject::save(QSettings& settings)
 {
-	QSettings settings;
-
 	settings.beginGroup(objectName());
 
 	save_nogroup(this, settings);
 
 	settings.endGroup();
+}
+
+void ApiObject::load()
+{
+	QSettings settings;
+
+	load(settings);
+}
+
+
+void ApiObject::save()
+{
+	QSettings settings;
+
+	save(settings);
 }
 
 void ApiObject::js_register(QJSEngine *engine)
