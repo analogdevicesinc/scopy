@@ -571,6 +571,7 @@ basic_block_sptr SignalGenerator::getSignalSource(gr::top_block_sptr top,
 {
 	bool inv_saw_wave = data.waveform == SG_INV_SAW_WAVE;
 	analog::gr_waveform_t waveform;
+	double phase;
 	double amplitude;
 	float offset;
 
@@ -582,6 +583,13 @@ basic_block_sptr SignalGenerator::getSignalSource(gr::top_block_sptr top,
 		offset = data.offset - (float) data.amplitude / 2.0;
 	}
 
+	if (data.waveform == SG_TRI_WAVE)
+		phase = data.phase + 90.0;
+	else if (data.waveform == SG_SQR_WAVE)
+		phase = data.phase + 180.0;
+	else
+		phase = data.phase;
+
 	if (inv_saw_wave) {
 		waveform = analog::GR_SAW_WAVE;
 		offset = -data.offset - (float) data.amplitude / 2.0;
@@ -592,7 +600,7 @@ basic_block_sptr SignalGenerator::getSignalSource(gr::top_block_sptr top,
 	auto src = analog::sig_source_f::make(samp_rate, waveform,
 			data.frequency, amplitude, offset);
 	auto delay = blocks::delay::make(sizeof(float),
-			samp_rate * data.phase / (data.frequency * 360.0));
+			samp_rate * phase / (data.frequency * 360.0));
 
 	auto skip_head = blocks::skiphead::make(sizeof(float),
 			samp_rate / data.frequency);
