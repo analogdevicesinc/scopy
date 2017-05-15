@@ -312,7 +312,6 @@ public:
 				bool load = true) :
 		ApiObject(), lga(lga), index(index)
 		{
-			setObjectName("channel_group");
 			if(!load)
 				set_channels_api();
 		}
@@ -358,7 +357,6 @@ public:
 			ChannelGroup_API *chg, int index=-1) :
 		ApiObject(), lga(lga), lchg(chg), index(index)
 		{
-			setObjectName("channel");
 		}
 	~LogicChannel_API() { }
 
