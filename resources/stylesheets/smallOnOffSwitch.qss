@@ -1,0 +1,27 @@
+QPushButton {
+min-height: 20px;
+max-height: 20px;
+min-width: 40px;
+max-width: 40px;
+border-radius: 4px;
+background-color: #141416;
+qproperty-color_start: #727273;
+qproperty-color_end: #4a64ff;
+}
+
+QWidget#handle {
+margin-right: 2px;
+margin-top: 2px;
+margin-left: 2px;
+margin-bottom: 2px;
+min-height: 16px;
+max-height: 16px;
+min-width: 16px;
+max-width: 16px;
+border-radius: 2px;
+background-color: white;
+}
+
+QWidget#handle:disabled {
+background-color: #aaaaaa;
+}
