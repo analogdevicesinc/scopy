@@ -1298,7 +1298,7 @@ color: white;
                 <item>
                  <widget class="QLabel" name="label_3">
                   <property name="styleSheet">
-                   <string notr="true">QLabel 
+                   <string notr="true">QLabel
 {
 width: 56px;
 height: 17px;
@@ -1421,7 +1421,7 @@ color: #FFFFFF;
                 <item>
                  <widget class="QLabel" name="label">
                   <property name="styleSheet">
-                   <string notr="true">QLabel 
+                   <string notr="true">QLabel
 {
 width: 56px;
 height: 17px;

@@ -124,6 +124,7 @@ private Q_SLOTS:
 	void triggerTimeout();
 	void startTimeout();
 	void capturedSlot();
+	void exportCmbItemChanged(int index);
 public Q_SLOTS:
 	void onTimeTriggerHandlePosChanged(int);
 	void onTimePositionSpinboxChanged(double value);
@@ -241,6 +242,7 @@ private:
 	DigitalBufferPreviewer *buffer_previewer;
 	void set_buffersize();
 	MouseWheelWidgetGuard *wheelEventGuard;
+	void setupExportMenu();
 };
 
 class LogicAnalyzer_API : public ApiObject
@@ -378,5 +380,5 @@ private:
 	int index;
 };
 }
-
+Q_DECLARE_METATYPE(std::shared_ptr<sigrok::OutputFormat>);
 #endif // LOGIC_ANALYZER_H
