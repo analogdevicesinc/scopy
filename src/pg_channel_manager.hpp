@@ -167,7 +167,13 @@ public:
 	QFrame *topSep,*botSep, *chUiSep;
 
 	void updateTrace();
+
+	std::map<const srd_channel *,
+	    std::shared_ptr<pv::view::TraceTreeItem> > setupDecoder(const char *decoder,
+	                    std::vector<int> ids);
+
 	void setupUARTDecoder();
+	void setupSPIDecoder();
 	void setupParallelDecoder();
 	void highlight(bool val);
 	void highlightTopSeparator();

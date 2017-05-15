@@ -188,7 +188,7 @@ QJsonValue Pattern_API::toJson(Pattern *p)
 		params["freq"]= QJsonValue((qint64)sp->getClkFrequency());
 		params["CPHA"]=sp->getCPHA();
 		params["CPOL"]=sp->getCPOL();
-		params["CS"]=sp->getCSEnabled();
+		params["CS"]=sp->getCSPol();
 		params["MSB"]=sp->getMsbFirst();
 
 		QJsonArray spi;
@@ -265,7 +265,7 @@ Pattern *Pattern_API::fromJson(QJsonValue j)
 		sp->setWaitClocks(params["IFS"].toInt());
 		sp->setCPHA(params["CPHA"].toBool());
 		sp->setCPOL(params["CPOL"].toBool());
-		sp->setCSEnabled(params["CS"].toBool());
+		sp->setCSPol(params["CS"].toBool());
 		sp->setMsbFirst(params["MSB"].toBool());
 
 		for (auto val : params["v"].toArray()) {
@@ -1284,7 +1284,7 @@ void UARTPatternUI::parse_ui()
 
 	auto oldStr = ui->LE_paramsOut->text();
 	auto newStr = ui->CB_baud->currentText() + "/8"
-			+ui->CB_Parity->currentText()[0] + ui->CB_Stop->currentText();
+	              +ui->CB_Parity->currentText()[0] + ui->CB_Stop->currentText();
 	ui->LE_paramsOut->setText(newStr);
 	qDebug()<<ui->LE_paramsOut->text();
 	pattern->set_params(ui->LE_paramsOut->text().toStdString());
@@ -1292,8 +1292,8 @@ void UARTPatternUI::parse_ui()
 	pattern->set_string(ui->LE_Data->text().toStdString());
 
 	Q_EMIT patternChanged();
-	if(oldStr != newStr)
-	{
+
+	if (oldStr != newStr) {
 		Q_EMIT decoderChanged();
 	}
 
@@ -1743,11 +1743,10 @@ uint8_t SPIPattern::generate_pattern(uint32_t sample_rate,
 
 	auto clkActiveBit = 0;
 	auto outputBit = 1;
+	auto csBit = 2;
 
-	if (CSEnabled) {
-		clkActiveBit = 1;
-		outputBit=2;
-		memset(buffer, (CPOL) ? 0xffff : 0xfffd, (number_of_samples)*sizeof(short));
+	if (CSPol) {
+		memset(buffer, (CPOL) ? 0xfffb : 0xfffa, (number_of_samples)*sizeof(short));
 	} else {
 		memset(buffer, (CPOL) ? 0xffff : 0xfffe, (number_of_samples)*sizeof(short));
 	}
@@ -1758,7 +1757,7 @@ uint8_t SPIPattern::generate_pattern(uint32_t sample_rate,
 	buf_ptr+=waitClocks*samples_per_bit;
 	auto k=0;
 
-	for (std::deque<uint8_t>::reverse_iterator it = v.rbegin(); it != v.rend();
+	for (std::deque<uint8_t>::iterator it = v.begin(); it != v.end();
 	     ++it) {
 		uint8_t val = *it;
 		bool oldbit;
@@ -1777,10 +1776,8 @@ uint8_t SPIPattern::generate_pattern(uint32_t sample_rate,
 			}
 
 			for (auto i=0; i<samples_per_bit/2; i++,buf_ptr++) {
-				if (CSEnabled) {
-					*buf_ptr = changeBit(*buf_ptr,0,0);
-				}
 
+				*buf_ptr = changeBit(*buf_ptr,csBit,CSPol);
 				*buf_ptr = changeBit(*buf_ptr,clkActiveBit,CPOL);
 
 				if (CPHA) {
@@ -1791,10 +1788,7 @@ uint8_t SPIPattern::generate_pattern(uint32_t sample_rate,
 			}
 
 			for (auto i=samples_per_bit/2; i<samples_per_bit; i++,buf_ptr++) {
-				if (CSEnabled) {
-					*buf_ptr = changeBit(*buf_ptr,0,0);
-				}
-
+				*buf_ptr = changeBit(*buf_ptr,csBit,CSPol);
 				*buf_ptr = changeBit(*buf_ptr,clkActiveBit,!CPOL);
 				*buf_ptr = changeBit(*buf_ptr,outputBit,bit);
 			}
@@ -1843,14 +1837,14 @@ void SPIPattern::setClkFrequency(const uint32_t& value)
 	clkFrequency = value;
 }
 
-bool SPIPattern::getCSEnabled() const
+bool SPIPattern::getCSPol() const
 {
-	return CSEnabled;
+	return CSPol;
 }
 
-void SPIPattern::setCSEnabled(bool value)
+void SPIPattern::setCSPol(bool value)
 {
-	CSEnabled = value;
+	CSPol = value;
 }
 
 
@@ -1883,7 +1877,7 @@ void SPIPatternUI::build_ui(QWidget *parent,uint16_t number_of_channels)
 	frequencySpinButton->setValue(pattern->getClkFrequency());
 	ui->PB_CPHA->setChecked(pattern->getCPHA());
 	ui->PB_CPOL->setChecked(pattern->getCPOL());
-	ui->PB_CS->setChecked(pattern->getCSEnabled());
+	ui->PB_CS->setChecked(pattern->getCSPol());
 	ui->PB_MSB->setChecked(pattern->getMsbFirst());
 	ui->LE_IFS->setText(QString::number(pattern->getWaitClocks()));
 	ui->LE_BPF->setText(QString::number(pattern->getBytesPerFrame()));
@@ -1932,6 +1926,12 @@ void SPIPatternUI::parse_ui()
 
 	auto BPF = ui->LE_BPF->text().toInt(&ok);
 
+	auto oldbpf = pattern->getBytesPerFrame();
+	auto oldcpha = pattern->getCPHA();
+	auto oldcpol = pattern->getCPOL();
+	auto oldcspol = pattern->getCSPol();
+	auto oldmsb = pattern->getMsbFirst();
+
 	if (ok && BPF>0) {
 		pattern->setBytesPerFrame(ui->LE_BPF->text().toInt());
 	}
@@ -1942,34 +1942,36 @@ void SPIPatternUI::parse_ui()
 		pattern->setWaitClocks(IFS);
 	}
 
+
+
 	pattern->setCPHA(ui->PB_CPHA->isChecked());
 	pattern->setCPOL(ui->PB_CPOL->isChecked());
-	pattern->setCSEnabled(ui->PB_CS->isChecked());
+	pattern->setCSPol(ui->PB_CS->isChecked());
 	pattern->setMsbFirst(ui->PB_MSB->isChecked());
 	QStringList strList = ui->LE_toSend->text().split(' ',QString::SkipEmptyParts);
 	pattern->v.clear();
-
 	bool fail = false;
 
-	std::deque<uint8_t> buf;
+	std::vector<uint8_t> b;
+	std::reverse(strList.begin(),strList.end());
 
 	for (QString str: strList) {
 		uint64_t val;
 		bool ok;
+		b.clear();
 		val = str.toULongLong(&ok,16);
-
-		buf.clear();
 
 		if (ok) {
 			while (val) {
 				auto u8val = val & 0xff;
 				val = val >> 8;
-				buf.push_front(u8val);
+				b.push_back(u8val);
 			}
 
-			for (auto b: buf) {
-				pattern->v.push_front(b);
+			for (auto u8val : b) {
+				pattern->v.push_front(u8val);
 			}
+
 		} else {
 			fail = true;
 			/* add str*/
@@ -1985,6 +1987,11 @@ void SPIPatternUI::parse_ui()
 
 	Q_EMIT patternChanged();
 
+	if (oldbpf!=pattern->getBytesPerFrame() || oldcpha!=pattern->getCPHA()
+	    || oldcpol!=pattern->getCPOL() || oldcspol != pattern->getCSPol()
+	    || oldmsb!=pattern->getMsbFirst()) {
+		Q_EMIT decoderChanged();
+	}
 }
 
 

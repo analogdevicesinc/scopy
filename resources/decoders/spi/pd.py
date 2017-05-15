@@ -126,7 +126,7 @@ class Decoder(srd.Decoder):
 
     def __init__(self):
         self.samplerate = None
-        self.oldclk = 1
+        self.oldclk = -1
         self.bitcount = 0
         self.misodata = self.mosidata = 0
         self.misobits = []

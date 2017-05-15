@@ -470,7 +470,7 @@ private Q_SLOTS:
 class SPIPattern : virtual public Pattern
 {
 private:
-	bool CSEnabled;
+	bool CSPol;
 	uint8_t bytesPerFrame;
 	uint32_t clkFrequency;
 	uint8_t waitClocks;
@@ -488,8 +488,8 @@ public:
 	uint32_t get_required_nr_of_samples(uint32_t sample_rate,
 	                                    uint32_t number_of_channels);
 
-	bool getCSEnabled() const;
-	void setCSEnabled(bool value);
+	bool getCSPol() const;
+	void setCSPol(bool value);
 	bool getCPOL() const;
 	void setCPOL(bool value);
 	bool getCPHA() const;

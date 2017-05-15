@@ -145,7 +145,7 @@ QPushButton:!checked {
      <item>
       <widget class="QLabel" name="label_7">
        <property name="text">
-        <string>Chip Select</string>
+        <string>CS Polarity</string>
        </property>
       </widget>
      </item>
