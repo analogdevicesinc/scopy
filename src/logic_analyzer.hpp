@@ -125,6 +125,7 @@ private Q_SLOTS:
 	void startTimeout();
 	void capturedSlot();
 	void exportCmbItemChanged(int index);
+	void btnExportPressed();
 public Q_SLOTS:
 	void onTimeTriggerHandlePosChanged(int);
 	void onTimePositionSpinboxChanged(double value);

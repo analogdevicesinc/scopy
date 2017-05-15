@@ -343,6 +343,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 		this, &LogicAnalyzer::triggerStateTimeout);
 	connect(main_win->view_, SIGNAL(data_received()),
 		this, SLOT(updateBufferPreviewer()));
+	connect(ui->btnExport, SIGNAL(pressed()),
+		this, SLOT(btnExportPressed()));
 
 	cleanHWParams();
 	chm_ui = new LogicAnalyzerChannelManagerUI(0, main_win, &chm, ui->scrollAreaWidgetContents,
@@ -485,13 +487,24 @@ void LogicAnalyzer::setupExportMenu()
 		ui->exportCmb->addItem(QString::fromStdString(f.second->description()),
 			QVariant::fromValue(f.second));
 	}
-	connect(ui->exportCmb, SIGNAL(currentIndexChanged(int)),
-		this, SLOT(exportCmbItemChanged(int)));
+//	connect(ui->exportCmb, SIGNAL(currentIndexChanged(int)),
+//		this, SLOT(exportCmbItemChanged(int)));
 }
 
 void LogicAnalyzer::exportCmbItemChanged(int index)
 {
 	QVariant item = ui->exportCmb->itemData(index);
+	if(item.isNull())
+		return;
+	shared_ptr<sigrok::OutputFormat> val;
+	if( item.canConvert<shared_ptr<sigrok::OutputFormat>>())
+		val = item.value<shared_ptr<sigrok::OutputFormat>>();
+	main_win->export_file(val);
+}
+
+void LogicAnalyzer::btnExportPressed()
+{
+	QVariant item = ui->exportCmb->currentData();
 	if(item.isNull())
 		return;
 	shared_ptr<sigrok::OutputFormat> val;

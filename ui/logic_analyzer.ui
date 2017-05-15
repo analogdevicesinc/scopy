@@ -1502,6 +1502,23 @@ color: #FFFFFF;
                  </spacer>
                 </item>
                 <item>
+                 <layout class="QVBoxLayout" name="verticalLayout_5">
+                  <property name="topMargin">
+                   <number>50</number>
+                  </property>
+                  <item>
+                   <widget class="QPushButton" name="btnExport">
+                    <property name="text">
+                     <string>PushButton</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QComboBox" name="exportCmb"/>
+                  </item>
+                 </layout>
+                </item>
+                <item>
                  <spacer name="verticalSpacer_5">
                   <property name="orientation">
                    <enum>Qt::Vertical</enum>
