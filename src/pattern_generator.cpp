@@ -406,6 +406,7 @@ void PatternGenerator::patternChanged(int index)
 
 	deleteSettingsWidget();
 	createSettingsWidget();
+	Q_EMIT currentUI->decoderChanged();
 	bufui->updateUi();
 }
 

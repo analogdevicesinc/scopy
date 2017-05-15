@@ -1446,7 +1446,7 @@ void I2CPattern::sample_ack()
 
 void I2CPattern::sample_payload()
 {
-	for (std::deque<uint8_t>::reverse_iterator it = v.rbegin(); it != v.rend();
+	for (std::deque<uint8_t>::iterator it = v.begin(); it != v.end();
 	     ++it) {
 		uint8_t val;
 
@@ -1506,42 +1506,6 @@ uint8_t I2CPattern::generate_pattern(uint32_t sample_rate,
 	sample_ack();
 	sample_payload();
 	sample_stop();
-
-	/*for (std::deque<uint8_t>::reverse_iterator it = v.rbegin(); it != v.rend();
-	     ++it) {
-		uint8_t val = *it;
-		bool oldbit;
-		//buf_ptr+=samples_per_bit;
-		k++;
-
-		for (auto j=0; j<8; j++) {
-			bool bit;
-
-			if (msbFirst) {
-				bit = (val & 0x80) >> 7;
-				val = val << 1;
-			} else {
-				bit = (val & 0x01);
-				val = val >> 1;
-			}
-
-			for (auto i=0; i<samples_per_bit/2; i++,buf_ptr++) {
-
-			}
-
-			for (auto i=samples_per_bit/2; i<samples_per_bit; i++,buf_ptr++) {
-
-			}
-
-		}
-
-		if (k==bytesPerFrame) {
-			k=0;
-			buf_ptr+=waitClocks*samples_per_bit;
-		}
-
-	}*/
-
 	return 0;
 }
 
@@ -1577,6 +1541,8 @@ void I2CPatternUI::build_ui(QWidget *parent,uint16_t number_of_channels)
 	ui->LE_IFS->setText(QString::number(pattern->getInterFrameSpace()));
 	ui->LE_address->setText(QString::number(pattern->getAddress(),16));
 	ui->PB_readWrite->setChecked(pattern->getWrite());
+	ui->PB_MSB->setVisible(false);
+	ui->label_8->setVisible(false);
 
 	//ui->LE_BPF->setText(QString::number(pattern->getBytesPerFrame()));
 	QString buf;
@@ -1634,25 +1600,27 @@ void I2CPatternUI::parse_ui()
 	pattern->v.clear();
 
 	bool fail = false;
-	std::deque<uint8_t> buf;
+
+	std::vector<uint8_t> b;
+	std::reverse(strList.begin(),strList.end());
 
 	for (QString str: strList) {
 		uint64_t val;
 		bool ok;
+		b.clear();
 		val = str.toULongLong(&ok,16);
-
-		buf.clear();
 
 		if (ok) {
 			while (val) {
 				auto u8val = val & 0xff;
 				val = val >> 8;
-				buf.push_front(u8val);
+				b.push_back(u8val);
 			}
 
-			for (auto b: buf) {
-				pattern->v.push_front(b);
+			for (auto u8val : b) {
+				pattern->v.push_front(u8val);
 			}
+
 		} else {
 			fail = true;
 			/* add str*/

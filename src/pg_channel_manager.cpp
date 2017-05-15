@@ -912,6 +912,25 @@ void PatternGeneratorChannelGroupUI::setupSPIDecoder()
 	}
 }
 
+void PatternGeneratorChannelGroupUI::setupI2CDecoder()
+{
+	std::vector<int> ids;
+
+	if (chg->get_channel_count()>=2) {
+		ids.push_back(chg->get_channel(0)->get_id());
+		ids.push_back(chg->get_channel(1)->get_id());
+
+		/*auto i2cdecoder = decodeTrace->decoder()->stack().front();
+		auto i2cpattern = dynamic_cast<I2CPattern *>(getChannelGroup()->pattern);
+		*/
+		auto chMap = setupDecoder("i2c",ids);
+
+		//i2cdecoder->set_option("bitorder", bitorderstr);
+		decodeTrace->set_channel_map(chMap);
+	}
+}
+
+
 void PatternGeneratorChannelGroupUI::updateTrace()
 {
 	auto chgOffset =  geometry().top()+ui->widget_2->geometry().bottom() + 3;
@@ -1534,7 +1553,10 @@ void PatternGeneratorChannelManagerUI::updateUi()
 			} else if (dynamic_cast<SPIPattern *>
 			           (static_cast<PatternGeneratorChannelGroup *>(ch)->pattern)) {
 				currentChannelGroupUI->setupSPIDecoder();
-			} else {
+			} else if (dynamic_cast<I2CPattern *>
+			           (static_cast<PatternGeneratorChannelGroup *>(ch)->pattern)) {
+				currentChannelGroupUI->setupI2CDecoder();
+			} else	{
 				currentChannelGroupUI->setupParallelDecoder();
 			}
 

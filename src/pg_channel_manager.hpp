@@ -174,6 +174,7 @@ public:
 
 	void setupUARTDecoder();
 	void setupSPIDecoder();
+	void setupI2CDecoder();
 	void setupParallelDecoder();
 	void highlight(bool val);
 	void highlightTopSeparator();

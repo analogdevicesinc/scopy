@@ -75,6 +75,9 @@ QPushButton:!checked {
      </item>
      <item>
       <widget class="QPushButton" name="PB_MSB">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="styleSheet">
         <string notr="true">QPushButton {
   min-height: 20px;
@@ -101,6 +104,9 @@ QPushButton:!checked {
      </item>
      <item>
       <widget class="QLabel" name="label_8">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
         <string>MSB First</string>
        </property>
