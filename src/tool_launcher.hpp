@@ -20,6 +20,8 @@
 #ifndef M2K_TOOL_LAUNCHER_H
 #define M2K_TOOL_LAUNCHER_H
 
+#include <QFuture>
+#include <QFutureWatcher>
 #include <QJSEngine>
 #include <QMainWindow>
 #include <QPair>
@@ -99,9 +101,8 @@ private:
 	QVector<QPair<QWidget, Ui::Device> *> devices;
 
 	QTimer *search_timer;
-	QFutureWatcher<QPair<iio_context_info **, int>> *watcher;
-	QFuture<QPair<iio_context_info **, int>> future;
-	QPair<iio_context_info **, int> searchDevices();
+	QFutureWatcher<QVector<QString>> watcher;
+	QFuture<QVector<QString>> future;
 
 	DMM *dmm;
 	PowerController *power_control;
@@ -122,6 +123,7 @@ private:
 	QSocketNotifier notifier;
 	QString previousIp;
 
+	QVector<QString> searchDevices();
 	void swapMenu(QWidget *menu);
 	void destroyContext();
 	bool loadDecoders(QString path);

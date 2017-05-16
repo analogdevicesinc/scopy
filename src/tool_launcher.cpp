@@ -31,8 +31,6 @@
 #include <QSignalTransition>
 #include <QMessageBox>
 #include <QTimer>
-#include <QFutureWatcher>
-#include <QFuture>
 #include <QSettings>
 
 #include <iio.h>
@@ -50,9 +48,6 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	network_analyzer(nullptr), tl_api(new ToolLauncher_API(this)),
 	notifier(STDIN_FILENO, QSocketNotifier::Read)
 {
-	struct iio_context_info **info;
-	unsigned int nb_contexts;
-
 	ui->setupUi(this);
 
 	setWindowIcon(QIcon(":/icon.ico"));
@@ -60,34 +55,9 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	// TO DO: remove this when the About menu becomes available
 	setWindowTitle(QString("Scopy - ") + QString(SCOPY_VERSION_GIT));
 
-	struct iio_scan_context *scan_ctx = iio_create_scan_context("usb", 0);
-
-	if (!scan_ctx) {
-		std::cerr << "Unable to create scan context!" << std::endl;
-		return;
-	}
-
-	ssize_t ret = iio_scan_context_get_info_list(scan_ctx, &info);
-
-	if (ret < 0) {
-		std::cerr << "Unable to scan!" << std::endl;
-		return;
-	}
-
-	nb_contexts = static_cast<unsigned int>(ret);
-
-	for (unsigned int i = 0; i < nb_contexts; i++) {
-		const char *uri = iio_context_info_get_uri(info[i]);
-
-		if (!QString(uri).startsWith("usb:")) {
-			continue;
-		}
-
-		addContext(QString(uri));
-	}
-
-	iio_context_info_list_free(info);
-	iio_scan_context_destroy(scan_ctx);
+	const QVector<QString>& uris = searchDevices();
+	for (const QString& each : uris)
+		addContext(each);
 
 	current = ui->homeWidget;
 
@@ -128,10 +98,9 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 
 	connect(&notifier, SIGNAL(activated(int)), this, SLOT(hasText()));
 
-	watcher = new QFutureWatcher<QPair<iio_context_info **, int>>();
 	search_timer = new QTimer();
 	connect(search_timer, SIGNAL(timeout()), this, SLOT(search()));
-	connect(watcher, SIGNAL(finished()), this, SLOT(update()));
+	connect(&watcher, SIGNAL(finished()), this, SLOT(update()));
 	search_timer->start(TIMER_TIMEOUT_MS);
 }
 
@@ -139,99 +108,78 @@ void ToolLauncher::search()
 {
 	search_timer->stop();
 	future = QtConcurrent::run(this, &ToolLauncher::searchDevices);
-	watcher->setFuture(future);
+	watcher.setFuture(future);
 }
 
-QPair<iio_context_info **, int> ToolLauncher::searchDevices()
+QVector<QString> ToolLauncher::searchDevices()
 {
 	struct iio_context_info **info;
 	unsigned int nb_contexts;
-
+	QVector<QString> uris;
 
 	struct iio_scan_context *scan_ctx = iio_create_scan_context("usb", 0);
 
 	if (!scan_ctx) {
 		std::cerr << "Unable to create scan context!" << std::endl;
-		return QPair<iio_context_info **, int> (nullptr,0);
+		return uris;
 	}
 
 	ssize_t ret = iio_scan_context_get_info_list(scan_ctx, &info);
 
 	if (ret < 0) {
 		std::cerr << "Unable to scan!" << std::endl;
-		return QPair<iio_context_info **, int> (nullptr,0);
+		goto out_destroy_context;
 	}
 
 	nb_contexts = static_cast<unsigned int>(ret);
 
-	QPair<iio_context_info **, int> new_devices = QPair<iio_context_info **, int>
-			(info, nb_contexts);
+	for (unsigned int i = 0; i < nb_contexts; i++)
+		uris.append(QString(iio_context_info_get_uri(info[i])));
 
+	iio_context_info_list_free(info);
+out_destroy_context:
 	iio_scan_context_destroy(scan_ctx);
-
-	return new_devices;
+	return uris;
 }
 
 void ToolLauncher::update()
 {
-	QPair<iio_context_info **, unsigned int> new_devices = watcher->result();
+	const QVector<QString>& uris = watcher.result();
 
 	//Delete devices that are in the devices list but not found anymore when scanning
 
-	int index = 0;
+	for (auto it = devices.begin(); it != devices.end();) {
+		QString uri = (*it)->second.btn->property("uri").toString();
 
-	for (auto it = devices.begin(); it != devices.end(); ++it) {
-		if (!QString((
-				     *it)->second.btn->property("uri").toString()).startsWith("usb:")) {
-			continue;
-		}
-
-		bool found = false;
-
-		for (unsigned int i = 0; i < new_devices.second; i++) {
-			const char *uri = iio_context_info_get_uri(new_devices.first[i]);
-
-			if ((*it)->second.btn->property("uri").toString() == uri) {
-				found = true;
-			}
-
-			break;
-		}
-
-		if (!found) {
+		if (uri.startsWith("usb:") && !uris.contains(uri)) {
 			delete *it;
-			devices.remove(index);
-			break;
+			it = devices.erase(it);
 		} else {
-			index++;
+			++it;
 		}
-
 	}
 
-	for (unsigned int i = 0; i < new_devices.second; i++) {
-		const char *uri = iio_context_info_get_uri(new_devices.first[i]);
-
-		if (!QString(uri).startsWith("usb:")) {
+	for (const QString& uri : uris) {
+		if (!uri.startsWith("usb:"))
 			continue;
-		}
 
 		bool found = false;
 
-		for (auto it = devices.begin(); it != devices.end(); ++it)
-			if ((*it)->second.btn->property("uri").toString() == uri) {
+		for (const auto each : devices) {
+			QString str = each->second.btn->property("uri")
+				.toString();
+
+			if (str == uri) {
 				found = true;
 				break;
 			}
-
-		if (!found) {
-			addContext(QString(uri));
 		}
+
+		if (!found)
+			addContext(uri);
 	}
 
-
-	iio_context_info_list_free(new_devices.first);
 	search_timer->start(TIMER_TIMEOUT_MS);
-
 }
 
 
@@ -246,7 +194,6 @@ ToolLauncher::~ToolLauncher()
 	devices.clear();
 
 	delete search_timer;
-	delete watcher;
 
 	tl_api->ApiObject::save();
 	delete tl_api;
