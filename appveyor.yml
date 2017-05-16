@@ -5,6 +5,9 @@ install:
     - C:\msys64\usr\bin\bash -lc "pacman -Rs --noconfirm mingw-w64-i686-gcc-ada mingw-w64-i686-gcc-fortran mingw-w64-i686-gcc-libgfortran mingw-w64-i686-gcc-objc"
     - C:\msys64\usr\bin\bash -lc "pacman -Rs --noconfirm mingw-w64-x86_64-gcc-ada mingw-w64-x86_64-gcc-fortran mingw-w64-x86_64-gcc-libgfortran mingw-w64-x86_64-gcc-objc"
 
+    # Remove existing file that causes GCC install to fail
+    - C:\msys64\usr\bin\bash -lc "rm /mingw32/etc/gdbinit /mingw64/etc/gdbinit"
+
     # Update to GCC 6.2 and install dependencies
     - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -Sy mingw-w64-i686-gcc mingw-w64-i686-qt5 mingw-w64-i686-libusb mingw-w64-i686-boost mingw-w64-i686-python3 mingw-w64-i686-fftw mingw-w64-i686-libzip mingw-w64-i686-glibmm"
     - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -Sy mingw-w64-x86_64-gcc mingw-w64-x86_64-qt5 mingw-w64-x86_64-libusb mingw-w64-x86_64-boost mingw-w64-x86_64-python3 mingw-w64-x86_64-fftw mingw-w64-x86_64-libzip mingw-w64-x86_64-glibmm"
