@@ -55,6 +55,9 @@ void CustomSwitch::setDuration(int ms)
 
 void CustomSwitch::toggleAnim(bool enabled)
 {
+	if (!isVisible())
+		return;
+
 	QRect off_rect(0, handle.y(), handle.width(), handle.height());
 	QRect on_rect(width() - handle.width(), handle.y(),
 			handle.width(), handle.height());
