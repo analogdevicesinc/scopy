@@ -147,6 +147,8 @@ void ToolLauncher::updateListOfDevices(const QVector<QString>& uris)
 	//Delete devices that are in the devices list but not found anymore when scanning
 
 	for (auto it = devices.begin(); it != devices.end();) {
+		if ((*it)->second.btn->isChecked())
+			(*it)->second.btn->click();
 		QString uri = (*it)->second.btn->property("uri").toString();
 
 		if (uri.startsWith("usb:") && !uris.contains(uri)) {
