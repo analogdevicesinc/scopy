@@ -20,12 +20,14 @@
 #ifndef MENU_ANIM_HPP
 #define MENU_ANIM_HPP
 
+#include "coloredQWidget.hpp"
+
 #include <QPropertyAnimation>
 #include <QSize>
 #include <QWidget>
 
 namespace adiscope {
-	class MenuAnim : public QWidget
+	class MenuAnim : public ColoredQWidget
 	{
 		Q_OBJECT
 

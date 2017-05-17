@@ -24,7 +24,7 @@
 
 using namespace adiscope;
 
-MenuAnim::MenuAnim(QWidget *parent) : QWidget(parent),
+MenuAnim::MenuAnim(QWidget *parent) : ColoredQWidget(parent),
 	open_anim_max(this, "maximumWidth"),
 	open_anim_min(this, "minimumWidth"),
 	close_anim_max(this, "maximumWidth"),
