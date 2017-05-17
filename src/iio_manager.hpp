@@ -32,6 +32,8 @@
 /* 1k samples by default */
 #define IIO_BUFFER_SIZE 0x400
 
+template <typename T> class QFutureWatcher;
+
 namespace adiscope {
 	class iio_manager : public QObject, public gr::top_block
 	{
@@ -117,6 +119,8 @@ namespace adiscope {
 
 		std::vector<connection> connections;
 
+		QFutureWatcher<void> *watcher;
+
 		iio_manager(unsigned int id, struct iio_context *ctx,
 				const std::string &dev,
 				unsigned long buffer_size);
@@ -130,6 +134,7 @@ namespace adiscope {
 
 	Q_SIGNALS:
 		void timeout();
+		void flowgraph_errored();
 	};
 }
 

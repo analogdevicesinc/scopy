@@ -21,6 +21,9 @@
 #include "timeout_block.hpp"
 
 #include <QDebug>
+#include <QtConcurrentRun>
+#include <QFuture>
+#include <QFutureWatcher>
 
 #include <gnuradio/blocks/null_sink.h>
 #include <gnuradio/blocks/short_to_float.h>
@@ -187,11 +190,26 @@ void iio_manager::start(iio_manager::port_id copy)
 	if (!_started) {
 		qDebug() << "Starting top block";
 		top_block::start();
+
+		watcher = new QFutureWatcher<void>;
+		QObject::connect(watcher, &QFutureWatcher<void>::finished,
+				[=]() {
+			stop_all();
+			Q_EMIT flowgraph_errored();
+		});
+
+		QFuture<void> future = QtConcurrent::run([=]() {
+			top_block::wait();
+		});
+
+		watcher->setFuture(future);
+
+		_started = true;
 	}
 
 	qDebug() << "Enabling copy block" << copy->alias().c_str();
 	copy->set_enabled(true);
-	_started = true;
+
 
 unlock:
 	copy_mutex.unlock();
@@ -219,6 +237,7 @@ void iio_manager::stop(iio_manager::port_id copy)
 
 	if (!inuse) {
 		qDebug() << "Stopping top block";
+		delete watcher;
 		top_block::stop();
 		top_block::wait();
 		_started = false;
