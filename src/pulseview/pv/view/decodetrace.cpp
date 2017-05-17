@@ -717,7 +717,10 @@ int DecodeTrace::get_row_at_point(const QPoint &point)
 	if (!row_height_)
 		return -1;
 
-	const int y = (point.y() - get_visual_y() + row_height_ / 2);
+	auto row_offset = -(((max_visible_rows_==1) ? 0 : max_visible_rows_ * v_extents().second)) ;
+	int y1 = get_visual_y() - (-v_extents().first/2 ) + v_extents().second + row_offset;
+
+	const int y = (point.y() - y1 + row_height_ / 2);
 
 	/* Integer divison of (x-1)/x would yield 0, so we check for this. */
 	if (y < 0)
