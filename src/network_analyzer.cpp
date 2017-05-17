@@ -116,8 +116,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
 NetworkAnalyzer::~NetworkAnalyzer()
 {
-	stop = true;
-	thd.waitForFinished();
+	ui->run_button->setChecked(false);
 
 	net_api->save();
 	delete net_api;
