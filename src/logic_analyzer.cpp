@@ -1422,6 +1422,20 @@ void ChannelGroup_API::set_channels_api()
 	}
 }
 
+QString ChannelGroup_API::getDecoder() const
+{
+	if(lga->chm.get_channel_group(this->getIndex())->getDecoder())
+		return QString::fromUtf8(lga->chm.get_channel_group(
+			this->getIndex())->getDecoder()->name);
+	return "";
+}
+
+void ChannelGroup_API::setDecoder(QString val)
+{
+	lga->chm.get_channel_group(getIndex())->setDecoder(
+		lga->chm.get_decoder_from_name(val.toUtf8()));
+}
+
 /*
  * Channel_API
  */

@@ -306,6 +306,7 @@ class ChannelGroup_API : public ApiObject
 	Q_PROPERTY(bool ch_grouped READ chGrouped WRITE setChGrouped)
 	Q_PROPERTY(QString name READ getName WRITE setName)
 	Q_PROPERTY(bool ch_collapsed READ getChCollapsed WRITE setChCollapsed)
+	Q_PROPERTY(QString decoder READ getDecoder WRITE setDecoder)
 
 public:
 	explicit ChannelGroup_API(LogicAnalyzer *lga, int index = -1,
@@ -339,6 +340,9 @@ public:
 
 	int getIndex() const;
 	void set_channels_api();
+
+	QString getDecoder() const;
+	void setDecoder(QString val);
 private:
 	LogicAnalyzer *lga;
 	QList<LogicChannel_API *> channels_api;
