@@ -185,7 +185,7 @@ void LogicSignal::paint_mid(QPainter &p, const ViewItemPaintParams &pp)
 	if (!channel_->enabled())
 		return;
 
-	const float high_offset = y - signal_height_ + 0.5f;
+	const float high_offset = y - signal_height_ + 2 + 0.5f;
 	const float low_offset = y + 0.5f;
 
 	const deque< shared_ptr<pv::data::LogicSegment> > &segments =
