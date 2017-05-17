@@ -296,6 +296,7 @@ class ChannelGroup_API : public ApiObject
 {
 	friend class LogicChannel_API;
 	Q_OBJECT
+	Q_PROPERTY(QString decoder READ getDecoder WRITE setDecoder)
 	Q_PROPERTY(int channels_list_size READ channels_list_size WRITE
 		   setChannelsListSize SCRIPTABLE false)
 	Q_PROPERTY(QList<LogicChannel_API*> channels_list READ getChannelsForStoring
@@ -306,7 +307,6 @@ class ChannelGroup_API : public ApiObject
 	Q_PROPERTY(bool ch_grouped READ chGrouped WRITE setChGrouped)
 	Q_PROPERTY(QString name READ getName WRITE setName)
 	Q_PROPERTY(bool ch_collapsed READ getChCollapsed WRITE setChCollapsed)
-	Q_PROPERTY(QString decoder READ getDecoder WRITE setDecoder)
 
 public:
 	explicit ChannelGroup_API(LogicAnalyzer *lga, int index = -1,
@@ -355,6 +355,7 @@ class LogicChannel_API : public ApiObject
 	Q_PROPERTY(int index READ getIndex WRITE setIndex)
 	Q_PROPERTY(QString trigger READ getTrigger WRITE setTrigger)
 	Q_PROPERTY(QString name READ getName WRITE setName)
+	Q_PROPERTY(QString role READ getRole WRITE setRole)
 
 public:
 	explicit LogicChannel_API(LogicAnalyzer *lga,
@@ -372,6 +373,9 @@ public:
 
 	int getIndex() const;
 	void setIndex(int);
+
+	QString getRole() const;
+	void setRole(QString val);
 private:
 	LogicAnalyzer *lga;
 	ChannelGroup_API *lchg;

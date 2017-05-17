@@ -1473,3 +1473,21 @@ void LogicChannel_API::setIndex(int val)
 	lga->chm.get_channel_group(lchg->getIndex())->add_channel(
 		lga->chm.get_channel(val));
 }
+
+QString LogicChannel_API::getRole() const
+{
+	if(lga->chm.get_channel_group(lchg->getIndex())->is_grouped()) {
+		auto ch = lga->chm.get_channel_group(lchg->getIndex())->getChannelById(
+			getIndex())->getChannel_role();
+		if(ch) {
+			return ch->name;
+		}
+	}
+	return "";
+}
+
+void LogicChannel_API::setRole(QString val)
+{
+	auto ch = lga->chm.get_channel_group(lchg->getIndex())->get_srd_channel_from_name(val.toUtf8());
+	lga->chm.get_channel_group(lchg->getIndex())->getChannelById(getIndex())->setChannel_role(ch);
+}
