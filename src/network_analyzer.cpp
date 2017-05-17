@@ -83,6 +83,9 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 		ui->run_button->setChecked(false);
 	});
 
+	connect(&*iio, &iio_manager::flowgraph_errored, [=]() {
+		Q_EMIT appShouldStop();
+	});
 
 	ui->rightMenu->setMaximumWidth(0);
 

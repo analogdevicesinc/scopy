@@ -96,6 +96,7 @@ namespace adiscope {
 
 	Q_SIGNALS:
 		void sweepDone();
+		void appShouldStop();
 	};
 
 	class NetworkAnalyzer_API : public ApiObject
