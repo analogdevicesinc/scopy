@@ -97,6 +97,8 @@ namespace adiscope {
 		void triggerPositionChanged(double);
 		void selectedChannelChanged(int);
 
+		void appShouldStop();
+
 	private Q_SLOTS:
 		void on_actionClose_triggered();
 		void on_boxCursors_toggled(bool on);
