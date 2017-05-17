@@ -235,6 +235,100 @@ void MainWindow::select_device(shared_ptr<devices::Device> device)
 	}
 }
 
+std::shared_ptr<sigrok::OutputFormat> MainWindow::get_output_format_from_string(QString string)
+{
+	const map<std::string, shared_ptr<sigrok::OutputFormat> > formats =
+		device_manager_.context()->output_formats();
+	QString filter;
+	for( const pair<std::string, shared_ptr<sigrok::OutputFormat>> &f : formats) {
+		if( f.first == "srzip")
+			continue;
+		assert(f.second);
+		filter = QString("%2(*.%1)").arg(
+			QString::fromStdString(join(f.second->extensions(), ", *.")),
+			tr("%1 files ").arg(
+			QString::fromStdString(f.second->description())));
+		if(filter == string) {
+			return f.second;
+		}
+	}
+	return nullptr;
+}
+
+void MainWindow::export_file()
+{
+	using pv::dialogs::StoreProgress;
+	shared_ptr<OutputFormat> outputFormat;
+	QString filter;
+	QString selectedFilter = "";
+	vector<string> exts;
+
+	// Stop any currently running capture session
+	session_.stop_capture();
+
+	QSettings settings;
+	const QString dir = settings.value(SettingSaveDirectory).toString();
+
+	std::pair<uint64_t, uint64_t> sample_range;
+	sample_range = std::make_pair(0, 0);
+
+	// Construct the filter for file dialog
+	const map<string, shared_ptr<sigrok::OutputFormat> > formats =
+		device_manager_.context()->output_formats();
+	for( const pair<string, shared_ptr<sigrok::OutputFormat>> &f : formats) {
+		if( f.first == "srzip")
+			continue;
+		assert(f.second);
+		const vector<string> exts2 = f.second->extensions();
+		exts.insert(exts.end(), exts2.begin(), exts2.end());
+		filter += QString("%2(*.%1);;").arg(
+			QString::fromStdString(join(exts2, ", *.")),
+			tr("%1 files ").arg(
+			QString::fromStdString(f.second->description())));
+
+	}
+
+	if (exts.empty())
+		filter += "(*.*)";
+	else
+		filter += QString("%2(*.%1);;").arg(
+			QString::fromStdString(join(exts, ", *.")),
+			tr("All Files"));
+
+	// Show the file dialog
+	const QString file_name = QFileDialog::getSaveFileName(
+		this, tr("Save File"), dir, filter, &selectedFilter);
+
+	if (file_name.isEmpty())
+		return;
+
+	const QString abs_path = QFileInfo(file_name).absolutePath();
+	settings.setValue(SettingSaveDirectory, abs_path);
+
+	if(selectedFilter != "")
+		outputFormat = get_output_format_from_string(selectedFilter);
+	if(!outputFormat)
+		return;
+
+	// Show the options dialog
+	map<string, Glib::VariantBase> options;
+	if (!outputFormat->options().empty()) {
+		dialogs::InputOutputOptions dlg(
+			tr("Export %1").arg(QString::fromStdString(
+				outputFormat->description())),
+			outputFormat->options(), this);
+		if (!dlg.exec())
+			return;
+		options = dlg.options();
+		dlg.hide();
+	}
+
+	StoreProgress *dlg = new StoreProgress(file_name, outputFormat, options,
+		sample_range, session_, this);
+	dlg->run();
+	dlg->hide();
+}
+
 void MainWindow::export_file(shared_ptr<OutputFormat> format,
 	bool selection_only)
 {

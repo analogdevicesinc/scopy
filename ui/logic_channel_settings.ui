@@ -70,11 +70,8 @@ color: rgba(255,255,255,50);
      </item>
      <item>
       <widget class="Line" name="line">
-       <property name="styleSheet">
-        <string notr="true">QFrame{
-	opacity: 0.1;
-  color: rgba(255,255,255,50);
-}</string>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
        </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -266,11 +263,8 @@ color: rgba(255,255,255,50);
      </item>
      <item>
       <widget class="Line" name="line_2">
-       <property name="styleSheet">
-        <string notr="true">QFrame{
-	opacity: 0.1;
-  color: rgba(255,255,255,50);
-}</string>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
        </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>

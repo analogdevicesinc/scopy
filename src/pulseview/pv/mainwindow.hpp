@@ -111,6 +111,8 @@ public:
 
 	void restart_acquisition();
 
+	void export_file();
+
 public Q_SLOTS:
 	void export_file(std::shared_ptr<sigrok::OutputFormat> format,
 		bool selection_only = false);
@@ -140,6 +142,8 @@ private:
 			std::map<std::string, Glib::VariantBase>());
 
 	void save_selection_to_file();
+
+	std::shared_ptr<sigrok::OutputFormat> get_output_format_from_string(QString string);
 
 private:
 	void closeEvent(QCloseEvent *event);

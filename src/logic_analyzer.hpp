@@ -124,7 +124,6 @@ private Q_SLOTS:
 	void triggerTimeout();
 	void startTimeout();
 	void capturedSlot();
-	void exportCmbItemChanged(int index);
 	void btnExportPressed();
 public Q_SLOTS:
 	void onTimeTriggerHandlePosChanged(int);
@@ -139,6 +138,7 @@ Q_SIGNALS:
 
 private:
 	std::shared_ptr<sigrok::Context> context;
+	pv::DeviceManager *device_manager;
 	Ui::LogicAnalyzer *ui;
 	Ui::DigitalTriggerSettings *trigger_settings_ui;
 	QButtonGroup *settings_group;
@@ -243,7 +243,6 @@ private:
 	DigitalBufferPreviewer *buffer_previewer;
 	void set_buffersize();
 	MouseWheelWidgetGuard *wheelEventGuard;
-	void setupExportMenu();
 };
 
 class LogicAnalyzer_API : public ApiObject

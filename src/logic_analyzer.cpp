@@ -189,8 +189,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	std::string open_file, open_file_format;
 	context = sigrok::Context::create();
 
-	pv::DeviceManager device_manager(context);
-	pv::MainWindow *w = new pv::MainWindow(device_manager, filt, open_file,
+	device_manager = new pv::DeviceManager(context);
+	pv::MainWindow *w = new pv::MainWindow(*device_manager, filt, open_file,
 	                                       open_file_format, parent);
 
 	for (unsigned int j = 0; j < iio_device_get_channels_count(dev); j++) {
@@ -222,9 +222,6 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 		timeBase, 0, Qt::AlignLeft);
 	ui->generalSettingsLayout->insertWidget(ui->generalSettingsLayout->count() - 3,
 		timePosition, 0, Qt::AlignLeft);
-
-	/* Export Menu */
-	setupExportMenu();
 
 	options["numchannels"] = Glib::Variant<gint32>(
 			g_variant_new_int32(no_channels),true);
@@ -412,7 +409,6 @@ LogicAnalyzer::~LogicAnalyzer()
 	delete ui;
 
 	/* Destroy libsigrokdecode */
-	srd_exit();
 	qDeleteAll(channel_groups_api);
 	channel_groups_api.clear();
 }
@@ -475,42 +471,9 @@ void LogicAnalyzer::updateAreaTimeTrigger()
 		chm_ui->sizeHint().width()-20, 0, 0, 0);
 }
 
-void LogicAnalyzer::setupExportMenu()
-{
-	const map<string, shared_ptr<sigrok::OutputFormat> > formats =
-		context->output_formats();
-	ui->exportCmb->addItem("None", QVariant());
-	for( const pair<string, shared_ptr<sigrok::OutputFormat>> &f : formats) {
-		if( f.first == "srzip")
-			continue;
-		assert(f.second);
-		ui->exportCmb->addItem(QString::fromStdString(f.second->description()),
-			QVariant::fromValue(f.second));
-	}
-//	connect(ui->exportCmb, SIGNAL(currentIndexChanged(int)),
-//		this, SLOT(exportCmbItemChanged(int)));
-}
-
-void LogicAnalyzer::exportCmbItemChanged(int index)
-{
-	QVariant item = ui->exportCmb->itemData(index);
-	if(item.isNull())
-		return;
-	shared_ptr<sigrok::OutputFormat> val;
-	if( item.canConvert<shared_ptr<sigrok::OutputFormat>>())
-		val = item.value<shared_ptr<sigrok::OutputFormat>>();
-	main_win->export_file(val);
-}
-
 void LogicAnalyzer::btnExportPressed()
 {
-	QVariant item = ui->exportCmb->currentData();
-	if(item.isNull())
-		return;
-	shared_ptr<sigrok::OutputFormat> val;
-	if( item.canConvert<shared_ptr<sigrok::OutputFormat>>())
-		val = item.value<shared_ptr<sigrok::OutputFormat>>();
-	main_win->export_file(val);
+	main_win->export_file();
 }
 
 double LogicAnalyzer::pickSampleRateFor(double timeSpanSecs, double desiredBuffersize)
