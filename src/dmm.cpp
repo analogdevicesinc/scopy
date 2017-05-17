@@ -100,7 +100,7 @@ void DMM::disconnectAll()
 
 DMM::~DMM()
 {
-	timer.stop();
+	ui->run_button->setChecked(false);
 	disconnectAll();
 
 	dmm_api->save();
