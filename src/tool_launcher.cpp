@@ -528,6 +528,8 @@ void adiscope::ToolLauncher::enableCalibTools(float gain_ch1, float gain_ch2)
 		oscilloscope = new Oscilloscope(ctx, filter,
 						ui->stopOscilloscope, &js_engine,
 						gain_ch1, gain_ch2, this);
+		connect(oscilloscope, SIGNAL(appShouldStop()),
+				this, SLOT(disconnect()));
 
 		ui->oscilloscope->setEnabled(true);
 	}
@@ -535,6 +537,8 @@ void adiscope::ToolLauncher::enableCalibTools(float gain_ch1, float gain_ch2)
 	if (filter->compatible(TOOL_DMM)) {
 		dmm = new DMM(ctx, filter, ui->stopDMM, &js_engine,
 				gain_ch1, gain_ch2, this);
+		connect(dmm, SIGNAL(appShouldStop()), this, SLOT(disconnect()));
+
 		ui->dmm->setEnabled(true);
 	}
 }
@@ -649,6 +653,9 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 	if (filter->compatible((TOOL_NETWORK_ANALYZER))) {
 		network_analyzer = new NetworkAnalyzer(ctx, filter,
 		                                       ui->stopNetworkAnalyzer, &js_engine, this);
+		connect(network_analyzer, SIGNAL(appShouldStop()),
+				this, SLOT(disconnect()));
+
 		ui->networkAnalyzer->setEnabled(true);
 	}
 
