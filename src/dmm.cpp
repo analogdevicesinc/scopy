@@ -65,6 +65,10 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, QPushButton *runButton,
 	connect(ui->historySizeCh2, SIGNAL(currentIndexChanged(int)),
 			this, SLOT(setHistorySizeCh2(int)));
 
+	connect(&*manager, &iio_manager::flowgraph_errored, [=]() {
+		Q_EMIT appShouldStop();
+	});
+
 	setHistorySizeCh1(ui->historySizeCh1->currentIndex());
 	setHistorySizeCh2(ui->historySizeCh2->currentIndex());
 

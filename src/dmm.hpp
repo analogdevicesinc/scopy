@@ -79,6 +79,9 @@ namespace adiscope {
 	private Q_SLOTS:
 		void setHistorySizeCh1(int idx);
 		void setHistorySizeCh2(int idx);
+
+	Q_SIGNALS:
+		void appShouldStop();
 	};
 
 	class DMM_API : public ApiObject
