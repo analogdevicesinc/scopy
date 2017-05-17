@@ -127,7 +127,7 @@ void Viewport::drag_by(const QPoint &delta)
 
 		view_.set_scale_offset(view_.scale(),
 			(*drag_offset_ - delta.x() * view_.scale() / (geometry().width() / divisionCount)));
-		view_.set_v_offset(-drag_v_offset_ - delta.y());
+		//view_.set_v_offset(-drag_v_offset_ - delta.y());
 		update();
 		if( getTimeTriggerActive() )
 			Q_EMIT plotChanged(false);
@@ -380,8 +380,8 @@ void Viewport::wheelEvent(QWheelEvent *event)
 		if (event->modifiers() & Qt::ControlModifier) {
 			// Vertical scrolling with the control key pressed
 			// is intrepretted as vertical scrolling
-			view_.set_v_offset(-view_.owner_visual_v_offset() -
-				(event->delta() * height()) / (8 * 120));
+		/*	view_.set_v_offset(-view_.owner_visual_v_offset() -
+				(event->delta() * height()) / (8 * 120));*/
 		} else {
 			// Vertical scrolling is interpreted as zooming in/out
 			view_.zoom(event->delta() / 120, event->x());
