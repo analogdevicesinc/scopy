@@ -134,6 +134,8 @@ private:
 	void disconnect();
 	Q_INVOKABLE QPushButton *addContext(const QString& hostname);
 
+	void updateListOfDevices(const QVector<QString>& uris);
+
 	static void apply_m2k_fixes(struct iio_context *ctx);
 };
 

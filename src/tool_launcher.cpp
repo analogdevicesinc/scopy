@@ -142,10 +142,8 @@ out_destroy_context:
 	return uris;
 }
 
-void ToolLauncher::update()
+void ToolLauncher::updateListOfDevices(const QVector<QString>& uris)
 {
-	const QVector<QString>& uris = watcher.result();
-
 	//Delete devices that are in the devices list but not found anymore when scanning
 
 	for (auto it = devices.begin(); it != devices.end();) {
@@ -182,6 +180,11 @@ void ToolLauncher::update()
 	search_timer->start(TIMER_TIMEOUT_MS);
 }
 
+
+void ToolLauncher::update()
+{
+	updateListOfDevices(watcher.result());
+}
 
 ToolLauncher::~ToolLauncher()
 {
@@ -246,8 +249,10 @@ void ToolLauncher::addRemoteContext()
 
 void ToolLauncher::swapMenu(QWidget *menu)
 {
-	current->setVisible(false);
-	ui->centralLayout->removeWidget(current);
+	if (current) {
+		current->setVisible(false);
+		ui->centralLayout->removeWidget(current);
+	}
 
 	current = menu;
 
@@ -353,11 +358,17 @@ void adiscope::ToolLauncher::device_btn_clicked(bool pressed)
 
 void adiscope::ToolLauncher::disconnect()
 {
+	/* Switch back to home screen */
+	ui->btnHome->click();
+
 	if (ctx) {
 		destroyContext();
 		resetStylesheets();
 		search_timer->start(TIMER_TIMEOUT_MS);
 	}
+
+	/* Update the list of devices now */
+	updateListOfDevices(searchDevices());
 }
 
 void adiscope::ToolLauncher::on_btnConnect_clicked(bool pressed)
