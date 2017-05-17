@@ -546,17 +546,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx,
 
 Oscilloscope::~Oscilloscope()
 {
-	for (unsigned int i = 0; i < nb_channels; i++)
-		iio->stop(ids[i]);
-	if (fft_is_visible)
-		for (unsigned int i = 0; i < nb_channels; i++)
-			iio->stop(fft_ids[i]);
-	if (hist_is_visible)
-		for (unsigned int i = 0; i < nb_channels; i++)
-			iio->stop(hist_ids[i]);
-	if (xy_is_visible)
-		for (unsigned int i = 0; i < (nb_channels & ~1); i++)
-			iio->stop(xy_ids[i]);
+	ui->pushButtonRunStop->setChecked(false);
 
 	bool started = iio->started();
 	if (started)
