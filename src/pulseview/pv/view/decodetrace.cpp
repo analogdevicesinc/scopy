@@ -40,6 +40,7 @@ extern "C" {
 #include <QMenu>
 #include <QPushButton>
 #include <QToolTip>
+#include <QColor>
 
 #include "decodetrace.hpp"
 
@@ -189,7 +190,7 @@ pair<int, int> DecodeTrace::v_extents() const
 	const int signal_margin =
 		QFontMetrics(QApplication::font()).height() / 3;
 
-	return make_pair(-row_height, signal_margin/*row_height * row_count*/);
+	return make_pair(-row_height, signal_margin);
 }
 
 void DecodeTrace::paint_back(QPainter &p, const ViewItemPaintParams &pp)
@@ -219,7 +220,8 @@ void DecodeTrace::paint_mid(QPainter &p, const ViewItemPaintParams &pp)
 	p.setPen(Qt::black);
 
 	// Iterate through the rows
-	int y = get_visual_y() - (-v_extents().first/2) + v_extents().second;
+	auto row_offset = -(((max_visible_rows_==1) ? 0 : max_visible_rows_ * v_extents().second)) ;
+	int y = get_visual_y() - (-v_extents().first/2 ) + v_extents().second + row_offset;
 	pair<uint64_t, uint64_t> sample_range = get_sample_range(
 		pp.left(), pp.right());
 
@@ -248,7 +250,7 @@ void DecodeTrace::paint_mid(QPainter &p, const ViewItemPaintParams &pp)
 
 		vector<Annotation> annotations;
 		decoder_stack_->get_annotation_subset(annotations, row,
-			sample_range.first, sample_range.second);
+			sample_range.first,sample_range.second);
 		if (!annotations.empty()) {
 			draw_annotations(annotations, p, annotation_height, pp, y,
 				base_colour, row_title_width);
@@ -272,12 +274,11 @@ void DecodeTrace::paint_mid(QPainter &p, const ViewItemPaintParams &pp)
 void DecodeTrace::paint_fore(QPainter &p, const ViewItemPaintParams &pp)
 {
 	using namespace pv::data::decode;
-#if 0
-
 	assert(row_height_);
-
+	auto row_offset = -(((max_visible_rows_==1) ? 0 : max_visible_rows_ * v_extents().second)) ;
 	for (size_t i = 0; i < visible_rows_.size(); i++) {
-		const int y = i * row_height_ + get_visual_y();
+
+		const int y = i * row_height_ + get_visual_y()- (-v_extents().first/2) + v_extents().second + row_offset;
 
 		p.setPen(QPen(Qt::NoPen));
 		p.setBrush(QApplication::palette().brush(QPalette::WindowText));
@@ -298,17 +299,22 @@ void DecodeTrace::paint_fore(QPainter &p, const ViewItemPaintParams &pp)
 			Qt::TextDontClip;
 
 		// Draw the outline
-		p.setPen(QApplication::palette().color(QPalette::Base));
-		/*for (int dx = -1; dx <= 1; dx++)
+
+		QFont font = p.font();
+		QFont newFont = QFont("ArialMT",10,QFont::Normal);
+		p.setFont(newFont);
+
+		p.setPen(QColor::fromRgb(0,0,0));
+		for (int dx = -1; dx <= 1; dx++)
 			for (int dy = -1; dy <= 1; dy++)
 				if (dx != 0 && dy != 0)
-					p.drawText(r.translated(dx, dy), f, h);*/
+					p.drawText(r.translated(dx, dy), f, h);
 
 		// Draw the text
-		p.setPen(QApplication::palette().color(QPalette::WindowText));
+		p.setPen(QColor::fromRgb(255,255,255,255));
 		p.drawText(r, f, h);
+		p.setFont(font);
 	}
-#endif
 }
 
 void DecodeTrace::populate_popup_form(QWidget *parent, QFormLayout *form)

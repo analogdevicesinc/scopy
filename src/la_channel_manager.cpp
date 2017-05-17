@@ -1062,6 +1062,20 @@ void LogicAnalyzerChannelGroupUI::decoderChanged(const QString text)
 			text.toStdString().c_str());
 	}
 
+	if(decoder)
+	{
+		QLayoutItem* item;
+		while ( ( item = ui->ann_row_layout->takeAt( 0 ) ) != NULL )
+		{
+		     delete item->widget();
+		     delete item;
+		}
+		for(auto l = decoder->annotation_rows; l ;l=l->next){
+			auto label = new QLabel("",this);
+			label->setStyleSheet("");
+			ui->ann_row_layout->addWidget(label);
+		}
+	}
 	static_cast<LogicAnalyzerChannelGroup *>(chg)->setDecoder(decoder);
 	chm_ui->update_ui_children(this);
 }
@@ -1611,6 +1625,10 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 					lachannelgroupUI->ui->decoderCombo->addItem(var);
 				}
 
+				connect(lachannelgroupUI->ui->decoderCombo,
+					SIGNAL(currentIndexChanged(const QString&)),
+					lachannelgroupUI, SLOT(decoderChanged(const QString&)));
+
 				if (lachannelgroupUI->getChannelGroup()->getDecoder()) {
 					QString name = QString::fromUtf8(
 						lachannelgroupUI->getChannelGroup()->getDecoder()->name);
@@ -1624,9 +1642,7 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 
 				connect(lachannelgroupUI->ui->collapseGroupBtn, SIGNAL(clicked()),
 				        lachannelgroupUI, SLOT(collapse_group()));
-				connect(lachannelgroupUI->ui->decoderCombo,
-				        SIGNAL(currentIndexChanged(const QString&)),
-				        lachannelgroupUI, SLOT(decoderChanged(const QString&)));
+
 
 				lachannelgroupUI->ui->stackedWidget->setCurrentIndex(1);
 

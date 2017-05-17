@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>380</width>
-    <height>38</height>
+    <height>40</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -520,6 +520,16 @@ background:#4a64ff;
          </item>
         </layout>
        </widget>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="ann_row_layout">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+       </layout>
       </item>
       <item>
        <spacer name="verticalSpacer">

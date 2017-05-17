@@ -815,7 +815,9 @@ void PatternGeneratorChannelGroupUI::setupUARTDecoder()
 
 	auto chMap = setupDecoder("uart",ids);
 
+	auto uartdecoderstack = decodeTrace->decoder()->stack();
 	auto uartdecoder = decodeTrace->decoder()->stack().front();
+
 	uartdecoder->set_option("baudrate",
 	                        g_variant_new_int64(dynamic_cast<UARTPattern *>
 	                                        (getChannelGroup()->pattern)->get_baud_rate()));
@@ -852,6 +854,18 @@ void PatternGeneratorChannelGroupUI::setupUARTDecoder()
 	uartdecoder->set_option("num_stop_bits",
 	                        g_variant_new_double(dynamic_cast<UARTPattern *>
 	                                        (getChannelGroup()->pattern)->get_stop_bits()));
+
+	// Add the decoder rows
+
+	auto decc = uartdecoder->decoder();
+
+	auto decoderAnnotations = 3;
+
+	for (auto i=0; i<decoderAnnotations; i++) {
+		ui->ann_row_layout->addWidget(new QLabel("",this));
+
+	}
+
 	decodeTrace->set_channel_map(chMap);
 
 
@@ -908,6 +922,14 @@ void PatternGeneratorChannelGroupUI::setupSPIDecoder()
 		spidecoder->set_option("cpha", g_variant_new_int64(!spipattern->getCPHA()));
 		//spidecoder->set_option("wordsize", g_variant_new_int64(spipattern->getBytesPerFrame()*8));
 
+		auto decc = spidecoder->decoder();
+		auto decoderAnnotations = 3;
+
+		for (auto i=0; i<decoderAnnotations; i++) {
+			ui->ann_row_layout->addWidget(new QLabel("",this));
+
+		}
+
 		decodeTrace->set_channel_map(chMap);
 	}
 }
@@ -920,12 +942,19 @@ void PatternGeneratorChannelGroupUI::setupI2CDecoder()
 		ids.push_back(chg->get_channel(0)->get_id());
 		ids.push_back(chg->get_channel(1)->get_id());
 
-		/*auto i2cdecoder = decodeTrace->decoder()->stack().front();
-		auto i2cpattern = dynamic_cast<I2CPattern *>(getChannelGroup()->pattern);
-		*/
+
 		auto chMap = setupDecoder("i2c",ids);
 
-		//i2cdecoder->set_option("bitorder", bitorderstr);
+		auto i2cdecoder = decodeTrace->decoder()->stack().front();
+		auto i2cpattern = dynamic_cast<I2CPattern *>(getChannelGroup()->pattern);
+
+		auto decoderAnnotations = 2;
+
+		for (auto i=0; i<decoderAnnotations; i++) {
+			ui->ann_row_layout->addWidget(new QLabel("",this));
+
+		}
+
 		decodeTrace->set_channel_map(chMap);
 	}
 }

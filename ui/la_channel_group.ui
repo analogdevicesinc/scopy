@@ -1772,6 +1772,13 @@ background:#4a64ff;
         </property>
        </spacer>
       </item>
+      <item>
+       <layout class="QVBoxLayout" name="ann_row_layout">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+       </layout>
+      </item>
      </layout>
     </widget>
    </item>
