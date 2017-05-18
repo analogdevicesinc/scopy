@@ -27,7 +27,7 @@ namespace adiscope {
 	{
 	public:
 		explicit ColoredQWidget(QWidget *parent = nullptr);
-		~ColoredQWidget();
+		virtual ~ColoredQWidget();
 	};
 }
 
