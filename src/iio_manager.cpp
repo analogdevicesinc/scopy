@@ -237,9 +237,12 @@ void iio_manager::stop(iio_manager::port_id copy)
 
 	if (!inuse) {
 		qDebug() << "Stopping top block";
-		delete watcher;
+		QObject::disconnect(watcher);
 		top_block::stop();
-		top_block::wait();
+
+		watcher->waitForFinished();
+		delete watcher;
+
 		_started = false;
 	}
 
