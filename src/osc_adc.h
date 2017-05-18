@@ -15,6 +15,8 @@ extern "C" {
 
 namespace adiscope {
 
+class HardwareTrigger;
+
 class IioUtils
 {
 public:
@@ -43,6 +45,8 @@ public:
 
 	struct iio_context * iio_context() const;
 	struct iio_device * iio_adc_dev() const;
+	std::shared_ptr<HardwareTrigger> getTrigger() const;
+
 	uint numAdcChannels() const;
 	QList<struct iio_channel *> adcChannelList() const;
 	uint numAdcBits() const;
@@ -58,6 +62,9 @@ public:
 
 	virtual std::unique_ptr<Settings> getCurrentHwSettings();
 	virtual void setHwSettings(Settings *settings);
+
+protected:
+	std::shared_ptr<HardwareTrigger> m_trigger;
 
 private:
 	struct iio_context *m_ctx;

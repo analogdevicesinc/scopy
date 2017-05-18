@@ -1,7 +1,8 @@
 #include "osc_adc.h"
-#include "filter.hpp"
+#include "hardware_trigger.hpp"
 #include <iio.h>
 #include <QString>
+#include <QDebug>
 
 using namespace adiscope;
 
@@ -91,6 +92,11 @@ struct iio_context * GenericAdc::iio_context() const
 struct iio_device * GenericAdc::iio_adc_dev() const
 {
 	return m_adc;
+}
+
+std::shared_ptr<HardwareTrigger> GenericAdc::getTrigger() const
+{
+	return m_trigger;
 }
 
 QList<struct iio_channel *> GenericAdc::adcChannelList() const
@@ -184,6 +190,15 @@ M2kAdc::M2kAdc(struct iio_context *ctx, struct iio_device *adc_dev):
 		true));
 	m_offset_channels.push_back(iio_device_find_channel(ad5625, "voltage3",
 		true));
+
+	// Check for hardware triggering support
+	struct iio_device *m2k_trigger = iio_context_find_device(ctx,
+		"m2k-adc-trigger");
+	try {
+		m_trigger = std::make_shared<HardwareTrigger>(m2k_trigger);
+	} catch (std::exception& e){
+		qDebug() << "Disabling hardware trigger support." << e.what();
+	}
 
 	// Available frequencies list
 	QStringList list = IioUtils::available_options_list(adc_dev,
