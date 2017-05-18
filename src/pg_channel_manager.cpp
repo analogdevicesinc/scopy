@@ -1477,8 +1477,9 @@ void PatternGeneratorChannelManagerUI::updateUi()
 	static const int channelComboMaxLength = 15;
 	static const int outputComboMaxLength = 5;
 
-	disconnect(pg->getCurrentPatternUI(),SIGNAL(decoderChanged()),this,
-	           SLOT(triggerUpdateUi()));
+	if(pg->getCurrentPatternUI())
+		disconnect(pg->getCurrentPatternUI(),SIGNAL(decoderChanged()),this,
+			   SLOT(triggerUpdateUi()));
 	qDebug()<<"updateUI";
 
 	for (auto ch : chg_ui) {
