@@ -29,6 +29,14 @@ int main(int argc, char **argv)
 {
 	QApplication app(argc, argv);
 
+	if (app.styleSheet().isEmpty()) {
+		QFile file(":/stylesheets/stylesheets/global.qss");
+		file.open(QFile::ReadOnly);
+
+		QString stylesheet = QString::fromLatin1(file.readAll());
+		app.setStyleSheet(stylesheet);
+	}
+
 	auto pythonpath = qgetenv("SCOPY_PYTHONPATH");
 	if (!pythonpath.isNull())
 		qputenv("PYTHONPATH", pythonpath);

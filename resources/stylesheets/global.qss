@@ -1,0 +1,227 @@
+/* Default background color */
+QMainWindow > .QWidget, adiscope--Sismograph > QwtPlotCanvas, QMessageBox {
+	background-color: #272730;
+}
+
+/* Default settings for QWidget and its sub-classes */
+QWidget {
+	background-color: none;
+	color: #bebebe;
+	font: 75 10pt "DejaVu Sans";
+}
+
+QLabel {
+	color: rgba(255, 255, 255, 150);
+	font-size: 14px;
+	text-align: left;
+}
+
+QLabel:disabled {
+	color: rgba(255, 255, 255, 80);
+}
+
+QMainWindow > .QWidget > .QWidget {
+	background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 rgba(0, 0, 0, 40), stop:1 transparent);
+}
+
+QTextBrowser {
+	background-color: rgba(0, 0, 0, 150);
+}
+
+/* Apply a gradiant to the MenuAnim widgets */
+adiscope--MenuAnim {
+	background-color: qlineargradient(spread:pad, x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgba(0, 0, 0, 40), stop: 0.15 transparent, stop: 0.85 transparent, stop: 1.0 rgba(0, 0, 0, 40));
+}
+
+/* Except for the tool launcher's MenuAnim */
+QMainWindow > .QWidget > .adiscope--MenuAnim {
+	background-color: none;
+}
+
+adiscope--dBgraph, adiscope--NyquistGraph, QwtPolarCanvas, pv--view--Viewport {
+	background-color: black;
+}
+
+adiscope--dBgraph > QwtPlotCanvas {
+	background-color: rgba(255, 255, 255, 25);
+}
+
+QwtThermo {
+	background-color: transparent;
+	color: #999999;
+	font-size: 20pt;
+}
+
+adiscope--BufferPreviewer {
+	border: 1px solid #7092be;
+	alternate-background-color: #4a64ff;
+	selection-background-color: #141416;
+	selection-color: #ff7200;
+	background-color: transparent;
+	color: white;
+}
+
+QDial {
+  background-color: black;
+  color: #4963ff;
+}
+
+QTabWidget::pane {
+	border-top: 0px;
+}
+
+QTabBar::tab {
+	min-width: 100px;
+	min-height: 32px;
+	padding-bottom: 5px;
+	font: bold;
+}
+
+QTabBar::tab:selected {
+	color: white;
+	border-bottom: 2px solid #f36d0a;
+	margin-top: 0px;
+}
+
+QTabBar::tab:!selected {
+	border-bottom: 2px solid #373740;
+	margin-top: 0px;
+}
+
+QRadioButton {
+	color: white;
+	spacing: 12px;
+	background-color: transparent;
+}
+
+QRadioButton::indicator {
+	width: 14px;
+	height: 14px;
+	border: 2px solid;
+	border-radius: 9px;
+	border-color: #4963FF;
+}
+
+QRadioButton::indicator:checked {
+	background-color: #4963FF;
+}
+
+QLineEdit {
+	color: white;
+	background-color: transparent;
+}
+
+QComboBox {
+	height: 24px;
+	border: none;
+	font-size: 16px;
+	font-weight: bold;
+	background-color: transparent;
+	border-bottom: 1px solid rgba(255, 255, 255, 102);
+	padding-bottom: 4px;
+}
+
+QComboBox:disabled
+{
+	color: #555555;
+}
+
+QComboBox QAbstractItemView {
+	border: none;
+	background-color: #1b1b21;
+	text-align: left;
+	color: #bebebe;
+	outline: none;
+
+	border-bottom: 1px solid #bebebe;
+	border-top: 1px solid #bebebe;
+}
+
+/* This only works on Windows */
+QComboBox QAbstractItemView {
+	selection-background-color: #272730;
+}
+
+/* This does not work on Windows */
+QComboBox::item:selected {
+	font-weight: bold;
+	font-size: 18px;
+	border-bottom: 0px solid none;
+	background-color: #272730;
+}
+
+QComboBox::drop-down {
+	subcontrol-position: center right;
+	border-image: url(:/icons/sba_cmb_box_arrow.svg);
+	width: 10px;
+	height: 6px;
+	font-size: 16px;
+	text-align: left;
+}
+
+QComboBox::indicator {
+    background-color: transparent;
+    selection-background-color: transparent;
+    color: transparent;
+    selection-color: transparent;
+}
+
+QScrollArea, QScrollArea > .QWidget > .QWidget {
+	background-color: transparent;
+}
+
+QMessageBox QLabel {
+	height: 420px;
+	width: 680px;
+	color: rgba(255,255,255,240);
+	font-size: 14px;
+}
+
+QMessageBox QPushButton {
+	height: 30px;
+	width: 120px;
+	background-color: #4a64ff;
+	color: white;
+	font-size: 16px;
+}
+
+QAbstractSpinBox
+{
+	height: 45px;
+	border-bottom: 1px solid rgba(255, 255, 255, 102);
+}
+
+QAbstractSpinBox::up-button, QAbstractSpinBox::down-button {
+	height: 20px;
+	width: 20px;
+}
+
+QAbstractSpinBox::up-button
+{
+	border-image: url(:/icons/sba_up_btn.svg);
+}
+
+QAbstractSpinBox::up-button:hover
+{
+	border-image: url(:/icons/sba_up_btn_hover.svg);
+}
+
+QAbstractSpinBox::up-button:pressed
+{
+	border-image: url(:/icons/sba_up_btn_pressed.svg);
+}
+
+QAbstractSpinBox::down-button
+{
+	border-image: url(:/icons/sba_dn_btn.svg);
+}
+
+QAbstractSpinBox::down-button:hover
+{
+	border-image: url(:/icons/sba_dn_btn_hover.svg);
+}
+
+QAbstractSpinBox::down-button:pressed
+{
+	border-image: url(:/icons/sba_dn_btn_pressed.svg);
+}

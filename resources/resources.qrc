@@ -114,6 +114,7 @@
         <file>icons/dio101.svg</file>
     </qresource>
     <qresource prefix="/stylesheets">
+        <file>stylesheets/global.qss</file>
         <file>stylesheets/plot.qss</file>
         <file>stylesheets/spinbox_type_a.qss</file>
         <file>stylesheets/dropdown_switch_list.qss</file>
