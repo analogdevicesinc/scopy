@@ -19,11 +19,6 @@
   <property name="windowTitle">
    <string>Scopy</string>
   </property>
-  <property name="styleSheet">
-   <string notr="true">background-color: rgb(39, 39, 48);
-color: rgb(190, 190, 190);
-font: 75 10pt &quot;DejaVu Sans&quot;;</string>
-  </property>
   <widget class="QWidget" name="centralWidget">
    <property name="sizePolicy">
     <sizepolicy hsizetype="Maximum" vsizetype="Minimum">
@@ -56,23 +51,9 @@ font: 75 10pt &quot;DejaVu Sans&quot;;</string>
        </size>
       </property>
       <property name="styleSheet">
-       <string notr="true">QPushButton {
-Text-align:left;
-border: none;
-background-color: none;
-}
-
-QWidget#menu {
-background-color: none;
-}
-
-QWidget:hover {
-background-color: rgb(27, 27, 33);
-}
-
-QWidget[selected=true] {
-background-color: rgb(27, 27, 33);
-}</string>
+       <string notr="true">QPushButton { text-align:left; border: none; background-color: none; }
+.QWidget:hover { background-color: rgba(0, 0, 0, 60); }
+.QWidget[selected=true] { background-color: rgba(0, 0, 0, 60); }</string>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
        <property name="leftMargin">
@@ -159,7 +140,7 @@ color: rgb(255, 255, 255);
        <item>
         <widget class="Line" name="line_3">
          <property name="styleSheet">
-          <string notr="true">color: rgb(51, 51, 59);</string>
+          <string notr="true">color: rgba(255, 255, 255, 16);</string>
          </property>
          <property name="frameShadow">
           <enum>QFrame::Plain</enum>
@@ -247,7 +228,7 @@ color: rgb(255, 255, 255);
        <item>
         <widget class="Line" name="line_2">
          <property name="styleSheet">
-          <string notr="true">color: rgb(51, 51, 59);</string>
+          <string notr="true">color: rgba(255, 255, 255, 16);</string>
          </property>
          <property name="frameShadow">
           <enum>QFrame::Plain</enum>
@@ -1179,7 +1160,7 @@ background-image: url(:/icons/ico-play-green.svg);
        <item>
         <widget class="Line" name="line">
          <property name="styleSheet">
-          <string notr="true">color: rgb(51, 51, 59);</string>
+          <string notr="true">color: rgba(255, 255, 255, 16);</string>
          </property>
          <property name="frameShadow">
           <enum>QFrame::Plain</enum>
@@ -1254,11 +1235,6 @@ background-position: left center;</string>
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QWidget#homeWidget {
-background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 rgba(35, 35, 43, 255), stop:1 rgba(39, 39, 48, 255));
-}</string>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_3">
          <property name="spacing">
@@ -1594,9 +1570,6 @@ background-color: orange;
          </item>
          <item>
           <widget class="QTextBrowser" name="textBrowser">
-           <property name="styleSheet">
-            <string notr="true">background-color: #0e0e0e;</string>
-           </property>
            <property name="frameShape">
             <enum>QFrame::NoFrame</enum>
            </property>
