@@ -25,9 +25,6 @@
    </property>
    <item>
     <widget class="QWidget" name="mainWidget" native="true">
-     <property name="styleSheet">
-      <string notr="true">QWidget#mainWidget { background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 rgba(35, 35, 43, 255), stop:1 rgba(39, 39, 48, 255)); }</string>
-     </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <property name="spacing">
        <number>0</number>
@@ -150,35 +147,6 @@ QPushButton:!checked {
           </property>
           <item>
            <widget class="QTabWidget" name="tabWidget">
-            <property name="styleSheet">
-             <string notr="true">/* QTabsWidgets */
-QTabWidget::pane {
-  border-top: 0px;
-}
-QTabBar::tab {
-  min-width: 100px;
-  min-height: 32px;
-  padding-bottom: 5px;
-  font: bold;
-}
-QTabBar::tab:selected {
-  color: white;
-  border-bottom: 2px solid rgba(243, 109, 10);
-  margin-top: 0px;
-}
-QTabBar::tab:!selected {
-  border-bottom: 2px solid rgba(55, 55, 64);
-  margin-top: 0px;
-}
-
-QTabWidget#tabWidget QWidget {
-  background-color: none;
-}
-
-QTabWidget#tabWidget QWidget QWidget {
-  background-color: black;
-}</string>
-            </property>
             <property name="currentIndex">
              <number>0</number>
             </property>
@@ -209,9 +177,6 @@ QTabWidget#tabWidget QWidget QWidget {
                   <horstretch>0</horstretch>
                   <verstretch>0</verstretch>
                  </sizepolicy>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true">QwtPlotCanvas { background-color: #141416; }</string>
                 </property>
                 <property name="frameShape">
                  <enum>QFrame::NoFrame</enum>
@@ -253,9 +218,6 @@ QTabWidget#tabWidget QWidget QWidget {
                   <horstretch>0</horstretch>
                   <verstretch>0</verstretch>
                  </sizepolicy>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true">QwtPlotCanvas { background-color: #141416; }</string>
                 </property>
                 <property name="frameShape">
                  <enum>QFrame::NoFrame</enum>
@@ -377,9 +339,6 @@ QTabWidget#tabWidget QWidget QWidget {
               </property>
               <item>
                <widget class="adiscope::dBgraph" name="nicholsgraph">
-                <property name="styleSheet">
-                 <string notr="true">QwtPlotCanvas { background-color: #141416; }</string>
-                </property>
                 <property name="frameShape">
                  <enum>QFrame::StyledPanel</enum>
                 </property>
@@ -429,15 +388,6 @@ QTabWidget#tabWidget QWidget QWidget {
           </property>
           <item>
            <widget class="adiscope::MenuAnim" name="rightMenu" native="true">
-            <property name="styleSheet">
-             <string notr="true">QLabel {
-  font-size: 15px;
-  color: rgba(255, 255, 255, 51);
-}
-adiscope--MenuAnim {
-background-color: qlineargradient(spread:pad, x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgba(20, 20, 22, 51), stop: 0.15 rgba(39, 39, 48, 51), stop: 0.85 rgba(39, 39, 48, 51), stop: 1.0 rgba(20, 20, 22, 51));
-}</string>
-            </property>
             <layout class="QVBoxLayout" name="verticalLayout_4">
              <property name="spacing">
               <number>24</number>
