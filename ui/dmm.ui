@@ -16,9 +16,6 @@
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
-  <property name="windowTitle">
-   <string>Form</string>
-  </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <property name="spacing">
     <number>0</number>
@@ -38,9 +35,8 @@
    <item>
     <widget class="QWidget" name="leftPanel" native="true">
      <property name="styleSheet">
-      <string notr="true">QWidget { background-color: #141416; }
-QLabel { color: #444444; font-weight: bold; qproperty-alignment: 'AlignBottom | AlignLeft'; }
-QwtThermo { color: #999999; font-size: 20pt; }</string>
+      <string notr="true">QWidget#leftPanel { background-color: rgba(0, 0, 0, 40); }
+QLabel { color: #444444; font-size: 40pt; font-weight: bold; qproperty-alignment: 'AlignBottom | AlignLeft'; }</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_8">
       <property name="leftMargin">
@@ -132,10 +128,7 @@ QwtThermo { color: #999999; font-size: 20pt; }</string>
                  </size>
                 </property>
                 <property name="styleSheet">
-                 <string notr="true">QLCDNumber {
-background-color: transparent;
-color: #ff7200;
-}</string>
+                 <string notr="true">QLCDNumber { color: #ff7200; }</string>
                 </property>
                 <property name="frameShape">
                  <enum>QFrame::NoFrame</enum>
@@ -161,9 +154,6 @@ color: #ff7200;
                   <width>180</width>
                   <height>105</height>
                  </size>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true">QLabel { font-size: 40pt; }</string>
                 </property>
                 <property name="text">
                  <string>VDC</string>
@@ -279,10 +269,7 @@ color: #ff7200;
                  </size>
                 </property>
                 <property name="styleSheet">
-                 <string notr="true">QLCDNumber {
-background-color: transparent;
-color: #9013fe;
-}</string>
+                 <string notr="true">QLCDNumber { color: #9013fe; }</string>
                 </property>
                 <property name="frameShape">
                  <enum>QFrame::NoFrame</enum>
@@ -308,9 +295,6 @@ color: #9013fe;
                   <width>180</width>
                   <height>105</height>
                  </size>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true">QLabel { font-size: 40pt; }</string>
                 </property>
                 <property name="text">
                  <string>VDC</string>
@@ -376,25 +360,6 @@ color: #9013fe;
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">QWidget{background-color: rgb(39,39,48);}
-QLabel { color: white; }
-QRadioButton {
-color: white;
-spacing: 12px;
-background-color: transparent;
-}
-QRadioButton::indicator {
-width: 14px;
-height: 14px;
-border: 2px solid;
-border-radius: 9px;
-border-color: rgb(73, 99, 255);
-}
-QRadioButton::indicator:checked {
-background-color: rgb(73, 99, 255);
-}</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <property name="spacing">
@@ -579,35 +544,6 @@ QPushButton:disabled {
             <height>0</height>
            </size>
           </property>
-          <property name="styleSheet">
-           <string notr="true">/* QComboBoxes*/
-QComboBox
-{
-  height: 24px;
-  border: 0px;
-  color: white;
-  font-size: 14px;
-  border-bottom: 1px solid rgba(255, 255, 255, 102);
-  padding-bottom: 4px;
-}
-QComboBox::drop-down
-{
-  subcontrol-position: center right;
-  width: 10px;
-  height: 6px;
-  border-image: url(:/icons/sba_cmb_box_arrow.svg);
-}
-QComboBox QAbstractItemView {
-  border: 0px;
-  color: white;
-  selection-background-color: rgba(25, 25, 25);
-  outline: 0px;
-}
-QComboBox:disabled
-{
-  color: rgb(85, 85, 85);
-}</string>
-          </property>
           <property name="currentIndex">
            <number>1</number>
           </property>
@@ -742,35 +678,6 @@ QComboBox:disabled
             <width>80</width>
             <height>0</height>
            </size>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">/* QComboBoxes*/
-QComboBox
-{
-  height: 24px;
-  border: 0px;
-  color: white;
-  font-size: 14px;
-  border-bottom: 1px solid rgba(255, 255, 255, 102);
-  padding-bottom: 4px;
-}
-QComboBox::drop-down
-{
-  subcontrol-position: center right;
-  width: 10px;
-  height: 6px;
-  border-image: url(:/icons/sba_cmb_box_arrow.svg);
-}
-QComboBox QAbstractItemView {
-  border: 0px;
-  color: white;
-  selection-background-color: rgba(25, 25, 25);
-  outline: 0px;
-}
-QComboBox:disabled
-{
-  color: rgb(85, 85, 85);
-}</string>
           </property>
           <property name="currentIndex">
            <number>1</number>
