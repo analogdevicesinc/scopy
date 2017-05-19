@@ -350,7 +350,7 @@ double M2kAdc::convSampleDiffToVoltsDiff(uint chnIdx, double smp) const
 {
 	double hw_gain = gainAt(m_chn_hw_gain_modes[chnIdx]);
 
-	return ((smp * 0.78) / (1 << (numAdcBits() - 1)) * 1.3 *
+	return (smp * 0.78) / ((1 << (numAdcBits() - 1)) * 1.3 *
 		hw_gain) * m_chn_corr_gains[chnIdx] *
 		m_filt_comp_table.at(sampleRate());
 }
