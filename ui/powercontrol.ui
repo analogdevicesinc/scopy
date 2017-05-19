@@ -44,7 +44,7 @@
       </sizepolicy>
      </property>
      <property name="styleSheet">
-      <string notr="true">QWidget { background-color: #141416; }
+      <string notr="true">QWidget#leftPanel { background-color: rgba(0, 0, 0, 40); }
 QLabel { color: #444444; }</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
@@ -230,9 +230,6 @@ color: #ff7200;
       </item>
       <item>
        <widget class="QwtThermo" name="scale_dac1">
-        <property name="styleSheet">
-         <string notr="true">QwtThermo { color: #999999; font-size: 20pt; }</string>
-        </property>
         <property name="upperBound">
          <double>5.000000000000000</double>
         </property>
@@ -423,9 +420,6 @@ color: #9013fe;
       </item>
       <item>
        <widget class="QwtThermo" name="scale_dac2">
-        <property name="styleSheet">
-         <string notr="true">QwtThermo { color: #999999; font-size: 20pt; }</string>
-        </property>
         <property name="lowerBound">
          <double>-5.000000000000000</double>
         </property>
@@ -459,9 +453,6 @@ color: #9013fe;
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">QWidget{background-color: rgb(39,39,48);}</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_4">
       <property name="spacing">
