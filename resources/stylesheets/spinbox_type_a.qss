@@ -1,7 +1,6 @@
 QPushButton#SBA_UpButton {
   width: 30px;
   height: 30px;
-  background-color: rgb(39, 39, 48, 255);
   border-image: url(:/icons/sba_up_btn.svg);
   border: 0px;
 }
@@ -9,13 +8,12 @@ QPushButton#SBA_UpButton:pressed {
   border-image: url(:/icons/sba_up_btn_pressed.svg);
 }
 QPushButton#SBA_UpButton:hover:!pressed {
-  image: url(:/icons/sba_up_btn_hover.svg);
+  border-image: url(:/icons/sba_up_btn_hover.svg);
 }
 
 QPushButton#SBA_DownButton {
   width: 30px;
   height: 30px;
-  background-color: rgb(39, 39, 48, 255);
   border-image: url(:/icons/sba_dn_btn.svg);
   border: 0px;
 }
@@ -23,7 +21,7 @@ QPushButton#SBA_DownButton:pressed {
   border-image: url(:/icons/sba_dn_btn_pressed.svg);
 }
 QPushButton#SBA_DownButton:hover:!pressed {
-  image: url(:/icons/sba_dn_btn_hover.svg);
+  border-image: url(:/icons/sba_dn_btn_hover.svg);
 }
 
 QLabel#SBA_Label {
@@ -35,7 +33,7 @@ QLineEdit#SBA_LineEdit {
   height: 20px;
   width: 75px;
   color: white;
-  background-color: rgba(39, 39, 48, 255);
+  background-color: transparent;
   font-size: 18px;
   font-style: bold;
   border: 0px;
@@ -48,9 +46,9 @@ QFrame#SBA_Line {
 
 QComboBox#SBA_Combobox {
   height: 20px;
-  color: rgba(255, 255, 255, 102);
   border: 0px;
   font-size: 12px;
+  font-weight: normal;
 }
 QComboBox#SBA_Combobox QAbstractItemView {
   border: 0px;
@@ -64,5 +62,6 @@ QComboBox#SBA_Combobox::drop-down {
 }
 
 QDial#SBA_CompletionCircle {
-  color: rgb(73, 99, 255);
+  background-color: black;
+  color: #4963ff;
 }

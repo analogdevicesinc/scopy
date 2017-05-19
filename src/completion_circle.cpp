@@ -28,7 +28,7 @@
 using namespace adiscope;
 
 CompletionCircle::CompletionCircle(QWidget *parent, bool invert_circle) :
-	QDial(parent), m_xc(0), m_yc(0), m_radius(24),
+	QDial(parent), m_xc(0), m_yc(0), m_radius(23),
 	m_pressed(false), m_log_scale(false), invert_circle(invert_circle), m_origin(90)
 {
 	setWrapping(true);
@@ -75,20 +75,18 @@ void CompletionCircle::paintEvent(QPaintEvent *)
 
 	p.setRenderHint(QPainter::Antialiasing);
 
-	// Background circle
-	p.setPen(Qt::black);
-	p.setBrush(Qt::black);
-	p.drawEllipse(QPoint(xc, yc), r, r);
-
 	// The color filled rail
-	p.setPen(qss_color);
-	p.setBrush(qss_color);
+	QPen rail_pen(qss_color);
+	rail_pen.setWidth(3);
+	p.setPen(rail_pen);
 	QRectF rect(xc - r, yc - r, 2* r, 2 * r);
-	p.drawPie(rect, m_origin * 16, angle * 16);
+	p.drawArc(rect, m_origin * 16, angle * 16);
 
-	p.setPen(qss_bgcolor);
-	p.setBrush(qss_bgcolor);
-	p.drawEllipse(QPoint(xc, yc), r - 3, r - 3);
+	// Background circle
+	QPen bg_pen(qss_bgcolor);
+	bg_pen.setWidth(3);
+	p.setPen(bg_pen);
+	p.drawArc(rect, (m_origin + angle) * 16, (360 - angle) * 16);
 
 	// The center dot
 	QColor centerDotColor(Qt::black);
