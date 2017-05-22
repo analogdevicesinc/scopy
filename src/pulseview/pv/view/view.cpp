@@ -1292,5 +1292,19 @@ void View::commit_decoder_channels(std::shared_ptr<TraceTreeItem> trace,
 	}
 }
 
+void View::setGridPosition(int pos, int pixel)
+{
+	if(pos < grid_positions.size())
+		grid_positions[pos] = pixel;
+	else
+		grid_positions.push_back(pixel);
+}
+
+int View::getGridPosition(int pos)
+{
+	if(pos < grid_positions.size())
+		return grid_positions.at(pos);
+}
+
 } // namespace view
 } // namespace pv

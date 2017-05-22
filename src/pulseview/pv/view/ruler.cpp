@@ -40,7 +40,6 @@ class Viewport;
 const float Ruler::RulerHeight = 2.5f; // x Text Height
 const int Ruler::MinorTickSubdivision = 1;
 int Ruler::divisionCount_ = 10;
-
 const float Ruler::HoverArrowSize = 0.5f; // x Text Height
 
 Ruler::Ruler(View &parent) :
@@ -158,7 +157,6 @@ void Ruler::paintEvent(QPaintEvent*)
 	const int major_tick_y1 = text_height + ValueMargin;
 	const int minor_tick_y1 = (major_tick_y1 + ruler_height) / 2;
 
-
 	QPainter p(this);
 	if( view_.viewport()->getTimeTriggerActive() )
 	{
@@ -188,14 +186,24 @@ void Ruler::paintEvent(QPaintEvent*)
 
 	// Draw the tick marks
 	QPen pen = QPen(QColor(255, 255, 255, 30*256/100));
+	int pos = 0;
+	int maxLabelWidth = getMaxLabelWidth();
+	pv::util::Timestamp offset_used =
+		(ruler_offset != 0) ? ruler_offset : view_.offset();
 	for (const auto& tick: tick_position_cache_->major) {
-//		p.setPen(pen);
-//		p.drawLine(QPointF(tick.first, 0),
-//			QPointF(tick.first, major_tick_y1));
-
+		int x = view_.getGridPosition(pos);
+		auto time = offset_used + (x + 0.5) *
+			view_.scale()/(view_.viewport()->size().width() / view_.divisionCount());
+		auto str = format_time_with_distance(this->view_.tick_period(),
+				time,
+				this->view_.tick_prefix(),
+				this->view_.time_unit(),
+				this->view_.tick_precision());
 		p.setPen(palette().color(foregroundRole()));
-		p.drawText(tick.first, major_tick_y1 + ValueMargin, 0, text_height,
-			AlignCenter | AlignBottom | TextDontClip, tick.second);
+		if(9 * maxLabelWidth < width() || pos % 2 == 0)
+			p.drawText(x, major_tick_y1 + ValueMargin, 0, text_height,
+				AlignCenter | AlignBottom | TextDontClip, str);
+		pos++;
 	}
 
 	// Draw the hover mark
@@ -226,6 +234,19 @@ int Ruler::getTickZeroPosition()
 			}
 		}
 	return -1;
+}
+
+int Ruler::getMaxLabelWidth()
+{
+	int max = 0, labelWidth = 0;
+	if( tick_position_cache_.is_initialized() )
+		for (const auto& tick: tick_position_cache_->major) {
+			labelWidth = fontMetrics().width(tick.second);
+			if(labelWidth > max) {
+				max = labelWidth;
+			}
+		}
+	return max;
 }
 
 void Ruler::set_offset(double value)
@@ -260,7 +281,6 @@ Ruler::TickPositions Ruler::calculate_tick_positions(
 
 	double x;
 	double width_division = width / divisionCount_;
-
 	do {
 		pv::util::Timestamp t = t0 + division * minor_period;
 		x = ((t - offset) * width_division / scale).convert_to<double>();

@@ -339,10 +339,9 @@ void Viewport::paint_grid(QPainter &p, const ViewItemPaintParams &pp)
 
 		p1 = QPointF(x + w*i/division_count, y);
 		p2 = QPointF(x + w*i/division_count, y + h * row_count);
-
+		view_.setGridPosition(i, x + w*i/division_count);
 		p.drawLine(p1, p2);
 	}
-
 	p.setRenderHint(QPainter::Antialiasing, true);    
 	paint_axis(p,pp,pp.top());
 	paint_axis(p,pp,pp.bottom());

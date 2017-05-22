@@ -324,7 +324,8 @@ public:
 	Ruler *ruler_;
 	void set_offset(double timePos, double timeSpan, bool running);
 	double start_plot_offset();
-
+	void setGridPosition(int pos, int pixel);
+	int getGridPosition(int pos);
 private Q_SLOTS:
 
 	void h_scroll_value_changed(int value);
@@ -418,6 +419,7 @@ private:
 
 	// This is true when the defaults couldn't be set due to insufficient info
 	bool scroll_needs_defaults;
+	std::vector<int> grid_positions;
 };
 
 } // namespace view
