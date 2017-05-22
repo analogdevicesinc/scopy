@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>378</width>
-    <height>648</height>
+    <width>333</width>
+    <height>699</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -20,113 +20,12 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">QLineEdit
-{
-  font-family: Arial;
-  font-size: 18px;
-  line-height: 21px;
-  color: #FFFFFF;
-  border: 0px;
-  border-bottom: 1px solid rgba(255,255,255,100);
-}
-
-QLineEdit:disabled
-{
-  color: rgb(85, 85, 85);
-}
-
-QFrame
-{
-height: 1px;
-color: rgba(255,255,255,25);
-}
-
-QComboBox
-{
-  height: 19px;
-  border: 0px;
-  border-bottom: 1px solid rgba(255, 255, 255, 102);
-  font-family: ArialMT;
-  font-size: 18px;
-  font-weight: normal;
-  font-style: normal;
-  text-align: left;
-  color: #ffffff;
-}
-
-QLabel
-{
-width: 68.2px;
-height: 16.46px;
-font-family: Arial;
-font-size: 14px;
-line-height: 16px;
-color: rgba(255,255,255,150);
-}
-
-QLabel:disabled
-{
-  color: rgb(85, 85, 85);
-}
-
-QComboBox::drop-down
-{
-  subcontrol-position: center right;
-  width: 10px;
-  height: 6px;
-  border-image: url(:/icons/sba_cmb_box_arrow.svg);
-  font-family: ArialMT;
-  font-size: 16px;
-  font-weight: normal;
-  font-style: normal;
-  text-align: left;
-}
-
-QComboBox QAbstractItemView {
-  border: 0px;
-  selection-background-color: rgba(25, 25, 25);
-  outline: 0px;
-  color:rgba(255,255,255,102);
-  /*background:black;*/
- padding: 1px 0px 1px 3px; /*This makes text colour work*/
-}
-
-QComboBox:disabled
-{
-  color: rgb(85, 85, 85);
-}
-
-
-QComboBox QAbstractItemView::item {
-  font-family: ArialMT;
-  font-size: 18px;
-  font-weight: normal;
-  font-style: normal;
-  text-align: left;
-  color: rgba(255,255,255,0);
-  border-bottom: 0px solid rgba(255, 255, 255, 102);
-
-}
-
-/* Color of the selected list item. */
-QComboBox::item:selected {
-  font-family: ArialMT;
-  font-size: 18px;
-  font-weight: normal;
-  font-style: normal;
-  text-align: left;
-  color: #ffffff;
-  border-bottom: 0px solid rgba(255, 255, 255, 102);
- 
-}
-/* Indicator will shine through the label text if you don't make it hidden. */
-QComboBox::indicator{
-    background-color:transparent;
-    selection-background-color:transparent;
-    color:transparent;
-    selection-color:transparent;
-}
-</string>
+   <string notr="true">#PBLeft, #PBRight {
+  width: 40px;
+  height: 30px;
+  border-radius: 4px;
+  background-color: #4a64ff;
+}</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
@@ -146,7 +45,13 @@ QComboBox::indicator{
    </property>
    <item>
     <layout class="QVBoxLayout" name="verticalLayout_2">
+     <property name="leftMargin">
+      <number>40</number>
+     </property>
      <property name="topMargin">
+      <number>40</number>
+     </property>
+     <property name="rightMargin">
       <number>40</number>
      </property>
      <item>
@@ -161,22 +66,6 @@ QComboBox::indicator{
         <number>0</number>
        </property>
        <item>
-        <spacer name="horizontalSpacer_4">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Fixed</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
         <layout class="QVBoxLayout" name="verticalLayout_3">
          <property name="spacing">
           <number>0</number>
@@ -184,7 +73,7 @@ QComboBox::indicator{
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_2">
            <property name="spacing">
-            <number>0</number>
+            <number>20</number>
            </property>
            <property name="topMargin">
             <number>0</number>
@@ -236,19 +125,6 @@ color: #FFFFFF;
                <height>0</height>
               </size>
              </property>
-             <property name="styleSheet">
-              <string notr="true">  width: 40px;
-  height: 30px;
-  border-radius: 4px;
-  background-color: #4a64ff;
-  font-family: ArialMT;
-  font-size: 14px;
-  font-weight: bold;
-  font-style: normal;
-  text-align: center;
-  color: #ffffff;
-</string>
-             </property>
              <property name="text">
               <string/>
              </property>
@@ -266,36 +142,7 @@ color: #FFFFFF;
             </widget>
            </item>
            <item>
-            <spacer name="horizontalSpacer_2">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Maximum</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
             <widget class="QPushButton" name="PBRight">
-             <property name="styleSheet">
-              <string notr="true">  width: 40px;
-  height: 30px;
-  border-radius: 4px;
-  background-color: #4a64ff;
-  font-family: ArialMT;
-  font-size: 14px;
-  font-weight: bold;
-  font-style: normal;
-  text-align: center;
-  color: #ffffff;
-</string>
-             </property>
              <property name="text">
               <string/>
              </property>
@@ -360,8 +207,8 @@ background-color: #4A64FF;</string>
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>292</width>
-              <height>559</height>
+              <width>249</width>
+              <height>556</height>
              </rect>
             </property>
             <property name="sizePolicy">
@@ -446,7 +293,7 @@ color: rgba(255,255,255,50);
                <item>
                 <layout class="QVBoxLayout" name="verticalLayout_5">
                  <property name="spacing">
-                  <number>0</number>
+                  <number>21</number>
                  </property>
                  <item>
                   <widget class="QLabel" name="label_2">
@@ -454,22 +301,6 @@ color: rgba(255,255,255,50);
                     <string>Pattern</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
-                  <spacer name="verticalSpacer_4">
-                   <property name="orientation">
-                    <enum>Qt::Vertical</enum>
-                   </property>
-                   <property name="sizeType">
-                    <enum>QSizePolicy::Fixed</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>0</width>
-                     <height>21</height>
-                    </size>
-                   </property>
-                  </spacer>
                  </item>
                  <item>
                   <widget class="QComboBox" name="CBPattern"/>
@@ -495,7 +326,7 @@ color: rgba(255,255,255,50);
                <item>
                 <layout class="QVBoxLayout" name="verticalLayout_4">
                  <property name="spacing">
-                  <number>0</number>
+                  <number>21</number>
                  </property>
                  <property name="topMargin">
                   <number>0</number>
@@ -506,22 +337,6 @@ color: rgba(255,255,255,50);
                     <string>Output</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
-                  <spacer name="verticalSpacer_3">
-                   <property name="orientation">
-                    <enum>Qt::Vertical</enum>
-                   </property>
-                   <property name="sizeType">
-                    <enum>QSizePolicy::Fixed</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>0</width>
-                     <height>21</height>
-                    </size>
-                   </property>
-                  </spacer>
                  </item>
                  <item>
                   <widget class="QComboBox" name="CBOutput">
@@ -1030,22 +845,6 @@ color: rgba(255,255,255,50);
           </spacer>
          </item>
         </layout>
-       </item>
-       <item>
-        <spacer name="horizontalSpacer_5">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Fixed</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
        </item>
       </layout>
      </item>
