@@ -275,10 +275,19 @@ void LogicAnalyzerChannelUI::dropEvent(QDropEvent *event)
 	{
 		short from = (short)event->mimeData()->data("la/channelgroup")[1];
 		auto fromNrOfChannels = chm_ui->chm->get_channel_group(from)->get_channel_count();
-		chm_ui->chm->join({(int)chgIndex,from});
+
+		for(int i = 0; i < fromNrOfChannels; i++) {
+			/* Check for duplicates */
+			auto chToBeAdded = chm_ui->chm->get_channel_group(from)->get_channel(i);
+			auto ids = chm_ui->chm->get_channel_group(chgIndex)->get_ids();
+			if( std::find(ids.begin(), ids.end(), chToBeAdded->get_id()) == ids.end()) {
+				Channel *ch = new LogicAnalyzerChannel(
+					chToBeAdded->get_id(), chToBeAdded->get_label());
+				chm_ui->chm->get_channel_group(chgIndex)->add_channel(ch);
+			}
+		}
 		chm_ui->chm->highlightChannel(chm_ui->chm->get_channel_group(chgIndex));
-		chgIndex = chm_ui->chm->get_channel_groups()->size() - 1;
-		auto chgIter = std::find(channelGroups->begin(), channelGroups->end(), chgroup);
+
 		auto j = 0;
 		for( auto i = fromNrOfChannels; i > 0; i--)
 		{
