@@ -108,6 +108,7 @@ namespace adiscope {
 		void onXY_view_toggled(bool visible);
 
 		void onTimeTriggerDelayChanged(double);
+		void onTriggerLevelChanged(double);
 		void onTriggerModeChanged(int);
 
 		void onVertScaleValueChanged(double value);
@@ -304,15 +305,21 @@ namespace adiscope {
 		Q_PROPERTY(double cursor_h2 READ cursorH2 WRITE setCursorH2);
 
 		Q_PROPERTY(bool auto_trigger
-				READ autoTrigger WRITE setAutoTrigger);
+				READ autoTrigger WRITE setAutoTrigger)
+		Q_PROPERTY(bool internal_trigger
+				READ internalTrigger WRITE setInternalTrigger)
 		Q_PROPERTY(bool external_trigger
-				READ externalTrigger WRITE setExternalTrigger);
-
+				READ externalTrigger WRITE setExternalTrigger)
 		Q_PROPERTY(int trigger_source
-				READ triggerSource WRITE setTriggerSource);
-
-		Q_PROPERTY(QList<double> trigger_level
+				READ triggerSource WRITE setTriggerSource)
+		Q_PROPERTY(double trigger_level
 				READ getTriggerLevel WRITE setTriggerLevel)
+		Q_PROPERTY(double trigger_hysteresis READ getTriggerHysteresis
+				WRITE setTriggerHysteresis)
+		Q_PROPERTY(bool internal_condition READ internalCondition
+				WRITE setInternalCondition)
+		Q_PROPERTY(bool external_condition READ externalCondition
+				WRITE setExternalCondition)
 
 		Q_PROPERTY(QList<QString> math_channels
 				READ getMathChannels WRITE setMathChannels
@@ -374,14 +381,29 @@ namespace adiscope {
 		bool autoTrigger() const;
 		void setAutoTrigger(bool en);
 
+		bool internalTrigger() const;
+		void setInternalTrigger(bool en);
+
 		bool externalTrigger() const;
 		void setExternalTrigger(bool en);
 
 		int triggerSource() const;
 		void setTriggerSource(int idx);
 
-		QList<double> getTriggerLevel() const;
-		void setTriggerLevel(const QList<double>& list);
+		double getTriggerLevel() const;
+		void setTriggerLevel(double level);
+
+		double getTriggerHysteresis() const;
+		void setTriggerHysteresis(double hyst);
+
+		int internalCondition() const;
+		void setInternalCondition(int cond);
+
+		int externalCondition() const;
+		void setExternalCondition(int cond);
+
+		int internExtern() const;
+		void setInternExtern(int option);
 
 		QList<QString> getMathChannels() const;
 		void setMathChannels(const QList<QString>& list);

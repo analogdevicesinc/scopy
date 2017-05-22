@@ -25,140 +25,77 @@
 #include "ui_trigger_settings.h"
 
 #include <iio.h>
+#include <QDebug>
 
 using namespace adiscope;
 using namespace std;
 
-vector<string> TriggerSettings::lut_trigger_sources = {
-	"a",
-	"b",
-	"a_OR_b",
-	"a_AND_b",
-	"a_XOR_b",
+struct TriggerSettings::trigg_channel_config {
+	double level_min;
+	double level_max;
+	double level_step;
+	double level_val;
+	double hyst_min;
+	double hyst_max;
+	double hyst_step;
+	double hyst_val;
 };
 
-vector<string> TriggerSettings::lut_triggerX_types = {
-	"always",
-	"analog",
-	"digital",
-	"digital_OR_analog",
-	"digital_AND_analog",
-	"digital_XOR_analog",
-	"!digital_OR_analog",
-	"!digital_AND_analog",
-	"!digital_XOR_analog",
-};
-
-vector<string> TriggerSettings::lut_analog_trigger_conditions = {
-	"edge-rising",
-	"edge-falling",
-	"level-low",
-	"level-high",
-};
-
-vector<string> TriggerSettings::lut_digital_trigger_conditions = {
-	"edge-rising",
-	"edge-falling",
-	"edge-any",
-	"level-low",
-	"level-high",
-};
-
-TriggerSettings::TriggerSettings(struct iio_context *ctx,
-		std::shared_ptr<GenericAdc> adc,
+TriggerSettings::TriggerSettings(std::shared_ptr<GenericAdc> adc,
 		QWidget *parent) :
 	QWidget(parent), ui(new Ui::TriggerSettings),
 	adc(adc),
-	triggerA_en(false), triggerB_en(false),
-	temporarily_disabled(false)
+	trigger(adc->getTrigger()),
+	current_channel(0),
+	temporarily_disabled(false),
+	adc_running(false)
 {
 	ui->setupUi(this);
 
-	trigger_auto_mode = ui->btnAuto->isChecked();
-
-	ui_triggerAlevel = new PositionSpinButton({
-						{"μVolts", 1E-6},
-						{"mVolts", 1E-3},
-						{"Volts", 1E0}
-						},
-						"Level",
-						-25, +25);
-	ui_triggerBlevel = new PositionSpinButton({
-						{"μVolts", 1E-6},
-						{"mVolts", 1E-3},
-						{"Volts", 1E0}
-						},
-						"Level",
-						-25, +25);
-	ui_triggerAHyst = new PositionSpinButton({
-						{"μVolts", 1E-6},
-						{"mVolts", 1E-3},
-						{"Volts", 1E0}
-						},
-						"Hyst A",
-						-25, +25,
-						false);
-	ui_triggerBHyst = new PositionSpinButton({
-						{"μVolts", 1E-6},
-						{"mVolts", 1E-3},
-						{"Volts", 1E0}
-						},
-						"Hyst B",
-						-25, +25,
-						false);
-	ui_triggerHoldoff = new PositionSpinButton({
-						{"μs", 1E-6},
-						{"ms", 1E-3},
-						{"s", 1E0}
-						},
-						"Holdoff",
-						0, 1,
-						false);
-
-	ui->triggerAlevel_container->addWidget(ui_triggerAlevel, 0, Qt::AlignLeft);
-	ui->triggerBlevel_container->addWidget(ui_triggerBlevel, 0, Qt::AlignLeft);
-	ui->hysterezisA_container->addWidget(ui_triggerAHyst);
-	ui->hysterezisB_container->addWidget(ui_triggerBHyst);
-	ui->holdoff_container->addWidget(ui_triggerHoldoff);
-
-	if (ctx) {
-		struct iio_device *dev = iio_context_find_device(ctx,
-							"m2k-adc-trigger");
-		if (dev) {
-			this->trigger0 = iio_device_find_channel(dev,
-							"voltage0", false);
-			this->trigger1 = iio_device_find_channel(dev,
-							"voltage1", false);
-			this->digitalTrigger0 = iio_device_find_channel(dev,
-							"voltage2", false);
-			this->digitalTrigger1 = iio_device_find_channel(dev,
-							"voltage3", false);
-			this->trigger0Mode = iio_device_find_channel(dev,
-							"voltage4", false);
-			this->trigger1Mode = iio_device_find_channel(dev,
-							"voltage5", false);
-			this->timeTrigger = iio_device_find_channel(dev,
-							"voltage6", false);
-
-			trigger_all_widgets_update();
-
-			on_btn_noise_reject_toggled(false);
-			onSpinboxTriggerAhystChanged(0);
-			onSpinboxTriggerBhystChanged(0);
-		}
+	for (uint i = 0; i < trigger->numChannels(); i++) {
+		struct trigg_channel_config config = {};
+		trigg_configs.push_back(config);
 	}
 
-	connect(ui_triggerAlevel, SIGNAL(valueChanged(double)),
-		SLOT(onSpinboxTriggerAlevelChanged(double)));
-	connect(ui_triggerBlevel, SIGNAL(valueChanged(double)),
-		SLOT(onSpinboxTriggerBlevelChanged(double)));
-	connect(ui_triggerAHyst, SIGNAL(valueChanged(double)),
-		SLOT(onSpinboxTriggerAhystChanged(double)));
-	connect(ui_triggerBHyst, SIGNAL(valueChanged(double)),
-		SLOT(onSpinboxTriggerBhystChanged(double)));
+	// Populate UI source comboboxes with the available channels
+	for (uint i = 0; i < trigger->numChannels(); i++) {
+		ui->cmb_source->addItem(QString("Channel %1").arg(i + 1));
+	}
+
+	trigger_auto_mode = ui->btnAuto->isChecked();
+
+	auto m2k_adc = dynamic_pointer_cast<M2kAdc>(adc);
+	if (m2k_adc) {
+		auto adc_range = m2k_adc->inputRange(
+			m2k_adc->chnHwGainMode(current_channel));
+		auto hyst_range = QPair<double, double>(
+			adc_range.first / 10, adc_range.second / 10);
+		setTriggerLevelRange(current_channel, adc_range);
+		setTriggerHystRange(current_channel, hyst_range);
+	}
+
+	connect(ui->trigger_level, SIGNAL(valueChanged(double)),
+		SLOT(onSpinboxTriggerLevelChanged(double)));
+	connect(ui->trigger_hysteresis, SIGNAL(valueChanged(double)),
+		SLOT(onSpinboxTriggerHystChanged(double)));
 
 	connect(ui->btnNormal, SIGNAL(clicked()), this,
 			SLOT(autoTriggerEnable()));
+
+	// Default GUI settings
+	ui->cmb_source->setCurrentIndex(0);
+	on_cmb_source_currentIndexChanged(0);
+	ui->intern_en->setChecked(true);
+	ui->extern_en->setChecked(false);
+	on_extern_en_toggled(false);
+	ui->cmb_condition->setCurrentIndex(0);
+	on_cmb_condition_currentIndexChanged(0);
+	ui->cmb_extern_condition->setCurrentIndex(0);
+	on_cmb_extern_condition_currentIndexChanged(0);
+	ui->cmb_analog_extern->setCurrentIndex(0);
+	on_cmb_analog_extern_currentIndexChanged(0);
+	ui->trigger_level->setValue(0);
+	ui->trigger_hysteresis->setValue(50e-3);
 }
 
 TriggerSettings::~TriggerSettings()
@@ -169,24 +106,24 @@ TriggerSettings::~TriggerSettings()
 	delete ui;
 }
 
-double TriggerSettings::levelA_value()
+int TriggerSettings::currentChannel() const
 {
-	return ui_triggerAlevel->value();
+	return current_channel;
 }
 
-double TriggerSettings::levelB_value()
+bool TriggerSettings::analogEnabled() const
 {
-	return ui_triggerBlevel->value();
+	return ui->intern_en->isChecked();
 }
 
-bool TriggerSettings::levelA_enabled()
+bool TriggerSettings::digitalEnabled() const
 {
-	return triggerA_en;
+	return ui->extern_en->isChecked();
 }
 
-bool TriggerSettings::levelB_enabled()
+double TriggerSettings::level() const
 {
-	return triggerB_en;
+	return ui->trigger_level->value();
 }
 
 long long TriggerSettings::triggerDelay() const
@@ -198,458 +135,155 @@ void TriggerSettings::setTriggerDelay(long long raw_delay)
 {
 	if (trigger_raw_delay != raw_delay) {
 		trigger_raw_delay = raw_delay;
-		trigg_delay_write_hardware(raw_delay);
+
+		delay_hw_write(raw_delay);
 	}
 }
 
-void TriggerSettings::setTriggerLevelA(double level)
+void TriggerSettings::setTriggerLevel(double level)
 {
-	double current_level = ui_triggerAlevel->value();
+	double current_level = ui->trigger_level->value();
 
-	if (current_level != level)
-		ui_triggerAlevel->setValue(level);
-}
-
-void TriggerSettings::setTriggerLevelB(double level)
-{
-	double current_level = ui_triggerBlevel->value();
-
-	if (current_level != level)
-		ui_triggerBlevel->setValue(level);
-}
-
-void TriggerSettings::on_cmb_trigg_source_currentIndexChanged(int index)
-{
-	bool triggerA_new_state;
-	bool triggerB_new_state;
-
-	if (this->timeTrigger) {
-		iio_channel_attr_write(this->timeTrigger, "logic_mode",
-				       lut_trigger_sources[index].c_str());
-	}
-
-	trigger_ab_enabled_update(triggerA_new_state, triggerB_new_state);
-	if (triggerA_new_state != triggerA_en) {
-		triggerA_en = triggerA_new_state;
-		Q_EMIT triggerAenabled(triggerA_new_state);
-	}
-	if (triggerB_new_state != triggerB_en) {
-		triggerB_en = triggerB_new_state;
-		Q_EMIT triggerBenabled(triggerB_new_state);
+	if (current_level != level) {
+		ui->trigger_level->setValue(level);
+		trigg_configs[current_channel].level_val = level;
 	}
 }
 
-void TriggerSettings::on_cmb_trigg_A_currentIndexChanged(int index)
+void TriggerSettings::setTriggerHysteresis(double hyst)
 {
-	if (this->trigger0Mode) {
-		int i = index + 1;
-		iio_channel_attr_write(this->trigger0Mode, "mode",
-				       lut_triggerX_types[i].c_str());
+	double current_hyst = ui->trigger_hysteresis->value();
+
+	if (current_hyst != hyst) {
+		ui->trigger_hysteresis->setValue(hyst);
+		trigg_configs[current_channel].hyst_val = hyst;
 	}
-
-	ui_reconf_on_triggerA_mode_changed(index);
 }
 
-void TriggerSettings::on_cmb_trigg_B_currentIndexChanged(int index)
+void TriggerSettings::on_cmb_source_currentIndexChanged(int index)
 {
-	if (this->trigger1Mode) {
-		int i = index + 1;
-		iio_channel_attr_write(this->trigger1Mode, "mode",
-				       lut_triggerX_types[i].c_str());
-	}
+	current_channel = index;
 
-	ui_reconf_on_triggerB_mode_changed(index);
+	ui->trigger_level->setMinValue(trigg_configs[index].level_min);
+	ui->trigger_level->setMaxValue(trigg_configs[index].level_max);
+	ui->trigger_level->setStep(trigg_configs[index].level_step);
+	ui->trigger_hysteresis->setMinValue(trigg_configs[index].hyst_min);
+	ui->trigger_hysteresis->setMaxValue(trigg_configs[index].hyst_max);
+	ui->trigger_hysteresis->setStep(trigg_configs[index].hyst_step);
+
+	if (adc_running)
+		write_ui_settings_to_hawrdware();
 }
 
-void TriggerSettings::onSpinboxTriggerAlevelChanged(double value)
+void TriggerSettings::onSpinboxTriggerLevelChanged(double value)
 {
-	Q_EMIT levelAChanged(value);
-	triggA_level_write_hardware(value);
+	level_hw_write(value);
+	trigg_configs[current_channel].level_val = value;
+
+	Q_EMIT levelChanged(value);
 }
 
-void TriggerSettings::onSpinboxTriggerBlevelChanged(double value)
+void TriggerSettings::onSpinboxTriggerHystChanged(double value)
 {
-	Q_EMIT levelBChanged(value);
-	triggB_level_write_hardware(value);
+	hysteresis_hw_write(value);
+	trigg_configs[current_channel].hyst_val = value;
 }
 
-void TriggerSettings::onSpinboxTriggerAhystChanged(double value)
+void TriggerSettings::on_cmb_condition_currentIndexChanged(int index)
 {
-	if (!this->trigger0)
-		return;
-
-	int rawValue = (int)adc->convVoltsDiffToSampleDiff(0, value);
-	QString s = QString::number(rawValue);
-
-	iio_channel_attr_write(this->trigger0, "trigger_hysteresis",
-				s.toLocal8Bit().QByteArray::constData());
+	analog_cond_hw_write(index);
 }
 
-void TriggerSettings::onSpinboxTriggerBhystChanged(double value)
+void TriggerSettings::on_cmb_extern_condition_currentIndexChanged(int index)
 {
-	if (!this->trigger1)
-		return;
-
-	int rawValue = (int)adc->convVoltsDiffToSampleDiff(1, value);
-	QString s = QString::number(rawValue);
-
-	iio_channel_attr_write(this->trigger1, "trigger_hysteresis",
-				s.toLocal8Bit().QByteArray::constData());
+	digital_cond_hw_write(index);
 }
 
-void TriggerSettings::on_cmb_triggA_cond_currentIndexChanged(int index)
+void TriggerSettings::on_intern_en_toggled(bool checked)
 {
-	if (!this->trigger0)
-		return;
+	HardwareTrigger::mode mode = determineTriggerMode(checked,
+				ui->extern_en->isChecked());
+	mode_hw_write(mode);
 
-	if (index < ui->cmb_triggA_cond->count() - 1) {
-		iio_channel_attr_write(this->trigger0, "trigger",
-				lut_analog_trigger_conditions[index].c_str());
-		int pos = ui->cmb_trigg_A->currentIndex();
-		iio_channel_attr_write(this->trigger0Mode, "mode",
-				       lut_triggerX_types[pos + 1].c_str());
+	ui_reconf_on_intern_toggled(checked);
+
+	Q_EMIT(analogTriggerEnabled(checked));
+}
+
+void TriggerSettings::on_extern_en_toggled(bool checked)
+{
+	HardwareTrigger::mode mode = determineTriggerMode(
+				ui->intern_en->isChecked(), checked);
+	mode_hw_write(mode);
+
+	ui_reconf_on_extern_toggled(checked);
+}
+
+HardwareTrigger::mode TriggerSettings::determineTriggerMode(bool intern_checked,
+			bool extern_checked) const
+{
+	HardwareTrigger::mode mode;
+
+	if (intern_checked) {
+		if (extern_checked) {
+			int n = static_cast<int>(HardwareTrigger::DIGITAL) + 1;
+			int i = ui->cmb_analog_extern->currentIndex();
+
+			mode = static_cast<HardwareTrigger::mode>(n + i);
+		} else {
+			mode = HardwareTrigger::ANALOG;
+		}
 	} else {
-		iio_channel_attr_write(this->trigger0Mode, "mode",
-				       lut_triggerX_types[0].c_str());
-	}
-
-	ui_reconf_on_triggerA_cond_changed(index);
-}
-
-void TriggerSettings::on_cmb_triggB_cond_currentIndexChanged(int index)
-{
-	if (!this->trigger1)
-		return;
-
-	if (index < ui->cmb_triggB_cond->count() - 1) {
-		iio_channel_attr_write(this->trigger1, "trigger",
-				lut_analog_trigger_conditions[index].c_str());
-		int pos = ui->cmb_trigg_B->currentIndex();
-		iio_channel_attr_write(this->trigger1Mode, "mode",
-				       lut_triggerX_types[pos + 1].c_str());
-	} else {
-		iio_channel_attr_write(this->trigger1Mode, "mode",
-				       lut_triggerX_types[0].c_str());
-	}
-
-	ui_reconf_on_triggerB_cond_changed(index);
-}
-
-void TriggerSettings::on_cmb_triggA_ext_cond_currentIndexChanged(int index)
-{
-	if (!this->digitalTrigger0)
-		return;
-
-	iio_channel_attr_write(this->digitalTrigger0, "trigger",
-				lut_digital_trigger_conditions[index].c_str());
-}
-
-void TriggerSettings::on_cmb_triggB_ext_cond_currentIndexChanged(int index)
-{
-	if (!this->digitalTrigger1)
-		return;
-
-	iio_channel_attr_write(this->digitalTrigger1, "trigger",
-				lut_digital_trigger_conditions[index].c_str());
-}
-
-void adiscope::TriggerSettings::on_trigg_A_extern_en_toggled(bool checked)
-{
-	ui_reconf_on_triggerA_extern_changed(checked);
-}
-
-void adiscope::TriggerSettings::on_trigg_B_extern_en_toggled(bool checked)
-{
-	ui_reconf_on_triggerB_extern_changed(checked);
-}
-
-void TriggerSettings::trigger_all_widgets_update()
-{
-	ssize_t ret;
-	char buf[4096];
-
-	if (this->trigger0) {
-		ret = iio_channel_attr_read(this->trigger0, "trigger", buf, sizeof(buf));
-		if (ret >= 0) {
-			int pos = std::find(lut_analog_trigger_conditions.begin(),lut_analog_trigger_conditions.end(), buf) -
-					lut_analog_trigger_conditions.begin();
-			if (pos < lut_analog_trigger_conditions.size()) {
-				ui->cmb_triggA_cond->setCurrentIndex(pos);
-				ui_reconf_on_triggerA_cond_changed(pos);
-			}
-		}
-
-		ret = iio_channel_attr_read(this->trigger0, "trigger_level", buf, sizeof(buf));
-		if (ret >= 0) {
-			double val = adc->convSampleToVolts(0,
-				QString(buf).toDouble());
-			ui_triggerAlevel->setValue(val);
-		}
-
-		ret = iio_channel_attr_read(this->trigger0, "trigger_hysteresis", buf, sizeof(buf));
-		if (ret >= 0) {
-			double val = adc->convSampleDiffToVoltsDiff(0,
-				QString(buf).toDouble());
-			ui_triggerAHyst->setValue(val);
+		if (extern_checked) {
+			mode = HardwareTrigger::DIGITAL;
+		} else {
+			mode = HardwareTrigger::ALWAYS;
 		}
 	}
 
-	if (this->trigger1) {
-		ret = iio_channel_attr_read(this->trigger1, "trigger", buf, sizeof(buf));
-		if (ret >= 0) {
-			int pos = std::find(lut_analog_trigger_conditions.begin(),lut_analog_trigger_conditions.end(), buf) -
-					lut_analog_trigger_conditions.begin();
-			if (pos < lut_analog_trigger_conditions.size()) {
-				ui->cmb_triggB_cond->setCurrentIndex(pos);
-				ui_reconf_on_triggerB_cond_changed(pos);
-			}
+	return mode;
+}
+
+void TriggerSettings::ui_reconf_on_intern_toggled(bool checked)
+{
+	ui->analog_controls->setEnabled(checked);
+
+	bool analog_and_ext = checked && ui->extern_en->isChecked();
+	ui->lbl_analog_extern->setEnabled(analog_and_ext);
+	ui->cmb_analog_extern->setEnabled(analog_and_ext);
+}
+
+void TriggerSettings::ui_reconf_on_extern_toggled(bool checked)
+{
+	ui->digital_controls->setEnabled(checked);
+
+	bool analog_and_ext = checked && ui->intern_en->isChecked();
+	ui->lbl_analog_extern->setEnabled(analog_and_ext);
+	ui->cmb_analog_extern->setEnabled(analog_and_ext);
+}
+
+void TriggerSettings::on_cmb_analog_extern_currentIndexChanged(int index)
+{
+	if (adc_running) {
+		HardwareTrigger::mode mode;
+		int n = static_cast<int>(HardwareTrigger::DIGITAL) + 1;
+
+		mode = static_cast<HardwareTrigger::mode>(n + index);
+		try {
+			trigger->setTriggerMode(current_channel, mode);
 		}
-
-		ret = iio_channel_attr_read(this->trigger1, "trigger_level", buf, sizeof(buf));
-		if (ret >= 0) {
-			double val = adc->convSampleToVolts(1,
-				QString(buf).toDouble());
-			ui_triggerBlevel->setValue(val);
+		catch (std::exception& e)
+		{
+			qDebug() << e.what();
 		}
-
-		ret = iio_channel_attr_read(this->trigger1, "trigger_hysteresis", buf, sizeof(buf));
-		if (ret >= 0) {
-			double val = adc->convSampleDiffToVoltsDiff(1,
-				QString(buf).toDouble());
-			ui_triggerBHyst->setValue(val);
-		}
-	}
-
-
-	if (this->digitalTrigger0) {
-		ret = iio_channel_attr_read(this->digitalTrigger0, "trigger", buf, sizeof(buf));
-		if (ret >= 0) {
-			int pos = std::find(lut_digital_trigger_conditions.begin(), lut_digital_trigger_conditions.end(), buf) -
-					lut_digital_trigger_conditions.begin();
-			if (pos < lut_digital_trigger_conditions.size())
-				ui->cmb_triggA_ext_cond->setCurrentIndex(pos);
-		}
-	}
-
-	if (this->digitalTrigger1) {
-		ret = iio_channel_attr_read(this->digitalTrigger1, "trigger", buf, sizeof(buf));
-		if (ret >= 0) {
-			int pos = std::find(lut_digital_trigger_conditions.begin(), lut_digital_trigger_conditions.end(), buf) -
-					lut_digital_trigger_conditions.begin();
-			if (pos < lut_digital_trigger_conditions.size())
-				ui->cmb_triggB_ext_cond->setCurrentIndex(pos);
-		}
-	}
-
-	if (this->trigger0Mode) {
-		ret = iio_channel_attr_read(this->trigger0Mode, "mode", buf, sizeof(buf));
-		if (ret >= 0) {
-			int pos = std::find(lut_triggerX_types.begin(), lut_triggerX_types.end(), buf) -
-					lut_triggerX_types.begin();
-			if (pos < lut_triggerX_types.size()) {
-				if (pos != 0) {
-					ui->cmb_trigg_A->setCurrentIndex(pos - 1);
-					ui_reconf_on_triggerA_mode_changed(pos - 1);
-					if (ui->cmb_trigg_A->currentIndex() == 0)
-						ui_reconf_on_triggerA_extern_changed(false);
-				} else {
-					int last = ui->cmb_triggA_cond->count() - 1;
-					ui->cmb_triggA_cond->setCurrentIndex(last);
-					ui_reconf_on_triggerA_cond_changed(last);
-					ui_reconf_on_triggerA_extern_changed(false);
-				}
-			}
-		}
-	}
-
-	if (this->trigger1Mode) {
-		ret = iio_channel_attr_read(this->trigger1Mode, "mode", buf, sizeof(buf));
-		if (ret >= 0) {
-			int pos = std::find(lut_triggerX_types.begin(), lut_triggerX_types.end(), buf) -
-					lut_triggerX_types.begin();
-			if (pos < lut_triggerX_types.size()) {
-				if (pos != 0) {
-					ui->cmb_trigg_B->setCurrentIndex(pos - 1);
-					ui_reconf_on_triggerB_mode_changed(pos - 1);
-					if (ui->cmb_trigg_B->currentIndex() == 0)
-						ui_reconf_on_triggerB_extern_changed(false);
-				} else {
-					int last = ui->cmb_triggB_cond->count() - 1;
-					ui->cmb_triggB_cond->setCurrentIndex(last);
-					ui_reconf_on_triggerB_cond_changed(last);
-					ui_reconf_on_triggerB_extern_changed(false);
-				}
-			}
-		}
-	}
-
-	if (this->timeTrigger) {
-		ret = iio_channel_attr_read(this->timeTrigger, "logic_mode", buf, sizeof(buf));
-		if (ret >= 0) {
-			int pos = std::find(lut_trigger_sources.begin(), lut_trigger_sources.end(), buf) -
-					lut_trigger_sources.begin();
-			if (pos < lut_trigger_sources.size())
-				ui->cmb_trigg_source->setCurrentIndex(pos);
-		}
-		trigger_ab_enabled_update(triggerA_en, triggerB_en);
-
-		iio_channel_attr_read_longlong(this->timeTrigger, "delay",
-			&trigger_raw_delay);
-	}
-}
-
-void TriggerSettings::ui_reconf_on_triggerA_mode_changed(int index)
-{
-	bool on = index != 1;
-
-	ui->cmb_triggA_cond->setEnabled(on);
-	ui->lbl_triggA_cond->setEnabled(on);
-	ui_triggerAlevel->setEnabled(on);
-	ui_triggerAHyst->setEnabled(on);
-	ui->lbl_triggA_ext_cond->setDisabled(on);
-	ui->cmb_triggA_ext_cond->setDisabled(on);
-}
-
-void TriggerSettings::ui_reconf_on_triggerB_mode_changed(int index)
-{
-	bool on = index != 1;
-
-	ui->cmb_triggB_cond->setEnabled(on);
-	ui->lbl_triggB_cond->setEnabled(on);
-	ui_triggerBlevel->setEnabled(on);
-	ui_triggerBHyst->setEnabled(on);
-	ui->lbl_triggB_ext_cond->setDisabled(on);
-	ui->cmb_triggB_ext_cond->setDisabled(on);
-}
-
-void TriggerSettings::ui_reconf_on_triggerA_cond_changed(int index)
-{
-	if (index == ui->cmb_triggA_cond->count() - 1) {
-		ui->trigg_A_extern_en->setChecked(false);
-		ui->trigg_A_extern_en->setEnabled(false);
-		ui->lbl_external_a_en->setEnabled(false);
-	} else {
-		ui->trigg_A_extern_en->setEnabled(true);
-		ui->lbl_external_a_en->setEnabled(true);
-	}
-}
-
-void TriggerSettings::ui_reconf_on_triggerB_cond_changed(int index)
-{
-	if (index == ui->cmb_triggA_cond->count() - 1) {
-		ui->trigg_B_extern_en->setChecked(false);
-		ui->trigg_B_extern_en->setEnabled(false);
-		ui->lbl_external_b_en->setEnabled(false);
-	} else {
-		ui->trigg_B_extern_en->setEnabled(true);
-		ui->lbl_external_b_en->setEnabled(true);
-	}
-}
-
-void TriggerSettings::ui_reconf_on_triggerA_extern_changed(bool checked)
-{
-	QString trigger_type;
-	if (checked)
-		trigger_type = "Digital(External)";
-	else
-		trigger_type = "Analog";
-
-	int i = ui->cmb_trigg_A->findText(trigger_type, Qt::MatchExactly);
-	ui->cmb_trigg_A->setCurrentIndex(i);
-
-	ui->cmb_trigg_A->setEnabled(checked);
-	ui->lbl_trigg_A->setEnabled(checked);
-	ui->cmb_triggA_ext_cond->setEnabled(checked);
-	ui->lbl_triggA_ext_cond->setEnabled(checked);
-}
-
-void TriggerSettings::ui_reconf_on_triggerB_extern_changed(bool checked)
-{
-	QString trigger_type;
-	if (checked)
-		trigger_type = "Digital(External)";
-	else
-		trigger_type = "Analog";
-
-	int i = ui->cmb_trigg_B->findText(trigger_type, Qt::MatchExactly);
-	ui->cmb_trigg_B->setCurrentIndex(i);
-
-	ui->cmb_trigg_B->setEnabled(checked);
-	ui->lbl_trigg_B->setEnabled(checked);
-	ui->cmb_triggB_ext_cond->setEnabled(checked);
-	ui->lbl_triggB_ext_cond->setEnabled(checked);
-}
-
-void TriggerSettings::trigger_ab_enabled_update(bool &a_en, bool &b_en)
-{
-	int index = ui->cmb_trigg_source->currentIndex();
-
-	a_en = true;
-	b_en = true;
-	if (index == 0)
-		b_en = false;
-	else if (index == 1)
-		a_en = false;
-}
-
-void TriggerSettings::trigg_delay_write_hardware(int raw_delay)
-{
-	if (this->timeTrigger) {
-		QString s = QString::number(raw_delay);
-		iio_channel_attr_write(this->timeTrigger, "delay",
-			s.toLocal8Bit().QByteArray::constData());
-	}
-}
-
-void TriggerSettings::triggA_level_write_hardware(double value)
-{
-	if (!this->trigger0)
-		return;
-
-	int rawValue = (int)adc->convVoltsToSample(0, value);
-	QString s = QString::number(rawValue);
-
-	iio_channel_attr_write(this->trigger0, "trigger_level",
-				s.toLocal8Bit().QByteArray::constData());
-}
-
-void TriggerSettings::triggB_level_write_hardware(double value)
-{
-	if (!this->trigger1)
-		return;
-
-	int rawValue = (int)adc->convVoltsToSample(1, value);
-	QString s = QString::number(rawValue);
-
-	iio_channel_attr_write(this->trigger1, "trigger_level",
-				s.toLocal8Bit().QByteArray::constData());
-}
-
-void adiscope::TriggerSettings::on_btn_noise_reject_toggled(bool checked)
-{
-	if (checked) {
-		ui_triggerAHyst->setEnabled(true);
-		ui_triggerBHyst->setEnabled(true);
-
-		ui_triggerAHyst->setValue(hystA_last_val);
-		ui_triggerBHyst->setValue(hystB_last_val);
-	} else {
-		hystA_last_val = ui_triggerAHyst->value();
-		hystB_last_val = ui_triggerBHyst->value();
-
-		ui_triggerAHyst->setValue(0);
-		ui_triggerBHyst->setValue(0);
-
-		ui_triggerAHyst->setEnabled(false);
-		ui_triggerBHyst->setEnabled(false);
 	}
 }
 
 void TriggerSettings::autoTriggerDisable()
 {
 	if (ui->btnAuto->isChecked()) {
-		iio_channel_attr_write(this->trigger0Mode, "mode", "always");
-		iio_channel_attr_write(this->trigger1Mode, "mode", "always");
+		mode_hw_write(HardwareTrigger::ALWAYS);
+
 		temporarily_disabled = true;
 	}
 }
@@ -657,13 +291,8 @@ void TriggerSettings::autoTriggerDisable()
 void TriggerSettings::autoTriggerEnable()
 {
 	if (temporarily_disabled) {
-		int indexA = ui->cmb_trigg_A->currentIndex() + 1;
-		iio_channel_attr_write(this->trigger0Mode, "mode",
-				lut_triggerX_types[indexA].c_str());
-
-		int indexB = ui->cmb_trigg_B->currentIndex() + 1;
-		iio_channel_attr_write(this->trigger1Mode, "mode",
-				lut_triggerX_types[indexB].c_str());
+		mode_hw_write(determineTriggerMode(ui->intern_en->isChecked(),
+			ui->extern_en->isChecked()));
 
 		temporarily_disabled = false;
 	}
@@ -671,16 +300,7 @@ void TriggerSettings::autoTriggerEnable()
 
 bool TriggerSettings::triggerIsArmed() const
 {
-	int tr_a = (ui->cmb_triggA_cond->currentText() != "None" ? 1 : 0) << 0;
-	int tr_b = (ui->cmb_triggB_cond->currentText() != "None" ? 1 : 0) << 1;
-
-	int i = ui->cmb_trigg_source->currentIndex();
-	if (i > 1)
-		i = 3; // Both trigger are used as source
-	else
-		i++; // Trigger A on bit 0 and Trigger B on bit 1
-
-	return (i & (tr_a | tr_b));
+	return ui->intern_en->isChecked() || ui->extern_en->isChecked();
 }
 
 void TriggerSettings::on_btnAuto_toggled(bool checked)
@@ -698,23 +318,178 @@ TriggerSettings::TriggerMode TriggerSettings::triggerMode() const
 
 void TriggerSettings::updateHwVoltLevels(int chnIdx)
 {
-	if (chnIdx == 0) {
-		triggA_level_write_hardware(ui_triggerAlevel->value());
-		onSpinboxTriggerAhystChanged(hystA_last_val);
-	} else if (chnIdx == 1) {
-		triggB_level_write_hardware(ui_triggerBlevel->value());
-		onSpinboxTriggerBhystChanged(hystB_last_val);
+	try {
+		int rawValue = (int)adc->convVoltsToSample(chnIdx,
+		trigg_configs[chnIdx].level_val);
+		trigger->setLevel(chnIdx, rawValue);
+
+		rawValue = (int)adc->convVoltsDiffToSampleDiff(chnIdx,
+		trigg_configs[chnIdx].hyst_val);
+		trigger->setHysteresis(chnIdx, rawValue);
+	}
+	catch (std::exception& e)
+	{
+		qDebug() << e.what();
 	}
 }
 
-void TriggerSettings::setTriggerARange(const QPair<double, double>& range)
+void TriggerSettings::setTriggerLevelRange(int chn,
+	const QPair<double, double>& range)
 {
-	ui_triggerAlevel->setMinValue(range.first);
-	ui_triggerAlevel->setMaxValue(range.second);
+	trigg_configs[chn].level_min = range.first;
+	trigg_configs[chn].level_max = range.second;
+
+	if (current_channel == chn) {
+		ui->trigger_level->setMinValue(range.first);
+		ui->trigger_level->setMaxValue(range.second);
+	}
 }
 
-void TriggerSettings::setTriggerBRange(const QPair<double, double>& range)
+void TriggerSettings::setTriggerHystRange(int chn,
+	const QPair<double, double>& range)
 {
-	ui_triggerBlevel->setMinValue(range.first);
-	ui_triggerBlevel->setMaxValue(range.second);
+	trigg_configs[chn].hyst_min = range.first;
+	trigg_configs[chn].hyst_max = range.second;
+
+	if (current_channel == chn) {
+		ui->trigger_hysteresis->setMinValue(range.first);
+		ui->trigger_hysteresis->setMaxValue(range.second);
+	}
+}
+
+void TriggerSettings::setTriggerLevelStep(int chn, double step)
+{
+	trigg_configs[chn].level_step = step;
+
+	if (current_channel == chn) {
+		ui->trigger_level->setStep(step);
+	}
+}
+
+void TriggerSettings::setTriggerHystStep(int chn, double step)
+{
+	trigg_configs[chn].hyst_step = step;
+
+	if (current_channel == chn) {
+		ui->trigger_hysteresis->setStep(step);
+	}
+}
+
+void TriggerSettings::setAdcRunningState(bool on)
+{
+	adc_running = on;
+
+	if (on) {
+		write_ui_settings_to_hawrdware();
+	}
+}
+
+void TriggerSettings::write_ui_settings_to_hawrdware()
+{
+	source_hw_write(ui->cmb_source->currentIndex());
+	mode_hw_write(determineTriggerMode(ui->intern_en->isChecked(),
+		ui->extern_en->isChecked()));
+	analog_cond_hw_write(ui->cmb_condition->currentIndex());
+	digital_cond_hw_write(ui->cmb_extern_condition->currentIndex());
+	level_hw_write(ui->trigger_level->value());
+	hysteresis_hw_write(ui->trigger_hysteresis->value());
+	delay_hw_write(trigger_raw_delay);
+}
+
+void TriggerSettings:: delay_hw_write(long long raw_delay)
+{
+	if (adc_running) {
+		try {
+			trigger->setDelay(raw_delay);
+		}
+		catch (std::exception& e) {
+			qDebug() << e.what();
+		}
+	}
+}
+
+void TriggerSettings:: level_hw_write(double level)
+{
+	if (adc_running) {
+		int rawValue = (int)adc->convVoltsToSample(current_channel,
+			level);
+
+		try {
+			trigger->setLevel(current_channel, rawValue);
+		}
+		catch (std::exception& e) {
+			qDebug() << e.what();
+		}
+	}
+}
+
+void TriggerSettings:: hysteresis_hw_write(double level)
+{
+	if (adc_running) {
+		int rawValue = (int)adc->convVoltsDiffToSampleDiff(
+			current_channel, level);
+
+		try {
+			trigger->setHysteresis(current_channel, rawValue);
+		}
+		catch (std::exception& e) {
+			qDebug() << e.what();
+		}
+	}
+}
+
+void TriggerSettings:: analog_cond_hw_write(int cond)
+{
+	if (adc_running) {
+		HardwareTrigger::condition t_cond =
+			static_cast<HardwareTrigger::condition>(cond);
+
+		try {
+			trigger->setAnalogCondition(current_channel, t_cond);
+		}
+		catch (std::exception& e) {
+			qDebug() << e.what();
+		}
+	}
+}
+
+void TriggerSettings:: digital_cond_hw_write(int cond)
+{
+	if (adc_running) {
+		HardwareTrigger::condition t_cond =
+			static_cast<HardwareTrigger::condition>(cond);
+
+		try {
+			trigger->setDigitalCondition(current_channel, t_cond);
+		}
+		catch (std::exception& e) {
+			qDebug() << e.what();
+		}
+	}
+}
+
+void TriggerSettings:: mode_hw_write(int mode)
+{
+	if (adc_running) {
+		try {
+			trigger->setTriggerMode(current_channel,
+				static_cast<HardwareTrigger::mode>(mode));
+		}
+		catch (std::exception& e)
+		{
+			qDebug() << e.what();
+		}
+	}
+}
+
+void TriggerSettings:: source_hw_write(int source)
+{
+	if (adc_running) {
+		try {
+			trigger->setSourceChannel(source);
+		}
+		catch (std::exception& e) {
+			qDebug() << e.what();
+		}
+	}
 }

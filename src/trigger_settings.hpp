@@ -20,6 +20,8 @@
 #ifndef TRIGGER_SETTINGS_HPP
 #define TRIGGER_SETTINGS_HPP
 
+#include "hardware_trigger.hpp"
+
 #include <QWidget>
 #include <string>
 #include <memory>
@@ -54,101 +56,78 @@ namespace adiscope {
 			AUTO
 		};
 
-		explicit TriggerSettings(struct iio_context *ctx,
-					std::shared_ptr<GenericAdc> adc,
+		explicit TriggerSettings(std::shared_ptr<GenericAdc> adc,
 					QWidget *parent = nullptr);
 		~TriggerSettings();
 
-		double levelA_value();
-		double levelB_value();
-		bool levelA_enabled();
-		bool levelB_enabled();
+		int currentChannel() const;
+		bool analogEnabled() const;
+		bool digitalEnabled() const;
+		double level() const;
+		double hysteresis() const;
 		bool triggerIsArmed() const;
 		enum TriggerMode triggerMode() const;
 		long long triggerDelay() const;
 
 	Q_SIGNALS:
-		void levelAChanged(double);
-		void levelBChanged(double);
-		void triggerAenabled(bool);
-		void triggerBenabled(bool);
+		void levelChanged(double);
+		void analogTriggerEnabled(bool);
 		void triggerModeChanged(int);
 
 	public Q_SLOTS:
 		void setTriggerDelay(long long);
-		void setTriggerLevelA(double);
-		void setTriggerLevelB(double);
-
+		void setTriggerLevel(double);
+		void setTriggerHysteresis(double);
+		void setTriggerLevelRange(int chn,
+			const QPair<double, double>& range);
+		void setTriggerHystRange(int chn,
+			const QPair<double, double>& range);
+		void setTriggerLevelStep(int chn, double step);
+		void setTriggerHystStep(int chn, double step);
 		void autoTriggerDisable();
 		void autoTriggerEnable();
-
-		void setTriggerARange(const QPair<double, double>&);
-		void setTriggerBRange(const QPair<double, double>&);
-
 		void updateHwVoltLevels(int chnIdx);
+		void setAdcRunningState(bool on);
 
 	private Q_SLOTS:
-		void on_cmb_trigg_source_currentIndexChanged(int);
-		void on_cmb_trigg_A_currentIndexChanged(int);
-		void on_cmb_trigg_B_currentIndexChanged(int);
-		void onSpinboxTriggerAlevelChanged(double);
-		void onSpinboxTriggerBlevelChanged(double);
-		void onSpinboxTriggerAhystChanged(double);
-		void onSpinboxTriggerBhystChanged(double);
-		void on_cmb_triggA_cond_currentIndexChanged(int);
-		void on_cmb_triggB_cond_currentIndexChanged(int);
-		void on_cmb_triggA_ext_cond_currentIndexChanged(int);
-		void on_cmb_triggB_ext_cond_currentIndexChanged(int);
-		void on_trigg_A_extern_en_toggled(bool);
-		void on_trigg_B_extern_en_toggled(bool);
-		void on_btn_noise_reject_toggled(bool);
+		void on_cmb_source_currentIndexChanged(int);
+		void onSpinboxTriggerLevelChanged(double);
+		void onSpinboxTriggerHystChanged(double);
+		void on_cmb_condition_currentIndexChanged(int);
+		void on_cmb_extern_condition_currentIndexChanged(int);
+		void on_intern_en_toggled(bool);
+		void on_extern_en_toggled(bool);
+		void on_cmb_analog_extern_currentIndexChanged(int);
 		void on_btnAuto_toggled(bool);
 
 	private:
-		void trigger_all_widgets_update();
-		void trigger_ab_enabled_update(bool &a_en, bool &b_en);
+		void delay_hw_write(long long delay);
+		void level_hw_write(double level);
+		void hysteresis_hw_write(double level);
+		void analog_cond_hw_write(int cond);
+		void digital_cond_hw_write(int cond);
+		void mode_hw_write(int mode);
+		void source_hw_write(int source);
 
-		void ui_reconf_on_triggerA_mode_changed(int);
-		void ui_reconf_on_triggerB_mode_changed(int);
-		void ui_reconf_on_triggerA_cond_changed(int);
-		void ui_reconf_on_triggerB_cond_changed(int);
-		void ui_reconf_on_triggerA_extern_changed(bool);
-		void ui_reconf_on_triggerB_extern_changed(bool);
-
-		void trigg_delay_write_hardware(int raw_delay);
-		void triggA_level_write_hardware(double value);
-		void triggB_level_write_hardware(double value);
+		void ui_reconf_on_intern_toggled(bool);
+		void ui_reconf_on_extern_toggled(bool);
+		void write_ui_settings_to_hawrdware();
+		void trigg_level_write_hardware(int chn, double value);
+		HardwareTrigger::mode determineTriggerMode(bool intern_checked,
+			bool extern_checked) const;
 
 	private:
+		struct trigg_channel_config;
+
 		Ui::TriggerSettings *ui;
-		PositionSpinButton *ui_triggerAlevel;
-		PositionSpinButton *ui_triggerBlevel;
-		PositionSpinButton *ui_triggerAHyst;
-		PositionSpinButton *ui_triggerBHyst;
-		PositionSpinButton *ui_triggerHoldoff;
-
 		std::shared_ptr<GenericAdc> adc;
-
-		struct iio_channel *trigger0;
-		struct iio_channel *trigger1;
-		struct iio_channel *digitalTrigger0;
-		struct iio_channel *digitalTrigger1;
-		struct iio_channel *timeTrigger;
-		struct iio_channel *trigger0Mode;
-		struct iio_channel *trigger1Mode;
-		static std::vector<std::string> lut_trigger_sources;
-		static std::vector<std::string> lut_triggerX_types;
-		static std::vector<std::string> lut_analog_trigger_conditions;
-		static std::vector<std::string> lut_digital_trigger_conditions;
-
-		bool triggerA_en;
-		bool triggerB_en;
+		std::shared_ptr<HardwareTrigger> trigger;
+		QList<trigg_channel_config> trigg_configs;
+		int current_channel;
 		bool temporarily_disabled;
 		bool trigger_auto_mode;
-
 		long long trigger_raw_delay;
-		double hystA_last_val;
-		double hystB_last_val;
+		bool adc_running;
 	};
 
 }

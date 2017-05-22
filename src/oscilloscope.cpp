@@ -70,7 +70,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	active_sample_rate(adc->readSampleRate()),
 	nb_math_channels(0),
 	ui(new Ui::Oscilloscope),
-	trigger_settings(ctx, adc),
+	trigger_settings(adc),
 	measure_settings(nullptr),
 	plot(parent, 16, 10),
 	fft_plot(nb_channels, parent),
@@ -300,12 +300,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	plot.setMinimumWidth(500);
 
 	plot.levelTriggerA()->setMobileAxis(QwtAxisId(QwtPlot::yLeft, 0));
-	plot.levelTriggerB()->setMobileAxis(QwtAxisId(QwtPlot::yLeft, 1));
-
-	plot.setTriggerAEnabled(trigger_settings.levelA_enabled());
-	plot.setTriggerBEnabled(trigger_settings.levelB_enabled());
-	plot.levelTriggerA()->setPosition(trigger_settings.levelA_value());
-	plot.levelTriggerB()->setPosition(trigger_settings.levelB_value());
+	plot.setTriggerAEnabled(trigger_settings.analogEnabled());
+	plot.levelTriggerA()->setPosition(trigger_settings.level());
 
 	// TO DO: Give user the option to make these axes visible
 	plot.enableAxis(QwtPlot::yLeft, false);
@@ -444,27 +440,15 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		SLOT(onCursorReadoutsChanged(struct cursorReadoutsText)));
 
 	// Connections with Trigger Settings
-	connect(&trigger_settings, SIGNAL(triggerAenabled(bool)),
+	connect(&trigger_settings, SIGNAL(analogTriggerEnabled(bool)),
 		&plot, SLOT(setTriggerAEnabled(bool)));
-	connect(&trigger_settings, SIGNAL(triggerBenabled(bool)),
-		&plot, SLOT(setTriggerBEnabled(bool)));
-	connect(&trigger_settings, SIGNAL(levelAChanged(double)),
+	connect(&trigger_settings, SIGNAL(levelChanged(double)),
 		plot.levelTriggerA(), SLOT(setPosition(double)));
 	connect(plot.levelTriggerA(), SIGNAL(positionChanged(double)),
-		&trigger_settings, SLOT(setTriggerLevelA(double)));
-	connect(&trigger_settings, SIGNAL(levelBChanged(double)),
-		plot.levelTriggerB(), SLOT(setPosition(double)));
-	connect(plot.levelTriggerB(), SIGNAL(positionChanged(double)),
-		&trigger_settings, SLOT(setTriggerLevelB(double)));
+		&trigger_settings, SLOT(setTriggerLevel(double)));
 
-	connect(&trigger_settings, &TriggerSettings::levelAChanged,
-		[=](double level) {
-			plot.setPeriodDetectLevel(0, level);
-		});
-	connect(&trigger_settings, &TriggerSettings::levelBChanged,
-		[=](double level) {
-			plot.setPeriodDetectLevel(1, level);
-		});
+	connect(&trigger_settings, SIGNAL(levelChanged(double)),
+		SLOT(onTriggerLevelChanged(double)));
 
 	connect(&trigger_settings, SIGNAL(triggerModeChanged(int)),
 		this, SLOT(onTriggerModeChanged(int)));
@@ -523,6 +507,16 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		for (int i = 0; i < nb_channels; i++) {
 			current_channel = i;
 			updateGainMode();
+
+			auto adc_range = m2k_adc->inputRange(
+					m2k_adc->chnHwGainMode(i));
+			auto hyst_range = QPair<double, double>(
+				adc_range.first / 10, adc_range.second / 10);
+			double vscale = plot.VertUnitsPerDiv(i);
+			trigger_settings.setTriggerLevelRange(i, adc_range);
+			trigger_settings.setTriggerLevelStep(i, vscale);
+			trigger_settings.setTriggerHystRange(i, hyst_range);
+			trigger_settings.setTriggerHystStep(i, vscale / 10);
 		}
 		current_channel = crt_chn_copy;
 	}
@@ -866,9 +860,13 @@ void Oscilloscope::runStopToggled(bool checked)
 		if (timePosition->value() != active_time_pos)
 			timePosition->setValue(active_time_pos);
 
+		trigger_settings.setAdcRunningState(true);
+
 		toggle_blockchain_flow(true);
 	} else {
 		toggle_blockchain_flow(false);
+
+		trigger_settings.setAdcRunningState(false);
 
 		adc_setup = adc->getCurrentHwSettings();
 	}
@@ -1023,6 +1021,14 @@ void Oscilloscope::onTimeTriggerDelayChanged(double value)
 		Q_EMIT triggerPositionChanged(value);
 }
 
+void Oscilloscope::onTriggerLevelChanged(double value)
+{
+	int trigger_chn = trigger_settings.currentChannel();
+
+	if (trigger_chn > -1)
+		plot.setPeriodDetectLevel(trigger_chn, value);
+}
+
 void Oscilloscope::comboBoxUpdateToValue(QComboBox *box, double value, std::vector<double>list)
 {
 	int i = find_if( list.begin(), list.end(),
@@ -1155,6 +1161,8 @@ void adiscope::Oscilloscope::onVertScaleValueChanged(double value)
 		plot.replot();
 	}
 	voltsPosition->setStep(value / 10);
+	trigger_settings.setTriggerLevelStep(current_channel, value);
+	trigger_settings.setTriggerHystStep(current_channel, value / 10);
 
 	// Send scale information to the measure object
 	plot.setPeriodDetectHyst(current_channel, value / 5);
@@ -1988,11 +1996,14 @@ void Oscilloscope::updateGainMode()
 			if (running)
 				toggle_blockchain_flow(true);
 
-			auto range = m2k_adc->inputRange(M2kAdc::LOW_GAIN_MODE);
-			if (current_channel == 0)
-				trigger_settings.setTriggerARange(range);
-			else if (current_channel == 1)
-				trigger_settings.setTriggerBRange(range);
+			auto adc_range = m2k_adc->inputRange(
+					M2kAdc::LOW_GAIN_MODE);
+			trigger_settings.setTriggerLevelRange(current_channel,
+				adc_range);
+			auto hyst_range = QPair<double, double>(
+				adc_range.first / 10, adc_range.second / 10);
+			trigger_settings.setTriggerHystRange(current_channel,
+				hyst_range);
 		}
 	} else {
 		if (!high_gain_modes[current_channel]) {
@@ -2005,11 +2016,14 @@ void Oscilloscope::updateGainMode()
 			if (running)
 				toggle_blockchain_flow(true);
 
-			auto range = m2k_adc->inputRange(M2kAdc::HIGH_GAIN_MODE);
-			if (current_channel == 0)
-				trigger_settings.setTriggerARange(range);
-			else if (current_channel == 1)
-				trigger_settings.setTriggerBRange(range);
+			auto adc_range = m2k_adc->inputRange(
+					M2kAdc::LOW_GAIN_MODE);
+			trigger_settings.setTriggerLevelRange(current_channel,
+				adc_range);
+			auto hyst_range = QPair<double, double>(
+				adc_range.first / 10, adc_range.second / 10);
+			trigger_settings.setTriggerHystRange(current_channel,
+				hyst_range);
 		}
 	}
 }
@@ -2177,59 +2191,84 @@ void Oscilloscope_API::setAutoTrigger(bool en)
 		osc->trigger_settings.ui->btnNormal->setChecked(true);
 }
 
+bool Oscilloscope_API::internalTrigger() const
+{
+	return osc->trigger_settings.ui->intern_en->isChecked();
+}
+
+void Oscilloscope_API::setInternalTrigger(bool en)
+{
+	osc->trigger_settings.ui->intern_en->setChecked(en);
+}
+
 bool Oscilloscope_API::externalTrigger() const
 {
-	return osc->trigger_settings.ui->trigg_A_extern_en->isChecked();
+	return osc->trigger_settings.ui->extern_en->isChecked();
 }
 
 void Oscilloscope_API::setExternalTrigger(bool en)
 {
-	osc->trigger_settings.ui->trigg_A_extern_en->setChecked(en);
+	osc->trigger_settings.ui->extern_en->setChecked(en);
 }
 
 int Oscilloscope_API::triggerSource() const
 {
-	return osc->trigger_settings.ui->cmb_trigg_source->currentIndex();
+	return osc->trigger_settings.ui->cmb_source->currentIndex();
 }
 
 void Oscilloscope_API::setTriggerSource(int idx)
 {
-	osc->trigger_settings.ui->cmb_trigg_source->setCurrentIndex(idx);
+	osc->trigger_settings.ui->cmb_source->setCurrentIndex(idx);
 }
 
-QList<double> Oscilloscope_API::getTriggerLevel() const
+double Oscilloscope_API::getTriggerLevel() const
 {
-	QList<double> list;
-	unsigned int i;
-
-
-	// TO DO: Generalize this once we figure out a rule to pair a channel
-	// with a trigger
-	for (i = 0; i < osc->nb_channels; i++) {
-		if (i == 0)
-			list.append(osc->trigger_settings.levelA_value());
-		else if (i == 1)
-			list.append(osc->trigger_settings.levelB_value());
-		else
-			break;
-	}
-
-	return list;
+	return osc->trigger_settings.ui->trigger_level->value();
 }
-void Oscilloscope_API::setTriggerLevel(const QList<double>& list)
-{
-	unsigned int i;
 
-	// TO DO: Generalize this once we figure out a rule to pair a channel
-	// with a trigger
-	for (i = 0; i < osc->nb_channels; i++) {
-		if (i == 0)
-			osc->trigger_settings.setTriggerLevelA(list.at(i));
-		else if (i == 1)
-			osc->trigger_settings.setTriggerLevelB(list.at(i));
-		else
-			break;
-	}
+void Oscilloscope_API::setTriggerLevel(double level)
+{
+	osc->trigger_settings.ui->trigger_level->setValue(level);
+}
+
+double Oscilloscope_API::getTriggerHysteresis() const
+{
+	return osc->trigger_settings.ui->trigger_hysteresis->value();
+}
+
+void Oscilloscope_API::setTriggerHysteresis(double hyst)
+{
+	osc->trigger_settings.ui->trigger_hysteresis->setValue(hyst);
+}
+
+int Oscilloscope_API::internalCondition() const
+{
+	return osc->trigger_settings.ui->cmb_condition->currentIndex();
+}
+
+void Oscilloscope_API::setInternalCondition(int cond)
+{
+	osc->trigger_settings.ui->cmb_condition->setCurrentIndex(cond);
+}
+
+int Oscilloscope_API::externalCondition() const
+{
+	return osc->trigger_settings.ui->cmb_extern_condition->currentIndex();
+}
+
+void Oscilloscope_API::setExternalCondition(int cond)
+{
+	osc->trigger_settings.ui->cmb_extern_condition->setCurrentIndex(cond);
+}
+
+int Oscilloscope_API::internExtern() const
+{
+	return osc->trigger_settings.ui->cmb_analog_extern->currentIndex();
+}
+
+void Oscilloscope_API::setInternExtern(int option)
+{
+	osc->trigger_settings.ui->cmb_analog_extern->setCurrentIndex(option);
 }
 
 QList<QString> Oscilloscope_API::getMathChannels() const
