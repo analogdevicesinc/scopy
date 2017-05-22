@@ -440,6 +440,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		SLOT(onCursorReadoutsChanged(struct cursorReadoutsText)));
 
 	// Connections with Trigger Settings
+	connect(&trigger_settings, SIGNAL(sourceChanged(int)),
+		SLOT(onTriggerSourceChanged(int)));
 	connect(&trigger_settings, SIGNAL(analogTriggerEnabled(bool)),
 		&plot, SLOT(setTriggerAEnabled(bool)));
 	connect(&trigger_settings, SIGNAL(levelChanged(double)),
@@ -1013,6 +1015,11 @@ void adiscope::Oscilloscope::on_boxMeasure_toggled(bool on)
 	// Set the visibility of the cursor readouts owned by the plot
 	if (ui->boxCursors->isChecked())
 		plot.setCursorReadoutsVisible(!on);
+}
+
+void Oscilloscope::onTriggerSourceChanged(int chnIdx)
+{
+	plot.levelTriggerA()->setMobileAxis(QwtAxisId(QwtPlot::yLeft, chnIdx));
 }
 
 void Oscilloscope::onTimeTriggerDelayChanged(double value)

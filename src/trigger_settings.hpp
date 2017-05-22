@@ -70,6 +70,7 @@ namespace adiscope {
 		long long triggerDelay() const;
 
 	Q_SIGNALS:
+		void sourceChanged(int);
 		void levelChanged(double);
 		void analogTriggerEnabled(bool);
 		void triggerModeChanged(int);

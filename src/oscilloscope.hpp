@@ -107,6 +107,7 @@ namespace adiscope {
 		void onHistogram_view_toggled(bool visible);
 		void onXY_view_toggled(bool visible);
 
+		void onTriggerSourceChanged(int);
 		void onTimeTriggerDelayChanged(double);
 		void onTriggerLevelChanged(double);
 		void onTriggerModeChanged(int);

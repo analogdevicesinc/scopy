@@ -173,6 +173,8 @@ void TriggerSettings::on_cmb_source_currentIndexChanged(int index)
 
 	if (adc_running)
 		write_ui_settings_to_hawrdware();
+
+	Q_EMIT sourceChanged(index);
 }
 
 void TriggerSettings::onSpinboxTriggerLevelChanged(double value)
