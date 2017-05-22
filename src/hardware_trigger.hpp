@@ -42,7 +42,7 @@ public:
 		QList<condition> digital_condition;
 		QList<int> level;
 		QList<int> hysteresis;
-		QList<mode> mode;
+		QList<enum mode> mode;
 		QString source;
 		int delay;
 	};
