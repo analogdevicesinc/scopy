@@ -353,6 +353,15 @@ void adiscope::ToolLauncher::disconnect()
 	ui->btnHome->click();
 
 	if (ctx) {
+		ui->stopDIO->setChecked(false);
+		ui->stopDMM->setChecked(false);
+		ui->stopLogicAnalyzer->setChecked(false);
+		ui->stopNetworkAnalyzer->setChecked(false);
+		ui->stopOscilloscope->setChecked(false);
+		ui->stopPatternGenerator->setChecked(false);
+		ui->stopPowerControl->setChecked(false);
+		ui->stopSignalGenerator->setChecked(false);
+
 		destroyContext();
 		resetStylesheets();
 		search_timer->start(TIMER_TIMEOUT_MS);
