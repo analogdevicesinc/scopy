@@ -21,7 +21,8 @@
 #include <QSettings>
 #include <QtGlobal>
 
-#include "src/tool_launcher.hpp"
+#include "config.h"
+#include "tool_launcher.hpp"
 
 using namespace adiscope;
 
@@ -36,6 +37,7 @@ int main(int argc, char **argv)
 	QCoreApplication::setOrganizationName("ADI");
 	QCoreApplication::setOrganizationDomain("analog.com");
 	QCoreApplication::setApplicationName("Scopy");
+	QCoreApplication::setApplicationVersion(SCOPY_VERSION_GIT);
 	QSettings::setDefaultFormat(QSettings::IniFormat);
 
 	ToolLauncher launcher;
