@@ -68,6 +68,9 @@ Q_SIGNALS:
 	void calibrationDone(float gain_ch1, float gain_ch2);
 	void dacCalibrationDone(float dacA_vlsb, float dacB_vlsb);
 
+	void adcToolsCreated();
+	void dacToolsCreated();
+
 private Q_SLOTS:
 	void search();
 	void update();

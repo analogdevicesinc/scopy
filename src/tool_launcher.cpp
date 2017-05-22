@@ -545,6 +545,8 @@ void adiscope::ToolLauncher::enableCalibTools(float gain_ch1, float gain_ch2)
 
 		ui->dmm->setEnabled(true);
 	}
+
+	Q_EMIT adcToolsCreated();
 }
 
 void adiscope::ToolLauncher::enableDacBasedTools(float dacA_vlsb,
@@ -580,6 +582,8 @@ void adiscope::ToolLauncher::enableDacBasedTools(float dacA_vlsb,
 
 		ui->signalGenerator->setEnabled(true);
 	}
+
+	Q_EMIT dacToolsCreated();
 }
 
 bool adiscope::ToolLauncher::switchContext(const QString& uri)
@@ -758,8 +762,7 @@ bool ToolLauncher_API::connect(const QString& uri)
 			done = true;
 	});
 
-	tl->connect(tl, &ToolLauncher::calibrationDone,
-			[&](float, float) {
+	tl->connect(tl, &ToolLauncher::adcToolsCreated, [&]() {
 		did_connect = true;
 		done = true;
 	});
@@ -768,6 +771,7 @@ bool ToolLauncher_API::connect(const QString& uri)
 	tl->ui->btnConnect->click();
 
 	do {
+		QCoreApplication::processEvents();
 		QThread::msleep(10);
 	} while (!done);
 	return did_connect;
