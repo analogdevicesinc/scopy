@@ -18,6 +18,7 @@
  */
 
 #include <QApplication>
+#include <QCommandLineParser>
 #include <QSettings>
 #include <QtGlobal>
 
@@ -39,6 +40,13 @@ int main(int argc, char **argv)
 	QCoreApplication::setApplicationName("Scopy");
 	QCoreApplication::setApplicationVersion(SCOPY_VERSION_GIT);
 	QSettings::setDefaultFormat(QSettings::IniFormat);
+
+	QCommandLineParser parser;
+
+	parser.addHelpOption();
+	parser.addVersionOption();
+
+	parser.process(app);
 
 	ToolLauncher launcher;
 	launcher.show();
