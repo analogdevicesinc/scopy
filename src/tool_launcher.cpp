@@ -90,6 +90,8 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 		SLOT(setButtonBackground(bool)));
 	connect(ui->btnNetworkAnalyzer, SIGNAL(toggled(bool)), this,
 		SLOT(setButtonBackground(bool)));
+	connect(ui->btnDigitalIO, SIGNAL(toggled(bool)), this,
+		SLOT(setButtonBackground(bool)));
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
 	js_engine.installExtensions(QJSEngine::ConsoleExtension);
