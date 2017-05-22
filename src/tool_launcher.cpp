@@ -104,6 +104,23 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	search_timer->start(TIMER_TIMEOUT_MS);
 }
 
+void ToolLauncher::runProgram(const QString& program, const QString& fn)
+{
+	QJSValue val = js_engine.evaluate(program, fn);
+
+	int ret;
+	if (val.isError()) {
+		qInfo() << "Exception:" << val.toString();
+		ret = EXIT_FAILURE;
+	} else if (!val.isUndefined()) {
+		qInfo() << val.toString();
+		ret = EXIT_SUCCESS;
+	}
+
+	/* Exit application */
+	qApp->exit(ret);
+}
+
 void ToolLauncher::search()
 {
 	search_timer->stop();

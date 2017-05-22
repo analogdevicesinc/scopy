@@ -63,6 +63,8 @@ public:
 	explicit ToolLauncher(QWidget *parent = 0);
 	~ToolLauncher();
 
+	Q_INVOKABLE void runProgram(const QString& program, const QString& fn);
+
 Q_SIGNALS:
 	void connectionDone(bool success);
 	void calibrationDone(float gain_ch1, float gain_ch2);

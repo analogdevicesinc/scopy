@@ -46,10 +46,36 @@ int main(int argc, char **argv)
 	parser.addHelpOption();
 	parser.addVersionOption();
 
+	parser.addOptions({
+		{ {"s", "script"}, "Run given script.", "script" },
+	});
+
 	parser.process(app);
 
 	ToolLauncher launcher;
-	launcher.show();
+
+	QString script = parser.value("script");
+	if (script.isEmpty()) {
+		launcher.show();
+	} else {
+		launcher.hide();
+
+		QFile file(script);
+		if (!file.open(QFile::ReadOnly)) {
+			qCritical() << "Unable to open script file";
+			return EXIT_FAILURE;
+		}
+
+		QTextStream stream(&file);
+		QString contents = stream.readAll();
+		file.close();
+
+		QMetaObject::invokeMethod(&launcher,
+				 "runProgram",
+				 Qt::QueuedConnection,
+				 Q_ARG(QString, contents),
+				 Q_ARG(QString, script));
+	}
 
 	return app.exec();
 }
