@@ -244,7 +244,7 @@ class LogicAnalyzer_API : public ApiObject
 	Q_OBJECT
 	Q_PROPERTY(int channel_groups_list_size READ channel_groups_list_size WRITE
 		setChannelGroupsListSize SCRIPTABLE false)
-	Q_PROPERTY(QVariantList channel_groups_list READ getChannelGroups)
+	Q_PROPERTY(QVariantList channel_groups READ getChannelGroups)
 	Q_PROPERTY(bool running READ running WRITE run STORED false)
 	Q_PROPERTY(double time_position READ getTimePos WRITE setTimePos)
 	Q_PROPERTY(double time_base READ getTimeBase WRITE setTimeBase)
@@ -295,11 +295,11 @@ class ChannelGroup_API : public ApiObject
 	Q_PROPERTY(QString decoder READ getDecoder WRITE setDecoder)
 	Q_PROPERTY(int channels_list_size READ channels_list_size WRITE
 		   setChannelsListSize SCRIPTABLE false)
-	Q_PROPERTY(QVariantList channels_list READ getChannels)
-	Q_PROPERTY(bool ch_enabled READ chEnabled WRITE setChEnabled)
-	Q_PROPERTY(bool ch_grouped READ chGrouped WRITE setChGrouped)
+	Q_PROPERTY(QVariantList channels READ getChannels)
+	Q_PROPERTY(bool enabled READ chEnabled WRITE setChEnabled)
+	Q_PROPERTY(bool grouped READ chGrouped WRITE setChGrouped)
 	Q_PROPERTY(QString name READ getName WRITE setName)
-	Q_PROPERTY(bool ch_collapsed READ getChCollapsed WRITE setChCollapsed)
+	Q_PROPERTY(bool collapsed READ getChCollapsed WRITE setChCollapsed)
 
 public:
 	explicit ChannelGroup_API(LogicAnalyzer *lga, int index = -1,
