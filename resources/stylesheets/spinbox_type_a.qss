@@ -46,14 +46,12 @@ QFrame#SBA_Line {
 
 QComboBox#SBA_Combobox {
   height: 20px;
-  border: 0px;
   font-size: 12px;
   font-weight: normal;
+  border-bottom: 0px;
+  padding-bottom: 0px;
 }
-QComboBox#SBA_Combobox QAbstractItemView {
-  border: 0px;
-  color: rgba(255, 255, 255, 102);
-}
+
 QComboBox#SBA_Combobox::drop-down {
   subcontrol-position: center right;
   width: 10px;

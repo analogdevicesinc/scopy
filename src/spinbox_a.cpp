@@ -53,7 +53,9 @@ SpinBoxA::SpinBoxA(QWidget *parent) : QWidget(parent),
 	QFile file(":stylesheets/stylesheets/spinbox_type_a.qss");
 	file.open(QFile::ReadOnly);
 	QString styleSheet = QString::fromLatin1(file.readAll());
-	this->setStyleSheet(styleSheet);
+
+	const QString& currentStylesheet = this->styleSheet();
+	this->setStyleSheet(currentStylesheet + styleSheet);
 
 	ui->SBA_LineEdit->installEventFilter(this);
 
