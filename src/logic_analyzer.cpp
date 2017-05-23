@@ -50,6 +50,7 @@
 #include "ui_logic_analyzer.h"
 #include "ui_logic_channel_settings.h"
 #include "ui_digital_trigger_settings.h"
+#include "ui_la_channel_group.h"
 
 /* Boost includes */
 #include <boost/thread.hpp>
