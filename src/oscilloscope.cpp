@@ -1168,8 +1168,11 @@ void adiscope::Oscilloscope::onVertScaleValueChanged(double value)
 		plot.replot();
 	}
 	voltsPosition->setStep(value / 10);
-	trigger_settings.setTriggerLevelStep(current_channel, value);
-	trigger_settings.setTriggerHystStep(current_channel, value / 10);
+
+	if (current_channel < adc->getTrigger()->numChannels()) {
+		trigger_settings.setTriggerLevelStep(current_channel, value);
+		trigger_settings.setTriggerHystStep(current_channel, value / 10);
+	}
 
 	// Send scale information to the measure object
 	plot.setPeriodDetectHyst(current_channel, value / 5);
