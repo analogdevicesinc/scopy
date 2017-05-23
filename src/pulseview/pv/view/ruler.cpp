@@ -95,6 +95,13 @@ QString Ruler::format_time_with_distance(
 	if (t.is_zero())
 		return "0";
 
+	int exp = -pv::util::exponent(prefix);
+	double powr = pow(10, exp);
+	if( powr * distance.convert_to<double>() < 10)
+		precision = exp+2;
+	else
+		precision = 0;
+
 	// If we have to use samples then we have no alternative formats
 	if (unit == pv::util::TimeUnit::Samples)
 		return pv::util::format_time_si_adjusted(t, prefix, precision, "sa", sign);
@@ -187,9 +194,12 @@ void Ruler::paintEvent(QPaintEvent*)
 	// Draw the tick marks
 	QPen pen = QPen(QColor(255, 255, 255, 30*256/100));
 	int pos = 0;
+	int visible_lbl = 9;
+	int skip_pos = 1;
 	int maxLabelWidth = getMaxLabelWidth();
 	pv::util::Timestamp offset_used =
 		(ruler_offset != 0) ? ruler_offset : view_.offset();
+
 	for (const auto& tick: tick_position_cache_->major) {
 		int x = view_.getGridPosition(pos);
 		auto time = offset_used + (x + 0.5) *
@@ -200,7 +210,12 @@ void Ruler::paintEvent(QPaintEvent*)
 				this->view_.time_unit(),
 				this->view_.tick_precision());
 		p.setPen(palette().color(foregroundRole()));
-		if(9 * maxLabelWidth < width() || pos % 2 == 0)
+
+		while(!(visible_lbl * maxLabelWidth < width())) {
+			 visible_lbl  = visible_lbl%2 == 0 ? visible_lbl/2 : (visible_lbl-1)/2;
+			 skip_pos *= 2;
+		}
+		 if(pos % skip_pos == 0)
 			p.drawText(x, major_tick_y1 + ValueMargin, 0, text_height,
 				AlignCenter | AlignBottom | TextDontClip, str);
 		pos++;
