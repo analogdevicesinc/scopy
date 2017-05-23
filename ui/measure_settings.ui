@@ -13,14 +13,6 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <property name="styleSheet">
-   <string notr="true">QWidget
-{
-  background-color: rgb(39, 39, 48);
-  color: rgb(190, 190, 190);
-  font: 75 10pt &quot;DejaVu Sans&quot;;
-}</string>
-  </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <property name="spacing">
     <number>0</number>

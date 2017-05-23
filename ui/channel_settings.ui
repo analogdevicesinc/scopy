@@ -13,14 +13,6 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <property name="styleSheet">
-   <string notr="true">QWidget
-{
-  background-color: rgb(39, 39, 48);
-  color: rgb(190, 190, 190);
-  font: 75 10pt &quot;DejaVu Sans&quot;;
-}</string>
-  </property>
   <layout class="QVBoxLayout" name="vLayout">
    <property name="spacing">
     <number>0</number>
@@ -242,9 +234,6 @@
      <property name="spacing">
       <number>10</number>
      </property>
-     <property name="topMargin">
-      <number>0</number>
-     </property>
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_19">
        <item>
@@ -348,26 +337,6 @@
        </item>
        <item>
         <widget class="QComboBox" name="cmbChnLineWidth">
-         <property name="styleSheet">
-          <string notr="true">QComboBox {
-  height: 20px;
-  color: #ffffff;
-  border: 0px;
-  font-size: 18px;
-  font-style: bold;
-}
-
-QComboBox QAbstractItemView {
-  border: 0px;
-}
-
-QComboBox::drop-down {
-  subcontrol-position: center right;
-  width: 10px;
-  height: 6px;
-  border-image: url(:/icons/sba_cmb_box_arrow.svg);
-}</string>
-         </property>
          <property name="currentIndex">
           <number>1</number>
          </property>
