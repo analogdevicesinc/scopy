@@ -1247,14 +1247,12 @@ void LogicAnalyzer_API::setChannelGroupsListSize(int size)
 	}
 }
 
-QList<ChannelGroup_API*> LogicAnalyzer_API::getChannelGroupsForStoring()
+QVariantList LogicAnalyzer_API::getChannelGroups()
 {
-	return lga->channel_groups_api;
-}
-
-QQmlListProperty<ChannelGroup_API> LogicAnalyzer_API::getChannelGroupsForScripting()
-{
-	return QQmlListProperty<ChannelGroup_API>(this, lga->channel_groups_api);
+	QVariantList list;
+	for(ChannelGroup_API *each : lga->channel_groups_api)
+		list.append(QVariant::fromValue(each));
+	return list;
 }
 
 void LogicAnalyzer_API::run(bool en)
@@ -1335,7 +1333,13 @@ bool ChannelGroup_API::chEnabled() const
 
 void ChannelGroup_API::setChEnabled(bool en)
 {
-	lga->chm.get_channel_group(getIndex())->enable(en);
+	auto chGroupUI = lga->chm_ui->getUiFromChGroup(
+		lga->chm.get_channel_group(getIndex()));
+	if(chGroupUI) {
+		chGroupUI->ui->btnEnableChannel->setChecked(en);
+	}
+	else
+		lga->chm.get_channel_group(getIndex())->enable(en);
 }
 
 bool ChannelGroup_API::chGrouped() const
@@ -1394,14 +1398,14 @@ void ChannelGroup_API::setChannelsListSize(int size)
 	}
 }
 
-QList<LogicChannel_API*> ChannelGroup_API::getChannelsForStoring()
+QVariantList ChannelGroup_API::getChannels()
 {
-	return channels_api;
-}
+	QVariantList list;
 
-QQmlListProperty<LogicChannel_API> ChannelGroup_API::getChannelsForScripting()
-{
-	return QQmlListProperty<LogicChannel_API>(this, channels_api);
+	for (LogicChannel_API *each : channels_api)
+		list.append(QVariant::fromValue(each));
+
+	return list;
 }
 
 void ChannelGroup_API::set_channels_api()
@@ -1488,6 +1492,8 @@ QString LogicChannel_API::getRole() const
 
 void LogicChannel_API::setRole(QString val)
 {
-	auto ch = lga->chm.get_channel_group(lchg->getIndex())->get_srd_channel_from_name(val.toUtf8());
-	lga->chm.get_channel_group(lchg->getIndex())->getChannelById(getIndex())->setChannel_role(ch);
+	auto ch = lga->chm.get_channel_group(
+		lchg->getIndex())->get_srd_channel_from_name(val.toUtf8());
+	lga->chm.get_channel_group(lchg->getIndex())->getChannelById(
+		getIndex())->setChannel_role(ch);
 }

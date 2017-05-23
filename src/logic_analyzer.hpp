@@ -244,10 +244,7 @@ class LogicAnalyzer_API : public ApiObject
 	Q_OBJECT
 	Q_PROPERTY(int channel_groups_list_size READ channel_groups_list_size WRITE
 		setChannelGroupsListSize SCRIPTABLE false)
-	Q_PROPERTY(QList<ChannelGroup_API*> channel_groups_list READ getChannelGroupsForStoring
-		SCRIPTABLE false)
-	Q_PROPERTY(QQmlListProperty<ChannelGroup_API> channel_groups READ
-		getChannelGroupsForScripting STORED false)
+	Q_PROPERTY(QVariantList channel_groups_list READ getChannelGroups)
 	Q_PROPERTY(bool running READ running WRITE run STORED false)
 	Q_PROPERTY(double time_position READ getTimePos WRITE setTimePos)
 	Q_PROPERTY(double time_base READ getTimeBase WRITE setTimeBase)
@@ -264,8 +261,7 @@ public:
 	int channel_groups_list_size() const;
 	void setChannelGroupsListSize(int size);
 
-	QList<ChannelGroup_API*> getChannelGroupsForStoring();
-	QQmlListProperty<ChannelGroup_API> getChannelGroupsForScripting();
+	QVariantList getChannelGroups();
 
 	bool running() const;
 	void run(bool en);
@@ -299,10 +295,7 @@ class ChannelGroup_API : public ApiObject
 	Q_PROPERTY(QString decoder READ getDecoder WRITE setDecoder)
 	Q_PROPERTY(int channels_list_size READ channels_list_size WRITE
 		   setChannelsListSize SCRIPTABLE false)
-	Q_PROPERTY(QList<LogicChannel_API*> channels_list READ getChannelsForStoring
-		   SCRIPTABLE false)
-	Q_PROPERTY(QQmlListProperty<LogicChannel_API> channels READ
-		getChannelsForScripting STORED false)
+	Q_PROPERTY(QVariantList channels_list READ getChannels)
 	Q_PROPERTY(bool ch_enabled READ chEnabled WRITE setChEnabled)
 	Q_PROPERTY(bool ch_grouped READ chGrouped WRITE setChGrouped)
 	Q_PROPERTY(QString name READ getName WRITE setName)
@@ -335,8 +328,7 @@ public:
 	int channels_list_size() const;
 	void setChannelsListSize(int size);
 
-	QList<LogicChannel_API*> getChannelsForStoring();
-	QQmlListProperty<LogicChannel_API> getChannelsForScripting();
+	QVariantList getChannels();
 
 	int getIndex() const;
 	void set_channels_api();
