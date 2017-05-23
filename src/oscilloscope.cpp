@@ -65,7 +65,6 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	QWidget(parent),
 	adc(adc),
 	m2k_adc(dynamic_pointer_cast<M2kAdc>(adc)),
-	adc_setup(adc->getCurrentHwSettings()),
 	nb_channels(Oscilloscope::adc->numAdcChannels()),
 	active_sample_rate(adc->readSampleRate()),
 	nb_math_channels(0),
@@ -185,6 +184,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		ui->chn_scales->addWidget(label);
 
 		high_gain_modes.push_back(false);
+		channel_offset.push_back(0.0);
 
 		channels_api.append(new Channel_API(this));
 	}
@@ -841,16 +841,13 @@ void Oscilloscope::runStopToggled(bool checked)
 	setDynamicProperty(btn, "running", checked);
 
 	if (checked) {
-		adc->setHwSettings(adc_setup.release());
+		writeAllSettingsToHardware();
 
 		plot.setSampleRate(active_sample_rate, 1, "");
 		plot.setBufferSizeLabelValue(active_sample_count);
 		plot.setSampleRatelabelValue(active_sample_rate);
 
 		last_set_sample_count = active_sample_count;
-
-		if (active_sample_rate != adc->sampleRate())
-			adc->setSampleRate(active_sample_rate);
 
 		if (active_trig_sample_count !=
 				trigger_settings.triggerDelay()) {
@@ -862,15 +859,11 @@ void Oscilloscope::runStopToggled(bool checked)
 		if (timePosition->value() != active_time_pos)
 			timePosition->setValue(active_time_pos);
 
-		trigger_settings.setAdcRunningState(true);
-
 		toggle_blockchain_flow(true);
 	} else {
 		toggle_blockchain_flow(false);
 
 		trigger_settings.setAdcRunningState(false);
-
-		adc_setup = adc->getCurrentHwSettings();
 	}
 
 	// Update trigger status
@@ -2040,7 +2033,8 @@ void Oscilloscope::updateGainMode()
 
 void Oscilloscope::setGainMode(uint chnIdx, M2kAdc::GainMode gain_mode)
 {
-	m2k_adc->setChnHwGainMode(chnIdx, gain_mode);
+	if (ui->pushButtonRunStop->isChecked())
+		m2k_adc->setChnHwGainMode(chnIdx, gain_mode);
 
 	boost::shared_ptr<adc_sample_conv> block =
 	dynamic_pointer_cast<adc_sample_conv>(
@@ -2052,7 +2046,9 @@ void Oscilloscope::setGainMode(uint chnIdx, M2kAdc::GainMode gain_mode)
 
 void Oscilloscope::setChannelHwOffset(uint chnIdx, double offset)
 {
-	m2k_adc->setChnHwOffset(chnIdx, offset);
+	channel_offset[current_channel] = offset;
+	if (ui->pushButtonRunStop->isChecked())
+		m2k_adc->setChnHwOffset(chnIdx, offset);
 
 	// Compensate the offset set in hardware
 	boost::shared_ptr<adc_sample_conv> block =
@@ -2072,6 +2068,27 @@ void Oscilloscope::setAllSinksSampleCount(unsigned long sample_count)
 		math_sink->set_nsamps(sample_count);
 		++it;
 	}
+}
+
+void Oscilloscope::writeAllSettingsToHardware()
+{
+	// Sample Rate
+	if (active_sample_rate != adc->sampleRate())
+		adc->setSampleRate(active_sample_rate);
+
+	// Offset and Gain
+	if (m2k_adc) {
+		for (uint i = 0; i < nb_channels; i++) {
+			m2k_adc->setChnHwOffset(i, channel_offset[i]);
+
+			M2kAdc::GainMode mode = high_gain_modes[i] ?
+				M2kAdc::HIGH_GAIN_MODE : M2kAdc::LOW_GAIN_MODE;
+			m2k_adc->setChnHwGainMode(i, mode);
+		}
+	}
+
+	// Writes all trigger settings to hardware
+	trigger_settings.setAdcRunningState(true);
 }
 
 /*

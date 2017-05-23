@@ -28,7 +28,6 @@
 #include "filter.hpp"
 #include "iio_manager.hpp"
 #include "peek_sample.hpp"
-#include "osc_adc.h"
 
 namespace Ui {
 	class DMM;
@@ -38,6 +37,7 @@ class QJSEngine;
 
 namespace adiscope {
 	class DMM_API;
+	class GenericAdc;
 
 	class DMM : public QWidget
 	{
@@ -61,7 +61,6 @@ namespace adiscope {
 			peek_block_ch1, peek_block_ch2;
 		iio_manager::port_id id_ch1, id_ch2;
 		std::shared_ptr<GenericAdc> adc;
-		GenericAdc::settings_uptr adc_setup;
 		bool mode_ac_ch1, mode_ac_ch2;
 
 		DMM_API *dmm_api;
@@ -70,6 +69,7 @@ namespace adiscope {
 		void configureMode(bool is_ac);
 		iio_manager::port_id configureMode(bool is_ac, unsigned int ch);
 		int numSamplesFromIdx(int idx);
+		void writeAllSettingsToHardware();
 
 	public Q_SLOTS:
 		void updateValuesList();

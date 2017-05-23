@@ -20,12 +20,15 @@
 #include "dmm.hpp"
 #include "dynamicWidget.hpp"
 #include "ui_dmm.h"
+#include "osc_adc.h"
+#include "hardware_trigger.hpp"
 
 #include <gnuradio/blocks/moving_average_ff.h>
 #include <gnuradio/blocks/rms_ff.h>
 #include <gnuradio/blocks/short_to_float.h>
 #include <gnuradio/blocks/sub_ff.h>
 
+#include <memory>
 #include <QJSEngine>
 
 using namespace adiscope;
@@ -37,7 +40,7 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, std::shared_ptr<GenericAdc> adc,
 	peek_block_ch1(gnuradio::get_initial_sptr(new peek_sample<float>)),
 	peek_block_ch2(gnuradio::get_initial_sptr(new peek_sample<float>)),
 	mode_ac_ch1(false), mode_ac_ch2(false),
-	adc(adc), adc_setup(adc->getCurrentHwSettings()),
+	adc(adc),
 	dmm_api(new DMM_API(this))
 {
 	ui->setupUi(this);
@@ -133,8 +136,7 @@ void DMM::updateValuesList()
 void DMM::toggleTimer(bool start)
 {
 	if (start) {
-		adc->setHwSettings(adc_setup.release());
-
+		writeAllSettingsToHardware();
 		manager->start(id_ch1);
 		manager->start(id_ch2);
 
@@ -148,8 +150,6 @@ void DMM::toggleTimer(bool start)
 
 		manager->stop(id_ch1);
 		manager->stop(id_ch2);
-
-		adc_setup = adc->getCurrentHwSettings();
 	}
 
 	setDynamicProperty(ui->run_button, "running", start);
@@ -266,6 +266,25 @@ void DMM::setHistorySizeCh2(int idx)
 	int num_samples = numSamplesFromIdx(idx);
 
 	ui->sismograph_ch2->setNumSamples(num_samples);
+}
+
+void DMM::writeAllSettingsToHardware()
+{
+	adc->setSampleRate(100e6); // TO DO: Make AdcGeneric class detect highest sample rate and use that
+
+	auto m2k_adc = std::dynamic_pointer_cast<M2kAdc>(adc);
+	if (m2k_adc) {
+		for (uint i = 0; i < adc->numAdcChannels(); i++) {
+			m2k_adc->setChnHwOffset(i, 0.0);
+			m2k_adc->setChnHwGainMode(i, M2kAdc::LOW_GAIN_MODE);
+		}
+	}
+
+	auto trigger = adc->getTrigger();
+	if (trigger) {
+		for (uint i = 0; i < trigger->numChannels(); i++)
+			trigger->setTriggerMode(i, HardwareTrigger::ALWAYS);
+	}
 }
 
 bool DMM_API::running() const

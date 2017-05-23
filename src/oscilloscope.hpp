@@ -49,8 +49,8 @@
 #include "HistogramDisplayPlot.h"
 #include "spinbox_a.hpp"
 #include "trigger_settings.hpp"
-#include "osc_adc.h"
 #include "plot_utils.hpp"
+#include "osc_adc.h"
 
 class QJSEngine;
 class SymmetricBufferMode;
@@ -162,7 +162,6 @@ namespace adiscope {
 	private:
 		std::shared_ptr<GenericAdc> adc;
 		std::shared_ptr<M2kAdc> m2k_adc;
-		GenericAdc::settings_uptr adc_setup;
 		unsigned int nb_channels, nb_math_channels;
 		double active_sample_rate;
 		unsigned long active_sample_count;
@@ -214,6 +213,7 @@ namespace adiscope {
 		bool fft_is_visible, hist_is_visible, xy_is_visible;
 		bool statistics_enabled;
 		QList<bool> high_gain_modes;
+		std::vector<double> channel_offset;
 
 		bool trigger_is_forced;
 		bool new_data_is_triggered;
@@ -246,6 +246,8 @@ namespace adiscope {
 
 		QList<QPair<std::shared_ptr<MeasurementData>,
 			Statistic>> statistics_data;
+
+		void writeAllSettingsToHardware();
 
 		void comboBoxUpdateToValue(QComboBox *box, double value, std::vector<double>list);
 
