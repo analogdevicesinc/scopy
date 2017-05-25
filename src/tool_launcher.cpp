@@ -36,6 +36,7 @@
 #include <iio.h>
 
 #define TIMER_TIMEOUT_MS 5000
+#define ALIVE_TIMER_TIMEOUT_MS 5000
 
 using namespace adiscope;
 
@@ -104,6 +105,9 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	connect(search_timer, SIGNAL(timeout()), this, SLOT(search()));
 	connect(&watcher, SIGNAL(finished()), this, SLOT(update()));
 	search_timer->start(TIMER_TIMEOUT_MS);
+
+	alive_timer = new QTimer();
+	connect(alive_timer, SIGNAL(timeout()), this, SLOT(ping()));
 }
 
 void ToolLauncher::search()
@@ -194,7 +198,7 @@ void ToolLauncher::update()
 
 ToolLauncher::~ToolLauncher()
 {
-	destroyContext();
+	disconnect();
 
 	for (auto it = devices.begin(); it != devices.end(); ++it) {
 		delete *it;
@@ -203,6 +207,7 @@ ToolLauncher::~ToolLauncher()
 	devices.clear();
 
 	delete search_timer;
+	delete alive_timer;
 
 	tl_api->ApiObject::save();
 	delete tl_api;
@@ -355,6 +360,7 @@ void adiscope::ToolLauncher::disconnect()
 	ui->btnHome->click();
 
 	if (ctx) {
+		alive_timer->stop();
 		ui->stopDIO->setChecked(false);
 		ui->stopDMM->setChecked(false);
 		ui->stopLogicAnalyzer->setChecked(false);
@@ -371,6 +377,14 @@ void adiscope::ToolLauncher::disconnect()
 
 	/* Update the list of devices now */
 	updateListOfDevices(searchDevices());
+}
+
+void adiscope::ToolLauncher::ping()
+{
+	int ret = iio_context_get_version(ctx, nullptr, nullptr, nullptr);
+
+	if (ret < 0)
+		disconnect();
 }
 
 void adiscope::ToolLauncher::on_btnConnect_clicked(bool pressed)
@@ -597,6 +611,8 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 	if (!ctx) {
 		return false;
 	}
+
+	alive_timer->start(ALIVE_TIMER_TIMEOUT_MS);
 
 	filter = new Filter(ctx);
 

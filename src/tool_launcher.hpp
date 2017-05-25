@@ -73,6 +73,7 @@ Q_SIGNALS:
 private Q_SLOTS:
 	void search();
 	void update();
+	void ping();
 
 	void on_btnOscilloscope_clicked();
 	void on_btnSignalGenerator_clicked();
@@ -102,7 +103,7 @@ private:
 
 	QVector<QPair<QWidget, Ui::Device> *> devices;
 
-	QTimer *search_timer;
+	QTimer *search_timer, *alive_timer;
 	QFutureWatcher<QVector<QString>> watcher;
 	QFuture<QVector<QString>> future;
 
