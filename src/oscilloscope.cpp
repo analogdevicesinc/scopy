@@ -482,10 +482,6 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	connect(this, SIGNAL(selectedChannelChanged(int)),
 		this, SLOT(update_chn_settings_panel(int)));
 
-	connect(&*iio, &iio_manager::flowgraph_errored, [=]() {
-		Q_EMIT appShouldStop();
-	});
-
 	if (nb_channels < 2)
 		gsettings_ui->XY_view->hide();
 
