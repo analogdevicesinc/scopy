@@ -55,6 +55,8 @@
 #include "ui_oscilloscope.h"
 #include "ui_trigger_settings.h"
 
+#define MAX_MATH_CHANNELS 4
+
 using namespace adiscope;
 using namespace gr;
 using namespace std;
@@ -626,6 +628,14 @@ unsigned int Oscilloscope::find_curve_number()
 
 void Oscilloscope::add_math_channel(const std::string& function)
 {
+	if (nb_math_channels + 1 > MAX_MATH_CHANNELS - 1){
+		if (ui->btnAddMath->isChecked()){
+			ui->btnAddMath->setChecked(false);
+			toggleRightMenu(ui->btnAddMath);
+		}
+		ui->btnAddMath->hide();
+	}
+
 	auto math = iio::iio_math::make(function, nb_channels);
 	unsigned int curve_id = nb_channels + nb_math_channels;
 	unsigned int curve_number = find_curve_number();
@@ -723,6 +733,10 @@ void Oscilloscope::add_math_channel(const std::string& function)
 
 void Oscilloscope::del_math_channel()
 {
+	if (nb_math_channels > MAX_MATH_CHANNELS - 1){
+		ui->btnAddMath->show();
+	}
+
 	QPushButton *delBtn = static_cast<QPushButton *>(QObject::sender());
 	QWidget *parent = delBtn->parentWidget();
 	QString qname = delBtn->property("curve_name").toString();
