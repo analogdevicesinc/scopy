@@ -19,35 +19,6 @@
   <property name="windowTitle">
    <string>Scopy Signal Generator</string>
   </property>
-  <property name="styleSheet">
-   <string notr="true">/* QComboBoxes*/
-QComboBox
-{
-  height: 24px;
-  border: 0px;
-  color: white;
-  font-size: 14px;
-  border-bottom: 1px solid rgba(255, 255, 255, 102);
-  padding-bottom: 4px;
-}
-QComboBox::drop-down
-{
-  subcontrol-position: center right;
-  width: 10px;
-  height: 6px;
-  border-image: url(:/icons/sba_cmb_box_arrow.svg);
-}
-QComboBox QAbstractItemView {
-  border: 0px;
-  color: white;
-  selection-background-color: rgba(25, 25, 25);
-  outline: 0px;
-}
-QComboBox:disabled
-{
-  color: rgb(85, 85, 85);
-}</string>
-  </property>
   <layout class="QVBoxLayout" name="verticalLayout_4">
    <property name="spacing">
     <number>0</number>
@@ -67,8 +38,9 @@ QComboBox:disabled
    <item>
     <widget class="QWidget" name="mainWidget" native="true">
      <property name="styleSheet">
-      <string notr="true">QWidget { background-color: none; }
-QWidget#mainWidget { background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 rgba(35, 35, 43, 255), stop:1 rgba(39, 39, 48, 255)); }</string>
+      <string notr="true">#mainWidget {
+background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 rgba(0, 0, 0, 40), stop:1 transparent);
+}</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <property name="spacing">
@@ -187,11 +159,6 @@ QPushButton:disabled {
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
-             </property>
-             <property name="styleSheet">
-              <string notr="true">QWidget {
-  background-color: rgb(39, 39, 48);
-}</string>
              </property>
              <property name="title">
               <string>Configuration</string>
