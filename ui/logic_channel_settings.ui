@@ -22,47 +22,13 @@
   <property name="styleSheet">
    <string notr="true">QLabel
 {
-width: 68.2px;
-height: 16.46px;
-font-family: Arial;
 font-size: 14px;
-line-height: 16px;
 color: rgba(255,255,255,150);
 }
 
 QLabel:disabled
 {
   color: rgb(85, 85, 85);
-}
-
-/* Color of the selected list item. */
-QComboBox::item:selected {
-  font-family: ArialMT;
-  font-size: 16px;
-  font-weight: normal;
-  font-style: normal;
-  text-align: right;
-  color: #ffffff;
-  border-bottom: 1px solid rgba(255, 255, 255, 102);
- 
-}
-/* Indicator will shine through the label text if you don't make it hidden. */ 
-QComboBox::indicator{
-    background-color:transparent;
-    selection-background-color:transparent;
-    color:transparent;
-    selection-color:transparent;
-}
-
-QLineEdit {
-  height: 20px;
-  width: 50px;
-  color: white;
-  font-size: 14px;
-font-family: Arial;
-font-weight:bold;
-border:0px;
- border-bottom: 1px solid rgba(255, 255, 255, 102); 
 }</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">

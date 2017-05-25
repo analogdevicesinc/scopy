@@ -141,7 +141,6 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 
 	/* Time position widget */
 	this->d_bottomHandlesArea = new HorizHandlesArea(this);
-	this->d_bottomHandlesArea->setMinimumHeight(50);
 	this->d_bottomHandlesArea->setLeftPadding(20);
 	this->d_bottomHandlesArea->setRightPadding(20);
 

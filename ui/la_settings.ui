@@ -19,131 +19,6 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <property name="styleSheet">
-   <string notr="true">QLineEdit {
-  height: 20px;
-  width: 50px;
-  color: white;
-  font-size: 14px;
-font-family: Arial;
-font-weight:bold;
-border:0px;
-/*  border-bottom: 1px solid rgba(255, 255, 255, 102); */
-}
-
-QLabel
-{
-width: 68.2px;
-height: 16.46px;
-font-family: Arial;
-font-size: 14px;
-line-height: 16px;
-color: rgba(255,255,255,150);
-}
-
-QLabel:disabled
-{
-  color: rgb(85, 85, 85);
-}
-
-/* Double Spin box */
-QDoubleSpinBox
-{
-	height: 45px;
-	border-bottom: 1px solid rgba(255, 255, 255, 102);
-}
-
-QDoubleSpinBox::up-button
-{
-	border-image: url(:/icons/sba_up_btn.svg);
-	height: 20px;
-	width: 20px;
- }
-
-QDoubleSpinBox::up-button:hover
-{
-	border-image: url(:/icons/sba_up_btn_hover.svg);
-	height: 20px;
-	width: 20px;
- }
-
-QDoubleSpinBox::up-button:pressed
-{
-	border-image: url(:/icons/sba_up_btn_pressed.svg);
-	height:20px;
-	width: 20px;
-}
-
-QDoubleSpinBox::down-button
-{
-	border-image: url(:/icons/sba_dn_btn.svg);
-	height:20px;
-	width: 20px;
-}
-
-QDoubleSpinBox::down-button:hover
-{
-	border-image: url(:/icons/sba_dn_btn_hover.svg);
-	height:20px;
-	width: 20px;
-}
-
-QDoubleSpinBox::down-button:pressed
-{
-	border-image: url(:/icons/sba_dn_btn_pressed.svg);
-	height:20px;
-	width: 20px;
-}
-
-/* Spin box */
-QSpinBox
-{
-	height:45px;
-	border-bottom: 1px solid rgba(255, 255, 255, 102);
-}
-
-QSpinBox::up-button
-{
-	border-image: url(:/icons/sba_up_btn.svg);
-	height: 20px;
-	width: 20px;
- }
-
-QSpinBox::up-button:hover
-{
-	border-image: url(:/icons/sba_up_btn_hover.svg);
-	height: 20px;
-	width: 20px;
- }
-
-QSpinBox::up-button:pressed
-{
-	border-image: url(:/icons/sba_up_btn_pressed.svg);
-	height:20px;
-	width: 20px;
-}
-
-QSpinBox::down-button
-{
-	border-image: url(:/icons/sba_dn_btn.svg);
-	height:20px;
-	width: 20px;
-}
-
-QSpinBox::down-button:hover
-{
-	border-image: url(:/icons/sba_dn_btn_hover.svg);
-	height:20px;
-	width: 20px;
-}
-
-QSpinBox::down-button:pressed
-{
-	border-image: url(:/icons/sba_dn_btn_pressed.svg);
-	height:20px;
-	width: 20px;
-}</string>
-  </property>
   <layout class="QVBoxLayout" name="verticalLayout_1">
    <property name="spacing">
     <number>0</number>
@@ -168,21 +43,7 @@ QSpinBox::down-button:pressed
   height: 30px;
   border-radius: 4px;
   background-color: #4a64ff;
-  font-family: ArialMT;
-  font-size: 14px;
-  font-weight: bold;
-  font-style: normal;
-  text-align: center;
-  color: #ffffff;
-}
-
-/*
-QPushButton:hover
-{
-	 background-color: #4a34ff;
-}*/
-
-</string>
+}</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <property name="spacing">
@@ -210,13 +71,8 @@ QPushButton:hover
           <property name="styleSheet">
            <string notr="true">QLabel 
 {
-width: 37px;
-height: 17px;
-font-family: Arial;
 font-size: 14px;
 font-weight: bold;
-line-height: 16px;
-color: #FFFFFF;
 }</string>
           </property>
           <property name="text">
@@ -269,9 +125,6 @@ color: #FFFFFF;
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <property name="styleSheet">
-           <string notr="true"/>
-          </property>
           <property name="text">
            <string/>
           </property>
@@ -311,9 +164,6 @@ color: #FFFFFF;
    </item>
    <item>
     <widget class="QWidget" name="requiredChn" native="true">
-     <property name="styleSheet">
-      <string notr="true"/>
-     </property>
      <layout class="QHBoxLayout" name="horizontalLayout_3">
       <property name="spacing">
        <number>0</number>
@@ -369,13 +219,10 @@ color: rgba(255,255,255,50);
            </sizepolicy>
           </property>
           <property name="styleSheet">
-           <string notr="true">QFrame{
-	opacity: 0.1;
-  color: rgba(255,255,255,50);
-}</string>
+           <string notr="true">color: rgba(255,255,255,50);</string>
           </property>
           <property name="frameShadow">
-           <enum>QFrame::Sunken</enum>
+           <enum>QFrame::Plain</enum>
           </property>
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -389,9 +236,6 @@ color: rgba(255,255,255,50);
    </item>
    <item>
     <widget class="QWidget" name="optionalChn" native="true">
-     <property name="styleSheet">
-      <string notr="true"/>
-     </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <property name="spacing">
        <number>0</number>
@@ -441,10 +285,10 @@ color: rgba(255,255,255,50);
         <item>
          <widget class="Line" name="line_4">
           <property name="styleSheet">
-           <string notr="true">QFrame{
-	opacity: 0.1;
-  color: rgba(255,255,255,50);
-}</string>
+           <string notr="true">color: rgba(255,255,255,50);</string>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Plain</enum>
           </property>
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -499,10 +343,10 @@ color: rgba(255,255,255,50);
       <item>
        <widget class="Line" name="line_5">
         <property name="styleSheet">
-         <string notr="true">QFrame{
-	opacity: 0.1;
-  color: rgba(255,255,255,50);
-}</string>
+         <string notr="true">color: rgba(255,255,255,50);</string>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
         </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>

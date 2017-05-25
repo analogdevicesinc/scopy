@@ -19,39 +19,6 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <property name="styleSheet">
-   <string notr="true">/* Color of the selected list item. */
-QComboBox::item:selected {
-  font-family: ArialMT;
-  font-size: 16px;
-  font-weight: normal;
-  font-style: normal;
-  text-align: right;
-  color: #ffffff;
-  border-bottom: 1px solid rgba(255, 255, 255, 102);
- 
-}
-/* Indicator will shine through the label text if you don't make it hidden. */ 
-QComboBox::indicator{
-    background-color:transparent;
-    selection-background-color:transparent;
-    color:transparent;
-    selection-color:transparent;
-}
-
-QLabel {
-width: 68.2px;
-height: 16.46px;
-opacity: 0.6;
-font-family: Arial;
-font-size: 14px;
-line-height: 16px;
-color: #FFFFFF;
-}
-
-
-</string>
-  </property>
   <layout class="QVBoxLayout" name="verticalLayout_1">
    <property name="spacing">
     <number>0</number>
@@ -101,7 +68,7 @@ color: #FFFFFF;
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="channelGroup">
          <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -129,7 +96,13 @@ color: #FFFFFF;
              </sizepolicy>
             </property>
             <property name="styleSheet">
-             <string notr="true"/>
+             <string notr="true">QLabel {
+opacity: 0.6;
+font-size: 14px;
+color: white;
+}
+
+</string>
             </property>
             <property name="text">
              <string>Settings</string>
