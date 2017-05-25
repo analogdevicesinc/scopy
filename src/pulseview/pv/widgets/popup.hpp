@@ -45,7 +45,7 @@ private:
 	static const unsigned int MarginWidth;
 
 public:
-	Popup(QWidget *parent);
+	Popup(QWidget *parent, bool colour = false);
 
 	const QPoint& point() const;
 	Position position() const;
@@ -89,6 +89,7 @@ Q_SIGNALS:
 private:
 	QPoint point_;
 	Position pos_;
+	bool colour_popup;
 };
 
 } // namespace widgets

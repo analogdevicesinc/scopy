@@ -19,12 +19,13 @@
  */
 
 #include "colourpopup.hpp"
+#include "QPainter"
 
 namespace pv {
 namespace widgets {
 
 ColourPopup::ColourPopup(int rows, int cols, QWidget *parent) :
-	Popup(parent),
+	Popup(parent, true),
 	well_array_(rows, cols, this),
 	layout_(this)
 {
@@ -46,6 +47,5 @@ void ColourPopup::colour_selected(int, int)
 {
 	close();
 }
-
 } // widgets
 } // pv

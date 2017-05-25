@@ -40,10 +40,11 @@ const unsigned int Popup::ArrowLength = 10;
 const unsigned int Popup::ArrowOverlap = 3;
 const unsigned int Popup::MarginWidth = 6;
 
-Popup::Popup(QWidget *parent) :
+Popup::Popup(QWidget *parent, bool colour) :
 	QWidget(parent, Qt::Popup | Qt::FramelessWindowHint),
 	point_(),
-	pos_(Left)
+	pos_(Left),
+	colour_popup(colour)
 {
 }
 
@@ -266,7 +267,10 @@ void Popup::paintEvent(QPaintEvent*)
 		b.translated(-1, 0).intersected(b.translated(0, -1)))));
 
 	painter.setPen(Qt::NoPen);
-	painter.setBrush(QApplication::palette().brush(QPalette::Window));
+	if(!colour_popup)
+		painter.setBrush(QApplication::palette().brush(QPalette::Window));
+	else
+		painter.setBrush(QColor("#141416"));
 	painter.drawRect(rect());
 
 	// Draw the arrow
@@ -280,10 +284,12 @@ void Popup::paintEvent(QPaintEvent*)
 	const QRegion arrow_outline = a.subtracted(
 		a.translated(ArrowOffsets[pos_]));
 
-	painter.setClipRegion(bubble_outline.subtracted(a).united(
-		arrow_outline));
-	painter.setBrush(outline_color);
-	painter.drawRect(rect());
+	if(!colour_popup) {
+		painter.setClipRegion(bubble_outline.subtracted(a).united(
+					      arrow_outline));
+		painter.setBrush(outline_color);
+		painter.drawRect(rect());
+	}
 }
 
 void Popup::resizeEvent(QResizeEvent*)
