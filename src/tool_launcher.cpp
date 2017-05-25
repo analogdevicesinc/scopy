@@ -662,15 +662,10 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 
 		if (!success) {
 			search_timer->stop();
-			QMessageBox *error = new QMessageBox(this);
-			//	error->setWindowFlags(Qt::FramelessWindowHint);
-			error->setText("There was a problem initializing libsigrokdecode. Some features may be missing");
-			QFile file(":/stylesheets/stylesheets/dialogbox.qss");
-			file.open(QFile::ReadOnly);
-			QString stylesheet = QString::fromLatin1(file.readAll());
-			error->setStyleSheet(stylesheet);
-			error->exec();
-			delete error;
+
+			QMessageBox error(this);
+			error.setText("There was a problem initializing libsigrokdecode. Some features may be missing");
+			error.exec();
 		}
 	}
 
