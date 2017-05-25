@@ -61,6 +61,9 @@ QLabel { color: #444444; font-size: 40pt; font-weight: bold; qproperty-alignment
           <property name="orientation">
            <enum>Qt::Vertical</enum>
           </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Maximum</enum>
+          </property>
           <property name="sizeHint" stdset="0">
            <size>
             <width>0</width>
@@ -77,7 +80,7 @@ QLabel { color: #444444; font-size: 40pt; font-weight: bold; qproperty-alignment
           <item>
            <widget class="adiscope::Sismograph" name="sismograph_ch1">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Minimum" vsizetype="MinimumExpanding">
+             <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -200,7 +203,7 @@ QLabel { color: #444444; font-size: 40pt; font-weight: bold; qproperty-alignment
            <enum>Qt::Vertical</enum>
           </property>
           <property name="sizeType">
-           <enum>QSizePolicy::MinimumExpanding</enum>
+           <enum>QSizePolicy::Maximum</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
@@ -218,7 +221,7 @@ QLabel { color: #444444; font-size: 40pt; font-weight: bold; qproperty-alignment
           <item>
            <widget class="adiscope::Sismograph" name="sismograph_ch2">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Minimum" vsizetype="MinimumExpanding">
+             <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -339,6 +342,9 @@ QLabel { color: #444444; font-size: 40pt; font-weight: bold; qproperty-alignment
          <spacer name="verticalSpacer_4">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Maximum</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
@@ -785,7 +791,7 @@ QPushButton:disabled {
   </connection>
  </connections>
  <buttongroups>
-  <buttongroup name="buttonGroup_2"/>
   <buttongroup name="buttonGroup"/>
+  <buttongroup name="buttonGroup_2"/>
  </buttongroups>
 </ui>
