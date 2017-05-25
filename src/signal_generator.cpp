@@ -274,7 +274,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 
 SignalGenerator::~SignalGenerator()
 {
-	stop();
+	ui->run_button->setChecked(false);
 
 	sg_api->save();
 	delete sg_api;
