@@ -74,8 +74,6 @@ private Q_SLOTS:
 	void search();
 	void update();
 
-	void disconnect();
-
 	void on_btnOscilloscope_clicked();
 	void on_btnSignalGenerator_clicked();
 	void on_btnDMM_clicked();
@@ -139,6 +137,7 @@ private:
 	void resetStylesheets();
 	void calibrate();
 	void checkIp(const QString& ip);
+	void disconnect();
 	Q_INVOKABLE QPushButton *addContext(const QString& hostname);
 
 	void updateListOfDevices(const QVector<QString>& uris);

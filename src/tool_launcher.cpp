@@ -538,15 +538,12 @@ void adiscope::ToolLauncher::enableAdcBasedTools()
 		oscilloscope = new Oscilloscope(ctx, filter, adc,
 						ui->stopOscilloscope,
 						&js_engine, this);
-		connect(oscilloscope, SIGNAL(appShouldStop()),
-				this, SLOT(disconnect()));
 		ui->oscilloscope->setEnabled(true);
 		adc_users_group.addButton(ui->stopOscilloscope);
 	}
 
 	if (filter->compatible(TOOL_DMM)) {
 		dmm = new DMM(ctx, filter, adc, ui->stopDMM, &js_engine, this);
-		connect(dmm, SIGNAL(appShouldStop()), this, SLOT(disconnect()));
 		ui->dmm->setEnabled(true);
 		adc_users_group.addButton(ui->stopDMM);
 	}
@@ -665,9 +662,6 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 	if (filter->compatible((TOOL_NETWORK_ANALYZER))) {
 		network_analyzer = new NetworkAnalyzer(ctx, filter,
 		                                       ui->stopNetworkAnalyzer, &js_engine, this);
-		connect(network_analyzer, SIGNAL(appShouldStop()),
-				this, SLOT(disconnect()));
-
 		ui->networkAnalyzer->setEnabled(true);
 	}
 
