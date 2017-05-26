@@ -200,6 +200,7 @@ void Ruler::paintEvent(QPaintEvent*)
 	pv::util::Timestamp offset_used =
 		(ruler_offset != 0) ? ruler_offset : view_.offset();
 
+	int last_end_pix = 0;
 	for (const auto& tick: tick_position_cache_->major) {
 		int x = view_.getGridPosition(pos);
 		auto time = offset_used + (x + 0.5) *
@@ -209,15 +210,20 @@ void Ruler::paintEvent(QPaintEvent*)
 				this->view_.tick_prefix(),
 				this->view_.time_unit(),
 				this->view_.tick_precision());
+		if(last_end_pix == 0)
+			last_end_pix = -fontMetrics().width(str)/2;
 		p.setPen(palette().color(foregroundRole()));
 
 		while(!(visible_lbl * maxLabelWidth < width())) {
 			 visible_lbl  = visible_lbl%2 == 0 ? visible_lbl/2 : (visible_lbl-1)/2;
 			 skip_pos *= 2;
 		}
-		 if(pos % skip_pos == 0)
+		int half = fontMetrics().width(str)/2;
+		if(pos % skip_pos == 0 && (last_end_pix <= x-half)) {
 			p.drawText(x, major_tick_y1 + ValueMargin, 0, text_height,
 				AlignCenter | AlignBottom | TextDontClip, str);
+			last_end_pix = x + half;
+		}
 		pos++;
 	}
 
