@@ -261,15 +261,6 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	buffer_previewer->setMaximumHeight(20);
 	buffer_previewer->setMinimumWidth(480);
 	buffer_previewer->setMaximumWidth(480);
-	buffer_previewer->setHighlightBgColor(QColor("#141416"));
-	buffer_previewer->setHighlightFgColor(QColor("#ff7200"));
-	buffer_previewer->setCursorColor(QColor("#4A64FF"));
-	QString stylesheet = "adiscope--BufferPreviewer {"
-			"background-color: #272730;"
-			"color: #ffffff;"
-			"border: 1px solid #7092be;"
-		"}";
-	buffer_previewer->setStyleSheet(stylesheet);
 	ui->vLayoutBufferSlot->addWidget(buffer_previewer);
 
 	buffer_previewer->setCursorPos(0.5);

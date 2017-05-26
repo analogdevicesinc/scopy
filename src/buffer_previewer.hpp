@@ -22,7 +22,6 @@
 #define BUFFER_PREVIEWER_H
 
 #include <QFrame>
-#include <QColor>
 
 namespace adiscope{
 
@@ -51,12 +50,6 @@ public:
 	void setVerticalSpacing(int);
 	int pixelsPerPeriod() const;
 	double wavePhase() const;
-	QColor highlightBgColor() const;
-	void setHighlightBgColor(QColor);
-	QColor highlightFgColor() const;
-	void setHighlightFgColor(QColor);
-	QColor cursorColor() const;
-	void setCursorColor(QColor);
 
 protected:
 	void paintEvent(QPaintEvent *) Q_DECL_OVERRIDE;
@@ -73,9 +66,6 @@ private:
 	int m_verticalSpacing;
 	int m_pixelsPerPeriod;
 	double m_startingPhase;
-	QColor m_highlightBgColor;
-	QColor m_highlightFgColor;
-	QColor m_cursorColor;
 
 	int m_fullWaveNumPoints;
 	QPointF *m_fullWavePoints;

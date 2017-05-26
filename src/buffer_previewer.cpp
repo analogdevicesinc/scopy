@@ -46,9 +46,6 @@ BufferPreviewer::BufferPreviewer(int pixelsPerPeriod, double wavePhase,
 	m_verticalSpacing(0),
 	m_pixelsPerPeriod(pixelsPerPeriod),
 	m_startingPhase(wavePhase),
-	m_highlightBgColor(QColor(Qt::black)),
-	m_highlightFgColor(QColor(Qt::white)),
-	m_cursorColor(QColor(Qt::gray)),
 	m_fullWaveNumPoints(1),
 	m_fullWavePoints(new QPointF[m_fullWaveNumPoints])
 {
@@ -156,36 +153,6 @@ double BufferPreviewer::wavePhase() const
 	return m_startingPhase;
 }
 
-QColor BufferPreviewer::highlightBgColor() const
-{
-	return m_highlightBgColor;
-}
-
-void BufferPreviewer::setHighlightBgColor(QColor color)
-{
-	m_highlightBgColor = color;
-}
-
-QColor BufferPreviewer::highlightFgColor() const
-{
-	return m_highlightFgColor;
-}
-
-void BufferPreviewer::setHighlightFgColor(QColor color)
-{
-	m_highlightFgColor = color;
-}
-
-QColor BufferPreviewer::cursorColor() const
-{
-	return m_cursorColor;
-}
-
-void BufferPreviewer::setCursorColor(QColor color)
-{
-	m_cursorColor = color;
-}
-
 void BufferPreviewer::paintEvent(QPaintEvent *)
 {
 	QPainter p(this);
@@ -229,12 +196,12 @@ void BufferPreviewer::paintEvent(QPaintEvent *)
 	// Draw the highlight rectangle
 	p.setRenderHint(QPainter::Antialiasing, false);
 	p.setPen(rectPen);
-	p.setBrush(m_highlightBgColor);
+	p.setBrush(palette().color(QPalette::Highlight));
 	p.drawRect(hlight_start, 0, hlight_width, h);
 
 	// Highlight the visible wave that intersects the highlight rectangle
 	p.setRenderHint(QPainter::Antialiasing, true);
-	linePen.setColor(m_highlightFgColor);
+	linePen.setColor(palette().color(QPalette::HighlightedText));
 	p.setPen(linePen);
 	p.drawPolyline(m_fullWavePoints + hlightedWaveStartPos , hlightedWaveWidth);
 
@@ -243,7 +210,7 @@ void BufferPreviewer::paintEvent(QPaintEvent *)
 	int cur_head_w = 8;
 	int cur_head_h = 4;
 	p.setPen(rectPen);
-	p.setBrush(m_cursorColor);
+	p.setBrush(palette().color(QPalette::AlternateBase));
 	p.drawRect((cursor_start - 1) - cur_head_w / 2 + 1, 0, cur_head_w, cur_head_h);
 	p.drawRect((cursor_start - 1), cur_head_h, 2, h - cur_head_h);
 }
