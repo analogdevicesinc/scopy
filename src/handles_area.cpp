@@ -79,10 +79,9 @@ void HandlesArea::resizeEvent(QResizeEvent *event)
 VertHandlesArea::VertHandlesArea(QWidget *parent):
 	HandlesArea(parent)
 {
-
+	largest_child_height = 0;
 	top_padding = 50;
 	bottom_padding = 50;
-
 }
 
 int VertHandlesArea::topPadding()
@@ -136,10 +135,9 @@ void VertHandlesArea::resizeMask(QSize size)
 HorizHandlesArea::HorizHandlesArea(QWidget *parent):
 	HandlesArea(parent)
 {
-
+	largest_child_width = 0;
 	left_padding = 50;
 	right_padding = 50;
-
 }
 
 int HorizHandlesArea::leftPadding()
