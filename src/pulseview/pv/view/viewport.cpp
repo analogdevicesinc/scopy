@@ -31,6 +31,7 @@
 
 #include "../session.hpp"
 
+#include <QApplication>
 #include <QMouseEvent>
 
 using std::abs;
@@ -57,11 +58,11 @@ Viewport::Viewport(View &parent) :
 	cursorsActive(false),
 	cursorsPixelValues(std::pair<int, int>(0,0))
 {
-	setAutoFillBackground(true);
-	setStyleSheet("background-color:black;\n"
-		      "border:0px;\n"
-		      "margin:0px;\npadding:0px;");
-	setBackgroundRole(QPalette::Base);
+	/* Permits the QWidget to have a visible background */
+	setAttribute(Qt::WA_StyledBackground, true);
+
+	/* TODO: Why isn't it picking up the application-wide stylesheet? */
+	setStyleSheet(qApp->styleSheet());
 }
 
 void Viewport::setTimeTriggerPosActive(bool active)
