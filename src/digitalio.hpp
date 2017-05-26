@@ -58,16 +58,6 @@ class dioGroup;
 namespace adiscope {
 class DigitalIO;
 class DigitalIO_API;
-/*
-class DigitalIoChannel
-{
-	Q_OBJECT
-	int channel_id;
-	int io;
-public:
-	DigitalIoChannel(int channel_id,int io);
-	~DigitalIoChannel();
-};*/
 
 class DigitalIoGroup : public QWidget
 {
@@ -75,7 +65,6 @@ class DigitalIoGroup : public QWidget
 	int nr_of_channels;
 	int ch_mask;
 	int channels;
-//	QList channels;
 	int io_mask;
 	int mode;
 	DigitalIO *dio;
@@ -88,9 +77,6 @@ public:
 
 Q_SIGNALS:
 	void slider(int val);
-	/*QList<Ui::dioChannel*> chui;
-	QList<QWidget*> chWidget;*/
-
 
 private Q_SLOTS:
 	void on_lineEdit_editingFinished();
@@ -113,9 +99,9 @@ private:
 	struct iio_context *ctx;
 	DigitalIO_API *dio_api;
 	QList<DigitalIoGroup *> groups;
-	Ui::DigitalIoMenu *menu;
 	QTimer *poll;
 	DIOManager *diom;
+	int polling_rate = 500; // ms
 
 	QPair<QWidget *,Ui::dioChannel *>  *findIndividualUi(int ch);
 
@@ -128,9 +114,7 @@ public:
 	void setOutput(int ch, int out);
 
 public Q_SLOTS:
-	void rightMenuToggle();
 	void updateUi();
-	void enableOutputs();
 	void setDirection();
 	void setOutput();
 	void setSlider(int val);
@@ -141,7 +125,6 @@ public Q_SLOTS:
 class DigitalIO_API : public ApiObject
 {
 	Q_OBJECT
-	//Q_PROPERTY(QString chm READ chm WRITE setChm SCRIPTABLE false);
 	Q_PROPERTY(QList<bool> dir READ direction WRITE setDirection SCRIPTABLE true);
 	Q_PROPERTY(QList<bool> out READ output    WRITE setOutput SCRIPTABLE true);
 

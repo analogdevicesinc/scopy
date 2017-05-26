@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>142</width>
-    <height>221</height>
+    <height>196</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -51,6 +51,151 @@ border:1px solid red;
       <size>
        <width>20</width>
        <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <spacer name="horizontalSpacer_7">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="styleSheet">
+        <string notr="true">QLabel
+{
+background:transparent;
+height: 28px;
+width: 14px;
+color: #FFFFFF;
+font-family: Arial;
+font-size: 24px;	
+line-height: 28px;
+text-align: center;
+}</string>
+       </property>
+       <property name="text">
+        <string>0</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_8">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="input">
+       <property name="styleSheet">
+        <string notr="true">QPushButton
+{
+width: 14px;
+height: 14px;
+border: 2px solid;
+border-radius: 9px;
+border-color: rgb(73, 99, 255);
+}
+
+QPushButton[high=false]{
+width: 14px;
+height: 14px;
+border: 2px solid;
+border-radius: 9px;
+border-color: rgb(73, 99, 255);
+}
+
+QPushButton[high=true] {
+width: 14px;
+height: 14px;
+border: 2px solid;
+border-radius: 9px;
+border-color: rgb(73, 99, 255);
+background-color: rgb(73, 99, 255);
+}
+
+QPushButton[high=false][short=true] {
+width: 14px;
+height: 14px;
+border: 2px solid;
+border-radius: 9px;
+border-color: red;
+}
+QPushButton[high=true][short=true] {
+
+width: 14px;
+height: 14px;
+border: 2px solid;
+border-radius: 9px;
+border-color: red;
+background-color: red;
+}</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="checkable">
+        <bool>false</bool>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_9">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>10</width>
+       <height>10</height>
       </size>
      </property>
     </spacer>
@@ -154,45 +299,6 @@ QPushButton:checked
     </spacer>
    </item>
    <item>
-    <widget class="QLabel" name="label">
-     <property name="styleSheet">
-      <string notr="true">QLabel
-{
-background:transparent;
-height: 28px;
-width: 14px;
-color: #FFFFFF;
-font-family: Arial;
-font-size: 24px;	
-line-height: 28px;
-text-align: center;
-}</string>
-     </property>
-     <property name="text">
-      <string>0</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Fixed</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>10</width>
-       <height>10</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <property name="spacing">
       <number>0</number>
@@ -256,104 +362,6 @@ QPushButton:!checked
      </item>
      <item>
       <spacer name="horizontalSpacer_2">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <spacer name="verticalSpacer_5">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Fixed</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>5</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <property name="topMargin">
-      <number>0</number>
-     </property>
-     <item>
-      <spacer name="horizontalSpacer_5">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="input">
-       <property name="styleSheet">
-        <string notr="true">
-QPushButton:!checked {
-width: 14px;
-height: 14px;
-border: 2px solid;
-border-radius: 9px;
-border-color: rgb(73, 99, 255);
-}
-QPushButton:checked {
-
-width: 14px;
-height: 14px;
-border: 2px solid;
-border-radius: 9px;
-border-color: rgb(73, 99, 255);
-background-color: rgb(73, 99, 255);
-}
-
-QPushButton:!checked[short=true] {
-width: 14px;
-height: 14px;
-border: 2px solid;
-border-radius: 9px;
-border-color: red;
-}
-QPushButton:checked[short=true] {
-
-width: 14px;
-height: 14px;
-border: 2px solid;
-border-radius: 9px;
-border-color: red;
-background-color: red;
-}</string>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
-       <property name="checked">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_6">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>

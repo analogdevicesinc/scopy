@@ -96,7 +96,6 @@ void DigitalIO::setOutput(int ch, int out)
 {
 	if (!offline_mode) {
 		diom->setOutRaw(ch,out);
-		//updateUi();
 	}
 }
 
@@ -121,7 +120,7 @@ void DigitalIO::setOutput()
 	setOutput(ch, output);
 
 	if (diom->getDirection(ch) && diom->getOutputEnabled()) { // only if output
-		findIndividualUi(ch)->second->input->setChecked(output);
+		setDynamicProperty(findIndividualUi(ch)->second->input,"high",output);
 	}
 }
 
@@ -133,20 +132,11 @@ DigitalIO::DigitalIO(struct iio_context *ctx, Filter *filt, QPushButton *runBtn,
 	ui(new Ui::DigitalIO),
 	offline_mode(offline_mode),
 	dio_api(new DigitalIO_API(this)),
-	menu(new Ui::DigitalIoMenu),
 	diom(diom)
 {
-	// IIO
-	if (!offline_mode) {
-		/*		dev = iio_context_find_device(ctx, "m2k-logic-analyzer-tx");
-				channel_manager_dev = iio_context_find_device(ctx, "m2k-logic-analyzer");
-				this->no_channels = iio_device_get_channels_count(channel_manager_dev);*/
-	}
 
 	// UI
 	ui->setupUi(this);
-
-
 	groups.append(new DigitalIoGroup("DIO 0 - 7 ",0xff,0xff,this,ui->dioContainer));
 	ui->containerLayout->addWidget(groups.last());
 	groups.append(new DigitalIoGroup("DIO 8 - 15",0xff00,0xff00,this,
@@ -160,17 +150,11 @@ DigitalIO::DigitalIO(struct iio_context *ctx, Filter *filt, QPushButton *runBtn,
 
 	connect(diom,SIGNAL(locked()),this,SLOT(lockUi()));
 	connect(diom,SIGNAL(unlocked()),this,SLOT(lockUi()));
-	menu->setupUi(ui->rightMenu);
-	menu->lineEdit->setValidator(new QIntValidator(500, 9999, this));
-	ui->pushButton_2->setChecked(true);
-	rightMenuToggle();
-	connect(menu->enableOutputs_PB,SIGNAL(clicked()),this,SLOT(enableOutputs()));
 	poll = new QTimer(this);
-	connect(ui->pushButton_2,SIGNAL(clicked()),this,SLOT(rightMenuToggle()));
 	connect(poll,SIGNAL(timeout()),this,SLOT(updateUi()));
 
 	dio_api->setObjectName(QString::fromStdString(Filter::tool_name(
-			TOOL_DIGITALIO)));
+	                               TOOL_DIGITALIO)));
 	dio_api->load();
 	dio_api->js_register(engine);
 
@@ -216,7 +200,8 @@ void DigitalIO::updateUi()
 			auto chk = gpi&0x01;
 			gpi >>= 1;
 
-			chui->input->setChecked(chk);
+			setDynamicProperty(chui->input,"high",chk);
+
 			auto isLocked = diom->getLockMask() & 1<<i;
 			auto isOutput = diom->getDirection(i);
 
@@ -240,15 +225,6 @@ void DigitalIO::updateUi()
 		}
 	}
 }
-
-void DigitalIO::enableOutputs()
-{
-	if (!offline_mode) {
-		diom->enableOutput(menu->enableOutputs_PB->isChecked());
-	}
-}
-}
-
 
 void adiscope::DigitalIoGroup::on_inout_clicked()
 {
@@ -302,11 +278,6 @@ void adiscope::DigitalIoGroup::on_comboBox_activated(int index)
 	ui->stackedWidget->setCurrentIndex(index);
 }
 
-void adiscope::DigitalIO::rightMenuToggle()
-{
-	ui->rightMenu->toggleMenu(ui->pushButton_2->isChecked());
-}
-
 void adiscope::DigitalIO::lockUi()
 {
 	auto lockmask = diom->getLockMask();
@@ -343,10 +314,10 @@ void adiscope::DigitalIO::lockUi()
 void adiscope::DigitalIO::on_btnRunStop_clicked()
 {
 	if (ui->btnRunStop->isChecked()) {
-		poll->start(menu->lineEdit->text().toInt());
+		poll->start(polling_rate);
+		diom->enableOutput(true);
 	} else {
 		poll->stop();
-		menu->enableOutputs_PB->setChecked(false);
 		diom->enableOutput(false);
 	}
 }
@@ -400,5 +371,5 @@ void DigitalIO_API::setOutput(const QList<bool>& list)
 	}
 }
 
-
+}
 
