@@ -32,7 +32,8 @@ fft_block::fft_block(bool use_complex, size_t fft_size, unsigned int nbthreads)
 	: hier_block2("FFT",
 			io_signature::make(1, 1, use_complex ?
 				sizeof(gr_complex) : sizeof(float)),
-			io_signature::make(1, 1, sizeof(gr_complex)))
+			io_signature::make(1, 1, sizeof(gr_complex))),
+	d_complex(use_complex)
 {
 	auto s2v = blocks::stream_to_vector::make(
 			use_complex ? sizeof(gr_complex) : sizeof(float),
@@ -42,21 +43,30 @@ fft_block::fft_block(bool use_complex, size_t fft_size, unsigned int nbthreads)
 	/* We use a Hamming window for now */
 	auto window = fft::window::hamming(fft_size);
 
-	basic_block_sptr fft;
+	//basic_block_sptr fft;
 	if (use_complex)
-		fft = fft::fft_vcc::make(fft_size, true,
+		d_fft = fft::fft_vcc::make(fft_size, true,
 				window, false, nbthreads);
 	else
-		fft = fft::fft_vfc::make(fft_size, true,
+		d_fft = fft::fft_vfc::make(fft_size, true,
 				window, nbthreads);
 
 	/* Connect everything */
 	hier_block2::connect(this->self(), 0, s2v, 0);
-	hier_block2::connect(s2v, 0, fft, 0);
-	hier_block2::connect(fft, 0, v2s, 0);
+	hier_block2::connect(s2v, 0, d_fft, 0);
+	hier_block2::connect(d_fft, 0, v2s, 0);
 	hier_block2::connect(v2s, 0, this->self(), 0);
 }
 
 fft_block::~fft_block()
 {
+}
+
+bool fft_block::set_window(const std::vector<float>& window)
+{
+	if (d_complex) {
+		boost::dynamic_pointer_cast<fft::fft_vcc>(d_fft)->set_window(window);
+	} else {
+		boost::dynamic_pointer_cast<fft::fft_vfc>(d_fft)->set_window(window);
+	}
 }

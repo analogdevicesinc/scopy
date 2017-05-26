@@ -54,6 +54,7 @@ class GenericAdc;
 
 namespace adiscope {
 class ToolLauncher_API;
+class SpectrumAnalyzer;
 
 class ToolLauncher : public QMainWindow
 {
@@ -82,6 +83,7 @@ private Q_SLOTS:
 	void on_btnLogicAnalyzer_clicked();
 	void on_btnPatternGenerator_clicked();
 	void on_btnNetworkAnalyzer_clicked();
+	void on_btnSpectrumAnalyzer_clicked();
 	void on_btnHome_clicked();
 	void setButtonBackground(bool on);
 
@@ -116,6 +118,7 @@ private:
 	DIOManager *dioManager;
 	PatternGenerator *pattern_generator;
 	NetworkAnalyzer *network_analyzer;
+	SpectrumAnalyzer *spectrum_analyzer;
 	QWidget *current;
 
 	QButtonGroup adc_users_group;

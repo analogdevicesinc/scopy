@@ -21,6 +21,7 @@
 #include "connectDialog.hpp"
 #include "dynamicWidget.hpp"
 #include "oscilloscope.hpp"
+#include "spectrum_analyzer.hpp"
 #include "tool_launcher.hpp"
 
 #include "ui_device.h"
@@ -46,7 +47,8 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	power_control(nullptr), dmm(nullptr), signal_generator(nullptr),
 	oscilloscope(nullptr), current(nullptr), filter(nullptr),
 	logic_analyzer(nullptr), pattern_generator(nullptr), dio(nullptr),
-	network_analyzer(nullptr), tl_api(new ToolLauncher_API(this)),
+	network_analyzer(nullptr), spectrum_analyzer(nullptr),
+	tl_api(new ToolLauncher_API(this)),
 	notifier(STDIN_FILENO, QSocketNotifier::Read)
 {
 	ui->setupUi(this);
@@ -92,6 +94,8 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	connect(ui->btnNetworkAnalyzer, SIGNAL(toggled(bool)), this,
 		SLOT(setButtonBackground(bool)));
 	connect(ui->btnDigitalIO, SIGNAL(toggled(bool)), this,
+		SLOT(setButtonBackground(bool)));
+	connect(ui->btnSpectrumAnalyzer, SIGNAL(toggled(bool)), this,
 		SLOT(setButtonBackground(bool)));
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
@@ -313,6 +317,11 @@ void adiscope::ToolLauncher::on_btnNetworkAnalyzer_clicked()
 	swapMenu(static_cast<QWidget *>(network_analyzer));
 }
 
+void adiscope::ToolLauncher::on_btnSpectrumAnalyzer_clicked()
+{
+	swapMenu(static_cast<QWidget *>(spectrum_analyzer));
+}
+
 void adiscope::ToolLauncher::on_btnDigitalIO_clicked()
 {
 	swapMenu(static_cast<QWidget *>(dio));
@@ -437,6 +446,7 @@ void adiscope::ToolLauncher::destroyContext()
 	ui->logicAnalyzer->setDisabled(true);
 	ui->patternGenerator->setDisabled(true);
 	ui->networkAnalyzer->setDisabled(true);
+	ui->spectrumAnalyzer->setDisabled(true);
 
 	if (dio) {
 		delete dio;
@@ -476,6 +486,11 @@ void adiscope::ToolLauncher::destroyContext()
 	if (network_analyzer) {
 		delete network_analyzer;
 		network_analyzer = nullptr;
+	}
+
+	if (spectrum_analyzer) {
+		delete spectrum_analyzer;
+		spectrum_analyzer = nullptr;
 	}
 
 	if (filter) {
@@ -519,10 +534,12 @@ void adiscope::ToolLauncher::calibrate()
 	auto old_dmm_text = ui->btnDMM->text();
 	auto old_osc_text = ui->btnOscilloscope->text();
 	auto old_siggen_text = ui->btnSignalGenerator->text();
+	auto old_spectrum_text = ui->btnSpectrumAnalyzer->text();
 
 	ui->btnDMM->setText("Calibrating...");
 	ui->btnOscilloscope->setText("Calibrating...");
 	ui->btnSignalGenerator->setText("Calibrating...");
+	ui->btnSpectrumAnalyzer->setText("Calibrating...");
 
 	Calibration calib(ctx);
 
@@ -541,6 +558,7 @@ void adiscope::ToolLauncher::calibrate()
 	ui->btnDMM->setText(old_dmm_text);
 	ui->btnOscilloscope->setText(old_osc_text);
 	ui->btnSignalGenerator->setText(old_siggen_text);
+	ui->btnSpectrumAnalyzer->setText(old_spectrum_text);
 
 	Q_EMIT adcCalibrationDone();
 	Q_EMIT dacCalibrationDone(calib.dacAvlsb(), calib.dacBvlsb());
@@ -560,6 +578,13 @@ void adiscope::ToolLauncher::enableAdcBasedTools()
 		dmm = new DMM(ctx, filter, adc, ui->stopDMM, &js_engine, this);
 		ui->dmm->setEnabled(true);
 		adc_users_group.addButton(ui->stopDMM);
+	}
+
+	if (filter->compatible(TOOL_SPECTRUM_ANALYZER)) {
+		spectrum_analyzer = new SpectrumAnalyzer(ctx, filter, adc,
+			ui->stopSpectrumAnalyzer, this);
+		ui->spectrumAnalyzer->setEnabled(true);
+		adc_users_group.addButton(ui->stopSpectrumAnalyzer);
 	}
 }
 

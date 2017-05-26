@@ -20,6 +20,7 @@
 #include "FftDisplayPlot.h"
 #include "spectrumUpdateEvents.h"
 #include "signal_generator.hpp"
+#include "average.h"
 
 using namespace adiscope;
 
@@ -36,14 +37,18 @@ FftDisplayPlot::FftDisplayPlot(int nplots, QWidget *parent) :
 
 		d_plot_curve.push_back(plot);
 		y_data.push_back(nullptr);
+
+		d_ch_average_type.push_back(AverageType::SAMPLE);
 	}
+	d_ch_avg_obj.resize(nplots);
+
 	d_numPoints = 1024;
 	x_data = new double[d_numPoints];
 
 	dBFormatter.setTwoDecimalMode(false);
 	freqFormatter.setTwoDecimalMode(true);
 
-	OscScaleDraw *yScaleDraw = new OscScaleDraw(&dBFormatter, "dB");
+	OscScaleDraw *yScaleDraw = new OscScaleDraw(&dBFormatter, "");
 	setAxisScaleDraw(QwtPlot::yLeft, yScaleDraw);
 	yScaleDraw->setFloatPrecision(2);
 
@@ -107,10 +112,51 @@ void FftDisplayPlot::plotData(const std::vector<double *> pts,
 					y_data[i], halfNumPoints);
 #endif
 		}
+
+		// Resize the average objects to the new number of points
+		for (int i = 0; i < d_ch_avg_obj.size(); i++) {
+			if (!d_ch_avg_obj[i])
+				continue;
+
+			uint size = d_ch_avg_obj[i]->dataWidth();
+			if (size == halfNumPoints)
+				continue;
+
+			uint h = d_ch_avg_obj[i]->history();
+			d_ch_avg_obj[i] = getNewAvgObject(
+				d_ch_average_type[i], halfNumPoints, h);
+		}
 	}
 
-	for (unsigned int i = 0; i < d_nplots; i++)
-		memcpy(y_data[i], pts[i], halfNumPoints * sizeof(double));
+	for (unsigned int i = 0; i < d_nplots; i++) {
+		bool needs_dB_avg = false;
+
+		switch (d_ch_average_type[i]) {
+		case LINEAR_DB:
+			needs_dB_avg = true;
+		case EXPONENTIAL_DB:
+			needs_dB_avg = true;
+		case SAMPLE:
+			memcpy(y_data[i], pts[i],
+				halfNumPoints * sizeof(double));
+			break;
+		default:
+			d_ch_avg_obj[i]->pushNewData(pts[i]);
+			d_ch_avg_obj[i]->getAverage(y_data[i], halfNumPoints);
+			break;
+		}
+
+		for (int s = 0; s < halfNumPoints; s++) {
+			//dB Full-Scale
+			y_data[i][s] = 10 * log10(4 * (y_data[i][s] / (2048 * 2048)) /
+				(halfNumPoints * halfNumPoints));
+		}
+
+		if (needs_dB_avg) {
+			d_ch_avg_obj[i]->pushNewData(y_data[i]);
+			d_ch_avg_obj[i]->getAverage(y_data[i], halfNumPoints);
+		}
+	}
 
 	_resetXAxisPoints();
 
@@ -127,8 +173,6 @@ void FftDisplayPlot::_resetXAxisPoints()
 		x_data[loc] = freqValue;
 		freqValue += fft_bin_size;
 	}
-
-	setAxisScale(QwtPlot::xBottom, d_start_frequency, d_stop_frequency);
 }
 
 void FftDisplayPlot::customEvent(QEvent *e)
@@ -148,4 +192,95 @@ void FftDisplayPlot::setSampleRate(double sr, double units,
 	d_stop_frequency = sr / 2;
 
 	_resetXAxisPoints();
+}
+
+FftDisplayPlot::AverageType FftDisplayPlot::averageType(uint chIdx) const
+{
+	if (chIdx < d_ch_average_type.size())
+		return d_ch_average_type[chIdx];
+
+	return SAMPLE;
+}
+
+uint FftDisplayPlot::averageHistory(uint chIdx) const
+{
+	uint history = 0;
+
+	if (chIdx < d_ch_average_type.size())
+		if (d_ch_avg_obj[chIdx])
+			history = d_ch_avg_obj[chIdx]->history();
+
+	return history;
+}
+
+void FftDisplayPlot::setAverage(uint chIdx, enum AverageType avg_type,
+	uint history)
+{
+	if (chIdx >= d_ch_average_type.size()) {
+		return;
+	}
+
+	d_ch_average_type[chIdx] = avg_type;
+	d_ch_avg_obj[chIdx] = getNewAvgObject(avg_type, d_numPoints, history);
+}
+
+void FftDisplayPlot::resetAverageHistory()
+{
+	for (int i = 0; i < d_ch_avg_obj.size(); i++)
+		if (d_ch_avg_obj[i])
+			d_ch_avg_obj[i]->reset();
+}
+
+FftDisplayPlot::average_sptr FftDisplayPlot::getNewAvgObject(
+	enum AverageType avg_type, uint data_width, uint history)
+{
+	switch (avg_type) {
+		case SAMPLE:
+			return nullptr;
+
+		case PEAK_HOLD:
+			return boost::make_shared<PeakHold>(data_width,
+				history);
+		case PEAK_HOLD_CONTINUOUS:
+			return boost::make_shared<PeakHoldContinuous>(
+				data_width, history);
+		case MIN_HOLD:
+			return boost::make_shared<MinHold>(data_width, history);
+		case MIN_HOLD_CONTINUOUS:
+			return boost::make_shared<MinHoldContinuous>(data_width,
+				history);
+		case LINEAR_RMS:
+			return boost::make_shared<LinearAverage>(data_width,
+				history);
+		case LINEAR_DB:
+			return boost::make_shared<LinearAverage>(data_width,
+				history);
+		case EXPONENTIAL_RMS:
+			return boost::make_shared<ExponentialAverage>(
+				data_width, history);
+		case EXPONENTIAL_DB:
+			return boost::make_shared<ExponentialAverage>(
+				data_width, history);
+		default:
+			return nullptr;
+	}
+}
+
+QString FftDisplayPlot::leftVerAxisUnit() const
+{
+	QString unit;
+	auto scale_draw = dynamic_cast<const OscScaleDraw *>(
+		axisScaleDraw(QwtPlot::yLeft));
+	if (scale_draw)
+		unit = scale_draw->getUnitType();
+
+	return unit;
+}
+
+void FftDisplayPlot::setLeftVertAxisUnit(const QString& unit)
+{
+	auto scale_draw = dynamic_cast<OscScaleDraw *>(
+		axisScaleDraw(QwtPlot::yLeft));
+	if (scale_draw)
+		scale_draw->setUnitType(unit);
 }

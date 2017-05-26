@@ -39,6 +39,7 @@ static const std::string tool_names[] = {
 	"logic",
 	"pattern",
 	"network",
+	"spectrum",
 	"launcher",
 };
 

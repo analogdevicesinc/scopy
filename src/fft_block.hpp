@@ -29,6 +29,12 @@ namespace adiscope {
 		fft_block(bool use_complex, size_t fft_size,
 				unsigned int nbthreads = 1);
 		~fft_block();
+
+		bool set_window(const std::vector<float>& window);
+
+	private:
+		bool d_complex;
+		gr::basic_block_sptr d_fft;
 	};
 }
 

@@ -21,11 +21,31 @@
 #define FFT_DISPLAY_PLOT_H
 
 #include "DisplayPlot.h"
+#include <boost/shared_ptr.hpp>
+
+namespace adiscope {
+	class SpectrumAverage;
+}
 
 namespace adiscope {
 	class FftDisplayPlot : public DisplayPlot
 	{
 		Q_OBJECT
+
+	public:
+		enum AverageType {
+			SAMPLE = 0,
+			PEAK_HOLD = 1,
+			PEAK_HOLD_CONTINUOUS = 2,
+			MIN_HOLD = 3,
+			MIN_HOLD_CONTINUOUS = 4,
+			LINEAR_RMS = 5,
+			LINEAR_DB = 6,
+			EXPONENTIAL_RMS = 7,
+			EXPONENTIAL_DB = 8,
+		};
+
+	typedef boost::shared_ptr<SpectrumAverage> average_sptr;
 
 	private:
 		double* x_data;
@@ -37,13 +57,27 @@ namespace adiscope {
 		MetricPrefixFormatter dBFormatter;
 		MetricPrefixFormatter freqFormatter;
 
+		std::vector<enum AverageType> d_ch_average_type;
+		std::vector<average_sptr> d_ch_avg_obj;
+
 		void plotData(const std::vector<double *> pts,
 				uint64_t num_points);
 		void _resetXAxisPoints();
 
+		average_sptr getNewAvgObject(enum AverageType avg_type,
+			uint data_width, uint history);
+
 	public:
 		explicit FftDisplayPlot(int nplots, QWidget *parent = nullptr);
 		~FftDisplayPlot();
+
+		QString leftVerAxisUnit() const;
+		void setLeftVertAxisUnit(const QString& unit);
+		enum AverageType averageType(uint chIdx) const;
+		uint averageHistory(uint chIdx) const;
+		void setAverage(uint chIdx, enum AverageType avg_type,
+			uint history);
+		void resetAverageHistory();
 
 		void replot();
 
