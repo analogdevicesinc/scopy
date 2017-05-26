@@ -292,6 +292,12 @@ void PlotAxisConfiguration::setCursorShapeOnHover(Qt::CursorShape shape)
 void PlotAxisConfiguration::setMouseGesturesEnabled(bool en)
 {
 	d_mouseGestures->setEnabled(en);
+	QwtScaleWidget *scaleWidget = d_plot->axisWidget(d_axis);
+	if (en) {
+		scaleWidget->setCursor(d_hoverCursorShape);
+	} else {
+		scaleWidget->setCursor(QCursor());
+	}
 }
 
 /*
@@ -1224,5 +1230,17 @@ void DisplayPlot::setYaxisNumDiv(unsigned int num)
 		d_yAxisNumDiv = num;
 		d_yAxisMin = -(double)num / 2;
 		d_yAxisMax = (double)num / 2;
+	}
+}
+
+void DisplayPlot::setXaxisMouseGesturesEnabled(bool en)
+{
+	horizAxis->setMouseGesturesEnabled(en);
+}
+
+void DisplayPlot::setYaxisMouseGesturesEnabled(int axisId, bool en)
+{
+	if (axisId < vertAxes.size()) {
+		vertAxes[axisId]->setMouseGesturesEnabled(en);
 	}
 }

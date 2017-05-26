@@ -452,6 +452,8 @@ public Q_SLOTS:
   void setYaxisLabelFontSize(int fs);
   void setXaxisLabelFontSize(int fs);
   void setAxesLabelFontSize(int fs);
+  void setXaxisMouseGesturesEnabled(bool en);
+  void setYaxisMouseGesturesEnabled(int axisId, bool en);
 
   void setStop(bool on);
 
