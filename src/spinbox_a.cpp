@@ -92,7 +92,10 @@ SpinBoxA::SpinBoxA(vector<pair<QString, double> >units, const QString& name,
 
 	ui->SBA_Label->setText(name);
 
-	setValue(min_value);
+	if (m_value < min_value)
+		setValue(min_value);
+	else if (m_value > max_value)
+		setValue(max_value);
 }
 
 SpinBoxA::~SpinBoxA()
