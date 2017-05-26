@@ -1,4 +1,5 @@
 #include "hardware_trigger.hpp"
+#include <QPair>
 
 #include <stdexcept>
 
