@@ -117,6 +117,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	this->setAttribute(Qt::WA_DeleteOnClose, true);
 	iio_context_set_timeout(ctx, UINT_MAX);
 
+	ui->areaTimeTriggerLayout->setContentsMargins(0, 0, 0, 0);
+
 	symmBufferMode = make_shared<LogicAnalyzerSymmetricBufferMode>();
 	symmBufferMode->setMaxSampleRate(80000000);
 	symmBufferMode->setEntireBufferMaxSize(500000); // max 0.5 mega-samples
@@ -357,7 +359,6 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	trigger_settings_ui->btnNormal->setChecked(true);
 	main_win->view_->viewport()->setTimeTriggerPosActive(true);
 	ui->areaTimeTriggerLayout->addWidget(this->bottomHandlesArea(), 0, 1, 1, 3);
-	updateAreaTimeTriggerPadding();
 	ui->triggerStateLabel->setText("Stop");
 
 	ensurePolished();
@@ -429,7 +430,6 @@ void LogicAnalyzer::get_channel_groups_api()
 void LogicAnalyzer::resizeEvent()
 {
 	if(!initialised) {
-		updateAreaTimeTriggerPadding();
 		timePosition->setValue(0);
 		value_cursor1 = -(timeBase->value() * 3 + active_plot_timebase * 10 / 2 - active_timePos);
 		value_cursor2 = -(timeBase->value() * 6 + active_plot_timebase * 10 / 2 - active_timePos);
@@ -645,12 +645,6 @@ void LogicAnalyzer::setSamplerateLabelValue(double value)
 {
 	d_sampleRateLabelVal = value;
 	updateBuffersizeSamplerateLabel(d_bufferSizeLabelVal, value);
-}
-
-void LogicAnalyzer::updateAreaTimeTriggerPadding()
-{
-	ui->areaTimeTriggerLayout->setContentsMargins(
-		chm_ui->sizeHint().width() - 20, 0, 0, 0);
 }
 
 void LogicAnalyzer::onRulerChanged(double ruler_value, bool silent)
@@ -971,9 +965,7 @@ void LogicAnalyzer::onChmWidthChanged(int value)
 	int l, r, b, t;
 	ui->areaTimeTriggerLayout->getContentsMargins(&l, &t, &r, &b);
 	if(l != value - 20 ){
-		ui->areaTimeTriggerLayout->setContentsMargins(value - 20, 0, 0, 0);
 		timePosition->valueChanged(timePosition->value());
-
 	}
 }
 
