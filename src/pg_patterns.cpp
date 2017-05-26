@@ -140,6 +140,44 @@ uint32_t changeBit(uint32_t number,uint8_t n, bool x)
 	number ^= (-x ^ number) & (1 << n);
 	return number;
 }
+
+Pattern *Pattern_API::fromString(QString str)
+{
+	/*QJsonValue val;
+
+	val = QJsonObject(str);
+	if(val.isNull())
+	{
+		qDebug()<<"Invalid String";
+		return PatternFactory::create(0);
+	}*/
+
+	QJsonObject obj;
+	QJsonDocument doc = QJsonDocument::fromJson(str.toUtf8());
+
+
+	if (!doc.isNull()) {
+		if (doc.isObject()) {
+			obj = doc.object();
+		} else {
+			qDebug() << "Document is not an object" << endl;
+		}
+	} else {
+		qDebug() << "Invalid JSON...\n" << str << endl;
+	}
+
+	return fromJson(obj);
+}
+
+QString Pattern_API::toString(Pattern *p)
+{
+	QJsonValue val;
+	val = toJson(p);
+	QJsonDocument doc(val.toObject());
+	QString ret(doc.toJson(QJsonDocument::Compact));
+	return ret;
+}
+
 QJsonValue Pattern_API::toJson(Pattern *p)
 {
 	QJsonObject obj;
@@ -228,9 +266,9 @@ QJsonValue Pattern_API::toJson(Pattern *p)
 	return QJsonValue(obj);;
 }
 
-Pattern *Pattern_API::fromJson(QJsonValue j)
+Pattern *Pattern_API::fromJson(QJsonObject obj)
 {
-	QJsonObject obj = j.toObject();
+	//QJsonObject obj = j.toObject();
 	Pattern *p = PatternFactory::create(obj["name"].toString());
 
 	ClockPattern *cp = dynamic_cast<ClockPattern *>(p);
@@ -1744,7 +1782,6 @@ uint8_t SPIPattern::generate_pattern(uint32_t sample_rate,
 			}
 
 			for (auto i=0; i<samples_per_bit/2; i++,buf_ptr++) {
-
 				*buf_ptr = changeBit(*buf_ptr,csBit,CSPol);
 				*buf_ptr = changeBit(*buf_ptr,clkActiveBit,CPOL);
 

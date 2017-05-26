@@ -135,6 +135,11 @@ size_t ChannelManager::get_channel_group_count()
 	return channel_group.size();
 }
 
+size_t ChannelManager::get_channel_count()
+{
+	return channel.size();
+}
+
 std::vector<ChannelGroup *> *ChannelManager::get_channel_groups()
 {
 	return &channel_group;
@@ -227,6 +232,11 @@ uint16_t Channel::get_mask()
 uint16_t Channel::get_id()
 {
 	return id;
+}
+
+void Channel::set_id(int val)
+{
+	id=val;
 }
 
 std::string Channel::get_label()

@@ -25,6 +25,7 @@
 #include <QJsonArray>
 #include <QIntValidator>
 #include <QtQml/QJSEngine>
+//#include <QQmlListProperty>
 #include <QtUiTools/QUiLoader>
 #include <QVector>
 #include <vector>
@@ -38,6 +39,7 @@
 #include "pg_patterns.hpp"
 #include "pg_channel_manager.hpp"
 #include "pg_buffer_manager.hpp"
+#include <QQmlListProperty>
 
 // Generated UI
 #include "ui_pattern_generator.h"
@@ -84,11 +86,15 @@ class QJSEngine;
 
 namespace adiscope {
 class PatternGenerator_API;
+class PatternGeneratorChannelGroup_API;
+class PatternGeneratorChannel_API;
 
 
 class PatternGenerator : public QWidget
 {
 	friend class PatternGenerator_API;
+	friend class PatternGeneratorChannelGroup_API;
+	friend class PatternGeneratorChannel_API;
 	friend class ToolLauncher_API;
 
 	Q_OBJECT
@@ -141,7 +147,6 @@ private:
 	bool offline_mode;
 
 	PatternGenerator_API *pg_api;
-
 	PatternGeneratorChannelGroup *selected_channel_group;
 	PatternGeneratorChannelManager chm;
 	PatternGeneratorChannelManagerUI *chmui;
@@ -168,6 +173,9 @@ private:
 	static QStringList digital_trigger_conditions;
 	static QStringList possibleSampleRates;
 
+	//QList<PatternGeneratorChannelGroup_API*> getChgApi();
+	//void setChgApi();
+
 	QString toString();
 	QJsonValue chmToJson();
 
@@ -189,26 +197,151 @@ private Q_SLOTS:
 	void resetPGToDefault();
 };
 
+class PatternGeneratorChannel_API : public ApiObject
+{
+	Q_OBJECT
+	Q_PROPERTY(QString label READ label WRITE setLabel);
+	Q_PROPERTY(int id READ id WRITE setId);
+	Q_PROPERTY(int mask READ mask);
+	PatternGeneratorChannel *ch;
+
+public:
+	PatternGeneratorChannel_API(PatternGeneratorChannel *_ch) : ch(_ch) {}
+
+	QString label()
+	{
+		return QString::fromStdString(ch->get_label());
+	}
+	void setLabel(QString _str)
+	{
+		ch->set_label(_str.toStdString());
+	}
+	int id()
+	{
+		return ch->get_id();
+	}
+	void setId(int val)
+	{
+	//	ch->set_id(val);
+	}
+	int mask()
+	{
+		return ch->get_mask();
+	}
+};
+
+class PatternGeneratorChannelGroup_API : public ApiObject
+{
+	Q_OBJECT
+	Q_PROPERTY(QString label READ label WRITE setLabel);
+	Q_PROPERTY(bool grouped READ grouped WRITE setGrouped);
+	Q_PROPERTY(bool enabled READ enabled WRITE setEnabled);
+	Q_PROPERTY(bool collapsed READ collapsed WRITE setCollapsed);
+	Q_PROPERTY(QString pattern READ pattern WRITE setPattern);
+
+	Q_PROPERTY(QList<int> channel_list READ channels WRITE setChannels);
+
+	PatternGeneratorChannelGroup *chg;
+	QList<int> channel_list_;
+
+	PatternGeneratorChannelManagerUI *chmui;
+	PatternGeneratorChannelManager *chm;
+
+public:
+	PatternGeneratorChannelGroup_API(PatternGeneratorChannelGroup *_chg,
+	                                 PatternGeneratorChannelManagerUI *chmui) : chg(_chg),chmui(chmui),
+		chm(chmui->chm) {}
+
+	QString label()
+	{
+		return QString::fromStdString(chg->get_label());
+	}
+	void setLabel(QString _str)
+	{
+		chg->set_label(_str.toStdString());
+	}
+
+	QList<int> channels();
+	void setChannels(QList<int>);
+
+	bool grouped()
+	{
+		return chg->is_grouped();
+	}
+	void setGrouped(bool _val)
+	{
+		chg->group(_val);
+	}
+
+	QString pattern();
+	void setPattern(QString);
+
+	bool enabled()
+	{
+		return chg->is_enabled();
+	}
+	void setEnabled(bool _val)
+	{
+		return chg->enable(_val);
+	}
+
+	bool collapsed()
+	{
+		return chg->isCollapsed();
+	}
+	void setCollapsed(bool _val)
+	{
+		chg->collapse(_val);
+	}
+
+};
+
 class PatternGenerator_API : public ApiObject
 {
 	Q_OBJECT
-	Q_PROPERTY(QString chm READ chm WRITE setChm SCRIPTABLE false);
+
+	Q_PROPERTY(int channel_size READ channel_size WRITE set_channel_size SCRIPTABLE
+	           false);
+	Q_PROPERTY(QVariantList channel_list READ getChannels);
+
+	Q_PROPERTY(int channel_groups_size READ channel_groups_size WRITE
+	           set_channel_groups_size SCRIPTABLE false);
+	Q_PROPERTY(QVariantList channel_groups_list READ getChannelGroups);
+
+	Q_PROPERTY(bool running READ running WRITE run STORED false);
+	Q_PROPERTY(bool single READ single WRITE run_single STORED false);
 
 public:
-	explicit PatternGenerator_API(PatternGenerator *pg) :
-		ApiObject(), pg(pg) {}
+	explicit PatternGenerator_API(PatternGenerator *pg,
+	                              PatternGeneratorChannelManagerUI *chmui) :
+		ApiObject(), pg(pg), chmui(chmui),chm(chmui->chm) {}
 	~PatternGenerator_API() {}
 
-	QString chm() const;
-	void setChm(QString);
+
+	int channel_groups_size();
+	void set_channel_groups_size(int val);
+	QVariantList getChannelGroups();
+
+	int channel_size();
+	void set_channel_size(int val);
+	QVariantList getChannels();
+
+	bool running() const;
+	void run(bool en);
+	bool single() const;
+	void run_single(bool en);
 
 private:
+	void refreshApi();
 	PatternGenerator *pg;
+	PatternGeneratorChannelManagerUI *chmui;
+	PatternGeneratorChannelManager *chm;
+	QList<PatternGeneratorChannelGroup_API *> pg_cga;
+	QList<PatternGeneratorChannel_API *> pg_cha;
 };
 
 } /* namespace adiscope */
 
-//Q_DECLARE_METATYPE(adiscope::PGChannelGroupStructure)
 
 #endif // LOGIC_ANALYZER_H
 

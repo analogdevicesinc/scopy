@@ -154,7 +154,11 @@ class Pattern_API : public QObject
 	Q_OBJECT
 public:
 	static QJsonValue toJson(Pattern *p);
-	static Pattern *fromJson(QJsonValue j);
+	static Pattern *fromJson(QJsonObject j);
+
+	static Pattern *fromString(QString);
+	static QString toString(Pattern *p);
+
 private:
 	Pattern_API() {}
 };

@@ -238,6 +238,7 @@ public:
 	uint32_t computeSuggestedBufferSize(uint32_t sample_rate);
 	void add_channel_group(PatternGeneratorChannelGroup *chg);
 	PatternGeneratorChannel *get_channel(int);
+	void clearChannels();
 	void clearChannelGroups();
 };
 

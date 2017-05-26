@@ -68,6 +68,7 @@ public:
 	virtual ~Channel();
 	uint16_t get_mask();
 	virtual uint16_t get_id();
+	virtual void set_id(int val);
 	std::string get_label();
 	void set_label(std::string);
 	QColor getBgcolor() const;
@@ -179,6 +180,7 @@ public:
 	std::vector<int> get_enabled_indexes();
 	std::vector<int> get_selected_indexes();
 	std::vector<ChannelGroup *> *get_channel_groups();
+	size_t get_channel_count();
 	size_t get_channel_group_count();
 	ChannelGroup *get_channel_group(int index);
 };

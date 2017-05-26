@@ -1117,12 +1117,17 @@ PatternGeneratorChannelManager::~PatternGeneratorChannelManager()
 	}
 }
 
-void PatternGeneratorChannelManager::clearChannelGroups()
+void PatternGeneratorChannelManager::clearChannels()
 {
 	for (auto ch : channel) {
 		std::string temp = "DIO" + std::to_string(ch->get_id());
 		ch->set_label(temp);
 	}
+}
+
+void PatternGeneratorChannelManager::clearChannelGroups()
+{
+	clearChannels();
 
 	for (auto ch : channel_group) {
 		delete ch;
@@ -1477,9 +1482,10 @@ void PatternGeneratorChannelManagerUI::updateUi()
 	static const int channelComboMaxLength = 15;
 	static const int outputComboMaxLength = 5;
 
-	if(pg->getCurrentPatternUI())
+	if (pg->getCurrentPatternUI())
 		disconnect(pg->getCurrentPatternUI(),SIGNAL(decoderChanged()),this,
-			   SLOT(triggerUpdateUi()));
+		           SLOT(triggerUpdateUi()));
+
 	qDebug()<<"updateUI";
 
 	for (auto ch : chg_ui) {
