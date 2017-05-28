@@ -164,8 +164,19 @@ void SymmetricBufferMode::configParamsOnTriggPosChanged()
 	if (triggPosInBuffer < 0) {
 		m_triggerBufferSize = 0;
 		unsigned long delaySamples = -triggPosInBuffer;
-		m_visibleBufferSize = (m_timeBase * m_timeDivsCount) *
+		double bufferSize = (m_timeBase * m_timeDivsCount) *
 			m_sampleRate + delaySamples;
+
+		// Limit buffer size and recalculate trigger position
+		if (bufferSize > m_entireBufferMaxSize) {
+			bufferSize = m_entireBufferMaxSize;
+			long long triggPosInBuffer = -m_entireBufferMaxSize +
+				2 * triggOffset;
+			m_triggerPos = (triggPosInBuffer - triggOffset) /
+				m_sampleRate;
+		}
+
+		m_visibleBufferSize = bufferSize;
 
 		return;
 	}
