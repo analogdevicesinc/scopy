@@ -226,6 +226,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 			((double) sample_rate * 10.0));
 	plot->setHorizOffset((double) NB_POINTS /
 			((double) sample_rate * 2.0));
+	plot->zoomBaseUpdate();
 
 	ui->plot->addWidget(plot, 0, 0);
 
