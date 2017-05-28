@@ -214,6 +214,10 @@ PlotAxisConfiguration::PlotAxisConfiguration(int axisPos, int axisIdx, DisplayPl
 		scaleDraw->setMinimumExtent( fm.width("100.00") );
 	}
 
+	// TO DO: Move this to a stylesheet file.
+	QwtScaleWidget *scaleWidget = d_plot->axisWidget(d_axis);
+	scaleWidget->setStyleSheet("background-color: none;");
+
 	// This helps creating a fixed 5 X 5 grid
 	d_plot->setAxisScale(d_axis, -5.0, 5.0, 1);
 
