@@ -138,6 +138,7 @@ void SymmetricBufferMode::configParamsOnTimeBaseChanged()
 		trigBuffSize = 0;
 	} else if (triggPosInBuffer > m_triggerBufferMaxSize) {
 		triggPosInBuffer = m_triggerBufferMaxSize;
+		trigBuffSize = triggPosInBuffer;
 	}
 
 	m_visibleBufferSize = bufferSize;
