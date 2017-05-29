@@ -22,6 +22,7 @@
 #include "signal_generator.hpp"
 #include "average.h"
 
+#include <boost/make_shared.hpp>
 using namespace adiscope;
 
 FftDisplayPlot::FftDisplayPlot(int nplots, QWidget *parent) :

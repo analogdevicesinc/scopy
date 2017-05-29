@@ -45,6 +45,7 @@
 #include "ui_spectrum_analyzer.h"
 #include "ui_channel.h"
 
+#include <boost/make_shared.hpp>
 #include <iio.h>
 #include <iostream>
 
