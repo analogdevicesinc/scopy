@@ -1207,6 +1207,7 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 	plot.replot();
 	plot.setDataStartingPoint(active_trig_sample_count);
 	plot.resetXaxisOnNextReceivedData();
+	plot.zoomBaseUpdate();
 
 	/* Reconfigure the GNU Radio block to receive a different number of samples  */
 	bool started = iio->started();
