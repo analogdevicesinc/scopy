@@ -131,7 +131,7 @@ class SpectrumChannel: public QObject
 Q_OBJECT
 
 public:
-	boost::shared_ptr<fft_block> fft_block;
+	boost::shared_ptr<adiscope::fft_block> fft_block;
 	QWidget *m_widget;
 	Ui::Channel *m_ui;
 
