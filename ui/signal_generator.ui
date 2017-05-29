@@ -575,7 +575,7 @@ background-image: url(:/icons/floppy_hover.svg);
                     <property name="name" stdset="0">
                      <string>Frequency</string>
                     </property>
-                    <property name="min_freq" stdset="0">
+                    <property name="min_value" stdset="0">
                      <double>0.001000000000000</double>
                     </property>
                    </widget>
