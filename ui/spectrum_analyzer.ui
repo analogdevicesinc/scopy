@@ -122,27 +122,56 @@ QComboBox:disabled
          </spacer>
         </item>
         <item>
-         <widget class="QPushButton" name="btnStart">
+         <widget class="QPushButton" name="run_button">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="layoutDirection">
+           <enum>Qt::RightToLeft</enum>
+          </property>
           <property name="styleSheet">
            <string notr="true">QPushButton {
-color: white;
-background-color: #27b34f;
-font-family: &quot;monospace&quot;;
-font-weight: bold;
-height: 30px;
-border-width: 0px;
-border-radius: 3px;
-min-width: 6em;
+  width: 80px;
+  height: 40px;
+  border-radius: 4px;
+  background-color: #27b34f;
+  color: white;
+  font-family: &quot;monospace&quot;;
+  font-weight: bold;
+
+  text-align: left;
+  padding-left: 20px;
+  padding-right: 20px;
+  qproperty-text: &quot;Run&quot;;
 }
-QPushButton:disabled {
-background-color: grey;
+
+QPushButton[running=true] {
+  qproperty-text: &quot;Stop&quot;;
 }
+
 QPushButton:checked {
-background-color: #F45000;
+  background-color: #F45000;
+}
+
+QPushButton:disabled {
+  background-color: grey;
 }</string>
           </property>
           <property name="text">
-           <string>Start</string>
+           <string>Run</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../resources/resources.qrc">
+            <normaloff>:/icons/ico-play.svg</normaloff>:/icons/ico-play.svg</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>8</width>
+            <height>10</height>
+           </size>
           </property>
           <property name="checkable">
            <bool>true</bool>
@@ -978,6 +1007,8 @@ QLabel {
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../resources/resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

@@ -191,11 +191,11 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	else
 		build_gnuradio_block_chain_no_ctx();
 
-	connect(ui->btnStart, SIGNAL(toggled(bool)), this,
+	connect(ui->run_button, SIGNAL(toggled(bool)), this,
 		SLOT(runStopToggled(bool)));
-	connect(ui->btnStart, SIGNAL(toggled(bool)), runButton,
+	connect(ui->run_button, SIGNAL(toggled(bool)), runButton,
 			SLOT(setChecked(bool)));
-	connect(menuRunButton, SIGNAL(toggled(bool)), ui->btnStart,
+	connect(menuRunButton, SIGNAL(toggled(bool)), ui->run_button,
 		SLOT(setChecked(bool)));
 
 	connect(ui->start_freq, SIGNAL(valueChanged(double)),
@@ -263,11 +263,11 @@ void SpectrumAnalyzer::runStopToggled(bool checked)
 	if (iio) {
 		if (checked) {
 			writeAllSettingsToHardware();
-			ui->btnStart->setText("Stop");
+			ui->run_button->setText("Stop");
 			for (int i = 0; i < num_adc_channels; i++)
 				iio->start(fft_ids[i]);
 		} else {
-			ui->btnStart->setText("Start");
+			ui->run_button->setText("Run");
 			for (int i = 0; i < num_adc_channels; i++)
 				iio->stop(fft_ids[i]);
 		}
