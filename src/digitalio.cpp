@@ -314,9 +314,11 @@ void adiscope::DigitalIO::lockUi()
 void adiscope::DigitalIO::on_btnRunStop_clicked()
 {
 	if (ui->btnRunStop->isChecked()) {
+		ui->btnRunStop->setText("Stop");
 		poll->start(polling_rate);
 		diom->enableOutput(true);
 	} else {
+		ui->btnRunStop->setText("Run");
 		poll->stop();
 		diom->enableOutput(false);
 	}

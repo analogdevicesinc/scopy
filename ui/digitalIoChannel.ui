@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>142</width>
-    <height>196</height>
+    <height>206</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -78,6 +78,12 @@ border:1px solid red;
      </item>
      <item>
       <widget class="QLabel" name="label">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="styleSheet">
         <string notr="true">QLabel
 {
@@ -114,6 +120,12 @@ text-align: center;
      </item>
      <item>
       <widget class="QPushButton" name="input">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="styleSheet">
         <string notr="true">QPushButton
 {
@@ -194,8 +206,8 @@ background-color: red;
      </property>
      <property name="sizeHint" stdset="0">
       <size>
-       <width>10</width>
-       <height>10</height>
+       <width>15</width>
+       <height>15</height>
       </size>
      </property>
     </spacer>
@@ -227,7 +239,7 @@ background-color: red;
      <item>
       <widget class="QPushButton" name="inout">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -325,7 +337,7 @@ QPushButton:checked
         <bool>true</bool>
        </property>
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>

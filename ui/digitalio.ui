@@ -44,7 +44,7 @@
       <number>0</number>
      </property>
      <property name="topMargin">
-      <number>29</number>
+      <number>20</number>
      </property>
      <item>
       <spacer name="horizontalSpacer">
@@ -87,7 +87,7 @@ background-color: grey;
 }</string>
        </property>
        <property name="text">
-        <string>Start</string>
+        <string>Run</string>
        </property>
        <property name="icon">
         <iconset resource="../resources/resources.qrc">
@@ -105,38 +105,6 @@ background-color: grey;
       </widget>
      </item>
      <item>
-      <spacer name="horizontalSpacer_2">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeType">
-        <enum>QSizePolicy::Preferred</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>200</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_4">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeType">
-        <enum>QSizePolicy::Fixed</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>62</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
       <spacer name="horizontalSpacer_3">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -146,7 +114,7 @@ background-color: grey;
        </property>
        <property name="sizeHint" stdset="0">
         <size>
-         <width>82</width>
+         <width>30</width>
          <height>20</height>
         </size>
        </property>
