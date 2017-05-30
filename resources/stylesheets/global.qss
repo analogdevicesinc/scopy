@@ -5,7 +5,7 @@ QMainWindow > .QWidget, adiscope--Sismograph > QwtPlotCanvas, QMessageBox {
 
 /* Default settings for QWidget and its sub-classes */
 QWidget {
-	background-color: none;
+	background-color: transparent;
 	color: #bebebe;
 	font: 75 10pt "DejaVu Sans";
 }
@@ -47,7 +47,6 @@ adiscope--dBgraph > QwtPlotCanvas {
 }
 
 QwtThermo {
-	background-color: transparent;
 	color: #999999;
 	font-size: 20pt;
 }
@@ -57,7 +56,6 @@ adiscope--BufferPreviewer {
 	alternate-background-color: #4a64ff;
 	selection-background-color: #141416;
 	selection-color: #ff7200;
-	background-color: transparent;
 	color: white;
 }
 
@@ -91,7 +89,6 @@ QTabBar::tab:!selected {
 QRadioButton {
 	color: white;
 	spacing: 12px;
-	background-color: transparent;
 }
 
 QRadioButton::indicator {
@@ -108,7 +105,6 @@ QRadioButton::indicator:checked {
 
 QLineEdit {
 	color: white;
-	background-color: transparent;
 }
 
 QComboBox {
@@ -116,7 +112,6 @@ QComboBox {
 	border: none;
 	font-size: 16px;
 	font-weight: bold;
-	background-color: transparent;
 	border-bottom: 1px solid rgba(255, 255, 255, 102);
 	padding-bottom: 4px;
 }
@@ -160,14 +155,9 @@ QComboBox::drop-down {
 }
 
 QComboBox::indicator {
-    background-color: transparent;
     selection-background-color: transparent;
     color: transparent;
     selection-color: transparent;
-}
-
-QScrollArea, QScrollArea > .QWidget > .QWidget {
-	background-color: transparent;
 }
 
 QMessageBox QLabel {
