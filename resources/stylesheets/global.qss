@@ -38,12 +38,25 @@ QMainWindow > .QWidget > .adiscope--MenuAnim {
 	background-color: none;
 }
 
-adiscope--dBgraph, adiscope--NyquistGraph, QwtPolarCanvas, pv--view--Viewport {
+QwtPlot, QwtPolarPlot, pv--view--Viewport, adiscope--Oscilloscope #widgetPlotContainer {
 	background-color: black;
 }
 
-adiscope--dBgraph > QwtPlotCanvas {
-	background-color: rgba(255, 255, 255, 25);
+/* QwtPlot should have a black background, except the sismographs */
+adiscope--Sismograph {
+	background-color: transparent;
+}
+
+QwtPlotCanvas {
+	background-color: #141416;
+}
+
+QwtPolarCanvas {
+	background-color: none;
+}
+
+QwtScaleWidget {
+	color: rgba(255, 255, 255, 180);
 }
 
 QwtThermo {
