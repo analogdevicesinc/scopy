@@ -173,9 +173,10 @@ QComboBox::drop-down {
 }
 
 QComboBox::indicator {
-    selection-background-color: transparent;
-    color: transparent;
-    selection-color: transparent;
+	background-color: transparent;
+	selection-background-color: transparent;
+	color: transparent;
+	selection-color: transparent;
 }
 
 QMessageBox QLabel {
