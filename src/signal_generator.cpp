@@ -951,7 +951,11 @@ size_t SignalGenerator::get_samples_count(const struct iio_device *dev,
 		case SIGNAL_TYPE_WAVEFORM:
 		case SIGNAL_TYPE_MATH:
 			ratio = (double) rate / ptr->frequency;
-			if (ratio < 2.0)
+			if (ptr->type == SIGNAL_TYPE_WAVEFORM
+					&& ptr->waveform == SG_SIN_WAVE
+					&& ratio < 2.5)
+				return 0; /* rate too low */
+			else if (ratio < 2.0)
 				return 0; /* rate too low */
 
 			/* The ratio must be even for square waveforms */
