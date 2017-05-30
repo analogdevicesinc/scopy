@@ -87,6 +87,9 @@ namespace adiscope {
 		static unsigned long get_max_sample_rate(
 				const struct iio_device *dev);
 
+		static double get_best_ratio(double ratio,
+				double max, double *fract);
+
 	private:
 		Ui::SignalGenerator *ui;
 		OscilloscopePlot *plot;

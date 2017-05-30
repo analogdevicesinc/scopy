@@ -904,6 +904,32 @@ size_t SignalGenerator::lcm(size_t a, size_t b)
 	return temp ? (a / temp * b) : 0;
 }
 
+double SignalGenerator::get_best_ratio(double ratio, double max, double *fract)
+{
+	double max_it = max / ratio;
+	double best_ratio = ratio;
+	double best_fract = 1.0;
+
+	for (double i = 1.0; i < max_it; i += 1.0) {
+		double integral, new_ratio = i * ratio;
+		double new_fract = modf(new_ratio, &integral);
+
+		if (new_fract < best_fract) {
+			best_fract = new_fract;
+			best_ratio = new_ratio;
+		}
+
+		if (new_fract == 0.0)
+			break;
+	}
+
+	qDebug() << QString("Input ratio %1, ratio: %2 (fract left %3)")
+		.arg(ratio).arg(best_ratio).arg(best_fract);
+	if (fract)
+		*fract = best_fract;
+	return best_ratio;
+}
+
 size_t SignalGenerator::get_samples_count(const struct iio_device *dev,
 		unsigned long rate, bool perfect)
 {
@@ -919,33 +945,27 @@ size_t SignalGenerator::get_samples_count(const struct iio_device *dev,
 
 		QWidget *w = static_cast<QWidget *>(iio_channel_get_data(chn));
 		auto ptr = getData(w);
-		size_t ratio;
+		double ratio, fract;
 
 		switch (ptr->type) {
 		case SIGNAL_TYPE_WAVEFORM:
-			if (perfect && fmod((double) rate, ptr->frequency) != 0)
-				return 0;
-
-			ratio = rate / ptr->frequency;
-			if (ratio < 2)
+		case SIGNAL_TYPE_MATH:
+			ratio = (double) rate / ptr->frequency;
+			if (ratio < 2.0)
 				return 0; /* rate too low */
 
 			/* The ratio must be even for square waveforms */
-			if (perfect && (ptr->waveform == SG_SQR_WAVE)
-					&& (ratio & 0x1))
+			if (perfect && (ptr->type == SIGNAL_TYPE_WAVEFORM)
+					&& (ptr->waveform == SG_SQR_WAVE)
+					&& (fmod(ratio, 2.0) != 0.0))
 				return 0;
 
-			size = lcm(size, ratio);
-			break;
-		case SIGNAL_TYPE_MATH:
-			if (perfect && fmod((double) rate, ptr->math_freq) != 0)
+			ratio = get_best_ratio(ratio,
+					(double) (max_buffer_size / 4), &fract);
+			if (perfect && fract != 0.0)
 				return 0;
 
-			ratio = rate / ptr->math_freq;
-			if (ratio < 2)
-				return 0; /* rate too low */
-
-			size = lcm(size, ratio);
+			size = lcm(size, (size_t) ratio);
 			break;
 		case SIGNAL_TYPE_CONSTANT:
 		case SIGNAL_TYPE_BUFFER:
