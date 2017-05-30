@@ -100,6 +100,10 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 		SLOT(setButtonBackground(bool)));
 	connect(ui->btnSpectrumAnalyzer, SIGNAL(toggled(bool)), this,
 		SLOT(setButtonBackground(bool)));
+	connect(ui->btnHome, SIGNAL(toggled(bool)), this,
+		SLOT(setButtonBackground(bool)));
+	ui->btnHome->toggle();
+
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
 	js_engine.installExtensions(QJSEngine::ConsoleExtension);
