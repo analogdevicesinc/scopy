@@ -402,6 +402,7 @@ void adiscope::ToolLauncher::disconnect()
 		ui->stopPatternGenerator->setChecked(false);
 		ui->stopPowerControl->setChecked(false);
 		ui->stopSignalGenerator->setChecked(false);
+		ui->stopSpectrumAnalyzer->setChecked(false);
 
 		destroyContext();
 		resetStylesheets();
