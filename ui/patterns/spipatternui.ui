@@ -38,23 +38,7 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="QPushButton" name="PB_CPOL">
-       <property name="styleSheet">
-        <string notr="true">QPushButton {
-  min-height: 20px;
-  max-height: 20px;
-  min-width: 40px;
-  max-width: 40px;
-}
-
-QPushButton:checked {
-  border-image: url(:/icons/logic_switch_on.svg);
-}
-
-QPushButton:!checked {
-  border-image: url(:/icons/logic_switch_off.svg);
-}</string>
-       </property>
+      <widget class="adiscope::SmallOnOffSwitch" name="PB_CPOL">
        <property name="text">
         <string/>
        </property>
@@ -74,23 +58,7 @@ QPushButton:!checked {
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="PB_CPHA">
-       <property name="styleSheet">
-        <string notr="true">QPushButton {
-  min-height: 20px;
-  max-height: 20px;
-  min-width: 40px;
-  max-width: 40px;
-}
-
-QPushButton:checked {
-  border-image: url(:/icons/logic_switch_on.svg);
-}
-
-QPushButton:!checked {
-  border-image: url(:/icons/logic_switch_off.svg);
-}</string>
-       </property>
+      <widget class="adiscope::SmallOnOffSwitch" name="PB_CPHA">
        <property name="text">
         <string/>
        </property>
@@ -117,23 +85,7 @@ QPushButton:!checked {
       <number>0</number>
      </property>
      <item>
-      <widget class="QPushButton" name="PB_CS">
-       <property name="styleSheet">
-        <string notr="true">QPushButton {
-  min-height: 20px;
-  max-height: 20px;
-  min-width: 40px;
-  max-width: 40px;
-}
-
-QPushButton:checked {
-  border-image: url(:/icons/logic_switch_on.svg);
-}
-
-QPushButton:!checked {
-  border-image: url(:/icons/logic_switch_off.svg);
-}</string>
-       </property>
+      <widget class="adiscope::SmallOnOffSwitch" name="PB_CS">
        <property name="text">
         <string/>
        </property>
@@ -150,23 +102,7 @@ QPushButton:!checked {
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="PB_MSB">
-       <property name="styleSheet">
-        <string notr="true">QPushButton {
-  min-height: 20px;
-  max-height: 20px;
-  min-width: 40px;
-  max-width: 40px;
-}
-
-QPushButton:checked {
-  border-image: url(:/icons/logic_switch_on.svg);
-}
-
-QPushButton:!checked {
-  border-image: url(:/icons/logic_switch_off.svg);
-}</string>
-       </property>
+      <widget class="adiscope::SmallOnOffSwitch" name="PB_MSB">
        <property name="text">
         <string/>
        </property>
@@ -216,6 +152,13 @@ QPushButton:!checked {
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>adiscope::SmallOnOffSwitch</class>
+   <extends>QPushButton</extends>
+   <header>smallOnOffSwitch.hpp</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
