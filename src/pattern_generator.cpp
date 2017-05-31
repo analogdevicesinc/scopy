@@ -110,6 +110,20 @@ const char *PatternGenerator::channelNames[] = {
 	"voltage12", "voltage13", "voltage14", "voltage15"
 };
 
+QStringList PatternGenerator::strStatus = QStringList() << "STOPPED"<<"CONFIG"<<"RUNNING"<<"WAITING";
+
+PatternGenerator::runState PatternGenerator::pgStatus()
+{
+	return _pgStatus;
+}
+
+void PatternGenerator::setPGStatus(PatternGenerator::runState val)
+{
+	_pgStatus = val;
+	ui->status->setText(strStatus[val]);
+
+}
+
 PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
                                    QPushButton *runBtn, QJSEngine *engine,
                                    DIOManager *diom, ToolLauncher *parent,
@@ -193,6 +207,7 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 	                ui->pgSettings,this);
 
 	connect(bufui,SIGNAL(uiUpdated()),this,SLOT(updatePGettings()));
+	connect(bufui,SIGNAL(uiUpdated()),this,SLOT(reloadBufferInDevice()));
 	main_win = bufui->getPVWindow();
 	chmui = new PatternGeneratorChannelManagerUI(ui->channelManagerWidget, main_win,
 	                &chm, cgSettings, this);
@@ -239,6 +254,7 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 	api->load(*settings);
 	api->js_register(engine);
 	chm.highlightChannel(chm.get_channel_group(0));
+	setPGStatus(STOPPED);
 	chmui->updateUi();
 
 }
@@ -642,6 +658,14 @@ void PatternGenerator::updateBufferSize()
 
 
 
+void PatternGenerator::reloadBufferInDevice()
+{
+	if(pgStatus()!=STOPPED)
+	{
+		stopPatternGeneration();
+		startPatternGeneration(true);
+	}
+}
 
 bool PatternGenerator::startPatternGeneration(bool cyclic)
 {
@@ -651,6 +675,7 @@ bool PatternGenerator::startPatternGeneration(bool cyclic)
 	if (offline_mode) {
 		return true;
 	}
+	setPGStatus(CONFIG);
 
 	if (!dev) {
 		qDebug("Devices not found");
@@ -696,6 +721,7 @@ bool PatternGenerator::startPatternGeneration(bool cyclic)
 	/* Push buffer       */
 	auto number_of_bytes = iio_buffer_push(txbuf);
 	qDebug("\nPushed %ld bytes to devices\r\n",number_of_bytes);
+	setPGStatus(RUNNING);
 	return true;
 }
 
@@ -716,6 +742,7 @@ void PatternGenerator::stopPatternGeneration()
 			iio_channel_disable(ch);
 		}
 	}
+	setPGStatus(STOPPED);
 
 }
 
@@ -726,11 +753,14 @@ void PatternGenerator::startStop(bool start)
 	if (start) {
 		if (startPatternGeneration(true)) {
 			ui->btnRunStop->setText("Stop");
+			setPGStatus(RUNNING);
 		} else {
 			qDebug("Pattern generation failed");
+			setPGStatus(WAITING);
 		}
 	} else {
 		stopPatternGeneration();
+		setPGStatus(STOPPED);
 		ui->btnRunStop->setText("Run");
 	}
 }
@@ -739,6 +769,7 @@ void PatternGenerator::singleRun()
 {
 	main_win->action_view_zoom_fit()->trigger();
 	stopPatternGeneration();
+	ui->btnRunStop->setChecked(false);
 
 	if (startPatternGeneration(false)) {
 		uint32_t time_until_buffer_destroy = 500 + (uint32_t)(((
@@ -751,6 +782,7 @@ void PatternGenerator::singleRun()
 	} else {
 		qDebug("Pattern generation failed");
 		ui->btnSingleRun->setChecked(true);
+		setPGStatus(STOPPED);
 	}
 }
 

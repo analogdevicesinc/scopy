@@ -697,9 +697,25 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 r
            </item>
            <item>
             <layout class="QVBoxLayout" name="verticalLayout_3">
-             <property name="topMargin">
-              <number>37</number>
+             <property name="spacing">
+              <number>0</number>
              </property>
+             <property name="topMargin">
+              <number>21</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="status">
+               <property name="styleSheet">
+                <string notr="true">color: white</string>
+               </property>
+               <property name="text">
+                <string>TextLabel</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
              <item>
               <widget class="QWidget" name="centralWidget" native="true">
                <property name="sizePolicy">

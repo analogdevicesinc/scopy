@@ -129,6 +129,20 @@ private:
 		OPENED_CG
 	} rightMenuState;
 
+	typedef enum runState_t {
+		STOPPED,
+		CONFIG,
+		RUNNING,
+		WAITING,
+	} runState;
+
+	runState _pgStatus;
+	static QStringList strStatus;
+	//Q_PROPERTY(runState pgStatus READ pgStatus WRITE setPGStatus)
+
+	void setPGStatus(runState _val);
+	runState pgStatus();
+
 	PatternUI *currentUI;
 	bool offline_mode;
 
@@ -170,6 +184,8 @@ private:
 	void showColorSettings(bool check);
 
 private Q_SLOTS:
+
+	void reloadBufferInDevice();
 	void patternChanged(int index);
 	void configureAutoSet();
 	void changeName(QString name);
