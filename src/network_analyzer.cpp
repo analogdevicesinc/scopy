@@ -203,7 +203,7 @@ void NetworkAnalyzer::run()
 		if (started)
 			iio->lock();
 
-		/* We want at least 64 periods */
+		/* We want at least 8 periods */
 		double ratio = (double) adc_rate / frequency;
 
 		unsigned long buffer_size;
@@ -370,10 +370,16 @@ size_t NetworkAnalyzer::get_sin_samples_count(const struct iio_channel *chn,
 	const struct iio_device *dev = iio_channel_get_device(chn);
 	size_t max_buffer_size = 4 * 1024 * 1024 /
 		(size_t) iio_device_get_sample_size(dev);
-	size_t size = rate / frequency;
+	double ratio = (double) rate / frequency;
+	size_t size;
 
-	if (size < 2)
+	if (ratio < 2.5)
 		return 0; /* rate too low */
+
+	ratio = SignalGenerator::get_best_ratio(ratio,
+			(double) (max_buffer_size / 4), nullptr);
+
+	size = (size_t) ratio;
 
 	/* The buffer size must be a multiple of 4 */
 	while (size & 0x3)
