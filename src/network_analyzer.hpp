@@ -104,7 +104,8 @@ namespace adiscope {
 
 		Q_PROPERTY(double min_freq READ getMinFreq WRITE setMinFreq);
 		Q_PROPERTY(double max_freq READ getMaxFreq WRITE setMaxFreq);
-		Q_PROPERTY(double step_size READ getStepSize WRITE setStepSize);
+		Q_PROPERTY(double samples_count READ getSamplesCount
+				WRITE setSamplesCount);
 		Q_PROPERTY(double amplitude READ getAmplitude
 				WRITE setAmplitude);
 		Q_PROPERTY(double offset READ getOffset WRITE setOffset);
@@ -114,6 +115,8 @@ namespace adiscope {
 		Q_PROPERTY(double min_phase READ getMinPhase WRITE setMinPhase);
 		Q_PROPERTY(double max_phase READ getMaxPhase WRITE setMaxPhase);
 
+		Q_PROPERTY(bool log_freq READ isLogFreq WRITE setLogFreq);
+
 	public:
 		explicit NetworkAnalyzer_API(NetworkAnalyzer *net) :
 			ApiObject(), net(net) {}
@@ -121,13 +124,13 @@ namespace adiscope {
 
 		double getMinFreq() const;
 		double getMaxFreq() const;
-		double getStepSize() const;
+		double getSamplesCount() const;
 		double getAmplitude() const;
 		double getOffset() const;
 
 		void setMinFreq(double freq);
 		void setMaxFreq(double freq);
-		void setStepSize(double step);
+		void setSamplesCount(double step);
 		void setAmplitude(double amp);
 		void setOffset(double offset);
 
@@ -140,6 +143,9 @@ namespace adiscope {
 		void setMaxMag(double val);
 		void setMinPhase(double val);
 		void setMaxPhase(double val);
+
+		bool isLogFreq() const;
+		void setLogFreq(bool is_log);
 
 	private:
 		NetworkAnalyzer *net;

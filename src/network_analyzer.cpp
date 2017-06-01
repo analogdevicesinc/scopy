@@ -103,7 +103,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 			this, SLOT(updateNumSamples()));
 	connect(ui->maxFreq, SIGNAL(valueChanged(double)),
 			this, SLOT(updateNumSamples()));
-	connect(ui->stepSize, SIGNAL(valueChanged(double)),
+	connect(ui->samplesCount, SIGNAL(valueChanged(double)),
 			this, SLOT(updateNumSamples()));
 
 	net_api->setObjectName(QString::fromStdString(Filter::tool_name(
@@ -126,10 +126,7 @@ NetworkAnalyzer::~NetworkAnalyzer()
 
 void NetworkAnalyzer::updateNumSamples()
 {
-	double min = ui->minFreq->value();
-	double max = ui->maxFreq->value();
-	double step = ui->stepSize->value();
-	unsigned int num_samples = 1 + (unsigned int)((max - min) / step);
+	unsigned int num_samples = (unsigned int) ui->samplesCount->value();
 
 	ui->dbgraph->setNumSamples(num_samples);
 	ui->phasegraph->setNumSamples(num_samples);
@@ -159,9 +156,27 @@ void NetworkAnalyzer::run()
 			iio_channel_disable(each);
 	}
 
-	for (double frequency = ui->minFreq->value();
-			!stop && frequency <= ui->maxFreq->value();
-			frequency += ui->stepSize->value()) {
+	unsigned int steps = (unsigned int) ui->samplesCount->value();
+	double min_freq = ui->minFreq->value();
+	double max_freq = ui->maxFreq->value();
+	double log10_min_freq = log10(min_freq);
+	double log10_max_freq = log10(max_freq);
+	double step;
+
+	bool is_log = ui->isLog->isChecked();
+	if (is_log)
+		step = (log10_max_freq - log10_min_freq) / (double)(steps - 1);
+	else
+		step = (max_freq - min_freq) / (double)(steps - 1);
+
+	for (unsigned int i = 0; !stop && i < steps; i++) {
+		double frequency;
+
+		if (is_log)
+			frequency = exp10(log10_min_freq + (double) i * step);
+		else
+			frequency = min_freq + (double) i * step;
+
 		unsigned long rate = get_best_sin_sample_rate(dac1, frequency);
 		size_t samples_count = get_sin_samples_count(
 				dac1, rate, frequency);
@@ -495,9 +510,9 @@ double NetworkAnalyzer_API::getMaxFreq() const
 	return net->ui->maxFreq->value();
 }
 
-double NetworkAnalyzer_API::getStepSize() const
+double NetworkAnalyzer_API::getSamplesCount() const
 {
-	return net->ui->stepSize->value();
+	return net->ui->samplesCount->value();
 }
 
 double NetworkAnalyzer_API::getAmplitude() const
@@ -524,9 +539,9 @@ void NetworkAnalyzer_API::setMaxFreq(double freq)
 	net->ui->phasegraph->setXMax(freq);
 }
 
-void NetworkAnalyzer_API::setStepSize(double step)
+void NetworkAnalyzer_API::setSamplesCount(double step)
 {
-	net->ui->stepSize->setValue(step);
+	net->ui->samplesCount->setValue(step);
 }
 
 void NetworkAnalyzer_API::setAmplitude(double amp)
@@ -587,4 +602,17 @@ void NetworkAnalyzer_API::setMaxPhase(double val)
 	net->ui->phaseMax->setValue(val);
 	net->ui->phasegraph->setYMax(val);
 	net->ui->nicholsgraph->setXMax(val);
+}
+
+bool NetworkAnalyzer_API::isLogFreq() const
+{
+	return net->ui->isLog->isChecked();
+}
+
+void NetworkAnalyzer_API::setLogFreq(bool is_log)
+{
+	if (is_log)
+		net->ui->isLog->setChecked(true);
+	else
+		net->ui->isLinear->setChecked(true);
 }
