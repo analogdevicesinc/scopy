@@ -46,10 +46,7 @@ dBgraph::dBgraph(QWidget *parent) : QwtPlot(parent),
 	curve.setXAxis(QwtPlot::xTop);
 	curve.setYAxis(QwtPlot::yLeft);
 
-	OscScaleEngine *scaleTop = new OscScaleEngine;
-	scaleTop->setMajorTicksCount(8);
-	this->setAxisScaleEngine(QwtPlot::xTop,
-			static_cast<QwtScaleEngine *>(scaleTop));
+	useLogFreq(false);
 
 	OscScaleEngine *scaleLeft = new OscScaleEngine;
 	scaleLeft->setMajorTicksCount(6);
@@ -243,4 +240,18 @@ void dBgraph::setXUnit(const QString& unit)
 void dBgraph::setYUnit(const QString& unit)
 {
 	draw_y->setUnitType(unit);
+}
+
+void dBgraph::useLogFreq(bool use_log_freq)
+{
+	if (use_log_freq) {
+		this->setAxisScaleEngine(QwtPlot::xTop, new QwtLogScaleEngine);
+	} else {
+		auto scaleTop = new OscScaleEngine;
+		scaleTop->setMajorTicksCount(8);
+		this->setAxisScaleEngine(QwtPlot::xTop, scaleTop);
+	}
+
+	this->log_freq = use_log_freq;
+	replot();
 }

@@ -55,6 +55,8 @@ namespace adiscope {
 		Q_PROPERTY(QString xunit READ xUnit WRITE setXUnit);
 		Q_PROPERTY(QString yunit READ yUnit WRITE setYUnit);
 
+		Q_PROPERTY(bool log_freq MEMBER log_freq WRITE useLogFreq);
+
 	public:
 		explicit dBgraph(QWidget *parent = nullptr);
 		~dBgraph();
@@ -87,11 +89,14 @@ namespace adiscope {
 		void setXUnit(const QString& unit);
 		void setYUnit(const QString& unit);
 
+		void useLogFreq(bool use_log_freq);
+
 	private:
 		QwtPlotCurve curve;
 		unsigned int numSamples;
 		double xmin, xmax, ymin, ymax;
 		QColor color;
+		bool log_freq;
 
 		OscScaleDraw *draw_x, *draw_y;
 		PrefixFormatter *formatter;
