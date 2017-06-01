@@ -25,6 +25,9 @@
    </property>
    <item>
     <widget class="QWidget" name="mainWidget" native="true">
+     <property name="styleSheet">
+      <string notr="true">#mainWidget { background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 rgba(0, 0, 0, 40), stop:1 transparent); }</string>
+     </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <property name="spacing">
        <number>0</number>
@@ -209,6 +212,9 @@ QPushButton:!checked {
                 <property name="ymax" stdset="0">
                  <double>10.000000000000000</double>
                 </property>
+                <property name="log_freq" stdset="0">
+                 <bool>true</bool>
+                </property>
                </widget>
               </item>
               <item>
@@ -252,6 +258,9 @@ QPushButton:!checked {
                 </property>
                 <property name="ymax" stdset="0">
                  <double>180.000000000000000</double>
+                </property>
+                <property name="log_freq" stdset="0">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>
@@ -402,308 +411,254 @@ QPushButton:!checked {
               <number>20</number>
              </property>
              <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_2">
-               <item>
-                <widget class="QLabel" name="label">
-                 <property name="text">
-                  <string>FREQUENCY SWIPE SETTINGS</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="Line" name="line">
-                 <property name="styleSheet">
-                  <string notr="true">border: 1px solid rgb(255, 255, 255, 15);</string>
-                 </property>
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item>
-              <layout class="QGridLayout" name="freqGrid">
-               <property name="spacing">
-                <number>12</number>
+              <widget class="QGroupBox" name="groupBox">
+               <property name="title">
+                <string>Frequency Sweep Settings</string>
                </property>
-               <item row="0" column="0">
-                <widget class="adiscope::ScaleSpinButton" name="minFreq" native="true">
-                 <property name="units" stdset="0">
-                  <stringlist notr="true">
-                   <string>mHz=1e-3</string>
-                   <string>Hz=1e0</string>
-                   <string>kHz=1e3</string>
-                   <string>MHz=1e6</string>
-                  </stringlist>
-                 </property>
-                 <property name="min_value" stdset="0">
-                  <double>0.001000000000000</double>
-                 </property>
-                 <property name="max_value" stdset="0">
-                  <double>50000000.000000000000000</double>
-                 </property>
-                 <property name="show_progress" stdset="0">
-                  <bool>false</bool>
-                 </property>
-                 <property name="name" stdset="0">
-                  <string>Min Freq</string>
-                 </property>
-                 <property name="value" stdset="0">
-                  <double>1000.000000000000000</double>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="1">
-                <widget class="adiscope::ScaleSpinButton" name="maxFreq" native="true">
-                 <property name="units" stdset="0">
-                  <stringlist notr="true">
-                   <string>mHz=1e-3</string>
-                   <string>Hz=1e0</string>
-                   <string>kHz=1e3</string>
-                   <string>MHz=1e6</string>
-                  </stringlist>
-                 </property>
-                 <property name="name" stdset="0">
-                  <string>Max Freq</string>
-                 </property>
-                 <property name="min_value" stdset="0">
-                  <double>0.001000000000000</double>
-                 </property>
-                 <property name="max_value" stdset="0">
-                  <double>50000000.000000000000000</double>
-                 </property>
-                 <property name="show_progress" stdset="0">
-                  <bool>false</bool>
-                 </property>
-                 <property name="value" stdset="0">
-                  <double>50000.000000000000000</double>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="0">
-                <widget class="adiscope::ScaleSpinButton" name="stepSize" native="true">
-                 <property name="units" stdset="0">
-                  <stringlist notr="true">
-                   <string>mHz=1e-3</string>
-                   <string>Hz=1e0</string>
-                   <string>kHz=1e3</string>
-                   <string>MHz=1e6</string>
-                  </stringlist>
-                 </property>
-                 <property name="name" stdset="0">
-                  <string>Step Size</string>
-                 </property>
-                 <property name="min_value" stdset="0">
-                  <double>0.001000000000000</double>
-                 </property>
-                 <property name="max_value" stdset="0">
-                  <double>50000000.000000000000000</double>
-                 </property>
-                 <property name="show_progress" stdset="0">
-                  <bool>false</bool>
-                 </property>
-                 <property name="value" stdset="0">
-                  <double>1000.000000000000000</double>
-                 </property>
-                </widget>
-               </item>
-              </layout>
+               <layout class="QGridLayout" name="gridLayout_3">
+                <item row="2" column="0">
+                 <widget class="adiscope::ScaleSpinButton" name="samplesCount" native="true">
+                  <property name="units" stdset="0">
+                   <stringlist notr="true">
+                    <string>samples=1e0</string>
+                   </stringlist>
+                  </property>
+                  <property name="name" stdset="0">
+                   <string>Samples count</string>
+                  </property>
+                  <property name="min_value" stdset="0">
+                   <double>10.000000000000000</double>
+                  </property>
+                  <property name="max_value" stdset="0">
+                   <double>10000.000000000000000</double>
+                  </property>
+                  <property name="show_progress" stdset="0">
+                   <bool>false</bool>
+                  </property>
+                  <property name="value" stdset="0">
+                   <double>1000.000000000000000</double>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="adiscope::ScaleSpinButton" name="minFreq" native="true">
+                  <property name="units" stdset="0">
+                   <stringlist notr="true">
+                    <string>mHz=1e-3</string>
+                    <string>Hz=1e0</string>
+                    <string>kHz=1e3</string>
+                    <string>MHz=1e6</string>
+                   </stringlist>
+                  </property>
+                  <property name="min_value" stdset="0">
+                   <double>0.001000000000000</double>
+                  </property>
+                  <property name="max_value" stdset="0">
+                   <double>50000000.000000000000000</double>
+                  </property>
+                  <property name="show_progress" stdset="0">
+                   <bool>false</bool>
+                  </property>
+                  <property name="name" stdset="0">
+                   <string>Min Freq</string>
+                  </property>
+                  <property name="value" stdset="0">
+                   <double>1000.000000000000000</double>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="adiscope::ScaleSpinButton" name="maxFreq" native="true">
+                  <property name="units" stdset="0">
+                   <stringlist notr="true">
+                    <string>mHz=1e-3</string>
+                    <string>Hz=1e0</string>
+                    <string>kHz=1e3</string>
+                    <string>MHz=1e6</string>
+                   </stringlist>
+                  </property>
+                  <property name="name" stdset="0">
+                   <string>Max Freq</string>
+                  </property>
+                  <property name="min_value" stdset="0">
+                   <double>0.001000000000000</double>
+                  </property>
+                  <property name="max_value" stdset="0">
+                   <double>50000000.000000000000000</double>
+                  </property>
+                  <property name="show_progress" stdset="0">
+                   <bool>false</bool>
+                  </property>
+                  <property name="value" stdset="0">
+                   <double>50000.000000000000000</double>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
              </item>
              <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_4">
-               <item>
-                <widget class="QLabel" name="label_2">
-                 <property name="text">
-                  <string>WAVEFORM SETTINGS</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="Line" name="line_2">
-                 <property name="styleSheet">
-                  <string notr="true">border: 1px solid rgb(255, 255, 255, 15);</string>
-                 </property>
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                </widget>
-               </item>
-              </layout>
+              <widget class="QGroupBox" name="groupBox_2">
+               <property name="title">
+                <string>Waveform Settings</string>
+               </property>
+               <layout class="QGridLayout" name="gridLayout_4">
+                <item row="0" column="0">
+                 <widget class="adiscope::ScaleSpinButton" name="amplitude" native="true">
+                  <property name="units" stdset="0">
+                   <stringlist notr="true">
+                    <string>µVolts=1e-6</string>
+                    <string>mVolts=1e-3</string>
+                    <string>Volts=1e0</string>
+                   </stringlist>
+                  </property>
+                  <property name="name" stdset="0">
+                   <string>Amplitude</string>
+                  </property>
+                  <property name="min_value" stdset="0">
+                   <double>0.000001000000000</double>
+                  </property>
+                  <property name="max_value" stdset="0">
+                   <double>5.000000000000000</double>
+                  </property>
+                  <property name="show_progress" stdset="0">
+                   <bool>false</bool>
+                  </property>
+                  <property name="value" stdset="0">
+                   <double>1.000000000000000</double>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="adiscope::PositionSpinButton" name="offset" native="true">
+                  <property name="units" stdset="0">
+                   <stringlist notr="true">
+                    <string>µVolts=1e-6</string>
+                    <string>mVolts=1e-3</string>
+                    <string>Volts=1e0</string>
+                   </stringlist>
+                  </property>
+                  <property name="name" stdset="0">
+                   <string>Offset</string>
+                  </property>
+                  <property name="min_value" stdset="0">
+                   <double>-5.000000000000000</double>
+                  </property>
+                  <property name="max_value" stdset="0">
+                   <double>5.000000000000000</double>
+                  </property>
+                  <property name="show_progress" stdset="0">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
              </item>
              <item>
-              <layout class="QGridLayout" name="gridLayout">
-               <item row="0" column="0">
-                <widget class="adiscope::ScaleSpinButton" name="amplitude" native="true">
-                 <property name="units" stdset="0">
-                  <stringlist notr="true">
-                   <string>µVolts=1e-6</string>
-                   <string>mVolts=1e-3</string>
-                   <string>Volts=1e0</string>
-                  </stringlist>
-                 </property>
-                 <property name="name" stdset="0">
-                  <string>Amplitude</string>
-                 </property>
-                 <property name="min_value" stdset="0">
-                  <double>0.000001000000000</double>
-                 </property>
-                 <property name="max_value" stdset="0">
-                  <double>5.000000000000000</double>
-                 </property>
-                 <property name="show_progress" stdset="0">
-                  <bool>false</bool>
-                 </property>
-                 <property name="value" stdset="0">
-                  <double>1.000000000000000</double>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="1">
-                <widget class="adiscope::PositionSpinButton" name="offset" native="true">
-                 <property name="units" stdset="0">
-                  <stringlist notr="true">
-                   <string>µVolts=1e-6</string>
-                   <string>mVolts=1e-3</string>
-                   <string>Volts=1e0</string>
-                  </stringlist>
-                 </property>
-                 <property name="name" stdset="0">
-                  <string>Offset</string>
-                 </property>
-                 <property name="min_value" stdset="0">
-                  <double>-5.000000000000000</double>
-                 </property>
-                 <property name="max_value" stdset="0">
-                  <double>5.000000000000000</double>
-                 </property>
-                 <property name="show_progress" stdset="0">
-                  <bool>false</bool>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_5">
-               <item>
-                <widget class="QLabel" name="label_3">
-                 <property name="text">
-                  <string>DISPLAY SETTINGS</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="Line" name="line_3">
-                 <property name="styleSheet">
-                  <string notr="true">border: 1px solid rgb(255, 255, 255, 15);</string>
-                 </property>
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item>
-              <layout class="QGridLayout" name="gridLayout_2">
-               <item row="0" column="0">
-                <widget class="adiscope::PositionSpinButton" name="magMax" native="true">
-                 <property name="units" stdset="0">
-                  <stringlist notr="true">
-                   <string>dB=1e0</string>
-                  </stringlist>
-                 </property>
-                 <property name="name" stdset="0">
-                  <string>Max. Magnitude</string>
-                 </property>
-                 <property name="min_value" stdset="0">
-                  <double>-120.000000000000000</double>
-                 </property>
-                 <property name="max_value" stdset="0">
-                  <double>120.000000000000000</double>
-                 </property>
-                 <property name="value" stdset="0">
-                  <double>10.000000000000000</double>
-                 </property>
-                 <property name="show_progress" stdset="0">
-                  <bool>false</bool>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="1">
-                <widget class="adiscope::PositionSpinButton" name="magMin" native="true">
-                 <property name="units" stdset="0">
-                  <stringlist notr="true">
-                   <string>dB=1e0</string>
-                  </stringlist>
-                 </property>
-                 <property name="name" stdset="0">
-                  <string>Min. Magnitude</string>
-                 </property>
-                 <property name="min_value" stdset="0">
-                  <double>-120.000000000000000</double>
-                 </property>
-                 <property name="max_value" stdset="0">
-                  <double>120.000000000000000</double>
-                 </property>
-                 <property name="value" stdset="0">
-                  <double>-90.000000000000000</double>
-                 </property>
-                 <property name="show_progress" stdset="0">
-                  <bool>false</bool>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="0">
-                <widget class="adiscope::PositionSpinButton" name="phaseMax" native="true">
-                 <property name="units" stdset="0">
-                  <stringlist notr="true">
-                   <string>°=1e0</string>
-                  </stringlist>
-                 </property>
-                 <property name="name" stdset="0">
-                  <string>Max. Phase</string>
-                 </property>
-                 <property name="min_value" stdset="0">
-                  <double>-180.000000000000000</double>
-                 </property>
-                 <property name="max_value" stdset="0">
-                  <double>180.000000000000000</double>
-                 </property>
-                 <property name="value" stdset="0">
-                  <double>180.000000000000000</double>
-                 </property>
-                 <property name="show_progress" stdset="0">
-                  <bool>false</bool>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="1">
-                <widget class="adiscope::PositionSpinButton" name="phaseMin" native="true">
-                 <property name="units" stdset="0">
-                  <stringlist notr="true">
-                   <string>°=1e0</string>
-                  </stringlist>
-                 </property>
-                 <property name="name" stdset="0">
-                  <string>Min. Phase</string>
-                 </property>
-                 <property name="min_value" stdset="0">
-                  <double>-180.000000000000000</double>
-                 </property>
-                 <property name="max_value" stdset="0">
-                  <double>180.000000000000000</double>
-                 </property>
-                 <property name="value" stdset="0">
-                  <double>-180.000000000000000</double>
-                 </property>
-                 <property name="show_progress" stdset="0">
-                  <bool>false</bool>
-                 </property>
-                </widget>
-               </item>
-              </layout>
+              <widget class="QGroupBox" name="groupBox_3">
+               <property name="title">
+                <string>Display Settings</string>
+               </property>
+               <layout class="QGridLayout" name="gridLayout">
+                <item row="0" column="1">
+                 <widget class="adiscope::PositionSpinButton" name="magMin" native="true">
+                  <property name="units" stdset="0">
+                   <stringlist notr="true">
+                    <string>dB=1e0</string>
+                   </stringlist>
+                  </property>
+                  <property name="name" stdset="0">
+                   <string>Min. Magnitude</string>
+                  </property>
+                  <property name="min_value" stdset="0">
+                   <double>-120.000000000000000</double>
+                  </property>
+                  <property name="max_value" stdset="0">
+                   <double>120.000000000000000</double>
+                  </property>
+                  <property name="value" stdset="0">
+                   <double>-90.000000000000000</double>
+                  </property>
+                  <property name="show_progress" stdset="0">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="0">
+                 <widget class="adiscope::PositionSpinButton" name="magMax" native="true">
+                  <property name="units" stdset="0">
+                   <stringlist notr="true">
+                    <string>dB=1e0</string>
+                   </stringlist>
+                  </property>
+                  <property name="name" stdset="0">
+                   <string>Max. Magnitude</string>
+                  </property>
+                  <property name="min_value" stdset="0">
+                   <double>-120.000000000000000</double>
+                  </property>
+                  <property name="max_value" stdset="0">
+                   <double>120.000000000000000</double>
+                  </property>
+                  <property name="value" stdset="0">
+                   <double>10.000000000000000</double>
+                  </property>
+                  <property name="show_progress" stdset="0">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="adiscope::PositionSpinButton" name="phaseMax" native="true">
+                  <property name="units" stdset="0">
+                   <stringlist notr="true">
+                    <string>°=1e0</string>
+                   </stringlist>
+                  </property>
+                  <property name="name" stdset="0">
+                   <string>Max. Phase</string>
+                  </property>
+                  <property name="min_value" stdset="0">
+                   <double>-180.000000000000000</double>
+                  </property>
+                  <property name="max_value" stdset="0">
+                   <double>180.000000000000000</double>
+                  </property>
+                  <property name="value" stdset="0">
+                   <double>180.000000000000000</double>
+                  </property>
+                  <property name="show_progress" stdset="0">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="adiscope::PositionSpinButton" name="phaseMin" native="true">
+                  <property name="units" stdset="0">
+                   <stringlist notr="true">
+                    <string>°=1e0</string>
+                   </stringlist>
+                  </property>
+                  <property name="name" stdset="0">
+                   <string>Min. Phase</string>
+                  </property>
+                  <property name="min_value" stdset="0">
+                   <double>-180.000000000000000</double>
+                  </property>
+                  <property name="max_value" stdset="0">
+                   <double>180.000000000000000</double>
+                  </property>
+                  <property name="value" stdset="0">
+                   <double>-180.000000000000000</double>
+                  </property>
+                  <property name="show_progress" stdset="0">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
              </item>
              <item>
               <spacer name="verticalSpacer">
@@ -1102,5 +1057,40 @@ QPushButton:!checked {
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>run_button</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>groupBox</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>987</x>
+     <y>39</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1070</x>
+     <y>189</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>run_button</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>groupBox_2</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>987</x>
+     <y>39</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1070</x>
+     <y>307</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
+ <buttongroups>
+  <buttongroup name="buttonGroup"/>
+ </buttongroups>
 </ui>
