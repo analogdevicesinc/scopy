@@ -32,16 +32,17 @@ QLabel#SBA_Label {
 QLineEdit#SBA_LineEdit {
   height: 20px;
   width: 75px;
-  color: white;
-  background-color: transparent;
   font-size: 18px;
-  font-style: bold;
   border: 0px;
   bottom: 10px;
 }
 
 QFrame#SBA_Line {
   color: #4a64ff;
+}
+
+QFrame#SBA_Line:disabled {
+  color: #555555;
 }
 
 QComboBox#SBA_Combobox {
