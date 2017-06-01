@@ -172,10 +172,12 @@ void NetworkAnalyzer::run()
 	for (unsigned int i = 0; !stop && i < steps; i++) {
 		double frequency;
 
-		if (is_log)
-			frequency = exp10(log10_min_freq + (double) i * step);
-		else
+		if (is_log) {
+			frequency = pow(10.0,
+					log10_min_freq + (double) i * step);
+		} else {
 			frequency = min_freq + (double) i * step;
+		}
 
 		unsigned long rate = get_best_sin_sample_rate(dac1, frequency);
 		size_t samples_count = get_sin_samples_count(
