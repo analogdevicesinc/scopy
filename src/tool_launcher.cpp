@@ -114,6 +114,23 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	connect(alive_timer, SIGNAL(timeout()), this, SLOT(ping()));
 }
 
+void ToolLauncher::runProgram(const QString& program, const QString& fn)
+{
+	QJSValue val = js_engine.evaluate(program, fn);
+
+	int ret;
+	if (val.isError()) {
+		qInfo() << "Exception:" << val.toString();
+		ret = EXIT_FAILURE;
+	} else if (!val.isUndefined()) {
+		qInfo() << val.toString();
+		ret = EXIT_SUCCESS;
+	}
+
+	/* Exit application */
+	qApp->exit(ret);
+}
+
 void ToolLauncher::search()
 {
 	search_timer->stop();
@@ -586,6 +603,8 @@ void adiscope::ToolLauncher::enableAdcBasedTools()
 		ui->spectrumAnalyzer->setEnabled(true);
 		adc_users_group.addButton(ui->stopSpectrumAnalyzer);
 	}
+
+	Q_EMIT adcToolsCreated();
 }
 
 void adiscope::ToolLauncher::enableDacBasedTools(float dacA_vlsb,
@@ -621,6 +640,8 @@ void adiscope::ToolLauncher::enableDacBasedTools(float dacA_vlsb,
 
 		ui->signalGenerator->setEnabled(true);
 	}
+
+	Q_EMIT dacToolsCreated();
 }
 
 bool adiscope::ToolLauncher::switchContext(const QString& uri)
@@ -796,8 +817,7 @@ bool ToolLauncher_API::connect(const QString& uri)
 			done = true;
 	});
 
-	tl->connect(tl, &ToolLauncher::adcCalibrationDone,
-			[&]() {
+	tl->connect(tl, &ToolLauncher::adcToolsCreated, [&]() {
 		did_connect = true;
 		done = true;
 	});
@@ -806,6 +826,7 @@ bool ToolLauncher_API::connect(const QString& uri)
 	tl->ui->btnConnect->click();
 
 	do {
+		QCoreApplication::processEvents();
 		QThread::msleep(10);
 	} while (!done);
 	return did_connect;

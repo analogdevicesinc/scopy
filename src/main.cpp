@@ -18,10 +18,12 @@
  */
 
 #include <QApplication>
+#include <QCommandLineParser>
 #include <QSettings>
 #include <QtGlobal>
 
-#include "src/tool_launcher.hpp"
+#include "config.h"
+#include "tool_launcher.hpp"
 
 using namespace adiscope;
 
@@ -44,10 +46,44 @@ int main(int argc, char **argv)
 	QCoreApplication::setOrganizationName("ADI");
 	QCoreApplication::setOrganizationDomain("analog.com");
 	QCoreApplication::setApplicationName("Scopy");
+	QCoreApplication::setApplicationVersion(SCOPY_VERSION_GIT);
 	QSettings::setDefaultFormat(QSettings::IniFormat);
 
+	QCommandLineParser parser;
+
+	parser.addHelpOption();
+	parser.addVersionOption();
+
+	parser.addOptions({
+		{ {"s", "script"}, "Run given script.", "script" },
+	});
+
+	parser.process(app);
+
 	ToolLauncher launcher;
-	launcher.show();
+
+	QString script = parser.value("script");
+	if (script.isEmpty()) {
+		launcher.show();
+	} else {
+		launcher.hide();
+
+		QFile file(script);
+		if (!file.open(QFile::ReadOnly)) {
+			qCritical() << "Unable to open script file";
+			return EXIT_FAILURE;
+		}
+
+		QTextStream stream(&file);
+		QString contents = stream.readAll();
+		file.close();
+
+		QMetaObject::invokeMethod(&launcher,
+				 "runProgram",
+				 Qt::QueuedConnection,
+				 Q_ARG(QString, contents),
+				 Q_ARG(QString, script));
+	}
 
 	return app.exec();
 }
