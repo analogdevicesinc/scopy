@@ -22,6 +22,7 @@
 #define POPUP_PULSEVIEW
 
 #include <QWidget>
+#include <QApplication>
 
 namespace pv {
 namespace widgets {
@@ -45,7 +46,9 @@ private:
 	static const unsigned int MarginWidth;
 
 public:
-	Popup(QWidget *parent, bool colour = false);
+	Popup(QWidget *parent, QBrush popup_color = QApplication::palette().brush(
+		QPalette::Window), bool outline = true,
+		QColor outline_color = QApplication::palette().color(QPalette::Dark));
 
 	const QPoint& point() const;
 	Position position() const;
@@ -89,7 +92,9 @@ Q_SIGNALS:
 private:
 	QPoint point_;
 	Position pos_;
-	bool colour_popup;
+	bool outline;
+	QBrush popup_color;
+	QColor outline_color;
 };
 
 } // namespace widgets

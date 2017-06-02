@@ -37,6 +37,11 @@ ColourButton::ColourButton(int rows, int cols, QWidget *parent) :
 	connect(this, SIGNAL(clicked(bool)), this, SLOT(on_clicked(bool)));
 	connect(&popup_, SIGNAL(selected(int, int)),
 		this, SLOT(on_selected(int, int)));
+	setMinimumWidth(80);
+	setMaximumWidth(80);
+	setMinimumHeight(20);
+	setMaximumHeight(20);
+	this->setFocusPolicy(Qt::NoFocus);
 }
 
 ColourPopup& ColourButton::popup()
@@ -95,12 +100,9 @@ void ColourButton::paintEvent(QPaintEvent *event)
 	QPushButton::paintEvent(event);
 
 	QPainter p(this);
-
-	const QRect r = rect().adjusted(SwatchMargin, SwatchMargin,
-		-SwatchMargin, -SwatchMargin);
-	p.setPen(QApplication::palette().color(QPalette::Dark));
+	p.setPen(QPen(cur_colour_));
 	p.setBrush(QBrush(cur_colour_));
-	p.drawRect(r);
+	p.drawRect(rect());
 }
 
 } // widgets

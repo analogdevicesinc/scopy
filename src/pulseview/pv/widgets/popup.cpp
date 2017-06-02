@@ -40,11 +40,14 @@ const unsigned int Popup::ArrowLength = 10;
 const unsigned int Popup::ArrowOverlap = 3;
 const unsigned int Popup::MarginWidth = 6;
 
-Popup::Popup(QWidget *parent, bool colour) :
-	QWidget(parent, Qt::Popup | Qt::FramelessWindowHint),
+Popup::Popup(QWidget *parent, QBrush popup_color,
+		bool outline, QColor outline_color) :
+	QWidget(parent, Qt::Popup),
 	point_(),
 	pos_(Left),
-	colour_popup(colour)
+	popup_color(popup_color),
+	outline(outline),
+	outline_color(outline_color)
 {
 }
 
@@ -255,10 +258,6 @@ void Popup::closeEvent(QCloseEvent*)
 void Popup::paintEvent(QPaintEvent*)
 {
 	QPainter painter(this);
-	painter.setRenderHint(QPainter::Antialiasing);
-
-	const QColor outline_color(QApplication::palette().color(
-		QPalette::Dark));
 
 	// Draw the bubble
 	const QRegion b = bubble_region();
@@ -267,15 +266,8 @@ void Popup::paintEvent(QPaintEvent*)
 		b.translated(-1, 0).intersected(b.translated(0, -1)))));
 
 	painter.setPen(Qt::NoPen);
-	if(!colour_popup)
-		painter.setBrush(QApplication::palette().brush(QPalette::Window));
-	else
-		painter.setBrush(QColor("#272730"));
+	painter.setBrush(popup_color);
 	painter.drawRect(rect());
-
-	// Draw the arrow
-	if (!space_for_arrow())
-		return;
 
 	const QPoint ArrowOffsets[] = {
 		QPoint(1, 0), QPoint(0, -1), QPoint(-1, 0), QPoint(0, 1)};
@@ -284,9 +276,12 @@ void Popup::paintEvent(QPaintEvent*)
 	const QRegion arrow_outline = a.subtracted(
 		a.translated(ArrowOffsets[pos_]));
 
-	if(!colour_popup) {
-		painter.setClipRegion(bubble_outline.subtracted(a).united(
-					      arrow_outline));
+	if(outline) {
+		if(space_for_arrow())
+			painter.setClipRegion(bubble_outline.subtracted(a).united(
+				arrow_outline));
+		else
+			painter.setClipRegion(bubble_outline);
 		painter.setBrush(outline_color);
 		painter.drawRect(rect());
 	}
