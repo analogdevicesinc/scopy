@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>600</width>
-    <height>40</height>
+    <width>539</width>
+    <height>46</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -175,7 +175,7 @@ QLabel:disabled { color: #555555; }</string>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>50</width>
+                <width>20</width>
                 <height>20</height>
                </size>
               </property>
@@ -564,7 +564,7 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
-                 <width>100</width>
+                 <width>60</width>
                  <height>20</height>
                 </size>
                </property>
@@ -611,11 +611,11 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
                 <enum>Qt::Horizontal</enum>
                </property>
                <property name="sizeType">
-                <enum>QSizePolicy::Preferred</enum>
+                <enum>QSizePolicy::Minimum</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
-                 <width>20</width>
+                 <width>40</width>
                  <height>20</height>
                 </size>
                </property>
@@ -669,7 +669,7 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
-                 <width>10</width>
+                 <width>5</width>
                  <height>20</height>
                 </size>
                </property>
@@ -697,6 +697,9 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
                </property>
                <property name="styleSheet">
                 <string notr="true"/>
+               </property>
+               <property name="frame">
+                <bool>false</bool>
                </property>
               </widget>
              </item>
@@ -732,7 +735,7 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>25</width>
+                <width>36</width>
                 <height>20</height>
                </size>
               </property>
@@ -1373,7 +1376,7 @@ background:#4a64ff;
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>40</width>
+                <width>30</width>
                 <height>20</height>
                </size>
               </property>

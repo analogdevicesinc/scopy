@@ -117,8 +117,6 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	this->setAttribute(Qt::WA_DeleteOnClose, true);
 	iio_context_set_timeout(ctx, UINT_MAX);
 
-	ui->areaTimeTriggerLayout->setContentsMargins(0, 0, 0, 0);
-
 	symmBufferMode = make_shared<LogicAnalyzerSymmetricBufferMode>();
 	symmBufferMode->setMaxSampleRate(80000000);
 	symmBufferMode->setEntireBufferMaxSize(500000); // max 0.5 mega-samples
@@ -131,8 +129,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	buffer_previewer->setVerticalSpacing(6);
 	buffer_previewer->setMinimumHeight(20);
 	buffer_previewer->setMaximumHeight(20);
-	buffer_previewer->setMinimumWidth(380);
-	buffer_previewer->setMaximumWidth(380);
+	buffer_previewer->setMinimumWidth(375);
+	buffer_previewer->setMaximumWidth(375);
 	ui->vLayoutBufferSlot->addWidget(buffer_previewer);
 
 	buffer_previewer->setCursorPos(0.5);
@@ -183,7 +181,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	ui->timebaseLabel->setMinimumWidth(width);
 
 	this->settings_group->setExclusive(true);
-	this->no_channels = get_no_channels(dev);
+	if(dev)
+		this->no_channels = get_no_channels(dev);
 
 	/* sigrok and sigrokdecode initialisation */
 	std::string open_file, open_file_format;
@@ -197,7 +196,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 		struct iio_channel *chn = iio_device_get_channel(dev, j);
 
 		if (!iio_channel_is_output(chn) &&
-		    iio_channel_is_scan_element(chn)) {
+				iio_channel_is_scan_element(chn)) {
 			iio_channel_enable(chn);
 		}
 	}
@@ -225,10 +224,12 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 
 	options["numchannels"] = Glib::Variant<gint32>(
 			g_variant_new_int32(no_channels),true);
-	logic_analyzer_ptr = std::make_shared<pv::devices::BinaryStream>(
+	if(dev) {
+		logic_analyzer_ptr = std::make_shared<pv::devices::BinaryStream>(
 	                            context, dev, maxBuffersize,
 	                             w->get_format_from_string("binary"),
 	                             options, this);
+	}
 
 	/* setup view */
 	main_win = w;
@@ -359,6 +360,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	trigger_settings_ui->btnNormal->setChecked(true);
 	main_win->view_->viewport()->setTimeTriggerPosActive(true);
 	ui->areaTimeTriggerLayout->addWidget(this->bottomHandlesArea(), 0, 1, 1, 3);
+	updateAreaTimeTrigger();
 	ui->triggerStateLabel->setText("Stop");
 
 	ensurePolished();
@@ -411,10 +413,12 @@ LogicAnalyzer::~LogicAnalyzer()
 
 void LogicAnalyzer::set_buffersize()
 {
-	main_win->view_->session().set_buffersize(logic_analyzer_ptr->get_buffersize());
-	if(running) {
-		//restart acquisition to recreate buffer
-		main_win->restart_acquisition();
+	if(logic_analyzer_ptr) {
+		main_win->view_->session().set_buffersize(logic_analyzer_ptr->get_buffersize());
+		if(running) {
+			//restart acquisition to recreate buffer
+			main_win->restart_acquisition();
+		}
 	}
 }
 
@@ -430,6 +434,7 @@ void LogicAnalyzer::get_channel_groups_api()
 void LogicAnalyzer::resizeEvent()
 {
 	if(!initialised) {
+		updateAreaTimeTrigger();
 		timePosition->setValue(0);
 		value_cursor1 = -(timeBase->value() * 3 + active_plot_timebase * 10 / 2 - active_timePos);
 		value_cursor2 = -(timeBase->value() * 6 + active_plot_timebase * 10 / 2 - active_timePos);
@@ -449,6 +454,12 @@ void LogicAnalyzer::resizeEvent()
 	d_timeTriggerHandle->setPositionSilenty(trigX);
 	main_win->view_->viewport()->setTimeTriggerPixel(trigX);
 	main_win->view_->time_item_appearance_changed(true, true);
+}
+
+void LogicAnalyzer::updateAreaTimeTrigger()
+{
+	ui->areaTimeTriggerLayout->setContentsMargins(
+		chm_ui->sizeHint().width()-20, 0, 0, 0);
 }
 
 double LogicAnalyzer::pickSampleRateFor(double timeSpanSecs, double desiredBuffersize)
@@ -550,7 +561,7 @@ void LogicAnalyzer::onHorizScaleValueChanged(double value)
 	enableTrigger(true);
 	if( plotTimeSpan >= timespanLimitStream )
 	{
-		if(logic_analyzer_ptr->get_buffersize() != custom_sampleCount) {
+		if(logic_analyzer_ptr && logic_analyzer_ptr->get_buffersize() != custom_sampleCount) {
 			logic_analyzer_ptr->set_buffersize(custom_sampleCount);
 			set_buffersize();
 		}
@@ -603,6 +614,8 @@ void LogicAnalyzer::enableTrigger(bool value)
 
 void LogicAnalyzer::setSampleRate()
 {
+	if(!logic_analyzer_ptr)
+		return;
 	options["samplerate"] = Glib::Variant<guint64>(
 	                  g_variant_new_uint64(active_sampleRate),true);
 	Glib::VariantBase tmp = logic_analyzer_ptr->get_options()["samplerate"];
@@ -759,6 +772,8 @@ int LogicAnalyzer::timeToPixel(double time)
 
 void LogicAnalyzer::startStop(bool start)
 {
+	if(!logic_analyzer_ptr)
+		return;
 	if (start) {
 		last_set_sample_count = active_sampleCount;
 		if(main_win->view_->scale() != timeBase->value())
@@ -806,6 +821,8 @@ void LogicAnalyzer::setTriggerDelay(bool silent)
 
 void LogicAnalyzer::setHWTriggerDelay(long long delay)
 {
+	if(!dev)
+		return;
 	std::string name = "voltage0";
 	struct iio_channel *triggerch = iio_device_find_channel(dev, name.c_str(), false);
 	QString s = QString::number(delay);
@@ -816,6 +833,8 @@ void LogicAnalyzer::setHWTriggerDelay(long long delay)
 
 void LogicAnalyzer::singleRun()
 {
+	if(!logic_analyzer_ptr)
+		return;
 	if( running )
 	{
 		startStop(false);
@@ -840,6 +859,8 @@ void LogicAnalyzer::singleRun()
 
 unsigned int LogicAnalyzer::get_no_channels(struct iio_device *dev)
 {
+	if(!dev)
+		return 0;
 	unsigned int nb = 0;
 
 	for (unsigned int i = 0; i < iio_device_get_channels_count(dev); i++) {
@@ -895,6 +916,8 @@ void LogicAnalyzer::toggleRightMenu()
 
 void LogicAnalyzer::setHWTrigger(int chid, std::string trigger_val)
 {
+	if(!dev)
+		return;
 	std::string name = "voltage" + to_string(chid);
 	struct iio_channel *triggerch = iio_device_find_channel(dev, name.c_str(), false);
 
@@ -906,6 +929,8 @@ void LogicAnalyzer::setHWTrigger(int chid, std::string trigger_val)
 
 std::string LogicAnalyzer::get_trigger_from_device(int chid)
 {
+	if(!dev)
+		"none";
 	std::string name = "voltage" + to_string(chid);
 	struct iio_channel *triggerch = iio_device_find_channel(dev, name.c_str(), false);
 	if( !triggerch )
@@ -965,12 +990,15 @@ void LogicAnalyzer::onChmWidthChanged(int value)
 	int l, r, b, t;
 	ui->areaTimeTriggerLayout->getContentsMargins(&l, &t, &r, &b);
 	if(l != value - 20 ){
+		ui->areaTimeTriggerLayout->setContentsMargins(value-20, 0, 0, 0);
 		timePosition->valueChanged(timePosition->value());
 	}
 }
 
 void LogicAnalyzer::setHWTriggerLogic(const QString value)
 {
+	if(!dev)
+		return;
 	std::string name = "voltage0";
 	struct iio_channel *triggerch = iio_device_find_channel(dev, name.c_str(), false);
 	QString s = value.toLower();

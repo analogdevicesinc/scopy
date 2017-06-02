@@ -88,6 +88,7 @@ public:
 	                       QWidget *parent = 0,
 	                       unsigned int sample_rate = 200000);
 	~LogicAnalyzer();
+	void updateAreaTimeTrigger();
 
 	void setHWTrigger(int chid, std::string trigger_val);
 	std::string get_trigger_from_device(int chid);

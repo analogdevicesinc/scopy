@@ -1599,14 +1599,14 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 			setWidgetMinimumNrOfChars(lachannelgroupUI->ui->comboBox, 5);
 			lachannelgroupUI->ui->comboBox->setIconSize(QSize(30,20));
 			setWidgetMinimumNrOfChars(lachannelgroupUI->ui->comboBox_2, 5);
-			retainWidgetSizeWhenHidden(lachannelgroupUI->ui->collapseGroupBtn);
-
+			if(!lachannelgroupUI->ui->collapseGroupBtn->isChecked())
+				retainWidgetSizeWhenHidden(lachannelgroupUI->ui->collapseGroupBtn);
+			setWidgetMinimumNrOfChars(lachannelgroupUI->ui->decoderCombo, 10);
 			/* Manage widget visibility  */
 			if (collapsed) {
 				lachannelgroupUI->ui->leftWidget->setVisible(false);
 				lachannelgroupUI->ui->rightWidget->setVisible(false);
 				lachannelgroupUI->ui->stackedWidget->setCurrentIndex(0);
-				setWidgetMinimumNrOfChars(lachannelgroupUI->ui->decoderCombo, 10);
 
 			}
 
@@ -1620,7 +1620,7 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 			/* Grouped widget */
 			if (ch->is_grouped()) {
 				if(!collapsed) {
-					setWidgetMinimumNrOfChars(lachannelgroupUI->ui->decoderCombo, 17);
+					setWidgetMinimumNrOfChars(lachannelgroupUI->ui->decoderCombo, 10);
 				}
 
 				auto trace1 = main_win->view_->add_decoder();
@@ -1686,13 +1686,14 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 
 						/* Set no of characters to widgets */
 						setWidgetMinimumNrOfChars(lachannelUI->ui->groupName, 8);
-						setWidgetMinimumNrOfChars(lachannelUI->ui->indexLabel2, 5);
-						setWidgetMinimumNrOfChars(lachannelUI->ui->indexLabel, 5);
+						setWidgetMinimumNrOfChars(lachannelUI->ui->indexLabel2, 3);
+						setWidgetMinimumNrOfChars(lachannelUI->ui->indexLabel, 3);
 						setWidgetMinimumNrOfChars(lachannelUI->ui->comboBox, 5);
 						lachannelUI->ui->comboBox->setIconSize(QSize(30, 20));
-						setWidgetMinimumNrOfChars(lachannelUI->ui->comboBox_2, 8);
+						setWidgetMinimumNrOfChars(lachannelUI->ui->comboBox_2, 5);
 
-						retainWidgetSizeWhenHidden(lachannelUI->ui->collapseGroupBtn);
+						if(!lachannelUI->ui->collapseGroupBtn->isChecked())
+							retainWidgetSizeWhenHidden(lachannelUI->ui->collapseGroupBtn);
 						lachannelUI->ui->stackedWidget->setCurrentIndex(2);
 
 						/* Manage widget visibility */

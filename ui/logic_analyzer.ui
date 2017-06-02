@@ -640,14 +640,14 @@ QPushButton:checked:hover {
              </property>
              <property name="minimumSize">
               <size>
-               <width>62</width>
-               <height>47</height>
+               <width>64</width>
+               <height>48</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>62</width>
-               <height>47</height>
+               <width>64</width>
+               <height>48</height>
               </size>
              </property>
              <property name="styleSheet">
@@ -689,14 +689,14 @@ QPushButton:checked:hover {
              </property>
              <property name="minimumSize">
               <size>
-               <width>62</width>
-               <height>47</height>
+               <width>64</width>
+               <height>48</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>62</width>
-               <height>47</height>
+               <width>64</width>
+               <height>48</height>
               </size>
              </property>
              <property name="styleSheet">
@@ -741,7 +741,7 @@ QPushButton:checked:hover {
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout">
          <property name="spacing">
-          <number>20</number>
+          <number>0</number>
          </property>
          <property name="leftMargin">
           <number>0</number>
@@ -760,9 +760,15 @@ QPushButton:checked:hover {
            <property name="spacing">
             <number>0</number>
            </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_2">
              <property name="spacing">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
               <number>0</number>
              </property>
              <item>
@@ -847,7 +853,7 @@ QPushButton:checked:hover {
                     <number>0</number>
                    </property>
                    <property name="leftMargin">
-                    <number>20</number>
+                    <number>0</number>
                    </property>
                    <property name="topMargin">
                     <number>5</number>
@@ -933,13 +939,13 @@ QPushButton:checked:hover {
                     <number>0</number>
                    </property>
                    <property name="leftMargin">
-                    <number>20</number>
+                    <number>0</number>
                    </property>
                    <property name="topMargin">
                     <number>0</number>
                    </property>
                    <property name="rightMargin">
-                    <number>20</number>
+                    <number>0</number>
                    </property>
                    <property name="bottomMargin">
                     <number>0</number>
@@ -1000,7 +1006,7 @@ QPushButton:checked:hover {
                     <number>0</number>
                    </property>
                    <property name="leftMargin">
-                    <number>20</number>
+                    <number>0</number>
                    </property>
                    <property name="topMargin">
                     <number>0</number>
@@ -1009,33 +1015,6 @@ QPushButton:checked:hover {
                     <number>20</number>
                    </property>
                    <property name="bottomMargin">
-                    <number>0</number>
-                   </property>
-                  </layout>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QWidget" name="areaTimeTrigger" native="true">
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>30</height>
-                   </size>
-                  </property>
-                  <layout class="QGridLayout" name="areaTimeTriggerLayout">
-                   <property name="leftMargin">
-                    <number>0</number>
-                   </property>
-                   <property name="topMargin">
-                    <number>0</number>
-                   </property>
-                   <property name="rightMargin">
-                    <number>0</number>
-                   </property>
-                   <property name="bottomMargin">
-                    <number>0</number>
-                   </property>
-                   <property name="spacing">
                     <number>0</number>
                    </property>
                   </layout>
@@ -1045,6 +1024,33 @@ QPushButton:checked:hover {
               </widget>
              </item>
             </layout>
+           </item>
+           <item>
+            <widget class="QWidget" name="areaTimeTrigger" native="true">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>30</height>
+              </size>
+             </property>
+             <layout class="QGridLayout" name="areaTimeTriggerLayout">
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <property name="spacing">
+               <number>0</number>
+              </property>
+             </layout>
+            </widget>
            </item>
            <item>
             <widget class="QWidget" name="cursorsStatusWidget" native="true">
@@ -1268,7 +1274,7 @@ color: white;
              <number>0</number>
             </property>
             <property name="leftMargin">
-             <number>20</number>
+             <number>15</number>
             </property>
             <property name="topMargin">
              <number>20</number>
@@ -1282,7 +1288,7 @@ color: white;
             <item>
              <widget class="QStackedWidget" name="stackedWidget">
               <property name="currentIndex">
-               <number>3</number>
+               <number>1</number>
               </property>
               <widget class="QWidget" name="cursorSettings">
                <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -1570,8 +1576,8 @@ color: #FFFFFF;</string>
                     <rect>
                      <x>0</x>
                      <y>0</y>
-                     <width>131</width>
-                     <height>613</height>
+                     <width>92</width>
+                     <height>30</height>
                     </rect>
                    </property>
                    <layout class="QVBoxLayout" name="scrollAreaLayout">
