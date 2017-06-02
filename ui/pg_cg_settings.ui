@@ -208,7 +208,7 @@ background-color: #4A64FF;</string>
               <x>0</x>
               <y>0</y>
               <width>249</width>
-              <height>556</height>
+              <height>505</height>
              </rect>
             </property>
             <property name="sizePolicy">
@@ -234,58 +234,12 @@ background-color: #4A64FF;</string>
               <number>10</number>
              </property>
              <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_4">
-               <property name="spacing">
-                <number>12</number>
-               </property>
-               <property name="topMargin">
-                <number>18</number>
-               </property>
-               <property name="bottomMargin">
-                <number>32</number>
-               </property>
-               <item>
-                <widget class="QLabel" name="LPattern">
-                 <property name="styleSheet">
-                  <string notr="true">QLabel
-{
-height: 15px;
-font-family: Arial;
-font-size: 12px;
-line-height: 14px;
-color: rgba(255,255,255,50);
-}</string>
-                 </property>
-                 <property name="text">
-                  <string>CLOCK</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="Line" name="line_2">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="frameShadow">
-                  <enum>QFrame::Plain</enum>
-                 </property>
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item>
               <layout class="QHBoxLayout" name="horizontalLayout_3">
                <property name="spacing">
                 <number>0</number>
                </property>
                <property name="topMargin">
-                <number>0</number>
+                <number>20</number>
                </property>
                <property name="bottomMargin">
                 <number>20</number>
@@ -365,6 +319,52 @@ color: rgba(255,255,255,50);
               </layout>
              </item>
              <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_4">
+               <property name="spacing">
+                <number>12</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="bottomMargin">
+                <number>12</number>
+               </property>
+               <item>
+                <widget class="QLabel" name="LPattern">
+                 <property name="styleSheet">
+                  <string notr="true">QLabel
+{
+height: 15px;
+font-family: Arial;
+font-size: 12px;
+line-height: 14px;
+color: rgba(255,255,255,50);
+}</string>
+                 </property>
+                 <property name="text">
+                  <string>CLOCK</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="Line" name="line_2">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Plain</enum>
+                 </property>
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
               <widget class="QWidget" name="patternSettings" native="true">
                <property name="enabled">
                 <bool>true</bool>
@@ -427,10 +427,10 @@ color: rgba(255,255,255,50);
                    <number>12</number>
                   </property>
                   <property name="topMargin">
-                   <number>37</number>
+                   <number>20</number>
                   </property>
                   <property name="bottomMargin">
-                   <number>17</number>
+                   <number>0</number>
                   </property>
                   <item>
                    <widget class="QLabel" name="label_5">
@@ -825,6 +825,7 @@ color: rgba(255,255,255,50);
             </layout>
             <zorder>widget</zorder>
             <zorder>patternSettings</zorder>
+            <zorder></zorder>
            </widget>
           </widget>
          </item>
