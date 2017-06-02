@@ -51,6 +51,9 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	tl_api(new ToolLauncher_API(this)),
 	notifier(STDIN_FILENO, QSocketNotifier::Read)
 {
+	if (!isatty(STDIN_FILENO))
+		notifier.setEnabled(false);
+
 	ui->setupUi(this);
 
 	setWindowIcon(QIcon(":/icon.ico"));
