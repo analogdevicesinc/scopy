@@ -1,3 +1,5 @@
+#!/usr/bin/scopy -s
+
 /* How to run this script:
  * scopy --script read_dmm.js
  */
