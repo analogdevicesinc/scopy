@@ -75,6 +75,11 @@ int main(int argc, char **argv)
 		}
 
 		QTextStream stream(&file);
+
+		QString firstLine = stream.readLine();
+		if (!firstLine.startsWith("#!"))
+			stream.seek(0);
+
 		QString contents = stream.readAll();
 		file.close();
 
