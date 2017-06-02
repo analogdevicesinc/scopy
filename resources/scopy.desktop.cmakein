@@ -1,7 +1,7 @@
 [Desktop Entry]
 Version=1.0
-Icon=scopy
-Exec=scopy
+Icon=@CMAKE_INSTALL_PREFIX@/share/icons/hicolor/apps/scalable/scopy.svg
+Exec=@CMAKE_INSTALL_PREFIX@/bin/scopy
 Terminal=false
 Type=Application
 Categories=Science;

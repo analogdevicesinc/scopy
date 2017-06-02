@@ -261,6 +261,7 @@ configure_file(config.h.cmakein ${CMAKE_CURRENT_BINARY_DIR}/config.h @ONLY)
 
 if (NOT ENABLE_APPLICATION_BUNDLE)
 	install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
-	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/scopy.desktop DESTINATION share/applications)
+	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/resources/scopy.desktop.cmakein ${CMAKE_CURRENT_BINARY_DIR}/scopy.desktop @ONLY)
+	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/scopy.desktop DESTINATION share/applications)
 	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/icon_small.svg DESTINATION share/icons/hicolor/apps/scalable RENAME scopy.svg)
 endif()
