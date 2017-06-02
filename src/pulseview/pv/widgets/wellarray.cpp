@@ -106,8 +106,8 @@ WellArray::WellArray(int rows, int cols, QWidget *parent)
 {
     d = nullptr;
     setFocusPolicy(Qt::StrongFocus);
-    cellw = 28;
-    cellh = 24;
+    cellw = 80;
+    cellh = 30;
     curCol = 0;
     curRow = 0;
     selCol = -1;
@@ -130,17 +130,17 @@ QSize WellArray::sizeHint() const
 
 void WellArray::paintCell(QPainter* p, int row, int col, const QRect &rect)
 {
-    int b = 3; //margin
+    int b = 10; //hmargin
 
+	this->setFocusPolicy(Qt::NoFocus);
     const QPalette& g = palette();
     QStyleOptionFrame opt;
     int dfw = style()->pixelMetric(QStyle::PM_DefaultFrameWidth);
     opt.lineWidth = dfw;
     opt.midLineWidth = 1;
-    opt.rect = rect.adjusted(b, b, -b, -b);
+    opt.rect = rect.adjusted(b, 3, -b, -3);
     opt.palette = g;
     opt.state = QStyle::State_Enabled | QStyle::State_Sunken;
-    style()->drawPrimitive(QStyle::PE_Frame, &opt, p, this);
     b += dfw;
 
     if ((row == curRow) && (col == curCol)) {

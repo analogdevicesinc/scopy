@@ -24,7 +24,37 @@ namespace pv {
 namespace view {
 
 const QColor TracePalette::Colours[Cols * Rows] = {
+	//Row1
+	QColor("#F44336"),
+	QColor("#E91E63"),
+	QColor("#9C27B0"),
+	QColor("#673AB7"),
 
+	//Row2
+	QColor("#3F51B5"),
+	QColor("#2096F3"),
+	QColor("#03A9F4"),
+	QColor("#02BCD4"),
+
+	//Row3
+	QColor("#019688"),
+	QColor("#4DAF50"),
+	QColor("#8BC34A"),
+	QColor("#CDDC39"),
+
+	//Row4
+	QColor("#FFEB3B"),
+	QColor("#FFC108"),
+	QColor("#FF9800"),
+	QColor("#FF5721"),
+
+	//Row5
+	QColor("#795448"),
+	QColor("#9E9E9E"),
+	QColor("#607D8B"),
+	QColor("#FFFFFF"),
+
+	/*
 	// Light Colours
 	QColor(0xFC, 0xE9, 0x4F),	// Butter
 	QColor(0xFC, 0xAF, 0x3E),	// Orange
@@ -64,6 +94,7 @@ const QColor TracePalette::Colours[Cols * Rows] = {
 	QColor(0xD3, 0xD7, 0xCF),	// Grey 5
 	QColor(0xEE, 0xEE, 0xEC),	// Grey 6
 	QColor(0xFF, 0xFF, 0xFF),	// White
+	*/
 };
 
 } // view

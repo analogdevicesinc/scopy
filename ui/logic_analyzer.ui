@@ -945,7 +945,7 @@ QPushButton:checked:hover {
                     <number>0</number>
                    </property>
                    <property name="rightMargin">
-                    <number>0</number>
+                    <number>20</number>
                    </property>
                    <property name="bottomMargin">
                     <number>0</number>
@@ -1274,7 +1274,7 @@ color: white;
              <number>0</number>
             </property>
             <property name="leftMargin">
-             <number>15</number>
+             <number>10</number>
             </property>
             <property name="topMargin">
              <number>20</number>

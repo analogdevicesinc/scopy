@@ -20,6 +20,7 @@
 
 #include "colourpopup.hpp"
 #include "QPainter"
+#include "QGraphicsDropShadowEffect"
 
 namespace pv {
 namespace widgets {
@@ -36,6 +37,13 @@ ColourPopup::ColourPopup(int rows, int cols, QWidget *parent) :
 		this, SIGNAL(selected(int, int)));
 	connect(&well_array_, SIGNAL(selected(int, int)),
 		this, SLOT(colour_selected(int, int)));
+
+	this->window()->setAttribute(Qt::WA_TranslucentBackground);
+	QGraphicsDropShadowEffect *ef = new QGraphicsDropShadowEffect();
+	ef->setBlurRadius(100);
+	ef->setColor(QColor("black"));
+	ef->setOffset(10);
+	this->setGraphicsEffect(ef);
 }
 
 WellArray& ColourPopup::well_array()

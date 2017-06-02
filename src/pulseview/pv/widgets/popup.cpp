@@ -270,7 +270,7 @@ void Popup::paintEvent(QPaintEvent*)
 	if(!colour_popup)
 		painter.setBrush(QApplication::palette().brush(QPalette::Window));
 	else
-		painter.setBrush(QColor("#141416"));
+		painter.setBrush(QColor("#272730"));
 	painter.drawRect(rect());
 
 	// Draw the arrow

@@ -29,8 +29,8 @@ namespace view {
 class TracePalette
 {
 public:
-	static const unsigned int Cols = 8;
-	static const unsigned int Rows = 4;
+	static const unsigned int Cols = 4;
+	static const unsigned int Rows = 5;
 	static const QColor Colours[Cols * Rows];
 };
 
