@@ -97,7 +97,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	unsigned long max_samplerate =
 		std::min(max_samplerate1, max_samplerate2);
 
-	ui->maxFreq->setMaxValue(max_samplerate / 2 - 1);
+	ui->maxFreq->setMaxValue((double) max_samplerate / 2.5 - 1.0);
 
 	connect(ui->minFreq, SIGNAL(valueChanged(double)),
 			this, SLOT(updateNumSamples()));
