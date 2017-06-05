@@ -328,8 +328,14 @@ void NetworkAnalyzer::run()
 		if (buf_dac2)
 			iio_buffer_destroy(buf_dac2);
 
+		double mag;
+		if (ui->refCh1->isChecked()) {
+			phase = -phase;
+			mag = 10.0 * log10(mag2) - 10.0 * log10(mag1);
+		} else {
+			mag = 10.0 * log10(mag1) - 10.0 * log10(mag2);
+		}
 
-		double mag = 10.0 * log10(mag1) - 10.0 * log10(mag2);
 		qDebug() << "Frequency" << frequency << "Hz," <<
 			adc_rate << "SPS," << buffer_size << "samples," <<
 			mag << "Mag," << phase << "Deg, ratio" << ratio;
@@ -617,4 +623,20 @@ void NetworkAnalyzer_API::setLogFreq(bool is_log)
 		net->ui->isLog->setChecked(true);
 	else
 		net->ui->isLinear->setChecked(true);
+}
+
+int NetworkAnalyzer_API::getRefChannel() const
+{
+	if (net->ui->refCh1->isChecked())
+		return 1;
+	else
+		return 2;
+}
+
+void NetworkAnalyzer_API::setRefChannel(int chn)
+{
+	if (chn == 1)
+		net->ui->refCh1->setChecked(true);
+	else
+		net->ui->refCh2->setChecked(true);
 }

@@ -117,6 +117,9 @@ namespace adiscope {
 
 		Q_PROPERTY(bool log_freq READ isLogFreq WRITE setLogFreq);
 
+		Q_PROPERTY(int ref_channel READ getRefChannel
+				WRITE setRefChannel);
+
 	public:
 		explicit NetworkAnalyzer_API(NetworkAnalyzer *net) :
 			ApiObject(), net(net) {}
@@ -146,6 +149,9 @@ namespace adiscope {
 
 		bool isLogFreq() const;
 		void setLogFreq(bool is_log);
+
+		int getRefChannel() const;
+		void setRefChannel(int chn);
 
 	private:
 		NetworkAnalyzer *net;
