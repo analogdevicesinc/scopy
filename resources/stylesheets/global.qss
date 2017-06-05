@@ -244,3 +244,18 @@ QAbstractSpinBox::down-button:pressed
 {
 	border-image: url(:/icons/sba_dn_btn_pressed.svg);
 }
+
+QGroupBox {
+	border: 2px solid rgba(255, 255, 255, 40);
+	border-radius: 8px;
+	color: rgba(255, 255, 255, 40);
+	font-size: 16px;
+	font-weight: bold;
+	margin-top: 9px;
+	padding-top: 5px;
+}
+
+QGroupBox::title {
+	subcontrol-origin: margin;
+	subcontrol-position: top left; /* position at the top center */
+}
