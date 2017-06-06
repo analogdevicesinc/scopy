@@ -586,12 +586,14 @@ void LogicAnalyzerChannelGroup::setChannelForDecoder(const srd_channel* ch,
 		auto itByKey = channels_.find(ch);
 		auto itByValue = (findByValue(ch_id) == nullptr) ? channels_.end() : channels_.find(findByValue(ch_id));
 		if( itByKey != channels_.end() && itByValue != channels_.end() && itByKey != itByValue) {
-			getChannelById(itByKey->second)->setChannel_role(nullptr);
+			if( getChannelById(itByKey->second))
+				getChannelById(itByKey->second)->setChannel_role(nullptr);
 			channels_.at(ch) = ch_id;
 			itByValue->second = -1;
 		}
 		else if( itByKey != channels_.end() ) {
-			getChannelById(itByKey->second)->setChannel_role(nullptr);
+			if( getChannelById(itByKey->second))
+				getChannelById(itByKey->second)->setChannel_role(nullptr);
 			channels_.at(ch) = ch_id;
 		}
 		else if( itByValue != channels_.end() ) {
