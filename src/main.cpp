@@ -31,6 +31,10 @@ int main(int argc, char **argv)
 {
 	QApplication app(argc, argv);
 
+	QFont font("sans");
+	font.setStyleStrategy(QFont::PreferAntialias);
+	app.setFont(font);
+
 	if (app.styleSheet().isEmpty()) {
 		QFile file(":/stylesheets/stylesheets/global.qss");
 		file.open(QFile::ReadOnly);
