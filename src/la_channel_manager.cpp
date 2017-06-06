@@ -21,6 +21,7 @@
 #include "pulseview/pv/widgets/colourbutton.hpp"
 #include "pulseview/pv/view/tracepalette.hpp"
 #include "pulseview/pv/binding/decoder.hpp"
+#include "scroll_filter.hpp"
 
 using std::dynamic_pointer_cast;
 
@@ -1361,6 +1362,7 @@ LogicAnalyzerChannelManagerUI::LogicAnalyzerChannelManagerUI(QWidget *parent,
 	chm->highlightChannel(chm->get_channel_group(0));
 	showHighlight(true);
 	ui->scrollAreaWidgetContents->installEventFilter(this);
+	eventFilterGuard = new MouseWheelWidgetGuard(this);
 	Q_EMIT(widthChanged(geometry().width()));
 }
 
@@ -1812,6 +1814,10 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 	connect(ui->scrollArea->verticalScrollBar(), SIGNAL(rangeChanged(int,int)),
 	        this, SLOT(chmRangeChanged(int,int)));
 	la->get_channel_groups_api();
+
+	if(!eventFilterGuard)
+		eventFilterGuard = new MouseWheelWidgetGuard(this);
+	eventFilterGuard->installEventRecursively(this);
 }
 
 void LogicAnalyzerChannelManagerUI::chmScrollChanged(int value)
@@ -2096,6 +2102,7 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 		generalSettingsUi->nameLineEdit->setText(QString::fromStdString(chGroup->get_label()));
 		QString ch_thickness = QString::number(chGroup->getCh_thickness());
 		generalSettingsUi->cmbThickness->setCurrentText(ch_thickness);
+
 		colour_button_BG->set_colour(chGroup->getBgcolor());
 		colour_button_edge->set_colour(chGroup->getEdgecolor());
 		colour_button_high->set_colour(chGroup->getHighcolor());
@@ -2184,6 +2191,7 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 				}
 				optChUI->roleCombo->setProperty("id", QVariant(optch->id));
 				optChUI->roleCombo->setProperty("name", QVariant(optch->name));
+
 				settingsUI->verticalLayout_1->insertWidget(
 					settingsUI->verticalLayout_1->count()-1, r);
 
@@ -2230,6 +2238,7 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 		generalSettingsUi->nameLineEdit->setText(QString::fromStdString(ch->get_label()));
 		QString ch_thickness = QString::number(ch->getCh_thickness());
 		generalSettingsUi->cmbThickness->setCurrentText(ch_thickness);
+
 		showColorSettings(true);
 
 		colour_button_BG->set_colour(ch->getBgcolor());
@@ -2257,6 +2266,7 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 	}
 
 	locationSettingsWidget->setVisible(true);
+	la->installWheelEventGuard();
 }
 
 void LogicAnalyzerChannelManagerUI::deleteSettingsWidget()

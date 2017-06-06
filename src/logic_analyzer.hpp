@@ -70,6 +70,7 @@ namespace adiscope {
 class LogicAnalyzer_API;
 class ChannelGroup_API;
 class LogicChannel_API;
+class MouseWheelWidgetGuard;
 
 class LogicAnalyzer : public QWidget
 {
@@ -97,6 +98,7 @@ public:
 	void captured();
 	void setTriggerCache(int chid, std::string trigger_value);
 	void get_channel_groups_api();
+	void installWheelEventGuard();
 
 private Q_SLOTS:
 	void startStop(bool start);
@@ -238,6 +240,7 @@ private:
 
 	DigitalBufferPreviewer *buffer_previewer;
 	void set_buffersize();
+	MouseWheelWidgetGuard *wheelEventGuard;
 };
 
 class LogicAnalyzer_API : public ApiObject

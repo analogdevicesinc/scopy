@@ -41,6 +41,7 @@
 #include "streams_to_short.h"
 #include "logic_analyzer.hpp"
 #include "spinbox_a.hpp"
+#include "scroll_filter.hpp"
 
 /* Sigrok includes */
 #include "libsigrokcxx/libsigrokcxx.hpp"
@@ -429,6 +430,13 @@ void LogicAnalyzer::get_channel_groups_api()
 	for(int i=0; i < chm.get_channel_group_count(); i++) {
 		channel_groups_api.append(new ChannelGroup_API(this, i, false));
 	}
+}
+
+void LogicAnalyzer::installWheelEventGuard()
+{
+	if(!wheelEventGuard)
+		wheelEventGuard = new MouseWheelWidgetGuard(this);
+	wheelEventGuard->installEventRecursively(this);
 }
 
 void LogicAnalyzer::resizeEvent()

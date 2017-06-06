@@ -40,6 +40,7 @@ class LogicAnalyzer;
 class LogicAnalyzerChannelGroup;
 class LogicAnalyzerChannelGroupUI;
 class LogicAnalyzerChannelManagerUI;
+class MouseWheelWidgetGuard;
 
 class LogicAnalyzerChannel : public Channel
 {
@@ -323,6 +324,7 @@ private:
 	QFrame* addSeparator(QVBoxLayout *lay, int pos);
 	void createColorButtons();
 	void showColorSettings(bool);
+	MouseWheelWidgetGuard *eventFilterGuard;
 Q_SIGNALS:
 	void widthChanged(int);
 };
