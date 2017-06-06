@@ -138,6 +138,7 @@ private:
 	QSocketNotifier notifier;
 	QString previousIp;
 
+	void loadToolTips(bool connected);
 	QVector<QString> searchDevices();
 	void swapMenu(QWidget *menu);
 	void destroyContext();

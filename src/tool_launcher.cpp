@@ -105,6 +105,10 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	ui->btnHome->toggle();
 
 
+
+	loadToolTips(false);
+
+
 #if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
 	js_engine.installExtensions(QJSEngine::ConsoleExtension);
 #endif
@@ -218,6 +222,33 @@ void ToolLauncher::updateListOfDevices(const QVector<QString>& uris)
 	search_timer->start(TIMER_TIMEOUT_MS);
 }
 
+void ToolLauncher::loadToolTips(bool connected){
+	if (connected){
+		ui->btnHome->setToolTip(QString("Click to open the home menu"));
+		ui->btnDigitalIO->setToolTip(QString("Click to open the Digital IO tool"));
+		ui->btnLogicAnalyzer->setToolTip(QString("Click to open the Logical Analyzer tool"));
+		ui->btnNetworkAnalyzer->setToolTip(QString("Click to open the Network Analyzer tool"));
+		ui->btnOscilloscope->setToolTip(QString("Click to open the Oscilloscope tool"));
+		ui->btnPatternGenerator->setToolTip(QString("Click to open the Pattern Generator tool"));
+		ui->btnPowerControl->setToolTip(QString("Click to open the Power Supply tool"));
+		ui->btnSignalGenerator->setToolTip(QString("Click to open the Signal Generator tool"));
+		ui->btnSpectrumAnalyzer->setToolTip(QString("Click to open the Spectrum Analyzer tool"));
+		ui->btnDMM->setToolTip(QString("Click to open the Voltmeter tool"));
+		ui->btnConnect->setToolTip(QString("Click to disconnect the device"));
+	} else {
+		ui->btnHome->setToolTip(QString());
+		ui->btnDigitalIO->setToolTip(QString());
+		ui->btnLogicAnalyzer->setToolTip(QString());
+		ui->btnNetworkAnalyzer->setToolTip(QString());
+		ui->btnOscilloscope->setToolTip(QString());
+		ui->btnPatternGenerator->setToolTip(QString());
+		ui->btnPowerControl->setToolTip(QString());
+		ui->btnSignalGenerator->setToolTip(QString());
+		ui->btnSpectrumAnalyzer->setToolTip(QString());
+		ui->btnDMM->setToolTip(QString());
+		ui->btnConnect->setToolTip(QString("Select a device first"));
+	}
+}
 
 void ToolLauncher::update()
 {
@@ -385,6 +416,11 @@ void adiscope::ToolLauncher::device_btn_clicked(bool pressed)
 
 	resetStylesheets();
 	ui->btnConnect->setEnabled(pressed);
+	if (pressed){
+		ui->btnConnect->setToolTip(QString("Click to connect the device"));
+	} else {
+		ui->btnConnect->setToolTip(QString("Select a device first"));
+	}
 }
 
 void adiscope::ToolLauncher::disconnect()
@@ -405,6 +441,7 @@ void adiscope::ToolLauncher::disconnect()
 		ui->stopSpectrumAnalyzer->setChecked(false);
 
 		destroyContext();
+		loadToolTips(false);
 		resetStylesheets();
 		search_timer->start(TIMER_TIMEOUT_MS);
 	}
@@ -425,6 +462,7 @@ void adiscope::ToolLauncher::on_btnConnect_clicked(bool pressed)
 {
 	if (ctx) {
 		disconnect();
+		ui->btnConnect->setToolTip(QString("Click to connect the device"));
 		return;
 	}
 
@@ -730,7 +768,7 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 		ui->networkAnalyzer->setEnabled(true);
 	}
 
-
+	loadToolTips(true);
 	QtConcurrent::run(std::bind(&ToolLauncher::calibrate, this));
 
 	return true;
