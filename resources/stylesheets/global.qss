@@ -10,6 +10,14 @@ QWidget {
 	font: 75 10pt "DejaVu Sans";
 }
 
+QToolTip {
+    padding: 6px;
+    border: 1px solid rgba(149, 152, 154, 150);
+    background-color: #272730;
+    font: 75 10pt "DejaVu Sans";
+    color: white;
+}
+
 QLabel {
 	color: rgba(255, 255, 255, 150);
 	font-size: 14px;
