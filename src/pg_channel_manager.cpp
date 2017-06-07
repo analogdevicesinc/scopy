@@ -563,6 +563,10 @@ void PatternGeneratorChannelGroupUI::enable(bool enabled)
 	ChannelGroupUI::enable(enabled);
 	enableControls(enabled);
 	Q_EMIT channel_enabled();
+
+	if (this->getChannelGroup() == managerUi->chm->getHighlightedChannelGroup()) {
+		managerUi->pg->enableBufferUpdates(enabled);
+	}
 }
 
 int PatternGeneratorChannelGroupUI::isChecked()

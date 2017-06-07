@@ -291,9 +291,6 @@ public:
 	void clearHoverWidget();
 
 	void groupSplitSelected();
-	PatternGeneratorChannelGroup *getSelectedChannelGroup() const;
-	void setSelectedChannelGroup(PatternGeneratorChannelGroup *value);
-
 	void retainWidgetSizeWhenHidden(QWidget *w);
 	void setWidgetNrOfChars(QWidget *w, int minNrOfChars, int maxNrOfChars=0);
 	bool eventFilter(QObject *object, QEvent *event);

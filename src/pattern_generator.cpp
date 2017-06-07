@@ -117,6 +117,17 @@ PatternGenerator::runState PatternGenerator::pgStatus()
 	return _pgStatus;
 }
 
+void PatternGenerator::enableBufferUpdates(bool enabled)
+{
+	if (enabled) {
+		connect(getCurrentPatternUI(),SIGNAL(patternParamsChanged()),bufui,
+		        SLOT(updateUi()));
+	} else {
+		disconnect(getCurrentPatternUI(),SIGNAL(patternParamsChanged()),bufui,
+		           SLOT(updateUi()));
+	}
+}
+
 void PatternGenerator::setPGStatus(PatternGenerator::runState val)
 {
 	_pgStatus = val;
@@ -455,7 +466,10 @@ void PatternGenerator::createSettingsWidget()
 	currentUI->setVisible(true);
 
 	connect(currentUI,SIGNAL(decoderChanged()),chmui,SLOT(triggerUpdateUi()));
-	connect(currentUI,SIGNAL(patternChanged()),bufui,SLOT(updateUi()));
+
+	if (chg->is_enabled()) {
+		enableBufferUpdates(true);
+	}
 }
 
 void PatternGenerator::colorChanged(QColor color)
