@@ -224,7 +224,10 @@ void NetworkAnalyzer::run()
 		double ratio = (double) adc_rate / frequency;
 
 		unsigned long buffer_size;
-		if (ratio <= 5.0)
+
+		if (adc_rate < 10000)
+			buffer_size = 2.0 * ratio;
+		else if (ratio <= 5.0)
 			buffer_size = 128.0 * ratio;
 		else if (ratio <= 10.0)
 			buffer_size = 64.0 * ratio;
