@@ -131,7 +131,7 @@ QLabel{
             </size>
            </property>
            <property name="text">
-            <string>View</string>
+            <string>Enable</string>
            </property>
           </widget>
          </item>
