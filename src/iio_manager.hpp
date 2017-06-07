@@ -58,7 +58,7 @@ namespace adiscope {
 		 * Warning: the flowgraph needs to be locked first! */
 		port_id connect(gr::basic_block_sptr dst, int src_port,
 				int dst_port, bool use_float = false,
-				unsigned long buffer_size = 0);
+				unsigned long buffer_size = IIO_BUFFER_SIZE);
 
 		/* Connect two regular blocks between themselves. */
 		void connect(gr::basic_block_sptr src, int src_port,
@@ -99,13 +99,12 @@ namespace adiscope {
 		static std::map<const std::string, map_entry> dev_map;
 		static unsigned _id;
 		std::mutex copy_mutex;
-		std::mutex buffer_mutex;
 		bool _started;
 
 		unsigned long buffer_size;
 		std::vector<unsigned long> buffer_sizes;
 
-		std::vector<port_id> copy_blocks;
+		std::vector<std::pair<port_id, unsigned long> > copy_blocks;
 
 		gr::iio::device_source::sptr iio_block;
 
@@ -123,7 +122,7 @@ namespace adiscope {
 
 		void del_connection(gr::basic_block_sptr block, bool reverse);
 
-		void set_buffer_size_unlocked(unsigned long size);
+		void update_buffer_size_unlocked();
 
 	private Q_SLOTS:
 		void got_timeout();

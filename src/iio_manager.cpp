@@ -116,7 +116,7 @@ iio_manager::port_id iio_manager::connect(basic_block_sptr dst,
 	/* The copy block is used as a valve to turn on/off this
 	 * specific channel. */
 	auto copy = blocks::copy::make(sizeof(short));
-	copy_blocks.push_back(copy);
+	copy_blocks.push_back(std::make_pair(copy, _buffer_size));
 
 	/* Disable the valve by default. */
 	copy->set_enabled(false);
@@ -135,13 +135,6 @@ iio_manager::port_id iio_manager::connect(basic_block_sptr dst,
 		iio_manager::connect(copy, 0, dst, dst_port);
 	}
 
-	buffer_mutex.lock();
-	if (_buffer_size > this->buffer_size)
-		this->set_buffer_size_unlocked(_buffer_size);
-
-	buffer_sizes.push_back(_buffer_size);
-
-	buffer_mutex.unlock();
 	copy_mutex.unlock();
 
 	/* Returns an ID that identifies the connection to the port,
@@ -155,26 +148,31 @@ void iio_manager::disconnect(iio_manager::port_id copy)
 
 	copy->set_enabled(false);
 
-	auto pos = std::find(copy_blocks.begin(), copy_blocks.end(), copy);
-	copy_blocks.erase(pos);
+	for (auto it = copy_blocks.begin(); it != copy_blocks.end(); ++it) {
+		if (it->first == copy) {
+			copy_blocks.erase(it);
+			break;
+		}
+	}
 
 	del_connection(copy, false);
 	hier_block2::disconnect(copy);
-
-	buffer_mutex.lock();
-	buffer_sizes.erase(buffer_sizes.begin() + (pos - copy_blocks.begin()));
-
-	unsigned long size = 0;
-	for (auto it = buffer_sizes.begin(); it != buffer_sizes.end(); ++it)
-		if (*it > size)
-			size = *it;
-	if (!size)
-		size = IIO_BUFFER_SIZE;
-	if (size != this->buffer_size)
-		this->set_buffer_size_unlocked(size);
-
-	buffer_mutex.unlock();
 	copy_mutex.unlock();
+}
+
+void iio_manager::update_buffer_size_unlocked()
+{
+	unsigned long size = 0;
+
+	for (auto it = copy_blocks.begin(); it != copy_blocks.end(); ++it) {
+		if (it->first->enabled() && size < it->second)
+			size = it->second;
+	}
+
+	if (size) {
+		iio_block->set_buffer_size(size);
+		this->buffer_size = size;
+	}
 }
 
 void iio_manager::start(iio_manager::port_id copy)
@@ -184,15 +182,17 @@ void iio_manager::start(iio_manager::port_id copy)
 	if (copy->enabled())
 		goto unlock;
 
+	qDebug() << "Enabling copy block" << copy->alias().c_str();
+	copy->set_enabled(true);
+
+	update_buffer_size_unlocked();
+
 	if (!_started) {
 		qDebug() << "Starting top block";
 		top_block::start();
 	}
 
-	qDebug() << "Enabling copy block" << copy->alias().c_str();
-	copy->set_enabled(true);
 	_started = true;
-
 unlock:
 	copy_mutex.unlock();
 }
@@ -215,7 +215,7 @@ void iio_manager::stop(iio_manager::port_id copy)
 	/* Verify whether all blocks are disabled */
 	for (auto it = copy_blocks.cbegin();
 			!inuse && it != copy_blocks.cend(); ++it)
-		inuse = (*it)->enabled();
+		inuse = it->first->enabled();
 
 	if (!inuse) {
 		qDebug() << "Stopping top block";
@@ -223,6 +223,8 @@ void iio_manager::stop(iio_manager::port_id copy)
 		top_block::wait();
 
 		_started = false;
+	} else {
+		update_buffer_size_unlocked();
 	}
 
 unlock:
@@ -232,7 +234,7 @@ unlock:
 void iio_manager::stop_all()
 {
 	for (auto it = copy_blocks.begin(); it != copy_blocks.end(); ++it)
-		stop(*it);
+		stop(it->first);
 }
 
 void iio_manager::connect(gr::basic_block_sptr src, int src_port,
@@ -304,22 +306,19 @@ void iio_manager::del_connection(gr::basic_block_sptr block, bool reverse)
 		del_connection(block, false);
 }
 
-void iio_manager::set_buffer_size_unlocked(unsigned long size)
-{
-	iio_block->set_buffer_size((unsigned int) size);
-	this->buffer_size = size;
-}
-
 void iio_manager::set_buffer_size(iio_manager::port_id copy, unsigned long size)
 {
-	buffer_mutex.lock();
-	if (size > this->buffer_size)
-		this->set_buffer_size_unlocked(size);
+	copy_mutex.lock();
 
-	auto pos = std::find(copy_blocks.begin(), copy_blocks.end(), copy);
-	buffer_sizes[pos - copy_blocks.begin()] = size;
+	for (auto it = copy_blocks.begin(); it != copy_blocks.end(); ++it) {
+		if (it->first == copy) {
+			it->second = size;
+			break;
+		}
+	}
 
-	buffer_mutex.unlock();
+	update_buffer_size_unlocked();
+	copy_mutex.unlock();
 }
 
 void iio_manager::got_timeout()
