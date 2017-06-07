@@ -161,7 +161,9 @@ void WellArray::paintCell(QPainter* p, int row, int col, const QRect &rect)
 void WellArray::paintCellContents(QPainter *p, int row, int col, const QRect &r)
 {
     if (d) {
-        p->fillRect(r, d->brush[row*numCols()+col]);
+	p->setPen(Qt::NoPen);
+	p->setBrush(d->brush[row*numCols()+col]);
+	p->drawRoundedRect(r, 4, 4);
     } else {
         p->fillRect(r, Qt::white);
         p->setPen(Qt::black);

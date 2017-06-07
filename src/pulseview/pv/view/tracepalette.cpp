@@ -25,7 +25,7 @@ namespace view {
 
 const QColor TracePalette::Colours[Cols * Rows] = {
 	//Row1
-	QColor("#F44336"),
+	QColor(0xC0, 0x00, 0x00),
 	QColor("#E91E63"),
 	QColor("#9C27B0"),
 	QColor("#673AB7"),
@@ -49,7 +49,7 @@ const QColor TracePalette::Colours[Cols * Rows] = {
 	QColor("#FF5721"),
 
 	//Row5
-	QColor("#795448"),
+	QColor(),
 	QColor("#9E9E9E"),
 	QColor("#607D8B"),
 	QColor("#FFFFFF"),

@@ -24,6 +24,7 @@
 
 #include <QApplication>
 #include <QPainter>
+#include <QStyle>
 
 namespace pv {
 namespace widgets {
@@ -37,11 +38,13 @@ ColourButton::ColourButton(int rows, int cols, QWidget *parent) :
 	connect(this, SIGNAL(clicked(bool)), this, SLOT(on_clicked(bool)));
 	connect(&popup_, SIGNAL(selected(int, int)),
 		this, SLOT(on_selected(int, int)));
-	setMinimumWidth(80);
-	setMaximumWidth(80);
-	setMinimumHeight(20);
-	setMaximumHeight(20);
+	setMinimumWidth(90);
+	setMaximumWidth(90);
+	setMinimumHeight(25);
+	setMaximumHeight(25);
 	this->setFocusPolicy(Qt::NoFocus);
+	setIcon(QIcon(":/icons/gear_wheel.svg"));
+	setIconSize(QSize(25, 25));
 }
 
 ColourPopup& ColourButton::popup()
@@ -102,7 +105,13 @@ void ColourButton::paintEvent(QPaintEvent *event)
 	QPainter p(this);
 	p.setPen(QPen(cur_colour_));
 	p.setBrush(QBrush(cur_colour_));
-	p.drawRect(rect());
+	p.drawRoundedRect(rect(), 4, 4);
+
+
+	if(!this->icon().isNull())
+		//Draw the icon at 75% button height
+		style()->drawItemPixmap(&p, rect(),Qt::AlignRight|Qt::AlignVCenter,
+			this->icon().pixmap(rect().height()));
 }
 
 } // widgets
