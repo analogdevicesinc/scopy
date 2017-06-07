@@ -34,7 +34,6 @@
   <property name="styleSheet">
    <string notr="true">QWidget
 {
-  background-color: rgb(39, 39, 48);
   color: rgb(190, 190, 190);
   font: 75 10pt &quot;DejaVu Sans&quot;;
 }
@@ -94,13 +93,13 @@ background-color: rgb(73, 99, 255);
     <number>0</number>
    </property>
    <property name="leftMargin">
-    <number>18</number>
+    <number>0</number>
    </property>
    <property name="topMargin">
     <number>10</number>
    </property>
    <property name="rightMargin">
-    <number>18</number>
+    <number>0</number>
    </property>
    <property name="bottomMargin">
     <number>0</number>
@@ -108,16 +107,30 @@ background-color: rgb(73, 99, 255);
    <item>
     <widget class="QLabel" name="trigger_settings_label">
      <property name="styleSheet">
-      <string notr="true">  background:  rgb(39, 39, 48);
-  min-width: 135px;
-  padding-bottom: 5px;
+      <string notr="true">  min-width: 135px;
+  padding-bottom: 15px;
   font: bold;
   color: white;
-  border-bottom: 2px solid rgba(243, 109, 10);
   margin-top: 0px;</string>
      </property>
      <property name="text">
       <string>Trigger Settings</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="Line" name="line_2">
+     <property name="styleSheet">
+      <string notr="true">color: #4A64FF;</string>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
+     <property name="lineWidth">
+      <number>2</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
@@ -130,7 +143,7 @@ background-color: rgb(73, 99, 255);
       <number>0</number>
      </property>
      <property name="topMargin">
-      <number>10</number>
+      <number>20</number>
      </property>
      <property name="rightMargin">
       <number>0</number>
@@ -149,6 +162,9 @@ background-color: rgb(73, 99, 255);
       <layout class="QHBoxLayout" name="horizontalLayout">
        <property name="spacing">
         <number>20</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
        </property>
        <property name="bottomMargin">
         <number>10</number>
