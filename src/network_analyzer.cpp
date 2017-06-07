@@ -307,7 +307,11 @@ void NetworkAnalyzer::run()
 			iio->unlock();
 
 		do {
+			QCoreApplication::processEvents();
 			QThread::msleep(10);
+
+			if (!ui->run_button->isChecked())
+				break;
 		} while (!got_it);
 
 		iio->stop(id1);
@@ -324,6 +328,9 @@ void NetworkAnalyzer::run()
 		iio_buffer_destroy(buf_dac1);
 		if (buf_dac2)
 			iio_buffer_destroy(buf_dac2);
+
+		if (!got_it) /* Process was cancelled */
+			return;
 
 		double mag;
 		if (ui->refCh1->isChecked()) {
