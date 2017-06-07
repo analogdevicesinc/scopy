@@ -221,7 +221,7 @@ public:
 	}
 	void setId(int val)
 	{
-	//	ch->set_id(val);
+		//	ch->set_id(val);
 	}
 	int mask()
 	{

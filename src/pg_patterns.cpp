@@ -525,7 +525,7 @@ void ClockPatternUI::parse_ui()
 	pattern->set_phase(phaseSpinButton->value());
 	pattern->set_duty_cycle(dutySpinButton->value());
 
-	Q_EMIT patternChanged();
+	Q_EMIT patternParamsChanged();
 
 }
 
@@ -615,7 +615,7 @@ void NumberPatternUI::parse_ui()
 
 	pattern->set_nr(val);
 
-	Q_EMIT patternChanged();
+	Q_EMIT patternParamsChanged();
 }
 
 RandomPattern::RandomPattern()
@@ -708,7 +708,7 @@ Pattern *RandomPatternUI::get_pattern()
 void RandomPatternUI::parse_ui()
 {
 	pattern->set_frequency(frequencySpinButton->value());
-	Q_EMIT patternChanged();
+	Q_EMIT patternParamsChanged();
 }
 
 void RandomPatternUI::build_ui(QWidget *parent,uint16_t number_of_channels)
@@ -895,7 +895,7 @@ void BinaryCounterPatternUI::parse_ui()
 	if(!ok) qDebug()<<"Cannot set frequency, not a uint16";
 	pattern->set_increment(ui->incrementEdit->text().toUInt(&ok));
 	if(!ok) qDebug()<<"Cannot set frequency, not a uint16";*/
-	Q_EMIT patternChanged();
+	Q_EMIT patternParamsChanged();
 }
 
 GrayCounterPattern::GrayCounterPattern()
@@ -993,7 +993,7 @@ void GrayCounterPatternUI::parse_ui()
 	if(!ok) qDebug()<<"Cannot set frequency, not a uint16";
 	pattern->set_increment(ui->incrementEdit->text().toUInt(&ok));
 	if(!ok) qDebug()<<"Cannot set frequency, not a uint16";*/
-	Q_EMIT patternChanged();
+	Q_EMIT patternParamsChanged();
 }
 
 
@@ -1329,7 +1329,7 @@ void UARTPatternUI::parse_ui()
 	qDebug()<<ui->LE_Data->text();
 	pattern->set_string(ui->LE_Data->text().toStdString());
 
-	Q_EMIT patternChanged();
+	Q_EMIT patternParamsChanged();
 
 	if (oldStr != newStr) {
 		Q_EMIT decoderChanged();
@@ -1672,7 +1672,7 @@ void I2CPatternUI::parse_ui()
 	}
 
 
-	Q_EMIT patternChanged();
+	Q_EMIT patternParamsChanged();
 
 }
 
@@ -1990,7 +1990,7 @@ void SPIPatternUI::parse_ui()
 	}
 
 
-	Q_EMIT patternChanged();
+	Q_EMIT patternParamsChanged();
 
 	if (oldbpf!=pattern->getBytesPerFrame() || oldcpha!=pattern->getCPHA()
 	    || oldcpol!=pattern->getCPOL() || oldcspol != pattern->getCSPol()

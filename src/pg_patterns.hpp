@@ -176,7 +176,7 @@ public:
 	virtual void parse_ui();
 	virtual void destroy_ui();
 Q_SIGNALS:
-	void patternChanged();
+	void patternParamsChanged();
 	void decoderChanged();
 };
 

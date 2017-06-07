@@ -110,7 +110,8 @@ const char *PatternGenerator::channelNames[] = {
 	"voltage12", "voltage13", "voltage14", "voltage15"
 };
 
-QStringList PatternGenerator::strStatus = QStringList() << "STOPPED"<<"CONFIG"<<"RUNNING"<<"WAITING";
+QStringList PatternGenerator::strStatus = QStringList() <<
+                "STOPPED"<<"CONFIG"<<"RUNNING"<<"WAITING";
 
 PatternGenerator::runState PatternGenerator::pgStatus()
 {
@@ -674,8 +675,7 @@ void PatternGenerator::updateBufferSize()
 
 void PatternGenerator::reloadBufferInDevice()
 {
-	if(pgStatus()!=STOPPED)
-	{
+	if (pgStatus()!=STOPPED) {
 		stopPatternGeneration();
 		startPatternGeneration(true);
 	}
@@ -689,6 +689,7 @@ bool PatternGenerator::startPatternGeneration(bool cyclic)
 	if (offline_mode) {
 		return true;
 	}
+
 	setPGStatus(CONFIG);
 
 	if (!dev) {
@@ -756,6 +757,7 @@ void PatternGenerator::stopPatternGeneration()
 			iio_channel_disable(ch);
 		}
 	}
+
 	setPGStatus(STOPPED);
 
 }
