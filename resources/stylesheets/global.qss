@@ -1,5 +1,5 @@
 /* Default background color */
-QMainWindow > .QWidget, adiscope--Sismograph > QwtPlotCanvas, QMessageBox {
+QMainWindow > .QWidget, adiscope--Sismograph > QwtPlotCanvas, QMessageBox, QToolTip {
 	background-color: #272730;
 }
 
@@ -7,14 +7,13 @@ QMainWindow > .QWidget, adiscope--Sismograph > QwtPlotCanvas, QMessageBox {
 QWidget {
 	background-color: transparent;
 	color: #bebebe;
-	font: 75 10pt "DejaVu Sans";
+	font-weight: 75;
+	font-size: 13px;
 }
 
 QToolTip {
     padding: 6px;
     border: 1px solid rgba(149, 152, 154, 150);
-    background-color: #272730;
-    font: 75 10pt "DejaVu Sans";
     color: white;
 }
 
@@ -69,7 +68,7 @@ QwtScaleWidget {
 
 QwtThermo {
 	color: #999999;
-	font-size: 20pt;
+	font-size: 26px;
 }
 
 adiscope--BufferPreviewer {
