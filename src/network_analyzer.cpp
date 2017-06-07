@@ -242,9 +242,6 @@ void NetworkAnalyzer::run()
 		auto id2 = iio->connect(f2c2, 1, 0, true,
 				buffer_size);
 
-		iio->set_buffer_size(id1, buffer_size);
-		iio->set_buffer_size(id2, buffer_size);
-
 		auto null = blocks::null_source::make(sizeof(float));
 		iio->connect(null, 0, f2c1, 1);
 		iio->connect(null, 0, f2c2, 1);
