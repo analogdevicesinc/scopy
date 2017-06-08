@@ -744,13 +744,14 @@ void PatternGenerator::stopPatternGeneration()
 {
 	/* Destroy buffer */
 	if (!offline_mode) {
+
+		/* Reset Tx Channls*/
+		diom->unlock();
+
 		if (buffer_created == true) {
 			iio_buffer_destroy(txbuf);
 			buffer_created = false;
 		}
-
-		/* Reset Tx Channls*/
-		diom->unlock();
 
 		for (int j = 0; j < no_channels; j++) {
 			auto ch = iio_device_find_channel(dev, channelNames[j], true);
