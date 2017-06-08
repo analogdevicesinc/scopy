@@ -206,9 +206,9 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 
 	for (auto var : PatternFactory::get_ui_list()) {
 		cgSettings->CBPattern->addItem(var);
-		cgSettings->CBPattern->setItemData(i,
-		                                   (PatternFactory::get_description_list())[i],Qt::ToolTipRole);
-		i++;
+		/*cgSettings->CBPattern->setItemData(i,
+						   (PatternFactory::get_description_list())[i],Qt::ToolTipRole);
+		i++;*/
 	}
 
 	connect(ui->btnChSettings, SIGNAL(pressed()), this, SLOT(toggleRightMenu()));
