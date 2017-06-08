@@ -638,7 +638,7 @@ QPushButton:!checked {
                    <double>0.000001000000000</double>
                   </property>
                   <property name="max_value" stdset="0">
-                   <double>5.000000000000000</double>
+                   <double>10.000000000000000</double>
                   </property>
                   <property name="show_progress" stdset="0">
                    <bool>false</bool>
