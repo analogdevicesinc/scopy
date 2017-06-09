@@ -111,7 +111,7 @@ public:
 
 	void restart_acquisition();
 
-	void export_file();
+	QString export_file();
 
 public Q_SLOTS:
 	void export_file(std::shared_ptr<sigrok::OutputFormat> format,

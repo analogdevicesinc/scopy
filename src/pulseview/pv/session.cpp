@@ -672,6 +672,13 @@ void Session::feed_in_logic(shared_ptr<Logic> logic)
 	data_received();
 }
 
+bool Session::is_data()
+{
+	if(logic_data_->segments().size() == 0)
+		return false;
+	return true;
+}
+
 void Session::feed_in_analog(shared_ptr<Analog> analog)
 {
 	lock_guard<recursive_mutex> lock(data_mutex_);

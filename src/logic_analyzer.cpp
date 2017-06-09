@@ -392,6 +392,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	chm_ui->setWidgetMinimumNrOfChars(ui->triggerStateLabel, 9);
 	state_timer->setInterval(2);
 	chm_ui->update_ui();
+	ui->lblExportStatus->setText("Not exported");
 }
 
 LogicAnalyzer::~LogicAnalyzer()
@@ -473,7 +474,15 @@ void LogicAnalyzer::updateAreaTimeTrigger()
 
 void LogicAnalyzer::btnExportPressed()
 {
-	main_win->export_file();
+	if( !main_win->session_.is_data()) {
+		ui->lblExportStatus->setText("No data to export.");
+		return;
+	}
+	QString filename = main_win->export_file();
+	if(filename != "")
+		ui->lblExportStatus->setText("Exported");
+	else
+		ui->lblExportStatus->setText("Not exported");
 }
 
 double LogicAnalyzer::pickSampleRateFor(double timeSpanSecs, double desiredBuffersize)
@@ -786,6 +795,7 @@ int LogicAnalyzer::timeToPixel(double time)
 
 void LogicAnalyzer::startStop(bool start)
 {
+	ui->lblExportStatus->setText("Not exported");
 	if(!logic_analyzer_ptr)
 		return;
 	if (start) {
@@ -847,6 +857,7 @@ void LogicAnalyzer::setHWTriggerDelay(long long delay)
 
 void LogicAnalyzer::singleRun()
 {
+	ui->lblExportStatus->setText("Not exported");
 	if(!logic_analyzer_ptr)
 		return;
 	if( running )

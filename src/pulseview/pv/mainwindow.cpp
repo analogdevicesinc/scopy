@@ -255,7 +255,7 @@ std::shared_ptr<sigrok::OutputFormat> MainWindow::get_output_format_from_string(
 	return nullptr;
 }
 
-void MainWindow::export_file()
+QString MainWindow::export_file()
 {
 	using pv::dialogs::StoreProgress;
 	shared_ptr<OutputFormat> outputFormat;
@@ -296,11 +296,11 @@ void MainWindow::export_file()
 			tr("All Files"));
 
 	// Show the file dialog
-	const QString file_name = QFileDialog::getSaveFileName(
+	QString file_name = QFileDialog::getSaveFileName(
 		this, tr("Save File"), dir, filter, &selectedFilter);
 
 	if (file_name.isEmpty())
-		return;
+		return "";
 
 	const QString abs_path = QFileInfo(file_name).absolutePath();
 	settings.setValue(SettingSaveDirectory, abs_path);
@@ -308,7 +308,7 @@ void MainWindow::export_file()
 	if(selectedFilter != "")
 		outputFormat = get_output_format_from_string(selectedFilter);
 	if(!outputFormat)
-		return;
+		return "";
 
 	// Show the options dialog
 	map<string, Glib::VariantBase> options;
@@ -318,7 +318,7 @@ void MainWindow::export_file()
 				outputFormat->description())),
 			outputFormat->options(), this);
 		if (!dlg.exec())
-			return;
+			return "";
 		options = dlg.options();
 		dlg.hide();
 	}
@@ -327,6 +327,8 @@ void MainWindow::export_file()
 		sample_range, session_, this);
 	dlg->run();
 	dlg->hide();
+	dlg->cancel();
+	return file_name;
 }
 
 void MainWindow::export_file(shared_ptr<OutputFormat> format,

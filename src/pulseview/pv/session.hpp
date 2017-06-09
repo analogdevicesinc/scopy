@@ -147,6 +147,8 @@ public:
 
 	void set_timespanLimit(double value);
 
+	bool is_data();
+
 private:
 	void set_capture_state(capture_state state);
 
