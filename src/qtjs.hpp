@@ -20,6 +20,8 @@ public:
 	explicit QtJs(QJSEngine *engine);
 
 	Q_INVOKABLE void exit();
+	Q_INVOKABLE void sleep(unsigned long s);
+	Q_INVOKABLE void msleep(unsigned long ms);
 };
 
 }

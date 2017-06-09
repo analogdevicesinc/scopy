@@ -8,6 +8,8 @@
 #include <QApplication>
 #include <QJSEngine>
 #include <QMetaProperty>
+#include <QThread>
+#include <QElapsedTimer>
 
 using namespace adiscope;
 
@@ -30,4 +32,20 @@ QtJs::QtJs(QJSEngine *engine) : QObject(engine)
 void QtJs::exit()
 {
 	QApplication::closeAllWindows();
+}
+
+void QtJs::sleep(unsigned long s)
+{
+	msleep(s * 1000);
+}
+
+void QtJs::msleep(unsigned long ms)
+{
+	QElapsedTimer timer;
+
+	timer.start();
+	while (!timer.hasExpired(ms)) {
+		QCoreApplication::processEvents();
+		QThread::msleep(1);
+	}
 }
