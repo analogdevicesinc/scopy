@@ -18,6 +18,8 @@ class QtJs : public QObject
 
 public:
 	explicit QtJs(QJSEngine *engine);
+
+	Q_INVOKABLE void exit();
 };
 
 }

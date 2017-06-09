@@ -5,6 +5,7 @@
 
 #include "qtjs.hpp"
 
+#include <QApplication>
 #include <QJSEngine>
 #include <QMetaProperty>
 
@@ -24,4 +25,9 @@ QtJs::QtJs(QJSEngine *engine) : QObject(engine)
 
 	engine->globalObject().setProperty("inspect",
 			engine->evaluate("function(o) { for (each in o) { print(each); } }"));
+}
+
+void QtJs::exit()
+{
+	QApplication::closeAllWindows();
 }
