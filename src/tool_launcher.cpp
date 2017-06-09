@@ -23,6 +23,7 @@
 #include "oscilloscope.hpp"
 #include "spectrum_analyzer.hpp"
 #include "tool_launcher.hpp"
+#include "qtjs.hpp"
 
 #include "ui_device.h"
 #include "ui_tool_launcher.h"
@@ -108,10 +109,10 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 
 	loadToolTips(false);
 
-
 #if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
 	js_engine.installExtensions(QJSEngine::ConsoleExtension);
 #endif
+	QtJs *js_object = new QtJs(&js_engine);
 	tl_api->js_register(&js_engine);
 
 	connect(&notifier, SIGNAL(activated(int)), this, SLOT(hasText()));
