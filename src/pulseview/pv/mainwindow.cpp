@@ -328,6 +328,7 @@ QString MainWindow::export_file()
 	dlg->run();
 	dlg->hide();
 	dlg->cancel();
+	delete dlg;
 	return file_name;
 }
 
