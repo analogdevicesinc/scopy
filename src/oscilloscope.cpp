@@ -64,7 +64,7 @@ using namespace std;
 Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		std::shared_ptr<GenericAdc> adc, QPushButton *runButton,
 		 QJSEngine *engine, QWidget *parent) :
-	QWidget(parent),
+	Tool(ctx, runButton, new Oscilloscope_API(this), parent),
 	adc(adc),
 	m2k_adc(dynamic_pointer_cast<M2kAdc>(adc)),
 	nb_channels(Oscilloscope::adc->numAdcChannels()),
@@ -89,8 +89,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	menuOpened(false), current_channel(-1), math_chn_counter(0),
 	channels_group(new QButtonGroup(this)),
 	active_settings_btn(nullptr),
-	last_non_general_settings_btn(nullptr),
-	menuRunButton(runButton), osc_api(new Oscilloscope_API(this))
+	last_non_general_settings_btn(nullptr)
 {
 	ui->setupUi(this);
 	int triggers_panel = ui->stackedWidget->insertWidget(-1, &trigger_settings);
@@ -512,10 +511,10 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		current_channel = crt_chn_copy;
 	}
 
-	osc_api->setObjectName(QString::fromStdString(Filter::tool_name(
+	api->setObjectName(QString::fromStdString(Filter::tool_name(
 			TOOL_OSCILLOSCOPE)));
-	osc_api->load();
-	osc_api->js_register(engine);
+	api->load();
+	api->js_register(engine);
 }
 
 Oscilloscope::~Oscilloscope()
@@ -544,8 +543,8 @@ Oscilloscope::~Oscilloscope()
 	gr::hier_block2_sptr hier = iio->to_hier_block2();
 	qDebug() << "OSC disconnected:\n" << gr::dot_graph(hier).c_str();
 
-	osc_api->save();
-	delete osc_api;
+	api->save();
+	delete api;
 
 	delete[] xy_ids;
 	delete[] hist_ids;
@@ -1086,10 +1085,10 @@ void adiscope::Oscilloscope::updateRunButton(bool ch_enabled)
 	}
 
 	ui->pushButtonRunStop->setEnabled(ch_enabled);
-	menuRunButton->setEnabled(ch_enabled);
+	run_button->setEnabled(ch_enabled);
 	if (!ch_enabled) {
 		ui->pushButtonRunStop->setChecked(false);
-		menuRunButton->setChecked(false);
+		run_button->setChecked(false);
 
 		if (ui->btnChannel->isChecked()) {
 			ui->btnChannel->setChecked(false);

@@ -58,8 +58,9 @@ using namespace gr;
 
 NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 		QPushButton *runButton, QJSEngine *engine,
-		QWidget *parent) : QWidget(parent),
-	ui(new Ui::NetworkAnalyzer), net_api(new NetworkAnalyzer_API(this))
+		QWidget *parent) :
+	Tool(ctx, runButton, new NetworkAnalyzer_API(this), parent),
+	ui(new Ui::NetworkAnalyzer)
 {
 	iio = iio_manager::get_instance(ctx,
 			filt->device_name(TOOL_NETWORK_ANALYZER, 2));
@@ -106,10 +107,10 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	connect(ui->samplesCount, SIGNAL(valueChanged(double)),
 			this, SLOT(updateNumSamples()));
 
-	net_api->setObjectName(QString::fromStdString(Filter::tool_name(
+	api->setObjectName(QString::fromStdString(Filter::tool_name(
 			TOOL_NETWORK_ANALYZER)));
-	net_api->load();
-	net_api->js_register(engine);
+	api->load();
+	api->js_register(engine);
 
 	updateNumSamples();
 }
@@ -118,8 +119,8 @@ NetworkAnalyzer::~NetworkAnalyzer()
 {
 	ui->run_button->setChecked(false);
 
-	net_api->save();
-	delete net_api;
+	api->save();
+	delete api;
 
 	delete ui;
 }

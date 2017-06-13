@@ -113,9 +113,8 @@ const char *PatternGenerator::channelNames[] = {
 PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
                                    QPushButton *runBtn, QJSEngine *engine,
                                    DIOManager *diom, QWidget *parent, bool offline_mode_) :
-	QWidget(parent),
-	ctx(ctx),
-	settings_group(new QButtonGroup(this)), menuRunButton(runBtn),
+	Tool(ctx, runBtn, new PatternGenerator_API(this), parent),
+	settings_group(new QButtonGroup(this)),
 	ui(new Ui::PatternGenerator),
 	pgSettings(new Ui::PGSettings),
 	cgSettings(new Ui::PGCGSettings),
@@ -234,11 +233,10 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 
 	//main_win->view_->viewport()->disableDrag();
 
-	pg_api = new PatternGenerator_API(this,chmui);
-	pg_api->setObjectName(QString::fromStdString(Filter::tool_name(
+	api->setObjectName(QString::fromStdString(Filter::tool_name(
 	                              TOOL_PATTERN_GENERATOR)));
-	pg_api->load();
-	pg_api->js_register(engine);
+	api->load();
+	api->js_register(engine);
 	chm.highlightChannel(chm.get_channel_group(0));
 	chmui->updateUi();
 
@@ -254,8 +252,8 @@ PatternGenerator::~PatternGenerator()
 		delete var;
 	}
 
-	pg_api->save();
-	delete pg_api;
+	api->save();
+	delete api;
 
 	delete ui;
 	delete bufman;
@@ -903,6 +901,9 @@ void PatternGenerator::resetPGToDefault()
 
 void PatternGenerator_API::refreshApi()
 {
+	PatternGeneratorChannelManagerUI *chmui = pg->chmui;
+	PatternGeneratorChannelManager *chm = chmui->chm;
+
 	pg_cga.clear();
 	pg_cha.clear();
 
@@ -971,6 +972,8 @@ int PatternGenerator_API::channel_groups_size()
 
 void PatternGenerator_API::set_channel_groups_size(int val)
 {
+	PatternGeneratorChannelManager *chm = pg->chmui->chm;
+
 	chm->clearChannelGroups();
 
 	for (auto i=0; i<val; i++) {
@@ -985,6 +988,8 @@ int PatternGenerator_API::channel_size()
 
 void PatternGenerator_API::set_channel_size(int val)
 {
+	PatternGeneratorChannelManager *chm = pg->chmui->chm;
+
 	chm->clearChannels();
 }
 

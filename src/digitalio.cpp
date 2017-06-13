@@ -134,11 +134,9 @@ void DigitalIO::setOutput()
 DigitalIO::DigitalIO(struct iio_context *ctx, Filter *filt, QPushButton *runBtn,
                      DIOManager *diom, QJSEngine *engine,
                      QWidget *parent, bool offline_mode) :
-	QWidget(parent),
-	ctx(ctx),
+	Tool(ctx, runBtn, new DigitalIO_API(this), parent),
 	ui(new Ui::DigitalIO),
 	offline_mode(offline_mode),
-	dio_api(new DigitalIO_API(this)),
 	diom(diom)
 {
 
@@ -160,10 +158,10 @@ DigitalIO::DigitalIO(struct iio_context *ctx, Filter *filt, QPushButton *runBtn,
 	poll = new QTimer(this);
 	connect(poll,SIGNAL(timeout()),this,SLOT(updateUi()));
 
-	dio_api->setObjectName(QString::fromStdString(Filter::tool_name(
+	api->setObjectName(QString::fromStdString(Filter::tool_name(
 	                               TOOL_DIGITALIO)));
-	dio_api->load();
-	dio_api->js_register(engine);
+	api->load();
+	api->js_register(engine);
 
 }
 
@@ -172,8 +170,8 @@ DigitalIO::~DigitalIO()
 	if (!offline_mode) {
 	}
 
-	dio_api->save();
-	delete dio_api;
+	api->save();
+	delete api;
 	delete ui;
 }
 

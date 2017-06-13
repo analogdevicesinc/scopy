@@ -31,9 +31,8 @@ using namespace adiscope;
 
 PowerController::PowerController(struct iio_context *ctx,
 		QPushButton *runButton, QJSEngine *engine, QWidget *parent) :
-	QWidget(parent), ui(new Ui::PowerController),
-	in_sync(false), menuRunButton(runButton),
-	pw_api(new PowerController_API(this))
+	Tool(ctx, runButton, new PowerController_API(this), parent),
+	ui(new Ui::PowerController), in_sync(false)
 {
 	ui->setupUi(this);
 
@@ -74,10 +73,10 @@ PowerController::PowerController(struct iio_context *ctx,
 
 	connect(runButton, SIGNAL(clicked(bool)), this, SLOT(startStop(bool)));
 
-	pw_api->setObjectName(QString::fromStdString(Filter::tool_name(
+	api->setObjectName(QString::fromStdString(Filter::tool_name(
 			TOOL_POWER_CONTROLLER)));
-	pw_api->load();
-	pw_api->js_register(engine);
+	api->load();
+	api->js_register(engine);
 }
 
 PowerController::~PowerController()
@@ -86,8 +85,8 @@ PowerController::~PowerController()
 	iio_channel_attr_write_bool(ch1w, "powerdown", true);
 	iio_channel_attr_write_bool(ch2w, "powerdown", true);
 
-	pw_api->save();
-	delete pw_api;
+	api->save();
+	delete api;
 
 	delete ui;
 }
@@ -130,9 +129,9 @@ void PowerController::dac1_set_enabled(bool enabled)
 		dac2_set_enabled(enabled);
 
 	if (enabled)
-		menuRunButton->setChecked(true);
+		run_button->setChecked(true);
 	else if (!ui->dac2->isChecked())
-		menuRunButton->setChecked(false);
+		run_button->setChecked(false);
 
 	setDynamicProperty(ui->dac1, "running", enabled);
 }
@@ -142,9 +141,9 @@ void PowerController::dac2_set_enabled(bool enabled)
 	iio_channel_attr_write_bool(ch2w, "powerdown", !enabled);
 
 	if (enabled)
-		menuRunButton->setChecked(true);
+		run_button->setChecked(true);
 	else if (!ui->dac1->isChecked())
-		menuRunButton->setChecked(false);
+		run_button->setChecked(false);
 
 	setDynamicProperty(ui->dac2, "running", enabled);
 }

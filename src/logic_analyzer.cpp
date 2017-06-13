@@ -88,14 +88,12 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
                              QJSEngine *engine,
                              QWidget *parent,
                              unsigned int sample_rate) :
-	QWidget(parent),
+	Tool(ctx, runBtn, new LogicAnalyzer_API(this), parent),
 	dev_name(filt->device_name(TOOL_LOGIC_ANALYZER)),
-	ctx(ctx),
 	itemsize(sizeof(uint16_t)),
 	dev(iio_context_find_device(ctx, dev_name.c_str())),
 	menuOpened(false),
 	settings_group(new QButtonGroup(this)),
-	menuRunButton(runBtn),
 	ui(new Ui::LogicAnalyzer),
 	active_settings_btn(nullptr),
 	timespanLimitStream(11),
@@ -110,7 +108,6 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	trigger_settings(new QWidget(this)),
 	value_cursor1(-0.033),
 	value_cursor2(0.033),
-	la_api(new LogicAnalyzer_API(this)),
 	initialised(false),
 	timer(new QTimer(this)),
 	armed(false),
@@ -391,10 +388,10 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	timer->setInterval(timer_timeout_ms);
 	QMetaObject::invokeMethod(timer, "start",Qt::QueuedConnection);
 
-	la_api->setObjectName(QString::fromStdString(Filter::tool_name(
+	api->setObjectName(QString::fromStdString(Filter::tool_name(
 			TOOL_LOGIC_ANALYZER)));
-	la_api->load();
-	la_api->js_register(engine);
+	api->load();
+	api->js_register(engine);
 
 	chm_ui->setWidgetMinimumNrOfChars(ui->triggerStateLabel, 9);
 	state_timer->setInterval(2);
@@ -418,8 +415,8 @@ void LogicAnalyzer::configureMaxSampleRate()
 
 LogicAnalyzer::~LogicAnalyzer()
 {
-	la_api->save();
-	delete la_api;
+	api->save();
+	delete api;
 
 	if(running)
 		startStop(false);

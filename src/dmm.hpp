@@ -28,6 +28,7 @@
 #include "filter.hpp"
 #include "iio_manager.hpp"
 #include "peek_sample.hpp"
+#include "tool.hpp"
 
 namespace Ui {
 	class DMM;
@@ -39,7 +40,7 @@ namespace adiscope {
 	class DMM_API;
 	class GenericAdc;
 
-	class DMM : public QWidget
+	class DMM : public Tool
 	{
 		friend class DMM_API;
 		friend class ToolLauncher_API;
@@ -62,8 +63,6 @@ namespace adiscope {
 		iio_manager::port_id id_ch1, id_ch2;
 		std::shared_ptr<GenericAdc> adc;
 		bool mode_ac_ch1, mode_ac_ch2;
-
-		DMM_API *dmm_api;
 
 		void disconnectAll();
 		void configureMode(bool is_ac);

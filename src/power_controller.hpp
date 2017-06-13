@@ -21,11 +21,11 @@
 #define POWER_CONTROLLER_HPP
 
 #include <QPushButton>
-#include <QWidget>
 #include <QTimer>
 
 #include "apiObject.hpp"
 #include "spinbox_a.hpp"
+#include "tool.hpp"
 
 extern "C" {
 	struct iio_context;
@@ -43,7 +43,7 @@ class QHideEvent;
 namespace adiscope {
 	class PowerController_API;
 
-	class PowerController : public QWidget
+	class PowerController : public Tool
 	{
 		friend class PowerController_API;
 		friend class ToolLauncher_API;
@@ -73,11 +73,8 @@ namespace adiscope {
 		struct iio_channel *ch1w, *ch2w, *ch1r, *ch2r;
 		QTimer timer;
 		bool in_sync;
-		QPushButton *menuRunButton;
 
 		PositionSpinButton *valuePos, *valueNeg;
-
-		PowerController_API *pw_api;
 
 		void showEvent(QShowEvent *event);
 		void hideEvent(QHideEvent *event);

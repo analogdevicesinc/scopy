@@ -898,21 +898,21 @@ void ToolLauncher_API::load(const QString& file)
 	this->ApiObject::load(settings);
 
 	if (tl->oscilloscope)
-		tl->oscilloscope->osc_api->load(settings);
+		tl->oscilloscope->api->load(settings);
 	if (tl->dmm)
-		tl->dmm->dmm_api->load(settings);
+		tl->dmm->api->load(settings);
 	if (tl->power_control)
-		tl->power_control->pw_api->load(settings);
+		tl->power_control->api->load(settings);
 	if (tl->signal_generator)
-		tl->signal_generator->sg_api->load(settings);
+		tl->signal_generator->api->load(settings);
 	if (tl->logic_analyzer)
-		tl->logic_analyzer->la_api->load(settings);
+		tl->logic_analyzer->api->load(settings);
 	if (tl->dio)
-		tl->dio->dio_api->load(settings);
+		tl->dio->api->load(settings);
 	if (tl->pattern_generator)
-		tl->pattern_generator->pg_api->load(settings);
+		tl->pattern_generator->api->load(settings);
 	if (tl->network_analyzer)
-		tl->network_analyzer->net_api->load(settings);
+		tl->network_analyzer->api->load(settings);
 }
 
 void ToolLauncher_API::save(const QString& file)
@@ -922,19 +922,19 @@ void ToolLauncher_API::save(const QString& file)
 	this->ApiObject::save(settings);
 
 	if (tl->oscilloscope)
-		tl->oscilloscope->osc_api->save(settings);
+		tl->oscilloscope->api->save(settings);
 	if (tl->dmm)
-		tl->dmm->dmm_api->save(settings);
+		tl->dmm->api->save(settings);
 	if (tl->power_control)
-		tl->power_control->pw_api->save(settings);
+		tl->power_control->api->save(settings);
 	if (tl->signal_generator)
-		tl->signal_generator->sg_api->save(settings);
+		tl->signal_generator->api->save(settings);
 	if (tl->logic_analyzer)
-		tl->logic_analyzer->la_api->save(settings);
+		tl->logic_analyzer->api->save(settings);
 	if (tl->dio)
-		tl->dio->dio_api->save(settings);
+		tl->dio->api->save(settings);
 	if (tl->pattern_generator)
-		tl->pattern_generator->pg_api->save(settings);
+		tl->pattern_generator->api->save(settings);
 	if (tl->network_analyzer)
-		tl->network_analyzer->net_api->save(settings);
+		tl->network_analyzer->api->save(settings);
 }

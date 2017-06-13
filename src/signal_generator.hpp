@@ -33,6 +33,7 @@
 #include "filter.hpp"
 #include "oscilloscope_plot.hpp"
 #include "scope_sink_f.h"
+#include "tool.hpp"
 
 #include "ui_channel.h"
 
@@ -62,7 +63,7 @@ namespace adiscope {
 		SG_INV_SAW_WAVE,
 	};
 
-	class SignalGenerator : public QWidget
+	class SignalGenerator : public Tool
 	{
 		friend class SignalGenerator_API;
 		friend class ToolLauncher_API;
@@ -94,20 +95,16 @@ namespace adiscope {
 		Ui::SignalGenerator *ui;
 		OscilloscopePlot *plot;
 		gr::top_block_sptr top_block;
-		struct iio_context *ctx;
 		struct time_block_data *time_block_data;
 
 		unsigned int currentChannel;
 		unsigned long sample_rate;
 
 		QButtonGroup *settings_group;
-		QPushButton *menuRunButton;
 
 		QVector<struct iio_buffer *> buffers;
 		QVector<QPair<QWidget, Ui::Channel> *> channels;
 		QVector<QPair<struct iio_channel *, double>> channels_vlsb;
-
-		SignalGenerator_API *sg_api;
 
 		QSharedPointer<signal_generator_data> getData(QWidget *obj);
 		QSharedPointer<signal_generator_data> getCurrentData();

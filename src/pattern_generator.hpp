@@ -29,6 +29,7 @@
 #include "pg_patterns.hpp"
 #include "pg_channel_manager.hpp"
 #include "pg_buffer_manager.hpp"
+#include "tool.hpp"
 
 
 extern "C" {
@@ -76,7 +77,7 @@ class PatternGeneratorChannel_API;
 class Filter;
 
 
-class PatternGenerator : public QWidget
+class PatternGenerator : public Tool
 {
 	friend class PatternGenerator_API;
 	friend class PatternGeneratorChannelGroup_API;
@@ -117,7 +118,6 @@ private:
 	Ui::PGCGSettings *cgSettings;
 
 	QButtonGroup *settings_group;
-	QPushButton *menuRunButton;
 
 	pv::widgets::ColourButton *colour_button_edge,
 	*colour_button_high, *colour_button_BG,
@@ -132,7 +132,6 @@ private:
 	PatternUI *currentUI;
 	bool offline_mode;
 
-	PatternGenerator_API *pg_api;
 	PatternGeneratorChannelGroup *selected_channel_group;
 	PatternGeneratorChannelManager chm;
 	PatternGeneratorChannelManagerUI *chmui;
@@ -145,7 +144,6 @@ private:
 
 	// IIO
 
-	struct iio_context *ctx;
 	struct iio_device *dev;
 	struct iio_device *channel_manager_dev;
 	struct iio_buffer *txbuf;
@@ -298,9 +296,8 @@ class PatternGenerator_API : public ApiObject
 	Q_PROPERTY(bool single READ single WRITE run_single STORED false);
 
 public:
-	explicit PatternGenerator_API(PatternGenerator *pg,
-	                              PatternGeneratorChannelManagerUI *chmui) :
-		ApiObject(), pg(pg), chmui(chmui),chm(chmui->chm) {}
+	explicit PatternGenerator_API(PatternGenerator *pg) :
+		ApiObject(), pg(pg) {}
 	~PatternGenerator_API() {}
 
 
@@ -320,8 +317,6 @@ public:
 private:
 	void refreshApi();
 	PatternGenerator *pg;
-	PatternGeneratorChannelManagerUI *chmui;
-	PatternGeneratorChannelManager *chm;
 	QList<PatternGeneratorChannelGroup_API *> pg_cga;
 	QList<PatternGeneratorChannel_API *> pg_cha;
 };

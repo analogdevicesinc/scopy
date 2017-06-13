@@ -35,13 +35,13 @@ using namespace adiscope;
 
 DMM::DMM(struct iio_context *ctx, Filter *filt, std::shared_ptr<GenericAdc> adc,
 		QPushButton *runButton, QJSEngine *engine, QWidget *parent) :
-	QWidget(parent), ui(new Ui::DMM), timer(this),
+	Tool(ctx, runButton, new DMM_API(this), parent),
+	ui(new Ui::DMM), timer(this),
 	manager(iio_manager::get_instance(ctx, filt->device_name(TOOL_DMM))),
 	peek_block_ch1(gnuradio::get_initial_sptr(new peek_sample<float>)),
 	peek_block_ch2(gnuradio::get_initial_sptr(new peek_sample<float>)),
 	mode_ac_ch1(false), mode_ac_ch2(false),
-	adc(adc),
-	dmm_api(new DMM_API(this))
+	adc(adc)
 {
 	ui->setupUi(this);
 
@@ -81,10 +81,10 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, std::shared_ptr<GenericAdc> adc,
 	if (started)
 		manager->unlock();
 
-	dmm_api->setObjectName(QString::fromStdString(Filter::tool_name(
+	api->setObjectName(QString::fromStdString(Filter::tool_name(
 			TOOL_DMM)));
-	dmm_api->load();
-	dmm_api->js_register(engine);
+	api->load();
+	api->js_register(engine);
 }
 
 void DMM::disconnectAll()
@@ -105,8 +105,8 @@ DMM::~DMM()
 	ui->run_button->setChecked(false);
 	disconnectAll();
 
-	dmm_api->save();
-	delete dmm_api;
+	api->save();
+	delete api;
 
 	delete ui;
 }

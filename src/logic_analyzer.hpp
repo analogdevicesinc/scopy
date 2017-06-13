@@ -33,6 +33,7 @@
 #include "la_channel_manager.hpp"
 #include "la_capture_params.hpp"
 #include "plot_utils.hpp"
+#include "tool.hpp"
 
 using namespace pv;
 using namespace pv::toolbars;
@@ -72,7 +73,7 @@ class Filter;
 class ScaleSpinButton;
 class PositionSpinButton;
 
-class LogicAnalyzer : public QWidget
+class LogicAnalyzer : public Tool
 {
 	friend class LogicAnalyzer_API;
 	friend class ToolLauncher_API;
@@ -143,7 +144,6 @@ private:
 	Ui::DigitalTriggerSettings *trigger_settings_ui;
 	QButtonGroup *settings_group;
 	QPushButton *active_settings_btn;
-	QPushButton *menuRunButton;
 	QPushButton *triggerBtn;
 
 	static std::vector<std::string> trigger_mapping;
@@ -154,13 +154,11 @@ private:
 
 	const std::string& dev_name;
 
-	struct iio_context *ctx;
 	struct iio_device *dev;
 	unsigned int no_channels;
 	unsigned int itemsize;
 	pv::MainWindow *main_win;
 
-	LogicAnalyzer_API *la_api;
 	QList<ChannelGroup_API *> channel_groups_api;
 	LogicAnalyzerChannelManager chm;
 	LogicAnalyzerChannelManagerUI *chm_ui;

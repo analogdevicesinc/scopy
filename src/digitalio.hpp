@@ -32,6 +32,7 @@
 #include "digitalchannel_manager.hpp"
 
 #include "apiObject.hpp"
+#include "tool.hpp"
 
 
 extern "C" {
@@ -79,7 +80,7 @@ private Q_SLOTS:
 	void on_inout_clicked();
 };
 
-class DigitalIO : public QWidget
+class DigitalIO : public Tool
 {
 	friend class DigitalIO_API;
 	friend class ToolLauncher_API;
@@ -90,8 +91,6 @@ private:
 	Ui::DigitalIO *ui;
 	Filter *filt;
 	bool offline_mode;
-	struct iio_context *ctx;
-	DigitalIO_API *dio_api;
 	QList<DigitalIoGroup *> groups;
 	QTimer *poll;
 	DIOManager *diom;

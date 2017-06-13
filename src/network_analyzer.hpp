@@ -23,8 +23,8 @@
 #include "apiObject.hpp"
 #include "iio_manager.hpp"
 #include "signal_sample.hpp"
+#include "tool.hpp"
 
-#include <QWidget>
 #include <QtConcurrentRun>
 
 extern "C" {
@@ -45,7 +45,7 @@ namespace adiscope {
 	class NetworkAnalyzer_API;
 	class Filter;
 
-	class NetworkAnalyzer : public QWidget
+	class NetworkAnalyzer : public Tool
 	{
 		friend class NetworkAnalyzer_API;
 		friend class ToolLauncher_API;
@@ -66,8 +66,6 @@ namespace adiscope {
 
 		QFuture<void> thd;
 		bool stop;
-
-		NetworkAnalyzer_API *net_api;
 
 		void run();
 

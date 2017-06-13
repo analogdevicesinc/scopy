@@ -90,11 +90,11 @@ struct adiscope::time_block_data {
 
 SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 		QPushButton *runButton, QJSEngine *engine, QWidget *parent) :
-	QWidget(parent), ui(new Ui::SignalGenerator),
-	ctx(_ctx), time_block_data(new adiscope::time_block_data),
+	Tool(_ctx, runButton, new SignalGenerator_API(this), parent),
+	ui(new Ui::SignalGenerator),
+	time_block_data(new adiscope::time_block_data),
 	currentChannel(0), sample_rate(0),
-	settings_group(new QButtonGroup(this)), menuRunButton(runButton),
-	sg_api(new SignalGenerator_API(this))
+	settings_group(new QButtonGroup(this))
 {
 	ui->setupUi(this);
 	this->setAttribute(Qt::WA_DeleteOnClose, true);
@@ -230,10 +230,10 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 
 	ui->plot->addWidget(plot, 0, 0);
 
-	sg_api->setObjectName(QString::fromStdString(Filter::tool_name(
+	api->setObjectName(QString::fromStdString(Filter::tool_name(
 			TOOL_SIGNAL_GENERATOR)));
-	sg_api->load();
-	sg_api->js_register(engine);
+	api->load();
+	api->js_register(engine);
 
 	connect(ui->rightMenu, SIGNAL(finished(bool)), this,
 			SLOT(rightMenuFinished(bool)));
@@ -277,8 +277,8 @@ SignalGenerator::~SignalGenerator()
 {
 	ui->run_button->setChecked(false);
 
-	sg_api->save();
-	delete sg_api;
+	api->save();
+	delete api;
 
 	delete plot;
 	delete ui;
@@ -681,7 +681,7 @@ void adiscope::SignalGenerator::channel_box_toggled(bool checked)
 	}
 
 	ui->run_button->setEnabled(enable_run);
-	menuRunButton->setEnabled(enable_run);
+	run_button->setEnabled(enable_run);
 }
 
 void adiscope::SignalGenerator::renameConfigPanel()

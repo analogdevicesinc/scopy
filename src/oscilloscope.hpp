@@ -51,6 +51,7 @@
 #include "trigger_settings.hpp"
 #include "plot_utils.hpp"
 #include "osc_adc.h"
+#include "tool.hpp"
 
 class QJSEngine;
 class SymmetricBufferMode;
@@ -75,7 +76,7 @@ namespace adiscope {
 	class StateUpdater;
 	class AnalogBufferPreviewer;
 
-	class Oscilloscope : public QWidget
+	class Oscilloscope : public Tool
 	{
 		friend class Oscilloscope_API;
 		friend class Channel_API;
@@ -236,7 +237,6 @@ namespace adiscope {
 		CustomPushButton *last_non_general_settings_btn;
 		QPushButton *menuRunButton;
 
-		Oscilloscope_API *osc_api;
 		QList<Channel_API *> channels_api;
 
 		QList<std::shared_ptr<MeasurementData>> measurements_data;
