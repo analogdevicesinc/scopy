@@ -29,6 +29,9 @@
 
 /* Qt includes */
 #include <QDebug>
+#include <QListView>
+#include <QPushButton>
+#include <QTimer>
 
 /* Local includes */
 #include "pulseview/pv/mainwindow.hpp"
@@ -42,10 +45,13 @@
 #include "logic_analyzer.hpp"
 #include "spinbox_a.hpp"
 #include "scroll_filter.hpp"
+#include "buffer_previewer.hpp"
+#include "handles_area.hpp"
+#include "plot_line_handle.h"
 
 /* Sigrok includes */
-#include "libsigrokcxx/libsigrokcxx.hpp"
-#include "libsigrokdecode/libsigrokdecode.h"
+#include <libsigrokcxx/libsigrokcxx.hpp>
+#include <libsigrokdecode/libsigrokdecode.h>
 
 /* Generated UI */
 #include "ui_logic_analyzer.h"
@@ -55,7 +61,6 @@
 
 /* Boost includes */
 #include <boost/thread.hpp>
-#include <QListView>
 
 using namespace std;
 using namespace adiscope;
@@ -64,7 +69,6 @@ using namespace pv::toolbars;
 using namespace pv::widgets;
 using sigrok::Context;
 using sigrok::ConfigKey;
-using namespace Glibmm;
 
 const unsigned long LogicAnalyzer::maxBuffersize = 16000;
 const unsigned long LogicAnalyzer::maxTriggerBufferSize = 8192;

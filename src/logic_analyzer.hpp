@@ -22,24 +22,17 @@
 
 /* Qt includes */
 #include <QWidget>
-#include <QPushButton>
-#include <QTimer>
-#include <QQmlListProperty>
 
 /* Local includes */
 #include "apiObject.hpp"
-#include "filter.hpp"
 #include "pulseview/pv/widgets/sweeptimingwidget.hpp"
 #include "pulseview/pv/devicemanager.hpp"
 #include "pulseview/pv/mainwindow.hpp"
 #include "pulseview/pv/view/viewport.hpp"
 #include "pulseview/pv/devices/binarystream.hpp"
 #include "la_channel_manager.hpp"
-#include "handles_area.hpp"
-#include "plot_line_handle.h"
-#include "spinbox_a.hpp"
 #include "la_capture_params.hpp"
-#include "buffer_previewer.hpp"
+#include "plot_utils.hpp"
 
 using namespace pv;
 using namespace pv::toolbars;
@@ -54,9 +47,6 @@ class Ruler;
 class Session;
 }
 
-namespace Glibmm {
-}
-
 namespace Ui {
 class LogicAnalyzer;
 class Channel;
@@ -65,12 +55,22 @@ class DigitalTriggerSettings;
 }
 
 class QJSEngine;
+class QPushButton;
+class QTimer;
+
+class HorizHandlesArea;
+class FreePlotLineHandleH;
+class PlotLineHandleH;
 
 namespace adiscope {
 class LogicAnalyzer_API;
 class ChannelGroup_API;
 class LogicChannel_API;
 class MouseWheelWidgetGuard;
+class DigitalBufferPreviewer;
+class Filter;
+class ScaleSpinButton;
+class PositionSpinButton;
 
 class LogicAnalyzer : public QWidget
 {
