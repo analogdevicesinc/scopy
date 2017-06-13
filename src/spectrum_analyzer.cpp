@@ -80,11 +80,11 @@ SpectrumAnalyzer::win_types = {
 };
 
 SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
-	std::shared_ptr<GenericAdc> adc, QPushButton *runButton, QWidget *parent):
-	QWidget(parent),
+	std::shared_ptr<GenericAdc> adc, QPushButton *runButton,
+	ToolLauncher *parent):
+	Tool(ctx, runButton, new SpectrumAnalyzer_API(this), parent),
 	ui(new Ui::SpectrumAnalyzer),
 	fft_plot(nullptr),
-	menuRunButton(runButton),
 	settings_group(new QButtonGroup(this)),
 	adc(adc),
 	adc_name(ctx ? filt->device_name(TOOL_SPECTRUM_ANALYZER) : ""),
@@ -196,7 +196,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 		SLOT(runStopToggled(bool)));
 	connect(ui->run_button, SIGNAL(toggled(bool)), runButton,
 			SLOT(setChecked(bool)));
-	connect(menuRunButton, SIGNAL(toggled(bool)), ui->run_button,
+	connect(run_button, SIGNAL(toggled(bool)), ui->run_button,
 		SLOT(setChecked(bool)));
 
 	connect(ui->start_freq, SIGNAL(valueChanged(double)),

@@ -29,6 +29,7 @@
 #include "fft_block.hpp"
 #include "FftDisplayPlot.h"
 #include "osc_adc.h"
+#include "tool.hpp"
 
 #include <QWidget>
 
@@ -57,7 +58,7 @@ class QButtonGroup;
 namespace adiscope {
 class SpectrumAnalyzer_API;
 
-class SpectrumAnalyzer: public QWidget
+class SpectrumAnalyzer: public Tool
 {
 	friend class SpectrumAnalyzer_API;
 
@@ -79,7 +80,7 @@ public:
 
 	explicit SpectrumAnalyzer(struct iio_context *iio, Filter *filt,
 		std::shared_ptr<GenericAdc> adc, QPushButton *runButton,
-		QWidget *parent = 0);
+		ToolLauncher *parent);
 	~SpectrumAnalyzer();
 
 private Q_SLOTS:
@@ -107,7 +108,6 @@ private:
 	PositionSpinButton *ui_centerFreq;
 	PositionSpinButton *ui_span;
 
-	QPushButton *menuRunButton;
 	QButtonGroup *settings_group;
 	FftDisplayPlot *fft_plot;
 
