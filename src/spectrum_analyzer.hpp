@@ -23,6 +23,7 @@
 #include <gnuradio/top_block.h>
 #include <gnuradio/fft/window.h>
 
+#include "apiObject.hpp"
 #include "iio_manager.hpp"
 #include "scope_sink_f.h"
 #include "fft_block.hpp"
@@ -54,9 +55,12 @@ class QPushButton;
 class QButtonGroup;
 
 namespace adiscope {
+class SpectrumAnalyzer_API;
 
 class SpectrumAnalyzer: public QWidget
 {
+	friend class SpectrumAnalyzer_API;
+
 	Q_OBJECT
 
 public:
@@ -177,6 +181,19 @@ private:
 
 	static std::vector<float> build_win(SpectrumAnalyzer::FftWinType type,
 		int ntaps);
+};
+
+class SpectrumAnalyzer_API : public ApiObject
+{
+	Q_OBJECT
+
+public:
+	explicit SpectrumAnalyzer_API(SpectrumAnalyzer *sp) :
+		ApiObject(), sp(sp) {}
+	~SpectrumAnalyzer_API() {}
+
+private:
+	SpectrumAnalyzer *sp;
 };
 
 } // namespace adiscope
