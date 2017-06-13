@@ -67,7 +67,6 @@ using sigrok::ConfigKey;
 using namespace Glibmm;
 
 const unsigned long LogicAnalyzer::maxBuffersize = 16000;
-const unsigned long LogicAnalyzer::maxSampleRate = 80000000;
 const unsigned long LogicAnalyzer::maxTriggerBufferSize = 8192;
 
 std::vector<std::string> LogicAnalyzer::trigger_mapping = {
@@ -98,6 +97,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	timespanLimitStream(11),
 	plotRefreshRate(100),
 	active_sampleRate(0.0),
+	maxSamplingFrequency(0),
 	active_hw_sampleRate(0.0),
 	active_sampleCount(0),
 	active_triggerSampleCount(0),
@@ -117,9 +117,12 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	timer->setSingleShot(true);
 	this->setAttribute(Qt::WA_DeleteOnClose, true);
 	iio_context_set_timeout(ctx, UINT_MAX);
+	this->configureMaxSampleRate();
+	if( maxSamplingFrequency == 0 )
+		maxSamplingFrequency = 80000000;
 
 	symmBufferMode = make_shared<LogicAnalyzerSymmetricBufferMode>();
-	symmBufferMode->setMaxSampleRate(80000000);
+	symmBufferMode->setMaxSampleRate(maxSamplingFrequency);
 	symmBufferMode->setEntireBufferMaxSize(500000); // max 0.5 mega-samples
 	symmBufferMode->setTriggerBufferMaxSize(8192); // 8192 is what hardware supports
 	symmBufferMode->setTimeDivisionCount(10);
@@ -395,6 +398,20 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	ui->lblExportStatus->setText("Not exported");
 }
 
+
+void LogicAnalyzer::configureMaxSampleRate()
+{
+	auto logic_analyzer_dev = iio_context_find_device(ctx, "m2k-logic-analyzer");
+	if(!logic_analyzer_dev)
+		return;
+	long long maxSampling;
+	int ret = iio_device_attr_read_longlong(logic_analyzer_dev,
+		"sampling_frequency", &maxSampling);
+	if(ret < 0)
+		return;
+	maxSamplingFrequency = maxSampling;
+}
+
 LogicAnalyzer::~LogicAnalyzer()
 {
 	la_api->save();
@@ -491,16 +508,16 @@ double LogicAnalyzer::pickSampleRateFor(double timeSpanSecs, double desiredBuffe
 
 	// Pick the highest sample rate that we can set, that is lower or equal to
 	// the idealSampleRate.
-	double divider = maxSampleRate / idealSamplerate;
+	double divider = maxSamplingFrequency / idealSamplerate;
 	double intpart = ceil(divider);
 
 	if( intpart != 0 )
 	{
-		idealSamplerate = maxSampleRate / intpart;
+		idealSamplerate = maxSamplingFrequency / intpart;
 	}
 	else
 	{
-		idealSamplerate = maxSampleRate;
+		idealSamplerate = maxSamplingFrequency;
 	}
 
 	return idealSamplerate;

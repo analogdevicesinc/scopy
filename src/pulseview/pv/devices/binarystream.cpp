@@ -194,13 +194,12 @@ void BinaryStream::shutdown() {
 
 void BinaryStream::stop()
 {
+	interrupt_ = true;
 	assert(session_);
 	session_->stop();
 	la->set_triggered_status("stopped");
 	running = false;
-	interrupt_ = true;
 	single_ = false;
-	lock_guard<recursive_mutex> lock(data_mutex_);
 	if(data_ )
 		iio_buffer_cancel(data_);
 	if( data_ )

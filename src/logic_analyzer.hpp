@@ -169,7 +169,8 @@ private:
 	static unsigned int get_no_channels(struct iio_device *dev);
 
 	static const unsigned long maxBuffersize;
-	static const unsigned long maxSampleRate;
+	long long maxSamplingFrequency;
+	void configureMaxSampleRate();
 	static const unsigned long maxTriggerBufferSize;
 	double active_sampleRate;
 	double active_hw_sampleRate;
