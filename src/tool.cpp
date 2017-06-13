@@ -27,8 +27,10 @@ Tool::Tool(struct iio_context *ctx, QPushButton *runButton,
 	QWidget(static_cast<QWidget *>(parent)),
 	ctx(ctx), run_button(runButton), api(api)
 {
+	run_button->parentWidget()->setDisabled(false);
 }
 
 Tool::~Tool()
 {
+	run_button->parentWidget()->setDisabled(true);
 }

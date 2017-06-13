@@ -502,16 +502,6 @@ void adiscope::ToolLauncher::on_btnConnect_clicked(bool pressed)
 
 void adiscope::ToolLauncher::destroyContext()
 {
-	ui->digitalIO->setDisabled(true);
-	ui->oscilloscope->setDisabled(true);
-	ui->signalGenerator->setDisabled(true);
-	ui->dmm->setDisabled(true);
-	ui->powerControl->setDisabled(true);
-	ui->logicAnalyzer->setDisabled(true);
-	ui->patternGenerator->setDisabled(true);
-	ui->networkAnalyzer->setDisabled(true);
-	ui->spectrumAnalyzer->setDisabled(true);
-
 	if (dio) {
 		delete dio;
 		dio = nullptr;
@@ -634,20 +624,17 @@ void adiscope::ToolLauncher::enableAdcBasedTools()
 		oscilloscope = new Oscilloscope(ctx, filter, adc,
 						ui->stopOscilloscope,
 						&js_engine, this);
-		ui->oscilloscope->setEnabled(true);
 		adc_users_group.addButton(ui->stopOscilloscope);
 	}
 
 	if (filter->compatible(TOOL_DMM)) {
 		dmm = new DMM(ctx, filter, adc, ui->stopDMM, &js_engine, this);
-		ui->dmm->setEnabled(true);
 		adc_users_group.addButton(ui->stopDMM);
 	}
 
 	if (filter->compatible(TOOL_SPECTRUM_ANALYZER)) {
 		spectrum_analyzer = new SpectrumAnalyzer(ctx, filter, adc,
 			ui->stopSpectrumAnalyzer, this);
-		ui->spectrumAnalyzer->setEnabled(true);
 		adc_users_group.addButton(ui->stopSpectrumAnalyzer);
 	}
 
@@ -684,8 +671,6 @@ void adiscope::ToolLauncher::enableDacBasedTools(float dacA_vlsb,
 					iio_channel_get_id(chn),
 					iio_device_get_name(dev), dacB_vlsb);
 		}
-
-		ui->signalGenerator->setEnabled(true);
 	}
 
 	Q_EMIT dacToolsCreated();
@@ -739,34 +724,29 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 
 	if (filter->compatible(TOOL_DIGITALIO)) {
 		dio = new DigitalIO(ctx, filter, ui->stopDIO, dioManager, &js_engine, this);
-		ui->digitalIO->setEnabled(true);
 	}
 
 
 	if (filter->compatible(TOOL_POWER_CONTROLLER)) {
 		power_control = new PowerController(ctx,
 		                                    ui->stopPowerControl, &js_engine, this);
-		ui->powerControl->setEnabled(true);
 	}
 
 	if (filter->compatible(TOOL_LOGIC_ANALYZER)) {
 		logic_analyzer = new LogicAnalyzer(ctx, filter,
 		                                   ui->stopLogicAnalyzer, &js_engine, this);
-		ui->logicAnalyzer->setEnabled(true);
 	}
 
 
 	if (filter->compatible((TOOL_PATTERN_GENERATOR))) {
 		pattern_generator = new PatternGenerator(ctx, filter,
 		                ui->stopPatternGenerator, &js_engine,dioManager, this);
-		ui->patternGenerator->setEnabled(true);
 	}
 
 
 	if (filter->compatible((TOOL_NETWORK_ANALYZER))) {
 		network_analyzer = new NetworkAnalyzer(ctx, filter,
 		                                       ui->stopNetworkAnalyzer, &js_engine, this);
-		ui->networkAnalyzer->setEnabled(true);
 	}
 
 	loadToolTips(true);
