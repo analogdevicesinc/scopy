@@ -104,6 +104,9 @@ private Q_SLOTS:
 	void hasText();
 
 	void on_btnDigitalIO_clicked();
+
+	void toolDetached(bool detached);
+
 private:
 	Ui::ToolLauncher *ui;
 	struct iio_context *ctx;

@@ -17,44 +17,30 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef SCOPY_TOOL_HPP
-#define SCOPY_TOOL_HPP
+#ifndef SCOPY_DETACHED_WINDOW_HPP
+#define SCOPY_DETACHED_WINDOW_HPP
 
-#include <QWidget>
+#include <QMainWindow>
 
-class QJSEngine;
-class QPushButton;
-
-extern "C" {
-	struct iio_context;
-}
+class QCloseEvent;
 
 namespace adiscope {
-class ApiObject;
-class ToolLauncher;
-
-class Tool : public QWidget
+class DetachedWindow: public QMainWindow
 {
 	Q_OBJECT
 
-public:
-	explicit Tool(struct iio_context *ctx, QPushButton *runButton,
-			ApiObject *api, ToolLauncher *parent);
-	~Tool();
-
-	QPushButton *runButton() { return this->run_button; }
-
 Q_SIGNALS:
-	void detachedState(bool detached);
+	void closed();
 
-public Q_SLOTS:
-	virtual void attached();
+public:
+	explicit DetachedWindow(QWidget *parent = Q_NULLPTR);
+	~DetachedWindow();
 
-protected:
-	struct iio_context *ctx;
-	QPushButton *run_button;
-	ApiObject *api;
+	void setCentralWidget(QWidget *widget);
+
+private:
+	void closeEvent(QCloseEvent *event);
 };
 }
 
-#endif /* SCOPY_TOOL_HPP */
+#endif /* SCOPY_DETACHED_WINDOW_HPP */

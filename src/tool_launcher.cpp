@@ -19,6 +19,7 @@
 
 #include "config.h"
 #include "connectDialog.hpp"
+#include "detachedWindow.hpp"
 #include "dynamicWidget.hpp"
 #include "oscilloscope.hpp"
 #include "spectrum_analyzer.hpp"
@@ -797,6 +798,26 @@ void ToolLauncher::checkIp(const QString& ip)
 	} else {
 		previousIp = "";
 	}
+}
+
+void ToolLauncher::toolDetached(bool detached)
+{
+	Tool *tool = static_cast<Tool *>(QObject::sender());
+
+	if (detached) {
+		/* Switch back to the home screen */
+		if (current == static_cast<QWidget *>(tool))
+			ui->btnHome->click();
+
+		DetachedWindow *window = new DetachedWindow(this);
+		window->setCentralWidget(tool);
+		window->show();
+
+		connect(window, SIGNAL(closed()), tool, SLOT(attached()));
+	}
+
+	tool->setVisible(detached);
+	tool->runButton()->parentWidget()->setEnabled(!detached);
 }
 
 bool ToolLauncher_API::menu_opened() const
