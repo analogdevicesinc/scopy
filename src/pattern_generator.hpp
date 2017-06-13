@@ -21,30 +21,14 @@
 #define PATTERN_GENERATOR_H
 
 #include <QWidget>
-#include <QPushButton>
-#include <QJsonArray>
-#include <QIntValidator>
-#include <QtQml/QJSEngine>
-//#include <QQmlListProperty>
-#include <QtUiTools/QUiLoader>
 #include <QVector>
 #include <vector>
 #include <string>
-
-#include "src/pulseview/pv/devices/binarybuffer.hpp"
-#include "pulseview/pv/widgets/colourbutton.hpp"
-#include "filter.hpp"
 
 #include "apiObject.hpp"
 #include "pg_patterns.hpp"
 #include "pg_channel_manager.hpp"
 #include "pg_buffer_manager.hpp"
-#include <QQmlListProperty>
-
-// Generated UI
-#include "ui_pattern_generator.h"
-#include "ui_pg_settings.h"
-#include "ui_pg_cg_settings.h"
 
 
 extern "C" {
@@ -83,11 +67,13 @@ class PGSettings;
 }
 
 class QJSEngine;
+class QPushButton;
 
 namespace adiscope {
 class PatternGenerator_API;
 class PatternGeneratorChannelGroup_API;
 class PatternGeneratorChannel_API;
+class Filter;
 
 
 class PatternGenerator : public QWidget

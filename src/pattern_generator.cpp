@@ -37,19 +37,27 @@
 #include <QPushButton>
 #include <QFileDialog>
 
-///* pulseview and sigrok */
 #include <boost/math/common_factor.hpp>
+
+///* pulseview and sigrok */
 #include "pulseview/pv/mainwindow.hpp"
 #include "pulseview/pv/view/viewport.hpp"
 #include "pulseview/pv/devices/binarybuffer.hpp"
 #include "pulseview/pv/devicemanager.hpp"
 #include "pulseview/pv/toolbars/mainbar.hpp"
-#include "libsigrokcxx/libsigrokcxx.hpp"
-#include "libsigrokdecode/libsigrokdecode.h"
+#include "pulseview/pv/widgets/colourbutton.hpp"
 #include "pulseview/pv/view/tracepalette.hpp"
 
+#include <libsigrokcxx/libsigrokcxx.hpp>
+#include <libsigrokdecode/libsigrokdecode.h>
+
+#include "filter.hpp"
 #include "pattern_generator.hpp"
 
+// Generated UI
+#include "ui_pattern_generator.h"
+#include "ui_pg_settings.h"
+#include "ui_pg_cg_settings.h"
 
 using namespace std;
 using namespace adiscope;
