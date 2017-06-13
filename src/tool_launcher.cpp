@@ -913,6 +913,8 @@ void ToolLauncher_API::load(const QString& file)
 		tl->pattern_generator->api->load(settings);
 	if (tl->network_analyzer)
 		tl->network_analyzer->api->load(settings);
+	if (tl->spectrum_analyzer)
+		tl->spectrum_analyzer->api->load(settings);
 }
 
 void ToolLauncher_API::save(const QString& file)
@@ -937,4 +939,6 @@ void ToolLauncher_API::save(const QString& file)
 		tl->pattern_generator->api->save(settings);
 	if (tl->network_analyzer)
 		tl->network_analyzer->api->save(settings);
+	if (tl->spectrum_analyzer)
+		tl->spectrum_analyzer->api->save(settings);
 }

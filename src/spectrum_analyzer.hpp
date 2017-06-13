@@ -61,6 +61,7 @@ class SpectrumAnalyzer_API;
 class SpectrumAnalyzer: public Tool
 {
 	friend class SpectrumAnalyzer_API;
+	friend class ToolLauncher_API;
 
 	Q_OBJECT
 
