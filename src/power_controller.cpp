@@ -30,7 +30,8 @@
 using namespace adiscope;
 
 PowerController::PowerController(struct iio_context *ctx,
-		QPushButton *runButton, QJSEngine *engine, QWidget *parent) :
+		QPushButton *runButton, QJSEngine *engine,
+		ToolLauncher *parent) :
 	Tool(ctx, runButton, new PowerController_API(this), parent),
 	ui(new Ui::PowerController), in_sync(false)
 {

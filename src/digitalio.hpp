@@ -100,8 +100,8 @@ private:
 
 public:
 	explicit DigitalIO(struct iio_context *ctx, Filter *filt, QPushButton *runBtn,
-	                   DIOManager *diom,
-	                   QJSEngine *engine,QWidget *parent = 0, bool offline_mode = 0);
+	                   DIOManager *diom, QJSEngine *engine,
+	                   ToolLauncher *parent, bool offline_mode = 0);
 	~DigitalIO();
 	void setDirection(int ch, int direction);
 	void setOutput(int ch, int out);

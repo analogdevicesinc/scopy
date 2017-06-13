@@ -112,7 +112,8 @@ const char *PatternGenerator::channelNames[] = {
 
 PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
                                    QPushButton *runBtn, QJSEngine *engine,
-                                   DIOManager *diom, QWidget *parent, bool offline_mode_) :
+                                   DIOManager *diom, ToolLauncher *parent,
+				   bool offline_mode_) :
 	Tool(ctx, runBtn, new PatternGenerator_API(this), parent),
 	settings_group(new QButtonGroup(this)),
 	ui(new Ui::PatternGenerator),

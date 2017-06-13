@@ -86,7 +86,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
                              Filter *filt,
                              QPushButton *runBtn,
                              QJSEngine *engine,
-                             QWidget *parent,
+                             ToolLauncher *parent,
                              unsigned int sample_rate) :
 	Tool(ctx, runBtn, new LogicAnalyzer_API(this), parent),
 	dev_name(filt->device_name(TOOL_LOGIC_ANALYZER)),
@@ -195,7 +195,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 
 	device_manager = new pv::DeviceManager(context);
 	pv::MainWindow *w = new pv::MainWindow(*device_manager, filt, open_file,
-	                                       open_file_format, parent);
+	                                       open_file_format, this);
 
 	for (unsigned int j = 0; j < iio_device_get_channels_count(dev); j++) {
 		struct iio_channel *chn = iio_device_get_channel(dev, j);

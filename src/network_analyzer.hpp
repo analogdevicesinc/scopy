@@ -55,7 +55,7 @@ namespace adiscope {
 	public:
 		explicit NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 				QPushButton *runButton, QJSEngine *engine,
-				QWidget *parent = 0);
+				ToolLauncher *parent);
 		~NetworkAnalyzer();
 
 	private:

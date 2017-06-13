@@ -34,7 +34,7 @@
 using namespace adiscope;
 
 DMM::DMM(struct iio_context *ctx, Filter *filt, std::shared_ptr<GenericAdc> adc,
-		QPushButton *runButton, QJSEngine *engine, QWidget *parent) :
+		QPushButton *runButton, QJSEngine *engine, ToolLauncher *parent) :
 	Tool(ctx, runButton, new DMM_API(this), parent),
 	ui(new Ui::DMM), timer(this),
 	manager(iio_manager::get_instance(ctx, filt->device_name(TOOL_DMM))),

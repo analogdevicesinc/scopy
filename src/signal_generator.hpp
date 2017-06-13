@@ -73,7 +73,7 @@ namespace adiscope {
 	public:
 		explicit SignalGenerator(struct iio_context *ctx,
 				Filter *filt, QPushButton *runButton,
-				QJSEngine *engine, QWidget *parent = 0);
+				QJSEngine *engine, ToolLauncher *parent);
 		~SignalGenerator();
 
 		double vlsb_of_channel(const char *channel,

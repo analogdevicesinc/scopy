@@ -31,6 +31,7 @@ extern "C" {
 
 namespace adiscope {
 class ApiObject;
+class ToolLauncher;
 
 class Tool : public QWidget
 {
@@ -38,7 +39,7 @@ class Tool : public QWidget
 
 public:
 	explicit Tool(struct iio_context *ctx, QPushButton *runButton,
-			ApiObject *api, QWidget *parent);
+			ApiObject *api, ToolLauncher *parent);
 	~Tool();
 
 	QPushButton *runButton() { return this->run_button; }

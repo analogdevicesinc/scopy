@@ -63,7 +63,7 @@ using namespace std;
 
 Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		std::shared_ptr<GenericAdc> adc, QPushButton *runButton,
-		 QJSEngine *engine, QWidget *parent) :
+		 QJSEngine *engine, ToolLauncher *parent) :
 	Tool(ctx, runButton, new Oscilloscope_API(this), parent),
 	adc(adc),
 	m2k_adc(dynamic_pointer_cast<M2kAdc>(adc)),
@@ -73,10 +73,10 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	ui(new Ui::Oscilloscope),
 	trigger_settings(adc),
 	measure_settings(nullptr),
-	plot(parent, 16, 10),
-	fft_plot(nb_channels, parent),
-	xy_plot(nb_channels / 2, parent),
-	hist_plot(nb_channels, parent),
+	plot(this, 16, 10),
+	fft_plot(nb_channels, this),
+	xy_plot(nb_channels / 2, this),
+	hist_plot(nb_channels, this),
 	ids(new iio_manager::port_id[nb_channels]),
 	fft_ids(new iio_manager::port_id[nb_channels]),
 	hist_ids(new iio_manager::port_id[nb_channels]),

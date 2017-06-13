@@ -88,7 +88,7 @@ namespace adiscope {
 		explicit Oscilloscope(struct iio_context *ctx, Filter *filt,
 				std::shared_ptr<GenericAdc> adc,
 				QPushButton *runButton, QJSEngine *engine,
-				QWidget *parent = 0);
+				ToolLauncher *parent = 0);
 		~Oscilloscope();
 
 	Q_SIGNALS:

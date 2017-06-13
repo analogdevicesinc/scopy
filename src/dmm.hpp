@@ -51,7 +51,7 @@ namespace adiscope {
 		explicit DMM(struct iio_context *ctx, Filter *filt,
 				std::shared_ptr<GenericAdc> adc,
 				QPushButton *runButton, QJSEngine *engine,
-				QWidget *parent = nullptr);
+				ToolLauncher *parent);
 		~DMM();
 
 	private:

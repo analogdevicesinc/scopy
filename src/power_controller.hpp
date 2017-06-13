@@ -53,7 +53,7 @@ namespace adiscope {
 	public:
 		explicit PowerController(struct iio_context *ctx,
 				QPushButton *runButton, QJSEngine *engine,
-				QWidget *parent = 0);
+				ToolLauncher *parent = 0);
 		~PowerController();
 
 	public Q_SLOTS:

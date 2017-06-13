@@ -89,7 +89,7 @@ struct adiscope::time_block_data {
 };
 
 SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
-		QPushButton *runButton, QJSEngine *engine, QWidget *parent) :
+		QPushButton *runButton, QJSEngine *engine, ToolLauncher *parent) :
 	Tool(_ctx, runButton, new SignalGenerator_API(this), parent),
 	ui(new Ui::SignalGenerator),
 	time_block_data(new adiscope::time_block_data),
@@ -99,7 +99,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 	ui->setupUi(this);
 	this->setAttribute(Qt::WA_DeleteOnClose, true);
 
-	this->plot = new OscilloscopePlot(parent);
+	this->plot = new OscilloscopePlot(this);
 
 	QVector<struct iio_channel *> iio_channels;
 

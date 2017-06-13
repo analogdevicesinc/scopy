@@ -18,11 +18,13 @@
  */
 
 #include "tool.hpp"
+#include "tool_launcher.hpp"
 
 using namespace adiscope;
 
 Tool::Tool(struct iio_context *ctx, QPushButton *runButton,
-		ApiObject *api, QWidget *parent) : QWidget(parent),
+		ApiObject *api, ToolLauncher *parent) :
+	QWidget(static_cast<QWidget *>(parent)),
 	ctx(ctx), run_button(runButton), api(api)
 {
 }

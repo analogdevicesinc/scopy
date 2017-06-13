@@ -87,7 +87,7 @@ public:
 	                       Filter *filt,
 	                       QPushButton *runButton,
 			       QJSEngine *engine,
-	                       QWidget *parent = 0,
+	                       ToolLauncher *parent,
 	                       unsigned int sample_rate = 200000);
 	~LogicAnalyzer();
 	void updateAreaTimeTrigger();

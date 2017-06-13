@@ -58,7 +58,7 @@ using namespace gr;
 
 NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 		QPushButton *runButton, QJSEngine *engine,
-		QWidget *parent) :
+		ToolLauncher *parent) :
 	Tool(ctx, runButton, new NetworkAnalyzer_API(this), parent),
 	ui(new Ui::NetworkAnalyzer)
 {
