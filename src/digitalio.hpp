@@ -32,13 +32,6 @@
 #include "digitalchannel_manager.hpp"
 
 #include "apiObject.hpp"
-#include "dynamicWidget.hpp"
-
-// Generated UI
-#include "ui_digitalio.h"
-#include "ui_digitalIoElement.h"
-#include "ui_digitalIoChannel.h"
-#include "ui_digitaliomenu.h"
 
 
 extern "C" {
@@ -53,6 +46,7 @@ class DigitalIO;
 class DigitalIoMenu;
 class dioElement;
 class dioGroup;
+class dioChannel;
 }
 
 namespace adiscope {

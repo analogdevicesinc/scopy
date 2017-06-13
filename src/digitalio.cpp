@@ -29,6 +29,13 @@
 #include <QtQml/QQmlEngine>
 
 #include "digitalio.hpp"
+#include "dynamicWidget.hpp"
+
+// Generated UI
+#include "ui_digitalio.h"
+#include "ui_digitalIoElement.h"
+#include "ui_digitalIoChannel.h"
+#include "ui_digitaliomenu.h"
 
 using namespace std;
 using namespace adiscope;
