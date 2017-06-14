@@ -912,7 +912,7 @@ uint8_t GrayCounterPattern::generate_pattern(uint32_t sample_rate,
 	buffer = new short[number_of_samples];
 	auto samples_per_count = ((float)sample_rate/(float)frequency);
 	init_value = 0;
-	end_value =1<< number_of_channels;
+	end_value =(1<< (number_of_channels))-1;
 	increment = 1;
 	start_value = 0;
 	auto i=init_value;
