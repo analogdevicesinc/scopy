@@ -31,11 +31,17 @@ Tool::Tool(struct iio_context *ctx, QPushButton *runButton,
 
 	connect(this, SIGNAL(detachedState(bool)), parent,
 			SLOT(toolDetached(bool)));
+
+	QSettings oldSettings;
+	QFile tempFile(oldSettings.fileName() + ".bak");
+	settings = new QSettings(tempFile.fileName(), QSettings::IniFormat);
 }
 
 Tool::~Tool()
 {
 	run_button->parentWidget()->setDisabled(true);
+
+	delete settings;
 }
 
 void Tool::attached()

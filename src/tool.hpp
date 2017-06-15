@@ -21,6 +21,7 @@
 #define SCOPY_TOOL_HPP
 
 #include <QWidget>
+#include <QSettings>
 
 class QJSEngine;
 class QPushButton;
@@ -54,6 +55,7 @@ protected:
 	struct iio_context *ctx;
 	QPushButton *run_button;
 	ApiObject *api;
+	QSettings *settings;
 };
 }
 
