@@ -128,6 +128,7 @@ private:
 	NetworkAnalyzer *network_analyzer;
 	SpectrumAnalyzer *spectrum_analyzer;
 	QWidget *current;
+	QSettings *settings;
 
 	QButtonGroup adc_users_group;
 
@@ -151,6 +152,7 @@ private:
 	void calibrate();
 	void checkIp(const QString& ip);
 	void disconnect();
+	void saveSettings();
 	Q_INVOKABLE QPushButton *addContext(const QString& hostname);
 
 	void updateListOfDevices(const QVector<QString>& uris);

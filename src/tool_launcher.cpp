@@ -79,7 +79,6 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 
 	tl_api->setObjectName(QString::fromStdString(Filter::tool_name(
 			TOOL_LAUNCHER)));
-	tl_api->ApiObject::load();
 
 	/* Show a smooth opening when the app starts */
 	ui->menu->toggleMenu(true);
@@ -125,6 +124,28 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 
 	alive_timer = new QTimer();
 	connect(alive_timer, SIGNAL(timeout()), this, SLOT(ping()));
+
+	QSettings oldSettings;
+	QFile scopy(oldSettings.fileName());
+	QFile tempFile(oldSettings.fileName() + ".bak");
+	if (tempFile.exists())
+		tempFile.remove();
+	scopy.copy(tempFile.fileName());
+	settings = new QSettings(tempFile.fileName(), QSettings::IniFormat);
+
+	tl_api->ApiObject::load(*settings);
+}
+
+void ToolLauncher::saveSettings()
+{
+	QSettings settings;
+	QFile tempFile(settings.fileName() + ".bak");
+	QSettings tempSettings(tempFile.fileName(), QSettings::IniFormat);
+	QFile scopyFile(settings.fileName());
+	if (scopyFile.exists())
+		scopyFile.remove();
+	tempSettings.sync();
+	QFile::copy(tempFile.fileName(), scopyFile.fileName());
 }
 
 void ToolLauncher::runProgram(const QString& program, const QString& fn)
@@ -270,9 +291,12 @@ ToolLauncher::~ToolLauncher()
 	delete search_timer;
 	delete alive_timer;
 
-	tl_api->ApiObject::save();
+	tl_api->ApiObject::save(*settings);
+	delete settings;
 	delete tl_api;
 	delete ui;
+
+	saveSettings();
 }
 
 void ToolLauncher::destroyPopup()
