@@ -24,9 +24,6 @@
 #include <vector>
 #include <iio.h>
 
-/* GNU Radio includes */
-#include <gnuradio/blocks/file_descriptor_sink.h>
-
 /* Qt includes */
 #include <QDebug>
 #include <QListView>
@@ -87,11 +84,11 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
                              QPushButton *runBtn,
                              QJSEngine *engine,
                              ToolLauncher *parent,
-                             unsigned int sample_rate) :
+                             bool offline_mode_) :
 	Tool(ctx, runBtn, new LogicAnalyzer_API(this), parent),
-	dev_name(filt->device_name(TOOL_LOGIC_ANALYZER)),
 	itemsize(sizeof(uint16_t)),
-	dev(iio_context_find_device(ctx, dev_name.c_str())),
+	dev_name(),
+	dev(nullptr),
 	menuOpened(false),
 	settings_group(new QButtonGroup(this)),
 	ui(new Ui::LogicAnalyzer),
@@ -112,12 +109,17 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	timer(new QTimer(this)),
 	armed(false),
 	state_timer(new QTimer(this)),
-	trigger_state("Stop")
+	trigger_state("Stop"),
+	offline_mode(offline_mode_)
 {
 	ui->setupUi(this);
 	timer->setSingleShot(true);
 	this->setAttribute(Qt::WA_DeleteOnClose, true);
-	iio_context_set_timeout(ctx, UINT_MAX);
+	if(!offline_mode) {
+		iio_context_set_timeout(ctx, UINT_MAX);
+		dev_name = filt->device_name(TOOL_LOGIC_ANALYZER);
+		dev = iio_context_find_device(ctx, dev_name.c_str());
+	}
 	this->configureMaxSampleRate();
 	if( maxSamplingFrequency == 0 )
 		maxSamplingFrequency = 80000000;
@@ -186,8 +188,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	ui->timebaseLabel->setMinimumWidth(width);
 
 	this->settings_group->setExclusive(true);
-	if(dev)
-		this->no_channels = get_no_channels(dev);
+	this->no_channels = get_no_channels(dev);
 
 	/* sigrok and sigrokdecode initialisation */
 	std::string open_file, open_file_format;
@@ -197,7 +198,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	pv::MainWindow *w = new pv::MainWindow(*device_manager, filt, open_file,
 	                                       open_file_format, this);
 
-	for (unsigned int j = 0; j < iio_device_get_channels_count(dev); j++) {
+	for (unsigned int j = 0; j < get_no_channels(dev); j++) {
 		struct iio_channel *chn = iio_device_get_channel(dev, j);
 
 		if (!iio_channel_is_output(chn) &&
@@ -227,14 +228,14 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	ui->generalSettingsLayout->insertWidget(ui->generalSettingsLayout->count() - 3,
 		timePosition, 0, Qt::AlignLeft);
 
+	int chn = (no_channels == 0) ? 16 : no_channels;
 	options["numchannels"] = Glib::Variant<gint32>(
-			g_variant_new_int32(no_channels),true);
-	if(dev) {
-		logic_analyzer_ptr = std::make_shared<pv::devices::BinaryStream>(
-	                            context, dev, maxBuffersize,
-	                             w->get_format_from_string("binary"),
-	                             options, this);
-	}
+			g_variant_new_int32(chn),true);
+
+	logic_analyzer_ptr = std::make_shared<pv::devices::BinaryStream>(
+				context, dev, maxBuffersize,
+				w->get_format_from_string("binary"),
+				options, this);
 
 	/* setup view */
 	main_win = w;
@@ -402,15 +403,18 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 
 void LogicAnalyzer::configureMaxSampleRate()
 {
-	auto logic_analyzer_dev = iio_context_find_device(ctx, "m2k-logic-analyzer");
-	if(!logic_analyzer_dev)
-		return;
-	long long maxSampling;
-	int ret = iio_device_attr_read_longlong(logic_analyzer_dev,
-		"sampling_frequency", &maxSampling);
-	if(ret < 0)
-		return;
-	maxSamplingFrequency = maxSampling;
+	if(!offline_mode) {
+		auto logic_analyzer_dev = iio_context_find_device(ctx,
+			"m2k-logic-analyzer");
+		if(!logic_analyzer_dev)
+			return;
+		long long maxSampling;
+		int ret = iio_device_attr_read_longlong(logic_analyzer_dev,
+			"sampling_frequency", &maxSampling);
+		if(ret < 0)
+			return;
+		maxSamplingFrequency = maxSampling;
+	}
 }
 
 LogicAnalyzer::~LogicAnalyzer()
@@ -655,7 +659,7 @@ void LogicAnalyzer::enableTrigger(bool value)
 
 void LogicAnalyzer::setSampleRate()
 {
-	if(!logic_analyzer_ptr)
+	if(!dev)
 		return;
 	options["samplerate"] = Glib::Variant<guint64>(
 	                  g_variant_new_uint64(active_sampleRate),true);
@@ -814,7 +818,7 @@ int LogicAnalyzer::timeToPixel(double time)
 void LogicAnalyzer::startStop(bool start)
 {
 	ui->lblExportStatus->setText("Not exported");
-	if(!logic_analyzer_ptr)
+	if(!dev)
 		return;
 	if (start) {
 		last_set_sample_count = active_sampleCount;
@@ -876,7 +880,7 @@ void LogicAnalyzer::setHWTriggerDelay(long long delay)
 void LogicAnalyzer::singleRun()
 {
 	ui->lblExportStatus->setText("Not exported");
-	if(!logic_analyzer_ptr)
+	if(!dev)
 		return;
 	if( running )
 	{

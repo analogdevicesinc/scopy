@@ -52,7 +52,8 @@ BinaryStream::BinaryStream(const std::shared_ptr<sigrok::Context> &context,
 	data_(nullptr)
 {
 	/* 10 buffers, 10ms each -> 250ms before we lose data */
-	iio_device_set_kernel_buffers_count(dev_, 25);
+	if(dev)
+		iio_device_set_kernel_buffers_count(dev_, 25);
 }
 
 BinaryStream::~BinaryStream() {
@@ -106,7 +107,8 @@ std::string BinaryStream::display_name(const DeviceManager&) const
 void BinaryStream::start()
 {
 	/* sample_rate / 100 -> 10ms */
-	data_ = iio_device_create_buffer(dev_, buffersize_, false);
+	if(dev_)
+		data_ = iio_device_create_buffer(dev_, buffersize_, false);
 
 	if (!data_) {
 		throw std::runtime_error("Could not create RX buffer");
@@ -115,6 +117,8 @@ void BinaryStream::start()
 
 void BinaryStream::run()
 {
+	if(!dev_)
+		return;
 	if( running )
 		stop();
 	running = true;

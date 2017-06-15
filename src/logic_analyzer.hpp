@@ -88,7 +88,7 @@ public:
 	                       QPushButton *runButton,
 			       QJSEngine *engine,
 	                       ToolLauncher *parent,
-	                       unsigned int sample_rate = 200000);
+	                       bool offline_mode_ = 0);
 	~LogicAnalyzer();
 	void updateAreaTimeTrigger();
 
@@ -152,7 +152,7 @@ private:
 	ScaleSpinButton *timeBase;
 	PositionSpinButton *timePosition;
 
-	const std::string& dev_name;
+	std::string dev_name;
 
 	struct iio_device *dev;
 	unsigned int no_channels;
@@ -242,6 +242,7 @@ private:
 	DigitalBufferPreviewer *buffer_previewer;
 	void set_buffersize();
 	MouseWheelWidgetGuard *wheelEventGuard;
+	bool offline_mode;
 };
 
 class LogicAnalyzer_API : public ApiObject
