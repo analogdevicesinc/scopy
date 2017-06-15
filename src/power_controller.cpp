@@ -76,7 +76,7 @@ PowerController::PowerController(struct iio_context *ctx,
 
 	api->setObjectName(QString::fromStdString(Filter::tool_name(
 			TOOL_POWER_CONTROLLER)));
-	api->load();
+	api->load(*settings);
 	api->js_register(engine);
 }
 
@@ -86,7 +86,7 @@ PowerController::~PowerController()
 	iio_channel_attr_write_bool(ch1w, "powerdown", true);
 	iio_channel_attr_write_bool(ch2w, "powerdown", true);
 
-	api->save();
+	api->save(*settings);
 	delete api;
 
 	delete ui;

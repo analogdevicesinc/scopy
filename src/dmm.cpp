@@ -83,7 +83,7 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, std::shared_ptr<GenericAdc> adc,
 
 	api->setObjectName(QString::fromStdString(Filter::tool_name(
 			TOOL_DMM)));
-	api->load();
+	api->load(*settings);
 	api->js_register(engine);
 }
 
@@ -105,7 +105,7 @@ DMM::~DMM()
 	ui->run_button->setChecked(false);
 	disconnectAll();
 
-	api->save();
+	api->save(*settings);
 	delete api;
 
 	delete ui;

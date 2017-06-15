@@ -391,7 +391,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 
 	api->setObjectName(QString::fromStdString(Filter::tool_name(
 			TOOL_LOGIC_ANALYZER)));
-	api->load();
+	api->load(*settings);
 	api->js_register(engine);
 
 	chm_ui->setWidgetMinimumNrOfChars(ui->triggerStateLabel, 9);
@@ -419,7 +419,7 @@ void LogicAnalyzer::configureMaxSampleRate()
 
 LogicAnalyzer::~LogicAnalyzer()
 {
-	api->save();
+	api->save(*settings);
 	delete api;
 
 	if(running)

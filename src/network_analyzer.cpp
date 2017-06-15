@@ -109,7 +109,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	api->setObjectName(QString::fromStdString(Filter::tool_name(
 			TOOL_NETWORK_ANALYZER)));
-	api->load();
+	api->load(*settings);
 	api->js_register(engine);
 
 	updateNumSamples();
@@ -119,7 +119,7 @@ NetworkAnalyzer::~NetworkAnalyzer()
 {
 	ui->run_button->setChecked(false);
 
-	api->save();
+	api->save(*settings);
 	delete api;
 
 	delete ui;

@@ -232,7 +232,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 
 	api->setObjectName(QString::fromStdString(Filter::tool_name(
 			TOOL_SIGNAL_GENERATOR)));
-	api->load();
+	api->load(*settings);
 	api->js_register(engine);
 
 	connect(ui->rightMenu, SIGNAL(finished(bool)), this,
@@ -277,7 +277,7 @@ SignalGenerator::~SignalGenerator()
 {
 	ui->run_button->setChecked(false);
 
-	api->save();
+	api->save(*settings);
 	delete api;
 
 	delete plot;

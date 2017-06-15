@@ -513,7 +513,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 
 	api->setObjectName(QString::fromStdString(Filter::tool_name(
 			TOOL_OSCILLOSCOPE)));
-	api->load();
+	api->load(*settings);
 	api->js_register(engine);
 }
 
@@ -543,7 +543,7 @@ Oscilloscope::~Oscilloscope()
 	gr::hier_block2_sptr hier = iio->to_hier_block2();
 	qDebug() << "OSC disconnected:\n" << gr::dot_graph(hier).c_str();
 
-	api->save();
+	api->save(*settings);
 	delete api;
 
 	delete[] xy_ids;

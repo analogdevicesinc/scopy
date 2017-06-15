@@ -236,7 +236,7 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 
 	api->setObjectName(QString::fromStdString(Filter::tool_name(
 	                              TOOL_PATTERN_GENERATOR)));
-	api->load();
+	api->load(*settings);
 	api->js_register(engine);
 	chm.highlightChannel(chm.get_channel_group(0));
 	chmui->updateUi();
@@ -253,7 +253,7 @@ PatternGenerator::~PatternGenerator()
 		delete var;
 	}
 
-	api->save();
+	api->save(*settings);
 	delete api;
 
 	delete ui;

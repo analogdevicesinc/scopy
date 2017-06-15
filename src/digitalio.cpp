@@ -160,7 +160,7 @@ DigitalIO::DigitalIO(struct iio_context *ctx, Filter *filt, QPushButton *runBtn,
 
 	api->setObjectName(QString::fromStdString(Filter::tool_name(
 	                               TOOL_DIGITALIO)));
-	api->load();
+	api->load(*settings);
 	api->js_register(engine);
 
 }
@@ -170,7 +170,7 @@ DigitalIO::~DigitalIO()
 	if (!offline_mode) {
 	}
 
-	api->save();
+	api->save(*settings);
 	delete api;
 	delete ui;
 }
