@@ -7,11 +7,11 @@
     <x>0</x>
     <y>0</y>
     <width>333</width>
-    <height>699</height>
+    <height>690</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+   <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -176,7 +176,7 @@ background-color: #4A64FF;</string>
          <item>
           <widget class="QScrollArea" name="scrollArea">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -208,7 +208,7 @@ background-color: #4A64FF;</string>
               <x>0</x>
               <y>0</y>
               <width>249</width>
-              <height>505</height>
+              <height>596</height>
              </rect>
             </property>
             <property name="sizePolicy">
@@ -370,13 +370,10 @@ color: rgba(255,255,255,50);
                 <bool>true</bool>
                </property>
                <property name="sizePolicy">
-                <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
-               </property>
-               <property name="styleSheet">
-                <string notr="true"/>
                </property>
                <layout class="QVBoxLayout" name="verticalLayout_9">
                 <property name="spacing">
@@ -396,6 +393,38 @@ color: rgba(255,255,255,50);
                 </property>
                </layout>
               </widget>
+             </item>
+             <item>
+              <spacer name="verticalSpacer_2">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Preferred</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <spacer name="verticalSpacer">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Minimum</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>0</height>
+                </size>
+               </property>
+              </spacer>
              </item>
              <item>
               <widget class="QWidget" name="widget" native="true">
@@ -433,6 +462,34 @@ color: rgba(255,255,255,50);
                    <number>0</number>
                   </property>
                   <item>
+                   <widget class="QPushButton" name="btnCollapse2">
+                    <property name="styleSheet">
+                     <string notr="true">QPushButton {
+  max-height: 6px;
+  max-width: 10px;
+  border-image: url(:/icons/sba_cmb_box_arrow.svg);
+}
+
+QPushButton:checked
+{
+  max-height: 10px;
+  max-width:  6px;
+border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
+}
+
+
+
+</string>
+                    </property>
+                    <property name="text">
+                     <string/>
+                    </property>
+                    <property name="checkable">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
                    <widget class="QLabel" name="label_5">
                     <property name="styleSheet">
                      <string notr="true">QLabel
@@ -468,24 +525,111 @@ color: rgba(255,255,255,50);
                  </layout>
                 </item>
                 <item>
-                 <layout class="QVBoxLayout" name="verticalLayout_6">
-                  <property name="spacing">
-                   <number>21</number>
-                  </property>
-                  <property name="topMargin">
-                   <number>15</number>
-                  </property>
-                  <item>
-                   <widget class="QLabel" name="label_6">
-                    <property name="text">
-                     <string>Name</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLineEdit" name="LECHLabel"/>
-                  </item>
-                 </layout>
+                 <widget class="QWidget" name="widget_3" native="true">
+                  <layout class="QVBoxLayout" name="verticalLayout_13">
+                   <property name="spacing">
+                    <number>0</number>
+                   </property>
+                   <property name="leftMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="topMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="rightMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="bottomMargin">
+                    <number>0</number>
+                   </property>
+                   <item>
+                    <layout class="QVBoxLayout" name="verticalLayout_6">
+                     <property name="spacing">
+                      <number>21</number>
+                     </property>
+                     <property name="topMargin">
+                      <number>15</number>
+                     </property>
+                     <item>
+                      <widget class="QLabel" name="label_6">
+                       <property name="text">
+                        <string>Name</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QLineEdit" name="LECHLabel"/>
+                     </item>
+                    </layout>
+                   </item>
+                   <item>
+                    <layout class="QVBoxLayout" name="verticalLayout_8">
+                     <property name="spacing">
+                      <number>16</number>
+                     </property>
+                     <item>
+                      <widget class="QLabel" name="label_7">
+                       <property name="text">
+                        <string>Thickness</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QComboBox" name="cmb_thickness">
+                       <property name="enabled">
+                        <bool>true</bool>
+                       </property>
+                       <item>
+                        <property name="text">
+                         <string>1</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>1.5</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>2</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>2.5</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>3</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>3.5</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>4</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>4.5</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>5</string>
+                        </property>
+                       </item>
+                      </widget>
+                     </item>
+                    </layout>
+                   </item>
+                  </layout>
+                 </widget>
                 </item>
                 <item>
                  <layout class="QHBoxLayout" name="horizontalLayout_7">
@@ -501,72 +645,6 @@ color: rgba(255,255,255,50);
                   <property name="bottomMargin">
                    <number>0</number>
                   </property>
-                  <item>
-                   <layout class="QVBoxLayout" name="verticalLayout_8">
-                    <property name="spacing">
-                     <number>16</number>
-                    </property>
-                    <item>
-                     <widget class="QLabel" name="label_7">
-                      <property name="text">
-                       <string>Thickness</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QComboBox" name="cmb_thickness">
-                      <property name="enabled">
-                       <bool>true</bool>
-                      </property>
-                      <item>
-                       <property name="text">
-                        <string>1</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>1.5</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>2</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>2.5</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>3</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>3.5</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>4</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>4.5</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>5</string>
-                       </property>
-                      </item>
-                     </widget>
-                    </item>
-                   </layout>
-                  </item>
                  </layout>
                 </item>
                 <item>
@@ -575,7 +653,7 @@ color: rgba(255,255,255,50);
                    <number>0</number>
                   </property>
                   <property name="topMargin">
-                   <number>35</number>
+                   <number>0</number>
                   </property>
                   <property name="bottomMargin">
                    <number>0</number>
@@ -583,7 +661,7 @@ color: rgba(255,255,255,50);
                   <item>
                    <layout class="QHBoxLayout" name="horizontalLayout_8">
                     <property name="topMargin">
-                     <number>0</number>
+                     <number>15</number>
                     </property>
                     <property name="bottomMargin">
                      <number>30</number>
@@ -647,6 +725,9 @@ color: rgba(255,255,255,50);
                     </item>
                     <item>
                      <widget class="Line" name="line_4">
+                      <property name="frameShadow">
+                       <enum>QFrame::Plain</enum>
+                      </property>
                       <property name="orientation">
                        <enum>Qt::Horizontal</enum>
                       </property>
@@ -806,44 +887,12 @@ color: rgba(255,255,255,50);
                   </item>
                  </layout>
                 </item>
-                <item>
-                 <spacer name="verticalSpacer_2">
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>40</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
                </layout>
               </widget>
              </item>
             </layout>
-            <zorder>widget</zorder>
-            <zorder>patternSettings</zorder>
-            <zorder></zorder>
            </widget>
           </widget>
-         </item>
-         <item>
-          <spacer name="verticalSpacer">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-           <property name="sizeType">
-            <enum>QSizePolicy::Preferred</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>20</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
          </item>
         </layout>
        </item>

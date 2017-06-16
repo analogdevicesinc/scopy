@@ -558,20 +558,25 @@ private Q_SLOTS:
 };
 
 
-#if 0
+
 
 class JSPattern : public QObject, virtual public Pattern
 {
 	Q_OBJECT
 private:
 protected:
+public:
+
 	QJSEngine *qEngine;
 	JSConsole *console;
 	QWidget *ui_form;
-	QJsonObject obj;
-public:
 
+	QJsonObject obj;
 	JSPattern(QJsonObject obj_);
+	quint32 number_of_samples;
+	quint32 number_of_channels;
+	quint32 sample_rate;
+
 	Q_INVOKABLE quint32 get_nr_of_samples();
 	Q_INVOKABLE quint32 get_nr_of_channels();
 	Q_INVOKABLE quint32 get_sample_rate();
@@ -583,7 +588,8 @@ public:
 	uint32_t get_required_nr_of_samples();
 	void init();
 	uint8_t pre_generate();
-	uint8_t generate_pattern();
+	uint8_t generate_pattern(uint32_t sample_rate,
+				 uint32_t number_of_samples, uint16_t number_of_channels);
 	void deinit();
 	virtual bool handle_result(QJSValue result,QString str = "");
 };
@@ -599,25 +605,42 @@ public:
 };
 
 
-class JSPatternUI : public PatternUI, public JSPattern
+class JSPatternUIScript_API;
+
+class JSPatternUI : public PatternUI
 {
+	Q_OBJECT
 	QUiLoader *loader;
 	Ui::GenericJSPatternUI *ui;
-	//QWidget *ui_form;
+//	QWidget *ui_form;
+	JSPattern *pattern;
 	QString form_name;
 	QWidget *parent_;
+	JSPatternUIScript_API *jspat_api;
 	JSPatternUIStatusWindow *textedit;
 public:
-	JSPatternUI(QJsonObject obj_, QWidget *parent = 0);
+	JSPatternUI(JSPattern* pat,QJsonObject obj_, QWidget *parent = 0);
 	~JSPatternUI();
 
+	Pattern *get_pattern();
 	bool handle_result(QJSValue result,QString str = "");
 	void find_all_children(QObject *parent, QJSValue property);
-	void build_ui(QWidget *parent = 0);
-	void post_load_ui();
-	void parse_ui();
+	void build_ui(QWidget *parent = 0,uint16_t number_of_channels=0);
+	void post_load_ui();	
 	void destroy_ui();
+public Q_SLOTS:
+	void parse_ui();
 };
+
+class JSPatternUIScript_API : public QObject
+{
+	Q_OBJECT
+	JSPatternUI *pattern;
+public:
+	JSPatternUIScript_API(QObject *parent, JSPatternUI *pat);
+	Q_INVOKABLE void parse_ui();
+};
+#if 0
 
 class LFSRPattern : virtual public Pattern
 {

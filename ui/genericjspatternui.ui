@@ -7,13 +7,19 @@
     <x>0</x>
     <y>0</y>
     <width>240</width>
-    <height>618</height>
+    <height>228</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
+  <layout class="QVBoxLayout" name="verticalLayout_2">
    <property name="leftMargin">
     <number>0</number>
    </property>
@@ -26,11 +32,41 @@
    <property name="bottomMargin">
     <number>0</number>
    </property>
-   <item row="0" column="0">
-    <widget class="QWidget" name="ui_form" native="true"/>
+   <item>
+    <widget class="QWidget" name="ui_form" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+     </layout>
+    </widget>
    </item>
-   <item row="1" column="0">
+   <item>
     <widget class="QTextEdit" name="jsstatus">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
@@ -45,7 +81,7 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="0">
+   <item>
     <widget class="QPushButton" name="clearconsole">
      <property name="text">
       <string>Clear console</string>

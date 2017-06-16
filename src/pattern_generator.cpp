@@ -211,6 +211,11 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 		i++;*/
 	}
 
+	QFontMetrics labelm(cgSettings->CBPattern->font());
+	auto label_min_width = labelm.width(QString(12,'X'));
+	cgSettings->CBPattern->setMinimumWidth(label_min_width);
+	cgSettings->CBPattern->setMaximumWidth(label_min_width);
+
 	connect(ui->btnChSettings, SIGNAL(pressed()), this, SLOT(toggleRightMenu()));
 	connect(ui->btnPGSettings, SIGNAL(pressed()), this, SLOT(toggleRightMenu()));
 	bufman = new PatternGeneratorBufferManager(&chm);
@@ -238,11 +243,12 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 	        this, SLOT(changeChannelThickness(QString)));
 	connect(cgSettings->btnCollapse, &QPushButton::clicked,
 	[=](bool check) {
-		if (check) {
-			cgSettings->widget_2->hide();
-		} else {
-			cgSettings->widget_2->show();
-		}
+		cgSettings->widget_2->setVisible(!check);
+	});
+
+	connect(cgSettings->btnCollapse2, &QPushButton::clicked,
+	[=](bool check) {
+		cgSettings->widget_3->setVisible(!check);
 	});
 	connect(colour_button_edge, SIGNAL(selected(const QColor)),
 	        this, SLOT(colorChanged(QColor)));

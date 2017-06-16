@@ -23,6 +23,7 @@
 #include <QtQml/QQmlEngine>
 #include <QPushButton>
 #include <QJsonDocument>
+#include <QDirIterator>
 
 #include <errno.h>
 
@@ -2000,22 +2001,23 @@ void SPIPatternUI::parse_ui()
 }
 
 
-#if 0
 JSPattern::JSPattern(QJsonObject obj_) : obj(obj_)
 {
 	qDebug()<<"JSPattern created";
+	set_name(obj["name"].toString().toStdString());
 	console = new JSConsole();
 	qEngine = nullptr;
 }
 
 void JSPattern::init()
 {
+
 	if (qEngine!=nullptr) {
 		qEngine->collectGarbage();
 		delete qEngine;
 	}
 
-	qEngine = new QJSEngine();
+	qEngine = new QJSEngine();	
 }
 
 void JSPattern::deinit()
@@ -2114,9 +2116,13 @@ bool JSPattern::handle_result(QJSValue result,QString str)
 
 }
 
-uint8_t JSPattern::generate_pattern()
+uint8_t JSPattern::generate_pattern(uint32_t sample_rate,
+				    uint32_t number_of_samples, uint16_t number_of_channels)
 {
 
+	this->sample_rate = sample_rate;
+	this->number_of_channels = number_of_channels;
+	this->number_of_samples = number_of_samples;
 	handle_result(qEngine->evaluate("generate()"),"Eval generate");
 	commitBuffer(qEngine->evaluate("pg.buffer"),qEngine->evaluate("pg.buffersize"));
 	return 0;
@@ -2167,16 +2173,25 @@ void JSPattern::commitBuffer(QJSValue jsBufferValue, QJSValue jsBufferSize)
 	}
 }
 
-JSPatternUI::JSPatternUI(QJsonObject obj_, QWidget *parent) : JSPattern(obj_),
+JSPatternUIScript_API::JSPatternUIScript_API(QObject *parent, JSPatternUI *pat) : QObject(parent),pattern(pat)
+{}
+
+void JSPatternUIScript_API::parse_ui()
+{
+	pattern->parse_ui();
+}
+
+JSPatternUI::JSPatternUI(JSPattern* pat,QJsonObject obj_, QWidget *parent) : pattern(pat),
 	PatternUI(parent)
 {
 	qDebug()<<"JSPatternUI created";
 	loader = nullptr;
-	ui_form = nullptr;
+	pattern->ui_form = nullptr;
 	ui = new Ui::GenericJSPatternUI();
 	ui->setupUi(this);
 	setVisible(false);
 	textedit = new JSPatternUIStatusWindow(ui->jsstatus);
+	//ui->jsstatus->setVisible(false);
 
 }
 JSPatternUI::~JSPatternUI()
@@ -2184,19 +2199,20 @@ JSPatternUI::~JSPatternUI()
 	qDebug()<<"JSPatternUI destroyed";
 
 }
-void JSPatternUI::build_ui(QWidget *parent)
+void JSPatternUI::build_ui(QWidget *parent,uint16_t number_of_channels)
 {
 	qDebug()<<"JSPatternUI built";
+	jspat_api = new JSPatternUIScript_API(this,this);
 	parent_ = parent;
 	parent->layout()->addWidget(this);
-	QFile file(obj["filepath"].toString() + obj["ui_form"].toString());
+	QFile file(pattern->obj["filepath"].toString() + pattern->obj["ui_form"].toString());
 	file.open(QFile::ReadOnly);
 
 	if (file.exists() && file.isReadable()) {
 		loader = new QUiLoader;
-		ui_form = loader->load(&file, ui->ui_form);
+		pattern->ui_form = loader->load(&file, ui->ui_form);
 		file.close();
-		form_name = ui_form->objectName();
+		form_name = pattern->ui_form->objectName();
 
 	} else {
 		qDebug() << "file does not exist";
@@ -2206,8 +2222,8 @@ void JSPatternUI::build_ui(QWidget *parent)
 }
 void JSPatternUI::destroy_ui()
 {
-	if (ui_form) {
-		delete ui_form;
+	if (pattern->ui_form) {
+		delete pattern->ui_form;
 	}
 
 	if (loader) {
@@ -2228,7 +2244,7 @@ void JSPatternUI::find_all_children(QObject *parent, QJSValue property)
 
 	for (auto child: parent->children()) {
 		if (child->objectName()!="") {
-			QJSValue jschild = qEngine->newQObject(child);
+			QJSValue jschild = pattern->qEngine->newQObject(child);
 			property.setProperty(child->objectName(),jschild);
 			QQmlEngine::setObjectOwnership(child, QQmlEngine::CppOwnership);
 
@@ -2239,7 +2255,7 @@ void JSPatternUI::find_all_children(QObject *parent, QJSValue property)
 
 void JSPatternUI::post_load_ui()
 {
-	QString fileName(obj["filepath"].toString() + obj["ui_script"].toString());
+	QString fileName(pattern->obj["filepath"].toString() + pattern->obj["ui_script"].toString());
 	qDebug()<<fileName;
 	QFile scriptFile(fileName);
 	scriptFile.open(QIODevice::ReadOnly);
@@ -2247,49 +2263,58 @@ void JSPatternUI::post_load_ui()
 	QString contents = stream.readAll();
 	scriptFile.close();
 
-	JSPattern *pg = this;
+	JSPattern *pg = pattern;
 	JSPatternUIStatusWindow *status_window = textedit;
-	QJSValue pgObj =  qEngine->newQObject(pg);
-	QJSValue consoleObj =  qEngine->newQObject(console);
-	QJSValue statusTextObj =  qEngine->newQObject(status_window);
+	QJSValue pgObj =  pattern->qEngine->newQObject(pg);
+	QJSValue consoleObj =  pattern->qEngine->newQObject(pattern->console);
+	QJSValue statusTextObj =  pattern->qEngine->newQObject(status_window);
+	QJSValue parseuiobj = pattern->qEngine->newQObject(jspat_api);
 	QJSValue uiObj =
-	        qEngine->newQObject(/*ui_form*/ui->ui_form->findChild<QWidget *>(form_name));
+		pattern->qEngine->newQObject(/*ui_form*/ui->ui_form->findChild<QWidget *>(form_name));
 
-	qEngine->globalObject().setProperty("pg",pgObj);
+	pattern->qEngine->globalObject().setProperty("pg",pgObj);
 	QQmlEngine::setObjectOwnership(/*(QObject*)*/pg, QQmlEngine::CppOwnership);
-	qEngine->globalObject().setProperty("console", consoleObj);
-	QQmlEngine::setObjectOwnership(/*(QObject*)*/console, QQmlEngine::CppOwnership);
-	qEngine->globalObject().setProperty("ui", uiObj);
-	QQmlEngine::setObjectOwnership(/*(QObject*)*/ui_form, QQmlEngine::CppOwnership);
+	pattern->qEngine->globalObject().setProperty("console", consoleObj);
+	QQmlEngine::setObjectOwnership(/*(QObject*)*/pattern->console, QQmlEngine::CppOwnership);
+	pattern->qEngine->globalObject().setProperty("ui", uiObj);
+	QQmlEngine::setObjectOwnership(/*(QObject*)*/pattern->ui_form, QQmlEngine::CppOwnership);
 
-	qEngine->globalObject().setProperty("status_window", statusTextObj);
+	pattern->qEngine->globalObject().setProperty("script", parseuiobj);
+	QQmlEngine::setObjectOwnership(/*(QObject*)*/this, QQmlEngine::CppOwnership);
+
+	pattern->qEngine->globalObject().setProperty("status_window", statusTextObj);
 	QQmlEngine::setObjectOwnership(/*(QObject*)*/status_window,
 	                QQmlEngine::CppOwnership);
 
-	qEngine->evaluate("ui_elements = [];");
+	pattern->qEngine->evaluate("ui_elements = [];");
 
 	find_all_children(ui->ui_form->findChild<QObject *>(form_name),
-	                  qEngine->globalObject().property("ui_elements"));
+			  pattern->qEngine->globalObject().property("ui_elements"));
 
-	qEngine->evaluate("pg.buffer = [];").toString();
-	qEngine->evaluate("pg.buffersize = 0;").toString();
+	pattern->qEngine->evaluate("pg.buffer = [];").toString();
+	pattern->qEngine->evaluate("pg.buffersize = 0;").toString();
 
 
-	qEngine->evaluate("function post_load_ui(){ status_window.print(\"post_load_ui() not found\")}");
-	qEngine->evaluate("function parse_ui(){ status_window.print(\"parse_ui() not found\")}");
-	handle_result(qEngine->evaluate(contents, fileName),"eval ui_script");
-	handle_result(qEngine->evaluate("post_load_ui()"),"post_load_ui");
+	pattern->qEngine->evaluate("function post_load_ui(){ status_window.print(\"post_load_ui() not found\")}");
+	pattern->qEngine->evaluate("function parse_ui(){ status_window.print(\"parse_ui() not found\")}");
+	handle_result(pattern->qEngine->evaluate(contents, fileName),"eval ui_script");
+	handle_result(pattern->qEngine->evaluate("post_load_ui()"),"post_load_ui");
 }
 
 void JSPatternUI::parse_ui()
 {
-	handle_result(qEngine->evaluate("parse_ui()"),"parse_ui");
+	handle_result(pattern->qEngine->evaluate("parse_ui_callback()"),"parse_ui");
+	Q_EMIT patternParamsChanged();
+}
+
+Pattern *JSPatternUI::get_pattern()
+{
+	return pattern;
 }
 
 bool JSPatternUI::handle_result(QJSValue result,QString str)
 {
-	JSPattern::handle_result(result,str);
-# if 0
+	pattern->handle_result(result,str);
 
 	if (result.isError()) {
 		/*    qDebug()
@@ -2299,12 +2324,14 @@ bool JSPatternUI::handle_result(QJSValue result,QString str)
 		return -2;*/
 		textedit->print((QString)"Uncaught exception at line" +
 		                result.property("lineNumber").toString() + ":" + result.toString());
+		return -2;
 
 	} else {
 		textedit->print(str + " - Success");
+		return 0;
 	}
 
-#endif
+
 }
 
 JSPatternUIStatusWindow::JSPatternUIStatusWindow(QTextEdit *textedit)
@@ -2320,6 +2347,9 @@ void JSPatternUIStatusWindow::print(QString str)
 {
 	con->append(str);
 }
+
+
+#if 0
 
 uint32_t LFSRPattern::get_lfsr_period() const
 {
@@ -2968,7 +2998,7 @@ void PatternFactory::init()
 	*/
 	static_ui_limit = ui_list.count();
 
-	/*QString searchPattern = "generator.json";
+	QString searchPattern = "generator.json";
 	QDirIterator it("patterngenerator", QStringList() << searchPattern, QDir::Files, QDirIterator::Subdirectories);
 	int i = 0;
 	while (it.hasNext())
@@ -2994,7 +3024,7 @@ void PatternFactory::init()
 	    }
 
 	}
-	patterns = pattern_object;*/
+	patterns = pattern_object;
 	qDebug()<<patterns;
 }
 
@@ -3040,6 +3070,16 @@ Pattern *PatternFactory::create(int index)
 
 	case I2CPatternId:
 		return new I2CPattern();
+
+	default:
+	    if(index>=static_ui_limit)
+	    {
+		return new JSPattern(patterns[QString::number(index-static_ui_limit)].toObject());
+	    }
+	    else
+	    {
+		return nullptr;
+	    }
 		/* case 0: return new ConstantPattern();
 		 case 1: return new NumberPattern();
 
@@ -3111,6 +3151,16 @@ PatternUI *PatternFactory::create_ui(Pattern *pattern, int index,
 	case I2CPatternId:
 		return new I2CPatternUI(dynamic_cast<I2CPattern *>(pattern),
 		                        parent);
+
+	default:
+	if(index>=static_ui_limit)
+	{
+	    return new JSPatternUI(dynamic_cast<JSPattern*>(pattern), patterns[QString::number(static_ui_limit-index)].toObject(), parent);
+	}
+	else
+	{
+	    return nullptr;
+	}
 		/*
 		case 0: return new ConstantPatternUI(parent);
 		case 3: return new PulsePatternUI(parent);
@@ -3119,15 +3169,7 @@ PatternUI *PatternFactory::create_ui(Pattern *pattern, int index,
 		case 6: return new GrayCounterPatternUI(parent);
 		case 7: return new JohnsonCounterPatternUI(parent);
 		case 8: return new WalkingPatternUI(parent);
-		default:
-		if(index>=static_ui_limit)
-		{
-		    return new JSPatternUI(patterns[QString::number(static_ui_limit-index)].toObject(), parent);
-		}
-		else
-		{
-		    return nullptr;
-		}
+
 		*/
 	}
 }
