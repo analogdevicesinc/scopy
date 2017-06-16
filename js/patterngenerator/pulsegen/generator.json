@@ -1,0 +1,8 @@
+{
+  "name": "Scripted Pulse Generatror",
+  "description": "Scripted Pulse Generatror",
+  "generate_script": "generate.js",
+  "ui_form": "scriptpulsegen.ui",
+  "ui_script": "ui.js",
+  "enabled": true
+}

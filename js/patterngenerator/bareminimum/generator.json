@@ -1,0 +1,8 @@
+{
+  "name": "Bare Minimum",
+  "description": "Minimal configuration needed for scripted pattern generator",
+  "generate_script": "generate.js",
+  "ui_form": "",
+  "ui_script": "",
+  "enabled": true
+}
