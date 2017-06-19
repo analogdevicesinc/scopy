@@ -618,13 +618,8 @@ unsigned int Oscilloscope::find_curve_number()
 
 void Oscilloscope::add_math_channel(const std::string& function)
 {
-	if (nb_math_channels + 1 > MAX_MATH_CHANNELS - 1){
-		if (ui->btnAddMath->isChecked()){
-			ui->btnAddMath->setChecked(false);
-			toggleRightMenu(ui->btnAddMath);
-		}
-		ui->btnAddMath->hide();
-	}
+	if (nb_math_channels == MAX_MATH_CHANNELS)
+		return;
 
 	auto math = iio::iio_math::make(function, nb_channels);
 	unsigned int curve_id = nb_channels + nb_math_channels;
@@ -719,11 +714,19 @@ void Oscilloscope::add_math_channel(const std::string& function)
 
 	// Default hysteresis levels for measurements of the new channel
 	plot.setPeriodDetectHyst(curve_id, 1.0 / 5);
+
+	if (nb_math_channels == MAX_MATH_CHANNELS ){
+		if (ui->btnAddMath->isChecked()){
+			ui->btnAddMath->setChecked(false);
+			toggleRightMenu(ui->btnChannel);
+		}
+		ui->btnAddMath->hide();
+	}
 }
 
 void Oscilloscope::del_math_channel()
 {
-	if (nb_math_channels > MAX_MATH_CHANNELS - 1){
+	if (nb_math_channels - 1 < MAX_MATH_CHANNELS){
 		ui->btnAddMath->show();
 	}
 
