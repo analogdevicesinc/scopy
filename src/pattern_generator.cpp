@@ -235,6 +235,8 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 
 	connect(cgSettings->CBPattern,SIGNAL(activated(int)),this,
 	        SLOT(patternChanged(int)));
+	connect(cgSettings->CBOutput,SIGNAL(activated(int)),this,
+	        SLOT(outputModeChanged(int)));
 	connect(cgSettings->LECHLabel,SIGNAL(textEdited(QString)),this,
 	        SLOT(changeName(QString)));
 	connect(cgSettings->PBLeft,SIGNAL(pressed()),this,SLOT(pushButtonLeft()));
@@ -396,15 +398,37 @@ void PatternGenerator::updateCGSettings()
 	QString title;
 	QString name;
 	qreal thickness;
+	QString strMode;
+
+	bool mode;
+	bool mixed=false;
+
 
 	if (ch==nullptr) {
 		name = QString::fromStdString(chg->get_label());
 		title = name;
 		thickness = chg->getCh_thickness();
 
+		mode = chg->get_channel(0)->getOutputMode();
+
 		if (chg->is_grouped()) {
 			showColorSettings(false);
+
+			if (cgSettings->CBOutput->findText("Mix")==-1) {
+				cgSettings->CBOutput->addItem("Mix");
+			}
+
+			for (int i=0; i<chg->get_channel_count(); i++)
+				if (chg->get_channel(i)->getOutputMode()!=mode) {
+					mixed=true;
+				}
+
 		} else {
+
+			if (cgSettings->CBOutput->findText("Mix")!=-1) {
+				cgSettings->CBOutput->removeItem(cgSettings->CBOutput->findText("Mix"));
+			}
+
 			showColorSettings(true);
 		}
 
@@ -413,10 +437,18 @@ void PatternGenerator::updateCGSettings()
 		colour_button_high->set_colour(chg->getHighcolor());
 		colour_button_low->set_colour(chg->getLowcolor());
 
+
 	} else {
+
+
+		if (cgSettings->CBOutput->findText("Mix")!=-1) {
+			cgSettings->CBOutput->removeItem(cgSettings->CBOutput->findText("Mix"));
+		}
+
 		name = QString::fromStdString(ch->get_label());
 		auto id = QString::number(ch->get_id());
 		title = "Channel " + id;
+		mode = ch->getOutputMode();
 		thickness = ch->getCh_thickness();
 		showColorSettings(true);
 		colour_button_BG->set_colour(ch->getBgcolor());
@@ -425,10 +457,23 @@ void PatternGenerator::updateCGSettings()
 		colour_button_low->set_colour(ch->getLowcolor());
 	}
 
+	if (mixed) {
+		strMode="Mix";
+	} else {
+		if (mode) {
+			strMode = "OD";
+		} else {
+			strMode = "PP";
+		}
+	}
+
 	auto pattern = QString::fromStdString(chg->pattern->get_name());
 
 	cgSettings->LTitle->setText(title);
 	cgSettings->CBPattern->setCurrentText(pattern);
+
+	cgSettings->CBOutput->setCurrentText(strMode);
+
 	cgSettings->LECHLabel->setText(name);
 	cgSettings->LPattern->setText(pattern);
 	cgSettings->cmb_thickness->setCurrentText(QString::number(thickness));
@@ -436,6 +481,25 @@ void PatternGenerator::updateCGSettings()
 
 	deleteSettingsWidget();
 	createSettingsWidget();
+}
+
+void PatternGenerator::outputModeChanged(int index)
+{
+	auto chg = chm.getHighlightedChannelGroup();
+	auto ch = chm.getHighlightedChannel();
+
+	if (index==2) {
+		return;
+	}
+
+	if (ch) {
+		ch->setOutputMode(index);
+	} else {
+		for (int i=0; i<chg->get_channel_count(); i++) {
+			chg->get_channel(i)->setOutputMode(index);
+		}
+	}
+
 }
 
 void PatternGenerator::patternChanged(int index)
@@ -714,6 +778,7 @@ bool PatternGenerator::startPatternGeneration(bool cyclic)
 	}
 
 	qDebug("Setting channel direction");
+	diom->setMode(chm.get_mode_mask());
 	diom->lock(chm.get_enabled_mask());
 
 	qDebug("Setting sample rate");

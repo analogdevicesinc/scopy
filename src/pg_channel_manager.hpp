@@ -42,17 +42,13 @@ class PatternGeneratorChannelManagerUI;
 
 class PatternGeneratorChannel : public Channel
 {
-	std::string channel_role;
-	std::string trigger;
+	bool outputMode;
 public:
 	PatternGeneratorChannel(uint16_t id_, std::string label_);
-
-	std::string getChannel_role() const;
-	void setChannel_role(const std::string& value);
-	std::string getTrigger() const;
-	void setTrigger(const std::string& value);
 	qreal getCh_thickness() const;
 	void setCh_thickness(const qreal value);
+	bool getOutputMode() const;
+	void setOutputMode(bool value);
 
 private:
 	qreal ch_thickness;
@@ -222,6 +218,7 @@ public:
 	~PatternGeneratorChannelManager();
 	PatternGeneratorChannelGroup *get_channel_group(int index);
 
+	uint16_t get_mode_mask();
 	void join(std::vector<int> index);
 	void split(int index);
 	void move(int from, int to, bool after=true);

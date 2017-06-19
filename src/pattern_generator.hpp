@@ -185,6 +185,7 @@ private:
 private Q_SLOTS:
 
 	void reloadBufferInDevice();
+	void outputModeChanged(int index);
 	void patternChanged(int index);
 	void configureAutoSet();
 	void changeName(QString name);
@@ -202,6 +203,7 @@ class PatternGeneratorChannel_API : public ApiObject
 	Q_PROPERTY(QString label READ label WRITE setLabel);
 	Q_PROPERTY(int id READ id WRITE setId);
 	Q_PROPERTY(int mask READ mask);
+	Q_PROPERTY(bool outputMode READ outputMode WRITE setOutputMode)
 	PatternGeneratorChannel *ch;
 
 public:
@@ -226,6 +228,14 @@ public:
 	int mask()
 	{
 		return ch->get_mask();
+	}
+	bool outputMode()
+	{
+		return ch->getOutputMode();
+	}
+	void setOutputMode(bool val)
+	{
+		ch->setOutputMode(val);
 	}
 };
 

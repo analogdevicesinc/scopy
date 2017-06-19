@@ -295,7 +295,7 @@ background-color: #4A64FF;</string>
                  <item>
                   <widget class="QComboBox" name="CBOutput">
                    <property name="enabled">
-                    <bool>false</bool>
+                    <bool>true</bool>
                    </property>
                    <item>
                     <property name="text">
@@ -305,11 +305,6 @@ background-color: #4A64FF;</string>
                    <item>
                     <property name="text">
                      <string>OD</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>OS</string>
                     </property>
                    </item>
                   </widget>

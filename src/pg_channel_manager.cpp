@@ -48,22 +48,21 @@ class DecoderStack;
 namespace adiscope {
 
 //////////////////////// CHANNEL
+bool PatternGeneratorChannel::getOutputMode() const
+{
+	return outputMode;
+}
+
+void PatternGeneratorChannel::setOutputMode(bool value)
+{
+	outputMode = value;
+}
+
 PatternGeneratorChannel::PatternGeneratorChannel(uint16_t id_,
-                std::string label_) : Channel(id_,label_), channel_role("None"),
-	trigger("rising"),
+                std::string label_) : Channel(id_,label_),
+
 	ch_thickness(1.0)
-{
-
-}
-std::string PatternGeneratorChannel::getTrigger() const
-{
-	return trigger;
-}
-
-void PatternGeneratorChannel::setTrigger(const std::string& value)
-{
-	trigger = value;
-}
+{}
 
 qreal PatternGeneratorChannel::getCh_thickness() const
 {
@@ -73,16 +72,6 @@ qreal PatternGeneratorChannel::getCh_thickness() const
 void PatternGeneratorChannel::setCh_thickness(const qreal value)
 {
 	ch_thickness = value;
-}
-
-std::string PatternGeneratorChannel::getChannel_role() const
-{
-	return channel_role;
-}
-
-void PatternGeneratorChannel::setChannel_role(const std::string& value)
-{
-	channel_role = value;
 }
 ///////////////////////// CHANNEL UI
 PatternGeneratorChannelUI::PatternGeneratorChannelUI(PatternGeneratorChannel
@@ -1147,6 +1136,18 @@ PatternGeneratorChannelGroup *PatternGeneratorChannelManager::get_channel_group(
 	return static_cast<PatternGeneratorChannelGroup *>(channel_group[index]);
 }
 
+uint16_t PatternGeneratorChannelManager::get_mode_mask()
+{
+	uint16_t mask=0;
+
+	for (int i=0; i<channel.size(); i++) {
+		mask = mask | (get_channel(i)->getOutputMode() << i);
+	}
+
+	return mask;
+
+}
+
 void PatternGeneratorChannelManager::join(std::vector<int> index)
 {
 	PatternGeneratorChannelGroup *ret;
@@ -1575,7 +1576,6 @@ void PatternGeneratorChannelManagerUI::updateUi()
 		        SLOT(select(bool)));
 		connect(currentChannelGroupUI,SIGNAL(requestUpdateUi()),this,
 		        SLOT(triggerUpdateUi()));
-
 
 		if (ch->is_grouped()) { // create subwidgets
 			currentChannelGroupUI->ui->DioLabel->setText("");

@@ -211,6 +211,8 @@ public:
 	bool getInRaw(int ch);
 	void setDeviceOutRaw(int ch);
 
+	void setOutputMode(int ch, bool mode);
+	void setMode(int mask);
 	void setDirection(int ch, bool output);
 	bool getDirection(int ch);
 	void setDeviceDirection(int ch, bool force);

@@ -256,8 +256,10 @@ std::vector<Channel *> *ChannelGroup::get_channels()
 
 Channel *ChannelGroup::get_channel(int index)
 {
-	if(index < channels.size())
+	if (index < channels.size()) {
 		return channels[index];
+	}
+
 	return nullptr;
 }
 
@@ -471,6 +473,20 @@ iio_channel *DIOManager::getChannel(int ch)
 }
 
 
+void DIOManager::setOutputMode(int chid, bool mode)
+{
+	auto ch = getChannel(chid);
+	char strMode[10];
+
+	if (mode) {
+		strcpy(strMode,"open-drain");
+	} else {
+		strcpy(strMode,"push-pull");
+	}
+
+	iio_channel_attr_write(ch, "outputmode", strMode);
+}
+
 void DIOManager::setDeviceDirection(int chid, bool force)
 {
 
@@ -566,6 +582,19 @@ void DIOManager::setDirection(int ch, bool output)
 bool DIOManager::getDirection(int ch)
 {
 	return direction&(1<<ch);
+}
+
+void DIOManager::setMode(int mask)
+{
+	lockMask = mask;
+	int i=0;
+
+	while (mask) {
+		setOutputMode(i,mask&0x01);
+		mask=mask>>1;
+		i++;
+	}
+
 }
 
 void DIOManager::lock(int mask)
