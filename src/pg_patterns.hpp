@@ -589,7 +589,7 @@ public:
 	void init();
 	uint8_t pre_generate();
 	uint8_t generate_pattern(uint32_t sample_rate,
-				 uint32_t number_of_samples, uint16_t number_of_channels);
+	                         uint32_t number_of_samples, uint16_t number_of_channels);
 	void deinit();
 	virtual bool handle_result(QJSValue result,QString str = "");
 };
@@ -619,14 +619,14 @@ class JSPatternUI : public PatternUI
 	JSPatternUIScript_API *jspat_api;
 	JSPatternUIStatusWindow *textedit;
 public:
-	JSPatternUI(JSPattern* pat,QJsonObject obj_, QWidget *parent = 0);
+	JSPatternUI(JSPattern *pat,QJsonObject obj_, QWidget *parent = 0);
 	~JSPatternUI();
 
 	Pattern *get_pattern();
 	bool handle_result(QJSValue result,QString str = "");
 	void find_all_children(QObject *parent, QJSValue property);
 	void build_ui(QWidget *parent = 0,uint16_t number_of_channels=0);
-	void post_load_ui();	
+	void post_load_ui();
 	void destroy_ui();
 public Q_SLOTS:
 	void parse_ui();

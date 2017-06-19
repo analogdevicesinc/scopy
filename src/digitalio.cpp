@@ -153,11 +153,11 @@ DigitalIO::DigitalIO(struct iio_context *ctx, Filter *filt, QPushButton *runBtn,
 	connect(runBtn, SIGNAL(toggled(bool)), ui->btnRunStop, SLOT(setChecked(bool)));
 	connect(ui->btnRunStop, SIGNAL(toggled(bool)), runBtn, SLOT(setChecked(bool)));
 
-	if(!offline_mode)
-	{
+	if (!offline_mode) {
 		connect(diom,SIGNAL(locked()),this,SLOT(lockUi()));
 		connect(diom,SIGNAL(unlocked()),this,SLOT(lockUi()));
 	}
+
 	poll = new QTimer(this);
 	connect(poll,SIGNAL(timeout()),this,SLOT(updateUi()));
 
