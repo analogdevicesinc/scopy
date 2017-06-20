@@ -248,6 +248,10 @@ void MeasureSettings::setSelectedChannel(int chnIdx)
 		m_selectedChannel = chnIdx;
 		loadMeasurementStatesFromData();
 		loadStatisticStatesForChannel(chnIdx);
+		if (m_ui->button_measDisplayAll->isChecked()){
+			disableDisplayAllMeasurements();
+			displayAllMeasurements();
+		}
 	}
 }
 
