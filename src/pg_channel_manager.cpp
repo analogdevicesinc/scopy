@@ -1825,10 +1825,7 @@ void PatternGeneratorChannelManagerUI::groupSplitSelected()
 	if (changeHighlight) {
 
 		chm->highlightChannel(chm->get_channel_group(selection[0]));
-		pg->updateCGSettings();
 	}
-
-	/*Q_EMIT channelsChanged();*/
 }
 
 void PatternGeneratorChannelManagerUI::showHighlight(bool val)
