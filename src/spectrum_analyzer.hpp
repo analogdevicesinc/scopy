@@ -94,6 +94,8 @@ private Q_SLOTS:
 	void on_spinBox_averaging_valueChanged(int);
 	void runStopToggled(bool);
 	void onChannelSettingsToggled(bool);
+	void onChannelSelected(bool);
+	void onChannelEnabled(bool);
 	void onStartStopChanged();
 	void onCenterSpanChanged();
 	void on_btnLeftPeak_clicked();
@@ -104,6 +106,7 @@ private:
 	void build_gnuradio_block_chain();
 	void build_gnuradio_block_chain_no_ctx();
 	void writeAllSettingsToHardware();
+	int channelIdOfOpenedSettings() const;
 
 private:
 	Ui::SpectrumAnalyzer *ui;
@@ -114,6 +117,7 @@ private:
 	PositionSpinButton *ui_span;
 
 	QButtonGroup *settings_group;
+	QButtonGroup *channels_group;
 	FftDisplayPlot *fft_plot;
 
 	QList<channel_sptr> channels;
@@ -150,6 +154,9 @@ public:
 
 	int id() const { return m_id; }
 	QString name() const { return m_name; }
+
+	bool isSettingsOn() const;
+	void setSettingsOn(bool on);
 
 	float lineWidth() const;
 	void setLinewidth(float);

@@ -86,6 +86,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	ui(new Ui::SpectrumAnalyzer),
 	fft_plot(nullptr),
 	settings_group(new QButtonGroup(this)),
+	channels_group(new QButtonGroup(this)),
 	adc(adc),
 	adc_name(ctx ? filt->device_name(TOOL_SPECTRUM_ANALYZER) : ""),
 	crt_channel_id(0),
@@ -178,10 +179,18 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 		channels.push_back(channel);
 
 		settings_group->addButton(channel->m_ui->btn);
+		channels_group->addButton(channel->m_ui->name);
 
 		connect(channel.get(), SIGNAL(settingsToggled(bool)), this,
 			SLOT(onChannelSettingsToggled(bool)));
+		connect(channel.get(), SIGNAL(selected(bool)), this,
+			SLOT(onChannelSelected(bool)));
+		connect(channel.get(), SIGNAL(enabled(bool)), this,
+			SLOT(onChannelEnabled(bool)));
 	}
+
+	if (num_adc_channels > 0)
+		channels[crt_channel_id]->m_ui->name->setChecked(true);
 
 	// Initialize Sweep controls
 	double max_sr = 50e6; // TO DO: adc should detect max sampl rate and use that
@@ -392,9 +401,15 @@ void SpectrumAnalyzer::on_comboBox_type_currentIndexChanged(const QString& s)
 	if (it == avg_types.end())
 		return;
 
+	int crt_channel = channelIdOfOpenedSettings();
+	if (crt_channel < 0) {
+		qDebug() << "invalid channel ID for the opened Settings menu";
+		return;
+	}
+
 	auto avg_type = (*it).second;
-	if (avg_type != channels[crt_channel_id]->averageType())
-		channels[crt_channel_id]->setAverageType(avg_type);
+	if (avg_type != channels[crt_channel]->averageType())
+		channels[crt_channel]->setAverageType(avg_type);
 }
 
 void SpectrumAnalyzer::on_comboBox_window_currentIndexChanged(const QString& s)
@@ -406,24 +421,34 @@ void SpectrumAnalyzer::on_comboBox_window_currentIndexChanged(const QString& s)
 	if (it == win_types.end())
 		return;
 
-	if (!channels[crt_channel_id]->fft_block)
+	int crt_channel = channelIdOfOpenedSettings();
+	if (crt_channel < 0) {
+		qDebug() << "invalid channel ID for the opened Settings menu";
+		return;
+	}
+
+	if (!channels[crt_channel]->fft_block)
 		return;
 	auto win_type = (*it).second;
-	if (win_type != channels[crt_channel_id]->fftWindow())
-		channels[crt_channel_id]->setFftWindow((*it).second, FFT_SIZE);
+	if (win_type != channels[crt_channel]->fftWindow())
+		channels[crt_channel]->setFftWindow((*it).second, FFT_SIZE);
 }
 
 void SpectrumAnalyzer::on_spinBox_averaging_valueChanged(int n)
 {
-	if (n != channels[crt_channel_id]->averaging())
-		channels[crt_channel_id]->setAveraging(n);
+	int crt_channel = channelIdOfOpenedSettings();
+	if (crt_channel < 0) {
+		qDebug() << "invalid channel ID for the opened Settings menu";
+		return;
+	}
+
+	if (n != channels[crt_channel]->averaging())
+		channels[crt_channel]->setAveraging(n);
 }
 
 void SpectrumAnalyzer::onChannelSettingsToggled(bool en)
 {
 	SpectrumChannel *sc = static_cast<SpectrumChannel *>(QObject::sender());
-
-	crt_channel_id = sc->id();
 
 	QString style = QString("border: 2px solid %1").arg(sc->color().name());
 	ui->lineChannelSettingsTitle->setStyleSheet(style);
@@ -448,6 +473,38 @@ void SpectrumAnalyzer::onChannelSettingsToggled(bool en)
 
 	ui->stackedWidget->setCurrentWidget(ui->channelSettings);
 	ui->stackedWidget->setVisible(en);
+}
+
+void SpectrumAnalyzer::onChannelSelected(bool en)
+{
+	SpectrumChannel *sc = static_cast<SpectrumChannel *>(QObject::sender());
+	int old_crt_chn = crt_channel_id;
+	crt_channel_id = sc->id();
+
+	fft_plot->setPeakVisible(old_crt_chn, crt_peak, false);
+	fft_plot->setPeakVisible(crt_channel_id, crt_peak, true);
+
+	if (!ui->run_button->isChecked()) {
+			fft_plot->replot();
+	}
+}
+
+void SpectrumAnalyzer::onChannelEnabled(bool en)
+{
+	SpectrumChannel *sc = static_cast<SpectrumChannel *>(QObject::sender());
+
+	if (en) {
+		channels_group->addButton(sc->m_ui->name);
+		sc->m_ui->name->setChecked(true);
+		sc->m_ui->btn->setDisabled(false);
+	} else {
+		sc->m_ui->btn->setChecked(false);
+		sc->m_ui->btn->setDisabled(true);
+		channels_group->removeButton(sc->m_ui->name);
+		sc->m_ui->name->setChecked(false);
+		if (channels_group->buttons().size() > 0)
+			channels_group->buttons()[0]->setChecked(true);
+	}
 }
 
 void SpectrumAnalyzer::onStartStopChanged()
@@ -544,6 +601,19 @@ void SpectrumAnalyzer::writeAllSettingsToHardware()
 	}
 }
 
+int SpectrumAnalyzer::channelIdOfOpenedSettings() const
+{
+	int chId = -1;
+	for (int i = 0; i < channels.size(); i++) {
+		if (channels[i]->isSettingsOn()) {
+			chId = channels[i]->id();
+			break;
+		}
+	}
+
+	return chId;
+}
+
 void SpectrumAnalyzer::on_btnLeftPeak_clicked()
 {
 	if (crt_peak > 0) {
@@ -607,6 +677,16 @@ SpectrumChannel::SpectrumChannel(int id, const QString& name,
 		SLOT(onNameButtonToggled(bool)));
 	connect(m_ui->btn, SIGNAL(toggled(bool)), this,
 		SLOT(onSettingsBtnToggled(bool)));
+}
+
+bool SpectrumChannel::isSettingsOn() const
+{
+	return m_ui->btn->isChecked();
+}
+
+void SpectrumChannel::setSettingsOn(bool on)
+{
+	m_ui->btn->setChecked(on);
 }
 
 float SpectrumChannel::lineWidth() const
@@ -685,7 +765,7 @@ void SpectrumChannel::onEnableBoxToggled(bool en)
 
 void SpectrumChannel::onNameButtonToggled(bool en)
 {
-//	setDynamicProperty(m_ui->name->parentWidget(), "selected", en);
+	setDynamicProperty(m_ui->name->parentWidget(), "selected", en);
 
 	Q_EMIT selected(en);
 }
