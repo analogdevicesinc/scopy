@@ -25,9 +25,19 @@
 
 namespace adiscope {
 	class SpectrumAverage;
+	class SpectrumMarker;
 }
 
 namespace adiscope {
+
+	struct marker_data {
+		float x;
+		float y;
+		int bin;
+		bool active;
+		QString label;
+	};
+
 	class FftDisplayPlot : public DisplayPlot
 	{
 		Q_OBJECT
@@ -60,12 +70,19 @@ namespace adiscope {
 		std::vector<enum AverageType> d_ch_average_type;
 		std::vector<average_sptr> d_ch_avg_obj;
 
+		QList<int> d_num_markers;
+		QList<QList<struct marker_data>> d_markers;
+		QList<QList<SpectrumMarker *>> d_gui_markers;
+
 		void plotData(const std::vector<double *> pts,
 				uint64_t num_points);
 		void _resetXAxisPoints();
 
 		average_sptr getNewAvgObject(enum AverageType avg_type,
 			uint data_width, uint history);
+
+		void add_marker(int chn);
+		void remove_marker(int chn, int which);
 
 	public:
 		explicit FftDisplayPlot(int nplots, QWidget *parent = nullptr);
@@ -78,6 +95,12 @@ namespace adiscope {
 		void setAverage(uint chIdx, enum AverageType avg_type,
 			uint history);
 		void resetAverageHistory();
+
+		uint peakCount(uint chIdx) const;
+		void setPeakCount(uint chIdx, uint count);
+		bool isPeakVisible(uint chIdx, uint peakIdx) const;
+		void setPeakVisible(uint chnIdx, uint peakIdx, bool on);
+		void findPeaks(int chn);
 
 		void replot();
 

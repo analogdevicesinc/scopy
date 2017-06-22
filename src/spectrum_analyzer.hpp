@@ -88,6 +88,7 @@ private Q_SLOTS:
 	void on_btnToolSettings_toggled(bool checked);
 	void on_btnSettings_pressed();
 	void on_btnSweep_toggled(bool checked);
+	void on_btnMarkers_toggled(bool checked);
 	void on_comboBox_type_currentIndexChanged(const QString&);
 	void on_comboBox_window_currentIndexChanged(const QString&);
 	void on_spinBox_averaging_valueChanged(int);
@@ -95,6 +96,9 @@ private Q_SLOTS:
 	void onChannelSettingsToggled(bool);
 	void onStartStopChanged();
 	void onCenterSpanChanged();
+	void on_btnLeftPeak_clicked();
+	void on_btnRightPeak_clicked();
+	void on_btnMaxPeak_clicked();
 
 private:
 	void build_gnuradio_block_chain();
@@ -123,6 +127,8 @@ private:
 	int num_adc_channels;
 	int adc_bits_count;
 	int crt_channel_id;
+	int crt_peak;
+	uint max_peak_count;
 
 	gr::top_block_sptr top_block;
 

@@ -21,8 +21,11 @@
 #include "spectrumUpdateEvents.h"
 #include "signal_generator.hpp"
 #include "average.h"
+#include "spectrum_marker.hpp"
 
+#include <qwt_symbol.h>
 #include <boost/make_shared.hpp>
+
 using namespace adiscope;
 
 FftDisplayPlot::FftDisplayPlot(int nplots, QWidget *parent) :
@@ -40,6 +43,10 @@ FftDisplayPlot::FftDisplayPlot(int nplots, QWidget *parent) :
 		y_data.push_back(nullptr);
 
 		d_ch_average_type.push_back(AverageType::SAMPLE);
+
+		d_num_markers.push_back(0);
+		d_markers.push_back(QList<marker_data>());
+		d_gui_markers.push_back(QList<SpectrumMarker *>());
 	}
 	d_ch_avg_obj.resize(nplots);
 
@@ -160,6 +167,10 @@ void FftDisplayPlot::plotData(const std::vector<double *> pts,
 	}
 
 	_resetXAxisPoints();
+
+	for (int i = 0; i < d_nplots; i++) {
+		findPeaks(i);
+	}
 
 	replot();
 }
@@ -284,4 +295,137 @@ void FftDisplayPlot::setLeftVertAxisUnit(const QString& unit)
 		axisScaleDraw(QwtPlot::yLeft));
 	if (scale_draw)
 		scale_draw->setUnitType(unit);
+}
+
+void FftDisplayPlot::findPeaks(int chn)
+{
+	QList<struct marker_data>& markers = d_markers[chn];
+	int marker_count = markers.size();
+	int maxX[marker_count + 1];
+	float maxY[marker_count + 1];
+	double *x = x_data;
+	double *y = y_data[chn];
+
+	for (int i = 0; i <= marker_count; i++) {
+		maxX[i] = 0;
+		maxY[i] = -200.0;
+	}
+
+	maxY[0] = y[0];
+	for (int i = 3; i < d_numPoints; i++) {
+		for (int j = 0; j < marker_count; j++ ) {
+			if  ((y[i - 1] > maxY[j]) &&
+					((!((y[i - 2] > y[i - 1]) &&
+					 (y[i - 1] > y[i]))) &&
+					 (!((y[i - 2] < y[i - 1]) &&
+					 (y[i - 1] < y[i]))))) {
+
+				for (int k = marker_count; k > j; k--) {
+					maxY[k] = maxY[k - 1];
+					maxX[k] = maxX[k - 1];
+				}
+				maxY[j] = y[i - 1];
+				maxX[j] = i - 1;
+				break;
+			}
+		}
+	}
+
+	for (int i = 0; i < marker_count; i++) {
+		markers[i].x = x[maxX[i]];
+		markers[i].y = y[maxX[i]];
+		markers[i].bin = maxX[i];
+
+		d_gui_markers[chn][i]->setValue(markers[i].x, markers[i].y);
+	}
+}
+
+void FftDisplayPlot::add_marker(int chn)
+{
+	QString markerName = QString("M%1").arg(d_markers[chn].size());
+	// Data Marker
+	struct marker_data data_marker;
+	data_marker.label = markerName;
+	d_markers[chn].push_back(data_marker);
+
+	// GUI Marker
+	SpectrumMarker *gui_marker = new SpectrumMarker(markerName);
+	QwtSymbol *symbol = new QwtSymbol(
+		QwtSymbol::Diamond,QColor(255, 242, 0),
+		QPen(QColor(237, 28, 36), 2, Qt::SolidLine),
+		QSize(18, 18));
+	symbol->setSize(18, 18);
+	gui_marker->setSymbol(symbol);
+	gui_marker->setLabel(gui_marker->title());
+	gui_marker->setLabelAlignment(Qt::AlignTop);
+	gui_marker->attach(this);
+
+	QwtText mrk_lbl = gui_marker->label();
+	mrk_lbl.setColor(Qt::white);
+
+	QFont lbl_font = mrk_lbl.font();
+	lbl_font.setBold(true);
+	lbl_font.setPixelSize(11);
+
+	mrk_lbl.setFont(lbl_font);
+	gui_marker->setLabel(mrk_lbl);
+
+	d_gui_markers[chn].push_back(gui_marker);
+}
+
+void FftDisplayPlot::remove_marker(int chn, int which)
+{
+	if (which < d_markers[chn].size()) {
+		d_markers[chn].removeAt(which);
+		d_gui_markers[chn][which]->detach();
+		delete d_gui_markers[chn][which];
+		d_gui_markers[chn].removeAt(which);
+	}
+}
+
+uint FftDisplayPlot::peakCount(uint chIdx) const
+{
+	if (chIdx >= d_markers.size())
+		return 0;
+
+	return d_markers[chIdx].size();
+}
+
+void FftDisplayPlot::setPeakCount(uint chIdx, uint count)
+{
+	if (chIdx >= d_markers.size())
+		return;
+
+	if (d_markers[chIdx].size() == count)
+		return;
+
+	while (d_markers[chIdx].size()) {
+		remove_marker(chIdx, 0);
+	}
+
+	for (uint i = 0; i < count; i++) {
+		add_marker(chIdx);
+	}
+}
+
+bool FftDisplayPlot::isPeakVisible(uint chIdx, uint peakIdx) const
+{
+	if (chIdx >= d_markers.size())
+		return false;
+
+	if (peakIdx >= d_markers[chIdx].size())
+		return false;
+
+	return d_gui_markers[chIdx][peakIdx]->isVisible();
+}
+
+void FftDisplayPlot::setPeakVisible(uint chIdx, uint peakIdx, bool on)
+{
+	if (chIdx >= d_markers.size())
+		return;
+
+	if (peakIdx >= d_markers[chIdx].size())
+		return;
+
+	d_gui_markers[chIdx][peakIdx]->setVisible(on);
 }

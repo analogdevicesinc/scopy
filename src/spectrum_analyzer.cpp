@@ -88,7 +88,9 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	settings_group(new QButtonGroup(this)),
 	adc(adc),
 	adc_name(ctx ? filt->device_name(TOOL_SPECTRUM_ANALYZER) : ""),
-	crt_channel_id(0)
+	crt_channel_id(0),
+	crt_peak(0),
+	max_peak_count(10)
 {
 
 	// Get the list of names of the available channels
@@ -143,6 +145,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	settings_group->addButton(ui->btnToolSettings);
 	settings_group->addButton(ui->btnSettings);
 	settings_group->addButton(ui->btnSweep);
+	settings_group->addButton(ui->btnMarkers);
 	settings_group->setExclusive(true);
 
 	fft_plot = new FftDisplayPlot(num_adc_channels, this);
@@ -153,6 +156,14 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	fft_plot->setXaxisMouseGesturesEnabled(false);
 	for (uint i = 0; i < num_adc_channels; i++)
 		fft_plot->setYaxisMouseGesturesEnabled(i, false);
+	// Configure peak markers
+	for (uint i = 0; i < num_adc_channels; i++) {
+		fft_plot->setPeakCount(i, max_peak_count);
+		for (uint pk = 0; pk < max_peak_count; pk++) {
+			fft_plot->setPeakVisible(i, pk, false);
+		}
+	}
+	fft_plot->setPeakVisible(crt_channel_id, crt_peak, true);
 
 	QGridLayout *gLayout = static_cast<QGridLayout *>
 		(ui->widgetPlotContainer->layout());
@@ -256,6 +267,12 @@ void SpectrumAnalyzer::on_btnSettings_pressed()
 void SpectrumAnalyzer::on_btnSweep_toggled(bool checked)
 {
 	ui->stackedWidget->setCurrentWidget(ui->sweepSettings);
+	ui->stackedWidget->setVisible(checked);
+}
+
+void SpectrumAnalyzer::on_btnMarkers_toggled(bool checked)
+{
+	ui->stackedWidget->setCurrentWidget(ui->markerSettings);
 	ui->stackedWidget->setVisible(checked);
 }
 
@@ -524,6 +541,43 @@ void SpectrumAnalyzer::writeAllSettingsToHardware()
 	if (trigger) {
 		for (uint i = 0; i < trigger->numChannels(); i++)
 			trigger->setTriggerMode(i, HardwareTrigger::ALWAYS);
+	}
+}
+
+void SpectrumAnalyzer::on_btnLeftPeak_clicked()
+{
+	if (crt_peak > 0) {
+		fft_plot->setPeakVisible(crt_channel_id, crt_peak, false);
+		fft_plot->setPeakVisible(crt_channel_id, --crt_peak, true);
+
+		if (!ui->run_button->isChecked()) {
+			fft_plot->replot();
+		}
+	}
+}
+
+void SpectrumAnalyzer::on_btnRightPeak_clicked()
+{
+	if (crt_peak < max_peak_count - 1) {
+		fft_plot->setPeakVisible(crt_channel_id, crt_peak, false);
+		fft_plot->setPeakVisible(crt_channel_id, ++crt_peak, true);
+
+		if (!ui->run_button->isChecked()) {
+			fft_plot->replot();
+		}
+	}
+}
+
+void SpectrumAnalyzer::on_btnMaxPeak_clicked()
+{
+	if (crt_peak != 0) {
+		fft_plot->setPeakVisible(crt_channel_id, crt_peak, false);
+		crt_peak = 0;
+		fft_plot->setPeakVisible(crt_channel_id, crt_peak, true);
+
+		if (!ui->run_button->isChecked()) {
+			fft_plot->replot();
+		}
 	}
 }
 
