@@ -156,7 +156,7 @@ void FftDisplayPlot::plotData(const std::vector<double *> pts,
 
 		for (int s = 0; s < halfNumPoints; s++) {
 			//dB Full-Scale
-			y_data[i][s] = 10 * log10(4 * (y_data[i][s] / (2048 * 2048)) /
+			y_data[i][s] = 10 * log10((y_data[i][s] / (2048 * 2048)) /
 				(halfNumPoints * halfNumPoints));
 		}
 
