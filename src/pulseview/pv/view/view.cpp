@@ -91,7 +91,7 @@ using std::weak_ptr;
 namespace pv {
 namespace view {
 
-const Timestamp View::MaxScale("1e0");
+const Timestamp View::MaxScale("10e0");
 const Timestamp View::MinScale("100e-12");
 const int View::DivisionCount = 10;
 

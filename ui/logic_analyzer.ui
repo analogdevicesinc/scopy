@@ -1122,19 +1122,6 @@ color: white;
                 </property>
                </widget>
               </item>
-              <item row="0" column="0">
-               <spacer name="horizontalSpacer_18">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>339</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
               <item row="0" column="1">
                <widget class="QLabel" name="label_5">
                 <property name="sizePolicy">
@@ -1240,6 +1227,19 @@ color: white;
                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                 </property>
                </widget>
+              </item>
+              <item row="0" column="0">
+               <spacer name="horizontalSpacer_18">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>339</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
               </item>
              </layout>
             </widget>
@@ -1467,6 +1467,43 @@ color: #FFFFFF;
                   <property name="orientation">
                    <enum>Qt::Horizontal</enum>
                   </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="verticalSpacer_3">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeType">
+                   <enum>QSizePolicy::Fixed</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_8">
+                  <property name="text">
+                   <string>Run</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QComboBox" name="cmbRunMode">
+                  <item>
+                   <property name="text">
+                    <string>Repeated</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>Stream</string>
+                   </property>
+                  </item>
                  </widget>
                 </item>
                 <item>

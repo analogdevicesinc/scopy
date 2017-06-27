@@ -73,7 +73,7 @@ public:
 
 	void stop();
 
-	void set_buffersize(size_t value);
+	void set_buffersize(size_t value, bool entire_buf);
 
 	size_t get_buffersize();
 
@@ -84,6 +84,8 @@ public:
 	void set_single(bool);
 
 	void set_timeout(bool);
+
+	void set_entire_buffersize(size_t);
 private:
 	const std::shared_ptr<sigrok::Context> context_;
 	const std::shared_ptr<sigrok::InputFormat> format_;
@@ -95,6 +97,7 @@ private:
 	std::ifstream *f;
 	std::atomic<bool> interrupt_;
 	size_t buffersize_;
+	size_t entire_buffersize;
 	bool single_;
 	std::atomic<bool> running;
 	adiscope::LogicAnalyzer* la;

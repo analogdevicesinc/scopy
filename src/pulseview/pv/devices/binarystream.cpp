@@ -132,11 +132,13 @@ void BinaryStream::run()
 		stop();
 	running = true;
 	size_t nrx = 0;
+	size_t size_to_display;
 	input_->reset();
 	interrupt_ = false;
 	while (!interrupt_)
 	{
 		nbytes_rx = 0;
+		size_to_display = 0;
 		if(autoTrigger) {
 			la->refilling();
 		}
@@ -146,10 +148,15 @@ void BinaryStream::run()
 			nbytes_rx = iio_buffer_refill(data_);
 		nrx += nbytes_rx / 2;
 		if( nbytes_rx > 0 ) {
-
 			la->set_triggered_status("running");
-			input_->send(iio_buffer_start(data_), (size_t)(nbytes_rx));
-			input_->end();
+			size_to_display = (nrx > entire_buffersize) ? nbytes_rx-2*(entire_buffersize-nrx) : nbytes_rx;
+			input_->send(iio_buffer_start(data_), (size_t)(size_to_display));
+			if( nrx >= entire_buffersize ) {
+				input_->end();
+				input_->send(iio_buffer_start(data_)+(size_t)(size_to_display),
+					(size_t)(2*(entire_buffersize-nrx)));
+				nrx = 0;
+			}
 
 			if(autoTrigger) {
 				la->captured();
@@ -171,9 +178,16 @@ void BinaryStream::set_timeout(bool checked)
 	autoTrigger = checked;
 }
 
-void BinaryStream::set_buffersize(size_t value)
+void BinaryStream::set_buffersize(size_t value, bool entire_buf)
 {
 	buffersize_ = value;
+	if(entire_buf)
+		entire_buffersize =  value;
+}
+
+void BinaryStream::set_entire_buffersize(size_t value)
+{
+	entire_buffersize = value;
 }
 
 size_t BinaryStream::get_buffersize()

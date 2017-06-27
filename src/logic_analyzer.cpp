@@ -213,7 +213,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 		{"μs", 1E-6},
 		{"ms", 1E-3},
 		{"s", 1E0}
-	}, "Time Base", 10e-9, 1e0);
+	}, "Time Base", 10e-9, 10e0);
 	timePosition = new PositionSpinButton({
 		{"ns", 1E-9},
 		{"μs", 1E-6},
@@ -347,6 +347,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 		this, SLOT(updateBufferPreviewer()));
 	connect(ui->btnExport, SIGNAL(pressed()),
 		this, SLOT(btnExportPressed()));
+	connect(ui->cmbRunMode, SIGNAL(currentIndexChanged(int)),
+		this, SLOT(runModeChanged(int)));
 
 	cleanHWParams();
 	chm_ui = new LogicAnalyzerChannelManagerUI(0, main_win, &chm, ui->scrollAreaWidgetContents,
@@ -559,6 +561,12 @@ void LogicAnalyzer::captured()
 	Q_EMIT capturedSignal();
 }
 
+void LogicAnalyzer::triggeredOnce()
+{
+	//disable HW trigger
+	cleanHWParams();
+}
+
 void LogicAnalyzer::capturedSlot()
 {
 	if(timer->isActive()) {
@@ -600,24 +608,26 @@ void LogicAnalyzer::onHorizScaleValueChanged(double value)
 
 	double plotTimeSpan = value * 10; //Hdivision count
 	timer_timeout_ms = plotTimeSpan * 1000  + 100; //transfer time
+	custom_sampleCount = active_sampleCount / plotRefreshRate;
 
-	custom_sampleCount = maxBuffersize / plotRefreshRate;
+	if( plotTimeSpan >= timespanLimitStream )
+		d_timeTriggerHandle->setPosition(0);
 
 	enableTrigger(true);
-	if( plotTimeSpan >= timespanLimitStream )
+	if( plotTimeSpan >= timespanLimitStream && d_timeTriggerHandle->position() == 0 )
 	{
+		acquisition_mode = (ui->cmbRunMode->currentIndex() == REPEATED) ? SCREEN : SHIFT;
 		if(logic_analyzer_ptr && logic_analyzer_ptr->get_buffersize() != custom_sampleCount) {
-			logic_analyzer_ptr->set_buffersize(custom_sampleCount);
+			logic_analyzer_ptr->set_buffersize(custom_sampleCount, false);
+			logic_analyzer_ptr->set_entire_buffersize(active_sampleCount);
 			set_buffersize();
 		}
-		enableTrigger(false);
-		active_triggerSampleCount = 0;
 	}
 	else if( logic_analyzer_ptr )
 	{
 		if(logic_analyzer_ptr->get_buffersize() != active_sampleCount)
 		{
-			logic_analyzer_ptr->set_buffersize(active_sampleCount);
+			logic_analyzer_ptr->set_buffersize(active_sampleCount, true);
 			set_buffersize();
 		}
 	}
@@ -684,6 +694,7 @@ void LogicAnalyzer::updateBuffersizeSamplerateLabel(int samples, double samplera
 	QString txtSampleperiod = d_cursorTimeFormatter.format(1 / samplerate, "", 0);
 	QString text = QString("%1 Samples at ").arg(samples) + txtSamplerate +
 		"/" + txtSampleperiod;
+	text = (acquisition_mode == REPEATED) ? text : "Streaming at " + txtSamplerate;
 	ui->samplerateLabel->setText(text);
 }
 
@@ -755,12 +766,26 @@ void LogicAnalyzer::onTimePositionSpinboxChanged(double value)
 	active_triggerSampleCount = -(long long)params.triggerBufferSize;
 	active_timePos = -params.timePos;
 
-	int pix = timeToPixel(-value);
-	if( logic_analyzer_ptr )
+	double plotTimeSpan = 10 * timeBase->value();
+
+	int trigX = timeToPixel(-active_timePos);
+	d_timeTriggerHandle->setPositionSilenty(trigX);
+
+
+	if( plotTimeSpan >= timespanLimitStream && trigX == 0)
+	{
+		custom_sampleCount = active_sampleCount / plotRefreshRate;
+		if(logic_analyzer_ptr && logic_analyzer_ptr->get_buffersize() != custom_sampleCount) {
+			logic_analyzer_ptr->set_buffersize(custom_sampleCount, false);
+			logic_analyzer_ptr->set_entire_buffersize(active_sampleCount);
+			set_buffersize();
+		}
+	}
+	else if( logic_analyzer_ptr )
 	{
 		if(logic_analyzer_ptr->get_buffersize() != active_sampleCount)
 		{
-			logic_analyzer_ptr->set_buffersize(active_sampleCount);
+			logic_analyzer_ptr->set_buffersize(active_sampleCount, true);
 			set_buffersize();
 		}
 	}
@@ -773,8 +798,6 @@ void LogicAnalyzer::onTimePositionSpinboxChanged(double value)
 		setSamplerateLabelValue(active_sampleRate);
 	}
 	setTriggerDelay();
-	int trigX = timeToPixel(-active_timePos);
-	d_timeTriggerHandle->setPositionSilenty(trigX);
 	main_win->view_->viewport()->setTimeTriggerPixel(trigX);
 	main_win->view_->time_item_appearance_changed(true, true);
 	recomputeCursorsValue(false);
@@ -830,7 +853,8 @@ void LogicAnalyzer::startStop(bool start)
 		setSampleRate();
 		running = true;
 		ui->btnRunStop->setText("Stop");
-		ui->btnSingleRun->setEnabled(false);
+		if(acquisition_mode != REPEATED)
+			ui->btnSingleRun->setEnabled(false);
 		setHWTriggerDelay(active_triggerSampleCount);
 		setTriggerDelay();
 		if (timePosition->value() != active_timePos)
@@ -842,7 +866,8 @@ void LogicAnalyzer::startStop(bool start)
 		main_win->view_->viewport()->enableDrag();
 		running = false;
 		ui->btnRunStop->setText("Run");
-		ui->btnSingleRun->setEnabled(true);
+		if(acquisition_mode != REPEATED)
+			ui->btnSingleRun->setEnabled(true);
 		if(timer->isActive()) {
 			timer->stop();
 		}
@@ -1280,6 +1305,27 @@ void LogicAnalyzer::resetInstrumentToDefault()
 void LogicAnalyzer::setTimeout(bool checked)
 {
 	logic_analyzer_ptr->set_timeout(checked);
+}
+
+void LogicAnalyzer::runModeChanged(int index)
+{
+	switch(index){
+		case REPEATED:
+		{
+			ui->btnSingleRun->setEnabled(true);
+		}
+			break;
+		case SCREEN:
+		{
+			ui->btnSingleRun->setEnabled(false);
+		}
+			break;
+		case SHIFT:
+		{
+
+		}
+		default:break;
+	}
 }
 
 /*

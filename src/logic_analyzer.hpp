@@ -83,6 +83,12 @@ class LogicAnalyzer : public Tool
 	Q_OBJECT
 
 public:
+	enum AcquisitionMode {
+		REPEATED,
+		SCREEN,
+		SHIFT
+	};
+
 	explicit LogicAnalyzer(struct iio_context *ctx,
 	                       Filter *filt,
 	                       QPushButton *runButton,
@@ -100,6 +106,10 @@ public:
 	void setTriggerCache(int chid, std::string trigger_value);
 	void get_channel_groups_api();
 	void installWheelEventGuard();
+	void triggeredOnce();
+
+	int getCurrent_acquisition_mode() const;
+	void setCurrent_acquisition_mode(int value);
 
 private Q_SLOTS:
 	void startStop(bool start);
@@ -126,6 +136,7 @@ private Q_SLOTS:
 	void startTimeout();
 	void capturedSlot();
 	void btnExportPressed();
+	void runModeChanged(int index);
 public Q_SLOTS:
 	void onTimeTriggerHandlePosChanged(int);
 	void onTimePositionSpinboxChanged(double value);
@@ -243,6 +254,7 @@ private:
 	void set_buffersize();
 	MouseWheelWidgetGuard *wheelEventGuard;
 	bool offline_mode;
+	int acquisition_mode;
 };
 
 class LogicAnalyzer_API : public ApiObject
