@@ -578,7 +578,7 @@ void PatternGenerator::colorChanged(QColor color)
 	QString type = sender->property("type").toString();
 
 	if (type == "background") {
-		if (!ch) {
+		if (!chui) {
 			chg->setBgcolor(color);
 			chgui->updateTrace();
 		} else {
@@ -586,7 +586,7 @@ void PatternGenerator::colorChanged(QColor color)
 			chui->updateTrace();
 		}
 	} else if (type == "edge") {
-		if (!ch) {
+		if (!chui) {
 			chg->setEdgecolor(color);
 			chgui->updateTrace();
 		} else {
@@ -594,7 +594,7 @@ void PatternGenerator::colorChanged(QColor color)
 			chui->updateTrace();
 		}
 	} else if (type == "low") {
-		if (!ch) {
+		if (!chui) {
 			chg->setLowcolor(color);
 			chgui->updateTrace();
 		} else {
@@ -602,7 +602,7 @@ void PatternGenerator::colorChanged(QColor color)
 			chui->updateTrace();
 		}
 	} else if (type == "high") {
-		if (!ch) {
+		if (!chui) {
 			chg->setHighcolor(color);
 			chgui->updateTrace();
 		} else {
