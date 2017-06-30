@@ -1835,7 +1835,9 @@ void LogicAnalyzerChannelManagerUI::chmRangeChanged(int min, int max)
 
 void LogicAnalyzerChannelManagerUI::triggerUpdateUi()
 {
+	int val = ui->scrollArea->verticalScrollBar()->value();
 	update_ui();
+	ui->scrollArea->verticalScrollBar()->setValue(val);
 }
 
 void LogicAnalyzerChannelManagerUI::collapse(bool check)
@@ -1872,7 +1874,8 @@ void LogicAnalyzerChannelManagerUI::groupSplit_clicked()
 		chm->join(selection);
 		chm->deselect_all();
 	}
-
+	ui->scrollArea->verticalScrollBar()->setValue(
+		ui->scrollArea->verticalScrollBar()->maximum());
 	update_ui();
 }
 
