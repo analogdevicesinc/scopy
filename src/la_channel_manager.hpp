@@ -325,6 +325,7 @@ private:
 	void createColorButtons();
 	void showColorSettings(bool);
 	MouseWheelWidgetGuard *eventFilterGuard;
+	void enableCgSettings(bool en);
 Q_SIGNALS:
 	void widthChanged(int);
 };
