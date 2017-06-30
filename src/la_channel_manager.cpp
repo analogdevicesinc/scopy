@@ -1883,6 +1883,14 @@ void LogicAnalyzerChannelManagerUI::hideInactive_clicked(bool hide)
 {
 	hidden = hide;
 	update_ui();
+	auto chg = chm->getHighlightedChannelGroup();
+	auto ch = chm->getHighlightedChannel();
+	if(getUiFromCh(ch)==nullptr && getUiFromChGroup(chg)==nullptr) {
+		enableCgSettings(false);
+	}
+	else {
+		enableCgSettings(true);
+	}
 }
 
 void LogicAnalyzerChannelManagerUI::showHighlight(bool check)
@@ -2086,6 +2094,17 @@ void LogicAnalyzerChannelManagerUI::showColorSettings(bool check)
 	}
 }
 
+void LogicAnalyzerChannelManagerUI::enableCgSettings(bool en)
+{
+	generalSettingsUi->cmbThickness->setEnabled(en);
+	generalSettingsUi->nameLineEdit->setEnabled(en);
+	colour_button_BG->setEnabled(en);
+	colour_button_edge->setEnabled(en);
+	colour_button_high->setEnabled(en);
+	colour_button_low->setEnabled(en);
+}
+
+
 void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 {
 	settingsUI = new Ui::LASettingsWidget();
@@ -2099,6 +2118,16 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 		this, SLOT(highlightNext()));
 	connect(settingsUI->btnPrevious, SIGNAL(pressed()),
 		this, SLOT(highlightPrevious()));
+
+	auto chg = chm->getHighlightedChannelGroup();
+	auto ch = chm->getHighlightedChannel();
+	if(getUiFromCh(ch)==nullptr && getUiFromChGroup(chg)==nullptr) {
+		enableCgSettings(false);
+		return;
+	}
+	else {
+		enableCgSettings(true);
+	}
 
 	if (chm->getHighlightedChannelGroup()) {
 		LogicAnalyzerChannelGroup *chGroup = chm->getHighlightedChannelGroup();

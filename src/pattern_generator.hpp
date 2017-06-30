@@ -181,6 +181,7 @@ private:
 	void deleteSettingsWidget();
 	void createSettingsWidget();
 	void showColorSettings(bool check);
+	void enableCgSettings(bool en);
 
 private Q_SLOTS:
 

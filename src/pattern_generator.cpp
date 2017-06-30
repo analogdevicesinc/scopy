@@ -390,10 +390,33 @@ PatternUI *PatternGenerator::getCurrentPatternUI()
 	return currentUI;
 }
 
+void PatternGenerator::enableCgSettings(bool en)
+{
+	cgSettings->CBOutput->setEnabled(en);
+	cgSettings->CBPattern->setEnabled(en);
+	cgSettings->cmb_thickness->setEnabled(en);
+	cgSettings->btnCollapse->setEnabled(en);
+	cgSettings->btnCollapse2->setEnabled(en);
+	cgSettings->LECHLabel->setEnabled(en);
+	cgSettings->patternSettings->setEnabled(en);
+	colour_button_BG->setEnabled(en);
+	colour_button_edge->setEnabled(en);
+	colour_button_high->setEnabled(en);
+	colour_button_low->setEnabled(en);
+}
+
 void PatternGenerator::updateCGSettings()
 {
 	auto chg = chm.getHighlightedChannelGroup();
 	auto ch = chm.getHighlightedChannel();
+
+	if(chmui->findUiByChannel(ch)==nullptr && chmui->findUiByChannelGroup(chg)==nullptr) {
+		enableCgSettings(false);
+		return;
+	}
+	else {
+		enableCgSettings(true);
+	}
 
 	QString title;
 	QString name;
