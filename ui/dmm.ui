@@ -46,7 +46,7 @@ QLabel { color: rgba(255, 255, 255, 40); font-size: 51px; font-weight: bold; qpr
        <number>32</number>
       </property>
       <property name="rightMargin">
-       <number>32</number>
+       <number>16</number>
       </property>
       <property name="bottomMargin">
        <number>32</number>
@@ -75,7 +75,7 @@ QLabel { color: rgba(255, 255, 255, 40); font-size: 51px; font-weight: bold; qpr
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_7">
           <property name="spacing">
-           <number>20</number>
+           <number>12</number>
           </property>
           <item>
            <widget class="adiscope::Sismograph" name="sismograph_ch1">
@@ -126,7 +126,7 @@ QLabel { color: rgba(255, 255, 255, 40); font-size: 51px; font-weight: bold; qpr
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>315</width>
+                  <width>368</width>
                   <height>105</height>
                  </size>
                 </property>
@@ -137,7 +137,7 @@ QLabel { color: rgba(255, 255, 255, 40); font-size: 51px; font-weight: bold; qpr
                  <enum>QFrame::NoFrame</enum>
                 </property>
                 <property name="digitCount">
-                 <number>6</number>
+                 <number>7</number>
                 </property>
                 <property name="segmentStyle">
                  <enum>QLCDNumber::Flat</enum>
@@ -154,7 +154,7 @@ QLabel { color: rgba(255, 255, 255, 40); font-size: 51px; font-weight: bold; qpr
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>180</width>
+                  <width>170</width>
                   <height>105</height>
                  </size>
                 </property>
@@ -216,7 +216,7 @@ QLabel { color: rgba(255, 255, 255, 40); font-size: 51px; font-weight: bold; qpr
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_9">
           <property name="spacing">
-           <number>20</number>
+           <number>12</number>
           </property>
           <item>
            <widget class="adiscope::Sismograph" name="sismograph_ch2">
@@ -267,7 +267,7 @@ QLabel { color: rgba(255, 255, 255, 40); font-size: 51px; font-weight: bold; qpr
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>315</width>
+                  <width>368</width>
                   <height>105</height>
                  </size>
                 </property>
@@ -278,7 +278,7 @@ QLabel { color: rgba(255, 255, 255, 40); font-size: 51px; font-weight: bold; qpr
                  <enum>QFrame::NoFrame</enum>
                 </property>
                 <property name="digitCount">
-                 <number>6</number>
+                 <number>7</number>
                 </property>
                 <property name="segmentStyle">
                  <enum>QLCDNumber::Flat</enum>
@@ -295,7 +295,7 @@ QLabel { color: rgba(255, 255, 255, 40); font-size: 51px; font-weight: bold; qpr
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>180</width>
+                  <width>170</width>
                   <height>105</height>
                  </size>
                 </property>
