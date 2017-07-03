@@ -1,6 +1,6 @@
 #define AppExeName "Scopy.exe"
 #define AppName "Scopy"
-#define Python "python3.5"
+#define Python "python3.6"
 
 [Setup]
 AppId={{02A7A7F9-F068-4B1C-85F6-B6D325938E19}
