@@ -1120,8 +1120,6 @@ void PatternGeneratorChannelManager::clearChannels()
 
 void PatternGeneratorChannelManager::clearChannelGroups()
 {
-	clearChannels();
-
 	for (auto ch : channel_group) {
 		delete ch;
 	}
