@@ -460,7 +460,6 @@ void PatternGenerator::updateCGSettings()
 		colour_button_high->set_colour(chg->getHighcolor());
 		colour_button_low->set_colour(chg->getLowcolor());
 
-
 	} else {
 
 
@@ -479,6 +478,10 @@ void PatternGenerator::updateCGSettings()
 		colour_button_high->set_colour(ch->getHighcolor());
 		colour_button_low->set_colour(ch->getLowcolor());
 	}
+	colour_button_high->update();
+	colour_button_low->update();
+	colour_button_edge->update();
+	colour_button_BG->update();
 
 	if (mixed) {
 		strMode="Mix";
