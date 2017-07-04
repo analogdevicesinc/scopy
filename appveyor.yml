@@ -13,11 +13,11 @@ install:
     - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -Sy mingw-w64-x86_64-gcc mingw-w64-x86_64-qt5 mingw-w64-x86_64-libusb mingw-w64-x86_64-boost mingw-w64-x86_64-python3 mingw-w64-x86_64-fftw mingw-w64-x86_64-libzip mingw-w64-x86_64-glibmm"
 
     # Install 32-bit pre-compiled libraries
-    - appveyor DownloadFile "https://ci.appveyor.com/api/projects/analogdevicesinc/scopy-mingw-build-deps/artifacts/scopy-mingw32-build-deps.tar.xz?branch=master&job=Environment: MINGW_VERSION=mingw32, ARCH=i686" -FileName C:\scopy-mingw32-build-deps.tar.xz
+    - 'appveyor DownloadFile "https://ci.appveyor.com/api/projects/analogdevicesinc/scopy-mingw-build-deps/artifacts/scopy-mingw32-build-deps.tar.xz?branch=master&job=Environment: MINGW_VERSION=mingw32, ARCH=i686" -FileName C:\scopy-mingw32-build-deps.tar.xz'
     - C:\msys64\usr\bin\bash -lc "cd /c ; tar xJf scopy-mingw32-build-deps.tar.xz"
 
     # Install 64-bit pre-compiled libraries
-    - appveyor DownloadFile "https://ci.appveyor.com/api/projects/analogdevicesinc/scopy-mingw-build-deps/artifacts/scopy-mingw64-build-deps.tar.xz?branch=master&job=Environment: MINGW_VERSION=mingw64, ARCH=x86_64" -FileName C:\scopy-mingw64-build-deps.tar.xz
+    - 'appveyor DownloadFile "https://ci.appveyor.com/api/projects/analogdevicesinc/scopy-mingw-build-deps/artifacts/scopy-mingw64-build-deps.tar.xz?branch=master&job=Environment: MINGW_VERSION=mingw64, ARCH=x86_64"' -FileName C:\scopy-mingw64-build-deps.tar.xz'
     - C:\msys64\usr\bin\bash -lc "cd /c ; tar xJf scopy-mingw64-build-deps.tar.xz"
 
     # Download a 32-bit version of windres.exe
