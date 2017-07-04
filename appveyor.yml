@@ -17,7 +17,7 @@ install:
     - C:\msys64\usr\bin\bash -lc "cd /c ; tar xJf scopy-mingw32-build-deps.tar.xz"
 
     # Install 64-bit pre-compiled libraries
-    - 'appveyor DownloadFile "https://ci.appveyor.com/api/projects/analogdevicesinc/scopy-mingw-build-deps/artifacts/scopy-mingw64-build-deps.tar.xz?branch=master&job=Environment: MINGW_VERSION=mingw64, ARCH=x86_64"' -FileName C:\scopy-mingw64-build-deps.tar.xz'
+    - 'appveyor DownloadFile "https://ci.appveyor.com/api/projects/analogdevicesinc/scopy-mingw-build-deps/artifacts/scopy-mingw64-build-deps.tar.xz?branch=master&job=Environment: MINGW_VERSION=mingw64, ARCH=x86_64" -FileName C:\scopy-mingw64-build-deps.tar.xz'
     - C:\msys64\usr\bin\bash -lc "cd /c ; tar xJf scopy-mingw64-build-deps.tar.xz"
 
     # Download a 32-bit version of windres.exe
