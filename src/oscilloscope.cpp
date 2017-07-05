@@ -1112,9 +1112,36 @@ void adiscope::Oscilloscope::channel_box_toggled(bool checked)
 		channels_group->addButton(name);
 		name->setChecked(true);
 
+		bool shouldActivate = true;
+
+		for (unsigned int i = 0; i < nb_channels + nb_math_channels; i++) {
+			if (i == id)
+				continue;
+			QWidget *parent = ui->channelsList->itemAt(i)->widget();
+			QCheckBox *channelBox = parent->findChild<QCheckBox *>("box");
+			if (channelBox->isChecked())
+				shouldActivate = false;
+		}
+
+		if (shouldActivate)
+			measure_settings->activateDisplayAll();
+
 	} else {
 		qDebug() << "Detaching curve" << id;
 		plot.DetachCurve(id);
+		bool shouldDisable = true;
+
+		for (unsigned int i = 0; i < nb_channels + nb_math_channels; i++) {
+			if (i == id)
+				continue;
+			QWidget *parent = ui->channelsList->itemAt(i)->widget();
+			QCheckBox *channelBox = parent->findChild<QCheckBox *>("box");
+			if (channelBox->isChecked())
+				shouldDisable = false;
+		}
+
+		if (shouldDisable)
+			measure_settings->disableDisplayAll();
 
 		channels_group->removeButton(name);
 		name->setChecked(false);

@@ -74,6 +74,9 @@ public:
 	bool emitStatsChanged()const;
 	void setEmitStatsChanged(bool en);
 
+	void disableDisplayAll();
+	void activateDisplayAll();
+
 	QList<MeasurementItem> measurementSelection();
 	QList<MeasurementItem> statisticSelection();
 
@@ -92,7 +95,6 @@ public Q_SLOTS:
 	void onChannelAdded(int);
 	void onChannelRemoved(int);
 	void setSelectedChannel(int);
-
 private Q_SLOTS:
 	void onMeasurementPropertyChanged(QStandardItem *item);
 	void on_button_measDisplayAll_toggled(bool checked);
@@ -133,6 +135,7 @@ private:
 	bool m_emitDeleteAll;
 	bool m_emitStatsDeleteAll;
 	bool m_are_dropdowns_filled;
+	bool m_enableDisplayAll;
 
 	CapturePlot* m_plot;
 	int m_selectedChannel;

@@ -48,7 +48,8 @@ MeasureSettings::MeasureSettings(CapturePlot *plot, QWidget *parent) :
 	m_emitDeleteAll(true),
 	m_are_dropdowns_filled(false),
 	m_plot(plot),
-	m_selectedChannel(-1)
+	m_selectedChannel(-1),
+	m_enableDisplayAll(false)
 {
 	QTreeView *treeView;
 
@@ -456,6 +457,20 @@ void MeasureSettings::on_button_statsDeleteAll_toggled(bool checked)
 		else
 			recoverAllStatistics();
 	}
+}
+
+void MeasureSettings::disableDisplayAll()
+{
+	if (m_ui->button_measDisplayAll->isChecked()){
+		m_ui->button_measDisplayAll->setChecked(false);
+		m_enableDisplayAll = true;
+	} else {
+		m_enableDisplayAll = false;
+	}
+}
+
+void MeasureSettings::activateDisplayAll(){
+	m_ui->button_measDisplayAll->setChecked(m_enableDisplayAll);
 }
 
 void MeasureSettings::deleteAllStatistics()
