@@ -867,8 +867,8 @@ void PatternGenerator::startStop(bool start)
 //	main_win->action_view_zoom_fit()->trigger();
 
 	if (start) {
+		ui->btnRunStop->setText("Stop");
 		if (startPatternGeneration(true)) {
-			ui->btnRunStop->setText("Stop");
 			setPGStatus(RUNNING);
 		} else {
 			qDebug("Pattern generation failed");
