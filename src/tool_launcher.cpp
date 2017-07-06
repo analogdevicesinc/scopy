@@ -770,7 +770,7 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 
 
 	if (filter->compatible((TOOL_NETWORK_ANALYZER))) {
-		network_analyzer = new NetworkAnalyzer(ctx, filter,
+		network_analyzer = new NetworkAnalyzer(ctx, filter, adc,
 		                                       ui->stopNetworkAnalyzer, &js_engine, this);
 	}
 
