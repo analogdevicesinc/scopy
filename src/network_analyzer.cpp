@@ -21,6 +21,8 @@
 #include "network_analyzer.hpp"
 #include "signal_generator.hpp"
 #include "spinbox_a.hpp"
+#include "osc_adc.h"
+#include "hardware_trigger.hpp"
 #include "ui_network_analyzer.h"
 
 #include <gnuradio/analog/sig_source_c.h>
@@ -57,10 +59,12 @@ using namespace adiscope;
 using namespace gr;
 
 NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
+		std::shared_ptr<GenericAdc> adc_dev,
 		QPushButton *runButton, QJSEngine *engine,
 		ToolLauncher *parent) :
 	Tool(ctx, runButton, new NetworkAnalyzer_API(this), parent),
-	ui(new Ui::NetworkAnalyzer)
+	ui(new Ui::NetworkAnalyzer),
+	adc_dev(adc_dev)
 {
 	iio = iio_manager::get_instance(ctx,
 			filt->device_name(TOOL_NETWORK_ANALYZER, 2));
@@ -387,6 +391,7 @@ void NetworkAnalyzer::startStop(bool pressed)
 		ui->phasegraph->reset();
 		ui->xygraph->reset();
 		ui->nicholsgraph->reset();
+		configHwForNetworkAnalyzing();
 		thd = QtConcurrent::run(this, &NetworkAnalyzer::run);
 	} else {
 		thd.waitForFinished();
@@ -514,6 +519,15 @@ struct iio_buffer * NetworkAnalyzer::generateSinWave(
 	iio_buffer_push(buf);
 
 	return buf;
+}
+
+void NetworkAnalyzer::configHwForNetworkAnalyzing()
+{
+	auto trigger = adc_dev->getTrigger();
+	if (trigger) {
+		for (uint i = 0; i < trigger->numChannels(); i++)
+			trigger->setTriggerMode(i, HardwareTrigger::ALWAYS);
+	}
 }
 
 double NetworkAnalyzer_API::getMinFreq() const

@@ -44,6 +44,7 @@ class QJSEngine;
 namespace adiscope {
 	class NetworkAnalyzer_API;
 	class Filter;
+	class GenericAdc;
 
 	class NetworkAnalyzer : public Tool
 	{
@@ -54,6 +55,7 @@ namespace adiscope {
 
 	public:
 		explicit NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
+				std::shared_ptr<GenericAdc> adc_dev,
 				QPushButton *runButton, QJSEngine *engine,
 				ToolLauncher *parent);
 		~NetworkAnalyzer();
@@ -62,6 +64,7 @@ namespace adiscope {
 		Ui::NetworkAnalyzer *ui;
 		struct iio_channel *dac1, *dac2;
 		struct iio_device *adc;
+		std::shared_ptr<GenericAdc> adc_dev;
 		boost::shared_ptr<iio_manager> iio;
 
 		QFuture<void> thd;
@@ -87,6 +90,7 @@ namespace adiscope {
 				size_t samples_count);
 
 		unsigned long get_best_adc_rate(double frequency);
+		void configHwForNetworkAnalyzing();
 
 	private Q_SLOTS:
 		void startStop(bool start);
