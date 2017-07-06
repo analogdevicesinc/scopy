@@ -1237,6 +1237,12 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 	for (unsigned int i = 0; i < nb_channels; i++)
 		iio->set_buffer_size(ids[i], active_sample_count);
 
+	/* timeout = how long a buffer capture takes + transmission latency. The
+	latter is a guessed value. If we could get a feedback from hardware that
+	the acquisition has been made and it's on the way then we can drop this
+	approach. */
+	iio->set_device_timeout((active_sample_count / active_sample_rate) * 1000 + 100);
+
 	if (started)
 		iio->unlock();
 
