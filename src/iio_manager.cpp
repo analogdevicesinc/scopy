@@ -325,3 +325,8 @@ void iio_manager::got_timeout()
 {
 	Q_EMIT timeout();
 }
+
+void iio_manager::set_device_timeout(unsigned int mseconds)
+{
+	iio_block->set_timeout_ms(mseconds);
+}

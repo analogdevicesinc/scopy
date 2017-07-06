@@ -95,6 +95,9 @@ namespace adiscope {
 		void lock() { gr::top_block::stop(); gr::top_block::wait(); }
 		void unlock() { gr::top_block::start(); }
 
+		/* Set the timeout for the source device */
+		void set_device_timeout(unsigned int mseconds);
+
 	private:
 		static std::map<const std::string, map_entry> dev_map;
 		static unsigned _id;
