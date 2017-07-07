@@ -2511,6 +2511,10 @@ void Channel_API::setVoltsPerDiv(double val)
 {
 	int index = osc->channels_api.indexOf(this);
 	osc->plot.setVertUnitsPerDiv(val, index);
+
+	QLabel *label = static_cast<QLabel *>(
+			osc->ui->chn_scales->itemAt(index)->widget());
+	label->setText(osc->vertMeasureFormat.format(val, "V", 3));
 }
 
 double Channel_API::getVOffset() const
