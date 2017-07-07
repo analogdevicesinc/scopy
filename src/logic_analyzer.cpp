@@ -1263,6 +1263,8 @@ void LogicAnalyzer::setCursorsActive(bool active)
 void LogicAnalyzer::resetInstrumentToDefault()
 {
 	chm.clearChannelGroups();
+	cleanHWParams();
+	chm.clearTrigger();
 	for(int i = 0; i < no_channels; i++) {
 		chm.add_channel_group(new LogicAnalyzerChannelGroup(chm.get_channel(i)));
 	}

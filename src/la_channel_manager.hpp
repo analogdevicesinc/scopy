@@ -236,6 +236,7 @@ public:
 	void add_channel_group(LogicAnalyzerChannelGroup *chg);
 	LogicAnalyzerChannel *get_channel(int);
 	void clearChannelGroups();
+	void clearTrigger();
 private:
 	std::vector<const srd_decoder *> decoderList;
 	QStringList nameDecoderList;

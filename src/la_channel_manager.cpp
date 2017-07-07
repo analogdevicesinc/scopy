@@ -1198,8 +1198,14 @@ void LogicAnalyzerChannelManager::clearChannelGroups()
 	for (auto ch : channel_group) {
 		delete ch;
 	}
-
 	channel_group.erase(channel_group.begin(),channel_group.end());
+}
+
+void LogicAnalyzerChannelManager::clearTrigger()
+{
+	for(auto ch : lchannels) {
+		ch->setTrigger("None");
+	}
 }
 
 void LogicAnalyzerChannelManager::split(int index)
