@@ -1274,6 +1274,7 @@ void LogicAnalyzer::resetInstrumentToDefault()
 	timeBase->setValue(1e-3);
 	ui->btnCursorsLock->setChecked(false);
 	ui->boxCursors->setChecked(false);
+	ui->btnShowChannels->clicked(false);
 }
 
 void LogicAnalyzer::setTimeout(bool checked)
