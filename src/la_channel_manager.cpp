@@ -389,7 +389,6 @@ void LogicAnalyzerChannelUI::highlightBotSeparator()
 
 void LogicAnalyzerChannelUI::enableControls(bool enabled)
 {
-	ui->btnRemGroup->setEnabled(enabled);
 	ui->groupName->setEnabled(enabled);
 	ui->comboBox_2->setEnabled(enabled);
 	ui->comboBox->setEnabled(enabled);
@@ -1027,7 +1026,6 @@ void LogicAnalyzerChannelGroupUI::collapse_group()
 
 void LogicAnalyzerChannelGroupUI::enableControls(bool enabled)
 {
-	ui->btnRemGroup->setEnabled(enabled);
 	ui->decoderCombo->setEnabled(enabled);
 	ui->groupName->setEnabled(enabled);
 	ui->comboBox_2->setEnabled(enabled);
