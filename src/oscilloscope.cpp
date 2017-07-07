@@ -1291,6 +1291,7 @@ void adiscope::Oscilloscope::onTimePositionChanged(double value)
 	plot.replot();
 	plot.setDataStartingPoint(active_trig_sample_count);
 	plot.resetXaxisOnNextReceivedData();
+	plot.zoomBaseUpdate();
 
 	if (started) {
 		trigger_settings.setTriggerDelay(active_trig_sample_count);
