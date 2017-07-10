@@ -87,6 +87,9 @@ public:
 	double minValue();
 	double maxValue();
 
+	int decimalCount() const;
+	void setDecimalCount(int);
+
 	bool isInFineMode();
 
 	bool isCircleInverted() const;
@@ -129,6 +132,7 @@ protected:
 	double m_value;
 	double m_min_value;
 	double m_max_value;
+	int m_decimal_count;
 	std::vector<std::pair<QString, double> > m_units;
 	QRegExpValidator *m_validator;
 };

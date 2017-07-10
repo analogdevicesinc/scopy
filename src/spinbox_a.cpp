@@ -45,6 +45,7 @@ using namespace adiscope;
 
 SpinBoxA::SpinBoxA(QWidget *parent) : QWidget(parent),
 	ui(new Ui::SpinBoxA), m_value(0.0), m_min_value(0.0), m_max_value(0.0),
+	m_decimal_count(3),
 	m_validator(new QRegExpValidator(this))
 {
 	ui->setupUi(this);
@@ -220,7 +221,18 @@ void SpinBoxA::setValue(double value)
 	// Update line edit
 	int index;
 	double scale = findUnitOfValue(m_value, &index);
-	ui->SBA_LineEdit->setText(QString::number(m_value / scale));
+	double number = m_value / scale;
+	double abs_number = qAbs(number);
+	int significant_digits = m_decimal_count;
+	if (abs_number >= 100) {
+		significant_digits += 3;
+	} else if (abs_number >= 10) {
+		significant_digits += 2;
+	} else if (abs_number >= 1) {
+		significant_digits += 1;
+	}
+	ui->SBA_LineEdit->setText(QString::number(number, 'g',
+		significant_digits));
 
 	if (m_value != 0) {
 		ui->SBA_Combobox->blockSignals(true);
@@ -247,6 +259,18 @@ void SpinBoxA::setMinValue(double value)
 	}
 
 	ui->SBA_CompletionCircle->setMinimumDouble(value);
+}
+
+int SpinBoxA::decimalCount() const
+{
+	return m_decimal_count;
+}
+
+void SpinBoxA::setDecimalCount(int count)
+{
+	if (count >= 0) {
+		m_decimal_count = count;
+	}
 }
 
 double SpinBoxA::maxValue()
