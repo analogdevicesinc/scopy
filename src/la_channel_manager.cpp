@@ -1637,10 +1637,16 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 
 				/* Populate role combo based on parent decoder */
 				lachannelgroupUI->ui->decoderCombo->addItem("None");
+				int decoder_char_count = QString("None").count();
 
 				for (auto var : chm->get_name_decoder_list()) {
 					lachannelgroupUI->ui->decoderCombo->addItem(var);
+					decoder_char_count = (var.count() > decoder_char_count) ? var.count() : decoder_char_count;
 				}
+
+				QFontMetrics labelm(lachannelgroupUI->ui->decoderCombo->font());
+				auto label_min_width = labelm.width(QString(decoder_char_count+2, 'X'));
+				lachannelgroupUI->ui->decoderCombo->view()->setMinimumWidth(label_min_width);
 
 				connect(lachannelgroupUI->ui->decoderCombo,
 					SIGNAL(currentIndexChanged(const QString&)),
