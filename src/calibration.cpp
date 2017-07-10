@@ -18,6 +18,7 @@
  */
 
 #include "calibration.hpp"
+#include "osc_adc.h"
 
 #include <QDebug>
 #include <QtGlobal>
@@ -695,6 +696,11 @@ bool Calibration::calibrateAll()
 	ok = calibrateADCgain();
 	if (!ok)
 		return false;
+
+	if (IioUtils::hardware_revision(m_ctx) == "B") {
+		QThread::msleep(750);
+	}
+
 	ok = calibrateDACoffset();
 	if (!ok)
 		return false;

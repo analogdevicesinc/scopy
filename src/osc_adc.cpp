@@ -60,6 +60,26 @@ QList<struct iio_channel *> IioUtils::pick_channels_with_direction(
 	return return_list;
 }
 
+std::string IioUtils::hardware_revision(struct iio_context *ctx)
+{
+	const char *hw_rev_attr_val = iio_context_get_attr_value(ctx,
+			"hw_model");
+	std::string rev;
+
+	if (hw_rev_attr_val) {
+		std::string const s = hw_rev_attr_val;
+		std::string const key = "Rev.";
+		int n = s.find(key);
+
+		n += key.length();
+		rev =  s.substr(n, 1);
+	} else {
+		rev = "A";
+	}
+
+	return rev;
+}
+
 /*
  * class GenericAdc
  */
@@ -231,12 +251,25 @@ M2kAdc::~M2kAdc()
 
 void M2kAdc::apply_m2k_fixes()
 {
+	std::string hw_rev = IioUtils::hardware_revision(iio_context());
+
 	struct iio_device *dev = iio_context_find_device(iio_context(),
 		"ad9963");
 
+	int config1;
+	int config2;
+
+	if (hw_rev == "A") {
+		config1 = 0x1B; // IGAIN1 +-6db  0.25db steps
+		config2 = 0x1B;
+	} else if (hw_rev == "B") {
+		config1 = 0x05;
+		config2 = 0x05;
+	}
+
 	/* Configure TX path */
-	iio_device_reg_write(dev, 0x68, 0x1B);  // IGAIN1 +-6db  0.25db steps
-	iio_device_reg_write(dev, 0x6B, 0x1B);  //
+	iio_device_reg_write(dev, 0x68, config1);
+	iio_device_reg_write(dev, 0x6B, config2);
 	iio_device_reg_write(dev, 0x69, 0x1C);  // IGAIN2 +-2.5%
 	iio_device_reg_write(dev, 0x6C, 0x1C);
 	iio_device_reg_write(dev, 0x6A, 0x20);  // IRSET +-20%

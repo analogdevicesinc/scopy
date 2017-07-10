@@ -26,6 +26,7 @@ public:
 			struct iio_device *dev);
 	static QList<struct iio_channel *> pick_channels_with_direction(
 		const QList<struct iio_channel *>& list, bool output);
+	static std::string hardware_revision(struct iio_context *);
 };
 
 class GenericAdc
