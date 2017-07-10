@@ -19,8 +19,6 @@
 
 #include "signal_sample.hpp"
 
-#include <vector>
-
 using namespace adiscope;
 
 signal_sample::signal_sample() :
@@ -29,6 +27,7 @@ signal_sample::signal_sample() :
 			gr::io_signature::make(0, 0, 0)),
 	QObject()
 {
+	qRegisterMetaType<std::vector<float>>();
 	set_max_noutput_items(1);
 }
 

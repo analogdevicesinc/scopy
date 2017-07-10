@@ -20,9 +20,13 @@
 #ifndef SIGNAL_SAMPLE_HPP
 #define SIGNAL_SAMPLE_HPP
 
+#include <vector>
+
 #include <QObject>
 
 #include <gnuradio/sync_block.h>
+
+Q_DECLARE_METATYPE(std::vector<float>);
 
 namespace adiscope {
 	class signal_sample : public QObject, public gr::sync_block
