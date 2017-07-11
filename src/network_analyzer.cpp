@@ -184,9 +184,9 @@ void NetworkAnalyzer::run()
 			frequency = min_freq + (double) i * step;
 		}
 
-		unsigned long rate = get_best_sin_sample_rate(dac1, frequency);
+		unsigned long rate = get_best_sample_rate(dev1, frequency);
 		size_t samples_count = get_sin_samples_count(
-				dac1, rate, frequency);
+				dev1, rate, frequency);
 		unsigned long adc_rate;
 
 		double amplitude = ui->amplitude->value();
@@ -216,7 +216,7 @@ void NetworkAnalyzer::run()
 			iio_device_attr_write_bool(dev1, "dma_sync", false);
 		}
 
-		adc_rate = get_best_adc_rate(frequency);
+		adc_rate = get_best_sample_rate(adc, frequency);
 		iio_device_attr_write_longlong(adc,
 				"sampling_frequency", adc_rate);
 
@@ -225,23 +225,8 @@ void NetworkAnalyzer::run()
 		if (started)
 			iio->lock();
 
-		/* We want at least 8 periods */
-		double ratio = (double) adc_rate / frequency;
-
-		unsigned long buffer_size;
-
-		if (adc_rate < 10000)
-			buffer_size = 2.0 * ratio;
-		else if (ratio <= 5.0)
-			buffer_size = 128.0 * ratio;
-		else if (ratio <= 10.0)
-			buffer_size = 64.0 * ratio;
-		else if (ratio <= 15.0)
-			buffer_size = 32.0 * ratio;
-		else if (ratio <= 20.0)
-			buffer_size = 16.0 * ratio;
-		else
-			buffer_size = 8.0 * ratio;
+		size_t buffer_size = get_sin_samples_count(
+				adc, adc_rate, frequency);
 
 		auto f2c1 = blocks::float_to_complex::make();
 		auto f2c2 = blocks::float_to_complex::make();
@@ -350,7 +335,7 @@ void NetworkAnalyzer::run()
 
 		qDebug() << "Frequency" << frequency << "Hz," <<
 			adc_rate << "SPS," << buffer_size << "samples," <<
-			mag << "Mag," << phase << "Deg, ratio" << ratio;
+			mag << "Mag," << phase << "Deg";
 
 		double phase_deg = phase * 180.0 / M_PI;
 
@@ -400,10 +385,9 @@ void NetworkAnalyzer::startStop(bool pressed)
 	setDynamicProperty(ui->run_button, "running", pressed);
 }
 
-size_t NetworkAnalyzer::get_sin_samples_count(const struct iio_channel *chn,
+size_t NetworkAnalyzer::get_sin_samples_count(const struct iio_device *dev,
 		unsigned long rate, double frequency)
 {
-	const struct iio_device *dev = iio_channel_get_device(chn);
 	size_t max_buffer_size = 4 * 1024 * 1024 /
 		(size_t) iio_device_get_sample_size(dev);
 	double ratio = (double) rate / frequency;
@@ -412,10 +396,11 @@ size_t NetworkAnalyzer::get_sin_samples_count(const struct iio_channel *chn,
 	if (ratio < 2.5)
 		return 0; /* rate too low */
 
-	ratio = SignalGenerator::get_best_ratio(ratio,
-			(double) (max_buffer_size / 4), nullptr);
+	if (rate <= 10000)
+		max_buffer_size = rate / 2; /* 500ms */
 
-	size = (size_t) ratio;
+	size = (size_t) SignalGenerator::get_best_ratio(ratio,
+			(double) (max_buffer_size / 4), nullptr);
 
 	/* The buffer size must be a multiple of 4 */
 	while (size & 0x3)
@@ -431,16 +416,15 @@ size_t NetworkAnalyzer::get_sin_samples_count(const struct iio_channel *chn,
 	return size;
 }
 
-unsigned long NetworkAnalyzer::get_best_sin_sample_rate(
-		const struct iio_channel *chn, double frequency)
+unsigned long NetworkAnalyzer::get_best_sample_rate(
+		const struct iio_device *dev, double frequency)
 {
-	const struct iio_device *dev = iio_channel_get_device(chn);
 	QVector<unsigned long> values =
 		SignalGenerator::get_available_sample_rates(dev);
 
 	/* Return the best sample rate that we can create a buffer for */
 	for (unsigned long rate : values) {
-		size_t buf_size = get_sin_samples_count(chn, rate, frequency);
+		size_t buf_size = get_sin_samples_count(dev, rate, frequency);
 		if (buf_size)
 			return rate;
 
@@ -449,23 +433,6 @@ unsigned long NetworkAnalyzer::get_best_sin_sample_rate(
 	}
 
 	throw std::runtime_error("Unable to calculate best sample rate");
-}
-
-unsigned long NetworkAnalyzer::get_best_adc_rate(double frequency)
-{
-	QVector<unsigned long> values =
-		SignalGenerator::get_available_sample_rates(adc);
-
-	/* Return the smallest rate that is at least 10 times the frequency */
-	qSort(values.begin(), values.end(), qLess<unsigned long>());
-
-	for (unsigned long rate : values) {
-		if ((double) rate >= 10.0 * frequency)
-			return rate;
-	}
-
-	/* Or return the fastest one */
-	return values.takeLast();
 }
 
 struct iio_buffer * NetworkAnalyzer::generateSinWave(

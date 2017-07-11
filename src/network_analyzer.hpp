@@ -73,12 +73,8 @@ namespace adiscope {
 		void run();
 
 		static size_t get_sin_samples_count(
-				const struct iio_channel *chn,
+				const struct iio_device *dev,
 				unsigned long rate,
-				double frequency);
-
-		static unsigned long get_best_sin_sample_rate(
-				const struct iio_channel *chn,
 				double frequency);
 
 		static struct iio_buffer * generateSinWave(
@@ -89,7 +85,9 @@ namespace adiscope {
 				unsigned long rate,
 				size_t samples_count);
 
-		unsigned long get_best_adc_rate(double frequency);
+		static unsigned long get_best_sample_rate(
+				const struct iio_device *dev,
+				double frequency);
 		void configHwForNetworkAnalyzing();
 
 	private Q_SLOTS:
