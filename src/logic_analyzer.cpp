@@ -1433,6 +1433,34 @@ void LogicAnalyzer_API::setInactiveHidden(bool en)
 	lga->ui->btnShowChannels->clicked(en);
 }
 
+QString LogicAnalyzer_API::runMode() const
+{
+	if(lga->acquisition_mode == 0)
+	{
+		return "REPEATED";
+	}
+	else if(lga->acquisition_mode == 1)
+	{
+		return "STREAM";
+	}
+	else
+	{
+		return "SCREEN";
+	}
+}
+
+void LogicAnalyzer_API::setRunMode(QString value)
+{
+	if(value == "STREAM")
+	{
+		lga->runModeChanged(1);
+	}
+	else
+	{
+		lga->runModeChanged(0);
+	}
+}
+
 
 /*
  * ChannelGroup_API

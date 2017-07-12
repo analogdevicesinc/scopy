@@ -264,6 +264,7 @@ class LogicAnalyzer_API : public ApiObject
 	Q_PROPERTY(bool running READ running WRITE run STORED false)
 	Q_PROPERTY(double time_position READ getTimePos WRITE setTimePos)
 	Q_PROPERTY(double time_base READ getTimeBase WRITE setTimeBase)
+	Q_PROPERTY(QString run_mode READ runMode WRITE setRunMode)
 	Q_PROPERTY(bool external_trigger READ externalTrigger WRITE setExternalTrigger)
 	Q_PROPERTY(bool cursors_active READ cursorsActive WRITE setCursorsActive)
 	Q_PROPERTY(bool cursors_locked READ cursorsLocked WRITE setCursorsLocked)
@@ -287,6 +288,9 @@ public:
 
 	double getTimeBase() const;
 	void setTimeBase(double base);
+
+	QString runMode() const;
+	void setRunMode(QString);
 
 	bool externalTrigger() const;
 	void setExternalTrigger(bool val);
