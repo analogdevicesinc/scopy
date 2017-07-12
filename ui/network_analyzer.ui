@@ -498,14 +498,13 @@ QPushButton:!checked {
                  <widget class="adiscope::ScaleSpinButton" name="minFreq" native="true">
                   <property name="units" stdset="0">
                    <stringlist notr="true">
-                    <string>mHz=1e-3</string>
                     <string>Hz=1e0</string>
                     <string>kHz=1e3</string>
                     <string>MHz=1e6</string>
                    </stringlist>
                   </property>
                   <property name="min_value" stdset="0">
-                   <double>0.001000000000000</double>
+                   <double>1.000000000000000</double>
                   </property>
                   <property name="max_value" stdset="0">
                    <double>50000000.000000000000000</double>
@@ -565,7 +564,6 @@ QPushButton:!checked {
                  <widget class="adiscope::ScaleSpinButton" name="maxFreq" native="true">
                   <property name="units" stdset="0">
                    <stringlist notr="true">
-                    <string>mHz=1e-3</string>
                     <string>Hz=1e0</string>
                     <string>kHz=1e3</string>
                     <string>MHz=1e6</string>
@@ -575,7 +573,7 @@ QPushButton:!checked {
                    <string>Max Freq</string>
                   </property>
                   <property name="min_value" stdset="0">
-                   <double>0.001000000000000</double>
+                   <double>1.000000000000000</double>
                   </property>
                   <property name="max_value" stdset="0">
                    <double>50000000.000000000000000</double>
