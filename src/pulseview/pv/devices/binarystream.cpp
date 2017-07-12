@@ -49,7 +49,8 @@ BinaryStream::BinaryStream(const std::shared_ptr<sigrok::Context> &context,
 	running(false),
 	la(parent),
 	autoTrigger(false),
-	data_(nullptr)
+        data_(nullptr),
+        stream_mode(false)
 {
 	/* 10 buffers, 10ms each -> 250ms before we lose data */
 	if(dev)
@@ -135,42 +136,47 @@ void BinaryStream::run()
 	size_t size_to_display;
 	input_->reset();
 	interrupt_ = false;
-	while (!interrupt_)
-	{
-		nbytes_rx = 0;
-		size_to_display = 0;
-		if(autoTrigger) {
-			la->refilling();
-		}
-		la->set_triggered_status("awaiting");
-		lock_guard<recursive_mutex> lock(data_mutex_);
-		if(data_)
-			nbytes_rx = iio_buffer_refill(data_);
-		nrx += nbytes_rx / 2;
-		if( nbytes_rx > 0 ) {
-			la->set_triggered_status("running");
-			size_to_display = (nrx > entire_buffersize) ? nbytes_rx-2*(entire_buffersize-nrx) : nbytes_rx;
-			input_->send(iio_buffer_start(data_), (size_t)(size_to_display));
-			if( nrx >= entire_buffersize ) {
-				input_->end();
-				input_->send(iio_buffer_start(data_)+(size_t)(size_to_display),
-					(size_t)(2*(entire_buffersize-nrx)));
-				nrx = 0;
-			}
+        while (!interrupt_)
+        {
+                nbytes_rx = 0;
+                size_to_display = 0;
+                if(autoTrigger) {
+                        la->refilling();
+                }
+                la->set_triggered_status("awaiting");
+                lock_guard<recursive_mutex> lock(data_mutex_);
+                if(data_)
+                        nbytes_rx = iio_buffer_refill(data_);
+                nrx += nbytes_rx / 2;
 
-			if(autoTrigger) {
-				la->captured();
-			}
-		}
-		if( single_ && running ) {
-			interrupt_ = true;
-			stop();
-		}
+                if( nbytes_rx > 0 ) {
+                        la->set_triggered_status("running");
+                        size_to_display = (nrx > entire_buffersize && !stream_mode) ?
+                                                nbytes_rx-2*(nrx-entire_buffersize) : nbytes_rx;
+                        input_->send(iio_buffer_start(data_), (size_t)(size_to_display));
 
-	}
-	input_->end();
-	interrupt_ = false;
-	single_ = false;
+                        if( nrx >= entire_buffersize && !stream_mode) {
+                                if( !single_ ) {
+                                        input_->end();
+                                        input_->send(iio_buffer_start(data_)+(size_t)(size_to_display),
+                                                     (size_t)(2*(nrx-entire_buffersize)));
+                                        nrx = 0;
+                                }
+                        }
+
+                        if(autoTrigger) {
+                                la->captured();
+                        }
+                }
+                if( single_ && running && nrx >= entire_buffersize) {
+                        interrupt_ = true;
+                        stop();
+                        nrx = 0;
+                }
+        }
+        input_->end();
+        interrupt_ = false;
+        single_ = false;
 }
 
 void BinaryStream::set_timeout(bool checked)
@@ -200,6 +206,11 @@ void BinaryStream::set_single(bool check)
 	if( running )
 		stop();
 	single_ = check;
+}
+
+void BinaryStream::set_stream(bool check)
+{
+    stream_mode = check;
 }
 
 void BinaryStream::set_options(std::map<std::string, Glib::VariantBase> opt)

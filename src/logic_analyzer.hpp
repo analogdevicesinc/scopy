@@ -84,9 +84,9 @@ class LogicAnalyzer : public Tool
 
 public:
 	enum AcquisitionMode {
-		REPEATED,
-		SCREEN,
-		SHIFT
+                REPEATED,
+                STREAM,
+                SCREEN
 	};
 
 	explicit LogicAnalyzer(struct iio_context *ctx,
@@ -188,9 +188,7 @@ private:
 	unsigned long custom_sampleCount;
 	long long active_triggerSampleCount;
 	long long active_hw_trigger_sample_count;
-	double active_timePos;
-	double pickSampleRateFor(double timeSpanSecs,
-		double desiredBufferSize);
+        double active_timePos;
 
 	void settings_panel_update(int id);
 	void toggleRightMenu(QPushButton *btn);

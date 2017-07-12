@@ -86,6 +86,8 @@ public:
 	void set_timeout(bool);
 
 	void set_entire_buffersize(size_t);
+
+        void set_stream(bool check);
 private:
 	const std::shared_ptr<sigrok::Context> context_;
 	const std::shared_ptr<sigrok::InputFormat> format_;
@@ -104,6 +106,7 @@ private:
 	bool autoTrigger;
 	ssize_t nbytes_rx;
 	mutable std::recursive_mutex data_mutex_;
+        bool stream_mode;
 };
 
 } // namespace devices
