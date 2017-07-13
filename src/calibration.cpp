@@ -128,6 +128,8 @@ bool Calibration::initialize()
 
 	// Make sure we calibrate at highest sample rate
 	iio_device_attr_write_longlong(m_m2k_adc, "sampling_frequency", 1E8);
+	iio_device_attr_write_longlong(m_m2k_dac_a, "sampling_frequency", 75E6);
+	iio_device_attr_write_longlong(m_m2k_dac_b, "sampling_frequency", 75E6);
 
 	m_initialized = true;
 
