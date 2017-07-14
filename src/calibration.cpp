@@ -20,6 +20,7 @@
 #include "calibration.hpp"
 #include "osc_adc.h"
 
+#include <errno.h>
 #include <QDebug>
 #include <QtGlobal>
 #include <iio.h>
