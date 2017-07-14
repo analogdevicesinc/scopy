@@ -93,7 +93,7 @@ find_library(IIO_LIBRARIES NAMES iio libiio PATHS ${VC_PATH}/lib ${VC_PATH}/lib/
 find_path(IIO_INCLUDE_DIRS iio.h PATHS ${VC_PATH}/include)
 
 find_library(QWTPOLAR_LIBRARIES qwtpolar)
-find_path(QWTPOLAR_INCLUDE_DIRS qwt_polar_plot.h)
+find_path(QWTPOLAR_INCLUDE_DIRS qwt_polar_plot.h PATH_SUFFIXES qwt)
 if (NOT QWTPOLAR_LIBRARIES OR NOT QWTPOLAR_INCLUDE_DIRS)
 	message(SEND_ERROR "QwtPolar not found")
 endif()
