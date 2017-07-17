@@ -605,8 +605,9 @@ basic_block_sptr SignalGenerator::getSignalSource(gr::top_block_sptr top,
 	auto delay = blocks::delay::make(sizeof(float),
 			samp_rate * phase / (data.frequency * 360.0));
 
-	auto skip_head = blocks::skiphead::make(sizeof(float),
-			samp_rate / data.frequency);
+	double to_skip = get_best_ratio(samp_rate / data.frequency,
+			samp_rate, NULL);
+	auto skip_head = blocks::skiphead::make(sizeof(float), to_skip);
 
 	top->connect(src, 0, delay, 0);
 	top->connect(delay, 0, skip_head, 0);
