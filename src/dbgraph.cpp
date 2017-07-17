@@ -184,7 +184,7 @@ void dBgraph::setXMin(double val)
 {
 	setAxisScale(QwtPlot::xTop, val, xmax);
 	xmin = val;
-	draw_x->updateMetrics();
+	draw_x->invalidateCache();
 
 	zoomer->cancel();
 	zoomer->setZoomBase();
@@ -195,7 +195,7 @@ void dBgraph::setXMax(double val)
 {
 	setAxisScale(QwtPlot::xTop, xmin, val);
 	xmax = val;
-	draw_x->updateMetrics();
+	draw_x->invalidateCache();
 
 	zoomer->cancel();
 	zoomer->setZoomBase();

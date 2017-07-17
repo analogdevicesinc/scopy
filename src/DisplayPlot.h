@@ -558,13 +558,9 @@ public:
 	void setUnitType(const QString& unit);
 	QString getUnitType() const;
 
-	void updateMetrics();
-
 private:
 	unsigned int m_floatPrecision;
 	QString m_unit;
-	mutable QString m_metricPrefix;
-	mutable double m_magnitude;
 	PrefixFormatter *m_formatter;
 };
 

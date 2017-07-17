@@ -44,8 +44,6 @@ using namespace adiscope;
 OscScaleDraw::OscScaleDraw(const QString &unit) : QwtScaleDraw(),
 	m_floatPrecision(3),
 	m_unit(unit),
-	m_metricPrefix(""),
-	m_magnitude(1.0),
 	m_formatter(NULL)
 {
 	enableComponent(QwtAbstractScaleDraw::Backbone, false);
@@ -56,11 +54,6 @@ OscScaleDraw::OscScaleDraw(PrefixFormatter *formatter, const QString& unit) :
 	OscScaleDraw(unit)
 {
 	m_formatter = formatter;
-
-	if (unit.isEmpty() && formatter) {
-		double tmp;
-		formatter->getFormatAttributes(1.0, m_metricPrefix, tmp);
-	}
 }
 
 void OscScaleDraw::setFloatPrecision(unsigned int numDigits)
@@ -90,20 +83,14 @@ QString OscScaleDraw::getUnitType() const
 
 QwtText OscScaleDraw::label( double value ) const
 {
-	return QLocale().toString( value / m_magnitude , 'f', m_floatPrecision) + ' ' + m_metricPrefix + m_unit;
-}
-
-void OscScaleDraw::updateMetrics()
-{
-	const QwtScaleDiv scDiv = scaleDiv();
-	double lower = fabs(scDiv.lowerBound());
-	double upper = fabs(scDiv.upperBound());
-	double max = (upper > lower) ? upper : lower;
+	QString prefix;
+	double scale = 1.0;
 
 	if (m_formatter)
-		m_formatter->getFormatAttributes(max, m_metricPrefix, m_magnitude);
+		m_formatter->getFormatAttributes(value, prefix, scale);
 
-	invalidateCache();
+	return QLocale().toString(value / scale, 'f', m_floatPrecision)
+		+ ' ' + prefix + m_unit;
 }
 
 /*
@@ -1031,7 +1018,7 @@ void DisplayPlot::_onXbottomAxisWidgetScaleDivChanged()
 	OscScaleDraw *scale_draw = dynamic_cast<OscScaleDraw *>(axis_widget->scaleDraw());
 
 	if (scale_draw) {
-		scale_draw->updateMetrics();
+		scale_draw->invalidateCache();
 		axis_widget->update();
 	}
 }
@@ -1042,7 +1029,7 @@ void DisplayPlot::_onYleftAxisWidgetScaleDivChanged()
 	OscScaleDraw *scale_draw = dynamic_cast<OscScaleDraw *>(axis_widget->scaleDraw());
 
 	if (scale_draw) {
-		scale_draw->updateMetrics();
+		scale_draw->invalidateCache();
 		axis_widget->update();
 	}
 }
