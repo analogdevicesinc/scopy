@@ -666,8 +666,8 @@ void adiscope::SignalGenerator::channel_box_toggled(bool checked)
 		plot->AttachCurve(id);
 	} else {
 		if (channels[id]->second.btn->isChecked()) {
-			channels[id]->second.btn->setChecked(false);
 			toggleRightMenu(channels[id]->second.btn);
+			channels[id]->second.btn->setChecked(false);
 		}
 
 		plot->DetachCurve(id);
