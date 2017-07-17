@@ -22,6 +22,8 @@
 #include "spinbox_a.hpp"
 #include "ui_signal_generator.h"
 
+#include <cmath>
+
 #include <QBrush>
 #include <QFileDialog>
 #include <QFileInfo>
@@ -585,9 +587,9 @@ basic_block_sptr SignalGenerator::getSignalSource(gr::top_block_sptr top,
 	}
 
 	if (data.waveform == SG_TRI_WAVE)
-		phase = data.phase + 90.0;
+		phase = std::fmod(data.phase + 90.0, 360.0);
 	else if (data.waveform == SG_SQR_WAVE)
-		phase = data.phase + 180.0;
+		phase = std::fmod(data.phase + 180.0, 360.0);
 	else
 		phase = data.phase;
 
