@@ -290,49 +290,61 @@ SignalGenerator::~SignalGenerator()
 void SignalGenerator::constantValueChanged(double value)
 {
 	auto ptr = getCurrentData();
-	ptr->constant = (float) value;
 
-	updatePreview();
+	if (ptr->constant != (float) value) {
+		ptr->constant = (float) value;
+		updatePreview();
+	}
 }
 
 void SignalGenerator::amplitudeChanged(double value)
 {
 	auto ptr = getCurrentData();
-	ptr->amplitude = value;
 
-	updatePreview();
+	if (ptr->amplitude != value) {
+		ptr->amplitude = value;
+		updatePreview();
+	}
 }
 
 void SignalGenerator::offsetChanged(double value)
 {
 	auto ptr = getCurrentData();
-	ptr->offset = (float) value;
 
-	updatePreview();
+	if (ptr->offset != (float) value) {
+		ptr->offset = (float) value;
+		updatePreview();
+	}
 }
 
 void SignalGenerator::frequencyChanged(double value)
 {
 	auto ptr = getCurrentData();
-	ptr->frequency = value;
 
-	updatePreview();
+	if (ptr->frequency != value) {
+		ptr->frequency = value;
+		updatePreview();
+	}
 }
 
 void SignalGenerator::mathFreqChanged(double value)
 {
 	auto ptr = getCurrentData();
-	ptr->math_freq = value;
 
-	updatePreview();
+	if (ptr->math_freq != value) {
+		ptr->math_freq = value;
+		updatePreview();
+	}
 }
 
 void SignalGenerator::phaseChanged(double value)
 {
 	auto ptr = getCurrentData();
-	ptr->phase = value;
 
-	updatePreview();
+	if (ptr->phase != value) {
+		ptr->phase = value;
+		updatePreview();
+	}
 }
 
 void SignalGenerator::waveformTypeChanged(int val)
@@ -346,9 +358,11 @@ void SignalGenerator::waveformTypeChanged(int val)
 	};
 
 	auto ptr = getCurrentData();
-	ptr->waveform = types[val];
 
-	updatePreview();
+	if (ptr->waveform != types[val]) {
+		ptr->waveform = types[val];
+		updatePreview();
+	}
 }
 
 QSharedPointer<signal_generator_data> SignalGenerator::getCurrentData()
@@ -365,9 +379,11 @@ QSharedPointer<signal_generator_data> SignalGenerator::getData(QWidget *obj)
 void SignalGenerator::tabChanged(int index)
 {
 	auto ptr = getCurrentData();
-	ptr->type = (enum SIGNAL_TYPE) index;
 
-	updatePreview();
+	if (ptr->type != (enum SIGNAL_TYPE) index) {
+		ptr->type = (enum SIGNAL_TYPE) index;
+		updatePreview();
+	}
 }
 
 void SignalGenerator::updatePreview()
@@ -564,9 +580,11 @@ void SignalGenerator::startStop(bool pressed)
 void SignalGenerator::setFunction(const QString& function)
 {
 	auto ptr = getCurrentData();
-	ptr->function = function;
 
-	updatePreview();
+	if (ptr->function != function) {
+		ptr->function = function;
+		updatePreview();
+	}
 }
 
 basic_block_sptr SignalGenerator::getSignalSource(gr::top_block_sptr top,
@@ -739,8 +757,6 @@ void adiscope::SignalGenerator::rightMenuFinished(bool opened)
 
 		renameConfigPanel();
 		ui->tabWidget->setCurrentIndex((int) ptr->type);
-		updatePreview();
-
 		ui->rightMenu->toggleMenu(true);
 	}
 }
