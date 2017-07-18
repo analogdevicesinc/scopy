@@ -1507,6 +1507,32 @@ color: #FFFFFF;
                  </widget>
                 </item>
                 <item>
+                 <spacer name="verticalSpacer_13">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeType">
+                   <enum>QSizePolicy::Fixed</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_10">
+                  <property name="text">
+                   <string>Sampling frequency</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="lineeditSampleRate"/>
+                </item>
+                <item>
                  <spacer name="verticalSpacer_8">
                   <property name="orientation">
                    <enum>Qt::Vertical</enum>
@@ -1722,7 +1748,7 @@ color: #FFFFFF;</string>
                     <rect>
                      <x>0</x>
                      <y>0</y>
-                     <width>100</width>
+                     <width>92</width>
                      <height>30</height>
                     </rect>
                    </property>

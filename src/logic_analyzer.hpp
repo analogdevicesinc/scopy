@@ -137,6 +137,7 @@ private Q_SLOTS:
 	void capturedSlot();
 	void btnExportPressed();
 	void runModeChanged(int index);
+	void validateSamplingFrequency();
 public Q_SLOTS:
 	void onTimeTriggerHandlePosChanged(int);
 	void onTimePositionSpinboxChanged(double value);

@@ -228,6 +228,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	ui->generalSettingsLayout->insertWidget(ui->generalSettingsLayout->count() - 3,
 		timePosition, 0, Qt::AlignLeft);
 
+	ui->lineeditSampleRate->setValidator(new QDoubleValidator(1E0, 1E+8, 5, this));
+
 	int chn = (no_channels == 0) ? 16 : no_channels;
 	options["numchannels"] = Glib::Variant<gint32>(
 			g_variant_new_int32(chn),true);
@@ -349,6 +351,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 		this, SLOT(btnExportPressed()));
 	connect(ui->cmbRunMode, SIGNAL(currentIndexChanged(int)),
 		this, SLOT(runModeChanged(int)));
+	connect(ui->lineeditSampleRate, &QLineEdit::editingFinished,
+		this, &LogicAnalyzer::validateSamplingFrequency);
 
 	cleanHWParams();
 	chm_ui = new LogicAnalyzerChannelManagerUI(0, main_win, &chm, ui->scrollAreaWidgetContents,
@@ -581,18 +585,20 @@ void LogicAnalyzer::onHorizScaleValueChanged(double value)
         acquisition_mode = ui->cmbRunMode->currentIndex();
         acquisition_mode = (acquisition_mode == REPEATED
                             && plotTimeSpan >= timespanLimitStream) ? SCREEN : acquisition_mode;
-        active_sampleRate = maxSamplingFrequency / 50;
-        custom_sampleCount = 16384;
-        active_triggerSampleCount = 0;
         active_plot_timebase = value;
 
         if(acquisition_mode == SCREEN || acquisition_mode == STREAM) {
+                ui->lineeditSampleRate->setEnabled(true);
+//                active_sampleRate = maxSamplingFrequency / 50;
+                validateSamplingFrequency();
+                custom_sampleCount = 16384;
+                active_triggerSampleCount = 0;
                 double bufferTimeSpan = custom_sampleCount / active_sampleRate;
-                double total_sampleCount = plotTimeSpan / bufferTimeSpan * custom_sampleCount;
-                active_sampleCount = total_sampleCount;
+                active_sampleCount = plotTimeSpan / bufferTimeSpan * custom_sampleCount;
+
 		if(logic_analyzer_ptr && logic_analyzer_ptr->get_buffersize() != 16384) {
 			logic_analyzer_ptr->set_buffersize(custom_sampleCount, false);
-			logic_analyzer_ptr->set_entire_buffersize(total_sampleCount);
+			logic_analyzer_ptr->set_entire_buffersize(active_sampleCount);
 			set_buffersize();
 		}
 		setSampleRate();
@@ -615,6 +621,7 @@ void LogicAnalyzer::onHorizScaleValueChanged(double value)
                 updateBufferPreviewer();
 	}
 	else {
+		ui->lineeditSampleRate->setEnabled(false);
 		symmBufferMode->setTimeBase(value);
 		LogicAnalyzerSymmetricBufferMode::capture_parameters params = symmBufferMode->captureParameters();
 		active_sampleRate = params.sampleRate;
@@ -1315,9 +1322,11 @@ void LogicAnalyzer::runModeChanged(int index)
                 acquisition_mode = REPEATED;
                 if( logic_analyzer_ptr )
                         logic_analyzer_ptr->set_stream(false);
+                ui->lineeditSampleRate->setEnabled(false);
                 if(timeBase->value() * 10 >= timespanLimitStream) {
                         d_timeTriggerHandle->setPosition(0);
                         acquisition_mode = SCREEN;
+                        ui->lineeditSampleRate->setEnabled(true);
                 }
         }
                 break;
@@ -1328,10 +1337,25 @@ void LogicAnalyzer::runModeChanged(int index)
                         logic_analyzer_ptr->set_stream(true);
                 d_timeTriggerHandle->setPosition(0);
                 acquisition_mode = STREAM;
+                ui->lineeditSampleRate->setEnabled(true);
         }
                 break;
         default:break;
         }
+}
+
+void LogicAnalyzer::validateSamplingFrequency()
+{
+	double intpart;
+	bool ok;
+	double samplingFreq = ui->lineeditSampleRate->text().toDouble(&ok);
+	if(ok) {
+		double srDivider = maxSamplingFrequency / samplingFreq;
+		double fractpart = modf(srDivider, &intpart);
+		if(fractpart != 0)
+			active_sampleRate = maxSamplingFrequency / (intpart+1);
+		ui->lineeditSampleRate->setText(QString::number(active_sampleRate));
+	}
 }
 
 /*
@@ -1453,11 +1477,11 @@ void LogicAnalyzer_API::setRunMode(QString value)
 {
 	if(value == "STREAM")
 	{
-		lga->runModeChanged(1);
+		lga->ui->cmbRunMode->setCurrentIndex(1);
 	}
 	else
 	{
-		lga->runModeChanged(0);
+		lga->ui->cmbRunMode->setCurrentIndex(0);
 	}
 }
 
