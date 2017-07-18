@@ -39,17 +39,21 @@ PowerController::PowerController(struct iio_context *ctx,
 
 	struct iio_device *dev1 = iio_context_find_device(ctx, "ad5627");
 	struct iio_device *dev2 = iio_context_find_device(ctx, "ad9963");
-	if (!dev1 || !dev2)
+	struct iio_device *dev3 = iio_context_find_device(ctx, "m2k-fabric");
+
+	if (!dev1 || !dev2 || !dev3)
 		throw std::runtime_error("Unable to find device\n");
 
 	this->ch1w = iio_device_find_channel(dev1, "voltage0", true);
 	this->ch2w = iio_device_find_channel(dev1, "voltage1", true);
 	this->ch1r = iio_device_find_channel(dev2, "voltage2", false);
 	this->ch2r = iio_device_find_channel(dev2, "voltage1", false);
-	if (!ch1w || !ch2w || !ch1r || !ch2r)
+	this->pd = iio_device_find_channel(dev3, "voltage2", true);
+	if (!ch1w || !ch2w || !ch1r || !ch2r || !pd)
 		throw std::runtime_error("Unable to find channels\n");
 
 	/* Power down DACs by default */
+	iio_channel_attr_write_bool(pd, "user_supply_powerdown", true);
 	iio_channel_attr_write_bool(ch1w, "powerdown", true);
 	iio_channel_attr_write_bool(ch2w, "powerdown", true);
 
@@ -85,6 +89,7 @@ PowerController::~PowerController()
 	/* Power down DACs */
 	iio_channel_attr_write_bool(ch1w, "powerdown", true);
 	iio_channel_attr_write_bool(ch2w, "powerdown", true);
+	iio_channel_attr_write_bool(pd, "user_supply_powerdown", true);
 
 	api->save(*settings);
 	delete api;
@@ -129,10 +134,13 @@ void PowerController::dac1_set_enabled(bool enabled)
 	if (in_sync)
 		dac2_set_enabled(enabled);
 
-	if (enabled)
+	if (enabled) {
 		run_button->setChecked(true);
-	else if (!ui->dac2->isChecked())
+		iio_channel_attr_write_bool(pd, "user_supply_powerdown", false);
+	} else if (!ui->dac2->isChecked()) {
 		run_button->setChecked(false);
+		iio_channel_attr_write_bool(pd, "user_supply_powerdown", true);
+	}
 
 	setDynamicProperty(ui->dac1, "running", enabled);
 }
@@ -141,10 +149,13 @@ void PowerController::dac2_set_enabled(bool enabled)
 {
 	iio_channel_attr_write_bool(ch2w, "powerdown", !enabled);
 
-	if (enabled)
+	if (enabled) {
 		run_button->setChecked(true);
-	else if (!ui->dac1->isChecked())
+		iio_channel_attr_write_bool(pd, "user_supply_powerdown", false);
+	} else if (!ui->dac1->isChecked()) {
 		run_button->setChecked(false);
+		iio_channel_attr_write_bool(pd, "user_supply_powerdown", true);
+	}
 
 	setDynamicProperty(ui->dac2, "running", enabled);
 }

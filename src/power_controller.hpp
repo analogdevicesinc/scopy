@@ -70,7 +70,7 @@ namespace adiscope {
 
 	private:
 		Ui::PowerController *ui;
-		struct iio_channel *ch1w, *ch2w, *ch1r, *ch2r;
+		struct iio_channel *ch1w, *ch2w, *ch1r, *ch2r, *pd;
 		QTimer timer;
 		bool in_sync;
 
