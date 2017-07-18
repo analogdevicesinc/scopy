@@ -21,13 +21,12 @@
 #define DMM_HPP
 
 #include <QPushButton>
-#include <QTimer>
 #include <QWidget>
 
 #include "apiObject.hpp"
 #include "filter.hpp"
 #include "iio_manager.hpp"
-#include "peek_sample.hpp"
+#include "signal_sample.hpp"
 #include "tool.hpp"
 
 namespace Ui {
@@ -56,30 +55,29 @@ namespace adiscope {
 
 	private:
 		Ui::DMM *ui;
-		QTimer timer;
 		boost::shared_ptr<iio_manager> manager;
-		boost::shared_ptr<peek_sample<float>>
-			peek_block_ch1, peek_block_ch2;
 		iio_manager::port_id id_ch1, id_ch2;
 		std::shared_ptr<GenericAdc> adc;
-		bool mode_ac_ch1, mode_ac_ch2;
+		boost::shared_ptr<signal_sample> signal;
+		unsigned long sample_rate;
 
 		void disconnectAll();
-		void configureMode(bool is_ac);
-		iio_manager::port_id configureMode(bool is_ac, unsigned int ch);
+		gr::basic_block_sptr configureGraph(gr::basic_block_sptr s2f,
+				bool is_low_ac, bool is_high_ac);
+		void configureModes();
 		int numSamplesFromIdx(int idx);
 		void writeAllSettingsToHardware();
 
 	public Q_SLOTS:
-		void updateValuesList();
-
 		void toggleTimer(bool start);
-		void toggleAC1(bool enable);
-		void toggleAC2(bool enable);
 
 	private Q_SLOTS:
 		void setHistorySizeCh1(int idx);
 		void setHistorySizeCh2(int idx);
+
+		void updateValuesList(std::vector<float> values);
+
+		void toggleAC();
 	};
 
 	class DMM_API : public ApiObject
@@ -112,10 +110,10 @@ namespace adiscope {
 		Q_PROPERTY(double value_ch2 READ read_ch2);
 
 	public:
-		bool get_mode_ac_ch1() const { return dmm->mode_ac_ch1; }
-		bool get_mode_ac_ch2() const { return dmm->mode_ac_ch2; }
-		void set_mode_ac_ch1(bool en) { dmm->toggleAC1(en); }
-		void set_mode_ac_ch2(bool en) { dmm->toggleAC2(en); }
+		bool get_mode_ac_ch1() const;
+		bool get_mode_ac_ch2() const;
+		void set_mode_ac_ch1(bool en);
+		void set_mode_ac_ch2(bool en);
 
 		bool get_histogram_ch1() const;
 		bool get_histogram_ch2() const;

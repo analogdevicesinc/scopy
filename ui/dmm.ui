@@ -158,6 +158,10 @@ QLabel { color: rgba(255, 255, 255, 40); font-size: 51px; font-weight: bold; qpr
                   <height>105</height>
                  </size>
                 </property>
+                <property name="styleSheet">
+                 <string notr="true">QLabel[ac=false] { qproperty-text: &quot;VDC&quot;; }
+QLabel[ac=true] { qproperty-text: &quot;VRMS&quot;; }</string>
+                </property>
                 <property name="text">
                  <string>VDC</string>
                 </property>
@@ -298,6 +302,10 @@ QLabel { color: rgba(255, 255, 255, 40); font-size: 51px; font-weight: bold; qpr
                   <width>170</width>
                   <height>105</height>
                  </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">QLabel[ac=false] { qproperty-text: &quot;VDC&quot;; }
+QLabel[ac=true] { qproperty-text: &quot;VRMS&quot;; }</string>
                 </property>
                 <property name="text">
                  <string>VDC</string>
@@ -489,27 +497,41 @@ QPushButton:disabled {
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="btn_ch1_dc">
-        <property name="text">
-         <string>DC (Direct Current)</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-        <attribute name="buttonGroup">
-         <string notr="true">buttonGroup</string>
-        </attribute>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="btn_ch1_ac">
-        <property name="text">
-         <string>AC (Alternating Current)</string>
-        </property>
-        <attribute name="buttonGroup">
-         <string notr="true">buttonGroup</string>
-        </attribute>
-       </widget>
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <item>
+         <widget class="QRadioButton" name="btn_ch1_dc">
+          <property name="text">
+           <string>DC (Direct Current)</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+          <attribute name="buttonGroup">
+           <string notr="true">buttonGroup</string>
+          </attribute>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="btn_ch1_ac">
+          <property name="text">
+           <string>AC (20 Hz - 800 Hz)</string>
+          </property>
+          <attribute name="buttonGroup">
+           <string notr="true">buttonGroup</string>
+          </attribute>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="btn_ch1_ac2">
+          <property name="text">
+           <string>AC (800 Hz - 40 kHz)</string>
+          </property>
+          <attribute name="buttonGroup">
+           <string notr="true">buttonGroup</string>
+          </attribute>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
        <layout class="QGridLayout" name="gridLayout">
@@ -624,27 +646,41 @@ QPushButton:disabled {
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="btn_ch2_dc">
-        <property name="text">
-         <string>DC (Direct Current)</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-        <attribute name="buttonGroup">
-         <string notr="true">buttonGroup_2</string>
-        </attribute>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="btn_ch2_ac">
-        <property name="text">
-         <string>AC (Alternating Current)</string>
-        </property>
-        <attribute name="buttonGroup">
-         <string notr="true">buttonGroup_2</string>
-        </attribute>
-       </widget>
+       <layout class="QVBoxLayout" name="verticalLayout_5">
+        <item>
+         <widget class="QRadioButton" name="btn_ch2_dc">
+          <property name="text">
+           <string>DC (Direct Current)</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+          <attribute name="buttonGroup">
+           <string notr="true">buttonGroup_2</string>
+          </attribute>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="btn_ch2_ac">
+          <property name="text">
+           <string>AC (20 Hz - 800 Hz)</string>
+          </property>
+          <attribute name="buttonGroup">
+           <string notr="true">buttonGroup_2</string>
+          </attribute>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="btn_ch2_ac2">
+          <property name="text">
+           <string>AC (800 Hz - 40 kHz)</string>
+          </property>
+          <attribute name="buttonGroup">
+           <string notr="true">buttonGroup_2</string>
+          </attribute>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
        <layout class="QGridLayout" name="gridLayout_2">
