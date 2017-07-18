@@ -589,8 +589,6 @@ void LogicAnalyzer::onHorizScaleValueChanged(double value)
 
         if(acquisition_mode == SCREEN || acquisition_mode == STREAM) {
                 ui->lineeditSampleRate->setEnabled(true);
-//                active_sampleRate = maxSamplingFrequency / 50;
-                validateSamplingFrequency();
                 custom_sampleCount = 16384;
                 active_triggerSampleCount = 0;
                 double bufferTimeSpan = custom_sampleCount / active_sampleRate;
@@ -707,6 +705,7 @@ void LogicAnalyzer::updateBuffersizeSamplerateLabel(int samples, double samplera
 		"/" + txtSampleperiod;
 	text = (acquisition_mode == REPEATED) ? text : "Streaming at " + txtSamplerate;
 	ui->samplerateLabel->setText(text);
+	ui->lineeditSampleRate->setText(QString::number(samplerate, 'g', 5));
 }
 
 void LogicAnalyzer::setTimebaseLabel(double value)
@@ -1352,9 +1351,12 @@ void LogicAnalyzer::validateSamplingFrequency()
 	if(ok) {
 		double srDivider = maxSamplingFrequency / samplingFreq;
 		double fractpart = modf(srDivider, &intpart);
-		if(fractpart != 0)
-			active_sampleRate = maxSamplingFrequency / (intpart+1);
+		if(fractpart != 0) {
+			intpart = (intpart == 0) ? intpart++ : intpart;
+			active_sampleRate = maxSamplingFrequency / intpart;
+		}
 		ui->lineeditSampleRate->setText(QString::number(active_sampleRate));
+		onHorizScaleValueChanged(timeBase->value());
 	}
 }
 
