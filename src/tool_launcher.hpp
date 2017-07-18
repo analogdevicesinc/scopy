@@ -28,6 +28,8 @@
 #include <QSocketNotifier>
 #include <QVector>
 #include <QButtonGroup>
+#include <QMap>
+#include <QStringList>
 
 #include "apiObject.hpp"
 #include "dmm.hpp"
@@ -41,6 +43,7 @@
 #include "pattern_generator.hpp"
 #include "network_analyzer.hpp"
 #include "digitalio.hpp"
+#include "menuoption.h"
 
 extern "C" {
 	struct iio_context;
@@ -81,15 +84,16 @@ private Q_SLOTS:
 	void search();
 	void update();
 	void ping();
+	void highlightLast(bool on);
 
-	void on_btnOscilloscope_clicked();
-	void on_btnSignalGenerator_clicked();
-	void on_btnDMM_clicked();
-	void on_btnPowerControl_clicked();
-	void on_btnLogicAnalyzer_clicked();
-	void on_btnPatternGenerator_clicked();
-	void on_btnNetworkAnalyzer_clicked();
-	void on_btnSpectrumAnalyzer_clicked();
+	void btnOscilloscope_clicked();
+	void btnSignalGenerator_clicked();
+	void btnDMM_clicked();
+	void btnPowerControl_clicked();
+	void btnLogicAnalyzer_clicked();
+	void btnPatternGenerator_clicked();
+	void btnNetworkAnalyzer_clicked();
+	void btnSpectrumAnalyzer_clicked();
 	void on_btnHome_clicked();
 	void setButtonBackground(bool on);
 
@@ -104,13 +108,19 @@ private Q_SLOTS:
 
 	void hasText();
 
-	void on_btnDigitalIO_clicked();
+	void btnDigitalIO_clicked();
 
 	void toolDetached(bool detached);
+
+	void swapMenuOptions(int source, int destination, bool dropAfter);
+	void highlight(bool on, int position);
 
 private:
 	Ui::ToolLauncher *ui;
 	struct iio_context *ctx;
+
+	QMap<QString, MenuOption*> toolMenu;
+	QVector<int> position;
 
 	QVector<QPair<QWidget, Ui::Device> *> devices;
 
@@ -157,7 +167,15 @@ private:
 	void saveSettings();
 	Q_INVOKABLE QPushButton *addContext(const QString& hostname);
 
+	QList<QString> getOrder();
+	void setOrder(QList<QString> list);
+
 	void updateListOfDevices(const QVector<QString>& uris);
+	void generateMenu();
+	QStringList tools;
+	QStringList toolIcons;
+	void UpdatePosition(QWidget *widget, int position);
+	void insertMenuOptions();
 };
 
 class ToolLauncher_API: public ApiObject
@@ -165,14 +183,16 @@ class ToolLauncher_API: public ApiObject
 	Q_OBJECT
 
 	Q_PROPERTY(bool menu_opened READ menu_opened WRITE open_menu
-	           STORED false);
+		   STORED false);
 
 	Q_PROPERTY(bool hidden READ hidden WRITE hide STORED false);
 
 	Q_PROPERTY(QString previous_ip READ getPreviousIp WRITE addIp
-	           SCRIPTABLE false);
+		   SCRIPTABLE false);
 
 	Q_PROPERTY(bool maximized READ maximized WRITE setMaximized);
+
+	Q_PROPERTY(QList<QString> tool_list READ order WRITE setOrder);
 
 public:
 	explicit ToolLauncher_API(ToolLauncher *tl) : ApiObject(), tl(tl) {}
@@ -180,6 +200,9 @@ public:
 
 	bool menu_opened() const;
 	void open_menu(bool open);
+
+	QList<QString> order();
+	void setOrder(QList<QString> list);
 
 	bool hidden() const;
 	void hide(bool hide);
