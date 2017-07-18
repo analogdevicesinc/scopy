@@ -220,7 +220,7 @@ void Symbol::updateSurfacePos()
 	QwtInterval interval = plot()->axisInterval(d_mobileAxis);
 
 	if (d_within_plot) {
-		if (d_mobileAxis == QwtPlot::yLeft) {
+		if (d_mobileAxis.pos == QwtPlot::yLeft) {
 			if (plotCoord.y() < interval.minValue())
 				plotCoord.setY(interval.minValue());
 			else if (plotCoord.y() > interval.maxValue())
