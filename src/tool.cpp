@@ -48,3 +48,8 @@ void Tool::attached()
 {
 	Q_EMIT detachedState(false);
 }
+
+void Tool::detached()
+{
+	Q_EMIT detachedState(true);
+}

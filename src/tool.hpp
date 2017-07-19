@@ -50,6 +50,7 @@ Q_SIGNALS:
 
 public Q_SLOTS:
 	virtual void attached();
+	virtual void detached();
 
 protected:
 	struct iio_context *ctx;
