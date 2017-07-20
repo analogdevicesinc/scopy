@@ -96,6 +96,7 @@ namespace adiscope {
 		OscilloscopePlot *plot;
 		gr::top_block_sptr top_block;
 		struct time_block_data *time_block_data;
+		struct iio_channel *amp1, *amp2;
 
 		unsigned int currentChannel;
 		unsigned long sample_rate;

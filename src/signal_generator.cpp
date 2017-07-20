@@ -129,6 +129,17 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 		}
 	}
 
+	/* FIXME: TODO: Move this into a HW class / lib M2k */
+	struct iio_device *fabric = iio_context_find_device(ctx, "m2k-fabric");
+	if (fabric) {
+		this->amp1 = iio_device_find_channel(fabric, "voltage0", true);
+		this->amp2 = iio_device_find_channel(fabric, "voltage1", true);
+		if (amp1 && amp2) {
+			iio_channel_attr_write_bool(amp1, "powerdown", true);
+			iio_channel_attr_write_bool(amp2, "powerdown", true);
+		}
+	}
+
 	/* Max amplitude by default */
 	ui->amplitude->setValue(ui->amplitude->maxValue());
 
@@ -569,10 +580,17 @@ void SignalGenerator::stop()
 
 void SignalGenerator::startStop(bool pressed)
 {
+
 	if (pressed)
 		start();
 	else
 		stop();
+
+	if (amp1 && amp2) {
+		/* FIXME: TODO: Move this into a HW class / lib M2k */
+		iio_channel_attr_write_bool(amp1, "powerdown", !pressed);
+		iio_channel_attr_write_bool(amp2, "powerdown", !pressed);
+	}
 
 	setDynamicProperty(ui->run_button, "running", pressed);
 }
