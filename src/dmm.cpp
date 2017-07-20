@@ -30,6 +30,8 @@
 #include <gnuradio/blocks/sub_ff.h>
 #include <gnuradio/filter/dc_blocker_ff.h>
 
+#include <boost/make_shared.hpp>
+
 #include <memory>
 #include <QJSEngine>
 
