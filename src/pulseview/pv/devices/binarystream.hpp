@@ -88,6 +88,10 @@ public:
 	void set_entire_buffersize(size_t);
 
         void set_stream(bool check);
+
+        bool get_single();
+
+        bool is_running();
 private:
 	const std::shared_ptr<sigrok::Context> context_;
 	const std::shared_ptr<sigrok::InputFormat> format_;

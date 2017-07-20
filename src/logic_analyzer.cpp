@@ -852,7 +852,13 @@ void LogicAnalyzer::startStop(bool start)
 	ui->lblExportStatus->setText("Not exported");
 	if(!dev)
 		return;
+
 	if (start) {
+		if(logic_analyzer_ptr->get_single()
+				&& logic_analyzer_ptr->is_running()) {
+			main_win->run_stop();
+			running = false;
+		}
 		last_set_sample_count = active_sampleCount;
 		if(main_win->view_->scale() != timeBase->value())
 			Q_EMIT timeBase->valueChanged(timeBase->value());
@@ -914,7 +920,6 @@ void LogicAnalyzer::singleRun()
 		return;
 	if( running )
 	{
-		startStop(false);
 		ui->btnRunStop->setChecked(false);
 	}
 	last_set_sample_count = active_sampleCount;
@@ -1357,6 +1362,8 @@ void LogicAnalyzer::validateSamplingFrequency()
 		}
 		ui->lineeditSampleRate->setText(QString::number(active_sampleRate));
 		onHorizScaleValueChanged(timeBase->value());
+		if(running)
+			setSamplerateLabelValue(active_sampleRate);
 	}
 }
 

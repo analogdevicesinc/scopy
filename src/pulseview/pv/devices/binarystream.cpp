@@ -208,6 +208,16 @@ void BinaryStream::set_single(bool check)
 	single_ = check;
 }
 
+bool BinaryStream::get_single()
+{
+	return single_;
+}
+
+bool BinaryStream::is_running()
+{
+	return running;
+}
+
 void BinaryStream::set_stream(bool check)
 {
     stream_mode = check;
