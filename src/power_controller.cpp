@@ -36,7 +36,6 @@ PowerController::PowerController(struct iio_context *ctx,
 	ui(new Ui::PowerController), in_sync(false)
 {
 	ui->setupUi(this);
-
 	struct iio_device *dev1 = iio_context_find_device(ctx, "ad5627");
 	struct iio_device *dev2 = iio_context_find_device(ctx, "ad9963");
 	struct iio_device *dev3 = iio_context_find_device(ctx, "m2k-fabric");
@@ -51,6 +50,23 @@ PowerController::PowerController(struct iio_context *ctx,
 	this->pd = iio_device_find_channel(dev3, "voltage2", true);
 	if (!ch1w || !ch2w || !ch1r || !ch2r || !pd)
 		throw std::runtime_error("Unable to find channels\n");
+
+	/* FIXME: TODO: Move this into a HW class / lib M2k
+	 * This should be part of some pre-init call, where*/
+	if (1) {
+		struct iio_channel *chan;
+		/* These are the two ADC amplifiers */
+		chan = iio_device_find_channel(dev3, "voltage0", false);
+		if (chan)
+			iio_channel_attr_write_bool(chan, "powerdown", false);
+
+		chan = iio_device_find_channel(dev3, "voltage1", false);
+		if (chan)
+			iio_channel_attr_write_bool(chan, "powerdown", false);
+
+		/* ADF4360 globaal clock power down */
+		iio_device_attr_write(dev3, "clk_powerdown", "0");
+	}
 
 	/* Power down DACs by default */
 	iio_channel_attr_write_bool(pd, "user_supply_powerdown", true);
@@ -90,6 +106,23 @@ PowerController::~PowerController()
 	iio_channel_attr_write_bool(ch1w, "powerdown", true);
 	iio_channel_attr_write_bool(ch2w, "powerdown", true);
 	iio_channel_attr_write_bool(pd, "user_supply_powerdown", true);
+
+	/* FIXME: TODO: Move this into a HW class / lib M2k */
+	struct iio_device *dev3 = iio_context_find_device(ctx, "m2k-fabric");
+	if (dev3) {
+		struct iio_channel *chan;
+		/* These are the two ADC amplifiers */
+		chan = iio_device_find_channel(dev3, "voltage0", false);
+		if (chan)
+			iio_channel_attr_write_bool(chan, "powerdown", true);
+
+		chan = iio_device_find_channel(dev3, "voltage1", false);
+		if (chan)
+			iio_channel_attr_write_bool(chan, "powerdown", true);
+
+		/* ADF4360 globaal clock power down */
+		iio_device_attr_write(dev3, "clk_powerdown", "1");
+	}
 
 	api->save(*settings);
 	delete api;
