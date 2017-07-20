@@ -286,6 +286,9 @@ void DMM::writeAllSettingsToHardware()
 			m2k_adc->setChnHwOffset(i, 0.0);
 			m2k_adc->setChnHwGainMode(i, M2kAdc::LOW_GAIN_MODE);
 		}
+
+		iio_device_attr_write_longlong(adc->iio_adc_dev(),
+			"oversampling_ratio", 1);
 	}
 
 	auto trigger = adc->getTrigger();

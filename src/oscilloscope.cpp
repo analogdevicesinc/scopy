@@ -2096,6 +2096,9 @@ void Oscilloscope::writeAllSettingsToHardware()
 				M2kAdc::HIGH_GAIN_MODE : M2kAdc::LOW_GAIN_MODE;
 			m2k_adc->setChnHwGainMode(i, mode);
 		}
+
+		iio_device_attr_write_longlong(adc->iio_adc_dev(),
+			"oversampling_ratio", 1);
 	}
 
 	// Writes all trigger settings to hardware

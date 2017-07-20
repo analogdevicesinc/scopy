@@ -512,6 +512,12 @@ void NetworkAnalyzer::configHwForNetworkAnalyzing()
 		for (uint i = 0; i < trigger->numChannels(); i++)
 			trigger->setTriggerMode(i, HardwareTrigger::ALWAYS);
 	}
+
+	auto m2k_adc = std::dynamic_pointer_cast<M2kAdc>(adc_dev);
+	if (m2k_adc) {
+		iio_device_attr_write_longlong(m2k_adc->iio_adc_dev(),
+			"oversampling_ratio", 1);
+	}
 }
 
 double NetworkAnalyzer_API::getMinFreq() const
