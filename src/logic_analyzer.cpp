@@ -351,7 +351,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 		this, SLOT(btnExportPressed()));
 	connect(ui->cmbRunMode, SIGNAL(currentIndexChanged(int)),
 		this, SLOT(runModeChanged(int)));
-	connect(ui->lineeditSampleRate, &QLineEdit::editingFinished,
+	connect(ui->lineeditSampleRate, &QLineEdit::returnPressed,
 		this, &LogicAnalyzer::validateSamplingFrequency);
 
 	cleanHWParams();
@@ -581,89 +581,7 @@ void LogicAnalyzer::set_triggered_status(std::string value)
 
 void LogicAnalyzer::onHorizScaleValueChanged(double value)
 {
-        double plotTimeSpan = value * 10; //Hdivision count
-        acquisition_mode = ui->cmbRunMode->currentIndex();
-        acquisition_mode = (acquisition_mode == REPEATED
-                            && plotTimeSpan >= timespanLimitStream) ? SCREEN : acquisition_mode;
-        active_plot_timebase = value;
-
-        if(acquisition_mode == SCREEN || acquisition_mode == STREAM) {
-                ui->lineeditSampleRate->setEnabled(true);
-                custom_sampleCount = 16384;
-                active_triggerSampleCount = 0;
-                double bufferTimeSpan = custom_sampleCount / active_sampleRate;
-                active_sampleCount = plotTimeSpan / bufferTimeSpan * custom_sampleCount;
-
-		if(logic_analyzer_ptr && logic_analyzer_ptr->get_buffersize() != 16384) {
-			logic_analyzer_ptr->set_buffersize(custom_sampleCount, false);
-			logic_analyzer_ptr->set_entire_buffersize(active_sampleCount);
-			set_buffersize();
-		}
-		setSampleRate();
-		if( running )
-		{
-			last_set_sample_count = custom_sampleCount;
-			setBuffersizeLabelValue(active_sampleCount);
-			setSamplerateLabelValue(active_sampleRate);
-			setHWTriggerDelay(active_triggerSampleCount);
-                }
-
-                setTriggerDelay();
-                d_timeTriggerHandle->setPosition(0);
-                main_win->view_->viewport()->setTimeTriggerPixel(0);
-                main_win->view_->time_item_appearance_changed(true, true);
-
-                // Change the sensitivity of time position control
-                timePosition->setStep(value / 10);
-                recomputeCursorsValue(true);
-                updateBufferPreviewer();
-	}
-	else {
-		ui->lineeditSampleRate->setEnabled(false);
-		symmBufferMode->setTimeBase(value);
-		LogicAnalyzerSymmetricBufferMode::capture_parameters params = symmBufferMode->captureParameters();
-		active_sampleRate = params.sampleRate;
-		active_sampleCount = params.entireBufferSize;
-		active_triggerSampleCount = -(long long)params.triggerBufferSize;
-		active_timePos = -params.timePos;
-
-		timer_timeout_ms = plotTimeSpan * 1000  + 100; //transfer time
-
-                if( logic_analyzer_ptr )
-                {
-                        if(logic_analyzer_ptr->get_buffersize() != active_sampleCount)
-                        {
-                                logic_analyzer_ptr->set_buffersize(active_sampleCount, true);
-                                set_buffersize();
-                        }
-                }
-
-                if( running )
-                {
-                        last_set_sample_count = active_sampleCount;
-                        setSampleRate();
-                        setBuffersizeLabelValue(active_sampleCount);
-                        setSamplerateLabelValue(active_sampleRate);
-                        setHWTriggerDelay(active_triggerSampleCount);
-
-                        if( timePosition->value() != -params.timePos ) {
-                                timePosition->setValue(-params.timePos);
-                        }
-                }
-                setTriggerDelay();
-
-                int trigX = timeToPixel(-active_timePos);
-                d_timeTriggerHandle->setPositionSilenty(trigX);
-                main_win->view_->viewport()->setTimeTriggerPixel(trigX);
-                main_win->view_->time_item_appearance_changed(true, true);
-
-                // Change the sensitivity of time position control
-                timePosition->setStep(value / 10);
-                recomputeCursorsValue(true);
-                updateBufferPreviewer();
-        }
-
-
+	configParams(value, timePosition->value());
 }
 
 void LogicAnalyzer::enableTrigger(bool value)
@@ -767,50 +685,132 @@ void LogicAnalyzer::refreshTriggerPos(int px)
 	d_timeTriggerHandle->setPositionSilenty(px);
 }
 
+void LogicAnalyzer::configParams(double timebase, double timepos)
+{
+
+	timeBase->blockSignals(true);
+	timePosition->blockSignals(true);
+
+	timePosition->setValue(timepos);
+	timeBase->setValue(timebase);
+
+	timeBase->blockSignals(false);
+	timePosition->blockSignals(false);
+
+	symmBufferMode->setTriggerPos(-timepos);
+	symmBufferMode->setTimeBase(timebase);
+	LogicAnalyzerSymmetricBufferMode::capture_parameters params = symmBufferMode->captureParameters();
+
+        double plotTimeSpan = timebase * 10;
+        acquisition_mode = ui->cmbRunMode->currentIndex();
+        acquisition_mode = (acquisition_mode == REPEATED
+                            && plotTimeSpan >= timespanLimitStream) ? SCREEN : acquisition_mode;
+
+        if(acquisition_mode == SCREEN || acquisition_mode == STREAM) {
+                if(active_plot_timebase != timebase)
+                {
+                        active_plot_timebase = timebase;
+                        d_timeTriggerHandle->setPositionSilenty(0);
+                        onTimeTriggerHandlePosChanged(0);
+                }
+                else if(active_timePos != -params.timePos)
+                        active_timePos = -params.timePos;
+
+                int trigX = timeToPixel(-active_timePos);
+                d_timeTriggerHandle->setPositionSilenty(trigX);
+
+                if( trigX != 0 ) {
+                        acquisition_mode = REPEATED;
+                        ui->cmbRunMode->blockSignals(true);
+                        ui->cmbRunMode->setCurrentIndex(0);
+                        ui->cmbRunMode->blockSignals(false);
+                        ui->lineeditSampleRate->setEnabled(false);
+                }
+                else {
+                        ui->lineeditSampleRate->setEnabled(true);
+                        active_triggerSampleCount = 0;
+                        custom_sampleCount = 16384;
+
+			double bufferTimeSpan = custom_sampleCount / active_sampleRate;
+			active_sampleCount = plotTimeSpan / bufferTimeSpan * custom_sampleCount;
+
+			if(logic_analyzer_ptr)
+			{
+				logic_analyzer_ptr->set_buffersize(custom_sampleCount, false);
+				logic_analyzer_ptr->set_entire_buffersize(active_sampleCount);
+				set_buffersize();
+			}
+			setSampleRate();
+			if( running )
+			{
+				last_set_sample_count = custom_sampleCount;
+				setBuffersizeLabelValue(active_sampleCount);
+				setSamplerateLabelValue(active_sampleRate);
+				setHWTriggerDelay(active_triggerSampleCount);
+			}
+
+			setTriggerDelay();
+			d_timeTriggerHandle->setPosition(trigX);
+			main_win->view_->viewport()->setTimeTriggerPixel(trigX);
+			main_win->view_->time_item_appearance_changed(true, true);
+
+			// Change the sensitivity of time position control
+			timePosition->setStep(timebase / 10);
+			recomputeCursorsValue(true);
+			updateBufferPreviewer();
+		}
+
+        }
+        if(acquisition_mode == REPEATED) {
+                if(active_plot_timebase != timebase)
+                        active_plot_timebase = timebase;
+                else if(active_timePos != -params.timePos)
+                        active_timePos = -params.timePos;
+
+                ui->lineeditSampleRate->setEnabled(false);
+                active_sampleRate = params.sampleRate;
+                active_sampleCount = params.entireBufferSize;
+                active_triggerSampleCount = -(long long)params.triggerBufferSize;
+
+                if( logic_analyzer_ptr )
+                {
+                        if(logic_analyzer_ptr->get_buffersize() != active_sampleCount)
+                        {
+                                logic_analyzer_ptr->set_buffersize(active_sampleCount, true);
+                                set_buffersize();
+                        }
+                }
+
+                if( running )
+                {
+                        last_set_sample_count = active_sampleCount;
+                        setSampleRate();
+                        setBuffersizeLabelValue(active_sampleCount);
+                        setSamplerateLabelValue(active_sampleRate);
+                        setHWTriggerDelay(active_triggerSampleCount);
+
+                        if( timePosition->value() != -params.timePos ) {
+                                timePosition->setValue(-params.timePos);
+                        }
+                }
+                setTriggerDelay();
+
+                int trigX = timeToPixel(-active_timePos);
+                d_timeTriggerHandle->setPositionSilenty(trigX);
+                main_win->view_->viewport()->setTimeTriggerPixel(trigX);
+                main_win->view_->time_item_appearance_changed(true, true);
+
+                // Change the sensitivity of time position control
+                timePosition->setStep(timebase / 10);
+                recomputeCursorsValue(true);
+                updateBufferPreviewer();
+        }
+
+}
+
 void LogicAnalyzer::onTimePositionSpinboxChanged(double value)
 {
-	symmBufferMode->setTriggerPos(-value);
-	SymmetricBufferMode::capture_parameters params = symmBufferMode->captureParameters();
-	active_sampleRate = params.sampleRate;
-	active_sampleCount = params.entireBufferSize;
-	active_triggerSampleCount = -(long long)params.triggerBufferSize;
-	active_timePos = -params.timePos;
-
-	double plotTimeSpan = 10 * timeBase->value();
-
-	int trigX = timeToPixel(-active_timePos);
-	d_timeTriggerHandle->setPositionSilenty(trigX);
-
-	if( plotTimeSpan >= timespanLimitStream && trigX == 0)
-	{
-		custom_sampleCount = active_sampleCount / plotRefreshRate;
-		if(logic_analyzer_ptr && logic_analyzer_ptr->get_buffersize() != custom_sampleCount) {
-			logic_analyzer_ptr->set_buffersize(custom_sampleCount, false);
-			logic_analyzer_ptr->set_entire_buffersize(active_sampleCount);
-			set_buffersize();
-		}
-	}
-	else if( logic_analyzer_ptr )
-	{
-		if(logic_analyzer_ptr->get_buffersize() != active_sampleCount)
-		{
-			logic_analyzer_ptr->set_buffersize(active_sampleCount, true);
-			set_buffersize();
-		}
-	}
-	if( running )
-	{
-		last_set_sample_count = active_sampleCount;
-		setSampleRate();
-		setHWTriggerDelay(active_triggerSampleCount);
-		setBuffersizeLabelValue(active_sampleCount);
-		setSamplerateLabelValue(active_sampleRate);
-	}
-	setTriggerDelay();
-	main_win->view_->viewport()->setTimeTriggerPixel(trigX);
-	main_win->view_->time_item_appearance_changed(true, true);
-	recomputeCursorsValue(false);
-	updateBufferPreviewer();
+        configParams(timeBase->value(), value);
 }
 
 void LogicAnalyzer::onTimeTriggerHandlePosChanged(int pos)
@@ -864,8 +864,8 @@ void LogicAnalyzer::startStop(bool start)
 		ui->btnRunStop->setText("Stop");
 		setHWTriggerDelay(active_triggerSampleCount);
 		setTriggerDelay();
-		if (timePosition->value() != active_timePos)
-			timePosition->setValue(active_timePos);
+//		if (timePosition->value() != active_timePos)
+//			timePosition->setValue(active_timePos);
 		if(!armed)
 			armed = true;
 		state_timer->start(2);
@@ -926,8 +926,8 @@ void LogicAnalyzer::singleRun()
 	setSamplerateLabelValue(active_sampleRate);
 	setHWTriggerDelay(active_triggerSampleCount);
 	setTriggerDelay();
-	if (timePosition->value() != active_timePos)
-		timePosition->setValue(active_timePos);
+//	if (timePosition->value() != active_timePos)
+//		timePosition->setValue(active_timePos);
 	logic_analyzer_ptr->set_single(true);
 	main_win->run_stop();
 	running = false;

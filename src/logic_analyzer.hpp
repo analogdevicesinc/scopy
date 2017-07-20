@@ -254,6 +254,8 @@ private:
 	MouseWheelWidgetGuard *wheelEventGuard;
 	bool offline_mode;
 	int acquisition_mode;
+
+	void configParams(double timebase, double timepos);
 };
 
 class LogicAnalyzer_API : public ApiObject
