@@ -91,7 +91,8 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	adc_name(ctx ? filt->device_name(TOOL_SPECTRUM_ANALYZER) : ""),
 	crt_channel_id(0),
 	crt_peak(0),
-	max_peak_count(10)
+	max_peak_count(10),
+	bin_sizes({256, 512, 1024, 2048, 4096, 8192, 16384, 32768})
 {
 
 	// Get the list of names of the available channels
@@ -204,9 +205,6 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	ui->center_freq->setStep(1e6);
 	ui->span_freq->setStep(1e6);
 
-	double rbw = (100e6 / FFT_SIZE) / 1e3;
-	ui->cmb_rbw->addItem(QString::number(rbw) + "kHz");
-
 	if (ctx)
 		build_gnuradio_block_chain();
 	else
@@ -290,6 +288,9 @@ void SpectrumAnalyzer::runStopToggled(bool checked)
 	if (iio) {
 		if (checked) {
 			writeAllSettingsToHardware();
+			fft_plot->setSampleRate(sample_rate, 1, "");
+			fft_sink->set_samp_rate(sample_rate);
+
 			ui->run_button->setText("Stop");
 			for (int i = 0; i < num_adc_channels; i++)
 				iio->start(fft_ids[i]);
@@ -353,6 +354,7 @@ void SpectrumAnalyzer::build_gnuradio_block_chain()
 		iio->connect(ctm, 0, fft_sink, i);
 
 		channels[i]->fft_block = fft;
+		channels[i]->ctm_block = ctm;
 	}
 
 	if (started)
@@ -431,7 +433,7 @@ void SpectrumAnalyzer::on_comboBox_window_currentIndexChanged(const QString& s)
 		return;
 	auto win_type = (*it).second;
 	if (win_type != channels[crt_channel]->fftWindow())
-		channels[crt_channel]->setFftWindow((*it).second, FFT_SIZE);
+		channels[crt_channel]->setFftWindow((*it).second, fft_size);
 }
 
 void SpectrumAnalyzer::on_spinBox_averaging_valueChanged(int n)
@@ -535,6 +537,19 @@ void SpectrumAnalyzer::onStartStopChanged()
 	// Configure plot
 	fft_plot->setAxisScale(QwtPlot::xBottom, start, stop);
 	fft_plot->replot();
+
+	setSampleRate(2 * stop);
+
+	/* Re-populate the RBW list with the new available values */
+	ui->cmb_rbw->blockSignals(true);
+	ui->cmb_rbw->clear();
+	int i = 0;
+	for (; i < bin_sizes.size(); i++) {
+		ui->cmb_rbw->addItem(freq_formatter.format(
+		sample_rate / bin_sizes[i], "Hz", 2));
+	}
+	ui->cmb_rbw->blockSignals(false);
+	ui->cmb_rbw->setCurrentIndex(i - 1);
 }
 
 void SpectrumAnalyzer::onCenterSpanChanged()
@@ -592,6 +607,9 @@ void SpectrumAnalyzer::writeAllSettingsToHardware()
 			m2k_adc->setChnHwOffset(i, 0.0);
 			m2k_adc->setChnHwGainMode(i, M2kAdc::LOW_GAIN_MODE);
 		}
+
+		iio_device_attr_write_longlong(adc->iio_adc_dev(),
+			"oversampling_ratio", sample_rate_divider);
 	}
 
 	auto trigger = adc->getTrigger();
@@ -649,6 +667,71 @@ void SpectrumAnalyzer::on_btnMaxPeak_clicked()
 			fft_plot->replot();
 		}
 	}
+}
+
+void SpectrumAnalyzer::on_cmb_rbw_currentIndexChanged(int index)
+{
+	uint new_fft_size = bin_sizes[index];
+
+	if (new_fft_size != fft_size) {
+		setFftSize(new_fft_size);
+	}
+}
+
+void SpectrumAnalyzer::setSampleRate(double sr)
+{
+	double max_sr = 100E6; // TO DO: make OscAdc figure out the max sr of an ADC
+
+	sample_rate_divider = (int)(max_sr / sr);
+	sample_rate = max_sr / sample_rate_divider;
+
+	if (iio->started()) {
+		auto m2k_adc = std::dynamic_pointer_cast<M2kAdc>(adc);
+		if (m2k_adc) {
+			iio_device_attr_write_longlong(adc->iio_adc_dev(),
+				"oversampling_ratio", sample_rate_divider);
+		} else {
+			adc->setSampleRate(sr);
+		}
+
+		fft_plot->setSampleRate(sample_rate, 1, "");
+		fft_sink->set_samp_rate(sample_rate);
+	}
+}
+
+void SpectrumAnalyzer::setFftSize(uint size)
+{
+	// TO DO: This is cumbersome. We shouldn't have to rebuild the entire
+	//        block chain every time we need to change the FFT size. A
+	//        spectrum_sink block similar to scope_sink_f would be better
+
+	bool started = iio->started();
+
+	if (started)
+		iio->lock();
+
+	fft_size = size;
+	fft_sink->set_nsamps(size);
+	for (int i = 0; i < channels.size(); i++) {
+		auto fft = gnuradio::get_initial_sptr(
+			new fft_block(false, size));
+
+		iio->disconnect(fft_ids[i]);
+		fft_ids[i] = iio->connect(fft, i, 0, true, size);
+		iio->connect(fft, 0, channels[i]->ctm_block, 0);
+		iio->connect(channels[i]->ctm_block, 0, fft_sink, i);
+
+		if (started)
+			iio->start(fft_ids[i]);
+
+		channels[i]->fft_block = fft;
+		channels[i]->setFftWindow(channels[i]->fftWindow(), size);
+
+		iio->set_buffer_size(fft_ids[i], size);
+	}
+
+	if (started)
+		iio->unlock();
 }
 
 /*

@@ -22,6 +22,7 @@
 
 #include <gnuradio/top_block.h>
 #include <gnuradio/fft/window.h>
+#include <gnuradio/blocks/complex_to_mag_squared.h>
 
 #include "apiObject.hpp"
 #include "iio_manager.hpp"
@@ -30,6 +31,7 @@
 #include "FftDisplayPlot.h"
 #include "osc_adc.h"
 #include "tool.hpp"
+#include "plot_utils.hpp"
 
 #include <QWidget>
 
@@ -101,12 +103,15 @@ private Q_SLOTS:
 	void on_btnLeftPeak_clicked();
 	void on_btnRightPeak_clicked();
 	void on_btnMaxPeak_clicked();
+	void on_cmb_rbw_currentIndexChanged(int index);
 
 private:
 	void build_gnuradio_block_chain();
 	void build_gnuradio_block_chain_no_ctx();
 	void writeAllSettingsToHardware();
 	int channelIdOfOpenedSettings() const;
+	void setSampleRate(double sr);
+	void setFftSize(uint size);
 
 private:
 	Ui::SpectrumAnalyzer *ui;
@@ -133,6 +138,11 @@ private:
 	int crt_channel_id;
 	int crt_peak;
 	uint max_peak_count;
+	double sample_rate;
+	int sample_rate_divider;
+	uint fft_size;
+	QList<uint> bin_sizes;
+	MetricPrefixFormatter freq_formatter;
 
 	gr::top_block_sptr top_block;
 
@@ -147,6 +157,7 @@ Q_OBJECT
 
 public:
 	boost::shared_ptr<adiscope::fft_block> fft_block;
+	gr::blocks::complex_to_mag_squared::sptr ctm_block;
 	QWidget *m_widget;
 	Ui::Channel *m_ui;
 
