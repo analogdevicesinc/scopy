@@ -75,6 +75,17 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	if (!dac1 || !dac2)
 		throw std::runtime_error("Unable to find channels in filter file");
 
+	/* FIXME: TODO: Move this into a HW class / lib M2k */
+	struct iio_device *fabric = iio_context_find_device(ctx, "m2k-fabric");
+	if (fabric) {
+		this->amp1 = iio_device_find_channel(fabric, "voltage0", true);
+		this->amp2 = iio_device_find_channel(fabric, "voltage1", true);
+		if (amp1 && amp2) {
+			iio_channel_attr_write_bool(amp1, "powerdown", true);
+			iio_channel_attr_write_bool(amp2, "powerdown", true);
+		}
+	}
+
 	ui->setupUi(this);
 
 	connect(ui->run_button, SIGNAL(toggled(bool)),
@@ -370,6 +381,12 @@ void NetworkAnalyzer::run()
 void NetworkAnalyzer::startStop(bool pressed)
 {
 	stop = !pressed;
+
+	if (amp1 && amp2) {
+		/* FIXME: TODO: Move this into a HW class / lib M2k */
+		iio_channel_attr_write_bool(amp1, "powerdown", !pressed);
+		iio_channel_attr_write_bool(amp2, "powerdown", !pressed);
+	}
 
 	if (pressed) {
 		ui->dbgraph->reset();

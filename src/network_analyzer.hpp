@@ -62,7 +62,7 @@ namespace adiscope {
 
 	private:
 		Ui::NetworkAnalyzer *ui;
-		struct iio_channel *dac1, *dac2;
+		struct iio_channel *dac1, *dac2, *amp1, *amp2;
 		struct iio_device *adc;
 		std::shared_ptr<GenericAdc> adc_dev;
 		boost::shared_ptr<iio_manager> iio;
