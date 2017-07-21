@@ -1322,7 +1322,6 @@ void LogicAnalyzer::runModeChanged(int index)
         switch(index){
         case REPEATED:
         {
-                ui->btnSingleRun->setEnabled(true);
                 acquisition_mode = REPEATED;
                 if( logic_analyzer_ptr )
                         logic_analyzer_ptr->set_stream(false);
@@ -1336,7 +1335,6 @@ void LogicAnalyzer::runModeChanged(int index)
                 break;
         case STREAM:
         {
-                ui->btnSingleRun->setEnabled(false);
                 if( logic_analyzer_ptr )
                         logic_analyzer_ptr->set_stream(true);
                 d_timeTriggerHandle->setPosition(0);
