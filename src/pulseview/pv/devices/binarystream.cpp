@@ -154,6 +154,7 @@ void BinaryStream::run()
                         size_to_display = (nrx > entire_buffersize && !stream_mode) ?
                                                 nbytes_rx-2*(nrx-entire_buffersize) : nbytes_rx;
                         input_->send(iio_buffer_start(data_), (size_t)(size_to_display));
+                        la->bufferSentSignal(false);
 
                         if( nrx >= entire_buffersize && !stream_mode) {
                                 if( !single_ ) {
@@ -161,6 +162,7 @@ void BinaryStream::run()
                                         input_->send(iio_buffer_start(data_)+(size_t)(size_to_display),
                                                      (size_t)(2*(nrx-entire_buffersize)));
                                         nrx = 0;
+                                        la->bufferSentSignal(true);
                                 }
                         }
 

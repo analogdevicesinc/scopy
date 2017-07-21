@@ -107,7 +107,7 @@ public:
 	void get_channel_groups_api();
 	void installWheelEventGuard();
 	void triggeredOnce();
-
+	void bufferSentSignal(bool lastBuffer);
 	int getCurrent_acquisition_mode() const;
 	void setCurrent_acquisition_mode(int value);
 

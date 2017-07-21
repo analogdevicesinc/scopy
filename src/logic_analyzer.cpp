@@ -732,6 +732,7 @@ void LogicAnalyzer::configParams(double timebase, double timepos)
                         custom_sampleCount = 16384;
 
 			double bufferTimeSpan = custom_sampleCount / active_sampleRate;
+			buffer_previewer->setNoOfSteps(plotTimeSpan / bufferTimeSpan + 1);
 			active_sampleCount = plotTimeSpan / bufferTimeSpan * custom_sampleCount;
 
 			if(logic_analyzer_ptr)
@@ -771,6 +772,7 @@ void LogicAnalyzer::configParams(double timebase, double timepos)
                 active_sampleRate = params.sampleRate;
                 active_sampleCount = params.entireBufferSize;
                 active_triggerSampleCount = -(long long)params.triggerBufferSize;
+                buffer_previewer->setNoOfSteps(0);
 
                 if( logic_analyzer_ptr )
                 {
@@ -854,6 +856,7 @@ void LogicAnalyzer::startStop(bool start)
 		return;
 
 	if (start) {
+		buffer_previewer->setWaveformWidth(0);
 		if(logic_analyzer_ptr->get_single()
 				&& logic_analyzer_ptr->is_running()) {
 			main_win->run_stop();
@@ -915,6 +918,7 @@ void LogicAnalyzer::setHWTriggerDelay(long long delay)
 
 void LogicAnalyzer::singleRun()
 {
+	buffer_previewer->setWaveformWidth(0);
 	ui->lblExportStatus->setText("Not exported");
 	if(!dev)
 		return;
@@ -1131,11 +1135,19 @@ void LogicAnalyzer::updateBufferPreviewer()
 	double cPos = cPosInContainer * containerWidth + containerPos;
 
 	// Update the widget
-	buffer_previewer->setWaveformWidth(wWidth);
-	buffer_previewer->setWaveformPos(wPos);
-	buffer_previewer->setHighlightWidth(hWidth);
-	buffer_previewer->setHighlightPos(hPos);
-	buffer_previewer->setCursorPos(cPos);
+	if(acquisition_mode != SCREEN) {
+		buffer_previewer->setWaveformWidth(wWidth);
+		buffer_previewer->setWaveformPos(wPos);
+		buffer_previewer->setHighlightWidth(hWidth);
+		buffer_previewer->setHighlightPos(hPos);
+		buffer_previewer->setCursorPos(cPos);
+	}
+	if(acquisition_mode == SCREEN) {
+		buffer_previewer->setWaveformPos(wPos);
+		buffer_previewer->setHighlightWidth(hWidth);
+		buffer_previewer->setHighlightPos(hPos);
+		buffer_previewer->setCursorPos(0);
+	}
 
 }
 
@@ -1156,6 +1168,17 @@ void LogicAnalyzer::setupTriggerSettingsUI(bool enabled)
 				chm.get_channel(i)->setTrigger(trigger_mapping[0]);
 		}
 		chm_ui->update_ui();
+	}
+}
+
+void LogicAnalyzer::bufferSentSignal(bool lastBuffer)
+{
+	if(!lastBuffer) {
+		double val = buffer_previewer->waveformWidth() + 0.0002;
+		buffer_previewer->setWaveformWidth(val);
+	}
+	else {
+		buffer_previewer->setWaveformWidth(0);
 	}
 }
 

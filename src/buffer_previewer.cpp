@@ -265,6 +265,16 @@ DigitalBufferPreviewer::DigitalBufferPreviewer(int pixelsPerPeriod,
 {
 }
 
+void DigitalBufferPreviewer::setNoOfSteps(int val)
+{
+	m_noOfSteps = val;
+}
+
+int DigitalBufferPreviewer::noOfSteps()
+{
+	return m_noOfSteps;
+}
+
 void DigitalBufferPreviewer::buildFullWaveform(QPointF *wavePoints, int numPts)
 {
 	for (int i = 0; i < numPts; i++) {
