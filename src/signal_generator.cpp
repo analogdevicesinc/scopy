@@ -90,11 +90,13 @@ struct adiscope::time_block_data {
 	unsigned long nb_channels;
 };
 
-SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
+SignalGenerator::SignalGenerator(struct iio_context *_ctx,
+		QList<std::shared_ptr<GenericDac>> dacs, Filter *filt,
 		QPushButton *runButton, QJSEngine *engine, ToolLauncher *parent) :
 	Tool(_ctx, runButton, new SignalGenerator_API(this), parent),
 	ui(new Ui::SignalGenerator),
 	time_block_data(new adiscope::time_block_data),
+	dacs(dacs),
 	currentChannel(0), sample_rate(0),
 	settings_group(new QButtonGroup(this))
 {
@@ -105,27 +107,22 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 
 	QVector<struct iio_channel *> iio_channels;
 
-	for (unsigned int dev_id = 0; ; dev_id++) {
-		struct iio_device *dev;
-		try {
-			dev = filt->find_device(ctx,
-					TOOL_SIGNAL_GENERATOR, dev_id);
-		} catch (std::exception &ex) {
-			break;
-		}
+	for (int i = 0; i < dacs.size(); i++) {
+		struct iio_device *dev = dacs[i]->iio_dac_dev();
 
-		unsigned int nb = iio_device_get_channels_count(dev);
 		unsigned long dev_sample_rate = get_max_sample_rate(dev);
 
 		if (dev_sample_rate > sample_rate)
 			sample_rate = dev_sample_rate;
 
-		for (unsigned int i = 0; i < nb; i++) {
-			struct iio_channel *ch = iio_device_get_channel(dev, i);
+		QList<struct iio_channel *> dac_channels =
+			dacs[i]->dacChannelList();
 
-			if (iio_channel_is_output(ch) &&
-					iio_channel_is_scan_element(ch))
-				iio_channels.append(ch);
+		for (int i = 0; i < dac_channels.size(); i++) {
+			iio_channels.append(dac_channels[i]);
+			channel_dac.push_back(QPair<struct iio_channel *,
+				std::shared_ptr<GenericDac>>(iio_channels[i],
+				dacs[i]));
 		}
 	}
 
@@ -207,8 +204,6 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 			pair->second.btn->setChecked(true);
 
 		channels.append(pair);
-
-		channels_vlsb.append(QPair<struct iio_channel *, double>(chn, 0.0));
 	}
 
 	time_block_data->nb_channels = nb_channels;
@@ -508,28 +503,29 @@ void SignalGenerator::start()
 
 			float volts_to_raw_coef;
 			double vlsb = 1;
-			auto pair_it = std::find_if(channels_vlsb.begin(),
-				channels_vlsb.end(),
+			double corr = 1; // interpolation correction
+			auto pair_it = std::find_if(channel_dac.begin(),
+				channel_dac.end(),
 				[&each](const QPair<struct iio_channel *,
-				double>& element) {
+				std::shared_ptr<GenericDac>>& element) {
 					return element.first == each;
 				}
 				);
-			if (pair_it != channels_vlsb.end()) {
-				vlsb = (*pair_it).second;
+			if (pair_it != channel_dac.end()) {
+				std::shared_ptr<GenericDac> dac =(*pair_it).second;
+				vlsb = dac->vlsb();
+				auto m2k_dac = std::dynamic_pointer_cast<M2kDac>
+					(dac);
+				if (m2k_dac) {
+					corr = m2k_dac->compTable(best_rate);
+				}
 			}
 
-			if (vlsb == 0.0) {	// DAC_RAW = (-Vout * 2^11) / 5V
-						// Multiplying with 16 because the HDL considers the DAC data as 16 bit
-						// instead of 12 bit(data is shifted to the left).
-				volts_to_raw_coef = -1 * (1 << (DAC_BIT_COUNT - 1)) /
-					AMPLITUDE_VOLTS * 16 / INTERP_BY_100_CORR;
-			} else {		// DAC_RAW = (-Vout / (voltage corresponding to a LSB));
-						// Multiplying with 16 because the HDL considers the DAC data as 16 bit
-						// instead of 12 bit(data is shifted to the left).
-				volts_to_raw_coef = -1 * (1 / vlsb) * 16;
-			}
-
+			// DAC_RAW = (-Vout / (voltage corresponding to a LSB));
+			// Multiplying with 16 because the HDL considers the DAC data as 16 bit
+			// instead of 12 bit(data is shifted to the left)
+			// Divide by corr when interpolation is used
+			volts_to_raw_coef = (-1 * (1 / vlsb) * 16) / corr;
 
 			auto f2s = blocks::float_to_short::make(1,
 					volts_to_raw_coef);
@@ -1030,41 +1026,6 @@ size_t SignalGenerator::get_samples_count(const struct iio_device *dev,
 		return 0;
 
 	return size;
-}
-
-double SignalGenerator::vlsb_of_channel(const char *channel,
-	const char *dev_parent)
-{
-	double vlsb = -1;
-
-	for (auto it = channels_vlsb.begin(); it != channels_vlsb.end(); ++it) {
-		struct iio_channel *chn = (*it).first;
-		const struct iio_device *dev = iio_channel_get_device(chn);
-
-		if (!strcmp(iio_channel_get_id(chn), channel) &&
-			!strcmp(iio_device_get_name(dev), dev_parent)) {
-			vlsb = (*it).second;
-			break;
-		}
-	}
-
-	return vlsb;
-}
-
-void SignalGenerator::set_vlsb_of_channel(const char *channel,
-	const char *dev_parent, double vlsb)
-{
-	for (auto it = channels_vlsb.begin(); it != channels_vlsb.end(); ++it) {
-		struct iio_channel *chn = (*it).first;
-		const struct iio_device *dev = iio_channel_get_device(chn);
-
-		if (!strcmp(iio_channel_get_id(chn), channel) &&
-			!strcmp(iio_device_get_name(dev), dev_parent)) {
-			(*it).second = vlsb;
-
-			break;
-		}
-	}
 }
 
 bool SignalGenerator_API::running() const

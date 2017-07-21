@@ -34,6 +34,7 @@
 #include "oscilloscope_plot.hpp"
 #include "scope_sink_f.h"
 #include "tool.hpp"
+#include "hw_dac.h"
 
 #include "ui_channel.h"
 
@@ -54,6 +55,7 @@ namespace adiscope {
 	struct signal_generator_data;
 	struct time_block_data;
 	class SignalGenerator_API;
+	class GenericDac;
 
 	enum sg_waveform {
 		SG_SIN_WAVE = gr::analog::GR_SIN_WAVE,
@@ -72,14 +74,10 @@ namespace adiscope {
 
 	public:
 		explicit SignalGenerator(struct iio_context *ctx,
+				QList<std::shared_ptr<GenericDac>> dacs,
 				Filter *filt, QPushButton *runButton,
 				QJSEngine *engine, ToolLauncher *parent);
 		~SignalGenerator();
-
-		double vlsb_of_channel(const char *channel,
-			const char *dev_parent);
-		void set_vlsb_of_channel(const char *channel,
-			const char *dev_parent, double vlsb);
 
 		static const size_t min_buffer_size = 1024;
 
@@ -97,6 +95,7 @@ namespace adiscope {
 		gr::top_block_sptr top_block;
 		struct time_block_data *time_block_data;
 		struct iio_channel *amp1, *amp2;
+		QList<std::shared_ptr<GenericDac>> dacs;
 
 		unsigned int currentChannel;
 		unsigned long sample_rate;
@@ -105,7 +104,8 @@ namespace adiscope {
 
 		QVector<struct iio_buffer *> buffers;
 		QVector<QPair<QWidget, Ui::Channel> *> channels;
-		QVector<QPair<struct iio_channel *, double>> channels_vlsb;
+		QVector<QPair<struct iio_channel *,
+			std::shared_ptr<adiscope::GenericDac>>> channel_dac;
 
 		QSharedPointer<signal_generator_data> getData(QWidget *obj);
 		QSharedPointer<signal_generator_data> getCurrentData();

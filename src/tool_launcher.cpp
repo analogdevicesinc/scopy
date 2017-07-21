@@ -25,6 +25,8 @@
 #include "spectrum_analyzer.hpp"
 #include "tool_launcher.hpp"
 #include "qtjs.hpp"
+#include "osc_adc.h"
+#include "hw_dac.h"
 
 #include "ui_device.h"
 #include "ui_tool_launcher.h"
@@ -73,8 +75,8 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 
 	connect(this, SIGNAL(adcCalibrationDone()),
 		this, SLOT(enableAdcBasedTools()));
-	connect(this, SIGNAL(dacCalibrationDone(float, float)),
-		this, SLOT(enableDacBasedTools(float, float)));
+	connect(this, SIGNAL(dacCalibrationDone()),
+		this, SLOT(enableDacBasedTools()));
 	connect(ui->btnAdd, SIGNAL(clicked()), this, SLOT(addRemoteContext()));
 
 	tl_api->setObjectName(QString::fromStdString(Filter::tool_name(
@@ -634,13 +636,24 @@ void adiscope::ToolLauncher::calibrate()
 		m2k_adc->setChnCorrectionGain(1, calib.adcGainChannel1());
 	}
 
+	for (int i = 0; i < dacs.size(); i++) {
+		auto m2k_dac = std::dynamic_pointer_cast<M2kDac>(dacs[i]);
+		if (m2k_dac) {
+			if (i == 0) {
+				dacs[i]->setVlsb(calib.dacAvlsb());
+			} else if (i == 1) {
+				dacs[i]->setVlsb(calib.dacBvlsb());
+			}
+		}
+	}
+
 	ui->btnDMM->setText(old_dmm_text);
 	ui->btnOscilloscope->setText(old_osc_text);
 	ui->btnSignalGenerator->setText(old_siggen_text);
 	ui->btnSpectrumAnalyzer->setText(old_spectrum_text);
 
 	Q_EMIT adcCalibrationDone();
-	Q_EMIT dacCalibrationDone(calib.dacAvlsb(), calib.dacBvlsb());
+	Q_EMIT dacCalibrationDone();
 }
 
 void adiscope::ToolLauncher::enableAdcBasedTools()
@@ -666,36 +679,12 @@ void adiscope::ToolLauncher::enableAdcBasedTools()
 	Q_EMIT adcToolsCreated();
 }
 
-void adiscope::ToolLauncher::enableDacBasedTools(float dacA_vlsb,
-                float dacB_vlsb)
+void adiscope::ToolLauncher::enableDacBasedTools()
 {
 	if (filter->compatible(TOOL_SIGNAL_GENERATOR)) {
-		signal_generator = new SignalGenerator(ctx, filter,
-							ui->stopSignalGenerator, &js_engine, this);
+		signal_generator = new SignalGenerator(ctx, dacs, filter,
+				ui->stopSignalGenerator, &js_engine, this);
 
-		struct iio_device *dev = iio_context_find_device(ctx, "m2k-dac-a");
-
-		if (dev) {
-			struct iio_channel *chn = iio_device_find_channel(dev,
-							"voltage0", true);
-
-			if (chn)
-				signal_generator->set_vlsb_of_channel(
-					iio_channel_get_id(chn),
-					iio_device_get_name(dev), dacA_vlsb);
-		}
-
-		dev = iio_context_find_device(ctx, "m2k-dac-b");
-
-		if (dev) {
-			struct iio_channel *chn = iio_device_find_channel(dev,
-						"voltage0", true);
-
-			if (chn)
-				signal_generator->set_vlsb_of_channel(
-					iio_channel_get_id(chn),
-					iio_device_get_name(dev), dacB_vlsb);
-		}
 	}
 
 	Q_EMIT dacToolsCreated();
@@ -719,12 +708,36 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 
 	filter = new Filter(ctx);
 
+	// Find available DACs
+	QList<struct iio_device *> iio_dacs;
+	for (unsigned int dev_id = 0; ; dev_id++) {
+		struct iio_device *dev;
+		try {
+			dev = filter->find_device(ctx,
+					TOOL_SIGNAL_GENERATOR, dev_id);
+		} catch (std::exception &ex) {
+			break;
+		}
+		iio_dacs.push_back(dev);
+	}
+
 	if (filter->hw_name().compare("M2K") == 0) {
 		adc = AdcBuilder::newAdc(AdcBuilder::M2K, ctx,
 			filter->find_device(ctx, TOOL_OSCILLOSCOPE));
+
+		for (int i = 0; i < iio_dacs.size(); i++) {
+			auto dac = DacBuilder::newDac(DacBuilder::M2K, ctx,
+				iio_dacs[i]);
+			dacs.push_back(dac);
+		}
 	} else {
 		adc = AdcBuilder::newAdc(AdcBuilder::GENERIC, ctx,
 			filter->find_device(ctx, TOOL_OSCILLOSCOPE));
+		for (int i = 0; i < iio_dacs.size(); i++) {
+			auto dac = DacBuilder::newDac(DacBuilder::GENERIC, ctx,
+				iio_dacs[i]);
+			dacs.push_back(dac);
+		}
 	}
 
 	if (filter->compatible(TOOL_PATTERN_GENERATOR)

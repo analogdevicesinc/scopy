@@ -50,6 +50,7 @@ namespace Ui {
 class ToolLauncher;
 class Device;
 class GenericAdc;
+class GenericDac;
 }
 
 namespace adiscope {
@@ -71,7 +72,7 @@ public:
 Q_SIGNALS:
 	void connectionDone(bool success);
 	void adcCalibrationDone();
-	void dacCalibrationDone(float dacA_vlsb, float dacB_vlsb);
+	void dacCalibrationDone();
 
 	void adcToolsCreated();
 	void dacToolsCreated();
@@ -99,7 +100,7 @@ private Q_SLOTS:
 	void destroyPopup();
 
 	void enableAdcBasedTools();
-	void enableDacBasedTools(float dacA_vlsb, float dacB_vlsb);
+	void enableDacBasedTools();
 
 	void hasText();
 
@@ -133,6 +134,7 @@ private:
 	QButtonGroup adc_users_group;
 
 	std::shared_ptr<GenericAdc> adc;
+	QList<std::shared_ptr<GenericDac>> dacs;
 
 	Filter *filter;
 	ToolLauncher_API *tl_api;
