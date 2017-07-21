@@ -134,8 +134,12 @@ namespace adiscope {
 				unsigned long sample_rate, bool perfect = false);
 		unsigned long get_best_sample_rate(
 				const struct iio_device *dev);
-		int set_sample_rate(const struct iio_device *dev,
-				unsigned long sample_rate);
+		//int set_sample_rate(const struct iio_device *dev,
+		//		unsigned long sample_rate);
+		void calc_sampling_params(const struct iio_device *dev,
+			unsigned long sample_rate,
+			unsigned long& out_sample_rate,
+			unsigned long& out_oversampling_ratio);
 		bool use_oversampling(const struct iio_device *dev);
 
 	private Q_SLOTS:

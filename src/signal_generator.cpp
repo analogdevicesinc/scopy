@@ -489,6 +489,12 @@ void SignalGenerator::start()
 					iio_device_get_name(dev) ?:
 					iio_device_get_id(dev));
 
+		unsigned long final_rate;
+		unsigned long oversampling;
+
+		calc_sampling_params(dev, best_rate, final_rate,
+			oversampling);
+
 		for (auto each : enabled_channels) {
 			if (dev != iio_channel_get_device(each))
 				continue;
@@ -517,7 +523,7 @@ void SignalGenerator::start()
 				auto m2k_dac = std::dynamic_pointer_cast<M2kDac>
 					(dac);
 				if (m2k_dac) {
-					corr = m2k_dac->compTable(best_rate);
+					corr = m2k_dac->compTable(final_rate);
 				}
 			}
 
@@ -548,7 +554,12 @@ void SignalGenerator::start()
 					samples_count * sizeof(short));
 		}
 
-		set_sample_rate(dev, best_rate);
+		if (iio_device_find_attr(dev, "oversampling_ratio")) {
+			iio_device_attr_write_longlong(dev,
+				"oversampling_ratio", oversampling);
+		}
+		iio_device_attr_write_longlong(dev, "sampling_frequency",
+			final_rate);
 
 		qDebug() << "Pushed cyclic buffer";
 
@@ -890,31 +901,22 @@ unsigned long SignalGenerator::get_max_sample_rate(const struct iio_device *dev)
 	return values.takeFirst();
 }
 
-int SignalGenerator::set_sample_rate(const struct iio_device *dev,
-		unsigned long rate)
+void SignalGenerator::calc_sampling_params(const iio_device *dev,
+	unsigned long rate, unsigned long& out_sample_rate,
+	unsigned long& out_oversampling_ratio)
 {
 	if (use_oversampling(dev)) {
 		/* We assume that the rate requested here will always be a
 		 * divider of the max sample rate */
-		unsigned int ratio = sample_rate / rate;
+		out_oversampling_ratio = sample_rate / rate;
+		out_sample_rate = sample_rate;
 
-		int ret = iio_device_attr_write_longlong(
-				dev, "oversampling_ratio", ratio);
-		if (ret < 0)
-			return ret;
-
-		rate = sample_rate;
 		qDebug() << QString("Using oversampling with a ratio of %1")
-			.arg(ratio);
+			.arg(out_oversampling_ratio);
 	} else {
-		int ret = iio_device_attr_write_longlong(
-				dev, "oversampling_ratio", 1);
-		if (ret < 0)
-			return ret;
+		out_sample_rate = rate;
+		out_oversampling_ratio = 1;
 	}
-
-set_sample_rate:
-	return iio_device_attr_write_longlong(dev, "sampling_frequency", rate);
 }
 
 size_t SignalGenerator::gcd(size_t a, size_t b)
