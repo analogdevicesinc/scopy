@@ -92,6 +92,7 @@ public:
 	void highlightTopSeparator();
 	void highlightBotSeparator();
 	void resetSeparatorHighlight(bool force = false);
+	bool eventFilter(QObject *watched, QEvent *event);
 Q_SIGNALS:
 	void requestUpdateUi();
 private Q_SLOTS:
@@ -176,6 +177,7 @@ public:
 	void highlightTopSeparator();
 	void highlightBotSeparator();
 	void hideSeparatorHighlight(bool force = false);
+	bool eventFilter(QObject *watched, QEvent *event);
 
 
 Q_SIGNALS:

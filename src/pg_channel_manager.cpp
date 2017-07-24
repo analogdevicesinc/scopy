@@ -82,6 +82,7 @@ PatternGeneratorChannelUI::PatternGeneratorChannelUI(PatternGeneratorChannel
 	this->ch = ch;
 	ui = new Ui::PGChannelGroup();
 	setAcceptDrops(true);
+	this->installEventFilter(this);
 }
 
 void PatternGeneratorChannelUI::setTrace(
@@ -136,6 +137,29 @@ void PatternGeneratorChannelUI::resetSeparatorHighlight(bool force)
 {
 	topSep->setVisible(false);
 	botSep->setVisible(false);
+}
+
+bool PatternGeneratorChannelUI::eventFilter(QObject *watched, QEvent *event)
+{
+	if (event->type() == QEvent::DragEnter){
+		QDragEnterEvent *enterEvent = static_cast<QDragEnterEvent *>(event);
+		if (!enterEvent->mimeData()->hasFormat("patterngenerator/channelgroup")
+				&& !enterEvent->mimeData()->hasFormat("patterngenerator/channel"))
+			return true;
+		}
+	if (event->type() == QEvent::Drop){
+		QDropEvent *dropEvent = static_cast<QDropEvent *>(event);
+		if (!dropEvent->mimeData()->hasFormat("patterngenerator/channelgroup")
+				&& !dropEvent->mimeData()->hasFormat("patterngenerator/channel"))
+			return true;
+		}
+	if (event->type() == QEvent::DragMove){
+		QDragMoveEvent *dropEvent = static_cast<QDragMoveEvent *>(event);
+		if (!dropEvent->mimeData()->hasFormat("patterngenerator/channelgroup")
+				&& !dropEvent->mimeData()->hasFormat("patterngenerator/channel"))
+			return true;
+		}
+	return QWidget::event(event);
 }
 
 void PatternGeneratorChannelUI::mouseMoveEvent(QMouseEvent *event)
@@ -454,6 +478,7 @@ PatternGeneratorChannelGroupUI::PatternGeneratorChannelGroupUI(
 	decodeTrace = nullptr;
 	//setDragEnabled(true);
 	//setDropIndicatorShown(true);
+	this->installEventFilter(this);
 }
 
 PatternGeneratorChannelGroupUI::~PatternGeneratorChannelGroupUI()
@@ -637,6 +662,29 @@ void PatternGeneratorChannelGroupUI::hideSeparatorHighlight(bool force)
 		topSep->setVisible(true);
 		botSep->setVisible(true);
 	}
+}
+
+bool PatternGeneratorChannelGroupUI::eventFilter(QObject *watched, QEvent *event)
+{
+	if (event->type() == QEvent::DragEnter){
+		QDragEnterEvent *enterEvent = static_cast<QDragEnterEvent *>(event);
+		if (!enterEvent->mimeData()->hasFormat("patterngenerator/channelgroup")
+				&& !enterEvent->mimeData()->hasFormat("patterngenerator/channel"))
+			return true;
+		}
+	if (event->type() == QEvent::Drop){
+		QDropEvent *dropEvent = static_cast<QDropEvent *>(event);
+		if (!dropEvent->mimeData()->hasFormat("patterngenerator/channelgroup")
+				&& !dropEvent->mimeData()->hasFormat("patterngenerator/channel"))
+			return true;
+		}
+	if (event->type() == QEvent::DragMove){
+		QDragMoveEvent *dropEvent = static_cast<QDragMoveEvent *>(event);
+		if (!dropEvent->mimeData()->hasFormat("patterngenerator/channelgroup")
+				&& !dropEvent->mimeData()->hasFormat("patterngenerator/channel"))
+			return true;
+		}
+	return QWidget::event(event);
 }
 
 void PatternGeneratorChannelGroupUI::mouseMoveEvent(QMouseEvent *event)
