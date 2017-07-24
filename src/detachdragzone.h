@@ -16,6 +16,8 @@ public:
 	explicit DetachDragZone(QWidget *parent = 0);
 	~DetachDragZone();
 
+	bool eventFilter(QObject *watched, QEvent *event);
+
 Q_SIGNALS:
 	void detachWidget(int);
 	void changeText(QString);

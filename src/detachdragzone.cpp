@@ -14,6 +14,16 @@ DetachDragZone::~DetachDragZone()
 {
 }
 
+bool DetachDragZone::eventFilter(QObject *watched, QEvent *event)
+{
+	if (event->type() == QEvent::DragEnter){
+		QDragEnterEvent *enterEvent = static_cast<QDragEnterEvent *>(event);
+		if (!enterEvent->mimeData()->hasFormat("menu/option"))
+			return true;
+		}
+	return QWidget::event(event);
+}
+
 void DetachDragZone::dragEnterEvent(QDragEnterEvent *event)
 {
 
