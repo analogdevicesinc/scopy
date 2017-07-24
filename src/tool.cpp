@@ -40,6 +40,7 @@ Tool::Tool(struct iio_context *ctx, QPushButton *runButton,
 	settings = new QSettings(tempFile.fileName(), QSettings::IniFormat);
 
 	setAcceptDrops(true);
+	this->installEventFilter(this);
 
 	connect(this, SIGNAL(changeText(QString)), parent->infoWidget,
 		SLOT(setText(QString)));
@@ -52,6 +53,16 @@ Tool::~Tool()
 	run_button->parentWidget()->setDisabled(true);
 
 	delete settings;
+}
+
+bool Tool::eventFilter(QObject *watched, QEvent *event)
+{
+	if (event->type() == QEvent::DragEnter){
+	QDragEnterEvent *enterEvent = static_cast<QDragEnterEvent *>(event);
+	if (!enterEvent->mimeData()->hasFormat("menu/option"))
+		return true;
+	}
+	return QWidget::event(event);
 }
 
 void Tool::attached()

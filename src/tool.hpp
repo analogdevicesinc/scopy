@@ -48,6 +48,7 @@ public:
 	~Tool();
 
 	QPushButton *runButton() { return this->run_button; }
+	bool eventFilter(QObject *watched, QEvent *event);
 
 Q_SIGNALS:
 	void detachedState(bool detached);
