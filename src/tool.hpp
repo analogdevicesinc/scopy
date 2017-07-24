@@ -22,6 +22,10 @@
 
 #include <QWidget>
 #include <QSettings>
+#include <QMouseEvent>
+#include <QDragMoveEvent>
+#include <QDropEvent>
+#include <QString>
 
 class QJSEngine;
 class QPushButton;
@@ -47,10 +51,19 @@ public:
 
 Q_SIGNALS:
 	void detachedState(bool detached);
+	void detachTool(int);
+	void changeText(QString);
 
 public Q_SLOTS:
 	virtual void attached();
 	virtual void detached();
+
+private Q_SLOTS:
+	void dragEnterEvent(QDragEnterEvent *event);
+	void dragMoveEvent(QDragMoveEvent *event);
+	void dragLeaveEvent(QDragLeaveEvent *event);
+	void dropEvent(QDropEvent *event);
+
 
 protected:
 	struct iio_context *ctx;
