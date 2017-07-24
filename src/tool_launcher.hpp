@@ -30,6 +30,7 @@
 #include <QButtonGroup>
 #include <QMap>
 #include <QStringList>
+#include <info_widget.h>
 
 #include "apiObject.hpp"
 #include "dmm.hpp"
@@ -71,6 +72,7 @@ public:
 	~ToolLauncher();
 
 	Q_INVOKABLE void runProgram(const QString& program, const QString& fn);
+	InfoWidget *infoWidget;
 
 Q_SIGNALS:
 	void connectionDone(bool success);
@@ -80,7 +82,11 @@ Q_SIGNALS:
 	void adcToolsCreated();
 	void dacToolsCreated();
 
+public Q_SLOTS:
+	void detachToolOnPosition(int);
+
 private Q_SLOTS:
+
 	void search();
 	void update();
 	void ping();

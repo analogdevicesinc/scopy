@@ -81,7 +81,12 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	for (int i = 0; i < tools.size(); i++)
 		position.push_back(i);
 
+	infoWidget = new InfoWidget(this);
 	generateMenu();
+	connect(ui->homeWidget, SIGNAL(detachWidget(int)), this,
+				SLOT(detachToolOnPosition(int)));
+	connect(ui->homeWidget, SIGNAL(changeText(QString)), infoWidget,
+		SLOT(setText(QString)));
 
 
 	setWindowIcon(QIcon(":/icon.ico"));
@@ -333,6 +338,10 @@ void ToolLauncher::generateMenu()
 				SLOT(swapMenuOptions(int, int, bool)));
 		connect(toolMenu[tools[i]], SIGNAL(highlight(bool, int)), this,
 				SLOT(highlight(bool, int)));
+		connect(toolMenu[tools[i]], SIGNAL(enableInfoWidget(bool)), infoWidget,
+				SLOT(enable(bool)));
+		connect(toolMenu[tools[i]], SIGNAL(changeText(QString)), infoWidget,
+				SLOT(setText(QString)));
 	}
 }
 
@@ -1061,6 +1070,31 @@ void ToolLauncher::highlight(bool on, int position)
 void ToolLauncher::UpdatePosition(QWidget *widget, int position){
 	MenuOption *menuOption = static_cast<MenuOption *>(widget);
 	menuOption->setPosition(position);
+}
+
+void ToolLauncher::detachToolOnPosition(int position)
+{
+	for (const auto x : toolMenu)
+		if (x->getPosition() == position){
+			if (x->getName() == "Oscilloscope")
+				oscilloscope->detached();
+			else if (x->getName() == "Digital IO")
+				dio->detached();
+			else if (x->getName() == "Voltmeter")
+				dmm->detached();
+			else if (x->getName() == "Power Supply")
+				power_control->detached();
+			else if (x->getName() == "Signal Generator")
+				signal_generator->detached();
+			else if (x->getName() == "Pattern Generator")
+				pattern_generator->detached();
+			else if (x->getName() == "Logic Analyzer")
+				logic_analyzer->detached();
+			else if (x->getName() == "Network Analyzer")
+				network_analyzer->detached();
+			else
+				spectrum_analyzer->detached();
+			}
 }
 
 QList<QString> ToolLauncher_API::order()

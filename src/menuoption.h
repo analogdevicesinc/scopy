@@ -61,6 +61,8 @@ private:
 Q_SIGNALS:
 	void requestPositionChange(int, int, bool);
 	void highlight(bool, int);
+	void enableInfoWidget(bool);
+	void changeText(QString);
 
 private Q_SLOTS:
 	void mousePressEvent(QMouseEvent *event) override;

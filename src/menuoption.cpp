@@ -177,13 +177,16 @@ void MenuOption::mouseMoveEvent(QMouseEvent *event)
 	drag->setPixmap(pix);
 
 	drag->setMimeData(mimeData);
+	Q_EMIT enableInfoWidget(true);
 	Qt::DropAction dropAction = drag->exec(Qt::MoveAction);
+	Q_EMIT enableInfoWidget(false);
 	this->setVisible(true);
 
 }
 
 void MenuOption::dragEnterEvent(QDragEnterEvent *event)
 {
+	Q_EMIT changeText("Move");
 	auto w = this->geometry().width();
 	auto h = this->geometry().height();
 	topDragbox.setRect(0, 0, w, h/2);
