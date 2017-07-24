@@ -106,6 +106,7 @@ LogicAnalyzerChannelUI::LogicAnalyzerChannelUI(LogicAnalyzerChannel *ch,
 	this->chgroupui = chgroupui;
 	this->chm_ui = chm_ui;
 	setAcceptDrops(true);
+	this->installEventFilter(this);
 
 	std::string trigger_val = chm_ui->chm->get_channel(get_channel()->get_id())->getTrigger();
 	for(int i = 0; i < trigger_mapping.size(); i++)
@@ -397,6 +398,29 @@ void LogicAnalyzerChannelUI::enableControls(bool enabled)
 	trace->visible(enabled);
 }
 
+bool LogicAnalyzerChannelUI::eventFilter(QObject *watched, QEvent *event)
+{
+	if (event->type() == QEvent::DragEnter){
+		QDragEnterEvent *enterEvent = static_cast<QDragEnterEvent *>(event);
+		if (!enterEvent->mimeData()->hasFormat("la/channelgroup")
+				&& !enterEvent->mimeData()->hasFormat("la/channel"))
+			return true;
+		}
+	if (event->type() == QEvent::Drop){
+		QDropEvent *dropEvent = static_cast<QDropEvent *>(event);
+		if (!dropEvent->mimeData()->hasFormat("la/channelgroup")
+				&& !dropEvent->mimeData()->hasFormat("la/channel"))
+			return true;
+		}
+	if (event->type() == QEvent::DragMove){
+		QDragMoveEvent *dropEvent = static_cast<QDragMoveEvent *>(event);
+		if (!dropEvent->mimeData()->hasFormat("la/channelgroup")
+				&& !dropEvent->mimeData()->hasFormat("la/channel"))
+			return true;
+		}
+	return QWidget::event(event);
+}
+
 LogicAnalyzerChannelGroup* LogicAnalyzerChannelUI::getChannelGroup()
 {
 	return chgroup;
@@ -656,6 +680,7 @@ LogicAnalyzerChannelGroupUI::LogicAnalyzerChannelGroupUI(
 	this->lchg = chg;
 	this->chm_ui = chm_ui;
 	setAcceptDrops(true);
+	this->installEventFilter(this);
 
 	/* Set triggerCombo index according to the device */
 	LogicAnalyzerChannel *ch;
@@ -774,6 +799,29 @@ void LogicAnalyzerChannelGroupUI::highlightBotSeparator()
 std::shared_ptr<pv::view::DecodeTrace> LogicAnalyzerChannelGroupUI::getDecodeTrace()
 {
 	return decodeTrace;
+}
+
+bool LogicAnalyzerChannelGroupUI::eventFilter(QObject *watched, QEvent *event)
+{
+	if (event->type() == QEvent::DragEnter){
+		QDragEnterEvent *enterEvent = static_cast<QDragEnterEvent *>(event);
+		if (!enterEvent->mimeData()->hasFormat("la/channelgroup")
+				&& !enterEvent->mimeData()->hasFormat("la/channel"))
+			return true;
+		}
+	if (event->type() == QEvent::Drop){
+		QDropEvent *dropEvent = static_cast<QDropEvent *>(event);
+		if (!dropEvent->mimeData()->hasFormat("la/channelgroup")
+				&& !dropEvent->mimeData()->hasFormat("la/channel"))
+			return true;
+		}
+	if (event->type() == QEvent::DragMove){
+		QDragMoveEvent *dropEvent = static_cast<QDragMoveEvent *>(event);
+		if (!dropEvent->mimeData()->hasFormat("la/channelgroup")
+				&& !dropEvent->mimeData()->hasFormat("la/channel"))
+			return true;
+		}
+	return QWidget::event(event);
 }
 
 void LogicAnalyzerChannelGroupUI::resetSeparatorHighlight(bool force)

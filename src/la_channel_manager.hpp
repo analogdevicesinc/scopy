@@ -101,6 +101,7 @@ public:
 	void highlightBotSeparator();
 	void resetSeparatorHighlight(bool force = false);
 	void enableControls(bool enabled);
+	bool eventFilter(QObject *watched, QEvent *event);
 private Q_SLOTS:
 	void remove();
 	void mousePressEvent(QMouseEvent *) override;
@@ -184,6 +185,7 @@ public:
 	void highlightBotSeparator();
 	void resetSeparatorHighlight(bool force = false);
 	std::shared_ptr<pv::view::DecodeTrace> getDecodeTrace();
+	bool eventFilter(QObject *watched, QEvent *event);
 
 private Q_SLOTS:
 	void set_decoder(std::string value);
