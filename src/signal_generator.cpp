@@ -243,6 +243,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 	api->load(*settings);
 	api->js_register(engine);
 
+	renameConfigPanel();
 	connect(ui->rightMenu, SIGNAL(finished(bool)), this,
 			SLOT(rightMenuFinished(bool)));
 
