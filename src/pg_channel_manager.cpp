@@ -1491,6 +1491,9 @@ void PatternGeneratorChannelManagerUI::updateUi()
 
 	qDebug()<<"updateUI";
 
+	auto scrollVal = ui->scrollArea->verticalScrollBar()->value();
+	auto scrollMin = ui->scrollArea->verticalScrollBar()->minimum();
+	auto scrollMax = ui->scrollArea->verticalScrollBar()->maximum();
 	for (auto ch : chg_ui) {
 		ch->hide();
 		ch->setMouseTracking(false); // prevent hovering after the channel is deleted
@@ -1713,6 +1716,9 @@ void PatternGeneratorChannelManagerUI::updateUi()
 	        SLOT(chmScrollChanged(int)));
 	connect(pg->getCurrentPatternUI(),SIGNAL(decoderChanged()),this,
 	        SLOT(triggerUpdateUi()));
+
+	chmVertScrollArea->setRange(scrollMin,scrollMax);
+	chmVertScrollArea->setValue(scrollVal);
 }
 
 void PatternGeneratorChannelManagerUI::chmScrollChanged(int val)
