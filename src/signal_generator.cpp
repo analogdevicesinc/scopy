@@ -118,10 +118,10 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 		QList<struct iio_channel *> dac_channels =
 			dacs[i]->dacChannelList();
 
-		for (int i = 0; i < dac_channels.size(); i++) {
-			iio_channels.append(dac_channels[i]);
+		for (int j = 0; j < dac_channels.size(); j++) {
+			iio_channels.append(dac_channels[j]);
 			channel_dac.push_back(QPair<struct iio_channel *,
-				std::shared_ptr<GenericDac>>(iio_channels[i],
+				std::shared_ptr<GenericDac>>(dac_channels[j],
 				dacs[i]));
 		}
 	}
