@@ -177,7 +177,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 
 		QLabel *label= new QLabel(this);
 		label->setText(vertMeasureFormat.format(
-			plot.VertUnitsPerDiv(i), "V", 3));
+			plot.VertUnitsPerDiv(i), "V/div", 3));
 		label->setStyleSheet(QString("QLabel {"
 				"color: %1;"
 				"font-weight: bold;"
@@ -696,7 +696,7 @@ void Oscilloscope::add_math_channel(const std::string& function)
 
 	QLabel *label= new QLabel(this);
 		label->setText(vertMeasureFormat.format(
-			plot.VertUnitsPerDiv(curve_id), "V", 3));
+			plot.VertUnitsPerDiv(curve_id), "V/div", 3));
 		label->setStyleSheet(QString("QLabel {"
 				"color: %1;"
 				"font-weight: bold;"
@@ -1202,7 +1202,7 @@ void adiscope::Oscilloscope::onVertScaleValueChanged(double value)
 
 	QLabel *label = static_cast<QLabel *>(
 			ui->chn_scales->itemAt(current_channel)->widget());
-	label->setText(vertMeasureFormat.format(value, "V", 3));
+	label->setText(vertMeasureFormat.format(value, "V/div", 3));
 
 	// Switch between high and low gain modes only for the M2K channels
 	if (m2k_adc && current_channel < nb_channels) {
@@ -2544,7 +2544,7 @@ void Channel_API::setVoltsPerDiv(double val)
 
 	QLabel *label = static_cast<QLabel *>(
 			osc->ui->chn_scales->itemAt(index)->widget());
-	label->setText(osc->vertMeasureFormat.format(val, "V", 3));
+	label->setText(osc->vertMeasureFormat.format(val, "V/div", 3));
 }
 
 double Channel_API::getVOffset() const
