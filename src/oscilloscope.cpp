@@ -735,8 +735,24 @@ void Oscilloscope::del_math_channel()
 	QString qname = delBtn->property("curve_name").toString();
 	unsigned int curve_id = delBtn->property("id").toUInt();
 
-	measure_settings->onChannelRemoved(curve_id);
+	bool allChannelsDisabled = true;
+	for (unsigned int i = nb_channels;
+			i < nb_channels + nb_math_channels; i++) {
+		if (i == curve_id)
+			continue;
+		QWidget *parent = ui->channelsList->itemAt(i)->widget();
+		QCheckBox *box = parent->findChild<QCheckBox *>("box");
+		if (box->isChecked())
+			allChannelsDisabled = false;
+	}
 
+	if (allChannelsDisabled){
+		current_channel = 0;
+		Q_EMIT selectedChannelChanged(0);
+		update_measure_for_channel(0);
+	}
+
+	measure_settings->onChannelRemoved(curve_id);
 	plot.unregisterSink(qname.toStdString());
 
 	nb_math_channels--;
