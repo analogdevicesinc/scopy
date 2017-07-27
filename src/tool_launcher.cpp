@@ -849,6 +849,8 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 
 	filter = new Filter(ctx);
 
+	dacs.clear();
+
 	// Find available DACs
 	QList<struct iio_device *> iio_dacs;
 	for (unsigned int dev_id = 0; ; dev_id++) {
