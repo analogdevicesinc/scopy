@@ -185,7 +185,7 @@ QTabBar::tab {
 }
 QTabBar::tab:selected {
   color: white;
-  border-bottom: 2px solid rgba(243, 109, 10);
+  border-bottom: 2px solid rgba(74, 100, 255);
   margin-top: 0px;
 }
 QTabBar::tab:!selected {
