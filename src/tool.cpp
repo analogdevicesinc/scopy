@@ -38,14 +38,6 @@ Tool::Tool(struct iio_context *ctx, QPushButton *runButton,
 	QSettings oldSettings;
 	QFile tempFile(oldSettings.fileName() + ".bak");
 	settings = new QSettings(tempFile.fileName(), QSettings::IniFormat);
-
-	setAcceptDrops(true);
-	this->installEventFilter(this);
-
-	connect(this, SIGNAL(changeText(QString)), parent->infoWidget,
-		SLOT(setText(QString)));
-	connect(this, SIGNAL(detachTool(int)), parent,
-					SLOT(detachToolOnPosition(int)));
 }
 
 Tool::~Tool()
@@ -53,16 +45,6 @@ Tool::~Tool()
 	run_button->parentWidget()->setDisabled(true);
 
 	delete settings;
-}
-
-bool Tool::eventFilter(QObject *watched, QEvent *event)
-{
-	if (event->type() == QEvent::DragEnter){
-	QDragEnterEvent *enterEvent = static_cast<QDragEnterEvent *>(event);
-	if (!enterEvent->mimeData()->hasFormat("menu/option"))
-		return true;
-	}
-	return QWidget::event(event);
 }
 
 void Tool::attached()
@@ -75,31 +57,4 @@ void Tool::detached()
 	Q_EMIT detachedState(true);
 }
 
-void Tool::dragEnterEvent(QDragEnterEvent *event)
-{
-	Q_EMIT changeText(" Detach");
-	event->accept();
-}
 
-void Tool::dragMoveEvent(QDragMoveEvent *event)
-{
-	event->accept();
-}
-
-void Tool::dragLeaveEvent(QDragLeaveEvent *event)
-{
-	Q_EMIT changeText(" Move");
-	event->accept();
-}
-
-void Tool::dropEvent(QDropEvent *event)
-{
-	short position;
-	if (event->source() == this && event->possibleActions() & Qt::MoveAction){
-		return;
-	}
-	if (event->mimeData()->hasFormat("menu/option")){
-		position = (short)event->mimeData()->data("menu/option")[1];
-		Q_EMIT detachTool(position);
-	}
-}

@@ -27,6 +27,7 @@
 #include <QDropEvent>
 #include <QString>
 
+
 class QJSEngine;
 class QPushButton;
 
@@ -48,23 +49,13 @@ public:
 	~Tool();
 
 	QPushButton *runButton() { return this->run_button; }
-	bool eventFilter(QObject *watched, QEvent *event);
 
 Q_SIGNALS:
 	void detachedState(bool detached);
-	void detachTool(int);
-	void changeText(QString);
 
 public Q_SLOTS:
 	virtual void attached();
 	virtual void detached();
-
-private Q_SLOTS:
-	void dragEnterEvent(QDragEnterEvent *event);
-	void dragMoveEvent(QDragMoveEvent *event);
-	void dragLeaveEvent(QDragLeaveEvent *event);
-	void dropEvent(QDropEvent *event);
-
 
 protected:
 	struct iio_context *ctx;
