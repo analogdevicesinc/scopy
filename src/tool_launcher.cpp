@@ -227,13 +227,12 @@ void ToolLauncher::runProgram(const QString& program, const QString& fn)
 {
 	QJSValue val = js_engine.evaluate(program, fn);
 
-	int ret;
+	int ret = EXIT_SUCCESS;
 	if (val.isError()) {
 		qInfo() << "Exception:" << val.toString();
 		ret = EXIT_FAILURE;
 	} else if (!val.isUndefined()) {
 		qInfo() << val.toString();
-		ret = EXIT_SUCCESS;
 	}
 
 	/* Exit application */
