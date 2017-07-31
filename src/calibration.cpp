@@ -103,6 +103,18 @@ bool Calibration::initialize()
 	m_dac_a_ch_vlsb = 0;
 	m_dac_b_ch_vlsb = 0;
 
+	m_initialized = true;
+
+	return m_initialized;
+}
+
+bool Calibration::isInitialized() const
+{
+	return m_initialized;
+}
+
+void Calibration::setHardwareInCalibMode()
+{
 	// Make sure hardware triggers are disabled before calibrating
 	struct iio_device *trigg_dev = iio_context_find_device(m_ctx,
 		"m2k-adc-trigger");
@@ -131,19 +143,50 @@ bool Calibration::initialize()
 		}
 	}
 
-	// Make sure we calibrate at highest sample rate
+	// Make sure we calibrate at the highest sample rate
 	iio_device_attr_write_longlong(m_m2k_adc, "sampling_frequency", 1E8);
+	iio_device_attr_write_longlong(m_m2k_adc, "oversampling_ratio", 1);
 	iio_device_attr_write_longlong(m_m2k_dac_a, "sampling_frequency", 75E6);
+	iio_device_attr_write_longlong(m_m2k_dac_a, "oversampling_ratio", 1);
 	iio_device_attr_write_longlong(m_m2k_dac_b, "sampling_frequency", 75E6);
-
-	m_initialized = true;
-
-	return m_initialized;
+	iio_device_attr_write_longlong(m_m2k_dac_b, "oversampling_ratio", 1);
 }
 
-bool Calibration::isInitialized() const
+void Calibration::restoreHardwareFromCalibMode()
 {
-	return m_initialized;
+	struct iio_device *trigg_dev = iio_context_find_device(m_ctx,
+							"m2k-adc-trigger");
+	struct iio_channel *trigger0Mode;
+	struct iio_channel *trigger1Mode;
+
+	if (trigg_dev) {
+		trigger0Mode = iio_device_find_channel(trigg_dev, "voltage4",
+							false);
+		trigger1Mode = iio_device_find_channel(trigg_dev, "voltage5",
+							false);
+
+		if (trigger0Mode && !m_trigger0_mode.empty()) {
+			iio_channel_attr_write(trigger0Mode, "mode",
+						m_trigger0_mode.c_str());
+		}
+		if (trigger1Mode) {
+			iio_channel_attr_write(trigger1Mode, "mode",
+						m_trigger1_mode.c_str());
+		}
+	}
+
+	iio_device_attr_read_double(m_m2k_adc, "sampling_frequency",
+		&adc_sampl_freq);
+	iio_device_attr_read_double(m_m2k_adc, "oversampling_ratio",
+		&adc_oversampl);
+	iio_device_attr_read_double(m_m2k_dac_a, "sampling_frequency",
+		&dac_a_sampl_freq);
+	iio_device_attr_read_double(m_m2k_dac_a, "sampling_frequency",
+		&dac_a_oversampl);
+	iio_device_attr_read_double(m_m2k_dac_b, "sampling_frequency",
+		&dac_b_sampl_freq);
+	iio_device_attr_read_double(m_m2k_dac_b, "sampling_frequency",
+		&dac_b_oversampl);
 }
 
 bool Calibration::calibrateADCoffset()
@@ -296,30 +339,6 @@ bool Calibration::resetSettings()
 		m_adc_ch1_offset);
 
 	return true;
-}
-
-void Calibration::restoreTriggerSetup()
-{
-	struct iio_device *trigg_dev = iio_context_find_device(m_ctx,
-							"m2k-adc-trigger");
-	struct iio_channel *trigger0Mode;
-	struct iio_channel *trigger1Mode;
-
-	if (trigg_dev) {
-		trigger0Mode = iio_device_find_channel(trigg_dev, "voltage4",
-							false);
-		trigger1Mode = iio_device_find_channel(trigg_dev, "voltage5",
-							false);
-
-		if (trigger0Mode && !m_trigger0_mode.empty()) {
-			iio_channel_attr_write(trigger0Mode, "mode",
-						m_trigger0_mode.c_str());
-		}
-		if (trigger1Mode) {
-			iio_channel_attr_write(trigger1Mode, "mode",
-						m_trigger1_mode.c_str());
-		}
-	}
 }
 
 void Calibration::setChannelEnableState(struct iio_channel *chn, bool en)
@@ -766,4 +785,14 @@ QList<double> Calibration_API::get_dac_gains() const
 bool Calibration_API::calibrateAll()
 {
 	return calib->calibrateAll();
+}
+
+void Calibration_API::setHardwareInCalibMode()
+{
+	calib->setHardwareInCalibMode();
+}
+
+void Calibration_API::restoreHardwareFromCalibMode()
+{
+	calib->restoreHardwareFromCalibMode();
 }

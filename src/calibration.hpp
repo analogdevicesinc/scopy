@@ -48,6 +48,9 @@ public:
 	bool initialize();
 	bool isInitialized() const;
 
+	void setHardwareInCalibMode();
+	void restoreHardwareFromCalibMode();
+
 	bool calibrateAll();
 	bool calibrateADCoffset();
 	bool calibrateADCgain();
@@ -64,7 +67,6 @@ public:
 	double dacBvlsb() const;
 
 	bool resetSettings();
-	void restoreTriggerSetup();
 
 	static void setChannelEnableState(struct iio_channel *chn, bool en);
 	static double average(int16_t *data, size_t numElements);
@@ -116,6 +118,12 @@ private:
 
 	std::string m_trigger0_mode;
 	std::string m_trigger1_mode;
+	double adc_sampl_freq;
+	double adc_oversampl;
+	double dac_a_sampl_freq;
+	double dac_a_oversampl;
+	double dac_b_sampl_freq;
+	double dac_b_oversampl;
 
 	bool m_initialized;
 };
@@ -135,6 +143,9 @@ public:
 	QList<double> get_adc_gains() const;
 	QList<double> get_dac_offsets() const;
 	QList<double> get_dac_gains() const;
+
+	Q_INVOKABLE void setHardwareInCalibMode();
+	Q_INVOKABLE void restoreHardwareFromCalibMode();
 
 	Q_INVOKABLE bool calibrateAll();
 

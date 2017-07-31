@@ -768,8 +768,9 @@ void adiscope::ToolLauncher::calibrate()
 	toolMenu["Spectrum Analyzer"]->getToolBtn()->setText("Calibrating...");
 
 	if (calib->isInitialized()) {
+		calib->setHardwareInCalibMode();
 		calib->calibrateAll();
-		calib->restoreTriggerSetup();
+		calib->restoreHardwareFromCalibMode();
 	}
 
 	auto m2k_adc = std::dynamic_pointer_cast<M2kAdc>(adc);
