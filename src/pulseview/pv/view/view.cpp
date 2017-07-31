@@ -858,8 +858,14 @@ bool View::eventFilter(QObject *object, QEvent *event)
 		hover_point_ = QPoint(-1, -1);
 		hover_point_changed();
 	}
-
 	return QObject::eventFilter(object, event);
+}
+
+void View::keyPressEvent(QKeyEvent *event)
+{
+	QKeyEvent *keyE = static_cast<QKeyEvent *>(event);
+	if(keyE->key() == Qt::Key_Up || keyE->key() == Qt::Key_Down)
+		return;
 }
 
 bool View::viewportEvent(QEvent *event)

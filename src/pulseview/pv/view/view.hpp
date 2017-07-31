@@ -308,6 +308,8 @@ private:
 
 	bool viewportEvent(QEvent *event);
 
+	void keyPressEvent(QKeyEvent *event);
+
 	void resizeEvent(QResizeEvent *event);
 
 	void session_error(const QString text, const QString info_text);
