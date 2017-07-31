@@ -505,7 +505,7 @@ void ClockPatternUI::build_ui(QWidget *parent,uint16_t number_of_channels)
 	parent_ = parent;
 	parent->layout()->addWidget(this);
 	frequencySpinButton->setValue(pattern->get_frequency());
-	//phaseSpinButton->setValue(pattern->get_phase());
+	phaseSpinButton->setValue(pattern->get_phase());
 	dutySpinButton->setValue(pattern->get_duty_cycle());
 
 	connect(frequencySpinButton,SIGNAL(valueChanged(double)),this,SLOT(parse_ui()));
