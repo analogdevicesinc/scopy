@@ -149,6 +149,8 @@ public:
 
 	bool is_data();
 
+	int get_logic_sample_count();
+
 private:
 	void set_capture_state(capture_state state);
 

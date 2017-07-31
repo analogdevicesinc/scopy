@@ -245,6 +245,8 @@ void Viewport::paintEvent(QPaintEvent*)
 	if( cursorsActive ){
 		paint_cursors(p, pp);
 	}
+
+	paint_last_sample_cursor(p, pp);
 	p.end();
 }
 
@@ -313,6 +315,28 @@ void Viewport::paint_time_trigger_line(QPainter &p, const ViewItemPaintParams &p
 
 	QPoint p1 = QPoint(timeTriggerPixel, y);
 	QPoint p2 = QPoint(timeTriggerPixel, y + h * row_count);
+	p.drawLine(p1, p2);
+}
+
+void Viewport::paint_last_sample_cursor(QPainter &p, const ViewItemPaintParams &pp)
+{
+	int sample_index = view_.session().get_logic_sample_count() - 1;
+	double samplerate = view_.session().get_samplerate();
+	int px;
+	if( samplerate != 1 ) {
+		const double samples_per_pixel = samplerate * pp.scale();
+		const double pixels_offset = pp.pixels_offset();
+		px = (sample_index / samples_per_pixel - pixels_offset) + pp.left();
+	}
+
+	QPen pen = QPen(QColor("white"));
+	p.setPen(pen);
+	const int y = view_.owner_visual_v_offset();
+	const int h = pp.height();
+	int row_count = view_.height() / divisionHeight;
+
+	QPoint p1 = QPoint(px, y);
+	QPoint p2 = QPoint(px, y + h * row_count);
 	p.drawLine(p1, p2);
 }
 

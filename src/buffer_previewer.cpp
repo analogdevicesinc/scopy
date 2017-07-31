@@ -265,12 +265,12 @@ DigitalBufferPreviewer::DigitalBufferPreviewer(int pixelsPerPeriod,
 {
 }
 
-void DigitalBufferPreviewer::setNoOfSteps(int val)
+void DigitalBufferPreviewer::setNoOfSteps(double val)
 {
 	m_noOfSteps = val;
 }
 
-int DigitalBufferPreviewer::noOfSteps()
+double DigitalBufferPreviewer::noOfSteps()
 {
 	return m_noOfSteps;
 }

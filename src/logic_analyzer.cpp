@@ -1174,7 +1174,8 @@ void LogicAnalyzer::setupTriggerSettingsUI(bool enabled)
 void LogicAnalyzer::bufferSentSignal(bool lastBuffer)
 {
 	if(!lastBuffer) {
-		double val = buffer_previewer->waveformWidth() + 0.0002;
+		double div =1 / buffer_previewer->noOfSteps();
+		double val = buffer_previewer->waveformWidth() + div;
 		buffer_previewer->setWaveformWidth(val);
 	}
 	else {

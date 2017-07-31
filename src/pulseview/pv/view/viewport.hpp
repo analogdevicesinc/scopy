@@ -129,6 +129,7 @@ private:
 	void paint_grid(QPainter &p, const ViewItemPaintParams &pp);
 	void paint_axis(QPainter &p, const ViewItemPaintParams &pp, int y);
 	void paint_time_trigger_line(QPainter &p, const ViewItemPaintParams &pp, int pos);
+	void paint_last_sample_cursor(QPainter &p, const ViewItemPaintParams &pp);
 	void paint_cursors(QPainter &p, const ViewItemPaintParams &pp);
 
 	void mouseDoubleClickEvent(QMouseEvent *event);

@@ -679,6 +679,13 @@ bool Session::is_data()
 	return true;
 }
 
+int Session::get_logic_sample_count()
+{
+	if(logic_data_->segments().size() != 0)
+		return logic_data_->segments().at(0)->get_sample_count();
+	return 0;
+}
+
 void Session::feed_in_analog(shared_ptr<Analog> analog)
 {
 	lock_guard<recursive_mutex> lock(data_mutex_);

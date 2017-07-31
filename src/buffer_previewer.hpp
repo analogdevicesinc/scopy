@@ -87,13 +87,13 @@ class DigitalBufferPreviewer: public BufferPreviewer
 public:
 	explicit DigitalBufferPreviewer(QWidget *parent = 0);
 	explicit DigitalBufferPreviewer(int pixelsPerPeriod, QWidget *parent = 0);
-	void setNoOfSteps(int val);
-	int noOfSteps();
+	void setNoOfSteps(double val);
+	double noOfSteps();
 
 protected:
 	virtual void buildFullWaveform(QPointF *wavePoints, int numPts);
 private:
-	int m_noOfSteps;
+	double m_noOfSteps;
 };
 
 } // namespace adiscope
