@@ -68,6 +68,8 @@ public:
 
 	bool resetSettings();
 
+	double getIioDevTemp(const QString& devName) const;
+
 	static void setChannelEnableState(struct iio_channel *chn, bool en);
 	static double average(int16_t *data, size_t numElements);
 	static float convSampleToVolts(float sample, float correctionGain = 1);
@@ -148,6 +150,8 @@ public:
 	Q_INVOKABLE void restoreHardwareFromCalibMode();
 
 	Q_INVOKABLE bool calibrateAll();
+
+	Q_INVOKABLE double devTemp(const QString& devName);
 
 private:
 	Calibration *calib;

@@ -737,6 +737,33 @@ bool Calibration::calibrateAll()
 	return true;
 }
 
+/* FIXME: TODO: Move this into a HW class / lib M2k */
+double Calibration::getIioDevTemp(const QString& devName) const
+{
+	double temp = -273.15;
+
+	struct iio_device *dev = iio_context_find_device(m_ctx,
+		devName.toLatin1().data());
+
+	if (dev) {
+		struct iio_channel *chn = iio_device_find_channel(dev, "temp0",
+			false);
+		if (chn) {
+			double offset;
+			double raw;
+			double scale;
+
+			iio_channel_attr_read_double(chn, "offset", &offset);
+			iio_channel_attr_read_double(chn, "raw", &raw);
+			iio_channel_attr_read_double(chn, "scale", &scale);
+
+			temp = (raw + offset) * scale / 1000;
+		}
+	}
+
+	return temp;
+}
+
 /*
  * class Calibration_API
  */
@@ -795,4 +822,9 @@ void Calibration_API::setHardwareInCalibMode()
 void Calibration_API::restoreHardwareFromCalibMode()
 {
 	calib->restoreHardwareFromCalibMode();
+}
+
+double Calibration_API::devTemp(const QString& devName)
+{
+	return calib->getIioDevTemp(devName);
 }
