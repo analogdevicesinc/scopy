@@ -56,7 +56,8 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	logic_analyzer(nullptr), pattern_generator(nullptr), dio(nullptr),
 	network_analyzer(nullptr), spectrum_analyzer(nullptr),
 	tl_api(new ToolLauncher_API(this)),
-	notifier(STDIN_FILENO, QSocketNotifier::Read)
+	notifier(STDIN_FILENO, QSocketNotifier::Read),
+	infoWidget(nullptr)
 {
 	if (!isatty(STDIN_FILENO))
 		notifier.setEnabled(false);
@@ -430,6 +431,8 @@ ToolLauncher::~ToolLauncher()
 
 	delete search_timer;
 	delete alive_timer;
+
+	delete infoWidget;
 
 	tl_api->ApiObject::save(*settings);
 	delete settings;

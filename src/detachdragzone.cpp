@@ -1,4 +1,5 @@
 #include "detachdragzone.h"
+#include "tool_launcher.hpp"
 #include <QMimeData>
 
 using namespace adiscope;
@@ -6,6 +7,14 @@ using namespace adiscope;
 DetachDragZone::DetachDragZone(QWidget *parent) :
 	QWidget(parent)
 {
+	ToolLauncher *tl = static_cast<ToolLauncher*>(parent->parent());
+	if (tl->infoWidget != nullptr){
+		connect(this, SIGNAL(changeText(QString)), tl->infoWidget,
+			SLOT(setText(QString)));
+		connect(this, SIGNAL(detachWidget(int)), tl,
+			SLOT(detachToolOnPosition(int)));
+	}
+
 	setAcceptDrops(true);
 	this->installEventFilter(this);
 }
