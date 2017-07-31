@@ -20,6 +20,8 @@
 #ifndef CALIBRATION_HPP
 #define CALIBRATION_HPP
 
+#include "apiObject.hpp"
+
 #include <cstdint>
 #include <cstdlib>
 #include <string>
@@ -33,10 +35,14 @@ extern "C" {
 
 namespace adiscope {
 
+class Calibration_API;
+
 class Calibration
 {
+	friend class Calibration_API;
+
 public:
-	Calibration(struct iio_context *ctx = NULL);
+	Calibration(struct iio_context *ctx, QJSEngine *engine);
 	~Calibration();
 
 	bool initialize();
@@ -76,6 +82,8 @@ private:
 	void dacAOutputDC(int16_t value);
 	void dacBOutputDC(int16_t value);
 
+	ApiObject *m_api;
+
 	struct iio_context *m_ctx;
 	struct iio_device *m_m2k_adc;
 	struct iio_device *m_m2k_dac_a;
@@ -110,6 +118,28 @@ private:
 	std::string m_trigger1_mode;
 
 	bool m_initialized;
+};
+
+class Calibration_API: public ApiObject
+{
+	Q_OBJECT
+
+	Q_PROPERTY(QList<double> adc_offsets READ get_adc_offsets)
+	Q_PROPERTY(QList<double> adc_gains READ get_adc_gains)
+	Q_PROPERTY(QList<double> dac_offsets READ get_dac_offsets)
+	Q_PROPERTY(QList<double> dac_gains READ get_dac_gains)
+
+public:
+	explicit Calibration_API(Calibration *calib);
+	QList<double> get_adc_offsets() const;
+	QList<double> get_adc_gains() const;
+	QList<double> get_dac_offsets() const;
+	QList<double> get_dac_gains() const;
+
+	Q_INVOKABLE bool calibrateAll();
+
+private:
+	Calibration *calib;
 };
 
 } // namespace adiscope

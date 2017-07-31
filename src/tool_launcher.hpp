@@ -149,6 +149,7 @@ private:
 
 	QButtonGroup adc_users_group;
 
+	Calibration *calib;
 	std::shared_ptr<GenericAdc> adc;
 	QList<std::shared_ptr<GenericDac>> dacs;
 

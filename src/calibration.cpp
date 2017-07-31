@@ -28,12 +28,15 @@
 
 using namespace adiscope;
 
-Calibration::Calibration(struct iio_context *ctx):
+Calibration::Calibration(struct iio_context *ctx, QJSEngine *engine):
+	m_api(new Calibration_API(this)),
 	m_ctx(ctx),
 	m_dac_a_buffer(NULL),
 	m_dac_b_buffer(NULL),
 	m_initialized(false)
 {
+	m_api->setObjectName("calib");
+	m_api->js_register(engine);
 }
 
 Calibration::~Calibration()
@@ -42,6 +45,7 @@ Calibration::~Calibration()
 		iio_buffer_destroy(m_dac_a_buffer);
 	if (m_dac_b_buffer)
 		iio_buffer_destroy(m_dac_b_buffer);
+	delete m_api;
 }
 
 bool Calibration::initialize()
@@ -712,4 +716,54 @@ bool Calibration::calibrateAll()
 		return false;
 
 	return true;
+}
+
+/*
+ * class Calibration_API
+ */
+
+Calibration_API::Calibration_API(Calibration *calib) : ApiObject(),
+	calib(calib)
+{
+}
+
+QList<double> Calibration_API::get_adc_offsets() const
+{
+	QList<double> offsets;
+
+	offsets.push_back(static_cast<double>(calib->adcOffsetChannel0()));
+	offsets.push_back(static_cast<double>(calib->adcOffsetChannel1()));
+
+	return offsets;
+}
+
+QList<double> Calibration_API::get_adc_gains() const
+{
+	QList<double> gains = { calib->adcGainChannel0(),
+		calib->adcGainChannel1() };
+
+	return gains;
+}
+
+QList<double> Calibration_API::get_dac_offsets() const
+{
+	QList<double> offsets;
+
+	offsets.push_back(static_cast<double>(calib->dacAoffset()));
+	offsets.push_back(static_cast<double>(calib->dacBoffset()));
+
+	return offsets;
+}
+
+QList<double> Calibration_API::get_dac_gains() const
+{
+	QList<double> gains = { calib->dacAvlsb(),
+		calib->dacBvlsb() };
+
+	return gains;
+}
+
+bool Calibration_API::calibrateAll()
+{
+	return calib->calibrateAll();
 }
