@@ -468,7 +468,11 @@ void ScaleSpinButton::stepUp()
 	if (isInFineMode()) {
 		newVal = (current_val + m_fine_increment) * current_scale;
 	} else {
-		newVal =  m_steps.getNumberAfter(current_val * current_scale + epsilon);
+		auto oldVal = current_val * current_scale + epsilon;
+		newVal =  m_steps.getNumberAfter(oldVal);
+		if(oldVal>=newVal) // reached end of scale
+			newVal = maxValue();
+
 	}
 
 	setValue(newVal);
