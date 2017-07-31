@@ -36,7 +36,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QWidget" name="mainWidget" native="true">
+    <widget class="adiscope::DetachDragZone" name="mainWidget" native="true">
      <property name="styleSheet">
       <string notr="true">#mainWidget {
 background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 rgba(0, 0, 0, 40), stop:1 transparent);
@@ -601,15 +601,15 @@ background-image: url(:/icons/floppy_hover.svg);
  </widget>
  <customwidgets>
   <customwidget>
-   <class>adiscope::MenuAnim</class>
+   <class>adiscope::DetachDragZone</class>
    <extends>QWidget</extends>
-   <header>menu_anim.hpp</header>
+   <header>detachdragzone.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>adiscope::Math</class>
+   <class>adiscope::MenuAnim</class>
    <extends>QWidget</extends>
-   <header>math.hpp</header>
+   <header>menu_anim.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
@@ -622,6 +622,12 @@ background-image: url(:/icons/floppy_hover.svg);
    <class>adiscope::PositionSpinButton</class>
    <extends>QWidget</extends>
    <header>spinbox_a.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::Math</class>
+   <extends>QWidget</extends>
+   <header>math.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

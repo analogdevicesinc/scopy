@@ -39,7 +39,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QWidget" name="mainWidget" native="true">
+    <widget class="adiscope::DetachDragZone" name="mainWidget" native="true">
      <property name="minimumSize">
       <size>
        <width>300</width>
@@ -640,14 +640,14 @@ QPushButton:checked:hover {
              </property>
              <property name="minimumSize">
               <size>
-               <width>64</width>
-               <height>48</height>
+               <width>62</width>
+               <height>47</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>64</width>
-               <height>48</height>
+               <width>62</width>
+               <height>47</height>
               </size>
              </property>
              <property name="styleSheet">
@@ -689,14 +689,14 @@ QPushButton:checked:hover {
              </property>
              <property name="minimumSize">
               <size>
-               <width>64</width>
-               <height>48</height>
+               <width>62</width>
+               <height>47</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>64</width>
-               <height>48</height>
+               <width>62</width>
+               <height>47</height>
               </size>
              </property>
              <property name="styleSheet">
@@ -1685,7 +1685,7 @@ color: #FFFFFF;</string>
                     <rect>
                      <x>0</x>
                      <y>0</y>
-                     <width>92</width>
+                     <width>100</width>
                      <height>30</height>
                     </rect>
                    </property>
@@ -1914,6 +1914,12 @@ QPushButton:checked { border-image: url(:/icons/setup_btn_checked.svg); }
    <class>adiscope::CustomSwitch</class>
    <extends>QPushButton</extends>
    <header>customSwitch.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::DetachDragZone</class>
+   <extends>QWidget</extends>
+   <header>detachdragzone.h</header>
+   <container>1</container>
   </customwidget>
   <customwidget>
    <class>adiscope::MenuAnim</class>

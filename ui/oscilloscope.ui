@@ -36,7 +36,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QWidget" name="mainWidget" native="true">
+    <widget class="adiscope::DetachDragZone" name="mainWidget" native="true">
      <property name="styleSheet">
       <string notr="true">#mainWidget {
 background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 rgba(0, 0, 0, 40), stop:1 transparent);
@@ -855,6 +855,12 @@ QLabel {
   </action>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>adiscope::DetachDragZone</class>
+   <extends>QWidget</extends>
+   <header>detachdragzone.h</header>
+   <container>1</container>
+  </customwidget>
   <customwidget>
    <class>adiscope::MenuAnim</class>
    <extends>QWidget</extends>

@@ -33,7 +33,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QWidget" name="mainWidget" native="true">
+    <widget class="adiscope::DetachDragZone" name="mainWidget" native="true">
      <property name="minimumSize">
       <size>
        <width>0</width>
@@ -1202,21 +1202,27 @@ QLabel {
  </widget>
  <customwidgets>
   <customwidget>
+   <class>adiscope::DetachDragZone</class>
+   <extends>QWidget</extends>
+   <header>detachdragzone.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>adiscope::MenuAnim</class>
    <extends>QWidget</extends>
    <header>menu_anim.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>adiscope::CustomPushButton</class>
-   <extends>QPushButton</extends>
-   <header>customPushButton.hpp</header>
-  </customwidget>
-  <customwidget>
    <class>adiscope::PositionSpinButton</class>
    <extends>QWidget</extends>
    <header>spinbox_a.hpp</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::CustomPushButton</class>
+   <extends>QPushButton</extends>
+   <header>customPushButton.hpp</header>
   </customwidget>
  </customwidgets>
  <resources>

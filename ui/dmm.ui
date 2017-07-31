@@ -33,7 +33,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QWidget" name="leftPanel" native="true">
+    <widget class="adiscope::DetachDragZone" name="leftPanel" native="true">
      <property name="styleSheet">
       <string notr="true">QWidget#leftPanel { background-color: rgba(0, 0, 0, 40); }
 QLabel { color: rgba(255, 255, 255, 40); font-size: 51px; font-weight: bold; qproperty-alignment: 'AlignBottom | AlignLeft'; }</string>
@@ -170,29 +170,20 @@ QLabel[ac=true] { qproperty-text: &quot;VRMS&quot;; }</string>
              </layout>
             </item>
             <item>
-             <widget class="adiscope::CustomScale" name="scaleCh1">
-              <property name="lowerBound">
+             <widget class="adiscope::CustomScale" name="scaleCh1" native="true">
+              <property name="lowerBound" stdset="0">
                <double>-0.100000000000000</double>
               </property>
-              <property name="upperBound">
+              <property name="upperBound" stdset="0">
                <double>0.100000000000000</double>
               </property>
-              <property name="scaleMaxMajor">
+              <property name="scaleMaxMajor" stdset="0">
                <number>5</number>
               </property>
-              <property name="scaleMaxMinor">
+              <property name="scaleMaxMinor" stdset="0">
                <number>5</number>
               </property>
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="scalePosition">
-               <enum>QwtThermo::LeadingScale</enum>
-              </property>
-              <property name="originMode">
-               <enum>QwtThermo::OriginCustom</enum>
-              </property>
-              <property name="borderWidth">
+              <property name="borderWidth" stdset="0">
                <number>0</number>
               </property>
              </widget>
@@ -315,29 +306,20 @@ QLabel[ac=true] { qproperty-text: &quot;VRMS&quot;; }</string>
              </layout>
             </item>
             <item>
-             <widget class="adiscope::CustomScale" name="scaleCh2">
-              <property name="lowerBound">
+             <widget class="adiscope::CustomScale" name="scaleCh2" native="true">
+              <property name="lowerBound" stdset="0">
                <double>-0.100000000000000</double>
               </property>
-              <property name="upperBound">
+              <property name="upperBound" stdset="0">
                <double>0.100000000000000</double>
               </property>
-              <property name="scaleMaxMajor">
+              <property name="scaleMaxMajor" stdset="0">
                <number>5</number>
               </property>
-              <property name="scaleMaxMinor">
+              <property name="scaleMaxMinor" stdset="0">
                <number>5</number>
               </property>
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="scalePosition">
-               <enum>QwtThermo::LeadingScale</enum>
-              </property>
-              <property name="originMode">
-               <enum>QwtThermo::OriginCustom</enum>
-              </property>
-              <property name="borderWidth">
+              <property name="borderWidth" stdset="0">
                <number>0</number>
               </property>
              </widget>
@@ -368,7 +350,7 @@ QLabel[ac=true] { qproperty-text: &quot;VRMS&quot;; }</string>
     </widget>
    </item>
    <item>
-    <widget class="QWidget" name="widget_2" native="true">
+    <widget class="adiscope::DetachDragZone" name="widget_2" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
        <horstretch>0</horstretch>
@@ -787,6 +769,12 @@ QPushButton:disabled {
    <class>adiscope::CustomScale</class>
    <extends>QwtThermo</extends>
    <header>customScale.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::DetachDragZone</class>
+   <extends>QWidget</extends>
+   <header>detachdragzone.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>
