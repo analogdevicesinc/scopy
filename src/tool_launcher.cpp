@@ -25,6 +25,7 @@
 #include "spectrum_analyzer.hpp"
 #include "tool_launcher.hpp"
 #include "qtjs.hpp"
+#include "jsfileio.h"
 #include "osc_adc.h"
 #include "hw_dac.h"
 #include "menuoption.h"
@@ -163,6 +164,8 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	js_engine.installExtensions(QJSEngine::ConsoleExtension);
 #endif
 	QtJs *js_object = new QtJs(&js_engine);
+	js_engine.globalObject().setProperty("fileIO",
+				js_engine.newQObject(new JsFileIo(this)));
 	tl_api->js_register(&js_engine);
 
 	connect(&notifier, SIGNAL(activated(int)), this, SLOT(hasText()));
