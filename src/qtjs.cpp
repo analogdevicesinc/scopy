@@ -11,6 +11,9 @@
 #include <QThread>
 #include <QElapsedTimer>
 
+#include <iostream>
+
+using std::cout;
 using namespace adiscope;
 
 QtJs::QtJs(QJSEngine *engine) : QObject(engine)
@@ -48,4 +51,9 @@ void QtJs::msleep(unsigned long ms)
 		QCoreApplication::processEvents();
 		QThread::msleep(1);
 	}
+}
+
+void QtJs::printToConsole(const QString& text)
+{
+	cout << text.toStdString() << std::endl;
 }
