@@ -679,7 +679,7 @@ void Calibration::dacOutputDC(struct iio_device *dac,
 
 	*buffer = iio_device_create_buffer(dac,
 			size, true);
-	if (!buffer) {
+	if (!(*buffer)) {
 		qDebug() << "Could not create buffer for: "  <<
 			 iio_device_get_name(dac);
 		return;
