@@ -1142,6 +1142,18 @@ void ToolLauncher_API::hide(bool hide)
 	tl->setVisible(!hide);
 }
 
+QList<QString> ToolLauncher_API::usb_uri_list()
+{
+	QList<QString> uri_list;
+	auto list = tl->searchDevices();
+
+	for (int i = 0; i < list.size(); i++) {
+		uri_list.push_back(list[i]);
+	}
+
+	return uri_list;
+}
+
 bool ToolLauncher_API::connect(const QString& uri)
 {
 	QPushButton *btn = nullptr;

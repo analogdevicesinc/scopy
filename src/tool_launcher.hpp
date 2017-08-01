@@ -233,6 +233,7 @@ public:
 		}
 	}
 
+	Q_INVOKABLE QList<QString> usb_uri_list();
 	Q_INVOKABLE bool connect(const QString& uri);
 	Q_INVOKABLE void disconnect();
 
