@@ -995,6 +995,7 @@ void ToolLauncher::toolDetached(bool detached)
 
 		DetachedWindow *window = new DetachedWindow(this);
 		window->setCentralWidget(tool);
+		window->setMinimumSize(tool->size());
 		window->show();
 
 		connect(window, SIGNAL(closed()), tool, SLOT(attached()));
