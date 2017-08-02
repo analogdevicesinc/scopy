@@ -224,10 +224,14 @@ bool Calibration::calibrateADCoffset()
 	int16_t ch1_avg = average(dataCh1, num_samples);
 
 	// Convert from raw format to signed raw
+	int16_t tmp;
+
+	tmp = ch0_avg;
 	iio_channel_convert(m_adc_channel0, (void *)&ch0_avg,
-		(const void *)&ch0_avg);
+		(const void *)&tmp);
+	tmp = ch1_avg;
 	iio_channel_convert(m_adc_channel1, (void *)&ch1_avg,
-		(const void *)&ch1_avg);
+		(const void *)&tmp);
 
 	double voltage0 = convSampleToVolts(ch0_avg);
 	double voltage1 = convSampleToVolts(ch1_avg);
@@ -279,8 +283,12 @@ bool Calibration::calibrateADCgain()
 	avg1 = average(dataCh1, num_samples);
 
 	// Convert from raw format to signed raw
-	iio_channel_convert(m_adc_channel0, (void *)&avg0, (const void *)&avg0);
-	iio_channel_convert(m_adc_channel1, (void *)&avg0, (const void *)&avg1);
+	int16_t tmp;
+
+	tmp = avg0;
+	iio_channel_convert(m_adc_channel0, (void *)&avg0, (const void *)&tmp);
+	tmp = avg1;
+	iio_channel_convert(m_adc_channel1, (void *)&avg0, (const void *)&tmp);
 
 	avg0 = convSampleToVolts(avg0);
 	avg1 = convSampleToVolts(avg1);
@@ -561,10 +569,14 @@ bool Calibration::calibrateDACoffset()
 	int16_t ch1_avg = average(dataCh1, num_samples);
 
 	// Convert from raw format to signed raw
+	int16_t tmp;
+
+	tmp = ch0_avg;
 	iio_channel_convert(m_adc_channel0, (void *)&ch0_avg,
-		(const void *)&ch0_avg);
+		(const void *)&tmp);
+	tmp = ch1_avg;
 	iio_channel_convert(m_adc_channel1, (void *)&ch1_avg,
-		(const void *)&ch1_avg);
+		(const void *)&tmp);
 
 	double voltage0 = convSampleToVolts(ch0_avg, m_adc_ch0_gain);
 	double voltage1 = convSampleToVolts(ch1_avg, m_adc_ch1_gain);
@@ -629,10 +641,14 @@ bool Calibration::calibrateDACgain()
 	int16_t ch1_avg = average(dataCh1, num_samples);
 
 	// Convert from raw format to signed raw
+	int16_t tmp;
+
+	tmp = ch0_avg;
 	iio_channel_convert(m_adc_channel0, (void *)&ch0_avg,
-		(const void *)&ch0_avg);
+		(const void *)&tmp);
+	tmp = ch1_avg;
 	iio_channel_convert(m_adc_channel1, (void *)&ch1_avg,
-		(const void *)&ch1_avg);
+		(const void *)&tmp);
 
 	double voltage0 = convSampleToVolts(ch0_avg, m_adc_ch0_gain);
 	double voltage1 = convSampleToVolts(ch1_avg, m_adc_ch1_gain);
