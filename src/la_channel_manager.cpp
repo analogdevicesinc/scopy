@@ -1699,6 +1699,8 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 				connect(lachannelgroupUI->ui->decoderCombo,
 					SIGNAL(currentIndexChanged(const QString&)),
 					lachannelgroupUI, SLOT(decoderChanged(const QString&)));
+				connect(lachannelgroupUI->ui->btnRemGroup, SIGNAL(pressed()),
+					lachannelgroupUI, SLOT(remove()));
 
 				if (lachannelgroupUI->getChannelGroup()->getDecoder()) {
 					QString name = QString::fromUtf8(
@@ -1796,8 +1798,6 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 						lachannelUI->topSep = prevSep;
 						prevSep = lachannelUI->botSep;
 
-						connect(lachannelgroupUI->ui->btnRemGroup, SIGNAL(pressed()),
-							lachannelgroupUI, SLOT(remove()));
 						connect(lachannelUI->ui->btnRemGroup, SIGNAL(pressed()),
 							lachannelUI, SLOT(remove()));
 						connect(lachannelUI->ui->comboBox_2,
