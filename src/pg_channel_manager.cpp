@@ -1417,7 +1417,7 @@ uint32_t PatternGeneratorChannelManager::computeSuggestedSampleRate()
 uint32_t PatternGeneratorChannelManager::computeSuggestedBufferSize(
         uint32_t sample_rate)
 {
-	uint32_t bufferSize = 1;
+	uint32_t bufferSize = 4;
 	uint32_t maxNonPeriodic = 1;
 	qDebug()<<"suggested buffersizes";
 
