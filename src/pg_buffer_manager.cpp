@@ -1,4 +1,5 @@
 #include "pg_buffer_manager.hpp"
+#include "pattern_generator.hpp"
 
 namespace adiscope {
 
@@ -68,8 +69,10 @@ void PatternGeneratorBufferManager::enableAutoSet(bool val)
 uint32_t PatternGeneratorBufferManager::adjustSampleRate(
         uint32_t suggestedSampleRate)
 {
-	if (suggestedSampleRate>80000000) {
-		suggestedSampleRate = 80000000;
+	if (suggestedSampleRate>PGMaxSampleRate) {
+		suggestedSampleRate = PGMaxSampleRate;
+	} else {
+		suggestedSampleRate = PGMaxSampleRate / (PGMaxSampleRate/suggestedSampleRate);
 	}
 
 	return suggestedSampleRate;

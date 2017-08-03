@@ -93,8 +93,8 @@ namespace adiscope {
 */
 
 QStringList PatternGenerator::possibleSampleRates = QStringList()
-                << "80000000"
-                << "40000000"   << "20000000"  << "10000000"
+                << "100000000"
+                << "50000000"   << "20000000"  << "10000000"
                 << "5000000"    << "2000000"   << "1000000"
                 << "500000"     << "200000"    << "100000"
                 << "50000"      << "20000"     << "10000"
@@ -139,7 +139,7 @@ void PatternGenerator::setPGStatus(PatternGenerator::runState val)
 PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
                                    QPushButton *runBtn, QJSEngine *engine,
                                    DIOManager *diom, ToolLauncher *parent,
-				   bool offline_mode_) :
+                                   bool offline_mode_) :
 	Tool(ctx, runBtn, new PatternGenerator_API(this), parent),
 	settings_group(new QButtonGroup(this)),
 	ui(new Ui::PatternGenerator),
@@ -270,7 +270,7 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 	//main_win->view_->viewport()->disableDrag();
 
 	api->setObjectName(QString::fromStdString(Filter::tool_name(
-	                              TOOL_PATTERN_GENERATOR)));
+	                           TOOL_PATTERN_GENERATOR)));
 	api->load(*settings);
 	api->js_register(engine);
 	chm.highlightChannel(chm.get_channel_group(0));
@@ -410,11 +410,11 @@ void PatternGenerator::updateCGSettings()
 	auto chg = chm.getHighlightedChannelGroup();
 	auto ch = chm.getHighlightedChannel();
 
-	if(chmui->findUiByChannel(ch)==nullptr && chmui->findUiByChannelGroup(chg)==nullptr) {
+	if (chmui->findUiByChannel(ch)==nullptr
+	    && chmui->findUiByChannelGroup(chg)==nullptr) {
 		enableCgSettings(false);
 		return;
-	}
-	else {
+	} else {
 		enableCgSettings(true);
 	}
 
@@ -478,6 +478,7 @@ void PatternGenerator::updateCGSettings()
 		colour_button_high->set_colour(ch->getHighcolor());
 		colour_button_low->set_colour(ch->getLowcolor());
 	}
+
 	colour_button_high->update();
 	colour_button_low->update();
 	colour_button_edge->update();
@@ -656,8 +657,11 @@ void PatternGenerator::changeName(QString name)
 
 	if (ch==nullptr) {
 		chg->set_label(name.toStdString());
-		if(!chg->is_grouped())
+
+		if (!chg->is_grouped()) {
 			chg->get_channel(0)->set_label(name.toStdString());
+		}
+
 		chgui->ui->ChannelGroupLabel->setText(name);
 	} else {
 		ch->set_label(name.toStdString());
@@ -868,6 +872,7 @@ void PatternGenerator::startStop(bool start)
 
 	if (start) {
 		ui->btnRunStop->setText("Stop");
+
 		if (startPatternGeneration(true)) {
 			setPGStatus(RUNNING);
 		} else {

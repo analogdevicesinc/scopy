@@ -76,6 +76,7 @@ class PatternGeneratorChannelGroup_API;
 class PatternGeneratorChannel_API;
 class Filter;
 
+const uint32_t PGMaxSampleRate = 100000000;
 
 class PatternGenerator : public Tool
 {

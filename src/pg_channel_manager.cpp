@@ -141,24 +141,33 @@ void PatternGeneratorChannelUI::resetSeparatorHighlight(bool force)
 
 bool PatternGeneratorChannelUI::eventFilter(QObject *watched, QEvent *event)
 {
-	if (event->type() == QEvent::DragEnter){
+	if (event->type() == QEvent::DragEnter) {
 		QDragEnterEvent *enterEvent = static_cast<QDragEnterEvent *>(event);
+
 		if (!enterEvent->mimeData()->hasFormat("patterngenerator/channelgroup")
-				&& !enterEvent->mimeData()->hasFormat("patterngenerator/channel"))
+		    && !enterEvent->mimeData()->hasFormat("patterngenerator/channel")) {
 			return true;
 		}
-	if (event->type() == QEvent::Drop){
+	}
+
+	if (event->type() == QEvent::Drop) {
 		QDropEvent *dropEvent = static_cast<QDropEvent *>(event);
+
 		if (!dropEvent->mimeData()->hasFormat("patterngenerator/channelgroup")
-				&& !dropEvent->mimeData()->hasFormat("patterngenerator/channel"))
+		    && !dropEvent->mimeData()->hasFormat("patterngenerator/channel")) {
 			return true;
 		}
-	if (event->type() == QEvent::DragMove){
+	}
+
+	if (event->type() == QEvent::DragMove) {
 		QDragMoveEvent *dropEvent = static_cast<QDragMoveEvent *>(event);
+
 		if (!dropEvent->mimeData()->hasFormat("patterngenerator/channelgroup")
-				&& !dropEvent->mimeData()->hasFormat("patterngenerator/channel"))
+		    && !dropEvent->mimeData()->hasFormat("patterngenerator/channel")) {
 			return true;
 		}
+	}
+
 	return QWidget::event(event);
 }
 
@@ -664,26 +673,36 @@ void PatternGeneratorChannelGroupUI::hideSeparatorHighlight(bool force)
 	}
 }
 
-bool PatternGeneratorChannelGroupUI::eventFilter(QObject *watched, QEvent *event)
+bool PatternGeneratorChannelGroupUI::eventFilter(QObject *watched,
+                QEvent *event)
 {
-	if (event->type() == QEvent::DragEnter){
+	if (event->type() == QEvent::DragEnter) {
 		QDragEnterEvent *enterEvent = static_cast<QDragEnterEvent *>(event);
+
 		if (!enterEvent->mimeData()->hasFormat("patterngenerator/channelgroup")
-				&& !enterEvent->mimeData()->hasFormat("patterngenerator/channel"))
+		    && !enterEvent->mimeData()->hasFormat("patterngenerator/channel")) {
 			return true;
 		}
-	if (event->type() == QEvent::Drop){
+	}
+
+	if (event->type() == QEvent::Drop) {
 		QDropEvent *dropEvent = static_cast<QDropEvent *>(event);
+
 		if (!dropEvent->mimeData()->hasFormat("patterngenerator/channelgroup")
-				&& !dropEvent->mimeData()->hasFormat("patterngenerator/channel"))
+		    && !dropEvent->mimeData()->hasFormat("patterngenerator/channel")) {
 			return true;
 		}
-	if (event->type() == QEvent::DragMove){
+	}
+
+	if (event->type() == QEvent::DragMove) {
 		QDragMoveEvent *dropEvent = static_cast<QDragMoveEvent *>(event);
+
 		if (!dropEvent->mimeData()->hasFormat("patterngenerator/channelgroup")
-				&& !dropEvent->mimeData()->hasFormat("patterngenerator/channel"))
+		    && !dropEvent->mimeData()->hasFormat("patterngenerator/channel")) {
 			return true;
 		}
+	}
+
 	return QWidget::event(event);
 }
 
@@ -1382,35 +1401,24 @@ uint32_t PatternGeneratorChannelManager::computeSuggestedSampleRate()
 {
 	qDebug()<<"suggested sampleRates:";
 	uint32_t sampleRate = 1;
-	//uint32_t sampleDivider=0;
 
 	for (auto &&chg : channel_group) {
 		if (chg->is_enabled()) {
 			auto patternSamplingFrequency = static_cast<PatternGeneratorChannelGroup *>
 			                                (chg)->pattern->get_min_sampling_freq();
 
-			//	uint32_t val = 80000000 / patternSamplingFrequency;
 			if (patternSamplingFrequency==0) {
 				continue;
 			}
 
 			sampleRate = boost::math::lcm(patternSamplingFrequency, sampleRate);
-			//sampleDivider = boost::math::gcd(sampleDivider,val);
 			qDebug()<<static_cast<PatternGeneratorChannelGroup *>
 			        (chg)->pattern->get_min_sampling_freq();
-//			qDebug()<<80000000.0/val;
-
 		}
 	}
 
-	//qDebug()<<"final samplerate: "<<80000000.0/sampleDivider;
-	qDebug()<<"final samplerate: "<<sampleRate;
 
-	/*if (!sampleDivider) {
-		sampleDivider = 1;
-	}
-
-	return 80000000/sampleDivider;*/
+	qDebug()<<" - "<<sampleRate;
 	return sampleRate;
 }
 
@@ -1542,6 +1550,7 @@ void PatternGeneratorChannelManagerUI::updateUi()
 	auto scrollVal = ui->scrollArea->verticalScrollBar()->value();
 	auto scrollMin = ui->scrollArea->verticalScrollBar()->minimum();
 	auto scrollMax = ui->scrollArea->verticalScrollBar()->maximum();
+
 	for (auto ch : chg_ui) {
 		ch->hide();
 		ch->setMouseTracking(false); // prevent hovering after the channel is deleted

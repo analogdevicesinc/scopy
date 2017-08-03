@@ -28,6 +28,7 @@
 #include <errno.h>
 
 #include "pg_patterns.hpp"
+#include "pattern_generator.hpp"
 
 using namespace std;
 using namespace adiscope;
@@ -378,8 +379,9 @@ void ClockPattern::set_frequency(float value)
 {
 	frequency = value;
 
-	if (frequency>40000000) {
-		frequency = 40000000;
+	if (frequency>50000000) {
+		//frequency = 50000000;
+		duty_cycle_granularity = 1;
 	}
 
 	if (frequency>20000000) {
@@ -480,7 +482,7 @@ ClockPatternUI::ClockPatternUI(ClockPattern *pattern,
 		{"Hz", 1E0},
 		{"kHz", 1E+3},
 		{"MHz", 1E+6}
-	}, "Frequency", 1e0, 40e+6,true,false,this);
+	}, "Frequency", 1e0, PGMaxSampleRate/2,true,false,this, {1,2.5,5});
 	ui->verticalLayout->addWidget(frequencySpinButton);
 	phaseSpinButton = new PhaseSpinButton(this);
 	ui->verticalLayout->addWidget(phaseSpinButton);
@@ -690,7 +692,7 @@ RandomPatternUI::RandomPatternUI(RandomPattern *pattern,
 		{"Hz", 1E0},
 		{"kHz", 1E+3},
 		{"MHz", 1E+6}
-	}, "Frequency", 1e0, 40e+6,true,false,this);
+	}, "Frequency", 1e0, PGMaxSampleRate/2,true,false,this, {1,2.5,5});
 	ui->verticalLayout->addWidget(frequencySpinButton);
 }
 RandomPatternUI::~RandomPatternUI()
@@ -848,7 +850,7 @@ BinaryCounterPatternUI::BinaryCounterPatternUI(BinaryCounterPattern *pattern,
 		{"Hz", 1E0},
 		{"kHz", 1E+3},
 		{"MHz", 1E+6}
-	}, "Frequency", 1e0, 40e+6,true,false,this);
+	}, "Frequency", 1e0, PGMaxSampleRate/2,true,false,this, {1,2.5,5});
 	ui->verticalLayout->addWidget(frequencySpinButton);
 }
 
@@ -948,7 +950,7 @@ GrayCounterPatternUI::GrayCounterPatternUI(GrayCounterPattern *pattern,
 		{"Hz", 1E0},
 		{"kHz", 1E+3},
 		{"MHz", 1E+6}
-	}, "Frequency", 1e0, 40e+6,true,false,this);
+	}, "Frequency", 1e0, PGMaxSampleRate/2,true,false,this, {1,2.5,5});
 	ui->verticalLayout->addWidget(frequencySpinButton);
 }
 GrayCounterPatternUI::~GrayCounterPatternUI()
@@ -1560,7 +1562,7 @@ I2CPatternUI::I2CPatternUI(I2CPattern *pattern,
 		{"Hz", 1E0},
 		{"kHz", 1E+3},
 		{"MHz", 1E+6}
-	}, "Frequency", 1e0, 40e+6,true,false,this);
+	}, "Frequency", 1e0, PGMaxSampleRate/2,true,false,this, {1,2.5,5});
 	ui->verticalLayout->insertWidget(0,frequencySpinButton);
 	setVisible(false);
 }
@@ -1865,7 +1867,7 @@ SPIPatternUI::SPIPatternUI(SPIPattern *pattern,
 		{"Hz", 1E0},
 		{"kHz", 1E+3},
 		{"MHz", 1E+6}
-	}, "Frequency", 1e0, 40e+6,true,false,this);
+	}, "Frequency", 1e0, PGMaxSampleRate/2,true,false,this, {1,2.5,5});
 	ui->verticalLayout->insertWidget(0,frequencySpinButton);
 	setVisible(false);
 }
