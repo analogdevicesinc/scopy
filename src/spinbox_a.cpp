@@ -430,13 +430,11 @@ m_fine_increment(1)
 ScaleSpinButton::ScaleSpinButton(vector<pair<QString, double> >units,
                                  const QString& name,
                                  double min_value, double max_value,
-                                 bool hasProgressWidget, bool invertCircle, QWidget *parent):
+				 bool hasProgressWidget, bool invertCircle, QWidget *parent, std::vector<double> steps):
 	SpinBoxA(units, name, min_value, max_value,
 	         hasProgressWidget, invertCircle, parent),
 	m_steps(1E-3, 1E+3, 10,
-{
-	1, 2, 5
-}),
+steps),
 m_fine_increment(1)
 {
 	ui->SBA_CompletionCircle->setIsLogScale(true);
