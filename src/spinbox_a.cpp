@@ -619,7 +619,7 @@ void PhaseSpinButton::stepUp()
 	double step = m_step;
 
 	if (isInFineMode()) {
-		step /= 10;
+		step = 1;
 	}
 
 	newVal =  m_value + step;
@@ -635,10 +635,10 @@ void PhaseSpinButton::stepDown()
 	double step = m_step;
 
 	if (isInFineMode()) {
-		step /= 10;
+		step = 1;
 	}
 
-	newVal = current_val * current_scale - step;
+	newVal = m_value - step;
 
 	setValue(newVal);
 }
