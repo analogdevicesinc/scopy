@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>263</width>
+    <width>199</width>
     <height>200</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -53,7 +53,7 @@
      <item>
       <widget class="QLabel" name="label_4">
        <property name="text">
-        <string>Clock Polarity</string>
+        <string>CPOL</string>
        </property>
       </widget>
      </item>
@@ -73,7 +73,7 @@
      <item>
       <widget class="QLabel" name="label_3">
        <property name="text">
-        <string>Clock Phase</string>
+        <string>CPHA</string>
        </property>
       </widget>
      </item>
@@ -97,7 +97,7 @@
      <item>
       <widget class="QLabel" name="label_7">
        <property name="text">
-        <string>CS Polarity</string>
+        <string>CSPOL</string>
        </property>
       </widget>
      </item>
