@@ -306,11 +306,28 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	hist_plot.setMinimumHeight(200);
 	hist_plot.setMinimumWidth(300);
 
-	xy_plot.setMinimumHeight(200);
-	xy_plot.setMinimumWidth(300);
+	xy_plot.setMinimumHeight(50);
+	xy_plot.setMinimumWidth(50);
 
 	xy_plot.setVertUnitsPerDiv(5);
 	xy_plot.setHorizUnitsPerDiv(5);
+
+	xy_plot.disableLegend();
+
+	// Disable mouse interactions with the axes until we figure out if we want to use them
+	xy_plot.setXaxisMouseGesturesEnabled(false);
+	for (uint i = 0; i < nb_channels; i++)
+		xy_plot.setYaxisMouseGesturesEnabled(i, false);
+
+	// TO DO: refactor this once the source of the X and Y axes can be configured
+	QWidget *xsw = xy_plot.axisWidget(QwtPlot::xBottom);
+	xsw->setStyleSheet(
+		QString("color: %1").arg(plot.getLineColor(0).name()));
+	QWidget *ysw = xy_plot.axisWidget(QwtPlot::yLeft);
+	ysw->setStyleSheet(
+		QString("color: %1").arg(plot.getLineColor(1).name()));
+
+	xy_plot.setLineColor(0, QColor("#F8E71C"));
 
 	ui->hlayout_fft->addWidget(&fft_plot);
 	ui->container_fft_plot->hide();
@@ -318,7 +335,9 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	ui->gridLayoutHist->addWidget(&hist_plot, 0, 0);
 	hist_plot.hide();
 
-	ui->gridLayout_XY->addWidget(&xy_plot, 0, 0);
+	QWidget *w = ui->gridLayout_XY->itemAtPosition(1, 0)->widget();
+	ui->gridLayout_XY->addWidget(&xy_plot, 1, 0);
+	ui->gridLayout_XY->addWidget(w, 2, 0);
 	xy_plot.hide();
 
 	ui->rightMenu->setMaximumWidth(0);
@@ -374,7 +393,6 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	ui->btnGeneralSettings->setProperty("id", QVariant(-gsettings_panel));
 
 	gsettings_ui->Histogram_view->hide();
-	gsettings_ui->XY_view->hide();
 
 	connect(gsettings_ui->FFT_view, SIGNAL(toggled(bool)),
 		SLOT(onFFT_view_toggled(bool)));
@@ -533,6 +551,7 @@ Oscilloscope::~Oscilloscope()
 	if (hist_is_visible)
 		for (unsigned int i = 0; i < nb_channels; i++)
 			iio->disconnect(hist_ids[i]);
+
 	if (xy_is_visible)
 		for (unsigned int i = 0; i < (nb_channels & ~1); i++)
 			iio->disconnect(xy_ids[i]);
@@ -968,19 +987,33 @@ void Oscilloscope::onXY_view_toggled(bool visible)
 
 	if (visible) {
 
+		auto xy_conv = gnuradio::get_initial_sptr(
+				new adc_sample_conv(nb_channels));
+		if (m2k_adc) {
+			xy_conv->setCorrectionGain(0,
+				m2k_adc->chnCorrectionGain(0));
+			xy_conv->setCorrectionGain(1,
+				m2k_adc->chnCorrectionGain(1));
+		}
+
 		for (unsigned int i = 0; i < nb_channels / 2; i++) {
+			xy_ids[i * 2] = iio->connect(xy_conv, i * 2, 0, true);
+			xy_ids[i * 2 + 1] = iio->connect(xy_conv,
+					i * 2 + 1, 1, true);
+
 			auto ftc = blocks::float_to_complex::make(1);
 			auto basic = ftc->to_basic_block();
 
-			xy_ids[i * 2] = iio->connect(basic, i * 2, 0, true);
-			xy_ids[i * 2 + 1] = iio->connect(basic,
-					i * 2 + 1, 1, true);
+			iio->connect(xy_conv, 0, basic, 0);
+			iio->connect(xy_conv, 1, basic, 1);
 
-			printf("IDs: %s / %s\n", xy_ids[i * 2]->alias().c_str(),
-					xy_ids[i * 2 + 1]->alias().c_str());
 
 			iio->connect(ftc, 0, this->qt_xy_block, i);
+
+			iio->set_buffer_size(xy_ids[i * 2], active_sample_count);
+			iio->set_buffer_size(xy_ids[i * 2 + 1], active_sample_count);
 		}
+
 
 		if (ui->pushButtonRunStop->isChecked())
 			for (unsigned int i = 0; i < (nb_channels & ~1); i++)
@@ -1208,6 +1241,15 @@ void adiscope::Oscilloscope::onVertScaleValueChanged(double value)
 	}
 	voltsPosition->setStep(value / 10);
 
+	// TO DO: refactor this once the source of the X and Y axes can be configured
+	if (current_channel == 0) {
+		xy_plot.setHorizUnitsPerDiv(value);
+	} else {
+		xy_plot.setVertUnitsPerDiv(value, QwtPlot::yLeft);
+	}
+	xy_plot.replot();
+	xy_plot.zoomBaseUpdate();
+
 	if (current_channel < adc->getTrigger()->numChannels()) {
 		trigger_settings.setTriggerLevelStep(current_channel, value);
 		trigger_settings.setTriggerHystStep(current_channel, value / 10);
@@ -1277,8 +1319,10 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 			timePosition->setValue(-params.timePos);
 	}
 
-	for (unsigned int i = 0; i < nb_channels; i++)
+	for (unsigned int i = 0; i < nb_channels; i++) {
 		iio->set_buffer_size(ids[i], active_sample_count);
+		iio->set_buffer_size(xy_ids[i], active_sample_count);
+	}
 
 	/* timeout = how long a buffer capture takes + transmission latency. The
 	latter is a guessed value. If we could get a feedback from hardware that
@@ -1362,8 +1406,10 @@ void adiscope::Oscilloscope::onTimePositionChanged(double value)
 		adc->setSampleRate(active_sample_rate);
 	}
 
-	for (unsigned int i = 0; i < nb_channels; i++)
+	for (unsigned int i = 0; i < nb_channels; i++) {
 		iio->set_buffer_size(ids[i], active_sample_count);
+		iio->set_buffer_size(xy_ids[i], active_sample_count);
+	}
 
 	if (started)
 		iio->unlock();
@@ -2561,6 +2607,15 @@ void Channel_API::setVoltsPerDiv(double val)
 	QLabel *label = static_cast<QLabel *>(
 			osc->ui->chn_scales->itemAt(index)->widget());
 	label->setText(osc->vertMeasureFormat.format(val, "V/div", 3));
+
+	// TO DO: refactor this once the source of the X and Y axes can be configured
+	if (index == 0) {
+		osc->xy_plot.setHorizUnitsPerDiv(val);
+	} else {
+		osc->xy_plot.setVertUnitsPerDiv(val, QwtPlot::yLeft);
+	}
+	osc->xy_plot.replot();
+	osc->xy_plot.zoomBaseUpdate();
 }
 
 double Channel_API::getVOffset() const

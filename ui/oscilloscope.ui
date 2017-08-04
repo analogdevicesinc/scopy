@@ -59,7 +59,7 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 r
        <number>0</number>
       </property>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout">
+       <layout class="QHBoxLayout" name="hLayout_top_btn_area">
         <property name="spacing">
          <number>40</number>
         </property>
@@ -280,8 +280,14 @@ QPushButton:checked:hover {
        </layout>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="hLayout">
+       <layout class="QHBoxLayout" name="hLayout_central_area">
         <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
          <number>0</number>
         </property>
         <item>
@@ -465,9 +471,6 @@ QPushButton:checked:hover {
              <item row="0" column="1">
               <layout class="QGridLayout" name="gridLayoutHist"/>
              </item>
-             <item row="1" column="1">
-              <layout class="QGridLayout" name="gridLayout_XY"/>
-             </item>
              <item row="2" column="0">
               <layout class="QVBoxLayout" name="plot_and_scales">
                <property name="spacing">
@@ -548,7 +551,58 @@ QPushButton:checked:hover {
          </layout>
         </item>
         <item>
-         <layout class="QVBoxLayout" name="verticalLayout_5">
+         <layout class="QGridLayout" name="gridLayout_XY">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>20</number>
+          </property>
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <item row="0" column="0">
+           <widget class="QWidget" name="widget_xy_plot_top" native="true">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>45</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>45</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color: black;</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QWidget" name="widget_xy_plot_bottom" native="true">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>58</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>58</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color: black;</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="vLayout_for_rightMenu">
           <property name="topMargin">
            <number>20</number>
           </property>
@@ -604,7 +658,7 @@ QPushButton:checked:hover {
        </layout>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_5">
+       <layout class="QHBoxLayout" name="hLayout_bottom_btn_area">
         <property name="spacing">
          <number>0</number>
         </property>
