@@ -476,7 +476,7 @@ iio_channel *DIOManager::getChannel(int ch)
 void DIOManager::setOutputMode(int chid, bool mode)
 {
 	auto ch = getChannel(chid);
-	char strMode[10];
+	char strMode[20];
 
 	if (mode) {
 		strcpy(strMode,"open-drain");
