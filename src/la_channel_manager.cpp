@@ -1808,6 +1808,9 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 						connect(lachannelUI->ui->comboBox,
 							SIGNAL(currentIndexChanged(int)),
 							lachannelUI, SLOT(triggerChanged(int)));
+						connect(lachannelUI->ui->comboBox,
+							SIGNAL(currentIndexChanged(int)),
+							la, SLOT(triggerChanged(int)));
 
 						str = QString().number(ch->get_channel(i)->get_id());
 						lachannelUI->ui->indexLabel2->setText(str);
