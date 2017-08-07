@@ -49,7 +49,7 @@ const QColor TracePalette::Colours[Cols * Rows] = {
 	QColor("#FF5721"),
 
 	//Row5
-	QColor(),
+	QColor("#795448"),
 	QColor("#9E9E9E"),
 	QColor("#607D8B"),
 	QColor("#FFFFFF"),
