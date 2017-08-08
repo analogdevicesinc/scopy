@@ -1436,7 +1436,7 @@ void LogicAnalyzerChannelManagerUI::createColorButtons()
 
 	colour_button_BG = new ColourButton(
 		pv::view::TracePalette::Rows, pv::view::TracePalette::Cols,
-		generalSettingsUi->colorBG);
+		generalSettingsUi->colorBG, true);
 	colour_button_BG->set_palette(pv::view::TracePalette::Colours);
 	colour_button_BG->setProperty("type", QVariant("background"));
 

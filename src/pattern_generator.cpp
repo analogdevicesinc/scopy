@@ -177,7 +177,7 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 
 	colour_button_BG = new pv::widgets::ColourButton(
 	        pv::view::TracePalette::Rows, pv::view::TracePalette::Cols,
-	        cgSettings->colorBG);
+	        cgSettings->colorBG, true);
 	colour_button_BG->set_palette(pv::view::TracePalette::Colours);
 	colour_button_BG->setProperty("type", QVariant("background"));
 

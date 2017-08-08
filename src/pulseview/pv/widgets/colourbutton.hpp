@@ -36,7 +36,7 @@ private:
 	static const int SwatchMargin;
 
 public:
-	ColourButton(int rows, int cols, QWidget *parent);
+	ColourButton(int rows, int cols, QWidget *parent, bool bgButton = false);
 
 	ColourPopup& popup();
 
@@ -60,6 +60,7 @@ Q_SIGNALS:
 private:
 	ColourPopup popup_;
 	QColor cur_colour_;
+	bool bgButton_;
 };
 
 } // widgets

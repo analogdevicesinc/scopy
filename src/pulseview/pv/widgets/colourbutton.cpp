@@ -31,9 +31,10 @@ namespace widgets {
 
 const int ColourButton::SwatchMargin = 7;
 
-ColourButton::ColourButton(int rows, int cols, QWidget *parent) :
+ColourButton::ColourButton(int rows, int cols, QWidget *parent, bool bgButton) :
 	QPushButton("", parent),
-	popup_(rows, cols, this)
+	popup_(rows, cols, this),
+	bgButton_(bgButton)
 {
 	connect(this, SIGNAL(clicked(bool)), this, SLOT(on_clicked(bool)));
 	connect(&popup_, SIGNAL(selected(int, int)),
@@ -82,8 +83,22 @@ void ColourButton::set_palette(const QColor *const palette)
 
 	for (unsigned int r = 0; r < rows; r++)
 		for (unsigned int c = 0; c < cols; c++)
-			popup_.well_array().setCellBrush(r, c,
-				QBrush(palette[r * cols + c]));
+		{
+			if(palette[r * cols + c].isValid()) {
+				popup_.well_array().setCellBrush(r, c,
+					QBrush(palette[r * cols + c]));
+			}
+			else {
+				QColor col;
+				if(bgButton_)
+					col = QColor("#000000");
+				else
+					col = QColor("#795448");
+				popup_.well_array().setCellBrush(r, c,
+					QBrush(col));
+			}
+
+		}
 }
 
 void ColourButton::on_clicked(bool)
