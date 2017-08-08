@@ -170,20 +170,29 @@ QLabel[ac=true] { qproperty-text: &quot;VRMS&quot;; }</string>
              </layout>
             </item>
             <item>
-             <widget class="adiscope::CustomScale" name="scaleCh1" native="true">
-              <property name="lowerBound" stdset="0">
+             <widget class="adiscope::CustomScale" name="scaleCh1">
+              <property name="lowerBound">
                <double>-0.100000000000000</double>
               </property>
-              <property name="upperBound" stdset="0">
+              <property name="upperBound">
                <double>0.100000000000000</double>
               </property>
-              <property name="scaleMaxMajor" stdset="0">
+              <property name="scaleMaxMajor">
                <number>5</number>
               </property>
-              <property name="scaleMaxMinor" stdset="0">
+              <property name="scaleMaxMinor">
                <number>5</number>
               </property>
-              <property name="borderWidth" stdset="0">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="scalePosition">
+               <enum>QwtThermo::LeadingScale</enum>
+              </property>
+              <property name="originMode">
+               <enum>QwtThermo::OriginCustom</enum>
+              </property>
+              <property name="borderWidth">
                <number>0</number>
               </property>
              </widget>
@@ -306,20 +315,29 @@ QLabel[ac=true] { qproperty-text: &quot;VRMS&quot;; }</string>
              </layout>
             </item>
             <item>
-             <widget class="adiscope::CustomScale" name="scaleCh2" native="true">
-              <property name="lowerBound" stdset="0">
+             <widget class="adiscope::CustomScale" name="scaleCh2">
+              <property name="lowerBound">
                <double>-0.100000000000000</double>
               </property>
-              <property name="upperBound" stdset="0">
+              <property name="upperBound">
                <double>0.100000000000000</double>
               </property>
-              <property name="scaleMaxMajor" stdset="0">
+              <property name="scaleMaxMajor">
                <number>5</number>
               </property>
-              <property name="scaleMaxMinor" stdset="0">
+              <property name="scaleMaxMinor">
                <number>5</number>
               </property>
-              <property name="borderWidth" stdset="0">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+               <property name="scalePosition">
+               <enum>QwtThermo::LeadingScale</enum>
+              </property>
+              <property name="originMode">
+               <enum>QwtThermo::OriginCustom</enum>
+              </property>
+              <property name="borderWidth">
                <number>0</number>
               </property>
              </widget>

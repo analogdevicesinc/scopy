@@ -229,14 +229,20 @@ color: #ff7200;
        </layout>
       </item>
       <item>
-       <widget class="QwtThermo" name="scale_dac1" native="true">
-        <property name="upperBound" stdset="0">
+       <widget class="QwtThermo" name="scale_dac1">
+        <property name="upperBound">
          <double>5.000000000000000</double>
         </property>
-        <property name="scaleMaxMinor" stdset="0">
+        <property name="scaleMaxMinor">
          <number>10</number>
         </property>
-        <property name="borderWidth" stdset="0">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="scalePosition">
+         <enum>QwtThermo::LeadingScale</enum>
+        </property>
+        <property name="borderWidth">
          <number>0</number>
         </property>
        </widget>
@@ -413,17 +419,26 @@ color: #9013fe;
        </layout>
       </item>
       <item>
-       <widget class="QwtThermo" name="scale_dac2" native="true">
-        <property name="lowerBound" stdset="0">
+       <widget class="QwtThermo" name="scale_dac2">
+        <property name="lowerBound">
          <double>-5.000000000000000</double>
         </property>
-        <property name="upperBound" stdset="0">
+        <property name="upperBound">
          <double>0.000000000000000</double>
         </property>
-        <property name="scaleMaxMinor" stdset="0">
+        <property name="scaleMaxMinor">
          <number>10</number>
         </property>
-        <property name="borderWidth" stdset="0">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="scalePosition">
+         <enum>QwtThermo::LeadingScale</enum>
+        </property>
+        <property name="originMode">
+         <enum>QwtThermo::OriginMaximum</enum>
+        </property>
+        <property name="borderWidth">
          <number>0</number>
         </property>
        </widget>
