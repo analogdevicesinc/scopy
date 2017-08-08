@@ -1570,6 +1570,7 @@ void LogicAnalyzerChannelManagerUI::setWidgetMinimumNrOfChars(QWidget *w,
 
 void LogicAnalyzerChannelManagerUI::update_ui_children(LogicAnalyzerChannelGroupUI* chgroupUI)
 {
+	int index = 0;
 	for(LogicAnalyzerChannelUI* lachannelUI : chgroupUI->ch_ui)
 	{
 		lachannelUI->ui->comboBox_2->clear();
@@ -1579,8 +1580,16 @@ void LogicAnalyzerChannelManagerUI::update_ui_children(LogicAnalyzerChannelGroup
 		for (auto var : chgroupUI->getChannelGroup()->get_decoder_roles_list()) {
 			lachannelUI->ui->comboBox_2->addItem(var);
 		}
-		lachannelUI->getChannel()->setChannel_role(nullptr);
-		lachannelUI->ui->comboBox_2->setCurrentIndex(0);
+		if(auto dec = chgroupUI->getChannelGroup()->getDecoder()) {
+			if(strcmp(dec->id, "parallel") == 0)
+				lachannelUI->ui->comboBox_2->setCurrentText(
+				chgroupUI->getChannelGroup()->get_decoder_roles_list().at(index+1));
+		}
+		else {
+			lachannelUI->getChannel()->setChannel_role(nullptr);
+			lachannelUI->ui->comboBox_2->setCurrentIndex(0);
+		}
+		index++;
 	}
 }
 
