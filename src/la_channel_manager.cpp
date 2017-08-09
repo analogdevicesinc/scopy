@@ -391,7 +391,6 @@ void LogicAnalyzerChannelUI::highlightBotSeparator()
 void LogicAnalyzerChannelUI::enableControls(bool enabled)
 {
 	ui->groupName->setEnabled(enabled);
-	ui->comboBox_2->setEnabled(enabled);
 	ui->comboBox->setEnabled(enabled);
 	ui->indexLabel->setEnabled(enabled);
 	ui->indexLabel2->setEnabled(enabled);
@@ -537,7 +536,7 @@ void LogicAnalyzerChannelGroup::setDecoder(const srd_decoder *value)
 	g_slist_free(optChannels);
 }
 
-LogicAnalyzerChannel* LogicAnalyzerChannelGroup::getChannelById(int id)
+LogicAnalyzerChannel* LogicAnalyzerChannelGroup::get_channel_by_id(int id)
 {
 	for(auto&& ch : *(get_channels()))
 	{
@@ -545,6 +544,15 @@ LogicAnalyzerChannel* LogicAnalyzerChannelGroup::getChannelById(int id)
 		{
 			return static_cast<LogicAnalyzerChannel *>(ch);
 		}
+	}
+	return nullptr;
+}
+
+LogicAnalyzerChannel* LogicAnalyzerChannelGroup::get_channel_at_index(int index)
+{
+	auto channels = get_channels();
+	if(index < channels->size()) {
+		return static_cast<LogicAnalyzerChannel *>(channels->at(index));
 	}
 	return nullptr;
 }
@@ -609,14 +617,14 @@ void LogicAnalyzerChannelGroup::setChannelForDecoder(const srd_channel* ch,
 		auto itByKey = channels_.find(ch);
 		auto itByValue = (findByValue(ch_id) == nullptr) ? channels_.end() : channels_.find(findByValue(ch_id));
 		if( itByKey != channels_.end() && itByValue != channels_.end() && itByKey != itByValue) {
-			if( getChannelById(itByKey->second))
-				getChannelById(itByKey->second)->setChannel_role(nullptr);
+			if( get_channel_by_id(itByKey->second))
+				get_channel_by_id(itByKey->second)->setChannel_role(nullptr);
 			channels_.at(ch) = ch_id;
 			itByValue->second = -1;
 		}
 		else if( itByKey != channels_.end() ) {
-			if( getChannelById(itByKey->second))
-				getChannelById(itByKey->second)->setChannel_role(nullptr);
+			if( get_channel_by_id(itByKey->second))
+				get_channel_by_id(itByKey->second)->setChannel_role(nullptr);
 			channels_.at(ch) = ch_id;
 		}
 		else if( itByValue != channels_.end() ) {
@@ -984,7 +992,7 @@ void LogicAnalyzerChannelGroupUI::setupDecoder()
 				std::shared_ptr<pv::view::TraceTreeItem> > channel_map;
 
 		for(auto id : lchg->get_ids()) {
-			LogicAnalyzerChannel* lch = lchg->getChannelById(id);
+			LogicAnalyzerChannel* lch = lchg->get_channel_by_id(id);
 			std::pair<const srd_channel *,
 				std::shared_ptr<pv::view::TraceTreeItem> > chtracepair;
 			if( lch->getChannel_role() ) {
@@ -1581,11 +1589,19 @@ void LogicAnalyzerChannelManagerUI::update_ui_children(LogicAnalyzerChannelGroup
 			lachannelUI->ui->comboBox_2->addItem(var);
 		}
 		if(auto dec = chgroupUI->getChannelGroup()->getDecoder()) {
-			if(strcmp(dec->id, "parallel") == 0)
+			if(strcmp(dec->id, "parallel") == 0) {
 				lachannelUI->ui->comboBox_2->setCurrentText(
-				chgroupUI->getChannelGroup()->get_decoder_roles_list().at(index+1));
+					chgroupUI->getChannelGroup()->get_decoder_roles_list().at(index+1));
+				lachannelUI->ui->comboBox_2->setEnabled(false);
+			}
+			else {
+				lachannelUI->ui->comboBox_2->setEnabled(true);
+				lachannelUI->getChannel()->setChannel_role(nullptr);
+				lachannelUI->ui->comboBox_2->setCurrentIndex(0);
+			}
 		}
 		else {
+			lachannelUI->ui->comboBox_2->setEnabled(true);
 			lachannelUI->getChannel()->setChannel_role(nullptr);
 			lachannelUI->ui->comboBox_2->setCurrentIndex(0);
 		}
@@ -1826,6 +1842,7 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 						lachannelUI->ui->indexLabel->setText(str);
 					}
 
+					update_ui_children(lachannelgroupUI);
 					lachannelgroupUI->ui->layoutChildren->removeWidget(prevSep);
 					lachannelgroupUI->botSep = addSeparator(ui->verticalLayout,
 							ui->verticalLayout->count()-1);
@@ -2246,8 +2263,8 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 				reqChUI->roleCombo->addItem("-");
 				for (auto&& ch : *(chGroup->get_channels())) {
 					reqChUI->roleCombo->addItem(QString::number(ch->get_id()));
-					if(chGroup->getChannelById(ch->get_id())->getChannel_role() &&
-						(QString::fromUtf8(chGroup->getChannelById(ch->get_id())->getChannel_role()->name)
+					if(chGroup->get_channel_by_id(ch->get_id())->getChannel_role() &&
+						(QString::fromUtf8(chGroup->get_channel_by_id(ch->get_id())->getChannel_role()->name)
 							== rqch->name))
 					{
 						reqChUI->roleCombo->setCurrentText(QString::number(ch->get_id()));
@@ -2269,6 +2286,7 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 			else
 				settingsUI->optionalChn->hide();
 
+			int index = 0;
 			for (auto optch : chGroup->decoderOptChannels) {
 
 				if (optch == nullptr) {
@@ -2282,17 +2300,35 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 				optChUI->labelRole->setText(QString::fromUtf8(optch->name));
 				optChUI->stackedWidget->setCurrentIndex(0);
 
+				if(strcmp(decoder->id, "parallel") == 0 &&
+						strcmp(optch->name, "CLK") != 0) {
+					auto currentCh = chGroup->get_channel_at_index(index);
+					if(auto role = currentCh->getChannel_role()) {
+						if(optch->name == role->name) {
+							optChUI->roleCombo->addItem(QString::number(currentCh->get_id()));
+							optChUI->roleCombo->setCurrentIndex(0);
+							optChUI->roleCombo->setEnabled(false);
+						}
+					}
+
+					index++;
+					goto display_widget;
+				}
+
 				/* Add all the available channels + "none" to the list */
 				optChUI->roleCombo->addItem("-");
 				for (auto&& ch : *(chGroup->get_channels())) {
 					optChUI->roleCombo->addItem(QString::number(ch->get_id()));
-					if(chGroup->getChannelById(ch->get_id())->getChannel_role() &&
-						(QString::fromUtf8(chGroup->getChannelById(ch->get_id())->getChannel_role()->name)
+					if(chGroup->get_channel_by_id(ch->get_id())->getChannel_role() &&
+						(QString::fromUtf8(chGroup->get_channel_by_id(ch->get_id())->getChannel_role()->name)
 							== optch->name))
 					{
 						optChUI->roleCombo->setCurrentText(QString::number(ch->get_id()));
 					}
 				}
+
+			display_widget:
+
 				optChUI->roleCombo->setProperty("id", QVariant(optch->id));
 				optChUI->roleCombo->setProperty("name", QVariant(optch->name));
 
@@ -2302,6 +2338,9 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 				connect(optChUI->roleCombo,
 				        SIGNAL(currentIndexChanged(const QString&)),
 				        this, SLOT(rolesChangedRHS(const QString&)));
+
+				if( index >= chGroup->get_channel_count() )
+					break;
 			}
 
 			/* Create widgets for options */

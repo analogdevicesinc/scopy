@@ -139,7 +139,8 @@ public:
 	void collapse(bool val);
 	QStringList get_decoder_roles_list();
 	const srd_channel *get_srd_channel_from_name(const char*);
-	LogicAnalyzerChannel* getChannelById(int id);
+	LogicAnalyzerChannel* get_channel_by_id(int id);
+	LogicAnalyzerChannel* get_channel_at_index(int index);
 	void setChannelForDecoder(const srd_channel*, uint16_t);
 	std::map<const srd_channel*, uint16_t> get_decoder_channels();
 	qreal getCh_thickness() const;
