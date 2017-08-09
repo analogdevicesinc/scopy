@@ -38,7 +38,6 @@
 #include "fft_block.hpp"
 #include "adc_sample_conv.hpp"
 #include "dynamicWidget.hpp"
-#include "spinbox_a.hpp"
 #include "hardware_trigger.hpp"
 
 /* Generated UI */
@@ -91,6 +90,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	adc_name(ctx ? filt->device_name(TOOL_SPECTRUM_ANALYZER) : ""),
 	crt_channel_id(0),
 	crt_peak(0),
+	crt_marker(-1),
 	max_peak_count(10),
 	bin_sizes({256, 512, 1024, 2048, 4096, 8192, 16384, 32768})
 {
@@ -121,6 +121,8 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	}
 
 	ui->setupUi(this);
+	// Temporarily disable the delta marker button
+	ui->pushButton_4->hide();
 
 	// Hide general settings and current settings for now
 	ui->btnToolSettings->hide();
@@ -158,14 +160,6 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	fft_plot->setXaxisMouseGesturesEnabled(false);
 	for (uint i = 0; i < num_adc_channels; i++)
 		fft_plot->setYaxisMouseGesturesEnabled(i, false);
-	// Configure peak markers
-	for (uint i = 0; i < num_adc_channels; i++) {
-		fft_plot->setPeakCount(i, max_peak_count);
-		for (uint pk = 0; pk < max_peak_count; pk++) {
-			fft_plot->setPeakVisible(i, pk, false);
-		}
-	}
-	fft_plot->setPeakVisible(crt_channel_id, crt_peak, true);
 
 	QGridLayout *gLayout = static_cast<QGridLayout *>
 		(ui->widgetPlotContainer->layout());
@@ -204,6 +198,34 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	ui->stop_freq->setStep(1e6);
 	ui->center_freq->setStep(1e6);
 	ui->span_freq->setStep(1e6);
+
+	// Initialize Marker controls
+	mrk_buttons.push_back(ui->mrk1);
+	mrk_buttons.push_back(ui->mrk2);
+	mrk_buttons.push_back(ui->mrk3);
+	mrk_buttons.push_back(ui->mrk4);
+	mrk_buttons.push_back(ui->mrk5);
+	for (int i = 0; i < mrk_buttons.size(); i++) {
+		QPushButton *btn = mrk_buttons[i];
+		btn->setProperty("id", QVariant(i));
+		connect(btn, SIGNAL(toggled(bool)), this,
+			SLOT(onMarkerToggled(bool)));
+	}
+
+	// Configure plot peak capabilities
+	for (uint i = 0; i < num_adc_channels; i++) {
+		fft_plot->setPeakCount(i, max_peak_count);
+	}
+
+	// Configure markers
+	for (int i = 0; i < num_adc_channels; i++) {
+		fft_plot->setMarkerCount(i, 5);
+		for (int m = 0; m < 5; m++) {
+			fft_plot->setMarkerEnabled(i, m, false);
+		}
+	}
+	setActiveMarker(0);
+
 
 	if (ctx)
 		build_gnuradio_block_chain();
@@ -480,14 +502,10 @@ void SpectrumAnalyzer::onChannelSettingsToggled(bool en)
 void SpectrumAnalyzer::onChannelSelected(bool en)
 {
 	SpectrumChannel *sc = static_cast<SpectrumChannel *>(QObject::sender());
-	int old_crt_chn = crt_channel_id;
 	crt_channel_id = sc->id();
 
-	fft_plot->setPeakVisible(old_crt_chn, crt_peak, false);
-	fft_plot->setPeakVisible(crt_channel_id, crt_peak, true);
-
 	if (!ui->run_button->isChecked()) {
-			fft_plot->replot();
+		fft_plot->replot();
 	}
 }
 
@@ -634,38 +652,28 @@ int SpectrumAnalyzer::channelIdOfOpenedSettings() const
 
 void SpectrumAnalyzer::on_btnLeftPeak_clicked()
 {
-	if (crt_peak > 0) {
-		fft_plot->setPeakVisible(crt_channel_id, crt_peak, false);
-		fft_plot->setPeakVisible(crt_channel_id, --crt_peak, true);
-
-		if (!ui->run_button->isChecked()) {
+	fft_plot->marker_to_next_lower_freq_peak(crt_channel_id, crt_marker);
+	if (!ui->run_button->isChecked()) {
+			fft_plot->updateMarkerUi(crt_channel_id, crt_marker);
 			fft_plot->replot();
-		}
 	}
 }
 
 void SpectrumAnalyzer::on_btnRightPeak_clicked()
 {
-	if (crt_peak < max_peak_count - 1) {
-		fft_plot->setPeakVisible(crt_channel_id, crt_peak, false);
-		fft_plot->setPeakVisible(crt_channel_id, ++crt_peak, true);
-
-		if (!ui->run_button->isChecked()) {
+	fft_plot->marker_to_next_higher_freq_peak(crt_channel_id, crt_marker);
+	if (!ui->run_button->isChecked()) {
+			fft_plot->updateMarkerUi(crt_channel_id, crt_marker);
 			fft_plot->replot();
-		}
 	}
 }
 
 void SpectrumAnalyzer::on_btnMaxPeak_clicked()
 {
-	if (crt_peak != 0) {
-		fft_plot->setPeakVisible(crt_channel_id, crt_peak, false);
-		crt_peak = 0;
-		fft_plot->setPeakVisible(crt_channel_id, crt_peak, true);
-
-		if (!ui->run_button->isChecked()) {
+	fft_plot->marker_to_max_peak(crt_channel_id, crt_marker);
+	if (!ui->run_button->isChecked()) {
+			fft_plot->updateMarkerUi(crt_channel_id, crt_marker);
 			fft_plot->replot();
-		}
 	}
 }
 
@@ -732,6 +740,73 @@ void SpectrumAnalyzer::setFftSize(uint size)
 
 	if (started)
 		iio->unlock();
+}
+
+void SpectrumAnalyzer::on_btnPrevMrk_clicked()
+{
+	int m = crt_marker - 1;
+
+	if (m < 0)
+		m = mrk_buttons.size() - 1;
+
+	setActiveMarker(m % mrk_buttons.size());
+}
+
+void SpectrumAnalyzer::on_btnNextMrk_clicked()
+{
+	int m = crt_marker + 1;
+
+	setActiveMarker(m % mrk_buttons.size());
+}
+
+void SpectrumAnalyzer::on_btnDnAmplPeak_clicked()
+{
+	fft_plot->marker_to_next_lower_mag_peak(crt_channel_id, crt_marker);
+	if (!ui->run_button->isChecked()) {
+			fft_plot->updateMarkerUi(crt_channel_id, crt_marker);
+			fft_plot->replot();
+	}
+}
+
+void SpectrumAnalyzer::on_btnUpAmplPeak_clicked()
+{
+	fft_plot->marker_to_next_higher_mag_peak(crt_channel_id, crt_marker);
+	if (!ui->run_button->isChecked()) {
+			fft_plot->updateMarkerUi(crt_channel_id, crt_marker);
+			fft_plot->replot();
+	}
+}
+
+void SpectrumAnalyzer::onMarkerToggled(bool on)
+{
+	QPushButton *btn = static_cast<QPushButton *>(QObject::sender());
+	uint id = btn->property("id").toUInt();
+
+	setMarkerEnabled(id, on);
+}
+
+void SpectrumAnalyzer::setMarkerEnabled(int mrk_idx, bool en)
+{
+	fft_plot->setMarkerEnabled(0, mrk_idx, en);
+	if (en) {
+		double cf = ui->center_freq->value();
+		fft_plot->setMarkerAtFreq(0, mrk_idx, cf);
+	}
+	fft_plot->replot();
+}
+
+void SpectrumAnalyzer::setActiveMarker(int mrk_idx)
+{
+	for (int i = 0; i < mrk_buttons.size(); i++) {
+		setDynamicProperty(mrk_buttons[i], "active", false);
+	}
+
+	if (mrk_idx < 0 || mrk_idx >= mrk_buttons.size()) {
+		return;
+	}
+
+	setDynamicProperty(mrk_buttons[mrk_idx], "active", true);
+	crt_marker = mrk_idx;
 }
 
 /*

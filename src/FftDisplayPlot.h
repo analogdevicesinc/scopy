@@ -30,7 +30,13 @@ namespace adiscope {
 
 namespace adiscope {
 
+	struct marker {
+		std::shared_ptr<struct marker_data> data;
+		std::shared_ptr<SpectrumMarker> ui;
+	};
+
 	struct marker_data {
+		int type;
 		float x;
 		float y;
 		int bin;
@@ -71,8 +77,9 @@ namespace adiscope {
 		std::vector<average_sptr> d_ch_avg_obj;
 
 		QList<int> d_num_markers;
-		QList<QList<struct marker_data>> d_markers;
-		QList<QList<SpectrumMarker *>> d_gui_markers;
+		QList<QList<marker>> d_markers;
+		QList<QList<std::shared_ptr<struct marker_data>>> d_peaks;
+		QList<QList<std::shared_ptr<struct marker_data>>> d_freq_asc_sorted_peaks;
 
 		void plotData(const std::vector<double *> pts,
 				uint64_t num_points);
@@ -84,10 +91,14 @@ namespace adiscope {
 		void add_marker(int chn);
 		void remove_marker(int chn, int which);
 
+		void findPeaks(int chn);
+		void calculate_fixed_markers(int chn);
+
 	public:
 		explicit FftDisplayPlot(int nplots, QWidget *parent = nullptr);
 		~FftDisplayPlot();
 
+		int64_t posAtFrequency(double freq) const;
 		QString leftVerAxisUnit() const;
 		void setLeftVertAxisUnit(const QString& unit);
 		enum AverageType averageType(uint chIdx) const;
@@ -96,11 +107,29 @@ namespace adiscope {
 			uint history);
 		void resetAverageHistory();
 
+		// Markers
 		uint peakCount(uint chIdx) const;
 		void setPeakCount(uint chIdx, uint count);
-		bool isPeakVisible(uint chIdx, uint peakIdx) const;
-		void setPeakVisible(uint chnIdx, uint peakIdx, bool on);
-		void findPeaks(int chn);
+
+		uint markerCount(uint chIdx) const;
+		void setMarkerCount(uint chIdx, uint count);
+
+		bool markerEnabled(uint chIdx, uint mkIdx) const;
+		void setMarkerEnabled(uint chIdx, uint mkIdx, bool en);
+
+		double markerFrequency(uint chIdx, uint mkIdx) const;
+		double markerMagnutide(uint chIdx, uint mkIdx) const;
+
+		void setMarkerAtFreq(uint chIdx, uint mkIdx, double pos);
+
+		void marker_to_max_peak(uint chIdx, uint mkIdx);
+		void marker_to_next_higher_freq_peak(uint chIdx, uint mkIdx);
+		void marker_to_next_lower_freq_peak(uint chIdx, uint mkIdx);
+		void marker_to_next_higher_mag_peak(uint chIdx, uint mkIdx);
+		void marker_to_next_lower_mag_peak(uint chIdx, uint mkIdx);
+
+		void updateMarkerUi(uint chIdx, uint mkIdx);
+		void updateMarkersUi();
 
 		void replot();
 

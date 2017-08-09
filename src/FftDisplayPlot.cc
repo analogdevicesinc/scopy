@@ -45,8 +45,11 @@ FftDisplayPlot::FftDisplayPlot(int nplots, QWidget *parent) :
 		d_ch_average_type.push_back(AverageType::SAMPLE);
 
 		d_num_markers.push_back(0);
-		d_markers.push_back(QList<marker_data>());
-		d_gui_markers.push_back(QList<SpectrumMarker *>());
+		d_markers.push_back(QList<marker>());
+		d_peaks.push_back(
+			QList<std::shared_ptr<marker_data>>());
+		d_freq_asc_sorted_peaks.push_back(
+			QList<std::shared_ptr<marker_data>>());
 	}
 	d_ch_avg_obj.resize(nplots);
 
@@ -169,6 +172,7 @@ void FftDisplayPlot::plotData(const std::vector<double *> pts,
 	_resetXAxisPoints();
 
 	for (int i = 0; i < d_nplots; i++) {
+		calculate_fixed_markers(i);
 		findPeaks(i);
 	}
 
@@ -185,6 +189,17 @@ void FftDisplayPlot::_resetXAxisPoints()
 		x_data[loc] = freqValue;
 		freqValue += fft_bin_size;
 	}
+}
+
+int64_t FftDisplayPlot:: posAtFrequency(double freq) const
+{
+	int64_t pos;
+	double fft_bin_size = (d_stop_frequency - d_start_frequency)
+		/ static_cast<double>(d_numPoints);
+
+	pos = qRound64((freq - d_start_frequency) / (fft_bin_size));
+
+	return pos;
 }
 
 void FftDisplayPlot::customEvent(QEvent *e)
@@ -299,7 +314,8 @@ void FftDisplayPlot::setLeftVertAxisUnit(const QString& unit)
 
 void FftDisplayPlot::findPeaks(int chn)
 {
-	QList<struct marker_data>& markers = d_markers[chn];
+	QList<std::shared_ptr<struct marker_data>>& markers = d_peaks[chn];
+	QList<std::shared_ptr<struct marker_data>>& f_sort_mrks = d_freq_asc_sorted_peaks[chn];
 	int marker_count = markers.size();
 	int maxX[marker_count + 1];
 	float maxY[marker_count + 1];
@@ -332,24 +348,56 @@ void FftDisplayPlot::findPeaks(int chn)
 	}
 
 	for (int i = 0; i < marker_count; i++) {
-		markers[i].x = x[maxX[i]];
-		markers[i].y = y[maxX[i]];
-		markers[i].bin = maxX[i];
+		markers[i]->x = x[maxX[i]];
+		markers[i]->y = y[maxX[i]];
+		markers[i]->bin = maxX[i];
+	}
 
-		d_gui_markers[chn][i]->setValue(markers[i].x, markers[i].y);
+	for (int i = 0; i < markers.size(); i++) {
+		f_sort_mrks[i] = markers[i];
+	}
+	std::sort(f_sort_mrks.begin(), f_sort_mrks.end(),
+		[](const std::shared_ptr<struct marker_data> m1,
+			const std::shared_ptr<struct marker_data> m2) -> bool
+			{
+				return m1->x < m2->x;
+			});
+
+	updateMarkersUi();
+}
+
+void FftDisplayPlot::updateMarkerUi(uint chIdx, uint mkIdx)
+{
+	auto marker = d_markers[chIdx][mkIdx];
+
+	// update marker ony if active
+	if (marker.data) {
+		marker.ui->setValue(marker.data->x, marker.data->y);
+	}
+}
+
+void FftDisplayPlot::updateMarkersUi()
+{
+	for (int c = 0; c < d_nplots; c++) {
+		for (int i = 0; i < d_markers[c].size(); i++) {
+			updateMarkerUi(c, i);
+		}
 	}
 }
 
 void FftDisplayPlot::add_marker(int chn)
 {
-	QString markerName = QString("M%1").arg(d_markers[chn].size());
-	// Data Marker
-	struct marker_data data_marker;
-	data_marker.label = markerName;
-	d_markers[chn].push_back(data_marker);
+	QString markerName = QString("M%1").arg(d_markers[chn].size() + 1);
 
-	// GUI Marker
-	SpectrumMarker *gui_marker = new SpectrumMarker(markerName);
+	// Data marker
+	auto marker_data = std::make_shared<struct marker_data>();
+	marker_data->type = 0; // Fixed marker
+	marker_data->x = 0;
+	marker_data->y = 0;
+	marker_data->bin = 0;
+
+	// GUI marker
+	auto gui_marker = std::make_shared<SpectrumMarker>(markerName);
 	QwtSymbol *symbol = new QwtSymbol(
 		QwtSymbol::Diamond,QColor(255, 242, 0),
 		QPen(QColor(237, 28, 36), 2, Qt::SolidLine),
@@ -370,34 +418,75 @@ void FftDisplayPlot::add_marker(int chn)
 	mrk_lbl.setFont(lbl_font);
 	gui_marker->setLabel(mrk_lbl);
 
-	d_gui_markers[chn].push_back(gui_marker);
+	struct marker marker;
+	marker.data = marker_data;
+	marker.ui = gui_marker;
+	d_markers[chn].push_back(marker);
 }
 
 void FftDisplayPlot::remove_marker(int chn, int which)
 {
 	if (which < d_markers[chn].size()) {
+		d_markers[chn][which].ui->detach();
 		d_markers[chn].removeAt(which);
-		d_gui_markers[chn][which]->detach();
-		delete d_gui_markers[chn][which];
-		d_gui_markers[chn].removeAt(which);
+	}
+}
+
+void FftDisplayPlot::calculate_fixed_markers(int chn)
+{
+	for (int i = 0; i < d_markers[chn].size(); i++) {
+		// update active markers only
+		auto marker = d_markers[chn][i];
+		if (marker.data && marker.data->type == 0) {
+			marker.data->y = y_data[chn][marker.data->bin];
+			marker.data->x = x_data[marker.data->bin];
+		}
 	}
 }
 
 uint FftDisplayPlot::peakCount(uint chIdx) const
 {
-	if (chIdx >= d_markers.size())
+	if (chIdx >= d_peaks.size())
 		return 0;
 
-	return d_markers[chIdx].size();
+	return d_peaks[chIdx].size();
 }
 
 void FftDisplayPlot::setPeakCount(uint chIdx, uint count)
 {
-	if (chIdx >= d_markers.size())
+	if (chIdx >= d_peaks.size())
 		return;
 
-	if (d_markers[chIdx].size() == count)
+	if (d_peaks[chIdx].size() == count)
 		return;
+
+
+	d_peaks[chIdx].clear();
+	d_freq_asc_sorted_peaks[chIdx].clear();
+
+	for (uint i = 0; i < count; i++) {
+		auto data_marker_sp = std::make_shared<struct marker_data>();
+		data_marker_sp->type = 1; // Peak marker
+		d_peaks[chIdx].push_back(data_marker_sp);
+		d_freq_asc_sorted_peaks[chIdx].push_back(data_marker_sp);
+	}
+}
+
+uint FftDisplayPlot::markerCount(uint chIdx) const
+{
+	return d_markers[chIdx].size();
+}
+
+void FftDisplayPlot::setMarkerCount(uint chIdx, uint count)
+{
+	if (chIdx >= d_markers.size()) {
+		qDebug() << "Invalid channel index!";
+		return;
+	}
+
+	if (d_markers[chIdx].size() == count) {
+		return;
+	}
 
 	while (d_markers[chIdx].size()) {
 		remove_marker(chIdx, 0);
@@ -408,24 +497,169 @@ void FftDisplayPlot::setPeakCount(uint chIdx, uint count)
 	}
 }
 
-bool FftDisplayPlot::isPeakVisible(uint chIdx, uint peakIdx) const
+bool FftDisplayPlot::markerEnabled(uint chIdx, uint mkIdx) const
 {
-	if (chIdx >= d_markers.size())
-		return false;
-
-	if (peakIdx >= d_markers[chIdx].size())
-		return false;
-
-	return d_gui_markers[chIdx][peakIdx]->isVisible();
+	return !!d_markers[chIdx][mkIdx].data;
 }
 
-void FftDisplayPlot::setPeakVisible(uint chIdx, uint peakIdx, bool on)
+void FftDisplayPlot::setMarkerEnabled(uint chIdx, uint mkIdx, bool en)
 {
-	if (chIdx >= d_markers.size())
+	if (chIdx >= d_markers.size()) {
+		qDebug() << "Invalid channel index!";
+		return;
+	}
+
+	if (mkIdx >= d_markers[chIdx].size()) {
+		qDebug() << "Invalid marker index";
+		return;
+	}
+
+	if (en) {
+		auto data_sp = std::make_shared<struct marker_data>();
+		data_sp->x = 0;
+		data_sp->y = axisScaleDiv(QwtPlot::yLeft).lowerBound();
+		data_sp->bin = 0;
+
+		d_markers[chIdx][mkIdx].data = data_sp;
+		d_markers[chIdx][mkIdx].ui->setValue(data_sp->x, data_sp->y);
+	} else {
+		d_markers[chIdx][mkIdx].data = nullptr;
+	}
+
+	d_markers[chIdx][mkIdx].ui->setVisible(en);
+}
+
+double FftDisplayPlot::markerFrequency(uint chIdx, uint mkIdx) const
+{
+	if (chIdx >= d_markers.size()) {
+		qDebug() << "Invalid channel index!";
+		return 0;
+	}
+
+	if (mkIdx >= d_markers[chIdx].size()) {
+		qDebug() << "Invalid marker index";
+		return 0;
+	}
+
+	return d_markers[chIdx][mkIdx].data->x;
+}
+
+double FftDisplayPlot::markerMagnutide(uint chIdx, uint mkIdx) const
+{
+	if (chIdx >= d_markers.size()) {
+		qDebug() << "Invalid channel index!";
+		return 0;
+	}
+
+	if (mkIdx >= d_markers[chIdx].size()) {
+		qDebug() << "Invalid marker index";
+		return 0;
+	}
+
+	return d_markers[chIdx][mkIdx].data->y;
+}
+
+void FftDisplayPlot::setMarkerAtFreq(uint chIdx, uint mkIdx, double freq)
+{
+	if (chIdx >= d_markers.size()) {
+		qDebug() << "Invalid channel index!";
+		return;
+	}
+
+	if (mkIdx >= d_markers[chIdx].size()) {
+		qDebug() << "Invalid marker index";
+		return;
+	}
+
+	int64_t pos = posAtFrequency(freq);
+	if (pos < 0 && pos > d_numPoints) {
+		qDebug() << "Invalid frenquency!";
+		return;
+	}
+	d_markers[chIdx][mkIdx].data->bin = pos;
+}
+
+void FftDisplayPlot::marker_to_max_peak(uint chIdx, uint mkIdx)
+{
+	d_markers[chIdx][mkIdx].data = d_peaks[chIdx][0];
+}
+
+void FftDisplayPlot::marker_to_next_higher_freq_peak(uint chIdx, uint mkIdx)
+{
+	auto peaks = d_freq_asc_sorted_peaks[chIdx];
+	double freq = d_markers[chIdx][mkIdx].ui->value().x();
+	int pos = -1;
+
+	// find the first peak with the freq higher that marker freq pos
+	for (int i = 0; i < peaks.size(); i++) {
+		if (peaks[i]->x > freq) {
+			pos = i;
+			break;
+		}
+	}
+
+	if (pos < 0)
 		return;
 
-	if (peakIdx >= d_markers[chIdx].size())
+	d_markers[chIdx][mkIdx].data = peaks[pos];
+}
+
+void FftDisplayPlot::marker_to_next_lower_freq_peak(uint chIdx, uint mkIdx)
+{
+	auto peaks = d_freq_asc_sorted_peaks[chIdx];
+	double freq = d_markers[chIdx][mkIdx].ui->value().x();
+	int pos = -1;
+
+	// find the first peak with the freq lower that marker freq pos
+	for (int i = peaks.size() - 1; i >= 0; i--) {
+		if (peaks[i]->x < freq) {
+			pos = i;
+			break;
+		}
+	}
+
+	if (pos < 0)
 		return;
 
-	d_gui_markers[chIdx][peakIdx]->setVisible(on);
+	d_markers[chIdx][mkIdx].data = peaks[pos];
+}
+
+void FftDisplayPlot::marker_to_next_higher_mag_peak(uint chIdx, uint mkIdx)
+{
+	auto peaks = d_peaks[chIdx];
+	double mag = d_markers[chIdx][mkIdx].ui->value().y();
+	int pos = -1;
+
+	// find the first peak with the magnitude higher than the current marker
+	for (int i = peaks.size() - 1; i >= 0; i--) {
+		if (peaks[i]->y > mag) {
+			pos = i;
+			break;
+		}
+	}
+
+	if (pos < 0)
+		return;
+
+	d_markers[chIdx][mkIdx].data = peaks[pos];
+}
+
+void FftDisplayPlot::marker_to_next_lower_mag_peak(uint chIdx, uint mkIdx)
+{
+	auto peaks = d_peaks[chIdx];
+	double mag = d_markers[chIdx][mkIdx].ui->value().y();
+	int pos = -1;
+
+	// find the first peak with the magnitude lower than the current marker
+	for (int i = 0; i < peaks.size(); i++) {
+		if (peaks[i]->y < mag) {
+			pos = i;
+			break;
+		}
+	}
+
+	if (pos < 0)
+		return;
+
+	d_markers[chIdx][mkIdx].data = peaks[pos];
 }

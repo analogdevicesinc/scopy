@@ -47,8 +47,6 @@ namespace Ui {
 	class Channel;
 }
 
-class PositionSpinButton;
-
 namespace adiscope {
 	class SpectrumChannel;
 	class Filter;
@@ -100,8 +98,13 @@ private Q_SLOTS:
 	void onChannelEnabled(bool);
 	void onStartStopChanged();
 	void onCenterSpanChanged();
+	void onMarkerToggled(bool);
+	void on_btnPrevMrk_clicked();
+	void on_btnNextMrk_clicked();
 	void on_btnLeftPeak_clicked();
 	void on_btnRightPeak_clicked();
+	void on_btnUpAmplPeak_clicked();
+	void on_btnDnAmplPeak_clicked();
 	void on_btnMaxPeak_clicked();
 	void on_cmb_rbw_currentIndexChanged(int index);
 
@@ -112,14 +115,11 @@ private:
 	int channelIdOfOpenedSettings() const;
 	void setSampleRate(double sr);
 	void setFftSize(uint size);
+	void setMarkerEnabled(int mrk_idx, bool en);
+	void setActiveMarker(int mrk_idx);
 
 private:
 	Ui::SpectrumAnalyzer *ui;
-
-	PositionSpinButton *ui_startFreq;
-	PositionSpinButton *ui_stopFreq;
-	PositionSpinButton *ui_centerFreq;
-	PositionSpinButton *ui_span;
 
 	QButtonGroup *settings_group;
 	QButtonGroup *channels_group;
@@ -137,12 +137,15 @@ private:
 	int adc_bits_count;
 	int crt_channel_id;
 	int crt_peak;
+	int crt_marker;
 	uint max_peak_count;
 	double sample_rate;
 	int sample_rate_divider;
 	uint fft_size;
 	QList<uint> bin_sizes;
 	MetricPrefixFormatter freq_formatter;
+
+	QList<QPushButton *> mrk_buttons;
 
 	gr::top_block_sptr top_block;
 
