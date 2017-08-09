@@ -99,23 +99,37 @@
         <number>10</number>
        </property>
        <item>
-        <widget class="QCheckBox" name="FFT_view">
+        <widget class="QLabel" name="label_2">
          <property name="text">
-          <string>FFT</string>
+          <string>FFT:</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="XY_view">
+        <widget class="adiscope::CustomSwitch" name="FFT_view">
          <property name="text">
-          <string>X-Y</string>
+          <string/>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="Histogram_view">
+        <widget class="QLabel" name="label_3">
          <property name="text">
-          <string>Histogram</string>
+          <string>X-Y:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="adiscope::CustomSwitch" name="XY_view">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="adiscope::CustomSwitch" name="Histogram_view">
+         <property name="text">
+          <string/>
          </property>
         </widget>
        </item>
@@ -141,6 +155,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>adiscope::CustomSwitch</class>
+   <extends>QPushButton</extends>
+   <header>customSwitch.hpp</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
