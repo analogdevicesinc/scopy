@@ -1213,18 +1213,13 @@ void View::remove_trace_clones()
 void View::set_timebase(double value)
 {
 
-	if( session_.get_capture_state() == Session::Running )
+	if( session_.get_capture_state() != Session::Running )
 	{
-		session_.stop_capture();
 		set_scale_offset(value, offset_);
 		session_.set_timeSpan(value * DivisionCount);
-		session_.start_capture([&](QString message) {
-			session_error("Capture failed", message); });
 	}
-	else
-	{
+	else {
 		set_scale_offset(value, offset_);
-		session_.set_timeSpan(value * DivisionCount);
 	}
 	capture_scale = scale_;
 }

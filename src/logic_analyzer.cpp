@@ -110,7 +110,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	armed(false),
 	state_timer(new QTimer(this)),
 	trigger_state("Stop"),
-	offline_mode(offline_mode_)
+	offline_mode(offline_mode_),
+	zoomed_in(false)
 {
 	ui->setupUi(this);
 	timer->setSingleShot(true);
@@ -474,17 +475,18 @@ void LogicAnalyzer::resizeEvent()
 	if(!initialised) {
 		updateAreaTimeTrigger();
 		timePosition->setValue(0);
-		value_cursor1 = -(timeBase->value() * 3 + active_plot_timebase * 10 / 2 - active_timePos);
-		value_cursor2 = -(timeBase->value() * 6 + active_plot_timebase * 10 / 2 - active_timePos);
+		value_cursor1 = -(active_timePos - timeBase->value() * 2);
+		value_cursor2 = -(active_timePos + timeBase->value() * 2);
 		cursorValueChanged_1(timeToPixel(value_cursor1));
 		cursorValueChanged_2(timeToPixel(value_cursor2));
 		initialised = true;
 	}
-	int x1 = timeToPixel(value_cursor1);
+
+	int x1 = timeToPixel(value_cursor1 - active_timePos);
 	d_hCursorHandle1->setPositionSilenty(x1);
 	main_win->view_->viewport()->cursorValueChanged_1(x1);
 
-	int x2 = timeToPixel(value_cursor2);
+	int x2 = timeToPixel(value_cursor2 - active_timePos);
 	d_hCursorHandle2->setPositionSilenty(x2);
 	main_win->view_->viewport()->cursorValueChanged_2(x2);
 
@@ -581,7 +583,8 @@ void LogicAnalyzer::set_triggered_status(std::string value)
 
 void LogicAnalyzer::onHorizScaleValueChanged(double value)
 {
-	configParams(value, timePosition->value());
+	zoomed_in = false;
+	configParams(value, active_timePos);
 }
 
 void LogicAnalyzer::enableTrigger(bool value)
@@ -652,6 +655,7 @@ void LogicAnalyzer::onRulerChanged(double ruler_value, bool silent)
 			timePosition->setValue(timePos);
 	}
 	else {
+		zoomed_in = true;
 		active_plot_timebase = main_win->view_->scale();
 		int pix = timeToPixel(-timePos);
 		if( pix != d_timeTriggerHandle->position() )
@@ -668,9 +672,11 @@ void LogicAnalyzer::onRulerChanged(double ruler_value, bool silent)
 			setTimebaseLabel(active_plot_timebase);
 		}
 	}
+
 	int trigX = timeToPixel(-active_timePos);
 	d_timeTriggerHandle->setPositionSilenty(trigX);
 	main_win->view_->viewport()->setTimeTriggerPixel(trigX);
+
 	main_win->view_->time_item_appearance_changed(true, true);
 	updateBufferPreviewer();
 }
@@ -692,7 +698,8 @@ void LogicAnalyzer::configParams(double timebase, double timepos)
 	timePosition->blockSignals(true);
 
 	timePosition->setValue(timepos);
-	timeBase->setValue(timebase);
+	if(!zoomed_in)
+		timeBase->setValue(timebase);
 
 	timeBase->blockSignals(false);
 	timePosition->blockSignals(false);
@@ -800,7 +807,6 @@ void LogicAnalyzer::configParams(double timebase, double timepos)
                 int trigX = timeToPixel(-active_timePos);
                 d_timeTriggerHandle->setPositionSilenty(trigX);
                 main_win->view_->viewport()->setTimeTriggerPixel(trigX);
-                main_win->view_->time_item_appearance_changed(true, true);
 
                 // Change the sensitivity of time position control
                 timePosition->setStep(timebase / 10);
@@ -808,11 +814,12 @@ void LogicAnalyzer::configParams(double timebase, double timepos)
                 updateBufferPreviewer();
         }
 
+        main_win->view_->time_item_appearance_changed(true, true);
 }
 
 void LogicAnalyzer::onTimePositionSpinboxChanged(double value)
 {
-        configParams(timeBase->value(), value);
+        configParams(active_plot_timebase, value);
 }
 
 void LogicAnalyzer::onTimeTriggerHandlePosChanged(int pos)
@@ -863,8 +870,10 @@ void LogicAnalyzer::startStop(bool start)
 			running = false;
 		}
 		last_set_sample_count = active_sampleCount;
-		if(main_win->view_->scale() != timeBase->value())
+		if(main_win->view_->scale() != timeBase->value()){
+			zoomed_in = false;
 			Q_EMIT timeBase->valueChanged(timeBase->value());
+		}
 		main_win->view_->viewport()->disableDrag();
 		setBuffersizeLabelValue(active_sampleCount);
 		setSamplerateLabelValue(active_sampleRate);
@@ -873,8 +882,6 @@ void LogicAnalyzer::startStop(bool start)
 		ui->btnRunStop->setText("Stop");
 		setHWTriggerDelay(active_triggerSampleCount);
 		setTriggerDelay();
-//		if (timePosition->value() != active_timePos)
-//			timePosition->setValue(active_timePos);
 		if(!armed)
 			armed = true;
 		state_timer->start(2);
@@ -927,8 +934,10 @@ void LogicAnalyzer::singleRun()
 		ui->btnRunStop->setChecked(false);
 	}
 	last_set_sample_count = active_sampleCount;
-	if(main_win->view_->scale() != timeBase->value())
+	if(main_win->view_->scale() != timeBase->value()){
+		zoomed_in = false;
 		Q_EMIT timeBase->valueChanged(timeBase->value());
+	}
 	setSampleRate();
 	running = true;
 	setBuffersizeLabelValue(active_sampleCount);
@@ -1240,7 +1249,7 @@ void LogicAnalyzer::cursorValueChanged_1(int pos)
 	value_cursor1 = -(pixelToTime(pos) + active_plot_timebase * 10 / 2 - active_timePos);
 	if( ui->btnCursorsLock->isChecked() ) {
 		value_cursor2 = value_cursor1 - value_cursors_delta;
-		int pairPos = timeToPixel(value_cursor2);
+		int pairPos = timeToPixel(value_cursor2 - active_timePos);
 		d_hCursorHandle2->setPositionSilenty(pairPos);
 		QString text = d_cursorTimeFormatter.format(value_cursor2, "", 3);
 		ui->lblCursor2->setText(text);
@@ -1261,7 +1270,7 @@ void LogicAnalyzer::cursorValueChanged_2(int pos)
 	if( ui->btnCursorsLock->isChecked() ) {
 
 		value_cursor1 = value_cursors_delta + value_cursor2;
-		int pairPos = timeToPixel(value_cursor1);
+		int pairPos = timeToPixel(value_cursor1-active_timePos);
 		d_hCursorHandle1->setPositionSilenty(pairPos);
 		QString text = d_cursorTimeFormatter.format(value_cursor1, "", 3);
 		ui->lblCursor1->setText(text);
@@ -1280,8 +1289,8 @@ void LogicAnalyzer::recomputeCursorsValue(bool zoom)
 {
 	int x1 = d_hCursorHandle1->position();
 	int x2 = d_hCursorHandle2->position();
-	value_cursor2 = -(pixelToTime(x1) + active_plot_timebase * 10 / 2 - active_timePos);
-	value_cursor1 = -(pixelToTime(x2) + active_plot_timebase * 10 / 2 - active_timePos);
+	value_cursor2 = -(pixelToTime(x2) + active_plot_timebase * 10 / 2 - active_timePos);
+	value_cursor1 = -(pixelToTime(x1) + active_plot_timebase * 10 / 2 - active_timePos);
 	QString text = d_cursorTimeFormatter.format(value_cursor2, "", 3);
 	ui->lblCursor2->setText(text);
 	text = d_cursorTimeFormatter.format(value_cursor1, "", 3);

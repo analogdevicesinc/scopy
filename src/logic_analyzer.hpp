@@ -254,6 +254,7 @@ private:
 	MouseWheelWidgetGuard *wheelEventGuard;
 	bool offline_mode;
 	int acquisition_mode;
+	bool zoomed_in;
 
 	void configParams(double timebase, double timepos);
 };
