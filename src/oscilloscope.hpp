@@ -34,6 +34,7 @@
 #include <QVector>
 #include <QWidget>
 #include <QButtonGroup>
+#include <QMap>
 
 /* Local includes */
 #include "apiObject.hpp"
@@ -52,6 +53,7 @@
 #include "plot_utils.hpp"
 #include "osc_adc.h"
 #include "tool.hpp"
+#include "osc_export_settings.h"
 
 class QJSEngine;
 class SymmetricBufferMode;
@@ -96,8 +98,11 @@ namespace adiscope {
 		void triggerBLevelChanged(double);
 		void triggerPositionChanged(double);
 		void selectedChannelChanged(int);
+		void activateExportButton();
 
 	private Q_SLOTS:
+		void btnExport_clicked();
+
 		void on_actionClose_triggered();
 		void on_boxCursors_toggled(bool on);
 		void on_boxMeasure_toggled(bool on);
@@ -186,6 +191,9 @@ namespace adiscope {
 		Ui::CursorsSettings *cr_ui;
 		QWidget *statisticsPanel;
 		AnalogBufferPreviewer *buffer_previewer;
+		ExportSettings *exportSettings;
+
+		QMap<int, bool> exportConfig;
 
 		std::shared_ptr<SymmetricBufferMode> symmBufferMode;
 
@@ -277,6 +285,8 @@ namespace adiscope {
 		void statisticsUpdateGuiPosIndex();
 
 		void updateBufferPreviewer();
+		void export_settings_init();
+		void pause(bool paused);
 	};
 
 	class Oscilloscope_API : public ApiObject

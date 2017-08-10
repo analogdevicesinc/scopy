@@ -40,6 +40,7 @@
 #include "state_updater.h"
 #include "osc_capture_params.hpp"
 #include "buffer_previewer.hpp"
+#include "config.h"
 
 /* Generated UI */
 #include "ui_math_panel.h"
@@ -529,6 +530,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		current_channel = crt_chn_copy;
 	}
 
+	export_settings_init();
+
 	api->setObjectName(QString::fromStdString(Filter::tool_name(
 			TOOL_OSCILLOSCOPE)));
 	api->load(*settings);
@@ -575,6 +578,108 @@ Oscilloscope::~Oscilloscope()
 	delete cursor_readouts_ui;
 	delete cr_ui;
 	delete ui;
+}
+
+void Oscilloscope::pause(bool paused)
+{
+	if (ui->pushButtonRunStop->isChecked()){
+		toggle_blockchain_flow(!paused);
+		trigger_settings.setAdcRunningState(!paused);
+	}
+}
+
+void Oscilloscope::export_settings_init()
+{
+
+	exportSettings = new ExportSettings();
+	exportSettings->enableExportButton(false);
+	gsettings_ui->verticalLayout_2->insertWidget(3 ,exportSettings);
+
+	for (int i = 0; i < nb_channels; ++i){
+		exportSettings->addChannel(i, QString("Channel") +
+					   QString::number(i + 1));
+	}
+
+	connect(exportSettings->getExportButton(), SIGNAL(clicked()), this,
+		SLOT(btnExport_clicked()));
+	connect(this, &Oscilloscope::activateExportButton,
+		[=](){
+		exportSettings->enableExportButton(true);
+	});
+}
+
+void Oscilloscope::btnExport_clicked(){
+
+	exportConfig = exportSettings->getExportConfig();
+	pause(true);
+	auto export_dialog( new QFileDialog( this ) );
+	export_dialog->setWindowModality( Qt::WindowModal );
+	export_dialog->setFileMode( QFileDialog::AnyFile );
+	export_dialog->setAcceptMode( QFileDialog::AcceptSave );
+	export_dialog->setNameFilters({"Comma-separated values files (*.csv)",
+					       "Tab-delimited values files (*.txt)"});
+	bool atleastOneChannelEnabled = false;
+	for (auto x : exportConfig.keys())
+		if (exportConfig[x]){
+			atleastOneChannelEnabled = true;
+			break;
+		}
+	if (!atleastOneChannelEnabled){
+		return;
+	}
+
+	if (export_dialog->exec()){
+		QString filter = export_dialog->selectedNameFilter();
+		QFile f(export_dialog->selectedFiles().at(0));
+		f.open(QIODevice::WriteOnly);
+		QTextStream outputStream(&f);
+		QString separator = "";
+		if (filter.contains(".txt")){
+			separator += "\t";
+		} else if (filter.contains(".csv")){
+			separator += ",";
+		}
+
+		//write header data
+		outputStream << "Scopy Version:" << separator << QString(SCOPY_VERSION_GIT) << "\n";
+		//TO DO: add more details for the device
+		outputStream << "Device:" << separator << "M2K" << "\n";
+		outputStream << "Generated on:" << separator << QDate::currentDate().toString("dddd MMMM dd/MM/yyyy") << "\n";
+		//get nr of samples
+		int samples = plot.Curve(0)->data()->size();
+		outputStream << "Nr of samples:" << separator << QString::number(samples) << "\n";
+
+		outputStream << "Sample" << separator;
+		outputStream << "Time(s)" << separator;
+		int channels_number = nb_channels + nb_math_channels;
+		for (int i = 0; i < channels_number; ++i){
+			if (exportConfig[i]){
+				QString chNo = (i > 1) ? QString::number(i - 1) : QString::number(i + 1);
+				outputStream << ((i > 1) ? "Math" : "Channel") + chNo + "(V)"
+					<< ((i == channels_number - 1) ? "\n" : separator);
+			} else {
+				if (i == channels_number - 1){
+					outputStream << "\n";
+				}
+			}
+		}
+		for (int i = 0; i < samples; ++i){
+			outputStream << QString::number(i) << separator;
+			outputStream << plot.Curve(0)->data()->sample(i).x() << separator;
+			for (int j = 0; j < channels_number; ++j){
+				if (exportConfig[j]){
+					outputStream << plot.Curve(j)->data()->sample(i).y()
+					<< ((j == channels_number - 1) ? "\n" : separator);
+				} else {
+					if (j == channels_number - 1){
+						outputStream << "\n";
+					}
+				}
+			}
+		}
+		f.close();
+	}
+	pause(false);
 }
 
 void Oscilloscope::create_math_panel()
@@ -684,6 +789,8 @@ void Oscilloscope::add_math_channel(const std::string& function)
 	channel_ui.setupUi(channel_widget);
 	channel_ui.name->setText(QString("Math %1").arg(curve_number + 1));
 
+	exportSettings->addChannel(curve_id, channel_ui.name->text());
+
 	QString stylesheet(channel_ui.box->styleSheet());
 	stylesheet += QString("\nQCheckBox::indicator {\nborder-color: %1;\n}\nQCheckBox::indicator:checked {\nbackground-color: %1;\n}\n"
 			).arg(plot.getLineColor(curve_id).name());
@@ -775,6 +882,8 @@ void Oscilloscope::del_math_channel()
 	plot.unregisterSink(qname.toStdString());
 
 	nb_math_channels--;
+	exportSettings->removeChannel(curve_id);
+	exportConfig.remove(curve_id);
 
 	/* Lock the flowgraph if we are already started */
 	bool started = iio->started();
@@ -875,6 +984,8 @@ void Oscilloscope::toggle_blockchain_flow(bool en)
 
 void Oscilloscope::runStopToggled(bool checked)
 {
+
+	Q_EMIT activateExportButton();
 	QPushButton *btn = static_cast<QPushButton *>(QObject::sender());
 	setDynamicProperty(btn, "running", checked);
 
@@ -1975,6 +2086,7 @@ void Oscilloscope::onStatisticsReset()
 
 void Oscilloscope::singleCaptureDone()
 {
+	Q_EMIT activateExportButton();
 	ui->pushButtonSingle->setChecked(false);
 }
 
