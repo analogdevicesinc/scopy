@@ -98,12 +98,14 @@ void FftDisplayPlot::plotData(const std::vector<double *> pts,
 		uint64_t num_points)
 {
 	uint64_t halfNumPoints = num_points / 2;
+	bool numPointsChanged = false;
 
 	if (d_stop || halfNumPoints == 0)
 		return;
 
 	if (halfNumPoints != d_numPoints) {
 		d_numPoints = halfNumPoints;
+		numPointsChanged = true;
 
 		if (x_data)
 			delete []x_data;
@@ -171,6 +173,21 @@ void FftDisplayPlot::plotData(const std::vector<double *> pts,
 	}
 
 	_resetXAxisPoints();
+
+	if (numPointsChanged) {
+		// When the number of points change but the start and stop freq
+		// stay the same, we need to update the position of fixed markers
+		for (int c = 0; c < d_nplots; c++) {
+			for (int m = 0; m < d_markers[c].size(); m++) {
+				auto marker = d_markers[c][m];
+				if (!marker.data || marker.data->type != 0)
+					continue;
+
+				marker.data->bin = posAtFrequency(marker.data->x);
+				marker.data->x = x_data[marker.data->bin];
+			}
+		}
+	}
 
 	for (int i = 0; i < d_nplots; i++) {
 		calculate_fixed_markers(i);
