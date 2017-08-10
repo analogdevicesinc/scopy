@@ -653,6 +653,11 @@ void Session::feed_in_logic(shared_ptr<Logic> logic)
 		// This could be the first packet after a trigger
 		set_capture_state(Running);
 
+
+		// Clear signal data before creating another segment
+		for (const shared_ptr<data::SignalData> d : get_data())
+			d->clear_old_data();
+
 		// Create a new data segment
 		cur_logic_segment_ = shared_ptr<data::LogicSegment>(
 			new data::LogicSegment(

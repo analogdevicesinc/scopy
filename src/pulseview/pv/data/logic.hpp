@@ -23,7 +23,11 @@
 
 #include "signaldata.hpp"
 
+#include <boost/thread/locks.hpp>
+#include <boost/thread/shared_mutex.hpp>
 #include <deque>
+using boost::shared_mutex;
+using boost::shared_lock;
 
 namespace pv {
 namespace data {
@@ -50,10 +54,10 @@ public:
 	void clear_old_data();
 
 	uint64_t max_sample_count() const;
-
 private:
 	const unsigned int num_channels_;
 	std::deque< std::shared_ptr<LogicSegment> > segments_;
+	mutable boost::shared_mutex segments_mutex;
 };
 
 } // namespace data

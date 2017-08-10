@@ -27,6 +27,7 @@ using std::deque;
 using std::max;
 using std::shared_ptr;
 using std::vector;
+using std::lock_guard;
 
 namespace pv {
 namespace data {
@@ -46,27 +47,32 @@ unsigned int Logic::num_channels() const
 void Logic::push_segment(
 	shared_ptr<LogicSegment> &segment)
 {
+	lock_guard<boost::shared_mutex> lock(segments_mutex);
 	segments_.push_front(segment);
 }
 
 const deque< shared_ptr<LogicSegment> >& Logic::logic_segments() const
 {
+	lock_guard<boost::shared_mutex> lock(segments_mutex);
 	return segments_;
 }
 
 vector< shared_ptr<Segment> > Logic::segments() const
 {
+	lock_guard<boost::shared_mutex> lock(segments_mutex);
 	return vector< shared_ptr<Segment> >(
 		segments_.begin(), segments_.end());
 }
 
 void Logic::clear()
 {
+	lock_guard<boost::shared_mutex> lock(segments_mutex);
 	segments_.clear();
 }
 
 void Logic::clear_old_data()
 {
+	lock_guard<boost::shared_mutex> lock(segments_mutex);
 	if(segments_.size() > 1) {
 		segments_.erase(segments_.begin()+1, segments_.end());
 	}
