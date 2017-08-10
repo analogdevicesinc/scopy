@@ -163,7 +163,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	QGridLayout *gLayout = static_cast<QGridLayout *>
 		(ui->widgetPlotContainer->layout());
-	gLayout->addWidget(fft_plot, 0, 0, 1, 1);
+	gLayout->addWidget(fft_plot, 1, 0, 1, 1);
 
 	// Initialize spectrum channels
 	for (int i = 0 ; i < num_adc_channels; i++) {
@@ -225,6 +225,9 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 		}
 	}
 	setActiveMarker(0);
+
+	connect(fft_plot, SIGNAL(newMarkerData()),
+		this, SLOT(onPlotNewMarkerData()));
 
 
 	if (ctx)
@@ -783,6 +786,8 @@ void SpectrumAnalyzer::onMarkerToggled(bool on)
 	uint id = btn->property("id").toUInt();
 
 	setMarkerEnabled(id, on);
+
+	updateCrtMrkLblVisibility();
 }
 
 void SpectrumAnalyzer::setMarkerEnabled(int mrk_idx, bool en)
@@ -791,6 +796,7 @@ void SpectrumAnalyzer::setMarkerEnabled(int mrk_idx, bool en)
 	if (en) {
 		double cf = ui->center_freq->value();
 		fft_plot->setMarkerAtFreq(0, mrk_idx, cf);
+		fft_plot->updateMarkerUi(0, mrk_idx);
 	}
 	fft_plot->replot();
 }
@@ -807,7 +813,46 @@ void SpectrumAnalyzer::setActiveMarker(int mrk_idx)
 
 	setDynamicProperty(mrk_buttons[mrk_idx], "active", true);
 	crt_marker = mrk_idx;
+
+	if (fft_plot->markerEnabled(0, mrk_idx)) {
+		setCurrentMarkerLabelData(0, mrk_idx);
+	}
+
+	updateCrtMrkLblVisibility();
 }
+
+void SpectrumAnalyzer::setCurrentMarkerLabelData(int chIdx, int mkIdx)
+{
+	QString txtFreq = freq_formatter.format(
+			fft_plot->markerFrequency(chIdx, mkIdx), "Hz", 3);
+	QString txtMag = QString::number(
+		fft_plot->markerMagnutide(chIdx, mkIdx), 'f', 3) +
+		QString(" dBFS");
+	QString txt = QString("Marker %1 -> ").arg(mkIdx + 1) +
+		txtFreq + QString(" ") + txtMag;
+	ui->lbl_crtMarkerReading->setText(txt);
+}
+
+void SpectrumAnalyzer::updateCrtMrkLblVisibility()
+{
+	bool visible = false;
+	for (int i = 0; i < mrk_buttons.size(); i++) {
+		if (mrk_buttons[i]->isChecked() && i == crt_marker) {
+			visible = true;
+			break;
+		}
+	}
+	ui->lbl_crtMarkerReading->setVisible(visible);
+}
+
+void SpectrumAnalyzer::onPlotNewMarkerData()
+{
+	// Update top-right label holding the reading of the active marker
+	if (fft_plot->markerEnabled(0, crt_marker)) {
+		setCurrentMarkerLabelData(0, crt_marker);
+	}
+}
+
 
 /*
  * class SpectrumChannel

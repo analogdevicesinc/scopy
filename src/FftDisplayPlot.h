@@ -80,6 +80,7 @@ namespace adiscope {
 		QList<QList<marker>> d_markers;
 		QList<QList<std::shared_ptr<struct marker_data>>> d_peaks;
 		QList<QList<std::shared_ptr<struct marker_data>>> d_freq_asc_sorted_peaks;
+		bool d_emitNewMkrData;
 
 		void plotData(const std::vector<double *> pts,
 				uint64_t num_points);
@@ -90,7 +91,8 @@ namespace adiscope {
 
 		void add_marker(int chn);
 		void remove_marker(int chn, int which);
-
+		void marker_set_pos_source(uint chIdx, uint mkIdx,
+			std::shared_ptr<struct marker_data> source_sptr);
 		void findPeaks(int chn);
 		void calculate_fixed_markers(int chn);
 
@@ -132,6 +134,9 @@ namespace adiscope {
 		void updateMarkersUi();
 
 		void replot();
+
+	Q_SIGNALS:
+		void newMarkerData();
 
 	public Q_SLOTS:
 		void setSampleRate(double sr, double units,

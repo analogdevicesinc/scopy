@@ -107,6 +107,7 @@ private Q_SLOTS:
 	void on_btnDnAmplPeak_clicked();
 	void on_btnMaxPeak_clicked();
 	void on_cmb_rbw_currentIndexChanged(int index);
+	void onPlotNewMarkerData();
 
 private:
 	void build_gnuradio_block_chain();
@@ -117,6 +118,8 @@ private:
 	void setFftSize(uint size);
 	void setMarkerEnabled(int mrk_idx, bool en);
 	void setActiveMarker(int mrk_idx);
+	void setCurrentMarkerLabelData(int chIdx, int mkIdx);
+	void updateCrtMrkLblVisibility();
 
 private:
 	Ui::SpectrumAnalyzer *ui;

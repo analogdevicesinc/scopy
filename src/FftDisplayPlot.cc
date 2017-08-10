@@ -31,7 +31,8 @@ using namespace adiscope;
 FftDisplayPlot::FftDisplayPlot(int nplots, QWidget *parent) :
 	DisplayPlot(nplots, parent),
 	d_start_frequency(0),
-	d_stop_frequency(1000)
+	d_stop_frequency(1000),
+	d_emitNewMkrData(true)
 {
 	for (unsigned int i = 0; i < nplots; i++) {
 		auto plot = new QwtPlotCurve(QString("Data %1").arg(i));
@@ -174,6 +175,9 @@ void FftDisplayPlot::plotData(const std::vector<double *> pts,
 	for (int i = 0; i < d_nplots; i++) {
 		calculate_fixed_markers(i);
 		findPeaks(i);
+
+		if (d_emitNewMkrData)
+			Q_EMIT newMarkerData();
 	}
 
 	replot();
@@ -432,6 +436,14 @@ void FftDisplayPlot::remove_marker(int chn, int which)
 	}
 }
 
+void FftDisplayPlot::marker_set_pos_source(uint chIdx, uint mkIdx,
+			std::shared_ptr<struct marker_data> source_sptr)
+{
+	d_markers[chIdx][mkIdx].data = source_sptr;
+	if (d_emitNewMkrData)
+		Q_EMIT newMarkerData();
+}
+
 void FftDisplayPlot::calculate_fixed_markers(int chn)
 {
 	for (int i = 0; i < d_markers[chn].size(); i++) {
@@ -527,6 +539,13 @@ void FftDisplayPlot::setMarkerEnabled(uint chIdx, uint mkIdx, bool en)
 	}
 
 	d_markers[chIdx][mkIdx].ui->setVisible(en);
+
+	int en_markers = 0;
+	for (int c = 0;  c < d_nplots; c++)
+		for (int m = 0; m < d_markers[c].size(); m++)
+			if (!!d_markers[c][m].data)
+				en_markers++;
+	d_emitNewMkrData = (en_markers > 0);
 }
 
 double FftDisplayPlot::markerFrequency(uint chIdx, uint mkIdx) const
@@ -576,12 +595,26 @@ void FftDisplayPlot::setMarkerAtFreq(uint chIdx, uint mkIdx, double freq)
 		qDebug() << "Invalid frenquency!";
 		return;
 	}
+
+	double y;
+	if (y_data[chIdx]) {
+		y = y_data[chIdx][pos];
+	} else {
+		y = axisScaleDiv(QwtPlot::yLeft).lowerBound();
+	}
+	d_markers[chIdx][mkIdx].data->x = x_data[pos];
+	d_markers[chIdx][mkIdx].data->y = y;
 	d_markers[chIdx][mkIdx].data->bin = pos;
+
+	marker_set_pos_source(chIdx, mkIdx, d_markers[chIdx][mkIdx].data);
 }
 
 void FftDisplayPlot::marker_to_max_peak(uint chIdx, uint mkIdx)
 {
 	d_markers[chIdx][mkIdx].data = d_peaks[chIdx][0];
+
+	if (d_emitNewMkrData)
+		Q_EMIT newMarkerData();
 }
 
 void FftDisplayPlot::marker_to_next_higher_freq_peak(uint chIdx, uint mkIdx)
@@ -601,7 +634,7 @@ void FftDisplayPlot::marker_to_next_higher_freq_peak(uint chIdx, uint mkIdx)
 	if (pos < 0)
 		return;
 
-	d_markers[chIdx][mkIdx].data = peaks[pos];
+	marker_set_pos_source(chIdx, mkIdx, peaks[pos]);
 }
 
 void FftDisplayPlot::marker_to_next_lower_freq_peak(uint chIdx, uint mkIdx)
@@ -621,7 +654,7 @@ void FftDisplayPlot::marker_to_next_lower_freq_peak(uint chIdx, uint mkIdx)
 	if (pos < 0)
 		return;
 
-	d_markers[chIdx][mkIdx].data = peaks[pos];
+	marker_set_pos_source(chIdx, mkIdx, peaks[pos]);
 }
 
 void FftDisplayPlot::marker_to_next_higher_mag_peak(uint chIdx, uint mkIdx)
@@ -641,7 +674,7 @@ void FftDisplayPlot::marker_to_next_higher_mag_peak(uint chIdx, uint mkIdx)
 	if (pos < 0)
 		return;
 
-	d_markers[chIdx][mkIdx].data = peaks[pos];
+	marker_set_pos_source(chIdx, mkIdx, peaks[pos]);
 }
 
 void FftDisplayPlot::marker_to_next_lower_mag_peak(uint chIdx, uint mkIdx)
@@ -661,5 +694,5 @@ void FftDisplayPlot::marker_to_next_lower_mag_peak(uint chIdx, uint mkIdx)
 	if (pos < 0)
 		return;
 
-	d_markers[chIdx][mkIdx].data = peaks[pos];
+	marker_set_pos_source(chIdx, mkIdx, peaks[pos]);
 }
