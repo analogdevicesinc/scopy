@@ -598,7 +598,7 @@ void Oscilloscope::export_settings_init()
 
 	exportSettings = new ExportSettings();
 	exportSettings->enableExportButton(false);
-	gsettings_ui->verticalLayout_2->insertWidget(3 ,exportSettings);
+	gsettings_ui->export_2->addWidget(exportSettings);
 
 	for (int i = 0; i < nb_channels; ++i){
 		exportSettings->addChannel(i, QString("Channel") +
