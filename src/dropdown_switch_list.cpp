@@ -148,6 +148,12 @@ void DropdownSwitchList::addDropdownElement(const QIcon& icon,
 	m_model->setData(index, user_data, Qt::UserRole);
 }
 
+void DropdownSwitchList::removeItem(int index)
+{
+	QComboBox::removeItem(index);
+	m_rows--;
+}
+
 void DropdownSwitchList::resetIndex(int)
 {
 	setCurrentIndex(-1);

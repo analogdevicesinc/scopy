@@ -45,6 +45,8 @@ namespace adiscope {
 		void addDropdownElement(const QIcon&, const QString&,
 			const QVariant& user_data);
 
+		void removeItem(int index);
+
 	private Q_SLOTS:
 		void resetIndex(int);
 
