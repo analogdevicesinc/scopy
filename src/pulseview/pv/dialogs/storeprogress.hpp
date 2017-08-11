@@ -49,6 +49,7 @@ public:
 	virtual ~StoreProgress();
 
 	void run();
+	void wait();
 
 private:
 	void show_error();

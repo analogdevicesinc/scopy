@@ -405,6 +405,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	state_timer->setInterval(2);
 	chm_ui->update_ui();
 	ui->lblExportStatus->setText("Not exported");
+	ui->lblExportStatus->setEnabled(false);
 }
 
 
@@ -509,10 +510,14 @@ void LogicAnalyzer::btnExportPressed()
 		return;
 	}
 	QString filename = main_win->export_file();
-	if(filename != "")
+	if(filename != "") {
+		ui->lblExportStatus->setEnabled(true);
 		ui->lblExportStatus->setText("Exported");
-	else
+	}
+	else {
+		ui->lblExportStatus->setEnabled(false);
 		ui->lblExportStatus->setText("Not exported");
+	}
 }
 
 void LogicAnalyzer::startTimeout()
@@ -858,6 +863,7 @@ int LogicAnalyzer::timeToPixel(double time)
 
 void LogicAnalyzer::startStop(bool start)
 {
+	ui->lblExportStatus->setEnabled(false);
 	ui->lblExportStatus->setText("Not exported");
 	if(!dev)
 		return;
@@ -926,6 +932,7 @@ void LogicAnalyzer::setHWTriggerDelay(long long delay)
 void LogicAnalyzer::singleRun()
 {
 	buffer_previewer->setWaveformWidth(0);
+	ui->lblExportStatus->setEnabled(false);
 	ui->lblExportStatus->setText("Not exported");
 	if(!dev)
 		return;

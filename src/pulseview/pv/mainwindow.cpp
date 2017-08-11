@@ -320,14 +320,12 @@ QString MainWindow::export_file()
 		if (!dlg.exec())
 			return "";
 		options = dlg.options();
-		dlg.hide();
 	}
 
 	StoreProgress *dlg = new StoreProgress(file_name, outputFormat, options,
 		sample_range, session_, this);
 	dlg->run();
-	dlg->hide();
-	dlg->cancel();
+	dlg->wait();
 	delete dlg;
 	return file_name;
 }

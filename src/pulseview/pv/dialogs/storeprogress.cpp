@@ -52,10 +52,13 @@ StoreProgress::~StoreProgress()
 
 void StoreProgress::run()
 {
-	if (session_.start())
-		show();
-	else
+	if (!session_.start())
 		show_error();
+}
+
+void StoreProgress::wait()
+{
+	session_.wait();
 }
 
 void StoreProgress::show_error()
