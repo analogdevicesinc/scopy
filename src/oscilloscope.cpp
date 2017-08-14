@@ -2277,6 +2277,7 @@ void Oscilloscope::setChannelHwOffset(uint chnIdx, double offset)
 void Oscilloscope::setAllSinksSampleCount(unsigned long sample_count)
 {
 	this->qt_time_block->set_nsamps(sample_count);
+	this->qt_xy_block->set_nsamps(sample_count);
 
 	auto it = math_sinks.constBegin();
 	while (it != math_sinks.constEnd()) {
