@@ -96,7 +96,8 @@ Session::Session(DeviceManager &device_manager) :
 	cur_samplerate_(0),
 	buffersize_(0),
 	timeSpan(0),
-	timespanLimitStream(0)
+	timespanLimitStream(0),
+	screen_mode_(false)
 {
 }
 
@@ -226,6 +227,12 @@ void Session::stop_capture()
 	// Clear signal data
 	for (const shared_ptr<data::SignalData> d : get_data())
 		d->clear_old_data();
+
+	if(screen_mode_) {
+		lock_guard<recursive_mutex> lock(data_mutex_);
+		cur_logic_segment_.reset();
+		cur_analog_segments_.clear();
+	}
 }
 
 set< shared_ptr<data::SignalData> > Session::get_data() const
@@ -393,6 +400,21 @@ void Session::set_capture_state(capture_state state)
 void Session::set_buffersize(size_t value)
 {
 	buffersize_ = value;
+}
+
+void Session::set_entire_buffersize(size_t value)
+{
+	entire_buffersize_ = value;
+}
+
+void Session::set_screen_mode(bool value)
+{
+	screen_mode_ = value;
+}
+
+bool Session::is_screen_mode()
+{
+	return screen_mode_;
 }
 
 void Session::set_samplerate(double value)
@@ -670,8 +692,13 @@ void Session::feed_in_logic(shared_ptr<Logic> logic)
 		// this after both analog and logic sweeps have begun.
 		frame_began();
 	} else {
-		// Append to the existing data segment
-		cur_logic_segment_->append_payload(logic);
+		if( get_logic_sample_count() == entire_buffersize_ && screen_mode_) {
+			cur_logic_segment_->replace_payload(logic);
+		}
+		else {
+			// Append to the existing data segment
+			cur_logic_segment_->append_payload(logic);
+		}
 	}
 
 	data_received();
@@ -688,6 +715,13 @@ int Session::get_logic_sample_count()
 {
 	if(logic_data_->segments().size() != 0)
 		return logic_data_->segments().at(0)->get_sample_count();
+	return 0;
+}
+
+int Session::get_logic_active_sample()
+{
+	if(logic_data_->segments().size() != 0)
+		return logic_data_->segments().at(0)->get_active_sample_index();
 	return 0;
 }
 
@@ -799,9 +833,11 @@ void Session::data_feed_in(shared_ptr<sigrok::Device> device,
 	case SR_DF_END:
 	{
 		{
-			lock_guard<recursive_mutex> lock(data_mutex_);
-			cur_logic_segment_.reset();
-			cur_analog_segments_.clear();
+			if(!screen_mode_) {
+				lock_guard<recursive_mutex> lock(data_mutex_);
+				cur_logic_segment_.reset();
+				cur_analog_segments_.clear();
+			}
 		}
 		frame_ended();
 		break;

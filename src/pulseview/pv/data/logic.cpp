@@ -74,7 +74,7 @@ void Logic::clear_old_data()
 {
 	lock_guard<boost::shared_mutex> lock(segments_mutex);
 	if(segments_.size() > 1) {
-		segments_.erase(segments_.begin()+1, segments_.end());
+		segments_.resize(1);
 	}
 }
 

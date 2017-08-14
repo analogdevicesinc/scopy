@@ -246,7 +246,8 @@ void Viewport::paintEvent(QPaintEvent*)
 		paint_cursors(p, pp);
 	}
 
-	paint_last_sample_cursor(p, pp);
+	if( view_.session().is_screen_mode())
+		paint_last_sample_cursor(p, pp);
 	p.end();
 }
 
@@ -320,7 +321,7 @@ void Viewport::paint_time_trigger_line(QPainter &p, const ViewItemPaintParams &p
 
 void Viewport::paint_last_sample_cursor(QPainter &p, const ViewItemPaintParams &pp)
 {
-	int sample_index = view_.session().get_logic_sample_count() - 1;
+	int sample_index = view_.session().get_logic_active_sample();
 	double samplerate = view_.session().get_samplerate();
 	int px;
 	if( samplerate != 1 ) {

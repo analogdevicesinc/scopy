@@ -37,6 +37,8 @@ public:
 
 	uint64_t get_sample_count() const;
 
+	uint64_t get_active_sample_index();
+
 	const pv::util::Timestamp& start_time() const;
 
 	double samplerate() const;
@@ -74,11 +76,14 @@ public:
 protected:
 	void append_data(void *data, uint64_t samples);
 	void add_data(void *data, uint64_t samples, size_t buffersize);
+	void replace_data(void *data, uint64_t samples);
 
 protected:
 	mutable std::recursive_mutex mutex_;
 	std::vector<uint8_t> data_;
 	uint64_t sample_count_;
+	uint64_t total_sample_count_;
+	uint64_t active_sample_index_;
 	pv::util::Timestamp start_time_;
 	double samplerate_;
 	uint64_t capacity_;

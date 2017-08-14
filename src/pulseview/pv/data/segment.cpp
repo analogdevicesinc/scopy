@@ -32,10 +32,12 @@ namespace data {
 
 Segment::Segment(uint64_t samplerate, unsigned int unit_size) :
 	sample_count_(0),
+	total_sample_count_(0),
 	start_time_(0),
 	samplerate_(samplerate),
 	capacity_(0),
-	unit_size_(unit_size)
+	unit_size_(unit_size),
+	active_sample_index_(0)
 {
 	lock_guard<recursive_mutex> lock(mutex_);
 	assert(unit_size_ > 0);
@@ -50,6 +52,11 @@ uint64_t Segment::get_sample_count() const
 {
 	lock_guard<recursive_mutex> lock(mutex_);
 	return sample_count_;
+}
+
+uint64_t Segment::get_active_sample_index()
+{
+	return active_sample_index_;
 }
 
 const pv::util::Timestamp& Segment::start_time() const
@@ -104,6 +111,32 @@ void Segment::append_data(void *data, uint64_t samples)
 	memcpy((uint8_t*)data_.data() + sample_count_ * unit_size_,
 		data, samples * unit_size_);
 	sample_count_ += samples;
+	total_sample_count_ += samples;
+	active_sample_index_ = total_sample_count_;
+}
+
+void Segment::replace_data(void *data, uint64_t samples)
+{
+        lock_guard<recursive_mutex> lock(mutex_);
+        assert(capacity_ == sample_count_);
+        uint64_t free_space = capacity_ - active_sample_index_;
+
+        uint64_t samples_to_copy = samples;
+        uint64_t samples_left = 0;
+        if( samples > free_space )
+                samples_to_copy = free_space;
+
+        memcpy((uint8_t*)data_.data() + active_sample_index_ * unit_size_,
+               data, samples_to_copy * unit_size_);
+
+        if(samples_to_copy !=  samples) {
+                samples_left =  samples - samples_to_copy;
+                memcpy((uint8_t*)data_.data(),
+                        (uint8_t*)data + samples_to_copy * unit_size_,
+                        samples_left * unit_size_);
+        }
+        total_sample_count_ += samples;
+        active_sample_index_ = total_sample_count_ % capacity_;
 }
 
 /*

@@ -718,6 +718,7 @@ void LogicAnalyzer::configParams(double timebase, double timepos)
         acquisition_mode = (acquisition_mode == REPEATED
                             && plotTimeSpan >= timespanLimitStream) ? SCREEN : acquisition_mode;
 
+        main_win->session_.set_screen_mode(false);
         if(acquisition_mode == SCREEN || acquisition_mode == STREAM) {
                 if(active_plot_timebase != timebase)
                 {
@@ -739,14 +740,18 @@ void LogicAnalyzer::configParams(double timebase, double timepos)
                         ui->lineeditSampleRate->setEnabled(false);
                 }
                 else {
+                        if( acquisition_mode == SCREEN)
+                                main_win->session_.set_screen_mode(true);
+
                         ui->lineeditSampleRate->setEnabled(true);
                         active_triggerSampleCount = 0;
-                        custom_sampleCount = 16384;
+                        custom_sampleCount = 8192;
 
 			double bufferTimeSpan = custom_sampleCount / active_sampleRate;
 			buffer_previewer->setNoOfSteps(plotTimeSpan / bufferTimeSpan + 1);
-			active_sampleCount = plotTimeSpan / bufferTimeSpan * custom_sampleCount;
+			active_sampleCount = (plotTimeSpan / bufferTimeSpan) * custom_sampleCount;
 
+			main_win->session_.set_entire_buffersize(active_sampleCount);
 			if(logic_analyzer_ptr)
 			{
 				logic_analyzer_ptr->set_buffersize(custom_sampleCount, false);
@@ -1366,9 +1371,11 @@ void LogicAnalyzer::runModeChanged(int index)
                 if( logic_analyzer_ptr )
                         logic_analyzer_ptr->set_stream(false);
                 ui->lineeditSampleRate->setEnabled(false);
+                main_win->session_.set_screen_mode(false);
                 if(timeBase->value() * 10 >= timespanLimitStream) {
                         d_timeTriggerHandle->setPosition(0);
                         acquisition_mode = SCREEN;
+                        main_win->session_.set_screen_mode(true);
                         ui->lineeditSampleRate->setEnabled(true);
                 }
         }
@@ -1379,6 +1386,7 @@ void LogicAnalyzer::runModeChanged(int index)
                         logic_analyzer_ptr->set_stream(true);
                 d_timeTriggerHandle->setPosition(0);
                 acquisition_mode = STREAM;
+                main_win->session_.set_screen_mode(false);
                 ui->lineeditSampleRate->setEnabled(true);
         }
                 break;

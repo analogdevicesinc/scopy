@@ -49,7 +49,8 @@ const uint64_t LogicSegment::MipMapDataUnit = 64*1024;	// bytes
 LogicSegment::LogicSegment(shared_ptr<Logic> logic, uint64_t samplerate,
 				const uint64_t expected_num_samples) :
 	Segment(samplerate, logic->unit_size()),
-	last_append_sample_(0)
+	last_append_sample_(0),
+	replace_mode(false)
 {
 	set_capacity(expected_num_samples);
 
@@ -148,9 +149,21 @@ void LogicSegment::append_payload(shared_ptr<Logic> logic)
 
 	append_data(logic->data_pointer(),
 		logic->data_length() / unit_size_);
-
+	replace_mode = false;
 	// Generate the first mip-map from the data
 	append_payload_to_mipmap();
+}
+
+void LogicSegment::replace_payload(shared_ptr<Logic> logic)
+{
+	assert(unit_size_ ==  logic->unit_size());
+	assert((logic->data_length() % unit_size_) == 0);
+	lock_guard<recursive_mutex> lock(mutex_);
+	uint64_t previous_active_index = get_active_sample_index();
+	replace_data(logic->data_pointer(), logic->data_length() / unit_size_);
+
+	replace_mode = true;
+	append_payload_to_mipmap(previous_active_index);
 }
 
 void LogicSegment::add_payload(shared_ptr<Logic> logic, size_t buffersize)
@@ -197,32 +210,41 @@ void LogicSegment::reallocate_mipmap_level(MipMapLevel &m)
 	}
 }
 
-void LogicSegment::append_payload_to_mipmap()
+void LogicSegment::append_payload_to_mipmap(uint64_t prev_active)
 {
 	MipMapLevel &m0 = mip_map_[0];
-	uint64_t prev_length;
+	uint64_t prev_index;
+	uint64_t end_index;
 	const uint8_t *src_ptr;
 	uint8_t *dest_ptr;
 	uint64_t accumulator;
 	unsigned int diff_counter;
 
-	// Expand the data buffer to fit the new samples
-	prev_length = m0.length;
-	m0.length = sample_count_ / MipMapScaleFactor;
+	if(replace_mode)
+	{
+		prev_index = (prev_active > active_sample_index_) ? 0 : prev_active / MipMapScaleFactor;
+		end_index = active_sample_index_ / MipMapScaleFactor;
+	}
+	else {
+		// Expand the data buffer to fit the new samples
+		prev_index = m0.length;
+		m0.length = sample_count_ / MipMapScaleFactor;
+		end_index = m0.length;
+	}
 
 	// Break off if there are no new samples to compute
-	if (m0.length == prev_length)
+	if (m0.length == prev_index)
 		return;
 
 	reallocate_mipmap_level(m0);
 
-	dest_ptr = (uint8_t*)m0.data + prev_length * unit_size_;
+	dest_ptr = (uint8_t*)m0.data + prev_index * unit_size_;
 
 	// Iterate through the samples to populate the first level mipmap
 	const uint8_t *const end_src_ptr = (uint8_t*)data_.data() +
-		m0.length * unit_size_ * MipMapScaleFactor;
+		end_index * unit_size_ * MipMapScaleFactor;
 	for (src_ptr = (uint8_t*)data_.data() +
-			prev_length * unit_size_ * MipMapScaleFactor;
+			prev_index * unit_size_ * MipMapScaleFactor;
 			src_ptr < end_src_ptr;) {
 		// Accumulate transitions which have occurred in this sample
 		accumulator = 0;
@@ -243,23 +265,30 @@ void LogicSegment::append_payload_to_mipmap()
 		MipMapLevel &m = mip_map_[level];
 		const MipMapLevel &ml = mip_map_[level-1];
 
-		// Expand the data buffer to fit the new samples
-		prev_length = m.length;
-		m.length = ml.length / MipMapScaleFactor;
+		if(replace_mode) {
+			end_index = end_index / MipMapScaleFactor;
+			prev_index =  prev_index / MipMapScaleFactor;
+		}
+		else {
+			// Expand the data buffer to fit the new samples
+			prev_index = m.length;
+			m.length = ml.length / MipMapScaleFactor;
+			end_index = m.length;
+		}
 
 		// Break off if there are no more samples to computed
-		if (m.length == prev_length)
+		if (m.length == prev_index)
 			break;
 
 		reallocate_mipmap_level(m);
 
 		// Subsample the level lower level
 		src_ptr = (uint8_t*)ml.data +
-			unit_size_ * prev_length * MipMapScaleFactor;
+			unit_size_ * prev_index * MipMapScaleFactor;
 		const uint8_t *const end_dest_ptr =
-			(uint8_t*)m.data + unit_size_ * m.length;
+			(uint8_t*)m.data + unit_size_ * end_index;
 		for (dest_ptr = (uint8_t*)m.data +
-				unit_size_ * prev_length;
+				unit_size_ * prev_index;
 				dest_ptr < end_dest_ptr;
 				dest_ptr += unit_size_) {
 			accumulator = 0;

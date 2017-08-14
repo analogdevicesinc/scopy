@@ -141,6 +141,12 @@ public:
 
 	void set_buffersize(size_t value);
 
+	void set_entire_buffersize(size_t value);
+
+	void set_screen_mode(bool value);
+
+	bool is_screen_mode();
+
 	void set_samplerate(double value);
 
 	void set_timeSpan(double value);
@@ -150,6 +156,8 @@ public:
 	bool is_data();
 
 	int get_logic_sample_count();
+
+	int get_logic_active_sample();
 
 private:
 	void set_capture_state(capture_state state);
@@ -202,6 +210,10 @@ private:
 	bool out_of_memory_;
 
 	size_t buffersize_;
+
+	size_t entire_buffersize_;
+
+	bool screen_mode_;
 
 	double timeSpan;
 
