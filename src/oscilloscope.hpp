@@ -163,6 +163,8 @@ namespace adiscope {
 		void setGainMode(uint chnIdx, M2kAdc::GainMode gain_mode);
 		void setChannelHwOffset(uint chnIdx, double offset);
 
+		void on_xyPlotLineType_toggled(bool checked);
+
 	private:
 		std::shared_ptr<GenericAdc> adc;
 		std::shared_ptr<M2kAdc> m2k_adc;

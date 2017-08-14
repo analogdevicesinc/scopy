@@ -112,6 +112,8 @@
         <file>icons/in-out-out.svg</file>
         <file>icons/dio100.svg</file>
         <file>icons/dio101.svg</file>
+        <file>icons/lines_on_plot.svg</file>
+        <file>icons/dots_on_plot.svg</file>
     </qresource>
     <qresource prefix="/stylesheets">
         <file>stylesheets/global.qss</file>

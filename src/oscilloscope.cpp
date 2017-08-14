@@ -315,6 +315,9 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 
 	xy_plot.disableLegend();
 
+	xy_plot.setLineStyle(0, Qt::SolidLine);
+	xy_plot.setLineMarker(0, QwtSymbol::NoSymbol);
+
 	// Disable mouse interactions with the axes until we figure out if we want to use them
 	xy_plot.setXaxisMouseGesturesEnabled(false);
 	for (uint i = 0; i < nb_channels; i++)
@@ -336,10 +339,12 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	ui->gridLayoutHist->addWidget(&hist_plot, 0, 0);
 	hist_plot.hide();
 
-	QWidget *w = ui->gridLayout_XY->itemAtPosition(1, 0)->widget();
-	ui->gridLayout_XY->addWidget(&xy_plot, 1, 0);
-	ui->gridLayout_XY->addWidget(w, 2, 0);
-	xy_plot.hide();
+	QGridLayout *gridL = static_cast<QGridLayout *>(
+		ui->xy_plot_container->layout());
+	QWidget *w = gridL->itemAtPosition(1, 0)->widget();
+	gridL->addWidget(&xy_plot, 1, 0);
+	gridL->addWidget(w, 2, 0);
+	ui->xy_plot_container->hide();
 
 	ui->rightMenu->setMaximumWidth(0);
 
@@ -1130,9 +1135,9 @@ void Oscilloscope::onXY_view_toggled(bool visible)
 			for (unsigned int i = 0; i < (nb_channels & ~1); i++)
 				iio->start(xy_ids[i]);
 
-		xy_plot.show();
+		ui->xy_plot_container->show();
 	} else {
-		xy_plot.hide();
+		ui->xy_plot_container->hide();
 
 		for (unsigned int i = 0; i < (nb_channels & ~1); i++)
 			iio->iio_manager::disconnect(xy_ids[i]);
@@ -2304,6 +2309,18 @@ void Oscilloscope::writeAllSettingsToHardware()
 
 	// Writes all trigger settings to hardware
 	trigger_settings.setAdcRunningState(true);
+}
+
+void Oscilloscope::on_xyPlotLineType_toggled(bool checked)
+{
+	if (checked) {
+		xy_plot.setLineStyle(0, Qt::NoPen);
+		xy_plot.setLineMarker(0, QwtSymbol::Ellipse);
+	} else {
+		xy_plot.setLineStyle(0, Qt::SolidLine);
+		xy_plot.setLineMarker(0, QwtSymbol::NoSymbol);
+	}
+	xy_plot.replot();
 }
 
 /*
