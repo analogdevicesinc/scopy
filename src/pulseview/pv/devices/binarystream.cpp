@@ -143,14 +143,13 @@ void BinaryStream::run()
                 if(autoTrigger) {
                         la->refilling();
                 }
-                la->set_triggered_status("awaiting");
+
                 lock_guard<recursive_mutex> lock(data_mutex_);
                 if(data_)
                         nbytes_rx = iio_buffer_refill(data_);
                 nrx += nbytes_rx / 2;
 
                 if( nbytes_rx > 0 ) {
-                        la->set_triggered_status("running");
                         size_to_display = (nrx > entire_buffersize && !stream_mode) ?
                                                 nbytes_rx-2*(nrx-entire_buffersize) : nbytes_rx;
                         input_->send(iio_buffer_start(data_), (size_t)(size_to_display));
@@ -247,7 +246,6 @@ void BinaryStream::stop()
 	interrupt_ = true;
 	assert(session_);
 	session_->stop();
-	la->set_triggered_status("stopped");
 	running = false;
 	single_ = false;
 	if(data_ )

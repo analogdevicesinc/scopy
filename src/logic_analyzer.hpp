@@ -72,6 +72,7 @@ class DigitalBufferPreviewer;
 class Filter;
 class ScaleSpinButton;
 class PositionSpinButton;
+class StateUpdater;
 
 class LogicAnalyzer : public Tool
 {
@@ -89,6 +90,13 @@ public:
                 SCREEN
 	};
 
+	enum TriggerState {
+		Stop,
+		Waiting,
+		Triggered,
+		Auto,
+	};
+
 	explicit LogicAnalyzer(struct iio_context *ctx,
 	                       Filter *filt,
 	                       QPushButton *runButton,
@@ -100,13 +108,11 @@ public:
 
 	void setHWTrigger(int chid, std::string trigger_val);
 	std::string get_trigger_from_device(int chid);
-	void set_triggered_status(std::string value);
 	void refilling();
 	void captured();
 	void setTriggerCache(int chid, std::string trigger_value);
 	void get_channel_groups_api();
 	void installWheelEventGuard();
-	void triggeredOnce();
 	void bufferSentSignal(bool lastBuffer);
 	int getCurrent_acquisition_mode() const;
 	void setCurrent_acquisition_mode(int value);
@@ -132,13 +138,15 @@ private Q_SLOTS:
 	void resizeEvent();
 	void resetInstrumentToDefault();
 	void setTimeout(bool);
-	void triggerStateTimeout();
 	void triggerTimeout();
 	void startTimeout();
 	void capturedSlot();
 	void btnExportPressed();
 	void runModeChanged(int index);
 	void validateSamplingFrequency();
+	void setTriggerState(int);
+	void onDataReceived();
+	void onTriggerModeChanged(bool);
 public Q_SLOTS:
 	void onTimeTriggerHandlePosChanged(int);
 	void onTimePositionSpinboxChanged(double value);
@@ -237,7 +245,6 @@ private:
 	double value_cursor1;
 	double value_cursor2;
 	double value_cursors_delta;
-	void enableTrigger(bool value);
 	void cleanHWParams();
 	void cursorsFormatDelta();
 
@@ -247,8 +254,6 @@ private:
 	int timer_timeout_ms;
 	std::atomic<bool> armed;
 	void autoCaptureEnable();
-	QString trigger_state;
-	QTimer *state_timer;
 
 	DigitalBufferPreviewer *buffer_previewer;
 	void set_buffersize();
@@ -258,6 +263,8 @@ private:
 	bool zoomed_in;
 
 	void configParams(double timebase, double timepos);
+	StateUpdater *triggerUpdater;
+	bool trigger_is_forced;
 };
 
 class LogicAnalyzer_API : public ApiObject

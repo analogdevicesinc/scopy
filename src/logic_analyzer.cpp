@@ -45,6 +45,7 @@
 #include "buffer_previewer.hpp"
 #include "handles_area.hpp"
 #include "plot_line_handle.h"
+#include "state_updater.h"
 
 /* Sigrok includes */
 #include <libsigrokcxx/libsigrokcxx.hpp>
@@ -108,10 +109,10 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	initialised(false),
 	timer(new QTimer(this)),
 	armed(false),
-	state_timer(new QTimer(this)),
-	trigger_state("Stop"),
 	offline_mode(offline_mode_),
-	zoomed_in(false)
+	zoomed_in(false),
+	triggerUpdater(new StateUpdater(250, this)),
+	trigger_is_forced(false)
 {
 	ui->setupUi(this);
 	timer->setSingleShot(true);
@@ -338,22 +339,28 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 		this, SLOT(resetInstrumentToDefault()));
 	connect(trigger_settings_ui->btnAuto, SIGNAL(toggled(bool)),
 		this, SLOT(setTimeout(bool)));
+	connect(trigger_settings_ui->btnAuto, SIGNAL(toggled(bool)),
+		this, SLOT(onTriggerModeChanged(bool)));
 	connect(this, SIGNAL(startRefill()),
 		this, SLOT(startTimeout()));
 	connect(this, SIGNAL(capturedSignal()),
 		this, SLOT(capturedSlot()));
 	connect(timer, &QTimer::timeout,
 		this, &LogicAnalyzer::triggerTimeout);
-	connect(state_timer, &QTimer::timeout,
-		this, &LogicAnalyzer::triggerStateTimeout);
 	connect(main_win->view_, SIGNAL(data_received()),
 		this, SLOT(updateBufferPreviewer()));
+	connect(main_win->view_, SIGNAL(data_received()),
+		this, SLOT(onDataReceived()));
 	connect(ui->btnExport, SIGNAL(pressed()),
 		this, SLOT(btnExportPressed()));
 	connect(ui->cmbRunMode, SIGNAL(currentIndexChanged(int)),
 		this, SLOT(runModeChanged(int)));
 	connect(ui->lineeditSampleRate, &QLineEdit::returnPressed,
 		this, &LogicAnalyzer::validateSamplingFrequency);
+
+	triggerUpdater->setOffState(Stop);
+	connect(triggerUpdater, SIGNAL(outputChanged(int)),
+		this, SLOT(setTriggerState(int)));
 
 	cleanHWParams();
 	chm_ui = new LogicAnalyzerChannelManagerUI(0, main_win, &chm, ui->scrollAreaWidgetContents,
@@ -376,7 +383,6 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	main_win->view_->viewport()->setTimeTriggerPosActive(true);
 	ui->areaTimeTriggerLayout->addWidget(this->bottomHandlesArea(), 0, 1, 1, 3);
 	updateAreaTimeTrigger();
-	ui->triggerStateLabel->setText("Stop");
 
 	ensurePolished();
 	main_win->view_->viewport()->ensurePolished();
@@ -402,7 +408,6 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	api->js_register(engine);
 
 	chm_ui->setWidgetMinimumNrOfChars(ui->triggerStateLabel, 9);
-	state_timer->setInterval(2);
 	chm_ui->update_ui();
 	ui->lblExportStatus->setText("Not exported");
 	ui->lblExportStatus->setEnabled(false);
@@ -529,15 +534,11 @@ void LogicAnalyzer::startTimeout()
 void LogicAnalyzer::triggerTimeout()
 {
 	if(armed) {
+		trigger_is_forced = true;
 		armed = false;
 		autoCaptureEnable();
 		timer->setInterval(timer_timeout_ms);
 	}
-}
-
-void LogicAnalyzer::triggerStateTimeout()
-{
-	ui->triggerStateLabel->setText(trigger_state);
 }
 
 void LogicAnalyzer::refilling()
@@ -551,12 +552,6 @@ void LogicAnalyzer::captured()
 	Q_EMIT capturedSignal();
 }
 
-void LogicAnalyzer::triggeredOnce()
-{
-	//disable HW trigger
-	cleanHWParams();
-}
-
 void LogicAnalyzer::capturedSlot()
 {
 	if(timer->isActive()) {
@@ -568,21 +563,43 @@ void LogicAnalyzer::capturedSlot()
 	}
 }
 
-void LogicAnalyzer::set_triggered_status(std::string value)
+void LogicAnalyzer::setTriggerState(int triggerState)
+{
+	if(!trigger_settings_ui)
+		return;
+
+	ui->triggerStateLabel->hide();
+	switch (triggerState) {
+	case Waiting:
+		ui->triggerStateLabel->setText("Waiting");
+		break;
+	case Triggered:
+		ui->triggerStateLabel->setText("Triggered");
+		break;
+	case Stop:
+		ui->triggerStateLabel->setText("Stop");
+		break;
+	case Auto:
+		ui->triggerStateLabel->setText("Auto");
+		break;
+	default:
+		break;
+	};
+
+	ui->triggerStateLabel->show();
+}
+
+void LogicAnalyzer::onTriggerModeChanged(bool val)
 {
 	if(!trigger_settings_ui)
 		return;
 	if(trigger_settings_ui->btnAuto->isChecked()) {
-		state_timer->stop();
-		ui->triggerStateLabel->setText("Auto");
+		triggerUpdater->setIdleState(Auto);
+		triggerUpdater->setInput(Auto);
 	}
 	else {
-		if( value == "awaiting" )
-			trigger_state = "Waiting";
-		else if(value == "running")
-			trigger_state = "Triggered";
-		else if(value == "stopped")
-			trigger_state = "Stop";
+		triggerUpdater->setIdleState(Waiting);
+		triggerUpdater->setInput(Waiting);
 	}
 }
 
@@ -590,16 +607,6 @@ void LogicAnalyzer::onHorizScaleValueChanged(double value)
 {
 	zoomed_in = false;
 	configParams(value, active_timePos);
-}
-
-void LogicAnalyzer::enableTrigger(bool value)
-{
-	if( !value )
-		d_timeTriggerHandle->hide();
-	else
-		d_timeTriggerHandle->show();
-	main_win->view_->viewport()->setTimeTriggerPosActive(value);
-	main_win->view_->time_item_appearance_changed(true, true);
 }
 
 void LogicAnalyzer::setSampleRate()
@@ -714,6 +721,8 @@ void LogicAnalyzer::configParams(double timebase, double timepos)
 	LogicAnalyzerSymmetricBufferMode::capture_parameters params = symmBufferMode->captureParameters();
 
         double plotTimeSpan = timebase * 10;
+        timer_timeout_ms = plotTimeSpan * 1000  + 100; //transfer time
+
         acquisition_mode = ui->cmbRunMode->currentIndex();
         acquisition_mode = (acquisition_mode == REPEATED
                             && plotTimeSpan >= timespanLimitStream) ? SCREEN : acquisition_mode;
@@ -908,7 +917,6 @@ void LogicAnalyzer::startStop(bool start)
 		setTriggerDelay();
 		if(!armed)
 			armed = true;
-		state_timer->start(2);
 	} else {
 		main_win->view_->viewport()->enableDrag();
 		running = false;
@@ -922,7 +930,8 @@ void LogicAnalyzer::startStop(bool start)
 		}
 	}
 	main_win->run_stop();
-//	setTriggerDelay();
+
+	triggerUpdater->setEnabled(start);
 }
 
 void LogicAnalyzer::setTriggerDelay(bool silent)
@@ -949,6 +958,8 @@ void LogicAnalyzer::setHWTriggerDelay(long long delay)
 
 void LogicAnalyzer::singleRun()
 {
+	if(!armed)
+		armed = true;
 	buffer_previewer->setWaveformWidth(0);
 	ui->lblExportStatus->setEnabled(false);
 	ui->lblExportStatus->setText("Not exported");
@@ -974,6 +985,7 @@ void LogicAnalyzer::singleRun()
 	logic_analyzer_ptr->set_single(true);
 	main_win->run_stop();
 	running = false;
+	triggerUpdater->setEnabled(true);
 }
 
 unsigned int LogicAnalyzer::get_no_channels(struct iio_device *dev)
@@ -1434,6 +1446,26 @@ void LogicAnalyzer::validateSamplingFrequency()
 		onHorizScaleValueChanged(timeBase->value());
 		if(running)
 			setSamplerateLabelValue(active_sampleRate);
+	}
+}
+
+void LogicAnalyzer::onDataReceived()
+{
+	bool new_data;
+	if(!trigger_settings_ui)
+		return;
+	if(armed && !trigger_is_forced)
+		new_data = true;
+	else
+		new_data = false;
+
+	trigger_is_forced = false;
+
+	if(new_data) {
+		triggerUpdater->setInput(Triggered);
+	}
+	else {
+		triggerUpdater->setInput(Auto);
 	}
 }
 
