@@ -124,6 +124,7 @@ private Q_SLOTS:
 	void onRulerChanged(double, bool);
 	void setHWTriggerLogic(const QString value);
 	void setupTriggerSettingsUI(bool enabled = false);
+	void cleanTrigger();
 	void setExternalTrigger(int);
 	void cursorValueChanged_1(int);
 	void cursorValueChanged_2(int);

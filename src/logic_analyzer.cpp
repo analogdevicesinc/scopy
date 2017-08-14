@@ -733,6 +733,10 @@ void LogicAnalyzer::configParams(double timebase, double timepos)
                 d_timeTriggerHandle->setPositionSilenty(trigX);
 
                 if( trigX != 0 ) {
+                        if(chm_ui->is_streaming_mode()) {
+                                chm_ui->set_streaming_mode(false);
+                                chm_ui->update_ui();
+                        }
                         acquisition_mode = REPEATED;
                         ui->cmbRunMode->blockSignals(true);
                         ui->cmbRunMode->setCurrentIndex(0);
@@ -740,6 +744,11 @@ void LogicAnalyzer::configParams(double timebase, double timepos)
                         ui->lineeditSampleRate->setEnabled(false);
                 }
                 else {
+                        if(!chm_ui->is_streaming_mode()) {
+                                chm_ui->set_streaming_mode(true);
+                                cleanTrigger();
+                        }
+
                         if( acquisition_mode == SCREEN)
                                 main_win->session_.set_screen_mode(true);
 
@@ -777,9 +786,13 @@ void LogicAnalyzer::configParams(double timebase, double timepos)
 			recomputeCursorsValue(true);
 			updateBufferPreviewer();
 		}
-
         }
         if(acquisition_mode == REPEATED) {
+                if(chm_ui->is_streaming_mode()) {
+                        chm_ui->set_streaming_mode(false);
+                        chm_ui->update_ui();
+                }
+
                 if(active_plot_timebase != timebase)
                         active_plot_timebase = timebase;
                 else if(active_timePos != -params.timePos)
@@ -1183,13 +1196,18 @@ void LogicAnalyzer::setupTriggerSettingsUI(bool enabled)
 		setHWTrigger(17, trigger_mapping[0]);
 	}
 	else {
-		for(int i = 0; i < get_no_channels(dev) + 2; i++) {
-			setHWTrigger(i, trigger_mapping[0]);
-			if(i < get_no_channels(dev))
-				chm.get_channel(i)->setTrigger(trigger_mapping[0]);
-		}
-		chm_ui->update_ui();
+		cleanTrigger();
 	}
+}
+
+void LogicAnalyzer::cleanTrigger()
+{
+	for(int i = 0; i < get_no_channels(dev) + 2; i++) {
+		setHWTrigger(i, trigger_mapping[0]);
+		if(i < get_no_channels(dev))
+			chm.get_channel(i)->setTrigger(trigger_mapping[0]);
+	}
+	chm_ui->update_ui();
 }
 
 void LogicAnalyzer::bufferSentSignal(bool lastBuffer)
@@ -1364,6 +1382,8 @@ void LogicAnalyzer::setTimeout(bool checked)
 
 void LogicAnalyzer::runModeChanged(int index)
 {
+        bool en;
+
         switch(index){
         case REPEATED:
         {
@@ -1372,11 +1392,13 @@ void LogicAnalyzer::runModeChanged(int index)
                         logic_analyzer_ptr->set_stream(false);
                 ui->lineeditSampleRate->setEnabled(false);
                 main_win->session_.set_screen_mode(false);
+                en = false;
                 if(timeBase->value() * 10 >= timespanLimitStream) {
                         d_timeTriggerHandle->setPosition(0);
                         acquisition_mode = SCREEN;
                         main_win->session_.set_screen_mode(true);
                         ui->lineeditSampleRate->setEnabled(true);
+                        en = true;
                 }
         }
                 break;
@@ -1388,10 +1410,12 @@ void LogicAnalyzer::runModeChanged(int index)
                 acquisition_mode = STREAM;
                 main_win->session_.set_screen_mode(false);
                 ui->lineeditSampleRate->setEnabled(true);
+                en = true;
         }
                 break;
         default:break;
         }
+        chm_ui->set_streaming_mode(en);
 }
 
 void LogicAnalyzer::validateSamplingFrequency()

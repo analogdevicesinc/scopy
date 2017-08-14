@@ -391,7 +391,7 @@ void LogicAnalyzerChannelUI::highlightBotSeparator()
 void LogicAnalyzerChannelUI::enableControls(bool enabled)
 {
 	ui->groupName->setEnabled(enabled);
-	ui->comboBox->setEnabled(enabled);
+	ui->comboBox->setEnabled(!chm_ui->is_streaming_mode() && enabled);
 	ui->indexLabel->setEnabled(enabled);
 	ui->indexLabel2->setEnabled(enabled);
 	trace->visible(enabled);
@@ -1085,7 +1085,7 @@ void LogicAnalyzerChannelGroupUI::enableControls(bool enabled)
 	ui->decoderCombo->setEnabled(enabled);
 	ui->groupName->setEnabled(enabled);
 	ui->comboBox_2->setEnabled(enabled);
-	ui->comboBox->setEnabled(enabled);
+	ui->comboBox->setEnabled(!chm_ui->is_streaming_mode() && enabled);
 	ui->indexLabel->setEnabled(enabled);
 	trace->visible(enabled);
 	for (auto &&ch : ch_ui) {
@@ -1412,7 +1412,8 @@ LogicAnalyzerChannelManagerUI::LogicAnalyzerChannelManagerUI(QWidget *parent,
 	currentSettingsWidget(nullptr),
 	hoverWidget(nullptr),
 	generalSettings(nullptr),
-	locationSettingsLayout(settingsLayout)
+	locationSettingsLayout(settingsLayout),
+	streaming_mode(false)
 {
 	ui->setupUi(this);
 	main_win = main_win_;
@@ -1574,6 +1575,16 @@ void LogicAnalyzerChannelManagerUI::setWidgetMinimumNrOfChars(QWidget *w,
 	auto label_min_width = labelm.width(QString(nrOfChars,'X'));
 	w->setMinimumWidth(label_min_width);
 	w->setMaximumWidth(label_min_width+4);
+}
+
+void LogicAnalyzerChannelManagerUI::set_streaming_mode(bool en)
+{
+	streaming_mode = en;
+}
+
+bool LogicAnalyzerChannelManagerUI::is_streaming_mode()
+{
+	return streaming_mode;
 }
 
 void LogicAnalyzerChannelManagerUI::update_ui_children(LogicAnalyzerChannelGroupUI* chgroupUI)

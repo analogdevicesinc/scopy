@@ -301,6 +301,8 @@ public:
 	void updatePlot();
 	void setWidgetMinimumNrOfChars(QWidget *w, int nrOfChars);
 	std::shared_ptr<pv::binding::Decoder> binding_;
+	void set_streaming_mode(bool);
+	bool is_streaming_mode();
 
 public Q_SLOTS:
 	void chmScrollChanged(int value);
@@ -323,6 +325,7 @@ private:
 	bool collapsed;
 	std::vector<int> visibleItemsIndexes;
 	QButtonGroup *settings_exclusive_group;
+	bool streaming_mode;
 	pv::widgets::ColourButton *colour_button_edge, *colour_button_BG,
 		*colour_button_low, *colour_button_high;
 	QFrame* addSeparator(QVBoxLayout *lay, int pos);
