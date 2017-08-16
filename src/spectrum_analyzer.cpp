@@ -706,7 +706,10 @@ void SpectrumAnalyzer::setSampleRate(double sr)
 	double max_sr = 100E6; // TO DO: make OscAdc figure out the max sr of an ADC
 
 	sample_rate_divider = (int)(max_sr / sr);
-	sample_rate = max_sr / sample_rate_divider;
+	double new_sr = max_sr / sample_rate_divider;
+
+	if (new_sr == sample_rate)
+		return;
 
 	if (iio->started()) {
 		stop_blockchain_flow();
@@ -719,11 +722,12 @@ void SpectrumAnalyzer::setSampleRate(double sr)
 			adc->setSampleRate(sr);
 		}
 
-		fft_plot->presetSampleRate(sample_rate);
-		fft_sink->set_samp_rate(sample_rate);
+		fft_plot->presetSampleRate(new_sr);
+		fft_sink->set_samp_rate(new_sr);
 
 		start_blockchain_flow();
 	}
+	sample_rate = new_sr;
 }
 
 void SpectrumAnalyzer::setFftSize(uint size)
