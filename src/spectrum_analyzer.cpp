@@ -723,6 +723,7 @@ void SpectrumAnalyzer::setSampleRate(double sr)
 		}
 
 		fft_plot->presetSampleRate(new_sr);
+		fft_plot->resetAverageHistory();
 		fft_sink->set_samp_rate(new_sr);
 
 		start_blockchain_flow();
