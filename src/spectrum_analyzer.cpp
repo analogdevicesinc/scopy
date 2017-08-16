@@ -709,6 +709,8 @@ void SpectrumAnalyzer::setSampleRate(double sr)
 	sample_rate = max_sr / sample_rate_divider;
 
 	if (iio->started()) {
+		stop_blockchain_flow();
+
 		auto m2k_adc = std::dynamic_pointer_cast<M2kAdc>(adc);
 		if (m2k_adc) {
 			iio_device_attr_write_longlong(adc->iio_adc_dev(),
@@ -719,6 +721,8 @@ void SpectrumAnalyzer::setSampleRate(double sr)
 
 		fft_plot->presetSampleRate(sample_rate);
 		fft_sink->set_samp_rate(sample_rate);
+
+		start_blockchain_flow();
 	}
 }
 
