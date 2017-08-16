@@ -315,7 +315,7 @@ void SpectrumAnalyzer::runStopToggled(bool checked)
 			writeAllSettingsToHardware();
 		}
 
-		fft_plot->setSampleRate(sample_rate, 1, "");
+		fft_plot->presetSampleRate(sample_rate);
 		fft_sink->set_samp_rate(sample_rate);
 		ui->run_button->setText("Stop");
 		start_blockchain_flow();
@@ -717,7 +717,7 @@ void SpectrumAnalyzer::setSampleRate(double sr)
 			adc->setSampleRate(sr);
 		}
 
-		fft_plot->setSampleRate(sample_rate, 1, "");
+		fft_plot->presetSampleRate(sample_rate);
 		fft_sink->set_samp_rate(sample_rate);
 	}
 }

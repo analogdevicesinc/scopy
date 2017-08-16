@@ -32,6 +32,8 @@ FftDisplayPlot::FftDisplayPlot(int nplots, QWidget *parent) :
 	DisplayPlot(nplots, parent),
 	d_start_frequency(0),
 	d_stop_frequency(1000),
+	d_sampl_rate(1),
+	d_preset_sampl_rate(d_sampl_rate),
 	d_emitNewMkrData(true)
 {
 	for (unsigned int i = 0; i < nplots; i++) {
@@ -99,6 +101,13 @@ void FftDisplayPlot::plotData(const std::vector<double *> pts,
 {
 	uint64_t halfNumPoints = num_points / 2;
 	bool numPointsChanged = false;
+
+	// Update sample rate if required
+	if (d_sampl_rate != d_preset_sampl_rate) {
+		d_sampl_rate = d_preset_sampl_rate;
+		d_start_frequency = 0;
+		d_stop_frequency = d_sampl_rate / 2;
+	}
 
 	if (d_stop || halfNumPoints == 0)
 		return;
@@ -238,8 +247,15 @@ void FftDisplayPlot::setSampleRate(double sr, double units,
 {
 	d_start_frequency = 0;
 	d_stop_frequency = sr / 2;
+	d_sampl_rate = sr;
+	d_preset_sampl_rate = sr;
 
 	_resetXAxisPoints();
+}
+
+void FftDisplayPlot::presetSampleRate(double sr)
+{
+	d_preset_sampl_rate = sr;
 }
 
 FftDisplayPlot::AverageType FftDisplayPlot::averageType(uint chIdx) const

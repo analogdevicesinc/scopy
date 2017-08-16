@@ -69,6 +69,8 @@ namespace adiscope {
 
 		double d_start_frequency;
 		double d_stop_frequency;
+		double d_sampl_rate;
+		double d_preset_sampl_rate;
 
 		MetricPrefixFormatter dBFormatter;
 		MetricPrefixFormatter freqFormatter;
@@ -141,6 +143,7 @@ namespace adiscope {
 	public Q_SLOTS:
 		void setSampleRate(double sr, double units,
 			const std::string &strunits);
+		void presetSampleRate(double sr);
 		void customEvent(QEvent *e);
 	};
 }
