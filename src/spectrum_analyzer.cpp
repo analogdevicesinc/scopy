@@ -310,27 +310,18 @@ void SpectrumAnalyzer::on_btnMarkers_toggled(bool checked)
 
 void SpectrumAnalyzer::runStopToggled(bool checked)
 {
-	if (iio) {
-		if (checked) {
+	if (checked) {
+		if (iio) {
 			writeAllSettingsToHardware();
-			fft_plot->setSampleRate(sample_rate, 1, "");
-			fft_sink->set_samp_rate(sample_rate);
+		}
 
-			ui->run_button->setText("Stop");
-			for (int i = 0; i < num_adc_channels; i++)
-				iio->start(fft_ids[i]);
-		} else {
-			ui->run_button->setText("Run");
-			for (int i = 0; i < num_adc_channels; i++)
-				iio->stop(fft_ids[i]);
-		}
+		fft_plot->setSampleRate(sample_rate, 1, "");
+		fft_sink->set_samp_rate(sample_rate);
+		ui->run_button->setText("Stop");
+		start_blockchain_flow();
 	} else {
-		if (checked) {
-			fft_sink->reset();
-			top_block->start();
-		} else {
-			top_block->stop();
-		}
+		ui->run_button->setText("Run");
+		stop_blockchain_flow();
 	}
 
 	if (!checked)
@@ -416,6 +407,27 @@ void SpectrumAnalyzer::build_gnuradio_block_chain_no_ctx()
 		top_block->connect(ctm, 0, fft_sink, i);
 
 		channels[i]->fft_block = fft;
+	}
+}
+
+void SpectrumAnalyzer::start_blockchain_flow()
+{
+	if (iio) {
+		for (int i = 0; i < num_adc_channels; i++)
+			iio->start(fft_ids[i]);
+	} else {
+		fft_sink->reset();
+		top_block->start();
+	}
+}
+
+void SpectrumAnalyzer::stop_blockchain_flow()
+{
+	if (iio) {
+		for (int i = 0; i < num_adc_channels; i++)
+			iio->stop(fft_ids[i]);
+	} else {
+		top_block->stop();
 	}
 }
 

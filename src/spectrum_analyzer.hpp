@@ -112,6 +112,8 @@ private Q_SLOTS:
 private:
 	void build_gnuradio_block_chain();
 	void build_gnuradio_block_chain_no_ctx();
+	void start_blockchain_flow();
+	void stop_blockchain_flow();
 	void writeAllSettingsToHardware();
 	int channelIdOfOpenedSettings() const;
 	void setSampleRate(double sr);
