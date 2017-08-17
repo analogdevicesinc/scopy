@@ -976,6 +976,7 @@ void LogicAnalyzer::singleRun()
 	}
 	setSampleRate();
 	running = true;
+	triggerUpdater->setEnabled(running);
 	setBuffersizeLabelValue(active_sampleCount);
 	setSamplerateLabelValue(active_sampleRate);
 	setHWTriggerDelay(active_triggerSampleCount);
@@ -985,7 +986,6 @@ void LogicAnalyzer::singleRun()
 	logic_analyzer_ptr->set_single(true);
 	main_win->run_stop();
 	running = false;
-	triggerUpdater->setEnabled(true);
 }
 
 unsigned int LogicAnalyzer::get_no_channels(struct iio_device *dev)
@@ -1467,6 +1467,10 @@ void LogicAnalyzer::onDataReceived()
 	else {
 		triggerUpdater->setInput(Auto);
 	}
+
+	/* Single shot */
+	if( !running )
+		triggerUpdater->setEnabled(running);
 }
 
 /*
