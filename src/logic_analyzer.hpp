@@ -147,6 +147,7 @@ private Q_SLOTS:
 	void setTriggerState(int);
 	void onDataReceived();
 	void onTriggerModeChanged(bool);
+	void resetState();
 public Q_SLOTS:
 	void onTimeTriggerHandlePosChanged(int);
 	void onTimePositionSpinboxChanged(double value);

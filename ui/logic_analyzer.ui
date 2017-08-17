@@ -1583,7 +1583,97 @@ color: #FFFFFF;
                    </spacer>
                   </item>
                   <item>
-                   <widget class="QLineEdit" name="lineeditSampleRate"/>
+                   <layout class="QHBoxLayout" name="horizontalLayout_5">
+                    <property name="spacing">
+                     <number>7</number>
+                    </property>
+                    <property name="topMargin">
+                     <number>0</number>
+                    </property>
+                    <item>
+                     <widget class="QLineEdit" name="lineeditSampleRate">
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>32</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>32</height>
+                       </size>
+                      </property>
+                      <property name="styleSheet">
+                       <string notr="true">QLineEdit {
+height: 32px;
+color: white;
+font-family: &quot;monospace&quot; 14;
+border: 2px solid;
+border-color: orange;
+border-radius: 10px;
+padding: 0 8px;
+background: transparent;
+selection-background-color: darkgray;
+}
+QLineEdit[invalid=true] {
+border-color: red;
+}
+QLineEdit[valid=true] {
+border-color: green;
+}
+QLineEdit[enabled=false] {
+border-color: grey;
+color: grey;
+}</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="btnApply">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="minimumSize">
+                       <size>
+                        <width>40</width>
+                        <height>32</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>40</width>
+                        <height>32</height>
+                       </size>
+                      </property>
+                      <property name="styleSheet">
+                       <string notr="true">QPushButton {
+color: white;
+background-color: #4a64ff;
+font-family: &quot;monospace&quot;;
+font-weight: bold;
+border-width: 0px;
+border-radius: 3px;
+min-width: 40px;
+
+}
+QPushButton:!enabled { background-color: grey; }
+QPushButton:enabled:!pressed { background-color: orange; }
+QPushButton[valid=true]:enabled:!pressed { background-color: green; }
+QPushButton[invalid=true]:enabled:!pressed { background-color: red; }</string>
+                      </property>
+                      <property name="text">
+                       <string>Apply</string>
+                      </property>
+                      <property name="autoDefault">
+                       <bool>true</bool>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
                   </item>
                  </layout>
                 </item>

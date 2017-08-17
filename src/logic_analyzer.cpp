@@ -46,6 +46,7 @@
 #include "handles_area.hpp"
 #include "plot_line_handle.h"
 #include "state_updater.h"
+#include "dynamicWidget.hpp"
 
 /* Sigrok includes */
 #include <libsigrokcxx/libsigrokcxx.hpp>
@@ -230,7 +231,11 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	ui->generalSettingsLayout->insertWidget(ui->generalSettingsLayout->count() - 5,
 		timePosition, 0, Qt::AlignLeft);
 
-	ui->lineeditSampleRate->setValidator(new QDoubleValidator(1E0, 1E+8, 5, this));
+	QDoubleValidator *validator = new QDoubleValidator(ui->lineeditSampleRate);
+	validator->setNotation(QDoubleValidator::ScientificNotation);
+	validator->setDecimals(5);
+
+	ui->lineeditSampleRate->setValidator(validator);
 
 	int chn = (no_channels == 0) ? 16 : no_channels;
 	options["numchannels"] = Glib::Variant<gint32>(
@@ -357,6 +362,10 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 		this, SLOT(runModeChanged(int)));
 	connect(ui->lineeditSampleRate, &QLineEdit::returnPressed,
 		this, &LogicAnalyzer::validateSamplingFrequency);
+	connect(ui->btnApply, SIGNAL(clicked()),
+		this, SLOT(validateSamplingFrequency()));
+	connect(ui->lineeditSampleRate, SIGNAL(textChanged(const QString&)),
+		this, SLOT(resetState()));
 
 	triggerUpdater->setOffState(Stop);
 	connect(triggerUpdater, SIGNAL(outputChanged(int)),
@@ -750,7 +759,8 @@ void LogicAnalyzer::configParams(double timebase, double timepos)
                         ui->cmbRunMode->blockSignals(true);
                         ui->cmbRunMode->setCurrentIndex(0);
                         ui->cmbRunMode->blockSignals(false);
-                        ui->lineeditSampleRate->setEnabled(false);
+                        setDynamicProperty(ui->lineeditSampleRate, "enabled", false);
+                        ui->btnApply->setEnabled(false);
                 }
                 else {
                         if(!chm_ui->is_streaming_mode()) {
@@ -761,9 +771,11 @@ void LogicAnalyzer::configParams(double timebase, double timepos)
                         if( acquisition_mode == SCREEN)
                                 main_win->session_.set_screen_mode(true);
 
-                        ui->lineeditSampleRate->setEnabled(true);
+                        setDynamicProperty(ui->lineeditSampleRate, "enabled", true);
+                        ui->btnApply->setEnabled(true);
+
                         active_triggerSampleCount = 0;
-                        custom_sampleCount = 8192;
+                        custom_sampleCount = 4096;
 
 			double bufferTimeSpan = custom_sampleCount / active_sampleRate;
 			buffer_previewer->setNoOfSteps(plotTimeSpan / bufferTimeSpan + 1);
@@ -807,7 +819,9 @@ void LogicAnalyzer::configParams(double timebase, double timepos)
                 else if(active_timePos != -params.timePos)
                         active_timePos = -params.timePos;
 
-                ui->lineeditSampleRate->setEnabled(false);
+                setDynamicProperty(ui->lineeditSampleRate, "enabled", false);
+                ui->btnApply->setEnabled(false);
+
                 active_sampleRate = params.sampleRate;
                 active_sampleCount = params.entireBufferSize;
                 active_triggerSampleCount = -(long long)params.triggerBufferSize;
@@ -1402,14 +1416,18 @@ void LogicAnalyzer::runModeChanged(int index)
                 acquisition_mode = REPEATED;
                 if( logic_analyzer_ptr )
                         logic_analyzer_ptr->set_stream(false);
-                ui->lineeditSampleRate->setEnabled(false);
+
+                setDynamicProperty(ui->lineeditSampleRate, "enabled", false);
+                ui->btnApply->setEnabled(false);
+
                 main_win->session_.set_screen_mode(false);
                 en = false;
                 if(timeBase->value() * 10 >= timespanLimitStream) {
                         d_timeTriggerHandle->setPosition(0);
                         acquisition_mode = SCREEN;
                         main_win->session_.set_screen_mode(true);
-                        ui->lineeditSampleRate->setEnabled(true);
+                        setDynamicProperty(ui->lineeditSampleRate, "enabled", true);
+                        ui->btnApply->setEnabled(true);
                         en = true;
                 }
         }
@@ -1421,7 +1439,8 @@ void LogicAnalyzer::runModeChanged(int index)
                 d_timeTriggerHandle->setPosition(0);
                 acquisition_mode = STREAM;
                 main_win->session_.set_screen_mode(false);
-                ui->lineeditSampleRate->setEnabled(true);
+                setDynamicProperty(ui->lineeditSampleRate, "enabled", true);
+                ui->btnApply->setEnabled(true);
                 en = true;
         }
                 break;
@@ -1432,21 +1451,46 @@ void LogicAnalyzer::runModeChanged(int index)
 
 void LogicAnalyzer::validateSamplingFrequency()
 {
-	double intpart;
 	bool ok;
+	double srDivider =  0;
 	double samplingFreq = ui->lineeditSampleRate->text().toDouble(&ok);
 	if(ok) {
-		double srDivider = maxSamplingFrequency / samplingFreq;
-		double fractpart = modf(srDivider, &intpart);
-		if(fractpart != 0) {
-			intpart = (intpart == 0) ? intpart++ : intpart;
-			active_sampleRate = maxSamplingFrequency / intpart;
+		if( samplingFreq < 10 ) {
+			active_sampleRate = 10;
+			setDynamicProperty(ui->lineeditSampleRate, "invalid", true);
+			goto validate;
 		}
+		if( samplingFreq > 3e+6 ) {
+			samplingFreq = 3e+6;
+			setDynamicProperty(ui->lineeditSampleRate, "invalid", true);
+		}
+
+		srDivider = maxSamplingFrequency / samplingFreq;
+		srDivider = round(srDivider);
+		srDivider = (srDivider == 0.0) ? srDivider + 1 : srDivider;
+
+		active_sampleRate = maxSamplingFrequency / srDivider;
+validate:
 		ui->lineeditSampleRate->setText(QString::number(active_sampleRate));
 		onHorizScaleValueChanged(timeBase->value());
 		if(running)
 			setSamplerateLabelValue(active_sampleRate);
+
+		setDynamicProperty(ui->lineeditSampleRate, "valid", true);
+		setDynamicProperty(ui->btnApply, "valid", true);
 	}
+	else {
+		setDynamicProperty(ui->lineeditSampleRate, "invalid", true);
+		setDynamicProperty(ui->btnApply, "invalid", true);
+	}
+}
+
+void LogicAnalyzer::resetState()
+{
+	setDynamicProperty(ui->lineeditSampleRate, "invalid", false);
+	setDynamicProperty(ui->btnApply, "invalid", false);
+	setDynamicProperty(ui->lineeditSampleRate, "valid", false);
+	setDynamicProperty(ui->btnApply, "valid", false);
 }
 
 void LogicAnalyzer::onDataReceived()
