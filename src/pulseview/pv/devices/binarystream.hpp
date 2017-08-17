@@ -104,6 +104,7 @@ private:
 	std::atomic<bool> interrupt_;
 	size_t buffersize_;
 	size_t entire_buffersize;
+	unsigned int actual_buffersize;
 	bool single_;
 	std::atomic<bool> running;
 	adiscope::LogicAnalyzer* la;

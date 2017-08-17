@@ -97,7 +97,8 @@ Session::Session(DeviceManager &device_manager) :
 	buffersize_(0),
 	timeSpan(0),
 	timespanLimitStream(0),
-	screen_mode_(false)
+	screen_mode_(false),
+	entire_buffersize_(0)
 {
 }
 

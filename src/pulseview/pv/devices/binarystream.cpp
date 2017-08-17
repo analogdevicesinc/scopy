@@ -50,7 +50,8 @@ BinaryStream::BinaryStream(const std::shared_ptr<sigrok::Context> &context,
 	la(parent),
 	autoTrigger(false),
         data_(nullptr),
-        stream_mode(false)
+        stream_mode(false),
+        actual_buffersize(0)
 {
 	/* 10 buffers, 10ms each -> 250ms before we lose data */
 	if(dev)
@@ -107,8 +108,6 @@ std::string BinaryStream::display_name(const DeviceManager&) const
 
 void BinaryStream::start()
 {
-	unsigned int actual_buffersize;
-
 	/* sample_rate / 100 -> 10ms */
 	if(dev_) {
 		/*
@@ -147,18 +146,25 @@ void BinaryStream::run()
                 lock_guard<recursive_mutex> lock(data_mutex_);
                 if(data_)
                         nbytes_rx = iio_buffer_refill(data_);
+
+                if( actual_buffersize != buffersize_ ) {
+                        nbytes_rx -= ((actual_buffersize-buffersize_) * 2);
+                }
+
                 nrx += nbytes_rx / 2;
 
                 if( nbytes_rx > 0 ) {
                         size_to_display = (nrx > entire_buffersize && !stream_mode) ?
                                                 nbytes_rx-2*(nrx-entire_buffersize) : nbytes_rx;
-                        input_->send(iio_buffer_start(data_), (size_t)(size_to_display));
+                        if(data_)
+                                input_->send(iio_buffer_start(data_), (size_t)(size_to_display));
                         la->bufferSentSignal(false);
 
                         if( nrx >= entire_buffersize && !stream_mode) {
                                 if( !single_ ) {
                                         input_->end();
-                                        input_->send(iio_buffer_start(data_)+(size_t)(size_to_display),
+                                        if(data_ && (nrx != entire_buffersize))
+                                                input_->send(iio_buffer_start(data_)+(size_t)(size_to_display),
                                                      (size_t)(2*(nrx-entire_buffersize)));
                                         nrx = 0;
                                         la->bufferSentSignal(true);
