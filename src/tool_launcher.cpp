@@ -58,7 +58,8 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	network_analyzer(nullptr), spectrum_analyzer(nullptr),
 	tl_api(new ToolLauncher_API(this)),
 	notifier(STDIN_FILENO, QSocketNotifier::Read),
-	infoWidget(nullptr)
+	infoWidget(nullptr),
+	calib(nullptr)
 {
 	if (!isatty(STDIN_FILENO))
 		notifier.setEnabled(false);
