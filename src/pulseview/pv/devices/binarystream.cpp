@@ -106,9 +106,18 @@ std::string BinaryStream::display_name(const DeviceManager&) const
 
 void BinaryStream::start()
 {
+	unsigned int actual_buffersize;
+
 	/* sample_rate / 100 -> 10ms */
-	if(dev_)
-		data_ = iio_device_create_buffer(dev_, buffersize_, false);
+	if(dev_) {
+		/*
+		 * There is a restriction in the HDL that the buffer size must
+		 * be a multiple of 8 bytes (4x 16-bit samples). Round up to the
+		 * nearest multiple.
+		 */
+		actual_buffersize = ((buffersize_ + 3) / 4) * 4;
+		data_ = iio_device_create_buffer(dev_, actual_buffersize, false);
+	}
 
 	if (!data_) {
 		throw std::runtime_error("Could not create RX buffer");
