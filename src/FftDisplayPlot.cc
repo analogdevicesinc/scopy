@@ -22,6 +22,7 @@
 #include "signal_generator.hpp"
 #include "average.h"
 #include "spectrum_marker.hpp"
+#include "marker_controller.h"
 
 #include <qwt_symbol.h>
 #include <boost/make_shared.hpp>
@@ -34,6 +35,7 @@ FftDisplayPlot::FftDisplayPlot(int nplots, QWidget *parent) :
 	d_stop_frequency(1000),
 	d_sampl_rate(1),
 	d_preset_sampl_rate(d_sampl_rate),
+	d_mrkCtrl(nullptr),
 	d_emitNewMkrData(true)
 {
 	for (unsigned int i = 0; i < nplots; i++) {
@@ -72,6 +74,25 @@ FftDisplayPlot::FftDisplayPlot(int nplots, QWidget *parent) :
 
 	_resetXAxisPoints();
 
+	d_mrkCtrl = new MarkerController(this);
+
+	connect(d_mrkCtrl,
+		SIGNAL(markerSelected(std::shared_ptr<SpectrumMarker>)),
+		this,
+		SLOT(onMrkCtrlMarkerSelected(std::shared_ptr<SpectrumMarker>))
+	);
+	connect(d_mrkCtrl,
+		SIGNAL(markerPositionChanged(std::shared_ptr<SpectrumMarker>)),
+		this,
+		SLOT(onMrkCtrlMarkerPosChanged(std::shared_ptr<SpectrumMarker>))
+	);
+	connect(d_mrkCtrl,
+		SIGNAL(markerReleased(std::shared_ptr<SpectrumMarker>)),
+		this,
+		SLOT(onMrkCtrlMarkerReleased(std::shared_ptr<SpectrumMarker>))
+	);
+
+
 	setMinXaxisDivision(1);     // A minimum division of 1 Hz
 	setMaxXaxisDivision(5E6);   // A maximum division of 5 MHz
 	setMinYaxisDivision(1E-3);  // A minimum division of 1 mdB
@@ -82,6 +103,12 @@ FftDisplayPlot::FftDisplayPlot(int nplots, QWidget *parent) :
 
 FftDisplayPlot::~FftDisplayPlot()
 {
+	for (uint c = 0; c < d_nplots; c++) {
+		for (uint i = 0; i < d_markers[c].size(); i++) {
+			d_markers[c][i].ui->detach();
+		}
+	}
+
 	if (x_data)
 		delete[] x_data;
 
@@ -408,7 +435,7 @@ void FftDisplayPlot::updateMarkerUi(uint chIdx, uint mkIdx)
 	auto marker = d_markers[chIdx][mkIdx];
 
 	// update marker ony if active
-	if (marker.data) {
+	if (marker.data && marker.data->update_ui) {
 		marker.ui->setValue(marker.data->x, marker.data->y);
 	}
 }
@@ -432,6 +459,7 @@ void FftDisplayPlot::add_marker(int chn)
 	marker_data->x = 0;
 	marker_data->y = 0;
 	marker_data->bin = 0;
+	marker_data->update_ui = true;
 
 	// GUI marker
 	auto gui_marker = std::make_shared<SpectrumMarker>(markerName);
@@ -512,6 +540,7 @@ void FftDisplayPlot::setPeakCount(uint chIdx, uint count)
 	for (uint i = 0; i < count; i++) {
 		auto data_marker_sp = std::make_shared<struct marker_data>();
 		data_marker_sp->type = 1; // Peak marker
+		data_marker_sp->update_ui = true;
 		d_peaks[chIdx].push_back(data_marker_sp);
 		d_freq_asc_sorted_peaks[chIdx].push_back(data_marker_sp);
 	}
@@ -564,11 +593,16 @@ void FftDisplayPlot::setMarkerEnabled(uint chIdx, uint mkIdx, bool en)
 		data_sp->x = 0;
 		data_sp->y = axisScaleDiv(QwtPlot::yLeft).lowerBound();
 		data_sp->bin = 0;
+		data_sp->update_ui = true;
 
 		d_markers[chIdx][mkIdx].data = data_sp;
 		d_markers[chIdx][mkIdx].ui->setValue(data_sp->x, data_sp->y);
+
+		d_mrkCtrl->registerMarker(d_markers[chIdx][mkIdx].ui);
+
 	} else {
 		d_markers[chIdx][mkIdx].data = nullptr;
+		d_mrkCtrl->unRegisterMarker(d_markers[chIdx][mkIdx].ui);
 	}
 
 	d_markers[chIdx][mkIdx].ui->setVisible(en);
@@ -728,4 +762,117 @@ void FftDisplayPlot::marker_to_next_lower_mag_peak(uint chIdx, uint mkIdx)
 		return;
 
 	marker_set_pos_source(chIdx, mkIdx, peaks[pos]);
+}
+
+int FftDisplayPlot::getMarkerPos(const QList<marker>& marker_list,
+	std::shared_ptr<SpectrumMarker> marker) const
+{
+	int pos = -1;
+
+	auto it = std::find_if(marker_list.begin(), marker_list.end(),
+		[&](const struct marker &mrk) {
+			return mrk.ui == marker;
+		});
+	if (it != marker_list.end()) {
+		pos = it - marker_list.begin();
+	}
+
+	return pos;
+}
+
+void FftDisplayPlot::onMrkCtrlMarkerSelected(std::shared_ptr<SpectrumMarker>
+	marker)
+{
+	for (uint i = 0; i < d_nplots; i++) {
+		for (uint j = 0; j < d_markers[i].size(); j++) {
+			if (d_markers[i][j].ui == marker) {
+				marker->setSelected(true);
+				Q_EMIT markerSelected(i, j);
+			} else {
+				d_markers[i][j].ui->setSelected(false);
+			}
+		}
+	}
+}
+
+void FftDisplayPlot::onMrkCtrlMarkerPosChanged(std::shared_ptr<SpectrumMarker>
+	marker)
+{
+	int markerPos;
+	uint chn = -1;
+
+	for (uint i = 0; i < d_nplots; i++) {
+		markerPos = getMarkerPos(d_markers[i], marker);
+		if (markerPos >= 0) {
+			chn = i;
+			break;
+		}
+	}
+
+	if (markerPos < 0) {
+		qDebug() << "unknown marker in marker controller";
+		return;
+	}
+
+	int bin = posAtFrequency(marker->value().x());
+	if (bin < 0) {
+		qDebug() << "bin should not be negative";
+		return;
+	}
+	if (bin >= d_numPoints) {
+		bin = d_numPoints - 1;
+	}
+
+	auto marker_data = std::make_shared<struct marker_data>();
+
+	double y;
+	if (y_data[chn]) {
+		y = y_data[chn][bin];
+	} else {
+		y = axisScaleDiv(QwtPlot::yLeft).lowerBound();
+	}
+
+	marker_data->type = 0; // Fixed marker
+	marker_data->x = x_data[bin];
+	marker_data->y = y;
+	marker_data->bin = bin;
+	marker_data->update_ui = false;
+
+	marker_set_pos_source(chn, markerPos, marker_data);
+}
+
+void FftDisplayPlot::onMrkCtrlMarkerReleased(std::shared_ptr<SpectrumMarker>
+	marker)
+{
+	int markerPos;
+	uint chn = -1;
+
+	for (uint i = 0; i < d_nplots; i++) {
+		markerPos = getMarkerPos(d_markers[i], marker);
+		if (markerPos >= 0) {
+			chn = i;
+			break;
+		}
+	}
+
+	if (markerPos < 0) {
+		qDebug() << "unknown marker in marker controller";
+		return;
+	}
+
+	d_markers[chn][markerPos].data->update_ui = true;
+	updateMarkerUi(chn, markerPos);
+	replot();
+}
+
+void FftDisplayPlot::selectMarker(uint chIdx, uint mkIdx)
+{
+	for (uint i = 0; i < d_nplots; i++) {
+		for (uint j = 0; j < d_markers[i].size(); j++) {
+			d_markers[i][j].ui->setSelected(false);
+		}
+	}
+	d_markers[chIdx][mkIdx].ui->setSelected(true);
+
+	replot();
 }

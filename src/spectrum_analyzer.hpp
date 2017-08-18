@@ -108,6 +108,7 @@ private Q_SLOTS:
 	void on_btnMaxPeak_clicked();
 	void on_cmb_rbw_currentIndexChanged(int index);
 	void onPlotNewMarkerData();
+	void onPlotMarkerSelected(uint chIdx, uint mkIdx);
 
 private:
 	void build_gnuradio_block_chain();

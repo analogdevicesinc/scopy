@@ -26,6 +26,7 @@
 namespace adiscope {
 	class SpectrumAverage;
 	class SpectrumMarker;
+	class MarkerController;
 }
 
 namespace adiscope {
@@ -41,6 +42,7 @@ namespace adiscope {
 		float y;
 		int bin;
 		bool active;
+		bool update_ui;
 		QString label;
 	};
 
@@ -78,6 +80,7 @@ namespace adiscope {
 		std::vector<enum AverageType> d_ch_average_type;
 		std::vector<average_sptr> d_ch_avg_obj;
 
+		MarkerController *d_mrkCtrl;
 		QList<int> d_num_markers;
 		QList<QList<marker>> d_markers;
 		QList<QList<std::shared_ptr<struct marker_data>>> d_peaks;
@@ -97,6 +100,13 @@ namespace adiscope {
 			std::shared_ptr<struct marker_data> source_sptr);
 		void findPeaks(int chn);
 		void calculate_fixed_markers(int chn);
+		int getMarkerPos(const QList<marker>& marker_list,
+			 std::shared_ptr<SpectrumMarker> marker) const;
+
+	private Q_SLOTS:
+		void onMrkCtrlMarkerSelected(std::shared_ptr<SpectrumMarker>);
+		void onMrkCtrlMarkerPosChanged(std::shared_ptr<SpectrumMarker>);
+		void onMrkCtrlMarkerReleased(std::shared_ptr<SpectrumMarker>);
 
 	public:
 		explicit FftDisplayPlot(int nplots, QWidget *parent = nullptr);
@@ -135,10 +145,13 @@ namespace adiscope {
 		void updateMarkerUi(uint chIdx, uint mkIdx);
 		void updateMarkersUi();
 
+		void selectMarker(uint chIdx, uint mkIdx);
+
 		void replot();
 
 	Q_SIGNALS:
 		void newMarkerData();
+		void markerSelected(uint chIdx, uint mkIdx);
 
 	public Q_SLOTS:
 		void setSampleRate(double sr, double units,

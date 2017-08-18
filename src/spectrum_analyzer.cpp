@@ -228,7 +228,8 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	connect(fft_plot, SIGNAL(newMarkerData()),
 		this, SLOT(onPlotNewMarkerData()));
-
+	connect(fft_plot, SIGNAL(markerSelected(uint, uint)),
+		this, SLOT(onPlotMarkerSelected(uint, uint)));
 
 	if (ctx)
 		build_gnuradio_block_chain();
@@ -834,6 +835,7 @@ void SpectrumAnalyzer::setActiveMarker(int mrk_idx)
 
 	setDynamicProperty(mrk_buttons[mrk_idx], "active", true);
 	crt_marker = mrk_idx;
+	fft_plot->selectMarker(0, mrk_idx);
 
 	if (fft_plot->markerEnabled(0, mrk_idx)) {
 		setCurrentMarkerLabelData(0, mrk_idx);
@@ -871,6 +873,13 @@ void SpectrumAnalyzer::onPlotNewMarkerData()
 	// Update top-right label holding the reading of the active marker
 	if (fft_plot->markerEnabled(0, crt_marker)) {
 		setCurrentMarkerLabelData(0, crt_marker);
+	}
+}
+
+void SpectrumAnalyzer::onPlotMarkerSelected(uint chIdx, uint mkIdx)
+{
+	if (crt_marker != mkIdx) {
+		setActiveMarker(mkIdx);
 	}
 }
 
