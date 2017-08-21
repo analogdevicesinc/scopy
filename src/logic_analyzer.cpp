@@ -622,6 +622,7 @@ void LogicAnalyzer::setSampleRate()
 {
 	if(!dev)
 		return;
+
 	options["samplerate"] = Glib::Variant<guint64>(
 	                  g_variant_new_uint64(active_sampleRate),true);
 	Glib::VariantBase tmp = logic_analyzer_ptr->get_options()["samplerate"];
@@ -827,6 +828,7 @@ void LogicAnalyzer::configParams(double timebase, double timepos)
                 active_triggerSampleCount = -(long long)params.triggerBufferSize;
                 buffer_previewer->setNoOfSteps(0);
 
+                main_win->session_.set_entire_buffersize(0);
                 if( logic_analyzer_ptr )
                 {
                         if(logic_analyzer_ptr->get_buffersize() != active_sampleCount)
@@ -859,7 +861,7 @@ void LogicAnalyzer::configParams(double timebase, double timepos)
                 recomputeCursorsValue(true);
                 updateBufferPreviewer();
         }
-
+        logic_analyzer_ptr->set_stream(acquisition_mode == STREAM);
         main_win->view_->time_item_appearance_changed(true, true);
 }
 
