@@ -128,12 +128,14 @@ void FftDisplayPlot::plotData(const std::vector<double *> pts,
 {
 	uint64_t halfNumPoints = num_points / 2;
 	bool numPointsChanged = false;
+	bool samplRateChanged = false;
 
 	// Update sample rate if required
 	if (d_sampl_rate != d_preset_sampl_rate) {
 		d_sampl_rate = d_preset_sampl_rate;
 		d_start_frequency = 0;
 		d_stop_frequency = d_sampl_rate / 2;
+		samplRateChanged = true;
 	}
 
 	if (d_stop || halfNumPoints == 0)
@@ -220,6 +222,27 @@ void FftDisplayPlot::plotData(const std::vector<double *> pts,
 					continue;
 
 				marker.data->bin = posAtFrequency(marker.data->x);
+				marker.data->x = x_data[marker.data->bin];
+			}
+		}
+	}
+	if (samplRateChanged) {
+		// When the sample rate changes, the frequency of each bin
+		// chhanges. Markers need to be updated so that they point to
+		// the same frequency as before.
+		for (int c = 0; c < d_nplots; c++) {
+			for (int m = 0; m < d_markers[c].size(); m++) {
+				auto marker = d_markers[c][m];
+				if (!marker.data || marker.data->type != 0)
+					continue;
+
+				if (marker.data->x > d_stop_frequency) {
+					marker.data->bin = d_numPoints - 1;
+				} else {
+					marker.data->bin = posAtFrequency(
+						marker.data->x);
+				}
+
 				marker.data->x = x_data[marker.data->bin];
 			}
 		}
