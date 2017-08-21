@@ -126,8 +126,6 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 			TOOL_NETWORK_ANALYZER)));
 	api->load(*settings);
 	api->js_register(engine);
-
-	updateNumSamples();
 }
 
 NetworkAnalyzer::~NetworkAnalyzer()
@@ -142,6 +140,9 @@ NetworkAnalyzer::~NetworkAnalyzer()
 
 void NetworkAnalyzer::updateNumSamples()
 {
+	if (!ui->run_button->isChecked())
+		return;
+
 	unsigned int num_samples = (unsigned int) ui->samplesCount->value();
 
 	ui->dbgraph->setNumSamples(num_samples);
@@ -393,6 +394,7 @@ void NetworkAnalyzer::startStop(bool pressed)
 		ui->phasegraph->reset();
 		ui->xygraph->reset();
 		ui->nicholsgraph->reset();
+		updateNumSamples();
 		configHwForNetworkAnalyzing();
 		thd = QtConcurrent::run(this, &NetworkAnalyzer::run);
 	} else {
