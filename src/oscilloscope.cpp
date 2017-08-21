@@ -89,8 +89,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	triggerUpdater(new StateUpdater(250, this)),
 	menuOpened(false), current_channel(-1), math_chn_counter(0),
 	channels_group(new QButtonGroup(this)),
-	active_settings_btn(nullptr),
-	last_non_general_settings_btn(nullptr)
+	active_settings_btn(nullptr)
 {
 	ui->setupUi(this);
 	int triggers_panel = ui->stackedWidget->insertWidget(-1, &trigger_settings);
@@ -1161,6 +1160,11 @@ void adiscope::Oscilloscope::on_boxCursors_toggled(bool on)
 		plot.setCursorReadoutsVisible(!ui->boxMeasure->isChecked());
 	else if (ui->btnCursors->isChecked())
 		on_btnSettings_clicked(false);
+
+	if (!on){
+		menuOrder.removeOne(ui->btnCursors);
+	}
+
 	measure_panel_ui->cursorReadouts->setVisible(on);
 }
 
@@ -1170,6 +1174,11 @@ void adiscope::Oscilloscope::on_boxMeasure_toggled(bool on)
 		update_measure_for_channel(current_channel);
 	else if (ui->btnMeasure->isChecked())
 		on_btnSettings_clicked(false);
+
+	if (!on){
+		menuOrder.removeOne(ui->btnMeasure);
+	}
+
 	measurePanel->setVisible(on);
 	statisticsPanel->setVisible(on && statistics_enabled);
 
@@ -1555,8 +1564,16 @@ void adiscope::Oscilloscope::toggleRightMenu(QPushButton *btn)
 		id = current_channel;
 
 	active_settings_btn = static_cast<CustomPushButton *>(btn);
-	if (id != -ui->stackedWidget->indexOf(ui->generalSettings))
-		last_non_general_settings_btn = active_settings_btn;
+	if (id != -ui->stackedWidget->indexOf(ui->generalSettings)){
+		if (!menuOrder.contains(active_settings_btn)){
+			menuOrder.push_back(active_settings_btn);
+		} else {
+			menuOrder.removeOne(active_settings_btn);
+			menuOrder.push_back(active_settings_btn);
+		}
+	} else {
+		menuOrder.removeOne(active_settings_btn);
+	}
 
 	if (open)
 		settings_panel_update(id);
@@ -2182,8 +2199,9 @@ void Oscilloscope::on_btnSettings_clicked(bool checked)
 {
 	CustomPushButton *btn = nullptr;
 
-	if (checked && last_non_general_settings_btn) {
-		btn = last_non_general_settings_btn;
+	if (checked && !menuOrder.isEmpty()) {
+		btn = menuOrder.back();
+		menuOrder.pop_back();
 	} else {
 		btn = static_cast<CustomPushButton *>(
 			ui->settings_group->checkedButton());

@@ -244,7 +244,6 @@ namespace adiscope {
 		QButtonGroup *channels_group; // selected state of each channel
 
 		CustomPushButton *active_settings_btn;
-		CustomPushButton *last_non_general_settings_btn;
 		QPushButton *menuRunButton;
 
 		QList<Channel_API *> channels_api;
@@ -254,6 +253,8 @@ namespace adiscope {
 
 		QList<QPair<std::shared_ptr<MeasurementData>,
 			Statistic>> statistics_data;
+
+		QList<CustomPushButton *> menuOrder;
 
 		void writeAllSettingsToHardware();
 
