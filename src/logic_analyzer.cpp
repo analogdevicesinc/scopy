@@ -623,6 +623,9 @@ void LogicAnalyzer::setSampleRate()
 	if(!dev)
 		return;
 
+	if( acquisition_mode != REPEATED )
+		validateSamplingFrequency();
+
 	options["samplerate"] = Glib::Variant<guint64>(
 	                  g_variant_new_uint64(active_sampleRate),true);
 	Glib::VariantBase tmp = logic_analyzer_ptr->get_options()["samplerate"];
@@ -1470,6 +1473,14 @@ void LogicAnalyzer::validateSamplingFrequency()
 		srDivider = maxSamplingFrequency / samplingFreq;
 		srDivider = round(srDivider);
 		srDivider = (srDivider == 0.0) ? srDivider + 1 : srDivider;
+
+		samplingFreq = maxSamplingFrequency / srDivider;
+		if( samplingFreq == active_sampleRate ) {
+			setDynamicProperty(ui->lineeditSampleRate, "valid", true);
+			setDynamicProperty(ui->btnApply, "valid", true);
+			return;
+		}
+		active_sampleRate = samplingFreq;
 
 		active_sampleRate = maxSamplingFrequency / srDivider;
 validate:
