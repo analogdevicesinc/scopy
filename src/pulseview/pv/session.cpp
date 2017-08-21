@@ -693,7 +693,7 @@ void Session::feed_in_logic(shared_ptr<Logic> logic)
 		// this after both analog and logic sweeps have begun.
 		frame_began();
 	} else {
-		if( abs(get_logic_sample_count() - entire_buffersize_) < sample_count
+		if( (entire_buffersize_ - get_logic_sample_count() < sample_count)
 				&& screen_mode_) {
 			cur_logic_segment_->replace_payload(logic);
 		}
