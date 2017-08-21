@@ -51,9 +51,6 @@
 using namespace adiscope;
 using namespace std;
 
-// To fix: the value is temporary. FTT size will depend on other tool settings
-#define FFT_SIZE 32768
-
 std::vector<std::pair<QString, FftDisplayPlot::AverageType>>
 SpectrumAnalyzer::avg_types = {
 	{"Sample", FftDisplayPlot::SAMPLE},
@@ -92,6 +89,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	crt_peak(0),
 	crt_marker(-1),
 	max_peak_count(10),
+	fft_size(32768),
 	bin_sizes({256, 512, 1024, 2048, 4096, 8192, 16384, 32768})
 {
 
@@ -332,7 +330,7 @@ void SpectrumAnalyzer::runStopToggled(bool checked)
 void SpectrumAnalyzer::build_gnuradio_block_chain()
 {
 	// TO DO: don't use the 100e6 hardcoded value anymore
-	fft_sink = adiscope::scope_sink_f::make(FFT_SIZE, 100e6,
+	fft_sink = adiscope::scope_sink_f::make(fft_size, 100e6,
 			"Osc Frequency", num_adc_channels,
 			(QObject *)fft_plot);
 	fft_sink->set_trigger_mode(TRIG_MODE_TAG, 0, "buffer_start");
@@ -362,11 +360,11 @@ void SpectrumAnalyzer::build_gnuradio_block_chain()
 
 	for (int i = 0; i < num_adc_channels; i++) {
 		auto fft = gnuradio::get_initial_sptr(
-				new fft_block(false, FFT_SIZE));
+				new fft_block(false, fft_size));
 		auto ctm = gr::blocks::complex_to_mag_squared::make(1);
 
 		// iio(i)->fft->ctm->fft_sink
-		fft_ids[i] = iio->connect(fft, i, 0, true, FFT_SIZE);
+		fft_ids[i] = iio->connect(fft, i, 0, true, fft_size);
 		iio->connect(fft, 0, ctm, 0);
 		iio->connect(ctm, 0, fft_sink, i);
 
@@ -381,7 +379,7 @@ void SpectrumAnalyzer::build_gnuradio_block_chain()
 void SpectrumAnalyzer::build_gnuradio_block_chain_no_ctx()
 {
 	// TO DO: don't use the 100e6 hardcoded value anymore
-	fft_sink = adiscope::scope_sink_f::make(FFT_SIZE, 100e6,
+	fft_sink = adiscope::scope_sink_f::make(fft_size, 100e6,
 			"Osc Frequency", num_adc_channels,
 			(QObject *)fft_plot);
 
@@ -389,7 +387,7 @@ void SpectrumAnalyzer::build_gnuradio_block_chain_no_ctx()
 
 	for (int i = 0; i < num_adc_channels; i++) {
 		auto fft = gnuradio::get_initial_sptr(
-				new fft_block(false, FFT_SIZE));
+				new fft_block(false, fft_size));
 		auto ctm = gr::blocks::complex_to_mag_squared::make(1);
 
 		auto siggen = gr::analog::sig_source_f::make(100e6,
