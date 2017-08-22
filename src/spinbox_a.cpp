@@ -144,8 +144,8 @@ void SpinBoxA::onLineEditTextEdited()
 
 	if (unit.isEmpty()) {
 		unit = m_units[ui->SBA_Combobox->currentIndex()].first;
-	} else if (unit.at(0) == 'u') {
-		unit = unit.replace(0, 1, "μ");
+	} else if (unit.at(0) == "μ") {
+		unit = unit.replace(0, 1, "u");
 	}
 
 	i = find_if(m_units.begin(), m_units.end(),
@@ -396,6 +396,10 @@ void SpinBoxA::setUnits(const QStringList& list)
 		QStringList curr = it->split('=');
 		QString s = curr.at(0);
 		double val = curr.at(1).toDouble();
+
+		if (s.contains("μ")) {
+			sufixes += (s.at(0) + '|');
+		}
 
 		QString newS = s.replace(QRegExp("[μ]"), "u");
 		sufixes += (newS.at(0) + '|');
