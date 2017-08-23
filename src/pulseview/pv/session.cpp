@@ -692,17 +692,15 @@ void Session::feed_in_logic(shared_ptr<Logic> logic)
 		// frame_began is DecoderStack, but in future we need to signal
 		// this after both analog and logic sweeps have begun.
 		frame_began();
-	} else {
-		if( (entire_buffersize_ - get_logic_sample_count() < sample_count)
-				&& screen_mode_) {
-			cur_logic_segment_->replace_payload(logic);
-		}
-		else {
-			// Append to the existing data segment
-			cur_logic_segment_->append_payload(logic);
-		}
 	}
-
+	if( (entire_buffersize_ - get_logic_sample_count() < sample_count)
+			&& screen_mode_) {
+		cur_logic_segment_->replace_payload(logic);
+	}
+	else {
+		// Append to the existing data segment
+		cur_logic_segment_->append_payload(logic);
+	}
 	data_received();
 }
 
@@ -840,8 +838,8 @@ void Session::data_feed_in(shared_ptr<sigrok::Device> device,
 				cur_logic_segment_.reset();
 				cur_analog_segments_.clear();
 			}
+			frame_ended();
 		}
-		frame_ended();
 		break;
 	}
 	default:

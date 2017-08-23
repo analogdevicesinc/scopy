@@ -162,6 +162,7 @@ private:
 
 	mutable std::mutex output_mutex_;
 	int64_t	samples_decoded_;
+	int64_t active_decode_index_;
 
 	std::map<const decode::Row, decode::RowData> rows_;
 

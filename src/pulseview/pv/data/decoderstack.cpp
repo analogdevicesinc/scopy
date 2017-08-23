@@ -66,7 +66,8 @@ DecoderStack::DecoderStack(pv::Session &session,
 	samplerate_(0),
 	sample_count_(0),
 	frame_complete_(false),
-	samples_decoded_(0)
+	samples_decoded_(0),
+	active_decode_index_(0)
 {
 	connect(&session_, SIGNAL(frame_began()),
 		this, SLOT(on_new_frame()));
@@ -228,6 +229,7 @@ void DecoderStack::begin_decode()
 	}
 
 	clear();
+	active_decode_index_ = 0;
 
 	// Check that all decoders have the required channels
 	for (const shared_ptr<decode::Decoder> &dec : stack_)
@@ -337,7 +339,7 @@ void DecoderStack::decode_data(
 	const unsigned int chunk_sample_count =
 		DecodeChunkLength / segment_->unit_size();
 
-	for (int64_t i = 0; !interrupt_ && i < sample_count;
+	for (int64_t i = active_decode_index_; !interrupt_ && i < sample_count;
 			i += chunk_sample_count) {
 
 		const int64_t chunk_end = min(
@@ -357,6 +359,8 @@ void DecoderStack::decode_data(
 
 		if (i % DecodeNotifyPeriod == 0)
 			new_decode_data();
+
+		active_decode_index_ = chunk_end;
 	}
 
 	new_decode_data();

@@ -56,7 +56,6 @@ LogicSegment::LogicSegment(shared_ptr<Logic> logic, uint64_t samplerate,
 
 	lock_guard<recursive_mutex> lock(mutex_);
 	memset(mip_map_, 0, sizeof(mip_map_));
-	append_payload(logic);
 }
 
 LogicSegment::~LogicSegment()
