@@ -125,7 +125,8 @@ void EdgelessPlotGrid::updateScaleDiv( const QwtScaleDiv& xScaleDiv,
 }
 
 OscPlotZoomer::OscPlotZoomer(QWidget *parent, bool doReplot) :
-	QwtPlotZoomer(parent, doReplot)
+	QwtPlotZoomer(parent, doReplot),
+	lastIndex(-1)
 {
 }
 
@@ -137,18 +138,48 @@ void OscPlotZoomer::rescale()
 	    return;
 
 	const QStack<QRectF> &stack = zoomStack();
-	uint index = zoomRectIndex();
+	int index = zoomRectIndex();
 	const QRectF &rect = stack[index];
 	if ( rect != scaleRect() )
 	{
+
+	    xMinValue = plt->axisInterval(xAxis()).minValue();
+	    xMaxValue = plt->axisInterval(xAxis()).maxValue();
 	    const bool doReplot = plt->autoReplot();
 	    plt->setAutoReplot( false );
 
 	    double x1 = rect.left();
 	    double x2 = rect.right();
 
-	    if ( !plt->axisScaleDiv( xAxis() ).isIncreasing() )
+	    if (index > lastIndex) {
+		if (x1 < xMinValue){
+		    x1 = xMinValue;
+		}
+		if (x2 > xMaxValue){
+		    double oneDiv = plt->axisInterval(xAxis()).width() / plt->Curve(0)->data()->size();
+		    x2 = xMaxValue - oneDiv;
+		}
+
+		maxValuesStack.push(QPair<double, double>(xMinValue,xMaxValue));
+		lastIndex = index;
+
+	    } else {
+		lastIndex = index;
+		xMinValue = maxValuesStack.top().first;
+		xMaxValue = maxValuesStack.top().second;
+		maxValuesStack.pop();
+		if (x1 < xMinValue){
+		    x1 = xMinValue;
+		}
+		if (x2 > xMaxValue){
+		    double oneDiv = plt->axisInterval(xAxis()).width() / plt->Curve(0)->data()->size();
+		    x2 = xMaxValue - oneDiv;
+		}
+	    }
+
+	    if ( !plt->axisScaleDiv( xAxis() ).isIncreasing() ){
 		qSwap( x1, x2 );
+	    }
 
 	    double width = fabs(x1 - x2);
 	    plt->setHorizUnitsPerDiv(width / plt->xAxisNumDiv());

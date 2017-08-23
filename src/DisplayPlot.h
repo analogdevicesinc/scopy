@@ -573,6 +573,9 @@ public:
 
 protected:
 	virtual void rescale();
+	int lastIndex;
+	double xMinValue, xMaxValue;
+	QStack<QPair<double, double>> maxValuesStack;
 };
 
 /*
