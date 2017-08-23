@@ -139,33 +139,5 @@ void Segment::replace_data(void *data, uint64_t samples)
         active_sample_index_ = total_sample_count_ % capacity_;
 }
 
-/*
- * Don't append data to the existing segment; Reset the existing data;
- * Should be used in buffer mode, not continuous mode
- * @param buffersize - requested buffersize (pv plot display mechanism
- * divides the buffer into multiple buffers so we need to know what
- * size was requested initially
- */
-void Segment::add_data(void *data, uint64_t samples, size_t buffersize)
-{
-	lock_guard<recursive_mutex> lock(mutex_);
-	if( sample_count_ == buffersize )
-	{
-		sample_count_ = 0;
-		data_.clear();
-	}
-
-	assert(capacity_ >= sample_count_);
-
-	// Ensure there's enough capacity to copy.
-	const uint64_t free_space = capacity_ - sample_count_;
-	if (free_space < samples)
-		set_capacity(sample_count_ + samples);
-
-	memcpy((uint8_t*)data_.data() + sample_count_ * unit_size_,
-		data, samples * unit_size_);
-	sample_count_ += samples;
-}
-
 } // namespace data
 } // namespace pv

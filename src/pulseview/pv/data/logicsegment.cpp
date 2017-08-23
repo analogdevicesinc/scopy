@@ -166,21 +166,6 @@ void LogicSegment::replace_payload(shared_ptr<Logic> logic)
 	append_payload_to_mipmap(previous_active_index);
 }
 
-void LogicSegment::add_payload(shared_ptr<Logic> logic, size_t buffersize)
-{
-	assert(unit_size_ == logic->unit_size());
-	assert((logic->data_length() % unit_size_) == 0);
-
-	lock_guard<recursive_mutex> lock(mutex_);
-
-	add_data(logic->data_pointer(),
-		logic->data_length() / unit_size_, buffersize);
-
-	// Generate the first mip-map from the data
-	append_payload_to_mipmap();
-}
-
-
 void LogicSegment::get_samples(uint8_t *const data,
 	int64_t start_sample, int64_t end_sample) const
 {
