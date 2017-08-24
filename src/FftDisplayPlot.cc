@@ -696,11 +696,20 @@ void FftDisplayPlot::setMarkerAtFreq(uint chIdx, uint mkIdx, double freq)
 	} else {
 		y = axisScaleDiv(QwtPlot::yLeft).lowerBound();
 	}
-	d_markers[chIdx][mkIdx].data->x = x_data[pos];
-	d_markers[chIdx][mkIdx].data->y = y;
-	d_markers[chIdx][mkIdx].data->bin = pos;
 
-	marker_set_pos_source(chIdx, mkIdx, d_markers[chIdx][mkIdx].data);
+	if (d_markers[chIdx][mkIdx].data->type != 0) {
+		auto marker_data = std::make_shared<struct marker_data>();
+		marker_data->type = 0; // Fixed marker
+		marker_data->x = x_data[pos];
+		marker_data->y = y;
+		marker_data->bin = pos;
+		marker_data->update_ui = d_markers[chIdx][mkIdx].data->update_ui;
+		marker_set_pos_source(chIdx, mkIdx, marker_data);
+	} else {
+		d_markers[chIdx][mkIdx].data->x = x_data[pos];
+		d_markers[chIdx][mkIdx].data->y = y;
+		d_markers[chIdx][mkIdx].data->bin = pos;
+	}
 }
 
 void FftDisplayPlot::marker_to_max_peak(uint chIdx, uint mkIdx)
@@ -902,4 +911,19 @@ void FftDisplayPlot::selectMarker(uint chIdx, uint mkIdx)
 	d_markers[chIdx][mkIdx].ui->setSelected(true);
 
 	replot();
+}
+
+int FftDisplayPlot::markerType(uint chIdx, uint mkIdx) const
+{
+	if (chIdx >= d_markers.size()) {
+		qDebug() << "Invalid channel index!";
+		return -1;
+	}
+
+	if (mkIdx >= d_markers[chIdx].size()) {
+		qDebug() << "Invalid marker index";
+		return -1;
+	}
+
+	return d_markers[chIdx][mkIdx].data->type;
 }

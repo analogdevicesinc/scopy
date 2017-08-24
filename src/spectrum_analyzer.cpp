@@ -229,6 +229,14 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	connect(fft_plot, SIGNAL(markerSelected(uint, uint)),
 		this, SLOT(onPlotMarkerSelected(uint, uint)));
 
+	connect(ui->marker_freq_pos, SIGNAL(valueChanged(double)),
+		this, SLOT(onMarkerFreqPosChanged(double)));
+
+	connect(fft_plot, SIGNAL(sampleRateUpdated(double)),
+		this, SLOT(onPlotSampleRateUpdated(double)));
+	connect(fft_plot, SIGNAL(sampleCountUpdated(uint)),
+		this, SLOT(onPlotSampleCountUpdated(uint)));
+
 	if (ctx)
 		build_gnuradio_block_chain();
 	else
@@ -255,6 +263,11 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	ui->stackedWidget->setVisible(false);
 	ui->start_freq->setValue(0);
 	ui->stop_freq->setValue(50e6);
+
+	ui->marker_freq_pos->setMaxValue(ui->stop_freq->value());
+	ui->marker_freq_pos->setStep(2 * (ui->stop_freq->value() -
+		ui->start_freq->value()) / bin_sizes[ui->cmb_rbw->currentIndex()]);
+
 }
 
 SpectrumAnalyzer::~SpectrumAnalyzer()
@@ -807,6 +820,10 @@ void SpectrumAnalyzer::onMarkerToggled(bool on)
 
 	setMarkerEnabled(id, on);
 
+	if (id == crt_marker) {
+		updateMrkFreqPosSpinBtnValue();
+	}
+
 	updateCrtMrkLblVisibility();
 }
 
@@ -840,6 +857,7 @@ void SpectrumAnalyzer::setActiveMarker(int mrk_idx)
 	}
 
 	updateCrtMrkLblVisibility();
+	updateMrkFreqPosSpinBtnValue();
 }
 
 void SpectrumAnalyzer::setCurrentMarkerLabelData(int chIdx, int mkIdx)
@@ -871,6 +889,7 @@ void SpectrumAnalyzer::onPlotNewMarkerData()
 	// Update top-right label holding the reading of the active marker
 	if (fft_plot->markerEnabled(0, crt_marker)) {
 		setCurrentMarkerLabelData(0, crt_marker);
+		updateMrkFreqPosSpinBtnValue();
 	}
 }
 
@@ -881,6 +900,59 @@ void SpectrumAnalyzer::onPlotMarkerSelected(uint chIdx, uint mkIdx)
 	}
 }
 
+void SpectrumAnalyzer::onMarkerFreqPosChanged(double freq)
+{
+	if (!fft_plot->markerEnabled(crt_channel_id, crt_marker))
+		return;
+
+	fft_plot->setMarkerAtFreq(crt_channel_id, crt_marker, freq);
+	fft_plot->updateMarkerUi(crt_channel_id, crt_marker);
+	double actual_freq = fft_plot->markerFrequency(crt_channel_id,
+		crt_marker);
+
+	ui->marker_freq_pos->blockSignals(true);
+	ui->marker_freq_pos->setValue(actual_freq);
+	ui->marker_freq_pos->blockSignals(false);
+
+	fft_plot->replot();
+}
+
+void SpectrumAnalyzer::updateMrkFreqPosSpinBtnLimits()
+{
+	if (!fft_plot->markerEnabled(crt_channel_id, crt_marker))
+		return;
+
+	ui->marker_freq_pos->setMaxValue(ui->stop_freq->value());
+	ui->marker_freq_pos->setStep(2 * ui->stop_freq->value() /
+		bin_sizes[ui->cmb_rbw->currentIndex()]);
+
+	updateMrkFreqPosSpinBtnValue();
+}
+
+void SpectrumAnalyzer::updateMrkFreqPosSpinBtnValue()
+{
+	if (!fft_plot->markerEnabled(crt_channel_id, crt_marker))
+		return;
+	if (!fft_plot->markerType(crt_channel_id, crt_marker) == 0)
+		return;
+
+	double freq = fft_plot->markerFrequency(crt_channel_id, crt_marker);
+	if (freq != ui->marker_freq_pos->value()) {
+		ui->marker_freq_pos->blockSignals(true);
+		ui->marker_freq_pos->setValue(freq);
+		ui->marker_freq_pos->blockSignals(false);
+	}
+}
+
+void SpectrumAnalyzer::onPlotSampleRateUpdated(double)
+{
+	updateMrkFreqPosSpinBtnLimits();
+}
+
+void SpectrumAnalyzer::onPlotSampleCountUpdated(uint)
+{
+	updateMrkFreqPosSpinBtnLimits();
+}
 
 /*
  * class SpectrumChannel

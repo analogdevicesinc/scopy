@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>548</height>
+    <height>553</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -439,7 +439,13 @@ QPushButton:!checked {
         <item>
          <widget class="adiscope::MenuAnim" name="rightMenu" native="true">
           <property name="styleSheet">
-           <string notr="true">background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(35, 35, 43, 255), stop:0.1 rgba(39, 39, 48, 255), stop: 0.9 rgba(39, 39, 48, 255), stop: 1 rgba(35, 35, 43, 255));</string>
+           <string notr="true">QWidget#rightMenu {
+  background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(35, 35, 43, 255), stop:0.1 rgba(39, 39, 48, 255), stop: 0.9 rgba(39, 39, 48, 255), stop: 1 rgba(35, 35, 43, 255));
+}
+
+QWidget {
+   background-color: rgba(39, 39, 48, 255);
+}</string>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">
            <property name="spacing">
@@ -1395,87 +1401,6 @@ background-color: #F45000;
                   <number>15</number>
                  </property>
                  <item row="3" column="2">
-                  <widget class="QPushButton" name="btnUpAmplPeak">
-                   <property name="styleSheet">
-                    <string notr="true">QPushButton {
-color: white;
-background-color: #4A64FF;
-height: 30px;
-width: 110px;
-border-radius: 4px;
-}
-QPushButton:disabled {
-background-color: grey;
-}
-QPushButton:pressed {
-background-color: #F45000;
-}</string>
-                   </property>
-                   <property name="text">
-                    <string>Up Ampl</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="0">
-                  <widget class="QPushButton" name="btnLeftPeak">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="styleSheet">
-                    <string notr="true">QPushButton {
-color: white;
-background-color: #4A64FF;
-height: 30px;
-width: 110px;
-border-radius: 4px;
-}
-QPushButton:disabled {
-background-color: grey;
-}
-QPushButton:pressed {
-background-color: #F45000;
-}</string>
-                   </property>
-                   <property name="text">
-                    <string>&lt;- Peak</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="0" colspan="3">
-                  <widget class="QPushButton" name="btnMaxPeak">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="styleSheet">
-                    <string notr="true">QPushButton {
-color: white;
-background-color: #4A64FF;
-font-family: &quot;monospace&quot;;
-font-size:14px;
-height: 30px;
-width: 120px;
-border-width: 0px;
-border-radius: 4px;
-}
-QPushButton:disabled {
-background-color: grey;
-}
-QPushButton:pressed {
-background-color: #F45000;
-}</string>
-                   </property>
-                   <property name="text">
-                    <string>Peak</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="2">
                   <widget class="QPushButton" name="btnRightPeak">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -1516,7 +1441,20 @@ background-color: #F45000;
                    </property>
                   </widget>
                  </item>
-                 <item row="3" column="0">
+                 <item row="3" column="1">
+                  <spacer name="horizontalSpacer_10">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>0</width>
+                     <height>10</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item row="4" column="0">
                   <widget class="QPushButton" name="btnDnAmplPeak">
                    <property name="styleSheet">
                     <string notr="true">QPushButton {
@@ -1538,18 +1476,115 @@ background-color: #F45000;
                    </property>
                   </widget>
                  </item>
-                 <item row="2" column="1">
-                  <spacer name="horizontalSpacer_10">
-                   <property name="orientation">
-                    <enum>Qt::Horizontal</enum>
+                 <item row="4" column="2">
+                  <widget class="QPushButton" name="btnUpAmplPeak">
+                   <property name="styleSheet">
+                    <string notr="true">QPushButton {
+color: white;
+background-color: #4A64FF;
+height: 30px;
+width: 110px;
+border-radius: 4px;
+}
+QPushButton:disabled {
+background-color: grey;
+}
+QPushButton:pressed {
+background-color: #F45000;
+}</string>
                    </property>
-                   <property name="sizeHint" stdset="0">
+                   <property name="text">
+                    <string>Up Ampl</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="3" column="0">
+                  <widget class="QPushButton" name="btnLeftPeak">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">QPushButton {
+color: white;
+background-color: #4A64FF;
+height: 30px;
+width: 110px;
+border-radius: 4px;
+}
+QPushButton:disabled {
+background-color: grey;
+}
+QPushButton:pressed {
+background-color: #F45000;
+}</string>
+                   </property>
+                   <property name="text">
+                    <string>&lt;- Peak</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="0" colspan="3">
+                  <widget class="QPushButton" name="btnMaxPeak">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">QPushButton {
+color: white;
+background-color: #4A64FF;
+font-family: &quot;monospace&quot;;
+font-size:14px;
+height: 30px;
+width: 120px;
+border-width: 0px;
+border-radius: 4px;
+}
+QPushButton:disabled {
+background-color: grey;
+}
+QPushButton:pressed {
+background-color: #F45000;
+}</string>
+                   </property>
+                   <property name="text">
+                    <string>Peak</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="0" colspan="3">
+                  <widget class="adiscope::PositionSpinButton" name="marker_freq_pos" native="true">
+                   <property name="minimumSize">
                     <size>
                      <width>0</width>
-                     <height>10</height>
+                     <height>20</height>
                     </size>
                    </property>
-                  </spacer>
+                   <property name="name" stdset="0">
+                    <string>Frequency Position</string>
+                   </property>
+                   <property name="min_value" stdset="0">
+                    <double>0.000000000000000</double>
+                   </property>
+                   <property name="max_value" stdset="0">
+                    <double>50000000.000000000000000</double>
+                   </property>
+                   <property name="units" stdset="0">
+                    <stringlist>
+                     <string>Hz=1e0</string>
+                     <string>kHz=1e3</string>
+                     <string>MHz=1e6</string>
+                    </stringlist>
+                   </property>
+                   <property name="show_progress" stdset="0">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </item>

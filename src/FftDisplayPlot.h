@@ -136,6 +136,8 @@ namespace adiscope {
 
 		void setMarkerAtFreq(uint chIdx, uint mkIdx, double pos);
 
+		int markerType(uint chIdx, uint mkIdx) const;
+
 		void marker_to_max_peak(uint chIdx, uint mkIdx);
 		void marker_to_next_higher_freq_peak(uint chIdx, uint mkIdx);
 		void marker_to_next_lower_freq_peak(uint chIdx, uint mkIdx);
