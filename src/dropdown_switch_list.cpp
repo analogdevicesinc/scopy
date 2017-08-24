@@ -19,6 +19,7 @@
 
 #include "dropdown_switch_list.h"
 #include "checkbox_delegate.h"
+#include "ComboBoxLineEdit.h"
 
 #include <QLineEdit>
 #include <QStandardItemModel>
@@ -48,6 +49,7 @@ DropdownSwitchList::DropdownSwitchList(int switchColCount, QWidget *parent):
 
 	// Title of the dropdown
 	setEditable(true);
+	this->setLineEdit(new ComboBoxLineEdit(this));
 	lineEdit()->setReadOnly(true);
 	this->setTitle(m_title);
 
