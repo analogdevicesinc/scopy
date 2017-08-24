@@ -346,12 +346,14 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 		this, SLOT(setTimeout(bool)));
 	connect(trigger_settings_ui->btnAuto, SIGNAL(toggled(bool)),
 		this, SLOT(onTriggerModeChanged(bool)));
-	connect(this, SIGNAL(startRefill()),
-		this, SLOT(startTimeout()));
-	connect(this, SIGNAL(capturedSignal()),
-		this, SLOT(capturedSlot()));
+
+	connect(this, SIGNAL(starttimeout()),
+		this, SLOT(startTimer()));
+	connect(main_win->view_, SIGNAL(data_received()),
+		this, SLOT(stopTimer()));
 	connect(timer, &QTimer::timeout,
 		this, &LogicAnalyzer::triggerTimeout);
+
 	connect(main_win->view_, SIGNAL(data_received()),
 		this, SLOT(updateBufferPreviewer()));
 	connect(main_win->view_, SIGNAL(data_received()),
@@ -534,10 +536,12 @@ void LogicAnalyzer::btnExportPressed()
 	}
 }
 
-void LogicAnalyzer::startTimeout()
+void LogicAnalyzer::startTimer()
 {
-	timer->setSingleShot(true);
-	timer->start(timer_timeout_ms);
+	if(!timer->isActive()) {
+		timer->setSingleShot(true);
+		timer->start(timer_timeout_ms);
+	}
 }
 
 void LogicAnalyzer::triggerTimeout()
@@ -546,29 +550,31 @@ void LogicAnalyzer::triggerTimeout()
 		trigger_is_forced = true;
 		armed = false;
 		autoCaptureEnable();
-		timer->setInterval(timer_timeout_ms);
 	}
 }
 
-void LogicAnalyzer::refilling()
+void LogicAnalyzer::startTimeout()
 {
-	if(!timer->isActive())
-		Q_EMIT startRefill();
+	Q_EMIT starttimeout();
 }
 
-void LogicAnalyzer::captured()
+void LogicAnalyzer::stopTimeout()
 {
-	Q_EMIT capturedSignal();
+	Q_EMIT stoptimeout();
 }
 
-void LogicAnalyzer::capturedSlot()
+void LogicAnalyzer::stopTimer()
 {
-	if(timer->isActive()) {
-		timer->stop();
-	}
-	else {
-		armed = true;
-		autoCaptureEnable();
+	if(trigger_settings_ui->btnAuto->isChecked()) {
+		if(timer->isActive()) {
+			timer->stop();
+		}
+		else {
+			if(!armed)
+				trigger_is_forced = true;
+			armed = true;
+			autoCaptureEnable();
+		}
 	}
 }
 
@@ -1408,7 +1414,15 @@ void LogicAnalyzer::resetInstrumentToDefault()
 
 void LogicAnalyzer::setTimeout(bool checked)
 {
+	if(!armed) {
+		armed = true;
+		autoCaptureEnable();
+	}
 	logic_analyzer_ptr->set_timeout(checked);
+	if(checked)
+		startTimer();
+	else if(timer->isActive())
+		timer->stop();
 }
 
 void LogicAnalyzer::runModeChanged(int index)

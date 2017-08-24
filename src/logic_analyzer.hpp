@@ -108,8 +108,8 @@ public:
 
 	void setHWTrigger(int chid, std::string trigger_val);
 	std::string get_trigger_from_device(int chid);
-	void refilling();
-	void captured();
+	void startTimeout();
+	void stopTimeout();
 	void setTriggerCache(int chid, std::string trigger_value);
 	void get_channel_groups_api();
 	void installWheelEventGuard();
@@ -139,8 +139,8 @@ private Q_SLOTS:
 	void resetInstrumentToDefault();
 	void setTimeout(bool);
 	void triggerTimeout();
-	void startTimeout();
-	void capturedSlot();
+	void startTimer();
+	void stopTimer();
 	void btnExportPressed();
 	void runModeChanged(int index);
 	void validateSamplingFrequency();
@@ -156,8 +156,8 @@ public Q_SLOTS:
 	void triggerChanged(int);
 	void updateBufferPreviewer();
 Q_SIGNALS:
-	void startRefill();
-	void capturedSignal();
+	void starttimeout();
+	void stoptimeout();
 
 private:
 	std::shared_ptr<sigrok::Context> context;

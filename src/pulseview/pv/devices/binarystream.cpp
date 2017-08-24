@@ -140,20 +140,19 @@ void BinaryStream::run()
                 nbytes_rx = 0;
                 size_to_display = 0;
                 if(autoTrigger) {
-                        la->refilling();
+                        la->startTimeout();
                 }
 
                 lock_guard<recursive_mutex> lock(data_mutex_);
                 if(data_)
                         nbytes_rx = iio_buffer_refill(data_);
 
-                if( actual_buffersize != buffersize_ ) {
-                        nbytes_rx -= ((actual_buffersize-buffersize_) * 2);
-                }
-
-                nrx += nbytes_rx / 2;
-
                 if( nbytes_rx > 0 ) {
+                        if( actual_buffersize != buffersize_ ) {
+                                nbytes_rx -= ((actual_buffersize-buffersize_) * 2);
+                        }
+
+                        nrx += nbytes_rx / 2;
                         size_to_display = (nrx > entire_buffersize && !stream_mode) ?
                                                 nbytes_rx-2*(nrx-entire_buffersize) : nbytes_rx;
                         if(data_)
@@ -173,13 +172,14 @@ void BinaryStream::run()
                         }
 
                         if(autoTrigger) {
-                                la->captured();
+                                la->stopTimeout();
                         }
-                }
-                if( single_ && running && nrx >= entire_buffersize) {
-                        interrupt_ = true;
-                        stop();
-                        nrx = 0;
+
+                        if( single_ && running && nrx >= entire_buffersize) {
+                                interrupt_ = true;
+                                stop();
+                                nrx = 0;
+                        }
                 }
         }
         input_->end();
