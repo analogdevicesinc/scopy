@@ -2791,3 +2791,35 @@ void Channel_API::setLineThickness(double val)
 
 	osc->plot.setLineWidthF(index, val);
 }
+
+#define DECLARE_MEASURE(m, t) \
+	double Channel_API::measured_ ## m () const\
+	{\
+		int index = osc->channels_api.indexOf(const_cast<Channel_API*>(this));\
+		auto measData = osc->plot.measurement(Measure::t, index);\
+		return measData->value();\
+	}
+DECLARE_MEASURE(period, PERIOD)
+DECLARE_MEASURE(frequency, FREQUENCY)
+DECLARE_MEASURE(min, MIN)
+DECLARE_MEASURE(max, MAX)
+DECLARE_MEASURE(peak_to_peak, PEAK_PEAK)
+DECLARE_MEASURE(mean, MEAN)
+DECLARE_MEASURE(cycle_mean, CYCLE_MEAN)
+DECLARE_MEASURE(rms, RMS)
+DECLARE_MEASURE(cycle_rms, CYCLE_RMS)
+DECLARE_MEASURE(ac_rms, AC_RMS)
+DECLARE_MEASURE(area, AREA)
+DECLARE_MEASURE(cycle_area, CYCLE_AREA)
+DECLARE_MEASURE(low, LOW)
+DECLARE_MEASURE(high, HIGH)
+DECLARE_MEASURE(amplitude, AMPLITUDE)
+DECLARE_MEASURE(middle, MIDDLE)
+DECLARE_MEASURE(pos_overshoot, P_OVER)
+DECLARE_MEASURE(neg_overshoot, N_OVER)
+DECLARE_MEASURE(rise, RISE)
+DECLARE_MEASURE(fall, FALL)
+DECLARE_MEASURE(pos_width, P_WIDTH)
+DECLARE_MEASURE(neg_width, N_WIDTH)
+DECLARE_MEASURE(pos_duty, P_DUTY)
+DECLARE_MEASURE(neg_duty, N_DUTY)

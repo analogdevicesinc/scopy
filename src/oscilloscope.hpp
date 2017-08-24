@@ -455,6 +455,31 @@ namespace adiscope {
 		Q_PROPERTY(double line_thickness
 				READ getLineThickness WRITE setLineThickness)
 
+		Q_PROPERTY(double period READ measured_period)
+		Q_PROPERTY(double frequency READ measured_frequency)
+		Q_PROPERTY(double min READ measured_min)
+		Q_PROPERTY(double max READ measured_max)
+		Q_PROPERTY(double peak_to_peak READ measured_peak_to_peak)
+		Q_PROPERTY(double mean READ measured_mean)
+		Q_PROPERTY(double cycle_mean READ measured_cycle_mean)
+		Q_PROPERTY(double rms READ measured_rms)
+		Q_PROPERTY(double cycle_rms READ measured_cycle_rms)
+		Q_PROPERTY(double ac_rms READ measured_ac_rms)
+		Q_PROPERTY(double area READ measured_area)
+		Q_PROPERTY(double cycle_area READ measured_cycle_area)
+		Q_PROPERTY(double low READ measured_low)
+		Q_PROPERTY(double high READ measured_high)
+		Q_PROPERTY(double amplitude READ measured_amplitude)
+		Q_PROPERTY(double middle READ measured_middle)
+		Q_PROPERTY(double pos_overshoot READ measured_pos_overshoot)
+		Q_PROPERTY(double neg_overshoot READ measured_neg_overshoot)
+		Q_PROPERTY(double rise READ measured_rise)
+		Q_PROPERTY(double fall READ measured_fall)
+		Q_PROPERTY(double pos_width READ measured_pos_width)
+		Q_PROPERTY(double neg_width READ measured_neg_width)
+		Q_PROPERTY(double pos_duty READ measured_pos_duty)
+		Q_PROPERTY(double neg_duty READ measured_neg_duty)
+
 
 	public:
 		explicit Channel_API(Oscilloscope *osc) :
@@ -472,6 +497,31 @@ namespace adiscope {
 
 		double getLineThickness() const;
 		void setLineThickness(double val);
+
+		double measured_period() const;
+		double measured_frequency() const;
+		double measured_min() const;
+		double measured_max() const;
+		double measured_peak_to_peak() const;
+		double measured_mean() const;
+		double measured_cycle_mean() const;
+		double measured_rms() const;
+		double measured_cycle_rms() const;
+		double measured_ac_rms() const;
+		double measured_area() const;
+		double measured_cycle_area() const;
+		double measured_low() const;
+		double measured_high() const;
+		double measured_amplitude() const;
+		double measured_middle() const;
+		double measured_pos_overshoot() const;
+		double measured_neg_overshoot() const;
+		double measured_rise() const;
+		double measured_fall() const;
+		double measured_pos_width() const;
+		double measured_neg_width() const;
+		double measured_pos_duty() const;
+		double measured_neg_duty() const;
 
 	private:
 		Oscilloscope *osc;
