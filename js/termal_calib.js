@@ -59,6 +59,7 @@ function run_entire_calibration() {
 			var time_stamp = date.toTimeString()
 			
 			calibData += reading_iteration + "," + ++calib_iteration + "," + calib_data + (SHOW_TIMESTAMP ? "," + time_stamp : '') + '\n'
+			log(calibData)
 			
 			if (c + 1 < NB_CALIBS_IN_A_READING) {
 				printToConsole("Waiting " + SECONDS_BETWEEN_CALIBS + "s until next calibration")
@@ -73,8 +74,6 @@ function run_entire_calibration() {
 			msleep(SECONDS_BETWEEN_READINGS * 1000)
 		}
 	}
-	
-	return calibData
 }
 
 function build_header() {
@@ -116,23 +115,26 @@ function connect() {
 	
 	return true;
 }
- 
+
+function log(message) {
+  fileIO.appendToFile(message, OUTPUT_FILENAME)
+}
+
 function main() {
-	var script_output=''
-	
-	if (SHOW_START_END_TIME) {
-		var date = new Date()
-		script_output += "Script started on: " + date.toLocaleString() + '\n'
-	}
-	
+  var date = new Date()
+
 	if (!connect())
 		return Error()
 
-	script_output += build_header()
+  if (SHOW_START_END_TIME)
+		log("Script started on: " + date.toLocaleString() + '\n');
+
+	var header = build_header()
+	log(header)
 	
 	calib.setHardwareInCalibMode()
 	
-	script_output += run_entire_calibration();
+	run_entire_calibration();
 	
 	calib.restoreHardwareFromCalibMode()
 
@@ -140,10 +142,8 @@ function main() {
 	
 	if (SHOW_START_END_TIME) {
 		date = new Date()
-		script_output += "Script ended on: " + date.toLocaleString() + '\n'
+		log("Script ended on: " + date.toLocaleString() + '\n')
 	}
-	
-	fileIO.writeToFile(script_output, OUTPUT_FILENAME)
 }
 
 main()
