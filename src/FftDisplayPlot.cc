@@ -685,7 +685,7 @@ void FftDisplayPlot::setMarkerAtFreq(uint chIdx, uint mkIdx, double freq)
 	}
 
 	int64_t pos = posAtFrequency(freq);
-	if (pos < 0 && pos > d_numPoints) {
+	if (pos < 0 || pos >= d_numPoints) {
 		qDebug() << "Invalid frenquency!";
 		return;
 	}
