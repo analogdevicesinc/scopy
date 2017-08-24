@@ -18,3 +18,13 @@ void JsFileIo::writeToFile(const QString& data, const QString& path)
 		stream << data;
 	}
 }
+
+void JsFileIo::appendToFile(const QString& data, const QString& path)
+{
+	QFile file(path);
+
+	if (file.open(QIODevice::Append)) {
+		QTextStream stream(&file);
+		stream << data;
+	}
+}

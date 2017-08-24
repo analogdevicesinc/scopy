@@ -12,6 +12,7 @@ public:
 	JsFileIo(QObject *parent = 0);
 
 	Q_INVOKABLE void writeToFile(const QString& data, const QString& path);
+	Q_INVOKABLE void appendToFile(const QString& data, const QString& path);
 };
 
 } /* namespace adiscope */
