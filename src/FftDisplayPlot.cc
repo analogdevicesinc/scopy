@@ -136,6 +136,8 @@ void FftDisplayPlot::plotData(const std::vector<double *> pts,
 		d_start_frequency = 0;
 		d_stop_frequency = d_sampl_rate / 2;
 		samplRateChanged = true;
+
+		Q_EMIT sampleRateUpdated(d_sampl_rate);
 	}
 
 	if (d_stop || halfNumPoints == 0)
@@ -144,6 +146,8 @@ void FftDisplayPlot::plotData(const std::vector<double *> pts,
 	if (halfNumPoints != d_numPoints) {
 		d_numPoints = halfNumPoints;
 		numPointsChanged = true;
+
+		Q_EMIT sampleCountUpdated(d_numPoints);
 
 		if (x_data)
 			delete []x_data;
