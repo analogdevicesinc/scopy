@@ -530,6 +530,7 @@ void SpectrumAnalyzer::onChannelSettingsToggled(bool en)
 
 	QString style = QString("border: 2px solid %1").arg(sc->color().name());
 	ui->lineChannelSettingsTitle->setStyleSheet(style);
+	ui->channelSettingsTitle->setText(sc->name());
 
 	auto it = std::find_if(avg_types.begin(), avg_types.end(),
 		[&](const std::pair<QString, FftDisplayPlot::AverageType>& p){
