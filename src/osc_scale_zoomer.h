@@ -21,9 +21,10 @@
 #define OSC_SCALE_ZOOMER_H
 
 #include <qwt_plot_zoomer.h>
+#include "limitedplotzoomer.h"
 
 namespace adiscope {
-	class OscScaleZoomer : public QwtPlotZoomer
+	class OscScaleZoomer : public LimitedPlotZoomer
 	{
 		Q_OBJECT
 

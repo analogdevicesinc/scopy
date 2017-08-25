@@ -24,7 +24,8 @@
 
 using namespace adiscope;
 
-OscScaleZoomer::OscScaleZoomer(QWidget *parent) : QwtPlotZoomer(parent)
+OscScaleZoomer::OscScaleZoomer(QWidget *parent) :
+	LimitedPlotZoomer(parent)
 {
 	setTrackerMode(QwtPicker::AlwaysOn);
 
