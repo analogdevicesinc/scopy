@@ -43,6 +43,7 @@
 #include "utils.h"
 #include "osc_adjuster.hpp"
 #include "plot_utils.hpp"
+#include "limitedplotzoomer.h"
 
 #if QWT_VERSION >= 0x060000
 #include <qwt_compat.h>
@@ -564,7 +565,7 @@ private:
 	PrefixFormatter *m_formatter;
 };
 
-class OscPlotZoomer: public QwtPlotZoomer
+class OscPlotZoomer: public LimitedPlotZoomer
 {
 public:
 	OscPlotZoomer(QWidget*, bool doReplot = true);
@@ -573,9 +574,6 @@ public:
 
 protected:
 	virtual void rescale();
-	int lastIndex;
-	double xMinValue, xMaxValue;
-	QStack<QPair<double, double>> maxValuesStack;
 };
 
 /*
