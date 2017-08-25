@@ -45,10 +45,13 @@ class Tool : public QWidget
 
 public:
 	explicit Tool(struct iio_context *ctx, QPushButton *runButton,
-			ApiObject *api, ToolLauncher *parent);
+			ApiObject *api, const QString& name,
+			ToolLauncher *parent);
 	~Tool();
 
 	QPushButton *runButton() { return this->run_button; }
+	const QString& getName();
+	void setName(const QString& name);
 
 Q_SIGNALS:
 	void detachedState(bool detached);
@@ -62,6 +65,7 @@ protected:
 	QPushButton *run_button;
 	ApiObject *api;
 	QSettings *settings;
+	QString name;
 };
 }
 

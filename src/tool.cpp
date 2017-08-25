@@ -26,9 +26,11 @@
 using namespace adiscope;
 
 Tool::Tool(struct iio_context *ctx, QPushButton *runButton,
-		ApiObject *api, ToolLauncher *parent) :
+		ApiObject *api, const QString& name,
+		ToolLauncher *parent) :
 	QWidget(static_cast<QWidget *>(parent)),
-	ctx(ctx), run_button(runButton), api(api)
+	ctx(ctx), run_button(runButton), api(api),
+	name(name)
 {
 	run_button->parentWidget()->setDisabled(false);
 
@@ -45,6 +47,18 @@ Tool::~Tool()
 	run_button->parentWidget()->setDisabled(true);
 
 	delete settings;
+}
+
+
+
+const QString &Tool::getName()
+{
+	return name;
+}
+
+void Tool::setName(const QString &name)
+{
+	this->name = name;
 }
 
 void Tool::attached()
