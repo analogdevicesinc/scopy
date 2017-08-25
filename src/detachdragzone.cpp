@@ -5,7 +5,7 @@
 using namespace adiscope;
 
 DetachDragZone::DetachDragZone(QWidget *parent) :
-	QWidget(parent)
+	ColoredQWidget(parent)
 {
 	ToolLauncher *tl = static_cast<ToolLauncher*>(parent->parent());
 	if (tl->infoWidget != nullptr){
@@ -62,4 +62,3 @@ void DetachDragZone::dropEvent(QDropEvent *event)
 		Q_EMIT detachWidget(position);
 	}
 }
-

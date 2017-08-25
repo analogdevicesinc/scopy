@@ -7,8 +7,10 @@
 #include <QDropEvent>
 #include <QString>
 
+#include "coloredQWidget.hpp"
+
 namespace adiscope {
-class DetachDragZone : public QWidget
+class DetachDragZone : public ColoredQWidget
 {
 	Q_OBJECT
 
@@ -27,7 +29,6 @@ private Q_SLOTS:
 	void dragMoveEvent(QDragMoveEvent *event);
 	void dragLeaveEvent(QDragLeaveEvent *event);
 	void dropEvent(QDropEvent *event);
-
 
 };
 }
