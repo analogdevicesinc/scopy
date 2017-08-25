@@ -27,10 +27,6 @@ QLabel:disabled, QRadioButton:disabled {
 	color: rgba(255, 255, 255, 80);
 }
 
-QMainWindow > .QWidget > .QWidget {
-	background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 rgba(0, 0, 0, 40), stop:1 transparent);
-}
-
 QTextBrowser {
 	background-color: rgba(0, 0, 0, 150);
 }
