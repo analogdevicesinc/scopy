@@ -107,6 +107,7 @@ private Q_SLOTS:
 	void on_btnDnAmplPeak_clicked();
 	void on_btnMaxPeak_clicked();
 	void on_cmb_rbw_currentIndexChanged(int index);
+	void on_cmb_units_currentIndexChanged(const QString&);
 	void onPlotNewMarkerData();
 	void onPlotMarkerSelected(uint chIdx, uint mkIdx);
 	void onMarkerFreqPosChanged(double);

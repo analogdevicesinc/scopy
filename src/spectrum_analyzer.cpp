@@ -157,7 +157,6 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	fft_plot = new FftDisplayPlot(num_adc_channels, this);
 	fft_plot->disableLegend();
 	fft_plot->setAxisScale(QwtPlot::yLeft, -200, 0, 10);
-	fft_plot->setLeftVertAxisUnit(ui->cmb_units->currentText());
 	// Disable mouse interactions with the axes until they are in a working state
 	fft_plot->setXaxisMouseGesturesEnabled(false);
 	for (uint i = 0; i < num_adc_channels; i++)
@@ -275,6 +274,8 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	ui->marker_freq_pos->setMaxValue(ui->stop_freq->value());
 	ui->marker_freq_pos->setStep(2 * (ui->stop_freq->value() -
 		ui->start_freq->value()) / bin_sizes[ui->cmb_rbw->currentIndex()]);
+
+	ui->lblMagUnit->setText(ui->cmb_units->currentText());
 
 }
 
@@ -987,6 +988,12 @@ void SpectrumAnalyzer::singleCaptureDone()
 	if (ui->btnSingle->isChecked()) {
 		ui->btnSingle->setChecked(false);
 	}
+}
+
+
+void SpectrumAnalyzer::on_cmb_units_currentIndexChanged(const QString& unit)
+{
+	ui->lblMagUnit->setText(unit);
 }
 
 /*
