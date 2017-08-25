@@ -152,6 +152,7 @@ namespace adiscope {
 		void replot();
 
 	Q_SIGNALS:
+		void newData();
 		void sampleRateUpdated(double);
 		void sampleCountUpdated(uint);
 		void newMarkerData();

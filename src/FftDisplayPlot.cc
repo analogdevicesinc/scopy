@@ -261,6 +261,8 @@ void FftDisplayPlot::plotData(const std::vector<double *> pts,
 	}
 
 	replot();
+
+	Q_EMIT newData();
 }
 
 void FftDisplayPlot::_resetXAxisPoints()
