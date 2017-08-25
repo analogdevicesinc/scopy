@@ -100,10 +100,13 @@ QComboBox:disabled
       <item>
        <layout class="QHBoxLayout" name="hLayoutTopBar">
         <property name="spacing">
-         <number>0</number>
+         <number>20</number>
         </property>
         <property name="topMargin">
          <number>9</number>
+        </property>
+        <property name="rightMargin">
+         <number>15</number>
         </property>
         <property name="bottomMargin">
          <number>9</number>
@@ -196,26 +199,53 @@ QPushButton:disabled {
         </item>
         <item>
          <widget class="QPushButton" name="btnSingle">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="layoutDirection">
+           <enum>Qt::RightToLeft</enum>
+          </property>
           <property name="styleSheet">
            <string notr="true">QPushButton {
-color: white;
-background-color: #FF7200;
-font-family: &quot;monospace&quot;;
-font-weight: bold;
-height: 30px;
-border-width: 0px;
-border-radius: 3px;
-min-width: 6em;
+  width: 80px;
+  height: 40px;
+  border-radius: 4px;
+  background-color: #ff7200;
+  color: white;
+  font-family: &quot;monospace&quot;;
+  font-weight: bold;
+
+  text-align: left;
+  padding-left: 20px;
+  padding-right: 20px;
+  qproperty-text: &quot;Single&quot;;
 }
+
+QPushButton[running=true] {
+  qproperty-text: &quot;Stop&quot;;
+  background-color: #F45000;
+}
+
 QPushButton:disabled {
-background-color: grey;
-}
-QPushButton:checked {
-background-color: #F45000;
+  background-color: grey;
 }</string>
           </property>
           <property name="text">
            <string>Single</string>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normalon>:/icons/ico-oneshot.svg</normalon>
+           </iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>10</width>
+            <height>10</height>
+           </size>
           </property>
           <property name="checkable">
            <bool>true</bool>
@@ -336,22 +366,6 @@ QPushButton:!checked {
            <bool>true</bool>
           </property>
          </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer_3">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Fixed</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>15</width>
-            <height>0</height>
-           </size>
-          </property>
-         </spacer>
         </item>
        </layout>
       </item>
@@ -1765,15 +1779,15 @@ QLabel {
    <container>1</container>
   </customwidget>
   <customwidget>
+   <class>adiscope::CustomPushButton</class>
+   <extends>QPushButton</extends>
+   <header>customPushButton.hpp</header>
+  </customwidget>
+  <customwidget>
    <class>adiscope::PositionSpinButton</class>
    <extends>QWidget</extends>
    <header>spinbox_a.hpp</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>adiscope::CustomPushButton</class>
-   <extends>QPushButton</extends>
-   <header>customPushButton.hpp</header>
   </customwidget>
  </customwidgets>
  <resources>

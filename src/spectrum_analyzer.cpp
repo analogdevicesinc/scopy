@@ -127,8 +127,12 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	ui->btnSettings->hide();
 
 	// Hide Single and Preset buttons until functionality is added
-	ui->btnSingle->hide();
 	ui->btnPreset->hide();
+
+	ui->run_button->setProperty("normal_text",
+		QVariant(ui->run_button->text()));
+	ui->btnSingle->setProperty("normal_text",
+		QVariant(ui->btnSingle->text()));
 
 	ui->comboBox_type->blockSignals(true);
 	ui->comboBox_type->clear();
@@ -248,6 +252,10 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 			SLOT(setChecked(bool)));
 	connect(run_button, SIGNAL(toggled(bool)), ui->run_button,
 		SLOT(setChecked(bool)));
+	connect(ui->btnSingle, SIGNAL(toggled(bool)),
+		SLOT(runStopToggled(bool)));
+	connect(fft_plot, SIGNAL(newData()),
+		SLOT(singleCaptureDone()));
 
 	connect(ui->start_freq, SIGNAL(valueChanged(double)),
 		this, SLOT(onStartStopChanged()));
@@ -322,17 +330,36 @@ void SpectrumAnalyzer::on_btnMarkers_toggled(bool checked)
 
 void SpectrumAnalyzer::runStopToggled(bool checked)
 {
+	QPushButton *btn = static_cast<QPushButton *>(QObject::sender());
+	setDynamicProperty(btn, "running", checked);
+
 	if (checked) {
+		if (btn == ui->btnSingle && ui->run_button->isChecked()) {
+			ui->run_button->blockSignals(true);
+			ui->run_button->setChecked(false);
+			ui->run_button->blockSignals(false);
+			ui->run_button->setText(ui->run_button->property(
+					"normal_text").toString());
+			setDynamicProperty(ui->run_button, "running", false);
+		} else if (btn == ui->run_button &&
+				ui->btnSingle->isChecked()) {
+			ui->btnSingle->blockSignals(true);
+			ui->btnSingle->setChecked(false);
+			ui->btnSingle->blockSignals(false);
+			ui->btnSingle->setText(ui->btnSingle->property(
+					"normal_text").toString());
+			setDynamicProperty(ui->btnSingle, "running", false);
+		}
+
 		if (iio) {
 			writeAllSettingsToHardware();
 		}
 
 		fft_plot->presetSampleRate(sample_rate);
 		fft_sink->set_samp_rate(sample_rate);
-		ui->run_button->setText("Stop");
 		start_blockchain_flow();
 	} else {
-		ui->run_button->setText("Run");
+		btn->setText(btn->property("normal_text").toString());
 		stop_blockchain_flow();
 	}
 
@@ -952,6 +979,13 @@ void SpectrumAnalyzer::onPlotSampleRateUpdated(double)
 void SpectrumAnalyzer::onPlotSampleCountUpdated(uint)
 {
 	updateMrkFreqPosSpinBtnLimits();
+}
+
+void SpectrumAnalyzer::singleCaptureDone()
+{
+	if (ui->btnSingle->isChecked()) {
+		ui->btnSingle->setChecked(false);
+	}
 }
 
 /*

@@ -112,6 +112,7 @@ private Q_SLOTS:
 	void onMarkerFreqPosChanged(double);
 	void onPlotSampleRateUpdated(double);
 	void onPlotSampleCountUpdated(uint);
+	void singleCaptureDone();
 
 private:
 	void build_gnuradio_block_chain();
