@@ -1103,6 +1103,9 @@ void SpectrumChannel::onEnableBoxToggled(bool en)
 
 void SpectrumChannel::onNameButtonToggled(bool en)
 {
+	if (en && !m_ui->box->isChecked()) {
+		m_ui->box->setChecked(true);
+	}
 	setDynamicProperty(m_ui->name->parentWidget(), "selected", en);
 
 	Q_EMIT selected(en);
