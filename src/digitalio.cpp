@@ -134,7 +134,7 @@ void DigitalIO::setOutput()
 DigitalIO::DigitalIO(struct iio_context *ctx, Filter *filt, QPushButton *runBtn,
                      DIOManager *diom, QJSEngine *engine,
                      ToolLauncher *parent, bool offline_mode) :
-	Tool(ctx, runBtn, new DigitalIO_API(this), parent),
+	Tool(ctx, runBtn, new DigitalIO_API(this), "Digital IO", parent),
 	ui(new Ui::DigitalIO),
 	offline_mode(offline_mode),
 	diom(diom)

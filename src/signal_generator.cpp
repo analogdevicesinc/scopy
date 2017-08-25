@@ -93,7 +93,7 @@ struct adiscope::time_block_data {
 SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 		QList<std::shared_ptr<GenericDac>> dacs, Filter *filt,
 		QPushButton *runButton, QJSEngine *engine, ToolLauncher *parent) :
-	Tool(_ctx, runButton, new SignalGenerator_API(this), parent),
+	Tool(_ctx, runButton, new SignalGenerator_API(this), "Signal Generator", parent),
 	ui(new Ui::SignalGenerator),
 	time_block_data(new adiscope::time_block_data),
 	dacs(dacs),

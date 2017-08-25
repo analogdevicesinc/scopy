@@ -82,7 +82,7 @@ SpectrumAnalyzer::win_types = {
 SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	std::shared_ptr<GenericAdc> adc, QPushButton *runButton,
 	ToolLauncher *parent):
-	Tool(ctx, runButton, new SpectrumAnalyzer_API(this), parent),
+	Tool(ctx, runButton, new SpectrumAnalyzer_API(this), "Spectrum Analyzer", parent),
 	ui(new Ui::SpectrumAnalyzer),
 	fft_plot(nullptr),
 	settings_group(new QButtonGroup(this)),

@@ -1005,6 +1005,7 @@ void ToolLauncher::toolDetached(bool detached)
 
 		DetachedWindow *window = new DetachedWindow(this);
 		window->setCentralWidget(tool);
+		window->setWindowTitle("Scopy - " + tool->getName());
 		window->resize(sizeHint());
 		window->show();
 

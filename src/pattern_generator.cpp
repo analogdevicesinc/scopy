@@ -140,7 +140,7 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
                                    QPushButton *runBtn, QJSEngine *engine,
                                    DIOManager *diom, ToolLauncher *parent,
                                    bool offline_mode_) :
-	Tool(ctx, runBtn, new PatternGenerator_API(this), parent),
+	Tool(ctx, runBtn, new PatternGenerator_API(this), "Pattern Generator", parent),
 	settings_group(new QButtonGroup(this)),
 	ui(new Ui::PatternGenerator),
 	pgSettings(new Ui::PGSettings),

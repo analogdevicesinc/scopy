@@ -65,7 +65,7 @@ using namespace std;
 Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		std::shared_ptr<GenericAdc> adc, QPushButton *runButton,
 		 QJSEngine *engine, ToolLauncher *parent) :
-	Tool(ctx, runButton, new Oscilloscope_API(this), parent),
+	Tool(ctx, runButton, new Oscilloscope_API(this), "Oscilloscope", parent),
 	adc(adc),
 	m2k_adc(dynamic_pointer_cast<M2kAdc>(adc)),
 	nb_channels(Oscilloscope::adc->numAdcChannels()),

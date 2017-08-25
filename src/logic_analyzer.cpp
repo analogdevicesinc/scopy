@@ -87,7 +87,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
                              QJSEngine *engine,
                              ToolLauncher *parent,
                              bool offline_mode_) :
-	Tool(ctx, runBtn, new LogicAnalyzer_API(this), parent),
+	Tool(ctx, runBtn, new LogicAnalyzer_API(this), "Logic Analyzer", parent),
 	itemsize(sizeof(uint16_t)),
 	dev_name(),
 	dev(nullptr),

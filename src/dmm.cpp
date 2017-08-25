@@ -39,7 +39,7 @@ using namespace adiscope;
 
 DMM::DMM(struct iio_context *ctx, Filter *filt, std::shared_ptr<GenericAdc> adc,
 		QPushButton *runButton, QJSEngine *engine, ToolLauncher *parent)
-	: Tool(ctx, runButton, new DMM_API(this), parent),
+	: Tool(ctx, runButton, new DMM_API(this), "Voltmeter", parent),
 	ui(new Ui::DMM), signal(boost::make_shared<signal_sample>()),
 	manager(iio_manager::get_instance(ctx, filt->device_name(TOOL_DMM))),
 	adc(adc)
