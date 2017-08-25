@@ -948,9 +948,6 @@ void SpectrumAnalyzer::onMarkerFreqPosChanged(double freq)
 
 void SpectrumAnalyzer::updateMrkFreqPosSpinBtnLimits()
 {
-	if (!fft_plot->markerEnabled(crt_channel_id, crt_marker))
-		return;
-
 	ui->marker_freq_pos->setMaxValue(ui->stop_freq->value());
 	ui->marker_freq_pos->setStep(2 * ui->stop_freq->value() /
 		bin_sizes[ui->cmb_rbw->currentIndex()]);
