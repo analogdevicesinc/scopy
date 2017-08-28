@@ -558,11 +558,28 @@ void SpectrumAnalyzer::onChannelSettingsToggled(bool en)
 void SpectrumAnalyzer::onChannelSelected(bool en)
 {
 	SpectrumChannel *sc = static_cast<SpectrumChannel *>(QObject::sender());
-	crt_channel_id = sc->id();
+	int chIdx = sc->id();
 
+	// Is this if branch required?
 	if (!ui->run_button->isChecked()) {
 		fft_plot->replot();
 	}
+
+	// Update markers settings menu based on current channel
+	if (en) {
+		ui->labelMarkerSettingsTitle->setText(sc->name());
+
+		for (int i = 0; i < fft_plot->markerCount(chIdx); i++) {
+			mrk_buttons[i]->blockSignals(true);
+			mrk_buttons[i]->setChecked(
+				fft_plot->markerEnabled(chIdx, i));
+			mrk_buttons[i]->blockSignals(false);
+		}
+
+		updateCrtMrkLblVisibility();
+	}
+
+	crt_channel_id = chIdx;
 }
 
 void SpectrumAnalyzer::onChannelEnabled(bool en)
@@ -847,22 +864,25 @@ void SpectrumAnalyzer::onMarkerToggled(bool on)
 	QPushButton *btn = static_cast<QPushButton *>(QObject::sender());
 	uint id = btn->property("id").toUInt();
 
-	setMarkerEnabled(id, on);
+	setMarkerEnabled(crt_channel_id, id, on);
 
 	if (id == crt_marker) {
+		if (on) {
+			setCurrentMarkerLabelData(crt_channel_id, id);
+		}
 		updateMrkFreqPosSpinBtnValue();
 	}
 
 	updateCrtMrkLblVisibility();
 }
 
-void SpectrumAnalyzer::setMarkerEnabled(int mrk_idx, bool en)
+void SpectrumAnalyzer::setMarkerEnabled(int ch_idx, int mrk_idx, bool en)
 {
-	fft_plot->setMarkerEnabled(0, mrk_idx, en);
+	fft_plot->setMarkerEnabled(ch_idx, mrk_idx, en);
 	if (en) {
 		double cf = ui->center_freq->value();
-		fft_plot->setMarkerAtFreq(0, mrk_idx, cf);
-		fft_plot->updateMarkerUi(0, mrk_idx);
+		fft_plot->setMarkerAtFreq(ch_idx, mrk_idx, cf);
+		fft_plot->updateMarkerUi(ch_idx, mrk_idx);
 	}
 	fft_plot->replot();
 }
@@ -879,10 +899,10 @@ void SpectrumAnalyzer::setActiveMarker(int mrk_idx)
 
 	setDynamicProperty(mrk_buttons[mrk_idx], "active", true);
 	crt_marker = mrk_idx;
-	fft_plot->selectMarker(0, mrk_idx);
+	fft_plot->selectMarker(crt_channel_id, mrk_idx);
 
-	if (fft_plot->markerEnabled(0, mrk_idx)) {
-		setCurrentMarkerLabelData(0, mrk_idx);
+	if (fft_plot->markerEnabled(crt_channel_id, mrk_idx)) {
+		setCurrentMarkerLabelData(crt_channel_id, mrk_idx);
 	}
 
 	updateCrtMrkLblVisibility();
@@ -916,14 +936,18 @@ void SpectrumAnalyzer::updateCrtMrkLblVisibility()
 void SpectrumAnalyzer::onPlotNewMarkerData()
 {
 	// Update top-right label holding the reading of the active marker
-	if (fft_plot->markerEnabled(0, crt_marker)) {
-		setCurrentMarkerLabelData(0, crt_marker);
+	if (fft_plot->markerEnabled(crt_channel_id, crt_marker)) {
+		setCurrentMarkerLabelData(crt_channel_id, crt_marker);
 		updateMrkFreqPosSpinBtnValue();
 	}
 }
 
 void SpectrumAnalyzer::onPlotMarkerSelected(uint chIdx, uint mkIdx)
 {
+	if (crt_channel_id != chIdx) {
+		channels[chIdx]->m_ui->name->setChecked(true);
+
+	}
 	if (crt_marker != mkIdx) {
 		setActiveMarker(mkIdx);
 	}

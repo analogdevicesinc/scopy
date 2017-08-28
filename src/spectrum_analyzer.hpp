@@ -124,7 +124,7 @@ private:
 	int channelIdOfOpenedSettings() const;
 	void setSampleRate(double sr);
 	void setFftSize(uint size);
-	void setMarkerEnabled(int mrk_idx, bool en);
+	void setMarkerEnabled(int ch_idx, int mrk_idx, bool en);
 	void setActiveMarker(int mrk_idx);
 	void setCurrentMarkerLabelData(int chIdx, int mkIdx);
 	void updateCrtMrkLblVisibility();
