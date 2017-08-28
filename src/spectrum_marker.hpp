@@ -32,6 +32,9 @@ public:
 		bool movable = true);
 	virtual ~SpectrumMarker();
 
+	QColor defaultColor() const;
+	void setDefaultColor(const QColor&);
+
 	bool selected() const;
 	void setSelected(bool on);
 
@@ -48,6 +51,7 @@ private:
 	QwtAxisId m_yAxis;
 	bool m_selected;
 	bool m_movable;
+	QColor m_default_color;
 };
 
 } /* namespace adiscope */

@@ -38,6 +38,9 @@ FftDisplayPlot::FftDisplayPlot(int nplots, QWidget *parent) :
 	d_mrkCtrl(nullptr),
 	d_emitNewMkrData(true)
 {
+	// TO DO: Add more colors
+	d_markerColors << QColor(255, 242, 0) << QColor(210, 155, 210);
+
 	for (unsigned int i = 0; i < nplots; i++) {
 		auto plot = new QwtPlotCurve(QString("Data %1").arg(i));
 
@@ -492,14 +495,16 @@ void FftDisplayPlot::add_marker(int chn)
 
 	// GUI marker
 	auto gui_marker = std::make_shared<SpectrumMarker>(markerName);
+	QColor marker_color = d_markerColors[chn % d_markerColors.size()];
 	QwtSymbol *symbol = new QwtSymbol(
-		QwtSymbol::Diamond,QColor(255, 242, 0),
+		QwtSymbol::Diamond, marker_color,
 		QPen(QColor(237, 28, 36), 2, Qt::SolidLine),
 		QSize(18, 18));
 	symbol->setSize(18, 18);
 	gui_marker->setSymbol(symbol);
 	gui_marker->setLabel(gui_marker->title());
 	gui_marker->setLabelAlignment(Qt::AlignTop);
+	gui_marker->setDefaultColor(marker_color);
 	gui_marker->attach(this);
 
 	QwtText mrk_lbl = gui_marker->label();

@@ -40,6 +40,16 @@ SpectrumMarker::~SpectrumMarker()
 {
 }
 
+QColor SpectrumMarker::defaultColor() const
+{
+	return m_default_color;
+}
+
+void SpectrumMarker::setDefaultColor(const QColor& color)
+{
+	m_default_color = color;
+}
+
 bool SpectrumMarker::selected() const
 {
 	return m_selected;
@@ -54,7 +64,7 @@ void SpectrumMarker::setSelected(bool on)
 		if (on) {
 			brush.setColor(symbol()->pen().color());
 		} else {
-			brush.setColor(QColor(255, 242, 0));
+			brush.setColor(defaultColor());
 		}
 
 		QwtSymbol *new_sym = new QwtSymbol(symbol()->style(),

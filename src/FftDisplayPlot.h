@@ -87,6 +87,8 @@ namespace adiscope {
 		QList<QList<std::shared_ptr<struct marker_data>>> d_freq_asc_sorted_peaks;
 		bool d_emitNewMkrData;
 
+		QList<QColor> d_markerColors;
+
 		void plotData(const std::vector<double *> pts,
 				uint64_t num_points);
 		void _resetXAxisPoints();
