@@ -123,5 +123,5 @@ void Sismograph::setColor(const QColor& color)
 
 void Sismograph::updateScale(const QwtScaleDiv div)
 {
-	setAxisScaleDiv(QwtPlot::xTop, div);
+	setAxisScale(QwtPlot::xTop, div.lowerBound(), div.upperBound());
 }
