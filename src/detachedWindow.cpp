@@ -23,8 +23,10 @@
 
 using namespace adiscope;
 
-DetachedWindow::DetachedWindow(QWidget *parent) : QMainWindow(parent)
+DetachedWindow::DetachedWindow(QIcon icon, QWidget *parent):
+	QMainWindow(parent)
 {
+	this->setWindowIcon(icon);
 }
 
 DetachedWindow::~DetachedWindow()
