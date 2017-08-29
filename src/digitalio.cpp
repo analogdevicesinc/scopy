@@ -106,6 +106,15 @@ void DigitalIO::setOutput(int ch, int out)
 	}
 }
 
+void DigitalIO::setVisible(bool visible)
+{
+	if (visible)
+		poll->start(polling_rate);
+	else
+		poll->stop();
+	Tool::setVisible(visible);
+}
+
 void DigitalIO::setSlider(int val)
 {
 	auto grp = static_cast<DigitalIoGroup *>(QObject::sender());
@@ -321,11 +330,9 @@ void adiscope::DigitalIO::on_btnRunStop_clicked()
 {
 	if (ui->btnRunStop->isChecked()) {
 		ui->btnRunStop->setText("Stop");
-		poll->start(polling_rate);
 		diom->enableOutput(true);
 	} else {
 		ui->btnRunStop->setText("Run");
-		poll->stop();
 		diom->enableOutput(false);
 	}
 }

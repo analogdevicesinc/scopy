@@ -105,6 +105,7 @@ public:
 	~DigitalIO();
 	void setDirection(int ch, int direction);
 	void setOutput(int ch, int out);
+	void setVisible(bool visible);
 
 public Q_SLOTS:
 	void updateUi();
