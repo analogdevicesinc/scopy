@@ -144,8 +144,10 @@ void SpinBoxA::onLineEditTextEdited()
 
 	if (unit.isEmpty()) {
 		unit = m_units[ui->SBA_Combobox->currentIndex()].first;
-	} else if (unit.at(0) == "μ") {
+	} else if (unit.startsWith(QString("μ"))) {
+		qDebug()<<"before unit "<<unit ;
 		unit = unit.replace(0, 1, "u");
+		qDebug()<<"after unit "<<unit ;
 	}
 
 	i = find_if(m_units.begin(), m_units.end(),
