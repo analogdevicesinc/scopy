@@ -24,6 +24,7 @@
 #include <QVector>
 #include <vector>
 #include <string>
+#include <QTimer>
 
 #include "apiObject.hpp"
 #include "pg_patterns.hpp"
@@ -138,6 +139,7 @@ private:
 
 	runState _pgStatus;
 	static QStringList strStatus;
+	QTimer *singleRunTimer;
 	//Q_PROPERTY(runState pgStatus READ pgStatus WRITE setPGStatus)
 
 	void setPGStatus(runState _val);

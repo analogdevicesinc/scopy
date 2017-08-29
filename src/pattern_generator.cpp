@@ -232,6 +232,9 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 	ui->channelManagerWidgetLayout->addWidget(chmui);
 	ui->btnChSettings->setChecked(true);
 	ui->rightWidget->setCurrentIndex(1);
+	singleRunTimer = new QTimer();
+	singleRunTimer->setSingleShot(true);
+	connect(singleRunTimer,SIGNAL(timeout()),this,SLOT(singleRunStop()));
 
 	connect(cgSettings->CBPattern,SIGNAL(activated(int)),this,
 	        SLOT(patternChanged(int)));
@@ -872,7 +875,11 @@ void PatternGenerator::startStop(bool start)
 
 	if (start) {
 		ui->btnRunStop->setText("Stop");
-
+		if(singleRunTimer->isActive())
+		{
+			singleRunTimer->stop();
+			singleRunStop();
+		}
 		if (startPatternGeneration(true)) {
 			setPGStatus(RUNNING);
 		} else {
@@ -897,7 +904,10 @@ void PatternGenerator::singleRun()
 		                bufman->getBufferSize()/2)/((
 		                                float)bufman->getSampleRate()))*1000.0);
 		qDebug("Time until buffer destroy %d", time_until_buffer_destroy);
-		QTimer::singleShot(time_until_buffer_destroy, this, SLOT(singleRunStop()));
+
+		singleRunTimer->setInterval(time_until_buffer_destroy);
+		singleRunTimer->start();
+
 		qDebug("Pattern generation single started");
 		ui->btnSingleRun->setChecked(false);
 	} else {
