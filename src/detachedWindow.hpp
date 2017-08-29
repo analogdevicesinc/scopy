@@ -33,7 +33,7 @@ Q_SIGNALS:
 	void closed();
 
 public:
-	explicit DetachedWindow(QWidget *parent = Q_NULLPTR);
+	explicit DetachedWindow(QIcon icon, QWidget *parent = Q_NULLPTR);
 	~DetachedWindow();
 
 	void setCentralWidget(QWidget *widget);
