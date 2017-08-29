@@ -45,6 +45,7 @@
 #include "network_analyzer.hpp"
 #include "digitalio.hpp"
 #include "menuoption.h"
+#include "detachedWindow.hpp"
 
 extern "C" {
 	struct iio_context;
@@ -126,6 +127,7 @@ private:
 	struct iio_context *ctx;
 
 	QMap<QString, MenuOption*> toolMenu;
+	QList<DetachedWindow *> detachedWindows;
 	QVector<int> position;
 
 	QVector<QPair<QWidget, Ui::Device> *> devices;
@@ -183,6 +185,7 @@ private:
 	QStringList toolIcons;
 	void UpdatePosition(QWidget *widget, int position);
 	void insertMenuOptions();
+	void closeEvent(QCloseEvent *event);
 };
 
 class ToolLauncher_API: public ApiObject
