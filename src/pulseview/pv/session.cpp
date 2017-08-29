@@ -725,6 +725,11 @@ int Session::get_logic_active_sample()
 	return 0;
 }
 
+std::shared_ptr<data::Logic> Session::get_logic_data()
+{
+	return logic_data_;
+}
+
 void Session::feed_in_analog(shared_ptr<Analog> analog)
 {
 	lock_guard<recursive_mutex> lock(data_mutex_);
