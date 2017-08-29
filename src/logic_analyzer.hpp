@@ -116,6 +116,7 @@ public:
 	void bufferSentSignal(bool lastBuffer);
 	int getCurrent_acquisition_mode() const;
 	void setCurrent_acquisition_mode(int value);
+	QString saveToFile();
 
 private Q_SLOTS:
 	void startStop(bool start);
@@ -266,6 +267,7 @@ private:
 	void configParams(double timebase, double timepos);
 	StateUpdater *triggerUpdater;
 	bool trigger_is_forced;
+	bool exportTabCsv(QString separator, QString);
 };
 
 class LogicAnalyzer_API : public ApiObject

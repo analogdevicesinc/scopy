@@ -159,6 +159,8 @@ public:
 
 	int get_logic_active_sample();
 
+	std::shared_ptr<data::Logic> get_logic_data();
+
 private:
 	void set_capture_state(capture_state state);
 

@@ -72,6 +72,7 @@ public:
 
 	void get_samples(uint8_t *const data,
 		int64_t start_sample, int64_t end_sample) const;
+	uint64_t get_sample(uint64_t index) const;
 
 private:
 	uint64_t unpack_sample(const uint8_t *ptr) const;
@@ -81,7 +82,7 @@ private:
 
 	void append_payload_to_mipmap(uint64_t prev_active=0);
 
-	uint64_t get_sample(uint64_t index) const;
+
 
 public:
 	/**
