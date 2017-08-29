@@ -27,7 +27,8 @@ MenuOption::MenuOption(QString toolName, QString iconPath,
 	position(position),
 	usesCustomBtn(usesCustomBtn),
 	botSep(nullptr),
-	topSep(nullptr)
+	topSep(nullptr),
+	detached(false)
 {
 	ui->setupUi(this);
 	ui->toolBtn->setText(toolName);
@@ -125,6 +126,16 @@ int MenuOption::getPosition()
 QString MenuOption::getName()
 {
 	return toolName;
+}
+
+void MenuOption::setDetached(bool detached)
+{
+	this->detached = detached;
+}
+
+bool MenuOption::isDetached()
+{
+	return detached;
 }
 
 void MenuOption::highlightBotSeparator(bool on)

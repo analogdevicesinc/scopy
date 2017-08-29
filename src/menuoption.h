@@ -32,6 +32,9 @@ public:
 
 	QString getName();
 
+	void setDetached(bool detached);
+	bool isDetached();
+
 	void highlightBotSeparator(bool on);
 	void highlightNeighbour(bool on);
 
@@ -39,6 +42,7 @@ public:
 	bool eventFilter(QObject *watched, QEvent *event);
 private:
 
+	bool detached;
 	int position;
 	QString toolName;
 
