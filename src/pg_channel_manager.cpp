@@ -1425,15 +1425,20 @@ uint32_t PatternGeneratorChannelManager::computeSuggestedSampleRate()
 uint32_t PatternGeneratorChannelManager::computeSuggestedBufferSize(
         uint32_t sample_rate)
 {
-	uint32_t bufferSize = 4;
-	uint32_t maxNonPeriodic = 1;
+	const uint32_t divconstant=50000000 / 128;
+	uint32_t size=sample_rate/divconstant;
+	uint32_t minsize=4;
+
+
+	uint32_t bufferSize = boost::math::gcd(size,(uint32_t)4);
+	uint32_t maxNonPeriodic = size;
 	qDebug()<<"suggested buffersizes";
 
 	for (auto &&chg : channel_group) {
 		if (chg->is_enabled()) {
 			auto patternBufferSize = static_cast<PatternGeneratorChannelGroup *>
 			                         (chg)->pattern->get_required_nr_of_samples(sample_rate,
-			                                         chg->get_channel_count());
+								 chg->get_channel_count());
 
 			if (patternBufferSize==0) {
 				continue;

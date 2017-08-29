@@ -81,8 +81,8 @@ uint32_t PatternGeneratorBufferManager::adjustSampleRate(
 uint32_t PatternGeneratorBufferManager::adjustBufferSize(
         uint32_t suggestedBufferSize)
 {
-	if (suggestedBufferSize>1000000) {
-		suggestedBufferSize = 1000000;
+	if (suggestedBufferSize>1048576) {
+		suggestedBufferSize = 1048576;
 	}
 
 	return suggestedBufferSize;
