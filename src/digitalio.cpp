@@ -148,8 +148,6 @@ DigitalIO::DigitalIO(struct iio_context *ctx, Filter *filt, QPushButton *runBtn,
 	                                 ui->dioContainer));
 	ui->containerLayout->addWidget(groups.last());
 
-	connect(ui->btnRunStop, SIGNAL(toggled(bool)), this,
-	        SLOT(on_btnRunStop_clicked()));
 	connect(runBtn, SIGNAL(toggled(bool)), ui->btnRunStop, SLOT(setChecked(bool)));
 	connect(ui->btnRunStop, SIGNAL(toggled(bool)), runBtn, SLOT(setChecked(bool)));
 
