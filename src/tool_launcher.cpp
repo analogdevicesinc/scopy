@@ -19,7 +19,6 @@
 
 #include "config.h"
 #include "connectDialog.hpp"
-#include "detachedWindow.hpp"
 #include "dynamicWidget.hpp"
 #include "oscilloscope.hpp"
 #include "spectrum_analyzer.hpp"
@@ -424,6 +423,7 @@ void ToolLauncher::update()
 
 ToolLauncher::~ToolLauncher()
 {
+
 	disconnect();
 
 	for (auto it = devices.begin(); it != devices.end(); ++it) {
@@ -491,6 +491,13 @@ void ToolLauncher::addRemoteContext()
 
 void ToolLauncher::swapMenu(QWidget *menu)
 {
+	Tool *tl = dynamic_cast<Tool* >(menu);
+	if (tl){
+		MenuOption *mo = static_cast<MenuOption *>(tl->runButton()->parentWidget());
+		if (mo->isDetached())
+			return;
+	}
+
 	if (current) {
 		current->setVisible(false);
 		ui->centralLayout->removeWidget(current);
@@ -505,6 +512,10 @@ void ToolLauncher::swapMenu(QWidget *menu)
 void ToolLauncher::setButtonBackground(bool on)
 {
 	auto *btn = static_cast<QPushButton *>(QObject::sender());
+	MenuOption *mo = static_cast<MenuOption *>(btn->parentWidget());
+
+	if (mo->isDetached())
+		return;
 
 	setDynamicProperty(btn->parentWidget(), "selected", on);
 }
@@ -612,10 +623,16 @@ void adiscope::ToolLauncher::disconnect()
 		toolMenu["Spectrum Analyzer"]->getToolStopBtn()->setChecked(false);
 		toolMenu["Voltmeter"]->getToolStopBtn()->setChecked(false);
 
+		for (auto x : detachedWindows){
+			x->close();
+		}
+
 		destroyContext();
 		loadToolTips(false);
 		resetStylesheets();
 		search_timer->start(TIMER_TIMEOUT_MS);
+
+
 	}
 
 	/* Update the list of devices now */
@@ -998,23 +1015,51 @@ void ToolLauncher::toolDetached(bool detached)
 {
 	Tool *tool = static_cast<Tool *>(QObject::sender());
 
+	MenuOption *mo = static_cast<MenuOption *>(tool->runButton()->parentWidget());
+	if (mo->isDetached() && detached){
+		for (auto x : detachedWindows)
+			if (x->windowTitle().contains(tool->getName())){
+				x->activateWindow();
+				return;
+			}
+	}
+	mo->setDetached(detached);
+
 	if (detached) {
 		/* Switch back to the home screen */
 		if (current == static_cast<QWidget *>(tool))
 			ui->btnHome->click();
 
-		DetachedWindow *window = new DetachedWindow(this);
+		setDynamicProperty(tool->runButton()->parentWidget(), "selected", false);
+
+		DetachedWindow *window = new DetachedWindow(this->windowIcon());
 		window->setCentralWidget(tool);
 		window->setWindowTitle("Scopy - " + tool->getName());
 		window->resize(sizeHint());
 		window->show();
+		detachedWindows.push_back(window);
 
-		connect(window, SIGNAL(closed()), tool, SLOT(attached()));
+		connect(window, &DetachedWindow::closed, [=](){
+			tool->attached();
+			detachedWindows.removeOne(window);
+		});
+		connect(mo->getToolBtn(), &QPushButton::clicked,
+			[=](){
+			window->activateWindow();
+		});
 	}
 
 	tool->setVisible(detached);
-	tool->runButton()->parentWidget()->setEnabled(!detached);
 }
+
+void ToolLauncher::closeEvent(QCloseEvent *event)
+{
+	for (auto x : detachedWindows){
+		x->close();
+	}
+	detachedWindows.clear();
+}
+
 
 void ToolLauncher::swapMenuOptions(int source, int destination, bool dropAfter)
 {
