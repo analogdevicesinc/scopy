@@ -161,9 +161,9 @@ void BinaryStream::run()
 
                         if( nrx >= entire_buffersize && !stream_mode) {
                                 size_t remaining_samples = 2 * (nrx - entire_buffersize);
-                                if( !single_ && remaining_samples > 0) {
+                                if( !single_ ) {
                                         input_->end();
-                                        if(data_)
+                                        if(data_ && remaining_samples > 0)
                                                 input_->send(iio_buffer_start(data_)+(size_t)(size_to_display),
                                                      remaining_samples);
                                         nrx = 0;
