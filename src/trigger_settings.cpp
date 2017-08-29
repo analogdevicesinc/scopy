@@ -69,7 +69,7 @@ TriggerSettings::TriggerSettings(std::shared_ptr<GenericAdc> adc,
 		auto adc_range = m2k_adc->inputRange(
 			m2k_adc->chnHwGainMode(current_channel));
 		auto hyst_range = QPair<double, double>(
-			adc_range.first / 10, adc_range.second / 10);
+			0, adc_range.second / 10);
 		setTriggerLevelRange(current_channel, adc_range);
 		setTriggerHystRange(current_channel, hyst_range);
 	}

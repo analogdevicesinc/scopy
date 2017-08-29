@@ -524,7 +524,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 			auto adc_range = m2k_adc->inputRange(
 					m2k_adc->chnHwGainMode(i));
 			auto hyst_range = QPair<double, double>(
-				adc_range.first / 10, adc_range.second / 10);
+				0, adc_range.second / 10);
 			double vscale = plot.VertUnitsPerDiv(i);
 			trigger_settings.setTriggerLevelRange(i, adc_range);
 			trigger_settings.setTriggerLevelStep(i, vscale);
@@ -2239,7 +2239,7 @@ void Oscilloscope::updateGainMode()
 			trigger_settings.setTriggerLevelRange(current_channel,
 				adc_range);
 			auto hyst_range = QPair<double, double>(
-				adc_range.first / 10, adc_range.second / 10);
+				0, adc_range.second / 10);
 			trigger_settings.setTriggerHystRange(current_channel,
 				hyst_range);
 		}
@@ -2259,7 +2259,7 @@ void Oscilloscope::updateGainMode()
 			trigger_settings.setTriggerLevelRange(current_channel,
 				adc_range);
 			auto hyst_range = QPair<double, double>(
-				adc_range.first / 10, adc_range.second / 10);
+				0, adc_range.second / 10);
 			trigger_settings.setTriggerHystRange(current_channel,
 				hyst_range);
 		}
