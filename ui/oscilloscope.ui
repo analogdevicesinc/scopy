@@ -1029,38 +1029,6 @@ QLabel {
  </resources>
  <connections>
   <connection>
-   <sender>pushButtonSingle</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>pushButtonRunStop</receiver>
-   <slot>setDisabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>925</x>
-     <y>40</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>765</x>
-     <y>40</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>pushButtonRunStop</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>pushButtonSingle</receiver>
-   <slot>setDisabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>765</x>
-     <y>40</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>925</x>
-     <y>40</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>btnTrigger</sender>
    <signal>toggled(bool)</signal>
    <receiver>btnSettings</receiver>
