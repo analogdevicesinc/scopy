@@ -137,6 +137,8 @@ View::View(Session &session, QWidget *parent) :
 		this, SLOT(data_updated()));
 	connect(&session_, SIGNAL(data_received()),
 		this, SIGNAL(data_received()));
+	connect(&session_, SIGNAL(new_segment_received()),
+		this, SIGNAL(new_segment_received()));
 	connect(&session_, SIGNAL(frame_ended()),
 		this, SLOT(data_updated()));
 	connect(ruler_, SIGNAL(selection_changed()),
