@@ -692,6 +692,7 @@ void Session::feed_in_logic(shared_ptr<Logic> logic)
 		// frame_began is DecoderStack, but in future we need to signal
 		// this after both analog and logic sweeps have begun.
 		frame_began();
+		new_segment_received();
 	}
 	if( (entire_buffersize_ - get_logic_sample_count() < sample_count)
 			&& screen_mode_) {

@@ -356,14 +356,14 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 
 	connect(this, SIGNAL(starttimeout()),
 		this, SLOT(startTimer()));
-	connect(main_win->view_, SIGNAL(data_received()),
+	connect(this, SIGNAL(stoptimeout()),
 		this, SLOT(stopTimer()));
 	connect(timer, &QTimer::timeout,
 		this, &LogicAnalyzer::triggerTimeout);
 
-	connect(main_win->view_, SIGNAL(data_received()),
+	connect(main_win->view_, SIGNAL(new_segment_received()),
 		this, SLOT(updateBufferPreviewer()));
-	connect(main_win->view_, SIGNAL(data_received()),
+	connect(main_win->view_, SIGNAL(new_segment_received()),
 		this, SLOT(onDataReceived()));
 	connect(ui->btnExport, SIGNAL(pressed()),
 		this, SLOT(btnExportPressed()));
@@ -1641,7 +1641,8 @@ void LogicAnalyzer::onDataReceived()
 		triggerUpdater->setInput(Triggered);
 	}
 	else {
-		triggerUpdater->setInput(Auto);
+		if(trigger_settings_ui->btnAuto->isChecked())
+			triggerUpdater->setInput(Auto);
 	}
 
 	/* Single shot */

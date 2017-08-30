@@ -233,6 +233,8 @@ Q_SIGNALS:
 
 	void data_received();
 
+	void new_segment_received();
+
 	void frame_ended();
 };
 
