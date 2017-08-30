@@ -988,12 +988,32 @@ void Oscilloscope::toggle_blockchain_flow(bool en)
 
 void Oscilloscope::runStopToggled(bool checked)
 {
-
-	Q_EMIT activateExportButton();
 	QPushButton *btn = static_cast<QPushButton *>(QObject::sender());
 	setDynamicProperty(btn, "running", checked);
 
+	// When switching between continuous run and single or vice versa there
+	// is no need to reconfigure anything besides the GUI of the buttons
+	if (btn == ui->pushButtonSingle && ui->pushButtonRunStop->isChecked()) {
+		ui->pushButtonRunStop->blockSignals(true);
+		ui->pushButtonRunStop->setChecked(false);
+		ui->pushButtonRunStop->blockSignals(false);
+		setDynamicProperty(ui->pushButtonRunStop, "running",
+			false);
+		return;
+	} else if (btn == ui->pushButtonRunStop &&
+			ui->pushButtonSingle->isChecked()) {
+		ui->pushButtonSingle->blockSignals(true);
+		ui->pushButtonSingle->setChecked(false);
+		ui->pushButtonSingle->blockSignals(false);
+		setDynamicProperty(ui->pushButtonSingle, "running",
+			false);
+		return;
+	}
+
+	Q_EMIT activateExportButton();
+
 	if (checked) {
+
 		writeAllSettingsToHardware();
 
 		plot.setSampleRate(active_sample_rate, 1, "");
