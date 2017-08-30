@@ -129,11 +129,6 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	// Hide Single and Preset buttons until functionality is added
 	ui->btnPreset->hide();
 
-	ui->run_button->setProperty("normal_text",
-		QVariant(ui->run_button->text()));
-	ui->btnSingle->setProperty("normal_text",
-		QVariant(ui->btnSingle->text()));
-
 	ui->comboBox_type->blockSignals(true);
 	ui->comboBox_type->clear();
 	for (auto it = avg_types.begin(); it != avg_types.end(); ++it) {
@@ -339,16 +334,12 @@ void SpectrumAnalyzer::runStopToggled(bool checked)
 			ui->run_button->blockSignals(true);
 			ui->run_button->setChecked(false);
 			ui->run_button->blockSignals(false);
-			ui->run_button->setText(ui->run_button->property(
-					"normal_text").toString());
 			setDynamicProperty(ui->run_button, "running", false);
 		} else if (btn == ui->run_button &&
 				ui->btnSingle->isChecked()) {
 			ui->btnSingle->blockSignals(true);
 			ui->btnSingle->setChecked(false);
 			ui->btnSingle->blockSignals(false);
-			ui->btnSingle->setText(ui->btnSingle->property(
-					"normal_text").toString());
 			setDynamicProperty(ui->btnSingle, "running", false);
 		}
 
@@ -360,7 +351,6 @@ void SpectrumAnalyzer::runStopToggled(bool checked)
 		fft_sink->set_samp_rate(sample_rate);
 		start_blockchain_flow();
 	} else {
-		btn->setText(btn->property("normal_text").toString());
 		stop_blockchain_flow();
 	}
 
