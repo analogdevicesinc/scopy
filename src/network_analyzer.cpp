@@ -173,6 +173,24 @@ void NetworkAnalyzer::run()
 			iio_channel_disable(each);
 	}
 
+	// Adjust the gain of the ADC channels based on sweep settings
+	auto m2k_adc = std::dynamic_pointer_cast<M2kAdc>(adc_dev);
+	if (m2k_adc) {
+		double sweep_ampl = ui->amplitude->value();
+		QPair<double, double> range = m2k_adc->inputRange(
+				M2kAdc::HIGH_GAIN_MODE);
+		double threshold = range.second - range.first;
+		M2kAdc::GainMode gain_mode;
+		if (sweep_ampl > threshold) {
+			gain_mode = M2kAdc::LOW_GAIN_MODE;
+		} else {
+			gain_mode = M2kAdc::HIGH_GAIN_MODE;
+		}
+		for (int chn = 0; chn < m2k_adc->numAdcChannels(); chn++) {
+			m2k_adc->setChnHwGainMode(chn, gain_mode);
+		}
+	}
+
 	unsigned int steps = (unsigned int) ui->samplesCount->value();
 	double min_freq = ui->minFreq->value();
 	double max_freq = ui->maxFreq->value();
