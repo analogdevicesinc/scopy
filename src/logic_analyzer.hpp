@@ -156,6 +156,7 @@ public Q_SLOTS:
 	void onChmWidthChanged(int);
 	void triggerChanged(int);
 	void updateBufferPreviewer();
+	void requestUpdateBufferPreviewer();
 Q_SIGNALS:
 	void starttimeout();
 	void stoptimeout();

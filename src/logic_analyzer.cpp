@@ -362,7 +362,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 		this, &LogicAnalyzer::triggerTimeout);
 
 	connect(main_win->view_, SIGNAL(new_segment_received()),
-		this, SLOT(updateBufferPreviewer()));
+		this, SLOT(requestUpdateBufferPreviewer()));
 	connect(main_win->view_, SIGNAL(new_segment_received()),
 		this, SLOT(onDataReceived()));
 	connect(ui->btnExport, SIGNAL(pressed()),
@@ -1047,6 +1047,7 @@ void LogicAnalyzer::startStop(bool start)
 		setTriggerDelay();
 		if(!armed)
 			armed = true;
+		updateBufferPreviewer();
 	} else {
 		main_win->view_->viewport()->enableDrag();
 		running = false;
@@ -1116,6 +1117,7 @@ void LogicAnalyzer::singleRun()
 	logic_analyzer_ptr->set_single(true);
 	main_win->run_stop();
 	running = false;
+	updateBufferPreviewer();
 }
 
 unsigned int LogicAnalyzer::get_no_channels(struct iio_device *dev)
@@ -1267,6 +1269,12 @@ void LogicAnalyzer::setHWTriggerLogic(const QString value)
 		s.toLocal8Bit().QByteArray::constData());
 }
 
+void LogicAnalyzer::requestUpdateBufferPreviewer()
+{
+	if(acquisition_mode != REPEATED)
+		updateBufferPreviewer();
+}
+
 void LogicAnalyzer::updateBufferPreviewer()
 {
 	// Time interval within the plot canvas
@@ -1354,6 +1362,8 @@ void LogicAnalyzer::cleanTrigger()
 
 void LogicAnalyzer::bufferSentSignal(bool lastBuffer)
 {
+	if(acquisition_mode == REPEATED)
+		return;
 	if(!lastBuffer) {
 		double div =1 / buffer_previewer->noOfSteps();
 		double val = buffer_previewer->waveformWidth() + div;
