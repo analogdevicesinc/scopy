@@ -774,6 +774,16 @@ int Measure::channel() const
 	return m_channel;
 }
 
+void Measure::setChannel(int channel)
+{
+	if (m_channel != channel) {
+		for (int i = 0; i < m_measurements.size(); i++) {
+			m_measurements[i]->setChannel(channel);
+		}
+		m_channel = channel;
+	}
+}
+
 QList<std::shared_ptr<MeasurementData>> Measure::measurments()
 {
 	return m_measurements;
@@ -869,6 +879,11 @@ MeasurementData::unitTypes MeasurementData::unitType() const
 int MeasurementData::channel() const
 {
 	return m_channel;
+}
+
+void MeasurementData::setChannel(int channel)
+{
+	m_channel = channel;
 }
 
 MeasurementData::axisType MeasurementData::axis() const

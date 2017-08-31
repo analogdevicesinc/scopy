@@ -55,6 +55,7 @@ namespace adiscope {
 		QString unit() const;
 		enum unitTypes unitType() const;
 		int channel() const;
+		void setChannel(int);
 		enum axisType axis() const;
 
 	private:
@@ -112,6 +113,7 @@ namespace adiscope {
 		double hysteresisSpan();
 		void setHysteresisSpan(double);
 		int channel() const;
+		void setChannel(int);
 
 		QList<std::shared_ptr<MeasurementData>> measurments();
 		std::shared_ptr<MeasurementData> measurement(int id);

@@ -656,6 +656,11 @@ void CapturePlot::cleanUpJustBeforeChannelRemoval(int chnIdx)
 {
 	Measure *measure = measureOfChannel(chnIdx);
 	if (measure) {
+		int pos = d_measureObjs.indexOf(measure);
+		for (int i = pos + 1; i < d_measureObjs.size(); i++) {
+			d_measureObjs[i]->setChannel(
+				d_measureObjs[i]->channel() - 1);
+		}
 		d_measureObjs.removeOne(measure);
 		delete measure;
 	}
