@@ -47,7 +47,7 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, std::shared_ptr<GenericAdc> adc,
 	ui->setupUi(this);
 
 	/* TODO: avoid hardcoding sample rate */
-	sample_rate = 1e5;
+	sample_rate = 1e6;
 
 	ui->sismograph_ch1->setColor(QColor("#ff7200"));
 	ui->sismograph_ch2->setColor(QColor("#9013fe"));
@@ -166,13 +166,13 @@ gr::basic_block_sptr DMM::configureGraph(gr::basic_block_sptr s2f,
 			is_high_ac ? (sample_rate / 10.0) : 100.0);
 
 	/* TODO: figure out best value for the blocker parameter */
-	auto blocker = gr::filter::dc_blocker_ff::make(100, true);
+	auto blocker = gr::filter::dc_blocker_ff::make(1000, true);
 
 	manager->connect(s2f, 0, blocker, 0);
 
 	if (is_low_ac || is_high_ac) {
 		/* TODO: figure out best value for the RMS parameter */
-		auto rms = gr::blocks::rms_ff::make(0.001);
+		auto rms = gr::blocks::rms_ff::make(0.0001);
 		manager->connect(blocker, 0, rms, 0);
 
 		manager->connect(rms, 0, keep_one, 0);
@@ -200,9 +200,9 @@ void DMM::configureModes()
 	if (is_high_ac_ch1) {
 		id_ch1 = manager->connect(s2f1, 0, 0, false, sample_rate / 10);
 	} else {
-		/* Low-frequency AC: decimate data rate to 1 kSPS */
+		/* Low-frequency AC: decimate data rate */
 		auto keep_one1 = gr::blocks::keep_one_in_n::make(
-				sizeof(short), sample_rate / 1e3);
+				sizeof(short), sample_rate / 1e4);
 		id_ch1 = manager->connect(keep_one1, 0, 0, false,
 				sample_rate / 10);
 
@@ -212,9 +212,9 @@ void DMM::configureModes()
 	if (is_high_ac_ch2) {
 		id_ch2 = manager->connect(s2f2, 1, 0, false, sample_rate / 10);
 	} else {
-		/* Low-frequency AC: decimate data rate to 1 kSPS */
+		/* Low-frequency AC: decimate data rate */
 		auto keep_one2 = gr::blocks::keep_one_in_n::make(
-				sizeof(short), sample_rate / 1e3);
+				sizeof(short), sample_rate / 1e4);
 		id_ch2 = manager->connect(keep_one2, 1, 0, false,
 				sample_rate / 10);
 
