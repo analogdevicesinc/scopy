@@ -26,7 +26,7 @@
 #include <QDirIterator>
 
 #include <errno.h>
-
+#include "boost/math/common_factor.hpp"
 #include "pg_patterns.hpp"
 #include "pattern_generator.hpp"
 
@@ -367,7 +367,10 @@ void ClockPattern::set_duty_cycle(float value)
 	}
 
 	//    value = (value / (100/duty_cycle_granularity)) * (100/duty_cycle_granularity);
+
 	duty_cycle = value;
+	auto max = 100;
+	duty_cycle_granularity = 100/boost::math::gcd((int)value, max);
 }
 
 float ClockPattern::get_frequency() const
@@ -379,7 +382,7 @@ void ClockPattern::set_frequency(float value)
 {
 	frequency = value;
 
-	if (frequency>50000000) {
+	/*if (frequency>50000000) {
 		//frequency = 50000000;
 		duty_cycle_granularity = 1;
 	}
@@ -402,7 +405,7 @@ void ClockPattern::set_frequency(float value)
 
 	if (frequency<2000000) {
 		duty_cycle_granularity = 20;
-	}
+	}*/
 }
 
 int ClockPattern::get_phase() const
@@ -442,15 +445,22 @@ ClockPattern::~ClockPattern()
 uint8_t ClockPattern::generate_pattern(uint32_t sample_rate,
                                        uint32_t number_of_samples, uint16_t number_of_channels)
 {
-	float period_number_of_samples = (float)sample_rate/frequency;
-	qDebug()<<"period_number_of_samples - "<<period_number_of_samples;
-	float number_of_periods = number_of_samples / period_number_of_samples;
-	qDebug()<<"number_of_periods - " << number_of_periods;
-	float low_number_of_samples = (period_number_of_samples *
+	float f_period_number_of_samples = (float)sample_rate/frequency;
+	qDebug()<<"period_number_of_samples - "<<f_period_number_of_samples;
+	float f_number_of_periods = number_of_samples / f_period_number_of_samples;
+	qDebug()<<"number_of_periods - " << f_number_of_periods;
+	float f_low_number_of_samples = (f_period_number_of_samples *
 	                               (100-duty_cycle)) / 100;
-	qDebug()<<"low_number_of_samples - " << low_number_of_samples;
-	float high_number_of_samples = period_number_of_samples - low_number_of_samples;
-	qDebug()<<"high_number_of_samples - " << high_number_of_samples;
+	qDebug()<<"low_number_of_samples - " << f_low_number_of_samples;
+	float f_high_number_of_samples = f_period_number_of_samples - f_low_number_of_samples;
+	qDebug()<<"high_number_of_samples - " << f_high_number_of_samples;
+
+
+	int period_number_of_samples = (int)round(f_period_number_of_samples);
+	int number_of_periods = (int)round(f_number_of_periods);
+	int low_number_of_samples = (int)round(f_low_number_of_samples);
+	int high_number_of_samples = (int)round(f_high_number_of_samples);
+
 
 	delete_buffer();
 	buffer = new short[number_of_samples];
