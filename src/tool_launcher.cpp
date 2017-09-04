@@ -1019,6 +1019,7 @@ void ToolLauncher::toolDetached(bool detached)
 	if (mo->isDetached() && detached){
 		for (auto x : detachedWindows)
 			if (x->windowTitle().contains(tool->getName())){
+				x->showNormal();
 				x->activateWindow();
 				return;
 			}
@@ -1045,6 +1046,7 @@ void ToolLauncher::toolDetached(bool detached)
 		});
 		connect(mo->getToolBtn(), &QPushButton::clicked,
 			[=](){
+			window->showNormal();
 			window->activateWindow();
 		});
 	}
