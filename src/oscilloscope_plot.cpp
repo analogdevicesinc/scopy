@@ -321,6 +321,8 @@ CapturePlot::CapturePlot(QWidget *parent,
 
 CapturePlot::~CapturePlot()
 {
+	canvas()->removeEventFilter(d_cursorReadouts);
+	canvas()->removeEventFilter(d_symbolCtrl);
 }
 
 HorizBar *CapturePlot::levelTriggerA()
