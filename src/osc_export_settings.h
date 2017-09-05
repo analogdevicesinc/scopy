@@ -33,6 +33,7 @@ public Q_SLOTS:
 	QMap<int, bool> getExportConfig();
 	void on_btnExportAll_clicked();
 	void enableExportButton(bool on);
+	void disableUIMargins();
 
 private:
 	Ui::ExportSettings *ui;

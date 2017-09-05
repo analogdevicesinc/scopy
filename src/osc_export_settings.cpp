@@ -131,4 +131,9 @@ void ExportSettings::enableExportButton(bool on)
 	ui->btnExport->setEnabled(on);
 }
 
+void ExportSettings::disableUIMargins()
+{
+	ui->verticalLayout_3->setMargin(0);
+}
+
 

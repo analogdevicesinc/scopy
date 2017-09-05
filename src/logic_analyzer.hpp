@@ -73,6 +73,7 @@ class Filter;
 class ScaleSpinButton;
 class PositionSpinButton;
 class StateUpdater;
+class ExportSettings;
 
 class LogicAnalyzer : public Tool
 {
@@ -161,6 +162,7 @@ public Q_SLOTS:
 Q_SIGNALS:
 	void starttimeout();
 	void stoptimeout();
+	void activateExportButton();
 
 private:
 	std::shared_ptr<sigrok::Context> context;
@@ -269,6 +271,9 @@ private:
 	void configParams(double timebase, double timepos);
 	StateUpdater *triggerUpdater;
 	bool trigger_is_forced;
+	ExportSettings *exportSettings;
+	QMap<int, bool> exportConfig;
+	void init_export_settings();
 	bool exportTabCsv(QString separator, QString);
 };
 

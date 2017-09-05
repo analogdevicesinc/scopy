@@ -54,6 +54,7 @@
 #include "state_updater.h"
 #include "dynamicWidget.hpp"
 #include "config.h"
+#include "osc_export_settings.h"
 
 /* Sigrok includes */
 #include <libsigrokcxx/libsigrokcxx.hpp>
@@ -367,8 +368,6 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 		this, SLOT(onDataReceived()));
 	connect(main_win->view_, SIGNAL(frame_ended()),
 		this, SLOT(onFrameEnded()));
-	connect(ui->btnExport, SIGNAL(pressed()),
-		this, SLOT(btnExportPressed()));
 	connect(ui->cmbRunMode, SIGNAL(currentIndexChanged(int)),
 		this, SLOT(runModeChanged(int)));
 	connect(ui->lineeditSampleRate, &QLineEdit::returnPressed,
@@ -429,8 +428,26 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 
 	chm_ui->setWidgetMinimumNrOfChars(ui->triggerStateLabel, 9);
 	chm_ui->update_ui();
-	ui->lblExportStatus->setText("Not exported");
-	ui->lblExportStatus->setEnabled(false);
+	init_export_settings();
+}
+
+void LogicAnalyzer::init_export_settings()
+{
+	exportSettings = new ExportSettings(this);
+	exportSettings->enableExportButton(false);
+	ui->verticalLayout_5->addWidget(exportSettings);
+	for(int i = 0; i < no_channels; i++){
+		exportSettings->addChannel(i, "DIO" + QString::number(i));
+	}
+
+	connect(exportSettings->getExportButton(), SIGNAL(clicked()), this,
+		SLOT(btnExportPressed()));
+	connect(this, &LogicAnalyzer::activateExportButton,
+		[=](){
+		exportSettings->enableExportButton(true);
+	});
+
+	exportSettings->disableUIMargins();
 }
 
 
@@ -534,6 +551,18 @@ QString LogicAnalyzer::saveToFile()
 	QString selectedFilter;
 	bool done = false;
 	bool paused = false;
+	bool noChannelEnabled = true;
+	
+	exportConfig = exportSettings->getExportConfig();
+	for( auto x : exportConfig.keys() ) {
+		if(exportConfig[x]) {
+			noChannelEnabled =  false;
+			break;
+		}
+	}
+
+	if( noChannelEnabled )
+		return "";
 
 	if(running) {
 		paused = true;
@@ -595,10 +624,13 @@ bool LogicAnalyzer::exportTabCsv(QString separator, QString filename)
 	QTextStream out(&file);
 
 	// Write the header ( sample number + channels)
-	out << "Sample"  << separator;
 	for(int ch = 0; ch < get_no_channels(dev); ch++) {
-		out << "Channel " + QString::number(ch) +
-		       ((ch == get_no_channels(dev)-1) ? "\n" : separator);
+		if( exportConfig[ch] ) {
+			out << "Channel " + QString::number(ch) +
+			       ((ch == no_channels - 1) ? "\n" : separator);
+		}
+		else if( ch == no_channels - 1)
+			out << "\n";
 	}
 
 	// Write the values
@@ -606,13 +638,15 @@ bool LogicAnalyzer::exportTabCsv(QString separator, QString filename)
 	if(logic_data) {
 		shared_ptr<pv::data::LogicSegment> segment = logic_data->logic_segments().front();
 		for(int i = 0; i < segment->get_sample_count(); i++) {
-			out << QString::number(i) << separator;
-
 			uint64_t sample = segment->get_sample(i);
-			for(int ch = 0; ch < get_no_channels(dev); ch++) {
+			for(int ch = 0; ch < no_channels; ch++) {
 				int bit = (sample >> ch) & 1;
-				out << (bit ? "1" : "0");
-				out << ((ch == get_no_channels(dev)-1) ? "\n" : separator);
+				if(exportConfig[ch]) {
+					out << (bit ? "1" : "0");
+					out << ((ch == no_channels - 1) ? "\n" : separator);
+				}
+				else if( ch == no_channels - 1)
+					out << "\n";
 			}
 		}
 	}
@@ -626,21 +660,10 @@ bool LogicAnalyzer::exportTabCsv(QString separator, QString filename)
 
 void LogicAnalyzer::btnExportPressed()
 {
-	if( !main_win->session_.is_data()) {
-		ui->lblExportStatus->setText("No data to export.");
+	if( !main_win->session_.is_data())
 		return;
-	}
 
 	QString filename = saveToFile();
-
-	if(filename != "") {
-		ui->lblExportStatus->setEnabled(true);
-		ui->lblExportStatus->setText("Exported");
-	}
-	else {
-		ui->lblExportStatus->setEnabled(false);
-		ui->lblExportStatus->setText("Not exported");
-	}
 }
 
 void LogicAnalyzer::startTimer()
@@ -1024,8 +1047,6 @@ int LogicAnalyzer::timeToPixel(double time)
 
 void LogicAnalyzer::startStop(bool start)
 {
-	ui->lblExportStatus->setEnabled(false);
-	ui->lblExportStatus->setText("Not exported");
 	if(!dev)
 		return;
 
@@ -1063,6 +1084,7 @@ void LogicAnalyzer::startStop(bool start)
 		}
 	}
 	main_win->run_stop();
+	Q_EMIT activateExportButton();
 
 	triggerUpdater->setEnabled(start);
 }
@@ -1096,8 +1118,6 @@ void LogicAnalyzer::singleRun(bool checked)
 			armed = true;
 		ui->btnSingleRun->setText("Stop");
 		buffer_previewer->setWaveformWidth(0);
-		ui->lblExportStatus->setEnabled(false);
-		ui->lblExportStatus->setText("Not exported");
 		if(!dev)
 			return;
 		if( running )
@@ -1136,6 +1156,7 @@ void LogicAnalyzer::singleRun(bool checked)
 			armed = true;
 			autoCaptureEnable();
 		}
+		Q_EMIT activateExportButton();
 		triggerUpdater->setEnabled(running);
 	}
 }

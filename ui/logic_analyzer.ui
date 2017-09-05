@@ -1694,96 +1694,13 @@ QPushButton[invalid=true]:enabled:!pressed { background-color: red; }</string>
                  </spacer>
                 </item>
                 <item>
-                 <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,0,0,0">
+                 <layout class="QVBoxLayout" name="verticalLayout_5" stretch="">
                   <property name="spacing">
                    <number>0</number>
                   </property>
                   <property name="topMargin">
                    <number>20</number>
                   </property>
-                  <item>
-                   <layout class="QHBoxLayout" name="horizontalLayout_3">
-                    <property name="topMargin">
-                     <number>0</number>
-                    </property>
-                    <property name="bottomMargin">
-                     <number>20</number>
-                    </property>
-                    <item>
-                     <widget class="QLabel" name="label_6">
-                      <property name="styleSheet">
-                       <string notr="true">QLabel {
-opacity: 0.2;
-font-family: Arial;
-font-size: 13px;
-line-height: 14px;
-color: rgba(255,255,255,50);
-}</string>
-                      </property>
-                      <property name="text">
-                       <string>EXPORT STATUS</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="Line" name="line_3">
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                      <property name="frameShadow">
-                       <enum>QFrame::Plain</enum>
-                      </property>
-                      <property name="orientation">
-                       <enum>Qt::Horizontal</enum>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
-                  </item>
-                  <item>
-                   <widget class="QLabel" name="lblExportStatus">
-                    <property name="text">
-                     <string/>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <spacer name="verticalSpacer_2">
-                    <property name="orientation">
-                     <enum>Qt::Vertical</enum>
-                    </property>
-                    <property name="sizeType">
-                     <enum>QSizePolicy::Fixed</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>20</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                  <item>
-                   <widget class="QPushButton" name="btnExport">
-                    <property name="styleSheet">
-                     <string notr="true">height:40px;
-background-color: #4A64FF;
-border-radius: 4px;
-
-font-family: Arial;
-font-size: 14px;
-font-weight: bold;
-line-height: 16px;
-color: #FFFFFF;</string>
-                    </property>
-                    <property name="text">
-                     <string>Export</string>
-                    </property>
-                   </widget>
-                  </item>
                  </layout>
                 </item>
                 <item>
