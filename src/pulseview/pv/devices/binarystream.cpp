@@ -176,6 +176,7 @@ void BinaryStream::run()
                         }
 
                         if( single_ && running && nrx >= entire_buffersize) {
+                                running = false;
                                 interrupt_ = true;
                                 stop();
                                 nrx = 0;

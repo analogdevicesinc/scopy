@@ -261,6 +261,8 @@ Q_SIGNALS:
 
 	void new_segment_received();
 
+	void frame_ended();
+
 public Q_SLOTS:
 	void trigger_event(util::Timestamp location);
 

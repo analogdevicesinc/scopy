@@ -577,7 +577,7 @@ background-color: grey;
            </size>
           </property>
           <property name="checkable">
-           <bool>false</bool>
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -1861,7 +1861,7 @@ color: #FFFFFF;</string>
                     <rect>
                      <x>0</x>
                      <y>0</y>
-                     <width>92</width>
+                     <width>100</width>
                      <height>30</height>
                     </rect>
                    </property>

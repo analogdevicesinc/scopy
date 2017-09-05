@@ -313,8 +313,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 		this, SLOT(toggleRightMenu()));
 	connect(ui->btnRunStop, SIGNAL(toggled(bool)),
 	        this, SLOT(startStop(bool)));
-	connect(ui->btnSingleRun, SIGNAL(pressed()),
-	        this, SLOT(singleRun()));
+	connect(ui->btnSingleRun, SIGNAL(toggled(bool)),
+		this, SLOT(singleRun(bool)));
 	connect(runBtn, SIGNAL(toggled(bool)), ui->btnRunStop,
 	        SLOT(setChecked(bool)));
 	connect(ui->btnRunStop, SIGNAL(toggled(bool)), runBtn,
@@ -365,6 +365,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 		this, SLOT(requestUpdateBufferPreviewer()));
 	connect(main_win->view_, SIGNAL(new_segment_received()),
 		this, SLOT(onDataReceived()));
+	connect(main_win->view_, SIGNAL(frame_ended()),
+		this, SLOT(onFrameEnded()));
 	connect(ui->btnExport, SIGNAL(pressed()),
 		this, SLOT(btnExportPressed()));
 	connect(ui->cmbRunMode, SIGNAL(currentIndexChanged(int)),
@@ -680,6 +682,8 @@ void LogicAnalyzer::stopTimer()
 			armed = true;
 			autoCaptureEnable();
 		}
+		if(ui->btnSingleRun->isChecked())
+			ui->btnSingleRun->setChecked(false);
 	}
 }
 
@@ -1027,10 +1031,8 @@ void LogicAnalyzer::startStop(bool start)
 
 	if (start) {
 		buffer_previewer->setWaveformWidth(0);
-		if(logic_analyzer_ptr->get_single()
-				&& logic_analyzer_ptr->is_running()) {
-			main_win->run_stop();
-			running = false;
+		if(ui->btnSingleRun->isChecked()) {
+			ui->btnSingleRun->setChecked(false);
 		}
 		last_set_sample_count = active_sampleCount;
 		if(main_win->view_->scale() != timeBase->value()){
@@ -1087,37 +1089,55 @@ void LogicAnalyzer::setHWTriggerDelay(long long delay)
 	active_hw_trigger_sample_count = delay;
 }
 
-void LogicAnalyzer::singleRun()
+void LogicAnalyzer::singleRun(bool checked)
 {
-	if(!armed)
-		armed = true;
-	buffer_previewer->setWaveformWidth(0);
-	ui->lblExportStatus->setEnabled(false);
-	ui->lblExportStatus->setText("Not exported");
-	if(!dev)
-		return;
-	if( running )
-	{
-		ui->btnRunStop->setChecked(false);
+	if(checked) {
+		if(!armed)
+			armed = true;
+		ui->btnSingleRun->setText("Stop");
+		buffer_previewer->setWaveformWidth(0);
+		ui->lblExportStatus->setEnabled(false);
+		ui->lblExportStatus->setText("Not exported");
+		if(!dev)
+			return;
+		if( running )
+		{
+			ui->btnRunStop->setChecked(false);
+		}
+		last_set_sample_count = active_sampleCount;
+		if(main_win->view_->scale() != timeBase->value()){
+			zoomed_in = false;
+			Q_EMIT timeBase->valueChanged(timeBase->value());
+		}
+		setSampleRate();
+		running = true;
+		triggerUpdater->setEnabled(running);
+		setBuffersizeLabelValue(active_sampleCount);
+		setSamplerateLabelValue(active_sampleRate);
+		setHWTriggerDelay(active_triggerSampleCount);
+		setTriggerDelay();
+		//	if (timePosition->value() != active_timePos)
+		//		timePosition->setValue(active_timePos);
+		logic_analyzer_ptr->set_single(true);
+		main_win->run_stop();
+		running = false;
+		updateBufferPreviewer();
 	}
-	last_set_sample_count = active_sampleCount;
-	if(main_win->view_->scale() != timeBase->value()){
-		zoomed_in = false;
-		Q_EMIT timeBase->valueChanged(timeBase->value());
+	else {
+		ui->btnSingleRun->setText("Single");
+		if(logic_analyzer_ptr->get_single()
+				&& logic_analyzer_ptr->is_running()) {
+			main_win->run_stop();
+		}
+		running = false;
+		if(timer->isActive())
+			timer->stop();
+		if(!armed && trigger_settings_ui->btnAuto->isChecked()) {
+			armed = true;
+			autoCaptureEnable();
+		}
+		triggerUpdater->setEnabled(running);
 	}
-	setSampleRate();
-	running = true;
-	triggerUpdater->setEnabled(running);
-	setBuffersizeLabelValue(active_sampleCount);
-	setSamplerateLabelValue(active_sampleRate);
-	setHWTriggerDelay(active_triggerSampleCount);
-	setTriggerDelay();
-//	if (timePosition->value() != active_timePos)
-//		timePosition->setValue(active_timePos);
-	logic_analyzer_ptr->set_single(true);
-	main_win->run_stop();
-	running = false;
-	updateBufferPreviewer();
 }
 
 unsigned int LogicAnalyzer::get_no_channels(struct iio_device *dev)
@@ -1658,6 +1678,14 @@ void LogicAnalyzer::onDataReceived()
 	/* Single shot */
 	if( !running )
 		triggerUpdater->setEnabled(running);
+}
+
+void LogicAnalyzer::onFrameEnded()
+{
+	/* Reset the Single button state when the frame ended
+	 * and data was received */
+	if(ui->btnSingleRun->isChecked() && main_win->session_.is_data())
+		ui->btnSingleRun->setChecked(false);
 }
 
 /*

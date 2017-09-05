@@ -127,7 +127,7 @@ private Q_SLOTS:
 	void on_btnShowChannelsClicked(bool check);
 	void onHorizScaleValueChanged(double value);
 	void setTimebaseLabel(double value);
-	void singleRun();
+	void singleRun(bool);
 	void onRulerChanged(double, bool);
 	void setHWTriggerLogic(const QString value);
 	void setupTriggerSettingsUI(bool enabled = false);
@@ -147,6 +147,7 @@ private Q_SLOTS:
 	void validateSamplingFrequency();
 	void setTriggerState(int);
 	void onDataReceived();
+	void onFrameEnded();
 	void onTriggerModeChanged(bool);
 	void resetState();
 public Q_SLOTS:
