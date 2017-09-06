@@ -1418,6 +1418,34 @@ color: #FFFFFF;
                 <property name="spacing">
                  <number>0</number>
                 </property>
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
+                <item>
+                 <spacer name="verticalSpacer_3">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeType">
+                   <enum>QSizePolicy::Fixed</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
                 <item>
                  <widget class="QLabel" name="label">
                   <property name="styleSheet">
@@ -1470,142 +1498,165 @@ color: #FFFFFF;
                  </widget>
                 </item>
                 <item>
-                 <spacer name="verticalSpacer_3">
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
+                 <widget class="QScrollArea" name="scrollArea_2">
+                  <property name="frameShape">
+                   <enum>QFrame::NoFrame</enum>
                   </property>
-                  <property name="sizeType">
-                   <enum>QSizePolicy::Fixed</enum>
+                  <property name="verticalScrollBarPolicy">
+                   <enum>Qt::ScrollBarAlwaysOff</enum>
                   </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>20</height>
-                   </size>
+                  <property name="horizontalScrollBarPolicy">
+                   <enum>Qt::ScrollBarAlwaysOff</enum>
                   </property>
-                 </spacer>
-                </item>
-                <item>
-                 <spacer name="verticalSpacer_13">
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
+                  <property name="widgetResizable">
+                   <bool>true</bool>
                   </property>
-                  <property name="sizeType">
-                   <enum>QSizePolicy::Fixed</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-                <item>
-                 <spacer name="verticalSpacer_7">
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
-                  </property>
-                  <property name="sizeType">
-                   <enum>QSizePolicy::Fixed</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-                <item>
-                 <layout class="QVBoxLayout" name="verticalLayout_6">
-                  <property name="topMargin">
-                   <number>20</number>
-                  </property>
-                  <item>
-                   <widget class="QLabel" name="label_8">
-                    <property name="text">
-                     <string>Run</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QComboBox" name="cmbRunMode">
-                    <item>
-                     <property name="text">
-                      <string>Repeated</string>
-                     </property>
-                    </item>
-                    <item>
-                     <property name="text">
-                      <string>Stream</string>
-                     </property>
-                    </item>
-                   </widget>
-                  </item>
-                  <item>
-                   <spacer name="verticalSpacer_8">
-                    <property name="orientation">
-                     <enum>Qt::Vertical</enum>
-                    </property>
-                    <property name="sizeType">
-                     <enum>QSizePolicy::Fixed</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>20</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                  <item>
-                   <widget class="QLabel" name="label_10">
-                    <property name="text">
-                     <string>Sampling frequency</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <spacer name="verticalSpacer_15">
-                    <property name="orientation">
-                     <enum>Qt::Vertical</enum>
-                    </property>
-                    <property name="sizeType">
-                     <enum>QSizePolicy::Fixed</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>0</width>
-                      <height>5</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                  <item>
-                   <layout class="QHBoxLayout" name="horizontalLayout_5">
+                  <widget class="QWidget" name="scrollAreaWidgetContents_2">
+                   <property name="geometry">
+                    <rect>
+                     <x>0</x>
+                     <y>0</y>
+                     <width>157</width>
+                     <height>554</height>
+                    </rect>
+                   </property>
+                   <layout class="QVBoxLayout" name="verticalLayout_7">
                     <property name="spacing">
+                     <number>0</number>
+                    </property>
+                    <property name="leftMargin">
                      <number>7</number>
                     </property>
                     <property name="topMargin">
-                     <number>0</number>
+                     <number>7</number>
+                    </property>
+                    <property name="rightMargin">
+                     <number>7</number>
+                    </property>
+                    <property name="bottomMargin">
+                     <number>7</number>
                     </property>
                     <item>
-                     <widget class="QLineEdit" name="lineeditSampleRate">
-                      <property name="minimumSize">
+                     <spacer name="verticalSpacer_13">
+                      <property name="orientation">
+                       <enum>Qt::Vertical</enum>
+                      </property>
+                      <property name="sizeType">
+                       <enum>QSizePolicy::Fixed</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
                        <size>
-                        <width>0</width>
-                        <height>32</height>
+                        <width>20</width>
+                        <height>20</height>
                        </size>
                       </property>
-                      <property name="maximumSize">
+                     </spacer>
+                    </item>
+                    <item>
+                     <spacer name="verticalSpacer_7">
+                      <property name="orientation">
+                       <enum>Qt::Vertical</enum>
+                      </property>
+                      <property name="sizeType">
+                       <enum>QSizePolicy::Fixed</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
                        <size>
-                        <width>16777215</width>
-                        <height>32</height>
+                        <width>20</width>
+                        <height>20</height>
                        </size>
                       </property>
-                      <property name="styleSheet">
-                       <string notr="true">QLineEdit {
+                     </spacer>
+                    </item>
+                    <item>
+                     <layout class="QVBoxLayout" name="verticalLayout_6">
+                      <property name="topMargin">
+                       <number>20</number>
+                      </property>
+                      <item>
+                       <widget class="QLabel" name="label_8">
+                        <property name="text">
+                         <string>Run</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QComboBox" name="cmbRunMode">
+                        <item>
+                         <property name="text">
+                          <string>Repeated</string>
+                         </property>
+                        </item>
+                        <item>
+                         <property name="text">
+                          <string>Stream</string>
+                         </property>
+                        </item>
+                       </widget>
+                      </item>
+                      <item>
+                       <spacer name="verticalSpacer_8">
+                        <property name="orientation">
+                         <enum>Qt::Vertical</enum>
+                        </property>
+                        <property name="sizeType">
+                         <enum>QSizePolicy::Fixed</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>20</width>
+                          <height>20</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                      <item>
+                       <widget class="QLabel" name="label_10">
+                        <property name="text">
+                         <string>Sampling frequency</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <spacer name="verticalSpacer_15">
+                        <property name="orientation">
+                         <enum>Qt::Vertical</enum>
+                        </property>
+                        <property name="sizeType">
+                         <enum>QSizePolicy::Fixed</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>0</width>
+                          <height>5</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                      <item>
+                       <layout class="QHBoxLayout" name="horizontalLayout_5">
+                        <property name="spacing">
+                         <number>7</number>
+                        </property>
+                        <property name="topMargin">
+                         <number>0</number>
+                        </property>
+                        <item>
+                         <widget class="QLineEdit" name="lineeditSampleRate">
+                          <property name="minimumSize">
+                           <size>
+                            <width>0</width>
+                            <height>32</height>
+                           </size>
+                          </property>
+                          <property name="maximumSize">
+                           <size>
+                            <width>16777215</width>
+                            <height>32</height>
+                           </size>
+                          </property>
+                          <property name="styleSheet">
+                           <string notr="true">QLineEdit {
 height: 32px;
 color: white;
 font-family: &quot;monospace&quot; 14;
@@ -1626,31 +1677,31 @@ QLineEdit[enabled=false] {
 border-color: grey;
 color: grey;
 }</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QPushButton" name="btnApply">
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                      <property name="minimumSize">
-                       <size>
-                        <width>40</width>
-                        <height>32</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>40</width>
-                        <height>32</height>
-                       </size>
-                      </property>
-                      <property name="styleSheet">
-                       <string notr="true">QPushButton {
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QPushButton" name="btnApply">
+                          <property name="sizePolicy">
+                           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                           </sizepolicy>
+                          </property>
+                          <property name="minimumSize">
+                           <size>
+                            <width>40</width>
+                            <height>32</height>
+                           </size>
+                          </property>
+                          <property name="maximumSize">
+                           <size>
+                            <width>40</width>
+                            <height>32</height>
+                           </size>
+                          </property>
+                          <property name="styleSheet">
+                           <string notr="true">QPushButton {
 color: white;
 background-color: #4a64ff;
 font-family: &quot;monospace&quot;;
@@ -1664,62 +1715,65 @@ QPushButton:!enabled { background-color: grey; }
 QPushButton:enabled:!pressed { background-color: orange; }
 QPushButton[valid=true]:enabled:!pressed { background-color: green; }
 QPushButton[invalid=true]:enabled:!pressed { background-color: red; }</string>
-                      </property>
-                      <property name="text">
-                       <string>Apply</string>
-                      </property>
-                      <property name="autoDefault">
-                       <bool>true</bool>
-                      </property>
-                     </widget>
+                          </property>
+                          <property name="text">
+                           <string>Apply</string>
+                          </property>
+                          <property name="autoDefault">
+                           <bool>true</bool>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
+                      </item>
+                     </layout>
                     </item>
-                   </layout>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <spacer name="verticalSpacer">
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
-                  </property>
-                  <property name="sizeType">
-                   <enum>QSizePolicy::Fixed</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-                <item>
-                 <layout class="QVBoxLayout" name="verticalLayout_5" stretch="">
-                  <property name="spacing">
-                   <number>0</number>
-                  </property>
-                  <property name="topMargin">
-                   <number>20</number>
-                  </property>
-                 </layout>
-                </item>
-                <item>
-                 <spacer name="verticalSpacer_5">
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="btnResetInstrument">
-                  <property name="styleSheet">
-                   <string notr="true">height:40px;
+                    <item>
+                     <spacer name="verticalSpacer">
+                      <property name="orientation">
+                       <enum>Qt::Vertical</enum>
+                      </property>
+                      <property name="sizeType">
+                       <enum>QSizePolicy::Fixed</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>20</width>
+                        <height>20</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
+                    <item>
+                     <layout class="QVBoxLayout" name="verticalLayout_5">
+                      <property name="spacing">
+                       <number>0</number>
+                      </property>
+                      <property name="topMargin">
+                       <number>20</number>
+                      </property>
+                     </layout>
+                    </item>
+                    <item>
+                     <spacer name="verticalSpacer_5">
+                      <property name="orientation">
+                       <enum>Qt::Vertical</enum>
+                      </property>
+                      <property name="sizeType">
+                       <enum>QSizePolicy::MinimumExpanding</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>20</width>
+                        <height>20</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="btnResetInstrument">
+                      <property name="styleSheet">
+                       <string notr="true">height:40px;
 background-color: #4A64FF;
 border-radius: 4px;
 
@@ -1728,10 +1782,14 @@ font-size: 14px;
 font-weight: bold;
 line-height: 16px;
 color: #FFFFFF;</string>
-                  </property>
-                  <property name="text">
-                   <string>Reset Instrument</string>
-                  </property>
+                      </property>
+                      <property name="text">
+                       <string>Reset Instrument</string>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
                  </widget>
                 </item>
                </layout>
@@ -1778,7 +1836,7 @@ color: #FFFFFF;</string>
                     <rect>
                      <x>0</x>
                      <y>0</y>
-                     <width>100</width>
+                     <width>92</width>
                      <height>30</height>
                     </rect>
                    </property>
