@@ -84,6 +84,9 @@ public:
 		ToolLauncher *parent);
 	~SpectrumAnalyzer();
 
+Q_SIGNALS:
+	void isRunning(bool);
+
 private Q_SLOTS:
 	void on_btnToolSettings_toggled(bool checked);
 	void on_btnSettings_pressed();

@@ -99,6 +99,7 @@ namespace adiscope {
 		void triggerPositionChanged(double);
 		void selectedChannelChanged(int);
 		void activateExportButton();
+		void isRunning(bool);
 
 	private Q_SLOTS:
 		void btnExport_clicked();
