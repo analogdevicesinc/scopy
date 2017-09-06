@@ -248,6 +248,9 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 		SLOT(setChecked(bool)));
 	connect(ui->btnSingle, SIGNAL(toggled(bool)),
 		SLOT(runStopToggled(bool)));
+	connect(this, SIGNAL(isRunning(bool)), run_button,
+		SLOT(setChecked(bool)));
+
 	connect(fft_plot, SIGNAL(newData()),
 		SLOT(singleCaptureDone()));
 
@@ -998,6 +1001,7 @@ void SpectrumAnalyzer::singleCaptureDone()
 {
 	if (ui->btnSingle->isChecked()) {
 		ui->btnSingle->setChecked(false);
+		Q_EMIT isRunning(false);
 	}
 }
 

@@ -417,6 +417,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 			SLOT(setChecked(bool)));
 	connect(ui->pushButtonRunStop, SIGNAL(toggled(bool)), runButton,
 			SLOT(setChecked(bool)));
+	connect(this, SIGNAL(isRunning(bool)), runButton,
+			SLOT(setChecked(bool)));
 
 	// Signal-Slot Connections
 
@@ -2130,7 +2132,11 @@ void Oscilloscope::onStatisticsReset()
 void Oscilloscope::singleCaptureDone()
 {
 	Q_EMIT activateExportButton();
-	ui->pushButtonSingle->setChecked(false);
+	if (ui->pushButtonSingle->isChecked()){
+		ui->pushButtonSingle->setChecked(false);
+		Q_EMIT isRunning(false);
+	}
+
 }
 
 void Oscilloscope::onIioDataRefillTimeout()
