@@ -262,3 +262,23 @@ QGroupBox::title {
 	subcontrol-origin: margin;
 	subcontrol-position: top left; /* position at the top center */
 }
+
+QScrollBar:vertical {
+  background: #262628;
+  max-width: 8px;
+}
+
+QScrollBar::handle:vertical {
+  background: #4a4a4b;
+  border: 0;
+  border-radius: 3px;
+}
+
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+    background: none;
+}
+
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+  border: none;
+  background: none;
+}

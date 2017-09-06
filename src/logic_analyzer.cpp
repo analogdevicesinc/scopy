@@ -224,7 +224,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 		{"μs", 1E-6},
 		{"ms", 1E-3},
 		{"s", 1E0}
-	}, "Time Base", 10e-9, 10e0);
+	}, "Time Base", 10e-9, 10e0,
+	true, false, this);
 	timePosition = new PositionSpinButton({
 		{"ns", 1E-9},
 		{"μs", 1E-6},
@@ -232,7 +233,10 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 		{"s", 1E0}
 	}, "Position",
 	-timeBase->maxValue() * 5,
-	timeBase->maxValue() * 5);
+	timeBase->maxValue() * 5,
+	true,
+	false,
+	this);
 
 	ui->verticalLayout_7->insertWidget(ui->verticalLayout_7->count() - 6,
 		timeBase, 0, Qt::AlignLeft);
@@ -429,6 +433,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	chm_ui->setWidgetMinimumNrOfChars(ui->triggerStateLabel, 9);
 	chm_ui->update_ui();
 	init_export_settings();
+	installWheelEventGuard();
 }
 
 void LogicAnalyzer::init_export_settings()

@@ -1288,7 +1288,7 @@ color: white;
             <item>
              <widget class="QStackedWidget" name="stackedWidget">
               <property name="currentIndex">
-               <number>1</number>
+               <number>2</number>
               </property>
               <widget class="QWidget" name="cursorSettings">
                <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -1503,7 +1503,7 @@ color: #FFFFFF;
                    <enum>QFrame::NoFrame</enum>
                   </property>
                   <property name="verticalScrollBarPolicy">
-                   <enum>Qt::ScrollBarAlwaysOff</enum>
+                   <enum>Qt::ScrollBarAsNeeded</enum>
                   </property>
                   <property name="horizontalScrollBarPolicy">
                    <enum>Qt::ScrollBarAlwaysOff</enum>
@@ -1823,7 +1823,7 @@ color: #FFFFFF;</string>
                    <enum>QFrame::NoFrame</enum>
                   </property>
                   <property name="verticalScrollBarPolicy">
-                   <enum>Qt::ScrollBarAlwaysOff</enum>
+                   <enum>Qt::ScrollBarAsNeeded</enum>
                   </property>
                   <property name="horizontalScrollBarPolicy">
                    <enum>Qt::ScrollBarAlwaysOff</enum>
@@ -1836,8 +1836,8 @@ color: #FFFFFF;</string>
                     <rect>
                      <x>0</x>
                      <y>0</y>
-                     <width>92</width>
-                     <height>30</height>
+                     <width>149</width>
+                     <height>613</height>
                     </rect>
                    </property>
                    <layout class="QVBoxLayout" name="scrollAreaLayout">
