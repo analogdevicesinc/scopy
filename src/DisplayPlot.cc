@@ -81,6 +81,58 @@ QString OscScaleDraw::getUnitType() const
 	return m_unit;
 }
 
+void OscScaleDraw::draw(QPainter *painter, const QPalette &) const
+{
+	QList<double> ticks = scaleDiv().ticks(QwtScaleDiv::MajorTick);
+	QList<QRect> labels;
+
+	for (int i = 0; i < ticks.size(); ++i){
+		QRect bounds = boundingLabelRect(painter->font(), ticks[i]);
+		int half = painter->font().pointSize() / 4;
+
+		if (orientation() == Qt::Horizontal)
+			bounds.adjust(-half, 0, half, 0);
+		else
+			bounds.adjust(0, -half / 2, 0, half / 2);
+
+		labels.append(bounds);
+	}
+
+	bool overlap = false;
+
+	do {
+		overlap = false;
+		for(int i = 1; i < labels.size(); ++i){
+			QRect last_rectangle = labels.at(i - 1);
+			QRect current_rectangle = labels.at(i);
+
+			if (current_rectangle.intersects(last_rectangle)){
+				overlap = true;
+				break;
+			}
+		}
+
+		if (overlap){
+			if ((ticks.size() % 2) == 0){
+				if (ticks.size() > 2){
+					labels.removeAt(ticks.size() - 2);
+					ticks.removeAt(ticks.size() - 2);
+				}
+			}
+
+			for (int i = (ticks.size() / 2) * 2 - 1; i >= 0; i -= 2){
+				labels.removeAt(i);
+				ticks.removeAt(i);
+			}
+		}
+
+	} while (overlap);
+
+	for (int i = 0; i < ticks.size(); ++i){
+		drawLabel(painter, ticks[i]);
+	}
+}
+
 QwtText OscScaleDraw::label( double value ) const
 {
 	QString prefix;

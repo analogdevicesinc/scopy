@@ -559,6 +559,9 @@ public:
 	void setUnitType(const QString& unit);
 	QString getUnitType() const;
 
+protected:
+	virtual void draw(QPainter *, const QPalette &) const;
+
 private:
 	unsigned int m_floatPrecision;
 	QString m_unit;
