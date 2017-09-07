@@ -908,7 +908,8 @@ void Oscilloscope::del_math_channel()
 	/* Exit from group and set another channel as the current channel */
 	QPushButton *name = parent->findChild<QPushButton *>("name");
 	channels_group->removeButton(name);
-	if (channels_group->buttons().size() > 0)
+	if (channels_group->buttons().size() > 0 &&
+			channels_group->checkedId() == -1)
 		channels_group->buttons()[0]->setChecked(true);
 
 	/* Remove the math channel from the bottom list of channels */
