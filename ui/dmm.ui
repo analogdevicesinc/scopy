@@ -170,21 +170,30 @@ QLabel[ac=true] { qproperty-text: &quot;VRMS&quot;; }</string>
              </layout>
             </item>
             <item>
-             <widget class="adiscope::CustomScale" name="scaleCh1" native="true">
-              <property name="lowerBound" stdset="0">
+             <widget class="adiscope::CustomScale" name="scaleCh1">
+              <property name="lowerBound">
                <double>-0.100000000000000</double>
               </property>
-              <property name="upperBound" stdset="0">
+              <property name="upperBound">
                <double>0.100000000000000</double>
               </property>
-              <property name="scaleMaxMajor" stdset="0">
+              <property name="scaleMaxMajor">
                <number>5</number>
               </property>
-              <property name="scaleMaxMinor" stdset="0">
+              <property name="scaleMaxMinor">
                <number>5</number>
               </property>
-              <property name="borderWidth" stdset="0">
-               <number>0</number>
+              <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="scalePosition">
+              <enum>QwtThermo::LeadingScale</enum>
+              </property>
+              <property name="originMode">
+              <enum>QwtThermo::OriginCustom</enum>
+              </property>
+              <property name="borderWidth">
+              <number>0</number>
               </property>
              </widget>
             </item>
@@ -306,20 +315,29 @@ QLabel[ac=true] { qproperty-text: &quot;VRMS&quot;; }</string>
              </layout>
             </item>
             <item>
-             <widget class="adiscope::CustomScale" name="scaleCh2" native="true">
-              <property name="lowerBound" stdset="0">
+             <widget class="adiscope::CustomScale" name="scaleCh2">
+              <property name="lowerBound">
                <double>-0.100000000000000</double>
               </property>
-              <property name="upperBound" stdset="0">
+              <property name="upperBound">
                <double>0.100000000000000</double>
               </property>
-              <property name="scaleMaxMajor" stdset="0">
+              <property name="scaleMaxMajor">
                <number>5</number>
               </property>
-              <property name="scaleMaxMinor" stdset="0">
+              <property name="scaleMaxMinor">
                <number>5</number>
               </property>
-              <property name="borderWidth" stdset="0">
+              <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="scalePosition">
+              <enum>QwtThermo::LeadingScale</enum>
+              </property>
+              <property name="originMode">
+              <enum>QwtThermo::OriginCustom</enum>
+              </property>
+              <property name="borderWidth">
                <number>0</number>
               </property>
              </widget>
@@ -803,22 +821,16 @@ QPushButton:disabled {
  </widget>
  <customwidgets>
   <customwidget>
-   <class>adiscope::CustomSwitch</class>
-   <extends>QPushButton</extends>
-   <header>customSwitch.hpp</header>
-  </customwidget>
-  <customwidget>
-   <class>adiscope::DetachDragZone</class>
-   <extends>QWidget</extends>
-   <header>detachdragzone.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>QwtThermo</class>
    <extends>QWidget</extends>
    <header>qwt_thermo.h</header>
   </customwidget>
   <customwidget>
+   <class>adiscope::CustomSwitch</class>
+   <extends>QPushButton</extends>
+   <header>customSwitch.hpp</header>
+  </customwidget>
+  <customwidget>  
    <class>adiscope::LcdNumber</class>
    <extends>QLCDNumber</extends>
    <header>lcdNumber.hpp</header>
@@ -833,6 +845,12 @@ QPushButton:disabled {
    <class>adiscope::CustomScale</class>
    <extends>QwtThermo</extends>
    <header>customScale.hpp</header>
+  </customwidget>
+  <customwidget>
+  <class>adiscope::DetachDragZone</class>
+  <extends>QWidget</extends>
+  <header>detachdragzone.h</header>
+  <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>
@@ -873,7 +891,7 @@ QPushButton:disabled {
   </connection>
  </connections>
  <buttongroups>
-  <buttongroup name="buttonGroup_2"/>
   <buttongroup name="buttonGroup"/>
+  <buttongroup name="buttonGroup_2"/>
  </buttongroups>
 </ui>
