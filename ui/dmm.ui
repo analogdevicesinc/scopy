@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>900</width>
-    <height>720</height>
+    <height>816</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -170,29 +170,20 @@ QLabel[ac=true] { qproperty-text: &quot;VRMS&quot;; }</string>
              </layout>
             </item>
             <item>
-             <widget class="adiscope::CustomScale" name="scaleCh1">
-              <property name="lowerBound">
+             <widget class="adiscope::CustomScale" name="scaleCh1" native="true">
+              <property name="lowerBound" stdset="0">
                <double>-0.100000000000000</double>
               </property>
-              <property name="upperBound">
+              <property name="upperBound" stdset="0">
                <double>0.100000000000000</double>
               </property>
-              <property name="scaleMaxMajor">
+              <property name="scaleMaxMajor" stdset="0">
                <number>5</number>
               </property>
-              <property name="scaleMaxMinor">
+              <property name="scaleMaxMinor" stdset="0">
                <number>5</number>
               </property>
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="scalePosition">
-               <enum>QwtThermo::LeadingScale</enum>
-              </property>
-              <property name="originMode">
-               <enum>QwtThermo::OriginCustom</enum>
-              </property>
-              <property name="borderWidth">
+              <property name="borderWidth" stdset="0">
                <number>0</number>
               </property>
              </widget>
@@ -315,29 +306,20 @@ QLabel[ac=true] { qproperty-text: &quot;VRMS&quot;; }</string>
              </layout>
             </item>
             <item>
-             <widget class="adiscope::CustomScale" name="scaleCh2">
-              <property name="lowerBound">
+             <widget class="adiscope::CustomScale" name="scaleCh2" native="true">
+              <property name="lowerBound" stdset="0">
                <double>-0.100000000000000</double>
               </property>
-              <property name="upperBound">
+              <property name="upperBound" stdset="0">
                <double>0.100000000000000</double>
               </property>
-              <property name="scaleMaxMajor">
+              <property name="scaleMaxMajor" stdset="0">
                <number>5</number>
               </property>
-              <property name="scaleMaxMinor">
+              <property name="scaleMaxMinor" stdset="0">
                <number>5</number>
               </property>
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-               <property name="scalePosition">
-               <enum>QwtThermo::LeadingScale</enum>
-              </property>
-              <property name="originMode">
-               <enum>QwtThermo::OriginCustom</enum>
-              </property>
-              <property name="borderWidth">
+              <property name="borderWidth" stdset="0">
                <number>0</number>
               </property>
              </widget>
@@ -377,19 +359,19 @@ QLabel[ac=true] { qproperty-text: &quot;VRMS&quot;; }</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <property name="spacing">
-       <number>24</number>
+       <number>20</number>
       </property>
       <property name="leftMargin">
        <number>25</number>
       </property>
       <property name="topMargin">
-       <number>25</number>
+       <number>15</number>
       </property>
       <property name="rightMargin">
        <number>25</number>
       </property>
       <property name="bottomMargin">
-       <number>25</number>
+       <number>20</number>
       </property>
       <item alignment="Qt::AlignHCenter">
        <widget class="QPushButton" name="run_button">
@@ -748,10 +730,68 @@ QPushButton:disabled {
         <property name="orientation">
          <enum>Qt::Vertical</enum>
         </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>20</width>
-          <height>0</height>
+          <width>0</width>
+          <height>15</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_4">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Data Logging</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="Line" name="line_3">
+        <property name="styleSheet">
+         <string notr="true">color: rgb(51, 51, 59);</string>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="lineWidth">
+         <number>2</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="adiscope::CustomSwitch" name="btnDataLogging">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="verticalSpacer_8">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::MinimumExpanding</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>0</width>
+          <height>2</height>
          </size>
         </property>
        </spacer>
@@ -763,14 +803,20 @@ QPushButton:disabled {
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QwtThermo</class>
-   <extends>QWidget</extends>
-   <header>qwt_thermo.h</header>
-  </customwidget>
-  <customwidget>
    <class>adiscope::CustomSwitch</class>
    <extends>QPushButton</extends>
    <header>customSwitch.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::DetachDragZone</class>
+   <extends>QWidget</extends>
+   <header>detachdragzone.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QwtThermo</class>
+   <extends>QWidget</extends>
+   <header>qwt_thermo.h</header>
   </customwidget>
   <customwidget>
    <class>adiscope::LcdNumber</class>
@@ -787,12 +833,6 @@ QPushButton:disabled {
    <class>adiscope::CustomScale</class>
    <extends>QwtThermo</extends>
    <header>customScale.hpp</header>
-  </customwidget>
-  <customwidget>
-   <class>adiscope::DetachDragZone</class>
-   <extends>QWidget</extends>
-   <header>detachdragzone.h</header>
-   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>
@@ -833,7 +873,7 @@ QPushButton:disabled {
   </connection>
  </connections>
  <buttongroups>
-  <buttongroup name="buttonGroup"/>
   <buttongroup name="buttonGroup_2"/>
+  <buttongroup name="buttonGroup"/>
  </buttongroups>
 </ui>

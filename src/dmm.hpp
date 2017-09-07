@@ -28,6 +28,7 @@
 #include "iio_manager.hpp"
 #include "signal_sample.hpp"
 #include "tool.hpp"
+#include <thread>
 
 namespace Ui {
 	class DMM;
@@ -60,6 +61,10 @@ namespace adiscope {
 		std::shared_ptr<GenericAdc> adc;
 		boost::shared_ptr<signal_sample> signal;
 		unsigned long sample_rate;
+		std::atomic<bool> interrupt_data_logging;
+		std::atomic<bool> data_logging;
+		QString filename;
+		std::thread data_logging_thread;
 
 		void disconnectAll();
 		gr::basic_block_sptr configureGraph(gr::basic_block_sptr s2f,
@@ -78,6 +83,12 @@ namespace adiscope {
 		void updateValuesList(std::vector<float> values);
 
 		void toggleAC();
+
+		void toggleDataLogging(bool);
+
+		void startDataLogging(bool);
+
+		void dataLoggingThread();
 	};
 
 	class DMM_API : public ApiObject
