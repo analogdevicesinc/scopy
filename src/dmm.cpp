@@ -255,12 +255,13 @@ void DMM::toggleDataLogging(bool en)
 			tr("Comma-separated values files (*.csv);;All Files(*)"),
 			&selectedFilter);
 
-		if(filename.isEmpty())
+		if(filename.isEmpty()) {
+			ui->btnDataLogging->setChecked(false);
 			return;
+		}
+
 		QFile file(filename);
 		if( !file.open(QIODevice::WriteOnly)) {
-			QMessageBox::information(this, tr("Unable to open file"),
-						 file.errorString());
 			return;
 		}
 
@@ -315,8 +316,6 @@ void DMM::dataLoggingThread()
 	QString separator = ",";
 	QFile file(filename);
 	if( !file.open(QIODevice::Append)) {
-		QMessageBox::information(this, tr("Unable to open file"),
-					 file.errorString());
 		return;
 	}
 
