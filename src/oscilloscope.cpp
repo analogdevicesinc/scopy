@@ -887,7 +887,6 @@ void Oscilloscope::del_math_channel()
 	measure_settings->onChannelRemoved(curve_id);
 	plot.unregisterSink(qname.toStdString());
 
-	nb_math_channels--;
 	exportSettings->removeChannel(curve_id);
 	exportConfig.remove(curve_id);
 
@@ -908,13 +907,28 @@ void Oscilloscope::del_math_channel()
 	/* Exit from group and set another channel as the current channel */
 	QPushButton *name = parent->findChild<QPushButton *>("name");
 	channels_group->removeButton(name);
-	if (channels_group->buttons().size() > 0 &&
-			channels_group->checkedId() == -1)
-		channels_group->buttons()[0]->setChecked(true);
+
+	for (unsigned int i = curve_id + 1;
+			i < nb_channels + nb_math_channels; i++) {
+		QWidget *parent = ui->channelsList->itemAt(i)->widget();
+		QCheckBox *box = parent->findChild<QCheckBox *>("box");
+		QPushButton *name = parent->findChild<QPushButton *>("name");
+		QPushButton *del_btn = parent->findChild<QPushButton *>("delBtn");
+
+		/* Update the IDs */
+		box->setProperty("id", QVariant(i - 1));
+		name->setProperty("id", QVariant(i - 1));
+		del_btn->setProperty("id", QVariant(i - 1));
+	}
+	nb_math_channels--;
 
 	/* Remove the math channel from the bottom list of channels */
 	ui->channelsList->removeWidget(parent);
 	delete parent;
+
+	if (channels_group->buttons().size() > 0 &&
+			channels_group->checkedId() == -1)
+		channels_group->buttons()[0]->setChecked(true);
 
 	/* If the removed channel is before the current axis, we update the
 	 * current axis to account for the index change */
@@ -935,16 +949,6 @@ void Oscilloscope::del_math_channel()
 
 	for (unsigned int i = nb_channels;
 			i < nb_channels + nb_math_channels; i++) {
-		QWidget *parent = ui->channelsList->itemAt(i)->widget();
-		QCheckBox *box = parent->findChild<QCheckBox *>("box");
-		QPushButton *name = parent->findChild<QPushButton *>("name");
-		QPushButton *del_btn = parent->findChild<QPushButton *>("delBtn");
-
-		/* Update the IDs */
-		box->setProperty("id", QVariant(i));
-		name->setProperty("id", QVariant(i));
-		del_btn->setProperty("id", QVariant(i));
-
 		/* Update the curve-to-axis map */
 		plot.Curve(i)->setAxes(
 				QwtAxisId(QwtPlot::xBottom, 0),
