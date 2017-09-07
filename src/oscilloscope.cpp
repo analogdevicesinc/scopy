@@ -927,8 +927,14 @@ void Oscilloscope::del_math_channel()
 	delete parent;
 
 	if (channels_group->buttons().size() > 0 &&
-			channels_group->checkedId() == -1)
+			channels_group->checkedId() == -1){
 		channels_group->buttons()[0]->setChecked(true);
+	} else {
+		if (current_channel != 0)
+			current_channel = current_channel - 1;
+			Q_EMIT selectedChannelChanged(current_channel);
+			update_measure_for_channel(current_channel);
+	}
 
 	/* If the removed channel is before the current axis, we update the
 	 * current axis to account for the index change */
