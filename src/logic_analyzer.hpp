@@ -275,6 +275,7 @@ private:
 	QMap<int, bool> exportConfig;
 	void init_export_settings();
 	bool exportTabCsv(QString separator, QString);
+	bool exportVCD(QString, QString, QString);
 };
 
 class LogicAnalyzer_API : public ApiObject
