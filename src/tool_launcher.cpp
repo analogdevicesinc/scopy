@@ -328,7 +328,7 @@ void ToolLauncher::generateMenu()
 		if (tools[i] == "Oscilloscope" ||
 			tools[i] == "Voltmeter" ||
 			tools[i] == "Spectrum Analyzer" ||
-			tools[i] == "Siganl Generator") {
+			tools[i] == "Network Analyzer") {
 			toolMenu.insert(tools[i],
 					new MenuOption(tools[i],
 						toolIcons[i], i, true, ui->menu));
@@ -782,11 +782,13 @@ void adiscope::ToolLauncher::calibrate()
 	auto old_osc_text = toolMenu["Oscilloscope"]->getToolBtn()->text();
 	auto old_siggen_text = toolMenu["Signal Generator"]->getToolBtn()->text();
 	auto old_spectrum_text = toolMenu["Spectrum Analyzer"]->getToolBtn()->text();
+	auto old_network_text = toolMenu["Network Analyzer"]->getToolBtn()->text();
 
 	toolMenu["Voltmeter"]->getToolBtn()->setText("Calibrating...");
 	toolMenu["Oscilloscope"]->getToolBtn()->setText("Calibrating...");
 	toolMenu["Signal Generator"]->getToolBtn()->setText("Calibrating...");
 	toolMenu["Spectrum Analyzer"]->getToolBtn()->setText("Calibrating...");
+	toolMenu["Network Analyzer"]->getToolBtn()->setText("Calibrating...");
 
 	if (calib->isInitialized()) {
 		calib->setHardwareInCalibMode();
@@ -818,6 +820,7 @@ void adiscope::ToolLauncher::calibrate()
 	toolMenu["Oscilloscope"]->getToolBtn()->setText(old_osc_text);
 	toolMenu["Signal Generator"]->getToolBtn()->setText(old_siggen_text);
 	toolMenu["Spectrum Analyzer"]->getToolBtn()->setText(old_spectrum_text);
+	toolMenu["Network Analyzer"]->getToolBtn()->setText(old_network_text);
 
 	Q_EMIT adcCalibrationDone();
 	Q_EMIT dacCalibrationDone();
@@ -844,6 +847,12 @@ void adiscope::ToolLauncher::enableAdcBasedTools()
 		adc_users_group.addButton(toolMenu["Spectrum Analyzer"]->getToolStopBtn());
 	}
 
+	if (filter->compatible((TOOL_NETWORK_ANALYZER))) {
+		network_analyzer = new NetworkAnalyzer(ctx, filter, adc,
+			toolMenu["Network Analyzer"]->getToolStopBtn(), &js_engine, this);
+		adc_users_group.addButton(toolMenu["Network Analyzer"]->getToolStopBtn());
+	}
+
 	Q_EMIT adcToolsCreated();
 }
 
@@ -852,9 +861,8 @@ void adiscope::ToolLauncher::enableDacBasedTools()
 {
 	if (filter->compatible(TOOL_SIGNAL_GENERATOR)) {
 		signal_generator = new SignalGenerator(ctx, dacs, filter,
-							toolMenu["Signal Generator"]->getToolStopBtn(), &js_engine, this);
+			toolMenu["Signal Generator"]->getToolStopBtn(), &js_engine, this);
 	}
-
 	Q_EMIT dacToolsCreated();
 }
 
@@ -955,11 +963,26 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 				toolMenu["Pattern Generator"]->getToolStopBtn(), &js_engine,dioManager, this);
 	}
 
-
-	if (filter->compatible((TOOL_NETWORK_ANALYZER))) {
-		network_analyzer = new NetworkAnalyzer(ctx, filter, adc,
-						       toolMenu["Network Analyzer"]->getToolStopBtn(), &js_engine, this);
-	}
+	connect(toolMenu["Network Analyzer"]->getToolStopBtn(),
+			QPushButton::toggled,
+			[=](bool en) {
+		if(en) {
+			if(!toolMenu["Signal Generator"]->getToolStopBtn()->isChecked())
+				return;
+			toolMenu["Signal Generator"]->getToolStopBtn()->setChecked(false);
+		}
+	});
+	connect(toolMenu["Signal Generator"]->getToolStopBtn(),
+			QPushButton::toggled,
+			[=](bool en) {
+		if(en) {
+			if(adc_users_group.checkedId() == adc_users_group.id(toolMenu["Network Analyzer"]->getToolStopBtn())){
+				auto btn = dynamic_cast<CustomPushButton*>(
+							toolMenu["Network Analyzer"]->getToolStopBtn());
+				btn->setChecked(false);
+			}
+		}
+	});
 
 	loadToolTips(true);
 	QtConcurrent::run(std::bind(&ToolLauncher::calibrate, this));
