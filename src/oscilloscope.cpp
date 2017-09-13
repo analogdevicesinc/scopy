@@ -1306,9 +1306,12 @@ void adiscope::Oscilloscope::updateRunButton(bool ch_enabled)
 
 	ui->pushButtonRunStop->setEnabled(ch_enabled);
 	run_button->setEnabled(ch_enabled);
+	ui->pushButtonSingle->setEnabled(ch_enabled);
+
 	if (!ch_enabled) {
 		ui->pushButtonRunStop->setChecked(false);
 		run_button->setChecked(false);
+		ui->pushButtonSingle->setChecked(false);
 
 		if (ui->btnChannel->isChecked()) {
 			ui->btnChannel->setChecked(false);
