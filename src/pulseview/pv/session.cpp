@@ -267,6 +267,13 @@ double Session::get_samplerate() const
 	return samplerate;
 }
 
+void Session::clear_data()
+{
+	// Clear signal data
+	for (const shared_ptr<data::SignalData> d : get_data())
+		d->clear();
+}
+
 const unordered_set< shared_ptr<view::Signal> > Session::signals() const
 {
 	shared_lock<shared_mutex> lock(signals_mutex_);

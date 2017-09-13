@@ -161,6 +161,8 @@ public:
 
 	std::shared_ptr<data::Logic> get_logic_data();
 
+	void clear_data();
+
 private:
 	void set_capture_state(capture_state state);
 

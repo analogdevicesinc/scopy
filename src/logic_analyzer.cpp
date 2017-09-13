@@ -1568,9 +1568,14 @@ void LogicAnalyzer::resetInstrumentToDefault()
 	chm_ui->update_ui();
 	timePosition->setValue(0);
 	timeBase->setValue(1e-3);
+	setSampleRate();
+	setHWTriggerDelay(active_triggerSampleCount);
+	setTriggerDelay();
 	ui->btnCursorsLock->setChecked(false);
 	ui->boxCursors->setChecked(false);
 	ui->btnShowChannels->clicked(false);
+	main_win->session_.clear_data();
+	updateBufferPreviewer();
 }
 
 void LogicAnalyzer::setTimeout(bool checked)
