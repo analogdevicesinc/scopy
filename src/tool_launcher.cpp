@@ -964,7 +964,7 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 	}
 
 	connect(toolMenu["Network Analyzer"]->getToolStopBtn(),
-			QPushButton::toggled,
+			&QPushButton::toggled,
 			[=](bool en) {
 		if(en) {
 			if(!toolMenu["Signal Generator"]->getToolStopBtn()->isChecked())
@@ -973,7 +973,7 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 		}
 	});
 	connect(toolMenu["Signal Generator"]->getToolStopBtn(),
-			QPushButton::toggled,
+			&QPushButton::toggled,
 			[=](bool en) {
 		if(en) {
 			if(adc_users_group.checkedId() == adc_users_group.id(toolMenu["Network Analyzer"]->getToolStopBtn())){
