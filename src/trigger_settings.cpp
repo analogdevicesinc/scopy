@@ -21,6 +21,7 @@
 #include "adc_sample_conv.hpp"
 #include "spinbox_a.hpp"
 #include "osc_adc.h"
+#include "scroll_filter.hpp"
 
 #include "ui_trigger_settings.h"
 
@@ -96,6 +97,8 @@ TriggerSettings::TriggerSettings(std::shared_ptr<GenericAdc> adc,
 	on_cmb_analog_extern_currentIndexChanged(0);
 	ui->trigger_level->setValue(0);
 	ui->trigger_hysteresis->setValue(50e-3);
+	MouseWheelWidgetGuard *wheelEventGuard = new MouseWheelWidgetGuard(this);
+	wheelEventGuard->installEventRecursively(this);
 }
 
 TriggerSettings::~TriggerSettings()

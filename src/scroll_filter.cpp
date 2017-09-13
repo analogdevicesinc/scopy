@@ -23,6 +23,7 @@
 #include <QComboBox>
 #include <QSpinBox>
 #include <QDoubleSpinBox>
+#include <QLineEdit>
 
 using namespace adiscope;
 
@@ -64,6 +65,13 @@ void MouseWheelWidgetGuard::installEventRecursively(QWidget *parentWidget)
 	QList<QSpinBox*> spinBoxes = parentWidget->
 		findChildren<QSpinBox*>();
 	for(auto ch : spinBoxes) {
+		ch->installEventFilter(new MouseWheelWidgetGuard(ch));
+		ch->setFocusPolicy(Qt::StrongFocus);
+	}
+
+	QList<QLineEdit*> lineEdits = parentWidget->
+		findChildren<QLineEdit*>();
+	for(auto ch : lineEdits) {
 		ch->installEventFilter(new MouseWheelWidgetGuard(ch));
 		ch->setFocusPolicy(Qt::StrongFocus);
 	}
