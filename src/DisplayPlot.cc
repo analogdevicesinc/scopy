@@ -177,7 +177,8 @@ void EdgelessPlotGrid::updateScaleDiv( const QwtScaleDiv& xScaleDiv,
 }
 
 OscPlotZoomer::OscPlotZoomer(QWidget *parent, bool doReplot) :
-	LimitedPlotZoomer(parent, doReplot)
+	LimitedPlotZoomer(parent, doReplot),
+	lastIndex(-1)
 {
 }
 
@@ -193,6 +194,11 @@ void OscPlotZoomer::rescale()
 	const QRectF &rect = stack[index];
 	if ( rect != scaleRect() )
 	{
+	    if (lastIndex < index)
+		    Q_EMIT zoomIn();
+	    else
+		    Q_EMIT zoomOut();
+	    lastIndex = index;
 
 	    const bool doReplot = plt->autoReplot();
 	    plt->setAutoReplot( false );

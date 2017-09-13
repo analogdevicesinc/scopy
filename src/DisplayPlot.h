@@ -570,13 +570,21 @@ private:
 
 class OscPlotZoomer: public LimitedPlotZoomer
 {
+	Q_OBJECT
 public:
 	OscPlotZoomer(QWidget*, bool doReplot = true);
 
 	void cancel() { reset(); }
 
+Q_SIGNALS:
+	void zoomIn();
+	void zoomOut();
+
 protected:
 	virtual void rescale();
+
+private:
+	int lastIndex;
 };
 
 /*
