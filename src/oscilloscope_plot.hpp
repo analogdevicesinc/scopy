@@ -97,6 +97,8 @@ namespace adiscope {
 		QList<std::shared_ptr<MeasurementData>> measurements(int chnIdx);
 		std::shared_ptr<MeasurementData> measurement(int id, int chnIdx);
 
+		OscPlotZoomer* getZoomer();
+
 	Q_SIGNALS:
 		void timeTriggerValueChanged(double);
 		void channelOffsetChanged(double);

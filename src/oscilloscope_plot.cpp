@@ -748,6 +748,11 @@ std::shared_ptr<MeasurementData> CapturePlot::measurement(int id, int chnIdx)
 		return std::shared_ptr<MeasurementData>();
 }
 
+OscPlotZoomer *CapturePlot::getZoomer()
+{
+	return static_cast<OscPlotZoomer* >(d_zoomer);
+}
+
 void CapturePlot::setPeriodDetectLevel(int chnIdx, double lvl)
 {
 	Measure *measure = measureOfChannel(chnIdx);
