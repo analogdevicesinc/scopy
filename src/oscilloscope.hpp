@@ -176,6 +176,8 @@ namespace adiscope {
 		double active_time_pos;
 		double last_set_time_pos;
 		unsigned long last_set_sample_count;
+		int zoom_level;
+		QStack<double> timePositions;
 
 		Ui::Oscilloscope *ui;
 		Ui::OscGeneralSettings *gsettings_ui;

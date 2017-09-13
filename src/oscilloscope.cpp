@@ -89,7 +89,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	triggerUpdater(new StateUpdater(250, this)),
 	menuOpened(false), current_channel(-1), math_chn_counter(0),
 	channels_group(new QButtonGroup(this)),
-	active_settings_btn(nullptr)
+	active_settings_btn(nullptr),
+	zoom_level(0)
 {
 	ui->setupUi(this);
 	int triggers_panel = ui->stackedWidget->insertWidget(-1, &trigger_settings);
@@ -535,6 +536,15 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		}
 		current_channel = crt_chn_copy;
 	}
+
+	connect(plot.getZoomer(), &OscPlotZoomer::zoomIn, [=](){
+		timePositions.push(plot.HorizOffset());
+		zoom_level++;
+	});
+	connect(plot.getZoomer(), &OscPlotZoomer::zoomOut, [=](){
+		timePosition->setValue(timePositions.pop());
+		zoom_level--;
+	});
 
 	export_settings_init();
 
@@ -1537,7 +1547,9 @@ void adiscope::Oscilloscope::onTimePositionChanged(double value)
 	plot.replot();
 	plot.setDataStartingPoint(active_trig_sample_count);
 	plot.resetXaxisOnNextReceivedData();
-	plot.zoomBaseUpdate();
+
+	if (zoom_level == 0)
+		plot.zoomBaseUpdate();
 
 	if (started) {
 		trigger_settings.setTriggerDelay(active_trig_sample_count);
