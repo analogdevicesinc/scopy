@@ -50,6 +50,7 @@ namespace adiscope {
 	class SpectrumChannel;
 	class Filter;
 	class ChannelWidget;
+	class DbClickButtons;
 }
 
 class QPushButton;
@@ -101,9 +102,8 @@ private Q_SLOTS:
 	void onChannelEnabled(bool);
 	void onStartStopChanged();
 	void onCenterSpanChanged();
-	void onMarkerToggled(bool);
-	void on_btnPrevMrk_clicked();
-	void on_btnNextMrk_clicked();
+	void onMarkerToggled(int, bool);
+	void onMarkerSelected(int);
 	void on_btnLeftPeak_clicked();
 	void on_btnRightPeak_clicked();
 	void on_btnUpAmplPeak_clicked();
@@ -128,7 +128,7 @@ private:
 	void setSampleRate(double sr);
 	void setFftSize(uint size);
 	void setMarkerEnabled(int ch_idx, int mrk_idx, bool en);
-	void setActiveMarker(int mrk_idx);
+	void updateWidgetsRelatedToMarker(int mrk_idx);
 	void setCurrentMarkerLabelData(int chIdx, int mkIdx);
 	void updateCrtMrkLblVisibility();
 	void updateMrkFreqPosSpinBtnLimits();
@@ -136,6 +136,7 @@ private:
 
 private:
 	Ui::SpectrumAnalyzer *ui;
+	adiscope::DbClickButtons *marker_selector;
 
 	QButtonGroup *settings_group;
 	QButtonGroup *channels_group;
@@ -153,15 +154,12 @@ private:
 	int adc_bits_count;
 	int crt_channel_id;
 	int crt_peak;
-	int crt_marker;
 	uint max_peak_count;
 	double sample_rate;
 	int sample_rate_divider;
 	uint fft_size;
 	QList<uint> bin_sizes;
 	MetricPrefixFormatter freq_formatter;
-
-	QList<QPushButton *> mrk_buttons;
 
 	gr::top_block_sptr top_block;
 

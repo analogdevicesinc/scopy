@@ -40,6 +40,7 @@
 #include "dynamicWidget.hpp"
 #include "hardware_trigger.hpp"
 #include "channel_widget.hpp"
+#include "db_click_buttons.hpp"
 
 /* Generated UI */
 #include "ui_spectrum_analyzer.h"
@@ -80,6 +81,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	ToolLauncher *parent):
 	Tool(ctx, runButton, new SpectrumAnalyzer_API(this), "Spectrum Analyzer", parent),
 	ui(new Ui::SpectrumAnalyzer),
+	marker_selector(new DbClickButtons(this)),
 	fft_plot(nullptr),
 	settings_group(new QButtonGroup(this)),
 	channels_group(new QButtonGroup(this)),
@@ -87,7 +89,6 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	adc_name(ctx ? filt->device_name(TOOL_SPECTRUM_ANALYZER) : ""),
 	crt_channel_id(0),
 	crt_peak(0),
-	crt_marker(-1),
 	max_peak_count(10),
 	fft_size(32768),
 	bin_sizes({256, 512, 1024, 2048, 4096, 8192, 16384, 32768})
@@ -196,19 +197,6 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	ui->center_freq->setStep(1e6);
 	ui->span_freq->setStep(1e6);
 
-	// Initialize Marker controls
-	mrk_buttons.push_back(ui->mrk1);
-	mrk_buttons.push_back(ui->mrk2);
-	mrk_buttons.push_back(ui->mrk3);
-	mrk_buttons.push_back(ui->mrk4);
-	mrk_buttons.push_back(ui->mrk5);
-	for (int i = 0; i < mrk_buttons.size(); i++) {
-		QPushButton *btn = mrk_buttons[i];
-		btn->setProperty("id", QVariant(i));
-		connect(btn, SIGNAL(toggled(bool)), this,
-			SLOT(onMarkerToggled(bool)));
-	}
-
 	// Configure plot peak capabilities
 	for (uint i = 0; i < num_adc_channels; i++) {
 		fft_plot->setPeakCount(i, max_peak_count);
@@ -221,7 +209,15 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 			fft_plot->setMarkerEnabled(i, m, false);
 		}
 	}
-	setActiveMarker(0);
+
+	// Initialize Marker controls
+	ui->hLayout_marker_selector->addWidget(marker_selector);
+
+	connect(marker_selector, SIGNAL(buttonToggled(int, bool)),
+		this, SLOT(onMarkerToggled(int, bool)));
+	connect(marker_selector, SIGNAL(buttonSelected(int)),
+		this, SLOT(onMarkerSelected(int)));
+	marker_selector->setSelectedButton(0);
 
 	connect(fft_plot, SIGNAL(newMarkerData()),
 		this, SLOT(onPlotNewMarkerData()));
@@ -564,12 +560,12 @@ void SpectrumAnalyzer::onChannelSelected(bool en)
 	if (en) {
 		ui->labelMarkerSettingsTitle->setText(cw->fullName());
 
+		marker_selector->blockSignals(true);
 		for (int i = 0; i < fft_plot->markerCount(chIdx); i++) {
-			mrk_buttons[i]->blockSignals(true);
-			mrk_buttons[i]->setChecked(
+			marker_selector->setButtonChecked(i,
 				fft_plot->markerEnabled(chIdx, i));
-			mrk_buttons[i]->blockSignals(false);
 		}
+		marker_selector->blockSignals(false);
 
 		updateCrtMrkLblVisibility();
 	}
@@ -721,6 +717,8 @@ int SpectrumAnalyzer::channelIdOfOpenedSettings() const
 
 void SpectrumAnalyzer::on_btnLeftPeak_clicked()
 {
+	int crt_marker = marker_selector->selectedButton();
+
 	fft_plot->marker_to_next_lower_freq_peak(crt_channel_id, crt_marker);
 	if (!ui->run_button->isChecked()) {
 			fft_plot->updateMarkerUi(crt_channel_id, crt_marker);
@@ -730,6 +728,8 @@ void SpectrumAnalyzer::on_btnLeftPeak_clicked()
 
 void SpectrumAnalyzer::on_btnRightPeak_clicked()
 {
+	int crt_marker = marker_selector->selectedButton();
+
 	fft_plot->marker_to_next_higher_freq_peak(crt_channel_id, crt_marker);
 	if (!ui->run_button->isChecked()) {
 			fft_plot->updateMarkerUi(crt_channel_id, crt_marker);
@@ -739,6 +739,8 @@ void SpectrumAnalyzer::on_btnRightPeak_clicked()
 
 void SpectrumAnalyzer::on_btnMaxPeak_clicked()
 {
+	int crt_marker = marker_selector->selectedButton();
+
 	fft_plot->marker_to_max_peak(crt_channel_id, crt_marker);
 	if (!ui->run_button->isChecked()) {
 			fft_plot->updateMarkerUi(crt_channel_id, crt_marker);
@@ -820,25 +822,10 @@ void SpectrumAnalyzer::setFftSize(uint size)
 		iio->unlock();
 }
 
-void SpectrumAnalyzer::on_btnPrevMrk_clicked()
-{
-	int m = crt_marker - 1;
-
-	if (m < 0)
-		m = mrk_buttons.size() - 1;
-
-	setActiveMarker(m % mrk_buttons.size());
-}
-
-void SpectrumAnalyzer::on_btnNextMrk_clicked()
-{
-	int m = crt_marker + 1;
-
-	setActiveMarker(m % mrk_buttons.size());
-}
-
 void SpectrumAnalyzer::on_btnDnAmplPeak_clicked()
 {
+	int crt_marker = marker_selector->selectedButton();
+
 	fft_plot->marker_to_next_lower_mag_peak(crt_channel_id, crt_marker);
 	if (!ui->run_button->isChecked()) {
 			fft_plot->updateMarkerUi(crt_channel_id, crt_marker);
@@ -848,6 +835,8 @@ void SpectrumAnalyzer::on_btnDnAmplPeak_clicked()
 
 void SpectrumAnalyzer::on_btnUpAmplPeak_clicked()
 {
+	int crt_marker = marker_selector->selectedButton();
+
 	fft_plot->marker_to_next_higher_mag_peak(crt_channel_id, crt_marker);
 	if (!ui->run_button->isChecked()) {
 			fft_plot->updateMarkerUi(crt_channel_id, crt_marker);
@@ -855,14 +844,11 @@ void SpectrumAnalyzer::on_btnUpAmplPeak_clicked()
 	}
 }
 
-void SpectrumAnalyzer::onMarkerToggled(bool on)
+void SpectrumAnalyzer::onMarkerToggled(int id, bool on)
 {
-	QPushButton *btn = static_cast<QPushButton *>(QObject::sender());
-	uint id = btn->property("id").toUInt();
-
 	setMarkerEnabled(crt_channel_id, id, on);
 
-	if (id == crt_marker) {
+	if (id == marker_selector->selectedButton()) {
 		if (on) {
 			setCurrentMarkerLabelData(crt_channel_id, id);
 		}
@@ -870,6 +856,12 @@ void SpectrumAnalyzer::onMarkerToggled(bool on)
 	}
 
 	updateCrtMrkLblVisibility();
+}
+
+void SpectrumAnalyzer::onMarkerSelected(int id)
+{
+	fft_plot->selectMarker(crt_channel_id, id);
+	updateWidgetsRelatedToMarker(id);
 }
 
 void SpectrumAnalyzer::setMarkerEnabled(int ch_idx, int mrk_idx, bool en)
@@ -883,24 +875,11 @@ void SpectrumAnalyzer::setMarkerEnabled(int ch_idx, int mrk_idx, bool en)
 	fft_plot->replot();
 }
 
-void SpectrumAnalyzer::setActiveMarker(int mrk_idx)
+void SpectrumAnalyzer::updateWidgetsRelatedToMarker(int mrk_idx)
 {
-	for (int i = 0; i < mrk_buttons.size(); i++) {
-		setDynamicProperty(mrk_buttons[i], "active", false);
-	}
-
-	if (mrk_idx < 0 || mrk_idx >= mrk_buttons.size()) {
-		return;
-	}
-
-	setDynamicProperty(mrk_buttons[mrk_idx], "active", true);
-	crt_marker = mrk_idx;
-	fft_plot->selectMarker(crt_channel_id, mrk_idx);
-
 	if (fft_plot->markerEnabled(crt_channel_id, mrk_idx)) {
 		setCurrentMarkerLabelData(crt_channel_id, mrk_idx);
 	}
-
 	updateCrtMrkLblVisibility();
 	updateMrkFreqPosSpinBtnValue();
 }
@@ -919,18 +898,14 @@ void SpectrumAnalyzer::setCurrentMarkerLabelData(int chIdx, int mkIdx)
 
 void SpectrumAnalyzer::updateCrtMrkLblVisibility()
 {
-	bool visible = false;
-	for (int i = 0; i < mrk_buttons.size(); i++) {
-		if (mrk_buttons[i]->isChecked() && i == crt_marker) {
-			visible = true;
-			break;
-		}
-	}
+	int crt = marker_selector->selectedButton();
+	bool visible = marker_selector->buttonChecked(crt);
 	ui->lbl_crtMarkerReading->setVisible(visible);
 }
 
 void SpectrumAnalyzer::onPlotNewMarkerData()
 {
+	int crt_marker = marker_selector->selectedButton();
 	// Update top-right label holding the reading of the active marker
 	if (fft_plot->markerEnabled(crt_channel_id, crt_marker)) {
 		setCurrentMarkerLabelData(crt_channel_id, crt_marker);
@@ -942,15 +917,18 @@ void SpectrumAnalyzer::onPlotMarkerSelected(uint chIdx, uint mkIdx)
 {
 	if (crt_channel_id != chIdx) {
 		channels[chIdx]->widget()->nameButton()->setChecked(true);
-
 	}
-	if (crt_marker != mkIdx) {
-		setActiveMarker(mkIdx);
+
+	if (marker_selector->selectedButton() != mkIdx) {
+		marker_selector->setSelectedButton(mkIdx);
+		updateWidgetsRelatedToMarker(mkIdx);
 	}
 }
 
 void SpectrumAnalyzer::onMarkerFreqPosChanged(double freq)
 {
+	int crt_marker = marker_selector->selectedButton();
+
 	if (!fft_plot->markerEnabled(crt_channel_id, crt_marker))
 		return;
 
@@ -977,6 +955,8 @@ void SpectrumAnalyzer::updateMrkFreqPosSpinBtnLimits()
 
 void SpectrumAnalyzer::updateMrkFreqPosSpinBtnValue()
 {
+	int crt_marker = marker_selector->selectedButton();
+
 	if (!fft_plot->markerEnabled(crt_channel_id, crt_marker))
 		return;
 	if (!fft_plot->markerType(crt_channel_id, crt_marker) == 0)
@@ -1007,7 +987,6 @@ void SpectrumAnalyzer::singleCaptureDone()
 		Q_EMIT isRunning(false);
 	}
 }
-
 
 void SpectrumAnalyzer::on_cmb_units_currentIndexChanged(const QString& unit)
 {
