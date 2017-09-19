@@ -235,6 +235,7 @@ void SpinBoxA::setValue(double value)
 	}
 	ui->SBA_LineEdit->setText(QString::number(number, 'g',
 		significant_digits));
+	ui->SBA_LineEdit->setCursorPosition(0);
 
 	if (m_value != 0) {
 		ui->SBA_Combobox->blockSignals(true);
