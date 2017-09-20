@@ -649,3 +649,13 @@ void PhaseSpinButton::stepDown()
 
 	setValue(newVal);
 }
+
+double PhaseSpinButton:: step()
+{
+	return m_step;
+}
+
+void PhaseSpinButton::setStep(double step)
+{
+	m_step = step;
+}

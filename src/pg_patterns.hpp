@@ -185,6 +185,7 @@ Q_SIGNALS:
 class ClockPattern : virtual public Pattern
 {
 	int duty_cycle_granularity = 20;
+	int phase_granularity=20;
 	float frequency;
 	float duty_cycle;
 	int phase;

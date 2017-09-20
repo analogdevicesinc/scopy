@@ -189,6 +189,9 @@ class PhaseSpinButton: public SpinBoxA
 public:
 	explicit PhaseSpinButton(QWidget *parent = nullptr);
 
+	double step();
+	void setStep(double);
+
 public Q_SLOTS:
 	void stepUp();
 	void stepDown();

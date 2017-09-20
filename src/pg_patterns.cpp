@@ -344,7 +344,7 @@ void PatternUI::destroy_ui() {}
 
 uint32_t ClockPattern::get_min_sampling_freq()
 {
-	return frequency * (duty_cycle_granularity);
+	return frequency * boost::math::lcm(duty_cycle_granularity,phase_granularity);
 }
 
 uint32_t ClockPattern::get_required_nr_of_samples(uint32_t sample_rate,
@@ -366,8 +366,6 @@ void ClockPattern::set_duty_cycle(float value)
 		value = 100;
 	}
 
-	//    value = (value / (100/duty_cycle_granularity)) * (100/duty_cycle_granularity);
-
 	duty_cycle = value;
 	auto max = 100;
 	duty_cycle_granularity = 100/boost::math::gcd((int)value, max);
@@ -381,31 +379,6 @@ float ClockPattern::get_frequency() const
 void ClockPattern::set_frequency(float value)
 {
 	frequency = value;
-
-	/*if (frequency>50000000) {
-		//frequency = 50000000;
-		duty_cycle_granularity = 1;
-	}
-
-	if (frequency>20000000) {
-		duty_cycle_granularity = 2;
-	}
-
-	if (frequency>10000000 && frequency <= 20000000) {
-		duty_cycle_granularity = 4;
-	}
-
-	if (frequency>5000000 && frequency <= 10000000) {
-		duty_cycle_granularity = 8;
-	}
-
-	if (frequency>2000000 && frequency <= 5000000) {
-		duty_cycle_granularity = 16;
-	}
-
-	if (frequency<2000000) {
-		duty_cycle_granularity = 20;
-	}*/
 }
 
 int ClockPattern::get_phase() const
@@ -424,6 +397,8 @@ void ClockPattern::set_phase(int value)
 	if (phase<0) {
 		phase = 360-(abs(phase)%360);
 	}
+	auto max=360;
+	phase_granularity=360/boost::math::gcd((int)phase,max);
 
 }
 
@@ -535,9 +510,24 @@ void ClockPatternUI::parse_ui()
 {
 	bool ok =0;
 	pattern->set_frequency(frequencySpinButton->value());
-	pattern->set_phase(phaseSpinButton->value());
+	auto dutystep=100.0/ (PGMaxSampleRate / pattern->get_frequency());
+	auto dutyval = dutySpinButton->value();
+
+	dutySpinButton->blockSignals(true);
+	dutySpinButton->setStep(dutystep>1 ? dutystep : 1);
+	dutySpinButton->setValue(floor(dutyval/dutystep)*dutystep);
+	dutySpinButton->blockSignals(false);
 	pattern->set_duty_cycle(dutySpinButton->value());
 
+
+	auto phasestep=360.0/ (PGMaxSampleRate / pattern->get_frequency());
+	auto phaseval = phaseSpinButton->value();
+
+	/*phaseSpinButton->blockSignals(true);
+	phaseSpinButton->setStep(phasestep>15 ? phasestep : 15);
+	phaseSpinButton->setValue(floor(phaseval/phasestep)*phasestep);
+	phaseSpinButton->blockSignals(false);*/
+	pattern->set_phase(phaseSpinButton->value());
 	Q_EMIT patternParamsChanged();
 
 }
