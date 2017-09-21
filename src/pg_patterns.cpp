@@ -510,13 +510,24 @@ void ClockPatternUI::destroy_ui()
 void ClockPatternUI::parse_ui()
 {
 	bool ok =0;
+
+
+	/*auto freq=frequencySpinButton->value();
+	freq=(freq*PGMaxSampleRate)/(int)PGMaxSampleRate;*/
+	//freq=ceil(freq*100)/100;
+	//frequencySpinButton->setValue(freq);
 	pattern->set_frequency(frequencySpinButton->value());
+
+
 	auto dutystep=100.0/ (PGMaxSampleRate / pattern->get_frequency());
+	dutystep=(dutystep>1 ? dutystep : 1);
+	dutystep=floor(dutystep*100+0.5)/100.0;
 	auto dutyval = dutySpinButton->value();
+	dutyval=floor((dutyval/dutystep) +0.5)*dutystep;
 
 	dutySpinButton->blockSignals(true);
-	dutySpinButton->setStep(dutystep>1 ? dutystep : 1);
-	dutySpinButton->setValue(floor(dutyval/dutystep)*dutystep);
+	dutySpinButton->setStep(dutystep);
+	dutySpinButton->setValue(dutyval);
 	dutySpinButton->blockSignals(false);
 	pattern->set_duty_cycle(dutySpinButton->value());
 
