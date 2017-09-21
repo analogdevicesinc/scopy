@@ -436,7 +436,8 @@ uint8_t ClockPattern::generate_pattern(uint32_t sample_rate,
 	int low_number_of_samples = (int)round(f_low_number_of_samples);
 	int high_number_of_samples = (int)round(f_high_number_of_samples);
 
-
+	if(period_number_of_samples==0)
+		period_number_of_samples=1;
 	delete_buffer();
 	buffer = new short[number_of_samples];
 	int i=0;
