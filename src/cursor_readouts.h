@@ -21,6 +21,8 @@
 #define CURSOR_READOUTS_H
 
 #include <QWidget>
+#include <QPropertyAnimation>
+#include "customplotpositionbutton.h"
 
 class QwtPlot;
 
@@ -64,15 +66,24 @@ namespace adiscope {
 
 		virtual bool eventFilter(QObject *, QEvent *);
 
+		void setTransparency(int value);
+		void moveToPosition(CustomPlotPositionButton::ReadoutsPosition position);
 	private:
 		QPoint plotPointToPixelPoint(const QPointF &point) const;
-		void updateSizeAndPosition();
+		void updateSizeAndPosition(bool resize = false);
 
 	private:
 		Ui::CursorReadouts *ui;
 		bool d_voltage_rd_visible;
 		bool d_time_rd_visible;
 		QPoint d_topLeft;
+		void moveTopLeft(bool resize = false);
+		void moveTopRight(bool resize = false);
+		void moveBottomLeft(bool resize = false);
+		void moveBottomRight(bool resize = false);
+		CustomPlotPositionButton::ReadoutsPosition currentPosition;
+		QPropertyAnimation *anim, *anim2;
+		QRect lastTimeRect, lastVoltageRect;
 	};
 }
 
