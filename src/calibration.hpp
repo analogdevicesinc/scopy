@@ -25,6 +25,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <string>
+#include <memory>
 
 extern "C" {
 	struct iio_context;
@@ -35,6 +36,8 @@ extern "C" {
 
 namespace adiscope {
 
+class M2kAdc;
+class M2kDac;
 class Calibration_API;
 
 class Calibration
@@ -42,7 +45,10 @@ class Calibration
 	friend class Calibration_API;
 
 public:
-	Calibration(struct iio_context *ctx, QJSEngine *engine);
+	Calibration(struct iio_context *ctx, QJSEngine *engine,
+		    std::shared_ptr<M2kAdc> adc = nullptr,
+		    std::shared_ptr<M2kDac> dac_a = nullptr,
+		    std::shared_ptr<M2kDac> dac_b = nullptr);
 	~Calibration();
 
 	bool initialize();
@@ -66,7 +72,8 @@ public:
 	double dacAvlsb() const;
 	double dacBvlsb() const;
 
-	bool resetSettings();
+	bool resetCalibration();
+	void updateCorrections();
 
 	double getIioDevTemp(const QString& devName) const;
 
@@ -87,6 +94,10 @@ private:
 	void dacBOutputDC(int16_t value);
 
 	ApiObject *m_api;
+
+	std::shared_ptr<M2kAdc> m2k_adc;
+	std::shared_ptr<M2kDac> m2k_dac_a;
+	std::shared_ptr<M2kDac> m2k_dac_b;
 
 	struct iio_context *m_ctx;
 	struct iio_device *m_m2k_adc;
@@ -149,6 +160,7 @@ public:
 	Q_INVOKABLE void setHardwareInCalibMode();
 	Q_INVOKABLE void restoreHardwareFromCalibMode();
 
+	Q_INVOKABLE bool resetCalibration();
 	Q_INVOKABLE bool calibrateAll();
 
 	Q_INVOKABLE double devTemp(const QString& devName);

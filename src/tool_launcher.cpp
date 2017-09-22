@@ -797,26 +797,6 @@ void adiscope::ToolLauncher::calibrate()
 		calib->restoreHardwareFromCalibMode();
 	}
 
-	auto m2k_adc = std::dynamic_pointer_cast<M2kAdc>(adc);
-	if (m2k_adc) {
-		m2k_adc->setChnCorrectionOffset(0, calib->adcOffsetChannel0());
-		m2k_adc->setChnCorrectionOffset(1, calib->adcOffsetChannel1());
-		m2k_adc->setChnCorrectionGain(0, calib->adcGainChannel0());
-		m2k_adc->setChnCorrectionGain(1, calib->adcGainChannel1());
-	}
-
-	for (int i = 0; i < dacs.size(); i++) {
-		auto m2k_dac = std::dynamic_pointer_cast<M2kDac>(dacs[i]);
-		if (m2k_dac) {
-			if (i == 0) {
-				dacs[i]->setVlsb(calib->dacAvlsb());
-			} else if (i == 1) {
-				dacs[i]->setVlsb(calib->dacBvlsb());
-			}
-		}
-	}
-
-
 	toolMenu["Voltmeter"]->getToolBtn()->setText(old_dmm_text);
 	toolMenu["Oscilloscope"]->getToolBtn()->setText(old_osc_text);
 	toolMenu["Signal Generator"]->getToolBtn()->setText(old_siggen_text);
@@ -885,9 +865,6 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 
 	filter = new Filter(ctx);
 
-	calib = new Calibration(ctx,  &js_engine);
-	calib->initialize();
-
 	dacs.clear();
 
 	// Find available DACs
@@ -921,6 +898,21 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 			dacs.push_back(dac);
 		}
 	}
+
+	auto m2k_adc = std::dynamic_pointer_cast<M2kAdc>(adc);
+	std::shared_ptr<M2kDac> m2k_dac_a;
+	std::shared_ptr<M2kDac> m2k_dac_b;
+	for(int i = 0; i < dacs.size(); i++) {
+		if(i == 0) {
+			m2k_dac_a = std::dynamic_pointer_cast<M2kDac>(dacs.at(i));
+		}
+		if(i == 1 ){
+			m2k_dac_b = std::dynamic_pointer_cast<M2kDac>(dacs.at(i));
+		}
+	}
+	calib = new Calibration(ctx, &js_engine, m2k_adc, m2k_dac_a, m2k_dac_b);
+	calib->initialize();
+
 
 	if (filter->compatible(TOOL_PATTERN_GENERATOR)
 	    || filter->compatible(TOOL_DIGITALIO)) {

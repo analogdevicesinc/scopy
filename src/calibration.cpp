@@ -19,6 +19,7 @@
 
 #include "calibration.hpp"
 #include "osc_adc.h"
+#include "hw_dac.h"
 
 #include <errno.h>
 #include <QDebug>
@@ -28,12 +29,18 @@
 
 using namespace adiscope;
 
-Calibration::Calibration(struct iio_context *ctx, QJSEngine *engine):
+Calibration::Calibration(struct iio_context *ctx, QJSEngine *engine,
+			 std::shared_ptr<M2kAdc> adc,
+			 std::shared_ptr<M2kDac> dac_a,
+			 std::shared_ptr<M2kDac> dac_b):
 	m_api(new Calibration_API(this)),
 	m_ctx(ctx),
 	m_dac_a_buffer(NULL),
 	m_dac_b_buffer(NULL),
-	m_initialized(false)
+	m_initialized(false),
+	m2k_adc(adc),
+	m2k_dac_a(dac_a),
+	m2k_dac_b(dac_b)
 {
 	m_api->setObjectName("calib");
 	m_api->js_register(engine);
@@ -326,7 +333,32 @@ double Calibration::adcGainChannel1() const
 	return m_adc_ch1_gain;
 }
 
-bool Calibration::resetSettings()
+void Calibration::updateCorrections()
+{
+	iio_channel_attr_write_double(m_ad5625_channel2, "raw",
+				      m_adc_ch0_offset);
+	iio_channel_attr_write_double(m_ad5625_channel3, "raw",
+				      m_adc_ch1_offset);
+
+	iio_channel_attr_write_double(m_ad5625_channel0, "raw",
+				      m_dac_a_ch_offset);
+	iio_channel_attr_write_double(m_ad5625_channel1, "raw",
+				      m_dac_b_ch_offset);
+
+	if(m2k_adc) {
+		m2k_adc->setChnCorrectionOffset(0, adcOffsetChannel0());
+		m2k_adc->setChnCorrectionOffset(1, adcOffsetChannel1());
+		m2k_adc->setChnCorrectionGain(0, adcGainChannel0());
+		m2k_adc->setChnCorrectionGain(1, adcGainChannel1());
+	}
+
+	if(m2k_dac_a)
+		m2k_dac_a->setVlsb(dacAvlsb());
+	if(m2k_dac_b)
+		m2k_dac_b->setVlsb(dacBvlsb());
+}
+
+bool Calibration::resetCalibration()
 {
 	if (!m_initialized) {
 		qDebug() << "Rx path is not initialized for calibration.";
@@ -338,14 +370,16 @@ bool Calibration::resetSettings()
 	m_adc_ch0_offset = 2048;
 	m_adc_ch1_offset = 2048;
 
+	m_dac_a_ch_offset =  2048;
+	m_dac_b_ch_offset =  2048;
+
 	m_adc_ch0_gain = 1;
 	m_adc_ch1_gain = 1;
 
-	iio_channel_attr_write_double(m_ad5625_channel2, "raw",
-		m_adc_ch0_offset);
-	iio_channel_attr_write_double(m_ad5625_channel3, "raw",
-		m_adc_ch1_offset);
+	m_dac_a_ch_vlsb = 0.0034;
+	m_dac_b_ch_vlsb = 0.0034;
 
+	updateCorrections();
 	return true;
 }
 
@@ -750,6 +784,7 @@ bool Calibration::calibrateAll()
 	if (!ok)
 		return false;
 
+	updateCorrections();
 	return true;
 }
 
@@ -828,6 +863,11 @@ QList<double> Calibration_API::get_dac_gains() const
 bool Calibration_API::calibrateAll()
 {
 	return calib->calibrateAll();
+}
+
+bool Calibration_API::resetCalibration()
+{
+	return calib->resetCalibration();
 }
 
 void Calibration_API::setHardwareInCalibMode()
