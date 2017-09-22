@@ -150,6 +150,20 @@ void Calibration::setHardwareInCalibMode()
 		}
 	}
 
+	/* Save the previous values for sampling frequency and oversampling ratio */
+	iio_device_attr_read_double(m_m2k_adc, "sampling_frequency",
+		&adc_sampl_freq);
+	iio_device_attr_read_double(m_m2k_adc, "oversampling_ratio",
+		&adc_oversampl);
+	iio_device_attr_read_double(m_m2k_dac_a, "sampling_frequency",
+		&dac_a_sampl_freq);
+	iio_device_attr_read_double(m_m2k_dac_a, "oversampling_ratio",
+		&dac_a_oversampl);
+	iio_device_attr_read_double(m_m2k_dac_b, "sampling_frequency",
+		&dac_b_sampl_freq);
+	iio_device_attr_read_double(m_m2k_dac_b, "oversampling_ratio",
+		&dac_b_oversampl);
+
 	// Make sure we calibrate at the highest sample rate
 	iio_device_attr_write_longlong(m_m2k_adc, "sampling_frequency", 1E8);
 	iio_device_attr_write_longlong(m_m2k_adc, "oversampling_ratio", 1);
@@ -182,18 +196,19 @@ void Calibration::restoreHardwareFromCalibMode()
 		}
 	}
 
-	iio_device_attr_read_double(m_m2k_adc, "sampling_frequency",
-		&adc_sampl_freq);
-	iio_device_attr_read_double(m_m2k_adc, "oversampling_ratio",
-		&adc_oversampl);
-	iio_device_attr_read_double(m_m2k_dac_a, "sampling_frequency",
-		&dac_a_sampl_freq);
-	iio_device_attr_read_double(m_m2k_dac_a, "sampling_frequency",
-		&dac_a_oversampl);
-	iio_device_attr_read_double(m_m2k_dac_b, "sampling_frequency",
-		&dac_b_sampl_freq);
-	iio_device_attr_read_double(m_m2k_dac_b, "sampling_frequency",
-		&dac_b_oversampl);
+	/* Restore the previous values for sampling frequency and oversampling ratio */
+	iio_device_attr_write_double(m_m2k_adc, "sampling_frequency",
+		adc_sampl_freq);
+	iio_device_attr_write_double(m_m2k_adc, "oversampling_ratio",
+		adc_oversampl);
+	iio_device_attr_write_double(m_m2k_dac_a, "sampling_frequency",
+		dac_a_sampl_freq);
+	iio_device_attr_write_double(m_m2k_dac_a, "oversampling_ratio",
+		dac_a_oversampl);
+	iio_device_attr_write_double(m_m2k_dac_b, "sampling_frequency",
+		dac_b_sampl_freq);
+	iio_device_attr_write_double(m_m2k_dac_b, "oversampling_ratio",
+		dac_b_oversampl);
 }
 
 bool Calibration::calibrateADCoffset()
