@@ -58,7 +58,8 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	tl_api(new ToolLauncher_API(this)),
 	notifier(STDIN_FILENO, QSocketNotifier::Read),
 	infoWidget(nullptr),
-	calib(nullptr)
+	calib(nullptr),
+	skip_calibration(false)
 {
 	if (!isatty(STDIN_FILENO))
 		notifier.setEnabled(false);
@@ -790,7 +791,7 @@ void adiscope::ToolLauncher::calibrate()
 	toolMenu["Spectrum Analyzer"]->getToolBtn()->setText("Calibrating...");
 	toolMenu["Network Analyzer"]->getToolBtn()->setText("Calibrating...");
 
-	if (calib->isInitialized()) {
+	if (calib->isInitialized() && !skip_calibration) {
 		calib->setHardwareInCalibMode();
 		calib->calibrateAll();
 		calib->restoreHardwareFromCalibMode();
@@ -1214,6 +1215,16 @@ bool ToolLauncher_API::hidden() const
 void ToolLauncher_API::hide(bool hide)
 {
 	tl->setVisible(!hide);
+}
+
+void ToolLauncher_API::skip_calibration(bool skip)
+{
+	tl->skip_calibration = skip;
+}
+
+bool ToolLauncher_API::calibration_skipped()
+{
+	return tl->skip_calibration;
 }
 
 QList<QString> ToolLauncher_API::usb_uri_list()

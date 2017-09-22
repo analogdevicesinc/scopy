@@ -163,6 +163,8 @@ private:
 	QSocketNotifier notifier;
 	QString previousIp;
 
+	bool skip_calibration;
+
 	void loadToolTips(bool connected);
 	QVector<QString> searchDevices();
 	void swapMenu(QWidget *menu);
@@ -204,6 +206,8 @@ class ToolLauncher_API: public ApiObject
 
 	Q_PROPERTY(QList<QString> tool_list READ order WRITE setOrder);
 
+	Q_PROPERTY(bool skip_calibration READ calibration_skipped WRITE skip_calibration);
+
 public:
 	explicit ToolLauncher_API(ToolLauncher *tl) : ApiObject(), tl(tl) {}
 	~ToolLauncher_API() {}
@@ -216,6 +220,9 @@ public:
 
 	bool hidden() const;
 	void hide(bool hide);
+
+	bool calibration_skipped();
+	void skip_calibration(bool);
 
 	const QString& getPreviousIp()
 	{
