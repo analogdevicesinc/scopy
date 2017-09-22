@@ -26,6 +26,7 @@
 #include "plot_line_handle.h"
 #include "cursor_readouts.h"
 #include "measure.h"
+#include "customplotpositionbutton.h"
 
 class QLabel;
 
@@ -119,6 +120,8 @@ namespace adiscope {
 		void setBufferSizeLabelValue(int numSamples);
 		void setSampleRatelabelValue(double sampleRate);
 		void setTriggerState(int triggerState);
+		void setCursorReadoutsTransparency(int value);
+		void moveCursorReadouts(CustomPlotPositionButton::ReadoutsPosition position);
 
 	protected:
 		virtual void cleanUpJustBeforeChannelRemoval(int chnIdx);

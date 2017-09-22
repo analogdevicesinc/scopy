@@ -812,6 +812,16 @@ void CapturePlot::setTriggerState(int triggerState)
 	d_triggerStateLabel->show();
 }
 
+void CapturePlot::setCursorReadoutsTransparency(int value)
+{
+	d_cursorReadouts->setTransparency(value);
+}
+
+void CapturePlot::moveCursorReadouts(CustomPlotPositionButton::ReadoutsPosition position)
+{
+	d_cursorReadouts->moveToPosition(position);
+}
+
 void CapturePlot::updateBufferSizeSampleRateLabel(int nsamples, double sr)
 {
 	QString txtSampleRate = d_cursorMetricFormatter.format(sr, "Hz", 0);
