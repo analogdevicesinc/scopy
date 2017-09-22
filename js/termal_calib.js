@@ -48,12 +48,15 @@ function run_one_calib() {
 function run_entire_calibration() {
 	var reading_iteration = 0;
 	var calib_iteration = 0
+	var ret;
 
   // Configure the oscilloscope
   osc.current_channel = 0
   osc.trigger_level = 0
   osc.external = false
   osc.measure = true
+  osc.channels[0].v_offset = 0
+  osc.channels[1].v_offset = 0
   osc.measure_en = [4294967295, 4294967295] // Enable all measurements for both channels
 
 	for (r = 0; r < NB_READINGS; r++) {
@@ -61,14 +64,18 @@ function run_entire_calibration() {
 			printToConsole("Reading: " + reading_iteration + " Calibration: " + calib_iteration + " Calibrating..")
 			date = new Date()
 
+			ret = calib.resetCalibration()
+
 			// Read Amplitude and Frequency before a calibration
-			osc.internal = true
+			osc.internal = false
 			osc.running = true
 			msleep(250)
 			var ch0_ampl_before = osc.channels[0].peak_to_peak
 			var ch1_ampl_before = osc.channels[1].peak_to_peak
 			var ch0_freq_before = osc.channels[0].frequency
 			var ch1_freq_before = osc.channels[1].frequency
+			var ch0_mean_before = osc.channels[0].mean
+			var ch1_mean_before = osc.channels[1].mean
 			osc.internal = false
 			osc.running = false
 
@@ -76,21 +83,23 @@ function run_entire_calibration() {
 			var calib_data = run_one_calib()
 
       // Read Amplitude and Frequency after a calibration
-      osc.internal = true
+      osc.internal = false
       osc.running = true
 			msleep(250)
       var ch0_ampl_after = osc.channels[0].peak_to_peak
       var ch1_ampl_after = osc.channels[1].peak_to_peak
 		  var ch0_freq_after = osc.channels[0].frequency
 		  var ch1_freq_after = osc.channels[1].frequency
+		  var ch0_mean_after = osc.channels[0].mean
+		  var ch1_mean_after = osc.channels[1].mean
 		  osc.internal = false
 		  osc.running = false
 
 			var time_stamp = date.toTimeString()
 			
 			var calibData = reading_iteration + "," + ++calib_iteration + "," + calib_data + (SHOW_TIMESTAMP ? "," + time_stamp : '') + "," +
-        ch0_freq_before + "," + ch0_freq_after + "," + ch0_ampl_before + "," + ch0_ampl_after + "," +
-        ch1_freq_before + "," + ch1_freq_after + "," + ch1_ampl_before + "," + ch1_ampl_after +
+        ch0_freq_before + "," + ch0_freq_after + "," + ch0_ampl_before + "," + ch0_ampl_after + "," + ch0_mean_before + "," + ch0_mean_after + "," +
+        ch1_freq_before + "," + ch1_freq_after + "," + ch1_ampl_before + "," + ch1_ampl_after + "," + ch1_mean_before + "," + ch1_mean_after +
         '\n'
 			log(calibData)
 			
@@ -114,8 +123,8 @@ function build_header() {
 		"ADC Ch 1 Gain, ADC Ch 2 Gain, DAC Ch1 Offset(RAW), DAC Ch2 Offset(RAW)," +
 		"DAC Ch 1VLsb (Volts), DAC Ch 2VLsb (Volts), Ad9963 Temp(Celsius), " + 
 		"XAdc Temp(Celsius)" +  (SHOW_TIMESTAMP ? "," + "Time Stamp" : '') + "," +
-		"ADC Ch1 Freq Before, ADC Ch1 Freq After, ADC Ch1 Ampl Before, ADC Ch1 Ampl After," +
-		"ADC Ch2 Freq Before, ADC Ch2 Freq After, ADC Ch2 Ampl Before, ADC Ch2 Ampl After" +
+		"ADC Ch1 Freq Before, ADC Ch1 Freq After, ADC Ch1 Ampl Before, ADC Ch1 Ampl After, ADC Ch1 Mean Before, ADC Ch1 Mean After," +
+		"ADC Ch2 Freq Before, ADC Ch2 Freq After, ADC Ch2 Ampl Before, ADC Ch2 Ampl After, ADC Ch2 Mean Before, ADC Ch2 Mean After" +
 		 '\n'
 		
 	return header
@@ -123,7 +132,7 @@ function build_header() {
 
 function connectToUSB(host) {
 	printToConsole("Connecting to " + host + "...")
-
+	launcher.skip_calibration = true;
 	var success = launcher.connect(host)
 
 	if (success)
@@ -175,6 +184,7 @@ function main() {
 	
 	calib.restoreHardwareFromCalibMode()
 
+	launcher.skip_calibration = false;
 	launcher.disconnect()
 	
 	if (SHOW_START_END_TIME) {
