@@ -365,6 +365,7 @@ void Calibration::updateCorrections()
 		m2k_adc->setChnCorrectionOffset(1, adcOffsetChannel1());
 		m2k_adc->setChnCorrectionGain(0, adcGainChannel0());
 		m2k_adc->setChnCorrectionGain(1, adcGainChannel1());
+        m2k_adc->setUpdateGain(true);
 	}
 
 	if(m2k_dac_a)

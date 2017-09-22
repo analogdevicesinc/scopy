@@ -65,7 +65,8 @@ int adc_sample_conv::work(int noutput_items,
 		gr_vector_const_void_star &input_items,
 		gr_vector_void_star &output_items)
 {
-	updateCorrectionGain();
+        if(m2k_adc->updateGain())
+            updateCorrectionGain();
 	for (unsigned int i = 0; i < input_items.size(); i++) {
 		const float* in = static_cast<const float *>(input_items[i]);
 		float *out = static_cast<float *>(output_items[i]);
@@ -91,10 +92,11 @@ int adc_sample_conv::work(int noutput_items,
 
 void adc_sample_conv::updateCorrectionGain()
 {
-	if(m2k_adc) {
-		setCorrectionGain(0, m2k_adc->chnCorrectionGain(0));
-		setCorrectionGain(1, m2k_adc->chnCorrectionGain(1));
-	}
+        if(m2k_adc) {
+            setCorrectionGain(0, m2k_adc->chnCorrectionGain(0));
+            setCorrectionGain(1, m2k_adc->chnCorrectionGain(1));
+            m2k_adc->setUpdateGain(false);
+        }
 }
 
 void adc_sample_conv::setCorrectionGain(int connection, float gain)
