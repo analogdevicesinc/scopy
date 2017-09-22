@@ -18,16 +18,20 @@
  */
 
 #include "adc_sample_conv.hpp"
+#include "osc_adc.h"
 
 using namespace gr;
 using namespace adiscope;
 
-adc_sample_conv::adc_sample_conv(int nconnections, bool inverse) :
+adc_sample_conv::adc_sample_conv(int nconnections,
+				 std::shared_ptr<M2kAdc> adc,
+				 bool inverse) :
 	gr::sync_block("adc_sample_conv",
 			gr::io_signature::make(nconnections, nconnections, sizeof(float)),
 			gr::io_signature::make(nconnections, nconnections, sizeof(float))),
 	d_nconnections(nconnections),
-	inverse(inverse)
+	inverse(inverse),
+	m2k_adc(adc)
 {
 	for (int i = 0; i < d_nconnections; i++) {
 		d_correction_gains.push_back(1.0);
@@ -61,6 +65,7 @@ int adc_sample_conv::work(int noutput_items,
 		gr_vector_const_void_star &input_items,
 		gr_vector_void_star &output_items)
 {
+	updateCorrectionGain();
 	for (unsigned int i = 0; i < input_items.size(); i++) {
 		const float* in = static_cast<const float *>(input_items[i]);
 		float *out = static_cast<float *>(output_items[i]);
@@ -82,6 +87,14 @@ int adc_sample_conv::work(int noutput_items,
 	}
 
 	return noutput_items;
+}
+
+void adc_sample_conv::updateCorrectionGain()
+{
+	if(m2k_adc) {
+		setCorrectionGain(0, m2k_adc->chnCorrectionGain(0));
+		setCorrectionGain(1, m2k_adc->chnCorrectionGain(1));
+	}
 }
 
 void adc_sample_conv::setCorrectionGain(int connection, float gain)

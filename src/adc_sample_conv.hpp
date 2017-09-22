@@ -21,8 +21,11 @@
 #define ADC_SAMPLE_CONV_HPP
 
 #include <gnuradio/sync_block.h>
+#include <memory>
 
 namespace adiscope {
+
+	class M2kAdc;
 	class adc_sample_conv : public gr::sync_block
 	{
 	private:
@@ -32,9 +35,13 @@ namespace adiscope {
 		std::vector<float> d_filter_compensations;
 		std::vector<float> d_offsets;
 		std::vector<float> d_hardware_gains;
+		std::shared_ptr<M2kAdc> m2k_adc;
+		void updateCorrectionGain();
 
 	public:
-		explicit adc_sample_conv(int nconnections, bool inverse = false);
+		explicit adc_sample_conv(int nconnections,
+					 std::shared_ptr<M2kAdc> m2k_adc,
+					 bool inverse = false);
 		~adc_sample_conv();
 
 		static float convSampleToVolts(float sample,

@@ -227,7 +227,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		iio->lock();
 
 	auto adc_samp_conv = gnuradio::get_initial_sptr(
-			new adc_sample_conv(nb_channels));
+			new adc_sample_conv(nb_channels, m2k_adc));
 	if (m2k_adc) {
 		adc_samp_conv->setCorrectionGain(0,
 			m2k_adc->chnCorrectionGain(0));
@@ -1146,7 +1146,7 @@ void Oscilloscope::onXY_view_toggled(bool visible)
 	if (visible) {
 
 		auto xy_conv = gnuradio::get_initial_sptr(
-				new adc_sample_conv(nb_channels));
+				new adc_sample_conv(nb_channels, m2k_adc));
 		if (m2k_adc) {
 			xy_conv->setCorrectionGain(0,
 				m2k_adc->chnCorrectionGain(0));

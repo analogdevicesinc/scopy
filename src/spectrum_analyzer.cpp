@@ -377,9 +377,9 @@ void SpectrumAnalyzer::build_gnuradio_block_chain()
 
 	boost::shared_ptr<adc_sample_conv> adc_samp_conv;
 	if (canConvRawToVolts) {
-		adc_samp_conv = gnuradio::get_initial_sptr(
-			new adc_sample_conv(num_adc_channels));
 		auto m2k_adc = dynamic_pointer_cast<M2kAdc>(adc);
+		adc_samp_conv = gnuradio::get_initial_sptr(
+			new adc_sample_conv(num_adc_channels, m2k_adc));
 		for (int i = 0; i < adc->numAdcChannels(); i++) {
 			double corr_gain = 1.0;
 
