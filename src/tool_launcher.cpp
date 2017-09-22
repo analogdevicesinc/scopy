@@ -779,29 +779,31 @@ bool ToolLauncher::loadDecoders(QString path)
 
 void adiscope::ToolLauncher::calibrate()
 {
-	auto old_dmm_text = toolMenu["Voltmeter"]->getToolBtn()->text();
-	auto old_osc_text = toolMenu["Oscilloscope"]->getToolBtn()->text();
-	auto old_siggen_text = toolMenu["Signal Generator"]->getToolBtn()->text();
-	auto old_spectrum_text = toolMenu["Spectrum Analyzer"]->getToolBtn()->text();
-	auto old_network_text = toolMenu["Network Analyzer"]->getToolBtn()->text();
+	if(!skip_calibration) {
+		auto old_dmm_text = toolMenu["Voltmeter"]->getToolBtn()->text();
+		auto old_osc_text = toolMenu["Oscilloscope"]->getToolBtn()->text();
+		auto old_siggen_text = toolMenu["Signal Generator"]->getToolBtn()->text();
+		auto old_spectrum_text = toolMenu["Spectrum Analyzer"]->getToolBtn()->text();
+		auto old_network_text = toolMenu["Network Analyzer"]->getToolBtn()->text();
 
-	toolMenu["Voltmeter"]->getToolBtn()->setText("Calibrating...");
-	toolMenu["Oscilloscope"]->getToolBtn()->setText("Calibrating...");
-	toolMenu["Signal Generator"]->getToolBtn()->setText("Calibrating...");
-	toolMenu["Spectrum Analyzer"]->getToolBtn()->setText("Calibrating...");
-	toolMenu["Network Analyzer"]->getToolBtn()->setText("Calibrating...");
+		toolMenu["Voltmeter"]->getToolBtn()->setText("Calibrating...");
+		toolMenu["Oscilloscope"]->getToolBtn()->setText("Calibrating...");
+		toolMenu["Signal Generator"]->getToolBtn()->setText("Calibrating...");
+		toolMenu["Spectrum Analyzer"]->getToolBtn()->setText("Calibrating...");
+		toolMenu["Network Analyzer"]->getToolBtn()->setText("Calibrating...");
 
-	if (calib->isInitialized() && !skip_calibration) {
-		calib->setHardwareInCalibMode();
-		calib->calibrateAll();
-		calib->restoreHardwareFromCalibMode();
+		if (calib->isInitialized()) {
+			calib->setHardwareInCalibMode();
+			calib->calibrateAll();
+			calib->restoreHardwareFromCalibMode();
+		}
+
+		toolMenu["Voltmeter"]->getToolBtn()->setText(old_dmm_text);
+		toolMenu["Oscilloscope"]->getToolBtn()->setText(old_osc_text);
+		toolMenu["Signal Generator"]->getToolBtn()->setText(old_siggen_text);
+		toolMenu["Spectrum Analyzer"]->getToolBtn()->setText(old_spectrum_text);
+		toolMenu["Network Analyzer"]->getToolBtn()->setText(old_network_text);
 	}
-
-	toolMenu["Voltmeter"]->getToolBtn()->setText(old_dmm_text);
-	toolMenu["Oscilloscope"]->getToolBtn()->setText(old_osc_text);
-	toolMenu["Signal Generator"]->getToolBtn()->setText(old_siggen_text);
-	toolMenu["Spectrum Analyzer"]->getToolBtn()->setText(old_spectrum_text);
-	toolMenu["Network Analyzer"]->getToolBtn()->setText(old_network_text);
 
 	Q_EMIT adcCalibrationDone();
 	Q_EMIT dacCalibrationDone();
