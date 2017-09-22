@@ -41,6 +41,7 @@
 #include "osc_capture_params.hpp"
 #include "buffer_previewer.hpp"
 #include "config.h"
+#include "customplotpositionbutton.h"
 
 /* Generated UI */
 #include "ui_math_panel.h"
@@ -473,20 +474,6 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	connect(&trigger_settings, SIGNAL(triggerModeChanged(int)),
 		this, SLOT(onTriggerModeChanged(int)));
 
-	cr_ui = new Ui::CursorsSettings;
-	cr_ui->setupUi(ui->cursorsSettings);
-	connect(cr_ui->hCursorsEnable, SIGNAL(toggled(bool)),
-		&plot, SLOT(setVertCursorsEnabled(bool)));
-	connect(cr_ui->vCursorsEnable, SIGNAL(toggled(bool)),
-		&plot, SLOT(setHorizCursorsEnabled(bool)));
-
-	connect(cr_ui->hCursorsEnable, SIGNAL(toggled(bool)),
-		cursor_readouts_ui->TimeCursors,
-		SLOT(setVisible(bool)));
-	connect(cr_ui->vCursorsEnable, SIGNAL(toggled(bool)),
-		cursor_readouts_ui->VoltageCursors,
-		SLOT(setVisible(bool)));
-
 	connect(&*iio, SIGNAL(timeout()),
 			&trigger_settings, SLOT(autoTriggerDisable()));
 	connect(&plot, SIGNAL(newData()),
@@ -547,6 +534,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	});
 
 	export_settings_init();
+	cursor_panel_init();
 
 	api->setObjectName(QString::fromStdString(Filter::tool_name(
 			TOOL_OSCILLOSCOPE)));
@@ -594,6 +582,40 @@ Oscilloscope::~Oscilloscope()
 	delete cursor_readouts_ui;
 	delete cr_ui;
 	delete ui;
+}
+
+void Oscilloscope::cursor_panel_init()
+{
+	cr_ui = new Ui::CursorsSettings;
+	cr_ui->setupUi(ui->cursorsSettings);
+	//cr_ui->posSelect->setStyleSheet("background-color:red;");
+	CustomPlotPositionButton *positionSelect = new CustomPlotPositionButton(cr_ui->posSelect);
+
+	connect(cr_ui->hCursorsEnable, SIGNAL(toggled(bool)),
+		&plot, SLOT(setVertCursorsEnabled(bool)));
+	connect(cr_ui->vCursorsEnable, SIGNAL(toggled(bool)),
+		&plot, SLOT(setHorizCursorsEnabled(bool)));
+
+	connect(cr_ui->hCursorsEnable, SIGNAL(toggled(bool)),
+		cursor_readouts_ui->TimeCursors,
+		SLOT(setVisible(bool)));
+	connect(cr_ui->vCursorsEnable, SIGNAL(toggled(bool)),
+		cursor_readouts_ui->VoltageCursors,
+		SLOT(setVisible(bool)));
+
+	cr_ui->horizontalSlider->setMaximum(100);
+	cr_ui->horizontalSlider->setMinimum(0);
+	cr_ui->horizontalSlider->setSingleStep(1);
+	connect(cr_ui->horizontalSlider, &QSlider::valueChanged, [=](int value){
+		cr_ui->transLabel->setText("Transparency: " + QString::number(value) + "%");
+		plot.setCursorReadoutsTransparency(value);
+	});
+	cr_ui->horizontalSlider->setSliderPosition(0);
+
+	connect(positionSelect, &CustomPlotPositionButton::positionChanged,
+		[=](CustomPlotPositionButton::ReadoutsPosition position){
+		plot.moveCursorReadouts(position);
+	});
 }
 
 void Oscilloscope::pause(bool paused)

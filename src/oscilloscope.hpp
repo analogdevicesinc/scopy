@@ -293,6 +293,7 @@ namespace adiscope {
 		void updateBufferPreviewer();
 		void export_settings_init();
 		void pause(bool paused);
+		void cursor_panel_init();
 	};
 
 	class Oscilloscope_API : public ApiObject
