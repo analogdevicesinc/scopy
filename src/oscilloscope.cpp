@@ -1823,7 +1823,8 @@ void Oscilloscope::measureLabelsRearrange()
 		measure_panel_ui->measurements->layout()->addWidget(container);
 	}
 
-	QGridLayout*gLayout = new QGridLayout(container);
+	QGridLayout *gLayout = new QGridLayout(container);
+
 	gLayout->setContentsMargins(0, 0, 0, 0);
 	gLayout->setVerticalSpacing(5);
 	gLayout->setHorizontalSpacing(5);
@@ -1833,6 +1834,7 @@ void Oscilloscope::measureLabelsRearrange()
 	for (int i = 0; i < measurements_data.size(); i++) {
 		QLabel *name = new QLabel();
 		QLabel *value = new QLabel();
+
 
 		int row = nb_meas_added % max_rows;
 		int col = nb_meas_added / max_rows;
@@ -2029,6 +2031,8 @@ void Oscilloscope::measure_panel_init()
 	cursor_readouts_ui->cursorV2->setMinimumWidth(minWidth);
 	cursor_readouts_ui->voltageDelta->setMinimumWidth(minWidth);
 	delete label;
+
+	measure_panel_ui->scrollArea->setMinimumHeight(label->height() * 4);
 
 	QHBoxLayout *hLayout = static_cast<QHBoxLayout *>(
 		measure_panel_ui->cursorReadouts->layout());
