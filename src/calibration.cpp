@@ -163,14 +163,17 @@ void Calibration::setHardwareInCalibMode()
 		&dac_b_sampl_freq);
 	iio_device_attr_read_double(m_m2k_dac_b, "oversampling_ratio",
 		&dac_b_oversampl);
+}
 
+void Calibration::configHwSamplerate()
+{
 	// Make sure we calibrate at the highest sample rate
-	iio_device_attr_write_longlong(m_m2k_adc, "sampling_frequency", 1E8);
-	iio_device_attr_write_longlong(m_m2k_adc, "oversampling_ratio", 1);
-	iio_device_attr_write_longlong(m_m2k_dac_a, "sampling_frequency", 75E6);
-	iio_device_attr_write_longlong(m_m2k_dac_a, "oversampling_ratio", 1);
-	iio_device_attr_write_longlong(m_m2k_dac_b, "sampling_frequency", 75E6);
-	iio_device_attr_write_longlong(m_m2k_dac_b, "oversampling_ratio", 1);
+	m2k_adc->setSampleRate(1e8);
+	iio_device_attr_write_longlong(m2k_adc->iio_adc_dev(), "oversampling_ratio", 1);
+	m2k_dac_a->setSampleRate(75E6);
+	iio_device_attr_write_longlong(m2k_dac_a->iio_dac_dev(), "oversampling_ratio", 1);
+	m2k_dac_b->setSampleRate(75E6);
+	iio_device_attr_write_longlong(m2k_dac_b->iio_dac_dev(), "oversampling_ratio", 1);
 }
 
 void Calibration::restoreHardwareFromCalibMode()
@@ -365,7 +368,6 @@ void Calibration::updateCorrections()
 		m2k_adc->setChnCorrectionOffset(1, adcOffsetChannel1());
 		m2k_adc->setChnCorrectionGain(0, adcGainChannel0());
 		m2k_adc->setChnCorrectionGain(1, adcGainChannel1());
-        m2k_adc->setUpdateGain(true);
 	}
 
 	if(m2k_dac_a)
@@ -775,12 +777,13 @@ float Calibration::convSampleToVolts(float sample, float correctionGain)
 float Calibration::convVoltsToSample(float voltage, float correctionGain)
 {
 	// TO DO: explain this formula and add methods to change gain and offset
-	return (voltage * correctionGain * (2048 * 1.3) / 0.78);
+	return (voltage / correctionGain * (2048 * 1.3) / 0.78);
 }
 
 bool Calibration::calibrateAll()
 {
 	bool ok;
+	configHwSamplerate();
 
 	ok = calibrateADCoffset();
 	if (!ok)

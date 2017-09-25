@@ -104,9 +104,6 @@ public:
 	double chnHwOffset(uint chnIdx) const;
 	void setChnHwOffset(uint chnIdx, double offset);
 
-        bool updateGain() const;
-        void setUpdateGain(bool);
-
         GainMode chnHwGainMode(uint chnIdx) const;
 	void setChnHwGainMode(uint chnIdx, GainMode gain_mode);
 
@@ -134,7 +131,6 @@ private:
 	QList<double> m_chn_corr_gains;
 	QList<double> m_chn_hw_offsets;
 	QList<GainMode> m_chn_hw_gain_modes;
-    bool m_update_gain;
 };
 
 class AdcBuilder

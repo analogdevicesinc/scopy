@@ -92,6 +92,7 @@ private:
 		struct iio_buffer** buffer, size_t value);
 	void dacAOutputDC(int16_t value);
 	void dacBOutputDC(int16_t value);
+	void configHwSamplerate();
 
 	ApiObject *m_api;
 

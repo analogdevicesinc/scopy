@@ -1484,16 +1484,6 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 		iio->lock();
 	setAllSinksSampleCount(active_sample_count);
 
-	// Apply amplitude corrections when using different sample rates
-	if (m2k_adc && active_sample_rate != adc->sampleRate()) {
-		boost::shared_ptr<adc_sample_conv> block =
-			dynamic_pointer_cast<adc_sample_conv>(adc_samp_conv_block);
-		block->setFilterCompensation(0,
-			m2k_adc->compTable(active_sample_rate));
-		block->setFilterCompensation(1,
-			m2k_adc->compTable(active_sample_rate));
-	}
-
 	if (started) {
 		plot.setSampleRate(active_sample_rate, 1, "");
 		plot.setBufferSizeLabelValue(active_sample_count);

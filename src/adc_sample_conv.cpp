@@ -65,8 +65,7 @@ int adc_sample_conv::work(int noutput_items,
 		gr_vector_const_void_star &input_items,
 		gr_vector_void_star &output_items)
 {
-        if(m2k_adc->updateGain())
-            updateCorrectionGain();
+	updateCorrectionGain();
 	for (unsigned int i = 0; i < input_items.size(); i++) {
 		const float* in = static_cast<const float *>(input_items[i]);
 		float *out = static_cast<float *>(output_items[i]);
@@ -95,7 +94,10 @@ void adc_sample_conv::updateCorrectionGain()
         if(m2k_adc) {
             setCorrectionGain(0, m2k_adc->chnCorrectionGain(0));
             setCorrectionGain(1, m2k_adc->chnCorrectionGain(1));
-            m2k_adc->setUpdateGain(false);
+            setFilterCompensation(0, m2k_adc->compTable(m2k_adc->sampleRate()));
+            setFilterCompensation(1, m2k_adc->compTable(m2k_adc->sampleRate()));
+            setHardwareGain(0, m2k_adc->gainAt(m2k_adc->chnHwGainMode(0)));
+            setHardwareGain(1, m2k_adc->gainAt(m2k_adc->chnHwGainMode(1)));
         }
 }
 

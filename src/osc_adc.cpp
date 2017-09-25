@@ -243,7 +243,6 @@ M2kAdc::M2kAdc(struct iio_context *ctx, struct iio_device *adc_dev):
 		m_chn_hw_offsets.push_back(0.0);
 		m_chn_hw_gain_modes.push_back(GainMode::LOW_GAIN_MODE);
 	}
-    m_update_gain = true;
 }
 
 M2kAdc::~M2kAdc()
@@ -290,16 +289,6 @@ void M2kAdc::setChnCorrectionOffset(uint chnIdx, double offset)
 double M2kAdc::chnCorrectionGain(uint chnIdx) const
 {
 	return m_chn_corr_gains[chnIdx];
-}
-
-void M2kAdc::setUpdateGain(bool value)
-{
-    m_update_gain = value;
-}
-
-bool M2kAdc::updateGain() const
-{
-    return m_update_gain;
 }
 
 void M2kAdc::setChnCorrectionGain(uint chnIdx, double gain)
