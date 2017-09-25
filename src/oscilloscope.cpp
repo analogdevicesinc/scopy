@@ -290,9 +290,6 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 				QwtAxisId(QwtPlot::yLeft, i));
 	}
 
-	plot.setMinimumHeight(300);
-	plot.setMinimumWidth(500);
-
 	plot.levelTriggerA()->setMobileAxis(QwtAxisId(QwtPlot::yLeft, 0));
 	plot.setTriggerAEnabled(trigger_settings.analogEnabled());
 	plot.levelTriggerA()->setPosition(trigger_settings.level());

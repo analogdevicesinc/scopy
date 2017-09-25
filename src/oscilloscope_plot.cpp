@@ -60,6 +60,10 @@ CapturePlot::CapturePlot(QWidget *parent,
 	d_bufferSizeLabelVal(0),
 	d_sampleRateLabelVal(1.0)
 {
+
+	setMinimumHeight(300);
+	setMinimumWidth(500);
+
 	/* Initial colors scheme */
 	d_trigAactiveLinePen = QPen(QColor(255, 255, 255), 2, Qt::SolidLine);
 	d_trigAinactiveLinePen = QPen(QColor(175, 175, 175), 2, Qt::DashLine);
@@ -85,6 +89,8 @@ CapturePlot::CapturePlot(QWidget *parent,
 	d_rightHandlesArea->setMinimumWidth(50);
 	d_bottomHandlesArea->setLargestChildWidth(60);
 	d_rightHandlesArea->setLargestChildHeight(60);
+	d_leftHandlesArea->setMinimumHeight(this->minimumHeight());
+	d_rightHandlesArea->setMinimumHeight(this->minimumHeight());
 
 	/* Add content to the top area of the plot */
 	// Time Base
