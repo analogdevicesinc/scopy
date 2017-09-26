@@ -55,6 +55,7 @@ namespace adiscope {
 
 class QPushButton;
 class QButtonGroup;
+class QGridLayout;
 
 namespace adiscope {
 class SpectrumAnalyzer_API;
@@ -117,6 +118,7 @@ private Q_SLOTS:
 	void onPlotSampleRateUpdated(double);
 	void onPlotSampleCountUpdated(uint);
 	void singleCaptureDone();
+	void on_btnMarkerTable_toggled(bool checked);
 
 private:
 	void build_gnuradio_block_chain();
@@ -133,6 +135,9 @@ private:
 	void updateCrtMrkLblVisibility();
 	void updateMrkFreqPosSpinBtnLimits();
 	void updateMrkFreqPosSpinBtnValue();
+
+	QPair<int, int> getGridLayoutPosFromIndex(QGridLayout *layout,
+		int index) const;
 
 private:
 	Ui::SpectrumAnalyzer *ui;
@@ -166,6 +171,7 @@ private:
 	static std::vector<std::pair<QString,
 		FftDisplayPlot::AverageType>> avg_types;
 	static std::vector<std::pair<QString, FftWinType>> win_types;
+	static std::vector<QString> markerTypes;
 };
 
 class SpectrumChannel: public QObject

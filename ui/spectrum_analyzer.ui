@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>553</height>
+    <width>857</width>
+    <height>661</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -400,9 +400,22 @@ QPushButton:!checked {
            <property name="bottomMargin">
             <number>50</number>
            </property>
-           <property name="spacing">
+           <property name="horizontalSpacing">
             <number>0</number>
            </property>
+           <property name="verticalSpacing">
+            <number>10</number>
+           </property>
+           <item row="3" column="0">
+            <layout class="QHBoxLayout" name="hLayout_plotBottomBar">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+            </layout>
+           </item>
+           <item row="2" column="0">
+            <widget class="adiscope::MarkerTable" name="markerTable" native="true"/>
+           </item>
            <item row="0" column="0">
             <layout class="QHBoxLayout" name="hLayout_plotTopBar">
              <property name="spacing">
@@ -446,13 +459,6 @@ QPushButton:!checked {
               </size>
              </property>
             </widget>
-           </item>
-           <item row="2" column="0">
-            <layout class="QHBoxLayout" name="hLayout_plotBottomBar">
-             <property name="spacing">
-              <number>0</number>
-             </property>
-            </layout>
            </item>
           </layout>
          </widget>
@@ -1030,7 +1036,7 @@ border-bottom: 1px solid rgba(255,255,255,100);</string>
                <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_4">
                  <property name="spacing">
-                  <number>5</number>
+                  <number>10</number>
                  </property>
                  <property name="topMargin">
                   <number>10</number>
@@ -1148,7 +1154,7 @@ background-color: #F45000;
                   <number>15</number>
                  </property>
                  <property name="bottomMargin">
-                  <number>0</number>
+                  <number>15</number>
                  </property>
                  <property name="verticalSpacing">
                   <number>15</number>
@@ -1342,6 +1348,76 @@ background-color: #F45000;
                 </layout>
                </item>
                <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_2">
+                 <property name="spacing">
+                  <number>10</number>
+                 </property>
+                 <item>
+                  <widget class="QLabel" name="label_6">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="text">
+                    <string>General</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="Line" name="line_2">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QGridLayout" name="gridLayout_4">
+                 <property name="topMargin">
+                  <number>15</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="horizontalSpacing">
+                  <number>0</number>
+                 </property>
+                 <property name="verticalSpacing">
+                  <number>10</number>
+                 </property>
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="label_9">
+                   <property name="text">
+                    <string>Marker Table</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="adiscope::CustomSwitch" name="btnMarkerTable">
+                   <property name="text">
+                    <string/>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1">
+                  <spacer name="horizontalSpacer_3">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>0</width>
+                     <height>10</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </item>
+               <item>
                 <spacer name="verticalSpacer_5">
                  <property name="orientation">
                   <enum>Qt::Vertical</enum>
@@ -1506,6 +1582,11 @@ QLabel {
  </widget>
  <customwidgets>
   <customwidget>
+   <class>adiscope::CustomSwitch</class>
+   <extends>QPushButton</extends>
+   <header>customSwitch.hpp</header>
+  </customwidget>
+  <customwidget>
    <class>adiscope::DetachDragZone</class>
    <extends>QWidget</extends>
    <header>detachdragzone.h</header>
@@ -1526,6 +1607,12 @@ QLabel {
    <class>adiscope::PositionSpinButton</class>
    <extends>QWidget</extends>
    <header>spinbox_a.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::MarkerTable</class>
+   <extends>QWidget</extends>
+   <header location="global">marker_table.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

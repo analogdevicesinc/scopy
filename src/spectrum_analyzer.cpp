@@ -76,6 +76,13 @@ SpectrumAnalyzer::win_types = {
 	{"Kaiser", FftWinType::KAISER},
 };
 
+std::vector<QString> SpectrumAnalyzer::markerTypes = {
+	"Manual",
+	"Peak",
+	"Delta",
+	"Fixed",
+};
+
 SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	std::shared_ptr<GenericAdc> adc, QPushButton *runButton,
 	ToolLauncher *parent):
@@ -271,7 +278,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 		ui->start_freq->value()) / bin_sizes[ui->cmb_rbw->currentIndex()]);
 
 	ui->lblMagUnit->setText(ui->cmb_units->currentText());
-
+	ui->markerTable->hide();
 }
 
 SpectrumAnalyzer::~SpectrumAnalyzer()
@@ -848,6 +855,17 @@ void SpectrumAnalyzer::onMarkerToggled(int id, bool on)
 {
 	setMarkerEnabled(crt_channel_id, id, on);
 
+	// Add/remove the marker from the marker table
+	if (on) {
+		int mkType = fft_plot->markerType(crt_channel_id, id);
+		ui->markerTable->addMarker(id, crt_channel_id, QString("M%1").arg(id + 1),
+			fft_plot->markerFrequency(crt_channel_id, id),
+			fft_plot->markerMagnutide(crt_channel_id, id),
+			markerTypes[mkType]);
+	} else {
+		ui->markerTable->removeMarker(id, crt_channel_id);
+	}
+
 	if (id == marker_selector->selectedButton()) {
 		if (on) {
 			setCurrentMarkerLabelData(crt_channel_id, id);
@@ -910,6 +928,19 @@ void SpectrumAnalyzer::onPlotNewMarkerData()
 	if (fft_plot->markerEnabled(crt_channel_id, crt_marker)) {
 		setCurrentMarkerLabelData(crt_channel_id, crt_marker);
 		updateMrkFreqPosSpinBtnValue();
+	}
+
+	// Update the markers in the marker table
+	for (int c = 0; c < num_adc_channels; c++) {
+		for (int m = 0; m < fft_plot->markerCount(c); m++) {
+			if (fft_plot->markerEnabled(c, m)) {
+				int mkType = fft_plot->markerType(c, m);
+				ui->markerTable->updateMarker(m, c,
+				fft_plot->markerFrequency(c, m),
+				fft_plot->markerMagnutide(c, m),
+				markerTypes[mkType]);
+			}
+		}
 	}
 }
 
@@ -991,6 +1022,42 @@ void SpectrumAnalyzer::singleCaptureDone()
 void SpectrumAnalyzer::on_cmb_units_currentIndexChanged(const QString& unit)
 {
 	ui->lblMagUnit->setText(unit);
+}
+
+void SpectrumAnalyzer::on_btnMarkerTable_toggled(bool checked)
+{
+	ui->markerTable->setVisible(checked);
+
+	// Set the Plot 3 times taller than the Marker Table (when visible)
+	QGridLayout *layout = static_cast<QGridLayout *>(
+			ui->widgetPlotContainer->layout());
+	int row1 = getGridLayoutPosFromIndex(layout,
+		layout->indexOf(ui->markerTable)).first;
+	int row2 = getGridLayoutPosFromIndex(layout,
+		layout->indexOf(fft_plot)).first;
+
+	if (checked) {
+		layout->setRowStretch(row1, 1);
+		layout->setRowStretch(row2, 3);
+	} else {
+		layout->setRowStretch(row1, 0);
+		layout->setRowStretch(row2, 0);
+	}
+}
+
+QPair<int, int> SpectrumAnalyzer::getGridLayoutPosFromIndex(QGridLayout *layout,
+		int index) const
+{
+	QPair<int, int> pos = qMakePair(-1, -1);
+
+	if (layout && index >= 0) {
+		int row, col, rowSpan, colSpan;
+		layout->getItemPosition(index, &row, &col, &rowSpan, &colSpan);
+		pos.first = row;
+		pos.second = col;
+	}
+
+	return pos;
 }
 
 /*

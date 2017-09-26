@@ -63,6 +63,14 @@ namespace adiscope {
 			EXPONENTIAL_DB = 8,
 		};
 
+	public:
+		enum MarkerType {
+			MANUAL = 0,
+			PEAK = 1,
+			DELTA = 2,
+			FIXED = 3,
+		};
+
 	typedef boost::shared_ptr<SpectrumAverage> average_sptr;
 
 	private:
