@@ -354,7 +354,7 @@ QPushButton:checked:hover {
               <widget class="QWidget" name="container_fft_plot" native="true">
                <layout class="QGridLayout" name="gridLayoutFFT">
                 <property name="leftMargin">
-                 <number>0</number>
+                 <number>20</number>
                 </property>
                 <property name="topMargin">
                  <number>0</number>
@@ -366,13 +366,16 @@ QPushButton:checked:hover {
                  <number>0</number>
                 </property>
                 <property name="horizontalSpacing">
-                 <number>10</number>
+                 <number>2</number>
                 </property>
                 <property name="verticalSpacing">
                  <number>0</number>
                 </property>
                 <item row="0" column="1">
                  <layout class="QVBoxLayout" name="vlayout_fft_size">
+                  <property name="spacing">
+                   <number>0</number>
+                  </property>
                   <property name="rightMargin">
                    <number>10</number>
                   </property>
@@ -463,7 +466,11 @@ QPushButton:checked:hover {
                  </layout>
                 </item>
                 <item row="0" column="0">
-                 <layout class="QHBoxLayout" name="hlayout_fft"/>
+                 <layout class="QHBoxLayout" name="hlayout_fft">
+                  <property name="spacing">
+                   <number>0</number>
+                  </property>
+                 </layout>
                 </item>
                </layout>
               </widget>

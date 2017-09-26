@@ -25,7 +25,7 @@
 /* GNU Radio includes */
 #include <gnuradio/blocks/short_to_float.h>
 #include <gnuradio/iio/device_source.h>
-#include <gnuradio/blocks/complex_to_mag.h>
+#include <gnuradio/blocks/complex_to_mag_squared.h>
 
 /* Qt includes */
 #include <QPair>
@@ -294,6 +294,7 @@ namespace adiscope {
 		void export_settings_init();
 		void pause(bool paused);
 		void cursor_panel_init();
+		void setFFT_params();
 	};
 
 	class Oscilloscope_API : public ApiObject

@@ -109,6 +109,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	measure_settings_init();
 
 	fft_size = 1024;
+	ui->comboBox->setCurrentText(QString::number(fft_size));
+
 	last_set_sample_count = 0;
 	last_set_time_pos = 0;
 
@@ -127,13 +129,18 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 			400, "Osc XY", nb_channels / 2, (QObject*)&xy_plot);
 
 	this->qt_time_block->set_trigger_mode(TRIG_MODE_TAG, 0, "buffer_start");
-	this->qt_fft_block->set_trigger_mode(TRIG_MODE_TAG, 0, "buffer_start");
 
 	// Prevent the application from hanging while waiting for a trigger condition
 	iio_context_set_timeout(ctx, UINT_MAX);
 
 	plot.registerSink(qt_time_block->name(), nb_channels, 0);
 	plot.disableLegend();
+
+	fft_plot.disableLegend();
+	fft_plot.setAxisScale(QwtPlot::yLeft, -200, 0, 10);
+	fft_plot.setXaxisMouseGesturesEnabled(false);
+	for (uint i = 0; i < nb_channels; i++)
+		fft_plot.setYaxisMouseGesturesEnabled(i, false);
 
 	iio = iio_manager::get_instance(ctx,
 			filt->device_name(TOOL_OSCILLOSCOPE));
@@ -283,6 +290,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	/* Default plot settings */
 	plot.setSampleRate(adc->sampleRate(), 1, "");
 	plot.setActiveVertAxis(0);
+
+	setFFT_params();
 
 	for (unsigned int i = 0; i < nb_channels; i++) {
 		plot.Curve(i)->setAxes(
@@ -1002,29 +1011,40 @@ void Oscilloscope::on_actionClose_triggered()
 void Oscilloscope::toggle_blockchain_flow(bool en)
 {
 	if (en) {
-		for (unsigned int i = 0; i < nb_channels; i++)
-			iio->start(ids[i]);
-		if (fft_is_visible)
+		if(active_sample_count < fft_size && fft_is_visible)
 			for (unsigned int i = 0; i < nb_channels; i++)
 				iio->start(fft_ids[i]);
+
+		for (unsigned int i = 0; i < nb_channels; i++)
+			iio->start(ids[i]);
 		if (hist_is_visible)
 			for (unsigned int i = 0; i < nb_channels; i++)
 				iio->start(hist_ids[i]);
 		if (xy_is_visible)
 			for (unsigned int i = 0; i < (nb_channels & ~1); i++)
 				iio->start(xy_ids[i]);
+
+		if(active_sample_count >= fft_size && fft_is_visible)
+			for (unsigned int i = 0; i < nb_channels; i++)
+				iio->start(fft_ids[i]);
+
 	} else {
-		for (unsigned int i = 0; i < nb_channels; i++)
-			iio->stop(ids[i]);
-		if (fft_is_visible)
+		if(active_sample_count > fft_size && fft_is_visible)
 			for (unsigned int i = 0; i < nb_channels; i++)
 				iio->stop(fft_ids[i]);
+
+		for (unsigned int i = 0; i < nb_channels; i++)
+			iio->stop(ids[i]);
 		if (hist_is_visible)
 			for (unsigned int i = 0; i < nb_channels; i++)
 				iio->stop(hist_ids[i]);
 		if (xy_is_visible)
 			for (unsigned int i = 0; i < (nb_channels & ~1); i++)
 				iio->stop(xy_ids[i]);
+
+		if(active_sample_count <= fft_size && fft_is_visible)
+			for (unsigned int i = 0; i < nb_channels; i++)
+				iio->stop(fft_ids[i]);
 	}
 }
 
@@ -1061,6 +1081,9 @@ void Oscilloscope::runStopToggled(bool checked)
 		plot.setSampleRate(active_sample_rate, 1, "");
 		plot.setBufferSizeLabelValue(active_sample_count);
 		plot.setSampleRatelabelValue(active_sample_rate);
+		if(fft_is_visible) {
+			setFFT_params();
+		}
 
 		last_set_sample_count = active_sample_count;
 
@@ -1085,6 +1108,14 @@ void Oscilloscope::runStopToggled(bool checked)
 	triggerUpdater->setEnabled(checked);
 }
 
+void Oscilloscope::setFFT_params()
+{
+	fft_plot.setSampleRate(active_sample_rate, 1, "");
+	double start = 0;
+	double stop = active_sample_rate / 2;
+	fft_plot.setAxisScale(QwtPlot::xBottom, start, stop);
+}
+
 void Oscilloscope::onFFT_view_toggled(bool visible)
 {
 	/* Lock the flowgraph if we are already started */
@@ -1093,20 +1124,17 @@ void Oscilloscope::onFFT_view_toggled(bool visible)
 		iio->lock();
 
 	if (visible) {
-		std::string mag2dB_formula = "20 * log10(x/4096/" + std::to_string(qt_fft_block->nsamps() / 2) + ")"; // 4096 = 2^NUM_ADC_BITS
-
+		setFFT_params();
 		for (unsigned int i = 0; i < nb_channels; i++) {
 			auto fft = gnuradio::get_initial_sptr(
 					new fft_block(false, fft_size));
 
+			auto ctm = blocks::complex_to_mag_squared::make(1);
+
+			/** GNU Radio flow: iio(i) ->  fft -> ctm -> qt_fft_block */
 			fft_ids[i] = iio->connect(fft, i, 0, true);
-
-			auto ctm = blocks::complex_to_mag::make(1);
-			auto m2dB = iio::iio_math::make(mag2dB_formula);
-
 			iio->connect(fft, 0, ctm, 0);
-			iio->connect(ctm, 0, m2dB, 0);
-			iio->connect(m2dB, 0, qt_fft_block, i);
+			iio->connect(ctm, 0, qt_fft_block, i);
 
 			if (ui->pushButtonRunStop->isChecked())
 				iio->start(fft_ids[i]);
@@ -1489,6 +1517,10 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 		plot.setBufferSizeLabelValue(active_sample_count);
 		plot.setSampleRatelabelValue(active_sample_rate);
 
+		if(fft_is_visible) {
+			setFFT_params();
+		}
+
 		last_set_sample_count = active_sample_count;
 
 		adc->setSampleRate(active_sample_rate);
@@ -1503,6 +1535,7 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 	for (unsigned int i = 0; i < nb_channels; i++) {
 		iio->set_buffer_size(ids[i], active_sample_count);
 		iio->set_buffer_size(xy_ids[i], active_sample_count);
+		iio->set_buffer_size(fft_ids[i], fft_size);
 	}
 
 	/* timeout = how long a buffer capture takes + transmission latency. The
@@ -2366,6 +2399,7 @@ void Oscilloscope::setAllSinksSampleCount(unsigned long sample_count)
 		math_sink->set_nsamps(sample_count);
 		++it;
 	}
+	this->qt_fft_block->set_nsamps(fft_size);
 }
 
 void Oscilloscope::writeAllSettingsToHardware()
