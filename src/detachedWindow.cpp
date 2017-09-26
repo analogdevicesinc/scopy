@@ -24,7 +24,8 @@
 using namespace adiscope;
 
 DetachedWindow::DetachedWindow(QIcon icon, QWidget *parent):
-	QMainWindow(parent)
+	QMainWindow(parent),
+	state(Qt::WindowState::WindowNoState)
 {
 	this->setWindowIcon(icon);
 }
@@ -38,6 +39,14 @@ void DetachedWindow::closeEvent(QCloseEvent *event)
 	Q_EMIT closed();
 }
 
+void DetachedWindow::hideEvent(QHideEvent *event)
+{
+	if (isMaximized())
+		state = Qt::WindowState::WindowMaximized;
+	else
+		state = Qt::WindowState::WindowNoState;
+}
+
 void DetachedWindow::setCentralWidget(QWidget *widget)
 {
 	QWidget *child = new QWidget(this);
@@ -48,4 +57,11 @@ void DetachedWindow::setCentralWidget(QWidget *widget)
 	layout->addWidget(widget);
 
 	QMainWindow::setCentralWidget(child);
+}
+
+void DetachedWindow::showWindow()
+{
+	if (isMinimized())
+		setWindowState(state);
+	activateWindow();
 }

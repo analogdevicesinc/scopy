@@ -21,8 +21,10 @@
 #define SCOPY_DETACHED_WINDOW_HPP
 
 #include <QMainWindow>
+#include <QEvent>
 
 class QCloseEvent;
+
 
 namespace adiscope {
 class DetachedWindow: public QMainWindow
@@ -37,9 +39,12 @@ public:
 	~DetachedWindow();
 
 	void setCentralWidget(QWidget *widget);
+	void showWindow();
 
 private:
 	void closeEvent(QCloseEvent *event);
+	void hideEvent(QHideEvent *event);
+	Qt::WindowState state;
 };
 }
 
