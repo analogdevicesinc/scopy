@@ -263,6 +263,9 @@ void CursorReadouts::updateSizeAndPosition(bool resize)
 
 void CursorReadouts::moveTopLeft(bool resize)
 {
+	if (!isVisible())
+		return;
+
 	int firstPos = 3;
 	int secondPos = 6;
 
@@ -329,6 +332,9 @@ void CursorReadouts::moveTopLeft(bool resize)
 
 void CursorReadouts::moveTopRight(bool resize)
 {
+	if (!isVisible())
+		return;
+
 	QwtScaleDiv vScaleDiv = plot()->axisScaleDiv(QwtPlot::yLeft);
 	QwtScaleDiv hScaleDiv = plot()->axisScaleDiv(QwtPlot::xBottom);
 
@@ -394,6 +400,9 @@ void CursorReadouts::moveTopRight(bool resize)
 
 void CursorReadouts::moveBottomLeft(bool resize)
 {
+	if (!isVisible())
+		return;
+
 	int firstPos = 3;
 	int secondPos = 6;
 
@@ -457,6 +466,9 @@ void CursorReadouts::moveBottomLeft(bool resize)
 
 void CursorReadouts::moveBottomRight(bool resize)
 {
+	if (!isVisible())
+		return;
+
 	QwtScaleDiv vScaleDiv = plot()->axisScaleDiv(QwtPlot::yLeft);
 	QwtScaleDiv hScaleDiv = plot()->axisScaleDiv(QwtPlot::xBottom);
 
