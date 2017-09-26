@@ -29,6 +29,25 @@ private:
 };
 
 /*
+ * Class ChannelDelegate
+ */
+class ChannelDelegate : public QStyledItemDelegate
+{
+public:
+	ChannelDelegate(QObject *parent = 0): QStyledItemDelegate(parent)
+	{
+	}
+
+	virtual QString displayText(const QVariant &value, const QLocale &locale) const
+	{
+		Q_UNUSED(locale)
+
+		int mkId = value.toInt();
+		return QString::number(mkId + 1);
+	}
+};
+
+/*
  * Class MarkerTable
  */
 
@@ -61,6 +80,9 @@ ui(new Ui::MarkerTable)
 
 	FrequencyDelegate *freqDelegate = new FrequencyDelegate(this);
 	ui->tableView->setItemDelegateForColumn(COL_FREQ, freqDelegate);
+
+	ChannelDelegate *chnDelegate = new ChannelDelegate(this);
+	ui->tableView->setItemDelegateForColumn(COL_CH, chnDelegate);
 }
 
 MarkerTable::~MarkerTable()
