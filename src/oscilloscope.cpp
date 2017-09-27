@@ -137,7 +137,6 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	plot.disableLegend();
 
 	fft_plot.disableLegend();
-	fft_plot.setAxisScale(QwtPlot::yLeft, -200, 0, 10);
 	fft_plot.setXaxisMouseGesturesEnabled(false);
 	for (uint i = 0; i < nb_channels; i++)
 		fft_plot.setYaxisMouseGesturesEnabled(i, false);
@@ -224,7 +223,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		&plot, SLOT(setTriggerState(int)));
 
 	plot.setZoomerEnabled(true);
-
+	fft_plot.setZoomerEnabled();
 	create_math_panel();
 
 	/* Gnuradio Blocks Connections */
@@ -290,8 +289,6 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	/* Default plot settings */
 	plot.setSampleRate(adc->sampleRate(), 1, "");
 	plot.setActiveVertAxis(0);
-
-	setFFT_params();
 
 	for (unsigned int i = 0; i < nb_channels; i++) {
 		plot.Curve(i)->setAxes(
@@ -541,6 +538,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 
 	export_settings_init();
 	cursor_panel_init();
+	setFFT_params(true);
 
 	api->setObjectName(QString::fromStdString(Filter::tool_name(
 			TOOL_OSCILLOSCOPE)));
@@ -1108,12 +1106,16 @@ void Oscilloscope::runStopToggled(bool checked)
 	triggerUpdater->setEnabled(checked);
 }
 
-void Oscilloscope::setFFT_params()
+void Oscilloscope::setFFT_params(bool force)
 {
-	fft_plot.setSampleRate(active_sample_rate, 1, "");
-	double start = 0;
-	double stop = active_sample_rate / 2;
-	fft_plot.setAxisScale(QwtPlot::xBottom, start, stop);
+	if(fft_plot.sampleRate() != adc->sampleRate() || force) {
+		fft_plot.setSampleRate(adc->sampleRate(), 1, "");
+		double start = 0;
+		double stop =  adc->sampleRate() / 2;
+		fft_plot.setAxisScale(QwtPlot::xBottom, start, stop);
+		fft_plot.setAxisScale(QwtPlot::yLeft, -200, 0, 10);
+		fft_plot.zoomBaseUpdate();
+	}
 }
 
 void Oscilloscope::onFFT_view_toggled(bool visible)
@@ -1519,11 +1521,6 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 		plot.setSampleRate(active_sample_rate, 1, "");
 		plot.setBufferSizeLabelValue(active_sample_count);
 		plot.setSampleRatelabelValue(active_sample_rate);
-
-		if(fft_is_visible) {
-			setFFT_params();
-		}
-
 		last_set_sample_count = active_sample_count;
 
 		adc->setSampleRate(active_sample_rate);
@@ -1533,6 +1530,10 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 		// Time base changes can limit the time position value
 		if (timePosition->value() != -params.timePos)
 			timePosition->setValue(-params.timePos);
+
+		if(fft_is_visible) {
+			setFFT_params();
+		}
 	}
 
 	for (unsigned int i = 0; i < nb_channels; i++) {

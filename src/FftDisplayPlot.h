@@ -152,6 +152,8 @@ namespace adiscope {
 		void selectMarker(uint chIdx, uint mkIdx);
 
 		void replot();
+		void setZoomerEnabled();
+		double sampleRate();
 
 	Q_SIGNALS:
 		void newData();

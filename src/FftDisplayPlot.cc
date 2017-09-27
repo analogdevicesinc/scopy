@@ -29,6 +29,38 @@
 
 using namespace adiscope;
 
+class FftDisplayZoomer: public QwtPlotZoomer
+{
+public:
+#if QWT_VERSION < 0x060100
+  FftDisplayZoomer(QwtPlotCanvas* canvas)
+#else /* QWT_VERSION < 0x060100 */
+  FftDisplayZoomer(QWidget* canvas)
+#endif /* QWT_VERSION < 0x060100 */
+    : QwtPlotZoomer(canvas)
+  {
+    setTrackerMode(QwtPicker::AlwaysOn);
+  }
+
+  virtual ~FftDisplayZoomer(){
+
+  }
+
+  virtual void updateTrackerText(){
+    updateDisplay();
+  }
+
+protected:
+  using QwtPlotZoomer::trackerText;
+  virtual QwtText trackerText( const QPoint& p ) const
+  {
+    QwtDoublePoint dp = QwtPlotZoomer::invTransform(p);
+    QwtText t(QString("(%1, %2)").arg(dp.x(), 0, 'f', 4).
+              arg(dp.y(), 0, 'f', 4));
+    return t;
+  }
+};
+
 FftDisplayPlot::FftDisplayPlot(int nplots, QWidget *parent) :
 	DisplayPlot(nplots, parent),
 	d_start_frequency(0),
@@ -40,6 +72,8 @@ FftDisplayPlot::FftDisplayPlot(int nplots, QWidget *parent) :
 {
 	// TO DO: Add more colors
 	d_markerColors << QColor(255, 242, 0) << QColor(210, 155, 210);
+
+	d_zoomer = nullptr;
 
 	for (unsigned int i = 0; i < nplots; i++) {
 		auto plot = new QwtPlotCurve(QString("Data %1").arg(i));
@@ -124,6 +158,29 @@ FftDisplayPlot::~FftDisplayPlot()
 void FftDisplayPlot::replot()
 {
 	QwtPlot::replot();
+}
+
+void FftDisplayPlot::setZoomerEnabled()
+{
+        if(!d_zoomer) {
+                d_zoomer = new FftDisplayZoomer(canvas());
+
+                QFont font("DejaVu Sans", 10, 75);
+                d_zoomer->setTrackerFont(font);
+
+#if QWT_VERSION < 0x060000
+                d_zoomer->setSelectionFlags(QwtPicker::RectSelection | QwtPicker::DragSelection);
+#endif
+
+                d_zoomer->setMousePattern(QwtEventPattern::MouseSelect2,
+                                          Qt::RightButton, Qt::ControlModifier);
+                d_zoomer->setMousePattern(QwtEventPattern::MouseSelect3,
+                                          Qt::RightButton);
+
+                const QColor c("#999999");
+                d_zoomer->setRubberBandPen(c);
+                d_zoomer->setTrackerPen(c);
+        }
 }
 
 void FftDisplayPlot::plotData(const std::vector<double *> pts,
@@ -310,6 +367,11 @@ void FftDisplayPlot::setSampleRate(double sr, double units,
 	d_preset_sampl_rate = sr;
 
 	_resetXAxisPoints();
+}
+
+double FftDisplayPlot::sampleRate()
+{
+	return d_sampl_rate;
 }
 
 void FftDisplayPlot::presetSampleRate(double sr)
