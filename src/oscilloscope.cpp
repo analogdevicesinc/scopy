@@ -1376,6 +1376,7 @@ void adiscope::Oscilloscope::channel_box_toggled(bool checked)
 	if (checked) {
 		qDebug() << "Attaching curve" << id;
 		plot.AttachCurve(id);
+		fft_plot.AttachCurve(id);
 		channels_group->addButton(name);
 		name->setChecked(true);
 
@@ -1396,6 +1397,7 @@ void adiscope::Oscilloscope::channel_box_toggled(bool checked)
 	} else {
 		qDebug() << "Detaching curve" << id;
 		plot.DetachCurve(id);
+		fft_plot.DetachCurve(id);
 		bool shouldDisable = true;
 
 		for (unsigned int i = 0; i < nb_channels + nb_math_channels; i++) {
@@ -1420,6 +1422,7 @@ void adiscope::Oscilloscope::channel_box_toggled(bool checked)
 	plot.setOffsetWidgetVisible(id, checked);
 
 	plot.replot();
+	fft_plot.replot();
 	updateRunButton(checked);
 }
 
