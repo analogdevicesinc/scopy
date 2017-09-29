@@ -51,8 +51,11 @@ void CustomPushButton::setChecked(bool checked)
 	if (btnGroup) {
 		if(btnGroup->checkedId() == group()->id(this) && !checked)
 			btnGroup->setExclusive(false);
+	}
 
-		QPushButton::setChecked(checked);
+	QPushButton::setChecked(checked);
+
+	if (btnGroup) {
 		btnGroup->setExclusive(true);
 	}
 }
