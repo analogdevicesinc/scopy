@@ -38,10 +38,14 @@ void CustomPushButton::mouseReleaseEvent(QMouseEvent *event)
 	if (btnGroup) {
 		if(btnGroup->checkedId() == group()->id(this) && isDown())
 			btnGroup->setExclusive(false);
+	}
 
-		QPushButton::mouseReleaseEvent(event);
+	QPushButton::mouseReleaseEvent(event);
+
+	if (btnGroup) {
 		btnGroup->setExclusive(true);
 	}
+
 }
 
 void CustomPushButton::setChecked(bool checked)
