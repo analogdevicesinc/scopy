@@ -35,6 +35,7 @@
 #include <QWidget>
 #include <QButtonGroup>
 #include <QMap>
+#include <QQueue>
 
 /* Local includes */
 #include "apiObject.hpp"
@@ -113,6 +114,12 @@ namespace adiscope {
 		void onHistogram_view_toggled(bool visible);
 		void onXY_view_toggled(bool visible);
 
+		void on_btnAddMath_toggled(bool);
+		void on_btnCursors_toggled(bool);
+		void on_btnMeasure_toggled(bool);
+		void on_btnTrigger_toggled(bool);
+		void on_btnGeneralSettings_toggled(bool);
+
 		void onTriggerSourceChanged(int);
 		void onTimeTriggerDelayChanged(double);
 		void onTriggerLevelChanged(double);
@@ -129,10 +136,10 @@ namespace adiscope {
 
 		void onChannelWidgetEnabled(bool);
 		void onChannelWidgetSelected(bool);
+		void onChannelWidgetMenuToggled(bool);
 		void onChannelWidgetDeleteClicked();
 
 		void rightMenuFinished(bool opened);
-		void toggleRightMenu();
 
 		void toggle_blockchain_flow(bool);
 		void runStopToggled(bool);
@@ -240,7 +247,6 @@ namespace adiscope {
 		MetricPrefixFormatter vertMeasureFormat;
 		TimePrefixFormatter horizMeasureFormat;
 
-		bool menuOpened;
 		int current_channel;
 		unsigned int math_chn_counter;
 
@@ -259,13 +265,16 @@ namespace adiscope {
 
 		QList<CustomPushButton *> menuOrder;
 
+		QQueue<QPair<CustomPushButton *, bool>> menuButtonActions;
+
 		void writeAllSettingsToHardware();
 
 		void comboBoxUpdateToValue(QComboBox *box, double value, std::vector<double>list);
 
 		void settings_panel_update(int id);
 		void settings_panel_size_adjust();
-		void toggleRightMenu(QPushButton *btn);
+		void triggerRightMenuToggle(CustomPushButton *, bool checked);
+		void toggleRightMenu(CustomPushButton *, bool checked);
 		void create_math_panel();
 		void add_math_channel(const std::string& function);
 		unsigned int find_curve_number();

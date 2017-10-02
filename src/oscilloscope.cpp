@@ -87,7 +87,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	trigger_is_forced(false),
 	new_data_is_triggered(false),
 	triggerUpdater(new StateUpdater(250, this)),
-	menuOpened(false), current_channel(-1), math_chn_counter(0),
+	current_channel(-1), math_chn_counter(0),
 	channels_group(new QButtonGroup(this)),
 	active_settings_btn(nullptr),
 	zoom_level(0)
@@ -161,17 +161,17 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		ch_widget->setShortName(QString("CH %1").arg(i + 1));
 		ch_widget->nameButton()->setText(ch_widget->shortName());
 
-		/* We don't use the settings button - hide it */
-		ch_widget->menuButton()->hide();
-
 		connect(ch_widget, SIGNAL(enabled(bool)),
 			SLOT(onChannelWidgetEnabled(bool)));
 		connect(ch_widget, SIGNAL(selected(bool)),
 			SLOT(onChannelWidgetSelected(bool)));
+		connect(ch_widget, SIGNAL(menuToggled(bool)),
+			SLOT(onChannelWidgetMenuToggled(bool)));
 
 		ui->channelsList->addWidget(ch_widget);
 
 		channels_group->addButton(ch_widget->nameButton());
+		ui->settings_group->addButton(ch_widget->menuButton());
 
 		QLabel *label= new QLabel(this);
 		label->setText(vertMeasureFormat.format(
@@ -191,20 +191,11 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	connect(ui->rightMenu, SIGNAL(finished(bool)), this,
 			SLOT(rightMenuFinished(bool)));
 
-	/* Channel Settings */
-	ui->btnChannel->setProperty("id", QVariant(0));
-	connect(ui->btnChannel, SIGNAL(pressed()), this,
-			SLOT(toggleRightMenu()));
-
 	/* Cursors Settings */
 	ui->btnCursors->setProperty("id", QVariant(-1));
-	connect(ui->btnCursors, SIGNAL(pressed()),
-			this, SLOT(toggleRightMenu()));
 
 	/* Trigger Settings */
 	ui->btnTrigger->setProperty("id", QVariant(-triggers_panel));
-	connect(ui->btnTrigger, SIGNAL(pressed()),
-			this, SLOT(toggleRightMenu()));
 
 	/* Trigger Status Updater */
 	triggerUpdater->setOffState(CapturePlot::Stop);
@@ -403,9 +394,6 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	connect(gsettings_ui->Histogram_view, SIGNAL(toggled(bool)),
 		SLOT(onHistogram_view_toggled(bool)));
 
-	connect(ui->btnGeneralSettings, SIGNAL(pressed()),
-				this, SLOT(toggleRightMenu()));
-
 	connect(ui->pushButtonRunStop, SIGNAL(toggled(bool)), this,
 			SLOT(runStopToggled(bool)));
 	connect(ui->pushButtonSingle, SIGNAL(toggled(bool)), this,
@@ -479,9 +467,6 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 			SLOT(onIioDataRefillTimeout()));
 	connect(&plot, SIGNAL(newData()), this, SLOT(onPlotNewData()));
 
-	connect(this, SIGNAL(selectedChannelChanged(int)),
-		this, SLOT(update_chn_settings_panel(int)));
-
 	if (nb_channels < 2)
 		gsettings_ui->XY_view->hide();
 
@@ -530,6 +515,10 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	export_settings_init();
 	cursor_panel_init();
 	setFFT_params(true);
+
+	// The trigger is always available (cannot be disabled) and we add it to
+	// the list so we can show in case all other menus are disabled
+	menuOrder.push_back(ui->btnTrigger);
 
 	api->setObjectName(QString::fromStdString(Filter::tool_name(
 			TOOL_OSCILLOSCOPE)));
@@ -718,8 +707,6 @@ void Oscilloscope::btnExport_clicked(){
 void Oscilloscope::create_math_panel()
 {
 	/* Math stuff */
-    connect(ui->btnAddMath, SIGNAL(pressed()),
-				this, SLOT(toggleRightMenu()));
 
 	QWidget *panel = new QWidget(this);
 	Ui::MathPanel math_ui;
@@ -826,8 +813,6 @@ void Oscilloscope::add_math_channel(const std::string& function)
 	exportSettings->addChannel(curve_id,
 		channel_widget->fullName());
 
-	channel_widget->menuButton()->hide();
-
 	channel_widget->setProperty("curve_nb", QVariant(curve_number));
 	channel_widget->setProperty("function",
 			QVariant(QString::fromStdString(function)));
@@ -838,12 +823,15 @@ void Oscilloscope::add_math_channel(const std::string& function)
 		SLOT(onChannelWidgetEnabled(bool)));
 	connect(channel_widget, SIGNAL(selected(bool)),
 		SLOT(onChannelWidgetSelected(bool)));
+	connect(channel_widget, SIGNAL(menuToggled(bool)),
+		SLOT(onChannelWidgetMenuToggled(bool)));
 	connect(channel_widget, SIGNAL(deleteClicked()),
 		SLOT(onChannelWidgetDeleteClicked()));
 
 	ui->channelsList->addWidget(channel_widget);
 
 	channels_group->addButton(channel_widget->nameButton());
+	ui->settings_group->addButton(channel_widget->menuButton());
 
 	QLabel *label= new QLabel(this);
 		label->setText(vertMeasureFormat.format(
@@ -869,7 +857,6 @@ void Oscilloscope::add_math_channel(const std::string& function)
 	if (nb_math_channels == MAX_MATH_CHANNELS ){
 		if (ui->btnAddMath->isChecked()){
 			ui->btnAddMath->setChecked(false);
-			toggleRightMenu(ui->btnChannel);
 		}
 		ui->btnAddMath->hide();
 	}
@@ -1223,12 +1210,12 @@ void adiscope::Oscilloscope::on_boxCursors_toggled(bool on)
 			on ? cr_ui->hCursorsEnable->isChecked() : false);
 
 	// Set the visibility of the cursor readouts owned by the Oscilloscope
-	if (on)
+	if (on) {
 		plot.setCursorReadoutsVisible(!ui->boxMeasure->isChecked());
-	else if (ui->btnCursors->isChecked())
-		on_btnSettings_clicked(false);
+	} else {
+		if (ui->btnCursors->isChecked())
+			ui->btnCursors->setChecked(false);
 
-	if (!on){
 		menuOrder.removeOne(ui->btnCursors);
 	}
 
@@ -1237,12 +1224,12 @@ void adiscope::Oscilloscope::on_boxCursors_toggled(bool on)
 
 void adiscope::Oscilloscope::on_boxMeasure_toggled(bool on)
 {
-	if (on)
+	if (on) {
 		update_measure_for_channel(current_channel);
-	else if (ui->btnMeasure->isChecked())
-		on_btnSettings_clicked(false);
+	} else {
+		if (ui->btnMeasure->isChecked())
+			ui->btnMeasure->setChecked(false);
 
-	if (!on){
 		menuOrder.removeOne(ui->btnMeasure);
 	}
 
@@ -1336,11 +1323,6 @@ void adiscope::Oscilloscope::updateRunButton(bool ch_enabled)
 		ui->pushButtonRunStop->setChecked(false);
 		run_button->setChecked(false);
 		ui->pushButtonSingle->setChecked(false);
-
-		if (ui->btnChannel->isChecked()) {
-			ui->btnChannel->setChecked(false);
-			toggleRightMenu(ui->btnChannel);
-		}
 	}
 }
 
@@ -1392,6 +1374,9 @@ void adiscope::Oscilloscope::onChannelWidgetEnabled(bool en)
 				break;
 			}
 		}
+
+		menuOrder.removeOne(static_cast<CustomPushButton *>(
+			w->menuButton()));
 	}
 
 	plot.setOffsetWidgetVisible(id, en);
@@ -1417,6 +1402,14 @@ void adiscope::Oscilloscope::onChannelWidgetSelected(bool checked)
 	if (plot.measurementsEnabled()) {
 		update_measure_for_channel(id);
 	}
+}
+
+void adiscope::Oscilloscope::onChannelWidgetMenuToggled(bool checked)
+{
+	ChannelWidget *cw = static_cast<ChannelWidget *>(QObject::sender());
+
+	triggerRightMenuToggle(
+		static_cast<CustomPushButton *>(cw->menuButton()), checked);
 }
 
 void adiscope::Oscilloscope::onVertScaleValueChanged(double value)
@@ -1600,26 +1593,20 @@ void adiscope::Oscilloscope::onTimePositionChanged(double value)
 
 void adiscope::Oscilloscope::rightMenuFinished(bool opened)
 {
-	menuOpened = opened;
+	Q_UNUSED(opened)
 
-	if (!opened && active_settings_btn && active_settings_btn->isChecked()) {
-		int id = active_settings_btn->property("id").toInt();
-		settings_panel_update(id);
-		if (id >= 0) {
-			update_chn_settings_panel(current_channel);
-		}
-		ui->rightMenu->toggleMenu(true);
+	// At the end of each animation, check if there are other button check
+	// actions that might have happened while animating and execute all
+	// these queued actions
+	while (menuButtonActions.size()) {
+		auto pair = menuButtonActions.dequeue();
+		toggleRightMenu(pair.first, pair.second);
 	}
 }
 
-void adiscope::Oscilloscope::toggleRightMenu(QPushButton *btn)
+void adiscope::Oscilloscope::toggleRightMenu(CustomPushButton *btn, bool checked)
 {
 	int id = btn->property("id").toInt();
-	bool btn_old_state = btn->isChecked();
-	bool open = !menuOpened;
-
-	if (id == 0)
-		id = current_channel;
 
 	active_settings_btn = static_cast<CustomPushButton *>(btn);
 	if (id != -ui->stackedWidget->indexOf(ui->generalSettings)){
@@ -1629,26 +1616,35 @@ void adiscope::Oscilloscope::toggleRightMenu(QPushButton *btn)
 			menuOrder.removeOne(active_settings_btn);
 			menuOrder.push_back(active_settings_btn);
 		}
-	} else {
-		menuOrder.removeOne(active_settings_btn);
 	}
 
-	if (open)
+	if (checked)
 		settings_panel_update(id);
 
 	if (id >= 0) {
 		plot.setActiveVertAxis(id);
-		if (open) {
+		if (checked) {
 			update_chn_settings_panel(id);
 		}
 	}
 
-	ui->rightMenu->toggleMenu(open);
+	// Update Settings button state
+	ui->btnSettings->setChecked(!!ui->settings_group->checkedButton());
+
+	ui->rightMenu->toggleMenu(checked);
 }
 
-void adiscope::Oscilloscope::toggleRightMenu()
+void Oscilloscope::triggerRightMenuToggle(CustomPushButton *btn, bool checked)
 {
-	toggleRightMenu(static_cast<QPushButton *>(QObject::sender()));
+	// Queue the action, if right menu animation is in progress. This way
+	// the action will be remembered and performed right after the animation
+	// finishes
+	if (ui->rightMenu->animInProgress()) {
+		menuButtonActions.enqueue(
+			QPair<CustomPushButton *, bool>(btn, checked));
+	} else {
+		toggleRightMenu(btn, checked);
+	}
 }
 
 void Oscilloscope::settings_panel_update(int id)
@@ -1858,8 +1854,6 @@ void Oscilloscope::measure_settings_init()
 
 	ui->btnMeasure->setProperty("id", QVariant(-measure_panel));
 
-	connect(ui->btnMeasure, SIGNAL(pressed()),
-				this, SLOT(toggleRightMenu()));
 	connect(ui->boxMeasure, SIGNAL(toggled(bool)),
 		&plot, SLOT(setMeasuremensEnabled(bool)));
 }
@@ -2265,11 +2259,7 @@ void Oscilloscope::on_btnSettings_clicked(bool checked)
 			ui->settings_group->checkedButton());
 	}
 
-	if (!btn)
-		btn = ui->btnChannel;
-
 	btn->setChecked(checked);
-	toggleRightMenu(btn);
 }
 
 void Oscilloscope::updateGainMode()
@@ -2399,6 +2389,36 @@ void Oscilloscope::on_xyPlotLineType_toggled(bool checked)
 		xy_plot.setLineMarker(0, QwtSymbol::NoSymbol);
 	}
 	xy_plot.replot();
+}
+
+void Oscilloscope::on_btnAddMath_toggled(bool checked)
+{
+	triggerRightMenuToggle(
+		static_cast<CustomPushButton *>(QObject::sender()), checked);
+}
+
+void Oscilloscope::on_btnCursors_toggled(bool checked)
+{
+	triggerRightMenuToggle(
+		static_cast<CustomPushButton *>(QObject::sender()), checked);
+}
+
+void Oscilloscope::on_btnMeasure_toggled(bool checked)
+{
+	triggerRightMenuToggle(
+		static_cast<CustomPushButton *>(QObject::sender()), checked);
+}
+
+void Oscilloscope::on_btnTrigger_toggled(bool checked)
+{
+	triggerRightMenuToggle(
+		static_cast<CustomPushButton *>(QObject::sender()), checked);
+}
+
+void Oscilloscope::on_btnGeneralSettings_toggled(bool checked)
+{
+	triggerRightMenuToggle(
+		static_cast<CustomPushButton *>(QObject::sender()), checked);
 }
 
 /*

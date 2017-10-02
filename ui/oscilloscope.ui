@@ -864,42 +864,6 @@ QLabel {
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout_6">
            <item>
-            <widget class="QLabel" name="label">
-             <property name="text">
-              <string>Channel Settings</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="adiscope::CustomPushButton" name="btnChannel">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <attribute name="buttonGroup">
-              <string notr="true">settings_group</string>
-             </attribute>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer_10">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Fixed</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>12</width>
-               <height>0</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
             <widget class="QCheckBox" name="boxCursors">
              <property name="text">
               <string>Cursors</string>
@@ -1014,6 +978,11 @@ QLabel {
  </widget>
  <customwidgets>
   <customwidget>
+   <class>adiscope::CustomPushButton</class>
+   <extends>QPushButton</extends>
+   <header>customPushButton.hpp</header>
+  </customwidget>
+  <customwidget>
    <class>adiscope::DetachDragZone</class>
    <extends>QWidget</extends>
    <header>detachdragzone.h</header>
@@ -1024,11 +993,6 @@ QLabel {
    <extends>QWidget</extends>
    <header>menu_anim.hpp</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>adiscope::CustomPushButton</class>
-   <extends>QPushButton</extends>
-   <header>customPushButton.hpp</header>
   </customwidget>
  </customwidgets>
  <resources>
@@ -1112,22 +1076,6 @@ QLabel {
     <hint type="destinationlabel">
      <x>878</x>
      <y>628</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>btnChannel</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>btnSettings</receiver>
-   <slot>setChecked(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>725</x>
-     <y>628</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1116</x>
-     <y>40</y>
     </hint>
    </hints>
   </connection>
