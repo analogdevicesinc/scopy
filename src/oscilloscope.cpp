@@ -510,6 +510,9 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		timePosition->setValue(timePositions.pop());
 		zoom_level--;
 	});
+	connect(plot.getZoomer(), &OscPlotZoomer::zoomFinished, [=](){
+		onVertScaleValueChanged(voltsPerDiv->value());
+	});
 
 	export_settings_init();
 	cursor_panel_init();
@@ -1413,10 +1416,12 @@ void adiscope::Oscilloscope::onChannelWidgetMenuToggled(bool checked)
 
 void adiscope::Oscilloscope::onVertScaleValueChanged(double value)
 {
-	if (value != plot.VertUnitsPerDiv(current_channel)) {
+	if (value != plot.VertUnitsPerDiv(current_channel)
+			|| !zoom_level) {
 		plot.setVertUnitsPerDiv(value, current_channel);
 		plot.replot();
-		plot.zoomBaseUpdate();
+		if (zoom_level == 0)
+			plot.zoomBaseUpdate();
 	}
 	voltsPosition->setStep(value / 10);
 

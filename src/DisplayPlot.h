@@ -579,6 +579,7 @@ public:
 Q_SIGNALS:
 	void zoomIn();
 	void zoomOut();
+	void zoomFinished();
 
 protected:
 	virtual void rescale();

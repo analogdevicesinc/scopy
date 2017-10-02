@@ -226,6 +226,8 @@ void OscPlotZoomer::rescale()
 	    plt->setAutoReplot( doReplot );
 
 	    plt->replot();
+
+	    Q_EMIT zoomFinished();
 	}
 }
 
