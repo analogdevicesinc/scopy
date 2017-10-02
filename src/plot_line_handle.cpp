@@ -66,6 +66,13 @@ void PlotLineHandle::mousePressEvent(QMouseEvent *event)
 	QWidget::mousePressEvent(event);
 }
 
+void PlotLineHandle::mouseReleaseEvent(QMouseEvent *event)
+{
+	Q_EMIT mouseReleased();
+
+	QWidget::mouseReleaseEvent(event);
+}
+
 void PlotLineHandle::setGrabbed(bool grabbed)
 {
 	if (m_grabbed != grabbed) {

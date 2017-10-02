@@ -44,9 +44,11 @@ public:
 Q_SIGNALS:
 	void positionChanged(int);
 	void grabbedChanged(bool);
+	void mouseReleased();
 
 protected:
 	void mousePressEvent(QMouseEvent *event);
+	void mouseReleaseEvent(QMouseEvent *event);
 
 protected:
 	bool m_enable_silent_move;
