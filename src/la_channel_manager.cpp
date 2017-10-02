@@ -1599,6 +1599,7 @@ void LogicAnalyzerChannelManagerUI::update_ui_children(LogicAnalyzerChannelGroup
 		for (auto var : chgroupUI->getChannelGroup()->get_decoder_roles_list()) {
 			lachannelUI->ui->comboBox_2->addItem(var);
 		}
+
 		if(auto dec = chgroupUI->getChannelGroup()->getDecoder()) {
 			if(strcmp(dec->id, "parallel") == 0) {
 				lachannelUI->ui->comboBox_2->setCurrentText(
@@ -1607,8 +1608,15 @@ void LogicAnalyzerChannelManagerUI::update_ui_children(LogicAnalyzerChannelGroup
 			}
 			else {
 				lachannelUI->ui->comboBox_2->setEnabled(true);
-				lachannelUI->getChannel()->setChannel_role(nullptr);
-				lachannelUI->ui->comboBox_2->setCurrentIndex(0);
+				if(lachannelUI->getChannel()->getChannel_role())
+				{
+					QString name = QString::fromUtf8(
+								lachannelUI->getChannel()->getChannel_role()->name);
+					int roleIndex = chgroupUI->getChannelGroup()->get_decoder_roles_list().indexOf(name)+1;
+					lachannelUI->ui->comboBox_2->setCurrentIndex(roleIndex);
+				}
+				else
+					lachannelUI->ui->comboBox_2->setCurrentIndex(0);
 			}
 		}
 		else {
@@ -1853,7 +1861,29 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 						lachannelUI->ui->indexLabel->setText(str);
 					}
 
-					update_ui_children(lachannelgroupUI);
+					int id = 0;
+					for(auto ch : lachannelgroupUI->ch_ui) {
+						auto dec = lachannelgroupUI->getChannelGroup()->getDecoder();
+						if(!dec)
+							break;
+
+						if(strcmp(dec->id, "parallel") != 0)
+							break;
+
+						ch->ui->comboBox_2->clear();
+
+						/* Populate role combo based on parent decoder */
+						ch->ui->comboBox_2->addItem("None");
+						for (auto var : lachannelgroupUI->getChannelGroup()->get_decoder_roles_list()) {
+							ch->ui->comboBox_2->addItem(var);
+						}
+
+						ch->ui->comboBox_2->setCurrentText(
+									lachannelgroupUI->getChannelGroup()->get_decoder_roles_list().at(id+1));
+						ch->ui->comboBox_2->setEnabled(false);
+						id++;
+					}
+
 					lachannelgroupUI->ui->layoutChildren->removeWidget(prevSep);
 					lachannelgroupUI->botSep = addSeparator(ui->verticalLayout,
 							ui->verticalLayout->count()-1);
