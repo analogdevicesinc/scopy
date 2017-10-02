@@ -21,6 +21,7 @@
 #include "signal_generator.hpp"
 #include "spinbox_a.hpp"
 #include "ui_signal_generator.h"
+#include "channel_widget.hpp"
 
 #include <cmath>
 
@@ -167,9 +168,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 		ptr->type = SIGNAL_TYPE_CONSTANT;
 		ptr->id = i;
 
-		auto pair = new QPair<QWidget, Ui::Channel>;
-		pair->second.setupUi(&pair->first);
-
+		ChannelWidget *cw = new ChannelWidget(i, false, true, QColor());
 
 		const char *ch_name = iio_channel_get_name(chn);
 		std::string s = "Channel ";
@@ -177,33 +176,30 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 			s += std::to_string(i + 1);
 			ch_name = s.c_str();
 		}
-		pair->second.box->setText(ch_name);
-		pair->second.name->setVisible(false);
+		cw->setFullName(ch_name);
+		cw->enableButton()->setText(cw->fullName());
 
-		pair->second.box->setProperty("id", QVariant(i));
-		pair->second.btn->setProperty("id", QVariant(i));
 
-		pair->first.setProperty("signal_generator_data",
+		cw->setProperty("signal_generator_data",
 				QVariant::fromValue(ptr));
-		pair->first.setProperty("channel_name",
-				QVariant(QString(ch_name)));
-		pair->first.setProperty("channel",
+		cw->setProperty("channel",
 				qVariantFromValue((void *) chn));
-		iio_channel_set_data(chn, &pair->first);
+		iio_channel_set_data(chn, cw);
 
-		ui->channelsList->addWidget(&pair->first);
+		ui->channelsList->addWidget(cw);
 
-		connect(pair->second.box, SIGNAL(toggled(bool)), this,
-				SLOT(channel_box_toggled(bool)));
+		connect(cw, SIGNAL(enabled(bool)),
+			SLOT(channelWidgetEnabled(bool)));
 
-		connect(pair->second.btn, SIGNAL(pressed()),
-				this, SLOT(toggleRightMenu()));
+		connect(cw, SIGNAL(menuToggled(bool)),
+			SLOT(channelWidgetMenuToggled(bool)));
 
-		settings_group->addButton(pair->second.btn);
+		settings_group->addButton(cw->menuButton());
+
+		channels.append(cw);
+
 		if (i == 0)
-			pair->second.btn->setChecked(true);
-
-		channels.append(pair);
+			cw->menuButton()->setChecked(true);
 	}
 
 	time_block_data->nb_channels = nb_channels;
@@ -219,10 +215,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 	/* This must be done after attaching the curves; otherwise
 	 * plot->getLineColor(i) returns black. */
 	for (unsigned int i = 0; i < nb_channels; i++) {
-		QString stylesheet(channels[i]->second.box->styleSheet());
-		stylesheet += QString("\nQCheckBox{spacing: 12px;\n}\nQCheckBox::indicator {\nborder-color: %1;\n}\nQCheckBox::indicator:checked {\nbackground-color: %1;\n}\n"
-				).arg(plot->getLineColor(i).name());
-		channels[i]->second.box->setStyleSheet(stylesheet);
+		channels[i]->setColor(plot->getLineColor(i));
 	}
 
 	plot->disableLegend();
@@ -374,7 +367,7 @@ void SignalGenerator::waveformTypeChanged(int val)
 
 QSharedPointer<signal_generator_data> SignalGenerator::getCurrentData()
 {
-	return getData(&channels[currentChannel]->first);
+	return getData(channels[currentChannel]);
 }
 
 QSharedPointer<signal_generator_data> SignalGenerator::getData(QWidget *obj)
@@ -402,8 +395,8 @@ void SignalGenerator::updatePreview()
 	for (auto it = channels.begin(); it != channels.end(); ++it) {
 		basic_block_sptr source;
 
-		if ((*it)->second.box->isChecked()) {
-			source = getSource(&(*it)->first, sample_rate, top);
+		if ((*it)->menuButton()->isChecked()) {
+			source = getSource((*it), sample_rate, top);
 			enabled = true;
 		} else {
 			source = blocks::nop::make(sizeof(float));
@@ -451,10 +444,10 @@ void SignalGenerator::start()
 		return;
 
 	for (auto it = channels.begin(); it != channels.end(); ++it) {
-		if (!(*it)->second.box->isChecked())
+		if (!(*it)->enableButton()->isChecked())
 			continue;
 
-		void *ptr = (*it)->first.property("channel").value<void *>();
+		void *ptr = (*it)->property("channel").value<void *>();
 		enabled_channels.append(static_cast<struct iio_channel *>(ptr));
 	}
 
@@ -701,42 +694,48 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
 	return blocks::nop::make(sizeof(float));
 }
 
-void adiscope::SignalGenerator::channel_box_toggled(bool checked)
+void adiscope::SignalGenerator::channelWidgetEnabled(bool en)
 {
-	QCheckBox *box = static_cast<QCheckBox *>(QObject::sender());
-	unsigned int id = box->property("id").toUInt();
+	ChannelWidget *cw = static_cast<ChannelWidget *>(QObject::sender());
+	int id = cw->id();
 
-	if (checked) {
+	if (en) {
 		plot->AttachCurve(id);
 	} else {
-		if (channels[id]->second.btn->isChecked()) {
-			toggleRightMenu(channels[id]->second.btn);
-			channels[id]->second.btn->setChecked(false);
-		}
-
 		plot->DetachCurve(id);
 	}
 
 	updatePreview();
 	plot->replot();
 
-	bool enable_run = checked;
-	if (!checked) {
+	bool enable_run = en;
+	if (!en) {
 		for (auto it = channels.begin();
 				!enable_run && it != channels.end(); ++it)
-			enable_run = (*it)->second.box->isChecked();
+			enable_run = (*it)->enableButton()->isChecked();
 	}
 
 	ui->run_button->setEnabled(enable_run);
 	run_button->setEnabled(enable_run);
 }
 
+void adiscope::SignalGenerator::channelWidgetMenuToggled(bool checked)
+{
+	ChannelWidget *cw = static_cast<ChannelWidget *>(QObject::sender());
+
+	currentChannel = cw->id();
+
+	if (checked)
+		renameConfigPanel();
+
+	plot->setActiveVertAxis(cw->id());
+	ui->rightMenu->toggleMenu(checked);
+}
+
 void adiscope::SignalGenerator::renameConfigPanel()
 {
-	QString name = channels[currentChannel]->first.property(
-			"channel_name").toString();
-
-	ui->config_panel->setTitle(QString("Configuration for %1").arg(name));
+	ui->config_panel->setTitle(QString("Configuration for %1").arg(
+		channels[currentChannel]->fullName()));
 }
 
 int SignalGenerator::sg_waveform_to_idx(enum sg_waveform wave)
@@ -785,25 +784,6 @@ void adiscope::SignalGenerator::rightMenuFinished(bool opened)
 		ui->tabWidget->setCurrentIndex((int) ptr->type);
 		ui->rightMenu->toggleMenu(true);
 	}
-}
-
-void adiscope::SignalGenerator::toggleRightMenu(QPushButton *btn)
-{
-	unsigned int id = btn->property("id").toUInt();
-	bool open = !settings_group->checkedButton();
-
-	currentChannel = id;
-
-	if (open)
-		renameConfigPanel();
-
-	plot->setActiveVertAxis(id);
-	ui->rightMenu->toggleMenu(open);
-}
-
-void adiscope::SignalGenerator::toggleRightMenu()
-{
-	toggleRightMenu(static_cast<QPushButton *>(QObject::sender()));
 }
 
 bool SignalGenerator::use_oversampling(const struct iio_device *dev)
@@ -1048,7 +1028,7 @@ QList<int> SignalGenerator_API::getMode() const
 	QList<int> list;
 
 	for (unsigned int i = 0; i < gen->channels.size(); i++) {
-		auto ptr = gen->getData(&gen->channels[i]->first);
+		auto ptr = gen->getData(gen->channels[i]);
 
 		list.append(static_cast<int>(ptr->type));
 	}
@@ -1062,7 +1042,7 @@ void SignalGenerator_API::setMode(const QList<int>& list)
 		return;
 
 	for (unsigned int i = 0; i < gen->channels.size(); i++) {
-		auto ptr = gen->getData(&gen->channels[i]->first);
+		auto ptr = gen->getData(gen->channels[i]);
 
 		ptr->type = static_cast<enum SIGNAL_TYPE>(list.at(i));
 	}
@@ -1075,7 +1055,7 @@ QList<double> SignalGenerator_API::getConstantValue() const
 	QList<double> list;
 
 	for (unsigned int i = 0; i < gen->channels.size(); i++) {
-		auto ptr = gen->getData(&gen->channels[i]->first);
+		auto ptr = gen->getData(gen->channels[i]);
 
 		list.append(static_cast<double>(ptr->constant));
 	}
@@ -1089,7 +1069,7 @@ void SignalGenerator_API::setConstantValue(const QList<double>& list)
 		return;
 
 	for (unsigned int i = 0; i < gen->channels.size(); i++) {
-		auto ptr = gen->getData(&gen->channels[i]->first);
+		auto ptr = gen->getData(gen->channels[i]);
 
 		ptr->constant = static_cast<float>(list.at(i));
 	}
@@ -1102,7 +1082,7 @@ QList<int> SignalGenerator_API::getWaveformType() const
 	QList<int> list;
 
 	for (unsigned int i = 0; i < gen->channels.size(); i++) {
-		auto ptr = gen->getData(&gen->channels[i]->first);
+		auto ptr = gen->getData(gen->channels[i]);
 
 		list.append(SignalGenerator::sg_waveform_to_idx(ptr->waveform));
 	}
@@ -1124,7 +1104,7 @@ void SignalGenerator_API::setWaveformType(const QList<int>& list)
 	};
 
 	for (unsigned int i = 0; i < gen->channels.size(); i++) {
-		auto ptr = gen->getData(&gen->channels[i]->first);
+		auto ptr = gen->getData(gen->channels[i]);
 
 		ptr->waveform = types[list.at(i)];
 
@@ -1138,7 +1118,7 @@ QList<double> SignalGenerator_API::getWaveformAmpl() const
 	QList<double> list;
 
 	for (unsigned int i = 0; i < gen->channels.size(); i++) {
-		auto ptr = gen->getData(&gen->channels[i]->first);
+		auto ptr = gen->getData(gen->channels[i]);
 
 		list.append(ptr->amplitude);
 	}
@@ -1152,7 +1132,7 @@ void SignalGenerator_API::setWaveformAmpl(const QList<double>& list)
 		return;
 
 	for (unsigned int i = 0; i < gen->channels.size(); i++) {
-		auto ptr = gen->getData(&gen->channels[i]->first);
+		auto ptr = gen->getData(gen->channels[i]);
 
 		ptr->amplitude = list.at(i);
 	}
@@ -1165,7 +1145,7 @@ QList<double> SignalGenerator_API::getWaveformFreq() const
 	QList<double> list;
 
 	for (unsigned int i = 0; i < gen->channels.size(); i++) {
-		auto ptr = gen->getData(&gen->channels[i]->first);
+		auto ptr = gen->getData(gen->channels[i]);
 
 		list.append(ptr->frequency);
 	}
@@ -1179,7 +1159,7 @@ void SignalGenerator_API::setWaveformFreq(const QList<double>& list)
 		return;
 
 	for (unsigned int i = 0; i < gen->channels.size(); i++) {
-		auto ptr = gen->getData(&gen->channels[i]->first);
+		auto ptr = gen->getData(gen->channels[i]);
 
 		ptr->frequency = list.at(i);
 	}
@@ -1192,7 +1172,7 @@ QList<double> SignalGenerator_API::getWaveformOfft() const
 	QList<double> list;
 
 	for (unsigned int i = 0; i < gen->channels.size(); i++) {
-		auto ptr = gen->getData(&gen->channels[i]->first);
+		auto ptr = gen->getData(gen->channels[i]);
 
 		list.append(static_cast<double>(ptr->offset));
 	}
@@ -1206,7 +1186,7 @@ void SignalGenerator_API::setWaveformOfft(const QList<double>& list)
 		return;
 
 	for (unsigned int i = 0; i < gen->channels.size(); i++) {
-		auto ptr = gen->getData(&gen->channels[i]->first);
+		auto ptr = gen->getData(gen->channels[i]);
 
 		ptr->offset = static_cast<float>(list.at(i));
 	}
@@ -1219,7 +1199,7 @@ QList<double> SignalGenerator_API::getWaveformPhase() const
 	QList<double> list;
 
 	for (unsigned int i = 0; i < gen->channels.size(); i++) {
-		auto ptr = gen->getData(&gen->channels[i]->first);
+		auto ptr = gen->getData(gen->channels[i]);
 
 		list.append(ptr->phase);
 	}
@@ -1233,7 +1213,7 @@ void SignalGenerator_API::setWaveformPhase(const QList<double>& list)
 		return;
 
 	for (unsigned int i = 0; i < gen->channels.size(); i++) {
-		auto ptr = gen->getData(&gen->channels[i]->first);
+		auto ptr = gen->getData(gen->channels[i]);
 
 		ptr->phase = list.at(i);
 	}
@@ -1246,7 +1226,7 @@ QList<double> SignalGenerator_API::getMathFreq() const
 	QList<double> list;
 
 	for (unsigned int i = 0; i < gen->channels.size(); i++) {
-		auto ptr = gen->getData(&gen->channels[i]->first);
+		auto ptr = gen->getData(gen->channels[i]);
 
 		list.append(ptr->math_freq);
 	}
@@ -1260,7 +1240,7 @@ void SignalGenerator_API::setMathFreq(const QList<double>& list)
 		return;
 
 	for (unsigned int i = 0; i < gen->channels.size(); i++) {
-		auto ptr = gen->getData(&gen->channels[i]->first);
+		auto ptr = gen->getData(gen->channels[i]);
 
 		ptr->math_freq = list.at(i);
 	}
@@ -1273,7 +1253,7 @@ QList<QString> SignalGenerator_API::getMathFunction() const
 	QList<QString> list;
 
 	for (unsigned int i = 0; i < gen->channels.size(); i++) {
-		auto ptr = gen->getData(&gen->channels[i]->first);
+		auto ptr = gen->getData(gen->channels[i]);
 
 		list.append(ptr->function);
 	}
@@ -1287,7 +1267,7 @@ void SignalGenerator_API::setMathFunction(const QList<QString>& list)
 		return;
 
 	for (unsigned int i = 0; i < gen->channels.size(); i++) {
-		auto ptr = gen->getData(&gen->channels[i]->first);
+		auto ptr = gen->getData(gen->channels[i]);
 
 		ptr->function = list.at(i);
 	}

@@ -39,10 +39,10 @@
 #include "adc_sample_conv.hpp"
 #include "dynamicWidget.hpp"
 #include "hardware_trigger.hpp"
+#include "channel_widget.hpp"
 
 /* Generated UI */
 #include "ui_spectrum_analyzer.h"
-#include "ui_channel.h"
 
 #include <boost/make_shared.hpp>
 #include <iio.h>
@@ -166,22 +166,23 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 		channel_sptr channel = boost::make_shared<SpectrumChannel>(i,
 			channel_names[i], fft_plot);
 		channel->setColor(fft_plot->getLineColor(i));
-		ui->channelsList->addWidget(channel->m_widget);
+		ui->channelsList->addWidget(channel->widget());
 		channels.push_back(channel);
 
-		settings_group->addButton(channel->m_ui->btn);
-		channels_group->addButton(channel->m_ui->name);
+		settings_group->addButton(channel->widget()->menuButton());
+		channels_group->addButton(channel->widget()->nameButton());
 
-		connect(channel.get(), SIGNAL(settingsToggled(bool)), this,
+		connect(channel.get()->widget(), SIGNAL(menuToggled(bool)),
 			SLOT(onChannelSettingsToggled(bool)));
-		connect(channel.get(), SIGNAL(selected(bool)), this,
+		connect(channel.get()->widget(), SIGNAL(selected(bool)),
 			SLOT(onChannelSelected(bool)));
-		connect(channel.get(), SIGNAL(enabled(bool)), this,
+		connect(channel.get()->widget(), SIGNAL(enabled(bool)),
 			SLOT(onChannelEnabled(bool)));
 	}
 
 	if (num_adc_channels > 0)
-		channels[crt_channel_id]->m_ui->name->setChecked(true);
+		channels[crt_channel_id]->widget()->nameButton()->
+			setChecked(true);
 
 	// Initialize Sweep controls
 	double max_sr = 50e6; // TO DO: adc should detect max sampl rate and use that
@@ -520,9 +521,10 @@ void SpectrumAnalyzer::on_spinBox_averaging_valueChanged(int n)
 
 void SpectrumAnalyzer::onChannelSettingsToggled(bool en)
 {
-	SpectrumChannel *sc = static_cast<SpectrumChannel *>(QObject::sender());
+	ChannelWidget *cw = static_cast<ChannelWidget *>(QObject::sender());
+	channel_sptr sc = channels.at(cw->id());
 
-	QString style = QString("border: 2px solid %1").arg(sc->color().name());
+	QString style = QString("border: 2px solid %1").arg(cw->color().name());
 	ui->lineChannelSettingsTitle->setStyleSheet(style);
 	ui->channelSettingsTitle->setText(sc->name());
 
@@ -550,8 +552,8 @@ void SpectrumAnalyzer::onChannelSettingsToggled(bool en)
 
 void SpectrumAnalyzer::onChannelSelected(bool en)
 {
-	SpectrumChannel *sc = static_cast<SpectrumChannel *>(QObject::sender());
-	int chIdx = sc->id();
+	ChannelWidget *cw = static_cast<ChannelWidget *>(QObject::sender());
+	int chIdx = cw->id();
 
 	// Is this if branch required?
 	if (!ui->run_button->isChecked()) {
@@ -560,7 +562,7 @@ void SpectrumAnalyzer::onChannelSelected(bool en)
 
 	// Update markers settings menu based on current channel
 	if (en) {
-		ui->labelMarkerSettingsTitle->setText(sc->name());
+		ui->labelMarkerSettingsTitle->setText(cw->fullName());
 
 		for (int i = 0; i < fft_plot->markerCount(chIdx); i++) {
 			mrk_buttons[i]->blockSignals(true);
@@ -577,20 +579,21 @@ void SpectrumAnalyzer::onChannelSelected(bool en)
 
 void SpectrumAnalyzer::onChannelEnabled(bool en)
 {
-	SpectrumChannel *sc = static_cast<SpectrumChannel *>(QObject::sender());
+	ChannelWidget *cw = static_cast<ChannelWidget *>(QObject::sender());
 
 	if (en) {
-		channels_group->addButton(sc->m_ui->name);
-		sc->m_ui->name->setChecked(true);
-		sc->m_ui->btn->setDisabled(false);
+		fft_plot->AttachCurve(cw->id());
 	} else {
-		sc->m_ui->btn->setChecked(false);
-		sc->m_ui->btn->setDisabled(true);
-		channels_group->removeButton(sc->m_ui->name);
-		sc->m_ui->name->setChecked(false);
-		if (channels_group->buttons().size() > 0)
-			channels_group->buttons()[0]->setChecked(true);
+		for (int i = 0; i < channels.size(); i++) {
+			ChannelWidget *cw = channels[i]->widget();
+			if (cw->enableButton()->isChecked()) {
+				cw->nameButton()->setChecked(true);
+				break;
+			}
+		}
+		fft_plot->DetachCurve(cw->id());
 	}
+	fft_plot->replot();
 }
 
 void SpectrumAnalyzer::onStartStopChanged()
@@ -938,7 +941,7 @@ void SpectrumAnalyzer::onPlotNewMarkerData()
 void SpectrumAnalyzer::onPlotMarkerSelected(uint chIdx, uint mkIdx)
 {
 	if (crt_channel_id != chIdx) {
-		channels[chIdx]->m_ui->name->setChecked(true);
+		channels[chIdx]->widget()->nameButton()->setChecked(true);
 
 	}
 	if (crt_marker != mkIdx) {
@@ -1024,29 +1027,21 @@ SpectrumChannel::SpectrumChannel(int id, const QString& name,
 	m_avg_type(FftDisplayPlot::SAMPLE),
 	m_fft_win(SpectrumAnalyzer::HAMMING),
 	m_plot(plot),
-	m_widget(new QWidget()),
-	m_ui(new Ui::Channel())
+	m_widget(new ChannelWidget(id, false, false, m_color))
 {
-	m_ui->setupUi(m_widget);
-	m_ui->name->setText(m_name);
-	setColor(m_color);
-
-	connect(m_ui->box, SIGNAL(toggled(bool)), this,
-		SLOT(onEnableBoxToggled(bool)));
-	connect(m_ui->name, SIGNAL(toggled(bool)), this,
-		SLOT(onNameButtonToggled(bool)));
-	connect(m_ui->btn, SIGNAL(toggled(bool)), this,
-		SLOT(onSettingsBtnToggled(bool)));
+	m_widget->setFullName(name);
+	m_widget->setShortName(QString("CH %1").arg(id));
+	m_widget->nameButton()->setText(m_widget->fullName());
 }
 
 bool SpectrumChannel::isSettingsOn() const
 {
-	return m_ui->btn->isChecked();
+	return m_widget->enableButton()->isChecked();
 }
 
 void SpectrumChannel::setSettingsOn(bool on)
 {
-	m_ui->btn->setChecked(on);
+	m_widget->enableButton()->setChecked(on);
 }
 
 float SpectrumChannel::lineWidth() const
@@ -1066,16 +1061,8 @@ QColor SpectrumChannel::color() const
 
 void SpectrumChannel::setColor(const QColor& color)
 {
+	m_widget->setColor(color);
 	m_color = color;
-
-	QString stylesheet(m_ui->box->styleSheet());
-	stylesheet += QString("\nQCheckBox::indicator {"
-		"\nborder-color: %1;\n}\nQCheckBox::indicator:checked {"
-		"\nbackground-color: %1;\n}\n"
-		).arg(color.name());
-
-	m_ui->box->setStyleSheet(stylesheet);
-
 }
 
 uint SpectrumChannel::averaging() const
@@ -1109,33 +1096,6 @@ void SpectrumChannel::setFftWindow(SpectrumAnalyzer::FftWinType win, int taps)
 SpectrumAnalyzer::FftWinType SpectrumChannel::fftWindow() const
 {
 	return m_fft_win;
-}
-
-void SpectrumChannel::onEnableBoxToggled(bool en)
-{
-	if (en) {
-		m_plot->AttachCurve(m_id);
-	} else {
-		m_plot->DetachCurve(m_id);
-	}
-	m_plot->replot();
-
-	Q_EMIT enabled(en);
-}
-
-void SpectrumChannel::onNameButtonToggled(bool en)
-{
-	if (en && !m_ui->box->isChecked()) {
-		m_ui->box->setChecked(true);
-	}
-	setDynamicProperty(m_ui->name->parentWidget(), "selected", en);
-
-	Q_EMIT selected(en);
-}
-
-void SpectrumChannel::onSettingsBtnToggled(bool en)
-{
-	Q_EMIT settingsToggled(en);
 }
 
 std::vector<float> SpectrumChannel::build_win(SpectrumAnalyzer::FftWinType type,

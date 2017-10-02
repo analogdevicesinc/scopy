@@ -44,12 +44,12 @@ extern "C" {
 
 namespace Ui {
 	class SpectrumAnalyzer;
-	class Channel;
 }
 
 namespace adiscope {
 	class SpectrumChannel;
 	class Filter;
+	class ChannelWidget;
 }
 
 class QPushButton;
@@ -177,13 +177,12 @@ Q_OBJECT
 public:
 	boost::shared_ptr<adiscope::fft_block> fft_block;
 	gr::blocks::complex_to_mag_squared::sptr ctm_block;
-	QWidget *m_widget;
-	Ui::Channel *m_ui;
 
 	SpectrumChannel(int id, const QString& name, FftDisplayPlot *plot);
 
 	int id() const { return m_id; }
 	QString name() const { return m_name; }
+	ChannelWidget *widget() const { return m_widget; }
 
 	bool isSettingsOn() const;
 	void setSettingsOn(bool on);
@@ -203,16 +202,6 @@ public:
 	SpectrumAnalyzer::FftWinType fftWindow() const;
 	void setFftWindow(SpectrumAnalyzer::FftWinType win, int taps);
 
-Q_SIGNALS:
-	void enabled(bool);
-	void selected(bool);
-	void settingsToggled(bool);
-
-private Q_SLOTS:
-	void onEnableBoxToggled(bool);
-	void onNameButtonToggled(bool);
-	void onSettingsBtnToggled(bool);
-
 private:
 	int m_id;
 	QString m_name;
@@ -222,6 +211,7 @@ private:
 	FftDisplayPlot::AverageType m_avg_type;
 	SpectrumAnalyzer::FftWinType m_fft_win;
 	FftDisplayPlot *m_plot;
+	ChannelWidget *m_widget;
 
 	static std::vector<float> build_win(SpectrumAnalyzer::FftWinType type,
 		int ntaps);

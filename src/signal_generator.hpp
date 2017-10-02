@@ -36,8 +36,6 @@
 #include "tool.hpp"
 #include "hw_dac.h"
 
-#include "ui_channel.h"
-
 extern "C" {
 	struct iio_buffer;
 	struct iio_context;
@@ -56,6 +54,7 @@ namespace adiscope {
 	struct time_block_data;
 	class SignalGenerator_API;
 	class GenericDac;
+	class ChannelWidget;
 
 	enum sg_waveform {
 		SG_SIN_WAVE = gr::analog::GR_SIN_WAVE,
@@ -103,7 +102,7 @@ namespace adiscope {
 		QButtonGroup *settings_group;
 
 		QVector<struct iio_buffer *> buffers;
-		QVector<QPair<QWidget, Ui::Channel> *> channels;
+		QVector<ChannelWidget *> channels;
 		QVector<QPair<struct iio_channel *,
 			std::shared_ptr<adiscope::GenericDac>>> channel_dac;
 
@@ -151,8 +150,8 @@ namespace adiscope {
 		void mathFreqChanged(double val);
 		void waveformTypeChanged(int val);
 		void tabChanged(int index);
-		void channel_box_toggled(bool);
-		void toggleRightMenu();
+		void channelWidgetEnabled(bool);
+		void channelWidgetMenuToggled(bool);
 		void rightMenuFinished(bool opened);
 		void loadFile();
 

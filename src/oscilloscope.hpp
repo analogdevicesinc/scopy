@@ -77,6 +77,7 @@ namespace adiscope {
 	class MeasureSettings;
 	class StateUpdater;
 	class AnalogBufferPreviewer;
+	class ChannelWidget;
 
 	class Oscilloscope : public Tool
 	{
@@ -126,8 +127,9 @@ namespace adiscope {
 
 		void on_comboBox_currentIndexChanged(const QString &arg1);
 
-		void channel_box_toggled(bool);
-		void channel_name_checked(bool);
+		void onChannelWidgetEnabled(bool);
+		void onChannelWidgetSelected(bool);
+		void onChannelWidgetDeleteClicked();
 
 		void rightMenuFinished(bool opened);
 		void toggleRightMenu();
@@ -135,8 +137,6 @@ namespace adiscope {
 		void toggle_blockchain_flow(bool);
 		void runStopToggled(bool);
 		void singleCaptureDone();
-
-		void del_math_channel();
 
 		void onMeasuremetsAvailable();
 
@@ -269,7 +269,7 @@ namespace adiscope {
 		void create_math_panel();
 		void add_math_channel(const std::string& function);
 		unsigned int find_curve_number();
-		QWidget *channelWidgetAtId(int id);
+		ChannelWidget *channelWidgetAtId(int id);
 		void update_measure_for_channel(int ch_idx);
 		void setAllSinksSampleCount(unsigned long sample_count);
 
