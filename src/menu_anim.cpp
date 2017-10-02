@@ -29,7 +29,8 @@ MenuAnim::MenuAnim(QWidget *parent) : ColoredQWidget(parent),
 	open_anim_min(this, "minimumWidth"),
 	close_anim_max(this, "maximumWidth"),
 	close_anim_min(this, "minimumWidth"),
-	min_width(-1)
+	min_width(-1),
+	animInProg(false)
 {
 	open_anim_max.setDuration(500);
 	open_anim_max.setEasingCurve(QEasingCurve::InOutExpo);
@@ -52,6 +53,8 @@ MenuAnim::MenuAnim(QWidget *parent) : ColoredQWidget(parent),
 void MenuAnim::toggleMenu(bool open)
 {
 	int start, stop;
+
+	animInProg = true;
 
 	if (min_width < 0)
 		min_width = 0;
@@ -96,12 +99,19 @@ void MenuAnim::setMinimumSize(QSize size)
 		min_width = size.width();
 }
 
+bool MenuAnim::animInProgress() const
+{
+	return animInProg;
+}
+
 void MenuAnim::closeAnimFinished()
 {
+	animInProg = false;
 	Q_EMIT finished(false);
 }
 
 void MenuAnim::openAnimFinished()
 {
+	animInProg = false;
 	Q_EMIT finished(true);
 }

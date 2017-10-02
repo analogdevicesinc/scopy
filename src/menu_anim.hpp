@@ -36,6 +36,7 @@ namespace adiscope {
 		~MenuAnim() {}
 
 		void setMinimumSize(QSize size);
+		bool animInProgress() const;
 
 	Q_SIGNALS:
 		void finished(bool opened);
@@ -51,6 +52,7 @@ namespace adiscope {
 		QPropertyAnimation close_anim_max, close_anim_min,
 				   open_anim_max, open_anim_min;
 		int min_width;
+		bool animInProg;
 	};
 }
 
