@@ -380,6 +380,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 				-25,
 				25);
 
+	plot.setOffsetInterval(-25, 25);
+
 	ch_ui = new Ui::ChannelSettings();
 	ch_ui->setupUi(ui->channelSettings);
 

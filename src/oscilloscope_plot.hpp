@@ -99,6 +99,9 @@ namespace adiscope {
 		std::shared_ptr<MeasurementData> measurement(int id, int chnIdx);
 
 		OscPlotZoomer* getZoomer();
+		void setOffsetInterval(double minValue, double maxValue);
+		double getMaxOffsetValue();
+		double getMinOffsetValue();
 
 	Q_SIGNALS:
 		void timeTriggerValueChanged(double);
@@ -207,6 +210,7 @@ namespace adiscope {
 	        QList<Measure *> d_measureObjs;
 
 		double value_v1, value_v2, value_h1, value_h2;
+		double d_minOffsetValue, d_maxOffsetValue;
 	};
 }
 

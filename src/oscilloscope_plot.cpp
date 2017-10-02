@@ -653,6 +653,26 @@ void CapturePlot::onChannelAdded(int chnIdx)
 			chOffsetHdl->setPositionSilenty(pos);
 		});
 
+	connect(chOffsetHdl, &RoundedHandleV::mouseReleased,
+		[=](){
+			int chn_id = d_offsetHandles.indexOf(chOffsetHdl);
+			int offset = this->VertOffset(chn_id);
+			if (offset > d_maxOffsetValue){
+				offset = d_maxOffsetValue;
+				this->setVertOffset(offset, chn_id);
+				this->replot();
+
+				Q_EMIT channelOffsetChanged(offset);
+			}
+			if (offset < d_minOffsetValue){
+				offset = d_minOffsetValue;
+				this->setVertOffset(offset, chn_id);
+				this->replot();
+
+				Q_EMIT channelOffsetChanged(offset);
+			}
+	});
+
 	/* Add Measure ojbect that handles all channel measurements */
 	Measure *measure = new Measure(chnIdx, d_ydata[chnIdx],
 		Curve(chnIdx)->data()->size());
@@ -757,6 +777,22 @@ std::shared_ptr<MeasurementData> CapturePlot::measurement(int id, int chnIdx)
 OscPlotZoomer *CapturePlot::getZoomer()
 {
 	return static_cast<OscPlotZoomer* >(d_zoomer);
+}
+
+void CapturePlot::setOffsetInterval(double minValue, double maxValue)
+{
+	d_minOffsetValue = minValue;
+	d_maxOffsetValue = maxValue;
+}
+
+double CapturePlot::getMaxOffsetValue()
+{
+	return d_maxOffsetValue;
+}
+
+double CapturePlot::getMinOffsetValue()
+{
+	return d_minOffsetValue;
 }
 
 void CapturePlot::setPeriodDetectLevel(int chnIdx, double lvl)
