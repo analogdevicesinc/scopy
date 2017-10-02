@@ -89,7 +89,6 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	triggerUpdater(new StateUpdater(250, this)),
 	current_channel(-1), math_chn_counter(0),
 	channels_group(new QButtonGroup(this)),
-	active_settings_btn(nullptr),
 	zoom_level(0)
 {
 	ui->setupUi(this);
@@ -1608,13 +1607,12 @@ void adiscope::Oscilloscope::toggleRightMenu(CustomPushButton *btn, bool checked
 {
 	int id = btn->property("id").toInt();
 
-	active_settings_btn = static_cast<CustomPushButton *>(btn);
 	if (id != -ui->stackedWidget->indexOf(ui->generalSettings)){
-		if (!menuOrder.contains(active_settings_btn)){
-			menuOrder.push_back(active_settings_btn);
+		if (!menuOrder.contains(btn)){
+			menuOrder.push_back(btn);
 		} else {
-			menuOrder.removeOne(active_settings_btn);
-			menuOrder.push_back(active_settings_btn);
+			menuOrder.removeOne(btn);
+			menuOrder.push_back(btn);
 		}
 	}
 

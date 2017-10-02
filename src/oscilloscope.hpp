@@ -252,7 +252,6 @@ namespace adiscope {
 
 		QButtonGroup *channels_group; // selected state of each channel
 
-		CustomPushButton *active_settings_btn;
 		QPushButton *menuRunButton;
 
 		QList<Channel_API *> channels_api;
