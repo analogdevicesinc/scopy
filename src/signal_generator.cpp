@@ -719,17 +719,27 @@ void adiscope::SignalGenerator::channelWidgetEnabled(bool en)
 	run_button->setEnabled(enable_run);
 }
 
+void adiscope::SignalGenerator::triggerRightMenuToggle(int chIdx, bool checked)
+{
+	// Queue the action, if right menu animation is in progress. This way
+	// the action will be remembered and performed right after the animation
+	// finishes
+	if (ui->rightMenu->animInProgress()) {
+		menuButtonActions.enqueue(
+			QPair<int, bool>(chIdx, checked));
+	} else {
+		updateAndToggleMenu(chIdx, checked);
+	}
+}
+
 void adiscope::SignalGenerator::channelWidgetMenuToggled(bool checked)
 {
 	ChannelWidget *cw = static_cast<ChannelWidget *>(QObject::sender());
 
 	currentChannel = cw->id();
-
-	if (checked)
-		renameConfigPanel();
-
 	plot->setActiveVertAxis(cw->id());
-	ui->rightMenu->toggleMenu(checked);
+
+	triggerRightMenuToggle(cw->id(), checked);
 }
 
 void adiscope::SignalGenerator::renameConfigPanel()
@@ -755,34 +765,55 @@ int SignalGenerator::sg_waveform_to_idx(enum sg_waveform wave)
 	}
 }
 
+void SignalGenerator::updateRightMenuForChn(int chIdx)
+{
+	auto ptr = getData(channels[chIdx]);
+
+	ui->constantValue->setValue(ptr->constant);
+	ui->frequency->setValue(ptr->frequency);
+	ui->offset->setValue(ptr->offset);
+	ui->amplitude->setValue(ptr->amplitude);
+	ui->phase->setValue(ptr->phase);
+	ui->label_path->setText(ptr->file);
+	ui->mathWidget->setFunction(ptr->function);
+	ui->mathFrequency->setValue(ptr->math_freq);
+
+	if (!ptr->file.isNull()) {
+		auto info = QFileInfo(ptr->file);
+		ui->label_size->setText(QString("%1 ").arg(
+					info.size() / sizeof(float))
+				+ tr("samples"));
+	} else {
+		ui->label_size->setText("");
+	}
+
+	ui->type->setCurrentIndex(sg_waveform_to_idx(ptr->waveform));
+
+	renameConfigPanel();
+	ui->tabWidget->setCurrentIndex((int) ptr->type);
+}
+
+void SignalGenerator::updateAndToggleMenu(int chIdx, bool open)
+{
+	if (open)
+		updateRightMenuForChn(chIdx);
+
+	ui->rightMenu->toggleMenu(open);
+}
+
 void adiscope::SignalGenerator::rightMenuFinished(bool opened)
 {
-	if (!opened && !!settings_group->checkedButton()) {
-		auto ptr = getCurrentData();
+	Q_UNUSED(opened)
 
-		ui->constantValue->setValue(ptr->constant);
-		ui->frequency->setValue(ptr->frequency);
-		ui->offset->setValue(ptr->offset);
-		ui->amplitude->setValue(ptr->amplitude);
-		ui->phase->setValue(ptr->phase);
-		ui->label_path->setText(ptr->file);
-		ui->mathWidget->setFunction(ptr->function);
-		ui->mathFrequency->setValue(ptr->math_freq);
+	// At the end of each animation, check if there are other button check
+	// actions that might have happened while animating and execute all
+	// these queued actions
+	while (menuButtonActions.size()) {
+		auto pair = menuButtonActions.dequeue();
+		int chIdx = pair.first;
+		bool open = pair.second;
 
-		if (!ptr->file.isNull()) {
-			auto info = QFileInfo(ptr->file);
-			ui->label_size->setText(QString("%1 ").arg(
-						info.size() / sizeof(float))
-					+ tr("samples"));
-		} else {
-			ui->label_size->setText("");
-		}
-
-		ui->type->setCurrentIndex(sg_waveform_to_idx(ptr->waveform));
-
-		renameConfigPanel();
-		ui->tabWidget->setCurrentIndex((int) ptr->type);
-		ui->rightMenu->toggleMenu(true);
+		updateAndToggleMenu(chIdx, open);
 	}
 }
 

@@ -28,6 +28,7 @@
 #include <QTreeWidgetItem>
 #include <QSharedPointer>
 #include <QWidget>
+#include <QQueue>
 
 #include "apiObject.hpp"
 #include "filter.hpp"
@@ -100,6 +101,7 @@ namespace adiscope {
 		unsigned long sample_rate;
 
 		QButtonGroup *settings_group;
+		QQueue<QPair<int, bool>> menuButtonActions;
 
 		QVector<struct iio_buffer *> buffers;
 		QVector<ChannelWidget *> channels;
@@ -114,7 +116,9 @@ namespace adiscope {
 		void stop();
 
 		void updatePreview();
-		void toggleRightMenu(QPushButton *btn);
+		void updateRightMenuForChn(int chIdx);
+		void updateAndToggleMenu(int chIdx, bool open);
+		void triggerRightMenuToggle(int chIdx, bool checked);
 
 		gr::basic_block_sptr getSignalSource(
 				gr::top_block_sptr top,
