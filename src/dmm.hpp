@@ -28,7 +28,11 @@
 #include "iio_manager.hpp"
 #include "signal_sample.hpp"
 #include "tool.hpp"
+#include "scroll_filter.hpp"
 #include <thread>
+#include "spinbox_a.hpp"
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/condition_variable.hpp>
 
 namespace Ui {
 	class DMM;
@@ -61,10 +65,18 @@ namespace adiscope {
 		std::shared_ptr<GenericAdc> adc;
 		boost::shared_ptr<signal_sample> signal;
 		unsigned long sample_rate;
+
 		std::atomic<bool> interrupt_data_logging;
 		std::atomic<bool> data_logging;
 		QString filename;
 		std::thread data_logging_thread;
+		bool use_timer;
+		unsigned long logging_refresh_rate;
+		PositionSpinButton *data_logging_timer;
+
+		boost::mutex data_mutex;
+		boost::condition_variable data_cond;
+		MouseWheelWidgetGuard *wheelEventGuard;
 
 		void disconnectAll();
 		gr::basic_block_sptr configureGraph(gr::basic_block_sptr s2f,
@@ -89,6 +101,8 @@ namespace adiscope {
 		void startDataLogging(bool);
 
 		void dataLoggingThread();
+
+		void chooseFile();
 	};
 
 	class DMM_API : public ApiObject
