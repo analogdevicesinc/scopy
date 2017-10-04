@@ -1988,6 +1988,20 @@ void Oscilloscope::measure_panel_init()
 	measurePanel = new QWidget(this);
 	measure_panel_ui = new Ui::MeasurementsPanel();
 	measure_panel_ui->setupUi(measurePanel);
+
+	connect(measure_panel_ui->scrollArea->horizontalScrollBar(), &QScrollBar::rangeChanged,
+		measure_panel_ui->scrollArea_2->horizontalScrollBar(), &QScrollBar::setRange);
+
+	connect(measure_panel_ui->scrollArea_2->horizontalScrollBar(), &QScrollBar::valueChanged,
+		measure_panel_ui->scrollArea->horizontalScrollBar(), &QScrollBar::setValue);
+	connect(measure_panel_ui->scrollArea->horizontalScrollBar(), &QScrollBar::valueChanged,
+		measure_panel_ui->scrollArea_2->horizontalScrollBar(), &QScrollBar::setValue);
+
+	connect(measure_panel_ui->scrollArea->horizontalScrollBar(), &QScrollBar::rangeChanged,
+		[=](double v1, double v2){
+		measure_panel_ui->scrollArea_2->widget()->setFixedWidth(measure_panel_ui->scrollAreaWidgetContents->width());
+	});
+
 	measurePanel->hide();
 
 	connect(&plot, SIGNAL(measurementsAvailable()),
