@@ -61,7 +61,7 @@ CapturePlot::CapturePlot(QWidget *parent,
 	d_sampleRateLabelVal(1.0)
 {
 
-	setMinimumHeight(300);
+	setMinimumHeight(250);
 	setMinimumWidth(500);
 
 	/* Initial colors scheme */
