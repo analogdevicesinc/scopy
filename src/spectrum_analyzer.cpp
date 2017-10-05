@@ -158,6 +158,8 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	settings_group->setExclusive(true);
 
 	fft_plot = new FftDisplayPlot(num_adc_channels, this);
+	fft_plot->canvas()->setStyleSheet(QString("QwtPlotCanvas { "
+		"background-color: #141416; }"));
 	fft_plot->disableLegend();
 	fft_plot->setAxisScale(QwtPlot::yLeft, -200, 0, 10);
 	// Disable mouse interactions with the axes until they are in a working state
