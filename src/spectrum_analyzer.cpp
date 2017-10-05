@@ -1084,7 +1084,7 @@ SpectrumChannel::SpectrumChannel(int id, const QString& name,
 
 bool SpectrumChannel::isSettingsOn() const
 {
-	return m_widget->enableButton()->isChecked();
+	return m_widget->menuButton()->isChecked();
 }
 
 void SpectrumChannel::setSettingsOn(bool on)
