@@ -89,7 +89,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	triggerUpdater(new StateUpdater(250, this)),
 	current_channel(-1), math_chn_counter(0),
 	channels_group(new QButtonGroup(this)),
-	zoom_level(0)
+	zoom_level(0),
+	current_ch_widget(-1)
 {
 	ui->setupUi(this);
 	int triggers_panel = ui->stackedWidget->insertWidget(-1, &trigger_settings);
@@ -485,8 +486,10 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 
 	if (m2k_adc) {
 		int crt_chn_copy = current_channel;
+		int crt_chn_w_copy = current_ch_widget;
 		for (int i = 0; i < nb_channels; i++) {
 			current_channel = i;
+			current_ch_widget = i;
 			updateGainMode();
 
 			auto adc_range = m2k_adc->inputRange(
@@ -500,6 +503,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 			trigger_settings.setTriggerHystStep(i, vscale / 10);
 		}
 		current_channel = crt_chn_copy;
+		current_ch_widget = crt_chn_w_copy;
 	}
 
 	connect(plot.getZoomer(), &OscPlotZoomer::zoomIn, [=](){
@@ -1082,6 +1086,11 @@ void Oscilloscope::setFFT_params(bool force)
 	}
 }
 
+void Oscilloscope::setChannelWidgetIndex(int chnIdx)
+{
+	current_ch_widget = chnIdx;
+}
+
 void Oscilloscope::onFFT_view_toggled(bool visible)
 {
 	/* Lock the flowgraph if we are already started */
@@ -1401,6 +1410,7 @@ void adiscope::Oscilloscope::onChannelWidgetSelected(bool checked)
 		current_channel = id;
 		Q_EMIT selectedChannelChanged(id);
 	}
+
 	if (plot.measurementsEnabled()) {
 		update_measure_for_channel(id);
 	}
@@ -1410,15 +1420,17 @@ void adiscope::Oscilloscope::onChannelWidgetMenuToggled(bool checked)
 {
 	ChannelWidget *cw = static_cast<ChannelWidget *>(QObject::sender());
 
+	current_ch_widget = cw->id();
+
 	triggerRightMenuToggle(
 		static_cast<CustomPushButton *>(cw->menuButton()), checked);
 }
 
 void adiscope::Oscilloscope::onVertScaleValueChanged(double value)
 {
-	if (value != plot.VertUnitsPerDiv(current_channel)
+	if (value != plot.VertUnitsPerDiv(current_ch_widget)
 			|| !zoom_level) {
-		plot.setVertUnitsPerDiv(value, current_channel);
+		plot.setVertUnitsPerDiv(value, current_ch_widget);
 		plot.replot();
 		if (zoom_level == 0)
 			plot.zoomBaseUpdate();
@@ -1426,7 +1438,7 @@ void adiscope::Oscilloscope::onVertScaleValueChanged(double value)
 	voltsPosition->setStep(value / 10);
 
 	// TO DO: refactor this once the source of the X and Y axes can be configured
-	if (current_channel == 0) {
+	if (current_ch_widget == 0) {
 		xy_plot.setHorizUnitsPerDiv(value);
 	} else {
 		xy_plot.setVertUnitsPerDiv(value, QwtPlot::yLeft);
@@ -1434,24 +1446,24 @@ void adiscope::Oscilloscope::onVertScaleValueChanged(double value)
 	xy_plot.replot();
 	xy_plot.zoomBaseUpdate();
 
-	if (current_channel < adc->getTrigger()->numChannels()) {
-		trigger_settings.setTriggerLevelStep(current_channel, value);
-		trigger_settings.setTriggerHystStep(current_channel, value / 10);
+	if (current_ch_widget < adc->getTrigger()->numChannels()) {
+		trigger_settings.setTriggerLevelStep(current_ch_widget, value);
+		trigger_settings.setTriggerHystStep(current_ch_widget, value / 10);
 	}
 
 	// Send scale information to the measure object
-	plot.setPeriodDetectHyst(current_channel, value / 5);
+	plot.setPeriodDetectHyst(current_ch_widget, value / 5);
 
 	QLabel *label = static_cast<QLabel *>(
-			ui->chn_scales->itemAt(current_channel)->widget());
+			ui->chn_scales->itemAt(current_ch_widget)->widget());
 	label->setText(vertMeasureFormat.format(value, "V/div", 3));
 
 	// Switch between high and low gain modes only for the M2K channels
-	if (m2k_adc && current_channel < nb_channels) {
+	if (m2k_adc && current_ch_widget < nb_channels) {
 		updateGainMode();
-		setChannelHwOffset(current_channel,
+		setChannelHwOffset(current_ch_widget,
 			voltsPosition->value());
-		trigger_settings.updateHwVoltLevels(current_channel);
+		trigger_settings.updateHwVoltLevels(current_ch_widget);
 	}
 }
 
@@ -1519,20 +1531,20 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 
 void adiscope::Oscilloscope::onVertOffsetValueChanged(double value)
 {
-	if (value != -plot.VertOffset(current_channel)) {
-		plot.setVertOffset(-value, current_channel);
+	if (value != -plot.VertOffset(current_ch_widget)) {
+		plot.setVertOffset(-value, current_ch_widget);
 		plot.replot();
 	}
 
 	// Switch between high and low gain modes only for the M2K channels
-	if (m2k_adc && current_channel < nb_channels) {
+	if (m2k_adc && current_ch_widget < nb_channels) {
 		if (ui->pushButtonRunStop->isChecked())
 			toggle_blockchain_flow(false);
 
 		updateGainMode();
-		setChannelHwOffset(current_channel, value);
+		setChannelHwOffset(current_ch_widget, value);
 
-		trigger_settings.updateHwVoltLevels(current_channel);
+		trigger_settings.updateHwVoltLevels(current_ch_widget);
 
 		if (ui->pushButtonRunStop->isChecked())
 			toggle_blockchain_flow(true);
@@ -1677,7 +1689,7 @@ void Oscilloscope::settings_panel_size_adjust()
 
 void Oscilloscope::onChannelOffsetChanged(double value)
 {
-	voltsPosition->setValue(-plot.VertOffset(current_channel));
+	voltsPosition->setValue(-plot.VertOffset(current_ch_widget));
 }
 
 ChannelWidget * Oscilloscope::channelWidgetAtId(int id)
@@ -2270,49 +2282,49 @@ void Oscilloscope::updateGainMode()
 {
 	QwtInterval hw_input_itv(-2.5, 2.5);
 	QwtInterval plot_vert_itv = plot.axisScaleDiv(
-		QwtAxisId(QwtPlot::yLeft, current_channel)).interval();
+		QwtAxisId(QwtPlot::yLeft, current_ch_widget)).interval();
 
 	// If max signal span that can be captured is smaller than the plot
 	// screen try to increase the range (switch to low gain mode)
 	if (plot_vert_itv.minValue() < hw_input_itv.minValue() ||
 		plot_vert_itv.maxValue() > hw_input_itv.maxValue()) {
-		if (high_gain_modes[current_channel]) {
-			high_gain_modes[current_channel] = false;
+		if (high_gain_modes[current_ch_widget]) {
+			high_gain_modes[current_ch_widget] = false;
 			bool running = ui->pushButtonRunStop->isChecked();
 
 			if (running)
 				toggle_blockchain_flow(false);
-			setGainMode(current_channel, M2kAdc::LOW_GAIN_MODE);
+			setGainMode(current_ch_widget, M2kAdc::LOW_GAIN_MODE);
 			if (running)
 				toggle_blockchain_flow(true);
 
 			auto adc_range = m2k_adc->inputRange(
 					M2kAdc::LOW_GAIN_MODE);
-			trigger_settings.setTriggerLevelRange(current_channel,
+			trigger_settings.setTriggerLevelRange(current_ch_widget,
 				adc_range);
 			auto hyst_range = QPair<double, double>(
 				0, adc_range.second / 10);
-			trigger_settings.setTriggerHystRange(current_channel,
+			trigger_settings.setTriggerHystRange(current_ch_widget,
 				hyst_range);
 		}
 	} else {
-		if (!high_gain_modes[current_channel]) {
-			high_gain_modes[current_channel] = true;
+		if (!high_gain_modes[current_ch_widget]) {
+			high_gain_modes[current_ch_widget] = true;
 			bool running = ui->pushButtonRunStop->isChecked();
 
 			if (running)
 				toggle_blockchain_flow(false);
-			setGainMode(current_channel, M2kAdc::HIGH_GAIN_MODE);
+			setGainMode(current_ch_widget, M2kAdc::HIGH_GAIN_MODE);
 			if (running)
 				toggle_blockchain_flow(true);
 
 			auto adc_range = m2k_adc->inputRange(
 					M2kAdc::LOW_GAIN_MODE);
-			trigger_settings.setTriggerLevelRange(current_channel,
+			trigger_settings.setTriggerLevelRange(current_ch_widget,
 				adc_range);
 			auto hyst_range = QPair<double, double>(
 				0, adc_range.second / 10);
-			trigger_settings.setTriggerHystRange(current_channel,
+			trigger_settings.setTriggerHystRange(current_ch_widget,
 				hyst_range);
 		}
 	}
@@ -2773,8 +2785,8 @@ void Oscilloscope::channelLineWidthChanged(int id)
 {
 	qreal width = 0.5 * (id + 1);
 
-	if (width != plot.getLineWidthF(current_channel)) {
-		plot.setLineWidthF(current_channel, width);
+	if (width != plot.getLineWidthF(current_ch_widget)) {
+		plot.setLineWidthF(current_ch_widget, width);
 		plot.replot();
 	}
 }
@@ -2789,6 +2801,8 @@ void Oscilloscope_API::setCurrentChannel(int chn_id)
 	ChannelWidget *chn_widget = osc->channelWidgetAtId(chn_id);
 	if (!chn_widget)
 		return;
+
+	osc->setChannelWidgetIndex(chn_id);
 
 	chn_widget->nameButton()->setChecked(true);
 }
