@@ -879,6 +879,11 @@ void Oscilloscope::onChannelWidgetDeleteClicked()
 	QString qname = delBtn->property("curve_name").toString();
 	unsigned int curve_id = cw->id();
 
+	if (curve_id == current_ch_widget &&
+			cw->menuButton()->isChecked())
+		triggerRightMenuToggle(static_cast<CustomPushButton*>(cw->menuButton()), false);
+	menuOrder.removeOne(static_cast<CustomPushButton*>(cw->menuButton()));
+
 	bool allChannelsDisabled = true;
 	for (unsigned int i = nb_channels;
 			i < nb_channels + nb_math_channels; i++) {
@@ -964,6 +969,9 @@ void Oscilloscope::onChannelWidgetDeleteClicked()
 				QwtAxisId(QwtPlot::xBottom, 0),
 				QwtAxisId(QwtPlot::yLeft, i));
 	}
+
+	if (current_ch_widget > nb_channels + nb_math_channels - 1)
+		current_ch_widget = current_ch_widget - 1;
 
 	updateRunButton(false);
 	plot.replot();
