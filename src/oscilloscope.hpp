@@ -248,6 +248,7 @@ namespace adiscope {
 		TimePrefixFormatter horizMeasureFormat;
 
 		int current_channel;
+		int current_ch_widget;
 		unsigned int math_chn_counter;
 
 		QButtonGroup *channels_group; // selected state of each channel
@@ -303,6 +304,7 @@ namespace adiscope {
 		void pause(bool paused);
 		void cursor_panel_init();
 		void setFFT_params(bool force=false);
+		void setChannelWidgetIndex(int chnIdx);
 	};
 
 	class Oscilloscope_API : public ApiObject
