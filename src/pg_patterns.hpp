@@ -215,6 +215,7 @@ class ClockPatternUI : public PatternUI
 	ScaleSpinButton *frequencySpinButton;
 	PhaseSpinButton *phaseSpinButton;
 	PositionSpinButton *dutySpinButton;
+	double requestedFrequency,requestedDuty,requestedPhase;
 public:
 	ClockPatternUI(ClockPattern *pattern, QWidget *parent = 0);
 	virtual ~ClockPatternUI();

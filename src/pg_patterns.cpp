@@ -492,6 +492,9 @@ void ClockPatternUI::build_ui(QWidget *parent,uint16_t number_of_channels)
 {
 	parent_ = parent;
 	parent->layout()->addWidget(this);
+	requestedFrequency=pattern->get_frequency();
+	requestedPhase=pattern->get_phase();
+	requestedDuty=pattern->get_duty_cycle();
 	frequencySpinButton->setValue(pattern->get_frequency());
 	phaseSpinButton->setValue(pattern->get_phase());
 	dutySpinButton->setValue(pattern->get_duty_cycle());
@@ -512,17 +515,31 @@ void ClockPatternUI::parse_ui()
 	bool ok =0;
 
 
-	/*auto freq=frequencySpinButton->value();
-	freq=(freq*PGMaxSampleRate)/(int)PGMaxSampleRate;*/
-	//freq=ceil(freq*100)/100;
-	//frequencySpinButton->setValue(freq);
-	pattern->set_frequency(frequencySpinButton->value());
+	QObject* obj = sender();
+	if(obj==frequencySpinButton)
+	{
+		requestedFrequency = frequencySpinButton->value();
+	}
+	if(obj==phaseSpinButton)
+	{
+		requestedPhase=phaseSpinButton->value();
+	}
+	if(obj==dutySpinButton)
+	{
+		requestedDuty=dutySpinButton->value();
+	}
+
+	auto freq=requestedFrequency;//frequencySpinButton->value();
+	freq=(PGMaxSampleRate)/(PGMaxSampleRate/(long)freq);
+	freq=ceil(freq*100)/100;
+	frequencySpinButton->setValue(freq);
+	pattern->set_frequency(freq);
 
 
 	auto dutystep=100.0/ (PGMaxSampleRate / pattern->get_frequency());
 	dutystep=(dutystep>1 ? dutystep : 1);
 	dutystep=floor(dutystep*100+0.5)/100.0;
-	auto dutyval = dutySpinButton->value();
+	auto dutyval = requestedDuty;//dutySpinButton->value();
 	dutyval=floor((dutyval/dutystep) +0.5)*dutystep;
 
 	dutySpinButton->blockSignals(true);
@@ -533,12 +550,12 @@ void ClockPatternUI::parse_ui()
 
 
 	auto phasestep=360.0/ (PGMaxSampleRate / pattern->get_frequency());
-	auto phaseval = phaseSpinButton->value();
+	auto phaseval = requestedPhase;//phaseSpinButton->value();
 
-	/*phaseSpinButton->blockSignals(true);
+	phaseSpinButton->blockSignals(true);
 	phaseSpinButton->setStep(phasestep>15 ? phasestep : 15);
 	phaseSpinButton->setValue(floor(phaseval/phasestep)*phasestep);
-	phaseSpinButton->blockSignals(false);*/
+	phaseSpinButton->blockSignals(false);
 	pattern->set_phase(phaseSpinButton->value());
 	Q_EMIT patternParamsChanged();
 
