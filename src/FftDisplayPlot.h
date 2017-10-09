@@ -81,6 +81,7 @@ namespace adiscope {
 	private:
 		double* x_data;
 		std::vector<double*> y_data;
+		std::vector<double*> y_original_data;
 
 		std::vector<double> y_scale_factor;
 
@@ -111,6 +112,10 @@ namespace adiscope {
 				uint64_t num_points);
 		void _resetXAxisPoints();
 
+		void resetAverages();
+		void averageDataAndComputeMagnitude(std::vector<double *>
+			in_data, std::vector<double *> out_data,
+			uint64_t nb_points);
 		average_sptr getNewAvgObject(enum AverageType avg_type,
 			uint data_width, uint history);
 
@@ -122,6 +127,7 @@ namespace adiscope {
 		void calculate_fixed_markers(int chn);
 		int getMarkerPos(const QList<marker>& marker_list,
 			 std::shared_ptr<SpectrumMarker> marker) const;
+		void detectMarkers();
 
 	private Q_SLOTS:
 		void onMrkCtrlMarkerSelected(std::shared_ptr<SpectrumMarker>);
@@ -177,6 +183,7 @@ namespace adiscope {
 
 		void selectMarker(uint chIdx, uint mkIdx);
 
+		void recalculateMagnitudes();
 		void replot();
 		void setZoomerEnabled();
 		double sampleRate();

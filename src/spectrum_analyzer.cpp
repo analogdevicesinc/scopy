@@ -1048,6 +1048,8 @@ void SpectrumAnalyzer::on_cmb_units_currentIndexChanged(const QString& unit)
 		return;
 
 	fft_plot->setMagnitudeType((*it).second);
+	fft_plot->recalculateMagnitudes();
+	fft_plot->replot();
 
 	ui->lblMagUnit->setText(unit);
 }

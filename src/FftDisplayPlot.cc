@@ -84,6 +84,7 @@ FftDisplayPlot::FftDisplayPlot(int nplots, QWidget *parent) :
 
 		d_plot_curve.push_back(plot);
 		y_data.push_back(nullptr);
+		y_original_data.push_back(nullptr);
 
 		d_ch_average_type.push_back(AverageType::SAMPLE);
 
@@ -154,6 +155,8 @@ FftDisplayPlot::~FftDisplayPlot()
 	for (unsigned int i = 0; i < d_nplots; i++) {
 		if (y_data[i])
 			delete[] y_data[i];
+		if (y_original_data[i])
+			delete[] y_original_data[i];
 	}
 }
 
@@ -225,8 +228,11 @@ void FftDisplayPlot::plotData(const std::vector<double *> pts,
 		for (unsigned int i = 0; i < d_nplots; i++) {
 			if (y_data[i])
 				delete[] y_data[i];
+			if (y_original_data[i])
+				delete[] y_original_data[i];
 
 			y_data[i] = new double[halfNumPoints];
+			y_original_data[i] = new double[halfNumPoints];
 
 #if QWT_VERSION < 0x060000
 			d_plot_curve[i]->setRawData(x_data,
@@ -252,62 +258,19 @@ void FftDisplayPlot::plotData(const std::vector<double *> pts,
 		}
 	}
 
-	if (magTypeChanged) {
-		// When the magnitude type changes, we reset the data that is
-		// being stored in the average objects
-		for (int i = 0; i < d_ch_avg_obj.size(); i++) {
-			if (!d_ch_avg_obj[i])
-				continue;
-
-			d_ch_avg_obj[i]->reset();
-		}
-	}
-
+	// We store the received data before touching it
 	for (unsigned int i = 0; i < d_nplots; i++) {
-		bool needs_dB_avg = false;
-
-		switch (d_ch_average_type[i]) {
-		case LINEAR_DB:
-			needs_dB_avg = true;
-		case EXPONENTIAL_DB:
-			needs_dB_avg = true;
-		case SAMPLE:
-			memcpy(y_data[i], pts[i],
+		memcpy(y_original_data[i], pts[i],
 				halfNumPoints * sizeof(double));
-			break;
-		default:
-			d_ch_avg_obj[i]->pushNewData(pts[i]);
-			d_ch_avg_obj[i]->getAverage(y_data[i], halfNumPoints);
-			break;
-		}
-
-		for (int s = 0; s < halfNumPoints; s++) {
-			//dB Full-Scale
-			switch (d_magType) {
-			case DBFS:
-				y_data[i][s] = 10 * log10((y_data[i][s] / (2048 * 2048)) /
-					(halfNumPoints * halfNumPoints));
-				break;
-			case DBV:
-				y_data[i][s] = 10 * log10(y_data[i][s]) +
-					20 * log10(y_scale_factor[i]) -
-					20 * log10(halfNumPoints) -
-					20 * log10(sqrt(2));
-				break;
-			case DBU:
-				y_data[i][s] = 10 * log10(y_data[i][s]) +
-					20 * log10(y_scale_factor[i]) -
-					20 * log10(halfNumPoints) -
-					20 * log10(sqrt(2) * 0.77459667);
-				break;
-			};
-		}
-
-		if (needs_dB_avg) {
-			d_ch_avg_obj[i]->pushNewData(y_data[i]);
-			d_ch_avg_obj[i]->getAverage(y_data[i], halfNumPoints);
-		}
 	}
+
+	// When the magnitude type changes, we reset the data that is
+	// being stored in the average objects
+	if (magTypeChanged) {
+		resetAverageHistory();
+	}
+
+	averageDataAndComputeMagnitude(y_original_data, y_data, halfNumPoints);
 
 	_resetXAxisPoints();
 
@@ -347,17 +310,64 @@ void FftDisplayPlot::plotData(const std::vector<double *> pts,
 		}
 	}
 
-	for (int i = 0; i < d_nplots; i++) {
-		calculate_fixed_markers(i);
-		findPeaks(i);
-
-		if (d_emitNewMkrData)
-			Q_EMIT newMarkerData();
-	}
-
+	detectMarkers();
 	replot();
 
 	Q_EMIT newData();
+}
+
+void FftDisplayPlot::averageDataAndComputeMagnitude(std::vector<double *>
+	in_data, std::vector<double *> out_data, uint64_t nb_points)
+{
+	std::vector<double *> source;
+
+	for (unsigned int i = 0; i < d_nplots; i++) {
+		bool needs_dB_avg = false;
+
+		switch (d_ch_average_type[i]) {
+		case LINEAR_DB:
+			needs_dB_avg = true;
+		case EXPONENTIAL_DB:
+			needs_dB_avg = true;
+		case SAMPLE:
+			source = in_data;
+			break;
+		default: // For all the other averaging types do the averaging
+			// before converting to dB
+			d_ch_avg_obj[i]->pushNewData(in_data[i]);
+			d_ch_avg_obj[i]->getAverage(out_data[i], nb_points);
+			source = out_data;
+			break;
+		}
+
+		for (int s = 0; s < nb_points; s++) {
+			//dB Full-Scale
+			switch (d_magType) {
+			case DBFS:
+				out_data[i][s] = 10 * log10((source[i][s] /
+					(2048 * 2048)) /
+					(nb_points * nb_points));
+				break;
+			case DBV:
+				out_data[i][s] = 10 * log10(source[i][s]) +
+					20 * log10(y_scale_factor[i]) -
+					20 * log10(nb_points) -
+					20 * log10(sqrt(2));
+				break;
+			case DBU:
+				out_data[i][s] = 10 * log10(source[i][s]) +
+					20 * log10(y_scale_factor[i]) -
+					20 * log10(nb_points) -
+					20 * log10(sqrt(2) * 0.77459667);
+				break;
+			};
+		}
+
+		if (needs_dB_avg) {
+			d_ch_avg_obj[i]->pushNewData(out_data[i]);
+			d_ch_avg_obj[i]->getAverage(out_data[i], nb_points);
+		}
+	}
 }
 
 void FftDisplayPlot::_resetXAxisPoints()
@@ -1050,4 +1060,33 @@ FftDisplayPlot::MagnitudeType FftDisplayPlot::magnitudeType() const
 void FftDisplayPlot::setMagnitudeType(enum MagnitudeType type)
 {
 	d_presetMagType = type;
+}
+
+/*
+ * This can be used to make the plot recalculate the spectrum magnitude
+ */
+void FftDisplayPlot::recalculateMagnitudes()
+{
+	if (d_presetMagType != d_magType) {
+		d_magType = d_presetMagType;
+		resetAverageHistory();
+	}
+	averageDataAndComputeMagnitude(y_original_data, y_data, d_numPoints);
+	detectMarkers();
+
+	Q_EMIT newData();
+}
+
+/*
+ * Does all the work for detecting the enabled markers
+ */
+void FftDisplayPlot::detectMarkers()
+{
+	for (int i = 0; i < d_nplots; i++) {
+		calculate_fixed_markers(i);
+		findPeaks(i);
+
+		if (d_emitNewMkrData)
+			Q_EMIT newMarkerData();
+	}
 }
