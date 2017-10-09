@@ -63,7 +63,12 @@ namespace adiscope {
 			EXPONENTIAL_DB = 8,
 		};
 
-	public:
+		enum MagnitudeType {
+			DBFS = 0,
+			DBV = 1,
+			DBU = 2,
+		};
+
 		enum MarkerType {
 			MANUAL = 0,
 			PEAK = 1,
@@ -77,6 +82,8 @@ namespace adiscope {
 		double* x_data;
 		std::vector<double*> y_data;
 
+		std::vector<double> y_scale_factor;
+
 		double d_start_frequency;
 		double d_stop_frequency;
 		double d_sampl_rate;
@@ -87,6 +94,9 @@ namespace adiscope {
 
 		std::vector<enum AverageType> d_ch_average_type;
 		std::vector<average_sptr> d_ch_avg_obj;
+
+		enum MagnitudeType d_presetMagType;
+		enum MagnitudeType d_magType;
 
 		MarkerController *d_mrkCtrl;
 		QList<int> d_num_markers;
@@ -122,9 +132,17 @@ namespace adiscope {
 		explicit FftDisplayPlot(int nplots, QWidget *parent = nullptr);
 		~FftDisplayPlot();
 
+		// Scaling factors for plot samples (one per channel)
+		double channelScaleFactor(int chIdx) const;
+		void setScaleFactor(int chIdx, double scale);
+
 		int64_t posAtFrequency(double freq) const;
 		QString leftVerAxisUnit() const;
 		void setLeftVertAxisUnit(const QString& unit);
+
+		enum MagnitudeType magnitudeType() const;
+		void setMagnitudeType(enum MagnitudeType);
+
 		enum AverageType averageType(uint chIdx) const;
 		uint averageHistory(uint chIdx) const;
 		void setAverage(uint chIdx, enum AverageType avg_type,

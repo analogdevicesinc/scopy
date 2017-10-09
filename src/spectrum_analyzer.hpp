@@ -169,6 +169,8 @@ private:
 	gr::top_block_sptr top_block;
 
 	static std::vector<std::pair<QString,
+		FftDisplayPlot::MagnitudeType>> mag_types;
+	static std::vector<std::pair<QString,
 		FftDisplayPlot::AverageType>> avg_types;
 	static std::vector<std::pair<QString, FftWinType>> win_types;
 	static std::vector<QString> markerTypes;

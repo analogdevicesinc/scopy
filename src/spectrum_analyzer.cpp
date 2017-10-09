@@ -52,6 +52,13 @@
 using namespace adiscope;
 using namespace std;
 
+std::vector<std::pair<QString, FftDisplayPlot::MagnitudeType>>
+SpectrumAnalyzer::mag_types = {
+	{"dBFS", FftDisplayPlot::DBFS},
+	{"dBV", FftDisplayPlot::DBV},
+	{"dBu", FftDisplayPlot::DBU},
+};
+
 std::vector<std::pair<QString, FftDisplayPlot::AverageType>>
 SpectrumAnalyzer::avg_types = {
 	{"Sample", FftDisplayPlot::SAMPLE},
@@ -136,6 +143,13 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	// Hide Single and Preset buttons until functionality is added
 	ui->btnPreset->hide();
+
+	ui->cmb_units->blockSignals(true);
+	ui->cmb_units->clear();
+	for (auto it = mag_types.begin(); it != mag_types.end(); ++it) {
+		ui->cmb_units->addItem(it->first);
+	}
+	ui->cmb_units->blockSignals(false);
 
 	ui->comboBox_type->blockSignals(true);
 	ui->comboBox_type->clear();
@@ -380,19 +394,22 @@ void SpectrumAnalyzer::build_gnuradio_block_chain()
 		iio->lock();
 
 	bool canConvRawToVolts = (adc_name == "m2k-adc");
-
-	boost::shared_ptr<adc_sample_conv> adc_samp_conv;
 	if (canConvRawToVolts) {
 		auto m2k_adc = dynamic_pointer_cast<M2kAdc>(adc);
-		adc_samp_conv = gnuradio::get_initial_sptr(
-			new adc_sample_conv(num_adc_channels, m2k_adc));
 		for (int i = 0; i < adc->numAdcChannels(); i++) {
 			double corr_gain = 1.0;
+			double hw_gain = 1.0;
 
-			if (m2k_adc)
+			if (m2k_adc) {
 				corr_gain = m2k_adc->chnCorrectionGain(i);
+				hw_gain = m2k_adc->gainAt(
+					m2k_adc->chnHwGainMode(i));
+			}
 
-			adc_samp_conv->setCorrectionGain(i, corr_gain);
+			// Calculate the VLSB for current channel
+			double vlsb = adc_sample_conv::convSampleToVolts(1,
+				corr_gain, 1, 0, hw_gain);
+			fft_plot->setScaleFactor(i, vlsb);
 		}
 	}
 
@@ -1023,6 +1040,15 @@ void SpectrumAnalyzer::singleCaptureDone()
 
 void SpectrumAnalyzer::on_cmb_units_currentIndexChanged(const QString& unit)
 {
+	auto it = std::find_if(mag_types.begin(), mag_types.end(),
+		[&](const std::pair<QString, FftDisplayPlot::MagnitudeType>& p){
+			return p.first == unit;
+		});
+	if (it == mag_types.end())
+		return;
+
+	fft_plot->setMagnitudeType((*it).second);
+
 	ui->lblMagUnit->setText(unit);
 }
 

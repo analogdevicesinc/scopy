@@ -67,6 +67,7 @@ FftDisplayPlot::FftDisplayPlot(int nplots, QWidget *parent) :
 	d_stop_frequency(1000),
 	d_sampl_rate(1),
 	d_preset_sampl_rate(d_sampl_rate),
+	d_presetMagType(MagnitudeType::DBFS),
 	d_mrkCtrl(nullptr),
 	d_emitNewMkrData(true)
 {
@@ -93,6 +94,7 @@ FftDisplayPlot::FftDisplayPlot(int nplots, QWidget *parent) :
 		d_freq_asc_sorted_peaks.push_back(
 			QList<std::shared_ptr<marker_data>>());
 	}
+	y_scale_factor.resize(nplots);
 	d_ch_avg_obj.resize(nplots);
 
 	d_numPoints = 1024;
@@ -189,6 +191,7 @@ void FftDisplayPlot::plotData(const std::vector<double *> pts,
 	uint64_t halfNumPoints = num_points / 2;
 	bool numPointsChanged = false;
 	bool samplRateChanged = false;
+	bool magTypeChanged = false;
 
 	// Update sample rate if required
 	if (d_sampl_rate != d_preset_sampl_rate) {
@@ -198,6 +201,11 @@ void FftDisplayPlot::plotData(const std::vector<double *> pts,
 		samplRateChanged = true;
 
 		Q_EMIT sampleRateUpdated(d_sampl_rate);
+	}
+
+	if (d_magType != d_presetMagType) {
+		d_magType = d_presetMagType;
+		magTypeChanged = true;
 	}
 
 	if (d_stop || halfNumPoints == 0)
@@ -244,6 +252,17 @@ void FftDisplayPlot::plotData(const std::vector<double *> pts,
 		}
 	}
 
+	if (magTypeChanged) {
+		// When the magnitude type changes, we reset the data that is
+		// being stored in the average objects
+		for (int i = 0; i < d_ch_avg_obj.size(); i++) {
+			if (!d_ch_avg_obj[i])
+				continue;
+
+			d_ch_avg_obj[i]->reset();
+		}
+	}
+
 	for (unsigned int i = 0; i < d_nplots; i++) {
 		bool needs_dB_avg = false;
 
@@ -264,8 +283,24 @@ void FftDisplayPlot::plotData(const std::vector<double *> pts,
 
 		for (int s = 0; s < halfNumPoints; s++) {
 			//dB Full-Scale
-			y_data[i][s] = 10 * log10((y_data[i][s] / (2048 * 2048)) /
-				(halfNumPoints * halfNumPoints));
+			switch (d_magType) {
+			case DBFS:
+				y_data[i][s] = 10 * log10((y_data[i][s] / (2048 * 2048)) /
+					(halfNumPoints * halfNumPoints));
+				break;
+			case DBV:
+				y_data[i][s] = 10 * log10(y_data[i][s]) +
+					20 * log10(y_scale_factor[i]) -
+					20 * log10(halfNumPoints) -
+					20 * log10(sqrt(2));
+				break;
+			case DBU:
+				y_data[i][s] = 10 * log10(y_data[i][s]) +
+					20 * log10(y_scale_factor[i]) -
+					20 * log10(halfNumPoints) -
+					20 * log10(sqrt(2) * 0.77459667);
+				break;
+			};
 		}
 
 		if (needs_dB_avg) {
@@ -995,4 +1030,24 @@ int FftDisplayPlot::markerType(uint chIdx, uint mkIdx) const
 	}
 
 	return d_markers[chIdx][mkIdx].data->type;
+}
+
+double FftDisplayPlot::channelScaleFactor(int chIdx) const
+{
+	return y_scale_factor[chIdx];
+}
+
+void FftDisplayPlot::setScaleFactor(int chIdx, double scale)
+{
+	y_scale_factor[chIdx] = scale;
+}
+
+FftDisplayPlot::MagnitudeType FftDisplayPlot::magnitudeType() const
+{
+	return d_magType;
+}
+
+void FftDisplayPlot::setMagnitudeType(enum MagnitudeType type)
+{
+	d_presetMagType = type;
 }
