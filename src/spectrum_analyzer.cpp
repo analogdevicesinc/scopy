@@ -927,7 +927,7 @@ void SpectrumAnalyzer::setCurrentMarkerLabelData(int chIdx, int mkIdx)
 			fft_plot->markerFrequency(chIdx, mkIdx), "Hz", 3);
 	QString txtMag = QString::number(
 		fft_plot->markerMagnutide(chIdx, mkIdx), 'f', 3) +
-		QString(" dBFS");
+		QString(" " + ui->cmb_units->currentText());
 	QString txt = QString("Marker %1 -> ").arg(mkIdx + 1) +
 		txtFreq + QString(" ") + txtMag;
 	ui->lbl_crtMarkerReading->setText(txt);
