@@ -301,10 +301,9 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 SpectrumAnalyzer::~SpectrumAnalyzer()
 {
-	if (iio) {
-		for (unsigned int i = 0; i < num_adc_channels; i++)
-			iio->stop(fft_ids[i]);
+	ui->run_button->setChecked(false);
 
+	if (iio) {
 		bool started = iio->started();
 		if (started)
 			iio->lock();
