@@ -395,7 +395,7 @@ void SignalGenerator::updatePreview()
 	for (auto it = channels.begin(); it != channels.end(); ++it) {
 		basic_block_sptr source;
 
-		if ((*it)->menuButton()->isChecked()) {
+		if ((*it)->enableButton()->isChecked()) {
 			source = getSource((*it), sample_rate, top);
 			enabled = true;
 		} else {
