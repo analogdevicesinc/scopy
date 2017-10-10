@@ -360,6 +360,14 @@ void FftDisplayPlot::averageDataAndComputeMagnitude(std::vector<double *>
 					20 * log10(nb_points) -
 					20 * log10(sqrt(2) * 0.77459667);
 				break;
+			case VPEAK:
+				out_data[i][s] = sqrt(source[i][s]) *
+					y_scale_factor[i] / nb_points;
+				break;
+			case VRMS:
+				out_data[i][s] = sqrt(source[i][s]) *
+					y_scale_factor[i] / sqrt(2) / nb_points;
+				break;
 			};
 		}
 

@@ -67,6 +67,8 @@ namespace adiscope {
 			DBFS = 0,
 			DBV = 1,
 			DBU = 2,
+			VPEAK = 3,
+			VRMS = 4,
 		};
 
 		enum MarkerType {

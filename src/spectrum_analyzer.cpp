@@ -57,6 +57,8 @@ SpectrumAnalyzer::mag_types = {
 	{"dBFS", FftDisplayPlot::DBFS},
 	{"dBV", FftDisplayPlot::DBV},
 	{"dBu", FftDisplayPlot::DBU},
+	{"Vpeak", FftDisplayPlot::VPEAK},
+	{"Vrms", FftDisplayPlot::VRMS},
 };
 
 std::vector<std::pair<QString, FftDisplayPlot::AverageType>>
@@ -1046,6 +1048,18 @@ void SpectrumAnalyzer::on_cmb_units_currentIndexChanged(const QString& unit)
 		});
 	if (it == mag_types.end())
 		return;
+
+	FftDisplayPlot::MagnitudeType magType = (*it).second;
+
+	switch (magType) {
+	case FftDisplayPlot::VPEAK:
+	case FftDisplayPlot::VRMS:
+		fft_plot->setAxisScale(QwtPlot::yLeft, 0, 25, 10);
+		break;
+	default:
+		fft_plot->setAxisScale(QwtPlot::yLeft, -200, 0, 10);
+		break;
+	}
 
 	fft_plot->setMagnitudeType((*it).second);
 	fft_plot->recalculateMagnitudes();
