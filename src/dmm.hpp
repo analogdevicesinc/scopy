@@ -22,6 +22,7 @@
 
 #include <QPushButton>
 #include <QWidget>
+#include <atomic>
 
 #include "apiObject.hpp"
 #include "filter.hpp"
