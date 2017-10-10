@@ -1180,7 +1180,11 @@ void SpectrumChannel::setAverageType(FftDisplayPlot::AverageType avg_type)
 void SpectrumChannel::setFftWindow(SpectrumAnalyzer::FftWinType win, int taps)
 {
 	m_fft_win = win;
-	fft_block->set_window(build_win(win, taps));
+
+	std::vector<float> window = build_win(win, taps);
+	float gain = calcCoherentPowerGain(window);
+	scaletFftWindow(window, 1 / gain);
+	fft_block->set_window(window);
 }
 
 SpectrumAnalyzer::FftWinType SpectrumChannel::fftWindow() const
@@ -1209,5 +1213,24 @@ std::vector<float> SpectrumChannel::build_win(SpectrumAnalyzer::FftWinType type,
 		default:
 			std::vector<float> v(ntaps, 1.0);
 			return v;
+	}
+}
+
+float
+SpectrumChannel::calcCoherentPowerGain(const std::vector<float>& win) const
+{
+	float sum = 0;
+
+	for (int i = 0; i < win.size(); i++) {
+		sum += win[i];
+	}
+
+	return sum / win.size();
+}
+
+void SpectrumChannel::scaletFftWindow(std::vector<float>& win, float gain)
+{
+	for (int i = 0; i < win.size(); i++) {
+		win[i] *= gain;
 	}
 }

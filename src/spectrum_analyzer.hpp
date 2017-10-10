@@ -219,6 +219,9 @@ private:
 	FftDisplayPlot *m_plot;
 	ChannelWidget *m_widget;
 
+	float calcCoherentPowerGain(const std::vector<float>& win) const;
+	void scaletFftWindow(std::vector<float>& win, float gain);
+
 	static std::vector<float> build_win(SpectrumAnalyzer::FftWinType type,
 		int ntaps);
 };
