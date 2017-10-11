@@ -1632,7 +1632,8 @@ void adiscope::Oscilloscope::toggleRightMenu(CustomPushButton *btn, bool checked
 	}
 
 	// Update Settings button state
-	ui->btnSettings->setChecked(!!ui->settings_group->checkedButton());
+	if(!ui->btnGeneralSettings->isChecked())
+		ui->btnSettings->setChecked(!!ui->settings_group->checkedButton());
 
 	ui->rightMenu->toggleMenu(checked);
 }
@@ -2422,6 +2423,8 @@ void Oscilloscope::on_btnGeneralSettings_toggled(bool checked)
 {
 	triggerRightMenuToggle(
 		static_cast<CustomPushButton *>(QObject::sender()), checked);
+	if(checked)
+		ui->btnSettings->setChecked(!checked);
 }
 
 /*
