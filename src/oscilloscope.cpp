@@ -884,22 +884,20 @@ void Oscilloscope::onChannelWidgetDeleteClicked()
 		triggerRightMenuToggle(static_cast<CustomPushButton*>(cw->menuButton()), false);
 	menuOrder.removeOne(static_cast<CustomPushButton*>(cw->menuButton()));
 
-	bool allChannelsDisabled = true;
-	for (unsigned int i = nb_channels;
-			i < nb_channels + nb_math_channels; i++) {
-		if (i == curve_id)
-			continue;
-		ChannelWidget *w = static_cast<ChannelWidget *>(
+	/*If there are no more channels enabled, we should
+	disable the measurements.*/
+	bool shouldDisable = true;
+	for (unsigned int i = 0; i < nb_channels + nb_math_channels; i++) {
+		ChannelWidget *cw = static_cast<ChannelWidget *>(
 			ui->channelsList->itemAt(i)->widget());
-		if (w->enableButton()->isChecked())
-			allChannelsDisabled = false;
+		if (curve_id == cw->id())
+			continue;
+		if (cw->enableButton()->isChecked())
+			shouldDisable = false;
 	}
 
-	if (allChannelsDisabled){
-		current_channel = 0;
-		Q_EMIT selectedChannelChanged(0);
-		update_measure_for_channel(0);
-	}
+	if (shouldDisable)
+		measure_settings->disableDisplayAll();
 
 	measure_settings->onChannelRemoved(curve_id);
 	plot.unregisterSink(qname.toStdString());
@@ -935,14 +933,37 @@ void Oscilloscope::onChannelWidgetDeleteClicked()
 	ui->channelsList->removeWidget(cw);
 	delete cw;
 
-	if (channels_group->buttons().size() > 0 &&
-			channels_group->checkedId() == -1){
-		channels_group->buttons()[0]->setChecked(true);
-	} else {
-		if (current_channel != 0)
-			current_channel = current_channel - 1;
-			Q_EMIT selectedChannelChanged(current_channel);
-			update_measure_for_channel(current_channel);
+	if (curve_id < current_channel) {
+		/*If the deleted math channel is before the current channel,
+		we will need to update the current channel to its new value.*/
+		current_channel -= 1;
+		current_ch_widget -= 1;
+		Q_EMIT selectedChannelChanged(current_channel);
+		update_measure_for_channel(current_channel);
+	} else if (curve_id == current_channel) {
+		/*If the deleted channel is the current channel, check if we have
+		enabled channels and select the first one we find
+		else update the plots axis and zoomer properties from channel 0.*/
+		bool channelsEnabled = false;
+		for (unsigned int i = 0; i < nb_channels + nb_math_channels; i++) {
+			ChannelWidget *cw = static_cast<ChannelWidget *>(
+				ui->channelsList->itemAt(i)->widget());
+			if (cw->enableButton()->isChecked()) {
+				channelsEnabled = true;
+				Q_EMIT selectedChannelChanged(0);
+				update_measure_for_channel(0);
+				cw->nameButton()->setChecked(true);
+				Q_EMIT selectedChannelChanged(cw->id());
+				update_measure_for_channel(cw->id());
+				break;
+			}
+		}
+		if (channelsEnabled) {
+			if (curve_id < current_ch_widget)
+				current_ch_widget -= 1;
+		} else {
+			Q_EMIT selectedChannelChanged(0);
+		}
 	}
 
 	/* If the removed channel is before the current axis, we update the
@@ -969,9 +990,6 @@ void Oscilloscope::onChannelWidgetDeleteClicked()
 				QwtAxisId(QwtPlot::xBottom, 0),
 				QwtAxisId(QwtPlot::yLeft, i));
 	}
-
-	if (current_ch_widget > nb_channels + nb_math_channels - 1)
-		current_ch_widget = current_ch_widget - 1;
 
 	updateRunButton(false);
 	plot.replot();
@@ -1365,8 +1383,11 @@ void adiscope::Oscilloscope::onChannelWidgetEnabled(bool en)
 				shouldActivate = false;
 		}
 
-		if (shouldActivate)
+		if (shouldActivate) {
+			Q_EMIT selectedChannelChanged(id);
+			update_measure_for_channel(id);
 			measure_settings->activateDisplayAll();
+		}
 
 	} else {
 		plot.DetachCurve(id);
