@@ -310,10 +310,12 @@ void DMM::toggleDataLogging(bool en)
 
 	/* If DMM is already running, check all the parameters before
 	 * starting the data logging */
-	if(filename.isEmpty() && ui->run_button->isChecked()) {
-		setDynamicProperty(ui->filename, "invalid", true);
+	if(filename.isEmpty()) {
 		ui->filename->setText("No file selected");
-		ui->btnDataLogging->setChecked(false);
+		setDynamicProperty(ui->filename, "invalid", true);
+		if(ui->run_button->isChecked()) {
+			ui->btnDataLogging->setChecked(false);
+		}
 		return;
 	}
 
@@ -325,7 +327,7 @@ void DMM::toggleDataLogging(bool en)
 	if(en) {
 		QFile file(filename);
 
-		if(ui->btn_overwrite->isChecked()) {
+		if(ui->btn_overwrite->isChecked() || file.size() == 0) {
 			if( !file.open(QIODevice::WriteOnly)) {
 				return;
 			}
@@ -353,6 +355,8 @@ void DMM::toggleDataLogging(bool en)
 		data_logging_thread = std::thread(&DMM::dataLoggingThread, this);
 	}
 	else if(!en) {
+		if(!use_timer)
+			data_cond.notify_all();
 		interrupt_data_logging = true;
 		if(data_logging_thread.joinable()) {
 			if(use_timer)
@@ -391,10 +395,8 @@ void DMM::startDataLogging(bool start)
 			else
 				data_logging_thread.join();
 		}
-		if(!data_logging) {
-			ui->btn_overwrite->setEnabled(true);
-			ui->btn_append->setEnabled(true);
-		}
+		ui->btn_overwrite->setEnabled(true);
+		ui->btn_append->setEnabled(true);
 	}
 }
 
@@ -409,11 +411,16 @@ void DMM::dataLoggingThread()
 	QTextStream out(&file);
 
 	while(!interrupt_data_logging) {
+		if(use_timer && !file.isOpen()) {
+			if( !file.open(QIODevice::Append)) {
+				return;
+			}
+		}
 		bool is_low_ac_ch1 = ui->btn_ch1_ac->isChecked();
 		bool is_low_ac_ch2 = ui->btn_ch2_ac->isChecked();
 		bool is_high_ac_ch1 = ui->btn_ch1_ac2->isChecked();
 		bool is_high_ac_ch2 = ui->btn_ch2_ac2->isChecked();
-		QString ch1_dc_rms="", ch2_dc_rms="", ch1_ac_rms="", ch2_ac_rms="";
+		QString ch1_dc_rms="-", ch2_dc_rms="-", ch1_ac_rms="-", ch2_ac_rms="-";
 
 		out << QDateTime::currentDateTime().time().toString() << separator;
 
@@ -444,10 +451,13 @@ void DMM::dataLoggingThread()
 			ch2_dc_rms << separator <<
 			ch2_ac_rms << "\n";
 
-		if(use_timer)
+		if(use_timer) {
+			file.close();
 			QThread::msleep(logging_refresh_rate);
+		}
 	}
-	file.close();
+	if(file.isOpen())
+		file.close();
 }
 
 void DMM::toggleAC()
