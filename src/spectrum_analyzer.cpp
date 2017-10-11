@@ -937,8 +937,11 @@ void SpectrumAnalyzer::setCurrentMarkerLabelData(int chIdx, int mkIdx)
 void SpectrumAnalyzer::updateCrtMrkLblVisibility()
 {
 	int crt = marker_selector->selectedButton();
-	bool visible = marker_selector->buttonChecked(crt);
-	ui->lbl_crtMarkerReading->setVisible(visible);
+
+	if (crt >= 0) {
+		bool visible = marker_selector->buttonChecked(crt);
+		ui->lbl_crtMarkerReading->setVisible(visible);
+	}
 }
 
 void SpectrumAnalyzer::onPlotNewMarkerData()
