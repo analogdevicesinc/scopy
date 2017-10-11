@@ -865,6 +865,7 @@ void Oscilloscope::add_math_channel(const std::string& function)
 			ui->btnAddMath->setChecked(false);
 		}
 		ui->btnAddMath->hide();
+		menuOrder.removeOne(ui->btnAddMath);
 	}
 }
 
