@@ -1385,12 +1385,14 @@ void adiscope::Oscilloscope::onChannelWidgetEnabled(bool en)
 		if (shouldDisable)
 			measure_settings->disableDisplayAll();
 
-		for (int i = 0; i < nb_channels + nb_math_channels; i++) {
-			ChannelWidget *cw = static_cast<ChannelWidget *>(
-				ui->channelsList->itemAt(i)->widget());
-			if (cw->enableButton()->isChecked()) {
-				cw->nameButton()->setChecked(true);
-				break;
+		if (current_channel == id) {
+			for (int i = 0; i < nb_channels + nb_math_channels; i++) {
+				ChannelWidget *cw = static_cast<ChannelWidget *>(
+					ui->channelsList->itemAt(i)->widget());
+				if (cw->enableButton()->isChecked()) {
+					cw->nameButton()->setChecked(true);
+					break;
+				}
 			}
 		}
 
