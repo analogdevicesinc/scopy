@@ -1182,6 +1182,9 @@ void PatternGeneratorChannelManager::clearChannels()
 	for (auto ch : channel) {
 		std::string temp = "DIO" + std::to_string(ch->get_id());
 		ch->set_label(temp);
+		PatternGeneratorChannel *pgch=static_cast<PatternGeneratorChannel*>(ch);
+		if(pgch)
+			pgch->setCh_thickness(0.0);
 	}
 }
 
@@ -1215,8 +1218,9 @@ uint16_t PatternGeneratorChannelManager::get_mode_mask()
 
 void PatternGeneratorChannelManager::join(std::vector<int> index)
 {
-	PatternGeneratorChannelGroup *ret;
+	PatternGeneratorChannelGroup *src=static_cast<PatternGeneratorChannelGroup *>(channel_group[index[0]]);
 
+	auto chthickness = src->getCh_thickness();
 	for (auto i=1; i<index.size(); i++) {
 		auto it = std::next(channel_group.begin(), index[i]);
 		static_cast<PatternGeneratorChannelGroup *>(channel_group[index[0]])->append(
@@ -1231,8 +1235,10 @@ void PatternGeneratorChannelManager::join(std::vector<int> index)
 		}
 	}
 
-	channel_group[index[0]]->group(true);
-	channel_group[index[0]]->set_label("Group name");
+	src->group(true);
+	src->set_label("Group name");
+	src->setCh_thickness(chthickness);
+
 
 }
 
