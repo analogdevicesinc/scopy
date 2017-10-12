@@ -499,7 +499,7 @@ QWidget {
               </sizepolicy>
              </property>
              <property name="currentIndex">
-              <number>3</number>
+              <number>2</number>
              </property>
              <widget class="QWidget" name="channelSettings">
               <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -807,32 +807,23 @@ border-bottom: 1px solid rgba(255,255,255,100);</string>
                  <property name="rightMargin">
                   <number>0</number>
                  </property>
-                 <property name="bottomMargin">
-                  <number>77</number>
-                 </property>
                  <property name="spacing">
                   <number>12</number>
                  </property>
-                 <item row="2" column="0">
-                  <layout class="QVBoxLayout" name="verticalLayout_5">
+                 <item row="2" column="1">
+                  <layout class="QVBoxLayout" name="verticalLayout_9">
                    <property name="spacing">
                     <number>2</number>
                    </property>
                    <item>
-                    <widget class="QLabel" name="lbl_units">
+                    <widget class="QLabel" name="lbl_rbw">
                      <property name="text">
-                      <string>Units</string>
+                      <string>Resolution BW</string>
                      </property>
                     </widget>
                    </item>
                    <item>
-                    <widget class="QComboBox" name="cmb_units">
-                     <item>
-                      <property name="text">
-                       <string>dBFS</string>
-                      </property>
-                     </item>
-                    </widget>
+                    <widget class="QComboBox" name="cmb_rbw"/>
                    </item>
                   </layout>
                  </item>
@@ -847,26 +838,6 @@ border-bottom: 1px solid rgba(255,255,255,100);</string>
                    </property>
                    <property name="name" stdset="0">
                     <string>Stop</string>
-                   </property>
-                   <property name="show_progress" stdset="0">
-                    <bool>false</bool>
-                   </property>
-                   <property name="min_value" stdset="0">
-                    <double>0.000000000000000</double>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="0">
-                  <widget class="adiscope::PositionSpinButton" name="start_freq" native="true">
-                   <property name="units" stdset="0">
-                    <stringlist>
-                     <string>Hz=1e0</string>
-                     <string>kHz=1e3</string>
-                     <string>MHz=1e6</string>
-                    </stringlist>
-                   </property>
-                   <property name="name" stdset="0">
-                    <string>Start</string>
                    </property>
                    <property name="show_progress" stdset="0">
                     <bool>false</bool>
@@ -896,6 +867,26 @@ border-bottom: 1px solid rgba(255,255,255,100);</string>
                    </property>
                   </widget>
                  </item>
+                 <item row="0" column="0">
+                  <widget class="adiscope::PositionSpinButton" name="start_freq" native="true">
+                   <property name="units" stdset="0">
+                    <stringlist>
+                     <string>Hz=1e0</string>
+                     <string>kHz=1e3</string>
+                     <string>MHz=1e6</string>
+                    </stringlist>
+                   </property>
+                   <property name="name" stdset="0">
+                    <string>Start</string>
+                   </property>
+                   <property name="show_progress" stdset="0">
+                    <bool>false</bool>
+                   </property>
+                   <property name="min_value" stdset="0">
+                    <double>0.000000000000000</double>
+                   </property>
+                  </widget>
+                 </item>
                  <item row="1" column="0">
                   <widget class="adiscope::PositionSpinButton" name="center_freq" native="true">
                    <property name="units" stdset="0">
@@ -916,22 +907,64 @@ border-bottom: 1px solid rgba(255,255,255,100);</string>
                    </property>
                   </widget>
                  </item>
-                 <item row="2" column="1">
-                  <layout class="QVBoxLayout" name="verticalLayout_9">
+                 <item row="2" column="0">
+                  <layout class="QVBoxLayout" name="verticalLayout_5">
                    <property name="spacing">
                     <number>2</number>
                    </property>
                    <item>
-                    <widget class="QLabel" name="lbl_rbw">
+                    <widget class="QLabel" name="lbl_units">
                      <property name="text">
-                      <string>Resolution BW</string>
+                      <string>Units</string>
                      </property>
                     </widget>
                    </item>
                    <item>
-                    <widget class="QComboBox" name="cmb_rbw"/>
+                    <widget class="QComboBox" name="cmb_units">
+                     <item>
+                      <property name="text">
+                       <string>dBFS</string>
+                      </property>
+                     </item>
+                    </widget>
                    </item>
                   </layout>
+                 </item>
+                 <item row="3" column="0">
+                  <widget class="adiscope::PositionSpinButton" name="top" native="true">
+                   <property name="units" stdset="0">
+                    <stringlist>
+                     <string>dBFS=1e0</string>
+                    </stringlist>
+                   </property>
+                   <property name="name" stdset="0">
+                    <string>Top</string>
+                   </property>
+                   <property name="show_progress" stdset="0">
+                    <bool>false</bool>
+                   </property>
+                   <property name="min_value" stdset="0">
+                    <double>-100.000000000000000</double>
+                   </property>
+                   <property name="max_value" stdset="0">
+                    <double>100.000000000000000</double>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="3" column="1">
+                  <widget class="adiscope::PositionSpinButton" name="range" native="true">
+                   <property name="units" stdset="0">
+                    <stringlist>
+                     <string>dBFS=1e0</string>
+                    </stringlist>
+                   </property>
+                   <property name="name" stdset="0">
+                    <string>Range</string>
+                   </property>
+                   <property name="show_progress" stdset="0">
+                    <bool>false</bool>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </item>

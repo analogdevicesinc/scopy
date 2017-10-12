@@ -119,6 +119,8 @@ private Q_SLOTS:
 	void onPlotSampleCountUpdated(uint);
 	void singleCaptureDone();
 	void on_btnMarkerTable_toggled(bool checked);
+	void onTopValueChanged(double);
+	void onRangeValueChanged(double);
 
 private:
 	void build_gnuradio_block_chain();

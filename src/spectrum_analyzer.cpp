@@ -222,6 +222,10 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	ui->center_freq->setStep(1e6);
 	ui->span_freq->setStep(1e6);
 
+	// Initialize vertical axis controls
+	ui->range->setMinValue(1);
+	ui->range->setMaxValue(200);
+
 	// Configure plot peak capabilities
 	for (uint i = 0; i < num_adc_channels; i++) {
 		fft_plot->setPeakCount(i, max_peak_count);
@@ -285,11 +289,19 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	connect(ui->span_freq, SIGNAL(valueChanged(double)),
 		this, SLOT(onCenterSpanChanged()));
 
+	connect(ui->top, SIGNAL(valueChanged(double)),
+		SLOT(onTopValueChanged(double)));
+	connect(ui->range, SIGNAL(valueChanged(double)),
+		SLOT(onRangeValueChanged(double)));
+
 	// UI default
 	ui->comboBox_window->setCurrentText("Hamming");
 	ui->stackedWidget->setVisible(false);
 	ui->start_freq->setValue(0);
 	ui->stop_freq->setValue(50e6);
+
+	ui->top->setValue(0);
+	ui->range->setValue(200);
 
 	ui->marker_freq_pos->setMaxValue(ui->stop_freq->value());
 	ui->marker_freq_pos->setStep(2 * (ui->stop_freq->value() -
@@ -1108,6 +1120,20 @@ QPair<int, int> SpectrumAnalyzer::getGridLayoutPosFromIndex(QGridLayout *layout,
 	}
 
 	return pos;
+}
+
+void SpectrumAnalyzer::onTopValueChanged(double top)
+{
+	double range = ui->range->value();
+	fft_plot->setAxisScale(QwtPlot::yLeft, top - range, top);
+	fft_plot->replot();
+}
+
+void SpectrumAnalyzer::onRangeValueChanged(double range)
+{
+	double top = ui->top->value();
+	fft_plot->setAxisScale(QwtPlot::yLeft, top - range, top);
+	fft_plot->replot();
 }
 
 /*
