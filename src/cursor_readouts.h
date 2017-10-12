@@ -22,6 +22,7 @@
 
 #include <QWidget>
 #include <QPropertyAnimation>
+#include <QShowEvent>
 #include "customplotpositionbutton.h"
 
 class QwtPlot;
@@ -68,6 +69,8 @@ namespace adiscope {
 
 		void setTransparency(int value);
 		void moveToPosition(CustomPlotPositionButton::ReadoutsPosition position);
+
+		void showEvent(QShowEvent *event);
 	private:
 		QPoint plotPointToPixelPoint(const QPointF &point) const;
 		void updateSizeAndPosition(bool resize = false);

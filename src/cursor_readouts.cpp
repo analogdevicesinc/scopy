@@ -95,6 +95,13 @@ void CursorReadouts::moveToPosition(CustomPlotPositionButton::ReadoutsPosition p
 	currentPosition = position;
 }
 
+void CursorReadouts::showEvent(QShowEvent *event)
+{
+	moveTopLeft(true);
+
+	QWidget::showEvent(event);
+}
+
 QwtPlot *CursorReadouts::plot()
 {
 	return static_cast<QwtPlot *>(parent());
