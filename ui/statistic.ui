@@ -146,7 +146,7 @@ font-size: 14px;</string>
       </size>
      </property>
      <property name="styleSheet">
-      <string notr="true">border: 1px solid rgba(255, 255, 255, 51);</string>
+      <string notr="true">border: 1px solid rgba(255, 255, 255, 33);</string>
      </property>
      <property name="orientation">
       <enum>Qt::Vertical</enum>
