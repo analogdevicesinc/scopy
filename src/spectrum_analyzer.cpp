@@ -297,6 +297,10 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	ui->lblMagUnit->setText(ui->cmb_units->currentText());
 	ui->markerTable->hide();
+
+	for (auto ch: channels) {
+		ch->setFftWindow(FftWinType::HAMMING, fft_size);
+	}
 }
 
 SpectrumAnalyzer::~SpectrumAnalyzer()
