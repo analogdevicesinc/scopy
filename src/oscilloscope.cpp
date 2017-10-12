@@ -2098,6 +2098,9 @@ void Oscilloscope::statisticsUpdateGui()
 			QString("Statistic"), Qt::FindDirectChildrenOnly);
 	for (int i = 0; i < statistics.size(); i++)
 		statistics[i]->updateStatistics(statistics_data[i].second);
+
+	if (!ui->boxMeasure->isChecked())
+		statisticsPanel->hide();
 }
 
 void Oscilloscope::statisticsUpdateGuiTitleColor()
