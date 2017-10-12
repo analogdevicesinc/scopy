@@ -1075,10 +1075,17 @@ void FftDisplayPlot::setMagnitudeType(enum MagnitudeType type)
  */
 void FftDisplayPlot::recalculateMagnitudes()
 {
+	// Check if at least one acquisition has been made
+	for (unsigned int i = 0; i < d_nplots; i++) {
+		if (!y_data[i])
+			return;
+	}
+
 	if (d_presetMagType != d_magType) {
 		d_magType = d_presetMagType;
 		resetAverageHistory();
 	}
+
 	averageDataAndComputeMagnitude(y_original_data, y_data, d_numPoints);
 	detectMarkers();
 
