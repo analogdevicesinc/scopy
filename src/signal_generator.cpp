@@ -339,8 +339,8 @@ void SignalGenerator::rescale()
 	auto xDivisions=10;
 
 
-	zoomT1=hOffset-hUnitsPerDiv*(xDivisions);
-	zoomT2=hOffset+hUnitsPerDiv*(xDivisions);
+	zoomT1=hOffset-hUnitsPerDiv*(xDivisions/2);
+	zoomT2=hOffset+hUnitsPerDiv*(xDivisions/2);
 
 	zoomT1OnScreen=hOffset-hUnitsPerDiv*(xDivisions/2);
 	zoomT2OnScreen=hOffset+hUnitsPerDiv*(xDivisions/2);
@@ -363,6 +363,7 @@ void SignalGenerator::rescale()
 	time_block_data->time_block->set_nsamps(nb_points);
 	time_block_data->time_block->set_samp_rate(sample_rate);
 	updatePreview();
+	plot->replot();
 }
 
 void SignalGenerator::constantValueChanged(double value)
@@ -724,28 +725,29 @@ basic_block_sptr SignalGenerator::getSignalSource(gr::top_block_sptr top,
 
 	auto src = analog::sig_source_f::make(samp_rate, waveform,
 			data.frequency, amplitude, offset);
-	auto delay = blocks::delay::make(sizeof(float),
-			samp_rate * phase / (data.frequency * 360.0));
+/*	auto delay = blocks::delay::make(sizeof(float),
+			samp_rate * phase / (data.frequency * 360.0));*/
 
-	double to_skip = get_best_ratio(samp_rate / data.frequency,
-			samp_rate, NULL);
-	auto skip_head = blocks::skiphead::make(sizeof(float),(uint64_t) to_skip);
+	uint64_t to_skip = samp_rate * phase / (data.frequency * 360.0);
+	auto skip_head = blocks::skiphead::make(sizeof(float),(uint64_t)to_skip);
 
-	top->connect(src, 0, delay, 0);
-	top->connect(delay, 0, skip_head, 0);
+	/*top->connect(src, 0, delay, 0);
+	top->connect(delay, 0, skip_head, 0);*/
+	top->connect(src, 0, skip_head, 0);
 
 	if (!inv_saw_wave) {
 		return skip_head;
 	} else {
 		auto mult = blocks::multiply_const_ff::make(-1.0);
 		top->connect(skip_head, 0, mult, 0);
+		//top->connect(delay, 0, mult, 0);
 
 		return mult;
 	}
 }
 
 gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
-		unsigned long samp_rate, gr::top_block_sptr top, bool phase_correction)
+		unsigned long samp_rate, gr::top_block_sptr top, bool preview)
 {
 	auto ptr = getData(obj);
 	enum SIGNAL_TYPE type = ptr->type;
@@ -756,7 +758,7 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
 				analog::GR_CONST_WAVE, 0, 0,
 				ptr->constant);
 	case SIGNAL_TYPE_WAVEFORM:
-		if(phase_correction)
+		if(preview)
 		{
 			int full_periods=(int)((double)zoomT1OnScreen*ptr->frequency);
 			double phase_in_time = zoomT1OnScreen - full_periods/ptr->frequency;
