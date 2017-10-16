@@ -1096,6 +1096,11 @@ void DisplayPlot::_onYleftAxisWidgetScaleDivChanged()
 	}
 }
 
+QwtPlotZoomer *DisplayPlot::getZoomer() const
+{
+	return d_zoomer;
+}
+
 void DisplayPlot::horizAxisScaleIncrease()
 {
 	double div = HorizUnitsPerDiv();

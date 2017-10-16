@@ -360,6 +360,9 @@ public:
   // Make sure to create your won PlotNewData method in the derived
   // class:
   // void PlotNewData(...);
+  QwtPlotZoomer *getZoomer() const;
+
+
 
 public Q_SLOTS:
   virtual void disableLegend();

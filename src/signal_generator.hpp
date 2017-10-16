@@ -99,6 +99,7 @@ namespace adiscope {
 
 		unsigned int currentChannel;
 		unsigned long sample_rate;
+		unsigned long nb_points;
 
 		QButtonGroup *settings_group;
 		QQueue<QPair<int, bool>> menuButtonActions;
@@ -114,6 +115,7 @@ namespace adiscope {
 
 		void start();
 		void stop();
+		void resetZoom();
 
 		void updatePreview();
 		void updateRightMenuForChn(int chIdx);
@@ -123,11 +125,11 @@ namespace adiscope {
 		gr::basic_block_sptr getSignalSource(
 				gr::top_block_sptr top,
 				unsigned long sample_rate,
-				struct signal_generator_data &data);
+				struct signal_generator_data &data, double phase_correction=0.0);
 
 		gr::basic_block_sptr getSource(QWidget *obj,
 				unsigned long sample_rate,
-				gr::top_block_sptr top);
+				gr::top_block_sptr top, bool     phase_correction=false);
 
 		static size_t gcd(size_t a, size_t b);
 		static size_t lcm(size_t a, size_t b);
@@ -145,6 +147,12 @@ namespace adiscope {
 			unsigned long& out_oversampling_ratio);
 		bool use_oversampling(const struct iio_device *dev);
 
+		double zoomT1;
+		double zoomT2;
+
+		double zoomT1OnScreen;
+		double zoomT2OnScreen;
+
 	private Q_SLOTS:
 		void constantValueChanged(double val);
 		void amplitudeChanged(double val);
@@ -158,6 +166,7 @@ namespace adiscope {
 		void channelWidgetMenuToggled(bool);
 		void rightMenuFinished(bool opened);
 		void loadFile();
+		void rescale();
 
 		void startStop(bool start);
 		void setFunction(const QString& function);

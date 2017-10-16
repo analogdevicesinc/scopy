@@ -30,6 +30,7 @@
 #include <QFileInfo>
 #include <QPalette>
 #include <QSharedPointer>
+#include <QElapsedTimer>
 
 #include <gnuradio/analog/sig_source_f.h>
 #include <gnuradio/analog/sig_source_waveform.h>
@@ -91,6 +92,8 @@ struct adiscope::time_block_data {
 	unsigned long nb_channels;
 };
 
+static double temp_sample_rate;
+
 SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 		QList<std::shared_ptr<GenericDac>> dacs, Filter *filt,
 		QPushButton *runButton, QJSEngine *engine, ToolLauncher *parent) :
@@ -99,8 +102,10 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 	time_block_data(new adiscope::time_block_data),
 	dacs(dacs),
 	currentChannel(0), sample_rate(0),
-	settings_group(new QButtonGroup(this))
+	settings_group(new QButtonGroup(this)),nb_points(NB_POINTS)
 {
+	zoomT1=0;
+	zoomT2=1;
 	ui->setupUi(this);
 	this->setAttribute(Qt::WA_DeleteOnClose, true);
 
@@ -204,13 +209,13 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 
 	time_block_data->nb_channels = nb_channels;
 	time_block_data->time_block = scope_sink_f::make(
-			NB_POINTS, sample_rate,
+			nb_points, sample_rate,
 			"Signal Generator", nb_channels,
 			static_cast<QWidget *>(plot));
 
 	/* Attach all curves by default */
 	plot->registerSink(time_block_data->time_block->name(),
-			nb_channels, NB_POINTS);
+			nb_channels, nb_points);
 
 	/* This must be done after attaching the curves; otherwise
 	 * plot->getLineColor(i) returns black. */
@@ -223,9 +228,9 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 
 	plot->setVertUnitsPerDiv(AMPLITUDE_VOLTS * 2.0 / 10.0);
 
-	plot->setHorizUnitsPerDiv((double) NB_POINTS /
+	plot->setHorizUnitsPerDiv((double) nb_points /
 			((double) sample_rate * 10.0));
-	plot->setHorizOffset((double) NB_POINTS /
+	plot->setHorizOffset((double) nb_points /
 			((double) sample_rate * 2.0));
 	plot->zoomBaseUpdate();
 
@@ -272,7 +277,10 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 	connect(runButton, SIGNAL(toggled(bool)),
 			this, SLOT(startStop(bool)));
 
-	updatePreview();
+
+	connect(plot->getZoomer(),SIGNAL(zoomed(QRectF)),this,SLOT(rescale()));
+
+	resetZoom();
 }
 
 SignalGenerator::~SignalGenerator()
@@ -287,13 +295,83 @@ SignalGenerator::~SignalGenerator()
 	delete time_block_data;
 }
 
+void SignalGenerator::resetZoom()
+{
+
+	double period=0.0;
+	for (auto it = channels.begin(); it != channels.end(); ++it) {
+		if ((*it)->enableButton()->isChecked()) {
+			auto ptr = getData((*it));
+			switch (ptr->type) {
+			case SIGNAL_TYPE_CONSTANT:
+			case SIGNAL_TYPE_BUFFER:
+				break;
+			case SIGNAL_TYPE_WAVEFORM:
+				if(period< 1 / (ptr->frequency))
+				{
+					period=(1/ptr->frequency);
+				}
+				break;
+			case SIGNAL_TYPE_MATH:
+				if(period< 1 / (ptr->frequency))
+				{
+					period=(1/ptr->frequency);
+				}
+				break;
+			default:
+				break;
+
+			}
+		}
+	}
+	period=period*2;
+	plot->setHorizUnitsPerDiv(period/10 );
+	plot->setHorizOffset(period/2);
+	plot->zoomBaseUpdate();
+	rescale();
+}
+
+void SignalGenerator::rescale()
+{
+
+	auto hOffset=plot->HorizOffset();
+	auto hUnitsPerDiv=plot->HorizUnitsPerDiv();
+	auto xDivisions=10;
+
+
+	zoomT1=hOffset-hUnitsPerDiv*(xDivisions);
+	zoomT2=hOffset+hUnitsPerDiv*(xDivisions);
+
+	zoomT1OnScreen=hOffset-hUnitsPerDiv*(xDivisions/2);
+	zoomT2OnScreen=hOffset+hUnitsPerDiv*(xDivisions/2);
+
+	auto deltaT= zoomT2-zoomT1;
+
+	long max_sample_rate=750000000;
+	nb_points=NB_POINTS;
+	sample_rate=nb_points/deltaT;
+
+	if(sample_rate>max_sample_rate)
+	{
+		nb_points=nb_points / (long)(sample_rate/max_sample_rate);
+		sample_rate=max_sample_rate;
+
+	}
+	long startSample=sample_rate*zoomT1;
+	plot->setDataStartingPoint(startSample);
+	plot->setSampleRate(sample_rate,1,"Hz");
+	time_block_data->time_block->set_nsamps(nb_points);
+	time_block_data->time_block->set_samp_rate(sample_rate);
+	updatePreview();
+}
+
 void SignalGenerator::constantValueChanged(double value)
 {
 	auto ptr = getCurrentData();
 
 	if (ptr->constant != (float) value) {
 		ptr->constant = (float) value;
-		updatePreview();
+		resetZoom();
 	}
 }
 
@@ -303,7 +381,7 @@ void SignalGenerator::amplitudeChanged(double value)
 
 	if (ptr->amplitude != value) {
 		ptr->amplitude = value;
-		updatePreview();
+		resetZoom();
 	}
 }
 
@@ -313,7 +391,7 @@ void SignalGenerator::offsetChanged(double value)
 
 	if (ptr->offset != (float) value) {
 		ptr->offset = (float) value;
-		updatePreview();
+		resetZoom();
 	}
 }
 
@@ -323,7 +401,7 @@ void SignalGenerator::frequencyChanged(double value)
 
 	if (ptr->frequency != value) {
 		ptr->frequency = value;
-		updatePreview();
+		resetZoom();
 	}
 }
 
@@ -333,7 +411,8 @@ void SignalGenerator::mathFreqChanged(double value)
 
 	if (ptr->math_freq != value) {
 		ptr->math_freq = value;
-		updatePreview();
+
+		resetZoom();
 	}
 }
 
@@ -343,7 +422,7 @@ void SignalGenerator::phaseChanged(double value)
 
 	if (ptr->phase != value) {
 		ptr->phase = value;
-		updatePreview();
+		resetZoom();
 	}
 }
 
@@ -361,7 +440,7 @@ void SignalGenerator::waveformTypeChanged(int val)
 
 	if (ptr->waveform != types[val]) {
 		ptr->waveform = types[val];
-		updatePreview();
+		resetZoom();
 	}
 }
 
@@ -382,7 +461,7 @@ void SignalGenerator::tabChanged(int index)
 
 	if (ptr->type != (enum SIGNAL_TYPE) index) {
 		ptr->type = (enum SIGNAL_TYPE) index;
-		updatePreview();
+		resetZoom();
 	}
 }
 
@@ -396,19 +475,23 @@ void SignalGenerator::updatePreview()
 		basic_block_sptr source;
 
 		if ((*it)->enableButton()->isChecked()) {
-			source = getSource((*it), sample_rate, top);
+
+			source = getSource((*it), sample_rate, top, true);
 			enabled = true;
 		} else {
 			source = blocks::nop::make(sizeof(float));
 		}
 
-		auto head = blocks::head::make(sizeof(float), NB_POINTS);
+		auto head = blocks::head::make(sizeof(float), nb_points);
 		top->connect(source, 0, head, 0);
 
 		top->connect(head, 0, time_block_data->time_block, i++);
 	}
 
+	QElapsedTimer timer;
+	timer.start();
 	top->run();
+	qDebug() << "The slow operation took" << timer.elapsed() << "milliseconds";
 	top->disconnect_all();
 
 	if (ui->run_button->isChecked()) {
@@ -432,7 +515,7 @@ void SignalGenerator::loadFile()
 	this->ui->label_size->setText(QString("%1 ").arg(
 				info.size() / sizeof(float)) + tr("samples"));
 
-	updatePreview();
+	resetZoom();
 }
 
 void SignalGenerator::start()
@@ -602,12 +685,12 @@ void SignalGenerator::setFunction(const QString& function)
 
 	if (ptr->function != function) {
 		ptr->function = function;
-		updatePreview();
+		resetZoom();
 	}
 }
 
 basic_block_sptr SignalGenerator::getSignalSource(gr::top_block_sptr top,
-		unsigned long samp_rate, struct signal_generator_data &data)
+		unsigned long samp_rate, struct signal_generator_data &data,double phase_correction)
 {
 	bool inv_saw_wave = data.waveform == SG_INV_SAW_WAVE;
 	analog::gr_waveform_t waveform;
@@ -623,12 +706,14 @@ basic_block_sptr SignalGenerator::getSignalSource(gr::top_block_sptr top,
 		offset = data.offset - (float) data.amplitude / 2.0;
 	}
 
+	phase = data.phase + phase_correction;
+
 	if (data.waveform == SG_TRI_WAVE)
-		phase = std::fmod(data.phase + 90.0, 360.0);
+		phase = std::fmod(phase + 90.0, 360.0);
 	else if (data.waveform == SG_SQR_WAVE)
-		phase = std::fmod(data.phase + 180.0, 360.0);
+		phase = std::fmod(phase + 180.0, 360.0);
 	else
-		phase = data.phase;
+		if(phase<0) phase=phase+360.0;
 
 	if (inv_saw_wave) {
 		waveform = analog::GR_SAW_WAVE;
@@ -644,7 +729,7 @@ basic_block_sptr SignalGenerator::getSignalSource(gr::top_block_sptr top,
 
 	double to_skip = get_best_ratio(samp_rate / data.frequency,
 			samp_rate, NULL);
-	auto skip_head = blocks::skiphead::make(sizeof(float), to_skip);
+	auto skip_head = blocks::skiphead::make(sizeof(float),(uint64_t) to_skip);
 
 	top->connect(src, 0, delay, 0);
 	top->connect(delay, 0, skip_head, 0);
@@ -660,18 +745,24 @@ basic_block_sptr SignalGenerator::getSignalSource(gr::top_block_sptr top,
 }
 
 gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
-		unsigned long samp_rate, gr::top_block_sptr top)
+		unsigned long samp_rate, gr::top_block_sptr top, bool phase_correction)
 {
 	auto ptr = getData(obj);
 	enum SIGNAL_TYPE type = ptr->type;
-
+	double phase=0.0;
 	switch (type) {
 	case SIGNAL_TYPE_CONSTANT:
 		return analog::sig_source_f::make(samp_rate,
 				analog::GR_CONST_WAVE, 0, 0,
 				ptr->constant);
 	case SIGNAL_TYPE_WAVEFORM:
-		return getSignalSource(top, samp_rate, *ptr);
+		if(phase_correction)
+		{
+			int full_periods=(int)((double)zoomT1OnScreen*ptr->frequency);
+			double phase_in_time = zoomT1OnScreen - full_periods/ptr->frequency;
+			phase = (phase_in_time*ptr->frequency) * 360.0;
+		}
+		return getSignalSource(top, samp_rate, *ptr, phase);
 	case SIGNAL_TYPE_BUFFER:
 		if (!ptr->file.isNull()) {
 			auto str = ptr->file.toStdString();
@@ -705,7 +796,7 @@ void adiscope::SignalGenerator::channelWidgetEnabled(bool en)
 		plot->DetachCurve(id);
 	}
 
-	updatePreview();
+	resetZoom();
 	plot->replot();
 
 	bool enable_run = en;
