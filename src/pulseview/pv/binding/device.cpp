@@ -29,6 +29,7 @@
 #include "../prop/enum.hpp"
 #include "../prop/int.hpp"
 
+#include <libsigrok/version.h>
 #include <libsigrokcxx/libsigrokcxx.hpp>
 
 using boost::optional;
@@ -175,7 +176,11 @@ QString Device::print_timebase(Glib::VariantBase gvar)
 {
 	uint64_t p, q;
 	g_variant_get(gvar.gobj(), "(tt)", &p, &q);
+#if SR_LIB_VERSION_CURRENT >= 4
+	return QString::fromUtf8(sr_period_string(p, q));
+#else
 	return QString::fromUtf8(sr_period_string(p * q));
+#endif
 }
 
 QString Device::print_vdiv(Glib::VariantBase gvar)
