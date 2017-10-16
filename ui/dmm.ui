@@ -380,17 +380,87 @@ QLabel[ac=true] { qproperty-text: &quot;VRMS&quot;; }</string>
        <number>0</number>
       </property>
       <property name="leftMargin">
-       <number>0</number>
+       <number>25</number>
       </property>
       <property name="topMargin">
-       <number>0</number>
+       <number>15</number>
       </property>
       <property name="rightMargin">
-       <number>0</number>
+       <number>5</number>
       </property>
       <property name="bottomMargin">
        <number>0</number>
       </property>
+      <item>
+       <widget class="QPushButton" name="run_button">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="layoutDirection">
+         <enum>Qt::RightToLeft</enum>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton {
+  width: 80px;
+  height: 40px;
+  border-radius: 4px;
+  background-color: #27b34f;
+  color: white;
+  font-family: &quot;monospace&quot;;
+  font-weight: bold;
+
+  text-align: left;
+  padding-left: 20px;
+  padding-right: 20px;
+  qproperty-text: &quot;Run&quot;;
+}
+
+QPushButton[running=true] {
+  qproperty-text: &quot;Stop&quot;;
+  background-color: #F45000;
+}
+
+QPushButton:disabled {
+  background-color: grey;
+}</string>
+        </property>
+        <property name="text">
+         <string>Run</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/resources.qrc">
+          <normaloff>:/icons/ico-play.svg</normaloff>:/icons/ico-play.svg</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>8</width>
+          <height>10</height>
+         </size>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="verticalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>0</width>
+          <height>24</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
       <item>
        <widget class="QScrollArea" name="scrollArea">
         <property name="enabled">
@@ -417,7 +487,7 @@ QLabel[ac=true] { qproperty-text: &quot;VRMS&quot;; }</string>
            <x>0</x>
            <y>0</y>
            <width>170</width>
-           <height>837</height>
+           <height>737</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -431,87 +501,17 @@ QLabel[ac=true] { qproperty-text: &quot;VRMS&quot;; }</string>
            <number>20</number>
           </property>
           <property name="leftMargin">
-           <number>25</number>
+           <number>0</number>
           </property>
           <property name="topMargin">
-           <number>15</number>
+           <number>0</number>
           </property>
           <property name="rightMargin">
-           <number>15</number>
+           <number>10</number>
           </property>
           <property name="bottomMargin">
            <number>20</number>
           </property>
-          <item>
-           <widget class="QPushButton" name="run_button">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="layoutDirection">
-             <enum>Qt::RightToLeft</enum>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">QPushButton {
-  width: 80px;
-  height: 40px;
-  border-radius: 4px;
-  background-color: #27b34f;
-  color: white;
-  font-family: &quot;monospace&quot;;
-  font-weight: bold;
-
-  text-align: left;
-  padding-left: 20px;
-  padding-right: 20px;
-  qproperty-text: &quot;Run&quot;;
-}
-
-QPushButton[running=true] {
-  qproperty-text: &quot;Stop&quot;;
-  background-color: #F45000;
-}
-
-QPushButton:disabled {
-  background-color: grey;
-}</string>
-            </property>
-            <property name="text">
-             <string>Run</string>
-            </property>
-            <property name="icon">
-             <iconset resource="../resources/resources.qrc">
-              <normaloff>:/icons/ico-play.svg</normaloff>:/icons/ico-play.svg</iconset>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>8</width>
-              <height>10</height>
-             </size>
-            </property>
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="verticalSpacer_2">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Fixed</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>0</width>
-              <height>24</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
           <item>
            <widget class="QLabel" name="label">
             <property name="sizePolicy">
@@ -1008,6 +1008,11 @@ color: white;
  </widget>
  <customwidgets>
   <customwidget>
+   <class>adiscope::CustomSwitch</class>
+   <extends>QPushButton</extends>
+   <header>customSwitch.hpp</header>
+  </customwidget>
+  <customwidget>
    <class>adiscope::DetachDragZone</class>
    <extends>QWidget</extends>
    <header>detachdragzone.h</header>
@@ -1017,11 +1022,6 @@ color: white;
    <class>QwtThermo</class>
    <extends>QWidget</extends>
    <header>qwt_thermo.h</header>
-  </customwidget>
-  <customwidget>
-   <class>adiscope::CustomSwitch</class>
-   <extends>QPushButton</extends>
-   <header>customSwitch.hpp</header>
   </customwidget>
   <customwidget>
    <class>adiscope::LcdNumber</class>
