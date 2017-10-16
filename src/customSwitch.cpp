@@ -81,4 +81,8 @@ void CustomSwitch::showEvent(QShowEvent *event)
 		handle.setGeometry(QRect(width() - handle.width(), handle.y(),
 					handle.width(), handle.height()));
 	}
+	else {
+		handle.setGeometry(QRect(0, handle.y(), handle.width(),
+					 handle.height()));
+	}
 }

@@ -1668,9 +1668,13 @@ void LogicAnalyzer::resetInstrumentToDefault()
 	setSampleRate();
 	setHWTriggerDelay(active_triggerSampleCount);
 	setTriggerDelay();
-	ui->btnCursorsLock->setChecked(false);
 	ui->boxCursors->setChecked(false);
+	if(ui->btnCursorsLock->isChecked())
+		ui->btnCursorsLock->toggle();
+	ui->cursorSettings->update();
 	ui->btnShowChannels->clicked(false);
+	initialised = false;
+	resizeEvent();
 	main_win->session_.clear_data();
 	updateBufferPreviewer();
 }
