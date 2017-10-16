@@ -4,7 +4,7 @@
 #include <QMouseEvent>
 #include <QDebug>
 #include <QScrollBar>
-#include <QPointf>
+#include <QPointF>
 
 using namespace adiscope;
 
