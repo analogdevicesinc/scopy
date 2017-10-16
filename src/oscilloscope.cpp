@@ -2044,9 +2044,9 @@ void Oscilloscope::measure_panel_init()
 	cursor_readouts_ui->cursorV1->setMinimumWidth(minWidth);
 	cursor_readouts_ui->cursorV2->setMinimumWidth(minWidth);
 	cursor_readouts_ui->voltageDelta->setMinimumWidth(minWidth);
-	delete label;
-
 	measure_panel_ui->scrollArea->setMinimumHeight(label->height() * 4);
+
+	delete label;
 
 	QHBoxLayout *hLayout = static_cast<QHBoxLayout *>(
 		measure_panel_ui->cursorReadouts->layout());
