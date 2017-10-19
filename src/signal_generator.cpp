@@ -299,6 +299,7 @@ void SignalGenerator::resetZoom()
 {
 
 	double period=0.0;
+	unsigned int slowSignalId;
 	for (auto it = channels.begin(); it != channels.end(); ++it) {
 		if ((*it)->enableButton()->isChecked()) {
 			auto ptr = getData((*it));
@@ -310,13 +311,15 @@ void SignalGenerator::resetZoom()
 				if(period< 1 / (ptr->frequency))
 				{
 					period=(1/ptr->frequency);
+					slowSignalId = ptr->id;
 				}
 				break;
 			case SIGNAL_TYPE_MATH:
-				if(period< 1 / (ptr->frequency))
-				{
-					period=(1/ptr->frequency);
+				if (period< 1 / (ptr->math_freq)) {
+					period=(1/ptr->math_freq);
+					slowSignalId = ptr->id;
 				}
+
 				break;
 			default:
 				break;
@@ -329,6 +332,8 @@ void SignalGenerator::resetZoom()
 	plot->setHorizOffset(period/2);
 	plot->zoomBaseUpdate();
 	rescale();
+	plot->DetachCurve(slowSignalId);
+	plot->AttachCurve(slowSignalId);
 }
 
 void SignalGenerator::rescale()
@@ -777,8 +782,24 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
 		if (!ptr->function.isEmpty()) {
 			auto str = ptr->function.toStdString();
 
-			return iio::iio_math_gen::make(samp_rate,
-					ptr->math_freq, str);
+			if (preview) {
+				int full_periods=(int)((double)zoomT1OnScreen*ptr->math_freq);
+				double phase_in_time = zoomT1OnScreen - full_periods/ptr->math_freq;
+				phase = (phase_in_time*ptr->math_freq) * 360.0;
+				auto src = iio::iio_math_gen::make(samp_rate,
+				                                   ptr->math_freq, str);
+
+				uint64_t to_skip = samp_rate * phase / (ptr->math_freq * 360.0);
+				auto skip_head = blocks::skiphead::make(sizeof(float),(uint64_t)to_skip);
+				top->connect(src, 0, skip_head, 0);
+				return skip_head;
+
+			} else {
+				return iio::iio_math_gen::make(samp_rate,
+				                               ptr->math_freq, str);
+			}
+
+
 		}
 	default:
 		break;
