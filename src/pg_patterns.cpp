@@ -397,6 +397,7 @@ void ClockPattern::set_phase(int value)
 	if (phase<0) {
 		phase = 360-(abs(phase)%360);
 	}
+
 	auto max=360;
 	phase_granularity=360/boost::math::gcd((int)phase,max);
 
@@ -425,9 +426,10 @@ uint8_t ClockPattern::generate_pattern(uint32_t sample_rate,
 	float f_number_of_periods = number_of_samples / f_period_number_of_samples;
 	qDebug()<<"number_of_periods - " << f_number_of_periods;
 	float f_low_number_of_samples = (f_period_number_of_samples *
-	                               (100-duty_cycle)) / 100;
+	                                 (100-duty_cycle)) / 100;
 	qDebug()<<"low_number_of_samples - " << f_low_number_of_samples;
-	float f_high_number_of_samples = f_period_number_of_samples - f_low_number_of_samples;
+	float f_high_number_of_samples = f_period_number_of_samples -
+	                                 f_low_number_of_samples;
 	qDebug()<<"high_number_of_samples - " << f_high_number_of_samples;
 
 
@@ -436,8 +438,10 @@ uint8_t ClockPattern::generate_pattern(uint32_t sample_rate,
 	int low_number_of_samples = (int)round(f_low_number_of_samples);
 	int high_number_of_samples = (int)round(f_high_number_of_samples);
 
-	if(period_number_of_samples==0)
+	if (period_number_of_samples==0) {
 		period_number_of_samples=1;
+	}
+
 	delete_buffer();
 	buffer = new short[number_of_samples];
 	int i=0;
@@ -470,9 +474,12 @@ ClockPatternUI::ClockPatternUI(ClockPattern *pattern,
 		{"MHz", 1E+6}
 	}, "Frequency", 1e0, PGMaxSampleRate/2,true,false,this, {1,2.5,5});
 	ui->verticalLayout->addWidget(frequencySpinButton);
+	frequencySpinButton->setFineModeAvailable(false);
 	phaseSpinButton = new PhaseSpinButton(this);
+	phaseSpinButton->setFineModeAvailable(false);
 	ui->verticalLayout->addWidget(phaseSpinButton);
 	dutySpinButton = new PositionSpinButton({{"%",1}},"Duty",0,100,true,false,this);
+	dutySpinButton->setFineModeAvailable(false);
 	ui->verticalLayout->addWidget(dutySpinButton);
 	setVisible(false);
 }
@@ -515,17 +522,17 @@ void ClockPatternUI::parse_ui()
 	bool ok =0;
 
 
-	QObject* obj = sender();
-	if(obj==frequencySpinButton)
-	{
+	QObject *obj = sender();
+
+	if (obj==frequencySpinButton) {
 		requestedFrequency = frequencySpinButton->value();
 	}
-	if(obj==phaseSpinButton)
-	{
+
+	if (obj==phaseSpinButton) {
 		requestedPhase=phaseSpinButton->value();
 	}
-	if(obj==dutySpinButton)
-	{
+
+	if (obj==dutySpinButton) {
 		requestedDuty=dutySpinButton->value();
 	}
 
@@ -550,11 +557,14 @@ void ClockPatternUI::parse_ui()
 
 
 	auto phasestep=360.0/ (PGMaxSampleRate / pattern->get_frequency());
-	auto phaseval = requestedPhase;//phaseSpinButton->value();
+	phasestep=(phasestep>1?phasestep:1);
+	phasestep=floor(phasestep*360+0.5)/360.0;
+	auto phaseval = requestedPhase;
+	phaseval = floor((phaseval/phasestep)+0.5)*phasestep;
 
 	phaseSpinButton->blockSignals(true);
-	phaseSpinButton->setStep(phasestep>15 ? phasestep : 15);
-	phaseSpinButton->setValue(floor(phaseval/phasestep)*phasestep);
+	phaseSpinButton->setStep(phasestep);
+	phaseSpinButton->setValue(phaseval);
 	phaseSpinButton->blockSignals(false);
 	pattern->set_phase(phaseSpinButton->value());
 	Q_EMIT patternParamsChanged();

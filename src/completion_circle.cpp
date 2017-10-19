@@ -29,7 +29,8 @@ using namespace adiscope;
 
 CompletionCircle::CompletionCircle(QWidget *parent, bool invert_circle) :
 	QDial(parent), m_xc(0), m_yc(0), m_radius(23),
-	m_pressed(false), m_log_scale(false), invert_circle(invert_circle), m_origin(90)
+	m_pressed(false), m_log_scale(false), invert_circle(invert_circle),
+	m_origin(90),m_toggleable(true)
 {
 	setWrapping(true);
 	setMinimumSize(50, 50);
@@ -89,15 +90,17 @@ void CompletionCircle::paintEvent(QPaintEvent *)
 	p.drawArc(rect, (m_origin + angle) * 16, (360 - angle) * 16);
 
 	// The center dot
-	QColor centerDotColor(Qt::black);
+	if (m_toggleable) {
+		QColor centerDotColor(Qt::black);
 
-	if (m_pressed) {
-		centerDotColor = QColor(255, 114, 0);
+		if (m_pressed) {
+			centerDotColor = QColor(255, 114, 0);
+		}
+
+		p.setPen(centerDotColor);
+		p.setBrush(centerDotColor);
+		p.drawEllipse(QPoint(xc, yc), 3, 3);
 	}
-
-	p.setPen(centerDotColor);
-	p.setBrush(centerDotColor);
-	p.drawEllipse(QPoint(xc, yc), 3, 3);
 
 	// The dash
 	angle = angle + m_origin;
@@ -121,9 +124,11 @@ void CompletionCircle::mousePressEvent(QMouseEvent *e)
 {
 	if (e->button() == Qt::LeftButton) {
 		if (pointInsideCircle(e->pos(), m_xc, m_yc, m_radius - 2)) {
-			m_pressed = !m_pressed;
-			repaint();
-			Q_EMIT toggled(m_pressed);
+			if (m_toggleable) {
+				m_pressed = !m_pressed;
+				repaint();
+				Q_EMIT toggled(m_pressed);
+			}
 		}
 	}
 }
@@ -221,11 +226,20 @@ void CompletionCircle::setMaximumDouble(double value)
 	repaint();
 }
 
+void CompletionCircle::setToggleable(bool tog)
+{
+	m_toggleable = tog;
+}
+
 bool CompletionCircle::isLogScale()
 {
 	return m_log_scale;
 }
 
+bool CompletionCircle::toggleable()
+{
+	return m_toggleable;
+}
 void CompletionCircle::setIsLogScale(bool state)
 {
 	m_log_scale = state;

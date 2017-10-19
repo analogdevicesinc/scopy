@@ -37,11 +37,13 @@ public:
 	double maximumDouble();
 	bool toggledState();
 	bool isLogScale();
+	bool toggleable();
 
 	void setOrigin(double);
 	void setMinimumDouble(double);
 	void setMaximumDouble(double);
 	void setIsLogScale(bool);
+	void setToggleable(bool);
 
 public Q_SLOTS:
 	void setValueDouble(double);
@@ -79,6 +81,7 @@ private:
 	bool m_pressed;
 	bool m_log_scale;
 	bool invert_circle;
+	bool m_toggleable;
 };
 }
 

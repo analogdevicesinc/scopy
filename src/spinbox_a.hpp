@@ -98,6 +98,10 @@ public:
 	bool progressShown() const;
 	void showProgress(bool show);
 
+    bool fineModeAvailable();
+    void setFineModeAvailable(bool);
+
+
 	QString getName() const;
 	void setName(const QString& name);
 
@@ -146,7 +150,7 @@ public:
 	                         const QString& name = "",
 	                         double min_value = 0.0, double max_value = 0.0,
 	                         bool hasProgressWidget = true,
-				 bool invertCircle = false, QWidget *parent = 0, std::vector<double> steps = {1,2,5});
+                 bool invertCircle = false, QWidget *parent = 0, std::vector<double> steps = {1,2,5});
 
 public Q_SLOTS:
 	void stepUp();

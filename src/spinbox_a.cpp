@@ -95,6 +95,7 @@ SpinBoxA::SpinBoxA(vector<pair<QString, double> >units, const QString& name,
 
 	ui->SBA_Label->setText(name);
 
+
 	if (m_value < min_value)
 		setValue(min_value);
 	else if (m_value > max_value)
@@ -376,6 +377,15 @@ bool SpinBoxA::progressShown() const
 void SpinBoxA::showProgress(bool show)
 {
 	ui->SBA_CompletionCircle->setVisible(show);
+}
+
+bool SpinBoxA::fineModeAvailable()
+{
+    return ui->SBA_CompletionCircle->toggleable();
+}
+void SpinBoxA::setFineModeAvailable(bool tog)
+{
+    ui->SBA_CompletionCircle->setToggleable(tog);
 }
 
 QString SpinBoxA::getName() const
