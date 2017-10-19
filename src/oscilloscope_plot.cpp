@@ -607,6 +607,16 @@ Measure* CapturePlot::measureOfChannel(int chnIdx) const
 	return measure;
 }
 
+void CapturePlot::bringCurveToFront(unsigned int curveIdx)
+{
+	for (auto &item : d_offsetHandles) {
+		if (item->pen().color() == getLineColor(curveIdx))
+			item->raise();
+	}
+
+	DisplayPlot::bringCurveToFront(curveIdx);
+}
+
 void CapturePlot::onChannelAdded(int chnIdx)
 {
 	setLeftVertAxesCount(chnIdx + 1);

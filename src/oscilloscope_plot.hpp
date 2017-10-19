@@ -103,6 +103,7 @@ namespace adiscope {
 		double getMaxOffsetValue();
 		double getMinOffsetValue();
 
+		void bringCurveToFront(unsigned int curveIdx);
 	Q_SIGNALS:
 		void timeTriggerValueChanged(double);
 		void channelOffsetChanged(double);
