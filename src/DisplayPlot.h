@@ -364,6 +364,7 @@ public:
 
 
 
+  void bringCurveToFront(unsigned int curveIdx);
 public Q_SLOTS:
   virtual void disableLegend();
   virtual void setYaxis(double min, double max);

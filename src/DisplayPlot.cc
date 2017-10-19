@@ -979,6 +979,13 @@ void DisplayPlot::AttachCurve(unsigned int curveIdx)
 	}
 }
 
+void DisplayPlot::bringCurveToFront(unsigned int curveIdx)
+{
+	DetachCurve(curveIdx);
+	AttachCurve(curveIdx);
+	replot();
+}
+
 QwtPlotCurve * DisplayPlot::Curve(unsigned int curveIdx)
 {
 	QwtPlotCurve *curve = NULL;
