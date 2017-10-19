@@ -859,6 +859,10 @@ void Oscilloscope::add_math_channel(const std::string& function)
 	// Default hysteresis levels for measurements of the new channel
 	plot.setPeriodDetectHyst(curve_id, 1.0 / 5);
 
+	// Keep the current selected channels curve on top of the other ones
+	if (isVisible())
+		plot.bringCurveToFront(current_channel);
+
 	if (nb_math_channels == MAX_MATH_CHANNELS ){
 		if (ui->btnAddMath->isChecked()){
 			ui->btnAddMath->setChecked(false);
@@ -1115,6 +1119,7 @@ void Oscilloscope::setFFT_params(bool force)
 void Oscilloscope::setChannelWidgetIndex(int chnIdx)
 {
 	current_ch_widget = chnIdx;
+	plot.bringCurveToFront(chnIdx);
 }
 
 void Oscilloscope::onFFT_view_toggled(bool visible)
@@ -1430,6 +1435,7 @@ void adiscope::Oscilloscope::onChannelWidgetSelected(bool checked)
 	if (id != current_channel) {
 		current_channel = id;
 		Q_EMIT selectedChannelChanged(id);
+		plot.bringCurveToFront(id);
 	}
 
 	if (plot.measurementsEnabled()) {
