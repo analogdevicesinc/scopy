@@ -142,6 +142,7 @@ QComboBox:disabled
   border-radius: 4px;
   background-color: #27b34f;
   color: white;
+  font-size: 12px;
   font-family: &quot;monospace&quot;;
   font-weight: bold;
 
@@ -217,7 +218,7 @@ QPushButton:disabled {
   color: white;
   font-family: &quot;monospace&quot;;
   font-weight: bold;
-
+  font-size: 12px;
   text-align: left;
   padding-left: 20px;
   padding-right: 20px;
@@ -275,6 +276,7 @@ QPushButton:disabled {
 color: white;
 background-color: #4A64FF;
 font-family: &quot;monospace&quot;;
+font-size: 12px;
 font-weight: bold;
 height: 30px;
 border-width: 0px;
