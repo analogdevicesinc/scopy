@@ -138,7 +138,7 @@ QwtText OscScaleDraw::label( double value ) const
 	QString prefix;
 	double scale = 1.0;
 	QString sign = "";
-	unsigned int bonusPrecision = 0;
+	int bonusPrecision = 0;
 
 	double lower = scaleDiv().interval().minValue();
 	double upper = scaleDiv().interval().maxValue();
@@ -153,36 +153,21 @@ QwtText OscScaleDraw::label( double value ) const
 		qDebug() << "The label with value: " << value << " has position: " << position;
 
 		if (position == 4) {
+			// center label with extra precision
 			bonusPrecision = 3;
 		} else if (position < 4){
 			sign = "-";
+			// negative delta label
 			value = step * (4 - position);
 		} else if (position > 4) {
 			sign = "+";
+			// positive delta label
 			value = step * (position - 4);
 		}
 	}
 
 	if (m_formatter) {
 		m_formatter->getFormatAttributes(value, prefix, scale);
-	}
-
-	else {
-		MetricPrefixFormatter *m_form = new MetricPrefixFormatter();
-		m_form->getFormatAttributes(value, prefix, scale);
-		if (prefix == "n"){
-			prefix = "μ";
-			scale = 1e-6;
-		}
-		if (prefix == "m" && (value == 0.5 || value == -0.5)){
-			prefix = "";
-			scale = 1;
-		}
-		if (prefix == "μ" && (value == 0.0005 || value == -0.0005)){
-			prefix = "m";
-			scale = 1e-3;
-		}
-		bonusPrecision = -2;
 	}
 
 	return sign + QLocale().toString(value / scale, 'f', m_floatPrecision + bonusPrecision)

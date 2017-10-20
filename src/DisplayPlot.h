@@ -566,7 +566,7 @@ protected:
 	virtual void draw(QPainter *, const QPalette &) const;
 
 private:
-	unsigned int m_floatPrecision;
+	int m_floatPrecision;
 	QString m_unit;
 	PrefixFormatter *m_formatter;
 };
