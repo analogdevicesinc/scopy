@@ -162,6 +162,7 @@ TimeDomainDisplayPlot::TimeDomainDisplayPlot(QWidget* parent, unsigned int xNumD
 
   // Reconfigure the bottom horizontal axis that was created by the base class
   configureAxis(QwtPlot::xBottom, 0);
+  configureAxis(QwtPlot::yLeft, 0);
 
   d_yAxisUnit = "";
 
