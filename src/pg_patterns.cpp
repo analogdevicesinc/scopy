@@ -474,7 +474,6 @@ ClockPatternUI::ClockPatternUI(ClockPattern *pattern,
 		{"MHz", 1E+6}
 	}, "Frequency", 1e0, PGMaxSampleRate/2,true,false,this, {1,2.5,5});
 	ui->verticalLayout->addWidget(frequencySpinButton);
-	frequencySpinButton->setFineModeAvailable(false);
 	phaseSpinButton = new PhaseSpinButton(this);
 	phaseSpinButton->setFineModeAvailable(false);
 	ui->verticalLayout->addWidget(phaseSpinButton);
@@ -524,7 +523,13 @@ void ClockPatternUI::parse_ui()
 
 	QObject *obj = sender();
 
+	bool freqStepDown = false;
+
 	if (obj==frequencySpinButton) {
+		if (frequencySpinButton->value() < requestedFrequency) {
+			freqStepDown=true;
+		}
+
 		requestedFrequency = frequencySpinButton->value();
 	}
 
@@ -537,11 +542,22 @@ void ClockPatternUI::parse_ui()
 	}
 
 	auto freq=requestedFrequency;//frequencySpinButton->value();
-	freq=(PGMaxSampleRate)/(PGMaxSampleRate/(long)freq);
-	freq=ceil(freq*100)/100;
-	frequencySpinButton->setValue(freq);
-	pattern->set_frequency(freq);
 
+	long div;
+
+	if (freqStepDown) {
+		div=(long)ceil((double)PGMaxSampleRate/freq);
+	} else {
+		div=(long)floor((double)PGMaxSampleRate/freq);
+	}
+
+	freq=(PGMaxSampleRate)/(float)div;
+	requestedFrequency=freq;
+
+	frequencySpinButton->blockSignals(true);
+	frequencySpinButton->setValue(freq);
+	frequencySpinButton->blockSignals(false);
+	pattern->set_frequency(freq);
 
 	auto dutystep=100.0/ (PGMaxSampleRate / pattern->get_frequency());
 	dutystep=(dutystep>1 ? dutystep : 1);
