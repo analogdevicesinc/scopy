@@ -99,6 +99,7 @@ namespace adiscope {
 
 		unsigned int currentChannel;
 		unsigned long sample_rate;
+        unsigned long max_sample_rate;
 		unsigned long nb_points;
 
 		QButtonGroup *settings_group;
@@ -233,8 +234,7 @@ namespace adiscope {
 
 	private:
 		SignalGenerator *gen;
-	};
-	unsigned long max_sample_rate;
+    };
 }
 
 #endif /* M2K_SIGNAL_GENERATOR_H */
