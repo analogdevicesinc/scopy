@@ -134,6 +134,8 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 		}
 	}
 
+	max_sample_rate = sample_rate;
+
 	/* FIXME: TODO: Move this into a HW class / lib M2k */
 	struct iio_device *fabric = iio_context_find_device(ctx, "m2k-fabric");
 
@@ -1090,8 +1092,8 @@ void SignalGenerator::calc_sampling_params(const iio_device *dev,
 	if (use_oversampling(dev)) {
 		/* We assume that the rate requested here will always be a
 		 * divider of the max sample rate */
-		out_oversampling_ratio = sample_rate / rate;
-		out_sample_rate = sample_rate;
+		out_oversampling_ratio = max_sample_rate / rate;
+		out_sample_rate = max_sample_rate;
 
 		qDebug() << QString("Using oversampling with a ratio of %1")
 		         .arg(out_oversampling_ratio);

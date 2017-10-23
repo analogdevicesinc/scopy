@@ -234,6 +234,7 @@ namespace adiscope {
 	private:
 		SignalGenerator *gen;
 	};
+	unsigned long max_sample_rate;
 }
 
 #endif /* M2K_SIGNAL_GENERATOR_H */
