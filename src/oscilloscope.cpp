@@ -108,7 +108,6 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	measure_settings_init();
 
 	fft_size = 1024;
-	ui->comboBox->setCurrentText(QString::number(fft_size));
 
 	last_set_sample_count = 0;
 	last_set_time_pos = 0;
@@ -1306,41 +1305,31 @@ void Oscilloscope::comboBoxUpdateToValue(QComboBox *box, double value, std::vect
 		box->setCurrentIndex(i);
 }
 
-void adiscope::Oscilloscope::on_comboBox_currentIndexChanged(const QString &arg1)
+void adiscope::Oscilloscope::apply_fft_buffersize()
 {
-	bool ok;
-	int size = arg1.toInt(&ok);
+	if (fft_is_visible) {
+		bool started = iio->started();
+		if (started)
+			iio->lock();
 
-	if (!ok)
-		return;
+		qt_fft_block->set_nsamps(fft_size);
 
-	if (size != fft_size) {
-		fft_size = size;
+		for (unsigned int i = 0; i < nb_channels; i++)
+			iio->disconnect(fft_ids[i]);
 
-		if (fft_is_visible) {
-			bool started = iio->started();
-			if (started)
-				iio->lock();
+		if (started)
+			iio->unlock();
 
-			qt_fft_block->set_nsamps(fft_size);
+		onFFT_view_toggled(fft_is_visible);
 
-			for (unsigned int i = 0; i < nb_channels; i++)
-				iio->disconnect(fft_ids[i]);
+		if (started)
+			iio->lock();
 
-			if (started)
-				iio->unlock();
+		for (unsigned int i = 0; i < nb_channels; i++)
+			iio->set_buffer_size(fft_ids[i], fft_size);
 
-			onFFT_view_toggled(fft_is_visible);
-
-			if (started)
-				iio->lock();
-
-			for (unsigned int i = 0; i < nb_channels; i++)
-				iio->set_buffer_size(fft_ids[i], fft_size);
-
-			if (started)
-				iio->unlock();
-		}
+		if (started)
+			iio->unlock();
 	}
 }
 
@@ -1534,16 +1523,11 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 		// Time base changes can limit the time position value
 		if (timePosition->value() != -params.timePos)
 			timePosition->setValue(-params.timePos);
-
-		if(fft_is_visible) {
-			setFFT_params();
-		}
 	}
 
 	for (unsigned int i = 0; i < nb_channels; i++) {
 		iio->set_buffer_size(ids[i], active_sample_count);
 		iio->set_buffer_size(xy_ids[i], active_sample_count);
-		iio->set_buffer_size(fft_ids[i], fft_size);
 	}
 
 	/* timeout = how long a buffer capture takes + transmission latency. The
@@ -1554,6 +1538,12 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 
 	if (started)
 		iio->unlock();
+
+
+	// Compute the appropriate value for fft_size
+	double power = ceil(log2(active_sample_count));
+	fft_size = pow(2, power);
+	apply_fft_buffersize();
 
 	// Change the sensitivity of time position control
 	timePosition->setStep(value / 10);
@@ -1637,6 +1627,11 @@ void adiscope::Oscilloscope::onTimePositionChanged(double value)
 
 	if (started)
 		iio->unlock();
+
+	// Compute the appropriate value for fft_size
+	double power = ceil(log2(active_sample_count));
+	fft_size = pow(2, power);
+	apply_fft_buffersize();
 }
 
 void adiscope::Oscilloscope::rightMenuFinished(bool opened)

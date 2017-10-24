@@ -132,7 +132,7 @@ namespace adiscope {
 
 		void onChannelOffsetChanged(double value);
 
-		void on_comboBox_currentIndexChanged(const QString &arg1);
+		void apply_fft_buffersize();
 
 		void onChannelWidgetEnabled(bool);
 		void onChannelWidgetSelected(bool);
