@@ -556,6 +556,10 @@ void PositionSpinButton::stepUp()
 	double newVal;
 	double step = m_step;
 
+	if(m_step < current_scale) {
+		step = current_scale / 10;
+	}
+
 	if (isInFineMode()) {
 		step /= 10;
 	}
@@ -571,6 +575,10 @@ void PositionSpinButton::stepDown()
 	double current_scale = m_units[ui->SBA_Combobox->currentIndex()].second;
 	double newVal;
 	double step = m_step;
+
+	if(m_step < current_scale) {
+		step = current_scale / 10;
+	}
 
 	if (isInFineMode()) {
 		step /= 10;
