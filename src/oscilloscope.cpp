@@ -31,7 +31,6 @@
 /* Local includes */
 #include "adc_sample_conv.hpp"
 #include "customPushButton.hpp"
-#include "math.hpp"
 #include "oscilloscope.hpp"
 #include "dynamicWidget.hpp"
 #include "measurement_gui.h"
@@ -45,7 +44,6 @@
 #include "channel_widget.hpp"
 
 /* Generated UI */
-#include "ui_math_panel.h"
 #include "ui_channel_settings.h"
 #include "ui_cursors_settings.h"
 #include "ui_osc_general_settings.h"
@@ -90,7 +88,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	current_channel(-1), math_chn_counter(0),
 	channels_group(new QButtonGroup(this)),
 	zoom_level(0),
-	current_ch_widget(-1)
+	current_ch_widget(-1),
+	addChannel(true)
 {
 	ui->setupUi(this);
 	int triggers_panel = ui->stackedWidget->insertWidget(-1, &trigger_settings);
@@ -370,6 +369,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	ch_ui->vertical->insertWidget(1, voltsPerDiv, 0, Qt::AlignLeft);
 	ch_ui->vertical->insertWidget(2, voltsPosition, 0, Qt::AlignLeft);
 
+	init_channel_settings();
+
 	timeBase->setValue(plot.HorizUnitsPerDiv());
 	voltsPerDiv->setValue(plot.VertUnitsPerDiv());
 	timePosition->setStep(timeBase->value() / 10);
@@ -579,6 +580,20 @@ Oscilloscope::~Oscilloscope()
 	delete ui;
 }
 
+void Oscilloscope::init_channel_settings()
+{
+	connect(ch_ui->function, &QPushButton::toggled, this,
+		&Oscilloscope::openEditMathPanel);
+
+	connect(ui->btnAddMath, &QPushButton::toggled, [=](bool on){
+		if (on && !addChannel) {
+			addChannel = true;
+			math_pair->first.btnAddChannel->setText("Add Channel");
+			ch_ui->function->setChecked(false);
+		}
+	});
+}
+
 void Oscilloscope::cursor_panel_init()
 {
 	cr_ui = new Ui::CursorsSettings;
@@ -727,6 +742,8 @@ void Oscilloscope::create_math_panel()
 
 	Math *math = new Math(nullptr, nb_channels);
 
+	math_pair = new QPair<Ui::MathPanel, Math*>(math_ui, math);
+
 	connect(math, &Math::functionValid,
 			[=](const QString &function) {
 				btn->setEnabled(true);
@@ -740,8 +757,14 @@ void Oscilloscope::create_math_panel()
 
 	connect(btn, &QPushButton::clicked,
 			[=]() {
-				QVariant var = btn->property("function");
-				add_math_channel(var.toString().toStdString());
+				if (addChannel) {
+					QVariant var = btn->property("function");
+					add_math_channel(var.toString().toStdString());
+				} else {
+					QVariant var = btn->property("function");
+					editMathChannelFunction(current_ch_widget,
+								var.toString().toStdString());
+				}
 			});
 
 	QVBoxLayout *layout = static_cast<QVBoxLayout *>(panel->layout());
@@ -817,6 +840,9 @@ void Oscilloscope::add_math_channel(const std::string& function)
 	ChannelWidget *channel_widget = new ChannelWidget(curve_id, true, false,
 		plot.getLineColor(curve_id).name(), this);
 
+	channel_widget->setMathChannel(true);
+	channel_widget->setFunction(QString::fromStdString(function));
+
 	channel_widget->setFullName(QString("Math %1").arg(curve_number + 1));
 	channel_widget->setShortName(QString("M%1").arg(curve_number + 1));
 	channel_widget->nameButton()->setText(channel_widget->shortName());
@@ -825,8 +851,6 @@ void Oscilloscope::add_math_channel(const std::string& function)
 		channel_widget->fullName());
 
 	channel_widget->setProperty("curve_nb", QVariant(curve_number));
-	channel_widget->setProperty("function",
-			QVariant(QString::fromStdString(function)));
 	channel_widget->deleteButton()->setProperty(
 		"curve_name", QVariant(qname));
 
@@ -838,6 +862,11 @@ void Oscilloscope::add_math_channel(const std::string& function)
 		SLOT(onChannelWidgetMenuToggled(bool)));
 	connect(channel_widget, SIGNAL(deleteClicked()),
 		SLOT(onChannelWidgetDeleteClicked()));
+	connect(channel_widget, &ChannelWidget::menuToggled,
+		[=](bool on){
+		if (!on)
+			ch_ui->function->setChecked(false);
+	});
 
 	ui->channelsList->addWidget(channel_widget);
 
@@ -1766,6 +1795,96 @@ void Oscilloscope::update_chn_settings_panel(int id)
 	ch_ui->line_channelColor->setStyleSheet(stylesheet);
 	int cmbIdx = (int)(plot.getLineWidthF(id) / 0.5) - 1;
 	ch_ui->cmbChnLineWidth->setCurrentIndex(cmbIdx);
+
+	if (chn_widget->isMathChannel()) {
+		ch_ui->function->setVisible(true);
+		ch_ui->function->setText(chn_widget->function());
+	} else {
+		ch_ui->function->setVisible(false);
+	}
+}
+
+void Oscilloscope::openEditMathPanel(bool on)
+{
+	ChannelWidget *chn_widget = channelWidgetAtId(current_ch_widget);
+
+	if (on) {
+		addChannel = false;
+		triggerRightMenuToggle(
+			static_cast<CustomPushButton* >(chn_widget->menuButton()), false);
+		math_pair->first.btnAddChannel->setText("Save");
+		math_pair->second->setFunction(chn_widget->function());
+		triggerRightMenuToggle(
+			static_cast<CustomPushButton* >(ui->btnAddMath), true);
+	}
+}
+
+void Oscilloscope::editMathChannelFunction(int id, const std::string& new_function)
+{
+	ChannelWidget *chn_widget = channelWidgetAtId(id);
+
+	triggerRightMenuToggle(
+		static_cast<CustomPushButton* >(ui->btnAddMath), false);
+	triggerRightMenuToggle(
+		static_cast<CustomPushButton* >(chn_widget->menuButton()), true);
+	math_pair->first.btnAddChannel->setText("Add Channel");
+	math_pair->second->setFunction("");
+	addChannel = true;
+	ch_ui->function->setChecked(false);
+
+	if (chn_widget->function().toStdString() == new_function)
+		return;
+
+	QString qname = chn_widget->deleteButton()->property("curve_name").toString();
+	std::string name = qname.toStdString();
+
+	auto math = iio::iio_math::make(new_function, nb_channels);
+
+	bool started = iio->started();
+	if (started)
+		iio->lock();
+
+	auto pair = math_sinks.value(qname);
+	for (unsigned int i = 0; i < nb_channels; ++i)
+		iio->disconnect(adc_samp_conv_block, i, pair.first, i);
+	iio->disconnect(pair.first, 0, pair.second, 0);
+
+	auto math_pair = QPair<gr::basic_block_sptr, gr::basic_block_sptr>(
+				math, pair.second);
+
+	math_sinks.insert(qname, math_pair);
+
+	for (unsigned int i = 0; i < nb_channels; ++i)
+		iio->connect(adc_samp_conv_block, i, math, i);
+	iio->connect(math, 0, pair.second, 0);
+
+	if (started)
+		iio->unlock();
+
+	// If the oscilloscope is not running, create a single run situation only for
+	// the channel that is edited .
+//	else {
+//		QList<QString> keys = math_sinks.keys();
+//		for (const QString &key : keys)
+//			if (key != qname) {
+//				pair = math_sinks.value(key);
+//				for (unsigned int i = 0; i < nb_channels; ++i)
+//					iio->disconnect(adc_samp_conv_block, i, pair.first, i);
+//				iio->disconnect(pair.first, 0, pair.second, 0);
+//			}
+
+//		ui->pushButtonSingle->setChecked(true);
+
+//		for (const QString &key : keys)
+//			if (key != qname) {
+//				pair = math_sinks.value(key);
+//				for (unsigned int i = 0; i < nb_channels; ++i)
+//					iio->connect(adc_samp_conv_block, i, pair.first, i);
+//				iio->connect(pair.first, 0, pair.second, 0);
+//			}
+//	}
+
+	chn_widget->setFunction(QString::fromStdString(new_function));
 }
 
 void Oscilloscope::onMeasuremetsAvailable()

@@ -55,6 +55,10 @@
 #include "osc_adc.h"
 #include "tool.hpp"
 #include "osc_export_settings.h"
+#include "math.hpp"
+
+/*Generated UI */
+#include "ui_math_panel.h"
 
 class QJSEngine;
 class SymmetricBufferMode;
@@ -173,6 +177,8 @@ namespace adiscope {
 
 		void on_xyPlotLineType_toggled(bool checked);
 
+		void openEditMathPanel(bool on);
+
 	private:
 		std::shared_ptr<GenericAdc> adc;
 		std::shared_ptr<M2kAdc> m2k_adc;
@@ -204,6 +210,9 @@ namespace adiscope {
 		QWidget *statisticsPanel;
 		AnalogBufferPreviewer *buffer_previewer;
 		ExportSettings *exportSettings;
+
+		QPair<Ui::MathPanel, Math*> *math_pair;
+		bool addChannel;
 
 		QMap<int, bool> exportConfig;
 
@@ -305,6 +314,8 @@ namespace adiscope {
 		void cursor_panel_init();
 		void setFFT_params(bool force=false);
 		void setChannelWidgetIndex(int chnIdx);
+		void init_channel_settings();
+		void editMathChannelFunction(int id, const std::string &new_function);
 	};
 
 	class Oscilloscope_API : public ApiObject
