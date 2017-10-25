@@ -36,6 +36,12 @@ public:
 	QString shortName() const;
 	void setShortName(const QString&);
 
+	QString function() const;
+	void setFunction(const QString &);
+
+	bool isMathChannel() const;
+	void setMathChannel(const bool&);
+
 Q_SIGNALS:
 	void enabled(bool en);
 	void selected(bool on);
@@ -59,6 +65,8 @@ private:
 	QColor m_color;
 	QString m_fullName;
 	QString m_shortName;
+	bool m_math;
+	QString m_function;
 
 	void init();
 	void setButtonNoGroup(QAbstractButton *btn);

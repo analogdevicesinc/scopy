@@ -21,7 +21,9 @@ ChannelWidget::ChannelWidget(int id, bool deletable, bool simplified,
 	m_id(id),
 	m_deletable(deletable),
 	m_simplified(simplified),
-	m_color(color)
+	m_color(color),
+	m_math(false),
+	m_function("")
 {
 	init();
 }
@@ -142,6 +144,27 @@ QString ChannelWidget::shortName() const
 void ChannelWidget::setShortName(const QString &name)
 {
 	m_shortName = name;
+}
+
+QString ChannelWidget::function() const
+{
+	return m_function;
+}
+
+void ChannelWidget::setFunction(const QString &function)
+{
+	m_function = function;
+	setProperty("function", QVariant(function));
+}
+
+bool ChannelWidget::isMathChannel() const
+{
+	return m_math;
+}
+
+void ChannelWidget::setMathChannel(const bool &math)
+{
+	m_math = math;
 }
 
 void ChannelWidget::on_box_toggled(bool checked)
