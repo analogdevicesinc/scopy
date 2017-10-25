@@ -514,7 +514,13 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		zoom_level--;
 	});
 	connect(plot.getZoomer(), &OscPlotZoomer::zoomFinished, [=](){
-		onVertScaleValueChanged(voltsPerDiv->value());
+		ChannelWidget *channel_widget = channelWidgetAtId(current_ch_widget);
+
+		if (!channel_widget)
+			return;
+
+		if (channel_widget->menuButton()->isChecked())
+			onVertScaleValueChanged(voltsPerDiv->value());
 	});
 
 	export_settings_init();
