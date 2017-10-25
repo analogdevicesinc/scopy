@@ -884,8 +884,11 @@ void Oscilloscope::onChannelWidgetDeleteClicked()
 	unsigned int curve_id = cw->id();
 
 	if (curve_id == current_ch_widget &&
-			cw->menuButton()->isChecked())
-		triggerRightMenuToggle(static_cast<CustomPushButton*>(cw->menuButton()), false);
+			cw->menuButton()->isChecked()) {
+		menuButtonActions.removeAll(QPair<CustomPushButton*, bool>
+					    (static_cast<CustomPushButton*>(cw->menuButton()), true));
+		toggleRightMenu(static_cast<CustomPushButton*>(cw->menuButton()), false);
+	}
 	menuOrder.removeOne(static_cast<CustomPushButton*>(cw->menuButton()));
 
 	/*If there are no more channels enabled, we should
