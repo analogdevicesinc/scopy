@@ -43,14 +43,14 @@ extern "C" {
 }
 
 namespace Ui {
-	class SpectrumAnalyzer;
+class SpectrumAnalyzer;
 }
 
 namespace adiscope {
-	class SpectrumChannel;
-	class Filter;
-	class ChannelWidget;
-	class DbClickButtons;
+class SpectrumChannel;
+class Filter;
+class ChannelWidget;
+class DbClickButtons;
 }
 
 class QPushButton;
@@ -59,10 +59,14 @@ class QGridLayout;
 
 namespace adiscope {
 class SpectrumAnalyzer_API;
+class SpectrumChannel_API;
+class SpectrumMarker_API;
 
 class SpectrumAnalyzer: public Tool
 {
+	friend class SpectrumChannel_API;
 	friend class SpectrumAnalyzer_API;
+	friend class SpectrumMarker_API;
 	friend class ToolLauncher_API;
 
 	Q_OBJECT
@@ -82,8 +86,8 @@ public:
 	typedef boost::shared_ptr<SpectrumChannel> channel_sptr;
 
 	explicit SpectrumAnalyzer(struct iio_context *iio, Filter *filt,
-		std::shared_ptr<GenericAdc> adc, QPushButton *runButton,
-		ToolLauncher *parent);
+	                          std::shared_ptr<GenericAdc> adc, QPushButton *runButton,
+	                          QJSEngine *engine, ToolLauncher *parent);
 	~SpectrumAnalyzer();
 
 Q_SIGNALS:
@@ -138,8 +142,11 @@ private:
 	void updateMrkFreqPosSpinBtnLimits();
 	void updateMrkFreqPosSpinBtnValue();
 
+	QList<SpectrumChannel_API *> ch_api;
+	QList<SpectrumMarker_API *> marker_api;
+
 	QPair<int, int> getGridLayoutPosFromIndex(QGridLayout *layout,
-		int index) const;
+	                int index) const;
 
 private:
 	Ui::SpectrumAnalyzer *ui;
@@ -171,16 +178,17 @@ private:
 	gr::top_block_sptr top_block;
 
 	static std::vector<std::pair<QString,
-		FftDisplayPlot::MagnitudeType>> mag_types;
+	       FftDisplayPlot::MagnitudeType>> mag_types;
 	static std::vector<std::pair<QString,
-		FftDisplayPlot::AverageType>> avg_types;
+	       FftDisplayPlot::AverageType>> avg_types;
 	static std::vector<std::pair<QString, FftWinType>> win_types;
 	static std::vector<QString> markerTypes;
 };
 
 class SpectrumChannel: public QObject
 {
-Q_OBJECT
+	Q_OBJECT
+	friend class SpectrumChannel_API;
 
 public:
 	boost::shared_ptr<adiscope::fft_block> fft_block;
@@ -188,9 +196,18 @@ public:
 
 	SpectrumChannel(int id, const QString& name, FftDisplayPlot *plot);
 
-	int id() const { return m_id; }
-	QString name() const { return m_name; }
-	ChannelWidget *widget() const { return m_widget; }
+	int id() const
+	{
+		return m_id;
+	}
+	QString name() const
+	{
+		return m_name;
+	}
+	ChannelWidget *widget() const
+	{
+		return m_widget;
+	}
 
 	bool isSettingsOn() const;
 	void setSettingsOn(bool on);
@@ -225,13 +242,89 @@ private:
 	void scaletFftWindow(std::vector<float>& win, float gain);
 
 	static std::vector<float> build_win(SpectrumAnalyzer::FftWinType type,
-		int ntaps);
+	                                    int ntaps);
+};
+
+class SpectrumChannel_API : public ApiObject
+{
+	Q_OBJECT
+	Q_PROPERTY(bool enabled READ enabled WRITE enable);
+	Q_PROPERTY(int type READ type WRITE setType);
+	Q_PROPERTY(int window READ window WRITE setWindow);
+	Q_PROPERTY(int averaging READ averaging WRITE setAveraging);
+
+public:
+	explicit SpectrumChannel_API(SpectrumAnalyzer *sp,
+	                             boost::shared_ptr<SpectrumChannel> spch) :
+		ApiObject(), spch(spch),sp(sp) {}
+	~SpectrumChannel_API() {}
+
+	bool enabled();
+	int type();
+	int window();
+	int averaging();
+
+	void enable(bool);
+	void setType(int);
+	void setWindow(int);
+	void setAveraging(int);
+
+private:
+	SpectrumAnalyzer *sp;
+	boost::shared_ptr<SpectrumChannel> spch;
+};
+
+class SpectrumMarker_API :public ApiObject
+{
+	Q_OBJECT
+
+	Q_PROPERTY(int chId READ chId WRITE setChId);
+	Q_PROPERTY(int mkId READ mkId WRITE setMkId);
+	Q_PROPERTY(bool en READ enabled WRITE setEnabled);
+	Q_PROPERTY(int type READ type WRITE setType);
+	Q_PROPERTY(double freq READ freq WRITE setFreq);
+
+	int m_chid;
+	int m_mkid;
+public:
+	explicit SpectrumMarker_API(SpectrumAnalyzer *sp,int chid, int mkid) :
+		ApiObject(), sp(sp), m_mkid(mkid), m_chid(chid) {}
+	~SpectrumMarker_API() {}
+
+	int chId();
+	void setChId(int);
+
+	int mkId();
+	void setMkId(int);
+
+	int type();
+	void setType(int);
+
+	double freq();
+	void setFreq(double);
+
+	bool enabled();
+	void setEnabled(bool);
+
+	SpectrumAnalyzer *sp;
+
 };
 
 class SpectrumAnalyzer_API : public ApiObject
 {
 	Q_OBJECT
-
+	Q_PROPERTY(bool running READ running WRITE run STORED false);
+	Q_PROPERTY(double startFreq READ startFreq WRITE setStartFreq);
+	Q_PROPERTY(double stopFreq  READ stopFreq  WRITE setStopFreq);
+	Q_PROPERTY(QString units READ units WRITE setUnits);
+	Q_PROPERTY(QString resBW READ resBW WRITE setResBW);
+	Q_PROPERTY(double topScale READ topScale WRITE setTopScale);
+	Q_PROPERTY(double range READ range WRITE setRange);
+	Q_PROPERTY(QVariantList channels READ getChannels);
+	Q_PROPERTY(int currentChannel READ currentChannel WRITE setCurrentChannel);
+	Q_PROPERTY(bool markerTableVisible READ markerTableVisible WRITE
+	           setMarkerTableVisible);
+	Q_PROPERTY(QVariantList markers READ getMarkers);
 public:
 	explicit SpectrumAnalyzer_API(SpectrumAnalyzer *sp) :
 		ApiObject(), sp(sp) {}
@@ -239,6 +332,34 @@ public:
 
 private:
 	SpectrumAnalyzer *sp;
+	bool running();
+	void run(bool);
+	QVariantList getChannels();
+	QVariantList getMarkers();
+
+	int currentChannel();
+	void setCurrentChannel(int);
+
+	double startFreq();
+	void setStartFreq(double);
+
+	double stopFreq();
+	void setStopFreq(double);
+
+	QString units();
+	void setUnits(QString);
+
+	QString resBW();
+	void setResBW(QString);
+
+	double topScale();
+	void setTopScale(double);
+
+	double range();
+	void setRange(double);
+
+	bool markerTableVisible();
+	void setMarkerTableVisible(bool);
 };
 
 } // namespace adiscope

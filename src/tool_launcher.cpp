@@ -826,7 +826,7 @@ void adiscope::ToolLauncher::enableAdcBasedTools()
 
 	if (filter->compatible(TOOL_SPECTRUM_ANALYZER)) {
 		spectrum_analyzer = new SpectrumAnalyzer(ctx, filter, adc,
-			toolMenu["Spectrum Analyzer"]->getToolStopBtn(), this);
+			toolMenu["Spectrum Analyzer"]->getToolStopBtn(),&js_engine, this);
 		adc_users_group.addButton(toolMenu["Spectrum Analyzer"]->getToolStopBtn());
 	}
 
