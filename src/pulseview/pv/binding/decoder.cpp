@@ -50,14 +50,18 @@ namespace binding {
 
 Decoder::Decoder(
 	shared_ptr<pv::data::DecoderStack> decoder_stack,
-	shared_ptr<data::decode::Decoder> decoder) :
+	shared_ptr<data::decode::Decoder> decoder,
+	std::vector< std::shared_ptr<pv::prop::Property> > props) :
 	decoder_stack_(decoder_stack),
 	decoder_(decoder)
 {
 	assert(decoder_);
+	bool default_values = props.empty();
 
 	const srd_decoder *const dec = decoder_->decoder();
 	assert(dec);
+
+	Glib::VariantBase variant;
 
 	for (GSList *l = dec->options; l; l = l->next) {
 		const srd_decoder_option *const opt =
@@ -86,6 +90,17 @@ Decoder::Decoder(
 		else
 			continue;
 
+		if(!default_values) {
+			for(auto p : props) {
+				if(p->name() == name){
+					variant = p->get();
+					break;
+				}
+			}
+		}
+
+		if (variant.gobj())
+			setter(opt->id, variant);
 		properties_.push_back(prop);
 	}
 }

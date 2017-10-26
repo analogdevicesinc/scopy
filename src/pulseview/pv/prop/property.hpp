@@ -55,6 +55,7 @@ public:
 	virtual bool labeled_widget() const;
 
 	virtual void commit() = 0;
+	Glib::VariantBase get();
 
 protected:
 	const Getter getter_;

@@ -40,5 +40,10 @@ bool Property::labeled_widget() const
 	return false;
 }
 
+Glib::VariantBase Property::get()
+{
+	return getter_();
+}
+
 } // prop
 } // pv

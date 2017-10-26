@@ -501,15 +501,17 @@ const srd_decoder *LogicAnalyzerChannelGroup::getDecoder()
 
 void LogicAnalyzerChannelGroup::setDecoder(const srd_decoder *value)
 {
+	if( value == nullptr )
+		return;
+	if( value ==  decoder )
+		return;
+
 	decoderRolesNameList.clear();
 	decoderReqChannels.clear();
 	decoderOptChannels.clear();
-	channels_.clear();
 	properties_.clear();
+	channels_.clear();
 	decoder = value;
-
-	if( decoder == nullptr )
-		return;
 
 	GSList *reqCh = g_slist_copy(decoder->channels);
 	for (; reqCh; reqCh = reqCh->next) {
@@ -2389,16 +2391,10 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 				settingsUI->options->hide();
 			}
 			else {
-				if(chGroup->properties_.size() > 0) {
-					binding_ = std::make_shared<binding::Decoder>(
-								chGroupUI->getDecodeTrace()->decoder(),
-								chGroupUI->getDecodeTrace()->pv_decoder());
-				}
-				else {
-					binding_ = std::make_shared<binding::Decoder>(
-								chGroupUI->getDecodeTrace()->decoder(),
-								chGroupUI->getDecodeTrace()->pv_decoder());
-				}
+				binding_ = std::make_shared<binding::Decoder>(
+							chGroupUI->getDecodeTrace()->decoder(),
+							chGroupUI->getDecodeTrace()->pv_decoder(),
+							chGroup->properties_);
 				QFormLayout *layOpt = new QFormLayout(settingsUI->options);
 				chGroup->properties_ = binding_->properties();
 				binding_->add_properties_to_form(layOpt, true, settingsUI->options);

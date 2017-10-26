@@ -42,8 +42,9 @@ class Decoder : public Binding
 {
 public:
 	Decoder(std::shared_ptr<pv::data::DecoderStack> decoder_stack,
-		std::shared_ptr<pv::data::decode::Decoder> decoder);
-
+		std::shared_ptr<pv::data::decode::Decoder> decoder,
+		std::vector< std::shared_ptr<pv::prop::Property> > =
+			std::vector< std::shared_ptr<pv::prop::Property>>());
 private:
 	static std::shared_ptr<prop::Property> bind_enum(const QString &name,
 		const srd_decoder_option *option,
