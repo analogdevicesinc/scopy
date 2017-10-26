@@ -223,7 +223,7 @@ gr::basic_block_sptr DMM::configureGraph(gr::basic_block_sptr s2f,
 {
 	/* 10 fps refresh rate for the plot */
 	auto keep_one = gr::blocks::keep_one_in_n::make(sizeof(float),
-			is_high_ac ? (sample_rate / 10.0) : 100.0);
+			is_high_ac ? (sample_rate / 100.0) : 1000.0);
 
 	/* TODO: figure out best value for the blocker parameter */
 	auto blocker = gr::filter::dc_blocker_ff::make(1000, true);
