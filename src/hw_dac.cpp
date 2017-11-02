@@ -82,6 +82,11 @@ void GenericDac::setVlsb(double vlsb)
 	// TO DO: implement a generic formula
 }
 
+double GenericDac::convVoltsToSample(double volts)
+{
+        return 0;
+}
+
 /*
  * Class M2kDac
  */
@@ -116,4 +121,9 @@ double M2kDac::vlsb() const
 void M2kDac::setVlsb(double vlsb)
 {
 	m_vlsb = vlsb;
+}
+
+double M2kDac::convVoltsToSample(double volts)
+{
+	return (-1 * (1 / vlsb()) * 16) / compTable(sampleRate());
 }

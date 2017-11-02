@@ -33,6 +33,7 @@ public:
 
 	virtual double vlsb() const;
 	virtual void setVlsb(double vlsb);
+	virtual double convVoltsToSample(double);
 
 private:
 	struct iio_context *m_ctx;
@@ -52,6 +53,7 @@ public:
 
 	virtual double vlsb() const;
 	virtual void setVlsb(double vlsb);
+	virtual double convVoltsToSample(double);
 
 private:
 	std::map<double, double> m_filt_comp_table;

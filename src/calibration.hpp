@@ -45,6 +45,19 @@ class Calibration
 	friend class Calibration_API;
 
 public:
+	enum calibration_mode {
+		ADC_REF1,
+		ADC_REF2,
+		ADC_GND,
+		DAC,
+		NONE
+	};
+
+        enum gain_mode {
+                LOW,
+                HIGH
+        };
+
 	Calibration(struct iio_context *ctx, QJSEngine *engine,
 		    std::shared_ptr<M2kAdc> adc = nullptr,
 		    std::shared_ptr<M2kDac> dac_a = nullptr,
@@ -83,6 +96,12 @@ public:
 	static float convSampleToVolts(float sample, float correctionGain = 1);
 	static float convVoltsToSample(float sample, float correctionGain = 1);
 
+	bool setCalibrationMode(int);
+	bool setGainMode(int ch, int);
+	void dacAOutputDCVolts(int16_t volts);
+	void dacBOutputDCVolts(int16_t volts);
+	void dacOutputStop();
+
 private:
 	bool adc_data_capture(int16_t *dataCh0, int16_t *dataCh1,
 		size_t num_sampl_per_chn);
@@ -115,6 +134,9 @@ private:
 	struct iio_channel *m_dac_a_channel;
 	struct iio_channel *m_dac_b_channel;
 
+	struct iio_channel *m_dac_a_fabric;
+	struct iio_channel *m_dac_b_fabric;
+
 	struct iio_channel *m_ad5625_channel0;
 	struct iio_channel *m_ad5625_channel1;
 	struct iio_channel *m_ad5625_channel2;
@@ -142,6 +164,7 @@ private:
 	double dac_b_oversampl;
 
 	bool m_initialized;
+	int m_calibration_mode;
 };
 
 class Calibration_API: public ApiObject
@@ -165,6 +188,11 @@ public:
 
 	Q_INVOKABLE bool resetCalibration();
 	Q_INVOKABLE bool calibrateAll();
+	Q_INVOKABLE bool setGainMode(int, int);
+	Q_INVOKABLE bool setCalibrationMode(int);
+	Q_INVOKABLE void dacAOutputDCVolts(int);
+	Q_INVOKABLE void dacBOutputDCVolts(int);
+	Q_INVOKABLE void dacOutputStop();
 
 	Q_INVOKABLE double devTemp(const QString& devName);
 

@@ -91,7 +91,7 @@ bool Calibration::initialize()
 	if (!m_dac_a_channel)
 		return false;
 	m_dac_b_channel = iio_device_find_channel(m_m2k_dac_b, "voltage0", true);
-	if (!m_dac_a_channel)
+	if (!m_dac_b_channel)
 		return false;
 	m_ad5625_channel0 = iio_device_find_channel(m2k_ad5625, "voltage0", true);
 	if (!m_ad5625_channel0)
@@ -104,6 +104,12 @@ bool Calibration::initialize()
 		return false;
 	m_ad5625_channel3 = iio_device_find_channel(m2k_ad5625, "voltage3", true);
 	if (!m_ad5625_channel3)
+		return false;
+	m_dac_a_fabric = iio_device_find_channel(m_m2k_fabric, "voltage0", true);
+	if (!m_dac_a_fabric)
+		return false;
+	m_dac_b_fabric = iio_device_find_channel(m_m2k_fabric, "voltage1", true);
+	if (!m_dac_b_fabric)
 		return false;
 
 	m_adc_ch0_gain = 1;
@@ -227,7 +233,7 @@ bool Calibration::calibrateADCoffset()
 	qDebug() << "Starting ADC OFFSET CALIBRATION";
 
 	// Ground ADC inputs
-	iio_device_attr_write(m_m2k_fabric, "calibration_mode", "adc_gnd");
+	setCalibrationMode(ADC_GND);
 
 	// Set DAC channels to middle scale
 	iio_channel_attr_write_longlong(m_ad5625_channel2, "raw", 2048);
@@ -290,7 +296,7 @@ bool Calibration::calibrateADCgain()
 
 	qDebug() << "Starting ADC GAIN CALIBRATION";
 
-	iio_device_attr_write(m_m2k_fabric, "calibration_mode", "adc_ref1");
+	setCalibrationMode(ADC_REF1);
 
 	double vref1 = 0.4615;
 	const unsigned int num_samples = 1e5;
@@ -325,7 +331,7 @@ bool Calibration::calibrateADCgain()
 	qDebug() << "Gain for channel0: " << m_adc_ch0_gain;
 	qDebug() << "Gain for channel1: " << m_adc_ch1_gain;
 
-	iio_device_attr_write(m_m2k_fabric, "calibration_mode", "none");
+	setCalibrationMode(NONE);
 
 	calibrated = true;
 
@@ -384,7 +390,7 @@ bool Calibration::resetCalibration()
 		return false;
 	}
 
-	iio_device_attr_write(m_m2k_fabric, "calibration_mode", "none");
+	setCalibrationMode(NONE);
 
 	m_adc_ch0_offset = 2048;
 	m_adc_ch1_offset = 2048;
@@ -540,7 +546,7 @@ bool Calibration::fine_tune(size_t span, int16_t centerVal0, int16_t centerVal1,
 		}
 	}
 
-	iio_device_attr_write(m_m2k_fabric, "calibration_mode", "none");
+	setCalibrationMode(NONE);
 
 	m_adc_ch0_offset = candidateOffsets0[i0];
 	m_adc_ch1_offset = candidateOffsets1[i1];
@@ -595,7 +601,7 @@ bool Calibration::calibrateDACoffset()
 	qDebug() << "Starting DAC OFFSET CALIBRATION";
 
 	// connect ADC to DAC
-	iio_device_attr_write(m_m2k_fabric, "calibration_mode", "dac");
+	setCalibrationMode(DAC);
 
 	// Set DAC offset channels to middle scale
 	iio_channel_attr_write_longlong(m_ad5625_channel0, "raw", 2048);
@@ -659,7 +665,7 @@ bool Calibration::calibrateDACoffset()
 	setChannelEnableState(m_dac_a_channel, false);
 	setChannelEnableState(m_dac_b_channel, false);
 
-	iio_device_attr_write(m_m2k_fabric, "calibration_mode", "none");
+	setCalibrationMode(NONE);
 
 	calibrated = true;
 
@@ -671,7 +677,7 @@ bool Calibration::calibrateDACgain()
 	bool calibrated = false;
 
 	// connect ADC to DAC
-	iio_device_attr_write(m_m2k_fabric, "calibration_mode", "dac");
+	setCalibrationMode(DAC);
 
 	// Use the positive half scale point for gain calibration
 	dacAOutputDC(1024);
@@ -726,7 +732,7 @@ bool Calibration::calibrateDACgain()
 	setChannelEnableState(m_dac_a_channel, false);
 	setChannelEnableState(m_dac_b_channel, false);
 
-	iio_device_attr_write(m_m2k_fabric, "calibration_mode", "none");
+	setCalibrationMode(NONE);
 
 	calibrated = true;
 
@@ -756,12 +762,64 @@ void Calibration::dacOutputDC(struct iio_device *dac,
 
 	std::fill_n(data, size, value);
 	iio_channel_write(channel, *buffer, data, size * sizeof(data[0]));
+
 	iio_buffer_push(*buffer);
+}
+
+void Calibration::dacAOutputDCVolts(int16_t dac_a_volts)
+{
+	int dac_a_raw;
+	setCalibrationMode(NONE);
+	setChannelEnableState(m_dac_a_channel, true);
+	iio_device_attr_write_bool(m_m2k_dac_a, "dma_sync", true);
+	dac_a_raw = (dac_a_volts / m_dac_a_ch_vlsb);
+	dacAOutputDC(dac_a_raw);
+
+	iio_device_attr_write_bool(m_m2k_dac_a, "dma_sync", false);
+
+	iio_channel_attr_write_bool(m_dac_a_fabric, "powerdown", false);
+}
+
+void Calibration::dacBOutputDCVolts(int16_t dac_b_volts)
+{
+	int dac_b_raw;
+	setCalibrationMode(NONE);
+	setChannelEnableState(m_dac_b_channel, true);
+	iio_device_attr_write_bool(m_m2k_dac_b, "dma_sync", true);
+	dac_b_raw = (dac_b_volts / m_dac_b_ch_vlsb);
+	dacBOutputDC(dac_b_raw);
+
+	iio_device_attr_write_bool(m_m2k_dac_b, "dma_sync", false);
+
+	iio_channel_attr_write_bool(m_dac_b_fabric, "powerdown", false);
 }
 
 void Calibration::dacAOutputDC(int16_t value)
 {
 	dacOutputDC(m_m2k_dac_a, m_dac_a_channel, &m_dac_a_buffer, value);
+}
+
+void Calibration::dacOutputStop()
+{
+	if (m_dac_a_buffer) {
+		iio_buffer_cancel(m_dac_a_buffer);
+		iio_buffer_destroy(m_dac_a_buffer);
+		m_dac_a_buffer = NULL;
+	}
+
+	if (m_dac_b_buffer) {
+		iio_buffer_cancel(m_dac_b_buffer);
+		iio_buffer_destroy(m_dac_b_buffer);
+		m_dac_b_buffer = NULL;
+	}
+	setChannelEnableState(m_dac_a_channel, false);
+	setChannelEnableState(m_dac_b_channel, false);
+
+	/* FIXME: TODO: Move this into a HW class / lib M2k */
+	iio_channel_attr_write_bool(m_dac_a_fabric, "powerdown", true);
+	iio_channel_attr_write_bool(m_dac_b_fabric, "powerdown", true);
+
+	setCalibrationMode(NONE);
 }
 
 void Calibration::dacBOutputDC(int16_t value)
@@ -826,6 +884,49 @@ void Calibration::cancelCalibration()
 {
 	m_cancel=true;
 }
+
+bool Calibration::setGainMode(int ch, int mode)
+{
+        switch (mode) {
+        case HIGH:
+                m2k_adc->setChnHwGainMode(ch, M2kAdc::HIGH_GAIN_MODE);
+                break;
+        case LOW:
+                m2k_adc->setChnHwGainMode(ch, M2kAdc::LOW_GAIN_MODE);
+                break;
+        default:
+                return false;
+        }
+        return true;
+}
+
+bool Calibration::setCalibrationMode(int mode)
+{
+        std::string strMode;
+        switch (mode) {
+        case ADC_GND:
+                strMode = "adc_gnd";
+                break;
+        case ADC_REF1:
+                strMode = "adc_ref1";
+                break;
+        case ADC_REF2:
+                strMode = "adc_ref2";
+                break;
+        case DAC:
+                strMode = "dac";
+                break;
+        case NONE:
+                strMode = "none";
+                break;
+        default:
+                return false;
+        }
+        iio_device_attr_write(m_m2k_fabric, "calibration_mode", strMode.c_str());
+        m_calibration_mode = mode;
+	return true;
+}
+
 /* FIXME: TODO: Move this into a HW class / lib M2k */
 double Calibration::getIioDevTemp(const QString& devName) const
 {
@@ -908,9 +1009,34 @@ bool Calibration_API::resetCalibration()
 	return calib->resetCalibration();
 }
 
+bool Calibration_API::setGainMode(int ch, int mode)
+{
+	return calib->setGainMode(ch, mode);
+}
+
+bool Calibration_API::setCalibrationMode(int mode)
+{
+	return calib->setCalibrationMode(mode);
+}
+
 void Calibration_API::setHardwareInCalibMode()
 {
 	calib->setHardwareInCalibMode();
+}
+
+void Calibration_API::dacAOutputDCVolts(int value)
+{
+	calib->dacAOutputDCVolts(value);
+}
+
+void Calibration_API::dacBOutputDCVolts(int value)
+{
+	calib->dacBOutputDCVolts(value);
+}
+
+void Calibration_API::dacOutputStop()
+{
+	calib->dacOutputStop();
 }
 
 void Calibration_API::restoreHardwareFromCalibMode()
