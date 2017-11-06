@@ -81,6 +81,7 @@ protected:
 	void paintEvent(QPaintEvent *event);
 	int originPosToCenter(int origin);
 	int centerPosToOrigin(int center);
+	void mouseDoubleClickEvent(QMouseEvent *event);
 
 protected:
 	bool m_facingBottom;
@@ -100,6 +101,7 @@ protected:
 	void paintEvent(QPaintEvent *event);
 	int originPosToCenter(int origin);
 	int centerPosToOrigin(int center);
+	void mouseDoubleClickEvent(QMouseEvent *event);
 
 protected:
 	bool m_facingRight;

@@ -179,6 +179,13 @@ int PlotLineHandleH::centerPosToOrigin(int center)
 	return (center - offset);
 }
 
+void PlotLineHandleH::mouseDoubleClickEvent(QMouseEvent *event)
+{
+	HorizHandlesArea *area = static_cast<HorizHandlesArea *>(parent());
+	int center = (area->width() - area->leftPadding() - area->rightPadding()) / 2;
+	setPosition(center);
+}
+
 PlotLineHandleV::PlotLineHandleV(const QPixmap &handleIcon, QWidget *parent,
 			bool facingRight):
 	PlotLineHandle(handleIcon, parent),
@@ -269,6 +276,14 @@ int PlotLineHandleV::centerPosToOrigin(int center)
 
 	return (center - offset);
 }
+
+void PlotLineHandleV::mouseDoubleClickEvent(QMouseEvent *event)
+{
+	VertHandlesArea *area = static_cast<VertHandlesArea *>(parent());
+	int center = (area->height() - area->topPadding() - area->bottomPadding()) / 2;
+	setPosition(center);
+}
+
 
 FreePlotLineHandleH::FreePlotLineHandleH(const QPixmap &handleIcon,
 			const QPixmap &beyondLeftIcon,
