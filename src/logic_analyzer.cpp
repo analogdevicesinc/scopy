@@ -423,7 +423,6 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	setCursorsActive(false);
 
 	timer->setInterval(timer_timeout_ms);
-	QMetaObject::invokeMethod(timer, "start",Qt::QueuedConnection);
 
 	api->setObjectName(QString::fromStdString(Filter::tool_name(
 			TOOL_LOGIC_ANALYZER)));
