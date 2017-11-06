@@ -177,6 +177,7 @@ namespace adiscope {
 		void setChannelHwOffset(uint chnIdx, double offset);
 
 		void on_xyPlotLineType_toggled(bool checked);
+		void setup_xy_channels();
 
 		void openEditMathPanel(bool on);
 
@@ -234,7 +235,6 @@ namespace adiscope {
 		iio_manager::port_id *ids;
 		iio_manager::port_id *fft_ids;
 		iio_manager::port_id *hist_ids;
-		iio_manager::port_id *xy_ids;
 
 		ScaleSpinButton *timeBase;
 		PositionSpinButton *timePosition;
@@ -319,6 +319,12 @@ namespace adiscope {
 		void setChannelWidgetIndex(int chnIdx);
 		void init_channel_settings();
 		void editMathChannelFunction(int id, const std::string &new_function);
+
+
+		std::vector<QPair<gr::basic_block_sptr, int> > xy_channels;
+		int index_x, index_y;
+		bool locked;
+		boost::shared_ptr<gr::blocks::float_to_complex> ftc;
 	};
 
 	class Oscilloscope_API : public ApiObject

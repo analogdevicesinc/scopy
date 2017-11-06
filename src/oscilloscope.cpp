@@ -27,6 +27,7 @@
 #include <QVBoxLayout>
 #include <QtWidgets/QSpacerItem>
 #include <QSignalBlocker>
+#include <QComboBox>
 
 /* Local includes */
 #include "adc_sample_conv.hpp"
@@ -79,7 +80,6 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	ids(new iio_manager::port_id[nb_channels]),
 	fft_ids(new iio_manager::port_id[nb_channels]),
 	hist_ids(new iio_manager::port_id[nb_channels]),
-	xy_ids(new iio_manager::port_id[nb_channels & ~1]),
 	fft_is_visible(false), hist_is_visible(false), xy_is_visible(false),
 	statistics_enabled(false),
 	trigger_is_forced(false),
@@ -89,7 +89,11 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	channels_group(new QButtonGroup(this)),
 	zoom_level(0),
 	current_ch_widget(-1),
-	addChannel(true)
+	addChannel(true),
+	index_x(0),
+	index_y(1),
+	ftc(nullptr),
+	locked(false)
 {
 	ui->setupUi(this);
 	int triggers_panel = ui->stackedWidget->insertWidget(-1, &trigger_settings);
@@ -221,10 +225,10 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 			m2k_adc->chnCorrectionGain(1));
 	}
 
+
 	for (unsigned int i = 0; i < nb_channels; i++) {
 		ids[i] = iio->connect(adc_samp_conv, i, i,
 				true, qt_time_block->nsamps());
-
 		iio->connect(adc_samp_conv, i, qt_time_block, i);
 	}
 
@@ -307,12 +311,15 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		xy_plot.setYaxisMouseGesturesEnabled(i, false);
 
 	// TO DO: refactor this once the source of the X and Y axes can be configured
-	QWidget *xsw = xy_plot.axisWidget(QwtPlot::xBottom);
-	xsw->setStyleSheet(
-		QString("color: %1").arg(plot.getLineColor(0).name()));
-	QWidget *ysw = xy_plot.axisWidget(QwtPlot::yLeft);
-	ysw->setStyleSheet(
-		QString("color: %1").arg(plot.getLineColor(1).name()));
+	for(int i = 0; i < nb_channels + nb_math_channels; i++) {
+		ChannelWidget *cw = static_cast<ChannelWidget *>(
+			ui->channelsList->itemAt(i)->widget());
+		ui->cmb_x_channel->addItem(cw->shortName());
+		ui->cmb_y_channel->addItem(cw->shortName());
+	}
+	ui->cmb_x_channel->setCurrentIndex(0);
+	ui->cmb_y_channel->setCurrentIndex(1);
+	setup_xy_channels();
 
 	xy_plot.setLineColor(0, QColor("#F8E71C"));
 
@@ -327,6 +334,12 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	QWidget *w = gridL->itemAtPosition(1, 0)->widget();
 	gridL->addWidget(&xy_plot, 1, 0);
 	gridL->addWidget(w, 2, 0);
+
+	connect(ui->cmb_x_channel, SIGNAL(currentIndexChanged(int)),
+		this, SLOT(setup_xy_channels()));
+	connect(ui->cmb_y_channel, SIGNAL(currentIndexChanged(int)),
+		this, SLOT(setup_xy_channels()));
+
 	ui->xy_plot_container->hide();
 
 	ui->rightMenu->setMaximumWidth(0);
@@ -558,11 +571,6 @@ Oscilloscope::~Oscilloscope()
 	if (hist_is_visible)
 		for (unsigned int i = 0; i < nb_channels; i++)
 			iio->disconnect(hist_ids[i]);
-
-	if (xy_is_visible)
-		for (unsigned int i = 0; i < (nb_channels & ~1); i++)
-			iio->disconnect(xy_ids[i]);
-
 	if (started)
 		iio->unlock();
 
@@ -572,7 +580,6 @@ Oscilloscope::~Oscilloscope()
 	api->save(*settings);
 	delete api;
 
-	delete[] xy_ids;
 	delete[] hist_ids;
 	delete[] fft_ids;
 	delete[] ids;
@@ -909,6 +916,10 @@ void Oscilloscope::add_math_channel(const std::string& function)
 		ui->btnAddMath->hide();
 		menuOrder.removeOne(ui->btnAddMath);
 	}
+	ui->cmb_x_channel->addItem(channel_widget->fullName());
+	ui->cmb_y_channel->addItem(channel_widget->fullName());
+	if(xy_is_visible)
+		setup_xy_channels();
 }
 
 void Oscilloscope::onChannelWidgetDeleteClicked()
@@ -955,13 +966,30 @@ void Oscilloscope::onChannelWidgetDeleteClicked()
 	bool started = iio->started();
 	if (started)
 		iio->lock();
-
+	locked = true;
+	if(xy_is_visible) {
+		ui->cmb_x_channel->blockSignals(true);
+		ui->cmb_y_channel->blockSignals(true);
+		ui->cmb_x_channel->removeItem(curve_id);
+		ui->cmb_y_channel->removeItem(curve_id);
+		if(index_x >= curve_id)
+			ui->cmb_x_channel->setCurrentIndex(curve_id-1);
+		if(index_y >= curve_id)
+			ui->cmb_y_channel->setCurrentIndex(curve_id-1);
+		ui->cmb_x_channel->blockSignals(false);
+		ui->cmb_y_channel->blockSignals(false);
+		setup_xy_channels();
+	}
 	/* Disconnect the blocks from the running flowgraph */
 	auto pair = math_sinks.take(qname);
 	for (unsigned int i = 0; i < nb_channels; i++)
 		iio->disconnect(adc_samp_conv_block, i, pair.first, i);
 	iio->disconnect(pair.first, 0, pair.second, 0);
 
+	if(xy_is_visible)
+		setup_xy_channels();
+
+	locked = false;
 	if (started)
 		iio->unlock();
 
@@ -1036,7 +1064,6 @@ void Oscilloscope::onChannelWidgetDeleteClicked()
 				QwtAxisId(QwtPlot::xBottom, 0),
 				QwtAxisId(QwtPlot::yLeft, i));
 	}
-
 	updateRunButton(false);
 	plot.replot();
 }
@@ -1058,9 +1085,6 @@ void Oscilloscope::toggle_blockchain_flow(bool en)
 		if (hist_is_visible)
 			for (unsigned int i = 0; i < nb_channels; i++)
 				iio->start(hist_ids[i]);
-		if (xy_is_visible)
-			for (unsigned int i = 0; i < (nb_channels & ~1); i++)
-				iio->start(xy_ids[i]);
 
 		if(active_sample_count >= fft_size && fft_is_visible)
 			for (unsigned int i = 0; i < nb_channels; i++)
@@ -1076,9 +1100,6 @@ void Oscilloscope::toggle_blockchain_flow(bool en)
 		if (hist_is_visible)
 			for (unsigned int i = 0; i < nb_channels; i++)
 				iio->stop(hist_ids[i]);
-		if (xy_is_visible)
-			for (unsigned int i = 0; i < (nb_channels & ~1); i++)
-				iio->stop(xy_ids[i]);
 
 		if(active_sample_count <= fft_size && fft_is_visible)
 			for (unsigned int i = 0; i < nb_channels; i++)
@@ -1235,54 +1256,81 @@ void Oscilloscope::onXY_view_toggled(bool visible)
 {
 	/* Lock the flowgraph if we are already started */
 	bool started = iio->started();
-	if (started)
+	if (started && !locked)
 		iio->lock();
 
 	if (visible) {
+		if(xy_is_visible && index_x == ui->cmb_x_channel->currentIndex()
+				&& index_y == ui->cmb_y_channel->currentIndex())
+		{
+			xy_is_visible = visible;
+			if (started && !locked)
+				iio->unlock();
+			return;
+		}
 
-		auto xy_conv = gnuradio::get_initial_sptr(
-				new adc_sample_conv(nb_channels, m2k_adc));
+		boost::shared_ptr<adc_sample_conv> block =
+		dynamic_pointer_cast<adc_sample_conv>(
+						adc_samp_conv_block);
 		if (m2k_adc) {
-			xy_conv->setCorrectionGain(0,
+			block->setCorrectionGain(0,
 				m2k_adc->chnCorrectionGain(0));
-			xy_conv->setCorrectionGain(1,
+			block->setCorrectionGain(1,
 				m2k_adc->chnCorrectionGain(1));
 		}
 
-		for (unsigned int i = 0; i < nb_channels / 2; i++) {
-			xy_ids[i * 2] = iio->connect(xy_conv, i * 2, 0, true);
-			xy_ids[i * 2 + 1] = iio->connect(xy_conv,
-					i * 2 + 1, 1, true);
+		if(!ftc)
+			ftc = blocks::float_to_complex::make(1);
 
-			auto ftc = blocks::float_to_complex::make(1);
-			auto basic = ftc->to_basic_block();
-
-			iio->connect(xy_conv, 0, basic, 0);
-			iio->connect(xy_conv, 1, basic, 1);
-
-
-			iio->connect(ftc, 0, this->qt_xy_block, i);
-
-			iio->set_buffer_size(xy_ids[i * 2], active_sample_count);
-			iio->set_buffer_size(xy_ids[i * 2 + 1], active_sample_count);
+		if(xy_channels.size() > 0) {
+			iio->disconnect(xy_channels.at(index_x).first,
+					xy_channels.at(index_x).second,
+					ftc, 0);
+			iio->disconnect(xy_channels.at(index_y).first,
+					xy_channels.at(index_y).second,
+					ftc, 1);
+			xy_channels.clear();
 		}
 
+		index_x = ui->cmb_x_channel->currentIndex();
+		index_y = ui->cmb_y_channel->currentIndex();
 
-		if (ui->pushButtonRunStop->isChecked())
-			for (unsigned int i = 0; i < (nb_channels & ~1); i++)
-				iio->start(xy_ids[i]);
+		if(xy_channels.size() == 0) {
+			for(unsigned int i = 0; i < nb_channels; i++)
+				xy_channels.push_back(QPair<gr::basic_block_sptr, int>(
+							      adc_samp_conv_block, i));
+			for(auto p : math_sinks) {
+				auto math = p.first;
+				xy_channels.push_back(QPair<gr::basic_block_sptr, int>(
+							      math, 0));
+			}
+		}
+
+		iio->connect(xy_channels.at(index_x).first, xy_channels.at(index_x).second,
+			     ftc, 0);
+		iio->connect(xy_channels.at(index_y).first, xy_channels.at(index_y).second,
+			     ftc, 1);
+
+		if(!xy_is_visible)
+			iio->connect(ftc, 0, this->qt_xy_block, 0);
 
 		ui->xy_plot_container->show();
 	} else {
 		ui->xy_plot_container->hide();
+		// Disconnect the XY section from the running flowgraph
+		iio->disconnect(xy_channels.at(index_x).first, xy_channels.at(index_x).second,
+				ftc, 0);
+		iio->disconnect(xy_channels.at(index_y).first, xy_channels.at(index_y).second,
+				ftc, 1);
 
-		for (unsigned int i = 0; i < (nb_channels & ~1); i++)
-			iio->iio_manager::disconnect(xy_ids[i]);
+		iio->disconnect(ftc, 0, this->qt_xy_block, 0);
+
+		xy_channels.clear();
 	}
 
 	xy_is_visible = visible;
 
-	if (started)
+	if (started && !locked)
 		iio->unlock();
 }
 
@@ -1507,9 +1555,10 @@ void adiscope::Oscilloscope::onVertScaleValueChanged(double value)
 	voltsPosition->setStep(value / 10);
 
 	// TO DO: refactor this once the source of the X and Y axes can be configured
-	if (current_ch_widget == 0) {
+	if (current_ch_widget == index_x) {
 		xy_plot.setHorizUnitsPerDiv(value);
-	} else {
+	}
+	if (current_ch_widget == index_y) {
 		xy_plot.setVertUnitsPerDiv(value, QwtPlot::yLeft);
 	}
 	xy_plot.replot();
@@ -1575,7 +1624,6 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 
 	for (unsigned int i = 0; i < nb_channels; i++) {
 		iio->set_buffer_size(ids[i], active_sample_count);
-		iio->set_buffer_size(xy_ids[i], active_sample_count);
 	}
 
 	/* timeout = how long a buffer capture takes + transmission latency. The
@@ -1670,7 +1718,6 @@ void adiscope::Oscilloscope::onTimePositionChanged(double value)
 
 	for (unsigned int i = 0; i < nb_channels; i++) {
 		iio->set_buffer_size(ids[i], active_sample_count);
-		iio->set_buffer_size(xy_ids[i], active_sample_count);
 	}
 
 	if (started)
@@ -1740,9 +1787,9 @@ void Oscilloscope::triggerRightMenuToggle(CustomPushButton *btn, bool checked)
 
 void Oscilloscope::settings_panel_update(int id)
 {
-	if (id >= 0)
+        if (id >= 0)
         ui->stackedWidget->setCurrentIndex(0);
-	else
+        else
         ui->stackedWidget->setCurrentIndex(-id);
 
         settings_panel_size_adjust();
@@ -1827,6 +1874,8 @@ void Oscilloscope::openEditMathPanel(bool on)
 void Oscilloscope::editMathChannelFunction(int id, const std::string& new_function)
 {
 	ChannelWidget *chn_widget = channelWidgetAtId(id);
+	int current_x = index_x;
+	int current_y = index_y;
 
 	triggerRightMenuToggle(
 		static_cast<CustomPushButton* >(ui->btnAddMath), false);
@@ -1848,7 +1897,18 @@ void Oscilloscope::editMathChannelFunction(int id, const std::string& new_functi
 	bool started = iio->started();
 	if (started)
 		iio->lock();
-
+	locked = true;
+	if(xy_is_visible) {
+		ui->cmb_x_channel->blockSignals(true);
+		ui->cmb_y_channel->blockSignals(true);
+		if(index_x == id)
+			ui->cmb_x_channel->setCurrentIndex(id-1);
+		if(index_y == id)
+			ui->cmb_y_channel->setCurrentIndex(id-1);
+		ui->cmb_x_channel->blockSignals(false);
+		ui->cmb_y_channel->blockSignals(false);
+		setup_xy_channels();
+	}
 	auto pair = math_sinks.value(qname);
 	for (unsigned int i = 0; i < nb_channels; ++i)
 		iio->disconnect(adc_samp_conv_block, i, pair.first, i);
@@ -1863,6 +1923,16 @@ void Oscilloscope::editMathChannelFunction(int id, const std::string& new_functi
 		iio->connect(adc_samp_conv_block, i, math, i);
 	iio->connect(math, 0, pair.second, 0);
 
+	if(xy_is_visible) {
+		ui->cmb_x_channel->blockSignals(true);
+		ui->cmb_y_channel->blockSignals(true);
+		ui->cmb_x_channel->setCurrentIndex(current_x);
+		ui->cmb_y_channel->setCurrentIndex(current_y);
+		ui->cmb_x_channel->blockSignals(false);
+		ui->cmb_y_channel->blockSignals(false);
+		setup_xy_channels();
+	}
+	locked = false;
 	if (started)
 		iio->unlock();
 
@@ -2594,6 +2664,25 @@ void Oscilloscope::on_xyPlotLineType_toggled(bool checked)
 	xy_plot.replot();
 }
 
+void Oscilloscope::setup_xy_channels()
+{
+	int x = ui->cmb_x_channel->currentIndex();
+	int y = ui->cmb_y_channel->currentIndex();
+	QWidget *xsw = xy_plot.axisWidget(QwtPlot::xBottom);
+	xsw->setStyleSheet(
+		QString("color: %1").arg(plot.getLineColor(x).name()));
+	QWidget *ysw = xy_plot.axisWidget(QwtPlot::yLeft);
+	ysw->setStyleSheet(
+		QString("color: %1").arg(plot.getLineColor(y).name()));
+
+	// If XY visible, reconnect the data flow
+	if(xy_is_visible)
+		onXY_view_toggled(true);
+
+	xy_plot.setHorizUnitsPerDiv(plot.VertUnitsPerDiv(x));
+	xy_plot.setVertUnitsPerDiv(plot.VertUnitsPerDiv(y), QwtPlot::yLeft);
+}
+
 void Oscilloscope::on_btnAddMath_toggled(bool checked)
 {
 	triggerRightMenuToggle(
@@ -3040,9 +3129,10 @@ void Channel_API::setVoltsPerDiv(double val)
 	label->setText(osc->vertMeasureFormat.format(val, "V/div", 3));
 
 	// TO DO: refactor this once the source of the X and Y axes can be configured
-	if (index == 0) {
+	if (index == osc->index_x) {
 		osc->xy_plot.setHorizUnitsPerDiv(val);
-	} else {
+	}
+	if (index == osc->index_y) {
 		osc->xy_plot.setVertUnitsPerDiv(val, QwtPlot::yLeft);
 	}
 	osc->xy_plot.replot();
