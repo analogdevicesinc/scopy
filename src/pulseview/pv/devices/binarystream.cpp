@@ -120,7 +120,8 @@ void BinaryStream::start()
 	}
 
 	if (!data_) {
-		throw std::runtime_error("Could not create RX buffer");
+		//	throw std::runtime_error("Could not create RX buffer");
+		std::cout<<"Could not create RX buffer";
 	}
 }
 

@@ -613,6 +613,8 @@ void adiscope::ToolLauncher::disconnect()
 	ui->btnHome->click();
 
 	if (ctx) {
+		auto iio=iio_manager::get_instance(ctx,filter->device_name(TOOL_DMM));
+		iio->stop_all();
 		alive_timer->stop();
 		toolMenu["Digital IO"]->getToolStopBtn()->setChecked(false);
 		toolMenu["Logic Analyzer"]->getToolStopBtn()->setChecked(false);
@@ -779,7 +781,10 @@ bool ToolLauncher::loadDecoders(QString path)
 
 void adiscope::ToolLauncher::calibrate()
 {
-	if(!skip_calibration) {
+	bool ok=true;
+
+	if (!skip_calibration) {
+		ok=false;
 		auto old_dmm_text = toolMenu["Voltmeter"]->getToolBtn()->text();
 		auto old_osc_text = toolMenu["Oscilloscope"]->getToolBtn()->text();
 		auto old_siggen_text = toolMenu["Signal Generator"]->getToolBtn()->text();
@@ -794,7 +799,7 @@ void adiscope::ToolLauncher::calibrate()
 
 		if (calib->isInitialized()) {
 			calib->setHardwareInCalibMode();
-			calib->calibrateAll();
+			ok = calib->calibrateAll();
 			calib->restoreHardwareFromCalibMode();
 		}
 
@@ -805,8 +810,10 @@ void adiscope::ToolLauncher::calibrate()
 		toolMenu["Network Analyzer"]->getToolBtn()->setText(old_network_text);
 	}
 
-	Q_EMIT adcCalibrationDone();
-	Q_EMIT dacCalibrationDone();
+	if (ok) {
+		Q_EMIT adcCalibrationDone();
+		Q_EMIT dacCalibrationDone();
+	}
 }
 
 void adiscope::ToolLauncher::enableAdcBasedTools()
