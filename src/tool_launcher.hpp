@@ -135,6 +135,7 @@ private:
 	QTimer *search_timer, *alive_timer;
 	QFutureWatcher<QVector<QString>> watcher;
 	QFuture<QVector<QString>> future;
+	QFuture<void> calibration_thread;
 
 	DMM *dmm;
 	PowerController *power_control;
@@ -163,6 +164,7 @@ private:
 	QSocketNotifier notifier;
 	QString previousIp;
 
+	bool calibrating;
 	bool skip_calibration;
 
 	void loadToolTips(bool connected);

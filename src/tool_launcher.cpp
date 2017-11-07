@@ -59,7 +59,8 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	notifier(STDIN_FILENO, QSocketNotifier::Read),
 	infoWidget(nullptr),
 	calib(nullptr),
-	skip_calibration(false)
+	skip_calibration(false),
+	calibrating(false)
 {
 	if (!isatty(STDIN_FILENO))
 		notifier.setEnabled(false);
@@ -613,6 +614,10 @@ void adiscope::ToolLauncher::disconnect()
 	ui->btnHome->click();
 
 	if (ctx) {
+		if (calibrating) {
+			calib->cancelCalibration();
+			calibration_thread.waitForFinished();
+		}
 		auto iio=iio_manager::get_instance(ctx,filter->device_name(TOOL_DMM));
 		iio->stop_all();
 		alive_timer->stop();
@@ -785,6 +790,7 @@ void adiscope::ToolLauncher::calibrate()
 
 	if (!skip_calibration) {
 		ok=false;
+		calibrating=true;
 		auto old_dmm_text = toolMenu["Voltmeter"]->getToolBtn()->text();
 		auto old_osc_text = toolMenu["Oscilloscope"]->getToolBtn()->text();
 		auto old_siggen_text = toolMenu["Signal Generator"]->getToolBtn()->text();
@@ -809,6 +815,8 @@ void adiscope::ToolLauncher::calibrate()
 		toolMenu["Spectrum Analyzer"]->getToolBtn()->setText(old_spectrum_text);
 		toolMenu["Network Analyzer"]->getToolBtn()->setText(old_network_text);
 	}
+
+	calibrating=false;
 
 	if (ok) {
 		Q_EMIT adcCalibrationDone();
@@ -987,7 +995,8 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 	});
 
 	loadToolTips(true);
-	QtConcurrent::run(std::bind(&ToolLauncher::calibrate, this));
+	calibration_thread = QtConcurrent::run(std::bind(&ToolLauncher::calibrate,
+	                                       this));
 
 	return true;
 }

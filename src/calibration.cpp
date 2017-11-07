@@ -40,7 +40,8 @@ Calibration::Calibration(struct iio_context *ctx, QJSEngine *engine,
 	m_initialized(false),
 	m2k_adc(adc),
 	m2k_dac_a(dac_a),
-	m2k_dac_b(dac_b)
+	m2k_dac_b(dac_b),
+	m_cancel(false)
 {
 	m_api->setObjectName("calib");
 	m_api->js_register(engine);
@@ -786,27 +787,45 @@ bool Calibration::calibrateAll()
 	configHwSamplerate();
 
 	ok = calibrateADCoffset();
-	if (!ok)
-		return false;
+
+	if (!ok || m_cancel) {
+		goto calibration_fail;
+	}
+
 	ok = calibrateADCgain();
-	if (!ok)
-		return false;
+
+	if (!ok || m_cancel) {
+		goto calibration_fail;
+	}
 
 	if (IioUtils::hardware_revision(m_ctx) == "B") {
 		QThread::msleep(750);
 	}
 
 	ok = calibrateDACoffset();
-	if (!ok)
-		return false;
+
+	if (!ok || m_cancel) {
+		goto calibration_fail;
+	}
+
 	ok = calibrateDACgain();
-	if (!ok)
-		return false;
+
+	if (!ok  || m_cancel) {
+		goto calibration_fail;
+	}
 
 	updateCorrections();
 	return true;
+
+calibration_fail:
+	m_cancel=false;
+	return false;
 }
 
+void Calibration::cancelCalibration()
+{
+	m_cancel=true;
+}
 /* FIXME: TODO: Move this into a HW class / lib M2k */
 double Calibration::getIioDevTemp(const QString& devName) const
 {

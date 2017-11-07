@@ -62,6 +62,7 @@ public:
 	bool calibrateADCgain();
 	bool calibrateDACoffset();
 	bool calibrateDACgain();
+	void cancelCalibration();
 
 	int adcOffsetChannel0() const;
 	int adcOffsetChannel1() const;
@@ -95,6 +96,7 @@ private:
 	void configHwSamplerate();
 
 	ApiObject *m_api;
+	bool m_cancel;
 
 	std::shared_ptr<M2kAdc> m2k_adc;
 	std::shared_ptr<M2kDac> m2k_dac_a;
