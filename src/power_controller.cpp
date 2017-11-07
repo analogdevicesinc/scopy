@@ -47,8 +47,10 @@ PowerController::PowerController(struct iio_context *ctx,
 	this->ch2w = iio_device_find_channel(dev1, "voltage1", true);
 	this->ch1r = iio_device_find_channel(dev2, "voltage2", false);
 	this->ch2r = iio_device_find_channel(dev2, "voltage1", false);
-	this->pd = iio_device_find_channel(dev3, "voltage2", true);
-	if (!ch1w || !ch2w || !ch1r || !ch2r || !pd)
+	this->pd_pos = iio_device_find_channel(dev3, "voltage2", true);
+	this->pd_neg = iio_device_find_channel(dev3, "voltage3", true); /* For HW Rev. >= C */
+
+	if (!ch1w || !ch2w || !ch1r || !ch2r || !pd_pos)
 		throw std::runtime_error("Unable to find channels\n");
 
 	/* FIXME: TODO: Move this into a HW class / lib M2k
@@ -69,7 +71,9 @@ PowerController::PowerController(struct iio_context *ctx,
 	}
 
 	/* Power down DACs by default */
-	iio_channel_attr_write_bool(pd, "user_supply_powerdown", true);
+	iio_channel_attr_write_bool(pd_pos, "user_supply_powerdown", true);
+	if (pd_neg)
+		iio_channel_attr_write_bool(pd_neg, "user_supply_powerdown", true);
 	iio_channel_attr_write_bool(ch1w, "powerdown", true);
 	iio_channel_attr_write_bool(ch2w, "powerdown", true);
 
@@ -105,7 +109,9 @@ PowerController::~PowerController()
 	/* Power down DACs */
 	iio_channel_attr_write_bool(ch1w, "powerdown", true);
 	iio_channel_attr_write_bool(ch2w, "powerdown", true);
-	iio_channel_attr_write_bool(pd, "user_supply_powerdown", true);
+	iio_channel_attr_write_bool(pd_pos, "user_supply_powerdown", true);
+	if (pd_neg)
+		iio_channel_attr_write_bool(pd_neg, "user_supply_powerdown", true);
 
 	/* FIXME: TODO: Move this into a HW class / lib M2k */
 	struct iio_device *dev3 = iio_context_find_device(ctx, "m2k-fabric");
@@ -167,12 +173,17 @@ void PowerController::dac1_set_enabled(bool enabled)
 	if (in_sync)
 		dac2_set_enabled(enabled);
 
-	if (enabled) {
-		run_button->setChecked(true);
-		iio_channel_attr_write_bool(pd, "user_supply_powerdown", false);
-	} else if (!ui->dac2->isChecked()) {
-		run_button->setChecked(false);
-		iio_channel_attr_write_bool(pd, "user_supply_powerdown", true);
+	if (pd_neg) { /* For HW Rev. >= C */
+		run_button->setChecked(enabled);
+		iio_channel_attr_write_bool(pd_pos, "user_supply_powerdown", !enabled);
+	} else {
+		if (enabled) {
+			run_button->setChecked(true);
+			iio_channel_attr_write_bool(pd_pos, "user_supply_powerdown", false);
+		} else if (!ui->dac2->isChecked()) {
+			run_button->setChecked(false);
+			iio_channel_attr_write_bool(pd_pos, "user_supply_powerdown", true);
+		}
 	}
 
 	setDynamicProperty(ui->dac1, "running", enabled);
@@ -182,12 +193,17 @@ void PowerController::dac2_set_enabled(bool enabled)
 {
 	iio_channel_attr_write_bool(ch2w, "powerdown", !enabled);
 
-	if (enabled) {
-		run_button->setChecked(true);
-		iio_channel_attr_write_bool(pd, "user_supply_powerdown", false);
-	} else if (!ui->dac1->isChecked()) {
-		run_button->setChecked(false);
-		iio_channel_attr_write_bool(pd, "user_supply_powerdown", true);
+	if (pd_neg) { /* For HW Rev. >= C */
+		run_button->setChecked(enabled);
+		iio_channel_attr_write_bool(pd_neg, "user_supply_powerdown", !enabled);
+	} else {
+		if (enabled) {
+			run_button->setChecked(true);
+			iio_channel_attr_write_bool(pd_pos, "user_supply_powerdown", false);
+		} else if (!ui->dac1->isChecked()) {
+			run_button->setChecked(false);
+			iio_channel_attr_write_bool(pd_pos, "user_supply_powerdown", true);
+		}
 	}
 
 	setDynamicProperty(ui->dac2, "running", enabled);
