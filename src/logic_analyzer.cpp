@@ -779,8 +779,7 @@ void LogicAnalyzer::triggerTimeout()
 {
 	if(armed) {
 		trigger_is_forced = true;
-		armed = false;
-		autoCaptureEnable();
+		autoCaptureEnable(false);
 	}
 }
 
@@ -803,8 +802,7 @@ void LogicAnalyzer::stopTimer()
 		else {
 			if(!armed)
 				trigger_is_forced = true;
-			armed = true;
-			autoCaptureEnable();
+			autoCaptureEnable(true);
 		}
 		if(ui->btnSingleRun->isChecked())
 			ui->btnSingleRun->setChecked(false);
@@ -830,6 +828,9 @@ void LogicAnalyzer::setTriggerState(int triggerState)
 	case Auto:
 		ui->triggerStateLabel->setText("Auto");
 		break;
+	case Stream:
+		ui->triggerStateLabel->setText("Scan");
+		break;
 	default:
 		break;
 	};
@@ -849,6 +850,8 @@ void LogicAnalyzer::onTriggerModeChanged(bool val)
 		triggerUpdater->setIdleState(Waiting);
 		triggerUpdater->setInput(Waiting);
 	}
+	if(acquisition_mode != REPEATED)
+		triggerUpdater->setIdleState(Stream);
 }
 
 void LogicAnalyzer::onHorizScaleValueChanged(double value)
@@ -980,7 +983,11 @@ void LogicAnalyzer::configParams(double timebase, double timepos)
                             && plotTimeSpan >= timespanLimitStream) ? SCREEN : acquisition_mode;
 
         main_win->session_.set_screen_mode(false);
+
         if(acquisition_mode == SCREEN || acquisition_mode == STREAM) {
+                //Reset the triggered register
+                iio_device_attr_write_bool(dev, "streaming", false);
+                iio_device_attr_write_bool(dev, "streaming", true);
                 if(active_plot_timebase != timebase)
                 {
                         active_plot_timebase = timebase;
@@ -1006,10 +1013,8 @@ void LogicAnalyzer::configParams(double timebase, double timepos)
                         ui->btnApply->setEnabled(false);
                 }
                 else {
-                        if(!chm_ui->is_streaming_mode()) {
+                        if(!chm_ui->is_streaming_mode())
                                 chm_ui->set_streaming_mode(true);
-                                cleanTrigger();
-                        }
 
                         if( acquisition_mode == SCREEN)
                                 main_win->session_.set_screen_mode(true);
@@ -1023,6 +1028,8 @@ void LogicAnalyzer::configParams(double timebase, double timepos)
 			double bufferTimeSpan = custom_sampleCount / active_sampleRate;
 			buffer_previewer->setNoOfSteps(plotTimeSpan / bufferTimeSpan + 1);
 			active_sampleCount = (plotTimeSpan / bufferTimeSpan) * custom_sampleCount;
+
+			timer_timeout_ms = bufferTimeSpan * 1000  + 100; //transfer time
 
 			main_win->session_.set_entire_buffersize(active_sampleCount);
 			if(logic_analyzer_ptr)
@@ -1054,6 +1061,7 @@ void LogicAnalyzer::configParams(double timebase, double timepos)
         if(acquisition_mode == REPEATED) {
                 if(chm_ui->is_streaming_mode()) {
                         chm_ui->set_streaming_mode(false);
+                        iio_device_attr_write_bool(dev, "streaming", false);
                         chm_ui->update_ui();
                 }
 
@@ -1103,6 +1111,7 @@ void LogicAnalyzer::configParams(double timebase, double timepos)
                 recomputeCursorsValue(true);
                 updateBufferPreviewer();
         }
+        onTriggerModeChanged(trigger_settings_ui->btnAuto->isChecked());
         logic_analyzer_ptr->set_stream(acquisition_mode == STREAM);
         main_win->view_->time_item_appearance_changed(true, true);
 }
@@ -1152,6 +1161,11 @@ void LogicAnalyzer::startStop(bool start)
 		return;
 
 	if (start) {
+		//Reset the triggered register
+		iio_device_attr_write_bool(dev, "streaming", false);
+		if(acquisition_mode != REPEATED){
+			iio_device_attr_write_bool(dev, "streaming", true);
+		}
 		buffer_previewer->setWaveformWidth(0);
 		if(ui->btnSingleRun->isChecked()) {
 			ui->btnSingleRun->setChecked(false);
@@ -1170,7 +1184,7 @@ void LogicAnalyzer::startStop(bool start)
 		setHWTriggerDelay(active_triggerSampleCount);
 		setTriggerDelay();
 		if(!armed)
-			armed = true;
+			autoCaptureEnable(true);
 		updateBufferPreviewer();
 	} else {
 		main_win->view_->viewport()->enableDrag();
@@ -1180,8 +1194,7 @@ void LogicAnalyzer::startStop(bool start)
 			timer->stop();
 		}
 		if(!armed && trigger_settings_ui->btnAuto->isChecked()) {
-			armed = true;
-			autoCaptureEnable();
+			autoCaptureEnable(true);
 		}
 	}
 	main_win->run_stop();
@@ -1216,7 +1229,7 @@ void LogicAnalyzer::singleRun(bool checked)
 {
 	if(checked) {
 		if(!armed)
-			armed = true;
+			autoCaptureEnable(true);
 		ui->btnSingleRun->setText("Stop");
 		buffer_previewer->setWaveformWidth(0);
 		if(!dev)
@@ -1254,8 +1267,7 @@ void LogicAnalyzer::singleRun(bool checked)
 		if(timer->isActive())
 			timer->stop();
 		if(!armed && trigger_settings_ui->btnAuto->isChecked()) {
-			armed = true;
-			autoCaptureEnable();
+			autoCaptureEnable(true);
 		}
 		Q_EMIT activateExportButton();
 		triggerUpdater->setEnabled(running);
@@ -1344,6 +1356,33 @@ std::string LogicAnalyzer::get_trigger_from_device(int chid)
 	iio_channel_attr_read(triggerch, "trigger", trigger_val, sizeof(trigger_val));
 	string res(trigger_val);
 	return res;
+}
+
+std::vector<std::string> LogicAnalyzer::get_iio_trigger_options()
+{
+	char buf[1024];
+	std::vector<std::string> values;
+
+	if(!dev)
+		return trigger_mapping;
+	std::string name = "voltage0";
+	struct iio_channel *triggerch = iio_device_find_channel(dev, name.c_str(), false);
+	if( !triggerch )
+		return trigger_mapping;
+	int ret = iio_channel_attr_read(triggerch, "trigger_available", buf, sizeof(buf));
+
+	if (ret > 0) {
+		QStringList list = QString::fromUtf8(buf).split(' ');
+
+		for (auto it = list.cbegin(); it != list.cend(); ++it) {
+			values.push_back(it->toStdString());
+		}
+	}
+
+	if (values.empty()) {
+		values = trigger_mapping;
+	}
+	return values;
 }
 
 void LogicAnalyzer::toggleLeftMenu(bool val)
@@ -1516,19 +1555,20 @@ void LogicAnalyzer::bufferSentSignal(bool lastBuffer)
 	}
 }
 
-void LogicAnalyzer::autoCaptureEnable()
+void LogicAnalyzer::autoCaptureEnable(bool check)
 {
-	if(armed) {
+	if(check) {
 		for(int i = 0; i < get_no_channels(dev) + 2; i++) {
 			setHWTrigger(i, trigger_cache[i]);
 		}
 	}
-	else {
+	if(!check && armed){
 		for(int i = 0; i < get_no_channels(dev) + 2; i++) {
 			trigger_cache[i] = get_trigger_from_device(i);
 			setHWTrigger(i, trigger_mapping[0]);
 		}
 	}
+	armed = check;
 }
 
 void LogicAnalyzer::setTriggerCache(int chid, std::string trigger_value)
@@ -1681,8 +1721,7 @@ void LogicAnalyzer::resetInstrumentToDefault()
 void LogicAnalyzer::setTimeout(bool checked)
 {
 	if(!armed) {
-		armed = true;
-		autoCaptureEnable();
+		autoCaptureEnable(true);
 	}
 	logic_analyzer_ptr->set_timeout(checked);
 	if(checked)

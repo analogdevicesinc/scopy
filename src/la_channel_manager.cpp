@@ -83,15 +83,6 @@ void LogicAnalyzerChannel::setChannel_role(const srd_channel *value)
 	channel_role = value;
 }
 
-std::vector<std::string> LogicAnalyzerChannelUI::trigger_mapping = {
-		"none",
-		"edge-any",
-		"edge-rising",
-		"edge-falling",
-		"level-low",
-		"level-high",
-};
-
 LogicAnalyzerChannelUI::LogicAnalyzerChannelUI(LogicAnalyzerChannel *ch,
                 LogicAnalyzerChannelGroup *chgroup,
                 LogicAnalyzerChannelGroupUI *chgroupui,
@@ -109,9 +100,9 @@ LogicAnalyzerChannelUI::LogicAnalyzerChannelUI(LogicAnalyzerChannel *ch,
 	this->installEventFilter(this);
 
 	std::string trigger_val = chm_ui->chm->get_channel(get_channel()->get_id())->getTrigger();
-	for(int i = 0; i < trigger_mapping.size(); i++)
+	for(int i = 0; i < chm_ui->getTriggerMapping().size(); i++)
 	{
-		if( trigger_val == trigger_mapping[i] )
+		if( trigger_val == chm_ui->getTriggerMapping(i) )
 		{
 			getChannel()->setTrigger(trigger_val);
 			ui->comboBox->setCurrentIndex(i);
@@ -391,7 +382,7 @@ void LogicAnalyzerChannelUI::highlightBotSeparator()
 void LogicAnalyzerChannelUI::enableControls(bool enabled)
 {
 	ui->groupName->setEnabled(enabled);
-	ui->comboBox->setEnabled(!chm_ui->is_streaming_mode() && enabled);
+	ui->comboBox->setEnabled(enabled);
 	ui->indexLabel->setEnabled(enabled);
 	ui->indexLabel2->setEnabled(enabled);
 	trace->visible(enabled);
@@ -427,7 +418,7 @@ LogicAnalyzerChannelGroup* LogicAnalyzerChannelUI::getChannelGroup()
 
 void LogicAnalyzerChannelUI::triggerChanged(int index)
 {
-	std::string trigger_val = trigger_mapping[index];
+	std::string trigger_val = chm_ui->getTriggerMapping(index);
 	if( trigger_val != getChannel()->getTrigger() )
 	{
 		chm_ui->chm->get_channel(get_channel()->get_id())->setTrigger(trigger_val);
@@ -670,15 +661,6 @@ const srd_channel* LogicAnalyzerChannelGroup::get_srd_channel_from_name(const ch
 	return nullptr;
 }
 
-std::vector<std::string> LogicAnalyzerChannelGroupUI::trigger_mapping = {
-		"none",
-		"edge-any",
-		"edge-rising",
-		"edge-falling",
-		"level-low",
-		"level-high",
-};
-
 LogicAnalyzerChannelGroupUI::LogicAnalyzerChannelGroupUI(
         LogicAnalyzerChannelGroup *chg,
         LogicAnalyzerChannelManagerUI *chm_ui,
@@ -698,9 +680,9 @@ LogicAnalyzerChannelGroupUI::LogicAnalyzerChannelGroupUI(
 	{
 		ch = static_cast<LogicAnalyzerChannel*>(lchg->get_channel());
 		std::string trigger_val = chm_ui->chm->get_channel(ch->get_id())->getTrigger();
-		for(int i = 0; i < trigger_mapping.size(); i++)
+		for(int i = 0; i < chm_ui->getTriggerMapping().size(); i++)
 		{
-			if( trigger_val == trigger_mapping[i] )
+			if( trigger_val == chm_ui->getTriggerMapping(i) )
 			{
 				ch->setTrigger(trigger_val);
 				ui->comboBox->setCurrentIndex(i);
@@ -1087,7 +1069,7 @@ void LogicAnalyzerChannelGroupUI::enableControls(bool enabled)
 	ui->decoderCombo->setEnabled(enabled);
 	ui->groupName->setEnabled(enabled);
 	ui->comboBox_2->setEnabled(enabled);
-	ui->comboBox->setEnabled(!chm_ui->is_streaming_mode() && enabled);
+	ui->comboBox->setEnabled(enabled);
 	ui->indexLabel->setEnabled(enabled);
 	trace->visible(enabled);
 	for (auto &&ch : ch_ui) {
@@ -1154,7 +1136,7 @@ void LogicAnalyzerChannelGroupUI::triggerChanged(int index)
 	if( !lchg->is_grouped() )
 	{
 		ch = static_cast<LogicAnalyzerChannel*>(lchg->get_channel());
-		std::string trigger_val = trigger_mapping[index];
+		std::string trigger_val = chm_ui->getTriggerMapping(index);
 		if( trigger_val != ch->getTrigger() )
 		{
 			chm_ui->chm->get_channel(ch->get_id())->setTrigger(trigger_val);
@@ -1422,6 +1404,7 @@ LogicAnalyzerChannelManagerUI::LogicAnalyzerChannelManagerUI(QWidget *parent,
 	this->chm = chm;
 	this->la = la;
 	this->chm->initDecoderList();
+	this->trigger_mapping = la->get_iio_trigger_options();
 	createColorButtons();
 	showHighlight(false);
 	chm->highlightChannel(chm->get_channel_group(0));
@@ -1429,6 +1412,18 @@ LogicAnalyzerChannelManagerUI::LogicAnalyzerChannelManagerUI(QWidget *parent,
 	ui->scrollAreaWidgetContents->installEventFilter(this);
 	eventFilterGuard = new MouseWheelWidgetGuard(this);
 	Q_EMIT(widthChanged(geometry().width()));
+}
+
+std::vector<std::string> LogicAnalyzerChannelManagerUI::getTriggerMapping()
+{
+	return trigger_mapping;
+}
+
+std::string LogicAnalyzerChannelManagerUI::getTriggerMapping(int i)
+{
+	if(i < trigger_mapping.size())
+		return trigger_mapping[i];
+	return "";
 }
 
 void LogicAnalyzerChannelManagerUI::createColorButtons()

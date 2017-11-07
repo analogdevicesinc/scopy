@@ -76,8 +76,6 @@ class LogicAnalyzerChannelUI : public ChannelUI
 
 	int traceOffset;
 	int traceHeight;
-private:
-	static std::vector<std::string> trigger_mapping;
 public:
 	LogicAnalyzerChannelUI(LogicAnalyzerChannel *ch,
 	                       LogicAnalyzerChannelGroup *chgroup,
@@ -205,7 +203,6 @@ private:
 	std::shared_ptr<pv::view::TraceTreeItem> trace;
 	std::shared_ptr<pv::view::LogicSignal> logicTrace;
 	std::shared_ptr<pv::view::DecodeTrace> decodeTrace;
-	static std::vector<std::string> trigger_mapping;
 public Q_SLOTS:
 	void remove();
 	void enable(bool enabled);
@@ -303,6 +300,8 @@ public:
 	std::shared_ptr<pv::binding::Decoder> binding_;
 	void set_streaming_mode(bool);
 	bool is_streaming_mode();
+	std::vector<std::string> getTriggerMapping();
+	std::string getTriggerMapping(int);
 
 public Q_SLOTS:
 	void chmScrollChanged(int value);
@@ -333,6 +332,7 @@ private:
 	void showColorSettings(bool);
 	MouseWheelWidgetGuard *eventFilterGuard;
 	void enableCgSettings(bool en);
+	std::vector<std::string> trigger_mapping;
 Q_SIGNALS:
 	void widthChanged(int);
 };

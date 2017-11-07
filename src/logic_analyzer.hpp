@@ -96,6 +96,7 @@ public:
 		Waiting,
 		Triggered,
 		Auto,
+		Stream,
 	};
 
 	explicit LogicAnalyzer(struct iio_context *ctx,
@@ -118,6 +119,7 @@ public:
 	int getCurrent_acquisition_mode() const;
 	void setCurrent_acquisition_mode(int value);
 	QString saveToFile();
+	std::vector<std::string> get_iio_trigger_options();
 
 private Q_SLOTS:
 	void startStop(bool start);
@@ -259,7 +261,7 @@ private:
 	QTimer *timer;
 	int timer_timeout_ms;
 	std::atomic<bool> armed;
-	void autoCaptureEnable();
+	void autoCaptureEnable(bool);
 
 	DigitalBufferPreviewer *buffer_previewer;
 	void set_buffersize();
