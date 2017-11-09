@@ -159,6 +159,10 @@ namespace adiscope {
 		void constantValueChanged(double val);
 		void amplitudeChanged(double val);
 		void offsetChanged(double val);
+		void fileSampleRateChanged(double val);
+		void fileAmplitudeChanged(double val);
+		void fileOffsetChanged(double val);
+		void filePhaseChanged(double val);
 		void frequencyChanged(double val);
 		void phaseChanged(double val);
 		void mathFreqChanged(double val);

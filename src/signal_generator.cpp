@@ -40,9 +40,11 @@
 #include <gnuradio/blocks/head.h>
 #include <gnuradio/blocks/int_to_float.h>
 #include <gnuradio/blocks/multiply_const_ff.h>
+#include <gnuradio/blocks/add_const_ff.h>
 #include <gnuradio/blocks/nop.h>
 #include <gnuradio/blocks/skiphead.h>
 #include <gnuradio/blocks/vector_sink_s.h>
+#include <gnuradio/filter/fractional_resampler_ff.h>
 #include <gnuradio/iio/device_sink.h>
 #include <gnuradio/iio/math.h>
 
@@ -74,16 +76,25 @@ enum SIGNAL_TYPE {
 struct adiscope::signal_generator_data {
 	enum SIGNAL_TYPE type;
 	unsigned int id;
-
+	// SIGNAL_TYPE_CONSTANT
 	float constant;
+	// SIGNAL_TYPE_WAVEFORM
 	double amplitude;
 	float offset;
 	double frequency;
-	double math_freq;
 	double phase;
 	enum sg_waveform waveform;
+	// SIGNAL_TYPE_BUFFER
+	double file_sr;
+	double file_amplitude;
+	double file_offset;
+	unsigned long file_phase;
+	unsigned long file_nr_of_samples;
 	QString file;
+	bool file_loaded;
+	// SIGNAL_TYPE_MATH
 	QString function;
+	double math_freq;
 };
 Q_DECLARE_METATYPE(QSharedPointer<signal_generator_data>);
 
@@ -153,11 +164,17 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 	ui->amplitude->setValue(ui->amplitude->maxValue());
 
 	/* Set max frequency according to max sample rate */
+	ui->fileSampleRate->setMinValue(0.001);
 	ui->frequency->setMaxValue((sample_rate / 2) - 1);
 	ui->mathFrequency->setMaxValue((sample_rate / 2) - 1);
+	ui->fileSampleRate->setMaxValue((sample_rate / 2) - 1);
 
 	/* (lowest freq * 100 * 1000) frequency by default */
-	ui->frequency->setValue(ui->frequency->minValue() * 100 * 1000.0);
+	ui->frequency->setValue(ui->frequency->minValue() * 1000 * 1000.0);
+	ui->fileSampleRate->setValue(ui->fileSampleRate->minValue() * 100 * 1000.0);
+	ui->fileAmplitude->setValue(ui->fileAmplitude->maxValue()/2);
+	ui->fileOffset->setValue(0);
+	ui->filePhase->setValue(0);
 	ui->mathFrequency->setValue(
 	        ui->mathFrequency->minValue() * 100 * 1000.0);
 
@@ -175,6 +192,11 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 		ptr->phase = ui->phase->value();
 		ptr->waveform = SG_SIN_WAVE;
 		ptr->math_freq = ui->mathFrequency->value();
+		ptr->file_sr = ui->fileSampleRate->value();
+		ptr->file_amplitude = ui->fileAmplitude->value();
+		ptr->file_offset = ui->fileOffset->value();
+		ptr->file_phase = ui->filePhase->value();
+		ptr->file_loaded=false;
 
 		ptr->type = SIGNAL_TYPE_CONSTANT;
 		ptr->id = i;
@@ -259,6 +281,15 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 
 	connect(ui->amplitude, SIGNAL(valueChanged(double)),
 	        this, SLOT(amplitudeChanged(double)));
+
+	connect(ui->fileAmplitude, SIGNAL(valueChanged(double)),
+		this, SLOT(fileAmplitudeChanged(double)));
+	connect(ui->fileOffset, SIGNAL(valueChanged(double)),
+		this, SLOT(fileOffsetChanged(double)));
+	connect(ui->filePhase, SIGNAL(valueChanged(double)),
+		this, SLOT(filePhaseChanged(double)));
+	connect(ui->fileSampleRate, SIGNAL(valueChanged(double)),
+		this, SLOT(fileSampleRateChanged(double)));
 	connect(ui->offset, SIGNAL(valueChanged(double)),
 	        this, SLOT(offsetChanged(double)));
 	connect(ui->frequency, SIGNAL(valueChanged(double)),
@@ -313,10 +344,19 @@ void SignalGenerator::resetZoom()
 	for (auto it = channels.begin(); it != channels.end(); ++it) {
 		if ((*it)->enableButton()->isChecked()) {
 			auto ptr = getData((*it));
-
 			switch (ptr->type) {
 			case SIGNAL_TYPE_CONSTANT:
+				break;
 			case SIGNAL_TYPE_BUFFER:
+				if(ptr->file_loaded)
+				{
+					auto length=(1/ptr->file_sr)*ptr->file_nr_of_samples;
+					if(period<length)
+					{
+						period=length;
+						slowSignalId = ptr->id;
+					}
+				}
 				break;
 
 			case SIGNAL_TYPE_WAVEFORM:
@@ -342,7 +382,12 @@ void SignalGenerator::resetZoom()
 		}
 	}
 
-	period=period*2;
+	period*=2; // show 2 periods - ideally this would be an instrument preference/GUI control
+	if(period==0.0) // prevent empty graph
+		period=0.1;
+
+	plot->setVertUnitsPerDiv(1);
+	plot->setVertOffset(0);
 	plot->setHorizUnitsPerDiv(period/10);
 	plot->setHorizOffset(period/2);
 	plot->zoomBaseUpdate();
@@ -406,6 +451,36 @@ void SignalGenerator::amplitudeChanged(double value)
 	}
 }
 
+void SignalGenerator::fileAmplitudeChanged(double value)
+{
+	auto ptr = getCurrentData();
+
+	if (ptr->file_amplitude != value) {
+		ptr->file_amplitude = value;
+		resetZoom();
+	}
+}
+
+void SignalGenerator::fileOffsetChanged(double value)
+{
+	auto ptr = getCurrentData();
+
+	if (ptr->file_offset!= value) {
+		ptr->file_offset= value;
+		resetZoom();
+	}
+}
+
+void SignalGenerator::filePhaseChanged(double value)
+{
+	auto ptr = getCurrentData();
+
+	if (ptr->file_phase!= value) {
+		ptr->file_phase= value;
+		resetZoom();
+	}
+}
+
 void SignalGenerator::offsetChanged(double value)
 {
 	auto ptr = getCurrentData();
@@ -415,6 +490,17 @@ void SignalGenerator::offsetChanged(double value)
 		resetZoom();
 	}
 }
+
+void SignalGenerator::fileSampleRateChanged(double value)
+{
+	auto ptr = getCurrentData();
+
+	if (ptr->file_sr != value) {
+		ptr->file_sr = value;
+		resetZoom();
+	}
+}
+
 
 void SignalGenerator::frequencyChanged(double value)
 {
@@ -531,11 +617,18 @@ void SignalGenerator::loadFile()
 
 	ptr->file = QFileDialog::getOpenFileName(this, tr("Open File"));
 	this->ui->label_path->setText(ptr->file);
-
 	auto info = QFileInfo(ptr->file);
+	ptr->file_nr_of_samples=info.size() / sizeof(float);
 	this->ui->label_size->setText(QString("%1 ").arg(
 	                                      info.size() / sizeof(float)) + tr("samples"));
-
+	ptr->file_loaded=true;
+	ptr->file_amplitude=5.0;
+	ptr->file_offset=0;
+	ptr->file_phase=0;
+	ui->fileAmplitude->setValue(ptr->file_amplitude);
+	ui->fileOffset->setValue(ptr->file_offset);
+	ui->filePhase->setValue(ptr->file_phase);
+	ui->filePhase->setMaxValue(ptr->file_nr_of_samples);
 	resetZoom();
 }
 
@@ -760,14 +853,9 @@ basic_block_sptr SignalGenerator::getSignalSource(gr::top_block_sptr top,
 
 	auto src = analog::sig_source_f::make(samp_rate, waveform,
 	                                      data.frequency, amplitude, offset);
-	/*	auto delay = blocks::delay::make(sizeof(float),
-				samp_rate * phase / (data.frequency * 360.0));*/
 
 	uint64_t to_skip = samp_rate * phase / (data.frequency * 360.0);
 	auto skip_head = blocks::skiphead::make(sizeof(float),(uint64_t)to_skip);
-
-	/*top->connect(src, 0, delay, 0);
-	top->connect(delay, 0, skip_head, 0);*/
 	top->connect(src, 0, skip_head, 0);
 
 	if (!inv_saw_wave) {
@@ -806,11 +894,34 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
 	case SIGNAL_TYPE_BUFFER:
 		if (!ptr->file.isNull()) {
 			auto str = ptr->file.toStdString();
+			auto fs = blocks::file_source::make(
+				       sizeof(float), str.c_str(), true);
 
-			return blocks::file_source::make(
-			               sizeof(float), str.c_str(), true);
+			auto ratio=ptr->file_sr/samp_rate;
+			auto mult = blocks::multiply_const_ff::make(ptr->file_amplitude);
+			top->connect(fs,0,mult,0);
+			auto add = blocks::add_const_ff::make(ptr->file_offset);
+			top->connect(mult,0,add,0);
+			auto phase_skip = blocks::skiphead::make(sizeof(float),ptr->file_phase);
+			top->connect(add,0,phase_skip,0);
+			auto res = filter::fractional_resampler_ff::make(0,ratio);
+			top->connect(phase_skip,0,res,0);
+
+			if(preview)
+			{
+				auto buffer_freq = ptr->file_sr/(double)ptr->file_nr_of_samples;
+				int full_periods=(int)((double)zoomT1OnScreen * buffer_freq);
+				double phase_in_time = zoomT1OnScreen - (full_periods/buffer_freq);
+				unsigned long samples_to_skip = phase_in_time * samp_rate;
+				auto skip = blocks::skiphead::make(sizeof(float),samples_to_skip);
+				top->connect(res,0,skip,0);
+				return skip;
+			}
+			else
+			{
+				return res;
+			}
 		}
-
 		break;
 
 	case SIGNAL_TYPE_MATH:
@@ -933,6 +1044,10 @@ void SignalGenerator::updateRightMenuForChn(int chIdx)
 	ui->label_path->setText(ptr->file);
 	ui->mathWidget->setFunction(ptr->function);
 	ui->mathFrequency->setValue(ptr->math_freq);
+	ui->fileSampleRate->setValue(ptr->file_sr);
+	ui->fileOffset->setValue(ptr->file_offset);
+	ui->filePhase->setValue(ptr->file_phase);
+	ui->fileAmplitude->setValue(ptr->file_amplitude);
 
 	if (!ptr->file.isNull()) {
 		auto info = QFileInfo(ptr->file);
@@ -1215,8 +1330,15 @@ size_t SignalGenerator::get_samples_count(const struct iio_device *dev,
 			size = lcm(size, (size_t) ratio);
 			break;
 
-		case SIGNAL_TYPE_CONSTANT:
 		case SIGNAL_TYPE_BUFFER:
+			if(perfect && rate!=ptr->file_sr)
+				return 0;
+			ratio = rate/ptr->file_sr;
+			if(ratio<2.0)
+				return 0;
+			size=(ptr->file_nr_of_samples * ratio);
+			break;
+		case SIGNAL_TYPE_CONSTANT:
 		default:
 			break;
 		}

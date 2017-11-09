@@ -310,7 +310,7 @@ QTabBar::tab:!selected {
                        </stringlist>
                       </property>
                       <property name="name" stdset="0">
-                       <string>Frequency</string>
+                       <string>SampleRate</string>
                       </property>
                       <property name="min_value" stdset="0">
                        <double>0.001000000000000</double>
@@ -434,6 +434,99 @@ background-image: url(:/icons/floppy_hover.svg);
                      <string/>
                     </property>
                    </widget>
+                  </item>
+                  <item>
+                   <layout class="QVBoxLayout" name="verticalLayout_8">
+                    <property name="bottomMargin">
+                     <number>0</number>
+                    </property>
+                    <item>
+                     <layout class="QGridLayout" name="waveformGrid_2">
+                      <item row="1" column="0">
+                       <widget class="adiscope::ScaleSpinButton" name="fileSampleRate" native="true">
+                        <property name="minimumSize">
+                         <size>
+                          <width>30</width>
+                          <height>30</height>
+                         </size>
+                        </property>
+                        <property name="units" stdset="0">
+                         <stringlist notr="true">
+                          <string>mHz=1e-3</string>
+                          <string>Hz=1e0</string>
+                          <string>kHz=1e3</string>
+                          <string>MHz=1e6</string>
+                         </stringlist>
+                        </property>
+                        <property name="name" stdset="0">
+                         <string>SampleRate</string>
+                        </property>
+                        <property name="min_value" stdset="0">
+                         <double>0.001000000000000</double>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="0" column="0">
+                       <widget class="adiscope::ScaleSpinButton" name="fileAmplitude" native="true">
+                        <property name="minimumSize">
+                         <size>
+                          <width>30</width>
+                          <height>30</height>
+                         </size>
+                        </property>
+                        <property name="units" stdset="0">
+                         <stringlist notr="true">
+                          <string>µVolts=1e-6</string>
+                          <string>mVolts=1e-3</string>
+                          <string>Volts=1e0</string>
+                         </stringlist>
+                        </property>
+                        <property name="name" stdset="0">
+                         <string>Amplitude</string>
+                        </property>
+                        <property name="min_value" stdset="0">
+                         <double>0.000001000000000</double>
+                        </property>
+                        <property name="max_value" stdset="0">
+                         <double>10.000000000000000</double>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="0" column="1">
+                       <widget class="adiscope::PositionSpinButton" name="fileOffset" native="true">
+                        <property name="units" stdset="0">
+                         <stringlist notr="true">
+                          <string>µVolts=1e-6</string>
+                          <string>mVolts=1e-3</string>
+                          <string>Volts=1e0</string>
+                         </stringlist>
+                        </property>
+                        <property name="name" stdset="0">
+                         <string>Offset</string>
+                        </property>
+                        <property name="min_value" stdset="0">
+                         <double>-5.000000000000000</double>
+                        </property>
+                        <property name="max_value" stdset="0">
+                         <double>5.000000000000000</double>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="1" column="1">
+                       <widget class="adiscope::PositionSpinButton" name="filePhase" native="true">
+                        <property name="units" stdset="0">
+                         <stringlist notr="true">
+                          <string>samples=1e0</string>
+                         </stringlist>
+                        </property>
+                        <property name="name" stdset="0">
+                         <string>Phase</string>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </item>
+                   </layout>
                   </item>
                   <item>
                    <widget class="QGroupBox" name="groupBox_3">
