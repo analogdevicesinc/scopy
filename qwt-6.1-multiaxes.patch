@@ -1,0 +1,102 @@
+diff --git a/qwtconfig.pri b/qwtconfig.pri
+index 8c5bae5f..d8bbf785 100644
+--- a/qwtconfig.pri
++++ b/qwtconfig.pri
+@@ -16,10 +16,10 @@ QWT_VERSION      = $${QWT_VER_MAJ}.$${QWT_VER_MIN}.$${QWT_VER_PAT}
+ # Install paths
+ ######################################################################
+ 
+-QWT_INSTALL_PREFIX = $$[QT_INSTALL_PREFIX]
++QWT_INSTALL_PREFIX = /usr/local
+ 
+ unix {
+-    QWT_INSTALL_PREFIX    = /usr/local/qwt-$$QWT_VERSION-svn
++    QWT_INSTALL_PREFIX    = /usr/local
+     # QWT_INSTALL_PREFIX = /usr/local/qwt-$$QWT_VERSION-svn-qt-$$QT_VERSION
+ }
+ 
+@@ -29,7 +29,7 @@ win32 {
+ }
+ 
+ QWT_INSTALL_DOCS      = $${QWT_INSTALL_PREFIX}/doc
+-QWT_INSTALL_HEADERS   = $${QWT_INSTALL_PREFIX}/include
++QWT_INSTALL_HEADERS   = $${QWT_INSTALL_PREFIX}/include/qwt
+ QWT_INSTALL_LIBS      = $${QWT_INSTALL_PREFIX}/lib
+ 
+ ######################################################################
+@@ -63,7 +63,7 @@ QWT_INSTALL_PLUGINS   = $${QWT_INSTALL_PREFIX}/plugins/designer
+ # with every Qt upgrade. 
+ ######################################################################
+ 
+-QWT_INSTALL_FEATURES  = $${QWT_INSTALL_PREFIX}/features
++#QWT_INSTALL_FEATURES  = $${QWT_INSTALL_PREFIX}/features
+ # QWT_INSTALL_FEATURES  = $$[QT_INSTALL_PREFIX]/features
+ 
+ ######################################################################
+@@ -110,7 +110,7 @@ QWT_CONFIG     += QwtOpenGL
+ # to your qmake project file.
+ ######################################################################
+ 
+-QWT_CONFIG     += QwtMathML
++#QWT_CONFIG     += QwtMathML
+ 
+ ######################################################################
+ # If you want to build the Qwt designer plugin, 
+@@ -118,7 +118,7 @@ QWT_CONFIG     += QwtMathML
+ # Otherwise you have to build it from the designer directory.
+ ######################################################################
+ 
+-QWT_CONFIG     += QwtDesigner
++#QWT_CONFIG     += QwtDesigner
+ 
+ ######################################################################
+ # Compile all Qwt classes into the designer plugin instead
+@@ -141,7 +141,7 @@ win32 {
+ # Otherwise you have to build them from the examples directory.
+ ######################################################################
+ 
+-QWT_CONFIG     += QwtExamples
++#QWT_CONFIG     += QwtExamples
+ 
+ ######################################################################
+ # The playground is primarily intended for the Qwt development 
+@@ -152,7 +152,7 @@ QWT_CONFIG     += QwtExamples
+ # Otherwise you have to build them from the playground directory.
+ ######################################################################
+ 
+-QWT_CONFIG     += QwtPlayground
++#QWT_CONFIG     += QwtPlayground
+ 
+ ######################################################################
+ # When Qt has been built as framework qmake wants 
+@@ -161,14 +161,14 @@ QWT_CONFIG     += QwtPlayground
+ 
+ macx:!static:CONFIG(qt_framework, qt_framework|qt_no_framework) {
+ 
+-    QWT_CONFIG += QwtFramework
++#    QWT_CONFIG += QwtFramework
+ }  
+ 
+ ######################################################################
+ # Create and install pc files for pkg-config
+ # See http://www.freedesktop.org/wiki/Software/pkg-config/
+ ######################################################################
+-
++QWT_CONFIG     += QwtPkgConfig
+ unix {
+ 
+     QWT_CONFIG     += QwtPkgConfig
+diff --git a/src/src.pro b/src/src.pro
+index 0653ae3b..0b5587cb 100644
+--- a/src/src.pro
++++ b/src/src.pro
+@@ -30,7 +30,8 @@ contains(QWT_CONFIG, QwtDll) {
+     
+         # we increase the SONAME for every minor number
+ 
+-        QWT_SONAME=libqwt.so.$${VER_MAJ}.$${VER_MIN}
++        !macx: QWT_SONAME=libqwt.so.$${VER_MAJ}.$${VER_MIN}
++        macx: QWT_SONAME=$${QWT_INSTALL_LIBS}/libqwt.dylib
+         QMAKE_LFLAGS *= $${QMAKE_LFLAGS_SONAME}$${QWT_SONAME}
+         QMAKE_LFLAGS_SONAME=
+     }

@@ -165,7 +165,7 @@ void BinaryStream::run()
                                 if( !single_ ) {
                                         input_->end();
                                         if(data_ && remaining_samples > 0)
-                                                input_->send(iio_buffer_start(data_)+(size_t)(size_to_display),
+                                                input_->send((char*)iio_buffer_start(data_)+(size_t)(size_to_display),
                                                      remaining_samples);
                                         nrx = 0;
                                         la->bufferSentSignal(true);
