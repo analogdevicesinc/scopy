@@ -157,6 +157,7 @@ DigitalIO::DigitalIO(struct iio_context *ctx, Filter *filt, QPushButton *runBtn,
 	                                 ui->dioContainer));
 	ui->containerLayout->addWidget(groups.last());
 
+	connect(ui->btnRunStop, SIGNAL(toggled(bool)), this, SLOT(btnRunStop_toggled()));
 	connect(runBtn, SIGNAL(toggled(bool)), ui->btnRunStop, SLOT(setChecked(bool)));
 	connect(ui->btnRunStop, SIGNAL(toggled(bool)), runBtn, SLOT(setChecked(bool)));
 
@@ -326,7 +327,7 @@ void adiscope::DigitalIO::lockUi()
 
 }
 
-void adiscope::DigitalIO::on_btnRunStop_clicked()
+void adiscope::DigitalIO::btnRunStop_toggled()
 {
 	if (ui->btnRunStop->isChecked()) {
 		ui->btnRunStop->setText("Stop");

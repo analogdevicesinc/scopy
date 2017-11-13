@@ -113,7 +113,7 @@ public Q_SLOTS:
 	void setOutput();
 	void setSlider(int val);
 	void lockUi();
-	void on_btnRunStop_clicked();
+	void btnRunStop_toggled();
 };
 
 class DigitalIO_API : public ApiObject
