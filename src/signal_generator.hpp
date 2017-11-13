@@ -149,6 +149,9 @@ namespace adiscope {
 			unsigned long& out_oversampling_ratio);
 		bool use_oversampling(const struct iio_device *dev);
 
+		bool sample_rate_forced(const struct iio_device *dev);
+		unsigned long get_forced_sample_rate(const struct iio_device *dev);
+
 		double zoomT1;
 		double zoomT2;
 

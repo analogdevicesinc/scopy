@@ -39,12 +39,15 @@
 #include <gnuradio/blocks/float_to_short.h>
 #include <gnuradio/blocks/head.h>
 #include <gnuradio/blocks/int_to_float.h>
+#include <gnuradio/blocks/throttle.h>
 #include <gnuradio/blocks/multiply_const_ff.h>
 #include <gnuradio/blocks/add_const_ff.h>
 #include <gnuradio/blocks/nop.h>
 #include <gnuradio/blocks/skiphead.h>
 #include <gnuradio/blocks/vector_sink_s.h>
 #include <gnuradio/filter/fractional_resampler_ff.h>
+#include <gnuradio/filter/rational_resampler_base_fff.h>
+#include <gnuradio/filter/pfb_arb_resampler_fff.h>
 #include <gnuradio/iio/device_sink.h>
 #include <gnuradio/iio/math.h>
 
@@ -904,11 +907,21 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
 			top->connect(mult,0,add,0);
 			auto phase_skip = blocks::skiphead::make(sizeof(float),ptr->file_phase);
 			top->connect(add,0,phase_skip,0);
-			auto res = filter::fractional_resampler_ff::make(0,ratio);
-			top->connect(phase_skip,0,res,0);
 
 			if(preview)
 			{
+				//auto res = blocks::throttle::make(sizeof(float),ptr->file_sr);//
+				auto res = filter::fractional_resampler_ff::make(0,ratio);
+				//auto res=filter::pfb_arb_resampler_fff::make(ratio,std::vector<float>(1,1));
+				/*auto interp=ratio;
+				auto dec=1;
+				while(interp<1)
+				{
+					interp*=10;
+					//dec*=10;
+				}
+				auto res=filter::rational_resampler_base_fff::make(interp,dec,{1});*/
+				top->connect(phase_skip,0,res,0);
 				auto buffer_freq = ptr->file_sr/(double)ptr->file_nr_of_samples;
 				int full_periods=(int)((double)zoomT1OnScreen * buffer_freq);
 				double phase_in_time = zoomT1OnScreen - (full_periods/buffer_freq);
@@ -919,7 +932,7 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
 			}
 			else
 			{
-				return res;
+				return phase_skip;
 			}
 		}
 		break;
@@ -1112,6 +1125,9 @@ bool SignalGenerator::use_oversampling(const struct iio_device *dev)
 			if (ptr->waveform == SG_SQR_WAVE) {
 				return true;
 			}
+			break;
+		case SIGNAL_TYPE_BUFFER:
+			return true;
 
 		default:
 			break;
@@ -1160,6 +1176,12 @@ unsigned long SignalGenerator::get_best_sample_rate(
 
 	/* When using oversampling, we actually want to generate the
 	 * signal with the lowest sample rate possible. */
+
+	if(sample_rate_forced(dev))
+	{
+		return get_forced_sample_rate(dev);
+	}
+
 	if (use_oversampling(dev)) {
 		qSort(values.begin(), values.end(), qLess<unsigned long>());
 	}
@@ -1180,6 +1202,7 @@ unsigned long SignalGenerator::get_best_sample_rate(
 		qSort(values.begin(), values.end(), qGreater<unsigned long>());
 	}
 
+
 	for (unsigned long rate : values) {
 		size_t buf_size = get_samples_count(dev, rate);
 
@@ -1191,6 +1214,41 @@ unsigned long SignalGenerator::get_best_sample_rate(
 	}
 
 	throw std::runtime_error("Unable to calculate best sample rate");
+}
+
+bool SignalGenerator::sample_rate_forced(const struct iio_device *dev)
+{
+	for (unsigned int i = 0; i < iio_device_get_channels_count(dev); i++) {
+		struct iio_channel *chn = iio_device_get_channel(dev, i);
+
+		if (!iio_channel_is_enabled(chn)) {
+			continue;
+		}
+
+		QWidget *w = static_cast<QWidget *>(iio_channel_get_data(chn));
+		auto ptr = getData(w);
+		if(ptr->file_loaded && ptr->file_sr)
+			return true;
+	}
+	return false;
+}
+
+unsigned long SignalGenerator::get_forced_sample_rate(const struct iio_device *dev)
+{
+
+	for (unsigned int i = 0; i < iio_device_get_channels_count(dev); i++) {
+		struct iio_channel *chn = iio_device_get_channel(dev, i);
+
+		if (!iio_channel_is_enabled(chn)) {
+			continue;
+		}
+
+		QWidget *w = static_cast<QWidget *>(iio_channel_get_data(chn));
+		auto ptr = getData(w);
+		if(ptr->file_loaded && ptr->file_sr)
+			return ptr->file_sr;
+	}
+	return false;
 }
 
 unsigned long SignalGenerator::get_max_sample_rate(const struct iio_device *dev)
@@ -1215,7 +1273,7 @@ void SignalGenerator::calc_sampling_params(const iio_device *dev,
 		out_sample_rate = max_sample_rate;
 
 		qDebug() << QString("Using oversampling with a ratio of %1")
-		         .arg(out_oversampling_ratio);
+			 .arg(out_oversampling_ratio);
 	} else {
 		out_sample_rate = rate;
 		out_oversampling_ratio = 1;
@@ -1331,11 +1389,11 @@ size_t SignalGenerator::get_samples_count(const struct iio_device *dev,
 			break;
 
 		case SIGNAL_TYPE_BUFFER:
+			if(!ptr->file_loaded)
+				return 0;
 			if(perfect && rate!=ptr->file_sr)
 				return 0;
 			ratio = rate/ptr->file_sr;
-			if(ratio<2.0)
-				return 0;
 			size=(ptr->file_nr_of_samples * ratio);
 			break;
 		case SIGNAL_TYPE_CONSTANT:
