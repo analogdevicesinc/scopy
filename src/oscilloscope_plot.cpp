@@ -58,7 +58,8 @@ CapturePlot::CapturePlot(QWidget *parent,
 	d_measurementsEnabled(false),
 	d_cursorReadoutsVisible(false),
 	d_bufferSizeLabelVal(0),
-	d_sampleRateLabelVal(1.0)
+	d_sampleRateLabelVal(1.0),
+	d_labelsEnabled(false)
 {
 
 	setMinimumHeight(250);
@@ -323,10 +324,16 @@ CapturePlot::CapturePlot(QWidget *parent,
 	/* Add offset widgets for each new channel */
 	connect(this, SIGNAL(channelAdded(int)),
 		SLOT(onChannelAdded(int)));
+
+	installEventFilter(this);
+	QwtScaleWidget *scaleWidget = axisWidget(QwtPlot::xBottom);
+	const int fmw = QFontMetrics(scaleWidget->font()).width("-34567mV");
+	scaleWidget->setMinBorderDist(fmw / 2, fmw / 2);
 }
 
 CapturePlot::~CapturePlot()
 {
+	removeEventFilter(this);
 	canvas()->removeEventFilter(d_cursorReadouts);
 	canvas()->removeEventFilter(d_symbolCtrl);
 }
@@ -615,6 +622,77 @@ void CapturePlot::bringCurveToFront(unsigned int curveIdx)
 	}
 
 	DisplayPlot::bringCurveToFront(curveIdx);
+}
+
+void CapturePlot::enableLabels(bool enabled)
+{
+	d_labelsEnabled = enabled;
+	enableColoredLabels(enabled);
+}
+
+bool CapturePlot::enableAxisLabels(bool enabled)
+{
+	enableAxis(QwtPlot::xBottom, enabled);
+	if (!enabled) {
+		int nrAxes = axesCount(QwtPlot::yLeft);
+		for (int i = 0; i < nrAxes; ++i) {
+			setAxisVisible(QwtAxisId(QwtPlot::yLeft, i),
+					enabled);
+		}
+	}
+}
+
+bool CapturePlot::setActiveVertAxis(unsigned int axisIdx)
+{
+	DisplayPlot::setActiveVertAxis(axisIdx);
+	if (d_labelsEnabled) {
+		enableAxis(QwtPlot::xBottom, true);
+		d_bottomHandlesArea->setLeftPadding(50 + axisWidget(
+							QwtAxisId(QwtPlot::yLeft, d_activeVertAxis))->width());
+		Q_EMIT repositionTimeTrigger();
+	}
+}
+
+void CapturePlot::showYAxisWidget(unsigned int axisIdx, bool en)
+{
+	if (!d_labelsEnabled)
+		return;
+
+	setAxisVisible(QwtAxisId(QwtPlot::yLeft, axisIdx),
+						en);
+
+	int nrAxes = axesCount(QwtPlot::yLeft);
+	bool allAxisDisabled = true;
+	for (int i = 0; i < nrAxes; ++i)
+		if (isAxisVisible(QwtAxisId(QwtPlot::yLeft, i)))
+			allAxisDisabled = false;
+
+	if (allAxisDisabled) {
+		setAxisVisible(QwtPlot::xBottom, false);
+		d_bottomHandlesArea->setLeftPadding(50);
+		d_rightHandlesArea->setTopPadding(50);
+		Q_EMIT repositionTimeTrigger();
+	}
+	if (en) {
+		setAxisVisible(QwtPlot::xBottom, true);
+	}
+}
+
+bool CapturePlot::eventFilter(QObject *object, QEvent *event)
+{
+	if (object == canvas() && event->type() == QEvent::Resize) {
+		if (d_labelsEnabled) {
+			d_bottomHandlesArea->setLeftPadding(50 + axisWidget(QwtAxisId(QwtPlot::yLeft, d_activeVertAxis))->width());
+			d_rightHandlesArea->setTopPadding(50 + 6);
+			Q_EMIT repositionTimeTrigger();
+		} else {
+			if (d_bottomHandlesArea->leftPadding() != 50)
+				d_bottomHandlesArea->setLeftPadding(50);
+			if (d_rightHandlesArea->topPadding() != 50)
+				d_rightHandlesArea->setTopPadding(50);
+		}
+	}
+	return QObject::eventFilter(object, event);
 }
 
 void CapturePlot::onChannelAdded(int chnIdx)

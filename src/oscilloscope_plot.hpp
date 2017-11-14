@@ -104,12 +104,21 @@ namespace adiscope {
 		double getMinOffsetValue();
 
 		void bringCurveToFront(unsigned int curveIdx);
+
 		void setTimeBaseZoomed(bool zoomed);
+
+		void enableLabels(bool enabled);
+		bool eventFilter(QObject *, QEvent *);
+		bool setActiveVertAxis(unsigned int axisIdx);
+		void showYAxisWidget(unsigned int axisIdx, bool en);
+		bool enableAxisLabels(bool enabled);
+
 	Q_SIGNALS:
 		void timeTriggerValueChanged(double);
 		void channelOffsetChanged(double);
 		void measurementsAvailable();
 		void cursorReadoutsChanged(struct cursorReadoutsText);
+		void repositionTimeTrigger();
 
 	public Q_SLOTS:
 		void setTriggerAEnabled(bool en);
@@ -163,6 +172,7 @@ namespace adiscope {
 		bool d_vertCursorsEnabled;
 		bool d_horizCursorsEnabled;
 		bool d_measurementsEnabled;
+		bool d_labelsEnabled;
 
 		int d_selected_channel;
 
