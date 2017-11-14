@@ -536,6 +536,10 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 			TOOL_OSCILLOSCOPE)));
 	api->load(*settings);
 	api->js_register(engine);
+
+	if (!wheelEventGuard)
+		wheelEventGuard = new MouseWheelWidgetGuard(ui->mainWidget);
+	wheelEventGuard->installEventRecursively(ui->mainWidget);
 }
 
 Oscilloscope::~Oscilloscope()

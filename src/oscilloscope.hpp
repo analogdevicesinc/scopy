@@ -56,6 +56,7 @@
 #include "tool.hpp"
 #include "osc_export_settings.h"
 #include "math.hpp"
+#include "scroll_filter.hpp"
 
 /*Generated UI */
 #include "ui_math_panel.h"
@@ -210,6 +211,8 @@ namespace adiscope {
 		QWidget *statisticsPanel;
 		AnalogBufferPreviewer *buffer_previewer;
 		ExportSettings *exportSettings;
+
+		MouseWheelWidgetGuard *wheelEventGuard;
 
 		QPair<Ui::MathPanel, Math*> *math_pair;
 		bool addChannel;
