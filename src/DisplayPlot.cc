@@ -403,7 +403,7 @@ void PlotAxisConfiguration::setMouseGesturesEnabled(bool en)
 
 DisplayPlot::DisplayPlot(int nplots, QWidget* parent,
 			 unsigned int xNumDivs, unsigned int yNumDivs)
-  : QwtPlot(parent), d_nplots(nplots), d_stop(false)
+  : QwtPlot(parent), d_nplots(nplots), d_stop(false), d_coloredLabels(false)
 {
   d_CurveColors << QColor("#ff7200") << QColor("#9013fe") << QColor(Qt::green)
        << QColor(Qt::cyan) << QColor(Qt::magenta)
@@ -962,6 +962,11 @@ void DisplayPlot::setHorizUnitsPerDiv(double upd)
 	}
 }
 
+void DisplayPlot::enableColoredLabels(bool colored)
+{
+	d_coloredLabels = colored;
+}
+
 void DisplayPlot::setActiveVertAxis(unsigned int axisIdx)
 {
 	int numAxes = this->axesCount(QwtPlot::yLeft);
@@ -978,6 +983,11 @@ void DisplayPlot::setActiveVertAxis(unsigned int axisIdx)
 	}
 
 	d_activeVertAxis = axisIdx;
+	if (d_coloredLabels) {
+		OscScaleDraw *scaleDraw = static_cast<OscScaleDraw *>(this->axisScaleDraw(QwtAxisId(QwtPlot::yLeft, axisIdx)));
+		scaleDraw->setColor(getLineColor(axisIdx));
+		scaleDraw->invalidateCache();
+	}
 }
 
 int DisplayPlot::activeVertAxis()
