@@ -954,6 +954,10 @@ void TimeDomainDisplayPlot::configureAxis(int axisPos, int axisIdx)
 	OscScaleDraw *scaleDraw = new OscScaleDraw(prefixFormatter, unit);
 	scaleDraw->setFloatPrecision(floatPrecision);
 	this->setAxisScaleDraw(axis, scaleDraw);
+	if (axisPos == QwtPlot::yLeft) {
+		scaleDraw->setMinimumExtent(65);
+		axisWidget(axis)->setMaximumWidth(70);
+	}
 }
 
 void TimeDomainDisplayPlot::cleanUpJustBeforeChannelRemoval(int)
