@@ -563,6 +563,8 @@ public:
 	void setUnitType(const QString& unit);
 	QString getUnitType() const;
 
+	void setColor(QColor color);
+
 protected:
 	virtual void draw(QPainter *, const QPalette &) const;
 
@@ -570,6 +572,7 @@ private:
 	int m_floatPrecision;
 	QString m_unit;
 	PrefixFormatter *m_formatter;
+	QColor m_color;
 };
 
 class OscPlotZoomer: public LimitedPlotZoomer

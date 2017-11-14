@@ -44,7 +44,8 @@ using namespace adiscope;
 OscScaleDraw::OscScaleDraw(const QString &unit) : QwtScaleDraw(),
 	m_floatPrecision(3),
 	m_unit(unit),
-	m_formatter(NULL)
+	m_formatter(NULL),
+	m_color(Qt::gray)
 {
 	enableComponent(QwtAbstractScaleDraw::Backbone, false);
 	enableComponent(QwtAbstractScaleDraw::Ticks, false);
@@ -79,6 +80,11 @@ void OscScaleDraw::setUnitType(const QString& unit)
 QString OscScaleDraw::getUnitType() const
 {
 	return m_unit;
+}
+
+void OscScaleDraw::setColor(QColor color)
+{
+	m_color = color;
 }
 
 void OscScaleDraw::draw(QPainter *painter, const QPalette &) const
@@ -169,8 +175,13 @@ QwtText OscScaleDraw::label( double value ) const
 		m_formatter->getFormatAttributes(value, prefix, scale);
 	}
 
-	return sign + QLocale().toString(value / scale, 'f', m_floatPrecision + bonusPrecision)
-		+ ' ' + prefix + m_unit;
+	QwtText text(sign + QLocale().toString(value / scale, 'f', m_floatPrecision + bonusPrecision)
+		+ ' ' + prefix + m_unit);
+
+	if (m_color != Qt::gray)
+		text.setColor(m_color);
+
+	return text;
 }
 
 /*
