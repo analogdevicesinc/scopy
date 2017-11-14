@@ -582,14 +582,14 @@ Oscilloscope::~Oscilloscope()
 
 void Oscilloscope::init_channel_settings()
 {
-	connect(ch_ui->function, &QPushButton::toggled, this,
+	connect(ch_ui->btnEditMath, &QPushButton::toggled, this,
 		&Oscilloscope::openEditMathPanel);
 
 	connect(ui->btnAddMath, &QPushButton::toggled, [=](bool on){
 		if (on && !addChannel) {
 			addChannel = true;
 			math_pair->first.btnAddChannel->setText("Add Channel");
-			ch_ui->function->setChecked(false);
+			ch_ui->math_settings_widget->setVisible(false);
 		}
 	});
 }
@@ -865,7 +865,7 @@ void Oscilloscope::add_math_channel(const std::string& function)
 	connect(channel_widget, &ChannelWidget::menuToggled,
 		[=](bool on){
 		if (!on)
-			ch_ui->function->setChecked(false);
+			ch_ui->btnEditMath->setChecked(false);
 	});
 
 	ui->channelsList->addWidget(channel_widget);
@@ -1797,10 +1797,11 @@ void Oscilloscope::update_chn_settings_panel(int id)
 	ch_ui->cmbChnLineWidth->setCurrentIndex(cmbIdx);
 
 	if (chn_widget->isMathChannel()) {
-		ch_ui->function->setVisible(true);
-		ch_ui->function->setText(chn_widget->function());
+		ch_ui->math_settings_widget->setVisible(true);
+		ch_ui->function_2->setText(chn_widget->function());
+		ch_ui->function_2->setText(chn_widget->function());
 	} else {
-		ch_ui->function->setVisible(false);
+		ch_ui->math_settings_widget->setVisible(false);
 	}
 }
 
@@ -1830,7 +1831,7 @@ void Oscilloscope::editMathChannelFunction(int id, const std::string& new_functi
 	math_pair->first.btnAddChannel->setText("Add Channel");
 	math_pair->second->setFunction("");
 	addChannel = true;
-	ch_ui->function->setChecked(false);
+	ch_ui->btnEditMath->setChecked(false);
 
 	if (chn_widget->function().toStdString() == new_function)
 		return;
