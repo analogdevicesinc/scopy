@@ -17,6 +17,9 @@
  * Boston, MA 02110-1301, USA.
  */
 
+#ifndef MOUSEWHEELWIDGETGUARD
+#define MOUSEWHEELWIDGETGUARD
+
 #include <QObject>
 
 namespace adiscope {
@@ -32,3 +35,5 @@ protected:
 };
 
 }
+
+#endif
