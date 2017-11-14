@@ -567,6 +567,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	if (!wheelEventGuard)
 		wheelEventGuard = new MouseWheelWidgetGuard(ui->mainWidget);
 	wheelEventGuard->installEventRecursively(ui->mainWidget);
+
+	preferences_menu_init();
 }
 
 void Oscilloscope::updateTriggerLevelValue(std::vector<float> value)
@@ -599,6 +601,7 @@ Oscilloscope::~Oscilloscope()
 
 	api->save(*settings);
 	delete api;
+	delete pref_menu;
 
 	filterBlocks.clear();
 	subBlocks.clear();
@@ -740,6 +743,43 @@ void Oscilloscope::configureAcCoupling(int i, bool coupled)
 	}
 
 	chnAcCoupled[i] = coupled;
+}
+
+void Oscilloscope::preferences_menu_init()
+{
+	pref_menu = new PreferenceMenu(this);
+	PreferenceOption *label_option = new PreferenceOption(pref_menu, "enable labels on the plot", settings);
+	pref_menu->insertOption(label_option, SLOT(enableLabels(bool)));
+	gsettings_ui->preferences->insertWidget(0, pref_menu);
+	pref_menu->load();
+}
+
+void Oscilloscope::enableLabels(bool enable)
+{
+	plot.setUsingLeftAxisScales(enable);
+	plot.enableLabels(enable);
+	connect(&plot, &CapturePlot::repositionTimeTrigger, [=](){
+		double value = timePosition->value();
+		timePosition->setValue(0);
+		timePosition->setValue(value);
+	});
+
+	if (enable) {
+		bool allDisabled = true;
+		for (unsigned int i = 0; i < nb_channels + nb_math_channels; i++) {
+			ChannelWidget *cw = static_cast<ChannelWidget *>(
+				ui->channelsList->itemAt(i)->widget());
+			if (cw->enableButton()->isChecked()) {
+				allDisabled = false;
+			}
+		}
+		if (!allDisabled) {
+			plot.setActiveVertAxis(current_channel);
+			plot.enableAxisLabels(enable);
+		}
+	}
+	if (!enable)
+		plot.enableAxisLabels(enable);
 }
 
 void Oscilloscope::cursor_panel_init()
@@ -1331,6 +1371,11 @@ void Oscilloscope::setChannelWidgetIndex(int chnIdx)
 {
 	current_ch_widget = chnIdx;
 	plot.bringCurveToFront(chnIdx);
+	for (unsigned int i = 0; i < nb_channels + nb_math_channels; ++i) {
+		if (i == chnIdx)
+			continue;
+		plot.showYAxisWidget(i, false);
+	}
 }
 
 void Oscilloscope::onFFT_view_toggled(bool visible)
@@ -1589,7 +1634,7 @@ void adiscope::Oscilloscope::onChannelWidgetEnabled(bool en)
 	if (en) {
 		plot.AttachCurve(id);
 		fft_plot.AttachCurve(id);
-
+		plot.showYAxisWidget(id, en);
 		bool shouldActivate = true;
 
 		for (unsigned int i = 0; i < nb_channels + nb_math_channels; i++) {
@@ -1610,6 +1655,7 @@ void adiscope::Oscilloscope::onChannelWidgetEnabled(bool en)
 	} else {
 		plot.DetachCurve(id);
 		fft_plot.DetachCurve(id);
+		plot.showYAxisWidget(id, en);
 		bool shouldDisable = true;
 
 		for (unsigned int i = 0; i < nb_channels + nb_math_channels; i++) {
@@ -1659,6 +1705,7 @@ void adiscope::Oscilloscope::onChannelWidgetSelected(bool checked)
 		current_channel = id;
 		Q_EMIT selectedChannelChanged(id);
 		plot.bringCurveToFront(id);
+		plot.setActiveVertAxis(id);
 	}
 
 	if (plot.measurementsEnabled()) {
