@@ -367,6 +367,8 @@ public:
   void bringCurveToFront(unsigned int curveIdx);
   void enableColoredLabels(bool colored);
 
+  void enableMouseGesturesOnScales(bool enable);
+
 public Q_SLOTS:
   virtual void disableLegend();
   virtual void setYaxis(double min, double max);
@@ -548,6 +550,7 @@ protected:
 private:
   void AddAxisOffset(int axisPos, int axisIdx, double offset);
   bool d_coloredLabels;
+  bool d_mouseGesturesEnabled;
 };
 
 /*

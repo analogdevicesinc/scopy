@@ -403,7 +403,8 @@ void PlotAxisConfiguration::setMouseGesturesEnabled(bool en)
 
 DisplayPlot::DisplayPlot(int nplots, QWidget* parent,
 			 unsigned int xNumDivs, unsigned int yNumDivs)
-  : QwtPlot(parent), d_nplots(nplots), d_stop(false), d_coloredLabels(false)
+  : QwtPlot(parent), d_nplots(nplots), d_stop(false),
+    d_coloredLabels(false), d_mouseGesturesEnabled(false)
 {
   d_CurveColors << QColor("#ff7200") << QColor("#9013fe") << QColor(Qt::green)
        << QColor(Qt::cyan) << QColor(Qt::magenta)
@@ -465,6 +466,7 @@ DisplayPlot::DisplayPlot(int nplots, QWidget* parent,
   setActiveVertAxis(0);
 
   plotLayout()->setAlignCanvasToScales(true);
+
 
   for (unsigned int i = 0; i < 4; i++) {
 	QwtScaleDraw::Alignment scale =
@@ -967,6 +969,11 @@ void DisplayPlot::enableColoredLabels(bool colored)
 	d_coloredLabels = colored;
 }
 
+void DisplayPlot::enableMouseGesturesOnScales(bool enable)
+{
+	d_mouseGesturesEnabled = enable;
+}
+
 void DisplayPlot::setActiveVertAxis(unsigned int axisIdx)
 {
 	int numAxes = this->axesCount(QwtPlot::yLeft);
@@ -974,15 +981,17 @@ void DisplayPlot::setActiveVertAxis(unsigned int axisIdx)
 	if (axisIdx >= numAxes)
 		return;
 
+
 	if (d_usingLeftAxisScales) {
 		for (int i = 0; i < numAxes; i++) {
 			this->setAxisVisible(QwtAxisId(QwtPlot::yLeft, i),
 					(i == axisIdx));
-			this->vertAxes[i]->setMouseGesturesEnabled((i == axisIdx));
+			this->vertAxes[i]->setMouseGesturesEnabled(d_mouseGesturesEnabled);
 		}
 	}
 
 	d_activeVertAxis = axisIdx;
+
 	if (d_coloredLabels) {
 		OscScaleDraw *scaleDraw = static_cast<OscScaleDraw *>(this->axisScaleDraw(QwtAxisId(QwtPlot::yLeft, axisIdx)));
 		scaleDraw->setColor(getLineColor(axisIdx));
@@ -1307,7 +1316,7 @@ void DisplayPlot::configureAxis(int axisPos, int axisIdx)
 void DisplayPlot::bottomHorizAxisInit()
 {
 	horizAxis = new PlotAxisConfiguration(QwtPlot::xBottom, 0, this);
-	horizAxis->setMouseGesturesEnabled(true);
+	horizAxis->setMouseGesturesEnabled(d_mouseGesturesEnabled);
 	configureAxis(QwtPlot::xBottom, 0);
 	connect(axisWidget(horizAxis->axis()), SIGNAL(scaleDivChanged()),
 		      this, SLOT(_onXbottomAxisWidgetScaleDivChanged()));
