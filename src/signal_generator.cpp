@@ -40,11 +40,13 @@
 #include <gnuradio/blocks/wavfile_source.h>
 #include <gnuradio/blocks/float_to_short.h>
 #include <gnuradio/blocks/head.h>
+#include <gnuradio/blocks/null_sink.h>
 #include <gnuradio/blocks/int_to_float.h>
 #include <gnuradio/blocks/throttle.h>
 #include <gnuradio/blocks/multiply_const_ff.h>
 #include <gnuradio/blocks/add_const_ff.h>
 #include <gnuradio/blocks/nop.h>
+#include <gnuradio/blocks/copy.h>
 #include <gnuradio/blocks/skiphead.h>
 #include <gnuradio/blocks/vector_sink_s.h>
 #include <gnuradio/filter/fractional_resampler_ff.h>
@@ -122,8 +124,10 @@ struct adiscope::signal_generator_data {
 	double file_amplitude;
 	double file_offset;
 	unsigned long file_phase;
+	unsigned long file_nr_of_channels;
+	unsigned long file_channel;
 	unsigned long file_nr_of_samples;
-	std::vector<float> file_data;
+	std::vector< std::vector<float> > file_data; // vector for each channel
 	QString file;
 	enum sg_file_format file_type;
 	wav_header_t file_wav_hdr;
@@ -233,6 +237,8 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 		ptr->file_offset = ui->fileOffset->value();
 		ptr->file_phase = ui->filePhase->value();
 		ptr->file_type=FORMAT_NO_FILE;
+		ptr->file_nr_of_channels=0;
+		ptr->file_channel=0;
 
 		ptr->type = SIGNAL_TYPE_CONSTANT;
 		ptr->id = i;
@@ -324,6 +330,8 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 	        this, SLOT(fileOffsetChanged(double)));
 	connect(ui->filePhase, SIGNAL(valueChanged(double)),
 	        this, SLOT(filePhaseChanged(double)));
+	connect(ui->fileChannel, SIGNAL(currentIndexChanged(int)),
+	        this, SLOT(fileChannelChanged(int)));
 	connect(ui->fileSampleRate, SIGNAL(valueChanged(double)),
 	        this, SLOT(fileSampleRateChanged(double)));
 	connect(ui->offset, SIGNAL(valueChanged(double)),
@@ -544,6 +552,15 @@ void SignalGenerator::offsetChanged(double value)
 	}
 }
 
+void SignalGenerator::fileChannelChanged(int value)
+{
+	auto ptr = getCurrentData();
+
+	if (ptr->file_channel != (int) value) {
+		ptr->file_channel = (int) value;
+		resetZoom();
+	}
+}
 void SignalGenerator::fileSampleRateChanged(double value)
 {
 	auto ptr = getCurrentData();
@@ -699,6 +716,9 @@ void SignalGenerator::loadParametersFromFile(
 	ptr->file_type=getFileFormat(ptr->file);
 	auto info = QFileInfo(ptr->file);
 
+	ptr->file_nr_of_channels=1;
+	ptr->file_channel=0;
+
 	if (ptr->file_type==FORMAT_BIN_FLOAT) {
 		ptr->file_nr_of_samples=info.size() / sizeof(float);
 	}
@@ -725,6 +745,8 @@ void SignalGenerator::loadParametersFromFile(
 			if (chunkCompare(chunk,"fmt ")) {
 				f.read(ptr->file_wav_hdr.header_data,sizeof(ptr->file_wav_hdr.header_data));
 				ptr->file_sr=ptr->file_wav_hdr.SamplesPerSec;
+				ptr->file_nr_of_channels=ptr->file_wav_hdr.noChan;
+				ptr->file_channel=0;
 				continue;
 			}
 
@@ -762,20 +784,54 @@ void SignalGenerator::loadParametersFromFile(
 		QFile f(ptr->file);
 		f.open(QIODevice::ReadOnly);
 		QTextStream in(&f);
-		ptr->file_data.clear();
+		uint32_t i;
+		uint32_t sample_nr=0;
+		uint32_t chan;
 
-		while (!in.atEnd()) {
-			bool ok=false;
-			auto sample = in.readLine().toFloat(&ok);
-
-			if (!ok) {
-				ptr->file_type=FORMAT_NO_FILE;
-			}
-
-			ptr->file_data.push_back(sample);
+		for (i=0; i<ptr->file_data.size(); i++) {
+			ptr->file_data[i].clear();
 		}
 
-		ptr->file_nr_of_samples=ptr->file_data.size();
+		ptr->file_data.clear();
+
+		// determine number of channels
+		QString str = in.readLine();
+		QStringList splitStr = str.split(',',QString::SkipEmptyParts);
+
+		for (chan=0; chan<splitStr.size(); chan++)
+			ptr->file_data.push_back({});
+		auto nr_of_channels = ptr->file_data.size();
+
+		in.seek(0);
+
+		while (!in.atEnd()) {
+			str = in.readLine();
+			splitStr = str.split(',',QString::SkipEmptyParts);
+
+			for (chan=0; chan<nr_of_channels; chan++) {
+				bool ok=false;
+				float sample;
+
+				if (splitStr.size() > chan) {
+					sample = splitStr.at(chan).toFloat(
+					                 &ok);        // if not ok, autosets sample to 0
+				} else {
+					sample = 0.0;        // channel not found in csv record
+				}
+
+				ptr->file_data[chan].push_back(sample);
+
+				if (!ok) {
+					qDebug()<<"File corrupt @ line "<<sample_nr+1;
+				}
+			}
+
+			sample_nr++;
+		}
+
+		ptr->file_channel=0; // autoselect channel 0
+		ptr->file_nr_of_channels=nr_of_channels;
+		ptr->file_nr_of_samples=sample_nr;
 	}
 
 	this->ui->label_size->setText(QString::number(ptr->file_nr_of_samples) +
@@ -798,6 +854,16 @@ void SignalGenerator::loadFile()
 	ui->filePhase->setValue(ptr->file_phase);
 	ui->filePhase->setMaxValue(ptr->file_nr_of_samples);
 	ui->fileSampleRate->setValue(ptr->file_sr);
+	ui->fileChannel->blockSignals(true);
+	ui->fileChannel->clear();
+
+	for (auto i=0; i<ptr->file_nr_of_channels; i++) {
+		ui->fileChannel->addItem(QString::number(i));
+	}
+
+	ui->fileChannel->setEnabled(ptr->file_nr_of_channels>1);
+	ui->fileChannel->setCurrentIndex(ptr->file_channel);
+	ui->fileChannel->blockSignals(false);
 	resetZoom();
 }
 
@@ -1075,27 +1141,43 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
 			auto str = ptr->file.toStdString();
 
 			boost::shared_ptr<basic_block> fs;
+			boost::shared_ptr<blocks::wavfile_source> fs1;
+
+			auto null = blocks::null_sink::make(sizeof(float));
+			auto buffer=blocks::copy::make(sizeof(float)); // will act as multiplexer
 
 			switch (ptr->file_type) {
 			case FORMAT_BIN_FLOAT:
 				fs = blocks::file_source::make(sizeof(float), str.c_str(), true);
+				top->connect(fs,0,buffer,0);
 				break;
 
 			case FORMAT_WAVE:
 				fs = blocks::wavfile_source::make(str.c_str(),true);
+
+				for (auto i=0; i<ptr->file_nr_of_channels; i++) {
+					if (i==ptr->file_channel) {
+						top->connect(fs,i,buffer,0);
+					} else {
+						top->connect(fs,i,null,0);
+					}
+				}
+
 				break;
 
 			case FORMAT_CSV:
-				fs = blocks::vector_source_f::make(ptr->file_data,true);
+				fs = blocks::vector_source_f::make(ptr->file_data[ptr->file_channel],true);
+				top->connect(fs,0,buffer,0);
 				break;
 
 			default:
 				break;
 			}
 
+
 			auto ratio=ptr->file_sr/samp_rate;
 			auto mult = blocks::multiply_const_ff::make(ptr->file_amplitude);
-			top->connect(fs,0,mult,0);
+			top->connect(buffer,0,mult,0);
 			auto add = blocks::add_const_ff::make(ptr->file_offset);
 			top->connect(mult,0,add,0);
 			auto phase_skip = blocks::skiphead::make(sizeof(float),ptr->file_phase);
@@ -1244,6 +1326,7 @@ void SignalGenerator::updateRightMenuForChn(int chIdx)
 	ui->fileSampleRate->setValue(ptr->file_sr);
 	ui->fileOffset->setValue(ptr->file_offset);
 	ui->filePhase->setValue(ptr->file_phase);
+	ui->fileChannel->setCurrentIndex(ptr->file_channel);
 	ui->fileAmplitude->setValue(ptr->file_amplitude);
 
 	if (!ptr->file.isNull()) {

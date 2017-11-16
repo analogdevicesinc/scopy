@@ -204,6 +204,7 @@ private Q_SLOTS:
 	void amplitudeChanged(double val);
 	void offsetChanged(double val);
 	void fileSampleRateChanged(double val);
+	void fileChannelChanged(int val);
 	void fileAmplitudeChanged(double val);
 	void fileOffsetChanged(double val);
 	void filePhaseChanged(double val);
