@@ -36,6 +36,8 @@
 #include <gnuradio/analog/sig_source_waveform.h>
 #include <gnuradio/blocks/delay.h>
 #include <gnuradio/blocks/file_source.h>
+#include <gnuradio/blocks/vector_source_f.h>
+#include <gnuradio/blocks/wavfile_source.h>
 #include <gnuradio/blocks/float_to_short.h>
 #include <gnuradio/blocks/head.h>
 #include <gnuradio/blocks/int_to_float.h>
@@ -76,6 +78,34 @@ enum SIGNAL_TYPE {
 	SIGNAL_TYPE_MATH	= 3,
 };
 
+
+bool SignalGenerator::riffCompare(riff_header_t& ptr,const char *id2)
+{
+	const char riff[]="RIFF";
+
+	for (uint8_t i=0; i<4; i++)
+		if (ptr.riff[i]!=riff[i]) {
+			return false;
+		}
+
+	for (uint8_t i=0; i<4; i++)
+		if (ptr.id[i]!=id2[i]) {
+			return false;
+		}
+
+	return true;
+}
+
+bool SignalGenerator::chunkCompare(chunk_header_t& ptr,const char *id2)
+{
+	for (uint8_t i=0; i<4; i++)
+		if (ptr.id[i]!=id2[i]) {
+			return false;
+		}
+
+	return true;
+}
+
 struct adiscope::signal_generator_data {
 	enum SIGNAL_TYPE type;
 	unsigned int id;
@@ -93,8 +123,11 @@ struct adiscope::signal_generator_data {
 	double file_offset;
 	unsigned long file_phase;
 	unsigned long file_nr_of_samples;
+	std::vector<float> file_data;
 	QString file;
-	bool file_loaded;
+	enum sg_file_format file_type;
+	wav_header_t file_wav_hdr;
+	//bool file_loaded;
 	// SIGNAL_TYPE_MATH
 	QString function;
 	double math_freq;
@@ -199,7 +232,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 		ptr->file_amplitude = ui->fileAmplitude->value();
 		ptr->file_offset = ui->fileOffset->value();
 		ptr->file_phase = ui->filePhase->value();
-		ptr->file_loaded=false;
+		ptr->file_type=FORMAT_NO_FILE;
 
 		ptr->type = SIGNAL_TYPE_CONSTANT;
 		ptr->id = i;
@@ -286,13 +319,13 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 	        this, SLOT(amplitudeChanged(double)));
 
 	connect(ui->fileAmplitude, SIGNAL(valueChanged(double)),
-		this, SLOT(fileAmplitudeChanged(double)));
+	        this, SLOT(fileAmplitudeChanged(double)));
 	connect(ui->fileOffset, SIGNAL(valueChanged(double)),
-		this, SLOT(fileOffsetChanged(double)));
+	        this, SLOT(fileOffsetChanged(double)));
 	connect(ui->filePhase, SIGNAL(valueChanged(double)),
-		this, SLOT(filePhaseChanged(double)));
+	        this, SLOT(filePhaseChanged(double)));
 	connect(ui->fileSampleRate, SIGNAL(valueChanged(double)),
-		this, SLOT(fileSampleRateChanged(double)));
+	        this, SLOT(fileSampleRateChanged(double)));
 	connect(ui->offset, SIGNAL(valueChanged(double)),
 	        this, SLOT(offsetChanged(double)));
 	connect(ui->frequency, SIGNAL(valueChanged(double)),
@@ -340,17 +373,19 @@ void SignalGenerator::resetZoom()
 
 	disconnect(plot->getZoomer(),SIGNAL(zoomed(QRectF)),this,SLOT(rescale()));
 	bool disable_zoom=false;
+
 	for (auto it = channels.begin(); it != channels.end(); ++it) {
 		auto ptr=getData(*it);
-		if(ptr->type==SIGNAL_TYPE_BUFFER)
-		{
+
+		if (ptr->type==SIGNAL_TYPE_BUFFER) {
 			disable_zoom=true;
 			break;
 		}
 	}
 
-	if(!disable_zoom)
+	if (!disable_zoom) {
 		connect(plot->getZoomer(),SIGNAL(zoomed(QRectF)),this,SLOT(rescale()));
+	}
 
 	double period=0.0;
 	unsigned int slowSignalId;
@@ -358,19 +393,21 @@ void SignalGenerator::resetZoom()
 	for (auto it = channels.begin(); it != channels.end(); ++it) {
 		if ((*it)->enableButton()->isChecked()) {
 			auto ptr = getData((*it));
+
 			switch (ptr->type) {
 			case SIGNAL_TYPE_CONSTANT:
 				break;
+
 			case SIGNAL_TYPE_BUFFER:
-				if(ptr->file_loaded)
-				{
+				if (ptr->file_type) {
 					auto length=(1/ptr->file_sr)*ptr->file_nr_of_samples;
-					if(period<length)
-					{
+
+					if (period<length) {
 						period=length;
 						slowSignalId = ptr->id;
 					}
 				}
+
 				break;
 
 			case SIGNAL_TYPE_WAVEFORM:
@@ -397,8 +434,10 @@ void SignalGenerator::resetZoom()
 	}
 
 	period*=2; // show 2 periods - ideally this would be an instrument preference/GUI control
-	if(period==0.0) // prevent empty graph
+
+	if (period==0.0) { // prevent empty graph
 		period=0.1;
+	}
 
 	plot->setVertUnitsPerDiv(1);
 	plot->setVertOffset(0);
@@ -625,24 +664,140 @@ void SignalGenerator::updatePreview()
 	}
 }
 
+enum sg_file_format SignalGenerator::getFileFormat(QString filePath)
+{
+	if (filePath.isEmpty()) {
+		return FORMAT_NO_FILE;
+	}
+
+	QFile f;
+	f.setFileName(filePath);
+
+	if (!f.open(QIODevice::ReadOnly)) {
+		return FORMAT_NO_FILE;
+	}
+
+	f.close();
+
+	if (filePath.endsWith(".wav")) {
+		return FORMAT_WAVE;
+	}
+
+	if (filePath.endsWith(".csv")) {
+		return FORMAT_CSV;
+	}
+
+	return FORMAT_BIN_FLOAT;
+}
+
+
+
+void SignalGenerator::loadParametersFromFile(
+        QSharedPointer<signal_generator_data> ptr,QString filePath)
+{
+	ptr->file=filePath;
+	ptr->file_type=getFileFormat(ptr->file);
+	auto info = QFileInfo(ptr->file);
+
+	if (ptr->file_type==FORMAT_BIN_FLOAT) {
+		ptr->file_nr_of_samples=info.size() / sizeof(float);
+	}
+
+	if (ptr->file_type==FORMAT_WAVE) {
+		// read samples per second
+		riff_header_t riff;
+		chunk_header_t chunk;
+
+		QFile f;
+		QByteArray val;
+
+		f.setFileName(ptr->file);
+		f.open(QIODevice::ReadOnly);
+		f.read(riff.data,12);
+
+		if (!riffCompare(riff,"WAVE")) {
+			return;
+		}
+
+		while (!f.atEnd()) {
+			f.read(chunk.data,8);
+
+			if (chunkCompare(chunk,"fmt ")) {
+				f.read(ptr->file_wav_hdr.header_data,sizeof(ptr->file_wav_hdr.header_data));
+				ptr->file_sr=ptr->file_wav_hdr.SamplesPerSec;
+				continue;
+			}
+
+			if (chunkCompare(chunk,"data")) {
+				auto bytesPerSample = (ptr->file_wav_hdr.bitsPerSample/8);
+				ptr->file_nr_of_samples=riff.size/(bytesPerSample);
+				/*		ptr->file_data.clear();
+						for(auto i=0;i<ptr->file_nr_of_samples;i++) {
+							val=f.read(bytesPerSample);
+							QDataStream ds(val);
+							float val_f;
+							ds.setByteOrder(QDataStream::LittleEndian);
+							ds.setFloatingPointPrecision(QDataStream::SinglePrecision);
+							// only supports MONO right now
+							if(bytesPerSample<=2) {
+								int16_t val_i;
+								ds >> val_i;
+								float scaleFactor = (1<<ptr->file_wav_hdr.bitsPerSample-1)-1;
+								val_f =  val_i /scaleFactor;
+							}
+							else {
+								ds >> val_f;
+							}
+
+							ptr->file_data.push_back(val_f);
+						}*/
+				continue;
+			}
+
+			f.seek(f.pos()+chunk.size);
+		}
+	}
+
+	if (ptr->file_type==FORMAT_CSV) {
+		QFile f(ptr->file);
+		f.open(QIODevice::ReadOnly);
+		QTextStream in(&f);
+		ptr->file_data.clear();
+
+		while (!in.atEnd()) {
+			bool ok=false;
+			auto sample = in.readLine().toFloat(&ok);
+
+			if (!ok) {
+				ptr->file_type=FORMAT_NO_FILE;
+			}
+
+			ptr->file_data.push_back(sample);
+		}
+
+		ptr->file_nr_of_samples=ptr->file_data.size();
+	}
+
+	this->ui->label_size->setText(QString::number(ptr->file_nr_of_samples) +
+	                              tr(" samples"));
+	ptr->file_amplitude=5.0;
+	ptr->file_offset=0;
+	ptr->file_phase=0;
+}
+
 void SignalGenerator::loadFile()
 {
 	auto ptr = getCurrentData();
 
 	ptr->file = QFileDialog::getOpenFileName(this, tr("Open File"));
 	this->ui->label_path->setText(ptr->file);
-	auto info = QFileInfo(ptr->file);
-	ptr->file_nr_of_samples=info.size() / sizeof(float);
-	this->ui->label_size->setText(QString("%1 ").arg(
-	                                      info.size() / sizeof(float)) + tr("samples"));
-	ptr->file_loaded=true;
-	ptr->file_amplitude=5.0;
-	ptr->file_offset=0;
-	ptr->file_phase=0;
+
+	loadParametersFromFile(ptr,ptr->file);
 	ui->fileAmplitude->setValue(ptr->file_amplitude);
 	ui->fileOffset->setValue(ptr->file_offset);
 	ui->filePhase->setValue(ptr->file_phase);
 	ui->filePhase->setMaxValue(ptr->file_nr_of_samples);
+	ui->fileSampleRate->setValue(ptr->file_sr);
 	resetZoom();
 }
 
@@ -660,8 +815,18 @@ void SignalGenerator::start()
 			continue;
 		}
 
+		auto chn_data = getData(*it);
+
+		if (chn_data->file_type==FORMAT_NO_FILE && chn_data->type==SIGNAL_TYPE_BUFFER) {
+			continue;
+		}
+
 		void *ptr = (*it)->property("channel").value<void *>();
 		enabled_channels.append(static_cast<struct iio_channel *>(ptr));
+	}
+
+	if (enabled_channels.size()==0) {
+		return;
 	}
 
 	do {
@@ -908,8 +1073,25 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
 	case SIGNAL_TYPE_BUFFER:
 		if (!ptr->file.isNull()) {
 			auto str = ptr->file.toStdString();
-			auto fs = blocks::file_source::make(
-				       sizeof(float), str.c_str(), true);
+
+			boost::shared_ptr<basic_block> fs;
+
+			switch (ptr->file_type) {
+			case FORMAT_BIN_FLOAT:
+				fs = blocks::file_source::make(sizeof(float), str.c_str(), true);
+				break;
+
+			case FORMAT_WAVE:
+				fs = blocks::wavfile_source::make(str.c_str(),true);
+				break;
+
+			case FORMAT_CSV:
+				fs = blocks::vector_source_f::make(ptr->file_data,true);
+				break;
+
+			default:
+				break;
+			}
 
 			auto ratio=ptr->file_sr/samp_rate;
 			auto mult = blocks::multiply_const_ff::make(ptr->file_amplitude);
@@ -919,19 +1101,11 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
 			auto phase_skip = blocks::skiphead::make(sizeof(float),ptr->file_phase);
 			top->connect(add,0,phase_skip,0);
 
-			if(preview)
-			{
+			if (preview) {
 				//auto res = blocks::throttle::make(sizeof(float),ptr->file_sr);//
 				auto res = filter::fractional_resampler_ff::make(0,ratio);
-				//auto res=filter::pfb_arb_resampler_fff::make(ratio,std::vector<float>(1,1));
-				/*auto interp=ratio;
-				auto dec=1;
-				while(interp<1)
-				{
-					interp*=10;
-					//dec*=10;
-				}
-				auto res=filter::rational_resampler_base_fff::make(interp,dec,{1});*/
+				//auto res=filter::pfb_arb_resampler_fff::make(ratio,{0,1,0,0},1);
+				//auto res=filter::rational_resampler_base_fff::make(interp,dec,{1});
 				top->connect(phase_skip,0,res,0);
 				auto buffer_freq = ptr->file_sr/(double)ptr->file_nr_of_samples;
 				int full_periods=(int)((double)zoomT1OnScreen * buffer_freq);
@@ -940,12 +1114,11 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
 				auto skip = blocks::skiphead::make(sizeof(float),samples_to_skip);
 				top->connect(res,0,skip,0);
 				return skip;
-			}
-			else
-			{
+			} else {
 				return phase_skip;
 			}
 		}
+
 		break;
 
 	case SIGNAL_TYPE_MATH:
@@ -1136,7 +1309,9 @@ bool SignalGenerator::use_oversampling(const struct iio_device *dev)
 			if (ptr->waveform == SG_SQR_WAVE) {
 				return true;
 			}
+
 			break;
+
 		case SIGNAL_TYPE_BUFFER:
 			return true;
 
@@ -1188,8 +1363,7 @@ unsigned long SignalGenerator::get_best_sample_rate(
 	/* When using oversampling, we actually want to generate the
 	 * signal with the lowest sample rate possible. */
 
-	if(sample_rate_forced(dev))
-	{
+	if (sample_rate_forced(dev)) {
 		return get_forced_sample_rate(dev);
 	}
 
@@ -1238,13 +1412,17 @@ bool SignalGenerator::sample_rate_forced(const struct iio_device *dev)
 
 		QWidget *w = static_cast<QWidget *>(iio_channel_get_data(chn));
 		auto ptr = getData(w);
-		if(ptr->file_loaded && ptr->file_sr)
+
+		if (ptr->file_type && ptr->file_sr && ptr->type==SIGNAL_TYPE_BUFFER) {
 			return true;
+		}
 	}
+
 	return false;
 }
 
-unsigned long SignalGenerator::get_forced_sample_rate(const struct iio_device *dev)
+unsigned long SignalGenerator::get_forced_sample_rate(const struct iio_device
+                *dev)
 {
 
 	for (unsigned int i = 0; i < iio_device_get_channels_count(dev); i++) {
@@ -1256,9 +1434,12 @@ unsigned long SignalGenerator::get_forced_sample_rate(const struct iio_device *d
 
 		QWidget *w = static_cast<QWidget *>(iio_channel_get_data(chn));
 		auto ptr = getData(w);
-		if(ptr->file_loaded && ptr->file_sr)
+
+		if (ptr->file_type && ptr->file_sr && ptr->type==SIGNAL_TYPE_BUFFER) {
 			return ptr->file_sr;
+		}
 	}
+
 	return false;
 }
 
@@ -1284,7 +1465,7 @@ void SignalGenerator::calc_sampling_params(const iio_device *dev,
 		out_sample_rate = max_sample_rate;
 
 		qDebug() << QString("Using oversampling with a ratio of %1")
-			 .arg(out_oversampling_ratio);
+		         .arg(out_oversampling_ratio);
 	} else {
 		out_sample_rate = rate;
 		out_oversampling_ratio = 1;
@@ -1400,13 +1581,18 @@ size_t SignalGenerator::get_samples_count(const struct iio_device *dev,
 			break;
 
 		case SIGNAL_TYPE_BUFFER:
-			if(!ptr->file_loaded)
+			if (!ptr->file_type) {
 				return 0;
-			if(perfect && rate!=ptr->file_sr)
+			}
+
+			if (perfect && rate!=ptr->file_sr) {
 				return 0;
+			}
+
 			ratio = rate/ptr->file_sr;
 			size=(ptr->file_nr_of_samples * ratio);
 			break;
+
 		case SIGNAL_TYPE_CONSTANT:
 		default:
 			break;

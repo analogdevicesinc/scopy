@@ -45,204 +45,245 @@ extern "C" {
 }
 
 namespace Ui {
-	class SignalGenerator;
+class SignalGenerator;
 }
 
 class QJSEngine;
 
 namespace adiscope {
-	struct signal_generator_data;
-	struct time_block_data;
-	class SignalGenerator_API;
-	class GenericDac;
-	class ChannelWidget;
+struct signal_generator_data;
+struct time_block_data;
+class SignalGenerator_API;
+class GenericDac;
+class ChannelWidget;
 
-	enum sg_waveform {
-		SG_SIN_WAVE = gr::analog::GR_SIN_WAVE,
-		SG_SQR_WAVE = gr::analog::GR_SQR_WAVE,
-		SG_TRI_WAVE = gr::analog::GR_TRI_WAVE,
-		SG_SAW_WAVE = gr::analog::GR_SAW_WAVE,
-		SG_INV_SAW_WAVE,
+enum sg_waveform {
+	SG_SIN_WAVE = gr::analog::GR_SIN_WAVE,
+	SG_SQR_WAVE = gr::analog::GR_SQR_WAVE,
+	SG_TRI_WAVE = gr::analog::GR_TRI_WAVE,
+	SG_SAW_WAVE = gr::analog::GR_SAW_WAVE,
+	SG_INV_SAW_WAVE,
+};
+
+enum sg_file_format {
+	FORMAT_NO_FILE,
+	FORMAT_BIN_FLOAT,
+	FORMAT_CSV,
+	FORMAT_WAVE
+};
+
+typedef union {
+	struct {
+		uint16_t	format;    // Audio format 1=PCM,6=mulaw,7=alaw, 257=IBM Mu-Law, 258=IBM A-Law, 259=ADPCM
+		uint16_t	noChan;      // Number of channels 1=Mono 2=Sterio
+		uint32_t	SamplesPerSec;  // Sampling Frequency in Hz
+		uint32_t	bytesPerSec;    // bytes per second
+		uint16_t	blockAlign;     // 2=16-bit mono, 4=16-bit stereo
+		uint16_t	bitsPerSample;  // Number of bits per sample
 	};
+	char header_data[16];
+} wav_header_t;
 
-	class SignalGenerator : public Tool
-	{
-		friend class SignalGenerator_API;
-		friend class ToolLauncher_API;
-
-		Q_OBJECT
-
-	public:
-		explicit SignalGenerator(struct iio_context *ctx,
-				QList<std::shared_ptr<GenericDac>> dacs,
-				Filter *filt, QPushButton *runButton,
-				QJSEngine *engine, ToolLauncher *parent);
-		~SignalGenerator();
-
-		static const size_t min_buffer_size = 1024;
-        static const unsigned long default_sample_rate = 1000000;
-
-		static QVector<unsigned long> get_available_sample_rates(
-				const struct iio_device *dev);
-		static unsigned long get_max_sample_rate(
-				const struct iio_device *dev);
-
-		static double get_best_ratio(double ratio,
-				double max, double *fract);
-
-	private:
-		Ui::SignalGenerator *ui;
-		OscilloscopePlot *plot;
-		gr::top_block_sptr top_block;
-		struct time_block_data *time_block_data;
-		struct iio_channel *amp1, *amp2;
-		QList<std::shared_ptr<GenericDac>> dacs;
-
-		unsigned int currentChannel;
-		unsigned long sample_rate;
-        unsigned long max_sample_rate;
-		unsigned long nb_points;
-
-		QButtonGroup *settings_group;
-		QQueue<QPair<int, bool>> menuButtonActions;
-
-		QVector<struct iio_buffer *> buffers;
-		QVector<ChannelWidget *> channels;
-		QVector<QPair<struct iio_channel *,
-			std::shared_ptr<adiscope::GenericDac>>> channel_dac;
-
-		QSharedPointer<signal_generator_data> getData(QWidget *obj);
-		QSharedPointer<signal_generator_data> getCurrentData();
-		void renameConfigPanel();
-
-		void start();
-		void stop();
-		void resetZoom();
-
-		void updatePreview();
-		void updateRightMenuForChn(int chIdx);
-		void updateAndToggleMenu(int chIdx, bool open);
-		void triggerRightMenuToggle(int chIdx, bool checked);
-
-		gr::basic_block_sptr getSignalSource(
-				gr::top_block_sptr top,
-				unsigned long sample_rate,
-				struct signal_generator_data &data, double phase_correction=0.0);
-
-		gr::basic_block_sptr getSource(QWidget *obj,
-				unsigned long sample_rate,
-				gr::top_block_sptr top, bool     phase_correction=false);
-
-		static size_t gcd(size_t a, size_t b);
-		static size_t lcm(size_t a, size_t b);
-		static int sg_waveform_to_idx(enum sg_waveform wave);
-
-		size_t get_samples_count(const struct iio_device *dev,
-				unsigned long sample_rate, bool perfect = false);
-		unsigned long get_best_sample_rate(
-				const struct iio_device *dev);
-		//int set_sample_rate(const struct iio_device *dev,
-		//		unsigned long sample_rate);
-		void calc_sampling_params(const struct iio_device *dev,
-			unsigned long sample_rate,
-			unsigned long& out_sample_rate,
-			unsigned long& out_oversampling_ratio);
-		bool use_oversampling(const struct iio_device *dev);
-
-		bool sample_rate_forced(const struct iio_device *dev);
-		unsigned long get_forced_sample_rate(const struct iio_device *dev);
-
-		double zoomT1;
-		double zoomT2;
-
-		double zoomT1OnScreen;
-		double zoomT2OnScreen;
-
-	private Q_SLOTS:
-		void constantValueChanged(double val);
-		void amplitudeChanged(double val);
-		void offsetChanged(double val);
-		void fileSampleRateChanged(double val);
-		void fileAmplitudeChanged(double val);
-		void fileOffsetChanged(double val);
-		void filePhaseChanged(double val);
-		void frequencyChanged(double val);
-		void phaseChanged(double val);
-		void mathFreqChanged(double val);
-		void waveformTypeChanged(int val);
-		void tabChanged(int index);
-		void channelWidgetEnabled(bool);
-		void channelWidgetMenuToggled(bool);
-		void rightMenuFinished(bool opened);
-		void loadFile();
-		void rescale();
-
-		void startStop(bool start);
-		void setFunction(const QString& function);
+typedef union {
+	struct {
+		uint8_t riff[4];
+		uint32_t size;
+		uint8_t id[4];
 	};
+	char data[12];
+} riff_header_t;
 
-	class SignalGenerator_API : public ApiObject
-	{
-		Q_OBJECT
+typedef union {
+	struct {
+		uint8_t  id[4];
+		uint32_t size;
+	};
+	char data[8];
+} chunk_header_t;
 
-		Q_PROPERTY(bool running READ running WRITE run STORED false);
+class SignalGenerator : public Tool
+{
+	friend class SignalGenerator_API;
+	friend class ToolLauncher_API;
 
-		Q_PROPERTY(QList<int> mode READ getMode WRITE setMode);
-		Q_PROPERTY(QList<double> constant_volts
-				READ getConstantValue WRITE setConstantValue);
-		Q_PROPERTY(QList<int> waveform_type
-				READ getWaveformType WRITE setWaveformType);
-		Q_PROPERTY(QList<double> waveform_amplitude
-				READ getWaveformAmpl WRITE setWaveformAmpl);
-		Q_PROPERTY(QList<double> waveform_frequency
-				READ getWaveformFreq WRITE setWaveformFreq);
-		Q_PROPERTY(QList<double> waveform_offset
-				READ getWaveformOfft WRITE setWaveformOfft);
-		Q_PROPERTY(QList<double> waveform_phase
-				READ getWaveformPhase WRITE setWaveformPhase);
-		Q_PROPERTY(QList<double> math_frequency
-				READ getMathFreq WRITE setMathFreq);
-		Q_PROPERTY(QList<QString> math_function
-				READ getMathFunction WRITE setMathFunction);
+	Q_OBJECT
 
-	public:
-		bool running() const;
-		void run(bool en);
+public:
+	explicit SignalGenerator(struct iio_context *ctx,
+	                         QList<std::shared_ptr<GenericDac>> dacs,
+	                         Filter *filt, QPushButton *runButton,
+	                         QJSEngine *engine, ToolLauncher *parent);
+	~SignalGenerator();
 
-		QList<int> getMode() const;
-		void setMode(const QList<int>& list);
+	static const size_t min_buffer_size = 1024;
+	static const unsigned long default_sample_rate = 1000000;
 
-		QList<double> getConstantValue() const;
-		void setConstantValue(const QList<double>& list);
+	static QVector<unsigned long> get_available_sample_rates(
+	        const struct iio_device *dev);
+	static unsigned long get_max_sample_rate(
+	        const struct iio_device *dev);
 
-		QList<int> getWaveformType() const;
-		void setWaveformType(const QList<int>& list);
+	static double get_best_ratio(double ratio,
+	                             double max, double *fract);
 
-		QList<double> getWaveformAmpl() const;
-		void setWaveformAmpl(const QList<double>& list);
+private:
+	Ui::SignalGenerator *ui;
+	OscilloscopePlot *plot;
+	gr::top_block_sptr top_block;
+	struct time_block_data *time_block_data;
+	struct iio_channel *amp1, *amp2;
+	QList<std::shared_ptr<GenericDac>> dacs;
 
-		QList<double> getWaveformFreq() const;
-		void setWaveformFreq(const QList<double>& list);
+	unsigned int currentChannel;
+	unsigned long sample_rate;
+	unsigned long max_sample_rate;
+	unsigned long nb_points;
 
-		QList<double> getWaveformOfft() const;
-		void setWaveformOfft(const QList<double>& list);
+	QButtonGroup *settings_group;
+	QQueue<QPair<int, bool>> menuButtonActions;
 
-		QList<double> getWaveformPhase() const;
-		void setWaveformPhase(const QList<double>& list);
+	QVector<struct iio_buffer *> buffers;
+	QVector<ChannelWidget *> channels;
+	QVector<QPair<struct iio_channel *,
+		        std::shared_ptr<adiscope::GenericDac>>> channel_dac;
 
-		QList<double> getMathFreq() const;
-		void setMathFreq(const QList<double>& list);
+	QSharedPointer<signal_generator_data> getData(QWidget *obj);
+	QSharedPointer<signal_generator_data> getCurrentData();
+	void renameConfigPanel();
 
-		QList<QString> getMathFunction() const;
-		void setMathFunction(const QList<QString>& list);
+	void start();
+	void stop();
+	void resetZoom();
 
-		explicit SignalGenerator_API(SignalGenerator *gen) :
-			ApiObject(), gen(gen) {}
-		~SignalGenerator_API() {}
+	void updatePreview();
+	void updateRightMenuForChn(int chIdx);
+	void updateAndToggleMenu(int chIdx, bool open);
+	void triggerRightMenuToggle(int chIdx, bool checked);
 
-	private:
-		SignalGenerator *gen;
-    };
+	gr::basic_block_sptr getSignalSource(
+	        gr::top_block_sptr top,
+	        unsigned long sample_rate,
+	        struct signal_generator_data& data, double phase_correction=0.0);
+
+	gr::basic_block_sptr getSource(QWidget *obj,
+	                               unsigned long sample_rate,
+	                               gr::top_block_sptr top, bool     phase_correction=false);
+
+	static size_t gcd(size_t a, size_t b);
+	static size_t lcm(size_t a, size_t b);
+	static int sg_waveform_to_idx(enum sg_waveform wave);
+
+	size_t get_samples_count(const struct iio_device *dev,
+	                         unsigned long sample_rate, bool perfect = false);
+	unsigned long get_best_sample_rate(
+	        const struct iio_device *dev);
+	//int set_sample_rate(const struct iio_device *dev,
+	//		unsigned long sample_rate);
+	void calc_sampling_params(const struct iio_device *dev,
+	                          unsigned long sample_rate,
+	                          unsigned long& out_sample_rate,
+	                          unsigned long& out_oversampling_ratio);
+	bool use_oversampling(const struct iio_device *dev);
+
+	bool sample_rate_forced(const struct iio_device *dev);
+	unsigned long get_forced_sample_rate(const struct iio_device *dev);
+
+	double zoomT1;
+	double zoomT2;
+
+	double zoomT1OnScreen;
+	double zoomT2OnScreen;
+
+	enum sg_file_format getFileFormat(QString filePath);
+	void loadParametersFromFile(QSharedPointer<signal_generator_data> ptr,
+	                            QString filePath);
+	bool riffCompare(riff_header_t& ptr, const char *id2);
+	bool chunkCompare(chunk_header_t& ptr, const char *id2);
+private Q_SLOTS:
+	void constantValueChanged(double val);
+	void amplitudeChanged(double val);
+	void offsetChanged(double val);
+	void fileSampleRateChanged(double val);
+	void fileAmplitudeChanged(double val);
+	void fileOffsetChanged(double val);
+	void filePhaseChanged(double val);
+	void frequencyChanged(double val);
+	void phaseChanged(double val);
+	void mathFreqChanged(double val);
+	void waveformTypeChanged(int val);
+	void tabChanged(int index);
+	void channelWidgetEnabled(bool);
+	void channelWidgetMenuToggled(bool);
+	void rightMenuFinished(bool opened);
+	void loadFile();
+	void rescale();
+
+	void startStop(bool start);
+	void setFunction(const QString& function);
+};
+
+class SignalGenerator_API : public ApiObject
+{
+	Q_OBJECT
+
+	Q_PROPERTY(bool running READ running WRITE run STORED false);
+
+	Q_PROPERTY(QList<int> mode READ getMode WRITE setMode);
+	Q_PROPERTY(QList<double> constant_volts
+	           READ getConstantValue WRITE setConstantValue);
+	Q_PROPERTY(QList<int> waveform_type
+	           READ getWaveformType WRITE setWaveformType);
+	Q_PROPERTY(QList<double> waveform_amplitude
+	           READ getWaveformAmpl WRITE setWaveformAmpl);
+	Q_PROPERTY(QList<double> waveform_frequency
+	           READ getWaveformFreq WRITE setWaveformFreq);
+	Q_PROPERTY(QList<double> waveform_offset
+	           READ getWaveformOfft WRITE setWaveformOfft);
+	Q_PROPERTY(QList<double> waveform_phase
+	           READ getWaveformPhase WRITE setWaveformPhase);
+	Q_PROPERTY(QList<double> math_frequency
+	           READ getMathFreq WRITE setMathFreq);
+	Q_PROPERTY(QList<QString> math_function
+	           READ getMathFunction WRITE setMathFunction);
+
+public:
+	bool running() const;
+	void run(bool en);
+
+	QList<int> getMode() const;
+	void setMode(const QList<int>& list);
+
+	QList<double> getConstantValue() const;
+	void setConstantValue(const QList<double>& list);
+
+	QList<int> getWaveformType() const;
+	void setWaveformType(const QList<int>& list);
+
+	QList<double> getWaveformAmpl() const;
+	void setWaveformAmpl(const QList<double>& list);
+
+	QList<double> getWaveformFreq() const;
+	void setWaveformFreq(const QList<double>& list);
+
+	QList<double> getWaveformOfft() const;
+	void setWaveformOfft(const QList<double>& list);
+
+	QList<double> getWaveformPhase() const;
+	void setWaveformPhase(const QList<double>& list);
+
+	QList<double> getMathFreq() const;
+	void setMathFreq(const QList<double>& list);
+
+	QList<QString> getMathFunction() const;
+	void setMathFunction(const QList<QString>& list);
+
+	explicit SignalGenerator_API(SignalGenerator *gen) :
+		ApiObject(), gen(gen) {}
+	~SignalGenerator_API() {}
+
+private:
+	SignalGenerator *gen;
+};
 }
 
 #endif /* M2K_SIGNAL_GENERATOR_H */
