@@ -1099,7 +1099,7 @@ basic_block_sptr SignalGenerator::getSignalSource(gr::top_block_sptr top,
 	auto src = analog::sig_source_f::make(samp_rate, waveform,
 	                                      data.frequency, amplitude, offset);
 
-	uint64_t to_skip = samp_rate * phase / (data.frequency * 360.0);
+	uint64_t to_skip = samp_rate * (360.0 - phase) / (data.frequency * 360.0);
 	auto skip_head = blocks::skiphead::make(sizeof(float),(uint64_t)to_skip);
 	top->connect(src, 0, skip_head, 0);
 
