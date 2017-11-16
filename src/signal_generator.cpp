@@ -320,9 +320,6 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 	connect(runButton, SIGNAL(toggled(bool)),
 	        this, SLOT(startStop(bool)));
 
-
-	connect(plot->getZoomer(),SIGNAL(zoomed(QRectF)),this,SLOT(rescale()));
-
 	resetZoom();
 }
 
@@ -340,6 +337,20 @@ SignalGenerator::~SignalGenerator()
 
 void SignalGenerator::resetZoom()
 {
+
+	disconnect(plot->getZoomer(),SIGNAL(zoomed(QRectF)),this,SLOT(rescale()));
+	bool disable_zoom=false;
+	for (auto it = channels.begin(); it != channels.end(); ++it) {
+		auto ptr=getData(*it);
+		if(ptr->type==SIGNAL_TYPE_BUFFER)
+		{
+			disable_zoom=true;
+			break;
+		}
+	}
+
+	if(!disable_zoom)
+		connect(plot->getZoomer(),SIGNAL(zoomed(QRectF)),this,SLOT(rescale()));
 
 	double period=0.0;
 	unsigned int slowSignalId;
