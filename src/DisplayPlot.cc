@@ -145,7 +145,6 @@ QwtText OscScaleDraw::label( double value ) const
 	double diff = upper - lower;
 	double middle = (upper + lower) / 2;
 	double step = diff / 10.0;
-	qDebug() << diff;
 	if (middle > (100 * step) ) {
 		int current = 0;
 		while (value > (lower + current * step)) current++;
