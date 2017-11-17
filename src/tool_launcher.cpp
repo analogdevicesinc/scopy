@@ -54,7 +54,7 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	power_control(nullptr), dmm(nullptr), signal_generator(nullptr),
 	oscilloscope(nullptr), current(nullptr), filter(nullptr),
 	logic_analyzer(nullptr), pattern_generator(nullptr), dio(nullptr),
-	network_analyzer(nullptr), spectrum_analyzer(nullptr),
+	network_analyzer(nullptr), spectrum_analyzer(nullptr), debugger(nullptr),
 	tl_api(new ToolLauncher_API(this)),
 	notifier(STDIN_FILENO, QSocketNotifier::Read),
 	infoWidget(nullptr),
@@ -71,7 +71,7 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 			<< "Oscilloscope" << "Power Supply"
 			<< "Signal Generator" << "Pattern Generator"
 			<< "Logic Analyzer" << "Network Analyzer"
-			<< "Spectrum Analyzer";
+			<< "Spectrum Analyzer" << "Debugger";
 
 	toolIcons << ":/menu/io.png"
 			<< ":/menu/voltmeter.png"
@@ -81,6 +81,7 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 			<< ":/menu/pattern_generator.png"
 			<< ":/menu/logic_analyzer.png"
 			<< ":/menu/network_analyzer.png"
+			<< ":/menu/spectrum_analyzer.png"
 			<< ":/menu/spectrum_analyzer.png";
 	for (int i = 0; i < tools.size(); i++)
 		position.push_back(i);
@@ -132,6 +133,9 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 		SLOT(btnDigitalIO_clicked()));
 	connect(toolMenu["Spectrum Analyzer"]->getToolBtn(), SIGNAL(clicked()), this,
 		SLOT(btnSpectrumAnalyzer_clicked()));
+	connect(toolMenu["Debugger"]->getToolBtn(), SIGNAL(clicked()), this,
+		SLOT(btnDebugger_clicked()));
+
 
 
 		//option background
@@ -152,6 +156,8 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	connect(toolMenu["Digital IO"]->getToolBtn(), SIGNAL(toggled(bool)), this,
 		SLOT(setButtonBackground(bool)));
 	connect(toolMenu["Spectrum Analyzer"]->getToolBtn(), SIGNAL(toggled(bool)), this,
+		SLOT(setButtonBackground(bool)));
+	connect(toolMenu["Debugger"]->getToolBtn(), SIGNAL(toggled(bool)), this,
 		SLOT(setButtonBackground(bool)));
 	connect(ui->btnHome, SIGNAL(toggled(bool)), this,
 		SLOT(setButtonBackground(bool)));
@@ -495,9 +501,12 @@ void ToolLauncher::swapMenu(QWidget *menu)
 {
 	Tool *tl = dynamic_cast<Tool* >(menu);
 	if (tl){
-		MenuOption *mo = static_cast<MenuOption *>(tl->runButton()->parentWidget());
-		if (mo->isDetached())
-			return;
+		if (tl->runButton())
+		{
+			MenuOption *mo = static_cast<MenuOption *>(tl->runButton()->parentWidget());
+			if (mo->isDetached())
+				return;
+		}
 	}
 
 	if (current) {
@@ -570,6 +579,11 @@ void adiscope::ToolLauncher::btnDigitalIO_clicked()
 void adiscope::ToolLauncher::on_btnHome_clicked()
 {
 	swapMenu(ui->homeWidget);
+}
+
+void adiscope::ToolLauncher::btnDebugger_clicked()
+{
+	swapMenu(static_cast<QWidget *>(debugger));
 }
 
 void adiscope::ToolLauncher::resetStylesheets()
@@ -743,6 +757,11 @@ void adiscope::ToolLauncher::destroyContext()
 		spectrum_analyzer = nullptr;
 	}
 
+	if (debugger) {
+		delete debugger;
+		debugger = nullptr;
+	}
+
 	if (filter) {
 		delete filter;
 		filter = nullptr;
@@ -837,6 +856,11 @@ void adiscope::ToolLauncher::enableAdcBasedTools()
 		dmm = new DMM(ctx, filter, adc, toolMenu["Voltmeter"]->getToolStopBtn(),
 				&js_engine, this);
 		adc_users_group.addButton(toolMenu["Voltmeter"]->getToolStopBtn());
+	}
+
+	if (filter->compatible(TOOL_DEBUGGER)) {
+		debugger = new Debugger(ctx, filter, &js_engine, this);
+		toolMenu["Debugger"]->setEnabled(true);
 	}
 
 	if (filter->compatible(TOOL_SPECTRUM_ANALYZER)) {
@@ -935,6 +959,11 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 	    || filter->compatible(TOOL_DIGITALIO)) {
 		dioManager = new DIOManager(ctx,filter);
 
+	}
+
+	if (filter->compatible(TOOL_DEBUGGER)) {
+		debugger = new Debugger(ctx, filter, &js_engine, this);
+		toolMenu["Debugger"]->setEnabled(true);
 	}
 
 	if (filter->compatible(TOOL_LOGIC_ANALYZER)

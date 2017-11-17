@@ -46,6 +46,7 @@
 #include "digitalio.hpp"
 #include "menuoption.h"
 #include "detachedWindow.hpp"
+#include "debugger.h"
 
 extern "C" {
 	struct iio_context;
@@ -101,6 +102,7 @@ private Q_SLOTS:
 	void btnPatternGenerator_clicked();
 	void btnNetworkAnalyzer_clicked();
 	void btnSpectrumAnalyzer_clicked();
+	void btnDebugger_clicked();
 	void on_btnHome_clicked();
 	void setButtonBackground(bool on);
 
@@ -147,6 +149,7 @@ private:
 	PatternGenerator *pattern_generator;
 	NetworkAnalyzer *network_analyzer;
 	SpectrumAnalyzer *spectrum_analyzer;
+	Debugger *debugger;
 	QWidget *current;
 	QSettings *settings;
 

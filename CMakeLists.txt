@@ -79,9 +79,11 @@ find_package(Qwt REQUIRED)
 find_package(Qt5Qml REQUIRED)
 find_package(Qt5Svg REQUIRED)
 find_package(Qt5UiTools REQUIRED)
+find_package(Qt5Xml REQUIRED)
 
 set(GR_REQUIRED_COMPONENTS RUNTIME ANALOG BLOCKS FFT FILTER IIO VOLK PMT)
 find_package(Gnuradio PATHS "c:/Program Files/gnuradio/lib/cmake/gnuradio" REQUIRED)
+
 
 GR_MODULE(IIO gnuradio-iio gnuradio/iio/api.h gnuradio-iio)
 
@@ -118,6 +120,7 @@ include_directories(
 	${QWT_INCLUDE_DIRS}
 	${QWTPOLAR_INCLUDE_DIRS}
 	${Qt5Svg_INCLUDE_DIRS}
+	${Qt5Xml_INCLUDE_DIRS}
 	${IIO_INCLUDE_DIRS}
 	${LIBSIGROK_DECODE_INCLUDE_DIRS}
 	${LIBSIGROKCXX_INCLUDE_DIRS}
@@ -233,6 +236,7 @@ target_link_libraries(${PROJECT_NAME} LINK_PRIVATE
 		${QWT_LIBRARIES}
 		${QWTPOLAR_LIBRARIES}
 		${Qt5Svg_LIBRARIES}
+		${Qt5Xml_LIBRARIES}
 		${IIO_LIBRARIES}
 		${MATIO_LIBRARIES}
 		${LIBSIGROK_LIBRARIES}

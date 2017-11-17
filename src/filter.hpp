@@ -44,6 +44,7 @@ namespace adiscope {
 		TOOL_NETWORK_ANALYZER,
 		TOOL_SPECTRUM_ANALYZER,
 		TOOL_LAUNCHER,
+		TOOL_DEBUGGER,
 	};
 
 	class Filter
