@@ -79,12 +79,15 @@ namespace adiscope {
 		boost::condition_variable data_cond;
 		MouseWheelWidgetGuard *wheelEventGuard;
 
+		std::vector<double> m_min, m_max;
+
 		void disconnectAll();
 		gr::basic_block_sptr configureGraph(gr::basic_block_sptr s2f,
 				bool is_low_ac, bool is_high_ac);
 		void configureModes();
 		int numSamplesFromIdx(int idx);
 		void writeAllSettingsToHardware();
+		void checkPeakValues(int, double);
 
 	public Q_SLOTS:
 		void toggleTimer(bool start);
@@ -104,6 +107,13 @@ namespace adiscope {
 		void dataLoggingThread();
 
 		void chooseFile();
+
+		void resetPeakHold(bool);
+
+		void displayPeakHold(bool);
+
+		void collapsePeakHold(bool);
+		void collapseDataLog(bool);
 	};
 
 	class DMM_API : public ApiObject

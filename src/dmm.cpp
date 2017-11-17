@@ -73,6 +73,12 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, std::shared_ptr<GenericAdc> adc,
 
 	ui->gridLayout_3->addWidget(data_logging_timer, 9, 0);
 
+	for(int i = 0; i < adc->numAdcChannels(); i++)
+	{
+		m_min.push_back(0);
+		m_max.push_back(0);
+	}
+
 	connect(ui->run_button, SIGNAL(toggled(bool)),
 			this, SLOT(toggleTimer(bool)));
 	connect(ui->run_button, SIGNAL(toggled(bool)),
@@ -126,6 +132,15 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, std::shared_ptr<GenericAdc> adc,
 			this, SLOT(setHistorySizeCh1(int)));
 	connect(ui->historySizeCh2, SIGNAL(currentIndexChanged(int)),
 			this, SLOT(setHistorySizeCh2(int)));
+
+	connect(ui->btnResetPeakHold, SIGNAL(clicked(bool)),
+		SLOT(resetPeakHold(bool)));
+	connect(ui->btnDisplayPeakHold, SIGNAL(toggled(bool)),
+		SLOT(displayPeakHold(bool)));
+	connect(ui->btnCollapseDataLog, SIGNAL(toggled(bool)),
+		SLOT(collapseDataLog(bool)));
+	connect(ui->btnCollapsePeakHold, SIGNAL(toggled(bool)),
+		SLOT(collapsePeakHold(bool)));
 
 	setHistorySizeCh1(ui->historySizeCh1->currentIndex());
 	setHistorySizeCh2(ui->historySizeCh2->currentIndex());
@@ -194,10 +209,72 @@ void DMM::updateValuesList(std::vector<float> values)
 	ui->sismograph_ch1->plot(volts_ch1);
 	ui->sismograph_ch2->plot(volts_ch2);
 
+	checkPeakValues(0, volts_ch1);
+	checkPeakValues(1, volts_ch2);
+
 	if(!use_timer)
 		data_cond.notify_all();
 }
 
+void DMM::checkPeakValues(int ch, double peak)
+{
+	if(peak < m_min[ch])
+	{
+		m_min[ch] = peak;
+		if(ch == 0) ui->minCh1->display(m_min[ch]);
+		if(ch == 1) ui->minCh2->display(m_min[ch]);
+	}
+	if(peak > m_max[ch])
+	{
+		m_max[ch] = peak;
+		if(ch == 0) ui->maxCh1->display(m_max[ch]);
+		if(ch == 1) ui->maxCh2->display(m_max[ch]);
+	}
+}
+
+void DMM::collapseDataLog(bool checked)
+{
+	if(checked)
+		ui->gridLayout_3Widget->hide();
+	else
+		ui->gridLayout_3Widget->show();
+}
+
+void DMM::collapsePeakHold(bool checked)
+{
+	if(checked)
+		ui->gridLayout_4Widget->hide();
+	else
+		ui->gridLayout_4Widget->show();
+}
+
+void DMM::displayPeakHold(bool checked)
+{
+	if(!checked) {
+		ui->peakCh1Widget->hide();
+		ui->peakCh2Widget->hide();
+	}
+	else  {
+		ui->peakCh1Widget->show();
+		ui->peakCh2Widget->show();
+	}
+}
+
+void DMM::resetPeakHold(bool clicked)
+{
+	for(int ch = 0; ch < adc->numAdcChannels(); ch++) {
+		m_min[ch] = 0;
+		m_max[ch] = 0;
+		if(ch == 0) {
+			ui->maxCh1->display(m_max[ch]);
+			ui->minCh1->display(m_min[ch]);
+		}
+		if(ch == 1) {
+			ui->maxCh2->display(m_max[ch]);
+			ui->minCh2->display(m_min[ch]);
+		}
+	}
+}
 void DMM::toggleTimer(bool start)
 {
 	if (start) {
