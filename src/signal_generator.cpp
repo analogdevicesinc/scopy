@@ -49,11 +49,13 @@
 #include <gnuradio/blocks/copy.h>
 #include <gnuradio/blocks/skiphead.h>
 #include <gnuradio/blocks/vector_sink_s.h>
+#include <gnuradio/blocks/null_source.h>
 #include <gnuradio/filter/fractional_resampler_ff.h>
 #include <gnuradio/filter/rational_resampler_base_fff.h>
 #include <gnuradio/filter/pfb_arb_resampler_fff.h>
 #include <gnuradio/iio/device_sink.h>
 #include <gnuradio/iio/math.h>
+#include <matio.h>
 
 #include <iio.h>
 
@@ -709,6 +711,10 @@ enum sg_file_format SignalGenerator::getFileFormat(QString filePath)
 		return FORMAT_CSV;
 	}
 
+	if (filePath.endsWith(".mat")) {
+		return FORMAT_MAT;
+	}
+
 	return FORMAT_BIN_FLOAT;
 }
 
@@ -801,8 +807,44 @@ void SignalGenerator::loadParametersFromFile(
 			ptr->file_channel_names.push_back("Column " + QString::number(i));
 			ptr->file_nr_of_samples.push_back(sample_nr);
 		}
+
 		f.close();
 		ptr->file_message="CSV";
+	}
+
+	if (ptr->file_type==FORMAT_MAT) {
+		mat_t *matfp;
+		matvar_t *matvar;
+		matfp = Mat_Open(filePath.toStdString().c_str(),MAT_ACC_RDONLY);
+
+		if (NULL == matfp) {
+			qDebug()<<"Error opening MAT file "<<filePath;
+			ptr->file_nr_of_samples.push_back(0);
+			ptr->file_message = "MAT file could not be parsed";
+			return;
+		}
+
+		while ((matvar = Mat_VarReadNextInfo(matfp)) != NULL) {
+
+			/* must be a vector */
+			if (!(matvar->rank !=2 || (matvar->dims[0] > 1 && matvar->dims[1] > 1)
+			      || matvar->class_type != MAT_C_DOUBLE)) {
+				Mat_VarReadDataAll(matfp, matvar);
+
+				if (!matvar->isComplex) {
+					qDebug()<<"Complex buffers not supported";
+					ptr->file_message="Complex buffers not supported";
+					ptr->file_channel_names.push_back(QString(matvar->name));
+					ptr->file_nr_of_samples.push_back(*matvar->dims);
+					ptr->file_nr_of_channels++;
+				}
+			}
+
+			Mat_VarFree(matvar);
+			matvar = NULL;
+		}
+
+		Mat_Close(matfp);
 	}
 
 	if (ptr->file_nr_of_channels==0) {
@@ -1136,8 +1178,28 @@ void SignalGenerator::loadFileChannelData(QWidget *obj)
 		}
 	}
 
+	if (ptr->file_type==FORMAT_MAT) {
+		mat_t *matfp;
+		matvar_t *matvar;
 
+		matfp = Mat_Open(ptr->file.toStdString().c_str(),MAT_ACC_RDONLY);
 
+		if (NULL == matfp) {
+			qDebug()<<"Error opening MAT file "<<ptr->file;
+			return;
+		}
+
+		matvar=Mat_VarRead(matfp,
+		                   ptr->file_channel_names[ptr->file_channel].toStdString().c_str());
+		const double *xData = static_cast<const double *>(matvar->data) ;
+
+		for (auto i=0; i<ptr->file_nr_of_samples[ptr->file_channel]; ++i) {
+			ptr->file_data.push_back(xData[i]);
+		}
+
+		Mat_Close(matfp);
+		return;
+	}
 }
 
 gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
@@ -1192,12 +1254,15 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
 				break;
 
 			case FORMAT_CSV:
+			case FORMAT_MAT:
 				loadFileChannelData(obj);
 				fs = blocks::vector_source_f::make(ptr->file_data,true);
 				top->connect(fs,0,buffer,0);
 				break;
 
 			default:
+				fs=blocks::null_source::make(sizeof(float));
+				top->connect(fs,0,buffer,0);
 				break;
 			}
 

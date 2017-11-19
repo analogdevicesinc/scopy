@@ -90,6 +90,8 @@ find_package(Boost "1.55" COMPONENTS system filesystem thread REQUIRED)
 
 set(VC_PATH "$ENV{VS120COMNTOOLS}/../../VC")
 find_library(IIO_LIBRARIES NAMES iio libiio PATHS ${VC_PATH}/lib ${VC_PATH}/lib/amd64)
+find_library(MATIO_LIBRARIES NAMES matio)
+
 find_path(IIO_INCLUDE_DIRS iio.h PATHS ${VC_PATH}/include)
 
 find_library(QWTPOLAR_LIBRARIES qwtpolar)
@@ -232,6 +234,7 @@ target_link_libraries(${PROJECT_NAME} LINK_PRIVATE
 		${QWTPOLAR_LIBRARIES}
 		${Qt5Svg_LIBRARIES}
 		${IIO_LIBRARIES}
+		${MATIO_LIBRARIES}
 		${LIBSIGROK_LIBRARIES}
 		${LIBSIGROKCXX_LIBRARIES}
 		${LIBSIGROK_DECODE_LIBRARIES}

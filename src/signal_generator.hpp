@@ -69,7 +69,8 @@ enum sg_file_format {
 	FORMAT_NO_FILE,
 	FORMAT_BIN_FLOAT,
 	FORMAT_CSV,
-	FORMAT_WAVE
+	FORMAT_WAVE,
+	FORMAT_MAT
 };
 
 typedef union {
