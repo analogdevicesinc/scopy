@@ -127,7 +127,7 @@ struct adiscope::signal_generator_data {
 	unsigned long file_nr_of_channels;
 	unsigned long file_channel;
 	unsigned long file_nr_of_samples;
-	std::vector< std::vector<float> > file_data; // vector for each channel
+	std::vector<float> file_data; // vector for each channel
 	QString file;
 	enum sg_file_format file_type;
 	wav_header_t file_wav_hdr;
@@ -753,26 +753,6 @@ void SignalGenerator::loadParametersFromFile(
 			if (chunkCompare(chunk,"data")) {
 				auto bytesPerSample = (ptr->file_wav_hdr.bitsPerSample/8);
 				ptr->file_nr_of_samples=riff.size/(bytesPerSample);
-				/*		ptr->file_data.clear();
-						for(auto i=0;i<ptr->file_nr_of_samples;i++) {
-							val=f.read(bytesPerSample);
-							QDataStream ds(val);
-							float val_f;
-							ds.setByteOrder(QDataStream::LittleEndian);
-							ds.setFloatingPointPrecision(QDataStream::SinglePrecision);
-							// only supports MONO right now
-							if(bytesPerSample<=2) {
-								int16_t val_i;
-								ds >> val_i;
-								float scaleFactor = (1<<ptr->file_wav_hdr.bitsPerSample-1)-1;
-								val_f =  val_i /scaleFactor;
-							}
-							else {
-								ds >> val_f;
-							}
-
-							ptr->file_data.push_back(val_f);
-						}*/
 				continue;
 			}
 
@@ -788,50 +768,23 @@ void SignalGenerator::loadParametersFromFile(
 		uint32_t sample_nr=0;
 		uint32_t chan;
 
-		for (i=0; i<ptr->file_data.size(); i++) {
-			ptr->file_data[i].clear();
-		}
-
 		ptr->file_data.clear();
 
 		// determine number of channels
 		QString str = in.readLine();
 		QStringList splitStr = str.split(',',QString::SkipEmptyParts);
-
-		for (chan=0; chan<splitStr.size(); chan++)
-			ptr->file_data.push_back({});
-		auto nr_of_channels = ptr->file_data.size();
+		auto nr_of_channels = splitStr.size();
 
 		in.seek(0);
-
-		while (!in.atEnd()) {
-			str = in.readLine();
-			splitStr = str.split(',',QString::SkipEmptyParts);
-
-			for (chan=0; chan<nr_of_channels; chan++) {
-				bool ok=false;
-				float sample;
-
-				if (splitStr.size() > chan) {
-					sample = splitStr.at(chan).toFloat(
-					                 &ok);        // if not ok, autosets sample to 0
-				} else {
-					sample = 0.0;        // channel not found in csv record
-				}
-
-				ptr->file_data[chan].push_back(sample);
-
-				if (!ok) {
-					qDebug()<<"File corrupt @ line "<<sample_nr+1;
-				}
-			}
-
+		while(!in.atEnd()) {
+			str = in.readLine(); // count number of lines in CSV
 			sample_nr++;
 		}
 
 		ptr->file_channel=0; // autoselect channel 0
 		ptr->file_nr_of_channels=nr_of_channels;
 		ptr->file_nr_of_samples=sample_nr;
+		f.close();
 	}
 
 	this->ui->label_size->setText(QString::number(ptr->file_nr_of_samples) +
@@ -1114,6 +1067,42 @@ basic_block_sptr SignalGenerator::getSignalSource(gr::top_block_sptr top,
 	}
 }
 
+void SignalGenerator::loadFileChannelData(QWidget *obj)
+{
+	auto ptr = getData(obj);
+	if(ptr->type!=SIGNAL_TYPE_BUFFER){
+		qDebug()<<"loadFileChannelData called without having SIGNAL_TYPE_BUFFER";
+		return;
+	}
+	ptr->file_data.clear();
+	if(ptr->file_type==FORMAT_CSV)
+	{
+		QFile f(ptr->file);
+		f.open(QIODevice::ReadOnly);
+		QTextStream in(&f);
+		QString str;
+		QStringList splitStr;
+		float sample=0.0;
+		uint32_t sample_nr=0;
+		bool ok=false;
+		while (!in.atEnd()) {
+			str = in.readLine();
+			splitStr = str.split(',',QString::KeepEmptyParts);
+			if(splitStr.size()>ptr->file_channel)
+				sample = splitStr.at(ptr->file_channel).toFloat(&ok);
+			else
+				sample = 0.0;
+			ptr->file_data.push_back(sample);
+			sample_nr++;
+			if(!ok)
+				qDebug()<<"file corrupt @ line "<<sample_nr;
+		}
+	}
+
+
+
+}
+
 gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
                 unsigned long samp_rate, gr::top_block_sptr top, bool preview)
 {
@@ -1166,7 +1155,8 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
 				break;
 
 			case FORMAT_CSV:
-				fs = blocks::vector_source_f::make(ptr->file_data[ptr->file_channel],true);
+				loadFileChannelData(obj);
+				fs = blocks::vector_source_f::make(ptr->file_data,true);
 				top->connect(fs,0,buffer,0);
 				break;
 

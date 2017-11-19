@@ -197,6 +197,7 @@ private:
 	enum sg_file_format getFileFormat(QString filePath);
 	void loadParametersFromFile(QSharedPointer<signal_generator_data> ptr,
 	                            QString filePath);
+	void loadFileChannelData(QWidget *obj);
 	bool riffCompare(riff_header_t& ptr, const char *id2);
 	bool chunkCompare(chunk_header_t& ptr, const char *id2);
 private Q_SLOTS:
