@@ -129,6 +129,7 @@ struct adiscope::signal_generator_data {
 	unsigned long file_nr_of_samples;
 	std::vector<float> file_data; // vector for each channel
 	QString file;
+	QString file_message;
 	enum sg_file_format file_type;
 	wav_header_t file_wav_hdr;
 	//bool file_loaded;
@@ -721,6 +722,7 @@ void SignalGenerator::loadParametersFromFile(
 
 	if (ptr->file_type==FORMAT_BIN_FLOAT) {
 		ptr->file_nr_of_samples=info.size() / sizeof(float);
+		ptr->file_message="Binary floats file";
 	}
 
 	if (ptr->file_type==FORMAT_WAVE) {
@@ -758,6 +760,7 @@ void SignalGenerator::loadParametersFromFile(
 
 			f.seek(f.pos()+chunk.size);
 		}
+		ptr->file_message="WAV";
 	}
 
 	if (ptr->file_type==FORMAT_CSV) {
@@ -785,6 +788,7 @@ void SignalGenerator::loadParametersFromFile(
 		ptr->file_nr_of_channels=nr_of_channels;
 		ptr->file_nr_of_samples=sample_nr;
 		f.close();
+		ptr->file_message="CSV";
 	}
 
 	this->ui->label_size->setText(QString::number(ptr->file_nr_of_samples) +
@@ -809,6 +813,7 @@ void SignalGenerator::loadFile()
 	ui->fileSampleRate->setValue(ptr->file_sr);
 	ui->fileChannel->blockSignals(true);
 	ui->fileChannel->clear();
+	ui->label_format->setText(ptr->file_message);
 
 	for (auto i=0; i<ptr->file_nr_of_channels; i++) {
 		ui->fileChannel->addItem(QString::number(i));
