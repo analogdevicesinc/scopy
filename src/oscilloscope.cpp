@@ -20,6 +20,8 @@
 /* GNU Radio includes */
 #include <gnuradio/blocks/float_to_complex.h>
 #include <gnuradio/iio/math.h>
+#include <gnuradio/blocks/sub_ff.h>
+#include <gnuradio/filter/iir_filter_ffd.h>
 
 /* Qt includes */
 #include <QtWidgets>
@@ -187,6 +189,9 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 
 		high_gain_modes.push_back(false);
 		channel_offset.push_back(0.0);
+		chnAcCoupled.push_back(false);
+		filterBlocks.push_back(nullptr);
+		subBlocks.push_back(nullptr);
 
 		channels_api.append(new Channel_API(this));
 	}
@@ -430,6 +435,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		SLOT(onTimePositionChanged(double)));
 	connect(voltsPosition, SIGNAL(valueChanged(double)),
 		SLOT(onVertOffsetValueChanged(double)));
+	connect(ch_ui->btnCoupled, SIGNAL(toggled(bool)),
+		SLOT(onChannelCouplingChanged(bool)));
 
 	connect(ch_ui->cmbChnLineWidth, SIGNAL(currentIndexChanged(int)),
 		SLOT(channelLineWidthChanged(int)));
@@ -585,6 +592,8 @@ Oscilloscope::~Oscilloscope()
 	api->save(*settings);
 	delete api;
 
+	filterBlocks.clear();
+	subBlocks.clear();
 	delete[] hist_ids;
 	delete[] fft_ids;
 	delete[] ids;
@@ -608,6 +617,97 @@ void Oscilloscope::init_channel_settings()
 			ch_ui->math_settings_widget->setVisible(false);
 		}
 	});
+}
+
+void Oscilloscope::activateAcCoupling(int i)
+{
+	double alpha, beta;
+	bool started = iio->started();
+	if(started) {
+		iio->lock();
+	}
+
+	boost::shared_ptr<adc_sample_conv> block =
+	dynamic_pointer_cast<adc_sample_conv>(
+					adc_samp_conv_block);
+
+	iio->disconnect(block, i, qt_time_block, i);
+
+	if (active_sample_rate <= 1e6) {
+		alpha = 1 / active_sample_rate;
+	} else {
+		alpha = 60 / (active_sample_rate + 60);
+	}
+	beta = 1 - alpha;
+
+	filterBlocks[i] = gr::filter::iir_filter_ffd::make({alpha}, {1, -beta}, false);
+	subBlocks[i] = gr::blocks::sub_ff::make();
+
+	iio->connect(block, i, subBlocks.at(i), 0);
+	iio->connect(block, i, filterBlocks.at(i), 0);
+	iio->connect(filterBlocks.at(i), 0, subBlocks.at(i), 1);
+	iio->connect(subBlocks.at(i), 0, qt_time_block, i);
+
+	for (auto pair = math_sinks.begin(); pair != math_sinks.end(); pair++) {
+		auto math = pair.value().first;
+		iio->disconnect(adc_samp_conv_block, i, math, i);
+		iio->connect(subBlocks.at(i), 0, math, i);
+	}
+
+	for(int ch = 0; ch < nb_channels; ch++)
+		iio->set_buffer_size(ids[ch], active_sample_count);
+
+	if(started) {
+		iio->unlock();
+	}
+}
+
+void Oscilloscope::deactivateAcCoupling(int i)
+{
+	bool started = iio->started();
+	if(started) {
+		iio->lock();
+	}
+
+	boost::shared_ptr<adc_sample_conv> block =
+	dynamic_pointer_cast<adc_sample_conv>(
+					adc_samp_conv_block);
+
+	for (auto pair = math_sinks.begin(); pair != math_sinks.end(); pair++) {
+		auto math = pair.value().first;
+		iio->disconnect(subBlocks.at(i), 0, math, i);
+		iio->connect(adc_samp_conv_block, i, math, i);
+	}
+
+	iio->disconnect(block, i, subBlocks.at(i), 0);
+	iio->disconnect(block, i, filterBlocks.at(i), 0);
+	iio->disconnect(filterBlocks.at(i), 0, subBlocks.at(i), 1);
+	iio->disconnect(subBlocks.at(i), 0, qt_time_block, i);
+	filterBlocks[i] = nullptr;
+	subBlocks[i] = nullptr;
+	iio->connect(block, i, qt_time_block, i);
+
+	for(int ch = 0; ch < nb_channels; ch++) {
+		iio->set_buffer_size(ids[ch], active_sample_count);
+	}
+
+	if(started) {
+		iio->unlock();
+	}
+}
+
+void Oscilloscope::configureAcCoupling(int i, bool coupled)
+{
+	if (coupled && !chnAcCoupled.at(i)) {
+		activateAcCoupling(i);
+	} else if (!coupled && chnAcCoupled.at(i)) {
+		deactivateAcCoupling(i);
+	} else if (coupled && chnAcCoupled.at(i)) {
+		deactivateAcCoupling(i);
+		activateAcCoupling(i);
+	}
+
+	chnAcCoupled[i] = coupled;
 }
 
 void Oscilloscope::cursor_panel_init()
@@ -841,8 +941,13 @@ void Oscilloscope::add_math_channel(const std::string& function)
 
 	math_sink->set_trigger_mode(TRIG_MODE_TAG, 0, "buffer_start");
 
-	for (unsigned int i = 0; i < nb_channels; i++)
-		iio->connect(adc_samp_conv_block, i, math, i);
+	for (unsigned int i = 0; i < nb_channels; i++) {
+		if(subBlocks.at(i) != nullptr) {
+			iio->connect(subBlocks.at(i), 0, math, i);
+		} else {
+			iio->connect(adc_samp_conv_block, i, math, i);
+		}
+	}
 	iio->connect(math, 0, math_sink, 0);
 
 	if (started)
@@ -987,8 +1092,13 @@ void Oscilloscope::onChannelWidgetDeleteClicked()
 	}
 	/* Disconnect the blocks from the running flowgraph */
 	auto pair = math_sinks.take(qname);
-	for (unsigned int i = 0; i < nb_channels; i++)
-		iio->disconnect(adc_samp_conv_block, i, pair.first, i);
+	for (unsigned int i = 0; i < nb_channels; i++) {
+		if(subBlocks.at(i) != nullptr) {
+			iio->disconnect(subBlocks.at(i), 0, pair.first, i);
+		} else {
+			iio->disconnect(adc_samp_conv_block, i, pair.first, i);
+		}
+	}
 	iio->disconnect(pair.first, 0, pair.second, 0);
 
 	if(xy_is_visible)
@@ -1548,6 +1658,11 @@ void Oscilloscope::cancelZoom()
 	}
 }
 
+void adiscope::Oscilloscope::onChannelCouplingChanged(bool en)
+{
+	configureAcCoupling(current_ch_widget, en);
+}
+
 void adiscope::Oscilloscope::onVertScaleValueChanged(double value)
 {
 	cancelZoom();
@@ -1644,6 +1759,10 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 	if (started)
 		iio->unlock();
 
+	for(int ch = 0; ch < nb_channels; ch++) {
+		configureAcCoupling(ch, chnAcCoupled.at(ch));
+	}
+
 
 	// Compute the appropriate value for fft_size
 	double power = ceil(log2(active_sample_count));
@@ -1731,6 +1850,10 @@ void adiscope::Oscilloscope::onTimePositionChanged(double value)
 
 	if (started)
 		iio->unlock();
+
+	for(int ch = 0; ch < nb_channels; ch++) {
+		configureAcCoupling(ch, chnAcCoupled.at(ch));
+	}
 
 	// Compute the appropriate value for fft_size
 	double power = ceil(log2(active_sample_count));
@@ -1864,8 +1987,11 @@ void Oscilloscope::update_chn_settings_panel(int id)
 		ch_ui->math_settings_widget->setVisible(true);
 		ch_ui->function_2->setText(chn_widget->function());
 		ch_ui->function_2->setText(chn_widget->function());
+		ch_ui->wCoupling->setVisible(false);
 	} else {
 		ch_ui->math_settings_widget->setVisible(false);
+		ch_ui->wCoupling->setVisible(true);
+		ch_ui->btnCoupled->setChecked(chnAcCoupled.at(id));
 	}
 }
 
@@ -1923,8 +2049,13 @@ void Oscilloscope::editMathChannelFunction(int id, const std::string& new_functi
 		setup_xy_channels();
 	}
 	auto pair = math_sinks.value(qname);
-	for (unsigned int i = 0; i < nb_channels; ++i)
-		iio->disconnect(adc_samp_conv_block, i, pair.first, i);
+	for (unsigned int i = 0; i < nb_channels; ++i) {
+		if(subBlocks.at(i) != nullptr) {
+			iio->disconnect(subBlocks.at(i), 0, pair.first, i);
+		} else {
+			iio->disconnect(adc_samp_conv_block, i, pair.first, i);
+		}
+	}
 	iio->disconnect(pair.first, 0, pair.second, 0);
 
 	auto math_pair = QPair<gr::basic_block_sptr, gr::basic_block_sptr>(
@@ -1932,8 +2063,13 @@ void Oscilloscope::editMathChannelFunction(int id, const std::string& new_functi
 
 	math_sinks.insert(qname, math_pair);
 
-	for (unsigned int i = 0; i < nb_channels; ++i)
-		iio->connect(adc_samp_conv_block, i, math, i);
+	for (unsigned int i = 0; i < nb_channels; ++i) {
+		if(subBlocks.at(i) != nullptr) {
+			iio->connect(subBlocks.at(i), 0, math, i);
+		} else {
+			iio->connect(adc_samp_conv_block, i, math, i);
+		}
+	}
 	iio->connect(math, 0, pair.second, 0);
 
 	if(xy_is_visible) {

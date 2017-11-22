@@ -135,6 +135,8 @@ namespace adiscope {
 		void onVertOffsetValueChanged(double value);
 		void onTimePositionChanged(double value);
 
+
+		void onChannelCouplingChanged(bool en);
 		void onChannelOffsetChanged(double value);
 
 		void onChannelWidgetEnabled(bool);
@@ -244,6 +246,10 @@ namespace adiscope {
 		QList<bool> high_gain_modes;
 		std::vector<double> channel_offset;
 
+		std::vector<bool> chnAcCoupled;
+		std::vector<gr::basic_block_sptr> filterBlocks;
+		std::vector<gr::basic_block_sptr> subBlocks;
+
 		bool trigger_is_forced;
 		bool new_data_is_triggered;
 		CapturePlot::TriggerState trigger_state;
@@ -324,6 +330,10 @@ namespace adiscope {
 		bool locked;
 		boost::shared_ptr<gr::blocks::float_to_complex> ftc;
 		void cancelZoom();
+
+		void configureAcCoupling(int, bool);
+		void activateAcCoupling(int);
+		void deactivateAcCoupling(int);
 	};
 
 	class Oscilloscope_API : public ApiObject

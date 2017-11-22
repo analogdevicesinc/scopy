@@ -116,7 +116,7 @@
         <x>0</x>
         <y>0</y>
         <width>228</width>
-        <height>468</height>
+        <height>472</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -577,10 +577,13 @@ QPushButton:hover {
          <property name="bottomMargin">
           <number>0</number>
          </property>
-         <property name="spacing">
+         <property name="horizontalSpacing">
           <number>0</number>
          </property>
-         <item row="1" column="0">
+         <property name="verticalSpacing">
+          <number>10</number>
+         </property>
+         <item row="1" column="0" colspan="2">
           <layout class="QVBoxLayout" name="vLayoutLineWidth">
            <property name="spacing">
             <number>0</number>
@@ -708,6 +711,48 @@ QPushButton:hover {
            </item>
           </layout>
          </item>
+         <item row="3" column="0" colspan="2">
+          <widget class="QWidget" name="wCoupling" native="true">
+           <layout class="QHBoxLayout" name="layCoupling">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>10</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="label_2">
+              <property name="styleSheet">
+               <string notr="true">color: rgba(255, 255, 255, 102);</string>
+              </property>
+              <property name="text">
+               <string>Software
+AC Coupling</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="adiscope::CustomSwitch" name="btnCoupled">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
         </layout>
        </item>
        <item>
@@ -729,6 +774,13 @@ QPushButton:hover {
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>adiscope::CustomSwitch</class>
+   <extends>QPushButton</extends>
+   <header>customSwitch.hpp</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
