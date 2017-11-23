@@ -225,6 +225,8 @@ void Debugger::updateRegMap()
 	}
 
 	ui->descriptionLabel->setText(QString("Description: ") + reg->getDescription());
+	ui->defaultValueLabel->setText(QString("0x%1").arg(reg->getDefaultValue(), 0,
+	                               16));
 
 	ui->addressSpinBox->blockSignals(false); //activate signals from Address spinbox
 }
