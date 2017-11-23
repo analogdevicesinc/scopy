@@ -182,42 +182,42 @@ void dBgraph::setYTitle(const QString& title)
 
 void dBgraph::setXMin(double val)
 {
+	zoomer->resetZoom();
 	setAxisScale(QwtPlot::xTop, val, xmax);
 	xmin = val;
 	draw_x->invalidateCache();
 
-	zoomer->cancel();
 	zoomer->setZoomBase();
 	replot();
 }
 
 void dBgraph::setXMax(double val)
 {
+	zoomer->resetZoom();
 	setAxisScale(QwtPlot::xTop, xmin, val);
 	xmax = val;
 	draw_x->invalidateCache();
 
-	zoomer->cancel();
 	zoomer->setZoomBase();
 	replot();
 }
 
 void dBgraph::setYMin(double val)
 {
+	zoomer->resetZoom();
 	setAxisScale(QwtPlot::yLeft, val, ymax);
 	ymin = val;
 
-	zoomer->cancel();
 	zoomer->setZoomBase();
 	replot();
 }
 
 void dBgraph::setYMax(double val)
 {
+	zoomer->resetZoom();
 	setAxisScale(QwtPlot::yLeft, ymin, val);
 	ymax = val;
 
-	zoomer->cancel();
 	zoomer->setZoomBase();
 	replot();
 }
