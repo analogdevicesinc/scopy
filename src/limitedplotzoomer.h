@@ -7,7 +7,8 @@ namespace adiscope {
 class LimitedPlotZoomer : public QwtPlotZoomer
 {
 public:
-        LimitedPlotZoomer(QWidget*, bool doReplot = false);
+	LimitedPlotZoomer(QWidget*, bool doReplot = false);
+	void resetZoom();
 
 protected:
         virtual void zoom(const QRectF &);

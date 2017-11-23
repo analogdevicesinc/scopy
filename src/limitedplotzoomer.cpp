@@ -8,6 +8,11 @@ LimitedPlotZoomer::LimitedPlotZoomer(QWidget *parent, bool doReplot):
 {
 }
 
+void LimitedPlotZoomer::resetZoom()
+{
+	QwtPlotZoomer::zoom(0);
+}
+
 void LimitedPlotZoomer::zoom(const QRectF &rect)
 {
     double xMinValue = plot()->axisInterval(xAxis()).minValue();
