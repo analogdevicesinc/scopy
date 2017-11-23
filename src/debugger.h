@@ -22,42 +22,42 @@ class Debugger;
 namespace adiscope {
 
 
-    class Debugger : public Tool
-    {
-        Q_OBJECT
+class Debugger : public Tool
+{
+	Q_OBJECT
 
-    public:
-        explicit Debugger(struct iio_context *ctx, Filter *filt,
-                          QJSEngine *engine, ToolLauncher *parent = 0);
-        ~Debugger();
+public:
+	explicit Debugger(struct iio_context *ctx, Filter *filt,
+	                  QJSEngine *engine, ToolLauncher *parent = 0);
+	~Debugger();
 
-    public Q_SLOTS:
-        void updateChannelComboBox(QString devName);
-        void updateAttributeComboBox(QString channel);
-        void updateFilename(int index);
-        void updateValueWidget(QString attribute);
-        void updateRegMap(void);
+public Q_SLOTS:
+	void updateChannelComboBox(QString devName);
+	void updateAttributeComboBox(QString channel);
+	void updateFilename(int index);
+	void updateValueWidget(QString attribute);
+	void updateRegMap(void);
 
-        void on_ReadButton_clicked();
-        void on_WriteButton_clicked();
+	void on_ReadButton_clicked();
+	void on_WriteButton_clicked();
 
-        void on_readRegPushButton_clicked();
-        void on_writeRegPushButton_clicked();
+	void on_readRegPushButton_clicked();
+	void on_writeRegPushButton_clicked();
 
-    private Q_SLOTS:
-        void on_detailedRegMapCheckBox_stateChanged(int arg1);
+private Q_SLOTS:
+	void on_detailedRegMapCheckBox_stateChanged(int arg1);
 
-    private:
-        void updateSources(void);
+private:
+	void updateSources(void);
 
-    private:
-        Ui::Debugger *ui;
+private:
+	Ui::Debugger *ui;
 
-        Debug debug;
+	Debug debug;
 
-        RegisterWidget *reg;
-        QVector<BitfieldWidget*> bitfieldsVector;
-    };
+	RegisterWidget *reg;
+	QVector<BitfieldWidget *> bitfieldsVector;
+};
 }
 
 #endif // MAINWINDOW_H
