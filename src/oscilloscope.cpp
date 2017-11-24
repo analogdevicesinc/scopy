@@ -537,6 +537,12 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 
 		if (channel_widget->menuButton()->isChecked() && isZoomOut)
 			onVertScaleValueChanged(voltsPerDiv->value());
+
+		for (int i = 0; i < nb_channels + nb_math_channels; ++i) {
+			QLabel *label = static_cast<QLabel *>(
+						ui->chn_scales->itemAt(i)->widget());
+			label->setText(vertMeasureFormat.format(plot.VertUnitsPerDiv(i), "V/div", 3));
+		}
 	});
 
 	export_settings_init();
