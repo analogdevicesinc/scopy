@@ -786,7 +786,9 @@ std::shared_ptr<MeasurementData> CapturePlot::measurement(int id, int chnIdx)
 
 OscPlotZoomer *CapturePlot::getZoomer()
 {
-	return static_cast<OscPlotZoomer* >(d_zoomer);
+	if (d_zoomer.isEmpty())
+		return nullptr;
+	return static_cast<OscPlotZoomer* >(d_zoomer[0]);
 }
 
 void CapturePlot::setOffsetInterval(double minValue, double maxValue)

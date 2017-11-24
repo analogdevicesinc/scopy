@@ -131,20 +131,20 @@ HistogramDisplayPlot::HistogramDisplayPlot(int nplots, QWidget* parent)
   d_xdata = new double[d_bins];
   memset(d_xdata, 0x0, d_bins*sizeof(double));
 
-  d_zoomer = new HistogramDisplayZoomer(canvas(), 0);
+  d_zoomer.push_back(new HistogramDisplayZoomer(canvas(), 0));
 
 #if QWT_VERSION < 0x060000
-  d_zoomer->setSelectionFlags(QwtPicker::RectSelection | QwtPicker::DragSelection);
+  d_zoomer[0]->setSelectionFlags(QwtPicker::RectSelection | QwtPicker::DragSelection);
 #endif
 
-  d_zoomer->setMousePattern(QwtEventPattern::MouseSelect2,
+  d_zoomer[0]->setMousePattern(QwtEventPattern::MouseSelect2,
                             Qt::RightButton, Qt::ControlModifier);
-  d_zoomer->setMousePattern(QwtEventPattern::MouseSelect3,
+  d_zoomer[0]->setMousePattern(QwtEventPattern::MouseSelect3,
                             Qt::RightButton);
 
   const QColor c(Qt::darkRed);
-  d_zoomer->setRubberBandPen(c);
-  d_zoomer->setTrackerPen(c);
+  d_zoomer[0]->setRubberBandPen(c);
+  d_zoomer[0]->setTrackerPen(c);
 
   d_semilogx = false;
   d_semilogy = false;
@@ -303,7 +303,7 @@ HistogramDisplayPlot::_resetXAxisPoints(double left, double right)
 
   // Set up zoomer base for maximum unzoom x-axis
   // and reset to maximum unzoom level
-  QwtDoubleRect zbase = d_zoomer->zoomBase();
+  QwtDoubleRect zbase = d_zoomer[0]->zoomBase();
 
   if(d_semilogx) {
     setAxisScale(QwtPlot::xBottom, 1e-1, d_right);
@@ -315,9 +315,9 @@ HistogramDisplayPlot::_resetXAxisPoints(double left, double right)
   }
 
   zbase.setRight(d_right);
-  d_zoomer->zoom(zbase);
-  d_zoomer->setZoomBase(zbase);
-  d_zoomer->zoom(0);
+  d_zoomer[0]->zoom(zbase);
+  d_zoomer[0]->setZoomBase(zbase);
+  d_zoomer[0]->zoom(0);
 }
 
 void

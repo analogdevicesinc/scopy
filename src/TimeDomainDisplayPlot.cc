@@ -166,23 +166,23 @@ TimeDomainDisplayPlot::TimeDomainDisplayPlot(QWidget* parent, unsigned int xNumD
 
   d_yAxisUnit = "";
 
-  d_zoomer = new TimeDomainDisplayZoomer(canvas());
+  //d_zoomer = new TimeDomainDisplayZoomer(canvas());
 
   QFont font("DejaVu Sans", 10, 75);
-  d_zoomer->setTrackerFont(font);
+  //d_zoomer->setTrackerFont(font);
 
 #if QWT_VERSION < 0x060000
-  d_zoomer->setSelectionFlags(QwtPicker::RectSelection | QwtPicker::DragSelection);
+  //d_zoomer->setSelectionFlags(QwtPicker::RectSelection | QwtPicker::DragSelection);
 #endif
 
-  d_zoomer->setMousePattern(QwtEventPattern::MouseSelect2,
-			   Qt::RightButton, Qt::ControlModifier);
-  d_zoomer->setMousePattern(QwtEventPattern::MouseSelect3,
-			   Qt::RightButton);
+  //d_zoomer->setMousePattern(QwtEventPattern::MouseSelect2,
+//			   Qt::RightButton, Qt::ControlModifier);
+  //d_zoomer->setMousePattern(QwtEventPattern::MouseSelect3,
+	//		   Qt::RightButton);
 
   const QColor c("#999999");
-  d_zoomer->setRubberBandPen(c);
-  d_zoomer->setTrackerPen(c);
+  //d_zoomer->setRubberBandPen(c);
+  //d_zoomer->setTrackerPen(c);
 
   d_semilogx = false;
   d_semilogy = false;
@@ -207,6 +207,11 @@ TimeDomainDisplayPlot::TimeDomainDisplayPlot(QWidget* parent, unsigned int xNumD
   d_trigger_lines[1]->setRenderHint(QwtPlotItem::RenderAntialiased);
   d_trigger_lines[1]->setXValue(0.0);
   d_trigger_lines[1]->setYValue(0.0);
+
+  for (int i = 0; i < 6; i++) {
+	  d_zoomer.push_back(new TimeDomainDisplayZoomer(this->canvas()));
+	  d_zoomer[i]->setEnabled(false);
+  }
 }
 
 
@@ -690,19 +695,26 @@ TimeDomainDisplayPlot::setTagBackgroundStyle(Qt::BrushStyle b)
 
 void TimeDomainDisplayPlot::setZoomerEnabled(bool en)
 {
-	d_zoomer->setEnabled(en);
+	for (unsigned int i = 0; i < d_zoomer.size(); ++i)
+		d_zoomer[i]->setEnabled(en);
 }
 
 bool TimeDomainDisplayPlot::isZoomerEnabled()
 {
-	return d_zoomer->isEnabled();
+	if (d_zoomer.isEmpty())
+		return false;
+	return d_zoomer[0]->isEnabled();
 }
 
 void TimeDomainDisplayPlot::setZoomerVertAxis(int index)
 {
-	if (index > -1 && index < axesCount(QwtPlot::yLeft))
-		d_zoomer->setAxes(QwtAxisId(QwtPlot::xBottom, 0),
-			QwtAxisId(QwtPlot::yLeft, index));
+	if (index < -1 || index >= axesCount(QwtPlot::yLeft))
+		return;
+
+	for (unsigned int i = 0; i < d_zoomer.size(); ++i)
+		if (d_zoomer[i]->isEnabled())
+			d_zoomer[i]->setTrackerMode(
+					(i == index) ? QwtPicker::AlwaysOn : QwtPicker::AlwaysOff);
 }
 
 QString TimeDomainDisplayPlot::timeScaleValueFormat(double value, int precision) const
@@ -901,8 +913,10 @@ void TimeDomainDisplayPlot::cleanUpJustBeforeChannelRemoval(int)
 
 void TimeDomainDisplayPlot::cancelZoom()
 {
-	OscPlotZoomer *zoomer = static_cast<OscPlotZoomer *>(d_zoomer);
-	zoomer->cancel();
+	for (unsigned int i = 0; i < d_zoomer.size(); ++i) {
+		OscPlotZoomer *zoomer = static_cast<OscPlotZoomer *>(d_zoomer[i]);
+		zoomer->cancel();
+	}
 }
 
 long TimeDomainDisplayPlot::dataStartingPoint() const

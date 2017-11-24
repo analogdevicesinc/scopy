@@ -74,7 +74,7 @@ FftDisplayPlot::FftDisplayPlot(int nplots, QWidget *parent) :
 	// TO DO: Add more colors
 	d_markerColors << QColor(255, 242, 0) << QColor(210, 155, 210);
 
-	d_zoomer = nullptr;
+	d_zoomer.push_back(nullptr);
 
 	for (unsigned int i = 0; i < nplots; i++) {
 		auto plot = new QwtPlotCurve(QString("Data %1").arg(i));
@@ -167,24 +167,24 @@ void FftDisplayPlot::replot()
 
 void FftDisplayPlot::setZoomerEnabled()
 {
-        if(!d_zoomer) {
-                d_zoomer = new FftDisplayZoomer(canvas());
+	if(!d_zoomer[0]) {
+		d_zoomer[0] = new FftDisplayZoomer(canvas());
 
                 QFont font("DejaVu Sans", 10, 75);
-                d_zoomer->setTrackerFont(font);
+		d_zoomer[0]->setTrackerFont(font);
 
 #if QWT_VERSION < 0x060000
-                d_zoomer->setSelectionFlags(QwtPicker::RectSelection | QwtPicker::DragSelection);
+		d_zoomer[0]->setSelectionFlags(QwtPicker::RectSelection | QwtPicker::DragSelection);
 #endif
 
-                d_zoomer->setMousePattern(QwtEventPattern::MouseSelect2,
+		d_zoomer[0]->setMousePattern(QwtEventPattern::MouseSelect2,
                                           Qt::RightButton, Qt::ControlModifier);
-                d_zoomer->setMousePattern(QwtEventPattern::MouseSelect3,
+		d_zoomer[0]->setMousePattern(QwtEventPattern::MouseSelect3,
                                           Qt::RightButton);
 
                 const QColor c("#999999");
-                d_zoomer->setRubberBandPen(c);
-                d_zoomer->setTrackerPen(c);
+		d_zoomer[0]->setRubberBandPen(c);
+		d_zoomer[0]->setTrackerPen(c);
         }
 }
 
