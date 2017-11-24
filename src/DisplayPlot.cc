@@ -217,6 +217,9 @@ void OscPlotZoomer::rescale()
 	if ( !plt )
 	    return;
 
+	if (!plt->canvas()->isVisible())
+		return;
+
 	const QStack<QRectF> &stack = zoomStack();
 	int index = zoomRectIndex();
 	const QRectF &rect = stack[index];
@@ -239,8 +242,10 @@ void OscPlotZoomer::rescale()
 	    }
 
 	    double width = fabs(x1 - x2);
-	    plt->setHorizUnitsPerDiv(width / plt->xAxisNumDiv());
-	    plt->setHorizOffset(x1 + (width / 2));
+	    if (yAxis().id == 0) {
+		plt->setHorizUnitsPerDiv(width / plt->xAxisNumDiv());
+		plt->setHorizOffset(x1 + (width / 2));
+	    }
 
 	    double y1 = rect.top();
 	    double y2 = rect.bottom();
@@ -248,8 +253,8 @@ void OscPlotZoomer::rescale()
 		qSwap( y1, y2 );
 
 	    double height = fabs(y1 - y2);
-	    plt->setVertUnitsPerDiv(height / plt->yAxisNumDiv());
-	    plt->setVertOffset(y1 + (height / 2));
+	    plt->setVertUnitsPerDiv(height / plt->yAxisNumDiv(), yAxis().id);
+	    plt->setVertOffset(y1 + (height / 2), yAxis().id);
 
 	    plt->setAutoReplot( doReplot );
 
@@ -518,15 +523,18 @@ void
 DisplayPlot::setYaxis(double min, double max)
 {
   setAxisScale(QwtPlot::yLeft, min, max);
-  if(!d_autoscale_state)
-    d_zoomer->setZoomBase();
+  if(!d_autoscale_state) {
+    for (unsigned int i = 0; i < d_zoomer.size(); ++i)
+	    d_zoomer[i]->setZoomBase();
+  }
 }
 
 void
 DisplayPlot::setXaxis(double min, double max)
 {
   setAxisScale(QwtPlot::xBottom, min, max);
-  d_zoomer->setZoomBase();
+  for (unsigned int i = 0; i < d_zoomer.size(); ++i)
+	  d_zoomer[i]->setZoomBase();
 }
 
 void
@@ -599,13 +607,15 @@ SETUPLINE(9, 8)
 
 void
 DisplayPlot::setZoomerColor(QColor c) {
-  d_zoomer->setRubberBandPen(c);
-  d_zoomer->setTrackerPen(c);
+  for (unsigned int i = 0; i < d_zoomer.size(); ++i) {
+	d_zoomer[i]->setRubberBandPen(c);
+	d_zoomer[i]->setTrackerPen(c);
+  }
 }
 
 QColor
 DisplayPlot::getZoomerColor() const {
-  return d_zoomer->rubberBandPen().color();
+  return d_zoomer[0]->rubberBandPen().color();
 }
 
 void
@@ -851,7 +861,8 @@ DisplayPlot::onPickerPointSelected6(const QPointF & p)
 
 void DisplayPlot::zoomBaseUpdate()
 {
-	d_zoomer->setZoomBase(true);
+	for (unsigned int i = 0; i < d_zoomer.size(); ++i)
+		d_zoomer[i]->setZoomBase(true);
 }
 
 void DisplayPlot::AddAxisOffset(int axisPos, int axisIdx, double offset)
@@ -1133,7 +1144,10 @@ void DisplayPlot::_onYleftAxisWidgetScaleDivChanged()
 
 QwtPlotZoomer *DisplayPlot::getZoomer() const
 {
-	return d_zoomer;
+	if (d_zoomer.isEmpty())
+		return nullptr;
+
+	return d_zoomer[0];
 }
 
 void DisplayPlot::horizAxisScaleIncrease()

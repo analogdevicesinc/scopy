@@ -72,20 +72,20 @@ ConstellationDisplayPlot::ConstellationDisplayPlot(int nplots, QWidget* parent)
   d_numPoints = 1024;
   d_pen_size = 5;
 
-  d_zoomer = new ConstellationDisplayZoomer(canvas());
+  d_zoomer.push_back(new ConstellationDisplayZoomer(canvas()));
 
 #if QWT_VERSION < 0x060000
-  d_zoomer->setSelectionFlags(QwtPicker::RectSelection | QwtPicker::DragSelection);
+  d_zoomer[0]->setSelectionFlags(QwtPicker::RectSelection | QwtPicker::DragSelection);
 #endif
 
-  d_zoomer->setMousePattern(QwtEventPattern::MouseSelect2,
+  d_zoomer[0]->setMousePattern(QwtEventPattern::MouseSelect2,
                             Qt::RightButton, Qt::ControlModifier);
-  d_zoomer->setMousePattern(QwtEventPattern::MouseSelect3,
+  d_zoomer[0]->setMousePattern(QwtEventPattern::MouseSelect3,
                             Qt::RightButton);
 
   const QColor c(Qt::darkRed);
-  d_zoomer->setRubberBandPen(c);
-  d_zoomer->setTrackerPen(c);
+  d_zoomer[0]->setRubberBandPen(c);
+  d_zoomer[0]->setTrackerPen(c);
 
 //  setAxisScaleEngine(QwtPlot::xBottom, new QwtLinearScaleEngine);
 //  set_xaxis(-2.0, 2.0);

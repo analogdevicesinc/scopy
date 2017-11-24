@@ -510,7 +510,7 @@ protected:
   QString d_xAxisUnit;
 
   QwtPlotPanner* d_panner;
-  QwtPlotZoomer* d_zoomer;
+  QVector<QwtPlotZoomer*> d_zoomer;
   QwtPlotGrid *d_grid;
 
   QwtDblClickPlotPicker *d_picker;
