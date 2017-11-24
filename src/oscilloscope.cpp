@@ -206,7 +206,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	connect(triggerUpdater, SIGNAL(outputChanged(int)),
 		&plot, SLOT(setTriggerState(int)));
 
-	plot.setZoomerEnabled(true);
+	//plot.setZoomerEnabled(true);
 	fft_plot.setZoomerEnabled();
 	create_math_panel();
 
@@ -278,6 +278,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		plot.Curve(i)->setAxes(
 				QwtAxisId(QwtPlot::xBottom, 0),
 				QwtAxisId(QwtPlot::yLeft, i));
+		plot.addZoomer(i);
 	}
 
 	plot.levelTriggerA()->setMobileAxis(QwtAxisId(QwtPlot::yLeft, 0));
@@ -897,6 +898,7 @@ void Oscilloscope::add_math_channel(const std::string& function)
 	plot.Curve(curve_id)->setAxes(
 			QwtAxisId(QwtPlot::xBottom, 0),
 			QwtAxisId(QwtPlot::yLeft, curve_id));
+	plot.addZoomer(curve_id);
 	plot.replot();
 
 	/* We added a Math channel that is enabled by default,
@@ -1065,6 +1067,7 @@ void Oscilloscope::onChannelWidgetDeleteClicked()
 				QwtAxisId(QwtPlot::xBottom, 0),
 				QwtAxisId(QwtPlot::yLeft, i));
 	}
+	plot.removeZoomer(curve_id);
 	updateRunButton(false);
 	plot.replot();
 }
