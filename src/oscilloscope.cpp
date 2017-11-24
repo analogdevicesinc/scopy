@@ -526,6 +526,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		zoom_level++;
 	});
 	connect(plot.getZoomer(), &OscPlotZoomer::zoomOut, [=](){
+		if (timePositions.empty())
+			return;
 		timePosition->setValue(timePositions.pop());
 		zoom_level--;
 	});
