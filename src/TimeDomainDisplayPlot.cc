@@ -538,6 +538,55 @@ TimeDomainDisplayPlot::_autoScale(double bottom, double top)
 }
 
 void
+TimeDomainDisplayPlot::addZoomer(unsigned int zoomerIdx)
+{
+	QFont font("DejaVu Sans", 10, 75);
+	d_zoomer[zoomerIdx]->setTrackerFont(font);
+
+	#if QWT_VERSION < 0x060000
+		d_zoomer[zoomerIdx]->setSelectionFlags(QwtPicker::RectSelection | QwtPicker::DragSelection);
+	#endif
+
+	d_zoomer[zoomerIdx]->setMousePattern(QwtEventPattern::MouseSelect2,
+				 Qt::RightButton, Qt::ControlModifier);
+	d_zoomer[zoomerIdx]->setMousePattern(QwtEventPattern::MouseSelect3,
+				 Qt::RightButton);
+	d_zoomer[zoomerIdx]->setTrackerMode(QwtPicker::AlwaysOff);
+	const QColor c("#999999");
+	d_zoomer[zoomerIdx]->setRubberBandPen(c);
+	d_zoomer[zoomerIdx]->setTrackerPen(c);
+
+	d_zoomer[zoomerIdx]->setEnabled(true);
+	d_zoomer[zoomerIdx]->setAxes(QwtAxisId(QwtPlot::xBottom, 0), QwtAxisId(QwtPlot::yLeft, zoomerIdx));
+}
+
+void
+TimeDomainDisplayPlot::removeZoomer(unsigned int zoomerIdx)
+{
+	if (zoomerIdx == 0 || zoomerIdx == 1) {
+		d_zoomer[zoomerIdx]->setEnabled(false);
+		return;
+	}
+
+	int toDisable = zoomerIdx;
+	while (d_zoomer[toDisable]->isEnabled()
+			&& toDisable < d_zoomer.size() - 1) {
+		toDisable++;
+	}
+
+	if (toDisable == d_zoomer.size() - 1 && d_zoomer[toDisable]->isEnabled()) {
+		d_zoomer[toDisable]->setEnabled(false);
+	} else {
+		d_zoomer[toDisable - 1]->setEnabled(false);
+	}
+
+	for (int i = 0; i < d_zoomer.size(); ++i) {
+		if (d_zoomer[i]->isEnabled())
+			d_zoomer[i]->setAxes(QwtAxisId(QwtPlot::xBottom, 0), QwtAxisId(QwtPlot::yLeft, i));
+	}
+}
+
+void
 TimeDomainDisplayPlot::setAutoScale(bool state)
 {
   d_autoscale_state = state;

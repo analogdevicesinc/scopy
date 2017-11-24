@@ -114,6 +114,9 @@ public:
 
   long dataStartingPoint() const;
 
+  void addZoomer(unsigned int zoomerIdx);
+  void removeZoomer(unsigned int zoomerIdx);
+
 Q_SIGNALS:
   void channelAdded(int);
   void newData();
