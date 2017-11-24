@@ -223,12 +223,16 @@ void OscPlotZoomer::rescale()
 	const QStack<QRectF> &stack = zoomStack();
 	int index = zoomRectIndex();
 	const QRectF &rect = stack[index];
+	bool isZoomOut = false;
 	if ( rect != scaleRect() )
 	{
-	    if (lastIndex < index)
+	    if (lastIndex < index) {
 		    Q_EMIT zoomIn();
-	    else
+	    }
+	    else {
 		    Q_EMIT zoomOut();
+		    isZoomOut = true;
+	    }
 	    lastIndex = index;
 
 	    const bool doReplot = plt->autoReplot();
@@ -260,7 +264,7 @@ void OscPlotZoomer::rescale()
 
 	    plt->replot();
 
-	    Q_EMIT zoomFinished();
+	    Q_EMIT zoomFinished(isZoomOut);
 	}
 }
 
