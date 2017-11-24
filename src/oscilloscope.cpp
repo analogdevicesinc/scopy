@@ -529,13 +529,13 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		timePosition->setValue(timePositions.pop());
 		zoom_level--;
 	});
-	connect(plot.getZoomer(), &OscPlotZoomer::zoomFinished, [=](){
+	connect(plot.getZoomer(), &OscPlotZoomer::zoomFinished, [=](bool isZoomOut){
 		ChannelWidget *channel_widget = channelWidgetAtId(current_ch_widget);
 
 		if (!channel_widget)
 			return;
 
-		if (channel_widget->menuButton()->isChecked())
+		if (channel_widget->menuButton()->isChecked() && isZoomOut)
 			onVertScaleValueChanged(voltsPerDiv->value());
 	});
 
