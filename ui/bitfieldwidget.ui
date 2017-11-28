@@ -93,7 +93,7 @@
         </sizepolicy>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="page">
         <property name="sizePolicy">
@@ -129,7 +129,7 @@
             <string>0x</string>
            </property>
            <property name="maximum">
-            <number>65535</number>
+            <number>999999999</number>
            </property>
            <property name="displayIntegerBase">
             <number>16</number>

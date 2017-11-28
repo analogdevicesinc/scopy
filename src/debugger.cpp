@@ -38,8 +38,7 @@ Debugger::Debugger(struct iio_context *ctx, Filter *filt,
 	                 &Debugger::updateValueWidget);
 	QObject::connect(ui->DevicecomboBox, &QComboBox::currentTextChanged, this,
 	                 &Debugger::updateSources);
-	QObject::connect(ui->DevicecomboBox, &QComboBox::currentTextChanged, this,
-	                 &Debugger::updateRegMap);
+
 	QObject::connect(ui->addressSpinBox, SIGNAL(valueChanged(int)), this,
 	                 SLOT(updateRegMap()));
 
@@ -47,6 +46,11 @@ Debugger::Debugger(struct iio_context *ctx, Filter *filt,
 	                 SLOT(setValue(int)));
 	QObject::connect(this->reg, SIGNAL(valueChanged(int)), ui->valueSpinBox,
 	                 SLOT(setValue(int)));
+
+	QObject::connect(ui->DevicecomboBox, &QComboBox::currentTextChanged, this,
+	                 &Debugger::updateRegMap);
+	QObject::connect(ui->sourceComboBox, &QComboBox::currentTextChanged, this,
+	                 &Debugger::updateRegMap);
 
 
 	on_detailedRegMapCheckBox_stateChanged(0);
@@ -62,8 +66,11 @@ void Debugger::updateChannelComboBox(QString devName)
 	QStringList channels;
 
 	ui->ChannelComboBox->blockSignals(true);
+	ui->addressSpinBox->blockSignals(true);
 	ui->ChannelComboBox->clear();
+	ui->addressSpinBox->setValue(0);
 	ui->ChannelComboBox->blockSignals(false);
+	ui->addressSpinBox->blockSignals(false);
 
 	debug.scanChannels(devName);
 	channels = debug.getChannelList();
@@ -205,8 +212,13 @@ void Debugger::updateSources()
 	reg->verifyAvailableSources(ui->DevicecomboBox->currentText());
 	QStringList list = reg->getSources();
 
+	ui->sourceComboBox->blockSignals(true);
 	ui->sourceComboBox->clear();
 	ui->sourceComboBox->addItems(list);
+	ui->sourceComboBox->blockSignals(false);
+
+	Q_EMIT ui->sourceComboBox->currentTextChanged(
+	        ui->sourceComboBox->currentText());
 }
 
 void Debugger::updateRegMap()
@@ -220,11 +232,15 @@ void Debugger::updateRegMap()
 	reg->createRegMap(&device, &address, &source);
 	ui->addressSpinBox->setValue(address);
 
+	if (!ui->sourceComboBox->currentText().isEmpty()) {
+		ui->addressSpinBox->setMaximum(reg->getLastAddress());
+	}
+
 	if (ui->enableAutoReadCheckBox->isChecked()) {
 		on_readRegPushButton_clicked();
 	}
 
-	ui->descriptionLabel->setText(QString("Description: ") + reg->getDescription());
+	ui->descriptionLineEdit->setText(reg->getDescription());
 	ui->defaultValueLabel->setText(QString("0x%1").arg(reg->getDefaultValue(), 0,
 	                               16));
 

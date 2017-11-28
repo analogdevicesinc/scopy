@@ -129,6 +129,19 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
       <number>0</number>
      </property>
      <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
       <layout class="QVBoxLayout" name="verticalLayout">
        <property name="spacing">
         <number>0</number>
@@ -179,7 +192,7 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
            <number>0</number>
           </property>
           <item>
-           <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0,0,0" rowminimumheight="0,0,0,0,0,0">
+           <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0,0,0">
             <property name="sizeConstraint">
              <enum>QLayout::SetFixedSize</enum>
             </property>
@@ -190,7 +203,7 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
              <number>15</number>
             </property>
             <property name="verticalSpacing">
-             <number>20</number>
+             <number>10</number>
             </property>
             <item row="3" column="0">
              <widget class="QLabel" name="IIODeviceAttributesLabel">
@@ -263,15 +276,15 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
               </property>
              </widget>
             </item>
+            <item row="4" column="1">
+             <widget class="QComboBox" name="ChannelComboBox"/>
+            </item>
             <item row="5" column="0">
              <widget class="QPushButton" name="WriteButton">
               <property name="text">
                <string>Write</string>
               </property>
              </widget>
-            </item>
-            <item row="4" column="1">
-             <widget class="QComboBox" name="ChannelComboBox"/>
             </item>
             <item row="0" column="0">
              <widget class="QLabel" name="DeviceSelectionLabel">
@@ -298,6 +311,9 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
                <set>Qt::AlignCenter</set>
               </property>
              </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QComboBox" name="DevicecomboBox"/>
             </item>
             <item row="4" column="0">
              <widget class="QPushButton" name="ReadButton">
@@ -369,25 +385,6 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
                </widget>
               </widget>
              </widget>
-            </item>
-            <item row="2" column="1">
-             <widget class="QComboBox" name="DevicecomboBox"/>
-            </item>
-            <item row="4" column="5">
-             <spacer name="horizontalSpacer_2">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeType">
-               <enum>QSizePolicy::Expanding</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
             </item>
            </layout>
           </item>
@@ -511,7 +508,7 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
                <string>0x</string>
               </property>
               <property name="maximum">
-               <number>255</number>
+               <number>65535</number>
               </property>
               <property name="value">
                <number>0</number>
@@ -521,35 +518,6 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
               </property>
              </widget>
             </item>
-            <item row="6" column="6">
-             <spacer name="horizontalSpacer_5">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeType">
-               <enum>QSizePolicy::MinimumExpanding</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item row="6" column="4">
-             <spacer name="horizontalSpacer_3">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
             <item row="6" column="0">
              <widget class="QPushButton" name="readRegPushButton">
               <property name="text">
@@ -557,14 +525,14 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
               </property>
              </widget>
             </item>
-            <item row="6" column="5">
+            <item row="6" column="4">
              <widget class="QLabel" name="descriptionLabel">
               <property name="text">
                <string>Description:</string>
               </property>
              </widget>
             </item>
-            <item row="9" column="5">
+            <item row="9" column="4">
              <widget class="QLabel" name="defaultValueLabel">
               <property name="text">
                <string>Default Value:</string>
@@ -577,7 +545,7 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
                <string>0x</string>
               </property>
               <property name="maximum">
-               <number>65535</number>
+               <number>429496729</number>
               </property>
               <property name="displayIntegerBase">
                <number>16</number>
@@ -624,6 +592,19 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
               </property>
              </widget>
             </item>
+            <item row="6" column="5">
+             <widget class="QLineEdit" name="descriptionLineEdit">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
            </layout>
           </item>
          </layout>
@@ -640,22 +621,6 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
          <property name="topMargin">
           <number>0</number>
          </property>
-         <item>
-          <spacer name="horizontalSpacer_4">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeType">
-            <enum>QSizePolicy::Preferred</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
          <item>
           <widget class="QWidget" name="widget" native="true">
            <property name="sizePolicy">
@@ -694,22 +659,6 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
             </property>
            </layout>
           </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer_6">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeType">
-            <enum>QSizePolicy::Preferred</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
          </item>
         </layout>
        </item>

@@ -29,6 +29,7 @@ public:
 	void verifyAvailableSources(const QString device);
 	QString getDescription() const;
 	uint32_t getDefaultValue(void) const;
+	uint32_t getLastAddress(void) const;
 
 Q_SIGNALS:
 	void valueChanged(int);
