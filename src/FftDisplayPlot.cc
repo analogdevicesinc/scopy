@@ -23,13 +23,14 @@
 #include "average.h"
 #include "spectrum_marker.hpp"
 #include "marker_controller.h"
+#include "limitedplotzoomer.h"
 
 #include <qwt_symbol.h>
 #include <boost/make_shared.hpp>
 
 using namespace adiscope;
 
-class FftDisplayZoomer: public QwtPlotZoomer
+class FftDisplayZoomer: public LimitedPlotZoomer
 {
 public:
 #if QWT_VERSION < 0x060100
@@ -37,7 +38,7 @@ public:
 #else /* QWT_VERSION < 0x060100 */
   FftDisplayZoomer(QWidget* canvas)
 #endif /* QWT_VERSION < 0x060100 */
-    : QwtPlotZoomer(canvas)
+    : LimitedPlotZoomer(canvas)
   {
     setTrackerMode(QwtPicker::AlwaysOn);
   }
