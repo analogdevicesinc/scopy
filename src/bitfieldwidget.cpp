@@ -72,7 +72,9 @@ void BitfieldWidget::createWidget()
 	if (options.isNull()) {
 		/*set spinBox*/
 		ui->stackedWidget->setCurrentIndex(1);
-		ui->valueSpinBox->setMaximum((int)(pow(2, width) - 1));
+		int temp = (int)pow(2, width) - 1;
+		long temp2= ui->valueSpinBox->maximum();
+		ui->valueSpinBox->setMaximum(temp);
 		connect(ui->valueSpinBox, SIGNAL(valueChanged(int)), this,
 		        SLOT(setValue(int))); //connect spinBox singnal to the value changed signal
 	} else {
@@ -95,8 +97,10 @@ void BitfieldWidget::createWidget()
 
 void BitfieldWidget::updateValue(uint32_t *value)
 {
+	int temp = *value & ((uint32_t)pow(2, width)  - 1);
+
 	if (ui->stackedWidget->currentIndex() == 1) {
-		ui->valueSpinBox->setValue(*value & ((uint32_t)pow(2, width)  - 1));
+		ui->valueSpinBox->setValue(temp);
 	} else {
 		ui->valueComboBox->setCurrentIndex(*value & ((uint32_t)pow(2, width) - 1));
 	}

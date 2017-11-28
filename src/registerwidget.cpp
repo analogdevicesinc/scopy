@@ -5,11 +5,13 @@ using namespace adiscope;
 
 RegisterWidget::RegisterWidget(QWidget *parent,  Debug  *debug) :
 	QWidget(parent),
-	ui(new Ui::RegisterWidget)
+	ui(new Ui::RegisterWidget),
+	address(0)
 {
 	ui->setupUi(this);
 
 	regMap.setIioContext(debug->getIioContext());
+
 
 	QObject::connect(this, &RegisterWidget::valueChanged, this,
 	                 &RegisterWidget::updateBitfields);
@@ -20,6 +22,11 @@ RegisterWidget::~RegisterWidget()
 	delete ui;
 }
 
+uint32_t RegisterWidget::getLastAddress(void) const
+{
+	return regMap.getLastAddress();
+}
+
 void RegisterWidget::createRegMap(const QString *device, int *address,
                                   const QString *source)
 {
@@ -27,7 +34,7 @@ void RegisterWidget::createRegMap(const QString *device, int *address,
 	QString addr;
 	bool goHigh = false;
 
-	if (*address > this->address) {
+	if (*address >= this->address) {
 		goHigh = true;
 	}
 
@@ -64,7 +71,9 @@ void RegisterWidget::createRegMap(const QString *device, int *address,
 			}
 		}
 
-		this->address = *address;
+		bool status;
+		this->address =
+		        regNode->firstChildElement("Address").text().split("0x")[1].toUInt(&status, 16);
 
 		/*get register information from the node*/
 		name = regNode->firstChildElement("Name").text();
@@ -99,6 +108,15 @@ void RegisterWidget::createRegMap(const QString *device, int *address,
 	}
 }
 
+bool lessThan(const BitfieldWidget *b1, const BitfieldWidget *b2)
+{
+	if (b1->getRegOffset() <= b2->getRegOffset()) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
 void RegisterWidget::checkRegisterMap(void)
 {
 	int size = 0;
@@ -108,6 +126,9 @@ void RegisterWidget::checkRegisterMap(void)
 	int count = 0;
 	int gap;
 	int bit = 0;
+
+	/*sort vector using bit number*/
+	qSort(bitfieldsVector.begin(), bitfieldsVector.end(), lessThan);
 
 	for (auto iterator = bitfieldsVector.begin(); iterator != bitfieldsVector.end();
 	     ++iterator) {
@@ -159,6 +180,19 @@ void RegisterWidget::checkRegisterMap(void)
 		}
 
 		/*if bits are missing at the end of the register*/
+		size = 0;
+		count = 0;
+
+		for (auto iterator = bitfieldsVector.begin(); iterator != bitfieldsVector.end();
+		     ++iterator) {
+			size += (*iterator)->getSliceWidth();
+			slice[count] = (*iterator)->getSliceWidth();
+			regOffsets[count] = (*iterator)->getRegOffset();
+			count++;
+		}
+
+		bit = size;
+
 		while (size < width) {
 			bitfieldsVector.insert(count, new BitfieldWidget(this, bit++));
 			count++;

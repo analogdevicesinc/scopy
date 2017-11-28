@@ -32,6 +32,7 @@ public:
 	~Debugger();
 
 public Q_SLOTS:
+	void updateSources(void);
 	void updateChannelComboBox(QString devName);
 	void updateAttributeComboBox(QString channel);
 	void updateFilename(int index);
@@ -44,11 +45,9 @@ public Q_SLOTS:
 	void on_readRegPushButton_clicked();
 	void on_writeRegPushButton_clicked();
 
+
 private Q_SLOTS:
 	void on_detailedRegMapCheckBox_stateChanged(int arg1);
-
-private:
-	void updateSources(void);
 
 private:
 	Ui::Debugger *ui;
