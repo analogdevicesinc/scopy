@@ -365,6 +365,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 	connect(runButton, SIGNAL(toggled(bool)),
 	        this, SLOT(startStop(bool)));
 
+	plot->addZoomer(0);
 	resetZoom();
 }
 
