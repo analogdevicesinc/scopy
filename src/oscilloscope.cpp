@@ -111,6 +111,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	measure_settings_init();
 
 	fft_size = 1024;
+	fft_plot.setNumPoints(0);
 
 	last_set_sample_count = 0;
 	last_set_time_pos = 0;
@@ -1193,6 +1194,12 @@ void Oscilloscope::onFFT_view_toggled(bool visible)
 		iio->lock();
 
 	if (visible) {
+		qt_fft_block->set_nsamps(fft_size);
+		if (fft_is_visible) {
+			for (unsigned int i = 0; i < nb_channels; i++)
+				iio->disconnect(fft_ids[i]);
+		}
+
 		setFFT_params();
 		for (unsigned int i = 0; i < nb_channels; i++) {
 			auto fft = gnuradio::get_initial_sptr(
@@ -1209,12 +1216,19 @@ void Oscilloscope::onFFT_view_toggled(bool visible)
 				iio->start(fft_ids[i]);
 		}
 
+		for (unsigned int i = 0; i < nb_channels; i++) {
+			iio->set_buffer_size(fft_ids[i], fft_size);
+		}
+
 		ui->container_fft_plot->show();
 	} else {
 		ui->container_fft_plot->hide();
 
-		for (unsigned int i = 0; i < nb_channels; i++)
-			iio->disconnect(fft_ids[i]);
+		if (fft_is_visible) {
+			for (unsigned int i = 0; i < nb_channels; i++) {
+				iio->disconnect(fft_ids[i]);
+			}
+		}
 	}
 
 	fft_is_visible = visible;
@@ -1398,34 +1412,6 @@ void Oscilloscope::comboBoxUpdateToValue(QComboBox *box, double value, std::vect
 				[&value](const double element) {return element == value;} ) - list.begin();
 	if (i < list.size())
 		box->setCurrentIndex(i);
-}
-
-void adiscope::Oscilloscope::apply_fft_buffersize()
-{
-	if (fft_is_visible) {
-		bool started = iio->started();
-		if (started)
-			iio->lock();
-
-		qt_fft_block->set_nsamps(fft_size);
-
-		for (unsigned int i = 0; i < nb_channels; i++)
-			iio->disconnect(fft_ids[i]);
-
-		if (started)
-			iio->unlock();
-
-		onFFT_view_toggled(fft_is_visible);
-
-		if (started)
-			iio->lock();
-
-		for (unsigned int i = 0; i < nb_channels; i++)
-			iio->set_buffer_size(fft_ids[i], fft_size);
-
-		if (started)
-			iio->unlock();
-	}
 }
 
 void adiscope::Oscilloscope::updateRunButton(bool ch_enabled)
@@ -1639,7 +1625,7 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 	// Compute the appropriate value for fft_size
 	double power = ceil(log2(active_sample_count));
 	fft_size = pow(2, power);
-	apply_fft_buffersize();
+	onFFT_view_toggled(fft_is_visible);
 
 	// Change the sensitivity of time position control
 	timePosition->setStep(value / 10);
@@ -1726,7 +1712,7 @@ void adiscope::Oscilloscope::onTimePositionChanged(double value)
 	// Compute the appropriate value for fft_size
 	double power = ceil(log2(active_sample_count));
 	fft_size = pow(2, power);
-	apply_fft_buffersize();
+	onFFT_view_toggled(fft_is_visible);
 }
 
 void adiscope::Oscilloscope::rightMenuFinished(bool opened)

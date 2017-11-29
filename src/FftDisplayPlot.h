@@ -189,6 +189,7 @@ namespace adiscope {
 		void replot();
 		void setZoomerEnabled();
 		double sampleRate();
+		void setNumPoints(uint64_t num_points);
 
 	Q_SIGNALS:
 		void newData();

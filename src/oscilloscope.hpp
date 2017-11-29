@@ -137,8 +137,6 @@ namespace adiscope {
 
 		void onChannelOffsetChanged(double value);
 
-		void apply_fft_buffersize();
-
 		void onChannelWidgetEnabled(bool);
 		void onChannelWidgetSelected(bool);
 		void onChannelWidgetMenuToggled(bool);

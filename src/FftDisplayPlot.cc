@@ -188,6 +188,11 @@ void FftDisplayPlot::setZoomerEnabled()
         }
 }
 
+void FftDisplayPlot::setNumPoints(uint64_t num_points)
+{
+	d_numPoints = num_points;
+}
+
 void FftDisplayPlot::plotData(const std::vector<double *> pts,
 		uint64_t num_points)
 {
