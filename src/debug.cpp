@@ -9,7 +9,7 @@ Debug::Debug(QObject *parent) : QObject(parent)
 
 Debug::~Debug()
 {
-	iio_context_destroy(ctx);
+//	iio_context_destroy(ctx);
 }
 
 void Debug::scanDevices(void)

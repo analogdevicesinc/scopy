@@ -6,8 +6,9 @@ using namespace adiscope;
 using namespace std;
 
 Debugger::Debugger(struct iio_context *ctx, Filter *filt,
-                   QJSEngine *engine, ToolLauncher *parent) :
-	Tool(ctx, nullptr, nullptr, "Debug", parent),
+                   QPushButton *runButton, QJSEngine *engine,
+                   ToolLauncher *parent) :
+	Tool(ctx, runButton, nullptr, "Debug", parent),
 	ui(new Ui::Debugger)
 {
 	ui->setupUi(this);
@@ -58,6 +59,7 @@ Debugger::Debugger(struct iio_context *ctx, Filter *filt,
 
 Debugger::~Debugger()
 {
+
 	delete ui;
 }
 

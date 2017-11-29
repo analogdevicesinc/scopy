@@ -501,12 +501,11 @@ void ToolLauncher::swapMenu(QWidget *menu)
 {
 	Tool *tl = dynamic_cast<Tool* >(menu);
 	if (tl){
-		if (tl->runButton())
-		{
-			MenuOption *mo = static_cast<MenuOption *>(tl->runButton()->parentWidget());
-			if (mo->isDetached())
-				return;
-		}
+
+		MenuOption *mo = static_cast<MenuOption *>(tl->runButton()->parentWidget());
+		if (mo->isDetached())
+			return;
+
 	}
 
 	if (current) {
@@ -644,6 +643,7 @@ void adiscope::ToolLauncher::disconnect()
 		toolMenu["Signal Generator"]->getToolStopBtn()->setChecked(false);
 		toolMenu["Spectrum Analyzer"]->getToolStopBtn()->setChecked(false);
 		toolMenu["Voltmeter"]->getToolStopBtn()->setChecked(false);
+		toolMenu["Debugger"]->getToolStopBtn()->setChecked(false);
 
 		for (auto x : detachedWindows){
 			x->close();
@@ -859,8 +859,9 @@ void adiscope::ToolLauncher::enableAdcBasedTools()
 	}
 
 	if (filter->compatible(TOOL_DEBUGGER)) {
-		debugger = new Debugger(ctx, filter, &js_engine, this);
-		toolMenu["Debugger"]->setEnabled(true);
+		debugger = new Debugger(ctx, filter,toolMenu["Debugger"]->getToolStopBtn(),
+				&js_engine, this);
+		adc_users_group.addButton(toolMenu["Debugger"]->getToolStopBtn());
 	}
 
 	if (filter->compatible(TOOL_SPECTRUM_ANALYZER)) {
@@ -959,11 +960,6 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 	    || filter->compatible(TOOL_DIGITALIO)) {
 		dioManager = new DIOManager(ctx,filter);
 
-	}
-
-	if (filter->compatible(TOOL_DEBUGGER)) {
-		debugger = new Debugger(ctx, filter, &js_engine, this);
-		toolMenu["Debugger"]->setEnabled(true);
 	}
 
 	if (filter->compatible(TOOL_LOGIC_ANALYZER)
