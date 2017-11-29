@@ -28,7 +28,8 @@ class Debugger : public Tool
 
 public:
 	explicit Debugger(struct iio_context *ctx, Filter *filt,
-	                  QJSEngine *engine, ToolLauncher *parent = 0);
+	                  QPushButton *runButton, QJSEngine *engine,
+	                  ToolLauncher *parent = 0);
 	~Debugger();
 
 public Q_SLOTS:
@@ -51,6 +52,7 @@ private Q_SLOTS:
 
 private:
 	Ui::Debugger *ui;
+	QPushButton *menuRunButton;
 
 	Debug debug;
 

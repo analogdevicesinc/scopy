@@ -32,7 +32,6 @@ Tool::Tool(struct iio_context *ctx, QPushButton *runButton,
 	ctx(ctx), run_button(runButton), api(api),
 	name(name)
 {
-    if (run_button)
         run_button->parentWidget()->setDisabled(false);
 
 	connect(this, SIGNAL(detachedState(bool)), parent,
