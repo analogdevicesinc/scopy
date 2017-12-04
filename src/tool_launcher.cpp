@@ -40,6 +40,8 @@
 #include <QTimer>
 #include <QSettings>
 #include <QStringList>
+#include <QFileDialog>
+#include <QFile>
 
 #include <iio.h>
 
@@ -194,6 +196,50 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	ui->menu->setMinimumSize(ui->menu->sizeHint());
 	/* Show a smooth opening when the app starts */
 	ui->menu->toggleMenu(true);
+
+	connect(ui->saveBtn, &QPushButton::clicked, this, &ToolLauncher::saveSession);
+	connect(ui->loadBtn, &QPushButton::clicked, this, &ToolLauncher::loadSession);
+}
+
+void ToolLauncher::saveSession()
+{
+	if (ctx) {
+		auto export_dialog( new QFileDialog( this ) );
+		export_dialog->setWindowModality( Qt::WindowModal );
+		export_dialog->setFileMode( QFileDialog::AnyFile );
+		export_dialog->setAcceptMode( QFileDialog::AcceptSave );
+		export_dialog->setNameFilters({"Scopy-Files (*.ini)"});
+		if (export_dialog->exec()){
+			QFile f(export_dialog->selectedFiles().at(0));
+			this->tl_api->save(f.fileName());
+		}
+	}
+}
+
+void ToolLauncher::loadSession()
+{
+	if (ctx) {
+		auto export_dialog( new QFileDialog( this ) );
+		export_dialog->setWindowModality( Qt::WindowModal );
+		export_dialog->setFileMode( QFileDialog::AnyFile );
+		export_dialog->setAcceptMode( QFileDialog::AcceptOpen );
+		export_dialog->setNameFilters({"Scopy-Files (*.ini)"});
+		if (export_dialog->exec()){
+			QFile f(export_dialog->selectedFiles().at(0));
+			QStack<QPushButton*> enabledTools;
+			for (auto tool : toolMenu)
+				if (tool->getToolStopBtn()->isEnabled()) {
+					enabledTools.push(tool->getToolStopBtn());
+					tool->getToolStopBtn()->setDisabled(true);
+				}
+			this->tl_api->load(f.fileName());
+			while (!enabledTools.isEmpty()) {
+				QPushButton *btn = enabledTools.back();
+				btn->setEnabled(true);
+				enabledTools.pop();
+			}
+		}
+	}
 }
 
 QList<QString> ToolLauncher::getOrder()

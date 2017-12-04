@@ -86,6 +86,9 @@ Q_SIGNALS:
 public Q_SLOTS:
 	void detachToolOnPosition(int);
 
+	void loadSession();
+	void saveSession();
+
 private Q_SLOTS:
 
 	void search();
