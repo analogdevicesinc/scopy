@@ -964,7 +964,7 @@ void TimeDomainDisplayPlot::cancelZoom()
 {
 	for (unsigned int i = 0; i < d_zoomer.size(); ++i) {
 		OscPlotZoomer *zoomer = static_cast<OscPlotZoomer *>(d_zoomer[i]);
-		zoomer->cancel();
+		zoomer->resetZoom();
 	}
 }
 

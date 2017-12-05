@@ -522,23 +522,18 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	}
 
 	connect(plot.getZoomer(), &OscPlotZoomer::zoomIn, [=](){
-		timePositions.push(plot.HorizOffset());
 		zoom_level++;
+		plot.setTimeBaseZoomed(true);
 	});
 	connect(plot.getZoomer(), &OscPlotZoomer::zoomOut, [=](){
-		if (timePositions.empty())
-			return;
-		timePosition->setValue(timePositions.pop());
-		zoom_level--;
+		if (zoom_level != 0) zoom_level--;
+		if (zoom_level == 0)
+			plot.setTimeBaseZoomed(false);
 	});
 	connect(plot.getZoomer(), &OscPlotZoomer::zoomFinished, [=](bool isZoomOut){
 		ChannelWidget *channel_widget = channelWidgetAtId(current_ch_widget);
 
-		if (!channel_widget)
-			return;
-
-		if (channel_widget->menuButton()->isChecked() && isZoomOut)
-			onVertScaleValueChanged(voltsPerDiv->value());
+		plot.setTimeBaseLabelValue(plot.HorizUnitsPerDiv());
 
 		for (int i = 0; i < nb_channels + nb_math_channels; ++i) {
 			QLabel *label = static_cast<QLabel *>(
@@ -1542,14 +1537,25 @@ void adiscope::Oscilloscope::onChannelWidgetMenuToggled(bool checked)
 		static_cast<CustomPushButton *>(cw->menuButton()), checked);
 }
 
+void Oscilloscope::cancelZoom()
+{
+	zoom_level = 0;
+	plot.cancelZoom();
+
+	for (int i = 0; i < nb_channels + nb_math_channels; ++i) {
+		QLabel *label = static_cast<QLabel *>(
+					ui->chn_scales->itemAt(i)->widget());
+		label->setText(vertMeasureFormat.format(plot.VertUnitsPerDiv(i), "V/div", 3));
+	}
+}
+
 void adiscope::Oscilloscope::onVertScaleValueChanged(double value)
 {
-	if (value != plot.VertUnitsPerDiv(current_ch_widget)
-			|| !zoom_level) {
+	cancelZoom();
+	if (value != plot.VertUnitsPerDiv(current_ch_widget)) {
 		plot.setVertUnitsPerDiv(value, current_ch_widget);
 		plot.replot();
-		if (zoom_level == 0)
-			plot.zoomBaseUpdate();
+		plot.zoomBaseUpdate();
 	}
 	voltsPosition->setStep(value / 10);
 
@@ -1586,6 +1592,7 @@ void adiscope::Oscilloscope::onVertScaleValueChanged(double value)
 
 void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 {
+	cancelZoom();
 	symmBufferMode->setTimeBase(value);
 	SymmetricBufferMode::capture_parameters params = symmBufferMode->captureParameters();
 	active_sample_rate = params.sampleRate;
@@ -1835,7 +1842,11 @@ void Oscilloscope::update_chn_settings_panel(int id)
 	if (!chn_widget)
 		return;
 
+	disconnect(voltsPerDiv, SIGNAL(valueChanged(double)), this,
+		SLOT(onVertScaleValueChanged(double)));
 	voltsPerDiv->setValue(plot.VertUnitsPerDiv(id));
+	connect(voltsPerDiv, SIGNAL(valueChanged(double)),
+		SLOT(onVertScaleValueChanged(double)));
 	voltsPosition->setValue(-plot.VertOffset(id));
 
 	QString name = chn_widget->fullName();
