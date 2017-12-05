@@ -825,9 +825,8 @@ void Oscilloscope::add_math_channel(const std::string& function)
 	std::string name = qname.toStdString();
 
 	auto math_sink = adiscope::scope_sink_f::make(
-
-	plot.axisInterval(QwtPlot::xBottom).width() * adc->sampleRate(),
-	adc->sampleRate(), name, 1, (QObject *)&plot);
+			noZoomXAxisWidth * adc->sampleRate(),
+			adc->sampleRate(), name, 1, (QObject *)&plot);
 
 	/* Add the math block and the math scope sink into a container, so that
 	 * we can disconnect them when removing the math channel later */
@@ -850,7 +849,7 @@ void Oscilloscope::add_math_channel(const std::string& function)
 		iio->unlock();
 
 	plot.registerSink(name, 1,
-			plot.axisInterval(QwtPlot::xBottom).width() *
+			noZoomXAxisWidth *
 			adc->sampleRate());
 
 	ChannelWidget *channel_widget = new ChannelWidget(curve_id, true, false,
@@ -1606,6 +1605,10 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 	plot.setDataStartingPoint(active_trig_sample_count);
 	plot.resetXaxisOnNextReceivedData();
 	plot.zoomBaseUpdate();
+
+	if (zoom_level == 0) {
+		noZoomXAxisWidth = plot.axisInterval(QwtPlot::xBottom).width();
+	}
 
 	/* Reconfigure the GNU Radio block to receive a different number of samples  */
 	bool started = iio->started();

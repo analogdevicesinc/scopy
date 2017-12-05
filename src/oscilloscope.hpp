@@ -184,6 +184,7 @@ namespace adiscope {
 		std::shared_ptr<M2kAdc> m2k_adc;
 		unsigned int nb_channels, nb_math_channels;
 		double active_sample_rate;
+		double noZoomXAxisWidth;
 		unsigned long active_sample_count;
 		long long active_trig_sample_count;
 		double active_time_pos;
