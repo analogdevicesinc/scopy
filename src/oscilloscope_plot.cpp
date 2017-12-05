@@ -829,7 +829,25 @@ struct cursorReadoutsText CapturePlot::allCursorReadouts() const
 void CapturePlot::setTimeBaseLabelValue(double value)
 {
 	QString text = d_cursorTimeFormatter.format(value, "", 3);
-	d_timeBaseLabel->setText(text + "/div");
+	if (d_timeBaseLabel->text().contains("Zoom: ")) {
+		d_timeBaseLabel->setText("Zoom: " + text + "/div");
+	} else {
+		d_timeBaseLabel->setText(text + "/div");
+	}
+}
+
+void CapturePlot::setTimeBaseZoomed(bool zoomed)
+{
+	if (zoomed) {
+		if (!d_timeBaseLabel->text().contains("Zoom: "))
+			d_timeBaseLabel->setText("Zoom: " + d_timeBaseLabel->text());
+	} else {
+		QString text = d_timeBaseLabel->text();
+		if (text.contains("Zoom: ")) {
+			text = text.remove("Zoom: ");
+			d_timeBaseLabel->setText(text);
+		}
+	}
 }
 
 void CapturePlot::setBufferSizeLabelValue(int numSamples)

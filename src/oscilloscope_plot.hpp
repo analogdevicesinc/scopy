@@ -104,6 +104,7 @@ namespace adiscope {
 		double getMinOffsetValue();
 
 		void bringCurveToFront(unsigned int curveIdx);
+		void setTimeBaseZoomed(bool zoomed);
 	Q_SIGNALS:
 		void timeTriggerValueChanged(double);
 		void channelOffsetChanged(double);
