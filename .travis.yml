@@ -1,0 +1,24 @@
+language: cpp
+sudo: required
+
+cache:
+  ccache: true
+  directories:
+    - .ccache
+    - ${TRAVIS_BUILD_DIR}/deps
+
+python:
+  - "3.5"
+
+matrix:
+  fast_finish: true
+  include:
+    - compiler: clang
+      os: osx
+      osx_image: xcode8.3
+      env: LDIST=-osx_10.12
+
+before_install:
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./CI/travis/before_install_darwin.sh ; fi
+
+  - mkdir -p ${TRAVIS_BUILD_DIR}/build
