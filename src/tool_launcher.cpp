@@ -1318,7 +1318,7 @@ void ToolLauncher::detachToolOnPosition(int position)
 				debugger->detached();
 			else
 				spectrum_analyzer->detached();
-		}
+		
 			}
 }
 
