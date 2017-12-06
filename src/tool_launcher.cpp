@@ -500,11 +500,7 @@ ToolLauncher::~ToolLauncher()
 	delete tl_api;
 	delete ui;
 
-	for (auto iterator = debugWindows.begin();
-	     iterator != debugWindows.end(); iterator++) {
-		delete(*iterator);
-	}
-	debugWindows.clear();
+
 
 
 	saveSettings();
@@ -1218,6 +1214,17 @@ void ToolLauncher::closeEvent(QCloseEvent *event)
 		x->close();
 	}
 	detachedWindows.clear();
+
+	for (auto iterator : debugInstances) {
+		delete iterator;
+	}
+	debugInstances.clear();
+
+	for (auto iterator : debugWindows) {
+		iterator->close();
+		delete iterator;
+	}
+	debugWindows.clear();
 }
 
 
