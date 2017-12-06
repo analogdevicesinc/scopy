@@ -62,6 +62,7 @@ class GenericDac;
 namespace adiscope {
 class ToolLauncher_API;
 class SpectrumAnalyzer;
+class Debugger;
 
 class ToolLauncher : public QMainWindow
 {
@@ -86,6 +87,7 @@ Q_SIGNALS:
 
 public Q_SLOTS:
 	void detachToolOnPosition(int);
+	void addDebugWindow(void);
 
 	void loadSession();
 	void saveSession();
@@ -134,6 +136,7 @@ private:
 	QMap<QString, MenuOption*> toolMenu;
 	QList<DetachedWindow *> detachedWindows;
 	QVector<int> position;
+	QVector<Debugger*> debugWindows;
 
 	QVector<QPair<QWidget, Ui::Device> *> devices;
 	QVector<Tool*> toolList;

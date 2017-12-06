@@ -12,6 +12,8 @@
 #include "registerwidget.h"
 #include "filter.hpp"
 #include "tool.hpp"
+#include "detachedWindow.hpp"
+#include "tool_launcher.hpp"
 
 class QJSEngine;
 
@@ -32,6 +34,9 @@ public:
 	                  ToolLauncher *parent = 0);
 	~Debugger();
 
+Q_SIGNALS:
+	void newDebuggerInstance();
+
 public Q_SLOTS:
 	void updateSources(void);
 	void updateChannelComboBox(QString devName);
@@ -50,9 +55,13 @@ public Q_SLOTS:
 private Q_SLOTS:
 	void on_detailedRegMapCheckBox_stateChanged(int arg1);
 
+	void on_newWindowButton_clicked();
+
 private:
 	Ui::Debugger *ui;
 	QPushButton *menuRunButton;
+	Filter *filter;
+	QJSEngine *eng;
 
 	Debug debug;
 

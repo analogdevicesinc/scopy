@@ -500,6 +500,13 @@ ToolLauncher::~ToolLauncher()
 	delete tl_api;
 	delete ui;
 
+	for (auto iterator = debugWindows.begin();
+	     iterator != debugWindows.end(); iterator++) {
+		delete(*iterator);
+	}
+	debugWindows.clear();
+
+
 	saveSettings();
 }
 
@@ -945,6 +952,8 @@ void adiscope::ToolLauncher::enableAdcBasedTools()
 		debugger = new Debugger(ctx, filter,toolMenu["Debugger"]->getToolStopBtn(),
 				&js_engine, this);
 		adc_users_group.addButton(toolMenu["Debugger"]->getToolStopBtn());
+		QObject::connect(debugger, &Debugger::newDebuggerInstance, this,
+				 &ToolLauncher::addDebugWindow);
 	}
 
 	if (filter->compatible(TOOL_SPECTRUM_ANALYZER)) {
@@ -1305,8 +1314,11 @@ void ToolLauncher::detachToolOnPosition(int position)
 				logic_analyzer->detached();
 			else if (x->getName() == "Network Analyzer")
 				network_analyzer->detached();
+			else if (x->getName() == "Debugger")
+				debugger->detached();
 			else
 				spectrum_analyzer->detached();
+		}
 			}
 }
 
@@ -1467,4 +1479,19 @@ void ToolLauncher_API::save(const QString& file)
 		tl->network_analyzer->api->save(settings);
 	if (tl->spectrum_analyzer)
 		tl->spectrum_analyzer->api->save(settings);
+}
+
+void ToolLauncher::addDebugWindow()
+{
+	DetachedWindow *window = new DetachedWindow(this->windowIcon());
+	Debugger *debug = new Debugger(ctx, filter,toolMenu["Debugger"]->getToolStopBtn(),
+			&js_engine, this);
+	QObject::connect(debug, &Debugger::newDebuggerInstance, this,
+			 &ToolLauncher::addDebugWindow);
+
+	window->setCentralWidget(debug);
+	window->setWindowTitle("Scopy - Debugger");
+	window->resize(sizeHint());
+	window->show();
+	debugWindows.append(debug);
 }

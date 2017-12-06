@@ -9,7 +9,8 @@ Debugger::Debugger(struct iio_context *ctx, Filter *filt,
                    QPushButton *runButton, QJSEngine *engine,
                    ToolLauncher *parent) :
 	Tool(ctx, runButton, nullptr, "Debug", parent),
-	ui(new Ui::Debugger)
+	ui(new Ui::Debugger), filter(filt),
+	eng(engine)
 {
 	ui->setupUi(this);
 	debug.setIioContext(ctx);
@@ -283,4 +284,9 @@ void adiscope::Debugger::on_detailedRegMapCheckBox_stateChanged(int arg1)
 	} else {
 		ui->widget->show();
 	}
+}
+
+void adiscope::Debugger::on_newWindowButton_clicked()
+{
+	Q_EMIT newDebuggerInstance();
 }
