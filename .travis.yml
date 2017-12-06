@@ -1,6 +1,10 @@
 language: cpp
 sudo: required
 
+branches:
+  only:
+    - osx
+
 cache:
   ccache: true
   directories:
