@@ -172,6 +172,8 @@ if (APPLE)
 endif(APPLE)
 
 if (ENABLE_APPLICATION_BUNDLE)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
+
 	set(PKGINFO ${CMAKE_BINARY_DIR}/PkgInfo)
 	file(WRITE ${PKGINFO} "APPLScopy")
 	set_source_files_properties(${PKGINFO} PROPERTIES MACOSX_PACKAGE_LOCATION .)
