@@ -262,7 +262,7 @@ void M2kAdc::apply_m2k_fixes()
 	if (hw_rev == "A") {
 		config1 = 0x1B; // IGAIN1 +-6db  0.25db steps
 		config2 = 0x1B;
-	} else if (hw_rev == "B") {
+	} else if (hw_rev != "A") {
 		config1 = 0x05;
 		config2 = 0x05;
 	}

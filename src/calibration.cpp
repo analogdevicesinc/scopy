@@ -798,7 +798,7 @@ bool Calibration::calibrateAll()
 		goto calibration_fail;
 	}
 
-	if (IioUtils::hardware_revision(m_ctx) == "B") {
+	if (IioUtils::hardware_revision(m_ctx) != "A") {
 		QThread::msleep(750);
 	}
 
