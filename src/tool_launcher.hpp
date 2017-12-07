@@ -133,7 +133,8 @@ private:
 	QMap<QString, MenuOption*> toolMenu;
 	QList<DetachedWindow *> detachedWindows;
 	QVector<int> position;
-	QVector<Debugger*> debugWindows;
+	QVector<Debugger*> debugInstances;
+	QVector<DetachedWindow *> debugWindows;
 
 	QVector<QPair<QWidget, Ui::Device> *> devices;
 
