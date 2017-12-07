@@ -21,9 +21,14 @@ matrix:
       os: osx
       osx_image: xcode8.3
       env: LDIST=-osx_10.12
+    - compiler: gcc
+      os: linux
+      dist: trusty
+      env: LDIST=-trusty
 
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./CI/travis/before_install_darwin.sh ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./CI/travis/before_install_linux.sh ; fi
 
   - mkdir -p ${TRAVIS_BUILD_DIR}/build
 
