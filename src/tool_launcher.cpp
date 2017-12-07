@@ -1500,5 +1500,6 @@ void ToolLauncher::addDebugWindow()
 	window->setWindowTitle("Scopy - Debugger");
 	window->resize(sizeHint());
 	window->show();
-	debugWindows.append(debug);
+	debugWindows.append(window);
+	debugInstances.append(debug);
 }
