@@ -401,7 +401,7 @@ void DMM::toggleDataLogging(bool en)
 		ui->btn_append->setEnabled(false);
 	}
 
-	if(en) {
+	if(en && ui->run_button->isChecked()) {
 		QFile file(filename);
 
 		if(ui->btn_overwrite->isChecked() || file.size() == 0) {
@@ -436,10 +436,8 @@ void DMM::toggleDataLogging(bool en)
 			data_cond.notify_all();
 		interrupt_data_logging = true;
 		if(data_logging_thread.joinable()) {
-			if(use_timer)
-				data_logging_thread.detach();
-			else
-				data_logging_thread.join();
+			data_logging_thread.detach();
+			data_logging_thread.join();
 		}
 	}
 }
@@ -467,10 +465,8 @@ void DMM::startDataLogging(bool start)
 			data_cond.notify_all();
 		interrupt_data_logging = true;
 		if(data_logging_thread.joinable()) {
-			if(use_timer)
-				data_logging_thread.detach();
-			else
-				data_logging_thread.join();
+			data_logging_thread.detach();
+			data_logging_thread.join();
 		}
 		ui->btn_overwrite->setEnabled(true);
 		ui->btn_append->setEnabled(true);
@@ -481,15 +477,12 @@ void DMM::dataLoggingThread()
 {
 	QString separator = ",";
 	QFile file(filename);
-	if( !file.open(QIODevice::Append)) {
-		return;
-	}
 
 	QTextStream out(&file);
 
 	while(!interrupt_data_logging) {
-		if(use_timer && !file.isOpen()) {
-			if( !file.open(QIODevice::Append)) {
+		if (!file.isOpen()) {
+			if (!file.open(QIODevice::Append)) {
 				return;
 			}
 		}
@@ -528,13 +521,16 @@ void DMM::dataLoggingThread()
 			ch2_dc_rms << separator <<
 			ch2_ac_rms << "\n";
 
-		if(use_timer) {
+		if (file.isOpen()) {
 			file.close();
+		}
+		if (use_timer) {
 			QThread::msleep(logging_refresh_rate);
 		}
 	}
-	if(file.isOpen())
+	if (file.isOpen()) {
 		file.close();
+	}
 }
 
 void DMM::toggleAC()
