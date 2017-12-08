@@ -174,6 +174,8 @@ private:
 	bool calibrating;
 	bool skip_calibration;
 
+	bool debugger_enabled;
+
 	void loadToolTips(bool connected);
 	QVector<QString> searchDevices();
 	void swapMenu(QWidget *menu);
@@ -217,6 +219,8 @@ class ToolLauncher_API: public ApiObject
 
 	Q_PROPERTY(bool skip_calibration READ calibration_skipped WRITE skip_calibration);
 
+	Q_PROPERTY(bool debugger READ debugger_enabled WRITE enable_debugger)
+
 public:
 	explicit ToolLauncher_API(ToolLauncher *tl) : ApiObject(), tl(tl) {}
 	~ToolLauncher_API() {}
@@ -232,6 +236,9 @@ public:
 
 	bool calibration_skipped();
 	void skip_calibration(bool);
+
+	bool debugger_enabled();
+	void enable_debugger(bool);
 
 	const QString& getPreviousIp()
 	{
