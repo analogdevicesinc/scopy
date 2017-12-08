@@ -486,7 +486,17 @@ void ToolLauncher::addRemoteContext()
 	ConnectDialog *dialog = new ConnectDialog(popup);
 	connect(dialog, &ConnectDialog::newContext,
 	[=](const QString& uri) {
-		addContext(uri);
+		bool found = false;
+		for (auto it = devices.begin(); it != devices.end(); ++it) {
+			QString dev_uri = (*it)->second.btn->property("uri").toString();
+			if (dev_uri == uri) {
+				found = true;
+				break;
+			}
+		}
+		if (!found) {
+			addContext(uri);
+		}
 		popup->close();
 	});
 }
