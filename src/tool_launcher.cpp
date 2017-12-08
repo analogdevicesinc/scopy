@@ -62,7 +62,8 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	infoWidget(nullptr),
 	calib(nullptr),
 	skip_calibration(false),
-	calibrating(false)
+	calibrating(false),
+	debugger_enabled(false)
 {
 	if (!isatty(STDIN_FILENO))
 		notifier.setEnabled(false);
@@ -415,6 +416,8 @@ void ToolLauncher::insertMenuOptions(){
 		 SLOT(swapMenuOptions(int, int, bool)));
 	connect(dragZone, SIGNAL(highlightLastSeparator(bool)), this,
 		SLOT(highlightLast(bool)));
+
+	toolMenu["Debugger"]->setVisible(debugger_enabled);
 }
 
 void ToolLauncher::highlightLast(bool on){
@@ -1362,6 +1365,16 @@ void ToolLauncher_API::hide(bool hide)
 void ToolLauncher_API::skip_calibration(bool skip)
 {
 	tl->skip_calibration = skip;
+}
+
+bool ToolLauncher_API::debugger_enabled()
+{
+	return tl->debugger_enabled;
+}
+
+void ToolLauncher_API::enable_debugger(bool enabled)
+{
+	tl->debugger_enabled = enabled;
 }
 
 bool ToolLauncher_API::calibration_skipped()
