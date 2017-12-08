@@ -190,6 +190,7 @@ private:
 	void UpdatePosition(QWidget *widget, int position);
 	void insertMenuOptions();
 	void closeEvent(QCloseEvent *event);
+	void highlightDevice(QPushButton *btn);
 };
 
 class ToolLauncher_API: public ApiObject

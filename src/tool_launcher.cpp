@@ -491,6 +491,7 @@ void ToolLauncher::addRemoteContext()
 			QString dev_uri = (*it)->second.btn->property("uri").toString();
 			if (dev_uri == uri) {
 				found = true;
+				highlightDevice((*it)->second.btn);
 				break;
 			}
 		}
@@ -498,6 +499,24 @@ void ToolLauncher::addRemoteContext()
 			addContext(uri);
 		}
 		popup->close();
+	});
+}
+
+void ToolLauncher::highlightDevice(QPushButton *btn)
+{
+	bool initialBtnState = btn->property("checked").toBool();
+
+	QTimer::singleShot(200, [=](){
+		setDynamicProperty(btn, "checked", !initialBtnState);
+	});
+	QTimer::singleShot(400, [=](){
+		setDynamicProperty(btn, "checked", initialBtnState);
+	});
+	QTimer::singleShot(600, [=](){
+		setDynamicProperty(btn, "checked", !initialBtnState);
+	});
+	QTimer::singleShot(800, [=](){
+		setDynamicProperty(btn, "checked", initialBtnState);
 	});
 }
 
