@@ -955,8 +955,13 @@ void TimeDomainDisplayPlot::configureAxis(int axisPos, int axisIdx)
 	scaleDraw->setFloatPrecision(floatPrecision);
 	this->setAxisScaleDraw(axis, scaleDraw);
 	if (axisPos == QwtPlot::yLeft) {
-		scaleDraw->setMinimumExtent(65);
-		axisWidget(axis)->setMaximumWidth(70);
+		//yLeft 0 has a different position than the rest, so we
+		//give it a bigger minimum extent in order to align it with
+		//the other yLeft axes.
+		if (axisIdx == 0)
+			scaleDraw->setMinimumExtent(94);
+		else
+			scaleDraw->setMinimumExtent(65);
 	}
 }
 
