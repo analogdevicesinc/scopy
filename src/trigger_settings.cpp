@@ -96,6 +96,8 @@ TriggerSettings::TriggerSettings(std::shared_ptr<GenericAdc> adc,
 	ui->cmb_analog_extern->setCurrentIndex(0);
 	on_cmb_analog_extern_currentIndexChanged(0);
 	ui->trigger_level->setValue(0);
+	m_dc_level = 0;
+	m_ac_coupled = false;
 	ui->trigger_hysteresis->setValue(50e-3);
 	MouseWheelWidgetGuard *wheelEventGuard = new MouseWheelWidgetGuard(this);
 	wheelEventGuard->installEventRecursively(this);
@@ -143,10 +145,23 @@ void TriggerSettings::setTriggerDelay(long long raw_delay)
 	}
 }
 
+void TriggerSettings::setAcCoupled(bool coupled)
+{
+	m_ac_coupled = coupled;
+}
+
+void TriggerSettings::setDcLevelCoupled(double value)
+{
+	if (m_dc_level != value) {
+		m_dc_level = value;
+	} else {
+		level_hw_write(trigg_configs[current_channel].level_val);
+	}
+}
+
 void TriggerSettings::setTriggerLevel(double level)
 {
 	double current_level = ui->trigger_level->value();
-
 	if (current_level != level) {
 		ui->trigger_level->setValue(level);
 		trigg_configs[current_channel].level_val = level;
@@ -184,7 +199,6 @@ void TriggerSettings::onSpinboxTriggerLevelChanged(double value)
 {
 	level_hw_write(value);
 	trigg_configs[current_channel].level_val = value;
-
 	Q_EMIT levelChanged(value);
 }
 
@@ -416,11 +430,17 @@ void TriggerSettings:: delay_hw_write(long long raw_delay)
 void TriggerSettings:: level_hw_write(double level)
 {
 	if (adc_running) {
+		if (m_ac_coupled) {
+			level = level + m_dc_level;
+		}
 		int rawValue = (int)adc->convVoltsToSample(current_channel,
 			level);
 
 		try {
-			trigger->setLevel(current_channel, rawValue);
+			if (m_raw_level != rawValue) {
+				trigger->setLevel(current_channel, rawValue);
+			}
+			m_raw_level = rawValue;
 		}
 		catch (std::exception& e) {
 			qDebug() << e.what();

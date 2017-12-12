@@ -68,6 +68,8 @@ namespace adiscope {
 		bool triggerIsArmed() const;
 		enum TriggerMode triggerMode() const;
 		long long triggerDelay() const;
+		void setDcLevelCoupled(double);
+		void setAcCoupled(bool);
 
 	Q_SIGNALS:
 		void sourceChanged(int);
@@ -129,6 +131,9 @@ namespace adiscope {
 		bool trigger_auto_mode;
 		long long trigger_raw_delay;
 		bool adc_running;
+		bool m_ac_coupled;
+		double m_dc_level;
+		double m_raw_level;
 	};
 
 }

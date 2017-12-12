@@ -84,6 +84,7 @@ namespace adiscope {
 	class StateUpdater;
 	class AnalogBufferPreviewer;
 	class ChannelWidget;
+	class signal_sample;
 
 	class Oscilloscope : public Tool
 	{
@@ -181,6 +182,8 @@ namespace adiscope {
 
 		void openEditMathPanel(bool on);
 
+		void updateTriggerLevelValue(std::vector<float> value);
+
 	private:
 		std::shared_ptr<GenericAdc> adc;
 		std::shared_ptr<M2kAdc> m2k_adc;
@@ -249,6 +252,7 @@ namespace adiscope {
 		std::vector<bool> chnAcCoupled;
 		std::vector<gr::basic_block_sptr> filterBlocks;
 		std::vector<gr::basic_block_sptr> subBlocks;
+		boost::shared_ptr<signal_sample> triggerLevelSink;
 
 		bool trigger_is_forced;
 		bool new_data_is_triggered;

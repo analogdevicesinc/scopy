@@ -45,6 +45,7 @@
 #include "config.h"
 #include "customplotpositionbutton.h"
 #include "channel_widget.hpp"
+#include "signal_sample.hpp"
 
 /* Generated UI */
 #include "ui_channel_settings.h"
@@ -195,6 +196,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 
 		channels_api.append(new Channel_API(this));
 	}
+	triggerLevelSink = nullptr;
 
 	connect(ui->rightMenu, SIGNAL(finished(bool)), this,
 			SLOT(rightMenuFinished(bool)));
@@ -567,6 +569,12 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	wheelEventGuard->installEventRecursively(ui->mainWidget);
 }
 
+void Oscilloscope::updateTriggerLevelValue(std::vector<float> value)
+{
+	trigger_settings.setDcLevelCoupled(value.at(0));
+	onTriggerLevelChanged(trigger_settings.level());
+}
+
 Oscilloscope::~Oscilloscope()
 {
 	ui->pushButtonRunStop->setChecked(false);
@@ -622,6 +630,11 @@ void Oscilloscope::init_channel_settings()
 void Oscilloscope::activateAcCoupling(int i)
 {
 	double alpha, beta;
+	bool trigger = (i == trigger_settings.currentChannel());
+	if (trigger) {
+		trigger_settings.setAcCoupled(true);
+	}
+
 	bool started = iio->started();
 	if(started) {
 		iio->lock();
@@ -643,10 +656,19 @@ void Oscilloscope::activateAcCoupling(int i)
 	filterBlocks[i] = gr::filter::iir_filter_ffd::make({alpha}, {1, -beta}, false);
 	subBlocks[i] = gr::blocks::sub_ff::make();
 
+
 	iio->connect(block, i, subBlocks.at(i), 0);
 	iio->connect(block, i, filterBlocks.at(i), 0);
 	iio->connect(filterBlocks.at(i), 0, subBlocks.at(i), 1);
 	iio->connect(subBlocks.at(i), 0, qt_time_block, i);
+
+	if (trigger) {
+		triggerLevelSink = boost::make_shared<signal_sample>();
+		connect(&*triggerLevelSink, SIGNAL(triggered(std::vector<float>)),
+			this, SLOT(updateTriggerLevelValue(std::vector<float>)));
+
+		iio->connect(filterBlocks.at(i), 0, triggerLevelSink, 0);
+	}
 
 	for (auto pair = math_sinks.begin(); pair != math_sinks.end(); pair++) {
 		auto math = pair.value().first;
@@ -664,6 +686,11 @@ void Oscilloscope::activateAcCoupling(int i)
 
 void Oscilloscope::deactivateAcCoupling(int i)
 {
+	bool trigger = (i == trigger_settings.currentChannel());
+	if (trigger) {
+		trigger_settings.setAcCoupled(false);
+	}
+
 	bool started = iio->started();
 	if(started) {
 		iio->lock();
@@ -683,8 +710,13 @@ void Oscilloscope::deactivateAcCoupling(int i)
 	iio->disconnect(block, i, filterBlocks.at(i), 0);
 	iio->disconnect(filterBlocks.at(i), 0, subBlocks.at(i), 1);
 	iio->disconnect(subBlocks.at(i), 0, qt_time_block, i);
+	if (trigger) {
+		iio->disconnect(filterBlocks.at(i), 0, triggerLevelSink, 0);
+		trigger_settings.updateHwVoltLevels(i);
+	}
 	filterBlocks[i] = nullptr;
 	subBlocks[i] = nullptr;
+	triggerLevelSink = nullptr;
 	iio->connect(block, i, qt_time_block, i);
 
 	for(int ch = 0; ch < nb_channels; ch++) {
@@ -1252,7 +1284,6 @@ void Oscilloscope::runStopToggled(bool checked)
 	Q_EMIT activateExportButton();
 
 	if (checked) {
-
 		writeAllSettingsToHardware();
 
 		plot.setSampleRate(active_sample_rate, 1, "");
@@ -1277,7 +1308,6 @@ void Oscilloscope::runStopToggled(bool checked)
 		toggle_blockchain_flow(true);
 	} else {
 		toggle_blockchain_flow(false);
-
 		trigger_settings.setAdcRunningState(false);
 	}
 
