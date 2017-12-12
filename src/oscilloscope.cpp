@@ -1098,10 +1098,13 @@ void Oscilloscope::add_math_channel(const std::string& function)
 		ui->btnAddMath->hide();
 		menuOrder.removeOne(ui->btnAddMath);
 	}
+
 	ui->cmb_x_channel->addItem(channel_widget->fullName());
 	ui->cmb_y_channel->addItem(channel_widget->fullName());
 	if(xy_is_visible)
 		setup_xy_channels();
+
+	plot.showYAxisWidget(curve_id, false);
 }
 
 void Oscilloscope::onChannelWidgetDeleteClicked()
