@@ -1232,6 +1232,8 @@ void Oscilloscope::onChannelWidgetDeleteClicked()
 		current_ch_widget -= 1;
 	}
 
+	plot.setActiveVertAxis(current_channel);
+
 	/* If the removed channel is before the current axis, we update the
 	 * current axis to account for the index change */
 	int current_axis = plot.activeVertAxis();
