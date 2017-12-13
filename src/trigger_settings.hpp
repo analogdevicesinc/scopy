@@ -64,12 +64,13 @@ namespace adiscope {
 		bool analogEnabled() const;
 		bool digitalEnabled() const;
 		double level() const;
+		double dcLevel() const;
 		double hysteresis() const;
 		bool triggerIsArmed() const;
 		enum TriggerMode triggerMode() const;
 		long long triggerDelay() const;
 		void setDcLevelCoupled(double);
-		void setAcCoupled(bool);
+		void setAcCoupled(bool, int);
 
 	Q_SIGNALS:
 		void sourceChanged(int);
@@ -91,10 +92,10 @@ namespace adiscope {
 		void autoTriggerEnable();
 		void updateHwVoltLevels(int chnIdx);
 		void setAdcRunningState(bool on);
+		void onSpinboxTriggerLevelChanged(double);
 
 	private Q_SLOTS:
 		void on_cmb_source_currentIndexChanged(int);
-		void onSpinboxTriggerLevelChanged(double);
 		void onSpinboxTriggerHystChanged(double);
 		void on_cmb_condition_currentIndexChanged(int);
 		void on_cmb_extern_condition_currentIndexChanged(int);
@@ -132,8 +133,6 @@ namespace adiscope {
 		long long trigger_raw_delay;
 		bool adc_running;
 		bool m_ac_coupled;
-		double m_dc_level;
-		double m_raw_level;
 	};
 
 }

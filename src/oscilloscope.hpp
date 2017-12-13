@@ -26,6 +26,7 @@
 #include <gnuradio/blocks/short_to_float.h>
 #include <gnuradio/iio/device_source.h>
 #include <gnuradio/blocks/complex_to_mag_squared.h>
+#include <gnuradio/blocks/keep_one_in_n.h>
 
 /* Qt includes */
 #include <QPair>
@@ -184,6 +185,7 @@ namespace adiscope {
 		void openEditMathPanel(bool on);
 
 		void updateTriggerLevelValue(std::vector<float> value);
+		void configureAcCouplingTrigger(bool);
 
 	public Q_SLOTS:
 		void enableLabels(bool);
@@ -255,9 +257,11 @@ namespace adiscope {
 		std::vector<double> channel_offset;
 
 		std::vector<bool> chnAcCoupled;
+		bool triggerAcCoupled;
 		std::vector<gr::basic_block_sptr> filterBlocks;
 		std::vector<gr::basic_block_sptr> subBlocks;
-		boost::shared_ptr<signal_sample> triggerLevelSink;
+		QPair<boost::shared_ptr<signal_sample>, int> triggerLevelSink;
+		boost::shared_ptr<gr::blocks::keep_one_in_n> keep_one;
 
 		bool trigger_is_forced;
 		bool new_data_is_triggered;
@@ -345,6 +349,8 @@ namespace adiscope {
 		void configureAcCoupling(int, bool);
 		void activateAcCoupling(int);
 		void deactivateAcCoupling(int);
+		void activateAcCouplingTrigger(int);
+		void deactivateAcCouplingTrigger();
 	};
 
 	class Oscilloscope_API : public ApiObject

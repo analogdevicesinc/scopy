@@ -40,6 +40,7 @@ struct TriggerSettings::trigg_channel_config {
 	double hyst_max;
 	double hyst_step;
 	double hyst_val;
+	double dc_level;
 };
 
 TriggerSettings::TriggerSettings(std::shared_ptr<GenericAdc> adc,
@@ -96,7 +97,6 @@ TriggerSettings::TriggerSettings(std::shared_ptr<GenericAdc> adc,
 	ui->cmb_analog_extern->setCurrentIndex(0);
 	on_cmb_analog_extern_currentIndexChanged(0);
 	ui->trigger_level->setValue(0);
-	m_dc_level = 0;
 	m_ac_coupled = false;
 	ui->trigger_hysteresis->setValue(50e-3);
 	MouseWheelWidgetGuard *wheelEventGuard = new MouseWheelWidgetGuard(this);
@@ -136,6 +136,11 @@ long long TriggerSettings::triggerDelay() const
 	return trigger_raw_delay;
 }
 
+double TriggerSettings::dcLevel() const
+{
+	return trigg_configs[current_channel].dc_level;
+}
+
 void TriggerSettings::setTriggerDelay(long long raw_delay)
 {
 	if (trigger_raw_delay != raw_delay) {
@@ -145,17 +150,17 @@ void TriggerSettings::setTriggerDelay(long long raw_delay)
 	}
 }
 
-void TriggerSettings::setAcCoupled(bool coupled)
+void TriggerSettings::setAcCoupled(bool coupled, int chnIdx)
 {
-	m_ac_coupled = coupled;
+	if (chnIdx == current_channel) {
+		m_ac_coupled = coupled;
+	}
 }
 
 void TriggerSettings::setDcLevelCoupled(double value)
 {
-	if (m_dc_level != value) {
-		m_dc_level = value;
-	} else {
-		level_hw_write(trigg_configs[current_channel].level_val);
+	if (trigg_configs[current_channel].dc_level != value) {
+		trigg_configs[current_channel].dc_level = value;
 	}
 }
 
@@ -181,6 +186,7 @@ void TriggerSettings::setTriggerHysteresis(double hyst)
 void TriggerSettings::on_cmb_source_currentIndexChanged(int index)
 {
 	current_channel = index;
+	m_ac_coupled = false;
 
 	ui->trigger_level->setMinValue(trigg_configs[index].level_min);
 	ui->trigger_level->setMaxValue(trigg_configs[index].level_max);
@@ -338,8 +344,11 @@ TriggerSettings::TriggerMode TriggerSettings::triggerMode() const
 void TriggerSettings::updateHwVoltLevels(int chnIdx)
 {
 	try {
-		int rawValue = (int)adc->convVoltsToSample(chnIdx,
-		trigg_configs[chnIdx].level_val);
+		double level = trigg_configs[chnIdx].level_val;
+		if (m_ac_coupled) {
+			level = level + trigg_configs[current_channel].dc_level;
+		}
+		int rawValue = (int)adc->convVoltsToSample(chnIdx, level);
 		trigger->setLevel(chnIdx, rawValue);
 
 		rawValue = (int)adc->convVoltsDiffToSampleDiff(chnIdx,
@@ -431,16 +440,13 @@ void TriggerSettings:: level_hw_write(double level)
 {
 	if (adc_running) {
 		if (m_ac_coupled) {
-			level = level + m_dc_level;
+			level = level + trigg_configs[current_channel].dc_level;
 		}
 		int rawValue = (int)adc->convVoltsToSample(current_channel,
 			level);
 
 		try {
-			if (m_raw_level != rawValue) {
-				trigger->setLevel(current_channel, rawValue);
-			}
-			m_raw_level = rawValue;
+			trigger->setLevel(current_channel, rawValue);
 		}
 		catch (std::exception& e) {
 			qDebug() << e.what();
