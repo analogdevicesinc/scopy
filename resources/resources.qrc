@@ -114,6 +114,8 @@
         <file>icons/dio101.svg</file>
         <file>icons/lines_on_plot.svg</file>
         <file>icons/dots_on_plot.svg</file>
+        <file>icons/ic load.svg</file>
+        <file>icons/ic save.svg</file>
     </qresource>
     <qresource prefix="/stylesheets">
         <file>stylesheets/global.qss</file>
