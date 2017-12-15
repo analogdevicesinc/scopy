@@ -97,6 +97,7 @@ public:
 	void updateCGSettings();
 	PatternUI *getCurrentPatternUI();
 	void enableBufferUpdates(bool enabled);
+	void settingsLoaded();
 
 private Q_SLOTS:
 

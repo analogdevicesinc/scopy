@@ -278,7 +278,7 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 	api->js_register(engine);
 	chm.highlightChannel(chm.get_channel_group(0));
 	setPGStatus(STOPPED);
-	chmui->updateUi();
+	settingsLoaded();
 
 }
 
@@ -298,6 +298,11 @@ PatternGenerator::~PatternGenerator()
 	delete ui;
 	delete bufman;
 	srd_exit();
+}
+
+void PatternGenerator::settingsLoaded()
+{
+	chmui->updateUi();
 }
 
 void PatternGenerator::generatePattern()
