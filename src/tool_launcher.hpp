@@ -134,6 +134,7 @@ private:
 	QVector<int> position;
 
 	QVector<QPair<QWidget, Ui::Device> *> devices;
+	QVector<Tool*> toolList;
 
 	QTimer *search_timer, *alive_timer;
 	QFutureWatcher<QVector<QString>> watcher;

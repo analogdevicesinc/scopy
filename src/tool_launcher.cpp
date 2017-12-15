@@ -832,6 +832,8 @@ void adiscope::ToolLauncher::destroyContext()
 		iio_context_destroy(ctx);
 		ctx = nullptr;
 	}
+
+	toolList.clear();
 }
 
 bool ToolLauncher::loadDecoders(QString path)
@@ -905,18 +907,21 @@ void adiscope::ToolLauncher::enableAdcBasedTools()
 		oscilloscope = new Oscilloscope(ctx, filter, adc,
 						toolMenu["Oscilloscope"]->getToolStopBtn(),
 						&js_engine, this);
+		toolList.push_back(oscilloscope);
 		adc_users_group.addButton(toolMenu["Oscilloscope"]->getToolStopBtn());
 	}
 
 	if (filter->compatible(TOOL_DMM)) {
 		dmm = new DMM(ctx, filter, adc, toolMenu["Voltmeter"]->getToolStopBtn(),
 				&js_engine, this);
-		adc_users_group.addButton(toolMenu["Voltmeter"]->getToolStopBtn());
+		adc_users_group.addButton(toolMenu["Voltmeter"]->getToolStopBtn());\
+		toolList.push_back(dmm);
 	}
 
 	if (filter->compatible(TOOL_SPECTRUM_ANALYZER)) {
 		spectrum_analyzer = new SpectrumAnalyzer(ctx, filter, adc,
 			toolMenu["Spectrum Analyzer"]->getToolStopBtn(),&js_engine, this);
+		toolList.push_back(spectrum_analyzer);
 		adc_users_group.addButton(toolMenu["Spectrum Analyzer"]->getToolStopBtn());
 	}
 
@@ -924,6 +929,7 @@ void adiscope::ToolLauncher::enableAdcBasedTools()
 		network_analyzer = new NetworkAnalyzer(ctx, filter, adc,
 			toolMenu["Network Analyzer"]->getToolStopBtn(), &js_engine, this);
 		adc_users_group.addButton(toolMenu["Network Analyzer"]->getToolStopBtn());
+		toolList.push_back(network_analyzer);
 	}
 
 	Q_EMIT adcToolsCreated();
@@ -935,6 +941,7 @@ void adiscope::ToolLauncher::enableDacBasedTools()
 	if (filter->compatible(TOOL_SIGNAL_GENERATOR)) {
 		signal_generator = new SignalGenerator(ctx, dacs, filter,
 			toolMenu["Signal Generator"]->getToolStopBtn(), &js_engine, this);
+		toolList.push_back(signal_generator);
 	}
 	Q_EMIT dacToolsCreated();
 }
@@ -1029,23 +1036,27 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 	if (filter->compatible(TOOL_DIGITALIO)) {
 		dio = new DigitalIO(ctx, filter, toolMenu["Digital IO"]->getToolStopBtn(),
 				dioManager, &js_engine, this);
+		toolList.push_back(dio);
 	}
 
 
 	if (filter->compatible(TOOL_POWER_CONTROLLER)) {
 		power_control = new PowerController(ctx, toolMenu["Power Supply"]->getToolStopBtn(),
 				&js_engine, this);
+		toolList.push_back(power_control);
 	}
 
 	if (filter->compatible(TOOL_LOGIC_ANALYZER)) {
 		logic_analyzer = new LogicAnalyzer(ctx, filter, toolMenu["Logic Analyzer"]->getToolStopBtn(),
 				&js_engine, this);
+		toolList.push_back(logic_analyzer);
 	}
 
 
 	if (filter->compatible((TOOL_PATTERN_GENERATOR))) {
 		pattern_generator = new PatternGenerator(ctx, filter,
 				toolMenu["Pattern Generator"]->getToolStopBtn(), &js_engine,dioManager, this);
+		toolList.push_back(pattern_generator);
 	}
 
 	connect(toolMenu["Network Analyzer"]->getToolStopBtn(),
@@ -1398,6 +1409,9 @@ void ToolLauncher_API::load(const QString& file)
 		tl->network_analyzer->api->load(settings);
 	if (tl->spectrum_analyzer)
 		tl->spectrum_analyzer->api->load(settings);
+
+	for (auto tool : tl->toolList)
+		tool->settingsLoaded();
 }
 
 void ToolLauncher_API::save(const QString& file)
