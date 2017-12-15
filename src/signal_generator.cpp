@@ -381,6 +381,11 @@ SignalGenerator::~SignalGenerator()
 	delete time_block_data;
 }
 
+void SignalGenerator::settingsLoaded()
+{
+	updatePreview();
+}
+
 void SignalGenerator::resetZoom()
 {
 

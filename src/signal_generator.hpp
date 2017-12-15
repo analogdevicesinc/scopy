@@ -127,6 +127,8 @@ public:
 	static double get_best_ratio(double ratio,
 	                             double max, double *fract);
 
+	void settingsLoaded();
+
 private:
 	Ui::SignalGenerator *ui;
 	OscilloscopePlot *plot;
