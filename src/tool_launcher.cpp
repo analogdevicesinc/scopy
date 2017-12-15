@@ -440,6 +440,8 @@ void ToolLauncher::loadToolTips(bool connected){
 		toolMenu["Voltmeter"]->getToolBtn()->setToolTip(
 					QString("Click to open the Voltmeter tool"));
 		ui->btnConnect->setToolTip(QString("Click to disconnect the device"));
+		ui->saveBtn->setToolTip(QString("Click to save the current session"));
+		ui->loadBtn->setToolTip(QString("Click to load a session"));
 	} else {
 		ui->btnHome->setToolTip(QString());
 		toolMenu["Digital IO"]->getToolBtn()->setToolTip(
@@ -460,6 +462,8 @@ void ToolLauncher::loadToolTips(bool connected){
 					QString());
 		toolMenu["Voltmeter"]->getToolBtn()->setToolTip(
 					QString());
+		ui->saveBtn->setToolTip(QString());
+		ui->loadBtn->setToolTip(QString());
 		ui->btnConnect->setToolTip(QString("Select a device first"));
 	}
 }
