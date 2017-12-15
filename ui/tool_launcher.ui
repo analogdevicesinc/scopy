@@ -155,7 +155,16 @@ color: rgb(255, 255, 255);
        </item>
        <item>
         <widget class="QWidget" name="home" native="true">
+         <property name="maximumSize">
+          <size>
+           <width>145</width>
+           <height>16777215</height>
+          </size>
+         </property>
          <layout class="QHBoxLayout" name="horizontalLayout_7">
+          <property name="spacing">
+           <number>2</number>
+          </property>
           <property name="leftMargin">
            <number>0</number>
           </property>
@@ -163,7 +172,7 @@ color: rgb(255, 255, 255);
            <number>0</number>
           </property>
           <property name="rightMargin">
-           <number>0</number>
+           <number>2</number>
           </property>
           <property name="bottomMargin">
            <number>0</number>
@@ -178,12 +187,18 @@ color: rgb(255, 255, 255);
             </property>
             <property name="minimumSize">
              <size>
-              <width>0</width>
-              <height>48</height>
+              <width>32</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>16777215</height>
              </size>
             </property>
             <property name="text">
-             <string>Home</string>
+             <string>  Home</string>
             </property>
             <property name="icon">
              <iconset resource="../resources/resources.qrc">
@@ -207,23 +222,13 @@ color: rgb(255, 255, 255);
            </widget>
           </item>
           <item>
-           <spacer name="horizontalSpacer">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Fixed</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
+           <widget class="QPushButton" name="saveBtn">
+            <property name="maximumSize">
              <size>
-              <width>32</width>
-              <height>0</height>
+              <width>16</width>
+              <height>16</height>
              </size>
             </property>
-           </spacer>
-          </item>
-          <item>
-           <widget class="QPushButton" name="saveBtn">
             <property name="text">
              <string/>
             </property>
@@ -235,7 +240,29 @@ color: rgb(255, 255, 255);
            </widget>
           </item>
           <item>
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Preferred</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>8</width>
+              <height>0</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
            <widget class="QPushButton" name="loadBtn">
+            <property name="maximumSize">
+             <size>
+              <width>16</width>
+              <height>16</height>
+             </size>
+            </property>
             <property name="text">
              <string/>
             </property>
