@@ -61,6 +61,11 @@ void Tool::setName(const QString &name)
 	this->name = name;
 }
 
+void Tool::settingsLoaded()
+{
+
+}
+
 void Tool::attached()
 {
 	Q_EMIT detachedState(false);

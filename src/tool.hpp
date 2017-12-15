@@ -52,6 +52,7 @@ public:
 	QPushButton *runButton() { return this->run_button; }
 	const QString& getName();
 	void setName(const QString& name);
+	virtual void settingsLoaded();
 
 Q_SIGNALS:
 	void detachedState(bool detached);
