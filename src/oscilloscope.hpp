@@ -103,6 +103,8 @@ namespace adiscope {
 				ToolLauncher *parent = 0);
 		~Oscilloscope();
 
+		void settingsLoaded();
+
 	Q_SIGNALS:
 		void triggerALevelChanged(double);
 		void triggerBLevelChanged(double);

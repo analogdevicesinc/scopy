@@ -635,6 +635,21 @@ Oscilloscope::~Oscilloscope()
 	delete ui;
 }
 
+void Oscilloscope::settingsLoaded()
+{
+	for (int i = 0; i < nb_channels + nb_math_channels; ++i)
+		if (channelWidgetAtId(i)->menuButton()->isChecked()) {
+			current_ch_widget = i;
+			break;
+		}
+
+	disconnect(voltsPerDiv, SIGNAL(valueChanged(double)), this,
+		SLOT(onVertScaleValueChanged(double)));
+	voltsPerDiv->setValue(plot.VertUnitsPerDiv(current_ch_widget));
+	connect(voltsPerDiv, SIGNAL(valueChanged(double)),
+		SLOT(onVertScaleValueChanged(double)));
+}
+
 void Oscilloscope::init_channel_settings()
 {
 	connect(ch_ui->btnEditMath, &QPushButton::toggled, this,
