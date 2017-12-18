@@ -1362,6 +1362,12 @@ void Oscilloscope::onChannelWidgetDeleteClicked()
 	plot.replot();
 }
 
+void Oscilloscope::clearMathChannels()
+{
+	while (nb_math_channels)
+		channelWidgetAtId(2)->deleteButton()->click();
+}
+
 void Oscilloscope::on_actionClose_triggered()
 {
 	this->close();
@@ -3284,6 +3290,7 @@ QList<QString> Oscilloscope_API::getMathChannels() const
 
 void Oscilloscope_API::setMathChannels(const QList<QString>& list)
 {
+	osc->clearMathChannels();
 	for (unsigned int i = 0; i < list.size(); i++)
 		osc->add_math_channel(list.at(i).toStdString());
 }

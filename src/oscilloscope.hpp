@@ -353,6 +353,7 @@ namespace adiscope {
 		void deactivateAcCoupling(int);
 		void activateAcCouplingTrigger(int);
 		void deactivateAcCouplingTrigger();
+		void clearMathChannels();
 	};
 
 	class Oscilloscope_API : public ApiObject
