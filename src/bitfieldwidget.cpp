@@ -1,3 +1,22 @@
+/*
+ * Copyright 2016 Analog Devices, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with GNU Radio; see the file LICENSE.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street,
+ * Boston, MA 02110-1301, USA.
+ */
+
 #include "bitfieldwidget.h"
 #include "ui_bitfieldwidget.h"
 
@@ -64,7 +83,6 @@ void BitfieldWidget::createWidget()
 	for (int i = 1; i < width; i++) {
 		label = new QLabel(this);
 		label->setText(QString("Bit %1 ").arg(regOffset + i));
-//        label->setContentsMargins(0, 0, 10, 0);
 		ui->bitHorizontalLayout->insertWidget(1,label);
 	}
 
@@ -95,17 +113,17 @@ void BitfieldWidget::createWidget()
 	}
 }
 
-void BitfieldWidget::updateValue(uint32_t *value)
+void BitfieldWidget::updateValue(uint32_t& value)
 {
-	int temp = *value & ((uint32_t)pow(2, width)  - 1);
+	int temp = value & ((uint32_t)pow(2, width)  - 1);
 
 	if (ui->stackedWidget->currentIndex() == 1) {
 		ui->valueSpinBox->setValue(temp);
 	} else {
-		ui->valueComboBox->setCurrentIndex(*value & ((uint32_t)pow(2, width) - 1));
+		ui->valueComboBox->setCurrentIndex(value & ((uint32_t)pow(2, width) - 1));
 	}
 
-	*value = (*value >> width);
+	value = (value >> width);
 }
 
 int BitfieldWidget::getRegOffset() const

@@ -46,7 +46,6 @@
 #include "digitalio.hpp"
 #include "menuoption.h"
 #include "detachedWindow.hpp"
-#include "debugger.h"
 
 extern "C" {
 	struct iio_context;

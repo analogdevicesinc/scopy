@@ -1,3 +1,22 @@
+/*
+ * Copyright 2016 Analog Devices, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with GNU Radio; see the file LICENSE.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street,
+ * Boston, MA 02110-1301, USA.
+ */
+
 #include "regmapparser.h"
 #include "string.h"
 
@@ -31,13 +50,9 @@ void RegmapParser::deviceXmlFileSelection(const QString *device,
 			if (pcoreGetVersion(device, &pcoreMajor) && pcoreMajor > 8) {
 				adcRegmapName.append(QString("adi_regmap_adc_v%1.xml").arg(pcoreMajor));
 				dacRegmapName.append(QString("adi_regmap_dac_v%1.xml").arg(pcoreMajor));
-				//                sprintf(adcRegmapName, "adi_regmap_adc_v%d.xml", pcoreMajor);
-				//                sprintf(dacRegmapName, "adi_regmap_dac_v%d.xml", pcoreMajor);
 			} else {
 				adcRegmapName.append("adi_regmap_adc.xml");
 				dacRegmapName.append("adi_regmap_dac.xml");
-				//                sprintf(adcRegmapName, "adi_regmap_adc.xml");
-				//                sprintf(dacRegmapName, "adi_regmap_dac.xml");
 			}
 
 			/* Attempt to associate AXI Core ADC xml or AXI Core DAC xml to the device */
@@ -133,15 +148,10 @@ QDomNode *RegmapParser::getRegisterNode(const QString address)
 			return &lastNode;
 		}
 
-		//	if (registers.size() == (i+1))
-		//		return &node;
-
 		if (addr.isNull()) {
 			continue;
 		}
 
-		//        int temp = addr.text().toInt();
-		//        int temp0 = address.toLatin1().;
 		if (hexNode == hexAddress) {
 			return &node;
 		}

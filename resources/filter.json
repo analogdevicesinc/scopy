@@ -22,6 +22,6 @@
 		"pattern-devices": [ "m2k-logic-analyzer-tx" ],
 		"network-devices": [ "m2k-dac-a:voltage0", "m2k-dac-b:voltage0", "m2k-adc" ],
 		"spectrum-devices": [ "m2k-adc" ],
-		"debugger": ["m2k-adc"]
+		"debugger": ["m2k-adc", "m2k-dac-a", "m2k-dac-b", "m2k-logic-analyzer-rx", "m2k-logic-analyzer-tx", "m2k-logic-analyzer"]
 	}
 }

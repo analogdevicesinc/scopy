@@ -29,6 +29,7 @@
 #include "hw_dac.h"
 #include "menuoption.h"
 #include "dragzone.h"
+#include "debugger.h"
 
 #include "ui_device.h"
 #include "ui_tool_launcher.h"
@@ -502,9 +503,6 @@ ToolLauncher::~ToolLauncher()
 	delete settings;
 	delete tl_api;
 	delete ui;
-
-
-
 
 	saveSettings();
 }
