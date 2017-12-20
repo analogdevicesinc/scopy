@@ -1,3 +1,22 @@
+/*
+ * Copyright 2016 Analog Devices, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with GNU Radio; see the file LICENSE.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street,
+ * Boston, MA 02110-1301, USA.
+ */
+
 #include "debug.h"
 
 using namespace adiscope;
@@ -9,7 +28,6 @@ Debug::Debug(QObject *parent) : QObject(parent)
 
 Debug::~Debug()
 {
-//	iio_context_destroy(ctx);
 }
 
 void Debug::scanDevices(void)
@@ -66,32 +84,32 @@ void Debug::setIioContext(struct iio_context *ctx)
 	}
 }
 
-QStringList Debug::getDeviceList()
+QStringList Debug::getDeviceList() const
 {
 	return deviceList;
 }
 
-QStringList Debug::getChannelList()
+QStringList Debug::getChannelList() const
 {
 	return channelList;
 }
 
-QStringList Debug::getAttributeList()
+QStringList Debug::getAttributeList() const
 {
 	return attributeList;
 }
 
-QStringList Debug::getFileName()
+QStringList Debug::getFileName() const
 {
 	return filename;
 }
 
-QVector<QString> Debug::getAttributeVector()
+QVector<QString> Debug::getAttributeVector() const
 {
 	return attributeAvailable;
 }
 
-void Debug::scanChannels(QString devName)
+void Debug::scanChannels(const QString& devName)
 {
 	int nb_channels;
 	struct iio_device *device;
@@ -123,7 +141,7 @@ void Debug::scanChannels(QString devName)
 	}
 }
 
-void Debug::scanChannelAttributes(QString devName, QString channel)
+void Debug::scanChannelAttributes(QString devName, QString& channel)
 {
 	struct iio_device *device;
 	struct iio_channel *ch;
@@ -180,8 +198,8 @@ void Debug::scanChannelAttributes(QString devName, QString channel)
 
 }
 
-QStringList Debug::getAvailableValues(QString devName, QString channel,
-                                      QString attribute)
+QStringList Debug::getAvailableValues(const QString& devName, QString& channel,
+                                      QString& attribute) const
 {
 	struct iio_device *device;
 	struct iio_channel *ch;
@@ -224,8 +242,8 @@ QStringList Debug::getAvailableValues(QString devName, QString channel,
 	}
 }
 
-QString Debug::readAttribute(QString devName, QString channel,
-                             QString attribute)
+QString Debug::readAttribute(const QString& devName, QString& channel,
+                             const QString& attribute)
 {
 	struct iio_device *device;
 	struct iio_channel *ch;
@@ -254,8 +272,9 @@ QString Debug::readAttribute(QString devName, QString channel,
 	return QString(value);
 }
 
-void Debug::writeAttribute(QString devName, QString channel, QString attribute,
-                           QString value)
+void Debug::writeAttribute(const QString& devName, QString& channel,
+                           const QString& attribute,
+                           const QString& value)
 {
 	struct iio_device *device;
 	struct iio_channel *ch;

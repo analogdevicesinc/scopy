@@ -1,3 +1,22 @@
+/*
+ * Copyright 2016 Analog Devices, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with GNU Radio; see the file LICENSE.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street,
+ * Boston, MA 02110-1301, USA.
+ */
+
 #include "debugger.h"
 #include "ui_debugger.h"
 #include <QDebug>
@@ -166,21 +185,25 @@ void Debugger::on_ReadButton_clicked()
 	channel = ui->ChannelComboBox->currentText();
 	attribute = ui->AttributeComboBox->currentText();
 
+
+
 	if (channel.contains("Global", Qt::CaseInsensitive)) {
 		channel.clear();
 	}
 
-	if (!attribute.isNull()) {
-		value = debug.readAttribute(dev, channel, attribute);
+	if (attribute.contains(("None", Qt::CaseInsensitive))) {
+		if (!attribute.isNull()) {
+			value = debug.readAttribute(dev, channel, attribute);
 
-		if (ui->valueStackedWidget->currentIndex() == 0) {
-			ui->valueLineEdit->setText(value);
+			if (ui->valueStackedWidget->currentIndex() == 0) {
+				ui->valueLineEdit->setText(value);
+			} else {
+				index = ui->valueComboBox->findText(value, Qt::MatchCaseSensitive);
+				ui->valueComboBox->setCurrentIndex(index);
+			}
 		} else {
-			index = ui->valueComboBox->findText(value, Qt::MatchCaseSensitive);
-			ui->valueComboBox->setCurrentIndex(index);
+			ui->valueStackedWidget->setCurrentIndex(0);
 		}
-	} else {
-		ui->valueStackedWidget->setCurrentIndex(0);
 	}
 }
 
