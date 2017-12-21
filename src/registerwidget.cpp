@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Analog Devices, Inc.
+ * Copyright 2017 Analog Devices, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,8 @@ using namespace adiscope;
 RegisterWidget::RegisterWidget(QWidget *parent,  Debug  *debug) :
 	QWidget(parent),
 	ui(new Ui::RegisterWidget),
-	address(0)
+	address(0),
+	value(0)
 {
 	ui->setupUi(this);
 
