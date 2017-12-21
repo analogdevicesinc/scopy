@@ -298,6 +298,8 @@ namespace adiscope {
 
 		QQueue<QPair<CustomPushButton *, bool>> menuButtonActions;
 
+		QVector<double> probe_attenuation;
+
 		void writeAllSettingsToHardware();
 
 		void comboBoxUpdateToValue(QComboBox *box, double value, std::vector<double>list);

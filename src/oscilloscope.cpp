@@ -288,6 +288,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 				QwtAxisId(QwtPlot::xBottom, 0),
 				QwtAxisId(QwtPlot::yLeft, i));
 		plot.addZoomer(i);
+		probe_attenuation.push_back(1);
 	}
 
 	plot.levelTriggerA()->setMobileAxis(QwtAxisId(QwtPlot::yLeft, 0));
@@ -551,10 +552,35 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		for (int i = 0; i < nb_channels + nb_math_channels; ++i) {
 			QLabel *label = static_cast<QLabel *>(
 						ui->chn_scales->itemAt(i)->widget());
-			label->setText(vertMeasureFormat.format(plot.VertUnitsPerDiv(i), "V/div", 3));
+			double value = probe_attenuation[i] * plot.VertUnitsPerDiv(i);
+			label->setText(vertMeasureFormat.format(value, "V/div", 3));
 		}
 	});
 
+	connect(ch_ui->probe_attenuation, &QLineEdit::editingFinished , [=](){
+		bool valid = false;
+		double value = ch_ui->probe_attenuation->text().toDouble(&valid);
+		if (valid && value <= 0) {
+			valid = false;
+		}
+		if (!valid) {
+			setDynamicProperty(ch_ui->probe_attenuation, "valid", false);
+			setDynamicProperty(ch_ui->probe_attenuation, "invalid", true);
+		} else {
+			setDynamicProperty(ch_ui->probe_attenuation, "invalid", false);
+			setDynamicProperty(ch_ui->probe_attenuation, "valid", true);
+		}
+
+		if (valid) {
+			probe_attenuation[current_ch_widget] = value;
+			for (int i = 0; i < nb_channels + nb_math_channels; ++i) {
+				QLabel *label = static_cast<QLabel *>(
+							ui->chn_scales->itemAt(i)->widget());
+				double value = probe_attenuation[i] * plot.VertUnitsPerDiv(i);
+				label->setText(vertMeasureFormat.format(value, "V/div", 3));
+			}
+		}
+	});
 	export_settings_init();
 	cursor_panel_init();
 	setFFT_params(true);
@@ -1091,6 +1117,7 @@ void Oscilloscope::add_math_channel(const std::string& function)
 	unsigned int curve_number = find_curve_number();
 
 	nb_math_channels++;
+	probe_attenuation.push_back(1);
 
 	QString qname = QString("Math %1").arg(math_chn_counter++);
 	std::string name = qname.toStdString();
@@ -1217,6 +1244,7 @@ void Oscilloscope::onChannelWidgetDeleteClicked()
 	QString qname = delBtn->property("curve_name").toString();
 	unsigned int curve_id = cw->id();
 
+	probe_attenuation.removeAt(curve_id);
 	if (curve_id == current_ch_widget &&
 			cw->menuButton()->isChecked()) {
 		menuButtonActions.removeAll(QPair<CustomPushButton*, bool>
@@ -1846,6 +1874,7 @@ void Oscilloscope::cancelZoom()
 	for (int i = 0; i < nb_channels + nb_math_channels; ++i) {
 		QLabel *label = static_cast<QLabel *>(
 					ui->chn_scales->itemAt(i)->widget());
+		double value = probe_attenuation[i] * plot.VertUnitsPerDiv(i);
 		label->setText(vertMeasureFormat.format(plot.VertUnitsPerDiv(i), "V/div", 3));
 	}
 }
@@ -1887,7 +1916,9 @@ void adiscope::Oscilloscope::onVertScaleValueChanged(double value)
 
 	QLabel *label = static_cast<QLabel *>(
 			ui->chn_scales->itemAt(current_ch_widget)->widget());
-	label->setText(vertMeasureFormat.format(value, "V/div", 3));
+	double labelValue = probe_attenuation[current_ch_widget]
+			* plot.VertUnitsPerDiv(current_ch_widget);
+	label->setText(vertMeasureFormat.format(labelValue, "V/div", 3));
 
 	// Switch between high and low gain modes only for the M2K channels
 	if (m2k_adc && current_ch_widget < nb_channels) {
@@ -2197,6 +2228,7 @@ void Oscilloscope::update_chn_settings_panel(int id)
 			ch_ui->btnCoupled->setChecked(chnAcCoupled.at(id));
 		}
 	}
+	ch_ui->probe_attenuation->setText(QString::number(probe_attenuation[id]));
 }
 
 void Oscilloscope::openEditMathPanel(bool on)
