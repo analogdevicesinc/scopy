@@ -45,7 +45,8 @@ OscScaleDraw::OscScaleDraw(const QString &unit) : QwtScaleDraw(),
 	m_floatPrecision(3),
 	m_unit(unit),
 	m_formatter(NULL),
-	m_color(Qt::gray)
+	m_color(Qt::gray),
+	m_displayScale(1)
 {
 	enableComponent(QwtAbstractScaleDraw::Backbone, false);
 	enableComponent(QwtAbstractScaleDraw::Ticks, false);
@@ -85,6 +86,11 @@ QString OscScaleDraw::getUnitType() const
 void OscScaleDraw::setColor(QColor color)
 {
 	m_color = color;
+}
+
+void OscScaleDraw::setDisplayScale(double value)
+{
+	m_displayScale = value;
 }
 
 void OscScaleDraw::draw(QPainter *painter, const QPalette &) const
@@ -174,6 +180,8 @@ QwtText OscScaleDraw::label( double value ) const
 	if (m_formatter) {
 		m_formatter->getFormatAttributes(value, prefix, scale);
 	}
+
+	value *= m_displayScale;
 
 	QwtText text(sign + QLocale().toString(value / scale, 'f', m_floatPrecision + bonusPrecision)
 		+ ' ' + prefix + m_unit);

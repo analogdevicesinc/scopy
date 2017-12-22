@@ -571,6 +571,8 @@ public:
 
 	void setColor(QColor color);
 
+	void setDisplayScale(double value);
+
 protected:
 	virtual void draw(QPainter *, const QPalette &) const;
 
@@ -579,6 +581,7 @@ private:
 	QString m_unit;
 	PrefixFormatter *m_formatter;
 	QColor m_color;
+	double m_displayScale;
 };
 
 class OscPlotZoomer: public LimitedPlotZoomer
