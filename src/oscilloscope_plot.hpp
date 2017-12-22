@@ -109,7 +109,7 @@ namespace adiscope {
 
 		void enableLabels(bool enabled);
 		bool eventFilter(QObject *, QEvent *);
-		bool setActiveVertAxis(unsigned int axisIdx);
+		bool setActiveVertAxis(unsigned int axisIdx, bool selected = true);
 		void showYAxisWidget(unsigned int axisIdx, bool en);
 		bool enableAxisLabels(bool enabled);
 

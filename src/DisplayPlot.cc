@@ -975,6 +975,7 @@ void DisplayPlot::enableMouseGesturesOnScales(bool enable)
 }
 
 void DisplayPlot::setActiveVertAxis(unsigned int axisIdx)
+void DisplayPlot::setActiveVertAxis(unsigned int axisIdx, bool selected)
 {
 	int numAxes = this->axesCount(QwtPlot::yLeft);
 
@@ -982,7 +983,7 @@ void DisplayPlot::setActiveVertAxis(unsigned int axisIdx)
 		return;
 
 
-	if (d_usingLeftAxisScales) {
+	if (d_usingLeftAxisScales && selected) {
 		for (int i = 0; i < numAxes; i++) {
 			this->setAxisVisible(QwtAxisId(QwtPlot::yLeft, i),
 					(i == axisIdx));
@@ -992,7 +993,7 @@ void DisplayPlot::setActiveVertAxis(unsigned int axisIdx)
 
 	d_activeVertAxis = axisIdx;
 
-	if (d_coloredLabels) {
+	if (d_coloredLabels && selected) {
 		OscScaleDraw *scaleDraw = static_cast<OscScaleDraw *>(this->axisScaleDraw(QwtAxisId(QwtPlot::yLeft, axisIdx)));
 		scaleDraw->setColor(getLineColor(axisIdx));
 		scaleDraw->invalidateCache();

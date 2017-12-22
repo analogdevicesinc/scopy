@@ -2124,7 +2124,7 @@ void adiscope::Oscilloscope::toggleRightMenu(CustomPushButton *btn, bool checked
 		settings_panel_update(id);
 
 	if (id >= 0) {
-		plot.setActiveVertAxis(id);
+		plot.setActiveVertAxis(id, false);
 		if (checked) {
 			update_chn_settings_panel(id);
 		}

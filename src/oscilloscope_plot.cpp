@@ -645,6 +645,9 @@ bool CapturePlot::enableAxisLabels(bool enabled)
 bool CapturePlot::setActiveVertAxis(unsigned int axisIdx)
 {
 	DisplayPlot::setActiveVertAxis(axisIdx);
+bool CapturePlot::setActiveVertAxis(unsigned int axisIdx, bool selected)
+{
+	DisplayPlot::setActiveVertAxis(axisIdx, selected);
 	if (d_labelsEnabled) {
 		enableAxis(QwtPlot::xBottom, true);
 		d_bottomHandlesArea->setLeftPadding(50 + axisWidget(

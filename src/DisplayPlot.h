@@ -391,7 +391,7 @@ public Q_SLOTS:
   virtual void vertAxisScaleIncrease();
   virtual void vertAxisScaleDecrease();
 
-  void setActiveVertAxis(unsigned int axisIdx);
+  void setActiveVertAxis(unsigned int axisIdx, bool selected = true);
   int activeVertAxis();
 
   void setVertOffset(double offset, int axisIdx = 0);
