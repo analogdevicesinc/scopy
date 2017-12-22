@@ -216,6 +216,9 @@ QList<QString> ToolLauncher::getOrder()
 
 void ToolLauncher::setOrder(QList<QString> list)
 {
+	if (tools.size() != list.size())
+		return;
+
 	for (int i = 0; i < tools.size(); ++i){
 		for (int j = 0; j < list.size(); ++j)
 			if (tools[j] == list[i])
