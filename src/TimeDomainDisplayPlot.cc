@@ -780,6 +780,7 @@ QString TimeDomainDisplayPlot::timeScaleValueFormat(double value)
 
 QString TimeDomainDisplayPlot::yAxisScaleValueFormat(double value, int precision) const
 {
+	value *= d_displayScale;
 	return d_metricFormatter.format(value, d_yAxisUnit, precision);
 }
 
