@@ -120,7 +120,13 @@ struct adiscope::signal_generator_data {
 	float offset;
 	double frequency;
 	double phase;
+	double dutycycle;
 	enum sg_waveform waveform;
+
+	double rise;
+	double holdh;
+	double fall;
+	double holdl;
 	// SIGNAL_TYPE_BUFFER
 	double file_sr;
 	double file_amplitude;
@@ -219,8 +225,22 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 	ui->fileAmplitude->setValue(ui->fileAmplitude->maxValue()/2);
 	ui->fileOffset->setValue(0);
 	ui->filePhase->setValue(0);
+
+	ui->leFalltime->setText(QString::number(0.25));
+	ui->leRisetime->setText(QString::number(0.25));
+	ui->leHoldhightime->setText(QString::number(0.25));
+	ui->leHoldlowtime->setText(QString::number(0.25));
+
+	ui->dutycycle->setValue(50);
+	ui->dutycycle->setVisible(false);
+	ui->wtrapezparams->setVisible(false);
 	ui->mathFrequency->setValue(
 	        ui->mathFrequency->minValue() * 100 * 1000.0);
+
+	ui->leFalltime->setValidator(new QDoubleValidator(0, 100, 2, ui->leFalltime));
+	ui->leRisetime->setValidator(new QDoubleValidator(0, 100, 2, ui->leRisetime));
+	ui->leHoldlowtime->setValidator(new QDoubleValidator(0, 100, 2, ui->leHoldlowtime));
+	ui->leHoldhightime->setValidator(new QDoubleValidator(0, 100, 2, ui->leHoldhightime));
 
 	unsigned int nb_channels = iio_channels.size();
 
@@ -234,6 +254,11 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 		ptr->frequency = ui->frequency->value();
 		ptr->constant = ui->constantValue->value();
 		ptr->phase = ui->phase->value();
+		ptr->holdh = ui->leHoldhightime->text().toDouble();
+		ptr->holdl = ui->leHoldlowtime->text().toDouble();
+		ptr->rise = ui->leRisetime->text().toDouble();
+		ptr->fall = ui->leFalltime->text().toDouble();
+		ptr->dutycycle = ui->dutycycle->value();
 		ptr->waveform = SG_SIN_WAVE;
 		ptr->math_freq = ui->mathFrequency->value();
 		ptr->file_sr = ui->fileSampleRate->value();
@@ -344,6 +369,18 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 	        this, SLOT(frequencyChanged(double)));
 	connect(ui->phase, SIGNAL(valueChanged(double)),
 	        this, SLOT(phaseChanged(double)));
+
+	connect(ui->dutycycle, SIGNAL(valueChanged(double)),
+		this, SLOT(dutyChanged(double)));
+
+	connect(ui->leFalltime, SIGNAL(textChanged(QString)),
+		this, SLOT(fallChanged(QString)));
+	connect(ui->leHoldhightime, SIGNAL(textChanged(QString)),
+		this, SLOT(holdHighChanged(QString)));
+	connect(ui->leHoldlowtime, SIGNAL(textChanged(QString)),
+		this, SLOT(holdLowChanged(QString)));
+	connect(ui->leRisetime, SIGNAL(textChanged(QString)),
+		this, SLOT(riseChanged(QString)));
 
 	connect(ui->mathFrequency, SIGNAL(valueChanged(double)),
 	        this, SLOT(mathFreqChanged(double)));
@@ -606,6 +643,60 @@ void SignalGenerator::mathFreqChanged(double value)
 	}
 }
 
+void SignalGenerator::dutyChanged(double value)
+{
+	auto ptr = getCurrentData();
+
+	if (ptr->dutycycle != value) {
+		ptr->dutycycle= value;
+		resetZoom();
+	}
+}
+
+void SignalGenerator::fallChanged(QString value)
+{
+	auto ptr = getCurrentData();
+
+	double dblval = value.toDouble();
+	if (ptr->fall != dblval) {
+		ptr->fall= dblval;
+		resetZoom();
+	}
+}
+
+void SignalGenerator::holdHighChanged(QString value)
+{
+	auto ptr = getCurrentData();
+
+	double dblval = value.toDouble();
+	if (ptr->holdh != dblval) {
+		ptr->holdh= dblval;
+		resetZoom();
+	}
+}
+
+void SignalGenerator::holdLowChanged(QString value)
+{
+	auto ptr = getCurrentData();
+
+	double dblval = value.toDouble();
+	if (ptr->holdl != dblval) {
+		ptr->holdl= dblval;
+		resetZoom();
+	}
+}
+
+void SignalGenerator::riseChanged(QString value)
+{
+	auto ptr = getCurrentData();
+
+	double dblval = value.toDouble();
+	if (ptr->rise != dblval) {
+		ptr->rise= dblval;
+		resetZoom();
+	}
+}
+
 void SignalGenerator::phaseChanged(double value)
 {
 	auto ptr = getCurrentData();
@@ -622,6 +713,7 @@ void SignalGenerator::waveformTypeChanged(int val)
 		SG_SIN_WAVE,
 		SG_SQR_WAVE,
 		SG_TRI_WAVE,
+		SG_TRA_WAVE,
 		SG_SAW_WAVE,
 		SG_INV_SAW_WAVE,
 	};
@@ -630,8 +722,12 @@ void SignalGenerator::waveformTypeChanged(int val)
 
 	if (ptr->waveform != types[val]) {
 		ptr->waveform = types[val];
+		// only show trapezoid parameters for the apropriate waveform
+		ui->wtrapezparams->setVisible(types[val]==SG_TRA_WAVE);
+		ui->dutycycle->setVisible(types[val]==SG_SQR_WAVE);
 		resetZoom();
 	}
+
 }
 
 QSharedPointer<signal_generator_data> SignalGenerator::getCurrentData()
@@ -1099,16 +1195,12 @@ basic_block_sptr SignalGenerator::getSignalSource(gr::top_block_sptr top,
 	analog::gr_waveform_t waveform;
 	double phase;
 	double amplitude;
+	double rise=0.5,fall=0.5;
+	double holdh=0.0,holdl=0.0;
 	float offset;
 
-	if (data.waveform == SG_SIN_WAVE) {
-		amplitude = data.amplitude / 2.0;
-		offset = data.offset;
-	} else {
-		amplitude = data.amplitude;
-		offset = data.offset - (float) data.amplitude / 2.0;
-	}
-
+	amplitude = data.amplitude / 2.0;
+	offset = data.offset;
 	phase = data.phase + phase_correction;
 
 	if (data.waveform == SG_TRI_WAVE) {
@@ -1119,29 +1211,48 @@ basic_block_sptr SignalGenerator::getSignalSource(gr::top_block_sptr top,
 		phase=phase+360.0;
 	}
 
-	if (inv_saw_wave) {
-		waveform = analog::GR_SAW_WAVE;
-		offset = -data.offset - (float) data.amplitude / 2.0;
-	} else {
-		waveform = static_cast<analog::gr_waveform_t>(data.waveform);
+	if(data.waveform==SG_SIN_WAVE)
+		waveform=analog::GR_SIN_WAVE;
+	else
+		waveform=analog::GR_TRA_WAVE;
+
+	boost::shared_ptr<analog::sig_source_f> src = analog::sig_source_f::make(samp_rate, waveform,
+					      data.frequency, amplitude, offset,phase*0.01745329);
+
+	switch(data.waveform)
+	{
+	case SG_SQR_WAVE:
+		rise=fall=0.001;
+		holdh=(data.dutycycle/100.0);
+		holdl=1.0-(data.dutycycle/100.0);
+		break;
+	case SG_TRI_WAVE:
+		rise=fall=1;
+		holdh=0.001;
+		holdl=0.001;
+		break;
+	case SG_SAW_WAVE:
+		fall=holdh=holdl=0.001;
+		rise=1;
+		break;
+	case SG_INV_SAW_WAVE:
+		rise=holdh=holdl=0.001;
+		fall=1;
+		break;
+	case SG_TRA_WAVE:
+		rise=data.rise;
+		fall=data.fall;
+		holdl=data.holdl;
+		holdh=data.holdh;
+		break;
+
+	default:
+		break;
 	}
 
-	auto src = analog::sig_source_f::make(samp_rate, waveform,
-	                                      data.frequency, amplitude, offset);
+	src->set_tra_params(rise,holdh,fall,holdl);
+	return src;
 
-	uint64_t to_skip = samp_rate * (360.0 - phase) / (data.frequency * 360.0);
-	auto skip_head = blocks::skiphead::make(sizeof(float),(uint64_t)to_skip);
-	top->connect(src, 0, skip_head, 0);
-
-	if (!inv_saw_wave) {
-		return skip_head;
-	} else {
-		auto mult = blocks::multiply_const_ff::make(-1.0);
-		top->connect(skip_head, 0, mult, 0);
-		//top->connect(delay, 0, mult, 0);
-
-		return mult;
-	}
 }
 
 void SignalGenerator::loadFileChannelData(QWidget *obj)
@@ -1419,6 +1530,13 @@ void SignalGenerator::updateRightMenuForChn(int chIdx)
 	ui->offset->setValue(ptr->offset);
 	ui->amplitude->setValue(ptr->amplitude);
 	ui->phase->setValue(ptr->phase);
+	ui->dutycycle->setValue(ptr->dutycycle);
+
+	ui->leFalltime->setText(QString::number(ptr->fall));
+	ui->leRisetime->setText(QString::number(ptr->rise));
+	ui->leHoldhightime->setText(QString::number(ptr->holdh));
+	ui->leHoldlowtime->setText(QString::number(ptr->holdl));
+
 	ui->label_path->setText(ptr->file);
 	ui->mathWidget->setFunction(ptr->function);
 	ui->mathFrequency->setValue(ptr->math_freq);
@@ -1887,6 +2005,7 @@ void SignalGenerator_API::setWaveformType(const QList<int>& list)
 		SG_SIN_WAVE,
 		SG_SQR_WAVE,
 		SG_TRI_WAVE,
+		SG_TRA_WAVE,
 		SG_SAW_WAVE,
 		SG_INV_SAW_WAVE,
 	};

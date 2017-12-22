@@ -281,6 +281,11 @@ QTabBar::tab:!selected {
                     </item>
                     <item>
                      <property name="text">
+                      <string>Trapezoidal</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
                       <string>Rising Ramp Sawtooth</string>
                      </property>
                     </item>
@@ -293,6 +298,29 @@ QTabBar::tab:!selected {
                   </item>
                   <item>
                    <layout class="QGridLayout" name="waveformGrid">
+                    <property name="bottomMargin">
+                     <number>0</number>
+                    </property>
+                    <item row="0" column="1">
+                     <widget class="adiscope::PositionSpinButton" name="offset" native="true">
+                      <property name="units" stdset="0">
+                       <stringlist notr="true">
+                        <string>µVolts=1e-6</string>
+                        <string>mVolts=1e-3</string>
+                        <string>Volts=1e0</string>
+                       </stringlist>
+                      </property>
+                      <property name="name" stdset="0">
+                       <string>Offset</string>
+                      </property>
+                      <property name="min_value" stdset="0">
+                       <double>-5.000000000000000</double>
+                      </property>
+                      <property name="max_value" stdset="0">
+                       <double>5.000000000000000</double>
+                      </property>
+                     </widget>
+                    </item>
                     <item row="1" column="0">
                      <widget class="adiscope::ScaleSpinButton" name="frequency" native="true">
                       <property name="minimumSize">
@@ -310,7 +338,7 @@ QTabBar::tab:!selected {
                        </stringlist>
                       </property>
                       <property name="name" stdset="0">
-                       <string>SampleRate</string>
+                       <string>Frequency</string>
                       </property>
                       <property name="min_value" stdset="0">
                        <double>0.001000000000000</double>
@@ -343,23 +371,18 @@ QTabBar::tab:!selected {
                       </property>
                      </widget>
                     </item>
-                    <item row="0" column="1">
-                     <widget class="adiscope::PositionSpinButton" name="offset" native="true">
-                      <property name="units" stdset="0">
-                       <stringlist notr="true">
-                        <string>µVolts=1e-6</string>
-                        <string>mVolts=1e-3</string>
-                        <string>Volts=1e0</string>
-                       </stringlist>
-                      </property>
+                    <item row="2" column="1">
+                     <widget class="adiscope::PositionSpinButton" name="dutycycle" native="true">
                       <property name="name" stdset="0">
-                       <string>Offset</string>
-                      </property>
-                      <property name="min_value" stdset="0">
-                       <double>-5.000000000000000</double>
+                       <string>Duty Cycle</string>
                       </property>
                       <property name="max_value" stdset="0">
-                       <double>5.000000000000000</double>
+                       <double>100.000000000000000</double>
+                      </property>
+                      <property name="units" stdset="0">
+                       <stringlist>
+                        <string>%=1e0</string>
+                       </stringlist>
                       </property>
                      </widget>
                     </item>
@@ -368,6 +391,7 @@ QTabBar::tab:!selected {
                       <property name="units" stdset="0">
                        <stringlist notr="true">
                         <string>°=1e0</string>
+                        <string>pirad=0.5</string>
                        </stringlist>
                       </property>
                       <property name="name" stdset="0">
@@ -379,6 +403,98 @@ QTabBar::tab:!selected {
                      </widget>
                     </item>
                    </layout>
+                  </item>
+                  <item>
+                   <widget class="QWidget" name="wtrapezparams" native="true">
+                    <layout class="QGridLayout" name="gridLayout">
+                     <property name="leftMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="topMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="rightMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="bottomMargin">
+                      <number>0</number>
+                     </property>
+                     <item row="0" column="0">
+                      <layout class="QVBoxLayout" name="verticalLayout_9">
+                       <property name="spacing">
+                        <number>0</number>
+                       </property>
+                       <property name="topMargin">
+                        <number>0</number>
+                       </property>
+                       <item>
+                        <widget class="QLabel" name="label_2">
+                         <property name="text">
+                          <string>Rise</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QLineEdit" name="leRisetime"/>
+                       </item>
+                      </layout>
+                     </item>
+                     <item row="0" column="1">
+                      <layout class="QVBoxLayout" name="verticalLayout_10">
+                       <property name="spacing">
+                        <number>0</number>
+                       </property>
+                       <item>
+                        <widget class="QLabel" name="label_3">
+                         <property name="text">
+                          <string>Hold High</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QLineEdit" name="leHoldhightime"/>
+                       </item>
+                      </layout>
+                     </item>
+                     <item row="3" column="0">
+                      <layout class="QVBoxLayout" name="verticalLayout_11">
+                       <property name="spacing">
+                        <number>0</number>
+                       </property>
+                       <property name="topMargin">
+                        <number>0</number>
+                       </property>
+                       <item>
+                        <widget class="QLabel" name="label_6">
+                         <property name="text">
+                          <string>Fall</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QLineEdit" name="leFalltime"/>
+                       </item>
+                      </layout>
+                     </item>
+                     <item row="3" column="1">
+                      <layout class="QVBoxLayout" name="verticalLayout_12">
+                       <property name="spacing">
+                        <number>0</number>
+                       </property>
+                       <item>
+                        <widget class="QLabel" name="label_8">
+                         <property name="text">
+                          <string>Hold Low</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QLineEdit" name="leHoldlowtime"/>
+                       </item>
+                      </layout>
+                     </item>
+                    </layout>
+                   </widget>
                   </item>
                   <item>
                    <spacer name="verticalSpacer_3">
