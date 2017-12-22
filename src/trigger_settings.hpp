@@ -72,6 +72,8 @@ namespace adiscope {
 		void setDcLevelCoupled(double);
 		void setAcCoupled(bool, int);
 
+		void setChannelAttenuation(double value);
+
 	Q_SIGNALS:
 		void sourceChanged(int);
 		void levelChanged(double);
@@ -133,6 +135,7 @@ namespace adiscope {
 		long long trigger_raw_delay;
 		bool adc_running;
 		bool m_ac_coupled;
+		double m_displayScale;
 	};
 
 }

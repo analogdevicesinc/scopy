@@ -157,6 +157,13 @@ void TriggerSettings::setAcCoupled(bool coupled, int chnIdx)
 	}
 }
 
+void TriggerSettings::setChannelAttenuation(double value)
+{
+	m_displayScale = value;
+	ui->trigger_hysteresis->setDisplayScale(value);
+	ui->trigger_level->setDisplayScale(value);
+}
+
 void TriggerSettings::setDcLevelCoupled(double value)
 {
 	if (trigg_configs[current_channel].dc_level != value) {
