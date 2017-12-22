@@ -22,6 +22,7 @@ public:
 	void setLabelsColor(const QColor& color);
 	virtual void init(QLabel *name, QLabel *value);
 	virtual void update(const MeasurementData& data) = 0;
+	void setDisplayScale(double value);
 
 protected:
 	QString m_name;
@@ -29,6 +30,7 @@ protected:
 	QLabel *m_nameLabel;
 	QLabel *m_valueLabel;
 	int m_minValLableWidth;
+	double m_displayScale;
 };
 
 class MetricMeasurementGui: public MeasurementGui

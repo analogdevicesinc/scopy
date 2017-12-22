@@ -13,7 +13,8 @@ MeasurementGui::MeasurementGui():
 	m_value(""),
 	m_nameLabel(NULL),
 	m_valueLabel(NULL),
-	m_minValLableWidth(0)
+	m_minValLableWidth(0),
+	m_displayScale(1)
 {
 }
 
@@ -46,6 +47,11 @@ void MeasurementGui::init(QLabel *name, QLabel *value)
 	m_valueLabel = value;
 }
 
+void MeasurementGui::setDisplayScale(double value)
+{
+	m_displayScale = value;
+}
+
 
 /*
  * Class MetricMeasurementGui implementation
@@ -71,8 +77,13 @@ void MetricMeasurementGui::init(QLabel *name, QLabel *value)
 void MetricMeasurementGui::update(const MeasurementData& data)
 {
 	m_name = data.name() + ":";
-	if (data.measured() && data.enabled())
-		m_value = m_formatter.format(data.value(), data.unit(), 3);
+	if (data.measured() && data.enabled()) {
+		double value = data.value();
+		if (data.axis() == MeasurementData::VERTICAL) {
+			value *= m_displayScale;
+		}
+		m_value = m_formatter.format(value, data.unit(), 3);
+	}
 	else
 		m_value = "--";
 
@@ -105,9 +116,13 @@ void TimeMeasurementGui::update(const MeasurementData& data)
 {
 	m_name = data.name() + ":";
 
-	if (data.measured() && data.enabled())
-		m_value = m_formatter.format(data.value(), "", 3);
-	else
+	if (data.measured() && data.enabled()) {
+		double value = data.value();
+		if (data.axis() == MeasurementData::VERTICAL) {
+			value *= m_displayScale;
+		}
+		m_value = m_formatter.format(value, "", 3);
+	} else
 		m_value = "--";
 
 	m_nameLabel->setText(m_name);
@@ -140,7 +155,11 @@ void PercentageMeasurementGui::update(const MeasurementData& data)
 	m_name = data.name() + ":";
 
 	if (data.measured() && data.enabled()) {
-		m_value.setNum(data.value(), 'f', 2);
+		double value = data.value();
+		if (data.axis() == MeasurementData::VERTICAL) {
+			value *= m_displayScale;
+		}
+		m_value.setNum(value, 'f', 2);
 		m_value += "%";
 	} else {
 		m_value = "--";
@@ -163,9 +182,13 @@ void DimensionlessMeasurementGui::update(const MeasurementData& data)
 {
 	m_name = data.name() + ":";
 
-	if (data.measured() && data.enabled())
-		m_value.setNum(data.value(), 'f', 3);
-	else
+	if (data.measured() && data.enabled()) {
+		double value = data.value();
+		if (data.axis() == MeasurementData::VERTICAL) {
+			value *= m_displayScale;
+		}
+		m_value.setNum(value, 'f', 3);
+	} else
 		m_value = "--";
 
 	m_nameLabel->setText(m_name);
