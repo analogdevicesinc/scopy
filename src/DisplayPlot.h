@@ -369,6 +369,8 @@ public:
 
   void enableMouseGesturesOnScales(bool enable);
 
+  void setDisplayScale(double value);
+
 public Q_SLOTS:
   virtual void disableLegend();
   virtual void setYaxis(double min, double max);
@@ -525,6 +527,8 @@ protected:
   int64_t d_numPoints;
 
   bool d_stop;
+
+  double d_displayScale;
 
   QList<QColor> d_CurveColors;
 

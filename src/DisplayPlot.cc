@@ -412,7 +412,8 @@ void PlotAxisConfiguration::setMouseGesturesEnabled(bool en)
 DisplayPlot::DisplayPlot(int nplots, QWidget* parent,
 			 unsigned int xNumDivs, unsigned int yNumDivs)
   : QwtPlot(parent), d_nplots(nplots), d_stop(false),
-    d_coloredLabels(false), d_mouseGesturesEnabled(false)
+    d_coloredLabels(false), d_mouseGesturesEnabled(false),
+    d_displayScale(1)
 {
   d_CurveColors << QColor("#ff7200") << QColor("#9013fe") << QColor(Qt::green)
        << QColor(Qt::cyan) << QColor(Qt::magenta)
@@ -982,7 +983,16 @@ void DisplayPlot::enableMouseGesturesOnScales(bool enable)
 	d_mouseGesturesEnabled = enable;
 }
 
-void DisplayPlot::setActiveVertAxis(unsigned int axisIdx)
+void DisplayPlot::setDisplayScale(double value)
+{
+	d_displayScale = value;
+	OscScaleDraw *osd = nullptr;
+	osd = static_cast<OscScaleDraw*>(axisWidget(QwtAxisId(QwtPlot::yLeft, d_activeVertAxis))->scaleDraw());
+	osd->setDisplayScale(d_displayScale);
+	osd->invalidateCache();
+	axisWidget(QwtAxisId(QwtPlot::yLeft, d_activeVertAxis))->update();
+}
+
 void DisplayPlot::setActiveVertAxis(unsigned int axisIdx, bool selected)
 {
 	int numAxes = this->axesCount(QwtPlot::yLeft);
