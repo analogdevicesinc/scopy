@@ -573,14 +573,26 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 
 		if (valid) {
 			probe_attenuation[current_ch_widget] = value;
+			if (current_channel == current_ch_widget) {
+				plot.setDisplayScale(probe_attenuation[current_ch_widget]);
+			}
+
 			for (int i = 0; i < nb_channels + nb_math_channels; ++i) {
 				QLabel *label = static_cast<QLabel *>(
 							ui->chn_scales->itemAt(i)->widget());
 				double value = probe_attenuation[i] * plot.VertUnitsPerDiv(i);
 				label->setText(vertMeasureFormat.format(value, "V/div", 3));
 			}
+
+			voltsPerDiv->setDisplayScale(probe_attenuation[current_ch_widget]);
+			voltsPosition->setDisplayScale(probe_attenuation[current_ch_widget]);
+
+			measureLabelsRearrange();
+
+			onTriggerSourceChanged(trigger_settings.currentChannel());
 		}
 	});
+
 	export_settings_init();
 	cursor_panel_init();
 	setFFT_params(true);
@@ -1720,6 +1732,7 @@ void adiscope::Oscilloscope::on_boxMeasure_toggled(bool on)
 void Oscilloscope::onTriggerSourceChanged(int chnIdx)
 {
 	plot.levelTriggerA()->setMobileAxis(QwtAxisId(QwtPlot::yLeft, chnIdx));
+	trigger_settings.setChannelAttenuation(probe_attenuation[chnIdx]);
 	if (chnAcCoupled.at(chnIdx)) {
 		deactivateAcCouplingTrigger();
 		activateAcCouplingTrigger(chnIdx);
@@ -1849,6 +1862,7 @@ void adiscope::Oscilloscope::onChannelWidgetSelected(bool checked)
 		Q_EMIT selectedChannelChanged(id);
 		plot.bringCurveToFront(id);
 		plot.setActiveVertAxis(id);
+		plot.setDisplayScale(probe_attenuation[id]);
 	}
 
 	if (plot.measurementsEnabled()) {
@@ -2229,6 +2243,8 @@ void Oscilloscope::update_chn_settings_panel(int id)
 		}
 	}
 	ch_ui->probe_attenuation->setText(QString::number(probe_attenuation[id]));
+	voltsPerDiv->setDisplayScale(probe_attenuation[id]);
+	voltsPosition->setDisplayScale(probe_attenuation[id]);
 }
 
 void Oscilloscope::openEditMathPanel(bool on)
@@ -2421,6 +2437,9 @@ void Oscilloscope::measureLabelsRearrange()
 	int nb_meas_added = 0;
 
 	for (int i = 0; i < measurements_data.size(); i++) {
+
+		int channel = measurements_data[i]->channel();
+
 		QLabel *name = new QLabel();
 		QLabel *value = new QLabel();
 
@@ -2435,6 +2454,7 @@ void Oscilloscope::measureLabelsRearrange()
 		value_layout->addWidget(value);
 		gLayout->addLayout(value_layout, row, 2 * col + 1);
 
+		measurements_gui[i]->setDisplayScale(probe_attenuation[channel]);
 		measurements_gui[i]->init(name, value);
 		measurements_gui[i]->update(*(measurements_data[i]));
 		measurements_gui[i]->setLabelsColor(plot.getLineColor(
