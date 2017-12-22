@@ -191,7 +191,7 @@ void Debugger::on_ReadButton_clicked()
 		channel.clear();
 	}
 
-	if (attribute.contains(("None", Qt::CaseInsensitive))) {
+	if (!attribute.contains("None", Qt::CaseInsensitive)) {
 		if (!attribute.isNull()) {
 			value = debug.readAttribute(dev, channel, attribute);
 
