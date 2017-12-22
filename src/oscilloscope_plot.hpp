@@ -113,6 +113,8 @@ namespace adiscope {
 		void showYAxisWidget(unsigned int axisIdx, bool en);
 		bool enableAxisLabels(bool enabled);
 
+		void setDisplayScale(double value);
+
 	Q_SIGNALS:
 		void timeTriggerValueChanged(double);
 		void channelOffsetChanged(double);

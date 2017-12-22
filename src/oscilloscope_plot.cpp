@@ -420,11 +420,12 @@ void CapturePlot::onVoltageCursor1Moved(double value)
 {
 	QString text;
 
+	value *= d_displayScale;
 	text = d_cursorMetricFormatter.format(value, "V", 3);
 	d_cursorReadouts->setVoltageCursor1Text(text);
 	d_cursorReadoutsText.v1 = text;
 
-	double diff = value - d_hBar2->plotCoord().y();
+	double diff = value - (d_hBar2->plotCoord().y() * d_displayScale) ;
 	text = d_cursorMetricFormatter.format(diff, "V", 3);
 	d_cursorReadouts->setVoltageDeltaText(text);
 	d_cursorReadoutsText.vDelta = text;
@@ -437,11 +438,12 @@ void CapturePlot::onVoltageCursor2Moved(double value)
 {
 	QString text;
 
+	value *= d_displayScale;
 	text = d_cursorMetricFormatter.format(value, "V", 3);
 	d_cursorReadouts->setVoltageCursor2Text(text);
 	d_cursorReadoutsText.v2 = text;
 
-	double diff = d_hBar1->plotCoord().y() - value;
+	double diff = (d_hBar1->plotCoord().y() * d_displayScale) - value;
 	text = d_cursorMetricFormatter.format(diff, "V", 3);
 	d_cursorReadouts->setVoltageDeltaText(text);
 	d_cursorReadoutsText.vDelta = text;
@@ -555,6 +557,7 @@ void CapturePlot::setSelectedChannel(int id)
 			d_hBar2->setMobileAxis(QwtAxisId(QwtPlot::yLeft, id));
 		}
 	}
+	//
 }
 
 int CapturePlot::selectedChannel()
@@ -642,9 +645,13 @@ bool CapturePlot::enableAxisLabels(bool enabled)
 	}
 }
 
-bool CapturePlot::setActiveVertAxis(unsigned int axisIdx)
+void CapturePlot::setDisplayScale(double value)
 {
-	DisplayPlot::setActiveVertAxis(axisIdx);
+	DisplayPlot::setDisplayScale(value);
+	onVoltageCursor1Moved(d_hBar1->plotCoord().y());
+	onVoltageCursor2Moved(d_hBar2->plotCoord().y());
+}
+
 bool CapturePlot::setActiveVertAxis(unsigned int axisIdx, bool selected)
 {
 	DisplayPlot::setActiveVertAxis(axisIdx, selected);
