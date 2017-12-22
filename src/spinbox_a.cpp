@@ -73,6 +73,8 @@ SpinBoxA::SpinBoxA(QWidget *parent) : QWidget(parent),
 	        ui->SBA_CompletionCircle, SLOT(setValueDouble(double)));
 	connect(ui->SBA_CompletionCircle, SIGNAL(toggled(bool)),
 	        SLOT(setFineMode(bool)));
+
+	m_displayScale = 1;
 }
 
 SpinBoxA::SpinBoxA(vector<pair<QString, double> >units, const QString& name,
@@ -95,11 +97,14 @@ SpinBoxA::SpinBoxA(vector<pair<QString, double> >units, const QString& name,
 
 	ui->SBA_Label->setText(name);
 
+	m_displayScale = 1;
 
 	if (m_value < min_value)
 		setValue(min_value);
 	else if (m_value > max_value)
 		setValue(max_value);
+
+
 }
 
 SpinBoxA::~SpinBoxA()
@@ -158,6 +163,7 @@ void SpinBoxA::onLineEditTextEdited()
 
 	if (i < m_units.size()) {
 		value *= m_units[i].second;
+		value /= m_displayScale;
 		setValue(value);
 	}
 }
@@ -234,6 +240,9 @@ void SpinBoxA::setValue(double value)
 	} else if (abs_number >= 1) {
 		significant_digits += 1;
 	}
+
+	number *= m_displayScale;
+
 	ui->SBA_LineEdit->setText(QString::number(number, 'g',
 		significant_digits));
 	ui->SBA_LineEdit->setCursorPosition(0);
@@ -398,6 +407,12 @@ void SpinBoxA::setName(const QString& name)
 	ui->SBA_Label->setText(name);
 }
 
+void SpinBoxA::setDisplayScale(double value)
+{
+	m_displayScale = value;
+	setValue(m_value);
+}
+
 void SpinBoxA::setUnits(const QStringList& list)
 {
 	QString regex = "^(?!^.{18})(([+,-]?)([0-9]*)([.]?)([0-9]+))";
@@ -475,6 +490,7 @@ void ScaleSpinButton::setMaxValue(double value)
 void ScaleSpinButton::stepUp()
 {
 	double current_val = ui->SBA_LineEdit->text().toDouble();
+	current_val /= m_displayScale;
 	double current_scale = m_units[ui->SBA_Combobox->currentIndex()].second;
 	double newVal;
 
@@ -496,6 +512,7 @@ void ScaleSpinButton::stepUp()
 void ScaleSpinButton::stepDown()
 {
 	double current_val = ui->SBA_LineEdit->text().toDouble();
+	current_val /= m_displayScale;
 	double current_scale = m_units[ui->SBA_Combobox->currentIndex()].second;
 	double newVal;
 
@@ -552,6 +569,7 @@ void PositionSpinButton::setStep(double step)
 void PositionSpinButton::stepUp()
 {
 	double current_val = ui->SBA_LineEdit->text().toDouble();
+	current_val /= m_displayScale;
 	double current_scale = m_units[ui->SBA_Combobox->currentIndex()].second;
 	double newVal;
 	double step = m_step;
@@ -572,6 +590,7 @@ void PositionSpinButton::stepUp()
 void PositionSpinButton::stepDown()
 {
 	double current_val = ui->SBA_LineEdit->text().toDouble();
+	current_val /= m_displayScale;
 	double current_scale = m_units[ui->SBA_Combobox->currentIndex()].second;
 	double newVal;
 	double step = m_step;

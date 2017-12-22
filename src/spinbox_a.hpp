@@ -105,6 +105,8 @@ public:
 	QString getName() const;
 	void setName(const QString& name);
 
+	void setDisplayScale(double value);
+
 public Q_SLOTS:
 	virtual void setValue(double);
 	void setFineMode(bool);
@@ -139,6 +141,7 @@ protected:
 	int m_decimal_count;
 	std::vector<std::pair<QString, double> > m_units;
 	QRegExpValidator *m_validator;
+	double m_displayScale;
 };
 
 class ScaleSpinButton: public SpinBoxA
