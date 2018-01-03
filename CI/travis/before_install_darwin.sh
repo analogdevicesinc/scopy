@@ -7,7 +7,7 @@ echo 'export PATH="$(brew --prefix qt)/bin:$PATH"' >> ~/.bash_profile
 brew link --force qt
 
 brew unlink bison
-brew install cmake fftw bison autoconf automake libtool libzip glibmm doxygen python3 wget boost gnu-sed libmatio
+brew install cmake fftw bison autoconf automake libtool libzip glibmm doxygen python3 wget boost gnu-sed libmatio dylibbundler
 brew install gcc llvm
 brew link --overwrite --force gcc
 brew link --overwrite --force bison
@@ -126,9 +126,9 @@ fi
 sudo make install
 
 cd ${WORKDIR}
-rm latest_libiio${LDIST}.pkg*
-wget http://swdownloads.analog.com/cse/travis_builds/latest_libiio${LDIST}.pkg
-sudo installer -pkg latest_libiio${LDIST}.pkg -target /
+rm master_latest_libiio${LDIST}.pkg*
+wget http://swdownloads.analog.com/cse/travis_builds/master_latest_libiio${LDIST}.pkg
+sudo installer -pkg master_latest_libiio${LDIST}.pkg -target /
 
 cd ${WORKDIR}
 if [ ! -d libad9361-iio ]; then
