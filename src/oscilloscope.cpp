@@ -587,7 +587,9 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 			voltsPerDiv->setDisplayScale(probe_attenuation[current_ch_widget]);
 			voltsPosition->setDisplayScale(probe_attenuation[current_ch_widget]);
 
-			measureLabelsRearrange();
+			if (!runButton->isChecked() && plot.measurementsEnabled()) {
+				measureUpdateValues();
+			}
 
 			onTriggerSourceChanged(trigger_settings.currentChannel());
 		}
