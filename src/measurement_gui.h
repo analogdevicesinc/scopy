@@ -21,8 +21,7 @@ public:
 	QString value() const;
 	void setLabelsColor(const QColor& color);
 	virtual void init(QLabel *name, QLabel *value);
-	virtual void update(const MeasurementData& data) = 0;
-	void setDisplayScale(double value);
+	virtual void update(const MeasurementData& data, double displayScale) = 0;
 
 protected:
 	QString m_name;
@@ -30,7 +29,6 @@ protected:
 	QLabel *m_nameLabel;
 	QLabel *m_valueLabel;
 	int m_minValLableWidth;
-	double m_displayScale;
 };
 
 class MetricMeasurementGui: public MeasurementGui
@@ -39,7 +37,7 @@ public:
 	MetricMeasurementGui();
 
 	virtual void init(QLabel *name, QLabel *value);
-	virtual void update(const MeasurementData& data);
+	virtual void update(const MeasurementData& data, double displayScale);
 
 protected:
 	MetricPrefixFormatter m_formatter;
@@ -51,7 +49,7 @@ public:
 	TimeMeasurementGui();
 
 	virtual void init(QLabel *name, QLabel *value);
-	virtual void update(const MeasurementData& data);
+	virtual void update(const MeasurementData& data, double displayScale);
 
 protected:
 	TimePrefixFormatter m_formatter;
@@ -63,7 +61,7 @@ public:
 	PercentageMeasurementGui();
 
 	virtual void init(QLabel *name, QLabel *value);
-	virtual void update(const MeasurementData& data);
+	virtual void update(const MeasurementData& data, double displayScale);
 };
 
 class DimensionlessMeasurementGui: public MeasurementGui
@@ -71,7 +69,7 @@ class DimensionlessMeasurementGui: public MeasurementGui
 public:
 	DimensionlessMeasurementGui();
 
-	virtual void update(const MeasurementData& data);
+	virtual void update(const MeasurementData& data, double displayScale);
 };
 
 } // namespace adiscope

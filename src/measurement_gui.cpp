@@ -13,8 +13,7 @@ MeasurementGui::MeasurementGui():
 	m_value(""),
 	m_nameLabel(NULL),
 	m_valueLabel(NULL),
-	m_minValLableWidth(0),
-	m_displayScale(1)
+	m_minValLableWidth(0)
 {
 }
 
@@ -47,11 +46,6 @@ void MeasurementGui::init(QLabel *name, QLabel *value)
 	m_valueLabel = value;
 }
 
-void MeasurementGui::setDisplayScale(double value)
-{
-	m_displayScale = value;
-}
-
 
 /*
  * Class MetricMeasurementGui implementation
@@ -74,13 +68,13 @@ void MetricMeasurementGui::init(QLabel *name, QLabel *value)
 	MeasurementGui::init(name, value);
 }
 
-void MetricMeasurementGui::update(const MeasurementData& data)
+void MetricMeasurementGui::update(const MeasurementData& data, double displayScale)
 {
 	m_name = data.name() + ":";
 	if (data.measured() && data.enabled()) {
 		double value = data.value();
 		if (data.axis() == MeasurementData::VERTICAL) {
-			value *= m_displayScale;
+			value *= displayScale;
 		}
 		m_value = m_formatter.format(value, data.unit(), 3);
 	}
@@ -112,14 +106,14 @@ void TimeMeasurementGui::init(QLabel *name, QLabel *value)
 	MeasurementGui::init(name, value);
 }
 
-void TimeMeasurementGui::update(const MeasurementData& data)
+void TimeMeasurementGui::update(const MeasurementData& data, double displayScale)
 {
 	m_name = data.name() + ":";
 
 	if (data.measured() && data.enabled()) {
 		double value = data.value();
 		if (data.axis() == MeasurementData::VERTICAL) {
-			value *= m_displayScale;
+			value *= displayScale;
 		}
 		m_value = m_formatter.format(value, "", 3);
 	} else
@@ -150,14 +144,14 @@ void PercentageMeasurementGui::init(QLabel *name, QLabel *value)
 	MeasurementGui::init(name, value);
 }
 
-void PercentageMeasurementGui::update(const MeasurementData& data)
+void PercentageMeasurementGui::update(const MeasurementData& data, double displayScale)
 {
 	m_name = data.name() + ":";
 
 	if (data.measured() && data.enabled()) {
 		double value = data.value();
 		if (data.axis() == MeasurementData::VERTICAL) {
-			value *= m_displayScale;
+			value *= displayScale;
 		}
 		m_value.setNum(value, 'f', 2);
 		m_value += "%";
@@ -178,14 +172,14 @@ void PercentageMeasurementGui::update(const MeasurementData& data)
 {
 }
 
-void DimensionlessMeasurementGui::update(const MeasurementData& data)
+void DimensionlessMeasurementGui::update(const MeasurementData& data, double displayScale)
 {
 	m_name = data.name() + ":";
 
 	if (data.measured() && data.enabled()) {
 		double value = data.value();
 		if (data.axis() == MeasurementData::VERTICAL) {
-			value *= m_displayScale;
+			value *= displayScale;
 		}
 		m_value.setNum(value, 'f', 3);
 	} else

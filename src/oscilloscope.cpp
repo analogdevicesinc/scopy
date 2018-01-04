@@ -2454,11 +2454,10 @@ void Oscilloscope::measureLabelsRearrange()
 		value_layout->addWidget(value);
 		gLayout->addLayout(value_layout, row, 2 * col + 1);
 
-		measurements_gui[i]->setDisplayScale(probe_attenuation[channel]);
 		measurements_gui[i]->init(name, value);
-		measurements_gui[i]->update(*(measurements_data[i]));
-		measurements_gui[i]->setLabelsColor(plot.getLineColor(
-			measurements_data[i]->channel()));
+		measurements_gui[i]->update(*(measurements_data[i]),
+					    probe_attenuation[channel]);
+		measurements_gui[i]->setLabelsColor(plot.getLineColor(channel));
 
 		nb_meas_added++;
 	}
@@ -2466,8 +2465,11 @@ void Oscilloscope::measureLabelsRearrange()
 
 void Oscilloscope::measureUpdateValues()
 {
-	for (int i = 0; i < measurements_data.size(); i++)
-		measurements_gui[i]->update(*(measurements_data[i]));
+	for (int i = 0; i < measurements_data.size(); i++) {
+		int channel = measurements_data[i]->channel();
+		measurements_gui[i]->update(*(measurements_data[i]),
+					    probe_attenuation[channel]);
+	}
 }
 
 void Oscilloscope::measure_settings_init()
