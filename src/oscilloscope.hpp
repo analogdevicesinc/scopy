@@ -521,6 +521,9 @@ namespace adiscope {
 		Q_PROPERTY(double line_thickness
 				READ getLineThickness WRITE setLineThickness)
 
+		Q_PROPERTY(double probe_attenuation READ getProbeAttenuation
+				WRITE setProbeAttenuation)
+
 		Q_PROPERTY(double period READ measured_period)
 		Q_PROPERTY(double frequency READ measured_frequency)
 		Q_PROPERTY(double min READ measured_min)
@@ -563,6 +566,9 @@ namespace adiscope {
 
 		double getLineThickness() const;
 		void setLineThickness(double val);
+
+		double getProbeAttenuation() const;
+		void setProbeAttenuation(double val);
 
 		double measured_period() const;
 		double measured_frequency() const;

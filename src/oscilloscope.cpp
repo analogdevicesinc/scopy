@@ -597,6 +597,15 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	api->load(*settings);
 	api->js_register(engine);
 
+	plot.setDisplayScale(probe_attenuation[current_channel]);
+	onTriggerSourceChanged(trigger_settings.currentChannel());
+	for (int i = 0; i < nb_channels + nb_math_channels; ++i) {
+		QLabel *label = static_cast<QLabel *>(
+					ui->chn_scales->itemAt(i)->widget());
+		double value = probe_attenuation[i] * plot.VertUnitsPerDiv(i);
+		label->setText(vertMeasureFormat.format(value, "V/div", 3));
+	}
+
 	if (!wheelEventGuard)
 		wheelEventGuard = new MouseWheelWidgetGuard(ui->mainWidget);
 	wheelEventGuard->installEventRecursively(ui->mainWidget);
@@ -3577,6 +3586,21 @@ void Channel_API::setLineThickness(double val)
 	int index = osc->channels_api.indexOf(this);
 
 	osc->plot.setLineWidthF(index, val);
+}
+
+double Channel_API::getProbeAttenuation() const
+{
+	int index = osc->channels_api.indexOf(const_cast<Channel_API*>(this));
+
+	return osc->probe_attenuation[index];
+}
+
+void Channel_API::setProbeAttenuation(double val)
+{
+	int index = osc->channels_api.indexOf(const_cast<Channel_API*>(this));
+
+	osc->probe_attenuation[index] = val;
+
 }
 
 #define DECLARE_MEASURE(m, t) \
