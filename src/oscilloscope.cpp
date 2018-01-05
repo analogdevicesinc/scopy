@@ -1889,7 +1889,7 @@ void Oscilloscope::cancelZoom()
 		QLabel *label = static_cast<QLabel *>(
 					ui->chn_scales->itemAt(i)->widget());
 		double value = probe_attenuation[i] * plot.VertUnitsPerDiv(i);
-		label->setText(vertMeasureFormat.format(plot.VertUnitsPerDiv(i), "V/div", 3));
+		label->setText(vertMeasureFormat.format(value, "V/div", 3));
 	}
 }
 
