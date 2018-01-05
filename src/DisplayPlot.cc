@@ -177,11 +177,11 @@ QwtText OscScaleDraw::label( double value ) const
 		}
 	}
 
+	value *= m_displayScale;
+
 	if (m_formatter) {
 		m_formatter->getFormatAttributes(value, prefix, scale);
 	}
-
-	value *= m_displayScale;
 
 	QwtText text(sign + QLocale().toString(value / scale, 'f', m_floatPrecision + bonusPrecision)
 		+ ' ' + prefix + m_unit);
