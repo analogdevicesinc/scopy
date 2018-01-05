@@ -764,7 +764,7 @@ AC Coupling</string>
           <number>10</number>
          </property>
          <item>
-          <widget class="QLabel" name="label_3">
+          <widget class="QLabel" name="probe_label">
            <property name="styleSheet">
             <string notr="true">color: rgba(255, 255, 255, 102);</string>
            </property>
@@ -775,28 +775,30 @@ Attenuation</string>
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="probe_attenuation">
-           <property name="styleSheet">
-            <string notr="true">QLineEdit {
-height: 22px;
-color: white;
-font-family: &quot;monospace&quot; 12;
-border: 2px solid;
-border-color: grey;
-border-radius: 5px;
-padding: 0 8px;
-background: transparent;
-selection-background-color: darkgray;
-}
-QLineEdit[invalid=true] {
-border-color: red;
-color: red;
-}
-QLineEdit[valid=true] {
-border-color: grey;
-color: white;
-}</string>
+          <widget class="QComboBox" name="probe_attenuation">
+           <property name="currentIndex">
+            <number>1</number>
            </property>
+           <item>
+            <property name="text">
+             <string>0.1X</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>1X</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>10X</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>100X</string>
+            </property>
+           </item>
           </widget>
          </item>
         </layout>

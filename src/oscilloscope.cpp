@@ -557,42 +557,31 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		}
 	});
 
-	connect(ch_ui->probe_attenuation, &QLineEdit::editingFinished , [=](){
-		bool valid = false;
-		double value = ch_ui->probe_attenuation->text().toDouble(&valid);
-		if (valid && value <= 0) {
-			valid = false;
-		}
-		if (!valid) {
-			setDynamicProperty(ch_ui->probe_attenuation, "valid", false);
-			setDynamicProperty(ch_ui->probe_attenuation, "invalid", true);
-		} else {
-			setDynamicProperty(ch_ui->probe_attenuation, "invalid", false);
-			setDynamicProperty(ch_ui->probe_attenuation, "valid", true);
+	connect(ch_ui->probe_attenuation, QOverload<int>::of(&QComboBox::currentIndexChanged),
+		[=](int index){
+		double value = 0.1 * (std::pow(10, index));
+
+		probe_attenuation[current_ch_widget] = value;
+		if (current_channel == current_ch_widget) {
+			plot.setDisplayScale(probe_attenuation[current_ch_widget]);
 		}
 
-		if (valid) {
-			probe_attenuation[current_ch_widget] = value;
-			if (current_channel == current_ch_widget) {
-				plot.setDisplayScale(probe_attenuation[current_ch_widget]);
-			}
-
-			for (int i = 0; i < nb_channels + nb_math_channels; ++i) {
-				QLabel *label = static_cast<QLabel *>(
-							ui->chn_scales->itemAt(i)->widget());
-				double value = probe_attenuation[i] * plot.VertUnitsPerDiv(i);
-				label->setText(vertMeasureFormat.format(value, "V/div", 3));
-			}
-
-			voltsPerDiv->setDisplayScale(probe_attenuation[current_ch_widget]);
-			voltsPosition->setDisplayScale(probe_attenuation[current_ch_widget]);
-
-			if (!runButton->isChecked() && plot.measurementsEnabled()) {
-				measureUpdateValues();
-			}
-
-			onTriggerSourceChanged(trigger_settings.currentChannel());
+		for (int i = 0; i < nb_channels + nb_math_channels; ++i) {
+			QLabel *label = static_cast<QLabel *>(
+						ui->chn_scales->itemAt(i)->widget());
+			double value = probe_attenuation[i] * plot.VertUnitsPerDiv(i);
+			label->setText(vertMeasureFormat.format(value, "V/div", 3));
 		}
+
+		voltsPerDiv->setDisplayScale(probe_attenuation[current_ch_widget]);
+		voltsPosition->setDisplayScale(probe_attenuation[current_ch_widget]);
+
+		if (!runButton->isChecked() && plot.measurementsEnabled()) {
+			measureUpdateValues();
+		}
+
+		onTriggerSourceChanged(trigger_settings.currentChannel());
+
 	});
 
 	export_settings_init();
@@ -2244,7 +2233,22 @@ void Oscilloscope::update_chn_settings_panel(int id)
 			ch_ui->btnCoupled->setChecked(chnAcCoupled.at(id));
 		}
 	}
-	ch_ui->probe_attenuation->setText(QString::number(probe_attenuation[id]));
+
+	if (chn_widget->isMathChannel()) {
+		ch_ui->probe_attenuation->setVisible(false);
+		ch_ui->probe_label->setVisible(false);
+	} else {
+		int index = 0;
+		double value = probe_attenuation[id];
+		while (value > 0.1) {
+			value /= 10;
+			index++;
+		}
+		ch_ui->probe_attenuation->setCurrentIndex(index);
+		ch_ui->probe_attenuation->setVisible(true);
+		ch_ui->probe_label->setVisible(true);
+	}
+
 	voltsPerDiv->setDisplayScale(probe_attenuation[id]);
 	voltsPosition->setDisplayScale(probe_attenuation[id]);
 }
