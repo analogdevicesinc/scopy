@@ -611,6 +611,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	wheelEventGuard->installEventRecursively(ui->mainWidget);
 
 	preferences_menu_init();
+
+	current_ch_widget = current_channel;
 }
 
 void Oscilloscope::updateTriggerLevelValue(std::vector<float> value)
