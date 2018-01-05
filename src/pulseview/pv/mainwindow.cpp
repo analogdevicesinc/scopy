@@ -23,6 +23,7 @@
 #include <libsigrokdecode/libsigrokdecode.h>
 #include <algorithm>
 #include <iterator>
+#include <iostream>
 
 #include <boost/algorithm/string/join.hpp>
 
