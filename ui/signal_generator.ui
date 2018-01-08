@@ -387,18 +387,9 @@ QTabBar::tab:!selected {
                      </widget>
                     </item>
                     <item row="1" column="1">
-                     <widget class="adiscope::PositionSpinButton" name="phase" native="true">
-                      <property name="units" stdset="0">
-                       <stringlist notr="true">
-                        <string>°=1e0</string>
-                        <string>pirad=0.5</string>
-                       </stringlist>
-                      </property>
+                     <widget class="adiscope::PhaseSpinButton" name="phase" native="true">
                       <property name="name" stdset="0">
                        <string>Phase</string>
-                      </property>
-                      <property name="max_value" stdset="0">
-                       <double>360.000000000000000</double>
                       </property>
                      </widget>
                     </item>
@@ -861,6 +852,12 @@ background-image: url(:/icons/floppy_hover.svg);
    <class>adiscope::Math</class>
    <extends>QWidget</extends>
    <header>math.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::PhaseSpinButton</class>
+   <extends>QWidget</extends>
+   <header>spinbox_a.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

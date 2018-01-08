@@ -369,6 +369,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 	        this, SLOT(frequencyChanged(double)));
 	connect(ui->phase, SIGNAL(valueChanged(double)),
 	        this, SLOT(phaseChanged(double)));
+	ui->phase->setStep(45);
 
 	connect(ui->dutycycle, SIGNAL(valueChanged(double)),
 		this, SLOT(dutyChanged(double)));
