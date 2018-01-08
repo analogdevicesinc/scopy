@@ -45,14 +45,13 @@
 #include <gnuradio/blocks/throttle.h>
 #include <gnuradio/blocks/multiply_const_ff.h>
 #include <gnuradio/blocks/add_const_ff.h>
+#include <gnuradio/blocks/repeat.h>
+#include <gnuradio/blocks/keep_one_in_n.h>
 #include <gnuradio/blocks/nop.h>
 #include <gnuradio/blocks/copy.h>
 #include <gnuradio/blocks/skiphead.h>
 #include <gnuradio/blocks/vector_sink_s.h>
 #include <gnuradio/blocks/null_source.h>
-#include <gnuradio/filter/fractional_resampler_ff.h>
-#include <gnuradio/filter/rational_resampler_base_fff.h>
-#include <gnuradio/filter/pfb_arb_resampler_fff.h>
 #include <gnuradio/iio/device_sink.h>
 #include <gnuradio/iio/math.h>
 #include <matio.h>
@@ -1394,18 +1393,21 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
 			top->connect(add,0,phase_skip,0);
 
 			if (preview) {
-				//auto res = blocks::throttle::make(sizeof(float),ptr->file_sr);//
-				auto res = filter::fractional_resampler_ff::make(0,ratio);
-				//auto res=filter::pfb_arb_resampler_fff::make(ratio,{0,1,0,0},1);
-				//auto res=filter::rational_resampler_base_fff::make(interp,dec,{1});
-				top->connect(phase_skip,0,res,0);
+				auto ratio = sample_rate/ptr->file_sr;
+				long m,n,integral;
+				reduceFraction(ratio,&m,&n,10);
+
+				auto interp= blocks::repeat::make(sizeof(float),m);
+				auto decim=blocks::keep_one_in_n::make(sizeof(float),n);
+				top->connect(phase_skip,0,interp,0);
+				top->connect(interp,0,decim,0);
 				auto buffer_freq = ptr->file_sr/(double)
 				                   ptr->file_nr_of_samples[ptr->file_channel];
 				int full_periods=(int)((double)zoomT1OnScreen * buffer_freq);
 				double phase_in_time = zoomT1OnScreen - (full_periods/buffer_freq);
 				unsigned long samples_to_skip = phase_in_time * samp_rate;
 				auto skip = blocks::skiphead::make(sizeof(float),samples_to_skip);
-				top->connect(res,0,skip,0);
+				top->connect(decim,0,skip,0);
 				return skip;
 			} else {
 				return phase_skip;
@@ -1771,6 +1773,16 @@ void SignalGenerator::calc_sampling_params(const iio_device *dev,
 		out_sample_rate = rate;
 		out_oversampling_ratio = 1;
 	}
+}
+
+void SignalGenerator::reduceFraction(double input, long *numerator, long *denominator, long precision)
+{
+    double integral = std::floor(input);
+    double frac = input - integral;
+    long gcd_ = gcd(round(frac * precision), precision);
+
+    *denominator = precision / gcd_;
+    *numerator = (round(frac * precision) / gcd_) + ((long)integral*(*denominator));
 }
 
 size_t SignalGenerator::gcd(size_t a, size_t b)

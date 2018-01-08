@@ -174,6 +174,7 @@ private:
 	                               unsigned long sample_rate,
 	                               gr::top_block_sptr top, bool     phase_correction=false);
 
+	static void reduceFraction(double input,long *numerator, long *denominator, long precision=1000000);
 	static size_t gcd(size_t a, size_t b);
 	static size_t lcm(size_t a, size_t b);
 	static int sg_waveform_to_idx(enum sg_waveform wave);
