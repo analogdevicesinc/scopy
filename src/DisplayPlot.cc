@@ -161,7 +161,6 @@ QwtText OscScaleDraw::label( double value ) const
 		int current = 0;
 		while (value > (lower + current * step)) current++;
 		int position = current - 1;
-		qDebug() << "The label with value: " << value << " has position: " << position;
 
 		if (position == 4) {
 			// center label with extra precision
