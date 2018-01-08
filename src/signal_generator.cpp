@@ -310,9 +310,9 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 
 	time_block_data->nb_channels = nb_channels;
 	time_block_data->time_block = scope_sink_f::make(
-	                                      nb_points, sample_rate,
-	                                      "Signal Generator", nb_channels,
-	                                      static_cast<QWidget *>(plot));
+					      nb_points, sample_rate,
+					      "Signal Generator", nb_channels,
+					      static_cast<QWidget *>(plot));
 
 	/* Attach all curves by default */
 	plot->registerSink(time_block_data->time_block->name(),
@@ -707,6 +707,12 @@ void SignalGenerator::phaseChanged(double value)
 	}
 }
 
+void SignalGenerator::waveformUpdateUi(int val)
+{
+	ui->wtrapezparams->setVisible(val==SG_TRA_WAVE);
+	ui->dutycycle->setVisible(val==SG_SQR_WAVE);
+}
+
 void SignalGenerator::waveformTypeChanged(int val)
 {
 	enum sg_waveform types[] = {
@@ -723,8 +729,7 @@ void SignalGenerator::waveformTypeChanged(int val)
 	if (ptr->waveform != types[val]) {
 		ptr->waveform = types[val];
 		// only show trapezoid parameters for the apropriate waveform
-		ui->wtrapezparams->setVisible(types[val]==SG_TRA_WAVE);
-		ui->dutycycle->setVisible(types[val]==SG_SQR_WAVE);
+		waveformUpdateUi(types[val]);
 		resetZoom();
 	}
 
@@ -1516,11 +1521,14 @@ int SignalGenerator::sg_waveform_to_idx(enum sg_waveform wave)
 	case SG_TRI_WAVE:
 		return 2;
 
-	case SG_SAW_WAVE:
+	case SG_TRA_WAVE:
 		return 3;
 
-	case SG_INV_SAW_WAVE:
+	case SG_SAW_WAVE:
 		return 4;
+
+	case SG_INV_SAW_WAVE:
+		return 5;
 	}
 }
 
@@ -1559,6 +1567,7 @@ void SignalGenerator::updateRightMenuForChn(int chIdx)
 	}
 
 	ui->type->setCurrentIndex(sg_waveform_to_idx(ptr->waveform));
+	waveformUpdateUi(ptr->waveform);
 
 	renameConfigPanel();
 	ui->tabWidget->setCurrentIndex((int) ptr->type);
@@ -2030,6 +2039,7 @@ void SignalGenerator_API::setWaveformType(const QList<int>& list)
 
 		if (i == gen->currentChannel) {
 			gen->ui->type->setCurrentIndex(list.at(i));
+			gen->updateRightMenuForChn(i);
 		}
 	}
 }
@@ -2145,6 +2155,153 @@ void SignalGenerator_API::setWaveformPhase(const QList<double>& list)
 
 	gen->ui->phase->setValue(gen->getCurrentData()->phase);
 }
+
+
+QList<double> SignalGenerator_API::getWaveformDuty() const
+{
+	QList<double> list;
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(gen->channels[i]);
+
+		list.append(ptr->dutycycle);
+	}
+
+	return list;
+}
+
+void SignalGenerator_API::setWaveformDuty(const QList<double>& list)
+{
+	if (list.size() != gen->channels.size()) {
+		return;
+	}
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(gen->channels[i]);
+
+		ptr->dutycycle = list.at(i);
+	}
+
+	gen->ui->dutycycle->setValue(gen->getCurrentData()->dutycycle);
+}
+
+
+QList<double> SignalGenerator_API::getWaveformRise() const
+{
+	QList<double> list;
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(gen->channels[i]);
+
+		list.append(ptr->rise);
+	}
+
+	return list;
+}
+
+void SignalGenerator_API::setWaveformRise(const QList<double>& list)
+{
+	if (list.size() != gen->channels.size()) {
+		return;
+	}
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(gen->channels[i]);
+
+		ptr->rise = list.at(i);
+	}
+
+	gen->ui->leRisetime->setText(QString::number(gen->getCurrentData()->rise));
+}
+
+
+QList<double> SignalGenerator_API::getWaveformFall() const
+{
+	QList<double> list;
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(gen->channels[i]);
+
+		list.append(ptr->fall);
+	}
+
+	return list;
+}
+
+void SignalGenerator_API::setWaveformFall(const QList<double>& list)
+{
+	if (list.size() != gen->channels.size()) {
+		return;
+	}
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(gen->channels[i]);
+
+		ptr->fall = list.at(i);
+	}
+
+	gen->ui->leFalltime->setText(QString::number(gen->getCurrentData()->fall));
+}
+
+
+QList<double> SignalGenerator_API::getWaveformHoldHigh() const
+{
+	QList<double> list;
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(gen->channels[i]);
+
+		list.append(ptr->holdh);
+	}
+
+	return list;
+}
+
+void SignalGenerator_API::setWaveformHoldHigh(const QList<double>& list)
+{
+	if (list.size() != gen->channels.size()) {
+		return;
+	}
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(gen->channels[i]);
+
+		ptr->holdh = list.at(i);
+	}
+
+	gen->ui->leHoldhightime->setText(QString::number(gen->getCurrentData()->holdh));
+}
+
+
+QList<double> SignalGenerator_API::getWaveformHoldLow() const
+{
+	QList<double> list;
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(gen->channels[i]);
+
+		list.append(ptr->holdl);
+	}
+
+	return list;
+}
+
+void SignalGenerator_API::setWaveformHoldLow(const QList<double>& list)
+{
+	if (list.size() != gen->channels.size()) {
+		return;
+	}
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(gen->channels[i]);
+
+		ptr->holdl = list.at(i);
+	}
+
+	gen->ui->leHoldlowtime->setText(QString::number(gen->getCurrentData()->holdl));
+}
+
+
 
 QList<double> SignalGenerator_API::getMathFreq() const
 {

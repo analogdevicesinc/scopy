@@ -225,6 +225,8 @@ private Q_SLOTS:
 	void riseChanged(QString value);
 
 	void mathFreqChanged(double val);
+
+	void waveformUpdateUi(int val);
 	void waveformTypeChanged(int val);
 	void tabChanged(int index);
 	void channelWidgetEnabled(bool);
@@ -260,6 +262,19 @@ class SignalGenerator_API : public ApiObject
 	           READ getMathFreq WRITE setMathFreq);
 	Q_PROPERTY(QList<QString> math_function
 	           READ getMathFunction WRITE setMathFunction);
+	Q_PROPERTY(QList<double> waveform_duty
+		   READ getWaveformDuty WRITE setWaveformDuty);
+
+	Q_PROPERTY(QList<double> waveform_rise
+		   READ getWaveformRise WRITE setWaveformRise);
+	Q_PROPERTY(QList<double> waveform_fall
+		   READ getWaveformFall WRITE setWaveformFall);
+	Q_PROPERTY(QList<double> waveform_holdhigh
+		   READ getWaveformHoldHigh WRITE setWaveformHoldHigh);
+	Q_PROPERTY(QList<double> waveform_holdlow
+		   READ getWaveformHoldLow WRITE setWaveformHoldLow);
+
+
 
 public:
 	bool running() const;
@@ -285,6 +300,18 @@ public:
 
 	QList<double> getWaveformPhase() const;
 	void setWaveformPhase(const QList<double>& list);
+
+	QList<double> getWaveformDuty() const;
+	void setWaveformDuty(const QList<double>& list);
+
+	QList<double> getWaveformHoldLow() const;
+	void setWaveformHoldLow(const QList<double>& list);
+	QList<double> getWaveformHoldHigh() const;
+	void setWaveformHoldHigh(const QList<double>& list);
+	QList<double> getWaveformFall() const;
+	void setWaveformFall(const QList<double>& list);
+	QList<double> getWaveformRise() const;
+	void setWaveformRise(const QList<double>& list);
 
 	QList<double> getMathFreq() const;
 	void setMathFreq(const QList<double>& list);
