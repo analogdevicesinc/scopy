@@ -93,6 +93,10 @@ dBgraph::dBgraph(QWidget *parent) : QwtPlot(parent),
 	}
 
 	zoomer = new OscScaleZoomer(canvas());
+	zoomer->setMousePattern(QwtEventPattern::MouseSelect3,
+				Qt::RightButton);
+	zoomer->setMousePattern(QwtEventPattern::MouseSelect2,
+				 Qt::RightButton, Qt::ControlModifier);
 
 	static_cast<QFrame *>(canvas())->setLineWidth(0);
 	setContentsMargins(10, 10, 20, 20);
