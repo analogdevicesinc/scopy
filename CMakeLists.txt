@@ -42,6 +42,10 @@ if (NOT SCOPY_VERSION_GIT)
 	set(SCOPY_VERSION_GIT v${PROJECT_VERSION})
 endif()
 
+# Set .exe properties
+set(SCOPY_PRODUCTVERSION_STR ${PROJECT_VERSION})
+string(TIMESTAMP BUILD_YEAR "%Y")
+
 if (MSVC)
 	# http://www.suodenjoki.dk/us/archive/2010/min-max.htm
 	add_definitions(-DNOMINMAX)
@@ -159,7 +163,7 @@ qt5_wrap_ui (m2kscope_FORMS_HEADERS ${M2KSCOPE_UIS})
 FILE(GLOB M2KSCOPE_RESOURCES resources/*.qrc)
 qt5_add_resources(m2kscope_RESOURCES ${M2KSCOPE_RESOURCES})
 
-set(RESOURCES resources/icon.rc)
+set(RESOURCES resources/properties.rc)
 
 add_definitions(-DQT_NO_KEYWORDS)
 

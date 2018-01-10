@@ -10,6 +10,7 @@ AppPublisher="Analog Devices, Inc."
 AppPublisherURL="http://www.analog.com"
 AppSupportURL="http://www.analog.com"
 AppUpdatesURL="http://www.analog.com"
+AppCopyright="Copyright 2018 Analog Devices, Inc."
 CreateAppDir=yes
 OutputBaseFilename=scopy-setup
 LicenseFile="C:\projects\scopy\LICENSE"
