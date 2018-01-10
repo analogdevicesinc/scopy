@@ -224,7 +224,7 @@ void EdgelessPlotGrid::updateScaleDiv( const QwtScaleDiv& xScaleDiv,
 }
 
 OscPlotZoomer::OscPlotZoomer(QWidget *parent, bool doReplot) :
-	LimitedPlotZoomer(parent, doReplot),
+	ExtendingPlotZoomer(parent, doReplot),
 	lastIndex(-1)
 {
 }

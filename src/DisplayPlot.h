@@ -43,7 +43,7 @@
 #include "utils.h"
 #include "osc_adjuster.hpp"
 #include "plot_utils.hpp"
-#include "limitedplotzoomer.h"
+#include "extendingplotzoomer.h"
 
 #if QWT_VERSION >= 0x060000
 #include <qwt_compat.h>
@@ -588,7 +588,7 @@ private:
 	double m_displayScale;
 };
 
-class OscPlotZoomer: public LimitedPlotZoomer
+class OscPlotZoomer: public ExtendingPlotZoomer
 {
 	Q_OBJECT
 public:
