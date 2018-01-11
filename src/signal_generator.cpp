@@ -36,6 +36,7 @@
 #include <gnuradio/analog/sig_source_waveform.h>
 #include <gnuradio/analog/noise_source_f.h>
 #include <gnuradio/analog/noise_type.h>
+#include <gnuradio/analog/rail_ff.h>
 #include <gnuradio/blocks/delay.h>
 #include <gnuradio/blocks/file_source.h>
 #include <gnuradio/blocks/vector_source_f.h>
@@ -1149,7 +1150,6 @@ void SignalGenerator::start()
 			void *ptr = iio_channel_get_data(each);
 			QWidget *w = static_cast<QWidget *>(ptr);
 			auto source = getSource(w, best_rate, top_block);
-
 			float volts_to_raw_coef;
 			double vlsb = 1;
 			double corr = 1; // interpolation correction
@@ -1158,11 +1158,11 @@ void SignalGenerator::start()
 			                            [&each](const QPair<struct iio_channel *,
 			std::shared_ptr<GenericDac>>& element) {
 				return element.first == each;
-			}
-			                           );
+			});
+
+			std::shared_ptr<GenericDac> dac =(*pair_it).second;
 
 			if (pair_it != channel_dac.end()) {
-				std::shared_ptr<GenericDac> dac =(*pair_it).second;
 				vlsb = dac->vlsb();
 				auto m2k_dac = std::dynamic_pointer_cast<M2kDac>
 				               (dac);
@@ -1177,19 +1177,17 @@ void SignalGenerator::start()
 			// instead of 12 bit(data is shifted to the left)
 			// Divide by corr when interpolation is used
 			volts_to_raw_coef = (-1 * (1 / vlsb) * 16) / corr;
-
 			auto f2s = blocks::float_to_short::make(1,
 			                                        volts_to_raw_coef);
-
 			auto head = blocks::head::make(
 			                    sizeof(short), samples_count);
-
 			auto vector = blocks::vector_sink_s::make();
+			auto clamp = analog::rail_ff::make(dac->vOutL(), dac->vOutH());
 
-			top_block->connect(source, 0, f2s, 0);
+			top_block->connect(source, 0, clamp, 0);
+			top_block->connect(clamp,0, f2s,0);
 			top_block->connect(f2s, 0, head, 0);
 			top_block->connect(head, 0, vector, 0);
-
 			top_block->run();
 
 			const std::vector<short>& samples = vector->data();

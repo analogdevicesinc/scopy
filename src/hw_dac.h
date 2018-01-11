@@ -34,6 +34,10 @@ public:
 	virtual double vlsb() const;
 	virtual void setVlsb(double vlsb);
 	virtual double convVoltsToSample(double);
+	virtual double vOutL() const;
+	virtual void setVOutL(double value);
+	virtual double vOutH() const;
+	virtual void setVOutH(double value);
 
 private:
 	struct iio_context *m_ctx;
@@ -41,6 +45,8 @@ private:
 	QList<struct iio_channel *> m_dac_channels;
 	uint m_dac_bits;
 	double m_sample_rate;
+	double m_vOutL;
+	double m_vOutH;
 };
 
 class M2kDac: public GenericDac

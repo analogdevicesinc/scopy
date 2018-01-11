@@ -87,6 +87,26 @@ double GenericDac::convVoltsToSample(double volts)
         return 0;
 }
 
+double GenericDac::vOutL() const
+{
+	return m_vOutL;
+}
+
+void GenericDac::setVOutL(double value)
+{
+	m_vOutL = value;
+}
+
+double GenericDac::vOutH() const
+{
+	return m_vOutH;
+}
+
+void GenericDac::setVOutH(double value)
+{
+	m_vOutH = value;
+}
+
 /*
  * Class M2kDac
  */
@@ -96,6 +116,9 @@ M2kDac::M2kDac(struct iio_context *ctx, struct iio_device *dac_dev):
 {
 	// Filters applied while interpolating affect the amplitude of the
 	// transmitted data
+
+	setVOutH(5.0);
+	setVOutL(-5.0);
 	m_filt_comp_table[75E6] = 1.00;
 	m_filt_comp_table[75E5] = 1.525879;
 	m_filt_comp_table[75E4] = 1.164153;
