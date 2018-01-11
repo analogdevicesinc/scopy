@@ -166,6 +166,9 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	connect(ui->btnHome, SIGNAL(toggled(bool)), this,
 		SLOT(setButtonBackground(bool)));
 
+	ui->saveBtn->parentWidget()->setEnabled(false);
+	ui->loadBtn->parentWidget()->setEnabled(false);
+
 	ui->btnHome->toggle();
 
 
@@ -731,6 +734,9 @@ void adiscope::ToolLauncher::disconnect()
 		toolMenu["Voltmeter"]->getToolStopBtn()->setChecked(false);
 		toolMenu["Debugger"]->getToolStopBtn()->setChecked(false);
 
+		ui->saveBtn->parentWidget()->setEnabled(false);
+		ui->loadBtn->parentWidget()->setEnabled(false);
+
 		for (auto x : detachedWindows){
 			x->close();
 		}
@@ -784,6 +790,9 @@ void adiscope::ToolLauncher::on_btnConnect_clicked(bool pressed)
 		setDynamicProperty(ui->btnConnect, "connected", true);
 		setDynamicProperty(btn, "connected", true);
 		search_timer->stop();
+
+		ui->saveBtn->parentWidget()->setEnabled(true);
+		ui->loadBtn->parentWidget()->setEnabled(true);
 
 		if (label) {
 			label->setText(filter->hw_name());
