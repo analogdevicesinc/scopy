@@ -225,10 +225,15 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 	ui->fileOffset->setValue(0);
 	ui->filePhase->setValue(0);
 
-	ui->leFalltime->setText(QString::number(0.25));
-	ui->leRisetime->setText(QString::number(0.25));
-	ui->leHoldhightime->setText(QString::number(0.25));
-	ui->leHoldlowtime->setText(QString::number(0.25));
+	ui->fallTime->setMinValue(0.00000001);
+	ui->riseTime->setMinValue(0.00000001);
+	ui->holdHighTime->setMinValue(0.00000001);
+	ui->holdLowTime->setMinValue(0.00000001);
+
+	ui->fallTime->setValue(0.25);
+	ui->riseTime->setValue(0.25);
+	ui->holdHighTime->setValue(0.25);
+	ui->holdLowTime->setValue(0.25);
 
 	ui->dutycycle->setValue(50);
 	ui->dutycycle->setVisible(false);
@@ -236,11 +241,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 	ui->mathFrequency->setValue(
 	        ui->mathFrequency->minValue() * 100 * 1000.0);
 
-	ui->leFalltime->setValidator(new QDoubleValidator(0, 100, 2, ui->leFalltime));
-	ui->leRisetime->setValidator(new QDoubleValidator(0, 100, 2, ui->leRisetime));
-	ui->leHoldlowtime->setValidator(new QDoubleValidator(0, 100, 2, ui->leHoldlowtime));
-	ui->leHoldhightime->setValidator(new QDoubleValidator(0, 100, 2, ui->leHoldhightime));
-
+	ui->cbNoiseType->setCurrentIndex(0);
 	unsigned int nb_channels = iio_channels.size();
 
 	for (unsigned int i = 0; i < nb_channels; i++) {
@@ -253,10 +254,10 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 		ptr->frequency = ui->frequency->value();
 		ptr->constant = ui->constantValue->value();
 		ptr->phase = ui->phase->value();
-		ptr->holdh = ui->leHoldhightime->text().toDouble();
-		ptr->holdl = ui->leHoldlowtime->text().toDouble();
-		ptr->rise = ui->leRisetime->text().toDouble();
-		ptr->fall = ui->leFalltime->text().toDouble();
+		ptr->holdh = ui->holdHighTime->value();
+		ptr->holdl = ui->holdLowTime->value();
+		ptr->rise = ui->riseTime->value();
+		ptr->fall = ui->fallTime->value();
 		ptr->dutycycle = ui->dutycycle->value();
 		ptr->waveform = SG_SIN_WAVE;
 		ptr->math_freq = ui->mathFrequency->value();
@@ -373,14 +374,14 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 	connect(ui->dutycycle, SIGNAL(valueChanged(double)),
 		this, SLOT(dutyChanged(double)));
 
-	connect(ui->leFalltime, SIGNAL(textChanged(QString)),
-		this, SLOT(fallChanged(QString)));
-	connect(ui->leHoldhightime, SIGNAL(textChanged(QString)),
-		this, SLOT(holdHighChanged(QString)));
-	connect(ui->leHoldlowtime, SIGNAL(textChanged(QString)),
-		this, SLOT(holdLowChanged(QString)));
-	connect(ui->leRisetime, SIGNAL(textChanged(QString)),
-		this, SLOT(riseChanged(QString)));
+	connect(ui->fallTime, SIGNAL(valueChanged(double)),
+		this, SLOT(fallChanged(double)));
+	connect(ui->holdHighTime, SIGNAL(valueChanged(double)),
+		this, SLOT(holdHighChanged(double)));
+	connect(ui->holdLowTime, SIGNAL(valueChanged(double)),
+		this, SLOT(holdLowChanged(double)));
+	connect(ui->riseTime, SIGNAL(valueChanged(double)),
+		this, SLOT(riseChanged(double)));
 
 	connect(ui->mathFrequency, SIGNAL(valueChanged(double)),
 	        this, SLOT(mathFreqChanged(double)));
@@ -653,49 +654,53 @@ void SignalGenerator::dutyChanged(double value)
 	}
 }
 
-void SignalGenerator::fallChanged(QString value)
+
+void SignalGenerator::trapezoidalComputeFrequency()
+{
+	auto ptr = getCurrentData();
+	ui->frequency->setValue(static_cast<double>(1/(ptr->rise+ptr->fall+ptr->holdh+ptr->holdl)));
+}
+
+void SignalGenerator::riseChanged(double value)
 {
 	auto ptr = getCurrentData();
 
-	double dblval = value.toDouble();
-	if (ptr->fall != dblval) {
-		ptr->fall= dblval;
-		resetZoom();
+	if (ptr->rise != value) {
+		ptr->rise= value;
+		trapezoidalComputeFrequency();
 	}
 }
 
-void SignalGenerator::holdHighChanged(QString value)
+void SignalGenerator::fallChanged(double value)
 {
 	auto ptr = getCurrentData();
 
-	double dblval = value.toDouble();
-	if (ptr->holdh != dblval) {
-		ptr->holdh= dblval;
-		resetZoom();
+	if (ptr->fall != value) {
+		ptr->fall= value;
+		trapezoidalComputeFrequency();
 	}
 }
 
-void SignalGenerator::holdLowChanged(QString value)
+void SignalGenerator::holdHighChanged(double value)
 {
 	auto ptr = getCurrentData();
 
-	double dblval = value.toDouble();
-	if (ptr->holdl != dblval) {
-		ptr->holdl= dblval;
-		resetZoom();
+	if (ptr->holdh != value) {
+		ptr->holdh= value;
+		trapezoidalComputeFrequency();
 	}
 }
 
-void SignalGenerator::riseChanged(QString value)
+void SignalGenerator::holdLowChanged(double value)
 {
 	auto ptr = getCurrentData();
 
-	double dblval = value.toDouble();
-	if (ptr->rise != dblval) {
-		ptr->rise= dblval;
-		resetZoom();
+	if (ptr->holdl != value) {
+		ptr->holdl= value;
+		trapezoidalComputeFrequency();
 	}
 }
+
 
 void SignalGenerator::phaseChanged(double value)
 {
@@ -709,8 +714,12 @@ void SignalGenerator::phaseChanged(double value)
 
 void SignalGenerator::waveformUpdateUi(int val)
 {
+	ui->frequency->setEnabled(val!=SG_TRA_WAVE);
 	ui->wtrapezparams->setVisible(val==SG_TRA_WAVE);
 	ui->dutycycle->setVisible(val==SG_SQR_WAVE);
+	if(val==SG_TRA_WAVE) {
+		trapezoidalComputeFrequency();
+	}
 }
 
 void SignalGenerator::waveformTypeChanged(int val)
@@ -1543,10 +1552,11 @@ void SignalGenerator::updateRightMenuForChn(int chIdx)
 	ui->phase->setValue(ptr->phase);
 	ui->dutycycle->setValue(ptr->dutycycle);
 
-	ui->leFalltime->setText(QString::number(ptr->fall));
-	ui->leRisetime->setText(QString::number(ptr->rise));
-	ui->leHoldhightime->setText(QString::number(ptr->holdh));
-	ui->leHoldlowtime->setText(QString::number(ptr->holdl));
+
+	ui->fallTime->setValue(ptr->fall);
+	ui->riseTime->setValue(ptr->rise);
+	ui->holdHighTime->setValue(ptr->holdh);
+	ui->holdLowTime->setValue(ptr->holdl);
 
 	ui->label_path->setText(ptr->file);
 	ui->mathWidget->setFunction(ptr->function);
@@ -2211,7 +2221,7 @@ void SignalGenerator_API::setWaveformRise(const QList<double>& list)
 		ptr->rise = list.at(i);
 	}
 
-	gen->ui->leRisetime->setText(QString::number(gen->getCurrentData()->rise));
+	gen->ui->riseTime->setValue(gen->getCurrentData()->rise);
 }
 
 
@@ -2240,7 +2250,7 @@ void SignalGenerator_API::setWaveformFall(const QList<double>& list)
 		ptr->fall = list.at(i);
 	}
 
-	gen->ui->leFalltime->setText(QString::number(gen->getCurrentData()->fall));
+	gen->ui->fallTime->setValue(gen->getCurrentData()->fall);
 }
 
 
@@ -2269,7 +2279,7 @@ void SignalGenerator_API::setWaveformHoldHigh(const QList<double>& list)
 		ptr->holdh = list.at(i);
 	}
 
-	gen->ui->leHoldhightime->setText(QString::number(gen->getCurrentData()->holdh));
+	gen->ui->holdHighTime->setValue(gen->getCurrentData()->holdh);
 }
 
 
@@ -2298,7 +2308,7 @@ void SignalGenerator_API::setWaveformHoldLow(const QList<double>& list)
 		ptr->holdl = list.at(i);
 	}
 
-	gen->ui->leHoldlowtime->setText(QString::number(gen->getCurrentData()->holdl));
+	gen->ui->holdLowTime->setValue(gen->getCurrentData()->holdl);
 }
 
 

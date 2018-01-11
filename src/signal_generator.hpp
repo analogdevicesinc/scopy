@@ -218,11 +218,12 @@ private Q_SLOTS:
 	void frequencyChanged(double val);
 	void dutyChanged(double val);
 	void phaseChanged(double val);
+	void trapezoidalComputeFrequency();
+	void riseChanged(double value);
+	void fallChanged(double value);
+	void holdHighChanged(double value);
+	void holdLowChanged(double value);
 
-	void fallChanged(QString value);
-	void holdHighChanged(QString value);
-	void holdLowChanged(QString value);
-	void riseChanged(QString value);
 
 	void mathFreqChanged(double val);
 

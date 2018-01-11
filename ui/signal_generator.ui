@@ -410,98 +410,111 @@ QTabBar::tab:!selected {
                      <property name="bottomMargin">
                       <number>0</number>
                      </property>
+                     <item row="2" column="1">
+                      <widget class="adiscope::ScaleSpinButton" name="holdLowTime" native="true">
+                       <property name="name" stdset="0">
+                        <string>Hold Low Time</string>
+                       </property>
+                       <property name="units" stdset="0">
+                        <stringlist notr="true">
+                         <string>ns=1e-9</string>
+                         <string>µs=1e-6</string>
+                         <string>ms=1e-3</string>
+                         <string>seconds=1e0</string>
+                        </stringlist>
+                       </property>
+                       <property name="max_value" stdset="0">
+                        <double>10.000000000000000</double>
+                       </property>
+                       <property name="show_progress" stdset="0">
+                        <bool>false</bool>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="1">
+                      <widget class="adiscope::ScaleSpinButton" name="holdHighTime" native="true">
+                       <property name="units" stdset="0">
+                        <stringlist notr="true">
+                         <string>ns=1e-9</string>
+                         <string>µs=1e-6</string>
+                         <string>ms=1e-3</string>
+                         <string>seconds=1e0</string>
+                        </stringlist>
+                       </property>
+                       <property name="name" stdset="0">
+                        <string>Hold High Time</string>
+                       </property>
+                       <property name="max_value" stdset="0">
+                        <double>10.000000000000000</double>
+                       </property>
+                       <property name="show_progress" stdset="0">
+                        <bool>false</bool>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="0">
+                      <widget class="adiscope::ScaleSpinButton" name="riseTime" native="true">
+                       <property name="minimumSize">
+                        <size>
+                         <width>30</width>
+                         <height>30</height>
+                        </size>
+                       </property>
+                       <property name="units" stdset="0">
+                        <stringlist notr="true">
+                         <string>ns=1e-9</string>
+                         <string>µs=1e-6</string>
+                         <string>ms=1e-3</string>
+                         <string>seconds=1e0</string>
+                        </stringlist>
+                       </property>
+                       <property name="name" stdset="0">
+                        <string>Rise Time</string>
+                       </property>
+                       <property name="max_value" stdset="0">
+                        <double>10.000000000000000</double>
+                       </property>
+                       <property name="show_progress" stdset="0">
+                        <bool>false</bool>
+                       </property>
+                      </widget>
+                     </item>
                      <item row="0" column="0">
-                      <layout class="QVBoxLayout" name="verticalLayout_9">
-                       <property name="spacing">
-                        <number>0</number>
+                      <widget class="QLabel" name="label_2">
+                       <property name="text">
+                        <string>Timing table</string>
                        </property>
-                       <property name="topMargin">
-                        <number>0</number>
-                       </property>
-                       <item>
-                        <widget class="QLabel" name="label_2">
-                         <property name="text">
-                          <string>Rise</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QLineEdit" name="leRisetime"/>
-                       </item>
-                      </layout>
+                      </widget>
                      </item>
-                     <item row="0" column="1">
-                      <layout class="QVBoxLayout" name="verticalLayout_10">
-                       <property name="spacing">
-                        <number>0</number>
+                     <item row="2" column="0">
+                      <widget class="adiscope::ScaleSpinButton" name="fallTime" native="true">
+                       <property name="minimumSize">
+                        <size>
+                         <width>30</width>
+                         <height>30</height>
+                        </size>
                        </property>
-                       <item>
-                        <widget class="QLabel" name="label_3">
-                         <property name="text">
-                          <string>Hold High</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QLineEdit" name="leHoldhightime"/>
-                       </item>
-                      </layout>
-                     </item>
-                     <item row="3" column="0">
-                      <layout class="QVBoxLayout" name="verticalLayout_11">
-                       <property name="spacing">
-                        <number>0</number>
+                       <property name="units" stdset="0">
+                        <stringlist notr="true">
+                         <string>ns=1e-9</string>
+                         <string>µs=1e-6</string>
+                         <string>ms=1e-3</string>
+                         <string>seconds=1e0</string>
+                        </stringlist>
                        </property>
-                       <property name="topMargin">
-                        <number>0</number>
+                       <property name="name" stdset="0">
+                        <string>Fall Time</string>
                        </property>
-                       <item>
-                        <widget class="QLabel" name="label_6">
-                         <property name="text">
-                          <string>Fall</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QLineEdit" name="leFalltime"/>
-                       </item>
-                      </layout>
-                     </item>
-                     <item row="3" column="1">
-                      <layout class="QVBoxLayout" name="verticalLayout_12">
-                       <property name="spacing">
-                        <number>0</number>
+                       <property name="max_value" stdset="0">
+                        <double>10.000000000000000</double>
                        </property>
-                       <item>
-                        <widget class="QLabel" name="label_8">
-                         <property name="text">
-                          <string>Hold Low</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QLineEdit" name="leHoldlowtime"/>
-                       </item>
-                      </layout>
+                       <property name="show_progress" stdset="0">
+                        <bool>false</bool>
+                       </property>
+                      </widget>
                      </item>
                     </layout>
                    </widget>
-                  </item>
-                  <item>
-                   <spacer name="verticalSpacer_3">
-                    <property name="orientation">
-                     <enum>Qt::Vertical</enum>
-                    </property>
-                    <property name="sizeType">
-                     <enum>QSizePolicy::MinimumExpanding</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>0</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                   </spacer>
                   </item>
                  </layout>
                 </widget>
