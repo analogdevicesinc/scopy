@@ -34,6 +34,8 @@
 
 #include <gnuradio/analog/sig_source_f.h>
 #include <gnuradio/analog/sig_source_waveform.h>
+#include <gnuradio/analog/noise_source_f.h>
+#include <gnuradio/analog/noise_type.h>
 #include <gnuradio/blocks/delay.h>
 #include <gnuradio/blocks/file_source.h>
 #include <gnuradio/blocks/vector_source_f.h>
@@ -45,6 +47,7 @@
 #include <gnuradio/blocks/throttle.h>
 #include <gnuradio/blocks/multiply_const_ff.h>
 #include <gnuradio/blocks/add_const_ff.h>
+#include <gnuradio/blocks/add_ff.h>
 #include <gnuradio/blocks/repeat.h>
 #include <gnuradio/blocks/keep_one_in_n.h>
 #include <gnuradio/blocks/nop.h>
@@ -81,6 +84,7 @@ enum SIGNAL_TYPE {
 	SIGNAL_TYPE_MATH	= 3,
 };
 
+Q_DECLARE_METATYPE(gr::analog::noise_type_t)
 
 bool SignalGenerator::riffCompare(riff_header_t& ptr,const char *id2)
 {
@@ -144,6 +148,10 @@ struct adiscope::signal_generator_data {
 	// SIGNAL_TYPE_MATH
 	QString function;
 	double math_freq;
+	// NOISE
+	gr::analog::noise_type_t noiseType;
+	float noiseAmplitude;
+
 };
 Q_DECLARE_METATYPE(QSharedPointer<signal_generator_data>);
 
@@ -242,6 +250,18 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 	        ui->mathFrequency->minValue() * 100 * 1000.0);
 
 	ui->cbNoiseType->setCurrentIndex(0);
+	ui->noiseAmplitude->setValue(0);
+	ui->btnNoiseCollapse->setVisible(false);
+	ui->cbNoiseType->setItemData(SG_NO_NOISE,0);
+	ui->cbNoiseType->setItemData(SG_UNIFORM_NOISE, analog::GR_UNIFORM);
+	ui->cbNoiseType->setItemData(SG_GAUSSIAN_NOISE, analog::GR_GAUSSIAN);
+	ui->cbNoiseType->setItemData(SG_LAPLACIAN_NOISE, analog::GR_LAPLACIAN);
+	ui->cbNoiseType->setItemData(SG_IMPULSE_NOISE, analog::GR_IMPULSE);
+
+	connect(ui->btnNoiseCollapse,&QPushButton::clicked,
+		[=](bool check) {
+			ui->wNoise->setVisible(!check);
+		});
 	unsigned int nb_channels = iio_channels.size();
 
 	for (unsigned int i = 0; i < nb_channels; i++) {
@@ -261,6 +281,8 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 		ptr->dutycycle = ui->dutycycle->value();
 		ptr->waveform = SG_SIN_WAVE;
 		ptr->math_freq = ui->mathFrequency->value();
+		ptr->noiseType = (gr::analog::noise_type_t)0;
+		ptr->noiseAmplitude=ui->noiseAmplitude->value();
 		ptr->file_sr = ui->fileSampleRate->value();
 		ptr->file_amplitude = ui->fileAmplitude->value();
 		ptr->file_offset = ui->fileOffset->value();
@@ -353,6 +375,8 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 	connect(ui->amplitude, SIGNAL(valueChanged(double)),
 	        this, SLOT(amplitudeChanged(double)));
 
+	connect(ui->noiseAmplitude,SIGNAL(valueChanged(double)),
+		this, SLOT(noiseAmplitudeChanged(double)));
 	connect(ui->fileAmplitude, SIGNAL(valueChanged(double)),
 	        this, SLOT(fileAmplitudeChanged(double)));
 	connect(ui->fileOffset, SIGNAL(valueChanged(double)),
@@ -388,6 +412,8 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 
 	connect(ui->type, SIGNAL(currentIndexChanged(int)),
 	        this, SLOT(waveformTypeChanged(int)));
+	connect(ui->cbNoiseType, SIGNAL(currentIndexChanged(int)),
+		this, SLOT(noiseTypeChanged(int)));
 
 	connect(ui->tabWidget, SIGNAL(currentChanged(int)),
 	        this, SLOT(tabChanged(int)));
@@ -639,7 +665,29 @@ void SignalGenerator::mathFreqChanged(double value)
 
 	if (ptr->math_freq != value) {
 		ptr->math_freq = value;
+		resetZoom();
+	}
+}
 
+
+void SignalGenerator::noiseTypeChanged(int index)
+{
+	auto ptr = getCurrentData();
+
+	gr::analog::noise_type_t value = qvariant_cast<gr::analog::noise_type_t>(ui->cbNoiseType->itemData(index));
+	if (ptr->noiseType != value) {
+		ptr->noiseType= value;
+		resetZoom();
+	}
+}
+
+void SignalGenerator::noiseAmplitudeChanged(double value)
+{
+
+	auto ptr = getCurrentData();
+
+	if (ptr->noiseAmplitude != value) {
+		ptr->noiseAmplitude = value;
 		resetZoom();
 	}
 }
@@ -755,12 +803,23 @@ QSharedPointer<signal_generator_data> SignalGenerator::getData(QWidget *obj)
 	return var.value<QSharedPointer<signal_generator_data>>();
 }
 
+void SignalGenerator::resizeTabWidget(int index)
+{
+	for(int i=0;i<ui->tabWidget->count();i++)
+		if(i!=index)
+		    ui->tabWidget->widget(i)->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+	ui->tabWidget->widget(index)->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+	ui->tabWidget->widget(index)->resize(ui->tabWidget->widget(index)->minimumSizeHint());
+	ui->tabWidget->widget(index)->adjustSize();
+}
+
 void SignalGenerator::tabChanged(int index)
 {
 	auto ptr = getCurrentData();
 
 	if (ptr->type != (enum SIGNAL_TYPE) index) {
 		ptr->type = (enum SIGNAL_TYPE) index;
+		resizeTabWidget(index);
 		resetZoom();
 	}
 }
@@ -1333,6 +1392,23 @@ void SignalGenerator::loadFileChannelData(QWidget *obj)
 	}
 }
 
+gr::basic_block_sptr SignalGenerator::getNoise(QWidget *obj)
+{
+	auto ptr = getData(obj);
+	if((int)ptr->noiseType != 0)
+	{
+		long noiseSeed=(rand());
+		double noiseDivider=1;
+		if(ptr->noiseType==analog::GR_IMPULSE)
+			noiseDivider=20; // magic value to divide impulse noise which generates way too big samples
+		return analog::noise_source_f::make((analog::noise_type_t)ptr->noiseType,ptr->noiseAmplitude/noiseDivider,noiseSeed);
+	}
+	else
+	{
+		return blocks::null_source::make(sizeof(float));
+	}
+}
+
 gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
                 unsigned long samp_rate, gr::top_block_sptr top, bool preview)
 {
@@ -1340,11 +1416,16 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
 	enum SIGNAL_TYPE type = ptr->type;
 	double phase=0.0;
 
+	auto noiseSrc = getNoise(obj);
+	auto noiseAdd = blocks::add_ff::make();
+	gr::basic_block_sptr generated_wave;
+
 	switch (type) {
 	case SIGNAL_TYPE_CONSTANT:
-		return analog::sig_source_f::make(samp_rate,
-		                                  analog::GR_CONST_WAVE, 0, 0,
-		                                  ptr->constant);
+		generated_wave = analog::sig_source_f::make(samp_rate,
+							analog::GR_CONST_WAVE, 0, 0,
+							ptr->constant);
+		break;
 
 	case SIGNAL_TYPE_WAVEFORM:
 		if (preview) {
@@ -1352,13 +1433,12 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
 			double phase_in_time = zoomT1OnScreen - full_periods/ptr->frequency;
 			phase = (phase_in_time*ptr->frequency) * 360.0;
 		}
-
-		return getSignalSource(top, samp_rate, *ptr, phase);
+		generated_wave = getSignalSource(top, samp_rate, *ptr, phase);
+		break;
 
 	case SIGNAL_TYPE_BUFFER:
 		if (!ptr->file.isNull()) {
 			auto str = ptr->file.toStdString();
-
 			boost::shared_ptr<basic_block> fs;
 			boost::shared_ptr<blocks::wavfile_source> fs1;
 
@@ -1373,7 +1453,6 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
 
 			case FORMAT_WAVE:
 				fs = blocks::wavfile_source::make(str.c_str(),true);
-
 				for (auto i=0; i<ptr->file_nr_of_channels; i++) {
 					if (i==ptr->file_channel) {
 						top->connect(fs,i,buffer,0);
@@ -1381,7 +1460,6 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
 						top->connect(fs,i,null,0);
 					}
 				}
-
 				break;
 
 			case FORMAT_CSV:
@@ -1396,7 +1474,6 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
 				top->connect(fs,0,buffer,0);
 				break;
 			}
-
 
 			auto ratio=ptr->file_sr/samp_rate;
 			auto mult = blocks::multiply_const_ff::make(ptr->file_amplitude);
@@ -1413,7 +1490,12 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
 
 				auto interp= blocks::repeat::make(sizeof(float),m);
 				auto decim=blocks::keep_one_in_n::make(sizeof(float),n);
-				top->connect(phase_skip,0,interp,0);
+				// Special noise handling for buffer previewer.
+				// Add noise before resampling, so noise is applied on buffered
+				// samples not displayed samples
+				top->connect(noiseSrc,0,noiseAdd,0);
+				top->connect(phase_skip,0,noiseAdd,1);
+				top->connect(noiseAdd,0,interp,0);
 				top->connect(interp,0,decim,0);
 				auto buffer_freq = ptr->file_sr/(double)
 				                   ptr->file_nr_of_samples[ptr->file_channel];
@@ -1422,12 +1504,15 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
 				unsigned long samples_to_skip = phase_in_time * samp_rate;
 				auto skip = blocks::skiphead::make(sizeof(float),samples_to_skip);
 				top->connect(decim,0,skip,0);
+				// return before readding the noise.
 				return skip;
 			} else {
-				return phase_skip;
+				generated_wave = phase_skip;
 			}
 		}
-
+		else {
+			generated_wave = blocks::nop::make(sizeof(float));
+		}
 		break;
 
 	case SIGNAL_TYPE_MATH:
@@ -1444,21 +1529,23 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
 				uint64_t to_skip = samp_rate * phase / (ptr->math_freq * 360.0);
 				auto skip_head = blocks::skiphead::make(sizeof(float),(uint64_t)to_skip);
 				top->connect(src, 0, skip_head, 0);
-				return skip_head;
+				generated_wave = skip_head;
 
 			} else {
-				return iio::iio_math_gen::make(samp_rate,
+				generated_wave = iio::iio_math_gen::make(samp_rate,
 				                               ptr->math_freq, str);
 			}
-
-
+			break;
 		}
 
 	default:
+		generated_wave = blocks::nop::make(sizeof(float));
 		break;
 	}
 
-	return blocks::nop::make(sizeof(float));
+	top->connect(noiseSrc,0,noiseAdd,0);
+	top->connect(generated_wave,0,noiseAdd,1);
+	return noiseAdd;
 }
 
 void adiscope::SignalGenerator::channelWidgetEnabled(bool en)
@@ -1552,6 +1639,9 @@ void SignalGenerator::updateRightMenuForChn(int chIdx)
 	ui->phase->setValue(ptr->phase);
 	ui->dutycycle->setValue(ptr->dutycycle);
 
+	ui->noiseAmplitude->setValue(ptr->noiseAmplitude);
+	auto noiseIndex = ui->cbNoiseType->findData(ptr->noiseType);
+	ui->cbNoiseType->setCurrentIndex(noiseIndex);
 
 	ui->fallTime->setValue(ptr->fall);
 	ui->riseTime->setValue(ptr->rise);
@@ -1578,9 +1668,9 @@ void SignalGenerator::updateRightMenuForChn(int chIdx)
 
 	ui->type->setCurrentIndex(sg_waveform_to_idx(ptr->waveform));
 	waveformUpdateUi(ptr->waveform);
-
 	renameConfigPanel();
 	ui->tabWidget->setCurrentIndex((int) ptr->type);
+	resizeTabWidget((int)ptr->type);
 }
 
 void SignalGenerator::updateAndToggleMenu(int chIdx, bool open)
@@ -2020,7 +2110,6 @@ QList<int> SignalGenerator_API::getWaveformType() const
 
 	for (unsigned int i = 0; i < gen->channels.size(); i++) {
 		auto ptr = gen->getData(gen->channels[i]);
-
 		list.append(SignalGenerator::sg_waveform_to_idx(ptr->waveform));
 	}
 
@@ -2046,7 +2135,6 @@ void SignalGenerator_API::setWaveformType(const QList<int>& list)
 		auto ptr = gen->getData(gen->channels[i]);
 
 		ptr->waveform = types[list.at(i)];
-
 		if (i == gen->currentChannel) {
 			gen->ui->type->setCurrentIndex(list.at(i));
 			gen->updateRightMenuForChn(i);
@@ -2193,6 +2281,63 @@ void SignalGenerator_API::setWaveformDuty(const QList<double>& list)
 	}
 
 	gen->ui->dutycycle->setValue(gen->getCurrentData()->dutycycle);
+}
+
+QList<int> SignalGenerator_API::getNoiseType() const
+{
+	QList<int> list;
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(gen->channels[i]);
+		list.append(ptr->noiseType);
+	}
+
+	return list;
+}
+
+void SignalGenerator_API::setNoiseType(const QList<int>& list)
+{
+	if (list.size() != gen->channels.size()) {
+		return;
+	}
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(gen->channels[i]);
+
+		ptr->noiseType = qvariant_cast<gr::analog::noise_type_t>(list.at(i));
+		if (i == gen->currentChannel) {
+			gen->ui->type->setCurrentIndex(list.at(i));
+			gen->updateRightMenuForChn(i);
+		}
+	}
+}
+
+
+QList<double> SignalGenerator_API::getNoiseAmpl() const
+{
+	QList<double> list;
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(gen->channels[i]);
+
+		list.append(ptr->noiseAmplitude);
+	}
+
+	return list;
+}
+
+void SignalGenerator_API::setNoiseAmpl(const QList<double>& list)
+{
+	if (list.size() != gen->channels.size()) {
+		return;
+	}
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(gen->channels[i]);
+		ptr->noiseAmplitude = list.at(i);
+	}
+
+	gen->ui->noiseAmplitude->setValue(gen->getCurrentData()->noiseAmplitude);
 }
 
 

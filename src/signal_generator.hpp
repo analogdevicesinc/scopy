@@ -21,6 +21,7 @@
 #define M2K_SIGNAL_GENERATOR_H
 
 #include <gnuradio/analog/sig_source_waveform.h>
+#include <gnuradio/analog/noise_type.h>
 #include <gnuradio/top_block.h>
 
 #include <QButtonGroup>
@@ -56,6 +57,14 @@ struct time_block_data;
 class SignalGenerator_API;
 class GenericDac;
 class ChannelWidget;
+
+enum sg_noise {
+	SG_NO_NOISE = 0,
+	SG_UNIFORM_NOISE = 1,
+	SG_GAUSSIAN_NOISE = 2,
+	SG_LAPLACIAN_NOISE = 3,
+	SG_IMPULSE_NOISE = 4,
+};
 
 enum sg_waveform {
 	SG_SIN_WAVE = gr::analog::GR_SIN_WAVE,
@@ -170,6 +179,7 @@ private:
 	        unsigned long sample_rate,
 	        struct signal_generator_data& data, double phase_correction=0.0);
 
+	gr::basic_block_sptr getNoise(QWidget *obj);
 	gr::basic_block_sptr getSource(QWidget *obj,
 	                               unsigned long sample_rate,
 	                               gr::top_block_sptr top, bool     phase_correction=false);
@@ -218,6 +228,8 @@ private Q_SLOTS:
 	void frequencyChanged(double val);
 	void dutyChanged(double val);
 	void phaseChanged(double val);
+	void noiseAmplitudeChanged(double val);
+	void noiseTypeChanged(int val);
 	void trapezoidalComputeFrequency();
 	void riseChanged(double value);
 	void fallChanged(double value);
@@ -230,6 +242,7 @@ private Q_SLOTS:
 	void waveformUpdateUi(int val);
 	void waveformTypeChanged(int val);
 	void tabChanged(int index);
+	void resizeTabWidget(int index);
 	void channelWidgetEnabled(bool);
 	void channelWidgetMenuToggled(bool);
 	void rightMenuFinished(bool opened);
@@ -266,6 +279,10 @@ class SignalGenerator_API : public ApiObject
 	Q_PROPERTY(QList<double> waveform_duty
 		   READ getWaveformDuty WRITE setWaveformDuty);
 
+	Q_PROPERTY(QList<int> noise_type
+		   READ getNoiseType WRITE setNoiseType);
+	Q_PROPERTY(QList<double> noise_amplitude
+		   READ getNoiseAmpl WRITE setNoiseAmpl);
 	Q_PROPERTY(QList<double> waveform_rise
 		   READ getWaveformRise WRITE setWaveformRise);
 	Q_PROPERTY(QList<double> waveform_fall
@@ -304,6 +321,11 @@ public:
 
 	QList<double> getWaveformDuty() const;
 	void setWaveformDuty(const QList<double>& list);
+
+	QList<int> getNoiseType() const;
+	void setNoiseType(const QList<int>& list);
+	QList<double> getNoiseAmpl() const;
+	void setNoiseAmpl(const QList<double>& list);
 
 	QList<double> getWaveformHoldLow() const;
 	void setWaveformHoldLow(const QList<double>& list);

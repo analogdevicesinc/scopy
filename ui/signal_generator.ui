@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1188</width>
-    <height>654</height>
+    <height>765</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -143,19 +143,22 @@ QPushButton:disabled {
         <item>
          <widget class="adiscope::MenuAnim" name="rightMenu" native="true">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+           <sizepolicy hsizetype="Maximum" vsizetype="Expanding">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_7">
+           <property name="topMargin">
+            <number>9</number>
+           </property>
            <property name="bottomMargin">
             <number>0</number>
            </property>
            <item>
             <widget class="QGroupBox" name="config_panel">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+              <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
@@ -167,7 +170,7 @@ QPushButton:disabled {
               <item>
                <widget class="QTabWidget" name="tabWidget">
                 <property name="sizePolicy">
-                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
                   <horstretch>0</horstretch>
                   <verstretch>0</verstretch>
                  </sizepolicy>
@@ -200,12 +203,24 @@ QTabBar::tab:!selected {
                  <bool>false</bool>
                 </property>
                 <widget class="QWidget" name="tabConstant">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
                  <attribute name="title">
                   <string>Constant</string>
                  </attribute>
                  <layout class="QVBoxLayout" name="verticalLayout_6">
                   <item>
                    <widget class="adiscope::PositionSpinButton" name="constantValue" native="true">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
                     <property name="units" stdset="0">
                      <stringlist notr="true">
                       <string>mVolts=1e-3</string>
@@ -226,22 +241,15 @@ QTabBar::tab:!selected {
                     </property>
                    </widget>
                   </item>
-                  <item>
-                   <spacer name="verticalSpacer">
-                    <property name="orientation">
-                     <enum>Qt::Vertical</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>20</width>
-                      <height>40</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
                  </layout>
                 </widget>
                 <widget class="QWidget" name="tabWaveform">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
                  <attribute name="title">
                   <string>Waveform</string>
                  </attribute>
@@ -519,6 +527,12 @@ QTabBar::tab:!selected {
                  </layout>
                 </widget>
                 <widget class="QWidget" name="tabBuffer">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
                  <attribute name="title">
                   <string>Buffer</string>
                  </attribute>
@@ -762,6 +776,12 @@ background-image: url(:/icons/floppy_hover.svg);
                  </layout>
                 </widget>
                 <widget class="QWidget" name="tabMath">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
                  <attribute name="title">
                   <string>Math</string>
                  </attribute>
@@ -800,6 +820,161 @@ background-image: url(:/icons/floppy_hover.svg);
               </item>
              </layout>
             </widget>
+           </item>
+           <item>
+            <widget class="QWidget" name="wNoise" native="true">
+             <layout class="QVBoxLayout" name="verticalLayout_9">
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_8">
+                <property name="spacing">
+                 <number>6</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <item>
+                 <widget class="QPushButton" name="btnNoiseCollapse">
+                  <property name="styleSheet">
+                   <string notr="true">QPushButton {
+  max-height: 6px;
+  max-width: 10px;
+  border-image: url(:/icons/sba_cmb_box_arrow.svg);
+}
+
+QPushButton:checked
+{
+  max-height: 10px;
+  max-width:  6px;
+border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
+}
+
+
+
+</string>
+                  </property>
+                  <property name="text">
+                   <string/>
+                  </property>
+                  <property name="checkable">
+                   <bool>true</bool>
+                  </property>
+                  <property name="checked">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="lblNoise">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="text">
+                   <string>Noise type </string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="Line" name="line">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <widget class="QComboBox" name="cbNoiseType">
+                <item>
+                 <property name="text">
+                  <string>None</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Uniform</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Gaussian</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Laplacian</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Impulse</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_5">
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <item>
+                 <spacer name="horizontalSpacer">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="adiscope::ScaleSpinButton" name="noiseAmplitude" native="true">
+                  <property name="name" stdset="0">
+                   <string>Amplitude</string>
+                  </property>
+                  <property name="min_value" stdset="0">
+                   <double>0.000000000000000</double>
+                  </property>
+                  <property name="max_value" stdset="0">
+                   <double>10.000000000000000</double>
+                  </property>
+                  <property name="units" stdset="0">
+                   <stringlist>
+                    <string>µVolts=1e-6</string>
+                    <string>mVolts=1e-3</string>
+                    <string>Volts=1e0</string>
+                   </stringlist>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
            </item>
           </layout>
          </widget>
