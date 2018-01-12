@@ -7,7 +7,7 @@ echo 'export PATH="$(brew --prefix qt)/bin:$PATH"' >> ~/.bash_profile
 brew link --force qt
 
 brew unlink bison
-brew install cmake fftw bison autoconf automake libtool libzip glibmm doxygen python3 wget boost gnu-sed libmatio dylibbundler
+brew install cmake fftw bison autoconf automake libtool libzip glib glibmm doxygen python3 wget boost gnu-sed libmatio dylibbundler
 brew install llvm
 brew link --overwrite --force gcc
 brew link --overwrite --force bison
@@ -50,7 +50,7 @@ sudo make install
 
 cd ${WORKDIR}
 if [ ! -d gnuradio ]; then
-  git clone https://github.com/gnuradio/gnuradio
+  git clone https://github.com/analogdevicesinc/gnuradio -b signal_source_phase
   cd gnuradio
   mkdir build
   cd build

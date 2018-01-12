@@ -73,7 +73,7 @@ sudo make install
 
 cd ${WORKDIR}
 if [ ! -d gnuradio ]; then
-  git clone https://github.com/gnuradio/gnuradio
+  git clone https://github.com/analogdevicesinc/gnuradio -b signal_source_phase
   cd gnuradio
   mkdir build
   cd build
