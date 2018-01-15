@@ -1170,9 +1170,20 @@ void ToolLauncher::checkIp(const QString& ip)
 		previousIp = ip;
 
 		QString uri = "ip:" + ip;
-		QMetaObject::invokeMethod(this, "addContext",
-					Qt::QueuedConnection,
-					Q_ARG(const QString&, uri));
+
+		bool found = false;
+		for (auto it = devices.begin(); it != devices.end(); ++it) {
+			QString dev_uri = (*it)->second.btn->property("uri").toString();
+			if (dev_uri == uri) {
+				found = true;
+				break;
+			}
+		}
+
+		if (!found)
+			QMetaObject::invokeMethod(this, "addContext",
+						Qt::QueuedConnection,
+						Q_ARG(const QString&, uri));
 	} else {
 		previousIp = "";
 	}
