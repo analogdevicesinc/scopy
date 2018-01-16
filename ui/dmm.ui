@@ -1319,9 +1319,9 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
               <number>0</number>
              </property>
              <item row="3" column="0" colspan="2">
-              <widget class="QLabel" name="label_6">
+              <widget class="QLabel" name="lblFileStatus">
                <property name="text">
-                <string>Filename</string>
+                <string>Choose a file</string>
                </property>
               </widget>
              </item>
