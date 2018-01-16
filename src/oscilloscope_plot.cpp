@@ -67,9 +67,11 @@ CapturePlot::CapturePlot(QWidget *parent,
 
 	/* Initial colors scheme */
 	d_trigAactiveLinePen = QPen(QColor(255, 255, 255), 2, Qt::SolidLine);
-	d_trigAinactiveLinePen = QPen(QColor(175, 175, 175), 2, Qt::DashLine);
+	d_trigAinactiveLinePen = QPen(QColor(175, 175, 175, 150), 2, Qt::DashLine);
 	d_trigBactiveLinePen = QPen(QColor(255, 255, 255), 2, Qt::SolidLine);
 	d_trigBinactiveLinePen = QPen(QColor(175, 175, 175), 2, Qt::DashLine);
+	d_timeTriggerInactiveLinePen = QPen(QColor(74, 100, 255, 150), 2, Qt::DashLine);
+	d_timeTriggerActiveLinePen = QPen(QColor(74, 100, 255), 2, Qt::SolidLine);
 	/* End of: Initial colors scheme */
 
 	d_symbolCtrl = new SymbolController(this);
@@ -144,7 +146,7 @@ CapturePlot::CapturePlot(QWidget *parent,
 	/* Time trigger widget */
 	d_timeTriggerBar = new VertBar(this);
 	d_symbolCtrl->attachSymbol(d_timeTriggerBar);
-	d_timeTriggerBar->setPen(QPen(QColor(74, 100, 255), 2, Qt::SolidLine));
+	d_timeTriggerBar->setPen(d_timeTriggerInactiveLinePen);
 	d_timeTriggerBar->setCanLeavePlot(true);
 
 	d_timeTriggerHandle = new FreePlotLineHandleH(
@@ -152,7 +154,10 @@ CapturePlot::CapturePlot(QWidget *parent,
 					QPixmap(":/icons/time_trigger_left.svg"),
 					QPixmap(":/icons/time_trigger_right.svg"),
 					d_bottomHandlesArea);
-	d_timeTriggerHandle->setPen(d_timeTriggerBar->pen());
+	d_timeTriggerHandle->setPen(d_timeTriggerActiveLinePen);
+
+	connect(d_timeTriggerHandle, SIGNAL(grabbedChanged(bool)),
+		SLOT(onTimeTriggerHandleGrabbed(bool)));
 
 	connect(d_timeTriggerHandle, SIGNAL(positionChanged(int)),
 		SLOT(onTimeTriggerHandlePosChanged(int)));
@@ -586,6 +591,13 @@ void CapturePlot::onTimeTriggerHandlePosChanged(int pos)
 	Q_EMIT timeTriggerValueChanged(-time);
 }
 
+void CapturePlot::onTimeTriggerHandleGrabbed(bool grabbed) {
+	if (grabbed)
+		d_timeTriggerBar->setPen(d_timeTriggerActiveLinePen);
+	else
+		d_timeTriggerBar->setPen(d_timeTriggerInactiveLinePen);
+	d_symbolCtrl->updateOverlay();
+}
 
 void CapturePlot::onTriggerAHandleGrabbed(bool grabbed)
 {
