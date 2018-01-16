@@ -406,7 +406,15 @@ void DMM::toggleDataLogging(bool en)
 
 		if(ui->btn_overwrite->isChecked() || file.size() == 0) {
 			if( !file.open(QIODevice::WriteOnly)) {
+				ui->lblFileStatus->setText("File is open in another program");
+				setDynamicProperty(ui->lblFileStatus, "invalid", true);
+				if(ui->run_button->isChecked()) {
+					ui->btnDataLogging->setChecked(false);
+				}
 				return;
+			} else {
+				ui->lblFileStatus->setText("Choose a file");
+				setDynamicProperty(ui->lblFileStatus, "invalid", false);
 			}
 			QTextStream out(&file);
 
@@ -437,7 +445,6 @@ void DMM::toggleDataLogging(bool en)
 		interrupt_data_logging = true;
 		if(data_logging_thread.joinable()) {
 			data_logging_thread.detach();
-			data_logging_thread.join();
 		}
 	}
 }
@@ -466,7 +473,6 @@ void DMM::startDataLogging(bool start)
 		interrupt_data_logging = true;
 		if(data_logging_thread.joinable()) {
 			data_logging_thread.detach();
-			data_logging_thread.join();
 		}
 		ui->btn_overwrite->setEnabled(true);
 		ui->btn_append->setEnabled(true);
@@ -483,7 +489,14 @@ void DMM::dataLoggingThread()
 	while(!interrupt_data_logging) {
 		if (!file.isOpen()) {
 			if (!file.open(QIODevice::Append)) {
+				ui->lblFileStatus->setText("File is open in another program");
+				setDynamicProperty(ui->lblFileStatus, "invalid", true);
+				if(ui->run_button->isChecked()) {
+					ui->btnDataLogging->setChecked(false);
+				}
 				return;
+			} else {
+				ui->lblFileStatus->setText("Choose a file");
 			}
 		}
 		bool is_low_ac_ch1 = ui->btn_ch1_ac->isChecked();
