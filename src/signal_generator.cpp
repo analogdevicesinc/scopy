@@ -1421,16 +1421,36 @@ void SignalGenerator::loadFileChannelData(QWidget *obj)
 	}
 }
 
-gr::basic_block_sptr SignalGenerator::getNoise(QWidget *obj)
+gr::basic_block_sptr SignalGenerator::getNoise(QWidget *obj, gr::top_block_sptr top)
 {
 	auto ptr = getData(obj);
 	if((int)ptr->noiseType != 0)
 	{
 		long noiseSeed=(rand());
 		double noiseDivider=1;
-		if(ptr->noiseType==analog::GR_IMPULSE)
-			noiseDivider=20; // magic value to divide impulse noise which generates way too big samples
-		return analog::noise_source_f::make((analog::noise_type_t)ptr->noiseType,ptr->noiseAmplitude/noiseDivider,noiseSeed);
+		switch(ptr->noiseType)
+		{
+		case analog::GR_IMPULSE:
+			noiseDivider=15;
+			break;
+		case analog::GR_GAUSSIAN:
+			noiseDivider=6;
+			break;
+		case analog::GR_UNIFORM:
+			noiseDivider=2.2;
+			break;
+		case analog::GR_LAPLACIAN:
+			noiseDivider=11;
+			break;
+		default:
+			noiseDivider=1;
+			break;
+		}
+		auto ampl = ptr->amplitude/2;
+		auto noise = analog::noise_source_f::make((analog::noise_type_t)ptr->noiseType,ptr->noiseAmplitude/noiseDivider,noiseSeed);
+		auto rail = analog::rail_ff::make(-ampl, ampl);
+		top->connect(noise,0,rail,0);
+		return rail;
 	}
 	else
 	{
@@ -1445,7 +1465,7 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
 	enum SIGNAL_TYPE type = ptr->type;
 	double phase=0.0;
 
-	auto noiseSrc = getNoise(obj);
+	auto noiseSrc = getNoise(obj, top);
 	auto noiseAdd = blocks::add_ff::make();
 	gr::basic_block_sptr generated_wave;
 
