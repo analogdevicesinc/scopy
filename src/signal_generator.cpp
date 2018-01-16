@@ -915,6 +915,19 @@ void SignalGenerator::loadParametersFromFile(
 
 	if (ptr->file_type==FORMAT_WAVE) {
 		// read samples per second
+		bool ok=true;
+		try {
+			auto fs = blocks::wavfile_source::make(ptr->file.toLocal8Bit(),true);
+		} catch(std::runtime_error& e)
+		{
+			ok=false;
+			ptr->file_message=QString::fromLocal8Bit(e.what());
+			ptr->file_nr_of_samples.push_back(0);
+			ptr->file_type=FORMAT_NO_FILE;
+		}
+		if(!ok)
+			return;
+
 		riff_header_t riff;
 		chunk_header_t chunk;
 		uint32_t nr_of_samples;
@@ -1438,7 +1451,6 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
 		if (!ptr->file.isNull()) {
 			auto str = ptr->file.toStdString();
 			boost::shared_ptr<basic_block> fs;
-			boost::shared_ptr<blocks::wavfile_source> fs1;
 
 			auto null = blocks::null_sink::make(sizeof(float));
 			auto buffer=blocks::copy::make(sizeof(float)); // will act as multiplexer
@@ -1450,7 +1462,13 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
 				break;
 
 			case FORMAT_WAVE:
-				fs = blocks::wavfile_source::make(str.c_str(),true);
+				try {
+					fs = blocks::wavfile_source::make(str.c_str(),true);
+				} catch(std::runtime_error& e)
+				{
+					ptr->file_message=QString::fromLocal8Bit(e.what());
+					fs=blocks::null_source::make(sizeof(float));
+				}
 				for (auto i=0; i<ptr->file_nr_of_channels; i++) {
 					if (i==ptr->file_channel) {
 						top->connect(fs,i,buffer,0);
@@ -1469,6 +1487,7 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
 
 			default:
 				fs=blocks::null_source::make(sizeof(float));
+				noiseSrc=blocks::null_source::make(sizeof(float));
 				top->connect(fs,0,buffer,0);
 				break;
 			}
