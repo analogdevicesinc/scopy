@@ -1004,7 +1004,6 @@ void DisplayPlot::setActiveVertAxis(unsigned int axisIdx, bool selected)
 		for (int i = 0; i < numAxes; i++) {
 			this->setAxisVisible(QwtAxisId(QwtPlot::yLeft, i),
 					(i == axisIdx));
-			this->vertAxes[i]->setMouseGesturesEnabled(d_mouseGesturesEnabled);
 		}
 	}
 
