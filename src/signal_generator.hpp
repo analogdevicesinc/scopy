@@ -179,7 +179,7 @@ private:
 	        unsigned long sample_rate,
 	        struct signal_generator_data& data, double phase_correction=0.0);
 
-	gr::basic_block_sptr getNoise(QWidget *obj);
+	gr::basic_block_sptr getNoise(QWidget *obj,gr::top_block_sptr top);
 	gr::basic_block_sptr getSource(QWidget *obj,
 	                               unsigned long sample_rate,
 	                               gr::top_block_sptr top, bool     phase_correction=false);
