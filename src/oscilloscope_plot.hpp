@@ -162,6 +162,7 @@ namespace adiscope {
 		void onVoltageCursor2Moved(double);
 
 		void onTimeTriggerHandlePosChanged(int);
+		void onTimeTriggerHandleGrabbed(bool);
 
 		void onTriggerAHandleGrabbed(bool);
 		void onTriggerBHandleGrabbed(bool);
@@ -220,6 +221,8 @@ namespace adiscope {
 	        QPen d_trigAinactiveLinePen;
 	        QPen d_trigBactiveLinePen;
 	        QPen d_trigBinactiveLinePen;
+		QPen d_timeTriggerInactiveLinePen;
+		QPen d_timeTriggerActiveLinePen;
 
 	        QList<Measure *> d_measureObjs;
 
