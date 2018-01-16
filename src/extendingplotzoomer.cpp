@@ -38,132 +38,133 @@ void ExtendingPlotZoomer::zoom(const QRectF &rect)
 QPolygon ExtendingPlotZoomer::adjustedPoints(const QPolygon &points) const
 {
 	QPolygon adjusted;
-	if (points.size() == 2) {
+	if (points.size() < 2)
+		return points;
 
-		if (points[0] == points[1]) {
+	if (points[0] == points[1]) {
+		cornerMarkers[0]->detach();
+		cornerMarkers[1]->detach();
+		cornerMarkers[2]->detach();
+		cornerMarkers[3]->detach();
+		static_cast<CapturePlot*>((QwtPlot*)plot())->replot();
+		return points;
+	}
+
+	const int width = qAbs(points[1].x() - points[0].x());
+	const int height = qAbs(points[1].y() - points[0].y());
+
+	if ((width > 50) && !widthPass) {
+		widthPass = true;
+	}
+
+	if ((height > 50) && !heightPass) {
+		heightPass = true;
+	}
+
+	//Handle width extension
+	if (width < 40 && widthPass && !extendWidth && !extendHeight) {
+		extendWidth = true;
+	}
+	if (width > 40 && widthPass && extendWidth && !extendHeight) {
+		extendWidth = false;
+	}
+
+	//Handle height extension
+	if (height < 40 && heightPass && !extendHeight && !extendWidth) {
+		extendHeight = true;
+	}
+	if (height > 40 && heightPass && extendHeight && !extendWidth) {
+		extendHeight = false;
+	}
+
+	if (extendWidth && !extendHeight) {
+		QPoint topLeft(0, points[0].y());
+		QPoint bottomRight(canvas()->width() - 2, points[1].y());
+		adjusted += topLeft;
+		adjusted += bottomRight;
+
+		if (yAxis() == QwtAxisId(QwtPlot::yLeft, 0)) {
 			cornerMarkers[0]->detach();
 			cornerMarkers[1]->detach();
 			cornerMarkers[2]->detach();
 			cornerMarkers[3]->detach();
+
+			QPointF x11 = invTransform(QPoint(points[0].x() - 40, points[1].y()));
+			QPointF x21 = invTransform(QPoint(points[0].x() + 40, points[1].y()));
+
+			QPainterPath path1;
+			path1.moveTo(x11);
+			path1.lineTo(x21);
+
+			extendMarkers[0]->setShape(path1);
+			extendMarkers[0]->setPen(Qt::white, 3, Qt::SolidLine);
+			extendMarkers[0]->setZ(1000);
+			extendMarkers[0]->attach((QwtPlot*)plot());
+
+
+			QPointF x12 = invTransform(QPoint(points[0].x() - 40, points[0].y()));
+			QPointF x22 = invTransform(QPoint(points[0].x() + 40, points[0].y()));
+
+			QPainterPath path2;
+			path2.moveTo(x12);
+			path2.lineTo(x22);
+
+			extendMarkers[1]->setShape(path2);
+			extendMarkers[1]->setPen(Qt::white, 3, Qt::SolidLine);
+			extendMarkers[1]->setZ(1000);
+			extendMarkers[1]->attach((QwtPlot*)plot());
+
+
 			static_cast<CapturePlot*>((QwtPlot*)plot())->replot();
-			return points;
 		}
 
-		const int width = qAbs(points[1].x() - points[0].x());
-		const int height = qAbs(points[1].y() - points[0].y());
-
-		if ((width > 50) && !widthPass) {
-			widthPass = true;
-		}
-
-		if ((height > 50) && !heightPass) {
-			heightPass = true;
-		}
-
-		//Handle width extension
-		if (width < 40 && widthPass && !extendWidth && !extendHeight) {
-			extendWidth = true;
-		}
-		if (width > 40 && widthPass && extendWidth && !extendHeight) {
-			extendWidth = false;
-		}
-
-		//Handle height extension
-		if (height < 40 && heightPass && !extendHeight && !extendWidth) {
-			extendHeight = true;
-		}
-		if (height > 40 && heightPass && extendHeight && !extendWidth) {
-			extendHeight = false;
-		}
-
-		if (extendWidth && !extendHeight) {
-			QPoint topLeft(0, points[0].y());
-			QPoint bottomRight(canvas()->width() - 2, points[1].y());
-			adjusted += topLeft;
-			adjusted += bottomRight;
-
-			if (yAxis() == QwtAxisId(QwtPlot::yLeft, 0)) {
-				cornerMarkers[0]->detach();
-				cornerMarkers[1]->detach();
-				cornerMarkers[2]->detach();
-				cornerMarkers[3]->detach();
-
-				QPointF x11 = invTransform(QPoint(points[0].x() - 40, points[1].y()));
-				QPointF x21 = invTransform(QPoint(points[0].x() + 40, points[1].y()));
-
-				QPainterPath path1;
-				path1.moveTo(x11);
-				path1.lineTo(x21);
-
-				extendMarkers[0]->setShape(path1);
-				extendMarkers[0]->setPen(Qt::white, 3, Qt::SolidLine);
-				extendMarkers[0]->setZ(1000);
-				extendMarkers[0]->attach((QwtPlot*)plot());
-
-
-				QPointF x12 = invTransform(QPoint(points[0].x() - 40, points[0].y()));
-				QPointF x22 = invTransform(QPoint(points[0].x() + 40, points[0].y()));
-
-				QPainterPath path2;
-				path2.moveTo(x12);
-				path2.lineTo(x22);
-
-				extendMarkers[1]->setShape(path2);
-				extendMarkers[1]->setPen(Qt::white, 3, Qt::SolidLine);
-				extendMarkers[1]->setZ(1000);
-				extendMarkers[1]->attach((QwtPlot*)plot());
-
-
-				static_cast<CapturePlot*>((QwtPlot*)plot())->replot();
-			}
-
-			return adjusted;
-		}
-
-		if (extendHeight && !extendWidth) {
-			QPoint topLeft(points[0].x(), 0);
-			QPoint bottomRight(points[1].x(), canvas()->height() - 2);
-			adjusted += topLeft;
-			adjusted += bottomRight;
-
-			if (yAxis() == QwtAxisId(QwtPlot::yLeft, 0)) {
-				cornerMarkers[0]->detach();
-				cornerMarkers[1]->detach();
-				cornerMarkers[2]->detach();
-				cornerMarkers[3]->detach();
-
-				QPointF x11 = invTransform(QPoint(points[0].x(), points[0].y() - 40));
-				QPointF x21 = invTransform(QPoint(points[0].x(), points[0].y() + 40));
-
-				QPainterPath path1;
-				path1.moveTo(x11);
-				path1.lineTo(x21);
-
-				extendMarkers[0]->setShape(path1);
-				extendMarkers[0]->setPen(Qt::white, 3, Qt::SolidLine);
-				extendMarkers[0]->setZ(1000);
-				extendMarkers[0]->attach((QwtPlot*)plot());
-
-
-				QPointF x12 = invTransform(QPoint(points[1].x(), points[0].y() - 40));
-				QPointF x22 = invTransform(QPoint(points[1].x(), points[0].y() + 40));
-
-				QPainterPath path2;
-				path2.moveTo(x12);
-				path2.lineTo(x22);
-
-				extendMarkers[1]->setShape(path2);
-				extendMarkers[1]->setPen(Qt::white, 3, Qt::SolidLine);
-				extendMarkers[1]->setZ(1000);
-				extendMarkers[1]->attach((QwtPlot*)plot());
-
-
-				static_cast<CapturePlot*>((QwtPlot*)plot())->replot();
-			}
-
-			return adjusted;
-		}
+		return adjusted;
 	}
+
+	if (extendHeight && !extendWidth) {
+		QPoint topLeft(points[0].x(), 0);
+		QPoint bottomRight(points[1].x(), canvas()->height() - 2);
+		adjusted += topLeft;
+		adjusted += bottomRight;
+
+		if (yAxis() == QwtAxisId(QwtPlot::yLeft, 0)) {
+			cornerMarkers[0]->detach();
+			cornerMarkers[1]->detach();
+			cornerMarkers[2]->detach();
+			cornerMarkers[3]->detach();
+
+			QPointF x11 = invTransform(QPoint(points[0].x(), points[0].y() - 40));
+			QPointF x21 = invTransform(QPoint(points[0].x(), points[0].y() + 40));
+
+			QPainterPath path1;
+			path1.moveTo(x11);
+			path1.lineTo(x21);
+
+			extendMarkers[0]->setShape(path1);
+			extendMarkers[0]->setPen(Qt::white, 3, Qt::SolidLine);
+			extendMarkers[0]->setZ(1000);
+			extendMarkers[0]->attach((QwtPlot*)plot());
+
+
+			QPointF x12 = invTransform(QPoint(points[1].x(), points[0].y() - 40));
+			QPointF x22 = invTransform(QPoint(points[1].x(), points[0].y() + 40));
+
+			QPainterPath path2;
+			path2.moveTo(x12);
+			path2.lineTo(x22);
+
+			extendMarkers[1]->setShape(path2);
+			extendMarkers[1]->setPen(Qt::white, 3, Qt::SolidLine);
+			extendMarkers[1]->setZ(1000);
+			extendMarkers[1]->attach((QwtPlot*)plot());
+
+
+			static_cast<CapturePlot*>((QwtPlot*)plot())->replot();
+		}
+
+		return adjusted;
+	}
+
 
 	if (yAxis() == QwtAxisId(QwtPlot::yLeft, 0)) {
 
