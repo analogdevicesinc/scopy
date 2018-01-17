@@ -121,7 +121,7 @@ class DigitalIO_API : public ApiObject
 	Q_OBJECT
 	Q_PROPERTY(QList<bool> dir READ direction WRITE setDirection SCRIPTABLE true);
 	Q_PROPERTY(QList<bool> out READ output    WRITE setOutput SCRIPTABLE true);
-
+	Q_PROPERTY(QList<bool> group READ grouped WRITE setGrouped SCRIPTABLE false);
 
 public:
 	explicit DigitalIO_API(DigitalIO *dio) : ApiObject(), dio(dio) {}
@@ -132,6 +132,8 @@ public:
 	QList<bool> output() const;
 	void setOutput(const QList<bool>& list);
 	void setOutput(int ch, int direction);
+	QList<bool> grouped() const;
+	void setGrouped(const QList<bool>& grouped);
 
 
 private:
