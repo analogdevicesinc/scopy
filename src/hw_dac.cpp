@@ -65,6 +65,15 @@ double GenericDac::readSampleRate()
 	return m_sample_rate;
 }
 
+size_t GenericDac::maxNumberOfSamples()
+{
+	return m_maxNumberOfSamples;
+}
+void GenericDac::setMaxNumberOfSamples(size_t val)
+{
+	m_maxNumberOfSamples = val;
+}
+
 void GenericDac::setSampleRate(double sr)
 {
 	iio_device_attr_write_double(m_dac, "sampling_frequency", sr);
@@ -119,6 +128,7 @@ M2kDac::M2kDac(struct iio_context *ctx, struct iio_device *dac_dev):
 
 	setVOutH(5.0);
 	setVOutL(-5.0);
+	setMaxNumberOfSamples(4 * 1024 * 1024 / 2); // 2 Megasamples
 	m_filt_comp_table[75E6] = 1.00;
 	m_filt_comp_table[75E5] = 1.525879;
 	m_filt_comp_table[75E4] = 1.164153;
