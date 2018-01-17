@@ -71,11 +71,11 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 
 	ui->setupUi(this);
 
-	tools << "Digital IO" << "Voltmeter"
-			<< "Oscilloscope" << "Power Supply"
-			<< "Signal Generator" << "Pattern Generator"
-			<< "Logic Analyzer" << "Network Analyzer"
-			<< "Spectrum Analyzer" << "Debugger";
+	tools << "Oscilloscope" << "Spectrum Analyzer"
+	      << "Network Analyzer" << "Signal Generator"
+	      << "Logic Analyzer" << "Pattern Generator"
+	      << "Digital IO" << "Voltmeter"
+	      << "Power Supply" << "Debugger";
 
 	toolIcons << ":/menu/io.png"
 			<< ":/menu/voltmeter.png"
