@@ -115,6 +115,7 @@ bool SignalGenerator::chunkCompare(chunk_header_t& ptr,const char *id2)
 }
 
 struct adiscope::signal_generator_data {
+	iio_channel* iio_ch;
 	enum SIGNAL_TYPE type;
 	unsigned int id;
 	// SIGNAL_TYPE_CONSTANT
@@ -270,6 +271,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 
 		auto ptr = QSharedPointer<signal_generator_data>(
 		                   new signal_generator_data);
+		ptr->iio_ch = chn;
 		ptr->amplitude = ui->amplitude->value();
 		ptr->offset = ui->offset->value();
 		ptr->frequency = ui->frequency->value();
@@ -1036,10 +1038,26 @@ void SignalGenerator::loadParametersFromFile(
 		Mat_Close(matfp);
 	}
 
+
 	if (ptr->file_nr_of_channels==0) {
 		ptr->file_message+=" File not loaded due to errors ";
 		ptr->file_nr_of_samples.push_back(0);
 		ptr->file_type=FORMAT_NO_FILE;
+	}
+
+	std::shared_ptr<GenericDac> dac ;
+	for(auto ch : channel_dac)
+		if(ptr->iio_ch==ch.first){
+			dac=ch.second;
+			break;}
+
+	for(auto ch_samples : ptr->file_nr_of_samples)
+	{
+		if(ch_samples > dac->maxNumberOfSamples())
+		{
+			ptr->file_message = "File too big. Too many samples";
+			ptr->file_type=FORMAT_NO_FILE;
+		}
 	}
 
 	ptr->file_amplitude=5.0;
@@ -1503,7 +1521,21 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
 			if (preview) {
 				auto ratio = sample_rate/ptr->file_sr;
 				long m,n,integral;
-				reduceFraction(ratio,&m,&n,10);
+				bool ok=false;
+				for(auto precision=8;precision<2048;precision<<=1)
+				{
+					reduceFraction(ratio,&m,&n,precision);
+					if(m!=0 && n!=0)
+					{
+						ok=true;
+						break;
+					}
+				}
+				if(!ok)
+				{
+					return blocks::nop::make(sizeof(float));
+				}
+
 
 				auto interp= blocks::repeat::make(sizeof(float),m);
 				auto decim=blocks::keep_one_in_n::make(sizeof(float),n);
@@ -1968,12 +2000,23 @@ double SignalGenerator::get_best_ratio(double ratio, double max, double *fract)
 size_t SignalGenerator::get_samples_count(const struct iio_device *dev,
                 unsigned long rate, bool perfect)
 {
-	size_t max_buffer_size = 4 * 1024 * 1024 /
-	                         (size_t) iio_device_get_sample_size(dev);
+
 	size_t size = 1;
+	size_t max_buffer_size;
 
 	for (unsigned int i = 0; i < iio_device_get_channels_count(dev); i++) {
 		struct iio_channel *chn = iio_device_get_channel(dev, i);
+
+		auto pair_it = std::find_if(channel_dac.begin(),
+					    channel_dac.end(),
+					    [&chn](const QPair<struct iio_channel *,
+		std::shared_ptr<GenericDac>>& element) {
+			return element.first == chn;
+		});
+
+		std::shared_ptr<GenericDac> dac =(*pair_it).second;
+
+		size_t max_buffer_size = dac->maxNumberOfSamples();
 
 		if (!iio_channel_is_enabled(chn)) {
 			continue;

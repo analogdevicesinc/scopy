@@ -30,6 +30,8 @@ public:
 	double sampleRate() const;
 	virtual double readSampleRate();
 	virtual void setSampleRate(double);
+	virtual size_t maxNumberOfSamples();
+	virtual void setMaxNumberOfSamples(size_t val);
 
 	virtual double vlsb() const;
 	virtual void setVlsb(double vlsb);
@@ -44,6 +46,7 @@ private:
 	struct iio_device *m_dac;
 	QList<struct iio_channel *> m_dac_channels;
 	uint m_dac_bits;
+	size_t m_maxNumberOfSamples;
 	double m_sample_rate;
 	double m_vOutL;
 	double m_vOutH;
