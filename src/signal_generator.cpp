@@ -1424,6 +1424,7 @@ void SignalGenerator::loadFileChannelData(QWidget *obj)
 gr::basic_block_sptr SignalGenerator::getNoise(QWidget *obj, gr::top_block_sptr top)
 {
 	auto ptr = getData(obj);
+	auto noiseaAmpl = ptr->noiseAmplitude/2;
 	if((int)ptr->noiseType != 0)
 	{
 		long noiseSeed=(rand());
@@ -1431,24 +1432,25 @@ gr::basic_block_sptr SignalGenerator::getNoise(QWidget *obj, gr::top_block_sptr 
 		switch(ptr->noiseType)
 		{
 		case analog::GR_IMPULSE:
+			noiseaAmpl=ptr -> noiseAmplitude;
 			noiseDivider=15;
 			break;
 		case analog::GR_GAUSSIAN:
-			noiseDivider=6;
+			noiseDivider=7;
 			break;
 		case analog::GR_UNIFORM:
-			noiseDivider=2.2;
+			noiseDivider=2;
 			break;
 		case analog::GR_LAPLACIAN:
-			noiseDivider=11;
+			noiseDivider=14;
 			break;
 		default:
 			noiseDivider=1;
 			break;
 		}
-		auto ampl = ptr->amplitude/2;
+
 		auto noise = analog::noise_source_f::make((analog::noise_type_t)ptr->noiseType,ptr->noiseAmplitude/noiseDivider,noiseSeed);
-		auto rail = analog::rail_ff::make(-ampl, ampl);
+		auto rail = analog::rail_ff::make(-noiseaAmpl, noiseaAmpl);
 		top->connect(noise,0,rail,0);
 		return rail;
 	}
@@ -2022,7 +2024,7 @@ size_t SignalGenerator::get_samples_count(const struct iio_device *dev,
 {
 
 	size_t size = 1;
-	size_t max_buffer_size;
+	size_t max_buffer_size=min_buffer_size<<1;
 
 	for (unsigned int i = 0; i < iio_device_get_channels_count(dev); i++) {
 		struct iio_channel *chn = iio_device_get_channel(dev, i);
@@ -2036,7 +2038,7 @@ size_t SignalGenerator::get_samples_count(const struct iio_device *dev,
 
 		std::shared_ptr<GenericDac> dac =(*pair_it).second;
 
-		size_t max_buffer_size = dac->maxNumberOfSamples();
+		max_buffer_size = dac->maxNumberOfSamples();
 
 		if (!iio_channel_is_enabled(chn)) {
 			continue;
