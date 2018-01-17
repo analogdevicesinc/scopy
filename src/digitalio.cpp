@@ -387,5 +387,25 @@ void DigitalIO_API::setOutput(const QList<bool>& list)
 	}
 }
 
+QList<bool> DigitalIO_API::grouped() const
+{
+
+	QList<bool> list;
+	for (int i = 0; i < dio->groups.size(); ++i) {
+		bool grouped = dio->groups[i]->ui->stackedWidget->currentIndex() == 1;
+		list.push_back(grouped);
+	}
+	return list;
+}
+
+void DigitalIO_API::setGrouped(const QList<bool> &grouped)
+{
+	for (int i = 0; i < grouped.size(); ++i) {
+		int index = grouped[i] ? 1 : 0;
+		dio->groups[i]->ui->stackedWidget->setCurrentIndex(index);
+		dio->groups[i]->ui->comboBox->setCurrentIndex(index);
+	}
+
+}
 }
 
