@@ -55,8 +55,8 @@ Name: "ukrainian"; MessagesFile: "compiler:Languages\Ukrainian.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
 
 [Files]
-Source: "c:\scopy_32\*"; DestDir: "{app}"; Check: not Is64BitInstallMode; Flags: recursesubdirs createallsubdirs
-Source: "c:\scopy_64\*"; DestDir: "{app}"; Check: Is64BitInstallMode; Flags: recursesubdirs createallsubdirs
+Source: "c:\scopy_32\*"; DestDir: "{app}"; Check: not Is64BitInstallMode; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "c:\scopy_64\*"; DestDir: "{app}"; Check: Is64BitInstallMode; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{group}\{#AppName}"; Filename: "{app}\{#AppExeName}"

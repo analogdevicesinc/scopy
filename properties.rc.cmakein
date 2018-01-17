@@ -1,0 +1,29 @@
+#include <windows.h>
+AppIcon ICON DISCARDABLE "@CMAKE_SOURCE_DIR@/resources/icon.ico"
+
+LANGUAGE LANG_ENGLISH, SUBLANG_DEFAULT
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION @SCOPY_FILEVERSION@
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904E4"
+        BEGIN
+            VALUE "FileVersion",        "@SCOPY_PRODUCTVERSION_STR@"
+            VALUE "CompanyName",        "Analog Devices"
+            VALUE "FileDescription",    "Scopy - A software oscilloscope and signal analysis toolset"
+            VALUE "InternalName",       "Scopy"
+            VALUE "LegalCopyright",     "Copyright 2016-@BUILD_YEAR@ ADI and other contributors"
+            VALUE "LegalTrademarks",    "https://www.gnu.org/licenses/gpl-3.0.en.html"
+            VALUE "OriginalFilename",   "scopy.exe"
+            VALUE "ProductName",        "Scopy"
+            VALUE "ProductVersion",     "@SCOPY_PRODUCTVERSION_STR@-g@SCOPY_VERSION_GIT@"
+        END
+    END
+
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1252
+    END
+END

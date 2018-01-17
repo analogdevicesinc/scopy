@@ -2,13 +2,5 @@
 #define CONFIG_H_CMAKEIN
 
 #define SCOPY_VERSION_GIT      "@SCOPY_VERSION_GIT@"
-#define SCOPY_PRODUCTVERSION_STR      "@SCOPY_PRODUCTVERSION_STR@-g@SCOPY_VERSION_GIT@"
-#define SCOPY_COMPANYNAME_STR         "Analog Devices"
-#define SCOPY_FILEDESCRIPTION_STR     "Scopy - A software oscilloscope and signal analysis toolset"
-#define SCOPY_INTERNALNAME_STR        "Scopy"
-#define SCOPY_LEGALCOPYRIGHT_STR      "Copyright 2016-@BUILD_YEAR@ ADI and other contributors"
-#define SCOPY_LEGALTRADEMARKS_STR      "https://www.gnu.org/licenses/gpl-3.0.en.html"
-#define SCOPY_PRODUCTNAME_STR         "Scopy"
-#define SCOPY_ORIGINALFILENAME_STR    "scopy.exe"
 
 #endif // CONFIG_H_CMAKEIN
