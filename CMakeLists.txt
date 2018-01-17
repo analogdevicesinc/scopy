@@ -43,8 +43,11 @@ if (NOT SCOPY_VERSION_GIT)
 endif()
 
 # Set .exe properties
-set(SCOPY_PRODUCTVERSION_STR ${PROJECT_VERSION})
-string(TIMESTAMP BUILD_YEAR "%Y")
+if (WIN32)
+	string(REPLACE "." "," SCOPY_FILEVERSION ${PROJECT_VERSION})
+	set(SCOPY_PRODUCTVERSION_STR ${PROJECT_VERSION})
+	string(TIMESTAMP BUILD_YEAR "%Y")
+endif()
 
 if (MSVC)
 	# http://www.suodenjoki.dk/us/archive/2010/min-max.htm
@@ -163,7 +166,10 @@ qt5_wrap_ui (m2kscope_FORMS_HEADERS ${M2KSCOPE_UIS})
 FILE(GLOB M2KSCOPE_RESOURCES resources/*.qrc)
 qt5_add_resources(m2kscope_RESOURCES ${M2KSCOPE_RESOURCES})
 
-set(RESOURCES resources/properties.rc)
+if (WIN32)
+        set(RESOURCES ${CMAKE_CURRENT_BINARY_DIR}/resources/properties.rc)
+        configure_file(properties.rc.cmakein ${RESOURCES} @ONLY)
+endif()
 
 add_definitions(-DQT_NO_KEYWORDS)
 
