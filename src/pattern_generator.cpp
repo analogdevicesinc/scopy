@@ -553,7 +553,6 @@ void PatternGenerator::patternChanged(int index)
 void PatternGenerator::deleteSettingsWidget()
 {
 	if (currentUI!=nullptr) {
-		currentUI->setVisible(false);
 		currentUI->destroy_ui();
 		currentUI->deleteLater();
 		currentUI = nullptr;
