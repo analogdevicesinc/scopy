@@ -56,6 +56,8 @@ class DigitalIO_API;
 
 class DigitalIoGroup : public QWidget
 {
+	friend class DigitalIO_API;
+
 	Q_OBJECT
 	int nr_of_channels;
 	int ch_mask;
