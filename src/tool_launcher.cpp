@@ -77,16 +77,17 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	      << "Digital IO" << "Voltmeter"
 	      << "Power Supply" << "Debugger";
 
-	toolIcons << ":/menu/io.png"
-			<< ":/menu/voltmeter.png"
-			<< ":/menu/oscilloscope.png"
-			<< ":/menu/power_supply.png"
-			<< ":/menu/signal_generator.png"
-			<< ":/menu/pattern_generator.png"
-			<< ":/menu/logic_analyzer.png"
-			<< ":/menu/network_analyzer.png"
-			<< ":/menu/spectrum_analyzer.png"
-			<< ":/menu/spectrum_analyzer.png";
+	toolIcons << ":/menu/oscilloscope.png"
+		<< ":/menu/spectrum_analyzer.png"
+		<< ":/menu/network_analyzer.png"
+		<< ":/menu/signal_generator.png"
+		<< ":/menu/logic_analyzer.png"
+		<< ":/menu/pattern_generator.png"
+		<< ":/menu/io.png"
+		<< ":/menu/voltmeter.png"
+		<< ":/menu/power_supply.png"
+		<< ":/menu/spectrum_analyzer.png";
+
 	for (int i = 0; i < tools.size(); i++)
 		position.push_back(i);
 
