@@ -91,6 +91,11 @@ QPushButton* ExportSettings::getExportButton()
 	return ui->btnExport;
 }
 
+QPushButton* ExportSettings::getExportAllButton()
+{
+	return ui->btnExportAll;
+}
+
 QMap<int, bool> ExportSettings::getExportConfig()
 {
 	QStandardItemModel *model =

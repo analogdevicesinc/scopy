@@ -926,7 +926,7 @@ void Oscilloscope::cursor_panel_init()
 	cr_ui = new Ui::CursorsSettings;
 	cr_ui->setupUi(ui->cursorsSettings);
 	//cr_ui->posSelect->setStyleSheet("background-color:red;");
-	CustomPlotPositionButton *positionSelect = new CustomPlotPositionButton(cr_ui->posSelect);
+	cursorsPositionButton = new CustomPlotPositionButton(cr_ui->posSelect);
 
 	connect(cr_ui->hCursorsEnable, SIGNAL(toggled(bool)),
 		&plot, SLOT(setVertCursorsEnabled(bool)));
@@ -949,7 +949,7 @@ void Oscilloscope::cursor_panel_init()
 	});
 	cr_ui->horizontalSlider->setSliderPosition(0);
 
-	connect(positionSelect, &CustomPlotPositionButton::positionChanged,
+	connect(cursorsPositionButton, &CustomPlotPositionButton::positionChanged,
 		[=](CustomPlotPositionButton::ReadoutsPosition position){
 		plot.moveCursorReadouts(position);
 	});
@@ -3508,6 +3508,86 @@ void Oscilloscope_API::setCurrentChannel(int chn_id)
 	chn_widget->nameButton()->setChecked(true);
 }
 
+bool Oscilloscope_API::getFftEn() const
+{
+	return osc->fft_is_visible;
+}
+
+void Oscilloscope_API::setFftEn(bool en)
+{
+	osc->gsettings_ui->FFT_view->setChecked(en);
+}
+
+bool Oscilloscope_API::getXyEn() const
+{
+	return osc->xy_is_visible;
+}
+
+void Oscilloscope_API::setXyEn(bool en)
+{
+	osc->gsettings_ui->XY_view->setChecked(en);
+}
+
+bool Oscilloscope_API::getExportAll() const
+{
+	return osc->exportSettings->getExportAllButton()->isChecked();
+}
+
+void Oscilloscope_API::setExportAll(bool en)
+{
+	osc->exportSettings->getExportAllButton()->setChecked(en);
+}
+
+int Oscilloscope_API::getCursorsPosition() const
+{
+	if (!hasCursors()) {
+		return 0;
+	}
+	auto currentPos = osc->plot.d_cursorReadouts->getCurrentPosition();
+	switch (currentPos) {
+	case CustomPlotPositionButton::ReadoutsPosition::topLeft:
+	default:
+		return 0;
+	case CustomPlotPositionButton::ReadoutsPosition::topRight:
+		return 1;
+	case CustomPlotPositionButton::ReadoutsPosition::bottomLeft:
+		return 2;
+	case CustomPlotPositionButton::ReadoutsPosition::bottomRight:
+		return 3;
+	}
+}
+
+void Oscilloscope_API::setCursorsPosition(int val)
+{
+	if (!hasCursors()) {
+		return;
+	}
+	enum CustomPlotPositionButton::ReadoutsPosition types[] = {
+		CustomPlotPositionButton::ReadoutsPosition::topLeft,
+		CustomPlotPositionButton::ReadoutsPosition::topRight,
+		CustomPlotPositionButton::ReadoutsPosition::bottomLeft,
+		CustomPlotPositionButton::ReadoutsPosition::bottomRight
+	};
+	osc->cursorsPositionButton->setPosition(types[val]);
+	osc->plot.replot();
+}
+
+int Oscilloscope_API::getCursorsTransparency() const
+{
+	if (!hasCursors()) {
+		return 0;
+	}
+	return osc->cr_ui->horizontalSlider->value();
+}
+
+void Oscilloscope_API::setCursorsTransparency(int val)
+{
+	if (!hasCursors()) {
+		return;
+	}
+	osc->cr_ui->horizontalSlider->setValue(val);
+}
+
 QVariantList Oscilloscope_API::getChannels()
 {
 	QVariantList list;
@@ -3603,6 +3683,22 @@ void Channel_API::setProbeAttenuation(double val)
 
 	osc->probe_attenuation[index] = val;
 
+}
+
+bool Channel_API::getAcCoupling() const
+{
+	int index = osc->channels_api.indexOf(const_cast<Channel_API*>(this));
+	return osc->chnAcCoupled[index];
+}
+
+void Channel_API::setAcCoupling(bool val)
+{
+	int index = osc->channels_api.indexOf(const_cast<Channel_API*>(this));
+	if (osc->current_channel == index) {
+		osc->ch_ui->btnCoupled->setChecked(val);
+	} else {
+		osc->configureAcCoupling(index, val);
+	}
 }
 
 #define DECLARE_MEASURE(m, t) \

@@ -25,6 +25,7 @@ public:
 
 	explicit CustomPlotPositionButton(QWidget *parent = 0);
 	~CustomPlotPositionButton();
+	void setPosition(ReadoutsPosition position);
 
 Q_SIGNALS:
 	void positionChanged(CustomPlotPositionButton::ReadoutsPosition position);

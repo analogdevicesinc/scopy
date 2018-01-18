@@ -50,3 +50,22 @@ CustomPlotPositionButton::~CustomPlotPositionButton()
 {
 	delete ui;
 }
+
+void CustomPlotPositionButton::setPosition(ReadoutsPosition position)
+{
+	switch (position) {
+	case topLeft:
+	default:
+		ui->leftTop->setChecked(true);
+		break;
+	case topRight:
+		ui->rightTop->setChecked(true);
+		break;
+	case bottomLeft:
+		ui->leftBot->setChecked(true);
+		break;
+	case bottomRight:
+		ui->rightBot->setChecked(true);
+		break;
+	}
+}

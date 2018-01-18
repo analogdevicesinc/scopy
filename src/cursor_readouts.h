@@ -69,6 +69,7 @@ namespace adiscope {
 
 		void setTransparency(int value);
 		void moveToPosition(CustomPlotPositionButton::ReadoutsPosition position);
+		CustomPlotPositionButton::ReadoutsPosition getCurrentPosition();
 
 		void showEvent(QShowEvent *event);
 	private:
