@@ -292,6 +292,7 @@ void adiscope::DigitalIoGroup::on_lineEdit_editingFinished()
 void adiscope::DigitalIoGroup::on_comboBox_activated(int index)
 {
 	ui->stackedWidget->setCurrentIndex(index);
+	on_inout_clicked();
 }
 
 void adiscope::DigitalIO::lockUi()
@@ -404,6 +405,7 @@ void DigitalIO_API::setGrouped(const QList<bool> &grouped)
 		int index = grouped[i] ? 1 : 0;
 		dio->groups[i]->ui->stackedWidget->setCurrentIndex(index);
 		dio->groups[i]->ui->comboBox->setCurrentIndex(index);
+		dio->groups[i]->on_inout_clicked();
 	}
 
 }
