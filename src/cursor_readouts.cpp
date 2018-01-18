@@ -102,7 +102,7 @@ CustomPlotPositionButton::ReadoutsPosition CursorReadouts::getCurrentPosition()
 
 void CursorReadouts::showEvent(QShowEvent *event)
 {
-	moveTopLeft(true);
+	updateSizeAndPosition(true);
 
 	QWidget::showEvent(event);
 }
