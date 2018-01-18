@@ -224,6 +224,7 @@ namespace adiscope {
 		AnalogBufferPreviewer *buffer_previewer;
 		ExportSettings *exportSettings;
 		PreferenceMenu *pref_menu;
+		CustomPlotPositionButton *cursorsPositionButton;
 
 		MouseWheelWidgetGuard *wheelEventGuard;
 
@@ -383,6 +384,10 @@ namespace adiscope {
 		Q_PROPERTY(double cursor_v2 READ cursorV2 WRITE setCursorV2);
 		Q_PROPERTY(double cursor_h1 READ cursorH1 WRITE setCursorH1);
 		Q_PROPERTY(double cursor_h2 READ cursorH2 WRITE setCursorH2);
+		Q_PROPERTY(int cursors_position READ getCursorsPosition
+			  WRITE setCursorsPosition)
+		Q_PROPERTY(int cursors_transparency READ getCursorsTransparency
+			  WRITE setCursorsTransparency)
 
 		Q_PROPERTY(bool auto_trigger
 				READ autoTrigger WRITE setAutoTrigger)
@@ -417,6 +422,11 @@ namespace adiscope {
 
 		Q_PROPERTY(int current_channel READ getCurrentChannel
 				WRITE setCurrentChannel)
+
+		Q_PROPERTY(bool fft_en READ getFftEn WRITE setFftEn)
+		Q_PROPERTY(bool xy_en READ getXyEn WRITE setXyEn)
+		Q_PROPERTY(bool export_all READ getExportAll
+			   WRITE setExportAll)
 
 	public:
 		explicit Oscilloscope_API(Oscilloscope *osc) :
@@ -503,6 +513,21 @@ namespace adiscope {
 		int getCurrentChannel() const;
 		void setCurrentChannel(int chn_id);
 
+		bool getFftEn() const;
+		void setFftEn(bool en);
+
+		bool getXyEn() const;
+		void setXyEn(bool en);
+
+		bool getExportAll() const;
+		void setExportAll(bool en);
+
+		int getCursorsPosition() const;
+		void setCursorsPosition(int val);
+
+		int getCursorsTransparency() const;
+		void setCursorsTransparency(int val);
+
 	private:
 		Oscilloscope *osc;
 	};
@@ -523,6 +548,8 @@ namespace adiscope {
 
 		Q_PROPERTY(double probe_attenuation READ getProbeAttenuation
 				WRITE setProbeAttenuation)
+		Q_PROPERTY(bool ac_coupling READ getAcCoupling
+				WRITE setAcCoupling)
 
 		Q_PROPERTY(double period READ measured_period)
 		Q_PROPERTY(double frequency READ measured_frequency)
@@ -569,6 +596,9 @@ namespace adiscope {
 
 		double getProbeAttenuation() const;
 		void setProbeAttenuation(double val);
+
+		bool getAcCoupling() const;
+		void setAcCoupling(bool val);
 
 		double measured_period() const;
 		double measured_frequency() const;

@@ -95,6 +95,11 @@ void CursorReadouts::moveToPosition(CustomPlotPositionButton::ReadoutsPosition p
 	currentPosition = position;
 }
 
+CustomPlotPositionButton::ReadoutsPosition CursorReadouts::getCurrentPosition()
+{
+	return currentPosition;
+}
+
 void CursorReadouts::showEvent(QShowEvent *event)
 {
 	moveTopLeft(true);
