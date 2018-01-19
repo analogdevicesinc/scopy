@@ -121,7 +121,7 @@ public:
 	void collapse(bool val);
 	void append(PatternGeneratorChannelGroup *tojoin);
 	qreal getCh_thickness() const;
-	void setCh_thickness(const qreal value);
+	void setCh_thickness(const qreal value, bool setChannels=true);
 
 private:
 	qreal ch_thickness;

@@ -28,6 +28,7 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QRgb>
 #include <QJsonValue>
 #include <QTimer>
 #include <QFile>
@@ -1087,6 +1088,50 @@ void PatternGenerator_API::refreshApi()
 	}
 }
 
+
+void PatternGeneratorChannel_API::setColor(QList<int> list)
+{
+	//	ch->set_id(val);
+	ch->setBgcolor(QColor((list[0]&0xff0000)>>16,(list[0]&0xff00)>>8,list[0]&0xff));
+	ch->setEdgecolor(QColor((list[1]&0xff0000)>>16,(list[1]&0xff00)>>8,list[1]&0xff));
+	ch->setHighcolor(QColor((list[2]&0xff0000)>>16,(list[2]&0xff00)>>8,list[2]&0xff));
+	ch->setLowcolor(QColor((list[3]&0xff0000)>>16,(list[3]&0xff00)>>8,list[3]&0xff));
+
+}
+QList<int> PatternGeneratorChannel_API::color()
+{
+	QList<int> list;
+
+	list.append(ch->getBgcolor().red()<<16   | ch->getBgcolor().green()<<8   | ch->getBgcolor().blue());
+	list.append(ch->getEdgecolor().red()<<16 | ch->getEdgecolor().green()<<8 | ch->getEdgecolor().blue());
+	list.append(ch->getHighcolor().red()<<16 | ch->getHighcolor().green()<<8 | ch->getHighcolor().blue());
+	list.append(ch->getLowcolor().red()<<16  | ch->getLowcolor().green()<<8  | ch->getLowcolor().blue());
+	return list;
+}
+
+
+
+void PatternGeneratorChannelGroup_API::setColor(QList<int> list)
+{
+	//	ch->set_id(val);
+	chg->setBgcolor(QColor((list[0]&0xff0000)>>16,(list[0]&0xff00)>>8,list[0]&0xff));
+	chg->setEdgecolor(QColor((list[1]&0xff0000)>>16,(list[1]&0xff00)>>8,list[1]&0xff));
+	chg->setHighcolor(QColor((list[2]&0xff0000)>>16,(list[2]&0xff00)>>8,list[2]&0xff));
+	chg->setLowcolor(QColor((list[3]&0xff0000)>>16,(list[3]&0xff00)>>8,list[3]&0xff));
+
+}
+QList<int> PatternGeneratorChannelGroup_API::color()
+{
+	QList<int> list;
+
+	list.append(chg->getBgcolor().red()<<16 | chg->getBgcolor().green()<<8 | chg->getBgcolor().blue());
+	list.append(chg->getEdgecolor().red()<<16 | chg->getEdgecolor().green()<<8 | chg->getEdgecolor().blue());
+	list.append(chg->getHighcolor().red()<<16 | chg->getHighcolor().green()<<8 | chg->getHighcolor().blue());
+	list.append(chg->getLowcolor().red()<<16 | chg->getLowcolor().green()<<8 | chg->getLowcolor().blue());
+	return list;
+}
+
+
 QList<int> PatternGeneratorChannelGroup_API::channels()
 {
 	QList<int> list;
@@ -1190,6 +1235,19 @@ bool PatternGenerator_API::single() const
 void PatternGenerator_API::run_single(bool en)
 {
 	pg->ui->btnSingleRun->setChecked(en);
+}
+
+bool PatternGenerator_API::inactiveHidden()
+{
+	return pg->chmui->isDisabledShown();
+}
+
+void PatternGenerator_API::setInactiveHidden(bool en)
+{
+	if(en)
+		pg->chmui->showDisabled();
+	else
+		pg->chmui->hideDisabled();
 }
 
 }
