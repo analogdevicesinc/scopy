@@ -252,7 +252,8 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 	        ui->mathFrequency->minValue() * 100 * 1000.0);
 
 	ui->cbNoiseType->setCurrentIndex(0);
-	ui->noiseAmplitude->setValue(0);
+	ui->noiseAmplitude->setMinValue(1e-06);
+	ui->noiseAmplitude->setValue(ui->noiseAmplitude->minValue());
 	ui->btnNoiseCollapse->setVisible(false);
 	ui->cbNoiseType->setItemData(SG_NO_NOISE,0);
 	ui->cbNoiseType->setItemData(SG_UNIFORM_NOISE, analog::GR_UNIFORM);
