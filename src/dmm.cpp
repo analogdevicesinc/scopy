@@ -614,23 +614,59 @@ void DMM::writeAllSettingsToHardware()
 	}
 }
 
-bool DMM_API::get_mode_ac_ch1() const
+bool DMM_API::get_mode_ac_high_ch1() const
+{
+	return dmm->ui->btn_ch1_ac2->isChecked();
+}
+
+bool DMM_API::get_mode_ac_low_ch1() const
 {
 	return dmm->ui->btn_ch1_ac->isChecked();
 }
 
-bool DMM_API::get_mode_ac_ch2() const
+bool DMM_API::get_mode_ac_high_ch2() const
+{
+	return dmm->ui->btn_ch2_ac2->isChecked();
+}
+
+bool DMM_API::get_mode_ac_low_ch2() const
 {
 	return dmm->ui->btn_ch2_ac->isChecked();
 }
 
-void DMM_API::set_mode_ac_ch1(bool en)
+void DMM_API::set_mode_ac_high_ch1(bool en)
 {
+	/* Set DC mode as default */
+	if (!get_mode_ac_low_ch1() && !en) {
+		dmm->ui->btn_ch1_dc->setChecked(!en);
+	}
+	dmm->ui->btn_ch1_ac2->setChecked(en);
+}
+
+void DMM_API::set_mode_ac_low_ch1(bool en)
+{
+	/* Set DC mode as default */
+	if (!get_mode_ac_high_ch1() && !en) {
+		dmm->ui->btn_ch1_dc->setChecked(!en);
+	}
 	dmm->ui->btn_ch1_ac->setChecked(en);
 }
 
-void DMM_API::set_mode_ac_ch2(bool en)
+void DMM_API::set_mode_ac_high_ch2(bool en)
 {
+	/* Set DC mode as default */
+	if (!get_mode_ac_low_ch2() && !en) {
+		dmm->ui->btn_ch2_dc->setChecked(!en);
+	}
+	dmm->ui->btn_ch2_ac2->setChecked(en);
+}
+
+void DMM_API::set_mode_ac_low_ch2(bool en)
+{
+	/* Set DC mode as default */
+	if (!get_mode_ac_high_ch2() && !en) {
+		dmm->ui->btn_ch2_dc->setChecked(!en);
+	}
 	dmm->ui->btn_ch2_ac->setChecked(en);
 }
 
@@ -692,4 +728,45 @@ void DMM_API::set_history_ch1_size_idx(int index)
 void DMM_API::set_history_ch2_size_idx(int index)
 {
 	dmm->ui->historySizeCh2->setCurrentIndex(index);
+}
+
+bool DMM_API::getDataLoggingEn() const
+{
+	return dmm->ui->btnDataLogging->isChecked();
+}
+
+void DMM_API::setDataLoggingEn(bool en)
+{
+	dmm->ui->btnDataLogging->setChecked(en);
+}
+
+double DMM_API::getDataLoggingTimer() const
+{
+	return dmm->data_logging_timer->value();
+}
+
+void DMM_API::setDataLoggingTimer(double val)
+{
+	dmm->data_logging_timer->setValue(val);
+}
+
+bool DMM_API::getPeakHoldEn() const
+{
+	return dmm->ui->btnDisplayPeakHold->isChecked();
+}
+
+void DMM_API::setPeakHoldEn(bool val)
+{
+	dmm->ui->btnDisplayPeakHold->setChecked(val);
+}
+
+bool DMM_API::getDataLoggingAppend() const
+{
+	return dmm->ui->btn_append->isChecked();
+}
+
+void DMM_API::setDataLoggingAppend(bool val)
+{
+	dmm->ui->btn_append->setChecked(val);
+	dmm->ui->btn_overwrite->setChecked(!val);
 }

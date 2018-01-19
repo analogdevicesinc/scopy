@@ -1211,7 +1211,7 @@ color: #FFFFFF;</string>
                <item>
                 <widget class="QLabel" name="label_13">
                  <property name="text">
-                  <string>Display</string>
+                  <string>Peak hold</string>
                  </property>
                 </widget>
                </item>
