@@ -943,9 +943,6 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
                   <property name="name" stdset="0">
                    <string>Amplitude</string>
                   </property>
-                  <property name="min_value" stdset="0">
-                   <double>0.000000000000000</double>
-                  </property>
                   <property name="max_value" stdset="0">
                    <double>10.000000000000000</double>
                   </property>
