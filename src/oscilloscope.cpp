@@ -3666,7 +3666,10 @@ double Channel_API::getLineThickness() const
 void Channel_API::setLineThickness(double val)
 {
 	int index = osc->channels_api.indexOf(this);
-
+	if (index == osc->current_ch_widget) {
+		int cmbIdx = (int)(val / 0.5) - 1;
+		osc->ch_ui->cmbChnLineWidth->setCurrentIndex(cmbIdx);
+	}
 	osc->plot.setLineWidthF(index, val);
 }
 
