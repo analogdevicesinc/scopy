@@ -456,11 +456,11 @@ qreal PatternGeneratorChannelGroup::getCh_thickness() const
 	return ch_thickness;
 }
 
-void PatternGeneratorChannelGroup::setCh_thickness(const qreal value)
+void PatternGeneratorChannelGroup::setCh_thickness(const qreal value, bool setChannels)
 {
 	ch_thickness = value;
 
-	if (is_grouped()) {
+	if (is_grouped() && setChannels) {
 		for (int i=0; i<get_channel_count(); i++) {
 			get_channel(i)->setCh_thickness(value);
 		}

@@ -209,10 +209,15 @@ class PatternGeneratorChannel_API : public ApiObject
 	Q_PROPERTY(int id READ id WRITE setId);
 	Q_PROPERTY(int mask READ mask);
 	Q_PROPERTY(bool outputMode READ outputMode WRITE setOutputMode)
+	Q_PROPERTY(QList<int> color READ color WRITE setColor);
+	Q_PROPERTY(double thickness READ thickness WRITE setThickness);
 	PatternGeneratorChannel *ch;
 
 public:
 	PatternGeneratorChannel_API(PatternGeneratorChannel *_ch) : ch(_ch) {}
+
+	QList<int> color();
+	void setColor(QList<int>);
 
 	QString label()
 	{
@@ -242,6 +247,15 @@ public:
 	{
 		ch->setOutputMode(val);
 	}
+
+	void setThickness(double val)
+	{
+		ch->setCh_thickness(val);
+	}
+	double thickness()
+	{
+		return ch->getCh_thickness();
+	}
 };
 
 class PatternGeneratorChannelGroup_API : public ApiObject
@@ -254,6 +268,8 @@ class PatternGeneratorChannelGroup_API : public ApiObject
 	Q_PROPERTY(QString pattern READ pattern WRITE setPattern);
 
 	Q_PROPERTY(QList<int> channel_list READ channels WRITE setChannels);
+	Q_PROPERTY(double thickness READ thickness WRITE setThickness);
+	Q_PROPERTY(QList<int> color READ color WRITE setColor);
 
 	PatternGeneratorChannelGroup *chg;
 	QList<int> channel_list_;
@@ -277,6 +293,10 @@ public:
 
 	QList<int> channels();
 	void setChannels(QList<int>);
+
+	QList<int> color();
+	void setColor(QList<int>);
+
 
 	bool grouped()
 	{
@@ -307,6 +327,14 @@ public:
 	{
 		chg->collapse(_val);
 	}
+	void setThickness(double val)
+	{
+		chg->setCh_thickness(val,false);
+	}
+	double thickness()
+	{
+		return chg->getCh_thickness();
+	}
 
 };
 
@@ -324,6 +352,7 @@ class PatternGenerator_API : public ApiObject
 
 	Q_PROPERTY(bool running READ running WRITE run STORED false);
 	Q_PROPERTY(bool single READ single WRITE run_single STORED false);
+	Q_PROPERTY(bool inactive_hidden READ inactiveHidden WRITE setInactiveHidden);
 
 public:
 	explicit PatternGenerator_API(PatternGenerator *pg) :
@@ -343,6 +372,8 @@ public:
 	void run(bool en);
 	bool single() const;
 	void run_single(bool en);
+	bool inactiveHidden();
+	void setInactiveHidden(bool);
 
 private:
 	void refreshApi();
