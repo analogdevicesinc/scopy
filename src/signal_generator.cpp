@@ -830,10 +830,12 @@ void SignalGenerator::tabChanged(int index)
 
 void SignalGenerator::updatePreview()
 {
+	const int nb_points_correction = 16; // generate slightly more points to avoid incomplete scope_sink_f buffer
 	gr::top_block_sptr top = make_top_block("Signal Generator Update");
 	unsigned int i = 0;
 	bool enabled = false;
 
+	time_block_data->time_block->reset();
 	for (auto it = channels.begin(); it != channels.end(); ++it) {
 		basic_block_sptr source;
 
@@ -845,9 +847,8 @@ void SignalGenerator::updatePreview()
 			source = blocks::nop::make(sizeof(float));
 		}
 
-		auto head = blocks::head::make(sizeof(float), nb_points);
+		auto head = blocks::head::make(sizeof(float), nb_points + nb_points_correction);
 		top->connect(source, 0, head, 0);
-
 		top->connect(head, 0, time_block_data->time_block, i++);
 	}
 
