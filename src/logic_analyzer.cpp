@@ -424,15 +424,15 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 
 	timer->setInterval(timer_timeout_ms);
 
-	api->setObjectName(QString::fromStdString(Filter::tool_name(
-			TOOL_LOGIC_ANALYZER)));
-	api->load(*settings);
-	api->js_register(engine);
-
 	chm_ui->setWidgetMinimumNrOfChars(ui->triggerStateLabel, 9);
 	chm_ui->update_ui();
 	init_export_settings();
 	installWheelEventGuard();
+
+	api->setObjectName(QString::fromStdString(Filter::tool_name(
+			TOOL_LOGIC_ANALYZER)));
+	api->load(*settings);
+	api->js_register(engine);
 }
 
 void LogicAnalyzer::init_export_settings()
@@ -1983,6 +1983,16 @@ void LogicAnalyzer_API::setRunMode(QString value)
 	{
 		lga->ui->cmbRunMode->setCurrentIndex(0);
 	}
+}
+
+bool LogicAnalyzer_API::getExportAll() const
+{
+	return lga->exportSettings->getExportAllButton()->isChecked();
+}
+
+void LogicAnalyzer_API::setExportAll(bool en)
+{
+	lga->exportSettings->getExportAllButton()->setChecked(en);
 }
 
 
