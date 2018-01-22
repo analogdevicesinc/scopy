@@ -294,6 +294,7 @@ class LogicAnalyzer_API : public ApiObject
 	Q_PROPERTY(bool cursors_active READ cursorsActive WRITE setCursorsActive)
 	Q_PROPERTY(bool cursors_locked READ cursorsLocked WRITE setCursorsLocked)
 	Q_PROPERTY(bool inactive_hidden READ inactiveHidden WRITE setInactiveHidden)
+	Q_PROPERTY(bool export_all READ getExportAll WRITE setExportAll)
 
 public:
 	explicit LogicAnalyzer_API(LogicAnalyzer *lga) :
@@ -328,6 +329,9 @@ public:
 
 	bool inactiveHidden() const;
 	void setInactiveHidden(bool en);
+
+	bool getExportAll() const;
+	void setExportAll(bool);
 
 private:
 	LogicAnalyzer *lga;
