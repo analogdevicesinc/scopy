@@ -1714,7 +1714,6 @@ void LogicAnalyzer::resetInstrumentToDefault()
 	ui->btnShowChannels->clicked(false);
 	exportSettings->getExportAllButton()->setChecked(true);
 	initialised = false;
-	resizeEvent();
 	main_win->session_.clear_data();
 	updateBufferPreviewer();
 }
