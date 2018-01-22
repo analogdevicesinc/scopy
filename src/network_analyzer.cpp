@@ -124,6 +124,9 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	api->setObjectName(QString::fromStdString(Filter::tool_name(
 			TOOL_NETWORK_ANALYZER)));
+
+	ui->xygraph->enableZooming(ui->btnZoomIn, ui->btnZoomOut);
+
 	api->load(*settings);
 	api->js_register(engine);
 }
