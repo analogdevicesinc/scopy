@@ -1712,6 +1712,7 @@ void LogicAnalyzer::resetInstrumentToDefault()
 		ui->btnCursorsLock->toggle();
 	ui->cursorSettings->update();
 	ui->btnShowChannels->clicked(false);
+	exportSettings->getExportAllButton()->setChecked(true);
 	initialised = false;
 	resizeEvent();
 	main_win->session_.clear_data();
