@@ -23,6 +23,7 @@
 #include <QPainter>
 #include <QPointF>
 #include <QRect>
+#include <QApplication>
 
 #include <QDebug>
 
@@ -108,12 +109,39 @@ NyquistGraph::NyquistGraph(QWidget *parent) : QwtPolarPlot(parent),
 	grid->showGrid(QwtPolar::Radius, true);
 	grid->attach(this);
 
+	panner = new QwtPolarPanner(this->canvas());
+	zoomer = new NyquistPlotZoomer(this->canvas());
+	panner->setEnabled(false);
+	zoomer->setEnabled(false);
+
 	curve.setData(samples);
 	curve.attach(this);
 }
 
 NyquistGraph::~NyquistGraph()
 {
+}
+
+void NyquistGraph::enableZooming(QPushButton *btnZoomIn, QPushButton *btnZoomOut)
+{
+	connect(btnZoomIn, &QPushButton::clicked, [=](){
+		zoomer->zoomIn();
+		if (zoomer->isZoomed())
+			QApplication::setOverrideCursor(Qt::OpenHandCursor);
+		else
+			QApplication::setOverrideCursor(Qt::CrossCursor);
+	});
+	connect(btnZoomOut, &QPushButton::clicked, [=](){
+		zoomer->zoomOut();
+		if (zoomer->isZoomed())
+			QApplication::setOverrideCursor(Qt::OpenHandCursor);
+		else
+			QApplication::setOverrideCursor(Qt::CrossCursor);
+	});
+
+	zoomer->setEnabled(true);
+	panner->setEnabled(true);
+	zoomer->setWheelFactor(1);
 }
 
 const QColor NyquistGraph::getColor() const
@@ -200,4 +228,41 @@ void NyquistGraph::setFontRadius(const QFont& font)
 {
 	grid->setAxisFont(QwtPolar::AxisRight, font);
 	grid->setAxisFont(QwtPolar::AxisTop, font);
+}
+
+void NyquistGraph::mousePressEvent(QMouseEvent *event)
+{
+	if (event->button() == Qt::RightButton) {
+		zoomer->cancelZoom();
+		QApplication::setOverrideCursor(Qt::CrossCursor);
+		QwtPolarPlot::mousePressEvent(event);
+		return;
+	}
+
+	if (zoomer->isZoomed())
+		QApplication::setOverrideCursor(Qt::ClosedHandCursor);
+
+	QwtPolarPlot::mousePressEvent(event);
+}
+
+void NyquistGraph::mouseReleaseEvent(QMouseEvent *event)
+{
+	if (zoomer->isZoomed())
+		QApplication::setOverrideCursor(Qt::OpenHandCursor);
+	QwtPolarPlot::mouseReleaseEvent(event);
+}
+
+void NyquistGraph::enterEvent(QEvent *event)
+{
+	if (zoomer->isZoomed())
+		QApplication::setOverrideCursor(Qt::OpenHandCursor);
+	else
+		QApplication::setOverrideCursor(Qt::CrossCursor);
+	QwtPolarPlot::enterEvent(event);
+}
+
+void NyquistGraph::leaveEvent(QEvent *event)
+{
+	QApplication::setOverrideCursor(Qt::ArrowCursor);
+	QwtPolarPlot::leaveEvent(event);
 }

@@ -22,9 +22,14 @@
 
 #include "customFifo.hpp"
 #include "dbgraph.hpp"
+#include "nyquistplotzoomer.h"
 
 #include <qwt_polar_curve.h>
 #include <qwt_polar_plot.h>
+#include <qwt_polar_panner.h>
+
+#include <QPushButton>
+#include <QMouseEvent>
 
 class QwtPolarGrid;
 
@@ -60,6 +65,8 @@ namespace adiscope {
 		QFont getFontAzimuth() const;
 		QFont getFontRadius() const;
 
+		void enableZooming(QPushButton *bntZoomIn, QPushButton *btnZoomOut);
+
 	public Q_SLOTS:
 		void setColor(const QColor& color);
 		void setBgColor(const QColor& color);
@@ -73,12 +80,20 @@ namespace adiscope {
 		void setFontAzimuth(const QFont& font);
 		void setFontRadius(const QFont& font);
 
+		void mousePressEvent(QMouseEvent *event);
+		void mouseReleaseEvent(QMouseEvent *event);
+		void enterEvent(QEvent *event);
+		void leaveEvent(QEvent *event);
+
 	private:
 		double mag_min, mag_max;
 		unsigned int numSamples;
 		NyquistSamplesArray *samples;
 		QwtPolarGrid *grid;
 		QwtPolarCurve curve;
+		QwtPolarPanner *panner;
+		NyquistPlotZoomer *zoomer;
+
 	};
 }
 
