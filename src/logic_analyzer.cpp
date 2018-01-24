@@ -2149,7 +2149,7 @@ int LogicChannel_API::getIndex() const
 void LogicChannel_API::setIndex(int val)
 {
 	index = val;
-	lga->chm.get_channel_group(lchg->getIndex())->add_channel(
+	lga->chm.get_channel_group(lchg->getIndex())->add_logic_channel(
 		lga->chm.get_channel(val));
 }
 

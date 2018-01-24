@@ -305,8 +305,11 @@ shared_ptr<pv::view::DecodeTrace> Session::add_decoder()
 
 void Session::remove_decode_clones()
 {
-	for (auto item = decode_traces_.begin(); item != decode_traces_.end(); )
+	for (auto item = decode_traces_.begin(); item != decode_traces_.end(); ) {
+		(*item)->decoder()->stop_decode();
+		item->reset();
 		item = decode_traces_.erase(item);
+	}
 	signals_changed();
 }
 

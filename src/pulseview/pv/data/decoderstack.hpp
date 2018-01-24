@@ -113,6 +113,7 @@ public:
 	uint64_t max_sample_count() const;
 
 	void begin_decode();
+	void stop_decode();
 
 	QString name();
 

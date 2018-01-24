@@ -87,6 +87,7 @@ public:
 	DecodeTrace(pv::Session &session,
 		std::shared_ptr<pv::data::DecoderStack> decoder_stack,
 		int index);
+	~DecodeTrace();
 
 	bool enabled() const;
 

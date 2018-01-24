@@ -274,9 +274,9 @@ void LogicAnalyzerChannelUI::dropEvent(QDropEvent *event)
 			auto chToBeAdded = chm_ui->chm->get_channel_group(from)->get_channel(i);
 			auto ids = chm_ui->chm->get_channel_group(chgIndex)->get_ids();
 			if( std::find(ids.begin(), ids.end(), chToBeAdded->get_id()) == ids.end()) {
-				Channel *ch = new LogicAnalyzerChannel(
+				LogicAnalyzerChannel *ch = new LogicAnalyzerChannel(
 					chToBeAdded->get_id(), chToBeAdded->get_label());
-				chm_ui->chm->get_channel_group(chgIndex)->add_channel(ch);
+				chm_ui->chm->get_channel_group(chgIndex)->add_logic_channel(ch);
 			}
 		}
 		chm_ui->chm->highlightChannel(chm_ui->chm->get_channel_group(chgIndex));
@@ -355,7 +355,7 @@ void LogicAnalyzerChannelUI::channelRoleChanged(const QString text)
 		channel_role = chgroup->get_srd_channel_from_name(
 		                  text.toStdString().c_str());
 	}
-	static_cast<LogicAnalyzerChannel *>(lch)->setChannel_role(channel_role);
+	lch->setChannel_role(channel_role);
 	if (channel_role)
 		chgroup->setChannelForDecoder(channel_role, getChannel()->get_id());
 	chgroupui->setupDecoder();
@@ -494,8 +494,6 @@ void LogicAnalyzerChannelGroup::setDecoder(const srd_decoder *value)
 {
 	if( value == nullptr )
 		return;
-	if( value ==  decoder )
-		return;
 
 	decoderRolesNameList.clear();
 	decoderReqChannels.clear();
@@ -531,11 +529,23 @@ void LogicAnalyzerChannelGroup::setDecoder(const srd_decoder *value)
 
 LogicAnalyzerChannel* LogicAnalyzerChannelGroup::get_channel_by_id(int id)
 {
-	for(auto&& ch : *(get_channels()))
+        for(auto&& ch : *(get_channels()))
+        {
+                if (ch->get_id() == id)
+                {
+                        return static_cast<LogicAnalyzerChannel *>(ch);
+                }
+        }
+        return nullptr;
+}
+
+LogicAnalyzerChannel* LogicAnalyzerChannelGroup::get_logic_channel_by_id(int id)
+{
+	for(auto ch : logicChannels)
 	{
 		if (ch->get_id() == id)
 		{
-			return static_cast<LogicAnalyzerChannel *>(ch);
+			return ch;
 		}
 	}
 	return nullptr;
@@ -548,6 +558,18 @@ LogicAnalyzerChannel* LogicAnalyzerChannelGroup::get_channel_at_index(int index)
 		return static_cast<LogicAnalyzerChannel *>(channels->at(index));
 	}
 	return nullptr;
+}
+
+void LogicAnalyzerChannelGroup::add_logic_channel(LogicAnalyzerChannel *chn)
+{
+	logicChannels.push_back(chn);
+	add_channel(chn);
+}
+
+void LogicAnalyzerChannelGroup::remove_logic_channel(int chnIndex)
+{
+	logicChannels.erase(logicChannels.begin() + chnIndex);
+	remove_channel(chnIndex);
 }
 
 QStringList LogicAnalyzerChannelGroup::get_decoder_roles_list()
@@ -610,14 +632,14 @@ void LogicAnalyzerChannelGroup::setChannelForDecoder(const srd_channel* ch,
 		auto itByKey = channels_.find(ch);
 		auto itByValue = (findByValue(ch_id) == nullptr) ? channels_.end() : channels_.find(findByValue(ch_id));
 		if( itByKey != channels_.end() && itByValue != channels_.end() && itByKey != itByValue) {
-			if( get_channel_by_id(itByKey->second))
-				get_channel_by_id(itByKey->second)->setChannel_role(nullptr);
+			if( get_logic_channel_by_id(itByKey->second))
+				get_logic_channel_by_id(itByKey->second)->setChannel_role(nullptr);
 			channels_.at(ch) = ch_id;
 			itByValue->second = -1;
 		}
 		else if( itByKey != channels_.end() ) {
-			if( get_channel_by_id(itByKey->second))
-				get_channel_by_id(itByKey->second)->setChannel_role(nullptr);
+			if( get_logic_channel_by_id(itByKey->second))
+				get_logic_channel_by_id(itByKey->second)->setChannel_role(nullptr);
 			channels_.at(ch) = ch_id;
 		}
 		else if( itByValue != channels_.end() ) {
@@ -644,6 +666,7 @@ LogicAnalyzerChannelGroup::~LogicAnalyzerChannelGroup()
 {
 	channels_.clear();
 	properties_.clear();
+
 }
 
 const srd_channel* LogicAnalyzerChannelGroup::get_srd_channel_from_name(const char* name)
@@ -725,6 +748,14 @@ void LogicAnalyzerChannelGroupUI::setTrace(
 {
 	trace = dynamic_pointer_cast<pv::view::TraceTreeItem>(item);
 	decodeTrace = item;
+}
+
+void LogicAnalyzerChannelGroupUI::setTrace()
+{
+	decodeTrace.reset();
+	trace.reset();
+	trace = nullptr;
+	decodeTrace = nullptr;
 }
 
 std::shared_ptr<pv::view::TraceTreeItem> LogicAnalyzerChannelGroupUI::getTrace()
@@ -974,11 +1005,10 @@ void LogicAnalyzerChannelGroupUI::setupDecoder()
 		decodeTrace->set_decoder(decoder);
 		std::map<const srd_channel *,
 				std::shared_ptr<pv::view::TraceTreeItem> > channel_map;
-
+		std::pair<const srd_channel *,
+			std::shared_ptr<pv::view::TraceTreeItem> > chtracepair;
 		for(auto id : lchg->get_ids()) {
-			LogicAnalyzerChannel* lch = lchg->get_channel_by_id(id);
-			std::pair<const srd_channel *,
-				std::shared_ptr<pv::view::TraceTreeItem> > chtracepair;
+			LogicAnalyzerChannel* lch = lchg->get_logic_channel_by_id(id);
 			if( lch->getChannel_role() ) {
 				chtracepair.first = lch->getChannel_role();
 				chtracepair.second = chm_ui->main_win->view_->get_clone_of(id);
@@ -1196,7 +1226,7 @@ LogicAnalyzerChannelGroup *LogicAnalyzerChannelManager::get_channel_group(
 
 void LogicAnalyzerChannelManager::join(std::vector<int> index)
 {
-	ChannelGroup *new_ch_group = new LogicAnalyzerChannelGroup();
+	LogicAnalyzerChannelGroup *new_ch_group = new LogicAnalyzerChannelGroup();
 
 	for (auto i=0; i<index.size(); i++) {
 		for (auto j = 0; j < get_channel_group(index[i])->get_channels()->size(); j++)
@@ -1207,9 +1237,9 @@ void LogicAnalyzerChannelManager::join(std::vector<int> index)
 					vec.end(), someId);
 			if( it == vec.end())
 			{
-				Channel *ch = new LogicAnalyzerChannel(get_channel_group(index[i])->get_channels()->at(j)->get_id(),
+				LogicAnalyzerChannel *ch = new LogicAnalyzerChannel(get_channel_group(index[i])->get_channels()->at(j)->get_id(),
 					get_channel_group(index[i])->get_channels()->at(j)->get_label());
-				new_ch_group->add_channel(ch);
+				new_ch_group->add_logic_channel(ch);
 			}
 		}
 	}
@@ -1666,7 +1696,7 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 	}
 	ui->scrollArea->setWidget(ui->scrollAreaWidgetContents);
 
-	main_win->view_->remove_trace_clones();
+	remove_trace_clones();
 	chg_ui.erase(chg_ui.begin(),chg_ui.end());
 
 	QFrame *prevSep = addSeparator(ui->verticalLayout,
@@ -1746,7 +1776,7 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 				if (lachannelgroupUI->getChannelGroup()->getDecoder()) {
 					QString name = QString::fromUtf8(
 						lachannelgroupUI->getChannelGroup()->getDecoder()->name);
-					int decIndex =chm->get_name_decoder_list().indexOf(name)+1;
+					int decIndex = chm->get_name_decoder_list().indexOf(name)+1;
 					lachannelgroupUI->ui->decoderCombo->setCurrentIndex(decIndex);
 				} else {
 					lachannelgroupUI->ui->decoderCombo->setCurrentIndex(0);
@@ -1945,6 +1975,14 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 	if(!eventFilterGuard)
 		eventFilterGuard = new MouseWheelWidgetGuard(this);
 	eventFilterGuard->installEventRecursively(this);
+}
+
+void LogicAnalyzerChannelManagerUI::remove_trace_clones()
+{
+	for (auto ch : this->chg_ui) {
+		ch->setTrace();
+	}
+	main_win->view_->remove_trace_clones();
 }
 
 void LogicAnalyzerChannelManagerUI::chmScrollChanged(int value)
@@ -2301,8 +2339,8 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 				reqChUI->roleCombo->addItem("-");
 				for (auto&& ch : *(chGroup->get_channels())) {
 					reqChUI->roleCombo->addItem(QString::number(ch->get_id()));
-					if(chGroup->get_channel_by_id(ch->get_id())->getChannel_role() &&
-						(QString::fromUtf8(chGroup->get_channel_by_id(ch->get_id())->getChannel_role()->name)
+					if(chGroup->get_logic_channel_by_id(ch->get_id())->getChannel_role() &&
+						(QString::fromUtf8(chGroup->get_logic_channel_by_id(ch->get_id())->getChannel_role()->name)
 							== rqch->name))
 					{
 						reqChUI->roleCombo->setCurrentText(QString::number(ch->get_id()));
@@ -2357,8 +2395,8 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 				optChUI->roleCombo->addItem("-");
 				for (auto&& ch : *(chGroup->get_channels())) {
 					optChUI->roleCombo->addItem(QString::number(ch->get_id()));
-					if(chGroup->get_channel_by_id(ch->get_id())->getChannel_role() &&
-						(QString::fromUtf8(chGroup->get_channel_by_id(ch->get_id())->getChannel_role()->name)
+					if(chGroup->get_logic_channel_by_id(ch->get_id())->getChannel_role() &&
+						(QString::fromUtf8(chGroup->get_logic_channel_by_id(ch->get_id())->getChannel_role()->name)
 							== optch->name))
 					{
 						optChUI->roleCombo->setCurrentText(QString::number(ch->get_id()));

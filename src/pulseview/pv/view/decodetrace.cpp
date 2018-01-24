@@ -155,6 +155,11 @@ DecodeTrace::DecodeTrace(pv::Session &session,
 		this, SLOT(on_show_hide_decoder(int)));
 }
 
+DecodeTrace::~DecodeTrace()
+{
+	decoder_stack_.reset();
+}
+
 bool DecodeTrace::enabled() const
 {
 	return true;

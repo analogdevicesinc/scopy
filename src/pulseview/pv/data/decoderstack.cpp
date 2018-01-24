@@ -54,7 +54,7 @@ namespace data {
 
 const double DecoderStack::DecodeMargin = 1.0;
 const double DecoderStack::DecodeThreshold = 0.2;
-const int64_t DecoderStack::DecodeChunkLength = 1024 * 256;
+const int64_t DecoderStack::DecodeChunkLength = 256;
 const unsigned int DecoderStack::DecodeNotifyPeriod = 1024;
 
 mutex DecoderStack::global_srd_mutex_;
@@ -215,6 +215,15 @@ void DecoderStack::clear()
 	error_message_ = QString();
 	rows_.clear();
 	class_rows_.clear();
+}
+
+void DecoderStack::stop_decode()
+{
+	if (decode_thread_.joinable()) {
+		interrupt_ = true;
+		input_cond_.notify_one();
+		decode_thread_.join();
+	}
 }
 
 void DecoderStack::begin_decode()

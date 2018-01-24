@@ -127,6 +127,7 @@ private:
 	std::map<const srd_channel*,uint16_t> channels_;
 	const srd_channel* findByValue(uint16_t ch_id);
 	qreal ch_thickness;
+	std::vector<LogicAnalyzerChannel*> logicChannels;
 public:
 	LogicAnalyzerChannelGroup(LogicAnalyzerChannel *ch);
 	LogicAnalyzerChannelGroup();
@@ -139,6 +140,9 @@ public:
 	const srd_channel *get_srd_channel_from_name(const char*);
 	LogicAnalyzerChannel* get_channel_by_id(int id);
 	LogicAnalyzerChannel* get_channel_at_index(int index);
+	LogicAnalyzerChannel* get_logic_channel_by_id(int id);
+	void add_logic_channel(LogicAnalyzerChannel *chn);
+	void remove_logic_channel(int chnIndex);
 	void setChannelForDecoder(const srd_channel*, uint16_t);
 	std::map<const srd_channel*, uint16_t> get_decoder_channels();
 	qreal getCh_thickness() const;
@@ -170,6 +174,7 @@ public:
 	void enableControls(bool enabled);
 	void setTrace(std::shared_ptr<pv::view::LogicSignal> item);
 	void setTrace(std::shared_ptr<pv::view::DecodeTrace> item);
+	void setTrace();
 
 	std::shared_ptr<pv::view::TraceTreeItem> getTrace();
 	LogicAnalyzerChannelUI* findChannelWithRole(const QString role);
@@ -302,6 +307,7 @@ public:
 	bool is_streaming_mode();
 	std::vector<std::string> getTriggerMapping();
 	std::string getTriggerMapping(int);
+	void remove_trace_clones();
 
 public Q_SLOTS:
 	void chmScrollChanged(int value);
