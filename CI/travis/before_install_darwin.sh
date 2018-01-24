@@ -106,7 +106,7 @@ sudo make install
 cd ${WORKDIR}
 rm qwtpolar-1.1.1.tar.bz2*
 if [ ! -d qwtpolar-1.1.1 ]; then
-  wget https://downloads.sourceforge.net/project/qwtpolar/qwtpolar/1.1.1/qwtpolar-1.1.1.tar.bz2
+  wget --no-check-certificate https://downloads.sourceforge.net/project/qwtpolar/qwtpolar/1.1.1/qwtpolar-1.1.1.tar.bz2
   tar xvjf qwtpolar-1.1.1.tar.bz2
   cd qwtpolar-1.1.1
   curl -o qwtpolar-qwt-6.1-compat.patch https://raw.githubusercontent.com/analogdevicesinc/scopy-flatpak/master/qwtpolar-qwt-6.1-compat.patch
