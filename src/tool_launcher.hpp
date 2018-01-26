@@ -31,6 +31,7 @@
 #include <QMap>
 #include <QStringList>
 #include <info_widget.h>
+#include <QTextBrowser>
 
 #include "apiObject.hpp"
 #include "dmm.hpp"
@@ -179,6 +180,8 @@ private:
 
 	bool debugger_enabled;
 
+	QString indexFile;
+
 	void loadToolTips(bool connected);
 	QVector<QString> searchDevices();
 	void swapMenu(QWidget *menu);
@@ -195,6 +198,9 @@ private:
 	QList<QString> getOrder();
 	void setOrder(QList<QString> list);
 
+	QTextBrowser *welcome;
+	QTextBrowser *index;
+
 	void updateListOfDevices(const QVector<QString>& uris);
 	void generateMenu();
 	QStringList tools;
@@ -203,6 +209,7 @@ private:
 	void insertMenuOptions();
 	void closeEvent(QCloseEvent *event);
 	void highlightDevice(QPushButton *btn);
+	void setupHomepage();
 };
 
 class ToolLauncher_API: public ApiObject
@@ -225,9 +232,14 @@ class ToolLauncher_API: public ApiObject
 
 	Q_PROPERTY(bool debugger READ debugger_enabled WRITE enable_debugger)
 
+	Q_PROPERTY(QString index_file READ getIndexFile WRITE setIndexFile)
+
 public:
 	explicit ToolLauncher_API(ToolLauncher *tl) : ApiObject(), tl(tl) {}
 	~ToolLauncher_API() {}
+
+	QString getIndexFile() const;
+	void setIndexFile(const QString &indexFile);
 
 	bool menu_opened() const;
 	void open_menu(bool open);

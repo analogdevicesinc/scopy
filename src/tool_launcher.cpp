@@ -43,6 +43,7 @@
 #include <QStringList>
 #include <QFileDialog>
 #include <QFile>
+#include <QDir>
 
 #include <iio.h>
 
@@ -64,7 +65,8 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	calib(nullptr),
 	skip_calibration(false),
 	calibrating(false),
-	debugger_enabled(false)
+	debugger_enabled(false),
+	indexFile("")
 {
 	if (!isatty(STDIN_FILENO))
 		notifier.setEnabled(false);
@@ -211,6 +213,8 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 
 	connect(ui->saveBtn, &QPushButton::clicked, this, &ToolLauncher::saveSession);
 	connect(ui->loadBtn, &QPushButton::clicked, this, &ToolLauncher::loadSession);
+
+	setupHomepage();
 }
 
 void ToolLauncher::saveSession()
@@ -585,6 +589,39 @@ void ToolLauncher::highlightDevice(QPushButton *btn)
 	QTimer::singleShot(800, [=](){
 		setDynamicProperty(btn, "checked", initialBtnState);
 	});
+}
+
+void ToolLauncher::setupHomepage()
+{
+	// Welcome page
+	welcome = new QTextBrowser(ui->stackedWidget);
+	welcome->setFrameShape(QFrame::NoFrame);
+	welcome->setOpenExternalLinks(true);
+	welcome->setSource(QUrl("qrc:/scopy.html"));
+	ui->stackedWidget->addWidget(welcome);
+
+	// Index page
+	index = new QTextBrowser(ui->stackedWidget);
+	index->setFrameShape(QFrame::NoFrame);
+
+	if (indexFile == "") {
+		return;
+	}
+
+	QFileInfo fileInfo(indexFile);
+	if (fileInfo.exists()) {
+		QFile indexFile(fileInfo.filePath());
+		indexFile.open(QFile::ReadOnly);
+		if (!indexFile.readAll().isEmpty()) {
+			index->setSearchPaths(QStringList(fileInfo.dir().absolutePath()));
+			indexFile.close();
+			index->setSource(QUrl::fromLocalFile(fileInfo.filePath()));
+			ui->stackedWidget->addWidget(index);
+			ui->stackedWidget->moveRight();
+		} else {
+			indexFile.close();
+		}
+	}
 }
 
 void ToolLauncher::swapMenu(QWidget *menu)
@@ -1362,6 +1399,16 @@ QList<QString> ToolLauncher_API::order()
 void ToolLauncher_API::setOrder(QList<QString> list)
 {
 	tl->setOrder(list);
+}
+
+QString ToolLauncher_API::getIndexFile() const
+{
+	return tl->indexFile;
+}
+
+void ToolLauncher_API::setIndexFile(const QString &indexFile)
+{
+	tl->indexFile = indexFile;
 }
 
 bool ToolLauncher_API::menu_opened() const
