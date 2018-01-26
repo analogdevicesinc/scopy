@@ -7,7 +7,8 @@ echo 'export PATH="$(brew --prefix qt)/bin:$PATH"' >> ~/.bash_profile
 brew link --force qt
 
 brew unlink bison
-brew install cmake fftw bison autoconf automake libtool libzip glib glibmm doxygen python3 wget boost gnu-sed libmatio dylibbundler
+brew install cmake fftw bison autoconf automake libtool libzip glib glibmm doxygen python3 wget boost gnu-sed libmatio dylibbundler libxml2
+brew install --build-from-source libusb
 brew install llvm
 brew link --overwrite --force gcc
 brew link --overwrite --force bison
