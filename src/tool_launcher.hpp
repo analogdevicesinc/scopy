@@ -46,6 +46,7 @@
 #include "digitalio.hpp"
 #include "menuoption.h"
 #include "detachedWindow.hpp"
+#include "preferences.h"
 
 extern "C" {
 	struct iio_context;
@@ -75,6 +76,8 @@ public:
 
 	Q_INVOKABLE void runProgram(const QString& program, const QString& fn);
 	InfoWidget *infoWidget;
+
+	Preferences *getPrefPanel() const;
 
 Q_SIGNALS:
 	void connectionDone(bool success);
@@ -159,6 +162,7 @@ private:
 	Debugger *debugger;
 	QWidget *current;
 	QSettings *settings;
+	Preferences *prefPanel;
 
 	QButtonGroup adc_users_group;
 
