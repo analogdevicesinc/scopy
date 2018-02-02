@@ -188,6 +188,8 @@ namespace adiscope {
 		void updateTriggerLevelValue(std::vector<float> value);
 		void configureAcCouplingTrigger(bool);
 
+		void readPreferences();
+
 	public Q_SLOTS:
 		void enableLabels(bool);
 

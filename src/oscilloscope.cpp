@@ -611,6 +611,10 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	wheelEventGuard->installEventRecursively(ui->mainWidget);
 
 	current_ch_widget = current_channel;
+
+	connect(prefPanel, &Preferences::notify, this, &Oscilloscope::readPreferences);
+
+	readPreferences();
 }
 
 void Oscilloscope::updateTriggerLevelValue(std::vector<float> value)
@@ -636,6 +640,9 @@ void Oscilloscope::updateTriggerLevelValue(std::vector<float> value)
 
 Oscilloscope::~Oscilloscope()
 {
+	disconnect(prefPanel, &Preferences::notify, this, &Oscilloscope::readPreferences);
+
+
 	ui->pushButtonRunStop->setChecked(false);
 
 	bool started = iio->started();
@@ -685,6 +692,11 @@ void Oscilloscope::settingsLoaded()
 	voltsPerDiv->setValue(plot.VertUnitsPerDiv(current_ch_widget));
 	connect(voltsPerDiv, SIGNAL(valueChanged(double)),
 		SLOT(onVertScaleValueChanged(double)));
+}
+
+void Oscilloscope::readPreferences()
+{
+	enableLabels(prefPanel->getOsc_labels_enabled());
 }
 
 void Oscilloscope::init_channel_settings()
