@@ -172,6 +172,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 	ui(new Ui::SignalGenerator),
 	time_block_data(new adiscope::time_block_data),
 	dacs(dacs),
+	nr_of_periods(2),
 	currentChannel(0), sample_rate(0),
 	settings_group(new QButtonGroup(this)),nb_points(NB_POINTS)
 {
@@ -433,12 +434,17 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 	connect(runButton, SIGNAL(toggled(bool)),
 	        this, SLOT(startStop(bool)));
 
+	connect(prefPanel, &Preferences::notify, this, &SignalGenerator::readPreferences);
+
 	plot->addZoomer(0);
 	resetZoom();
+
+	readPreferences();
 }
 
 SignalGenerator::~SignalGenerator()
 {
+	disconnect(prefPanel, &Preferences::notify, this, &SignalGenerator::readPreferences);
 	ui->run_button->setChecked(false);
 
 	api->save(*settings);
@@ -452,6 +458,15 @@ SignalGenerator::~SignalGenerator()
 void SignalGenerator::settingsLoaded()
 {
 	updatePreview();
+}
+
+void SignalGenerator::readPreferences()
+{
+	double prefered_periods_nr = prefPanel->getSig_gen_periods_nr();
+	if (nr_of_periods != prefered_periods_nr) {
+		nr_of_periods = prefered_periods_nr;
+		resetZoom();
+	}
 }
 
 void SignalGenerator::resetZoom()
@@ -519,7 +534,7 @@ void SignalGenerator::resetZoom()
 		}
 	}
 
-	period*=2; // show 2 periods - ideally this would be an instrument preference/GUI control
+	period*= nr_of_periods;
 
 	if (period==0.0) { // prevent empty graph
 		period=0.1;
