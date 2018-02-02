@@ -612,10 +612,13 @@ void ToolLauncher::swapMenu(QWidget *menu)
 void ToolLauncher::setButtonBackground(bool on)
 {
 	auto *btn = static_cast<QPushButton *>(QObject::sender());
-	MenuOption *mo = static_cast<MenuOption *>(btn->parentWidget());
+	MenuOption *mo = dynamic_cast<MenuOption *>(btn->parentWidget());
 
-	if (mo->isDetached())
-		return;
+	if (mo) {
+		if (mo->isDetached()) {
+			return;
+		}
+	}
 
 	setDynamicProperty(btn->parentWidget(), "selected", on);
 }
