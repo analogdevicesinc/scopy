@@ -130,6 +130,7 @@ private Q_SLOTS:
 
 	void swapMenuOptions(int source, int destination, bool dropAfter);
 	void highlight(bool on, int position);
+	void resetSession();
 
 private:
 	Ui::ToolLauncher *ui;

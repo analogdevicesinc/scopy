@@ -226,6 +226,8 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	connect(ui->prefBtn, &QPushButton::clicked, [=](){
 		swapMenu(static_cast<QWidget*>(prefPanel));
 	});
+
+	connect(prefPanel, &Preferences::reset, this, &ToolLauncher::resetSession);
 }
 
 void ToolLauncher::saveSession()
@@ -264,6 +266,40 @@ void ToolLauncher::loadSession()
 				QPushButton *btn = enabledTools.back();
 				btn->setEnabled(true);
 				enabledTools.pop();
+			}
+		}
+	}
+}
+
+void ToolLauncher::resetSession()
+{
+	bool deviceConnected = false;
+	QString uri;
+	if (ctx) {
+		for (auto it = devices.begin(); it != devices.end(); ++it) {
+			if ((*it)->second.btn->isChecked()) {
+				uri = (*it)->second.btn->property("uri").toString();
+			}
+		}
+
+		this->disconnect();
+		deviceConnected = true;
+	}
+
+	QSettings settings;
+	QFile fileScopy(settings.fileName());
+	QFile fileBak(settings.fileName() + ".bak");
+	fileScopy.open(QFile::WriteOnly);
+	fileBak.open(QFile::WriteOnly);
+	fileScopy.resize(0);
+	fileBak.resize(0);
+
+	if (deviceConnected) {
+		for (auto it = devices.begin(); it != devices.end(); ++it) {
+			if ((*it)->second.btn->property("uri").toString() == uri) {
+				(*it)->second.btn->setChecked(true);
+				on_btnConnect_clicked(true);
+				break;
 			}
 		}
 	}
