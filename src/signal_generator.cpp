@@ -446,8 +446,9 @@ SignalGenerator::~SignalGenerator()
 {
 	disconnect(prefPanel, &Preferences::notify, this, &SignalGenerator::readPreferences);
 	ui->run_button->setChecked(false);
-
-	api->save(*settings);
+	if (saveOnExit) {
+		api->save(*settings);
+	}
 	delete api;
 
 	delete plot;

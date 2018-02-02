@@ -186,7 +186,9 @@ DMM::~DMM()
 	ui->run_button->setChecked(false);
 	disconnectAll();
 
-	api->save(*settings);
+	if (saveOnExit) {
+		api->save(*settings);
+	}
 	delete api;
 
 	delete ui;

@@ -347,7 +347,9 @@ SpectrumAnalyzer::~SpectrumAnalyzer()
 {
 	ui->run_button->setChecked(false);
 
-	api->save(*settings);
+	if (saveOnExit) {
+		api->save(*settings);
+	}
 	delete api;
 
 	if (iio) {

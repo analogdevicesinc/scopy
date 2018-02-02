@@ -473,7 +473,9 @@ void LogicAnalyzer::configureMaxSampleRate()
 
 LogicAnalyzer::~LogicAnalyzer()
 {
-	api->save(*settings);
+	if (saveOnExit) {
+		api->save(*settings);
+	}
 	delete api;
 
 	if(running)
