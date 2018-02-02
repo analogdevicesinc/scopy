@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Preferences</class>
+ <widget class="QWidget" name="Preferences">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>963</width>
+    <height>661</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="topMargin">
+    <number>20</number>
+   </property>
+   <item>
+    <widget class="adiscope::DetachDragZone" name="mainWidget" native="true">
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QTabWidget" name="tabWidget">
+        <property name="styleSheet">
+         <string notr="true">QTabWidget::pane {
+  border-top: 0px;
+}
+QTabBar::tab {
+  min-width: 110px;
+  min-height: 32px;
+  padding-bottom: 5px;
+  font: bold;
+}
+QTabBar::tab:selected {
+  color: white;
+  border-bottom: 2px solid rgba(74, 100, 255);
+  margin-top: 0px;
+}
+QTabBar::tab:!selected {
+  border-bottom: 2px solid rgba(55, 55, 64);
+  margin-top: 0px;
+}</string>
+        </property>
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <widget class="QWidget" name="General">
+         <attribute name="title">
+          <string>General</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_3">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <property name="topMargin">
+             <number>10</number>
+            </property>
+            <item>
+             <widget class="QCheckBox" name="saveSessionCheckBox">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QCheckBox {
+  spacing: 8px;
+  background-color: transparent;
+  font-size: 14px;
+  font-weight: bold;
+  font-family: &quot;monospace&quot;;
+  color: rgba(255, 255, 255, 153);
+}
+
+QCheckBox::indicator {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgb(74,100,255);
+  border-radius: 4px;
+}
+QCheckBox::indicator:unchecked { background-color: transparent; }
+QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_4">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>Save session when closing scopy</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_3">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_4">
+            <property name="topMargin">
+             <number>10</number>
+            </property>
+            <item>
+             <spacer name="horizontalSpacer_4">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="resetBtn">
+              <property name="styleSheet">
+               <string notr="true">QPushButton {
+  width: 80px;
+  height: 20px;
+  border-radius: 4px;
+  background-color: #ff7200;
+  color: white;
+  font-family: &quot;monospace&quot;;
+  font-weight: bold;
+
+  text-align: left;
+  padding-left: 20px;
+  padding-right: 20px;
+}</string>
+              </property>
+              <property name="text">
+               <string>Reset Scopy</string>
+              </property>
+              <property name="flat">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="Oscilloscope">
+         <attribute name="title">
+          <string>Oscilloscope</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_4">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout">
+            <property name="topMargin">
+             <number>10</number>
+            </property>
+            <item>
+             <widget class="QCheckBox" name="oscLabelsCheckBox">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QCheckBox {
+  spacing: 8px;
+  background-color: transparent;
+  font-size: 14px;
+  font-weight: bold;
+  font-family: &quot;monospace&quot;;
+  color: rgba(255, 255, 255, 153);
+}
+
+QCheckBox::indicator {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgb(74,100,255);
+  border-radius: 4px;
+}
+QCheckBox::indicator:unchecked { background-color: transparent; }
+QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_2">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>Enable labels on the plot </string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <spacer name="verticalSpacer">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="SignalGenerator">
+         <attribute name="title">
+          <string>Signal Generator</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_5">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <property name="topMargin">
+             <number>10</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="label_3">
+              <property name="text">
+               <string>Number of displayed periods:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="sigGenNrPeriods">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QLineEdit {
+height: 22px;
+color: white;
+font-family: &quot;monospace&quot; 12;
+border: 2px solid;
+border-color: grey;
+border-radius: 5px;
+padding: 0 8px;
+background: transparent;
+selection-background-color: darkgray;
+}
+QLineEdit[invalid=true] {
+border-color: red;
+color: red;
+}
+QLineEdit[valid=true] {
+border-color: grey;
+color: white;
+}</string>
+              </property>
+              <property name="text">
+               <string>2</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>adiscope::DetachDragZone</class>
+   <extends>QWidget</extends>
+   <header>detachdragzone.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
