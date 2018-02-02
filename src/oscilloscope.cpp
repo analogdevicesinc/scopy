@@ -610,8 +610,6 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		wheelEventGuard = new MouseWheelWidgetGuard(ui->mainWidget);
 	wheelEventGuard->installEventRecursively(ui->mainWidget);
 
-	preferences_menu_init();
-
 	current_ch_widget = current_channel;
 }
 
@@ -660,7 +658,6 @@ Oscilloscope::~Oscilloscope()
 
 	api->save(*settings);
 	delete api;
-	delete pref_menu;
 
 	filterBlocks.clear();
 	subBlocks.clear();
@@ -882,15 +879,6 @@ void Oscilloscope::configureAcCoupling(int i, bool coupled)
 	}
 
 	chnAcCoupled[i] = coupled;
-}
-
-void Oscilloscope::preferences_menu_init()
-{
-	pref_menu = new PreferenceMenu(this);
-	PreferenceOption *label_option = new PreferenceOption(pref_menu, "enable labels on the plot", settings);
-	pref_menu->insertOption(label_option, SLOT(enableLabels(bool)));
-	gsettings_ui->preferences->insertWidget(0, pref_menu);
-	pref_menu->load();
 }
 
 void Oscilloscope::enableLabels(bool enable)
