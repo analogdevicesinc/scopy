@@ -41,7 +41,8 @@ static const std::string tool_names[] = {
 	"network",
 	"spectrum",
 	"launcher",
-	"debugger"
+	"debugger",
+	"calibration"
 };
 
 Filter::Filter(const struct iio_context *ctx)

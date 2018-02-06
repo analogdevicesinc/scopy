@@ -102,9 +102,33 @@ public:
 	void dacBOutputDCVolts(int16_t volts);
 	void dacOutputStop();
 
+	int getAdc_ch0_offset() const;
+	void setAdc_ch0_offset(int adc_ch0_offset);
+
+	int getAdc_ch1_offset() const;
+	void setAdc_ch1_offset(int adc_ch1_offset);
+
+	int getDac_a_ch_offset() const;
+	void setDac_a_ch_offset(int dac_a_ch_offset);
+
+	int getDac_b_ch_offset() const;
+	void setDac_b_ch_offset(int dac_b_ch_offset);
+
+	double getAdc_ch0_gain() const;
+	void setAdc_ch0_gain(double adc_ch0_gain);
+
+	double getAdc_ch1_gain() const;
+	void setAdc_ch1_gain(double adc_ch1_gain);
+
+	double getDac_a_ch_vlsb() const;
+	void setDac_a_ch_vlsb(double dac_a_ch_vlsb);
+
+	double getDac_b_ch_vlsb() const;
+	void setDac_b_ch_vlsb(double dac_b_ch_vlsb);
+
 private:
 	bool adc_data_capture(int16_t *dataCh0, int16_t *dataCh1,
-		size_t num_sampl_per_chn);
+			      size_t num_sampl_per_chn);
 	bool fine_tune(size_t span, int16_t centerVal0, int16_t centerVal1,
 		size_t num_samples);
 
