@@ -25,6 +25,7 @@
 /*Qt includes*/
 #include <QObject>
 #include <QString>
+#include <QListWidgetItem>
 
 /*Local includes*/
 #include "tool.hpp"
@@ -34,15 +35,42 @@
 
 class QJSEngine;
 
-struct stCalibProcedure {
-	QStringList *CalibText;
-	struct iio_device * device;
-	struct iio_channel * channel;
-};
-
 namespace Ui {
 class ManualCalibration;
+class CalibrationTemplate;
 }
+
+namespace adiscope {
+
+#define SUPPLY_0V_VALUE 0
+#define SUPPLY_4_5V_VALUE 4.5
+
+struct stCalibStory
+{
+	int calibProcedure;
+	int calibStep;
+	QStringList story;
+	QString storyName;
+};
+
+struct stCalibParam {
+	double positiveOffset;
+	double negativeOffset;
+	double positiveGain;
+	double negativeGain;
+};
+
+enum calibrations {
+	POSITIVE_OFFSET = 0,
+	NEGATIVE_OFFSET
+};
+
+enum steps {
+	STEP1 = 0,
+	STEP2,
+	STEP3,
+	STEP4
+};
 
 class ManualCalibration : public Tool
 {
@@ -51,16 +79,51 @@ class ManualCalibration : public Tool
 public:
 	explicit ManualCalibration(struct iio_context *ctx, Filter *filt,
 				   QPushButton *runButton, QJSEngine *engine,
-				   ToolLauncher *parent = 0);
+				   ToolLauncher *parent = 0, Calibration *cal = 0);
 
 	~ManualCalibration();
 
-	int startCalibration(struct stCalibProcedure calib, int index);
+	int startCalibration();
+	void setCalibration(Calibration *cal);
+
+private:
+	void positivePowerSupplySetup();
+	void positivePowerSupplyParam(const int& step);
+	void setEnablePositiveSuppply(bool enabled);
+	void setPositiveValue(double value);
+
+	void negativePowerSupplySetup();
+	void negativePowerSupplyParam(const int& step);
+
+
+	void displayStartUpCalibrationValues(void);
+
+
+private Q_SLOTS:
+	void on_calibList_itemClicked(QListWidgetItem *item);
+
+	void on_nextButton_clicked();
+	void nextStep();
 
 private:
 	Ui::ManualCalibration *ui;
+	struct iio_channel *ch1w, *ch2w, *ch1r, *ch2r, *pd_pos, *pd_neg;
+	Ui::CalibrationTemplate *positiveTempUi;
+	QPushButton *menuRunButton;
 	Filter *filter;
 	QJSEngine *eng;
-};
 
+	Calibration *calib;
+
+	struct stCalibStory stCalibrationStory;
+	struct stCalibParam stParameters;
+	QStringList calibListString;
+	QMap<QString, int> calibOption;
+
+	/*Calibrations procedure stories*/
+	const QStringList positiveOffsetStory = (QStringList() << "Calibrate the Positive Supply \n\n Measure the Voltage on the \"V+\" and enter the value in the field below \n\n The value should be 0V"
+						 << "Calibrate the Positive Supply \n\n Measure the Voltage on the \"V+\" and enter the value in the field below \n\n The value should be 4.5V");
+
+};
+}
 #endif // MANUALCALIBRATION_H

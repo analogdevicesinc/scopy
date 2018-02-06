@@ -45,6 +45,7 @@ namespace adiscope {
 		TOOL_SPECTRUM_ANALYZER,
 		TOOL_LAUNCHER,
 		TOOL_DEBUGGER,
+		TOOL_CALIBRATION,
 	};
 
 	class Filter

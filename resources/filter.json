@@ -12,7 +12,7 @@
 	},
 
 	"M2K": {
-		"compatible": ["dio", "siggen", "dmm", "power", "osc", "logic", "pattern", "network", "spectrum" , "debugger"],
+		"compatible": ["dio", "siggen", "dmm", "power", "osc", "logic", "pattern", "network", "spectrum" , "debugger", "calibration"],
 		"compatible-devices": [ "m2k-adc", "m2k-dac-a", "m2k-dac-b", "m2k-logic-analyzer-rx", "m2k-logic-analyzer-tx", "m2k-logic-analyzer" ],
 		"dio-devices": ["m2k-logic-analyzer"],
 		"osc-devices": [ "m2k-adc" ],
@@ -22,6 +22,7 @@
 		"pattern-devices": [ "m2k-logic-analyzer-tx" ],
 		"network-devices": [ "m2k-dac-a:voltage0", "m2k-dac-b:voltage0", "m2k-adc" ],
 		"spectrum-devices": [ "m2k-adc" ],
-		"debugger": ["m2k-adc", "m2k-dac-a", "m2k-dac-b", "m2k-logic-analyzer-rx", "m2k-logic-analyzer-tx", "m2k-logic-analyzer"]
+		"debugger": ["m2k-adc", "m2k-dac-a", "m2k-dac-b", "m2k-logic-analyzer-rx", "m2k-logic-analyzer-tx", "m2k-logic-analyzer"],
+		"calibration": ["m2k-adc", "m2k-dac-a", "m2k-dac-b", "m2k-logic-analyzer-rx", "m2k-logic-analyzer-tx", "m2k-logic-analyzer"]
 	}
 }

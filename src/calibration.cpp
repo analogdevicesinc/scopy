@@ -183,10 +183,90 @@ void Calibration::configHwSamplerate()
 	iio_device_attr_write_longlong(m2k_dac_b->iio_dac_dev(), "oversampling_ratio", 1);
 }
 
+double Calibration::getDac_b_ch_vlsb() const
+{
+	return m_dac_b_ch_vlsb;
+}
+
+void Calibration::setDac_b_ch_vlsb(double dac_b_ch_vlsb)
+{
+	m_dac_b_ch_vlsb = dac_b_ch_vlsb;
+}
+
+double Calibration::getDac_a_ch_vlsb() const
+{
+	return m_dac_a_ch_vlsb;
+}
+
+void Calibration::setDac_a_ch_vlsb(double dac_a_ch_vlsb)
+{
+	m_dac_a_ch_vlsb = dac_a_ch_vlsb;
+}
+
+double Calibration::getAdc_ch1_gain() const
+{
+	return m_adc_ch1_gain;
+}
+
+void Calibration::setAdc_ch1_gain(double adc_ch1_gain)
+{
+	m_adc_ch1_gain = adc_ch1_gain;
+}
+
+double Calibration::getAdc_ch0_gain() const
+{
+	return m_adc_ch0_gain;
+}
+
+void Calibration::setAdc_ch0_gain(double adc_ch0_gain)
+{
+	m_adc_ch0_gain = adc_ch0_gain;
+}
+
+int Calibration::getDac_b_ch_offset() const
+{
+	return m_dac_b_ch_offset;
+}
+
+void Calibration::setDac_b_ch_offset(int dac_b_ch_offset)
+{
+	m_dac_b_ch_offset = dac_b_ch_offset;
+}
+
+int Calibration::getDac_a_ch_offset() const
+{
+	return m_dac_a_ch_offset;
+}
+
+void Calibration::setDac_a_ch_offset(int dac_a_ch_offset)
+{
+	m_dac_a_ch_offset = dac_a_ch_offset;
+}
+
+int Calibration::getAdc_ch1_offset() const
+{
+	return m_adc_ch1_offset;
+}
+
+void Calibration::setAdc_ch1_offset(int adc_ch1_offset)
+{
+	m_adc_ch1_offset = adc_ch1_offset;
+}
+
+int Calibration::getAdc_ch0_offset() const
+{
+	return m_adc_ch0_offset;
+}
+
+void Calibration::setAdc_ch0_offset(int adc_ch0_offset)
+{
+	m_adc_ch0_offset = adc_ch0_offset;
+}
+
 void Calibration::restoreHardwareFromCalibMode()
 {
 	struct iio_device *trigg_dev = iio_context_find_device(m_ctx,
-							"m2k-adc-trigger");
+							       "m2k-adc-trigger");
 	struct iio_channel *trigger0Mode;
 	struct iio_channel *trigger1Mode;
 

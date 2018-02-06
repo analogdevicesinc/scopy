@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Form</class>
- <widget class="QWidget" name="Form">
+ <class>ManualCalibration</class>
+ <widget class="QWidget" name="ManualCalibration">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -13,6 +13,9 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">QTabBar::tab { width: 200px; }</string>
+  </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
     <widget class="QWidget" name="ListWidget" native="true">
@@ -20,7 +23,7 @@
       <item>
        <widget class="QTabWidget" name="tabWidget">
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="calibrations">
          <attribute name="title">
@@ -28,7 +31,7 @@
          </attribute>
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
-           <widget class="QListView" name="calibList"/>
+           <widget class="QListWidget" name="calibList"/>
           </item>
          </layout>
         </widget>
@@ -44,7 +47,7 @@
          </attribute>
          <layout class="QHBoxLayout" name="horizontalLayout_4">
           <item>
-           <widget class="QListView" name="paramList"/>
+           <widget class="QTableWidget" name="paramTable"/>
           </item>
          </layout>
         </widget>
@@ -64,7 +67,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_4">
+       <widget class="QPushButton" name="saveButton">
         <property name="text">
          <string>Save Calibration</string>
         </property>
