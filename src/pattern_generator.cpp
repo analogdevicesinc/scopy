@@ -535,6 +535,7 @@ void PatternGenerator::outputModeChanged(int index)
 			chg->get_channel(i)->setOutputMode(index);
 		}
 	}
+	diom->setMode(chm.get_mode_mask());
 
 }
 
