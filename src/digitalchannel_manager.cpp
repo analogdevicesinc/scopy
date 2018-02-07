@@ -586,13 +586,10 @@ bool DIOManager::getDirection(int ch)
 
 void DIOManager::setMode(int mask)
 {
-	lockMask = mask;
 	int i=0;
-
-	while (mask) {
+	for(i=0;i<nrOfChannels;i++) {
 		setOutputMode(i,mask&0x01);
 		mask=mask>>1;
-		i++;
 	}
 
 }
