@@ -130,6 +130,7 @@ protected:
 	virtual bool eventFilter(QObject *obj, QEvent *event);
 	double findUnitOfValue(double val,int *posInUnitsList = NULL);
 	void setUnits(const QStringList& map);
+	bool isUnitMatched(const QString& unit, double value);
 
 protected:
 	Ui::SpinBoxA *ui;
