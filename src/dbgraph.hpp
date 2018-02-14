@@ -24,6 +24,8 @@
 #include <qwt_plot_curve.h>
 
 #include "customFifo.hpp"
+#include "symbol_controller.h"
+#include "plot_line_handle.h"
 
 namespace adiscope {
 	class OscScaleDraw;
@@ -70,7 +72,7 @@ namespace adiscope {
 		const QColor& getColor() const;
 		QString xTitle() const;
 		QString yTitle() const;
-
+        QWidget *bottomHandlesArea();
 	public Q_SLOTS:
 		void plot(double x, double y);
 		void reset();
@@ -91,6 +93,11 @@ namespace adiscope {
 
 		void useLogFreq(bool use_log_freq);
 
+        void onVbar1PixelPosChanged(int pos);
+        void onVbar2PixelPosChanged(int pos);
+
+        void toggleCursors(bool);
+
 	private:
 		QwtPlotCurve curve;
 		unsigned int numSamples;
@@ -98,11 +105,21 @@ namespace adiscope {
 		QColor color;
 		bool log_freq;
 
+        bool d_cursorsEnabled;
+
 		OscScaleDraw *draw_x, *draw_y;
 		PrefixFormatter *formatter;
 		OscScaleZoomer *zoomer;
 
 		CustomFifo<double> xdata, ydata;
+
+        SymbolController *d_symbolCtrl;
+        HorizHandlesArea *d_bottomHandlesArea;
+
+        PlotLineHandleH *d_hCursorHandle1;
+        VertBar *d_vBar1;
+        PlotLineHandleH *d_hCursorHandle2;
+        VertBar *d_vBar2;
 	};
 }
 

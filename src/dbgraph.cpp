@@ -98,13 +98,57 @@ dBgraph::dBgraph(QWidget *parent) : QwtPlot(parent),
 	zoomer->setMousePattern(QwtEventPattern::MouseSelect2,
 				 Qt::RightButton, Qt::ControlModifier);
 
-	static_cast<QFrame *>(canvas())->setLineWidth(0);
-	setContentsMargins(10, 10, 20, 20);
+    static_cast<QFrame *>(canvas())->setLineWidth(0);
+    setContentsMargins(10, 10, 24, 20);
+
+    d_bottomHandlesArea = new HorizHandlesArea(this->canvas());
+    d_bottomHandlesArea->setLeftPadding(80);
+    d_bottomHandlesArea->setRightPadding(20);
+    d_bottomHandlesArea->setMinimumHeight(50);
+
+    d_symbolCtrl = new SymbolController(this);
+
+    d_hCursorHandle1 = new PlotLineHandleH(
+                QPixmap(":/icons/h_cursor_handle.svg"),
+                d_bottomHandlesArea);
+    d_hCursorHandle2 = new PlotLineHandleH(
+                QPixmap(":/icons/h_cursor_handle.svg"),
+                d_bottomHandlesArea);
+    d_vBar1 = new VertBar(this,true);
+    d_vBar2 = new VertBar(this,true);
+    d_symbolCtrl->attachSymbol(d_vBar1);
+    d_symbolCtrl->attachSymbol(d_vBar2);
+
+    QPen cursorsLinePen = QPen(QColor(155,155,155),1,Qt::DashLine);
+
+    d_vBar1->setPen(cursorsLinePen);
+    d_vBar2->setPen(cursorsLinePen);
+    d_hCursorHandle1->setPen(cursorsLinePen);
+    d_hCursorHandle2->setPen(cursorsLinePen);
+    d_vBar1->setVisible(false);
+    d_vBar2->setVisible(false);
+    d_hCursorHandle1->setVisible(false);
+    d_hCursorHandle2->setVisible(false);
+
+    connect(d_hCursorHandle1, SIGNAL(positionChanged(int)),
+            d_vBar1, SLOT(setPixelPosition(int)));
+    connect(d_vBar1, SIGNAL(pixelPositionChanged(int)),
+            SLOT(onVbar1PixelPosChanged(int)));
+
+    connect(d_hCursorHandle2, SIGNAL(positionChanged(int)),
+            d_vBar2, SLOT(setPixelPosition(int)));
+    connect(d_vBar2, SIGNAL(pixelPositionChanged(int)),
+            SLOT(onVbar2PixelPosChanged(int)));
+
 }
 
 dBgraph::~dBgraph()
 {
 	delete formatter;
+}
+
+QWidget* dBgraph::bottomHandlesArea(){
+    return d_bottomHandlesArea;
 }
 
 void dBgraph::setAxesScales(double xmin, double xmax, double ymin, double ymax)
@@ -258,4 +302,24 @@ void dBgraph::useLogFreq(bool use_log_freq)
 
 	this->log_freq = use_log_freq;
 	replot();
+}
+
+void dBgraph::onVbar1PixelPosChanged(int pos)
+{
+    d_hCursorHandle1->setPositionSilenty(pos);
+}
+
+void dBgraph::onVbar2PixelPosChanged(int pos)
+{
+    d_hCursorHandle2->setPositionSilenty(pos);
+}
+
+void dBgraph::toggleCursors(bool en){
+    if (d_cursorsEnabled != en) {
+        d_cursorsEnabled = en;
+        d_vBar1->setVisible(en);
+        d_vBar2->setVisible(en);
+        d_hCursorHandle1->setVisible(en);
+        d_hCursorHandle2->setVisible(en);
+    }
 }
