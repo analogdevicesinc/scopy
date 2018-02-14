@@ -115,12 +115,13 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
     m_dBgraph.setColor(QColor(255,114,0));
     m_dBgraph.setXTitle("Frequency (Hz)");
-    m_dBgraph.setYTitle("Magnitude (dB)");
+    m_dBgraph.setYTitle("Magnitude(dB)");
     m_dBgraph.setXMin(1000.000000);
     m_dBgraph.setXMax(50000.000000);
     m_dBgraph.setYMin(-90.000000);
     m_dBgraph.setYMax(10.000000);
     m_dBgraph.useLogFreq(true);
+
     m_phaseGraph.setColor(QColor(144,19,254));
     m_phaseGraph.setYTitle("Phase (°)");
     m_phaseGraph.setYUnit("°");
@@ -153,12 +154,13 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
             &m_phaseGraph, SLOT(useLogFreq(bool)));
 
     d_bottomHandlesArea = new HorizHandlesArea(this);
-    d_bottomHandlesArea->setLeftPadding(80);
+    d_bottomHandlesArea->setLeftPadding(90);
     d_bottomHandlesArea->setRightPadding(20);
     d_bottomHandlesArea->setMinimumHeight(50);
     ui->gridLayout_plots->addWidget(&m_dBgraph,0,0,1,1);
     ui->gridLayout_plots->addWidget(&m_phaseGraph,1,0,1,1);
     ui->gridLayout_plots->addWidget(d_bottomHandlesArea,2,0,1,1);
+
 
 	ui->maxFreq->setMaxValue((double) max_samplerate / 2.5 - 1.0);
 
@@ -168,6 +170,10 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 			this, SLOT(updateNumSamples()));
 	connect(ui->samplesCount, SIGNAL(valueChanged(double)),
 			this, SLOT(updateNumSamples()));
+    connect(ui->checkBox,SIGNAL(toggled(bool)),&m_dBgraph,
+            SLOT(toggleCursors(bool)));
+    connect(ui->checkBox,SIGNAL(toggled(bool)),&m_phaseGraph,
+            SLOT(toggleCursors(bool)));
 
 	api->setObjectName(QString::fromStdString(Filter::tool_name(
 			TOOL_NETWORK_ANALYZER)));
