@@ -42,11 +42,10 @@ class CalibrationTemplate;
 
 namespace adiscope {
 
-#define SUPPLY_0V_VALUE 0
+#define SUPPLY_100MV_VALUE 0.100
 #define SUPPLY_4_5V_VALUE 4.5
 
-struct stCalibStory
-{
+struct stCalibStory {
 	int calibProcedure;
 	int calibStep;
 	QStringList story;
@@ -54,10 +53,15 @@ struct stCalibStory
 };
 
 struct stCalibParam {
-	double positiveOffset;
-	double negativeOffset;
-	double positiveGain;
-	double negativeGain;
+	double offset_pos_dac;
+	double offset_neg_dac;
+	double gain_pos_dac;
+	double gain_neg_dac;
+
+	double offset_pos_adc;
+	double offset_neg_adc;
+	double gain_pos_adc;
+	double gain_neg_adc;
 };
 
 enum calibrations {
@@ -87,6 +91,8 @@ public:
 	void setCalibration(Calibration *cal);
 
 private:
+	void setupPowerSupplyIio(void);
+
 	void positivePowerSupplySetup();
 	void positivePowerSupplyParam(const int& step);
 	void setEnablePositiveSuppply(bool enabled);
@@ -95,9 +101,9 @@ private:
 	void negativePowerSupplySetup();
 	void negativePowerSupplyParam(const int& step);
 
-
 	void displayStartUpCalibrationValues(void);
-
+	void initParameters(void);
+	void updateParameters(void);
 
 private Q_SLOTS:
 	void on_calibList_itemClicked(QListWidgetItem *item);
@@ -105,10 +111,20 @@ private Q_SLOTS:
 	void on_nextButton_clicked();
 	void nextStep();
 
+	void on_loadButton_clicked();
+
+	void on_saveButton_clicked();
+
+	void on_restartButton_clicked();
+
+	void on_finishButton_clicked();
+
 private:
 	Ui::ManualCalibration *ui;
 	struct iio_channel *ch1w, *ch2w, *ch1r, *ch2r, *pd_pos, *pd_neg;
-	Ui::CalibrationTemplate *positiveTempUi;
+	Ui::CalibrationTemplate *TempUi;
+	QWidget *TempWidget;
+
 	QPushButton *menuRunButton;
 	Filter *filter;
 	QJSEngine *eng;
@@ -121,8 +137,9 @@ private:
 	QMap<QString, int> calibOption;
 
 	/*Calibrations procedure stories*/
-	const QStringList positiveOffsetStory = (QStringList() << "Calibrate the Positive Supply \n\n Measure the Voltage on the \"V+\" and enter the value in the field below \n\n The value should be 0V"
-						 << "Calibrate the Positive Supply \n\n Measure the Voltage on the \"V+\" and enter the value in the field below \n\n The value should be 4.5V");
+	const QStringList positiveOffsetStory = (QStringList() <<
+						"Calibrate the Positive Supply \n\n Measure the Voltage on the \"V+\" and enter the value in the field below \n\n The value should be around 100mV"
+						<< "Calibrate the Positive Supply \n\n Measure the Voltage on the \"V+\" and enter the value in the field below \n\n The value should be around 4.5V");
 
 };
 }
