@@ -113,6 +113,53 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	unsigned long max_samplerate =
 		std::min(max_samplerate1, max_samplerate2);
 
+    m_dBgraph.setColor(QColor(255,114,0));
+    m_dBgraph.setXTitle("Frequency (Hz)");
+    m_dBgraph.setYTitle("Magnitude (dB)");
+    m_dBgraph.setXMin(1000.000000);
+    m_dBgraph.setXMax(50000.000000);
+    m_dBgraph.setYMin(-90.000000);
+    m_dBgraph.setYMax(10.000000);
+    m_dBgraph.useLogFreq(true);
+    m_phaseGraph.setColor(QColor(144,19,254));
+    m_phaseGraph.setYTitle("Phase (°)");
+    m_phaseGraph.setYUnit("°");
+    m_phaseGraph.setXMin(1000.000000);
+    m_phaseGraph.setXMax(50000.000000);
+    m_phaseGraph.setYMin(-180.000000);
+    m_phaseGraph.setYMax(180.000000);
+    m_phaseGraph.useLogFreq(true);
+
+    connect(ui->minFreq, SIGNAL(valueChanged(double)),
+            &m_dBgraph, SLOT(setXMin(double)));
+    connect(ui->maxFreq, SIGNAL(valueChanged(double)),
+            &m_dBgraph, SLOT(setXMax(double)));
+    connect(ui->magMin, SIGNAL(valueChanged(double)),
+            &m_dBgraph, SLOT(setYMin(double)));
+    connect(ui->magMax, SIGNAL(valueChanged(double)),
+            &m_dBgraph, SLOT(setYMax(double)));
+    connect(ui->isLog, SIGNAL(toggled(bool)),
+            &m_dBgraph, SLOT(useLogFreq(bool)));
+
+    connect(ui->minFreq, SIGNAL(valueChanged(double)),
+            &m_phaseGraph, SLOT(setXMin(double)));
+    connect(ui->maxFreq, SIGNAL(valueChanged(double)),
+            &m_phaseGraph, SLOT(setXMax(double)));
+    connect(ui->phaseMin, SIGNAL(valueChanged(double)),
+            &m_phaseGraph, SLOT(setYMin(double)));
+    connect(ui->phaseMax, SIGNAL(valueChanged(double)),
+            &m_phaseGraph, SLOT(setYMax(double)));
+    connect(ui->isLog, SIGNAL(toggled(bool)),
+            &m_phaseGraph, SLOT(useLogFreq(bool)));
+
+    d_bottomHandlesArea = new HorizHandlesArea(this);
+    d_bottomHandlesArea->setLeftPadding(80);
+    d_bottomHandlesArea->setRightPadding(20);
+    d_bottomHandlesArea->setMinimumHeight(50);
+    ui->gridLayout_plots->addWidget(&m_dBgraph,0,0,1,1);
+    ui->gridLayout_plots->addWidget(&m_phaseGraph,1,0,1,1);
+    ui->gridLayout_plots->addWidget(d_bottomHandlesArea,2,0,1,1);
+
 	ui->maxFreq->setMaxValue((double) max_samplerate / 2.5 - 1.0);
 
 	connect(ui->minFreq, SIGNAL(valueChanged(double)),
@@ -149,8 +196,8 @@ void NetworkAnalyzer::updateNumSamples()
 
 	unsigned int num_samples = (unsigned int) ui->samplesCount->value();
 
-	ui->dbgraph->setNumSamples(num_samples);
-	ui->phasegraph->setNumSamples(num_samples);
+    m_dBgraph.setNumSamples(num_samples);
+    m_phaseGraph.setNumSamples(num_samples);
 	ui->xygraph->setNumSamples(num_samples);
 	ui->nicholsgraph->setNumSamples(num_samples);
 }
@@ -373,13 +420,13 @@ void NetworkAnalyzer::run()
 
 		double phase_deg = phase * 180.0 / M_PI;
 
-		QMetaObject::invokeMethod(ui->dbgraph,
+        QMetaObject::invokeMethod(&m_dBgraph,
 				 "plot",
 				 Qt::QueuedConnection,
 				 Q_ARG(double, frequency),
 				 Q_ARG(double, mag));
 
-		QMetaObject::invokeMethod(ui->phasegraph,
+        QMetaObject::invokeMethod(&m_phaseGraph,
 				 "plot",
 				 Qt::QueuedConnection,
 				 Q_ARG(double, frequency),
@@ -412,8 +459,8 @@ void NetworkAnalyzer::startStop(bool pressed)
 	}
 
 	if (pressed) {
-		ui->dbgraph->reset();
-		ui->phasegraph->reset();
+        m_dBgraph.reset();
+        m_phaseGraph.reset();
 		ui->xygraph->reset();
 		ui->nicholsgraph->reset();
 		updateNumSamples();
@@ -572,15 +619,15 @@ double NetworkAnalyzer_API::getOffset() const
 void NetworkAnalyzer_API::setMinFreq(double freq)
 {
 	net->ui->minFreq->setValue(freq);
-	net->ui->dbgraph->setXMin(freq);
-	net->ui->phasegraph->setXMin(freq);
+    net->m_dBgraph.setXMin(freq);
+    net->m_phaseGraph.setXMin(freq);
 }
 
 void NetworkAnalyzer_API::setMaxFreq(double freq)
 {
 	net->ui->maxFreq->setValue(freq);
-	net->ui->dbgraph->setXMax(freq);
-	net->ui->phasegraph->setXMax(freq);
+    net->m_dBgraph.setXMax(freq);
+    net->m_phaseGraph.setXMax(freq);
 }
 
 void NetworkAnalyzer_API::setSamplesCount(double step)
@@ -621,7 +668,7 @@ double NetworkAnalyzer_API::getMaxPhase() const
 void NetworkAnalyzer_API::setMinMag(double val)
 {
 	net->ui->magMin->setValue(val);
-	net->ui->dbgraph->setYMin(val);
+    net->m_dBgraph.setYMin(val);
 	net->ui->xygraph->setMin(val);
 	net->ui->nicholsgraph->setYMin(val);
 }
@@ -629,7 +676,7 @@ void NetworkAnalyzer_API::setMinMag(double val)
 void NetworkAnalyzer_API::setMaxMag(double val)
 {
 	net->ui->magMax->setValue(val);
-	net->ui->dbgraph->setYMax(val);
+    net->m_dBgraph.setYMax(val);
 	net->ui->xygraph->setMax(val);
 	net->ui->nicholsgraph->setYMax(val);
 }
@@ -637,14 +684,14 @@ void NetworkAnalyzer_API::setMaxMag(double val)
 void NetworkAnalyzer_API::setMinPhase(double val)
 {
 	net->ui->phaseMin->setValue(val);
-	net->ui->phasegraph->setYMin(val);
+    net->m_phaseGraph.setYMin(val);
 	net->ui->nicholsgraph->setXMin(val);
 }
 
 void NetworkAnalyzer_API::setMaxPhase(double val)
 {
 	net->ui->phaseMax->setValue(val);
-	net->ui->phasegraph->setYMax(val);
+    net->m_phaseGraph.setYMax(val);
 	net->ui->nicholsgraph->setXMax(val);
 }
 
