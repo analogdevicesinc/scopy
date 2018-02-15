@@ -102,6 +102,14 @@ PowerController::PowerController(struct iio_context *ctx,
 			TOOL_POWER_CONTROLLER)));
 	api->load(*settings);
 	api->js_register(engine);
+
+    /*Load calibration parameters from iio context*/
+    const char *name;
+    const char *value;
+    for (int i = 4; i < 12; i++) {
+	if (!iio_context_get_attr(ctx, i, &name, &value))
+	    calibrationParam[QString(name + 4)] = QString(*value).toDouble();
+    }
 }
 
 PowerController::~PowerController()
@@ -150,7 +158,10 @@ void PowerController::hideEvent(QHideEvent *event)
 
 void PowerController::dac1_set_value(double value)
 {
-	long long val = value * 4095.0 / (5.02 * 1.2);
+	const double offset = calibrationParam[QString("offset_pos_dac")];
+	const double gain = calibrationParam[QString("gain_pos_dac")];
+
+	long long val = (value - offset)  * 4095.0 / (5.02 * 1.2 * gain);
 
 	iio_channel_attr_write_longlong(ch1w, "raw", val);
 
@@ -163,7 +174,10 @@ void PowerController::dac1_set_value(double value)
 
 void PowerController::dac2_set_value(double value)
 {
-	long long val = value * 4095.0 / (-5.1 * 1.2);
+	const double offset = calibrationParam[QString("offset_neg_dac")];
+	const double gain = calibrationParam[QString("gain_neg_dac")];
+
+	long long val = (value - offset) * 4095.0 / (-5.1 * 1.2 * gain);
 
 	iio_channel_attr_write_longlong(ch2w, "raw", val);
 }
@@ -232,16 +246,21 @@ void PowerController::ratioChanged(int percent)
 
 void PowerController::update_lcd()
 {
+	const double offset1 = calibrationParam[QString("offset_pos_adc")];
+	const double gain1 = calibrationParam[QString("gain_pos_adc")];
+	const double offset2 = calibrationParam[QString("offset_neg_adc")];
+	const double gain2 = calibrationParam[QString("gain_neg_adc")];
+
 	long long val1 = 0, val2 = 0;
 
 	iio_channel_attr_read_longlong(ch1r, "raw", &val1);
 	iio_channel_attr_read_longlong(ch2r, "raw", &val2);
 
-	double value1 = (double) val1 * 6.4 / 4095.0;
+	double value1 = ((double) val1 * 6.4 * gain1 / 4095.0) - offset1;
 	ui->lcd1->display(value1);
 	ui->scale_dac1->setValue(value1);
 
-	double value2 = (double) val2 * -6.4 / 4095.0;
+	double value2 = ((double) val2 * -6.4 * gain2 / 4095.0) - offset2;
 	ui->lcd2->display(value2);
 	ui->scale_dac2->setValue(value2);
 

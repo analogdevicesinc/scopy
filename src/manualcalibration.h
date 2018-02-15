@@ -44,6 +44,8 @@ namespace adiscope {
 
 #define SUPPLY_100MV_VALUE 0.100
 #define SUPPLY_4_5V_VALUE 4.5
+#define SUPPLY_100MV_NEG_VALUE -0.100
+#define SUPPLY_4_5V_NEG_VALUE -4.5
 
 struct stCalibStory {
 	int calibProcedure;
@@ -100,6 +102,8 @@ private:
 
 	void negativePowerSupplySetup();
 	void negativePowerSupplyParam(const int& step);
+	void setEnableNegativeSuppply(bool enabled);
+	void setNegativeValue(double value);
 
 	void displayStartUpCalibrationValues(void);
 	void initParameters(void);
@@ -140,6 +144,9 @@ private:
 	const QStringList positiveOffsetStory = (QStringList() <<
 						"Calibrate the Positive Supply \n\n Measure the Voltage on the \"V+\" and enter the value in the field below \n\n The value should be around 100mV"
 						<< "Calibrate the Positive Supply \n\n Measure the Voltage on the \"V+\" and enter the value in the field below \n\n The value should be around 4.5V");
+	const QStringList negativeOffsetStory = (QStringList() <<
+						"Calibrate the Negative Supply \n\n Measure the Voltage on the \"V-\" and enter the value in the field below \n\n The value should be around -100mV"
+						<< "Calibrate the Negative Supply \n\n Measure the Voltage on the \"V-\" and enter the value in the field below \n\n The value should be around -4.5V");
 
 };
 }

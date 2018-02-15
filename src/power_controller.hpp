@@ -75,6 +75,7 @@ namespace adiscope {
 		bool in_sync;
 
 		PositionSpinButton *valuePos, *valueNeg;
+		QMap<QString, double> calibrationParam;
 
 		void showEvent(QShowEvent *event);
 		void hideEvent(QHideEvent *event);

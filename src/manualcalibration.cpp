@@ -61,6 +61,8 @@ ManualCalibration::ManualCalibration(struct iio_context *ctx, Filter *filt,
 		&ManualCalibration::on_restartButton_clicked);
 	connect(TempUi->finishButton, &QPushButton::clicked, this,
 		&ManualCalibration::on_finishButton_clicked);
+
+	setupPowerSupplyIio();
 }
 
 ManualCalibration::~ManualCalibration()
@@ -78,6 +80,7 @@ int ManualCalibration::startCalibration()
 		break;
 
 	case NEGATIVE_OFFSET:
+		negativePowerSupplyParam(stCalibrationStory.calibStep);
 		break;
 	}
 
@@ -108,6 +111,7 @@ void ManualCalibration::on_calibList_itemClicked(QListWidgetItem *item)
 		break;
 
 	case NEGATIVE_OFFSET:
+		negativePowerSupplySetup();
 		break;
 	}
 }
@@ -123,12 +127,10 @@ void ManualCalibration::positivePowerSupplySetup()
 	stCalibrationStory.calibStep = 0;
 	stCalibrationStory.story = positiveOffsetStory;
 	stCalibrationStory.storyName.clear();
-	stCalibrationStory.storyName.append("Positive offset");
+	stCalibrationStory.storyName.append("Positive supply");
 	ui->tabWidget->addTab(TempWidget, stCalibrationStory.storyName);
 	TempUi->instructionText->setText(
 		stCalibrationStory.story[stCalibrationStory.calibStep]);
-
-	setupPowerSupplyIio();
 
 	/*Set DAC to 0V*/
 	setEnablePositiveSuppply(true);
@@ -162,12 +164,16 @@ void ManualCalibration::setupPowerSupplyIio()
 	struct iio_channel *chan;
 	/* These are the two ADC amplifiers */
 	chan = iio_device_find_channel(dev3, "voltage0", false);
-	if (chan)
+
+	if (chan) {
 		iio_channel_attr_write_bool(chan, "powerdown", false);
+	}
 
 	chan = iio_device_find_channel(dev3, "voltage1", false);
-	if (chan)
+
+	if (chan) {
 		iio_channel_attr_write_bool(chan, "powerdown", false);
+	}
 
 	/* ADF4360 globaal clock power down */
 	iio_device_attr_write(dev3, "clk_powerdown", "0");
@@ -179,7 +185,7 @@ void ManualCalibration::positivePowerSupplyParam(const int& step)
 	long long val = 0;
 	double value = 0;
 
-	qDebug() << "Set positive offset parameters";
+	qDebug() << "Set positive supply parameters";
 
 	offset_Value = TempUi->lineEdit->text().toDouble();
 
@@ -200,13 +206,13 @@ void ManualCalibration::positivePowerSupplyParam(const int& step)
 
 		TempUi->inputTableWidget->setItem(0, 0, new QTableWidgetItem("100mV"));
 		TempUi->inputTableWidget->setItem(0, 1, new QTableWidgetItem(QString::number(
-					offset_Value) + QString("V")));
+				offset_Value) + QString("V")));
 		TempUi->lineEdit->clear();
 
 		ui->paramTable->setItem(0, 1, new QTableWidgetItem(QString::number(
-									   stParameters.offset_pos_dac)));
+						stParameters.offset_pos_dac)));
 		ui->paramTable->setItem(2, 1, new QTableWidgetItem(QString::number(
-									   stParameters.offset_pos_adc)));
+						stParameters.offset_pos_adc)));
 		ui->paramTable->resizeColumnsToContents();
 		break;
 
@@ -215,7 +221,7 @@ void ManualCalibration::positivePowerSupplyParam(const int& step)
 		setPositiveValue(4.5);
 
 		/*dac gain calibration*/
-		if (offset_Value != 0){
+		if (offset_Value != 0) {
 			stParameters.gain_pos_dac = SUPPLY_4_5V_VALUE / offset_Value;
 			qDebug() << "Positive gain DAC value: " << stParameters.gain_pos_dac;
 
@@ -225,21 +231,24 @@ void ManualCalibration::positivePowerSupplyParam(const int& step)
 			stParameters.gain_pos_adc = value / offset_Value;
 			qDebug() << "Positive gain ADC value: " << stParameters.gain_pos_adc;
 		}
+
 		TempUi->restartButton->setVisible(true);
 		TempUi->inputTableWidget->setItem(1, 0, new QTableWidgetItem("4.5V"));
 		TempUi->inputTableWidget->setItem(1, 1, new QTableWidgetItem(QString::number(
-					offset_Value) + QString("V")));
+				offset_Value) + QString("V")));
 
 		ui->paramTable->setItem(1, 1, new QTableWidgetItem(QString::number(
-									   stParameters.gain_pos_dac)));
+						stParameters.gain_pos_dac)));
 		ui->paramTable->setItem(3, 1, new QTableWidgetItem(QString::number(
-									   stParameters.gain_pos_adc)));
+						stParameters.gain_pos_adc)));
 		ui->paramTable->resizeColumnsToContents();
 
 		TempUi->nextButton->setVisible(false);
 		TempUi->finishButton->setVisible(true);
 		break;
 	}
+
+	TempUi->lineEdit->clear();
 }
 
 
@@ -254,6 +263,116 @@ void ManualCalibration::setPositiveValue(double value)
 	long long val = value * 4095.0 / (5.02 * 1.2);
 
 	iio_channel_attr_write_longlong(ch1w, "raw", val);
+}
+
+void ManualCalibration::negativePowerSupplySetup()
+{
+	TempUi->restartButton->setVisible(false);
+	TempUi->nextButton->setVisible(true);
+	TempUi->finishButton->setVisible(false);
+
+	/*Initialize the tab*/
+	stCalibrationStory.calibProcedure = NEGATIVE_OFFSET;
+	stCalibrationStory.calibStep = 0;
+	stCalibrationStory.story = negativeOffsetStory;
+	stCalibrationStory.storyName.clear();
+	stCalibrationStory.storyName.append("Negative supply");
+	ui->tabWidget->addTab(TempWidget, stCalibrationStory.storyName);
+	TempUi->instructionText->setText(
+		stCalibrationStory.story[stCalibrationStory.calibStep]);
+
+	setEnableNegativeSuppply(true);
+	setNegativeValue(0);
+}
+
+void ManualCalibration::negativePowerSupplyParam(const int& step)
+{
+	double offset_Value;
+	long long val = 0;
+	double value = 0;
+
+	qDebug() << "Set negative supply parameters";
+
+	offset_Value = TempUi->lineEdit->text().toDouble();
+
+	switch (step) {
+	case STEP1:
+		/*Set dac to 100mV*/
+		setNegativeValue(-0.1);
+
+		/*dac offset calibration*/
+		stParameters.offset_neg_dac = SUPPLY_100MV_NEG_VALUE - offset_Value;
+		qDebug() << "Negative offset DAC value: " << stParameters.offset_neg_dac;
+
+		/*adc offset calibration*/
+		iio_channel_attr_read_longlong(ch2r, "raw", &val);
+		value = (double) val * 6.4 / 4095.0;
+		stParameters.offset_neg_adc = value - offset_Value;
+		qDebug() << "Negative offset ADC value: " << stParameters.offset_neg_adc;
+
+		TempUi->inputTableWidget->setItem(0, 0, new QTableWidgetItem("-100mV"));
+		TempUi->inputTableWidget->setItem(0, 1, new QTableWidgetItem(QString::number(
+				offset_Value) + QString("V")));
+		TempUi->lineEdit->clear();
+
+		ui->paramTable->setItem(4, 1, new QTableWidgetItem(QString::number(
+						stParameters.offset_neg_dac)));
+		ui->paramTable->setItem(6, 1, new QTableWidgetItem(QString::number(
+						stParameters.offset_neg_adc)));
+		ui->paramTable->resizeColumnsToContents();
+		break;
+
+	case STEP2:
+		/*Set dac to 4.5V*/
+		setNegativeValue(-4.5);
+
+		/*dac gain calibration*/
+		if (offset_Value != 0) {
+			stParameters.gain_neg_dac = SUPPLY_4_5V_NEG_VALUE / offset_Value;
+			qDebug() << "Negative gain DAC value: " << stParameters.gain_neg_dac;
+
+			/*adc gain calibration*/
+			iio_channel_attr_read_longlong(ch2r, "raw", &val);
+			value = (double) val * 6.4 / 4095.0;
+			stParameters.gain_neg_adc = value / offset_Value;
+			qDebug() << "Negative gain ADC value: " << stParameters.gain_neg_adc;
+		}
+
+		TempUi->restartButton->setVisible(true);
+		TempUi->inputTableWidget->setItem(1, 0, new QTableWidgetItem("4.5V"));
+		TempUi->inputTableWidget->setItem(1, 1, new QTableWidgetItem(QString::number(
+				offset_Value) + QString("V")));
+
+		ui->paramTable->setItem(5, 1, new QTableWidgetItem(QString::number(
+						stParameters.gain_neg_dac)));
+		ui->paramTable->setItem(7, 1, new QTableWidgetItem(QString::number(
+						stParameters.gain_neg_adc)));
+		ui->paramTable->resizeColumnsToContents();
+
+		TempUi->nextButton->setVisible(false);
+		TempUi->finishButton->setVisible(true);
+		break;
+	}
+
+	TempUi->lineEdit->clear();
+}
+
+void ManualCalibration::setEnableNegativeSuppply(bool enabled)
+{
+	iio_channel_attr_write_bool(ch2w, "powerdown", !enabled);
+
+	if (pd_neg) {
+		iio_channel_attr_write_bool(pd_neg, "user_supply_powerdown", !enabled);
+	} else {
+		iio_channel_attr_write_bool(pd_pos, "user_supply_powerdown", !enabled);
+	}
+}
+
+void ManualCalibration::setNegativeValue(double value)
+{
+	long long val = value * 4095.0 / (-5.1 * 1.2);
+
+	iio_channel_attr_write_longlong(ch2w, "raw", val);
 }
 
 void ManualCalibration::on_nextButton_clicked()
@@ -360,22 +479,42 @@ void ManualCalibration::on_saveButton_clicked()
 		       << "\n#ad9963 temperature: " << temp_ad9963
 		       << tr(" °C") << "\n#FPGA temperature: "<< temp_fpga
 		       << tr(" °C") << endl;
+
 		for (int i = 0; i < ui->paramTable->rowCount(); i++)
 			stream << "cal," << ui->paramTable->item(i,0)->text() << "="
 			       << ui->paramTable->item(i,1)->text() << endl;
 	}
+
 	file.close();
 }
 
 void ManualCalibration::on_restartButton_clicked()
 {
 	ui->tabWidget->removeTab(3); //remove the story tab
-	positivePowerSupplySetup();
+
+	switch (stCalibrationStory.calibProcedure) {
+	case POSITIVE_OFFSET:
+		positivePowerSupplySetup();
+		break;
+
+	case NEGATIVE_OFFSET:
+		negativePowerSupplySetup();
+		break;
+	}
+
 	ui->tabWidget->setCurrentIndex(3);
+	TempUi->inputTableWidget->clearContents();
 }
 
 void ManualCalibration::on_finishButton_clicked()
 {
 	ui->tabWidget->removeTab(3); //remove the story tab
 	updateParameters();
+	TempUi->inputTableWidget->clearContents();
+	setNegativeValue(0);
+	setPositiveValue(0);
+	setEnablePositiveSuppply(false);
+	setEnableNegativeSuppply(false);
 }
+
+
