@@ -26,6 +26,8 @@
 #include "customFifo.hpp"
 #include "symbol_controller.h"
 #include "plot_line_handle.h"
+#include "cursor_readouts.h"
+#include "plotpickerwrapper.h"
 
 namespace adiscope {
 	class OscScaleDraw;
@@ -73,7 +75,9 @@ namespace adiscope {
 		QString xTitle() const;
 		QString yTitle() const;
         QWidget *bottomHandlesArea();
-	public Q_SLOTS:
+        QString cursorIntersection(qreal text);
+
+    public Q_SLOTS:
 		void plot(double x, double y);
 		void reset();
 
@@ -98,6 +102,9 @@ namespace adiscope {
 
         void toggleCursors(bool);
 
+        void onCursor1Moved(int);
+        void onCursor2Moved(int);
+
 	private:
 		QwtPlotCurve curve;
 		unsigned int numSamples;
@@ -120,6 +127,10 @@ namespace adiscope {
         VertBar *d_vBar1;
         PlotLineHandleH *d_hCursorHandle2;
         VertBar *d_vBar2;
+
+        PlotPickerWrapper* picker;
+
+        CursorReadouts *d_cursorReadouts;
 	};
 }
 
