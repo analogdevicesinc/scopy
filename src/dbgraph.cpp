@@ -22,6 +22,8 @@
 #include "osc_scale_engine.h"
 #include "osc_scale_zoomer.h"
 
+#include "plotpickerwrapper.h"
+
 #include <qwt_plot_layout.h>
 
 using namespace adiscope;
@@ -55,8 +57,8 @@ dBgraph::dBgraph(QWidget *parent) : QwtPlot(parent),
 
 	/* draw_x / draw_y: Outmost X / Y scales. Only draw the labels */
 	formatter = static_cast<PrefixFormatter *>(new MetricPrefixFormatter);
-	draw_x = new OscScaleDraw(formatter, "Hz");
-	draw_x->setFloatPrecision(2);
+    draw_x = new OscScaleDraw(formatter, "Hz");
+    draw_x->setFloatPrecision(2);
 	draw_x->enableComponent(QwtAbstractScaleDraw::Ticks, false);
 	draw_x->enableComponent(QwtAbstractScaleDraw::Backbone, false);
 	setAxisScaleDraw(QwtPlot::xTop, draw_x);
@@ -96,55 +98,57 @@ dBgraph::dBgraph(QWidget *parent) : QwtPlot(parent),
 	zoomer->setMousePattern(QwtEventPattern::MouseSelect3,
 				Qt::RightButton);
 	zoomer->setMousePattern(QwtEventPattern::MouseSelect2,
-				 Qt::RightButton, Qt::ControlModifier);
+	                        Qt::RightButton, Qt::ControlModifier);
 
-    static_cast<QFrame *>(canvas())->setLineWidth(0);
-    setContentsMargins(10, 10, 24, 20);
+	static_cast<QFrame *>(canvas())->setLineWidth(0);
+	setContentsMargins(10, 10, 24, 20);
 
-    d_bottomHandlesArea = new HorizHandlesArea(this->canvas());
-    d_bottomHandlesArea->setLeftPadding(80);
-    d_bottomHandlesArea->setRightPadding(20);
-    d_bottomHandlesArea->setMinimumHeight(50);
+	d_symbolCtrl = new SymbolController(this);
 
-    d_symbolCtrl = new SymbolController(this);
+	d_vBar1 = new VertBar(this,true);
+	d_vBar2 = new VertBar(this,true);
+	d_symbolCtrl->attachSymbol(d_vBar1);
+	d_symbolCtrl->attachSymbol(d_vBar2);
 
-    d_hCursorHandle1 = new PlotLineHandleH(
-                QPixmap(":/icons/h_cursor_handle.svg"),
-                d_bottomHandlesArea);
-    d_hCursorHandle2 = new PlotLineHandleH(
-                QPixmap(":/icons/h_cursor_handle.svg"),
-                d_bottomHandlesArea);
-    d_vBar1 = new VertBar(this,true);
-    d_vBar2 = new VertBar(this,true);
-    d_symbolCtrl->attachSymbol(d_vBar1);
-    d_symbolCtrl->attachSymbol(d_vBar2);
+	QPen cursorsLinePen = QPen(QColor(155,155,155),1,Qt::DashLine);
 
-    QPen cursorsLinePen = QPen(QColor(155,155,155),1,Qt::DashLine);
+	d_vBar1->setPen(cursorsLinePen);
+	d_vBar2->setPen(cursorsLinePen);
+	d_vBar1->setVisible(false);
+	d_vBar2->setVisible(false);
 
-    d_vBar1->setPen(cursorsLinePen);
-    d_vBar2->setPen(cursorsLinePen);
-    d_hCursorHandle1->setPen(cursorsLinePen);
-    d_hCursorHandle2->setPen(cursorsLinePen);
-    d_vBar1->setVisible(false);
-    d_vBar2->setVisible(false);
-    d_hCursorHandle1->setVisible(false);
-    d_hCursorHandle2->setVisible(false);
+	connect(d_vBar1, SIGNAL(pixelPositionChanged(int)),
+	        SLOT(onVbar1PixelPosChanged(int)));
 
-    connect(d_hCursorHandle1, SIGNAL(positionChanged(int)),
-            d_vBar1, SLOT(setPixelPosition(int)));
-    connect(d_vBar1, SIGNAL(pixelPositionChanged(int)),
-            SLOT(onVbar1PixelPosChanged(int)));
+	connect(d_vBar2, SIGNAL(pixelPositionChanged(int)),
+	        SLOT(onVbar2PixelPosChanged(int)));
 
-    connect(d_hCursorHandle2, SIGNAL(positionChanged(int)),
-            d_vBar2, SLOT(setPixelPosition(int)));
-    connect(d_vBar2, SIGNAL(pixelPositionChanged(int)),
-            SLOT(onVbar2PixelPosChanged(int)));
+    d_cursorReadouts = new CursorReadouts(this);
+    d_cursorReadouts->setAxis(QwtPlot::xTop,QwtPlot::yLeft);
+    d_cursorReadouts->setTopLeftStartingPoint(QPoint(8, 8));
+    d_cursorReadouts->moveToPosition(CustomPlotPositionButton::topLeft);
+
+    d_cursorReadouts->setTimeReadoutVisible(false);
+    d_cursorReadouts->setVoltageReadoutVisible(false);
+
+    d_cursorReadouts->setTimeCursor1LabelText("F1= ");
+    d_cursorReadouts->setTimeCursor2LabelText("F2= ");
+    d_cursorReadouts->setVoltageCursor1LabelText("Mag1= ");
+    d_cursorReadouts->setVoltageCursor2LabelText("Mag2= ");
+    d_cursorReadouts->setDeltaVoltageLabelText("ΔMag= ");
+
+    d_cursorReadouts->setFrequencyDeltaVisible(false);
+    d_cursorReadouts->setTimeDeltaVisible(false);
+    d_cursorReadouts->setTransparency(100);
+
+	picker = new PlotPickerWrapper(QwtPlot::xTop,QwtPlot::yLeft,this->canvas());
 
 }
 
 dBgraph::~dBgraph()
 {
 	delete formatter;
+    delete picker;
 }
 
 QWidget* dBgraph::bottomHandlesArea(){
@@ -226,6 +230,9 @@ void dBgraph::setXTitle(const QString& title)
 void dBgraph::setYTitle(const QString& title)
 {
 	setAxisTitle(QwtPlot::yLeft, title);
+    d_cursorReadouts->setVoltageCursor1LabelText(title.mid(0,3)+"1= ");
+    d_cursorReadouts->setVoltageCursor2LabelText(title.mid(0,3)+"2= ");
+    d_cursorReadouts->setDeltaVoltageLabelText("Δ"+title.mid(0,3)+"= ");
 }
 
 void dBgraph::setXMin(double val)
@@ -304,6 +311,21 @@ void dBgraph::useLogFreq(bool use_log_freq)
 	replot();
 }
 
+void dBgraph::onCursor1PositionChanged(int pos)
+{
+	pos = std::min(pos,QwtPlot::canvas()->width()-1);
+	d_vBar1->setPixelPosition(pos);
+	onCursor1Moved(pos);
+
+}
+void dBgraph::onCursor2PositionChanged(int pos)
+{
+	pos = std::min(pos,QwtPlot::canvas()->width()-1);
+	d_vBar2->setPixelPosition(pos);
+	onCursor2Moved(pos);
+
+}
+
 void dBgraph::onVbar1PixelPosChanged(int pos)
 {
     d_hCursorHandle1->setPositionSilenty(pos);
@@ -319,7 +341,78 @@ void dBgraph::toggleCursors(bool en){
         d_cursorsEnabled = en;
         d_vBar1->setVisible(en);
         d_vBar2->setVisible(en);
-        d_hCursorHandle1->setVisible(en);
-        d_hCursorHandle2->setVisible(en);
+
+        d_cursorReadouts->setTimeReadoutVisible(en);
+        d_cursorReadouts->setVoltageReadoutVisible(en);
+	}
+}
+
+void dBgraph::onCursor1Moved(int value){
+    QString text;
+
+    auto point = picker->pointCoordinates(QPoint(value,0));
+    text = draw_x->label(point.x()).text();
+
+    d_cursorReadouts->setTimeCursor1Text(text);
+    d_cursorReadouts->setVoltageCursor1Text(cursorIntersection(point.x()));
+
+    int d1 = d_cursorReadouts->voltageCursor1Text().split(" ")[0].toInt();
+    int d2 = d_cursorReadouts->voltageCursor2Text().split(" ")[0].toInt();
+
+    d_cursorReadouts->setVoltageDeltaText(QString::number(d2-d1)+" "+ draw_y->getUnitType());
+}
+
+void dBgraph::onCursor2Moved(int value){
+    QString text;
+
+    auto point = picker->pointCoordinates(QPoint(value,0));
+    text = draw_x->label(point.x()).text();
+
+    d_cursorReadouts->setTimeCursor2Text(text);
+    d_cursorReadouts->setVoltageCursor2Text(cursorIntersection(point.x()));
+
+    int d1 = d_cursorReadouts->voltageCursor1Text().split(" ")[0].toInt();
+    int d2 = d_cursorReadouts->voltageCursor2Text().split(" ")[0].toInt();
+
+    d_cursorReadouts->setVoltageDeltaText(QString::number(d2-d1)+" "+ draw_y->getUnitType());
+}
+
+QString dBgraph::cursorIntersection(qreal freq)
+{
+    if(xdata.size() == 0 || xdata.data()[xdata.size()-1] < freq){
+        return QString("-");//for the case when there is no plot
+    }
+    else{
+        double leftFreq,rightFreq,leftCustom,rightCustom;
+        int rightIndex = -1;
+        int leftIndex = -1;
+
+        for(int i=1;i<xdata.size();i++){
+            if(xdata.data()[i-1] <= freq && freq <= xdata.data()[i]){
+                leftIndex=i-1;
+                rightIndex=i;
+            }
+        }
+
+        if(leftIndex == -1 || rightIndex == -1){
+            return QString("-");
+        }
+
+        if(!log_freq){
+            leftFreq = xdata.data()[leftIndex];
+            rightFreq = xdata.data()[rightIndex];
+        }
+        else{
+            freq = log10(freq);
+            leftFreq = log10(xdata.data()[leftIndex]);
+            rightFreq = log10(xdata.data()[rightIndex]);
+        }
+
+        leftCustom = ydata.data()[leftIndex];
+        rightCustom = ydata.data()[rightIndex];
+
+        double val = (rightCustom - leftCustom)/(rightFreq - leftFreq)*(freq-leftFreq)+leftCustom;
+
+        return QString::number(val,'f',0) +" "+ draw_y->getUnitType();
     }
 }
