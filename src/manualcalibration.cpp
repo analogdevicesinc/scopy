@@ -134,7 +134,7 @@ void ManualCalibration::positivePowerSupplySetup()
 
 	/*Set DAC to 0V*/
 	setEnablePositiveSuppply(true);
-	setPositiveValue(0);
+	setPositiveValue(0.1);
 }
 
 void ManualCalibration::setupPowerSupplyIio()
@@ -191,9 +191,6 @@ void ManualCalibration::positivePowerSupplyParam(const int& step)
 
 	switch (step) {
 	case STEP1:
-		/*Set dac to 100mV*/
-		setPositiveValue(0.1);
-
 		/*dac offset calibration*/
 		stParameters.offset_pos_dac = SUPPLY_100MV_VALUE - offset_Value;
 		qDebug() << "Positive offset DAC value: " << stParameters.offset_pos_dac;
@@ -214,12 +211,12 @@ void ManualCalibration::positivePowerSupplyParam(const int& step)
 		ui->paramTable->setItem(2, 1, new QTableWidgetItem(QString::number(
 						stParameters.offset_pos_adc)));
 		ui->paramTable->resizeColumnsToContents();
+
+		/*Set dac to 4.5V*/
+		setPositiveValue(4.5);
 		break;
 
 	case STEP2:
-		/*Set dac to 4.5V*/
-		setPositiveValue(4.5);
-
 		/*dac gain calibration*/
 		if (offset_Value != 0) {
 			stParameters.gain_pos_dac = SUPPLY_4_5V_VALUE / offset_Value;
@@ -282,7 +279,7 @@ void ManualCalibration::negativePowerSupplySetup()
 		stCalibrationStory.story[stCalibrationStory.calibStep]);
 
 	setEnableNegativeSuppply(true);
-	setNegativeValue(0);
+	setNegativeValue(-0.1);
 }
 
 void ManualCalibration::negativePowerSupplyParam(const int& step)
@@ -297,9 +294,6 @@ void ManualCalibration::negativePowerSupplyParam(const int& step)
 
 	switch (step) {
 	case STEP1:
-		/*Set dac to 100mV*/
-		setNegativeValue(-0.1);
-
 		/*dac offset calibration*/
 		stParameters.offset_neg_dac = SUPPLY_100MV_NEG_VALUE - offset_Value;
 		qDebug() << "Negative offset DAC value: " << stParameters.offset_neg_dac;
@@ -320,12 +314,12 @@ void ManualCalibration::negativePowerSupplyParam(const int& step)
 		ui->paramTable->setItem(6, 1, new QTableWidgetItem(QString::number(
 						stParameters.offset_neg_adc)));
 		ui->paramTable->resizeColumnsToContents();
+
+		/*Set dac to -4.5V*/
+		setNegativeValue(-4.5);
 		break;
 
 	case STEP2:
-		/*Set dac to 4.5V*/
-		setNegativeValue(-4.5);
-
 		/*dac gain calibration*/
 		if (offset_Value != 0) {
 			stParameters.gain_neg_dac = SUPPLY_4_5V_NEG_VALUE / offset_Value;
