@@ -963,19 +963,7 @@ background-color: orange;
           </layout>
          </item>
          <item>
-          <widget class="QTextBrowser" name="textBrowser">
-           <property name="frameShape">
-            <enum>QFrame::NoFrame</enum>
-           </property>
-           <property name="source">
-            <url>
-             <string>qrc:/scopy.html</string>
-            </url>
-           </property>
-           <property name="openExternalLinks">
-            <bool>true</bool>
-           </property>
-          </widget>
+          <widget class="adiscope::StackedHomepage" name="stackedWidget"/>
          </item>
         </layout>
        </widget>
@@ -1020,6 +1008,12 @@ background-color: orange;
    <class>adiscope::DetachDragZone</class>
    <extends>QWidget</extends>
    <header>detachdragzone.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::StackedHomepage</class>
+   <extends>QStackedWidget</extends>
+   <header>stacked_homepage.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

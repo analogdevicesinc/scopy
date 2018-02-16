@@ -532,9 +532,11 @@ void PatternGenerator::outputModeChanged(int index)
 
 	if (ch) {
 		ch->setOutputMode(index);
+		diom->setOutputMode(ch->get_id(),index);
 	} else {
 		for (int i=0; i<chg->get_channel_count(); i++) {
 			chg->get_channel(i)->setOutputMode(index);
+			diom->setOutputMode(chg->get_channel(i)->get_id(),index);
 		}
 	}
 

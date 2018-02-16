@@ -137,7 +137,6 @@ void SpinBoxA::onLineEditTextEdited()
 	double value;
 	QString unit;
 	bool ok;
-	int i;
 
 	rx.indexIn(text);
 	value = rx.cap(1).toDouble(&ok);
@@ -150,14 +149,35 @@ void SpinBoxA::onLineEditTextEdited()
 
 	if (unit.isEmpty()) {
 		unit = m_units[ui->SBA_Combobox->currentIndex()].first;
-	} else if (unit.startsWith(QString("μ"))) {
+	} else if (unit.startsWith(QString("u"), Qt::CaseInsensitive)) {
 		qDebug()<<"before unit "<<unit ;
-		unit = unit.replace(0, 1, "u");
+		unit = unit.replace(0, 1, "μ");
+		qDebug()<<"after unit "<<unit ;
+	} else if (unit.startsWith(QString("r"), Qt::CaseInsensitive)) {
+		qDebug()<<"before unit "<<unit ;
+		unit = unit.replace(0, 1, "π");
 		qDebug()<<"after unit "<<unit ;
 	}
+	//check if the current user input fits to any unit measure
+	if (isUnitMatched(unit, value)) {
+		return;
+	}
 
-	i = find_if(m_units.begin(), m_units.end(),
-	[=](const pair<QString, double> pair) {
+	bool isLowerCase = unit == unit.toLower();
+
+	if (isLowerCase) {
+		unit = unit.toUpper();
+	} else {
+		unit = unit.toLower();
+	}
+	//change the user input and try again to find a match
+	isUnitMatched(unit, value);
+}
+
+bool SpinBoxA::isUnitMatched(const QString &unit, double value)
+{
+	int i = find_if(m_units.begin(), m_units.end(),
+		    [=](const pair<QString, double> pair) {
 		return pair.first.at(0) == unit.at(0);
 	}) - m_units.begin();
 
@@ -165,7 +185,11 @@ void SpinBoxA::onLineEditTextEdited()
 		value *= m_units[i].second;
 		value /= m_displayScale;
 		setValue(value);
+
+		return true;
 	}
+
+	return false;
 }
 
 QPushButton *SpinBoxA::upButton()
@@ -424,19 +448,27 @@ void SpinBoxA::setUnits(const QStringList& list)
 		QStringList curr = it->split('=');
 		QString s = curr.at(0);
 		double val = curr.at(1).toDouble();
-
-		if (s.contains("μ")) {
-			sufixes += (s.at(0) + '|');
-		}
-
-		QString newS = s.replace(QRegExp("[μ]"), "u");
-		sufixes += (newS.at(0) + '|');
+		sufixes += (s.at(0) + '|');
 
 		m_units.push_back(std::pair<QString, double>(s, val));
 		ui->SBA_Combobox->addItem(s);
 	}
 
 	if (!sufixes.isEmpty()) {
+		if (sufixes.contains("μ", Qt::CaseInsensitive)) {
+			sufixes += 'u', Qt::CaseInsensitive;
+			sufixes += '|';
+		}
+		if (sufixes.contains("π", Qt::CaseInsensitive)) {
+			sufixes += 'r', Qt::CaseInsensitive;
+			sufixes += '|';
+		}
+
+		QString lowercaseSufixes = sufixes.toLower();
+		sufixes.remove("μ|", Qt::CaseSensitive);
+		sufixes.remove("π|", Qt::CaseSensitive);
+		QString upercaseSufixes = sufixes.toUpper();
+		sufixes = upercaseSufixes + lowercaseSufixes;
 		sufixes.chop(1);
 		regex += "([" + sufixes + "]?)";
 	}
