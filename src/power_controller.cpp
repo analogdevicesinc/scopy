@@ -108,7 +108,7 @@ PowerController::PowerController(struct iio_context *ctx,
     const char *value;
     for (int i = 4; i < 12; i++) {
 	if (!iio_context_get_attr(ctx, i, &name, &value))
-	    calibrationParam[QString(name + 4)] = QString(*value).toDouble();
+	    calibrationParam[QString(name + 4)] = QString(value).toDouble();
     }
 }
 
@@ -158,8 +158,8 @@ void PowerController::hideEvent(QHideEvent *event)
 
 void PowerController::dac1_set_value(double value)
 {
-	const double offset = calibrationParam[QString("offset_pos_dac")];
-	const double gain = calibrationParam[QString("gain_pos_dac")];
+	double offset = calibrationParam[QString("offset_pos_dac")];
+	double gain = calibrationParam[QString("gain_pos_dac")];
 
 	long long val = (value - offset)  * 4095.0 / (5.02 * 1.2 * gain);
 
@@ -174,8 +174,8 @@ void PowerController::dac1_set_value(double value)
 
 void PowerController::dac2_set_value(double value)
 {
-	const double offset = calibrationParam[QString("offset_neg_dac")];
-	const double gain = calibrationParam[QString("gain_neg_dac")];
+	double offset = calibrationParam[QString("offset_neg_dac")];
+	double gain = calibrationParam[QString("gain_neg_dac")];
 
 	long long val = (value - offset) * 4095.0 / (-5.1 * 1.2 * gain);
 
@@ -246,10 +246,10 @@ void PowerController::ratioChanged(int percent)
 
 void PowerController::update_lcd()
 {
-	const double offset1 = calibrationParam[QString("offset_pos_adc")];
-	const double gain1 = calibrationParam[QString("gain_pos_adc")];
-	const double offset2 = calibrationParam[QString("offset_neg_adc")];
-	const double gain2 = calibrationParam[QString("gain_neg_adc")];
+	double offset1 = calibrationParam[QString("offset_pos_adc")];
+	double gain1 = calibrationParam[QString("gain_pos_adc")];
+	double offset2 = calibrationParam[QString("offset_neg_adc")];
+	double gain2 = calibrationParam[QString("gain_neg_adc")];
 
 	long long val1 = 0, val2 = 0;
 
