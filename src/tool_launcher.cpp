@@ -168,6 +168,8 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 		SLOT(setButtonBackground(bool)));
 	connect(ui->btnHome, SIGNAL(toggled(bool)), this,
 		SLOT(setButtonBackground(bool)));
+	connect(ui->prefBtn, SIGNAL(toggled(bool)), this,
+		SLOT(setButtonBackground(bool)));
 
 	ui->saveBtn->parentWidget()->setEnabled(false);
 	ui->loadBtn->parentWidget()->setEnabled(false);
@@ -207,12 +209,26 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	tl_api->ApiObject::load(*settings);
 
 	insertMenuOptions();
-	ui->menu->setMinimumSize(ui->menu->sizeHint());
+	ui->menu->setMinimumSize(ui->menu->sizeHint() + QSize(40, 0));
+
 	/* Show a smooth opening when the app starts */
 	ui->menu->toggleMenu(true);
 
 	connect(ui->saveBtn, &QPushButton::clicked, this, &ToolLauncher::saveSession);
 	connect(ui->loadBtn, &QPushButton::clicked, this, &ToolLauncher::loadSession);
+    
+	connect(ui->menu, &MenuAnim::finished, [=](bool opened) {
+		for (auto tools : ui->widget->findChildren<MenuOption *>())
+			tools->setMaximumWidth(opened ? 500 : 64);
+	});
+
+	prefPanel = new Preferences(this);
+	prefPanel->setVisible(false);
+	connect(ui->prefBtn, &QPushButton::clicked, [=](){
+		swapMenu(static_cast<QWidget*>(prefPanel));
+	});
+
+	connect(prefPanel, &Preferences::reset, this, &ToolLauncher::resetSession);
 
 	setupHomepage();
 }
@@ -253,6 +269,40 @@ void ToolLauncher::loadSession()
 				QPushButton *btn = enabledTools.back();
 				btn->setEnabled(true);
 				enabledTools.pop();
+			}
+		}
+	}
+}
+
+void ToolLauncher::resetSession()
+{
+	bool deviceConnected = false;
+	QString uri;
+	if (ctx) {
+		for (auto it = devices.begin(); it != devices.end(); ++it) {
+			if ((*it)->second.btn->isChecked()) {
+				uri = (*it)->second.btn->property("uri").toString();
+			}
+		}
+
+		this->disconnect();
+		deviceConnected = true;
+	}
+
+	QSettings settings;
+	QFile fileScopy(settings.fileName());
+	QFile fileBak(settings.fileName() + ".bak");
+	fileScopy.open(QFile::WriteOnly);
+	fileBak.open(QFile::WriteOnly);
+	fileScopy.resize(0);
+	fileBak.resize(0);
+
+	if (deviceConnected) {
+		for (auto it = devices.begin(); it != devices.end(); ++it) {
+			if ((*it)->second.btn->property("uri").toString() == uri) {
+				(*it)->second.btn->setChecked(true);
+				on_btnConnect_clicked(true);
+				break;
 			}
 		}
 	}
@@ -649,10 +699,13 @@ void ToolLauncher::swapMenu(QWidget *menu)
 void ToolLauncher::setButtonBackground(bool on)
 {
 	auto *btn = static_cast<QPushButton *>(QObject::sender());
-	MenuOption *mo = static_cast<MenuOption *>(btn->parentWidget());
+	MenuOption *mo = dynamic_cast<MenuOption *>(btn->parentWidget());
 
-	if (mo->isDetached())
-		return;
+	if (mo) {
+		if (mo->isDetached()) {
+			return;
+		}
+	}
 
 	setDynamicProperty(btn->parentWidget(), "selected", on);
 }
@@ -1356,6 +1409,11 @@ void ToolLauncher::highlight(bool on, int position)
 			x->highlightNeighbour(on);
 			return;
 		}
+}
+
+Preferences *ToolLauncher::getPrefPanel() const
+{
+	return prefPanel;
 }
 
 void ToolLauncher::UpdatePosition(QWidget *widget, int position){

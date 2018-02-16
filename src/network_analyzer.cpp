@@ -134,8 +134,9 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 NetworkAnalyzer::~NetworkAnalyzer()
 {
 	ui->run_button->setChecked(false);
-
-	api->save(*settings);
+	if (saveOnExit) {
+		api->save(*settings);
+	}
 	delete api;
 
 	delete ui;

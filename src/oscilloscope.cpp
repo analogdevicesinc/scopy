@@ -610,9 +610,11 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		wheelEventGuard = new MouseWheelWidgetGuard(ui->mainWidget);
 	wheelEventGuard->installEventRecursively(ui->mainWidget);
 
-	preferences_menu_init();
-
 	current_ch_widget = current_channel;
+
+	connect(prefPanel, &Preferences::notify, this, &Oscilloscope::readPreferences);
+
+	readPreferences();
 }
 
 void Oscilloscope::updateTriggerLevelValue(std::vector<float> value)
@@ -638,6 +640,9 @@ void Oscilloscope::updateTriggerLevelValue(std::vector<float> value)
 
 Oscilloscope::~Oscilloscope()
 {
+	disconnect(prefPanel, &Preferences::notify, this, &Oscilloscope::readPreferences);
+
+
 	ui->pushButtonRunStop->setChecked(false);
 
 	bool started = iio->started();
@@ -658,9 +663,10 @@ Oscilloscope::~Oscilloscope()
 	gr::hier_block2_sptr hier = iio->to_hier_block2();
 	qDebug() << "OSC disconnected:\n" << gr::dot_graph(hier).c_str();
 
-	api->save(*settings);
+	if (saveOnExit) {
+		api->save(*settings);
+	}
 	delete api;
-	delete pref_menu;
 
 	filterBlocks.clear();
 	subBlocks.clear();
@@ -688,6 +694,11 @@ void Oscilloscope::settingsLoaded()
 	voltsPerDiv->setValue(plot.VertUnitsPerDiv(current_ch_widget));
 	connect(voltsPerDiv, SIGNAL(valueChanged(double)),
 		SLOT(onVertScaleValueChanged(double)));
+}
+
+void Oscilloscope::readPreferences()
+{
+	enableLabels(prefPanel->getOsc_labels_enabled());
 }
 
 void Oscilloscope::init_channel_settings()
@@ -884,25 +895,19 @@ void Oscilloscope::configureAcCoupling(int i, bool coupled)
 	chnAcCoupled[i] = coupled;
 }
 
-void Oscilloscope::preferences_menu_init()
-{
-	pref_menu = new PreferenceMenu(this);
-	PreferenceOption *label_option = new PreferenceOption(pref_menu, "enable labels on the plot", settings);
-	pref_menu->insertOption(label_option, SLOT(enableLabels(bool)));
-	gsettings_ui->preferences->insertWidget(0, pref_menu);
-	pref_menu->load();
-}
-
 void Oscilloscope::enableLabels(bool enable)
 {
 	plot.setUsingLeftAxisScales(enable);
 	plot.enableLabels(enable);
-	connect(&plot, &CapturePlot::repositionTimeTrigger, [=](){
-		double value = timePosition->value();
-		timePosition->setValue(0);
-		timePosition->setValue(value);
-	});
-
+	if (enable) {
+		connect(&plot, &CapturePlot::repositionTimeTrigger, [=](){
+			double value = timePosition->value();
+			timePosition->setValue(0);
+			timePosition->setValue(value);
+		});
+	} else {
+		disconnect(&plot, &CapturePlot::repositionTimeTrigger, 0, 0);
+	}
 	if (enable) {
 		bool allDisabled = true;
 		for (unsigned int i = 0; i < nb_channels + nb_math_channels; i++) {

@@ -195,14 +195,20 @@ QMessageBox QLabel {
 	width: 680px;
 	color: rgba(255,255,255,240);
 	font-size: 14px;
+	font: bold;
 }
 
 QMessageBox QPushButton {
-	height: 30px;
+	height: 20px;
 	width: 120px;
 	background-color: #4a64ff;
 	color: white;
 	font-size: 16px;
+	font: bold;
+	border-radius: 5px;
+	border-color: #4a64ff;
+	border-style: solid;
+	border-width: 1px;
 }
 
 QAbstractSpinBox

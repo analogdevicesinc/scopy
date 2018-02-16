@@ -293,7 +293,9 @@ PatternGenerator::~PatternGenerator()
 		delete var;
 	}
 
-	api->save(*settings);
+	if (saveOnExit) {
+		api->save(*settings);
+	}
 	delete api;
 
 	delete ui;

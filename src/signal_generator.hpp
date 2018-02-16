@@ -152,6 +152,7 @@ private:
 	unsigned long sample_rate;
 	unsigned long max_sample_rate;
 	unsigned long nb_points;
+	double nr_of_periods;
 
 	QButtonGroup *settings_group;
 	QQueue<QPair<int, bool>> menuButtonActions;
@@ -251,6 +252,7 @@ private Q_SLOTS:
 
 	void startStop(bool start);
 	void setFunction(const QString& function);
+	void readPreferences();
 };
 
 class SignalGenerator_API : public ApiObject

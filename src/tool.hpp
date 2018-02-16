@@ -27,6 +27,7 @@
 #include <QDropEvent>
 #include <QString>
 
+#include "preferences.h"
 
 class QJSEngine;
 class QPushButton;
@@ -60,6 +61,7 @@ Q_SIGNALS:
 public Q_SLOTS:
 	virtual void attached();
 	virtual void detached();
+	virtual void readPreferences();
 
 protected:
 	struct iio_context *ctx;
@@ -67,6 +69,9 @@ protected:
 	ApiObject *api;
 	QSettings *settings;
 	QString name;
+	Preferences *prefPanel;
+	bool saveOnExit;
+
 };
 }
 

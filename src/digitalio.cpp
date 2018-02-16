@@ -181,7 +181,10 @@ DigitalIO::~DigitalIO()
 	if (!offline_mode) {
 	}
 
-	api->save(*settings);
+	if (saveOnExit) {
+		api->save(*settings);
+	}
+
 	delete api;
 	delete ui;
 }

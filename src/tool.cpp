@@ -30,7 +30,7 @@ Tool::Tool(struct iio_context *ctx, QPushButton *runButton,
 		ToolLauncher *parent) :
 	QWidget(static_cast<QWidget *>(parent)),
 	ctx(ctx), run_button(runButton), api(api),
-	name(name)
+	name(name), saveOnExit(true)
 {
         run_button->parentWidget()->setDisabled(false);
 
@@ -40,15 +40,21 @@ Tool::Tool(struct iio_context *ctx, QPushButton *runButton,
 	QSettings oldSettings;
 	QFile tempFile(oldSettings.fileName() + ".bak");
 	settings = new QSettings(tempFile.fileName(), QSettings::IniFormat);
+
+	prefPanel = parent->getPrefPanel();
+	connect(prefPanel, &Preferences::notify, this, &Tool::readPreferences);
+
+	readPreferences();
 }
 
 Tool::~Tool()
 {
+	disconnect(prefPanel, &Preferences::notify, this, &Tool::readPreferences);
+
 	run_button->parentWidget()->setDisabled(true);
 
 	delete settings;
 }
-
 
 
 const QString &Tool::getName()
@@ -64,6 +70,11 @@ void Tool::setName(const QString &name)
 void Tool::settingsLoaded()
 {
 
+}
+
+void Tool::readPreferences()
+{
+	saveOnExit = prefPanel->getSave_session_on_exit();
 }
 
 void Tool::attached()

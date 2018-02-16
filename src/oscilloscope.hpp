@@ -58,7 +58,6 @@
 #include "osc_export_settings.h"
 #include "math.hpp"
 #include "scroll_filter.hpp"
-#include "preference_menu.h"
 
 /*Generated UI */
 #include "ui_math_panel.h"
@@ -189,6 +188,8 @@ namespace adiscope {
 		void updateTriggerLevelValue(std::vector<float> value);
 		void configureAcCouplingTrigger(bool);
 
+		void readPreferences();
+
 	public Q_SLOTS:
 		void enableLabels(bool);
 
@@ -223,7 +224,6 @@ namespace adiscope {
 		QWidget *statisticsPanel;
 		AnalogBufferPreviewer *buffer_previewer;
 		ExportSettings *exportSettings;
-		PreferenceMenu *pref_menu;
 		CustomPlotPositionButton *cursorsPositionButton;
 
 		MouseWheelWidgetGuard *wheelEventGuard;
@@ -342,7 +342,6 @@ namespace adiscope {
 
 		void init_channel_settings();
 		void editMathChannelFunction(int id, const std::string &new_function);
-		void preferences_menu_init();
 
 		std::vector<QPair<gr::basic_block_sptr, int> > xy_channels;
 		int index_x, index_y;

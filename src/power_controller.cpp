@@ -130,7 +130,9 @@ PowerController::~PowerController()
 		iio_device_attr_write(dev3, "clk_powerdown", "1");
 	}
 
-	api->save(*settings);
+	if (saveOnExit) {
+		api->save(*settings);
+	}
 	delete api;
 
 	delete ui;
