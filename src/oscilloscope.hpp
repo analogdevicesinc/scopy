@@ -27,6 +27,7 @@
 #include <gnuradio/iio/device_source.h>
 #include <gnuradio/blocks/complex_to_mag_squared.h>
 #include <gnuradio/blocks/keep_one_in_n.h>
+#include <gnuradio/blocks/vector_sink_f.h>
 
 /* Qt includes */
 #include <QPair>
@@ -152,6 +153,9 @@ namespace adiscope {
 
 		void toggle_blockchain_flow(bool);
 		void runStopToggled(bool);
+		void autosetNextStep();
+		void autosetFinalStep();
+		void setupAutosetFreqSweep();
 		void singleCaptureDone();
 
 		void onMeasuremetsAvailable();
@@ -191,6 +195,7 @@ namespace adiscope {
 		void readPreferences();
 
 	public Q_SLOTS:
+		void requestAutoset();
 		void enableLabels(bool);
 
 	private:
@@ -205,6 +210,18 @@ namespace adiscope {
 		double last_set_time_pos;
 		unsigned long last_set_sample_count;
 		int zoom_level;
+
+		int autosetFFTIndex;
+		double autosetFrequency;
+		double autosetMaxAmpl;
+		double autosetMinAmpl;
+		int autosetSampleRateCnt;
+		int autosetChannel;
+		bool autosetEnabled;
+		const int autosetSkippedTimeSamples = 3000;
+		const int autosetFFTSize = 16384;
+		const int autosetNrOfSkippedTones=250;
+		const int autosetValidTone = 500;
 
 		Ui::Oscilloscope *ui;
 		Ui::OscGeneralSettings *gsettings_ui;
@@ -248,13 +265,14 @@ namespace adiscope {
 		iio_manager::port_id *ids;
 		iio_manager::port_id *fft_ids;
 		iio_manager::port_id *hist_ids;
+		iio_manager::port_id *autoset_id;
 
 		ScaleSpinButton *timeBase;
 		PositionSpinButton *timePosition;
 		ScaleSpinButton *voltsPerDiv;
 		PositionSpinButton *voltsPosition;
 
-		bool fft_is_visible, hist_is_visible, xy_is_visible;
+		bool fft_is_visible, hist_is_visible, xy_is_visible, autosetRequested;
 		bool statistics_enabled;
 		QList<bool> high_gain_modes;
 		std::vector<double> channel_offset;
@@ -265,6 +283,8 @@ namespace adiscope {
 		std::vector<gr::basic_block_sptr> subBlocks;
 		QPair<boost::shared_ptr<signal_sample>, int> triggerLevelSink;
 		boost::shared_ptr<gr::blocks::keep_one_in_n> keep_one;
+		boost::shared_ptr<gr::blocks::vector_sink_f> autosetFFTSink;
+		boost::shared_ptr<gr::blocks::vector_sink_f> autosetDataSink;
 
 		bool trigger_is_forced;
 		bool new_data_is_triggered;
@@ -272,6 +292,7 @@ namespace adiscope {
 		StateUpdater *triggerUpdater;
 
 		int fft_size;
+		int autoset_fft_size;
 
 		NumberSeries voltsPerDivList;
 		NumberSeries secPerDivList;
@@ -315,6 +336,7 @@ namespace adiscope {
 		ChannelWidget *channelWidgetAtId(int id);
 		void update_measure_for_channel(int ch_idx);
 		void setAllSinksSampleCount(unsigned long sample_count);
+		void autosetFFT();
 
 		void updateRunButton(bool ch_enabled);
 
@@ -367,7 +389,7 @@ namespace adiscope {
 		Q_PROPERTY(bool running READ running WRITE run STORED false);
 
 		Q_PROPERTY(bool cursors READ hasCursors WRITE setCursors);
-		Q_PROPERTY(bool measure READ hasMeasure WRITE setMeasure);
+        Q_PROPERTY(bool measure READ hasMeasure WRITE setMeasure);
 		Q_PROPERTY(bool measure_all
 				READ measureAll WRITE setMeasureAll);
 		Q_PROPERTY(bool counter READ hasCounter WRITE setCounter);
@@ -426,6 +448,7 @@ namespace adiscope {
 		Q_PROPERTY(bool xy_en READ getXyEn WRITE setXyEn)
 		Q_PROPERTY(bool export_all READ getExportAll
 			   WRITE setExportAll)
+		Q_PROPERTY(bool autoset_en READ autosetEnabled WRITE enableAutoset)
 
 	public:
 		explicit Oscilloscope_API(Oscilloscope *osc) :
@@ -439,6 +462,9 @@ namespace adiscope {
 
 		bool hasCursors() const;
 		void setCursors(bool en);
+
+		bool autosetEnabled() const;
+		void enableAutoset(bool en);
 
 		bool hasMeasure() const;
 		void setMeasure(bool en);

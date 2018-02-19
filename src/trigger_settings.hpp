@@ -88,6 +88,8 @@ namespace adiscope {
 			const QPair<double, double>& range);
 		void setTriggerHystRange(int chn,
 			const QPair<double, double>& range);
+		void setTriggerEnable(bool);
+		void setTriggerSource(int);
 		void setTriggerLevelStep(int chn, double step);
 		void setTriggerHystStep(int chn, double step);
 		void autoTriggerDisable();
@@ -96,12 +98,14 @@ namespace adiscope {
 		void setAdcRunningState(bool on);
 		void onSpinboxTriggerLevelChanged(double);
 
-	private Q_SLOTS:
+		void on_intern_en_toggled(bool);
 		void on_cmb_source_currentIndexChanged(int);
+
+	private Q_SLOTS:
 		void onSpinboxTriggerHystChanged(double);
 		void on_cmb_condition_currentIndexChanged(int);
 		void on_cmb_extern_condition_currentIndexChanged(int);
-		void on_intern_en_toggled(bool);
+
 		void on_extern_en_toggled(bool);
 		void on_cmb_analog_extern_currentIndexChanged(int);
 		void on_btnAuto_toggled(bool);

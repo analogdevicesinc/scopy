@@ -22,6 +22,10 @@
 #include <gnuradio/iio/math.h>
 #include <gnuradio/blocks/sub_ff.h>
 #include <gnuradio/filter/iir_filter_ffd.h>
+#include <gnuradio/blocks/nlog10_ff.h>
+#include <gnuradio/blocks/head.h>
+#include <gnuradio/blocks/null_source.h>
+#include <gnuradio/blocks/null_sink.h>
 
 /* Qt includes */
 #include <QtWidgets>
@@ -65,8 +69,8 @@ using namespace gr;
 using namespace std;
 
 Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
-		std::shared_ptr<GenericAdc> adc, QPushButton *runButton,
-		 QJSEngine *engine, ToolLauncher *parent) :
+			   std::shared_ptr<GenericAdc> adc, QPushButton *runButton,
+			   QJSEngine *engine, ToolLauncher *parent) :
 	Tool(ctx, runButton, new Oscilloscope_API(this), "Oscilloscope", parent),
 	adc(adc),
 	m2k_adc(dynamic_pointer_cast<M2kAdc>(adc)),
@@ -81,6 +85,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	xy_plot(nb_channels / 2, this),
 	hist_plot(nb_channels, this),
 	ids(new iio_manager::port_id[nb_channels]),
+	autoset_id(new iio_manager::port_id),
 	fft_ids(new iio_manager::port_id[nb_channels]),
 	hist_ids(new iio_manager::port_id[nb_channels]),
 	fft_is_visible(false), hist_is_visible(false), xy_is_visible(false),
@@ -97,7 +102,9 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	index_y(1),
 	ftc(nullptr),
 	locked(false),
-	triggerAcCoupled(false)
+	triggerAcCoupled(false),
+	autosetRequested(false),
+	autosetEnabled(true)
 {
 	ui->setupUi(this);
 	int triggers_panel = ui->stackedWidget->insertWidget(-1, &trigger_settings);
@@ -419,6 +426,9 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	connect(gsettings_ui->Histogram_view, SIGNAL(toggled(bool)),
 		SLOT(onHistogram_view_toggled(bool)));
 
+	ch_ui->btnAutoset->setEnabled(false);
+	connect(ui->pushButtonRunStop, SIGNAL(toggled(bool)),
+		ch_ui->btnAutoset,SLOT(setEnabled(bool)));
 	connect(ui->pushButtonRunStop, SIGNAL(toggled(bool)), this,
 			SLOT(runStopToggled(bool)));
 	connect(ui->pushButtonSingle, SIGNAL(toggled(bool)), this,
@@ -706,11 +716,15 @@ void Oscilloscope::init_channel_settings()
 	connect(ch_ui->btnEditMath, &QPushButton::toggled, this,
 		&Oscilloscope::openEditMathPanel);
 
+	connect(ch_ui->btnAutoset, &QPushButton::clicked, this,
+		&Oscilloscope::requestAutoset);
+
 	connect(ui->btnAddMath, &QPushButton::toggled, [=](bool on){
 		if (on && !addChannel) {
 			addChannel = true;
 			math_pair->first.btnAddChannel->setText("Add Channel");
 			ch_ui->math_settings_widget->setVisible(false);
+			ch_ui->btnAutoset->setVisible(autosetEnabled);
 		}
 	});
 }
@@ -1422,13 +1436,19 @@ void Oscilloscope::on_actionClose_triggered()
 
 void Oscilloscope::toggle_blockchain_flow(bool en)
 {
+	qDebug()<<"toggle blockchain flow " << en;
 	if (en) {
 		if(active_sample_count < fft_size && fft_is_visible)
 			for (unsigned int i = 0; i < nb_channels; i++)
 				iio->start(fft_ids[i]);
 
+		if (autosetRequested) {
+			iio->start(autoset_id[0]);
+		}
+
 		for (unsigned int i = 0; i < nb_channels; i++)
 			iio->start(ids[i]);
+
 		if (hist_is_visible)
 			for (unsigned int i = 0; i < nb_channels; i++)
 				iio->start(hist_ids[i]);
@@ -1441,9 +1461,13 @@ void Oscilloscope::toggle_blockchain_flow(bool en)
 		if(active_sample_count > fft_size && fft_is_visible)
 			for (unsigned int i = 0; i < nb_channels; i++)
 				iio->stop(fft_ids[i]);
-
 		for (unsigned int i = 0; i < nb_channels; i++)
 			iio->stop(ids[i]);
+
+		if (autosetRequested) {
+			iio->stop(autoset_id[0]);			
+		}
+
 		if (hist_is_visible)
 			for (unsigned int i = 0; i < nb_channels; i++)
 				iio->stop(hist_ids[i]);
@@ -1456,6 +1480,7 @@ void Oscilloscope::toggle_blockchain_flow(bool en)
 
 void Oscilloscope::runStopToggled(bool checked)
 {
+	qDebug()<<"runStopToggle";
 	QPushButton *btn = static_cast<QPushButton *>(QObject::sender());
 	setDynamicProperty(btn, "running", checked);
 
@@ -1533,6 +1558,28 @@ void Oscilloscope::setChannelWidgetIndex(int chnIdx)
 			continue;
 		plot.showYAxisWidget(i, false);
 	}
+}
+
+void Oscilloscope::autosetFFT()
+{
+	bool started = iio->started();
+	auto fft = gnuradio::get_initial_sptr(
+				new fft_block(false, autoset_fft_size));
+
+	auto ctm = blocks::complex_to_mag_squared::make(1);
+	auto log = blocks::nlog10_ff::make(10);
+	if(autoset_id[0]) {
+		iio->disconnect(autoset_id[0]);
+		autoset_id[0] = nullptr;
+	}
+	boost::shared_ptr<adc_sample_conv> block =
+	dynamic_pointer_cast<adc_sample_conv>(adc_samp_conv_block);
+	autosetFFTSink = blocks::vector_sink_f::make();
+	autosetDataSink = blocks::vector_sink_f::make();
+	autoset_id[0] = iio->connect(fft,autosetChannel,0,true);
+	iio->connect(fft,0,ctm,0);
+	iio->connect(ctm,0,log,0);
+	iio->connect(log,0,autosetFFTSink,0);
 }
 
 void Oscilloscope::onFFT_view_toggled(bool visible)
@@ -2239,11 +2286,13 @@ void Oscilloscope::update_chn_settings_panel(int id)
 
 	if (chn_widget->isMathChannel()) {
 		ch_ui->math_settings_widget->setVisible(true);
+		ch_ui->btnAutoset->setVisible(false);
 		ch_ui->function_2->setText(chn_widget->function());
 		ch_ui->function_2->setText(chn_widget->function());
 		ch_ui->wCoupling->setVisible(false);
 	} else {
 		ch_ui->math_settings_widget->setVisible(false);
+		ch_ui->btnAutoset->setVisible(autosetEnabled);
 		ch_ui->wCoupling->setVisible(true);
 		if (ch_ui->btnCoupled->isChecked() != chnAcCoupled.at(id)) {
 			ch_ui->btnCoupled->setChecked(chnAcCoupled.at(id));
@@ -2859,6 +2908,97 @@ void Oscilloscope::onStatisticsReset()
 	statisticsUpdateGui();
 }
 
+
+void Oscilloscope::setupAutosetFreqSweep()
+{	bool started = iio->started();
+	if(started)		
+		iio->lock();
+	qt_time_block->reset();
+	qt_time_block->clean_buffers();
+	if (m2k_adc) {
+		high_gain_modes[autosetChannel] = M2kAdc::LOW_GAIN_MODE;
+		trigger_settings.autoTriggerDisable();
+		trigger_settings.on_intern_en_toggled(false);
+	}
+	autosetSampleRateCnt--;
+	active_sample_rate = m2k_adc->availSamplRates()[autosetSampleRateCnt];
+	qt_time_block->set_samp_rate(active_sample_rate);
+	active_sample_count = autosetFFTSize;
+	setAllSinksSampleCount(active_sample_count);
+	autoset_fft_size = active_sample_count;
+	writeAllSettingsToHardware();
+	last_set_sample_count = active_sample_count;
+	autosetFFT();
+	iio->set_buffer_size(autoset_id[0], autoset_fft_size);
+	for (unsigned int i = 0; i < nb_channels; i++)
+		iio->set_buffer_size(ids[i], autoset_fft_size);
+	if(started)
+		iio->unlock();
+}
+
+void Oscilloscope::requestAutoset()
+{
+	if(!autosetRequested && current_ch_widget != -1 && current_ch_widget < nb_channels){
+		toggle_blockchain_flow(false);
+		autosetChannel = current_ch_widget;
+		autosetSampleRateCnt = m2k_adc->availSamplRates().count();
+		autosetRequested = true;
+		setupAutosetFreqSweep();
+		toggle_blockchain_flow(true);
+	}
+}
+
+void Oscilloscope::autosetNextStep()
+{
+	static int prevmaxindex=0;
+	// Only consider tone valid if it's index is higher than a preset value
+	// This ensures that a good enough resolution bandwidth is achieved
+	if(autosetSampleRateCnt > 0 && autosetFFTIndex < autosetValidTone ){
+		prevmaxindex = autosetFFTIndex;
+		setupAutosetFreqSweep();
+		toggle_blockchain_flow(true);
+	}
+	else
+	{
+		autosetFinalStep();
+	}
+}
+
+void Oscilloscope::autosetFinalStep() {
+	double timebaseval = timeBase->minValue();
+	double timeposval = 0;
+	double voltspos = 0;
+	double voltsperdiv = 1;
+	double triggerlevel = 0;
+
+	if(autoset_id[0]) {
+		iio->disconnect(autoset_id[0]);
+		autoset_id[0] = nullptr;
+	}
+	autosetRequested = false;
+	if(ui->pushButtonRunStop->isChecked())
+		runStopToggled(true);
+
+	// autoset frequency found
+	if(autosetFFTIndex>1) {
+		timebaseval = (1/autosetFrequency)/5;
+		voltsperdiv = (autosetMaxAmpl-autosetMinAmpl)/4;
+		triggerlevel = (autosetMaxAmpl+autosetMinAmpl)/2;
+	}
+
+	timeBase->setValue(timebaseval);
+	timeBase->stepUp();
+	timePosition->setValue(timeposval);
+	voltsPosition->setValue(voltspos);
+	voltsPerDiv->setValue(voltsperdiv);
+	voltsPerDiv->stepUp();
+	trigger_settings.setTriggerSource(autosetChannel);
+	trigger_settings.setTriggerLevel(triggerlevel);
+	trigger_settings.autoTriggerEnable();
+	trigger_settings.setTriggerEnable(true);
+	onTimePositionChanged(timePosition->value());
+}
+
 void Oscilloscope::singleCaptureDone()
 {
 	Q_EMIT activateExportButton();
@@ -2866,7 +3006,37 @@ void Oscilloscope::singleCaptureDone()
 		ui->pushButtonSingle->setChecked(false);
 		Q_EMIT isRunning(false);
 	}
+	if(autosetRequested)
+	{
+		toggle_blockchain_flow(false);
+		double max=-INFINITY;
+		size_t maxindex;
+		// try skipping the DC offset tones and last few tones that cause
+		// weird results
+		for(int j=autosetNrOfSkippedTones ;j<((autoset_fft_size/2)-5);j++) {
+		    if(autosetFFTSink->data()[j] > max) {
+			    max = autosetFFTSink->data()[j];
+			    maxindex=j;
+		    }
+		}
+		double maxVolts = -INFINITY;
+		double minVolts = INFINITY;
 
+		for(auto j=autosetSkippedTimeSamples;j<active_sample_count;j++) {
+			auto data = plot.Curve(autosetChannel)->data()->sample(j).y();
+			if(data > maxVolts)
+				maxVolts = data;
+			if(data < minVolts)
+				minVolts = data;
+		}
+
+		double frequency = (maxindex) * (active_sample_rate/autoset_fft_size);
+		autosetFFTIndex = maxindex;
+		autosetFrequency = frequency;
+		autosetMaxAmpl = maxVolts;
+		autosetMinAmpl = minVolts;
+		autosetNextStep();
+	}
 }
 
 void Oscilloscope::onIioDataRefillTimeout()
@@ -3159,6 +3329,15 @@ bool Oscilloscope_API::hasCursors() const
 void Oscilloscope_API::setCursors(bool en)
 {
 	osc->ui->boxCursors->setChecked(en);
+}
+
+bool Oscilloscope_API::autosetEnabled() const
+{
+	return osc->autosetEnabled;
+}
+void Oscilloscope_API::enableAutoset(bool en)
+{
+	osc->autosetEnabled=en;
 }
 
 bool Oscilloscope_API::hasMeasure() const
