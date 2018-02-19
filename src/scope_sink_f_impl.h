@@ -56,6 +56,7 @@ namespace adiscope {
       int d_trigger_channel;
       pmt::pmt_t d_trigger_tag_key;
       bool d_triggered;
+      bool d_cleanBuffers;
 
       void _reset();
       void _npoints_resize();
@@ -82,6 +83,7 @@ namespace adiscope {
       int nsamps() const;
       std::string name() const;
       void reset();
+      void clean_buffers();
 
 
       int work(int noutput_items,

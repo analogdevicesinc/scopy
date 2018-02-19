@@ -69,6 +69,7 @@ namespace adiscope {
 	d_fbuffers.push_back((float*)volk_malloc(d_buffer_size*sizeof(float),
                                                   volk_get_alignment()));
 	memset(d_fbuffers[n], 0, d_buffer_size*sizeof(float));
+        d_cleanBuffers = true;
       }
 
       // Set alignment properties for VOLK
@@ -258,6 +259,32 @@ namespace adiscope {
 	  d_tags[n][t].offset += adj;
 	}
       }
+    }
+
+    void
+    scope_sink_f_impl::clean_buffers()
+    {
+            gr::thread::scoped_lock lock(d_setlock);
+
+            // Set new size and reset buffer index
+            // (throws away any currently held data, but who cares?)
+            d_buffer_size = 2*d_size;
+
+            // Resize buffers and replace data
+            for(int n = 0; n < d_nconnections; n++) {
+                    volk_free(d_buffers[n]);
+                    d_buffers[n] = (double*)volk_malloc(d_buffer_size*sizeof(double),
+                                                        volk_get_alignment());
+                    memset(d_buffers[n], 0, d_buffer_size*sizeof(double));
+
+                    volk_free(d_fbuffers[n]);
+                    d_fbuffers[n] = (float*)volk_malloc(d_buffer_size*sizeof(float),
+                                                        volk_get_alignment());
+                    memset(d_fbuffers[n], 0, d_buffer_size*sizeof(float));
+            }
+
+            _reset();
+            d_cleanBuffers = true;
     }
 
     int
