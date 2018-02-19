@@ -846,6 +846,45 @@ Attenuation</string>
         </layout>
        </item>
        <item>
+        <spacer name="verticalSpacer_9">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>5</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnAutoset">
+         <property name="styleSheet">
+          <string notr="true">QPushButton {
+	background-color: rgba(0, 0, 0, 80);
+	color: gray;
+	font: bold  &quot;Times New Roman&quot;;	
+	font-size: 16px;
+	border-radius: 3px;
+  	border: 2px rgba(0, 0, 0, 80);
+}
+
+QPushButton:hover {
+	color: white;
+	background-color: rgba(0, 0, 0, 60);
+	border-color: rgba(0, 0, 0, 60);
+}</string>
+         </property>
+         <property name="text">
+          <string>Autoset</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <spacer name="verticalSpacer_2">
          <property name="orientation">
           <enum>Qt::Vertical</enum>

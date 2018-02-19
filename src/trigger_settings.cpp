@@ -392,6 +392,16 @@ void TriggerSettings::setTriggerHystRange(int chn,
 	}
 }
 
+void TriggerSettings::setTriggerEnable(bool en) {
+	ui->intern_en->setChecked(en);
+	on_intern_en_toggled(en);
+}
+
+void TriggerSettings::setTriggerSource(int ch) {
+	ui->cmb_source->setCurrentIndex(ch);
+	on_cmb_source_currentIndexChanged(ch);
+}
+
 void TriggerSettings::setTriggerLevelStep(int chn, double step)
 {
 	trigg_configs[chn].level_step = step;
