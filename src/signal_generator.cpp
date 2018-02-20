@@ -1088,7 +1088,8 @@ void SignalGenerator::loadFile()
 	auto ptr = getCurrentData();
 
 	ptr->file = QFileDialog::getOpenFileName(this, tr("Open File"));
-	this->ui->label_path->setText(ptr->file);
+	ui->label_path->setText(ptr->file);
+	Util::setWidgetNrOfChars(ui->label_path,10,30);
 	loadParametersFromFile(ptr,ptr->file);
 	ui->fileAmplitude->setValue(ptr->file_amplitude);
 	ui->fileOffset->setValue(ptr->file_offset);
