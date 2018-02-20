@@ -63,6 +63,8 @@
 /*Generated UI */
 #include "ui_math_panel.h"
 
+#define TIMEBASE_THRESHOLD 0.1
+
 class QJSEngine;
 class SymmetricBufferMode;
 
@@ -194,6 +196,12 @@ namespace adiscope {
 
 		void readPreferences();
 
+		void setSinksDisplayOneBuffer(bool);
+		void cleanBuffersAllSinks();
+		void preparePlotSampleCount();
+		void resetStreamingFlag(bool);
+		void onFilledScreen(bool);
+
 	public Q_SLOTS:
 		void requestAutoset();
 		void enableLabels(bool);
@@ -205,11 +213,13 @@ namespace adiscope {
 		double active_sample_rate;
 		double noZoomXAxisWidth;
 		unsigned long active_sample_count;
+		unsigned long active_plot_sample_count;
 		long long active_trig_sample_count;
 		double active_time_pos;
 		double last_set_time_pos;
 		unsigned long last_set_sample_count;
 		int zoom_level;
+		bool plot_samples_sequentially, d_displayOneBuffer, d_shouldResetStreaming;
 
 		int autosetFFTIndex;
 		double autosetFrequency;
