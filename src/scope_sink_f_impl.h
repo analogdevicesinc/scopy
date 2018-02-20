@@ -56,6 +56,8 @@ namespace adiscope {
       int d_trigger_channel;
       pmt::pmt_t d_trigger_tag_key;
       bool d_triggered;
+
+      bool d_displayOneBuffer;
       bool d_cleanBuffers;
 
       void _reset();
@@ -79,6 +81,8 @@ namespace adiscope {
       void set_samp_rate(const double samp_rate);
       void set_trigger_mode(trigger_mode mode, int channel,
 			    const std::string &tag_key="");
+
+      void set_displayOneBuffer(bool);
 
       int nsamps() const;
       std::string name() const;
