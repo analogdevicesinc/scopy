@@ -134,7 +134,7 @@ void ManualCalibration::positivePowerSupplySetup()
 
 	/*Set DAC to 0V*/
 	setEnablePositiveSuppply(true);
-	setPositiveValue(0.1);
+	setPositiveValue(0);
 }
 
 void ManualCalibration::setupPowerSupplyIio()
@@ -225,7 +225,7 @@ void ManualCalibration::positivePowerSupplyParam(const int& step)
 			/*adc gain calibration*/
 			iio_channel_attr_read_longlong(ch1r, "raw", &val);
 			value = (double) val * 6.4 / 4095.0;
-			stParameters.gain_pos_adc = value / offset_Value;
+			stParameters.gain_pos_adc = offset_Value / value;
 			qDebug() << "Positive gain ADC value: " << stParameters.gain_pos_adc;
 		}
 
@@ -279,7 +279,7 @@ void ManualCalibration::negativePowerSupplySetup()
 		stCalibrationStory.story[stCalibrationStory.calibStep]);
 
 	setEnableNegativeSuppply(true);
-	setNegativeValue(-0.1);
+	setNegativeValue(0);
 }
 
 void ManualCalibration::negativePowerSupplyParam(const int& step)
@@ -300,7 +300,7 @@ void ManualCalibration::negativePowerSupplyParam(const int& step)
 
 		/*adc offset calibration*/
 		iio_channel_attr_read_longlong(ch2r, "raw", &val);
-		value = (double) val * 6.4 / 4095.0;
+		value = (double) val * (-6.4) / 4095.0;
 		stParameters.offset_neg_adc = value - offset_Value;
 		qDebug() << "Negative offset ADC value: " << stParameters.offset_neg_adc;
 
@@ -327,8 +327,8 @@ void ManualCalibration::negativePowerSupplyParam(const int& step)
 
 			/*adc gain calibration*/
 			iio_channel_attr_read_longlong(ch2r, "raw", &val);
-			value = (double) val * 6.4 / 4095.0;
-			stParameters.gain_neg_adc = value / offset_Value;
+			value = (double) val * (-6.4) / 4095.0;
+			stParameters.gain_neg_adc =  offset_Value / value;
 			qDebug() << "Negative gain ADC value: " << stParameters.gain_neg_adc;
 		}
 

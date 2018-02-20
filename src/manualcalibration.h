@@ -42,9 +42,9 @@ class CalibrationTemplate;
 
 namespace adiscope {
 
-#define SUPPLY_100MV_VALUE 0.100
+#define SUPPLY_100MV_VALUE 0
 #define SUPPLY_4_5V_VALUE 4.5
-#define SUPPLY_100MV_NEG_VALUE -0.100
+#define SUPPLY_100MV_NEG_VALUE 0
 #define SUPPLY_4_5V_NEG_VALUE -4.5
 
 struct stCalibStory {
