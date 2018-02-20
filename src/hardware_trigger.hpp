@@ -82,7 +82,8 @@ public:
 	std::unique_ptr<struct Settings> getCurrentHwSettings();
 	void setHwTriggerSettings(struct Settings *settings);
 
-	void setStreaming(bool);
+	void setStreamingFlag(bool);
+	bool getStreamingFlag();
 
 private:
 	struct iio_device *m_trigger_device;
@@ -90,6 +91,7 @@ private:
 	QList<struct iio_channel *> m_digital_channels;
 	QList<struct iio_channel *> m_logic_channels;
 	struct iio_channel *m_delay_trigger;
+	bool m_streaming_flag;
 
 	uint m_num_channels;
 

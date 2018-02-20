@@ -344,7 +344,13 @@ void HardwareTrigger::setDelay(int delay)
 
 void HardwareTrigger::setStreamingFlag(bool val)
 {
+	m_streaming_flag = val;
 	iio_device_attr_write_bool(m_trigger_device, "streaming", val);
+}
+
+bool HardwareTrigger::getStreamingFlag()
+{
+	return m_streaming_flag;
 }
 
 HardwareTrigger::settings_uptr HardwareTrigger::getCurrentHwSettings()

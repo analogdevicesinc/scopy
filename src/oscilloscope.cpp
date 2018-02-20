@@ -104,7 +104,9 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	locked(false),
 	triggerAcCoupled(false),
 	autosetRequested(false),
-	autosetEnabled(true)
+	autosetEnabled(true),
+	plot_samples_sequentially(false),
+	d_displayOneBuffer(true)
 {
 	ui->setupUi(this);
 	int triggers_panel = ui->stackedWidget->insertWidget(-1, &trigger_settings);
@@ -501,6 +503,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	connect(&plot, SIGNAL(newData()),
 			&trigger_settings, SLOT(autoTriggerEnable()));
 	connect(&plot, SIGNAL(newData()), this, SLOT(singleCaptureDone()));
+
+	connect(&plot, SIGNAL(filledScreen(bool)), this, SLOT(onFilledScreen(bool)));
 
 	connect(&*iio, SIGNAL(timeout()),
 			SLOT(onIioDataRefillTimeout()));
@@ -1170,7 +1174,7 @@ void Oscilloscope::add_math_channel(const std::string& function)
 	if (started)
 		iio->lock();
 
-	math_sink->set_trigger_mode(TRIG_MODE_TAG, 0, "buffer_start");
+	math_sink->set_trigger_mode(TRIG_MODE_FREE, 0, "buffer_start");
 
 	for (unsigned int i = 0; i < nb_channels; i++) {
 		if(subBlocks.at(i) != nullptr) {
@@ -1264,6 +1268,7 @@ void Oscilloscope::add_math_channel(const std::string& function)
 		setup_xy_channels();
 
 	plot.showYAxisWidget(curve_id, false);
+	setSinksDisplayOneBuffer(d_displayOneBuffer);
 }
 
 void Oscilloscope::onChannelWidgetDeleteClicked()
@@ -1507,13 +1512,13 @@ void Oscilloscope::runStopToggled(bool checked)
 		writeAllSettingsToHardware();
 
 		plot.setSampleRate(active_sample_rate, 1, "");
-		plot.setBufferSizeLabelValue(active_sample_count);
+		plot.setBufferSizeLabelValue(active_plot_sample_count);
 		plot.setSampleRatelabelValue(active_sample_rate);
 		if(fft_is_visible) {
 			setFFT_params();
 		}
 
-		last_set_sample_count = active_sample_count;
+		last_set_sample_count = active_plot_sample_count;
 
 		if (active_trig_sample_count !=
 				trigger_settings.triggerDelay()) {
@@ -1526,8 +1531,11 @@ void Oscilloscope::runStopToggled(bool checked)
 			timePosition->setValue(active_time_pos);
 
 		toggle_blockchain_flow(true);
+		/* Reset the triggered && streaming flag */
+		resetStreamingFlag(plot_samples_sequentially);
 	} else {
 		toggle_blockchain_flow(false);
+		resetStreamingFlag(plot_samples_sequentially);
 		trigger_settings.setAdcRunningState(false);
 	}
 
@@ -1726,6 +1734,7 @@ void Oscilloscope::onXY_view_toggled(bool visible)
 	} else {
 		ui->xy_plot_container->hide();
 		// Disconnect the XY section from the running flowgraph
+
 		iio->disconnect(xy_channels.at(index_x).first, xy_channels.at(index_x).second,
 				ftc, 0);
 		iio->disconnect(xy_channels.at(index_y).first, xy_channels.at(index_y).second,
@@ -1995,6 +2004,22 @@ void adiscope::Oscilloscope::onVertScaleValueChanged(double value)
 	}
 }
 
+
+void Oscilloscope::setSinksDisplayOneBuffer(bool val)
+{
+	d_displayOneBuffer = val;
+	qt_time_block->set_displayOneBuffer(val);
+
+	auto it = math_sinks.constBegin();
+	while (it != math_sinks.constEnd()) {
+		scope_sink_f::sptr math_sink = dynamic_pointer_cast<
+				scope_sink_f>(it.value().second);
+		math_sink->set_displayOneBuffer(val);
+		++it;
+	}
+	qt_fft_block->set_displayOneBuffer(val);
+}
+
 void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 {
 	cancelZoom();
@@ -2002,6 +2027,7 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 	SymmetricBufferMode::capture_parameters params = symmBufferMode->captureParameters();
 	active_sample_rate = params.sampleRate;
 	active_sample_count = params.entireBufferSize;
+	active_plot_sample_count = active_sample_count;
 	active_trig_sample_count = -(long long)params.triggerBufferSize;
 	active_time_pos = -params.timePos;
 
@@ -2011,6 +2037,9 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 	plot.setDataStartingPoint(active_trig_sample_count);
 	plot.resetXaxisOnNextReceivedData();
 	plot.zoomBaseUpdate();
+	plot.setXAxisNumPoints(0);
+
+	preparePlotSampleCount();
 
 	if (zoom_level == 0) {
 		noZoomXAxisWidth = plot.axisInterval(QwtPlot::xBottom).width();
@@ -2020,13 +2049,13 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 	bool started = iio->started();
 	if (started)
 		iio->lock();
-	setAllSinksSampleCount(active_sample_count);
+	setAllSinksSampleCount(active_plot_sample_count);
 
 	if (started) {
 		plot.setSampleRate(active_sample_rate, 1, "");
-		plot.setBufferSizeLabelValue(active_sample_count);
+		plot.setBufferSizeLabelValue(active_plot_sample_count);
 		plot.setSampleRatelabelValue(active_sample_rate);
-		last_set_sample_count = active_sample_count;
+		last_set_sample_count = active_plot_sample_count;
 
 		adc->setSampleRate(active_sample_rate);
 		trigger_settings.setTriggerDelay(active_trig_sample_count);
@@ -2097,11 +2126,14 @@ void adiscope::Oscilloscope::onTimePositionChanged(double value)
 	SymmetricBufferMode::capture_parameters params = symmBufferMode->captureParameters();
 	active_sample_rate = params.sampleRate;
 	active_sample_count = params.entireBufferSize;
+	active_plot_sample_count = active_sample_count;
 	active_trig_sample_count = -(long long)params.triggerBufferSize;
 	active_time_pos = -params.timePos;
 
+//	preparePlotSampleCount();
 	// Realign plot data based on the new time position
 	plot.setHorizOffset(value);
+	plot.setXAxisNumPoints(plot_samples_sequentially ? active_plot_sample_count : 0);
 	plot.replot();
 	plot.setDataStartingPoint(active_trig_sample_count);
 	plot.resetXaxisOnNextReceivedData();
@@ -2113,11 +2145,11 @@ void adiscope::Oscilloscope::onTimePositionChanged(double value)
 		trigger_settings.setTriggerDelay(active_trig_sample_count);
 		last_set_time_pos = active_time_pos;
 	}
-
 	updateBufferPreviewer();
 
 	if (active_sample_rate == adc->sampleRate() &&
-			(active_sample_count == oldSampleCount))
+			(active_plot_sample_count == oldSampleCount) &&
+			!plot_samples_sequentially)
 		return;
 
 	/* Reconfigure the GNU Radio block to receive a different number of samples  */
@@ -2127,16 +2159,17 @@ void adiscope::Oscilloscope::onTimePositionChanged(double value)
 			configureAcCoupling(ch, !chnAcCoupled.at(ch));
 		}
 	}
+
 	if (started)
 		iio->lock();
-	setAllSinksSampleCount(active_sample_count);
+	setAllSinksSampleCount(active_plot_sample_count);
 
 	if (started) {
 		plot.setSampleRate(active_sample_rate, 1, "");
-		plot.setBufferSizeLabelValue(active_sample_count);
+		plot.setBufferSizeLabelValue(active_plot_sample_count);
 		plot.setSampleRatelabelValue(active_sample_rate);
 
-		last_set_sample_count = active_sample_count;
+		last_set_sample_count = active_plot_sample_count;
 
 		adc->setSampleRate(active_sample_rate);
 	}
@@ -2430,6 +2463,7 @@ void Oscilloscope::editMathChannelFunction(int id, const std::string& new_functi
 //	}
 
 	chn_widget->setFunction(QString::fromStdString(new_function));
+	setSinksDisplayOneBuffer(d_displayOneBuffer);
 }
 
 void Oscilloscope::onMeasuremetsAvailable()
@@ -3000,10 +3034,12 @@ void Oscilloscope::autosetFinalStep() {
 
 void Oscilloscope::singleCaptureDone()
 {
-	Q_EMIT activateExportButton();
-	if (ui->pushButtonSingle->isChecked()){
-		ui->pushButtonSingle->setChecked(false);
-		Q_EMIT isRunning(false);
+	if (!plot_samples_sequentially) {
+		Q_EMIT activateExportButton();
+		if (ui->pushButtonSingle->isChecked()){
+			ui->pushButtonSingle->setChecked(false);
+			Q_EMIT isRunning(false);
+		}
 	}
 	if(autosetRequested)
 	{
@@ -3040,6 +3076,69 @@ void Oscilloscope::singleCaptureDone()
 			autosetMinAmpl = minVolts;
 			autosetNextStep();
 		}
+	}
+}
+
+void Oscilloscope::onFilledScreen(bool full)
+{
+	d_shouldResetStreaming = full;
+	resetStreamingFlag(full);
+}
+
+void Oscilloscope::resetStreamingFlag(bool enable)
+{
+	if (enable != adc->getTrigger()->getStreamingFlag()) {
+		bool started = iio->started();
+		if (started)
+			iio->lock();
+
+		adc->getTrigger()->setStreamingFlag(false);
+		cleanBuffersAllSinks();
+		if (started)
+			iio->unlock();
+		if (enable) {
+			adc->getTrigger()->setStreamingFlag(true);
+		}
+
+		/* Single capture done */
+		if (plot_samples_sequentially && d_shouldResetStreaming) {
+			Q_EMIT activateExportButton();
+			if (ui->pushButtonSingle->isChecked() && started){
+				ui->pushButtonSingle->setChecked(false);
+				Q_EMIT isRunning(false);
+			}
+		}
+		d_shouldResetStreaming = false;
+	}
+}
+
+void Oscilloscope::cleanBuffersAllSinks()
+{
+	this->qt_time_block->clean_buffers();
+
+	auto it = math_sinks.constBegin();
+	while (it != math_sinks.constEnd()) {
+		scope_sink_f::sptr math_sink = dynamic_pointer_cast<
+				scope_sink_f>(it.value().second);
+		math_sink->clean_buffers();
+		++it;
+	}
+	qt_fft_block->clean_buffers();
+}
+
+void Oscilloscope::preparePlotSampleCount() {
+	if (timeBase->value() >= TIMEBASE_THRESHOLD) {
+		plot_samples_sequentially = true;
+		active_sample_count = -active_trig_sample_count;
+		setSinksDisplayOneBuffer(false);
+		plot.setXAxisNumPoints(active_plot_sample_count);
+		resetStreamingFlag(true);
+	} else {
+		plot_samples_sequentially = false;
+		setSinksDisplayOneBuffer(true);
+		plot.setXAxisNumPoints(0);
+		/* Reset the triggered && streaming flag */
+		resetStreamingFlag(false);
 	}
 }
 
