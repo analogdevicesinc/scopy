@@ -69,6 +69,8 @@ namespace adiscope {
 	d_fbuffers.push_back((float*)volk_malloc(d_buffer_size*sizeof(float),
                                                   volk_get_alignment()));
 	memset(d_fbuffers[n], 0, d_buffer_size*sizeof(float));
+
+        d_displayOneBuffer = true;
         d_cleanBuffers = true;
       }
 
@@ -204,6 +206,12 @@ namespace adiscope {
     }
 
     void
+    scope_sink_f_impl::set_displayOneBuffer(bool val)
+    {
+            d_displayOneBuffer = val;
+    }
+
+    void
     scope_sink_f_impl::_reset()
     {
       int n;
@@ -299,8 +307,12 @@ namespace adiscope {
 
       gr::thread::scoped_lock lock(d_setlock);
 
+      if (!d_displayOneBuffer && !d_cleanBuffers) {
+              return 0;
+      }
       int nfill = d_end - d_index;                 // how much room left in buffers
       int nitems = std::min(noutput_items, nfill); // num items we can put in buffers
+      int nItemsToSend = 0;
 
       // If tag trigger, look for the trigger
       if((d_trigger_mode != TRIG_MODE_FREE) && !d_triggered) {
@@ -329,31 +341,46 @@ namespace adiscope {
       d_index += nitems;
 
       // If we've have a full d_size of items in the buffers, plot.
-      if((d_triggered) && (d_index == d_end) && d_end != 0) {
-        // Copy data to be plotted to start of buffers.
-        for(n = 0; n < d_nconnections; n++) {
-          //memmove(d_buffers[n], &d_buffers[n][d_start], d_size*sizeof(double));
-          volk_32f_convert_64f(d_buffers[n], &d_fbuffers[n][d_start], d_size);
-        }
+      if((d_end != 0 && !d_displayOneBuffer) ||
+                      ((d_triggered) && (d_index == d_end) && d_end != 0 && d_displayOneBuffer)) {
+              // Copy data to be plotted to start of buffers.
+              for(n = 0; n < d_nconnections; n++) {
+                      if (!d_displayOneBuffer) {
+                              nItemsToSend = d_index;
+                              if (nItemsToSend >= d_size) {
+                                      nItemsToSend = d_size;
+                                      d_cleanBuffers = false;
+                              }
+                              volk_32f_convert_64f(d_buffers[n], &d_fbuffers[n][d_start], nItemsToSend);
+                      } else {
+                              //memmove(d_buffers[n], &d_buffers[n][d_start], d_size*sizeof(double));
+                              volk_32f_convert_64f(d_buffers[n], &d_fbuffers[n][d_start], d_size);
+                              nItemsToSend = d_size;
+                      }
+              }
 
-        // Plot if we are able to update
-        if(gr::high_res_timer_now() - d_last_time > d_update_time) {
-          d_last_time = gr::high_res_timer_now();
-          if (d_qApplication)
-		d_qApplication->postEvent(this->plot,
-				    new IdentifiableTimeUpdateEvent(d_buffers, d_size, d_tags, d_name));
-	}
+              // Plot if we are able to update
+              if((gr::high_res_timer_now() - d_last_time > d_update_time)
+                              || !d_cleanBuffers) {
+                      d_last_time = gr::high_res_timer_now();
+                      if (d_qApplication) {
+                              d_qApplication->postEvent(this->plot,
+                                                        new IdentifiableTimeUpdateEvent(d_buffers,
+                                                                                        nItemsToSend,
+                                                                                        d_tags,
+                                                                                        d_name));
+                      }
+              }
 
-        // We've plotting, so reset the state
-        _reset();
+              // We've plotting, so reset the state
+              if (d_displayOneBuffer) {
+                      _reset();
+              }
       }
 
-      // If we've filled up the buffers but haven't triggered, reset.
-      if(d_index == d_end) {
-        _reset();
+      if (d_displayOneBuffer && d_index == d_end) {
+              _reset();
       }
-
       return nitems;
     }
-
 } /* namespace gr */

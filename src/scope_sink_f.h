@@ -56,6 +56,7 @@ namespace adiscope {
       virtual int nsamps() const = 0;
       virtual std::string name() const = 0;
       virtual void reset() = 0;
+      virtual void set_displayOneBuffer(bool) = 0;
       virtual void clean_buffers() = 0;
 
       QApplication *d_qApplication;

@@ -159,6 +159,7 @@ TimeDomainDisplayPlot::TimeDomainDisplayPlot(QWidget* parent, unsigned int xNumD
   d_sample_rate = 1;
   d_data_starting_point = 0.0;
   d_curves_hidden = false;
+  d_nbPtsXAxis = 0;
 
   // Reconfigure the bottom horizontal axis that was created by the base class
   configureAxis(QwtPlot::xBottom, 0);
@@ -447,6 +448,11 @@ void TimeDomainDisplayPlot::newData(const QEvent* updateEvent)
 	const std::vector< std::vector<gr::tag_t> > tags = tevent->getTags();
 	const std::string sender = tevent->senderName();
 
+	if ((d_nbPtsXAxis != 0) && (d_nbPtsXAxis <= numDataPoints)
+			&& sender == "Osc Time") {
+		Q_EMIT filledScreen(true);
+	}
+
 	this->plotNewData(sender,
 			dataPoints,
 			numDataPoints,
@@ -584,6 +590,11 @@ TimeDomainDisplayPlot::removeZoomer(unsigned int zoomerIdx)
 		if (d_zoomer[i]->isEnabled())
 			d_zoomer[i]->setAxes(QwtAxisId(QwtPlot::xBottom, 0), QwtAxisId(QwtPlot::yLeft, i));
 	}
+}
+
+void TimeDomainDisplayPlot::setXAxisNumPoints(unsigned int pts)
+{
+	d_nbPtsXAxis = pts;
 }
 
 void

@@ -89,7 +89,6 @@ public:
 		   const int64_t numDataPoints, const double timeInterval,
                    const std::vector< std::vector<gr::tag_t> > &tags \
 		   = std::vector< std::vector<gr::tag_t> >());
-
   void replot();
 
   void stemPlot(bool en);
@@ -116,10 +115,12 @@ public:
 
   void addZoomer(unsigned int zoomerIdx);
   void removeZoomer(unsigned int zoomerIdx);
+  void setXAxisNumPoints(unsigned int);
 
 Q_SIGNALS:
   void channelAdded(int);
   void newData();
+  void filledScreen(bool);
 
 public Q_SLOTS:
   void setSampleRate(double sr, double units,
@@ -198,6 +199,7 @@ private:
 
   SinkManager d_sinkManager;
 
+  unsigned int d_nbPtsXAxis;
   bool d_curves_hidden;
 
   QColor getChannelColor();
