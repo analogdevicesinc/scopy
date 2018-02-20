@@ -111,6 +111,7 @@ HardwareTrigger::HardwareTrigger(struct iio_device *trigg_dev) :
 	if (!m_delay_trigger) {
 		throw std::runtime_error("no delay trigger available");
 	}
+	setStreamingFlag(false);
 }
 
 uint HardwareTrigger::numChannels() const
@@ -339,6 +340,11 @@ int HardwareTrigger::delay() const
 void HardwareTrigger::setDelay(int delay)
 {
 	iio_channel_attr_write_longlong(m_delay_trigger, "delay", delay);
+}
+
+void HardwareTrigger::setStreamingFlag(bool val)
+{
+	iio_device_attr_write_bool(m_trigger_device, "streaming", val);
 }
 
 HardwareTrigger::settings_uptr HardwareTrigger::getCurrentHwSettings()

@@ -82,6 +82,8 @@ public:
 	std::unique_ptr<struct Settings> getCurrentHwSettings();
 	void setHwTriggerSettings(struct Settings *settings);
 
+	void setStreaming(bool);
+
 private:
 	struct iio_device *m_trigger_device;
 	QList<struct iio_channel *> m_analog_channels;
