@@ -219,9 +219,9 @@ namespace adiscope {
 		int autosetChannel;
 		bool autosetEnabled;
 		const int autosetSkippedTimeSamples = 3000;
-		const int autosetFFTSize = 16384;
-		const int autosetNrOfSkippedTones=250;
-		const int autosetValidTone = 500;
+		const int autosetFFTSize = 8192;
+		const int autosetNrOfSkippedTones=50;
+		const int autosetValidTone = 250;
 
 		Ui::Oscilloscope *ui;
 		Ui::OscGeneralSettings *gsettings_ui;
