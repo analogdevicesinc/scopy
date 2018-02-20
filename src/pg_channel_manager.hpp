@@ -290,8 +290,6 @@ public:
 	void clearHoverWidget();
 
 	void groupSplitSelected();
-	void retainWidgetSizeWhenHidden(QWidget *w);
-	void setWidgetNrOfChars(QWidget *w, int minNrOfChars, int maxNrOfChars=0);
 	bool eventFilter(QObject *object, QEvent *event);
 	void updatePlot();
 

@@ -22,6 +22,7 @@
 
 #include "utils.h"
 #include <QDebug>
+#include <QSizePolicy>
 
 QwtPickerDblClickPointMachine::QwtPickerDblClickPointMachine()
 #if QWT_VERSION < 0x060000
@@ -82,3 +83,25 @@ QwtDblClickPlotPicker::stateMachine(int n) const
 {
   return new QwtPickerDblClickPointMachine;
 }
+
+void Util::retainWidgetSizeWhenHidden(QWidget *w)
+{
+	QSizePolicy sp_retain = w->sizePolicy();
+	sp_retain.setRetainSizeWhenHidden(true);
+	w->setSizePolicy(sp_retain);
+}
+
+void Util::setWidgetNrOfChars(QWidget *w,
+		int minNrOfChars, int maxNrOfChars)
+{
+	QFontMetrics labelm(w->font());
+
+	auto label_min_width = labelm.width(QString(minNrOfChars,'X'));
+	w->setMinimumWidth(label_min_width);
+
+	if (maxNrOfChars!=0) {
+		auto label_max_width = labelm.width(QString(maxNrOfChars,'X'));
+		w->setMaximumWidth(label_max_width);
+	}
+}
+

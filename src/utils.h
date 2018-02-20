@@ -26,6 +26,7 @@
 #include <qevent.h>
 #include <qwt_plot_picker.h>
 #include <qwt_picker_machine.h>
+#include <QWidget>
 
 class QwtDblClickPlotPicker: public QwtPlotPicker
 {
@@ -54,6 +55,13 @@ public:
 #endif
     transition( const QwtEventPattern &eventPattern,
 				  const QEvent *e);
+};
+
+class Util
+{
+public:
+	static void retainWidgetSizeWhenHidden(QWidget *w);
+	static void setWidgetNrOfChars(QWidget *w, int minNrOfChars, int maxNrOfChars=0);
 };
 
 #endif /* M2K_UTILS_H */

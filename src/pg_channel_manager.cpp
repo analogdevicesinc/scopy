@@ -13,6 +13,7 @@
 #include <glib.h>
 #include "boost/math/common_factor.hpp"
 #include "libsigrokdecode/libsigrokdecode.h"
+#include <utils.h>
 
 #include "ui_pg_channel_group.h"
 #include "ui_pg_channel_manager.h"
@@ -211,7 +212,7 @@ void PatternGeneratorChannelUI::mouseMoveEvent(QMouseEvent *event)
 		this->setVisible(!getManagerUi()->pixmapGrab);
 
 		if (getManagerUi()->pixmapRetainSize) {
-			getManagerUi()->retainWidgetSizeWhenHidden(this);
+			Util::retainWidgetSizeWhenHidden(this);
 		}
 
 		drag->setPixmap(pix);
@@ -741,7 +742,7 @@ void PatternGeneratorChannelGroupUI::mouseMoveEvent(QMouseEvent *event)
 		this->setVisible(!getManagerUi()->pixmapGrab);
 
 		if (getManagerUi()->pixmapRetainSize) {
-			getManagerUi()->retainWidgetSizeWhenHidden(this);
+			Util::retainWidgetSizeWhenHidden(this);
 		}
 
 		drag->setPixmap(pix);
@@ -1509,28 +1510,6 @@ PatternGeneratorChannelManagerUI::~PatternGeneratorChannelManagerUI()
 {
 	delete ui;
 }
-
-void PatternGeneratorChannelManagerUI::retainWidgetSizeWhenHidden(QWidget *w)
-{
-	QSizePolicy sp_retain = w->sizePolicy();
-	sp_retain.setRetainSizeWhenHidden(true);
-	w->setSizePolicy(sp_retain);
-}
-
-void PatternGeneratorChannelManagerUI::setWidgetNrOfChars(QWidget *w,
-                int minNrOfChars, int maxNrOfChars)
-{
-	QFontMetrics labelm(w->font());
-
-	auto label_min_width = labelm.width(QString(minNrOfChars,'X'));
-	w->setMinimumWidth(label_min_width);
-
-	if (maxNrOfChars!=0) {
-		auto label_max_width = labelm.width(QString(maxNrOfChars,'X'));
-		w->setMaximumWidth(label_max_width);
-	}
-}
-
 QFrame *PatternGeneratorChannelManagerUI::addSeparator(QVBoxLayout *lay,
                 int pos)
 {
@@ -1541,7 +1520,7 @@ QFrame *PatternGeneratorChannelManagerUI::addSeparator(QVBoxLayout *lay,
 	line->setFrameShape(QFrame::HLine);
 	line->setStyleSheet("color: rgba(255,255,255,50);");
 	lay->insertWidget(pos,line);
-	retainWidgetSizeWhenHidden(line);
+	Util::retainWidgetSizeWhenHidden(line);
 	line->setVisible(false);
 	return line;
 }
@@ -1594,8 +1573,8 @@ void PatternGeneratorChannelManagerUI::updateUi()
 	channelManagerHeaderWiget->ensurePolished();
 	ensurePolished();
 
-	setWidgetNrOfChars(chmHeader->labelName, channelGroupLabelMaxLength);
-	setWidgetNrOfChars(chmHeader->labelDIO, dioLabelMaxLength);
+	Util::setWidgetNrOfChars(chmHeader->labelName, channelGroupLabelMaxLength);
+	Util::setWidgetNrOfChars(chmHeader->labelDIO, dioLabelMaxLength);
 	chmHeader->labelView->setMinimumWidth(40);
 	chmHeader->labelSelect->setMinimumWidth(40);
 
@@ -1621,10 +1600,10 @@ void PatternGeneratorChannelManagerUI::updateUi()
 		currentChannelGroupUI->ensurePolished();
 		currentChannelGroupUI->topSep = prevSep;
 
-		retainWidgetSizeWhenHidden(currentChannelGroupUI->ui->collapseBtn);
-		retainWidgetSizeWhenHidden(currentChannelGroupUI->ui->splitBtn);
+		Util::retainWidgetSizeWhenHidden(currentChannelGroupUI->ui->collapseBtn);
+		Util::retainWidgetSizeWhenHidden(currentChannelGroupUI->ui->splitBtn);
 
-		setWidgetNrOfChars(currentChannelGroupUI->ui->ChannelGroupLabel,
+		Util::setWidgetNrOfChars(currentChannelGroupUI->ui->ChannelGroupLabel,
 		                   channelGroupLabelMaxLength);
 
 		QString channelGroupLabel = QString().fromStdString(ch->get_label());
@@ -1635,7 +1614,7 @@ void PatternGeneratorChannelManagerUI::updateUi()
 		}
 
 		currentChannelGroupUI->ui->ChannelGroupLabel->setText(channelGroupLabel);
-		setWidgetNrOfChars(currentChannelGroupUI->ui->DioLabel, dioLabelMaxLength);
+		Util::setWidgetNrOfChars(currentChannelGroupUI->ui->DioLabel, dioLabelMaxLength);
 
 		int i = 0;
 
@@ -1697,13 +1676,13 @@ void PatternGeneratorChannelManagerUI::updateUi()
 					currentChannelUI->topSep = prevSep;
 					prevSep =  currentChannelUI->botSep;
 
-					retainWidgetSizeWhenHidden(currentChannelUI->ui->collapseBtn);
-					retainWidgetSizeWhenHidden(currentChannelUI->ui->wgChannelEnableGroup);
-					retainWidgetSizeWhenHidden(currentChannelUI->ui->selectBox);
+					Util::retainWidgetSizeWhenHidden(currentChannelUI->ui->collapseBtn);
+					Util::retainWidgetSizeWhenHidden(currentChannelUI->ui->wgChannelEnableGroup);
+					Util::retainWidgetSizeWhenHidden(currentChannelUI->ui->selectBox);
 
-					setWidgetNrOfChars(currentChannelUI->ui->ChannelGroupLabel,
+					Util::setWidgetNrOfChars(currentChannelUI->ui->ChannelGroupLabel,
 					                   channelGroupLabelMaxLength);
-					setWidgetNrOfChars(currentChannelUI->ui->DioLabel, dioLabelMaxLength);
+					Util::setWidgetNrOfChars(currentChannelUI->ui->DioLabel, dioLabelMaxLength);
 
 					currentChannelUI->ui->wgChannelEnableGroup->setVisible(false);
 					currentChannelUI->ui->collapseBtn->setVisible(false);
