@@ -1436,7 +1436,6 @@ void Oscilloscope::on_actionClose_triggered()
 
 void Oscilloscope::toggle_blockchain_flow(bool en)
 {
-	qDebug()<<"toggle blockchain flow " << en;
 	if (en) {
 		if(active_sample_count < fft_size && fft_is_visible)
 			for (unsigned int i = 0; i < nb_channels; i++)
@@ -1480,7 +1479,6 @@ void Oscilloscope::toggle_blockchain_flow(bool en)
 
 void Oscilloscope::runStopToggled(bool checked)
 {
-	qDebug()<<"runStopToggle";
 	QPushButton *btn = static_cast<QPushButton *>(QObject::sender());
 	setDynamicProperty(btn, "running", checked);
 
@@ -3008,34 +3006,39 @@ void Oscilloscope::singleCaptureDone()
 	}
 	if(autosetRequested)
 	{
-		toggle_blockchain_flow(false);
-		double max=-INFINITY;
-		size_t maxindex;
-		// try skipping the DC offset tones and last few tones that cause
-		// weird results
-		for(int j=autosetNrOfSkippedTones ;j<((autoset_fft_size/2)-5);j++) {
-		    if(autosetFFTSink->data()[j] > max) {
-			    max = autosetFFTSink->data()[j];
-			    maxindex=j;
-		    }
-		}
-		double maxVolts = -INFINITY;
-		double minVolts = INFINITY;
+		if(autosetFFTSink->data().size())
+		{
+			toggle_blockchain_flow(false);
+			double max=-INFINITY;
+			size_t maxindex=1;
+			// try skipping the DC offset tones and last few tones that cause
+			// weird results
 
-		for(auto j=autosetSkippedTimeSamples;j<active_sample_count;j++) {
-			auto data = plot.Curve(autosetChannel)->data()->sample(j).y();
-			if(data > maxVolts)
-				maxVolts = data;
-			if(data < minVolts)
-				minVolts = data;
-		}
+			for(int j=autosetNrOfSkippedTones ;j<((autoset_fft_size/2)-5);j++) {
+				if(autosetFFTSink->data()[j] > max) {
+				    max = autosetFFTSink->data()[j];
+				    maxindex=j;
+			    }
+			}
+			double maxVolts = -INFINITY;
+			double minVolts = INFINITY;
 
-		double frequency = (maxindex) * (active_sample_rate/autoset_fft_size);
-		autosetFFTIndex = maxindex;
-		autosetFrequency = frequency;
-		autosetMaxAmpl = maxVolts;
-		autosetMinAmpl = minVolts;
-		autosetNextStep();
+			for(auto j=autosetSkippedTimeSamples;j<active_sample_count;j++) {
+				auto data = plot.Curve(autosetChannel)->data()->sample(j).y();
+				if(data > maxVolts)
+					maxVolts = data;
+				if(data < minVolts)
+					minVolts = data;
+			}
+
+			double frequency = (maxindex) * (active_sample_rate/autoset_fft_size);
+
+			autosetFFTIndex = maxindex;
+			autosetFrequency = frequency;
+			autosetMaxAmpl = maxVolts;
+			autosetMinAmpl = minVolts;
+			autosetNextStep();
+		}
 	}
 }
 
