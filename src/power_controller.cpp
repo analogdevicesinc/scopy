@@ -161,7 +161,10 @@ void PowerController::dac1_set_value(double value)
 	double offset = calibrationParam[QString("offset_pos_dac")];
 	double gain = calibrationParam[QString("gain_pos_dac")];
 
-	long long val = (value - offset)  * 4095.0 / (5.02 * 1.2 * gain);
+	long long val = (value + offset)  * 4095.0 / (5.02 * 1.2 * gain);
+
+	if (val < 0 )
+		val = 0;
 
 	iio_channel_attr_write_longlong(ch1w, "raw", val);
 
@@ -178,6 +181,9 @@ void PowerController::dac2_set_value(double value)
 	double gain = calibrationParam[QString("gain_neg_dac")];
 
 	long long val = (value - offset) * 4095.0 / (-5.1 * 1.2 * gain);
+
+	if (val < 0 )
+		val = 0;
 
 	iio_channel_attr_write_longlong(ch2w, "raw", val);
 }
@@ -256,11 +262,11 @@ void PowerController::update_lcd()
 	iio_channel_attr_read_longlong(ch1r, "raw", &val1);
 	iio_channel_attr_read_longlong(ch2r, "raw", &val2);
 
-	double value1 = ((double) val1 * 6.4 * gain1 / 4095.0) - offset1;
+	double value1 = (((double) val1 * 6.4 / 4095.0) - offset1) * gain1;
 	ui->lcd1->display(value1);
 	ui->scale_dac1->setValue(value1);
 
-	double value2 = ((double) val2 * -6.4 * gain2 / 4095.0) - offset2;
+	double value2 = (((double) val2 * (-6.4)  / 4095.0) - offset2) * gain2;
 	ui->lcd2->display(value2);
 	ui->scale_dac2->setValue(value2);
 
