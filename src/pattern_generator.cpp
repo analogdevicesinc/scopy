@@ -200,6 +200,8 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 	        SLOT(updateBufferSize()));
 	connect(pgSettings->LE_SampleRate,SIGNAL(editingFinished()),this,
 	        SLOT(updateSampleRate()));
+
+	pgSettings->PB_Reset->setVisible(false);
 	connect(pgSettings->PB_Reset,SIGNAL(clicked(bool)),this,
 	        SLOT(resetPGToDefault()));
 

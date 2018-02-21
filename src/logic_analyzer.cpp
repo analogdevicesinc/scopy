@@ -352,6 +352,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 		this, SLOT(setCursorsActive(bool)));
 	connect(main_win->view_, SIGNAL(resized()),
 		this, SLOT(resizeEvent()));
+	ui->btnResetInstrument->setVisible(false);
 	connect(ui->btnResetInstrument, SIGNAL(clicked(bool)),
 		this, SLOT(resetInstrumentToDefault()));
 	connect(trigger_settings_ui->btnAuto, SIGNAL(toggled(bool)),
