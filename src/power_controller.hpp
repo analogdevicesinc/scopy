@@ -51,6 +51,8 @@ namespace adiscope {
 		Q_OBJECT
 
 	public:
+		const int AVERAGE_COUNT = 5;
+
 		explicit PowerController(struct iio_context *ctx,
 				QPushButton *runButton, QJSEngine *engine,
 				ToolLauncher *parent = 0);
@@ -73,6 +75,8 @@ namespace adiscope {
 		struct iio_channel *ch1w, *ch2w, *ch1r, *ch2r, *pd_pos, *pd_neg;
 		QTimer timer;
 		bool in_sync;
+		QList<long long> averageVoltageCh1;
+		QList<long long> averageVoltageCh2;
 
 		PositionSpinButton *valuePos, *valueNeg;
 		QMap<QString, double> calibrationParam;

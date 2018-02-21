@@ -161,17 +161,19 @@ void PowerController::dac1_set_value(double value)
 	double offset = calibrationParam[QString("offset_pos_dac")];
 	double gain = calibrationParam[QString("gain_pos_dac")];
 
-	long long val = (value + offset)  * 4095.0 / (5.02 * 1.2 * gain);
+	long long val = (value * gain + offset)  * 4095.0 / (5.02 * 1.2 ) ;
 
 	if (val < 0 )
 		val = 0;
 
 	iio_channel_attr_write_longlong(ch1w, "raw", val);
+	averageVoltageCh1.clear();
 
 	if (in_sync) {
 		value = -value * ui->trackingRatio->value() / 100.0;
 		ui->valueNeg->setValue(value);
 		dac2_set_value(value);
+		averageVoltageCh2.clear();
 	}
 }
 
@@ -180,17 +182,19 @@ void PowerController::dac2_set_value(double value)
 	double offset = calibrationParam[QString("offset_neg_dac")];
 	double gain = calibrationParam[QString("gain_neg_dac")];
 
-	long long val = (value - offset) * 4095.0 / (-5.1 * 1.2 * gain);
+	long long val = (value * gain + offset) * 4095.0 / (-5.1 * 1.2 );
 
 	if (val < 0 )
 		val = 0;
 
 	iio_channel_attr_write_longlong(ch2w, "raw", val);
+	averageVoltageCh2.clear();
 }
 
 void PowerController::dac1_set_enabled(bool enabled)
 {
 	iio_channel_attr_write_bool(ch1w, "powerdown", !enabled);
+	averageVoltageCh1.clear();
 
 	if (in_sync)
 		dac2_set_enabled(enabled);
@@ -214,6 +218,7 @@ void PowerController::dac1_set_enabled(bool enabled)
 void PowerController::dac2_set_enabled(bool enabled)
 {
 	iio_channel_attr_write_bool(ch2w, "powerdown", !enabled);
+	averageVoltageCh2.clear();
 
 	if (pd_neg) { /* For HW Rev. >= C */
 		run_button->setChecked(enabled);
@@ -258,15 +263,32 @@ void PowerController::update_lcd()
 	double gain2 = calibrationParam[QString("gain_neg_adc")];
 
 	long long val1 = 0, val2 = 0;
+	double average1 = 0, average2 = 0;
 
 	iio_channel_attr_read_longlong(ch1r, "raw", &val1);
 	iio_channel_attr_read_longlong(ch2r, "raw", &val2);
 
-	double value1 = (((double) val1 * 6.4 / 4095.0) - offset1) * gain1;
+	averageVoltageCh1.push_back(val1);
+	averageVoltageCh2.push_back(val2);
+
+	if(averageVoltageCh1.length() > AVERAGE_COUNT)
+		averageVoltageCh1.pop_front();
+	if(averageVoltageCh2.length() > AVERAGE_COUNT)
+		averageVoltageCh2.pop_front();
+
+	for (int i = 0; i < averageVoltageCh1.size(); ++i)
+		average1 += averageVoltageCh1.at(i);
+	for (int i = 0; i < averageVoltageCh2.size(); ++i)
+		average2 += averageVoltageCh2.at(i);
+
+	average1  /= averageVoltageCh1.length();
+	average2  /= averageVoltageCh2.length();
+
+	double value1 = (((double) average1 * 6.4 / 4095.0) + offset1) * gain1;
 	ui->lcd1->display(value1);
 	ui->scale_dac1->setValue(value1);
 
-	double value2 = (((double) val2 * (-6.4)  / 4095.0) - offset2) * gain2;
+	double value2 = (((double) average2 * (-6.4)  / 4095.0) + offset2) * gain2;
 	ui->lcd2->display(value2);
 	ui->scale_dac2->setValue(value2);
 

@@ -42,11 +42,6 @@ class CalibrationTemplate;
 
 namespace adiscope {
 
-#define SUPPLY_100MV_VALUE 0
-#define SUPPLY_4_5V_VALUE 4.5
-#define SUPPLY_100MV_NEG_VALUE 0
-#define SUPPLY_4_5V_NEG_VALUE -4.5
-
 struct stCalibStory {
 	int calibProcedure;
 	int calibStep;
@@ -124,6 +119,11 @@ private Q_SLOTS:
 	void on_finishButton_clicked();
 
 private:
+	const double SUPPLY_100MV_VALUE = 0.1;
+	const double SUPPLY_4_5V_VALUE = 4.5;
+	const double SUPPLY_100MV_NEG_VALUE = -0.1;
+	const double SUPPLY_4_5V_NEG_VALUE = -4.5;
+
 	Ui::ManualCalibration *ui;
 	struct iio_channel *ch1w, *ch2w, *ch1r, *ch2r, *pd_pos, *pd_neg;
 	Ui::CalibrationTemplate *TempUi;
