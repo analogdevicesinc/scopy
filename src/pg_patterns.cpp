@@ -474,7 +474,10 @@ ClockPatternUI::ClockPatternUI(ClockPattern *pattern,
 		{"MHz", 1E+6}
 	}, "Frequency", 1e0, PGMaxSampleRate/2,true,false,this, {1,2.5,5});
 	ui->verticalLayout->addWidget(frequencySpinButton);
-	phaseSpinButton = new PhaseSpinButton(this);
+	phaseSpinButton = new PhaseSpinButton({
+		{"deg",1},
+		{"π rad",180}
+	},"Phase",0,360,true,true,this);
 	phaseSpinButton->setFineModeAvailable(false);
 	ui->verticalLayout->addWidget(phaseSpinButton);
 	dutySpinButton = new PositionSpinButton({{"%",1}},"Duty",0,100,true,false,this);
@@ -573,7 +576,7 @@ void ClockPatternUI::parse_ui()
 
 
 	auto phasestep=360.0/ (PGMaxSampleRate / pattern->get_frequency());
-	phasestep=(phasestep>1?phasestep:1);
+	phasestep=(phasestep>1 ? phasestep : 1);
 	phasestep=floor(phasestep*360+0.5)/360.0;
 	auto phaseval = requestedPhase;
 	phaseval = floor((phaseval/phasestep)+0.5)*phasestep;
