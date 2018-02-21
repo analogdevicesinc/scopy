@@ -290,7 +290,7 @@ color: rgb(255, 255, 255);
             <x>0</x>
             <y>0</y>
             <width>200</width>
-            <height>467</height>
+            <height>463</height>
            </rect>
           </property>
           <property name="minimumSize">
@@ -779,8 +779,8 @@ QPushButton:pressed {
 background-color: #F45000;
 }
 QPushButton[connected=true] {
-background-color: green;
-qproperty-text: &quot;Connected&quot;;
+/*background-color: green;*/
+qproperty-text: &quot;Disconnect&quot;;
 }
 QPushButton[failed=true] {
 background-color: red;
@@ -883,7 +883,7 @@ font-weight: bold;
                   </property>
                   <property name="minimumSize">
                    <size>
-                    <width>78</width>
+                    <width>102</width>
                     <height>64</height>
                    </size>
                   </property>
