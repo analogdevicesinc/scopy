@@ -15,7 +15,7 @@
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
-    <widget class="QWidget" name="ListWidget" native="true">
+    <widget class="adiscope::DetachDragZone" name="ListWidget" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
        <widget class="QTabWidget" name="tabWidget">
@@ -57,7 +57,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QWidget" name="SideBar" native="true">
+    <widget class="adiscope::DetachDragZone" name="SideBar" native="true">
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
        <widget class="QPushButton" name="loadButton">
@@ -91,6 +91,14 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>adiscope::DetachDragZone</class>
+   <extends>QWidget</extends>
+   <header>detachdragzone.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
