@@ -805,6 +805,7 @@ void SignalGenerator::frequencyChanged(double value)
 			ptr->phase = phase->value();
 		}
 		ptr->frequency = value;
+		ui->phase->setFrequency(value);
 		resetZoom();
 	}
 }
