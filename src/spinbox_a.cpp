@@ -547,11 +547,11 @@ PositionSpinButton::PositionSpinButton(QWidget *parent) : SpinBoxA(parent),
 }
 
 PositionSpinButton::PositionSpinButton(vector<pair<QString, double> >units,
-                                       const QString& name,
-                                       double min_value, double max_value,
-                                       bool hasProgressWidget, bool invertCircle, QWidget *parent):
+				       const QString& name,
+				       double min_value, double max_value,
+				       bool hasProgressWidget, bool invertCircle, QWidget *parent):
 	SpinBoxA(units, name, min_value, max_value,
-	         hasProgressWidget, invertCircle, parent),
+		 hasProgressWidget, invertCircle, parent),
 	m_step(1)
 {
 }
@@ -608,14 +608,29 @@ void PositionSpinButton::stepDown()
 	setValue(newVal);
 }
 
-PhaseSpinButton::PhaseSpinButton(QWidget *parent) : SpinBoxA(
-{ {"deg",1}, {"π rad",180}
-},"Phase",0,360,true,true,parent),
-m_step(15),
-m_fine_increment(1)
+PhaseSpinButton::PhaseSpinButton(QWidget *parent) : SpinBoxA(parent),
+	m_fine_increment(1),
+	m_inSeconds(false)
 {
 	ui->SBA_CompletionCircle->setIsLogScale(false);
 	ui->SBA_CompletionCircle->setOrigin(0);
+}
+
+PhaseSpinButton::PhaseSpinButton(std::vector<std::pair<QString, double> > units,
+				 const QString &name,
+				 double min_value, double max_value,
+				 bool hasProgressWidget,
+				 bool invertCircle, QWidget *parent):
+	SpinBoxA(units, name, min_value, max_value,
+		 hasProgressWidget, invertCircle, parent),
+	m_fine_increment(1),
+	m_inSeconds(false)
+{
+		ui->SBA_CompletionCircle->setIsLogScale(false);
+		setMinValue(min_value);
+		setMaxValue(max_value);
+		setFrequency(0.01);
+		ui->SBA_CompletionCircle->setOrigin(0);
 }
 
 void PhaseSpinButton::setValue(double value)
@@ -625,14 +640,18 @@ void PhaseSpinButton::setValue(double value)
 	if (isZero(value, 1E-12)) {
 		value = 0;
 	}
-
-	double period = 360;
-	int full_periods=value/period;
-	value = value - full_periods * period;
-
-	// Update line edit
 	int index;
-	auto scale = m_units.at(ui->SBA_Combobox->currentIndex()).second;
+	auto scale = inSeconds() ? findUnitOfValue(value, &index)
+				 : m_units.at(ui->SBA_Combobox->currentIndex()).second ;
+	double period = 360;
+
+	if (inSeconds()) {
+		value = computeSecondsTransformation(scale, index, value);
+	}
+	// Update line edit
+
+	int full_periods = value / period;
+	value -= full_periods * period;
 
 	if (value<0) {
 		value = value + period;
@@ -643,9 +662,12 @@ void PhaseSpinButton::setValue(double value)
 		emitValueChanged = true;
 	}
 
-	ui->SBA_LineEdit->setText(QString::number(round((m_value*10)/10) / scale));
+	if (!inSeconds()) {
+		ui->SBA_LineEdit->setText(QString::number(round((m_value * 10) / 10) / scale));
+	}
 
-	// Update line edit
+	// adjust scale for the ecurrent measure unit and handle unit measure change
+
 	if (emitValueChanged) {
 		Q_EMIT valueChanged(m_value);
 	}
@@ -653,43 +675,155 @@ void PhaseSpinButton::setValue(double value)
 
 void PhaseSpinButton::onComboboxIndexChanged(int index)
 {
+	if(index < 2) {
+		setInSeconds(false);
+	} else {
+		bool isGoingFromGradesToSeconds = false;
+		if (!inSeconds()) {
+			double period = 360;
+			m_secondsValue = m_value / frequency();
+			m_secondsValue /= period;
+			isGoingFromGradesToSeconds = true;
+		}
+		setInSeconds(true);
+		if (isGoingFromGradesToSeconds) {
+			setValue(m_secondsValue);
+
+		} else {
+			double value = ui->SBA_LineEdit->text().toDouble();
+			setValue(value * m_units[index].second);
+		}
+		return;
+	}
 	setValue(m_value);
+}
+
+void PhaseSpinButton::setInSeconds(bool val)
+{
+	m_inSeconds = val;
+}
+
+bool PhaseSpinButton::inSeconds()
+{
+	return m_inSeconds;
+}
+
+void PhaseSpinButton::setSecondsValue(double val)
+{
+	m_secondsValue = val;
+
+}
+
+double PhaseSpinButton::secondsValue()
+{
+	return m_secondsValue;
+}
+
+void PhaseSpinButton::setFrequency(double val)
+{
+	if (inSeconds()) {
+		updatePhaseAfterFrequenceChanged(val);
+	}
+	m_frequency = val;
+}
+
+double PhaseSpinButton::frequency()
+{
+	return m_frequency;
+}
+
+void PhaseSpinButton::updatePhaseAfterFrequenceChanged(double val)
+{
+	if (!inSeconds()) {
+		return;
+	}
+
+	double period = 360;
+	m_value = secondsValue() * period * val;
+
+	Q_EMIT valueChanged(m_value);
+}
+
+double PhaseSpinButton::computeSecondsTransformation(double scale, int index, double value)
+{
+	if (value < m_min_value) {
+		value = 0;
+	} else if (value > 10000) {
+		value = 10000;
+	}
+
+	double period = 360;
+	double number = value / scale;
+	double abs_number = qAbs(number);
+	int significant_digits = m_decimal_count;
+	if (abs_number >= 100) {
+		significant_digits += 3;
+	} else if (abs_number >= 10) {
+		significant_digits += 2;
+	} else if (abs_number >= 1) {
+		significant_digits += 1;
+	}
+
+	number *= m_displayScale;
+
+	if (value != 0) {
+		ui->SBA_Combobox->blockSignals(true);
+		ui->SBA_Combobox->setCurrentIndex(index);
+		if (index < 2) {
+			setInSeconds(false);
+		} else {
+			setInSeconds(true);
+		}
+		ui->SBA_Combobox->blockSignals(false);
+		ui->SBA_LineEdit->setText(QString::number(number, 'g',
+			significant_digits));
+		ui->SBA_LineEdit->setCursorPosition(0);
+	}
+
+	setSecondsValue(value);
+	value = secondsValue() * period * frequency();
+
+	return value;
 }
 
 void PhaseSpinButton::stepUp()
 {
 	double current_scale = m_units[ui->SBA_Combobox->currentIndex()].second;
 	double newVal;
-	double step = m_step;
+	double step = inSeconds() ? 10 * current_scale : 45;
 
 	if (isInFineMode()) {
-		step = 1;
+		step = inSeconds() ? 1 * current_scale : 1;;
+	}
+
+	if (inSeconds()) {
+		m_value = secondsValue();
 	}
 
 	newVal =  m_value + step;
 
+	ui->SBA_LineEdit->setText(QString::number(round((newVal * 10) / 10) / current_scale));
 	setValue(newVal);
 }
 
 void PhaseSpinButton::stepDown()
 {
-	double current_val = ui->SBA_LineEdit->text().toDouble();
 	double current_scale = m_units[ui->SBA_Combobox->currentIndex()].second;
 	double newVal;
-	double step = m_step;
+	double step = inSeconds()  ? 10 * current_scale : 45;
+
+	if (inSeconds()) {
+		m_value = secondsValue();
+	}
 
 	if (isInFineMode()) {
-		step = 1;
+		step = inSeconds()  ? 1 * current_scale : 1;
 	}
 
 	newVal = m_value - step;
 
+	ui->SBA_LineEdit->setText(QString::number(round((newVal * 10) / 10) / current_scale));
 	setValue(newVal);
-}
-
-double PhaseSpinButton:: step()
-{
-	return m_step;
 }
 
 void PhaseSpinButton::setStep(double step)
