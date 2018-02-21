@@ -174,10 +174,10 @@ class PositionSpinButton: public SpinBoxA
 public:
 	explicit PositionSpinButton(QWidget *parent = nullptr);
 	explicit PositionSpinButton(std::vector<std::pair<QString, double> >units,
-	                            const QString& name = "",
-	                            double min_value = 0.0, double max_value = 0.0,
-	                            bool hasProgressWidget = true,
-	                            bool invertCircle = false, QWidget *parent = 0);
+				    const QString& name ="",
+				    double min_value = 0.0, double max_value = 0.0,
+				    bool hasProgressWidget = true,
+				    bool invertCircle = false, QWidget *parent = 0);
 
 	double step();
 	void setStep(double);
@@ -196,8 +196,12 @@ class PhaseSpinButton: public SpinBoxA
 	Q_OBJECT
 public:
 	explicit PhaseSpinButton(QWidget *parent = nullptr);
+	explicit PhaseSpinButton(std::vector<std::pair<QString, double> >units,
+				 const QString& name ="",
+				 double min_value = 0.0, double max_value = 360.0,
+				 bool hasProgressWidget = true,
+				 bool invertCircle = false, QWidget *parent = 0);
 
-	double step();
 	void setStep(double);
 
 public Q_SLOTS:
@@ -206,11 +210,22 @@ public Q_SLOTS:
 
 	void setValue(double value);
 	void onComboboxIndexChanged(int index);
+	void updatePhaseAfterFrequenceChanged(double val);
+	double computeSecondsTransformation(double scale, int index, double value);
+	void setInSeconds(bool val);
+	bool inSeconds();
+	void setSecondsValue(double val);
+	double secondsValue();
+	void setFrequency(double val);
+	double frequency();
 
 protected:
 	std::vector<std::vector<double>> m_unit;
 	double m_step;
 	double m_fine_increment;
+	double m_frequency;
+	double m_secondsValue;
+	bool m_inSeconds;
 
 };
 
