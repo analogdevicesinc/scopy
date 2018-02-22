@@ -71,12 +71,15 @@ namespace adiscope {
 
 		int getNumSamples() const;
 
-		const QColor& getColor() const;
-		QString xTitle() const;
-		QString yTitle() const;
-        QWidget *bottomHandlesArea();
-        QString cursorIntersection(qreal text);
+	const QColor& getColor() const;
+	QString xTitle() const;
+	QString yTitle() const;
 
+	void toggleCursors(bool);
+	QString cursorIntersection(qreal text);
+Q_SIGNALS:
+	void VBar1PixelPosChanged(int);
+	void VBar2PixelPosChanged(int);
     public Q_SLOTS:
 		void plot(double x, double y);
 		void reset();
@@ -100,7 +103,8 @@ namespace adiscope {
         void onVbar1PixelPosChanged(int pos);
         void onVbar2PixelPosChanged(int pos);
 
-        void toggleCursors(bool);
+        void onCursor1PositionChanged(int pos);
+        void onCursor2PositionChanged(int pos);
 
         void onCursor1Moved(int);
         void onCursor2Moved(int);
@@ -121,11 +125,7 @@ namespace adiscope {
 		CustomFifo<double> xdata, ydata;
 
         SymbolController *d_symbolCtrl;
-        HorizHandlesArea *d_bottomHandlesArea;
-
-        PlotLineHandleH *d_hCursorHandle1;
         VertBar *d_vBar1;
-        PlotLineHandleH *d_hCursorHandle2;
         VertBar *d_vBar2;
 
         PlotPickerWrapper* picker;

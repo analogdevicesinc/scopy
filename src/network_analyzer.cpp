@@ -157,10 +157,33 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
     d_bottomHandlesArea->setLeftPadding(90);
     d_bottomHandlesArea->setRightPadding(20);
     d_bottomHandlesArea->setMinimumHeight(50);
+
     ui->gridLayout_plots->addWidget(&m_dBgraph,0,0,1,1);
     ui->gridLayout_plots->addWidget(&m_phaseGraph,1,0,1,1);
     ui->gridLayout_plots->addWidget(d_bottomHandlesArea,2,0,1,1);
 
+    d_hCursorHandle1 = new PlotLineHandleH(
+            QPixmap(":/icons/h_cursor_handle.svg"),
+            d_bottomHandlesArea);
+    d_hCursorHandle2 = new PlotLineHandleH(
+            QPixmap(":/icons/h_cursor_handle.svg"),
+            d_bottomHandlesArea);
+
+    QPen cursorsLinePen = QPen(QColor(155,155,155),1,Qt::DashLine);
+    d_hCursorHandle1->setPen(cursorsLinePen);
+    d_hCursorHandle2->setPen(cursorsLinePen);
+    d_hCursorHandle1->setVisible(false);
+    d_hCursorHandle2->setVisible(false);
+
+    connect(&m_dBgraph,SIGNAL(VBar1PixelPosChanged(int)),
+            SLOT(onVbar1PixelPosChanged(int)));
+    connect(&m_dBgraph,SIGNAL(VBar2PixelPosChanged(int)),
+            SLOT(onVbar2PixelPosChanged(int)));
+
+    connect(d_hCursorHandle1, SIGNAL(positionChanged(int)),&m_dBgraph, SLOT(onCursor1PositionChanged(int)));
+    connect(d_hCursorHandle2, SIGNAL(positionChanged(int)),&m_dBgraph, SLOT(onCursor2PositionChanged(int)));
+    connect(d_hCursorHandle1, SIGNAL(positionChanged(int)),&m_phaseGraph, SLOT(onCursor1PositionChanged(int)));
+    connect(d_hCursorHandle2, SIGNAL(positionChanged(int)),&m_phaseGraph, SLOT(onCursor2PositionChanged(int)));
 
 	ui->maxFreq->setMaxValue((double) max_samplerate / 2.5 - 1.0);
 
@@ -170,9 +193,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 			this, SLOT(updateNumSamples()));
 	connect(ui->samplesCount, SIGNAL(valueChanged(double)),
 			this, SLOT(updateNumSamples()));
-    connect(ui->checkBox,SIGNAL(toggled(bool)),&m_dBgraph,
-            SLOT(toggleCursors(bool)));
-    connect(ui->checkBox,SIGNAL(toggled(bool)),&m_phaseGraph,
+    connect(ui->checkBox,SIGNAL(toggled(bool)),
             SLOT(toggleCursors(bool)));
 
 	api->setObjectName(QString::fromStdString(Filter::tool_name(
@@ -595,6 +616,27 @@ void NetworkAnalyzer::configHwForNetworkAnalyzing()
 		iio_device_attr_write_longlong(m2k_adc->iio_adc_dev(),
 			"oversampling_ratio", 1);
 	}
+}
+
+void NetworkAnalyzer::onVbar1PixelPosChanged(int pos)
+{
+    d_hCursorHandle1->setPositionSilenty(pos);
+}
+
+void NetworkAnalyzer::onVbar2PixelPosChanged(int pos)
+{
+    d_hCursorHandle2->setPositionSilenty(pos);
+}
+
+void NetworkAnalyzer::toggleCursors(bool en)
+{
+    if (d_cursorsEnabled != en) {
+        d_cursorsEnabled = en;
+        m_dBgraph.toggleCursors(en);
+        m_phaseGraph.toggleCursors(en);
+        d_hCursorHandle1->setVisible(en);
+        d_hCursorHandle2->setVisible(en);
+    }
 }
 
 double NetworkAnalyzer_API::getMinFreq() const
