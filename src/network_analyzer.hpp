@@ -70,6 +70,10 @@ namespace adiscope {
         dBgraph m_dBgraph;
         dBgraph m_phaseGraph;
 
+        PlotLineHandleH *d_hCursorHandle1;
+        PlotLineHandleH *d_hCursorHandle2;
+        bool d_cursorsEnabled;
+
         HorizHandlesArea *d_bottomHandlesArea;
 
 		QFuture<void> thd;
@@ -98,6 +102,10 @@ namespace adiscope {
 	private Q_SLOTS:
 		void startStop(bool start);
 		void updateNumSamples();
+
+        void toggleCursors(bool en);
+        void onVbar1PixelPosChanged(int pos);
+        void onVbar2PixelPosChanged(int pos);
 
 	Q_SIGNALS:
 		void sweepDone();

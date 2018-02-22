@@ -67,6 +67,7 @@ dBgraph::dBgraph(QWidget *parent) : QwtPlot(parent),
 	draw_y->setFloatPrecision(0);
 	draw_y->enableComponent(QwtAbstractScaleDraw::Ticks, false);
 	draw_y->enableComponent(QwtAbstractScaleDraw::Backbone, false);
+    draw_y->setMinimumExtent(50);
 	setAxisScaleDraw(QwtPlot::yLeft, draw_y);
 
 	/* Create 4 scales within the plot itself. Only draw the ticks */
@@ -143,16 +144,14 @@ dBgraph::dBgraph(QWidget *parent) : QwtPlot(parent),
 
 	picker = new PlotPickerWrapper(QwtPlot::xTop,QwtPlot::yLeft,this->canvas());
 
+    onCursor1Moved(0);
+    onCursor2Moved(0);
 }
 
 dBgraph::~dBgraph()
 {
 	delete formatter;
     delete picker;
-}
-
-QWidget* dBgraph::bottomHandlesArea(){
-    return d_bottomHandlesArea;
 }
 
 void dBgraph::setAxesScales(double xmin, double xmax, double ymin, double ymax)
@@ -323,17 +322,16 @@ void dBgraph::onCursor2PositionChanged(int pos)
 	pos = std::min(pos,QwtPlot::canvas()->width()-1);
 	d_vBar2->setPixelPosition(pos);
 	onCursor2Moved(pos);
-
 }
 
 void dBgraph::onVbar1PixelPosChanged(int pos)
 {
-    d_hCursorHandle1->setPositionSilenty(pos);
+	Q_EMIT VBar1PixelPosChanged(pos);
 }
 
 void dBgraph::onVbar2PixelPosChanged(int pos)
 {
-    d_hCursorHandle2->setPositionSilenty(pos);
+	Q_EMIT VBar2PixelPosChanged(pos);
 }
 
 void dBgraph::toggleCursors(bool en){
