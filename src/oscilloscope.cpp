@@ -3835,6 +3835,34 @@ void Oscilloscope_API::setTimeBase(double value)
 	osc->timeBase->setValue(value);
 }
 
+void Oscilloscope_API::setMemoryDepth(int val)
+{
+	bool ok = false;
+	unsigned long buffersize = 0;
+	int i = 0;
+	QString currentText;
+	for (i = 0; i < osc->ch_ui->cmbMemoryDepth->count(); i++) {
+		ok = false;
+		currentText = osc->ch_ui->cmbMemoryDepth->itemText(i);
+		buffersize = currentText.toInt(&ok);
+		if (ok && (val == buffersize)) {
+			break;
+		}
+	}
+	if (i >= osc->ch_ui->cmbMemoryDepth->count()) {
+		i = 0;
+	}
+	osc->ch_ui->cmbMemoryDepth->setCurrentIndex(i);
+}
+
+int Oscilloscope_API::getMemoryDepth()
+{
+	bool ok;
+	QString currentText = osc->ch_ui->cmbMemoryDepth->currentText();
+	unsigned long bufferSize = currentText.toInt(&ok);
+	return bufferSize;
+}
+
 bool Oscilloscope_API::running() const
 {
 	return osc->ui->pushButtonRunStop->isChecked();

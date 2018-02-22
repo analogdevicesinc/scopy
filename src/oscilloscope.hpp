@@ -463,6 +463,9 @@ namespace adiscope {
 			   WRITE setExportAll)
 		Q_PROPERTY(bool autoset_en READ autosetEnabled WRITE enableAutoset)
 
+		Q_PROPERTY(int memory_depth READ getMemoryDepth
+			   WRITE setMemoryDepth)
+
 	public:
 		explicit Oscilloscope_API(Oscilloscope *osc) :
 			ApiObject(), osc(osc) {}
@@ -565,6 +568,9 @@ namespace adiscope {
 
 		int getCursorsTransparency() const;
 		void setCursorsTransparency(int val);
+
+		int getMemoryDepth();
+		void setMemoryDepth(int val);
 
 	private:
 		Oscilloscope *osc;
