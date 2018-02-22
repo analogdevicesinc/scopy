@@ -3281,26 +3281,6 @@ void Oscilloscope::cleanBuffersAllSinks()
 	qt_fft_block->clean_buffers();
 }
 
-void Oscilloscope::preparePlotSampleCount() {
-	if (!symmBufferMode->isEnhancedMemDepth()) {
-		if (timeBase->value() >= TIMEBASE_THRESHOLD) {
-			plot_samples_sequentially = true;
-			if (active_sample_count != -active_trig_sample_count) {
-				active_sample_count = -active_trig_sample_count;
-				setSinksDisplayOneBuffer(false);
-				plot.setXAxisNumPoints(active_plot_sample_count);
-//				resetStreamingFlag(true);
-			}
-		} else {
-			plot_samples_sequentially = false;
-			setSinksDisplayOneBuffer(true);
-			plot.setXAxisNumPoints(0);
-			/* Reset the triggered && streaming flag */
-//			resetStreamingFlag(false);
-		}
-	}
-}
-
 void Oscilloscope::onIioDataRefillTimeout()
 {
 	if (trigger_settings.triggerMode() == TriggerSettings::AUTO)
