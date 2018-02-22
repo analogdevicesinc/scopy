@@ -105,8 +105,8 @@ font-weight: normal;
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>252</width>
-        <height>497</height>
+        <width>228</width>
+        <height>472</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -846,6 +846,29 @@ Attenuation</string>
         </layout>
        </item>
        <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QLabel" name="label_3">
+          <property name="styleSheet">
+           <string notr="true">color: rgba(255, 255, 255, 102);</string>
+          </property>
+          <property name="text">
+           <string>Memory depth</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="cmbMemoryDepth"/>
+        </item>
+       </layout>
+       </item>
+       <item>
         <spacer name="verticalSpacer_9">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -885,8 +908,8 @@ QPushButton:hover
          <property name="text">
           <string>Autoset</string>
          </property>
-        </widget>
-       </item>
+        </widget> 
+        </item>
        <item>
         <spacer name="verticalSpacer_2">
          <property name="orientation">

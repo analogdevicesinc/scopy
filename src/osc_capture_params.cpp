@@ -34,7 +34,8 @@ SymmetricBufferMode::SymmetricBufferMode() :
 	m_sampleRate(0.0),
 	m_triggPosSR(0.0),
 	m_visibleBufferSize(0),
-	m_triggerBufferSize(0)
+	m_triggerBufferSize(0),
+	m_enhancedMemoryDepth(false)
 {
 }
 
@@ -59,6 +60,8 @@ SymmetricBufferMode::captureParameters() const
 	params.sampleRate = sampleRate;
 	params.timePos = m_triggerPos;
 	params.triggerBufferSize = m_triggerBufferSize;
+	params.availableBufferSizes = m_availableBufferSizes;
+	params.maxBufferSize = m_triggerBufferSize;
 
 	return params;
 }
@@ -86,10 +89,26 @@ void SymmetricBufferMode::setTimeDivisionCount(int count)
 
 void SymmetricBufferMode::setTimeBase(double secsPerDiv)
 {
-	if (m_timeBase != secsPerDiv) {
+	if ((m_timeBase != secsPerDiv) || m_enhancedMemoryDepth) {
 		m_timeBase = secsPerDiv;
 		configParamsOnTimeBaseChanged();
 	}
+}
+
+void SymmetricBufferMode::setCustomBufferSize(unsigned long customSize)
+{
+	m_visibleBufferSize = customSize;
+	configParamsOnCustomSizeChanged();
+}
+
+bool SymmetricBufferMode::isEnhancedMemDepth()
+{
+	return m_enhancedMemoryDepth;
+}
+
+bool SymmetricBufferMode::setEnhancedMemDepth(bool val)
+{
+	m_enhancedMemoryDepth = val;
 }
 
 void SymmetricBufferMode::setTriggerPos(double pos)
@@ -108,11 +127,20 @@ void SymmetricBufferMode::configParamsOnTimeBaseChanged()
 	auto ratesIt = m_sampleRates.rbegin();
 	sampleRate = *ratesIt;
 
+	m_enhancedMemoryDepth = false;
+	m_availableBufferSizes.clear();
+
 	unsigned long bufferSize = getVisibleBufferSize(sampleRate);
 	while ((m_triggerBufferMaxSize < bufferSize) && (ratesIt !=
 			m_sampleRates.rend() - 1)) {
+		if (bufferSize <= m_entireBufferMaxSize) {
+			m_availableBufferSizes.insert(m_availableBufferSizes.begin(), bufferSize);
+		}
 		sampleRate = *(++ratesIt);
 		bufferSize = getVisibleBufferSize(sampleRate);
+	}
+	if (bufferSize <= m_entireBufferMaxSize) {
+		m_availableBufferSizes.insert(m_availableBufferSizes.begin(), bufferSize);
 	}
 
 	// The zero value of the trigger position (seconds) starts at the middle
@@ -148,8 +176,34 @@ void SymmetricBufferMode::configParamsOnTimeBaseChanged()
 	m_triggPosSR = sampleRate;
 }
 
+double SymmetricBufferMode::getSamplerateFor(unsigned long buffersize)
+{
+	double desiredSamplrate = buffersize / (m_timeBase * m_timeDivsCount);
+	auto ratesIt = m_sampleRates.begin();
+	double sampleRate = *ratesIt;
+
+	while ( sampleRate < desiredSamplrate && (ratesIt != m_sampleRates.end() - 1)) {
+		sampleRate = *(++ratesIt);
+	}
+	return sampleRate;
+}
+
+void SymmetricBufferMode::configParamsOnCustomSizeChanged()
+{
+	m_sampleRate = getSamplerateFor(m_visibleBufferSize);
+	m_triggerBufferSize = m_triggerBufferMaxSize;
+	m_triggPosSR = m_sampleRate;
+	/* Move trigger to left such that we have 8192 before the trigger */
+	m_triggerPos = (m_timeBase * m_timeDivsCount / 2) - (m_triggerBufferMaxSize/m_sampleRate);
+	m_enhancedMemoryDepth = true;
+}
+
+
 void SymmetricBufferMode::configParamsOnTriggPosChanged()
 {
+	if (m_enhancedMemoryDepth)
+		return;
+
 	m_visibleBufferSize = getVisibleBufferSize(m_sampleRate);
 
 	// The zero value of the trigger position (seconds) starts at the middle
