@@ -2209,7 +2209,7 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 
 	// Compute the appropriate value for fft_size
 	double power;
-	if (symmBufferMode->isEnhancedMemDepth()) {
+	if (symmBufferMode->isEnhancedMemDepth() || plot_samples_sequentially) {
 		power = floor(log2(active_plot_sample_count));
 	} else {
 		power = ceil(log2(active_plot_sample_count));
@@ -2334,7 +2334,7 @@ void adiscope::Oscilloscope::onTimePositionChanged(double value)
 
 	// Compute the appropriate value for fft_size
 	double power;
-	if (symmBufferMode->isEnhancedMemDepth()) {
+	if (symmBufferMode->isEnhancedMemDepth() || plot_samples_sequentially) {
 		power = floor(log2(active_plot_sample_count));
 	} else {
 		power = ceil(log2(active_plot_sample_count));
