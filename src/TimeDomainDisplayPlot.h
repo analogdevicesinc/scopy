@@ -120,7 +120,7 @@ public:
 Q_SIGNALS:
   void channelAdded(int);
   void newData();
-  void filledScreen(bool);
+  void filledScreen(bool, unsigned int);
 
 public Q_SLOTS:
   void setSampleRate(double sr, double units,

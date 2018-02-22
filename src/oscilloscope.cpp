@@ -105,6 +105,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	triggerAcCoupled(false),
 	autosetRequested(false),
 	autosetEnabled(true),
+	memory_adjusted_time_pos(0),
 	plot_samples_sequentially(false),
 	d_displayOneBuffer(true)
 {
@@ -124,6 +125,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	measure_settings_init();
 
 	fft_size = 1024;
+	fft_plot_size = 1024;
 	fft_plot.setNumPoints(0);
 
 	last_set_sample_count = 0;
@@ -134,7 +136,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	this->qt_time_block = adiscope::scope_sink_f::make(0, adc->sampleRate(),
 		"Osc Time", nb_channels, (QObject *)&plot);
 
-	this->qt_fft_block = adiscope::scope_sink_f::make(fft_size, adc->sampleRate(),
+	this->qt_fft_block = adiscope::scope_sink_f::make(fft_plot_size, adc->sampleRate(),
 			"Osc Frequency", nb_channels, (QObject *)&fft_plot);
 
 	this->qt_hist_block = adiscope::histogram_sink_f::make(1024, 100, 0, 20,
@@ -504,11 +506,15 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 			&trigger_settings, SLOT(autoTriggerEnable()));
 	connect(&plot, SIGNAL(newData()), this, SLOT(singleCaptureDone()));
 
-	connect(&plot, SIGNAL(filledScreen(bool)), this, SLOT(onFilledScreen(bool)));
+	connect(&plot, SIGNAL(filledScreen(bool, unsigned int)), this,
+		SLOT(onFilledScreen(bool, unsigned int)));
 
 	connect(&*iio, SIGNAL(timeout()),
 			SLOT(onIioDataRefillTimeout()));
 	connect(&plot, SIGNAL(newData()), this, SLOT(onPlotNewData()));
+
+	connect(ch_ui->cmbMemoryDepth, SIGNAL(currentTextChanged(QString)),
+		this, SLOT(onCmbMemoryDepthChanged(QString)));
 
 	if (nb_channels < 2)
 		gsettings_ui->XY_view->hide();
@@ -1509,6 +1515,10 @@ void Oscilloscope::runStopToggled(bool checked)
 	Q_EMIT activateExportButton();
 
 	if (checked) {
+		if (symmBufferMode->isEnhancedMemDepth()) {
+			onCmbMemoryDepthChanged(ch_ui->cmbMemoryDepth->currentText());
+		}
+
 		writeAllSettingsToHardware();
 
 		plot.setSampleRate(active_sample_rate, 1, "");
@@ -1527,15 +1537,18 @@ void Oscilloscope::runStopToggled(bool checked)
 			last_set_time_pos = active_time_pos;
 		}
 
-		if (timePosition->value() != active_time_pos)
+		if ((timePosition->value() != active_time_pos)
+				&& !symmBufferMode->isEnhancedMemDepth()) {
 			timePosition->setValue(active_time_pos);
+		}
 
 		toggle_blockchain_flow(true);
-		/* Reset the triggered && streaming flag */
-		resetStreamingFlag(plot_samples_sequentially);
+		resetStreamingFlag(symmBufferMode->isEnhancedMemDepth()
+				   || plot_samples_sequentially);
 	} else {
 		toggle_blockchain_flow(false);
-		resetStreamingFlag(plot_samples_sequentially);
+		resetStreamingFlag(symmBufferMode->isEnhancedMemDepth()
+				   || plot_samples_sequentially);
 		trigger_settings.setAdcRunningState(false);
 	}
 
@@ -1596,7 +1609,7 @@ void Oscilloscope::onFFT_view_toggled(bool visible)
 		iio->lock();
 
 	if (visible) {
-		qt_fft_block->set_nsamps(fft_size);
+		qt_fft_block->set_nsamps(fft_plot_size);
 		if (fft_is_visible) {
 			for (unsigned int i = 0; i < nb_channels; i++)
 				iio->disconnect(fft_ids[i]);
@@ -1605,7 +1618,7 @@ void Oscilloscope::onFFT_view_toggled(bool visible)
 		setFFT_params();
 		for (unsigned int i = 0; i < nb_channels; i++) {
 			auto fft = gnuradio::get_initial_sptr(
-					new fft_block(false, fft_size));
+					new fft_block(false, fft_plot_size));
 
 			auto ctm = blocks::complex_to_mag_squared::make(1);
 
@@ -1614,12 +1627,12 @@ void Oscilloscope::onFFT_view_toggled(bool visible)
 			iio->connect(fft, 0, ctm, 0);
 			iio->connect(ctm, 0, qt_fft_block, i);
 
-			if (ui->pushButtonRunStop->isChecked())
+			if(started)
 				iio->start(fft_ids[i]);
 		}
 
 		for (unsigned int i = 0; i < nb_channels; i++) {
-			iio->set_buffer_size(fft_ids[i], fft_size);
+			iio->set_buffer_size(fft_ids[i], active_sample_count);
 		}
 
 		ui->container_fft_plot->show();
@@ -2005,6 +2018,93 @@ void adiscope::Oscilloscope::onVertScaleValueChanged(double value)
 }
 
 
+void Oscilloscope::onCmbMemoryDepthChanged(QString value)
+{
+	bool ok, started;
+	unsigned long bufferSize = value.toInt(&ok);
+	if (!ok) {
+		ch_ui->cmbMemoryDepth->setCurrentIndex(0);
+		return;
+	}
+
+	if (ch_ui->cmbMemoryDepth->currentIndex() == 0) {
+		onHorizScaleValueChanged(timeBase->value());
+		return;
+	}
+
+	started = iio->started();
+	if (started) {
+		toggle_blockchain_flow(false);
+	}
+
+	symmBufferMode->setCustomBufferSize(bufferSize);
+	SymmetricBufferMode::capture_parameters params = symmBufferMode->captureParameters();
+	memory_adjusted_time_pos = params.timePos;
+	timePosition->setValue(params.timePos);
+	active_time_pos = params.timePos;
+	active_sample_rate = params.sampleRate;
+	active_plot_sample_count = params.entireBufferSize;
+	active_sample_count = params.maxBufferSize;
+	active_trig_sample_count = -(long long)params.triggerBufferSize;
+	plot_samples_sequentially = false;
+
+	if (timeBase->value() < TIMEBASE_THRESHOLD) {
+		active_sample_count = active_plot_sample_count;
+		setSinksDisplayOneBuffer(true);
+	} else  {
+		setSinksDisplayOneBuffer(false);
+	}
+
+	plot.replot();
+	plot.setXAxisNumPoints(bufferSize);
+	plot.setHorizOffset(params.timePos);
+	plot.setDataStartingPoint(active_trig_sample_count);
+	plot.resetXaxisOnNextReceivedData();
+	plot.zoomBaseUpdate();
+
+	if (zoom_level == 0) {
+		noZoomXAxisWidth = plot.axisInterval(QwtPlot::xBottom).width();
+	}
+
+	setFFT_params(true);
+	setAllSinksSampleCount(active_plot_sample_count);
+
+	plot.setSampleRate(active_sample_rate, 1, "");
+	plot.setBufferSizeLabelValue(active_plot_sample_count);
+	plot.setSampleRatelabelValue(active_sample_rate);
+
+	adc->setSampleRate(active_sample_rate);
+	trigger_settings.setTriggerDelay(active_trig_sample_count);
+	last_set_time_pos = active_time_pos;
+	last_set_sample_count = active_plot_sample_count;
+
+	for (unsigned int i = 0; i < nb_channels; i++) {
+		iio->set_buffer_size(ids[i], active_sample_count);
+	}
+
+	for(int ch = 0; ch < nb_channels; ch++) {
+		configureAcCoupling(ch, chnAcCoupled.at(ch));
+	}
+
+	// Compute the appropriate value for fft_size
+	double power;
+	if (symmBufferMode->isEnhancedMemDepth() || plot_samples_sequentially) {
+		power = floor(log2(active_plot_sample_count));
+	} else {
+		power = ceil(log2(active_plot_sample_count));
+	}
+	fft_plot_size = pow(2, power);
+	fft_size = active_sample_count;
+	onFFT_view_toggled(fft_is_visible);
+
+	updateBufferPreviewer();
+	if (started) {
+		writeAllSettingsToHardware();
+		toggle_blockchain_flow(true);
+	}
+	resetStreamingFlag(true);
+}
+
 void Oscilloscope::setSinksDisplayOneBuffer(bool val)
 {
 	d_displayOneBuffer = val;
@@ -2030,6 +2130,14 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 	active_plot_sample_count = active_sample_count;
 	active_trig_sample_count = -(long long)params.triggerBufferSize;
 	active_time_pos = -params.timePos;
+	memory_adjusted_time_pos = -params.timePos;
+
+	ch_ui->cmbMemoryDepth->blockSignals(true);
+	ch_ui->cmbMemoryDepth->clear();
+	for (auto item : params.availableBufferSizes) {
+		ch_ui->cmbMemoryDepth->addItem(QString::number(item));
+	}
+	ch_ui->cmbMemoryDepth->blockSignals(false);
 
 	// Realign plot data based on the new sample count and trigger position
 	plot.setHorizUnitsPerDiv(value);
@@ -2039,7 +2147,21 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 	plot.zoomBaseUpdate();
 	plot.setXAxisNumPoints(0);
 
-	preparePlotSampleCount();
+	ch_ui->cmbMemoryDepth->setCurrentIndex(0);
+	if (timeBase->value() >= TIMEBASE_THRESHOLD) {
+		plot_samples_sequentially = true;
+		if (active_sample_count != -active_trig_sample_count) {
+			active_sample_count = ((-active_trig_sample_count + 3) / 4) * 4;
+			setSinksDisplayOneBuffer(false);
+			plot.setXAxisNumPoints(active_plot_sample_count);
+			resetStreamingFlag(true);
+		}
+	} else {
+		plot_samples_sequentially = false;
+		setSinksDisplayOneBuffer(true);
+		plot.setXAxisNumPoints(0);
+		resetStreamingFlag(false);
+	}
 
 	if (zoom_level == 0) {
 		noZoomXAxisWidth = plot.axisInterval(QwtPlot::xBottom).width();
@@ -2076,8 +2198,9 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 	approach. */
 	iio->set_device_timeout((active_sample_count / active_sample_rate) * 1000 + 100);
 
-	if (started)
+	if (started) {
 		iio->unlock();
+	}
 
 	for(int ch = 0; ch < nb_channels; ch++) {
 		configureAcCoupling(ch, chnAcCoupled.at(ch));
@@ -2085,8 +2208,14 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 
 
 	// Compute the appropriate value for fft_size
-	double power = ceil(log2(active_sample_count));
-	fft_size = pow(2, power);
+	double power;
+	if (symmBufferMode->isEnhancedMemDepth()) {
+		power = floor(log2(active_plot_sample_count));
+	} else {
+		power = ceil(log2(active_plot_sample_count));
+	}
+	fft_plot_size = pow(2, power);
+	fft_size = active_sample_count;
 	onFFT_view_toggled(fft_is_visible);
 
 	// Change the sensitivity of time position control
@@ -2120,17 +2249,33 @@ void adiscope::Oscilloscope::onVertOffsetValueChanged(double value)
 void adiscope::Oscilloscope::onTimePositionChanged(double value)
 {
 	bool started = iio->started();
+	bool enhancedMemDepth = symmBufferMode->isEnhancedMemDepth();
 
 	unsigned long oldSampleCount = symmBufferMode->captureParameters().entireBufferSize;
 	symmBufferMode->setTriggerPos(-value);
+
+	/* If the time position changes during enhanced memory depth mode,
+	 * the default settings are restored. (No enhanced memory depth, buffer size
+	 * is computed again, based on the current time trigger position.)
+	 * If the current timebase is greater than a threshold, the buffer size needs to
+	 * be computed again, in order to properly display samples.
+	 */
+	if ((enhancedMemDepth || (timeBase->value() >= TIMEBASE_THRESHOLD))
+			&& (value != memory_adjusted_time_pos)) {
+		onHorizScaleValueChanged(timeBase->value());
+		if (enhancedMemDepth) {
+			return;
+		}
+	}
+
 	SymmetricBufferMode::capture_parameters params = symmBufferMode->captureParameters();
 	active_sample_rate = params.sampleRate;
 	active_sample_count = params.entireBufferSize;
 	active_plot_sample_count = active_sample_count;
 	active_trig_sample_count = -(long long)params.triggerBufferSize;
 	active_time_pos = -params.timePos;
+	memory_adjusted_time_pos = -params.timePos;
 
-//	preparePlotSampleCount();
 	// Realign plot data based on the new time position
 	plot.setHorizOffset(value);
 	plot.setXAxisNumPoints(plot_samples_sequentially ? active_plot_sample_count : 0);
@@ -2148,8 +2293,7 @@ void adiscope::Oscilloscope::onTimePositionChanged(double value)
 	updateBufferPreviewer();
 
 	if (active_sample_rate == adc->sampleRate() &&
-			(active_plot_sample_count == oldSampleCount) &&
-			!plot_samples_sequentially)
+			(active_plot_sample_count == oldSampleCount))
 		return;
 
 	/* Reconfigure the GNU Radio block to receive a different number of samples  */
@@ -2178,8 +2322,9 @@ void adiscope::Oscilloscope::onTimePositionChanged(double value)
 		iio->set_buffer_size(ids[i], active_sample_count);
 	}
 
-	if (started)
+	if (started) {
 		iio->unlock();
+	}
 
 	for(int ch = 0; ch < nb_channels; ch++) {
 		if (chnCoupled.at(ch)) {
@@ -2188,8 +2333,14 @@ void adiscope::Oscilloscope::onTimePositionChanged(double value)
 	}
 
 	// Compute the appropriate value for fft_size
-	double power = ceil(log2(active_sample_count));
-	fft_size = pow(2, power);
+	double power;
+	if (symmBufferMode->isEnhancedMemDepth()) {
+		power = floor(log2(active_plot_sample_count));
+	} else {
+		power = ceil(log2(active_plot_sample_count));
+	}
+	fft_plot_size = pow(2, power);
+	fft_size = active_sample_count;
 	onFFT_view_toggled(fft_is_visible);
 }
 
@@ -3034,7 +3185,8 @@ void Oscilloscope::autosetFinalStep() {
 
 void Oscilloscope::singleCaptureDone()
 {
-	if (!plot_samples_sequentially) {
+	if (!symmBufferMode->isEnhancedMemDepth()
+			&& !plot_samples_sequentially) {
 		Q_EMIT activateExportButton();
 		if (ui->pushButtonSingle->isChecked()){
 			ui->pushButtonSingle->setChecked(false);
@@ -3079,37 +3231,40 @@ void Oscilloscope::singleCaptureDone()
 	}
 }
 
-void Oscilloscope::onFilledScreen(bool full)
+void Oscilloscope::onFilledScreen(bool full, unsigned int nb_samples)
 {
-	d_shouldResetStreaming = full;
-	resetStreamingFlag(full);
+	if (nb_samples == active_plot_sample_count) {
+		d_shouldResetStreaming = full;
+		resetStreamingFlag(full);
+	}
 }
 
 void Oscilloscope::resetStreamingFlag(bool enable)
 {
-	if (enable != adc->getTrigger()->getStreamingFlag()) {
-		bool started = iio->started();
-		if (started)
-			iio->lock();
+	bool started = iio->started();
+	if (started)
+		iio->lock();
 
-		adc->getTrigger()->setStreamingFlag(false);
-		cleanBuffersAllSinks();
-		if (started)
-			iio->unlock();
-		if (enable) {
-			adc->getTrigger()->setStreamingFlag(true);
-		}
+	adc->getTrigger()->setStreamingFlag(false);
+	cleanBuffersAllSinks();
 
-		/* Single capture done */
-		if (plot_samples_sequentially && d_shouldResetStreaming) {
-			Q_EMIT activateExportButton();
-			if (ui->pushButtonSingle->isChecked() && started){
-				ui->pushButtonSingle->setChecked(false);
-				Q_EMIT isRunning(false);
-			}
-		}
-		d_shouldResetStreaming = false;
+	if (started)
+		iio->unlock();
+
+	if (enable) {
+		adc->getTrigger()->setStreamingFlag(true);
 	}
+
+	/* Single capture done */
+	if ((symmBufferMode->isEnhancedMemDepth() || plot_samples_sequentially)
+			&& d_shouldResetStreaming) {
+		Q_EMIT activateExportButton();
+		if (ui->pushButtonSingle->isChecked() && started){
+			ui->pushButtonSingle->setChecked(false);
+			Q_EMIT isRunning(false);
+		}
+	}
+	d_shouldResetStreaming = false;
 }
 
 void Oscilloscope::cleanBuffersAllSinks()
@@ -3127,18 +3282,22 @@ void Oscilloscope::cleanBuffersAllSinks()
 }
 
 void Oscilloscope::preparePlotSampleCount() {
-	if (timeBase->value() >= TIMEBASE_THRESHOLD) {
-		plot_samples_sequentially = true;
-		active_sample_count = -active_trig_sample_count;
-		setSinksDisplayOneBuffer(false);
-		plot.setXAxisNumPoints(active_plot_sample_count);
-		resetStreamingFlag(true);
-	} else {
-		plot_samples_sequentially = false;
-		setSinksDisplayOneBuffer(true);
-		plot.setXAxisNumPoints(0);
-		/* Reset the triggered && streaming flag */
-		resetStreamingFlag(false);
+	if (!symmBufferMode->isEnhancedMemDepth()) {
+		if (timeBase->value() >= TIMEBASE_THRESHOLD) {
+			plot_samples_sequentially = true;
+			if (active_sample_count != -active_trig_sample_count) {
+				active_sample_count = -active_trig_sample_count;
+				setSinksDisplayOneBuffer(false);
+				plot.setXAxisNumPoints(active_plot_sample_count);
+//				resetStreamingFlag(true);
+			}
+		} else {
+			plot_samples_sequentially = false;
+			setSinksDisplayOneBuffer(true);
+			plot.setXAxisNumPoints(0);
+			/* Reset the triggered && streaming flag */
+//			resetStreamingFlag(false);
+		}
 	}
 }
 
@@ -3330,7 +3489,7 @@ void Oscilloscope::setAllSinksSampleCount(unsigned long sample_count)
 		math_sink->set_nsamps(sample_count);
 		++it;
 	}
-	this->qt_fft_block->set_nsamps(fft_size);
+	this->qt_fft_block->set_nsamps(fft_plot_size);
 }
 
 void Oscilloscope::writeAllSettingsToHardware()

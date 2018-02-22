@@ -30,6 +30,8 @@ public:
 		double timePos;
 		unsigned long entireBufferSize;
 		unsigned long triggerBufferSize;
+		unsigned long maxBufferSize;
+		std::vector<unsigned long long> availableBufferSizes;
 	};
 
 	virtual capture_parameters captureParameters() const = 0;
@@ -53,10 +55,14 @@ public:
 
 	void setTimeBase(double secsPerDiv);
 	void setTriggerPos(double pos);
+	void setCustomBufferSize(unsigned long customSize);
+	bool isEnhancedMemDepth();
+	bool setEnhancedMemDepth(bool);
 
 private:
 	void configParamsOnTimeBaseChanged();
 	void configParamsOnTriggPosChanged();
+	void configParamsOnCustomSizeChanged();
 
 	unsigned long getVisibleBufferSize(double sampleRate)
 	{
@@ -65,11 +71,14 @@ private:
 			0.5; // Round the positive value to nearest int
 	}
 
+	double getSamplerateFor(unsigned long);
+
 private:
 	std::vector<double> m_sampleRates;
 	unsigned int m_timeDivsCount;
 	unsigned long long m_entireBufferMaxSize;
 	unsigned long long m_triggerBufferMaxSize;
+	std::vector<unsigned long long> m_availableBufferSizes;
 
 	double m_timeBase;
 	double m_triggerPos;
@@ -78,6 +87,7 @@ private:
 	double m_triggPosSR;
 	unsigned long m_visibleBufferSize;
 	unsigned long m_triggerBufferSize;
+	bool m_enhancedMemoryDepth;
 };
 
 #endif // OSC_CAPTURE_PARAMS_H

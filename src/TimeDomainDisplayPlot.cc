@@ -450,7 +450,7 @@ void TimeDomainDisplayPlot::newData(const QEvent* updateEvent)
 
 	if ((d_nbPtsXAxis != 0) && (d_nbPtsXAxis <= numDataPoints)
 			&& sender == "Osc Time") {
-		Q_EMIT filledScreen(true);
+		Q_EMIT filledScreen(true, numDataPoints);
 	}
 
 	this->plotNewData(sender,
