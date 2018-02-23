@@ -2,6 +2,9 @@
 <ui version="4.0">
  <class>MathPanel</class>
  <widget class="QWidget" name="MathPanel">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -22,7 +25,7 @@
      <property name="styleSheet">
       <string notr="true">QPushButton {
 color: white;
-background-color: orange;
+background-color: #4a64ff;
 font-family: &quot;monospace&quot;;
 font-weight: bold;
 height: 30px;
@@ -31,10 +34,13 @@ border-radius: 3px;
 min-width: 6em;
 }
 QPushButton:disabled {
-background-color: grey;
+background-color: black;
+color:gray;
+
 }
-QPushButton:pressed {
-background-color: #F45000;
+QPushButton:hover
+{
+	 background-color: #4a34ff;
 }</string>
      </property>
      <property name="text">
