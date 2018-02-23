@@ -784,8 +784,19 @@ void CapturePlot::onChannelAdded(int chnIdx)
 	});
 
 	/* Add Measure ojbect that handles all channel measurements */
-	Measure *measure = new Measure(chnIdx, d_ydata[chnIdx],
-		Curve(chnIdx)->data()->size());
+
+	Measure *measure = nullptr;
+
+	if (isReferenceWaveform(Curve(chnIdx))) {
+		int idx = chnIdx - d_ydata.size();
+		measure = new Measure(chnIdx, d_ref_ydata[idx],
+			Curve(chnIdx)->data()->size());
+	} else {
+		int count = countReferenceWaveform(Curve(chnIdx));
+		std::cout << count << std::endl;
+		measure = new Measure(chnIdx, d_ydata[chnIdx - count],
+			Curve(chnIdx)->data()->size());
+	}
 	measure->setAdcBitCount(12);
 	d_measureObjs.push_back(measure);
 }
@@ -851,12 +862,20 @@ void CapturePlot::onNewDataReceived()
 	if (!d_measurementsEnabled)
 		return;
 
+	int ref_idx = 0;
 	for (int i = 0; i < d_measureObjs.size(); i++) {
 		Measure *measure = d_measureObjs[i];
 		if (measure->activeMeasurementsCount() > 0) {
 			int chn = measure->channel();
-			measure->setDataSource(d_ydata[chn],
-				Curve(chn)->data()->size());
+			if (isReferenceWaveform(Curve(chn))) {
+				measure->setDataSource(d_ref_ydata[ref_idx],
+					Curve(chn)->data()->size());
+				ref_idx++;
+			} else {
+				int count = countReferenceWaveform(Curve(chn));
+				measure->setDataSource(d_ydata[chn - count],
+					Curve(chn)->data()->size());
+			}
 			measure->setSampleRate(this->sampleRate());
 			measure->measure();
 		}
