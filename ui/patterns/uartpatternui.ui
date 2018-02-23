@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>276</width>
-    <height>246</height>
+    <height>300</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -32,6 +32,53 @@
    <property name="verticalSpacing">
     <number>10</number>
    </property>
+   <item row="2" column="1">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Stop</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Baud</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QComboBox" name="CB_Stop">
+     <item>
+      <property name="text">
+       <string>1</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>2</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>3</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="8" column="1">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Data to Send</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="1">
+    <widget class="QLineEdit" name="LE_paramsOut">
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
    <item row="1" column="1">
     <widget class="QComboBox" name="CB_baud">
      <property name="editable">
@@ -100,13 +147,6 @@
      </item>
     </widget>
    </item>
-   <item row="2" column="1">
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>Stop</string>
-     </property>
-    </widget>
-   </item>
    <item row="5" column="1">
     <widget class="QComboBox" name="CB_Parity">
      <item>
@@ -136,24 +176,10 @@
      </item>
     </widget>
    </item>
-   <item row="7" column="1">
-    <widget class="QLineEdit" name="LE_paramsOut">
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="9" column="1">
-    <widget class="QLineEdit" name="LE_Data">
-     <property name="maxLength">
-      <number>100</number>
-     </property>
-    </widget>
-   </item>
-   <item row="8" column="1">
-    <widget class="QLabel" name="label">
+   <item row="6" column="1">
+    <widget class="QLabel" name="label_5">
      <property name="text">
-      <string>Data to Send</string>
+      <string>Parameters</string>
      </property>
     </widget>
    </item>
@@ -164,38 +190,25 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="1">
-    <widget class="QComboBox" name="CB_Stop">
-     <item>
-      <property name="text">
-       <string>1</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>2</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>3</string>
-      </property>
-     </item>
-    </widget>
-   </item>
-   <item row="0" column="1">
-    <widget class="QLabel" name="label_4">
-     <property name="text">
-      <string>Baud</string>
+   <item row="9" column="1">
+    <widget class="QLineEdit" name="LE_Data">
+     <property name="maxLength">
+      <number>100</number>
      </property>
     </widget>
    </item>
-   <item row="6" column="1">
-    <widget class="QLabel" name="label_5">
-     <property name="text">
-      <string>Parameters</string>
+   <item row="10" column="1">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
      </property>
-    </widget>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>

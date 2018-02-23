@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>263</width>
-    <height>168</height>
+    <height>189</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -111,6 +111,19 @@
    </item>
    <item>
     <widget class="QLineEdit" name="LE_toSend"/>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>
