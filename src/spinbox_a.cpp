@@ -663,7 +663,6 @@ PhaseSpinButton::PhaseSpinButton(std::vector<std::pair<QString, double> > units,
 		ui->SBA_CompletionCircle->setIsLogScale(false);
 		setMinValue(min_value);
 		setMaxValue(max_value);
-		setFrequency(0.01);
 		ui->SBA_CompletionCircle->setOrigin(0);
 }
 
@@ -676,7 +675,7 @@ void PhaseSpinButton::setValue(double value)
 	}
 	int index;
 	auto scale = inSeconds() ? findUnitOfValue(value, &index)
-				 : m_units.at(ui->SBA_Combobox->currentIndex()).second ;
+				 : m_units.at(ui->SBA_Combobox->currentIndex()).second;
 	double period = 360;
 
 	if (inSeconds()) {
@@ -745,7 +744,6 @@ bool PhaseSpinButton::inSeconds()
 void PhaseSpinButton::setSecondsValue(double val)
 {
 	m_secondsValue = val;
-
 }
 
 double PhaseSpinButton::secondsValue()
@@ -756,6 +754,8 @@ double PhaseSpinButton::secondsValue()
 void PhaseSpinButton::setFrequency(double val)
 {
 	if (inSeconds()) {
+		qDebug() << "frequency changed:" << val << "update phase";
+
 		updatePhaseAfterFrequenceChanged(val);
 	}
 	m_frequency = val;
@@ -766,6 +766,11 @@ double PhaseSpinButton::frequency()
 	return m_frequency;
 }
 
+double PhaseSpinButton::value()
+{
+	return m_value;
+}
+
 void PhaseSpinButton::updatePhaseAfterFrequenceChanged(double val)
 {
 	if (!inSeconds()) {
@@ -774,8 +779,6 @@ void PhaseSpinButton::updatePhaseAfterFrequenceChanged(double val)
 
 	double period = 360;
 	m_value = secondsValue() * period * val;
-
-	Q_EMIT valueChanged(m_value);
 }
 
 double PhaseSpinButton::computeSecondsTransformation(double scale, int index, double value)
@@ -785,6 +788,7 @@ double PhaseSpinButton::computeSecondsTransformation(double scale, int index, do
 	} else if (value > 10000) {
 		value = 10000;
 	}
+	setSecondsValue(value);
 
 	double period = 360;
 	double number = value / scale;
@@ -814,7 +818,6 @@ double PhaseSpinButton::computeSecondsTransformation(double scale, int index, do
 		ui->SBA_LineEdit->setCursorPosition(0);
 	}
 
-	setSecondsValue(value);
 	value = secondsValue() * period * frequency();
 
 	return value;

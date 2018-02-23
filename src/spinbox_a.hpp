@@ -218,6 +218,7 @@ public Q_SLOTS:
 	double secondsValue();
 	void setFrequency(double val);
 	double frequency();
+	double value();
 
 protected:
 	std::vector<std::vector<double>> m_unit;

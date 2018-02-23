@@ -644,6 +644,22 @@ QTabBar::tab:selected {
                           <property name="show_progress" stdset="0">
                            <bool>false</bool>
                           </property>
+                          <property name="units" stdset="0">
+                           <stringlist notr="true">
+                            <string>deg=1</string>
+                            <string>π rad=180</string>
+                            <string>ns=1e-9</string>
+                            <string>μs=1e-6</string>
+                            <string>ms=1e-3</string>
+                            <string>seconds=1e0</string>
+                           </stringlist>
+                          </property>
+                          <property name="min_value" stdset="0">
+                           <double>0.000000000000000</double>
+                          </property>
+                          <property name="max_value" stdset="0">
+                           <double>360.000000000000000</double>
+                          </property>
                          </widget>
                         </item>
                        </layout>
