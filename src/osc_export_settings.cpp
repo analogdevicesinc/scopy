@@ -54,7 +54,12 @@ void ExportSettings::removeChannel(int id)
 	nr_channels--;
 }
 
-
+void ExportSettings::clear()
+{
+	for (int i = 0; i < nr_channels; ++i)
+		exportChannels->removeItem(i);
+	nr_channels = 0;
+}
 
 void ExportSettings::onExportChannelChanged(QStandardItem *item)
 {
@@ -139,6 +144,16 @@ void ExportSettings::enableExportButton(bool on)
 void ExportSettings::disableUIMargins()
 {
 	ui->verticalLayout_3->setMargin(0);
+}
+
+void ExportSettings::setTitleLabelVisible(bool enabled)
+{
+	ui->label->setVisible(enabled);
+}
+
+void ExportSettings::setExportAllButtonLabel(const QString& text)
+{
+	ui->label_3->setText(text);
 }
 
 

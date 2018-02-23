@@ -24,6 +24,8 @@ public:
 	explicit ExportSettings(QWidget *parent = 0);
 	~ExportSettings();
 
+	void clear();
+
 public Q_SLOTS:
 	void addChannel(int id, QString name);
 	void removeChannel(int id);
@@ -35,8 +37,10 @@ public Q_SLOTS:
 	void on_btnExportAll_clicked();
 	void enableExportButton(bool on);
 	void disableUIMargins();
+	void setTitleLabelVisible(bool enabled);
+	void setExportAllButtonLabel(const QString &text);
 
-private:
+protected:
 	Ui::ExportSettings *ui;
 	DropdownSwitchList *exportChannels;
 	void checkIfAllActivated();
