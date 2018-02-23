@@ -640,6 +640,11 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 r
           <height>16777215</height>
          </size>
         </property>
+        <property name="styleSheet">
+         <string notr="true">#leftWidget {
+background-color: qlineargradient(spread:pad, x1:0.9, y1:0, x2:0, y2:0, stop:0 rgba(0, 0, 0, 40), stop:1 transparent);
+}</string>
+        </property>
         <layout class="QVBoxLayout" name="leftWidgetLayout">
          <property name="spacing">
           <number>0</number>
