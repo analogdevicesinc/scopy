@@ -42,6 +42,9 @@ public:
 	bool isMathChannel() const;
 	void setMathChannel(const bool&);
 
+	bool isReferenceChannel() const;
+	void setReferenceChannel(const bool&);
+
 Q_SIGNALS:
 	void enabled(bool en);
 	void selected(bool on);
@@ -67,6 +70,7 @@ private:
 	QString m_shortName;
 	bool m_math;
 	QString m_function;
+	bool m_ref;
 
 	void init();
 	void setButtonNoGroup(QAbstractButton *btn);

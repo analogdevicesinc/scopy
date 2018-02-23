@@ -167,6 +167,16 @@ void ChannelWidget::setMathChannel(const bool &math)
 	m_math = math;
 }
 
+bool ChannelWidget::isReferenceChannel() const
+{
+	return m_ref;
+}
+
+void ChannelWidget::setReferenceChannel(const bool &ref)
+{
+	m_ref = ref;
+}
+
 void ChannelWidget::on_box_toggled(bool checked)
 {
 	if (checked) {
