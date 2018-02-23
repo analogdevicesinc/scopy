@@ -2916,7 +2916,7 @@ void Oscilloscope::setupAutosetFreqSweep()
 	if (m2k_adc) {
 		high_gain_modes[autosetChannel] = M2kAdc::LOW_GAIN_MODE;
 		trigger_settings.autoTriggerDisable();
-		trigger_settings.on_intern_en_toggled(false);
+		trigger_settings.setTriggerEnable(false);
 	}
 	autosetSampleRateCnt--;
 	active_sample_rate = m2k_adc->availSamplRates()[autosetSampleRateCnt];
