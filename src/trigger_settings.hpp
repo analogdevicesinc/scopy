@@ -98,14 +98,12 @@ namespace adiscope {
 		void setAdcRunningState(bool on);
 		void onSpinboxTriggerLevelChanged(double);
 
-		void on_intern_en_toggled(bool);
-		void on_cmb_source_currentIndexChanged(int);
-
 	private Q_SLOTS:
 		void onSpinboxTriggerHystChanged(double);
 		void on_cmb_condition_currentIndexChanged(int);
 		void on_cmb_extern_condition_currentIndexChanged(int);
-
+		void on_intern_en_toggled(bool);
+		void on_cmb_source_currentIndexChanged(int);
 		void on_extern_en_toggled(bool);
 		void on_cmb_analog_extern_currentIndexChanged(int);
 		void on_btnAuto_toggled(bool);
