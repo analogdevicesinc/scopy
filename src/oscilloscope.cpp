@@ -2979,8 +2979,9 @@ void Oscilloscope::autosetFinalStep() {
 
 	// autoset frequency found
 	if(autosetFFTIndex>1) {
-		timebaseval = (1/autosetFrequency)/5;
-		voltsperdiv = (autosetMaxAmpl-autosetMinAmpl)/4;
+		timebaseval = (1/autosetFrequency)/2;
+		voltsperdiv = (max(abs(autosetMaxAmpl),
+				   abs(autosetMinAmpl)))/5;
 		triggerlevel = (autosetMaxAmpl+autosetMinAmpl)/2;
 	}
 

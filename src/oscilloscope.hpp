@@ -218,7 +218,7 @@ namespace adiscope {
 		int autosetSampleRateCnt;
 		int autosetChannel;
 		bool autosetEnabled;
-		const int autosetSkippedTimeSamples = 3000;
+		const int autosetSkippedTimeSamples = 4096;
 		const int autosetFFTSize = 8192;
 		const int autosetNrOfSkippedTones=50;
 		const int autosetValidTone = 250;
