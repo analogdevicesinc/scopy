@@ -72,7 +72,7 @@ void SmallOnOffSwitch::toggleAnim(bool enabled)
 	anim.stop();
 	color_anim.stop();
 
-	if (enabled) {
+	if (!enabled) {
 		anim.setStartValue(off_rect);
 		anim.setEndValue(on_rect);
 		color_anim.setStartValue(color_start);
@@ -90,7 +90,7 @@ void SmallOnOffSwitch::toggleAnim(bool enabled)
 
 void SmallOnOffSwitch::showEvent(QShowEvent *event)
 {
-	if (isChecked()) {
+	if (!isChecked()) {
 		handle.setGeometry(QRect(width() - handle.width(), handle.y(),
 					handle.width(), handle.height()));
 		setHandleColor(color_end);

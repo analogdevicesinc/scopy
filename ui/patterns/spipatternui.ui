@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>199</width>
-    <height>200</height>
+    <width>227</width>
+    <height>222</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -39,6 +39,9 @@
      </property>
      <item>
       <widget class="adiscope::SmallOnOffSwitch" name="PB_CPOL">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
        <property name="text">
         <string/>
        </property>
@@ -59,6 +62,9 @@
      </item>
      <item>
       <widget class="adiscope::SmallOnOffSwitch" name="PB_CPHA">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
        <property name="text">
         <string/>
        </property>
@@ -86,10 +92,16 @@
      </property>
      <item>
       <widget class="adiscope::SmallOnOffSwitch" name="PB_CS">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
        <property name="text">
         <string/>
        </property>
        <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="checked">
         <bool>true</bool>
        </property>
       </widget>
@@ -107,6 +119,9 @@
         <string/>
        </property>
        <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="checked">
         <bool>true</bool>
        </property>
       </widget>
