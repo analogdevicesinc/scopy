@@ -113,7 +113,7 @@ const char *PatternGenerator::channelNames[] = {
 };
 
 QStringList PatternGenerator::strStatus = QStringList() <<
-                "STOPPED"<<"CONFIG"<<"RUNNING"<<"WAITING";
+		"Stopped"<<"Config"<<"Running"<<"Waiting";
 
 PatternGenerator::runState PatternGenerator::pgStatus()
 {
