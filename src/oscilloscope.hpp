@@ -56,7 +56,7 @@
 #include "plot_utils.hpp"
 #include "osc_adc.h"
 #include "tool.hpp"
-#include "osc_export_settings.h"
+#include "osc_import_settings.h"
 #include "math.hpp"
 #include "scroll_filter.hpp"
 
@@ -114,6 +114,7 @@ namespace adiscope {
 		void selectedChannelChanged(int);
 		void activateExportButton();
 		void isRunning(bool);
+		void importFileLoaded(bool);
 
 	private Q_SLOTS:
 		void btnExport_clicked();
@@ -206,10 +207,13 @@ namespace adiscope {
 		void requestAutoset();
 		void enableLabels(bool);
 
+		void import();
+
 	private:
 		std::shared_ptr<GenericAdc> adc;
 		std::shared_ptr<M2kAdc> m2k_adc;
 		unsigned int nb_channels, nb_math_channels;
+		unsigned int nb_ref_channels;
 		double active_sample_rate;
 		double noZoomXAxisWidth;
 		unsigned long active_sample_count;
@@ -258,6 +262,11 @@ namespace adiscope {
 
 		QPair<Ui::MathPanel, Math*> *math_pair;
 		bool addChannel;
+
+		QVector<QVector<QString>> import_data;
+		QString import_error;
+		ImportSettings *importSettings;
+		bool lastFunctionValid;
 
 		QMap<int, bool> exportConfig;
 
@@ -342,7 +351,7 @@ namespace adiscope {
 		void settings_panel_size_adjust();
 		void triggerRightMenuToggle(CustomPushButton *, bool checked);
 		void toggleRightMenu(CustomPushButton *, bool checked);
-		void create_math_panel();
+		void create_add_channel_panel();
 		void add_math_channel(const std::string& function);
 		unsigned int find_curve_number();
 		ChannelWidget *channelWidgetAtId(int id);
@@ -390,6 +399,7 @@ namespace adiscope {
 		void activateAcCouplingTrigger(int);
 		void deactivateAcCouplingTrigger();
 		void clearMathChannels();
+		void add_ref_waveform(unsigned int chIdx);
 	};
 
 	class Oscilloscope_API : public ApiObject
