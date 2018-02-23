@@ -37,6 +37,7 @@
 #include <QDirIterator>
 #include <QPushButton>
 #include <QFileDialog>
+#include <utils.h>
 
 #include <boost/math/common_factor.hpp>
 
@@ -280,6 +281,8 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 	api->load(*settings);
 	api->js_register(engine);
 	chm.highlightChannel(chm.get_channel_group(0));
+	Util::retainWidgetSizeWhenHidden(ui->btnPGSettings);
+	ui->btnPGSettings->setVisible(false);
 	setPGStatus(STOPPED);
 	settingsLoaded();
 
