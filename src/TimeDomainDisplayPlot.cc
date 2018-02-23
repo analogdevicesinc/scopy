@@ -161,6 +161,8 @@ TimeDomainDisplayPlot::TimeDomainDisplayPlot(QWidget* parent, unsigned int xNumD
   d_curves_hidden = false;
   d_nbPtsXAxis = 0;
 
+  d_nb_ref_curves = 0;
+
   // Reconfigure the bottom horizontal axis that was created by the base class
   configureAxis(QwtPlot::xBottom, 0);
   configureAxis(QwtPlot::yLeft, 0);
@@ -256,11 +258,12 @@ TimeDomainDisplayPlot::plotNewData(const std::string sender,
 	delete[] d_xdata[sinkIndex];
 	d_xdata[sinkIndex] = new double[numDataPoints];
 
+	int ref_offset = countReferenceWaveform(Curve(start));
 	for(int i = start; i < start + sinkNumChannels; i++) {
 	  delete[] d_ydata[i];
 	  d_ydata[i] = new double[numDataPoints];
 
-	  d_plot_curve[i]->setRawSamples(d_xdata[sinkIndex], d_ydata[i], numDataPoints);
+	  d_plot_curve[i + ref_offset]->setRawSamples(d_xdata[sinkIndex], d_ydata[i], numDataPoints);
 	}
 
 	_resetXAxisPoints(d_xdata[sinkIndex], numDataPoints, d_sample_rate);
@@ -851,6 +854,102 @@ QColor TimeDomainDisplayPlot::getChannelColor()
 	return Qt::black;
 }
 
+bool TimeDomainDisplayPlot::isReferenceWaveform(QwtPlotCurve *curve)
+{
+	return d_ref_curves.values().contains(curve);
+}
+
+int TimeDomainDisplayPlot::getCurveNextTo(int pos)
+{
+	while (isReferenceWaveform(Curve(pos))) pos++;
+	return pos;
+}
+
+int TimeDomainDisplayPlot::countReferenceWaveform(QwtPlotCurve *curve)
+{
+	/* returns the number of curves that are of type reference that were added before "curve" */
+
+	int count = 0;
+	for (int i = 0; i < d_plot_curve.size(); ++i)
+		if (d_plot_curve[i] == curve) {
+			return count;
+		} else if (isReferenceWaveform(d_plot_curve[i])) {
+			count++;
+		}
+}
+
+void TimeDomainDisplayPlot::registerReferenceWaveform(QString name, QVector<double> xData, QVector<double> yData)
+{
+
+	QColor color = getChannelColor();
+
+	QwtPlotCurve *curve = new QwtPlotCurve();
+	curve->setSamples(xData, yData);
+
+	curve->setPen(QPen(color));
+	curve->setRenderHint(QwtPlotItem::RenderAntialiased);
+
+	QwtSymbol *symbol = new QwtSymbol(QwtSymbol::NoSymbol, QBrush(color),
+					QPen(color), QSize(7,7));
+
+	curve->setSymbol(symbol);
+
+	curve->attach(this);
+
+	d_ref_ydata.push_back(new double[yData.size()]);
+	int n = d_ref_ydata.size() - 1;
+	memset(d_ref_ydata[n], 0x0, yData.size() * sizeof(double));
+	for (int i = 0; i < yData.size(); ++i)
+		d_ref_ydata[d_ref_ydata.size() - 1][i] = yData[i];
+
+	d_plot_curve.push_back(curve);
+	d_ref_curves.insert(name, curve);
+	d_nplots += 1;
+
+	Q_EMIT channelAdded(d_ydata.size() + d_nb_ref_curves);
+
+	d_nb_ref_curves++;
+}
+
+void TimeDomainDisplayPlot::unregisterReferenceWaveform(QString name)
+{
+	d_plot_curve.erase(std::find(d_plot_curve.begin(), d_plot_curve.end(), d_ref_curves[name]));
+
+	QwtPlotCurve *curve = d_ref_curves[name];
+	int pos = countReferenceWaveform(curve);
+	d_ref_ydata.erase(d_ref_ydata.begin() + pos);
+	curve->detach();
+	delete curve;
+
+	d_ref_curves.remove(name);
+	d_nb_ref_curves--;
+}
+
+void TimeDomainDisplayPlot::realignReferenceWaveforms(double timebase, double timeposition)
+{
+
+	QList<QwtPlotCurve *> curves = d_ref_curves.values();
+
+	for (auto &curve : curves) {
+		double x_axis_step_size = curve->data()->sample(1).x() -
+				curve->data()->sample(0).x();
+		double mid_point_on_screen = (timebase * 8) - ((timebase * 8) - timeposition);
+		int nr_of_samples_in_file = curve->data()->size();
+
+		QVector<double> xData;
+		QVector<double> yData;
+
+		for (int i = -(nr_of_samples_in_file / 2); i < (nr_of_samples_in_file / 2); ++i) {
+			xData.push_back(mid_point_on_screen + ((double)i * x_axis_step_size));
+		}
+
+		for (int i = 0; i < nr_of_samples_in_file; ++i)
+			yData.push_back(curve->data()->sample(i).y());
+
+		curve->setSamples(xData, yData);
+	}
+}
+
 bool TimeDomainDisplayPlot::registerSink(std::string sinkUniqueNme, unsigned int numChannels,
 	unsigned long long channelsDataLength, bool curvesAttached)
 {
@@ -877,13 +976,13 @@ bool TimeDomainDisplayPlot::registerSink(std::string sinkUniqueNme, unsigned int
 			QwtSymbol *symbol = new QwtSymbol(QwtSymbol::NoSymbol, QBrush(color),
 							QPen(color), QSize(7,7));
 
-			d_plot_curve[n]->setRawSamples(d_xdata[sinkIndex], d_ydata[n], channelsDataLength);
-			d_plot_curve[n]->setSymbol(symbol);
+			d_plot_curve.back()->setRawSamples(d_xdata[sinkIndex], d_ydata[n], channelsDataLength);
+			d_plot_curve.back()->setSymbol(symbol);
 
 			if (curvesAttached)
-				d_plot_curve[n]->attach(this);
+				d_plot_curve.back()->attach(this);
 
-			Q_EMIT channelAdded(n);
+			Q_EMIT channelAdded(n + d_nb_ref_curves);
 		}
 		d_nplots += numChannels;
 		_resetXAxisPoints(d_xdata[sinkIndex], channelsDataLength, d_sample_rate);
@@ -916,13 +1015,15 @@ bool TimeDomainDisplayPlot::unregisterSink(std::string sinkName)
 		d_ydata.erase(d_ydata.begin() + offset, d_ydata.begin() + offset + numChannels);
 
 		/* Remove the QwtPlotCurve */
+		int ref_offset = getCurveNextTo(offset);
+		ref_offset -= offset;
 		for (int i = offset; i < offset + numChannels; i++) {
-			d_plot_curve[i]->detach();
-			delete d_plot_curve[i];
+			d_plot_curve[i + ref_offset]->detach();
+			delete d_plot_curve[i + ref_offset];
 		}
 
-		d_plot_curve.erase(d_plot_curve.begin() + offset,
-				d_plot_curve.begin() + offset + numChannels);
+		d_plot_curve.erase(d_plot_curve.begin() + offset + ref_offset,
+				d_plot_curve.begin() + ref_offset + offset + numChannels);
 
 		// Finally remove the sink
 		ret = d_sinkManager.removeSink(sinkName);

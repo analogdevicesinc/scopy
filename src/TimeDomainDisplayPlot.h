@@ -117,6 +117,10 @@ public:
   void removeZoomer(unsigned int zoomerIdx);
   void setXAxisNumPoints(unsigned int);
 
+  void registerReferenceWaveform(QString name, QVector<double> xData, QVector<double> yData);
+  void unregisterReferenceWaveform(QString name);
+  void realignReferenceWaveforms(double timebase, double timeposition);
+
 Q_SIGNALS:
   void channelAdded(int);
   void newData();
@@ -171,6 +175,10 @@ private Q_SLOTS:
 protected:
   std::vector<double*> d_ydata;
   std::vector<double*> d_xdata;
+  std::vector<double*> d_ref_ydata;
+
+  bool isReferenceWaveform(QwtPlotCurve *curve);
+  int countReferenceWaveform(QwtPlotCurve *curve);
 
 private:
   void _resetXAxisPoints(double*& xAxis, unsigned long long numPoints, double sampleRate);
@@ -203,6 +211,10 @@ private:
   bool d_curves_hidden;
 
   QColor getChannelColor();
+
+  QMap<QString, QwtPlotCurve *> d_ref_curves;
+  int d_nb_ref_curves;
+  int getCurveNextTo(int pos);
 };
 } //adiscope
 
