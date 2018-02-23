@@ -677,7 +677,7 @@ void PhaseSpinButton::setValue(double value)
 	}
 	int index;
 	auto scale = inSeconds() ? findUnitOfValue(value, &index)
-				 : m_units.at(ui->SBA_Combobox->currentIndex()).second ;
+				 : m_units.at(ui->SBA_Combobox->currentIndex()).second;
 	double period = 360;
 
 	if (inSeconds()) {
@@ -756,6 +756,8 @@ double PhaseSpinButton::secondsValue()
 void PhaseSpinButton::setFrequency(double val)
 {
 	if (inSeconds()) {
+		qDebug() << "frequency changed:" << val << "update phase";
+
 		updatePhaseAfterFrequenceChanged(val);
 	}
 	m_frequency = val;
@@ -779,8 +781,6 @@ void PhaseSpinButton::updatePhaseAfterFrequenceChanged(double val)
 
 	double period = 360;
 	m_value = secondsValue() * period * val;
-
-	Q_EMIT valueChanged(m_value);
 }
 
 double PhaseSpinButton::computeSecondsTransformation(double scale, int index, double value)
