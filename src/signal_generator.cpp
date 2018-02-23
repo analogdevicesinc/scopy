@@ -438,6 +438,9 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 	plot->addZoomer(0);
 	resetZoom();
 
+	auto ptr = getCurrentData();
+	ui->phase->setFrequency(ptr->frequency);
+
 	readPreferences();
 }
 
@@ -673,8 +676,11 @@ void SignalGenerator::frequencyChanged(double value)
 	auto ptr = getCurrentData();
 
 	if (ptr->frequency != value) {
+		if(ui->phase->inSeconds()) {
+			ui->phase->setFrequency(value);
+			ptr->phase = ui->phase->value();
+		}
 		ptr->frequency = value;
-		ui->phase->setFrequency(value);
 		resetZoom();
 	}
 }
