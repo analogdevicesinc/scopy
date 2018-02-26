@@ -67,7 +67,7 @@
        <number>5</number>
       </property>
       <item row="2" column="1" alignment="Qt::AlignRight">
-       <widget class="QLabel" name="label_2">
+       <widget class="QLabel" name="cursorT2label">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -86,7 +86,7 @@
        </widget>
       </item>
       <item row="1" column="1" alignment="Qt::AlignRight">
-       <widget class="QLabel" name="label">
+       <widget class="QLabel" name="cursorT1label">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -131,7 +131,7 @@
        </widget>
       </item>
       <item row="4" column="1" alignment="Qt::AlignRight">
-       <widget class="QLabel" name="label_4">
+       <widget class="QLabel" name="frequencyDeltaLabel">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -163,7 +163,7 @@
        </widget>
       </item>
       <item row="3" column="1" alignment="Qt::AlignRight">
-       <widget class="QLabel" name="label_3">
+       <widget class="QLabel" name="timeDeltaLabel">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -325,7 +325,7 @@
        </widget>
       </item>
       <item row="1" column="1" alignment="Qt::AlignRight">
-       <widget class="QLabel" name="label_9">
+       <widget class="QLabel" name="cursorV1label">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -357,7 +357,7 @@
        </widget>
       </item>
       <item row="2" column="1" alignment="Qt::AlignRight">
-       <widget class="QLabel" name="label_11">
+       <widget class="QLabel" name="cursorV2label">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -376,7 +376,7 @@
        </widget>
       </item>
       <item row="3" column="1" alignment="Qt::AlignRight">
-       <widget class="QLabel" name="label_13">
+       <widget class="QLabel" name="deltaVlabel">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>

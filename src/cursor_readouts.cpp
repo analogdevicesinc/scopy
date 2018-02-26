@@ -34,7 +34,9 @@ CursorReadouts::CursorReadouts(QwtPlot *plot):
 	d_voltage_rd_visible(true),
 	d_time_rd_visible(true),
 	d_topLeft(QPoint(0, 0)),
-	currentPosition(CustomPlotPositionButton::topLeft)
+    currentPosition(CustomPlotPositionButton::topLeft),
+    hAxis(QwtPlot::xBottom),
+    vAxis(QwtPlot::yLeft)
 {
 	ui->setupUi(this);
 
@@ -42,7 +44,7 @@ CursorReadouts::CursorReadouts(QwtPlot *plot):
 	ui->VoltageCursors->setParent(plot->canvas());
 	this->setGeometry(0, 0, 0, 0);
 
-	plot->canvas()->installEventFilter(this);
+    plot->canvas()->installEventFilter(this);
 
 	ui->TimeCursors->setAttribute(Qt::WA_TransparentForMouseEvents);
 	ui->VoltageCursors->setAttribute(Qt::WA_TransparentForMouseEvents);
@@ -225,6 +227,61 @@ QString CursorReadouts::voltageDeltaText()
 	return ui->voltageDelta->text();
 }
 
+void CursorReadouts::setTimeDeltaVisible(bool visible){
+    ui->timeDeltaLabel->setVisible(visible);
+    ui->timeDelta->setVisible(visible);
+}
+
+void CursorReadouts::setFrequencyDeltaVisible(bool visible){
+    ui->frequencyDeltaLabel->setVisible(visible);
+    ui->frequencyDelta->setVisible(visible);
+}
+
+void CursorReadouts::setTimeCursor1LabelText(const QString &text){
+    ui->cursorT1label->setText(text);
+}
+
+QString CursorReadouts::timeCursor1LabelText(){
+    return ui->cursorT1label->text();
+}
+
+void CursorReadouts::setTimeCursor2LabelText(const QString &text){
+    ui->cursorT2label->setText(text);
+}
+
+QString CursorReadouts::timeCursor2LabelText(){
+    return ui->cursorT2label->text();
+}
+
+void CursorReadouts::setVoltageCursor1LabelText(const QString &text){
+    ui->cursorV1label->setText(text);
+}
+
+QString CursorReadouts::voltageCursor1LabelText(){
+    return ui->cursorV2label->text();
+}
+
+void CursorReadouts::setVoltageCursor2LabelText(const QString &text){
+    ui->cursorV2label->setText(text);
+}
+
+QString CursorReadouts::voltageCursor2LabelText(){
+    ui->cursorV2label->text();
+}
+
+void CursorReadouts::setDeltaVoltageLabelText(const QString &text){
+    ui->deltaVlabel->setText(text);
+}
+
+QString CursorReadouts::deltaVoltageLabelText(){
+    return ui->deltaVlabel->text();
+}
+
+void CursorReadouts::setAxis(QwtAxisId hAxis,QwtAxisId vAxis){
+    this->hAxis = hAxis;
+    this->vAxis = vAxis;
+}
+
 bool CursorReadouts::eventFilter(QObject *object, QEvent *event)
 {
 	if (object == plot()->canvas()) {
@@ -245,8 +302,8 @@ bool CursorReadouts::eventFilter(QObject *object, QEvent *event)
 
 QPoint CursorReadouts::plotPointToPixelPoint(const QPointF &point) const
 {
-	const QwtScaleMap xMap = plot()->canvasMap(QwtPlot::xBottom);
-	const QwtScaleMap yMap = plot()->canvasMap(QwtPlot::yLeft);
+    const QwtScaleMap xMap = plot()->canvasMap(hAxis);
+    const QwtScaleMap yMap = plot()->canvasMap(vAxis);
 
 	return QwtScaleMap::transform(xMap, yMap, point).toPoint();
 }
@@ -283,8 +340,8 @@ void CursorReadouts::moveTopLeft(bool resize)
 
 	d_topLeft = QPoint(8, 8);
 
-	QwtScaleDiv vScaleDiv = plot()->axisScaleDiv(QwtPlot::yLeft);
-	QwtScaleDiv hScaleDiv = plot()->axisScaleDiv(QwtPlot::xBottom);
+    QwtScaleDiv vScaleDiv = plot()->axisScaleDiv(vAxis);
+    QwtScaleDiv hScaleDiv = plot()->axisScaleDiv(hAxis);
 
 	QList<double> vMajorTicks = vScaleDiv.ticks(QwtScaleDiv::MajorTick);
 	QList<double> hMajorTicks = hScaleDiv.ticks(QwtScaleDiv::MajorTick);
@@ -347,8 +404,8 @@ void CursorReadouts::moveTopRight(bool resize)
 	if (!isVisible())
 		return;
 
-	QwtScaleDiv vScaleDiv = plot()->axisScaleDiv(QwtPlot::yLeft);
-	QwtScaleDiv hScaleDiv = plot()->axisScaleDiv(QwtPlot::xBottom);
+    QwtScaleDiv vScaleDiv = plot()->axisScaleDiv(vAxis);
+    QwtScaleDiv hScaleDiv = plot()->axisScaleDiv(hAxis);
 
 	QList<double> vMajorTicks = vScaleDiv.ticks(QwtScaleDiv::MajorTick);
 	QList<double> hMajorTicks = hScaleDiv.ticks(QwtScaleDiv::MajorTick);
@@ -418,8 +475,8 @@ void CursorReadouts::moveBottomLeft(bool resize)
 	int firstPos = 3;
 	int secondPos = 6;
 
-	QwtScaleDiv vScaleDiv = plot()->axisScaleDiv(QwtPlot::yLeft);
-	QwtScaleDiv hScaleDiv = plot()->axisScaleDiv(QwtPlot::xBottom);
+    QwtScaleDiv vScaleDiv = plot()->axisScaleDiv(vAxis);
+    QwtScaleDiv hScaleDiv = plot()->axisScaleDiv(hAxis);
 
 	QList<double> vMajorTicks = vScaleDiv.ticks(QwtScaleDiv::MajorTick);
 	QList<double> hMajorTicks = hScaleDiv.ticks(QwtScaleDiv::MajorTick);
@@ -481,8 +538,8 @@ void CursorReadouts::moveBottomRight(bool resize)
 	if (!isVisible())
 		return;
 
-	QwtScaleDiv vScaleDiv = plot()->axisScaleDiv(QwtPlot::yLeft);
-	QwtScaleDiv hScaleDiv = plot()->axisScaleDiv(QwtPlot::xBottom);
+    QwtScaleDiv vScaleDiv = plot()->axisScaleDiv(vAxis);
+    QwtScaleDiv hScaleDiv = plot()->axisScaleDiv(hAxis);
 
 	QList<double> vMajorTicks = vScaleDiv.ticks(QwtScaleDiv::MajorTick);
 	QList<double> hMajorTicks = hScaleDiv.ticks(QwtScaleDiv::MajorTick);
