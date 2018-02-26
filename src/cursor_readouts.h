@@ -23,6 +23,7 @@
 #include <QWidget>
 #include <QPropertyAnimation>
 #include <QShowEvent>
+#include <qwt_axis_id.h>
 #include "customplotpositionbutton.h"
 
 class QwtPlot;
@@ -64,7 +65,19 @@ namespace adiscope {
 		QString voltageCursor2Text();
 		void setVoltageDeltaText(const QString &);
 		QString voltageDeltaText();
-
+        void setTimeDeltaVisible(bool);
+        void setFrequencyDeltaVisible(bool);
+        void setTimeCursor1LabelText(const QString &);
+        QString timeCursor1LabelText();
+        void setTimeCursor2LabelText(const QString &);
+        QString timeCursor2LabelText();
+        void setVoltageCursor1LabelText(const QString &);
+        QString voltageCursor1LabelText();
+        void setVoltageCursor2LabelText(const QString &);
+        QString voltageCursor2LabelText();
+        void setDeltaVoltageLabelText(const QString &);
+        QString deltaVoltageLabelText();
+        void setAxis(QwtAxisId hAxis,QwtAxisId vAxis);
 		virtual bool eventFilter(QObject *, QEvent *);
 
 		void setTransparency(int value);
@@ -88,6 +101,7 @@ namespace adiscope {
 		CustomPlotPositionButton::ReadoutsPosition currentPosition;
 		QPropertyAnimation *anim, *anim2;
 		QRect lastTimeRect, lastVoltageRect;
+        QwtAxisId hAxis,vAxis;
 	};
 }
 
