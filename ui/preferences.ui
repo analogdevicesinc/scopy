@@ -295,17 +295,7 @@ QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
                </sizepolicy>
               </property>
               <property name="styleSheet">
-               <string notr="true">QLineEdit {
-height: 22px;
-color: white;
-font-family: &quot;monospace&quot; 12;
-border: 2px solid;
-border-color: grey;
-border-radius: 5px;
-padding: 0 8px;
-background: transparent;
-selection-background-color: darkgray;
-}
+               <string notr="true">
 QLineEdit[invalid=true] {
 border-color: red;
 color: red;
