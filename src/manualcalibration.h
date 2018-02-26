@@ -91,12 +91,12 @@ private:
 	void setupPowerSupplyIio(void);
 
 	void positivePowerSupplySetup();
-	void positivePowerSupplyParam(const int& step);
+	void positivePowerSupplyParam(const int step);
 	void setEnablePositiveSuppply(bool enabled);
 	void setPositiveValue(double value);
 
 	void negativePowerSupplySetup();
-	void negativePowerSupplyParam(const int& step);
+	void negativePowerSupplyParam(const int step);
 	void setEnableNegativeSuppply(bool enabled);
 	void setNegativeValue(double value);
 
@@ -119,11 +119,6 @@ private Q_SLOTS:
 	void on_finishButton_clicked();
 
 private:
-	const double SUPPLY_100MV_VALUE = 0.1;
-	const double SUPPLY_4_5V_VALUE = 4.5;
-	const double SUPPLY_100MV_NEG_VALUE = -0.1;
-	const double SUPPLY_4_5V_NEG_VALUE = -4.5;
-
 	Ui::ManualCalibration *ui;
 	struct iio_channel *ch1w, *ch2w, *ch1r, *ch2r, *pd_pos, *pd_neg;
 	Ui::CalibrationTemplate *TempUi;
@@ -140,13 +135,7 @@ private:
 	QStringList calibListString;
 	QMap<QString, int> calibOption;
 
-	/*Calibrations procedure stories*/
-	const QStringList positiveOffsetStory = (QStringList() <<
-						"Calibrate the Positive Supply \n\n Measure the Voltage on the \"V+\" and enter the value in the field below \n\n The value should be around 100mV"
-						<< "Calibrate the Positive Supply \n\n Measure the Voltage on the \"V+\" and enter the value in the field below \n\n The value should be around 4.5V");
-	const QStringList negativeOffsetStory = (QStringList() <<
-						"Calibrate the Negative Supply \n\n Measure the Voltage on the \"V-\" and enter the value in the field below \n\n The value should be around -100mV"
-						<< "Calibrate the Negative Supply \n\n Measure the Voltage on the \"V-\" and enter the value in the field below \n\n The value should be around -4.5V");
+
 
 };
 }
