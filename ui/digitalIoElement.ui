@@ -143,7 +143,7 @@ background-color: rgba(0, 0, 0, 80);
 }</string>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="page">
         <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -239,13 +239,7 @@ QPushButton:!checked
 {
  background-image: url(&quot;:/icons/in-out-out.svg&quot;);
 }
-
-QLineEdit
-{
-border:0px;
-border-bottom:1px solid rgba(255,255,255,140);
-background:transparent;
-}</string>
+</string>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_3">
          <property name="spacing">
@@ -392,14 +386,23 @@ QSlider::sub-page:horizontal {
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
+             <property name="maximumSize">
+              <size>
+               <width>43</width>
+               <height>16777215</height>
+              </size>
+             </property>
              <property name="styleSheet">
-              <string notr="true">height: 43px;	width: 61px;	color: #FFFFFF;	font-family: Arial;	font-size: 36px;	line-height: 42px;</string>
+              <string notr="true"/>
              </property>
              <property name="text">
               <string>127</string>
              </property>
              <property name="maxLength">
               <number>3</number>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
              </property>
             </widget>
            </item>
