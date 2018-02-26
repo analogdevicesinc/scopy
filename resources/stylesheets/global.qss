@@ -130,9 +130,8 @@ QRadioButton::indicator:checked:disabled {
 QLineEdit {
 	color: white;
 	font-size: 16px;
-	font-weight: bold;
-	border: 1px solid rgba(255, 255, 255, 102);
-	border-radius: 4px;
+	border: 0px solid gray;
+	border-bottom: 1px solid rgba(255, 255, 255, 102);
 	padding: 2px;
 }
 
