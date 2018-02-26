@@ -501,18 +501,7 @@ QMenu::item:selected { background-color: #F45000; }</string>
       </size>
      </property>
      <property name="styleSheet">
-      <string notr="true">QLineEdit {
-height: 32px;
-color: white;
-font-family: &quot;monospace&quot; 14;
-font-weight: bold;
-border: 2px solid;
-border-color: orange;
-border-radius: 10px;
-padding: 0 8px;
-background: transparent;
-selection-background-color: darkgray;
-}
+      <string notr="true">
 QLineEdit[invalid=true] {
 border-color: red;
 }
