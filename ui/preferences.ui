@@ -43,7 +43,7 @@ QTabBar::tab:!selected {
 }</string>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>2</number>
         </property>
         <widget class="QWidget" name="General">
          <attribute name="title">
@@ -119,23 +119,41 @@ QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
            </layout>
           </item>
           <item>
-           <spacer name="verticalSpacer_3">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>40</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
            <layout class="QHBoxLayout" name="horizontalLayout_4">
             <property name="topMargin">
              <number>10</number>
             </property>
+            <item>
+             <widget class="QPushButton" name="resetBtn">
+              <property name="styleSheet">
+               <string notr="true">QPushButton
+{
+  width: 175px;
+  height: 30px;
+  border-radius: 4px;
+  background-color: #4a64ff;
+
+  font-family: ArialMT;
+  font-size: 14px;
+  font-weight: normal;
+  font-style: normal;
+  text-align: center;
+  color: #ffffff;
+}
+
+QPushButton:hover
+{
+	 background-color: #4a34ff;
+}</string>
+              </property>
+              <property name="text">
+               <string>Reset Scopy</string>
+              </property>
+              <property name="flat">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
             <item>
              <spacer name="horizontalSpacer_4">
               <property name="orientation">
@@ -149,32 +167,20 @@ QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
               </property>
              </spacer>
             </item>
-            <item>
-             <widget class="QPushButton" name="resetBtn">
-              <property name="styleSheet">
-               <string notr="true">QPushButton {
-  width: 80px;
-  height: 20px;
-  border-radius: 4px;
-  background-color: #ff7200;
-  color: white;
-  font-family: &quot;monospace&quot;;
-  font-weight: bold;
-
-  text-align: left;
-  padding-left: 20px;
-  padding-right: 20px;
-}</string>
-              </property>
-              <property name="text">
-               <string>Reset Scopy</string>
-              </property>
-              <property name="flat">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
            </layout>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
           </item>
          </layout>
         </widget>
@@ -276,7 +282,7 @@ QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
             <item>
              <widget class="QLabel" name="label_3">
               <property name="text">
-               <string>Number of displayed periods:</string>
+               <string>Number of displayed periods</string>
               </property>
              </widget>
             </item>
