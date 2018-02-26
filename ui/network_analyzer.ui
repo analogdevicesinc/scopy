@@ -560,405 +560,673 @@ border: 5px solid white;
         </item>
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_8">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
           <property name="topMargin">
-           <number>39</number>
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
           </property>
           <item>
            <widget class="adiscope::MenuAnim" name="rightMenu" native="true">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">font-size: 13px;</string>
+            </property>
             <layout class="QVBoxLayout" name="verticalLayout_4">
              <property name="spacing">
-              <number>18</number>
+              <number>0</number>
              </property>
              <property name="leftMargin">
               <number>20</number>
              </property>
              <property name="topMargin">
-              <number>20</number>
+              <number>25</number>
              </property>
              <property name="rightMargin">
               <number>20</number>
              </property>
              <property name="bottomMargin">
-              <number>0</number>
+              <number>20</number>
              </property>
              <item>
-              <widget class="QGroupBox" name="boxRefChannel">
-               <property name="title">
-                <string>Reference channel</string>
+              <widget class="QLabel" name="label_5">
+               <property name="styleSheet">
+                <string notr="true">color: white;
+    font-size: 14px;
+    font-weight: normal;</string>
                </property>
-               <layout class="QHBoxLayout" name="horizontalLayout_4">
-                <property name="spacing">
-                 <number>6</number>
-                </property>
-                <property name="leftMargin">
-                 <number>9</number>
-                </property>
-                <property name="topMargin">
-                 <number>9</number>
-                </property>
-                <property name="rightMargin">
-                 <number>9</number>
-                </property>
-                <property name="bottomMargin">
-                 <number>9</number>
-                </property>
-                <item>
-                 <widget class="QRadioButton" name="refCh1">
-                  <property name="text">
-                   <string>Channel 1</string>
-                  </property>
-                  <property name="checked">
-                   <bool>true</bool>
-                  </property>
-                  <attribute name="buttonGroup">
-                   <string notr="true">buttonGroup_2</string>
-                  </attribute>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QRadioButton" name="refCh2">
-                  <property name="text">
-                   <string>Channel 2</string>
-                  </property>
-                  <attribute name="buttonGroup">
-                   <string notr="true">buttonGroup_2</string>
-                  </attribute>
-                 </widget>
-                </item>
-               </layout>
+               <property name="text">
+                <string>Settings</string>
+               </property>
               </widget>
              </item>
              <item>
-              <widget class="QGroupBox" name="boxFreqSweep">
-               <property name="title">
-                <string>Frequency Sweep Settings</string>
+              <spacer name="verticalSpacer_5">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
                </property>
-               <layout class="QGridLayout" name="gridLayout_3">
-                <property name="leftMargin">
-                 <number>9</number>
-                </property>
-                <property name="topMargin">
-                 <number>9</number>
-                </property>
-                <property name="rightMargin">
-                 <number>9</number>
-                </property>
-                <property name="bottomMargin">
-                 <number>9</number>
-                </property>
-                <property name="spacing">
-                 <number>6</number>
-                </property>
-                <item row="0" column="0">
-                 <widget class="QRadioButton" name="isLog">
-                  <property name="text">
-                   <string>Logarithmic</string>
-                  </property>
-                  <property name="checked">
-                   <bool>true</bool>
-                  </property>
-                  <attribute name="buttonGroup">
-                   <string notr="true">buttonGroup</string>
-                  </attribute>
-                 </widget>
-                </item>
-                <item row="4" column="0">
-                 <widget class="adiscope::ScaleSpinButton" name="minFreq" native="true">
-                  <property name="units" stdset="0">
-                   <stringlist notr="true">
-                    <string>Hz=1e0</string>
-                    <string>kHz=1e3</string>
-                    <string>MHz=1e6</string>
-                   </stringlist>
-                  </property>
-                  <property name="min_value" stdset="0">
-                   <double>1.000000000000000</double>
-                  </property>
-                  <property name="max_value" stdset="0">
-                   <double>50000000.000000000000000</double>
-                  </property>
-                  <property name="show_progress" stdset="0">
-                   <bool>false</bool>
-                  </property>
-                  <property name="name" stdset="0">
-                   <string>Min Freq</string>
-                  </property>
-                  <property name="value" stdset="0">
-                   <double>1000.000000000000000</double>
-                  </property>
-                 </widget>
-                </item>
-                <item row="5" column="0">
-                 <widget class="adiscope::ScaleSpinButton" name="samplesCount" native="true">
-                  <property name="units" stdset="0">
-                   <stringlist notr="true">
-                    <string>samples=1e0</string>
-                   </stringlist>
-                  </property>
-                  <property name="name" stdset="0">
-                   <string>Samples count</string>
-                  </property>
-                  <property name="min_value" stdset="0">
-                   <double>10.000000000000000</double>
-                  </property>
-                  <property name="max_value" stdset="0">
-                   <double>10000.000000000000000</double>
-                  </property>
-                  <property name="show_progress" stdset="0">
-                   <bool>false</bool>
-                  </property>
-                  <property name="value" stdset="0">
-                   <double>1000.000000000000000</double>
-                  </property>
-                 </widget>
-                </item>
-                <item row="3" column="0">
-                 <spacer name="verticalSpacer_2">
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
-                  </property>
-                  <property name="sizeType">
-                   <enum>QSizePolicy::Fixed</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>0</width>
-                    <height>12</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-                <item row="4" column="1">
-                 <widget class="adiscope::ScaleSpinButton" name="maxFreq" native="true">
-                  <property name="units" stdset="0">
-                   <stringlist notr="true">
-                    <string>Hz=1e0</string>
-                    <string>kHz=1e3</string>
-                    <string>MHz=1e6</string>
-                   </stringlist>
-                  </property>
-                  <property name="name" stdset="0">
-                   <string>Max Freq</string>
-                  </property>
-                  <property name="min_value" stdset="0">
-                   <double>1.000000000000000</double>
-                  </property>
-                  <property name="max_value" stdset="0">
-                   <double>50000000.000000000000000</double>
-                  </property>
-                  <property name="show_progress" stdset="0">
-                   <bool>false</bool>
-                  </property>
-                  <property name="value" stdset="0">
-                   <double>50000.000000000000000</double>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="1">
-                 <widget class="QRadioButton" name="isLinear">
-                  <property name="text">
-                   <string>Linear</string>
-                  </property>
-                  <attribute name="buttonGroup">
-                   <string notr="true">buttonGroup</string>
-                  </attribute>
-                 </widget>
-                </item>
-               </layout>
+               <property name="sizeType">
+                <enum>QSizePolicy::Fixed</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>15</width>
+                 <height>15</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="Line" name="line_2">
+               <property name="styleSheet">
+                <string notr="true">color: #4A64FF;</string>
+               </property>
+               <property name="frameShadow">
+                <enum>QFrame::Plain</enum>
+               </property>
+               <property name="lineWidth">
+                <number>2</number>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
               </widget>
              </item>
              <item>
-              <widget class="QGroupBox" name="boxWaveform">
-               <property name="title">
-                <string>Waveform Settings</string>
+              <layout class="QHBoxLayout" name="horizontalLayout_6">
+               <property name="spacing">
+                <number>0</number>
                </property>
-               <layout class="QGridLayout" name="gridLayout_4">
-                <property name="leftMargin">
-                 <number>9</number>
-                </property>
-                <property name="topMargin">
-                 <number>9</number>
-                </property>
-                <property name="rightMargin">
-                 <number>9</number>
-                </property>
-                <property name="bottomMargin">
-                 <number>9</number>
-                </property>
-                <property name="spacing">
-                 <number>6</number>
-                </property>
-                <item row="0" column="0">
-                 <widget class="adiscope::ScaleSpinButton" name="amplitude" native="true">
-                  <property name="units" stdset="0">
-                   <stringlist notr="true">
-                    <string>µVolts=1e-6</string>
-                    <string>mVolts=1e-3</string>
-                    <string>Volts=1e0</string>
-                   </stringlist>
-                  </property>
-                  <property name="name" stdset="0">
-                   <string>Amplitude</string>
-                  </property>
-                  <property name="min_value" stdset="0">
-                   <double>0.000001000000000</double>
-                  </property>
-                  <property name="max_value" stdset="0">
-                   <double>10.000000000000000</double>
-                  </property>
-                  <property name="show_progress" stdset="0">
-                   <bool>false</bool>
-                  </property>
-                  <property name="value" stdset="0">
-                   <double>1.000000000000000</double>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="1">
-                 <widget class="adiscope::PositionSpinButton" name="offset" native="true">
-                  <property name="units" stdset="0">
-                   <stringlist notr="true">
-                    <string>µVolts=1e-6</string>
-                    <string>mVolts=1e-3</string>
-                    <string>Volts=1e0</string>
-                   </stringlist>
-                  </property>
-                  <property name="name" stdset="0">
-                   <string>Offset</string>
-                  </property>
-                  <property name="min_value" stdset="0">
-                   <double>-5.000000000000000</double>
-                  </property>
-                  <property name="max_value" stdset="0">
-                   <double>5.000000000000000</double>
-                  </property>
-                  <property name="show_progress" stdset="0">
-                   <bool>false</bool>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </widget>
+               <property name="topMargin">
+                <number>25</number>
+               </property>
+               <property name="bottomMargin">
+                <number>15</number>
+               </property>
+               <item>
+                <widget class="QLabel" name="label">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">QLabel {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 70);
+    sizePolicy: Fixed, Fixed
+    }
+</string>
+                 </property>
+                 <property name="text">
+                  <string>REFERENCE </string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="Line" name="line">
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>1</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>1</height>
+                  </size>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">border: 1px solid rgba(255, 255, 255, 70);
+sizePolicy: Minimum, Fixed</string>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Sunken</enum>
+                 </property>
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                </widget>
+               </item>
+              </layout>
              </item>
              <item>
-              <widget class="QGroupBox" name="boxDisplay">
-               <property name="title">
-                <string>Display Settings</string>
+              <layout class="QHBoxLayout" name="horizontalLayout_5">
+               <property name="spacing">
+                <number>0</number>
                </property>
-               <layout class="QGridLayout" name="gridLayout">
-                <property name="leftMargin">
-                 <number>9</number>
-                </property>
-                <property name="topMargin">
-                 <number>9</number>
-                </property>
-                <property name="rightMargin">
-                 <number>9</number>
-                </property>
-                <property name="bottomMargin">
-                 <number>9</number>
-                </property>
-                <property name="spacing">
-                 <number>6</number>
-                </property>
-                <item row="0" column="1">
-                 <widget class="adiscope::PositionSpinButton" name="magMin" native="true">
-                  <property name="units" stdset="0">
-                   <stringlist notr="true">
-                    <string>dB=1e0</string>
-                   </stringlist>
-                  </property>
-                  <property name="name" stdset="0">
-                   <string>Min. Magnitude</string>
-                  </property>
-                  <property name="min_value" stdset="0">
-                   <double>-120.000000000000000</double>
-                  </property>
-                  <property name="max_value" stdset="0">
-                   <double>120.000000000000000</double>
-                  </property>
-                  <property name="value" stdset="0">
-                   <double>-90.000000000000000</double>
-                  </property>
-                  <property name="show_progress" stdset="0">
-                   <bool>false</bool>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="0">
-                 <widget class="adiscope::PositionSpinButton" name="magMax" native="true">
-                  <property name="units" stdset="0">
-                   <stringlist notr="true">
-                    <string>dB=1e0</string>
-                   </stringlist>
-                  </property>
-                  <property name="name" stdset="0">
-                   <string>Max. Magnitude</string>
-                  </property>
-                  <property name="min_value" stdset="0">
-                   <double>-120.000000000000000</double>
-                  </property>
-                  <property name="max_value" stdset="0">
-                   <double>120.000000000000000</double>
-                  </property>
-                  <property name="value" stdset="0">
-                   <double>10.000000000000000</double>
-                  </property>
-                  <property name="show_progress" stdset="0">
-                   <bool>false</bool>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="0">
-                 <widget class="adiscope::PositionSpinButton" name="phaseMax" native="true">
-                  <property name="units" stdset="0">
-                   <stringlist notr="true">
-                    <string>°=1e0</string>
-                   </stringlist>
-                  </property>
-                  <property name="name" stdset="0">
-                   <string>Max. Phase</string>
-                  </property>
-                  <property name="min_value" stdset="0">
-                   <double>-180.000000000000000</double>
-                  </property>
-                  <property name="max_value" stdset="0">
-                   <double>180.000000000000000</double>
-                  </property>
-                  <property name="value" stdset="0">
-                   <double>180.000000000000000</double>
-                  </property>
-                  <property name="show_progress" stdset="0">
-                   <bool>false</bool>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="1">
-                 <widget class="adiscope::PositionSpinButton" name="phaseMin" native="true">
-                  <property name="units" stdset="0">
-                   <stringlist notr="true">
-                    <string>°=1e0</string>
-                   </stringlist>
-                  </property>
-                  <property name="name" stdset="0">
-                   <string>Min. Phase</string>
-                  </property>
-                  <property name="min_value" stdset="0">
-                   <double>-180.000000000000000</double>
-                  </property>
-                  <property name="max_value" stdset="0">
-                   <double>180.000000000000000</double>
-                  </property>
-                  <property name="value" stdset="0">
-                   <double>-180.000000000000000</double>
-                  </property>
-                  <property name="show_progress" stdset="0">
-                   <bool>false</bool>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </widget>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
+               <item>
+                <widget class="QRadioButton" name="refCh1">
+                 <property name="text">
+                  <string>Channel 1</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                 <attribute name="buttonGroup">
+                  <string notr="true">buttonGroup_2</string>
+                 </attribute>
+                </widget>
+               </item>
+               <item>
+                <widget class="QRadioButton" name="refCh2">
+                 <property name="text">
+                  <string>Channel 2</string>
+                 </property>
+                 <attribute name="buttonGroup">
+                  <string notr="true">buttonGroup_2</string>
+                 </attribute>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_4">
+               <property name="spacing">
+                <number>0</number>
+               </property>
+               <property name="topMargin">
+                <number>25</number>
+               </property>
+               <property name="bottomMargin">
+                <number>15</number>
+               </property>
+               <item>
+                <widget class="QLabel" name="label_2">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">QLabel {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 70);
+    sizePolicy: Fixed, Fixed
+}</string>
+                 </property>
+                 <property name="text">
+                  <string>SWEEP </string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="Line" name="line_3">
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>1</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>1</height>
+                  </size>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">border: 1px solid rgba(255, 255, 255, 70);
+sizePolicy: Minimum, Fixed</string>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Sunken</enum>
+                 </property>
+                 <property name="lineWidth">
+                  <number>1</number>
+                 </property>
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QGridLayout" name="gridLayout_7">
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="spacing">
+                <number>15</number>
+               </property>
+               <item row="3" column="1">
+                <widget class="adiscope::ScaleSpinButton" name="samplesCount" native="true">
+                 <property name="units" stdset="0">
+                  <stringlist notr="true">
+                   <string>samples=1e0</string>
+                  </stringlist>
+                 </property>
+                 <property name="name" stdset="0">
+                  <string>Samples count</string>
+                 </property>
+                 <property name="min_value" stdset="0">
+                  <double>10.000000000000000</double>
+                 </property>
+                 <property name="max_value" stdset="0">
+                  <double>10000.000000000000000</double>
+                 </property>
+                 <property name="show_progress" stdset="0">
+                  <bool>false</bool>
+                 </property>
+                 <property name="value" stdset="0">
+                  <double>1000.000000000000000</double>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="0">
+                <widget class="adiscope::ScaleSpinButton" name="minFreq" native="true">
+                 <property name="units" stdset="0">
+                  <stringlist notr="true">
+                   <string>Hz=1e0</string>
+                   <string>kHz=1e3</string>
+                   <string>MHz=1e6</string>
+                  </stringlist>
+                 </property>
+                 <property name="min_value" stdset="0">
+                  <double>1.000000000000000</double>
+                 </property>
+                 <property name="max_value" stdset="0">
+                  <double>50000000.000000000000000</double>
+                 </property>
+                 <property name="show_progress" stdset="0">
+                  <bool>false</bool>
+                 </property>
+                 <property name="name" stdset="0">
+                  <string>Min Freq</string>
+                 </property>
+                 <property name="value" stdset="0">
+                  <double>1000.000000000000000</double>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="0">
+                <spacer name="verticalSpacer_2">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::Fixed</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>0</width>
+                   <height>12</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="2" column="1">
+                <widget class="adiscope::ScaleSpinButton" name="maxFreq" native="true">
+                 <property name="units" stdset="0">
+                  <stringlist notr="true">
+                   <string>Hz=1e0</string>
+                   <string>kHz=1e3</string>
+                   <string>MHz=1e6</string>
+                  </stringlist>
+                 </property>
+                 <property name="name" stdset="0">
+                  <string>Max Freq</string>
+                 </property>
+                 <property name="min_value" stdset="0">
+                  <double>1.000000000000000</double>
+                 </property>
+                 <property name="max_value" stdset="0">
+                  <double>50000000.000000000000000</double>
+                 </property>
+                 <property name="show_progress" stdset="0">
+                  <bool>false</bool>
+                 </property>
+                 <property name="value" stdset="0">
+                  <double>50000.000000000000000</double>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QRadioButton" name="isLog">
+                 <property name="text">
+                  <string>Logarithmic</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                 <attribute name="buttonGroup">
+                  <string notr="true">buttonGroup</string>
+                 </attribute>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QRadioButton" name="isLinear">
+                 <property name="text">
+                  <string>Linear</string>
+                 </property>
+                 <attribute name="buttonGroup">
+                  <string notr="true">buttonGroup</string>
+                 </attribute>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_7">
+               <property name="spacing">
+                <number>0</number>
+               </property>
+               <property name="topMargin">
+                <number>25</number>
+               </property>
+               <property name="bottomMargin">
+                <number>25</number>
+               </property>
+               <item>
+                <widget class="QLabel" name="label_3">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">QLabel {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 70);
+    sizePolicy: Fixed, Fixed
+    }
+</string>
+                 </property>
+                 <property name="text">
+                  <string>WAVEFORM </string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="Line" name="line_5">
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>1</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>1</height>
+                  </size>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">border: 1px solid rgba(255, 255, 255, 70);
+sizePolicy: Minimum, Fixed</string>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Sunken</enum>
+                 </property>
+                 <property name="lineWidth">
+                  <number>1</number>
+                 </property>
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QGridLayout" name="gridLayout_8">
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="spacing">
+                <number>15</number>
+               </property>
+               <item row="0" column="0">
+                <widget class="adiscope::ScaleSpinButton" name="amplitude" native="true">
+                 <property name="units" stdset="0">
+                  <stringlist notr="true">
+                   <string>µVolts=1e-6</string>
+                   <string>mVolts=1e-3</string>
+                   <string>Volts=1e0</string>
+                  </stringlist>
+                 </property>
+                 <property name="name" stdset="0">
+                  <string>Amplitude</string>
+                 </property>
+                 <property name="min_value" stdset="0">
+                  <double>0.000001000000000</double>
+                 </property>
+                 <property name="max_value" stdset="0">
+                  <double>10.000000000000000</double>
+                 </property>
+                 <property name="show_progress" stdset="0">
+                  <bool>false</bool>
+                 </property>
+                 <property name="value" stdset="0">
+                  <double>1.000000000000000</double>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="adiscope::PositionSpinButton" name="offset" native="true">
+                 <property name="units" stdset="0">
+                  <stringlist notr="true">
+                   <string>µVolts=1e-6</string>
+                   <string>mVolts=1e-3</string>
+                   <string>Volts=1e0</string>
+                  </stringlist>
+                 </property>
+                 <property name="name" stdset="0">
+                  <string>Offset</string>
+                 </property>
+                 <property name="min_value" stdset="0">
+                  <double>-5.000000000000000</double>
+                 </property>
+                 <property name="max_value" stdset="0">
+                  <double>5.000000000000000</double>
+                 </property>
+                 <property name="show_progress" stdset="0">
+                  <bool>false</bool>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_8">
+               <property name="spacing">
+                <number>0</number>
+               </property>
+               <property name="topMargin">
+                <number>25</number>
+               </property>
+               <property name="bottomMargin">
+                <number>25</number>
+               </property>
+               <item>
+                <widget class="QLabel" name="label_4">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">QLabel {
+       font-size: 12px;
+       color: rgba(255, 255, 255, 70);
+   sizePolicy: Fixed, Fixed
+    }
+   </string>
+                 </property>
+                 <property name="text">
+                  <string>DISPLAY </string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="Line" name="line_4">
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>1</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>1</height>
+                  </size>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">border: 1px solid rgba(255, 255, 255, 70);
+minimum-height:1px;
+maximum-height:1px;
+sizePolicy: Minimum, Fixed</string>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Sunken</enum>
+                 </property>
+                 <property name="lineWidth">
+                  <number>1</number>
+                 </property>
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QGridLayout" name="gridLayout_9">
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="spacing">
+                <number>15</number>
+               </property>
+               <item row="1" column="0">
+                <widget class="adiscope::PositionSpinButton" name="magMax" native="true">
+                 <property name="units" stdset="0">
+                  <stringlist notr="true">
+                   <string>dB=1e0</string>
+                  </stringlist>
+                 </property>
+                 <property name="name" stdset="0">
+                  <string>Max. Magnitude</string>
+                 </property>
+                 <property name="min_value" stdset="0">
+                  <double>-120.000000000000000</double>
+                 </property>
+                 <property name="max_value" stdset="0">
+                  <double>120.000000000000000</double>
+                 </property>
+                 <property name="value" stdset="0">
+                  <double>10.000000000000000</double>
+                 </property>
+                 <property name="show_progress" stdset="0">
+                  <bool>false</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="adiscope::PositionSpinButton" name="phaseMax" native="true">
+                 <property name="units" stdset="0">
+                  <stringlist notr="true">
+                   <string>°=1e0</string>
+                  </stringlist>
+                 </property>
+                 <property name="name" stdset="0">
+                  <string>Max. Phase</string>
+                 </property>
+                 <property name="min_value" stdset="0">
+                  <double>-180.000000000000000</double>
+                 </property>
+                 <property name="max_value" stdset="0">
+                  <double>180.000000000000000</double>
+                 </property>
+                 <property name="value" stdset="0">
+                  <double>180.000000000000000</double>
+                 </property>
+                 <property name="show_progress" stdset="0">
+                  <bool>false</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="0">
+                <widget class="adiscope::PositionSpinButton" name="magMin" native="true">
+                 <property name="units" stdset="0">
+                  <stringlist notr="true">
+                   <string>dB=1e0</string>
+                  </stringlist>
+                 </property>
+                 <property name="name" stdset="0">
+                  <string>Min. Magnitude</string>
+                 </property>
+                 <property name="min_value" stdset="0">
+                  <double>-120.000000000000000</double>
+                 </property>
+                 <property name="max_value" stdset="0">
+                  <double>120.000000000000000</double>
+                 </property>
+                 <property name="value" stdset="0">
+                  <double>-90.000000000000000</double>
+                 </property>
+                 <property name="show_progress" stdset="0">
+                  <bool>false</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="adiscope::PositionSpinButton" name="phaseMin" native="true">
+                 <property name="units" stdset="0">
+                  <stringlist notr="true">
+                   <string>°=1e0</string>
+                  </stringlist>
+                 </property>
+                 <property name="name" stdset="0">
+                  <string>Min. Phase</string>
+                 </property>
+                 <property name="min_value" stdset="0">
+                  <double>-180.000000000000000</double>
+                 </property>
+                 <property name="max_value" stdset="0">
+                  <double>180.000000000000000</double>
+                 </property>
+                 <property name="value" stdset="0">
+                  <double>-180.000000000000000</double>
+                 </property>
+                 <property name="show_progress" stdset="0">
+                  <bool>false</bool>
+                 </property>
+                </widget>
+               </item>
+              </layout>
              </item>
              <item>
               <spacer name="verticalSpacer">
@@ -968,6 +1236,19 @@ border: 5px solid white;
                <property name="sizeHint" stdset="0">
                 <size>
                  <width>0</width>
+                 <height>0</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_3">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>280</width>
                  <height>0</height>
                 </size>
                </property>
@@ -1025,7 +1306,6 @@ border: 5px solid white;
  </customwidgets>
  <resources>
   <include location="../resources/resources.qrc"/>
-  <include location="../resources/resources.qrc"/>
  </resources>
  <connections>
   <connection>
@@ -1041,102 +1321,6 @@ border: 5px solid white;
     <hint type="destinationlabel">
      <x>985</x>
      <y>440</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>minFreq</sender>
-   <signal>valueChanged(double)</signal>
-   <receiver>maxFreq</receiver>
-   <slot>setMinValue(double)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>963</x>
-     <y>90</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>969</x>
-     <y>90</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>maxFreq</sender>
-   <signal>valueChanged(double)</signal>
-   <receiver>minFreq</receiver>
-   <slot>setMaxValue(double)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>969</x>
-     <y>90</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>963</x>
-     <y>90</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>minFreq</sender>
-   <signal>valueChanged(double)</signal>
-   <receiver>dbgraph</receiver>
-   <slot>setXMin(double)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>957</x>
-     <y>90</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>468</x>
-     <y>294</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>maxFreq</sender>
-   <signal>valueChanged(double)</signal>
-   <receiver>dbgraph</receiver>
-   <slot>setXMax(double)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>969</x>
-     <y>90</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>468</x>
-     <y>294</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>minFreq</sender>
-   <signal>valueChanged(double)</signal>
-   <receiver>phasegraph</receiver>
-   <slot>setXMin(double)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>957</x>
-     <y>90</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>468</x>
-     <y>640</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>maxFreq</sender>
-   <signal>valueChanged(double)</signal>
-   <receiver>phasegraph</receiver>
-   <slot>setXMax(double)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>969</x>
-     <y>90</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>468</x>
-     <y>640</y>
     </hint>
    </hints>
   </connection>
@@ -1365,50 +1549,34 @@ border: 5px solid white;
    </hints>
   </connection>
   <connection>
-   <sender>run_button</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>boxFreqSweep</receiver>
-   <slot>setDisabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>987</x>
-     <y>39</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1070</x>
-     <y>189</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>run_button</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>boxWaveform</receiver>
-   <slot>setDisabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>987</x>
-     <y>39</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1070</x>
-     <y>307</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>isLog</sender>
-   <signal>toggled(bool)</signal>
+   <sender>minFreq</sender>
+   <signal>valueChanged(double)</signal>
    <receiver>phasegraph</receiver>
-   <slot>useLogFreq(bool)</slot>
+   <slot>setXMin(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1035</x>
-     <y>159</y>
+     <x>957</x>
+     <y>90</y>
     </hint>
     <hint type="destinationlabel">
-     <x>477</x>
-     <y>509</y>
+     <x>468</x>
+     <y>640</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>minFreq</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>dbgraph</receiver>
+   <slot>setXMin(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>957</x>
+     <y>90</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>468</x>
+     <y>294</y>
     </hint>
    </hints>
   </connection>
@@ -1429,18 +1597,82 @@ border: 5px solid white;
    </hints>
   </connection>
   <connection>
-   <sender>run_button</sender>
+   <sender>isLog</sender>
    <signal>toggled(bool)</signal>
-   <receiver>boxRefChannel</receiver>
-   <slot>setDisabled(bool)</slot>
+   <receiver>phasegraph</receiver>
+   <slot>useLogFreq(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>987</x>
-     <y>39</y>
+     <x>1035</x>
+     <y>159</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1062</x>
-     <y>151</y>
+     <x>477</x>
+     <y>509</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>maxFreq</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>minFreq</receiver>
+   <slot>setMaxValue(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>969</x>
+     <y>90</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>963</x>
+     <y>90</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>maxFreq</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>dbgraph</receiver>
+   <slot>setXMax(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>969</x>
+     <y>90</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>468</x>
+     <y>294</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>maxFreq</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>phasegraph</receiver>
+   <slot>setXMax(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>969</x>
+     <y>90</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>468</x>
+     <y>640</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>minFreq</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>maxFreq</receiver>
+   <slot>setMinValue(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>963</x>
+     <y>90</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>969</x>
+     <y>90</y>
     </hint>
    </hints>
   </connection>
