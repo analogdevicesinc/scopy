@@ -1353,17 +1353,7 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
                <item>
                 <widget class="QLineEdit" name="filename">
                  <property name="styleSheet">
-                  <string notr="true">QLineEdit {
-height: 22px;
-color: white;
-font-family: &quot;monospace&quot; 12;
-border: 2px solid;
-border-color: grey;
-border-radius: 5px;
-padding: 0 8px;
-background: transparent;
-selection-background-color: darkgray;
-}
+                  <string notr="true">
 QLineEdit[invalid=true] {
 border-color: red;
 color: red;
