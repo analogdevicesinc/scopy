@@ -270,7 +270,7 @@ public:
 	bool debugger_enabled();
 	void enable_debugger(bool);
 
-	bool manual_calibration_enabled();
+	bool manual_calibration_enabled() const;
 	void enable_manual_calibration(bool);
 
 	const QString& getPreviousIp()

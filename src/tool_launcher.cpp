@@ -1575,7 +1575,7 @@ void ToolLauncher_API::enable_debugger(bool enabled)
 	tl->debugger_enabled = enabled;
 }
 
-bool ToolLauncher_API::manual_calibration_enabled()
+bool ToolLauncher_API::manual_calibration_enabled() const
 {
 	return tl->manual_calibration_enabled;
 }

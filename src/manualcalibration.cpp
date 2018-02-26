@@ -30,6 +30,27 @@
 
 using namespace adiscope;
 
+static const double SUPPLY_100MV_VALUE = 0.1;
+static const double SUPPLY_4_5V_VALUE = 4.5;
+static const double SUPPLY_100MV_NEG_VALUE = -0.1;
+static const double SUPPLY_4_5V_NEG_VALUE = -4.5;
+
+/*Calibrations procedure stories*/
+static const QStringList positiveOffsetStory = (QStringList() <<
+					 R"(Calibrate the Positive Supply.
+Measure the Voltage on the \"V+\" and enter the value in the field below.
+The value should be around 100mV)"
+					 << R"(Calibrate the Positive Supply
+Measure the Voltage on the \"V+\" and enter the value in the field below.
+The value should be around 4.5V)");
+static const QStringList negativeOffsetStory = (QStringList() <<
+					 R"(Calibrate the Negative Supply
+Measure the Voltage on the \"V-\" and enter the value in the field below.
+The value should be around -100mV)"
+					 << R"(Calibrate the Negative Supply
+Measure the Voltage on the \"V-\" and enter the value in the field below.
+The value should be around -4.5V)");
+
 ManualCalibration::ManualCalibration(struct iio_context *ctx, Filter *filt,
 				     QPushButton *runButton, QJSEngine *engine,
 				     ToolLauncher *parent, Calibration *cal) :
@@ -179,7 +200,7 @@ void ManualCalibration::setupPowerSupplyIio()
 	iio_device_attr_write(dev3, "clk_powerdown", "0");
 }
 
-void ManualCalibration::positivePowerSupplyParam(const int& step)
+void ManualCalibration::positivePowerSupplyParam(const int step)
 {
 	double offset_Value;
 	long long val = 0;
@@ -285,7 +306,7 @@ void ManualCalibration::negativePowerSupplySetup()
 	setNegativeValue(-0.1);
 }
 
-void ManualCalibration::negativePowerSupplyParam(const int& step)
+void ManualCalibration::negativePowerSupplyParam(const int step)
 {
 	double offset_Value;
 	long long val = 0;
