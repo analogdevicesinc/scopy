@@ -56,6 +56,13 @@ void StackedHomepage::addWidget(QWidget *widget)
 	s_hc->raise();
 }
 
+void StackedHomepage::removeWidget(QWidget *widget)
+{
+	QStackedWidget::removeWidget(widget);
+	s_hc->setVisible(count() > 1);
+	s_hc->lower();
+}
+
 void StackedHomepage::moveLeft()
 {
 	slideInPrev();

@@ -96,7 +96,6 @@ public Q_SLOTS:
 	void saveSession();
 
 private Q_SLOTS:
-
 	void search();
 	void update();
 	void ping();
@@ -132,6 +131,34 @@ private Q_SLOTS:
 	void swapMenuOptions(int source, int destination, bool dropAfter);
 	void highlight(bool on, int position);
 	void resetSession();
+
+private:
+	void loadToolTips(bool connected);
+	QVector<QString> searchDevices();
+	void swapMenu(QWidget *menu);
+	void destroyContext();
+	bool loadDecoders(QString path);
+	bool switchContext(const QString& uri);
+	void resetStylesheets();
+	void calibrate();
+	void checkIp(const QString& ip);
+	void disconnect();
+	void saveSettings();
+	Q_INVOKABLE QPushButton *addContext(const QString& hostname);
+
+	QList<QString> getOrder();
+	void setOrder(QList<QString> list);
+
+	void updateListOfDevices(const QVector<QString>& uris);
+	void generateMenu();
+	QStringList tools;
+	QStringList toolIcons;
+	void UpdatePosition(QWidget *widget, int position);
+	void insertMenuOptions();
+	void closeEvent(QCloseEvent *event);
+	void highlightDevice(QPushButton *btn);
+	void setupHomepage();
+	void updateHomepage();
 
 private:
 	Ui::ToolLauncher *ui;
@@ -180,41 +207,15 @@ private:
 	QSocketNotifier notifier;
 	QString previousIp;
 
+	QTextBrowser *welcome;
+	QTextBrowser *index;
+
 	bool calibrating;
 	bool skip_calibration;
 
 	bool debugger_enabled;
 
 	QString indexFile;
-
-	void loadToolTips(bool connected);
-	QVector<QString> searchDevices();
-	void swapMenu(QWidget *menu);
-	void destroyContext();
-	bool loadDecoders(QString path);
-	bool switchContext(const QString& uri);
-	void resetStylesheets();
-	void calibrate();
-	void checkIp(const QString& ip);
-	void disconnect();
-	void saveSettings();
-	Q_INVOKABLE QPushButton *addContext(const QString& hostname);
-
-	QList<QString> getOrder();
-	void setOrder(QList<QString> list);
-
-	QTextBrowser *welcome;
-	QTextBrowser *index;
-
-	void updateListOfDevices(const QVector<QString>& uris);
-	void generateMenu();
-	QStringList tools;
-	QStringList toolIcons;
-	void UpdatePosition(QWidget *widget, int position);
-	void insertMenuOptions();
-	void closeEvent(QCloseEvent *event);
-	void highlightDevice(QPushButton *btn);
-	void setupHomepage();
 };
 
 class ToolLauncher_API: public ApiObject
