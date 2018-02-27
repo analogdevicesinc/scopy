@@ -66,7 +66,7 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	skip_calibration(false),
 	calibrating(false),
 	debugger_enabled(false),
-	indexFile("")
+	indexFile(""), pathToFile("")
 {
 	if (!isatty(STDIN_FILENO))
 		notifier.setEnabled(false);
@@ -172,7 +172,7 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 		SLOT(setButtonBackground(bool)));
 
 	ui->saveBtn->parentWidget()->setEnabled(false);
-	ui->loadBtn->parentWidget()->setEnabled(false);
+	ui->loadBtn->parentWidget()->setEnabled(true);
 
 	ui->btnHome->toggle();
 
@@ -250,30 +250,29 @@ void ToolLauncher::saveSession()
 
 void ToolLauncher::loadSession()
 {
-	if (ctx) {
-		auto export_dialog( new QFileDialog( this ) );
-		export_dialog->setWindowModality( Qt::WindowModal );
-		export_dialog->setFileMode( QFileDialog::AnyFile );
-		export_dialog->setAcceptMode( QFileDialog::AcceptOpen );
-		export_dialog->setNameFilters({"Scopy-Files (*.ini)"});
-		if (export_dialog->exec()){
-			QFile f(export_dialog->selectedFiles().at(0));
-			QStack<QPushButton*> enabledTools;
-			for (auto tool : toolMenu)
-				if (tool->getToolStopBtn()->isEnabled()) {
-					enabledTools.push(tool->getToolStopBtn());
-					tool->getToolStopBtn()->setDisabled(true);
-				}
-			this->tl_api->load(f.fileName());
-			while (!enabledTools.isEmpty()) {
-				QPushButton *btn = enabledTools.back();
-				btn->setEnabled(true);
-				enabledTools.pop();
+	auto export_dialog( new QFileDialog( this ) );
+	export_dialog->setWindowModality( Qt::WindowModal );
+	export_dialog->setFileMode( QFileDialog::AnyFile );
+	export_dialog->setAcceptMode( QFileDialog::AcceptOpen );
+	export_dialog->setNameFilters({"Scopy-Files (*.ini)"});
+	if (export_dialog->exec()){
+		QFile f(export_dialog->selectedFiles().at(0));
+		QStack<QPushButton*> enabledTools;
+		for (auto tool : toolMenu)
+			if (tool->getToolStopBtn()->isEnabled()) {
+				enabledTools.push(tool->getToolStopBtn());
+				tool->getToolStopBtn()->setDisabled(true);
 			}
+		pathToFile = f.fileName();
+		this->tl_api->load(pathToFile);
+		while (!enabledTools.isEmpty()) {
+			QPushButton *btn = enabledTools.back();
+			btn->setEnabled(true);
+			enabledTools.pop();
 		}
+		updateHomepage();
+		setupHomepage();
 	}
-	updateHomepage();
-	setupHomepage();
 }
 
 void ToolLauncher::resetSession()
@@ -289,6 +288,7 @@ void ToolLauncher::resetSession()
 		this->disconnect();
 		deviceConnected = true;
 	}
+	pathToFile = "";
 	indexFile = "";
 	updateHomepage();
 	setupHomepage();
@@ -538,7 +538,7 @@ void ToolLauncher::loadToolTips(bool connected){
 		toolMenu["Voltmeter"]->getToolBtn()->setToolTip(
 					QString());
 		ui->saveBtn->setToolTip(QString());
-		ui->loadBtn->setToolTip(QString());
+		ui->loadBtn->setToolTip(QString("Click to load a session"));
 		ui->btnConnect->setToolTip(QString("Select a device first"));
 	}
 }
@@ -841,7 +841,6 @@ void adiscope::ToolLauncher::disconnect()
 		toolMenu["Debugger"]->getToolStopBtn()->setChecked(false);
 
 		ui->saveBtn->parentWidget()->setEnabled(false);
-		ui->loadBtn->parentWidget()->setEnabled(false);
 
 		for (auto x : detachedWindows){
 			x->close();
@@ -898,7 +897,6 @@ void adiscope::ToolLauncher::on_btnConnect_clicked(bool pressed)
 		search_timer->stop();
 
 		ui->saveBtn->parentWidget()->setEnabled(true);
-		ui->loadBtn->parentWidget()->setEnabled(true);
 
 		if (label) {
 			label->setText(filter->hw_name());
@@ -1096,6 +1094,10 @@ void adiscope::ToolLauncher::enableDacBasedTools()
 			toolMenu["Signal Generator"]->getToolStopBtn(), &js_engine, this);
 		toolList.push_back(signal_generator);
 	}
+	if (pathToFile != "") {
+		this->tl_api->load(pathToFile);
+	}
+
 	Q_EMIT dacToolsCreated();
 }
 
@@ -1573,6 +1575,7 @@ bool ToolLauncher_API::connect(const QString& uri)
 		QCoreApplication::processEvents();
 		QThread::msleep(10);
 	} while (!done);
+
 	return did_connect;
 }
 
