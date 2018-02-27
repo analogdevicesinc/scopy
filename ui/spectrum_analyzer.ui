@@ -501,7 +501,7 @@ QWidget {
               </sizepolicy>
              </property>
              <property name="currentIndex">
-              <number>2</number>
+              <number>0</number>
              </property>
              <widget class="QWidget" name="channelSettings">
               <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -900,8 +900,7 @@ border-bottom: 1px solid rgba(255,255,255,100);</string>
                     </size>
                    </property>
                    <property name="styleSheet">
-                    <string notr="true"> border: 1px solid rgba(255, 255, 255, 70);
-    sizePolicy: Minimum, Fixed</string>
+                    <string notr="true"> border: 1px solid rgba(255, 255, 255, 70);</string>
                    </property>
                    <property name="orientation">
                     <enum>Qt::Horizontal</enum>
@@ -1049,8 +1048,7 @@ border-bottom: 1px solid rgba(255,255,255,100);</string>
                     </size>
                    </property>
                    <property name="styleSheet">
-                    <string notr="true"> border: 1px solid rgba(255, 255, 255, 70);
-    sizePolicy: Minimum, Fixed</string>
+                    <string notr="true"> border: 1px solid rgba(255, 255, 255, 70);</string>
                    </property>
                    <property name="orientation">
                     <enum>Qt::Horizontal</enum>
@@ -1326,8 +1324,7 @@ border-bottom: 1px solid rgba(255,255,255,100);</string>
                     </size>
                    </property>
                    <property name="styleSheet">
-                    <string notr="true">border: 1px solid rgba(255, 255, 255, 70);
-    sizePolicy: Minimum, Fixed</string>
+                    <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
                    </property>
                    <property name="orientation">
                     <enum>Qt::Horizontal</enum>
@@ -1635,7 +1632,7 @@ background-color: #F45000;
                    </property>
                    <property name="styleSheet">
                     <string notr="true">border: 1px solid rgba(255, 255, 255, 70);
-    sizePolicy: Minimum, Fixed</string>
+</string>
                    </property>
                    <property name="orientation">
                     <enum>Qt::Horizontal</enum>
