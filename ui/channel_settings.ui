@@ -105,7 +105,7 @@ font-weight: normal;
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>228</width>
+        <width>252</width>
         <height>497</height>
        </rect>
       </property>
@@ -301,20 +301,40 @@ color: rgba(255, 255, 255, 70);
             </item>
             <item>
              <widget class="QPushButton" name="btnEditMath">
+              <property name="minimumSize">
+               <size>
+                <width>240</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>240</width>
+                <height>30</height>
+               </size>
+              </property>
               <property name="styleSheet">
                <string notr="true">QPushButton {
-	background-color: rgba(0, 0, 0, 80);
-	color: gray;
-	font: bold  &quot;Times New Roman&quot;;	
-	font-size: 16px;
-	border-radius: 3px;
-  	border: 2px rgba(0, 0, 0, 80);
+  min-height: 30px;
+  max-height: 30px;
+  min-width: 240px;
+  max-width: 240px;
+
+  border: 0px;
+  border-radius: 4px;
+
+  background-color: #4a64ff;
+  color: #ffffff;
+
+  font-size: 14px;
 }
 
-QPushButton:hover {
-	color: white;
-	background-color: rgba(0, 0, 0, 60);
-	border-color: rgba(0, 0, 0, 60);
+QPushButton:pressed {
+  background-color: #2a44df;
+}
+
+QPushButton:disabled {
+  background-color:  #727273;
 }</string>
               </property>
               <property name="text">
