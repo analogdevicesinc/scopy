@@ -501,7 +501,7 @@ QWidget {
               </sizepolicy>
              </property>
              <property name="currentIndex">
-              <number>0</number>
+              <number>2</number>
              </property>
              <widget class="QWidget" name="channelSettings">
               <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -580,6 +580,9 @@ QWidget {
                  </property>
                  <item>
                   <widget class="QLabel" name="label_type">
+                   <property name="styleSheet">
+                    <string notr="true"> font-size: 13px;</string>
+                   </property>
                    <property name="text">
                     <string>Type</string>
                    </property>
@@ -611,6 +614,9 @@ QWidget {
                  </property>
                  <item>
                   <widget class="QLabel" name="label_window">
+                   <property name="styleSheet">
+                    <string notr="true"> font-size: 13px;</string>
+                   </property>
                    <property name="text">
                     <string>Window</string>
                    </property>
@@ -642,6 +648,9 @@ QWidget {
                  </property>
                  <item>
                   <widget class="QLabel" name="label_averaging">
+                   <property name="styleSheet">
+                    <string notr="true"> font-size: 13px;</string>
+                   </property>
                    <property name="text">
                     <string>Averaging</string>
                    </property>
@@ -1089,6 +1098,9 @@ border-bottom: 1px solid rgba(255,255,255,100);</string>
                    </item>
                    <item>
                     <widget class="QLabel" name="lbl_rbw">
+                     <property name="styleSheet">
+                      <string notr="true"> font-size: 13px;</string>
+                     </property>
                      <property name="text">
                       <string>Resolution BW</string>
                      </property>
@@ -1127,6 +1139,9 @@ border-bottom: 1px solid rgba(255,255,255,100);</string>
                    </item>
                    <item>
                     <widget class="QLabel" name="lbl_units">
+                     <property name="styleSheet">
+                      <string notr="true"> font-size: 13px;</string>
+                     </property>
                      <property name="text">
                       <string>Units</string>
                      </property>
