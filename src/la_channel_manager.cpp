@@ -1461,7 +1461,10 @@ void LogicAnalyzerChannelManagerUI::createColorButtons()
 	generalSettingsUi = new Ui::LChannelSettings();
 	generalSettings = new QWidget(locationSettingsWidget);
 	generalSettingsUi->setupUi(generalSettings);
-	locationSettingsLayout->insertWidget(locationSettingsLayout->count()-1, generalSettings);
+	locationSettingsLayout->insertWidget(locationSettingsLayout->count()-2, generalSettings);
+	QSpacerItem *spacerItem = new QSpacerItem(0, 0, QSizePolicy::Minimum,
+						  QSizePolicy::Expanding);
+	locationSettingsLayout->addSpacerItem(spacerItem);
 
 	/*Add color buttons */
 	colour_button_edge = new ColourButton(
@@ -2477,7 +2480,6 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 			settingsUI->verticalLayout_1->count() - 1, r);
 		settingsUI->options->hide();
 	}
-
 	locationSettingsWidget->setVisible(true);
 	la->installWheelEventGuard();
 }

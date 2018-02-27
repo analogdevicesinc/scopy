@@ -35,7 +35,6 @@
    <string notr="true">QWidget
 {
   color: rgb(190, 190, 190);
-  font: 75 10pt &quot;DejaVu Sans&quot;;
 }
 
 /* QComboBoxes*/
@@ -66,11 +65,11 @@ QComboBox:disabled
   color: rgb(85, 85, 85);
 }
 
-/* QLabels */
+/* QLabels 
 QLabel:disabled
 {
   color: rgb(85, 85, 85);
-}
+}*/
 
 QRadioButton {
 color: white;
@@ -86,7 +85,7 @@ border-color: rgb(73, 99, 255);
 }
 QRadioButton::indicator:checked {
 background-color: rgb(73, 99, 255);
-}s</string>
+}</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
@@ -107,16 +106,30 @@ background-color: rgb(73, 99, 255);
    <item>
     <widget class="QLabel" name="trigger_settings_label">
      <property name="styleSheet">
-      <string notr="true">  min-width: 135px;
-  padding-bottom: 15px;
-  font: bold;
-  color: white;
-  margin-top: 0px;</string>
+      <string notr="true">color: white;
+font-size: 14px;
+font-weight: normal;</string>
      </property>
      <property name="text">
       <string>Trigger Settings</string>
      </property>
     </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer_4">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>0</width>
+       <height>15</height>
+      </size>
+     </property>
+    </spacer>
    </item>
    <item>
     <widget class="Line" name="line_2">
@@ -135,6 +148,22 @@ background-color: rgb(73, 99, 255);
     </widget>
    </item>
    <item>
+    <spacer name="verticalSpacer_3">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>0</width>
+       <height>25</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
     <layout class="QVBoxLayout" name="verticalLayout_11">
      <property name="spacing">
       <number>10</number>
@@ -143,7 +172,7 @@ background-color: rgb(73, 99, 255);
       <number>0</number>
      </property>
      <property name="topMargin">
-      <number>20</number>
+      <number>0</number>
      </property>
      <property name="rightMargin">
       <number>0</number>
@@ -153,6 +182,15 @@ background-color: rgb(73, 99, 255);
      </property>
      <item>
       <widget class="QLabel" name="label">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="styleSheet">
+        <string notr="true"> font-size: 13px;</string>
+       </property>
        <property name="text">
         <string>Trigger mode</string>
        </property>
@@ -208,68 +246,62 @@ background-color: rgb(73, 99, 255);
       </layout>
      </item>
      <item>
-      <widget class="QLabel" name="lbl_trigg_source">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <property name="spacing">
+        <number>0</number>
        </property>
-       <property name="text">
-        <string>Trigger Logic</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QComboBox" name="cmb_trigg_logic">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="currentIndex">
+       <property name="topMargin">
         <number>0</number>
        </property>
        <item>
-        <property name="text">
-         <string>OR</string>
-        </property>
+        <widget class="QLabel" name="lbl_trigg_source">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="styleSheet">
+          <string notr="true"> font-size: 13px;</string>
+         </property>
+         <property name="text">
+          <string>Trigger Logic</string>
+         </property>
+        </widget>
        </item>
        <item>
-        <property name="text">
-         <string>AND</string>
-        </property>
+        <widget class="QComboBox" name="cmb_trigg_logic">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="currentIndex">
+          <number>0</number>
+         </property>
+         <item>
+          <property name="text">
+           <string>OR</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>AND</string>
+          </property>
+         </item>
+        </widget>
        </item>
-      </widget>
+      </layout>
      </item>
     </layout>
    </item>
    <item>
-    <spacer name="verticalSpacer_3">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Fixed</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>0</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_16">
-     <property name="spacing">
-      <number>5</number>
-     </property>
-     <item>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="1" column="0">
       <widget class="QLabel" name="label_2">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -288,20 +320,68 @@ background-color: rgb(73, 99, 255);
        </property>
        <property name="styleSheet">
         <string notr="true">QLabel {
-  color: rgb(85, 85, 85);
+		font-size: 12px;
+		color: rgba(255, 255, 255, 70);
 }</string>
        </property>
        <property name="text">
-        <string>EXTERNAL TRIGGER</string>
+        <string>EXTERNAL TRIGGER </string>
        </property>
       </widget>
      </item>
-     <item>
+     <item row="1" column="1">
       <widget class="Line" name="line">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>1</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>1</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
+       </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
       </widget>
+     </item>
+     <item row="0" column="0" colspan="2">
+      <spacer name="verticalSpacer_5">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Fixed</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>0</width>
+         <height>25</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="2" column="0" colspan="2">
+      <spacer name="verticalSpacer_6">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Fixed</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>0</width>
+         <height>15</height>
+        </size>
+       </property>
+      </spacer>
      </item>
     </layout>
    </item>
@@ -319,41 +399,6 @@ background-color: rgb(73, 99, 255);
      <property name="rightMargin">
       <number>0</number>
      </property>
-     <item>
-      <spacer name="verticalSpacer_21">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="sizeType">
-        <enum>QSizePolicy::Fixed</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>0</width>
-         <height>15</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QLabel" name="lbl_external_a_en">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>36</width>
-         <height>16</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>External</string>
-       </property>
-      </widget>
-     </item>
      <item>
       <spacer name="verticalSpacer_10">
        <property name="orientation">
@@ -391,209 +436,217 @@ background-color: rgb(73, 99, 255);
        <property name="sizeHint" stdset="0">
         <size>
          <width>0</width>
-         <height>18</height>
+         <height>10</height>
         </size>
        </property>
       </spacer>
      </item>
      <item>
-      <widget class="QWidget" name="trigg_ext_1" native="true">
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>50</height>
-        </size>
+      <layout class="QHBoxLayout" name="trigg_ext_1">
+       <property name="spacing">
+        <number>0</number>
        </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <item>
-         <widget class="QLabel" name="lbl_extern_1">
-          <property name="text">
-           <string>External 1</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QComboBox" name="cmb_trigg_extern_cond_1">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="palette">
-           <palette>
-            <active>
-             <colorrole role="WindowText">
-              <brush brushstyle="SolidPattern">
-               <color alpha="255">
-                <red>255</red>
-                <green>255</green>
-                <blue>255</blue>
-               </color>
-              </brush>
-             </colorrole>
-             <colorrole role="Button">
-              <brush brushstyle="SolidPattern">
-               <color alpha="255">
-                <red>39</red>
-                <green>39</green>
-                <blue>48</blue>
-               </color>
-              </brush>
-             </colorrole>
-             <colorrole role="Text">
-              <brush brushstyle="SolidPattern">
-               <color alpha="255">
-                <red>255</red>
-                <green>255</green>
-                <blue>255</blue>
-               </color>
-              </brush>
-             </colorrole>
-             <colorrole role="ButtonText">
-              <brush brushstyle="SolidPattern">
-               <color alpha="255">
-                <red>255</red>
-                <green>255</green>
-                <blue>255</blue>
-               </color>
-              </brush>
-             </colorrole>
-             <colorrole role="Base">
-              <brush brushstyle="SolidPattern">
-               <color alpha="255">
-                <red>39</red>
-                <green>39</green>
-                <blue>48</blue>
-               </color>
-              </brush>
-             </colorrole>
-             <colorrole role="Window">
-              <brush brushstyle="SolidPattern">
-               <color alpha="255">
-                <red>39</red>
-                <green>39</green>
-                <blue>48</blue>
-               </color>
-              </brush>
-             </colorrole>
-            </active>
-            <inactive>
-             <colorrole role="WindowText">
-              <brush brushstyle="SolidPattern">
-               <color alpha="255">
-                <red>255</red>
-                <green>255</green>
-                <blue>255</blue>
-               </color>
-              </brush>
-             </colorrole>
-             <colorrole role="Button">
-              <brush brushstyle="SolidPattern">
-               <color alpha="255">
-                <red>39</red>
-                <green>39</green>
-                <blue>48</blue>
-               </color>
-              </brush>
-             </colorrole>
-             <colorrole role="Text">
-              <brush brushstyle="SolidPattern">
-               <color alpha="255">
-                <red>255</red>
-                <green>255</green>
-                <blue>255</blue>
-               </color>
-              </brush>
-             </colorrole>
-             <colorrole role="ButtonText">
-              <brush brushstyle="SolidPattern">
-               <color alpha="255">
-                <red>255</red>
-                <green>255</green>
-                <blue>255</blue>
-               </color>
-              </brush>
-             </colorrole>
-             <colorrole role="Base">
-              <brush brushstyle="SolidPattern">
-               <color alpha="255">
-                <red>39</red>
-                <green>39</green>
-                <blue>48</blue>
-               </color>
-              </brush>
-             </colorrole>
-             <colorrole role="Window">
-              <brush brushstyle="SolidPattern">
-               <color alpha="255">
-                <red>39</red>
-                <green>39</green>
-                <blue>48</blue>
-               </color>
-              </brush>
-             </colorrole>
-            </inactive>
-            <disabled>
-             <colorrole role="WindowText">
-              <brush brushstyle="SolidPattern">
-               <color alpha="255">
-                <red>85</red>
-                <green>85</green>
-                <blue>85</blue>
-               </color>
-              </brush>
-             </colorrole>
-             <colorrole role="Button">
-              <brush brushstyle="SolidPattern">
-               <color alpha="255">
-                <red>39</red>
-                <green>39</green>
-                <blue>48</blue>
-               </color>
-              </brush>
-             </colorrole>
-             <colorrole role="Text">
-              <brush brushstyle="SolidPattern">
-               <color alpha="255">
-                <red>85</red>
-                <green>85</green>
-                <blue>85</blue>
-               </color>
-              </brush>
-             </colorrole>
-             <colorrole role="ButtonText">
-              <brush brushstyle="SolidPattern">
-               <color alpha="255">
-                <red>85</red>
-                <green>85</green>
-                <blue>85</blue>
-               </color>
-              </brush>
-             </colorrole>
-             <colorrole role="Base">
-              <brush brushstyle="SolidPattern">
-               <color alpha="255">
-                <red>39</red>
-                <green>39</green>
-                <blue>48</blue>
-               </color>
-              </brush>
-             </colorrole>
-             <colorrole role="Window">
-              <brush brushstyle="SolidPattern">
-               <color alpha="255">
-                <red>39</red>
-                <green>39</green>
-                <blue>48</blue>
-               </color>
-              </brush>
-             </colorrole>
-            </disabled>
-           </palette>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">QComboBox
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="lbl_extern_1">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">font-size: 13px;</string>
+         </property>
+         <property name="text">
+          <string>External 1</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="cmb_trigg_extern_cond_1">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="palette">
+          <palette>
+           <active>
+            <colorrole role="WindowText">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>255</red>
+               <green>255</green>
+               <blue>255</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Button">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>39</red>
+               <green>39</green>
+               <blue>48</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Text">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>255</red>
+               <green>255</green>
+               <blue>255</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="ButtonText">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>255</red>
+               <green>255</green>
+               <blue>255</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Base">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>39</red>
+               <green>39</green>
+               <blue>48</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Window">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>39</red>
+               <green>39</green>
+               <blue>48</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </active>
+           <inactive>
+            <colorrole role="WindowText">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>255</red>
+               <green>255</green>
+               <blue>255</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Button">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>39</red>
+               <green>39</green>
+               <blue>48</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Text">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>255</red>
+               <green>255</green>
+               <blue>255</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="ButtonText">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>255</red>
+               <green>255</green>
+               <blue>255</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Base">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>39</red>
+               <green>39</green>
+               <blue>48</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Window">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>39</red>
+               <green>39</green>
+               <blue>48</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </inactive>
+           <disabled>
+            <colorrole role="WindowText">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>85</red>
+               <green>85</green>
+               <blue>85</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Button">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>39</red>
+               <green>39</green>
+               <blue>48</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Text">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>85</red>
+               <green>85</green>
+               <blue>85</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="ButtonText">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>85</red>
+               <green>85</green>
+               <blue>85</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Base">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>39</red>
+               <green>39</green>
+               <blue>48</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Window">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>39</red>
+               <green>39</green>
+               <blue>48</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </disabled>
+          </palette>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QComboBox
 {
   height: 19px;
 
@@ -659,88 +712,87 @@ QComboBox::indicator{
     selection-color:transparent;
 }
 </string>
+         </property>
+         <property name="sizeAdjustPolicy">
+          <enum>QComboBox::AdjustToMinimumContentsLengthWithIcon</enum>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>30</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="frame">
+          <bool>false</bool>
+         </property>
+         <item>
+          <property name="text">
+           <string>None</string>
           </property>
-          <property name="sizeAdjustPolicy">
-           <enum>QComboBox::AdjustToMinimumContentsLengthWithIcon</enum>
+         </item>
+         <item>
+          <property name="text">
+           <string/>
           </property>
-          <property name="iconSize">
-           <size>
-            <width>30</width>
-            <height>20</height>
-           </size>
+          <property name="icon">
+           <iconset resource="../resources/resources.qrc">
+            <normaloff>:/icons/trigger_any_enabled.svg</normaloff>
+            <normalon>:/icons/trigger_any_enabled.svg</normalon>
+            <disabledoff>:/icons/trigger_any_disabled.svg</disabledoff>
+            <disabledon>:/icons/trigger_any_disabled.svg</disabledon>:/icons/trigger_any_enabled.svg</iconset>
           </property>
-          <property name="frame">
-           <bool>false</bool>
+         </item>
+         <item>
+          <property name="text">
+           <string/>
           </property>
-          <item>
-           <property name="text">
-            <string>None</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="../resources/resources.qrc">
-             <normaloff>:/icons/trigger_any_enabled.svg</normaloff>
-             <normalon>:/icons/trigger_any_enabled.svg</normalon>
-             <disabledoff>:/icons/trigger_any_disabled.svg</disabledoff>
-             <disabledon>:/icons/trigger_any_disabled.svg</disabledon>:/icons/trigger_any_enabled.svg</iconset>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="../resources/resources.qrc">
-             <normaloff>:/icons/trigger_rising_enabled.svg</normaloff>
-             <normalon>:/icons/trigger_rising_enabled.svg</normalon>
-             <disabledoff>:/icons/trigger_rising_disabled.svg</disabledoff>
-             <disabledon>:/icons/trigger_rising_disabled.svg</disabledon>:/icons/trigger_rising_enabled.svg</iconset>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="../resources/resources.qrc">
-             <normaloff>:/icons/trigger_falling_enabled.svg</normaloff>
-             <normalon>:/icons/trigger_falling_enabled.svg</normalon>
-             <disabledoff>:/icons/trigger_falling_disabled.svg</disabledoff>
-             <disabledon>:/icons/trigger_falling_disabled.svg</disabledon>:/icons/trigger_falling_enabled.svg</iconset>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="../resources/resources.qrc">
-             <normaloff>:/icons/trigger_low_enabled.svg</normaloff>
-             <normalon>:/icons/trigger_low_enabled.svg</normalon>
-             <disabledoff>:/icons/trigger_low_disabled.svg</disabledoff>
-             <disabledon>:/icons/trigger_low_disabled.svg</disabledon>:/icons/trigger_low_enabled.svg</iconset>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="../resources/resources.qrc">
-             <normaloff>:/icons/trigger_high_enabled.svg</normaloff>
-             <normalon>:/icons/trigger_high_enabled.svg</normalon>
-             <disabledoff>:/icons/trigger_high_disabled.svg</disabledoff>
-             <disabledon>:/icons/trigger_high_disabled.svg</disabledon>:/icons/trigger_high_enabled.svg</iconset>
-           </property>
-          </item>
-         </widget>
-        </item>
-       </layout>
-      </widget>
+          <property name="icon">
+           <iconset resource="../resources/resources.qrc">
+            <normaloff>:/icons/trigger_rising_enabled.svg</normaloff>
+            <normalon>:/icons/trigger_rising_enabled.svg</normalon>
+            <disabledoff>:/icons/trigger_rising_disabled.svg</disabledoff>
+            <disabledon>:/icons/trigger_rising_disabled.svg</disabledon>:/icons/trigger_rising_enabled.svg</iconset>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="../resources/resources.qrc">
+            <normaloff>:/icons/trigger_falling_enabled.svg</normaloff>
+            <normalon>:/icons/trigger_falling_enabled.svg</normalon>
+            <disabledoff>:/icons/trigger_falling_disabled.svg</disabledoff>
+            <disabledon>:/icons/trigger_falling_disabled.svg</disabledon>:/icons/trigger_falling_enabled.svg</iconset>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="../resources/resources.qrc">
+            <normaloff>:/icons/trigger_low_enabled.svg</normaloff>
+            <normalon>:/icons/trigger_low_enabled.svg</normalon>
+            <disabledoff>:/icons/trigger_low_disabled.svg</disabledoff>
+            <disabledon>:/icons/trigger_low_disabled.svg</disabledon>:/icons/trigger_low_enabled.svg</iconset>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="../resources/resources.qrc">
+            <normaloff>:/icons/trigger_high_enabled.svg</normaloff>
+            <normalon>:/icons/trigger_high_enabled.svg</normalon>
+            <disabledoff>:/icons/trigger_high_disabled.svg</disabledoff>
+            <disabledon>:/icons/trigger_high_disabled.svg</disabledon>:/icons/trigger_high_enabled.svg</iconset>
+          </property>
+         </item>
+        </widget>
+       </item>
+      </layout>
      </item>
      <item>
       <spacer name="verticalSpacer_16">
@@ -759,203 +811,211 @@ QComboBox::indicator{
       </spacer>
      </item>
      <item>
-      <widget class="QWidget" name="trigg_ext_2" native="true">
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>0</height>
-        </size>
+      <layout class="QHBoxLayout" name="trigg_ext_2">
+       <property name="spacing">
+        <number>0</number>
        </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_3">
-        <item>
-         <widget class="QLabel" name="lbl_extern_2">
-          <property name="text">
-           <string>External 2</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QComboBox" name="cmb_trigg_extern_cond_2">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="palette">
-           <palette>
-            <active>
-             <colorrole role="WindowText">
-              <brush brushstyle="SolidPattern">
-               <color alpha="255">
-                <red>255</red>
-                <green>255</green>
-                <blue>255</blue>
-               </color>
-              </brush>
-             </colorrole>
-             <colorrole role="Button">
-              <brush brushstyle="SolidPattern">
-               <color alpha="255">
-                <red>39</red>
-                <green>39</green>
-                <blue>48</blue>
-               </color>
-              </brush>
-             </colorrole>
-             <colorrole role="Text">
-              <brush brushstyle="SolidPattern">
-               <color alpha="255">
-                <red>255</red>
-                <green>255</green>
-                <blue>255</blue>
-               </color>
-              </brush>
-             </colorrole>
-             <colorrole role="ButtonText">
-              <brush brushstyle="SolidPattern">
-               <color alpha="255">
-                <red>255</red>
-                <green>255</green>
-                <blue>255</blue>
-               </color>
-              </brush>
-             </colorrole>
-             <colorrole role="Base">
-              <brush brushstyle="SolidPattern">
-               <color alpha="255">
-                <red>39</red>
-                <green>39</green>
-                <blue>48</blue>
-               </color>
-              </brush>
-             </colorrole>
-             <colorrole role="Window">
-              <brush brushstyle="SolidPattern">
-               <color alpha="255">
-                <red>39</red>
-                <green>39</green>
-                <blue>48</blue>
-               </color>
-              </brush>
-             </colorrole>
-            </active>
-            <inactive>
-             <colorrole role="WindowText">
-              <brush brushstyle="SolidPattern">
-               <color alpha="255">
-                <red>255</red>
-                <green>255</green>
-                <blue>255</blue>
-               </color>
-              </brush>
-             </colorrole>
-             <colorrole role="Button">
-              <brush brushstyle="SolidPattern">
-               <color alpha="255">
-                <red>39</red>
-                <green>39</green>
-                <blue>48</blue>
-               </color>
-              </brush>
-             </colorrole>
-             <colorrole role="Text">
-              <brush brushstyle="SolidPattern">
-               <color alpha="255">
-                <red>255</red>
-                <green>255</green>
-                <blue>255</blue>
-               </color>
-              </brush>
-             </colorrole>
-             <colorrole role="ButtonText">
-              <brush brushstyle="SolidPattern">
-               <color alpha="255">
-                <red>255</red>
-                <green>255</green>
-                <blue>255</blue>
-               </color>
-              </brush>
-             </colorrole>
-             <colorrole role="Base">
-              <brush brushstyle="SolidPattern">
-               <color alpha="255">
-                <red>39</red>
-                <green>39</green>
-                <blue>48</blue>
-               </color>
-              </brush>
-             </colorrole>
-             <colorrole role="Window">
-              <brush brushstyle="SolidPattern">
-               <color alpha="255">
-                <red>39</red>
-                <green>39</green>
-                <blue>48</blue>
-               </color>
-              </brush>
-             </colorrole>
-            </inactive>
-            <disabled>
-             <colorrole role="WindowText">
-              <brush brushstyle="SolidPattern">
-               <color alpha="255">
-                <red>85</red>
-                <green>85</green>
-                <blue>85</blue>
-               </color>
-              </brush>
-             </colorrole>
-             <colorrole role="Button">
-              <brush brushstyle="SolidPattern">
-               <color alpha="255">
-                <red>39</red>
-                <green>39</green>
-                <blue>48</blue>
-               </color>
-              </brush>
-             </colorrole>
-             <colorrole role="Text">
-              <brush brushstyle="SolidPattern">
-               <color alpha="255">
-                <red>85</red>
-                <green>85</green>
-                <blue>85</blue>
-               </color>
-              </brush>
-             </colorrole>
-             <colorrole role="ButtonText">
-              <brush brushstyle="SolidPattern">
-               <color alpha="255">
-                <red>85</red>
-                <green>85</green>
-                <blue>85</blue>
-               </color>
-              </brush>
-             </colorrole>
-             <colorrole role="Base">
-              <brush brushstyle="SolidPattern">
-               <color alpha="255">
-                <red>39</red>
-                <green>39</green>
-                <blue>48</blue>
-               </color>
-              </brush>
-             </colorrole>
-             <colorrole role="Window">
-              <brush brushstyle="SolidPattern">
-               <color alpha="255">
-                <red>39</red>
-                <green>39</green>
-                <blue>48</blue>
-               </color>
-              </brush>
-             </colorrole>
-            </disabled>
-           </palette>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">QComboBox
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="lbl_extern_2">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="styleSheet">
+          <string notr="true"> font-size: 13px;</string>
+         </property>
+         <property name="text">
+          <string>External 2</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="cmb_trigg_extern_cond_2">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="palette">
+          <palette>
+           <active>
+            <colorrole role="WindowText">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>255</red>
+               <green>255</green>
+               <blue>255</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Button">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>39</red>
+               <green>39</green>
+               <blue>48</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Text">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>255</red>
+               <green>255</green>
+               <blue>255</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="ButtonText">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>255</red>
+               <green>255</green>
+               <blue>255</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Base">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>39</red>
+               <green>39</green>
+               <blue>48</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Window">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>39</red>
+               <green>39</green>
+               <blue>48</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </active>
+           <inactive>
+            <colorrole role="WindowText">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>255</red>
+               <green>255</green>
+               <blue>255</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Button">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>39</red>
+               <green>39</green>
+               <blue>48</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Text">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>255</red>
+               <green>255</green>
+               <blue>255</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="ButtonText">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>255</red>
+               <green>255</green>
+               <blue>255</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Base">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>39</red>
+               <green>39</green>
+               <blue>48</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Window">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>39</red>
+               <green>39</green>
+               <blue>48</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </inactive>
+           <disabled>
+            <colorrole role="WindowText">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>85</red>
+               <green>85</green>
+               <blue>85</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Button">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>39</red>
+               <green>39</green>
+               <blue>48</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Text">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>85</red>
+               <green>85</green>
+               <blue>85</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="ButtonText">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>85</red>
+               <green>85</green>
+               <blue>85</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Base">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>39</red>
+               <green>39</green>
+               <blue>48</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Window">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>39</red>
+               <green>39</green>
+               <blue>48</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </disabled>
+          </palette>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QComboBox
 {
   height: 19px;
 
@@ -1021,88 +1081,87 @@ QComboBox::indicator{
     selection-color:transparent;
 }
 </string>
+         </property>
+         <property name="sizeAdjustPolicy">
+          <enum>QComboBox::AdjustToMinimumContentsLengthWithIcon</enum>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>30</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="frame">
+          <bool>false</bool>
+         </property>
+         <item>
+          <property name="text">
+           <string>None</string>
           </property>
-          <property name="sizeAdjustPolicy">
-           <enum>QComboBox::AdjustToMinimumContentsLengthWithIcon</enum>
+         </item>
+         <item>
+          <property name="text">
+           <string/>
           </property>
-          <property name="iconSize">
-           <size>
-            <width>30</width>
-            <height>20</height>
-           </size>
+          <property name="icon">
+           <iconset resource="../resources/resources.qrc">
+            <normaloff>:/icons/trigger_any_enabled.svg</normaloff>
+            <normalon>:/icons/trigger_any_enabled.svg</normalon>
+            <disabledoff>:/icons/trigger_any_disabled.svg</disabledoff>
+            <disabledon>:/icons/trigger_any_disabled.svg</disabledon>:/icons/trigger_any_enabled.svg</iconset>
           </property>
-          <property name="frame">
-           <bool>false</bool>
+         </item>
+         <item>
+          <property name="text">
+           <string/>
           </property>
-          <item>
-           <property name="text">
-            <string>None</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="../resources/resources.qrc">
-             <normaloff>:/icons/trigger_any_enabled.svg</normaloff>
-             <normalon>:/icons/trigger_any_enabled.svg</normalon>
-             <disabledoff>:/icons/trigger_any_disabled.svg</disabledoff>
-             <disabledon>:/icons/trigger_any_disabled.svg</disabledon>:/icons/trigger_any_enabled.svg</iconset>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="../resources/resources.qrc">
-             <normaloff>:/icons/trigger_rising_enabled.svg</normaloff>
-             <normalon>:/icons/trigger_rising_enabled.svg</normalon>
-             <disabledoff>:/icons/trigger_rising_disabled.svg</disabledoff>
-             <disabledon>:/icons/trigger_rising_disabled.svg</disabledon>:/icons/trigger_rising_enabled.svg</iconset>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="../resources/resources.qrc">
-             <normaloff>:/icons/trigger_falling_enabled.svg</normaloff>
-             <normalon>:/icons/trigger_falling_enabled.svg</normalon>
-             <disabledoff>:/icons/trigger_falling_disabled.svg</disabledoff>
-             <disabledon>:/icons/trigger_falling_disabled.svg</disabledon>:/icons/trigger_falling_enabled.svg</iconset>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="../resources/resources.qrc">
-             <normaloff>:/icons/trigger_low_enabled.svg</normaloff>
-             <normalon>:/icons/trigger_low_enabled.svg</normalon>
-             <disabledoff>:/icons/trigger_low_disabled.svg</disabledoff>
-             <disabledon>:/icons/trigger_low_disabled.svg</disabledon>:/icons/trigger_low_enabled.svg</iconset>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="../resources/resources.qrc">
-             <normaloff>:/icons/trigger_high_enabled.svg</normaloff>
-             <normalon>:/icons/trigger_high_enabled.svg</normalon>
-             <disabledoff>:/icons/trigger_high_disabled.svg</disabledoff>
-             <disabledon>:/icons/trigger_high_disabled.svg</disabledon>:/icons/trigger_high_enabled.svg</iconset>
-           </property>
-          </item>
-         </widget>
-        </item>
-       </layout>
-      </widget>
+          <property name="icon">
+           <iconset resource="../resources/resources.qrc">
+            <normaloff>:/icons/trigger_rising_enabled.svg</normaloff>
+            <normalon>:/icons/trigger_rising_enabled.svg</normalon>
+            <disabledoff>:/icons/trigger_rising_disabled.svg</disabledoff>
+            <disabledon>:/icons/trigger_rising_disabled.svg</disabledon>:/icons/trigger_rising_enabled.svg</iconset>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="../resources/resources.qrc">
+            <normaloff>:/icons/trigger_falling_enabled.svg</normaloff>
+            <normalon>:/icons/trigger_falling_enabled.svg</normalon>
+            <disabledoff>:/icons/trigger_falling_disabled.svg</disabledoff>
+            <disabledon>:/icons/trigger_falling_disabled.svg</disabledon>:/icons/trigger_falling_enabled.svg</iconset>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="../resources/resources.qrc">
+            <normaloff>:/icons/trigger_low_enabled.svg</normaloff>
+            <normalon>:/icons/trigger_low_enabled.svg</normalon>
+            <disabledoff>:/icons/trigger_low_disabled.svg</disabledoff>
+            <disabledon>:/icons/trigger_low_disabled.svg</disabledon>:/icons/trigger_low_enabled.svg</iconset>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="../resources/resources.qrc">
+            <normaloff>:/icons/trigger_high_enabled.svg</normaloff>
+            <normalon>:/icons/trigger_high_enabled.svg</normalon>
+            <disabledoff>:/icons/trigger_high_disabled.svg</disabledoff>
+            <disabledon>:/icons/trigger_high_disabled.svg</disabledon>:/icons/trigger_high_enabled.svg</iconset>
+          </property>
+         </item>
+        </widget>
+       </item>
+      </layout>
      </item>
     </layout>
    </item>

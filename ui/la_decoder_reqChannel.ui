@@ -68,7 +68,7 @@
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="channelGroup">
          <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -96,13 +96,7 @@
              </sizepolicy>
             </property>
             <property name="styleSheet">
-             <string notr="true">QLabel {
-opacity: 0.6;
-font-size: 14px;
-color: white;
-}
-
-</string>
+             <string notr="true">font-size: 13px;</string>
             </property>
             <property name="text">
              <string>Settings</string>
@@ -156,11 +150,14 @@ color: white;
           </property>
           <item>
            <widget class="QLabel" name="label">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="styleSheet">
-             <string notr="true">QLabel
-{
-opacity:0.2;
-}</string>
+             <string notr="true">font-size: 13px;</string>
             </property>
             <property name="text">
              <string>Role</string>
@@ -186,9 +183,7 @@ opacity:0.2;
           <item>
            <widget class="QLabel" name="labelChRole">
             <property name="styleSheet">
-             <string notr="true">QLabel {
- border-bottom: 1px solid rgba(255, 255, 255, 102);
-}</string>
+             <string notr="true">font-size: 13px;</string>
             </property>
             <property name="text">
              <string>Role</string>

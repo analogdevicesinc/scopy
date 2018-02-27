@@ -1288,7 +1288,7 @@ color: white;
             <item>
              <widget class="QStackedWidget" name="stackedWidget">
               <property name="currentIndex">
-               <number>2</number>
+               <number>1</number>
               </property>
               <widget class="QWidget" name="cursorSettings">
                <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -1440,8 +1440,8 @@ color: #FFFFFF;
                   </property>
                   <property name="sizeHint" stdset="0">
                    <size>
-                    <width>20</width>
-                    <height>20</height>
+                    <width>0</width>
+                    <height>10</height>
                    </size>
                   </property>
                  </spacer>
@@ -1449,16 +1449,9 @@ color: #FFFFFF;
                 <item>
                  <widget class="QLabel" name="label">
                   <property name="styleSheet">
-                   <string notr="true">QLabel
-{
-width: 56px;
-height: 17px;
-font-family: Arial;
-font-size: 14px;
-font-weight: bold;
-line-height: 16px;
-color: #FFFFFF;
-}</string>
+                   <string notr="true">color: white;
+	font-size: 14px;
+	font-weight: normal;</string>
                   </property>
                   <property name="text">
                    <string>Settings</string>
@@ -1475,8 +1468,8 @@ color: #FFFFFF;
                   </property>
                   <property name="sizeHint" stdset="0">
                    <size>
-                    <width>20</width>
-                    <height>20</height>
+                    <width>0</width>
+                    <height>15</height>
                    </size>
                   </property>
                  </spacer>
@@ -1517,7 +1510,7 @@ color: #FFFFFF;
                      <x>0</x>
                      <y>0</y>
                      <width>157</width>
-                     <height>554</height>
+                     <height>568</height>
                     </rect>
                    </property>
                    <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -1856,22 +1849,6 @@ color: #FFFFFF;</string>
                     <property name="bottomMargin">
                      <number>0</number>
                     </property>
-                    <item>
-                     <spacer name="verticalSpacer_14">
-                      <property name="orientation">
-                       <enum>Qt::Vertical</enum>
-                      </property>
-                      <property name="sizeType">
-                       <enum>QSizePolicy::Preferred</enum>
-                      </property>
-                      <property name="sizeHint" stdset="0">
-                       <size>
-                        <width>20</width>
-                        <height>40</height>
-                       </size>
-                      </property>
-                     </spacer>
-                    </item>
                    </layout>
                   </widget>
                  </widget>
@@ -2062,11 +2039,6 @@ QPushButton:checked { border-image: url(:/icons/setup_btn_checked.svg); }
  </widget>
  <customwidgets>
   <customwidget>
-   <class>adiscope::CustomSwitch</class>
-   <extends>QPushButton</extends>
-   <header>customSwitch.hpp</header>
-  </customwidget>
-  <customwidget>
    <class>adiscope::DetachDragZone</class>
    <extends>QWidget</extends>
    <header>detachdragzone.h</header>
@@ -2077,6 +2049,11 @@ QPushButton:checked { border-image: url(:/icons/setup_btn_checked.svg); }
    <extends>QWidget</extends>
    <header>menu_anim.hpp</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::CustomSwitch</class>
+   <extends>QPushButton</extends>
+   <header>customSwitch.hpp</header>
   </customwidget>
  </customwidgets>
  <resources>
