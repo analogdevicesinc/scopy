@@ -272,6 +272,8 @@ void ToolLauncher::loadSession()
 			}
 		}
 	}
+	updateHomepage();
+	setupHomepage();
 }
 
 void ToolLauncher::resetSession()
@@ -671,6 +673,17 @@ void ToolLauncher::setupHomepage()
 		} else {
 			indexFile.close();
 		}
+	}
+}
+
+void ToolLauncher::updateHomepage()
+{
+	int count = ui->stackedWidget->count();
+
+	while (count) {
+		ui->stackedWidget->removeWidget(ui->stackedWidget->currentWidget());
+		ui->stackedWidget->moveLeft();
+		count--;
 	}
 }
 

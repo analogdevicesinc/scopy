@@ -45,6 +45,7 @@ public:
 	~StackedHomepage();
 
 	void addWidget(QWidget *widget);
+	void removeWidget(QWidget *widget);
 
 public Q_SLOTS:
 	void moveLeft();
