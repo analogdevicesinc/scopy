@@ -22,6 +22,7 @@
 
 #include <QDebug>
 #include <QResizeEvent>
+#include <QStylePainter>
 
 using namespace adiscope;
 

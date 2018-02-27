@@ -133,9 +133,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 		dev_name = filt->device_name(TOOL_LOGIC_ANALYZER);
 		dev = iio_context_find_device(ctx, dev_name.c_str());
 	}
-	this->configureMaxSampleRate();
-	if( maxSamplingFrequency == 0 )
-		maxSamplingFrequency = 80000000;
+
+	maxSamplingFrequency = 100000000;
 
 	symmBufferMode = make_shared<LogicAnalyzerSymmetricBufferMode>();
 	symmBufferMode->setMaxSampleRate(maxSamplingFrequency);
@@ -240,16 +239,22 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	false,
 	this);
 
-	ui->verticalLayout_7->insertWidget(ui->verticalLayout_7->count() - 6,
-		timeBase, 0, Qt::AlignLeft);
+	frequencySpinButton = new ScaleSpinButton({
+		{"Hz", 1E0},
+		{"kHz", 1E+3},
+		{"MHz", 1E+6}
+	}, "Frequency", 10e0,
+	maxSamplingFrequency / 33,
+	true, false, this, {1,2.5,5});
+
 	ui->verticalLayout_7->insertWidget(ui->verticalLayout_7->count() - 5,
+		timeBase, 0, Qt::AlignLeft);
+	ui->verticalLayout_7->insertWidget(ui->verticalLayout_7->count() - 4,
 		timePosition, 0, Qt::AlignLeft);
+	ui->verticalLayout_6->addWidget(frequencySpinButton, 0, Qt::AlignLeft);
 
-	QDoubleValidator *validator = new QDoubleValidator(ui->lineeditSampleRate);
-	validator->setNotation(QDoubleValidator::ScientificNotation);
-	validator->setDecimals(5);
-
-	ui->lineeditSampleRate->setValidator(validator);
+	connect(frequencySpinButton, SIGNAL(valueChanged(double)),
+		this, SLOT(validateSamplingFrequency(double)));
 
 	int chn = (no_channels == 0) ? 16 : no_channels;
 	options["numchannels"] = Glib::Variant<gint32>(
@@ -369,14 +374,11 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 		this, SLOT(onDataReceived()));
 	connect(main_win->view_, SIGNAL(frame_ended()),
 		this, SLOT(onFrameEnded()));
-	connect(ui->cmbRunMode, SIGNAL(currentIndexChanged(int)),
-		this, SLOT(runModeChanged(int)));
-	connect(ui->lineeditSampleRate, &QLineEdit::returnPressed,
-		this, &LogicAnalyzer::validateSamplingFrequency);
-	connect(ui->btnApply, SIGNAL(clicked()),
-		this, SLOT(validateSamplingFrequency()));
-	connect(ui->lineeditSampleRate, SIGNAL(textChanged(const QString&)),
-		this, SLOT(resetState()));
+	connect(ui->btnRepeated, SIGNAL(toggled(bool)),
+		this, SLOT(runModeChanged(bool)));
+
+	ui->btnRepeated->setChecked(true);
+	ui->btnStream->setChecked(false);
 
 	triggerUpdater->setOffState(Stop);
 	connect(triggerUpdater, SIGNAL(outputChanged(int)),
@@ -865,7 +867,7 @@ void LogicAnalyzer::setSampleRate()
 		return;
 
 	if( acquisition_mode != REPEATED )
-		validateSamplingFrequency();
+		validateSamplingFrequency(frequencySpinButton->value());
 
 	options["samplerate"] = Glib::Variant<guint64>(
 	                  g_variant_new_uint64(active_sampleRate),true);
@@ -892,7 +894,6 @@ void LogicAnalyzer::updateBuffersizeSamplerateLabel(int samples, double samplera
 		"/" + txtSampleperiod;
 	text = (acquisition_mode == REPEATED) ? text : "Streaming at " + txtSamplerate;
 	ui->samplerateLabel->setText(text);
-	ui->lineeditSampleRate->setText(QString::number(samplerate, 'g', 5));
 }
 
 void LogicAnalyzer::setTimebaseLabel(double value)
@@ -977,7 +978,7 @@ void LogicAnalyzer::configParams(double timebase, double timepos)
         double plotTimeSpan = timebase * 10;
         timer_timeout_ms = plotTimeSpan * 1000  + 100; //transfer time
 
-        acquisition_mode = ui->cmbRunMode->currentIndex();
+        acquisition_mode = ui->btnRepeated->isChecked() ? REPEATED : STREAM;
         acquisition_mode = (acquisition_mode == REPEATED
                             && plotTimeSpan >= timespanLimitStream) ? SCREEN : acquisition_mode;
 
@@ -1005,11 +1006,12 @@ void LogicAnalyzer::configParams(double timebase, double timepos)
                                 chm_ui->update_ui();
                         }
                         acquisition_mode = REPEATED;
-                        ui->cmbRunMode->blockSignals(true);
-                        ui->cmbRunMode->setCurrentIndex(0);
-                        ui->cmbRunMode->blockSignals(false);
-                        setDynamicProperty(ui->lineeditSampleRate, "enabled", false);
-                        ui->btnApply->setEnabled(false);
+                        ui->btnRepeated->blockSignals(true);
+                        ui->btnStream->blockSignals(true);
+                        ui->btnRepeated->setChecked(true);
+                        ui->btnRepeated->blockSignals(false);
+                        ui->btnStream->blockSignals(false);
+                        frequencySpinButton->setEnabled(false);
                 }
                 else {
                         if(!chm_ui->is_streaming_mode())
@@ -1018,8 +1020,7 @@ void LogicAnalyzer::configParams(double timebase, double timepos)
                         if( acquisition_mode == SCREEN)
                                 main_win->session_.set_screen_mode(true);
 
-                        setDynamicProperty(ui->lineeditSampleRate, "enabled", true);
-                        ui->btnApply->setEnabled(true);
+                        frequencySpinButton->setEnabled(true);
 
                         active_triggerSampleCount = 0;
                         custom_sampleCount = 4096;
@@ -1033,7 +1034,7 @@ void LogicAnalyzer::configParams(double timebase, double timepos)
 			main_win->session_.set_entire_buffersize(active_sampleCount);
 			if(logic_analyzer_ptr)
 			{
-				logic_analyzer_ptr->set_buffersize(custom_sampleCount, false);
+				logic_analyzer_ptr->set_buffersize(custom_sampleCount, true);
 				logic_analyzer_ptr->set_entire_buffersize(active_sampleCount);
 				set_buffersize();
 			}
@@ -1069,8 +1070,7 @@ void LogicAnalyzer::configParams(double timebase, double timepos)
                 else if(active_timePos != -params.timePos)
                         active_timePos = -params.timePos;
 
-                setDynamicProperty(ui->lineeditSampleRate, "enabled", false);
-                ui->btnApply->setEnabled(false);
+                frequencySpinButton->setEnabled(false);
 
                 active_sampleRate = params.sampleRate;
                 active_sampleCount = params.entireBufferSize;
@@ -1729,19 +1729,16 @@ void LogicAnalyzer::setTimeout(bool checked)
 		timer->stop();
 }
 
-void LogicAnalyzer::runModeChanged(int index)
+void LogicAnalyzer::runModeChanged(bool repeated)
 {
         bool en;
 
-        switch(index){
-        case REPEATED:
-        {
+        if (repeated) {
                 acquisition_mode = REPEATED;
                 if( logic_analyzer_ptr )
                         logic_analyzer_ptr->set_stream(false);
 
-                setDynamicProperty(ui->lineeditSampleRate, "enabled", false);
-                ui->btnApply->setEnabled(false);
+                frequencySpinButton->setEnabled(false);
 
                 main_win->session_.set_screen_mode(false);
                 en = false;
@@ -1749,79 +1746,53 @@ void LogicAnalyzer::runModeChanged(int index)
                         d_timeTriggerHandle->setPosition(0);
                         acquisition_mode = SCREEN;
                         main_win->session_.set_screen_mode(true);
-                        setDynamicProperty(ui->lineeditSampleRate, "enabled", true);
-                        ui->btnApply->setEnabled(true);
+                        frequencySpinButton->setEnabled(true);
                         en = true;
                 }
-        }
-                break;
-        case STREAM:
-        {
+        } else {
                 if( logic_analyzer_ptr )
                         logic_analyzer_ptr->set_stream(true);
                 d_timeTriggerHandle->setPosition(0);
                 acquisition_mode = STREAM;
                 main_win->session_.set_screen_mode(false);
-                setDynamicProperty(ui->lineeditSampleRate, "enabled", true);
-                ui->btnApply->setEnabled(true);
+                frequencySpinButton->setEnabled(true);
                 en = true;
         }
-                break;
-        default:break;
-        }
+        frequencySpinButton->setEnabled(!repeated);
         chm_ui->set_streaming_mode(en);
 }
 
-void LogicAnalyzer::validateSamplingFrequency()
+void LogicAnalyzer::validateSamplingFrequency(double value)
 {
-	bool ok;
+	bool stepUp = false;
 	double srDivider =  0;
-	double samplingFreq = ui->lineeditSampleRate->text().toDouble(&ok);
-	if(ok) {
-		if( samplingFreq < 10 ) {
-			active_sampleRate = 10;
-			setDynamicProperty(ui->lineeditSampleRate, "invalid", true);
-			goto validate;
-		}
-		if( samplingFreq > 3e+6 ) {
-			samplingFreq = 3e+6;
-			setDynamicProperty(ui->lineeditSampleRate, "invalid", true);
-		}
+	double actualFrequency = value;
 
-		srDivider = maxSamplingFrequency / samplingFreq;
-		srDivider = round(srDivider);
-		srDivider = (srDivider == 0.0) ? srDivider + 1 : srDivider;
-
-		samplingFreq = maxSamplingFrequency / srDivider;
-		if( samplingFreq == active_sampleRate ) {
-			setDynamicProperty(ui->lineeditSampleRate, "valid", true);
-			setDynamicProperty(ui->btnApply, "valid", true);
-			return;
-		}
-		active_sampleRate = samplingFreq;
-
-		active_sampleRate = maxSamplingFrequency / srDivider;
-validate:
-		ui->lineeditSampleRate->setText(QString::number(active_sampleRate));
-		onHorizScaleValueChanged(timeBase->value());
-		if(running)
-			setSamplerateLabelValue(active_sampleRate);
-
-		setDynamicProperty(ui->lineeditSampleRate, "valid", true);
-		setDynamicProperty(ui->btnApply, "valid", true);
+	if (value == active_sampleRate) {
+		return;
 	}
-	else {
-		setDynamicProperty(ui->lineeditSampleRate, "invalid", true);
-		setDynamicProperty(ui->btnApply, "invalid", true);
-	}
-}
 
-void LogicAnalyzer::resetState()
-{
-	setDynamicProperty(ui->lineeditSampleRate, "invalid", false);
-	setDynamicProperty(ui->btnApply, "invalid", false);
-	setDynamicProperty(ui->lineeditSampleRate, "valid", false);
-	setDynamicProperty(ui->btnApply, "valid", false);
+	if (value > active_sampleRate) {
+		stepUp = true;
+	}
+
+	if (stepUp) {
+		srDivider = ceil(maxSamplingFrequency / actualFrequency);
+	} else {
+		srDivider = floor(maxSamplingFrequency / actualFrequency);
+	}
+
+	actualFrequency = maxSamplingFrequency / srDivider;
+
+	frequencySpinButton->blockSignals(true);
+	frequencySpinButton->setValue(actualFrequency);
+	frequencySpinButton->blockSignals(false);
+	active_sampleRate = actualFrequency;
+	onHorizScaleValueChanged(timeBase->value());
+
+	if(running) {
+		setSamplerateLabelValue(active_sampleRate);
+	}
 }
 
 void LogicAnalyzer::onDataReceived()
@@ -1977,11 +1948,11 @@ void LogicAnalyzer_API::setRunMode(QString value)
 {
 	if(value == "STREAM")
 	{
-		lga->ui->cmbRunMode->setCurrentIndex(1);
+		lga->ui->btnStream->setChecked(true);
 	}
 	else
 	{
-		lga->ui->cmbRunMode->setCurrentIndex(0);
+		lga->ui->btnRepeated->setChecked(true);
 	}
 }
 

@@ -22,6 +22,23 @@
   <property name="windowTitle">
    <string>Scopy Logic Analyzer</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">QRadioButton {
+color: white;
+spacing: 12px;
+background-color: transparent;
+}
+QRadioButton::indicator {
+width: 14px;
+height: 14px;
+border: 2px solid;
+border-radius: 9px;
+border-color: rgb(73, 99, 255);
+}
+QRadioButton::indicator:checked {
+background-color: rgb(73, 99, 255);
+}</string>
+  </property>
   <layout class="QVBoxLayout" name="scrollAreaWidgetContentsLayout" stretch="0">
    <property name="spacing">
     <number>0</number>
@@ -485,7 +502,7 @@ background-color: grey;
            <string>Run</string>
           </property>
           <property name="icon">
-           <iconset resource="../resources/resources.qrc">
+           <iconset>
             <normaloff>:/icons/ico-play.svg</normaloff>:/icons/ico-play.svg</iconset>
           </property>
           <property name="iconSize">
@@ -567,7 +584,7 @@ background-color: grey;
            <string>Single</string>
           </property>
           <property name="icon">
-           <iconset resource="../resources/resources.qrc">
+           <iconset>
             <normaloff>:/icons/ico-oneshot.svg</normaloff>:/icons/ico-oneshot.svg</iconset>
           </property>
           <property name="iconSize">
@@ -1288,7 +1305,7 @@ color: white;
             <item>
              <widget class="QStackedWidget" name="stackedWidget">
               <property name="currentIndex">
-               <number>2</number>
+               <number>0</number>
               </property>
               <widget class="QWidget" name="generalSettings">
                <layout class="QVBoxLayout" name="generalSettingsLayout">
@@ -1386,8 +1403,8 @@ color: white;
                     <rect>
                      <x>0</x>
                      <y>0</y>
-                     <width>129</width>
-                     <height>304</height>
+                     <width>177</width>
+                     <height>561</height>
                     </rect>
                    </property>
                    <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -1441,28 +1458,60 @@ color: white;
                     <item>
                      <layout class="QVBoxLayout" name="verticalLayout_6">
                       <property name="topMargin">
-                       <number>20</number>
+                       <number>25</number>
                       </property>
                       <item>
                        <widget class="QLabel" name="label_8">
+                        <property name="styleSheet">
+                         <string notr="true">font-size: 13px;</string>
+                        </property>
                         <property name="text">
-                         <string>Run</string>
+                         <string>Run Mode</string>
                         </property>
                        </widget>
                       </item>
                       <item>
-                       <widget class="QComboBox" name="cmbRunMode">
+                       <layout class="QHBoxLayout" name="horizontalLayout_3">
+                        <property name="spacing">
+                         <number>15</number>
+                        </property>
+                        <property name="topMargin">
+                         <number>10</number>
+                        </property>
                         <item>
-                         <property name="text">
-                          <string>Repeated</string>
-                         </property>
+                         <widget class="QRadioButton" name="btnRepeated">
+                          <property name="text">
+                           <string>Repeated</string>
+                          </property>
+                          <property name="checked">
+                           <bool>true</bool>
+                          </property>
+                         </widget>
                         </item>
                         <item>
-                         <property name="text">
-                          <string>Stream</string>
-                         </property>
+                         <widget class="QRadioButton" name="btnStream">
+                          <property name="text">
+                           <string>Stream</string>
+                          </property>
+                         </widget>
                         </item>
-                       </widget>
+                        <item>
+                         <spacer name="horizontalSpacer_4">
+                          <property name="orientation">
+                           <enum>Qt::Horizontal</enum>
+                          </property>
+                          <property name="sizeType">
+                           <enum>QSizePolicy::MinimumExpanding</enum>
+                          </property>
+                          <property name="sizeHint" stdset="0">
+                           <size>
+                            <width>0</width>
+                            <height>0</height>
+                           </size>
+                          </property>
+                         </spacer>
+                        </item>
+                       </layout>
                       </item>
                       <item>
                        <spacer name="verticalSpacer_8">
@@ -1481,13 +1530,6 @@ color: white;
                        </spacer>
                       </item>
                       <item>
-                       <widget class="QLabel" name="label_10">
-                        <property name="text">
-                         <string>Sampling frequency</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item>
                        <spacer name="verticalSpacer_15">
                         <property name="orientation">
                          <enum>Qt::Vertical</enum>
@@ -1503,116 +1545,7 @@ color: white;
                         </property>
                        </spacer>
                       </item>
-                      <item>
-                       <layout class="QHBoxLayout" name="horizontalLayout_5">
-                        <property name="spacing">
-                         <number>7</number>
-                        </property>
-                        <property name="topMargin">
-                         <number>0</number>
-                        </property>
-                        <item>
-                         <widget class="QLineEdit" name="lineeditSampleRate">
-                          <property name="minimumSize">
-                           <size>
-                            <width>0</width>
-                            <height>32</height>
-                           </size>
-                          </property>
-                          <property name="maximumSize">
-                           <size>
-                            <width>16777215</width>
-                            <height>32</height>
-                           </size>
-                          </property>
-                          <property name="styleSheet">
-                           <string notr="true">QLineEdit {
-height: 32px;
-color: white;
-font-family: &quot;monospace&quot; 14;
-border: 2px solid;
-border-color: orange;
-border-radius: 10px;
-padding: 0 8px;
-background: transparent;
-selection-background-color: darkgray;
-}
-QLineEdit[invalid=true] {
-border-color: red;
-}
-QLineEdit[valid=true] {
-border-color: green;
-}
-QLineEdit[enabled=false] {
-border-color: grey;
-color: grey;
-}</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QPushButton" name="btnApply">
-                          <property name="sizePolicy">
-                           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                           </sizepolicy>
-                          </property>
-                          <property name="minimumSize">
-                           <size>
-                            <width>40</width>
-                            <height>32</height>
-                           </size>
-                          </property>
-                          <property name="maximumSize">
-                           <size>
-                            <width>40</width>
-                            <height>32</height>
-                           </size>
-                          </property>
-                          <property name="styleSheet">
-                           <string notr="true">QPushButton {
-color: white;
-background-color: #4a64ff;
-font-family: &quot;monospace&quot;;
-font-weight: bold;
-border-width: 0px;
-border-radius: 3px;
-min-width: 40px;
-
-}
-QPushButton:!enabled { background-color: grey; }
-QPushButton:enabled:!pressed { background-color: orange; }
-QPushButton[valid=true]:enabled:!pressed { background-color: green; }
-QPushButton[invalid=true]:enabled:!pressed { background-color: red; }</string>
-                          </property>
-                          <property name="text">
-                           <string>Apply</string>
-                          </property>
-                          <property name="autoDefault">
-                           <bool>true</bool>
-                          </property>
-                         </widget>
-                        </item>
-                       </layout>
-                      </item>
                      </layout>
-                    </item>
-                    <item>
-                     <spacer name="verticalSpacer">
-                      <property name="orientation">
-                       <enum>Qt::Vertical</enum>
-                      </property>
-                      <property name="sizeType">
-                       <enum>QSizePolicy::Fixed</enum>
-                      </property>
-                      <property name="sizeHint" stdset="0">
-                       <size>
-                        <width>20</width>
-                        <height>20</height>
-                       </size>
-                      </property>
-                     </spacer>
                     </item>
                     <item>
                      <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -1962,8 +1895,6 @@ QPushButton:checked { border-image: url(:/icons/setup_btn_checked.svg); }
    <header>smallOnOffSwitch.hpp</header>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="../resources/resources.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

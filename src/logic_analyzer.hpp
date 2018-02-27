@@ -146,13 +146,12 @@ private Q_SLOTS:
 	void startTimer();
 	void stopTimer();
 	void btnExportPressed();
-	void runModeChanged(int index);
-	void validateSamplingFrequency();
+	void runModeChanged(bool);
+	void validateSamplingFrequency(double);
 	void setTriggerState(int);
 	void onDataReceived();
 	void onFrameEnded();
 	void onTriggerModeChanged(bool);
-	void resetState();
 public Q_SLOTS:
 	void onTimeTriggerHandlePosChanged(int);
 	void onTimePositionSpinboxChanged(double value);
@@ -180,6 +179,7 @@ private:
 
 	ScaleSpinButton *timeBase;
 	PositionSpinButton *timePosition;
+	ScaleSpinButton *frequencySpinButton;
 
 	std::string dev_name;
 
