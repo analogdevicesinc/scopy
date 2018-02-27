@@ -60,6 +60,13 @@ QComboBox#SBA_Combobox::drop-down {
   border-image: url(:/icons/sba_cmb_box_arrow.svg);
 }
 
+QComboBox#SBA_Combobox::drop-down:disabled {
+  subcontrol-position: center right;
+  width: 0px;
+  height: 0px;
+  border-image: url(:/icons/sba_cmb_box_arrow.svg);
+}
+
 QDial#SBA_CompletionCircle {
   background-color: black;
   color: #4963ff;
