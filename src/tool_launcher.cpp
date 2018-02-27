@@ -286,10 +286,12 @@ void ToolLauncher::resetSession()
 				uri = (*it)->second.btn->property("uri").toString();
 			}
 		}
-
 		this->disconnect();
 		deviceConnected = true;
 	}
+	indexFile = "";
+	updateHomepage();
+	setupHomepage();
 
 	QSettings settings;
 	QFile fileScopy(settings.fileName());
