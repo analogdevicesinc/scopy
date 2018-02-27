@@ -699,8 +699,7 @@ border: 5px solid white;
                   </size>
                  </property>
                  <property name="styleSheet">
-                  <string notr="true">border: 1px solid rgba(255, 255, 255, 70);
-sizePolicy: Minimum, Fixed</string>
+                  <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
                  </property>
                  <property name="frameShadow">
                   <enum>QFrame::Sunken</enum>
@@ -794,8 +793,7 @@ sizePolicy: Minimum, Fixed</string>
                   </size>
                  </property>
                  <property name="styleSheet">
-                  <string notr="true">border: 1px solid rgba(255, 255, 255, 70);
-sizePolicy: Minimum, Fixed</string>
+                  <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
                  </property>
                  <property name="frameShadow">
                   <enum>QFrame::Sunken</enum>
@@ -982,8 +980,7 @@ sizePolicy: Minimum, Fixed</string>
                   </size>
                  </property>
                  <property name="styleSheet">
-                  <string notr="true">border: 1px solid rgba(255, 255, 255, 70);
-sizePolicy: Minimum, Fixed</string>
+                  <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
                  </property>
                  <property name="frameShadow">
                   <enum>QFrame::Sunken</enum>
@@ -1105,9 +1102,7 @@ sizePolicy: Minimum, Fixed</string>
                  </property>
                  <property name="styleSheet">
                   <string notr="true">border: 1px solid rgba(255, 255, 255, 70);
-minimum-height:1px;
-maximum-height:1px;
-sizePolicy: Minimum, Fixed</string>
+</string>
                  </property>
                  <property name="frameShadow">
                   <enum>QFrame::Sunken</enum>
@@ -1280,13 +1275,13 @@ sizePolicy: Minimum, Fixed</string>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>adiscope::ScaleSpinButton</class>
+   <class>adiscope::PositionSpinButton</class>
    <extends>QWidget</extends>
    <header>spinbox_a.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>adiscope::PositionSpinButton</class>
+   <class>adiscope::ScaleSpinButton</class>
    <extends>QWidget</extends>
    <header>spinbox_a.hpp</header>
    <container>1</container>
