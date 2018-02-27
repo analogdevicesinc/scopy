@@ -50,11 +50,13 @@ namespace adiscope {
 		QPropertyAnimation color_anim;
 		QString stylesheet;
 		int duration_ms;
+		bool show_icon;
 
 		void setDuration(int ms);
 		void setHandleColor(const QColor& color);
 
 		void showEvent(QShowEvent *event);
+		void paintEvent(QPaintEvent *);
 
 	private Q_SLOTS:
 		void toggleAnim(bool enabled);

@@ -30,3 +30,13 @@ void adiscope::setDynamicProperty(QWidget *widget,
 	widget->style()->unpolish(widget);
 	widget->style()->polish(widget);
 }
+
+bool adiscope::getDynamicProperty(QWidget *widget,
+				  const char *property)
+{
+	QVariant val = widget->property(property);
+	if (val.canConvert<bool>()) {
+		return val.toBool();
+	}
+	return false;
+}

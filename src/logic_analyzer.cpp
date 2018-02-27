@@ -124,6 +124,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	trigger_is_forced(false)
 {
 	ui->setupUi(this);
+	setDynamicProperty(ui->btnCursorsLock, "use_icon", true);
+
 	timer->setSingleShot(true);
 	this->setAttribute(Qt::WA_DeleteOnClose, true);
 	if(!offline_mode) {
@@ -298,10 +300,6 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	listVw->setSpacing(2);
 
 	/* Cursor Settings */
-	settings_group->addButton(ui->btnCursors);
-	int cursors_panel =  ui->stackedWidget->indexOf(ui->cursorSettings);
-	ui->btnCursors->setProperty("id", QVariant(-cursors_panel));
-
 	connect(trigger_settings_ui->cmb_trigg_extern_cond_1,
 		SIGNAL(currentIndexChanged(int)),
 		this, SLOT(setExternalTrigger(int)));
@@ -313,8 +311,6 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	connect(trigger_settings_ui->cmb_trigg_logic, SIGNAL(currentTextChanged(const QString)),
 		this, SLOT(setHWTriggerLogic(const QString)));
 	connect(ui->btnTrigger, SIGNAL(pressed()),
-		this, SLOT(toggleRightMenu()));
-	connect(ui->btnCursors, SIGNAL(pressed()),
 		this, SLOT(toggleRightMenu()));
 	connect(ui->btnRunStop, SIGNAL(toggled(bool)),
 	        this, SLOT(startStop(bool)));
@@ -1683,6 +1679,7 @@ void LogicAnalyzer::cursorsFormatDelta()
 void LogicAnalyzer::setCursorsActive(bool active)
 {
 	main_win->view_->viewport()->setCursorsActive(active);
+	ui->btnCursorsLock->setEnabled(active);
 	if(active) {
 		d_hCursorHandle1->show();
 		d_hCursorHandle2->show();
@@ -1713,7 +1710,6 @@ void LogicAnalyzer::resetInstrumentToDefault()
 	ui->boxCursors->setChecked(false);
 	if(ui->btnCursorsLock->isChecked())
 		ui->btnCursorsLock->toggle();
-	ui->cursorSettings->update();
 	ui->btnShowChannels->clicked(false);
 	exportSettings->getExportAllButton()->setChecked(true);
 	initialised = false;
@@ -1948,6 +1944,7 @@ bool LogicAnalyzer_API::cursorsLocked() const
 void LogicAnalyzer_API::setCursorsLocked(bool en)
 {
 	lga->ui->btnCursorsLock->setChecked(en);
+	lga->ui->btnCursorsLock->toggled(en);
 }
 
 bool LogicAnalyzer_API::inactiveHidden() const

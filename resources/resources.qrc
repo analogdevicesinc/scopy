@@ -116,6 +116,8 @@
         <file>icons/dots_on_plot.svg</file>
         <file>icons/ic load.svg</file>
         <file>icons/ic save.svg</file>
+        <file>icons/ic-locked.svg</file>
+        <file>icons/ic-unlocked.svg</file>
     </qresource>
     <qresource prefix="/stylesheets">
         <file>stylesheets/global.qss</file>

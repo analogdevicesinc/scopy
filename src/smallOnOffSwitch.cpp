@@ -18,6 +18,7 @@
  */
 
 #include "smallOnOffSwitch.hpp"
+#include "dynamicWidget.hpp"
 
 #include <QDebug>
 #include <QResizeEvent>
@@ -26,7 +27,8 @@ using namespace adiscope;
 
 SmallOnOffSwitch::SmallOnOffSwitch(QWidget *parent) : QPushButton(parent),
 	color_start("grey"), color_end("blue"),
-	handle(this), anim(&handle, "geometry"), color_anim(this, "color")
+	handle(this), anim(&handle, "geometry"), color_anim(this, "color"),
+	show_icon(false)
 {
 	handle.setObjectName("handle");
 
@@ -86,6 +88,34 @@ void SmallOnOffSwitch::toggleAnim(bool enabled)
 
 	anim.start();
 	color_anim.start();
+}
+
+void SmallOnOffSwitch::paintEvent(QPaintEvent *e)
+{
+        QPushButton::paintEvent(e);
+        show_icon = getDynamicProperty(this, "use_icon");
+        if (!show_icon) {
+                return;
+        }
+
+        QIcon locked(":/icons/ic-locked.svg");
+        QIcon unlocked(":/icons/ic-unlocked.svg");
+        QPixmap pixmap;
+
+        QStylePainter p(this);
+        int w, h;
+        int left = 4, top = 4;
+
+        if (isChecked()) {
+                w = 8; h = 12;
+                pixmap =  locked.pixmap(w, h);
+                p.drawPixmap(left, handle.y() + top, w, h, pixmap);
+        } else {
+                w = 10; h = 12;
+                pixmap = unlocked.pixmap(w, h);
+                p.drawPixmap(left + handle.x() + handle.width(),
+                             handle.y() + top, w, h, pixmap);
+        }
 }
 
 void SmallOnOffSwitch::showEvent(QShowEvent *event)
