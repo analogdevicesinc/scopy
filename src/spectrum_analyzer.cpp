@@ -663,6 +663,10 @@ void SpectrumAnalyzer::onChannelSelected(bool en)
 	// Update markers settings menu based on current channel
 	if (en) {
 		ui->labelMarkerSettingsTitle->setText(cw->fullName());
+		QString stylesheet = QString("border: 2px solid %1"
+						).arg(cw->color().name());
+		ui->lineMarkerSettingsTitle->setStyleSheet(stylesheet);
+
 
 		marker_selector->blockSignals(true);
 
