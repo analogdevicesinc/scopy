@@ -19,7 +19,7 @@ QToolTip {
 
 QLabel {
 	color: rgba(255, 255, 255, 150);
-	font-size: 14px;
+	font-size: 13px;
 	text-align: left;
 }
 

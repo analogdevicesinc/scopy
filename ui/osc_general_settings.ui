@@ -48,13 +48,13 @@
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_4">
        <property name="spacing">
-        <number>10</number>
+        <number>15</number>
        </property>
        <property name="topMargin">
-        <number>10</number>
+        <number>0</number>
        </property>
        <property name="bottomMargin">
-        <number>10</number>
+        <number>0</number>
        </property>
        <item>
         <widget class="QLabel" name="label_4">
@@ -65,11 +65,9 @@
           </sizepolicy>
          </property>
          <property name="styleSheet">
-          <string notr="true">QLabel {
-  font-weight: bold;
-  font-size: 13px;
-  color: #ffffff;
-}
+          <string notr="true">color: white;
+	font-size: 14px;
+	font-weight: normal;
 </string>
          </property>
          <property name="text">
@@ -102,27 +100,8 @@
       </layout>
      </item>
      <item>
-      <spacer name="verticalSpacer">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="sizeType">
-        <enum>QSizePolicy::Fixed</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>0</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <property name="spacing">
-        <number>10</number>
-       </property>
-       <item>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="1" column="0">
         <widget class="QLabel" name="label">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -132,20 +111,68 @@
          </property>
          <property name="styleSheet">
           <string notr="true">QLabel {
-  color: rgb(85, 85, 85);
-}</string>
+		font-size: 12px;
+		color: rgba(255, 255, 255, 70);
+	}</string>
          </property>
          <property name="text">
-          <string>Views</string>
+          <string>VIEWS </string>
          </property>
         </widget>
        </item>
-       <item>
+       <item row="1" column="1">
         <widget class="Line" name="line">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>1</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>1</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
+         </property>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
         </widget>
+       </item>
+       <item row="2" column="0" colspan="2">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>0</width>
+           <height>15</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="0" column="0" colspan="2">
+        <spacer name="verticalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>0</width>
+           <height>25</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </item>
@@ -159,8 +186,11 @@
        </property>
        <item>
         <widget class="QLabel" name="label_2">
+         <property name="styleSheet">
+          <string notr="true">font-size: 13px;</string>
+         </property>
          <property name="text">
-          <string>FFT:</string>
+          <string>FFT</string>
          </property>
         </widget>
        </item>
@@ -173,8 +203,11 @@
        </item>
        <item>
         <widget class="QLabel" name="label_3">
+         <property name="styleSheet">
+          <string notr="true">font-size: 13px;</string>
+         </property>
          <property name="text">
-          <string>X-Y:</string>
+          <string>X-Y</string>
          </property>
         </widget>
        </item>

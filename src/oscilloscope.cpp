@@ -949,7 +949,7 @@ void Oscilloscope::cursor_panel_init()
 	cr_ui->horizontalSlider->setMinimum(0);
 	cr_ui->horizontalSlider->setSingleStep(1);
 	connect(cr_ui->horizontalSlider, &QSlider::valueChanged, [=](int value){
-		cr_ui->transLabel->setText("Transparency: " + QString::number(value) + "%");
+		cr_ui->transLabel->setText("Transparency " + QString::number(value) + "%");
 		plot.setCursorReadoutsTransparency(value);
 	});
 	cr_ui->horizontalSlider->setSliderPosition(0);

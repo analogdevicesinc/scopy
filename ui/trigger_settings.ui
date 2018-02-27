@@ -33,7 +33,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
-    <number>6</number>
+    <number>0</number>
    </property>
    <property name="leftMargin">
     <number>18</number>
@@ -49,6 +49,12 @@
    </property>
    <item>
     <widget class="QLabel" name="label_title">
+     <property name="styleSheet">
+      <string notr="true">color: white;
+	font-size: 14px;
+	font-weight: normal;
+</string>
+     </property>
      <property name="text">
       <string>Trigger Settings</string>
      </property>
@@ -64,8 +70,8 @@
      </property>
      <property name="sizeHint" stdset="0">
       <size>
-       <width>10</width>
-       <height>4</height>
+       <width>0</width>
+       <height>15</height>
       </size>
      </property>
     </spacer>
@@ -109,7 +115,7 @@
         <x>0</x>
         <y>0</y>
         <width>250</width>
-        <height>440</height>
+        <height>447</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -138,6 +144,9 @@
          </property>
          <item>
           <widget class="QLabel" name="label">
+           <property name="styleSheet">
+            <string notr="true">font-size: 13px;</string>
+           </property>
            <property name="text">
             <string>Trigger mode</string>
            </property>
@@ -199,6 +208,9 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="styleSheet">
+          <string notr="true">font-size: 13px;</string>
+         </property>
          <property name="text">
           <string>Channel Source</string>
          </property>
@@ -219,6 +231,9 @@
        </item>
        <item>
         <widget class="QLabel" name="lbl_internal">
+         <property name="styleSheet">
+          <string notr="true">font-size: 13px;</string>
+         </property>
          <property name="text">
           <string>Internal (Analog)</string>
          </property>
@@ -256,6 +271,9 @@
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">font-size: 13px;</string>
             </property>
             <property name="text">
              <string>Condition</string>
@@ -340,6 +358,9 @@
            <height>16</height>
           </size>
          </property>
+         <property name="styleSheet">
+          <string notr="true">font-size: 13px;</string>
+         </property>
          <property name="text">
           <string>External (Digital)</string>
          </property>
@@ -377,6 +398,9 @@
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">font-size: 13px;</string>
             </property>
             <property name="text">
              <string>Condition</string>
@@ -431,6 +455,9 @@
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">font-size: 13px;</string>
          </property>
          <property name="text">
           <string>Analog - Digital</string>
