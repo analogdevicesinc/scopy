@@ -216,6 +216,7 @@ private:
 	bool debugger_enabled;
 
 	QString indexFile;
+	QString pathToFile;
 };
 
 class ToolLauncher_API: public ApiObject
