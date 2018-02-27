@@ -118,6 +118,8 @@ private Q_SLOTS:
 
 	void on_finishButton_clicked();
 
+	void on_autoButton_clicked();
+
 private:
 	Ui::ManualCalibration *ui;
 	struct iio_channel *ch1w, *ch2w, *ch1r, *ch2r, *pd_pos, *pd_neg;

@@ -7,11 +7,141 @@
     <x>0</x>
     <y>0</y>
     <width>679</width>
-    <height>570</height>
+    <height>384</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QLabel {
+	color: rgba(255, 255, 255, 150);
+	text-align: left;
+	font-family:'DejaVu Sans';
+	font-size:14pt;
+	 font-weight:72;
+ 	font-style:normal
+}
+
+QPushButton
+{
+  width: 175px;
+  height: 30px;
+  background-color: #4a64ff;
+  border-radius: 4px;
+
+  font-family: ArialMT;
+  font-size: 14px;
+  font-weight: normal;
+  font-style: normal;
+  text-align: center;
+  color: #ffffff;
+
+}
+
+
+QPushButton:hover
+{
+	 background-color: #4a34ff;
+}
+
+QTabWidget::pane {
+    border: 1px solid black;
+}
+
+QTabWidget::tab-bar:top {
+    top: 1px;
+}
+
+QTabWidget::tab-bar:bottom {
+    bottom: 1px;
+}
+
+QTabWidget::tab-bar:left {
+    right: 1px;
+}
+
+QTabWidget::tab-bar:right {
+    left: 1px;
+}
+QTabBar::tab {
+    border: 1px solid black;
+	border-radius: 4px;
+}
+
+QTabBar::tab:selected {
+    background: #4a64ff;
+}
+
+QTabBar::tab:!selected {
+    background: #4a64ff;
+}
+
+QTabBar::tab:!selected:hover {
+    background: #4a34ff;
+}
+
+QTabBar::tab:top:!selected {
+    margin-top: 3px;
+}
+
+QTabBar::tab:bottom:!selected {
+    margin-bottom: 3px;
+}
+
+QTabBar::tab:top, QTabBar::tab:bottom {
+    min-width: 8ex;
+    margin-right: -1px;
+    padding: 5px 10px 5px 10px;
+}
+
+QTabBar::tab:top:selected {
+    border-bottom-color: none;
+}
+
+QTabBar::tab:bottom:selected {
+    border-top-color: none;
+}
+
+QTabBar::tab:top:last, QTabBar::tab:bottom:last,
+QTabBar::tab:top:only-one, QTabBar::tab:bottom:only-one {
+    margin-right: 0;
+}
+
+QTabBar::tab:left:!selected {
+    margin-right: 3px;
+}
+
+QTabBar::tab:right:!selected {
+    margin-left: 3px;
+}
+
+QTabBar::tab:left, QTabBar::tab:right {
+    min-height: 8ex;
+    margin-bottom: -1px;
+    padding: 10px 5px 10px 5px;
+}
+
+QTabBar::tab:left:selected {
+    border-left-color: none;
+}
+
+QTabBar::tab:right:selected {
+    border-right-color: none;
+}
+
+QTabBar::tab:left:last, QTabBar::tab:right:last,
+QTabBar::tab:left:only-one, QTabBar::tab:right:only-one {
+    margin-bottom: 0;
+}
+
+QListWidget
+{
+	font-family:'DejaVu Sans';
+	font-size:14pt;
+	font-weight:72;
+ 	font-style:normal
+}</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
@@ -20,7 +150,11 @@
       <item>
        <widget class="QTabWidget" name="tabWidget">
         <property name="styleSheet">
-         <string notr="true">QTabBar::tab {  width: 200px; }</string>
+         <string notr="true">QTabBar::tab
+ {  
+	width: 200px; 
+	height: 20px;
+}</string>
         </property>
         <property name="currentIndex">
          <number>0</number>
@@ -85,6 +219,16 @@
          </size>
         </property>
        </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="autoButton">
+        <property name="styleSheet">
+         <string notr="true">global.qss</string>
+        </property>
+        <property name="text">
+         <string>Run automatic</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

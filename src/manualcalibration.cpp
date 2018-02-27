@@ -38,17 +38,17 @@ static const double SUPPLY_4_5V_NEG_VALUE = -4.5;
 /*Calibrations procedure stories*/
 static const QStringList positiveOffsetStory = (QStringList() <<
 					 R"(Calibrate the Positive Supply.
-Measure the Voltage on the \"V+\" and enter the value in the field below.
+Measure the Voltage on the "V+" and enter the value in the field below.
 The value should be around 100mV)"
 					 << R"(Calibrate the Positive Supply
-Measure the Voltage on the \"V+\" and enter the value in the field below.
+Measure the Voltage on the "V+" and enter the value in the field below.
 The value should be around 4.5V)");
 static const QStringList negativeOffsetStory = (QStringList() <<
 					 R"(Calibrate the Negative Supply
-Measure the Voltage on the \"V-\" and enter the value in the field below.
+Measure the Voltage on the "V-" and enter the value in the field below.
 The value should be around -100mV)"
 					 << R"(Calibrate the Negative Supply
-Measure the Voltage on the \"V-\" and enter the value in the field below.
+Measure the Voltage on the "V-" and enter the value in the field below.
 The value should be around -4.5V)");
 
 ManualCalibration::ManualCalibration(struct iio_context *ctx, Filter *filt,
@@ -448,7 +448,10 @@ void ManualCalibration::displayStartUpCalibrationValues(void)
 
 	table->resizeColumnsToContents();
 
-	ui->tabWidget->addTab(table, "Startup calibration");
+	ui->tabWidget->removeTab(2);
+	ui->tabWidget->insertTab(2, table, "Startup calibration");
+	ui->tabWidget->setCurrentIndex(2);
+
 }
 
 void ManualCalibration::initParameters(void)
@@ -539,3 +542,13 @@ void ManualCalibration::on_finishButton_clicked()
 }
 
 
+
+void ManualCalibration::on_autoButton_clicked()
+{
+	if (calib->isInitialized()) {
+		calib->setHardwareInCalibMode();
+		calib->calibrateAll();
+		calib->restoreHardwareFromCalibMode();
+	}
+	displayStartUpCalibrationValues();
+}
