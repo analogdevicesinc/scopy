@@ -138,8 +138,8 @@ QLineEdit {
 QComboBox {
 	height: 24px;
 	border: none;
-	font-size: 16px;
-	font-weight: bold;
+	font-size: 14px;
+	font-family: Arial;
 	border-bottom: 1px solid rgba(255, 255, 255, 102);
 	padding-bottom: 4px;
 }
