@@ -68,7 +68,7 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, std::shared_ptr<GenericAdc> adc,
 		{"s", 1},
 		{"min", 60},
 		{"h", 3600}
-	}, "", 0, 3600,
+	}, "Timer", 0, 3600,
 	true, false, this);
 
 	ui->gridLayout_3->addWidget(data_logging_timer, 9, 0);
@@ -377,15 +377,24 @@ void DMM::chooseFile()
 		tr("Comma-separated values files (*.csv);;All Files(*)"),
 		&selectedFilter);
 	ui->filename->setText(filename);
+
 	if(!ui->run_button->isChecked()) {
 		toggleDataLogging(data_logging);
 	}
+
+	if (ui->run_button->isChecked() && data_logging) {
+		toggleDataLogging(false);
+		toggleDataLogging(true);
+	}
+
 }
 
 void DMM::toggleDataLogging(bool en)
 {
 	data_logging = en;
-	setDynamicProperty(ui->filename, "valid", true);
+	if (en) {
+		setDynamicProperty(ui->filename, "invalid", false);
+	}
 
 	/* If DMM is already running, check all the parameters before
 	 * starting the data logging */
@@ -409,14 +418,14 @@ void DMM::toggleDataLogging(bool en)
 		if(ui->btn_overwrite->isChecked() || file.size() == 0) {
 			if( !file.open(QIODevice::WriteOnly)) {
 				ui->lblFileStatus->setText("File is open in another program");
-				setDynamicProperty(ui->lblFileStatus, "invalid", true);
+				setDynamicProperty(ui->filename, "invalid", true);
 				if(ui->run_button->isChecked()) {
 					ui->btnDataLogging->setChecked(false);
 				}
 				return;
 			} else {
 				ui->lblFileStatus->setText("Choose a file");
-				setDynamicProperty(ui->lblFileStatus, "invalid", false);
+				setDynamicProperty(ui->filename, "invalid", false);
 			}
 			QTextStream out(&file);
 
@@ -492,7 +501,7 @@ void DMM::dataLoggingThread()
 		if (!file.isOpen()) {
 			if (!file.open(QIODevice::Append)) {
 				ui->lblFileStatus->setText("File is open in another program");
-				setDynamicProperty(ui->lblFileStatus, "invalid", true);
+				setDynamicProperty(ui->filename, "invalid", true);
 				if(ui->run_button->isChecked()) {
 					ui->btnDataLogging->setChecked(false);
 				}
