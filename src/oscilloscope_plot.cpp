@@ -172,7 +172,7 @@ CapturePlot::CapturePlot(QWidget *parent,
 	// Trigger A
 	d_levelTriggerABar = new HorizBar(this);
 	d_symbolCtrl->attachSymbol(d_levelTriggerABar);
-	d_levelTriggerABar->setPen(d_trigAinactiveLinePen);
+	d_levelTriggerABar->setPen(d_timeTriggerInactiveLinePen);
 	d_levelTriggerABar->setCanLeavePlot(true);
 
 	d_levelTriggerAHandle = new FreePlotLineHandleV(
@@ -180,7 +180,7 @@ CapturePlot::CapturePlot(QWidget *parent,
 					QPixmap(":/icons/level_trigger_up.svg"),
 					QPixmap(":/icons/level_trigger_down.svg"),
 					d_rightHandlesArea);
-	d_levelTriggerAHandle->setPen(d_trigAactiveLinePen);
+	d_levelTriggerAHandle->setPen(d_timeTriggerActiveLinePen);
 
 	d_levelTriggerABar->setVisible(false);
 	d_levelTriggerAHandle->setVisible(false);
@@ -602,9 +602,9 @@ void CapturePlot::onTimeTriggerHandleGrabbed(bool grabbed) {
 void CapturePlot::onTriggerAHandleGrabbed(bool grabbed)
 {
 	if (grabbed)
-		d_levelTriggerABar->setPen(d_trigAactiveLinePen);
+		d_levelTriggerABar->setPen(d_timeTriggerActiveLinePen);
 	else
-		d_levelTriggerABar->setPen(d_trigAinactiveLinePen);
+		d_levelTriggerABar->setPen(d_timeTriggerInactiveLinePen);
 	d_symbolCtrl->updateOverlay();
 }
 
