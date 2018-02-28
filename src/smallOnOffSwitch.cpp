@@ -110,12 +110,12 @@ void SmallOnOffSwitch::paintEvent(QPaintEvent *e)
         if (isChecked()) {
                 w = 8; h = 12;
                 pixmap =  locked.pixmap(w, h);
-                p.drawPixmap(left, handle.y() + top, w, h, pixmap);
+                p.drawPixmap(left + handle.x() + handle.width(),
+                             handle.y() + top, w, h, pixmap);
         } else {
                 w = 10; h = 12;
                 pixmap = unlocked.pixmap(w, h);
-                p.drawPixmap(left + handle.x() + handle.width(),
-                             handle.y() + top, w, h, pixmap);
+                p.drawPixmap(left, handle.y() + top, w, h, pixmap);
         }
 }
 
