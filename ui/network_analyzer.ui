@@ -1177,7 +1177,7 @@ border: 5px solid white;
        </layout>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_5">
+       <layout class="QHBoxLayout" name="horizontalLayout_9">
         <property name="leftMargin">
          <number>0</number>
         </property>
@@ -1191,7 +1191,7 @@ border: 5px solid white;
          <number>0</number>
         </property>
         <item>
-         <spacer name="horizontalSpacer_3">
+         <spacer name="horizontalSpacer_4">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
@@ -1204,7 +1204,7 @@ border: 5px solid white;
          </spacer>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_6">
+         <layout class="QHBoxLayout" name="horizontalLayout_10">
           <property name="leftMargin">
            <number>11</number>
           </property>
