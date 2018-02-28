@@ -149,11 +149,20 @@ QPushButton:disabled {
            </sizepolicy>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_7">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <property name="leftMargin">
+            <number>20</number>
+           </property>
            <property name="topMargin">
-            <number>9</number>
+            <number>25</number>
+           </property>
+           <property name="rightMargin">
+            <number>20</number>
            </property>
            <property name="bottomMargin">
-            <number>0</number>
+            <number>20</number>
            </property>
            <item>
             <widget class="QScrollArea" name="scrollArea">
@@ -162,6 +171,15 @@ QPushButton:disabled {
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
+             </property>
+             <property name="frameShape">
+              <enum>QFrame::NoFrame</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Sunken</enum>
+             </property>
+             <property name="lineWidth">
+              <number>0</number>
              </property>
              <property name="horizontalScrollBarPolicy">
               <enum>Qt::ScrollBarAlwaysOff</enum>
@@ -174,8 +192,8 @@ QPushButton:disabled {
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>428</width>
-                <height>615</height>
+                <width>404</width>
+                <height>587</height>
                </rect>
               </property>
               <property name="sizePolicy">
@@ -201,27 +219,15 @@ QPushButton:disabled {
                 <number>0</number>
                </property>
                <item>
-                <widget class="QGroupBox" name="config_panel">
+                <widget class="QTabWidget" name="tabWidget">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
                    <horstretch>0</horstretch>
                    <verstretch>0</verstretch>
                   </sizepolicy>
                  </property>
-                 <property name="title">
-                  <string>Configuration</string>
-                 </property>
-                 <layout class="QHBoxLayout" name="horizontalLayout_2">
-                  <item>
-                   <widget class="QTabWidget" name="tabWidget">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="styleSheet">
-                     <string notr="true">/* QTabsWidgets */
+                 <property name="styleSheet">
+                  <string notr="true">/* QTabsWidgets */
 QTabWidget::pane {
   border-top: 0px;
 }
@@ -231,373 +237,585 @@ QTabBar::tab {
   padding-bottom: 5px;
   font: bold;
 }
+QTabBar::tab:!selected {
+  border-bottom: 2px solid rgba(55, 55, 64);
+  margin-top: 0px;
+}
 QTabBar::tab:selected {
   color: white;
   border-bottom: 2px solid rgba(74, 100, 255);
   margin-top: 0px;
 }
-QTabBar::tab:!selected {
-  border-bottom: 2px solid rgba(55, 55, 64);
-  margin-top: 0px;
-}</string>
-                    </property>
-                    <property name="currentIndex">
-                     <number>0</number>
-                    </property>
-                    <property name="usesScrollButtons">
-                     <bool>false</bool>
-                    </property>
-                    <widget class="QWidget" name="tabConstant">
+</string>
+                 </property>
+                 <property name="currentIndex">
+                  <number>0</number>
+                 </property>
+                 <property name="usesScrollButtons">
+                  <bool>false</bool>
+                 </property>
+                 <widget class="QWidget" name="tabConstant">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <attribute name="title">
+                   <string>Constant</string>
+                  </attribute>
+                  <layout class="QVBoxLayout" name="verticalLayout_6">
+                   <property name="topMargin">
+                    <number>25</number>
+                   </property>
+                   <item>
+                    <widget class="adiscope::PositionSpinButton" name="constantValue" native="true">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
                        <horstretch>0</horstretch>
                        <verstretch>0</verstretch>
                       </sizepolicy>
                      </property>
-                     <attribute name="title">
-                      <string>Constant</string>
-                     </attribute>
-                     <layout class="QVBoxLayout" name="verticalLayout_6">
-                      <item>
-                       <widget class="adiscope::PositionSpinButton" name="constantValue" native="true">
-                        <property name="sizePolicy">
-                         <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-                          <horstretch>0</horstretch>
-                          <verstretch>0</verstretch>
-                         </sizepolicy>
-                        </property>
-                        <property name="units" stdset="0">
-                         <stringlist notr="true">
-                          <string>mVolts=1e-3</string>
-                          <string>Volts=1e0</string>
-                         </stringlist>
-                        </property>
-                        <property name="name" stdset="0">
-                         <string>Value</string>
-                        </property>
-                        <property name="min_value" stdset="0">
-                         <double>-5.000000000000000</double>
-                        </property>
-                        <property name="max_value" stdset="0">
-                         <double>5.000000000000000</double>
-                        </property>
-                        <property name="invert_circle" stdset="0">
-                         <bool>true</bool>
-                        </property>
-                       </widget>
-                      </item>
-                     </layout>
+                     <property name="units" stdset="0">
+                      <stringlist notr="true">
+                       <string>mVolts=1e-3</string>
+                       <string>Volts=1e0</string>
+                      </stringlist>
+                     </property>
+                     <property name="name" stdset="0">
+                      <string>Value</string>
+                     </property>
+                     <property name="min_value" stdset="0">
+                      <double>-5.000000000000000</double>
+                     </property>
+                     <property name="max_value" stdset="0">
+                      <double>5.000000000000000</double>
+                     </property>
+                     <property name="invert_circle" stdset="0">
+                      <bool>true</bool>
+                     </property>
                     </widget>
-                    <widget class="QWidget" name="tabWaveform">
+                   </item>
+                  </layout>
+                 </widget>
+                 <widget class="QWidget" name="tabWaveform">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <attribute name="title">
+                   <string>Waveform</string>
+                  </attribute>
+                  <layout class="QVBoxLayout" name="verticalLayout_5">
+                   <property name="spacing">
+                    <number>10</number>
+                   </property>
+                   <property name="leftMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="topMargin">
+                    <number>25</number>
+                   </property>
+                   <property name="rightMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="bottomMargin">
+                    <number>0</number>
+                   </property>
+                   <item>
+                    <widget class="QComboBox" name="type">
                      <property name="sizePolicy">
-                      <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                        <horstretch>0</horstretch>
                        <verstretch>0</verstretch>
                       </sizepolicy>
                      </property>
-                     <attribute name="title">
-                      <string>Waveform</string>
-                     </attribute>
-                     <layout class="QVBoxLayout" name="verticalLayout_5">
+                     <item>
+                      <property name="text">
+                       <string>Sine</string>
+                      </property>
+                     </item>
+                     <item>
+                      <property name="text">
+                       <string>Square</string>
+                      </property>
+                     </item>
+                     <item>
+                      <property name="text">
+                       <string>Triangle</string>
+                      </property>
+                     </item>
+                     <item>
+                      <property name="text">
+                       <string>Trapezoidal</string>
+                      </property>
+                     </item>
+                     <item>
+                      <property name="text">
+                       <string>Rising Ramp Sawtooth</string>
+                      </property>
+                     </item>
+                     <item>
+                      <property name="text">
+                       <string>Falling Ramp Sawtooth</string>
+                      </property>
+                     </item>
+                    </widget>
+                   </item>
+                   <item>
+                    <layout class="QGridLayout" name="waveformGrid">
+                     <property name="bottomMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="spacing">
+                      <number>15</number>
+                     </property>
+                     <item row="0" column="1">
+                      <widget class="adiscope::PositionSpinButton" name="offset" native="true">
+                       <property name="units" stdset="0">
+                        <stringlist notr="true">
+                         <string>µVolts=1e-6</string>
+                         <string>mVolts=1e-3</string>
+                         <string>Volts=1e0</string>
+                        </stringlist>
+                       </property>
+                       <property name="name" stdset="0">
+                        <string>Offset</string>
+                       </property>
+                       <property name="min_value" stdset="0">
+                        <double>-5.000000000000000</double>
+                       </property>
+                       <property name="max_value" stdset="0">
+                        <double>5.000000000000000</double>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="0">
+                      <widget class="adiscope::ScaleSpinButton" name="frequency" native="true">
+                       <property name="minimumSize">
+                        <size>
+                         <width>30</width>
+                         <height>30</height>
+                        </size>
+                       </property>
+                       <property name="units" stdset="0">
+                        <stringlist notr="true">
+                         <string>mHz=1e-3</string>
+                         <string>Hz=1e0</string>
+                         <string>kHz=1e3</string>
+                         <string>MHz=1e6</string>
+                        </stringlist>
+                       </property>
+                       <property name="name" stdset="0">
+                        <string>Frequency</string>
+                       </property>
+                       <property name="min_value" stdset="0">
+                        <double>0.001000000000000</double>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="0">
+                      <widget class="adiscope::ScaleSpinButton" name="amplitude" native="true">
+                       <property name="minimumSize">
+                        <size>
+                         <width>30</width>
+                         <height>30</height>
+                        </size>
+                       </property>
+                       <property name="units" stdset="0">
+                        <stringlist notr="true">
+                         <string>µVolts=1e-6</string>
+                         <string>mVolts=1e-3</string>
+                         <string>Volts=1e0</string>
+                        </stringlist>
+                       </property>
+                       <property name="name" stdset="0">
+                        <string>Amplitude</string>
+                       </property>
+                       <property name="min_value" stdset="0">
+                        <double>0.000001000000000</double>
+                       </property>
+                       <property name="max_value" stdset="0">
+                        <double>10.000000000000000</double>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="2" column="1">
+                      <widget class="adiscope::PositionSpinButton" name="dutycycle" native="true">
+                       <property name="name" stdset="0">
+                        <string>Duty Cycle</string>
+                       </property>
+                       <property name="max_value" stdset="0">
+                        <double>100.000000000000000</double>
+                       </property>
+                       <property name="units" stdset="0">
+                        <stringlist>
+                         <string>%=1e0</string>
+                        </stringlist>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="1">
+                      <widget class="adiscope::PhaseSpinButton" name="phase" native="true">
+                       <property name="name" stdset="0">
+                        <string>Phase</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </item>
+                   <item>
+                    <widget class="QWidget" name="wtrapezparams" native="true">
+                     <layout class="QVBoxLayout" name="verticalLayout_12">
+                      <property name="spacing">
+                       <number>15</number>
+                      </property>
+                      <property name="leftMargin">
+                       <number>0</number>
+                      </property>
+                      <property name="topMargin">
+                       <number>0</number>
+                      </property>
+                      <property name="rightMargin">
+                       <number>0</number>
+                      </property>
+                      <property name="bottomMargin">
+                       <number>0</number>
+                      </property>
                       <item>
-                       <widget class="QLabel" name="label_4">
-                        <property name="styleSheet">
-                         <string notr="true">padding: 10px;</string>
-                        </property>
-                        <property name="text">
-                         <string>Waveform type</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item>
-                       <widget class="QComboBox" name="type">
-                        <property name="sizePolicy">
-                         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                          <horstretch>0</horstretch>
-                          <verstretch>0</verstretch>
-                         </sizepolicy>
-                        </property>
-                        <item>
-                         <property name="text">
-                          <string>Sine</string>
-                         </property>
-                        </item>
-                        <item>
-                         <property name="text">
-                          <string>Square</string>
-                         </property>
-                        </item>
-                        <item>
-                         <property name="text">
-                          <string>Triangle</string>
-                         </property>
-                        </item>
-                        <item>
-                         <property name="text">
-                          <string>Trapezoidal</string>
-                         </property>
-                        </item>
-                        <item>
-                         <property name="text">
-                          <string>Rising Ramp Sawtooth</string>
-                         </property>
-                        </item>
-                        <item>
-                         <property name="text">
-                          <string>Falling Ramp Sawtooth</string>
-                         </property>
-                        </item>
-                       </widget>
-                      </item>
-                      <item>
-                       <layout class="QGridLayout" name="waveformGrid">
-                        <property name="bottomMargin">
+                       <layout class="QHBoxLayout" name="horizontalLayout_9">
+                        <property name="spacing">
                          <number>0</number>
                         </property>
-                        <item row="0" column="1">
-                         <widget class="adiscope::PositionSpinButton" name="offset" native="true">
-                          <property name="units" stdset="0">
-                           <stringlist notr="true">
-                            <string>µVolts=1e-6</string>
-                            <string>mVolts=1e-3</string>
-                            <string>Volts=1e0</string>
-                           </stringlist>
+                        <property name="topMargin">
+                         <number>0</number>
+                        </property>
+                        <item>
+                         <widget class="QLabel" name="label_2">
+                          <property name="sizePolicy">
+                           <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                           </sizepolicy>
                           </property>
-                          <property name="name" stdset="0">
-                           <string>Offset</string>
+                          <property name="styleSheet">
+                           <string notr="true">  QLabel {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 70);
+    }</string>
                           </property>
-                          <property name="min_value" stdset="0">
-                           <double>-5.000000000000000</double>
-                          </property>
-                          <property name="max_value" stdset="0">
-                           <double>5.000000000000000</double>
+                          <property name="text">
+                           <string>TIMING </string>
                           </property>
                          </widget>
                         </item>
-                        <item row="1" column="0">
-                         <widget class="adiscope::ScaleSpinButton" name="frequency" native="true">
+                        <item>
+                         <widget class="Line" name="line_3">
                           <property name="minimumSize">
                            <size>
-                            <width>30</width>
-                            <height>30</height>
+                            <width>0</width>
+                            <height>1</height>
                            </size>
                           </property>
-                          <property name="units" stdset="0">
-                           <stringlist notr="true">
-                            <string>mHz=1e-3</string>
-                            <string>Hz=1e0</string>
-                            <string>kHz=1e3</string>
-                            <string>MHz=1e6</string>
-                           </stringlist>
-                          </property>
-                          <property name="name" stdset="0">
-                           <string>Frequency</string>
-                          </property>
-                          <property name="min_value" stdset="0">
-                           <double>0.001000000000000</double>
-                          </property>
-                         </widget>
-                        </item>
-                        <item row="0" column="0">
-                         <widget class="adiscope::ScaleSpinButton" name="amplitude" native="true">
-                          <property name="minimumSize">
+                          <property name="maximumSize">
                            <size>
-                            <width>30</width>
-                            <height>30</height>
+                            <width>16777215</width>
+                            <height>1</height>
                            </size>
                           </property>
-                          <property name="units" stdset="0">
-                           <stringlist notr="true">
-                            <string>µVolts=1e-6</string>
-                            <string>mVolts=1e-3</string>
-                            <string>Volts=1e0</string>
-                           </stringlist>
+                          <property name="styleSheet">
+                           <string notr="true">border: 1px solid rgba(255, 255, 255, 70);
+ </string>
                           </property>
-                          <property name="name" stdset="0">
-                           <string>Amplitude</string>
-                          </property>
-                          <property name="min_value" stdset="0">
-                           <double>0.000001000000000</double>
-                          </property>
-                          <property name="max_value" stdset="0">
-                           <double>10.000000000000000</double>
-                          </property>
-                         </widget>
-                        </item>
-                        <item row="2" column="1">
-                         <widget class="adiscope::PositionSpinButton" name="dutycycle" native="true">
-                          <property name="name" stdset="0">
-                           <string>Duty Cycle</string>
-                          </property>
-                          <property name="max_value" stdset="0">
-                           <double>100.000000000000000</double>
-                          </property>
-                          <property name="units" stdset="0">
-                           <stringlist>
-                            <string>%=1e0</string>
-                           </stringlist>
-                          </property>
-                         </widget>
-                        </item>
-                        <item row="1" column="1">
-                         <widget class="adiscope::PhaseSpinButton" name="phase" native="true">
-                          <property name="name" stdset="0">
-                           <string>Phase</string>
+                          <property name="orientation">
+                           <enum>Qt::Horizontal</enum>
                           </property>
                          </widget>
                         </item>
                        </layout>
                       </item>
                       <item>
-                       <widget class="QWidget" name="wtrapezparams" native="true">
-                        <layout class="QGridLayout" name="gridLayout">
-                         <property name="leftMargin">
-                          <number>0</number>
-                         </property>
-                         <property name="topMargin">
-                          <number>0</number>
-                         </property>
-                         <property name="rightMargin">
-                          <number>0</number>
-                         </property>
-                         <property name="bottomMargin">
-                          <number>0</number>
-                         </property>
-                         <item row="2" column="1">
-                          <widget class="adiscope::ScaleSpinButton" name="holdLowTime" native="true">
-                           <property name="name" stdset="0">
-                            <string>Hold Low Time</string>
-                           </property>
-                           <property name="units" stdset="0">
-                            <stringlist notr="true">
-                             <string>ns=1e-9</string>
-                             <string>µs=1e-6</string>
-                             <string>ms=1e-3</string>
-                             <string>seconds=1e0</string>
-                            </stringlist>
-                           </property>
-                           <property name="max_value" stdset="0">
-                            <double>10.000000000000000</double>
-                           </property>
-                           <property name="show_progress" stdset="0">
-                            <bool>false</bool>
-                           </property>
-                          </widget>
-                         </item>
-                         <item row="1" column="1">
-                          <widget class="adiscope::ScaleSpinButton" name="holdHighTime" native="true">
-                           <property name="units" stdset="0">
-                            <stringlist notr="true">
-                             <string>ns=1e-9</string>
-                             <string>µs=1e-6</string>
-                             <string>ms=1e-3</string>
-                             <string>seconds=1e0</string>
-                            </stringlist>
-                           </property>
-                           <property name="name" stdset="0">
-                            <string>Hold High Time</string>
-                           </property>
-                           <property name="max_value" stdset="0">
-                            <double>10.000000000000000</double>
-                           </property>
-                           <property name="show_progress" stdset="0">
-                            <bool>false</bool>
-                           </property>
-                          </widget>
-                         </item>
-                         <item row="1" column="0">
-                          <widget class="adiscope::ScaleSpinButton" name="riseTime" native="true">
-                           <property name="minimumSize">
-                            <size>
-                             <width>30</width>
-                             <height>30</height>
-                            </size>
-                           </property>
-                           <property name="units" stdset="0">
-                            <stringlist notr="true">
-                             <string>ns=1e-9</string>
-                             <string>µs=1e-6</string>
-                             <string>ms=1e-3</string>
-                             <string>seconds=1e0</string>
-                            </stringlist>
-                           </property>
-                           <property name="name" stdset="0">
-                            <string>Rise Time</string>
-                           </property>
-                           <property name="max_value" stdset="0">
-                            <double>10.000000000000000</double>
-                           </property>
-                           <property name="show_progress" stdset="0">
-                            <bool>false</bool>
-                           </property>
-                          </widget>
-                         </item>
-                         <item row="0" column="0">
-                          <widget class="QLabel" name="label_2">
-                           <property name="text">
-                            <string>Timing table</string>
-                           </property>
-                          </widget>
-                         </item>
-                         <item row="2" column="0">
-                          <widget class="adiscope::ScaleSpinButton" name="fallTime" native="true">
-                           <property name="minimumSize">
-                            <size>
-                             <width>30</width>
-                             <height>30</height>
-                            </size>
-                           </property>
-                           <property name="units" stdset="0">
-                            <stringlist notr="true">
-                             <string>ns=1e-9</string>
-                             <string>µs=1e-6</string>
-                             <string>ms=1e-3</string>
-                             <string>seconds=1e0</string>
-                            </stringlist>
-                           </property>
-                           <property name="name" stdset="0">
-                            <string>Fall Time</string>
-                           </property>
-                           <property name="max_value" stdset="0">
-                            <double>10.000000000000000</double>
-                           </property>
-                           <property name="show_progress" stdset="0">
-                            <bool>false</bool>
-                           </property>
-                          </widget>
-                         </item>
-                        </layout>
-                       </widget>
+                       <layout class="QGridLayout" name="gridLayout_2">
+                        <property name="topMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="rightMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="bottomMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="spacing">
+                         <number>15</number>
+                        </property>
+                        <item row="0" column="1">
+                         <widget class="adiscope::ScaleSpinButton" name="holdHighTime" native="true">
+                          <property name="units" stdset="0">
+                           <stringlist notr="true">
+                            <string>ns=1e-9</string>
+                            <string>µs=1e-6</string>
+                            <string>ms=1e-3</string>
+                            <string>seconds=1e0</string>
+                           </stringlist>
+                          </property>
+                          <property name="name" stdset="0">
+                           <string>Hold High Time</string>
+                          </property>
+                          <property name="max_value" stdset="0">
+                           <double>10.000000000000000</double>
+                          </property>
+                          <property name="show_progress" stdset="0">
+                           <bool>false</bool>
+                          </property>
+                         </widget>
+                        </item>
+                        <item row="0" column="0">
+                         <widget class="adiscope::ScaleSpinButton" name="riseTime" native="true">
+                          <property name="minimumSize">
+                           <size>
+                            <width>30</width>
+                            <height>30</height>
+                           </size>
+                          </property>
+                          <property name="units" stdset="0">
+                           <stringlist notr="true">
+                            <string>ns=1e-9</string>
+                            <string>µs=1e-6</string>
+                            <string>ms=1e-3</string>
+                            <string>seconds=1e0</string>
+                           </stringlist>
+                          </property>
+                          <property name="name" stdset="0">
+                           <string>Rise Time</string>
+                          </property>
+                          <property name="max_value" stdset="0">
+                           <double>10.000000000000000</double>
+                          </property>
+                          <property name="show_progress" stdset="0">
+                           <bool>false</bool>
+                          </property>
+                         </widget>
+                        </item>
+                        <item row="1" column="0">
+                         <widget class="adiscope::ScaleSpinButton" name="fallTime" native="true">
+                          <property name="minimumSize">
+                           <size>
+                            <width>30</width>
+                            <height>30</height>
+                           </size>
+                          </property>
+                          <property name="units" stdset="0">
+                           <stringlist notr="true">
+                            <string>ns=1e-9</string>
+                            <string>µs=1e-6</string>
+                            <string>ms=1e-3</string>
+                            <string>seconds=1e0</string>
+                           </stringlist>
+                          </property>
+                          <property name="name" stdset="0">
+                           <string>Fall Time</string>
+                          </property>
+                          <property name="max_value" stdset="0">
+                           <double>10.000000000000000</double>
+                          </property>
+                          <property name="show_progress" stdset="0">
+                           <bool>false</bool>
+                          </property>
+                         </widget>
+                        </item>
+                        <item row="1" column="1">
+                         <widget class="adiscope::ScaleSpinButton" name="holdLowTime" native="true">
+                          <property name="name" stdset="0">
+                           <string>Hold Low Time</string>
+                          </property>
+                          <property name="units" stdset="0">
+                           <stringlist notr="true">
+                            <string>ns=1e-9</string>
+                            <string>µs=1e-6</string>
+                            <string>ms=1e-3</string>
+                            <string>seconds=1e0</string>
+                           </stringlist>
+                          </property>
+                          <property name="max_value" stdset="0">
+                           <double>10.000000000000000</double>
+                          </property>
+                          <property name="show_progress" stdset="0">
+                           <bool>false</bool>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
                       </item>
                      </layout>
                     </widget>
-                    <widget class="QWidget" name="tabBuffer">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
+                   </item>
+                   <item>
+                    <spacer name="verticalSpacer">
+                     <property name="orientation">
+                      <enum>Qt::Vertical</enum>
                      </property>
-                     <attribute name="title">
-                      <string>Buffer</string>
-                     </attribute>
-                     <layout class="QVBoxLayout" name="verticalLayout">
-                      <item>
-                       <widget class="QPushButton" name="load_file">
-                        <property name="sizePolicy">
-                         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                          <horstretch>0</horstretch>
-                          <verstretch>0</verstretch>
-                         </sizepolicy>
-                        </property>
-                        <property name="minimumSize">
-                         <size>
-                          <width>0</width>
-                          <height>64</height>
-                         </size>
-                        </property>
-                        <property name="styleSheet">
-                         <string notr="true">QPushButton {
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>20</width>
+                       <height>40</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                  </layout>
+                 </widget>
+                 <widget class="QWidget" name="tabBuffer">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <attribute name="title">
+                   <string>Buffer</string>
+                  </attribute>
+                  <layout class="QVBoxLayout" name="verticalLayout">
+                   <property name="topMargin">
+                    <number>25</number>
+                   </property>
+                   <item>
+                    <layout class="QHBoxLayout" name="horizontalLayout_10">
+                     <property name="spacing">
+                      <number>0</number>
+                     </property>
+                     <item>
+                      <widget class="QLabel" name="label_6">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="styleSheet">
+                        <string notr="true">  QLabel {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 70);
+    }</string>
+                       </property>
+                       <property name="text">
+                        <string>FILE </string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="Line" name="line_4">
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>1</height>
+                        </size>
+                       </property>
+                       <property name="maximumSize">
+                        <size>
+                         <width>16777215</width>
+                         <height>1</height>
+                        </size>
+                       </property>
+                       <property name="styleSheet">
+                        <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
+                       </property>
+                       <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </item>
+                   <item>
+                    <layout class="QHBoxLayout" name="horizontalLayout_7">
+                     <property name="spacing">
+                      <number>0</number>
+                     </property>
+                     <property name="topMargin">
+                      <number>0</number>
+                     </property>
+                     <item>
+                      <layout class="QFormLayout" name="formLayout">
+                       <property name="horizontalSpacing">
+                        <number>15</number>
+                       </property>
+                       <property name="verticalSpacing">
+                        <number>15</number>
+                       </property>
+                       <property name="leftMargin">
+                        <number>0</number>
+                       </property>
+                       <property name="rightMargin">
+                        <number>0</number>
+                       </property>
+                       <item row="0" column="0">
+                        <widget class="QLabel" name="label_5">
+                         <property name="font">
+                          <font>
+                           <family>DejaVu Sans</family>
+                           <pointsize>10</pointsize>
+                          </font>
+                         </property>
+                         <property name="text">
+                          <string>PATH</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="0" column="1">
+                        <widget class="QLineEdit" name="label_path"/>
+                       </item>
+                       <item row="1" column="0">
+                        <widget class="QLabel" name="label_9">
+                         <property name="font">
+                          <font>
+                           <family>DejaVu Sans</family>
+                           <pointsize>10</pointsize>
+                          </font>
+                         </property>
+                         <property name="text">
+                          <string>FORMAT</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="1" column="1">
+                        <widget class="QLineEdit" name="label_format"/>
+                       </item>
+                       <item row="2" column="0">
+                        <widget class="QLabel" name="label_7">
+                         <property name="font">
+                          <font>
+                           <family>DejaVu Sans</family>
+                           <pointsize>10</pointsize>
+                          </font>
+                         </property>
+                         <property name="text">
+                          <string>SIZE</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="2" column="1">
+                        <widget class="QLineEdit" name="label_size"/>
+                       </item>
+                      </layout>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="load_file">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>64</height>
+                        </size>
+                       </property>
+                       <property name="styleSheet">
+                        <string notr="true">QPushButton {
 height: 128px;
 width: 128px;
 border: none;
@@ -608,317 +826,252 @@ background-repeat: no-repeat;
 QPushButton:hover {
 background-image: url(:/icons/floppy_hover.svg);
 }</string>
-                        </property>
-                        <property name="text">
-                         <string/>
-                        </property>
-                       </widget>
-                      </item>
-                      <item>
-                       <layout class="QVBoxLayout" name="verticalLayout_8">
-                        <property name="bottomMargin">
-                         <number>0</number>
-                        </property>
-                        <item>
-                         <layout class="QGridLayout" name="waveformGrid_2">
-                          <item row="1" column="0">
-                           <widget class="adiscope::ScaleSpinButton" name="fileSampleRate" native="true">
-                            <property name="minimumSize">
-                             <size>
-                              <width>30</width>
-                              <height>30</height>
-                             </size>
-                            </property>
-                            <property name="units" stdset="0">
-                             <stringlist notr="true">
-                              <string>mHz=1e-3</string>
-                              <string>Hz=1e0</string>
-                              <string>kHz=1e3</string>
-                              <string>MHz=1e6</string>
-                             </stringlist>
-                            </property>
-                            <property name="name" stdset="0">
-                             <string>SampleRate</string>
-                            </property>
-                            <property name="min_value" stdset="0">
-                             <double>0.001000000000000</double>
-                            </property>
-                           </widget>
-                          </item>
-                          <item row="0" column="0">
-                           <widget class="adiscope::ScaleSpinButton" name="fileAmplitude" native="true">
-                            <property name="minimumSize">
-                             <size>
-                              <width>30</width>
-                              <height>30</height>
-                             </size>
-                            </property>
-                            <property name="units" stdset="0">
-                             <stringlist notr="true">
-                              <string>µVolts=1e-6</string>
-                              <string>mVolts=1e-3</string>
-                              <string>Volts=1e0</string>
-                             </stringlist>
-                            </property>
-                            <property name="name" stdset="0">
-                             <string>Amplitude</string>
-                            </property>
-                            <property name="min_value" stdset="0">
-                             <double>0.000001000000000</double>
-                            </property>
-                            <property name="max_value" stdset="0">
-                             <double>10.000000000000000</double>
-                            </property>
-                           </widget>
-                          </item>
-                          <item row="0" column="1">
-                           <widget class="adiscope::PositionSpinButton" name="fileOffset" native="true">
-                            <property name="units" stdset="0">
-                             <stringlist notr="true">
-                              <string>µVolts=1e-6</string>
-                              <string>mVolts=1e-3</string>
-                              <string>Volts=1e0</string>
-                             </stringlist>
-                            </property>
-                            <property name="name" stdset="0">
-                             <string>Offset</string>
-                            </property>
-                            <property name="min_value" stdset="0">
-                             <double>-5.000000000000000</double>
-                            </property>
-                            <property name="max_value" stdset="0">
-                             <double>5.000000000000000</double>
-                            </property>
-                           </widget>
-                          </item>
-                          <item row="1" column="1">
-                           <widget class="adiscope::PositionSpinButton" name="filePhase" native="true">
-                            <property name="units" stdset="0">
-                             <stringlist notr="true">
-                              <string>samples=1e0</string>
-                             </stringlist>
-                            </property>
-                            <property name="name" stdset="0">
-                             <string>Phase</string>
-                            </property>
-                           </widget>
-                          </item>
-                         </layout>
-                        </item>
-                       </layout>
-                      </item>
-                      <item>
-                       <layout class="QHBoxLayout" name="horizontalLayout_4">
-                        <item>
-                         <widget class="QLabel" name="label">
-                          <property name="sizePolicy">
-                           <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                           </sizepolicy>
-                          </property>
-                          <property name="text">
-                           <string>Channel:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QComboBox" name="fileChannel">
-                          <property name="currentText">
-                           <string/>
-                          </property>
-                         </widget>
-                        </item>
-                       </layout>
-                      </item>
-                      <item>
-                       <widget class="QWidget" name="widget" native="true">
-                        <property name="sizePolicy">
-                         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                          <horstretch>0</horstretch>
-                          <verstretch>0</verstretch>
-                         </sizepolicy>
-                        </property>
-                        <layout class="QVBoxLayout" name="verticalLayout_11">
-                         <property name="spacing">
-                          <number>0</number>
+                       </property>
+                       <property name="text">
+                        <string/>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </item>
+                   <item>
+                    <layout class="QHBoxLayout" name="horizontalLayout_4">
+                     <property name="spacing">
+                      <number>15</number>
+                     </property>
+                     <item>
+                      <widget class="QLabel" name="label">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="text">
+                        <string>CHANNEL</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QComboBox" name="fileChannel">
+                       <property name="currentText">
+                        <string/>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </item>
+                   <item>
+                    <layout class="QHBoxLayout" name="horizontalLayout_2">
+                     <property name="spacing">
+                      <number>0</number>
+                     </property>
+                     <item>
+                      <widget class="QLabel" name="label_4">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="styleSheet">
+                        <string notr="true">  QLabel {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 70);
+    }</string>
+                       </property>
+                       <property name="text">
+                        <string>SCALING </string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="Line" name="line_2">
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>1</height>
+                        </size>
+                       </property>
+                       <property name="maximumSize">
+                        <size>
+                         <width>16777215</width>
+                         <height>1</height>
+                        </size>
+                       </property>
+                       <property name="styleSheet">
+                        <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
+                       </property>
+                       <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </item>
+                   <item>
+                    <layout class="QVBoxLayout" name="verticalLayout_8">
+                     <property name="bottomMargin">
+                      <number>0</number>
+                     </property>
+                     <item>
+                      <layout class="QGridLayout" name="waveformGrid_2">
+                       <item row="1" column="0">
+                        <widget class="adiscope::ScaleSpinButton" name="fileSampleRate" native="true">
+                         <property name="minimumSize">
+                          <size>
+                           <width>30</width>
+                           <height>30</height>
+                          </size>
                          </property>
-                         <property name="leftMargin">
-                          <number>0</number>
+                         <property name="units" stdset="0">
+                          <stringlist notr="true">
+                           <string>mHz=1e-3</string>
+                           <string>Hz=1e0</string>
+                           <string>kHz=1e3</string>
+                           <string>MHz=1e6</string>
+                          </stringlist>
                          </property>
-                         <property name="topMargin">
-                          <number>0</number>
+                         <property name="name" stdset="0">
+                          <string>SampleRate</string>
                          </property>
-                         <property name="rightMargin">
-                          <number>0</number>
+                         <property name="min_value" stdset="0">
+                          <double>0.001000000000000</double>
                          </property>
-                         <property name="bottomMargin">
-                          <number>0</number>
+                        </widget>
+                       </item>
+                       <item row="0" column="0">
+                        <widget class="adiscope::ScaleSpinButton" name="fileAmplitude" native="true">
+                         <property name="minimumSize">
+                          <size>
+                           <width>30</width>
+                           <height>30</height>
+                          </size>
                          </property>
-                         <item>
-                          <widget class="QGroupBox" name="groupBox_3">
-                           <property name="sizePolicy">
-                            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                             <horstretch>0</horstretch>
-                             <verstretch>0</verstretch>
-                            </sizepolicy>
-                           </property>
-                           <property name="title">
-                            <string>File information</string>
-                           </property>
-                           <layout class="QFormLayout" name="formLayout">
-                            <item row="0" column="0">
-                             <widget class="QLabel" name="label_5">
-                              <property name="font">
-                               <font>
-                                <family>DejaVu Sans</family>
-                                <pointsize>10</pointsize>
-                               </font>
-                              </property>
-                              <property name="text">
-                               <string>File path:</string>
-                              </property>
-                             </widget>
-                            </item>
-                            <item row="0" column="1">
-                             <widget class="QLabel" name="label_path">
-                              <property name="sizePolicy">
-                               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                                <horstretch>0</horstretch>
-                                <verstretch>0</verstretch>
-                               </sizepolicy>
-                              </property>
-                              <property name="font">
-                               <font>
-                                <family>DejaVu Sans</family>
-                                <pointsize>10</pointsize>
-                               </font>
-                              </property>
-                              <property name="text">
-                               <string/>
-                              </property>
-                             </widget>
-                            </item>
-                            <item row="1" column="0">
-                             <widget class="QLabel" name="label_9">
-                              <property name="font">
-                               <font>
-                                <family>DejaVu Sans</family>
-                                <pointsize>10</pointsize>
-                               </font>
-                              </property>
-                              <property name="text">
-                               <string>Format:</string>
-                              </property>
-                             </widget>
-                            </item>
-                            <item row="1" column="1">
-                             <widget class="QLabel" name="label_format">
-                              <property name="font">
-                               <font>
-                                <family>DejaVu Sans</family>
-                                <pointsize>10</pointsize>
-                               </font>
-                              </property>
-                              <property name="text">
-                               <string/>
-                              </property>
-                             </widget>
-                            </item>
-                            <item row="2" column="0">
-                             <widget class="QLabel" name="label_7">
-                              <property name="font">
-                               <font>
-                                <family>DejaVu Sans</family>
-                                <pointsize>10</pointsize>
-                               </font>
-                              </property>
-                              <property name="text">
-                               <string>Size:</string>
-                              </property>
-                             </widget>
-                            </item>
-                            <item row="2" column="1">
-                             <widget class="QLabel" name="label_size">
-                              <property name="font">
-                               <font>
-                                <family>DejaVu Sans</family>
-                                <pointsize>10</pointsize>
-                               </font>
-                              </property>
-                              <property name="text">
-                               <string/>
-                              </property>
-                             </widget>
-                            </item>
-                           </layout>
-                          </widget>
-                         </item>
-                         <item>
-                          <spacer name="horizontalSpacer_5">
-                           <property name="orientation">
-                            <enum>Qt::Horizontal</enum>
-                           </property>
-                           <property name="sizeType">
-                            <enum>QSizePolicy::Preferred</enum>
-                           </property>
-                           <property name="sizeHint" stdset="0">
-                            <size>
-                             <width>350</width>
-                             <height>20</height>
-                            </size>
-                           </property>
-                          </spacer>
-                         </item>
-                        </layout>
-                       </widget>
-                      </item>
-                     </layout>
-                    </widget>
-                    <widget class="QWidget" name="tabMath">
+                         <property name="units" stdset="0">
+                          <stringlist notr="true">
+                           <string>µVolts=1e-6</string>
+                           <string>mVolts=1e-3</string>
+                           <string>Volts=1e0</string>
+                          </stringlist>
+                         </property>
+                         <property name="name" stdset="0">
+                          <string>Amplitude</string>
+                         </property>
+                         <property name="min_value" stdset="0">
+                          <double>0.000001000000000</double>
+                         </property>
+                         <property name="max_value" stdset="0">
+                          <double>10.000000000000000</double>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="0" column="1">
+                        <widget class="adiscope::PositionSpinButton" name="fileOffset" native="true">
+                         <property name="units" stdset="0">
+                          <stringlist notr="true">
+                           <string>µVolts=1e-6</string>
+                           <string>mVolts=1e-3</string>
+                           <string>Volts=1e0</string>
+                          </stringlist>
+                         </property>
+                         <property name="name" stdset="0">
+                          <string>Offset</string>
+                         </property>
+                         <property name="min_value" stdset="0">
+                          <double>-5.000000000000000</double>
+                         </property>
+                         <property name="max_value" stdset="0">
+                          <double>5.000000000000000</double>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="1" column="1">
+                        <widget class="adiscope::PositionSpinButton" name="filePhase" native="true">
+                         <property name="units" stdset="0">
+                          <stringlist notr="true">
+                           <string>samples=1e0</string>
+                          </stringlist>
+                         </property>
+                         <property name="name" stdset="0">
+                          <string>Phase</string>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
+                     </item>
+                    </layout>
+                   </item>
+                   <item>
+                    <widget class="QWidget" name="widget" native="true">
                      <property name="sizePolicy">
-                      <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                        <horstretch>0</horstretch>
                        <verstretch>0</verstretch>
                       </sizepolicy>
                      </property>
-                     <attribute name="title">
-                      <string>Math</string>
-                     </attribute>
-                     <layout class="QVBoxLayout" name="verticalLayout_3">
-                      <item>
-                       <widget class="adiscope::ScaleSpinButton" name="mathFrequency" native="true">
-                        <property name="units" stdset="0">
-                         <stringlist notr="true">
-                          <string>mHz=1e-3</string>
-                          <string>Hz=1e0</string>
-                          <string>kHz=1e3</string>
-                          <string>MHz=1e6</string>
-                         </stringlist>
-                        </property>
-                        <property name="name" stdset="0">
-                         <string>Frequency</string>
-                        </property>
-                        <property name="min_value" stdset="0">
-                         <double>0.001000000000000</double>
-                        </property>
-                       </widget>
-                      </item>
-                      <item>
-                       <widget class="adiscope::Math" name="mathWidget" native="true">
-                        <property name="sizePolicy">
-                         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-                          <horstretch>0</horstretch>
-                          <verstretch>0</verstretch>
-                         </sizepolicy>
-                        </property>
-                       </widget>
-                      </item>
+                     <layout class="QVBoxLayout" name="verticalLayout_11">
+                      <property name="spacing">
+                       <number>0</number>
+                      </property>
+                      <property name="leftMargin">
+                       <number>0</number>
+                      </property>
+                      <property name="topMargin">
+                       <number>0</number>
+                      </property>
+                      <property name="rightMargin">
+                       <number>0</number>
+                      </property>
+                      <property name="bottomMargin">
+                       <number>0</number>
+                      </property>
                      </layout>
                     </widget>
-                   </widget>
-                  </item>
-                 </layout>
+                   </item>
+                  </layout>
+                 </widget>
+                 <widget class="QWidget" name="tabMath">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <attribute name="title">
+                   <string>Math</string>
+                  </attribute>
+                  <layout class="QVBoxLayout" name="verticalLayout_3">
+                   <item>
+                    <widget class="adiscope::ScaleSpinButton" name="mathFrequency" native="true">
+                     <property name="units" stdset="0">
+                      <stringlist notr="true">
+                       <string>mHz=1e-3</string>
+                       <string>Hz=1e0</string>
+                       <string>kHz=1e3</string>
+                       <string>MHz=1e6</string>
+                      </stringlist>
+                     </property>
+                     <property name="name" stdset="0">
+                      <string>Frequency</string>
+                     </property>
+                     <property name="min_value" stdset="0">
+                      <double>0.001000000000000</double>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="adiscope::Math" name="mathWidget" native="true">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
                 </widget>
                </item>
                <item>
@@ -940,7 +1093,7 @@ background-image: url(:/icons/floppy_hover.svg);
                   <item>
                    <layout class="QHBoxLayout" name="horizontalLayout_8">
                     <property name="spacing">
-                     <number>6</number>
+                     <number>0</number>
                     </property>
                     <property name="topMargin">
                      <number>0</number>
@@ -984,8 +1137,14 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
                         <verstretch>0</verstretch>
                        </sizepolicy>
                       </property>
+                      <property name="styleSheet">
+                       <string notr="true">  QLabel {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 70);
+    }</string>
+                      </property>
                       <property name="text">
-                       <string>Noise type </string>
+                       <string>NOISE </string>
                       </property>
                      </widget>
                     </item>
@@ -996,6 +1155,21 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
                         <horstretch>0</horstretch>
                         <verstretch>0</verstretch>
                        </sizepolicy>
+                      </property>
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>1</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>1</height>
+                       </size>
+                      </property>
+                      <property name="styleSheet">
+                       <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
                       </property>
                       <property name="orientation">
                        <enum>Qt::Horizontal</enum>
@@ -1139,13 +1313,13 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>adiscope::ScaleSpinButton</class>
+   <class>adiscope::PositionSpinButton</class>
    <extends>QWidget</extends>
    <header>spinbox_a.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>adiscope::PositionSpinButton</class>
+   <class>adiscope::ScaleSpinButton</class>
    <extends>QWidget</extends>
    <header>spinbox_a.hpp</header>
    <container>1</container>

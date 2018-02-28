@@ -1690,8 +1690,14 @@ void adiscope::SignalGenerator::channelWidgetMenuToggled(bool checked)
 
 void adiscope::SignalGenerator::renameConfigPanel()
 {
-	ui->config_panel->setTitle(QString("Configuration for %1").arg(
-	                                   channels[currentChannel]->fullName()));
+	/*ui->config_panel->setTitle(QString("Configuration for %1").arg(
+					   channels[currentChannel]->fullName()));*/
+	QString stylesheet = "QTabBar::tab:selected {\
+			color: white;\
+			margin-top: 0px;\
+			border-bottom: 2px solid "
+		      + channels[currentChannel]->color().name() + "}";
+	ui->tabWidget->setStyleSheet(stylesheet);
 }
 
 int SignalGenerator::sg_waveform_to_idx(enum sg_waveform wave)
