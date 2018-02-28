@@ -71,7 +71,7 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, std::shared_ptr<GenericAdc> adc,
 	}, "Timer", 0, 3600,
 	true, false, this);
 
-	ui->gridLayout_3->addWidget(data_logging_timer, 9, 0);
+	ui->horizontalLayout_2->addWidget(data_logging_timer);
 
 	for(int i = 0; i < adc->numAdcChannels(); i++)
 	{

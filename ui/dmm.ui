@@ -767,9 +767,9 @@ QPushButton:disabled {
          <property name="geometry">
           <rect>
            <x>0</x>
-           <y>0</y>
+           <y>-263</y>
            <width>155</width>
-           <height>815</height>
+           <height>1016</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -802,10 +802,33 @@ QPushButton:disabled {
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="styleSheet">
+             <string notr="true">QLabel {
+	color: white;
+	font-size:14px;
+	font-weight:normal;
+}</string>
+            </property>
             <property name="text">
              <string>Channel 1</string>
             </property>
            </widget>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_13">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>0</width>
+              <height>10</height>
+             </size>
+            </property>
+           </spacer>
           </item>
           <item>
            <widget class="Line" name="line">
@@ -958,10 +981,36 @@ QPushButton:disabled {
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="autoFillBackground">
+             <bool>false</bool>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QLabel {
+	color: white;
+	font-size:14px;
+	font-weight:normal;
+}</string>
+            </property>
             <property name="text">
              <string>Channel 2</string>
             </property>
            </widget>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_14">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>10</height>
+             </size>
+            </property>
+           </spacer>
           </item>
           <item>
            <widget class="Line" name="line_2">
@@ -1101,13 +1150,16 @@ QPushButton:disabled {
             <property name="sizeHint" stdset="0">
              <size>
               <width>0</width>
-              <height>15</height>
+              <height>20</height>
              </size>
             </property>
            </spacer>
           </item>
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_12">
+            <property name="spacing">
+             <number>0</number>
+            </property>
             <property name="topMargin">
              <number>0</number>
             </property>
@@ -1141,21 +1193,39 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
             </item>
             <item>
              <widget class="QLabel" name="label_12">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="styleSheet">
                <string notr="true">QLabel {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 51);
+  font-size: 12px;
+  color: rgba(255, 255, 255, 70);
 }</string>
               </property>
               <property name="text">
-               <string>PEAK HOLD</string>
+               <string> PEAK HOLD </string>
               </property>
              </widget>
             </item>
             <item>
              <widget class="Line" name="line_4">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>1</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>1</height>
+               </size>
+              </property>
               <property name="styleSheet">
-               <string notr="true"/>
+               <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
               </property>
               <property name="frameShadow">
                <enum>QFrame::Plain</enum>
@@ -1169,6 +1239,22 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
              </widget>
             </item>
            </layout>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_10">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>0</width>
+              <height>10</height>
+             </size>
+            </property>
+           </spacer>
           </item>
           <item>
            <widget class="QWidget" name="gridLayout_4Widget" native="true">
@@ -1239,7 +1325,26 @@ color: #FFFFFF;</string>
            </widget>
           </item>
           <item>
+           <spacer name="verticalSpacer_11">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
            <layout class="QHBoxLayout" name="horizontalLayout_11">
+            <property name="spacing">
+             <number>0</number>
+            </property>
             <property name="topMargin">
              <number>0</number>
             </property>
@@ -1274,26 +1379,38 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
             <item>
              <widget class="QLabel" name="label_4">
               <property name="sizePolicy">
-               <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
               </property>
               <property name="styleSheet">
                <string notr="true">QLabel {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 51);
+  font-size: 12px;
+  color: rgba(255, 255, 255, 70);
 }</string>
               </property>
               <property name="text">
-               <string>DATA LOGGING</string>
+               <string> DATA LOGGING </string>
               </property>
              </widget>
             </item>
             <item>
              <widget class="Line" name="line_3">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>1</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>1</height>
+               </size>
+              </property>
               <property name="styleSheet">
-               <string notr="true"/>
+               <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
               </property>
               <property name="frameShadow">
                <enum>QFrame::Plain</enum>
@@ -1307,6 +1424,22 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
              </widget>
             </item>
            </layout>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_12">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>10</height>
+             </size>
+            </property>
+           </spacer>
           </item>
           <item>
            <widget class="QWidget" name="gridLayout_3Widget" native="true">
@@ -1323,24 +1456,7 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
              <property name="bottomMargin">
               <number>0</number>
              </property>
-             <item row="6" column="0" colspan="2">
-              <widget class="QRadioButton" name="btn_overwrite">
-               <property name="text">
-                <string>Overwrite</string>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item row="7" column="0" colspan="2">
-              <widget class="QRadioButton" name="btn_append">
-               <property name="text">
-                <string>Append</string>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="0" colspan="2">
+             <item row="5" column="0" colspan="2">
               <layout class="QHBoxLayout" name="horizontalLayout_10">
                <property name="spacing">
                 <number>3</number>
@@ -1398,15 +1514,21 @@ border-color: grey;
                </item>
               </layout>
              </item>
-             <item row="8" column="0" colspan="2">
-              <layout class="QHBoxLayout" name="horizontalLayout_2">
-               <property name="spacing">
-                <number>10</number>
+             <item row="3" column="0">
+              <spacer name="verticalSpacer_15">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
                </property>
-               <property name="topMargin">
-                <number>0</number>
+               <property name="sizeType">
+                <enum>QSizePolicy::Fixed</enum>
                </property>
-              </layout>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>10</height>
+                </size>
+               </property>
+              </spacer>
              </item>
              <item row="0" column="0">
               <widget class="adiscope::CustomSwitch" name="btnDataLogging">
@@ -1418,7 +1540,27 @@ border-color: grey;
                </property>
               </widget>
              </item>
-             <item row="3" column="0" colspan="2">
+             <item row="11" column="0" colspan="2">
+              <layout class="QHBoxLayout" name="horizontalLayout_2">
+               <property name="spacing">
+                <number>10</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+              </layout>
+             </item>
+             <item row="7" column="0" colspan="2">
+              <widget class="QRadioButton" name="btn_overwrite">
+               <property name="text">
+                <string>Overwrite</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="0" colspan="2">
               <widget class="QLabel" name="lblFileStatus">
                <property name="styleSheet">
                 <string notr="true"/>
@@ -1427,6 +1569,29 @@ border-color: grey;
                 <string>Choose a file</string>
                </property>
               </widget>
+             </item>
+             <item row="8" column="0" colspan="2">
+              <widget class="QRadioButton" name="btn_append">
+               <property name="text">
+                <string>Append</string>
+               </property>
+              </widget>
+             </item>
+             <item row="9" column="0">
+              <spacer name="verticalSpacer_16">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Fixed</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>10</height>
+                </size>
+               </property>
+              </spacer>
              </item>
             </layout>
            </widget>
@@ -1495,22 +1660,6 @@ border-color: grey;
  </resources>
  <connections>
   <connection>
-   <sender>histogramCh1</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>sismograph_ch1</receiver>
-   <slot>setVisible(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1079</x>
-     <y>238</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>129</x>
-     <y>231</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>histogramCh2</sender>
    <signal>toggled(bool)</signal>
    <receiver>sismograph_ch2</receiver>
@@ -1523,6 +1672,22 @@ border-color: grey;
     <hint type="destinationlabel">
      <x>129</x>
      <y>604</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>histogramCh1</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>sismograph_ch1</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1079</x>
+     <y>238</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>129</x>
+     <y>231</y>
     </hint>
    </hints>
   </connection>
