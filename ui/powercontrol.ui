@@ -663,12 +663,32 @@ QSlider::handle:disabled {
          </sizepolicy>
         </property>
         <property name="styleSheet">
-         <string notr="true">QLabel { color: white; }</string>
+         <string notr="true">QLabel {
+	 color: white;
+	font-size:14px;
+	font-weight:normal;
+}</string>
         </property>
         <property name="text">
          <string>Positive output</string>
         </property>
        </widget>
+      </item>
+      <item>
+       <spacer name="verticalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>15</height>
+         </size>
+        </property>
+       </spacer>
       </item>
       <item>
        <widget class="Line" name="line">
@@ -790,12 +810,32 @@ QPushButton:disabled {
          </sizepolicy>
         </property>
         <property name="styleSheet">
-         <string notr="true">QLabel { color: white; }</string>
+         <string notr="true">QLabel {
+	 color: white;
+	font-size:14px;
+	font-weight:normal;
+}</string>
         </property>
         <property name="text">
          <string>Negative output</string>
         </property>
        </widget>
+      </item>
+      <item>
+       <spacer name="verticalSpacer_5">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>15</height>
+         </size>
+        </property>
+       </spacer>
       </item>
       <item>
        <widget class="Line" name="line_2">
@@ -912,14 +952,10 @@ QPushButton:disabled {
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QwtThermo</class>
+   <class>adiscope::PositionSpinButton</class>
    <extends>QWidget</extends>
-   <header>qwt_thermo.h</header>
-  </customwidget>
-  <customwidget>
-   <class>adiscope::LcdNumber</class>
-   <extends>QLCDNumber</extends>
-   <header>lcdNumber.hpp</header>
+   <header>spinbox_a.hpp</header>
+   <container>1</container>
   </customwidget>
   <customwidget>
    <class>adiscope::DetachDragZone</class>
@@ -928,10 +964,14 @@ QPushButton:disabled {
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>adiscope::PositionSpinButton</class>
+   <class>QwtThermo</class>
    <extends>QWidget</extends>
-   <header>spinbox_a.hpp</header>
-   <container>1</container>
+   <header>qwt_thermo.h</header>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::LcdNumber</class>
+   <extends>QLCDNumber</extends>
+   <header>lcdNumber.hpp</header>
   </customwidget>
  </customwidgets>
  <resources>
