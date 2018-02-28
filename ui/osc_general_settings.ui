@@ -177,14 +177,20 @@
       </layout>
      </item>
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout_3">
+      <layout class="QGridLayout" name="gridLayout_2">
        <property name="leftMargin">
-        <number>10</number>
+        <number>0</number>
        </property>
        <property name="topMargin">
-        <number>10</number>
+        <number>0</number>
        </property>
-       <item>
+       <property name="bottomMargin">
+        <number>15</number>
+       </property>
+       <property name="verticalSpacing">
+        <number>15</number>
+       </property>
+       <item row="0" column="0">
         <widget class="QLabel" name="label_2">
          <property name="styleSheet">
           <string notr="true">font-size: 13px;</string>
@@ -194,14 +200,7 @@
          </property>
         </widget>
        </item>
-       <item>
-        <widget class="adiscope::CustomSwitch" name="FFT_view">
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-       <item>
+       <item row="2" column="0">
         <widget class="QLabel" name="label_3">
          <property name="styleSheet">
           <string notr="true">font-size: 13px;</string>
@@ -211,21 +210,28 @@
          </property>
         </widget>
        </item>
-       <item>
+       <item row="0" column="1">
+        <widget class="adiscope::CustomSwitch" name="FFT_view">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
         <widget class="adiscope::CustomSwitch" name="XY_view">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
-       <item>
-        <widget class="adiscope::CustomSwitch" name="Histogram_view">
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
       </layout>
+     </item>
+     <item>
+      <widget class="adiscope::CustomSwitch" name="Histogram_view">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
      </item>
      <item>
       <layout class="QVBoxLayout" name="export_2"/>
