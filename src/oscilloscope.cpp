@@ -2539,6 +2539,9 @@ void Oscilloscope::measure_settings_init()
 
 	connect(ui->boxMeasure, SIGNAL(toggled(bool)),
 		&plot, SLOT(setMeasuremensEnabled(bool)));
+	connect(ui->boxMeasure, &QCheckBox::toggled, [=](bool on){
+		cr_ui->readoutsWidget->setVisible(!on);
+	});
 }
 
 void Oscilloscope::onMeasurementActivated(int id, int chnIdx)
