@@ -237,7 +237,7 @@ QLabel:disabled
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>10</width>
+             <width>0</width>
              <height>20</height>
             </size>
            </property>
@@ -285,7 +285,7 @@ QLabel:disabled
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>10</width>
+             <width>0</width>
              <height>20</height>
             </size>
            </property>
@@ -326,7 +326,7 @@ QLabel:disabled
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>60</width>
+             <width>90</width>
              <height>20</height>
             </size>
            </property>
@@ -388,7 +388,7 @@ QLabel:disabled
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>39</width>
+             <width>45</width>
              <height>20</height>
             </size>
            </property>
