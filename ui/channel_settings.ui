@@ -864,19 +864,22 @@ Attenuation</string>
        <item>
         <widget class="QPushButton" name="btnAutoset">
          <property name="styleSheet">
-          <string notr="true">QPushButton {
-	background-color: rgba(0, 0, 0, 80);
-	color: gray;
-	font: bold  &quot;Times New Roman&quot;;	
-	font-size: 16px;
-	border-radius: 3px;
-  	border: 2px rgba(0, 0, 0, 80);
+          <string notr="true">QPushButton{
+  width: 175px;
+  height: 30px;
+  border-radius: 4px;
+  background-color: #4a64ff;
+  font-family: ArialMT;
+  font-size: 14px;
+  font-weight: normal;
+  font-style: normal;
+  text-align: center;
+  color: #ffffff;
 }
 
-QPushButton:hover {
-	color: white;
-	background-color: rgba(0, 0, 0, 60);
-	border-color: rgba(0, 0, 0, 60);
+QPushButton:hover
+{
+	 background-color: #4a34ff;
 }</string>
          </property>
          <property name="text">
