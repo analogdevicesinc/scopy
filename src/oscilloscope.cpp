@@ -3206,14 +3206,6 @@ void Oscilloscope::measure_panel_init()
 	cursorReadouts = new QWidget(measure_panel_ui->cursorReadouts);
 	cursor_readouts_ui = new Ui::CursorReadouts();
 	cursor_readouts_ui->setupUi(cursorReadouts);
-	cursor_readouts_ui->horizontalSpacer->changeSize(15, 0,
-		QSizePolicy::Fixed, QSizePolicy::Fixed);
-	cursor_readouts_ui->horizontalSpacer_2->changeSize(0, 0,
-		QSizePolicy::Fixed, QSizePolicy::Fixed);
-	cursor_readouts_ui->horizontalSpacer_3->changeSize(10, 0,
-		QSizePolicy::Fixed, QSizePolicy::Fixed);
-	cursor_readouts_ui->horizontalSpacer_4->changeSize(0, 0,
-		QSizePolicy::Fixed, QSizePolicy::Fixed);
 
 	cursor_readouts_ui->TimeCursors->setStyleSheet("QWidget {"
 		"background-color: transparent;"

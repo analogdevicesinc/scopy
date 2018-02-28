@@ -335,49 +335,17 @@ void CursorReadouts::moveTopLeft(bool resize)
 	if (!isVisible())
 		return;
 
-	int firstPos = 3;
-	int secondPos = 6;
-
 	d_topLeft = QPoint(8, 8);
 
-    QwtScaleDiv vScaleDiv = plot()->axisScaleDiv(vAxis);
-    QwtScaleDiv hScaleDiv = plot()->axisScaleDiv(hAxis);
+    QRect timeRect, voltageRect;
 
-	QList<double> vMajorTicks = vScaleDiv.ticks(QwtScaleDiv::MajorTick);
-	QList<double> hMajorTicks = hScaleDiv.ticks(QwtScaleDiv::MajorTick);
-
-	int vLastTick = vMajorTicks.size() - 1;
-
-	int firstVPos = vLastTick - 2;
-
-	if (plot()->width() > 100) {
-		while (plotPointToPixelPoint(QPointF(hMajorTicks[firstPos],
-						     vMajorTicks[firstVPos])).x() < 140) firstPos++;
-		while (plotPointToPixelPoint(QPointF(hMajorTicks[secondPos],
-						     vMajorTicks[firstVPos])).x() < 320) secondPos++;
-		while (plotPointToPixelPoint(QPointF(hMajorTicks[secondPos],
-						     vMajorTicks[firstVPos])).y() < 80) firstVPos--;
-	}
-
-	QPoint bottomRightFirstRect = plotPointToPixelPoint(QPointF(hMajorTicks[firstPos], vMajorTicks[firstVPos]));
-	QPoint bottomRightSecondRect = plotPointToPixelPoint(QPointF(hMajorTicks[secondPos], vMajorTicks[firstVPos]));
-
-	bottomRightFirstRect -= QPoint(0, 1);
-	bottomRightSecondRect -= QPoint(1, 1);
-
-	if (!d_time_rd_visible || !d_voltage_rd_visible) {
-		bottomRightFirstRect -= QPoint(1, 0);
-	}
-
-	QRect timeRect, voltageRect;
-
-	if (!d_time_rd_visible && d_voltage_rd_visible) {
-		timeRect = QRect(d_topLeft, bottomRightFirstRect);
-		voltageRect = timeRect;
-	} else {
-		timeRect = QRect(d_topLeft, bottomRightFirstRect);
-		voltageRect = QRect(timeRect.topRight(), bottomRightSecondRect);
-	}
+    if (!d_time_rd_visible && d_voltage_rd_visible) {
+            voltageRect = QRect(d_topLeft, QPoint(d_topLeft.x()+ui->VoltageCursors->width(),d_topLeft.y()+ui->VoltageCursors->height()));
+            timeRect = QRect(0,0,0,0);
+    } else {
+        timeRect = QRect(d_topLeft, QPoint(ui->TimeCursors->width()+d_topLeft.x(),ui->TimeCursors->height()+d_topLeft.y()));
+        voltageRect = QRect(QPoint(d_topLeft.x()+timeRect.width(),d_topLeft.y()), QPoint(d_topLeft.x()+timeRect.width()+ui->VoltageCursors->width(),ui->VoltageCursors->height()+d_topLeft.y()));
+    }
 
 	int diff = voltageRect.x() - lastVoltageRect.x();
 	if (diff < 10 && diff > -10) diff = voltageRect.y() - lastVoltageRect.y();
@@ -404,47 +372,19 @@ void CursorReadouts::moveTopRight(bool resize)
 	if (!isVisible())
 		return;
 
-    QwtScaleDiv vScaleDiv = plot()->axisScaleDiv(vAxis);
-    QwtScaleDiv hScaleDiv = plot()->axisScaleDiv(hAxis);
-
-	QList<double> vMajorTicks = vScaleDiv.ticks(QwtScaleDiv::MajorTick);
-	QList<double> hMajorTicks = hScaleDiv.ticks(QwtScaleDiv::MajorTick);
-
-	int firstPos = hMajorTicks.size() - 4;
-	int secondPos = hMajorTicks.size() - 1;
-
-	int vLastTick = vMajorTicks.size() - 1;
-	int firstVPos = vLastTick - 2;
-
-	while (plotPointToPixelPoint(QPointF(hMajorTicks[firstPos], vMajorTicks[firstVPos])).x() > plot()->width() - 140) firstPos--;
-	while (plotPointToPixelPoint(QPointF(hMajorTicks[firstPos], vMajorTicks[firstVPos])).y() < 80) firstVPos--;
-	int topLeftPos = firstPos - 3;
-	while (plotPointToPixelPoint(QPointF(hMajorTicks[topLeftPos], vMajorTicks[firstVPos] + 2)).x() > plot()->width() - 320) topLeftPos--;
-
-	QPoint bottomRightFirstRect = plotPointToPixelPoint(QPointF(hMajorTicks[firstPos], vMajorTicks[firstVPos]));
-	QPoint bottomRightSecondRect = plotPointToPixelPoint(QPointF(hMajorTicks[secondPos], vMajorTicks[firstVPos]));
-
-	bottomRightSecondRect -= QPoint(8, 0);
-
-	d_topLeft =  plotPointToPixelPoint(QPointF(hMajorTicks[topLeftPos], vMajorTicks[firstVPos]));
 	d_topLeft.setY(8);
+    d_topLeft.setX(plot()->canvas()->width()-8);
 
-	bottomRightFirstRect -= QPoint(0, 1);
-	bottomRightSecondRect -= QPoint(1, 1);
-
-	if (!d_time_rd_visible || !d_voltage_rd_visible) {
-		bottomRightFirstRect -= QPoint(1, 0);
-	}
 
 	QRect timeRect, voltageRect;
 
 	if (d_time_rd_visible && !d_voltage_rd_visible) {
-		voltageRect = QRect(QPoint(bottomRightFirstRect.x(), 8), bottomRightSecondRect);
-		timeRect = voltageRect;
-
+        voltageRect = QRect(0,0,0,0);
+        timeRect = QRect(d_topLeft.x() - ui->TimeCursors->width(),d_topLeft.y(),d_topLeft.x(),d_topLeft.y()+ui->TimeCursors->height());
 	} else {
-		timeRect = QRect(d_topLeft, bottomRightFirstRect);
-		voltageRect = QRect(timeRect.topRight(), bottomRightSecondRect);
+        voltageRect = QRect(d_topLeft.x() - ui->VoltageCursors->width(),d_topLeft.y(),d_topLeft.x(),d_topLeft.y()+ui->VoltageCursors->height());
+        timeRect = QRect(voltageRect.x()-ui->TimeCursors->width(),d_topLeft.y(),voltageRect.x(),d_topLeft.y()+ui->VoltageCursors->height());
+
 	}
 
 	int diff = timeRect.x() - lastTimeRect.x();
@@ -472,46 +412,18 @@ void CursorReadouts::moveBottomLeft(bool resize)
 	if (!isVisible())
 		return;
 
-	int firstPos = 3;
-	int secondPos = 6;
-
-    QwtScaleDiv vScaleDiv = plot()->axisScaleDiv(vAxis);
-    QwtScaleDiv hScaleDiv = plot()->axisScaleDiv(hAxis);
-
-	QList<double> vMajorTicks = vScaleDiv.ticks(QwtScaleDiv::MajorTick);
-	QList<double> hMajorTicks = hScaleDiv.ticks(QwtScaleDiv::MajorTick);
-
-	int firstVPos = 0;
-
-	while (plotPointToPixelPoint(QPointF(hMajorTicks[firstPos], vMajorTicks[firstVPos])).x() < 140) firstPos++;
-	while (plotPointToPixelPoint(QPointF(hMajorTicks[secondPos], vMajorTicks[firstVPos])).x() < 320) secondPos++;
-	while (plotPointToPixelPoint(QPointF(hMajorTicks[firstPos], vMajorTicks[firstVPos])).y() > plot()->height() - 80) firstVPos++;
-
-	QPoint bottomRightFirstRect = plotPointToPixelPoint(QPointF(hMajorTicks[firstPos], vMajorTicks[0]));
-	QPoint bottomRightSecondRect = plotPointToPixelPoint(QPointF(hMajorTicks[secondPos], vMajorTicks[0]));
-
-	d_topLeft = plotPointToPixelPoint(QPointF(hMajorTicks[firstPos], vMajorTicks[firstVPos]));
-	d_topLeft.setX(8);
-
-	bottomRightFirstRect -= QPoint(0, 8);
-	bottomRightSecondRect -= QPoint(0, 8);
-
-	bottomRightFirstRect -= QPoint(0, 1);
-	bottomRightSecondRect -= QPoint(1, 1);
-
-	if (!d_time_rd_visible || !d_voltage_rd_visible) {
-		bottomRightFirstRect -= QPoint(1, 0);
-	}
-
 	QRect timeRect, voltageRect;
 
-	if (!d_time_rd_visible && d_voltage_rd_visible) {
-		timeRect = QRect(d_topLeft, bottomRightFirstRect);
-		voltageRect = timeRect;
-	} else {
-		timeRect = QRect(d_topLeft, bottomRightFirstRect);
-		voltageRect = QRect(timeRect.topRight(), bottomRightSecondRect);
-	}
+    d_topLeft.setY(plot()->height()-8);
+    d_topLeft.setX(8);
+
+    if (!d_time_rd_visible && d_voltage_rd_visible) {
+            voltageRect = QRect(QPoint(d_topLeft.x(),d_topLeft.y()-ui->VoltageCursors->height()-24), QPoint(d_topLeft.x()+ui->VoltageCursors->width(),d_topLeft.y()));
+            timeRect = QRect(0,0,0,0);
+    } else {
+        timeRect = QRect(QPoint(d_topLeft.x(),d_topLeft.y()-ui->TimeCursors->height()-24), QPoint(ui->TimeCursors->width()+d_topLeft.x(),d_topLeft.y()));
+        voltageRect = QRect(QPoint(d_topLeft.x()+timeRect.width(),d_topLeft.y()-ui->VoltageCursors->height()-24), QPoint(d_topLeft.x()+timeRect.width()+ui->VoltageCursors->width(),d_topLeft.y()));
+    }
 
 	int diff = voltageRect.x() - lastVoltageRect.x();
 	if (diff < 10 && diff > -10) diff = voltageRect.y() - lastVoltageRect.y();
@@ -538,49 +450,19 @@ void CursorReadouts::moveBottomRight(bool resize)
 	if (!isVisible())
 		return;
 
-    QwtScaleDiv vScaleDiv = plot()->axisScaleDiv(vAxis);
-    QwtScaleDiv hScaleDiv = plot()->axisScaleDiv(hAxis);
-
-	QList<double> vMajorTicks = vScaleDiv.ticks(QwtScaleDiv::MajorTick);
-	QList<double> hMajorTicks = hScaleDiv.ticks(QwtScaleDiv::MajorTick);
-
-	int firstPos = hMajorTicks.size() - 4;
-	int secondPos = hMajorTicks.size() - 1;
-
-	int vLastTick = vMajorTicks.size() - 1;
-	int firstVPos = 0;
-
-	while (plotPointToPixelPoint(QPointF(hMajorTicks[firstPos], vMajorTicks[0])).x() > plot()->width() - 140) firstPos--;
-	int topLeftPos = firstPos - 3;
-	while (plotPointToPixelPoint(QPointF(hMajorTicks[topLeftPos], vMajorTicks[firstVPos] + 2)).x() > plot()->width() - 320) topLeftPos--;
-
-	while (plotPointToPixelPoint(QPointF(hMajorTicks[firstPos], vMajorTicks[firstVPos])).y() > plot()->height() - 80) firstVPos++;
-
-	QPoint bottomRightFirstRect = plotPointToPixelPoint(QPointF(hMajorTicks[firstPos], vMajorTicks[0]));
-	QPoint bottomRightSecondRect = plotPointToPixelPoint(QPointF(hMajorTicks[secondPos], vMajorTicks[0]));
-
-	bottomRightFirstRect -= QPoint(8, 8);
-	bottomRightSecondRect -= QPoint(8, 8);
-
-	d_topLeft =  plotPointToPixelPoint(QPointF(hMajorTicks[topLeftPos], vMajorTicks[firstVPos]));
-
-	bottomRightFirstRect -= QPoint(0, 1);
-	bottomRightSecondRect -= QPoint(1, 1);
-
-	if (!d_time_rd_visible || !d_voltage_rd_visible) {
-		bottomRightFirstRect -= QPoint(1, 0);
-	}
-
 	QRect timeRect, voltageRect;
 
-	if (d_time_rd_visible && !d_voltage_rd_visible) {
-		voltageRect = QRect(QPoint(bottomRightFirstRect.x(), d_topLeft.y()), bottomRightSecondRect);
-		timeRect = voltageRect;
+    d_topLeft.setY(plot()->height()-8);
+    d_topLeft.setX(plot()->canvas()->width()-8);
 
-	} else {
-		timeRect = QRect(d_topLeft, bottomRightFirstRect);
-		voltageRect = QRect(timeRect.topRight(), bottomRightSecondRect);
-	}
+    if (d_time_rd_visible && !d_voltage_rd_visible) {
+        voltageRect = QRect(0,0,0,0);
+        timeRect = QRect(d_topLeft.x() - ui->TimeCursors->width(),d_topLeft.y()-ui->TimeCursors->height()-24,d_topLeft.x(),d_topLeft.y());
+    } else {
+        voltageRect = QRect(d_topLeft.x() - ui->VoltageCursors->width(),d_topLeft.y()-ui->VoltageCursors->height()-24,d_topLeft.x(),d_topLeft.y());
+        timeRect = QRect(voltageRect.x()-ui->TimeCursors->width(),voltageRect.y(),voltageRect.x(),voltageRect.y()+ui->TimeCursors->height());
+
+    }
 
 	int diff = timeRect.x() - lastTimeRect.x();
 	if (diff < 10 && diff > -10) diff = timeRect.y() - lastTimeRect.y();
