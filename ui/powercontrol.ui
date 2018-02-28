@@ -456,7 +456,7 @@ color: #9013fe;
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_4">
       <property name="spacing">
-       <number>12</number>
+       <number>10</number>
       </property>
       <property name="leftMargin">
        <number>26</number>
@@ -473,7 +473,11 @@ color: #9013fe;
       <item>
        <widget class="QLabel" name="label_12">
         <property name="styleSheet">
-         <string notr="true">QLabel { color: white; }</string>
+         <string notr="true">QLabel {
+	 color: white;
+	font-size:14px;
+	font-weight:normal;
+}</string>
         </property>
         <property name="text">
          <string>Tracking ratio control</string>
@@ -481,9 +485,25 @@ color: #9013fe;
        </widget>
       </item>
       <item>
+       <spacer name="verticalSpacer_6">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>5</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
        <widget class="Line" name="line_3">
         <property name="styleSheet">
-         <string notr="true">color: rgb(51, 51, 59);</string>
+         <string notr="true">color: #4a64ff;</string>
         </property>
         <property name="frameShadow">
          <enum>QFrame::Plain</enum>
@@ -649,7 +669,7 @@ QSlider::handle:disabled {
         <property name="sizeHint" stdset="0">
          <size>
           <width>20</width>
-          <height>20</height>
+          <height>15</height>
          </size>
         </property>
        </spacer>
@@ -685,7 +705,7 @@ QSlider::handle:disabled {
         <property name="sizeHint" stdset="0">
          <size>
           <width>20</width>
-          <height>15</height>
+          <height>5</height>
          </size>
         </property>
        </spacer>
@@ -796,7 +816,7 @@ QPushButton:disabled {
         <property name="sizeHint" stdset="0">
          <size>
           <width>0</width>
-          <height>20</height>
+          <height>15</height>
          </size>
         </property>
        </spacer>
@@ -832,7 +852,7 @@ QPushButton:disabled {
         <property name="sizeHint" stdset="0">
          <size>
           <width>20</width>
-          <height>15</height>
+          <height>5</height>
          </size>
         </property>
        </spacer>
