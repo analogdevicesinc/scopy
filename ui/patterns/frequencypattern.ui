@@ -13,12 +13,9 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QFormLayout" name="formLayout">
-   <property name="horizontalSpacing">
-    <number>0</number>
-   </property>
-   <property name="verticalSpacing">
-    <number>0</number>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>5</number>
    </property>
    <property name="leftMargin">
     <number>0</number>
@@ -32,21 +29,24 @@
    <property name="bottomMargin">
     <number>0</number>
    </property>
-   <item row="0" column="0">
+   <item>
     <widget class="QLabel" name="label">
+     <property name="styleSheet">
+      <string notr="true">font-size: 13px;</string>
+     </property>
      <property name="text">
       <string>Frequency</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="0" colspan="2">
+   <item>
     <widget class="QLineEdit" name="frequency_LE">
      <property name="text">
       <string>1000</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="0">
+   <item>
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>

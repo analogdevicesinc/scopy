@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>227</width>
-    <height>222</height>
+    <height>391</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -20,6 +20,9 @@
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>10</number>
+   </property>
    <property name="leftMargin">
     <number>0</number>
    </property>
@@ -33,137 +36,224 @@
     <number>0</number>
    </property>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_3">
+    <layout class="QGridLayout" name="gridLayout">
      <property name="topMargin">
       <number>0</number>
      </property>
-     <item>
-      <widget class="adiscope::SmallOnOffSwitch" name="PB_CPOL">
-       <property name="enabled">
-        <bool>true</bool>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
+     <property name="spacing">
+      <number>15</number>
+     </property>
+     <item row="1" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout_6">
+       <property name="spacing">
+        <number>5</number>
        </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
+       <item>
+        <widget class="adiscope::SmallOnOffSwitch" name="PB_MSB">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_8">
+         <property name="styleSheet">
+          <string notr="true">font-size: 13px;</string>
+         </property>
+         <property name="text">
+          <string>MSB First</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
-     <item>
-      <widget class="QLabel" name="label_4">
-       <property name="text">
-        <string>CPOL</string>
+     <item row="0" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout_5">
+       <property name="spacing">
+        <number>5</number>
        </property>
-      </widget>
+       <item>
+        <widget class="adiscope::SmallOnOffSwitch" name="PB_CPHA">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_3">
+         <property name="styleSheet">
+          <string notr="true">font-size: 13px;</string>
+         </property>
+         <property name="text">
+          <string>CLK Phase</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
-     <item>
-      <widget class="adiscope::SmallOnOffSwitch" name="PB_CPHA">
-       <property name="enabled">
-        <bool>true</bool>
+     <item row="1" column="0">
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <property name="spacing">
+        <number>5</number>
        </property>
-       <property name="text">
-        <string/>
+       <property name="topMargin">
+        <number>0</number>
        </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
+       <item>
+        <widget class="adiscope::SmallOnOffSwitch" name="PB_CS">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_7">
+         <property name="styleSheet">
+          <string notr="true">font-size: 13px;</string>
+         </property>
+         <property name="text">
+          <string>CS Polarity</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
-     <item>
-      <widget class="QLabel" name="label_3">
-       <property name="text">
-        <string>CPHA</string>
+     <item row="0" column="0">
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <property name="spacing">
+        <number>5</number>
        </property>
-      </widget>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="adiscope::SmallOnOffSwitch" name="PB_CPOL">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_4">
+         <property name="styleSheet">
+          <string notr="true">font-size: 13px;</string>
+         </property>
+         <property name="text">
+          <string>CLK Polarity</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_4">
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <property name="spacing">
+      <number>5</number>
+     </property>
      <property name="topMargin">
       <number>0</number>
      </property>
      <item>
-      <widget class="adiscope::SmallOnOffSwitch" name="PB_CS">
-       <property name="enabled">
-        <bool>true</bool>
+      <widget class="QLabel" name="label_6">
+       <property name="styleSheet">
+        <string notr="true">font-size: 13px;</string>
        </property>
        <property name="text">
-        <string/>
-       </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
+        <string>Bytes per frame</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="label_7">
-       <property name="text">
-        <string>CSPOL</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="adiscope::SmallOnOffSwitch" name="PB_MSB">
-       <property name="text">
-        <string/>
-       </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="label_8">
-       <property name="text">
-        <string>MSB First</string>
-       </property>
-      </widget>
+      <widget class="QLineEdit" name="LE_BPF"/>
      </item>
     </layout>
    </item>
    <item>
-    <widget class="QLabel" name="label_6">
-     <property name="text">
-      <string>Bytes per frame</string>
+    <layout class="QVBoxLayout" name="verticalLayout_3">
+     <property name="spacing">
+      <number>5</number>
      </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLineEdit" name="LE_BPF"/>
-   </item>
-   <item>
-    <widget class="QLabel" name="label_5">
-     <property name="text">
-      <string>Inter frame space</string>
+     <property name="topMargin">
+      <number>0</number>
      </property>
-    </widget>
+     <item>
+      <widget class="QLabel" name="label_5">
+       <property name="styleSheet">
+        <string notr="true">font-size: 13px;</string>
+       </property>
+       <property name="text">
+        <string>Inter frame space</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="LE_IFS"/>
+     </item>
+    </layout>
    </item>
    <item>
-    <widget class="QLineEdit" name="LE_IFS"/>
-   </item>
-   <item>
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Data</string>
+    <layout class="QVBoxLayout" name="verticalLayout_5">
+     <property name="spacing">
+      <number>5</number>
      </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLineEdit" name="LE_toSend"/>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="label_2">
+       <property name="styleSheet">
+        <string notr="true">font-size: 13px;</string>
+       </property>
+       <property name="text">
+        <string>Data</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="LE_toSend"/>
+     </item>
+    </layout>
    </item>
    <item>
     <spacer name="verticalSpacer">

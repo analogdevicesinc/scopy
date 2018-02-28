@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>263</width>
-    <height>189</height>
+    <height>238</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -20,6 +20,9 @@
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>10</number>
+   </property>
    <property name="leftMargin">
     <number>0</number>
    </property>
@@ -34,6 +37,9 @@
    </property>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <property name="spacing">
+      <number>5</number>
+     </property>
      <property name="topMargin">
       <number>0</number>
      </property>
@@ -52,6 +58,9 @@
      </item>
      <item>
       <widget class="QLabel" name="label_4">
+       <property name="styleSheet">
+        <string notr="true">font-size: 13px;</string>
+       </property>
        <property name="text">
         <string>Write/Read</string>
        </property>
@@ -75,6 +84,9 @@
        <property name="enabled">
         <bool>false</bool>
        </property>
+       <property name="styleSheet">
+        <string notr="true">font-size: 13px;</string>
+       </property>
        <property name="text">
         <string>MSB First</string>
        </property>
@@ -83,34 +95,73 @@
     </layout>
    </item>
    <item>
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Address</string>
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <property name="spacing">
+      <number>5</number>
      </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLineEdit" name="LE_address"/>
-   </item>
-   <item>
-    <widget class="QLabel" name="label_5">
-     <property name="text">
-      <string>Inter frame space</string>
+     <property name="topMargin">
+      <number>0</number>
      </property>
-    </widget>
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="styleSheet">
+        <string notr="true">font-size: 13px;</string>
+       </property>
+       <property name="text">
+        <string>Address</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="LE_address"/>
+     </item>
+    </layout>
    </item>
    <item>
-    <widget class="QLineEdit" name="LE_IFS"/>
-   </item>
-   <item>
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Data</string>
+    <layout class="QVBoxLayout" name="verticalLayout_3">
+     <property name="spacing">
+      <number>5</number>
      </property>
-    </widget>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="label_5">
+       <property name="styleSheet">
+        <string notr="true">font-size: 13px;</string>
+       </property>
+       <property name="text">
+        <string>Inter frame space</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="LE_IFS"/>
+     </item>
+    </layout>
    </item>
    <item>
-    <widget class="QLineEdit" name="LE_toSend"/>
+    <layout class="QVBoxLayout" name="verticalLayout_4">
+     <property name="spacing">
+      <number>5</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="label_2">
+       <property name="styleSheet">
+        <string notr="true">font-size: 13px;</string>
+       </property>
+       <property name="text">
+        <string>Data</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="LE_toSend"/>
+     </item>
+    </layout>
    </item>
    <item>
     <spacer name="verticalSpacer">

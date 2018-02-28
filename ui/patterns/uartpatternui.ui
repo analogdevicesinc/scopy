@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>276</width>
-    <height>300</height>
+    <height>310</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -32,172 +32,7 @@
    <property name="verticalSpacing">
     <number>10</number>
    </property>
-   <item row="2" column="1">
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>Stop</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="1">
-    <widget class="QLabel" name="label_4">
-     <property name="text">
-      <string>Baud</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="1">
-    <widget class="QComboBox" name="CB_Stop">
-     <item>
-      <property name="text">
-       <string>1</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>2</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>3</string>
-      </property>
-     </item>
-    </widget>
-   </item>
-   <item row="8" column="1">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Data to Send</string>
-     </property>
-    </widget>
-   </item>
-   <item row="7" column="1">
-    <widget class="QLineEdit" name="LE_paramsOut">
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="1">
-    <widget class="QComboBox" name="CB_baud">
-     <property name="editable">
-      <bool>true</bool>
-     </property>
-     <property name="currentText">
-      <string>9600</string>
-     </property>
-     <property name="currentIndex">
-      <number>3</number>
-     </property>
-     <item>
-      <property name="text">
-       <string>1200</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>2400</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>4800</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>9600</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>14400</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>19200</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>28800</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>38400</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>57600</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>115200</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>230400</string>
-      </property>
-     </item>
-    </widget>
-   </item>
-   <item row="5" column="1">
-    <widget class="QComboBox" name="CB_Parity">
-     <item>
-      <property name="text">
-       <string>NONE</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>ODD</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>EVEN</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>MARK</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>SPACE</string>
-      </property>
-     </item>
-    </widget>
-   </item>
-   <item row="6" column="1">
-    <widget class="QLabel" name="label_5">
-     <property name="text">
-      <string>Parameters</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="1">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Parity</string>
-     </property>
-    </widget>
-   </item>
-   <item row="9" column="1">
-    <widget class="QLineEdit" name="LE_Data">
-     <property name="maxLength">
-      <number>100</number>
-     </property>
-    </widget>
-   </item>
-   <item row="10" column="1">
+   <item row="13" column="1">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -209,6 +44,236 @@
       </size>
      </property>
     </spacer>
+   </item>
+   <item row="3" column="1">
+    <layout class="QVBoxLayout" name="verticalLayout_4">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="label_3">
+       <property name="styleSheet">
+        <string notr="true">font-size: 13px;</string>
+       </property>
+       <property name="text">
+        <string>Stop</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="CB_Stop">
+       <item>
+        <property name="text">
+         <string>1</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>2</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>3</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="2" column="1">
+    <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0">
+     <property name="spacing">
+      <number>5</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="label_4">
+       <property name="styleSheet">
+        <string notr="true">font-size: 13px;</string>
+       </property>
+       <property name="text">
+        <string>Baud</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="CB_baud">
+       <property name="editable">
+        <bool>true</bool>
+       </property>
+       <property name="currentText">
+        <string>9600</string>
+       </property>
+       <property name="currentIndex">
+        <number>3</number>
+       </property>
+       <item>
+        <property name="text">
+         <string>1200</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>2400</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>4800</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>9600</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>14400</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>19200</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>28800</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>38400</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>57600</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>115200</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>230400</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="7" column="1">
+    <layout class="QVBoxLayout" name="verticalLayout_5">
+     <property name="spacing">
+      <number>5</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="label_2">
+       <property name="styleSheet">
+        <string notr="true">font-size: 13px;</string>
+       </property>
+       <property name="text">
+        <string>Parity</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="CB_Parity">
+       <item>
+        <property name="text">
+         <string>NONE</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>ODD</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>EVEN</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>MARK</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>SPACE</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="8" column="1">
+    <layout class="QVBoxLayout" name="verticalLayout_6">
+     <property name="spacing">
+      <number>5</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="label_5">
+       <property name="styleSheet">
+        <string notr="true">font-size: 13px;</string>
+       </property>
+       <property name="text">
+        <string>Parameters</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="LE_paramsOut">
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="10" column="1">
+    <layout class="QVBoxLayout" name="verticalLayout_7">
+     <property name="spacing">
+      <number>5</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="styleSheet">
+        <string notr="true">font-size: 13px;</string>
+       </property>
+       <property name="text">
+        <string>Data to Send</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="LE_Data">
+       <property name="maxLength">
+        <number>100</number>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>
