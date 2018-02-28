@@ -61,8 +61,7 @@ void Binding::add_properties_to_form(QFormLayout *layout,
 		else {
 			QLabel *lbl = new QLabel(p->name(), parent);
 			lbl->setWordWrap(true);
-			layout->addRow(lbl);
-			layout->addRow(widget);
+			layout->addRow(lbl, widget);
 			layout->setSpacing(10);
 		}
 	}
