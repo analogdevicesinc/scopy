@@ -1034,7 +1034,7 @@ void LogicAnalyzer::configParams(double timebase, double timepos)
 			main_win->session_.set_entire_buffersize(active_sampleCount);
 			if(logic_analyzer_ptr)
 			{
-				logic_analyzer_ptr->set_buffersize(custom_sampleCount, true);
+				logic_analyzer_ptr->set_buffersize(custom_sampleCount, false);
 				logic_analyzer_ptr->set_entire_buffersize(active_sampleCount);
 				set_buffersize();
 			}
@@ -1732,11 +1732,10 @@ void LogicAnalyzer::setTimeout(bool checked)
 void LogicAnalyzer::runModeChanged(bool repeated)
 {
         bool en;
+        bool shouldUpdate = d_timeTriggerHandle->position() == 0;
 
         if (repeated) {
                 acquisition_mode = REPEATED;
-                if( logic_analyzer_ptr )
-                        logic_analyzer_ptr->set_stream(false);
 
                 frequencySpinButton->setEnabled(false);
 
@@ -1748,15 +1747,18 @@ void LogicAnalyzer::runModeChanged(bool repeated)
                         main_win->session_.set_screen_mode(true);
                         frequencySpinButton->setEnabled(true);
                         en = true;
+                } else {
+                        shouldUpdate = true;
                 }
         } else {
-                if( logic_analyzer_ptr )
-                        logic_analyzer_ptr->set_stream(true);
                 d_timeTriggerHandle->setPosition(0);
                 acquisition_mode = STREAM;
                 main_win->session_.set_screen_mode(false);
                 frequencySpinButton->setEnabled(true);
                 en = true;
+        }
+        if (running && shouldUpdate) {
+                configParams(timeBase->value(), timePosition->value());
         }
         frequencySpinButton->setEnabled(!repeated);
         chm_ui->set_streaming_mode(en);
