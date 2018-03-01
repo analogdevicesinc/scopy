@@ -46,8 +46,10 @@ namespace adiscope {
 		int duration_ms;
 
 		void setDuration(int ms);
+		void updateOnOffLabels();
 
 		void showEvent(QShowEvent *event);
+		bool event(QEvent*);
 
 	private Q_SLOTS:
 		void toggleAnim(bool enabled);

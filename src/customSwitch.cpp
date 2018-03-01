@@ -45,6 +45,28 @@ CustomSwitch::CustomSwitch(QWidget *parent) : QPushButton(parent),
 	off.raise();
 	on.setText("on");
 	off.setText("off");
+	updateOnOffLabels();
+}
+
+void CustomSwitch::updateOnOffLabels()
+{
+	on.setEnabled(isChecked());
+	off.setEnabled(!isChecked());
+}
+
+bool CustomSwitch::event(QEvent *e)
+{
+	if (e->type() == QEvent::DynamicPropertyChange)
+	{
+		QDynamicPropertyChangeEvent *const propEvent = static_cast<QDynamicPropertyChangeEvent*>(e);
+		QString propName = propEvent->propertyName();
+		if(propName=="leftText" && property("leftText").isValid())
+			on.setText(property("leftText").toString());
+		if(propName=="rightText" && property("rightText").isValid())
+			on.setText(property("rightText").toString());
+
+	}
+	return QPushButton::event(e);
 }
 
 CustomSwitch::~CustomSwitch()
@@ -76,11 +98,13 @@ void CustomSwitch::toggleAnim(bool enabled)
 		anim.setEndValue(off_rect);
 	}
 
+	updateOnOffLabels();
 	anim.start();
 }
 
 void CustomSwitch::showEvent(QShowEvent *event)
 {
+	updateOnOffLabels();
 	if (isChecked()) {
 		handle.setGeometry(QRect(width() - handle.width(), handle.y(),
 					handle.width(), handle.height()));
@@ -89,4 +113,5 @@ void CustomSwitch::showEvent(QShowEvent *event)
 		handle.setGeometry(QRect(0, handle.y(), handle.width(),
 					 handle.height()));
 	}
+
 }
