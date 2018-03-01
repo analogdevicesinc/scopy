@@ -64,7 +64,7 @@
         <property name="sizeHint" stdset="0">
          <size>
           <width>20</width>
-          <height>25</height>
+          <height>20</height>
          </size>
         </property>
        </spacer>
@@ -123,7 +123,7 @@
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <property name="spacing">
-         <number>10</number>
+         <number>15</number>
         </property>
         <property name="leftMargin">
          <number>0</number>
@@ -145,7 +145,7 @@
           <property name="sizeHint" stdset="0">
            <size>
             <width>20</width>
-            <height>10</height>
+            <height>5</height>
            </size>
           </property>
          </spacer>
@@ -158,7 +158,7 @@
           <item>
            <widget class="QLabel" name="label_3">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -223,22 +223,6 @@
             </property>
            </layout>
           </item>
-          <item>
-           <spacer name="horizontalSpacer_2">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Preferred</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
          </layout>
         </item>
         <item>
@@ -261,36 +245,27 @@
           <item>
            <widget class="QPushButton" name="btnExport">
             <property name="styleSheet">
-             <string notr="true">height:40px;
-background-color: #4A64FF;
-border-radius: 4px;
+             <string notr="true">QPushButton {
+  min-height: 30px;
+  max-height: 30px;
 
-font-family: Arial;
-font-size: 14px;
-font-weight: bold;
-line-height: 16px;
-color: #FFFFFF;</string>
+  border: 0px;
+  border-radius: 4px;
+
+  background-color: #4a64ff;
+  color: #ffffff;
+
+  font-size: 14px;
+}
+
+QPushButton:pressed {
+  background-color: #2a44df;
+}</string>
             </property>
             <property name="text">
              <string>Export</string>
             </property>
            </widget>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Preferred</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
           </item>
          </layout>
         </item>
