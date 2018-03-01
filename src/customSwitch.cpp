@@ -41,6 +41,10 @@ CustomSwitch::CustomSwitch(QWidget *parent) : QPushButton(parent),
 	this->setStyleSheet(styleSheet);
 
 	connect(this, SIGNAL(toggled(bool)), SLOT(toggleAnim(bool)));
+	on.raise();
+	off.raise();
+	on.setText("on");
+	off.setText("off");
 }
 
 CustomSwitch::~CustomSwitch()

@@ -3,7 +3,7 @@ min-height: 30px;
 max-height: 30px;
 min-width: 100px;
 max-width: 100px;
-background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.501, y2:0, stop:0 #4A64FF, stop:1 #141416);
+background-color: #4a64ff;
 border-radius: 4px;
 }
 
@@ -16,7 +16,7 @@ min-height: 30px;
 max-height: 30px;
 min-width: 52px;
 max-width: 52px;
-background-color: white;
+background-color: black;
 border-radius: 2px;
 }
 
@@ -31,7 +31,6 @@ font: bold 16px "monospace";
 }
 
 QLabel#on {
-qproperty-text: "on";
 margin-left: 8px;
 color: white;
 }
@@ -41,9 +40,8 @@ color: rgba(255,255,255,102);
 }
 
 QLabel#off {
-qproperty-text: "off";
 margin-left: 56px;
-color: rgba(255,255,255,102);
+color: white;
 }
 
 QLabel#off:disabled {
