@@ -844,9 +844,9 @@ border-color: green;
       </size>
      </property>
      <property name="styleSheet">
-      <string notr="true">QPushButton:enabled:!pressed { background-color: #4a64f; }
-QPushButton[valid=true]:enabled:!pressed { background-color: #4a64f; }
-QPushButton[invalid=true]:enabled:!pressed { background-color: #4a64f; }
+      <string notr="true">QPushButton:enabled:!pressed { background-color: #4a64ff; }
+QPushButton[valid=true]:enabled:!pressed { background-color: #4a64ff; }
+QPushButton[invalid=true]:enabled:!pressed { background-color: #4a64ff; }
 QPushButton:pressed {
 background-color: #4a64ff;
 }
