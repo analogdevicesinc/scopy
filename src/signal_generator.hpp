@@ -57,6 +57,9 @@ struct time_block_data;
 class SignalGenerator_API;
 class GenericDac;
 class ChannelWidget;
+class PhaseSpinButton;
+class PositionSpinButton;
+class ScaleSpinButton;
 
 enum sg_noise {
 	SG_NO_NOISE = 0,
@@ -147,6 +150,15 @@ private:
 	struct time_block_data *time_block_data;
 	struct iio_channel *amp1, *amp2;
 	QList<std::shared_ptr<GenericDac>> dacs;
+
+	PhaseSpinButton *phase, *filePhase;
+	PositionSpinButton *offset, *fileOffset;
+	PositionSpinButton *constantValue, *dutycycle;
+	ScaleSpinButton *amplitude, *frequency;
+	ScaleSpinButton *riseTime, *fallTime;
+	ScaleSpinButton *holdHighTime, *holdLowTime;
+	ScaleSpinButton *fileSampleRate, *fileAmplitude;
+	ScaleSpinButton *mathFrequency, *noiseAmplitude;
 
 	unsigned int currentChannel;
 	unsigned long sample_rate;

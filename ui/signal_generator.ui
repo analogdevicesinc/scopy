@@ -119,7 +119,7 @@ QPushButton:disabled {
 }</string>
           </property>
           <property name="icon">
-           <iconset resource="../resources/resources.qrc">
+           <iconset>
             <normaloff>:/icons/ico-play.svg</normaloff>:/icons/ico-play.svg</iconset>
           </property>
           <property name="iconSize">
@@ -249,7 +249,7 @@ QTabBar::tab:selected {
 </string>
                  </property>
                  <property name="currentIndex">
-                  <number>0</number>
+                  <number>3</number>
                  </property>
                  <property name="usesScrollButtons">
                   <bool>false</bool>
@@ -268,34 +268,6 @@ QTabBar::tab:selected {
                    <property name="topMargin">
                     <number>25</number>
                    </property>
-                   <item>
-                    <widget class="adiscope::PositionSpinButton" name="constantValue" native="true">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="units" stdset="0">
-                      <stringlist notr="true">
-                       <string>mVolts=1e-3</string>
-                       <string>Volts=1e0</string>
-                      </stringlist>
-                     </property>
-                     <property name="name" stdset="0">
-                      <string>Value</string>
-                     </property>
-                     <property name="min_value" stdset="0">
-                      <double>-5.000000000000000</double>
-                     </property>
-                     <property name="max_value" stdset="0">
-                      <double>5.000000000000000</double>
-                     </property>
-                     <property name="invert_circle" stdset="0">
-                      <bool>true</bool>
-                     </property>
-                    </widget>
-                   </item>
                   </layout>
                  </widget>
                  <widget class="QWidget" name="tabWaveform">
@@ -372,98 +344,6 @@ QTabBar::tab:selected {
                      <property name="spacing">
                       <number>15</number>
                      </property>
-                     <item row="0" column="1">
-                      <widget class="adiscope::PositionSpinButton" name="offset" native="true">
-                       <property name="units" stdset="0">
-                        <stringlist notr="true">
-                         <string>µVolts=1e-6</string>
-                         <string>mVolts=1e-3</string>
-                         <string>Volts=1e0</string>
-                        </stringlist>
-                       </property>
-                       <property name="name" stdset="0">
-                        <string>Offset</string>
-                       </property>
-                       <property name="min_value" stdset="0">
-                        <double>-5.000000000000000</double>
-                       </property>
-                       <property name="max_value" stdset="0">
-                        <double>5.000000000000000</double>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="1" column="0">
-                      <widget class="adiscope::ScaleSpinButton" name="frequency" native="true">
-                       <property name="minimumSize">
-                        <size>
-                         <width>30</width>
-                         <height>30</height>
-                        </size>
-                       </property>
-                       <property name="units" stdset="0">
-                        <stringlist notr="true">
-                         <string>mHz=1e-3</string>
-                         <string>Hz=1e0</string>
-                         <string>kHz=1e3</string>
-                         <string>MHz=1e6</string>
-                        </stringlist>
-                       </property>
-                       <property name="name" stdset="0">
-                        <string>Frequency</string>
-                       </property>
-                       <property name="min_value" stdset="0">
-                        <double>0.001000000000000</double>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="0" column="0">
-                      <widget class="adiscope::ScaleSpinButton" name="amplitude" native="true">
-                       <property name="minimumSize">
-                        <size>
-                         <width>30</width>
-                         <height>30</height>
-                        </size>
-                       </property>
-                       <property name="units" stdset="0">
-                        <stringlist notr="true">
-                         <string>µVolts=1e-6</string>
-                         <string>mVolts=1e-3</string>
-                         <string>Volts=1e0</string>
-                        </stringlist>
-                       </property>
-                       <property name="name" stdset="0">
-                        <string>Amplitude</string>
-                       </property>
-                       <property name="min_value" stdset="0">
-                        <double>0.000001000000000</double>
-                       </property>
-                       <property name="max_value" stdset="0">
-                        <double>10.000000000000000</double>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="2" column="1">
-                      <widget class="adiscope::PositionSpinButton" name="dutycycle" native="true">
-                       <property name="name" stdset="0">
-                        <string>Duty Cycle</string>
-                       </property>
-                       <property name="max_value" stdset="0">
-                        <double>100.000000000000000</double>
-                       </property>
-                       <property name="units" stdset="0">
-                        <stringlist>
-                         <string>%=1e0</string>
-                        </stringlist>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="1" column="1">
-                      <widget class="adiscope::PhaseSpinButton" name="phase" native="true">
-                       <property name="name" stdset="0">
-                        <string>Phase</string>
-                       </property>
-                      </widget>
-                     </item>
                     </layout>
                    </item>
                    <item>
@@ -550,118 +430,6 @@ QTabBar::tab:selected {
                         <property name="spacing">
                          <number>15</number>
                         </property>
-                        <item row="0" column="1">
-                         <widget class="adiscope::ScaleSpinButton" name="holdHighTime" native="true">
-                          <property name="units" stdset="0">
-                           <stringlist notr="true">
-                            <string>ns=1e-9</string>
-                            <string>µs=1e-6</string>
-                            <string>ms=1e-3</string>
-                            <string>seconds=1e0</string>
-                           </stringlist>
-                          </property>
-                          <property name="name" stdset="0">
-                           <string>Hold High Time</string>
-                          </property>
-                          <property name="max_value" stdset="0">
-                           <double>10.000000000000000</double>
-                          </property>
-                          <property name="show_progress" stdset="0">
-                           <bool>false</bool>
-                          </property>
-                         </widget>
-                        </item>
-                        <item row="0" column="0">
-                         <widget class="adiscope::ScaleSpinButton" name="riseTime" native="true">
-                          <property name="minimumSize">
-                           <size>
-                            <width>30</width>
-                            <height>30</height>
-                           </size>
-                          </property>
-                          <property name="units" stdset="0">
-                           <stringlist notr="true">
-                            <string>ns=1e-9</string>
-                            <string>µs=1e-6</string>
-                            <string>ms=1e-3</string>
-                            <string>seconds=1e0</string>
-                           </stringlist>
-                          </property>
-                          <property name="name" stdset="0">
-                           <string>Rise Time</string>
-                          </property>
-                          <property name="max_value" stdset="0">
-                           <double>10.000000000000000</double>
-                          </property>
-                          <property name="show_progress" stdset="0">
-                           <bool>false</bool>
-                          </property>
-                         </widget>
-                        </item>
-                        <item row="1" column="0">
-                         <widget class="adiscope::ScaleSpinButton" name="fallTime" native="true">
-                          <property name="minimumSize">
-                           <size>
-                            <width>30</width>
-                            <height>30</height>
-                           </size>
-                          </property>
-                          <property name="units" stdset="0">
-                           <stringlist notr="true">
-                            <string>ns=1e-9</string>
-                            <string>µs=1e-6</string>
-                            <string>ms=1e-3</string>
-                            <string>seconds=1e0</string>
-                           </stringlist>
-                          </property>
-                          <property name="name" stdset="0">
-                           <string>Fall Time</string>
-                          </property>
-                          <property name="max_value" stdset="0">
-                           <double>10.000000000000000</double>
-                          </property>
-                          <property name="show_progress" stdset="0">
-                           <bool>false</bool>
-                          </property>
-                         </widget>
-                        </item>
-                        <item row="1" column="1">
-                         <widget class="adiscope::ScaleSpinButton" name="holdLowTime" native="true">
-                          <property name="name" stdset="0">
-                           <string>Hold Low Time</string>
-                          </property>
-                          <property name="units" stdset="0">
-                           <stringlist notr="true">
-                            <string>ns=1e-9</string>
-                            <string>µs=1e-6</string>
-                            <string>ms=1e-3</string>
-                            <string>seconds=1e0</string>
-                           </stringlist>
-                          </property>
-                          <property name="max_value" stdset="0">
-                           <double>10.000000000000000</double>
-                          </property>
-                          <property name="show_progress" stdset="0">
-                           <bool>false</bool>
-                          </property>
-                          <property name="units" stdset="0">
-                           <stringlist notr="true">
-                            <string>deg=1</string>
-                            <string>π rad=180</string>
-                            <string>ns=1e-9</string>
-                            <string>μs=1e-6</string>
-                            <string>ms=1e-3</string>
-                            <string>seconds=1e0</string>
-                           </stringlist>
-                          </property>
-                          <property name="min_value" stdset="0">
-                           <double>0.000000000000000</double>
-                          </property>
-                          <property name="max_value" stdset="0">
-                           <double>360.000000000000000</double>
-                          </property>
-                         </widget>
-                        </item>
                        </layout>
                       </item>
                      </layout>
@@ -931,90 +699,7 @@ background-image: url(:/icons/floppy_hover.svg);
                       <number>0</number>
                      </property>
                      <item>
-                      <layout class="QGridLayout" name="waveformGrid_2">
-                       <item row="1" column="0">
-                        <widget class="adiscope::ScaleSpinButton" name="fileSampleRate" native="true">
-                         <property name="minimumSize">
-                          <size>
-                           <width>30</width>
-                           <height>30</height>
-                          </size>
-                         </property>
-                         <property name="units" stdset="0">
-                          <stringlist notr="true">
-                           <string>mHz=1e-3</string>
-                           <string>Hz=1e0</string>
-                           <string>kHz=1e3</string>
-                           <string>MHz=1e6</string>
-                          </stringlist>
-                         </property>
-                         <property name="name" stdset="0">
-                          <string>SampleRate</string>
-                         </property>
-                         <property name="min_value" stdset="0">
-                          <double>0.001000000000000</double>
-                         </property>
-                        </widget>
-                       </item>
-                       <item row="0" column="0">
-                        <widget class="adiscope::ScaleSpinButton" name="fileAmplitude" native="true">
-                         <property name="minimumSize">
-                          <size>
-                           <width>30</width>
-                           <height>30</height>
-                          </size>
-                         </property>
-                         <property name="units" stdset="0">
-                          <stringlist notr="true">
-                           <string>µVolts=1e-6</string>
-                           <string>mVolts=1e-3</string>
-                           <string>Volts=1e0</string>
-                          </stringlist>
-                         </property>
-                         <property name="name" stdset="0">
-                          <string>Amplitude</string>
-                         </property>
-                         <property name="min_value" stdset="0">
-                          <double>0.000001000000000</double>
-                         </property>
-                         <property name="max_value" stdset="0">
-                          <double>10.000000000000000</double>
-                         </property>
-                        </widget>
-                       </item>
-                       <item row="0" column="1">
-                        <widget class="adiscope::PositionSpinButton" name="fileOffset" native="true">
-                         <property name="units" stdset="0">
-                          <stringlist notr="true">
-                           <string>µVolts=1e-6</string>
-                           <string>mVolts=1e-3</string>
-                           <string>Volts=1e0</string>
-                          </stringlist>
-                         </property>
-                         <property name="name" stdset="0">
-                          <string>Offset</string>
-                         </property>
-                         <property name="min_value" stdset="0">
-                          <double>-5.000000000000000</double>
-                         </property>
-                         <property name="max_value" stdset="0">
-                          <double>5.000000000000000</double>
-                         </property>
-                        </widget>
-                       </item>
-                       <item row="1" column="1">
-                        <widget class="adiscope::PositionSpinButton" name="filePhase" native="true">
-                         <property name="units" stdset="0">
-                          <stringlist notr="true">
-                           <string>samples=1e0</string>
-                          </stringlist>
-                         </property>
-                         <property name="name" stdset="0">
-                          <string>Phase</string>
-                         </property>
-                        </widget>
-                       </item>
-                      </layout>
+                      <layout class="QGridLayout" name="waveformGrid_2"/>
                      </item>
                     </layout>
                    </item>
@@ -1058,24 +743,6 @@ background-image: url(:/icons/floppy_hover.svg);
                    <string>Math</string>
                   </attribute>
                   <layout class="QVBoxLayout" name="verticalLayout_3">
-                   <item>
-                    <widget class="adiscope::ScaleSpinButton" name="mathFrequency" native="true">
-                     <property name="units" stdset="0">
-                      <stringlist notr="true">
-                       <string>mHz=1e-3</string>
-                       <string>Hz=1e0</string>
-                       <string>kHz=1e3</string>
-                       <string>MHz=1e6</string>
-                      </stringlist>
-                     </property>
-                     <property name="name" stdset="0">
-                      <string>Frequency</string>
-                     </property>
-                     <property name="min_value" stdset="0">
-                      <double>0.001000000000000</double>
-                     </property>
-                    </widget>
-                   </item>
                    <item>
                     <widget class="adiscope::Math" name="mathWidget" native="true">
                      <property name="sizePolicy">
@@ -1241,23 +908,6 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
                       </property>
                      </spacer>
                     </item>
-                    <item>
-                     <widget class="adiscope::ScaleSpinButton" name="noiseAmplitude" native="true">
-                      <property name="name" stdset="0">
-                       <string>Amplitude</string>
-                      </property>
-                      <property name="max_value" stdset="0">
-                       <double>10.000000000000000</double>
-                      </property>
-                      <property name="units" stdset="0">
-                       <stringlist>
-                        <string>µVolts=1e-6</string>
-                        <string>mVolts=1e-3</string>
-                        <string>Volts=1e0</string>
-                       </stringlist>
-                      </property>
-                     </widget>
-                    </item>
                    </layout>
                   </item>
                  </layout>
@@ -1329,32 +979,12 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>adiscope::PositionSpinButton</class>
-   <extends>QWidget</extends>
-   <header>spinbox_a.hpp</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>adiscope::ScaleSpinButton</class>
-   <extends>QWidget</extends>
-   <header>spinbox_a.hpp</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>adiscope::Math</class>
    <extends>QWidget</extends>
    <header>math.hpp</header>
    <container>1</container>
   </customwidget>
-  <customwidget>
-   <class>adiscope::PhaseSpinButton</class>
-   <extends>QWidget</extends>
-   <header>spinbox_a.hpp</header>
-   <container>1</container>
-  </customwidget>
  </customwidgets>
- <resources>
-  <include location="../resources/resources.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

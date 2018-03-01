@@ -220,41 +220,165 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 		}
 	}
 
+	/* Create waveform control widgets */
+	phase = new PhaseSpinButton({
+		{"deg",1},
+		{"π rad",180},
+		{"ns",1e-9},
+		{"μs",1e-6},
+		{"ms",1e-3},
+		{"seconds",1e0}
+	}, "Phase", 0, 360, true, true, this);
+
+	amplitude = new ScaleSpinButton({
+		{"μVolts",1e-6},
+		{"mVolts",1e-3},
+		{"Volts",1e0}
+	}, "Amplitude", 0.000001, 10, true, true, this);
+
+	offset = new PositionSpinButton({
+		{"μVolts",1e-6},
+		{"mVolts",1e-3},
+		{"Volts",1e0}
+	}, "Offset", -5, 5, true, true, this);
+
+	frequency = new ScaleSpinButton({
+		{"mHz",1e-3},
+		{"Hz",1e0},
+		{"kHz",1e3},
+		{"MHz",1e6}
+	},"Frequency", 0.001);
+
+	/* Create trapezoidal waveform control widgets */
+	riseTime = new ScaleSpinButton({
+		{"ns",1e-9},
+		{"μs",1e-6},
+		{"ms",1e-3},
+		{"seconds",1e0}
+	},"Rise Time", 0, 10);
+
+	fallTime = new ScaleSpinButton({
+		{"ns",1e-9},
+		{"μs",1e-6},
+		{"ms",1e-3},
+		{"seconds",1e0}
+	},"Fall Time", 0, 10);
+
+	holdHighTime = new ScaleSpinButton({
+		{"ns",1e-9},
+		{"μs",1e-6},
+		{"ms",1e-3},
+		{"seconds",1e0}
+	},"Hold High Tim", 0, 10);
+
+	holdLowTime = new ScaleSpinButton({
+		{"ns",1e-9},
+		{"μs",1e-6},
+		{"ms",1e-3},
+		{"seconds",1e0}
+	},"Hold Low Time", 0, 10);
+
+	/* Create file control widgets */
+	filePhase = new PhaseSpinButton({
+		{"samples",1e0}
+	}, "Phase");
+
+	fileOffset = new PositionSpinButton({
+		{"μVolts",1e-6},
+		{"mVolts",1e-3},
+		{"Volts",1e0}
+	}, "Offset", -5, 5, true, true, this);
+
+	fileSampleRate = new ScaleSpinButton({
+		{"mHz",1e-3},
+		{"Hz",1e0},
+		{"kHz",1e3},
+		{"MHz",1e6}
+	},"SampleRate", 0.001);
+
+	fileAmplitude = new ScaleSpinButton({
+		{"μVolts",1e-6},
+		{"mVolts",1e-3},
+		{"Volts",1e0}
+	}, "Amplitude", 0.000001, 10, true, true, this);
+
+	mathFrequency = new ScaleSpinButton({
+		{"mHz",1e-3},
+		{"Hz",1e0},
+		{"kHz",1e3},
+		{"MHz",1e6}
+	},"Frequency", 0.001);
+
+	noiseAmplitude = new ScaleSpinButton({
+		{"μVolts",1e-6},
+		{"mVolts",1e-3},
+		{"Volts",1e0}
+	}, "Amplitude", 0.000001, 10, true, true, this);
+
+	constantValue = new PositionSpinButton({
+		{"mVolts",1e-3},
+		{"Volts",1e0}
+	}, "Value", -5, 5, true, true, this);
+
+	dutycycle = new PositionSpinButton({
+		{"%",1e0}
+	}, "Duty Cycle", -5, 100);
+
+	ui->waveformGrid->addWidget(amplitude, 0, 0, 1, 1);
+	ui->waveformGrid->addWidget(offset, 0, 1, 1, 1);
+	ui->waveformGrid->addWidget(frequency, 1, 0, 1, 1);
+	ui->waveformGrid->addWidget(phase, 1, 1, 1, 1);
+	ui->waveformGrid->addWidget(dutycycle, 2, 1, 1, 1);
+
+	ui->gridLayout_2->addWidget(riseTime, 0, 0, 1, 1);
+	ui->gridLayout_2->addWidget(holdHighTime, 0, 1, 1, 1);
+	ui->gridLayout_2->addWidget(fallTime, 1, 0, 1, 1);
+	ui->gridLayout_2->addWidget(holdLowTime, 1, 1, 1, 1);
+
+	ui->waveformGrid_2->addWidget(fileAmplitude, 0, 0, 1, 1);
+	ui->waveformGrid_2->addWidget(fileOffset, 0, 1, 1, 1);
+	ui->waveformGrid_2->addWidget(fileSampleRate, 1, 0, 1, 1);
+	ui->waveformGrid_2->addWidget(filePhase, 1, 1, 1, 1);
+
+	ui->verticalLayout_3->insertWidget(0, mathFrequency);
+	ui->horizontalLayout_5->insertWidget(1, noiseAmplitude);
+	ui->verticalLayout_6->insertWidget(0, constantValue);
+
 	/* Max amplitude by default */
-	ui->amplitude->setValue(ui->amplitude->maxValue());
+	amplitude->setValue(amplitude->maxValue());
 
 	/* Set max frequency according to max sample rate */
-	ui->fileSampleRate->setMinValue(0.001);
-	ui->frequency->setMaxValue((sample_rate / 2) - 1);
-	ui->mathFrequency->setMaxValue((sample_rate / 2) - 1);
-	ui->fileSampleRate->setMaxValue((sample_rate / 2) - 1);
+	fileSampleRate->setMinValue(0.001);
+	frequency->setMaxValue((sample_rate / 2) - 1);
+	mathFrequency->setMaxValue((sample_rate / 2) - 1);
+	fileSampleRate->setMaxValue((sample_rate / 2) - 1);
 
 	/* (lowest freq * 100 * 1000) frequency by default */
-	ui->frequency->setValue(ui->frequency->minValue() * 1000 * 1000.0);
-	ui->fileSampleRate->setValue(ui->fileSampleRate->minValue() * 100 * 1000.0);
-	ui->fileAmplitude->setValue(ui->fileAmplitude->maxValue()/2);
-	ui->fileOffset->setValue(0);
-	ui->filePhase->setValue(0);
+	frequency->setValue(frequency->minValue() * 1000 * 1000.0);
+	fileSampleRate->setValue(fileSampleRate->minValue() * 100 * 1000.0);
+	fileAmplitude->setValue(fileAmplitude->maxValue()/2);
+	fileOffset->setValue(0);
+	filePhase->setValue(0);
 
-	ui->fallTime->setMinValue(0.00000001);
-	ui->riseTime->setMinValue(0.00000001);
-	ui->holdHighTime->setMinValue(0.00000001);
-	ui->holdLowTime->setMinValue(0.00000001);
+	fallTime->setMinValue(0.00000001);
+	riseTime->setMinValue(0.00000001);
+	holdHighTime->setMinValue(0.00000001);
+	holdLowTime->setMinValue(0.00000001);
 
-	ui->fallTime->setValue(0.25);
-	ui->riseTime->setValue(0.25);
-	ui->holdHighTime->setValue(0.25);
-	ui->holdLowTime->setValue(0.25);
+	fallTime->setValue(0.25);
+	riseTime->setValue(0.25);
+	holdHighTime->setValue(0.25);
+	holdLowTime->setValue(0.25);
 
-	ui->dutycycle->setValue(50);
-	ui->dutycycle->setVisible(false);
+	dutycycle->setValue(50);
+	dutycycle->setVisible(false);
 	ui->wtrapezparams->setVisible(false);
-	ui->mathFrequency->setValue(
-	        ui->mathFrequency->minValue() * 100 * 1000.0);
+	mathFrequency->setValue(
+		mathFrequency->minValue() * 100 * 1000.0);
 
 	ui->cbNoiseType->setCurrentIndex(0);
-	ui->noiseAmplitude->setMinValue(1e-06);
-	ui->noiseAmplitude->setValue(ui->noiseAmplitude->minValue());
+	noiseAmplitude->setMinValue(1e-06);
+	noiseAmplitude->setValue(noiseAmplitude->minValue());
 	ui->btnNoiseCollapse->setVisible(false);
 	ui->cbNoiseType->setItemData(SG_NO_NOISE,0);
 	ui->cbNoiseType->setItemData(SG_UNIFORM_NOISE, analog::GR_UNIFORM);
@@ -274,24 +398,24 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 		auto ptr = QSharedPointer<signal_generator_data>(
 		                   new signal_generator_data);
 		ptr->iio_ch = chn;
-		ptr->amplitude = ui->amplitude->value();
-		ptr->offset = ui->offset->value();
-		ptr->frequency = ui->frequency->value();
-		ptr->constant = ui->constantValue->value();
-		ptr->phase = ui->phase->value();
-		ptr->holdh = ui->holdHighTime->value();
-		ptr->holdl = ui->holdLowTime->value();
-		ptr->rise = ui->riseTime->value();
-		ptr->fall = ui->fallTime->value();
-		ptr->dutycycle = ui->dutycycle->value();
+		ptr->amplitude = amplitude->value();
+		ptr->offset = offset->value();
+		ptr->frequency = frequency->value();
+		ptr->constant = constantValue->value();
+		ptr->phase = phase->value();
+		ptr->holdh = holdHighTime->value();
+		ptr->holdl = holdLowTime->value();
+		ptr->rise = riseTime->value();
+		ptr->fall = fallTime->value();
+		ptr->dutycycle = dutycycle->value();
 		ptr->waveform = SG_SIN_WAVE;
-		ptr->math_freq = ui->mathFrequency->value();
+		ptr->math_freq = mathFrequency->value();
 		ptr->noiseType = (gr::analog::noise_type_t)0;
-		ptr->noiseAmplitude=ui->noiseAmplitude->value();
-		ptr->file_sr = ui->fileSampleRate->value();
-		ptr->file_amplitude = ui->fileAmplitude->value();
-		ptr->file_offset = ui->fileOffset->value();
-		ptr->file_phase = ui->filePhase->value();
+		ptr->noiseAmplitude=noiseAmplitude->value();
+		ptr->file_sr = fileSampleRate->value();
+		ptr->file_amplitude = fileAmplitude->value();
+		ptr->file_offset = fileOffset->value();
+		ptr->file_phase = filePhase->value();
 		ptr->file_type=FORMAT_NO_FILE;
 		ptr->file_nr_of_channels=0;
 		ptr->file_channel=0;
@@ -374,44 +498,44 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 	connect(ui->rightMenu, SIGNAL(finished(bool)), this,
 	        SLOT(rightMenuFinished(bool)));
 
-	connect(ui->constantValue, SIGNAL(valueChanged(double)),
+	connect(constantValue, SIGNAL(valueChanged(double)),
 	        SLOT(constantValueChanged(double)));
 
-	connect(ui->amplitude, SIGNAL(valueChanged(double)),
+	connect(amplitude, SIGNAL(valueChanged(double)),
 	        this, SLOT(amplitudeChanged(double)));
 
-	connect(ui->noiseAmplitude,SIGNAL(valueChanged(double)),
+	connect(noiseAmplitude,SIGNAL(valueChanged(double)),
 		this, SLOT(noiseAmplitudeChanged(double)));
-	connect(ui->fileAmplitude, SIGNAL(valueChanged(double)),
+	connect(fileAmplitude, SIGNAL(valueChanged(double)),
 	        this, SLOT(fileAmplitudeChanged(double)));
-	connect(ui->fileOffset, SIGNAL(valueChanged(double)),
+	connect(fileOffset, SIGNAL(valueChanged(double)),
 	        this, SLOT(fileOffsetChanged(double)));
-	connect(ui->filePhase, SIGNAL(valueChanged(double)),
+	connect(filePhase, SIGNAL(valueChanged(double)),
 	        this, SLOT(filePhaseChanged(double)));
 	connect(ui->fileChannel, SIGNAL(currentIndexChanged(int)),
 	        this, SLOT(fileChannelChanged(int)));
-	connect(ui->fileSampleRate, SIGNAL(valueChanged(double)),
+	connect(fileSampleRate, SIGNAL(valueChanged(double)),
 	        this, SLOT(fileSampleRateChanged(double)));
-	connect(ui->offset, SIGNAL(valueChanged(double)),
+	connect(offset, SIGNAL(valueChanged(double)),
 	        this, SLOT(offsetChanged(double)));
-	connect(ui->frequency, SIGNAL(valueChanged(double)),
+	connect(frequency, SIGNAL(valueChanged(double)),
 	        this, SLOT(frequencyChanged(double)));
-	connect(ui->phase, SIGNAL(valueChanged(double)),
+	connect(phase, SIGNAL(valueChanged(double)),
 	        this, SLOT(phaseChanged(double)));
 
-	connect(ui->dutycycle, SIGNAL(valueChanged(double)),
+	connect(dutycycle, SIGNAL(valueChanged(double)),
 		this, SLOT(dutyChanged(double)));
 
-	connect(ui->fallTime, SIGNAL(valueChanged(double)),
+	connect(fallTime, SIGNAL(valueChanged(double)),
 		this, SLOT(fallChanged(double)));
-	connect(ui->holdHighTime, SIGNAL(valueChanged(double)),
+	connect(holdHighTime, SIGNAL(valueChanged(double)),
 		this, SLOT(holdHighChanged(double)));
-	connect(ui->holdLowTime, SIGNAL(valueChanged(double)),
+	connect(holdLowTime, SIGNAL(valueChanged(double)),
 		this, SLOT(holdLowChanged(double)));
-	connect(ui->riseTime, SIGNAL(valueChanged(double)),
+	connect(riseTime, SIGNAL(valueChanged(double)),
 		this, SLOT(riseChanged(double)));
 
-	connect(ui->mathFrequency, SIGNAL(valueChanged(double)),
+	connect(mathFrequency, SIGNAL(valueChanged(double)),
 	        this, SLOT(mathFreqChanged(double)));
 
 	connect(ui->type, SIGNAL(currentIndexChanged(int)),
@@ -439,7 +563,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 	resetZoom();
 
 	auto ptr = getCurrentData();
-	ui->phase->setFrequency(ptr->frequency);
+	phase->setFrequency(ptr->frequency);
 
 	readPreferences();
 }
@@ -676,9 +800,9 @@ void SignalGenerator::frequencyChanged(double value)
 	auto ptr = getCurrentData();
 
 	if (ptr->frequency != value) {
-		if(ui->phase->inSeconds()) {
-			ui->phase->setFrequency(value);
-			ptr->phase = ui->phase->value();
+		if(phase->inSeconds()) {
+			phase->setFrequency(value);
+			ptr->phase = phase->value();
 		}
 		ptr->frequency = value;
 		resetZoom();
@@ -732,7 +856,7 @@ void SignalGenerator::dutyChanged(double value)
 void SignalGenerator::trapezoidalComputeFrequency()
 {
 	auto ptr = getCurrentData();
-	ui->frequency->setValue(static_cast<double>(1/(ptr->rise+ptr->fall+ptr->holdh+ptr->holdl)));
+	frequency->setValue(static_cast<double>(1/(ptr->rise+ptr->fall+ptr->holdh+ptr->holdl)));
 }
 
 void SignalGenerator::riseChanged(double value)
@@ -788,9 +912,9 @@ void SignalGenerator::phaseChanged(double value)
 
 void SignalGenerator::waveformUpdateUi(int val)
 {
-	ui->frequency->setEnabled(val!=SG_TRA_WAVE);
+	frequency->setEnabled(val!=SG_TRA_WAVE);
 	ui->wtrapezparams->setVisible(val==SG_TRA_WAVE);
-	ui->dutycycle->setVisible(val==SG_SQR_WAVE);
+	dutycycle->setVisible(val==SG_SQR_WAVE);
 	if(val==SG_TRA_WAVE) {
 		trapezoidalComputeFrequency();
 	}
@@ -1097,11 +1221,11 @@ void SignalGenerator::loadFile()
 	ui->label_path->setText(ptr->file);
 	Util::setWidgetNrOfChars(ui->label_path,10,30);
 	loadParametersFromFile(ptr,ptr->file);
-	ui->fileAmplitude->setValue(ptr->file_amplitude);
-	ui->fileOffset->setValue(ptr->file_offset);
-	ui->filePhase->setValue(ptr->file_phase);
-	ui->filePhase->setMaxValue(ptr->file_nr_of_samples[ptr->file_channel]);
-	ui->fileSampleRate->setValue(ptr->file_sr);
+	fileAmplitude->setValue(ptr->file_amplitude);
+	fileOffset->setValue(ptr->file_offset);
+	filePhase->setValue(ptr->file_phase);
+	filePhase->setMaxValue(ptr->file_nr_of_samples[ptr->file_channel]);
+	fileSampleRate->setValue(ptr->file_sr);
 	ui->fileChannel->blockSignals(true);
 	ui->fileChannel->clear();
 	ui->label_format->setText(ptr->file_message);
@@ -1734,30 +1858,30 @@ void SignalGenerator::updateRightMenuForChn(int chIdx)
 {
 	auto ptr = getData(channels[chIdx]);
 
-	ui->constantValue->setValue(ptr->constant);
-	ui->frequency->setValue(ptr->frequency);
-	ui->offset->setValue(ptr->offset);
-	ui->amplitude->setValue(ptr->amplitude);
-	ui->phase->setValue(ptr->phase);
-	ui->dutycycle->setValue(ptr->dutycycle);
+	constantValue->setValue(ptr->constant);
+	frequency->setValue(ptr->frequency);
+	offset->setValue(ptr->offset);
+	amplitude->setValue(ptr->amplitude);
+	phase->setValue(ptr->phase);
+	dutycycle->setValue(ptr->dutycycle);
 
-	ui->noiseAmplitude->setValue(ptr->noiseAmplitude);
+	noiseAmplitude->setValue(ptr->noiseAmplitude);
 	auto noiseIndex = ui->cbNoiseType->findData(ptr->noiseType);
 	ui->cbNoiseType->setCurrentIndex(noiseIndex);
 
-	ui->fallTime->setValue(ptr->fall);
-	ui->riseTime->setValue(ptr->rise);
-	ui->holdHighTime->setValue(ptr->holdh);
-	ui->holdLowTime->setValue(ptr->holdl);
+	fallTime->setValue(ptr->fall);
+	riseTime->setValue(ptr->rise);
+	holdHighTime->setValue(ptr->holdh);
+	holdLowTime->setValue(ptr->holdl);
 
 	ui->label_path->setText(ptr->file);
 	ui->mathWidget->setFunction(ptr->function);
-	ui->mathFrequency->setValue(ptr->math_freq);
-	ui->fileSampleRate->setValue(ptr->file_sr);
-	ui->fileOffset->setValue(ptr->file_offset);
-	ui->filePhase->setValue(ptr->file_phase);
+	mathFrequency->setValue(ptr->math_freq);
+	fileSampleRate->setValue(ptr->file_sr);
+	fileOffset->setValue(ptr->file_offset);
+	filePhase->setValue(ptr->file_phase);
 	ui->fileChannel->setCurrentIndex(ptr->file_channel);
-	ui->fileAmplitude->setValue(ptr->file_amplitude);
+	fileAmplitude->setValue(ptr->file_amplitude);
 
 	if (!ptr->file.isNull()) {
 		auto info = QFileInfo(ptr->file);
@@ -2214,7 +2338,7 @@ void SignalGenerator_API::setConstantValue(const QList<double>& list)
 		ptr->constant = static_cast<float>(list.at(i));
 	}
 
-	gen->ui->constantValue->setValue(gen->getCurrentData()->constant);
+	gen->constantValue->setValue(gen->getCurrentData()->constant);
 }
 
 QList<int> SignalGenerator_API::getWaveformType() const
@@ -2280,7 +2404,7 @@ void SignalGenerator_API::setWaveformAmpl(const QList<double>& list)
 		ptr->amplitude = list.at(i);
 	}
 
-	gen->ui->amplitude->setValue(gen->getCurrentData()->amplitude);
+	gen->amplitude->setValue(gen->getCurrentData()->amplitude);
 }
 
 QList<double> SignalGenerator_API::getWaveformFreq() const
@@ -2308,7 +2432,7 @@ void SignalGenerator_API::setWaveformFreq(const QList<double>& list)
 		ptr->frequency = list.at(i);
 	}
 
-	gen->ui->frequency->setValue(gen->getCurrentData()->frequency);
+	gen->frequency->setValue(gen->getCurrentData()->frequency);
 }
 
 QList<double> SignalGenerator_API::getWaveformOfft() const
@@ -2336,7 +2460,7 @@ void SignalGenerator_API::setWaveformOfft(const QList<double>& list)
 		ptr->offset = static_cast<float>(list.at(i));
 	}
 
-	gen->ui->offset->setValue(gen->getCurrentData()->offset);
+	gen->offset->setValue(gen->getCurrentData()->offset);
 }
 
 QList<double> SignalGenerator_API::getWaveformPhase() const
@@ -2364,7 +2488,7 @@ void SignalGenerator_API::setWaveformPhase(const QList<double>& list)
 		ptr->phase = list.at(i);
 	}
 
-	gen->ui->phase->setValue(gen->getCurrentData()->phase);
+	gen->phase->setValue(gen->getCurrentData()->phase);
 }
 
 
@@ -2393,7 +2517,7 @@ void SignalGenerator_API::setWaveformDuty(const QList<double>& list)
 		ptr->dutycycle = list.at(i);
 	}
 
-	gen->ui->dutycycle->setValue(gen->getCurrentData()->dutycycle);
+	gen->dutycycle->setValue(gen->getCurrentData()->dutycycle);
 }
 
 QList<int> SignalGenerator_API::getNoiseType() const
@@ -2450,7 +2574,7 @@ void SignalGenerator_API::setNoiseAmpl(const QList<double>& list)
 		ptr->noiseAmplitude = list.at(i);
 	}
 
-	gen->ui->noiseAmplitude->setValue(gen->getCurrentData()->noiseAmplitude);
+	gen->noiseAmplitude->setValue(gen->getCurrentData()->noiseAmplitude);
 }
 
 
@@ -2479,7 +2603,7 @@ void SignalGenerator_API::setWaveformRise(const QList<double>& list)
 		ptr->rise = list.at(i);
 	}
 
-	gen->ui->riseTime->setValue(gen->getCurrentData()->rise);
+	gen->riseTime->setValue(gen->getCurrentData()->rise);
 }
 
 
@@ -2508,7 +2632,7 @@ void SignalGenerator_API::setWaveformFall(const QList<double>& list)
 		ptr->fall = list.at(i);
 	}
 
-	gen->ui->fallTime->setValue(gen->getCurrentData()->fall);
+	gen->fallTime->setValue(gen->getCurrentData()->fall);
 }
 
 
@@ -2537,7 +2661,7 @@ void SignalGenerator_API::setWaveformHoldHigh(const QList<double>& list)
 		ptr->holdh = list.at(i);
 	}
 
-	gen->ui->holdHighTime->setValue(gen->getCurrentData()->holdh);
+	gen->holdHighTime->setValue(gen->getCurrentData()->holdh);
 }
 
 
@@ -2566,7 +2690,7 @@ void SignalGenerator_API::setWaveformHoldLow(const QList<double>& list)
 		ptr->holdl = list.at(i);
 	}
 
-	gen->ui->holdLowTime->setValue(gen->getCurrentData()->holdl);
+	gen->holdLowTime->setValue(gen->getCurrentData()->holdl);
 }
 
 
@@ -2596,7 +2720,7 @@ void SignalGenerator_API::setMathFreq(const QList<double>& list)
 		ptr->math_freq = list.at(i);
 	}
 
-	gen->ui->mathFrequency->setValue(gen->getCurrentData()->math_freq);
+	gen->mathFrequency->setValue(gen->getCurrentData()->math_freq);
 }
 
 QList<QString> SignalGenerator_API::getMathFunction() const
