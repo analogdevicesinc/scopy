@@ -217,7 +217,7 @@ background-color: red;
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="inout">
+      <widget class="adiscope::CustomSwitch" name="inout">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -227,24 +227,6 @@ background-color: red;
        <property name="layoutDirection">
         <enum>Qt::LeftToRight</enum>
        </property>
-       <property name="styleSheet">
-        <string notr="true">QPushButton
-{
-width:100px;
-height:30px;
-border-radius:2px;
-}
-QPushButton:!checked
-{
- border-image: url(&quot;:/icons/in-out-in.svg&quot;);
-}
-
-QPushButton:checked
-{
- border-image: url(&quot;:/icons/in-out-out.svg&quot;);
-}
-</string>
-       </property>
        <property name="text">
         <string/>
        </property>
@@ -252,6 +234,15 @@ QPushButton:checked
         <bool>true</bool>
        </property>
        <property name="checked">
+        <bool>false</bool>
+       </property>
+       <property name="leftText" stdset="0">
+        <string>in</string>
+       </property>
+       <property name="rightText" stdset="0">
+        <string>out</string>
+       </property>
+       <property name="polarity" stdset="0">
         <bool>false</bool>
        </property>
       </widget>
@@ -369,6 +360,13 @@ QPushButton:!checked
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>adiscope::CustomSwitch</class>
+   <extends>QPushButton</extends>
+   <header>customSwitch.hpp</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
