@@ -63,7 +63,7 @@ bool CustomSwitch::event(QEvent *e)
 		if(propName=="leftText" && property("leftText").isValid())
 			on.setText(property("leftText").toString());
 		if(propName=="rightText" && property("rightText").isValid())
-			on.setText(property("rightText").toString());
+			off.setText(property("rightText").toString());
 
 	}
 	return QPushButton::event(e);
