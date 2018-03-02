@@ -151,7 +151,7 @@ QPushButton:!checked {
           <item>
            <widget class="QTabWidget" name="tabWidget">
             <property name="currentIndex">
-             <number>0</number>
+             <number>1</number>
             </property>
             <widget class="QWidget" name="tab">
              <attribute name="title">
@@ -499,6 +499,22 @@ border: 5px solid white;
           <property name="bottomMargin">
            <number>0</number>
           </property>
+          <item>
+           <spacer name="verticalSpacer_4">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>39</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
           <item>
            <widget class="adiscope::MenuAnim" name="rightMenu" native="true">
             <property name="sizePolicy">
@@ -1506,86 +1522,6 @@ QLabel {
     <hint type="destinationlabel">
      <x>460</x>
      <y>386</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>minFreq</sender>
-   <signal>valueChanged(double)</signal>
-   <receiver>phasegraph</receiver>
-   <slot>setXMin(double)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>957</x>
-     <y>90</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>468</x>
-     <y>640</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>minFreq</sender>
-   <signal>valueChanged(double)</signal>
-   <receiver>dbgraph</receiver>
-   <slot>setXMin(double)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>957</x>
-     <y>90</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>468</x>
-     <y>294</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>run_button</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>boxRefChannel</receiver>
-   <slot>setDisabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>969</x>
-     <y>90</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>963</x>
-     <y>90</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>maxFreq</sender>
-   <signal>valueChanged(double)</signal>
-   <receiver>dbgraph</receiver>
-   <slot>setXMax(double)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>969</x>
-     <y>90</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>468</x>
-     <y>294</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>maxFreq</sender>
-   <signal>valueChanged(double)</signal>
-   <receiver>phasegraph</receiver>
-   <slot>setXMax(double)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>969</x>
-     <y>90</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>468</x>
-     <y>640</y>
     </hint>
    </hints>
   </connection>
