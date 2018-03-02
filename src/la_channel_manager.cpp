@@ -1756,6 +1756,9 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 				auto trace1 = main_win->view_->add_decoder();
 				lachannelgroupUI->setTrace(trace1);
 				lachannelgroupUI->setupDecoder();
+				QSpacerItem *spacerItem = new QSpacerItem(15, 0, QSizePolicy::MinimumExpanding,
+									  QSizePolicy::Minimum);
+				lachannelgroupUI->ui->rightWidgetLayout->insertSpacerItem(0, spacerItem);
 
 				/* Populate role combo based on parent decoder */
 				lachannelgroupUI->ui->decoderCombo->addItem("None");
@@ -1810,6 +1813,9 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 									this);
 						lachannelgroupUI->ch_ui.push_back(lachannelUI);
 						lachannelUI->ensurePolished();
+						QSpacerItem *spacerItem = new QSpacerItem(15, 0, QSizePolicy::MinimumExpanding,
+											  QSizePolicy::Minimum);
+						lachannelUI->ui->rightWidgetLayout->insertSpacerItem(0, spacerItem);
 
 						auto index = ch->get_channel(i)->get_id();
 						auto trace1 = main_win->view_->get_clone_of(index);

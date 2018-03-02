@@ -1412,13 +1412,13 @@ color: white;
                      <number>0</number>
                     </property>
                     <property name="leftMargin">
-                     <number>7</number>
+                     <number>0</number>
                     </property>
                     <property name="topMargin">
                      <number>7</number>
                     </property>
                     <property name="rightMargin">
-                     <number>7</number>
+                     <number>3</number>
                     </property>
                     <property name="bottomMargin">
                      <number>7</number>
@@ -1639,8 +1639,8 @@ color: #FFFFFF;</string>
                     <rect>
                      <x>0</x>
                      <y>0</y>
-                     <width>92</width>
-                     <height>30</height>
+                     <width>169</width>
+                     <height>606</height>
                     </rect>
                    </property>
                    <layout class="QVBoxLayout" name="scrollAreaLayout">

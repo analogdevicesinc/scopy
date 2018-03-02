@@ -6,19 +6,25 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>539</width>
+    <width>395</width>
     <height>46</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+   <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
+  </property>
   <property name="maximumSize">
    <size>
-    <width>16777215</width>
+    <width>395</width>
     <height>16777215</height>
    </size>
   </property>
@@ -709,7 +715,7 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
          </item>
          <item>
           <widget class="QWidget" name="rightWidget" native="true">
-           <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <layout class="QHBoxLayout" name="rightWidgetLayout">
             <property name="spacing">
              <number>0</number>
             </property>
@@ -771,7 +777,7 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
                 <string/>
                </property>
                <property name="icon">
-                <iconset resource="../resources/resources.qrc">
+                <iconset>
                  <normaloff>:/icons/trigger_any_enabled.svg</normaloff>
                  <normalon>:/icons/trigger_any_enabled.svg</normalon>
                  <disabledoff>:/icons/trigger_any_disabled.svg</disabledoff>
@@ -783,7 +789,7 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
                 <string/>
                </property>
                <property name="icon">
-                <iconset resource="../resources/resources.qrc">
+                <iconset>
                  <normaloff>:/icons/trigger_rising_enabled.svg</normaloff>
                  <normalon>:/icons/trigger_rising_enabled.svg</normalon>
                  <disabledoff>:/icons/trigger_rising_disabled.svg</disabledoff>
@@ -795,7 +801,7 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
                 <string/>
                </property>
                <property name="icon">
-                <iconset resource="../resources/resources.qrc">
+                <iconset>
                  <normaloff>:/icons/trigger_falling_enabled.svg</normaloff>
                  <normalon>:/icons/trigger_falling_enabled.svg</normalon>
                  <disabledoff>:/icons/trigger_falling_disabled.svg</disabledoff>
@@ -807,7 +813,7 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
                 <string/>
                </property>
                <property name="icon">
-                <iconset resource="../resources/resources.qrc">
+                <iconset>
                  <normaloff>:/icons/trigger_low_enabled.svg</normaloff>
                  <normalon>:/icons/trigger_low_enabled.svg</normalon>
                  <disabledoff>:/icons/trigger_low_disabled.svg</disabledoff>
@@ -819,7 +825,7 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
                 <string/>
                </property>
                <property name="icon">
-                <iconset resource="../resources/resources.qrc">
+                <iconset>
                  <normaloff>:/icons/trigger_high_enabled.svg</normaloff>
                  <normalon>:/icons/trigger_high_enabled.svg</normalon>
                  <disabledoff>:/icons/trigger_high_disabled.svg</disabledoff>
@@ -834,11 +840,11 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
                <enum>Qt::Horizontal</enum>
               </property>
               <property name="sizeType">
-               <enum>QSizePolicy::Preferred</enum>
+               <enum>QSizePolicy::Fixed</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>39</width>
+                <width>26</width>
                 <height>20</height>
                </size>
               </property>
@@ -854,14 +860,14 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
               </property>
               <property name="minimumSize">
                <size>
-                <width>14</width>
-                <height>14</height>
+                <width>16</width>
+                <height>16</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>14</width>
-                <height>14</height>
+                <width>16</width>
+                <height>16</height>
                </size>
               </property>
               <property name="styleSheet">
@@ -1372,11 +1378,11 @@ background:#4a64ff;
                <enum>Qt::Horizontal</enum>
               </property>
               <property name="sizeType">
-               <enum>QSizePolicy::Preferred</enum>
+               <enum>QSizePolicy::Fixed</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>30</width>
+                <width>20</width>
                 <height>20</height>
                </size>
               </property>
@@ -1434,8 +1440,6 @@ background:#4a64ff;
    <header>smallOnOffSwitch.hpp</header>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="../resources/resources.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>
