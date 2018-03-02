@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>291</width>
+    <width>293</width>
     <height>690</height>
    </rect>
   </property>
@@ -213,7 +213,7 @@ background-color: #4A64FF;</string>
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>247</width>
+              <width>249</width>
               <height>616</height>
              </rect>
             </property>
@@ -919,17 +919,7 @@ color: rgba(255, 255, 255, 70);
                        <item>
                         <widget class="QWidget" name="colorBG" native="true">
                          <property name="sizePolicy">
-                          <sizepolicy hsizetype="Minimum" vsizetype="MinimumExpanding">
-                           <horstretch>0</horstretch>
-                           <verstretch>0</verstretch>
-                          </sizepolicy>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QWidget" name="colorEdge" native="true">
-                         <property name="sizePolicy">
-                          <sizepolicy hsizetype="Minimum" vsizetype="MinimumExpanding">
+                          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                            <horstretch>0</horstretch>
                            <verstretch>0</verstretch>
                           </sizepolicy>
@@ -937,7 +927,35 @@ color: rgba(255, 255, 255, 70);
                          <property name="minimumSize">
                           <size>
                            <width>0</width>
-                           <height>0</height>
+                           <height>30</height>
+                          </size>
+                         </property>
+                         <property name="maximumSize">
+                          <size>
+                           <width>16777215</width>
+                           <height>30</height>
+                          </size>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QWidget" name="colorEdge" native="true">
+                         <property name="sizePolicy">
+                          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                           <horstretch>0</horstretch>
+                           <verstretch>0</verstretch>
+                          </sizepolicy>
+                         </property>
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>30</height>
+                          </size>
+                         </property>
+                         <property name="maximumSize">
+                          <size>
+                           <width>16777215</width>
+                           <height>30</height>
                           </size>
                          </property>
                         </widget>
@@ -979,17 +997,7 @@ color: rgba(255, 255, 255, 70);
                        <item>
                         <widget class="QWidget" name="colorLow" native="true">
                          <property name="sizePolicy">
-                          <sizepolicy hsizetype="Minimum" vsizetype="MinimumExpanding">
-                           <horstretch>0</horstretch>
-                           <verstretch>0</verstretch>
-                          </sizepolicy>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QWidget" name="colorHigh" native="true">
-                         <property name="sizePolicy">
-                          <sizepolicy hsizetype="Minimum" vsizetype="MinimumExpanding">
+                          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                            <horstretch>0</horstretch>
                            <verstretch>0</verstretch>
                           </sizepolicy>
@@ -997,7 +1005,35 @@ color: rgba(255, 255, 255, 70);
                          <property name="minimumSize">
                           <size>
                            <width>0</width>
-                           <height>0</height>
+                           <height>30</height>
+                          </size>
+                         </property>
+                         <property name="maximumSize">
+                          <size>
+                           <width>16777215</width>
+                           <height>30</height>
+                          </size>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QWidget" name="colorHigh" native="true">
+                         <property name="sizePolicy">
+                          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                           <horstretch>0</horstretch>
+                           <verstretch>0</verstretch>
+                          </sizepolicy>
+                         </property>
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>30</height>
+                          </size>
+                         </property>
+                         <property name="maximumSize">
+                          <size>
+                           <width>16777215</width>
+                           <height>30</height>
                           </size>
                          </property>
                         </widget>
