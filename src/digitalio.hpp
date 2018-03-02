@@ -121,9 +121,11 @@ public Q_SLOTS:
 class DigitalIO_API : public ApiObject
 {
 	Q_OBJECT
+
+	Q_PROPERTY(QList<bool> group READ grouped WRITE setGrouped SCRIPTABLE false);
 	Q_PROPERTY(QList<bool> dir READ direction WRITE setDirection SCRIPTABLE true);
 	Q_PROPERTY(QList<bool> out READ output    WRITE setOutput SCRIPTABLE true);
-	Q_PROPERTY(QList<bool> group READ grouped WRITE setGrouped SCRIPTABLE false);
+
 
 public:
 	explicit DigitalIO_API(DigitalIO *dio) : ApiObject(), dio(dio) {}
