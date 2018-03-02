@@ -23,7 +23,8 @@ ChannelWidget::ChannelWidget(int id, bool deletable, bool simplified,
 	m_simplified(simplified),
 	m_color(color),
 	m_math(false),
-	m_function("")
+	m_function(""),
+	m_ref(false)
 {
 	init();
 }
