@@ -7,7 +7,7 @@ echo 'export PATH="$(brew --prefix qt)/bin:$PATH"' >> ~/.bash_profile
 brew link --force qt
 
 brew unlink bison
-brew install cmake fftw bison autoconf automake libtool libzip glib glibmm doxygen python3 wget boost gnu-sed libmatio dylibbundler libxml2
+brew install cmake fftw bison autoconf automake libtool libzip glib glibmm doxygen wget boost gnu-sed libmatio dylibbundler libxml2
 brew install --build-from-source libusb
 brew install llvm
 brew link --overwrite --force gcc
@@ -36,7 +36,7 @@ brew pip cheetah
 
 # Build dependencies
 cd ${WORKDIR}
-rm volk-1.3.tar.gz*
+rm volk-1.3.tar.gz
 if [ ! -d volk-1.3 ]; then
   wget http://libvolk.org/releases/volk-1.3.tar.gz
   tar -xzf volk-1.3.tar.gz
@@ -65,37 +65,10 @@ fi
 sudo make install >/dev/null
 
 cd ${WORKDIR}
-if [ ! -d libsigrok ]; then
-  git clone https://github.com/sschnelle/libsigrok/
-  cd libsigrok
-  ./autogen.sh
-  CC=gcc CXX=g++ CXXFLAGS=-std=c++11 ./configure --disable-static --enable-shared --disable-all-drivers --enable-bindings --enable-cxx
-  make
-else
-  cd libsigrok
-  make >/dev/null
-fi
-sudo make install
-
-cd ${WORKDIR}
-rm libsigrokdecode-0.4.1.tar.gz*
-ls
-if [ ! -d libsigrokdecode-0.4.1 ]; then
-  wget http://sigrok.org/download/source/libsigrokdecode/libsigrokdecode-0.4.1.tar.gz
-  tar -xzvf libsigrokdecode-0.4.1.tar.gz
-  cd libsigrokdecode-0.4.1
-  ./configure
-  make >/dev/null
-else
-  cd libsigrokdecode-0.4.1
-fi
-sudo make install
-
-cd ${WORKDIR}
 if [ ! -d qwt ]; then
   git clone https://github.com/osakared/qwt.git -b qwt-6.1-multiaxes
   cd qwt
-  curl https://raw.githubusercontent.com/analogdevicesinc/scopy/osx/qwt-6.1-multiaxes.patch |patch -p1 --forward
+  curl https://raw.githubusercontent.com/analogdevicesinc/scopy/master/qwt-6.1-multiaxes.patch |patch -p1 --forward
   qmake
   make -j4 >/dev/null
 else
@@ -164,3 +137,33 @@ else
   make -j4
 fi
 sudo make install
+
+brew upgrade python
+
+cd ${WORKDIR}
+if [ ! -d libsigrok ]; then
+  git clone https://github.com/sschnelle/libsigrok/
+  cd libsigrok
+  ./autogen.sh
+  CC=gcc CXX=g++ CXXFLAGS=-std=c++11 ./configure --disable-static --enable-shared --disable-all-drivers --enable-bindings --enable-cxx
+  make
+else
+  cd libsigrok
+  make >/dev/null
+fi
+sudo make install
+
+cd ${WORKDIR}
+rm libsigrokdecode-0.4.1.tar.gz*
+ls
+if [ ! -d libsigrokdecode-0.4.1 ]; then
+  wget http://sigrok.org/download/source/libsigrokdecode/libsigrokdecode-0.4.1.tar.gz
+  tar -xzvf libsigrokdecode-0.4.1.tar.gz
+  cd libsigrokdecode-0.4.1
+  ./configure
+  make >/dev/null
+else
+  cd libsigrokdecode-0.4.1
+fi
+sudo make install
+
