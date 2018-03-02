@@ -452,7 +452,7 @@ QTabBar::tab:selected {
                  </widget>
                  <widget class="QWidget" name="tabBuffer">
                   <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                   <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
@@ -461,8 +461,14 @@ QTabBar::tab:selected {
                    <string>Buffer</string>
                   </attribute>
                   <layout class="QVBoxLayout" name="verticalLayout">
+                   <property name="leftMargin">
+                    <number>0</number>
+                   </property>
                    <property name="topMargin">
                     <number>25</number>
+                   </property>
+                   <property name="rightMargin">
+                    <number>0</number>
                    </property>
                    <item>
                     <layout class="QHBoxLayout" name="horizontalLayout_10">
@@ -520,8 +526,14 @@ QTabBar::tab:selected {
                      <property name="topMargin">
                       <number>0</number>
                      </property>
+                     <property name="rightMargin">
+                      <number>0</number>
+                     </property>
                      <item>
                       <layout class="QFormLayout" name="formLayout">
+                       <property name="fieldGrowthPolicy">
+                        <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+                       </property>
                        <property name="horizontalSpacing">
                         <number>15</number>
                        </property>
@@ -536,6 +548,12 @@ QTabBar::tab:selected {
                        </property>
                        <item row="0" column="0">
                         <widget class="QLabel" name="label_5">
+                         <property name="sizePolicy">
+                          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                           <horstretch>0</horstretch>
+                           <verstretch>0</verstretch>
+                          </sizepolicy>
+                         </property>
                          <property name="font">
                           <font>
                            <family>DejaVu Sans</family>
@@ -548,7 +566,14 @@ QTabBar::tab:selected {
                         </widget>
                        </item>
                        <item row="0" column="1">
-                        <widget class="QLineEdit" name="label_path"/>
+                        <widget class="QLineEdit" name="label_path">
+                         <property name="sizePolicy">
+                          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                           <horstretch>0</horstretch>
+                           <verstretch>0</verstretch>
+                          </sizepolicy>
+                         </property>
+                        </widget>
                        </item>
                        <item row="1" column="0">
                         <widget class="QLabel" name="label_9">
@@ -564,7 +589,14 @@ QTabBar::tab:selected {
                         </widget>
                        </item>
                        <item row="1" column="1">
-                        <widget class="QLineEdit" name="label_format"/>
+                        <widget class="QLineEdit" name="label_format">
+                         <property name="sizePolicy">
+                          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                           <horstretch>0</horstretch>
+                           <verstretch>0</verstretch>
+                          </sizepolicy>
+                         </property>
+                        </widget>
                        </item>
                        <item row="2" column="0">
                         <widget class="QLabel" name="label_7">
@@ -580,14 +612,21 @@ QTabBar::tab:selected {
                         </widget>
                        </item>
                        <item row="2" column="1">
-                        <widget class="QLineEdit" name="label_size"/>
+                        <widget class="QLineEdit" name="label_size">
+                         <property name="sizePolicy">
+                          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                           <horstretch>0</horstretch>
+                           <verstretch>0</verstretch>
+                          </sizepolicy>
+                         </property>
+                        </widget>
                        </item>
                       </layout>
                      </item>
                      <item>
                       <widget class="QPushButton" name="load_file">
                        <property name="sizePolicy">
-                        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                          <horstretch>0</horstretch>
                          <verstretch>0</verstretch>
                         </sizepolicy>
@@ -596,6 +635,12 @@ QTabBar::tab:selected {
                         <size>
                          <width>0</width>
                          <height>64</height>
+                        </size>
+                       </property>
+                       <property name="maximumSize">
+                        <size>
+                         <width>128</width>
+                         <height>16777215</height>
                         </size>
                        </property>
                        <property name="styleSheet">
@@ -638,6 +683,12 @@ background-image: url(:/icons/floppy_hover.svg);
                      </item>
                      <item>
                       <widget class="QComboBox" name="fileChannel">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
                        <property name="currentText">
                         <string/>
                        </property>
@@ -649,6 +700,9 @@ background-image: url(:/icons/floppy_hover.svg);
                     <layout class="QHBoxLayout" name="horizontalLayout_2">
                      <property name="spacing">
                       <number>0</number>
+                     </property>
+                     <property name="topMargin">
+                      <number>15</number>
                      </property>
                      <item>
                       <widget class="QLabel" name="label_4">
@@ -706,7 +760,7 @@ background-image: url(:/icons/floppy_hover.svg);
                    <item>
                     <widget class="QWidget" name="widget" native="true">
                      <property name="sizePolicy">
-                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                      <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
                        <horstretch>0</horstretch>
                        <verstretch>0</verstretch>
                       </sizepolicy>
@@ -734,7 +788,7 @@ background-image: url(:/icons/floppy_hover.svg);
                  </widget>
                  <widget class="QWidget" name="tabMath">
                   <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                   <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
@@ -743,6 +797,12 @@ background-image: url(:/icons/floppy_hover.svg);
                    <string>Math</string>
                   </attribute>
                   <layout class="QVBoxLayout" name="verticalLayout_3">
+                   <property name="leftMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="rightMargin">
+                    <number>0</number>
+                   </property>
                    <item>
                     <widget class="adiscope::Math" name="mathWidget" native="true">
                      <property name="sizePolicy">
