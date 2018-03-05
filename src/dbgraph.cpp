@@ -150,6 +150,8 @@ dBgraph::dBgraph(QWidget *parent) : QwtPlot(parent),
 
 dBgraph::~dBgraph()
 {
+	canvas()->removeEventFilter(d_cursorReadouts);
+	canvas()->removeEventFilter(d_symbolCtrl);
 	delete formatter;
     delete picker;
 }
