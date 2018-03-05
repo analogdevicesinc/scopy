@@ -3,7 +3,7 @@ min-height: 30px;
 max-height: 30px;
 min-width: 100px;
 max-width: 100px;
-background-color: #4a64ff;
+background-color: black;
 border-radius: 4px;
 }
 
@@ -16,7 +16,7 @@ min-height: 30px;
 max-height: 30px;
 min-width: 52px;
 max-width: 52px;
-background-color: black;
+background-color: #4a64ff;
 border-radius: 2px;
 }
 

@@ -84,8 +84,8 @@ void CustomSwitch::toggleAnim(bool enabled)
 	if (!isVisible())
 		return;
 
-	QRect off_rect(0, handle.y(), handle.width(), handle.height());
-	QRect on_rect(width() - handle.width(), handle.y(),
+	QRect on_rect(0, handle.y(), handle.width(), handle.height());
+	QRect off_rect(width() - handle.width(), handle.y(),
 			handle.width(), handle.height());
 
 	anim.stop();
@@ -106,12 +106,12 @@ void CustomSwitch::showEvent(QShowEvent *event)
 {
 	updateOnOffLabels();
 	if (isChecked()) {
-		handle.setGeometry(QRect(width() - handle.width(), handle.y(),
-					handle.width(), handle.height()));
-	}
-	else {
 		handle.setGeometry(QRect(0, handle.y(), handle.width(),
 					 handle.height()));
+	}
+	else {
+		handle.setGeometry(QRect(width() - handle.width(), handle.y(),
+					handle.width(), handle.height()));
 	}
 
 }
