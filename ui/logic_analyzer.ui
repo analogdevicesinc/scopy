@@ -502,7 +502,7 @@ background-color: grey;
            <string>Run</string>
           </property>
           <property name="icon">
-           <iconset>
+           <iconset resource="../resources/resources.qrc">
             <normaloff>:/icons/ico-play.svg</normaloff>:/icons/ico-play.svg</iconset>
           </property>
           <property name="iconSize">
@@ -584,7 +584,7 @@ background-color: grey;
            <string>Single</string>
           </property>
           <property name="icon">
-           <iconset>
+           <iconset resource="../resources/resources.qrc">
             <normaloff>:/icons/ico-oneshot.svg</normaloff>:/icons/ico-oneshot.svg</iconset>
           </property>
           <property name="iconSize">
@@ -1107,22 +1107,6 @@ color: white;
               <property name="verticalSpacing">
                <number>0</number>
               </property>
-              <item row="0" column="9">
-               <spacer name="horizontalSpacer_19">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeType">
-                 <enum>QSizePolicy::Fixed</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>5</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
               <item row="0" column="6">
                <widget class="QLabel" name="lblCursorDiff">
                 <property name="sizePolicy">
@@ -1180,7 +1164,7 @@ color: white;
                  <string notr="true">color: rgba(255, 255, 255, 153);</string>
                 </property>
                 <property name="text">
-                 <string>Δt =</string>
+                 <string>   Δt =</string>
                 </property>
                </widget>
               </item>
@@ -1253,6 +1237,22 @@ color: white;
                 <property name="sizeHint" stdset="0">
                  <size>
                   <width>339</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item row="0" column="9" rowspan="2">
+               <spacer name="horizontalSpacer_19">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeType">
+                 <enum>QSizePolicy::Fixed</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>5</width>
                   <height>20</height>
                  </size>
                 </property>
@@ -1403,8 +1403,8 @@ color: white;
                     <rect>
                      <x>0</x>
                      <y>0</y>
-                     <width>177</width>
-                     <height>561</height>
+                     <width>193</width>
+                     <height>560</height>
                     </rect>
                    </property>
                    <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -1540,7 +1540,7 @@ color: white;
                         <property name="sizeHint" stdset="0">
                          <size>
                           <width>0</width>
-                          <height>5</height>
+                          <height>0</height>
                          </size>
                         </property>
                        </spacer>
@@ -1553,7 +1553,7 @@ color: white;
                        <number>0</number>
                       </property>
                       <property name="topMargin">
-                       <number>20</number>
+                       <number>0</number>
                       </property>
                      </layout>
                     </item>
@@ -1639,8 +1639,8 @@ color: #FFFFFF;</string>
                     <rect>
                      <x>0</x>
                      <y>0</y>
-                     <width>169</width>
-                     <height>606</height>
+                     <width>92</width>
+                     <height>30</height>
                     </rect>
                    </property>
                    <layout class="QVBoxLayout" name="scrollAreaLayout">
@@ -1895,6 +1895,8 @@ QPushButton:checked { border-image: url(:/icons/setup_btn_checked.svg); }
    <header>smallOnOffSwitch.hpp</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../resources/resources.qrc"/>
+ </resources>
  <connections/>
 </ui>
