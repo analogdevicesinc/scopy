@@ -143,10 +143,16 @@ QPushButton:disabled {
         <item>
          <widget class="adiscope::MenuAnim" name="rightMenu" native="true">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Maximum" vsizetype="Expanding">
+           <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>16777215</height>
+           </size>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_7">
            <property name="spacing">
@@ -159,7 +165,7 @@ QPushButton:disabled {
             <number>25</number>
            </property>
            <property name="rightMargin">
-            <number>20</number>
+            <number>10</number>
            </property>
            <property name="bottomMargin">
             <number>20</number>
@@ -171,6 +177,12 @@ QPushButton:disabled {
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>16777215</height>
+              </size>
              </property>
              <property name="frameShape">
               <enum>QFrame::NoFrame</enum>
@@ -192,7 +204,7 @@ QPushButton:disabled {
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>404</width>
+                <width>380</width>
                 <height>587</height>
                </rect>
               </property>
@@ -201,6 +213,12 @@ QPushButton:disabled {
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>380</width>
+                <height>16777215</height>
+               </size>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_10">
                <property name="spacing">
