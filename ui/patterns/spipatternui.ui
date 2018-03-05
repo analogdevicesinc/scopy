@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>227</width>
+    <width>262</width>
     <height>391</height>
    </rect>
   </property>
@@ -98,6 +98,12 @@
          <property name="checked">
           <bool>true</bool>
          </property>
+         <property name="leftText" stdset="0">
+          <string>1</string>
+         </property>
+         <property name="rightText" stdset="0">
+          <string>0</string>
+         </property>
         </widget>
        </item>
        <item>
@@ -134,6 +140,12 @@
          <property name="checked">
           <bool>true</bool>
          </property>
+         <property name="leftText" stdset="0">
+          <string>1</string>
+         </property>
+         <property name="rightText" stdset="0">
+          <string>0</string>
+         </property>
         </widget>
        </item>
        <item>
@@ -169,6 +181,15 @@
          </property>
          <property name="checked">
           <bool>true</bool>
+         </property>
+         <property name="show_labels" stdset="0">
+          <bool>true</bool>
+         </property>
+         <property name="leftText" stdset="0">
+          <string>1</string>
+         </property>
+         <property name="rightText" stdset="0">
+          <string>0</string>
          </property>
         </widget>
        </item>

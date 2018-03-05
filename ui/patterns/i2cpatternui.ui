@@ -54,6 +54,12 @@
        <property name="checked">
         <bool>true</bool>
        </property>
+       <property name="leftText" stdset="0">
+        <string>W</string>
+       </property>
+       <property name="rightText" stdset="0">
+        <string>R</string>
+       </property>
       </widget>
      </item>
      <item>
