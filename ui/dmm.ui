@@ -767,9 +767,9 @@ QPushButton:disabled {
          <property name="geometry">
           <rect>
            <x>0</x>
-           <y>-263</y>
+           <y>0</y>
            <width>155</width>
-           <height>1016</height>
+           <height>861</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -780,7 +780,7 @@ QPushButton:disabled {
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_6">
           <property name="spacing">
-           <number>20</number>
+           <number>15</number>
           </property>
           <property name="leftMargin">
            <number>0</number>
@@ -813,22 +813,6 @@ QPushButton:disabled {
              <string>Channel 1</string>
             </property>
            </widget>
-          </item>
-          <item>
-           <spacer name="verticalSpacer_13">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Fixed</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>0</width>
-              <height>10</height>
-             </size>
-            </property>
-           </spacer>
           </item>
           <item>
            <widget class="Line" name="line">
@@ -995,22 +979,6 @@ QPushButton:disabled {
              <string>Channel 2</string>
             </property>
            </widget>
-          </item>
-          <item>
-           <spacer name="verticalSpacer_14">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Fixed</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>10</height>
-             </size>
-            </property>
-           </spacer>
           </item>
           <item>
            <widget class="Line" name="line_2">
@@ -1251,7 +1219,7 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
             <property name="sizeHint" stdset="0">
              <size>
               <width>0</width>
-              <height>10</height>
+              <height>5</height>
              </size>
             </property>
            </spacer>
@@ -1436,7 +1404,7 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
             <property name="sizeHint" stdset="0">
              <size>
               <width>20</width>
-              <height>10</height>
+              <height>5</height>
              </size>
             </property>
            </spacer>
