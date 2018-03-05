@@ -298,7 +298,7 @@ bool Calibration::calibrateADCgain()
 
 	setCalibrationMode(ADC_REF1);
 
-	double vref1 = 0.4615;
+	double vref1 = 0.46172;
 	const unsigned int num_samples = 1e5;
 	int16_t dataCh0[num_samples];
 	int16_t dataCh1[num_samples];
