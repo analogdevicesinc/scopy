@@ -501,7 +501,7 @@ QWidget {
               </sizepolicy>
              </property>
              <property name="currentIndex">
-              <number>2</number>
+              <number>3</number>
              </property>
              <widget class="QWidget" name="channelSettings">
               <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -1357,6 +1357,11 @@ background-color: grey;
 }
 QPushButton:pressed {
 background-color: #F45000;
+}
+
+QPushButton:hover
+{
+         background-color: #4a34ff;
 }</string>
                    </property>
                    <property name="text">
@@ -1382,6 +1387,11 @@ background-color: grey;
 }
 QPushButton:pressed {
 background-color: #F45000;
+}
+
+QPushButton:hover
+{
+         background-color: #4a34ff;
 }</string>
                    </property>
                    <property name="text">
@@ -1423,6 +1433,12 @@ background-color: grey;
 }
 QPushButton:pressed {
 background-color: #F45000;
+}
+
+
+QPushButton:hover
+{
+         background-color: #4a34ff;
 }</string>
                    </property>
                    <property name="text">
@@ -1458,6 +1474,11 @@ background-color: grey;
 }
 QPushButton:pressed {
 background-color: #F45000;
+}
+
+QPushButton:hover
+{
+         background-color: #4a34ff;
 }</string>
                    </property>
                    <property name="text">
@@ -1480,6 +1501,11 @@ background-color: grey;
 }
 QPushButton:pressed {
 background-color: #F45000;
+}
+
+QPushButton:hover
+{
+         background-color: #4a34ff;
 }</string>
                    </property>
                    <property name="text">
@@ -1508,6 +1534,12 @@ background-color: grey;
 }
 QPushButton:pressed {
 background-color: #F45000;
+}
+
+
+QPushButton:hover
+{
+         background-color: #4a34ff;
 }</string>
                    </property>
                    <property name="text">
@@ -1539,6 +1571,11 @@ background-color: grey;
 }
 QPushButton:pressed {
 background-color: #F45000;
+}
+
+QPushButton:hover
+{
+         background-color: #4a34ff;
 }</string>
                    </property>
                    <property name="text">
