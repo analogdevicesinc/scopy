@@ -52,6 +52,7 @@ dBgraph::dBgraph(QWidget *parent) : QwtPlot(parent),
 
 	OscScaleEngine *scaleLeft = new OscScaleEngine;
 	scaleLeft->setMajorTicksCount(6);
+    scaleLeft->showZero(true);
 	this->setAxisScaleEngine(QwtPlot::yLeft,
 			static_cast<QwtScaleEngine *>(scaleLeft));
 

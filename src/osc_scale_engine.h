@@ -33,7 +33,7 @@ public:
 
 	void setMinorTicksCount(uint minorTicks);
 	uint minorTicksCount();
-
+    void showZero(bool en);
 	virtual void autoScale( int maxSteps,
 		double &x1, double &x2, double &stepSize ) const;
 
@@ -48,9 +48,12 @@ protected:
 	void buildMinorTicks( const QList<double>& majorTicks,
 		int maxMinorSteps, double stepSize,
 		QList<double> &minorTicks, QList<double> &mediumTicks ) const;
+
+    QList<double> buildMajorTicks(const QwtInterval &interval, double stepSize) const;
 private:
 	uint m_majorTicks; // number of major ticks a scale should have
 	uint m_minorTicks; // number of minor ticks between two major ticks
+    bool m_showZero;
 };
 
 #endif /* M2K_OSC_SCALE_ENGINE_H */

@@ -33,7 +33,8 @@ static inline long double qwtIntervalWidthL( const QwtInterval &interval )
 OscScaleEngine::OscScaleEngine():
 	QwtLinearScaleEngine(10),
 	m_majorTicks(11),
-	m_minorTicks(9)
+    m_minorTicks(9),
+    m_showZero(false)
 {
 }
 
@@ -60,7 +61,9 @@ uint OscScaleEngine::minorTicksCount()
 {
 	return m_minorTicks;
 }
-
+void OscScaleEngine::showZero(bool en){
+    m_showZero = en;
+}
 void OscScaleEngine::autoScale( int maxSteps, double &x1, double &x2, double &stepSize ) const
 {
 	// No implementation is needed for now
@@ -142,9 +145,23 @@ void OscScaleEngine::buildMinorTicks( const QList<double>& majorTicks, int maxMi
 
 	// calculate minor ticks
 
-	for ( int i = 0; i < majorTicks.count(); i++ )
+    int majorTicksCnt = majorTicks.count();
+
+    if(m_showZero){
+        majorTicksCnt--;
+    }
+
+    for ( int i = 0; i < majorTicksCnt; i++ )
 	{
-		double val = majorTicks[i];
+        double val = majorTicks[i];
+
+        if(m_showZero){
+            double upper = majorTicks[i+1];
+            double diff = upper-val;
+
+            minStep = diff / numTicks;
+        }
+
 		for ( int k = 0; k < numTicks; k++ )
 		{
 			val += minStep;
@@ -159,4 +176,52 @@ void OscScaleEngine::buildMinorTicks( const QList<double>& majorTicks, int maxMi
 				minorTicks += alignedValue;
 		}
 	}
+}
+
+QList<double> OscScaleEngine::buildMajorTicks(const QwtInterval &interval, double stepSize) const
+{
+    if(m_showZero && interval.minValue() < 0 && interval.maxValue() > 0){
+        QList<double> majorTicks;
+
+        double range = interval.maxValue()-interval.minValue();
+        double upperRange = interval.maxValue() / range;
+        double lowerRange = fabs(interval.minValue()) / range;
+
+        int underTicks = round(lowerRange * (m_majorTicks -1));
+        int overTicks = round(upperRange * (m_majorTicks - 1));
+
+        if(overTicks == 0){
+            overTicks++;
+            underTicks--;
+        }
+        if(underTicks == 0)
+        {
+            underTicks++;
+            overTicks--;
+        }
+        if(overTicks + underTicks == m_majorTicks){
+            if(underTicks > overTicks)
+                underTicks--;
+            else
+                overTicks--;
+        }
+
+        double overStep = interval.maxValue() / overTicks;
+        double underStep = fabs(interval.minValue()) / underTicks;
+
+        double val = interval.maxValue();
+        for(int i=0;i<overTicks;i++){
+            majorTicks.append(val);
+            val -= overStep;
+        }
+        for(int i=0;i<underTicks+1;i++){
+            majorTicks.append(val);
+            val -= underStep;
+        }
+
+        return majorTicks;
+    }
+
+    return QwtLinearScaleEngine::buildMajorTicks(interval,stepSize);
+
 }
