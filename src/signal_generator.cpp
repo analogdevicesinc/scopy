@@ -1049,6 +1049,7 @@ enum sg_file_format SignalGenerator::getFileFormat(QString filePath)
 void SignalGenerator::loadParametersFromFile(
         QSharedPointer<signal_generator_data> ptr,QString filePath)
 {
+	ptr->file_message="";
 	ptr->file=filePath;
 	ptr->file_type=getFileFormat(ptr->file);
 	auto info = QFileInfo(ptr->file);
@@ -1219,7 +1220,10 @@ void SignalGenerator::loadFile()
 {
 	auto ptr = getCurrentData();
 
-	ptr->file = QFileDialog::getOpenFileName(this, tr("Open File"));
+	QString filename = QFileDialog::getOpenFileName(this, tr("Open File"));
+	if(filename.isEmpty()) // user hit cancel
+		return;
+	ptr->file = filename;
 	ui->label_path->setText(ptr->file);
 	Util::setWidgetNrOfChars(ui->label_path,10,30);
 	loadParametersFromFile(ptr,ptr->file);
