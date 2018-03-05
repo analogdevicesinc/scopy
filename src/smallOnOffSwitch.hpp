@@ -24,6 +24,7 @@
 #include <QPropertyAnimation>
 #include <QPushButton>
 #include <QWidget>
+#include <QLabel>
 
 class QShowEvent;
 
@@ -45,6 +46,7 @@ namespace adiscope {
 
 	private:
 		QColor color_start, color_end, color;
+		QLabel on, off;
 		QWidget handle;
 		QPropertyAnimation anim;
 		QPropertyAnimation color_anim;
@@ -54,12 +56,16 @@ namespace adiscope {
 
 		void setDuration(int ms);
 		void setHandleColor(const QColor& color);
+		void updateOnOffLabels();
 
+		bool event(QEvent *e);
 		void showEvent(QShowEvent *event);
 		void paintEvent(QPaintEvent *);
 
 	private Q_SLOTS:
 		void toggleAnim(bool enabled);
+	Q_SIGNALS:
+		void animationDone();
 	};
 }
 

@@ -27,11 +27,13 @@
 using namespace adiscope;
 
 SmallOnOffSwitch::SmallOnOffSwitch(QWidget *parent) : QPushButton(parent),
-	color_start("grey"), color_end("blue"),
+	color_start("grey"), color_end("blue"), on(this), off(this),
 	handle(this), anim(&handle, "geometry"), color_anim(this, "color"),
 	show_icon(false)
 {
 	handle.setObjectName("handle");
+	on.setObjectName("on");
+	off.setObjectName("off");
 
 	setFlat(true);
 	setCheckable(true);
@@ -42,6 +44,8 @@ SmallOnOffSwitch::SmallOnOffSwitch(QWidget *parent) : QPushButton(parent),
 	stylesheet = QString::fromLatin1(file.readAll());
 	this->setStyleSheet(stylesheet);
 
+	on.raise();
+	off.raise();
 	connect(this, SIGNAL(toggled(bool)), SLOT(toggleAnim(bool)));
 }
 
@@ -91,11 +95,26 @@ void SmallOnOffSwitch::toggleAnim(bool enabled)
 	color_anim.start();
 }
 
+bool SmallOnOffSwitch::event(QEvent* e)
+{
+	if (e->type() == QEvent::DynamicPropertyChange)
+	{
+		QDynamicPropertyChangeEvent *const propEvent = static_cast<QDynamicPropertyChangeEvent*>(e);
+		QString propName = propEvent->propertyName();
+		if(propName=="leftText" && property("leftText").isValid())
+			on.setText(property("leftText").toString());
+		if(propName=="rightText" && property("rightText").isValid())
+			off.setText(property("rightText").toString());
+
+	}
+	return QPushButton::event(e);
+}
 void SmallOnOffSwitch::paintEvent(QPaintEvent *e)
 {
         QPushButton::paintEvent(e);
         show_icon = getDynamicProperty(this, "use_icon");
-        if (!show_icon) {
+
+	if (!show_icon) {
                 return;
         }
 
@@ -128,4 +147,10 @@ void SmallOnOffSwitch::showEvent(QShowEvent *event)
 	} else {
 		setHandleColor(color_start);
 	}
+}
+
+void SmallOnOffSwitch::updateOnOffLabels()
+{
+	on.setEnabled(isChecked());
+	off.setEnabled(!isChecked());
 }

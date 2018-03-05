@@ -25,3 +25,29 @@ background-color: white;
 QWidget#handle:disabled {
 background-color: #aaaaaa;
 }
+
+
+QLabel {
+margin-top: 4px;
+background-color: transparent;
+font: 12px "monospace";
+}
+
+QLabel#on {
+margin-left: 3px;
+color: white;
+}
+
+QLabel#on:disabled {
+color: rgba(255,255,255,102);
+}
+
+QLabel#off {
+margin-left: 23px;
+color: white;
+}
+
+QLabel#off:disabled {
+color: rgba(255,255,255,51);
+}
+
