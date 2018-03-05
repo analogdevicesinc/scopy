@@ -290,7 +290,7 @@ color: rgb(255, 255, 255);
             <x>0</x>
             <y>0</y>
             <width>200</width>
-            <height>463</height>
+            <height>467</height>
            </rect>
           </property>
           <property name="minimumSize">
@@ -746,7 +746,7 @@ min-height: 30px;</string>
                <property name="styleSheet">
                 <string notr="true">QPushButton {
 color: white;
-background-color: orange;
+background-color: #4a64ff;
 font-family: &quot;monospace&quot;;
 font-weight: bold;
 height: 30px;
@@ -755,12 +755,17 @@ border-radius: 3px;
 min-width: 6em;
 qproperty-text: &quot;Connect&quot;;
 }
+
+QPushButton:hover
+{
+background-color: #4a34ff;
+}
+
 QPushButton:disabled {
-background-color: grey;
+background-color: black;
+color:gray;
 }
-QPushButton:pressed {
-background-color: #F45000;
-}
+
 QPushButton[connected=true] {
 /*background-color: green;*/
 qproperty-text: &quot;Disconnect&quot;;
@@ -866,7 +871,7 @@ font-weight: bold;
                   </property>
                   <property name="minimumSize">
                    <size>
-                    <width>102</width>
+                    <width>78</width>
                     <height>64</height>
                    </size>
                   </property>
