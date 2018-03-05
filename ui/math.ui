@@ -18,7 +18,6 @@
 color: white;
 background-color: #4a64ff;
 font-family: &quot;monospace&quot; 14pt;
-font-weight: bold;
 border-width: 0px;
 border-radius: 3px;
 min-width: 64px;
@@ -58,6 +57,28 @@ QMenu::item:selected { background-color: #F45000; }</string>
    <property name="bottomMargin">
     <number>0</number>
    </property>
+   <item row="6" column="5">
+    <widget class="QWidget" name="widget" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>8</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>0</width>
+       <height>48</height>
+      </size>
+     </property>
+    </widget>
+   </item>
    <item row="0" column="8">
     <widget class="QPushButton" name="btnCos">
      <property name="sizePolicy">
@@ -539,22 +560,6 @@ border-color: green;
      </property>
     </widget>
    </item>
-   <item row="1" column="2">
-    <spacer name="horizontalSpacer">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::MinimumExpanding</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>0</width>
-       <height>0</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
    <item row="5" column="4">
     <widget class="QPushButton" name="btn0">
      <property name="sizePolicy">
@@ -941,27 +946,21 @@ QPushButton:hover
      </property>
     </widget>
    </item>
-   <item row="6" column="5">
-    <widget class="QWidget" name="widget" native="true">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
+   <item row="2" column="9">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
-     <property name="minimumSize">
+     <property name="sizeType">
+      <enum>QSizePolicy::Expanding</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
       <size>
        <width>0</width>
-       <height>8</height>
+       <height>0</height>
       </size>
      </property>
-     <property name="maximumSize">
-      <size>
-       <width>0</width>
-       <height>48</height>
-      </size>
-     </property>
-    </widget>
+    </spacer>
    </item>
   </layout>
  </widget>
