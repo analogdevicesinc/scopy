@@ -224,21 +224,6 @@ QWidget#stackedWidgetPage1[locked=true]
 border:1px solid red;
 }
 
-QPushButton
-{
-width:100px;
-height:30px;
-border-radius:2px;
-}
-QPushButton:checked
-{
- background-image: url(&quot;:/icons/in-out-in.svg&quot;);
-}
-
-QPushButton:!checked
-{
- background-image: url(&quot;:/icons/in-out-out.svg&quot;);
-}
 </string>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -276,7 +261,7 @@ QPushButton:!checked
             </spacer>
            </item>
            <item>
-            <widget class="QPushButton" name="inout">
+            <widget class="adiscope::CustomSwitch" name="inout">
              <property name="text">
               <string/>
              </property>
@@ -285,6 +270,12 @@ QPushButton:!checked
              </property>
              <property name="checked">
               <bool>true</bool>
+             </property>
+             <property name="leftText" stdset="0">
+              <string>in</string>
+             </property>
+             <property name="rightText" stdset="0">
+              <string>out</string>
              </property>
             </widget>
            </item>
@@ -448,6 +439,13 @@ QSlider::sub-page:horizontal {
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>adiscope::CustomSwitch</class>
+   <extends>QPushButton</extends>
+   <header>customSwitch.hpp</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
