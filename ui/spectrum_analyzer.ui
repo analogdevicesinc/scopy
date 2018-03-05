@@ -501,7 +501,7 @@ QWidget {
               </sizepolicy>
              </property>
              <property name="currentIndex">
-              <number>0</number>
+              <number>2</number>
              </property>
              <widget class="QWidget" name="channelSettings">
               <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -811,7 +811,7 @@ border-bottom: 1px solid rgba(255,255,255,100);</string>
     font-weight: normal;</string>
                    </property>
                    <property name="text">
-                    <string>Settings</string>
+                    <string>Sweep</string>
                    </property>
                   </widget>
                  </item>
@@ -827,18 +827,6 @@ border-bottom: 1px solid rgba(255,255,255,100);</string>
                     </size>
                    </property>
                   </spacer>
-                 </item>
-                 <item>
-                  <widget class="QLabel" name="label">
-                   <property name="styleSheet">
-                    <string notr="true"> color: white;
-    font-size: 14px;
-    font-weight: normal;</string>
-                   </property>
-                   <property name="text">
-                    <string>Sweep</string>
-                   </property>
-                  </widget>
                  </item>
                 </layout>
                </item>
