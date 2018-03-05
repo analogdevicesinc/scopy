@@ -119,7 +119,7 @@ QPushButton:disabled {
 }</string>
           </property>
           <property name="icon">
-           <iconset>
+           <iconset resource="../resources/resources.qrc">
             <normaloff>:/icons/ico-play.svg</normaloff>:/icons/ico-play.svg</iconset>
           </property>
           <property name="iconSize">
@@ -249,7 +249,7 @@ QTabBar::tab:selected {
 </string>
                  </property>
                  <property name="currentIndex">
-                  <number>3</number>
+                  <number>2</number>
                  </property>
                  <property name="usesScrollButtons">
                   <bool>false</bool>
@@ -521,7 +521,7 @@ QTabBar::tab:selected {
                    <item>
                     <layout class="QHBoxLayout" name="horizontalLayout_7">
                      <property name="spacing">
-                      <number>0</number>
+                      <number>10</number>
                      </property>
                      <property name="topMargin">
                       <number>0</number>
@@ -561,12 +561,15 @@ QTabBar::tab:selected {
                           </font>
                          </property>
                          <property name="text">
-                          <string>PATH</string>
+                          <string>Path</string>
                          </property>
                         </widget>
                        </item>
                        <item row="0" column="1">
                         <widget class="QLineEdit" name="label_path">
+                         <property name="enabled">
+                          <bool>false</bool>
+                         </property>
                          <property name="sizePolicy">
                           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                            <horstretch>0</horstretch>
@@ -584,12 +587,15 @@ QTabBar::tab:selected {
                           </font>
                          </property>
                          <property name="text">
-                          <string>FORMAT</string>
+                          <string>Format</string>
                          </property>
                         </widget>
                        </item>
                        <item row="1" column="1">
                         <widget class="QLineEdit" name="label_format">
+                         <property name="enabled">
+                          <bool>false</bool>
+                         </property>
                          <property name="sizePolicy">
                           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                            <horstretch>0</horstretch>
@@ -607,12 +613,15 @@ QTabBar::tab:selected {
                           </font>
                          </property>
                          <property name="text">
-                          <string>SIZE</string>
+                          <string>Size</string>
                          </property>
                         </widget>
                        </item>
                        <item row="2" column="1">
                         <widget class="QLineEdit" name="label_size">
+                         <property name="enabled">
+                          <bool>false</bool>
+                         </property>
                          <property name="sizePolicy">
                           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                            <horstretch>0</horstretch>
@@ -621,52 +630,65 @@ QTabBar::tab:selected {
                          </property>
                         </widget>
                        </item>
-                      </layout>
-                     </item>
-                     <item>
-                      <widget class="QPushButton" name="load_file">
-                       <property name="sizePolicy">
-                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                         <horstretch>0</horstretch>
-                         <verstretch>0</verstretch>
-                        </sizepolicy>
-                       </property>
-                       <property name="minimumSize">
-                        <size>
-                         <width>0</width>
-                         <height>64</height>
-                        </size>
-                       </property>
-                       <property name="maximumSize">
-                        <size>
-                         <width>128</width>
-                         <height>16777215</height>
-                        </size>
-                       </property>
-                       <property name="styleSheet">
-                        <string notr="true">QPushButton {
-height: 128px;
+                       <item row="3" column="1">
+                        <widget class="QPushButton" name="load_file">
+                         <property name="sizePolicy">
+                          <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
+                           <horstretch>0</horstretch>
+                           <verstretch>0</verstretch>
+                          </sizepolicy>
+                         </property>
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>0</height>
+                          </size>
+                         </property>
+                         <property name="maximumSize">
+                          <size>
+                           <width>16777215</width>
+                           <height>16777215</height>
+                          </size>
+                         </property>
+                         <property name="styleSheet">
+                          <string notr="true">QPushButton{
+
+/*height: 128px;
 width: 128px;
-border: none;
-background-image: url(:/icons/floppy.svg);
+background-image: url(:/icons/floppy.svg);*/
 background-position: center center;
 background-repeat: no-repeat;
+background-color: #4a64ff;
+  height: 30px;
+  border-radius: 4px;
+  font-family: ArialMT;
+  font-size: 14px;
+  font-weight: normal;
+  font-style: normal;
+  text-align: center;
+  color: #ffffff;
 }
-QPushButton:hover {
-background-image: url(:/icons/floppy_hover.svg);
-}</string>
-                       </property>
-                       <property name="text">
-                        <string/>
-                       </property>
-                      </widget>
+
+
+QPushButton:hover
+{
+	 background-color: #4a34ff;
+}
+</string>
+                         </property>
+                         <property name="text">
+                          <string>Load file</string>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
                      </item>
                     </layout>
                    </item>
                    <item>
                     <layout class="QHBoxLayout" name="horizontalLayout_4">
                      <property name="spacing">
-                      <number>15</number>
+                      <number>10</number>
                      </property>
                      <item>
                       <widget class="QLabel" name="label">
@@ -677,12 +699,15 @@ background-image: url(:/icons/floppy_hover.svg);
                         </sizepolicy>
                        </property>
                        <property name="text">
-                        <string>CHANNEL</string>
+                        <string>Channel</string>
                        </property>
                       </widget>
                      </item>
                      <item>
                       <widget class="QComboBox" name="fileChannel">
+                       <property name="enabled">
+                        <bool>false</bool>
+                       </property>
                        <property name="sizePolicy">
                         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                          <horstretch>0</horstretch>
@@ -693,6 +718,22 @@ background-image: url(:/icons/floppy_hover.svg);
                         <string/>
                        </property>
                       </widget>
+                     </item>
+                     <item>
+                      <spacer name="horizontalSpacer_5">
+                       <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
+                       </property>
+                       <property name="sizeType">
+                        <enum>QSizePolicy::Fixed</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
+                        <size>
+                         <width>128</width>
+                         <height>0</height>
+                        </size>
+                       </property>
+                      </spacer>
                      </item>
                     </layout>
                    </item>
@@ -1045,6 +1086,8 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../resources/resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

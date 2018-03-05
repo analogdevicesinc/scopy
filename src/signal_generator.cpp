@@ -1193,6 +1193,8 @@ void SignalGenerator::loadParametersFromFile(
 		ptr->file_type=FORMAT_NO_FILE;
 	}
 
+	ui->fileChannel->setEnabled(ptr->file_nr_of_channels > 1);
+
 	std::shared_ptr<GenericDac> dac ;
 	for(auto ch : channel_dac)
 		if(ptr->iio_ch==ch.first){
