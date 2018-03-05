@@ -334,9 +334,9 @@ void M2kAdc::setChnHwGainMode(uint chnIdx, GainMode gain_mode)
 double M2kAdc::gainAt(GainMode gain_mode) const
 {
 	if (gain_mode == LOW_GAIN_MODE)
-		return 0.02;
+		return 0.02017;
 	else if (gain_mode == HIGH_GAIN_MODE)
-		return 0.212;
+		return 0.21229;
 	else
 		return 0;
 }
