@@ -1011,6 +1011,7 @@ void LogicAnalyzer::configParams(double timebase, double timepos)
                         ui->btnRepeated->setChecked(true);
                         ui->btnRepeated->blockSignals(false);
                         ui->btnStream->blockSignals(false);
+                        frequencySpinButton->setValue(params.sampleRate);
                         frequencySpinButton->setEnabled(false);
                 }
                 else {
@@ -1070,6 +1071,7 @@ void LogicAnalyzer::configParams(double timebase, double timepos)
                 else if(active_timePos != -params.timePos)
                         active_timePos = -params.timePos;
 
+                frequencySpinButton->setValue(params.sampleRate);
                 frequencySpinButton->setEnabled(false);
 
                 active_sampleRate = params.sampleRate;
@@ -1110,6 +1112,7 @@ void LogicAnalyzer::configParams(double timebase, double timepos)
                 recomputeCursorsValue(true);
                 updateBufferPreviewer();
         }
+
         onTriggerModeChanged(trigger_settings_ui->btnAuto->isChecked());
         logic_analyzer_ptr->set_stream(acquisition_mode == STREAM);
         main_win->view_->time_item_appearance_changed(true, true);
@@ -1789,6 +1792,11 @@ void LogicAnalyzer::validateSamplingFrequency(double value)
 	frequencySpinButton->blockSignals(true);
 	frequencySpinButton->setValue(actualFrequency);
 	frequencySpinButton->blockSignals(false);
+
+	if (acquisition_mode == REPEATED) {
+		return;
+	}
+
 	active_sampleRate = actualFrequency;
 	onHorizScaleValueChanged(timeBase->value());
 
