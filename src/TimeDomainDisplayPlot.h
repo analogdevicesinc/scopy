@@ -178,7 +178,7 @@ protected:
   std::vector<double*> d_ref_ydata;
 
   bool isReferenceWaveform(QwtPlotCurve *curve);
-  int countReferenceWaveform(QwtPlotCurve *curve);
+  int countReferenceWaveform(int position);
 
 private:
   void _resetXAxisPoints(double*& xAxis, unsigned long long numPoints, double sampleRate);

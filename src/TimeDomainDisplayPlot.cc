@@ -258,7 +258,7 @@ TimeDomainDisplayPlot::plotNewData(const std::string sender,
 	delete[] d_xdata[sinkIndex];
 	d_xdata[sinkIndex] = new double[numDataPoints];
 
-	int ref_offset = countReferenceWaveform(Curve(start));
+	int ref_offset = countReferenceWaveform(start);
 	for(int i = start; i < start + sinkNumChannels; i++) {
 	  delete[] d_ydata[i];
 	  d_ydata[i] = new double[numDataPoints];
@@ -865,9 +865,12 @@ int TimeDomainDisplayPlot::getCurveNextTo(int pos)
 	return pos;
 }
 
-int TimeDomainDisplayPlot::countReferenceWaveform(QwtPlotCurve *curve)
+int TimeDomainDisplayPlot::countReferenceWaveform(int position)
 {
 	/* returns the number of curves that are of type reference that were added before "curve" */
+
+	int curveIdx = getCurveNextTo(position);
+	QwtPlotCurve *curve = Curve(curveIdx);
 
 	int count = 0;
 	for (int i = 0; i < d_plot_curve.size(); ++i)
@@ -916,12 +919,16 @@ void TimeDomainDisplayPlot::unregisterReferenceWaveform(QString name)
 	d_plot_curve.erase(std::find(d_plot_curve.begin(), d_plot_curve.end(), d_ref_curves[name]));
 
 	QwtPlotCurve *curve = d_ref_curves[name];
-	int pos = countReferenceWaveform(curve);
+	d_ref_curves.remove(name);
+	int pos = 0;
+	for (int i = 0; i < d_plot_curve.size(); ++i)
+		if (isReferenceWaveform(Curve(i))) {
+			pos++;
+		}
 	d_ref_ydata.erase(d_ref_ydata.begin() + pos);
 	curve->detach();
 	delete curve;
 
-	d_ref_curves.remove(name);
 	d_nb_ref_curves--;
 }
 
@@ -1015,8 +1022,7 @@ bool TimeDomainDisplayPlot::unregisterSink(std::string sinkName)
 		d_ydata.erase(d_ydata.begin() + offset, d_ydata.begin() + offset + numChannels);
 
 		/* Remove the QwtPlotCurve */
-		int ref_offset = getCurveNextTo(offset);
-		ref_offset -= offset;
+		int ref_offset = countReferenceWaveform(offset);
 		for (int i = offset; i < offset + numChannels; i++) {
 			d_plot_curve[i + ref_offset]->detach();
 			delete d_plot_curve[i + ref_offset];

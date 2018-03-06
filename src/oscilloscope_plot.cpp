@@ -792,8 +792,7 @@ void CapturePlot::onChannelAdded(int chnIdx)
 		measure = new Measure(chnIdx, d_ref_ydata[idx],
 			Curve(chnIdx)->data()->size());
 	} else {
-		int count = countReferenceWaveform(Curve(chnIdx));
-		std::cout << count << std::endl;
+		int count = countReferenceWaveform(chnIdx);
 		measure = new Measure(chnIdx, d_ydata[chnIdx - count],
 			Curve(chnIdx)->data()->size());
 	}
@@ -872,7 +871,7 @@ void CapturePlot::onNewDataReceived()
 					Curve(chn)->data()->size());
 				ref_idx++;
 			} else {
-				int count = countReferenceWaveform(Curve(chn));
+				int count = countReferenceWaveform(chn);
 				measure->setDataSource(d_ydata[chn - count],
 					Curve(chn)->data()->size());
 			}
