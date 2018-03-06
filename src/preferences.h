@@ -59,6 +59,10 @@ public:
 	bool getDouble_click_to_detach() const;
 	void setDouble_click_to_detach(bool value);
 
+	bool getNa_show_zero() const;
+	void setNa_show_zero(bool value);
+
+
 Q_SIGNALS:
 
 	void notify();
@@ -76,6 +80,7 @@ private:
 	int sig_gen_periods_nr;
 	bool save_session_on_exit;
 	bool double_click_to_detach;
+	bool na_show_zero;
 
 	Preferences_API *pref_api;
 	QString getPreferenceIniFile() const;
@@ -90,6 +95,7 @@ class Preferences_API : public ApiObject
 	           setSigGenNrPeriods);
 	Q_PROPERTY(bool save_session_on_exit READ getSaveSession WRITE setSaveSession);
 	Q_PROPERTY(bool double_click_to_detach READ getDoubleClickToDetach WRITE setDoubleClickToDetach);
+	Q_PROPERTY(bool na_show_zero READ getNaShowZero WRITE setNaShowZero)
 
 public:
 
@@ -108,6 +114,9 @@ public:
 
 	bool getDoubleClickToDetach() const;
 	void setDoubleClickToDetach(const bool& enabled);
+
+	bool getNaShowZero() const;
+	void setNaShowZero(const bool& enabled);
 
 private:
 	Preferences *preferencePanel;
