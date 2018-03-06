@@ -70,6 +70,7 @@ namespace adiscope {
 		void setAxesTitles(const QString& x, const QString& y);
 
 		int getNumSamples() const;
+        void setShowZero(bool en);
 
 	const QColor& getColor() const;
 	QString xTitle() const;
