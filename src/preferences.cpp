@@ -73,6 +73,11 @@ Preferences::Preferences(QWidget *parent) :
 	connect(ui->resetBtn, &QPushButton::clicked, this,
 	        &Preferences::resetScopy);
 
+	connect(ui->na_zeroCheckBox, &QCheckBox::stateChanged, [=](int state) {
+		na_show_zero = (!state ? false : true);
+		Q_EMIT notify();
+	});
+
 	QString preference_ini_file = getPreferenceIniFile();
 	QSettings settings(preference_ini_file, QSettings::IniFormat);
 
@@ -104,6 +109,7 @@ void Preferences::showEvent(QShowEvent *event)
 	ui->oscLabelsCheckBox->setChecked(osc_labels_enabled);
 	ui->saveSessionCheckBox->setChecked(save_session_on_exit);
 	ui->doubleClickCheckBox->setChecked(double_click_to_detach);
+	ui->na_zeroCheckBox->setChecked(na_show_zero);
 
 	QWidget::showEvent(event);
 }
@@ -170,6 +176,16 @@ void Preferences::setOsc_labels_enabled(bool value)
 	osc_labels_enabled = value;
 }
 
+bool Preferences::getNa_show_zero() const
+{
+	return na_show_zero;
+}
+
+void Preferences::setNa_show_zero(bool value)
+{
+	na_show_zero = value;
+}
+
 bool Preferences_API::getOscLabelsEnabled() const
 {
 	return preferencePanel->osc_labels_enabled;
@@ -208,4 +224,14 @@ bool Preferences_API::getDoubleClickToDetach() const
 void Preferences_API::setDoubleClickToDetach(const bool &enabled)
 {
 	preferencePanel->double_click_to_detach = enabled;
+}
+
+bool Preferences_API::getNaShowZero() const
+{
+	return preferencePanel->na_show_zero;
+}
+
+void Preferences_API::setNaShowZero(const bool& enabled)
+{
+	preferencePanel->na_show_zero = enabled;
 }
