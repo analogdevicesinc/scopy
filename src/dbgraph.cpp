@@ -51,8 +51,7 @@ dBgraph::dBgraph(QWidget *parent) : QwtPlot(parent),
 	useLogFreq(false);
 
 	OscScaleEngine *scaleLeft = new OscScaleEngine;
-	scaleLeft->setMajorTicksCount(6);
-    scaleLeft->showZero(true);
+    scaleLeft->setMajorTicksCount(7);
 	this->setAxisScaleEngine(QwtPlot::yLeft,
 			static_cast<QwtScaleEngine *>(scaleLeft));
 
@@ -184,6 +183,18 @@ void dBgraph::plot(double x, double y)
 int dBgraph::getNumSamples() const
 {
 	return numSamples;
+}
+
+void dBgraph::setShowZero(bool en)
+{
+    OscScaleEngine *scaleLeft = new OscScaleEngine;
+    scaleLeft->setMajorTicksCount(7);
+    scaleLeft->showZero(en);
+
+    this->setAxisScaleEngine(QwtPlot::yLeft,
+            static_cast<QwtScaleEngine *>(scaleLeft));
+
+    replot();
 }
 
 void dBgraph::setNumSamples(int num)

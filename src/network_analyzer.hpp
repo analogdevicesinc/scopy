@@ -106,6 +106,7 @@ namespace adiscope {
         void toggleCursors(bool en);
         void onVbar1PixelPosChanged(int pos);
         void onVbar2PixelPosChanged(int pos);
+        void readPreferences();
 
 	Q_SIGNALS:
 		void sweepDone();

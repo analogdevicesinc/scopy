@@ -196,6 +196,10 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
     connect(ui->checkBox,SIGNAL(toggled(bool)),
             SLOT(toggleCursors(bool)));
 
+    connect(prefPanel,&Preferences::notify,this,&NetworkAnalyzer::readPreferences);
+
+    readPreferences();
+
 	api->setObjectName(QString::fromStdString(Filter::tool_name(
 			TOOL_NETWORK_ANALYZER)));
 
@@ -207,6 +211,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
 NetworkAnalyzer::~NetworkAnalyzer()
 {
+    disconnect(prefPanel,&Preferences::notify,this,&NetworkAnalyzer::readPreferences);
 	ui->run_button->setChecked(false);
 	if (saveOnExit) {
 		api->save(*settings);
@@ -637,6 +642,12 @@ void NetworkAnalyzer::toggleCursors(bool en)
         d_hCursorHandle1->setVisible(en);
         d_hCursorHandle2->setVisible(en);
     }
+}
+
+void NetworkAnalyzer::readPreferences()
+{
+    m_dBgraph.setShowZero(prefPanel->getNa_show_zero());
+    m_phaseGraph.setShowZero(prefPanel->getNa_show_zero());
 }
 
 double NetworkAnalyzer_API::getMinFreq() const
