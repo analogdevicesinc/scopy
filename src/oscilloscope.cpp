@@ -2820,6 +2820,9 @@ void Oscilloscope::update_chn_settings_panel(int id)
 	if (chn_widget->isMathChannel() || chn_widget->isReferenceChannel()) {
 		ch_ui->probe_attenuation->setVisible(false);
 		ch_ui->probe_label->setVisible(false);
+		ch_ui->label_3->setVisible(false);
+		ch_ui->cmbMemoryDepth->setVisible(false);
+		ch_ui->btnAutoset->setVisible(false);
 	} else {
 		int index = 0;
 		double value = probe_attenuation[id];
@@ -2831,6 +2834,9 @@ void Oscilloscope::update_chn_settings_panel(int id)
 		ch_ui->probe_attenuation->setCurrentIndex(index);
 		ch_ui->probe_attenuation->setVisible(true);
 		ch_ui->probe_label->setVisible(true);
+		ch_ui->label_3->setVisible(true);
+		ch_ui->cmbMemoryDepth->setVisible(true);
+		ch_ui->btnAutoset->setVisible(true);
 	}
 
 	voltsPerDiv->setDisplayScale(probe_attenuation[id]);
