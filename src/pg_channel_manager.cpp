@@ -1786,6 +1786,12 @@ void PatternGeneratorChannelManagerUI::triggerUpdateUi()
 {
 	updateUi();
 }
+void PatternGeneratorChannelManagerUI::triggerUpdateUiNoSettings()
+{
+	pg->suppressCGSettingsUpdate = true;
+	updateUi();
+	pg->suppressCGSettingsUpdate = false;
+}
 
 void PatternGeneratorChannelManagerUI::highlightChannel(
         PatternGeneratorChannelGroup *chg,

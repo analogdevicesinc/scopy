@@ -304,6 +304,7 @@ private Q_SLOTS:
 	void chmRangeChanged(int min, int max);
 public Q_SLOTS:
 	void triggerUpdateUi();
+	void triggerUpdateUiNoSettings();
 
 };
 

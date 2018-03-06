@@ -148,7 +148,7 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 	pgSettings(new Ui::PGSettings),
 	cgSettings(new Ui::PGCGSettings),
 	txbuf(0), buffer_created(0), currentUI(nullptr), offline_mode(offline_mode_),
-	diom(diom)
+	diom(diom), suppressCGSettingsUpdate(false)
 {
 	// IIO
 	if (!offline_mode) {
@@ -423,6 +423,8 @@ void PatternGenerator::enableCgSettings(bool en)
 
 void PatternGenerator::updateCGSettings()
 {
+	if(suppressCGSettingsUpdate)
+		return;
 	auto chg = chm.getHighlightedChannelGroup();
 	auto ch = chm.getHighlightedChannel();
 
@@ -580,7 +582,7 @@ void PatternGenerator::createSettingsWidget()
 	currentUI->post_load_ui();
 	currentUI->setVisible(true);
 
-	connect(currentUI,SIGNAL(decoderChanged()),chmui,SLOT(triggerUpdateUi()));
+	connect(currentUI,SIGNAL(decoderChanged()),chmui,SLOT(triggerUpdateUiNoSettings()));
 
 	if (chg->is_enabled()) {
 		enableBufferUpdates(true);
