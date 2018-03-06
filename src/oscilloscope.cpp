@@ -1242,10 +1242,21 @@ void Oscilloscope::create_add_channel_panel()
 	QLineEdit *fileLineEdit = new QLineEdit(ref);
 
 	QWidget *file_select = new QWidget(ref);
-	QHBoxLayout *layout_file_select = new QHBoxLayout(file_select);
+	QVBoxLayout *layout_file_select = new QVBoxLayout(file_select);
 	layout_file_select->addWidget(fileLineEdit);
 	QPushButton *btnOpenFile = new QPushButton(file_select);
-	btnOpenFile->setIcon(QIcon(":/icons/floppy_hover.svg"));
+	btnOpenFile->setStyleSheet("QPushButton{"
+				   "height:25px;"
+				   "background-color: #4A64FF;"
+				   "border-radius: 4px;"
+				   "font-family: Arial;"
+				   "font-size: 12px;"
+				   "line-height: 14px;"
+				   "color: #FFFFFF;}"
+				   "QPushButton:hover{"
+					"background-color: #4a34ff;"
+				   "}");
+	btnOpenFile->setText("Browse");
 	layout_file_select->addWidget(btnOpenFile);
 
 	layout_ref->addWidget(file_select);
