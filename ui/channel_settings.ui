@@ -335,6 +335,10 @@ QPushButton:pressed {
 
 QPushButton:disabled {
   background-color:  #727273;
+}
+
+QPushButton:hover {
+	background-color: #4a34ff;
 }</string>
               </property>
               <property name="text">
@@ -868,9 +872,12 @@ Attenuation</string>
   color: #ffffff;
 }
 
-QPushButton:hover
-{
-	 background-color: #4a34ff;
+QPushButton:pressed {
+  background-color: #2a44df;
+}
+
+QPushButton:hover {
+	background-color: #4a34ff;
 }</string>
          </property>
          <property name="text">
