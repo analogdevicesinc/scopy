@@ -767,9 +767,9 @@ QPushButton:disabled {
          <property name="geometry">
           <rect>
            <x>0</x>
-           <y>0</y>
-           <width>155</width>
-           <height>861</height>
+           <y>-116</y>
+           <width>141</width>
+           <height>889</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -1272,15 +1272,20 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
                   </size>
                  </property>
                  <property name="styleSheet">
-                  <string notr="true">height:25px;
+                  <string notr="true">QPushButton{
+height:25px;
 background-color: #4A64FF;
 border-radius: 4px;
 
 font-family: Arial;
 font-size: 12px;
-font-weight: bold;
 line-height: 14px;
-color: #FFFFFF;</string>
+color: #FFFFFF;
+}
+QPushButton:hover
+{
+         background-color: #4a34ff;
+}</string>
                  </property>
                  <property name="text">
                   <string>Reset</string>
@@ -1425,7 +1430,7 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
               <number>0</number>
              </property>
              <item row="5" column="0" colspan="2">
-              <layout class="QHBoxLayout" name="horizontalLayout_10">
+              <layout class="QVBoxLayout" name="verticalLayout_7">
                <property name="spacing">
                 <number>3</number>
                </property>
@@ -1451,7 +1456,7 @@ border-color: grey;
                <item>
                 <widget class="QPushButton" name="btnChooseFile">
                  <property name="sizePolicy">
-                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                    <horstretch>0</horstretch>
                    <verstretch>0</verstretch>
                   </sizepolicy>
@@ -1459,18 +1464,30 @@ border-color: grey;
                  <property name="minimumSize">
                   <size>
                    <width>20</width>
-                   <height>20</height>
+                   <height>25</height>
                   </size>
                  </property>
                  <property name="layoutDirection">
                   <enum>Qt::LeftToRight</enum>
                  </property>
-                 <property name="text">
-                  <string/>
+                 <property name="styleSheet">
+                  <string notr="true">QPushButton{
+height:25px;
+background-color: #4A64FF;
+border-radius: 4px;
+
+font-family: Arial;
+font-size: 12px;
+line-height: 14px;
+color: #FFFFFF;
+}
+QPushButton:hover
+{
+         background-color: #4a34ff;
+}</string>
                  </property>
-                 <property name="icon">
-                  <iconset resource="../resources/resources.qrc">
-                   <normaloff>:/icons/floppy_hover.svg</normaloff>:/icons/floppy_hover.svg</iconset>
+                 <property name="text">
+                  <string>Browse</string>
                  </property>
                  <property name="iconSize">
                   <size>
@@ -1661,7 +1678,7 @@ border-color: grey;
   </connection>
  </connections>
  <buttongroups>
-  <buttongroup name="buttonGroup"/>
   <buttongroup name="buttonGroup_2"/>
+  <buttongroup name="buttonGroup"/>
  </buttongroups>
 </ui>
