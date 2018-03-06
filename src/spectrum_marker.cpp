@@ -62,9 +62,9 @@ void SpectrumMarker::setSelected(bool on)
 
 		QBrush brush = symbol()->brush();
 		if (on) {
-			brush.setColor(symbol()->pen().color());
-		} else {
 			brush.setColor(defaultColor());
+		} else {
+			brush.setColor(symbol()->pen().color());
 		}
 
 		QwtSymbol *new_sym = new QwtSymbol(symbol()->style(),
@@ -115,6 +115,7 @@ QRect SpectrumMarker::boundingRectPixels() const
 {
 	QPoint markerPixPos = plotValueToPixels(value());
 	QRect symbolRect = symbol()->boundingRect();
+
 
 	return QRect(symbolRect.topLeft() + markerPixPos, symbolRect.size());
 }

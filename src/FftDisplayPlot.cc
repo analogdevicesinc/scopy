@@ -74,7 +74,6 @@ FftDisplayPlot::FftDisplayPlot(int nplots, QWidget *parent) :
 {
 	// TO DO: Add more colors
 	d_markerColors << QColor(255, 242, 0) << QColor(210, 155, 210);
-
 	d_zoomer.push_back(nullptr);
 
 	for (unsigned int i = 0; i < nplots; i++) {
@@ -618,14 +617,15 @@ void FftDisplayPlot::add_marker(int chn)
 	auto gui_marker = std::make_shared<SpectrumMarker>(markerName);
 	QColor marker_color = d_markerColors[chn % d_markerColors.size()];
 	QwtSymbol *symbol = new QwtSymbol(
-		QwtSymbol::Diamond, marker_color,
-		QPen(QColor(237, 28, 36), 2, Qt::SolidLine),
+		QwtSymbol::Diamond, QColor(237, 28, 36),
+		QPen(marker_color, 2, Qt::SolidLine),
 		QSize(18, 18));
 	symbol->setSize(18, 18);
+
 	gui_marker->setSymbol(symbol);
 	gui_marker->setLabel(gui_marker->title());
 	gui_marker->setLabelAlignment(Qt::AlignTop);
-	gui_marker->setDefaultColor(marker_color);
+	gui_marker->setDefaultColor(QColor(237, 28, 36));
 	gui_marker->attach(this);
 
 	QwtText mrk_lbl = gui_marker->label();
