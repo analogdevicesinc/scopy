@@ -149,6 +149,7 @@ void ExportSettings::disableUIMargins()
 void ExportSettings::setTitleLabelVisible(bool enabled)
 {
 	ui->label->setVisible(enabled);
+	ui->line->setVisible(enabled);
 }
 
 void ExportSettings::setExportAllButtonLabel(const QString& text)
