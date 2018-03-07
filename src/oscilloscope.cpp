@@ -436,14 +436,14 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	ch_ui->btnAutoset->setEnabled(false);
 	connect(ui->pushButtonRunStop, SIGNAL(toggled(bool)),
 		ch_ui->btnAutoset,SLOT(setEnabled(bool)));
-	connect(ui->pushButtonRunStop, SIGNAL(toggled(bool)), this,
-			SLOT(runStopToggled(bool)));
-	connect(ui->pushButtonSingle, SIGNAL(toggled(bool)), this,
-			SLOT(runStopToggled(bool)));
 	connect(runButton, SIGNAL(toggled(bool)), ui->pushButtonRunStop,
 			SLOT(setChecked(bool)));
 	connect(ui->pushButtonRunStop, SIGNAL(toggled(bool)), runButton,
 			SLOT(setChecked(bool)));
+	connect(ui->pushButtonRunStop, SIGNAL(toggled(bool)), this,
+			SLOT(runStopToggled(bool)));
+	connect(ui->pushButtonSingle, SIGNAL(toggled(bool)), this,
+			SLOT(runStopToggled(bool)));
 	connect(this, SIGNAL(isRunning(bool)), runButton,
 			SLOT(setChecked(bool)));
 
