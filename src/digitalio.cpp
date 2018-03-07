@@ -380,6 +380,27 @@ QList<bool> DigitalIO_API::output() const
 	return list;
 }
 
+QList<bool> DigitalIO_API::gpi() const
+{
+	QList<bool> list;
+	unsigned int i;
+	for (i = 0; i < 16; i++) {
+		auto GPI = dio->diom->getGpi() & (1 << i);
+		list.append(GPI);
+	}
+	return list;
+}
+
+bool DigitalIO_API::running() const
+{
+	return dio->ui->btnRunStop->isChecked();
+}
+
+void DigitalIO_API::run(bool en)
+{
+	dio->ui->btnRunStop->setChecked(en);
+}
+
 void DigitalIO_API::setOutput(const QList<bool>& list)
 {
 	unsigned int i;
