@@ -589,7 +589,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 			plot.setDisplayScale(probe_attenuation[current_ch_widget]);
 		}
 
-		for (int i = 0; i < nb_channels + nb_math_channels; ++i) {
+		for (int i = 0; i < nb_channels + nb_math_channels + nb_ref_channels; ++i) {
 			QLabel *label = static_cast<QLabel *>(
 						ui->chn_scales->itemAt(i)->widget());
 			double value = probe_attenuation[i] * plot.VertUnitsPerDiv(i);
@@ -622,7 +622,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 
 	plot.setDisplayScale(probe_attenuation[current_channel]);
 	onTriggerSourceChanged(trigger_settings.currentChannel());
-	for (int i = 0; i < nb_channels + nb_math_channels; ++i) {
+	for (int i = 0; i < nb_channels + nb_math_channels + nb_ref_channels; ++i) {
 		QLabel *label = static_cast<QLabel *>(
 					ui->chn_scales->itemAt(i)->widget());
 		double value = probe_attenuation[i] * plot.VertUnitsPerDiv(i);
@@ -810,8 +810,9 @@ Oscilloscope::~Oscilloscope()
 
 void Oscilloscope::settingsLoaded()
 {
-	for (int i = 0; i < nb_channels + nb_math_channels; ++i)
-		if (channelWidgetAtId(i)->menuButton()->isChecked()) {
+	for (int i = 0; i < nb_channels + nb_math_channels + nb_ref_channels; ++i)
+		if (channelWidgetAtId(i)->menuButton()->isChecked() &&
+				!channelWidgetAtId(i)->isReferenceChannel()) {
 			current_ch_widget = i;
 			break;
 		}
@@ -1396,7 +1397,7 @@ unsigned int Oscilloscope::find_curve_number()
 	do {
 		found = false;
 
-		for (unsigned int i = 0; !found && i < nb_math_channels; i++) {
+		for (unsigned int i = 0; !found && i < (nb_math_channels + nb_ref_channels); i++) {
 			QWidget *parent = ui->channelsList->itemAt(nb_channels + i)->widget();
 
 			ChannelWidget *cw = static_cast<ChannelWidget *>(parent);
@@ -1741,8 +1742,15 @@ void Oscilloscope::onChannelWidgetDeleteClicked()
 
 void Oscilloscope::clearMathChannels()
 {
-	while (nb_math_channels)
-		channelWidgetAtId(2)->deleteButton()->click();
+	int idx = 2;
+	while (nb_math_channels) {
+		if (!channelWidgetAtId(idx)->isReferenceChannel()) {
+			channelWidgetAtId(idx)->deleteButton()->click();
+		} else {
+			idx++;
+		}
+
+	}
 }
 
 void Oscilloscope::on_actionClose_triggered()
@@ -4114,7 +4122,7 @@ QList<QString> Oscilloscope_API::getMathChannels() const
 {
 	QList<QString> list;
 
-	for (unsigned int i = 0; i < osc->nb_math_channels; i++) {
+	for (unsigned int i = 0; i < osc->nb_math_channels + osc->nb_ref_channels; i++) {
 		QWidget *obj = osc->ui->channelsList->itemAt(
 		                       osc->nb_channels + i)->widget();
 		ChannelWidget *cw = static_cast<ChannelWidget *>(obj);
