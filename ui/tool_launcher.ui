@@ -289,7 +289,7 @@ color: rgb(255, 255, 255);
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>180</width>
+            <width>200</width>
             <height>440</height>
            </rect>
           </property>
@@ -375,7 +375,7 @@ color: rgb(255, 255, 255);
          </property>
          <property name="sizeHint" stdset="0">
           <size>
-           <width>180</width>
+           <width>200</width>
            <height>20</height>
           </size>
          </property>
