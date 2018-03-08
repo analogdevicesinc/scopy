@@ -72,6 +72,7 @@ Q_SIGNALS:
 	void highlight(bool, int);
 	void enableInfoWidget(bool);
 	void changeText(QString);
+	void detach(int);
 
 private Q_SLOTS:
 	void mousePressEvent(QMouseEvent *event) override;

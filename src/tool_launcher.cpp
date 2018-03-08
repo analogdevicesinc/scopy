@@ -466,6 +466,8 @@ void ToolLauncher::generateMenu()
 				SLOT(enable(bool)));
 		connect(toolMenu[tools[i]], SIGNAL(changeText(QString)), infoWidget,
 				SLOT(setText(QString)));
+		connect(toolMenu[tools[i]], SIGNAL(detach(int)), this,
+				SLOT(detachToolOnPosition(int)));
 	}
 }
 

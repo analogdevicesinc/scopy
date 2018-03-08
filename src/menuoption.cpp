@@ -75,10 +75,12 @@ MenuOption::MenuOption(QString toolName, QString iconPath,
 	}
 
 	this->installEventFilter(this);
+	getToolBtn()->installEventFilter(this);
 }
 
 MenuOption::~MenuOption()
 {
+	getToolBtn()->installEventFilter(this);
 	this->removeEventFilter(this);
 	delete ui;
 }
@@ -306,6 +308,25 @@ bool MenuOption::eventFilter(QObject *watched, QEvent *event)
 		QDragEnterEvent *enterEvent = static_cast<QDragEnterEvent *>(event);
 		if (!enterEvent->mimeData()->hasFormat("menu/option"))
 			return true;
+	}
+
+	if (event->type() == QEvent::MouseButtonDblClick) {
+		QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
+		if (mouseEvent->button() == Qt::LeftButton) {
+			Q_EMIT detach(this->position);
+			return true;
 		}
-	return QWidget::event(event);
+	}
+
+	return QObject::event(event);
+}
+
+int MenuOption::getMaxMenuElements() const
+{
+	return maxMenuElements;
+}
+
+void MenuOption::setMaxMenuElements(int value)
+{
+	maxMenuElements = value;
 }
