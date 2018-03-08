@@ -28,7 +28,8 @@ MenuOption::MenuOption(QString toolName, QString iconPath,
 	usesCustomBtn(usesCustomBtn),
 	botSep(nullptr),
 	topSep(nullptr),
-	detached(false)
+	detached(false),
+	maxMenuElements(8)
 {
 	ui->setupUi(this);
 	ui->toolBtn->setText(toolName);
@@ -60,7 +61,7 @@ MenuOption::MenuOption(QString toolName, QString iconPath,
 	topSep->setSizePolicy(sp_retainTopSep);
 	topSep->setVisible(false);
 
-	if (position == 8){
+	if (position == maxMenuElements){
 		botSep = new QFrame(this);
 		botSep->setFrameShadow(QFrame::Plain);
 		botSep->setLineWidth(1);
@@ -96,7 +97,7 @@ QPushButton *MenuOption::getToolStopBtn()
 void MenuOption::setPosition(int position)
 {
 	this->position = position;
-	if (position != 8){
+	if (position != maxMenuElements){
 		if (botSep != nullptr){
 			ui->verticalLayout->removeWidget(botSep);
 			delete botSep;
@@ -140,6 +141,9 @@ bool MenuOption::isDetached()
 
 void MenuOption::highlightBotSeparator(bool on)
 {
+	if (!botSep)
+		return;
+
 	botSep->setVisible(on);
 }
 
@@ -221,7 +225,7 @@ void MenuOption::dragMoveEvent(QDragMoveEvent *event)
 		highlightTopSeparator();
 		event->accept();
 	} else if (event->answerRect().intersects(botDragbox) &&
-				this->position == 8){
+				this->position == maxMenuElements){
 			disableSeparatorsHighlight();
 			highlightBotSeparator();
 			event->accept();

@@ -57,6 +57,16 @@ void DragZone::dropEvent(QDropEvent *event)
 	}
 }
 
+int DragZone::getPosition() const
+{
+	return position;
+}
+
+void DragZone::setPosition(int value)
+{
+	position = value;
+}
+
 bool DragZone::eventFilter(QObject *watched, QEvent *event)
 {
 	if (event->type() == QEvent::DragEnter){

@@ -22,6 +22,9 @@ public:
 
 	bool eventFilter(QObject *watched, QEvent *event);
 
+	int getPosition() const;
+	void setPosition(int value);
+
 Q_SIGNALS:
 	void requestPositionChange(int, int, bool);
 	void highlightLastSeparator(bool);

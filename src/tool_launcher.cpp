@@ -470,9 +470,23 @@ void ToolLauncher::generateMenu()
 }
 
 void ToolLauncher::insertMenuOptions(){
+
+	if (debugger_enabled) {
+		for (auto &option : toolMenu) {
+			option->setMaxMenuElements(
+						option->getMaxMenuElements() + 1);
+		}
+	}
+
+	int offset = 0;
 	for (int i = 0; i < position.size(); ++i){
-		ui->menuOptionsLayout->insertWidget(i, toolMenu[tools[position[i]]]);
-		toolMenu[tools[position[i]]]->setPosition(i);
+		if (toolMenu[tools[position[i]]]->getName() == "Debugger"
+				&& !debugger_enabled) {
+			offset = 1;
+			continue;
+		}
+		ui->menuOptionsLayout->insertWidget(i - offset, toolMenu[tools[position[i]]]);
+		toolMenu[tools[position[i]]]->setPosition(i - offset);
 		ui->buttonGroup_2->addButton(toolMenu[tools[position[i]]]->getToolBtn());
 	}
 
@@ -484,6 +498,7 @@ void ToolLauncher::insertMenuOptions(){
 		SLOT(highlightLast(bool)));
 
 	toolMenu["Debugger"]->setVisible(debugger_enabled);
+	dragZone->setPosition(ui->menuOptionsLayout->count() - 2);
 }
 
 void ToolLauncher::highlightLast(bool on){
@@ -1362,7 +1377,7 @@ void ToolLauncher::closeEvent(QCloseEvent *event)
 
 void ToolLauncher::swapMenuOptions(int source, int destination, bool dropAfter)
 {
-	int menuSize = ui->menuOptionsLayout->count();
+	int menuSize = toolMenu["Digital IO"]->getMaxMenuElements() + 1;
 
 	QWidget *sourceWidget = ui->menuOptionsLayout->itemAt(source)->widget();
 	if (dropAfter == true){

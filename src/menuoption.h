@@ -40,11 +40,16 @@ public:
 
 	void paintEvent(QPaintEvent *pe);
 	bool eventFilter(QObject *watched, QEvent *event);
+
+	int getMaxMenuElements() const;
+	void setMaxMenuElements(int value);
+
 private:
 
 	bool detached;
 	int position;
 	QString toolName;
+	int maxMenuElements;
 
 	QPoint dragStartPosition;
 
