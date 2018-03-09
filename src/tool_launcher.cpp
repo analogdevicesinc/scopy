@@ -90,8 +90,8 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 		<< ":/menu/io.png"
 		<< ":/menu/voltmeter.png"
 		<< ":/menu/power_supply.png"
-		<< ":/menu/spectrum_analyzer.png"
-		<< ":/menu/spectrum_analyzer.png";
+		<< ":/menu/debugger.png"
+		<< ":/menu/calibration.png";
 
 	for (int i = 0; i < tools.size(); i++)
 		position.push_back(i);
