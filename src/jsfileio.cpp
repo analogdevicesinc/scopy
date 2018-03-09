@@ -28,3 +28,33 @@ void JsFileIo::appendToFile(const QString& data, const QString& path)
 		stream << data;
 	}
 }
+
+QString JsFileIo::readAll(const QString& path)
+{
+	QFile file(path);
+	QString data;
+
+	if (file.open(QIODevice::ReadOnly)) {
+		QTextStream stream(&file);
+		data = stream.readAll();
+	}
+	return data;
+}
+
+QString JsFileIo::readLine(const QString& path, const int lineNumber)
+{
+	QFile file(path);
+	int i = 0;
+	QString data;
+
+	if (file.open(QIODevice::ReadOnly)) {
+		QTextStream stream(&file);
+		while( i <= lineNumber ){
+			data = stream.readLine();
+			if(stream.atEnd())
+				break;
+			i++;
+		}
+	}
+	return data;
+}
