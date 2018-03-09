@@ -44,12 +44,15 @@ public:
 	int getMaxMenuElements() const;
 	void setMaxMenuElements(int value);
 
+	void enableDoubleClick(bool enabled);
+
 private:
 
 	bool detached;
 	int position;
 	QString toolName;
 	int maxMenuElements;
+	bool doubleClickEnabled;
 
 	QPoint dragStartPosition;
 

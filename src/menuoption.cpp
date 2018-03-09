@@ -29,7 +29,8 @@ MenuOption::MenuOption(QString toolName, QString iconPath,
 	botSep(nullptr),
 	topSep(nullptr),
 	detached(false),
-	maxMenuElements(8)
+	maxMenuElements(8),
+	doubleClickEnabled(false)
 {
 	ui->setupUi(this);
 	ui->toolBtn->setText(toolName);
@@ -75,12 +76,13 @@ MenuOption::MenuOption(QString toolName, QString iconPath,
 	}
 
 	this->installEventFilter(this);
-	getToolBtn()->installEventFilter(this);
 }
 
 MenuOption::~MenuOption()
 {
-	getToolBtn()->installEventFilter(this);
+	if (doubleClickEnabled) {
+		getToolBtn()->installEventFilter(this);
+	}
 	this->removeEventFilter(this);
 	delete ui;
 }
@@ -329,4 +331,15 @@ int MenuOption::getMaxMenuElements() const
 void MenuOption::setMaxMenuElements(int value)
 {
 	maxMenuElements = value;
+}
+
+void MenuOption::enableDoubleClick(bool enabled)
+{
+	if (enabled) {
+		getToolBtn()->installEventFilter(this);
+		doubleClickEnabled = true;
+	} else {
+		getToolBtn()->removeEventFilter(this);
+		doubleClickEnabled = false;
+	}
 }
