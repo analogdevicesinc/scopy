@@ -108,8 +108,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	crt_peak(0),
 	max_peak_count(10),
 	fft_size(32768),
-	bin_sizes(
-{
+	bin_sizes({
 	256, 512, 1024, 2048, 4096, 8192, 16384, 32768
 })
 {
@@ -350,6 +349,7 @@ SpectrumAnalyzer::~SpectrumAnalyzer()
 	if (saveOnExit) {
 		api->save(*settings);
 	}
+
 	delete api;
 
 	if (iio) {
@@ -664,7 +664,7 @@ void SpectrumAnalyzer::onChannelSelected(bool en)
 	if (en) {
 		ui->labelMarkerSettingsTitle->setText(cw->fullName());
 		QString stylesheet = QString("border: 2px solid %1"
-						).arg(cw->color().name());
+		                            ).arg(cw->color().name());
 		ui->lineMarkerSettingsTitle->setStyleSheet(stylesheet);
 
 
@@ -1439,12 +1439,19 @@ void SpectrumMarker_API::setMkId(int val)
 
 int SpectrumMarker_API::type()
 {
-//	return sp->fft_plot->markerType(m_chid,m_mkid);
+	if (sp->fft_plot->markerEnabled(m_chid,m_mkid)) {
+		return sp->fft_plot->markerType(m_chid,m_mkid);
+	}
+
 }
 
 void SpectrumMarker_API::setType(int val)
 {
-	//sp->fft_plot->
+	m_type = val;
+
+	if (m_type == 1) { //if type is peak
+		sp->fft_plot->marker_to_max_peak(m_chid, m_mkid);
+	}
 }
 
 double SpectrumMarker_API::freq()
@@ -1459,7 +1466,10 @@ double SpectrumMarker_API::freq()
 void SpectrumMarker_API::setFreq(double pos)
 {
 	if (sp->fft_plot->markerEnabled(m_chid,m_mkid)) {
-		sp->fft_plot->setMarkerAtFreq(m_chid,m_mkid,pos);
+		if (m_type != 1) { //if type is not peak
+			sp->fft_plot->setMarkerAtFreq(m_chid,m_mkid,pos);
+		}
+
 		//sp->crt_channel_id=m_chid;
 		sp->updateWidgetsRelatedToMarker(m_mkid);
 		sp->fft_plot->updateMarkerUi(m_chid, m_mkid);
@@ -1470,7 +1480,13 @@ void SpectrumMarker_API::setFreq(double pos)
 			sp->marker_selector->blockSignals(false);
 		}
 
+		if (m_type != 1) { //if type is not peak
+			sp->ui->markerTable->updateMarker(m_mkid, m_chid,
+			                                  sp->fft_plot->markerFrequency(m_chid, m_mkid),
+			                                  sp->fft_plot->markerMagnutide(m_chid, m_mkid),
+			                                  sp->markerTypes[m_type]);
 
+		}
 	}
 }
 
@@ -1482,9 +1498,16 @@ bool SpectrumMarker_API::enabled()
 void SpectrumMarker_API::setEnabled(bool en)
 {
 	sp->fft_plot->setMarkerEnabled(m_chid,m_mkid,en);
-	//sp->crt_channel_id=m_chid;
 	sp->updateWidgetsRelatedToMarker(m_mkid);
 	sp->fft_plot->updateMarkerUi(m_chid, m_mkid);
+
+	if (en) {
+		sp->ui->markerTable->addMarker(m_mkid,m_chid, QString("M%1").arg(m_mkid + 1),
+		                               0,
+		                               0,
+		                               sp->markerTypes[0]);
+	}
+
 
 }
 
