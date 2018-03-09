@@ -33,9 +33,15 @@ Preferences::Preferences(QWidget *parent) :
 	ui(new Ui::Preferences),
 	sig_gen_periods_nr(2),
 	save_session_on_exit(true),
+	double_click_to_detach(false),
 	pref_api(new Preferences_API(this))
 {
 	ui->setupUi(this);
+
+	connect(ui->doubleClickCheckBox, &QCheckBox::stateChanged, [=](int state){
+		double_click_to_detach = (!state ? false : true);
+		Q_EMIT notify();
+	});
 
 	connect(ui->oscLabelsCheckBox, &QCheckBox::stateChanged, [=](int state) {
 		osc_labels_enabled = (!state ? false : true);
@@ -97,6 +103,7 @@ void Preferences::showEvent(QShowEvent *event)
 	ui->sigGenNrPeriods->setText(QString::number(sig_gen_periods_nr));
 	ui->oscLabelsCheckBox->setChecked(osc_labels_enabled);
 	ui->saveSessionCheckBox->setChecked(save_session_on_exit);
+	ui->doubleClickCheckBox->setChecked(double_click_to_detach);
 
 	QWidget::showEvent(event);
 }
@@ -121,6 +128,16 @@ void Preferences::resetScopy()
 	if (ret == QMessageBox::Ok) {
 		Q_EMIT reset();
 	}
+}
+
+bool Preferences::getDouble_click_to_detach() const
+{
+	return double_click_to_detach;
+}
+
+void Preferences::setDouble_click_to_detach(bool value)
+{
+	double_click_to_detach = value;
 }
 
 bool Preferences::getSave_session_on_exit() const
@@ -181,4 +198,14 @@ bool Preferences_API::getSaveSession() const
 void Preferences_API::setSaveSession(const bool& enabled)
 {
 	preferencePanel->save_session_on_exit = enabled;
+}
+
+bool Preferences_API::getDoubleClickToDetach() const
+{
+	return preferencePanel->double_click_to_detach;
+}
+
+void Preferences_API::setDoubleClickToDetach(const bool &enabled)
+{
+	preferencePanel->double_click_to_detach = enabled;
 }

@@ -56,6 +56,9 @@ public:
 	bool getSave_session_on_exit() const;
 	void setSave_session_on_exit(bool value);
 
+	bool getDouble_click_to_detach() const;
+	void setDouble_click_to_detach(bool value);
+
 Q_SIGNALS:
 
 	void notify();
@@ -72,6 +75,7 @@ private:
 	bool osc_labels_enabled;
 	int sig_gen_periods_nr;
 	bool save_session_on_exit;
+	bool double_click_to_detach;
 
 	Preferences_API *pref_api;
 	QString getPreferenceIniFile() const;
@@ -85,6 +89,7 @@ class Preferences_API : public ApiObject
 	Q_PROPERTY(int sig_gen_nr_periods READ getSigGenNrPeriods WRITE
 	           setSigGenNrPeriods);
 	Q_PROPERTY(bool save_session_on_exit READ getSaveSession WRITE setSaveSession);
+	Q_PROPERTY(bool double_click_to_detach READ getDoubleClickToDetach WRITE setDoubleClickToDetach);
 
 public:
 
@@ -100,6 +105,9 @@ public:
 
 	bool getSaveSession() const;
 	void setSaveSession(const bool& enabled);
+
+	bool getDoubleClickToDetach() const;
+	void setDoubleClickToDetach(const bool& enabled);
 
 private:
 	Preferences *preferencePanel;
