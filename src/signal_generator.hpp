@@ -241,6 +241,7 @@ private Q_SLOTS:
 	void frequencyChanged(double val);
 	void dutyChanged(double val);
 	void phaseChanged(double val);
+	void phaseIndexChanged();
 	void noiseAmplitudeChanged(double val);
 	void noiseTypeChanged(int val);
 	void trapezoidalComputeFrequency();

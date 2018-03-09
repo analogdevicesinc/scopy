@@ -125,6 +125,7 @@ struct adiscope::signal_generator_data {
 	float offset;
 	double frequency;
 	double phase;
+	int indexValue;
 	double dutycycle;
 	enum sg_waveform waveform;
 
@@ -398,16 +399,17 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 		auto ptr = QSharedPointer<signal_generator_data>(
 		                   new signal_generator_data);
 		ptr->iio_ch = chn;
-		ptr->amplitude = amplitude->value();
-		ptr->offset = offset->value();
-		ptr->frequency = frequency->value();
-		ptr->constant = constantValue->value();
-		ptr->phase = phase->value();
-		ptr->holdh = holdHighTime->value();
-		ptr->holdl = holdLowTime->value();
-		ptr->rise = riseTime->value();
-		ptr->fall = fallTime->value();
-		ptr->dutycycle = dutycycle->value();
+		ptr->amplitude = ui->amplitude->value();
+		ptr->offset = ui->offset->value();
+		ptr->frequency = ui->frequency->value();
+		ptr->constant = ui->constantValue->value();
+		ptr->phase = ui->phase->value();
+		ptr->indexValue = ui->phase->indexValue();
+		ptr->holdh = ui->holdHighTime->value();
+		ptr->holdl = ui->holdLowTime->value();
+		ptr->rise = ui->riseTime->value();
+		ptr->fall = ui->fallTime->value();
+		ptr->dutycycle = ui->dutycycle->value();
 		ptr->waveform = SG_SIN_WAVE;
 		ptr->math_freq = mathFrequency->value();
 		ptr->noiseType = (gr::analog::noise_type_t)0;
@@ -803,6 +805,7 @@ void SignalGenerator::frequencyChanged(double value)
 		if(ui->phase->inSeconds()) {
 			ui->phase->setFrequency(value);
 			ptr->phase = ui->phase->value();
+			ptr->indexValue = ui->phase->indexValue();
 		}
 		ptr->frequency = value;
 		resetZoom();
@@ -906,8 +909,16 @@ void SignalGenerator::phaseChanged(double value)
 
 	if (ptr->phase != value) {
 		ptr->phase = value;
+		ptr->indexValue = ui->phase->indexValue();
 		resetZoom();
 	}
+}
+
+void SignalGenerator::phaseIndexChanged()
+{
+	auto ptr = getCurrentData();
+
+	ptr->indexValue = ui->phase->indexValue();
 }
 
 void SignalGenerator::waveformUpdateUi(int val)
@@ -1810,6 +1821,7 @@ void adiscope::SignalGenerator::triggerRightMenuToggle(int chIdx, bool checked)
 		menuButtonActions.enqueue(
 		        QPair<int, bool>(chIdx, checked));
 	} else {
+		phaseIndexChanged();
 		updateAndToggleMenu(chIdx, checked);
 	}
 }
@@ -1864,12 +1876,21 @@ void SignalGenerator::updateRightMenuForChn(int chIdx)
 {
 	auto ptr = getData(channels[chIdx]);
 
-	constantValue->setValue(ptr->constant);
-	frequency->setValue(ptr->frequency);
-	offset->setValue(ptr->offset);
-	amplitude->setValue(ptr->amplitude);
-	phase->setValue(ptr->phase);
-	dutycycle->setValue(ptr->dutycycle);
+	if (ptr->indexValue < 2) {
+		ui->phase->setInSeconds(false);
+		ui->phase->setValue(ptr->phase);
+	} else {
+		ui->phase->setInSeconds(true);
+		ui->phase->setValue(ui->phase->changeValueFromDegreesToSeconds(ptr->phase));
+	}
+	ui->phase->blockSignals(true);
+	ui->phase->setComboboxIndex(ptr->indexValue);
+	ui->phase->blockSignals(false);
+	ui->constantValue->setValue(ptr->constant);
+	ui->offset->setValue(ptr->offset);
+	ui->frequency->setValue(ptr->frequency);
+	ui->amplitude->setValue(ptr->amplitude);
+	ui->dutycycle->setValue(ptr->dutycycle);
 
 	noiseAmplitude->setValue(ptr->noiseAmplitude);
 	auto noiseIndex = ui->cbNoiseType->findData(ptr->noiseType);
