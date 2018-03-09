@@ -107,6 +107,9 @@ namespace adiscope {
 
 		void settingsLoaded();
 
+		bool getTrigger_input() const;
+		void setTrigger_input(bool value);
+
 	Q_SIGNALS:
 		void triggerALevelChanged(double);
 		void triggerBLevelChanged(double);
@@ -308,6 +311,7 @@ namespace adiscope {
 
 		bool trigger_is_forced;
 		bool new_data_is_triggered;
+		bool trigger_input;
 		CapturePlot::TriggerState trigger_state;
 		StateUpdater *triggerUpdater;
 
@@ -448,6 +452,8 @@ namespace adiscope {
 				WRITE setInternalCondition)
 		Q_PROPERTY(bool external_condition READ externalCondition
 				WRITE setExternalCondition)
+		Q_PROPERTY(bool trigger_input READ getTriggerInput
+				WRITE setTriggerInput STORED false)
 
 		Q_PROPERTY(QList<QString> math_channels
 				READ getMathChannels WRITE setMathChannels
@@ -535,6 +541,9 @@ namespace adiscope {
 
 		double getTriggerHysteresis() const;
 		void setTriggerHysteresis(double hyst);
+
+		bool getTriggerInput() const;
+		void setTriggerInput(bool en);
 
 		int internalCondition() const;
 		void setInternalCondition(int cond);
