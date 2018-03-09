@@ -658,7 +658,8 @@ PhaseSpinButton::PhaseSpinButton(std::vector<std::pair<QString, double> > units,
 	SpinBoxA(units, name, min_value, max_value,
 		 hasProgressWidget, invertCircle, parent),
 	m_fine_increment(1),
-	m_inSeconds(false)
+	m_inSeconds(false),
+	m_indexValue(0)
 {
 		ui->SBA_CompletionCircle->setIsLogScale(false);
 		setMinValue(min_value);
@@ -688,7 +689,7 @@ void PhaseSpinButton::setValue(double value)
 	int full_periods = value / period;
 	value -= full_periods * period;
 
-	if (value<0) {
+	if (value < 0) {
 		value = value + period;
 	}
 
@@ -708,8 +709,15 @@ void PhaseSpinButton::setValue(double value)
 	}
 }
 
+void PhaseSpinButton::setComboboxIndex(int index)
+{
+	ui->SBA_Combobox->setCurrentIndex(index);
+}
+
 void PhaseSpinButton::onComboboxIndexChanged(int index)
 {
+	m_indexValue = index;
+
 	if(index < 2) {
 		setInSeconds(false);
 	} else {
@@ -723,7 +731,6 @@ void PhaseSpinButton::onComboboxIndexChanged(int index)
 		setInSeconds(true);
 		if (isGoingFromGradesToSeconds) {
 			setValue(m_secondsValue);
-
 		} else {
 			double value = ui->SBA_LineEdit->text().toDouble();
 			setValue(value * m_units[index].second);
@@ -771,6 +778,20 @@ double PhaseSpinButton::frequency()
 double PhaseSpinButton::value()
 {
 	return m_value;
+}
+
+double PhaseSpinButton::changeValueFromDegreesToSeconds(double val)
+{
+	double period = 360;
+	double valueInSeconds = val / frequency();
+	valueInSeconds /= period;
+
+	return valueInSeconds;
+}
+
+int PhaseSpinButton::indexValue()
+{
+	return m_indexValue;
 }
 
 void PhaseSpinButton::updatePhaseAfterFrequenceChanged(double val)

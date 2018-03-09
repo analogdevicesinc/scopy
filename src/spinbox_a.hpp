@@ -209,6 +209,7 @@ public Q_SLOTS:
 	void stepDown();
 
 	void setValue(double value);
+	void setComboboxIndex(int index);
 	void onComboboxIndexChanged(int index);
 	void updatePhaseAfterFrequenceChanged(double val);
 	double computeSecondsTransformation(double scale, int index, double value);
@@ -219,6 +220,8 @@ public Q_SLOTS:
 	void setFrequency(double val);
 	double frequency();
 	double value();
+	double changeValueFromDegreesToSeconds(double val);
+	int indexValue();
 
 protected:
 	std::vector<std::vector<double>> m_unit;
@@ -227,6 +230,7 @@ protected:
 	double m_frequency;
 	double m_secondsValue;
 	bool m_inSeconds;
+	int m_indexValue;
 
 };
 
