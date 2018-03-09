@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>102</width>
+    <width>126</width>
     <height>61</height>
    </rect>
   </property>
@@ -34,8 +34,8 @@ border-radius: 3px;
 min-width: 6em;
 }
 QPushButton:disabled {
-background-color: black;
-color:gray;
+background-color: gray;
+color:white;
 
 }
 QPushButton:hover
