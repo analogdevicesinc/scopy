@@ -1064,6 +1064,16 @@ void Oscilloscope::enableLabels(bool enable)
 		plot.enableAxisLabels(enable);
 }
 
+void Oscilloscope::setTrigger_input(bool value)
+{
+	trigger_input = value;
+}
+
+bool Oscilloscope::getTrigger_input() const
+{
+	return trigger_input;
+}
+
 void Oscilloscope::cursor_panel_init()
 {
 	cr_ui = new Ui::CursorsSettings;
@@ -1854,6 +1864,8 @@ void Oscilloscope::runStopToggled(bool checked)
 				&& !symmBufferMode->isEnhancedMemDepth()) {
 			timePosition->setValue(active_time_pos);
 		}
+
+		setTrigger_input(false);
 
 		toggle_blockchain_flow(true);
 		resetStreamingFlag(symmBufferMode->isEnhancedMemDepth()
@@ -3650,6 +3662,8 @@ void Oscilloscope::onPlotNewData()
 		triggerUpdater->setInput(CapturePlot::Auto);
 
 	updateBufferPreviewer();
+
+	trigger_input = true; //used to read trigger status from Js
 }
 
 void Oscilloscope::onTriggerModeChanged(int mode)
@@ -4101,6 +4115,16 @@ void Oscilloscope_API::setInternalCondition(int cond)
 int Oscilloscope_API::externalCondition() const
 {
 	return osc->trigger_settings.ui->cmb_extern_condition->currentIndex();
+}
+
+bool Oscilloscope_API::getTriggerInput() const
+{
+	return osc->getTrigger_input();
+}
+
+void Oscilloscope_API::setTriggerInput(bool en)
+{
+	osc->setTrigger_input(en);
 }
 
 void Oscilloscope_API::setExternalCondition(int cond)
