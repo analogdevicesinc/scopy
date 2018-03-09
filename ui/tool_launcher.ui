@@ -825,8 +825,8 @@ background-color: #4a34ff;
 }
 
 QPushButton:disabled {
-background-color: black;
-color:gray;
+background-color: gray;
+color:white;
 }
 
 QPushButton[connected=true] {
@@ -934,7 +934,7 @@ font-weight: bold;
                   </property>
                   <property name="minimumSize">
                    <size>
-                    <width>78</width>
+                    <width>102</width>
                     <height>64</height>
                    </size>
                   </property>
