@@ -76,6 +76,10 @@ private Q_SLOTS:
 
 	void on_newWindowButton_clicked();
 
+	void on_loadButton_clicked();
+
+	void on_runButton_clicked();
+
 private:
 	Ui::Debugger *ui;
 	QPushButton *menuRunButton;
@@ -83,6 +87,7 @@ private:
 	QJSEngine *eng;
 
 	Debug debug;
+	QFile scriptFile;
 
 	RegisterWidget *reg;
 	QVector<BitfieldWidget *> bitfieldsVector;

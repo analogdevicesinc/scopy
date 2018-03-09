@@ -20,6 +20,8 @@
 #include "debugger.h"
 #include "ui_debugger.h"
 #include <QDebug>
+#include <QFileDialog>
+
 
 using namespace adiscope;
 using namespace std;
@@ -312,4 +314,44 @@ void adiscope::Debugger::on_detailedRegMapCheckBox_stateChanged(int arg1)
 void adiscope::Debugger::on_newWindowButton_clicked()
 {
 	Q_EMIT newDebuggerInstance();
+}
+
+void adiscope::Debugger::on_loadButton_clicked()
+{
+	QString fileName = QFileDialog::getOpenFileName(this, tr("Save File"),
+			   "/home",
+			   tr("JavaScript (*.js)"));
+	scriptFile.setFileName(fileName);
+	ui->scriptLocation->setText(fileName);
+}
+
+void adiscope::Debugger::on_runButton_clicked()
+{
+	QJSValue result;
+
+	if (!scriptFile.open(QIODevice::ReadOnly))
+		qDebug() << "File not available";
+
+	QTextStream stream(&scriptFile);
+	QString contents = stream.readAll();
+	scriptFile.close();
+
+	QStringList l = contents.split('\n');
+
+	if(l[0].contains('#'))
+		l.removeFirst();
+	contents = l.join('\n');
+
+	result = eng->evaluate(contents, scriptFile.fileName());
+
+	if (result.isError()) {
+		qDebug()
+				<< "Uncaught exception at line"
+				<< result.property("lineNumber").toInt()
+				<< ":" << result.toString();
+	} else {
+		qDebug()<<" - Success";
+	}
+
+	ui->runButton->setText("Stop");
 }
