@@ -229,8 +229,17 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	});
 
 	connect(prefPanel, &Preferences::reset, this, &ToolLauncher::resetSession);
+	connect(prefPanel, &Preferences::notify, this, &ToolLauncher::readPreferences);
 
 	setupHomepage();
+	readPreferences();
+}
+
+void ToolLauncher::readPreferences()
+{
+	for (auto tool : toolMenu) {
+		tool->enableDoubleClick(prefPanel->getDouble_click_to_detach());
+	}
 }
 
 void ToolLauncher::saveSession()

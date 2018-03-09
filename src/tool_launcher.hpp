@@ -159,6 +159,7 @@ private:
 	void highlightDevice(QPushButton *btn);
 	void setupHomepage();
 	void updateHomepage();
+	void readPreferences();
 
 private:
 	Ui::ToolLauncher *ui;
