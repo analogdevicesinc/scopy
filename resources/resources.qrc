@@ -118,6 +118,8 @@
         <file>icons/ic save.svg</file>
         <file>icons/ic-locked.svg</file>
         <file>icons/ic-unlocked.svg</file>
+        <file>menu/calibration.png</file>
+        <file>menu/debugger.png</file>
     </qresource>
     <qresource prefix="/stylesheets">
         <file>stylesheets/global.qss</file>
