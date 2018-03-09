@@ -1446,7 +1446,7 @@ void Oscilloscope::add_math_channel(const std::string& function)
 	if (started)
 		iio->lock();
 
-	math_sink->set_trigger_mode(TRIG_MODE_FREE, 0, "buffer_start");
+	math_sink->set_trigger_mode(TRIG_MODE_TAG, 0, "buffer_start");
 
 	for (unsigned int i = 0; i < nb_channels; i++) {
 		if(subBlocks.at(i) != nullptr) {
