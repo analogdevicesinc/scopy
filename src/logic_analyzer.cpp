@@ -1773,10 +1773,6 @@ void LogicAnalyzer::validateSamplingFrequency(double value)
 	double srDivider =  0;
 	double actualFrequency = value;
 
-	if (value == active_sampleRate) {
-		return;
-	}
-
 	if (value > active_sampleRate) {
 		stepUp = true;
 	}
@@ -1788,6 +1784,10 @@ void LogicAnalyzer::validateSamplingFrequency(double value)
 	}
 
 	actualFrequency = maxSamplingFrequency / srDivider;
+
+	if (actualFrequency == active_sampleRate) {
+		return;
+	}
 
 	frequencySpinButton->blockSignals(true);
 	frequencySpinButton->setValue(actualFrequency);
