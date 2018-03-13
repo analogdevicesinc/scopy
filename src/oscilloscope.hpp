@@ -265,6 +265,8 @@ namespace adiscope {
 
 		QPair<Ui::MathPanel, Math*> *math_pair;
 		bool addChannel;
+		QTabWidget *tabWidget;
+		QWidget *ref;
 
 		QVector<QVector<QString>> import_data;
 		QString import_error;

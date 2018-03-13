@@ -850,6 +850,15 @@ void Oscilloscope::init_channel_settings()
 {
 	connect(ch_ui->btnEditMath, &QPushButton::toggled, this,
 		&Oscilloscope::openEditMathPanel);
+	connect(ch_ui->btnEditMath, &QPushButton::toggled, [=](bool on){
+		if (on) {
+			tabWidget->removeTab(1);
+			math_pair->first.btnAddChannel->setText("Save");
+
+		} else {
+			tabWidget->addTab(ref, "Reference");
+		}
+	});
 
 	connect(ch_ui->btnAutoset, &QPushButton::clicked, this,
 		&Oscilloscope::requestAutoset);
@@ -1255,13 +1264,13 @@ void Oscilloscope::create_add_channel_panel()
 	});
 
 	QHBoxLayout *layout = static_cast<QHBoxLayout *>(panel->layout());
-	QTabWidget *tabWidget = new QTabWidget(panel);
+	tabWidget = new QTabWidget(panel);
 	layout->insertWidget(0, tabWidget);
 	//set top margin to 0 and the rest to 9
 	layout->setContentsMargins(9, 0, 9, 9);
 	tabWidget->addTab(math, "Math");
 
-	QWidget *ref = new QWidget(panel);
+	ref = new QWidget(panel);
 
 	importSettings = new ImportSettings();
 
