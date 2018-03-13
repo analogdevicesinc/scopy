@@ -170,6 +170,30 @@ CapturePlot::CapturePlot(QWidget *parent,
 			d_timeTriggerHandle->setPositionSilenty(pos);
 		});
 
+	connect(d_timeTriggerHandle, &FreePlotLineHandleH::positionChanged,
+		d_timeTriggerBar, &VertBar::setPixelPosition);
+
+	connect(d_timeTriggerHandle, &RoundedHandleV::mouseReleased,
+		[=]() {
+			double pos = d_timeTriggerHandle->position();
+
+			QwtScaleMap xMap = this->canvasMap(QwtAxisId(QwtPlot::xBottom, 0));
+			double min = -(xAxisNumDiv() / 2.0) * HorizUnitsPerDiv();
+			double max = (xAxisNumDiv() / 2.0) * HorizUnitsPerDiv();
+
+			xMap.setScaleInterval(min, max);
+			double time = xMap.invTransform(pos);
+
+			if (time < d_timeTriggerMinValue) {
+				d_timeTriggerBar->setPixelPosition(
+							xMap.transform(d_timeTriggerMinValue));
+			}
+			if (time > d_timeTriggerMaxValue) {
+				d_timeTriggerBar->setPixelPosition(
+							xMap.transform(d_timeTriggerMaxValue));
+			}
+	});
+
 	/* Level triggers widgets */
 	// Trigger A
 	d_levelTriggerABar = new HorizBar(this);
