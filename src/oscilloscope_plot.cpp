@@ -696,6 +696,11 @@ void CapturePlot::setTimeTriggerInterval(double min, double max)
 	d_timeTriggerMaxValue = max;
 }
 
+bool CapturePlot::labelsEnabled()
+{
+	return d_labelsEnabled;
+}
+
 bool CapturePlot::setActiveVertAxis(unsigned int axisIdx, bool selected)
 {
 	DisplayPlot::setActiveVertAxis(axisIdx, selected);

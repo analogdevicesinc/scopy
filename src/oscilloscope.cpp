@@ -711,6 +711,7 @@ void Oscilloscope::add_ref_waveform(unsigned int chIdx)
 
 	channels_group->addButton(channel_widget->nameButton());
 	ui->settings_group->addButton(channel_widget->menuButton());
+	channel_widget->nameButton()->setChecked(true);
 
 	QLabel *label= new QLabel(this);
 	label->setText(vertMeasureFormat.format(
@@ -741,7 +742,7 @@ void Oscilloscope::add_ref_waveform(unsigned int chIdx)
 		menuOrder.removeOne(ui->btnAddMath);
 	}
 
-	plot.showYAxisWidget(curve_id, false);
+	plot.showYAxisWidget(curve_id, true);
 	plot.setVertUnitsPerDiv(1, curve_id); // force v/div to 1
 	plot.zoomBaseUpdate();
 }
@@ -828,7 +829,21 @@ void Oscilloscope::settingsLoaded()
 
 void Oscilloscope::readPreferences()
 {
-	enableLabels(prefPanel->getOsc_labels_enabled());
+	for (unsigned int i = 0; i < nb_channels + nb_math_channels + nb_ref_channels;
+	     i++) {
+		ChannelWidget *cw = static_cast<ChannelWidget *>(
+					    ui->channelsList->itemAt(i)->widget());
+
+		if (cw->enableButton()->isChecked()) {
+			/* At least one channel is enabled,
+			 * so we can enable/disable labels */
+			enableLabels(prefPanel->getOsc_labels_enabled());
+			return;
+		}
+	}
+
+	/* No channel is enabled, so we disable the labels */
+	enableLabels(false);
 }
 
 void Oscilloscope::init_channel_settings()
@@ -1511,6 +1526,7 @@ void Oscilloscope::add_math_channel(const std::string& function)
 
 	channels_group->addButton(channel_widget->nameButton());
 	ui->settings_group->addButton(channel_widget->menuButton());
+	channel_widget->nameButton()->setChecked(true);
 
 	QLabel *label= new QLabel(this);
 		label->setText(vertMeasureFormat.format(
@@ -1535,7 +1551,7 @@ void Oscilloscope::add_math_channel(const std::string& function)
 	plot.setPeriodDetectHyst(curve_id, 1.0 / 5);
 
 	// Keep the current selected channels curve on top of the other ones
-	if (isVisible())
+	if (isVisible() && channelWidgetAtId(current_channel)->enableButton()->isChecked())
 		plot.bringCurveToFront(current_channel);
 
 	if (nb_math_channels + nb_ref_channels == MAX_MATH_CHANNELS) {
@@ -1552,7 +1568,7 @@ void Oscilloscope::add_math_channel(const std::string& function)
 	if(xy_is_visible)
 		setup_xy_channels();
 
-	plot.showYAxisWidget(curve_id, false);
+	plot.showYAxisWidget(curve_id, true);
 	setSinksDisplayOneBuffer(d_displayOneBuffer);
 }
 
@@ -1682,19 +1698,20 @@ void Oscilloscope::onChannelWidgetDeleteClicked()
 	ui->channelsList->removeWidget(cw);
 	delete cw;
 
+	/*If the deleted channel is the current channel, check if we have
+	enabled channels and select the first one we find
+	else update the plots axis and zoomer properties from channel 0.*/
+	bool channelsEnabled = false;
+
 	if (curve_id < current_channel) {
 		/*If the deleted math channel is before the current channel,
 		we will need to update the current channel to its new value.*/
 		current_channel -= 1;
 		current_ch_widget -= 1;
+		channelsEnabled = true;
 		Q_EMIT selectedChannelChanged(current_channel);
 		update_measure_for_channel(current_channel);
 	} else if (curve_id == current_channel) {
-		/*If the deleted channel is the current channel, check if we have
-		enabled channels and select the first one we find
-		else update the plots axis and zoomer properties from channel 0.*/
-		bool channelsEnabled = false;
-
 		for (unsigned int i = 0; i < nb_channels + nb_math_channels + nb_ref_channels;
 		     i++) {
 			ChannelWidget *cw = static_cast<ChannelWidget *>(
@@ -1711,13 +1728,17 @@ void Oscilloscope::onChannelWidgetDeleteClicked()
 			}
 		}
 		if (channelsEnabled) {
-			if (curve_id < current_ch_widget)
+			if (curve_id < current_ch_widget) {
 				current_ch_widget -= 1;
+			}
 		} else {
+			current_channel = 0;
 			Q_EMIT selectedChannelChanged(0);
+			enableLabels(false);
 		}
 	} else if (curve_id < current_ch_widget) {
 		current_ch_widget -= 1;
+		channelsEnabled = true;
 	}
 
 	plot.setActiveVertAxis(current_channel);
@@ -1725,7 +1746,7 @@ void Oscilloscope::onChannelWidgetDeleteClicked()
 	/* If the removed channel is before the current axis, we update the
 	 * current axis to account for the index change */
 	int current_axis = plot.activeVertAxis();
-	if (current_axis > curve_id)
+	if (channelsEnabled && (current_axis > curve_id))
 		plot.setActiveVertAxis(current_axis - 1);
 
 	/* Before removing the axis, remove the offset widgets */
@@ -2213,6 +2234,7 @@ void adiscope::Oscilloscope::onChannelWidgetEnabled(bool en)
 		}
 
 		if (shouldActivate) {
+			plot.setActiveVertAxis(id);
 			Q_EMIT selectedChannelChanged(id);
 			update_measure_for_channel(id);
 			measure_settings->activateDisplayAll();
@@ -2240,6 +2262,8 @@ void adiscope::Oscilloscope::onChannelWidgetEnabled(bool en)
 
 		if (shouldDisable) {
 			measure_settings->disableDisplayAll();
+			plot.setActiveVertAxis(0);
+			enableLabels(false);
 		}
 
 		if (current_channel == id) {
@@ -2269,6 +2293,10 @@ void adiscope::Oscilloscope::onChannelWidgetSelected(bool checked)
 {
 	if (!checked) {
 		return;
+	}
+
+	if (isVisible() && plot.labelsEnabled() != prefPanel->getOsc_labels_enabled()) {
+		enableLabels(prefPanel->getOsc_labels_enabled());
 	}
 
 	ChannelWidget *w = static_cast<ChannelWidget *>(QObject::sender());
@@ -2719,7 +2747,6 @@ void adiscope::Oscilloscope::toggleRightMenu(CustomPushButton *btn, bool checked
 		settings_panel_update(id);
 
 	if (id >= 0) {
-		plot.setActiveVertAxis(id, false);
 		if (checked) {
 			update_chn_settings_panel(id);
 		}
@@ -4333,9 +4360,10 @@ void Oscilloscope_API::setCurrentChannel(int chn_id)
 	if (!chn_widget)
 		return;
 
-	osc->setChannelWidgetIndex(chn_id);
-
-	chn_widget->nameButton()->setChecked(true);
+	if (chn_widget->enableButton()->isChecked()) {
+		osc->setChannelWidgetIndex(chn_id);
+		chn_widget->nameButton()->setChecked(true);
+	}
 }
 
 bool Oscilloscope_API::getFftEn() const

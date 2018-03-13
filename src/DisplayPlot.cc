@@ -923,7 +923,9 @@ void DisplayPlot::setVertOffset(double offset, int axisIdx)
 
 double DisplayPlot::VertOffset(int axisIdx)
 {
-	return vertAxes[axisIdx]->offset();
+	if ((axisIdx >= 0) && (axisIdx < vertAxes.size()))
+		return vertAxes[axisIdx]->offset();
+	return 0;
 }
 
 void DisplayPlot::setHorizOffset(double offset)
