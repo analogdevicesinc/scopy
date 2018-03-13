@@ -399,6 +399,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 				25);
 
 	plot.setOffsetInterval(-25, 25);
+	plot.setTimeTriggerInterval(-timeBase->maxValue() * 5,
+				     timeBase->maxValue() * 5);
 
 	ch_ui = new Ui::ChannelSettings();
 	ch_ui->setupUi(ui->channelSettings);

@@ -114,6 +114,7 @@ namespace adiscope {
 		bool enableAxisLabels(bool enabled);
 
 		void setDisplayScale(double value);
+		void setTimeTriggerInterval(double min, double max);
 
 	Q_SIGNALS:
 		void timeTriggerValueChanged(double);
@@ -228,6 +229,7 @@ namespace adiscope {
 
 		double value_v1, value_v2, value_h1, value_h2;
 		double d_minOffsetValue, d_maxOffsetValue;
+		double d_timeTriggerMinValue, d_timeTriggerMaxValue;
 	};
 }
 

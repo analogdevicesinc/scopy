@@ -59,7 +59,9 @@ CapturePlot::CapturePlot(QWidget *parent,
 	d_cursorReadoutsVisible(false),
 	d_bufferSizeLabelVal(0),
 	d_sampleRateLabelVal(1.0),
-	d_labelsEnabled(false)
+	d_labelsEnabled(false),
+	d_timeTriggerMinValue(-1),
+	d_timeTriggerMaxValue(1)
 {
 
 	setMinimumHeight(250);
@@ -662,6 +664,12 @@ void CapturePlot::setDisplayScale(double value)
 	DisplayPlot::setDisplayScale(value);
 	onVoltageCursor1Moved(d_hBar1->plotCoord().y());
 	onVoltageCursor2Moved(d_hBar2->plotCoord().y());
+}
+
+void CapturePlot::setTimeTriggerInterval(double min, double max)
+{
+	d_timeTriggerMinValue = min;
+	d_timeTriggerMaxValue = max;
 }
 
 bool CapturePlot::setActiveVertAxis(unsigned int axisIdx, bool selected)
