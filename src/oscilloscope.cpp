@@ -2192,6 +2192,7 @@ void adiscope::Oscilloscope::updateRunButton(bool ch_enabled)
 {
 	for (unsigned int i = 0; !ch_enabled &&
 	     i < nb_channels + nb_math_channels + nb_ref_channels; i++) {
+		if (channelWidgetAtId(i)->isReferenceChannel()) continue;
 		QWidget *parent = ui->channelsList->itemAt(i)->widget();
 		QCheckBox *box = parent->findChild<QCheckBox *>("box");
 		ch_enabled = box->isChecked();
@@ -2286,7 +2287,9 @@ void adiscope::Oscilloscope::onChannelWidgetEnabled(bool en)
 
 	plot.replot();
 	fft_plot.replot();
-	updateRunButton(en);
+	if (!w->isReferenceChannel()) {
+		updateRunButton(en);
+	}
 }
 
 void adiscope::Oscilloscope::onChannelWidgetSelected(bool checked)
