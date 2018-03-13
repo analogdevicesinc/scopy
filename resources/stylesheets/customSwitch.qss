@@ -31,7 +31,13 @@ font: 16px "monospace";
 }
 
 QLabel#on {
-margin-left: 8px;
+margin-top: 0px;
+min-height:30px;
+max-height:30px;
+min-width:50px;
+max-width:50px;
+qproperty-alignment: AlignCenter AlignCenter;
+margin-left: 0px;
 color: white;
 }
 
@@ -40,8 +46,14 @@ color: rgba(255,255,255,102);
 }
 
 QLabel#off {
-margin-left: 56px;
+margin-top: 0px;
+min-height:30px;
+max-height:30px;
+min-width:50px;
+max-width:50px;
+margin-left: 50px;
 color: white;
+qproperty-alignment: AlignCenter AlignCenter;
 }
 
 QLabel#off:disabled {

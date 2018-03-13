@@ -243,7 +243,7 @@ background-color: red;
         <string>out</string>
        </property>
        <property name="polarity" stdset="0">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
       </widget>
      </item>

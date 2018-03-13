@@ -44,6 +44,7 @@ namespace adiscope {
 		QWidget handle;
 		QPropertyAnimation anim;
 		int duration_ms;
+		bool polarity;
 
 		void setDuration(int ms);
 		void updateOnOffLabels();

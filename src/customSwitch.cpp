@@ -25,7 +25,8 @@
 using namespace adiscope;
 
 CustomSwitch::CustomSwitch(QWidget *parent) : QPushButton(parent),
-	on(this), off(this), handle(this), anim(&handle, "geometry")
+	on(this), off(this), handle(this), anim(&handle, "geometry"),
+	polarity(false)
 {
 	on.setObjectName("on");
 	off.setObjectName("off");
@@ -50,8 +51,8 @@ CustomSwitch::CustomSwitch(QWidget *parent) : QPushButton(parent),
 
 void CustomSwitch::updateOnOffLabels()
 {
-	on.setEnabled(isChecked());
-	off.setEnabled(!isChecked());
+	on.setEnabled(isChecked() ^ polarity);
+	off.setEnabled(!isChecked() ^ polarity);
 }
 
 bool CustomSwitch::event(QEvent *e)
@@ -64,6 +65,8 @@ bool CustomSwitch::event(QEvent *e)
 			on.setText(property("leftText").toString());
 		if(propName=="rightText" && property("rightText").isValid())
 			off.setText(property("rightText").toString());
+		if(propName=="polarity" && property("polarity").isValid())
+			polarity = property("polarity").toBool();
 
 	}
 	return QPushButton::event(e);
@@ -90,7 +93,7 @@ void CustomSwitch::toggleAnim(bool enabled)
 
 	anim.stop();
 
-	if (enabled) {
+	if (enabled ^ polarity) {
 		anim.setStartValue(off_rect);
 		anim.setEndValue(on_rect);
 	} else {
@@ -105,7 +108,7 @@ void CustomSwitch::toggleAnim(bool enabled)
 void CustomSwitch::showEvent(QShowEvent *event)
 {
 	updateOnOffLabels();
-	if (isChecked()) {
+	if (isChecked() ^ polarity) {
 		handle.setGeometry(QRect(0, handle.y(), handle.width(),
 					 handle.height()));
 	}
