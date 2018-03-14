@@ -141,6 +141,7 @@ sudo make install
 brew upgrade python
 
 cd ${WORKDIR}
+rm -rf libsigrok
 if [ ! -d libsigrok ]; then
   git clone https://github.com/sschnelle/libsigrok/
   cd libsigrok
@@ -154,8 +155,7 @@ fi
 sudo make install
 
 cd ${WORKDIR}
-rm libsigrokdecode-0.4.1.tar.gz*
-ls
+rm -rf libsigrokdecode-0.4.1
 if [ ! -d libsigrokdecode-0.4.1 ]; then
   wget http://sigrok.org/download/source/libsigrokdecode/libsigrokdecode-0.4.1.tar.gz
   tar -xzvf libsigrokdecode-0.4.1.tar.gz
