@@ -363,7 +363,7 @@ void dBgraph::onCursor1Moved(int value){
     QString text;
 
     auto point = picker->pointCoordinates(QPoint(value,0));
-    text = draw_x->label(point.x()).text();
+    text = formatter->format(point.x(),"Hz",2);
 
     d_cursorReadouts->setTimeCursor1Text(text);
     d_cursorReadouts->setVoltageCursor1Text(cursorIntersection(point.x()));
@@ -378,7 +378,7 @@ void dBgraph::onCursor2Moved(int value){
     QString text;
 
     auto point = picker->pointCoordinates(QPoint(value,0));
-    text = draw_x->label(point.x()).text();
+    text = formatter->format(point.x(),"Hz",2);
 
     d_cursorReadouts->setTimeCursor2Text(text);
     d_cursorReadouts->setVoltageCursor2Text(cursorIntersection(point.x()));
