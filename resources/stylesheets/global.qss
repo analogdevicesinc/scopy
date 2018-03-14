@@ -80,6 +80,10 @@ QDial {
   color: #4963ff;
 }
 
+QTabWidget::tab-bar {
+        left: 0;
+}
+
 QTabWidget::pane {
 	border-top: 0px;
 }
