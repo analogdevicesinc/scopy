@@ -608,8 +608,10 @@ void PositionSpinButton::stepUp()
 	double newVal;
 	double step = m_step;
 
-	if(m_step < current_scale) {
-		step = current_scale / 10;
+	double ratio = current_scale / m_step;
+
+	if (ratio > 1e3) {
+		step = step * 1e3;
 	}
 
 	if (isInFineMode()) {
@@ -629,8 +631,9 @@ void PositionSpinButton::stepDown()
 	double newVal;
 	double step = m_step;
 
-	if(m_step < current_scale) {
-		step = current_scale / 10;
+	double ratio = current_scale / m_step;
+	if (ratio > 1e3) {
+		step = step * 1e3;
 	}
 
 	if (isInFineMode()) {
