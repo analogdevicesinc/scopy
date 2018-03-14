@@ -1095,7 +1095,7 @@ void PatternGenerator_API::refreshApi()
 
 	for (auto i=0; i<chm->get_channel_count(); i++) {
 		PatternGeneratorChannel *cha = chm->get_channel(i);
-		pg_cha.append(new PatternGeneratorChannel_API(cha));
+		pg_cha.append(new PatternGeneratorChannel_API(cha,chmui));
 	}
 }
 

@@ -213,9 +213,15 @@ class PatternGeneratorChannel_API : public ApiObject
 	Q_PROPERTY(QList<int> color READ color WRITE setColor);
 	Q_PROPERTY(double thickness READ thickness WRITE setThickness);
 	PatternGeneratorChannel *ch;
+	PatternGenerator *pg;
+	PatternGeneratorChannelManagerUI *chmui;
+	PatternGeneratorChannelManager *chm;
+
 
 public:
-	PatternGeneratorChannel_API(PatternGeneratorChannel *_ch) : ch(_ch) {}
+	PatternGeneratorChannel_API(PatternGeneratorChannel *_ch,
+				    PatternGeneratorChannelManagerUI *_chmui)
+		: ch(_ch),chmui(_chmui),chm(_chmui->chm),pg(_chmui->pg) {}
 
 	QList<int> color();
 	void setColor(QList<int>);
@@ -247,6 +253,7 @@ public:
 	void setOutputMode(bool val)
 	{
 		ch->setOutputMode(val);
+		pg->diom->setOutputMode(id(), val);
 	}
 
 	void setThickness(double val)
