@@ -701,7 +701,16 @@ void PhaseSpinButton::setValue(double value)
 		emitValueChanged = true;
 	}
 
-	if (!inSeconds()) {
+	if (m_value == 0) {
+		setSecondsValue(0);
+	}
+
+	if (m_scale != scale) {
+		m_scale = scale;
+		emitValueChanged = true;
+	}
+
+	if (!inSeconds() || m_value == 0) {
 		ui->SBA_LineEdit->setText(QString::number(round((m_value * 10) / 10) / scale));
 	}
 
@@ -829,8 +838,12 @@ double PhaseSpinButton::computeSecondsTransformation(double scale, int index, do
 	}
 
 	number *= m_displayScale;
+	double gradeValue = secondsValue() * period * frequency();
 
-	if (value != 0) {
+	int full_periods = value / period;
+	gradeValue -= full_periods * period;
+
+	if (value != 0 && gradeValue != 0) {
 		ui->SBA_Combobox->blockSignals(true);
 		ui->SBA_Combobox->setCurrentIndex(index);
 		if (index < 2) {

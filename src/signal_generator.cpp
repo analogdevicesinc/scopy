@@ -802,8 +802,8 @@ void SignalGenerator::frequencyChanged(double value)
 	auto ptr = getCurrentData();
 
 	if (ptr->frequency != value) {
+		phase->setFrequency(value);
 		if(phase->inSeconds()) {
-			phase->setFrequency(value);
 			ptr->phase = phase->value();
 			ptr->indexValue = phase->indexValue();
 		}
@@ -907,9 +907,9 @@ void SignalGenerator::phaseChanged(double value)
 {
 	auto ptr = getCurrentData();
 
+	ptr->indexValue = phase->indexValue();
 	if (ptr->phase != value) {
 		ptr->phase = value;
-		ptr->indexValue = phase->indexValue();
 		resetZoom();
 	}
 }
@@ -1876,6 +1876,11 @@ void SignalGenerator::updateRightMenuForChn(int chIdx)
 {
 	auto ptr = getData(channels[chIdx]);
 
+	constantValue->setValue(ptr->constant);
+	frequency->setValue(ptr->frequency);
+	phase->blockSignals(true);
+	phase->setComboboxIndex(ptr->indexValue);
+	phase->blockSignals(false);
 	if (ptr->indexValue < 2) {
 		phase->setInSeconds(false);
 		phase->setValue(ptr->phase);
@@ -1883,11 +1888,6 @@ void SignalGenerator::updateRightMenuForChn(int chIdx)
 		phase->setInSeconds(true);
 		phase->setValue(phase->changeValueFromDegreesToSeconds(ptr->phase));
 	}
-	phase->blockSignals(true);
-	phase->setComboboxIndex(ptr->indexValue);
-	phase->blockSignals(false);
-	constantValue->setValue(ptr->constant);
-	frequency->setValue(ptr->frequency);
 	offset->setValue(ptr->offset);
 	amplitude->setValue(ptr->amplitude);
 	dutycycle->setValue(ptr->dutycycle);
