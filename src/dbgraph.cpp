@@ -119,9 +119,13 @@ dBgraph::dBgraph(QWidget *parent) : QwtPlot(parent),
 
 	connect(d_vBar1, SIGNAL(pixelPositionChanged(int)),
 	        SLOT(onVbar1PixelPosChanged(int)));
+	connect(d_vBar1, SIGNAL(pixelPositionChanged(int)),
+	        SLOT(onCursor1Moved(int)));
 
 	connect(d_vBar2, SIGNAL(pixelPositionChanged(int)),
 	        SLOT(onVbar2PixelPosChanged(int)));
+	connect(d_vBar2, SIGNAL(pixelPositionChanged(int)),
+	        SLOT(onCursor2Moved(int)));
 
     d_cursorReadouts = new CursorReadouts(this);
     d_cursorReadouts->setAxis(QwtPlot::xTop,QwtPlot::yLeft);
@@ -441,6 +445,9 @@ void dBgraph::scaleDivChanged()
 	QwtInterval intv = plt->axisInterval(QwtPlot::xTop);
 	this->setAxisScale(QwtPlot::xTop, intv.minValue(), intv.maxValue());
 	this->replot();
+
+    onCursor1Moved(d_vBar1->transform(d_vBar1->plotCoord()).x());
+    onCursor2Moved(d_vBar2->transform(d_vBar2->plotCoord()).x());
 }
 
 void dBgraph::mousePressEvent(QMouseEvent *event)
