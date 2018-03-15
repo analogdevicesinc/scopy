@@ -315,8 +315,11 @@ bool MenuOption::eventFilter(QObject *watched, QEvent *event)
 	if (event->type() == QEvent::MouseButtonDblClick) {
 		QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
 		if (mouseEvent->button() == Qt::LeftButton) {
-			Q_EMIT detach(this->position);
-			return true;
+			QPushButton *btn = static_cast<QPushButton *>(watched);
+			if (btn == getToolBtn() && getToolBtn()->isEnabled()) {
+				Q_EMIT detach(this->position);
+				return true;
+			}
 		}
 	}
 
