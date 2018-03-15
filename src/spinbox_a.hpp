@@ -230,6 +230,7 @@ protected:
 	double m_frequency;
 	double m_secondsValue;
 	bool m_inSeconds;
+	double m_scale;
 	int m_indexValue;
 
 };
