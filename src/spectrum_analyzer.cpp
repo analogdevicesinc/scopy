@@ -1447,6 +1447,10 @@ int SpectrumMarker_API::type()
 
 void SpectrumMarker_API::setType(int val)
 {
+	if (val > SpectrumAnalyzer::markerTypes.size()) {
+		val = 0;
+	}
+
 	m_type = val;
 
 	if (m_type == 1) { //if type is peak
