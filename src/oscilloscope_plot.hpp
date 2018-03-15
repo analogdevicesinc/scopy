@@ -123,7 +123,6 @@ namespace adiscope {
 		void channelOffsetChanged(double);
 		void measurementsAvailable();
 		void cursorReadoutsChanged(struct cursorReadoutsText);
-		void repositionTimeTrigger();
 
 	public Q_SLOTS:
 		void setTriggerAEnabled(bool en);
@@ -148,6 +147,7 @@ namespace adiscope {
 	private:
 		Measure* measureOfChannel(int chnIdx) const;
 		void updateBufferSizeSampleRateLabel(int nsamples, double sr);
+		void updateHandleAreaPadding(bool);
 
 	private Q_SLOTS:
 		void onChannelAdded(int);

@@ -1001,6 +1001,7 @@ void DisplayPlot::setActiveVertAxis(unsigned int axisIdx, bool selected)
 	if (axisIdx >= numAxes)
 		return;
 
+	d_activeVertAxis = axisIdx;
 
 	if (d_usingLeftAxisScales && selected) {
 		for (int i = 0; i < numAxes; i++) {
@@ -1008,8 +1009,6 @@ void DisplayPlot::setActiveVertAxis(unsigned int axisIdx, bool selected)
 					(i == axisIdx));
 		}
 	}
-
-	d_activeVertAxis = axisIdx;
 
 	if (d_coloredLabels && selected) {
 		OscScaleDraw *scaleDraw = static_cast<OscScaleDraw *>(this->axisScaleDraw(QwtAxisId(QwtPlot::yLeft, axisIdx)));

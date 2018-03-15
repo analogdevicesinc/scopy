@@ -1059,16 +1059,6 @@ void Oscilloscope::enableLabels(bool enable)
 	plot.enableLabels(enable);
 
 	if (enable) {
-		connect(&plot, &CapturePlot::repositionTimeTrigger, [=](){
-			double value = timePosition->value();
-			timePosition->setValue(0);
-			timePosition->setValue(value);
-		});
-	} else {
-		disconnect(&plot, &CapturePlot::repositionTimeTrigger, 0, 0);
-	}
-
-	if (enable) {
 		bool allDisabled = true;
 
 		for (unsigned int i = 0; i < nb_channels + nb_math_channels + nb_ref_channels;

@@ -167,7 +167,8 @@ CapturePlot::CapturePlot(QWidget *parent,
 	/* When bar position changes due to plot resizes update the handle */
 	connect(d_timeTriggerBar, &VertBar::pixelPositionChanged,
 		[=](int pos) {
-			d_timeTriggerHandle->setPositionSilenty(pos);
+				updateHandleAreaPadding(d_labelsEnabled);
+				d_timeTriggerHandle->setPositionSilenty(pos);
 		});
 
 	connect(d_timeTriggerHandle, &FreePlotLineHandleH::positionChanged,
@@ -358,7 +359,7 @@ CapturePlot::CapturePlot(QWidget *parent,
 
 	installEventFilter(this);
 	QwtScaleWidget *scaleWidget = axisWidget(QwtPlot::xBottom);
-	const int fmw = QFontMetrics(scaleWidget->font()).width("-34567mV");
+	const int fmw = QFontMetrics(scaleWidget->font()).width("-XX.XX XX");
 	scaleWidget->setMinBorderDist(fmw / 2, fmw / 2);
 }
 
@@ -704,11 +705,9 @@ bool CapturePlot::labelsEnabled()
 bool CapturePlot::setActiveVertAxis(unsigned int axisIdx, bool selected)
 {
 	DisplayPlot::setActiveVertAxis(axisIdx, selected);
+	updateHandleAreaPadding(d_labelsEnabled);
 	if (d_labelsEnabled) {
 		enableAxis(QwtPlot::xBottom, true);
-		d_bottomHandlesArea->setLeftPadding(50 + axisWidget(
-							QwtAxisId(QwtPlot::yLeft, d_activeVertAxis))->width());
-		Q_EMIT repositionTimeTrigger();
 	}
 }
 
@@ -728,28 +727,39 @@ void CapturePlot::showYAxisWidget(unsigned int axisIdx, bool en)
 
 	if (allAxisDisabled) {
 		setAxisVisible(QwtPlot::xBottom, false);
-		d_bottomHandlesArea->setLeftPadding(50);
-		d_rightHandlesArea->setTopPadding(50);
-		Q_EMIT repositionTimeTrigger();
+		updateHandleAreaPadding(false);
 	}
 	if (en) {
 		setAxisVisible(QwtPlot::xBottom, true);
 	}
 }
 
+void CapturePlot::updateHandleAreaPadding(bool enabled)
+{
+	if (enabled) {
+		d_bottomHandlesArea->setLeftPadding(50 + axisWidget(QwtAxisId(QwtPlot::yLeft, d_activeVertAxis))->width());
+		QwtScaleWidget *scaleWidget = axisWidget(QwtPlot::xBottom);
+		const int fmw = QFontMetrics(scaleWidget->font()).width("-XX.XX XX");
+		const int fmh = QFontMetrics(scaleWidget->font()).height();
+		d_bottomHandlesArea->setRightPadding(50 + fmw/2);
+		d_rightHandlesArea->setTopPadding(50 + 6);
+		d_rightHandlesArea->setBottomPadding(50 + fmh);
+	} else {
+		if (d_bottomHandlesArea->leftPadding() != 50)
+			d_bottomHandlesArea->setLeftPadding(50);
+		if (d_bottomHandlesArea->rightPadding() != 50)
+			d_bottomHandlesArea->setRightPadding(50);
+		if (d_rightHandlesArea->topPadding() != 50)
+			d_rightHandlesArea->setTopPadding(50);
+		if (d_rightHandlesArea->bottomPadding() != 50)
+			d_rightHandlesArea->setBottomPadding(50);
+	}
+}
+
 bool CapturePlot::eventFilter(QObject *object, QEvent *event)
 {
 	if (object == canvas() && event->type() == QEvent::Resize) {
-		if (d_labelsEnabled) {
-			d_bottomHandlesArea->setLeftPadding(50 + axisWidget(QwtAxisId(QwtPlot::yLeft, d_activeVertAxis))->width());
-			d_rightHandlesArea->setTopPadding(50 + 6);
-			Q_EMIT repositionTimeTrigger();
-		} else {
-			if (d_bottomHandlesArea->leftPadding() != 50)
-				d_bottomHandlesArea->setLeftPadding(50);
-			if (d_rightHandlesArea->topPadding() != 50)
-				d_rightHandlesArea->setTopPadding(50);
-		}
+		updateHandleAreaPadding(d_labelsEnabled);
 	}
 	return QObject::eventFilter(object, event);
 }
