@@ -71,6 +71,7 @@ namespace adiscope {
 
 		int getNumSamples() const;
         void setShowZero(bool en);
+        const QwtScaleWidget* getAxisWidget(QwtAxisId id);
 
 	const QColor& getColor() const;
 	QString xTitle() const;
@@ -81,6 +82,8 @@ namespace adiscope {
 Q_SIGNALS:
 	void VBar1PixelPosChanged(int);
 	void VBar2PixelPosChanged(int);
+    void resetZoom();
+
     public Q_SLOTS:
 		void plot(double x, double y);
 		void reset();
@@ -109,6 +112,10 @@ Q_SIGNALS:
 
         void onCursor1Moved(int);
         void onCursor2Moved(int);
+
+        void scaleDivChanged();
+        void mousePressEvent(QMouseEvent *event);
+        void onResetZoom();
 
 	private:
 		QwtPlotCurve curve;
