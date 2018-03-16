@@ -98,18 +98,20 @@ PowerController::PowerController(struct iio_context *ctx,
 
 	connect(runButton, SIGNAL(clicked(bool)), this, SLOT(startStop(bool)));
 
+
+	/*Load calibration parameters from iio context*/
+	const char *name;
+	const char *value;
+	for (int i = 4; i < 12; i++) {
+		if (!iio_context_get_attr(ctx, i, &name, &value))
+			calibrationParam[QString(name + 4)] = QString(value).toDouble();
+	}
+
 	api->setObjectName(QString::fromStdString(Filter::tool_name(
-			TOOL_POWER_CONTROLLER)));
+							  TOOL_POWER_CONTROLLER)));
 	api->load(*settings);
 	api->js_register(engine);
 
-    /*Load calibration parameters from iio context*/
-    const char *name;
-    const char *value;
-    for (int i = 4; i < 12; i++) {
-	if (!iio_context_get_attr(ctx, i, &name, &value))
-	    calibrationParam[QString(name + 4)] = QString(value).toDouble();
-    }
 }
 
 PowerController::~PowerController()
