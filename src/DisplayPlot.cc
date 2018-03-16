@@ -151,6 +151,7 @@ QwtText OscScaleDraw::label( double value ) const
 	double scale = 1.0;
 	QString sign = "";
 	int bonusPrecision = 0;
+	bool center = false;
 
 	double lower = scaleDiv().interval().minValue();
 	double upper = scaleDiv().interval().maxValue();
@@ -164,6 +165,7 @@ QwtText OscScaleDraw::label( double value ) const
 
 		if (position == 4) {
 			// center label with extra precision
+			center = true;
 			bonusPrecision = 3;
 		} else if (position < 4){
 			sign = "-";
@@ -187,6 +189,9 @@ QwtText OscScaleDraw::label( double value ) const
 
 	if (m_color != Qt::gray)
 		text.setColor(m_color);
+	if (center) {
+		text.setColor(QColor(255, 255,255));
+	}
 
 	return text;
 }
