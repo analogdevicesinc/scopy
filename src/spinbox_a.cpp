@@ -733,15 +733,15 @@ void PhaseSpinButton::onComboboxIndexChanged(int index)
 	if(index < 2) {
 		setInSeconds(false);
 	} else {
-		bool isGoingFromGradesToSeconds = false;
+		bool isGoingFromDegreesToSeconds = false;
 		if (!inSeconds()) {
 			double period = 360;
 			m_secondsValue = m_value / frequency();
 			m_secondsValue /= period;
-			isGoingFromGradesToSeconds = true;
+			isGoingFromDegreesToSeconds = true;
 		}
 		setInSeconds(true);
-		if (isGoingFromGradesToSeconds) {
+		if (isGoingFromDegreesToSeconds) {
 			setValue(m_secondsValue);
 		} else {
 			double value = ui->SBA_LineEdit->text().toDouble();
@@ -838,12 +838,12 @@ double PhaseSpinButton::computeSecondsTransformation(double scale, int index, do
 	}
 
 	number *= m_displayScale;
-	double gradeValue = secondsValue() * period * frequency();
+	double degreesValue = secondsValue() * period * frequency();
 
-	int full_periods = value / period;
-	gradeValue -= full_periods * period;
+	int full_periods = degreesValue / period;
+	degreesValue -= full_periods * period;
 
-	if (value != 0 && gradeValue != 0) {
+	if (value != 0 && degreesValue != 0) {
 		ui->SBA_Combobox->blockSignals(true);
 		ui->SBA_Combobox->setCurrentIndex(index);
 		if (index < 2) {
