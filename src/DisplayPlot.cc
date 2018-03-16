@@ -184,6 +184,23 @@ QwtText OscScaleDraw::label( double value ) const
 		m_formatter->getFormatAttributes(value, prefix, scale);
 	}
 
+	if (orientation() == Qt::Vertical) {
+		double absVal = value > 0 ? value : -value;
+		if (absVal > 1e-2 && prefix == "m") {
+			scale = 1.0;
+			prefix = "";
+		} else if (absVal > 1e-5 && prefix == "μ") {
+			scale = 1e-3;
+			prefix = "m";
+		} else if (absVal > 1e-8 && prefix == "n") {
+			scale = 1e-6;
+			prefix = "μ";
+		} else if (absVal > 1e-11 && prefix == "p") {
+			scale = 1e-9;
+			prefix = "n";
+		}
+	}
+
 	QwtText text(sign + QLocale().toString(value / scale, 'f', m_floatPrecision + bonusPrecision)
 		+ ' ' + prefix + m_unit);
 
