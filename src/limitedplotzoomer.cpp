@@ -6,6 +6,7 @@ using namespace adiscope;
 LimitedPlotZoomer::LimitedPlotZoomer(QWidget *parent, bool doReplot):
     QwtPlotZoomer(parent, doReplot)
 {
+        setMaxStackDepth(5);
 }
 
 void LimitedPlotZoomer::resetZoom()
