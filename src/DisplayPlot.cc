@@ -266,6 +266,26 @@ void OscPlotZoomer::rescale()
 	bool isZoomOut = false;
 	if ( rect != scaleRect() )
 	{
+
+	    double x1 = rect.left();
+	    double x2 = rect.right();
+	    double y1 = rect.top();
+	    double y2 = rect.bottom();
+
+	    if ( !plt->axisScaleDiv( xAxis() ).isIncreasing() ){
+		qSwap( x1, x2 );
+	    }
+
+	    if ( !plt->axisScaleDiv( yAxis() ).isIncreasing() )
+		qSwap( y1, y2 );
+
+	    double width = fabs(x1 - x2);
+	    double height = fabs(y1 - y2);
+
+	    if (height == 0 || width == 0) {
+		    return;
+	    }
+
 	    if (lastIndex < index) {
 		    Q_EMIT zoomIn();
 	    }
@@ -278,25 +298,11 @@ void OscPlotZoomer::rescale()
 	    const bool doReplot = plt->autoReplot();
 	    plt->setAutoReplot( false );
 
-	    double x1 = rect.left();
-	    double x2 = rect.right();
-
-	    if ( !plt->axisScaleDiv( xAxis() ).isIncreasing() ){
-		qSwap( x1, x2 );
-	    }
-
-	    double width = fabs(x1 - x2);
 	    if (yAxis().id == 0) {
 		plt->setHorizUnitsPerDiv(width / plt->xAxisNumDiv());
 		plt->setHorizOffset(x1 + (width / 2));
 	    }
 
-	    double y1 = rect.top();
-	    double y2 = rect.bottom();
-	    if ( !plt->axisScaleDiv( yAxis() ).isIncreasing() )
-		qSwap( y1, y2 );
-
-	    double height = fabs(y1 - y2);
 	    plt->setVertUnitsPerDiv(height / plt->yAxisNumDiv(), yAxis().id);
 	    plt->setVertOffset(y1 + (height / 2), yAxis().id);
 
