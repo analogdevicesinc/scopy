@@ -580,6 +580,9 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 			double value = probe_attenuation[i] * plot.VertUnitsPerDiv(i);
 			label->setText(vertMeasureFormat.format(value, "V/div", 3));
 		}
+		if (isZoomOut) {
+			updateGainMode();
+		}
 	});
 
 	connect(ch_ui->probe_attenuation, QOverload<int>::of(&QComboBox::currentIndexChanged),
