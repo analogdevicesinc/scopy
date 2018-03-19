@@ -330,7 +330,7 @@ PlotAxisConfiguration::PlotAxisConfiguration(int axisPos, int axisIdx, DisplayPl
 	}
 
 	// Set cursor shape when hovering over the axis
-	setCursorShapeOnHover(shape);
+	//setCursorShapeOnHover(shape);
 
 	// Avoid jumping when labels with more/less digits
 	// appear/disappear when scrolling vertically
