@@ -386,10 +386,10 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 				-timeBase->maxValue() * 5,
 				timeBase->maxValue() * 5);
 	voltsPerDiv = new ScaleSpinButton({
-				{"μVolts", 1E-6},
+//				{"μVolts", 1E-6},
 				{"mVolts", 1E-3},
 				{"Volts", 1E0}
-				}, "Volts/Div", 1e-6, 1e1);
+				}, "Volts/Div", 1e-3, 1e1);
 	voltsPosition  = new PositionSpinButton({
 				{"μVolts", 1E-6},
 				{"mVolts", 1E-3},
