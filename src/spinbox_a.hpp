@@ -98,8 +98,8 @@ public:
 	bool progressShown() const;
 	void showProgress(bool show);
 
-    bool fineModeAvailable();
-    void setFineModeAvailable(bool);
+	bool fineModeAvailable();
+	void setFineModeAvailable(bool);
 
 
 	QString getName() const;
@@ -154,7 +154,7 @@ public:
 	                         const QString& name = "",
 	                         double min_value = 0.0, double max_value = 0.0,
 	                         bool hasProgressWidget = true,
-                 bool invertCircle = false, QWidget *parent = 0, std::vector<double> steps = {1,2,5});
+	                         bool invertCircle = false, QWidget *parent = 0, std::vector<double> steps = {1,2,5});
 
 public Q_SLOTS:
 	void stepUp();
@@ -174,10 +174,10 @@ class PositionSpinButton: public SpinBoxA
 public:
 	explicit PositionSpinButton(QWidget *parent = nullptr);
 	explicit PositionSpinButton(std::vector<std::pair<QString, double> >units,
-				    const QString& name ="",
-				    double min_value = 0.0, double max_value = 0.0,
-				    bool hasProgressWidget = true,
-				    bool invertCircle = false, QWidget *parent = 0);
+	                            const QString& name ="",
+	                            double min_value = 0.0, double max_value = 0.0,
+	                            bool hasProgressWidget = true,
+	                            bool invertCircle = false, QWidget *parent = 0);
 
 	double step();
 	void setStep(double);
@@ -197,10 +197,10 @@ class PhaseSpinButton: public SpinBoxA
 public:
 	explicit PhaseSpinButton(QWidget *parent = nullptr);
 	explicit PhaseSpinButton(std::vector<std::pair<QString, double> >units,
-				 const QString& name ="",
-				 double min_value = 0.0, double max_value = 360.0,
-				 bool hasProgressWidget = true,
-				 bool invertCircle = false, QWidget *parent = 0);
+	                         const QString& name ="",
+	                         double min_value = 0.0, double max_value = 360.0,
+	                         bool hasProgressWidget = true,
+	                         bool invertCircle = false, QWidget *parent = 0);
 
 	void setStep(double);
 
