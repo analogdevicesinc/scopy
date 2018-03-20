@@ -92,6 +92,10 @@ namespace adiscope {
 		double d_sampl_rate;
 		double d_preset_sampl_rate;
 
+		double m_sweepStart;
+		double m_sweepStop;
+		bool m_visiblePeakSearch;
+
 		MetricPrefixFormatter dBFormatter;
 		MetricPrefixFormatter freqFormatter;
 
@@ -156,6 +160,8 @@ namespace adiscope {
 		void setAverage(uint chIdx, enum AverageType avg_type,
 			uint history);
 		void resetAverageHistory();
+		void setStartStop(double start, double stop);
+		void setVisiblePeakSearch(bool enabled);
 
 		// Markers
 		uint peakCount(uint chIdx) const;

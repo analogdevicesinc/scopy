@@ -108,9 +108,11 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	crt_peak(0),
 	max_peak_count(10),
 	fft_size(32768),
+	searchVisiblePeaks(true),
 	bin_sizes({
 	256, 512, 1024, 2048, 4096, 8192, 16384, 32768
 })
+
 {
 
 	// Get the list of names of the available channels
@@ -314,6 +316,9 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	        SLOT(onTopValueChanged(double)));
 	connect(ui->range, SIGNAL(valueChanged(double)),
 	        SLOT(onRangeValueChanged(double)));
+	connect(prefPanel, &Preferences::notify,[=]() {
+		fft_plot->setVisiblePeakSearch(prefPanel->getSpectrum_visible_peak_search());
+	});
 
 	// UI default
 	ui->comboBox_window->setCurrentText("Hamming");
@@ -731,6 +736,7 @@ void SpectrumAnalyzer::onStartStopChanged()
 	ui->center_freq->blockSignals(false);
 
 	// Configure plot
+	fft_plot->setStartStop(start, stop);
 	fft_plot->setAxisScale(QwtPlot::xBottom, start, stop);
 	fft_plot->replot();
 

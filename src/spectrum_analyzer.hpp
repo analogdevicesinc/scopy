@@ -167,6 +167,7 @@ private:
 	int num_adc_channels;
 	int adc_bits_count;
 	int crt_channel_id;
+	bool searchVisiblePeaks;
 	int crt_peak;
 	uint max_peak_count;
 	double sample_rate;

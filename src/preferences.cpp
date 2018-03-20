@@ -34,7 +34,8 @@ Preferences::Preferences(QWidget *parent) :
 	sig_gen_periods_nr(2),
 	save_session_on_exit(true),
 	double_click_to_detach(false),
-	pref_api(new Preferences_API(this))
+	pref_api(new Preferences_API(this)),
+	spectrum_visible_peak_search(true)
 {
 	ui->setupUi(this);
 
@@ -75,6 +76,10 @@ Preferences::Preferences(QWidget *parent) :
 
 	connect(ui->na_zeroCheckBox, &QCheckBox::stateChanged, [=](int state) {
 		na_show_zero = (!state ? false : true);
+		Q_EMIT notify();
+	});
+	connect(ui->spectrumVisiblePeakSearch, &QCheckBox::stateChanged, [=](int state) {
+		spectrum_visible_peak_search = (!state ? false : true);
 		Q_EMIT notify();
 	});
 
@@ -134,6 +139,16 @@ void Preferences::resetScopy()
 	if (ret == QMessageBox::Ok) {
 		Q_EMIT reset();
 	}
+}
+
+bool Preferences::getSpectrum_visible_peak_search() const
+{
+	return spectrum_visible_peak_search;
+}
+
+void Preferences::setSpectrum_visible_peak_search(bool value)
+{
+	spectrum_visible_peak_search = value;
 }
 
 bool Preferences::getDouble_click_to_detach() const
@@ -234,4 +249,14 @@ bool Preferences_API::getNaShowZero() const
 void Preferences_API::setNaShowZero(const bool& enabled)
 {
 	preferencePanel->na_show_zero = enabled;
+}
+
+bool Preferences_API::getSpectrumVisiblePeakSearch() const
+{
+	return preferencePanel->spectrum_visible_peak_search;
+}
+
+void Preferences_API::setSpectrumVisiblePeakSearch(const bool &enabled)
+{
+	preferencePanel->spectrum_visible_peak_search = enabled;
 }

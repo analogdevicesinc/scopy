@@ -70,7 +70,8 @@ FftDisplayPlot::FftDisplayPlot(int nplots, QWidget *parent) :
 	d_preset_sampl_rate(d_sampl_rate),
 	d_presetMagType(MagnitudeType::DBFS),
 	d_mrkCtrl(nullptr),
-	d_emitNewMkrData(true)
+	d_emitNewMkrData(true),
+	m_visiblePeakSearch(true)
 {
 	// TO DO: Add more colors
 	d_markerColors << QColor(255, 242, 0) << QColor(210, 155, 210);
@@ -544,7 +545,19 @@ void FftDisplayPlot::findPeaks(int chn)
 	}
 
 	maxY[0] = y[0];
-	for (int i = 3; i < d_numPoints; i++) {
+
+	auto start = 3;
+	auto stop = d_numPoints;
+
+	if(m_visiblePeakSearch)
+	{
+		auto coef  = d_numPoints/d_stop_frequency;
+		start = m_sweepStart * coef;
+		stop = m_sweepStop * coef;
+		maxY[0] = y[start];
+	}
+
+	for (int i = start; i < stop; i++) {
 		for (int j = 0; j < marker_count; j++ ) {
 			if  ((y[i - 1] > maxY[j]) &&
 					((!((y[i - 2] > y[i - 1]) &&
@@ -906,6 +919,17 @@ void FftDisplayPlot::marker_to_next_higher_mag_peak(uint chIdx, uint mkIdx)
 		return;
 
 	marker_set_pos_source(chIdx, mkIdx, peaks[pos]);
+}
+
+void FftDisplayPlot::setStartStop(double start, double stop)
+{
+	m_sweepStart = start;
+	m_sweepStop = stop;
+}
+
+void FftDisplayPlot::setVisiblePeakSearch(bool enabled)
+{
+	m_visiblePeakSearch = enabled;
 }
 
 void FftDisplayPlot::marker_to_next_lower_mag_peak(uint chIdx, uint mkIdx)
