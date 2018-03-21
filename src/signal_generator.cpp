@@ -248,7 +248,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 		{"Hz",1e0},
 		{"kHz",1e3},
 		{"MHz",1e6}
-	},"Frequency", 0.001);
+	},"Frequency", 0.001, 0.0, true, false, this);
 
 	/* Create trapezoidal waveform control widgets */
 	riseTime = new ScaleSpinButton({
@@ -256,33 +256,33 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 		{"μs",1e-6},
 		{"ms",1e-3},
 		{"seconds",1e0}
-	},"Rise Time", 0, 10);
+	},"Rise Time", 0, 10, true, false, this);
 
 	fallTime = new ScaleSpinButton({
 		{"ns",1e-9},
 		{"μs",1e-6},
 		{"ms",1e-3},
 		{"seconds",1e0}
-	},"Fall Time", 0, 10);
+	},"Fall Time", 0, 10, true, false, this);
 
 	holdHighTime = new ScaleSpinButton({
 		{"ns",1e-9},
 		{"μs",1e-6},
 		{"ms",1e-3},
 		{"seconds",1e0}
-	},"High Time", 0, 10);
+	},"High Time", 0, 10, true, false, this);
 
 	holdLowTime = new ScaleSpinButton({
 		{"ns",1e-9},
 		{"μs",1e-6},
 		{"ms",1e-3},
 		{"seconds",1e0}
-	},"Low Time", 0, 10);
+	},"Low Time", 0, 10, true, false, this);
 
 	/* Create file control widgets */
 	filePhase = new PhaseSpinButton({
 		{"samples",1e0}
-	}, "Phase");
+	}, "Phase", 0.0, 360.0, true, false, this);
 
 	fileOffset = new PositionSpinButton({
 		{"μVolts",1e-6},
@@ -295,7 +295,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 		{"Hz",1e0},
 		{"kHz",1e3},
 		{"MHz",1e6}
-	},"SampleRate", 0.001);
+	},"SampleRate", 0.001, 0.0, true, false, this);
 
 	fileAmplitude = new ScaleSpinButton({
 		{"μVolts",1e-6},
@@ -308,7 +308,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 		{"Hz",1e0},
 		{"kHz",1e3},
 		{"MHz",1e6}
-	},"Frequency", 0.001);
+	},"Frequency", 0.001, 0.0, true, false, this);
 
 	noiseAmplitude = new ScaleSpinButton({
 		{"μVolts",1e-6},
@@ -323,7 +323,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 
 	dutycycle = new PositionSpinButton({
 		{"%",1e0}
-	}, "Duty Cycle", -5, 100);
+	}, "Duty Cycle", -5, 100, true, false, this);
 
 	ui->waveformGrid->addWidget(amplitude, 0, 0, 1, 1);
 	ui->waveformGrid->addWidget(offset, 0, 1, 1, 1);
