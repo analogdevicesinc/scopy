@@ -361,7 +361,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 				{"μs", 1E-6},
 				{"ms", 1E-3},
 				{"s", 1E0}
-				}, "Time Base", 100e-9, 1E0);
+				}, "Time Base", 100e-9, 1E0,
+				true, false, this);
 	timePosition = new PositionSpinButton({
 				{"ns", 1E-9},
 				{"μs", 1E-6},
@@ -369,19 +370,20 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 				{"s", 1E0}
 				}, "Position",
 				-timeBase->maxValue() * 5,
-				timeBase->maxValue() * 5);
+				timeBase->maxValue() * 5,
+				true, false, this);
 	voltsPerDiv = new ScaleSpinButton({
 //				{"μVolts", 1E-6},
 				{"mVolts", 1E-3},
 				{"Volts", 1E0}
-				}, "Volts/Div", 1e-3, 1e1);
+				}, "Volts/Div", 1e-3, 1e1,
+				true, false, this);
 	voltsPosition  = new PositionSpinButton({
 				{"μVolts", 1E-6},
 				{"mVolts", 1E-3},
 				{"Volts", 1E0}
 				}, "Position",
-				-25,
-				25);
+				-25, 25, true, false, this);
 
 	plot.setOffsetInterval(-25, 25);
 	plot.setTimeTriggerInterval(-timeBase->maxValue() * 5,
