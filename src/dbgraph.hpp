@@ -125,7 +125,7 @@ Q_SIGNALS:
 		bool log_freq;
 
         bool d_cursorsEnabled;
-
+        bool d_cursorsCentered;
 		OscScaleDraw *draw_x, *draw_y;
 		PrefixFormatter *formatter;
 		OscScaleZoomer *zoomer;

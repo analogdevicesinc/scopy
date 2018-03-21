@@ -28,7 +28,8 @@
 using namespace adiscope;
 
 dBgraph::dBgraph(QWidget *parent) : QwtPlot(parent),
-	curve("data")
+    curve("data"),
+    d_cursorsCentered(false)
 {
 	enableAxis(QwtPlot::xBottom, false);
 	enableAxis(QwtPlot::xTop, true);
@@ -147,8 +148,6 @@ dBgraph::dBgraph(QWidget *parent) : QwtPlot(parent),
 
 	picker = new PlotPickerWrapper(QwtPlot::xTop,QwtPlot::yLeft,this->canvas());
 
-    onCursor1Moved(0);
-    onCursor2Moved(0);
 }
 
 dBgraph::~dBgraph()
@@ -357,7 +356,13 @@ void dBgraph::onVbar2PixelPosChanged(int pos)
 void dBgraph::toggleCursors(bool en)
 {
 	if (d_cursorsEnabled != en) {
-		d_cursorsEnabled = en;
+        if(!d_cursorsCentered){
+            d_cursorsCentered=true;
+            d_vBar1->setPixelPosition(canvas()->width()/2-30);
+            d_vBar2->setPixelPosition(canvas()->width()/2+30);
+        }
+
+        d_cursorsEnabled = en;
 		d_vBar1->setVisible(en);
 		d_vBar2->setVisible(en);
 
