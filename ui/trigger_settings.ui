@@ -471,32 +471,11 @@ color: rgba(255,255,255,51);
              </spacer>
             </item>
             <item>
-             <widget class="adiscope::PositionSpinButton" name="trigger_level" native="true">
-              <property name="name" stdset="0">
-               <string>Level</string>
+             <layout class="QVBoxLayout" name="controlsLayout">
+              <property name="spacing">
+               <number>5</number>
               </property>
-              <property name="units" stdset="0">
-               <stringlist>
-                <string>µVolts=1e-6</string>
-                <string>mVolts=1e-3</string>
-                <string>Volts=1e0</string>
-               </stringlist>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="adiscope::PositionSpinButton" name="trigger_hysteresis" native="true">
-              <property name="name" stdset="0">
-               <string>Hysteresis</string>
-              </property>
-              <property name="units" stdset="0">
-               <stringlist>
-                <string>µVolts=1e-6</string>
-                <string>mVolts=1e-3</string>
-                <string>Volts=1e0</string>
-               </stringlist>
-              </property>
-             </widget>
+             </layout>
             </item>
            </layout>
           </widget>
@@ -823,12 +802,6 @@ color: rgba(255,255,255,51);
   </layout>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>adiscope::PositionSpinButton</class>
-   <extends>QWidget</extends>
-   <header>spinbox_a.hpp</header>
-   <container>1</container>
-  </customwidget>
   <customwidget>
    <class>adiscope::CustomSwitch</class>
    <extends>QPushButton</extends>

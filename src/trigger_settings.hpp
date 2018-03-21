@@ -131,6 +131,8 @@ namespace adiscope {
 		std::shared_ptr<GenericAdc> adc;
 		std::shared_ptr<HardwareTrigger> trigger;
 		QList<trigg_channel_config> trigg_configs;
+		PositionSpinButton *trigger_level;
+		PositionSpinButton *trigger_hysteresis;
 		int current_channel;
 		bool temporarily_disabled;
 		bool trigger_auto_mode;
