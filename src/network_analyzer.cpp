@@ -131,24 +131,113 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
     m_phaseGraph.setYMax(180.000000);
     m_phaseGraph.useLogFreq(true);
 
-    connect(ui->minFreq, SIGNAL(valueChanged(double)),
+    samplesCount = new ScaleSpinButton({
+            {"samples",1e0},
+    }, "Samples count", 10, 1000, false, false, this);
+    samplesCount->setValue(1000);
+
+    minFreq = new ScaleSpinButton({
+            {"Hz",1e0},
+            {"kHz",1e3},
+            {"MHz",1e6}
+    },"Min Freq", 1e0, 5e7, false, false, this);
+    minFreq->setValue(1000);
+
+    maxFreq = new ScaleSpinButton({
+            {"Hz",1e0},
+            {"kHz",1e3},
+            {"MHz",1e6}
+    },"Max Freq", 1e0, 5e7, false, false, this);
+    maxFreq->setValue(50000);
+
+    amplitude = new ScaleSpinButton({
+            {"μVolts",1e-6},
+            {"mVolts",1e-3},
+            {"Volts",1e0}
+    },"Amplitude", 1e-6, 1e1, false, false, this);
+    amplitude->setValue(1);
+
+    offset = new PositionSpinButton({
+            {"μVolts",1e-6},
+            {"mVolts",1e-3},
+            {"Volts",1e0}
+    },"Offset", -5, 5, false, false, this);
+
+    magMax = new PositionSpinButton({
+            {"dB",1e0}
+    }, "Max. Magnitude", -120, 120, false, false, this);
+    magMax->setValue(10);
+
+    magMin = new PositionSpinButton({
+            {"dB",1e0}
+    }, "Min. Magnitude", -120, 120, false, false, this);
+    magMin->setValue(-90);
+
+    phaseMax = new PositionSpinButton({
+            {"dB",1e0}
+    }, "Max. Phase", -180, 180, false, false, this);
+    phaseMax->setValue(180);
+
+    phaseMin = new PositionSpinButton({
+            {"dB",1e0}
+    }, "Min. Phase", -180, 180, false, false, this);
+    phaseMin->setValue(-180);
+
+
+    ui->samplesCountLayout->addWidget(samplesCount);
+    ui->minFreqLayout->addWidget(minFreq);
+    ui->maxFreqLayout->addWidget(maxFreq);
+    ui->amplitudeLayout->addWidget(amplitude);
+    ui->offsetLayout->addWidget(offset);
+    ui->magMaxLayout->addWidget(magMax);
+    ui->magMinLayout->addWidget(magMin);
+    ui->phaseMaxLayout->addWidget(phaseMax);
+    ui->phaseMinLayout->addWidget(phaseMin);
+
+    connect(magMax, &PositionSpinButton::valueChanged,
+            magMin, &PositionSpinButton::setMaxValue);
+    connect(magMin, &PositionSpinButton::valueChanged,
+            magMax, &PositionSpinButton::setMinValue);
+    connect(phaseMax, &PositionSpinButton::valueChanged,
+            phaseMin, &PositionSpinButton::setMaxValue);
+    connect(phaseMin, &PositionSpinButton::valueChanged,
+            phaseMax, &PositionSpinButton::setMinValue);
+    connect(minFreq, &ScaleSpinButton::valueChanged,
+            maxFreq, &ScaleSpinButton::setMinValue);
+    connect(maxFreq, &ScaleSpinButton::valueChanged,
+            minFreq, &ScaleSpinButton::setMaxValue);
+
+    connect(magMax, &PositionSpinButton::valueChanged,
+            ui->xygraph, &NyquistGraph::setMax);
+    connect(magMax, &PositionSpinButton::valueChanged,
+            ui->nicholsgraph, &dBgraph::setYMax);
+    connect(magMin, &PositionSpinButton::valueChanged,
+            ui->xygraph, &NyquistGraph::setMin);
+    connect(magMin, &PositionSpinButton::valueChanged,
+            ui->nicholsgraph, &dBgraph::setYMin);
+    connect(phaseMax, &PositionSpinButton::valueChanged,
+            ui->nicholsgraph, &dBgraph::setXMax);
+    connect(phaseMin, &PositionSpinButton::valueChanged,
+            ui->nicholsgraph, &dBgraph::setXMin);
+
+    connect(minFreq, SIGNAL(valueChanged(double)),
             &m_dBgraph, SLOT(setXMin(double)));
-    connect(ui->maxFreq, SIGNAL(valueChanged(double)),
+    connect(maxFreq, SIGNAL(valueChanged(double)),
             &m_dBgraph, SLOT(setXMax(double)));
-    connect(ui->magMin, SIGNAL(valueChanged(double)),
+    connect(magMin, SIGNAL(valueChanged(double)),
             &m_dBgraph, SLOT(setYMin(double)));
-    connect(ui->magMax, SIGNAL(valueChanged(double)),
+    connect(magMax, SIGNAL(valueChanged(double)),
             &m_dBgraph, SLOT(setYMax(double)));
     connect(ui->btnIsLog, SIGNAL(toggled(bool)),
             &m_dBgraph, SLOT(useLogFreq(bool)));
 
-    connect(ui->minFreq, SIGNAL(valueChanged(double)),
+    connect(minFreq, SIGNAL(valueChanged(double)),
             &m_phaseGraph, SLOT(setXMin(double)));
-    connect(ui->maxFreq, SIGNAL(valueChanged(double)),
+    connect(maxFreq, SIGNAL(valueChanged(double)),
             &m_phaseGraph, SLOT(setXMax(double)));
-    connect(ui->phaseMin, SIGNAL(valueChanged(double)),
+    connect(phaseMin, SIGNAL(valueChanged(double)),
             &m_phaseGraph, SLOT(setYMin(double)));
-    connect(ui->phaseMax, SIGNAL(valueChanged(double)),
+    connect(phaseMax, SIGNAL(valueChanged(double)),
             &m_phaseGraph, SLOT(setYMax(double)));
     connect(ui->btnIsLog, SIGNAL(toggled(bool)),
             &m_phaseGraph, SLOT(useLogFreq(bool)));
@@ -185,13 +274,13 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
     connect(d_hCursorHandle1, SIGNAL(positionChanged(int)),&m_phaseGraph, SLOT(onCursor1PositionChanged(int)));
     connect(d_hCursorHandle2, SIGNAL(positionChanged(int)),&m_phaseGraph, SLOT(onCursor2PositionChanged(int)));
 
-	ui->maxFreq->setMaxValue((double) max_samplerate / 2.5 - 1.0);
+        maxFreq->setMaxValue((double) max_samplerate / 2.5 - 1.0);
 
-	connect(ui->minFreq, SIGNAL(valueChanged(double)),
+	connect(minFreq, SIGNAL(valueChanged(double)),
 			this, SLOT(updateNumSamples()));
-	connect(ui->maxFreq, SIGNAL(valueChanged(double)),
+	connect(maxFreq, SIGNAL(valueChanged(double)),
 			this, SLOT(updateNumSamples()));
-	connect(ui->samplesCount, SIGNAL(valueChanged(double)),
+	connect(samplesCount, SIGNAL(valueChanged(double)),
 			this, SLOT(updateNumSamples()));
     connect(ui->checkBox,SIGNAL(toggled(bool)),
             SLOT(toggleCursors(bool)));
@@ -232,7 +321,7 @@ void NetworkAnalyzer::updateNumSamples()
 	if (!ui->run_button->isChecked())
 		return;
 
-	unsigned int num_samples = (unsigned int) ui->samplesCount->value();
+	unsigned int num_samples = (unsigned int) samplesCount->value();
 
     m_dBgraph.setNumSamples(num_samples);
     m_phaseGraph.setNumSamples(num_samples);
@@ -265,7 +354,7 @@ void NetworkAnalyzer::run()
 	// Adjust the gain of the ADC channels based on sweep settings
 	auto m2k_adc = std::dynamic_pointer_cast<M2kAdc>(adc_dev);
 	if (m2k_adc) {
-		double sweep_ampl = ui->amplitude->value();
+		double sweep_ampl = amplitude->value();
 		QPair<double, double> range = m2k_adc->inputRange(
 				M2kAdc::HIGH_GAIN_MODE);
 		double threshold = range.second - range.first;
@@ -280,9 +369,9 @@ void NetworkAnalyzer::run()
 		}
 	}
 
-	unsigned int steps = (unsigned int) ui->samplesCount->value();
-	double min_freq = ui->minFreq->value();
-	double max_freq = ui->maxFreq->value();
+	unsigned int steps = (unsigned int) samplesCount->value();
+	double min_freq = minFreq->value();
+	double max_freq = maxFreq->value();
 	double log10_min_freq = log10(min_freq);
 	double log10_max_freq = log10(max_freq);
 	double step;
@@ -308,14 +397,14 @@ void NetworkAnalyzer::run()
 				dev1, rate, frequency);
 		unsigned long adc_rate;
 
-		double amplitude = ui->amplitude->value();
-		double offset = ui->offset->value();
+		double amplitudeValue = amplitude->value();
+		double offsetValue = offset->value();
 
 		if (dev1 != dev2)
 			iio_device_attr_write_bool(dev1, "dma_sync", true);
 
 		struct iio_buffer *buf_dac1 = generateSinWave(dev1,
-				frequency, amplitude, offset,
+				frequency, amplitudeValue, offsetValue,
 				rate, samples_count);
 		if (!buf_dac1) {
 			qCritical() << "Unable to create DAC buffer";
@@ -325,8 +414,8 @@ void NetworkAnalyzer::run()
 		struct iio_buffer *buf_dac2 = nullptr;
 
 		if (dev1 != dev2) {
-			buf_dac2 = generateSinWave(dev2, frequency, amplitude,
-					offset, rate, samples_count);
+			buf_dac2 = generateSinWave(dev2, frequency, amplitudeValue,
+					offsetValue, rate, samples_count);
 			if (!buf_dac2) {
 				qCritical() << "Unable to create DAC buffer";
 				break;
@@ -666,81 +755,81 @@ void NetworkAnalyzer::onGraphIndexChanged(int index){
 
 double NetworkAnalyzer_API::getMinFreq() const
 {
-	return net->ui->minFreq->value();
+        return net->minFreq->value();
 }
 
 double NetworkAnalyzer_API::getMaxFreq() const
 {
-	return net->ui->maxFreq->value();
+        return net->maxFreq->value();
 }
 
 double NetworkAnalyzer_API::getSamplesCount() const
 {
-	return net->ui->samplesCount->value();
+        return net->samplesCount->value();
 }
 
 double NetworkAnalyzer_API::getAmplitude() const
 {
-	return net->ui->amplitude->value();
+        return net->amplitude->value();
 }
 
 double NetworkAnalyzer_API::getOffset() const
 {
-	return net->ui->offset->value();
+        return net->offset->value();
 }
 
 void NetworkAnalyzer_API::setMinFreq(double freq)
 {
-	net->ui->minFreq->setValue(freq);
+        net->minFreq->setValue(freq);
     net->m_dBgraph.setXMin(freq);
     net->m_phaseGraph.setXMin(freq);
 }
 
 void NetworkAnalyzer_API::setMaxFreq(double freq)
 {
-	net->ui->maxFreq->setValue(freq);
+        net->maxFreq->setValue(freq);
     net->m_dBgraph.setXMax(freq);
     net->m_phaseGraph.setXMax(freq);
 }
 
 void NetworkAnalyzer_API::setSamplesCount(double step)
 {
-	net->ui->samplesCount->setValue(step);
+        net->samplesCount->setValue(step);
 }
 
 void NetworkAnalyzer_API::setAmplitude(double amp)
 {
-	net->ui->amplitude->setValue(amp);
+        net->amplitude->setValue(amp);
 }
 
 void NetworkAnalyzer_API::setOffset(double offset)
 {
-	net->ui->offset->setValue(offset);
+        net->offset->setValue(offset);
 }
 
 double NetworkAnalyzer_API::getMinMag() const
 {
-	return net->ui->magMin->value();
+        return net->magMin->value();
 }
 
 double NetworkAnalyzer_API::getMaxMag() const
 {
-	return net->ui->magMax->value();
+        return net->magMax->value();
 }
 
 double NetworkAnalyzer_API::getMinPhase() const
 {
-	return net->ui->phaseMin->value();
+        return net->phaseMin->value();
 }
 
 double NetworkAnalyzer_API::getMaxPhase() const
 {
-	return net->ui->phaseMax->value();
+        return net->phaseMax->value();
 }
 
 void NetworkAnalyzer_API::setMinMag(double val)
 {
-	net->ui->magMin->setValue(val);
+        net->magMin->setValue(val);
     net->m_dBgraph.setYMin(val);
 	net->ui->xygraph->setMin(val);
 	net->ui->nicholsgraph->setYMin(val);
@@ -748,7 +837,7 @@ void NetworkAnalyzer_API::setMinMag(double val)
 
 void NetworkAnalyzer_API::setMaxMag(double val)
 {
-	net->ui->magMax->setValue(val);
+        net->magMax->setValue(val);
     net->m_dBgraph.setYMax(val);
 	net->ui->xygraph->setMax(val);
 	net->ui->nicholsgraph->setYMax(val);
@@ -756,14 +845,14 @@ void NetworkAnalyzer_API::setMaxMag(double val)
 
 void NetworkAnalyzer_API::setMinPhase(double val)
 {
-	net->ui->phaseMin->setValue(val);
+        net->phaseMin->setValue(val);
     net->m_phaseGraph.setYMin(val);
 	net->ui->nicholsgraph->setXMin(val);
 }
 
 void NetworkAnalyzer_API::setMaxPhase(double val)
 {
-	net->ui->phaseMax->setValue(val);
+        net->phaseMax->setValue(val);
     net->m_phaseGraph.setYMax(val);
 	net->ui->nicholsgraph->setXMax(val);
 }

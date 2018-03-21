@@ -868,56 +868,6 @@ color: rgba(255,255,255,51);
                    <property name="spacing">
                     <number>15</number>
                    </property>
-                   <item row="3" column="1">
-                    <widget class="adiscope::ScaleSpinButton" name="samplesCount" native="true">
-                     <property name="units" stdset="0">
-                      <stringlist notr="true">
-                       <string>samples=1e0</string>
-                      </stringlist>
-                     </property>
-                     <property name="name" stdset="0">
-                      <string>Samples count</string>
-                     </property>
-                     <property name="min_value" stdset="0">
-                      <double>10.000000000000000</double>
-                     </property>
-                     <property name="max_value" stdset="0">
-                      <double>10000.000000000000000</double>
-                     </property>
-                     <property name="show_progress" stdset="0">
-                      <bool>false</bool>
-                     </property>
-                     <property name="value" stdset="0">
-                      <double>1000.000000000000000</double>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="2" column="0">
-                    <widget class="adiscope::ScaleSpinButton" name="minFreq" native="true">
-                     <property name="units" stdset="0">
-                      <stringlist notr="true">
-                       <string>Hz=1e0</string>
-                       <string>kHz=1e3</string>
-                       <string>MHz=1e6</string>
-                      </stringlist>
-                     </property>
-                     <property name="min_value" stdset="0">
-                      <double>1.000000000000000</double>
-                     </property>
-                     <property name="max_value" stdset="0">
-                      <double>50000000.000000000000000</double>
-                     </property>
-                     <property name="show_progress" stdset="0">
-                      <bool>false</bool>
-                     </property>
-                     <property name="name" stdset="0">
-                      <string>Min Freq</string>
-                     </property>
-                     <property name="value" stdset="0">
-                      <double>1000.000000000000000</double>
-                     </property>
-                    </widget>
-                   </item>
                    <item row="3" column="0">
                     <spacer name="verticalSpacer_2">
                      <property name="orientation">
@@ -934,31 +884,37 @@ color: rgba(255,255,255,51);
                      </property>
                     </spacer>
                    </item>
-                   <item row="2" column="1">
-                    <widget class="adiscope::ScaleSpinButton" name="maxFreq" native="true">
-                     <property name="units" stdset="0">
-                      <stringlist notr="true">
-                       <string>Hz=1e0</string>
-                       <string>kHz=1e3</string>
-                       <string>MHz=1e6</string>
-                      </stringlist>
+                   <item row="1" column="1">
+                    <widget class="QRadioButton" name="isLinear">
+                     <property name="text">
+                      <string>Linear</string>
                      </property>
-                     <property name="name" stdset="0">
-                      <string>Max Freq</string>
-                     </property>
-                     <property name="min_value" stdset="0">
-                      <double>1.000000000000000</double>
-                     </property>
-                     <property name="max_value" stdset="0">
-                      <double>50000000.000000000000000</double>
-                     </property>
-                     <property name="show_progress" stdset="0">
-                      <bool>false</bool>
-                     </property>
-                     <property name="value" stdset="0">
-                      <double>50000.000000000000000</double>
-                     </property>
+                     <attribute name="buttonGroup">
+                      <string notr="true">buttonGroup</string>
+                     </attribute>
                     </widget>
+                   </item>
+                   <item row="1" column="0">
+                    <widget class="QRadioButton" name="isLog">
+                     <property name="text">
+                      <string>Logarithmic</string>
+                     </property>
+                     <property name="checked">
+                      <bool>true</bool>
+                     </property>
+                     <attribute name="buttonGroup">
+                      <string notr="true">buttonGroup</string>
+                     </attribute>
+                    </widget>
+                   </item>
+                   <item row="3" column="1">
+                    <layout class="QVBoxLayout" name="samplesCountLayout"/>
+                   </item>
+                   <item row="2" column="0">
+                    <layout class="QVBoxLayout" name="minFreqLayout"/>
+                   </item>
+                   <item row="2" column="1">
+                    <layout class="QVBoxLayout" name="maxFreqLayout"/>
                    </item>
                    <item row="1" column="0" colspan="2">
                     <widget class="adiscope::CustomSwitch" name="btnIsLog">
@@ -1117,54 +1073,11 @@ color: rgba(255,255,255,51);
                    <property name="spacing">
                     <number>15</number>
                    </property>
-                   <item row="0" column="0">
-                    <widget class="adiscope::ScaleSpinButton" name="amplitude" native="true">
-                     <property name="units" stdset="0">
-                      <stringlist notr="true">
-                       <string>µVolts=1e-6</string>
-                       <string>mVolts=1e-3</string>
-                       <string>Volts=1e0</string>
-                      </stringlist>
-                     </property>
-                     <property name="name" stdset="0">
-                      <string>Amplitude</string>
-                     </property>
-                     <property name="min_value" stdset="0">
-                      <double>0.000001000000000</double>
-                     </property>
-                     <property name="max_value" stdset="0">
-                      <double>10.000000000000000</double>
-                     </property>
-                     <property name="show_progress" stdset="0">
-                      <bool>false</bool>
-                     </property>
-                     <property name="value" stdset="0">
-                      <double>1.000000000000000</double>
-                     </property>
-                    </widget>
-                   </item>
                    <item row="0" column="1">
-                    <widget class="adiscope::PositionSpinButton" name="offset" native="true">
-                     <property name="units" stdset="0">
-                      <stringlist notr="true">
-                       <string>µVolts=1e-6</string>
-                       <string>mVolts=1e-3</string>
-                       <string>Volts=1e0</string>
-                      </stringlist>
-                     </property>
-                     <property name="name" stdset="0">
-                      <string>Offset</string>
-                     </property>
-                     <property name="min_value" stdset="0">
-                      <double>-5.000000000000000</double>
-                     </property>
-                     <property name="max_value" stdset="0">
-                      <double>5.000000000000000</double>
-                     </property>
-                     <property name="show_progress" stdset="0">
-                      <bool>false</bool>
-                     </property>
-                    </widget>
+                    <layout class="QVBoxLayout" name="offsetLayout"/>
+                   </item>
+                   <item row="0" column="0">
+                    <layout class="QVBoxLayout" name="amplitudeLayout"/>
                    </item>
                   </layout>
                  </item>
@@ -1239,100 +1152,16 @@ color: rgba(255,255,255,51);
                     <number>15</number>
                    </property>
                    <item row="1" column="0">
-                    <widget class="adiscope::PositionSpinButton" name="magMax" native="true">
-                     <property name="units" stdset="0">
-                      <stringlist notr="true">
-                       <string>dB=1e0</string>
-                      </stringlist>
-                     </property>
-                     <property name="name" stdset="0">
-                      <string>Max. Magnitude</string>
-                     </property>
-                     <property name="min_value" stdset="0">
-                      <double>-120.000000000000000</double>
-                     </property>
-                     <property name="max_value" stdset="0">
-                      <double>120.000000000000000</double>
-                     </property>
-                     <property name="value" stdset="0">
-                      <double>10.000000000000000</double>
-                     </property>
-                     <property name="show_progress" stdset="0">
-                      <bool>false</bool>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="1" column="1">
-                    <widget class="adiscope::PositionSpinButton" name="phaseMax" native="true">
-                     <property name="units" stdset="0">
-                      <stringlist notr="true">
-                       <string>°=1e0</string>
-                      </stringlist>
-                     </property>
-                     <property name="name" stdset="0">
-                      <string>Max. Phase</string>
-                     </property>
-                     <property name="min_value" stdset="0">
-                      <double>-180.000000000000000</double>
-                     </property>
-                     <property name="max_value" stdset="0">
-                      <double>180.000000000000000</double>
-                     </property>
-                     <property name="value" stdset="0">
-                      <double>180.000000000000000</double>
-                     </property>
-                     <property name="show_progress" stdset="0">
-                      <bool>false</bool>
-                     </property>
-                    </widget>
+                    <layout class="QVBoxLayout" name="magMaxLayout"/>
                    </item>
                    <item row="0" column="0">
-                    <widget class="adiscope::PositionSpinButton" name="magMin" native="true">
-                     <property name="units" stdset="0">
-                      <stringlist notr="true">
-                       <string>dB=1e0</string>
-                      </stringlist>
-                     </property>
-                     <property name="name" stdset="0">
-                      <string>Min. Magnitude</string>
-                     </property>
-                     <property name="min_value" stdset="0">
-                      <double>-120.000000000000000</double>
-                     </property>
-                     <property name="max_value" stdset="0">
-                      <double>120.000000000000000</double>
-                     </property>
-                     <property name="value" stdset="0">
-                      <double>-90.000000000000000</double>
-                     </property>
-                     <property name="show_progress" stdset="0">
-                      <bool>false</bool>
-                     </property>
-                    </widget>
+                    <layout class="QVBoxLayout" name="magMinLayout"/>
+                   </item>
+                   <item row="1" column="1">
+                    <layout class="QVBoxLayout" name="phaseMaxLayout"/>
                    </item>
                    <item row="0" column="1">
-                    <widget class="adiscope::PositionSpinButton" name="phaseMin" native="true">
-                     <property name="units" stdset="0">
-                      <stringlist notr="true">
-                       <string>°=1e0</string>
-                      </stringlist>
-                     </property>
-                     <property name="name" stdset="0">
-                      <string>Min. Phase</string>
-                     </property>
-                     <property name="min_value" stdset="0">
-                      <double>-180.000000000000000</double>
-                     </property>
-                     <property name="max_value" stdset="0">
-                      <double>180.000000000000000</double>
-                     </property>
-                     <property name="value" stdset="0">
-                      <double>-180.000000000000000</double>
-                     </property>
-                     <property name="show_progress" stdset="0">
-                      <bool>false</bool>
-                     </property>
-                    </widget>
+                    <layout class="QVBoxLayout" name="phaseMinLayout"/>
                    </item>
                   </layout>
                  </item>
@@ -1478,18 +1307,6 @@ QLabel {
    <header>customSwitch.hpp</header>
   </customwidget>
   <customwidget>
-   <class>adiscope::PositionSpinButton</class>
-   <extends>QWidget</extends>
-   <header>spinbox_a.hpp</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>adiscope::ScaleSpinButton</class>
-   <extends>QWidget</extends>
-   <header>spinbox_a.hpp</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>adiscope::dBgraph</class>
    <extends>QFrame</extends>
    <header>dbgraph.hpp</header>
@@ -1501,7 +1318,7 @@ QLabel {
    <header>nyquistGraph.hpp</header>
    <container>1</container>
   </customwidget>
- </customwidgets>
+</customwidgets>
  <resources/>
  <connections>
   <connection>
@@ -1520,213 +1337,9 @@ QLabel {
     </hint>
    </hints>
   </connection>
-  <connection>
-   <sender>minFreq</sender>
-   <signal>valueChanged(double)</signal>
-   <receiver>maxFreq</receiver>
-   <slot>setMinValue(double)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>963</x>
-     <y>90</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>969</x>
-     <y>90</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>maxFreq</sender>
-   <signal>valueChanged(double)</signal>
-   <receiver>minFreq</receiver>
-   <slot>setMaxValue(double)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>969</x>
-     <y>90</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>963</x>
-     <y>90</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>magMin</sender>
-   <signal>valueChanged(double)</signal>
-   <receiver>magMax</receiver>
-   <slot>setMinValue(double)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>995</x>
-     <y>322</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1111</x>
-     <y>322</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>magMax</sender>
-   <signal>valueChanged(double)</signal>
-   <receiver>magMin</receiver>
-   <slot>setMaxValue(double)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1111</x>
-     <y>322</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>995</x>
-     <y>322</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>phaseMin</sender>
-   <signal>valueChanged(double)</signal>
-   <receiver>phaseMax</receiver>
-   <slot>setMinValue(double)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>995</x>
-     <y>338</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1111</x>
-     <y>338</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>phaseMax</sender>
-   <signal>valueChanged(double)</signal>
-   <receiver>phaseMin</receiver>
-   <slot>setMaxValue(double)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1111</x>
-     <y>338</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>995</x>
-     <y>338</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>magMin</sender>
-   <signal>valueChanged(double)</signal>
-   <receiver>xygraph</receiver>
-   <slot>setMin(double)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1111</x>
-     <y>317</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>460</x>
-     <y>386</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>magMax</sender>
-   <signal>valueChanged(double)</signal>
-   <receiver>xygraph</receiver>
-   <slot>setMax(double)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>995</x>
-     <y>317</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>460</x>
-     <y>386</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>magMin</sender>
-   <signal>valueChanged(double)</signal>
-   <receiver>nicholsgraph</receiver>
-   <slot>setYMin(double)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1111</x>
-     <y>317</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>460</x>
-     <y>386</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>magMax</sender>
-   <signal>valueChanged(double)</signal>
-   <receiver>nicholsgraph</receiver>
-   <slot>setYMax(double)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>995</x>
-     <y>317</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>460</x>
-     <y>386</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>phaseMin</sender>
-   <signal>valueChanged(double)</signal>
-   <receiver>nicholsgraph</receiver>
-   <slot>setXMin(double)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1111</x>
-     <y>323</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>460</x>
-     <y>386</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>phaseMax</sender>
-   <signal>valueChanged(double)</signal>
-   <receiver>nicholsgraph</receiver>
-   <slot>setXMax(double)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>995</x>
-     <y>323</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>460</x>
-     <y>386</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>minFreq</sender>
-   <signal>valueChanged(double)</signal>
-   <receiver>maxFreq</receiver>
-   <slot>setMinValue(double)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>963</x>
-     <y>90</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>969</x>
-     <y>90</y>
-    </hint>
-   </hints>
-  </connection>
  </connections>
+ <buttongroups>
+  <buttongroup name="buttonGroup_2"/>
+  <buttongroup name="buttonGroup"/>
+ </buttongroups>
 </ui>

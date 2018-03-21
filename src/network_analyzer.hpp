@@ -20,6 +20,7 @@
 #ifndef SCOPY_NETWORK_ANALYZER_HPP
 #define SCOPY_NETWORK_ANALYZER_HPP
 
+#include "spinbox_a.hpp"
 #include "apiObject.hpp"
 #include "iio_manager.hpp"
 #include "signal_sample.hpp"
@@ -27,6 +28,7 @@
 #include "dbgraph.hpp"
 #include "handles_area.hpp"
 #include <QtConcurrentRun>
+
 
 extern "C" {
 	struct iio_buffer;
@@ -73,6 +75,16 @@ namespace adiscope {
         PlotLineHandleH *d_hCursorHandle1;
         PlotLineHandleH *d_hCursorHandle2;
         bool d_cursorsEnabled;
+
+        ScaleSpinButton *samplesCount;
+        ScaleSpinButton *minFreq;
+        ScaleSpinButton *maxFreq;
+        ScaleSpinButton *amplitude;
+        PositionSpinButton *offset;
+        PositionSpinButton *magMax;
+        PositionSpinButton *magMin;
+        PositionSpinButton *phaseMax;
+        PositionSpinButton *phaseMin;
 
         HorizHandlesArea *d_bottomHandlesArea;
 
