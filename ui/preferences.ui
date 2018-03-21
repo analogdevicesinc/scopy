@@ -33,7 +33,7 @@
   border-top: 0px;
 }
 QTabBar::tab {
-  min-width: 120px;
+  min-width: 130px;
   min-height: 32px;
   padding-bottom: 5px;
   font: bold;
@@ -49,7 +49,7 @@ QTabBar::tab:!selected {
 }</string>
         </property>
         <property name="currentIndex">
-         <number>2</number>
+         <number>3</number>
         </property>
         <widget class="QWidget" name="General">
          <attribute name="title">
@@ -430,10 +430,16 @@ QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
           <string>Network Analyzer</string>
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout_6">
+          <property name="spacing">
+           <number>10</number>
+          </property>
+          <property name="topMargin">
+           <number>15</number>
+          </property>
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_5">
             <property name="topMargin">
-             <number>10</number>
+             <number>0</number>
             </property>
             <item>
              <widget class="QCheckBox" name="na_zeroCheckBox">
