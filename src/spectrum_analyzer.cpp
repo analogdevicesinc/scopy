@@ -144,6 +144,8 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 			        QString("Channel %1").arg(i + 1));
 	}
 
+
+
 	ui->setupUi(this);
 	// Temporarily disable the delta marker button
 	ui->pushButton_4->hide();
@@ -230,20 +232,66 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 		setChecked(true);
 
 	// Initialize Sweep controls
-	double max_sr = 50e6; // TO DO: adc should detect max sampl rate and use that
-	ui->start_freq->setMaxValue(max_sr);
-	ui->stop_freq->setMaxValue(max_sr);
-	ui->center_freq->setMaxValue(max_sr);
-	ui->span_freq->setMaxValue(max_sr);
 
-	ui->start_freq->setStep(1e6);
-	ui->stop_freq->setStep(1e6);
-	ui->center_freq->setStep(1e6);
-	ui->span_freq->setStep(1e6);
+	stop_freq = new PositionSpinButton({
+		{"Hz",1e0},
+		{"kHz",1e3},
+		{"MHz",1e6}
+	}, "Stop", 0.0, 0.0, false, false, this);
+	ui->stopFreqLayout->addWidget(stop_freq);
+
+	span_freq = new PositionSpinButton({
+		{"Hz",1e0},
+		{"kHz",1e3},
+		{"MHz",1e6}
+	}, "Span", 0.0, 0.0, false, false, this);
+	ui->spanFreqLayout->addWidget(span_freq);
+
+	start_freq = new PositionSpinButton({
+		{"Hz",1e0},
+		{"kHz",1e3},
+		{"MHz",1e6}
+	}, "Start", 0.0, 0.0, false, false, this);
+	ui->startFreqLayout->addWidget(start_freq);
+
+	center_freq = new PositionSpinButton({
+		{"Hz",1e0},
+		{"kHz",1e3},
+		{"MHz",1e6}
+	}, "Center", 0.0, 0.0, false, false, this);
+	ui->centerFreqLayout->addWidget(center_freq);
+
+	range = new PositionSpinButton({
+		{" ",1e0},
+	}, "Range", 0.0, 0.0, false, false, this);
+	ui->rangeLayout->addWidget(range);
+
+	top = new PositionSpinButton({
+		{" ",1e0},
+	}, "Top", -100.0, 100.0, false, false, this);
+	ui->topLayout->addWidget(top);
+
+	marker_freq_pos = new PositionSpinButton({
+		{"Hz",1e0},
+		{"kHz",1e3},
+		{"MHz",1e6}
+	}, "Frequency Position", 0.0, 5e7, true, false, this);
+	ui->markerFreqPosLayout->addWidget(marker_freq_pos);
+
+	double max_sr = 50e6; // TO DO: adc should detect max sampl rate and use that
+	start_freq->setMaxValue(max_sr);
+	stop_freq->setMaxValue(max_sr);
+	center_freq->setMaxValue(max_sr);
+	span_freq->setMaxValue(max_sr);
+
+	start_freq->setStep(1e6);
+	stop_freq->setStep(1e6);
+	center_freq->setStep(1e6);
+	span_freq->setStep(1e6);
 
 	// Initialize vertical axis controls
-	ui->range->setMinValue(1);
-	ui->range->setMaxValue(200);
+	range->setMinValue(1);
+	range->setMaxValue(200);
 
 	// Configure plot peak capabilities
 	for (uint i = 0; i < num_adc_channels; i++) {
@@ -275,7 +323,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	connect(fft_plot, SIGNAL(markerSelected(uint, uint)),
 	        this, SLOT(onPlotMarkerSelected(uint, uint)));
 
-	connect(ui->marker_freq_pos, SIGNAL(valueChanged(double)),
+	connect(marker_freq_pos, SIGNAL(valueChanged(double)),
 	        this, SLOT(onMarkerFreqPosChanged(double)));
 
 	connect(fft_plot, SIGNAL(sampleRateUpdated(double)),
@@ -303,32 +351,32 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	connect(fft_plot, SIGNAL(newData()),
 	        SLOT(singleCaptureDone()));
 
-	connect(ui->start_freq, SIGNAL(valueChanged(double)),
+	connect(start_freq, SIGNAL(valueChanged(double)),
 	        this, SLOT(onStartStopChanged()));
-	connect(ui->stop_freq, SIGNAL(valueChanged(double)),
+	connect(stop_freq, SIGNAL(valueChanged(double)),
 	        this, SLOT(onStartStopChanged()));
-	connect(ui->center_freq, SIGNAL(valueChanged(double)),
+	connect(center_freq, SIGNAL(valueChanged(double)),
 	        this, SLOT(onCenterSpanChanged()));
-	connect(ui->span_freq, SIGNAL(valueChanged(double)),
+	connect(span_freq, SIGNAL(valueChanged(double)),
 	        this, SLOT(onCenterSpanChanged()));
 
-	connect(ui->top, SIGNAL(valueChanged(double)),
+	connect(top, SIGNAL(valueChanged(double)),
 	        SLOT(onTopValueChanged(double)));
-	connect(ui->range, SIGNAL(valueChanged(double)),
+	connect(range, SIGNAL(valueChanged(double)),
 	        SLOT(onRangeValueChanged(double)));
 
 	// UI default
 	ui->comboBox_window->setCurrentText("Hamming");
 	ui->stackedWidget->setVisible(false);
-	ui->start_freq->setValue(0);
-	ui->stop_freq->setValue(50e6);
+	start_freq->setValue(0);
+	stop_freq->setValue(50e6);
 
-	ui->top->setValue(0);
-	ui->range->setValue(200);
+	top->setValue(0);
+	range->setValue(200);
 
-	ui->marker_freq_pos->setMaxValue(ui->stop_freq->value());
-	ui->marker_freq_pos->setStep(2 * (ui->stop_freq->value() -
-	                                  ui->start_freq->value()) / bin_sizes[ui->cmb_rbw->currentIndex()]);
+	marker_freq_pos->setMaxValue(stop_freq->value());
+	marker_freq_pos->setStep(2 * (stop_freq->value() -
+					  start_freq->value()) / bin_sizes[ui->cmb_rbw->currentIndex()]);
 
 	ui->lblMagUnit->setText(ui->cmb_units->currentText());
 	ui->markerTable->hide();
@@ -713,8 +761,8 @@ void SpectrumAnalyzer::onChannelEnabled(bool en)
 
 void SpectrumAnalyzer::onStartStopChanged()
 {
-	double start = ui->start_freq->value();
-	double stop = ui->stop_freq->value();
+	double start = start_freq->value();
+	double stop = stop_freq->value();
 	double span = stop - start;
 	double center = start + (span / 2);
 
@@ -723,18 +771,18 @@ void SpectrumAnalyzer::onStartStopChanged()
 		span = stop - start;
 		center = start + (span / 2);
 
-		ui->start_freq->blockSignals(true);
-		ui->start_freq->setValue(start);
-		ui->start_freq->blockSignals(false);
+		start_freq->blockSignals(true);
+		start_freq->setValue(start);
+		start_freq->blockSignals(false);
 	}
 
 	// Update Center/Span
-	ui->span_freq->blockSignals(true);
-	ui->span_freq->setValue(span);
-	ui->span_freq->blockSignals(false);
-	ui->center_freq->blockSignals(true);
-	ui->center_freq->setValue(center);
-	ui->center_freq->blockSignals(false);
+	span_freq->blockSignals(true);
+	span_freq->setValue(span);
+	span_freq->blockSignals(false);
+	center_freq->blockSignals(true);
+	center_freq->setValue(center);
+	center_freq->blockSignals(false);
 
 	// Configure plot
 	fft_plot->setStartStop(start, stop);
@@ -759,8 +807,8 @@ void SpectrumAnalyzer::onStartStopChanged()
 
 void SpectrumAnalyzer::onCenterSpanChanged()
 {
-	double span = ui->span_freq->value();
-	double center = ui->center_freq->value();
+	double span = span_freq->value();
+	double center = center_freq->value();
 	double start = center - (span / 2);
 	double stop =center + (span / 2);
 
@@ -769,34 +817,34 @@ void SpectrumAnalyzer::onCenterSpanChanged()
 		span = stop - start;
 		center = start + (span / 2);
 
-		ui->span_freq->blockSignals(true);
-		ui->span_freq->setValue(span);
-		ui->span_freq->blockSignals(false);
-		ui->center_freq->blockSignals(true);
-		ui->center_freq->setValue(center);
-		ui->center_freq->blockSignals(false);
+		span_freq->blockSignals(true);
+		span_freq->setValue(span);
+		span_freq->blockSignals(false);
+		center_freq->blockSignals(true);
+		center_freq->setValue(center);
+		center_freq->blockSignals(false);
 	}
 
-	if (stop > ui->stop_freq->maxValue()) {
-		stop = ui->stop_freq->maxValue();
+	if (stop > stop_freq->maxValue()) {
+		stop = stop_freq->maxValue();
 		span = stop - start;
 		center = start + (span / 2);
 
-		ui->span_freq->blockSignals(true);
-		ui->span_freq->setValue(span);
-		ui->span_freq->blockSignals(false);
-		ui->center_freq->blockSignals(true);
-		ui->center_freq->setValue(center);
-		ui->center_freq->blockSignals(false);
+		span_freq->blockSignals(true);
+		span_freq->setValue(span);
+		span_freq->blockSignals(false);
+		center_freq->blockSignals(true);
+		center_freq->setValue(center);
+		center_freq->blockSignals(false);
 	}
 
 	// Update Start/Stop
-	ui->start_freq->blockSignals(true);
-	ui->start_freq->setValue(start);
-	ui->start_freq->blockSignals(false);
-	ui->stop_freq->blockSignals(true);
-	ui->stop_freq->setValue(stop);
-	ui->stop_freq->blockSignals(false);
+	start_freq->blockSignals(true);
+	start_freq->setValue(start);
+	start_freq->blockSignals(false);
+	stop_freq->blockSignals(true);
+	stop_freq->setValue(stop);
+	stop_freq->blockSignals(false);
 
 	// Configure plot
 	fft_plot->setAxisScale(QwtPlot::xBottom, start, stop);
@@ -1020,7 +1068,7 @@ void SpectrumAnalyzer::setMarkerEnabled(int ch_idx, int mrk_idx, bool en)
 	fft_plot->setMarkerEnabled(ch_idx, mrk_idx, en);
 
 	if (en) {
-		double cf = ui->center_freq->value();
+		double cf = center_freq->value();
 		fft_plot->setMarkerAtFreq(ch_idx, mrk_idx, cf);
 		fft_plot->updateMarkerUi(ch_idx, mrk_idx);
 	}
@@ -1109,17 +1157,17 @@ void SpectrumAnalyzer::onMarkerFreqPosChanged(double freq)
 	double actual_freq = fft_plot->markerFrequency(crt_channel_id,
 	                     crt_marker);
 
-	ui->marker_freq_pos->blockSignals(true);
-	ui->marker_freq_pos->setValue(actual_freq);
-	ui->marker_freq_pos->blockSignals(false);
+	marker_freq_pos->blockSignals(true);
+	marker_freq_pos->setValue(actual_freq);
+	marker_freq_pos->blockSignals(false);
 
 	fft_plot->replot();
 }
 
 void SpectrumAnalyzer::updateMrkFreqPosSpinBtnLimits()
 {
-	ui->marker_freq_pos->setMaxValue(ui->stop_freq->value());
-	ui->marker_freq_pos->setStep(2 * ui->stop_freq->value() /
+	marker_freq_pos->setMaxValue(stop_freq->value());
+	marker_freq_pos->setStep(2 * stop_freq->value() /
 	                             bin_sizes[ui->cmb_rbw->currentIndex()]);
 
 	updateMrkFreqPosSpinBtnValue();
@@ -1139,10 +1187,10 @@ void SpectrumAnalyzer::updateMrkFreqPosSpinBtnValue()
 
 	double freq = fft_plot->markerFrequency(crt_channel_id, crt_marker);
 
-	if (freq != ui->marker_freq_pos->value()) {
-		ui->marker_freq_pos->blockSignals(true);
-		ui->marker_freq_pos->setValue(freq);
-		ui->marker_freq_pos->blockSignals(false);
+	if (freq != marker_freq_pos->value()) {
+		marker_freq_pos->blockSignals(true);
+		marker_freq_pos->setValue(freq);
+		marker_freq_pos->blockSignals(false);
 	}
 }
 
@@ -1233,15 +1281,15 @@ QPair<int, int> SpectrumAnalyzer::getGridLayoutPosFromIndex(QGridLayout *layout,
 
 void SpectrumAnalyzer::onTopValueChanged(double top)
 {
-	double range = ui->range->value();
-	fft_plot->setAxisScale(QwtPlot::yLeft, top - range, top);
+	double rangeValue = range->value();
+	fft_plot->setAxisScale(QwtPlot::yLeft, top - rangeValue, top);
 	fft_plot->replot();
 }
 
 void SpectrumAnalyzer::onRangeValueChanged(double range)
 {
-	double top = ui->top->value();
-	fft_plot->setAxisScale(QwtPlot::yLeft, top - range, top);
+	double topValue = top->value();
+	fft_plot->setAxisScale(QwtPlot::yLeft, topValue - range, topValue);
 	fft_plot->replot();
 }
 
@@ -1569,20 +1617,20 @@ void SpectrumAnalyzer_API::setCurrentChannel(int ch)
 
 double SpectrumAnalyzer_API::startFreq()
 {
-	return sp->ui->start_freq->value();
+	return sp->start_freq->value();
 }
 void SpectrumAnalyzer_API::setStartFreq(double val)
 {
-	sp->ui->start_freq->setValue(val);
+	sp->start_freq->setValue(val);
 }
 
 double SpectrumAnalyzer_API::stopFreq()
 {
-	return sp->ui->stop_freq->value();
+	return sp->stop_freq->value();
 }
 void SpectrumAnalyzer_API::setStopFreq(double val)
 {
-	sp->ui->stop_freq->setValue(val);
+	sp->stop_freq->setValue(val);
 }
 
 QString SpectrumAnalyzer_API::resBW()
@@ -1607,20 +1655,20 @@ void SpectrumAnalyzer_API::setUnits(QString s)
 
 double SpectrumAnalyzer_API::topScale()
 {
-	return sp->ui->top->value();
+	return sp->top->value();
 }
 void SpectrumAnalyzer_API::setTopScale(double val)
 {
-	sp->ui->top->setValue(val);
+	sp->top->setValue(val);
 }
 
 double SpectrumAnalyzer_API::range()
 {
-	return sp->ui->range->value();
+	return sp->range->value();
 }
 void SpectrumAnalyzer_API::setRange(double val)
 {
-	sp->ui->range->setValue(val);
+	sp->range->setValue(val);
 }
 
 bool SpectrumAnalyzer_API::markerTableVisible()

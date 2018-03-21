@@ -32,6 +32,7 @@
 #include "osc_adc.h"
 #include "tool.hpp"
 #include "plot_utils.hpp"
+#include "spinbox_a.hpp"
 
 #include <QWidget>
 
@@ -158,6 +159,14 @@ private:
 	QButtonGroup *settings_group;
 	QButtonGroup *channels_group;
 	FftDisplayPlot *fft_plot;
+
+	PositionSpinButton *stop_freq;
+	PositionSpinButton *span_freq;
+	PositionSpinButton *start_freq;
+	PositionSpinButton *center_freq;
+	PositionSpinButton *range;
+	PositionSpinButton *top;
+	PositionSpinButton *marker_freq_pos;
 
 	QList<channel_sptr> channels;
 

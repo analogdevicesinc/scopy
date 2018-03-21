@@ -143,7 +143,7 @@ QComboBox:disabled
   background-color: #27b34f;
   color: white;
   font-size: 12px;
-  
+
   font-weight: bold;
 
   text-align: left;
@@ -217,7 +217,7 @@ QPushButton:disabled {
   border-radius: 4px;
   background-color: #ff7200;
   color: white;
-  
+
   font-weight: bold;
   font-size: 12px;
   text-align: left;
@@ -921,85 +921,17 @@ border-bottom: 1px solid rgba(255,255,255,100);</string>
                  <property name="spacing">
                   <number>15</number>
                  </property>
-                 <item row="0" column="1">
-                  <widget class="adiscope::PositionSpinButton" name="stop_freq" native="true">
-                   <property name="units" stdset="0">
-                    <stringlist>
-                     <string>Hz=1e0</string>
-                     <string>kHz=1e3</string>
-                     <string>MHz=1e6</string>
-                    </stringlist>
-                   </property>
-                   <property name="name" stdset="0">
-                    <string>Stop</string>
-                   </property>
-                   <property name="show_progress" stdset="0">
-                    <bool>false</bool>
-                   </property>
-                   <property name="min_value" stdset="0">
-                    <double>0.000000000000000</double>
-                   </property>
-                  </widget>
+                 <item row="1" column="0">
+                  <layout class="QHBoxLayout" name="centerFreqLayout"/>
                  </item>
                  <item row="1" column="1">
-                  <widget class="adiscope::PositionSpinButton" name="span_freq" native="true">
-                   <property name="units" stdset="0">
-                    <stringlist>
-                     <string>Hz=1e0</string>
-                     <string>kHz=1e3</string>
-                     <string>MHz=1e6</string>
-                    </stringlist>
-                   </property>
-                   <property name="name" stdset="0">
-                    <string>Span</string>
-                   </property>
-                   <property name="show_progress" stdset="0">
-                    <bool>false</bool>
-                   </property>
-                   <property name="min_value" stdset="0">
-                    <double>0.000000000000000</double>
-                   </property>
-                  </widget>
+                  <layout class="QHBoxLayout" name="spanFreqLayout"/>
                  </item>
                  <item row="0" column="0">
-                  <widget class="adiscope::PositionSpinButton" name="start_freq" native="true">
-                   <property name="units" stdset="0">
-                    <stringlist>
-                     <string>Hz=1e0</string>
-                     <string>kHz=1e3</string>
-                     <string>MHz=1e6</string>
-                    </stringlist>
-                   </property>
-                   <property name="name" stdset="0">
-                    <string>Start</string>
-                   </property>
-                   <property name="show_progress" stdset="0">
-                    <bool>false</bool>
-                   </property>
-                   <property name="min_value" stdset="0">
-                    <double>0.000000000000000</double>
-                   </property>
-                  </widget>
+                  <layout class="QHBoxLayout" name="startFreqLayout"/>
                  </item>
-                 <item row="1" column="0">
-                  <widget class="adiscope::PositionSpinButton" name="center_freq" native="true">
-                   <property name="units" stdset="0">
-                    <stringlist>
-                     <string>Hz=1e0</string>
-                     <string>kHz=1e3</string>
-                     <string>MHz=1e6</string>
-                    </stringlist>
-                   </property>
-                   <property name="name" stdset="0">
-                    <string>Center</string>
-                   </property>
-                   <property name="show_progress" stdset="0">
-                    <bool>false</bool>
-                   </property>
-                   <property name="min_value" stdset="0">
-                    <double>0.000000000000000</double>
-                   </property>
-                  </widget>
+                 <item row="0" column="1">
+                  <layout class="QHBoxLayout" name="stopFreqLayout"/>
                  </item>
                 </layout>
                </item>
@@ -1074,19 +1006,11 @@ border-bottom: 1px solid rgba(255,255,255,100);</string>
                     <number>2</number>
                    </property>
                    <item>
-                    <widget class="adiscope::PositionSpinButton" name="range" native="true">
-                     <property name="units" stdset="0">
-                      <stringlist>
-                       <string> =1e0</string>
-                      </stringlist>
+                    <layout class="QHBoxLayout" name="rangeLayout">
+                     <property name="spacing">
+                      <number>0</number>
                      </property>
-                     <property name="name" stdset="0">
-                      <string>Range</string>
-                     </property>
-                     <property name="show_progress" stdset="0">
-                      <bool>false</bool>
-                     </property>
-                    </widget>
+                    </layout>
                    </item>
                    <item>
                     <widget class="QLabel" name="lbl_rbw">
@@ -1109,25 +1033,7 @@ border-bottom: 1px solid rgba(255,255,255,100);</string>
                     <number>2</number>
                    </property>
                    <item>
-                    <widget class="adiscope::PositionSpinButton" name="top" native="true">
-                     <property name="units" stdset="0">
-                      <stringlist>
-                       <string> =1e0</string>
-                      </stringlist>
-                     </property>
-                     <property name="name" stdset="0">
-                      <string>Top</string>
-                     </property>
-                     <property name="show_progress" stdset="0">
-                      <bool>false</bool>
-                     </property>
-                     <property name="min_value" stdset="0">
-                      <double>-100.000000000000000</double>
-                     </property>
-                     <property name="max_value" stdset="0">
-                      <double>100.000000000000000</double>
-                     </property>
-                    </widget>
+                    <layout class="QHBoxLayout" name="topLayout"/>
                    </item>
                    <item>
                     <widget class="QLabel" name="lbl_units">
@@ -1419,33 +1325,7 @@ QPushButton:hover
                 </spacer>
                </item>
                <item>
-                <widget class="adiscope::PositionSpinButton" name="marker_freq_pos" native="true">
-                 <property name="minimumSize">
-                  <size>
-                   <width>0</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                 <property name="name" stdset="0">
-                  <string>Frequency Position</string>
-                 </property>
-                 <property name="min_value" stdset="0">
-                  <double>0.000000000000000</double>
-                 </property>
-                 <property name="max_value" stdset="0">
-                  <double>50000000.000000000000000</double>
-                 </property>
-                 <property name="units" stdset="0">
-                  <stringlist>
-                   <string>Hz=1e0</string>
-                   <string>kHz=1e3</string>
-                   <string>MHz=1e6</string>
-                  </stringlist>
-                 </property>
-                 <property name="show_progress" stdset="0">
-                  <bool>true</bool>
-                 </property>
-                </widget>
+                <layout class="QVBoxLayout" name="markerFreqPosLayout"/>
                </item>
                <item>
                 <spacer name="verticalSpacer_8">
@@ -1516,8 +1396,8 @@ QPushButton:hover
                       <string notr="true">QPushButton {
 color: white;
 background-color: #4A64FF;
-height: 60px;	
-width: 55px;	
+height: 60px;
+width: 55px;
 border-radius: 4px;
 padding-left: 5px;
 
@@ -1561,8 +1441,8 @@ QPushButton:hover
                       <string notr="true">QPushButton {
 color: white;
 background-color: #4A64FF;
-height: 60px;	
-width: 55px;	
+height: 60px;
+width: 55px;
 border-radius: 4px;
 
 padding-left: 5px;
@@ -1608,8 +1488,8 @@ QPushButton:hover
                       <string notr="true">QPushButton {
 color: white;
 background-color: #4A64FF;
-height: 60px;	
-width: 60px;	
+height: 60px;
+width: 60px;
 border-radius: 4px;
 }
 QPushButton:disabled {
@@ -1651,8 +1531,8 @@ QPushButton:hover
                       <string notr="true">QPushButton {
 color: white;
 background-color: #4A64FF;
-height: 60px;	
-width: 60px;	
+height: 60px;
+width: 60px;
 border-radius: 4px;
 }
 QPushButton:disabled {
@@ -1696,7 +1576,7 @@ color: white;
 background-color: #4A64FF;
 
 font-size:16px;
-height: 60px;	
+height: 60px;
 width: 60px;
 border-radius: 4px;
 border-width: 0px;
@@ -1893,7 +1773,7 @@ QPushButton:hover
   background-color: transparent;
   font-size: 14px;
   font-weight: bold;
-  
+
   color: rgba(255, 255, 255, 153);
 }
 
@@ -1919,7 +1799,7 @@ QPushButton:checked { border-image: url(:/icons/setup_btn_checked.svg); }
 QLabel {
   font-size: 14px;
   font-weight: bold;
-  
+
   color: rgba(255, 255, 255, 153);
 }</string>
           </property>
@@ -1986,6 +1866,12 @@ QLabel {
  </widget>
  <customwidgets>
   <customwidget>
+   <class>adiscope::MenuAnim</class>
+   <extends>QWidget</extends>
+   <header>menu_anim.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>adiscope::DetachDragZone</class>
    <extends>QWidget</extends>
    <header>detachdragzone.h</header>
@@ -1997,26 +1883,9 @@ QLabel {
    <header>customSwitch.hpp</header>
   </customwidget>
   <customwidget>
-   <class>adiscope::MenuAnim</class>
-   <extends>QWidget</extends>
-   <header>menu_anim.hpp</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>adiscope::CustomPushButton</class>
    <extends>QPushButton</extends>
    <header>customPushButton.hpp</header>
-  </customwidget>
-  <customwidget>
-   <class>adiscope::CustomSwitch</class>
-   <extends>QPushButton</extends>
-   <header>customSwitch.hpp</header>
-  </customwidget>
-  <customwidget>
-   <class>adiscope::PositionSpinButton</class>
-   <extends>QWidget</extends>
-   <header>spinbox_a.hpp</header>
-   <container>1</container>
   </customwidget>
   <customwidget>
    <class>adiscope::MarkerTable</class>
