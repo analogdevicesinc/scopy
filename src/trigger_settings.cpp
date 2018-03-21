@@ -59,6 +59,21 @@ TriggerSettings::TriggerSettings(std::shared_ptr<GenericAdc> adc,
 		trigg_configs.push_back(config);
 	}
 
+	trigger_level = new PositionSpinButton({
+		{"μVolts",1e-6},
+		{"mVolts",1e-3},
+		{"Volts",1e0}
+	}, "Level", 0.0, 0.0, true, false, this);
+
+	trigger_hysteresis = new PositionSpinButton({
+		{"μVolts",1e-6},
+		{"mVolts",1e-3},
+		{"Volts",1e0}
+	}, "Hysteresis", 0.0, 0.0, true, false, this);
+
+	ui->controlsLayout->addWidget(trigger_level);
+	ui->controlsLayout->addWidget(trigger_hysteresis);
+
 	// Populate UI source comboboxes with the available channels
 	for (uint i = 0; i < trigger->numChannels(); i++) {
 		ui->cmb_source->addItem(QString("Channel %1").arg(i + 1));
@@ -76,9 +91,9 @@ TriggerSettings::TriggerSettings(std::shared_ptr<GenericAdc> adc,
 		setTriggerHystRange(current_channel, hyst_range);
 	}
 
-	connect(ui->trigger_level, SIGNAL(valueChanged(double)),
+	connect(trigger_level, SIGNAL(valueChanged(double)),
 		SLOT(onSpinboxTriggerLevelChanged(double)));
-	connect(ui->trigger_hysteresis, SIGNAL(valueChanged(double)),
+	connect(trigger_hysteresis, SIGNAL(valueChanged(double)),
 		SLOT(onSpinboxTriggerHystChanged(double)));
 
 	connect(ui->btnTrigger, SIGNAL(clicked()), this,
@@ -96,9 +111,9 @@ TriggerSettings::TriggerSettings(std::shared_ptr<GenericAdc> adc,
 	on_cmb_extern_condition_currentIndexChanged(0);
 	ui->cmb_analog_extern->setCurrentIndex(0);
 	on_cmb_analog_extern_currentIndexChanged(0);
-	ui->trigger_level->setValue(0);
+	trigger_level->setValue(0);
 	m_ac_coupled = false;
-	ui->trigger_hysteresis->setValue(50e-3);
+	trigger_hysteresis->setValue(50e-3);
 	MouseWheelWidgetGuard *wheelEventGuard = new MouseWheelWidgetGuard(this);
 	wheelEventGuard->installEventRecursively(this);
 }
@@ -128,7 +143,7 @@ bool TriggerSettings::digitalEnabled() const
 
 double TriggerSettings::level() const
 {
-	return ui->trigger_level->value();
+	return trigger_level->value();
 }
 
 long long TriggerSettings::triggerDelay() const
@@ -160,8 +175,8 @@ void TriggerSettings::setAcCoupled(bool coupled, int chnIdx)
 void TriggerSettings::setChannelAttenuation(double value)
 {
 	m_displayScale = value;
-	ui->trigger_hysteresis->setDisplayScale(value);
-	ui->trigger_level->setDisplayScale(value);
+	trigger_hysteresis->setDisplayScale(value);
+	trigger_level->setDisplayScale(value);
 }
 
 void TriggerSettings::setDcLevelCoupled(double value)
@@ -173,19 +188,19 @@ void TriggerSettings::setDcLevelCoupled(double value)
 
 void TriggerSettings::setTriggerLevel(double level)
 {
-	double current_level = ui->trigger_level->value();
+	double current_level = trigger_level->value();
 	if (current_level != level) {
-		ui->trigger_level->setValue(level);
+		trigger_level->setValue(level);
 		trigg_configs[current_channel].level_val = level;
 	}
 }
 
 void TriggerSettings::setTriggerHysteresis(double hyst)
 {
-	double current_hyst = ui->trigger_hysteresis->value();
+	double current_hyst = trigger_hysteresis->value();
 
 	if (current_hyst != hyst) {
-		ui->trigger_hysteresis->setValue(hyst);
+		trigger_hysteresis->setValue(hyst);
 		trigg_configs[current_channel].hyst_val = hyst;
 	}
 }
@@ -195,12 +210,12 @@ void TriggerSettings::on_cmb_source_currentIndexChanged(int index)
 	current_channel = index;
 	m_ac_coupled = false;
 
-	ui->trigger_level->setMinValue(trigg_configs[index].level_min);
-	ui->trigger_level->setMaxValue(trigg_configs[index].level_max);
-	ui->trigger_level->setStep(trigg_configs[index].level_step);
-	ui->trigger_hysteresis->setMinValue(trigg_configs[index].hyst_min);
-	ui->trigger_hysteresis->setMaxValue(trigg_configs[index].hyst_max);
-	ui->trigger_hysteresis->setStep(trigg_configs[index].hyst_step);
+	trigger_level->setMinValue(trigg_configs[index].level_min);
+	trigger_level->setMaxValue(trigg_configs[index].level_max);
+	trigger_level->setStep(trigg_configs[index].level_step);
+	trigger_hysteresis->setMinValue(trigg_configs[index].hyst_min);
+	trigger_hysteresis->setMaxValue(trigg_configs[index].hyst_max);
+	trigger_hysteresis->setStep(trigg_configs[index].hyst_step);
 
 	if (adc_running)
 		write_ui_settings_to_hawrdware();
@@ -377,8 +392,8 @@ void TriggerSettings::setTriggerLevelRange(int chn,
 	trigg_configs[chn].level_max = range.second;
 
 	if (current_channel == chn) {
-		ui->trigger_level->setMinValue(range.first);
-		ui->trigger_level->setMaxValue(range.second);
+		trigger_level->setMinValue(range.first);
+		trigger_level->setMaxValue(range.second);
 	}
 }
 
@@ -389,8 +404,8 @@ void TriggerSettings::setTriggerHystRange(int chn,
 	trigg_configs[chn].hyst_max = range.second;
 
 	if (current_channel == chn) {
-		ui->trigger_hysteresis->setMinValue(range.first);
-		ui->trigger_hysteresis->setMaxValue(range.second);
+		trigger_hysteresis->setMinValue(range.first);
+		trigger_hysteresis->setMaxValue(range.second);
 	}
 }
 
@@ -409,7 +424,7 @@ void TriggerSettings::setTriggerLevelStep(int chn, double step)
 	trigg_configs[chn].level_step = step;
 
 	if (current_channel == chn) {
-		ui->trigger_level->setStep(step);
+		trigger_level->setStep(step);
 	}
 }
 
@@ -418,7 +433,7 @@ void TriggerSettings::setTriggerHystStep(int chn, double step)
 	trigg_configs[chn].hyst_step = step;
 
 	if (current_channel == chn) {
-		ui->trigger_hysteresis->setStep(step);
+		trigger_hysteresis->setStep(step);
 	}
 }
 
@@ -438,8 +453,8 @@ void TriggerSettings::write_ui_settings_to_hawrdware()
 		ui->extern_en->isChecked()));
 	analog_cond_hw_write(ui->cmb_condition->currentIndex());
 	digital_cond_hw_write(ui->cmb_extern_condition->currentIndex());
-	level_hw_write(ui->trigger_level->value());
-	hysteresis_hw_write(ui->trigger_hysteresis->value());
+	level_hw_write(trigger_level->value());
+	hysteresis_hw_write(trigger_hysteresis->value());
 	delay_hw_write(trigger_raw_delay);
 }
 

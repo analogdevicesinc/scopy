@@ -4146,22 +4146,22 @@ void Oscilloscope_API::setTriggerSource(int idx)
 
 double Oscilloscope_API::getTriggerLevel() const
 {
-	return osc->trigger_settings.ui->trigger_level->value();
+	return osc->trigger_settings.trigger_level->value();
 }
 
 void Oscilloscope_API::setTriggerLevel(double level)
 {
-	osc->trigger_settings.ui->trigger_level->setValue(level);
+	osc->trigger_settings.trigger_level->setValue(level);
 }
 
 double Oscilloscope_API::getTriggerHysteresis() const
 {
-	return osc->trigger_settings.ui->trigger_hysteresis->value();
+	return osc->trigger_settings.trigger_hysteresis->value();
 }
 
 void Oscilloscope_API::setTriggerHysteresis(double hyst)
 {
-	osc->trigger_settings.ui->trigger_hysteresis->setValue(hyst);
+	osc->trigger_settings.trigger_hysteresis->setValue(hyst);
 }
 
 int Oscilloscope_API::internalCondition() const
