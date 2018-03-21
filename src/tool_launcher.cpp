@@ -31,6 +31,7 @@
 #include "dragzone.h"
 #include "debugger.h"
 #include "manualcalibration.h"
+#include "apiobjectmanager.h"
 
 #include "ui_device.h"
 #include "ui_tool_launcher.h"
@@ -1723,6 +1724,8 @@ void ToolLauncher_API::load(const QString& file)
 	if (tl->spectrum_analyzer)
 		tl->spectrum_analyzer->api->load(settings);
 
+	ApiObjectManager::getInstance().load(settings);
+
 	for (auto tool : tl->toolList)
 		tool->settingsLoaded();
 }
@@ -1751,6 +1754,8 @@ void ToolLauncher_API::save(const QString& file)
 		tl->network_analyzer->api->save(settings);
 	if (tl->spectrum_analyzer)
 		tl->spectrum_analyzer->api->save(settings);
+
+	ApiObjectManager::getInstance().save(settings);
 }
 
 void ToolLauncher::addDebugWindow()
