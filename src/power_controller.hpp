@@ -72,13 +72,14 @@ namespace adiscope {
 
 	private:
 		Ui::PowerController *ui;
+		PositionSpinButton *valuePos;
+		PositionSpinButton *valueNeg;
 		struct iio_channel *ch1w, *ch2w, *ch1r, *ch2r, *pd_pos, *pd_neg;
 		QTimer timer;
 		bool in_sync;
 		QList<long long> averageVoltageCh1;
 		QList<long long> averageVoltageCh2;
 
-		PositionSpinButton *valuePos, *valueNeg;
 		QMap<QString, double> calibrationParam;
 
 		void showEvent(QShowEvent *event);

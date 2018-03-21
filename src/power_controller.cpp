@@ -83,17 +83,35 @@ PowerController::PowerController(struct iio_context *ctx,
 
 	ui->btnSync->click();
 
+	valuePos = new PositionSpinButton({
+		{"mVolts",1e-3},
+		{"Volts",1e0}
+	}, "Value", 0, 5, true, true, this);
+
+	valueNeg = new PositionSpinButton({
+		{"mVolts",1e-3},
+		{"Volts",1e0}
+	}, "Value", -5, 0, true, true, this);
+
+	ui->valuePosLayout->addWidget(valuePos);
+	ui->valueNegLayout->addWidget(valueNeg);
+
+	connect(valuePos, &PositionSpinButton::valueChanged,
+		ui->lcd1_set, &LcdNumber::display);
+	connect(valueNeg, &PositionSpinButton::valueChanged,
+		ui->lcd2_set, &LcdNumber::display);
+
 	connect(&this->timer, SIGNAL(timeout()), this, SLOT(update_lcd()));
 
 	connect(ui->dac1, SIGNAL(toggled(bool)), this,
 			SLOT(dac1_set_enabled(bool)));
 	connect(ui->dac2, SIGNAL(toggled(bool)), this,
-	        SLOT(dac2_set_enabled(bool)));
+			SLOT(dac2_set_enabled(bool)));
 	connect(ui->btnSync, SIGNAL(toggled(bool)), this,
-	        SLOT(sync_enabled(bool)));
-	connect(ui->valuePos, SIGNAL(valueChanged(double)), this,
+			SLOT(sync_enabled(bool)));
+	connect(valuePos, SIGNAL(valueChanged(double)), this,
 			SLOT(dac1_set_value(double)));
-	connect(ui->valueNeg, SIGNAL(valueChanged(double)), this,
+	connect(valueNeg, SIGNAL(valueChanged(double)), this,
 			SLOT(dac2_set_value(double)));
 	connect(ui->trackingRatio, SIGNAL(valueChanged(int)), this,
 			SLOT(ratioChanged(int)));
@@ -175,7 +193,7 @@ void PowerController::dac1_set_value(double value)
 
 	if (in_sync) {
 		value = -value * ui->trackingRatio->value() / 100.0;
-		ui->valueNeg->setValue(value);
+		valueNeg->setValue(value);
 		dac2_set_value(value);
 		averageVoltageCh2.clear();
 	}
@@ -248,14 +266,14 @@ void PowerController::sync_enabled(bool enabled)
 	}
 
 	in_sync = !enabled;
-	ui->valueNeg->setDisabled(!enabled);
-	ui->valueNeg->setValue(-ui->valuePos->value() *
+	valueNeg->setDisabled(!enabled);
+	valueNeg->setValue(-valuePos->value() *
 			(double) ui->trackingRatio->value() / 100.0);
 }
 
 void PowerController::ratioChanged(int percent)
 {
-	ui->valueNeg->setValue(-ui->valuePos->value() *
+	valueNeg->setValue(-valuePos->value() *
 			(double) percent / 100.0);
 }
 
@@ -331,21 +349,21 @@ void PowerController_API::setTrackingPercent(int percent)
 
 double PowerController_API::valueDac1() const
 {
-	return pw->ui->valuePos->value();
+	return pw->valuePos->value();
 }
 
 void PowerController_API::setValueDac1(double value)
 {
-	pw->ui->valuePos->setValue(value);
+	pw->valuePos->setValue(value);
 }
 
 double PowerController_API::valueDac2() const
 {
-	return pw->ui->valueNeg->value();
+	return pw->valueNeg->value();
 }
 
 void PowerController_API::setValueDac2(double value)
 {
 	if (!syncEnabled())
-		pw->ui->valueNeg->setValue(value);
+		pw->valueNeg->setValue(value);
 }
