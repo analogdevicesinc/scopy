@@ -23,8 +23,10 @@
 #include <QStringList>
 #include <QWidget>
 #include <vector>
+#include <QSettings>
 
 #include "plot_utils.hpp"
+#include "apiObject.hpp"
 
 class QHBoxLayout;
 class QVBoxLayout;
@@ -53,18 +55,13 @@ namespace adiscope {
  * SpinBoxA = Spinbox of type A. If other composite widgets around
  *            a QSpinBox will be created, they can be called B,C,..
  */
+class SpinBoxA_API;
+
 class SpinBoxA : public QWidget
 {
-	Q_OBJECT
+	friend class SpinBoxA_API;
 
-	Q_PROPERTY(QStringList units MEMBER m_units_list WRITE setUnits);
-	Q_PROPERTY(double min_value READ minValue WRITE setMinValue);
-	Q_PROPERTY(double max_value READ maxValue WRITE setMaxValue);
-	Q_PROPERTY(double value READ value WRITE setValue NOTIFY valueChanged);
-	Q_PROPERTY(bool fine_mode READ isInFineMode WRITE setFineMode);
-	Q_PROPERTY(bool invert_circle READ isCircleInverted WRITE invertCircle);
-	Q_PROPERTY(bool show_progress READ progressShown WRITE showProgress);
-	Q_PROPERTY(QString name READ getName WRITE setName);
+	Q_OBJECT
 
 public:
 	explicit SpinBoxA(QWidget *parent = nullptr);
@@ -107,6 +104,8 @@ public:
 
 	void setDisplayScale(double value);
 
+	static unsigned int current_id;
+
 public Q_SLOTS:
 	virtual void setValue(double);
 	void setFineMode(bool);
@@ -143,6 +142,58 @@ protected:
 	std::vector<std::pair<QString, double> > m_units;
 	QRegExpValidator *m_validator;
 	double m_displayScale;
+	SpinBoxA_API *m_sba_api;
+	unsigned int m_id;
+
+private:
+	QSettings *m_settings;
+};
+
+class SpinBoxA_API : public ApiObject
+{
+	Q_OBJECT
+
+	Q_PROPERTY(double min_value READ minValue WRITE setMinValue STORED false)
+	Q_PROPERTY(double max_value READ maxValue WRITE setMaxValue STORED false)
+	Q_PROPERTY(double value READ value WRITE setValue STORED false)
+	Q_PROPERTY(bool fine_mode READ isInFineMode WRITE setFineMode)
+	Q_PROPERTY(bool invert_circle READ isCircleInverted WRITE invertCircle STORED false)
+	Q_PROPERTY(bool show_progress READ progressShown WRITE showProgress STORED false)
+	Q_PROPERTY(QString name READ getName WRITE setName STORED false)
+
+public:
+	explicit SpinBoxA_API(SpinBoxA *sba);
+	~SpinBoxA_API();
+
+	double value() const;
+	void setValue(double value);
+
+	double minValue() const;
+	void setMinValue(double value);
+
+	double maxValue() const;
+	void setMaxValue(double value);
+
+	int decimalCount() const;
+	void setDecimalCount(int count);
+
+	bool isInFineMode();
+	void setFineMode(bool enabled);
+
+	bool isCircleInverted() const;
+	void invertCircle(bool invert);
+
+	bool progressShown() const;
+	void showProgress(bool show);
+
+	bool fineModeAvailable();
+	void setFineModeAvailable(bool available);
+
+	QString getName() const;
+	void setName(const QString& name);
+
+private:
+	SpinBoxA *sba;
 };
 
 class ScaleSpinButton: public SpinBoxA

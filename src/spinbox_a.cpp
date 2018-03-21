@@ -19,6 +19,7 @@
 
 #include "spinbox_a.hpp"
 #include "completion_circle.h"
+#include "apiobjectmanager.h"
 
 #include "ui_spinbox_a.h"
 
@@ -43,10 +44,13 @@ using namespace adiscope;
  * SpinBoxA class implementation
  */
 
+unsigned int SpinBoxA::current_id(0);
+
 SpinBoxA::SpinBoxA(QWidget *parent) : QWidget(parent),
 	ui(new Ui::SpinBoxA), m_value(0.0), m_min_value(0.0), m_max_value(0.0),
 	m_decimal_count(3),
-	m_validator(new QRegExpValidator(this))
+	m_validator(new QRegExpValidator(this)),
+	m_sba_api(new SpinBoxA_API(this))
 {
 	ui->setupUi(this);
 	ui->SBA_LineEdit->setValidator(m_validator);
@@ -105,11 +109,25 @@ SpinBoxA::SpinBoxA(vector<pair<QString, double> >units, const QString& name,
 		setValue(max_value);
 	}
 
+	m_id = current_id++;
 
+	QString spinBoxName = parent->objectName() + "SpinBox" + name + QString::number(m_id);
+	spinBoxName.remove(" ");
+	m_sba_api->setObjectName(spinBoxName);
+
+	QSettings oldSettings;
+	QFile tempFile(oldSettings.fileName() + ".bak");
+	m_settings = new QSettings(tempFile.fileName(), QSettings::IniFormat);
+
+	m_sba_api->load(*m_settings);
 }
 
 SpinBoxA::~SpinBoxA()
 {
+	current_id--;
+
+	m_sba_api->save(*m_settings);
+	delete m_sba_api;
 	delete ui;
 }
 
@@ -966,4 +984,105 @@ void PhaseSpinButton::stepDown()
 void PhaseSpinButton::setStep(double step)
 {
 	m_step = step;
+}
+
+SpinBoxA_API::SpinBoxA_API(SpinBoxA *sba) :
+	ApiObject(), sba(sba)
+{
+	ApiObjectManager::getInstance().registerApiObject(this);
+}
+
+SpinBoxA_API::~SpinBoxA_API()
+{
+	ApiObjectManager::getInstance().unregisterApiObject(this);
+}
+
+double SpinBoxA_API::value() const
+{
+	return sba->value();
+}
+
+void SpinBoxA_API::setValue(double value)
+{
+	sba->setValue(value);
+}
+
+double SpinBoxA_API::minValue() const
+{
+	return sba->minValue();
+}
+
+void SpinBoxA_API::setMinValue(double value)
+{
+	sba->setMinValue(value);
+}
+
+double SpinBoxA_API::maxValue() const
+{
+	return sba->maxValue();
+}
+
+void SpinBoxA_API::setMaxValue(double value)
+{
+	sba->setMaxValue(value);
+}
+
+int SpinBoxA_API::decimalCount() const
+{
+	return sba->decimalCount();
+}
+
+void SpinBoxA_API::setDecimalCount(int count)
+{
+	sba->setDecimalCount(count);
+}
+
+bool SpinBoxA_API::isInFineMode()
+{
+	return sba->isInFineMode();
+}
+
+void SpinBoxA_API::setFineMode(bool enabled)
+{
+	sba->setFineMode(enabled);
+}
+
+bool SpinBoxA_API::isCircleInverted() const
+{
+	return sba->isCircleInverted();
+}
+
+void SpinBoxA_API::invertCircle(bool invert)
+{
+	sba->invertCircle(invert);
+}
+
+bool SpinBoxA_API::progressShown() const
+{
+	return sba->progressShown();
+}
+
+void SpinBoxA_API::showProgress(bool show)
+{
+	sba->showProgress(show);
+}
+
+bool SpinBoxA_API::fineModeAvailable()
+{
+	return sba->fineModeAvailable();
+}
+
+void SpinBoxA_API::setFineModeAvailable(bool available)
+{
+	sba->setFineModeAvailable(available);
+}
+
+QString SpinBoxA_API::getName() const
+{
+	return sba->getName();
+}
+
+void SpinBoxA_API::setName(const QString &name)
+{
+	sba->setName(name);
 }
