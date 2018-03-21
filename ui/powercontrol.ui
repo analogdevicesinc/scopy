@@ -825,23 +825,7 @@ QSlider::sub-page:horizontal {
        </widget>
       </item>
       <item>
-       <widget class="adiscope::PositionSpinButton" name="valuePos" native="true">
-        <property name="units" stdset="0">
-         <stringlist>
-          <string>mVolts=1e-3</string>
-          <string>Volts=1e0</string>
-         </stringlist>
-        </property>
-        <property name="name" stdset="0">
-         <string>Value</string>
-        </property>
-        <property name="min_value" stdset="0">
-         <double>0.000000000000000</double>
-        </property>
-        <property name="max_value" stdset="0">
-         <double>5.000000000000000</double>
-        </property>
-       </widget>
+       <layout class="QVBoxLayout" name="valuePosLayout"/>
       </item>
       <item>
        <widget class="QPushButton" name="dac1">
@@ -972,23 +956,7 @@ QPushButton:disabled {
        </widget>
       </item>
       <item>
-       <widget class="adiscope::PositionSpinButton" name="valueNeg" native="true">
-        <property name="units" stdset="0">
-         <stringlist>
-          <string>mVolts=1e-3</string>
-          <string>Volts=1e0</string>
-         </stringlist>
-        </property>
-        <property name="name" stdset="0">
-         <string>Value</string>
-        </property>
-        <property name="min_value" stdset="0">
-         <double>-5.000000000000000</double>
-        </property>
-        <property name="max_value" stdset="0">
-         <double>0.000000000000000</double>
-        </property>
-       </widget>
+       <layout class="QVBoxLayout" name="valueNegLayout"/>
       </item>
       <item>
        <widget class="QPushButton" name="dac2">
@@ -1067,12 +1035,6 @@ QPushButton:disabled {
    <class>adiscope::CustomSwitch</class>
    <extends>QPushButton</extends>
    <header>customSwitch.hpp</header>
-  </customwidget>
-  <customwidget>
-   <class>adiscope::PositionSpinButton</class>
-   <extends>QWidget</extends>
-   <header>spinbox_a.hpp</header>
-   <container>1</container>
   </customwidget>
   <customwidget>
    <class>adiscope::DetachDragZone</class>
