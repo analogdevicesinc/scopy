@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>110</width>
-    <height>110</height>
+    <height>173</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -68,8 +68,8 @@ font-weight: bold;
        </property>
        <property name="minimumSize">
         <size>
-         <width>108</width>
-         <height>60</height>
+         <width>100</width>
+         <height>100</height>
         </size>
        </property>
        <property name="styleSheet">
@@ -100,12 +100,12 @@ background-color: red;
        </property>
        <property name="icon">
         <iconset resource="../resources/resources.qrc">
-         <normaloff>:/menu/face.png</normaloff>:/menu/face.png</iconset>
+         <normaloff>:/menu/ic adalm.png</normaloff>:/menu/ic adalm.png</iconset>
        </property>
        <property name="iconSize">
         <size>
-         <width>62</width>
-         <height>55</height>
+         <width>100</width>
+         <height>100</height>
         </size>
        </property>
        <property name="checkable">

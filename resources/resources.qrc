@@ -120,6 +120,9 @@
         <file>icons/ic-unlocked.svg</file>
         <file>menu/calibration.png</file>
         <file>menu/debugger.png</file>
+        <file>menu/ic adalm.svg</file>
+        <file>menu/ADALM2000.png</file>
+        <file>menu/ic adalm.png</file>
     </qresource>
     <qresource prefix="/stylesheets">
         <file>stylesheets/global.qss</file>
