@@ -39,13 +39,14 @@ ColourButton::ColourButton(int rows, int cols, QWidget *parent, bool bgButton) :
 	connect(this, SIGNAL(clicked(bool)), this, SLOT(on_clicked(bool)));
 	connect(&popup_, SIGNAL(selected(int, int)),
 		this, SLOT(on_selected(int, int)));
+	setStyleSheet("QPushButton { padding-right: 10px; }");
 	setMinimumWidth(90);
 	setMaximumWidth(90);
 	setMinimumHeight(25);
 	setMaximumHeight(25);
 	this->setFocusPolicy(Qt::NoFocus);
-	setIcon(QIcon(":/icons/gear_wheel.svg"));
-	setIconSize(QSize(25, 25));
+	setIcon(QIcon(":/icons/sba_cmb_box_arrow.svg"));
+	setIconSize(QSize(10, 6));
 }
 
 ColourPopup& ColourButton::popup()
@@ -124,9 +125,8 @@ void ColourButton::paintEvent(QPaintEvent *event)
 
 
 	if(!this->icon().isNull())
-		//Draw the icon at 75% button height
 		style()->drawItemPixmap(&p, rect(),Qt::AlignRight|Qt::AlignVCenter,
-			this->icon().pixmap(rect().height()));
+			this->icon().pixmap(iconSize()));
 }
 
 } // widgets
