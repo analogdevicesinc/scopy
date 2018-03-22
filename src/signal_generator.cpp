@@ -561,6 +561,8 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 
 	connect(prefPanel, &Preferences::notify, this, &SignalGenerator::readPreferences);
 
+	time_block_data->time_block->set_update_time(0.001);
+
 	plot->addZoomer(0);
 	resetZoom();
 
