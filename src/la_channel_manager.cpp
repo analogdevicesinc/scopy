@@ -1726,9 +1726,9 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 			/* Set no of characters to widgets */
 			setWidgetMinimumNrOfChars(lachannelgroupUI->ui->groupName, 8);
 			setWidgetMinimumNrOfChars(lachannelgroupUI->ui->indexLabel, 5);
-			setWidgetMinimumNrOfChars(lachannelgroupUI->ui->comboBox, 5);
+			setWidgetMinimumNrOfChars(lachannelgroupUI->ui->comboBox, 7);
 			lachannelgroupUI->ui->comboBox->setIconSize(QSize(30,20));
-			setWidgetMinimumNrOfChars(lachannelgroupUI->ui->comboBox_2, 5);
+			setWidgetMinimumNrOfChars(lachannelgroupUI->ui->comboBox_2, 7);
 			if(!lachannelgroupUI->ui->collapseGroupBtn->isChecked())
 				retainWidgetSizeWhenHidden(lachannelgroupUI->ui->collapseGroupBtn);
 			setWidgetMinimumNrOfChars(lachannelgroupUI->ui->decoderCombo, 10);
@@ -1832,9 +1832,9 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 						setWidgetMinimumNrOfChars(lachannelUI->ui->groupName, 8);
 						setWidgetMinimumNrOfChars(lachannelUI->ui->indexLabel2, 3);
 						setWidgetMinimumNrOfChars(lachannelUI->ui->indexLabel, 3);
-						setWidgetMinimumNrOfChars(lachannelUI->ui->comboBox, 5);
+						setWidgetMinimumNrOfChars(lachannelUI->ui->comboBox, 7);
 						lachannelUI->ui->comboBox->setIconSize(QSize(30, 20));
-						setWidgetMinimumNrOfChars(lachannelUI->ui->comboBox_2, 5);
+						setWidgetMinimumNrOfChars(lachannelUI->ui->comboBox_2, 7);
 
 						if(!lachannelUI->ui->collapseGroupBtn->isChecked())
 							retainWidgetSizeWhenHidden(lachannelUI->ui->collapseGroupBtn);
