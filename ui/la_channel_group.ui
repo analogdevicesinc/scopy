@@ -70,7 +70,7 @@
      </property>
      <property name="styleSheet">
       <string notr="true">QWidget[highlight=true] { background-color: #1b1b21; }
-QWidget[hover-property=true] { border:1px solid rgb(65,155,249); }
+QWidget[hover-property=true] { border:1px solid #4a64ff; }
 QLabel {
 color: white;
 font-size: 16px;
