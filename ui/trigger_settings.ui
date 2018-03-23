@@ -115,7 +115,7 @@
         <x>0</x>
         <y>0</y>
         <width>251</width>
-        <height>558</height>
+        <height>635</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -143,7 +143,7 @@
           <number>20</number>
          </property>
          <property name="bottomMargin">
-          <number>0</number>
+          <number>10</number>
          </property>
          <item>
           <widget class="QLabel" name="label">
@@ -260,14 +260,14 @@ color: rgba(255,255,255,51);
           </layout>
          </item>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_3">
-           <property name="spacing">
-            <number>5</number>
-           </property>
+          <layout class="QGridLayout" name="gridLayout">
            <property name="topMargin">
             <number>0</number>
            </property>
-           <item>
+           <property name="horizontalSpacing">
+            <number>3</number>
+           </property>
+           <item row="0" column="0">
             <widget class="QLabel" name="lbl_source">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -283,7 +283,7 @@ color: rgba(255,255,255,51);
              </property>
             </widget>
            </item>
-           <item>
+           <item row="1" column="0">
             <widget class="QComboBox" name="cmb_source">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -303,7 +303,7 @@ color: rgba(255,255,255,51);
        <item>
         <layout class="QVBoxLayout" name="verticalLayout_6">
          <property name="spacing">
-          <number>15</number>
+          <number>20</number>
          </property>
          <property name="topMargin">
           <number>0</number>
@@ -379,7 +379,7 @@ color: rgba(255,255,255,51);
           <widget class="QWidget" name="analog_controls" native="true">
            <layout class="QVBoxLayout" name="verticalLayout_2">
             <property name="spacing">
-             <number>5</number>
+             <number>10</number>
             </property>
             <property name="leftMargin">
              <number>0</number>
@@ -394,53 +394,63 @@ color: rgba(255,255,255,51);
              <number>0</number>
             </property>
             <item>
-             <widget class="QLabel" name="lbl_condition">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
+             <layout class="QVBoxLayout" name="verticalLayout_9">
+              <property name="spacing">
+               <number>5</number>
               </property>
-              <property name="styleSheet">
-               <string notr="true">font-size: 13px;</string>
-              </property>
-              <property name="text">
-               <string>Condition</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QComboBox" name="cmb_condition">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="currentIndex">
+              <property name="topMargin">
                <number>0</number>
               </property>
               <item>
-               <property name="text">
-                <string>Rising Edge</string>
-               </property>
+               <widget class="QLabel" name="lbl_condition">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">font-size: 13px;</string>
+                </property>
+                <property name="text">
+                 <string>Condition</string>
+                </property>
+               </widget>
               </item>
               <item>
-               <property name="text">
-                <string>Falling Edge</string>
-               </property>
+               <widget class="QComboBox" name="cmb_condition">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="currentIndex">
+                 <number>0</number>
+                </property>
+                <item>
+                 <property name="text">
+                  <string>Rising Edge</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Falling Edge</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Low</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>High</string>
+                 </property>
+                </item>
+               </widget>
               </item>
-              <item>
-               <property name="text">
-                <string>Low</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>High</string>
-               </property>
-              </item>
-             </widget>
+             </layout>
             </item>
             <item>
              <spacer name="verticalSpacer_4">
@@ -500,7 +510,7 @@ color: rgba(255,255,255,51);
           <number>0</number>
          </property>
          <property name="bottomMargin">
-          <number>0</number>
+          <number>10</number>
          </property>
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_5">
@@ -646,69 +656,130 @@ color: rgba(255,255,255,51);
        <item>
         <layout class="QVBoxLayout" name="verticalLayout_7">
          <property name="spacing">
-          <number>5</number>
-         </property>
-         <property name="topMargin">
           <number>15</number>
          </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
          <item>
-          <widget class="QLabel" name="lbl_analog_extern">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
+          <layout class="QHBoxLayout" name="horizontalLayout_6">
+           <property name="spacing">
+            <number>0</number>
            </property>
-           <property name="styleSheet">
-            <string notr="true">font-size: 13px;</string>
-           </property>
-           <property name="text">
-            <string>Analog - Digital</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QComboBox" name="cmb_analog_extern">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="currentIndex">
+           <property name="topMargin">
             <number>0</number>
            </property>
            <item>
-            <property name="text">
-             <string>Digital OR Analog</string>
-            </property>
+            <widget class="QLabel" name="label_4">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">QLabel {
+		font-size: 12px;
+		color: rgba(255, 255, 255, 70);
+	}</string>
+             </property>
+             <property name="text">
+              <string>TRIGGER LOGIC </string>
+             </property>
+            </widget>
            </item>
            <item>
-            <property name="text">
-             <string>Digital AND Analog</string>
-            </property>
+            <widget class="Line" name="line_3">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>1</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>1</height>
+              </size>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
+             </property>
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QVBoxLayout" name="verticalLayout_5">
+           <property name="spacing">
+            <number>5</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="lbl_analog_extern">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">font-size: 13px;</string>
+             </property>
+             <property name="text">
+              <string>Analog - Digital</string>
+             </property>
+            </widget>
            </item>
            <item>
-            <property name="text">
-             <string>Digital XOR Analog</string>
-            </property>
+            <widget class="QComboBox" name="cmb_analog_extern">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="currentIndex">
+              <number>0</number>
+             </property>
+             <item>
+              <property name="text">
+               <string>Digital OR Analog</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Digital AND Analog</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Digital XOR Analog</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>!Digital OR Analog</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>!Digital AND Analog</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>!Digital XOR Analog</string>
+              </property>
+             </item>
+            </widget>
            </item>
-           <item>
-            <property name="text">
-             <string>!Digital OR Analog</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>!Digital AND Analog</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>!Digital XOR Analog</string>
-            </property>
-           </item>
-          </widget>
+          </layout>
          </item>
         </layout>
        </item>
