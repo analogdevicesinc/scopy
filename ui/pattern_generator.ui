@@ -373,7 +373,8 @@ background-color: grey;
         </property>
         <property name="icon">
          <iconset resource="../resources/resources.qrc">
-          <normaloff>:/icons/ico-play.svg</normaloff>:/icons/ico-play.svg</iconset>
+          <normaloff>:/icons/ico-play.svg</normaloff>
+          <normalon>:/icons/ico-stop.svg</normalon>:/icons/ico-play.svg</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -438,7 +439,8 @@ background-color: grey;
         </property>
         <property name="icon">
          <iconset resource="../resources/resources.qrc">
-          <normaloff>:/icons/ico-oneshot.svg</normaloff>:/icons/ico-oneshot.svg</iconset>
+          <normaloff>:/icons/ico-oneshot.svg</normaloff>
+          <normalon>:/icons/ico-stop.svg</normalon>:/icons/ico-oneshot.svg</iconset>
         </property>
         <property name="iconSize">
          <size>

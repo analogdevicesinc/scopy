@@ -714,7 +714,8 @@ QPushButton:disabled {
         </property>
         <property name="icon">
          <iconset resource="../resources/resources.qrc">
-          <normaloff>:/icons/ico-play.svg</normaloff>:/icons/ico-play.svg</iconset>
+          <normaloff>:/icons/ico-play.svg</normaloff>
+          <normalon>:/icons/ico-stop.svg</normalon>:/icons/ico-play.svg</iconset>
         </property>
         <property name="iconSize">
          <size>
