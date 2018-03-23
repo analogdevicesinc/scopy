@@ -50,6 +50,7 @@
 #include "customplotpositionbutton.h"
 #include "channel_widget.hpp"
 #include "signal_sample.hpp"
+#include "utils.h"
 
 /* Generated UI */
 #include "ui_channel_settings.h"
@@ -409,6 +410,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	ch_ui->horizontal->insertWidget(2, timePosition, 0, Qt::AlignLeft);
 	ch_ui->vertical->insertWidget(1, voltsPerDiv, 0, Qt::AlignLeft);
 	ch_ui->vertical->insertWidget(2, voltsPosition, 0, Qt::AlignLeft);
+	Util::retainWidgetSizeWhenHidden(ch_ui->probeWidget);
 
 	init_channel_settings();
 

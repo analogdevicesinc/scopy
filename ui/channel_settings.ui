@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>288</width>
+    <width>535</width>
     <height>538</height>
    </rect>
   </property>
@@ -104,9 +104,9 @@ font-weight: normal;
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-36</y>
-        <width>252</width>
-        <height>533</height>
+        <y>-81</y>
+        <width>454</width>
+        <height>589</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -658,78 +658,195 @@ color: rgba(255, 255, 255, 70);
         </layout>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="thicknessLayout">
+        <layout class="QGridLayout" name="gridLayout">
          <property name="topMargin">
           <number>0</number>
          </property>
          <property name="bottomMargin">
-          <number>10</number>
+          <number>15</number>
          </property>
-         <item>
-          <widget class="QLabel" name="lblLineWidth">
-           <property name="styleSheet">
-            <string notr="true">font-size: 13px;</string>
+         <property name="horizontalSpacing">
+          <number>20</number>
+         </property>
+         <property name="verticalSpacing">
+          <number>15</number>
+         </property>
+         <item row="0" column="0">
+          <layout class="QVBoxLayout" name="thicknessLayout">
+           <property name="spacing">
+            <number>3</number>
            </property>
-           <property name="text">
-            <string>CH Thickness</string>
+           <property name="topMargin">
+            <number>0</number>
            </property>
-          </widget>
+           <property name="bottomMargin">
+            <number>10</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="lblLineWidth">
+             <property name="styleSheet">
+              <string notr="true">font-size: 13px;</string>
+             </property>
+             <property name="text">
+              <string>CH Thickness</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="cmbChnLineWidth">
+             <property name="currentIndex">
+              <number>1</number>
+             </property>
+             <item>
+              <property name="text">
+               <string>0.5</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>1</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>1.5</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>2</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>2.5</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>3</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>3.5</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>4</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>4.5</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>5</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+          </layout>
          </item>
-         <item>
-          <widget class="QComboBox" name="cmbChnLineWidth">
-           <property name="currentIndex">
-            <number>1</number>
+         <item row="1" column="0">
+          <layout class="QVBoxLayout" name="memDepthLayout">
+           <property name="spacing">
+            <number>3</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>10</number>
            </property>
            <item>
-            <property name="text">
-             <string>0.5</string>
-            </property>
+            <widget class="QLabel" name="label_3">
+             <property name="styleSheet">
+              <string notr="true">font-size: 13px;</string>
+             </property>
+             <property name="text">
+              <string>Memory depth</string>
+             </property>
+            </widget>
            </item>
            <item>
-            <property name="text">
-             <string>1</string>
-            </property>
+            <widget class="QComboBox" name="cmbMemoryDepth"/>
            </item>
-           <item>
-            <property name="text">
-             <string>1.5</string>
+          </layout>
+         </item>
+         <item row="0" column="1">
+          <widget class="QWidget" name="probeWidget" native="true">
+           <layout class="QHBoxLayout" name="horizontalLayout">
+            <property name="spacing">
+             <number>0</number>
             </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>2</string>
+            <property name="leftMargin">
+             <number>0</number>
             </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>2.5</string>
+            <property name="topMargin">
+             <number>0</number>
             </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>3</string>
+            <property name="rightMargin">
+             <number>0</number>
             </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>3.5</string>
+            <property name="bottomMargin">
+             <number>0</number>
             </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>4</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>4.5</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>5</string>
-            </property>
-           </item>
+            <item>
+             <layout class="QVBoxLayout" name="probeLayout">
+              <property name="spacing">
+               <number>3</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>10</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="probe_label">
+                <property name="styleSheet">
+                 <string notr="true">font-size: 13px;</string>
+                </property>
+                <property name="text">
+                 <string>Probe
+Attenuation</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="probe_attenuation">
+                <property name="currentIndex">
+                 <number>1</number>
+                </property>
+                <item>
+                 <property name="text">
+                  <string>0.1X</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>1X</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>10X</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>100X</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
           </widget>
          </item>
         </layout>
@@ -739,12 +856,12 @@ color: rgba(255, 255, 255, 70);
          <property name="minimumSize">
           <size>
            <width>0</width>
-           <height>50</height>
+           <height>0</height>
           </size>
          </property>
-         <layout class="QHBoxLayout" name="horizontalLayout">
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
           <property name="spacing">
-           <number>5</number>
+           <number>10</number>
           </property>
           <property name="leftMargin">
            <number>0</number>
@@ -756,7 +873,7 @@ color: rgba(255, 255, 255, 70);
            <number>0</number>
           </property>
           <property name="bottomMargin">
-           <number>10</number>
+           <number>20</number>
           </property>
           <item>
            <widget class="QLabel" name="label_2">
@@ -764,7 +881,7 @@ color: rgba(255, 255, 255, 70);
              <string notr="true">font-size: 13px;</string>
             </property>
             <property name="text">
-             <string>Software
+             <string>Software 
 AC Coupling</string>
             </property>
             <property name="alignment">
@@ -784,77 +901,6 @@ AC Coupling</string>
           </item>
          </layout>
         </widget>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="probeLayout">
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
-          <number>10</number>
-         </property>
-         <item>
-          <widget class="QLabel" name="probe_label">
-           <property name="styleSheet">
-            <string notr="true">font-size: 13px;</string>
-           </property>
-           <property name="text">
-            <string>Probe
-Attenuation</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QComboBox" name="probe_attenuation">
-           <property name="currentIndex">
-            <number>1</number>
-           </property>
-           <item>
-            <property name="text">
-             <string>0.1X</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>1X</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>10X</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>100X</string>
-            </property>
-           </item>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="memDepthLayout">
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
-          <number>10</number>
-         </property>
-         <item>
-          <widget class="QLabel" name="label_3">
-           <property name="styleSheet">
-            <string notr="true">font-size: 13px;</string>
-           </property>
-           <property name="text">
-            <string>Memory depth</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QComboBox" name="cmbMemoryDepth"/>
-         </item>
-        </layout>
        </item>
        <item>
         <widget class="QPushButton" name="btnAutoset">
