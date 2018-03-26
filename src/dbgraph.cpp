@@ -148,6 +148,9 @@ dBgraph::dBgraph(QWidget *parent) : QwtPlot(parent),
 
 	picker = new PlotPickerWrapper(QwtPlot::xTop,QwtPlot::yLeft,this->canvas());
 
+    QMargins margins = contentsMargins();
+    margins.setBottom(0);
+    setContentsMargins(margins);
 }
 
 dBgraph::~dBgraph()

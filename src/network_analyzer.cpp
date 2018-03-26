@@ -154,7 +154,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
             &m_phaseGraph, SLOT(useLogFreq(bool)));
 
     d_bottomHandlesArea = new HorizHandlesArea(this);
-    d_bottomHandlesArea->setLeftPadding(90);
+    d_bottomHandlesArea->setLeftPadding(89);
     d_bottomHandlesArea->setRightPadding(20);
     d_bottomHandlesArea->setMinimumHeight(50);
 
