@@ -277,6 +277,18 @@ void SpinBoxA::setValue(double value)
 		ui->SBA_Combobox->blockSignals(false);
 	}
 
+	if (m_value == m_min_value) {
+		ui->SBA_DownButton->setEnabled(false);
+	} else {
+		ui->SBA_DownButton->setEnabled(true);
+	}
+
+	if (m_value == m_max_value) {
+		ui->SBA_UpButton->setEnabled(false);
+	} else {
+		ui->SBA_UpButton->setEnabled(true);
+	}
+
 	if (emitValueChanged) {
 		Q_EMIT valueChanged(m_value);
 	}
@@ -513,12 +525,24 @@ void ScaleSpinButton::setMinValue(double value)
 {
 	m_steps.setLower(value);
 	SpinBoxA::setMinValue(value);
+
+	if (m_value == m_min_value) {
+		ui->SBA_DownButton->setEnabled(false);
+	} else {
+		ui->SBA_DownButton->setEnabled(true);
+	}
 }
 
 void ScaleSpinButton::setMaxValue(double value)
 {
 	m_steps.setUpper(value);
 	SpinBoxA::setMaxValue(value);
+
+	if (m_value == m_max_value) {
+		ui->SBA_UpButton->setEnabled(false);
+	} else {
+		ui->SBA_UpButton->setEnabled(true);
+	}
 }
 
 void ScaleSpinButton::stepUp()
@@ -670,6 +694,9 @@ PhaseSpinButton::PhaseSpinButton(std::vector<std::pair<QString, double> > units,
 
 		setFrequency(0.01);
 		ui->SBA_CompletionCircle->setOrigin(0);
+
+        ui->SBA_DownButton->setEnabled(true);
+        ui->SBA_UpButton->setEnabled(true);
 }
 
 void PhaseSpinButton::setValue(double value)
