@@ -343,7 +343,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 
 	ui->verticalLayout_3->insertWidget(0, mathFrequency);
 	ui->horizontalLayout_5->insertWidget(1, noiseAmplitude);
-	ui->verticalLayout_6->insertWidget(0, constantValue);
+	ui->gridLayout->addWidget(constantValue,0,0,1,1);
 
 	/* Max amplitude by default */
 	amplitude->setValue(amplitude->maxValue());
