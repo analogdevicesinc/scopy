@@ -62,77 +62,6 @@ QLabel { color: #444444; }</string>
       </property>
       <item>
        <layout class="QGridLayout" name="gridLayout">
-        <item row="0" column="0">
-         <spacer name="horizontalSpacer">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>42</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="0" column="3">
-         <widget class="QLabel" name="label_5">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>250</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="font">
-           <font>
-            <pointsize>30</pointsize>
-            <weight>75</weight>
-            <bold>true</bold>
-           </font>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">QLabel { color: #444444; qproperty-alignment: 'AlignBottom | AlignRight'; font-size: 30pt; font-weight: bold; }</string>
-          </property>
-          <property name="text">
-           <string>Set</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="3">
-         <widget class="QLabel" name="label_6">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>250</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="font">
-           <font>
-            <pointsize>30</pointsize>
-            <weight>75</weight>
-            <bold>true</bold>
-           </font>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">QLabel { color: #444444; qproperty-alignment: 'AlignBottom | AlignRight'; font-size: 30pt; font-weight: bold; }</string>
-          </property>
-          <property name="text">
-           <string>Measure</string>
-          </property>
-         </widget>
-        </item>
         <item row="1" column="1">
          <widget class="adiscope::LcdNumber" name="lcd1">
           <property name="sizePolicy">
@@ -226,6 +155,105 @@ color: #ff7200;
           </property>
          </widget>
         </item>
+        <item row="0" column="4">
+         <widget class="QLabel" name="label_5">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>220</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>220</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>30</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QLabel { color: #444444; qproperty-alignment: 'AlignBottom | AlignLeft'; font-size: 30pt; font-weight: bold; }</string>
+          </property>
+          <property name="text">
+           <string>Set</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>42</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="1" column="4">
+         <widget class="QLabel" name="label_6">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>220</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>220</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>30</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QLabel { color: #444444; qproperty-alignment: 'AlignBottom | AlignLeft'; font-size: 30pt; font-weight: bold; }</string>
+          </property>
+          <property name="text">
+           <string>Measure</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="3">
+         <spacer name="horizontalSpacer_4">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>30</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
        </layout>
       </item>
       <item>
@@ -249,7 +277,10 @@ color: #ff7200;
       </item>
       <item>
        <layout class="QGridLayout" name="gridLayout_2">
-        <item row="0" column="3">
+        <property name="horizontalSpacing">
+         <number>7</number>
+        </property>
+        <item row="0" column="4">
          <widget class="QLabel" name="label">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -259,8 +290,14 @@ color: #ff7200;
           </property>
           <property name="minimumSize">
            <size>
-            <width>250</width>
+            <width>220</width>
             <height>0</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>220</width>
+            <height>16777215</height>
            </size>
           </property>
           <property name="font">
@@ -271,7 +308,7 @@ color: #ff7200;
            </font>
           </property>
           <property name="styleSheet">
-           <string notr="true">QLabel { color: #444444; qproperty-alignment: 'AlignBottom | AlignRight'; font-size: 30pt; font-weight: bold; }</string>
+           <string notr="true">QLabel { color: #444444; qproperty-alignment: 'AlignBottom | AlignLeft'; font-size: 30pt; font-weight: bold; }</string>
           </property>
           <property name="text">
            <string>Set</string>
@@ -322,7 +359,7 @@ color: #9013fe;
           </property>
          </widget>
         </item>
-        <item row="1" column="3">
+        <item row="1" column="4">
          <widget class="QLabel" name="label_2">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -332,8 +369,14 @@ color: #9013fe;
           </property>
           <property name="minimumSize">
            <size>
-            <width>250</width>
+            <width>220</width>
             <height>0</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>220</width>
+            <height>16777215</height>
            </size>
           </property>
           <property name="font">
@@ -344,7 +387,7 @@ color: #9013fe;
            </font>
           </property>
           <property name="styleSheet">
-           <string notr="true">QLabel { color: #444444; qproperty-alignment: 'AlignBottom | AlignRight'; font-size: 30pt; font-weight: bold; }</string>
+           <string notr="true">QLabel { color: #444444; qproperty-alignment: 'AlignBottom | AlignLeft'; font-size: 30pt; font-weight: bold; }</string>
           </property>
           <property name="text">
            <string>Measure</string>
@@ -415,6 +458,22 @@ color: #9013fe;
            <enum>QLCDNumber::Flat</enum>
           </property>
          </widget>
+        </item>
+        <item row="0" column="3">
+         <spacer name="horizontalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>30</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
         </item>
        </layout>
       </item>
