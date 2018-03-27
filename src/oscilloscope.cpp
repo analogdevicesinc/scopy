@@ -855,15 +855,6 @@ void Oscilloscope::init_channel_settings()
 {
 	connect(ch_ui->btnEditMath, &QPushButton::toggled, this,
 		&Oscilloscope::openEditMathPanel);
-	connect(ch_ui->btnEditMath, &QPushButton::toggled, [=](bool on){
-		if (on) {
-			tabWidget->removeTab(1);
-			math_pair->first.btnAddChannel->setText("Save");
-
-		} else {
-			tabWidget->addTab(ref, "Reference");
-		}
-	});
 
 	connect(ch_ui->btnAutoset, &QPushButton::clicked, this,
 		&Oscilloscope::requestAutoset);
@@ -2911,6 +2902,13 @@ void Oscilloscope::openEditMathPanel(bool on)
 		math_pair->second->setFunction(chn_widget->function());
 		triggerRightMenuToggle(
 			static_cast<CustomPushButton* >(ui->btnAddMath), true);
+
+		tabWidget->removeTab(1);
+		tabWidget->tabBar()->hide();
+		math_pair->first.btnAddChannel->setText("Save");
+	} else {
+		tabWidget->addTab(ref, "Reference");
+		tabWidget->tabBar()->show();
 	}
 }
 
