@@ -455,8 +455,10 @@ void SpinBoxA::setUnits(const QStringList& list)
 	QString sufixes;
 
 	ui->SBA_Combobox->clear();
-	if(list.at(0).section("=",0,0).trimmed().isEmpty() && list.count()==1)
+
+	if (list.at(0).section("=",0,0).trimmed().isEmpty() || list.count()==1) {
 		ui->SBA_Combobox->setEnabled(false);
+	}
 
 	for (auto it = list.begin(); it != list.end(); ++it) {
 		QStringList curr = it->split('=');
