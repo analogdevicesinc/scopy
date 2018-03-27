@@ -303,7 +303,7 @@ background-color: red;
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="output">
+      <widget class="adiscope::SmallOnOffSwitch" name="output">
        <property name="enabled">
         <bool>true</bool>
        </property>
@@ -313,25 +313,6 @@ background-color: red;
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="styleSheet">
-        <string notr="true">QPushButton {
-background-color: transparent;
-width:60px;
-height:23px;
-border-radius:2px;
-}
-
-QPushButton:checked
-{
- border-image: url(&quot;:/icons/dio101.svg&quot;);
-}
-
-QPushButton:!checked
-{
- border-image: url(&quot;:/icons/dio100.svg&quot;);
-}
-</string>
-       </property>
        <property name="text">
         <string/>
        </property>
@@ -340,6 +321,15 @@ QPushButton:!checked
        </property>
        <property name="checked">
         <bool>false</bool>
+       </property>
+       <property name="bothValid" stdset="0">
+        <bool>true</bool>
+       </property>
+       <property name="leftText" stdset="0">
+        <string>1</string>
+       </property>
+       <property name="rightText" stdset="0">
+        <string>0</string>
        </property>
       </widget>
      </item>
@@ -361,6 +351,11 @@ QPushButton:!checked
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>adiscope::SmallOnOffSwitch</class>
+   <extends>QPushButton</extends>
+   <header>smallOnOffSwitch.hpp</header>
+  </customwidget>
   <customwidget>
    <class>adiscope::CustomSwitch</class>
    <extends>QPushButton</extends>
