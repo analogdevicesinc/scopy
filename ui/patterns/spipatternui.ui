@@ -104,6 +104,9 @@
          <property name="rightText" stdset="0">
           <string>0</string>
          </property>
+         <property name="bothValid" stdset="0">
+          <bool>true</bool>
+         </property>
         </widget>
        </item>
        <item>
@@ -145,6 +148,9 @@
          </property>
          <property name="rightText" stdset="0">
           <string>0</string>
+         </property>
+         <property name="bothValid" stdset="0">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -190,6 +196,9 @@
          </property>
          <property name="rightText" stdset="0">
           <string>0</string>
+         </property>
+         <property name="bothValid" stdset="0">
+          <bool>true</bool>
          </property>
         </widget>
        </item>

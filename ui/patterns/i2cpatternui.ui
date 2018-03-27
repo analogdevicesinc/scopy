@@ -60,6 +60,9 @@
        <property name="rightText" stdset="0">
         <string>R</string>
        </property>
+       <property name="bothValid" stdset="0">
+        <bool>true</bool>
+       </property>
       </widget>
      </item>
      <item>
