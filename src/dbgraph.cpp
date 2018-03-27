@@ -169,8 +169,16 @@ void dBgraph::setAxesScales(double xmin, double xmax, double ymin, double ymax)
 
 void dBgraph::setAxesTitles(const QString& x, const QString& y)
 {
-	setAxisTitle(QwtPlot::xTop, x);
-	setAxisTitle(QwtPlot::yLeft, y);
+    QwtText xTitle(x);
+    QwtText yTitle(y);
+
+    QFont font = axisTitle(QwtPlot::xTop).font();
+    font.setWeight(QFont::Normal);
+    xTitle.setFont(font);
+    yTitle.setFont(font);
+
+    setAxisTitle(QwtPlot::xTop, xTitle);
+    setAxisTitle(QwtPlot::yLeft, yTitle);
 }
 
 void dBgraph::plot(double x, double y)
@@ -247,12 +255,22 @@ QString dBgraph::yTitle() const
 
 void dBgraph::setXTitle(const QString& title)
 {
-	setAxisTitle(QwtPlot::xTop, title);
+    QwtText xTitle(title);
+    QFont font = axisTitle(QwtPlot::xTop).font();
+    font.setWeight(QFont::Normal);
+    xTitle.setFont(font);
+
+    setAxisTitle(QwtPlot::xTop, xTitle);
 }
 
 void dBgraph::setYTitle(const QString& title)
 {
-	setAxisTitle(QwtPlot::yLeft, title);
+    QwtText yTitle(title);
+    QFont font = axisTitle(QwtPlot::xTop).font();
+    font.setWeight(QFont::Normal);
+    yTitle.setFont(font);
+
+    setAxisTitle(QwtPlot::yLeft, yTitle);
     d_cursorReadouts->setVoltageCursor1LabelText(title.mid(0,3)+"1= ");
     d_cursorReadouts->setVoltageCursor2LabelText(title.mid(0,3)+"2= ");
     d_cursorReadouts->setDeltaVoltageLabelText("Δ"+title.mid(0,3)+"= ");
