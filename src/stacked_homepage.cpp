@@ -71,7 +71,6 @@ void StackedHomepage::moveLeft()
 
 void StackedHomepage::moveRight()
 {
-	int currentPage = currentIndex();
 	slideInNext();
 	s_hc->raise();
 }
