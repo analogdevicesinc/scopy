@@ -14,8 +14,8 @@ background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.501, y2:0, stop
 QWidget#handle {
 min-height: 30px;
 max-height: 30px;
-min-width: 52px;
-max-width: 52px;
+min-width: 50px;
+max-width: 50px;
 background-color: #4a64ff;
 border-radius: 2px;
 }
