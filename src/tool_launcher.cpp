@@ -68,7 +68,7 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	skip_calibration(false),
 	calibrating(false),
 	debugger_enabled(false),
-	indexFile(""), pathToFile(""),
+	indexFile(""), deviceInfo(""), pathToFile(""),
 	manual_calibration_enabled(false)
 {
 	if (!isatty(STDIN_FILENO))
@@ -254,6 +254,26 @@ void ToolLauncher::readPreferences()
 	}
 }
 
+void ToolLauncher::loadIndexPageFromContent(QString fileLocation)
+{
+	QFileInfo fileInfo(fileLocation);
+	if (fileInfo.exists()) {
+		QFile indexFile(fileInfo.filePath());
+		indexFile.open(QFile::ReadOnly);
+		if (!indexFile.readAll().isEmpty()) {
+			index->setSearchPaths(QStringList(fileInfo.dir().absolutePath()));
+			indexFile.close();
+			index->setSource(QUrl::fromLocalFile(fileInfo.filePath()));
+			ui->stackedWidget->addWidget(index);
+			int count = ui->stackedWidget->count();
+			qDebug() << "the number of homapeges is:" << count;
+			ui->stackedWidget->moveRight();
+		} else {
+			indexFile.close();
+		}
+	}
+}
+
 void ToolLauncher::saveSession()
 {
 	if (ctx) {
@@ -311,6 +331,7 @@ void ToolLauncher::resetSession()
 	}
 	pathToFile = "";
 	indexFile = "";
+	deviceInfo = "";
 	updateHomepage();
 	setupHomepage();
 
@@ -652,7 +673,7 @@ QPushButton *ToolLauncher::addContext(const QString& uri)
 
 void ToolLauncher::addRemoteContext()
 {
-	pv::widgets::Popup *popup = new pv::widgets::Popup(ui->homeWidget);
+	pv::widgets::Popup *popup = new pv::widgets::Popup(ui->homeWidget, QBrush(QColor(39, 39, 48)));
 	connect(popup, SIGNAL(closed()), this, SLOT(destroyPopup()));
 
 	QPoint pos = ui->groupBox->mapToGlobal(ui->btnAdd->pos());
@@ -715,20 +736,7 @@ void ToolLauncher::setupHomepage()
 		return;
 	}
 
-	QFileInfo fileInfo(indexFile);
-	if (fileInfo.exists()) {
-		QFile indexFile(fileInfo.filePath());
-		indexFile.open(QFile::ReadOnly);
-		if (!indexFile.readAll().isEmpty()) {
-			index->setSearchPaths(QStringList(fileInfo.dir().absolutePath()));
-			indexFile.close();
-			index->setSource(QUrl::fromLocalFile(fileInfo.filePath()));
-			ui->stackedWidget->addWidget(index);
-			ui->stackedWidget->moveRight();
-		} else {
-			indexFile.close();
-		}
-	}
+	loadIndexPageFromContent(indexFile);
 }
 
 void ToolLauncher::updateHomepage()
@@ -857,16 +865,23 @@ void adiscope::ToolLauncher::device_btn_clicked(bool pressed)
 			if ((*it)->second.btn != sender()) {
 				(*it)->second.btn->setChecked(false);
 			}
+	}
+	deviceInfo = "";
+	updateHomepage();
+	setupHomepage();
 
-		if (ui->btnConnect->property("connected").toBool()) {
-			ui->btnConnect->click();
-		}
-	} else {
-		disconnect();
+	ui->btnConnect->setEnabled(pressed);
+	// add a new page to the home screen
+	// display current device info on the new page's content
+	// currently is working properly only if the file is at the path that is
+	// assigned to the deviceInfo string
+	if (pressed) {
+		index = new QTextBrowser(ui->stackedWidget);
+		index->setFrameShape(QFrame::NoFrame);
+		deviceInfo = "d:/info.html";
+		loadIndexPageFromContent(deviceInfo);
 	}
 
-	resetStylesheets();
-	ui->btnConnect->setEnabled(pressed);
 	if (pressed){
 		ui->btnConnect->setToolTip(QString("Click to connect the device"));
 	} else {
