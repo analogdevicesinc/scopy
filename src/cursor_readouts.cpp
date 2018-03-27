@@ -418,11 +418,11 @@ void CursorReadouts::moveBottomLeft(bool resize)
     d_topLeft.setX(8);
 
     if (!d_time_rd_visible && d_voltage_rd_visible) {
-            voltageRect = QRect(QPoint(d_topLeft.x(),d_topLeft.y()-ui->VoltageCursors->height()-24), QPoint(d_topLeft.x()+ui->VoltageCursors->width(),d_topLeft.y()));
+            voltageRect = QRect(QPoint(d_topLeft.x(),d_topLeft.y()-ui->VoltageCursors->height()-20), QPoint(d_topLeft.x()+ui->VoltageCursors->width(),d_topLeft.y()));
             timeRect = QRect(0,0,0,0);
     } else {
-        timeRect = QRect(QPoint(d_topLeft.x(),d_topLeft.y()-ui->TimeCursors->height()-24), QPoint(ui->TimeCursors->width()+d_topLeft.x(),d_topLeft.y()));
-        voltageRect = QRect(QPoint(d_topLeft.x()+timeRect.width(),d_topLeft.y()-ui->VoltageCursors->height()-24), QPoint(d_topLeft.x()+timeRect.width()+ui->VoltageCursors->width(),d_topLeft.y()));
+        timeRect = QRect(QPoint(d_topLeft.x(),d_topLeft.y()-ui->TimeCursors->height()-20), QPoint(ui->TimeCursors->width()+d_topLeft.x(),d_topLeft.y()));
+        voltageRect = QRect(QPoint(d_topLeft.x()+timeRect.width(),d_topLeft.y()-ui->VoltageCursors->height()-20), QPoint(d_topLeft.x()+timeRect.width()+ui->VoltageCursors->width(),d_topLeft.y()));
     }
 
 	int diff = voltageRect.x() - lastVoltageRect.x();
@@ -457,9 +457,9 @@ void CursorReadouts::moveBottomRight(bool resize)
 
     if (d_time_rd_visible && !d_voltage_rd_visible) {
         voltageRect = QRect(0,0,0,0);
-        timeRect = QRect(d_topLeft.x() - ui->TimeCursors->width(),d_topLeft.y()-ui->TimeCursors->height()-24,d_topLeft.x(),d_topLeft.y());
+        timeRect = QRect(d_topLeft.x() - ui->TimeCursors->width(),d_topLeft.y()-ui->TimeCursors->height()-20,d_topLeft.x(),d_topLeft.y());
     } else {
-        voltageRect = QRect(d_topLeft.x() - ui->VoltageCursors->width(),d_topLeft.y()-ui->VoltageCursors->height()-24,d_topLeft.x(),d_topLeft.y());
+        voltageRect = QRect(d_topLeft.x() - ui->VoltageCursors->width(),d_topLeft.y()-ui->VoltageCursors->height()-20,d_topLeft.x(),d_topLeft.y());
         timeRect = QRect(voltageRect.x()-ui->TimeCursors->width(),voltageRect.y(),voltageRect.x(),voltageRect.y()+ui->TimeCursors->height());
 
     }
