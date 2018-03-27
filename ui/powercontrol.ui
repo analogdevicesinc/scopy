@@ -644,6 +644,50 @@ QSlider::handle:disabled {
        </layout>
       </item>
       <item>
+       <widget class="QSlider" name="trackingRatio">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QSlider::groove {
+    border: 1px solid #444444;
+    height: 2px; /* the groove expands to the size of the slider by default. by giving it a height, it has a fixed size */
+    background: #999999;
+    margin: 2px 0;
+    border-radius: 2px;
+}
+
+QSlider::handle {
+    background: rgb(73, 99, 255);
+    border: 0px solid;
+    width: 18px;
+    margin: -8px 0; /* handle is placed by default on the contents rect of the groove. Expand outside the groove */
+    border-radius: 8px;
+}
+
+QSlider::handle:disabled {
+    background: #444444;
+}
+
+QSlider::sub-page:horizontal {
+    background: #4A64FF;
+}</string>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>100</number>
+        </property>
+        <property name="value">
+         <number>100</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
        <spacer name="verticalSpacer">
         <property name="orientation">
          <enum>Qt::Vertical</enum>
