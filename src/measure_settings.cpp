@@ -59,7 +59,7 @@ MeasureSettings::MeasureSettings(CapturePlot *plot, QWidget *parent) :
 
 	m_horizMeasurements->setTitle("Horizontal");
 	m_horizMeasurements->setColumnTitle(0, "Name");
-	m_horizMeasurements->setColumnTitle(1, "Active");
+	m_horizMeasurements->setColumnTitle(1, "Measure");
 	m_horizMeasurements->setColumnTitle(2, "Stats");
 	m_horizMeasurements->setMaxVisibleItems(4);
 	treeView = static_cast<QTreeView *>(m_horizMeasurements->view());
@@ -72,7 +72,7 @@ MeasureSettings::MeasureSettings(CapturePlot *plot, QWidget *parent) :
 
 	m_vertMeasurements->setTitle("Vertical");
 	m_vertMeasurements->setColumnTitle(0, "Name");
-	m_vertMeasurements->setColumnTitle(1, "Active");
+	m_vertMeasurements->setColumnTitle(1, "Measure");
 	m_vertMeasurements->setColumnTitle(2, "Stats");
 	m_vertMeasurements->setMaxVisibleItems(4);
 	treeView = static_cast<QTreeView *>(m_vertMeasurements->view());
