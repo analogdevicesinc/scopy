@@ -270,14 +270,14 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 		{"μs",1e-6},
 		{"ms",1e-3},
 		{"seconds",1e0}
-	},"Hold High Tim", 0, 10);
+	},"High Time", 0, 10);
 
 	holdLowTime = new ScaleSpinButton({
 		{"ns",1e-9},
 		{"μs",1e-6},
 		{"ms",1e-3},
 		{"seconds",1e0}
-	},"Hold Low Time", 0, 10);
+	},"Low Time", 0, 10);
 
 	/* Create file control widgets */
 	filePhase = new PhaseSpinButton({
