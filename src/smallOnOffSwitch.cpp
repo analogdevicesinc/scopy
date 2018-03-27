@@ -83,11 +83,18 @@ void SmallOnOffSwitch::toggleAnim(bool enabled)
 		anim.setStartValue(off_rect);
 		anim.setEndValue(on_rect);
 		color_anim.setStartValue(color_start);
-		color_anim.setEndValue(color_end);
+		if(bothValid)
+			color_anim.setEndValue(color_start);
+		else
+			color_anim.setEndValue(color_end);
 	} else {
 		anim.setStartValue(on_rect);
 		anim.setEndValue(off_rect);
-		color_anim.setStartValue(color_end);
+		if(bothValid)
+			color_anim.setStartValue(color_start);
+		else
+			color_anim.setStartValue(color_end);
+
 		color_anim.setEndValue(color_start);
 	}
 
@@ -105,6 +112,9 @@ bool SmallOnOffSwitch::event(QEvent* e)
 			on.setText(property("leftText").toString());
 		if(propName=="rightText" && property("rightText").isValid())
 			off.setText(property("rightText").toString());
+		if(propName=="bothValid" && property("bothValid").isValid()) {
+			bothValid = property("bothValid").toBool();
+		}
 
 	}
 	return QPushButton::event(e);
@@ -142,8 +152,15 @@ void SmallOnOffSwitch::showEvent(QShowEvent *event)
 {
 	if (!isChecked()) {
 		handle.setGeometry(QRect(width() - handle.width(), handle.y(),
-					handle.width(), handle.height()));
-		setHandleColor(color_end);
+					handle.width(), handle.height()));		
+		if(bothValid)
+		{
+			setHandleColor(color_start);
+		}
+		else
+		{
+			setHandleColor(color_end);
+		}
 	} else {
 		setHandleColor(color_start);
 	}
@@ -151,6 +168,9 @@ void SmallOnOffSwitch::showEvent(QShowEvent *event)
 
 void SmallOnOffSwitch::updateOnOffLabels()
 {
-	on.setEnabled(isChecked());
-	off.setEnabled(!isChecked());
+	if(!bothValid)
+	{
+		on.setEnabled(isChecked());
+		off.setEnabled(!isChecked());
+	}
 }

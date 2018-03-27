@@ -53,6 +53,7 @@ namespace adiscope {
 		QString stylesheet;
 		int duration_ms;
 		bool show_icon;
+		bool bothValid;
 
 		void setDuration(int ms);
 		void setHandleColor(const QColor& color);
