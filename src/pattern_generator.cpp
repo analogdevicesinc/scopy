@@ -383,6 +383,13 @@ void PatternGenerator::toggleRightMenu(QPushButton *btn)
 
 void PatternGenerator::showColorSettings(bool check)
 {
+	Util::retainWidgetSizeWhenHidden(cgSettings->colorEdge);
+	Util::retainWidgetSizeWhenHidden(cgSettings->colorLow);
+	Util::retainWidgetSizeWhenHidden(cgSettings->colorHigh);
+	Util::retainWidgetSizeWhenHidden(cgSettings->lblEdge);
+	Util::retainWidgetSizeWhenHidden(cgSettings->lblLow);
+	Util::retainWidgetSizeWhenHidden(cgSettings->lblHigh);
+
 	if (check) {
 		cgSettings->colorEdge->show();
 		cgSettings->colorLow->show();
