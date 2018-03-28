@@ -1439,9 +1439,13 @@ LogicAnalyzerChannelManagerUI::LogicAnalyzerChannelManagerUI(QWidget *parent,
 	showHighlight(false);
 	chm->highlightChannel(chm->get_channel_group(0));
 	showHighlight(true);
+	ui->leftScrollArea->verticalScrollBar()->setValue(0);
 	ui->scrollAreaWidgetContents->installEventFilter(this);
+	ui->scrollAreaWidgetContents_2->installEventFilter(this);
 	eventFilterGuard = new MouseWheelWidgetGuard(this);
 	Q_EMIT(widthChanged(geometry().width()));
+	chmRangeChanged(ui->scrollArea->verticalScrollBar()->minimum(),
+			ui->scrollArea->verticalScrollBar()->maximum());
 }
 
 std::vector<std::string> LogicAnalyzerChannelManagerUI::getTriggerMapping()
@@ -1976,9 +1980,22 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 	ui->scrollArea->setMaximumWidth(managerHeaderWidget->sizeHint().width());
 	main_win->view_->viewport()->setDivisionCount(10);
 	connect(ui->scrollArea->verticalScrollBar(), SIGNAL(valueChanged(int)),
-	        this, SLOT(chmScrollChanged(int)));
+		this, SLOT(chmScrollChanged(int)));
 	connect(ui->scrollArea->verticalScrollBar(), SIGNAL(rangeChanged(int,int)),
-	        this, SLOT(chmRangeChanged(int,int)));
+		this, SLOT(chmRangeChanged(int,int)));
+
+	connect(ui->scrollArea->verticalScrollBar(), &QScrollBar::valueChanged,
+		[=](int val) {
+		if (val != ui->leftScrollArea->verticalScrollBar()->value()) {
+			ui->leftScrollArea->verticalScrollBar()->setValue(val);
+		}
+	});
+	connect(ui->leftScrollArea->verticalScrollBar(), &QScrollBar::valueChanged,
+		[=](int val) {
+		if (val != ui->scrollArea->verticalScrollBar()->value()) {
+			ui->scrollArea->verticalScrollBar()->setValue(val);
+		}
+	});
 	la->get_channel_groups_api();
 
 	if(!eventFilterGuard)
@@ -2003,6 +2020,8 @@ void LogicAnalyzerChannelManagerUI::chmRangeChanged(int min, int max)
 {
 	main_win->view_->verticalScrollBar()->setMinimum(min);
 	main_win->view_->verticalScrollBar()->setMaximum(max);
+	ui->leftScrollArea->verticalScrollBar()->setMinimum(min);
+	ui->leftScrollArea->verticalScrollBar()->setMaximum(max);
 }
 
 void LogicAnalyzerChannelManagerUI::triggerUpdateUi()
@@ -2603,6 +2622,8 @@ void LogicAnalyzerChannelManagerUI::set_pv_decoder(LogicAnalyzerChannelGroupUI
 void LogicAnalyzerChannelManagerUI::resizeEvent(QResizeEvent *event)
 {
 	Q_EMIT(widthChanged(geometry().width()));
+	chmRangeChanged(ui->scrollArea->verticalScrollBar()->minimum(),
+			ui->scrollArea->verticalScrollBar()->maximum());
 }
 
 void LogicAnalyzerChannelManagerUI::setHoverWidget(QWidget *hover)
