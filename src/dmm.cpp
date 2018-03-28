@@ -23,6 +23,7 @@
 #include <config.h>
 #include "osc_adc.h"
 #include "hardware_trigger.hpp"
+#include "utils.h"
 
 #include <gnuradio/blocks/keep_one_in_n.h>
 #include <gnuradio/blocks/moving_average_ff.h>
@@ -253,6 +254,8 @@ void DMM::collapsePeakHold(bool checked)
 void DMM::displayPeakHold(bool checked)
 {
 	if(!checked) {
+		Util::retainWidgetSizeWhenHidden(ui->peakCh1Widget);
+		Util::retainWidgetSizeWhenHidden(ui->peakCh2Widget);
 		ui->peakCh1Widget->hide();
 		ui->peakCh2Widget->hide();
 	}
