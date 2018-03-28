@@ -77,6 +77,7 @@ ui(new Ui::MarkerTable)
 	ui->tableView->verticalHeader()->hide();
 	ui->tableView->hideColumn(COL_ID);
 	ui->tableView->setShowGrid(false);
+	ui->tableView->setSelectionMode(QAbstractItemView::NoSelection);
 
 	FrequencyDelegate *freqDelegate = new FrequencyDelegate(this);
 	ui->tableView->setItemDelegateForColumn(COL_FREQ, freqDelegate);
