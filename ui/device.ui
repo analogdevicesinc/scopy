@@ -48,7 +48,6 @@
 qproperty-alignment: AlignCenter;
 color: white;
 font-family: &quot;monospace&quot;;
-font-weight: bold;
 }</string>
      </property>
      <property name="text">
@@ -68,7 +67,7 @@ font-weight: bold;
        </property>
        <property name="minimumSize">
         <size>
-         <width>100</width>
+         <width>78</width>
          <height>100</height>
         </size>
        </property>
@@ -131,7 +130,6 @@ background-color: red;
 qproperty-alignment: AlignCenter;
 color: white;
 font-family: &quot;monospace&quot;;
-font-weight: bold;
 }</string>
      </property>
      <property name="text">
