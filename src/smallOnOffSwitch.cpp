@@ -29,7 +29,7 @@ using namespace adiscope;
 SmallOnOffSwitch::SmallOnOffSwitch(QWidget *parent) : QPushButton(parent),
 	color_start("grey"), color_end("blue"), on(this), off(this),
 	handle(this), anim(&handle, "geometry"), color_anim(this, "color"),
-	show_icon(false)
+	show_icon(false),bothValid(false)
 {
 	handle.setObjectName("handle");
 	on.setObjectName("on");
