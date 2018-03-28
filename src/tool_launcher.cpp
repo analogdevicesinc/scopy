@@ -495,14 +495,27 @@ void ToolLauncher::insertMenuOptions(){
 						option->getMaxMenuElements() + 1);
 		}
 	}
+	if (manual_calibration_enabled) {
+		for (auto &option : toolMenu) {
+			option->setMaxMenuElements(
+						option->getMaxMenuElements() + 1);
+		}
+	}
+
 
 	int offset = 0;
 	for (int i = 0; i < position.size(); ++i){
 		if (toolMenu[tools[position[i]]]->getName() == "Debugger"
 				&& !debugger_enabled) {
-			offset = 1;
+			offset += 1;
 			continue;
 		}
+		if (toolMenu[tools[position[i]]]->getName() == "Calibration"
+				&& !debugger_enabled) {
+			offset += 1;
+			continue;
+		}
+
 		ui->menuOptionsLayout->insertWidget(i - offset, toolMenu[tools[position[i]]]);
 		toolMenu[tools[position[i]]]->setPosition(i - offset);
 		ui->buttonGroup_2->addButton(toolMenu[tools[position[i]]]->getToolBtn());
