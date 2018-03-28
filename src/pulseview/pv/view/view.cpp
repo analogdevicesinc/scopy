@@ -163,6 +163,7 @@ View::View(Session &session, QWidget *parent) :
 	delayed_view_updater_.setInterval(1000 / MaxViewAutoUpdateRate);
 
 	setViewport(viewport_);
+	setStyleSheet("border-top : 1px solid rgba(255, 255, 255, 60); ");
 
 	viewport_->installEventFilter(this);
 	ruler_->installEventFilter(this);
@@ -208,6 +209,10 @@ Viewport* View::viewport()
 const Viewport* View::viewport() const
 {
 	return viewport_;
+}
+
+QMargins View::getViewportMargins() {
+	return viewportMargins();
 }
 
 vector< shared_ptr<TimeItem> > View::time_items() const
@@ -751,10 +756,9 @@ void View::set_scroll_default()
 
 void View::update_layout()
 {
-	setViewportMargins(0, 0,
-			0, ruler_->sizeHint().height());
-	ruler_->setGeometry(viewport_->x(), viewport_->y() + viewport_->height(),
-		viewport_->width(), ruler_->extended_size_hint().height());
+	setViewportMargins(20, 0, 0, ruler_->sizeHint().height());
+	ruler_->setGeometry(this->x(), viewport_->y() + viewport_->height(),
+		this->width(), ruler_->extended_size_hint().height());
 	update_scroll();
 }
 

@@ -546,8 +546,10 @@ void LogicAnalyzer::resizeEvent()
 
 void LogicAnalyzer::updateAreaTimeTrigger()
 {
-	ui->areaTimeTriggerLayout->setContentsMargins(
-		chm_ui->sizeHint().width()-20, 0, 0, 0);
+	int cursorsWidth = ui->boxCursors->isChecked() ?  ui->cursorsStatusWidget->width() : 0;
+	int newValue = chm_ui->sizeHint().width() - cursorsWidth - d_bottomHandlesArea->leftPadding()
+			+ main_win->view_->getViewportMargins().left();
+	ui->areaTimeTriggerLayout->setContentsMargins(newValue, 0, 0, 0);
 }
 
 QString LogicAnalyzer::saveToFile()
@@ -1435,8 +1437,11 @@ void LogicAnalyzer::onChmWidthChanged(int value)
 {
 	int l, r, b, t;
 	ui->areaTimeTriggerLayout->getContentsMargins(&l, &t, &r, &b);
-	if(l != value - 20 ){
-		ui->areaTimeTriggerLayout->setContentsMargins(value-20, 0, 0, 0);
+	int cursorsWidth = ui->boxCursors->isChecked() ? ui->cursorsStatusWidget->width() : 0;
+	int newValue = value - cursorsWidth - d_bottomHandlesArea->leftPadding() +
+			main_win->view_->getViewportMargins().left();
+	if(l != newValue) {
+		ui->areaTimeTriggerLayout->setContentsMargins(newValue, 0, 0, 0);
 		timePosition->valueChanged(timePosition->value());
 	}
 }

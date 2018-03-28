@@ -149,6 +149,7 @@ void Ruler::paintEvent(QPaintEvent*)
 				this->view_.tick_precision());
 		};
 		pv::util::Timestamp offset_used = (ruler_offset != 0) ? ruler_offset : view_.offset();
+		viewport_margin = view_.getViewportMargins();
 		tick_position_cache_ = calculate_tick_positions(
 			view_.tick_period(),
 			offset_used,
@@ -167,7 +168,8 @@ void Ruler::paintEvent(QPaintEvent*)
 	QPainter p(this);
 	if( view_.viewport()->getTimeTriggerActive() )
 	{
-		int valuePx = view_.viewport()->getTimeTriggerPixel();
+		int valuePx = view_.viewport()->getTimeTriggerPixel()
+				+ viewport_margin.left();
 		if( valuePx != timeTriggerPx )
 			timeTriggerPx = valuePx;
 		QPen pen = QPen(QColor(74, 100, 255));
@@ -175,20 +177,27 @@ void Ruler::paintEvent(QPaintEvent*)
 
 		QPoint p1 = QPoint(timeTriggerPx, 0);
 		QPoint p2 = QPoint(timeTriggerPx, ruler_height);
-		p.drawLine(p1, p2);
+		if (timeTriggerPx >= viewport_margin.left()) {
+			p.drawLine(p1, p2);
+		}
 	}
 	if( view_.viewport()->getCursorsActive() ) {
 		std::pair<int, int> cursorValues = view_.viewport()->getCursorsPixelValues();
-
+		int pixCursor1 = cursorValues.first + viewport_margin.left();
+		int pixCursor2 = cursorValues.second + viewport_margin.left();
 		QPen cursorsLinePen = QPen(QColor(155, 155, 155), 1, Qt::DashLine);
 		p.setPen(cursorsLinePen);
-		QPoint p1 = QPoint(cursorValues.first, 0);
-		QPoint p2 = QPoint(cursorValues.first, ruler_height);
-		p.drawLine(p1, p2);
+		QPoint p1 = QPoint(pixCursor1, 0);
+		QPoint p2 = QPoint(pixCursor1, ruler_height);
+		if (pixCursor1 >= viewport_margin.left()) {
+			p.drawLine(p1, p2);
+		}
 
-		p1 = QPoint(cursorValues.second, 0);
-		p2 = QPoint(cursorValues.second, ruler_height);
-		p.drawLine(p1, p2);
+		p1 = QPoint(pixCursor2, 0);
+		p2 = QPoint(pixCursor2, ruler_height);
+		if (pixCursor2 >= viewport_margin.left()) {
+			p.drawLine(p1, p2);
+		}
 	}
 
 	// Draw the tick marks
@@ -203,6 +212,12 @@ void Ruler::paintEvent(QPaintEvent*)
 	int last_end_pix = 0;
 	for (const auto& tick: tick_position_cache_->major) {
 		int x = view_.getGridPosition(pos);
+		/* The last label doesn't fit so we adjust its position */
+		if (pos == 10) {
+			x -= 10;
+		} else {
+			x += 30;
+		}
 		auto time = offset_used + (x + 0.5) *
 			view_.scale()/(view_.viewport()->size().width() / view_.divisionCount());
 		auto str = format_time_with_distance(this->view_.tick_period(),

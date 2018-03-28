@@ -176,6 +176,7 @@ private:
 
 	pv::util::Timestamp ruler_offset;
 	int timeTriggerPx;
+	QMargins viewport_margin;
 	int getMaxLabelWidth();
 protected:
 	void resizeEvent(QResizeEvent*) override;

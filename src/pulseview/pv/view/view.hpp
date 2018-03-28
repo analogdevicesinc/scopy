@@ -97,6 +97,8 @@ public:
 
 	const Viewport* viewport() const;
 
+	QMargins getViewportMargins();
+
 	/**
 	 * Gets a list of time markers.
 	 */

@@ -301,7 +301,7 @@ void Viewport::paint_time_trigger_line(QPainter &p, const ViewItemPaintParams &p
 	if( samplerate != 1 ) {
 		const double samples_per_pixel = samplerate * pp.scale();
 		const double pixels_offset = pp.pixels_offset();
-		px = (sample_index / samples_per_pixel - pixels_offset) + pp.left();
+		px = (sample_index / samples_per_pixel - pixels_offset);
 		if( px != timeTriggerPixel) {
 			timeTriggerPixel = px;
 			repaintTriggerHandle(timeTriggerPixel);
@@ -369,7 +369,6 @@ void Viewport::paint_grid(QPainter &p, const ViewItemPaintParams &pp)
 		p.drawLine(p1, p2);
 	}
 	p.setRenderHint(QPainter::Antialiasing, true);    
-	paint_axis(p,pp,pp.top());
 	paint_axis(p,pp,pp.bottom());
    /* for (int i = 0; i <= row_count; i++) {
         if(y + divisionOffset+ division_height * i != 0)
