@@ -378,6 +378,10 @@ SpectrumAnalyzer::~SpectrumAnalyzer()
 	delete ui;
 }
 
+void SpectrumAnalyzer::readPreferences() {
+	fft_plot->setVisiblePeakSearch(prefPanel->getSpectrum_visible_peak_search());
+}
+
 void SpectrumAnalyzer::on_btnToolSettings_toggled(bool checked)
 {
 	ui->stackedWidget->setCurrentWidget(ui->generalSettings);

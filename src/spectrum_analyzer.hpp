@@ -90,6 +90,9 @@ public:
 	                          QJSEngine *engine, ToolLauncher *parent);
 	~SpectrumAnalyzer();
 
+public Q_SLOTS:
+	void readPreferences();
+
 Q_SIGNALS:
 	void isRunning(bool);
 
