@@ -46,6 +46,7 @@ MenuOption::MenuOption(QString toolName, QString iconPath,
 		customButton->setSizePolicy(button->sizePolicy());
 		customButton->setStyleSheet(button->styleSheet());
 		customButton->setCheckable(true);
+		customButton->setMaximumSize(32, 32);
 		ui->horizontalLayout->removeWidget(button);
 		delete button;
 		ui->horizontalLayout->insertWidget(1, customButton);
@@ -56,7 +57,7 @@ MenuOption::MenuOption(QString toolName, QString iconPath,
 	topSep->setLineWidth(1);
 	topSep->setFrameShape(QFrame::HLine);
 	topSep->setStyleSheet("color: rgba(255,255,255,50);");
-	ui->verticalLayout->insertWidget(0, topSep);
+	ui->verticalLayout->insertWidget(1, topSep);
 	QSizePolicy sp_retainTopSep = topSep->sizePolicy();
 	sp_retainTopSep.setRetainSizeWhenHidden(true);
 	topSep->setSizePolicy(sp_retainTopSep);
@@ -68,7 +69,7 @@ MenuOption::MenuOption(QString toolName, QString iconPath,
 		botSep->setLineWidth(1);
 		botSep->setFrameShape(QFrame::HLine);
 		botSep->setStyleSheet("color: rgba(255,255,255,50);");
-		ui->verticalLayout->insertWidget(2, botSep);
+		ui->verticalLayout->insertWidget(3, botSep);
 		QSizePolicy sp_retainBotSep = botSep->sizePolicy();
 		sp_retainBotSep.setRetainSizeWhenHidden(true);
 		botSep->setSizePolicy(sp_retainBotSep);
@@ -109,12 +110,13 @@ void MenuOption::setPosition(int position)
 		}
 	} else {
 		if (botSep == nullptr){
+			qDebug() << toolName << "  position : " << position;
 			botSep = new QFrame(this);
 			botSep->setFrameShadow(QFrame::Plain);
 			botSep->setLineWidth(1);
 			botSep->setFrameShape(QFrame::HLine);
 			botSep->setStyleSheet("color: rgba(255,255,255,50);");
-			ui->verticalLayout->insertWidget(2, botSep);
+			ui->verticalLayout->insertWidget(3, botSep);
 			QSizePolicy sp_retainBotSep = botSep->sizePolicy();
 			sp_retainBotSep.setRetainSizeWhenHidden(true);
 			botSep->setSizePolicy(sp_retainBotSep);
