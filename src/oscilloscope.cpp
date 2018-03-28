@@ -650,8 +650,6 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 
 	current_ch_widget = current_channel;
 
-	connect(prefPanel, &Preferences::notify, this, &Oscilloscope::readPreferences);
-
 	readPreferences();
 }
 

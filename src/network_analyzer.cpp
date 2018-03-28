@@ -196,8 +196,6 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
     connect(ui->checkBox,SIGNAL(toggled(bool)),
             SLOT(toggleCursors(bool)));
 
-    connect(prefPanel,&Preferences::notify,this,&NetworkAnalyzer::readPreferences);
-
     readPreferences();
 
 	api->setObjectName(QString::fromStdString(Filter::tool_name(

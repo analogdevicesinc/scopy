@@ -316,9 +316,6 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	        SLOT(onTopValueChanged(double)));
 	connect(ui->range, SIGNAL(valueChanged(double)),
 	        SLOT(onRangeValueChanged(double)));
-	connect(prefPanel, &Preferences::notify,[=]() {
-		fft_plot->setVisiblePeakSearch(prefPanel->getSpectrum_visible_peak_search());
-	});
 
 	// UI default
 	ui->comboBox_window->setCurrentText("Hamming");
