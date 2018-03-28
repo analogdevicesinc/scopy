@@ -114,8 +114,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>229</width>
-        <height>548</height>
+        <width>251</width>
+        <height>558</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -164,26 +164,84 @@
             <number>10</number>
            </property>
            <item>
-            <widget class="QRadioButton" name="btnAuto">
+            <widget class="adiscope::CustomSwitch" name="btnTrigger">
+             <property name="styleSheet">
+              <string notr="true">QPushButton {
+min-height: 30px;
+max-height: 30px;
+min-width: 225px;
+max-width: 225px;
+background-color: black;
+border-radius: 4px;
+}
+
+QPushButton:disabled {
+background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.501, y2:0, stop:0 #727273, stop:1 #141416);
+}
+
+QWidget#handle {
+min-height: 30px;
+max-height: 30px;
+min-width: 115px;
+max-width: 115px;
+background-color: #4a64ff;
+border-radius: 2px;
+}
+
+QWidget#handle:disabled {
+background-color: #aaaaaa;
+}
+
+QLabel {
+margin-top: 6px;
+background-color: transparent;
+font-size: 16px;
+line-height: 19px;
+}
+
+QLabel#on {
+margin-top: 0px;
+min-height:30px;
+max-height:30px;
+min-width:112px;
+max-width:112px;
+qproperty-alignment: AlignCenter AlignCenter;
+margin-left: 0px;
+color: white;
+}
+
+QLabel#on:disabled {
+color: rgba(255,255,255,102);
+}
+
+QLabel#off {
+margin-top: 0px;
+min-height:30px;
+max-height:30px;
+min-width:113px;
+max-width:113px;
+margin-left: 112px;
+color: white;
+qproperty-alignment: AlignCenter AlignCenter;
+}
+
+QLabel#off:disabled {
+color: rgba(255,255,255,51);
+}
+</string>
+             </property>
              <property name="text">
-              <string>Auto</string>
+              <string/>
              </property>
-             <property name="checked">
-              <bool>true</bool>
+             <property name="leftText" stdset="0">
+              <string>auto</string>
              </property>
-             <attribute name="buttonGroup">
-              <string notr="true">buttonGroup</string>
-             </attribute>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="btnNormal">
-             <property name="text">
-              <string>Normal</string>
+             <property name="rightText" stdset="0">
+              <string>normal</string>
              </property>
-             <attribute name="buttonGroup">
-              <string notr="true">buttonGroup</string>
-             </attribute>
+             <property name="duration_ms" stdset="0">
+              <number>0</number>
+             </property>
             </widget>
            </item>
            <item>
@@ -670,8 +728,6 @@
       </layout>
       <zorder></zorder>
       <zorder>verticalSpacer_3</zorder>
-      <zorder>verticalLayoutWidget</zorder>
-      <zorder>verticalLayoutWidget_2</zorder>
      </widget>
     </widget>
    </item>
@@ -708,7 +764,4 @@
  </customwidgets>
  <resources/>
  <connections/>
- <buttongroups>
-  <buttongroup name="buttonGroup"/>
- </buttongroups>
 </ui>

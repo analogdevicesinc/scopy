@@ -4075,15 +4075,12 @@ void Oscilloscope_API::setCursorH2(double val)
 
 bool Oscilloscope_API::autoTrigger() const
 {
-	return osc->trigger_settings.ui->btnAuto->isChecked();
+	return osc->trigger_settings.ui->btnTrigger->isChecked();
 }
 
 void Oscilloscope_API::setAutoTrigger(bool en)
 {
-	if (en)
-		osc->trigger_settings.ui->btnAuto->setChecked(true);
-	else
-		osc->trigger_settings.ui->btnNormal->setChecked(true);
+	osc->trigger_settings.ui->btnTrigger->setChecked(en);
 }
 
 bool Oscilloscope_API::internalTrigger() const

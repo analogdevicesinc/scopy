@@ -64,7 +64,7 @@ TriggerSettings::TriggerSettings(std::shared_ptr<GenericAdc> adc,
 		ui->cmb_source->addItem(QString("Channel %1").arg(i + 1));
 	}
 
-	trigger_auto_mode = ui->btnAuto->isChecked();
+	trigger_auto_mode = ui->btnTrigger->isChecked();
 
 	auto m2k_adc = dynamic_pointer_cast<M2kAdc>(adc);
 	if (m2k_adc) {
@@ -81,8 +81,8 @@ TriggerSettings::TriggerSettings(std::shared_ptr<GenericAdc> adc,
 	connect(ui->trigger_hysteresis, SIGNAL(valueChanged(double)),
 		SLOT(onSpinboxTriggerHystChanged(double)));
 
-	connect(ui->btnNormal, SIGNAL(clicked()), this,
-			SLOT(autoTriggerEnable()));
+	connect(ui->btnTrigger, SIGNAL(clicked()), this,
+	        SLOT(autoTriggerEnable()));
 
 	// Default GUI settings
 	ui->cmb_source->setCurrentIndex(0);
@@ -313,7 +313,7 @@ void TriggerSettings::on_cmb_analog_extern_currentIndexChanged(int index)
 
 void TriggerSettings::autoTriggerDisable()
 {
-	if (ui->btnAuto->isChecked()) {
+	if (!ui->btnTrigger->isChecked()) {
 		mode_hw_write(HardwareTrigger::ALWAYS);
 
 		temporarily_disabled = true;
@@ -322,11 +322,13 @@ void TriggerSettings::autoTriggerDisable()
 
 void TriggerSettings::autoTriggerEnable()
 {
-	if (temporarily_disabled) {
-		mode_hw_write(determineTriggerMode(ui->intern_en->isChecked(),
-			ui->extern_en->isChecked()));
+	if (!ui->btnTrigger->isChecked()) {
+		if (temporarily_disabled) {
+			mode_hw_write(determineTriggerMode(ui->intern_en->isChecked(),
+			                                   ui->extern_en->isChecked()));
 
-		temporarily_disabled = false;
+			temporarily_disabled = false;
+		}
 	}
 }
 
@@ -345,7 +347,7 @@ void TriggerSettings::on_btnAuto_toggled(bool checked)
 
 TriggerSettings::TriggerMode TriggerSettings::triggerMode() const
 {
-	return ui->btnAuto->isChecked() ? AUTO : NORMAL;
+	return ui->btnTrigger->isChecked() ? AUTO : NORMAL;
 }
 
 void TriggerSettings::updateHwVoltLevels(int chnIdx)
