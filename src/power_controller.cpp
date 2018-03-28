@@ -81,14 +81,16 @@ PowerController::PowerController(struct iio_context *ctx,
 	iio_channel_attr_write_longlong(ch1w, "raw", 0LL);
 	iio_channel_attr_write_longlong(ch2w, "raw", 0LL);
 
+	ui->btnSync->click();
+
 	connect(&this->timer, SIGNAL(timeout()), this, SLOT(update_lcd()));
 
 	connect(ui->dac1, SIGNAL(toggled(bool)), this,
 			SLOT(dac1_set_enabled(bool)));
 	connect(ui->dac2, SIGNAL(toggled(bool)), this,
-			SLOT(dac2_set_enabled(bool)));
-	connect(ui->sync, SIGNAL(toggled(bool)), this,
-			SLOT(sync_enabled(bool)));
+	        SLOT(dac2_set_enabled(bool)));
+	connect(ui->btnSync, SIGNAL(toggled(bool)), this,
+	        SLOT(sync_enabled(bool)));
 	connect(ui->valuePos, SIGNAL(valueChanged(double)), this,
 			SLOT(dac1_set_value(double)));
 	connect(ui->valueNeg, SIGNAL(valueChanged(double)), this,
@@ -241,12 +243,12 @@ void PowerController::dac2_set_enabled(bool enabled)
 void PowerController::sync_enabled(bool enabled)
 {
 	if (ui->dac1->isChecked()) {
-		dac2_set_enabled(enabled);
-		ui->dac2->setChecked(enabled);
+		dac2_set_enabled(!enabled);
+		ui->dac2->setChecked(!enabled);
 	}
 
-	in_sync = enabled;
-	ui->valueNeg->setDisabled(enabled);
+	in_sync = !enabled;
+	ui->valueNeg->setDisabled(!enabled);
 	ui->valueNeg->setValue(-ui->valuePos->value() *
 			(double) ui->trackingRatio->value() / 100.0);
 }
@@ -308,15 +310,13 @@ void PowerController::startStop(bool start)
 
 bool PowerController_API::syncEnabled() const
 {
-	return pw->ui->sync->isChecked();
+	return !pw->ui->btnSync->isChecked();
 }
 
 void PowerController_API::enableSync(bool en)
 {
-	if (en)
-		pw->ui->sync->click();
-	else
-		pw->ui->notSync->click();
+	pw->ui->btnSync->setChecked(en);
+	pw->ui->btnSync->click();
 }
 
 int PowerController_API::getTrackingPercent() const

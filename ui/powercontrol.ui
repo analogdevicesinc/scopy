@@ -576,36 +576,83 @@ color: #9013fe;
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="notSync">
-        <property name="focusPolicy">
-         <enum>Qt::NoFocus</enum>
-        </property>
+       <widget class="adiscope::CustomSwitch" name="btnSync">
         <property name="styleSheet">
-         <string notr="true">QRadioButton {
-color: white;
-spacing: 12px;
+         <string notr="true">QPushButton {
+min-height: 30px;
+max-height: 30px;
+min-width: 200px;
+max-width: 200px;
+background-color: black;
+border-radius: 4px;
+}
+
+QPushButton:disabled {
+background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.501, y2:0, stop:0 #727273, stop:1 #141416);
+}
+
+QWidget#handle {
+min-height: 30px;
+max-height: 30px;
+min-width: 102px;
+max-width: 102px;
+background-color: #4a64ff;
+border-radius: 2px;
+}
+
+QWidget#handle:disabled {
+background-color: #aaaaaa;
+}
+
+QLabel {
+margin-top: 6px;
 background-color: transparent;
+font: 16px &quot;monospace&quot;;
 }
-QRadioButton::indicator {
-width: 14px;
-height: 14px;
-border: 2px solid;
-border-radius: 9px;
-border-color: rgb(73, 99, 255);
+
+QLabel#on {
+margin-top: 0px;
+min-height:30px;
+max-height:30px;
+min-width:100px;
+max-width:100px;
+qproperty-alignment: AlignCenter AlignCenter;
+margin-left: 0px;
+color: white;
 }
-QRadioButton::indicator:checked {
-background-color: rgb(73, 99, 255);
-}</string>
+
+QLabel#on:disabled {
+color: rgba(255,255,255,102);
+}
+
+QLabel#off {
+margin-top: 0px;
+min-height:30px;
+max-height:30px;
+min-width:100px;
+max-width:100px;
+margin-left: 100px;
+color: white;
+qproperty-alignment: AlignCenter AlignCenter;
+}
+
+QLabel#off:disabled {
+color: rgba(255,255,255,51);
+}
+</string>
         </property>
         <property name="text">
-         <string>Independent controls</string>
+         <string/>
         </property>
-        <property name="checked">
-         <bool>true</bool>
+        <property name="leftText" stdset="0">
+         <string>Independent</string>
         </property>
-        <attribute name="buttonGroup">
-         <string notr="true">buttonGroup</string>
-        </attribute>
+        <property name="rightText" stdset="0">
+         <string>Tracking</string>
+        </property>
+        <property name="duration_ms" stdset="0">
+         <number>0</number>
+        </property>
        </widget>
       </item>
       <item>
@@ -614,48 +661,67 @@ background-color: rgb(73, 99, 255);
          <number>1</number>
         </property>
         <item>
-         <widget class="QRadioButton" name="sync">
-          <property name="focusPolicy">
-           <enum>Qt::NoFocus</enum>
+         <widget class="QSlider" name="trackingRatio">
+          <property name="enabled">
+           <bool>false</bool>
           </property>
           <property name="styleSheet">
-           <string notr="true">QRadioButton {
-color: white;
-spacing: 12px;
-background-color: transparent;
+           <string notr="true">QSlider::groove {
+    border: 1px solid #444444;
+    height: 2px; /* the groove expands to the size of the slider by default. by giving it a height, it has a fixed size */
+    background: #999999;
+    margin: 2px 0;
+    border-radius: 2px;
 }
-QRadioButton::indicator {
-width: 14px;
-height: 14px;
-border: 2px solid;
-border-radius: 9px;
-border-color: rgb(73, 99, 255);
+
+QSlider::handle {
+    background: rgb(73, 99, 255);
+    border: 0px solid;
+    width: 18px;
+    margin: -8px 0; /* handle is placed by default on the contents rect of the groove. Expand outside the groove */
+    border-radius: 8px;
 }
-QRadioButton::indicator:checked {
-background-color: rgb(73, 99, 255);
+
+QSlider::handle:disabled {
+    background: #444444;
 }</string>
           </property>
-          <property name="text">
-           <string>Tracking</string>
+          <property name="minimum">
+           <number>1</number>
           </property>
-          <attribute name="buttonGroup">
-           <string notr="true">buttonGroup</string>
-          </attribute>
+          <property name="maximum">
+           <number>100</number>
+          </property>
+          <property name="value">
+           <number>100</number>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
          </widget>
         </item>
         <item>
          <widget class="QLabel" name="trackingRatioLbl">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>25</width>
+            <height>0</height>
+           </size>
           </property>
           <property name="styleSheet">
            <string notr="true">QLabel { color: white; }</string>
           </property>
           <property name="text">
            <string>100</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
          </widget>
         </item>
@@ -676,46 +742,6 @@ background-color: rgb(73, 99, 255);
          </widget>
         </item>
        </layout>
-      </item>
-      <item>
-       <widget class="QSlider" name="trackingRatio">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QSlider::groove {
-    border: 1px solid #444444;
-    height: 2px; /* the groove expands to the size of the slider by default. by giving it a height, it has a fixed size */
-    background: #999999;
-    margin: 2px 0;
-    border-radius: 2px;
-}
-
-QSlider::handle {
-    background: rgb(73, 99, 255);
-    border: 0px solid;
-    width: 18px;
-    margin: -8px 0; /* handle is placed by default on the contents rect of the groove. Expand outside the groove */
-    border-radius: 8px;
-}
-
-QSlider::handle:disabled {
-    background: #444444;
-}</string>
-        </property>
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>100</number>
-        </property>
-        <property name="value">
-         <number>100</number>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
       </item>
       <item>
        <spacer name="verticalSpacer">
@@ -1031,6 +1057,11 @@ QPushButton:disabled {
  </widget>
  <customwidgets>
   <customwidget>
+   <class>adiscope::CustomSwitch</class>
+   <extends>QPushButton</extends>
+   <header>customSwitch.hpp</header>
+  </customwidget>
+  <customwidget>
    <class>adiscope::PositionSpinButton</class>
    <extends>QWidget</extends>
    <header>spinbox_a.hpp</header>
@@ -1057,38 +1088,6 @@ QPushButton:disabled {
   <include location="../resources/resources.qrc"/>
  </resources>
  <connections>
-  <connection>
-   <sender>sync</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>dac2</receiver>
-   <slot>setDisabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>838</x>
-     <y>96</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>838</x>
-     <y>287</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>sync</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>trackingRatio</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>844</x>
-     <y>114</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>844</x>
-     <y>150</y>
-    </hint>
-   </hints>
-  </connection>
   <connection>
    <sender>trackingRatio</sender>
    <signal>valueChanged(int)</signal>
@@ -1137,8 +1136,37 @@ QPushButton:disabled {
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>btnSync</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>trackingRatio</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>947</x>
+     <y>95</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>947</x>
+     <y>158</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnSync</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>dac2</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>947</x>
+     <y>95</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>947</x>
+     <y>447</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
- <buttongroups>
-  <buttongroup name="buttonGroup"/>
- </buttongroups>
 </ui>
