@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>334</width>
+    <width>358</width>
     <height>40</height>
    </rect>
   </property>
@@ -102,7 +102,7 @@ border:1px solid rgb(65,155,249);
         <property name="sizeHint" stdset="0">
          <size>
           <width>20</width>
-          <height>7</height>
+          <height>6</height>
          </size>
         </property>
        </spacer>
@@ -184,6 +184,22 @@ QLabel:disabled
             <property name="bottomMargin">
              <number>0</number>
             </property>
+            <item>
+             <spacer name="horizontalSpacer_4">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Fixed</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
             <item>
              <widget class="adiscope::SmallOnOffSwitch" name="enableBox">
               <property name="sizePolicy">
@@ -542,7 +558,7 @@ background:#4a64ff;
         <property name="sizeHint" stdset="0">
          <size>
           <width>20</width>
-          <height>7</height>
+          <height>6</height>
          </size>
         </property>
        </spacer>

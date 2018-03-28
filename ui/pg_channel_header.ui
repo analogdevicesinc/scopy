@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>275</width>
+    <width>290</width>
     <height>36</height>
    </rect>
   </property>
@@ -116,6 +116,22 @@ QLabel{
          <property name="bottomMargin">
           <number>0</number>
          </property>
+         <item>
+          <spacer name="horizontalSpacer_4">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
          <item>
           <widget class="QLabel" name="labelView">
            <property name="sizePolicy">
@@ -309,7 +325,7 @@ QLabel{
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>15</width>
+             <width>10</width>
              <height>20</height>
             </size>
            </property>
@@ -361,7 +377,7 @@ QLabel{
      <property name="sizeHint" stdset="0">
       <size>
        <width>8</width>
-       <height>8</height>
+       <height>7</height>
       </size>
      </property>
     </spacer>
