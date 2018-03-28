@@ -3335,8 +3335,6 @@ void Oscilloscope::statistics_panel_init()
 void Oscilloscope::statisticsUpdateValues()
 {
 	for (int i = 0; i < statistics_data.size(); i++) {
-		if (!statistics_data[i].first->enabled())
-			continue;
 		double meas_data = statistics_data[i].first->value();
 		statistics_data[i].second.pushNewData(meas_data);
 	}
