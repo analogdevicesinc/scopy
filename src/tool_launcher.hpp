@@ -80,6 +80,7 @@ public:
 	InfoWidget *infoWidget;
 
 	Preferences *getPrefPanel() const;
+	bool eventFilter(QObject *watched, QEvent *event);
 
 Q_SIGNALS:
 	void connectionDone(bool success);

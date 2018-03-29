@@ -227,6 +227,9 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	connect(ui->menu, &MenuAnim::finished, [=](bool opened) {
 		for (auto tools : ui->widget->findChildren<MenuOption *>())
 			tools->setMaximumWidth(opened ? 500 : 64);
+		ui->saveLbl->setVisible(opened);
+		ui->loadLbl->setVisible(opened);
+		ui->prefBtn->setText(opened ? "Preferences" : "");
 	});
 
 	prefPanel = new Preferences(this);
@@ -240,6 +243,7 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 
 	setupHomepage();
 	readPreferences();
+	this->installEventFilter(this);
 }
 
 void ToolLauncher::readPreferences()
@@ -599,6 +603,7 @@ ToolLauncher::~ToolLauncher()
 {
 
 	disconnect();
+	this->removeEventFilter(this);
 
 	for (auto it = devices.begin(); it != devices.end(); ++it) {
 		delete *it;
@@ -1496,6 +1501,31 @@ void ToolLauncher::highlight(bool on, int position)
 Preferences *ToolLauncher::getPrefPanel() const
 {
 	return prefPanel;
+}
+
+bool ToolLauncher::eventFilter(QObject *watched, QEvent *event)
+{
+	if (event->type() == QEvent::MouseButtonRelease) {
+		QMouseEvent *me = static_cast<QMouseEvent *>(event);
+		QPoint mousePosLoad = ui->Load->mapFromGlobal(QCursor::pos());
+		QPoint mousePosSave = ui->Save->mapFromGlobal(QCursor::pos());
+		QPoint mousePosPref = ui->preference->mapFromGlobal(QCursor::pos());
+
+		if (ui->menuControl->rect().contains(me->pos())) {
+			ui->btnMenu->toggle();
+			return true;
+		} else if (ui->Load->rect().contains(mousePosLoad)) {
+			ui->loadBtn->click();
+			return true;
+		} else  if (ui->Save->rect().contains(mousePosSave)) {
+			ui->saveBtn->click();
+			return true;
+		} else if (ui->preference->rect().contains(mousePosPref)) {
+			ui->prefBtn->click();
+			return true;
+		}
+	}
+	return QObject::eventFilter(watched, event);
 }
 
 void ToolLauncher::UpdatePosition(QWidget *widget, int position){
