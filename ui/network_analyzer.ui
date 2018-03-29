@@ -693,40 +693,91 @@ border: 5px solid white;
                   </layout>
                  </item>
                  <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_5">
-                   <property name="spacing">
-                    <number>0</number>
+                  <widget class="adiscope::CustomSwitch" name="btnRefChn">
+                   <property name="styleSheet">
+                    <string notr="true">QPushButton {
+min-height: 30px;
+max-height: 30px;
+min-width: 280px;
+max-width: 280px;
+background-color: black;
+border-radius: 4px;
+}
+
+QPushButton:disabled {
+background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.501, y2:0, stop:0 #727273, stop:1 #141416);
+}
+
+QWidget#handle {
+min-height: 30px;
+max-height: 30px;
+min-width: 142px;
+max-width: 142px;
+background-color: #4a64ff;
+border-radius: 2px;
+}
+
+QWidget#handle:disabled {
+background-color: #aaaaaa;
+}
+
+QLabel {
+margin-top: 6px;
+background-color: transparent;
+font-size: 16px;
+line-height: 19px;
+}
+
+QLabel#on {
+margin-top: 0px;
+min-height:30px;
+max-height:30px;
+min-width:140px;
+max-width:140px;
+qproperty-alignment: AlignCenter AlignCenter;
+margin-left: 0px;
+color: white;
+}
+
+QLabel#on:disabled {
+color: rgba(255,255,255,102);
+}
+
+QLabel#off {
+margin-top: 0px;
+min-height:30px;
+max-height:30px;
+min-width:140px;
+max-width:140px;
+margin-left: 140px;
+color: white;
+qproperty-alignment: AlignCenter AlignCenter;
+}
+
+QLabel#off:disabled {
+color: rgba(255,255,255,51);
+}
+</string>
                    </property>
-                   <property name="topMargin">
-                    <number>0</number>
+                   <property name="text">
+                    <string/>
                    </property>
-                   <property name="bottomMargin">
-                    <number>0</number>
+                   <property name="checkable">
+                    <bool>true</bool>
                    </property>
-                   <item>
-                    <widget class="QRadioButton" name="refCh1">
-                     <property name="text">
-                      <string>Channel 1</string>
-                     </property>
-                     <property name="checked">
-                      <bool>true</bool>
-                     </property>
-                     <attribute name="buttonGroup">
-                      <string notr="true">buttonGroup_2</string>
-                     </attribute>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QRadioButton" name="refCh2">
-                     <property name="text">
-                      <string>Channel 2</string>
-                     </property>
-                     <attribute name="buttonGroup">
-                      <string notr="true">buttonGroup_2</string>
-                     </attribute>
-                    </widget>
-                   </item>
-                  </layout>
+                   <property name="checked">
+                    <bool>true</bool>
+                   </property>
+                   <property name="leftText" stdset="0">
+                    <string>Channel 1</string>
+                   </property>
+                   <property name="rightText" stdset="0">
+                    <string>Channel 2</string>
+                   </property>
+                   <property name="duration_ms" stdset="0">
+                    <string>0</string>
+                   </property>
+                  </widget>
                  </item>
                  <item>
                   <layout class="QHBoxLayout" name="horizontalLayout_4">
@@ -1323,6 +1374,17 @@ QLabel {
  </widget>
  <customwidgets>
   <customwidget>
+   <class>adiscope::CustomSwitch</class>
+   <extends>QPushButton</extends>
+   <header>customSwitch.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::PositionSpinButton</class>
+   <extends>QWidget</extends>
+   <header>spinbox_a.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>adiscope::DetachDragZone</class>
    <extends>QWidget</extends>
    <header>detachdragzone.h</header>
@@ -1332,12 +1394,6 @@ QLabel {
    <class>adiscope::MenuAnim</class>
    <extends>QWidget</extends>
    <header>menu_anim.hpp</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>adiscope::PositionSpinButton</class>
-   <extends>QWidget</extends>
-   <header>spinbox_a.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>

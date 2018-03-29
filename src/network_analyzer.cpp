@@ -445,7 +445,7 @@ void NetworkAnalyzer::run()
 			return;
 
 		double mag;
-		if (ui->refCh1->isChecked()) {
+        if (ui->btnRefChn->isChecked()) {
 			phase = -phase;
 			mag = 10.0 * log10(mag2) - 10.0 * log10(mag1);
 		} else {
@@ -775,7 +775,7 @@ void NetworkAnalyzer_API::setLogFreq(bool is_log)
 
 int NetworkAnalyzer_API::getRefChannel() const
 {
-	if (net->ui->refCh1->isChecked())
+    if (net->ui->btnRefChn->isChecked())
 		return 1;
 	else
 		return 2;
@@ -784,7 +784,7 @@ int NetworkAnalyzer_API::getRefChannel() const
 void NetworkAnalyzer_API::setRefChannel(int chn)
 {
 	if (chn == 1)
-		net->ui->refCh1->setChecked(true);
+        net->ui->btnRefChn->setChecked(true);
 	else
-		net->ui->refCh2->setChecked(true);
+        net->ui->btnRefChn->setChecked(false);
 }
