@@ -122,40 +122,6 @@ color: #ff7200;
          </widget>
         </item>
         <item row="0" column="2">
-         <widget class="QLabel" name="label_7">
-          <property name="font">
-           <font>
-            <pointsize>30</pointsize>
-            <weight>75</weight>
-            <bold>true</bold>
-           </font>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">QLabel { color: #ff7200; font-size: 30pt; font-weight: bold; qproperty-alignment: 'AlignBottom'; }</string>
-          </property>
-          <property name="text">
-           <string>V</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="2">
-         <widget class="QLabel" name="label_9">
-          <property name="font">
-           <font>
-            <pointsize>30</pointsize>
-            <weight>75</weight>
-            <bold>true</bold>
-           </font>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">QLabel { color: #ff7200; font-size: 30pt; font-weight: bold; qproperty-alignment: 'AlignBottom'; }</string>
-          </property>
-          <property name="text">
-           <string>V</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="4">
          <widget class="QLabel" name="label_5">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -203,7 +169,7 @@ color: #ff7200;
           </property>
          </spacer>
         </item>
-        <item row="1" column="4">
+        <item row="1" column="2">
          <widget class="QLabel" name="label_6">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -238,22 +204,6 @@ color: #ff7200;
           </property>
          </widget>
         </item>
-        <item row="0" column="3">
-         <spacer name="horizontalSpacer_4">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Fixed</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>30</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
        </layout>
       </item>
       <item>
@@ -280,7 +230,7 @@ color: #ff7200;
         <property name="horizontalSpacing">
          <number>7</number>
         </property>
-        <item row="0" column="4">
+        <item row="0" column="2">
          <widget class="QLabel" name="label">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -359,7 +309,7 @@ color: #9013fe;
           </property>
          </widget>
         </item>
-        <item row="1" column="4">
+        <item row="1" column="2">
          <widget class="QLabel" name="label_2">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -394,40 +344,6 @@ color: #9013fe;
           </property>
          </widget>
         </item>
-        <item row="0" column="2">
-         <widget class="QLabel" name="label_10">
-          <property name="font">
-           <font>
-            <pointsize>30</pointsize>
-            <weight>75</weight>
-            <bold>true</bold>
-           </font>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">QLabel { color: #9013fe; font-size: 30pt; font-weight: bold; qproperty-alignment: 'AlignBottom'; }</string>
-          </property>
-          <property name="text">
-           <string>V</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="2">
-         <widget class="QLabel" name="label_11">
-          <property name="font">
-           <font>
-            <pointsize>30</pointsize>
-            <weight>75</weight>
-            <bold>true</bold>
-           </font>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">QLabel { color: #9013fe; font-size: 30pt; font-weight: bold; qproperty-alignment: 'AlignBottom'; }</string>
-          </property>
-          <property name="text">
-           <string>V</string>
-          </property>
-         </widget>
-        </item>
         <item row="1" column="1">
          <widget class="adiscope::LcdNumber" name="lcd2">
           <property name="sizePolicy">
@@ -458,22 +374,6 @@ color: #9013fe;
            <enum>QLCDNumber::Flat</enum>
           </property>
          </widget>
-        </item>
-        <item row="0" column="3">
-         <spacer name="horizontalSpacer_3">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Fixed</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>30</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
         </item>
        </layout>
       </item>
