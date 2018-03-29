@@ -67,6 +67,8 @@ bool CustomSwitch::event(QEvent *e)
 			off.setText(property("rightText").toString());
 		if(propName=="polarity" && property("polarity").isValid())
 			polarity = property("polarity").toBool();
+		if(propName=="duration" && property("duration").isValid())
+			setDuration(property("duration").toInt());
 
 	}
 	return QPushButton::event(e);
