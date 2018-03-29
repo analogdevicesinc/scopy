@@ -79,7 +79,7 @@ private Q_SLOTS:
 	void on_lineEdit_editingFinished();
 	void on_horizontalSlider_valueChanged(int value);
 	void on_comboBox_activated(int index);
-	void on_inout_clicked();
+	void changeDirection();
 };
 
 class DigitalIO : public Tool

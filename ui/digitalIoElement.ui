@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>815</width>
-    <height>242</height>
+    <height>271</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -143,7 +143,7 @@ background-color: rgba(0, 0, 0, 80);
 }</string>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="page">
         <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -277,6 +277,9 @@ border:1px solid red;
              <property name="rightText" stdset="0">
               <string>out</string>
              </property>
+             <property name="duration" stdset="0">
+              <number>0</number>
+             </property>
             </widget>
            </item>
            <item>
@@ -322,6 +325,9 @@ QSlider::handle:horizontal:enabled {
  border-image:url(&quot;:/icons/time_trigger_handle.svg&quot;); 
  height: 30px;	width: 40px;	border-radius: 4px;
  margin: -5 -20px;
+ border-bot:2px;
+ border-left:2px;
+ border-backgroundcolor:black;
 }
 
 QSlider::handle:horizontal:!enabled {

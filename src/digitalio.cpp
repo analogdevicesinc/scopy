@@ -70,14 +70,13 @@ DigitalIoGroup::DigitalIoGroup(QString label, int ch_mask,int io_mask,
 		ch_mask_temp>>=1;
 		j++;
 	}
-
+	connect(ui->inout,SIGNAL(clicked()),this,SLOT(changeDirection()));
 	connect(this,SIGNAL(slider(int)),dio,SLOT(setSlider(int)));
 	ui->label_2->setText(label);
 	auto max = (1<<nr_of_channels) -1;
 	ui->lineEdit->setValidator(new QIntValidator(0, max, this));
 	ui->lineEdit->setText(QString::number(max/2));
 	ui->horizontalSlider->setValue(max/2);
-
 }
 DigitalIoGroup::~DigitalIoGroup()
 {
@@ -159,7 +158,7 @@ DigitalIO::DigitalIO(struct iio_context *ctx, Filter *filt, QPushButton *runBtn,
 
 	connect(ui->btnRunStop, SIGNAL(toggled(bool)), this, SLOT(btnRunStop_toggled()));
 	connect(runBtn, SIGNAL(toggled(bool)), ui->btnRunStop, SLOT(setChecked(bool)));
-	connect(ui->btnRunStop, SIGNAL(toggled(bool)), runBtn, SLOT(setChecked(bool)));
+	connect(ui->btnRunStop, SIGNAL(toggled(bool)), runBtn, SLOT(setChecked(bool)));	
 
 	if (!offline_mode) {
 		connect(diom,SIGNAL(locked()),this,SLOT(lockUi()));
@@ -245,7 +244,7 @@ void DigitalIO::updateUi()
 	}
 }
 
-void adiscope::DigitalIoGroup::on_inout_clicked()
+void adiscope::DigitalIoGroup::changeDirection()
 {
 	qDebug()<<"PB";
 	auto chk = ui->inout->isChecked();
@@ -295,7 +294,7 @@ void adiscope::DigitalIoGroup::on_lineEdit_editingFinished()
 void adiscope::DigitalIoGroup::on_comboBox_activated(int index)
 {
 	ui->stackedWidget->setCurrentIndex(index);
-	on_inout_clicked();
+	changeDirection();
 }
 
 void adiscope::DigitalIO::lockUi()
@@ -429,7 +428,7 @@ void DigitalIO_API::setGrouped(const QList<bool> &grouped)
 		int index = grouped[i] ? 1 : 0;
 		dio->groups[i]->ui->stackedWidget->setCurrentIndex(index);
 		dio->groups[i]->ui->comboBox->setCurrentIndex(index);
-		dio->groups[i]->on_inout_clicked();
+		dio->groups[i]->changeDirection();
 	}
 
 }
