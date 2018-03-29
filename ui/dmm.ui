@@ -36,7 +36,7 @@
     <widget class="adiscope::DetachDragZone" name="leftPanel" native="true">
      <property name="styleSheet">
       <string notr="true">QWidget#leftPanel { background-color: rgba(0, 0, 0, 40); }
-QLabel { color: rgba(255, 255, 255, 40); font-size: 51px; font-weight: bold; qproperty-alignment: 'AlignBottom | AlignLeft'; }</string>
+QLabel { color: rgba(255, 255, 255, 90); font-size: 51px; font-weight: bold; qproperty-alignment: 'AlignBottom | AlignLeft'; }</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_8">
       <property name="leftMargin">
