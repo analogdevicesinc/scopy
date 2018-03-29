@@ -20,7 +20,9 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true"/>
+   <string notr="true">#LAChannelManager {
+background-color: qlineargradient(spread:pad, x1:0, y1:0.9, x2:0, y2:0, stop:0 rgba(0, 0, 0, 40), stop:1 transparent);
+}</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_1">
    <property name="spacing">
@@ -122,10 +124,16 @@
      <item>
       <widget class="QScrollArea" name="leftScrollArea">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>10</width>
+         <height>0</height>
+        </size>
        </property>
        <property name="maximumSize">
         <size>
