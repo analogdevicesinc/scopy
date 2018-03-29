@@ -78,6 +78,7 @@ ui(new Ui::MarkerTable)
 	ui->tableView->hideColumn(COL_ID);
 	ui->tableView->setShowGrid(false);
 	ui->tableView->setSelectionMode(QAbstractItemView::NoSelection);
+	ui->tableView->setStyleSheet("font-size: 14px;");
 
 	FrequencyDelegate *freqDelegate = new FrequencyDelegate(this);
 	ui->tableView->setItemDelegateForColumn(COL_FREQ, freqDelegate);
