@@ -54,7 +54,7 @@ namespace data {
 
 const double DecoderStack::DecodeMargin = 1.0;
 const double DecoderStack::DecodeThreshold = 0.2;
-const int64_t DecoderStack::DecodeChunkLength = 256;
+const int64_t DecoderStack::DecodeChunkLength = 1024 * 16;
 const unsigned int DecoderStack::DecodeNotifyPeriod = 1024;
 
 mutex DecoderStack::global_srd_mutex_;
