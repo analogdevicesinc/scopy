@@ -134,5 +134,6 @@
         <file>stylesheets/dropdown_switch_list.qss</file>
         <file>stylesheets/customSwitch.qss</file>
         <file>stylesheets/smallOnOffSwitch.qss</file>
+        <file>stylesheets/bigCustomSwitch.qss</file>
     </qresource>
 </RCC>

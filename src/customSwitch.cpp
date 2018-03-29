@@ -69,7 +69,14 @@ bool CustomSwitch::event(QEvent *e)
 			polarity = property("polarity").toBool();
 		if(propName=="duration" && property("duration").isValid())
 			setDuration(property("duration").toInt());
-
+		if(propName=="bigBtn" && property("bigBtn").isValid()) {
+			if (property("bigBtn").toBool()) {
+				QFile file(":stylesheets/stylesheets/bigCustomSwitch.qss");
+				file.open(QFile::ReadOnly);
+				QString styleSheet = QString::fromLatin1(file.readAll());
+				this->setStyleSheet(styleSheet);
+			}
+		}
 	}
 	return QPushButton::event(e);
 }
