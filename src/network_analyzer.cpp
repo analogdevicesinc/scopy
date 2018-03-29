@@ -139,7 +139,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
             &m_dBgraph, SLOT(setYMin(double)));
     connect(ui->magMax, SIGNAL(valueChanged(double)),
             &m_dBgraph, SLOT(setYMax(double)));
-    connect(ui->isLog, SIGNAL(toggled(bool)),
+    connect(ui->btnIsLog, SIGNAL(toggled(bool)),
             &m_dBgraph, SLOT(useLogFreq(bool)));
 
     connect(ui->minFreq, SIGNAL(valueChanged(double)),
@@ -150,7 +150,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
             &m_phaseGraph, SLOT(setYMin(double)));
     connect(ui->phaseMax, SIGNAL(valueChanged(double)),
             &m_phaseGraph, SLOT(setYMax(double)));
-    connect(ui->isLog, SIGNAL(toggled(bool)),
+    connect(ui->btnIsLog, SIGNAL(toggled(bool)),
             &m_phaseGraph, SLOT(useLogFreq(bool)));
 
     d_bottomHandlesArea = new HorizHandlesArea(this);
@@ -287,7 +287,7 @@ void NetworkAnalyzer::run()
 	double log10_max_freq = log10(max_freq);
 	double step;
 
-	bool is_log = ui->isLog->isChecked();
+    bool is_log = ui->btnIsLog->isChecked();
 	if (is_log)
 		step = (log10_max_freq - log10_min_freq) / (double)(steps - 1);
 	else
@@ -762,15 +762,12 @@ void NetworkAnalyzer_API::setMaxPhase(double val)
 
 bool NetworkAnalyzer_API::isLogFreq() const
 {
-	return net->ui->isLog->isChecked();
+    return net->ui->btnIsLog->isChecked();
 }
 
 void NetworkAnalyzer_API::setLogFreq(bool is_log)
 {
-	if (is_log)
-		net->ui->isLog->setChecked(true);
-	else
-		net->ui->isLinear->setChecked(true);
+    net->ui->btnIsLog->setChecked(is_log);
 }
 
 int NetworkAnalyzer_API::getRefChannel() const
