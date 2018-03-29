@@ -41,7 +41,7 @@ QMainWindow > .QWidget > .adiscope--MenuAnim {
 	background-color: none;
 }
 
-QwtPlot, QwtPolarPlot, pv--view--Viewport, adiscope--Oscilloscope #widgetPlotContainer, adiscope--NetworkAnalyzer #widgetPlotContainer  {
+QwtPlot, QwtPolarPlot, pv--view--Viewport, adiscope--SignalGenerator #plot_2, adiscope--Oscilloscope #widgetPlotContainer, adiscope--NetworkAnalyzer #widgetPlotContainer  {
 	background-color: black;
 }
 

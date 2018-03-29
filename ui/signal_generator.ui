@@ -137,8 +137,29 @@ QPushButton:disabled {
       </item>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout">
+        <property name="spacing">
+         <number>0</number>
+        </property>
         <item>
-         <layout class="QVBoxLayout" name="plot"/>
+         <widget class="QWidget" name="plot_2" native="true">
+          <layout class="QVBoxLayout" name="plot">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <property name="leftMargin">
+            <number>75</number>
+           </property>
+           <property name="topMargin">
+            <number>75</number>
+           </property>
+           <property name="rightMargin">
+            <number>75</number>
+           </property>
+           <property name="bottomMargin">
+            <number>75</number>
+           </property>
+          </layout>
+         </widget>
         </item>
         <item>
          <widget class="adiscope::MenuAnim" name="rightMenu" native="true">
