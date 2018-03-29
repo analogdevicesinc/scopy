@@ -356,9 +356,9 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	ui->btnResetInstrument->setVisible(false);
 	connect(ui->btnResetInstrument, SIGNAL(clicked(bool)),
 		this, SLOT(resetInstrumentToDefault()));
-	connect(trigger_settings_ui->btnAuto, SIGNAL(toggled(bool)),
+	connect(trigger_settings_ui->btnTriggerMode, SIGNAL(toggled(bool)),
 		this, SLOT(setTimeout(bool)));
-	connect(trigger_settings_ui->btnAuto, SIGNAL(toggled(bool)),
+	connect(trigger_settings_ui->btnTriggerMode, SIGNAL(toggled(bool)),
 		this, SLOT(onTriggerModeChanged(bool)));
 
 	connect(this, SIGNAL(starttimeout()),
@@ -400,8 +400,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	connect(chm_ui, SIGNAL(widthChanged(int)),
 		this, SLOT(onChmWidthChanged(int)));
 
-	trigger_settings_ui->btnAuto->setChecked(false);
-	trigger_settings_ui->btnNormal->setChecked(true);
+	trigger_settings_ui->btnTriggerMode->setChecked(false);
 	main_win->view_->viewport()->setTimeTriggerPosActive(true);
 	ui->areaTimeTriggerLayout->addWidget(this->bottomHandlesArea(), 0, 1, 1, 3);
 	updateAreaTimeTrigger();
@@ -798,7 +797,7 @@ void LogicAnalyzer::stopTimeout()
 
 void LogicAnalyzer::stopTimer()
 {
-	if(trigger_settings_ui->btnAuto->isChecked()) {
+	if(trigger_settings_ui->btnTriggerMode->isChecked()) {
 		if(timer->isActive()) {
 			timer->stop();
 		}
@@ -845,7 +844,7 @@ void LogicAnalyzer::onTriggerModeChanged(bool val)
 {
 	if(!trigger_settings_ui)
 		return;
-	if(trigger_settings_ui->btnAuto->isChecked()) {
+	if(trigger_settings_ui->btnTriggerMode->isChecked()) {
 		triggerUpdater->setIdleState(Auto);
 		triggerUpdater->setInput(Auto);
 	}
@@ -1115,7 +1114,7 @@ void LogicAnalyzer::configParams(double timebase, double timepos)
                 updateBufferPreviewer();
         }
 
-        onTriggerModeChanged(trigger_settings_ui->btnAuto->isChecked());
+        onTriggerModeChanged(trigger_settings_ui->btnTriggerMode->isChecked());
         logic_analyzer_ptr->set_stream(acquisition_mode == STREAM);
         main_win->view_->time_item_appearance_changed(true, true);
 }
@@ -1197,7 +1196,7 @@ void LogicAnalyzer::startStop(bool start)
 		if(timer->isActive()) {
 			timer->stop();
 		}
-		if(!armed && trigger_settings_ui->btnAuto->isChecked()) {
+		if(!armed && trigger_settings_ui->btnTriggerMode->isChecked()) {
 			autoCaptureEnable(true);
 		}
 	}
@@ -1270,7 +1269,7 @@ void LogicAnalyzer::singleRun(bool checked)
 		running = false;
 		if(timer->isActive())
 			timer->stop();
-		if(!armed && trigger_settings_ui->btnAuto->isChecked()) {
+		if(!armed && trigger_settings_ui->btnTriggerMode->isChecked()) {
 			autoCaptureEnable(true);
 		}
 		Q_EMIT activateExportButton();
@@ -1826,7 +1825,7 @@ void LogicAnalyzer::onDataReceived()
 		triggerUpdater->setInput(Triggered);
 	}
 	else {
-		if(trigger_settings_ui->btnAuto->isChecked())
+		if(trigger_settings_ui->btnTriggerMode->isChecked())
 			triggerUpdater->setInput(Auto);
 	}
 
