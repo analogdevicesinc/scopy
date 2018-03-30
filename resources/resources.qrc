@@ -123,6 +123,10 @@
         <file>menu/ic adalm.svg</file>
         <file>menu/ADALM2000.png</file>
         <file>menu/ic adalm.png</file>
+        <file>icons/ic arrow down.svg</file>
+        <file>icons/ic arrow left.svg</file>
+        <file>icons/ic arrow right.svg</file>
+        <file>icons/ic arrow up.svg</file>
     </qresource>
     <qresource prefix="/stylesheets">
         <file>stylesheets/global.qss</file>
