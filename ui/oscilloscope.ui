@@ -561,9 +561,6 @@ QPushButton:checked:hover {
                 <property name="bottomMargin">
                  <number>3</number>
                 </property>
-                <item>
-                 <widget class="QComboBox" name="cmb_y_channel"/>
-                </item>
                </layout>
               </item>
               <item>
@@ -578,31 +575,6 @@ QPushButton:checked:hover {
                  </size>
                 </property>
                </spacer>
-              </item>
-              <item>
-               <widget class="QPushButton" name="xyPlotLineType">
-                <property name="styleSheet">
-                 <string notr="true">QPushButton {
-  min-height: 40px;
-  min-width: 40px;
-  max-height: 40px;
-  max-width: 40px;
-
-  border-image: url(:/icons/dots_on_plot.svg);
-}
-
-QPushButton::checked {
-  border-image: url(:/icons/lines_on_plot.svg);
-}
-</string>
-                </property>
-                <property name="text">
-                 <string/>
-                </property>
-                <property name="checkable">
-                 <bool>true</bool>
-                </property>
-               </widget>
               </item>
               <item>
                <spacer name="horizontalSpacer_5">
@@ -683,9 +655,6 @@ QPushButton::checked {
                 <property name="rightMargin">
                  <number>0</number>
                 </property>
-                <item>
-                 <widget class="QComboBox" name="cmb_x_channel"/>
-                </item>
                </layout>
               </item>
               <item>
@@ -983,16 +952,21 @@ QLabel {
  </widget>
  <customwidgets>
   <customwidget>
+   <class>adiscope::MenuAnim</class>
+   <extends>QWidget</extends>
+   <header>menu_anim.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>adiscope::DetachDragZone</class>
    <extends>QWidget</extends>
    <header>detachdragzone.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>adiscope::MenuAnim</class>
-   <extends>QWidget</extends>
-   <header>menu_anim.hpp</header>
-   <container>1</container>
+   <class>adiscope::CustomPushButton</class>
+   <extends>QPushButton</extends>
+   <header>customPushButton.hpp</header>
   </customwidget>
   <customwidget>
    <class>adiscope::CustomPushButton</class>

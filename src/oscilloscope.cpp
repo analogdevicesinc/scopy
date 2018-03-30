@@ -337,17 +337,6 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	for (uint i = 0; i < nb_channels; i++)
 		xy_plot.setYaxisMouseGesturesEnabled(i, false);
 
-	// TO DO: refactor this once the source of the X and Y axes can be configured
-	for(int i = 0; i < nb_channels + nb_math_channels; i++) {
-		ChannelWidget *cw = static_cast<ChannelWidget *>(
-			ui->channelsList->itemAt(i)->widget());
-		ui->cmb_x_channel->addItem(cw->shortName());
-		ui->cmb_y_channel->addItem(cw->shortName());
-	}
-	ui->cmb_x_channel->setCurrentIndex(0);
-	ui->cmb_y_channel->setCurrentIndex(1);
-	setup_xy_channels();
-
 	xy_plot.setLineColor(0, QColor("#F8E71C"));
 
 	ui->hlayout_fft->addWidget(&fft_plot);
@@ -361,11 +350,6 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	QWidget *w = gridL->itemAtPosition(1, 0)->widget();
 	gridL->addWidget(&xy_plot, 1, 0);
 	gridL->addWidget(w, 2, 0);
-
-	connect(ui->cmb_x_channel, SIGNAL(currentIndexChanged(int)),
-		this, SLOT(setup_xy_channels()));
-	connect(ui->cmb_y_channel, SIGNAL(currentIndexChanged(int)),
-		this, SLOT(setup_xy_channels()));
 
 	ui->xy_plot_container->hide();
 
@@ -425,6 +409,22 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	gsettings_ui = new Ui::OscGeneralSettings();
 	gsettings_ui->setupUi(ui->generalSettings);
 
+	for(int i = 0; i < nb_channels + nb_math_channels; i++) {
+		ChannelWidget *cw = static_cast<ChannelWidget *>(
+			ui->channelsList->itemAt(i)->widget());
+		gsettings_ui->cmb_x_channel->addItem(cw->shortName());
+		gsettings_ui->cmb_y_channel->addItem(cw->shortName());
+	}
+	gsettings_ui->cmb_x_channel->setCurrentIndex(0);
+	gsettings_ui->cmb_y_channel->setCurrentIndex(1);
+	setup_xy_channels();
+
+	connect(gsettings_ui->cmb_x_channel, SIGNAL(currentIndexChanged(int)),
+		this, SLOT(setup_xy_channels()));
+	connect(gsettings_ui->cmb_y_channel, SIGNAL(currentIndexChanged(int)),
+		this, SLOT(setup_xy_channels()));
+
+
 	int gsettings_panel = ui->stackedWidget->indexOf(ui->generalSettings);
 	ui->btnGeneralSettings->setProperty("id", QVariant(-gsettings_panel));
 
@@ -450,6 +450,9 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 			SLOT(runStopToggled(bool)));
 	connect(this, SIGNAL(isRunning(bool)), runButton,
 			SLOT(setChecked(bool)));
+
+	connect(gsettings_ui->xyPlotLineType, SIGNAL(toggled(bool)),
+		this, SLOT(on_xyPlotLineType_toggled(bool)));
 
 	// Signal-Slot Connections
 
@@ -621,6 +624,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	// The trigger is always available (cannot be disabled) and we add it to
 	// the list so we can show in case all other menus are disabled
 	menuOrder.push_back(ui->btnTrigger);
+	gsettings_ui->xySettings->hide();
 
 	api->setObjectName(QString::fromStdString(Filter::tool_name(
 			TOOL_OSCILLOSCOPE)));
@@ -1558,8 +1562,8 @@ void Oscilloscope::add_math_channel(const std::string& function)
 		menuOrder.removeOne(ui->btnAddMath);
 	}
 
-	ui->cmb_x_channel->addItem(channel_widget->fullName());
-	ui->cmb_y_channel->addItem(channel_widget->fullName());
+	gsettings_ui->cmb_x_channel->addItem(channel_widget->shortName());
+	gsettings_ui->cmb_y_channel->addItem(channel_widget->shortName());
 	if(xy_is_visible)
 		setup_xy_channels();
 
@@ -1623,21 +1627,21 @@ void Oscilloscope::onChannelWidgetDeleteClicked()
 		locked = true;
 
 		if (xy_is_visible) {
-			ui->cmb_x_channel->blockSignals(true);
-			ui->cmb_y_channel->blockSignals(true);
-			ui->cmb_x_channel->removeItem(curve_id);
-			ui->cmb_y_channel->removeItem(curve_id);
+			gsettings_ui->cmb_x_channel->blockSignals(true);
+			gsettings_ui->cmb_y_channel->blockSignals(true);
+			gsettings_ui->cmb_x_channel->removeItem(curve_id);
+			gsettings_ui->cmb_y_channel->removeItem(curve_id);
 
 			if (index_x >= curve_id) {
-				ui->cmb_x_channel->setCurrentIndex(curve_id-1);
+				gsettings_ui->cmb_x_channel->setCurrentIndex(curve_id-1);
 			}
 
 			if (index_y >= curve_id) {
-				ui->cmb_y_channel->setCurrentIndex(curve_id-1);
+				gsettings_ui->cmb_y_channel->setCurrentIndex(curve_id-1);
 			}
 
-			ui->cmb_x_channel->blockSignals(false);
-			ui->cmb_y_channel->blockSignals(false);
+			gsettings_ui->cmb_x_channel->blockSignals(false);
+			gsettings_ui->cmb_y_channel->blockSignals(false);
 			setup_xy_channels();
 		}
 
@@ -2030,14 +2034,20 @@ void Oscilloscope::onHistogram_view_toggled(bool visible)
 
 void Oscilloscope::onXY_view_toggled(bool visible)
 {
+	if (visible) {
+		gsettings_ui->xySettings->show();
+	} else {
+		gsettings_ui->xySettings->hide();
+	}
+
 	/* Lock the flowgraph if we are already started */
 	bool started = iio->started();
 	if (started && !locked)
 		iio->lock();
 
 	if (visible) {
-		if(xy_is_visible && index_x == ui->cmb_x_channel->currentIndex()
-				&& index_y == ui->cmb_y_channel->currentIndex())
+		if(xy_is_visible && index_x == gsettings_ui->cmb_x_channel->currentIndex()
+				&& index_y == gsettings_ui->cmb_y_channel->currentIndex())
 		{
 			xy_is_visible = visible;
 			if (started && !locked)
@@ -2068,8 +2078,8 @@ void Oscilloscope::onXY_view_toggled(bool visible)
 			xy_channels.clear();
 		}
 
-		index_x = ui->cmb_x_channel->currentIndex();
-		index_y = ui->cmb_y_channel->currentIndex();
+		index_x = gsettings_ui->cmb_x_channel->currentIndex();
+		index_y = gsettings_ui->cmb_y_channel->currentIndex();
 
 		if(xy_channels.size() == 0) {
 			for(unsigned int i = 0; i < nb_channels; i++)
@@ -2940,14 +2950,14 @@ void Oscilloscope::editMathChannelFunction(int id, const std::string& new_functi
 		iio->lock();
 	locked = true;
 	if(xy_is_visible) {
-		ui->cmb_x_channel->blockSignals(true);
-		ui->cmb_y_channel->blockSignals(true);
+		gsettings_ui->cmb_x_channel->blockSignals(true);
+		gsettings_ui->cmb_y_channel->blockSignals(true);
 		if(index_x == id)
-			ui->cmb_x_channel->setCurrentIndex(id-1);
+			gsettings_ui->cmb_x_channel->setCurrentIndex(id-1);
 		if(index_y == id)
-			ui->cmb_y_channel->setCurrentIndex(id-1);
-		ui->cmb_x_channel->blockSignals(false);
-		ui->cmb_y_channel->blockSignals(false);
+			gsettings_ui->cmb_y_channel->setCurrentIndex(id-1);
+		gsettings_ui->cmb_x_channel->blockSignals(false);
+		gsettings_ui->cmb_y_channel->blockSignals(false);
 		setup_xy_channels();
 	}
 	auto pair = math_sinks.value(qname);
@@ -2975,12 +2985,12 @@ void Oscilloscope::editMathChannelFunction(int id, const std::string& new_functi
 	iio->connect(math, 0, pair.second, 0);
 
 	if(xy_is_visible) {
-		ui->cmb_x_channel->blockSignals(true);
-		ui->cmb_y_channel->blockSignals(true);
-		ui->cmb_x_channel->setCurrentIndex(current_x);
-		ui->cmb_y_channel->setCurrentIndex(current_y);
-		ui->cmb_x_channel->blockSignals(false);
-		ui->cmb_y_channel->blockSignals(false);
+		gsettings_ui->cmb_x_channel->blockSignals(true);
+		gsettings_ui->cmb_y_channel->blockSignals(true);
+		gsettings_ui->cmb_x_channel->setCurrentIndex(current_x);
+		gsettings_ui->cmb_y_channel->setCurrentIndex(current_y);
+		gsettings_ui->cmb_x_channel->blockSignals(false);
+		gsettings_ui->cmb_y_channel->blockSignals(false);
 		setup_xy_channels();
 	}
 	locked = false;
@@ -3899,8 +3909,8 @@ void Oscilloscope::on_xyPlotLineType_toggled(bool checked)
 
 void Oscilloscope::setup_xy_channels()
 {
-	int x = ui->cmb_x_channel->currentIndex();
-	int y = ui->cmb_y_channel->currentIndex();
+	int x = gsettings_ui->cmb_x_channel->currentIndex();
+	int y = gsettings_ui->cmb_y_channel->currentIndex();
 	QWidget *xsw = xy_plot.axisWidget(QwtPlot::xBottom);
 	xsw->setStyleSheet(
 		QString("color: %1").arg(plot.getLineColor(x).name()));
