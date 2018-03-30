@@ -149,14 +149,11 @@ QPushButton:!checked {
            <number>0</number>
           </property>
           <item>
-           <widget class="QTabWidget" name="tabWidget">
+           <widget class="QStackedWidget" name="stackedWidget">
             <property name="currentIndex">
              <number>0</number>
             </property>
-            <widget class="QWidget" name="tab">
-             <attribute name="title">
-              <string>Bode</string>
-             </attribute>
+            <widget class="QWidget" name="stackedWidgetPage1">
              <layout class="QVBoxLayout" name="verticalLayout_5">
               <property name="spacing">
                <number>0</number>
@@ -190,10 +187,7 @@ QPushButton:!checked {
               </item>
              </layout>
             </widget>
-            <widget class="QWidget" name="tabXY">
-             <attribute name="title">
-              <string>Nyquist</string>
-             </attribute>
+            <widget class="QWidget" name="stackedWidgetPage2">
              <layout class="QVBoxLayout" name="verticalLayout_6">
               <property name="leftMargin">
                <number>0</number>
@@ -421,10 +415,7 @@ border: 5px solid white;
               </item>
              </layout>
             </widget>
-            <widget class="QWidget" name="tab_3">
-             <attribute name="title">
-              <string>Nichols</string>
-             </attribute>
+            <widget class="QWidget" name="stackedWidgetPage3">
              <layout class="QVBoxLayout" name="verticalLayout_7">
               <property name="leftMargin">
                <number>0</number>
@@ -500,22 +491,6 @@ border: 5px solid white;
            <number>0</number>
           </property>
           <item>
-           <spacer name="verticalSpacer_4">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Fixed</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>39</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
            <widget class="adiscope::MenuAnim" name="rightMenu" native="true">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
@@ -572,9 +547,9 @@ border: 5px solid white;
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>0</y>
+                  <y>-38</y>
                   <width>322</width>
-                  <height>518</height>
+                  <height>585</height>
                  </rect>
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_11">
@@ -633,6 +608,49 @@ border: 5px solid white;
                     <enum>Qt::Horizontal</enum>
                    </property>
                   </widget>
+                 </item>
+                 <item>
+                  <layout class="QVBoxLayout" name="verticalLayout_12">
+                   <property name="spacing">
+                    <number>10</number>
+                   </property>
+                   <property name="topMargin">
+                    <number>10</number>
+                   </property>
+                   <item>
+                    <widget class="QLabel" name="label_6">
+                     <property name="styleSheet">
+                      <string notr="true">QLabel {
+  font-size: 14px;
+  font-family: &quot;monospace&quot;;
+  color: rgba(255, 255, 255, 153);
+}</string>
+                     </property>
+                     <property name="text">
+                      <string>Plot</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QComboBox" name="cmb_graphs">
+                     <item>
+                      <property name="text">
+                       <string>Bode</string>
+                      </property>
+                     </item>
+                     <item>
+                      <property name="text">
+                       <string>Nyquist</string>
+                      </property>
+                     </item>
+                     <item>
+                      <property name="text">
+                       <string>Nichols</string>
+                      </property>
+                     </item>
+                    </widget>
+                   </item>
+                  </layout>
                  </item>
                  <item>
                   <layout class="QHBoxLayout" name="horizontalLayout_6">
@@ -1382,6 +1400,9 @@ color: rgba(255,255,255,51);
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_10">
+          <property name="spacing">
+           <number>20</number>
+          </property>
           <property name="leftMargin">
            <number>11</number>
           </property>
@@ -1708,7 +1729,4 @@ QLabel {
    </hints>
   </connection>
  </connections>
- <buttongroups>
-  <buttongroup name="buttonGroup"/>
- </buttongroups>
 </ui>

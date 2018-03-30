@@ -213,6 +213,8 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
     connect(&m_dBgraph,SIGNAL(resetZoom()),&m_phaseGraph,SLOT(onResetZoom()));
     connect(&m_phaseGraph,SIGNAL(resetZoom()),&m_dBgraph,SLOT(onResetZoom()));
+
+    connect(ui->cmb_graphs,SIGNAL(currentIndexChanged(int)),SLOT(onGraphIndexChanged(int)));
 }
 
 NetworkAnalyzer::~NetworkAnalyzer()
@@ -654,6 +656,10 @@ void NetworkAnalyzer::readPreferences()
 {
     m_dBgraph.setShowZero(prefPanel->getNa_show_zero());
     m_phaseGraph.setShowZero(prefPanel->getNa_show_zero());
+}
+
+void NetworkAnalyzer::onGraphIndexChanged(int index){
+    ui->stackedWidget->setCurrentIndex(index);
 }
 
 double NetworkAnalyzer_API::getMinFreq() const

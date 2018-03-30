@@ -107,6 +107,7 @@ namespace adiscope {
         void onVbar1PixelPosChanged(int pos);
         void onVbar2PixelPosChanged(int pos);
         void readPreferences();
+        void onGraphIndexChanged(int);
 
 	Q_SIGNALS:
 		void sweepDone();
