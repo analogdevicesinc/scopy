@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>142</width>
+    <width>152</width>
     <height>206</height>
    </rect>
   </property>
@@ -48,9 +48,12 @@ border:1px solid red;
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Fixed</enum>
+       </property>
        <property name="sizeHint" stdset="0">
         <size>
-         <width>40</width>
+         <width>25</width>
          <height>20</height>
         </size>
        </property>
@@ -90,9 +93,12 @@ text-align: center;
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Fixed</enum>
+       </property>
        <property name="sizeHint" stdset="0">
         <size>
-         <width>40</width>
+         <width>24</width>
          <height>20</height>
         </size>
        </property>
@@ -106,46 +112,36 @@ text-align: center;
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="minimumSize">
+        <size>
+         <width>42</width>
+         <height>0</height>
+        </size>
+       </property>
        <property name="styleSheet">
         <string notr="true">QPushButton
 {
-width: 14px;
+width: 40px;
 height: 14px;
-border: 2px solid;
-border-radius: 9px;
-border-color: rgb(73, 99, 255);
+border: 2px solid ;
+border-radius: 8px;
+border-color: white; 
 }
 
 QPushButton[high=false]{
-width: 14px;
-height: 14px;
-border: 2px solid;
-border-radius: 9px;
-border-color: rgb(73, 99, 255);
+border-color: white;
+background-color: rgba(255, 255, 255, 50); 
 }
 
 QPushButton[high=true] {
-width: 14px;
-height: 14px;
-border: 2px solid;
-border-radius: 9px;
-border-color: rgb(73, 99, 255);
-background-color: rgb(73, 99, 255);
+border-color: white;
+background-color: white;
 }
 
 QPushButton[high=false][short=true] {
-width: 14px;
-height: 14px;
-border: 2px solid;
-border-radius: 9px;
 border-color: red;
 }
 QPushButton[high=true][short=true] {
-
-width: 14px;
-height: 14px;
-border: 2px solid;
-border-radius: 9px;
 border-color: red;
 background-color: red;
 }</string>
@@ -166,9 +162,12 @@ background-color: red;
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Fixed</enum>
+       </property>
        <property name="sizeHint" stdset="0">
         <size>
-         <width>40</width>
+         <width>25</width>
          <height>20</height>
         </size>
        </property>
@@ -206,11 +205,11 @@ background-color: red;
         <enum>Qt::Horizontal</enum>
        </property>
        <property name="sizeType">
-        <enum>QSizePolicy::Preferred</enum>
+        <enum>QSizePolicy::Fixed</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
-         <width>20</width>
+         <width>25</width>
          <height>20</height>
         </size>
        </property>
@@ -223,6 +222,12 @@ background-color: red;
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>100</width>
+         <height>0</height>
+        </size>
        </property>
        <property name="layoutDirection">
         <enum>Qt::LeftToRight</enum>
@@ -256,11 +261,11 @@ background-color: red;
         <enum>Qt::Horizontal</enum>
        </property>
        <property name="sizeType">
-        <enum>QSizePolicy::Preferred</enum>
+        <enum>QSizePolicy::Fixed</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
-         <width>20</width>
+         <width>25</width>
          <height>20</height>
         </size>
        </property>
