@@ -60,11 +60,17 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 r
       </property>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_6">
+        <property name="spacing">
+         <number>6</number>
+        </property>
         <property name="topMargin">
-         <number>20</number>
+         <number>15</number>
         </property>
         <property name="rightMargin">
          <number>40</number>
+        </property>
+        <property name="bottomMargin">
+         <number>16</number>
         </property>
         <item>
          <spacer name="horizontalSpacer_3">
@@ -226,7 +232,7 @@ QPushButton:disabled {
                 <x>0</x>
                 <y>0</y>
                 <width>380</width>
-                <height>587</height>
+                <height>577</height>
                </rect>
               </property>
               <property name="sizePolicy">

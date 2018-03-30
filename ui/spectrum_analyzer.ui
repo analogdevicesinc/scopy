@@ -103,13 +103,13 @@ QComboBox:disabled
          <number>20</number>
         </property>
         <property name="topMargin">
-         <number>9</number>
+         <number>15</number>
         </property>
         <property name="rightMargin">
          <number>15</number>
         </property>
         <property name="bottomMargin">
-         <number>9</number>
+         <number>16</number>
         </property>
         <item>
          <spacer name="horizontalSpacer">
@@ -2005,6 +2005,11 @@ QLabel {
    <class>adiscope::CustomPushButton</class>
    <extends>QPushButton</extends>
    <header>customPushButton.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::CustomSwitch</class>
+   <extends>QPushButton</extends>
+   <header>customSwitch.hpp</header>
   </customwidget>
   <customwidget>
    <class>adiscope::PositionSpinButton</class>

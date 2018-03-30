@@ -70,7 +70,7 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 r
          <number>40</number>
         </property>
         <property name="bottomMargin">
-         <number>5</number>
+         <number>9</number>
         </property>
         <item>
          <spacer name="horizontalSpacer_7">
@@ -308,44 +308,49 @@ QPushButton:checked:hover {
         <item>
          <layout class="QVBoxLayout" name="plot_and_buffPreviewer">
           <item>
-           <layout class="QHBoxLayout" name="hLayout_buffPreview">
-            <property name="spacing">
-             <number>0</number>
+           <widget class="QWidget" name="hLayoutBufferPreview" native="true">
+            <property name="styleSheet">
+             <string notr="true">background-color:black;</string>
             </property>
-            <item>
-             <spacer name="horizontalSpacer_4">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>10</width>
-                <height>10</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <layout class="QVBoxLayout" name="vLayoutBufferSlot">
-              <property name="spacing">
-               <number>0</number>
-              </property>
-             </layout>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer_3">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>10</width>
-                <height>10</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
+            <layout class="QHBoxLayout" name="hLayout_buffPreview">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <item>
+              <spacer name="horizontalSpacer_4">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>10</width>
+                 <height>10</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <layout class="QVBoxLayout" name="vLayoutBufferSlot">
+               <property name="spacing">
+                <number>0</number>
+               </property>
+              </layout>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_3">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>10</width>
+                 <height>10</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </widget>
           </item>
           <item>
            <widget class="QWidget" name="widgetPlotContainer" native="true">
@@ -977,11 +982,6 @@ QLabel {
  </widget>
  <customwidgets>
   <customwidget>
-   <class>adiscope::CustomPushButton</class>
-   <extends>QPushButton</extends>
-   <header>customPushButton.hpp</header>
-  </customwidget>
-  <customwidget>
    <class>adiscope::DetachDragZone</class>
    <extends>QWidget</extends>
    <header>detachdragzone.h</header>
@@ -992,6 +992,11 @@ QLabel {
    <extends>QWidget</extends>
    <header>menu_anim.hpp</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::CustomPushButton</class>
+   <extends>QPushButton</extends>
+   <header>customPushButton.hpp</header>
   </customwidget>
  </customwidgets>
  <resources>
