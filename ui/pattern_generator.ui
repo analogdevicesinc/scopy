@@ -68,13 +68,13 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 r
        <number>40</number>
       </property>
       <property name="topMargin">
-       <number>20</number>
+       <number>15</number>
       </property>
       <property name="rightMargin">
        <number>40</number>
       </property>
       <property name="bottomMargin">
-       <number>20</number>
+       <number>9</number>
       </property>
       <item>
        <widget class="QPushButton" name="btnHideInactive">
@@ -372,7 +372,7 @@ background-color: grey;
          <string>Run</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/resources.qrc">
+         <iconset>
           <normaloff>:/icons/ico-play.svg</normaloff>
           <normalon>:/icons/ico-stop.svg</normalon>:/icons/ico-play.svg</iconset>
         </property>
@@ -438,7 +438,7 @@ background-color: grey;
          <string>Single</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/resources.qrc">
+         <iconset>
           <normaloff>:/icons/ico-oneshot.svg</normaloff>
           <normalon>:/icons/ico-stop.svg</normalon>:/icons/ico-oneshot.svg</iconset>
         </property>
@@ -838,20 +838,18 @@ background-color: qlineargradient(spread:pad, x1:0.9, y1:0, x2:0, y2:0, stop:0 r
  </widget>
  <customwidgets>
   <customwidget>
-   <class>adiscope::DetachDragZone</class>
-   <extends>QWidget</extends>
-   <header>detachdragzone.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>adiscope::MenuAnim</class>
    <extends>QWidget</extends>
    <header>menu_anim.hpp</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>adiscope::DetachDragZone</class>
+   <extends>QWidget</extends>
+   <header>detachdragzone.h</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
- <resources>
-  <include location="../resources/resources.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

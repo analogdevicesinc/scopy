@@ -91,13 +91,13 @@ background-color: rgb(73, 99, 255);
          <number>0</number>
         </property>
         <property name="topMargin">
-         <number>20</number>
+         <number>15</number>
         </property>
         <property name="rightMargin">
          <number>40</number>
         </property>
         <property name="bottomMargin">
-         <number>20</number>
+         <number>9</number>
         </property>
         <item>
          <widget class="QPushButton" name="btnShowChannels">
@@ -502,7 +502,7 @@ background-color: grey;
            <string>Run</string>
           </property>
           <property name="icon">
-           <iconset resource="../resources/resources.qrc">
+           <iconset>
             <normaloff>:/icons/ico-play.svg</normaloff>
             <normalon>:/icons/ico-stop.svg</normalon>:/icons/ico-play.svg</iconset>
           </property>
@@ -585,7 +585,7 @@ background-color: grey;
            <string>Single</string>
           </property>
           <property name="icon">
-           <iconset resource="../resources/resources.qrc">
+           <iconset>
             <normaloff>:/icons/ico-oneshot.svg</normaloff>
             <normalon>:/icons/ico-stop.svg</normalon>:/icons/ico-oneshot.svg</iconset>
           </property>
@@ -1463,7 +1463,7 @@ background-color: qlineargradient(spread:pad, x1:0.6, y1:0, x2:0, y2:0, stop:0 r
                      <x>0</x>
                      <y>0</y>
                      <width>193</width>
-                     <height>548</height>
+                     <height>563</height>
                     </rect>
                    </property>
                    <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -1698,7 +1698,7 @@ color: #FFFFFF;</string>
                     <rect>
                      <x>0</x>
                      <y>0</y>
-                     <width>92</width>
+                     <width>100</width>
                      <height>30</height>
                     </rect>
                    </property>
@@ -1937,15 +1937,15 @@ QPushButton:checked { border-image: url(:/icons/setup_btn_checked.svg); }
  </widget>
  <customwidgets>
   <customwidget>
-   <class>adiscope::DetachDragZone</class>
-   <extends>QWidget</extends>
-   <header>detachdragzone.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>adiscope::MenuAnim</class>
    <extends>QWidget</extends>
    <header>menu_anim.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::DetachDragZone</class>
+   <extends>QWidget</extends>
+   <header>detachdragzone.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
@@ -1954,8 +1954,6 @@ QPushButton:checked { border-image: url(:/icons/setup_btn_checked.svg); }
    <header>smallOnOffSwitch.hpp</header>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="../resources/resources.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

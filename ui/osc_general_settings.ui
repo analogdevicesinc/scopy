@@ -366,10 +366,13 @@
            <bool>true</bool>
           </property>
           <property name="leftText" stdset="0">
-           <string>Dots</string>
+           <string>dots</string>
           </property>
           <property name="rightText" stdset="0">
-           <string>Lines</string>
+           <string>lines</string>
+          </property>
+          <property name="duration" stdset="0">
+           <number>0</number>
           </property>
          </widget>
         </item>

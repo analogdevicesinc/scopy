@@ -122,7 +122,7 @@ QPushButton:disabled {
 }</string>
           </property>
           <property name="icon">
-           <iconset resource="../resources/resources.qrc">
+           <iconset>
             <normaloff>:/icons/ico-play.svg</normaloff>
             <normalon>:/icons/ico-stop.svg</normalon>:/icons/ico-play.svg</iconset>
           </property>
@@ -168,7 +168,7 @@ QPushButton:disabled {
 }</string>
           </property>
           <property name="icon">
-           <iconset resource="../resources/resources.qrc">
+           <iconset>
             <normaloff>:/icons/ico-oneshot.svg</normaloff>
             <normalon>:/icons/ico-stop.svg</normalon>:/icons/ico-oneshot.svg</iconset>
           </property>
@@ -497,7 +497,7 @@ QPushButton:checked:hover {
             <number>0</number>
            </property>
            <property name="topMargin">
-            <number>20</number>
+            <number>0</number>
            </property>
            <property name="rightMargin">
             <number>0</number>
@@ -682,7 +682,7 @@ QPushButton:checked:hover {
         <item>
          <layout class="QVBoxLayout" name="vLayout_for_rightMenu">
           <property name="topMargin">
-           <number>20</number>
+           <number>0</number>
           </property>
           <item>
            <widget class="adiscope::MenuAnim" name="rightMenu" native="true">
@@ -756,7 +756,7 @@ QPushButton:checked:hover {
            <string/>
           </property>
           <property name="icon">
-           <iconset resource="../resources/resources.qrc">
+           <iconset>
             <normaloff>:/menu/add.svg</normaloff>:/menu/add.svg</iconset>
           </property>
           <property name="checkable">
@@ -968,15 +968,8 @@ QLabel {
    <extends>QPushButton</extends>
    <header>customPushButton.hpp</header>
   </customwidget>
-  <customwidget>
-   <class>adiscope::CustomPushButton</class>
-   <extends>QPushButton</extends>
-   <header>customPushButton.hpp</header>
-  </customwidget>
  </customwidgets>
- <resources>
-  <include location="../resources/resources.qrc"/>
- </resources>
+ <resources/>
  <connections>
   <connection>
    <sender>btnTrigger</sender>

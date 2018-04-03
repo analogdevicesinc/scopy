@@ -50,10 +50,13 @@
          <number>40</number>
         </property>
         <property name="topMargin">
-         <number>20</number>
+         <number>15</number>
         </property>
         <property name="rightMargin">
          <number>40</number>
+        </property>
+        <property name="bottomMargin">
+         <number>15</number>
         </property>
         <item>
          <spacer name="horizontalSpacer">
@@ -99,7 +102,7 @@ QPushButton:disabled {
 }</string>
           </property>
           <property name="icon">
-           <iconset resource="../resources/resources.qrc">
+           <iconset>
             <normaloff>:/icons/ico-play.svg</normaloff>
             <normalon>:/icons/ico-stop.svg</normalon>:/icons/ico-play.svg</iconset>
           </property>
@@ -548,7 +551,7 @@ border: 5px solid white;
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>-38</y>
+                  <y>0</y>
                   <width>322</width>
                   <height>585</height>
                  </rect>
@@ -1460,14 +1463,9 @@ QLabel {
  </widget>
  <customwidgets>
   <customwidget>
-   <class>adiscope::CustomSwitch</class>
-   <extends>QPushButton</extends>
-   <header>customSwitch.hpp</header>
-  </customwidget>
-  <customwidget>
-   <class>adiscope::PositionSpinButton</class>
+   <class>adiscope::MenuAnim</class>
    <extends>QWidget</extends>
-   <header>spinbox_a.hpp</header>
+   <header>menu_anim.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
@@ -1477,9 +1475,14 @@ QLabel {
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>adiscope::MenuAnim</class>
+   <class>adiscope::CustomSwitch</class>
+   <extends>QPushButton</extends>
+   <header>customSwitch.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::PositionSpinButton</class>
    <extends>QWidget</extends>
-   <header>menu_anim.hpp</header>
+   <header>spinbox_a.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
@@ -1501,9 +1504,7 @@ QLabel {
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="../resources/resources.qrc"/>
- </resources>
+ <resources/>
  <connections>
   <connection>
    <sender>btnSettings</sender>
