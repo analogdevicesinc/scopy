@@ -708,6 +708,16 @@ void PhaseSpinButton::setValue(double value)
 	if (isZero(value, 1E-12)) {
 		value = 0;
 	}
+
+	if (inSeconds()) {
+		double periodInSeconds = changeValueFromDegreesToSeconds(360);
+		if (value < 0) {
+			value = value + periodInSeconds;
+		} else if (value > periodInSeconds) {
+			int full_periods = value / periodInSeconds;
+			value -= full_periods * periodInSeconds;
+		}
+	}
 	int index;
 	auto scale = inSeconds() ? findUnitOfValue(value, &index)
 				 : m_units.at(ui->SBA_Combobox->currentIndex()).second;
@@ -847,11 +857,6 @@ void PhaseSpinButton::updatePhaseAfterFrequenceChanged(double val)
 
 double PhaseSpinButton::computeSecondsTransformation(double scale, int index, double value)
 {
-	if (value < m_min_value) {
-		value = 0;
-	} else if (value > 10000) {
-		value = 10000;
-	}
 	setSecondsValue(value);
 
 	double period = 360;
@@ -885,7 +890,7 @@ double PhaseSpinButton::computeSecondsTransformation(double scale, int index, do
 			significant_digits));
 		ui->SBA_LineEdit->setCursorPosition(0);
 	}
-	value = secondsValue() * period * frequency();
+	value = degreesValue;
 
 	return value;
 }
@@ -894,10 +899,12 @@ void PhaseSpinButton::stepUp()
 {
 	double current_scale = m_units[ui->SBA_Combobox->currentIndex()].second;
 	double newVal;
-	double step = inSeconds() ? 10 * current_scale : 45;
+	double step = inSeconds() ? changeValueFromDegreesToSeconds(45)
+				  : 45;
 
 	if (isInFineMode()) {
-		step = inSeconds() ? 1 * current_scale : 1;;
+		step = inSeconds() ? changeValueFromDegreesToSeconds(1)
+				   : 1;
 	}
 
 	if (inSeconds()) {
@@ -914,14 +921,16 @@ void PhaseSpinButton::stepDown()
 {
 	double current_scale = m_units[ui->SBA_Combobox->currentIndex()].second;
 	double newVal;
-	double step = inSeconds()  ? 10 * current_scale : 45;
+	double step = inSeconds()  ? changeValueFromDegreesToSeconds(45)
+				   : 45;
 
 	if (inSeconds()) {
 		m_value = secondsValue();
 	}
 
 	if (isInFineMode()) {
-		step = inSeconds()  ? 1 * current_scale : 1;
+		step = inSeconds()  ? changeValueFromDegreesToSeconds(1)
+				    : 1;
 	}
 
 	newVal = m_value - step;
