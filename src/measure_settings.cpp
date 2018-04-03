@@ -232,6 +232,7 @@ void MeasureSettings::onChannelAdded(int chnIdx)
 void MeasureSettings::onChannelRemoved(int chnIdx)
 {
 	deleteMeasurementsOfChannel(m_selectedMeasurements, chnIdx);
+	updateMeasurementsOnChannelDel(m_selectedMeasurements, chnIdx);
 	Q_EMIT measurementSelectionListChanged();
 
 	deleteMeasurementsOfChannel(m_deleteAllBackup, chnIdx);
@@ -416,6 +417,26 @@ void MeasureSettings::deleteMeasurementsOfChannel(QList<MeasurementItem>& list,
 		i.next();
 		if (i.value().channel_id() == chnIdx)
 			i.remove();
+	}
+}
+
+void MeasureSettings::updateMeasurementsOnChannelDel(QList<MeasurementItem>& list,
+						     int chnIdx)
+{
+	int listSize = list.size();
+	int idx = 0;
+	int currentItemIdx = 0;
+	while (idx < listSize) {
+		auto item = m_selectedMeasurements.at(currentItemIdx);
+		if (item.channel_id() > chnIdx) {
+			m_selectedMeasurements.push_back(MeasurementItem(item.id(),
+									 item.channel_id() - 1));
+			Q_EMIT measurementActivated(item.id(), item.channel_id() - 1);
+			m_selectedMeasurements.removeAt(currentItemIdx);
+		} else {
+			currentItemIdx++;
+		}
+		idx++;
 	}
 }
 

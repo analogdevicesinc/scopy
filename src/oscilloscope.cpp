@@ -621,6 +621,10 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	cursor_panel_init();
 	setFFT_params(true);
 
+	for (unsigned int i = 0; i < nb_channels; i++) {
+		init_selected_measurements(i, {0, 1, 4, 5});
+	}
+
 	// The trigger is always available (cannot be disabled) and we add it to
 	// the list so we can show in case all other menus are disabled
 	menuOrder.push_back(ui->btnTrigger);
@@ -649,6 +653,20 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	connect(prefPanel, &Preferences::notify, this, &Oscilloscope::readPreferences);
 
 	readPreferences();
+}
+
+void Oscilloscope::init_selected_measurements(int chnIdx,
+					      std::vector<int> measureIdx)
+{
+	auto measurements = plot.measurements(chnIdx);
+
+	for (int i = 0; i < measureIdx.size(); i++) {
+		measurements[measureIdx[i]]->setEnabled(true);
+		measure_settings->onMeasurementActivated(
+					chnIdx, measureIdx[i], true);
+	}
+	measure_settings->loadMeasurementStatesFromData();
+	onMeasurementSelectionListChanged();
 }
 
 void Oscilloscope::add_ref_waveform(unsigned int chIdx)
@@ -754,6 +772,7 @@ void Oscilloscope::add_ref_waveform(unsigned int chIdx)
 	plot.showYAxisWidget(curve_id, true);
 	plot.setVertUnitsPerDiv(1, curve_id); // force v/div to 1
 	plot.zoomBaseUpdate();
+	init_selected_measurements(curve_id, {0, 1, 4, 5});
 }
 
 void Oscilloscope::updateTriggerLevelValue(std::vector<float> value)
@@ -1254,6 +1273,8 @@ void Oscilloscope::create_add_channel_panel()
 	});
 
 	QHBoxLayout *layout = static_cast<QHBoxLayout *>(panel->layout());
+	QSpacerItem *spacerItem = new QSpacerItem(0, 0, QSizePolicy::Minimum,
+						  QSizePolicy::Expanding);
 	tabWidget = new QTabWidget(panel);
 	layout->insertWidget(0, tabWidget);
 	//set top margin to 0 and the rest to 9
@@ -1288,6 +1309,8 @@ void Oscilloscope::create_add_channel_panel()
 
 	layout_ref->addWidget(file_select);
 	layout_ref->addWidget(importSettings);
+	layout_ref->addSpacerItem(spacerItem);
+
 
 	importSettings->setDisabled(true);
 
@@ -1569,6 +1592,7 @@ void Oscilloscope::add_math_channel(const std::string& function)
 
 	plot.showYAxisWidget(curve_id, true);
 	setSinksDisplayOneBuffer(d_displayOneBuffer);
+	init_selected_measurements(curve_id, {0, 1, 4, 5});
 }
 
 void Oscilloscope::onChannelWidgetDeleteClicked()
@@ -1609,7 +1633,6 @@ void Oscilloscope::onChannelWidgetDeleteClicked()
 		measure_settings->disableDisplayAll();
 
 	measure_settings->onChannelRemoved(curve_id);
-
 
 	if (cw->isMathChannel()) {
 		plot.unregisterSink(qname.toStdString());
@@ -1767,6 +1790,7 @@ void Oscilloscope::onChannelWidgetDeleteClicked()
 		        QwtAxisId(QwtPlot::yLeft, i));
 	}
 
+	onMeasurementSelectionListChanged();
 	plot.removeZoomer(curve_id);
 	updateRunButton(false);
 	plot.replot();

@@ -79,6 +79,7 @@ public:
 
 	QList<MeasurementItem> measurementSelection();
 	QList<MeasurementItem> statisticSelection();
+	void loadMeasurementStatesFromData();
 
 Q_SIGNALS:
 	void measurementActivated(int id, int chIdx);
@@ -95,11 +96,11 @@ public Q_SLOTS:
 	void onChannelAdded(int);
 	void onChannelRemoved(int);
 	void setSelectedChannel(int);
+	void onMeasurementActivated(int chnIdx, int id, bool en);
 private Q_SLOTS:
 	void onMeasurementPropertyChanged(QStandardItem *item);
 	void on_button_measDisplayAll_toggled(bool checked);
 	void on_button_measDeleteAll_toggled(bool checked);
-	void onMeasurementActivated(int chnIdx, int id, bool en);
 	void onStatisticActivated(DropdownSwitchList *dropdown, int id,
 		bool en);
 	void on_button_StatisticsEn_toggled(bool checked);
@@ -107,7 +108,6 @@ private Q_SLOTS:
 	void on_button_statsDeleteAll_toggled(bool checked);
 
 private:
-	void loadMeasurementStatesFromData();
 	void deleteAllMeasurements();
 	void recoverAllMeasurements();
 	void displayAllMeasurements();
@@ -117,6 +117,8 @@ private:
 	void setAllMeasurements(int col, bool en);
 	void deleteMeasurementsOfChannel(QList<MeasurementItem>& list,
 		int chnIdx);
+	void updateMeasurementsOnChannelDel(QList<MeasurementItem>& list,
+					    int chnIdx);
 	void deleteStatisticsOfChannel(QList<struct StatisticSelection>&
 		list, int chnIdx);
 	void deleteAllStatistics();

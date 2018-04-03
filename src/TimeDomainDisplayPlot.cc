@@ -917,14 +917,21 @@ void TimeDomainDisplayPlot::registerReferenceWaveform(QString name, QVector<doub
 void TimeDomainDisplayPlot::unregisterReferenceWaveform(QString name)
 {
 	d_plot_curve.erase(std::find(d_plot_curve.begin(), d_plot_curve.end(), d_ref_curves[name]));
-
 	QwtPlotCurve *curve = d_ref_curves[name];
 	d_ref_curves.remove(name);
 	int pos = 0;
-	for (int i = 0; i < d_plot_curve.size(); ++i)
+	int i = 0;
+	for (i = 0; i < d_plot_curve.size(); i++) {
 		if (isReferenceWaveform(Curve(i))) {
-			pos++;
+			if (Curve(i)->title().text() == name) {
+				break;
+			} else {
+				pos++;
+			}
 		}
+	}
+	cleanUpJustBeforeChannelRemoval(i);
+
 	d_ref_ydata.erase(d_ref_ydata.begin() + pos);
 	curve->detach();
 	delete curve;

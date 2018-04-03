@@ -406,6 +406,7 @@ namespace adiscope {
 		void deactivateAcCouplingTrigger();
 		void clearMathChannels();
 		void add_ref_waveform(unsigned int chIdx);
+		void init_selected_measurements(int, std::vector<int>);
 	};
 
 	class Oscilloscope_API : public ApiObject
