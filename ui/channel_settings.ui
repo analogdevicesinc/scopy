@@ -104,9 +104,9 @@ font-weight: normal;
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-81</y>
-        <width>454</width>
-        <height>589</height>
+        <y>0</y>
+        <width>461</width>
+        <height>574</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -916,6 +916,12 @@ AC Coupling</string>
   font-style: normal;
   text-align: center;
   color: #ffffff;
+}
+
+
+QPushButton:disabled {
+  background-color: grey;
+  color:white;
 }
 
 QPushButton:pressed {

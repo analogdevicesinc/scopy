@@ -3599,8 +3599,8 @@ void Oscilloscope::autosetFinalStep() {
 	voltsPerDiv->stepUp();
 	trigger_settings.setTriggerSource(autosetChannel);
 	trigger_settings.setTriggerLevel(triggerlevel);
-	trigger_settings.autoTriggerEnable();
 	trigger_settings.setTriggerEnable(true);
+	trigger_settings.autoTriggerEnable();	
 	onTimePositionChanged(timePosition->value());
 }
 
