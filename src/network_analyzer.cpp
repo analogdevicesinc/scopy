@@ -507,7 +507,11 @@ void NetworkAnalyzer::startStop(bool pressed)
 		configHwForNetworkAnalyzing();
 		thd = QtConcurrent::run(this, &NetworkAnalyzer::run);
 	} else {
+		ui->run_button->setEnabled(false);
+		ui->run_button->setText("Stopping");
+		QCoreApplication::processEvents();
 		thd.waitForFinished();
+		ui->run_button->setEnabled(true);
 	}
 
 	setDynamicProperty(ui->run_button, "running", pressed);
