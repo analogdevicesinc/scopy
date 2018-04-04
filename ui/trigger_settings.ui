@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>276</width>
+    <width>277</width>
     <height>491</height>
    </rect>
   </property>
@@ -115,7 +115,7 @@
         <x>0</x>
         <y>0</y>
         <width>251</width>
-        <height>635</height>
+        <height>637</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -241,6 +241,9 @@ color: rgba(255,255,255,51);
              </property>
              <property name="duration_ms" stdset="0">
               <number>0</number>
+             </property>
+             <property name="polarity" stdset="0">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -822,15 +825,15 @@ color: rgba(255,255,255,51);
  </widget>
  <customwidgets>
   <customwidget>
-   <class>adiscope::CustomSwitch</class>
-   <extends>QPushButton</extends>
-   <header>customSwitch.hpp</header>
-  </customwidget>
-  <customwidget>
    <class>adiscope::PositionSpinButton</class>
    <extends>QWidget</extends>
    <header>spinbox_a.hpp</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::CustomSwitch</class>
+   <extends>QPushButton</extends>
+   <header>customSwitch.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>
