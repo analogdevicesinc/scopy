@@ -29,6 +29,7 @@
 #include <cmath>
 #include <iostream>
 #include <volk/volk.h>
+#include <QFont>
 
 #include "TimeDomainDisplayPlot.h"
 #include "osc_scale_engine.h"
@@ -171,7 +172,9 @@ TimeDomainDisplayPlot::TimeDomainDisplayPlot(QWidget* parent, unsigned int xNumD
 
   //d_zoomer = new TimeDomainDisplayZoomer(canvas());
 
-  QFont font("DejaVu Sans", 10, 75);
+  QFont font;
+  font.setPointSize(10);
+  font.setWeight(75);
   //d_zoomer->setTrackerFont(font);
 
 #if QWT_VERSION < 0x060000
@@ -549,7 +552,9 @@ TimeDomainDisplayPlot::_autoScale(double bottom, double top)
 void
 TimeDomainDisplayPlot::addZoomer(unsigned int zoomerIdx)
 {
-	QFont font("DejaVu Sans", 10, 75);
+    QFont font;
+    font.setPointSize(10);
+    font.setWeight(75);
 	d_zoomer[zoomerIdx]->setTrackerFont(font);
 
 	#if QWT_VERSION < 0x060000

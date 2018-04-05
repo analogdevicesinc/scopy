@@ -42,7 +42,7 @@
    <string notr="true">QLabel
 {  
     opacity: 0.6;
-  font-family: ArialMT;
+  
   font-size: 14px;
   font-weight: normal;
   font-style: normal;
@@ -105,7 +105,7 @@ QLabel:disabled
      <property name="styleSheet">
       <string notr="true">QLabel
 {  
-  font-family: ArialMT;
+  
   font-size: 16px;
   font-weight: normal;
   font-style: normal;

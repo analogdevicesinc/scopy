@@ -47,7 +47,7 @@
       <string notr="true">QLabel {
 qproperty-alignment: AlignCenter;
 color: white;
-font-family: &quot;monospace&quot;;
+
 }</string>
      </property>
      <property name="text">
@@ -74,7 +74,7 @@ font-family: &quot;monospace&quot;;
        <property name="styleSheet">
         <string notr="true">QPushButton {
 color: white;
-font-family: &quot;monospace&quot;;
+
 font-weight: bold;
 height: 30px;
 border-width: 0px;
@@ -129,7 +129,7 @@ background-color: red;
       <string notr="true">QLabel {
 qproperty-alignment: AlignCenter;
 color: white;
-font-family: &quot;monospace&quot;;
+
 }</string>
      </property>
      <property name="text">

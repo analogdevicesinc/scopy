@@ -611,7 +611,7 @@ background-color: #aaaaaa;
 QLabel {
 margin-top: 6px;
 background-color: transparent;
-font: 16px &quot;monospace&quot;;
+font: 16px
 }
 
 QLabel#on {
@@ -862,7 +862,6 @@ QSlider::sub-page:horizontal {
   border-radius: 4px;
   background-color: #27b34f;
   color: white;
-  font-family: &quot;monospace&quot;;
   font-weight: bold;
 
   text-align: left;
@@ -1010,7 +1009,6 @@ QPushButton:disabled {
   border-radius: 4px;
   background-color: #27b34f;
   color: white;
-  font-family: &quot;monospace&quot;;
   font-weight: bold;
 
   text-align: left;

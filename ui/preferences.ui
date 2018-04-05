@@ -212,7 +212,7 @@ color: rgba(255, 255, 255, 70);
   background-color: transparent;
   font-size: 14px;
   font-weight: bold;
-  font-family: &quot;monospace&quot;;
+  
   color: rgba(255, 255, 255, 153);
 }
 
@@ -280,7 +280,7 @@ QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
   background-color: transparent;
   font-size: 14px;
   font-weight: bold;
-  font-family: &quot;monospace&quot;;
+  
   color: rgba(255, 255, 255, 153);
 }
 
@@ -423,7 +423,7 @@ color: rgba(255, 255, 255, 70);
   background-color: transparent;
   font-size: 14px;
   font-weight: bold;
-  font-family: &quot;monospace&quot;;
+  
   color: rgba(255, 255, 255, 153);
 }
 
@@ -581,7 +581,7 @@ color: rgba(255, 255, 255, 70);
   background-color: transparent;
   font-size: 14px;
   font-weight: bold;
-  font-family: &quot;monospace&quot;;
+  
   color: rgba(255, 255, 255, 153);
 }
 
@@ -898,7 +898,7 @@ color: rgba(255, 255, 255, 70);
   background-color: transparent;
   font-size: 14px;
   font-weight: bold;
-  font-family: &quot;monospace&quot;;
+  
   color: rgba(255, 255, 255, 153);
 }
 

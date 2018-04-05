@@ -113,7 +113,7 @@ border-radius:5px;
             </property>
             <property name="styleSheet">
              <string notr="true">QPushButton {
-font: 75 18pt &quot;Courier 10 Pitch&quot;;
+font: 75 18pt &quot;10 Pitch&quot;;
 color: rgb(255, 255, 255);
 }</string>
             </property>
@@ -1053,7 +1053,6 @@ min-height: 30px;</string>
                </property>
                <property name="font">
                 <font>
-                 <family>monospace</family>
                  <pointsize>10</pointsize>
                  <weight>75</weight>
                  <italic>false</italic>
@@ -1064,7 +1063,7 @@ min-height: 30px;</string>
                 <string notr="true">QPushButton {
 color: white;
 background-color: #4a64ff;
-font-family: &quot;monospace&quot;;
+
 height: 30px;
 border-width: 0px;
 border-radius: 3px;

@@ -126,7 +126,7 @@ border:1px solid #4a64ff;
 
 QLabel
 {  
-  font-family: ArialMT;
+  
   font-size: 16px;
   font-weight: normal;
   font-style: normal;

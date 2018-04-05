@@ -33,7 +33,11 @@ OscScaleZoomer::OscScaleZoomer(QWidget *parent) :
 	setRubberBandPen(pen);
 	setTrackerPen(pen);
 
-	setTrackerFont(QFont("DejaVu Sans", 10, 75));
+	QFont font;
+	font.setPointSize(10);
+	font.setWeight(75);
+
+	setTrackerFont(font);
 	setZoomBase();
 }
 
@@ -44,9 +48,9 @@ OscScaleZoomer::~OscScaleZoomer()
 QwtText OscScaleZoomer::trackerText(const QPoint& pos) const
 {
 	const OscScaleDraw *draw_x = static_cast<const OscScaleDraw *>(
-			plot()->axisScaleDraw(QwtPlot::xTop));
+	                                     plot()->axisScaleDraw(QwtPlot::xTop));
 	const OscScaleDraw *draw_y = static_cast<const OscScaleDraw *>(
-			plot()->axisScaleDraw(QwtPlot::yLeft));
+	                                     plot()->axisScaleDraw(QwtPlot::yLeft));
 	QwtDoublePoint dp = QwtPlotZoomer::invTransform(pos);
 	QString text;
 

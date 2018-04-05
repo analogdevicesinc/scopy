@@ -17,7 +17,7 @@
    <string notr="true">QLabel {
 	color: rgba(255, 255, 255, 150);
 	text-align: left;
-	font-family:'DejaVu Sans';
+	
 	font-size:14pt;
 	 font-weight:72;
  	font-style:normal
@@ -30,7 +30,7 @@ QPushButton
   background-color: #4a64ff;
   border-radius: 4px;
 
-  font-family: ArialMT;
+  
   font-size: 14px;
   font-weight: normal;
   font-style: normal;
@@ -137,7 +137,7 @@ QTabBar::tab:left:only-one, QTabBar::tab:right:only-one {
 
 QListWidget
 {
-	font-family:'DejaVu Sans';
+	
 	font-size:14pt;
 	font-weight:72;
  	font-style:normal

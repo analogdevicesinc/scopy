@@ -306,7 +306,11 @@ void DecodeTrace::paint_fore(QPainter &p, const ViewItemPaintParams &pp)
 		// Draw the outline
 
 		QFont font = p.font();
-		QFont newFont = QFont("ArialMT",10,QFont::Normal);
+        QFont newFont;
+        newFont.setPointSize(10);
+        newFont.setWeight(75);
+        newFont.setItalic(QFont::Normal);
+
 		p.setFont(newFont);
 
 		p.setPen(QColor::fromRgb(0,0,0));

@@ -45,7 +45,7 @@
 {
   background-color: none;
   color: rgb(190, 190, 190);
-  font: 75 10pt &quot;DejaVu Sans&quot;;
+  font: 75 10pt ;
 }
 
 QWidget#mainWidget
@@ -143,7 +143,7 @@ QComboBox:disabled
   background-color: #27b34f;
   color: white;
   font-size: 12px;
-  font-family: &quot;monospace&quot;;
+  
   font-weight: bold;
 
   text-align: left;
@@ -217,7 +217,7 @@ QPushButton:disabled {
   border-radius: 4px;
   background-color: #ff7200;
   color: white;
-  font-family: &quot;monospace&quot;;
+  
   font-weight: bold;
   font-size: 12px;
   text-align: left;
@@ -276,7 +276,7 @@ QPushButton:disabled {
            <string notr="true">QPushButton {
 color: white;
 background-color: #4A64FF;
-font-family: &quot;monospace&quot;;
+
 font-size: 12px;
 font-weight: bold;
 height: 30px;
@@ -1346,7 +1346,7 @@ border-bottom: 1px solid rgba(255,255,255,100);</string>
                     <string notr="true">QPushButton {
 color: white;
 background-color: #4A64FF;
-font-family: &quot;monospace&quot;;
+
 font-size:14px;
 height: 30px;
 width: 120px;
@@ -1376,7 +1376,7 @@ QPushButton:hover
                     <string notr="true">QPushButton {
 color: white;
 background-color: black;
-font-family: &quot;monospace&quot;;
+
 font-size:14px;
 height: 30px;
 width: 120px;
@@ -1694,7 +1694,7 @@ QPushButton:hover
                       <string notr="true">QPushButton {
 color: white;
 background-color: #4A64FF;
-font-family: &quot;monospace&quot;;
+
 font-size:16px;
 height: 60px;	
 width: 60px;
@@ -1893,7 +1893,7 @@ QPushButton:hover
   background-color: transparent;
   font-size: 14px;
   font-weight: bold;
-  font-family: &quot;monospace&quot;;
+  
   color: rgba(255, 255, 255, 153);
 }
 
@@ -1919,7 +1919,7 @@ QPushButton:checked { border-image: url(:/icons/setup_btn_checked.svg); }
 QLabel {
   font-size: 14px;
   font-weight: bold;
-  font-family: &quot;monospace&quot;;
+  
   color: rgba(255, 255, 255, 153);
 }</string>
           </property>

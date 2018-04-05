@@ -171,7 +171,9 @@ void FftDisplayPlot::setZoomerEnabled()
 	if(!d_zoomer[0]) {
 		d_zoomer[0] = new FftDisplayZoomer(canvas());
 
-                QFont font("DejaVu Sans", 10, 75);
+                QFont font;
+                font.setPointSize(10);
+                font.setWeight(75);
 		d_zoomer[0]->setTrackerFont(font);
 
 #if QWT_VERSION < 0x060000

@@ -16,7 +16,7 @@
   <property name="styleSheet">
    <string notr="true">QLineEdit
 {
-  font-family: Arial;
+  
   font-size: 18px;
   line-height: 21px;
   color: #FFFFFF;
@@ -65,7 +65,7 @@ QLineEdit:disabled
   border-radius: 4px;
   background-color: #27b34f;
   color: white;
-  font-family: &quot;monospace&quot;;
+  
   font-weight: bold;
 
   text-align: left;

@@ -44,7 +44,7 @@
   background-color: #4a64ff;
   border-radius: 4px;
 
-  font-family: ArialMT;
+  
   font-size: 14px;
   font-weight: normal;
   font-style: normal;
@@ -74,13 +74,13 @@ QCheckBox::indicator:checked {
 }
 
 QCheckBox{
-font: bold 16px &quot;monospace&quot;;
+font: bold 16px ;
 }
 
 QLabel {
 margin-top: 6px;
 background-color: transparent;
-font: bold 16px &quot;monospace&quot;;
+font: bold 16px ;
 }
 
 QScrollBar:horizontal {

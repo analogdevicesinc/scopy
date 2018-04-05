@@ -1295,7 +1295,6 @@ void Oscilloscope::create_add_channel_panel()
 				   "height:25px;"
 				   "background-color: #4A64FF;"
 				   "border-radius: 4px;"
-				   "font-family: Arial;"
 				   "font-size: 12px;"
 				   "line-height: 14px;"
 				   "color: #FFFFFF;}"

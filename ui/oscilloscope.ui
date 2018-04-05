@@ -103,7 +103,7 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 r
   border-radius: 4px;
   background-color: #27b34f;
   color: white;
-  font-family: &quot;monospace&quot;;
+  
   font-weight: bold;
 
   text-align: left;
@@ -149,7 +149,7 @@ QPushButton:disabled {
   border-radius: 4px;
   background-color: #ff7200;
   color: white;
-  font-family: &quot;monospace&quot;;
+  
   font-weight: bold;
 
   text-align: left;
@@ -806,7 +806,7 @@ QPushButton:checked:hover {
   background-color: transparent;
   font-size: 14px;
   font-weight: bold;
-  font-family: &quot;monospace&quot;;
+  
   color: rgba(255, 255, 255, 153);
 }
 
@@ -832,7 +832,7 @@ QPushButton:checked { border-image: url(:/icons/setup_btn_checked.svg); }
 QLabel {
   font-size: 14px;
   font-weight: bold;
-  font-family: &quot;monospace&quot;;
+  
   color: rgba(255, 255, 255, 153);
 }</string>
           </property>

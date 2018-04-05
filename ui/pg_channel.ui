@@ -59,7 +59,7 @@
      <property name="styleSheet">
       <string notr="true">QLabel
 {  
-  font-family: ArialMT;
+  
   font-size: 16px;
   font-weight: normal;
   font-style: normal;
@@ -94,7 +94,7 @@ padding:0px;
      <property name="styleSheet">
       <string notr="true">QLabel
 {  
-  font-family: ArialMT;
+  
   font-size: 16px;
   font-weight: normal;
   font-style: normal;

@@ -34,7 +34,7 @@
   <property name="styleSheet">
    <string notr="true">QWidget {
   color: rgba(255, 255, 255, 153);
-  font-family: &quot;monospace&quot;;
+  
   border-width: 0px;
   border-radius: 6px;
 }

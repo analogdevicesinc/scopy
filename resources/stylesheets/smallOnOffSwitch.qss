@@ -30,7 +30,7 @@ background-color: #aaaaaa;
 QLabel {
 margin-top: 4px;
 background-color: transparent;
-font: 12px "monospace";
+font: 12px ;
 }
 
 QLabel#on {
