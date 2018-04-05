@@ -339,6 +339,9 @@ background-color: red;
        <property name="rightText" stdset="0">
         <string>0</string>
        </property>
+       <property name="duration" stdset="0">
+        <number>0</number>
+       </property>
       </widget>
      </item>
      <item>
@@ -360,14 +363,14 @@ background-color: red;
  </widget>
  <customwidgets>
   <customwidget>
-   <class>adiscope::SmallOnOffSwitch</class>
-   <extends>QPushButton</extends>
-   <header>smallOnOffSwitch.hpp</header>
-  </customwidget>
-  <customwidget>
    <class>adiscope::CustomSwitch</class>
    <extends>QPushButton</extends>
    <header>customSwitch.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::SmallOnOffSwitch</class>
+   <extends>QPushButton</extends>
+   <header>smallOnOffSwitch.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>
