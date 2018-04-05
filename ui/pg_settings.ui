@@ -131,7 +131,7 @@
      <property name="styleSheet">
       <string notr="true">QLabel
 {
-font-family: Arial;
+
 font-size: 14px;
 font-weight: bold;
 line-height: 16px;
@@ -276,7 +276,7 @@ color: #FFFFFF;
 background-color: #4A64FF;
 border-radius: 4px;
 
-font-family: Arial;
+
 font-size: 14px;
 font-weight: bold;
 line-height: 16px;

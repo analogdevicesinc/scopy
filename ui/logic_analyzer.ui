@@ -127,7 +127,7 @@ background-color: rgb(73, 99, 255);
   border-radius: 4px;
   background-color: #4a64ff;
 
-  font-family: ArialMT;
+  
   font-size: 14px;
   font-weight: normal;
   font-style: normal;
@@ -174,7 +174,7 @@ QPushButton:hover
   height: 30px;
   border-radius: 4px;
   background-color: #4a64ff;
-  font-family: ArialMT;
+  
   font-size: 14px;
   font-weight: normal;
   font-style: normal;
@@ -219,7 +219,7 @@ QPushButton:hover
   height: 30px;
   border-radius: 4px;
   background-color: #4a64ff;
-  font-family: ArialMT;
+  
   font-size: 14px;
   font-weight: normal;
   font-style: normal;
@@ -450,7 +450,7 @@ border-image: url(:/icons/time_trigger_left.svg);
           </property>
           <property name="font">
            <font>
-            <family>monospace</family>
+            
             <weight>75</weight>
             <bold>true</bold>
            </font>
@@ -462,7 +462,7 @@ border-image: url(:/icons/time_trigger_left.svg);
            <string notr="true">/*QPushButton {
 color: white;
 background-color: green;
-font-family: &quot;monospace&quot;;
+
 font-weight: bold;
 height: 40px;
 border-width: 0px;
@@ -482,7 +482,7 @@ QPushButton {
   border-radius: 4px;
   background-color: #27b34f;
   color: white;
-  font-family: &quot;monospace&quot;;
+  
   font-weight: bold;
 
   text-align: left;
@@ -533,7 +533,7 @@ background-color: grey;
           </property>
           <property name="font">
            <font>
-            <family>monospace</family>
+            
             <weight>75</weight>
             <bold>true</bold>
            </font>
@@ -545,7 +545,7 @@ background-color: grey;
            <string notr="true">/*QPushButton {
 color: white;
 background-color: orange;
-font-family: &quot;monospace&quot;;
+
 font-weight: bold;
 height: 40px;
 border-width: 0px;
@@ -565,7 +565,7 @@ QPushButton {
   border-radius: 4px;
   background-color: #ff7200;
   color: white;
-  font-family: &quot;monospace&quot;;
+  
   font-weight: bold;
 
   text-align: left;
@@ -1639,7 +1639,7 @@ background-color: qlineargradient(spread:pad, x1:0.6, y1:0, x2:0, y2:0, stop:0 r
 background-color: #4A64FF;
 border-radius: 4px;
 
-font-family: Arial;
+
 font-size: 14px;
 font-weight: bold;
 line-height: 16px;
@@ -1799,7 +1799,7 @@ color: #FFFFFF;</string>
   background-color: transparent;
   font-size: 14px;
   font-weight: bold;
-  font-family: &quot;monospace&quot;;
+  
   color: rgba(255, 255, 255, 153);
 }
 
@@ -1815,7 +1815,7 @@ QCheckBox::indicator:checked { background-color: rgb(74,100,255); }
 QLabel {
   font-size: 14px;
   font-weight: bold;
-  font-family: &quot;monospace&quot;;
+  
   color: rgba(255, 255, 255, 153);
 }</string>
           </property>
@@ -1881,7 +1881,7 @@ QLabel {
            <string notr="true">QLabel {
   font-size: 14px;
   font-weight: bold;
-  font-family: &quot;monospace&quot;;
+  
   color: rgba(255, 255, 255, 153);
 }</string>
           </property>

@@ -69,7 +69,7 @@
        </property>
        <property name="styleSheet">
         <string notr="true">height: 55px;	width: 195px;	color: rgba(255,255,255,255);
-  font-family: ArialMT;
+  
   font-size: 18px;
   font-weight: normal;
   font-style: normal;</string>

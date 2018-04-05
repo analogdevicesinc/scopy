@@ -50,7 +50,7 @@ border: 1px solid white;
    </property>
    <property name="font">
     <font>
-     <family>DejaVu Sans</family>
+     
      <pointsize>-1</pointsize>
     </font>
    </property>
@@ -60,7 +60,7 @@ border: 1px solid white;
    <property name="styleSheet">
     <string notr="true">font-size: 30px;
 color: 	white;
-font-family: &quot;DejaVu Sans&quot;;
+
 </string>
    </property>
    <property name="frameShape">

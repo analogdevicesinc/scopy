@@ -83,7 +83,7 @@
   border-radius: 4px;
   background-color: #27b34f;
   color: white;
-  font-family: &quot;monospace&quot;;
+  
   font-weight: bold;
 
   text-align: left;
@@ -235,7 +235,7 @@ QPushButton:!checked {
                 </property>
                 <property name="font_azimuth" stdset="0">
                  <font>
-                  <family>DejaVu Sans</family>
+                  
                   <pointsize>16</pointsize>
                   <weight>75</weight>
                   <bold>true</bold>
@@ -243,7 +243,7 @@ QPushButton:!checked {
                 </property>
                 <property name="font_radius" stdset="0">
                  <font>
-                  <family>DejaVu Sans</family>
+                  
                   <pointsize>14</pointsize>
                  </font>
                 </property>
@@ -626,7 +626,7 @@ border: 5px solid white;
                      <property name="styleSheet">
                       <string notr="true">QLabel {
   font-size: 14px;
-  font-family: &quot;monospace&quot;;
+  
   color: rgba(255, 255, 255, 153);
 }</string>
                      </property>
@@ -1427,7 +1427,7 @@ color: rgba(255,255,255,51);
   background-color: transparent;
   font-size: 14px;
   font-weight: bold;
-  font-family: &quot;monospace&quot;;
+  
   color: rgba(255, 255, 255, 153);
 }
 
@@ -1443,7 +1443,7 @@ QCheckBox::indicator:checked { background-color: rgb(74,100,255); }
 QLabel {
   font-size: 14px;
   font-weight: bold;
-  font-family: &quot;monospace&quot;;
+  
   color: rgba(255, 255, 255, 153);
 }</string>
             </property>

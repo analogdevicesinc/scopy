@@ -103,7 +103,7 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 r
   border-radius: 4px;
   background-color: #27b34f;
   color: white;
-  font-family: &quot;monospace&quot;;
+  
   font-weight: bold;
 
   text-align: left;
@@ -669,7 +669,7 @@ QTabBar::tab:selected {
                          </property>
                          <property name="font">
                           <font>
-                           <family>DejaVu Sans</family>
+                           
                            <pointsize>10</pointsize>
                           </font>
                          </property>
@@ -701,7 +701,7 @@ QTabBar::tab:selected {
                         <widget class="QLabel" name="label_9">
                          <property name="font">
                           <font>
-                           <family>DejaVu Sans</family>
+                           
                            <pointsize>10</pointsize>
                           </font>
                          </property>
@@ -733,7 +733,7 @@ QTabBar::tab:selected {
                         <widget class="QLabel" name="label_7">
                          <property name="font">
                           <font>
-                           <family>DejaVu Sans</family>
+                           
                            <pointsize>10</pointsize>
                           </font>
                          </property>
@@ -828,7 +828,7 @@ background-repeat: no-repeat;
 background-color: #4a64ff;
   height: 30px;
   border-radius: 4px;
-  font-family: ArialMT;
+  
   font-size: 14px;
   font-weight: normal;
   font-style: normal;

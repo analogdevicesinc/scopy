@@ -17,7 +17,7 @@
    <string notr="true">QPushButton {
 color: white;
 background-color: #4a64ff;
-font-family: &quot;monospace&quot; 14pt;
+font-family:  14pt;
 border-width: 0px;
 border-radius: 3px;
 min-width: 64px;
@@ -30,13 +30,13 @@ background-color: #F45000;
 }
 QLabel {
 color: white;
-font-family: &quot;monospace&quot;;
+
 font-weight: bold;
 }
 QMenu {
 color: white;
 background-color: green;
-font-family: &quot;monospace&quot;;
+
 font-weight: bold;
 border-width: 0px;
 border-radius: 3px;

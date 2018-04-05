@@ -31,8 +31,7 @@ int main(int argc, char **argv)
 {
 	QApplication app(argc, argv);
 
-	QFont font("sans");
-	font.setStyleStrategy(QFont::PreferAntialias);
+	QFont font("Open Sans");
 	app.setFont(font);
 
 	if (app.styleSheet().isEmpty()) {

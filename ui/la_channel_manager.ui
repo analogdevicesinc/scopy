@@ -76,7 +76,7 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0.9, x2:0, y2:0, stop:0 r
         </size>
        </property>
        <property name="styleSheet">
-        <string notr="true">QLabel{\n\n  font-family: ArialMT;\n  font-size: 16px;\n  font-weight: normal;\n  font-style: normal;\n  text-align: left;\n  color: rgba(255,255,255,140)\n}</string>
+        <string notr="true">QLabel{\n\n  \n  font-size: 16px;\n  font-weight: normal;\n  font-style: normal;\n  text-align: left;\n  color: rgba(255,255,255,140)\n}</string>
        </property>
        <layout class="QHBoxLayout" name="headerWidgetLayout">
         <property name="spacing">

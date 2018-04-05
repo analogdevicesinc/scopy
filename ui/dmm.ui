@@ -691,7 +691,7 @@ QLabel[ac=true] { qproperty-text: &quot;VRMS&quot;; }</string>
   border-radius: 4px;
   background-color: #27b34f;
   color: white;
-  font-family: &quot;monospace&quot;;
+  
   font-weight: bold;
 
   text-align: left;
@@ -1284,7 +1284,7 @@ height:25px;
 background-color: #4A64FF;
 border-radius: 4px;
 
-font-family: Arial;
+
 font-size: 12px;
 line-height: 14px;
 color: #FFFFFF;
@@ -1483,7 +1483,7 @@ height:25px;
 background-color: #4A64FF;
 border-radius: 4px;
 
-font-family: Arial;
+
 font-size: 12px;
 line-height: 14px;
 color: #FFFFFF;

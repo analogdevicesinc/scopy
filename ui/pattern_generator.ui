@@ -86,7 +86,7 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 r
   border-radius: 4px;
   background-color: #4a64ff;
 
-  font-family: ArialMT;
+  
   font-size: 14px;
   font-weight: normal;
   font-style: normal;
@@ -117,7 +117,7 @@ QPushButton:hover
   height: 30px;
   border-radius: 4px;
   background-color: #4a64ff;
-  font-family: ArialMT;
+  
   font-size: 14px;
   font-weight: normal;
   font-style: normal;
@@ -337,7 +337,7 @@ QPushButton:hover
         </property>
         <property name="font">
          <font>
-          <family>monospace</family>
+          
           <weight>75</weight>
           <bold>true</bold>
          </font>
@@ -352,7 +352,7 @@ QPushButton:hover
   border-radius: 4px;
   background-color: #27b34f;
   color: white;
-  font-family: &quot;monospace&quot;;
+  
   font-weight: bold;
 
   text-align: left;
@@ -403,7 +403,7 @@ background-color: grey;
         </property>
         <property name="font">
          <font>
-          <family>monospace</family>
+          
           <weight>75</weight>
           <bold>true</bold>
          </font>
@@ -418,7 +418,7 @@ background-color: grey;
   border-radius: 4px;
   background-color: #ff7200;
   color: white;
-  font-family: &quot;monospace&quot;;
+  
   font-weight: bold;
 
   text-align: left;

@@ -23,7 +23,7 @@ color: black;</string>
      <item>
       <widget class="QLabel" name="label">
        <property name="styleSheet">
-        <string notr="true">font: 75 10pt &quot;DejaVu Sans&quot;;
+        <string notr="true">font: 75 10pt ;
 font-weight: bold;</string>
        </property>
        <property name="text">
@@ -44,7 +44,7 @@ font-weight: bold;</string>
         <string notr="true">QPushButton {
 color: white;
 background-color: orange;
-font-family: &quot;monospace&quot;;
+
 font-weight: bold;
 height: 30px;
 border-width: 0px;
@@ -75,7 +75,7 @@ background-color: red;
     <widget class="QGroupBox" name="groupBox">
      <property name="styleSheet">
       <string notr="true">QGroupBox {
-font: 75 10pt &quot;DejaVu Sans&quot;;
+font: 75 10pt ;
 font-weight: bold;
 }
 </string>

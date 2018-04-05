@@ -669,7 +669,7 @@ font-weight: normal;</string>
 
   border: 0px;
   border-bottom: 1px solid rgba(255, 255, 255, 102);
-  font-family: ArialMT;
+  
   font-size: 16px;
   font-weight: normal;
   font-style: normal;
@@ -684,7 +684,7 @@ QComboBox::drop-down
   width: 10px;
   height: 6px;
   border-image: url(:/icons/sba_cmb_box_arrow.svg);
-  font-family: ArialMT;
+  
   font-size: 16px;
   font-weight: normal;
   font-style: normal;
@@ -712,7 +712,7 @@ QComboBox:disabled
 
 /* Color of the selected list item. */
 QComboBox::item:selected {
-  font-family: ArialMT;
+  
   font-size: 16px;
   font-weight: normal;
   font-style: normal;
@@ -1038,7 +1038,7 @@ QComboBox::indicator{
 
   border: 0px;
   border-bottom: 1px solid rgba(255, 255, 255, 102);
-  font-family: ArialMT;
+  
   font-size: 16px;
   font-weight: normal;
   font-style: normal;
@@ -1053,7 +1053,7 @@ QComboBox::drop-down
   width: 10px;
   height: 6px;
   border-image: url(:/icons/sba_cmb_box_arrow.svg);
-  font-family: ArialMT;
+  
   font-size: 16px;
   font-weight: normal;
   font-style: normal;
@@ -1081,7 +1081,7 @@ QComboBox:disabled
 
 /* Color of the selected list item. */
 QComboBox::item:selected {
-  font-family: ArialMT;
+  
   font-size: 16px;
   font-weight: normal;
   font-style: normal;
