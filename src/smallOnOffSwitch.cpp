@@ -112,9 +112,11 @@ bool SmallOnOffSwitch::event(QEvent* e)
 			on.setText(property("leftText").toString());
 		if(propName=="rightText" && property("rightText").isValid())
 			off.setText(property("rightText").toString());
-		if(propName=="bothValid" && property("bothValid").isValid()) {
+		if(propName=="bothValid" && property("bothValid").isValid())
 			bothValid = property("bothValid").toBool();
-		}
+		if(propName=="duration" && property("duration").isValid())
+			setDuration(property("duration").toInt());
+
 
 	}
 	return QPushButton::event(e);
