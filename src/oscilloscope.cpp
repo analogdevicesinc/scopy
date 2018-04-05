@@ -3593,6 +3593,8 @@ void Oscilloscope::autosetFinalStep() {
 	timeBase->stepUp();
 	timePosition->setValue(timeposval);
 	voltsPosition->setValue(voltspos);
+	if(voltsperdiv < 2e-2)
+		voltsperdiv = 2e-2;
 	voltsPerDiv->setValue(voltsperdiv);
 	voltsPerDiv->stepUp();
 	trigger_settings.setTriggerSource(autosetChannel);
