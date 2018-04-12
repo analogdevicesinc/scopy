@@ -65,6 +65,9 @@ public:
 	bool getSpectrum_visible_peak_search() const;
 	void setSpectrum_visible_peak_search(bool value);
 
+	bool getAdvanced_device_info() const;
+	void setAdvanced_device_info(bool value);
+
 Q_SIGNALS:
 
 	void notify();
@@ -84,6 +87,7 @@ private:
 	bool double_click_to_detach;
 	bool na_show_zero;
 	bool spectrum_visible_peak_search;
+	bool advanced_device_info;
 
 	Preferences_API *pref_api;
 	QString getPreferenceIniFile() const;
@@ -100,6 +104,7 @@ class Preferences_API : public ApiObject
 	Q_PROPERTY(bool double_click_to_detach READ getDoubleClickToDetach WRITE setDoubleClickToDetach);
 	Q_PROPERTY(bool na_show_zero READ getNaShowZero WRITE setNaShowZero)
 	Q_PROPERTY(bool spectrum_visible_peak_search READ getSpectrumVisiblePeakSearch WRITE setSpectrumVisiblePeakSearch)
+	Q_PROPERTY(bool advanced_device_info READ getAdvancedDeviceInfo WRITE setAdvancedDeviceInfo)
 
 public:
 
@@ -124,6 +129,9 @@ public:
 
 	bool getSpectrumVisiblePeakSearch() const;
 	void setSpectrumVisiblePeakSearch(const bool& enabled);
+
+	bool getAdvancedDeviceInfo() const;
+	void setAdvancedDeviceInfo(const bool& enabled);
 
 private:
 	Preferences *preferencePanel;
