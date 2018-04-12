@@ -48,6 +48,8 @@
 #include "menuoption.h"
 #include "detachedWindow.hpp"
 #include "preferences.h"
+#include "info_page.hpp"
+#include "device_widget.hpp"
 
 extern "C" {
 	struct iio_context;
@@ -134,6 +136,7 @@ private Q_SLOTS:
 	void swapMenuOptions(int source, int destination, bool dropAfter);
 	void highlight(bool on, int position);
 	void resetSession();
+	DeviceWidget* getConnectedDevice();
 
 private:
 	void loadToolTips(bool connected);
@@ -164,6 +167,7 @@ private:
 	void updateHomepage();
 	void readPreferences();
 	void loadIndexPageFromContent(QString fileLocation);
+	DeviceWidget* getDevice(QString uri);
 
 private:
 	Ui::ToolLauncher *ui;
@@ -175,7 +179,7 @@ private:
 	QVector<Debugger*> debugInstances;
 	QVector<DetachedWindow *> debugWindows;
 
-	QVector<QPair<QWidget, Ui::Device> *> devices;
+	std::vector<DeviceWidget *> devices;
 	QVector<Tool*> toolList;
 
 	QTimer *search_timer, *alive_timer;
@@ -225,6 +229,8 @@ private:
 	QString indexFile;
 	QString deviceInfo;
 	QString pathToFile;
+
+	QButtonGroup *devices_group;
 };
 
 class ToolLauncher_API: public ApiObject

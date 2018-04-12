@@ -37,7 +37,8 @@ Preferences::Preferences(QWidget *parent) :
 	pref_api(new Preferences_API(this)),
 	spectrum_visible_peak_search(true),
 	osc_labels_enabled(false),
-	na_show_zero(false)
+	na_show_zero(false),
+	advanced_device_info(false)
 {
 	ui->setupUi(this);
 
@@ -82,6 +83,10 @@ Preferences::Preferences(QWidget *parent) :
 	});
 	connect(ui->spectrumVisiblePeakSearch, &QCheckBox::stateChanged, [=](int state) {
 		spectrum_visible_peak_search = (!state ? false : true);
+		Q_EMIT notify();
+	});
+	connect(ui->advancedInfoCheckBox, &QCheckBox::stateChanged, [=](int state) {
+		advanced_device_info = (!state ? false : true);
 		Q_EMIT notify();
 	});
 
@@ -141,6 +146,16 @@ void Preferences::resetScopy()
 	if (ret == QMessageBox::Ok) {
 		Q_EMIT reset();
 	}
+}
+
+bool Preferences::getAdvanced_device_info() const
+{
+	return advanced_device_info;
+}
+
+void Preferences::setAdvanced_device_info(bool value)
+{
+	advanced_device_info = value;
 }
 
 bool Preferences::getSpectrum_visible_peak_search() const
@@ -261,4 +276,14 @@ bool Preferences_API::getSpectrumVisiblePeakSearch() const
 void Preferences_API::setSpectrumVisiblePeakSearch(const bool &enabled)
 {
 	preferencePanel->spectrum_visible_peak_search = enabled;
+}
+
+bool Preferences_API::getAdvancedDeviceInfo() const
+{
+	return preferencePanel->advanced_device_info;
+}
+
+void Preferences_API::setAdvancedDeviceInfo(const bool& enabled)
+{
+	preferencePanel->advanced_device_info = enabled;
 }

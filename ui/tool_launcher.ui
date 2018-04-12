@@ -347,7 +347,7 @@ border-radius:5px;
             <x>0</x>
             <y>0</y>
             <width>200</width>
-            <height>438</height>
+            <height>427</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -963,7 +963,7 @@ background-position: left center;
             <number>0</number>
            </property>
            <property name="bottomMargin">
-            <number>10</number>
+            <number>0</number>
            </property>
            <item>
             <layout class="QHBoxLayout" name="hLayout_topbar">
@@ -1172,7 +1172,7 @@ border: 0px;</string>
                  <number>9</number>
                 </property>
                 <property name="bottomMargin">
-                 <number>9</number>
+                 <number>0</number>
                 </property>
                 <item>
                  <spacer name="verticalSpacer_2">
@@ -1190,7 +1190,7 @@ border: 0px;</string>
                 <item>
                  <widget class="QPushButton" name="btnAdd">
                   <property name="sizePolicy">
-                   <sizepolicy hsizetype="Fixed" vsizetype="MinimumExpanding">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
@@ -1232,8 +1232,48 @@ background-color: #4a34ff;
                     <height>40</height>
                    </size>
                   </property>
-                  <property name="flat">
+                  <property name="checkable">
                    <bool>true</bool>
+                  </property>
+                  <property name="checked">
+                   <bool>false</bool>
+                  </property>
+                  <property name="flat">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="Line" name="lineAdd">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>2</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>16777215</width>
+                    <height>2</height>
+                   </size>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">QFrame#line[selected=true] {
+	 border: 2px solid #4A64FF;
+}
+
+QFrame#line[selected=false] {
+	 border: 2px solid white;
+}</string>
+                  </property>
+                  <property name="lineWidth">
+                   <number>2</number>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="selected" stdset="0">
+                   <bool>false</bool>
                   </property>
                  </widget>
                 </item>
@@ -1253,7 +1293,11 @@ background-color: #4a34ff;
                </layout>
               </item>
               <item>
-               <layout class="QHBoxLayout" name="devicesList"/>
+               <layout class="QHBoxLayout" name="devicesList">
+                <property name="spacing">
+                 <number>3</number>
+                </property>
+               </layout>
               </item>
               <item>
                <spacer name="horizontalSpacer_2">
