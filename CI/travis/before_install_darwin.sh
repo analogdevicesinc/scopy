@@ -36,7 +36,7 @@ brew pip cheetah
 
 # Build dependencies
 cd ${WORKDIR}
-rm volk-1.3.tar.gz
+rm -rf volk-1.3
 if [ ! -d volk-1.3 ]; then
   wget http://libvolk.org/releases/volk-1.3.tar.gz
   tar -xzf volk-1.3.tar.gz
@@ -50,6 +50,7 @@ fi
 sudo make install
 
 cd ${WORKDIR}
+rm -rf gnuradio
 if [ ! -d gnuradio ]; then
   git clone https://github.com/analogdevicesinc/gnuradio -b signal_source_phase
   cd gnuradio
@@ -107,6 +108,7 @@ wget http://swdownloads.analog.com/cse/travis_builds/master_latest_libiio${LDIST
 sudo installer -pkg master_latest_libiio${LDIST}.pkg -target /
 
 cd ${WORKDIR}
+rm -rf libad9361-iio
 if [ ! -d libad9361-iio ]; then
   git clone https://github.com/analogdevicesinc/libad9361-iio
   cd libad9361-iio
