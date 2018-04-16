@@ -92,7 +92,7 @@ QTabBar::tab {
 	min-width: 100px;
 	min-height: 32px;
 	padding-bottom: 5px;
-	font: bold;
+        font: normal;
 }
 
 QTabBar::tab:selected {
