@@ -69,6 +69,7 @@ namespace adiscope {
 	private Q_SLOTS:
 		void startStop(bool start);
 		void ratioChanged(int percent);
+		void toggleRunButton(bool enabled);
 
 	private:
 		Ui::PowerController *ui;

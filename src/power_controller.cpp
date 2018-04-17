@@ -121,6 +121,9 @@ PowerController::PowerController(struct iio_context *ctx,
 	valuePos->setValue(0);
 	valueNeg->setValue(0);
 
+	connect(ui->dac1, &QPushButton::toggled, this, &PowerController::toggleRunButton);
+	connect(ui->dac2, &QPushButton::toggled, this, &PowerController::toggleRunButton);
+
 	/*Load calibration parameters from iio context*/
 	const char *name;
 	const char *value;
@@ -168,6 +171,17 @@ PowerController::~PowerController()
 	delete api;
 
 	delete ui;
+}
+
+void PowerController::toggleRunButton(bool enabled)
+{
+	bool dac1Enabled = ui->dac1->isChecked();
+	bool dac2Enabled = ui->dac2->isChecked();
+	if (enabled) {
+		run_button->setChecked(enabled);
+	} else {
+		run_button->setChecked(dac1Enabled | dac2Enabled);
+	}
 }
 
 void PowerController::showEvent(QShowEvent *event)
@@ -224,14 +238,11 @@ void PowerController::dac1_set_enabled(bool enabled)
 		dac2_set_enabled(enabled);
 
 	if (pd_neg) { /* For HW Rev. >= C */
-		run_button->setChecked(enabled);
 		iio_channel_attr_write_bool(pd_pos, "user_supply_powerdown", !enabled);
 	} else {
 		if (enabled) {
-			run_button->setChecked(true);
 			iio_channel_attr_write_bool(pd_pos, "user_supply_powerdown", false);
 		} else if (!ui->dac2->isChecked()) {
-			run_button->setChecked(false);
 			iio_channel_attr_write_bool(pd_pos, "user_supply_powerdown", true);
 		}
 	}
@@ -245,14 +256,11 @@ void PowerController::dac2_set_enabled(bool enabled)
 	averageVoltageCh2.clear();
 
 	if (pd_neg) { /* For HW Rev. >= C */
-		run_button->setChecked(enabled);
 		iio_channel_attr_write_bool(pd_neg, "user_supply_powerdown", !enabled);
 	} else {
 		if (enabled) {
-			run_button->setChecked(true);
 			iio_channel_attr_write_bool(pd_pos, "user_supply_powerdown", false);
 		} else if (!ui->dac1->isChecked()) {
-			run_button->setChecked(false);
 			iio_channel_attr_write_bool(pd_pos, "user_supply_powerdown", true);
 		}
 	}
