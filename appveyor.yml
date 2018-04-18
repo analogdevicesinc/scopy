@@ -11,6 +11,12 @@ install:
     # Remove existing file that causes GCC install to fail
     - C:\msys64\usr\bin\bash -lc "rm /mingw32/etc/gdbinit /mingw64/etc/gdbinit"
 
+    # Install an older version of icu library
+    - C:\msys64\usr\bin\bash -lc "pacman -U --noconfirm http://repo.msys2.org/mingw/i686/mingw-w64-i686-icu-58.2-3-any.pkg.tar.xz"
+    - C:\msys64\usr\bin\bash -lc "pacman -U --noconfirm http://repo.msys2.org/mingw/i686/mingw-w64-i686-icu-debug-libs-58.2-3-any.pkg.tar.xz"
+    - C:\msys64\usr\bin\bash -lc "pacman -U --noconfirm http://repo.msys2.org/mingw/x86_64/mingw-w64-x86_64-icu-58.2-3-any.pkg.tar.xz"
+    - C:\msys64\usr\bin\bash -lc "pacman -U --noconfirm http://repo.msys2.org/mingw/x86_64/mingw-w64-x86_64-icu-debug-libs-58.2-3-any.pkg.tar.xz"
+
     # Update to GCC 6.2 and install dependencies
     - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -Sy mingw-w64-i686-gcc mingw-w64-i686-libusb mingw-w64-i686-boost mingw-w64-i686-python3 mingw-w64-i686-fftw mingw-w64-i686-libzip mingw-w64-i686-glibmm mingw-w64-i686-matio"
     - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -Sy mingw-w64-x86_64-gcc mingw-w64-x86_64-libusb mingw-w64-x86_64-boost mingw-w64-x86_64-python3 mingw-w64-x86_64-fftw mingw-w64-x86_64-libzip mingw-w64-x86_64-glibmm mingw-w64-x86_64-matio"
