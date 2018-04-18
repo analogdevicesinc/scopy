@@ -195,7 +195,6 @@ background-color: #aaaaaa;
 QLabel {
 margin-top: 6px;
 background-color: transparent;
-font-size: 16px;
 line-height: 19px;
 }
 
