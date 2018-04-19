@@ -115,16 +115,6 @@ color: green;
        </property>
        <property name="styleSheet">
         <string notr="true">QPushButton {
-<<<<<<< HEAD
-color: white;
-background-color: orange;
-
-font-weight: bold;
-height: 30px;
-border-width: 0px;
-border-radius: 3px;
-min-width: 6em;
-=======
   min-height: 30px;
   max-height: 30px;
   border: 0px;
@@ -132,7 +122,6 @@ min-width: 6em;
   background-color: #4a64ff;
   color: #ffffff;
   font-size: 14px;
->>>>>>> ConnectDialog: Small changes in order to make it suitable to be a
 }
 
 QPushButton:disabled {
@@ -158,19 +147,10 @@ QPushButton:hover {
    <item row="2" column="0">
     <widget class="QLabel" name="description">
      <property name="styleSheet">
-<<<<<<< HEAD
-      <string notr="true">QGroupBox {
-font: 75 10pt ;
-font-weight: bold;
-color:white
-}
-</string>
-=======
       <string notr="true">color:white</string>
      </property>
      <property name="text">
       <string/>
->>>>>>> ConnectDialog: Small changes in order to make it suitable to be a
      </property>
     </widget>
    </item>
