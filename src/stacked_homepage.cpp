@@ -63,16 +63,25 @@ void StackedHomepage::removeWidget(QWidget *widget)
 	s_hc->lower();
 }
 
+void StackedHomepage::insertWidget(int pos, QWidget *widget)
+{
+	QStackedWidget::insertWidget(pos, widget);
+	s_hc->setVisible(count() > 1);
+	s_hc->raise();
+}
+
 void StackedHomepage::moveLeft()
 {
 	slideInPrev();
 	s_hc->raise();
+	Q_EMIT moved(-1);
 }
 
 void StackedHomepage::moveRight()
 {
 	slideInNext();
 	s_hc->raise();
+	Q_EMIT moved(1);
 }
 
 void StackedHomepage::openFile()
@@ -132,6 +141,8 @@ void StackedHomepage::animationDone()
 	s_active = false;
 	Q_EMIT animationFinished();
 	s_hc->raise();
+	s_hc->enableLeft(!(currentIndex() == 0));
+	s_hc->enableRight(!(currentIndex() == (count() - 1)));
 }
 
 void StackedHomepage::slideToIndex(int index)
@@ -156,10 +167,10 @@ void StackedHomepage::slideToIndex(int index)
 void StackedHomepage::slideInWidget(QWidget *newWidget, StackedHomepage::s_directions direction)
 {
 	if (s_active) {
-		return;
-	} else {
-		s_active = true;
+		animationDone();
+
 	}
+	s_active = true;
 
 	enum s_directions directionHint;
 	int current = currentIndex();
@@ -214,5 +225,4 @@ void StackedHomepage::slideInWidget(QWidget *newWidget, StackedHomepage::s_direc
 	s_current = current;
 	s_active = true;
 	animGroup->start();
-
 }

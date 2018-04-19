@@ -63,3 +63,13 @@ bool HomepageControls::eventFilter(QObject *watched, QEvent *event)
 
 	return QObject::eventFilter(watched, event);
 }
+
+void HomepageControls::enableLeft(bool en)
+{
+	ui->leftBtn->setEnabled(en);
+}
+
+void HomepageControls::enableRight(bool en)
+{
+	ui->rightBtn->setEnabled(en);
+}
