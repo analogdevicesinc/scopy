@@ -31,23 +31,24 @@ class Connect;
 }
 
 namespace adiscope {
-class ConnectDialog : public QObject
+class ConnectDialog : public QWidget
 {
 	Q_OBJECT
 
 public:
-	explicit ConnectDialog(QWidget *widget);
+	explicit ConnectDialog(QWidget *widget = 0);
 	~ConnectDialog();
 
 Q_SIGNALS:
 	void newContext(const QString& uri);
 	void finished(struct iio_context *ctx);
 
+public Q_SLOTS:
+	void discardSettings();
 
 private Q_SLOTS:
 	void btnClicked();
 	void validateInput();
-	void discardSettings();
 	void updatePopUp(struct iio_context *ctx);
 
 
