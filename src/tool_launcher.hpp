@@ -50,6 +50,7 @@
 #include "preferences.h"
 #include "info_page.hpp"
 #include "device_widget.hpp"
+#include "connectDialog.hpp"
 
 extern "C" {
 	struct iio_context;
@@ -67,6 +68,7 @@ class ToolLauncher_API;
 class SpectrumAnalyzer;
 class Debugger;
 class ManualCalibration;
+class UserNotes;
 
 class ToolLauncher : public QMainWindow
 {
@@ -118,10 +120,11 @@ private Q_SLOTS:
 	void on_btnHome_clicked();
 	void setButtonBackground(bool on);
 
-	void on_btnConnect_clicked(bool pressed);
-
-	void device_btn_clicked(bool pressed);
-	void addRemoteContext();
+	void connectBtn_clicked(bool);
+	void deviceBtn_clicked(bool);
+	void btnAdd_toggled(bool);
+	void btnHomepage_toggled(bool);
+	void forgetDeviceBtn_clicked(int, QString);
 	void destroyPopup();
 
 	void enableAdcBasedTools();
@@ -137,6 +140,8 @@ private Q_SLOTS:
 	void highlight(bool on, int position);
 	void resetSession();
 	DeviceWidget* getConnectedDevice();
+	int getSelectedDeviceIndex();
+	void pageMoved(int);
 
 private:
 	void loadToolTips(bool connected);
@@ -168,6 +173,7 @@ private:
 	void readPreferences();
 	void loadIndexPageFromContent(QString fileLocation);
 	DeviceWidget* getDevice(QString uri);
+	void setupAddPage();
 
 private:
 	Ui::ToolLauncher *ui;
@@ -202,6 +208,7 @@ private:
 	QWidget *current;
 	QSettings *settings;
 	Preferences *prefPanel;
+	UserNotes *notesPanel;
 
 	QButtonGroup adc_users_group;
 
@@ -217,6 +224,7 @@ private:
 	QSocketNotifier notifier;
 	QString previousIp;
 
+	ConnectDialog *connectWidget;
 	QTextBrowser *welcome;
 	QTextBrowser *index;
 
@@ -230,7 +238,7 @@ private:
 	QString deviceInfo;
 	QString pathToFile;
 
-	QButtonGroup *devices_group;
+	QButtonGroup *devices_btn_group;
 };
 
 class ToolLauncher_API: public ApiObject

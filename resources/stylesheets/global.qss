@@ -296,3 +296,24 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
   border: none;
   background: none;
 }
+
+QScrollBar:horizontal {
+  background: #262628;
+  max-height: 6px;
+  border-radius: 3px;
+}
+
+QScrollBar::handle:horizontal {
+  background: #4a4a4b;
+  border: 0;
+  border-radius: 3px;
+}
+
+QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
+    background: none;
+}
+
+QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
+  border: none;
+  background: none;
+}

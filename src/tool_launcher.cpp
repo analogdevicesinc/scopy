@@ -33,6 +33,7 @@
 #include "manualcalibration.h"
 #include "apiobjectmanager.h"
 #include "device_widget.hpp"
+#include "user_notes.hpp"
 
 #include "ui_device.h"
 #include "ui_tool_launcher.h"
@@ -71,7 +72,7 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	debugger_enabled(false),
 	indexFile(""), deviceInfo(""), pathToFile(""),
 	manual_calibration_enabled(false),
-	devices_group(new QButtonGroup(this)),
+	devices_btn_group(new QButtonGroup(this))
 {
 	if (!isatty(STDIN_FILENO))
 		notifier.setEnabled(false);
@@ -112,6 +113,22 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	// TO DO: remove this when the About menu becomes available
 	setWindowTitle(QString("Scopy - ") + QString(SCOPY_VERSION_GIT));
 
+	prefPanel = new Preferences(this);
+	prefPanel->setVisible(false);
+
+	notesPanel = new UserNotes(this);
+	notesPanel->setVisible(false);
+
+	connect(ui->prefBtn, &QPushButton::clicked, [=](){
+		swapMenu(static_cast<QWidget*>(prefPanel));
+	});
+	connect(ui->btnNotes, &QPushButton::clicked, [=](){
+		swapMenu(static_cast<QWidget*>(notesPanel));
+	});
+
+	connect(prefPanel, &Preferences::reset, this, &ToolLauncher::resetSession);
+	connect(prefPanel, &Preferences::notify, this, &ToolLauncher::readPreferences);
+
 	const QVector<QString>& uris = searchDevices();
 	for (const QString& each : uris)
 		addContext(each);
@@ -119,13 +136,15 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	current = ui->homeWidget;
 
 	ui->menu->setMinimumSize(ui->menu->sizeHint());
-	devices_group->addButton(ui->btnAdd);
+	devices_btn_group->addButton(ui->btnAdd);
+	devices_btn_group->addButton(ui->btnHomepage);
 
 	connect(this, SIGNAL(adcCalibrationDone()),
 		this, SLOT(enableAdcBasedTools()));
 	connect(this, SIGNAL(dacCalibrationDone()),
 		this, SLOT(enableDacBasedTools()));
-	connect(ui->btnAdd, SIGNAL(clicked()), this, SLOT(addRemoteContext()));
+	connect(ui->btnAdd, SIGNAL(toggled(bool)), this, SLOT(btnAdd_toggled(bool)));
+	connect(ui->btnHomepage, SIGNAL(toggled(bool)), this, SLOT(btnHomepage_toggled(bool)));
 
 	tl_api->setObjectName(QString::fromStdString(Filter::tool_name(
 			TOOL_LAUNCHER)));
@@ -181,13 +200,13 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 		SLOT(setButtonBackground(bool)));
 	connect(ui->prefBtn, SIGNAL(toggled(bool)), this,
 		SLOT(setButtonBackground(bool)));
+	connect(ui->btnNotes, SIGNAL(toggled(bool)), this,
+		SLOT(setButtonBackground(bool)));
 
 	ui->saveBtn->parentWidget()->setEnabled(false);
 	ui->loadBtn->parentWidget()->setEnabled(true);
 
 	ui->btnHome->toggle();
-
-
 
 	loadToolTips(false);
 
@@ -236,19 +255,15 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 		ui->prefBtn->setText(opened ? "Preferences" : "");
 	});
 
-	prefPanel = new Preferences(this);
-	prefPanel->setVisible(false);
-	connect(ui->prefBtn, &QPushButton::clicked, [=](){
-		swapMenu(static_cast<QWidget*>(prefPanel));
-	});
-
-	connect(prefPanel, &Preferences::reset, this, &ToolLauncher::resetSession);
-	connect(prefPanel, &Preferences::notify, this, &ToolLauncher::readPreferences);
+	connect(ui->stackedWidget, SIGNAL(moved(int)),
+		this, SLOT(pageMoved(int)));
 
 	setupHomepage();
+	setupAddPage();
 	readPreferences();
 	ui->stackedWidget->setStyleSheet("background-color:black;");
 	this->installEventFilter(this);
+	ui->btnConnect->hide();
 }
 
 void ToolLauncher::readPreferences()
@@ -268,13 +283,24 @@ void ToolLauncher::loadIndexPageFromContent(QString fileLocation)
 			index->setSearchPaths(QStringList(fileInfo.dir().absolutePath()));
 			indexFile.close();
 			index->setSource(QUrl::fromLocalFile(fileInfo.filePath()));
-			ui->stackedWidget->addWidget(index);
-			int count = ui->stackedWidget->count();
-			qDebug() << "the number of homapeges is:" << count;
-			ui->stackedWidget->moveRight();
+			ui->stackedWidget->removeWidget(ui->stackedWidget->widget(0));
+			ui->stackedWidget->insertWidget(0, index);
 		} else {
 			indexFile.close();
 		}
+	}
+}
+
+void ToolLauncher::pageMoved(int direction)
+{
+	if (ui->btnAdd->isChecked()) {
+		(direction > 0) ? devices.at(0)->click() : ui->btnHomepage->click();
+	} else if (ui->btnHomepage->isChecked()) {
+		(direction > 0) ? ui->btnAdd->click() : ui->btnHomepage->click();
+	} else {
+		int selectedIdx = getSelectedDeviceIndex() + direction;
+		(selectedIdx >= 0) ? devices.at(selectedIdx)->click() :
+				    ui->btnAdd->click();
 	}
 }
 
@@ -330,6 +356,17 @@ DeviceWidget* ToolLauncher::getConnectedDevice()
 	return nullptr;
 }
 
+int ToolLauncher::getSelectedDeviceIndex()
+{
+	for (int i = 0; i < devices.size(); i++) {
+		auto dev = devices.at(i);
+		if (dev->isChecked()) {
+			return i;
+		}
+	}
+	return -1;
+}
+
 void ToolLauncher::resetSession()
 {
 	QString uri;
@@ -355,7 +392,7 @@ void ToolLauncher::resetSession()
 
 	if (connectedDev) {
 		connectedDev->setChecked(true);
-		on_btnConnect_clicked(true);
+		connectBtn_clicked(true);
 	}
 }
 
@@ -455,13 +492,19 @@ void ToolLauncher::updateListOfDevices(const QVector<QString>& uris)
 	int pos = 0;
 	while (pos < devices.size()) {
 		auto dev = devices.at(pos);
+		if (dev->connected())
+			continue;
 		QString uri = dev->uri();
 		if (uri.startsWith("usb:") && !uris.contains(uri)) {
+			ui->stackedWidget->removeWidget(dev->infoPage());
+			devices_btn_group->removeButton(dev->deviceButton());
 			if (dev->isChecked()) {
-				dev->click();
-				return;
+				if (pos > 0) {
+					devices.at(pos-1)->click();
+				} else {
+					ui->btnHomepage->click();
+				}
 			}
-			devices_group->removeButton(dev->deviceButton());
 			delete dev;
 			devices.erase(devices.begin() + pos);
 		} else {
@@ -652,59 +695,89 @@ void ToolLauncher::destroyPopup()
 	popup->deleteLater();
 }
 
-QPushButton *ToolLauncher::addContext(const QString& uri)
+void ToolLauncher::forgetDeviceBtn_clicked(int pos, QString uri)
 {
-	auto pair = new QPair<QWidget, Ui::Device>;
-	pair->second.setupUi(&pair->first);
+	pos -= 2;
+	auto dev = devices.at(pos);
+	if (dev->uri().startsWith("usb:")) {
+		return;
+	}
 
-	pair->second.description->setText(uri);
+	auto connectedDev = getConnectedDevice();
+	if (connectedDev == dev) {
+		if (ctx) {
+			connectedDev->setConnected(false, false);
+			disconnect();
+			connectedDev->connectButton()->setToolTip(QString("Click to connect the device"));
+		}
+	}
+
+	if (dev->uri() == uri) {
+		/* Remove device selection and select the
+		 * precedent device (or the add page)
+		 */
+		ui->stackedWidget->removeWidget(dev->infoPage());
+		devices_btn_group->removeButton(dev->deviceButton());
+		if (dev->isChecked()) {
+			if (pos > 0) {
+				devices.at(pos-1)->click();
+			} else {
+				ui->btnHomepage->click();
+			}
+		}
+		delete dev;
+		devices.erase(devices.begin() + pos);
+
+	}
+}
+
 
 QPushButton *ToolLauncher::addContext(const QString& uri)
 {
 	auto deviceWidget = new DeviceWidget(uri,
 					     ui->devicesList->count() + 1,
 					     this);
-	connect(deviceWidget, SIGNAL(forgetDevice(int, QString)),
-		this, SLOT(forgetDevice(int, QString)));
+	auto connectBtn = deviceWidget->connectButton();
 
-	ui->devicesList->addWidget(deviceWidget);
+	if (connectBtn) {
+		connect(connectBtn, SIGNAL(clicked(bool)),
+			this, SLOT(connectBtn_clicked(bool)));
+	}
+
+	connect(deviceWidget, SIGNAL(forgetDevice(int, QString)),
+		this, SLOT(forgetDeviceBtn_clicked(int, QString)));
 
 	connect(deviceWidget, SIGNAL(selected(bool)),
-		this, SLOT(device_btn_clicked(bool)));
+		this, SLOT(deviceBtn_clicked(bool)));
 
-
-	devices_group->addButton(deviceWidget->deviceButton());
-
+	ui->devicesList->insertWidget(ui->devicesList->count() - 1,
+				deviceWidget);
+	ui->stackedWidget->addWidget(deviceWidget->infoPage());
+	devices_btn_group->addButton(deviceWidget->deviceButton());
 	devices.push_back(deviceWidget);
 
 	return deviceWidget->deviceButton();
 }
 
-void ToolLauncher::addRemoteContext()
+void ToolLauncher::btnHomepage_toggled(bool toggled)
 {
-	pv::widgets::Popup *popup = new pv::widgets::Popup(ui->homeWidget, QBrush(QColor(39, 39, 48)));
-	connect(popup, SIGNAL(closed()), this, SLOT(destroyPopup()));
+	setDynamicProperty(ui->homepageWidget, "selected", toggled);
+	if (toggled) {
+		ui->stackedWidget->slideToIndex(0);
+	}
+}
 
-	QPoint pos = ui->groupBox->mapToGlobal(ui->btnAdd->pos());
-	pos += QPoint(ui->btnAdd->width() / 2, ui->btnAdd->height());
-
-	popup->set_position(pos, pv::widgets::Popup::Bottom);
-	popup->show();
-
-	ConnectDialog *dialog = new ConnectDialog(popup);
-	connect(dialog, &ConnectDialog::newContext,
-	[=](const QString& uri) {
-		bool found = false;
-		for (auto it = devices.begin(); it != devices.end(); ++it) {
-			QString dev_uri = (*it)->second.btn->property("uri").toString();
-			if (dev_uri == uri) {
-				found = true;
-				highlightDevice((*it)->second.btn);
-				break;
-			}
+void ToolLauncher::btnAdd_toggled(bool toggled)
+{
+	setDynamicProperty(ui->addWidget, "selected", toggled);
+	if (toggled) {
+		ui->stackedWidget->slideToIndex(1);
+	} else {
+		if (connectWidget) {
+			connectWidget->discardSettings();
 		}
-		if (!found) {
-			addContext(uri);
+	}
+}
 
 DeviceWidget* ToolLauncher::getDevice(QString uri)
 {
@@ -741,7 +814,12 @@ void ToolLauncher::setupHomepage()
 	welcome->setFrameShape(QFrame::NoFrame);
 	welcome->setOpenExternalLinks(true);
 	welcome->setSource(QUrl("qrc:/scopy.html"));
-	ui->stackedWidget->addWidget(welcome);
+
+	if (ui->stackedWidget->count() == (devices.size()+2)) {
+		ui->stackedWidget->removeWidget(0);
+	}
+	ui->stackedWidget->insertWidget(0, welcome);
+	ui->btnHomepage->setChecked(true);
 
 	// Index page
 	index = new QTextBrowser(ui->stackedWidget);
@@ -749,21 +827,34 @@ void ToolLauncher::setupHomepage()
 
 	if (indexFile == "") {
 		return;
-
 	}
 
 	loadIndexPageFromContent(indexFile);
 }
 
+void ToolLauncher::setupAddPage()
+{
+	connectWidget = new ConnectDialog(ui->stackedWidget);
+	connect(connectWidget, &ConnectDialog::newContext,
+		[=](const QString& uri) {
+		bool found = false;
+		auto dev = getDevice(uri);
+		if (dev) {
+			highlightDevice(dev->deviceButton());
+		} else {
+			auto btn = addContext(uri);
+			if (btn) {
+				btn->setChecked(true);
+			}
+		}
+	});
+
+	ui->stackedWidget->insertWidget(1, connectWidget);
+}
+
 void ToolLauncher::updateHomepage()
 {
-	int count = ui->stackedWidget->count();
-
-	while (count) {
-		ui->stackedWidget->removeWidget(ui->stackedWidget->currentWidget());
-		ui->stackedWidget->moveLeft();
-		count--;
-	}
+	ui->stackedWidget->removeWidget(ui->stackedWidget->widget(0));
 }
 
 void ToolLauncher::swapMenu(QWidget *menu)
@@ -868,12 +959,11 @@ void adiscope::ToolLauncher::resetStylesheets()
 	setDynamicProperty(ui->btnConnect, "failed", false);
 
 	for (auto dev : devices) {
-		setDynamicProperty(dev->deviceButton(), "connected", false);
-		setDynamicProperty(dev->deviceButton(), "failed", false);
+		dev->setConnected(false, false);
 	}
 }
 
-void adiscope::ToolLauncher::device_btn_clicked(bool pressed)
+void adiscope::ToolLauncher::deviceBtn_clicked(bool pressed)
 {
 	DeviceWidget *dev;
 	for (auto d : devices) {
@@ -884,20 +974,10 @@ void adiscope::ToolLauncher::device_btn_clicked(bool pressed)
 	}
 
 	deviceInfo = "";
-	updateHomepage();
-	setupHomepage();
-
-	ui->btnConnect->setEnabled(pressed);
-	// add a new page to the home screen
-	// display current device info on the new page's content
-	// currently is working properly only if the file is at the path that is
-	// assigned to the deviceInfo string
-	if (pressed) {
-		index = new QTextBrowser(ui->stackedWidget);
-		index->setFrameShape(QFrame::NoFrame);
-		deviceInfo = "d:/info.html";
-		loadIndexPageFromContent(deviceInfo);
+	if (dev && pressed) {
+		ui->stackedWidget->slideToIndex(dev->index());
 	}
+
 
 	if (pressed){
 		ui->btnConnect->setToolTip(QString("Click to connect the device"));
@@ -955,50 +1035,48 @@ void adiscope::ToolLauncher::ping()
 		disconnect();
 }
 
-void adiscope::ToolLauncher::on_btnConnect_clicked(bool pressed)
+void adiscope::ToolLauncher::connectBtn_clicked(bool pressed)
 {
-	if (ctx) {
-		getConnectedDevice()->setConnected(false);
-		disconnect();
-		ui->btnConnect->setToolTip(QString("Click to connect the device"));
-		return;
-	}
-
-	QPushButton *btn = nullptr;
-	QLabel *label = nullptr;
-
-	DeviceWidget* dev = nullptr;
+	auto connectedDev = getConnectedDevice();
+	DeviceWidget* selectedDev = nullptr;
 	for (auto d : devices) {
-		if (d->isChecked()) {
-			dev = d;
+		if (d->connectButton() == sender()) {
+			selectedDev = d;
+		}
+		d->setConnected(false, false);
+	}
+
+	selectedDev->connectButton()->setText("Connecting...");
+
+	/* Disconnect connected device, if any */
+	if (ctx) {
+		connectedDev->setConnected(false, false);
+		disconnect();
+		connectedDev->connectButton()->setToolTip(QString("Click to connect the device"));
+	}
+
+	if (connectedDev != selectedDev) {
+		/* Connect to the selected device, if any */
+		if (selectedDev) {
+			QString uri = selectedDev->uri();
+			bool success = switchContext(uri);
+			if (success) {
+				selectedDev->setConnected(true, false, ctx);
+				selectedDev->setName(filter->hw_name());
+				setDynamicProperty(ui->btnConnect, "connected", true);
+
+				search_timer->stop();
+
+				ui->saveBtn->parentWidget()->setEnabled(true);
+
+			} else {
+				setDynamicProperty(ui->btnConnect, "failed", true);
+				selectedDev->setConnected(false, true);
+			}
+
+			Q_EMIT connectionDone(success);
 		}
 	}
-
-	if (!dev) {
-		throw std::runtime_error("No enabled device!");
-	}
-
-	QString uri = dev->uri();
-
-	bool success = switchContext(uri);
-	if (success) {
-		dev->setConnected(true);
-		setDynamicProperty(ui->btnConnect, "connected", true);
-		setDynamicProperty(dev->deviceButton(), "connected", true);
-
-		search_timer->stop();
-
-		ui->saveBtn->parentWidget()->setEnabled(true);
-
-		if (label) {
-			label->setText(filter->hw_name());
-		}
-	} else {
-		setDynamicProperty(ui->btnConnect, "failed", true);
-		setDynamicProperty(dev->deviceButton(), "failed", true);
-	}
-
-	Q_EMIT connectionDone(success);
 }
 
 void adiscope::ToolLauncher::destroyContext()
@@ -1069,6 +1147,9 @@ void adiscope::ToolLauncher::destroyContext()
 	}
 
 	if (ctx) {
+		auto dev = getConnectedDevice();
+		if (dev)
+			dev->setConnected(false, false);
 		iio_context_destroy(ctx);
 		ctx = nullptr;
 	}
@@ -1346,7 +1427,7 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 
 	loadToolTips(true);
 	calibration_thread = QtConcurrent::run(std::bind(&ToolLauncher::calibrate,
-	                                       this));
+					       this));
 
 	return true;
 }
@@ -1548,6 +1629,7 @@ bool ToolLauncher::eventFilter(QObject *watched, QEvent *event)
 		QPoint mousePosLoad = ui->Load->mapFromGlobal(QCursor::pos());
 		QPoint mousePosSave = ui->Save->mapFromGlobal(QCursor::pos());
 		QPoint mousePosPref = ui->preference->mapFromGlobal(QCursor::pos());
+		QPoint mousePosNotes = ui->notes->mapFromGlobal(QCursor::pos());
 
 		if (ui->menuControl->rect().contains(me->pos())) {
 			ui->btnMenu->toggle();
@@ -1560,6 +1642,9 @@ bool ToolLauncher::eventFilter(QObject *watched, QEvent *event)
 			return true;
 		} else if (ui->preference->rect().contains(mousePosPref)) {
 			ui->prefBtn->click();
+			return true;
+		} else if (ui->notes->rect().contains(mousePosNotes)) {
+			ui->btnNotes->click();
 			return true;
 		}
 	}
@@ -1712,9 +1797,8 @@ bool ToolLauncher_API::connect(const QString& uri)
 		done = true;
 	});
 
-	dev->setConnected(true);
-	dev->click();
 	tl->ui->btnConnect->click();
+	dev->click();
 
 	do {
 		QCoreApplication::processEvents();
@@ -1742,6 +1826,8 @@ void ToolLauncher_API::load(const QString& file)
 
 	this->ApiObject::load(settings);
 
+	if (tl->notesPanel)
+		tl->notesPanel->api()->load(settings);
 	if (tl->oscilloscope)
 		tl->oscilloscope->api->load(settings);
 	if (tl->dmm)
@@ -1773,6 +1859,8 @@ void ToolLauncher_API::save(const QString& file)
 
 	this->ApiObject::save(settings);
 
+	if (tl->notesPanel)
+		tl->notesPanel->api()->save(settings);
 	if (tl->oscilloscope)
 		tl->oscilloscope->api->save(settings);
 	if (tl->dmm)

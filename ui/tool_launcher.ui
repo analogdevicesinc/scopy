@@ -54,6 +54,9 @@
        <string notr="true">.QWidget[selected=true] { background-color: rgba(0, 0, 0, 60); }</string>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
+       <property name="spacing">
+        <number>0</number>
+       </property>
        <property name="leftMargin">
         <number>0</number>
        </property>
@@ -346,8 +349,8 @@ border-radius:5px;
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>200</width>
-            <height>427</height>
+            <width>631</width>
+            <height>456</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -873,6 +876,116 @@ border-radius:5px;
         </widget>
        </item>
        <item>
+        <widget class="QWidget" name="notes" native="true">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>200</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QPushButton { text-align:left; border: none; background-color: none; }
+.QWidget:hover {
+background-color: rgba(0, 0, 0, 60);
+border: 1px solid rgba(0, 0, 0, 30);
+border-radius:5px;
+}
+QWidget[selected=true] { 
+background-color: rgba(0, 0, 0, 60);
+border: 1px solid rgba(0, 0, 0, 30);
+border-radius:5px; 
+}</string>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_11">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_10">
+            <property name="leftMargin">
+             <number>10</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>10</number>
+            </property>
+            <item>
+             <spacer name="horizontalSpacer_14">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btnNotes">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>32</width>
+                <height>32</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Notes</string>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+              <property name="flat">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_15">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
         <layout class="QHBoxLayout" name="analogLogo">
          <property name="spacing">
           <number>0</number>
@@ -1148,6 +1261,9 @@ border: 0px;</string>
               <string/>
              </property>
              <layout class="QHBoxLayout" name="horizontalLayout">
+              <property name="spacing">
+               <number>2</number>
+              </property>
               <property name="leftMargin">
                <number>0</number>
               </property>
@@ -1162,35 +1278,19 @@ border: 0px;</string>
               </property>
               <item>
                <layout class="QVBoxLayout" name="verticalLayout_2">
-                <property name="leftMargin">
-                 <number>9</number>
-                </property>
-                <property name="topMargin">
+                <property name="spacing">
                  <number>0</number>
                 </property>
-                <property name="rightMargin">
-                 <number>9</number>
+                <property name="leftMargin">
+                 <number>0</number>
                 </property>
                 <property name="bottomMargin">
                  <number>0</number>
                 </property>
                 <item>
-                 <spacer name="verticalSpacer_2">
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>0</width>
-                    <height>0</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="btnAdd">
+                 <widget class="QWidget" name="btnsWidget" native="true">
                   <property name="sizePolicy">
-                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
@@ -1198,87 +1298,251 @@ border: 0px;</string>
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
-                    <height>40</height>
+                    <height>160</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
-                    <width>40</width>
-                    <height>40</height>
+                    <width>16777215</width>
+                    <height>160</height>
                    </size>
                   </property>
                   <property name="styleSheet">
-                   <string notr="true">QPushButton {
+                   <string notr="true">[selected=true] {
+  	opacity: 0.6;
+	border-radius: 4px;
+	background-color: #141416;
+}
+
+[selected=false] {
+	background-color: transparent;
+}</string>
+                  </property>
+                  <property name="selected" stdset="0">
+                   <bool>false</bool>
+                  </property>
+                  <layout class="QVBoxLayout" name="verticalLayout_6">
+                   <property name="spacing">
+                    <number>0</number>
+                   </property>
+                   <property name="leftMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="topMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="rightMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="bottomMargin">
+                    <number>0</number>
+                   </property>
+                   <item>
+                    <widget class="QWidget" name="homepageWidget" native="true">
+                     <property name="styleSheet">
+                      <string notr="true">[selected=true] {
+  	opacity: 0.6;
+	border-radius: 4px;
+	background-color: #141416;
+}
+
+[selected=false] {
+	background-color: transparent;
+}</string>
+                     </property>
+                     <property name="selected" stdset="0">
+                      <bool>false</bool>
+                     </property>
+                     <layout class="QVBoxLayout" name="verticalLayout_8">
+                      <property name="leftMargin">
+                       <number>10</number>
+                      </property>
+                      <property name="topMargin">
+                       <number>20</number>
+                      </property>
+                      <property name="rightMargin">
+                       <number>10</number>
+                      </property>
+                      <property name="bottomMargin">
+                       <number>10</number>
+                      </property>
+                      <item>
+                       <spacer name="verticalSpacer_3">
+                        <property name="orientation">
+                         <enum>Qt::Vertical</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>20</width>
+                          <height>0</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                      <item>
+                       <widget class="QPushButton" name="btnHomepage">
+                        <property name="sizePolicy">
+                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                          <horstretch>0</horstretch>
+                          <verstretch>0</verstretch>
+                         </sizepolicy>
+                        </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>40</height>
+                         </size>
+                        </property>
+                        <property name="maximumSize">
+                         <size>
+                          <width>40</width>
+                          <height>40</height>
+                         </size>
+                        </property>
+                        <property name="styleSheet">
+                         <string notr="true">QPushButton {
 height: 40px;
 width: 40px;
 border-width: 0px;
 border-radius: 4px;
 background-color: #4A64FF;
 }
+
 QPushButton:hover {
 background-color: #4a34ff;
-}</string>
-                  </property>
-                  <property name="text">
-                   <string/>
-                  </property>
-                  <property name="icon">
-                   <iconset resource="../resources/resources.qrc">
-                    <normaloff>:/menu/add.svg</normaloff>:/menu/add.svg</iconset>
-                  </property>
-                  <property name="iconSize">
-                   <size>
-                    <width>40</width>
-                    <height>40</height>
-                   </size>
-                  </property>
-                  <property name="checkable">
-                   <bool>true</bool>
-                  </property>
-                  <property name="checked">
-                   <bool>false</bool>
-                  </property>
-                  <property name="flat">
-                   <bool>false</bool>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="Line" name="lineAdd">
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>2</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>16777215</width>
-                    <height>2</height>
-                   </size>
-                  </property>
-                  <property name="styleSheet">
-                   <string notr="true">QFrame#line[selected=true] {
-	 border: 2px solid #4A64FF;
 }
 
-QFrame#line[selected=false] {
-	 border: 2px solid white;
+QPushButton:checked {
+background-color: #4a34ff;
 }</string>
-                  </property>
-                  <property name="lineWidth">
-                   <number>2</number>
-                  </property>
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="selected" stdset="0">
-                   <bool>false</bool>
-                  </property>
+                        </property>
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="icon">
+                         <iconset>
+                          <normalon>:/icons/house.png</normalon>
+                         </iconset>
+                        </property>
+                        <property name="checkable">
+                         <bool>true</bool>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QWidget" name="addWidget" native="true">
+                     <property name="styleSheet">
+                      <string notr="true">[selected=true] {
+  	opacity: 0.6;
+	border-radius: 4px;
+	background-color: #141416;
+}
+
+[selected=false] {
+	background-color: transparent;
+}</string>
+                     </property>
+                     <property name="selected" stdset="0">
+                      <bool>false</bool>
+                     </property>
+                     <layout class="QVBoxLayout" name="verticalLayout_7">
+                      <property name="leftMargin">
+                       <number>10</number>
+                      </property>
+                      <property name="topMargin">
+                       <number>10</number>
+                      </property>
+                      <property name="rightMargin">
+                       <number>10</number>
+                      </property>
+                      <property name="bottomMargin">
+                       <number>20</number>
+                      </property>
+                      <item>
+                       <widget class="QPushButton" name="btnAdd">
+                        <property name="sizePolicy">
+                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                          <horstretch>0</horstretch>
+                          <verstretch>0</verstretch>
+                         </sizepolicy>
+                        </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>40</height>
+                         </size>
+                        </property>
+                        <property name="maximumSize">
+                         <size>
+                          <width>40</width>
+                          <height>40</height>
+                         </size>
+                        </property>
+                        <property name="styleSheet">
+                         <string notr="true">QPushButton {
+height: 40px;
+width: 40px;
+border-width: 0px;
+border-radius: 4px;
+background-color: #4A64FF;
+}
+
+QPushButton:hover {
+background-color: #4a34ff;
+}
+
+QPushButton:checked {
+background-color: #4a34ff;
+}</string>
+                        </property>
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="icon">
+                         <iconset resource="../resources/resources.qrc">
+                          <normaloff>:/menu/add.svg</normaloff>:/menu/add.svg</iconset>
+                        </property>
+                        <property name="iconSize">
+                         <size>
+                          <width>40</width>
+                          <height>40</height>
+                         </size>
+                        </property>
+                        <property name="checkable">
+                         <bool>true</bool>
+                        </property>
+                        <property name="checked">
+                         <bool>false</bool>
+                        </property>
+                        <property name="flat">
+                         <bool>false</bool>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <spacer name="verticalSpacer_5">
+                        <property name="orientation">
+                         <enum>Qt::Vertical</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>0</width>
+                          <height>0</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                  </layout>
                  </widget>
                 </item>
                 <item>
-                 <spacer name="verticalSpacer_3">
+                 <spacer name="verticalSpacer_2">
                   <property name="orientation">
                    <enum>Qt::Vertical</enum>
                   </property>
@@ -1293,11 +1557,51 @@ QFrame#line[selected=false] {
                </layout>
               </item>
               <item>
-               <layout class="QHBoxLayout" name="devicesList">
-                <property name="spacing">
-                 <number>3</number>
+               <widget class="adiscope::OscCustomScrollArea" name="scrollArea_2">
+                <property name="widgetResizable">
+                 <bool>true</bool>
                 </property>
-               </layout>
+                <widget class="QWidget" name="devicesWidget">
+                 <property name="geometry">
+                  <rect>
+                   <x>0</x>
+                   <y>0</y>
+                   <width>258</width>
+                   <height>162</height>
+                  </rect>
+                 </property>
+                 <layout class="QHBoxLayout" name="devicesList">
+                  <property name="spacing">
+                   <number>0</number>
+                  </property>
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <spacer name="horizontalSpacer_16">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>0</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
+                </widget>
+               </widget>
               </item>
               <item>
                <spacer name="horizontalSpacer_2">
@@ -1382,6 +1686,12 @@ QFrame#line[selected=false] {
    <class>adiscope::StackedHomepage</class>
    <extends>QStackedWidget</extends>
    <header>stacked_homepage.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::OscCustomScrollArea</class>
+   <extends>QScrollArea</extends>
+   <header>osc_custom_scroll.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
