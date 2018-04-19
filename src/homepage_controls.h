@@ -39,6 +39,9 @@ public:
 	void updatePosition();
 	virtual bool eventFilter(QObject *, QEvent *);
 
+	void enableLeft(bool);
+	void enableRight(bool);
+
 Q_SIGNALS:
 	void goLeft();
 	void goRight();

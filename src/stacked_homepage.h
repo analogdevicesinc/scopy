@@ -44,8 +44,11 @@ public:
 	explicit StackedHomepage(QWidget *parent = 0);
 	~StackedHomepage();
 
+	void insertWidget(int pos, QWidget *widget);
 	void addWidget(QWidget *widget);
 	void removeWidget(QWidget *widget);
+
+	void slideToIndex(int index);
 
 public Q_SLOTS:
 	void moveLeft();
@@ -64,9 +67,9 @@ protected Q_SLOTS:
 
 Q_SIGNALS:
 	void animationFinished();
+	void moved(int);
 
 private:
-	void slideToIndex(int index);
 	void slideInWidget(QWidget* newWidget, enum s_directions direction);
 
 	HomepageControls *s_hc;
