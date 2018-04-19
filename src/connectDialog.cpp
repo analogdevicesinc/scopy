@@ -29,10 +29,10 @@
 
 using namespace adiscope;
 
-ConnectDialog::ConnectDialog(QWidget *widget) : QObject(widget),
+ConnectDialog::ConnectDialog(QWidget *widget) : QWidget(widget),
 	ui(new Ui::Connect), connected(false)
 {
-	ui->setupUi(widget);
+	ui->setupUi(this);
 	ui->connectBtn->setText("Connect");
 	//The connect button will be disabled untill we write something in the hostname line edit
 	ui->connectBtn->setDisabled(true);
@@ -46,7 +46,9 @@ ConnectDialog::ConnectDialog(QWidget *widget) : QObject(widget),
 	        SLOT(updatePopUp(struct iio_context *)));
 	ui->hostname->activateWindow();
 	ui->hostname->setFocus();
-
+	setDynamicProperty(ui->hostname, "invalid", false);
+	setDynamicProperty(ui->hostname, "valid", false);
+	ui->infoSection->hide();
 }
 
 ConnectDialog::~ConnectDialog()
@@ -59,7 +61,7 @@ void ConnectDialog::btnClicked()
 	if (!ui->connectBtn->isEnabled()) {
 		return;
 	} else {
-		ui->groupBox->setTitle("Waiting for connection...");
+		ui->infoSection->setText("Waiting for connection ...");
 	}
 
 	if (connected) {
@@ -78,12 +80,14 @@ void ConnectDialog::discardSettings()
 		ui->connectBtn->setDisabled(true);
 	}
 
-	ui->groupBox->setTitle(QString("Context info"));
+	ui->infoSection->setText("Context info");
 	setDynamicProperty(ui->connectBtn, "failed", false);
-	setDynamicProperty(ui->connectBtn, "connected", false);
+	setDynamicProperty(ui->hostname, "invalid", false);
+	setDynamicProperty(ui->hostname, "valid", false);
 	ui->connectBtn->setText("Connect");
 
-	ui->description->setPlainText(QString(""));
+	ui->infoSection->hide();
+	ui->description->setText(QString(""));
 	this->connected = false;
 }
 
@@ -113,20 +117,22 @@ void ConnectDialog::updatePopUp(struct iio_context *ctx)
 {
 	this->connected = !!ctx;
 
+	ui->infoSection->show();
 	if (!!ctx) {
 		ui->connectBtn->setDisabled(false);
 		QString description(iio_context_get_description(ctx));
-		ui->description->setPlainText(description);
-		ui->groupBox->setTitle(QString("Context info"));
-		setDynamicProperty(ui->connectBtn, "connected", true);
+		ui->description->setText(description);
+		ui->infoSection->setText("Context info");
+		setDynamicProperty(ui->hostname, "invalid", false);
+		setDynamicProperty(ui->hostname, "valid", true);
 		ui->connectBtn->setText("Add");
 
 		iio_context_destroy(ctx);
 	} else {
-		setDynamicProperty(ui->connectBtn, "failed", true);
-		ui->connectBtn->setText("Failed!");
-		ui->groupBox->setTitle(QString("Warning"));
-		ui->description->setPlainText("Error: Unable to find host: No such host is known!");
+		setDynamicProperty(ui->hostname, "valid", false);
+		setDynamicProperty(ui->hostname, "invalid", true);
+		ui->infoSection->setText("Warning");
+		ui->description->setText("Error: Unable to find host: No such host is known!");
 	}
 }
 bool ConnectDialog::eventFilter(QObject *watched, QEvent *event)
