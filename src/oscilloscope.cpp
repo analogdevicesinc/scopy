@@ -3868,7 +3868,7 @@ void Oscilloscope::setGainMode(uint chnIdx, M2kAdc::GainMode gain_mode)
 
 void Oscilloscope::setChannelHwOffset(uint chnIdx, double offset)
 {
-	channel_offset[current_channel] = offset;
+	channel_offset[chnIdx] = offset;
 	if (ui->pushButtonRunStop->isChecked())
 		m2k_adc->setChnHwOffset(chnIdx, offset);
 
