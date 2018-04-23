@@ -407,13 +407,13 @@ QPushButton:disabled {
        <property name="minimumSize">
         <size>
          <width>0</width>
-         <height>130</height>
+         <height>140</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
          <width>16777215</width>
-         <height>130</height>
+         <height>140</height>
         </size>
        </property>
        <property name="styleSheet">
@@ -524,7 +524,7 @@ background-color: #4a34ff;
           <x>0</x>
           <y>0</y>
           <width>768</width>
-          <height>130</height>
+          <height>140</height>
          </rect>
         </property>
         <layout class="QHBoxLayout" name="notesList">
