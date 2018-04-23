@@ -38,17 +38,21 @@ static const double SUPPLY_4_5V_NEG_VALUE = -4.5;
 /*Calibrations procedure stories*/
 static const QStringList positiveOffsetStory = (QStringList() <<
 					 R"(Calibrate the Positive Supply.
-Measure the Voltage on the "V+" and enter the value in the field below.
+Measure the Voltage on the "V+" and
+enter the value in the field below.
 The value should be around 100mV)"
 					 << R"(Calibrate the Positive Supply
-Measure the Voltage on the "V+" and enter the value in the field below.
+Measure the Voltage on the "V+"
+and enter the value in the field below.
 The value should be around 4.5V)");
 static const QStringList negativeOffsetStory = (QStringList() <<
 					 R"(Calibrate the Negative Supply
-Measure the Voltage on the "V-" and enter the value in the field below.
+Measure the Voltage on the "V-"
+and enter the value in the field below.
 The value should be around -100mV)"
 					 << R"(Calibrate the Negative Supply
-Measure the Voltage on the "V-" and enter the value in the field below.
+Measure the Voltage on the "V-"
+and enter the value in the field below.
 The value should be around -4.5V)");
 
 ManualCalibration::ManualCalibration(struct iio_context *ctx, Filter *filt,
@@ -60,12 +64,21 @@ ManualCalibration::ManualCalibration(struct iio_context *ctx, Filter *filt,
 {
 	ui->setupUi(this);
 	calibListString << "Positive supply"
-			<< "Negative supply";
+			<< "Negative supply"
+			<< "Calibration parameters"
+			<< "Autocalibration parameters";
 
 	calibOption.insert("Positive supply", 0);
 	calibOption.insert("Negative supply", 1);
+	calibOption.insert("Calibration parameters", 2);
+	calibOption.insert("Autocalibration parameters", 3);
 
 	ui->calibList->addItems(calibListString);
+
+	paramTable = new QTableWidget(ui->storyWidget);
+	startParamTable = new QTableWidget(ui->storyWidget);
+	paramTable->hide();
+	startParamTable->hide();
 
 	displayStartUpCalibrationValues();
 	initParameters();
@@ -124,15 +137,35 @@ void ManualCalibration::on_calibList_itemClicked(QListWidgetItem *item)
 	qDebug() << "Calibration list item clicked" << item->text().toLocal8Bit();
 	QString temp = item->text();
 
-	ui->tabWidget->removeTab(3); //remove the story tab
+//	ui->tabWidget->removeTab(3); //remove the story tab
+	ui->storyWidget->show();
 
 	switch (calibOption[temp]) {
 	case POSITIVE_OFFSET:
 		positivePowerSupplySetup();
+		paramTable->hide();
+		startParamTable->hide();
+		TempWidget->show();
 		break;
-
 	case NEGATIVE_OFFSET:
 		negativePowerSupplySetup();
+		paramTable->hide();
+		startParamTable->hide();
+		TempWidget->show();
+		break;
+	case CALIB_PARAM:
+		ui->storyWidget->layout()->addWidget(paramTable);
+		paramTable->show();
+		if(!ui->storyWidget->layout()->isEmpty())
+			TempWidget->hide();
+		startParamTable->hide();
+		break;
+	case START_CALIB_PARAM:
+		ui->storyWidget->layout()->addWidget(startParamTable);
+		startParamTable->show();
+		if(!ui->storyWidget->layout()->isEmpty())
+			TempWidget->hide();
+		paramTable->hide();
 		break;
 	}
 }
@@ -149,7 +182,8 @@ void ManualCalibration::positivePowerSupplySetup()
 	stCalibrationStory.story = positiveOffsetStory;
 	stCalibrationStory.storyName.clear();
 	stCalibrationStory.storyName.append("Positive supply");
-	ui->tabWidget->addTab(TempWidget, stCalibrationStory.storyName);
+	ui->storyWidget->layout()->addWidget(TempWidget);
+	//ui->tabWidget->addTab(TempWidget, stCalibrationStory.storyName);
 	TempUi->instructionText->setText(
 		stCalibrationStory.story[stCalibrationStory.calibStep]);
 
@@ -227,11 +261,11 @@ void ManualCalibration::positivePowerSupplyParam(const int step)
 				offset_Value) + QString("V")));
 		TempUi->lineEdit->clear();
 
-		ui->paramTable->setItem(0, 1, new QTableWidgetItem(QString::number(
+		paramTable->setItem(0, 1, new QTableWidgetItem(QString::number(
 						stParameters.offset_pos_dac)));
-		ui->paramTable->setItem(2, 1, new QTableWidgetItem(QString::number(
+		paramTable->setItem(2, 1, new QTableWidgetItem(QString::number(
 						stParameters.offset_pos_adc)));
-		ui->paramTable->resizeColumnsToContents();
+		paramTable->resizeColumnsToContents();
 
 		/*Set dac to 4.5V*/
 		setPositiveValue(4.5);
@@ -258,11 +292,11 @@ void ManualCalibration::positivePowerSupplyParam(const int step)
 		TempUi->inputTableWidget->setItem(1, 1, new QTableWidgetItem(QString::number(
 				offset_Value) + QString("V")));
 
-		ui->paramTable->setItem(1, 1, new QTableWidgetItem(QString::number(
+		paramTable->setItem(1, 1, new QTableWidgetItem(QString::number(
 						stParameters.gain_pos_dac)));
-		ui->paramTable->setItem(3, 1, new QTableWidgetItem(QString::number(
+		paramTable->setItem(3, 1, new QTableWidgetItem(QString::number(
 						stParameters.gain_pos_adc)));
-		ui->paramTable->resizeColumnsToContents();
+		paramTable->resizeColumnsToContents();
 
 		TempUi->nextButton->setVisible(false);
 		TempUi->finishButton->setVisible(true);
@@ -298,7 +332,8 @@ void ManualCalibration::negativePowerSupplySetup()
 	stCalibrationStory.story = negativeOffsetStory;
 	stCalibrationStory.storyName.clear();
 	stCalibrationStory.storyName.append("Negative supply");
-	ui->tabWidget->addTab(TempWidget, stCalibrationStory.storyName);
+	ui->storyWidget->layout()->addWidget(TempWidget);
+	//ui->tabWidget->addTab(TempWidget, stCalibrationStory.storyName);
 	TempUi->instructionText->setText(
 		stCalibrationStory.story[stCalibrationStory.calibStep]);
 
@@ -333,11 +368,11 @@ void ManualCalibration::negativePowerSupplyParam(const int step)
 				offset_Value) + QString("V")));
 		TempUi->lineEdit->clear();
 
-		ui->paramTable->setItem(4, 1, new QTableWidgetItem(QString::number(
+		paramTable->setItem(4, 1, new QTableWidgetItem(QString::number(
 						stParameters.offset_neg_dac)));
-		ui->paramTable->setItem(6, 1, new QTableWidgetItem(QString::number(
+		paramTable->setItem(6, 1, new QTableWidgetItem(QString::number(
 						stParameters.offset_neg_adc)));
-		ui->paramTable->resizeColumnsToContents();
+		paramTable->resizeColumnsToContents();
 
 		/*Set dac to -4.5V*/
 		setNegativeValue(-4.5);
@@ -364,11 +399,11 @@ void ManualCalibration::negativePowerSupplyParam(const int step)
 		TempUi->inputTableWidget->setItem(1, 1, new QTableWidgetItem(QString::number(
 				offset_Value) + QString("V")));
 
-		ui->paramTable->setItem(5, 1, new QTableWidgetItem(QString::number(
+		paramTable->setItem(5, 1, new QTableWidgetItem(QString::number(
 						stParameters.gain_neg_dac)));
-		ui->paramTable->setItem(7, 1, new QTableWidgetItem(QString::number(
+		paramTable->setItem(7, 1, new QTableWidgetItem(QString::number(
 						stParameters.gain_neg_adc)));
-		ui->paramTable->resizeColumnsToContents();
+		paramTable->resizeColumnsToContents();
 
 		TempUi->nextButton->setVisible(false);
 		TempUi->finishButton->setVisible(true);
@@ -408,72 +443,70 @@ void ManualCalibration::setCalibration(Calibration *cal)
 
 void ManualCalibration::displayStartUpCalibrationValues(void)
 {
-	QTableWidget *table = new QTableWidget(this);
 	QStringList tableHeader;
 
 	tableHeader <<"Name"<<"Value";
-	table->setRowCount(8);
-	table->setColumnCount(2);
-	table->setHorizontalHeaderLabels(tableHeader);
+	startParamTable->setRowCount(8);
+	startParamTable->setColumnCount(2);
+	startParamTable->setHorizontalHeaderLabels(tableHeader);
 
-	table->setItem(0, 0, new QTableWidgetItem("ADC offset Ch0"));
-	table->setItem(0, 1, new QTableWidgetItem(QString::number(
+	startParamTable->setItem(0, 0, new QTableWidgetItem("ADC offset Ch0"));
+	startParamTable->setItem(0, 1, new QTableWidgetItem(QString::number(
 				calib->adcOffsetChannel0())));
 
-	table->setItem(1, 0, new QTableWidgetItem("ADC offset Ch1"));
-	table->setItem(1, 1, new QTableWidgetItem(QString::number(
+	startParamTable->setItem(1, 0, new QTableWidgetItem("ADC offset Ch1"));
+	startParamTable->setItem(1, 1, new QTableWidgetItem(QString::number(
 				calib->adcOffsetChannel1())));
 
-	table->setItem(2, 0, new QTableWidgetItem("ADC gain Ch0"));
-	table->setItem(2, 1, new QTableWidgetItem(QString::number(
+	startParamTable->setItem(2, 0, new QTableWidgetItem("ADC gain Ch0"));
+	startParamTable->setItem(2, 1, new QTableWidgetItem(QString::number(
 				calib->adcGainChannel0())));
 
-	table->setItem(3, 0, new QTableWidgetItem("ADC gain Ch0"));
-	table->setItem(3, 1, new QTableWidgetItem(QString::number(
+	startParamTable->setItem(3, 0, new QTableWidgetItem("ADC gain Ch0"));
+	startParamTable->setItem(3, 1, new QTableWidgetItem(QString::number(
 				calib->adcGainChannel1())));
 
-	table->setItem(4, 0, new QTableWidgetItem("DAC A offset"));
-	table->setItem(4, 1, new QTableWidgetItem(QString::number(
+	startParamTable->setItem(4, 0, new QTableWidgetItem("DAC A offset"));
+	startParamTable->setItem(4, 1, new QTableWidgetItem(QString::number(
 				calib->dacAoffset())));
 
-	table->setItem(5, 0, new QTableWidgetItem("DAC B offset"));
-	table->setItem(5, 1, new QTableWidgetItem(QString::number(
+	startParamTable->setItem(5, 0, new QTableWidgetItem("DAC B offset"));
+	startParamTable->setItem(5, 1, new QTableWidgetItem(QString::number(
 				calib->dacBoffset())));
 
-	table->setItem(6, 0, new QTableWidgetItem("DAC A vlsb"));
-	table->setItem(6, 1, new QTableWidgetItem(QString::number(calib->dacAvlsb())));
+	startParamTable->setItem(6, 0, new QTableWidgetItem("DAC A vlsb"));
+	startParamTable->setItem(6, 1, new QTableWidgetItem(QString::number(calib->dacAvlsb())));
 
-	table->setItem(7, 0, new QTableWidgetItem("DAC B vlsb"));
-	table->setItem(7, 1, new QTableWidgetItem(QString::number(calib->dacBvlsb())));
+	startParamTable->setItem(7, 0, new QTableWidgetItem("DAC B vlsb"));
+	startParamTable->setItem(7, 1, new QTableWidgetItem(QString::number(calib->dacBvlsb())));
 
-	table->resizeColumnsToContents();
+	startParamTable->resizeColumnsToContents();
 
-	ui->tabWidget->removeTab(2);
-	ui->tabWidget->insertTab(2, table, "Startup calibration");
-	ui->tabWidget->setCurrentIndex(2);
+//	ui->tabWidget->removeTab(2);
+//	ui->tabWidget->insertTab(2, table, "Startup calibration");
+//	ui->tabWidget->setCurrentIndex(2);
 
 }
 
 void ManualCalibration::initParameters(void)
 {
-	QTableWidget *table = ui->paramTable;
 	QStringList tableHeader;
 	const char *name;
 	const char *value;
 
 	tableHeader <<"Name"<<"Value";
-	table->setRowCount(8);
-	table->setColumnCount(2);
-	table->setHorizontalHeaderLabels(tableHeader);
+	paramTable->setRowCount(8);
+	paramTable->setColumnCount(2);
+	paramTable->setHorizontalHeaderLabels(tableHeader);
 
 	for (int i = 4; i < 12; i++) {
 		if (!iio_context_get_attr(ctx, i, &name, &value)) {
-			table->setItem(i - 4, 0, new QTableWidgetItem(QString(name + 4)));
-			table->setItem(i - 4, 1, new QTableWidgetItem(QString(value)));
+			paramTable->setItem(i - 4, 0, new QTableWidgetItem(QString(name + 4)));
+			paramTable->setItem(i - 4, 1, new QTableWidgetItem(QString(value)));
 		}
 	}
 
-	table->resizeColumnsToContents();
+	paramTable->resizeColumnsToContents();
 }
 
 void ManualCalibration::updateParameters(void)
@@ -504,9 +537,9 @@ void ManualCalibration::on_saveButton_clicked()
 		       << tr(" °C") << "\n#FPGA temperature: "<< temp_fpga
 		       << tr(" °C") << endl;
 
-		for (int i = 0; i < ui->paramTable->rowCount(); i++)
-			stream << "cal," << ui->paramTable->item(i,0)->text() << "="
-			       << ui->paramTable->item(i,1)->text() << endl;
+		for (int i = 0; i < paramTable->rowCount(); i++)
+			stream << "cal," << paramTable->item(i,0)->text() << "="
+			       << paramTable->item(i,1)->text() << endl;
 	}
 
 	file.close();
@@ -514,7 +547,7 @@ void ManualCalibration::on_saveButton_clicked()
 
 void ManualCalibration::on_restartButton_clicked()
 {
-	ui->tabWidget->removeTab(3); //remove the story tab
+//	ui->tabWidget->removeTab(3); //remove the story tab
 
 	switch (stCalibrationStory.calibProcedure) {
 	case POSITIVE_OFFSET:
@@ -526,14 +559,22 @@ void ManualCalibration::on_restartButton_clicked()
 		break;
 	}
 
-	ui->tabWidget->setCurrentIndex(3);
+//	ui->tabWidget->setCurrentIndex(3);
 	TempUi->inputTableWidget->clearContents();
 }
 
 void ManualCalibration::on_finishButton_clicked()
 {
-	ui->tabWidget->removeTab(3); //remove the story tab
+//	ui->tabWidget->removeTab(3); //remove the story tab
+	ui->storyWidget->layout()->removeWidget(TempWidget);
+
+	QSizePolicy sp_retain = ui->storyWidget->sizePolicy();
+	sp_retain.setRetainSizeWhenHidden(true);
+	ui->storyWidget->setSizePolicy(sp_retain);
+
+	ui->storyWidget->hide();
 	updateParameters();
+
 	TempUi->inputTableWidget->clearContents();
 	setNegativeValue(0);
 	setPositiveValue(0);

@@ -26,6 +26,7 @@
 #include <QObject>
 #include <QString>
 #include <QListWidgetItem>
+#include <QTableWidget>
 
 /*Local includes*/
 #include "tool.hpp"
@@ -63,7 +64,9 @@ struct stCalibParam {
 
 enum calibrations {
 	POSITIVE_OFFSET = 0,
-	NEGATIVE_OFFSET
+	NEGATIVE_OFFSET,
+	CALIB_PARAM,
+	START_CALIB_PARAM
 };
 
 enum steps {
@@ -125,6 +128,8 @@ private:
 	struct iio_channel *ch1w, *ch2w, *ch1r, *ch2r, *pd_pos, *pd_neg;
 	Ui::CalibrationTemplate *TempUi;
 	QWidget *TempWidget;
+	QTableWidget *paramTable;
+	QTableWidget *startParamTable;
 
 	QPushButton *menuRunButton;
 	Filter *filter;
