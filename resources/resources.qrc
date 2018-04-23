@@ -128,6 +128,8 @@
         <file>icons/ic arrow right.svg</file>
         <file>icons/ic arrow up.svg</file>
         <file>icons/house.png</file>
+        <file>icons/ic_note_checked.svg</file>
+        <file>icons/ic_note_unchecked.svg</file>
     </qresource>
     <qresource prefix="/stylesheets">
         <file>stylesheets/global.qss</file>
