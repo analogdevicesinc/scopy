@@ -392,7 +392,7 @@ void ToolLauncher::resetSession()
 
 	if (connectedDev) {
 		connectedDev->setChecked(true);
-		connectBtn_clicked(true);
+		connectedDev->connectButton()->click();
 	}
 }
 
