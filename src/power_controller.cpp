@@ -118,6 +118,8 @@ PowerController::PowerController(struct iio_context *ctx,
 
 	connect(runButton, SIGNAL(clicked(bool)), this, SLOT(startStop(bool)));
 
+	valuePos->setValue(0);
+	valueNeg->setValue(0);
 
 	/*Load calibration parameters from iio context*/
 	const char *name;
