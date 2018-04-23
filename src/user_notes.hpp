@@ -34,6 +34,7 @@ using namespace std;
 namespace Ui {
 class UserNotes;
 class Note;
+class UserNotePage;
 }
 
 namespace adiscope  {
@@ -99,8 +100,10 @@ public:
 
         void click();
 
-        QTextBrowser *getPage() const;
-        void setPage(QTextBrowser *page);
+        QWidget *getPage() const;
+        void setPage(QWidget *page);
+
+        Ui::UserNotePage *getPageUi();
 
 public Q_SLOTS:
         void setSelected(bool selected);
@@ -113,7 +116,8 @@ private:
         QString m_name;
         QString m_path;
         bool m_selected;
-        QTextBrowser *m_page;
+        QWidget *m_page;
+        Ui::UserNotePage *pageUi;
 };
 
 

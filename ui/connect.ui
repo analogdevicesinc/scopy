@@ -41,8 +41,7 @@
      <item>
       <widget class="QLabel" name="label">
        <property name="styleSheet">
-        <string notr="true">font: 75 10pt ;
-font-weight: bold;</string>
+        <string notr="true"/>
        </property>
        <property name="text">
         <string>Hostname</string>

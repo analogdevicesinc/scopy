@@ -122,6 +122,7 @@ void Preferences::showEvent(QShowEvent *event)
 	ui->saveSessionCheckBox->setChecked(save_session_on_exit);
 	ui->doubleClickCheckBox->setChecked(double_click_to_detach);
 	ui->na_zeroCheckBox->setChecked(na_show_zero);
+	ui->advancedInfoCheckBox->setChecked(advanced_device_info);
 
 	QWidget::showEvent(event);
 }

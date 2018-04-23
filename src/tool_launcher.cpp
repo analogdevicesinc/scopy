@@ -697,6 +697,9 @@ void ToolLauncher::destroyPopup()
 
 void ToolLauncher::forgetDeviceBtn_clicked(int pos, QString uri)
 {
+	if (previousIp == uri.mid(3)) {
+		previousIp = "";
+	}
 	pos -= 2;
 	auto dev = devices.at(pos);
 	if (dev->uri().startsWith("usb:")) {

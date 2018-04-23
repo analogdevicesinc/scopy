@@ -20,6 +20,7 @@
 #include "user_notes.hpp"
 #include "ui_user_notes.h"
 #include "ui_note.h"
+#include "ui_user_note_page.h"
 #include "dynamicWidget.hpp"
 
 #include <QFileInfo>
@@ -42,8 +43,6 @@ UserNotes::UserNotes(QWidget *parent) :
                 SLOT(browse_btn_clicked(bool)));
         connect(ui->saveBtn, SIGNAL(clicked(bool)),
                 SLOT(save_btn_clicked(bool)));
-        connect(ui->removeBtn, SIGNAL(clicked(bool)),
-                this, SLOT(remove_btn_clicked(bool)));
         connect(ui->stackedWidget, SIGNAL(moved(int)),
                 this, SLOT(pageMoved(int)));
 
@@ -90,7 +89,6 @@ void UserNotes::add_btn_clicked(bool clicked)
 {
 	setDynamicProperty(ui->addWidget, "selected", clicked);
 	if (clicked) {
-		ui->removeBtn->setEnabled(false);
 		ui->stackedWidget->slideToIndex(0);
 	}
 }
@@ -160,7 +158,6 @@ int UserNotes::getNoteIndex(Note *note)
 void UserNotes::note_selected(bool selected)
 {
         if (selected) {
-                ui->removeBtn->setEnabled(true);
                 Note* n = getSelectedNote();
                 if (n) {
                         loadPageForNote(n, n->getPath());
@@ -203,6 +200,9 @@ Note* UserNotes::addNote(QString name, QString path)
 {
         Note *newNote = new Note(name, path, this);
 
+        connect(newNote->getPageUi()->btnRemove, SIGNAL(clicked(bool)),
+                this, SLOT(remove_btn_clicked(bool)));
+
         connect(newNote, SIGNAL(selected(bool)),
                 this, SLOT(note_selected(bool)));
 
@@ -219,7 +219,7 @@ void UserNotes::loadPageForNote(Note *note, QString path)
         int pos = getNoteIndex(note);
         pos++;
 
-        QTextBrowser *index = note->getPage();
+        QTextBrowser *index = note->getPageUi()->textBrowser;
         if (!index) {
                 index = new QTextBrowser(ui->stackedWidget);
         }
@@ -230,22 +230,23 @@ void UserNotes::loadPageForNote(Note *note, QString path)
 		QFile indexFile(path);
 		indexFile.open(QFile::ReadOnly);
 		if (!indexFile.readAll().isEmpty()) {
+			index->clear();
 			index->setSearchPaths(QStringList(fileInfo.dir().absolutePath()));
 			indexFile.close();
 			index->setSource(QUrl::fromLocalFile(fileInfo.filePath()));
 			index->setOpenExternalLinks(true);
+			note->getPageUi()->label->setText("Path: " + path);
 		} else {
 			indexFile.close();
 			index->clear();
-			index->append("Warning: The file is empty!");
+			note->getPageUi()->label->setText("Warning: The file is empty!");
 		}
 	} else {
 		index->clear();
-		index->append("Warning: The path is invalid!");
+		note->getPageUi()->label->setText("Warning: The path is invalid!");
 	}
 
         if (index) {
-                note->setPage(index);
                 ui->stackedWidget->insertWidget(pos, note->getPage());
         }
 }
@@ -275,6 +276,10 @@ Note::Note(QString name, QString path, QWidget *parent) :
         ui->name->setText(name);
         connect(ui->btn, SIGNAL(toggled(bool)),
                 this, SLOT(setSelected(bool)));
+
+	pageUi = new Ui::UserNotePage();
+	m_page = new QWidget(this);
+	pageUi->setupUi(m_page);
 }
 
 Note::~Note()
@@ -284,6 +289,11 @@ Note::~Note()
 		m_page = nullptr;
 	}
 	delete ui;
+}
+
+Ui::UserNotePage* Note::getPageUi()
+{
+	return pageUi;
 }
 
 QString Note::getName() const
@@ -319,12 +329,12 @@ void Note::setSelected(bool sel)
         Q_EMIT selected(sel);
 }
 
-QTextBrowser *Note::getPage() const
+QWidget *Note::getPage() const
 {
         return m_page;
 }
 
-void Note::setPage(QTextBrowser *page)
+void Note::setPage(QWidget *page)
 {
         m_page = page;
 }

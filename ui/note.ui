@@ -24,7 +24,7 @@
   </property>
   <property name="maximumSize">
    <size>
-    <width>100</width>
+    <width>115</width>
     <height>130</height>
    </size>
   </property>
@@ -71,13 +71,13 @@
        <number>10</number>
       </property>
       <property name="leftMargin">
-       <number>20</number>
+       <number>30</number>
       </property>
       <property name="topMargin">
        <number>20</number>
       </property>
       <property name="rightMargin">
-       <number>20</number>
+       <number>30</number>
       </property>
       <property name="bottomMargin">
        <number>20</number>
@@ -103,36 +103,43 @@ color: white;</string>
        <widget class="QPushButton" name="btn">
         <property name="minimumSize">
          <size>
-          <width>60</width>
-          <height>60</height>
+          <width>40</width>
+          <height>36</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>60</width>
-          <height>60</height>
+          <width>40</width>
+          <height>36</height>
          </size>
         </property>
         <property name="styleSheet">
          <string notr="true">QPushButton {
 border-width: 0px;
 border-radius: 4px;
-background-color: #4A64FF;
+background-color: transparent;
 }
-
-QPushButton:hover {
-background-color: #4a34ff;
-}
-
-QPushButton:checked {
-background-color: #4a34ff;
-}</string>
+</string>
         </property>
         <property name="text">
          <string/>
         </property>
+        <property name="icon">
+         <iconset resource="../resources/resources.qrc">
+          <normaloff>:/icons/ic_note_unchecked.svg</normaloff>
+          <normalon>:/icons/ic_note_checked.svg</normalon>:/icons/ic_note_unchecked.svg</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>40</width>
+          <height>36</height>
+         </size>
+        </property>
         <property name="checkable">
          <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
         </property>
        </widget>
       </item>
@@ -141,6 +148,8 @@ background-color: #4a34ff;
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../resources/resources.qrc"/>
+ </resources>
  <connections/>
 </ui>
