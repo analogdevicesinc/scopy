@@ -9,12 +9,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1030</width>
+    <width>1061</width>
     <height>799</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+   <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -32,7 +32,11 @@
    <double>1.000000000000000</double>
   </property>
   <property name="styleSheet">
-   <string notr="true">QPushButton
+   <string notr="true">QWidget#dragContainer{
+background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 rgba(0, 0, 0, 40), stop:1 transparent);
+}
+
+QPushButton
 {
   width: 175px;
   height: 30px;
@@ -44,7 +48,6 @@
   background-color: #4a64ff;
   border-radius: 4px;
 
-  
   font-size: 14px;
   font-weight: normal;
   font-style: normal;
@@ -53,13 +56,10 @@
 
 }
 
-
 QPushButton:hover
 {
 	 background-color: #4a34ff;
 }
-
-
 
 QCheckBox::indicator {
   border: 2px solid rgb(74, 100, 255);
@@ -74,13 +74,12 @@ QCheckBox::indicator:checked {
 }
 
 QCheckBox{
-font: bold 16px ;
+text-align: center;
+
 }
 
 QLabel {
-margin-top: 6px;
 background-color: transparent;
-font: bold 16px ;
 }
 
 QScrollBar:horizontal {
@@ -151,22 +150,60 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
           <number>9</number>
          </property>
          <item>
-          <widget class="QLabel" name="label_2">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
+          <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <property name="spacing">
+            <number>0</number>
            </property>
-           <property name="text">
-            <string>Scripting engine </string>
+           <property name="topMargin">
+            <number>0</number>
            </property>
-          </widget>
+           <item>
+            <widget class="QLabel" name="label_2">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">QLabel {
+		font-size: 12px;
+		color: rgba(255, 255, 255, 70);
+	}</string>
+             </property>
+             <property name="text">
+              <string>SCRIPTING ENGINE</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="Line" name="line_2">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>1</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>1</height>
+              </size>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
+             </property>
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
          <item>
           <widget class="QWidget" name="javascriptWidget" native="true">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -261,71 +298,7 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
               <property name="spacing">
                <number>10</number>
               </property>
-              <item row="3" column="1">
-               <widget class="QLabel" name="ValueLabel">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="layoutDirection">
-                 <enum>Qt::LeftToRight</enum>
-                </property>
-                <property name="text">
-                 <string>Value:</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="DeviceLabel">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true"/>
-                </property>
-                <property name="text">
-                 <string>Device</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="2">
-               <widget class="QComboBox" name="AttributeComboBox">
-                <property name="styleSheet">
-                 <string notr="true"/>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0">
-               <widget class="QPushButton" name="ReadButton">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string>Read</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="1">
-               <widget class="QComboBox" name="ChannelComboBox"/>
-              </item>
-              <item row="1" column="1">
-               <widget class="QComboBox" name="DevicecomboBox"/>
-              </item>
-              <item row="2" column="3">
+              <item row="3" column="3">
                <widget class="QLabel" name="FilenameLabel">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -340,11 +313,14 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
                  <string>Filename</string>
                 </property>
                 <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                 <set>Qt::AlignCenter</set>
                 </property>
                </widget>
               </item>
-              <item row="3" column="2">
+              <item row="3" column="1">
+               <widget class="QComboBox" name="ChannelComboBox"/>
+              </item>
+              <item row="5" column="2">
                <widget class="QStackedWidget" name="valueStackedWidget">
                 <property name="enabled">
                  <bool>false</bool>
@@ -368,7 +344,7 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
                  </size>
                 </property>
                 <property name="currentIndex">
-                 <number>1</number>
+                 <number>0</number>
                 </property>
                 <widget class="QWidget" name="page_0">
                  <property name="sizePolicy">
@@ -408,15 +384,28 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
                 </widget>
                </widget>
               </item>
-              <item row="0" column="4">
-               <widget class="QPushButton" name="newWindowButton">
-                <property name="text">
-                 <string>New Window</string>
+              <item row="3" column="2">
+               <widget class="QComboBox" name="AttributeComboBox">
+                <property name="styleSheet">
+                 <string notr="true"/>
                 </property>
                </widget>
               </item>
-              <item row="0" column="0">
-               <widget class="QLabel" name="DeviceSelectionLabel">
+              <item row="3" column="0">
+               <widget class="QPushButton" name="ReadButton">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>Read</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="DeviceLabel">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -427,21 +416,31 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
                  <string notr="true"/>
                 </property>
                 <property name="text">
-                 <string>Device Selection</string>
+                 <string>Device</string>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignCenter</set>
                 </property>
                </widget>
               </item>
-              <item row="3" column="0">
+              <item row="0" column="4">
+               <widget class="QPushButton" name="newWindowButton">
+                <property name="text">
+                 <string>New Window</string>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="0">
                <widget class="QPushButton" name="WriteButton">
                 <property name="text">
                  <string>Write</string>
                 </property>
                </widget>
               </item>
-              <item row="2" column="4">
+              <item row="2" column="1">
+               <widget class="QComboBox" name="DevicecomboBox"/>
+              </item>
+              <item row="3" column="4">
                <widget class="QLineEdit" name="filenameLineEdit">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -469,19 +468,95 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
                 </property>
                </widget>
               </item>
+              <item row="5" column="1">
+               <widget class="QLabel" name="ValueLabel">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="layoutDirection">
+                 <enum>Qt::LeftToRight</enum>
+                </property>
+                <property name="text">
+                 <string>Value:</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="1">
+               <spacer name="verticalSpacer_2">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeType">
+                 <enum>QSizePolicy::Fixed</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>16</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item row="1" column="0" colspan="5">
+               <layout class="QHBoxLayout" name="horizontalLayout_5">
+                <property name="spacing">
+                 <number>0</number>
+                </property>
+                <item>
+                 <widget class="QLabel" name="DeviceSelectionLabel">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">QLabel {
+		font-size: 12px;
+		color: rgba(255, 255, 255, 70);
+	}</string>
+                  </property>
+                  <property name="text">
+                   <string>DEVICE SELECTION</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="Line" name="line_3">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>1</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>16777215</width>
+                    <height>1</height>
+                   </size>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
              </layout>
             </item>
            </layout>
-          </widget>
-         </item>
-         <item>
-          <widget class="Line" name="line_4">
-           <property name="styleSheet">
-            <string notr="true">background-color: rgb(85, 87, 83);</string>
-           </property>
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
           </widget>
          </item>
          <item>
@@ -535,7 +610,7 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
                 </property>
                </widget>
               </item>
-              <item row="4" column="1">
+              <item row="5" column="1">
                <widget class="QLabel" name="addressLabel">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -550,11 +625,11 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
                  <string>Address:</string>
                 </property>
                 <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                 <set>Qt::AlignCenter</set>
                 </property>
                </widget>
               </item>
-              <item row="4" column="3">
+              <item row="5" column="3">
                <widget class="QLabel" name="addressHexLabel">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -565,26 +640,13 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
                 <property name="text">
                  <string>0x0000</string>
                 </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="QComboBox" name="sourceComboBox"/>
-              </item>
-              <item row="0" column="0">
-               <widget class="QLabel" name="regMapSettingsLabel">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string>Register Map Settings</string>
-                </property>
                 <property name="alignment">
                  <set>Qt::AlignCenter</set>
                 </property>
                </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QComboBox" name="sourceComboBox"/>
               </item>
               <item row="2" column="0">
                <widget class="QLabel" name="displayModeLabel">
@@ -602,7 +664,7 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
                 </property>
                </widget>
               </item>
-              <item row="5" column="3">
+              <item row="6" column="3">
                <widget class="QLabel" name="valueHexLabel">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -613,10 +675,16 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
                 <property name="text">
                  <string>&lt;value&gt;</string>
                 </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
                </widget>
               </item>
-              <item row="4" column="2">
+              <item row="5" column="2">
                <widget class="QSpinBox" name="addressSpinBox">
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
                 <property name="prefix">
                  <string>0x</string>
                 </property>
@@ -631,14 +699,14 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
                 </property>
                </widget>
               </item>
-              <item row="4" column="0">
+              <item row="5" column="0">
                <widget class="QPushButton" name="readRegPushButton">
                 <property name="text">
                  <string>Read</string>
                 </property>
                </widget>
               </item>
-              <item row="4" column="4">
+              <item row="5" column="4">
                <widget class="QLabel" name="descriptionLabel">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -649,9 +717,12 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
                 <property name="text">
                  <string>Description:</string>
                 </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
                </widget>
               </item>
-              <item row="5" column="4">
+              <item row="6" column="4">
                <widget class="QLabel" name="defaultValueLabel">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -662,10 +733,16 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
                 <property name="text">
                  <string>Default Value:</string>
                 </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
                </widget>
               </item>
-              <item row="5" column="2">
+              <item row="6" column="2">
                <widget class="QSpinBox" name="valueSpinBox">
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
                 <property name="prefix">
                  <string>0x</string>
                 </property>
@@ -677,24 +754,14 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
                 </property>
                </widget>
               </item>
-              <item row="3" column="0">
-               <widget class="QCheckBox" name="enableAutoReadCheckBox">
-                <property name="layoutDirection">
-                 <enum>Qt::LeftToRight</enum>
-                </property>
-                <property name="text">
-                 <string>Enable AutoRead</string>
-                </property>
-               </widget>
-              </item>
-              <item row="5" column="0">
+              <item row="6" column="0">
                <widget class="QPushButton" name="writeRegPushButton">
                 <property name="text">
                  <string>Write</string>
                 </property>
                </widget>
               </item>
-              <item row="5" column="1">
+              <item row="6" column="1">
                <widget class="QLabel" name="label">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -709,7 +776,7 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
                  <string>Value:</string>
                 </property>
                 <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                 <set>Qt::AlignCenter</set>
                 </property>
                </widget>
               </item>
@@ -729,7 +796,7 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
                 </property>
                </widget>
               </item>
-              <item row="4" column="5">
+              <item row="5" column="5">
                <widget class="QLineEdit" name="descriptionLineEdit">
                 <property name="minimumSize">
                  <size>
@@ -741,6 +808,82 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
                  <bool>true</bool>
                 </property>
                </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QCheckBox" name="enableAutoReadCheckBox">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="layoutDirection">
+                 <enum>Qt::LeftToRight</enum>
+                </property>
+                <property name="text">
+                 <string>Enable AutoRead</string>
+                </property>
+                <property name="checked">
+                 <bool>false</bool>
+                </property>
+                <property name="tristate">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0" colspan="6">
+               <layout class="QHBoxLayout" name="horizontalLayout_3">
+                <property name="spacing">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <item>
+                 <widget class="QLabel" name="regMapSettingsLabel">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">QLabel {
+		font-size: 12px;
+		color: rgba(255, 255, 255, 70);
+	}</string>
+                  </property>
+                  <property name="text">
+                   <string>REGISTER MAP SETTINGS</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="Line" name="line">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>1</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>16777212</width>
+                    <height>1</height>
+                   </size>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </item>
              </layout>
             </item>
