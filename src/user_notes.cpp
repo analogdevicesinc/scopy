@@ -109,7 +109,7 @@ void UserNotes::browse_btn_clicked(bool clicked)
 		QFile f(export_dialog->selectedFiles().at(0));
 		pathToFile = f.fileName();
 		ui->pathLineEdit->setText(pathToFile);
-
+        ui->pathLineEdit->setStyleSheet("");
 	}
 }
 
@@ -119,6 +119,12 @@ void UserNotes::save_btn_clicked(bool clicked)
                 ui->nameLineEdit->setText("Note " +
                                           QString::number(m_note_count));
         }
+
+        if(ui->pathLineEdit->text() == ""){
+            ui->pathLineEdit->setStyleSheet("border: 1px solid red");
+            return;
+        }
+
         auto note = addNote(ui->nameLineEdit->text(),
                             ui->pathLineEdit->text());
 
