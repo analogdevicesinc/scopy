@@ -3791,6 +3791,11 @@ void Oscilloscope::on_btnSettings_clicked(bool checked)
 
 void Oscilloscope::updateGainMode()
 {
+
+	if (current_ch_widget >= nb_channels) {
+		return;
+	}
+
 	QwtInterval hw_input_itv(-2.5, 2.5);
 	QwtInterval plot_vert_itv = plot.axisScaleDiv(
 		QwtAxisId(QwtPlot::yLeft, current_ch_widget)).interval();
