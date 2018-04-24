@@ -44,12 +44,19 @@ DeviceWidget::DeviceWidget(QString uri,
 
 	connect(m_infoPage->forgetDeviceButton(), SIGNAL(clicked(bool)),
 		this, SLOT(forgetDevice_clicked(bool)));
+	connect(m_infoPage->identifyDeviceButton(), SIGNAL(clicked(bool)),
+		this, SLOT(identifyDevice_clicked(bool)));
 }
 
 DeviceWidget::~DeviceWidget()
 {
         delete m_infoPage;
         delete m_ui;
+}
+
+void DeviceWidget::identifyDevice_clicked(bool pressed)
+{
+        Q_EMIT identifyDevice(m_uri);
 }
 
 void DeviceWidget::forgetDevice_clicked(bool pressed)

@@ -52,6 +52,7 @@ public:
         void setUri(QString uri);
 
         QPushButton *forgetDeviceButton();
+        QPushButton *identifyDeviceButton();
         QPushButton *connectButton();
 
         void getDeviceInfo();
