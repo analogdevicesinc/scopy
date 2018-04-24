@@ -33,8 +33,10 @@
 #include "tool.hpp"
 #include "plot_utils.hpp"
 #include "spinbox_a.hpp"
+#include "customPushButton.hpp"
 
 #include <QWidget>
+#include <QQueue>
 
 extern "C" {
 	struct iio_buffer;
@@ -99,7 +101,7 @@ Q_SIGNALS:
 
 private Q_SLOTS:
 	void on_btnToolSettings_toggled(bool checked);
-	void on_btnSettings_pressed();
+	void on_btnSettings_clicked(bool checked);
 	void on_btnSweep_toggled(bool checked);
 	void on_btnMarkers_toggled(bool checked);
 	void on_comboBox_type_currentIndexChanged(const QString&);
@@ -129,6 +131,8 @@ private Q_SLOTS:
 	void on_btnMarkerTable_toggled(bool checked);
 	void onTopValueChanged(double);
 	void onRangeValueChanged(double);
+	void rightMenuFinished(bool opened);	
+	void on_btnExport_clicked();
 
 private:
 	void build_gnuradio_block_chain();
@@ -151,6 +155,9 @@ private:
 
 	QPair<int, int> getGridLayoutPosFromIndex(QGridLayout *layout,
 	                int index) const;
+
+	QQueue<QPair<CustomPushButton *, bool>> menuButtonActions;
+	QList<CustomPushButton *> menuOrder;
 
 private:
 	Ui::SpectrumAnalyzer *ui;
@@ -190,12 +197,19 @@ private:
 
 	gr::top_block_sptr top_block;
 
+	bool marker_menu_opened;
+
 	static std::vector<std::pair<QString,
 	       FftDisplayPlot::MagnitudeType>> mag_types;
 	static std::vector<std::pair<QString,
 	       FftDisplayPlot::AverageType>> avg_types;
 	static std::vector<std::pair<QString, FftWinType>> win_types;
 	static std::vector<QString> markerTypes;
+	void triggerRightMenuToggle(CustomPushButton *btn, bool checked);
+	void toggleRightMenu(CustomPushButton *btn, bool checked);
+	void updateChannelSettingsPanel(unsigned int id);
+	ChannelWidget *getChannelWidgetAt(unsigned int id);
+	void updateMarkerMenu(unsigned int id);
 };
 
 class SpectrumChannel: public QObject

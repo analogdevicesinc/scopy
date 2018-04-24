@@ -30,6 +30,7 @@
 #include <QPushButton>
 #include <QButtonGroup>
 #include <QDebug>
+#include <QFileDialog>
 
 /* Local includes */
 #include "spectrum_analyzer.hpp"
@@ -41,6 +42,7 @@
 #include "hardware_trigger.hpp"
 #include "channel_widget.hpp"
 #include "db_click_buttons.hpp"
+#include "filemanager.h"
 
 /* Generated UI */
 #include "ui_spectrum_analyzer.h"
@@ -111,6 +113,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	searchVisiblePeaks(true),
 	sample_rate(100e6),
 	sample_rate_divider(1),
+	marker_menu_opened(false),
 	bin_sizes({
 	256, 512, 1024, 2048, 4096, 8192, 16384, 32768
 })
@@ -152,10 +155,6 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	// Temporarily disable the delta marker button
 	ui->pushButton_4->hide();
 
-	// Hide general settings and current settings for now
-	ui->btnToolSettings->hide();
-	ui->btnSettings->hide();
-
 	// Hide Single and Preset buttons until functionality is added
 	ui->btnPreset->hide();
 
@@ -186,8 +185,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	ui->comboBox_window->blockSignals(false);
 
-	settings_group->addButton(ui->btnToolSettings);
-	settings_group->addButton(ui->btnSettings);
+	settings_group->addButton(ui->btnToolSettings);;
 	settings_group->addButton(ui->btnSweep);
 	settings_group->addButton(ui->btnMarkers);
 	settings_group->setExclusive(true);
@@ -228,6 +226,8 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 		ch_api.append(new SpectrumChannel_API(this,channel));
 	}
+
+	channels_group->setExclusive(true);
 
 	if (num_adc_channels > 0)
 		channels[crt_channel_id]->widget()->nameButton()->
@@ -311,6 +311,8 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 		}
 	}
 
+	ui->rightMenu->setMaximumWidth(0);
+
 	// Initialize Marker controls
 	ui->hLayout_marker_selector->addWidget(marker_selector);
 
@@ -369,7 +371,6 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	// UI default
 	ui->comboBox_window->setCurrentText("Hamming");
-	ui->stackedWidget->setVisible(false);
 	start_freq->setValue(0);
 	stop_freq->setValue(50e6);
 
@@ -387,11 +388,13 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 		ch->setFftWindow(FftWinType::HAMMING, fft_size);
 	}
 
-
 	api->setObjectName(QString::fromStdString(Filter::tool_name(
 	                           TOOL_SPECTRUM_ANALYZER)));
 	api->load(*settings);
 	api->js_register(engine);
+
+	connect(ui->rightMenu, &MenuAnim::finished, this, &SpectrumAnalyzer::rightMenuFinished);
+	menuOrder.push_back(ui->btnSweep);
 }
 
 SpectrumAnalyzer::~SpectrumAnalyzer()
@@ -429,32 +432,148 @@ void SpectrumAnalyzer::readPreferences() {
 	fft_plot->setVisiblePeakSearch(prefPanel->getSpectrum_visible_peak_search());
 }
 
-void SpectrumAnalyzer::on_btnToolSettings_toggled(bool checked)
+void SpectrumAnalyzer::on_btnExport_clicked()
 {
-	ui->stackedWidget->setCurrentWidget(ui->generalSettings);
-	ui->stackedWidget->setVisible(checked);
+	auto export_dialog( new QFileDialog( this ) );
+	export_dialog->setWindowModality( Qt::WindowModal );
+	export_dialog->setFileMode( QFileDialog::AnyFile );
+	export_dialog->setAcceptMode( QFileDialog::AcceptSave );
+	export_dialog->setNameFilters({"Comma-separated values files (*.csv)",
+					       "Tab-delimited values files (*.txt)"});
+
+	if (export_dialog->exec()) {
+		FileManager fm("Spectrum Analyzer");
+		fm.open(export_dialog->selectedFiles().at(0), FileManager::EXPORT);
+
+		QVector<double> frequency_data;
+		int nr_samples = fft_plot->Curve(0)->data()->size();
+		for (int i = 0; i < nr_samples; ++i) {
+			frequency_data.push_back(fft_plot->Curve(0)->sample(i).x());
+		}
+
+		fm.save(frequency_data, "Frequency(Hz)");
+
+		for (int i = 0; i < channels.size(); ++i) {
+			QVector<double> data;
+			for (int j = 0; j < nr_samples; ++j) {
+				data.push_back(fft_plot->Curve(i)->sample(j).y());
+			}
+			fm.save(data, "Amplitude CH" + QString::number(i + 1) + "(db)");
+		}
+
+		fm.performWrite();
+	}
+
 }
 
-void SpectrumAnalyzer::on_btnSettings_pressed()
+void SpectrumAnalyzer::triggerRightMenuToggle(CustomPushButton *btn, bool checked)
 {
-	QPushButton *btn = static_cast<QPushButton *>(QObject::sender());
-	bool btnStateToBe = !btn->isChecked();
-	settings_group->setExclusive(btnStateToBe);
+	if (ui->rightMenu->animInProgress()) {
+		menuButtonActions.enqueue(
+			QPair<CustomPushButton *, bool>(btn, checked));
+	} else {
+		toggleRightMenu(btn, checked);
+	}
+}
 
-	ui->stackedWidget->setCurrentWidget(ui->channelSettings);
-	ui->stackedWidget->setVisible(btnStateToBe);
+void SpectrumAnalyzer::toggleRightMenu(CustomPushButton *btn, bool checked)
+{
+	int index;
+	bool chSettings = false;
+	int id = -1;
+
+	if (btn != ui->btnSettings && btn != ui->btnToolSettings) {
+		if (!menuOrder.contains(btn)) {
+			menuOrder.push_back(btn);
+		} else {
+			menuOrder.removeOne(btn);
+			menuOrder.push_back(btn);
+		}
+	}
+
+	for (int i = 0; i < channels.size(); ++i) {
+		if (channels.at(i).get()->widget()->menuButton() == btn) {
+			chSettings = true;
+			id = channels.at(i).get()->widget()->id();
+		}
+	}
+	if (!chSettings) {
+		if (btn == ui->btnToolSettings) {
+			index = 1;
+		} else if (btn == ui->btnSweep) {
+			index = 2;
+		} else if (btn == ui->btnMarkers) {
+			index = 3;
+		}
+	} else {
+		index = 0;
+	}
+
+	if (id != -1) {
+		updateChannelSettingsPanel(id);
+	}
+
+	if (marker_menu_opened) {
+		updateMarkerMenu(crt_channel_id);
+	}
+
+	if (!ui->btnToolSettings->isChecked() &&
+			!ui->btnSettings->isChecked()) {
+		ui->btnSettings->setChecked(checked);
+	}
+
+	if (checked) {
+		ui->stackedWidget->setCurrentIndex(index);
+	}
+
+	ui->rightMenu->toggleMenu(checked);
+}
+
+void SpectrumAnalyzer::rightMenuFinished(bool opened)
+{
+	Q_UNUSED(opened)
+
+	while(menuButtonActions.size()) {
+		auto pair = menuButtonActions.dequeue();
+		toggleRightMenu(pair.first, pair.second);
+	}
+}
+
+void SpectrumAnalyzer::on_btnToolSettings_toggled(bool checked)
+{
+	triggerRightMenuToggle(
+		static_cast<CustomPushButton *>(QObject::sender()), checked);
+	if (checked) {
+		ui->btnSettings->setChecked(!checked);
+	}
+}
+
+void SpectrumAnalyzer::on_btnSettings_clicked(bool checked)
+{
+	CustomPushButton *btn = nullptr;
+	if (checked && !menuOrder.isEmpty()) {
+		btn = menuOrder.back();
+		menuOrder.pop_back();
+	} else {
+		btn = static_cast<CustomPushButton *>(
+			settings_group->checkedButton());
+	}
+
+	btn->setChecked(checked);
 }
 
 void SpectrumAnalyzer::on_btnSweep_toggled(bool checked)
 {
-	ui->stackedWidget->setCurrentWidget(ui->sweepSettings);
-	ui->stackedWidget->setVisible(checked);
+	triggerRightMenuToggle(
+		static_cast<CustomPushButton *>(QObject::sender()), checked);
 }
 
 void SpectrumAnalyzer::on_btnMarkers_toggled(bool checked)
 {
-	ui->stackedWidget->setCurrentWidget(ui->markerSettings);
-	ui->stackedWidget->setVisible(checked);
+	marker_menu_opened = checked;
+
+	triggerRightMenuToggle(
+		static_cast<CustomPushButton *>(QObject::sender()), checked);
 }
 
 void SpectrumAnalyzer::runStopToggled(bool checked)
@@ -676,7 +795,16 @@ void SpectrumAnalyzer::on_spinBox_averaging_valueChanged(int n)
 void SpectrumAnalyzer::onChannelSettingsToggled(bool en)
 {
 	ChannelWidget *cw = static_cast<ChannelWidget *>(QObject::sender());
-	channel_sptr sc = channels.at(cw->id());
+
+	triggerRightMenuToggle(
+		static_cast<CustomPushButton *>(cw->menuButton()), en);
+}
+
+void SpectrumAnalyzer::updateChannelSettingsPanel(unsigned int id)
+{
+	channel_sptr sc = channels.at(id);
+
+	ChannelWidget *cw = getChannelWidgetAt(id);
 
 	QString style = QString("border: 2px solid %1").arg(cw->color().name());
 	ui->lineChannelSettingsTitle->setStyleSheet(style);
@@ -701,9 +829,14 @@ void SpectrumAnalyzer::onChannelSettingsToggled(bool en)
 	}
 
 	ui->spinBox_averaging->setValue(sc->averaging());
+}
 
-	ui->stackedWidget->setCurrentWidget(ui->channelSettings);
-	ui->stackedWidget->setVisible(en);
+ChannelWidget * SpectrumAnalyzer::getChannelWidgetAt(unsigned int id)
+{
+	for (int i = 0; i < channels.size(); ++i) {
+		if (channels.at(i).get()->widget()->id() == id)
+			return channels.at(i).get()->widget();
+	}
 }
 
 void SpectrumAnalyzer::onChannelSelected(bool en)
@@ -711,32 +844,42 @@ void SpectrumAnalyzer::onChannelSelected(bool en)
 	ChannelWidget *cw = static_cast<ChannelWidget *>(QObject::sender());
 	int chIdx = cw->id();
 
+	crt_channel_id = chIdx;
+
+	if (marker_menu_opened) {
+		triggerRightMenuToggle(
+			static_cast<CustomPushButton *>(ui->btnMarkers), en);
+	}
+}
+
+void SpectrumAnalyzer::updateMarkerMenu(unsigned int id)
+{
+	ChannelWidget *cw = getChannelWidgetAt(id);
+
 	// Is this if branch required?
 	if (!ui->run_button->isChecked()) {
 		fft_plot->replot();
 	}
 
 	// Update markers settings menu based on current channel
-	if (en) {
+	if (cw->nameButton()->isChecked()) {
 		ui->labelMarkerSettingsTitle->setText(cw->fullName());
 		QString stylesheet = QString("border: 2px solid %1"
-		                            ).arg(cw->color().name());
+					    ).arg(cw->color().name());
 		ui->lineMarkerSettingsTitle->setStyleSheet(stylesheet);
 
 
 		marker_selector->blockSignals(true);
 
-		for (int i = 0; i < fft_plot->markerCount(chIdx); i++) {
+		for (int i = 0; i < fft_plot->markerCount(id); i++) {
 			marker_selector->setButtonChecked(i,
-			                                  fft_plot->markerEnabled(chIdx, i));
+							  fft_plot->markerEnabled(id, i));
 		}
 
 		marker_selector->blockSignals(false);
 
 		updateCrtMrkLblVisibility();
 	}
-
-	crt_channel_id = chIdx;
 }
 
 void SpectrumAnalyzer::onChannelEnabled(bool en)
