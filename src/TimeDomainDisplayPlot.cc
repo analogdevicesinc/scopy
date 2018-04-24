@@ -945,6 +945,80 @@ void TimeDomainDisplayPlot::unregisterReferenceWaveform(QString name)
 	d_nb_ref_curves--;
 }
 
+void TimeDomainDisplayPlot::addPreview(QVector<QVector<double> > curvesToBePreviewed, double reftimebase,
+				       double timebase, double timeposition)
+{
+	d_preview_ydata.resize(curvesToBePreviewed[0].size());
+	for (int i = 0; i < curvesToBePreviewed.size(); ++i) {
+		for (int j = 0; j < curvesToBePreviewed[i].size(); ++j) {
+			d_preview_ydata[j].push_back(curvesToBePreviewed[i][j]);
+		}
+	}
+
+
+	double mid_point_on_screen = (timebase * 8) - ((
+						timebase * 8) - timeposition);
+	double x_axis_step_size = (reftimebase /
+				   (curvesToBePreviewed.size() / xAxisNumDiv()));
+
+	QVector<double> xData;
+	for (int i = -(curvesToBePreviewed.size() / 2); i < (curvesToBePreviewed.size() / 2);
+	     ++i) {
+		xData.push_back(mid_point_on_screen + ((double)i * x_axis_step_size));
+	}
+
+	for (int i = 0; i < curvesToBePreviewed[0].size(); ++i) {
+		QwtPlotCurve *curve = new QwtPlotCurve();
+		curve->setSamples(xData, d_preview_ydata[i]);
+
+		curve->setPen(QPen(Qt::gray));
+		curve->setRenderHint(QwtPlotItem::RenderAntialiased);
+
+		QwtSymbol *symbol = new QwtSymbol(QwtSymbol::NoSymbol, QBrush(Qt::gray),
+						QPen(Qt::gray), QSize(7,7));
+
+		curve->setSymbol(symbol);
+
+		curve->attach(this);
+
+		d_preview_curves.push_back(curve);
+		replot();
+	}
+
+}
+
+void TimeDomainDisplayPlot::clearPreview()
+{
+	for (auto it = d_preview_curves.begin(); it != d_preview_curves.end(); ++it) {
+		(*it)->detach();
+		delete *it;
+	}
+	d_preview_curves.clear();
+}
+
+void TimeDomainDisplayPlot::updatePreview(double reftimebase, double timebase, double timeposition)
+{
+	double mid_point_on_screen = (timebase * 8) - ((
+						timebase * 8) - timeposition);
+	double x_axis_step_size = (reftimebase /
+				   (d_preview_ydata[0].size() / xAxisNumDiv()));
+
+	QVector<double> xData;
+	for (int i = -(d_preview_ydata[0].size() / 2); i < (d_preview_ydata[0].size() / 2);
+	     ++i) {
+		xData.push_back(mid_point_on_screen + ((double)i * x_axis_step_size));
+	}
+
+	for (int i = 0; i < d_preview_curves.size(); ++i) {
+
+		d_preview_curves[i]->setSamples(xData, d_preview_ydata[i]);
+
+		replot();
+	}
+
+
+}
+
 void TimeDomainDisplayPlot::realignReferenceWaveforms(double timebase, double timeposition)
 {
 
