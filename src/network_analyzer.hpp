@@ -28,6 +28,8 @@
 #include "dbgraph.hpp"
 #include "handles_area.hpp"
 #include <QtConcurrentRun>
+#include "customPushButton.hpp"
+#include "scroll_filter.hpp"
 
 
 extern "C" {
@@ -88,6 +90,10 @@ namespace adiscope {
 
         HorizHandlesArea *d_bottomHandlesArea;
 
+        QQueue<QPair<CustomPushButton *, bool>> menuButtonActions;
+
+        MouseWheelWidgetGuard *wheelEventGuard;
+
 		QFuture<void> thd;
 		bool stop;
 
@@ -111,6 +117,9 @@ namespace adiscope {
 				double frequency);
 		void configHwForNetworkAnalyzing();
 
+		void triggerRightMenuToggle(CustomPushButton *btn, bool checked);
+		void toggleRightMenu(CustomPushButton *btn, bool checked);
+
 	private Q_SLOTS:
 		void startStop(bool start);
 		void updateNumSamples();
@@ -120,6 +129,8 @@ namespace adiscope {
         void onVbar2PixelPosChanged(int pos);
         void readPreferences();
         void onGraphIndexChanged(int);
+        void on_btnExport_clicked();
+        void rightMenuFinished(bool opened);
 
 	Q_SIGNALS:
 		void sweepDone();
