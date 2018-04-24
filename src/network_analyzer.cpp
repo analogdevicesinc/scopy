@@ -24,6 +24,7 @@
 #include "osc_adc.h"
 #include "hardware_trigger.hpp"
 #include "ui_network_analyzer.h"
+#include "filemanager.h"
 
 #include <gnuradio/analog/sig_source_c.h>
 #include <gnuradio/analog/sig_source_f.h>
@@ -47,6 +48,7 @@
 
 #include <QDebug>
 #include <QThread>
+#include <QFileDialog>
 
 #include <iio.h>
 
@@ -304,6 +306,20 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
     connect(&m_phaseGraph,SIGNAL(resetZoom()),&m_dBgraph,SLOT(onResetZoom()));
 
     connect(ui->cmb_graphs,SIGNAL(currentIndexChanged(int)),SLOT(onGraphIndexChanged(int)));
+
+    connect(ui->rightMenu, &MenuAnim::finished, this, &NetworkAnalyzer::rightMenuFinished);
+
+    connect(ui->btnSettings, &CustomPushButton::toggled, [=](bool checked){
+            triggerRightMenuToggle(ui->btnSettings, checked);
+    });
+    connect(ui->btnGeneralSettings, &CustomPushButton::toggled, [=](bool checked){
+            triggerRightMenuToggle(ui->btnGeneralSettings, checked);
+    });
+
+    if (!wheelEventGuard)
+            wheelEventGuard = new MouseWheelWidgetGuard(ui->mainWidget);
+    wheelEventGuard->installEventRecursively(ui->mainWidget);
+
 }
 
 NetworkAnalyzer::~NetworkAnalyzer()
@@ -316,6 +332,62 @@ NetworkAnalyzer::~NetworkAnalyzer()
 	delete api;
 
 	delete ui;
+}
+
+void NetworkAnalyzer::triggerRightMenuToggle(CustomPushButton *btn, bool checked)
+{
+	if (ui->rightMenu->animInProgress()) {
+		menuButtonActions.enqueue(
+			QPair<CustomPushButton *, bool>(btn, checked));
+	} else {
+		toggleRightMenu(btn, checked);
+	}
+}
+
+void NetworkAnalyzer::toggleRightMenu(CustomPushButton *btn, bool checked)
+{
+	// index is 0 for settings and 1 for general settings
+	int index = (btn == ui->btnSettings ? 0 : 1);
+
+	if (checked) {
+		ui->stackedWidget_2->setCurrentIndex(index);
+	}
+
+	ui->rightMenu->toggleMenu(checked);
+}
+
+void NetworkAnalyzer::rightMenuFinished(bool opened)
+{
+	Q_UNUSED(opened)
+
+	while(menuButtonActions.size()) {
+		auto pair = menuButtonActions.dequeue();
+		toggleRightMenu(pair.first, pair.second);
+	}
+}
+
+void NetworkAnalyzer::on_btnExport_clicked()
+{
+	auto export_dialog( new QFileDialog( this ) );
+	export_dialog->setWindowModality( Qt::WindowModal );
+	export_dialog->setFileMode( QFileDialog::AnyFile );
+	export_dialog->setAcceptMode( QFileDialog::AcceptSave );
+	export_dialog->setNameFilters({"Comma-separated values files (*.csv)",
+					       "Tab-delimited values files (*.txt)"});
+
+	if (export_dialog->exec()) {
+		FileManager fm("Network Analyzer");
+
+		fm.open(export_dialog->selectedFiles().at(0), FileManager::EXPORT);
+
+		fm.setAdditionalInformation(ui->btnRefChn->isChecked() ? "Reference channel: 1" : "Reference channel: 2");
+
+		fm.save(m_dBgraph.getXAxisData(), "Frequency(Hz)");
+		fm.save(m_dBgraph.getYAxisData(), "Magnitude(dB)");
+		fm.save(m_phaseGraph.getYAxisData(), "Phase(°)");
+
+		fm.performWrite();
+	}
 }
 
 void NetworkAnalyzer::updateNumSamples()
@@ -521,6 +593,7 @@ void NetworkAnalyzer::run()
 				break;
 		} while (!got_it);
 
+
 		iio->stop(id1);
 		iio->stop(id2);
 
@@ -576,6 +649,7 @@ void NetworkAnalyzer::run()
 				 Qt::QueuedConnection,
 				 Q_ARG(double, phase_deg),
 				 Q_ARG(double, mag));
+
 	}
 
 	Q_EMIT sweepDone();
