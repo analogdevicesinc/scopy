@@ -268,7 +268,7 @@ namespace adiscope {
 		QTabWidget *tabWidget;
 		QWidget *ref;
 
-		QVector<QVector<QString>> import_data;
+		QVector<QVector<double>> import_data;
 		QString import_error;
 		ImportSettings *importSettings;
 		bool lastFunctionValid;
@@ -296,6 +296,8 @@ namespace adiscope {
 		PositionSpinButton *timePosition;
 		ScaleSpinButton *voltsPerDiv;
 		PositionSpinButton *voltsPosition;
+
+		ScaleSpinButton *refChannelTimeBase;
 
 		bool fft_is_visible, hist_is_visible, xy_is_visible, autosetRequested;
 		bool statistics_enabled;

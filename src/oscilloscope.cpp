@@ -50,7 +50,7 @@
 #include "customplotpositionbutton.h"
 #include "channel_widget.hpp"
 #include "signal_sample.hpp"
-#include "utils.h"
+#include "filemanager.h"
 
 /* Generated UI */
 #include "ui_channel_settings.h"
@@ -687,21 +687,25 @@ void Oscilloscope::add_ref_waveform(unsigned int chIdx)
 	QVector<double> xData;
 	QVector<double> yData;
 
-	int nr_of_samples_in_file = stoi(import_data[3][1].toStdString());
+	double ref_waveform_timebase = refChannelTimeBase->value();
+
+	int nr_of_samples_in_file = import_data.size();
 
 	double mid_point_on_screen = (timeBase->value() * 8) - ((
-	                                     timeBase->value() * 8) - timePosition->value());
+					     timeBase->value() * 8) - timePosition->value());
 
-	double x_axis_step_size = (std::stod(import_data[6][1].toStdString()) -
-	                           std::stod(import_data[5][1].toStdString()));
+	double x_axis_step_size = (ref_waveform_timebase /
+				   (nr_of_samples_in_file / plot.xAxisNumDiv()));
 
 	for (int i = -(nr_of_samples_in_file / 2); i < (nr_of_samples_in_file / 2);
 	     ++i) {
 		xData.push_back(mid_point_on_screen + ((double)i * x_axis_step_size));
 	}
 
-	for (int i = 5; i < import_data.size(); ++i) {
-		yData.push_back(std::stod(import_data[i][chIdx].toStdString()));
+	if (!refChannelTimeBase->isEnabled()) chIdx++;
+
+	for (int i = 0; i < import_data.size(); ++i) {
+		yData.push_back(import_data[i][chIdx]);
 	}
 
 	plot.registerReferenceWaveform(qname, xData, yData);
@@ -1283,8 +1287,24 @@ void Oscilloscope::create_add_channel_panel()
 	btnOpenFile->setText("Browse");
 	layout_file_select->addWidget(btnOpenFile);
 
+	refChannelTimeBase = new ScaleSpinButton({
+				{"ns", 1E-9},
+				{"μs", 1E-6},
+				{"ms", 1E-3},
+				{"s", 1E0}
+				}, "Time Base", 100e-9, 1E0,
+				true, false, this);
+
+	refChannelTimeBase->setValue(1e-3);
+	refChannelTimeBase->setDisabled(true);
+
+	connect(refChannelTimeBase, &ScaleSpinButton::valueChanged, [=](double value){
+		plot.updatePreview(value, timeBase->value(), timePosition->value());
+	});
+
 	layout_ref->addWidget(file_select);
 	layout_ref->addWidget(importSettings);
+	layout_ref->addWidget(refChannelTimeBase);
 	layout_ref->addSpacerItem(spacerItem);
 
 
@@ -1314,10 +1334,19 @@ void Oscilloscope::create_add_channel_panel()
 
 			for (int key : import_map.keys()) {
 				if (import_map[key]) {
-					add_ref_waveform(key + 2);
+					add_ref_waveform(key);
 				}
 			}
-
+			plot.clearPreview();
+			ChannelWidget *cw = channelWidgetAtId(nb_channels + nb_math_channels +
+							      nb_ref_channels - 1);
+			triggerRightMenuToggle(ui->btnAddMath, false);
+			cw->menuButton()->setChecked(true);
+			refChannelTimeBase->setDisabled(true);
+			fileLineEdit->setText("");
+			fileLineEdit->setToolTip("");
+			importSettings->setEnabled(false);
+			btn->setDisabled(true);
 			return;
 		}
 
@@ -1332,19 +1361,14 @@ void Oscilloscope::create_add_channel_panel()
 	});
 
 	connect(this, &Oscilloscope::importFileLoaded, [=](bool loaded) {
-		if (loaded) {
-			btn->setEnabled(true);
-			importSettings->setEnabled(true);
+			btn->setEnabled(loaded);
+			importSettings->setEnabled(loaded);
 			fileLineEdit->setText(import_error);
-			fileLineEdit->setToolTip(import_error);
-		} else {
-			btn->setEnabled(false);
-			importSettings->setEnabled(false);
-			fileLineEdit->setText(import_error);
-			fileLineEdit->setToolTip("");
-		}
+			fileLineEdit->setToolTip(loaded ? import_error : "");
+			if (!loaded) {
+				importSettings->clear();
+			}
 	});
-
 
 	int panel_id = ui->stackedWidget->insertWidget(-1, panel);
 	ui->btnAddMath->setProperty("id", QVariant(-panel_id));
@@ -1354,64 +1378,49 @@ void Oscilloscope::import()
 {
 	QString fileName = QFileDialog::getOpenFileName(this,
 	                   tr("Open import file"), "",
-	                   tr("Import file (*.csv)"));
+			   tr({"Comma-separated values files (*.csv);;"
+			       "Tab-delimited values files (*.txt)"}));
 
-	if (fileName.isEmpty()) {
-		import_error = "No file selected";
-		Q_EMIT importFileLoaded(false);
-	} else {
-		QFile file(fileName);
+	FileManager fm("Oscilloscope");
 
-		if (!file.open(QIODevice::ReadOnly)) {
-			import_error = "Can't open selected file";
-			Q_EMIT importFileLoaded(false);
-			importSettings->clear();
+	importSettings->clear();
+	import_data.clear();
+
+	try {
+		fm.open(fileName, FileManager::IMPORT);
+
+		double nrOfSamples = fm.getNrOfSamples();
+		double sampRate = fm.getSampleRate();
+		double timeBase = (nrOfSamples / 16.0) / sampRate;
+
+		if (fm.getFormat() == FileManager::RAW) {
+			refChannelTimeBase->setEnabled(true);
 		} else {
-			QTextStream in(&file);
-
-			for (int i = 0; i < import_data.size(); ++i) {
-				import_data[i].clear();
-			}
-
-			import_data.clear();
-			importSettings->clear();
-
-			while (!in.atEnd()) {
-				QVector<QString> line_data;
-				QString line = in.readLine();
-				QStringList list = line.split(",", QString::SkipEmptyParts);
-
-				for (QString list_item : list) {
-					line_data.push_back(list_item);
-				}
-
-				import_data.push_back(line_data);
-			}
-
-			//Check if the file is exported from Scopy
-			if (import_data.size() < 3) {
-				import_error = "File not formatted properly";
-				Q_EMIT importFileLoaded(false);
-				importSettings->clear();
-			} else if (import_data[0][0] != "Scopy Version:"
-			           || import_data[1][0] != "Device:"
-			           || import_data[2][0] != "Generated on:") {
-				import_error = "File not formatted properly";
-				Q_EMIT importFileLoaded(false);
-				importSettings->clear();
-			} else {
-				//Find the actuall channels to import
-				import_error = fileName;
-				Q_EMIT importFileLoaded(true);
-
-				for (int i = 2; i < import_data[4].size(); ++i) {
-					importSettings->addChannel(i - 2, import_data[4][i].remove("(V)"));
-				}
-
-			}
+			refChannelTimeBase->setEnabled(false);
+			refChannelTimeBase->setValue(timeBase);
 		}
-	}
 
+		QVector<QVector<double>> data = fm.read();
+		for (int i = 0; i < data.size(); ++i) {
+			import_data.push_back(data[i]);
+		}
+
+		import_error = fileName;
+		Q_EMIT importFileLoaded(true);
+
+		for (int i = 0; i < fm.getNrOfChannels(); ++i) {
+			importSettings->addChannel(i, fm.getColumnName(i).remove("(V)"));
+		}
+
+		if (refChannelTimeBase->isEnabled()) {
+			plot.addPreview(import_data, refChannelTimeBase->value(),
+					this->timeBase->value(), timePosition->value());
+		}
+
+	} catch (FileManagerException &ex) {
+		import_error = QString(ex.what());
+		Q_EMIT importFileLoaded(false);
+	}
 }
 
 unsigned int Oscilloscope::find_curve_number()
