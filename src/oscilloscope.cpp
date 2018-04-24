@@ -1192,55 +1192,32 @@ void Oscilloscope::btnExport_clicked(){
 	}
 
 	if (export_dialog->exec()){
-		QString filter = export_dialog->selectedNameFilter();
-		QFile f(export_dialog->selectedFiles().at(0));
-		f.open(QIODevice::WriteOnly);
-		QTextStream outputStream(&f);
-		QString separator = "";
-		if (filter.contains(".txt")){
-			separator += "\t";
-		} else if (filter.contains(".csv")){
-			separator += ",";
+		FileManager fm("Oscilloscope");
+		fm.open(export_dialog->selectedFiles().at(0), FileManager::EXPORT);
+
+		int channels_number = nb_channels + nb_math_channels;
+		QVector<double> time_data;
+
+		for (int i = 0; i < plot.Curve(0)->data()->size(); ++i) {
+			time_data.push_back(plot.Curve(0)->sample(i).x());
 		}
 
-		//write header data
-		outputStream << "Scopy Version:" << separator << QString(SCOPY_VERSION_GIT) << "\n";
-		//TO DO: add more details for the device
-		outputStream << "Device:" << separator << "M2K" << "\n";
-		outputStream << "Generated on:" << separator << QDate::currentDate().toString("dddd MMMM dd/MM/yyyy") << "\n";
-		//get nr of samples
-		int samples = plot.Curve(0)->data()->size();
-		outputStream << "Nr of samples:" << separator << QString::number(samples) << "\n";
+		fm.save(time_data, "Time(S)");
 
-		outputStream << "Sample" << separator;
-		outputStream << "Time(s)" << separator;
-		int channels_number = nb_channels + nb_math_channels;
 		for (int i = 0; i < channels_number; ++i){
 			if (exportConfig[i]){
+				QVector<double> data;
+				int samples = plot.Curve(i)->data()->size();
+				for (int j = 0; j < samples; ++j)
+					data.push_back(plot.Curve(i)->data()->sample(j).y());
 				QString chNo = (i > 1) ? QString::number(i - 1) : QString::number(i + 1);
-				outputStream << ((i > 1) ? "Math" : "Channel") + chNo + "(V)"
-					<< ((i == channels_number - 1) ? "\n" : separator);
-			} else {
-				if (i == channels_number - 1){
-					outputStream << "\n";
-				}
+
+				fm.save(data, ((i > 1) ? "M" : "CH") + chNo + "(V)");
 			}
 		}
-		for (int i = 0; i < samples; ++i){
-			outputStream << QString::number(i) << separator;
-			outputStream << plot.Curve(0)->data()->sample(i).x() << separator;
-			for (int j = 0; j < channels_number; ++j){
-				if (exportConfig[j]){
-					outputStream << plot.Curve(j)->data()->sample(i).y()
-					<< ((j == channels_number - 1) ? "\n" : separator);
-				} else {
-					if (j == channels_number - 1){
-						outputStream << "\n";
-					}
-				}
-			}
-		}
-		f.close();
+
+		fm.setSampleRate(active_sample_rate);
+		fm.performWrite();
 	}
 	pause(false);
 }
