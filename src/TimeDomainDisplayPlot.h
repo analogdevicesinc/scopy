@@ -119,6 +119,9 @@ public:
 
   void registerReferenceWaveform(QString name, QVector<double> xData, QVector<double> yData);
   void unregisterReferenceWaveform(QString name);
+  void addPreview(QVector<QVector<double>> curvesToBePreviewed, double reftimebase,
+                  double timebase, double timeposition);
+  void clearPreview();
   void realignReferenceWaveforms(double timebase, double timeposition);
 
 Q_SIGNALS:
@@ -165,6 +168,8 @@ public Q_SLOTS:
   void resetXaxisOnNextReceivedData();
   void hideCurvesUntilNewData();
 
+  void updatePreview(double reftimebase, double timebase, double timeposition);
+
 protected:
   virtual void configureAxis(int axisPos, int axisIdx);
   virtual void cleanUpJustBeforeChannelRemoval(int chnIdx);
@@ -176,7 +181,9 @@ protected:
   std::vector<double*> d_ydata;
   std::vector<double*> d_xdata;
   std::vector<double*> d_ref_ydata;
-
+  QVector<QVector<double>> d_preview_xdata;
+  QVector<QVector<double>> d_preview_ydata;
+  QVector<QwtPlotCurve *> d_preview_curves;
   bool isReferenceWaveform(QwtPlotCurve *curve);
   int countReferenceWaveform(int position);
 
