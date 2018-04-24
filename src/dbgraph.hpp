@@ -79,6 +79,9 @@ namespace adiscope {
 
 	void toggleCursors(bool);
 	QString cursorIntersection(qreal text);
+	QVector<double> getXAxisData();
+	QVector<double> getYAxisData();
+
 Q_SIGNALS:
 	void VBar1PixelPosChanged(int);
 	void VBar2PixelPosChanged(int);
