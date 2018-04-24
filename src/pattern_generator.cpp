@@ -148,13 +148,12 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 	pgSettings(new Ui::PGSettings),
 	cgSettings(new Ui::PGCGSettings),
 	txbuf(0), buffer_created(0), currentUI(nullptr), offline_mode(offline_mode_),
-	diom(diom), suppressCGSettingsUpdate(false)
+	diom(diom), suppressCGSettingsUpdate(false), no_channels(16), selected_channel_group(0), dev(nullptr)
 {
 	// IIO
 	if (!offline_mode) {
 		dev = filt->find_device(ctx,TOOL_PATTERN_GENERATOR);
 		this->no_channels = iio_device_get_channels_count(dev);
-
 	}
 
 	// UI

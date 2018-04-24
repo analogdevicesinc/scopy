@@ -26,13 +26,13 @@ using namespace adiscope;
 
 SpectrumMarker::SpectrumMarker(const QString &title, bool movable) :
 	QwtPlotMarker(title), m_xAxis(QwtPlot::xBottom),
-	m_yAxis(QwtPlot::yLeft), m_movable(movable)
+	m_yAxis(QwtPlot::yLeft), m_movable(movable), m_selected(false)
 {
 }
 
 SpectrumMarker::SpectrumMarker(const QString &title, QwtAxisId xAxis,
 	QwtAxisId yAxis, bool movable) :
-	QwtPlotMarker(title), m_xAxis(xAxis), m_yAxis(yAxis), m_movable(movable)
+	QwtPlotMarker(title), m_xAxis(xAxis), m_yAxis(yAxis), m_movable(movable), m_selected(false)
 {
 }
 

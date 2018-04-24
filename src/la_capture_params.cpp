@@ -23,10 +23,12 @@
 #include <QtGlobal>
 
 LogicAnalyzerSymmetricBufferMode::LogicAnalyzerSymmetricBufferMode() :
+	m_maxSampleRate(100000000),
 	m_entireBufferMaxSize(0),
 	m_triggerBufferMaxSize(0),
 	m_timeBase(0.0),
 	m_triggerPos(0.0),
+	m_timeDivsCount(10),
 	m_sampleRate(0.0),
 	m_triggPosSR(0.0),
 	m_visibleBufferSize(0),
@@ -52,6 +54,7 @@ LogicAnalyzerSymmetricBufferMode::captureParameters() const
 	params.sampleRate = sampleRate;
 	params.timePos = m_triggerPos;
 	params.triggerBufferSize = m_triggerBufferSize;
+	params.maxBufferSize = m_triggerBufferSize;
 
 	return params;
 }

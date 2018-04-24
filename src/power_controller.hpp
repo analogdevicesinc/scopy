@@ -80,7 +80,6 @@ namespace adiscope {
 		bool in_sync;
 		QList<long long> averageVoltageCh1;
 		QList<long long> averageVoltageCh2;
-
 		QMap<QString, double> calibrationParam;
 
 		void showEvent(QShowEvent *event);

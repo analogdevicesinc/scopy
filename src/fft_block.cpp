@@ -62,7 +62,7 @@ fft_block::~fft_block()
 {
 }
 
-bool fft_block::set_window(const std::vector<float>& window)
+void fft_block::set_window(const std::vector<float>& window)
 {
 	if (d_complex) {
 		boost::dynamic_pointer_cast<fft::fft_vcc>(d_fft)->set_window(window);

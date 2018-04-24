@@ -255,13 +255,13 @@ void AnalogBufferPreviewer::buildFullWaveform(QPointF *wavePoints, int numPts)
  */
 
 DigitalBufferPreviewer::DigitalBufferPreviewer(QWidget *parent):
-	BufferPreviewer(parent)
+	BufferPreviewer(parent), m_noOfSteps(0)
 {
 }
 
 DigitalBufferPreviewer::DigitalBufferPreviewer(int pixelsPerPeriod,
 	QWidget *parent):
-	BufferPreviewer(pixelsPerPeriod, M_PI / 2, parent)
+	BufferPreviewer(pixelsPerPeriod, M_PI / 2, parent), m_noOfSteps(0)
 {
 }
 

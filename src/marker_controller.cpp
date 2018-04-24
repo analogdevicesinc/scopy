@@ -19,7 +19,8 @@ MarkerController::MarkerController(QwtPlot *plot):
 	QObject(static_cast<QObject *>(plot)),
 	d_picker(new QwtPlotPicker(plot->canvas())),
 	d_picked_mrk(nullptr),
-	d_item_moving(nullptr)
+	d_item_moving(nullptr),
+	d_mrks_default_z(0.0)
 {
 	d_picker->setStateMachine(new QwtPickerDragPointMachine);
 	connect(d_picker, SIGNAL(selected(QPointF)),

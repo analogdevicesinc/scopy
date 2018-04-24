@@ -62,7 +62,7 @@ void PatternGeneratorChannel::setOutputMode(bool value)
 PatternGeneratorChannel::PatternGeneratorChannel(uint16_t id_,
                 std::string label_) : Channel(id_,label_),
 
-	ch_thickness(1.0)
+	ch_thickness(1.0), outputMode(0)
 {}
 
 qreal PatternGeneratorChannel::getCh_thickness() const
@@ -78,12 +78,16 @@ void PatternGeneratorChannel::setCh_thickness(const qreal value)
 PatternGeneratorChannelUI::PatternGeneratorChannelUI(PatternGeneratorChannel
                 *ch, PatternGeneratorChannelGroup *chg, PatternGeneratorChannelGroupUI *chgui,
                 PatternGeneratorChannelManagerUI *managerUi, QWidget *parent) : ChannelUI(ch,
-	                                parent), managerUi(managerUi), chg(chg),chgui(chgui)
+					parent), managerUi(managerUi), chg(chg),chgui(chgui)
 {
 	this->ch = ch;
 	ui = new Ui::PGChannelGroup();
 	setAcceptDrops(true);
 	this->installEventFilter(this);
+	botSep = nullptr;
+	topSep = nullptr;
+	traceOffset = 0;
+	traceHeight = 0;
 }
 
 void PatternGeneratorChannelUI::setTrace(
@@ -478,7 +482,8 @@ const
 
 PatternGeneratorChannelGroupUI::PatternGeneratorChannelGroupUI(
         PatternGeneratorChannelGroup *chg, PatternGeneratorChannelManagerUI *managerUi,
-        QWidget *parent) : ChannelGroupUI(chg,parent), managerUi(managerUi)
+	QWidget *parent) : ChannelGroupUI(chg,parent), managerUi(managerUi),
+	traceOffset(0), traceHeight(0), topSep(nullptr), botSep(nullptr), chUiSep(nullptr)
 {
 	this->chg = chg;
 	checked = false;
@@ -874,25 +879,22 @@ void PatternGeneratorChannelGroupUI::setupUARTDecoder()
 		ids.push_back(chg->get_channel(i)->get_id());
 	}
 
+	UARTPattern* uart = dynamic_cast<UARTPattern *>(getChannelGroup()->pattern);
+	if(uart==nullptr)
+		return;
+
 	auto chMap = setupDecoder("uart",ids);
 
 	auto uartdecoderstack = decodeTrace->decoder()->stack();
 	auto uartdecoder = decodeTrace->decoder()->stack().front();
 
 	uartdecoder->set_option("baudrate",
-	                        g_variant_new_int64(dynamic_cast<UARTPattern *>
-	                                        (getChannelGroup()->pattern)->get_baud_rate()));
+				g_variant_new_int64(uart->get_baud_rate()));
 	uartdecoder->set_option("num_data_bits",g_variant_new_int64(8));
-	GVariant *parityStr;
-	auto par = dynamic_cast<UARTPattern *>
-	           (getChannelGroup()->pattern)->get_parity();
+	GVariant *parityStr = g_variant_new_string("none");;
+	auto par = uart->get_parity();
 
 	switch (par) {
-
-	case UARTPattern::SP_PARITY_NONE:
-		parityStr = g_variant_new_string("none");
-		uartdecoder->set_option("parity_check",g_variant_new_string("no"));
-		break;
 
 	case UARTPattern::SP_PARITY_ODD:
 		parityStr = g_variant_new_string("odd");
@@ -909,12 +911,18 @@ void PatternGeneratorChannelGroupUI::setupUARTDecoder()
 	case UARTPattern::SP_PARITY_SPACE:
 		parityStr = g_variant_new_string("space");
 		break;
+
+	case UARTPattern::SP_PARITY_NONE:
+	default:
+		parityStr = g_variant_new_string("none");
+		uartdecoder->set_option("parity_check",g_variant_new_string("no"));
+		break;
+
 	}
 
 	uartdecoder->set_option("parity_type",parityStr);
 	uartdecoder->set_option("num_stop_bits",
-	                        g_variant_new_double(dynamic_cast<UARTPattern *>
-	                                        (getChannelGroup()->pattern)->get_stop_bits()));
+				g_variant_new_double(uart->get_stop_bits()));
 
 	// Add the decoder rows
 
@@ -963,6 +971,10 @@ void PatternGeneratorChannelGroupUI::setupSPIDecoder()
 		auto chMap = setupDecoder("spi",ids);
 		auto spidecoder = decodeTrace->decoder()->stack().front();
 		auto spipattern = dynamic_cast<SPIPattern *>(getChannelGroup()->pattern);
+
+		if(spipattern == nullptr)
+			return;
+
 		GVariant *cspolstr, *bitorderstr;
 
 		if (spipattern->getCSPol()) {
@@ -1502,6 +1514,7 @@ PatternGeneratorChannelManagerUI::PatternGeneratorChannelManagerUI(
 	this->pg = pg;
 	disabledShown = true;
 	channelManagerHeaderWiget = nullptr;
+	chmHeader = nullptr;
 	hoverWidget = nullptr;
 	chm->highlightChannel(chm->get_channel_group(0));
 	ui->scrollAreaWidgetContents->installEventFilter(this);
@@ -1565,8 +1578,13 @@ void PatternGeneratorChannelManagerUI::updateUi()
 
 	main_win->view_->remove_trace_clones();
 
+	if(channelManagerHeaderWiget)
+		channelManagerHeaderWiget->deleteLater();
+	if(chmHeader)
+		delete chmHeader;
+
 	channelManagerHeaderWiget = new QWidget(ui->chmHeaderSlot);
-	Ui::PGChannelManagerHeader *chmHeader = new Ui::PGChannelManagerHeader();
+	chmHeader = new Ui::PGChannelManagerHeader();
 	chmHeader->setupUi(channelManagerHeaderWiget);
 	ui->chmHeaderSlotLayout->addWidget(channelManagerHeaderWiget);
 

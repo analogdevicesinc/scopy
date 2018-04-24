@@ -61,9 +61,7 @@ class DigitalIoGroup : public QWidget
 	Q_OBJECT
 	int nr_of_channels;
 	int ch_mask;
-	int channels;
 	int io_mask;
-	int mode;
 	DigitalIO *dio;
 public:
 	DigitalIoGroup(QString label, int ch_mask, int io_mask, DigitalIO *dio,

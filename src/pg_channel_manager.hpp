@@ -246,6 +246,7 @@ class PatternGeneratorChannelManagerUI : public QWidget
 	Q_OBJECT
 	QWidget *settingsWidget; // pointer to settingspage in stacked widget in main pg ui
 	QWidget *channelManagerHeaderWiget;
+	Ui::PGChannelManagerHeader *chmHeader;
 
 	bool disabledShown;
 	Ui::PGCGSettings *cgSettings;

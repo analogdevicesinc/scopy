@@ -20,7 +20,7 @@ public Q_SLOTS:
 private:
 	QScroller *scroll;
 	bool inside;
-	QScrollBar *bar;
+	//QScrollBar *bar;
 	bool disableCursor;
 };
 }

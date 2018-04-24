@@ -99,6 +99,10 @@ FftDisplayPlot::FftDisplayPlot(int nplots, QWidget *parent) :
 	y_scale_factor.resize(nplots);
 	d_ch_avg_obj.resize(nplots);
 
+	m_sweepStart = 0;
+	m_sweepStop = 1000;
+	d_magType = MagnitudeType::DBFS;
+
 	d_numPoints = 1024;
 	x_data = new double[d_numPoints];
 
@@ -334,7 +338,6 @@ void FftDisplayPlot::averageDataAndComputeMagnitude(std::vector<double *>
 
 		switch (d_ch_average_type[i]) {
 		case LINEAR_DB:
-			needs_dB_avg = true;
 		case EXPONENTIAL_DB:
 			needs_dB_avg = true;
 		case SAMPLE:
@@ -988,7 +991,7 @@ void FftDisplayPlot::onMrkCtrlMarkerSelected(std::shared_ptr<SpectrumMarker>
 void FftDisplayPlot::onMrkCtrlMarkerPosChanged(std::shared_ptr<SpectrumMarker>
 	marker)
 {
-	int markerPos;
+	int markerPos = 0;
 	uint chn = -1;
 
 	for (uint i = 0; i < d_nplots; i++) {
@@ -1034,7 +1037,7 @@ void FftDisplayPlot::onMrkCtrlMarkerPosChanged(std::shared_ptr<SpectrumMarker>
 void FftDisplayPlot::onMrkCtrlMarkerReleased(std::shared_ptr<SpectrumMarker>
 	marker)
 {
-	int markerPos;
+	int markerPos = -1;
 	uint chn = -1;
 
 	for (uint i = 0; i < d_nplots; i++) {

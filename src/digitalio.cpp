@@ -51,6 +51,7 @@ DigitalIoGroup::DigitalIoGroup(QString label, int ch_mask,int io_mask,
 
 	auto ch_mask_temp = ch_mask;
 	auto j=0;
+	nr_of_channels = 0;
 
 	while (ch_mask_temp) {
 		if (ch_mask_temp&0x01) {

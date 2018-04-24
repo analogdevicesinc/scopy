@@ -302,7 +302,7 @@ class SpectrumMarker_API :public ApiObject
 	int m_type;
 public:
 	explicit SpectrumMarker_API(SpectrumAnalyzer *sp,int chid, int mkid) :
-		ApiObject(), sp(sp), m_mkid(mkid), m_chid(chid) {}
+		ApiObject(), sp(sp), m_mkid(mkid), m_chid(chid), m_type(0) {}
 	~SpectrumMarker_API() {}
 
 	int chId();

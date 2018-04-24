@@ -84,7 +84,7 @@ public:
 
 	~ManualCalibration();
 
-	int startCalibration();
+	void startCalibration();
 	void setCalibration(Calibration *cal);
 
 private:

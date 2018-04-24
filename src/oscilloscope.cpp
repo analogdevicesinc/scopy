@@ -4048,7 +4048,7 @@ void Oscilloscope_API::setStatistics(bool en)
 
 bool Oscilloscope_API::horizontalCursors() const
 {
-	osc->cr_ui->hCursorsEnable->isChecked();
+	return osc->cr_ui->hCursorsEnable->isChecked();
 }
 
 void Oscilloscope_API::setHorizontalCursors(bool en)
@@ -4058,7 +4058,7 @@ void Oscilloscope_API::setHorizontalCursors(bool en)
 
 bool Oscilloscope_API::verticalCursors() const
 {
-	osc->cr_ui->vCursorsEnable->isChecked();
+	return osc->cr_ui->vCursorsEnable->isChecked();
 }
 
 void Oscilloscope_API::setVerticalCursors(bool en)
@@ -4514,6 +4514,8 @@ void Channel_API::setChannelEn(bool en)
 double Channel_API::getVoltsPerDiv() const
 {
 	int index = osc->channels_api.indexOf(const_cast<Channel_API*>(this));
+	if(index<0)
+		return 1.0;
 	return osc->plot.VertUnitsPerDiv(index);
 }
 
@@ -4590,6 +4592,8 @@ bool Channel_API::getAcCoupling() const
 void Channel_API::setAcCoupling(bool val)
 {
 	int index = osc->channels_api.indexOf(const_cast<Channel_API*>(this));
+	if(index < 0)
+		return;
 	if (osc->current_channel == index) {
 		osc->ch_ui->btnCoupled->setChecked(val);
 	} else {

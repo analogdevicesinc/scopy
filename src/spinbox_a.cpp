@@ -701,7 +701,12 @@ void PositionSpinButton::stepDown()
 
 PhaseSpinButton::PhaseSpinButton(QWidget *parent) : SpinBoxA(parent),
 	m_fine_increment(1),
-	m_inSeconds(false)
+	m_inSeconds(false),
+	m_indexValue(0),
+	m_step(15),
+	m_secondsValue(0),
+	m_scale(1),
+	m_frequency(1)
 {
 	ui->SBA_CompletionCircle->setIsLogScale(false);
 	ui->SBA_CompletionCircle->setOrigin(0);
@@ -716,7 +721,10 @@ PhaseSpinButton::PhaseSpinButton(std::vector<std::pair<QString, double> > units,
 	         hasProgressWidget, invertCircle, parent),
 	m_fine_increment(1),
 	m_inSeconds(false),
-	m_indexValue(0)
+	m_indexValue(0),
+	m_step(15),
+	m_secondsValue(0),
+	m_scale(1)
 {
 	ui->SBA_CompletionCircle->setIsLogScale(false);
 	setMinValue(min_value);

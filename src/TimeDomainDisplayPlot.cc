@@ -884,6 +884,7 @@ int TimeDomainDisplayPlot::countReferenceWaveform(int position)
 		} else if (isReferenceWaveform(d_plot_curve[i])) {
 			count++;
 		}
+	return count;
 }
 
 void TimeDomainDisplayPlot::registerReferenceWaveform(QString name, QVector<double> xData, QVector<double> yData)

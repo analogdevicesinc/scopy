@@ -1913,7 +1913,7 @@ void LogicAnalyzer_API::setExternalTrigger(bool en)
 
 bool LogicAnalyzer_API::cursorsActive() const
 {
-	lga->ui->boxCursors->isChecked();
+	return lga->ui->boxCursors->isChecked();
 }
 
 void LogicAnalyzer_API::setCursorsActive(bool en)
@@ -1923,7 +1923,7 @@ void LogicAnalyzer_API::setCursorsActive(bool en)
 
 bool LogicAnalyzer_API::cursorsLocked() const
 {
-	lga->ui->btnCursorsLock->isChecked();
+	return lga->ui->btnCursorsLock->isChecked();
 }
 
 void LogicAnalyzer_API::setCursorsLocked(bool en)

@@ -163,7 +163,6 @@ private:
 	// IIO
 
 	struct iio_device *dev;
-	struct iio_device *channel_manager_dev;
 	struct iio_buffer *txbuf;
 	DIOManager *diom;
 

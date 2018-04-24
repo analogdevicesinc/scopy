@@ -256,15 +256,12 @@ void M2kAdc::apply_m2k_fixes()
 	struct iio_device *dev = iio_context_find_device(iio_context(),
 		"ad9963");
 
-	int config1;
-	int config2;
+	int config1 = 0x05;
+	int config2 = 0x05;
 
 	if (hw_rev == "A") {
 		config1 = 0x1B; // IGAIN1 +-6db  0.25db steps
 		config2 = 0x1B;
-	} else if (hw_rev != "A") {
-		config1 = 0x05;
-		config2 = 0x05;
 	}
 
 	/* Configure TX path */

@@ -672,7 +672,7 @@ void CapturePlot::enableLabels(bool enabled)
 	enableColoredLabels(enabled);
 }
 
-bool CapturePlot::enableAxisLabels(bool enabled)
+void CapturePlot::enableAxisLabels(bool enabled)
 {
 	enableAxis(QwtPlot::xBottom, enabled);
 	if (!enabled) {
@@ -702,7 +702,7 @@ bool CapturePlot::labelsEnabled()
 	return d_labelsEnabled;
 }
 
-bool CapturePlot::setActiveVertAxis(unsigned int axisIdx, bool selected)
+void CapturePlot::setActiveVertAxis(unsigned int axisIdx, bool selected)
 {
 	DisplayPlot::setActiveVertAxis(axisIdx, selected);
 	updateHandleAreaPadding(d_labelsEnabled);

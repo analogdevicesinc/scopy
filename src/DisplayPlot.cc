@@ -318,7 +318,7 @@ void OscPlotZoomer::rescale()
  * PlotAxisConfiguration
  */
 PlotAxisConfiguration::PlotAxisConfiguration(int axisPos, int axisIdx, DisplayPlot *plot):
-	d_axis(QwtAxisId(axisPos, axisIdx)), d_plot(plot)
+	d_axis(QwtAxisId(axisPos, axisIdx)), d_plot(plot), d_hoverCursorShape(Qt::ArrowCursor)
 {
 	Qt::CursorShape shape;
 
@@ -920,9 +920,9 @@ void DisplayPlot::zoomBaseUpdate()
 
 void DisplayPlot::AddAxisOffset(int axisPos, int axisIdx, double offset)
 {
-	double min;
-	double max;
-	double ptsPerDiv;
+	double min = 0;
+	double max = 1;
+	double ptsPerDiv = 1;
 
 	switch (axisPos) {
 	case QwtPlot::yLeft:

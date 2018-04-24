@@ -21,6 +21,11 @@ GenericDac::GenericDac(struct iio_context *ctx, struct iio_device *dac_dev):
 		m_dac_bits = iio_channel_get_data_format(
 			m_dac_channels[0])->bits;
 	}
+	setVOutH(5.0);
+	setVOutL(-5.0);
+	setMaxNumberOfSamples(4 * 1024 * 1024 / 2); // 2 Megasamples
+	m_sample_rate = 1e6;
+
 }
 
 GenericDac::~GenericDac()
@@ -129,6 +134,7 @@ M2kDac::M2kDac(struct iio_context *ctx, struct iio_device *dac_dev):
 	setVOutH(5.0);
 	setVOutL(-5.0);
 	setMaxNumberOfSamples(4 * 1024 * 1024 / 2); // 2 Megasamples
+	m_vlsb = 10.0 / ((double)( 1 << 12 ));
 	m_filt_comp_table[75E6] = 1.00;
 	m_filt_comp_table[75E5] = 1.525879;
 	m_filt_comp_table[75E4] = 1.164153;

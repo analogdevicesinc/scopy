@@ -91,7 +91,7 @@ ManualCalibration::~ManualCalibration()
 
 }
 
-int ManualCalibration::startCalibration()
+void ManualCalibration::startCalibration()
 {
 	qDebug() << "START: Calibration has started";
 

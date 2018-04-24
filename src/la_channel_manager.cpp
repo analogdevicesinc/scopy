@@ -113,6 +113,10 @@ LogicAnalyzerChannelUI::LogicAnalyzerChannelUI(LogicAnalyzerChannel *ch,
 	QAbstractItemView *trigVw = ui->comboBox->view();
 	QListView* listVw = qobject_cast<QListView*>(trigVw);
 	listVw->setSpacing(2);
+	topSep = nullptr;
+	botSep = nullptr;
+	traceOffset = 0;
+	traceHeight = 0;
 }
 
 LogicAnalyzerChannelUI::~LogicAnalyzerChannelUI()
@@ -689,7 +693,12 @@ LogicAnalyzerChannelGroupUI::LogicAnalyzerChannelGroupUI(
         LogicAnalyzerChannelManagerUI *chm_ui,
         QWidget *parent):
 	ChannelGroupUI(chg,parent),
-	ui(new Ui::LAChannelGroup)
+	ui(new Ui::LAChannelGroup),
+	traceOffset(0),
+	traceHeight(0),
+	botSep(nullptr),
+	topSep(nullptr),
+	chUiSep(nullptr)
 {
 	this->ui->setupUi(this);
 	this->lchg = chg;

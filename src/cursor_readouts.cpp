@@ -266,7 +266,7 @@ void CursorReadouts::setVoltageCursor2LabelText(const QString &text){
 }
 
 QString CursorReadouts::voltageCursor2LabelText(){
-    ui->cursorV2label->text();
+    return ui->cursorV2label->text();
 }
 
 void CursorReadouts::setDeltaVoltageLabelText(const QString &text){

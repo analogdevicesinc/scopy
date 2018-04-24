@@ -84,7 +84,7 @@ QRectF NyquistSamplesArray::boundingRect() const
 
 NyquistGraph::NyquistGraph(QWidget *parent) : QwtPolarPlot(parent),
 	mag_min(0.0), mag_max(0.0), samples(new NyquistSamplesArray),
-	grid(new QwtPolarGrid)
+	grid(new QwtPolarGrid), numSamples(0)
 {
 	setAutoReplot(false);
 	setScale(QwtPolar::Azimuth, 0.0, 360.0, 45.0);

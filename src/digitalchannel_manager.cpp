@@ -459,7 +459,7 @@ DIOManager::DIOManager(iio_context *ctx, Filter *filt) : ctx(ctx)
 		iio_channel_attr_write(ch, "raw", "0");
 	}
 
-	direction = gpo = lockMask = outputEnabled = 0x00;
+	direction = gpi = gpo = lockMask = outputEnabled = 0x00;
 }
 
 DIOManager::~DIOManager()

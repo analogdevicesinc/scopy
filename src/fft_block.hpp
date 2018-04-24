@@ -30,7 +30,7 @@ namespace adiscope {
 				unsigned int nbthreads = 1);
 		~fft_block();
 
-		bool set_window(const std::vector<float>& window);
+		void set_window(const std::vector<float>& window);
 
 	private:
 		bool d_complex;

@@ -57,7 +57,7 @@ public:
 	void setTriggerPos(double pos);
 	void setCustomBufferSize(unsigned long customSize);
 	bool isEnhancedMemDepth();
-	bool setEnhancedMemDepth(bool);
+	void setEnhancedMemDepth(bool);
 
 private:
 	void configParamsOnTimeBaseChanged();

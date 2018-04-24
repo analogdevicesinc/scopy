@@ -30,7 +30,7 @@ using namespace adiscope;
 CompletionCircle::CompletionCircle(QWidget *parent, bool invert_circle) :
 	QDial(parent), m_xc(0), m_yc(0), m_radius(23),
 	m_pressed(false), m_log_scale(false), invert_circle(invert_circle),
-	m_origin(90),m_toggleable(true)
+	m_origin(90),m_toggleable(true), m_double_maximum(1.0), m_double_minimum(0.0), m_double_value(0.5)
 {
 	setWrapping(true);
 	setMinimumSize(50, 50);

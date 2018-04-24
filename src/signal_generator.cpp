@@ -617,8 +617,8 @@ void SignalGenerator::resetZoom()
 		connect(plot->getZoomer(),SIGNAL(zoomed(QRectF)),this,SLOT(rescale()));
 	}
 
-	double period=0.0;
-	unsigned int slowSignalId;
+	double period = 0.0;
+	unsigned int slowSignalId = 0;
 
 	for (auto it = channels.begin(); it != channels.end(); ++it) {
 		if ((*it)->enableButton()->isChecked()) {
@@ -1299,7 +1299,7 @@ void SignalGenerator::start()
 		/* First, disable all the channels of this device */
 		unsigned int nb = iio_device_get_channels_count(dev);
 
-		for (unsigned int i; i < nb; i++) {
+		for (unsigned int i = 0; i < nb; i++) {
 			iio_channel_disable(iio_device_get_channel(dev, i));
 		}
 
@@ -1320,7 +1320,7 @@ void SignalGenerator::start()
 		struct iio_buffer *buf = iio_device_create_buffer(
 		                                 dev, samples_count, true);
 
-		if (!buf) {
+		if (!buf || best_rate == 0) {
 			throw std::runtime_error("Unable to create buffer");
 		}
 

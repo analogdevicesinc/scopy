@@ -10,6 +10,9 @@ PatternGeneratorBufferManager::PatternGeneratorBufferManager(
 	bufferSize = 1;
 	buffer = new short[bufferSize];
 	sampleRate = 1;
+	start_sample = 0;
+	last_sample = 1;
+	buffer_created = 0;
 }
 
 PatternGeneratorBufferManager::~PatternGeneratorBufferManager()
@@ -69,6 +72,8 @@ void PatternGeneratorBufferManager::enableAutoSet(bool val)
 uint32_t PatternGeneratorBufferManager::adjustSampleRate(
         uint32_t suggestedSampleRate)
 {
+	if(suggestedSampleRate == 0)
+		return PGMaxSampleRate;
 	if (suggestedSampleRate>PGMaxSampleRate) {
 		suggestedSampleRate = PGMaxSampleRate;
 	} else {

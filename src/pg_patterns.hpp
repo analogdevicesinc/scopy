@@ -476,7 +476,7 @@ private Q_SLOTS:
 class SPIPattern : virtual public Pattern
 {
 private:
-	bool CSPol;
+	bool CSPOL;
 	uint8_t bytesPerFrame;
 	uint32_t clkFrequency;
 	uint8_t waitClocks;

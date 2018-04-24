@@ -35,7 +35,9 @@ Preferences::Preferences(QWidget *parent) :
 	save_session_on_exit(true),
 	double_click_to_detach(false),
 	pref_api(new Preferences_API(this)),
-	spectrum_visible_peak_search(true)
+	spectrum_visible_peak_search(true),
+	osc_labels_enabled(false),
+	na_show_zero(false)
 {
 	ui->setupUi(this);
 

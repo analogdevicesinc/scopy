@@ -109,6 +109,8 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	max_peak_count(10),
 	fft_size(32768),
 	searchVisiblePeaks(true),
+	sample_rate(100e6),
+	sample_rate_divider(1),
 	bin_sizes({
 	256, 512, 1024, 2048, 4096, 8192, 16384, 32768
 })
@@ -1038,6 +1040,8 @@ void SpectrumAnalyzer::onMarkerToggled(int id, bool on)
 	// Add/remove the marker from the marker table
 	if (on) {
 		int mkType = fft_plot->markerType(crt_channel_id, id);
+		if(mkType < 0)
+			return;
 		ui->markerTable->addMarker(id, crt_channel_id, QString("M%1").arg(id + 1),
 		                           fft_plot->markerFrequency(crt_channel_id, id),
 		                           fft_plot->markerMagnutide(crt_channel_id, id),
@@ -1497,6 +1501,7 @@ int SpectrumMarker_API::type()
 	if (sp->fft_plot->markerEnabled(m_chid,m_mkid)) {
 		return sp->fft_plot->markerType(m_chid,m_mkid);
 	}
+	return -1;
 
 }
 

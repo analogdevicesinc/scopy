@@ -64,7 +64,9 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 		ToolLauncher *parent) :
 	Tool(ctx, runButton, new NetworkAnalyzer_API(this), "Network Analyzer", parent),
 	ui(new Ui::NetworkAnalyzer),
-	adc_dev(adc_dev)
+	adc_dev(adc_dev),
+	d_cursorsEnabled(false),
+	stop(true), amp1(nullptr), amp2(nullptr)
 {
 	iio = iio_manager::get_instance(ctx,
 			filt->device_name(TOOL_NETWORK_ANALYZER, 2));
@@ -435,6 +437,10 @@ void NetworkAnalyzer::run()
 
 		size_t buffer_size = get_sin_samples_count(
 				adc, adc_rate, frequency);
+		if(buffer_size == 0) {
+			qDebug() << "Network analyzer buffer size 0";
+			return;
+		}
 
 		auto f2c1 = blocks::float_to_complex::make();
 		auto f2c2 = blocks::float_to_complex::make();

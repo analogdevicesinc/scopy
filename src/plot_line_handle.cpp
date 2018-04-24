@@ -32,7 +32,9 @@ PlotLineHandle::PlotLineHandle(const QPixmap &handleIcon, QWidget *parent):
 	m_outerSpacing(0),
 	m_image(handleIcon),
 	m_grabbed(false),
-	m_current_pos(0)
+	m_current_pos(0),
+	m_width(20),
+	m_height(20)
 {
 }
 

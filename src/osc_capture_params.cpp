@@ -35,7 +35,8 @@ SymmetricBufferMode::SymmetricBufferMode() :
 	m_triggPosSR(0.0),
 	m_visibleBufferSize(0),
 	m_triggerBufferSize(0),
-	m_enhancedMemoryDepth(false)
+	m_enhancedMemoryDepth(false),
+	m_timeDivsCount(10)
 {
 }
 
@@ -106,7 +107,7 @@ bool SymmetricBufferMode::isEnhancedMemDepth()
 	return m_enhancedMemoryDepth;
 }
 
-bool SymmetricBufferMode::setEnhancedMemDepth(bool val)
+void SymmetricBufferMode::setEnhancedMemDepth(bool val)
 {
 	m_enhancedMemoryDepth = val;
 }

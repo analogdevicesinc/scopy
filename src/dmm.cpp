@@ -55,7 +55,8 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, std::shared_ptr<GenericAdc> adc,
 	interrupt_data_logging(false),
 	filename(""),
 	use_timer(false),
-	logging_refresh_rate(0)
+	logging_refresh_rate(0),
+	wheelEventGuard(nullptr)
 {
 	ui->setupUi(this);
 
