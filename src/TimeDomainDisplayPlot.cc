@@ -998,6 +998,9 @@ void TimeDomainDisplayPlot::clearPreview()
 
 void TimeDomainDisplayPlot::updatePreview(double reftimebase, double timebase, double timeposition)
 {
+	if (!d_preview_ydata.size()) {
+		return;
+	}
 	double mid_point_on_screen = (timebase * 8) - ((
 						timebase * 8) - timeposition);
 	double x_axis_step_size = (reftimebase /
