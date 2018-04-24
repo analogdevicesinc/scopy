@@ -68,6 +68,9 @@ public:
 	bool getAdvanced_device_info() const;
 	void setAdvanced_device_info(bool value);
 
+	bool getUser_notes_active() const;
+	void setUser_notes_active(bool value);
+
 Q_SIGNALS:
 
 	void notify();
@@ -88,6 +91,7 @@ private:
 	bool na_show_zero;
 	bool spectrum_visible_peak_search;
 	bool advanced_device_info;
+	bool user_notes_active;
 
 	Preferences_API *pref_api;
 	QString getPreferenceIniFile() const;
@@ -105,6 +109,7 @@ class Preferences_API : public ApiObject
 	Q_PROPERTY(bool na_show_zero READ getNaShowZero WRITE setNaShowZero)
 	Q_PROPERTY(bool spectrum_visible_peak_search READ getSpectrumVisiblePeakSearch WRITE setSpectrumVisiblePeakSearch)
 	Q_PROPERTY(bool advanced_device_info READ getAdvancedDeviceInfo WRITE setAdvancedDeviceInfo)
+	Q_PROPERTY(bool user_notes_active READ getUserNotesActive WRITE setUserNotesActive)
 
 public:
 
@@ -132,6 +137,9 @@ public:
 
 	bool getAdvancedDeviceInfo() const;
 	void setAdvancedDeviceInfo(const bool& enabled);
+
+	bool getUserNotesActive() const;
+	void setUserNotesActive(const bool& enabled);
 
 private:
 	Preferences *preferencePanel;

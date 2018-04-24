@@ -268,6 +268,7 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 
 void ToolLauncher::readPreferences()
 {
+	ui->btnNotes->setVisible(prefPanel->getUser_notes_active());
 	for (auto tool : toolMenu) {
 		tool->enableDoubleClick(prefPanel->getDouble_click_to_detach());
 	}

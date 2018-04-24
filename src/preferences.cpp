@@ -38,7 +38,8 @@ Preferences::Preferences(QWidget *parent) :
 	spectrum_visible_peak_search(true),
 	osc_labels_enabled(false),
 	na_show_zero(false),
-	advanced_device_info(false)
+	advanced_device_info(false),
+	user_notes_active(false)
 {
 	ui->setupUi(this);
 
@@ -89,6 +90,10 @@ Preferences::Preferences(QWidget *parent) :
 		advanced_device_info = (!state ? false : true);
 		Q_EMIT notify();
 	});
+	connect(ui->userNotesCheckBox, &QCheckBox::stateChanged, [=](int state) {
+		user_notes_active = (!state ? false : true);
+		Q_EMIT notify();
+	});
 
 	QString preference_ini_file = getPreferenceIniFile();
 	QSettings settings(preference_ini_file, QSettings::IniFormat);
@@ -123,6 +128,7 @@ void Preferences::showEvent(QShowEvent *event)
 	ui->doubleClickCheckBox->setChecked(double_click_to_detach);
 	ui->na_zeroCheckBox->setChecked(na_show_zero);
 	ui->advancedInfoCheckBox->setChecked(advanced_device_info);
+	ui->userNotesCheckBox->setChecked(user_notes_active);
 
 	QWidget::showEvent(event);
 }
@@ -157,6 +163,16 @@ bool Preferences::getAdvanced_device_info() const
 void Preferences::setAdvanced_device_info(bool value)
 {
 	advanced_device_info = value;
+}
+
+bool Preferences::getUser_notes_active() const
+{
+	return user_notes_active;
+}
+
+void Preferences::setUser_notes_active(bool value)
+{
+	user_notes_active = value;
 }
 
 bool Preferences::getSpectrum_visible_peak_search() const
@@ -287,4 +303,14 @@ bool Preferences_API::getAdvancedDeviceInfo() const
 void Preferences_API::setAdvancedDeviceInfo(const bool& enabled)
 {
 	preferencePanel->advanced_device_info = enabled;
+}
+
+bool Preferences_API::getUserNotesActive() const
+{
+	return preferencePanel->user_notes_active;
+}
+
+void Preferences_API::setUserNotesActive(const bool& enabled)
+{
+	preferencePanel->user_notes_active = enabled;
 }
