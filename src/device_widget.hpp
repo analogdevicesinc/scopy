@@ -67,10 +67,12 @@ public:
 Q_SIGNALS:
         void selected(bool);
         void forgetDevice(int, QString);
+        void identifyDevice(QString);
 
 public Q_SLOTS:
         void on_btn_toggled(bool);
         void forgetDevice_clicked(bool);
+        void identifyDevice_clicked(bool);
 
 private:
         Ui::Device *m_ui;

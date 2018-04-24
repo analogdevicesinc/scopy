@@ -211,6 +211,11 @@ QPushButton* InfoPage::forgetDeviceButton()
         return ui->btnForget;
 }
 
+QPushButton* InfoPage::identifyDeviceButton()
+{
+        return ui->btnIdentify;
+}
+
 QPushButton* InfoPage::connectButton()
 {
         return ui->btnConnect;
