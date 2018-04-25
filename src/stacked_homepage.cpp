@@ -167,8 +167,11 @@ void StackedHomepage::slideToIndex(int index)
 void StackedHomepage::slideInWidget(QWidget *newWidget, StackedHomepage::s_directions direction)
 {
 	if (s_active) {
-		animationDone();
-
+		if (s_next != indexOf(newWidget)) {
+			animationDone();
+		} else {
+			return;
+		}
 	}
 	s_active = true;
 
