@@ -349,7 +349,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 	amplitude->setValue(amplitude->maxValue());
 
 	/* Set max frequency according to max sample rate */
-	fileSampleRate->setMinValue(0.001);
+	fileSampleRate->setMinValue(0.1);
 	frequency->setMaxValue((sample_rate / 2) - 1);
 	mathFrequency->setMaxValue((sample_rate / 2) - 1);
 	fileSampleRate->setMaxValue((sample_rate / 2) - 1);
@@ -357,7 +357,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 	/* (lowest freq * 100 * 1000) frequency by default */
 	frequency->setValue(frequency->minValue() * 1000 * 1000.0);
 	fileSampleRate->setValue(fileSampleRate->minValue() * 100 * 1000.0);
-	fileAmplitude->setValue(fileAmplitude->maxValue()/2);
+	fileAmplitude->setValue(1);
 	fileOffset->setValue(0);
 	filePhase->setValue(0);
 
@@ -568,6 +568,12 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 	phase->setFrequency(ptr->frequency);
 
 	readPreferences();
+
+	fileManager = new FileManager("Signal Generator");
+	fileAmplitude->setDisabled(true);
+	filePhase->setDisabled(true);
+	fileOffset->setDisabled(true);
+	fileSampleRate->setDisabled(true);
 }
 
 SignalGenerator::~SignalGenerator()
@@ -578,6 +584,8 @@ SignalGenerator::~SignalGenerator()
 		api->save(*settings);
 	}
 	delete api;
+
+	delete fileManager;
 
 	delete plot;
 	delete ui;
@@ -630,8 +638,10 @@ void SignalGenerator::resetZoom()
 
 			case SIGNAL_TYPE_BUFFER:
 				if (ptr->file_type) {
-					auto length=(1/ptr->file_sr)*ptr->file_nr_of_samples[ptr->file_channel];
-
+					double length = 1;
+					if (ptr->file_nr_of_samples.size() > 0) {
+						length=(1/ptr->file_sr)*ptr->file_nr_of_samples[ptr->file_channel];
+					}
 					if (period<length) {
 						period=length;
 						slowSignalId = ptr->id;
@@ -695,7 +705,7 @@ void SignalGenerator::rescale()
 
 	auto deltaT= zoomT2-zoomT1;
 
-	long max_sample_rate=750000000;
+	double max_sample_rate=750000000;
 	nb_points=NB_POINTS;
 	sample_rate=nb_points/deltaT;
 
@@ -782,7 +792,7 @@ void SignalGenerator::fileChannelChanged(int value)
 		ptr->file_channel = (int) value;
 		this->ui->label_size->setText(QString::number(
 		                                      ptr->file_nr_of_samples[ptr->file_channel]) +
-		                              tr(" samples"));
+					      tr(" samples"));
 		resetZoom();
 	}
 }
@@ -1057,7 +1067,7 @@ enum sg_file_format SignalGenerator::getFileFormat(QString filePath)
 
 
 
-void SignalGenerator::loadParametersFromFile(
+bool SignalGenerator::loadParametersFromFile(
         QSharedPointer<signal_generator_data> ptr,QString filePath)
 {
 	ptr->file_message="";
@@ -1088,7 +1098,7 @@ void SignalGenerator::loadParametersFromFile(
 			ptr->file_type=FORMAT_NO_FILE;
 		}
 		if(!ok)
-			return;
+			return false;
 
 		riff_header_t riff;
 		chunk_header_t chunk;
@@ -1101,7 +1111,7 @@ void SignalGenerator::loadParametersFromFile(
 		f.read(riff.data,12);
 
 		if (!riffCompare(riff,"WAVE")) {
-			return;
+			return false;
 		}
 
 		while (!f.atEnd()) {
@@ -1133,33 +1143,28 @@ void SignalGenerator::loadParametersFromFile(
 	}
 
 	if (ptr->file_type==FORMAT_CSV) {
-		QFile f(ptr->file);
-		f.open(QIODevice::ReadOnly);
-		QTextStream in(&f);
-		uint32_t sample_nr=0;
+
+		try {
+			fileManager->open(ptr->file, FileManager::IMPORT);
+		} catch(FileManagerException &e) {
+			ptr->file_message=QString::fromLocal8Bit(e.what());
+			ptr->file_nr_of_samples.push_back(0);
+			ptr->file_type=FORMAT_NO_FILE;
+			return false;
+		}
 
 		ptr->file_data.clear();
 
-		// determine number of channels
-		QString str = in.readLine();
-		QStringList splitStr = str.split(',',QString::SkipEmptyParts);
-		ptr->file_nr_of_channels=splitStr.size();
-
-		in.seek(0);
-
-		while (!in.atEnd()) {
-			str = in.readLine(); // count number of lines in CSV
-			sample_nr++;
-		}
+		ptr->file_nr_of_channels = fileManager->getNrOfChannels();
+		ptr->file_sr = fileManager->getSampleRate();
 
 		ptr->file_channel=0; // autoselect channel 0
 
 		for (auto i=0; i<ptr->file_nr_of_channels; i++) {
 			ptr->file_channel_names.push_back("Column " + QString::number(i));
-			ptr->file_nr_of_samples.push_back(sample_nr);
+			ptr->file_nr_of_samples.push_back(fileManager->getNrOfSamples());
 		}
 
-		f.close();
 		ptr->file_message="CSV";
 	}
 
@@ -1172,7 +1177,7 @@ void SignalGenerator::loadParametersFromFile(
 			qDebug()<<"Error opening MAT file "<<filePath;
 			ptr->file_nr_of_samples.push_back(0);
 			ptr->file_message = "MAT file could not be parsed";
-			return;
+			return false;
 		}
 
 		while ((matvar = Mat_VarReadNextInfo(matfp)) != NULL) {
@@ -1222,9 +1227,11 @@ void SignalGenerator::loadParametersFromFile(
 		}
 	}
 
-	ptr->file_amplitude=5.0;
+	ptr->file_amplitude=1.0;
 	ptr->file_offset=0;
 	ptr->file_phase=0;
+
+	return true;
 }
 
 void SignalGenerator::loadFile()
@@ -1237,8 +1244,14 @@ void SignalGenerator::loadFile()
 	ptr->file = filename;
 	ui->label_path->setText(ptr->file);
 	Util::setWidgetNrOfChars(ui->label_path,10,30);
-	loadParametersFromFile(ptr,ptr->file);
-	fileAmplitude->setValue(ptr->file_amplitude);
+	bool loaded = loadParametersFromFile(ptr,ptr->file);
+	fileAmplitude->setEnabled(loaded);
+	fileSampleRate->setEnabled(loaded);
+	filePhase->setEnabled(loaded);
+	fileOffset->setEnabled(loaded);
+	if (!loaded) {
+		return;
+	}
 	fileOffset->setValue(ptr->file_offset);
 	filePhase->setValue(ptr->file_phase);
 	filePhase->setMaxValue(ptr->file_nr_of_samples[ptr->file_channel]);
@@ -1390,8 +1403,10 @@ void SignalGenerator::start()
 			const std::vector<short>& samples = vector->data();
 			const short *data = samples.data();
 
-			iio_channel_write(each, buf, data,
+			if (samples.size()) {
+				iio_channel_write(each, buf, data,
 			                  samples_count * sizeof(short));
+			}
 		}
 
 		if (iio_device_find_attr(dev, "oversampling_ratio")) {
@@ -1535,31 +1550,13 @@ void SignalGenerator::loadFileChannelData(QWidget *obj)
 	ptr->file_data.clear();
 
 	if (ptr->file_type==FORMAT_CSV) {
-		QFile f(ptr->file);
-		f.open(QIODevice::ReadOnly);
-		QTextStream in(&f);
-		QString str;
-		QStringList splitStr;
-		float sample=0.0;
-		uint32_t sample_nr=0;
-		bool ok=false;
 
-		while (!in.atEnd()) {
-			str = in.readLine();
-			splitStr = str.split(',',QString::KeepEmptyParts);
+		if (ptr->file_channel >= ptr->file_nr_of_channels) {
+			return;
+		}
 
-			if (splitStr.size()>ptr->file_channel) {
-				sample = splitStr.at(ptr->file_channel).toFloat(&ok);
-			} else {
-				sample = 0.0;
-			}
-
-			ptr->file_data.push_back(sample);
-			sample_nr++;
-
-			if (!ok) {
-				qDebug()<<"file corrupt @ line "<<sample_nr;
-			}
+		for (auto x : fileManager->read(ptr->file_channel)) {
+			ptr->file_data.push_back(x);
 		}
 	}
 
@@ -1734,8 +1731,12 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
 				top->connect(phase_skip,0,noiseAdd,1);
 				top->connect(noiseAdd,0,interp,0);
 				top->connect(interp,0,decim,0);
-				auto buffer_freq = ptr->file_sr/(double)
+
+				double buffer_freq = 1;
+				if (ptr->file_nr_of_samples.size() > 0) {
+					buffer_freq = ptr->file_sr/(double)
 				                   ptr->file_nr_of_samples[ptr->file_channel];
+				}
 				int full_periods=(int)((double)zoomT1OnScreen * buffer_freq);
 				double phase_in_time = zoomT1OnScreen - (full_periods/buffer_freq);
 				unsigned long samples_to_skip = phase_in_time * samp_rate;
@@ -2276,7 +2277,9 @@ size_t SignalGenerator::get_samples_count(const struct iio_device *dev,
 			}
 
 			ratio = rate/ptr->file_sr;
-			size=(ptr->file_nr_of_samples[ptr->file_channel] * ratio);
+			if (ptr->file_nr_of_samples.size() > 0) {
+				size=(ptr->file_nr_of_samples[ptr->file_channel] * ratio);
+			}
 			break;
 
 		case SIGNAL_TYPE_CONSTANT:
