@@ -837,7 +837,6 @@ bool PatternGenerator::startPatternGeneration(bool cyclic)
 
 	qDebug("Setting channel direction");
 	diom->setMode(chm.get_mode_mask());
-	diom->lock(chm.get_enabled_mask());
 
 	qDebug("Setting sample rate");
 	iio_device_attr_write(dev, "sampling_frequency",
@@ -861,6 +860,8 @@ bool PatternGenerator::startPatternGeneration(bool cyclic)
 	     (uint16_t *)p_dat++,i++) {
 		*p_dat = bufman->buffer[i];
 	}
+
+	diom->lock(chm.get_enabled_mask());
 
 	/* Push buffer       */
 	auto number_of_bytes = iio_buffer_push(txbuf);
