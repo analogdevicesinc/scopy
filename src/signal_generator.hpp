@@ -37,6 +37,7 @@
 #include "scope_sink_f.h"
 #include "tool.hpp"
 #include "hw_dac.h"
+#include "filemanager.h"
 
 extern "C" {
 	struct iio_buffer;
@@ -160,9 +161,11 @@ private:
 	ScaleSpinButton *fileSampleRate, *fileAmplitude;
 	ScaleSpinButton *mathFrequency, *noiseAmplitude;
 
+	FileManager *fileManager;
+
 	unsigned int currentChannel;
-	unsigned long sample_rate;
-	unsigned long max_sample_rate;
+	double sample_rate;
+	double max_sample_rate;
 	unsigned long nb_points;
 	double nr_of_periods;
 
@@ -224,7 +227,7 @@ private:
 	double zoomT2OnScreen;
 
 	enum sg_file_format getFileFormat(QString filePath);
-	void loadParametersFromFile(QSharedPointer<signal_generator_data> ptr,
+	bool loadParametersFromFile(QSharedPointer<signal_generator_data> ptr,
 	                            QString filePath);
 	void loadFileChannelData(QWidget *obj);
 	bool riffCompare(riff_header_t& ptr, const char *id2);
