@@ -754,6 +754,9 @@ QPushButton *ToolLauncher::addContext(const QString& uri)
 	connect(deviceWidget, SIGNAL(selected(bool)),
 		this, SLOT(deviceBtn_clicked(bool)));
 
+	connect(deviceWidget->infoPage(), SIGNAL(stopSearching(bool)),
+		this, SLOT(stopSearching(bool)));
+
 	ui->devicesList->insertWidget(ui->devicesList->count() - 1,
 				deviceWidget);
 	ui->stackedWidget->addWidget(deviceWidget->infoPage());
@@ -761,6 +764,16 @@ QPushButton *ToolLauncher::addContext(const QString& uri)
 	devices.push_back(deviceWidget);
 
 	return deviceWidget->deviceButton();
+}
+
+void ToolLauncher::stopSearching(bool stop)
+{
+	if (stop){
+		search_timer->stop();
+	} else {
+		if (!getConnectedDevice())
+			search_timer->start(TIMER_TIMEOUT_MS);
+	}
 }
 
 void ToolLauncher::btnHomepage_toggled(bool toggled)
@@ -1063,6 +1076,7 @@ void adiscope::ToolLauncher::connectBtn_clicked(bool pressed)
 		/* Connect to the selected device, if any */
 		if (selectedDev) {
 			QString uri = selectedDev->uri();
+			selectedDev->infoPage()->identifyDevice(false);
 			bool success = switchContext(uri);
 			if (success) {
 				selectedDev->setConnected(true, false, ctx);

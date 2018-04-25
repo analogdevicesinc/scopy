@@ -142,6 +142,7 @@ private Q_SLOTS:
 	DeviceWidget* getConnectedDevice();
 	int getSelectedDeviceIndex();
 	void pageMoved(int);
+	void stopSearching(bool);
 
 private:
 	void loadToolTips(bool connected);

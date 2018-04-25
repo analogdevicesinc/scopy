@@ -17,7 +17,209 @@
    <string notr="true">/*background-color:black;*/</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="3" column="0" colspan="3">
+   <item row="0" column="2">
+    <widget class="QPushButton" name="btnForget">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>240</width>
+       <height>30</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>240</width>
+       <height>30</height>
+      </size>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QPushButton {
+  min-height: 30px;
+  max-height: 30px;
+
+  border: 0px;
+  border-radius: 4px;
+
+  background-color: #4a64ff;
+  color: #ffffff;
+
+  font-size: 14px;
+}
+
+QPushButton:pressed {
+  background-color: #2a44df;
+}
+
+QPushButton:hover {
+	background-color: #4a34ff;
+}
+
+QPushButton:disabled {
+  background-color:  #727273;
+}</string>
+     </property>
+     <property name="text">
+      <string>Forget device</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QPushButton" name="btnIdentify">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>240</width>
+       <height>30</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>240</width>
+       <height>30</height>
+      </size>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QPushButton {
+  min-height: 30px;
+  max-height: 30px;
+
+  border: 0px;
+  border-radius: 4px;
+
+  background-color: #4a64ff;
+  color: #ffffff;
+
+  font-size: 14px;
+}
+
+QPushButton:pressed {
+  background-color: #2a44df;
+}
+
+QPushButton:hover {
+	background-color: #4a34ff;
+}
+
+QPushButton:disabled {
+  background-color:  #727273;
+}</string>
+     </property>
+     <property name="text">
+      <string>Identify</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="2">
+    <widget class="QLabel" name="lblConnectionStatus">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>20</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>20</height>
+      </size>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QLabel {
+	color: red;
+}</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QPushButton" name="btnConnect">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>240</width>
+       <height>30</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>240</width>
+       <height>30</height>
+      </size>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QPushButton {
+  	border: 0px;
+  	border-radius: 4px;
+  	background-color: #4a64ff;
+	color: #ffffff;
+  	font-size: 14px;
+	qproperty-text: &quot;Connect&quot;;
+}
+
+QPushButton:hover
+{
+background-color: #4a34ff;
+}
+
+QPushButton:disabled {
+background-color: gray;
+color:white;
+}
+
+QPushButton[connected=true] {
+qproperty-text: &quot;Disconnect&quot;;
+}
+
+QPushButton:disabled {
+  background-color:  #727273;
+}
+</string>
+     </property>
+     <property name="text">
+      <string>Connect</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="3" rowspan="2">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="3" column="0" colspan="4">
     <widget class="QScrollArea" name="scrollArea">
      <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
@@ -31,7 +233,7 @@
         <x>0</x>
         <y>0</y>
         <width>767</width>
-        <height>271</height>
+        <height>308</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_2">
@@ -109,192 +311,6 @@
        </item>
       </layout>
      </widget>
-    </widget>
-   </item>
-   <item row="0" column="0">
-    <widget class="QPushButton" name="btnConnect">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>240</width>
-       <height>30</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>240</width>
-       <height>30</height>
-      </size>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">QPushButton {
-  	border: 0px;
-  	border-radius: 4px;
-  	background-color: #4a64ff;
-	color: #ffffff;
-  	font-size: 14px;
-	qproperty-text: &quot;Connect&quot;;
-}
-
-QPushButton:hover
-{
-background-color: #4a34ff;
-}
-
-QPushButton:disabled {
-background-color: gray;
-color:white;
-}
-
-QPushButton[connected=true] {
-qproperty-text: &quot;Disconnect&quot;;
-}
-
-QPushButton:disabled {
-  background-color:  #727273;
-}
-</string>
-     </property>
-     <property name="text">
-      <string>Connect</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="lblConnectionStatus">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>20</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>20</height>
-      </size>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">QLabel {
-	color: red;
-}</string>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="1">
-    <widget class="QPushButton" name="btnForget">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>240</width>
-       <height>30</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>240</width>
-       <height>30</height>
-      </size>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">QPushButton {
-  min-height: 30px;
-  max-height: 30px;
-
-  border: 0px;
-  border-radius: 4px;
-
-  background-color: #4a64ff;
-  color: #ffffff;
-
-  font-size: 14px;
-}
-
-QPushButton:pressed {
-  background-color: #2a44df;
-}
-
-QPushButton:hover {
-	background-color: #4a34ff;
-}
-
-QPushButton:disabled {
-  background-color:  #727273;
-}</string>
-     </property>
-     <property name="text">
-      <string>Forget device</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QPushButton" name="btnIdentify">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>240</width>
-       <height>30</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>240</width>
-       <height>30</height>
-      </size>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">QPushButton {
-  min-height: 30px;
-  max-height: 30px;
-
-  border: 0px;
-  border-radius: 4px;
-
-  background-color: #4a64ff;
-  color: #ffffff;
-
-  font-size: 14px;
-}
-
-QPushButton:pressed {
-  background-color: #2a44df;
-}
-
-QPushButton:hover {
-	background-color: #4a34ff;
-}
-
-QPushButton:disabled {
-  background-color:  #727273;
-}</string>
-     </property>
-     <property name="text">
-      <string>Identify</string>
-     </property>
     </widget>
    </item>
   </layout>
