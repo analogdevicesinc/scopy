@@ -22,6 +22,7 @@
 #include "preferences.h"
 
 #include <QString>
+#include <QTimer>
 
 using namespace std;
 using namespace adiscope;
@@ -33,8 +34,13 @@ InfoPage::InfoPage(QString uri, Preferences *pref,
         ui(new Ui::InfoPage),
         m_uri(uri),
         m_ctx(ctx),
+        m_fabric_channel(nullptr),
         m_advanced(false),
-        prefPanel(pref)
+        prefPanel(pref),
+        m_connected(false),
+        m_led_timer(new QTimer(this)),
+        m_blink_timer(new QTimer(this)),
+        m_search_interrupted(false)
 {
         ui->setupUi(this);
         ui->paramLabel->setText(uri);
@@ -43,6 +49,12 @@ InfoPage::InfoPage(QString uri, Preferences *pref,
                 ui->btnForget->setEnabled(false);
         }
         connect(prefPanel, &Preferences::notify, this, &InfoPage::readPreferences);
+        connect(ui->btnIdentify, SIGNAL(pressed()),
+                this, SLOT(identifyDevice()));
+        connect(m_led_timer, SIGNAL(timeout()),
+                this, SLOT(ledTimeout()));
+        connect(m_blink_timer, SIGNAL(timeout()),
+                this, SLOT(blinkTimeout()));
         readPreferences();
 }
 
@@ -66,6 +78,8 @@ struct iio_context *InfoPage::ctx() const
 
 void InfoPage::setCtx(struct iio_context *ctx)
 {
+        identifyDevice(false);
+        (!ctx) ? m_connected = false : m_connected = true;
         m_ctx = ctx;
 }
 
@@ -142,6 +156,9 @@ QPair<bool, QString> InfoPage::translateInfoParams(QString key)
                 advanced = true;
         } else if (key.contains("ip")) {
                 key = "IP Address";
+        } else if (key.startsWith("cal,gain") ||
+                   key.startsWith("cal,offset")) {
+                key = "";
         }
         return QPair<bool, QString>(advanced, key);
 }
@@ -154,6 +171,7 @@ void InfoPage::setConnectionStatus(bool failed)
 
 void InfoPage::refreshInfoWidget()
 {
+        ui->lblConnectionStatus->setText("");
         if ( ui->paramLayout != NULL )
         {
             QLayoutItem* item;
@@ -209,6 +227,97 @@ void InfoPage::setUri(QString uri)
 QPushButton* InfoPage::forgetDeviceButton()
 {
         return ui->btnForget;
+}
+
+void InfoPage::identifyDevice(bool clicked)
+{
+	ui->lblConnectionStatus->setText("");
+	if (clicked) {
+		/* If identification is already on for
+		 * this device, don't start it again
+		 */
+		if (m_search_interrupted) {
+			return;
+		}
+		m_search_interrupted = true;
+		Q_EMIT stopSearching(true);
+
+		if (!m_connected) {
+			m_ctx = iio_create_context_from_uri(m_uri.toStdString().c_str());
+		}
+
+		if (!m_ctx) {
+			return;
+		}
+
+		struct iio_device *m2k_fabric = iio_context_find_device(m_ctx,
+									"m2k-fabric");
+
+		m_fabric_channel = iio_device_find_channel(m2k_fabric, "voltage4", true);
+		if (m_fabric_channel) {
+			m_led_timer->start(3000);
+			m_blink_timer->start(100);
+		} else {
+			ui->lblConnectionStatus->setText("Can't identify device. Please try to update your firmware!");
+			if (!m_connected) {
+				iio_context_destroy(m_ctx);
+				m_ctx = nullptr;
+			}
+			m_fabric_channel = nullptr;
+
+			if (m_search_interrupted) {
+				m_search_interrupted = false;
+				Q_EMIT stopSearching(false);
+			}
+		}
+	} else {
+		ledTimeout();
+	}
+}
+
+void InfoPage::blinkTimeout()
+{
+	if (!m_fabric_channel)
+		return;
+	bool oldVal;
+	iio_channel_attr_read_bool(m_fabric_channel,
+				       "done_led_overwrite_powerdown",
+				       &oldVal);
+	iio_channel_attr_write_bool(m_fabric_channel,
+					"done_led_overwrite_powerdown",
+					!oldVal);
+}
+
+void InfoPage::ledTimeout()
+{
+	if (m_led_timer->isActive()) {
+		m_led_timer->stop();
+	} else {
+		return;
+	}
+
+	if (m_blink_timer->isActive()) {
+		m_blink_timer->stop();
+	}
+
+	if (!m_fabric_channel)
+		return;
+
+	if (m_ctx) {
+		iio_channel_attr_write_bool(m_fabric_channel,
+					    "done_led_overwrite_powerdown",
+					    false);
+		if (!m_connected) {
+			iio_context_destroy(m_ctx);
+			m_ctx = nullptr;
+		}
+	}
+	m_fabric_channel = nullptr;
+
+	if (m_search_interrupted) {
+		m_search_interrupted = false;
+		Q_EMIT stopSearching(false);
+	}
 }
 
 QPushButton* InfoPage::identifyDeviceButton()

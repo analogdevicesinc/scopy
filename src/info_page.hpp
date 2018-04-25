@@ -62,6 +62,14 @@ public:
 
 public Q_SLOTS:
         void readPreferences();
+        void identifyDevice(bool clicked = true);
+
+private Q_SLOTS:
+        void blinkTimeout();
+        void ledTimeout();
+
+Q_SIGNALS:
+        void stopSearching(bool);
 
 private:
         QPair<bool, QString> translateInfoParams(QString);
@@ -70,10 +78,15 @@ private:
         Ui::InfoPage *ui;
         QString m_uri;
         struct iio_context *m_ctx;
+        struct iio_channel *m_fabric_channel;
         bool m_advanced;
         Preferences *prefPanel;
         QMap<QString, QString> m_info_params;
         QMap<QString, QString> m_info_params_advanced;
+        QTimer *m_led_timer;
+        QTimer *m_blink_timer;
+        bool m_connected;
+        bool m_search_interrupted;
 };
 }
 #endif // INFO_PAGE_HPP
