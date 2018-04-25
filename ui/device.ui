@@ -177,7 +177,6 @@ background-color: red;
         <property name="styleSheet">
          <string notr="true">QLabel {
 color: white;
-font-family: &quot;monospace&quot;;
 qproperty-alignment: AlignCenter;
 }</string>
         </property>
