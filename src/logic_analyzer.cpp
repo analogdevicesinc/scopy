@@ -55,6 +55,7 @@
 #include "dynamicWidget.hpp"
 #include "config.h"
 #include "osc_export_settings.h"
+#include "filemanager.h"
 
 /* Sigrok includes */
 #include <libsigrokcxx/libsigrokcxx.hpp>
@@ -597,26 +598,30 @@ QString LogicAnalyzer::saveToFile()
 		}
 	}
 
-	QFile file(filename);
-	if( !file.open(QIODevice::WriteOnly)) {
-		return "";
-	}
 
-	QTextStream out(&file);
-
-	/* Write the general information */
-	out << startRow << "date " << QDateTime::currentDateTime().toString() << endRow;
-	out << startRow << "version Scopy - " << QString(SCOPY_VERSION_GIT) << endRow;
-	out << startRow << "comment " << QString::number(main_win->session_.get_logic_sample_count()) <<
-	       " samples acquired at " << QString::number(main_win->session_.get_samplerate()) <<
-	       " Hz " << endRow;
-
-	file.close();
-
-	if( separator != "" )
+	if( separator != "" ) {
 		done = exportTabCsv(separator, filename);
-	else
+
+	} else {
+		QFile file(filename);
+		if( !file.open(QIODevice::WriteOnly)) {
+			return "";
+		}
+
+		QTextStream out(&file);
+
+		/* Write the general information */
+		out << startRow << "date " << QDateTime::currentDateTime().toString() << endRow;
+		out << startRow << "version Scopy - " << QString(SCOPY_VERSION_GIT) << endRow;
+		out << startRow << "comment " << QString::number(main_win->session_.get_logic_sample_count()) <<
+		       " samples acquired at " << QString::number(main_win->session_.get_samplerate()) <<
+		       " Hz " << endRow;
+
+
+		file.close();
+
 		done = exportVCD(filename, startRow, endRow);
+	}
 
 	if(paused)
 		startStop(true);
@@ -719,45 +724,42 @@ bool LogicAnalyzer::exportVCD(QString filename, QString startSep, QString endSep
 
 bool LogicAnalyzer::exportTabCsv(QString separator, QString filename)
 {
-	QFile file(filename);
-	if( !file.open(QIODevice::Append)) {
-		return false;
-	}
+	FileManager fm("Logic Analyzer");
+	fm.open(filename, FileManager::EXPORT);
 
-	QTextStream out(&file);
-
-	// Write the header ( sample number + channels)
+	QStringList chNames;
 	for(int ch = 0; ch < no_channels; ch++) {
 		if( exportConfig[ch] ) {
-			out << "Channel " + QString::number(ch) +
-			       ((ch == no_channels - 1) ? "\n" : separator);
+			chNames.push_back("Channel " + QString::number(ch));
 		}
-		else if( ch == no_channels - 1)
-			out << "\n";
 	}
 
-	// Write the values
+	QVector<QVector<double>> data;
+
 	std::shared_ptr<pv::data::Logic> logic_data = main_win->session_.get_logic_data();
-	if(logic_data) {
+	if (!logic_data) {
+		return false;
+	} else {
 		shared_ptr<pv::data::LogicSegment> segment = logic_data->logic_segments().front();
-		for(int i = 0; i < segment->get_sample_count(); i++) {
+		for (int i = 0; i < segment->get_sample_count(); ++i) {
 			uint64_t sample = segment->get_sample(i);
-			for(int ch = 0; ch < no_channels; ch++) {
+			QVector<double> line;
+			for (int ch = 0; ch < no_channels; ++ch) {
 				int bit = (sample >> ch) & 1;
 				if(exportConfig[ch]) {
-					out << (bit ? "1" : "0");
-					out << ((ch == no_channels - 1) ? "\n" : separator);
+					line.push_back(bit);
 				}
-				else if( ch == no_channels - 1)
-					out << "\n";
 			}
+			data.push_back(line);
 		}
 	}
-	else {
-		file.close();
-		return false;
-	}
-	file.close();
+
+	fm.setSampleRate(main_win->session_.get_samplerate());
+
+	fm.save(data, chNames);
+
+	fm.performWrite();
+
 	return true;
 }
 
