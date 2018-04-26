@@ -299,7 +299,7 @@ void ToolLauncher::pageMoved(int direction)
 	} else if (ui->btnHomepage->isChecked()) {
 		(direction > 0) ? ui->btnAdd->click() : ui->btnHomepage->click();
 	} else {
-		int selectedIdx = getSelectedDeviceIndex() + direction;
+		int selectedIdx = getDeviceIndex(getSelectedDevice()) + direction;
 		(selectedIdx >= 0) ? devices.at(selectedIdx)->click() :
 				    ui->btnAdd->click();
 	}
@@ -357,11 +357,21 @@ DeviceWidget* ToolLauncher::getConnectedDevice()
 	return nullptr;
 }
 
-int ToolLauncher::getSelectedDeviceIndex()
+DeviceWidget* ToolLauncher::getSelectedDevice()
 {
 	for (int i = 0; i < devices.size(); i++) {
 		auto dev = devices.at(i);
 		if (dev->isChecked()) {
+			return dev;
+		}
+	}
+	return nullptr;
+}
+
+int ToolLauncher::getDeviceIndex(DeviceWidget *device)
+{
+	for (int i = 0; i < devices.size(); i++) {
+		if (devices.at(i) == device) {
 			return i;
 		}
 	}
@@ -696,13 +706,21 @@ void ToolLauncher::destroyPopup()
 	popup->deleteLater();
 }
 
-void ToolLauncher::forgetDeviceBtn_clicked(int pos, QString uri)
+void ToolLauncher::forgetDeviceBtn_clicked(QString uri)
 {
 	if (previousIp == uri.mid(3)) {
 		previousIp = "";
 	}
-	pos -= 2;
-	auto dev = devices.at(pos);
+	DeviceWidget *dev = nullptr;
+	for(auto d : devices) {
+		if (d == sender()) {
+			dev = d;
+		}
+	}
+	if (!dev) {
+		return;
+	}
+	int pos = getDeviceIndex(dev);
 	if (dev->uri().startsWith("usb:")) {
 		return;
 	}
@@ -731,16 +749,33 @@ void ToolLauncher::forgetDeviceBtn_clicked(int pos, QString uri)
 		}
 		delete dev;
 		devices.erase(devices.begin() + pos);
-
 	}
 }
 
 
 QPushButton *ToolLauncher::addContext(const QString& uri)
 {
-	auto deviceWidget = new DeviceWidget(uri,
-					     ui->devicesList->count() + 1,
-					     this);
+	auto tempCtx = iio_create_context_from_uri(uri.toStdString().c_str());
+	if (!tempCtx)
+		return nullptr;
+
+	auto tempFilter = new Filter(tempCtx);
+	if (!tempFilter)
+		return nullptr;
+
+	DeviceWidget *deviceWidget = nullptr;
+	if (tempFilter->hw_name().compare("M2K") == 0) {
+		deviceWidget = DeviceBuilder::newDevice(DeviceBuilder::M2K,
+					       uri, tempFilter->hw_name(), this);
+	} else {
+		deviceWidget = DeviceBuilder::newDevice(DeviceBuilder::GENERIC,
+					       uri, tempFilter->hw_name(), this);
+	}
+
+	delete tempFilter;
+	iio_context_destroy(tempCtx);
+	tempCtx = nullptr;
+
 	auto connectBtn = deviceWidget->connectButton();
 
 	if (connectBtn) {
@@ -748,8 +783,8 @@ QPushButton *ToolLauncher::addContext(const QString& uri)
 			this, SLOT(connectBtn_clicked(bool)));
 	}
 
-	connect(deviceWidget, SIGNAL(forgetDevice(int, QString)),
-		this, SLOT(forgetDeviceBtn_clicked(int, QString)));
+	connect(deviceWidget, SIGNAL(forgetDevice(QString)),
+		this, SLOT(forgetDeviceBtn_clicked(QString)));
 
 	connect(deviceWidget, SIGNAL(selected(bool)),
 		this, SLOT(deviceBtn_clicked(bool)));
@@ -992,7 +1027,7 @@ void adiscope::ToolLauncher::deviceBtn_clicked(bool pressed)
 
 	deviceInfo = "";
 	if (dev && pressed) {
-		ui->stackedWidget->slideToIndex(dev->index());
+		ui->stackedWidget->slideToIndex(getDeviceIndex(dev) + 2);
 	}
 
 
@@ -1081,6 +1116,7 @@ void adiscope::ToolLauncher::connectBtn_clicked(bool pressed)
 			if (success) {
 				selectedDev->setConnected(true, false, ctx);
 				selectedDev->setName(filter->hw_name());
+				selectedDev->infoPage()->identifyDevice(true);
 				setDynamicProperty(ui->btnConnect, "connected", true);
 
 				search_timer->stop();
