@@ -3673,9 +3673,9 @@ void Oscilloscope::resetStreamingFlag(bool enable)
 	if (started)
 		iio->unlock();
 
-	if (enable) {
-		adc->getTrigger()->setStreamingFlag(true);
-	}
+        if (enable && !d_displayOneBuffer) {
+                adc->getTrigger()->setStreamingFlag(true);
+        }
 
 	/* Single capture done */
 	if ((symmBufferMode->isEnhancedMemDepth() || plot_samples_sequentially)
