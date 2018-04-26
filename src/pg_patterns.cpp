@@ -24,6 +24,8 @@
 #include <QPushButton>
 #include <QJsonDocument>
 #include <QDirIterator>
+#include <QFileDialog>
+#include <QMap>
 
 #include <errno.h>
 #include "boost/math/common_factor.hpp"
@@ -3041,7 +3043,7 @@ uint32_t ImportPattern::get_required_nr_of_samples(uint32_t sample_rate,
 		uint32_t number_of_channels)
 {
 	// greatest common divider duty cycle and 1000;0;
-	uint32_t period_number_of_samples = (uint32_t)sample_rate/frequency;
+	uint32_t period_number_of_samples = ((uint32_t)sample_rate/frequency) * data.size();
 	return period_number_of_samples;
 }
 
@@ -3061,7 +3063,7 @@ ImportPattern::ImportPattern()
 {
 	set_name("Import");
 	set_description("Import pattern");
-	set_periodic(true);
+	set_periodic(false);
 	set_frequency(5000);
 }
 
@@ -3075,42 +3077,25 @@ uint8_t ImportPattern::generate_pattern(uint32_t sample_rate,
 {
 	float f_period_number_of_samples = (float)sample_rate/frequency;
 	qDebug()<<"period_number_of_samples - "<<f_period_number_of_samples;
-	float f_number_of_periods = number_of_samples / f_period_number_of_samples;
-	qDebug()<<"number_of_periods - " << f_number_of_periods;
-	float f_low_number_of_samples = (f_period_number_of_samples *
-					 (100-50)) / 100;
-	qDebug()<<"low_number_of_samples - " << f_low_number_of_samples;
-	float f_high_number_of_samples = f_period_number_of_samples -
-					 f_low_number_of_samples;
-	qDebug()<<"high_number_of_samples - " << f_high_number_of_samples;
-
 
 	int period_number_of_samples = (int)round(f_period_number_of_samples);
-	int number_of_periods = (int)round(f_number_of_periods);
-	int low_number_of_samples = (int)round(f_low_number_of_samples);
-	int high_number_of_samples = (int)round(f_high_number_of_samples);
-
 	if (period_number_of_samples==0) {
 		period_number_of_samples=1;
 	}
 
 	delete_buffer();
 	buffer = new short[number_of_samples];
-	int i=0;
 
-	/*// phased samples
-	int phased = (period_number_of_samples * phase/360);
 
-	while (i<number_of_samples) {
-		if ((i+phased) % ((int)period_number_of_samples) < low_number_of_samples) {
-			buffer[i] = 0;
-		} else {
-			buffer[i] = 0xffff;
+	for (int i = 0; i < data.size(); ++i) {
+		for (int j = 0; j < period_number_of_samples; ++j) {
+			buffer[i * period_number_of_samples + j] = data[i];
 		}
-
-		//buffer[i] = (number_of_samples % period_number_of_samples) ;
-		i++;
-	}*/
+	}
+	int i = data.size() * period_number_of_samples;
+	for (; i < number_of_samples; ++i) {
+		buffer[i] = 0xffff;
+	}
 
 	return 0;
 }
@@ -3125,8 +3110,47 @@ ImportPatternUI::ImportPatternUI(ImportPattern *pattern,
 		{"kHz", 1E+3},
 		{"MHz", 1E+6}
 	}, "Frequency", 1e0, PGMaxSampleRate/2,true,false,this, {1,2.5,5});
+	import_settings = new ImportSettings(this);
+	fileLineEdit = new QLineEdit(this);
+	openFileBtn = new QPushButton("Open file", this);
+	importBtn = new QPushButton("Import selected channels", this);
+	fileLineEdit->setDisabled(true);
+	fileLineEdit->setText("No file selected");
+	import_settings->setDisabled(true);
+	importBtn->setDisabled(true);
+	ui->verticalLayout->setSpacing(10);
+	ui->verticalLayout->addWidget(fileLineEdit);
+	ui->verticalLayout->addWidget(openFileBtn);
+	ui->verticalLayout->addWidget(import_settings);
 	ui->verticalLayout->addWidget(frequencySpinButton);
+	ui->verticalLayout->addWidget(importBtn);
+	this->setStylesheet();
 	setVisible(false);
+}
+
+void ImportPatternUI::setStylesheet()
+{
+	QString style = "QPushButton{"
+			"width: 175px;"
+			"height: 30px;"
+			"border-radius: 4px;"
+			"background-color: #4a64ff;"
+			"font-size: 14px;"
+			"font-weight: normal;"
+			"font-style: normal;"
+			"text-align: center;"
+			"color: #ffffff;"
+		      "}"
+			"QPushButton:disabled {"
+			"background-color: gray;"
+			"color:white;"
+			"}"
+		      "QPushButton:hover"
+		      "{"
+			"background-color: #4a34ff;"
+		      "}";
+	openFileBtn->setStyleSheet(style);
+	importBtn->setStyleSheet(style);
 }
 
 ImportPatternUI::~ImportPatternUI()
@@ -3147,7 +3171,40 @@ void ImportPatternUI::build_ui(QWidget *parent,uint16_t number_of_channels)
 	requestedFrequency=pattern->get_frequency();
 	frequencySpinButton->setValue(pattern->get_frequency());
 
+	connect(openFileBtn, &QPushButton::clicked, [=](){
+		fileName = QFileDialog::getOpenFileName(this,
+				   tr("Open import file"), "",
+				   tr({"Comma-separated values files (*.csv);;"
+				       "Tab-delimited values files (*.txt)"}));
+		FileManager fm("Pattern Generator");
+
+		try {
+			fm.open(fileName, FileManager::IMPORT);
+
+			data.clear();
+			data = fm.read();
+
+			import_settings->clear();
+			for (int i = 0; i < data[0].size(); ++i) {
+				import_settings->addChannel(i, "CH" + QString::number(i));
+			}
+
+			fileLineEdit->setText(fileName);
+			fileLineEdit->setToolTip(fileName);
+			import_settings->setDisabled(false);
+			importBtn->setDisabled(false);
+
+		} catch (FileManagerException &e) {
+			fileLineEdit->setText(QString(e.what()));
+			fileLineEdit->setToolTip("");
+			importBtn->setDisabled(true);
+		}
+
+	});
+
 	connect(frequencySpinButton,SIGNAL(valueChanged(double)),this,SLOT(parse_ui()));
+	connect(importBtn, &QPushButton::clicked, this, &ImportPatternUI::parse_ui);
+
 }
 void ImportPatternUI::destroy_ui()
 {
@@ -3156,6 +3213,7 @@ void ImportPatternUI::destroy_ui()
 
 void ImportPatternUI::parse_ui()
 {
+
 	bool ok =0;
 	QObject *obj = sender();
 	bool freqStepDown = false;
@@ -3175,12 +3233,33 @@ void ImportPatternUI::parse_ui()
 		div=(long)floor((double)PGMaxSampleRate/freq);
 	}
 
+	unsigned short mask = 0;
+	for (int key : import_settings->getExportConfig().keys()) {
+		mask = mask | (import_settings->getExportConfig()[key] << key);
+	}
+
+	pattern->channel_mapping = mask;
+	pattern->data.clear();
+	for (int i = 0; i < data.size(); ++i) {
+		int k = 0;
+		unsigned short line_mask = 0;
+		for (int j = 0 ; j < data[i].size(); ++j) {
+			if (mask & (1 << j) ) {
+				line_mask |= ((int)data[i][j] << k);
+				k++;
+			}
+		}
+		pattern->data.push_back(line_mask);
+	}
+
 	freq=(PGMaxSampleRate)/(float)div;
 	requestedFrequency=freq;
 	frequencySpinButton->blockSignals(true);
 	frequencySpinButton->setValue(freq);
 	frequencySpinButton->blockSignals(false);
 	pattern->set_frequency(freq);
+
+
 
 	Q_EMIT patternParamsChanged();
 

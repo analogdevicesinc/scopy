@@ -32,6 +32,7 @@
 #include <string>
 #include <memory>
 #include "spinbox_a.hpp"
+#include "osc_import_settings.h"
 
 // Generated UI
 #include "ui_binarycounterpatternui.h"
@@ -46,6 +47,7 @@
 #include "ui_walkingpattern.h"
 #include "ui_spipatternui.h"
 #include "ui_i2cpatternui.h"
+#include "filemanager.h"
 
 
 namespace Ui {
@@ -822,6 +824,8 @@ public:
 	uint32_t get_min_sampling_freq();
 	uint32_t get_required_nr_of_samples(uint32_t  sample_rate,
 					    uint32_t number_of_channels);
+	unsigned short channel_mapping;
+	QVector<unsigned short> data;
 
 };
 
@@ -833,6 +837,14 @@ class ImportPatternUI : public PatternUI
 	ImportPattern *pattern;
 	ScaleSpinButton *frequencySpinButton;
 	double requestedFrequency;
+	ImportSettings *import_settings;
+	QLineEdit *fileLineEdit;
+	QPushButton *openFileBtn;
+	QPushButton *importBtn;
+	QString fileName;
+	QVector<QVector<double>> data;
+
+	void setStylesheet();
 public:
 	ImportPatternUI(ImportPattern *pattern, QWidget *parent = 0);
 	virtual ~ImportPatternUI();
