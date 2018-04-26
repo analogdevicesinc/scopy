@@ -516,7 +516,7 @@ void ToolLauncher::insertMenuOptions(){
 			continue;
 		}
 		if (toolMenu[tools[position[i]]]->getName() == "Calibration"
-				&& !debugger_enabled) {
+				&& !manual_calibration_enabled) {
 			offset += 1;
 			continue;
 		}
