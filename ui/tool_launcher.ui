@@ -1256,6 +1256,18 @@ qproperty-text: &quot;Failed&quot;;
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>200</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>200</height>
+              </size>
+             </property>
              <property name="styleSheet">
               <string notr="true">background-color: transparent;
 border: 0px;</string>
@@ -1600,8 +1612,29 @@ background-color: #4a34ff;
               </item>
               <item row="0" column="1">
                <widget class="adiscope::OscCustomScrollArea" name="scrollArea_2">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
                 <property name="frameShape">
                  <enum>QFrame::NoFrame</enum>
+                </property>
+                <property name="verticalScrollBarPolicy">
+                 <enum>Qt::ScrollBarAlwaysOff</enum>
                 </property>
                 <property name="widgetResizable">
                  <bool>true</bool>
@@ -1612,7 +1645,7 @@ background-color: #4a34ff;
                    <x>0</x>
                    <y>0</y>
                    <width>261</width>
-                   <height>162</height>
+                   <height>200</height>
                   </rect>
                  </property>
                  <layout class="QHBoxLayout" name="devicesList">
@@ -1655,8 +1688,8 @@ background-color: #4a34ff;
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
-                  <width>40</width>
-                  <height>20</height>
+                  <width>0</width>
+                  <height>0</height>
                  </size>
                 </property>
                </spacer>
@@ -1716,18 +1749,6 @@ background-color: #4a34ff;
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>adiscope::DetachDragZone</class>
-   <extends>QWidget</extends>
-   <header>detachdragzone.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>adiscope::MenuAnim</class>
-   <extends>QWidget</extends>
-   <header>menu_anim.hpp</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>adiscope::StackedHomepage</class>
    <extends>QStackedWidget</extends>
    <header>stacked_homepage.h</header>
@@ -1737,6 +1758,18 @@ background-color: #4a34ff;
    <class>adiscope::OscCustomScrollArea</class>
    <extends>QScrollArea</extends>
    <header>osc_custom_scroll.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::DetachDragZone</class>
+   <extends>QWidget</extends>
+   <header>detachdragzone.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::MenuAnim</class>
+   <extends>QWidget</extends>
+   <header>menu_anim.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

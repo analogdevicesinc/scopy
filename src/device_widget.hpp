@@ -37,9 +37,9 @@ class DeviceWidget : public QWidget
 {
         Q_OBJECT
 public:
-        explicit DeviceWidget(QString uri, int index = 0,
+        explicit DeviceWidget(QString uri, QString name,
                               ToolLauncher *parent = nullptr);
-        ~DeviceWidget();
+        virtual ~DeviceWidget();
 
         QPushButton* deviceButton() const;
         QPushButton* connectButton() const;
@@ -53,9 +53,6 @@ public:
         void highlightDevice();
         void click();
 
-        int index() const;
-        void setIndex(int index);
-
         InfoPage *infoPage() const;
         void setInfoPage(InfoPage *infoPage);
 
@@ -66,7 +63,7 @@ public:
 
 Q_SIGNALS:
         void selected(bool);
-        void forgetDevice(int, QString);
+        void forgetDevice(QString);
         void identifyDevice(QString);
 
 public Q_SLOTS:
@@ -74,13 +71,40 @@ public Q_SLOTS:
         void forgetDevice_clicked(bool);
         void identifyDevice_clicked(bool);
 
-private:
+protected:
         Ui::Device *m_ui;
         QString m_uri;
-        int m_index;
         InfoPage *m_infoPage;
         bool m_connected;
         bool m_selected;
+};
+
+class M2kDeviceWidget : public DeviceWidget
+{
+        Q_OBJECT
+public:
+        explicit M2kDeviceWidget(QString uri, QString name,
+                              ToolLauncher *parent = nullptr);
+        ~M2kDeviceWidget();
+};
+
+class DeviceBuilder
+{
+public:
+	enum DeviceType {
+		GENERIC = 0,
+		M2K = 1,
+	};
+
+	static DeviceWidget* newDevice(DeviceType dev_type,
+				       QString uri, QString name,
+				       ToolLauncher *parent = nullptr)
+	{
+		switch (dev_type) {
+		case GENERIC: return new DeviceWidget(uri, name, parent);
+		case M2K: return new M2kDeviceWidget(uri, name, parent);
+		}
+	}
 };
 
 } /* namespace adiscope */

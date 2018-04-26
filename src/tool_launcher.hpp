@@ -124,7 +124,7 @@ private Q_SLOTS:
 	void deviceBtn_clicked(bool);
 	void btnAdd_toggled(bool);
 	void btnHomepage_toggled(bool);
-	void forgetDeviceBtn_clicked(int, QString);
+	void forgetDeviceBtn_clicked(QString);
 	void destroyPopup();
 
 	void enableAdcBasedTools();
@@ -140,7 +140,8 @@ private Q_SLOTS:
 	void highlight(bool on, int position);
 	void resetSession();
 	DeviceWidget* getConnectedDevice();
-	int getSelectedDeviceIndex();
+	DeviceWidget* getSelectedDevice();
+	int getDeviceIndex(DeviceWidget*);
 	void pageMoved(int);
 	void stopSearching(bool);
 

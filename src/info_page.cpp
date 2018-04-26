@@ -34,7 +34,6 @@ InfoPage::InfoPage(QString uri, Preferences *pref,
         ui(new Ui::InfoPage),
         m_uri(uri),
         m_ctx(ctx),
-        m_fabric_channel(nullptr),
         m_advanced(false),
         prefPanel(pref),
         m_connected(false),
@@ -249,9 +248,105 @@ void InfoPage::identifyDevice(bool clicked)
 		if (!m_ctx) {
 			return;
 		}
+		startIdentification(true);
+	} else {
+		ledTimeout();
+	}
+}
 
-		struct iio_device *m2k_fabric = iio_context_find_device(m_ctx,
-									"m2k-fabric");
+void InfoPage::blinkTimeout()
+{
+}
+
+void InfoPage::startIdentification(bool start)
+{
+	ui->lblConnectionStatus->setText("Can't identify this device.");
+	if (!m_connected) {
+		iio_context_destroy(m_ctx);
+		m_ctx = nullptr;
+	}
+	if (m_search_interrupted) {
+		m_search_interrupted = false;
+		Q_EMIT stopSearching(false);
+	}
+}
+
+void InfoPage::ledTimeout()
+{
+	if (m_led_timer->isActive()) {
+		m_led_timer->stop();
+	} else {
+		return;
+	}
+
+	if (m_blink_timer->isActive()) {
+		m_blink_timer->stop();
+	}
+
+	startIdentification(false);
+
+	if (m_ctx) {
+		if (!m_connected) {
+			iio_context_destroy(m_ctx);
+			m_ctx = nullptr;
+		}
+	}
+
+	if (m_search_interrupted) {
+		m_search_interrupted = false;
+		Q_EMIT stopSearching(false);
+	}
+}
+
+QPushButton* InfoPage::identifyDeviceButton()
+{
+        return ui->btnIdentify;
+}
+
+QPushButton* InfoPage::connectButton()
+{
+        return ui->btnConnect;
+}
+
+M2kInfoPage::M2kInfoPage(QString uri,
+                     Preferences* prefPanel,
+                     struct iio_context *ctx,
+                     QWidget *parent) :
+        InfoPage(uri, prefPanel, ctx, parent),
+        m_fabric_channel(nullptr)
+{
+	ui->extraWidget->setFrameShape(QFrame::NoFrame);
+	ui->extraWidget->setOpenExternalLinks(true);
+	ui->extraWidget->setSource(QUrl("qrc:/m2k.html"));
+	ui->extraWidget->setMaximumHeight(700);
+	ui->extraWidget->setMinimumHeight(700);
+}
+
+M2kInfoPage::~M2kInfoPage()
+{
+
+}
+
+void M2kInfoPage::startIdentification(bool start)
+{
+        if (start) {
+                struct iio_device *m2k_fabric = iio_context_find_device(m_ctx,
+                                                                        "m2k-fabric");
+
+		if (!m2k_fabric) {
+			ui->lblConnectionStatus->setText("Can't identify this device.");
+			if (!m_connected) {
+				iio_context_destroy(m_ctx);
+				m_ctx = nullptr;
+			}
+			m_fabric_channel = nullptr;
+
+			if (m_search_interrupted) {
+				m_search_interrupted = false;
+				Q_EMIT stopSearching(false);
+			}
+			return;
+		}
 
 		m_fabric_channel = iio_device_find_channel(m2k_fabric, "voltage4", true);
 		if (m_fabric_channel) {
@@ -271,11 +366,18 @@ void InfoPage::identifyDevice(bool clicked)
 			}
 		}
 	} else {
-		ledTimeout();
+		if (!m_fabric_channel)
+			return;
+		if (m_ctx) {
+			iio_channel_attr_write_bool(m_fabric_channel,
+						    "done_led_overwrite_powerdown",
+						    false);
+		}
+		m_fabric_channel = nullptr;
 	}
 }
 
-void InfoPage::blinkTimeout()
+void M2kInfoPage::blinkTimeout()
 {
 	if (!m_fabric_channel)
 		return;
@@ -286,46 +388,4 @@ void InfoPage::blinkTimeout()
 	iio_channel_attr_write_bool(m_fabric_channel,
 					"done_led_overwrite_powerdown",
 					!oldVal);
-}
-
-void InfoPage::ledTimeout()
-{
-	if (m_led_timer->isActive()) {
-		m_led_timer->stop();
-	} else {
-		return;
-	}
-
-	if (m_blink_timer->isActive()) {
-		m_blink_timer->stop();
-	}
-
-	if (!m_fabric_channel)
-		return;
-
-	if (m_ctx) {
-		iio_channel_attr_write_bool(m_fabric_channel,
-					    "done_led_overwrite_powerdown",
-					    false);
-		if (!m_connected) {
-			iio_context_destroy(m_ctx);
-			m_ctx = nullptr;
-		}
-	}
-	m_fabric_channel = nullptr;
-
-	if (m_search_interrupted) {
-		m_search_interrupted = false;
-		Q_EMIT stopSearching(false);
-	}
-}
-
-QPushButton* InfoPage::identifyDeviceButton()
-{
-        return ui->btnIdentify;
-}
-
-QPushButton* InfoPage::connectButton()
-{
-        return ui->btnConnect;
 }

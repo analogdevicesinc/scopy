@@ -42,7 +42,7 @@ public:
                           Preferences* prefPanel,
                           struct iio_context *ctx = nullptr,
                           QWidget *parent = 0);
-        ~InfoPage();
+        virtual ~InfoPage();
 
 
         struct iio_context *ctx() const;
@@ -65,20 +65,22 @@ public Q_SLOTS:
         void identifyDevice(bool clicked = true);
 
 private Q_SLOTS:
-        void blinkTimeout();
+        virtual void blinkTimeout();
         void ledTimeout();
 
 Q_SIGNALS:
         void stopSearching(bool);
 
+protected:
+        virtual void startIdentification(bool);
+
 private:
         QPair<bool, QString> translateInfoParams(QString);
 
-private:
+protected:
         Ui::InfoPage *ui;
         QString m_uri;
         struct iio_context *m_ctx;
-        struct iio_channel *m_fabric_channel;
         bool m_advanced;
         Preferences *prefPanel;
         QMap<QString, QString> m_info_params;
@@ -87,6 +89,51 @@ private:
         QTimer *m_blink_timer;
         bool m_connected;
         bool m_search_interrupted;
+};
+
+
+class M2kInfoPage : public InfoPage
+{
+        Q_OBJECT
+public:
+        explicit M2kInfoPage(QString uri,
+                             Preferences* prefPanel,
+                             struct iio_context *ctx = nullptr,
+                             QWidget *parent = 0);
+        ~M2kInfoPage();
+
+protected:
+        virtual void startIdentification(bool);
+
+private Q_SLOTS:
+        void blinkTimeout();
+
+private:
+         struct iio_channel *m_fabric_channel;
+};
+
+
+class InfoPageBuilder
+{
+public:
+	enum InfoPageType {
+		GENERIC = 0,
+		M2K = 1,
+	};
+
+	static InfoPage* newPage(InfoPageType page_type,
+				 QString uri,
+				 Preferences* prefPanel,
+				 struct iio_context *ctx = nullptr,
+				 QWidget *parent = 0)
+	{
+		switch (page_type) {
+		case GENERIC: return new InfoPage(uri, prefPanel,
+						  ctx, parent);
+		case M2K: return new M2kInfoPage(uri, prefPanel,
+						 ctx, parent);
+		}
+	}
 };
 }
 #endif // INFO_PAGE_HPP
