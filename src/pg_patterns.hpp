@@ -90,6 +90,8 @@ namespace adiscope {
 #define JohnsonCounterPatternDescription "Johnson counter pattern generator"
 #define WalkingCounterPatternName "Walking Counter Pattern"
 #define WalkingCounterPatternDescription "Walking counter pattern generator"
+#define ImportPatternName "Import"
+#define ImportPatternDescription "Import pattern generator"
 
 enum {
 	ClockPatternId = 0,
@@ -100,6 +102,7 @@ enum {
 	SPIPatternId,
 	I2CPatternId,
 	GrayCounterId,
+	ImportPatternId
 };
 
 
@@ -805,6 +808,41 @@ public:
 	void destroy_ui();
 };
 #endif
+
+class ImportPattern : virtual public Pattern
+{
+	float frequency;
+public:
+	ImportPattern();
+	virtual ~ImportPattern();
+	uint8_t generate_pattern(uint32_t sample_rate, uint32_t number_of_samples,
+				 uint16_t number_of_channels);
+	float get_frequency() const;
+	void set_frequency(float value);
+	uint32_t get_min_sampling_freq();
+	uint32_t get_required_nr_of_samples(uint32_t  sample_rate,
+					    uint32_t number_of_channels);
+
+};
+
+class ImportPatternUI : public PatternUI
+{
+	Q_OBJECT
+	Ui::EmptyPatternUI *ui;
+	QWidget *parent_;
+	ImportPattern *pattern;
+	ScaleSpinButton *frequencySpinButton;
+	double requestedFrequency;
+public:
+	ImportPatternUI(ImportPattern *pattern, QWidget *parent = 0);
+	virtual ~ImportPatternUI();
+	Pattern *get_pattern();
+	void build_ui(QWidget *parent = 0,uint16_t number_of_channels=0);
+	void destroy_ui();
+
+private Q_SLOTS:
+	void parse_ui();
+};
 
 class PatternFactory
 {

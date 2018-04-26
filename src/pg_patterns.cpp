@@ -192,6 +192,7 @@ QJsonValue Pattern_API::toJson(Pattern *p)
 	UARTPattern *up = dynamic_cast<UARTPattern *>(p);
 	SPIPattern *sp = dynamic_cast<SPIPattern *>(p);
 	I2CPattern *ip = dynamic_cast<I2CPattern *>(p);
+//	ImportPattern *imp = dynamic_cast<ImportPattern *>(p);
 
 	QJsonObject params;
 
@@ -3031,6 +3032,160 @@ void WalkingPatternUI::destroy_ui()
 
 #endif
 
+uint32_t ImportPattern::get_min_sampling_freq()
+{
+	return frequency;
+}
+
+uint32_t ImportPattern::get_required_nr_of_samples(uint32_t sample_rate,
+		uint32_t number_of_channels)
+{
+	// greatest common divider duty cycle and 1000;0;
+	uint32_t period_number_of_samples = (uint32_t)sample_rate/frequency;
+	return period_number_of_samples;
+}
+
+
+float ImportPattern::get_frequency() const
+{
+	return frequency;
+}
+
+void ImportPattern::set_frequency(float value)
+{
+	frequency = value;
+}
+
+
+ImportPattern::ImportPattern()
+{
+	set_name("Import");
+	set_description("Import pattern");
+	set_periodic(true);
+	set_frequency(5000);
+}
+
+ImportPattern::~ImportPattern()
+{
+
+}
+
+uint8_t ImportPattern::generate_pattern(uint32_t sample_rate,
+				       uint32_t number_of_samples, uint16_t number_of_channels)
+{
+	float f_period_number_of_samples = (float)sample_rate/frequency;
+	qDebug()<<"period_number_of_samples - "<<f_period_number_of_samples;
+	float f_number_of_periods = number_of_samples / f_period_number_of_samples;
+	qDebug()<<"number_of_periods - " << f_number_of_periods;
+	float f_low_number_of_samples = (f_period_number_of_samples *
+					 (100-50)) / 100;
+	qDebug()<<"low_number_of_samples - " << f_low_number_of_samples;
+	float f_high_number_of_samples = f_period_number_of_samples -
+					 f_low_number_of_samples;
+	qDebug()<<"high_number_of_samples - " << f_high_number_of_samples;
+
+
+	int period_number_of_samples = (int)round(f_period_number_of_samples);
+	int number_of_periods = (int)round(f_number_of_periods);
+	int low_number_of_samples = (int)round(f_low_number_of_samples);
+	int high_number_of_samples = (int)round(f_high_number_of_samples);
+
+	if (period_number_of_samples==0) {
+		period_number_of_samples=1;
+	}
+
+	delete_buffer();
+	buffer = new short[number_of_samples];
+	int i=0;
+
+	/*// phased samples
+	int phased = (period_number_of_samples * phase/360);
+
+	while (i<number_of_samples) {
+		if ((i+phased) % ((int)period_number_of_samples) < low_number_of_samples) {
+			buffer[i] = 0;
+		} else {
+			buffer[i] = 0xffff;
+		}
+
+		//buffer[i] = (number_of_samples % period_number_of_samples) ;
+		i++;
+	}*/
+
+	return 0;
+}
+
+ImportPatternUI::ImportPatternUI(ImportPattern *pattern,
+			       QWidget *parent) : PatternUI(parent), pattern(pattern)
+{
+	ui = new Ui::EmptyPatternUI();
+	ui->setupUi(this);
+	frequencySpinButton = new ScaleSpinButton({
+		{"Hz", 1E0},
+		{"kHz", 1E+3},
+		{"MHz", 1E+6}
+	}, "Frequency", 1e0, PGMaxSampleRate/2,true,false,this, {1,2.5,5});
+	ui->verticalLayout->addWidget(frequencySpinButton);
+	setVisible(false);
+}
+
+ImportPatternUI::~ImportPatternUI()
+{
+	//qDebug()<<"ClockPatternUI destroyed";
+	delete ui;
+}
+
+Pattern *ImportPatternUI::get_pattern()
+{
+	return pattern;
+}
+
+void ImportPatternUI::build_ui(QWidget *parent,uint16_t number_of_channels)
+{
+	parent_ = parent;
+	parent->layout()->addWidget(this);
+	requestedFrequency=pattern->get_frequency();
+	frequencySpinButton->setValue(pattern->get_frequency());
+
+	connect(frequencySpinButton,SIGNAL(valueChanged(double)),this,SLOT(parse_ui()));
+}
+void ImportPatternUI::destroy_ui()
+{
+	parent_->layout()->removeWidget(this);
+}
+
+void ImportPatternUI::parse_ui()
+{
+	bool ok =0;
+	QObject *obj = sender();
+	bool freqStepDown = false;
+
+	if (obj==frequencySpinButton) {
+		if (frequencySpinButton->value() < requestedFrequency) {
+			freqStepDown=true;
+		}
+		requestedFrequency = frequencySpinButton->value();
+	}
+
+	auto freq=requestedFrequency;//frequencySpinButton->value();
+	long div;
+	if (freqStepDown) {
+		div=(long)ceil((double)PGMaxSampleRate/freq);
+	} else {
+		div=(long)floor((double)PGMaxSampleRate/freq);
+	}
+
+	freq=(PGMaxSampleRate)/(float)div;
+	requestedFrequency=freq;
+	frequencySpinButton->blockSignals(true);
+	frequencySpinButton->setValue(freq);
+	frequencySpinButton->blockSignals(false);
+	pattern->set_frequency(freq);
+
+	Q_EMIT patternParamsChanged();
+
+}
+
 
 
 int PatternFactory::static_ui_limit = 0;
@@ -3061,6 +3216,8 @@ void PatternFactory::init()
 	description_list.append(I2CPatternDescription);
 	ui_list.append(GrayCounterPatternName);
 	description_list.append(GrayCounterPatternDescription);
+	ui_list.append(ImportPatternName);
+	description_list.append(ImportPatternDescription);
 	/*
 	ui_list.append(ConstantPatternName);
 	description_list.append(ConstantPatternDescription);
@@ -3154,6 +3311,9 @@ Pattern *PatternFactory::create(int index)
 	case I2CPatternId:
 		return new I2CPattern();
 
+	case ImportPatternId:
+		return new ImportPattern();
+
 	default:
 		if (index>=static_ui_limit) {
 			return new JSPattern(patterns[QString::number(index
@@ -3233,6 +3393,10 @@ PatternUI *PatternFactory::create_ui(Pattern *pattern, int index,
 	case I2CPatternId:
 		return new I2CPatternUI(dynamic_cast<I2CPattern *>(pattern),
 		                        parent);
+	case ImportPatternId:
+		return new ImportPatternUI(dynamic_cast<ImportPattern *>(pattern),
+					parent);
+
 
 	default:
 		if (index>=static_ui_limit) {
