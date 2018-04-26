@@ -14,13 +14,14 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">QLabel {
+   <string notr="true">QWidget#TopWidget{
+background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 rgba(0, 0, 0, 40), stop:1 transparent);
+}
+
+QLabel {
 	color: rgba(255, 255, 255, 150);
 	text-align: left;
-	
-	font-size:14pt;
-	 font-weight:72;
- 	font-style:normal
+	font-size: 18px;
 }
 
 QPushButton
@@ -30,10 +31,6 @@ QPushButton
   background-color: #4a64ff;
   border-radius: 4px;
 
-  
-  font-size: 14px;
-  font-weight: normal;
-  font-style: normal;
   text-align: center;
   color: #ffffff;
 
@@ -135,17 +132,29 @@ QTabBar::tab:left:only-one, QTabBar::tab:right:only-one {
     margin-bottom: 0;
 }
 
-QListWidget
-{
-	
-	font-size:14pt;
-	font-weight:72;
- 	font-style:normal
-}</string>
+QListWidget{
+	font-size: 14px;
+}
+</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
    <item>
-    <widget class="QWidget" name="TopWidget" native="true">
+    <widget class="adiscope::DetachDragZone" name="TopWidget" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
        <horstretch>0</horstretch>
@@ -175,11 +184,7 @@ QListWidget
            </property>
            <property name="font">
             <font>
-             <family>DejaVu Sans</family>
-             <pointsize>14</pointsize>
-             <weight>9</weight>
-             <italic>false</italic>
-             <bold>false</bold>
+             <pointsize>-1</pointsize>
             </font>
            </property>
           </widget>
@@ -264,6 +269,14 @@ QListWidget
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="font">
+            <font>
+             <family>ArialMT</family>
+             <weight>50</weight>
+             <italic>false</italic>
+             <bold>false</bold>
+            </font>
+           </property>
            <property name="styleSheet">
             <string notr="true">global.qss</string>
            </property>
@@ -280,6 +293,14 @@ QListWidget
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>adiscope::DetachDragZone</class>
+   <extends>QWidget</extends>
+   <header>detachdragzone.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
