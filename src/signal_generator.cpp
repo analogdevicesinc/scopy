@@ -2569,8 +2569,9 @@ void SignalGenerator_API::setNoiseType(const QList<int>& list)
 		auto ptr = gen->getData(gen->channels[i]);
 
 		ptr->noiseType = qvariant_cast<gr::analog::noise_type_t>(list.at(i));
+
 		if (i == gen->currentChannel) {
-			gen->ui->type->setCurrentIndex(list.at(i));
+			gen->ui->cbNoiseType->setCurrentIndex(list.at(i));
 			gen->updateRightMenuForChn(i);
 		}
 	}
