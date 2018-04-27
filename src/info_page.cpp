@@ -93,7 +93,7 @@ void InfoPage::getDeviceInfo()
 	if (temp_ctx) {
 		const char *name;
 		const char *value;
-		char *ctx_git_tag;
+		char ctx_git_tag[8];
 		unsigned int ctx_major, ctx_minor;
 		iio_context_get_version(temp_ctx, &ctx_major, &ctx_minor, ctx_git_tag);
 
