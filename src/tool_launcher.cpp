@@ -258,7 +258,9 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	connect(ui->stackedWidget, SIGNAL(moved(int)),
 		this, SLOT(pageMoved(int)));
 
+
 	setupHomepage();
+	ui->stackedWidget->setCurrentIndex(0);
 	setupAddPage();
 	readPreferences();
 	ui->stackedWidget->setStyleSheet("background-color:black;");
