@@ -112,6 +112,16 @@ QMap<int, bool> ExportSettings::getExportConfig()
 	return result;
 }
 
+void ExportSettings::setExportConfig(QMap<int, bool> config)
+{
+	QStandardItemModel *model =
+		static_cast<QStandardItemModel *>(exportChannels->model());
+	for (int key : config.keys()) {
+		model->item(key, 1)->setData(QVariant((int) config[key]),
+					     Qt::EditRole);
+	}
+}
+
 void ExportSettings::on_btnExportAll_clicked()
 {
 	QStandardItemModel *model =
