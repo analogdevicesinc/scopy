@@ -826,7 +826,10 @@ public:
 					    uint32_t number_of_channels);
 	unsigned short channel_mapping;
 	QVector<unsigned short> data;
+	QString fileName;
 
+	float getFrequency() const;
+	void setFrequency(float value);
 };
 
 class ImportPatternUI : public PatternUI

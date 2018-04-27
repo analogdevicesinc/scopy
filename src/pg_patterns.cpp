@@ -194,7 +194,7 @@ QJsonValue Pattern_API::toJson(Pattern *p)
 	UARTPattern *up = dynamic_cast<UARTPattern *>(p);
 	SPIPattern *sp = dynamic_cast<SPIPattern *>(p);
 	I2CPattern *ip = dynamic_cast<I2CPattern *>(p);
-//	ImportPattern *imp = dynamic_cast<ImportPattern *>(p);
+	ImportPattern *imp = dynamic_cast<ImportPattern *>(p);
 
 	QJsonObject params;
 
@@ -262,11 +262,17 @@ QJsonValue Pattern_API::toJson(Pattern *p)
 		params["v"]=i2c;
 
 		obj["params"] = QJsonValue(params);
-	}
+	} else if (imp) {
+		obj["name"] = QString::fromStdString(imp->get_name());
+		params["frequency"] =  QJsonValue((qint64)imp->get_frequency());
+		params["file"] = imp->fileName;
+		params["channel_mapping"] = QJsonValue((imp->channel_mapping));
 
+		obj["params"] = QJsonValue(params);
 
-	else {
+	} else {
 		obj["name"] = "none";
+
 	}
 
 	return QJsonValue(obj);;
@@ -285,6 +291,7 @@ Pattern *Pattern_API::fromJson(QJsonObject obj)
 	UARTPattern *up = dynamic_cast<UARTPattern *>(p);
 	SPIPattern *sp = dynamic_cast<SPIPattern *>(p);
 	I2CPattern *ip = dynamic_cast<I2CPattern *>(p);
+	ImportPattern *imp = dynamic_cast<ImportPattern *>(p);
 
 	QJsonObject params = obj["params"].toObject();
 
@@ -326,6 +333,10 @@ Pattern *Pattern_API::fromJson(QJsonObject obj)
 		for (auto val : params["v"].toArray()) {
 			ip->v.push_front(val.toInt());
 		}
+	} else if (imp) {
+		imp->fileName = params["file"].toString();
+		imp->channel_mapping = params["channel_mapping"].toInt();
+		imp->setFrequency(params["frequency"].toDouble());
 	}
 
 	return p;
@@ -3059,12 +3070,23 @@ void ImportPattern::set_frequency(float value)
 }
 
 
+float ImportPattern::getFrequency() const
+{
+	return frequency;
+}
+
+void ImportPattern::setFrequency(float value)
+{
+	frequency = value;
+}
+
 ImportPattern::ImportPattern()
 {
 	set_name("Import");
 	set_description("Import pattern");
 	set_periodic(false);
 	set_frequency(5000);
+	fileName = "";
 }
 
 ImportPattern::~ImportPattern()
@@ -3171,6 +3193,41 @@ void ImportPatternUI::build_ui(QWidget *parent,uint16_t number_of_channels)
 	requestedFrequency=pattern->get_frequency();
 	frequencySpinButton->setValue(pattern->get_frequency());
 
+	try {
+		FileManager fm("Pattern Generator");
+
+		fm.open(pattern->fileName, FileManager::IMPORT);
+		fileName = pattern->fileName;
+		data.clear();
+		data = fm.read();
+
+		import_settings->clear();
+		for (int i = 0; i < data[0].size(); ++i) {
+			import_settings->addChannel(i, "CH" + QString::number(i));
+		}
+
+		fileLineEdit->setText(fileName);
+		fileLineEdit->setToolTip(fileName);
+		import_settings->setDisabled(false);
+		importBtn->setDisabled(false);
+
+		unsigned short mask = pattern->channel_mapping;
+
+		QMap<int, bool> config;
+		for (int i = 0; i < data[0].size(); ++i) {
+			config[i] = (bool) (mask & (1 << i));
+		}
+
+		import_settings->setExportConfig(config);
+
+		parse_ui();
+
+	} catch (FileManagerException &e) {
+		fileLineEdit->setText(QString(e.what()));
+		fileLineEdit->setToolTip("");
+		importBtn->setDisabled(true);
+	}
+
 	connect(openFileBtn, &QPushButton::clicked, [=](){
 		fileName = QFileDialog::getOpenFileName(this,
 				   tr("Open import file"), "",
@@ -3258,6 +3315,7 @@ void ImportPatternUI::parse_ui()
 	frequencySpinButton->setValue(freq);
 	frequencySpinButton->blockSignals(false);
 	pattern->set_frequency(freq);
+	pattern->fileName = fileName;
 
 
 

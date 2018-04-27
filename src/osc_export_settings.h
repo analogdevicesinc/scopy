@@ -34,6 +34,7 @@ public Q_SLOTS:
 	QPushButton *getExportButton();
 	QPushButton *getExportAllButton();
 	QMap<int, bool> getExportConfig();
+	void setExportConfig(QMap<int, bool> config);
 	void on_btnExportAll_clicked();
 	void enableExportButton(bool on);
 	void disableUIMargins();
