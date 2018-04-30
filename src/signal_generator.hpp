@@ -189,6 +189,7 @@ private:
 	void updateRightMenuForChn(int chIdx);
 	void updateAndToggleMenu(int chIdx, bool open);
 	void triggerRightMenuToggle(int chIdx, bool checked);
+    void loadFileFromPath(QString filename);
 
 	gr::basic_block_sptr getSignalSource(
 	        gr::top_block_sptr top,
@@ -310,6 +311,16 @@ class SignalGenerator_API : public ApiObject
 	Q_PROPERTY(QList<double> waveform_holdlow
 		   READ getWaveformHoldLow WRITE setWaveformHoldLow);
 
+    Q_PROPERTY(QList<QString> buffer_file_path
+               READ getBufferFilePath WRITE setBufferFilePath)
+    Q_PROPERTY(QList<double> buffer_amplitude
+           READ getBufferAmplitude WRITE setBufferAmplitude)
+    Q_PROPERTY(QList<double> buffer_offset
+           READ getBufferOffset WRITE setBufferOffset)
+    Q_PROPERTY(QList<double> buffer_sample_rate
+           READ getBufferSampleRate WRITE setBufferSampleRate)
+    Q_PROPERTY(QList<double> buffer_phase
+           READ getBufferPhase WRITE setBufferPhase)
 
 
 public:
@@ -359,6 +370,17 @@ public:
 
 	QList<QString> getMathFunction() const;
 	void setMathFunction(const QList<QString>& list);
+
+    QList<QString> getBufferFilePath() const;
+    void setBufferFilePath(const QList<QString>& list);
+    QList<double> getBufferAmplitude() const;
+    void setBufferAmplitude(const QList<double>& list);
+    QList<double> getBufferOffset() const;
+    void setBufferOffset(const QList<double>& list);
+    QList<double> getBufferSampleRate() const;
+    void setBufferSampleRate(const QList<double>& list);
+    QList<double> getBufferPhase() const;
+    void setBufferPhase(const QList<double>& list);
 
 	explicit SignalGenerator_API(SignalGenerator *gen) :
 		ApiObject(), gen(gen) {}

@@ -361,6 +361,11 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 	fileOffset->setValue(0);
 	filePhase->setValue(0);
 
+    fileAmplitude->setDisabled(true);
+    filePhase->setDisabled(true);
+    fileOffset->setDisabled(true);
+    fileSampleRate->setDisabled(true);
+
 	fallTime->setMinValue(0.00000001);
 	riseTime->setMinValue(0.00000001);
 	holdHighTime->setMinValue(0.00000001);
@@ -570,10 +575,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 	readPreferences();
 
 	fileManager = new FileManager("Signal Generator");
-	fileAmplitude->setDisabled(true);
-	filePhase->setDisabled(true);
-	fileOffset->setDisabled(true);
-	fileSampleRate->setDisabled(true);
+
 }
 
 SignalGenerator::~SignalGenerator()
@@ -1208,6 +1210,7 @@ bool SignalGenerator::loadParametersFromFile(
 		ptr->file_message+=" File not loaded due to errors ";
 		ptr->file_nr_of_samples.push_back(0);
 		ptr->file_type=FORMAT_NO_FILE;
+        return false;
 	}
 
 	ui->fileChannel->setEnabled(ptr->file_nr_of_channels > 1);
@@ -1234,47 +1237,56 @@ bool SignalGenerator::loadParametersFromFile(
 	return true;
 }
 
+void SignalGenerator::loadFileFromPath(QString filename){
+    auto ptr = getCurrentData();
+
+    ptr->file = filename;
+    ui->label_path->setText(ptr->file);
+    Util::setWidgetNrOfChars(ui->label_path,10,30);
+    bool loaded = loadParametersFromFile(ptr,ptr->file);
+
+    fileAmplitude->setEnabled(loaded);
+    fileSampleRate->setEnabled(loaded);
+    filePhase->setEnabled(loaded);
+    fileOffset->setEnabled(loaded);
+    if (!loaded) {
+        ptr->file_type=FORMAT_NO_FILE;
+        resetZoom();
+        return;
+    }
+    fileOffset->setValue(ptr->file_offset);
+    filePhase->setValue(ptr->file_phase);
+    filePhase->setMaxValue(ptr->file_nr_of_samples[ptr->file_channel]);
+    fileSampleRate->setValue(ptr->file_sr);
+    ui->fileChannel->blockSignals(true);
+    ui->fileChannel->clear();
+    ui->label_format->setText(ptr->file_message);
+
+    if (ptr->file_channel_names.isEmpty()) {
+        for (auto i=0; i<ptr->file_nr_of_channels; i++) {
+            ui->fileChannel->addItem(QString::number(i));
+        }
+    } else {
+        ui->fileChannel->addItems(ptr->file_channel_names);
+    }
+
+    this->ui->label_size->setText(QString::number(
+                                          ptr->file_nr_of_samples[ptr->file_channel]) +
+                                  tr(" samples"));
+    ui->fileChannel->setEnabled(ptr->file_nr_of_channels>1);
+    ui->fileChannel->setCurrentIndex(ptr->file_channel);
+    ui->fileChannel->blockSignals(false);
+    updateRightMenuForChn(currentChannel);
+    resetZoom();
+}
+
 void SignalGenerator::loadFile()
 {
-	auto ptr = getCurrentData();
-
 	QString filename = QFileDialog::getOpenFileName(this, tr("Open File"));
 	if(filename.isEmpty()) // user hit cancel
 		return;
-	ptr->file = filename;
-	ui->label_path->setText(ptr->file);
-	Util::setWidgetNrOfChars(ui->label_path,10,30);
-	bool loaded = loadParametersFromFile(ptr,ptr->file);
-	fileAmplitude->setEnabled(loaded);
-	fileSampleRate->setEnabled(loaded);
-	filePhase->setEnabled(loaded);
-	fileOffset->setEnabled(loaded);
-	if (!loaded) {
-		return;
-	}
-	fileOffset->setValue(ptr->file_offset);
-	filePhase->setValue(ptr->file_phase);
-	filePhase->setMaxValue(ptr->file_nr_of_samples[ptr->file_channel]);
-	fileSampleRate->setValue(ptr->file_sr);
-	ui->fileChannel->blockSignals(true);
-	ui->fileChannel->clear();
-	ui->label_format->setText(ptr->file_message);
-
-	if (ptr->file_channel_names.isEmpty()) {
-		for (auto i=0; i<ptr->file_nr_of_channels; i++) {
-			ui->fileChannel->addItem(QString::number(i));
-		}
-	} else {
-		ui->fileChannel->addItems(ptr->file_channel_names);
-	}
-
-	this->ui->label_size->setText(QString::number(
-	                                      ptr->file_nr_of_samples[ptr->file_channel]) +
-	                              tr(" samples"));
-	ui->fileChannel->setEnabled(ptr->file_nr_of_channels>1);
-	ui->fileChannel->setCurrentIndex(ptr->file_channel);
-	ui->fileChannel->blockSignals(false);
-	resetZoom();
+    loadFileFromPath(filename);
+    updateRightMenuForChn(currentChannel);
 }
 
 void SignalGenerator::start()
@@ -1651,7 +1663,7 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
 		break;
 
 	case SIGNAL_TYPE_BUFFER:
-		if (!ptr->file.isNull()) {
+        if (!ptr->file.isNull() && ptr->file_type != FORMAT_NO_FILE) {
 			auto str = ptr->file.toStdString();
 			boost::shared_ptr<basic_block> fs;
 
@@ -1889,6 +1901,12 @@ void SignalGenerator::updateRightMenuForChn(int chIdx)
 		phase->setInSeconds(true);
 		phase->setValue(phase->changeValueFromDegreesToSeconds(ptr->phase));
 	}
+
+    fileAmplitude->setEnabled(ptr->file_type != FORMAT_NO_FILE);
+    fileSampleRate->setEnabled(ptr->file_type != FORMAT_NO_FILE);
+    filePhase->setEnabled(ptr->file_type != FORMAT_NO_FILE);
+    fileOffset->setEnabled(ptr->file_type != FORMAT_NO_FILE);
+
 	offset->setValue(ptr->offset);
 	amplitude->setValue(ptr->amplitude);
 	dutycycle->setValue(ptr->dutycycle);
@@ -1903,6 +1921,7 @@ void SignalGenerator::updateRightMenuForChn(int chIdx)
 	holdLowTime->setValue(ptr->holdl);
 
 	ui->label_path->setText(ptr->file);
+    ui->label_format->setText(ptr->file_message);
 	ui->mathWidget->setFunction(ptr->function);
 	mathFrequency->setValue(ptr->math_freq);
 	fileSampleRate->setValue(ptr->file_sr);
@@ -2405,6 +2424,7 @@ void SignalGenerator_API::setWaveformType(const QList<int>& list)
 		if (i == gen->currentChannel) {
 			gen->ui->type->setCurrentIndex(list.at(i));
 			gen->updateRightMenuForChn(i);
+            gen->resetZoom();
 		}
 	}
 }
@@ -2574,7 +2594,6 @@ void SignalGenerator_API::setNoiseType(const QList<int>& list)
 		ptr->noiseType = qvariant_cast<gr::analog::noise_type_t>(list.at(i));
 
 		if (i == gen->currentChannel) {
-			gen->ui->cbNoiseType->setCurrentIndex(list.at(i));
 			gen->updateRightMenuForChn(i);
 		}
 	}
@@ -2783,4 +2802,138 @@ void SignalGenerator_API::setMathFunction(const QList<QString>& list)
 		gen->ui->mathWidget->setFunction(
 		        gen->getCurrentData()->function);
 	}
+}
+
+QList<QString> SignalGenerator_API::getBufferFilePath() const{
+    QList<QString> list;
+
+    for (unsigned int i = 0; i < gen->channels.size(); i++) {
+        auto ptr = gen->getData(gen->channels[i]);
+
+        if(ptr->file!="" && ptr->file_type!=FORMAT_NO_FILE){
+            list.append(ptr->file);
+        }
+        else{
+            list.append("");
+        }
+
+    }
+
+    return list;
+}
+void SignalGenerator_API::setBufferFilePath(const QList<QString>& list){
+    if (list.size() != gen->channels.size()) {
+        return;
+    }
+
+    auto currentChannel = gen->currentChannel;
+    for (unsigned int i = 0; i < gen->channels.size(); i++) {
+        if(list.at(i) != ""){
+            gen->currentChannel = i;
+            gen->loadFileFromPath(list.at(i));
+        }
+    }
+    gen->currentChannel = currentChannel;
+    gen->updateRightMenuForChn(gen->currentChannel);
+}
+
+QList<double> SignalGenerator_API::getBufferAmplitude() const{
+    QList<double> list;
+
+    for (unsigned int i = 0; i < gen->channels.size(); i++) {
+        auto ptr = gen->getData(gen->channels[i]);
+
+        list.append(ptr->file_amplitude);
+    }
+
+    return list;
+}
+
+void SignalGenerator_API::setBufferAmplitude(const QList<double>& list){
+    if (list.size() != gen->channels.size()) {
+        return;
+    }
+
+    for (unsigned int i = 0; i < gen->channels.size(); i++) {
+        auto ptr = gen->getData(gen->channels[i]);
+
+        ptr->file_amplitude = list.at(i);
+    }
+
+    gen->fileAmplitude->setValue(gen->getCurrentData()->file_amplitude);
+}
+
+QList<double> SignalGenerator_API::getBufferOffset() const{
+    QList<double> list;
+
+    for (unsigned int i = 0; i < gen->channels.size(); i++) {
+        auto ptr = gen->getData(gen->channels[i]);
+
+        list.append(ptr->file_offset);
+    }
+
+    return list;
+}
+
+void SignalGenerator_API::setBufferOffset(const QList<double>& list){
+    if (list.size() != gen->channels.size()) {
+        return;
+    }
+
+    for (unsigned int i = 0; i < gen->channels.size(); i++) {
+        auto ptr = gen->getData(gen->channels[i]);
+
+        ptr->file_offset = list.at(i);
+    }
+    gen->fileOffset->setValue(gen->getCurrentData()->file_offset);
+}
+
+QList<double> SignalGenerator_API::getBufferSampleRate() const{
+    QList<double> list;
+
+    for (unsigned int i = 0; i < gen->channels.size(); i++) {
+        auto ptr = gen->getData(gen->channels[i]);
+
+        list.append(ptr->file_sr);
+    }
+
+    return list;
+}
+
+void SignalGenerator_API::setBufferSampleRate(const QList<double>& list){
+    if (list.size() != gen->channels.size()) {
+        return;
+    }
+
+    for (unsigned int i = 0; i < gen->channels.size(); i++) {
+        auto ptr = gen->getData(gen->channels[i]);
+
+        ptr->file_sr = list.at(i);
+    }
+    gen->fileSampleRate->setValue(gen->getCurrentData()->file_sr);
+}
+
+QList<double> SignalGenerator_API::getBufferPhase() const{
+    QList<double> list;
+
+    for (unsigned int i = 0; i < gen->channels.size(); i++) {
+        auto ptr = gen->getData(gen->channels[i]);
+
+        list.append(ptr->file_phase);
+    }
+
+    return list;
+}
+
+void SignalGenerator_API::setBufferPhase(const QList<double>& list){
+    if (list.size() != gen->channels.size()) {
+        return;
+    }
+
+    for (unsigned int i = 0; i < gen->channels.size(); i++) {
+        auto ptr = gen->getData(gen->channels[i]);
+
+        ptr->file_phase = list.at(i);
+    }
+    gen->filePhase->setValue(gen->getCurrentData()->file_phase);
 }
