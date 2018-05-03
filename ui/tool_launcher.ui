@@ -349,8 +349,8 @@ border-radius:5px;
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>631</width>
-            <height>456</height>
+            <width>633</width>
+            <height>458</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -1621,13 +1621,13 @@ background-color: #4a34ff;
                 <property name="minimumSize">
                  <size>
                   <width>0</width>
-                  <height>0</height>
+                  <height>200</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
                   <width>16777215</width>
-                  <height>16777215</height>
+                  <height>200</height>
                  </size>
                 </property>
                 <property name="frameShape">
@@ -1647,6 +1647,18 @@ background-color: #4a34ff;
                    <width>261</width>
                    <height>200</height>
                   </rect>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>200</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>200</height>
+                  </size>
                  </property>
                  <layout class="QHBoxLayout" name="devicesList">
                   <property name="spacing">

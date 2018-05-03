@@ -54,13 +54,16 @@ void StackedHomepage::addWidget(QWidget *widget)
 	QStackedWidget::addWidget(widget);
 	s_hc->setVisible(count() > 1);
 	s_hc->raise();
+	if (currentIndex() < count() - 1) {
+		s_hc->enableRight(true);
+	}
 }
 
 void StackedHomepage::removeWidget(QWidget *widget)
 {
 	QStackedWidget::removeWidget(widget);
 	s_hc->setVisible(count() > 1);
-	s_hc->lower();
+	s_hc->raise();
 }
 
 void StackedHomepage::insertWidget(int pos, QWidget *widget)

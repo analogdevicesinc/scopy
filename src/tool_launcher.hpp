@@ -241,6 +241,8 @@ private:
 	QString pathToFile;
 
 	QButtonGroup *devices_btn_group;
+
+	DeviceWidget* selectedDev;
 };
 
 class ToolLauncher_API: public ApiObject

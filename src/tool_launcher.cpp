@@ -72,7 +72,8 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	debugger_enabled(false),
 	indexFile(""), deviceInfo(""), pathToFile(""),
 	manual_calibration_enabled(false),
-	devices_btn_group(new QButtonGroup(this))
+	devices_btn_group(new QButtonGroup(this)),
+	selectedDev(nullptr)
 {
 	if (!isatty(STDIN_FILENO))
 		notifier.setEnabled(false);
@@ -297,13 +298,21 @@ void ToolLauncher::loadIndexPageFromContent(QString fileLocation)
 void ToolLauncher::pageMoved(int direction)
 {
 	if (ui->btnAdd->isChecked()) {
+		if (!devices.size() && direction > 0) {
+			return;
+		}
 		(direction > 0) ? devices.at(0)->click() : ui->btnHomepage->click();
 	} else if (ui->btnHomepage->isChecked()) {
 		(direction > 0) ? ui->btnAdd->click() : ui->btnHomepage->click();
 	} else {
 		int selectedIdx = getDeviceIndex(getSelectedDevice()) + direction;
-		(selectedIdx >= 0) ? devices.at(selectedIdx)->click() :
-				    ui->btnAdd->click();
+		if (selectedIdx < (int)devices.size()) {
+			if (selectedIdx >= 0) {
+				devices.at(selectedIdx)->click();
+			} else {
+				ui->btnAdd->click();
+			}
+		}
 	}
 }
 
@@ -1092,15 +1101,19 @@ void adiscope::ToolLauncher::ping()
 void adiscope::ToolLauncher::connectBtn_clicked(bool pressed)
 {
 	auto connectedDev = getConnectedDevice();
-	DeviceWidget* selectedDev = nullptr;
 	for (auto d : devices) {
 		if (d->connectButton() == sender()) {
 			selectedDev = d;
 		}
 		d->setConnected(false, false);
 	}
-
-	selectedDev->connectButton()->setText("Connecting...");
+	selectedDev->connectButton()->setEnabled(false);
+	if (selectedDev != connectedDev) {
+		selectedDev->connectButton()->setText("Connecting...");
+	} else {
+		selectedDev->connectButton()->setText("Disconnecting...");
+	}
+	QApplication::processEvents();
 
 	/* Disconnect connected device, if any */
 	if (ctx) {
@@ -1117,6 +1130,7 @@ void adiscope::ToolLauncher::connectBtn_clicked(bool pressed)
 			bool success = switchContext(uri);
 			if (success) {
 				selectedDev->setConnected(true, false, ctx);
+				selectedDev->connectButton()->setText("Calibrating...");
 				selectedDev->setName(filter->hw_name());
 				selectedDev->infoPage()->identifyDevice(true);
 				setDynamicProperty(ui->btnConnect, "connected", true);
@@ -1128,10 +1142,13 @@ void adiscope::ToolLauncher::connectBtn_clicked(bool pressed)
 			} else {
 				setDynamicProperty(ui->btnConnect, "failed", true);
 				selectedDev->setConnected(false, true);
+				selectedDev->connectButton()->setEnabled(true);
 			}
 
 			Q_EMIT connectionDone(success);
 		}
+	} else {
+		selectedDev->connectButton()->setEnabled(true);
 	}
 }
 
@@ -1340,6 +1357,8 @@ void adiscope::ToolLauncher::enableDacBasedTools()
 	}
 
 	Q_EMIT dacToolsCreated();
+	selectedDev->connectButton()->setText("Disconnect");
+	selectedDev->connectButton()->setEnabled(true);
 }
 
 bool adiscope::ToolLauncher::switchContext(const QString& uri)
