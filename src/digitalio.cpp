@@ -88,7 +88,6 @@ void DigitalIO::setDirection(int ch, int direction)
 {
 	if (!offline_mode) {
 		diom->setDirection(ch,direction);
-		updateUi();
 	}
 }
 
@@ -173,6 +172,7 @@ DigitalIO::DigitalIO(struct iio_context *ctx, Filter *filt, QPushButton *runBtn,
 	                               TOOL_DIGITALIO)));
 	api->load(*settings);
 	api->js_register(engine);
+	updateUi();
 
 }
 
