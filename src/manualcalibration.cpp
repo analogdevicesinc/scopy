@@ -42,17 +42,17 @@ Measure the Voltage on the "V+" and
 enter the value in the field below.
 The value should be around 100mV)"
 					 << R"(Calibrate the Positive Supply
-Measure the Voltage on the "V+"
-and enter the value in the field below.
+Measure the Voltage on the "V+" and
+enter the value in the field below.
 The value should be around 4.5V)");
 static const QStringList negativeOffsetStory = (QStringList() <<
 					 R"(Calibrate the Negative Supply
-Measure the Voltage on the "V-"
-and enter the value in the field below.
+Measure the Voltage on the "V-" and
+enter the value in the field below.
 The value should be around -100mV)"
 					 << R"(Calibrate the Negative Supply
-Measure the Voltage on the "V-"
-and enter the value in the field below.
+Measure the Voltage on the "V-" and
+enter the value in the field below.
 The value should be around -4.5V)");
 
 ManualCalibration::ManualCalibration(struct iio_context *ctx, Filter *filt,
@@ -99,6 +99,9 @@ ManualCalibration::ManualCalibration(struct iio_context *ctx, Filter *filt,
 		&ManualCalibration::on_finishButton_clicked);
 
 	setupPowerSupplyIio();
+
+	ui->calibList->setCurrentRow(3); //set to autocalibration parameters
+	on_calibList_itemClicked(ui->calibList->currentItem());
 }
 
 ManualCalibration::~ManualCalibration()
