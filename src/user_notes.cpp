@@ -60,6 +60,8 @@ UserNotes::UserNotes(QWidget *parent) :
 
         notes_api->load(settings);
         ui->stackedWidget->setStyleSheet("background-color: black;");
+
+        ui->stackedWidget->set_controls_enabled(false);
 }
 
 UserNotes::~UserNotes()

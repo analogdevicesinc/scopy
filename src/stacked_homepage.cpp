@@ -42,6 +42,7 @@ StackedHomepage::StackedHomepage(QWidget *parent) :
 	s_now = QPoint(0, 0);
 	s_current = 0;
 	s_next = 0;
+	s_controls_enabled = true;
 }
 
 StackedHomepage::~StackedHomepage()
@@ -75,15 +76,19 @@ void StackedHomepage::insertWidget(int pos, QWidget *widget)
 
 void StackedHomepage::moveLeft()
 {
-	slideInPrev();
-	s_hc->raise();
+	if (s_controls_enabled) {
+		slideInPrev();
+		s_hc->raise();
+	}
 	Q_EMIT moved(-1);
 }
 
 void StackedHomepage::moveRight()
 {
-	slideInNext();
-	s_hc->raise();
+	if (s_controls_enabled) {
+		slideInNext();
+		s_hc->raise();
+	}
 	Q_EMIT moved(1);
 }
 
@@ -231,4 +236,14 @@ void StackedHomepage::slideInWidget(QWidget *newWidget, StackedHomepage::s_direc
 	s_current = current;
 	s_active = true;
 	animGroup->start();
+}
+
+bool StackedHomepage::get_controls_enabled() const
+{
+	return s_controls_enabled;
+}
+
+void StackedHomepage::set_controls_enabled(bool value)
+{
+	s_controls_enabled = value;
 }

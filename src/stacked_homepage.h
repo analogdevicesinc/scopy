@@ -50,6 +50,9 @@ public:
 
 	void slideToIndex(int index);
 
+	bool get_controls_enabled() const;
+	void set_controls_enabled(bool value);
+
 public Q_SLOTS:
 	void moveLeft();
 	void moveRight();
@@ -80,6 +83,7 @@ private:
 	QPoint s_now;
 	int s_current;
 	int s_next;
+	bool s_controls_enabled;
 };
 }
 #endif // STACKED_HOMEPAGE_H
