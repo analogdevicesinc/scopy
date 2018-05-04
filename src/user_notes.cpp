@@ -199,8 +199,10 @@ void UserNotes::pageMoved(int direction)
 		(direction > 0) ? m_notes.at(0)->click() : ui->addBtn->click();
 	} else {
 		int selectedIdx = getNoteIndex(getSelectedNote()) + direction;
-		(selectedIdx >= 0) ? m_notes.at(selectedIdx)->click() :
-				    ui->addBtn->click();
+		if (selectedIdx < (int)m_notes.size()) {
+			(selectedIdx >= 0) ? m_notes.at(selectedIdx)->click() :
+					ui->addBtn->click();
+		}
 	}
 }
 

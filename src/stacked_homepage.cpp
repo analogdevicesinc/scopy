@@ -71,6 +71,8 @@ void StackedHomepage::insertWidget(int pos, QWidget *widget)
 {
 	QStackedWidget::insertWidget(pos, widget);
 	s_hc->setVisible(count() > 1);
+	s_hc->enableRight(currentIndex() < count() - 1);
+	s_hc->enableLeft(currentIndex() > 0);
 	s_hc->raise();
 }
 
