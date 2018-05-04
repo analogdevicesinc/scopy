@@ -545,6 +545,8 @@ void ClockPatternUI::parse_ui()
 	QObject *obj = sender();
 
 	bool freqStepDown = false;
+	bool phaseStepDown = false;
+	double oldPhase = 0;
 
 	if (obj==frequencySpinButton) {
 		if (frequencySpinButton->value() < requestedFrequency) {
@@ -555,7 +557,9 @@ void ClockPatternUI::parse_ui()
 	}
 
 	if (obj==phaseSpinButton) {
+		oldPhase = requestedPhase;
 		requestedPhase=phaseSpinButton->value();
+		phaseStepDown = phaseSpinButton->isStepDown();
 	}
 
 	if (obj==dutySpinButton) {
@@ -577,6 +581,7 @@ void ClockPatternUI::parse_ui()
 
 	frequencySpinButton->blockSignals(true);
 	frequencySpinButton->setValue(freq);
+	frequencySpinButton->updateCompletionCircle(freq);
 	frequencySpinButton->blockSignals(false);
 	pattern->set_frequency(freq);
 
@@ -589,6 +594,7 @@ void ClockPatternUI::parse_ui()
 	dutySpinButton->blockSignals(true);
 	dutySpinButton->setStep(dutystep);
 	dutySpinButton->setValue(dutyval);
+	dutySpinButton->updateCompletionCircle(dutyval);
 	dutySpinButton->blockSignals(false);
 	pattern->set_duty_cycle(dutySpinButton->value());
 
@@ -597,11 +603,26 @@ void ClockPatternUI::parse_ui()
 	phasestep=(phasestep>1 ? phasestep : 1);
 	phasestep=floor(phasestep*360+0.5)/360.0;
 	auto phaseval = requestedPhase;
-	phaseval = floor((phaseval/phasestep)+0.5)*phasestep;
+	if (phaseStepDown) {
+		phaseval = floor((phaseval/phasestep)-0.5)*phasestep;
+	} else {
+		phaseval = round((phaseval/phasestep)+0.5)*phasestep;
+	}
 
+	phaseval = abs(phaseval);
+
+	if (phaseval == oldPhase) {
+		if (phaseval == 0) phaseval = 360;
+		phaseStepDown ? (phaseval -= phasestep)
+			      : (phaseval += phasestep);
+	}
+
+	requestedPhase = phaseval;
 	phaseSpinButton->blockSignals(true);
 	phaseSpinButton->setStep(phasestep);
 	phaseSpinButton->setValue(phaseval);
+	if (phaseval >= 360) phaseval = (int)phaseval % 360;
+	phaseSpinButton->updateCompletionCircle(phaseval);
 	phaseSpinButton->blockSignals(false);
 	pattern->set_phase(phaseSpinButton->value());
 	Q_EMIT patternParamsChanged();

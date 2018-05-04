@@ -120,6 +120,7 @@ SpinBoxA::SpinBoxA(vector<pair<QString, double> >units, const QString& name,
 	m_settings = new QSettings(tempFile.fileName(), QSettings::IniFormat);
 
 	m_sba_api->load(*m_settings);
+	m_is_step_down = false;
 }
 
 SpinBoxA::~SpinBoxA()
@@ -129,6 +130,11 @@ SpinBoxA::~SpinBoxA()
 	m_sba_api->save(*m_settings);
 	delete m_sba_api;
 	delete ui;
+}
+
+void SpinBoxA::updateCompletionCircle(double value)
+{
+	ui->SBA_CompletionCircle->setValueDouble(value);
 }
 
 void SpinBoxA::onUpButtonPressed()
@@ -453,6 +459,11 @@ bool SpinBoxA::fineModeAvailable()
 void SpinBoxA::setFineModeAvailable(bool tog)
 {
 	ui->SBA_CompletionCircle->setToggleable(tog);
+}
+
+bool SpinBoxA::isStepDown() const
+{
+	return m_is_step_down;
 }
 
 QString SpinBoxA::getName() const
@@ -945,6 +956,7 @@ double PhaseSpinButton::computeSecondsTransformation(double scale, int index,
 
 void PhaseSpinButton::stepUp()
 {
+	m_is_step_down = false;
 	double current_scale = m_units[ui->SBA_Combobox->currentIndex()].second;
 	double newVal;
 	double step = inSeconds() ? changeValueFromDegreesToSeconds(45)
@@ -968,6 +980,7 @@ void PhaseSpinButton::stepUp()
 
 void PhaseSpinButton::stepDown()
 {
+	m_is_step_down = true;
 	double current_scale = m_units[ui->SBA_Combobox->currentIndex()].second;
 	double newVal;
 	double step = inSeconds()  ? changeValueFromDegreesToSeconds(45)

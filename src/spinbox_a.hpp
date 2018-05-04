@@ -98,6 +98,8 @@ public:
 	bool fineModeAvailable();
 	void setFineModeAvailable(bool);
 
+	bool isStepDown() const;
+
 
 	QString getName() const;
 	void setName(const QString& name);
@@ -106,6 +108,7 @@ public:
 
 	static unsigned int current_id;
 
+	void updateCompletionCircle(double value);
 public Q_SLOTS:
 	virtual void setValue(double);
 	void setFineMode(bool);
@@ -144,6 +147,7 @@ protected:
 	double m_displayScale;
 	SpinBoxA_API *m_sba_api;
 	unsigned int m_id;
+	bool m_is_step_down;
 
 private:
 	QSettings *m_settings;
