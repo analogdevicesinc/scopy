@@ -352,6 +352,4 @@ void adiscope::Debugger::on_runButton_clicked()
 	} else {
 		qDebug()<<" - Success";
 	}
-
-	ui->runButton->setText("Stop");
 }
