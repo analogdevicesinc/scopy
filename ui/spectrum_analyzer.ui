@@ -787,7 +787,7 @@ border-bottom: 1px solid rgba(255,255,255,100);</string>
     font-weight: normal;</string>
                  </property>
                  <property name="text">
-                  <string>Instrument Settings</string>
+                  <string>General settings</string>
                  </property>
                 </widget>
                </item>
