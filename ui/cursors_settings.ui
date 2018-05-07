@@ -490,6 +490,10 @@ QSlider::handle {
 
 QSlider::handle:disabled {
     background: #444444;
+}
+
+QSlider::sub-page:horizontal {
+    background: #4A64FF;
 }</string>
         </property>
         <property name="orientation">
