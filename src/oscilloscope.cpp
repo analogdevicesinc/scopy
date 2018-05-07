@@ -631,6 +631,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	// the list so we can show in case all other menus are disabled
 	menuOrder.push_back(ui->btnTrigger);
 	gsettings_ui->xySettings->hide();
+	timePosition->setValue(0);
 
 	api->setObjectName(QString::fromStdString(Filter::tool_name(
 			TOOL_OSCILLOSCOPE)));
