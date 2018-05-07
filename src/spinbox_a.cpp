@@ -619,6 +619,11 @@ void ScaleSpinButton::stepDown()
 	if (isInFineMode()) {
 		newVal = (current_val - m_fine_increment) * current_scale;
 
+		if (current_val - m_fine_increment < 1
+				&& current_val - m_fine_increment > 0) {
+			newVal = 0;
+		}
+
 		if ((m_min_value > 0 && newVal <= m_min_value) &&
 		    (ui->SBA_Combobox->currentIndex() > 0)) {
 			int i = ui->SBA_Combobox->currentIndex() - 1;
