@@ -517,9 +517,8 @@ void SpectrumAnalyzer::toggleRightMenu(CustomPushButton *btn, bool checked)
 		updateMarkerMenu(crt_channel_id);
 	}
 
-	if (!ui->btnToolSettings->isChecked() &&
-			!ui->btnSettings->isChecked()) {
-		ui->btnSettings->setChecked(checked);
+	if (!ui->btnToolSettings->isChecked()) {
+		ui->btnSettings->setChecked(!!this->settings_group->checkedButton());
 	}
 
 	if (checked) {
@@ -553,7 +552,6 @@ void SpectrumAnalyzer::on_btnSettings_clicked(bool checked)
 	CustomPushButton *btn = nullptr;
 	if (checked && !menuOrder.isEmpty()) {
 		btn = menuOrder.back();
-		menuOrder.pop_back();
 	} else {
 		btn = static_cast<CustomPushButton *>(
 			settings_group->checkedButton());
