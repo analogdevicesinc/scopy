@@ -2858,6 +2858,9 @@ void SignalGenerator_API::setBufferAmplitude(const QList<double>& list){
         auto ptr = gen->getData(gen->channels[i]);
 
         ptr->file_amplitude = list.at(i);
+        if(i == gen->currentChannel){
+            gen->resetZoom();
+        }
     }
 
     gen->fileAmplitude->setValue(gen->getCurrentData()->file_amplitude);
@@ -2884,6 +2887,9 @@ void SignalGenerator_API::setBufferOffset(const QList<double>& list){
         auto ptr = gen->getData(gen->channels[i]);
 
         ptr->file_offset = list.at(i);
+        if(i == gen->currentChannel){
+            gen->resetZoom();
+        }
     }
     gen->fileOffset->setValue(gen->getCurrentData()->file_offset);
 }
@@ -2909,6 +2915,9 @@ void SignalGenerator_API::setBufferSampleRate(const QList<double>& list){
         auto ptr = gen->getData(gen->channels[i]);
 
         ptr->file_sr = list.at(i);
+        if(i == gen->currentChannel){
+            gen->resetZoom();
+        }
     }
     gen->fileSampleRate->setValue(gen->getCurrentData()->file_sr);
 }
@@ -2934,6 +2943,9 @@ void SignalGenerator_API::setBufferPhase(const QList<double>& list){
         auto ptr = gen->getData(gen->channels[i]);
 
         ptr->file_phase = list.at(i);
+        if(i == gen->currentChannel){
+            gen->resetZoom();
+        }
     }
     gen->filePhase->setValue(gen->getCurrentData()->file_phase);
 }
