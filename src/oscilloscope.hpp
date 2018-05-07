@@ -228,7 +228,8 @@ namespace adiscope {
 		unsigned long last_set_sample_count;
 		int zoom_level;
 		bool plot_samples_sequentially, d_displayOneBuffer, d_shouldResetStreaming;
-
+		uint64_t restartFlowCounter;
+		const uint64_t NO_FLOW_BUFFERS = 1024;
 		int autosetFFTIndex;
 		double autosetFrequency;
 		double autosetMaxAmpl;
