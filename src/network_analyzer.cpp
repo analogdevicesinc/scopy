@@ -167,6 +167,8 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
             {"Volts",1e0}
     },"Offset", -5, 5, false, false, this);
 
+    offset->setValue(0);
+
     magMax = new PositionSpinButton({
             {"dB",1e0}
     }, "Max. Magnitude", -120, 120, false, false, this);
