@@ -34,7 +34,7 @@ font: 12px ;
 }
 
 QLabel#on {
-margin-left: 3px;
+margin-left: 2px;
 color: white;
 }
 
@@ -43,7 +43,7 @@ color: rgba(255,255,255,102);
 }
 
 QLabel#off {
-margin-left: 24px;
+margin-left: 23px;
 color: white;
 }
 

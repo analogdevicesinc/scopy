@@ -55,10 +55,10 @@
         <bool>true</bool>
        </property>
        <property name="leftText" stdset="0">
-        <string>W</string>
+        <string>R</string>
        </property>
        <property name="rightText" stdset="0">
-        <string>R</string>
+        <string>W</string>
        </property>
        <property name="bothValid" stdset="0">
         <bool>true</bool>
@@ -71,7 +71,7 @@
         <string notr="true">font-size: 13px;</string>
        </property>
        <property name="text">
-        <string>Write/Read</string>
+        <string>Read/Write</string>
        </property>
       </widget>
      </item>
