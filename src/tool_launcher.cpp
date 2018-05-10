@@ -1105,6 +1105,9 @@ void adiscope::ToolLauncher::connectBtn_clicked(bool pressed)
 		if (d->connectButton() == sender()) {
 			selectedDev = d;
 		}
+		else {
+			d->connectButton()->setEnabled(false);
+		}
 		d->setConnected(false, false);
 	}
 	selectedDev->connectButton()->setEnabled(false);
@@ -1149,6 +1152,11 @@ void adiscope::ToolLauncher::connectBtn_clicked(bool pressed)
 		}
 	} else {
 		selectedDev->connectButton()->setEnabled(true);
+	}
+	for (auto d : devices) {
+		if (d->connectButton() != sender()) {
+			d->connectButton()->setEnabled(true);
+		}
 	}
 }
 
