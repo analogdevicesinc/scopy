@@ -667,6 +667,14 @@ void NetworkAnalyzer::startStop(bool pressed)
 		iio_channel_attr_write_bool(amp2, "powerdown", !pressed);
 	}
 
+	ui->btnRefChn->setEnabled(!pressed);
+	ui->btnIsLog->setEnabled(!pressed);
+	maxFreq->setEnabled(!pressed);
+	minFreq->setEnabled(!pressed);
+	samplesCount->setEnabled(!pressed);
+	amplitude->setEnabled(!pressed);
+	offset->setEnabled(!pressed);
+
 	if (pressed) {
         m_dBgraph.reset();
         m_phaseGraph.reset();
