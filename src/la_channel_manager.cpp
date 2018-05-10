@@ -1644,7 +1644,7 @@ void LogicAnalyzerChannelManagerUI::update_ui_children(LogicAnalyzerChannelGroup
 		}
 
 		if(auto dec = chgroupUI->getChannelGroup()->getDecoder()) {
-			if(strcmp(dec->id, "parallel") == 0) {
+            if((strcmp(dec->id, "parallel") == 0) || (strcmp(dec->id, "unary") == 0) ) {
 				lachannelUI->ui->comboBox_2->setCurrentText(
 					chgroupUI->getChannelGroup()->get_decoder_roles_list().at(index+1));
 				lachannelUI->ui->comboBox_2->setEnabled(false);
@@ -1916,7 +1916,7 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 						if(!dec)
 							break;
 
-						if(strcmp(dec->id, "parallel") != 0)
+                        if((strcmp(dec->id, "parallel") != 0) && (strcmp(dec->id, "unary") != 0))
 							break;
 
 						ch->ui->comboBox_2->clear();
@@ -2413,8 +2413,8 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 				optChUI->labelRole->setText(QString::fromUtf8(optch->name));
 				optChUI->stackedWidget->setCurrentIndex(0);
 
-				if(strcmp(decoder->id, "parallel") == 0 &&
-						strcmp(optch->name, "CLK") != 0) {
+                if(((strcmp(decoder->id, "parallel") == 0) || (strcmp(decoder->id, "unary") == 0)) &&
+                        (strcmp(optch->name, "CLK") != 0)) {
 					auto currentCh = chGroup->get_channel_at_index(index);
 					if(auto role = currentCh->getChannel_role()) {
 						if(optch->name == role->name) {
