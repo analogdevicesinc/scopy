@@ -249,8 +249,6 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
             &m_phaseGraph, SLOT(useLogFreq(bool)));
 
     d_bottomHandlesArea = new HorizHandlesArea(this);
-    d_bottomHandlesArea->setLeftPadding(89);
-    d_bottomHandlesArea->setRightPadding(59);
     d_bottomHandlesArea->setMinimumHeight(50);
 
     ui->gridLayout_plots->addWidget(&m_dBgraph,0,0,1,1);
@@ -366,6 +364,19 @@ void NetworkAnalyzer::rightMenuFinished(bool opened)
 		auto pair = menuButtonActions.dequeue();
 		toggleRightMenu(pair.first, pair.second);
 	}
+}
+
+void NetworkAnalyzer::showEvent(QShowEvent *event)
+{
+        d_bottomHandlesArea->setLeftPadding(m_dBgraph.axisWidget(QwtAxisId(QwtPlot::yLeft, 0))->width()
+                                + ui->gridLayout_plots->margin()
+                                + ui->widgetPlotContainer->layout()->margin() + 1);
+        int rightPadding = 0;
+        rightPadding = rightPadding + m_dBgraph.width()
+                        - m_dBgraph.axisWidget(QwtPlot::yLeft)->width() - m_dBgraph.canvas()->width()
+                        - ui->widgetPlotContainer->layout()->margin() ;
+        d_bottomHandlesArea->setRightPadding(rightPadding);
+        Tool::showEvent(event);
 }
 
 void NetworkAnalyzer::on_btnExport_clicked()

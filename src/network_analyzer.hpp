@@ -132,6 +132,10 @@ namespace adiscope {
         void on_btnExport_clicked();
         void rightMenuFinished(bool opened);
 
+        public Q_SLOTS:
+
+        void showEvent(QShowEvent *event);
+
 	Q_SIGNALS:
 		void sweepDone();
 	};
