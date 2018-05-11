@@ -1153,12 +1153,12 @@ bool SignalGenerator::loadParametersFromFile(
 		}
 
 		ptr->file_data.clear();
-
 		ptr->file_nr_of_channels = fileManager->getNrOfChannels();
-		ptr->file_sr = fileManager->getSampleRate();
+
+		if(fileManager->getSampleRate())
+			ptr->file_sr = fileManager->getSampleRate();
 
 		ptr->file_channel=0; // autoselect channel 0
-
 		for (auto i=0; i<ptr->file_nr_of_channels; i++) {
 			ptr->file_channel_names.push_back("Column " + QString::number(i));
 			ptr->file_nr_of_samples.push_back(fileManager->getNrOfSamples());
