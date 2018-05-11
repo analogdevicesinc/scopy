@@ -1335,7 +1335,7 @@ void SignalGenerator::start()
 		/* Enable the (optional) DMA sync */
 		iio_device_attr_write_bool(dev, "dma_sync", true);
 
-		unsigned long best_rate = get_best_sample_rate(dev);
+		double best_rate = get_best_sample_rate(dev);
 		size_t samples_count = get_samples_count(dev, best_rate);
 
 		/* Create the IIO buffer */
@@ -1480,7 +1480,7 @@ void SignalGenerator::setFunction(const QString& function)
 }
 
 basic_block_sptr SignalGenerator::getSignalSource(gr::top_block_sptr top,
-                unsigned long samp_rate, struct signal_generator_data& data,
+		double samp_rate, struct signal_generator_data& data,
                 double phase_correction)
 {
 	bool inv_saw_wave = data.waveform == SG_INV_SAW_WAVE;
@@ -1633,7 +1633,7 @@ gr::basic_block_sptr SignalGenerator::getNoise(QWidget *obj, gr::top_block_sptr 
 }
 
 gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
-                unsigned long samp_rate, gr::top_block_sptr top, bool preview)
+		double samp_rate, gr::top_block_sptr top, bool preview)
 {
 	auto ptr = getData(obj);
 	enum SIGNAL_TYPE type = ptr->type;
@@ -2037,7 +2037,7 @@ QVector<unsigned long> SignalGenerator::get_available_sample_rates(
 	return values;
 }
 
-unsigned long SignalGenerator::get_best_sample_rate(
+double SignalGenerator::get_best_sample_rate(
         const struct iio_device *dev)
 {
 	QVector<unsigned long> values = get_available_sample_rates(dev);
@@ -2103,7 +2103,7 @@ bool SignalGenerator::sample_rate_forced(const struct iio_device *dev)
 	return false;
 }
 
-unsigned long SignalGenerator::get_forced_sample_rate(const struct iio_device
+double SignalGenerator::get_forced_sample_rate(const struct iio_device
                 *dev)
 {
 
@@ -2137,7 +2137,7 @@ unsigned long SignalGenerator::get_max_sample_rate(const struct iio_device *dev)
 }
 
 void SignalGenerator::calc_sampling_params(const iio_device *dev,
-                unsigned long rate, unsigned long& out_sample_rate,
+		double rate, unsigned long& out_sample_rate,
                 unsigned long& out_oversampling_ratio)
 {
 	if (use_oversampling(dev)) {
@@ -2219,7 +2219,7 @@ double SignalGenerator::get_best_ratio(double ratio, double max, double *fract)
 }
 
 size_t SignalGenerator::get_samples_count(const struct iio_device *dev,
-                unsigned long rate, bool perfect)
+		double rate, bool perfect)
 {
 
 	size_t size = 1;

@@ -193,12 +193,12 @@ private:
 
 	gr::basic_block_sptr getSignalSource(
 	        gr::top_block_sptr top,
-	        unsigned long sample_rate,
+		double sample_rate,
 	        struct signal_generator_data& data, double phase_correction=0.0);
 
 	gr::basic_block_sptr getNoise(QWidget *obj,gr::top_block_sptr top);
 	gr::basic_block_sptr getSource(QWidget *obj,
-	                               unsigned long sample_rate,
+				       double sample_rate,
 	                               gr::top_block_sptr top, bool     phase_correction=false);
 
 	static void reduceFraction(double input,long *numerator, long *denominator, long precision=1000000);
@@ -207,19 +207,19 @@ private:
 	static int sg_waveform_to_idx(enum sg_waveform wave);
 
 	size_t get_samples_count(const struct iio_device *dev,
-	                         unsigned long sample_rate, bool perfect = false);
-	unsigned long get_best_sample_rate(
+				 double sample_rate, bool perfect = false);
+	double get_best_sample_rate(
 	        const struct iio_device *dev);
 	//int set_sample_rate(const struct iio_device *dev,
 	//		unsigned long sample_rate);
 	void calc_sampling_params(const struct iio_device *dev,
-	                          unsigned long sample_rate,
+				  double sample_rate,
 	                          unsigned long& out_sample_rate,
 	                          unsigned long& out_oversampling_ratio);
 	bool use_oversampling(const struct iio_device *dev);
 
 	bool sample_rate_forced(const struct iio_device *dev);
-	unsigned long get_forced_sample_rate(const struct iio_device *dev);
+	double get_forced_sample_rate(const struct iio_device *dev);
 
 	double zoomT1;
 	double zoomT2;
