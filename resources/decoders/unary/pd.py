@@ -1,6 +1,7 @@
 #### This file is part of the libsigrokdecode project.
 ##
 ## Copyright (C) 2013 Uwe Hermann <uwe@hermann-uwe.de>
+## Copyright (C) 2018 Analog Devices, Inc.
 ##
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
