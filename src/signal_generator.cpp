@@ -493,8 +493,8 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 	plot->setHorizOffset((double) nb_points /
 	                     ((double) sample_rate * 2.0));
 	plot->zoomBaseUpdate();
-
 	ui->plot->addWidget(plot, 0, 0);
+	fileManager = new FileManager("Signal Generator");
 
 	api->setObjectName(QString::fromStdString(Filter::tool_name(
 	                           TOOL_SIGNAL_GENERATOR)));
@@ -573,9 +573,6 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 	phase->setFrequency(ptr->frequency);
 
 	readPreferences();
-
-	fileManager = new FileManager("Signal Generator");
-
 }
 
 SignalGenerator::~SignalGenerator()
