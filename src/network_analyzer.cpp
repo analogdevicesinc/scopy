@@ -376,6 +376,8 @@ void NetworkAnalyzer::showEvent(QShowEvent *event)
                         - m_dBgraph.axisWidget(QwtPlot::yLeft)->width() - m_dBgraph.canvas()->width()
                         - ui->widgetPlotContainer->layout()->margin() ;
         d_bottomHandlesArea->setRightPadding(rightPadding);
+        d_hCursorHandle1->setPosition(d_hCursorHandle1->pos().x());
+        d_hCursorHandle2->setPosition(d_hCursorHandle2->pos().x());
         Tool::showEvent(event);
 }
 
@@ -982,4 +984,14 @@ void NetworkAnalyzer_API::setRefChannel(int chn)
         net->ui->btnRefChn->setChecked(true);
 	else
         net->ui->btnRefChn->setChecked(false);
+}
+
+bool NetworkAnalyzer_API::getCursors() const
+{
+	return net->d_cursorsEnabled;
+}
+
+void NetworkAnalyzer_API::setCursors(bool enabled)
+{
+	net->ui->checkBox->setChecked(enabled);
 }

@@ -162,6 +162,8 @@ namespace adiscope {
 		Q_PROPERTY(int ref_channel READ getRefChannel
 				WRITE setRefChannel);
 
+		Q_PROPERTY(bool cursors READ getCursors WRITE setCursors);
+
 	public:
 		explicit NetworkAnalyzer_API(NetworkAnalyzer *net) :
 			ApiObject(), net(net) {}
@@ -194,6 +196,9 @@ namespace adiscope {
 
 		int getRefChannel() const;
 		void setRefChannel(int chn);
+
+		bool getCursors() const;
+		void setCursors(bool enabled);
 
 	private:
 		NetworkAnalyzer *net;
