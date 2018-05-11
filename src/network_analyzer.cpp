@@ -250,7 +250,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
     d_bottomHandlesArea = new HorizHandlesArea(this);
     d_bottomHandlesArea->setLeftPadding(89);
-    d_bottomHandlesArea->setRightPadding(20);
+    d_bottomHandlesArea->setRightPadding(59);
     d_bottomHandlesArea->setMinimumHeight(50);
 
     ui->gridLayout_plots->addWidget(&m_dBgraph,0,0,1,1);

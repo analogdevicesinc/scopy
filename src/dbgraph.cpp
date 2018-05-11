@@ -151,6 +151,11 @@ dBgraph::dBgraph(QWidget *parent) : QwtPlot(parent),
     QMargins margins = contentsMargins();
     margins.setBottom(0);
     setContentsMargins(margins);
+
+    QwtScaleWidget *scaleWidget = axisWidget(QwtPlot::xTop);
+    const int fmw = QFontMetrics(scaleWidget->font()).width("XXXX.XX XX");
+    scaleWidget->setMinBorderDist(fmw / 2, fmw / 2);
+
 }
 
 dBgraph::~dBgraph()
