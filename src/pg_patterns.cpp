@@ -545,7 +545,8 @@ void ClockPatternUI::parse_ui()
 	QObject *obj = sender();
 
 	bool freqStepDown = false;
-	bool phaseStepDown = false;
+	bool phaseStepDown = true;
+	bool phaseNoChange  = true;
 	double oldPhase = 0;
 
 	if (obj==frequencySpinButton) {
@@ -559,6 +560,7 @@ void ClockPatternUI::parse_ui()
 	if (obj==phaseSpinButton) {
 		oldPhase = requestedPhase;
 		requestedPhase=phaseSpinButton->value();
+		phaseNoChange = false;
 		phaseStepDown = phaseSpinButton->isStepDown();
 	}
 
@@ -599,30 +601,53 @@ void ClockPatternUI::parse_ui()
 	pattern->set_duty_cycle(dutySpinButton->value());
 
 
-	auto phasestep=360.0/ (PGMaxSampleRate / pattern->get_frequency());
-	phasestep=(phasestep>1 ? phasestep : 1);
-	phasestep=floor(phasestep*360+0.5)/360.0;
-	auto phaseval = requestedPhase;
-	if (phaseStepDown) {
-		phaseval = floor((phaseval/phasestep)-0.5)*phasestep;
-	} else {
-		phaseval = round((phaseval/phasestep)+0.5)*phasestep;
+	/*auto phaseStep=360.0/ (PGMaxSampleRate / pattern->get_frequency());
+	phaseStep=(phaseStep>1 ? phaseStep : 1);
+	phaseStep=floor(phaseStep*360+0.5)/360.0;
+	auto phaseVal = requestedPhase;
+	if (phaseNoChange)
+	{
+		phaseVal = (floor(phaseVal/phaseStep))*phaseStep;
+	}
+	else
+	{
+		if (phaseStepDown) {
+			phaseVal = floor((phaseVal/phaseStep)-0.5)*phaseStep;
+		} else {
+			phaseVal = round((phaseVal/phaseStep)+0.5)*phaseStep;
+		}
+
+		phaseVal = abs(phaseVal);
+
+		if (phaseVal == oldPhase) {
+			if (phaseVal == 0) phaseVal = 360;
+			phaseStepDown ? (phaseVal -= phaseStep)
+				      : (phaseVal += phaseStep);
+		}
+	}*/
+
+	auto phaseStep=360.0/ (PGMaxSampleRate / pattern->get_frequency());
+	phaseStep=(phaseStep>1 ? phaseStep : 1);
+	phaseStep=floor(phaseStep*360+0.5)/360.0;
+	auto phaseVal = requestedPhase;
+	if(phaseStep > 45)
+	{
+		if(phaseStepDown)
+			phaseVal = floor((phaseVal/phaseStep)-0.5)*phaseStep;
+		else
+			phaseVal = ceil((phaseVal/phaseStep)+0.5)*phaseStep;
+	}
+	else
+	{
+		phaseVal = floor((phaseVal/phaseStep)+0.5)*phaseStep;
 	}
 
-	phaseval = abs(phaseval);
-
-	if (phaseval == oldPhase) {
-		if (phaseval == 0) phaseval = 360;
-		phaseStepDown ? (phaseval -= phasestep)
-			      : (phaseval += phasestep);
-	}
-
-	requestedPhase = phaseval;
+	requestedPhase = phaseVal;
 	phaseSpinButton->blockSignals(true);
-	phaseSpinButton->setStep(phasestep);
-	phaseSpinButton->setValue(phaseval);
-	if (phaseval >= 360) phaseval = (int)phaseval % 360;
-	phaseSpinButton->updateCompletionCircle(phaseval);
+	phaseSpinButton->setStep(phaseStep);
+	phaseSpinButton->setValue(phaseVal);
+	if (phaseVal >= 360) phaseVal = (int)phaseVal % 360;
+	phaseSpinButton->updateCompletionCircle(phaseVal);
 	phaseSpinButton->blockSignals(false);
 	pattern->set_phase(phaseSpinButton->value());
 	Q_EMIT patternParamsChanged();
