@@ -2115,6 +2115,7 @@ QString LogicChannel_API::getTrigger() const
 void LogicChannel_API::setTrigger(QString val)
 {
 	lga->chm.get_channel(getIndex())->setTrigger(val.toStdString());
+	lga->setTriggerCache(getIndex(), val.toStdString());
 }
 
 QString LogicChannel_API::getName() const
