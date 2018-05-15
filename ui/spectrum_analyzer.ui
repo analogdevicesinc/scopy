@@ -457,7 +457,7 @@ QPushButton:checked:hover {
             <number>50</number>
            </property>
            <property name="bottomMargin">
-            <number>50</number>
+            <number>20</number>
            </property>
            <property name="horizontalSpacing">
             <number>0</number>
