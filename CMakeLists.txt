@@ -16,7 +16,7 @@
 #  Boston, MA 02110-1301, USA.
 
 cmake_minimum_required(VERSION 3.1.3)
-project(scopy LANGUAGES CXX VERSION 0.11)
+project(scopy LANGUAGES CXX VERSION 1.00)
 
 # Get the GIT hash of the latest commit
 include(FindGit OPTIONAL)
