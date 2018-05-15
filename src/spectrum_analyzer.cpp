@@ -312,6 +312,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	}
 
 	ui->rightMenu->setMaximumWidth(0);
+	ui->pushButton_3->hide();
 
 	// Initialize Marker controls
 	ui->hLayout_marker_selector->addWidget(marker_selector);
