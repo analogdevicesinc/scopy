@@ -79,6 +79,8 @@ namespace adiscope {
 	QString yTitle() const;
 
 	void toggleCursors(bool);
+    CustomPlotPositionButton::ReadoutsPosition getCursorReadoutCurrentPosition();
+
 	QString cursorIntersection(qreal text);
 	QVector<double> getXAxisData();
 	QVector<double> getYAxisData();
@@ -117,6 +119,9 @@ Q_SIGNALS:
 
         void onCursor1Moved(int);
         void onCursor2Moved(int);
+
+        void setCursorReadoutsTransparency(int value);
+        void moveCursorReadouts(CustomPlotPositionButton::ReadoutsPosition position);
 
         void scaleDivChanged();
         void mousePressEvent(QMouseEvent *event);

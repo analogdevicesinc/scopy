@@ -291,7 +291,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 			this, SLOT(updateNumSamples()));
 	connect(samplesCount, SIGNAL(valueChanged(double)),
 			this, SLOT(updateNumSamples()));
-    connect(ui->checkBox,SIGNAL(toggled(bool)),
+    connect(ui->boxCursors,SIGNAL(toggled(bool)),
             SLOT(toggleCursors(bool)));
 
     readPreferences();
@@ -319,6 +319,26 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
     });
     connect(ui->btnGeneralSettings, &CustomPushButton::toggled, [=](bool checked){
             triggerRightMenuToggle(ui->btnGeneralSettings, checked);
+    });
+    connect(ui->btnCursors, &CustomPushButton::toggled, [=](bool checked){
+            triggerRightMenuToggle(ui->btnCursors, checked);
+    });
+
+    ui->btnSettings->setProperty("id",QVariant(-1));
+    ui->btnGeneralSettings->setProperty("id",QVariant(-2));
+    ui->btnCursors->setProperty("id",QVariant(-3));
+
+
+    connect(ui->horizontalSlider, &QSlider::valueChanged, [=](int value){
+        ui->transLabel->setText("Transparency " + QString::number(value) + "%");
+        m_dBgraph.setCursorReadoutsTransparency(value);
+        m_phaseGraph.setCursorReadoutsTransparency(value);
+    });
+
+    connect(ui->posSelect, &CustomPlotPositionButton::positionChanged,
+        [=](CustomPlotPositionButton::ReadoutsPosition position){
+        m_dBgraph.moveCursorReadouts(position);
+        m_phaseGraph.moveCursorReadouts(position);
     });
 
     if (!wheelEventGuard)
@@ -351,14 +371,12 @@ void NetworkAnalyzer::triggerRightMenuToggle(CustomPushButton *btn, bool checked
 
 void NetworkAnalyzer::toggleRightMenu(CustomPushButton *btn, bool checked)
 {
-	// index is 0 for settings and 1 for general settings
-	int index = (btn == ui->btnSettings ? 0 : 1);
+    int id = btn->property("id").toInt();
 
-	if (checked) {
-		ui->stackedWidget_2->setCurrentIndex(index);
-	}
+    if(checked)
+        ui->stackedWidget_2->setCurrentIndex(-id-1);
 
-	ui->rightMenu->toggleMenu(checked);
+    ui->rightMenu->toggleMenu(checked);
 }
 
 void NetworkAnalyzer::rightMenuFinished(bool opened)
@@ -842,13 +860,18 @@ void NetworkAnalyzer::onVbar2PixelPosChanged(int pos)
 
 void NetworkAnalyzer::toggleCursors(bool en)
 {
+    if(!en){
+        ui->btnCursors->setChecked(en);
+    }
     if (d_cursorsEnabled != en) {
         d_cursorsEnabled = en;
         m_dBgraph.toggleCursors(en);
         m_phaseGraph.toggleCursors(en);
         d_hCursorHandle1->setVisible(en);
         d_hCursorHandle2->setVisible(en);
+        ui->btnCursors->setEnabled(en);
     }
+
 }
 
 void NetworkAnalyzer::readPreferences()
@@ -998,7 +1021,63 @@ bool NetworkAnalyzer_API::getCursors() const
 
 void NetworkAnalyzer_API::setCursors(bool enabled)
 {
-	net->ui->checkBox->setChecked(enabled);
+    net->ui->boxCursors->setChecked(enabled);
+}
+
+int NetworkAnalyzer_API::getCursorsPosition() const
+{
+    if (!net->ui->boxCursors->isChecked()) {
+        return 0;
+    }
+    auto currentPos = net->m_dBgraph.getCursorReadoutCurrentPosition();
+    switch (currentPos) {
+    case CustomPlotPositionButton::ReadoutsPosition::topLeft:
+    default:
+        return 0;
+    case CustomPlotPositionButton::ReadoutsPosition::topRight:
+        return 1;
+    case CustomPlotPositionButton::ReadoutsPosition::bottomLeft:
+        return 2;
+    case CustomPlotPositionButton::ReadoutsPosition::bottomRight:
+        return 3;
+    }
+}
+
+void NetworkAnalyzer_API::setCursorsPosition(int val)
+{
+    if (!net->ui->boxCursors->isChecked()) {
+        return;
+    }
+    enum CustomPlotPositionButton::ReadoutsPosition types[] = {
+        CustomPlotPositionButton::ReadoutsPosition::topLeft,
+        CustomPlotPositionButton::ReadoutsPosition::topRight,
+        CustomPlotPositionButton::ReadoutsPosition::bottomLeft,
+        CustomPlotPositionButton::ReadoutsPosition::bottomRight
+    };
+    net->ui->posSelect->setPosition(types[val]);
+    net->m_dBgraph.moveCursorReadouts(types[val]);
+    net->m_dBgraph.replot();
+    net->m_phaseGraph.moveCursorReadouts(types[val]);
+    net->m_phaseGraph.replot();
+}
+
+int NetworkAnalyzer_API::getCursorsTransparency() const
+{
+    if (!net->ui->boxCursors->isChecked()) {
+        return 0;
+    }
+    return net->ui->horizontalSlider->value();
+}
+
+void NetworkAnalyzer_API::setCursorsTransparency(int val)
+{
+    if (!net->ui->boxCursors->isChecked()) {
+        return;
+    }
+    net->ui->horizontalSlider->setValue(val);
+    net->ui->transLabel->setText("Transparency " + QString::number(val) + "%");
+    net->m_dBgraph.setCursorReadoutsTransparency(val);
+    net->m_phaseGraph.setCursorReadoutsTransparency(val);
 }
 
 int NetworkAnalyzer_API::getLineThickness() const
