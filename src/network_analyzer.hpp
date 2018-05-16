@@ -164,6 +164,10 @@ namespace adiscope {
 
 		Q_PROPERTY(bool cursors READ getCursors WRITE setCursors);
 		Q_PROPERTY(int lineThickness READ getLineThickness WRITE setLineThickness);
+		Q_PROPERTY(int cursors_position READ getCursorsPosition
+              WRITE setCursorsPosition)
+		Q_PROPERTY(int cursors_transparency READ getCursorsTransparency
+              WRITE setCursorsTransparency)
 
 	public:
 		explicit NetworkAnalyzer_API(NetworkAnalyzer *net) :
@@ -203,6 +207,11 @@ namespace adiscope {
 
 		int getLineThickness() const;
 		void setLineThickness(int index);
+		int getCursorsPosition() const;
+		void setCursorsPosition(int val);
+
+		int getCursorsTransparency() const;
+		void setCursorsTransparency(int val);
 
 	private:
 		NetworkAnalyzer *net;

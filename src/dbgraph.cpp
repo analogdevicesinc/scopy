@@ -146,7 +146,7 @@ dBgraph::dBgraph(QWidget *parent) : QwtPlot(parent),
 
     d_cursorReadouts->setFrequencyDeltaVisible(false);
     d_cursorReadouts->setTimeDeltaVisible(false);
-    d_cursorReadouts->setTransparency(100);
+    d_cursorReadouts->setTransparency(0);
 
 	picker = new PlotPickerWrapper(QwtPlot::xTop,QwtPlot::yLeft,this->canvas());
 
@@ -410,6 +410,11 @@ void dBgraph::toggleCursors(bool en)
 	}
 }
 
+CustomPlotPositionButton::ReadoutsPosition dBgraph::getCursorReadoutCurrentPosition()
+{
+    return d_cursorReadouts->getCurrentPosition();
+}
+
 void dBgraph::onCursor1Moved(int value)
 {
 	QString text;
@@ -481,6 +486,16 @@ QString dBgraph::cursorIntersection(qreal freq)
 
 		return QString::number(val,'f',0) +" "+ draw_y->getUnitType();
 	}
+}
+
+void dBgraph::setCursorReadoutsTransparency(int value)
+{
+    d_cursorReadouts->setTransparency(value);
+}
+
+void dBgraph::moveCursorReadouts(CustomPlotPositionButton::ReadoutsPosition position)
+{
+    d_cursorReadouts->moveToPosition(position);
 }
 
 QVector<double> dBgraph::getXAxisData()
