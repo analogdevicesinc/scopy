@@ -141,6 +141,9 @@ PowerController::PowerController(struct iio_context *ctx,
 
 PowerController::~PowerController()
 {
+	ui->dac1->setChecked(false);
+	ui->dac2->setChecked(false);
+
 	/* Power down DACs */
 	iio_channel_attr_write_bool(ch1w, "powerdown", true);
 	iio_channel_attr_write_bool(ch2w, "powerdown", true);
@@ -377,3 +380,24 @@ void PowerController_API::setValueDac2(double value)
 	if (!syncEnabled())
 		pw->valueNeg->setValue(value);
 }
+
+bool PowerController_API::Dac1Enabled() const
+{
+	return pw->ui->dac1->isChecked();
+}
+
+void PowerController_API::setDac1Enabled(bool enable)
+{
+	pw->ui->dac1->setChecked(enable);
+}
+
+bool PowerController_API::Dac2Enabled() const
+{
+	return pw->ui->dac2->isChecked();
+}
+
+void PowerController_API::setDac2Enabled(bool enable)
+{
+	pw->ui->dac2->setChecked(enable);
+}
+
