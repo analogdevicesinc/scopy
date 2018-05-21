@@ -1069,6 +1069,7 @@ bool TimeDomainDisplayPlot::registerSink(std::string sinkUniqueNme, unsigned int
 			curve->setPen(QPen(color));
 			curve->setRenderHint(QwtPlotItem::RenderAntialiased);
 			d_plot_curve.push_back(curve);
+			curve->setItemAttribute(QwtPlotItem::Legend, true);
 
 			QwtSymbol *symbol = new QwtSymbol(QwtSymbol::NoSymbol, QBrush(color),
 							QPen(color), QSize(7,7));
