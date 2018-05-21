@@ -305,7 +305,9 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 				QwtAxisId(QwtPlot::yLeft, i));
 		plot.addZoomer(i);
 		probe_attenuation.push_back(1);
+		plot.Curve(i)->setTitle("CH " + QString::number(i + 1));
 	}
+
 
 	plot.levelTriggerA()->setMobileAxis(QwtAxisId(QwtPlot::yLeft, 0));
 	plot.setTriggerAEnabled(trigger_settings.analogEnabled());
@@ -655,6 +657,9 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	current_ch_widget = current_channel;
 
 	readPreferences();
+
+	connect(ui->printBtn, &QPushButton::clicked,
+		&plot, &PrintablePlot::printPlot);
 }
 
 void Oscilloscope::init_selected_measurements(int chnIdx,
@@ -759,6 +764,7 @@ void Oscilloscope::add_ref_waveform(unsigned int chIdx)
 	plot.Curve(curve_id)->setAxes(
 	        QwtAxisId(QwtPlot::xBottom, 0),
 	        QwtAxisId(QwtPlot::yLeft, curve_id));
+	plot.Curve(curve_id)->setTitle("REF " + QString::number(nb_ref_channels + 1));
 	plot.addZoomer(curve_id);
 	plot.replot();
 
@@ -1550,6 +1556,7 @@ void Oscilloscope::add_math_channel(const std::string& function)
 	plot.Curve(curve_id)->setAxes(
 			QwtAxisId(QwtPlot::xBottom, 0),
 			QwtAxisId(QwtPlot::yLeft, curve_id));
+	plot.Curve(curve_id)->setTitle("M " + QString::number(curve_number + 1));
 	plot.addZoomer(curve_id);
 	plot.replot();
 
