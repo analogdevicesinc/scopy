@@ -44,6 +44,7 @@
 #include "osc_adjuster.hpp"
 #include "plot_utils.hpp"
 #include "extendingplotzoomer.h"
+#include "printableplot.h"
 
 #if QWT_VERSION >= 0x060000
 #include <qwt_compat.h>
@@ -205,7 +206,7 @@ private:
  * \brief QWidget base plot to build QTGUI plotting tools.
  * \ingroup qtgui_blk
  */
-class DisplayPlot:public QwtPlot
+class DisplayPlot:public PrintablePlot
 {
   Q_OBJECT
 
