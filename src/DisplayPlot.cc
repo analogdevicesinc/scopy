@@ -439,7 +439,7 @@ void PlotAxisConfiguration::setMouseGesturesEnabled(bool en)
 
 DisplayPlot::DisplayPlot(int nplots, QWidget* parent,
 			 unsigned int xNumDivs, unsigned int yNumDivs)
-  : QwtPlot(parent), d_nplots(nplots), d_stop(false),
+  : PrintablePlot(parent), d_nplots(nplots), d_stop(false),
     d_coloredLabels(false), d_mouseGesturesEnabled(false),
     d_displayScale(1)
 {
