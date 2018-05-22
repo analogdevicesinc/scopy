@@ -27,6 +27,7 @@
 #include "cursor_readouts.h"
 #include "measure.h"
 #include "customplotpositionbutton.h"
+#include "graticule.h"
 
 class QLabel;
 
@@ -118,11 +119,14 @@ namespace adiscope {
 		void setTimeTriggerInterval(double min, double max);
 		bool labelsEnabled();
 
+		void setGraticuleEnabled(bool enabled);
+
 	Q_SIGNALS:
 		void timeTriggerValueChanged(double);
 		void channelOffsetChanged(double);
 		void measurementsAvailable();
 		void cursorReadoutsChanged(struct cursorReadoutsText);
+		void canvasSizeChanged();
 
 	public Q_SLOTS:
 		void setTriggerAEnabled(bool en);
@@ -232,6 +236,9 @@ namespace adiscope {
 		double value_v1, value_v2, value_h1, value_h2;
 		double d_minOffsetValue, d_maxOffsetValue;
 		double d_timeTriggerMinValue, d_timeTriggerMaxValue;
+
+		bool displayGraticule;
+		Graticule *graticule;
 	};
 }
 

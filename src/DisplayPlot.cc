@@ -145,6 +145,7 @@ void OscScaleDraw::draw(QPainter *painter, const QPalette &) const
 	}
 }
 
+
 QwtText OscScaleDraw::label( double value ) const
 {
 	QString prefix;
@@ -520,6 +521,7 @@ DisplayPlot::DisplayPlot(int nplots, QWidget* parent,
 	scaleItem->setPalette(palette);
 	scaleItem->setBorderDistance(0);
 	scaleItem->attach(this);
+	scaleItems.push_back(scaleItem);
   }
 
   this->plotLayout()->setCanvasMargin(0, QwtPlot::yLeft);

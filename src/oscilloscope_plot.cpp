@@ -63,7 +63,6 @@ CapturePlot::CapturePlot(QWidget *parent,
 	d_timeTriggerMinValue(-1),
 	d_timeTriggerMaxValue(1)
 {
-
 	setMinimumHeight(250);
 	setMinimumWidth(500);
 
@@ -361,6 +360,11 @@ CapturePlot::CapturePlot(QWidget *parent,
 	QwtScaleWidget *scaleWidget = axisWidget(QwtPlot::xBottom);
 	const int fmw = QFontMetrics(scaleWidget->font()).width("-XX.XX XX");
 	scaleWidget->setMinBorderDist(fmw / 2, fmw / 2);
+
+	displayGraticule = false;
+
+	graticule = new Graticule(this);
+	connect(this, SIGNAL(canvasSizeChanged()),graticule,SLOT(onCanvasSizeChanged()));
 }
 
 CapturePlot::~CapturePlot()
@@ -702,6 +706,25 @@ bool CapturePlot::labelsEnabled()
 	return d_labelsEnabled;
 }
 
+void CapturePlot::setGraticuleEnabled(bool enabled){
+	displayGraticule = enabled;
+
+	if(!displayGraticule){
+		for(QwtPlotScaleItem* scale : scaleItems){
+			scale->attach(this);
+		}
+		graticule->enableGraticule(displayGraticule);
+	}
+	else{
+		for(QwtPlotScaleItem* scale : scaleItems){
+			scale->detach();
+		}
+		graticule->enableGraticule(displayGraticule);
+	}
+
+	replot();
+}
+
 void CapturePlot::setActiveVertAxis(unsigned int axisIdx, bool selected)
 {
 	DisplayPlot::setActiveVertAxis(axisIdx, selected);
@@ -760,6 +783,8 @@ bool CapturePlot::eventFilter(QObject *object, QEvent *event)
 {
 	if (object == canvas() && event->type() == QEvent::Resize) {
 		updateHandleAreaPadding(d_labelsEnabled);
+		Q_EMIT canvasSizeChanged();
+
 	}
 	return QObject::eventFilter(object, event);
 }
@@ -1079,3 +1104,5 @@ void CapturePlot::removeLeftVertAxis(unsigned int axis)
 
 	DisplayPlot::removeLeftVertAxis(axis);
 }
+
+
