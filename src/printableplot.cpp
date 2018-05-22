@@ -37,13 +37,12 @@ void PrintablePlot::dropBackground(bool drop)
 void PrintablePlot::printPlot()
 {
         legendDisplay = new QwtLegend(this);
-        legendDisplay->setDefaultItemMode(QwtLegendData::Checkable);
+        legendDisplay->setDefaultItemMode(QwtLegendData::ReadOnly);
         insertLegend(legendDisplay, QwtPlot::TopLegend);
 
         updateLegend();
 
-        d_plotRenderer.exportTo(this,
-                                "capturePlot");
+        d_plotRenderer.exportTo(this, "plotScreenshot");
 
         insertLegend(nullptr);
 }
