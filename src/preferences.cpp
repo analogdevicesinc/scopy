@@ -94,7 +94,10 @@ Preferences::Preferences(QWidget *parent) :
 		user_notes_active = (!state ? false : true);
 		Q_EMIT notify();
 	});
-
+	connect(ui->oscGraticuleCheckBox, &QCheckBox::stateChanged, [=](int state) {
+		graticule_enabled = (!state ? false : true);
+		Q_EMIT notify();
+	});
 	QString preference_ini_file = getPreferenceIniFile();
 	QSettings settings(preference_ini_file, QSettings::IniFormat);
 
@@ -129,6 +132,7 @@ void Preferences::showEvent(QShowEvent *event)
 	ui->na_zeroCheckBox->setChecked(na_show_zero);
 	ui->advancedInfoCheckBox->setChecked(advanced_device_info);
 	ui->userNotesCheckBox->setChecked(user_notes_active);
+	ui->oscGraticuleCheckBox->setChecked(graticule_enabled);
 
 	QWidget::showEvent(event);
 }
@@ -235,6 +239,16 @@ void Preferences::setNa_show_zero(bool value)
 	na_show_zero = value;
 }
 
+bool Preferences::getOsc_graticule_enabled() const
+{
+	return graticule_enabled;
+}
+
+void Preferences::setOsc_graticule_enabled(bool value)
+{
+	graticule_enabled = value;
+}
+
 bool Preferences_API::getOscLabelsEnabled() const
 {
 	return preferencePanel->osc_labels_enabled;
@@ -313,4 +327,13 @@ bool Preferences_API::getUserNotesActive() const
 void Preferences_API::setUserNotesActive(const bool& enabled)
 {
 	preferencePanel->user_notes_active = enabled;
+}
+
+bool Preferences_API::getGraticuleEnabled() const
+{
+	return preferencePanel->graticule_enabled;
+}
+void Preferences_API::setGraticuleEnabled(const bool& enabled)
+{
+	preferencePanel->graticule_enabled = enabled;
 }

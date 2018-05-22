@@ -863,6 +863,7 @@ void Oscilloscope::settingsLoaded()
 
 void Oscilloscope::readPreferences()
 {
+	plot.setGraticuleEnabled(prefPanel->getOsc_graticule_enabled());
 	for (unsigned int i = 0; i < nb_channels + nb_math_channels + nb_ref_channels;
 	     i++) {
 		ChannelWidget *cw = static_cast<ChannelWidget *>(
