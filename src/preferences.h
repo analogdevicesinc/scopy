@@ -71,6 +71,9 @@ public:
 	bool getUser_notes_active() const;
 	void setUser_notes_active(bool value);
 
+	bool getOsc_graticule_enabled() const;
+	void setOsc_graticule_enabled(bool value);
+
 Q_SIGNALS:
 
 	void notify();
@@ -92,6 +95,7 @@ private:
 	bool spectrum_visible_peak_search;
 	bool advanced_device_info;
 	bool user_notes_active;
+	bool graticule_enabled;
 
 	Preferences_API *pref_api;
 	QString getPreferenceIniFile() const;
@@ -110,6 +114,7 @@ class Preferences_API : public ApiObject
 	Q_PROPERTY(bool spectrum_visible_peak_search READ getSpectrumVisiblePeakSearch WRITE setSpectrumVisiblePeakSearch)
 	Q_PROPERTY(bool advanced_device_info READ getAdvancedDeviceInfo WRITE setAdvancedDeviceInfo)
 	Q_PROPERTY(bool user_notes_active READ getUserNotesActive WRITE setUserNotesActive)
+	Q_PROPERTY(bool graticule_enabled READ getGraticuleEnabled WRITE setGraticuleEnabled)
 
 public:
 
@@ -140,6 +145,9 @@ public:
 
 	bool getUserNotesActive() const;
 	void setUserNotesActive(const bool& enabled);
+
+	bool getGraticuleEnabled() const;
+	void setGraticuleEnabled(const bool& enabled);
 
 private:
 	Preferences *preferencePanel;
