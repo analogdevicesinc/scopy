@@ -524,6 +524,8 @@ protected:
   std::vector<PlotAxisConfiguration *> vertAxes;
   PlotAxisConfiguration *horizAxis;
 
+  QVector<QwtPlotScaleItem*> scaleItems;
+
   int64_t d_numPoints;
 
   bool d_stop;
@@ -555,6 +557,7 @@ private:
   void AddAxisOffset(int axisPos, int axisIdx, double offset);
   bool d_coloredLabels;
   bool d_mouseGesturesEnabled;
+
 };
 
 /*
