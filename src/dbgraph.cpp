@@ -48,6 +48,8 @@ dBgraph::dBgraph(QWidget *parent) : QwtPlot(parent),
 	curve.setXAxis(QwtPlot::xTop);
 	curve.setYAxis(QwtPlot::yLeft);
 
+	thickness = 1;
+
 	useLogFreq(false);
 
 	OscScaleEngine *scaleLeft = new OscScaleEngine;
@@ -240,12 +242,23 @@ void dBgraph::reset()
 void dBgraph::setColor(const QColor& color)
 {
 	this->color = color;
-	curve.setPen(QPen(color));
+	curve.setPen(QPen(color,thickness));
 }
 
 const QColor& dBgraph::getColor() const
 {
 	return this->color;
+}
+
+void dBgraph::setThickness(int index){
+	double thickness = 0.5 * (index + 1);
+	this->thickness = thickness;
+	curve.setPen(QPen(color,thickness));
+	replot();
+}
+
+double dBgraph::getThickness(){
+	return this->thickness;
 }
 
 QString dBgraph::xTitle() const

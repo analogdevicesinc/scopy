@@ -84,7 +84,7 @@ QRectF NyquistSamplesArray::boundingRect() const
 
 NyquistGraph::NyquistGraph(QWidget *parent) : QwtPolarPlot(parent),
 	mag_min(0.0), mag_max(0.0), samples(new NyquistSamplesArray),
-	grid(new QwtPolarGrid), numSamples(0)
+	grid(new QwtPolarGrid), numSamples(0),m_thickness(1)
 {
 	setAutoReplot(false);
 	setScale(QwtPolar::Azimuth, 0.0, 360.0, 45.0);
@@ -157,7 +157,7 @@ const QColor& NyquistGraph::getBgColor() const
 void NyquistGraph::setColor(const QColor& color)
 {
 	QPen pen(color);
-	pen.setWidthF(2.0);
+	pen.setWidthF(m_thickness);
 	curve.setPen(pen);
 }
 
@@ -193,6 +193,22 @@ void NyquistGraph::setNumSamples(int num)
 void NyquistGraph::reset()
 {
 	samples->clear();
+}
+
+void NyquistGraph::setThickness(int index)
+{
+	double thickness = 0.5 * (index + 1);
+	m_thickness = thickness;
+
+	QPen pen(curve.pen().color());
+	pen.setWidthF(m_thickness);
+	curve.setPen(pen);
+
+	replot();
+}
+double NyquistGraph::getThickness() const
+{
+	return m_thickness;
 }
 
 void NyquistGraph::setMin(double min)
