@@ -248,6 +248,11 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
     connect(ui->btnIsLog, SIGNAL(toggled(bool)),
             &m_phaseGraph, SLOT(useLogFreq(bool)));
 
+    connect(ui->cbLineThickness,SIGNAL(currentIndexChanged(int)),&m_dBgraph,SLOT(setThickness(int)));
+    connect(ui->cbLineThickness,SIGNAL(currentIndexChanged(int)),&m_phaseGraph,SLOT(setThickness(int)));
+    connect(ui->cbLineThickness,SIGNAL(currentIndexChanged(int)),ui->nicholsgraph,SLOT(setThickness(int)));
+    connect(ui->cbLineThickness,SIGNAL(currentIndexChanged(int)),ui->xygraph,SLOT(setThickness(int)));
+
     d_bottomHandlesArea = new HorizHandlesArea(this);
     d_bottomHandlesArea->setMinimumHeight(50);
 
@@ -994,4 +999,14 @@ bool NetworkAnalyzer_API::getCursors() const
 void NetworkAnalyzer_API::setCursors(bool enabled)
 {
 	net->ui->checkBox->setChecked(enabled);
+}
+
+int NetworkAnalyzer_API::getLineThickness() const
+{
+	return net->ui->cbLineThickness->currentIndex();
+}
+
+void NetworkAnalyzer_API::setLineThickness(int index)
+{
+	net->ui->cbLineThickness->setCurrentIndex(index);
 }

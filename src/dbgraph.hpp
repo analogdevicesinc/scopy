@@ -74,6 +74,7 @@ namespace adiscope {
         const QwtScaleWidget* getAxisWidget(QwtAxisId id);
 
 	const QColor& getColor() const;
+	double getThickness();
 	QString xTitle() const;
 	QString yTitle() const;
 
@@ -93,6 +94,7 @@ Q_SIGNALS:
 
 		void setNumSamples(int num);
 		void setColor(const QColor& color);
+		void setThickness(int index);
 		void setXTitle(const QString& title);
 		void setYTitle(const QString& title);
 		void setXMin(double val);
@@ -125,6 +127,7 @@ Q_SIGNALS:
 		unsigned int numSamples;
 		double xmin, xmax, ymin, ymax;
 		QColor color;
+		double thickness;
 		bool log_freq;
 
         bool d_cursorsEnabled;

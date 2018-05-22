@@ -61,6 +61,7 @@ namespace adiscope {
 		const QColor getColor() const;
 		const QColor& getBgColor() const;
 		int getNumSamples() const;
+		double getThickness() const;
 
 		QFont getFontAzimuth() const;
 		QFont getFontRadius() const;
@@ -73,6 +74,7 @@ namespace adiscope {
 		void setNumSamples(int num);
 		void plot(double x, double y);
 		void reset();
+		void setThickness(int value);
 
 		void setMin(double min);
 		void setMax(double max);
@@ -93,6 +95,7 @@ namespace adiscope {
 		QwtPolarCurve curve;
 		QwtPolarPanner *panner;
 		NyquistPlotZoomer *zoomer;
+		double m_thickness;
 
 	};
 }
