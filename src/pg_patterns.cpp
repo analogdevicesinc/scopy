@@ -784,7 +784,7 @@ uint8_t RandomPattern::generate_pattern(uint32_t sample_rate,
 {
 	delete_buffer();
 	buffer = new short[number_of_samples];
-	auto samples_per_count = ((float)sample_rate/(float)frequency);
+	auto samples_per_count = (int)round(((float)sample_rate/(float)frequency));
 	int j=0;
 
 	while (j<number_of_samples) {
@@ -938,7 +938,7 @@ uint8_t BinaryCounterPattern::generate_pattern(uint32_t sample_rate,
 {
 	delete_buffer();
 	buffer = new short[number_of_samples];
-	auto samples_per_count = ((float)sample_rate/(float)frequency);
+	auto samples_per_count = (int)round(((float)sample_rate/(float)frequency));
 	//auto i=init_value;
 	auto i = 0;
 	auto increment = 1;
@@ -1039,7 +1039,7 @@ uint8_t GrayCounterPattern::generate_pattern(uint32_t sample_rate,
 {
 	delete_buffer();
 	buffer = new short[number_of_samples];
-	auto samples_per_count = ((float)sample_rate/(float)frequency);
+	auto samples_per_count = (int)round(((float)sample_rate/(float)frequency));
 	init_value = 0;
 	end_value =(1<< (number_of_channels))-1;
 	increment = 1;
