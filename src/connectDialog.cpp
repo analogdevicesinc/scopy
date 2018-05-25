@@ -96,6 +96,7 @@ void ConnectDialog::validateInput()
 	ui->connectBtn->setDisabled(true);
 
 	QString new_uri = "ip:" + ui->hostname->text();
+	this->ui->hostname->setDisabled(true);
 	QtConcurrent::run(std::bind(&ConnectDialog::createContext,this,new_uri));
 }
 
@@ -103,18 +104,18 @@ void ConnectDialog::createContext(const QString& uri)
 {
 
 	this->parent()->installEventFilter(this);
-	this->ui->hostname->setDisabled(true);
 
 	struct iio_context *ctx_from_uri = iio_create_context_from_uri(
 	                uri.toStdString().c_str());
 
 	this->parent()->removeEventFilter(this);
-	this->ui->hostname->setDisabled(false);
+
 	Q_EMIT finished(ctx_from_uri);
 
 }
 void ConnectDialog::updatePopUp(struct iio_context *ctx)
 {
+	this->ui->hostname->setDisabled(false);
 	this->connected = !!ctx;
 
 	ui->infoSection->show();
