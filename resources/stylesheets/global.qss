@@ -7,7 +7,8 @@ QMainWindow > .QWidget, adiscope--Sismograph > QwtPlotCanvas, QMessageBox, QTool
 QWidget {
 	background-color: transparent;
 	color: #bebebe;
-	font-weight: 75;
+	font-style: normal;
+	font-weight: normal;
 	font-size: 13px;
 }
 
@@ -20,6 +21,8 @@ QToolTip {
 QLabel {
 	color: rgba(255, 255, 255, 150);
 	font-size: 13px;
+	font-style: normal;
+	font-weight: normal;
 	text-align: left;
 }
 

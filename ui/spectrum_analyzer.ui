@@ -45,7 +45,9 @@
 {
   background-color: none;
   color: rgb(190, 190, 190);
-  font: 75 10pt ;
+  font: 10pt;
+  font-style: normal;
+  font-weight: normal;
 }
 
 QWidget#mainWidget

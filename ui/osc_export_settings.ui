@@ -23,7 +23,7 @@
    <string notr="true">QWidget {
 	background-color: transparent;
 	color: #bebebe;
-	font-weight: 75;
+	font-weight: normal;
 	font-size: 13px;
 }</string>
   </property>
