@@ -493,7 +493,6 @@ void Measure::measure()
 	int adc_span = 1 << m_adc_bit_count;
 	int hlf_scale = adc_span / 2;
 	bool using_histogram_method = (adc_span > 1);
-
 	max = data[0];
 	min = data[0];
 	sum = data[0];
@@ -662,6 +661,7 @@ void Measure::measure()
 			sequence += crossSequence[i].m_name;
 
 		QString periodSequence = "LRMRHRHFMFLF";
+
 		int pos = sequence.indexOf(periodSequence);
 
 		if (pos < 0) {
@@ -823,7 +823,8 @@ MeasurementData::MeasurementData(const QString& name, axisType axis,
 	m_unit(unit),
 	m_unitType(DIMENSIONLESS),
 	m_channel(channel),
-	m_axis(axis)
+	m_axis(axis),
+	m_historySum(0)
 {
 	if (unit.isEmpty())
 		m_unitType = DIMENSIONLESS;
@@ -849,6 +850,18 @@ void MeasurementData::setValue(double value)
 {
 	m_value = value;
 	m_measured = true;
+
+	QStringList names;
+	names << "Low" << "High" << "Amplitude" /*<< "Middle"*/ << "+Over" << "-Over" << "Rise" << "Fall" << "+Width" << "-Width" << "+Duty" << "-Duty";
+
+	if(names.contains(m_name))
+	{
+		calculateMeasurementRSD(value);
+		if(rsd > 0.1)
+		{
+			m_measured = false;
+		}
+	}
 }
 
 bool MeasurementData::measured() const
@@ -894,6 +907,29 @@ void MeasurementData::setChannel(int channel)
 MeasurementData::axisType MeasurementData::axis() const
 {
 	return m_axis;
+}
+
+void MeasurementData::calculateMeasurementRSD(double value)
+{
+	if(measurementHistory.size() < 20){
+		measurementHistory.enqueue(value);
+		m_historySum += value;
+	}
+	else{
+		m_historySum -= measurementHistory.dequeue();
+		measurementHistory.enqueue(value);
+		m_historySum += value;
+	}
+
+	double dataMean = m_historySum / measurementHistory.size();
+
+	double sum = 0;
+	for(auto value : measurementHistory){
+		sum+= pow((value - dataMean),2);
+	}
+	double stdDev = sqrt(sum/(measurementHistory.size()-1));
+
+	rsd = (stdDev) / fabs(dataMean);
 }
 
 /*

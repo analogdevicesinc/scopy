@@ -23,6 +23,7 @@
 #include <QList>
 #include <QString>
 #include <memory>
+#include <QQueue>
 
 namespace adiscope {
 	class CrossingDetection;
@@ -57,6 +58,7 @@ namespace adiscope {
 		int channel() const;
 		void setChannel(int);
 		enum axisType axis() const;
+		void calculateMeasurementRSD(double);
 
 	private:
 		QString m_name;
@@ -67,6 +69,9 @@ namespace adiscope {
 		enum unitTypes m_unitType;
 		int m_channel;
 		enum axisType m_axis;
+		QQueue<double> measurementHistory;
+		double rsd;
+		double m_historySum;
 	};
 
 	class Measure
