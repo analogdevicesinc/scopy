@@ -3,6 +3,7 @@
 
 #include <QTreeView>
 #include <QStandardItem>
+#include <QHeaderView>
 
 using namespace adiscope;
 

@@ -18,6 +18,7 @@
 #include <QPainter>
 #include <QListView>
 #include <QFormLayout>
+#include <QButtonGroup>
 #include "pulseview/pv/widgets/colourbutton.hpp"
 #include "pulseview/pv/view/tracepalette.hpp"
 #include "pulseview/pv/binding/decoder.hpp"

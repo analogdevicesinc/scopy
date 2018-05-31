@@ -7,7 +7,7 @@ echo 'export PATH="$(brew --prefix qt)/bin:$PATH"' >> ~/.bash_profile
 brew link --force qt
 
 brew unlink bison
-brew install cmake fftw bison autoconf automake libtool libzip glib glibmm doxygen wget boost gnu-sed libmatio dylibbundler libxml2
+brew install cmake fftw bison autoconf automake libtool libzip glib glibmm doxygen wget boost gnu-sed libmatio dylibbundler libxml2 pkg-config
 brew install --build-from-source libusb
 brew install llvm
 brew link --overwrite --force gcc
@@ -145,7 +145,7 @@ brew upgrade python
 cd ${WORKDIR}
 rm -rf libsigrok
 if [ ! -d libsigrok ]; then
-  git clone https://github.com/sschnelle/libsigrok/
+  git clone https://github.com/sigrokproject/libsigrok/
   cd libsigrok
   ./autogen.sh
   CC=gcc CXX=g++ CXXFLAGS=-std=c++11 ./configure --disable-static --enable-shared --disable-all-drivers --enable-bindings --enable-cxx

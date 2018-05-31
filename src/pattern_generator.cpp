@@ -37,6 +37,7 @@
 #include <QDirIterator>
 #include <QPushButton>
 #include <QFileDialog>
+#include <QButtonGroup>
 #include <utils.h>
 
 #include <boost/math/common_factor.hpp>

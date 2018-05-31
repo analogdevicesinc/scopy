@@ -13,6 +13,8 @@
 #include <iostream>
 #include <QPaintEvent>
 #include <QPainter>
+#include <QStyle>
+#include <QStyleOption>
 #include "dynamicWidget.hpp"
 using namespace adiscope;
 

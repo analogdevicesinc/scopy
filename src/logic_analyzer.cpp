@@ -33,6 +33,7 @@
 #include <QFile>
 #include <QMessageBox>
 #include <QDateTime>
+#include <QButtonGroup>
 
 /* Local includes */
 #include "pulseview/pv/mainwindow.hpp"
