@@ -191,6 +191,9 @@ public:
 	std::shared_ptr<pv::view::DecodeTrace> getDecodeTrace();
 	bool eventFilter(QObject *watched, QEvent *event);
 
+	std::shared_ptr<pv::binding::Decoder> getBinding();
+	void setBinding(std::shared_ptr<pv::binding::Decoder>);
+
 private Q_SLOTS:
 	void set_decoder(std::string value);
 	void collapse_group();
@@ -208,6 +211,7 @@ private:
 	std::shared_ptr<pv::view::TraceTreeItem> trace;
 	std::shared_ptr<pv::view::LogicSignal> logicTrace;
 	std::shared_ptr<pv::view::DecodeTrace> decodeTrace;
+	std::shared_ptr<pv::binding::Decoder> binding_;
 public Q_SLOTS:
 	void remove();
 	void enable(bool enabled);
@@ -308,6 +312,9 @@ public:
 	std::vector<std::string> getTriggerMapping();
 	std::string getTriggerMapping(int);
 	void remove_trace_clones();
+	void setupChannel(LogicAnalyzerChannelGroup*, QFrame*);
+	void setupGroupedChannel(LogicAnalyzerChannelGroupUI*, QFrame*);
+	void deselect_all();
 
 public Q_SLOTS:
 	void chmScrollChanged(int value);

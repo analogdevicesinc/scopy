@@ -133,6 +133,8 @@ public:
 
 	std::shared_ptr<pv::data::decode::Decoder> pv_decoder();
 
+	void stop_decode();
+
 private:
 	void draw_annotations(std::vector<pv::data::decode::Annotation> annotations,
 		QPainter &p, int h, const ViewItemPaintParams &pp, int y,

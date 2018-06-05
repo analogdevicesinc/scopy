@@ -160,6 +160,11 @@ DecodeTrace::~DecodeTrace()
 	decoder_stack_.reset();
 }
 
+void DecodeTrace::stop_decode()
+{
+	decoder_stack_->stop_decode();
+}
+
 bool DecodeTrace::enabled() const
 {
 	return true;

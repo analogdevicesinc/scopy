@@ -496,15 +496,19 @@ const srd_decoder *LogicAnalyzerChannelGroup::getDecoder()
 
 void LogicAnalyzerChannelGroup::setDecoder(const srd_decoder *value)
 {
-	if( value == nullptr )
-		return;
-
 	decoderRolesNameList.clear();
 	decoderReqChannels.clear();
 	decoderOptChannels.clear();
-	properties_.clear();
+	if (decoder != value) {
+		properties_.clear();
+	}
 	channels_.clear();
 	decoder = value;
+
+	if( value == nullptr ) {
+		properties_.clear();
+		return;
+	}
 
 	GSList *reqCh = g_slist_copy(decoder->channels);
 	for (; reqCh; reqCh = reqCh->next) {
@@ -733,6 +737,12 @@ LogicAnalyzerChannelGroupUI::LogicAnalyzerChannelGroupUI(
 
 LogicAnalyzerChannelGroupUI::~LogicAnalyzerChannelGroupUI()
 {
+	if (decodeTrace) {
+		decodeTrace->stop_decode();
+	}
+	decodeTrace.reset();
+	trace.reset();
+	logicTrace.reset();
 	if( ui->baseWidget == chm_ui->hoverWidget ){
 		chm_ui->hoverWidget = nullptr;
 	}
@@ -761,6 +771,9 @@ void LogicAnalyzerChannelGroupUI::setTrace(
 
 void LogicAnalyzerChannelGroupUI::setTrace()
 {
+	if (decodeTrace) {
+		decodeTrace->stop_decode();
+	}
 	decodeTrace.reset();
 	trace.reset();
 	trace = nullptr;
@@ -831,6 +844,16 @@ void LogicAnalyzerChannelGroupUI::highlightBotSeparator()
 std::shared_ptr<pv::view::DecodeTrace> LogicAnalyzerChannelGroupUI::getDecodeTrace()
 {
 	return decodeTrace;
+}
+
+std::shared_ptr<pv::binding::Decoder> LogicAnalyzerChannelGroupUI::getBinding()
+{
+	return binding_;
+}
+
+void LogicAnalyzerChannelGroupUI::setBinding(std::shared_ptr<pv::binding::Decoder> bind)
+{
+	binding_ = bind;
 }
 
 bool LogicAnalyzerChannelGroupUI::eventFilter(QObject *watched, QEvent *event)
@@ -1027,6 +1050,14 @@ void LogicAnalyzerChannelGroupUI::setupDecoder()
 
 		}
 		decodeTrace->set_channel_map(channel_map);
+
+		if (decoder->options) {
+			binding_ = std::make_shared<binding::Decoder>(
+						getDecodeTrace()->decoder(),
+						getDecodeTrace()->pv_decoder(),
+						lchg->properties_);
+			lchg->properties_ = binding_->properties();
+		}
 	}
 }
 
@@ -1671,6 +1702,278 @@ void LogicAnalyzerChannelManagerUI::update_ui_children(LogicAnalyzerChannelGroup
 	}
 }
 
+void LogicAnalyzerChannelManagerUI::setupChannel(LogicAnalyzerChannelGroup* ch,
+						 QFrame* prevSep)
+{
+	LogicAnalyzerChannelGroupUI *lachannelgroupUI =
+		new LogicAnalyzerChannelGroupUI(ch, this, 0);
+	chg_ui.push_back(lachannelgroupUI);
+
+	ui->verticalLayout->insertWidget(ui->verticalLayout->count()-1,
+					 chg_ui.back());
+	lachannelgroupUI->ensurePolished();
+	lachannelgroupUI->topSep = prevSep;
+
+	lachannelgroupUI->ui->groupName->setText(
+		QString::fromStdString(ch->get_label()));
+
+	/* Set no of characters to widgets */
+	setWidgetMinimumNrOfChars(lachannelgroupUI->ui->groupName, 8);
+	setWidgetMinimumNrOfChars(lachannelgroupUI->ui->indexLabel, 5);
+	setWidgetMinimumNrOfChars(lachannelgroupUI->ui->comboBox, 7);
+	lachannelgroupUI->ui->comboBox->setIconSize(QSize(30,20));
+	setWidgetMinimumNrOfChars(lachannelgroupUI->ui->comboBox_2, 7);
+	if(!lachannelgroupUI->ui->collapseGroupBtn->isChecked())
+		retainWidgetSizeWhenHidden(lachannelgroupUI->ui->collapseGroupBtn);
+	setWidgetMinimumNrOfChars(lachannelgroupUI->ui->decoderCombo, 10);
+	/* Manage widget visibility  */
+	if (collapsed) {
+		lachannelgroupUI->ui->leftWidget->setVisible(false);
+		lachannelgroupUI->ui->rightWidget->setVisible(false);
+		lachannelgroupUI->ui->stackedWidget->setCurrentIndex(0);
+
+	}
+
+	connect(lachannelgroupUI->ui->selectCheckBox, SIGNAL(toggled(bool)),
+		chg_ui.back(), SLOT(select(bool)));
+	connect(lachannelgroupUI, SIGNAL(requestUpdateUI()),
+		this, SLOT(triggerUpdateUi()));
+
+	if (ch->is_grouped()) {
+		setupGroupedChannel(lachannelgroupUI, prevSep);
+	} else {
+		auto index = ch->get_channel(0)->get_id();
+		auto trace1 = main_win->view_->get_clone_of(index);
+		lachannelgroupUI->setTrace(trace1);
+		lachannelgroupUI->ui->stackedWidget->setCurrentIndex(0);
+
+		if (!collapsed) {
+			retainWidgetSizeWhenHidden(lachannelgroupUI->ui->btnRemGroup);
+		}
+
+		lachannelgroupUI->ui->btnRemGroup->setVisible(false);
+		lachannelgroupUI->ui->collapseGroupBtn->setVisible(false);
+
+		lachannelgroupUI->botSep = addSeparator(ui->verticalLayout,
+			ui->verticalLayout->count()-1);
+		prevSep = lachannelgroupUI->botSep;
+		lachannelgroupUI->chUiSep = lachannelgroupUI->botSep;
+
+		lachannelgroupUI->ui->decoderCombo->setVisible(false);
+		lachannelgroupUI->ui->indexLabel->setText(QString::number(index));
+
+		connect(lachannelgroupUI->ui->comboBox,
+			SIGNAL(currentIndexChanged(int)),
+			lachannelgroupUI, SLOT(triggerChanged(int)));
+		connect(lachannelgroupUI->ui->comboBox,
+			SIGNAL(currentIndexChanged(int)),
+			la, SLOT(triggerChanged(int)));
+
+	}
+	lachannelgroupUI->ui->btnEnableChannel->setChecked(ch->is_enabled());
+	lachannelgroupUI->enableControls(ch->is_enabled());
+	connect(lachannelgroupUI->ui->btnEnableChannel, SIGNAL(toggled(bool)),
+		lachannelgroupUI, SLOT(enable(bool)));
+}
+
+void LogicAnalyzerChannelManagerUI::deselect_all()
+{
+	for (auto ch : chg_ui) {
+		ch->ui->selectCheckBox->setChecked(false);
+	}
+
+}
+void LogicAnalyzerChannelManagerUI::setupGroupedChannel(LogicAnalyzerChannelGroupUI *lachannelgroupUI,
+							QFrame *prevSep)
+{
+	if(!collapsed) {
+		setWidgetMinimumNrOfChars(lachannelgroupUI->ui->decoderCombo, 10);
+	}
+
+	auto trace1 = main_win->view_->add_decoder();
+	lachannelgroupUI->setTrace(trace1);
+	lachannelgroupUI->setupDecoder();
+	QSpacerItem *spacerItem = new QSpacerItem(15, 0, QSizePolicy::MinimumExpanding,
+						  QSizePolicy::Minimum);
+	lachannelgroupUI->ui->rightWidgetLayout->insertSpacerItem(0, spacerItem);
+
+	/* Populate role combo based on parent decoder */
+	lachannelgroupUI->ui->decoderCombo->addItem("None");
+	int decoder_char_count = QString("None").count();
+
+	for (auto var : chm->get_name_decoder_list()) {
+		lachannelgroupUI->ui->decoderCombo->addItem(var);
+		decoder_char_count = (var.count() > decoder_char_count) ? var.count() : decoder_char_count;
+	}
+
+	QFontMetrics labelm(lachannelgroupUI->ui->decoderCombo->font());
+	auto label_min_width = labelm.width(QString(decoder_char_count+2, 'X'));
+	lachannelgroupUI->ui->decoderCombo->view()->setMinimumWidth(label_min_width);
+
+	connect(lachannelgroupUI->ui->decoderCombo,
+		SIGNAL(currentIndexChanged(const QString&)),
+		lachannelgroupUI, SLOT(decoderChanged(const QString&)));
+	connect(lachannelgroupUI->ui->btnRemGroup, SIGNAL(pressed()),
+		lachannelgroupUI, SLOT(remove()));
+
+	if (lachannelgroupUI->getChannelGroup()->getDecoder()) {
+		QString name = QString::fromUtf8(
+			lachannelgroupUI->getChannelGroup()->getDecoder()->name);
+		int decIndex = chm->get_name_decoder_list().indexOf(name)+1;
+		lachannelgroupUI->ui->decoderCombo->setCurrentIndex(decIndex);
+	} else {
+		lachannelgroupUI->ui->decoderCombo->setCurrentIndex(0);
+	}
+
+	lachannelgroupUI->ui->comboBox->setVisible(false);
+
+	connect(lachannelgroupUI->ui->collapseGroupBtn, SIGNAL(clicked()),
+		lachannelgroupUI, SLOT(collapse_group()));
+
+
+	lachannelgroupUI->ui->stackedWidget->setCurrentIndex(1);
+
+	if(!lachannelgroupUI->getChannelGroup()->isCollapsed()) {
+		lachannelgroupUI->chUiSep = addSeparator(
+			lachannelgroupUI->ui->layoutChildren,
+			lachannelgroupUI->ui->layoutChildren->count() );
+		prevSep = lachannelgroupUI->chUiSep;
+
+		/* Create subwidgets */
+		auto ch = lachannelgroupUI->getChannelGroup();
+		for (auto i=0; i < ch->get_channel_count(); i++) {
+			LogicAnalyzerChannelUI *lachannelUI =
+					new LogicAnalyzerChannelUI(
+						static_cast<LogicAnalyzerChannel *>(
+							ch->get_channel(i)),
+						lachannelgroupUI->getChannelGroup(),
+						lachannelgroupUI,
+						this);
+			lachannelgroupUI->ch_ui.push_back(lachannelUI);
+			lachannelUI->ensurePolished();
+			QSpacerItem *spacerItem = new QSpacerItem(15, 0, QSizePolicy::MinimumExpanding,
+								  QSizePolicy::Minimum);
+			lachannelUI->ui->rightWidgetLayout->insertSpacerItem(0, spacerItem);
+
+			auto index = ch->get_channel(i)->get_id();
+			auto trace1 = main_win->view_->get_clone_of(index);
+			lachannelUI->setTrace(trace1);
+
+			forceUpdate(lachannelUI);
+
+			auto str = QString::fromStdString(
+						ch->get_channel(i)->get_label());
+			lachannelUI->ui->groupName->setText(str);
+
+			/* Set no of characters to widgets */
+			setWidgetMinimumNrOfChars(lachannelUI->ui->groupName, 8);
+			setWidgetMinimumNrOfChars(lachannelUI->ui->indexLabel2, 3);
+			setWidgetMinimumNrOfChars(lachannelUI->ui->indexLabel, 3);
+			setWidgetMinimumNrOfChars(lachannelUI->ui->comboBox, 7);
+			lachannelUI->ui->comboBox->setIconSize(QSize(30, 20));
+			setWidgetMinimumNrOfChars(lachannelUI->ui->comboBox_2, 7);
+
+			if(!lachannelUI->ui->collapseGroupBtn->isChecked())
+				retainWidgetSizeWhenHidden(lachannelUI->ui->collapseGroupBtn);
+			lachannelUI->ui->stackedWidget->setCurrentIndex(2);
+
+			/* Manage widget visibility */
+			if (collapsed) {
+				lachannelUI->ui->leftWidget->setVisible(false);
+				lachannelUI->ui->rightWidget->setVisible(false);
+				lachannelUI->ui->stackedWidget->setCurrentIndex(0);
+			} else {
+				retainWidgetSizeWhenHidden(lachannelUI->ui->btnEnableChannel);
+				retainWidgetSizeWhenHidden(lachannelUI->ui->selectCheckBox);
+			}
+
+			lachannelUI->ui->btnEnableChannel->setVisible(false);
+			lachannelUI->ui->selectCheckBox->setVisible(false);
+			lachannelUI->ui->collapseGroupBtn->setVisible(false);
+
+			/* Populate role combo based on parent decoder */
+			lachannelUI->ui->comboBox_2->addItem("None");
+			for (auto var : lachannelgroupUI->getChannelGroup()->get_decoder_roles_list()) {
+				lachannelUI->ui->comboBox_2->addItem(var);
+			}
+			if (lachannelUI->getChannel()->getChannel_role()) {
+				QString name = QString::fromUtf8(
+							lachannelUI->getChannel()->getChannel_role()->name);
+				int roleIndex = lachannelgroupUI->getChannelGroup()->get_decoder_roles_list().indexOf(name)+1;
+				lachannelUI->ui->comboBox_2->setCurrentIndex(roleIndex);
+			} else {
+				lachannelUI->ui->comboBox_2->setCurrentIndex(0);
+			}
+
+			lachannelgroupUI->ui->layoutChildren->insertWidget(
+						lachannelgroupUI->ui->layoutChildren->count(), lachannelUI);
+			lachannelgroupUI->ensurePolished();
+
+			lachannelUI->botSep = addSeparator(
+						lachannelgroupUI->ui->layoutChildren,
+						lachannelgroupUI->ui->layoutChildren->count());
+			lachannelUI->topSep = prevSep;
+			prevSep = lachannelUI->botSep;
+
+			connect(lachannelUI->ui->btnRemGroup, SIGNAL(pressed()),
+				lachannelUI, SLOT(remove()));
+			connect(lachannelUI->ui->comboBox_2,
+				SIGNAL(currentTextChanged(const QString&)),
+				lachannelUI, SLOT(rolesChangedLHS(const QString&)));
+			connect(lachannelUI, SIGNAL(requestUpdateUI()),
+				this, SLOT(triggerUpdateUi()));
+			connect(lachannelUI->ui->comboBox,
+				SIGNAL(currentIndexChanged(int)),
+				lachannelUI, SLOT(triggerChanged(int)));
+			connect(lachannelUI->ui->comboBox,
+				SIGNAL(currentIndexChanged(int)),
+				la, SLOT(triggerChanged(int)));
+
+			str = QString().number(ch->get_channel(i)->get_id());
+			lachannelUI->ui->indexLabel2->setText(str);
+			lachannelUI->ui->indexLabel->setText(str);
+		}
+
+		int id = 0;
+		for(auto ch : lachannelgroupUI->ch_ui) {
+			auto dec = lachannelgroupUI->getChannelGroup()->getDecoder();
+			if(!dec)
+				break;
+
+			if((strcmp(dec->id, "parallel") != 0) && (strcmp(dec->id, "unary") != 0))
+				break;
+
+			ch->ui->comboBox_2->clear();
+
+			/* Populate role combo based on parent decoder */
+			ch->ui->comboBox_2->addItem("None");
+			for (auto var : lachannelgroupUI->getChannelGroup()->get_decoder_roles_list()) {
+				ch->ui->comboBox_2->addItem(var);
+			}
+
+			ch->ui->comboBox_2->setCurrentText(
+						lachannelgroupUI->getChannelGroup()->get_decoder_roles_list().at(id+1));
+			ch->ui->comboBox_2->setEnabled(false);
+			id++;
+		}
+
+		lachannelgroupUI->ui->layoutChildren->removeWidget(prevSep);
+		lachannelgroupUI->botSep = addSeparator(ui->verticalLayout,
+				ui->verticalLayout->count()-1);
+		prevSep = lachannelgroupUI->botSep;
+		lachannelgroupUI->ch_ui.back()->botSep = prevSep;
+		prevSep = lachannelgroupUI->botSep;
+	}
+	else {
+		lachannelgroupUI->ui->collapseGroupBtn->setChecked(true);
+		lachannelgroupUI->ui->subChannelWidget->setVisible(false);
+		lachannelgroupUI->botSep = addSeparator(ui->verticalLayout,
+				ui->verticalLayout->count()-1);
+		prevSep = lachannelgroupUI->botSep;
+	}
+	lachannelgroupUI->resetSeparatorHighlight();
+}
+
 void LogicAnalyzerChannelManagerUI::update_ui()
 {
 	for (auto ch : chg_ui) {
@@ -1717,270 +2020,10 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 
 	QFrame *prevSep = addSeparator(ui->verticalLayout,
 		ui->verticalLayout->count()-1);
-	auto offset = 0;
 
 	for (auto&& ch : *(chm->get_channel_groups())) {
 		if ((ch->is_enabled() && hidden) || !hidden) {
-
-			LogicAnalyzerChannelGroupUI *lachannelgroupUI =
-			        new LogicAnalyzerChannelGroupUI(
-			        static_cast<LogicAnalyzerChannelGroup *>(ch), this, 0);
-
-			chg_ui.push_back(lachannelgroupUI);
-
-			ui->verticalLayout->insertWidget(ui->verticalLayout->count()-1,
-			                                 chg_ui.back());
-			lachannelgroupUI->ensurePolished();
-			lachannelgroupUI->topSep = prevSep;
-
-			lachannelgroupUI->ui->groupName->setText(
-			        QString::fromStdString(ch->get_label()));
-
-			/* Set no of characters to widgets */
-			setWidgetMinimumNrOfChars(lachannelgroupUI->ui->groupName, 8);
-			setWidgetMinimumNrOfChars(lachannelgroupUI->ui->indexLabel, 5);
-			setWidgetMinimumNrOfChars(lachannelgroupUI->ui->comboBox, 7);
-			lachannelgroupUI->ui->comboBox->setIconSize(QSize(30,20));
-			setWidgetMinimumNrOfChars(lachannelgroupUI->ui->comboBox_2, 7);
-			if(!lachannelgroupUI->ui->collapseGroupBtn->isChecked())
-				retainWidgetSizeWhenHidden(lachannelgroupUI->ui->collapseGroupBtn);
-			setWidgetMinimumNrOfChars(lachannelgroupUI->ui->decoderCombo, 10);
-			/* Manage widget visibility  */
-			if (collapsed) {
-				lachannelgroupUI->ui->leftWidget->setVisible(false);
-				lachannelgroupUI->ui->rightWidget->setVisible(false);
-				lachannelgroupUI->ui->stackedWidget->setCurrentIndex(0);
-
-			}
-
-			connect(lachannelgroupUI->ui->selectCheckBox, SIGNAL(toggled(bool)),
-			        chg_ui.back(), SLOT(select(bool)));
-			connect(lachannelgroupUI, SIGNAL(requestUpdateUI()),
-				this, SLOT(triggerUpdateUi()));
-
-			offset+=(lachannelgroupUI->geometry().bottomRight().y());
-
-			/* Grouped widget */
-			if (ch->is_grouped()) {
-				if(!collapsed) {
-					setWidgetMinimumNrOfChars(lachannelgroupUI->ui->decoderCombo, 10);
-				}
-
-				auto trace1 = main_win->view_->add_decoder();
-				lachannelgroupUI->setTrace(trace1);
-				lachannelgroupUI->setupDecoder();
-				QSpacerItem *spacerItem = new QSpacerItem(15, 0, QSizePolicy::MinimumExpanding,
-									  QSizePolicy::Minimum);
-				lachannelgroupUI->ui->rightWidgetLayout->insertSpacerItem(0, spacerItem);
-
-				/* Populate role combo based on parent decoder */
-				lachannelgroupUI->ui->decoderCombo->addItem("None");
-				int decoder_char_count = QString("None").count();
-
-				for (auto var : chm->get_name_decoder_list()) {
-					lachannelgroupUI->ui->decoderCombo->addItem(var);
-					decoder_char_count = (var.count() > decoder_char_count) ? var.count() : decoder_char_count;
-				}
-
-				QFontMetrics labelm(lachannelgroupUI->ui->decoderCombo->font());
-				auto label_min_width = labelm.width(QString(decoder_char_count+2, 'X'));
-				lachannelgroupUI->ui->decoderCombo->view()->setMinimumWidth(label_min_width);
-
-				connect(lachannelgroupUI->ui->decoderCombo,
-					SIGNAL(currentIndexChanged(const QString&)),
-					lachannelgroupUI, SLOT(decoderChanged(const QString&)));
-				connect(lachannelgroupUI->ui->btnRemGroup, SIGNAL(pressed()),
-					lachannelgroupUI, SLOT(remove()));
-
-				if (lachannelgroupUI->getChannelGroup()->getDecoder()) {
-					QString name = QString::fromUtf8(
-						lachannelgroupUI->getChannelGroup()->getDecoder()->name);
-					int decIndex = chm->get_name_decoder_list().indexOf(name)+1;
-					lachannelgroupUI->ui->decoderCombo->setCurrentIndex(decIndex);
-				} else {
-					lachannelgroupUI->ui->decoderCombo->setCurrentIndex(0);
-				}
-
-				lachannelgroupUI->ui->comboBox->setVisible(false);
-
-				connect(lachannelgroupUI->ui->collapseGroupBtn, SIGNAL(clicked()),
-				        lachannelgroupUI, SLOT(collapse_group()));
-
-
-				lachannelgroupUI->ui->stackedWidget->setCurrentIndex(1);
-
-				if(!lachannelgroupUI->getChannelGroup()->isCollapsed()) {
-					lachannelgroupUI->chUiSep = addSeparator(
-						lachannelgroupUI->ui->layoutChildren,
-						lachannelgroupUI->ui->layoutChildren->count() );
-					prevSep = lachannelgroupUI->chUiSep;
-
-					/* Create subwidgets */
-					for (auto i=0; i<ch->get_channel_count(); i++) {
-						LogicAnalyzerChannelUI *lachannelUI =
-								new LogicAnalyzerChannelUI(
-									static_cast<LogicAnalyzerChannel *>(
-										ch->get_channel(i)),
-									lachannelgroupUI->getChannelGroup(),
-									lachannelgroupUI,
-									this);
-						lachannelgroupUI->ch_ui.push_back(lachannelUI);
-						lachannelUI->ensurePolished();
-						QSpacerItem *spacerItem = new QSpacerItem(15, 0, QSizePolicy::MinimumExpanding,
-											  QSizePolicy::Minimum);
-						lachannelUI->ui->rightWidgetLayout->insertSpacerItem(0, spacerItem);
-
-						auto index = ch->get_channel(i)->get_id();
-						auto trace1 = main_win->view_->get_clone_of(index);
-						lachannelUI->setTrace(trace1);
-
-						forceUpdate(lachannelUI);
-						offset+=lachannelUI->geometry().bottomRight().y();
-
-						auto str = QString::fromStdString(
-									ch->get_channel(i)->get_label());
-						lachannelUI->ui->groupName->setText(str);
-
-						/* Set no of characters to widgets */
-						setWidgetMinimumNrOfChars(lachannelUI->ui->groupName, 8);
-						setWidgetMinimumNrOfChars(lachannelUI->ui->indexLabel2, 3);
-						setWidgetMinimumNrOfChars(lachannelUI->ui->indexLabel, 3);
-						setWidgetMinimumNrOfChars(lachannelUI->ui->comboBox, 7);
-						lachannelUI->ui->comboBox->setIconSize(QSize(30, 20));
-						setWidgetMinimumNrOfChars(lachannelUI->ui->comboBox_2, 7);
-
-						if(!lachannelUI->ui->collapseGroupBtn->isChecked())
-							retainWidgetSizeWhenHidden(lachannelUI->ui->collapseGroupBtn);
-						lachannelUI->ui->stackedWidget->setCurrentIndex(2);
-
-						/* Manage widget visibility */
-						if (collapsed) {
-							lachannelUI->ui->leftWidget->setVisible(false);
-							lachannelUI->ui->rightWidget->setVisible(false);
-							lachannelUI->ui->stackedWidget->setCurrentIndex(0);
-						} else {
-							retainWidgetSizeWhenHidden(lachannelUI->ui->btnEnableChannel);
-							retainWidgetSizeWhenHidden(lachannelUI->ui->selectCheckBox);
-						}
-
-						lachannelUI->ui->btnEnableChannel->setVisible(false);
-						lachannelUI->ui->selectCheckBox->setVisible(false);
-						lachannelUI->ui->collapseGroupBtn->setVisible(false);
-
-						/* Populate role combo based on parent decoder */
-						lachannelUI->ui->comboBox_2->addItem("None");
-						for (auto var : lachannelgroupUI->getChannelGroup()->get_decoder_roles_list()) {
-							lachannelUI->ui->comboBox_2->addItem(var);
-						}
-						if (lachannelUI->getChannel()->getChannel_role()) {
-							QString name = QString::fromUtf8(
-										lachannelUI->getChannel()->getChannel_role()->name);
-							int roleIndex = lachannelgroupUI->getChannelGroup()->get_decoder_roles_list().indexOf(name)+1;
-							lachannelUI->ui->comboBox_2->setCurrentIndex(roleIndex);
-						} else {
-							lachannelUI->ui->comboBox_2->setCurrentIndex(0);
-						}
-
-						lachannelgroupUI->ui->layoutChildren->insertWidget(
-									lachannelgroupUI->ui->layoutChildren->count(), lachannelUI);
-						lachannelgroupUI->ensurePolished();
-
-						lachannelUI->botSep = addSeparator(
-									lachannelgroupUI->ui->layoutChildren,
-									lachannelgroupUI->ui->layoutChildren->count());
-						lachannelUI->topSep = prevSep;
-						prevSep = lachannelUI->botSep;
-
-						connect(lachannelUI->ui->btnRemGroup, SIGNAL(pressed()),
-							lachannelUI, SLOT(remove()));
-						connect(lachannelUI->ui->comboBox_2,
-							SIGNAL(currentTextChanged(const QString&)),
-							lachannelUI, SLOT(rolesChangedLHS(const QString&)));
-						connect(lachannelUI, SIGNAL(requestUpdateUI()),
-							this, SLOT(triggerUpdateUi()));
-						connect(lachannelUI->ui->comboBox,
-							SIGNAL(currentIndexChanged(int)),
-							lachannelUI, SLOT(triggerChanged(int)));
-						connect(lachannelUI->ui->comboBox,
-							SIGNAL(currentIndexChanged(int)),
-							la, SLOT(triggerChanged(int)));
-
-						str = QString().number(ch->get_channel(i)->get_id());
-						lachannelUI->ui->indexLabel2->setText(str);
-						lachannelUI->ui->indexLabel->setText(str);
-					}
-
-					int id = 0;
-					for(auto ch : lachannelgroupUI->ch_ui) {
-						auto dec = lachannelgroupUI->getChannelGroup()->getDecoder();
-						if(!dec)
-							break;
-
-                        if((strcmp(dec->id, "parallel") != 0) && (strcmp(dec->id, "unary") != 0))
-							break;
-
-						ch->ui->comboBox_2->clear();
-
-						/* Populate role combo based on parent decoder */
-						ch->ui->comboBox_2->addItem("None");
-						for (auto var : lachannelgroupUI->getChannelGroup()->get_decoder_roles_list()) {
-							ch->ui->comboBox_2->addItem(var);
-						}
-
-						ch->ui->comboBox_2->setCurrentText(
-									lachannelgroupUI->getChannelGroup()->get_decoder_roles_list().at(id+1));
-						ch->ui->comboBox_2->setEnabled(false);
-						id++;
-					}
-
-					lachannelgroupUI->ui->layoutChildren->removeWidget(prevSep);
-					lachannelgroupUI->botSep = addSeparator(ui->verticalLayout,
-							ui->verticalLayout->count()-1);
-					prevSep = lachannelgroupUI->botSep;
-					lachannelgroupUI->ch_ui.back()->botSep = prevSep;
-					prevSep = lachannelgroupUI->botSep;
-				}
-				else {
-					lachannelgroupUI->ui->collapseGroupBtn->setChecked(true);
-					lachannelgroupUI->ui->subChannelWidget->setVisible(false);
-					lachannelgroupUI->botSep = addSeparator(ui->verticalLayout,
-							ui->verticalLayout->count()-1);
-					prevSep = lachannelgroupUI->botSep;
-				}
-				lachannelgroupUI->resetSeparatorHighlight();
-			} else {
-				auto index = ch->get_channel(0)->get_id();
-				auto trace1 = main_win->view_->get_clone_of(index);
-				lachannelgroupUI->setTrace(trace1);
-				lachannelgroupUI->ui->stackedWidget->setCurrentIndex(0);
-
-				if (!collapsed) {
-					retainWidgetSizeWhenHidden(lachannelgroupUI->ui->btnRemGroup);
-				}
-
-				lachannelgroupUI->ui->btnRemGroup->setVisible(false);
-				lachannelgroupUI->ui->collapseGroupBtn->setVisible(false);
-
-				lachannelgroupUI->botSep = addSeparator(ui->verticalLayout,
-					ui->verticalLayout->count()-1);
-				prevSep = lachannelgroupUI->botSep;
-				lachannelgroupUI->chUiSep = lachannelgroupUI->botSep;
-
-				lachannelgroupUI->ui->decoderCombo->setVisible(false);
-				lachannelgroupUI->ui->indexLabel->setText(QString::number(index));
-
-				connect(lachannelgroupUI->ui->comboBox,
-				        SIGNAL(currentIndexChanged(int)),
-				        lachannelgroupUI, SLOT(triggerChanged(int)));
-				connect(lachannelgroupUI->ui->comboBox,
-				        SIGNAL(currentIndexChanged(int)),
-				        la, SLOT(triggerChanged(int)));
-
-			}
-			lachannelgroupUI->ui->btnEnableChannel->setChecked(ch->is_enabled());
-			lachannelgroupUI->enableControls(ch->is_enabled());
-			connect(lachannelgroupUI->ui->btnEnableChannel, SIGNAL(toggled(bool)),
-				lachannelgroupUI, SLOT(enable(bool)));
+			setupChannel(static_cast<LogicAnalyzerChannelGroup *>(ch), prevSep);
 		}
 	}
 
@@ -2063,20 +2106,23 @@ void LogicAnalyzerChannelManagerUI::groupSplit_clicked()
 	std::vector<int> selection = chm->get_selected_indexes();
 
 	if (selection.size() == 0) {
-		update_ui();
 		return;
 	}
 
 	if (selection.size() == 1) {
 		chm->join(selection);
-		chm->deselect_all();
+		deselect_all();
 	} else {
 		chm->join(selection);
-		chm->deselect_all();
+		deselect_all();
 	}
 	ui->scrollArea->verticalScrollBar()->setValue(
 		ui->scrollArea->verticalScrollBar()->maximum());
-	update_ui();
+
+	auto ch = chm->get_channel_group(chm->get_channel_group_count() - 1);
+	QFrame *prevSep = addSeparator(ui->verticalLayout,
+		ui->verticalLayout->count()-1);
+	setupChannel(ch, prevSep);
 }
 
 void LogicAnalyzerChannelManagerUI::hideInactive_clicked(bool hide)
@@ -2413,8 +2459,8 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 				optChUI->labelRole->setText(QString::fromUtf8(optch->name));
 				optChUI->stackedWidget->setCurrentIndex(0);
 
-                if(((strcmp(decoder->id, "parallel") == 0) || (strcmp(decoder->id, "unary") == 0)) &&
-                        (strcmp(optch->name, "CLK") != 0)) {
+                                if(((strcmp(decoder->id, "parallel") == 0) || (strcmp(decoder->id, "unary") == 0)) &&
+                                                (strcmp(optch->name, "CLK") != 0)) {
 					auto currentCh = chGroup->get_channel_at_index(index);
 					if(auto role = currentCh->getChannel_role()) {
 						if(optch->name == role->name) {
@@ -2467,6 +2513,7 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 							chGroup->properties_);
 				QFormLayout *layOpt = new QFormLayout(settingsUI->options);
 				chGroup->properties_ = binding_->properties();
+				chGroupUI->setBinding(binding_);
 				binding_->add_properties_to_form(layOpt, true, settingsUI->options);
 				layOpt->setMargin(0);
 				settingsUI->verticalLayout_1->insertLayout(

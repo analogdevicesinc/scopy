@@ -219,9 +219,11 @@ void DecoderStack::clear()
 
 void DecoderStack::stop_decode()
 {
+	disconnect(&session_, SIGNAL(frame_began()),
+		   this, SLOT(on_new_frame()));
+	input_cond_.notify_all();
 	if (decode_thread_.joinable()) {
 		interrupt_ = true;
-		input_cond_.notify_one();
 		decode_thread_.join();
 	}
 }
