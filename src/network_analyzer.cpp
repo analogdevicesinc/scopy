@@ -1024,6 +1024,15 @@ void NetworkAnalyzer_API::setCursors(bool enabled)
     net->ui->boxCursors->setChecked(enabled);
 }
 
+bool NetworkAnalyzer_API::running() const
+{
+	return net->ui->run_button->isChecked();
+}
+void NetworkAnalyzer_API::run(bool enabled)
+{
+	net->ui->run_button->setChecked(enabled);
+}
+
 int NetworkAnalyzer_API::getCursorsPosition() const
 {
     if (!net->ui->boxCursors->isChecked()) {

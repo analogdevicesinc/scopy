@@ -162,6 +162,7 @@ namespace adiscope {
 		Q_PROPERTY(int ref_channel READ getRefChannel
 				WRITE setRefChannel);
 
+		Q_PROPERTY(bool running READ running WRITE run STORED false);
 		Q_PROPERTY(bool cursors READ getCursors WRITE setCursors);
 		Q_PROPERTY(int line_thickness READ getLineThickness WRITE setLineThickness);
 		Q_PROPERTY(int cursors_position READ getCursorsPosition
@@ -170,6 +171,7 @@ namespace adiscope {
               WRITE setCursorsTransparency)
 		Q_PROPERTY(int plot_type READ getPlotType
 	      WRITE setPlotType)
+
 
 	public:
 		explicit NetworkAnalyzer_API(NetworkAnalyzer *net) :
@@ -206,6 +208,9 @@ namespace adiscope {
 
 		bool getCursors() const;
 		void setCursors(bool enabled);
+
+		bool running() const;
+		void run(bool enabled);
 
 		int getLineThickness() const;
 		void setLineThickness(int index);
