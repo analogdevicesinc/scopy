@@ -118,6 +118,7 @@ struct adiscope::signal_generator_data {
 	iio_channel* iio_ch;
 	enum SIGNAL_TYPE type;
 	unsigned int id;
+	bool enabled;
 	// SIGNAL_TYPE_CONSTANT
 	float constant;
 	// SIGNAL_TYPE_WAVEFORM
@@ -2358,6 +2359,30 @@ void SignalGenerator_API::setMode(const QList<int>& list)
 
 	gen->ui->tabWidget->setCurrentIndex(gen->getCurrentData()->type);
 }
+
+
+QList<bool> SignalGenerator_API::enabledChannels() const
+{
+	QList<bool> list;
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		list.append(static_cast<bool>(gen->channels[i]->enableButton()->isChecked()));
+	}
+
+	return list;
+}
+
+void SignalGenerator_API::enableChannels(const QList<bool>& list)
+{
+	if (list.size() != gen->channels.size()) {
+		return;
+	}
+
+	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+		gen->channels[i]->enableButton()->setChecked(list.at(i));
+	}
+}
+
 
 QList<double> SignalGenerator_API::getConstantValue() const
 {
