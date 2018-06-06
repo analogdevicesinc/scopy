@@ -2622,6 +2622,7 @@ void SignalGenerator_API::setNoiseAmpl(const QList<double>& list)
 	}
 
 	gen->noiseAmplitude->setValue(gen->getCurrentData()->noiseAmplitude);
+	gen->resetZoom();
 }
 
 
@@ -2798,7 +2799,9 @@ void SignalGenerator_API::setMathFunction(const QList<QString>& list)
 	if (gen->getCurrentData()->type == SIGNAL_TYPE_MATH) {
 		gen->ui->mathWidget->setFunction(
 		        gen->getCurrentData()->function);
+			gen->resetZoom();
 	}
+
 }
 
 QList<QString> SignalGenerator_API::getBufferFilePath() const{
