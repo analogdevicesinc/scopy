@@ -168,6 +168,8 @@ namespace adiscope {
               WRITE setCursorsPosition)
 		Q_PROPERTY(int cursors_transparency READ getCursorsTransparency
               WRITE setCursorsTransparency)
+		Q_PROPERTY(int plot_type READ getPlotType
+	      WRITE setPlotType)
 
 	public:
 		explicit NetworkAnalyzer_API(NetworkAnalyzer *net) :
@@ -213,6 +215,8 @@ namespace adiscope {
 		int getCursorsTransparency() const;
 		void setCursorsTransparency(int val);
 
+		int getPlotType() const;
+		void setPlotType(int val);
 	private:
 		NetworkAnalyzer *net;
 	};

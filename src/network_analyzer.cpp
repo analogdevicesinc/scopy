@@ -1080,6 +1080,16 @@ void NetworkAnalyzer_API::setCursorsTransparency(int val)
     net->m_phaseGraph.setCursorReadoutsTransparency(val);
 }
 
+int NetworkAnalyzer_API::getPlotType() const
+{
+	return net->ui->cmb_graphs->currentIndex();
+}
+
+void NetworkAnalyzer_API::setPlotType(int val)
+{
+	 net->ui->cmb_graphs->setCurrentIndex(val);
+}
+
 int NetworkAnalyzer_API::getLineThickness() const
 {
 	return net->ui->cbLineThickness->currentIndex();
