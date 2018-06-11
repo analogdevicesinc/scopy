@@ -1737,6 +1737,14 @@ bool SpectrumAnalyzer_API::running()
 void SpectrumAnalyzer_API::run(bool chk)
 {
 	sp->runButton()->setChecked(chk);
+bool SpectrumAnalyzer_API::single()
+{
+	return sp->ui->btnSingle->isChecked();
+}
+
+void SpectrumAnalyzer_API::runSingle(bool en)
+{
+	sp->ui->btnSingle->setChecked(en);
 }
 
 QVariantList SpectrumAnalyzer_API::getChannels()

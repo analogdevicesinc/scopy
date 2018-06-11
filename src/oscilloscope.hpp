@@ -419,6 +419,7 @@ namespace adiscope {
 		Q_PROPERTY(QVariantList channels READ getChannels);
 
 		Q_PROPERTY(bool running READ running WRITE run STORED false);
+		Q_PROPERTY(bool single READ single WRITE runSingle STORED false);
 
 		Q_PROPERTY(bool cursors READ hasCursors WRITE setCursors);
         Q_PROPERTY(bool measure READ hasMeasure WRITE setMeasure);
@@ -496,6 +497,9 @@ namespace adiscope {
 
 		bool running() const;
 		void run(bool en);
+
+                bool single() const;
+                void runSingle(bool en);
 
 		bool hasCursors() const;
 		void setCursors(bool en);

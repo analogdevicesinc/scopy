@@ -4294,6 +4294,16 @@ void Oscilloscope_API::run(bool en)
 	osc->ui->pushButtonRunStop->setChecked(en);
 }
 
+bool Oscilloscope_API::single() const
+{
+	return osc->ui->pushButtonSingle->isChecked();
+}
+
+void Oscilloscope_API::runSingle(bool en)
+{
+	osc->ui->pushButtonSingle->setChecked(en);
+}
+
 QList<int> Oscilloscope_API::measureEn() const
 {
 	QList<int> list;

@@ -1884,6 +1884,16 @@ void LogicAnalyzer_API::run(bool en)
 	lga->ui->btnRunStop->setChecked(en);
 }
 
+bool LogicAnalyzer_API::single() const
+{
+	return lga->ui->btnSingleRun->isChecked();
+}
+
+void LogicAnalyzer_API::runSingle(bool en)
+{
+	lga->ui->btnSingleRun->setChecked(en);
+}
+
 double LogicAnalyzer_API::getTimePos() const
 {
 	return lga->timePosition->value();

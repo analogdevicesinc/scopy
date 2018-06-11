@@ -1253,7 +1253,7 @@ bool PatternGenerator_API::single() const
 }
 void PatternGenerator_API::run_single(bool en)
 {
-	pg->ui->btnSingleRun->setChecked(en);
+	pg->ui->btnSingleRun->click();
 }
 
 bool PatternGenerator_API::inactiveHidden()

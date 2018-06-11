@@ -342,6 +342,7 @@ class SpectrumAnalyzer_API : public ApiObject
 {
 	Q_OBJECT
 	Q_PROPERTY(bool running READ running WRITE run STORED false);
+	Q_PROPERTY(bool single READ single WRITE runSingle STORED false);
 	Q_PROPERTY(double startFreq READ startFreq WRITE setStartFreq);
 	Q_PROPERTY(double stopFreq  READ stopFreq  WRITE setStopFreq);
 	Q_PROPERTY(QString units READ units WRITE setUnits);
@@ -362,6 +363,8 @@ private:
 	SpectrumAnalyzer *sp;
 	bool running();
 	void run(bool);
+	bool single();
+	void runSingle(bool);
 	QVariantList getChannels();
 	QVariantList getMarkers();
 

@@ -287,6 +287,7 @@ class LogicAnalyzer_API : public ApiObject
 		setChannelGroupsListSize SCRIPTABLE false)
 	Q_PROPERTY(QVariantList channel_groups READ getChannelGroups)
 	Q_PROPERTY(bool running READ running WRITE run STORED false)
+	Q_PROPERTY(bool single READ single WRITE runSingle STORED false)
 	Q_PROPERTY(double time_position READ getTimePos WRITE setTimePos)
 	Q_PROPERTY(double time_base READ getTimeBase WRITE setTimeBase)
 	Q_PROPERTY(QString run_mode READ runMode WRITE setRunMode)
@@ -308,6 +309,9 @@ public:
 
 	bool running() const;
 	void run(bool en);
+
+        bool single() const;
+        void runSingle(bool en);
 
 	double getTimePos() const;
 	void setTimePos(double pos);
