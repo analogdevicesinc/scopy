@@ -111,6 +111,7 @@ private Q_SLOTS:
 	void on_btnHideInactive_clicked();
 	void on_btnGroupWithSelected_clicked();
 	void colorChanged(QColor);
+	void checkEnabledChannels();
 
 private:
 

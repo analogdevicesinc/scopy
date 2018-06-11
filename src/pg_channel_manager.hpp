@@ -294,6 +294,8 @@ public:
 	bool eventFilter(QObject *object, QEvent *event);
 	void updatePlot();
 
+	std::vector<PatternGeneratorChannelGroupUI*> getEnabledChannelGroups();
+
 private:
 	QFrame *addSeparator(QVBoxLayout *lay, int pos);
 

@@ -1945,6 +1945,17 @@ void PatternGeneratorChannelManagerUI::updatePlot()
 	}
 }
 
+std::vector<PatternGeneratorChannelGroupUI*> PatternGeneratorChannelManagerUI::getEnabledChannelGroups()
+{
+        std::vector<PatternGeneratorChannelGroupUI*> enabled;
+        for (PatternGeneratorChannelGroupUI *chgUi : chg_ui) {
+                if (chgUi->getChannelGroup()->is_enabled()) {
+                        enabled.push_back(chgUi);
+                }
+        }
+        return enabled;
+}
+
 bool PatternGeneratorChannelManagerUI::eventFilter(QObject *object,
                 QEvent *event)
 {

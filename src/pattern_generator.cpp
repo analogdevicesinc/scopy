@@ -269,6 +269,7 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 	        this, SLOT(colorChanged(QColor)));
 
 	connect(chmui,SIGNAL(channelsChanged()),bufui,SLOT(updateUi()));
+	connect(chmui,SIGNAL(channelsChanged()),this,SLOT(checkEnabledChannels()));
 	connect(ui->btnRunStop, SIGNAL(toggled(bool)), this, SLOT(startStop(bool)));
 	connect(runBtn, SIGNAL(toggled(bool)), ui->btnRunStop, SLOT(setChecked(bool)));
 	connect(ui->btnRunStop, SIGNAL(toggled(bool)), runBtn, SLOT(setChecked(bool)));
@@ -426,6 +427,23 @@ void PatternGenerator::enableCgSettings(bool en)
 	colour_button_edge->setEnabled(en);
 	colour_button_high->setEnabled(en);
 	colour_button_low->setEnabled(en);
+}
+
+void PatternGenerator::checkEnabledChannels()
+{
+        auto enabled = chmui->getEnabledChannelGroups();
+        if (enabled.size() > 0) {
+                ui->btnSingleRun->setEnabled(true);
+                ui->btnRunStop->setEnabled(true);
+                runButton()->show();
+        } else {
+                if (ui->btnRunStop->isChecked()) {
+                        ui->btnRunStop->setChecked(false);
+                }
+                ui->btnSingleRun->setEnabled(false);
+                ui->btnRunStop->setEnabled(false);
+                runButton()->hide();
+        }
 }
 
 void PatternGenerator::updateCGSettings()
