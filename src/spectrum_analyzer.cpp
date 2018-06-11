@@ -1736,7 +1736,9 @@ bool SpectrumAnalyzer_API::running()
 
 void SpectrumAnalyzer_API::run(bool chk)
 {
-	sp->runButton()->setChecked(chk);
+	sp->ui->run_button->setChecked(chk);
+}
+
 bool SpectrumAnalyzer_API::single()
 {
 	return sp->ui->btnSingle->isChecked();
