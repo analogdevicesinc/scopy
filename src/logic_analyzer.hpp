@@ -152,6 +152,7 @@ private Q_SLOTS:
 	void onDataReceived();
 	void onFrameEnded();
 	void onTriggerModeChanged(bool);
+	void checkEnabledChannels();
 public Q_SLOTS:
 	void onTimeTriggerHandlePosChanged(int);
 	void onTimePositionSpinboxChanged(double value);

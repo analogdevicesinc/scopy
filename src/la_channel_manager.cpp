@@ -1153,6 +1153,7 @@ void LogicAnalyzerChannelGroupUI::enable(bool enabled)
 {
 	ChannelGroupUI::enable(enabled);
 	enableControls(enabled);
+	Q_EMIT channel_enabled();
 }
 
 LogicAnalyzerChannelUI*
@@ -1775,6 +1776,8 @@ void LogicAnalyzerChannelManagerUI::setupChannel(LogicAnalyzerChannelGroup* ch,
 	lachannelgroupUI->enableControls(ch->is_enabled());
 	connect(lachannelgroupUI->ui->btnEnableChannel, SIGNAL(toggled(bool)),
 		lachannelgroupUI, SLOT(enable(bool)));
+	connect(lachannelgroupUI, SIGNAL(channel_enabled()),
+		this, SIGNAL(channels_changed()));
 }
 
 void LogicAnalyzerChannelManagerUI::deselect_all()
@@ -1784,6 +1787,18 @@ void LogicAnalyzerChannelManagerUI::deselect_all()
 	}
 
 }
+
+std::vector<LogicAnalyzerChannelGroupUI*> LogicAnalyzerChannelManagerUI::getEnabledChannelGroups()
+{
+        std::vector<LogicAnalyzerChannelGroupUI*> enabled;
+        for (LogicAnalyzerChannelGroupUI *chgUi : chg_ui) {
+                if (chgUi->getChannelGroup()->is_enabled()) {
+                        enabled.push_back(chgUi);
+                }
+        }
+        return enabled;
+}
+
 void LogicAnalyzerChannelManagerUI::setupGroupedChannel(LogicAnalyzerChannelGroupUI *lachannelgroupUI,
 							QFrame *prevSep)
 {

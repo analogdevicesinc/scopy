@@ -218,6 +218,7 @@ public Q_SLOTS:
 Q_SIGNALS:
 	void remove(int index);
 	void requestUpdateUI();
+	void channel_enabled();
 };
 
 
@@ -315,6 +316,7 @@ public:
 	void setupChannel(LogicAnalyzerChannelGroup*, QFrame*);
 	void setupGroupedChannel(LogicAnalyzerChannelGroupUI*, QFrame*);
 	void deselect_all();
+	std::vector<LogicAnalyzerChannelGroupUI*> getEnabledChannelGroups();
 
 public Q_SLOTS:
 	void chmScrollChanged(int value);
@@ -348,6 +350,7 @@ private:
 	std::vector<std::string> trigger_mapping;
 Q_SIGNALS:
 	void widthChanged(int);
+	void channels_changed();
 };
 }
 #endif // LA_CHANNEL_MANAGER_HPP

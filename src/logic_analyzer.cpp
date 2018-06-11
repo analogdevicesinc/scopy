@@ -401,6 +401,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	        this, SLOT(on_btnShowChannelsClicked(bool)));
 	connect(chm_ui, SIGNAL(widthChanged(int)),
 		this, SLOT(onChmWidthChanged(int)));
+	connect(chm_ui, SIGNAL(channels_changed()),
+		this, SLOT(checkEnabledChannels()));
 
 	trigger_settings_ui->btnTriggerMode->setChecked(false);
 	main_win->view_->viewport()->setTimeTriggerPosActive(true);
@@ -517,6 +519,26 @@ void LogicAnalyzer::installWheelEventGuard()
 	if(!wheelEventGuard)
 		wheelEventGuard = new MouseWheelWidgetGuard(this);
 	wheelEventGuard->installEventRecursively(this);
+}
+
+void LogicAnalyzer::checkEnabledChannels()
+{
+        auto enabled = chm_ui->getEnabledChannelGroups();
+        if (enabled.size() > 0) {
+                ui->btnSingleRun->setEnabled(true);
+                ui->btnRunStop->setEnabled(true);
+                runButton()->show();
+        } else {
+                if (ui->btnRunStop->isChecked()) {
+                        ui->btnRunStop->setChecked(false);
+                }
+                if (ui->btnSingleRun->isChecked()) {
+                        ui->btnSingleRun->setChecked(false);
+                }
+                ui->btnSingleRun->setEnabled(false);
+                ui->btnRunStop->setEnabled(false);
+                runButton()->hide();
+        }
 }
 
 void LogicAnalyzer::resizeEvent()
