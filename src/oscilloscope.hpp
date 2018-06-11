@@ -483,7 +483,8 @@ namespace adiscope {
 		Q_PROPERTY(bool xy_en READ getXyEn WRITE setXyEn)
 		Q_PROPERTY(bool export_all READ getExportAll
 			   WRITE setExportAll)
-		Q_PROPERTY(bool autoset_en READ autosetEnabled WRITE enableAutoset)
+		Q_PROPERTY(bool autoset_en READ autosetEnabled WRITE enableAutoset
+		   SCRIPTABLE false)
 
 		Q_PROPERTY(int memory_depth READ getMemoryDepth
 			   WRITE setMemoryDepth)
