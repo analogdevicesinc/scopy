@@ -219,6 +219,8 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 				js_engine.newQObject(new JsFileIo(this)));
 	tl_api->js_register(&js_engine);
 
+	connect(js_object, SIGNAL(reset()), this,
+		SLOT(resetScopy()));
 	connect(&notifier, SIGNAL(activated(int)), this, SLOT(hasText()));
 
 	search_timer = new QTimer();
@@ -292,6 +294,13 @@ void ToolLauncher::loadIndexPageFromContent(QString fileLocation)
 		} else {
 			indexFile.close();
 		}
+	}
+}
+
+void ToolLauncher::resetScopy()
+{
+	if (prefPanel) {
+		prefPanel->resetScopy();
 	}
 }
 

@@ -79,7 +79,7 @@ Q_SIGNALS:
 	void notify();
 	void reset();
 
-private Q_SLOTS:
+public Q_SLOTS:
 
 	void resetScopy();
 
