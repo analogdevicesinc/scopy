@@ -4544,21 +4544,12 @@ double Channel_API::getVoltsPerDiv() const
 void Channel_API::setVoltsPerDiv(double val)
 {
 	int index = osc->channels_api.indexOf(this);
-	osc->plot.setVertUnitsPerDiv(val, index);
-
-	QLabel *label = static_cast<QLabel *>(
-			osc->ui->chn_scales->itemAt(index)->widget());
-	label->setText(osc->vertMeasureFormat.format(val, "V/div", 3));
-
-	// TO DO: refactor this once the source of the X and Y axes can be configured
-	if (index == osc->index_x) {
-		osc->xy_plot.setHorizUnitsPerDiv(val);
+	QWidget *obj = osc->ui->channelsList->itemAt(index)->widget();
+	ChannelWidget *cw = static_cast<ChannelWidget *>(obj);
+	if (cw) {
+		cw->menuButton()->setChecked(true);
+		osc->voltsPerDiv->setValue(val);
 	}
-	if (index == osc->index_y) {
-		osc->xy_plot.setVertUnitsPerDiv(val, QwtPlot::yLeft);
-	}
-	osc->xy_plot.replot();
-	osc->xy_plot.zoomBaseUpdate();
 }
 
 double Channel_API::getVOffset() const
@@ -4570,7 +4561,12 @@ double Channel_API::getVOffset() const
 void Channel_API::setVOffset(double val)
 {
 	int index = osc->channels_api.indexOf(this);
-	osc->plot.setVertOffset(val, index);
+	QWidget *obj = osc->ui->channelsList->itemAt(index)->widget();
+	ChannelWidget *cw = static_cast<ChannelWidget *>(obj);
+	if (cw) {
+		cw->menuButton()->setChecked(true);
+		osc->voltsPosition->setValue(val);
+	}
 }
 
 double Channel_API::getLineThickness() const
