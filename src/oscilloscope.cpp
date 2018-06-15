@@ -4579,8 +4579,12 @@ double Channel_API::getLineThickness() const
 void Channel_API::setLineThickness(double val)
 {
 	int index = osc->channels_api.indexOf(this);
+	int cmbIdx = (int)(val / 0.5) - 1;
+	if (cmbIdx > osc->ch_ui->cmbChnLineWidth->count()) {
+		cmbIdx = osc->ch_ui->cmbChnLineWidth->count() - 1;
+		val = (cmbIdx + 1) * 0.5;
+	}
 	if (index == osc->current_ch_widget) {
-		int cmbIdx = (int)(val / 0.5) - 1;
 		osc->ch_ui->cmbChnLineWidth->setCurrentIndex(cmbIdx);
 	}
 	osc->plot.setLineWidthF(index, val);
@@ -4595,10 +4599,17 @@ double Channel_API::getProbeAttenuation() const
 
 void Channel_API::setProbeAttenuation(double val)
 {
-	int index = osc->channels_api.indexOf(const_cast<Channel_API*>(this));
-
-	osc->probe_attenuation[index] = val;
-
+	int index = osc->channels_api.indexOf(this);
+	QWidget *obj = osc->ui->channelsList->itemAt(index)->widget();
+	ChannelWidget *cw = static_cast<ChannelWidget *>(obj);
+	if (cw) {
+		cw->menuButton()->setChecked(true);
+		int idx = std::log10(val / 0.1);
+		if (idx >= osc->ch_ui->probe_attenuation->count()) {
+			idx = osc->ch_ui->probe_attenuation->count() - 1;
+		}
+		osc->ch_ui->probe_attenuation->setCurrentIndex(idx);
+	}
 }
 
 bool Channel_API::getAcCoupling() const
