@@ -1104,7 +1104,12 @@ int NetworkAnalyzer_API::getLineThickness() const
 	return net->ui->cbLineThickness->currentIndex();
 }
 
-void NetworkAnalyzer_API::setLineThickness(int index)
+void NetworkAnalyzer_API::setLineThickness(int val)
 {
-	net->ui->cbLineThickness->setCurrentIndex(index);
+	int cmbIdx = (int)(val / 0.5) - 1;
+	if (cmbIdx > net->ui->cbLineThickness->count()) {
+		cmbIdx = net->ui->cbLineThickness->count() - 1;
+		val = (cmbIdx + 1) * 0.5;
+	}
+	net->ui->cbLineThickness->setCurrentIndex(cmbIdx);
 }
