@@ -4179,6 +4179,9 @@ int Oscilloscope_API::internalCondition() const
 
 void Oscilloscope_API::setInternalCondition(int cond)
 {
+	if (cond >= osc->trigger_settings.ui->cmb_condition->count()) {
+		cond = osc->trigger_settings.ui->cmb_condition->count() - 1;
+	}
 	osc->trigger_settings.ui->cmb_condition->setCurrentIndex(cond);
 }
 
@@ -4199,6 +4202,9 @@ void Oscilloscope_API::setTriggerInput(bool en)
 
 void Oscilloscope_API::setExternalCondition(int cond)
 {
+	if (cond >= osc->trigger_settings.ui->cmb_extern_condition->count()) {
+		cond = osc->trigger_settings.ui->cmb_extern_condition->count() - 1;
+	}
 	osc->trigger_settings.ui->cmb_extern_condition->setCurrentIndex(cond);
 }
 

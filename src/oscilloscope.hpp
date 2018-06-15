@@ -455,9 +455,9 @@ namespace adiscope {
 				READ getTriggerLevel WRITE setTriggerLevel)
 		Q_PROPERTY(double trigger_hysteresis READ getTriggerHysteresis
 				WRITE setTriggerHysteresis)
-		Q_PROPERTY(bool internal_condition READ internalCondition
+		Q_PROPERTY(int internal_condition READ internalCondition
 				WRITE setInternalCondition)
-		Q_PROPERTY(bool external_condition READ externalCondition
+		Q_PROPERTY(int external_condition READ externalCondition
 				WRITE setExternalCondition)
 		Q_PROPERTY(bool trigger_input READ getTriggerInput
 				WRITE setTriggerInput STORED false)
