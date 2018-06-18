@@ -317,6 +317,7 @@ public:
 	void setupGroupedChannel(LogicAnalyzerChannelGroupUI*, QFrame*);
 	void deselect_all();
 	std::vector<LogicAnalyzerChannelGroupUI*> getEnabledChannelGroups();
+	bool checkChannelInGroup(int);
 
 public Q_SLOTS:
 	void chmScrollChanged(int value);

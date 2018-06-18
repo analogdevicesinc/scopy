@@ -1153,6 +1153,19 @@ void LogicAnalyzerChannelGroupUI::enable(bool enabled)
 {
 	ChannelGroupUI::enable(enabled);
 	enableControls(enabled);
+
+	for (auto&& c : *(lchg->get_channels())) {
+		LogicAnalyzerChannel *ch = static_cast<LogicAnalyzerChannel*>(c);
+		if (enabled) {
+			auto trigger_val = ch->getTrigger();
+			chm_ui->la->setHWTrigger(ch->get_id(), trigger_val);
+			chm_ui->la->setTriggerCache(ch->get_id(), trigger_val);
+		} else {
+			if (!chm_ui->checkChannelInGroup(ch->get_id())) {
+				chm_ui->la->setHWTrigger(ch->get_id(), "none");
+			}
+		}
+	}
 	Q_EMIT channel_enabled();
 }
 
@@ -1488,6 +1501,17 @@ LogicAnalyzerChannelManagerUI::LogicAnalyzerChannelManagerUI(QWidget *parent,
 	Q_EMIT(widthChanged(geometry().width()));
 	chmRangeChanged(ui->scrollArea->verticalScrollBar()->minimum(),
 			ui->scrollArea->verticalScrollBar()->maximum());
+}
+
+bool LogicAnalyzerChannelManagerUI::checkChannelInGroup(int chId)
+{
+	for(auto chg : chg_ui) {
+		auto ch = chg->getChannelGroup()->get_channel_by_id(chId);
+		if (ch && chg->getChannelGroup()->is_enabled()) {
+			return true;
+		}
+	}
+	return false;
 }
 
 std::vector<std::string> LogicAnalyzerChannelManagerUI::getTriggerMapping()
