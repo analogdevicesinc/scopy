@@ -118,6 +118,8 @@ namespace adiscope {
 
 		void setTimeTriggerInterval(double min, double max);
 		bool labelsEnabled();
+		bool trackModeEnabled(bool enabled);
+		void repositionCursors();
 
 		void setGraticuleEnabled(bool enabled);
 
@@ -144,6 +146,9 @@ namespace adiscope {
 		void setTriggerState(int triggerState);
 		void setCursorReadoutsTransparency(int value);
 		void moveCursorReadouts(CustomPlotPositionButton::ReadoutsPosition position);
+		void setHorizCursorsLocked(bool value);
+		void setVertCursorsLocked(bool value);
+		void showEvent(QShowEvent *event);
 
 	protected:
 		virtual void cleanUpJustBeforeChannelRemoval(int chnIdx);
@@ -152,6 +157,8 @@ namespace adiscope {
 		Measure* measureOfChannel(int chnIdx) const;
 		void updateBufferSizeSampleRateLabel(int nsamples, double sr);
 		void updateHandleAreaPadding(bool);
+		double getHorizontalCursorIntersection(double time);
+		void displayIntersection();
 
 	private Q_SLOTS:
 		void onChannelAdded(int);
@@ -239,6 +246,16 @@ namespace adiscope {
 
 		bool displayGraticule;
 		Graticule *graticule;
+
+		bool d_trackMode;
+		QwtPlotMarker *markerIntersection1;
+		QwtPlotMarker *markerIntersection2;
+		bool horizCursorsLocked;
+		bool vertCursorsLocked;
+		int pixelPosHandleHoriz1;
+		int pixelPosHandleHoriz2;
+		int pixelPosHandleVert1;
+		int pixelPosHandleVert2;
 	};
 }
 
