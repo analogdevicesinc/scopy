@@ -148,17 +148,13 @@ QString Preferences::getPreferenceIniFile() const
 
 void Preferences::resetScopy()
 {
-	if (ui->resetBtn == static_cast<QPushButton *>(QObject::sender())) {
-		QMessageBox msgBox;
-		msgBox.setText("By resetting scopy you will lose the current configuration!");
-		msgBox.setInformativeText("Do you want to reset?");
-		msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
-		int ret = msgBox.exec();
+	QMessageBox msgBox;
+	msgBox.setText("By resetting scopy you will lose the current configuration!");
+	msgBox.setInformativeText("Do you want to reset?");
+	msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+	int ret = msgBox.exec();
 
-		if (ret == QMessageBox::Ok) {
-			Q_EMIT reset();
-		}
-	} else {
+	if (ret == QMessageBox::Ok) {
 		Q_EMIT reset();
 	}
 }

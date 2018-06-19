@@ -144,7 +144,6 @@ private Q_SLOTS:
 	int getDeviceIndex(DeviceWidget*);
 	void pageMoved(int);
 	void stopSearching(bool);
-	void resetScopy();
 
 private:
 	void loadToolTips(bool connected);
@@ -320,6 +319,7 @@ public:
 
 	Q_INVOKABLE void load(const QString& file);
 	Q_INVOKABLE void save(const QString& file);
+	Q_INVOKABLE bool reset();
 
 private:
 	ToolLauncher *tl;

@@ -219,8 +219,6 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 				js_engine.newQObject(new JsFileIo(this)));
 	tl_api->js_register(&js_engine);
 
-	connect(js_object, SIGNAL(reset()), this,
-		SLOT(resetScopy()));
 	connect(&notifier, SIGNAL(activated(int)), this, SLOT(hasText()));
 
 	search_timer = new QTimer();
@@ -294,13 +292,6 @@ void ToolLauncher::loadIndexPageFromContent(QString fileLocation)
 		} else {
 			indexFile.close();
 		}
-	}
-}
-
-void ToolLauncher::resetScopy()
-{
-	if (prefPanel) {
-		prefPanel->resetScopy();
 	}
 }
 
@@ -1943,6 +1934,23 @@ void ToolLauncher_API::load(const QString& file)
 
 	for (auto tool : tl->toolList)
 		tool->settingsLoaded();
+}
+
+bool ToolLauncher_API::reset()
+{
+	bool did_reconnect = false;
+	tl->resetSession();
+
+	tl->connect(tl, &ToolLauncher::adcToolsCreated, [&]() {
+		did_reconnect = true;
+	});
+
+	do {
+		QCoreApplication::processEvents();
+		QThread::msleep(10);
+	} while (!did_reconnect);
+
+	return did_reconnect;
 }
 
 void ToolLauncher_API::save(const QString& file)
