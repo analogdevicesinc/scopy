@@ -1262,16 +1262,21 @@ bool PatternGenerator_API::running() const
 }
 void PatternGenerator_API::run(bool en)
 {
-	pg->ui->btnRunStop->setChecked(en);
+	if (pg->ui->btnRunStop->isEnabled()) {
+		pg->ui->btnRunStop->setChecked(en);
+	}
 }
 
 bool PatternGenerator_API::single() const
 {
 	return pg->ui->btnSingleRun->isChecked();
 }
+
 void PatternGenerator_API::run_single(bool en)
 {
-	pg->ui->btnSingleRun->click();
+	if(pg->ui->btnSingleRun->isEnabled()) {
+		pg->ui->btnSingleRun->click();
+	}
 }
 
 bool PatternGenerator_API::inactiveHidden()

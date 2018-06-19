@@ -1903,7 +1903,9 @@ QVariantList LogicAnalyzer_API::getChannelGroups()
 
 void LogicAnalyzer_API::run(bool en)
 {
-	lga->ui->btnRunStop->setChecked(en);
+	if (lga->ui->btnRunStop->isEnabled()) {
+		lga->ui->btnRunStop->setChecked(en);
+	}
 }
 
 bool LogicAnalyzer_API::single() const
@@ -1913,7 +1915,9 @@ bool LogicAnalyzer_API::single() const
 
 void LogicAnalyzer_API::runSingle(bool en)
 {
-	lga->ui->btnSingleRun->setChecked(en);
+	if (lga->ui->btnSingleRun->isEnabled()) {
+		lga->ui->btnSingleRun->setChecked(en);
+	}
 }
 
 double LogicAnalyzer_API::getTimePos() const
