@@ -164,7 +164,7 @@ namespace adiscope {
 
 		Q_PROPERTY(bool running READ running WRITE run STORED false);
 		Q_PROPERTY(bool cursors READ getCursors WRITE setCursors);
-		Q_PROPERTY(int line_thickness READ getLineThickness WRITE setLineThickness);
+		Q_PROPERTY(double line_thickness READ getLineThickness WRITE setLineThickness);
 		Q_PROPERTY(int cursors_position READ getCursorsPosition
               WRITE setCursorsPosition)
 		Q_PROPERTY(int cursors_transparency READ getCursorsTransparency
@@ -212,8 +212,8 @@ namespace adiscope {
 		bool running() const;
 		void run(bool enabled);
 
-		int getLineThickness() const;
-		void setLineThickness(int index);
+		double getLineThickness() const;
+		void setLineThickness(double index);
 		int getCursorsPosition() const;
 		void setCursorsPosition(int val);
 

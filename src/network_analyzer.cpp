@@ -1099,17 +1099,20 @@ void NetworkAnalyzer_API::setPlotType(int val)
 	 net->ui->cmb_graphs->setCurrentIndex(val);
 }
 
-int NetworkAnalyzer_API::getLineThickness() const
+double NetworkAnalyzer_API::getLineThickness() const
 {
 	return net->ui->cbLineThickness->currentIndex();
 }
 
-void NetworkAnalyzer_API::setLineThickness(int val)
+void NetworkAnalyzer_API::setLineThickness(double val)
 {
 	int cmbIdx = (int)(val / 0.5) - 1;
 	if (cmbIdx > net->ui->cbLineThickness->count()) {
 		cmbIdx = net->ui->cbLineThickness->count() - 1;
 		val = (cmbIdx + 1) * 0.5;
+	}
+	if (cmbIdx < 0) {
+		cmbIdx = 0;
 	}
 	net->ui->cbLineThickness->setCurrentIndex(cmbIdx);
 }

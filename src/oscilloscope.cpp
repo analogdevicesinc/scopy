@@ -4584,6 +4584,10 @@ void Channel_API::setLineThickness(double val)
 		cmbIdx = osc->ch_ui->cmbChnLineWidth->count() - 1;
 		val = (cmbIdx + 1) * 0.5;
 	}
+	if (cmbIdx < 0) {
+		cmbIdx = 0;
+		val = 0.5;
+	}
 	if (index == osc->current_ch_widget) {
 		osc->ch_ui->cmbChnLineWidth->setCurrentIndex(cmbIdx);
 	}
