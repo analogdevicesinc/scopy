@@ -458,6 +458,8 @@ public Q_SLOTS:
   void setMarkerAlpha8 (int);
   void setMarkerAlpha9 (int);
 
+  void printWithNoBackground(bool editScaleDraw = true);
+
   void setZoomerColor(QColor c);
   void setPaletteColor(QColor c);
   void setAxisLabelFontSize(int axisId, int fs);
@@ -534,6 +536,7 @@ protected:
   double d_displayScale;
 
   QList<QColor> d_CurveColors;
+  QList<QColor> d_printColors;
 
   bool d_autoscale_state;
   int d_activeVertAxis;

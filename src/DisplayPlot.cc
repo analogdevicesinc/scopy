@@ -449,6 +449,10 @@ DisplayPlot::DisplayPlot(int nplots, QWidget* parent,
        << QColor(Qt::darkGreen) << QColor(Qt::darkBlue) << QColor(Qt::darkGray)
        << QColor(Qt::black);
 
+  d_printColors << QColor("#ff7200") << QColor("#9013fe") << QColor(Qt::darkGreen)
+       << QColor(Qt::blue) << QColor(Qt::magenta)
+       << QColor(Qt::darkRed);
+
   qRegisterMetaType<QColorList>("QColorList");
   resize(parent->width(), parent->height());
 
@@ -702,6 +706,32 @@ DisplayPlot::getAxisLabelFontSize(int axisId) const {
 void
 DisplayPlot::setYaxisLabelFontSize(int fs) {
   setAxisLabelFontSize(QwtPlot::yLeft, fs);
+}
+
+void
+DisplayPlot::printWithNoBackground(bool editScaleDraw)
+{
+        OscScaleDraw *scaleDraw = static_cast<OscScaleDraw *>(this->axisScaleDraw(QwtAxisId(QwtPlot::yLeft, d_activeVertAxis)));
+        QStack<QColor> colors;
+        for (int i = 0; i < d_plot_curve.size(); ++i) {
+                colors.push_back(getLineColor(i));
+                setLineColor(i, d_printColors[i]);
+        }
+
+        if (editScaleDraw) {
+                scaleDraw->setColor(getLineColor(d_activeVertAxis));
+                scaleDraw->invalidateCache();
+        }
+
+        PrintablePlot::printPlot();
+
+        for (int i = d_plot_curve.size() - 1; i >= 0; --i) {
+                setLineColor(i, colors.pop());
+        }
+        if (editScaleDraw) {
+                scaleDraw->setColor(getLineColor(d_activeVertAxis));
+                scaleDraw->invalidateCache();
+        }
 }
 
 int
