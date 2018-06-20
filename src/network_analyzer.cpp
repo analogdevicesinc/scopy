@@ -346,6 +346,21 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
             wheelEventGuard = new MouseWheelWidgetGuard(ui->mainWidget);
     wheelEventGuard->installEventRecursively(ui->mainWidget);
 
+    connect(ui->btnPrint, &QPushButton::clicked, [=]() {
+        QWidget *widget = ui->stackedWidget->currentWidget();
+        QImage img (widget->width(), widget->height(), QImage::Format_ARGB32);
+        QPainter painter(&img);
+        img.fill(Qt::black);
+        widget->render(&painter);
+
+	QString fileName = QFileDialog::getSaveFileName(this,
+				tr("Save to"), "",
+				tr({"(*.png);;"}));
+	painter.end();
+	img.invertPixels(QImage::InvertRgb);
+	img.save(fileName, 0, -1);
+    });
+
 }
 
 NetworkAnalyzer::~NetworkAnalyzer()
