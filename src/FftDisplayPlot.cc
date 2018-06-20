@@ -78,7 +78,7 @@ FftDisplayPlot::FftDisplayPlot(int nplots, QWidget *parent) :
 	d_zoomer.push_back(nullptr);
 
 	for (unsigned int i = 0; i < nplots; i++) {
-		auto plot = new QwtPlotCurve(QString("Data %1").arg(i));
+		auto plot = new QwtPlotCurve(QString("CH %1").arg(i + 1));
 
 		plot->setPen(QPen(d_CurveColors[i]));
 		plot->attach(this);
