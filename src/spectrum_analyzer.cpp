@@ -396,6 +396,11 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	connect(ui->rightMenu, &MenuAnim::finished, this, &SpectrumAnalyzer::rightMenuFinished);
 	menuOrder.push_back(ui->btnSweep);
+
+
+	connect(ui->btnPrint, &QPushButton::clicked, [=](){
+		fft_plot->printWithNoBackground(false);
+	});
 }
 
 SpectrumAnalyzer::~SpectrumAnalyzer()
