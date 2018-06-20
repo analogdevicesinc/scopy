@@ -435,6 +435,22 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 			TOOL_LOGIC_ANALYZER)));
 	api->load(*settings);
 	api->js_register(engine);
+
+	ui->btnPrint->hide();
+	connect(ui->btnPrint, &QPushButton::clicked, [=]() {
+		QImage img (ui->plotWidget->width(), ui->plotWidget->height(), QImage::Format_ARGB32);
+		QPainter painter(&img);
+		img.fill(Qt::black);
+
+		ui->plotWidget->render(&painter);
+
+		QString fileName = QFileDialog::getSaveFileName(this,
+				   tr("Save to"), "",
+				   tr({"(*.png);;"}));
+		painter.end();
+		img.invertPixels(QImage::InvertRgb);
+		img.save(fileName, 0, -1);
+	});
 }
 
 void LogicAnalyzer::init_export_settings()
@@ -1416,9 +1432,11 @@ std::vector<std::string> LogicAnalyzer::get_iio_trigger_options()
 void LogicAnalyzer::toggleLeftMenu(bool val)
 {
 	if (val) {
+		ui->btnPrint->show();
 		ui->btnGroupChannels->hide();
 		chm_ui->collapse(true);
 	} else {
+		ui->btnPrint->hide();
 		ui->btnGroupChannels->show();
 		chm_ui->collapse(false);
 	}
