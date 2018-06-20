@@ -37,6 +37,9 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************/
 
+/* Perform tool reset */
+launcher.reset()
+
 /* Comparator Input Voltage */
 var input_voltage = 2
 
