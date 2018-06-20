@@ -659,7 +659,9 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	readPreferences();
 
 	connect(ui->printBtn, &QPushButton::clicked,
-		&plot, &PrintablePlot::printPlot);
+		[=]() {
+		plot.printWithNoBackground();
+	});
 }
 
 void Oscilloscope::init_selected_measurements(int chnIdx,
