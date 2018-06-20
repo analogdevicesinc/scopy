@@ -250,6 +250,41 @@ border-image: url(:/icons/time_trigger_left.svg);
          </widget>
         </item>
         <item>
+         <widget class="QPushButton" name="btnPrint">
+          <property name="styleSheet">
+           <string notr="true">
+QPushButton {
+  width: 80px;
+  height: 40px;
+
+  text-align: left;
+  font-weight: bold;
+  padding-left: 20px;
+  padding-right: 20px;
+  qproperty-text: &quot;Print&quot;;
+
+  border-radius: 4px;
+
+  background-color: #4a64ff;
+  color: #ffffff;
+
+}
+
+QPushButton:pressed {
+  background-color: #2a44df;
+}
+
+QPushButton:hover {
+	background-color: #4a34ff;
+}
+</string>
+          </property>
+          <property name="text">
+           <string>Print</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <spacer name="horizontalSpacer">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -450,7 +485,6 @@ border-image: url(:/icons/time_trigger_left.svg);
           </property>
           <property name="font">
            <font>
-            
             <weight>75</weight>
             <bold>true</bold>
            </font>
@@ -502,7 +536,7 @@ background-color: grey;
            <string>Run</string>
           </property>
           <property name="icon">
-           <iconset>
+           <iconset resource="../resources/resources.qrc">
             <normaloff>:/icons/ico-play.svg</normaloff>
             <normalon>:/icons/ico-stop.svg</normalon>:/icons/ico-play.svg</iconset>
           </property>
@@ -533,7 +567,6 @@ background-color: grey;
           </property>
           <property name="font">
            <font>
-            
             <weight>75</weight>
             <bold>true</bold>
            </font>
@@ -585,7 +618,7 @@ background-color: grey;
            <string>Single</string>
           </property>
           <property name="icon">
-           <iconset>
+           <iconset resource="../resources/resources.qrc">
             <normaloff>:/icons/ico-oneshot.svg</normaloff>
             <normalon>:/icons/ico-stop.svg</normalon>:/icons/ico-oneshot.svg</iconset>
           </property>
@@ -1462,8 +1495,8 @@ background-color: qlineargradient(spread:pad, x1:0.6, y1:0, x2:0, y2:0, stop:0 r
                     <rect>
                      <x>0</x>
                      <y>0</y>
-                     <width>193</width>
-                     <height>563</height>
+                     <width>180</width>
+                     <height>571</height>
                     </rect>
                    </property>
                    <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -1698,7 +1731,7 @@ color: #FFFFFF;</string>
                     <rect>
                      <x>0</x>
                      <y>0</y>
-                     <width>100</width>
+                     <width>92</width>
                      <height>30</height>
                     </rect>
                    </property>
@@ -1954,6 +1987,8 @@ QPushButton:checked { border-image: url(:/icons/setup_btn_checked.svg); }
    <header>smallOnOffSwitch.hpp</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../resources/resources.qrc"/>
+ </resources>
  <connections/>
 </ui>
