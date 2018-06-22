@@ -49,13 +49,20 @@ SymmetricBufferMode::captureParameters() const
 {
 	struct capture_parameters params;
 	double sampleRate;
+	long long bufferOffsetPos;
 	unsigned long bufferSize;
 
 	// If trigger position altered the sample rate, return the altered one
 	sampleRate = qMin(m_sampleRate, m_triggPosSR);
 
 	// If trigger position altered the buffer size, return the altered one
-	bufferSize = qMax(m_visibleBufferSize, m_triggerBufferSize);
+	if (m_triggerBufferSize >= 0) {
+		bufferSize = qMax(m_visibleBufferSize, (unsigned long)m_triggerBufferSize);
+	} else {
+		bufferSize = m_visibleBufferSize;
+	}
+
+	bufferOffsetPos = (m_triggerBufferSize < 0) ? 0 : m_triggerBufferSize;
 
 	params.entireBufferSize = bufferSize;
 	params.sampleRate = sampleRate;
@@ -63,6 +70,7 @@ SymmetricBufferMode::captureParameters() const
 	params.triggerBufferSize = m_triggerBufferSize;
 	params.availableBufferSizes = m_availableBufferSizes;
 	params.maxBufferSize = m_triggerBufferSize;
+	params.dataStartingPoint = bufferOffsetPos;
 
 	return params;
 }
@@ -159,12 +167,15 @@ void SymmetricBufferMode::configParamsOnTimeBaseChanged()
 			triggOffset;
 
 		if (bufferSize > m_entireBufferMaxSize) {
+			trigBuffSize = triggPosInBuffer;
+			bufferSize = getVisibleBufferSize(sampleRate);
+		} else {
 			bufferSize = m_entireBufferMaxSize;
 			triggPosInBuffer = -m_entireBufferMaxSize +
-				2 * triggOffset;
+					2 * triggOffset;
+			trigBuffSize = 0;
 		}
 
-		trigBuffSize = 0;
 	} else if (triggPosInBuffer > m_triggerBufferMaxSize) {
 		triggPosInBuffer = m_triggerBufferMaxSize;
 		trigBuffSize = triggPosInBuffer;
@@ -204,6 +215,7 @@ void SymmetricBufferMode::configParamsOnTriggPosChanged()
 {
 	if (m_enhancedMemoryDepth)
 		return;
+	double bufferSize;
 
 	m_visibleBufferSize = getVisibleBufferSize(m_sampleRate);
 
@@ -218,18 +230,16 @@ void SymmetricBufferMode::configParamsOnTriggPosChanged()
 	m_triggPosSR = m_sampleRate;
 
 	if (triggPosInBuffer < 0) {
-		m_triggerBufferSize = 0;
 		unsigned long delaySamples = -triggPosInBuffer;
-		double bufferSize = (m_timeBase * m_timeDivsCount) *
-			m_sampleRate + delaySamples;
+		bufferSize = (m_timeBase * m_timeDivsCount) *
+				m_sampleRate + delaySamples;
+		m_triggerBufferSize = 0;
 
 		// Limit buffer size and recalculate trigger position
 		if (bufferSize > m_entireBufferMaxSize) {
-			bufferSize = m_entireBufferMaxSize;
-			long long triggPosInBuffer = -m_entireBufferMaxSize +
-				2 * triggOffset;
-			m_triggerPos = (triggPosInBuffer - triggOffset) /
-				m_sampleRate;
+			/* Delayed acquisition */
+			m_triggerBufferSize = triggPosInBuffer;
+			bufferSize = (m_timeBase * m_timeDivsCount) * m_sampleRate;
 		}
 
 		m_visibleBufferSize = bufferSize;
