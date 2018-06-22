@@ -29,8 +29,9 @@ public:
 		double sampleRate;
 		double timePos;
 		unsigned long entireBufferSize;
-		unsigned long triggerBufferSize;
-		unsigned long maxBufferSize;
+		long long triggerBufferSize;
+		long long maxBufferSize;
+		long long dataStartingPoint;
 		std::vector<unsigned long long> availableBufferSizes;
 	};
 
@@ -86,7 +87,7 @@ private:
 	double m_sampleRate;
 	double m_triggPosSR;
 	unsigned long m_visibleBufferSize;
-	unsigned long m_triggerBufferSize;
+	long long m_triggerBufferSize;
 	bool m_enhancedMemoryDepth;
 };
 
