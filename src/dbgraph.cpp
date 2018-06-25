@@ -158,6 +158,19 @@ dBgraph::dBgraph(QWidget *parent) : QwtPlot(parent),
     const int fmw = QFontMetrics(scaleWidget->font()).width("XXXX.XX XX");
     scaleWidget->setMinBorderDist(fmw / 2, fmw / 2);
 
+    markerIntersection1 = new QwtPlotMarker();
+    markerIntersection2 = new QwtPlotMarker();
+    QwtSymbol *symbol = new QwtSymbol(
+                    QwtSymbol::Ellipse, QColor(237, 28, 36),
+                    QPen(QColor(255, 255 ,255, 140), 2, Qt::SolidLine),
+                    QSize(18, 18));
+            symbol->setSize(5, 5);
+    markerIntersection1->setSymbol(symbol);
+    markerIntersection2->setSymbol(symbol);
+    markerIntersection1->setAxes(QwtPlot::xTop, QwtPlot::yLeft);
+    markerIntersection2->setAxes(QwtPlot::xTop, QwtPlot::yLeft);
+
+
 }
 
 dBgraph::~dBgraph()
@@ -197,6 +210,10 @@ void dBgraph::plot(double x, double y)
 	ydata.push(y);
 
 	curve.setRawSamples(xdata.data(), ydata.data(), xdata.size());
+
+	onCursor1Moved(d_vBar1->transform(d_vBar1->plotCoord()).x());
+	onCursor2Moved(d_vBar2->transform(d_vBar2->plotCoord()).x());
+
 	replot();
 }
 
@@ -423,10 +440,19 @@ void dBgraph::onCursor1Moved(int value)
 	text = formatter->format(point.x(),"Hz",2);
 
 	d_cursorReadouts->setTimeCursor1Text(text);
-	d_cursorReadouts->setVoltageCursor1Text(cursorIntersection(point.x()));
+	text = cursorIntersection(point.x());
+	d_cursorReadouts->setVoltageCursor1Text(text);
 
 	int d1 = d_cursorReadouts->voltageCursor1Text().split(" ")[0].toInt();
 	int d2 = d_cursorReadouts->voltageCursor2Text().split(" ")[0].toInt();
+
+	if (text == "-") {
+		markerIntersection1->detach();
+	} else {
+		markerIntersection1->attach(this);
+		markerIntersection1->setValue(point.x(), d1);
+		replot();
+	}
 
 	d_cursorReadouts->setVoltageDeltaText(QString::number(d2-d1)+" "+
 	                                      draw_y->getUnitType());
@@ -440,10 +466,19 @@ void dBgraph::onCursor2Moved(int value)
 	text = formatter->format(point.x(),"Hz",2);
 
 	d_cursorReadouts->setTimeCursor2Text(text);
-	d_cursorReadouts->setVoltageCursor2Text(cursorIntersection(point.x()));
+	text = cursorIntersection(point.x());
+	d_cursorReadouts->setVoltageCursor2Text(text);
 
 	int d1 = d_cursorReadouts->voltageCursor1Text().split(" ")[0].toInt();
 	int d2 = d_cursorReadouts->voltageCursor2Text().split(" ")[0].toInt();
+
+	if (text == "-") {
+		markerIntersection2->detach();
+	} else {
+		markerIntersection2->attach(this);
+		markerIntersection2->setValue(point.x(), d2);
+		replot();
+	}
 
 	d_cursorReadouts->setVoltageDeltaText(QString::number(d2-d1)+" "+
 	                                      draw_y->getUnitType());
