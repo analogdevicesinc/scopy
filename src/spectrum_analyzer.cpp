@@ -1375,10 +1375,14 @@ void SpectrumAnalyzer::on_cmb_units_currentIndexChanged(const QString& unit)
 	case FftDisplayPlot::VPEAK:
 	case FftDisplayPlot::VRMS:
 		fft_plot->setAxisScale(QwtPlot::yLeft, 0, 25, 10);
+		top->setValue(25);
+		range->setValue(25);
 		break;
 
 	default:
 		fft_plot->setAxisScale(QwtPlot::yLeft, -200, 0, 10);
+		top->setValue(0);
+		range->setValue(200);
 		break;
 	}
 
