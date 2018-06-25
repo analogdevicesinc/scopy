@@ -523,7 +523,6 @@ void CapturePlot::onVoltageCursor1Moved(double value)
 
 	bool error = false;
 	if (d_trackMode) {
-		value = getHorizontalCursorIntersection(d_vBar1->plotCoord().x());
 		if (value == ERROR_VALUE) {
 			error = true;
 		}
@@ -556,7 +555,6 @@ void CapturePlot::onVoltageCursor2Moved(double value)
 
 	bool error = false;
 	if (d_trackMode) {
-		value = getHorizontalCursorIntersection(d_vBar2->plotCoord().x());
 		if (value == ERROR_VALUE) {
 			error = true;
 		}
@@ -923,38 +921,53 @@ void CapturePlot::updateHandleAreaPadding(bool enabled)
 
 double CapturePlot::getHorizontalCursorIntersection(double time)
 {
-	QVector<double> xData, yData;
+	int n = Curve(d_selected_channel)->data()->size();
 
-	for (int i = 0; i < Curve(d_selected_channel)->data()->size(); ++i) {
-		xData.push_back(Curve(d_selected_channel)->data()->sample(i).x());
-		yData.push_back(Curve(d_selected_channel)->data()->sample(i).y());
-	}
-
-	if (xData.size() == 0) {
-		// remove marker probably
+	if (n == 0) {
 		return ERROR_VALUE;
 	} else {
 		double leftTime, rightTime, leftCustom, rightCustom;
 		int rightIndex = -1;
 		int leftIndex = -1;
 
-		for (int i = 1; i < xData.size(); ++i) {
-			if (xData[i - 1] <= time && time <= xData[i]) {
-				leftIndex = i - 1;
-				rightIndex = i;
+		int left = 0;
+		int right = n - 1;
+
+		if (Curve(d_selected_channel)->data()->sample(right).x() < time ||
+				Curve(d_selected_channel)->data()->sample(left).x() > time) {
+			return ERROR_VALUE;
+		}
+
+		while (left <= right) {
+			int mid = (left + right) / 2;
+			double xData = Curve(d_selected_channel)->data()->sample(mid).x();
+			if (xData == time) {
+				if (mid > 0) {
+					leftIndex = mid - 1;
+					rightIndex = mid;
+				}
 				break;
+			} else if (xData < time) {
+				left = mid + 1;
+			} else {
+				right = mid - 1;
 			}
+		}
+
+		if ((leftIndex == -1 || rightIndex == -1) && left > 0) {
+			leftIndex = left - 1;
+			rightIndex = left;
 		}
 
 		if (leftIndex == -1 || rightIndex == -1) {
 			return ERROR_VALUE;
 		}
 
-		leftTime = xData[leftIndex];
-		rightTime = xData[rightIndex];
+		leftTime = Curve(d_selected_channel)->data()->sample(leftIndex).x();
+		rightTime = Curve(d_selected_channel)->data()->sample(rightIndex).x();
 
-		leftCustom = yData[leftIndex];
-		rightCustom = yData[rightIndex];
+		leftCustom = Curve(d_selected_channel)->data()->sample(leftIndex).y();
+		rightCustom = Curve(d_selected_channel)->data()->sample(rightIndex).y();
 
 		double value = (rightCustom - leftCustom) / (rightTime - leftTime) *
 				(time - leftTime) + leftCustom;
