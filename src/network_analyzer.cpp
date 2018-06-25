@@ -92,12 +92,13 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	ui->setupUi(this);
 
-	connect(ui->run_button, SIGNAL(toggled(bool)),
-			this, SLOT(startStop(bool)));
+
 	connect(ui->run_button, SIGNAL(toggled(bool)),
 			runButton, SLOT(setChecked(bool)));
 	connect(runButton, SIGNAL(toggled(bool)),
 			ui->run_button, SLOT(setChecked(bool)));
+	connect(ui->run_button, SIGNAL(toggled(bool)),
+			this, SLOT(startStop(bool)));
 	connect(this, &NetworkAnalyzer::sweepDone,
 			[=]() {
 		ui->run_button->setChecked(false);
