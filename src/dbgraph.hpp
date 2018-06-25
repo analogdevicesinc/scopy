@@ -22,6 +22,7 @@
 
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>
+#include <qwt_plot_marker.h>
 
 #include "customFifo.hpp"
 #include "symbol_controller.h"
@@ -129,6 +130,8 @@ Q_SIGNALS:
 
 	private:
 		QwtPlotCurve curve;
+		QwtPlotMarker *markerIntersection1;
+		QwtPlotMarker *markerIntersection2;
 		unsigned int numSamples;
 		double xmin, xmax, ymin, ymax;
 		QColor color;
