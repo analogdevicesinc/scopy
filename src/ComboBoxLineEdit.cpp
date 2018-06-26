@@ -1,24 +1,28 @@
 #include "ComboBoxLineEdit.h"
-#include <QComboBox>
 
 using namespace adiscope;
 
 ComboBoxLineEdit::ComboBoxLineEdit(QWidget *parent):
-	QLineEdit(parent),
-	opened(false)
+	QLineEdit(parent)
 {
 }
 
 void ComboBoxLineEdit::mouseReleaseEvent(QMouseEvent *event)
 {
-	if (!rect().contains(event->localPos().toPoint()))
-		return;
-	QComboBox *comboBox = dynamic_cast<QComboBox *>(parent());
-	if (comboBox){
-		if (!opened)
-			comboBox->showPopup();
-		else
-			comboBox->hidePopup();
-		opened = !opened;
-	}
+	QWidget::mouseReleaseEvent(event);
+}
+
+void ComboBoxLineEdit::mousePressEvent(QMouseEvent *event)
+{
+	QWidget::mousePressEvent(event);
+}
+
+void ComboBoxLineEdit::enterEvent(QEvent *event)
+{
+	QWidget::enterEvent(event);
+}
+
+void ComboBoxLineEdit::leaveEvent(QEvent *event)
+{
+	QWidget::leaveEvent(event);
 }

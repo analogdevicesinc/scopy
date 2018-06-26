@@ -11,11 +11,11 @@ class ComboBoxLineEdit : public QLineEdit
 public:
 	ComboBoxLineEdit(QWidget *parent = 0);
 
-protected:
+protected Q_SLOTS:
 	void mouseReleaseEvent(QMouseEvent *event);
-
-private:
-	bool opened;
+	void mousePressEvent(QMouseEvent *event);
+	void enterEvent(QEvent *event);
+	void leaveEvent(QEvent *event);
 };
 }
 
