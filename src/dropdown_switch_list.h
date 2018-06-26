@@ -21,6 +21,7 @@
 #define DROPDOWN_SWITCH_LIST_H
 
 #include <QComboBox>
+#include "ComboBoxLineEdit.h"
 
 class QStandardItemModel;
 class QTreeView;
@@ -46,6 +47,14 @@ namespace adiscope {
 			const QVariant& user_data);
 
 		void removeItem(int index);
+		void showPopup() override;
+		void hidePopup() override;
+
+	protected Q_SLOTS:
+		void mousePressEvent(QMouseEvent *event);
+		void mouseReleaseEvent(QMouseEvent *event);
+		void enterEvent(QEvent *event);
+		void leaveEvent(QEvent *event);
 
 	private Q_SLOTS:
 		void resetIndex(int);
@@ -57,6 +66,10 @@ namespace adiscope {
 		QStandardItemModel *m_model;
 		QTreeView *m_treeView;
 		QStringList m_colTitles;
+		bool m_popVisible;
+		bool m_mouseInside;
+		bool m_mousePressed;
+		ComboBoxLineEdit *m_lineEdit;
 	};
 }
 

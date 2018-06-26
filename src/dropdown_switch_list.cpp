@@ -19,7 +19,6 @@
 
 #include "dropdown_switch_list.h"
 #include "checkbox_delegate.h"
-#include "ComboBoxLineEdit.h"
 
 #include <QLineEdit>
 #include <QStandardItemModel>
@@ -42,14 +41,18 @@ DropdownSwitchList::DropdownSwitchList(int switchColCount, QWidget *parent):
 	m_rows(0),
 	m_columns(1 + switchColCount),
 	m_model(NULL),
-	m_treeView(NULL)
+	m_treeView(NULL),
+	m_popVisible(false),
+	m_mouseInside(false),
+	m_mousePressed(false)
 {
 	if (m_columns < 2)
 		m_columns = 2;
 
 	// Title of the dropdown
 	setEditable(true);
-	this->setLineEdit(new ComboBoxLineEdit(this));
+	m_lineEdit = new ComboBoxLineEdit(this);
+	this->setLineEdit(m_lineEdit);
 	lineEdit()->setReadOnly(true);
 	this->setTitle(m_title);
 
@@ -155,6 +158,51 @@ void DropdownSwitchList::removeItem(int index)
 {
 	QComboBox::removeItem(index);
 	m_rows--;
+}
+
+void DropdownSwitchList::showPopup()
+{
+	m_popVisible = true;
+	QComboBox::showPopup();
+}
+
+void DropdownSwitchList::hidePopup()
+{
+	m_popVisible = false;
+	QComboBox::hidePopup();
+}
+
+void DropdownSwitchList::mousePressEvent(QMouseEvent *event)
+{
+	if (m_mouseInside) {
+		m_mousePressed = true;
+	}
+}
+
+void DropdownSwitchList::mouseReleaseEvent(QMouseEvent *event)
+{
+	if (!rect().contains(event->localPos().toPoint())) {
+		return;
+	}
+
+	if (m_mousePressed) {
+		m_mousePressed = false;
+		if (m_popVisible) {
+			hidePopup();
+		} else {
+			showPopup();
+		}
+	}
+}
+
+void DropdownSwitchList::enterEvent(QEvent *event)
+{
+	m_mouseInside = true;
+}
+
+void DropdownSwitchList::leaveEvent(QEvent *event)
+{
+	m_mouseInside = false;
 }
 
 void DropdownSwitchList::resetIndex(int)
