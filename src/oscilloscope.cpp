@@ -4544,29 +4544,41 @@ double Channel_API::getVoltsPerDiv() const
 void Channel_API::setVoltsPerDiv(double val)
 {
 	int index = osc->channels_api.indexOf(this);
-	QWidget *obj = osc->ui->channelsList->itemAt(index)->widget();
-	ChannelWidget *cw = static_cast<ChannelWidget *>(obj);
-	if (cw) {
-		cw->menuButton()->setChecked(true);
+	osc->plot.setVertUnitsPerDiv(val, index);
+
+	QLabel *label = static_cast<QLabel *>(
+				osc->ui->chn_scales->itemAt(index)->widget());
+	label->setText(osc->vertMeasureFormat.format(val, "V/div", 3));
+
+	if (index == osc->index_x) {
+		osc->xy_plot.setHorizUnitsPerDiv(val);
+	}
+	if (index == osc->index_y) {
+		osc->xy_plot.setVertUnitsPerDiv(val, QwtPlot::yLeft);
+	}
+	osc->xy_plot.replot();
+	osc->xy_plot.zoomBaseUpdate();
+	if (index == osc->current_ch_widget) {
 		osc->voltsPerDiv->setValue(val);
 	}
+	osc->plot.replot();
 }
 
 double Channel_API::getVOffset() const
 {
 	int index = osc->channels_api.indexOf(const_cast<Channel_API*>(this));
-	return osc->plot.VertOffset(index);
+	return -osc->plot.VertOffset(index);
 }
 
 void Channel_API::setVOffset(double val)
 {
 	int index = osc->channels_api.indexOf(this);
-	QWidget *obj = osc->ui->channelsList->itemAt(index)->widget();
-	ChannelWidget *cw = static_cast<ChannelWidget *>(obj);
-	if (cw) {
-		cw->menuButton()->setChecked(true);
+	if (index == osc->current_ch_widget) {
 		osc->voltsPosition->setValue(val);
+	} else {
+		osc->plot.setVertOffset(-val, index);
 	}
+	osc->plot.replot();
 }
 
 double Channel_API::getLineThickness() const
@@ -4604,15 +4616,19 @@ double Channel_API::getProbeAttenuation() const
 void Channel_API::setProbeAttenuation(double val)
 {
 	int index = osc->channels_api.indexOf(this);
-	QWidget *obj = osc->ui->channelsList->itemAt(index)->widget();
-	ChannelWidget *cw = static_cast<ChannelWidget *>(obj);
-	if (cw) {
-		cw->menuButton()->setChecked(true);
-		int idx = std::log10(val / 0.1);
-		if (idx >= osc->ch_ui->probe_attenuation->count()) {
-			idx = osc->ch_ui->probe_attenuation->count() - 1;
-		}
+
+	int idx = std::log10(val / 0.1);
+	if (idx >= osc->ch_ui->probe_attenuation->count()) {
+		idx = osc->ch_ui->probe_attenuation->count() - 1;
+	} else if (idx <= 0) {
+		idx = 0;
+	}
+	val = std::pow(10, idx) * 0.1;
+
+	if (index == osc->current_ch_widget) {
 		osc->ch_ui->probe_attenuation->setCurrentIndex(idx);
+	} else {
+		osc->probe_attenuation[index] = val;
 	}
 }
 
