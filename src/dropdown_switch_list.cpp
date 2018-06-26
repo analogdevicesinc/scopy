@@ -63,6 +63,7 @@ DropdownSwitchList::DropdownSwitchList(int switchColCount, QWidget *parent):
 
 	// View
 	m_treeView = new QTreeView(this);
+	m_treeView->setAutoScroll(false);
 	this->setView(m_treeView);
 
 	// Column titles
