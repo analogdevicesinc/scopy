@@ -1,14 +1,12 @@
 #!/bin/sh
 set -e
 
-sudo add-apt-repository --yes ppa:jonathonf/python-3.6
-sudo add-apt-repository --yes ppa:beineri/opt-qt592-trusty
 sudo apt-get -qq update
-sudo apt-get install -y git cmake libzip-dev libusb-1.0-0-dev autoconf libtool libxml2 libxml2-dev python3.6 python-dev python3.6-dev libfftw3-dev libffi-dev
-sudo apt-get install -y libmount-dev libpcre3-dev libglib2.0-dev libsigc++-2.0-dev libglibmm-2.4-dev doxygen libglu1-mesa-dev curl flex bison libmatio2 libmatio-dev
-sudo apt-get install -y --force-yes qt59base qt59declarative qt59quickcontrols qt59svg qt59tools
+sudo apt-get install -y build-essential g++ bison flex cmake libxml2-dev \
+	qt5-default qttools5-dev \
+	qtdeclarative5-dev libqt5svg5-dev libglibmm-2.4-dev libmatio-dev libglib2.0-dev \
+	libzip-dev libfftw3-dev libusb-dev doxygen libqt5opengl5-dev
 
-source /opt/qt59/bin/qt59-env.sh && qmllint client/qml/*.qml
 cd ${WORKDIR}
 
 sudo mv /usr/bin/python3 /usr/bin/python3-old
