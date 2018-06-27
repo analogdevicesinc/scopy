@@ -990,9 +990,7 @@ void SpectrumAnalyzer::onCenterSpanChanged()
 	stop_freq->setValue(stop);
 	stop_freq->blockSignals(false);
 
-	// Configure plot
-	fft_plot->setAxisScale(QwtPlot::xBottom, start, stop);
-	fft_plot->replot();
+	onStartStopChanged();
 }
 
 void SpectrumAnalyzer::writeAllSettingsToHardware()
