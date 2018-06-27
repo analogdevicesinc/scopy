@@ -1637,24 +1637,22 @@ void Oscilloscope::onChannelWidgetDeleteClicked()
 
 		locked = true;
 
-		if (xy_is_visible) {
-			gsettings_ui->cmb_x_channel->blockSignals(true);
-			gsettings_ui->cmb_y_channel->blockSignals(true);
-			gsettings_ui->cmb_x_channel->removeItem(curve_id);
-			gsettings_ui->cmb_y_channel->removeItem(curve_id);
+		gsettings_ui->cmb_x_channel->blockSignals(true);
+		gsettings_ui->cmb_y_channel->blockSignals(true);
+		gsettings_ui->cmb_x_channel->removeItem(curve_id);
+		gsettings_ui->cmb_y_channel->removeItem(curve_id);
 
-			if (index_x >= curve_id) {
-				gsettings_ui->cmb_x_channel->setCurrentIndex(curve_id-1);
-			}
-
-			if (index_y >= curve_id) {
-				gsettings_ui->cmb_y_channel->setCurrentIndex(curve_id-1);
-			}
-
-			gsettings_ui->cmb_x_channel->blockSignals(false);
-			gsettings_ui->cmb_y_channel->blockSignals(false);
-			setup_xy_channels();
+		if (index_x >= curve_id) {
+			gsettings_ui->cmb_x_channel->setCurrentIndex(curve_id-1);
 		}
+
+		if (index_y >= curve_id) {
+			gsettings_ui->cmb_y_channel->setCurrentIndex(curve_id-1);
+		}
+
+		gsettings_ui->cmb_x_channel->blockSignals(false);
+		gsettings_ui->cmb_y_channel->blockSignals(false);
+		setup_xy_channels();
 
 		/* Disconnect the blocks from the running flowgraph */
 		auto pair = math_sinks.take(qname);
