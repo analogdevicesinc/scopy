@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 
 brew update
 # Install Qt
