@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 
 sudo add-apt-repository --yes ppa:jonathonf/python-3.6
 sudo add-apt-repository --yes ppa:beineri/opt-qt592-trusty

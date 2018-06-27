@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 
 cd ${TRAVIS_BUILD_DIR}/build
 mkdir -p appdir/usr/bin/decoders

@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 
 deploy=0
 if [ -z "$TRAVIS_BUILD_DIR" ] ; then
