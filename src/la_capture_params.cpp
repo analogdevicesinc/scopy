@@ -20,6 +20,7 @@
 #include "la_capture_params.hpp"
 
 #include <algorithm>
+#include <cmath>
 #include <QtGlobal>
 
 LogicAnalyzerSymmetricBufferMode::LogicAnalyzerSymmetricBufferMode() :
@@ -111,7 +112,7 @@ void LogicAnalyzerSymmetricBufferMode::configParamsOnTimeBaseChanged()
 	while ((m_triggerBufferMaxSize < bufferSize) && (sr_divider <
 			m_maxSampleRate)) {
 		sr_divider++;
-		sampleRate = m_maxSampleRate / sr_divider;
+		sampleRate = ceil(m_maxSampleRate / sr_divider);
 		bufferSize = getVisibleBufferSize(sampleRate);
 	}
 
