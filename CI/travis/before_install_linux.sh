@@ -9,12 +9,6 @@ sudo apt-get install -y build-essential g++ bison flex cmake libxml2-dev \
 
 cd ${WORKDIR}
 
-sudo mv /usr/bin/python3 /usr/bin/python3-old
-sudo ln -s /usr/bin/python3.6 /usr/bin/python3
-sudo ln -s /usr/bin/python3.6m /usr/bin/python3m
-sudo ln -s /usr/bin/python3.6m-config /usr/bin/python3m-config
-sudo sed -i "s/4/6/g" /usr/lib/x86_64-linux-gnu/pkgconfig/python3.pc
-
 mkdir -p deps
 cd deps
 WORKDIR=$PWD
