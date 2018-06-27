@@ -7,5 +7,6 @@ moc_*.cpp
 *_automoc.cpp
 ui_*.h
 build
+deps
 scopy
 *.swp
