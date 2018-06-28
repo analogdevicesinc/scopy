@@ -88,7 +88,7 @@ sudo make install >/dev/null
 
 cd ${WORKDIR}
 if [ ! -d libsigrok ]; then
-  git clone https://github.com/sschnelle/libsigrok/
+  git clone https://github.com/sigrokproject/libsigrok/
   cd libsigrok
   ./autogen.sh
   ./configure --disable-all-drivers --enable-bindings --enable-cxx
