@@ -30,6 +30,7 @@
 #include <QSharedPointer>
 #include <QWidget>
 #include <QQueue>
+#include <QSharedPointer>
 
 #include "apiObject.hpp"
 #include "filter.hpp"
@@ -38,6 +39,8 @@
 #include "tool.hpp"
 #include "hw_dac.h"
 #include "filemanager.h"
+
+#include "gnuradio/analog/noise_type.h"
 
 extern "C" {
 	struct iio_buffer;
@@ -274,130 +277,61 @@ Q_SIGNALS:
 	void showTool();
 };
 
-class SignalGenerator_API : public ApiObject
-{
-	Q_OBJECT
+enum SIGNAL_TYPE {
+	SIGNAL_TYPE_CONSTANT	= 0,
+	SIGNAL_TYPE_WAVEFORM	= 1,
+	SIGNAL_TYPE_BUFFER	= 2,
+	SIGNAL_TYPE_MATH	= 3,
+};
 
-	Q_PROPERTY(bool running READ running WRITE run STORED false);
+struct signal_generator_data {
+	iio_channel* iio_ch;
+	enum SIGNAL_TYPE type;
+	unsigned int id;
+	bool enabled;
+	// SIGNAL_TYPE_CONSTANT
+	float constant;
+	// SIGNAL_TYPE_WAVEFORM
+	double amplitude;
+	float offset;
+	double frequency;
+	double phase;
+	int indexValue;
+	double dutycycle;
+	enum sg_waveform waveform;
 
-	Q_PROPERTY(QList<int> mode READ getMode WRITE setMode);
-	Q_PROPERTY(QList<bool> enabled
-	       READ enabledChannels WRITE enableChannels)
-	Q_PROPERTY(QList<double> constant_volts
-	           READ getConstantValue WRITE setConstantValue);
-	Q_PROPERTY(QList<int> waveform_type
-	           READ getWaveformType WRITE setWaveformType);
-	Q_PROPERTY(QList<double> waveform_amplitude
-	           READ getWaveformAmpl WRITE setWaveformAmpl);
-	Q_PROPERTY(QList<double> waveform_frequency
-	           READ getWaveformFreq WRITE setWaveformFreq);
-	Q_PROPERTY(QList<double> waveform_offset
-	           READ getWaveformOfft WRITE setWaveformOfft);
-	Q_PROPERTY(QList<double> waveform_phase
-	           READ getWaveformPhase WRITE setWaveformPhase);
-	Q_PROPERTY(QList<double> math_frequency
-	           READ getMathFreq WRITE setMathFreq);
-	Q_PROPERTY(QList<QString> math_function
-	           READ getMathFunction WRITE setMathFunction);
-	Q_PROPERTY(QList<double> waveform_duty
-		   READ getWaveformDuty WRITE setWaveformDuty);
+	double rise;
+	double holdh;
+	double fall;
+	double holdl;
+	// SIGNAL_TYPE_BUFFER
+	double file_sr;
+	double file_amplitude;
+	double file_offset;
+	unsigned long file_phase;
+	unsigned long file_nr_of_channels;
+	unsigned long file_channel;
+	std::vector<uint32_t> file_nr_of_samples;
+	std::vector<float> file_data; // vector for each channel
+	QString file;
+	QString file_message;
+	QStringList file_channel_names;
+	enum sg_file_format file_type;
+	wav_header_t file_wav_hdr;
+	//bool file_loaded;
+	// SIGNAL_TYPE_MATH
+	QString function;
+	double math_freq;
+	// NOISE
+	gr::analog::noise_type_t noiseType;
+	float noiseAmplitude;
+};
 
-	Q_PROPERTY(QList<int> noise_type
-		   READ getNoiseType WRITE setNoiseType);
-	Q_PROPERTY(QList<double> noise_amplitude
-		   READ getNoiseAmpl WRITE setNoiseAmpl);
-	Q_PROPERTY(QList<double> waveform_rise
-		   READ getWaveformRise WRITE setWaveformRise);
-	Q_PROPERTY(QList<double> waveform_fall
-		   READ getWaveformFall WRITE setWaveformFall);
-	Q_PROPERTY(QList<double> waveform_holdhigh
-		   READ getWaveformHoldHigh WRITE setWaveformHoldHigh);
-	Q_PROPERTY(QList<double> waveform_holdlow
-		   READ getWaveformHoldLow WRITE setWaveformHoldLow);
-
-    Q_PROPERTY(QList<QString> buffer_file_path
-               READ getBufferFilePath WRITE setBufferFilePath)
-    Q_PROPERTY(QList<double> buffer_amplitude
-           READ getBufferAmplitude WRITE setBufferAmplitude)
-    Q_PROPERTY(QList<double> buffer_offset
-           READ getBufferOffset WRITE setBufferOffset)
-    Q_PROPERTY(QList<double> buffer_sample_rate
-           READ getBufferSampleRate WRITE setBufferSampleRate)
-    Q_PROPERTY(QList<double> buffer_phase
-           READ getBufferPhase WRITE setBufferPhase)
-
-
-public:
-	bool running() const;
-	void run(bool en);
-
-	QList<int> getMode() const;
-	void setMode(const QList<int>& list);
-
-	QList<bool> enabledChannels() const;
-	void enableChannels(const QList<bool>& list);
-
-	QList<double> getConstantValue() const;
-	void setConstantValue(const QList<double>& list);
-
-	QList<int> getWaveformType() const;
-	void setWaveformType(const QList<int>& list);
-
-	QList<double> getWaveformAmpl() const;
-	void setWaveformAmpl(const QList<double>& list);
-
-	QList<double> getWaveformFreq() const;
-	void setWaveformFreq(const QList<double>& list);
-
-	QList<double> getWaveformOfft() const;
-	void setWaveformOfft(const QList<double>& list);
-
-	QList<double> getWaveformPhase() const;
-	void setWaveformPhase(const QList<double>& list);
-
-	QList<double> getWaveformDuty() const;
-	void setWaveformDuty(const QList<double>& list);
-
-	QList<int> getNoiseType() const;
-	void setNoiseType(const QList<int>& list);
-	QList<double> getNoiseAmpl() const;
-	void setNoiseAmpl(const QList<double>& list);
-
-	QList<double> getWaveformHoldLow() const;
-	void setWaveformHoldLow(const QList<double>& list);
-	QList<double> getWaveformHoldHigh() const;
-	void setWaveformHoldHigh(const QList<double>& list);
-	QList<double> getWaveformFall() const;
-	void setWaveformFall(const QList<double>& list);
-	QList<double> getWaveformRise() const;
-	void setWaveformRise(const QList<double>& list);
-
-	QList<double> getMathFreq() const;
-	void setMathFreq(const QList<double>& list);
-
-	QList<QString> getMathFunction() const;
-	void setMathFunction(const QList<QString>& list);
-
-    QList<QString> getBufferFilePath() const;
-    void setBufferFilePath(const QList<QString>& list);
-    QList<double> getBufferAmplitude() const;
-    void setBufferAmplitude(const QList<double>& list);
-    QList<double> getBufferOffset() const;
-    void setBufferOffset(const QList<double>& list);
-    QList<double> getBufferSampleRate() const;
-    void setBufferSampleRate(const QList<double>& list);
-    QList<double> getBufferPhase() const;
-    void setBufferPhase(const QList<double>& list);
-
-        Q_INVOKABLE void show();
-
-	explicit SignalGenerator_API(SignalGenerator *gen) :
-		ApiObject(), gen(gen) {}
-	~SignalGenerator_API() {}
-
-private:
-	SignalGenerator *gen;
+struct time_block_data {
+	scope_sink_f::sptr time_block;
+	unsigned long nb_channels;
 };
 }
+Q_DECLARE_METATYPE(gr::analog::noise_type_t)
 
 #endif /* M2K_SIGNAL_GENERATOR_H */
