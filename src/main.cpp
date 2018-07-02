@@ -59,18 +59,21 @@ int main(int argc, char **argv)
 
 	parser.addOptions({
 		{ {"s", "script"}, "Run given script.", "script" },
+		{ {"n", "nogui"}, "Run Scopy without GUI" },
 	});
 
 	parser.process(app);
 
 	ToolLauncher launcher;
 
+	bool nogui = parser.isSet("nogui");
 	QString script = parser.value("script");
-	if (script.isEmpty()) {
-		launcher.show();
-	} else {
+	if (nogui) {
 		launcher.hide();
-
+	} else {
+		launcher.show();
+	}
+	if (!script.isEmpty()) {
 		QFile file(script);
 		if (!file.open(QFile::ReadOnly)) {
 			qCritical() << "Unable to open script file";
