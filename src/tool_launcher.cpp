@@ -1939,6 +1939,14 @@ void ToolLauncher_API::load(const QString& file)
 bool ToolLauncher_API::reset()
 {
 	bool did_reconnect = false;
+
+	/* Check if we are currently connected
+	 * to any device */
+	auto connectedDev = tl->getConnectedDevice();
+	if (!connectedDev) {
+		did_reconnect = true;
+	}
+
 	tl->resetSession();
 
 	tl->connect(tl, &ToolLauncher::adcToolsCreated, [&]() {
