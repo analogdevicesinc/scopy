@@ -1882,6 +1882,7 @@ bool ToolLauncher_API::connect(const QString& uri)
 
 	tl->ui->btnConnect->click();
 	dev->click();
+	dev->connectButton()->click();
 
 	do {
 		QCoreApplication::processEvents();
