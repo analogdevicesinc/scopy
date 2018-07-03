@@ -34,6 +34,7 @@
 #include "apiobjectmanager.h"
 #include "device_widget.hpp"
 #include "user_notes.hpp"
+#include "external_script_api.hpp"
 
 #include "ui_device.h"
 #include "ui_tool_launcher.h"
@@ -275,6 +276,8 @@ void ToolLauncher::readPreferences()
 	for (auto tool : toolMenu) {
 		tool->enableDoubleClick(prefPanel->getDouble_click_to_detach());
 	}
+	allowExternalScript(prefPanel->getExternal_script_enabled());
+
 }
 
 void ToolLauncher::loadIndexPageFromContent(QString fileLocation)
@@ -327,6 +330,18 @@ void ToolLauncher::saveSession()
 		if (export_dialog->exec()){
 			QFile f(export_dialog->selectedFiles().at(0));
 			this->tl_api->save(f.fileName());
+		}
+	}
+}
+
+void ToolLauncher::allowExternalScript(bool prefEnabled)
+{
+	if (prefEnabled && debugger_enabled) {
+		js_engine.globalObject().setProperty("extern",
+						     js_engine.newQObject(new ExternalScript_API(this)));
+	} else {
+		if (js_engine.globalObject().hasProperty("extern")) {
+			js_engine.globalObject().deleteProperty("extern");
 		}
 	}
 }
@@ -1849,6 +1864,7 @@ bool ToolLauncher_API::debugger_enabled()
 void ToolLauncher_API::enable_debugger(bool enabled)
 {
 	tl->debugger_enabled = enabled;
+	tl->prefPanel->setDebugger_enabled(enabled);
 }
 
 bool ToolLauncher_API::manual_calibration_enabled() const
@@ -1962,6 +1978,17 @@ void ToolLauncher_API::load(const QString& file)
 
 	for (auto tool : tl->toolList)
 		tool->settingsLoaded();
+}
+
+bool ToolLauncher_API::enableExtern(bool en)
+{
+	if (en) {
+		if (!tl->debugger_enabled) {
+			return false;
+		}
+	}
+	tl->prefPanel->setExternal_script_enabled(en);
+	return true;
 }
 
 bool ToolLauncher_API::reset()
