@@ -45,6 +45,26 @@ void SpectrumChannel_API::setAveraging(int avg)
 	spch->setAveraging(avg);
 }
 
+QList<double> SpectrumChannel_API::data() const
+{
+	QList<double> list;
+	int i = sp->ch_api.indexOf(const_cast<SpectrumChannel_API*>(this));
+	int nr_samples = sp->fft_plot->Curve(0)->data()->size();
+	for (int j = 0; j < nr_samples; ++j) {
+		list.push_back(sp->fft_plot->Curve(i)->sample(j).y());
+	}
+	return list;
+}
+QList<double> SpectrumChannel_API::freq() const
+{
+	QList<double> frequency_data;
+	int nr_samples = sp->fft_plot->Curve(0)->data()->size();
+	for (int i = 0; i < nr_samples; ++i) {
+		frequency_data.push_back(sp->fft_plot->Curve(0)->sample(i).x());
+	}
+	return frequency_data;
+}
+
 int SpectrumMarker_API::chId()
 {
 	return m_chid;
@@ -174,12 +194,12 @@ void SpectrumAnalyzer_API::run(bool chk)
 	sp->ui->run_button->setChecked(chk);
 }
 
-bool SpectrumAnalyzer_API::single()
+bool SpectrumAnalyzer_API::isSingle()
 {
 	return sp->ui->btnSingle->isChecked();
 }
 
-void SpectrumAnalyzer_API::runSingle(bool en)
+void SpectrumAnalyzer_API::single(bool en)
 {
 	sp->ui->btnSingle->setChecked(en);
 }
