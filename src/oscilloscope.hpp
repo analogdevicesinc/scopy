@@ -118,6 +118,7 @@ namespace adiscope {
 		void activateExportButton();
 		void isRunning(bool);
 		void importFileLoaded(bool);
+		void showTool();
 
 	private Q_SLOTS:
 		void btnExport_clicked();
@@ -607,6 +608,8 @@ namespace adiscope {
 
 		int getMemoryDepth();
 		void setMemoryDepth(int val);
+
+		Q_INVOKABLE void show();
 
 	private:
 		Oscilloscope *osc;

@@ -2323,6 +2323,11 @@ size_t SignalGenerator::get_samples_count(const struct iio_device *dev,
 	return size;
 }
 
+void SignalGenerator_API::show()
+{
+	Q_EMIT gen->showTool();
+}
+
 bool SignalGenerator_API::running() const
 {
 	return gen->ui->run_button->isChecked();

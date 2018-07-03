@@ -342,6 +342,11 @@ void adiscope::DigitalIO::btnRunStop_toggled()
 	}
 }
 
+void DigitalIO_API::show()
+{
+	Q_EMIT dio->showTool();
+}
+
 QList<bool> DigitalIO_API::direction() const
 {
 	QList<bool> list;

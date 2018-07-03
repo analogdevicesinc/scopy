@@ -902,6 +902,11 @@ void NetworkAnalyzer::onGraphIndexChanged(int index){
     ui->stackedWidget->setCurrentIndex(index);
 }
 
+void NetworkAnalyzer_API::show()
+{
+        Q_EMIT net->showTool();
+}
+
 double NetworkAnalyzer_API::getMinFreq() const
 {
         return net->minFreq->value();

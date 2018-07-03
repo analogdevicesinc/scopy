@@ -84,6 +84,9 @@ namespace adiscope {
 
 		void showEvent(QShowEvent *event);
 		void hideEvent(QHideEvent *event);
+
+	Q_SIGNALS:
+		void showTool();
 	};
 
 	class PowerController_API : public ApiObject
@@ -121,6 +124,8 @@ namespace adiscope {
 
 		bool Dac2Enabled() const;
 		void setDac2Enabled(bool enable);
+
+		Q_INVOKABLE void show();
 
 	private:
 		PowerController *pw;

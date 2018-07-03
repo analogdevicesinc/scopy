@@ -1891,6 +1891,10 @@ void LogicAnalyzer::onFrameEnded()
  * class LogicAnalyzer_API
  */
 
+void LogicAnalyzer_API::show()
+{
+        Q_EMIT lga->showTool();
+}
 
 bool LogicAnalyzer_API::running() const
 {

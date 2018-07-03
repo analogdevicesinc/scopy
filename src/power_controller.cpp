@@ -339,6 +339,11 @@ void PowerController::startStop(bool start)
 	ui->dac2->setChecked(start);
 }
 
+void PowerController_API::show()
+{
+	Q_EMIT pw->showTool();
+}
+
 bool PowerController_API::syncEnabled() const
 {
 	return !pw->ui->btnSync->isChecked();

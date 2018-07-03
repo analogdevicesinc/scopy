@@ -270,6 +270,8 @@ private Q_SLOTS:
 	void startStop(bool start);
 	void setFunction(const QString& function);
 	void readPreferences();
+Q_SIGNALS:
+	void showTool();
 };
 
 class SignalGenerator_API : public ApiObject
@@ -386,6 +388,8 @@ public:
     void setBufferSampleRate(const QList<double>& list);
     QList<double> getBufferPhase() const;
     void setBufferPhase(const QList<double>& list);
+
+        Q_INVOKABLE void show();
 
 	explicit SignalGenerator_API(SignalGenerator *gen) :
 		ApiObject(), gen(gen) {}

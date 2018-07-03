@@ -1109,6 +1109,11 @@ void PatternGenerator::resetPGToDefault()
 	chmui->updateUi();
 }
 
+void PatternGenerator_API::show()
+{
+	Q_EMIT pg->showTool();
+}
+
 void PatternGenerator_API::refreshApi()
 {
 	PatternGeneratorChannelManagerUI *chmui = pg->chmui;

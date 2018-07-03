@@ -165,6 +165,7 @@ Q_SIGNALS:
 	void starttimeout();
 	void stoptimeout();
 	void activateExportButton();
+	void showTool();
 
 private:
 	std::shared_ptr<sigrok::Context> context;
@@ -337,6 +338,8 @@ public:
 
 	bool getExportAll() const;
 	void setExportAll(bool);
+
+	Q_INVOKABLE void show();
 
 private:
 	LogicAnalyzer *lga;

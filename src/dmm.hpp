@@ -114,6 +114,9 @@ namespace adiscope {
 
 		void collapsePeakHold(bool);
 		void collapseDataLog(bool);
+
+	Q_SIGNALS:
+		void showTool();
 	};
 
 	class DMM_API : public ApiObject
@@ -196,6 +199,8 @@ namespace adiscope {
 
 		bool getPeakHoldEn() const;
 		void setPeakHoldEn(bool);
+
+		Q_INVOKABLE void show();
 
 		explicit DMM_API(DMM *dmm) : ApiObject(), dmm(dmm) {}
 		~DMM_API() {}

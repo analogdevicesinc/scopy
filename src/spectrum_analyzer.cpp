@@ -1745,6 +1745,11 @@ void SpectrumMarker_API::setEnabled(bool en)
 
 }
 
+void SpectrumAnalyzer_API::show()
+{
+	Q_EMIT sp->showTool();
+}
+
 QVariantList SpectrumAnalyzer_API::getMarkers()
 {
 	QVariantList list;

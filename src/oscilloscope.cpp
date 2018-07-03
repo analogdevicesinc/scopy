@@ -4367,6 +4367,11 @@ int Oscilloscope_API::getMemoryDepth()
 	return bufferSize;
 }
 
+void Oscilloscope_API::show()
+{
+	Q_EMIT osc->showTool();
+}
+
 bool Oscilloscope_API::running() const
 {
 	return osc->ui->pushButtonRunStop->isChecked();

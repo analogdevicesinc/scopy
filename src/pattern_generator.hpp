@@ -201,6 +201,9 @@ private Q_SLOTS:
 	void updateSampleRate();
 	void updateBufferSize();
 	void resetPGToDefault();
+
+Q_SIGNALS:
+	void showTool();
 };
 
 class PatternGeneratorChannel_API : public ApiObject
@@ -382,6 +385,8 @@ public:
 	void run_single(bool en);
 	bool inactiveHidden();
 	void setInactiveHidden(bool);
+
+	Q_INVOKABLE void show();
 
 private:
 	void refreshApi();

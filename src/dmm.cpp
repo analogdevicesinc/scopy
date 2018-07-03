@@ -629,6 +629,11 @@ void DMM::writeAllSettingsToHardware()
 	}
 }
 
+void DMM_API::show()
+{
+	Q_EMIT dmm->showTool();
+}
+
 bool DMM_API::get_mode_ac_high_ch1() const
 {
 	return dmm->ui->btn_ch1_ac2->isChecked();
