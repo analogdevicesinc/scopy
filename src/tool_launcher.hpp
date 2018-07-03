@@ -176,6 +176,7 @@ private:
 	void loadIndexPageFromContent(QString fileLocation);
 	DeviceWidget* getDevice(QString uri);
 	void setupAddPage();
+	void allowExternalScript(bool);
 
 private:
 	Ui::ToolLauncher *ui;
@@ -320,6 +321,7 @@ public:
 	Q_INVOKABLE void load(const QString& file);
 	Q_INVOKABLE void save(const QString& file);
 	Q_INVOKABLE bool reset();
+	Q_INVOKABLE bool enableExtern(bool);
 
 private:
 	ToolLauncher *tl;

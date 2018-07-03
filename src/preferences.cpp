@@ -39,7 +39,9 @@ Preferences::Preferences(QWidget *parent) :
 	osc_labels_enabled(false),
 	na_show_zero(false),
 	advanced_device_info(false),
-	user_notes_active(false)
+	user_notes_active(false),
+	external_script_enabled(false),
+	debugger_enabled(false)
 {
 	ui->setupUi(this);
 
@@ -98,6 +100,10 @@ Preferences::Preferences(QWidget *parent) :
 		graticule_enabled = (!state ? false : true);
 		Q_EMIT notify();
 	});
+	connect(ui->extScriptCheckBox, &QCheckBox::stateChanged, [=](int state) {
+		external_script_enabled = (!state ? false : true);
+		Q_EMIT notify();
+	});
 	QString preference_ini_file = getPreferenceIniFile();
 	QSettings settings(preference_ini_file, QSettings::IniFormat);
 
@@ -133,6 +139,7 @@ void Preferences::showEvent(QShowEvent *event)
 	ui->advancedInfoCheckBox->setChecked(advanced_device_info);
 	ui->userNotesCheckBox->setChecked(user_notes_active);
 	ui->oscGraticuleCheckBox->setChecked(graticule_enabled);
+	ui->extScriptCheckBox->setChecked(external_script_enabled);
 
 	QWidget::showEvent(event);
 }
@@ -227,6 +234,29 @@ bool Preferences::getOsc_labels_enabled() const
 void Preferences::setOsc_labels_enabled(bool value)
 {
 	osc_labels_enabled = value;
+}
+
+void Preferences::setExternal_script_enabled(bool value)
+{
+	external_script_enabled = value;
+	ui->extScriptCheckBox->setChecked(external_script_enabled);
+	Q_EMIT notify();
+}
+
+void Preferences::setDebugger_enabled(bool value)
+{
+	debugger_enabled = value;
+	if (debugger_enabled) {
+		ui->extScriptWidget->show();
+	} else {
+		ui->extScriptWidget->hide();
+	}
+	setExternal_script_enabled(external_script_enabled);
+}
+
+bool Preferences::getExternal_script_enabled() const
+{
+	return external_script_enabled;
 }
 
 bool Preferences::getNa_show_zero() const
@@ -336,4 +366,13 @@ bool Preferences_API::getGraticuleEnabled() const
 void Preferences_API::setGraticuleEnabled(const bool& enabled)
 {
 	preferencePanel->graticule_enabled = enabled;
+}
+
+bool Preferences_API::getExternalScript() const
+{
+	return preferencePanel->external_script_enabled;
+}
+void Preferences_API::setExternalScript(const bool& enabled)
+{
+	preferencePanel->external_script_enabled = enabled;
 }
