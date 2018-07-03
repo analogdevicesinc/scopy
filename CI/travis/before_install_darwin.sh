@@ -7,26 +7,28 @@ brew install qt
 echo 'export PATH="$(brew --prefix qt)/bin:$PATH"' >> ~/.bash_profile
 brew link --force qt
 
-brew install cmake fftw bison autoconf automake libtool libzip glib glibmm doxygen wget boost gnu-sed libmatio dylibbundler libxml2 pkg-config
-brew install --build-from-source libusb
-brew install llvm
+brew_install_or_upgrade() {
+	brew install $1 || \
+		brew upgrade $1 || \
+		brew ls --versions $1 # check if installed last-ly
+}
+
+PACKAGES="cmake fftw bison gettext autoconf automake libtool libzip glib libusb python3 brew-pip"
+PACKAGES="$PACKAGES glibmm doxygen wget boost gnu-sed libmatio dylibbundler libxml2 pkg-config"
+
+for pak in $PACKAGES ; do
+	brew_install_or_upgrade $pak
+done
+
 brew link --overwrite --force gcc
 brew link --overwrite --force bison
 brew link --overwrite --force gettext
-brew upgrade cmake
-brew upgrade bison
-brew upgrade fftw
 
 source ./CI/travis/before_install_lib.sh
 
 # Get pip
 curl https://bootstrap.pypa.io/get-pip.py > get-pip.py
 sudo python get-pip.py
-
-brew install brew-pip
-sudo pip install --ignore-installed six
-brew pip mako
-brew pip cheetah
 
 make_build_git "libsigrok" "https://github.com/sigrokproject/libsigrok" "" "" "./autogen.sh"
 
