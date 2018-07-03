@@ -30,11 +30,8 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./CI/travis/before_install_darwin.sh ; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./CI/travis/before_install_linux.sh ; fi
 
-  - mkdir -p ${TRAVIS_BUILD_DIR}/build
-
 script:
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ${TRAVIS_BUILD_DIR}/CI/travis/make_darwin.sh; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ${TRAVIS_BUILD_DIR}/CI/travis/make_linux.sh ; fi
+  - ${TRAVIS_BUILD_DIR}/CI/travis/make.sh
 
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cd ${TRAVIS_BUILD_DIR}/build; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ${TRAVIS_BUILD_DIR}/CI/travis/package_darwin.sh; fi
