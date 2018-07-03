@@ -138,6 +138,7 @@ namespace adiscope {
 
 	Q_SIGNALS:
 		void sweepDone();
+		void showTool();
 	};
 
 	class NetworkAnalyzer_API : public ApiObject
@@ -222,6 +223,8 @@ namespace adiscope {
 
 		int getPlotType() const;
 		void setPlotType(int val);
+
+		Q_INVOKABLE void show();
 
 	private:
 		NetworkAnalyzer *net;

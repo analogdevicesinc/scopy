@@ -98,6 +98,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 	void isRunning(bool);
+	void showTool();
 
 private Q_SLOTS:
 	void on_btnToolSettings_toggled(bool checked);
@@ -355,6 +356,7 @@ class SpectrumAnalyzer_API : public ApiObject
 	           setMarkerTableVisible);
 	Q_PROPERTY(QVariantList markers READ getMarkers);
 public:
+	Q_INVOKABLE void show();
 	explicit SpectrumAnalyzer_API(SpectrumAnalyzer *sp) :
 		ApiObject(), sp(sp) {}
 	~SpectrumAnalyzer_API() {}

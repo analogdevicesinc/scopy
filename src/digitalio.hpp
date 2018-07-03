@@ -114,6 +114,8 @@ public Q_SLOTS:
 	void setSlider(int val);
 	void lockUi();
 	void btnRunStop_toggled();
+Q_SIGNALS:
+	void showTool();
 };
 
 class DigitalIO_API : public ApiObject
@@ -142,6 +144,8 @@ public:
 	QList<bool> gpi() const;
 	bool running() const;
 	void run(bool en);
+
+	Q_INVOKABLE void show();
 
 private:
 	DigitalIO *dio;

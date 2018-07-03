@@ -1311,6 +1311,9 @@ void adiscope::ToolLauncher::enableAdcBasedTools()
 						&js_engine, this);
 		toolList.push_back(oscilloscope);
 		adc_users_group.addButton(toolMenu["Oscilloscope"]->getToolStopBtn());
+		connect(oscilloscope, &Oscilloscope::showTool, [=]() {
+			toolMenu["Oscilloscope"]->getToolBtn()->click();
+		});
 	}
 
 	if (filter->compatible(TOOL_DMM)) {
@@ -1318,6 +1321,9 @@ void adiscope::ToolLauncher::enableAdcBasedTools()
 				&js_engine, this);
 		adc_users_group.addButton(toolMenu["Voltmeter"]->getToolStopBtn());\
 		toolList.push_back(dmm);
+		connect(dmm, &DMM::showTool, [=]() {
+			toolMenu["Voltmeter"]->getToolBtn()->click();
+		});
 	}
 
 	if (filter->compatible(TOOL_DEBUGGER)) {
@@ -1340,6 +1346,9 @@ void adiscope::ToolLauncher::enableAdcBasedTools()
 			toolMenu["Spectrum Analyzer"]->getToolStopBtn(),&js_engine, this);
 		toolList.push_back(spectrum_analyzer);
 		adc_users_group.addButton(toolMenu["Spectrum Analyzer"]->getToolStopBtn());
+		connect(spectrum_analyzer, &SpectrumAnalyzer::showTool, [=]() {
+			toolMenu["Spectrum Analyzer"]->getToolBtn()->click();
+		});
 	}
 
 	if (filter->compatible((TOOL_NETWORK_ANALYZER))) {
@@ -1347,6 +1356,9 @@ void adiscope::ToolLauncher::enableAdcBasedTools()
 			toolMenu["Network Analyzer"]->getToolStopBtn(), &js_engine, this);
 		adc_users_group.addButton(toolMenu["Network Analyzer"]->getToolStopBtn());
 		toolList.push_back(network_analyzer);
+		connect(network_analyzer, &NetworkAnalyzer::showTool, [=]() {
+			toolMenu["Network Analyzer"]->getToolBtn()->click();
+		});
 	}
 
 	Q_EMIT adcToolsCreated();
@@ -1359,6 +1371,9 @@ void adiscope::ToolLauncher::enableDacBasedTools()
 		signal_generator = new SignalGenerator(ctx, dacs, filter,
 			toolMenu["Signal Generator"]->getToolStopBtn(), &js_engine, this);
 		toolList.push_back(signal_generator);
+		connect(signal_generator, &SignalGenerator::showTool, [=]() {
+			toolMenu["Signal Generator"]->getToolBtn()->click();
+		});
 	}
 	if (pathToFile != "") {
 		this->tl_api->load(pathToFile);
@@ -1465,6 +1480,9 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 		dio = new DigitalIO(ctx, filter, toolMenu["Digital IO"]->getToolStopBtn(),
 				dioManager, &js_engine, this);
 		toolList.push_back(dio);
+		connect(dio, &DigitalIO::showTool, [=]() {
+			toolMenu["Digital IO"]->getToolBtn()->click();
+		});
 	}
 
 
@@ -1472,12 +1490,18 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 		power_control = new PowerController(ctx, toolMenu["Power Supply"]->getToolStopBtn(),
 				&js_engine, this);
 		toolList.push_back(power_control);
+		connect(power_control, &PowerController::showTool, [=]() {
+			toolMenu["Power Supply"]->getToolBtn()->click();
+		});
 	}
 
 	if (filter->compatible(TOOL_LOGIC_ANALYZER)) {
 		logic_analyzer = new LogicAnalyzer(ctx, filter, toolMenu["Logic Analyzer"]->getToolStopBtn(),
 				&js_engine, this);
 		toolList.push_back(logic_analyzer);
+		connect(logic_analyzer, &LogicAnalyzer::showTool, [=]() {
+			toolMenu["Logic Analyzer"]->getToolBtn()->click();
+		});
 	}
 
 
@@ -1485,6 +1509,9 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 		pattern_generator = new PatternGenerator(ctx, filter,
 				toolMenu["Pattern Generator"]->getToolStopBtn(), &js_engine,dioManager, this);
 		toolList.push_back(pattern_generator);
+		connect(pattern_generator, &PatternGenerator::showTool, [=]() {
+			toolMenu["Pattern Generator"]->getToolBtn()->click();
+		});
 	}
 
 	connect(toolMenu["Network Analyzer"]->getToolStopBtn(),
