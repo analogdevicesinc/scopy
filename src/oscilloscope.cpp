@@ -4626,24 +4626,30 @@ double Channel_API::getVoltsPerDiv() const
 void Channel_API::setVoltsPerDiv(double val)
 {
 	int index = osc->channels_api.indexOf(this);
-	osc->plot.setVertUnitsPerDiv(val, index);
-
-	QLabel *label = static_cast<QLabel *>(
-				osc->ui->chn_scales->itemAt(index)->widget());
-	label->setText(osc->vertMeasureFormat.format(val, "V/div", 3));
-
-	if (index == osc->index_x) {
-		osc->xy_plot.setHorizUnitsPerDiv(val);
-	}
-	if (index == osc->index_y) {
-		osc->xy_plot.setVertUnitsPerDiv(val, QwtPlot::yLeft);
-	}
-	osc->xy_plot.replot();
-	osc->xy_plot.zoomBaseUpdate();
-	if (index == osc->current_ch_widget) {
+	int prevSelectedChannel = osc->current_ch_widget;
+	if (index == prevSelectedChannel) {
 		osc->voltsPerDiv->setValue(val);
+		return;
 	}
-	osc->plot.replot();
+	QWidget *obj = osc->ui->channelsList->itemAt(index)->widget();
+	ChannelWidget *cw = static_cast<ChannelWidget *>(obj);
+	if (cw) {
+		cw->menuButton()->setChecked(true);
+		if (osc->voltsPerDiv->value() == val) {
+			osc->onVertScaleValueChanged(val);
+		} else {
+			osc->voltsPerDiv->setValue(val);
+		}
+	}
+
+	if (prevSelectedChannel < 0) {
+		return;
+	}
+	QWidget *prevObj = osc->ui->channelsList->itemAt(prevSelectedChannel)->widget();
+	ChannelWidget *prevCw = static_cast<ChannelWidget *>(prevObj);
+	if (prevCw) {
+		prevCw->menuButton()->setChecked(true);
+	}
 }
 
 double Channel_API::getVOffset() const
@@ -4655,12 +4661,31 @@ double Channel_API::getVOffset() const
 void Channel_API::setVOffset(double val)
 {
 	int index = osc->channels_api.indexOf(this);
-	if (index == osc->current_ch_widget) {
+	int prevSelectedChannel = osc->current_ch_widget;
+	if (index == prevSelectedChannel) {
 		osc->voltsPosition->setValue(val);
-	} else {
-		osc->plot.setVertOffset(-val, index);
+		return;
 	}
-	osc->plot.replot();
+
+	QWidget *obj = osc->ui->channelsList->itemAt(index)->widget();
+	ChannelWidget *cw = static_cast<ChannelWidget *>(obj);
+	if (cw) {
+		cw->menuButton()->setChecked(true);
+		if (osc->voltsPosition->value() == val) {
+			osc->onVertOffsetValueChanged(val);
+		} else {
+			osc->voltsPosition->setValue(val);
+		}
+	}
+
+	if (prevSelectedChannel < 0) {
+		return;
+	}
+	QWidget *prevObj = osc->ui->channelsList->itemAt(prevSelectedChannel)->widget();
+	ChannelWidget *prevCw = static_cast<ChannelWidget *>(prevObj);
+	if (prevCw) {
+		prevCw->menuButton()->setChecked(true);
+	}
 }
 
 double Channel_API::getLineThickness() const
