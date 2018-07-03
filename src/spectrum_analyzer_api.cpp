@@ -55,6 +55,7 @@ QList<double> SpectrumChannel_API::data() const
 	}
 	return list;
 }
+
 QList<double> SpectrumChannel_API::freq() const
 {
 	QList<double> frequency_data;
@@ -198,10 +199,9 @@ bool SpectrumAnalyzer_API::isSingle()
 {
 	return sp->ui->btnSingle->isChecked();
 }
-
-void SpectrumAnalyzer_API::single(bool en)
+void SpectrumAnalyzer_API::single(bool chk)
 {
-	sp->ui->btnSingle->setChecked(en);
+	sp->ui->btnSingle->setChecked(chk);
 }
 
 QVariantList SpectrumAnalyzer_API::getChannels()

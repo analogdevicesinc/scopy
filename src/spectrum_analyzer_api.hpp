@@ -31,8 +31,10 @@ private:
 	SpectrumAnalyzer *sp;
 	bool running();
 	void run(bool);
+
 	bool isSingle();
 	void single(bool);
+
 	QVariantList getChannels();
 	QVariantList getMarkers();
 
