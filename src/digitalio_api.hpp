@@ -13,6 +13,7 @@ class DigitalIO_API : public ApiObject
 	Q_PROPERTY(QList<bool> out READ output    WRITE setOutput SCRIPTABLE true);
 
 	Q_PROPERTY(QList<bool> gpi READ gpi STORED false);
+	Q_PROPERTY(QList<bool> locked READ locked STORED false);
 	Q_PROPERTY(bool running READ running WRITE run STORED false);
 
 public:
@@ -28,6 +29,7 @@ public:
 	void setGrouped(const QList<bool>& grouped);
 
 	QList<bool> gpi() const;
+	QList<bool> locked() const;
 	bool running() const;
 	void run(bool en);
 

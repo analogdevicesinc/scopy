@@ -100,4 +100,15 @@ void DigitalIO_API::setGrouped(const QList<bool> &grouped)
 	}
 
 }
+
+QList<bool> DigitalIO_API::locked() const
+{
+	QList<bool> list;
+	unsigned int i;
+	for (i = 0; i < 16; i++) {
+		auto GPI = dio->diom->isLocked(i);
+		list.append(GPI);
+	}
+	return list;
+}
 }
