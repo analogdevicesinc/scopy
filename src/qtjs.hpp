@@ -23,6 +23,7 @@ public:
 	Q_INVOKABLE void sleep(unsigned long s);
 	Q_INVOKABLE void msleep(unsigned long ms);
 	Q_INVOKABLE void printToConsole(const QString& text);
+	Q_INVOKABLE QString readFromConsole(const QString& text);
 };
 
 }

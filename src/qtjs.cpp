@@ -57,3 +57,11 @@ void QtJs::printToConsole(const QString& text)
 {
 	cout << text.toStdString() << std::endl;
 }
+
+QString QtJs::readFromConsole(const QString& text)
+{
+	std::string input;
+	std::cout << text.toStdString() << std::endl;
+	std::cin >> input;
+	return QString::fromStdString(input);
+}
