@@ -319,7 +319,7 @@ void Oscilloscope_API::show()
 
 bool Oscilloscope_API::running() const
 {
-	return osc->ui->pushButtonRunStop->isChecked();
+	return osc->ui->pushButtonRunStop->isChecked() || osc->ui->pushButtonSingle->isChecked();
 }
 
 void Oscilloscope_API::run(bool en)
@@ -327,14 +327,14 @@ void Oscilloscope_API::run(bool en)
 	osc->ui->pushButtonRunStop->setChecked(en);
 }
 
-bool Oscilloscope_API::single() const
+bool Oscilloscope_API::isSingle() const
 {
 	return osc->ui->pushButtonSingle->isChecked();
 }
-
-void Oscilloscope_API::runSingle(bool en)
+void Oscilloscope_API::single(bool en)
 {
-	osc->ui->pushButtonSingle->setChecked(en);
+	if(!osc->ui->pushButtonSingle->isChecked())
+		osc->ui->pushButtonSingle->setChecked(true);
 }
 
 QList<int> Oscilloscope_API::measureEn() const
@@ -711,6 +711,24 @@ void Channel_API::setAcCoupling(bool val)
 	} else {
 		osc->configureAcCoupling(index, val);
 	}
+}
+
+QList<double> Channel_API::data() const
+{
+	QList<double> list;
+	int index = osc->channels_api.indexOf(const_cast<Channel_API*>(this));
+	if(index < 0)
+		return list;
+	/*if(osc->ui->pushButtonRunStop->isChecked() ||
+	   osc->ui->pushButtonSingle->isChecked())
+		return list;*/
+	auto num_of_samples = osc->plot.Curve(index)->data()->size();
+	for(auto i=0; i<num_of_samples;i++)
+	{
+		double d =  osc->plot.Curve(index)->data()->sample(i).y();
+		list.append(d);
+	}
+	return list;
 }
 
 #define DECLARE_MEASURE(m, t) \

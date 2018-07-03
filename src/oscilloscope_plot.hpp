@@ -58,6 +58,7 @@ namespace adiscope {
 	class CapturePlot: public OscilloscopePlot
 	{
 		friend class Oscilloscope_API;
+		friend class Channel_API;
 
 		Q_OBJECT
 

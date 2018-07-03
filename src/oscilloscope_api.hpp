@@ -14,7 +14,7 @@ class Oscilloscope_API : public ApiObject
 	Q_PROPERTY(QVariantList channels READ getChannels);
 
 	Q_PROPERTY(bool running READ running WRITE run STORED false);
-	Q_PROPERTY(bool single READ single WRITE runSingle STORED false);
+	Q_PROPERTY(bool single READ isSingle WRITE single STORED false);
 
 	Q_PROPERTY(bool cursors READ hasCursors WRITE setCursors);
 	Q_PROPERTY(bool measure READ hasMeasure WRITE setMeasure);
@@ -92,9 +92,8 @@ public:
 
 	bool running() const;
 	void run(bool en);
-
-	bool single() const;
-	void runSingle(bool en);
+	bool isSingle() const;
+	void single(bool en);
 
 	bool hasCursors() const;
 	void setCursors(bool en);
@@ -245,8 +244,7 @@ public:
 	Q_PROPERTY(double neg_width READ measured_neg_width)
 	Q_PROPERTY(double pos_duty READ measured_pos_duty)
 	Q_PROPERTY(double neg_duty READ measured_neg_duty)
-
-
+	Q_PROPERTY(QList<double> data READ data STORED false)
 public:
 	explicit Channel_API(Oscilloscope *osc) :
 		ApiObject(), osc(osc) {}
@@ -294,6 +292,7 @@ public:
 	double measured_neg_width() const;
 	double measured_pos_duty() const;
 	double measured_neg_duty() const;
+	QList<double> data() const;
 
 	Q_INVOKABLE void setColor(int);
 
