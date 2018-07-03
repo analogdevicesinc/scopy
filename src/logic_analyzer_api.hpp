@@ -21,6 +21,7 @@ class LogicAnalyzer_API : public ApiObject
 	Q_PROPERTY(bool cursors_locked READ cursorsLocked WRITE setCursorsLocked)
 	Q_PROPERTY(bool inactive_hidden READ inactiveHidden WRITE setInactiveHidden)
 	Q_PROPERTY(bool export_all READ getExportAll WRITE setExportAll)
+	Q_PROPERTY(QList<int> data READ data STORED false)
 
 public:
 	explicit LogicAnalyzer_API(LogicAnalyzer *lga) :
@@ -63,6 +64,8 @@ public:
 	void setExportAll(bool);
 
 	Q_INVOKABLE void show();
+
+	QList<int> data() const;
 
 private:
 	LogicAnalyzer *lga;
@@ -148,6 +151,9 @@ public:
 
 	QString getRole() const;
 	void setRole(QString val);
+
+	QList<bool> data() const;
+
 private:
 	LogicAnalyzer *lga;
 	ChannelGroup_API *lchg;

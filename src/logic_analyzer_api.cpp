@@ -4,6 +4,8 @@
 #include "osc_export_settings.h"
 #include "spinbox_a.hpp"
 #include "ui_la_channel_group.h"
+#include <pulseview/pv/data/logicsegment.hpp>
+#include <pulseview/pv/data/logic.hpp>
 
 namespace adiscope {
 /*
@@ -339,5 +341,24 @@ void LogicChannel_API::setRole(QString val)
 		lchg->getIndex())->get_srd_channel_from_name(val.toUtf8());
 	lga->chm.get_channel_group(lchg->getIndex())->get_channel_by_id(
 		getIndex())->setChannel_role(ch);
+}
+
+QList<int> LogicAnalyzer_API::data() const
+{
+	QList<int> list;
+
+	std::shared_ptr<pv::data::Logic> logic_data = lga->main_win->session_.get_logic_data();
+	if (!logic_data) {
+		return list;
+	} else {
+		std::shared_ptr<pv::data::LogicSegment> segment = logic_data->logic_segments().front();
+		if(!segment)
+			return list;
+		for (int i = 0; i < segment->get_sample_count(); ++i) {
+			uint64_t sample = segment->get_sample(i);
+			list.append((int)sample);
+		}
+	}
+	return list;
 }
 }
