@@ -229,4 +229,23 @@ void NetworkAnalyzer_API::setLineThickness(int index)
 {
 	net->ui->cbLineThickness->setCurrentIndex(index);
 }
+
+QList<double> NetworkAnalyzer_API::data() const
+{
+	QList<double> list = net->m_dBgraph.getXAxisData().toList();
+	return list;
+}
+
+QList<double> NetworkAnalyzer_API::freq() const
+{
+	QList<double> list = net->m_dBgraph.getYAxisData().toList();
+	return list;
+}
+
+QList<double> NetworkAnalyzer_API::phase() const
+{
+	QList<double> list = net->m_phaseGraph.getXAxisData().toList();
+	return list;
+}
+
 }

@@ -37,8 +37,9 @@ class NetworkAnalyzer_API : public ApiObject
       WRITE setCursorsTransparency)
 	Q_PROPERTY(int plot_type READ getPlotType
       WRITE setPlotType)
-
-
+	Q_PROPERTY(QList<double> data READ data STORED false)
+	Q_PROPERTY(QList<double> phase READ phase STORED false)
+	Q_PROPERTY(QList<double> freq READ freq STORED false)
 public:
 	explicit NetworkAnalyzer_API(NetworkAnalyzer *net) :
 		ApiObject(), net(net) {}
@@ -90,6 +91,10 @@ public:
 	void setPlotType(int val);
 
 	Q_INVOKABLE void show();
+
+	QList<double> data() const;
+	QList<double> freq() const;
+	QList<double> phase() const;
 
 private:
 	NetworkAnalyzer *net;
