@@ -60,7 +60,7 @@ __build_common() {
 wget_and_untar() {
 	[ -d "$WORKDIR/$dir" ] || {
 		local tar_file="${dir}.tar.gz"
-		wget "$url" -O "$tar_file"
+		wget --no-check-certificate "$url" -O "$tar_file"
 		tar -xvf "$tar_file" > /dev/null
 	}
 }
