@@ -191,17 +191,6 @@ patch_qwtpolar() {
 		patch -p1 <<-EOF
 --- a/qwtpolarconfig.pri
 +++ b/qwtpolarconfig.pri
-@@ -16,7 +16,9 @@ QWT_POLAR_VER_PAT      = 1
- QWT_POLAR_VERSION      = \$\${QWT_POLAR_VER_MAJ}.\$\${QWT_POLAR_VER_MIN}.\$\${QWT_POLAR_VER_PAT}
- 
- unix {
--    QWT_POLAR_INSTALL_PREFIX    = /usr/local/qwtpolar-\$\$QWT_POLAR_VERSION
-+    QWT_POLAR_INSTALL_PREFIX    = $STAGINGDIR
-+    QMAKE_CXXFLAGS              = -I${STAGINGDIR}/include
-+    QMAKE_LFLAGS                = -L${STAGINGDIR}/lib
- }
- 
- win32 {
 @@ -70,14 +72,14 @@ QWT_POLAR_INSTALL_FEATURES  = \$\${QWT_POLAR_INSTALL_PREFIX}/features
  # Otherwise you have to build it from the designer directory.
  ######################################################################
