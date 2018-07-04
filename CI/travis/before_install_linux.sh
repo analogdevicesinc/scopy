@@ -9,6 +9,28 @@ sudo apt-get install -y build-essential g++ bison flex cmake libxml2-dev \
 
 source ./CI/travis/before_install_lib.sh
 
+patch_qwtpolar_linux() {
+	[ -f qwtpolar-qwt-6.1-compat.patch ] || {
+		patch_qwtpolar
+
+		patch -p1 <<-EOF
+--- a/qwtpolarconfig.pri
++++ b/qwtpolarconfig.pri
+@@ -16,7 +16,9 @@ QWT_POLAR_VER_PAT      = 1
+ QWT_POLAR_VERSION      = \$\${QWT_POLAR_VER_MAJ}.\$\${QWT_POLAR_VER_MIN}.\$\${QWT_POLAR_VER_PAT}
+ 
+ unix {
+-    QWT_POLAR_INSTALL_PREFIX    = /usr/local/qwtpolar-\$\$QWT_POLAR_VERSION
++    QWT_POLAR_INSTALL_PREFIX    = $STAGINGDIR
++    QMAKE_CXXFLAGS              = -I${STAGINGDIR}/include
++    QMAKE_LFLAGS                = -L${STAGINGDIR}/lib
+ }
+ 
+ win32 {
+EOF
+	}
+}
+
 make_build_wget "boost_1_63_0" "https://netcologne.dl.sourceforge.net/project/boost/boost/1.63.0/boost_1_63_0.tar.gz" "./bootstrap.sh" "./b2"
 
 make_build_git "libsigrok" "https://github.com/sigrokproject/libsigrok" "" "" "./autogen.sh"
@@ -17,7 +39,7 @@ make_build_wget "libsigrokdecode-0.4.1" "http://sigrok.org/download/source/libsi
 
 qmake_build_git "qwt" "https://github.com/osakared/qwt.git" "qwt-6.1-multiaxes" "qwt.pro" "patch_qwt"
 
-qmake_build_wget "qwtpolar-1.1.1" "https://downloads.sourceforge.net/project/qwtpolar/qwtpolar/1.1.1/qwtpolar-1.1.1.tar.bz2" "qwtpolar.pro" "patch_qwtpolar"
+qmake_build_wget "qwtpolar-1.1.1" "https://downloads.sourceforge.net/project/qwtpolar/qwtpolar/1.1.1/qwtpolar-1.1.1.tar.bz2" "qwtpolar.pro" "patch_qwtpolar_linux"
 
 cmake_build_wget "volk-1.3" "http://libvolk.org/releases/volk-1.3.tar.gz"
 
