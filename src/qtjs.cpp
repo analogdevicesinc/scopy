@@ -10,7 +10,8 @@
 #include <QMetaProperty>
 #include <QThread>
 #include <QElapsedTimer>
-
+#include <QtConcurrent>
+#include <thread>
 #include <iostream>
 
 using std::cout;
@@ -20,6 +21,7 @@ QtJs::QtJs(QJSEngine *engine) : QObject(engine)
 {
 	QJSValue js_obj = engine->newQObject(this);
 	auto meta = metaObject();
+	input = "";
 
 	for (unsigned int i = meta->methodOffset();
 			i < meta->methodCount(); i++) {
@@ -58,10 +60,30 @@ void QtJs::printToConsole(const QString& text)
 	cout << text.toStdString() << std::endl;
 }
 
-QString QtJs::readFromConsole(const QString& text)
+QString QtJs::readFromConsole(const QString& request)
 {
-	std::string input;
-	std::cout << text.toStdString() << std::endl;
-	std::cin >> input;
-	return QString::fromStdString(input);
+	bool done = false;
+	input = "";
+
+	std::cout << request.toStdString() << std::endl;
+	connect(&watcher, &QFutureWatcher<QString>::finished, [&]() {
+		input = watcher.result();
+		done = true;
+	});
+	future = QtConcurrent::run(this, &QtJs::readInput);
+	watcher.setFuture(future);
+
+	do {
+		QCoreApplication::processEvents();
+		QThread::msleep(10);
+	} while (!done && (input == ""));
+
+	return input;
+}
+
+QString QtJs::readInput()
+{
+	std::string in;
+	std::cin >> in;
+	return QString::fromStdString(in);
 }

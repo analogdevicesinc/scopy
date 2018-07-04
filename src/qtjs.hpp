@@ -7,7 +7,8 @@
 #define SCOPY_QTJS_HPP
 
 #include <QObject>
-
+#include <QFuture>
+#include <QFutureWatcher>
 class QJSEngine;
 
 namespace adiscope {
@@ -24,6 +25,12 @@ public:
 	Q_INVOKABLE void msleep(unsigned long ms);
 	Q_INVOKABLE void printToConsole(const QString& text);
 	Q_INVOKABLE QString readFromConsole(const QString& text);
+
+private:
+	QFutureWatcher<QString> watcher;
+	QFuture<QString> future;
+	QString input;
+	QString readInput();
 };
 
 }
