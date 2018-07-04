@@ -275,6 +275,33 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 		MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_BINARY_DIR}/Info.plist
 )
 
+
+
+set(CMAKE_INSTALL_DOCDIR "${CMAKE_CURRENT_BINARY_DIR}/doc")
+find_package(Doxygen)
+if(DOXYGEN_FOUND)
+	option(WITH_DOC "Generate documentation with Doxygen" ON)
+
+	if (WITH_DOC)
+		configure_file(${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxyfile_API.in ${CMAKE_CURRENT_BINARY_DIR}/doc/Doxyfile @ONLY)
+		set(HTML_DEST_DIR ${CMAKE_CURRENT_BINARY_DIR})
+		#file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/doc DESTINATION ${HTML_DEST_DIR})
+
+		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+			COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/doc/Doxyfile
+			WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+			COMMENT "Generating API documentation with Doxygen" VERBATIM
+			)
+
+		if(NOT SKIP_INSTALL_ALL)
+			install(DIRECTORY ${HTML_DEST_DIR} DESTINATION ${CMAKE_INSTALL_DOCDIR})
+		endif()
+	endif()
+else()
+	message(STATUS "Doxygen not found, API documentation won't be generated")
+endif()
+
+
 configure_file(scopy.iss.cmakein ${CMAKE_CURRENT_BINARY_DIR}/scopy.iss @ONLY)
 configure_file(config.h.cmakein ${CMAKE_CURRENT_BINARY_DIR}/config.h @ONLY)
 

@@ -7,15 +7,22 @@ namespace adiscope {
 
 class ApiObject;
 class Oscilloscope;
+/**
+  * @brief osc object
+  */
 class Oscilloscope_API : public ApiObject
 {
 	Q_OBJECT
+
 
 	Q_PROPERTY(QVariantList channels READ getChannels);
 
 	Q_PROPERTY(bool running READ running WRITE run STORED false);
 	Q_PROPERTY(bool single READ isSingle WRITE single STORED false);
 
+	/**
+	  * @brief Enables the cursors
+	  */
 	Q_PROPERTY(bool cursors READ hasCursors WRITE setCursors);
 	Q_PROPERTY(bool measure READ hasMeasure WRITE setMeasure);
 	Q_PROPERTY(bool measure_all
