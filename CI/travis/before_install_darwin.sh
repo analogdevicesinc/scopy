@@ -13,7 +13,7 @@ brew_install_or_upgrade() {
 		brew ls --versions $1 # check if installed last-ly
 }
 
-PACKAGES="cmake fftw bison gettext autoconf automake libtool libzip glib libusb python3 brew-pip"
+PACKAGES="cmake fftw bison gettext autoconf automake libtool libzip glib libusb python3 python brew-pip"
 PACKAGES="$PACKAGES glibmm doxygen wget boost gnu-sed libmatio dylibbundler libxml2 pkg-config"
 
 for pak in $PACKAGES ; do
@@ -26,9 +26,13 @@ brew link --overwrite --force gettext
 
 source ./CI/travis/before_install_lib.sh
 
-# Get pip
-curl https://bootstrap.pypa.io/get-pip.py > get-pip.py
-sudo python get-pip.py
+# Get pip if not installed ; on Travis + OS X, Python is not well supported
+if ! command -v pip ; then
+	curl https://bootstrap.pypa.io/get-pip.py > get-pip.py
+	sudo -H python get-pip.py
+fi
+
+pip install --user cheetah
 
 make_build_git "libsigrok" "https://github.com/sigrokproject/libsigrok" "" "" "./autogen.sh"
 
