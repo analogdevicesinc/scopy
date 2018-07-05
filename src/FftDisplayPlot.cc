@@ -803,7 +803,7 @@ double FftDisplayPlot::markerFrequency(uint chIdx, uint mkIdx) const
 	return d_markers[chIdx][mkIdx].data->x;
 }
 
-double FftDisplayPlot::markerMagnutide(uint chIdx, uint mkIdx) const
+double FftDisplayPlot::markerMagnitude(uint chIdx, uint mkIdx) const
 {
 	if (chIdx >= d_markers.size()) {
 		qDebug() << "Invalid channel index!";

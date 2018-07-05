@@ -174,7 +174,7 @@ namespace adiscope {
 		void setMarkerEnabled(uint chIdx, uint mkIdx, bool en);
 
 		double markerFrequency(uint chIdx, uint mkIdx) const;
-		double markerMagnutide(uint chIdx, uint mkIdx) const;
+		double markerMagnitude(uint chIdx, uint mkIdx) const;
 
 		void setMarkerAtFreq(uint chIdx, uint mkIdx, double pos);
 
