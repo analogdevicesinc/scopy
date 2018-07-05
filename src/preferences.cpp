@@ -41,7 +41,9 @@ Preferences::Preferences(QWidget *parent) :
 	advanced_device_info(false),
 	user_notes_active(false),
 	external_script_enabled(false),
-	debugger_enabled(false)
+	manual_calib_script_enabled(false),
+	debugger_enabled(false),
+	manual_calib_enabled(false)
 {
 	ui->setupUi(this);
 
@@ -104,6 +106,10 @@ Preferences::Preferences(QWidget *parent) :
 		external_script_enabled = (!state ? false : true);
 		Q_EMIT notify();
 	});
+	connect(ui->manualCalibCheckBox, &QCheckBox::stateChanged, [=](int state) {
+		manual_calib_script_enabled = (!state ? false : true);
+		Q_EMIT notify();
+	});
 	QString preference_ini_file = getPreferenceIniFile();
 	QSettings settings(preference_ini_file, QSettings::IniFormat);
 
@@ -140,6 +146,7 @@ void Preferences::showEvent(QShowEvent *event)
 	ui->userNotesCheckBox->setChecked(user_notes_active);
 	ui->oscGraticuleCheckBox->setChecked(graticule_enabled);
 	ui->extScriptCheckBox->setChecked(external_script_enabled);
+	ui->manualCalibCheckBox->setChecked(manual_calib_script_enabled);
 
 	QWidget::showEvent(event);
 }
@@ -236,10 +243,27 @@ void Preferences::setOsc_labels_enabled(bool value)
 	osc_labels_enabled = value;
 }
 
+bool Preferences::getExternal_script_enabled() const
+{
+	return external_script_enabled;
+}
+
 void Preferences::setExternal_script_enabled(bool value)
 {
 	external_script_enabled = value;
 	ui->extScriptCheckBox->setChecked(external_script_enabled);
+	Q_EMIT notify();
+}
+
+bool Preferences::getManual_calib_script_enabled() const
+{
+	return manual_calib_script_enabled;
+}
+
+void Preferences::setManual_calib_script_enabled(bool value)
+{
+	manual_calib_script_enabled = value;
+	ui->manualCalibCheckBox->setChecked(manual_calib_script_enabled);
 	Q_EMIT notify();
 }
 
@@ -254,9 +278,15 @@ void Preferences::setDebugger_enabled(bool value)
 	setExternal_script_enabled(external_script_enabled);
 }
 
-bool Preferences::getExternal_script_enabled() const
+void Preferences::setManual_calib_enabled(bool value)
 {
-	return external_script_enabled;
+	manual_calib_enabled = value;
+	if (manual_calib_enabled) {
+		ui->manualCalibWidget->show();
+	} else {
+		ui->manualCalibWidget->hide();
+	}
+	setManual_calib_script_enabled(manual_calib_script_enabled);
 }
 
 bool Preferences::getNa_show_zero() const
@@ -375,4 +405,14 @@ bool Preferences_API::getExternalScript() const
 void Preferences_API::setExternalScript(const bool& enabled)
 {
 	preferencePanel->external_script_enabled = enabled;
+}
+
+bool Preferences_API::getManualCalibScript() const
+{
+	return preferencePanel->manual_calib_script_enabled;
+}
+
+void Preferences_API::setManualCalibScript(const bool &enabled)
+{
+	preferencePanel->manual_calib_script_enabled = enabled;
 }
