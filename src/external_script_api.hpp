@@ -33,6 +33,7 @@ class ExternalScript_API : public QObject
 
 public:
 	explicit ExternalScript_API(QObject *parent = 0);
+	~ExternalScript_API() {}
 	Q_INVOKABLE QString start(const QString& cmd);
 	Q_INVOKABLE void setWorkingDir(const QString& root);
 	Q_INVOKABLE QString getWorkingDir();
