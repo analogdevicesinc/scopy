@@ -322,6 +322,7 @@ public:
 	Q_INVOKABLE void save(const QString& file);
 	Q_INVOKABLE bool reset();
 	Q_INVOKABLE bool enableExtern(bool);
+	Q_INVOKABLE bool enableCalibScript(bool);
 
 private:
 	ToolLauncher *tl;

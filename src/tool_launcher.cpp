@@ -277,7 +277,10 @@ void ToolLauncher::readPreferences()
 		tool->enableDoubleClick(prefPanel->getDouble_click_to_detach());
 	}
 	allowExternalScript(prefPanel->getExternal_script_enabled());
-
+	if (manual_calibration) {
+		manual_calibration->allowManualCalibScript(manual_calibration_enabled,
+				prefPanel->getManual_calib_script_enabled());
+	}
 }
 
 void ToolLauncher::loadIndexPageFromContent(QString fileLocation)
@@ -1875,6 +1878,7 @@ bool ToolLauncher_API::manual_calibration_enabled() const
 void ToolLauncher_API::enable_manual_calibration(bool enabled)
 {
 	tl->manual_calibration_enabled = enabled;
+	tl->prefPanel->setManual_calib_enabled(enabled);
 }
 
 bool ToolLauncher_API::calibration_skipped()
@@ -1982,12 +1986,19 @@ void ToolLauncher_API::load(const QString& file)
 
 bool ToolLauncher_API::enableExtern(bool en)
 {
-	if (en) {
-		if (!tl->debugger_enabled) {
-			return false;
-		}
+	if (en && !tl->debugger_enabled) {
+		return false;
 	}
 	tl->prefPanel->setExternal_script_enabled(en);
+	return true;
+}
+
+bool ToolLauncher_API::enableCalibScript(bool en)
+{
+	if (en && !tl->manual_calibration_enabled) {
+		return false;
+	}
+	tl->prefPanel->setManual_calib_script_enabled(en);
 	return true;
 }
 

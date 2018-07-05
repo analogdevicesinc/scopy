@@ -77,7 +77,11 @@ public:
 	bool getExternal_script_enabled() const;
 	void setExternal_script_enabled(bool value);
 
+	bool getManual_calib_script_enabled() const;
+	void setManual_calib_script_enabled(bool value);
+
 	void setDebugger_enabled(bool value);
+	void setManual_calib_enabled(bool value);
 
 Q_SIGNALS:
 
@@ -103,6 +107,8 @@ private:
 	bool graticule_enabled;
 	bool external_script_enabled;
 	bool debugger_enabled;
+	bool manual_calib_script_enabled;
+	bool manual_calib_enabled;
 
 	Preferences_API *pref_api;
 	QString getPreferenceIniFile() const;
@@ -123,6 +129,7 @@ class Preferences_API : public ApiObject
 	Q_PROPERTY(bool user_notes_active READ getUserNotesActive WRITE setUserNotesActive)
 	Q_PROPERTY(bool graticule_enabled READ getGraticuleEnabled WRITE setGraticuleEnabled)
 	Q_PROPERTY(bool external_script_enabled READ getExternalScript WRITE setExternalScript)
+	Q_PROPERTY(bool manual_calib_script_enabled READ getManualCalibScript WRITE setManualCalibScript)
 
 public:
 
@@ -159,6 +166,9 @@ public:
 
 	bool getExternalScript() const;
 	void setExternalScript(const bool& enabled);
+
+	bool getManualCalibScript() const;
+	void setManualCalibScript(const bool& enabled);
 
 private:
 	Preferences *preferencePanel;
