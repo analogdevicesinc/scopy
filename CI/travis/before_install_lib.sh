@@ -5,6 +5,7 @@ NUM_JOBS=4
 WORKDIR="${PWD}/deps"
 mkdir -p "$WORKDIR"
 STAGINGDIR="${WORKDIR}/staging"
+QMAKE="$(command -v qmake)"
 
 __cmake() {
 	local args="$1"
@@ -29,8 +30,8 @@ __make() {
 
 __qmake() {
 	$patchfunc
-	qmake "$qtarget" $SILENCED
-	CFLAGS=-I${STAGINGDIR}/include LDFLAGS=-L${STAGINGDIR}/lib \
+	$QMAKE "$qtarget" $SILENCED
+	QMAKE=$QMAKE CFLAGS=-I${STAGINGDIR}/include LDFLAGS=-L${STAGINGDIR}/lib \
 		make -j${NUM_JOBS} $SILENCED
 	make install
 }

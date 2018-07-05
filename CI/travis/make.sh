@@ -1,8 +1,15 @@
 #!/bin/bash
+
+# if we have a Qt59 installation use it
+if [ -f /opt/qt59/bin/qt59-env.sh ] ; then
+	source /opt/qt59/bin/qt59-env.sh
+fi
+
 set -e
 
+source ./CI/travis/lib.sh
+
 NUM_JOBS=4
-STAGINGDIR="${PWD}/deps/staging"
 
 mkdir -p build
 
