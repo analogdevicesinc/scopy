@@ -20,6 +20,7 @@
 #include "manualcalibration.h"
 #include "ui_manualcalibration.h"
 #include "ui_calibratetemplate.h"
+#include "manual_calibration_api.hpp"
 
 #include <QDebug>
 #include <QFileDialog>
@@ -58,9 +59,10 @@ The value should be around -4.5V)");
 ManualCalibration::ManualCalibration(struct iio_context *ctx, Filter *filt,
 				     QPushButton *runButton, QJSEngine *engine,
 				     ToolLauncher *parent, Calibration *cal) :
-	Tool(ctx, runButton, nullptr, "Calibration", parent),
+	Tool(ctx, runButton, new ManualCalibration_API(this), "Calibration", parent),
 	ui(new Ui::ManualCalibration), filter(filt),
-	eng(engine), calib(cal)
+	eng(engine), calib(cal),
+	calibrationFilePath("")
 {
 	ui->setupUi(this);
 	calibListString << "Positive supply"
@@ -145,6 +147,12 @@ void ManualCalibration::on_calibList_itemClicked(QListWidgetItem *item)
 	ui->storyWidget->show();
 	ui->loadButton->setEnabled(false);
 	ui->saveButton->setEnabled(false);
+
+	// Clean up the current calibration story
+	stCalibrationStory.calibProcedure = -1;
+	stCalibrationStory.calibStep = -1;
+	stCalibrationStory.story = QStringList();
+	stCalibrationStory.storyName.clear();
 
 	switch (calibOption[temp]) {
 	case POSITIVE_OFFSET:
@@ -447,6 +455,18 @@ void ManualCalibration::setCalibration(Calibration *cal)
 	calib = cal;
 }
 
+void ManualCalibration::allowManualCalibScript(bool calib_en, bool calib_pref_en)
+{
+	if (calib_pref_en && calib_en) {
+		eng->globalObject().setProperty("manual_calib",
+						     eng->newQObject(api));
+	} else {
+		if (eng->globalObject().hasProperty("manual_calib")) {
+			eng->globalObject().deleteProperty("manual_calib");
+		}
+	}
+}
+
 void ManualCalibration::displayStartUpCalibrationValues(void)
 {
 	QStringList tableHeader;
@@ -525,9 +545,15 @@ void ManualCalibration::on_loadButton_clicked()
 
 void ManualCalibration::on_saveButton_clicked()
 {
-	QString fileName = QFileDialog::getOpenFileName(this, tr("Save File"),
-			   "/home",
-			   tr("ini (*.ini)"));
+	QString fileName;
+	if (calibrationFilePath == "") {
+		fileName = QFileDialog::getOpenFileName(this, tr("Save File"),
+								   "/home",
+								   tr("ini (*.ini)"));
+	} else {
+		fileName = calibrationFilePath;
+	}
+
 	QFile file(fileName);
 	QString temp_ad9963 = QString::number(calib->getIioDevTemp(QString("ad9963")));
 	QString temp_fpga = QString::number(calib->getIioDevTemp(QString("xadc")));
@@ -547,6 +573,10 @@ void ManualCalibration::on_saveButton_clicked()
 	}
 
 	file.close();
+
+	if (calibrationFilePath != "") {
+		calibrationFilePath = "";
+	}
 }
 
 void ManualCalibration::on_restartButton_clicked()
@@ -592,4 +622,9 @@ void ManualCalibration::on_autoButton_clicked()
 		calib->restoreHardwareFromCalibMode();
 	}
 	displayStartUpCalibrationValues();
+}
+
+void ManualCalibration::setCalibrationFilePath(QString path)
+{
+	calibrationFilePath = path;
 }
