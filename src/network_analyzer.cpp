@@ -797,6 +797,8 @@ struct iio_buffer * NetworkAnalyzer::generateSinWave(
 	auto src = analog::sig_source_f::make(rate, analog::GR_SIN_WAVE,
 			frequency, amplitude / 2.0, offset);
 
+	iio_device_attr_write_longlong(dev, "oversampling_ratio", 1);
+
 	// DAC_RAW = (-Vout * 2^11) / 5V
 	// Multiplying with 16 because the HDL considers the DAC data as 16 bit
 	// instead of 12 bit(data is shifted to the left).
