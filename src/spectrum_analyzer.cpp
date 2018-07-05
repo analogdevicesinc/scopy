@@ -1210,7 +1210,7 @@ void SpectrumAnalyzer::onMarkerToggled(int id, bool on)
 			return;
 		ui->markerTable->addMarker(id, crt_channel_id, QString("M%1").arg(id + 1),
 		                           fft_plot->markerFrequency(crt_channel_id, id),
-		                           fft_plot->markerMagnutide(crt_channel_id, id),
+					   fft_plot->markerMagnitude(crt_channel_id, id),
 		                           markerTypes[mkType]);
 	} else {
 		ui->markerTable->removeMarker(id, crt_channel_id);
@@ -1261,7 +1261,7 @@ void SpectrumAnalyzer::setCurrentMarkerLabelData(int chIdx, int mkIdx)
 	QString txtFreq = freq_formatter.format(
 	                          fft_plot->markerFrequency(chIdx, mkIdx), "Hz", 3);
 	QString txtMag = QString::number(
-	                         fft_plot->markerMagnutide(chIdx, mkIdx), 'f', 3) +
+				 fft_plot->markerMagnitude(chIdx, mkIdx), 'f', 3) +
 	                 QString(" " + ui->cmb_units->currentText());
 	QString txt = QString("Marker %1 -> ").arg(mkIdx + 1) +
 	              txtFreq + QString(" ") + txtMag;
@@ -1295,7 +1295,7 @@ void SpectrumAnalyzer::onPlotNewMarkerData()
 				int mkType = fft_plot->markerType(c, m);
 				ui->markerTable->updateMarker(m, c,
 				                              fft_plot->markerFrequency(c, m),
-				                              fft_plot->markerMagnutide(c, m),
+							      fft_plot->markerMagnitude(c, m),
 				                              markerTypes[mkType]);
 			}
 		}
@@ -1717,7 +1717,7 @@ void SpectrumMarker_API::setFreq(double pos)
 		if (m_type != 1) { //if type is not peak
 			sp->ui->markerTable->updateMarker(m_mkid, m_chid,
 			                                  sp->fft_plot->markerFrequency(m_chid, m_mkid),
-			                                  sp->fft_plot->markerMagnutide(m_chid, m_mkid),
+							  sp->fft_plot->markerMagnitude(m_chid, m_mkid),
 			                                  sp->markerTypes[m_type]);
 
 		}
