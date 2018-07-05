@@ -76,8 +76,12 @@ enum steps {
 	STEP4
 };
 
+class ManualCalibration_API;
 class ManualCalibration : public Tool
 {
+	friend class ManualCalibration_API;
+	friend class ToolLauncher_API;
+
 	Q_OBJECT
 
 public:
@@ -89,6 +93,7 @@ public:
 
 	void startCalibration();
 	void setCalibration(Calibration *cal);
+	void allowManualCalibScript(bool calib_en, bool calib_pref_en);
 
 private:
 	void setupPowerSupplyIio(void);
@@ -106,6 +111,7 @@ private:
 	void displayStartUpCalibrationValues(void);
 	void initParameters(void);
 	void updateParameters(void);
+	void setCalibrationFilePath(QString path);
 
 private Q_SLOTS:
 	void on_calibList_itemClicked(QListWidgetItem *item);
@@ -142,7 +148,7 @@ private:
 	QStringList calibListString;
 	QMap<QString, int> calibOption;
 
-
+	QString calibrationFilePath;
 
 };
 }
