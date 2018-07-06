@@ -1724,6 +1724,15 @@ void SpectrumMarker_API::setFreq(double pos)
 	}
 }
 
+double SpectrumMarker_API::magnitude()
+{
+	if (sp->fft_plot->markerEnabled(m_chid,m_mkid)) {
+		return sp->fft_plot->markerMagnitude(m_chid,m_mkid);
+	} else {
+		return 0;
+	}
+}
+
 bool SpectrumMarker_API::enabled()
 {
 	return sp->fft_plot->markerEnabled(m_chid,m_mkid);
