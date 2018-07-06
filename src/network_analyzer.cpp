@@ -790,7 +790,7 @@ struct iio_buffer * NetworkAnalyzer::generateSinWave(
 	struct iio_buffer *buf = iio_device_create_buffer(
 			dev, samples_count, true);
 	if (!buf)
-		throw std::runtime_error("Unable to create buffer");
+		return buf;
 
 	auto top_block = gr::make_top_block("Signal Generator");
 
