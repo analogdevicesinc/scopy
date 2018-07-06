@@ -175,6 +175,8 @@ dBgraph::dBgraph(QWidget *parent) : QwtPlot(parent),
 
 dBgraph::~dBgraph()
 {
+	markerIntersection1->detach();
+	markerIntersection2->detach();
 	canvas()->removeEventFilter(d_cursorReadouts);
 	canvas()->removeEventFilter(d_symbolCtrl);
 	delete formatter;
@@ -211,9 +213,10 @@ void dBgraph::plot(double x, double y)
 
 	curve.setRawSamples(xdata.data(), ydata.data(), xdata.size());
 
-	onCursor1Moved(d_vBar1->transform(d_vBar1->plotCoord()).x());
-	onCursor2Moved(d_vBar2->transform(d_vBar2->plotCoord()).x());
-
+	if (d_cursorsEnabled) {
+		onCursor1Moved(d_vBar1->transform(d_vBar1->plotCoord()).x());
+		onCursor2Moved(d_vBar2->transform(d_vBar2->plotCoord()).x());
+	}
 	replot();
 }
 
@@ -254,6 +257,8 @@ void dBgraph::reset()
 {
 	xdata.clear();
 	ydata.clear();
+	markerIntersection1->detach();
+	markerIntersection2->detach();
 }
 
 void dBgraph::setColor(const QColor& color)
@@ -424,6 +429,14 @@ void dBgraph::toggleCursors(bool en)
 
 		d_cursorReadouts->setTimeReadoutVisible(en);
 		d_cursorReadouts->setVoltageReadoutVisible(en);
+		if (en) {
+			onCursor1Moved(d_vBar1->transform(d_vBar1->plotCoord()).x());
+			onCursor2Moved(d_vBar2->transform(d_vBar2->plotCoord()).x());
+		} else {
+			markerIntersection1->detach();
+			markerIntersection2->detach();
+			replot();
+		}
 	}
 }
 
@@ -451,8 +464,8 @@ void dBgraph::onCursor1Moved(int value)
 	} else {
 		markerIntersection1->attach(this);
 		markerIntersection1->setValue(point.x(), d1);
-		replot();
 	}
+	replot();
 
 	d_cursorReadouts->setVoltageDeltaText(QString::number(d2-d1)+" "+
 	                                      draw_y->getUnitType());
@@ -477,8 +490,8 @@ void dBgraph::onCursor2Moved(int value)
 	} else {
 		markerIntersection2->attach(this);
 		markerIntersection2->setValue(point.x(), d2);
-		replot();
 	}
+	replot();
 
 	d_cursorReadouts->setVoltageDeltaText(QString::number(d2-d1)+" "+
 	                                      draw_y->getUnitType());
