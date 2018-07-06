@@ -12,6 +12,21 @@ sudo apt-get install -y build-essential g++ bison flex cmake libxml2-dev libglib
 	libmatio-dev libglib2.0-dev libzip-dev libfftw3-dev libusb-dev doxygen \
 	python-cheetah
 
+# Trusty has an old boost and a newer boost; 1.55 is the minimum for Scopy
+if [ "$(get_codename)" == "trusty" ] ; then
+	BOOST_VER=1.55
+fi
+
+BOOST_PACKAGES_BASE="libboost libboost-regex libboost-date-time
+	libboost-program-options libboost-test libboost-filesystem
+	libboost-system libboost-thread"
+
+for package in $BOOST_PACKAGES_BASE ; do
+	BOOST_PACKAGES="$BOOST_PACKAGES ${package}${BOOST_VER}-dev"
+done
+
+sudo apt-get install -y $BOOST_PACKAGES
+
 source ./CI/travis/before_install_lib.sh
 
 if ! is_new_ubuntu ; then
@@ -51,17 +66,13 @@ EOF
 }
 
 if ! is_new_ubuntu ; then
-	make_build_wget "boost_1_63_0" "https://netcologne.dl.sourceforge.net/project/boost/boost/1.63.0/boost_1_63_0.tar.gz" "./bootstrap.sh" "./b2"
-
 	make_build_git "libsigrok" "https://github.com/sigrokproject/libsigrok" "" "" "./autogen.sh"
 
 	make_build_wget "libsigrokdecode-0.4.1" "http://sigrok.org/download/source/libsigrokdecode/libsigrokdecode-0.4.1.tar.gz"
 
 	cmake_build_wget "volk-1.3" "http://libvolk.org/releases/volk-1.3.tar.gz"
 else
-	sudo apt-get install -y libboost-dev libboost-regex-dev libboost-date-time-dev \
-		libboost-program-options-dev libboost-test-dev libboost-filesystem-dev \
-		libboost-system-dev libboost-thread-dev \
+	sudo apt-get install -y \
 		libvolk1-dev libsigrok-dev libsigrokcxx-dev libsigrokdecode-dev
 fi
 
