@@ -111,8 +111,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	d_displayOneBuffer(true),
 	nb_ref_channels(0),
 	lastFunctionValid(false),
-	import_error(""),
-	restartFlowCounter(NO_FLOW_BUFFERS)
+	import_error("")
 {
 	ui->setupUi(this);
 	int triggers_panel = ui->stackedWidget->insertWidget(-1, &trigger_settings);
@@ -1870,7 +1869,7 @@ void Oscilloscope::runStopToggled(bool checked)
 	Q_EMIT activateExportButton();
 
 	if (checked) {
-		restartFlowCounter = NO_FLOW_BUFFERS;
+		periodicFlowRestart(true);
 		if (symmBufferMode->isEnhancedMemDepth()) {
 			onCmbMemoryDepthChanged(ch_ui->cmbMemoryDepth->currentText());
 		}
@@ -3539,6 +3538,25 @@ void Oscilloscope::requestAutoset()
 	}
 }
 
+void Oscilloscope::periodicFlowRestart(bool force)
+{
+	static uint64_t restartFlowCounter = 0;
+	const uint64_t NO_FLOW_BUFFERS = 1024;
+	if(force) {
+		restartFlowCounter = NO_FLOW_BUFFERS;
+	}
+
+	if(restartFlowCounter == 0) {
+		restartFlowCounter = NO_FLOW_BUFFERS;
+		QElapsedTimer t;
+		t.start();
+		iio->lock();
+		iio->unlock();
+		qDebug()<<"Restarted flow @ " << QTime::currentTime().toString("hh:mm:ss") <<"restart took " << t.elapsed() << "ms";
+	}
+	restartFlowCounter--;
+}
+
 void Oscilloscope::autosetNextStep()
 {
 	static int prevmaxindex=0;
@@ -3604,16 +3622,7 @@ void Oscilloscope::singleCaptureDone()
 		}
 	}
 
-	if(restartFlowCounter == 0) {
-		restartFlowCounter = NO_FLOW_BUFFERS;
-		QElapsedTimer t;
-		t.start();
-		iio->lock();
-		iio->unlock();
-		qDebug()<<"Restarted flow @ " << QTime::currentTime().toString("hh:mm:ss") <<"restart took " << t.elapsed() << "ms";
-	}
-	restartFlowCounter--;
-
+	periodicFlowRestart();
 	if(autosetRequested)
 	{
 		if(autosetFFTSink->data().size())
