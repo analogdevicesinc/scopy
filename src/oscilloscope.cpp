@@ -3526,6 +3526,55 @@ void Oscilloscope::setupAutosetFreqSweep()
 		iio->unlock();
 }
 
+bool Oscilloscope::autosetFindFrequency()
+{
+	if(autosetFFTSink->data().size())
+	{
+		toggle_blockchain_flow(false);
+		double max=-INFINITY;
+		size_t maxindex=1;
+		// try skipping the DC offset tones and last few tones that cause
+		// weird results
+
+		for(int j=autosetNrOfSkippedTones ;j<((autoset_fft_size/2)-5);j++) {
+			if(autosetFFTSink->data()[j] > max) {
+			    max = autosetFFTSink->data()[j];
+			    maxindex=j;
+		    }
+		}
+
+		double frequency = (maxindex) * (active_sample_rate/autoset_fft_size);
+		autosetFFTIndex = maxindex;
+		if(autosetMaxIndexAmpl < max && (autosetFFTIndex > autosetValidTone)) {
+			autosetFrequency = frequency;
+			autosetMaxIndexAmpl = max;
+			return true; // found valid frequency
+		}
+		return false;
+	}
+}
+
+void Oscilloscope::autosetFindPeaks()
+{
+	if(autosetFFTSink->data().size())
+	{
+		double maxVolts = -INFINITY;
+		double minVolts = INFINITY;
+
+		for(auto j=autosetSkippedTimeSamples;j<active_sample_count;j++) {
+			auto data = plot.Curve(autosetChannel)->data()->sample(j).y();
+			if(data > maxVolts)
+				maxVolts = data;
+			if(data < minVolts)
+				minVolts = data;
+		}
+		autosetMaxAmpl = maxVolts;
+		autosetMinAmpl = minVolts;
+	}
+}
+
+
+
 void Oscilloscope::requestAutoset()
 {
 	if(!autosetRequested && current_ch_widget != -1 && current_ch_widget < nb_channels){
@@ -3533,6 +3582,8 @@ void Oscilloscope::requestAutoset()
 		autosetChannel = current_ch_widget;
 		autosetSampleRateCnt = m2k_adc->availSamplRates().count();
 		autosetRequested = true;
+		autosetFFTIndex = 0;
+		autosetMaxIndexAmpl = 0;
 		setupAutosetFreqSweep();
 		toggle_blockchain_flow(true);
 	}
@@ -3562,7 +3613,7 @@ void Oscilloscope::autosetNextStep()
 	static int prevmaxindex=0;
 	// Only consider tone valid if it's index is higher than a preset value
 	// This ensures that a good enough resolution bandwidth is achieved
-	if(autosetSampleRateCnt > 0 && autosetFFTIndex < autosetValidTone ){
+	if(autosetSampleRateCnt > 1){
 		prevmaxindex = autosetFFTIndex;
 		setupAutosetFreqSweep();
 		toggle_blockchain_flow(true);
@@ -3625,39 +3676,10 @@ void Oscilloscope::singleCaptureDone()
 	periodicFlowRestart();
 	if(autosetRequested)
 	{
-		if(autosetFFTSink->data().size())
-		{
-			toggle_blockchain_flow(false);
-			double max=-INFINITY;
-			size_t maxindex=1;
-			// try skipping the DC offset tones and last few tones that cause
-			// weird results
-
-			for(int j=autosetNrOfSkippedTones ;j<((autoset_fft_size/2)-5);j++) {
-				if(autosetFFTSink->data()[j] > max) {
-				    max = autosetFFTSink->data()[j];
-				    maxindex=j;
-			    }
-			}
-			double maxVolts = -INFINITY;
-			double minVolts = INFINITY;
-
-			for(auto j=autosetSkippedTimeSamples;j<active_sample_count;j++) {
-				auto data = plot.Curve(autosetChannel)->data()->sample(j).y();
-				if(data > maxVolts)
-					maxVolts = data;
-				if(data < minVolts)
-					minVolts = data;
-			}
-
-			double frequency = (maxindex) * (active_sample_rate/autoset_fft_size);
-
-			autosetFFTIndex = maxindex;
-			autosetFrequency = frequency;
-			autosetMaxAmpl = maxVolts;
-			autosetMinAmpl = minVolts;
-			autosetNextStep();
-		}
+		bool found = autosetFindFrequency();
+		if(found)
+			autosetFindPeaks();
+		autosetNextStep();
 	}
 }
 

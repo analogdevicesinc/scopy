@@ -162,6 +162,8 @@ namespace adiscope {
 		void periodicFlowRestart(bool force=false);
 		void autosetNextStep();
 		void autosetFinalStep();
+		void autosetFindPeaks();
+		bool autosetFindFrequency();
 		void setupAutosetFreqSweep();
 		void singleCaptureDone();
 
@@ -229,6 +231,8 @@ namespace adiscope {
 		unsigned long last_set_sample_count;
 		int zoom_level;
 		bool plot_samples_sequentially, d_displayOneBuffer, d_shouldResetStreaming;
+
+		int autosetMaxIndexAmpl;
 		int autosetFFTIndex;
 		double autosetFrequency;
 		double autosetMaxAmpl;
@@ -239,7 +243,7 @@ namespace adiscope {
 		const int autosetSkippedTimeSamples = 4096;
 		const int autosetFFTSize = 8192;
 		const int autosetNrOfSkippedTones=50;
-		const int autosetValidTone = 250;
+		const int autosetValidTone = 150;
 
 		Ui::Oscilloscope *ui;
 		Ui::OscGeneralSettings *gsettings_ui;
