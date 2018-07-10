@@ -31,7 +31,7 @@ ExternalScript_API::ExternalScript_API(QObject *parent):
         QObject(parent),
         m_external_process(nullptr),
         m_working_dir(QCoreApplication::applicationDirPath()),
-        m_process_timeout(100)
+        m_process_timeout(0)
 {
 }
 
