@@ -68,9 +68,9 @@ class I2CPatternUI;
 namespace adiscope {
 
 
-#define ConstantPatternName  "Constant Pattern"
+#define ConstantPatternName  "Constant"
 #define ConstantPatternDescription "Samples a constant 0 or 1 on the active channels"
-#define NumberPatternName "Number Pattern"
+#define NumberPatternName "Number"
 #define NumberPatternDescription "Samples a constant number over the active channels"
 #define ClockPatternName "Clock"
 #define ClockPatternDescription "Clock pattern generator"
