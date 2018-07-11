@@ -31,6 +31,7 @@
 #include <QButtonGroup>
 #include <QDebug>
 #include <QFileDialog>
+#include <QCheckBox>
 
 /* Local includes */
 #include "spectrum_analyzer.hpp"
@@ -906,6 +907,26 @@ void SpectrumAnalyzer::onChannelEnabled(bool en)
 	}
 
 	fft_plot->replot();
+	updateRunButton(en);
+}
+
+void SpectrumAnalyzer::updateRunButton(bool ch_en)
+{
+	for (unsigned int i = 0; !ch_en && i < num_adc_channels; i++) {
+		QWidget *parent = ui->channelsList->itemAt(i)->widget();
+		QCheckBox *box = parent->findChild<QCheckBox *>("box");
+		ch_en = box->isChecked();
+	}
+	ui->run_button->setEnabled(ch_en);
+	runButton()->setEnabled(ch_en);
+	setDynamicProperty(runButton(), "disabled", !ch_en);
+	ui->btnSingle->setEnabled(ch_en);
+
+	if (!ch_en) {
+		ui->run_button->setChecked(false);
+		runButton()->setChecked(false);
+		ui->btnSingle->setChecked(false);
+	}
 }
 
 void SpectrumAnalyzer::onStartStopChanged()

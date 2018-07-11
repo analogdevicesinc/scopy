@@ -40,6 +40,7 @@ MenuOption::MenuOption(QString toolName, QString iconPath,
 
 	setAcceptDrops(true);
 	setDynamicProperty(this, "allowHover", true);
+	setDynamicProperty(ui->toolStopButton, "disabled", false);
 
 	if (usesCustomBtn){
 		QWidget *button = ui->horizontalLayout->itemAt(1)->widget();

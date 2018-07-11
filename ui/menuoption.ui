@@ -13,7 +13,7 @@
     <x>0</x>
     <y>0</y>
     <width>183</width>
-    <height>34</height>
+    <height>44</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -175,6 +175,10 @@ QPushButton:enabled {
 background-image: url(:/icons/ico-stop.svg);
 }
 
+QPushButton[disabled=true][enabled=false] {
+background-image: url(:/icons/ico-stop.svg);
+}
+
 QPushButton:checked {
 background-image: url(:/icons/ico-play-green.svg);
 }</string>
@@ -192,6 +196,9 @@ background-image: url(:/icons/ico-play-green.svg);
         <bool>true</bool>
        </property>
        <property name="flat">
+        <bool>false</bool>
+       </property>
+       <property name="disabled" stdset="0">
         <bool>false</bool>
        </property>
       </widget>

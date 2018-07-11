@@ -133,6 +133,7 @@ private Q_SLOTS:
 	void onRangeValueChanged(double);
 	void rightMenuFinished(bool opened);	
 	void on_btnExport_clicked();
+	void updateRunButton(bool);
 
 private:
 	void build_gnuradio_block_chain();

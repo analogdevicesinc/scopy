@@ -1821,6 +1821,7 @@ void adiscope::SignalGenerator::channelWidgetEnabled(bool en)
 
 	ui->run_button->setEnabled(enable_run);
 	run_button->setEnabled(enable_run);
+	setDynamicProperty(run_button, "disabled", !enable_run);
 }
 
 void adiscope::SignalGenerator::triggerRightMenuToggle(int chIdx, bool checked)

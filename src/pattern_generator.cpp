@@ -56,6 +56,7 @@
 
 #include "filter.hpp"
 #include "pattern_generator.hpp"
+#include "dynamicWidget.hpp"
 
 // Generated UI
 #include "ui_pattern_generator.h"
@@ -435,14 +436,16 @@ void PatternGenerator::checkEnabledChannels()
         if (enabled.size() > 0) {
                 ui->btnSingleRun->setEnabled(true);
                 ui->btnRunStop->setEnabled(true);
-                runButton()->show();
+                runButton()->setEnabled(true);
+                setDynamicProperty(runButton(), "disabled", false);
         } else {
                 if (ui->btnRunStop->isChecked()) {
                         ui->btnRunStop->setChecked(false);
                 }
                 ui->btnSingleRun->setEnabled(false);
                 ui->btnRunStop->setEnabled(false);
-                runButton()->hide();
+                runButton()->setEnabled(false);
+                setDynamicProperty(runButton(), "disabled", true);
         }
 }
 

@@ -2260,6 +2260,7 @@ void adiscope::Oscilloscope::updateRunButton(bool ch_enabled)
 
 	ui->pushButtonRunStop->setEnabled(ch_enabled);
 	run_button->setEnabled(ch_enabled);
+	setDynamicProperty(run_button, "disabled", !ch_enabled);
 	ui->pushButtonSingle->setEnabled(ch_enabled);
 
 	if (!ch_enabled) {
