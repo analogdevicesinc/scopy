@@ -233,10 +233,12 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 		{"ns", 1E-9},
 		{"μs", 1E-6},
 		{"ms", 1E-3},
-		{"s", 1E0}
+		{"s", 1E0},
+		{"min", 60E0},
+		{"h", 36E2}
 	}, "Position",
 	-timeBase->maxValue() * 5,
-	timeBase->maxValue() * 5,
+	36E2,
 	true,
 	false,
 	this);
@@ -1253,10 +1255,10 @@ void LogicAnalyzer::startStop(bool start)
 void LogicAnalyzer::setTriggerDelay(bool silent)
 {
 	if( !silent ) {
-		main_win->view_->set_offset(timePosition->value(), active_plot_timebase * 10, running);
 		if( running )
 			main_win->view_->viewport()->setTimeTriggerSample(
 				-active_triggerSampleCount);
+		main_win->view_->set_offset(timePosition->value(), active_plot_timebase * 10, running);
 	}
 }
 
