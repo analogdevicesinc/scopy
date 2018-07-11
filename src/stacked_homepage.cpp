@@ -188,7 +188,6 @@ void StackedHomepage::slideInWidget(QWidget *newWidget, StackedHomepage::s_direc
 	enum s_directions directionHint;
 	int current = currentIndex();
 	int next = indexOf(newWidget);
-	qDebug() << current << " " << next;
 	if (current == next) {
 		s_active = false;
 		return;
