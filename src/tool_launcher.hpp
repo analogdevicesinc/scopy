@@ -184,6 +184,8 @@ private:
 
 	QMap<QString, MenuOption*> toolMenu;
 	QList<DetachedWindow *> detachedWindows;
+	QList<DetachedWindowState *> detachedWindowsStates;
+	bool closeEventTriggered;
 	QVector<int> position;
 	QVector<Debugger*> debugInstances;
 	QVector<DetachedWindow *> debugWindows;
@@ -244,6 +246,7 @@ private:
 	QButtonGroup *devices_btn_group;
 
 	DeviceWidget* selectedDev;
+	void toolsCreated();
 };
 
 class ToolLauncher_API: public ApiObject
@@ -270,9 +273,13 @@ class ToolLauncher_API: public ApiObject
 	
 	Q_PROPERTY(bool manual_calibration READ manual_calibration_enabled WRITE enable_manual_calibration)
 
+	Q_PROPERTY(QList<QString> detachedWindows READ getDetachedWindows WRITE setDetachedWindows)
 public:
 	explicit ToolLauncher_API(ToolLauncher *tl) : ApiObject(), tl(tl) {}
 	~ToolLauncher_API() {}
+
+	QList<QString> getDetachedWindows() const;
+	void setDetachedWindows(const QList<QString> &detachedWindows);
 
 	QString getIndexFile() const;
 	void setIndexFile(const QString &indexFile);

@@ -49,6 +49,8 @@
 #include <QFileDialog>
 #include <QFile>
 #include <QDir>
+#include <QDesktopWidget>
+#include <QJsonDocument>
 
 #include <iio.h>
 
@@ -74,7 +76,8 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	indexFile(""), deviceInfo(""), pathToFile(""),
 	manual_calibration_enabled(false),
 	devices_btn_group(new QButtonGroup(this)),
-	selectedDev(nullptr)
+	selectedDev(nullptr),
+	closeEventTriggered(false)
 {
 	if (!isatty(STDIN_FILENO))
 		notifier.setEnabled(false);
@@ -721,6 +724,12 @@ ToolLauncher::~ToolLauncher()
 	delete infoWidget;
 
 	tl_api->ApiObject::save(*settings);
+
+	for (auto it = detachedWindowsStates.begin(); it != detachedWindowsStates.end(); ++it) {
+		delete *it;
+	}
+	detachedWindowsStates.clear();
+
 	delete settings;
 	delete tl_api;
 	delete ui;
@@ -1094,7 +1103,13 @@ void adiscope::ToolLauncher::disconnect()
 
 		ui->saveBtn->parentWidget()->setEnabled(false);
 
+		//??TODO
+		if (!closeEventTriggered) {
+			detachedWindowsStates.clear();
+		}
+
 		for (auto x : detachedWindows){
+			detachedWindowsStates.push_back(new DetachedWindowState(x));
 			x->close();
 		}
 
@@ -1400,6 +1415,34 @@ void adiscope::ToolLauncher::enableDacBasedTools()
 	Q_EMIT dacToolsCreated();
 	selectedDev->connectButton()->setText("Disconnect");
 	selectedDev->connectButton()->setEnabled(true);
+
+	toolsCreated();
+}
+
+void ToolLauncher::toolsCreated()
+{
+	int totalScreenWidth = QApplication::desktop()->geometry().width();
+	int totalScreenHeight = QApplication::desktop()->geometry().height();
+	for (auto &dws : detachedWindowsStates) {
+		if ((dws->getGeometry().x() + dws->getGeometry().width()) > totalScreenWidth ||
+				dws->getGeometry().y() > totalScreenHeight ) {
+			continue;
+		}
+
+		this->toolMenu[dws->getName()]->detach(toolMenu[dws->getName()]->getPosition());
+
+		for (auto &dw : detachedWindows) {
+			if (dw->getName() == dws->getName()) {
+				dw->setGeometry(dws->getGeometry());
+				if (dws->getMaximized()) {
+					dw->setWindowState(Qt::WindowMaximized);
+				} else if (dws->getMinimized()) {
+					dw->setWindowState(Qt::WindowMinimized);
+				}
+				break;
+			}
+		}
+	}
 }
 
 bool adiscope::ToolLauncher::switchContext(const QString& uri)
@@ -1635,9 +1678,8 @@ void ToolLauncher::toolDetached(bool detached)
 
 		setDynamicProperty(tool->runButton()->parentWidget(), "selected", false);
 
-		DetachedWindow *window = new DetachedWindow(this->windowIcon());
+		DetachedWindow *window = new DetachedWindow(this->windowIcon(), tool->getName());
 		window->setCentralWidget(tool);
-		window->setWindowTitle("Scopy - " + tool->getName());
 		window->resize(sizeHint());
 		window->show();
 		detachedWindows.push_back(window);
@@ -1659,7 +1701,11 @@ void ToolLauncher::toolDetached(bool detached)
 
 void ToolLauncher::closeEvent(QCloseEvent *event)
 {
+	closeEventTriggered = true;
+	detachedWindowsStates.clear();
+
 	for (auto x : detachedWindows){
+		detachedWindowsStates.push_back(new DetachedWindowState(x));
 		x->close();
 	}
 	detachedWindows.clear();
@@ -1822,6 +1868,53 @@ QList<QString> ToolLauncher_API::order()
 void ToolLauncher_API::setOrder(QList<QString> list)
 {
 	tl->setOrder(list);
+}
+
+QList<QString> ToolLauncher_API::getDetachedWindows() const
+{
+	QList<QString> list;
+
+	for (auto &x : tl->detachedWindowsStates) {
+		QJsonObject obj;
+		obj["name"] = x->getName();
+		obj["posX"] = QJsonValue(x->getGeometry().x());
+		obj["posY"] = QJsonValue(x->getGeometry().y());
+		obj["width"] = QJsonValue(x->getGeometry().width());
+		obj["height"] = QJsonValue(x->getGeometry().height());
+		obj["maximized"] = QJsonValue(x->getMaximized());
+		obj["minimized"] = QJsonValue(x->getMinimized());
+		QJsonDocument doc(QJsonValue(obj).toObject());
+		list.push_back(doc.toJson(QJsonDocument::Compact));
+	}
+
+	return list;
+}
+
+void ToolLauncher_API::setDetachedWindows(const QList<QString> &detachedWindows)
+{
+	for (auto &dw : detachedWindows) {
+		QJsonObject obj;
+		QJsonDocument doc = QJsonDocument::fromJson(dw.toUtf8());
+		if (!doc.isNull()) {
+			if (doc.isObject()) {
+				obj = doc.object();
+			} else {
+				qDebug() << "Document is not an object" << endl;
+			}
+		} else {
+			qDebug() << "Invalid JSON...\n";
+		}
+		DetachedWindowState *dws = new DetachedWindowState();
+		dws->setName(obj["name"].toString());
+		dws->setMaximized(obj["maximized"].toBool());
+		dws->setMinimized(obj["minimized"].toBool());
+		double x = obj["posX"].toDouble();
+		double y = obj["posY"].toDouble();
+		int width = obj["width"].toInt();
+		int height = obj["height"].toInt();
+		dws->setGeometry(QRect(x, y, width, height));
+		tl->detachedWindowsStates.push_back(dws);
+	}
 }
 
 QString ToolLauncher_API::getIndexFile() const
@@ -2059,14 +2152,13 @@ void ToolLauncher_API::save(const QString& file)
 
 void ToolLauncher::addDebugWindow()
 {
-	DetachedWindow *window = new DetachedWindow(this->windowIcon());
+	DetachedWindow *window = new DetachedWindow(this->windowIcon(), "Debugger");
 	Debugger *debug = new Debugger(ctx, filter,toolMenu["Debugger"]->getToolStopBtn(),
 			&js_engine, this);
 	QObject::connect(debug, &Debugger::newDebuggerInstance, this,
 			 &ToolLauncher::addDebugWindow);
 
 	window->setCentralWidget(debug);
-	window->setWindowTitle("Scopy - Debugger");
 	window->resize(sizeHint());
 	window->show();
 	debugWindows.append(window);
