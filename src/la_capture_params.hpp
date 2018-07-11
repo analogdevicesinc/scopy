@@ -64,7 +64,7 @@ private:
 	double m_sampleRate;
 	double m_triggPosSR;
 	unsigned long m_visibleBufferSize;
-	unsigned long m_triggerBufferSize;
+	long long m_triggerBufferSize;
 };
 
 #endif // LA_CAPTURE_PARAMS_H
