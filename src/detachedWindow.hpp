@@ -35,17 +35,49 @@ Q_SIGNALS:
 	void closed();
 
 public:
-	explicit DetachedWindow(QIcon icon, QWidget *parent = Q_NULLPTR);
+	explicit DetachedWindow(QIcon icon, QString name, QWidget *parent = Q_NULLPTR);
 	~DetachedWindow();
 
 	void setCentralWidget(QWidget *widget);
 	void showWindow();
 
+	QString getName() const;
+	void setName(const QString &value);
+
 private:
 	void closeEvent(QCloseEvent *event);
 	void hideEvent(QHideEvent *event);
 	Qt::WindowState state;
+	QString name;
 };
+
+class DetachedWindowState {
+public:
+
+	DetachedWindowState() {}
+	~DetachedWindowState() {}
+
+	DetachedWindowState(DetachedWindow *detachedWindow);
+
+	QString getName() const;
+	void setName(const QString &value);
+
+	QRect getGeometry() const;
+	void setGeometry(const QRect &value);
+
+	bool getMaximized() const;
+	void setMaximized(bool value);
+
+	bool getMinimized() const;
+	void setMinimized(bool value);
+
+private:
+	QString name;
+	QRect geometry;
+	bool maximized;
+	bool minimized;
+};
+
 }
 
 #endif /* SCOPY_DETACHED_WINDOW_HPP */
