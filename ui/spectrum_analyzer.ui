@@ -131,6 +131,9 @@ QComboBox:disabled
         </item>
         <item>
          <widget class="QPushButton" name="btnPrint">
+          <property name="layoutDirection">
+           <enum>Qt::RightToLeft</enum>
+          </property>
           <property name="styleSheet">
            <string notr="true">
 QPushButton {
@@ -139,8 +142,8 @@ QPushButton {
 
   text-align: left;
   font-weight: bold;
-  padding-left: 20px;
-  padding-right: 20px;
+  padding-left: 15px;
+  padding-right: 15px;
   qproperty-text: &quot;Print&quot;;
 
   border-radius: 4px;
@@ -161,6 +164,16 @@ QPushButton:hover {
           </property>
           <property name="text">
            <string>Print</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../resources/resources.qrc">
+            <normaloff>:/icons/ic printer.svg</normaloff>:/icons/ic printer.svg</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>10</width>
+            <height>10</height>
+           </size>
           </property>
          </widget>
         </item>
@@ -2038,15 +2051,15 @@ QLabel {
  </widget>
  <customwidgets>
   <customwidget>
-   <class>adiscope::MenuAnim</class>
-   <extends>QWidget</extends>
-   <header>menu_anim.hpp</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>adiscope::DetachDragZone</class>
    <extends>QWidget</extends>
    <header>detachdragzone.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::MenuAnim</class>
+   <extends>QWidget</extends>
+   <header>menu_anim.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
