@@ -436,7 +436,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	api->load(*settings);
 	api->js_register(engine);
 
-	ui->btnPrint->hide();
+	ui->btnPrint->setFixedWidth(40);
 	connect(ui->btnPrint, &QPushButton::clicked, [=]() {
 		QImage img (ui->plotWidget->width(), ui->plotWidget->height(), QImage::Format_ARGB32);
 		QPainter painter(&img);
@@ -1434,11 +1434,11 @@ std::vector<std::string> LogicAnalyzer::get_iio_trigger_options()
 void LogicAnalyzer::toggleLeftMenu(bool val)
 {
 	if (val) {
-		ui->btnPrint->show();
+		ui->btnPrint->setFixedWidth(110);
 		ui->btnGroupChannels->hide();
 		chm_ui->collapse(true);
 	} else {
-		ui->btnPrint->hide();
+		ui->btnPrint->setFixedWidth(40);
 		ui->btnGroupChannels->show();
 		chm_ui->collapse(false);
 	}
