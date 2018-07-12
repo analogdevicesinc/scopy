@@ -85,7 +85,7 @@ background-color: rgb(73, 99, 255);
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_16">
         <property name="spacing">
-         <number>40</number>
+         <number>30</number>
         </property>
         <property name="leftMargin">
          <number>0</number>
@@ -110,13 +110,13 @@ background-color: rgb(73, 99, 255);
           <property name="minimumSize">
            <size>
             <width>0</width>
-            <height>30</height>
+            <height>40</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
             <width>240</width>
-            <height>30</height>
+            <height>40</height>
            </size>
           </property>
           <property name="styleSheet">
@@ -159,13 +159,13 @@ QPushButton:hover
           <property name="minimumSize">
            <size>
             <width>0</width>
-            <height>30</height>
+            <height>40</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
             <width>240</width>
-            <height>30</height>
+            <height>40</height>
            </size>
           </property>
           <property name="styleSheet">
@@ -210,7 +210,7 @@ QPushButton:hover
           <property name="maximumSize">
            <size>
             <width>40</width>
-            <height>30</height>
+            <height>40</height>
            </size>
           </property>
           <property name="styleSheet">
@@ -251,6 +251,9 @@ border-image: url(:/icons/time_trigger_left.svg);
         </item>
         <item>
          <widget class="QPushButton" name="btnPrint">
+          <property name="layoutDirection">
+           <enum>Qt::RightToLeft</enum>
+          </property>
           <property name="styleSheet">
            <string notr="true">
 QPushButton {
@@ -259,9 +262,8 @@ QPushButton {
 
   text-align: left;
   font-weight: bold;
-  padding-left: 20px;
-  padding-right: 20px;
-  qproperty-text: &quot;Print&quot;;
+  padding-left: 15px;
+  padding-right: 15px;
 
   border-radius: 4px;
 
@@ -281,6 +283,16 @@ QPushButton:hover {
           </property>
           <property name="text">
            <string>Print</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../resources/resources.qrc">
+            <normaloff>:/icons/ic printer.svg</normaloff>:/icons/ic printer.svg</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>10</width>
+            <height>10</height>
+           </size>
           </property>
          </widget>
         </item>
@@ -1731,7 +1743,7 @@ color: #FFFFFF;</string>
                     <rect>
                      <x>0</x>
                      <y>0</y>
-                     <width>92</width>
+                     <width>100</width>
                      <height>30</height>
                     </rect>
                    </property>
@@ -1970,15 +1982,15 @@ QPushButton:checked { border-image: url(:/icons/setup_btn_checked.svg); }
  </widget>
  <customwidgets>
   <customwidget>
-   <class>adiscope::MenuAnim</class>
-   <extends>QWidget</extends>
-   <header>menu_anim.hpp</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>adiscope::DetachDragZone</class>
    <extends>QWidget</extends>
    <header>detachdragzone.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::MenuAnim</class>
+   <extends>QWidget</extends>
+   <header>menu_anim.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
