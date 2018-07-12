@@ -78,6 +78,18 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 r
       </property>
       <item>
        <widget class="QPushButton" name="btnHideInactive">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>40</height>
+         </size>
+        </property>
         <property name="styleSheet">
          <string notr="true">QPushButton
 {
@@ -111,6 +123,18 @@ QPushButton:hover
       </item>
       <item>
        <widget class="QPushButton" name="btnGroupWithSelected">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>40</height>
+         </size>
+        </property>
         <property name="styleSheet">
          <string notr="true">QPushButton{
   width: 175px;
@@ -337,7 +361,6 @@ QPushButton:hover
         </property>
         <property name="font">
          <font>
-          
           <weight>75</weight>
           <bold>true</bold>
          </font>
@@ -372,7 +395,7 @@ background-color: grey;
          <string>Run</string>
         </property>
         <property name="icon">
-         <iconset>
+         <iconset resource="../resources/resources.qrc">
           <normaloff>:/icons/ico-play.svg</normaloff>
           <normalon>:/icons/ico-stop.svg</normalon>:/icons/ico-play.svg</iconset>
         </property>
@@ -403,7 +426,6 @@ background-color: grey;
         </property>
         <property name="font">
          <font>
-          
           <weight>75</weight>
           <bold>true</bold>
          </font>
@@ -438,7 +460,7 @@ background-color: grey;
          <string>Single</string>
         </property>
         <property name="icon">
-         <iconset>
+         <iconset resource="../resources/resources.qrc">
           <normaloff>:/icons/ico-oneshot.svg</normaloff>
           <normalon>:/icons/ico-stop.svg</normalon>:/icons/ico-oneshot.svg</iconset>
         </property>
@@ -838,18 +860,20 @@ background-color: qlineargradient(spread:pad, x1:0.9, y1:0, x2:0, y2:0, stop:0 r
  </widget>
  <customwidgets>
   <customwidget>
-   <class>adiscope::MenuAnim</class>
-   <extends>QWidget</extends>
-   <header>menu_anim.hpp</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>adiscope::DetachDragZone</class>
    <extends>QWidget</extends>
    <header>detachdragzone.h</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>adiscope::MenuAnim</class>
+   <extends>QWidget</extends>
+   <header>menu_anim.hpp</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../resources/resources.qrc"/>
+ </resources>
  <connections/>
 </ui>
