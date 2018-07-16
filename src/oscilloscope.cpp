@@ -17,6 +17,9 @@
  * Boston, MA 02110-1301, USA.
  */
 
+/* Boost 1.55 requires this explicitly */
+#include <boost/make_shared.hpp>
+
 /* GNU Radio includes */
 #include <gnuradio/blocks/float_to_complex.h>
 #include <gnuradio/iio/math.h>
