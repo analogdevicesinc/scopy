@@ -817,6 +817,7 @@ Oscilloscope::~Oscilloscope()
 
 
 	ui->pushButtonRunStop->setChecked(false);
+	setDynamicProperty(runButton(), "disabled", false);
 
 	bool started = iio->started();
 	if (started)

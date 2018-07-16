@@ -580,6 +580,7 @@ SignalGenerator::~SignalGenerator()
 {
 	disconnect(prefPanel, &Preferences::notify, this, &SignalGenerator::readPreferences);
 	ui->run_button->setChecked(false);
+	setDynamicProperty(runButton(), "disabled", false);
 	if (saveOnExit) {
 		api->save(*settings);
 	}

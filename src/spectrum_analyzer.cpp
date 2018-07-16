@@ -407,6 +407,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 SpectrumAnalyzer::~SpectrumAnalyzer()
 {
 	ui->run_button->setChecked(false);
+	setDynamicProperty(runButton(), "disabled", false);
 
 	if (saveOnExit) {
 		api->save(*settings);

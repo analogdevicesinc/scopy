@@ -498,6 +498,7 @@ LogicAnalyzer::~LogicAnalyzer()
 
 	if(running)
 		startStop(false);
+	setDynamicProperty(runButton(), "disabled", false);
 	logic_analyzer_ptr.reset();
 	context.reset();
 	timer->stop();

@@ -295,6 +295,7 @@ PatternGenerator::~PatternGenerator()
 	if (!offline_mode) {
 		stopPatternGeneration();
 	}
+	setDynamicProperty(runButton(), "disabled", false);
 
 	for (auto var : patterns) {
 		delete var;
