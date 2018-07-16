@@ -8,13 +8,16 @@ if ! is_new_ubuntu ; then
 fi
 
 sudo apt-get -qq update
-sudo apt-get install -y build-essential g++ bison flex cmake libxml2-dev libglibmm-2.4-dev \
+sudo apt-get install -y build-essential g++ bison flex libxml2-dev libglibmm-2.4-dev \
 	libmatio-dev libglib2.0-dev libzip-dev libfftw3-dev libusb-dev doxygen \
 	python-cheetah
 
 # Trusty has an old boost and a newer boost; 1.55 is the minimum for Scopy
 if [ "$(get_codename)" == "trusty" ] ; then
+	sudo apt-get install -y cmake3
 	BOOST_VER=1.55
+else
+	sudo apt-get install -y cmake
 fi
 
 BOOST_PACKAGES_BASE="libboost libboost-regex libboost-date-time
