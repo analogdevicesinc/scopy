@@ -145,3 +145,11 @@ void MarkerTable::updateMarker(int mkIdx, int chIdx, double frequency,
 	model->item(row, COL_MAGN)->setData(magnitude, Qt::DisplayRole);
 	model->item(row, COL_TYPE)->setData(type, Qt::DisplayRole);
 }
+
+bool MarkerTable::isMarker(int mkIdx, int chIdx)
+{
+	if (rowOfMarker(mkIdx, chIdx) > 0) {
+		return true;
+	}
+	return false;
+}

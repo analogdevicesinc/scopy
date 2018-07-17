@@ -24,6 +24,7 @@ public:
 	void removeMarker(int mkIdx, int chIdx);
 	void updateMarker(int mkIdx, int chIdx, double frequency,
 		double magnitude, const QString& type);
+	bool isMarker(int mkIdx, int chIdx);
 
 private:
 	enum Columns {

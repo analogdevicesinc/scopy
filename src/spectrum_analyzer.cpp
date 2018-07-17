@@ -1209,10 +1209,19 @@ void SpectrumAnalyzer::onMarkerToggled(int id, bool on)
 		int mkType = fft_plot->markerType(crt_channel_id, id);
 		if(mkType < 0)
 			return;
-		ui->markerTable->addMarker(id, crt_channel_id, QString("M%1").arg(id + 1),
-		                           fft_plot->markerFrequency(crt_channel_id, id),
-					   fft_plot->markerMagnitude(crt_channel_id, id),
-		                           markerTypes[mkType]);
+
+		bool mkExists = ui->markerTable->isMarker(id, crt_channel_id);
+		if (!mkExists) {
+			ui->markerTable->addMarker(id, crt_channel_id, QString("M%1").arg(id + 1),
+						   fft_plot->markerFrequency(crt_channel_id, id),
+						   fft_plot->markerMagnitude(crt_channel_id, id),
+						   markerTypes[mkType]);
+		} else {
+			ui->markerTable->updateMarker(id, crt_channel_id,
+						      fft_plot->markerFrequency(crt_channel_id, id),
+						      fft_plot->markerMagnitude(crt_channel_id, id),
+						      markerTypes[mkType]);
+		}
 	} else {
 		ui->markerTable->removeMarker(id, crt_channel_id);
 	}
@@ -1741,18 +1750,12 @@ bool SpectrumMarker_API::enabled()
 
 void SpectrumMarker_API::setEnabled(bool en)
 {
+	sp->channels[m_chid]->widget()->nameButton()->setChecked(true);
+	sp->channels[m_chid]->widget()->selected(true);
 	sp->fft_plot->setMarkerEnabled(m_chid,m_mkid,en);
+	sp->marker_selector->setButtonChecked(m_mkid, en);
 	sp->updateWidgetsRelatedToMarker(m_mkid);
 	sp->fft_plot->updateMarkerUi(m_chid, m_mkid);
-
-	if (en) {
-		sp->ui->markerTable->addMarker(m_mkid,m_chid, QString("M%1").arg(m_mkid + 1),
-		                               0,
-		                               0,
-		                               sp->markerTypes[0]);
-	}
-
-
 }
 
 void SpectrumAnalyzer_API::show()
