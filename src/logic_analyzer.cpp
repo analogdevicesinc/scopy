@@ -1254,11 +1254,16 @@ void LogicAnalyzer::startStop(bool start)
 
 void LogicAnalyzer::setTriggerDelay(bool silent)
 {
+	double val = timePosition->value();
 	if( !silent ) {
 		if( running )
 			main_win->view_->viewport()->setTimeTriggerSample(
 				-active_triggerSampleCount);
-		main_win->view_->set_offset(timePosition->value(), active_plot_timebase * 10, running);
+		if (active_triggerSampleCount > 0) {
+			val = active_triggerSampleCount / active_sampleRate +
+					active_plot_timebase * 5;
+		}
+		main_win->view_->set_offset(val, active_plot_timebase * 10, running);
 	}
 }
 

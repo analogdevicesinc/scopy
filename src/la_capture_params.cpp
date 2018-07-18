@@ -140,8 +140,8 @@ void LogicAnalyzerSymmetricBufferMode::configParamsOnTimeBaseChanged()
 			triggOffset;
 
 		if (bufferSize > m_entireBufferMaxSize) {
-			trigBuffSize = triggPosInBuffer;
-			bufferSize = getVisibleBufferSize(sampleRate);
+			trigBuffSize = -(bufferSize - m_entireBufferMaxSize);
+			bufferSize = m_entireBufferMaxSize;
 		} else {
 			bufferSize = m_entireBufferMaxSize;
 			triggPosInBuffer = -m_entireBufferMaxSize +
@@ -183,8 +183,8 @@ void LogicAnalyzerSymmetricBufferMode::configParamsOnTriggPosChanged()
 		m_triggerBufferSize = 0;
 
 		if (bufferSize > m_entireBufferMaxSize) {
-			m_triggerBufferSize = triggPosInBuffer;
-			bufferSize = (m_timeBase * m_timeDivsCount) * m_sampleRate;
+			m_triggerBufferSize = -(bufferSize - m_entireBufferMaxSize);
+			bufferSize = m_entireBufferMaxSize;
 		}
 		m_visibleBufferSize = bufferSize;
 		return;
