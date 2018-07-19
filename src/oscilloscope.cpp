@@ -122,7 +122,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		symmBufferMode = make_shared<SymmetricBufferMode>();
 		symmBufferMode->setSampleRates(
 			m2k_adc->availSamplRates().toVector().toStdVector());
-		symmBufferMode->setEntireBufferMaxSize(500000); // max 0.5 mega-samples
+		symmBufferMode->setEntireBufferMaxSize(64000);
 		symmBufferMode->setTriggerBufferMaxSize(8192); // 8192 is what hardware supports
 		symmBufferMode->setTimeDivisionCount(plot.xAxisNumDiv());
 	}
