@@ -125,6 +125,7 @@ namespace adiscope {
 		void repositionCursors();
 
 		void setGraticuleEnabled(bool enabled);
+		void setGatingEnabled(bool enabled);
 
 	Q_SIGNALS:
 		void timeTriggerValueChanged(double);
@@ -163,6 +164,7 @@ namespace adiscope {
 		void updateHandleAreaPadding(bool);
 		double getHorizontalCursorIntersection(double time);
 		void displayIntersection();
+		void updateGateMargins();
 
 	private Q_SLOTS:
 		void onChannelAdded(int);
@@ -178,6 +180,12 @@ namespace adiscope {
 		void onTimeCursor2Moved(double);
 		void onVoltageCursor1Moved(double);
 		void onVoltageCursor2Moved(double);
+
+		void onGateBar1PixelPosChanged(int);
+		void onGateBar2PixelPosChanged(int);
+
+		void onGateBar1Moved(double);
+		void onGateBar2Moved(double);
 
 		void onTimeTriggerHandlePosChanged(int);
 		void onTimeTriggerHandleGrabbed(bool);
@@ -218,10 +226,16 @@ namespace adiscope {
 		PlotLineHandleH *d_hCursorHandle1;
 		PlotLineHandleH *d_hCursorHandle2;
 
+		PlotLineHandleH *d_hGatingHandle1;
+		PlotLineHandleH *d_hGatingHandle2;
+
 		VertBar *d_vBar1;
 		VertBar *d_vBar2;
 		HorizBar *d_hBar1;
 		HorizBar *d_hBar2;
+
+		VertBar *d_gateBar1;
+		VertBar *d_gateBar2;
 
 		VertBar *d_timeTriggerBar;
 		HorizBar *d_levelTriggerABar;
@@ -229,6 +243,8 @@ namespace adiscope {
 		FreePlotLineHandleH *d_timeTriggerHandle;
 		FreePlotLineHandleV *d_levelTriggerAHandle;
 		FreePlotLineHandleV *d_levelTriggerBHandle;
+
+
 
 		CursorReadouts *d_cursorReadouts;
 		MetricPrefixFormatter d_cursorMetricFormatter;
@@ -261,6 +277,10 @@ namespace adiscope {
 		int pixelPosHandleHoriz2;
 		int pixelPosHandleVert1;
 		int pixelPosHandleVert2;
+
+		QwtPlotShapeItem *leftGate, *rightGate;
+		QRectF leftGateRect, rightGateRect;
+		bool d_gatingEnabled;
 	};
 }
 

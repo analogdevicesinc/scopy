@@ -93,6 +93,8 @@ Q_SIGNALS:
 	void statisticsEnabled(bool en);
 	void statisticsReset();
 
+	void gatingEnabled(bool en);
+
 public Q_SLOTS:
 	void onChannelAdded(int);
 	void onChannelRemoved(int);
@@ -107,6 +109,7 @@ private Q_SLOTS:
 	void on_button_StatisticsEn_toggled(bool checked);
 	void on_button_StatisticsReset_pressed();
 	void on_button_statsDeleteAll_toggled(bool checked);
+	void on_button_GatingEnable_toggled(bool checked);
 
 private:
 	void deleteAllMeasurements();

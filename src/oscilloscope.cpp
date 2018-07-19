@@ -125,7 +125,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	horiz_offset(0),
 	reset_horiz_offset(true),
 	wheelEventGuard(nullptr),
-	miniHistogram(true)
+	miniHistogram(true),
+	gatingEnabled(false)
 {
 	ui->setupUi(this);
 	int triggers_panel = ui->stackedWidget->insertWidget(-1, &trigger_settings);
@@ -2349,6 +2350,8 @@ void adiscope::Oscilloscope::on_boxMeasure_toggled(bool on)
 	// Set the visibility of the cursor readouts owned by the plot
 	if (ui->boxCursors->isChecked())
 		plot.setCursorReadoutsVisible(!on);
+	plot.setGatingEnabled(on && gatingEnabled);
+
 }
 
 void Oscilloscope::onTriggerSourceChanged(int chnIdx)
@@ -3428,6 +3431,8 @@ void Oscilloscope::measure_settings_init()
 	connect(measure_settings, SIGNAL(statisticsReset()),
 		SLOT(onStatisticsReset()));
 
+	connect(measure_settings, SIGNAL(gatingEnabled(bool)),SLOT(onGatingEnabled(bool)));
+
 	connect(&plot, SIGNAL(channelAdded(int)),
 		measure_settings, SLOT(onChannelAdded(int)));
 
@@ -3752,6 +3757,11 @@ void Oscilloscope::onStatisticsReset()
 	statisticsUpdateGui();
 }
 
+void Oscilloscope::onGatingEnabled(bool on){
+	gatingEnabled = on;
+	buffer_previewer->setGatingEnabled(on);
+	plot.setGatingEnabled(on);
+}
 
 void Oscilloscope::setupAutosetFreqSweep()
 {	bool started = iio->started();

@@ -487,6 +487,10 @@ void MeasureSettings::on_button_statsDeleteAll_toggled(bool checked)
 	}
 }
 
+void MeasureSettings::on_button_GatingEnable_toggled(bool checked){
+	Q_EMIT gatingEnabled(checked);
+}
+
 void MeasureSettings::disableDisplayAll()
 {
 	if (m_ui->button_measDisplayAll->isChecked()){
