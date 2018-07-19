@@ -285,15 +285,32 @@ CapturePlot::CapturePlot(QWidget *parent,
 				QPixmap(":/icons/h_cursor_handle.svg"),
 				d_bottomHandlesArea);
 
+	d_hGatingHandle1 = new PlotLineHandleH(
+				QPixmap(":/icons/h_cursor_handle.svg"),
+				d_bottomHandlesArea);
+
+	d_hGatingHandle2 = new PlotLineHandleH(
+				QPixmap(":/icons/h_cursor_handle.svg"),
+				d_bottomHandlesArea);
+
 	d_vBar1 = new VertBar(this, true);
 	d_vBar2 = new VertBar(this, true);
 	d_hBar1 = new HorizBar(this, true);
 	d_hBar2 = new HorizBar(this, true);
 
+	d_gateBar1 = new VertBar(this,true);
+	d_gateBar2 = new VertBar(this,true);
+
+	d_gateBar1->setVisible(false);
+	d_gateBar2->setVisible(false);
+
 	d_symbolCtrl->attachSymbol(d_vBar1);
 	d_symbolCtrl->attachSymbol(d_vBar2);
 	d_symbolCtrl->attachSymbol(d_hBar1);
 	d_symbolCtrl->attachSymbol(d_hBar2);
+
+	d_symbolCtrl->attachSymbol(d_gateBar1);
+	d_symbolCtrl->attachSymbol(d_gateBar2);
 
 	QPen cursorsLinePen = QPen(QColor(155, 155, 155), 1, Qt::DashLine);
 	d_hBar1->setPen(cursorsLinePen);
@@ -305,6 +322,15 @@ CapturePlot::CapturePlot(QWidget *parent,
 	d_vCursorHandle2->setPen(cursorsLinePen);
 	d_hCursorHandle1->setPen(cursorsLinePen);
 	d_hCursorHandle2->setPen(cursorsLinePen);
+
+	QPen gatePen = QPen(QColor(255,255,255),1,Qt::SolidLine);
+	d_gateBar1->setPen(gatePen);
+	d_gateBar2->setPen(gatePen);
+
+	d_gateBar1->setVisible(false);
+	d_gateBar2->setVisible(false);
+	d_hGatingHandle1->hide();
+	d_hGatingHandle2->hide();
 
 	d_vCursorHandle1->hide();
 	d_vCursorHandle2->hide();
@@ -381,10 +407,33 @@ CapturePlot::CapturePlot(QWidget *parent,
 		d_vBar2->setPixelPosition(value);
 	});
 
+	connect(d_hGatingHandle1, &PlotLineHandleH::positionChanged,[=](int value){
+		if(d_hGatingHandle1->position() <= d_hGatingHandle2->position()){
+			d_gateBar1->setPixelPosition(value);
+		}
+		else{
+			d_gateBar1->setPixelPosition(d_hGatingHandle2->position());
+			d_hGatingHandle1->setPosition(d_hGatingHandle2->position());
+		}
+	});
+
+	connect(d_hGatingHandle2, &PlotLineHandleH::positionChanged,[=](int value){
+		if(d_hGatingHandle2->position() >= d_hGatingHandle1->position()){
+			d_gateBar2->setPixelPosition(value);
+		}
+		else{
+			d_gateBar2->setPixelPosition(d_hGatingHandle1->position());
+			d_hGatingHandle2->setPosition(d_hGatingHandle1->position());
+		}
+	});
+
 	d_hBar1->setPosition(0 + voltsPerDiv);
 	d_hBar2->setPosition(0 - voltsPerDiv);
 	d_vBar1->setPosition(0 + secPerDiv);
 	d_vBar2->setPosition(0 - secPerDiv);
+
+	d_gateBar1->setPosition(0 - 4 * secPerDiv);
+	d_gateBar2->setPosition(0 + 4 * secPerDiv);
 
 	/* When bar position changes due to plot resizes update the handle */
 	connect(d_hBar1, SIGNAL(pixelPositionChanged(int)),
@@ -413,6 +462,16 @@ CapturePlot::CapturePlot(QWidget *parent,
 					QPointF(d_levelTriggerABar->plotCoord().x(), 0));
 	});
 
+	connect(d_gateBar1,SIGNAL(pixelPositionChanged(int)),
+			SLOT(onGateBar1PixelPosChanged(int)));
+	connect(d_gateBar2,SIGNAL(pixelPositionChanged(int)),
+			SLOT(onGateBar2PixelPosChanged(int)));
+
+	connect(d_gateBar1,SIGNAL(positionChanged(double)),
+			SLOT(onGateBar1Moved(double)));
+	connect(d_gateBar2,SIGNAL(positionChanged(double)),
+			SLOT(onGateBar2Moved(double)));
+
 	/* Apply measurements for every new batch of data */
 	connect(this, SIGNAL(newData()),
 		SLOT(onNewDataReceived()));
@@ -430,6 +489,27 @@ CapturePlot::CapturePlot(QWidget *parent,
 
 	graticule = new Graticule(this);
 	connect(this, SIGNAL(canvasSizeChanged()),graticule,SLOT(onCanvasSizeChanged()));
+
+	QBrush gateBrush = QBrush(QColor(0,30,150,90));
+	gateBrush.setStyle(Qt::SolidPattern);
+
+	leftGate = new QwtPlotShapeItem();
+	leftGate->setAxes(QwtPlot::xBottom,QwtPlot::yRight);
+	leftGateRect.setTop(axisScaleDiv(yRight).upperBound());
+	leftGateRect.setBottom(axisScaleDiv(yRight).lowerBound());
+	leftGateRect.setLeft(axisScaleDiv(xBottom).lowerBound());
+	leftGateRect.setRight(d_gateBar1->plotCoord().x());
+	leftGate->setRect(leftGateRect);
+	leftGate->setBrush(gateBrush);
+
+	rightGate = new QwtPlotShapeItem();
+	rightGate->setAxes(QwtPlot::xBottom,QwtPlot::yRight);
+	rightGateRect.setTop(axisScaleDiv(yRight).upperBound());
+	rightGateRect.setBottom(axisScaleDiv(yRight).lowerBound());
+	rightGateRect.setLeft(d_gateBar2->plotCoord().x());
+	rightGateRect.setRight(axisScaleDiv(xBottom).upperBound());
+	rightGate->setRect(rightGateRect);
+	rightGate->setBrush(gateBrush);
 }
 
 CapturePlot::~CapturePlot()
@@ -597,6 +677,38 @@ void CapturePlot::onVoltageCursor2Moved(double value)
 
 	value_h2 = value;
 	Q_EMIT cursorReadoutsChanged(d_cursorReadoutsText);
+}
+
+void CapturePlot::onGateBar1PixelPosChanged(int pos)
+{
+	d_hGatingHandle1->setPositionSilenty(pos);
+}
+
+void CapturePlot::onGateBar2PixelPosChanged(int pos)
+{
+	d_hGatingHandle2->setPositionSilenty(pos);
+}
+
+void CapturePlot::onGateBar1Moved(double value)
+{
+	leftGateRect.setTop(axisScaleDiv(yRight).upperBound());
+	leftGateRect.setBottom(axisScaleDiv(yRight).lowerBound());
+	leftGateRect.setLeft(axisScaleDiv(xBottom).lowerBound());
+	leftGateRect.setRight(value);
+	leftGate->setRect(leftGateRect);
+
+	replot();
+}
+
+void CapturePlot::onGateBar2Moved(double value)
+{
+	rightGateRect.setTop(axisScaleDiv(yRight).upperBound());
+	rightGateRect.setBottom(axisScaleDiv(yRight).lowerBound());
+	rightGateRect.setLeft(value);
+	rightGateRect.setRight(axisScaleDiv(xBottom).upperBound());
+	rightGate->setRect(rightGateRect);
+
+	replot();
 }
 
 QWidget * CapturePlot::topArea()
@@ -878,6 +990,25 @@ void CapturePlot::setGraticuleEnabled(bool enabled){
 	replot();
 }
 
+void CapturePlot::setGatingEnabled(bool enabled){
+	if(d_gatingEnabled != enabled){
+		d_gatingEnabled = enabled;
+		d_gateBar1->setVisible(enabled);
+		d_gateBar2->setVisible(enabled);
+		d_hGatingHandle1->setVisible(enabled);
+		d_hGatingHandle2->setVisible(enabled);
+		if(enabled){
+			leftGate->attach(this);
+			rightGate->attach(this);
+		}
+		else{
+			leftGate->detach();
+			rightGate->detach();
+		}
+		replot();
+	}
+}
+
 void CapturePlot::trackModeEnabled(bool enabled)
 {
 	d_trackMode = !enabled;
@@ -1060,6 +1191,18 @@ void CapturePlot::displayIntersection()
 	replot();
 }
 
+void CapturePlot::updateGateMargins(){
+	leftGateRect.setTop(axisScaleDiv(yRight).upperBound());
+	leftGateRect.setBottom(axisScaleDiv(yRight).lowerBound());
+	leftGate->setRect(leftGateRect);
+
+	rightGateRect.setTop(axisScaleDiv(yRight).upperBound());
+	rightGateRect.setBottom(axisScaleDiv(yRight).lowerBound());
+	rightGate->setRect(rightGateRect);
+
+	replot();
+}
+
 bool CapturePlot::eventFilter(QObject *object, QEvent *event)
 {
 	if (object == canvas() && event->type() == QEvent::Resize) {
@@ -1071,6 +1214,8 @@ bool CapturePlot::eventFilter(QObject *object, QEvent *event)
 		d_hCursorHandle2->triggerMove();
 		d_vCursorHandle1->triggerMove();
 		d_vCursorHandle2->triggerMove();
+
+		updateGateMargins();
 
 		Q_EMIT canvasSizeChanged();
 
