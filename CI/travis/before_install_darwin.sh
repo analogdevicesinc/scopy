@@ -68,8 +68,11 @@ cmake_build_wget "volk-1.3" "http://libvolk.org/releases/volk-1.3.tar.gz"
 
 cmake_build_git "gnuradio" "https://github.com/analogdevicesinc/gnuradio" "signal_source_phase_rebased" "-DENABLE_INTERNAL_VOLK:BOOL=OFF -DENABLE_GR_FEC:BOOL=OFF -DENABLE_GR_DIGITAL:BOOL=OFF -DENABLE_GR_DTV:BOOL=OFF -DENABLE_GR_ATSC:BOOL=OFF -DENABLE_GR_AUDIO:BOOL=OFF -DENABLE_GR_CHANNELS:BOOL=OFF -DENABLE_GR_NOAA:BOOL=OFF -DENABLE_GR_PAGER:BOOL=OFF -DENABLE_GR_TRELLIS:BOOL=OFF -DENABLE_GR_VOCODER:BOOL=OFF"
 
+SUDO=sudo
 cmake_build_git "libiio" "https://github.com/analogdevicesinc/libiio" "" "-DINSTALL_UDEV_RULE:BOOL=OFF"
 
 cmake_build_git "libad9361-iio" "https://github.com/analogdevicesinc/libad9361-iio"
+# no longer need sudo from here
+unset SUDO
 
 cmake_build_git "gr-iio" "https://github.com/analogdevicesinc/gr-iio"
