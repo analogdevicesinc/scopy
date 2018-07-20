@@ -17,7 +17,7 @@ __cmake() {
 		$args .. $SILENCED
 	CFLAGS=-I${STAGINGDIR}/include LDFLAGS=-L${STAGINGDIR}/lib make -j${NUM_JOBS} $SILENCED
 
-	make install
+	$SUDO make install
 	popd
 }
 
@@ -25,7 +25,7 @@ __make() {
 	$preconfigure
 	$configure --prefix="$STAGINGDIR" $SILENCED
 	CFLAGS=-I${STAGINGDIR}/include LDFLAGS=-L${STAGINGDIR}/lib $make -j${NUM_JOBS} $SILENCED
-	$make install
+	$SUDO $make install
 }
 
 __qmake() {
@@ -33,7 +33,7 @@ __qmake() {
 	$QMAKE "$qtarget" $SILENCED
 	QMAKE=$QMAKE CFLAGS=-I${STAGINGDIR}/include LDFLAGS=-L${STAGINGDIR}/lib \
 		make -j${NUM_JOBS} $SILENCED
-	make install
+	$SUDO make install
 }
 
 __build_common() {
