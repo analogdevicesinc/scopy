@@ -1783,7 +1783,9 @@ void PatternGeneratorChannelManagerUI::updateUi()
 	connect(pg->getCurrentPatternUI(),SIGNAL(decoderChanged()),this,
 	        SLOT(triggerUpdateUi()));
 
-	chmVertScrollArea->setRange(scrollMin,scrollMax);
+	QApplication::processEvents(QEventLoop::AllEvents);
+	chmVertScrollArea->setMinimum(scrollMin);
+	chmVertScrollArea->setMaximum(scrollMax);
 	chmVertScrollArea->setValue(scrollVal);
 }
 
