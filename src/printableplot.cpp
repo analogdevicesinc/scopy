@@ -42,7 +42,7 @@ void PrintablePlot::printPlot()
 
         updateLegend();
 
-        d_plotRenderer.exportTo(this, "plotScreenshot");
+	d_plotRenderer.exportTo(this, "plotScreenshot.png");
 
         insertLegend(nullptr);
 }
