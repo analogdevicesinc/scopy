@@ -557,7 +557,9 @@ void FftDisplayPlot::findPeaks(int chn)
 	if(m_visiblePeakSearch)
 	{
 		auto coef  = d_numPoints/d_stop_frequency;
-		start = m_sweepStart * coef;
+		if (m_sweepStart * coef > 0) {
+			start = m_sweepStart * coef;
+		}
 		stop = m_sweepStop * coef;
 		maxY[0] = y[start];
 	}
