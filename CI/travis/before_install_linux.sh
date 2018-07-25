@@ -85,8 +85,15 @@ qmake_build_wget "qwtpolar-1.1.1" "https://downloads.sourceforge.net/project/qwt
 
 cmake_build_git "gnuradio" "https://github.com/analogdevicesinc/gnuradio" "signal_source_phase_rebased" "-DENABLE_INTERNAL_VOLK:BOOL=OFF -DENABLE_GR_FEC:BOOL=OFF -DENABLE_GR_DIGITAL:BOOL=OFF -DENABLE_GR_DTV:BOOL=OFF -DENABLE_GR_ATSC:BOOL=OFF -DENABLE_GR_AUDIO:BOOL=OFF -DENABLE_GR_CHANNELS:BOOL=OFF -DENABLE_GR_NOAA:BOOL=OFF -DENABLE_GR_PAGER:BOOL=OFF -DENABLE_GR_TRELLIS:BOOL=OFF -DENABLE_GR_VOCODER:BOOL=OFF"
 
-cmake_build_git "libiio" "https://github.com/analogdevicesinc/libiio" "" "-DINSTALL_UDEV_RULE:BOOL=OFF"
+if [ "$TRAVIS" == "true" ] ; then
+	for pkg in libiio libad9361-iio ; do
+		wget http://swdownloads.analog.com/cse/travis_builds/master_latest_${pkg}${LDIST}.deb
+		sudo dpkg -i ./master_latest_${pkg}${LDIST}.deb
+	done
+else
+	cmake_build_git "libiio" "https://github.com/analogdevicesinc/libiio" "" "-DINSTALL_UDEV_RULE:BOOL=OFF"
 
-cmake_build_git "libad9361-iio" "https://github.com/analogdevicesinc/libad9361-iio" "" "-DLIBIIO_INCLUDEDIR:STRING=$STAGINGDIR/include -DLIBIIO_LIBRARIES:STRING=$STAGINGDIR/lib"
+	cmake_build_git "libad9361-iio" "https://github.com/analogdevicesinc/libad9361-iio" "" "-DLIBIIO_INCLUDEDIR:STRING=$STAGINGDIR/include -DLIBIIO_LIBRARIES:STRING=$STAGINGDIR/lib"
+fi
 
 cmake_build_git "gr-iio" "https://github.com/analogdevicesinc/gr-iio"
