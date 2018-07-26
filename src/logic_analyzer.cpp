@@ -140,7 +140,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 
 	symmBufferMode = make_shared<LogicAnalyzerSymmetricBufferMode>();
 	symmBufferMode->setMaxSampleRate(maxSamplingFrequency);
-	symmBufferMode->setEntireBufferMaxSize(64000);
+	symmBufferMode->setEntireBufferMaxSize(500000);
 	symmBufferMode->setTriggerBufferMaxSize(8192); // 8192 is what hardware supports
 	symmBufferMode->setTimeDivisionCount(10);
 
