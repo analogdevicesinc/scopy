@@ -2,10 +2,8 @@
 set -e
 
 brew update
-# Install Qt
-brew install qt
-echo 'export PATH="$(brew --prefix qt)/bin:$PATH"' >> ~/.bash_profile
-brew link --force qt
+QT_PATH="$(brew --prefix qt)/bin"
+export PATH="${QT_PATH}:$PATH"
 
 brew_install_or_upgrade() {
 	brew install $1 || \
@@ -13,16 +11,16 @@ brew_install_or_upgrade() {
 		brew ls --versions $1 # check if installed last-ly
 }
 
-PACKAGES="cmake fftw bison gettext autoconf automake libtool libzip glib libusb python3 python brew-pip"
+PACKAGES="qt cmake fftw bison gettext autoconf automake libtool libzip glib libusb python3 python brew-pip"
 PACKAGES="$PACKAGES glibmm doxygen wget boost gnu-sed libmatio dylibbundler libxml2 pkg-config"
 
 for pak in $PACKAGES ; do
 	brew_install_or_upgrade $pak
 done
 
-brew link --overwrite --force gcc
-brew link --overwrite --force bison
-brew link --overwrite --force gettext
+for pkg in qt gcc bison gettext ; do
+	brew link --overwrite --force $pkg
+done
 
 source ./CI/travis/before_install_lib.sh
 
