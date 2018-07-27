@@ -379,6 +379,7 @@ public Q_SLOTS:
   virtual void setLineLabel(int which, QString label);
   virtual QString getLineLabel(int which);
   virtual void setLineColor(int which, QColor color);
+  void setLineColor(int chnIdx, int colorIdx);
   virtual QColor getLineColor(int which) const;
   virtual void setLineWidth(int which, int width);
   virtual int getLineWidth(int which) const;

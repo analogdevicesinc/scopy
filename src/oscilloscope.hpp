@@ -708,6 +708,8 @@ namespace adiscope {
 		double measured_pos_duty() const;
 		double measured_neg_duty() const;
 
+		Q_INVOKABLE void setColor(int);
+
 	private:
 		Oscilloscope *osc;
 	};

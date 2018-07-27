@@ -608,6 +608,16 @@ DisplayPlot::getLineLabel(int which)
   return d_plot_curve[which]->title().text();
 }
 
+void DisplayPlot::setLineColor(int chnIdx, int colorIdx)
+{
+        if (colorIdx >= d_CurveColors.size()) {
+                colorIdx = d_CurveColors.size() - 1;
+        } else if (colorIdx < 0) {
+                colorIdx = 0;
+        }
+        setLineColor(chnIdx, d_CurveColors.at(colorIdx));
+}
+
 void
 DisplayPlot::setLineColor(int which, QColor color)
 {

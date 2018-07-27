@@ -4742,6 +4742,17 @@ void Channel_API::setProbeAttenuation(double val)
 	}
 }
 
+void Channel_API::setColor(int colorIdx)
+{
+	int index = osc->channels_api.indexOf(const_cast<Channel_API*>(this));
+	QWidget *obj = osc->ui->channelsList->itemAt(index)->widget();
+	ChannelWidget *cw = static_cast<ChannelWidget *>(obj);
+	osc->plot.setLineColor(index, colorIdx);
+	if (cw) {
+		cw->setColor(osc->plot.getLineColor(index));
+	}
+}
+
 bool Channel_API::getAcCoupling() const
 {
 	int index = osc->channels_api.indexOf(const_cast<Channel_API*>(this));
