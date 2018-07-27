@@ -697,6 +697,19 @@ void CapturePlot::onGateBar1Moved(double value)
 	leftGateRect.setRight(value);
 	leftGate->setRect(leftGateRect);
 
+	int n = Curve(d_selected_channel)->data()->size();
+	double maxTime = Curve(d_selected_channel)->data()->sample(n-1).x();
+	double minTime = Curve(d_selected_channel)->data()->sample(0).x();
+
+	int currentIndex = (value - minTime) / (maxTime-minTime) * n;
+
+	for (int i = 0; i < d_measureObjs.size(); i++) {
+		Measure *measure = d_measureObjs[i];
+		measure->setStartIndex(currentIndex);
+	}
+
+//	Q_EMIT leftGateChanged(value,currentIndex);
+
 	replot();
 }
 
@@ -707,6 +720,19 @@ void CapturePlot::onGateBar2Moved(double value)
 	rightGateRect.setLeft(value);
 	rightGateRect.setRight(axisScaleDiv(xBottom).upperBound());
 	rightGate->setRect(rightGateRect);
+
+	int n = Curve(d_selected_channel)->data()->size();
+	double maxTime = Curve(d_selected_channel)->data()->sample(n-1).x();
+	double minTime = Curve(d_selected_channel)->data()->sample(0).x();
+
+	int currentIndex = (value - minTime) / (maxTime-minTime) * n;
+
+	for (int i = 0; i < d_measureObjs.size(); i++) {
+		Measure *measure = d_measureObjs[i];
+		measure->setEndIndex(currentIndex);
+	}
+
+//	Q_EMIT rightGateChanged(value,currentIndex);
 
 	replot();
 }
@@ -1004,6 +1030,10 @@ void CapturePlot::setGatingEnabled(bool enabled){
 		else{
 			leftGate->detach();
 			rightGate->detach();
+		}
+		for (int i = 0; i < d_measureObjs.size(); i++) {
+			Measure *measure = d_measureObjs[i];
+			measure->setGatingEnabled(enabled);
 		}
 		replot();
 	}
