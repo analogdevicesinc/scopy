@@ -41,8 +41,6 @@ using std::bind;
 using std::dynamic_pointer_cast;
 using std::list;
 using std::map;
-using std::placeholders::_1;
-using std::placeholders::_2;
 using std::remove_if;
 using std::runtime_error;
 using std::shared_ptr;
@@ -104,9 +102,11 @@ DeviceManager::driver_scan(
 
 	devices_.insert(devices_.end(), driver_devices.begin(),
 		driver_devices.end());
-	devices_.sort(bind(&DeviceManager::compare_devices, this, _1, _2));
+	devices_.sort(bind(&DeviceManager::compare_devices, this,
+		std::placeholders::_1, std::placeholders::_2));
 	driver_devices.sort(bind(
-		&DeviceManager::compare_devices, this, _1, _2));
+		&DeviceManager::compare_devices, this,
+		std::placeholders::_1, std::placeholders::_2));
 
 	return driver_devices;
 }
