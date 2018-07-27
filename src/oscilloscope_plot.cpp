@@ -708,7 +708,8 @@ void CapturePlot::onGateBar1Moved(double value)
 		measure->setStartIndex(currentIndex);
 	}
 
-//	Q_EMIT leftGateChanged(value,currentIndex);
+	double width = (value - axisScaleDiv(xBottom).lowerBound()) / (axisScaleDiv(xBottom).upperBound() - axisScaleDiv(xBottom).lowerBound());
+	Q_EMIT leftGateChanged(width);
 
 	replot();
 }
@@ -732,7 +733,8 @@ void CapturePlot::onGateBar2Moved(double value)
 		measure->setEndIndex(currentIndex);
 	}
 
-//	Q_EMIT rightGateChanged(value,currentIndex);
+	double width = (axisScaleDiv(xBottom).upperBound() - value) / (axisScaleDiv(xBottom).upperBound() - axisScaleDiv(xBottom).lowerBound());
+	Q_EMIT rightGateChanged(width);
 
 	replot();
 }
@@ -1026,6 +1028,8 @@ void CapturePlot::setGatingEnabled(bool enabled){
 		if(enabled){
 			leftGate->attach(this);
 			rightGate->attach(this);
+			onGateBar1Moved(leftGateRect.right());
+			onGateBar2Moved(rightGateRect.left());
 		}
 		else{
 			leftGate->detach();
