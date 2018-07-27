@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
 sudo echo "/usr/local/lib" | dylibbundler -od -b -x ./Scopy.app/Contents/MacOS/Scopy -d ./Scopy.app/Contents/Frameworks/ -p @executable_path/../Frameworks/ >/dev/null
@@ -9,7 +9,14 @@ sudo cp -R /Library/Frameworks/ad9361.framework Scopy.app/Contents/Frameworks/
 
 iiorpath="$(otool -D ./Scopy.app/Contents/Frameworks/iio.framework/iio | grep @rpath)"
 ad9361rpath="$(otool -D ./Scopy.app/Contents/Frameworks/ad9361.framework/ad9361 | grep @rpath)"
-pythonidrpath="$(otool -D /usr/local/opt/python/Frameworks/Python.framework/Versions/3.6/Python | head -2 |  tail -1)"
+if [ -e /usr/local/opt/python/Frameworks/Python.framework/Versions/3.7/Python ] ; then
+	pythonidrpath="$(otool -D /usr/local/opt/python/Frameworks/Python.framework/Versions/3.7/Python | head -2 |  tail -1)"
+elif [ -e /usr/local/opt/python/Frameworks/Python.framework/Versions/3.6/Python ] ; then
+	pythonidrpath="$(otool -D /usr/local/opt/python/Frameworks/Python.framework/Versions/3.6/Python | head -2 |  tail -1)"
+else
+	echo "No Python 3.7 or 3.6 paths found"
+	exit 1
+fi
 libusbpath="$(otool -L ./Scopy.app/Contents/Frameworks/iio.framework/iio | grep libusb | cut -d " " -f 1)"
 libusbid="$(echo ${libusbpath} | rev | cut -d "/" -f 1 | rev)"
 

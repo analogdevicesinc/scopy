@@ -20,9 +20,13 @@ mkdir -p build
 
 pushd build
 
-cmake -DCMAKE_PREFIX_PATH="$STAGINGDIR;${QT_PATH}/lib/cmake" -DCMAKE_INSTALL_PREFIX="$STAGINGDIR" \
-	-DCMAKE_EXE_LINKER_FLAGS="-L${STAGINGDIR}/lib" ..
-
-CFLAGS=-I${STAGINGDIR}/include LDFLAGS=-L${STAGINGDIR}/lib make -j${NUM_JOBS}
+if [ "$TRAVIS" == "true" ] ; then
+	cmake ..
+	make -j${NUM_JOBS}
+else
+	cmake -DCMAKE_PREFIX_PATH="$STAGINGDIR;${QT_PATH}/lib/cmake" -DCMAKE_INSTALL_PREFIX="$STAGINGDIR" \
+		-DCMAKE_EXE_LINKER_FLAGS="-L${STAGINGDIR}/lib" ..
+	CFLAGS=-I${STAGINGDIR}/include LDFLAGS=-L${STAGINGDIR}/lib make -j${NUM_JOBS}
+fi
 
 popd

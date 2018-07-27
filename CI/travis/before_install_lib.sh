@@ -1,39 +1,53 @@
 #!/bin/bash
 set -e
 
-NUM_JOBS=4
-WORKDIR="${PWD}/deps"
-mkdir -p "$WORKDIR"
-STAGINGDIR="${WORKDIR}/staging"
-QMAKE="$(command -v qmake)"
+source ./CI/travis/lib.sh
 
 __cmake() {
 	local args="$1"
 	mkdir -p build
 	pushd build # build
 
-	cmake -DCMAKE_PREFIX_PATH="$STAGINGDIR" -DCMAKE_INSTALL_PREFIX="$STAGINGDIR" \
-		-DCMAKE_EXE_LINKER_FLAGS="-L${STAGINGDIR}/lib" \
-		$args .. $SILENCED
-	CFLAGS=-I${STAGINGDIR}/include LDFLAGS=-L${STAGINGDIR}/lib make -j${NUM_JOBS} $SILENCED
+	if [ "$TRAVIS" == "true" ] ; then
+		cmake $args ..
+		make -j${NUM_JOBS}
+		sudo make install
+	else
+		cmake -DCMAKE_PREFIX_PATH="$STAGINGDIR" -DCMAKE_INSTALL_PREFIX="$STAGINGDIR" \
+			-DCMAKE_EXE_LINKER_FLAGS="-L${STAGINGDIR}/lib" \
+			$args .. $SILENCED
+		CFLAGS=-I${STAGINGDIR}/include LDFLAGS=-L${STAGINGDIR}/lib make -j${NUM_JOBS} $SILENCED
+		make install
+	fi
 
-	$SUDO make install
 	popd
 }
 
 __make() {
 	$preconfigure
-	$configure --prefix="$STAGINGDIR" $SILENCED
-	CFLAGS=-I${STAGINGDIR}/include LDFLAGS=-L${STAGINGDIR}/lib $make -j${NUM_JOBS} $SILENCED
-	$SUDO $make install
+	if [ "$TRAVIS" == "true" ] ; then
+		$configure
+		$make -j${NUM_JOBS}
+		sudo $make install
+	else
+		$configure --prefix="$STAGINGDIR" $SILENCED
+		CFLAGS=-I${STAGINGDIR}/include LDFLAGS=-L${STAGINGDIR}/lib $make -j${NUM_JOBS} $SILENCED
+		$SUDO $make install
+	fi
 }
 
 __qmake() {
 	$patchfunc
-	$QMAKE "$qtarget" $SILENCED
-	QMAKE=$QMAKE CFLAGS=-I${STAGINGDIR}/include LDFLAGS=-L${STAGINGDIR}/lib \
-		make -j${NUM_JOBS} $SILENCED
-	$SUDO make install
+	if [ "$TRAVIS" == "true" ] ; then
+		$QMAKE $qtarget
+		make -j${NUM_JOBS}
+		sudo make install
+	else
+		$QMAKE "$qtarget" $SILENCED
+		QMAKE=$QMAKE CFLAGS=-I${STAGINGDIR}/include LDFLAGS=-L${STAGINGDIR}/lib \
+			make -j${NUM_JOBS} $SILENCED
+		$SUDO make install
+	fi
 }
 
 __build_common() {

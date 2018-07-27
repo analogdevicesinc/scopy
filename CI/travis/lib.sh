@@ -1,7 +1,13 @@
 #!/bin/bash
 
-DEPSDIR="${PWD}/deps"
-STAGINGDIR="${DEPSDIR}/staging"
+NUM_JOBS=4
+WORKDIR="${PWD}/deps"
+mkdir -p "$WORKDIR"
+if [ "$TRAVIS" == "true" ] ; then
+	STAGINGDIR=/usr/local
+else
+	STAGINGDIR="${WORKDIR}/staging"
+fi
 
 echo_red()   { printf "\033[1;31m$*\033[m\n"; }
 
