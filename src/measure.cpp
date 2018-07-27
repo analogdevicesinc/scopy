@@ -353,7 +353,8 @@ Measure::Measure(int channel, double *buffer, size_t length):
 	m_cross_level(0),
 	m_hysteresis_span(0),
 	m_histogram(nullptr),
-	m_cross_detect(nullptr)
+	m_cross_detect(nullptr),
+	m_gatingEnabled(false)
 {
 
 	// Create a set of measurements
@@ -494,16 +495,41 @@ void Measure::measure()
 	int hlf_scale = adc_span / 2;
 	bool using_histogram_method = (adc_span > 1);
 
-	max = data[0];
-	min = data[0];
-	sum = data[0];
-	sqr_sum = data[0] * data[0];
+	int startIndex;
+	int endIndex;
+
+	//if gating is enabled measure only on data between the gates
+	if(m_gatingEnabled){
+		//make sure that start/end indexes are valid
+		if(m_startIndex < 0 || m_startIndex > m_buf_length){
+			m_startIndex = 0;
+		}
+		if(m_endIndex < 0 || m_endIndex > m_buf_length ){
+			m_endIndex = m_buf_length;
+		}
+
+		max = data[m_startIndex];
+		min = data[m_startIndex];
+		sum = data[m_startIndex];
+		sqr_sum = data[m_startIndex] * data[m_startIndex];
+		startIndex = m_startIndex+1;
+		endIndex = m_endIndex;
+	}
+	else{
+		max = data[0];
+		min = data[0];
+		sum = data[0];
+		sqr_sum = data[0] * data[0];
+		startIndex = 1;
+		endIndex = data_length;
+	}
+
 	m_cross_detect = new CrossingDetection(m_cross_level, m_hysteresis_span,
 			"P");
 	if (using_histogram_method)
 		m_histogram = new int[adc_span]{};
 
-	for (size_t i = 1; i < data_length; i++) {
+	for (size_t i = startIndex; i < endIndex; i++) {
 
 		// Find level crossings (period detection)
 		m_cross_detect->crossDetectStep(data, i);
@@ -787,6 +813,20 @@ void Measure::setChannel(int channel)
 		}
 		m_channel = channel;
 	}
+}
+
+void Measure::setStartIndex(int index)
+{
+	m_startIndex = index;
+}
+
+void Measure::setEndIndex(int index)
+{
+	m_endIndex = index;
+}
+
+void Measure::setGatingEnabled(bool enable){
+	m_gatingEnabled = enable;
 }
 
 QList<std::shared_ptr<MeasurementData>> Measure::measurments()

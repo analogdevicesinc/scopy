@@ -114,6 +114,9 @@ namespace adiscope {
 		void setHysteresisSpan(double);
 		int channel() const;
 		void setChannel(int);
+		void setStartIndex(int);
+		void setEndIndex(int);
+		void setGatingEnabled(bool);
 
 		QList<std::shared_ptr<MeasurementData>> measurments();
 		std::shared_ptr<MeasurementData> measurement(int id);
@@ -132,7 +135,9 @@ namespace adiscope {
 		unsigned int m_adc_bit_count;
 		double m_cross_level;
 		double m_hysteresis_span;
-
+		int m_startIndex;
+		int m_endIndex;
+		int m_gatingEnabled;
 		int *m_histogram;
 		CrossingDetection *m_cross_detect;
 
