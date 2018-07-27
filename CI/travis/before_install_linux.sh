@@ -44,6 +44,7 @@ if ! is_new_ubuntu ; then
 else
 	sudo apt-get install -y qt5-default qttools5-dev qtdeclarative5-dev \
 		libqt5svg5-dev libqt5opengl5-dev
+	QMAKE="$(command -v qmake)"
 fi
 
 patch_qwtpolar_linux() {

@@ -2,8 +2,6 @@
 set -e
 
 brew update
-QT_PATH="$(brew --prefix qt)/bin"
-export PATH="${QT_PATH}:$PATH"
 
 brew_install_or_upgrade() {
 	brew install $1 || \
@@ -23,6 +21,9 @@ for pkg in qt gcc bison gettext ; do
 done
 
 source ./CI/travis/before_install_lib.sh
+
+QT_PATH="$(brew --prefix qt)/bin"
+export PATH="${QT_PATH}:$PATH"
 
 patch_qwtpolar_mac() {
 	[ -f qwtpolar-qwt-6.1-compat.patch ] || {
@@ -51,6 +52,8 @@ if ! command -v pip ; then
 	curl https://bootstrap.pypa.io/get-pip.py > get-pip.py
 	sudo -H python get-pip.py
 fi
+
+QMAKE="$(command -v qmake)"
 
 pip install --user cheetah
 
