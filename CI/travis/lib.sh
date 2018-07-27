@@ -9,6 +9,8 @@ else
 	STAGINGDIR="${WORKDIR}/staging"
 fi
 
+export PYTHON3=python3
+
 echo_red()   { printf "\033[1;31m$*\033[m\n"; }
 
 get_codename() {
