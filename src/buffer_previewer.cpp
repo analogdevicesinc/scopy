@@ -48,7 +48,8 @@ BufferPreviewer::BufferPreviewer(int pixelsPerPeriod, double wavePhase,
 	m_startingPhase(wavePhase),
 	m_fullWaveNumPoints(1),
 	m_fullWavePoints(new QPointF[m_fullWaveNumPoints]),
-	m_rightBtnClick(false)
+	m_rightBtnClick(false),
+	m_gatingEnabled(false)
 {
 }
 
@@ -154,6 +155,24 @@ double BufferPreviewer::wavePhase() const
 	return m_startingPhase;
 }
 
+void BufferPreviewer::setGatingEnabled(bool enabled)
+{
+	m_gatingEnabled = enabled;
+	update();
+}
+
+void BufferPreviewer::setLeftGateWidth(double width)
+{
+	m_leftGateWidth = width;
+	update();
+}
+
+void BufferPreviewer::setRightGateWidth(double width)
+{
+	m_rightGateWidth = width;
+	update();
+}
+
 void BufferPreviewer::paintEvent(QPaintEvent *)
 {
 	QPainter p(this);
@@ -224,6 +243,18 @@ void BufferPreviewer::paintEvent(QPaintEvent *)
 	p.setBrush(palette().color(QPalette::AlternateBase));
 	p.drawRect((cursor_start - 1) - cur_head_w / 2 + 1, 0, cur_head_w, cur_head_h);
 	p.drawRect((cursor_start - 1), cur_head_h, 2, h - cur_head_h);
+
+	//Draw gatings if enabled
+	if(m_gatingEnabled){
+		int leftGateWidth = hlight_width * m_leftGateWidth + hlight_start;
+		int rightGateWidth = hlight_width * m_rightGateWidth;
+		QBrush gateBrush(QColor(0,15,150,130));
+		p.setRenderHint(QPainter::Antialiasing,true);
+		//draw left gate
+		p.fillRect(0, 0, leftGateWidth,h, gateBrush);
+		//draw right gate
+		p.fillRect(hlight_start+hlight_width-rightGateWidth, 0,rightGateWidth+(w-hlight_start+hlight_width),h, gateBrush);
+	}
 }
 
 void BufferPreviewer::resizeEvent(QResizeEvent *)

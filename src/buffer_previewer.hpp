@@ -51,6 +51,10 @@ public:
 	int pixelsPerPeriod() const;
 	double wavePhase() const;
 
+	void setGatingEnabled(bool);
+	void setLeftGateWidth(double);
+	void setRightGateWidth(double);
+
 Q_SIGNALS:
 	void bufferMovedBy(int);
 	void bufferStopDrag();
@@ -85,6 +89,10 @@ private:
 	int m_pixelLeft;
 	int m_pixelRight;
 	bool m_rightBtnClick;
+
+	bool m_gatingEnabled;
+	double m_leftGateWidth;
+	double m_rightGateWidth;
 };
 
 class AnalogBufferPreviewer: public BufferPreviewer

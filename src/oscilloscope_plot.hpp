@@ -133,8 +133,8 @@ namespace adiscope {
 		void measurementsAvailable();
 		void cursorReadoutsChanged(struct cursorReadoutsText);
 		void canvasSizeChanged();
-		void leftGateChanged(double,int);
-		void rightGateChanged(double,int);
+		void leftGateChanged(double);
+		void rightGateChanged(double);
 
 	public Q_SLOTS:
 		void setTriggerAEnabled(bool en);

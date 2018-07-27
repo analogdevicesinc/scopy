@@ -182,6 +182,8 @@ namespace adiscope {
 		void onStatisticsEnabled(bool on);
 		void onStatisticsReset();
 		void onGatingEnabled(bool on);
+		void onLeftGateChanged(double);
+		void onRightGateChanged(double);
 
 		void onCursorReadoutsChanged(struct cursorReadoutsText);
 
