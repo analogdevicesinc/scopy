@@ -754,6 +754,25 @@ void CapturePlot::showEvent(QShowEvent *event)
 	d_hCursorHandle2->triggerMove();
 }
 
+void CapturePlot::printWithNoBackground(const QString& toolName, bool editScaleDraw)
+{
+	QwtPlotMarker detailsMarker;
+	detailsMarker.setAxes(QwtPlot::xBottom, QwtPlot::yLeft);
+	detailsMarker.attach(this);
+	double xMarker = axisInterval(QwtPlot::xBottom).maxValue();
+	double length = axisInterval(QwtPlot::xBottom).maxValue() - axisInterval(QwtPlot::xBottom).minValue();
+	xMarker -= (0.2 * length);
+	double yMarker = axisInterval(QwtPlot::yLeft).maxValue();
+	yMarker -= (0.1 * yMarker);
+	detailsMarker.setValue(xMarker, yMarker);
+	QwtText text(d_timeBaseLabel->text() + " " + d_sampleRateLabel->text());
+	text.setColor(QColor(0, 0, 0));
+	detailsMarker.setLabel(text);
+	replot();
+
+	DisplayPlot::printWithNoBackground(toolName, editScaleDraw);
+}
+
 void CapturePlot::setHorizCursorsLocked(bool value)
 {
 	horizCursorsLocked = value;

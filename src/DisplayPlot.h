@@ -459,7 +459,7 @@ public Q_SLOTS:
   void setMarkerAlpha8 (int);
   void setMarkerAlpha9 (int);
 
-  void printWithNoBackground(bool editScaleDraw = true);
+  void printWithNoBackground(const QString& toolName = "", bool editScaleDraw = true);
 
   void setZoomerColor(QColor c);
   void setPaletteColor(QColor c);

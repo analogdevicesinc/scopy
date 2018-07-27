@@ -38,7 +38,7 @@ public:
         void dropBackground(bool drop);
 
 public Q_SLOTS:
-        void printPlot();
+        void printPlot(const QString& toolName = "");
 
 private:
         QwtPlotRenderer d_plotRenderer;

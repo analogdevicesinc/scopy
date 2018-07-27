@@ -18,6 +18,7 @@
  */
 
 #include "printableplot.h"
+#include <QDateTime>
 
 using namespace adiscope;
 
@@ -34,7 +35,7 @@ void PrintablePlot::dropBackground(bool drop)
         d_plotRenderer.setDiscardFlag(QwtPlotRenderer::DiscardCanvasBackground, drop);
 }
 
-void PrintablePlot::printPlot()
+void PrintablePlot::printPlot(const QString& toolName)
 {
         legendDisplay = new QwtLegend(this);
         legendDisplay->setDefaultItemMode(QwtLegendData::ReadOnly);
@@ -42,7 +43,11 @@ void PrintablePlot::printPlot()
 
         updateLegend();
 
-	d_plotRenderer.exportTo(this, "plotScreenshot.png");
+        QString date = QDateTime::currentDateTime().toString("yyyy-MM-dd-hh-mm-ss");
+
+        QString fileName = "Scopy-" + toolName + "-" + date + ".png";
+
+        d_plotRenderer.exportTo(this, fileName);
 
         insertLegend(nullptr);
 }

@@ -34,6 +34,7 @@
 #include <QMessageBox>
 #include <QDateTime>
 #include <QButtonGroup>
+#include <QDateTime>
 
 /* Local includes */
 #include "pulseview/pv/mainwindow.hpp"
@@ -447,8 +448,12 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 
 		ui->plotWidget->render(&painter);
 
+		QString date = QDateTime::currentDateTime().toString("yyyy-MM-dd-hh-mm-ss");
+
+		QString fileNameHint = "Scopy-" + api->objectName() + "-" + date + ".png";
+
 		QString fileName = QFileDialog::getSaveFileName(this,
-				   tr("Save to"), "",
+				   tr("Save to"), fileNameHint,
 				   tr({"(*.png);;"}));
 		painter.end();
 		img.invertPixels(QImage::InvertRgb);

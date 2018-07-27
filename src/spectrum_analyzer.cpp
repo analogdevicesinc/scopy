@@ -401,7 +401,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 
 	connect(ui->btnPrint, &QPushButton::clicked, [=](){
-		fft_plot->printWithNoBackground(false);
+		fft_plot->printWithNoBackground(api->objectName(), false);
 	});
 }
 

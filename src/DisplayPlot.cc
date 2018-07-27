@@ -719,7 +719,7 @@ DisplayPlot::setYaxisLabelFontSize(int fs) {
 }
 
 void
-DisplayPlot::printWithNoBackground(bool editScaleDraw)
+DisplayPlot::printWithNoBackground(const QString& toolName, bool editScaleDraw)
 {
         OscScaleDraw *scaleDraw = static_cast<OscScaleDraw *>(this->axisScaleDraw(QwtAxisId(QwtPlot::yLeft, d_activeVertAxis)));
         QStack<QColor> colors;
@@ -733,7 +733,7 @@ DisplayPlot::printWithNoBackground(bool editScaleDraw)
                 scaleDraw->invalidateCache();
         }
 
-        PrintablePlot::printPlot();
+        PrintablePlot::printPlot(toolName);
 
         for (int i = d_plot_curve.size() - 1; i >= 0; --i) {
                 setLineColor(i, colors.pop());

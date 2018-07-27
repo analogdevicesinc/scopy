@@ -668,7 +668,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 
 	connect(ui->printBtn, &QPushButton::clicked,
 		[=]() {
-		plot.printWithNoBackground();
+		plot.printWithNoBackground(api->objectName());
 	});
 
 	//workaround for a bug that selected channel settings for disabled channels

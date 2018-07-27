@@ -49,6 +49,7 @@
 #include <QDebug>
 #include <QThread>
 #include <QFileDialog>
+#include <QDateTime>
 
 #include <iio.h>
 #include <network_analyzer_api.hpp>
@@ -353,9 +354,12 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
         QPainter painter(&img);
         img.fill(Qt::black);
         widget->render(&painter);
+        QString date = QDateTime::currentDateTime().toString("yyyy-MM-dd-hh-mm-ss");
+
+        QString fileNameHint = "Scopy-" + api->objectName() + "-" + date + ".png";
 
 	QString fileName = QFileDialog::getSaveFileName(this,
-				tr("Save to"), "",
+				tr("Save to"), fileNameHint,
 				tr({"(*.png);;"}));
 	painter.end();
 	img.invertPixels(QImage::InvertRgb);

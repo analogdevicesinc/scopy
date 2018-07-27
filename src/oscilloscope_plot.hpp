@@ -150,6 +150,7 @@ namespace adiscope {
 		void setHorizCursorsLocked(bool value);
 		void setVertCursorsLocked(bool value);
 		void showEvent(QShowEvent *event);
+		void printWithNoBackground(const QString& toolName = "", bool editScaleDraw = true);
 
 	protected:
 		virtual void cleanUpJustBeforeChannelRemoval(int chnIdx);
