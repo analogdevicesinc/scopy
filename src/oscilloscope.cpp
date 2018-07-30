@@ -2188,6 +2188,8 @@ void adiscope::Oscilloscope::on_boxCursors_toggled(bool on)
 	plot.setVertCursorsEnabled(
 			on ? cr_ui->hCursorsEnable->isChecked() : false);
 
+	plot.trackModeEnabled(on ? cr_ui->btnNormalTrack->isChecked() : true);
+
 	// Set the visibility of the cursor readouts owned by the Oscilloscope
 	if (on) {
 		plot.setCursorReadoutsVisible(!ui->boxMeasure->isChecked());
