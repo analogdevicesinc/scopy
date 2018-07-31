@@ -43,7 +43,8 @@ Preferences::Preferences(QWidget *parent) :
 	external_script_enabled(false),
 	manual_calib_script_enabled(false),
 	debugger_enabled(false),
-	manual_calib_enabled(false)
+	manual_calib_enabled(false),
+	graticule_enabled(false)
 {
 	ui->setupUi(this);
 
