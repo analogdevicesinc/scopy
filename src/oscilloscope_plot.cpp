@@ -1021,6 +1021,14 @@ bool CapturePlot::eventFilter(QObject *object, QEvent *event)
 {
 	if (object == canvas() && event->type() == QEvent::Resize) {
 		updateHandleAreaPadding(d_labelsEnabled);
+
+		//force cursor handles to emit position changed
+		//when the plot canvas is being resized
+		d_hCursorHandle1->triggerMove();
+		d_hCursorHandle2->triggerMove();
+		d_vCursorHandle1->triggerMove();
+		d_vCursorHandle2->triggerMove();
+
 		Q_EMIT canvasSizeChanged();
 
 	}
