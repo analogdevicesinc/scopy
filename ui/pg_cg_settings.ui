@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>293</width>
+    <width>294</width>
     <height>690</height>
    </rect>
   </property>
@@ -213,7 +213,7 @@ background-color: #4A64FF;</string>
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>249</width>
+              <width>250</width>
               <height>616</height>
              </rect>
             </property>
@@ -282,7 +282,7 @@ background-color: #4A64FF;</string>
                   <enum>Qt::Horizontal</enum>
                  </property>
                  <property name="sizeType">
-                  <enum>QSizePolicy::Preferred</enum>
+                  <enum>QSizePolicy::Expanding</enum>
                  </property>
                  <property name="sizeHint" stdset="0">
                   <size>

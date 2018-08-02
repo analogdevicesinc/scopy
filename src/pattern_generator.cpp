@@ -218,9 +218,14 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 	}
 
 	QFontMetrics labelm(cgSettings->CBPattern->font());
-	auto label_min_width = labelm.width(QString(12,'X'));
+	auto label_min_width = labelm.width(QString(20,'X'));
 	cgSettings->CBPattern->setMinimumWidth(label_min_width);
 	cgSettings->CBPattern->setMaximumWidth(label_min_width);
+
+	label_min_width = labelm.width(QString(4,'X'));
+	cgSettings->CBOutput->setMinimumWidth(label_min_width);
+	cgSettings->CBOutput->setMaximumWidth(label_min_width);
+
 
 	connect(ui->btnChSettings, SIGNAL(pressed()), this, SLOT(toggleRightMenu()));
 	connect(ui->btnPGSettings, SIGNAL(pressed()), this, SLOT(toggleRightMenu()));
