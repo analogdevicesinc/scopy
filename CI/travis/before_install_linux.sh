@@ -4,7 +4,7 @@ set -e
 source ./CI/travis/lib.sh
 
 if ! is_new_ubuntu ; then
-	sudo add-apt-repository --yes ppa:beineri/opt-qt592-trusty
+	sudo add-apt-repository --yes ppa:beineri/opt-qt592${LDIST}
 fi
 
 sudo apt-get -qq update
@@ -34,7 +34,8 @@ source ./CI/travis/before_install_lib.sh
 
 if ! is_new_ubuntu ; then
 	sudo apt-get install -y qt59base qt59declarative qt59quickcontrols \
-		qt59svg qt59tools python-dev automake libtool mesa-common-dev
+		qt59svg qt59tools python-dev automake libtool mesa-common-dev \
+		libegl1-mesa-dev libgl1-mesa-dev libgles2-mesa-dev libglu1-mesa-dev
 	# temporarily disable `set -e`
 	QMAKE=/opt/qt59/bin/qmake
 	$QMAKE -set QMAKE $QMAKE
