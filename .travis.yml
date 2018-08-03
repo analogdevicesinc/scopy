@@ -25,6 +25,10 @@ matrix:
       os: linux
       dist: trusty
       env: LDIST=-trusty
+    - compiler: gcc
+      os: linux
+      dist: xenial
+      env: LDIST=-xenial
 
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./CI/travis/before_install_darwin.sh ; fi
