@@ -107,6 +107,7 @@ class SpectrumMarker_API :public ApiObject
 	Q_PROPERTY(bool en READ enabled WRITE setEnabled);
 	Q_PROPERTY(int type READ type WRITE setType);
 	Q_PROPERTY(double freq READ freq WRITE setFreq);
+	Q_PROPERTY(double magnitude READ magnitude);
 
 	int m_chid;
 	int m_mkid;
