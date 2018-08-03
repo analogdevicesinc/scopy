@@ -630,23 +630,26 @@ void ClockPatternUI::parse_ui()
 	phaseStep=(phaseStep>1 ? phaseStep : 1);
 	phaseStep=floor(phaseStep*360+0.5)/360.0;
 	auto phaseVal = requestedPhase;
-	if(phaseStep > 45)
+	if(fmod(requestedPhase, phaseStep)  != 0)
 	{
-		if(phaseStepDown)
-			phaseVal = floor((phaseVal/phaseStep)-0.5)*phaseStep;
+		if(phaseStep > 45)
+		{
+			if(phaseStepDown)
+				phaseVal = floor((phaseVal/phaseStep)-0.5)*phaseStep;
+			else
+				phaseVal = ceil((phaseVal/phaseStep)+0.5)*phaseStep;
+		}
 		else
-			phaseVal = ceil((phaseVal/phaseStep)+0.5)*phaseStep;
-	}
-	else
-	{
-		phaseVal = floor((phaseVal/phaseStep)+0.5)*phaseStep;
-	}
+		{
+			phaseVal = floor((phaseVal/phaseStep)+0.5)*phaseStep;
+		}
 
-	requestedPhase = phaseVal;
-	phaseSpinButton->blockSignals(true);
-	phaseSpinButton->setStep(phaseStep);
-	phaseSpinButton->setValue(phaseVal);
-	if (phaseVal >= 360) phaseVal = (int)phaseVal % 360;
+		requestedPhase = phaseVal;
+		phaseSpinButton->blockSignals(true);
+		phaseSpinButton->setStep(phaseStep);
+		phaseSpinButton->setValue(phaseVal);
+		if (phaseVal >= 360) phaseVal = (int)phaseVal % 360;
+		}
 	phaseSpinButton->updateCompletionCircle(phaseVal);
 	phaseSpinButton->blockSignals(false);
 	pattern->set_phase(phaseSpinButton->value());
