@@ -37,7 +37,6 @@ __make() {
 }
 
 __qmake() {
-	$patchfunc
 	if [ "$TRAVIS" == "true" ] ; then
 		$QMAKE $qtarget
 		make -j${NUM_JOBS}
@@ -77,18 +76,24 @@ wget_and_untar() {
 		local tar_file="${dir}.tar.gz"
 		wget --no-check-certificate "$url" -O "$tar_file"
 		tar -xvf "$tar_file" > /dev/null
+		[ -z "$patchfunc" ] || {
+			pushd $dir
+			$patchfunc
+			popd
+		}
 	}
 }
 
 git_clone_update() {
-	if [ -d "$WORKDIR/$dir" ] ; then
-		pushd "$WORKDIR/$dir"
-		git pull
-		popd
-	else
+	[ -d "$WORKDIR/$dir" ] || {
 		[ -z "$branch" ] || branch="-b $branch"
 		git clone $branch "$url" "$dir"
-	fi
+		[ -z "$patchfunc" ] || {
+			pushd $dir
+			$patchfunc
+			popd
+		}
+	}
 }
 
 cmake_build_wget() {
@@ -146,7 +151,6 @@ qmake_build_git() {
 }
 
 patch_qwt() {
-	[ -f qwt_patched ] || {
 	patch -p1 <<-EOF
 --- a/qwtconfig.pri
 +++ b/qwtconfig.pri
@@ -193,17 +197,12 @@ patch_qwt() {
          QMAKE_LFLAGS_SONAME=
      }   
 EOF
-		touch qwt_patched
-	}
-	return 0
 }
 
 patch_qwtpolar() {
-	[ -f qwtpolar-qwt-6.1-compat.patch ] || {
-		wget https://raw.githubusercontent.com/analogdevicesinc/scopy-flatpak/master/qwtpolar-qwt-6.1-compat.patch
-		patch -p1 < qwtpolar-qwt-6.1-compat.patch 
+	wget https://raw.githubusercontent.com/analogdevicesinc/scopy-flatpak/master/qwtpolar-qwt-6.1-compat.patch -O - | patch -p1
 
-		patch -p1 <<-EOF
+	patch -p1 <<-EOF
 --- a/qwtpolarconfig.pri
 +++ b/qwtpolarconfig.pri
 @@ -70,14 +72,14 @@ QWT_POLAR_INSTALL_FEATURES  = \$\${QWT_POLAR_INSTALL_PREFIX}/features
@@ -232,5 +231,4 @@ patch_qwtpolar() {
  }
  
 EOF
-	}
 }
