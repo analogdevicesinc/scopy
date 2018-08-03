@@ -547,7 +547,9 @@ void ClockPatternUI::parse_ui()
 	bool freqStepDown = false;
 	bool phaseStepDown = true;
 	bool phaseNoChange  = true;
+	bool freqChange = false;
 	double oldPhase = 0;
+
 
 	if (obj==frequencySpinButton) {
 		if (frequencySpinButton->value() < requestedFrequency) {
@@ -555,6 +557,7 @@ void ClockPatternUI::parse_ui()
 		}
 
 		requestedFrequency = frequencySpinButton->value();
+		freqChange=true;
 	}
 
 	if (obj==phaseSpinButton) {
@@ -572,19 +575,22 @@ void ClockPatternUI::parse_ui()
 
 	long div;
 
-	if (freqStepDown) {
-		div=(long)ceil((double)PGMaxSampleRate/freq);
-	} else {
-		div=(long)floor((double)PGMaxSampleRate/freq);
+	if(freqChange)
+	{
+		if (freqStepDown) {
+			div=(long)ceil((double)PGMaxSampleRate/freq);
+		} else {
+			div=(long)floor((double)PGMaxSampleRate/freq);
+		}
+
+		freq=(PGMaxSampleRate)/(float)div;
+		requestedFrequency=freq;
+
+		frequencySpinButton->blockSignals(true);
+		frequencySpinButton->setValue(freq);
+		frequencySpinButton->updateCompletionCircle(freq);
+		frequencySpinButton->blockSignals(false);
 	}
-
-	freq=(PGMaxSampleRate)/(float)div;
-	requestedFrequency=freq;
-
-	frequencySpinButton->blockSignals(true);
-	frequencySpinButton->setValue(freq);
-	frequencySpinButton->updateCompletionCircle(freq);
-	frequencySpinButton->blockSignals(false);
 	pattern->set_frequency(freq);
 
 	auto dutystep=100.0/ (PGMaxSampleRate / pattern->get_frequency());
