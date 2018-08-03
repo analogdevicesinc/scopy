@@ -165,7 +165,9 @@ void SmallOnOffSwitch::showEvent(QShowEvent *event)
 		}
 	} else {
 		setHandleColor(color_start);
+		handle.setGeometry(0, handle.y(), handle.width(), handle.height());
 	}
+
 }
 
 void SmallOnOffSwitch::updateOnOffLabels()
