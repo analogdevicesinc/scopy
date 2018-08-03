@@ -670,6 +670,23 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		[=]() {
 		plot.printWithNoBackground();
 	});
+
+	//workaround for a bug that selected channel settings for disabled channels
+	bool found = false;
+	for (int i = 0; i < nb_channels + nb_math_channels +
+					nb_ref_channels; ++i) {
+		ChannelWidget *cw = channelWidgetAtId(i);
+		if (cw->enableButton()->isChecked()) {
+			cw->menuButton()->setChecked(true);
+			found = true;
+			break;
+		}
+	}
+	if (!found) {
+		ui->btnTrigger->setChecked(true);
+		ui->btnTrigger->setChecked(false);
+	}
+
 }
 
 void Oscilloscope::init_selected_measurements(int chnIdx,
