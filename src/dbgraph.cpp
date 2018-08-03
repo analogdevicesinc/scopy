@@ -462,8 +462,10 @@ void dBgraph::onCursor1Moved(int value)
 	if (text == "-") {
 		markerIntersection1->detach();
 	} else {
-		markerIntersection1->attach(this);
-		markerIntersection1->setValue(point.x(), d1);
+		if (d_cursorsEnabled) {
+			markerIntersection1->attach(this);
+			markerIntersection1->setValue(point.x(), d1);
+		}
 	}
 	replot();
 
@@ -488,8 +490,10 @@ void dBgraph::onCursor2Moved(int value)
 	if (text == "-") {
 		markerIntersection2->detach();
 	} else {
-		markerIntersection2->attach(this);
-		markerIntersection2->setValue(point.x(), d2);
+		if (d_cursorsEnabled) {
+			markerIntersection2->attach(this);
+			markerIntersection2->setValue(point.x(), d2);
+		}
 	}
 	replot();
 
