@@ -9,7 +9,8 @@ brew_install_or_upgrade() {
 		brew ls --versions $1 # check if installed last-ly
 }
 
-PACKAGES="qt cmake fftw bison gettext autoconf automake libtool libzip glib libusb python3 python brew-pip"
+PYTHON="python3 python@2 python brew-pip"
+PACKAGES="qt cmake fftw bison gettext autoconf automake libtool libzip glib libusb $PYTHON"
 PACKAGES="$PACKAGES glibmm doxygen wget boost gnu-sed libmatio dylibbundler libxml2 pkg-config"
 
 for pak in $PACKAGES ; do
