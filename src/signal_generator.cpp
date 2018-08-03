@@ -1460,7 +1460,7 @@ basic_block_sptr SignalGenerator::getSignalSource(gr::top_block_sptr top,
 	switch(data.waveform)
 	{
 	case SG_SQR_WAVE:
-		rise=fall=0.001;
+		rise=fall=0.0001;
 		holdh=(data.dutycycle/100.0);
 		holdl=1.0-(data.dutycycle/100.0);
 		break;
