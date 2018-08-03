@@ -387,6 +387,10 @@ void dBgraph::useLogFreq(bool use_log_freq)
 	}
 
 	this->log_freq = use_log_freq;
+	if (d_cursorsEnabled && isVisible()) {
+		onCursor1Moved(d_vBar1->transform(d_vBar1->plotCoord()).x());
+		onCursor2Moved(d_vBar2->transform(d_vBar2->plotCoord()).x());
+	}
 	replot();
 }
 
