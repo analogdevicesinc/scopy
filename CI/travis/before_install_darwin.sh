@@ -26,10 +26,9 @@ QT_PATH="$(brew --prefix qt)/bin"
 export PATH="${QT_PATH}:$PATH"
 
 patch_qwtpolar_mac() {
-	[ -f qwtpolar-qwt-6.1-compat.patch ] || {
-		patch_qwtpolar
+	patch_qwtpolar
 
-		patch -p1 <<-EOF
+	patch -p1 <<-EOF
 --- a/qwtpolarconfig.pri
 +++ b/qwtpolarconfig.pri
 @@ -16,7 +16,9 @@ QWT_POLAR_VER_PAT      = 1
@@ -44,7 +43,6 @@ patch_qwtpolar_mac() {
  
  win32 {
 EOF
-	}
 }
 
 # Get pip if not installed ; on Travis + OS X, Python is not well supported

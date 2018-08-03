@@ -48,10 +48,9 @@ else
 fi
 
 patch_qwtpolar_linux() {
-	[ -f qwtpolar-qwt-6.1-compat.patch ] || {
-		patch_qwtpolar
+	patch_qwtpolar
 
-		patch -p1 <<-EOF
+	patch -p1 <<-EOF
 --- a/qwtpolarconfig.pri
 +++ b/qwtpolarconfig.pri
 @@ -16,7 +16,9 @@ QWT_POLAR_VER_PAT      = 1
@@ -66,7 +65,6 @@ patch_qwtpolar_linux() {
  
  win32 {
 EOF
-	}
 }
 
 if ! is_new_ubuntu ; then
