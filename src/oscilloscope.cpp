@@ -4093,4 +4093,12 @@ void Oscilloscope::on_btnGeneralSettings_toggled(bool checked)
 		ui->btnSettings->setChecked(!checked);
 }
 
+void Oscilloscope::channelLineWidthChanged(int id)
+{
+	qreal width = 0.5 * (id + 1);
 
+	if (width != plot.getLineWidthF(current_ch_widget)) {
+		plot.setLineWidthF(current_ch_widget, width);
+		plot.replot();
+	}
+}

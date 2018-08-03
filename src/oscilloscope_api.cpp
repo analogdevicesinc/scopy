@@ -423,16 +423,6 @@ void Oscilloscope_API::setStatisticEn(const QList<int>& list)
 	osc->onStatisticSelectionListChanged();
 }
 
-void Oscilloscope::channelLineWidthChanged(int id)
-{
-	qreal width = 0.5 * (id + 1);
-
-	if (width != plot.getLineWidthF(current_ch_widget)) {
-		plot.setLineWidthF(current_ch_widget, width);
-		plot.replot();
-	}
-}
-
 int Oscilloscope_API::getCurrentChannel() const
 {
 	return osc->current_channel;
