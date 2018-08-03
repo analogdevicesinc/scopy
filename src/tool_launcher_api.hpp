@@ -19,6 +19,8 @@ class ToolLauncher_API: public ApiObject
 
 	Q_PROPERTY(bool maximized READ maximized WRITE setMaximized);
 
+	Q_PROPERTY(bool always_on_top READ alwaysOnTop WRITE setAlwaysOnTop);
+
 	Q_PROPERTY(QList<QString> tool_list READ order WRITE setOrder);
 
 	Q_PROPERTY(bool skip_calibration READ calibration_skipped WRITE skip_calibration);
@@ -74,6 +76,16 @@ public:
 		} else {
 			tl->showNormal();
 		}
+	}
+
+	bool alwaysOnTop() const
+	{
+		return !!(tl->windowFlags() & Qt::WindowStaysOnTopHint);
+	}
+	void setAlwaysOnTop(bool on)
+	{
+		tl->setWindowFlag(Qt::WindowStaysOnTopHint, on);
+		tl->show();
 	}
 
 	Q_INVOKABLE QList<QString> usb_uri_list();
