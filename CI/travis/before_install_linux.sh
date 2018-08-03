@@ -92,7 +92,7 @@ if [ "$TRAVIS" == "true" ] ; then
 else
 	cmake_build_git "libiio" "https://github.com/analogdevicesinc/libiio" "" "-DINSTALL_UDEV_RULE:BOOL=OFF"
 
-	cmake_build_git "libad9361-iio" "https://github.com/analogdevicesinc/libad9361-iio" "" "-DLIBIIO_INCLUDEDIR:STRING=$STAGINGDIR/include -DLIBIIO_LIBRARIES:STRING=$STAGINGDIR/lib"
+	cmake_build_git "libad9361-iio" "https://github.com/analogdevicesinc/libad9361-iio" "" "-DLIBIIO_INCLUDEDIR:PATH=$STAGINGDIR/include -DLIBIIO_LIBRARIES:FILEPATH=$STAGINGDIR/lib/libiio.so"
 fi
 
 cmake_build_git "gr-iio" "https://github.com/analogdevicesinc/gr-iio"
