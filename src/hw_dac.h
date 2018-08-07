@@ -84,6 +84,7 @@ public:
 		case GENERIC: return std::make_shared<GenericDac>(ctx, dac);
 		case M2K: return std::make_shared<M2kDac>(ctx, dac);
 		}
+		return nullptr;
 	}
 };
 

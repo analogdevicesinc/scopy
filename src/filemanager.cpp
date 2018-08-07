@@ -41,7 +41,7 @@ FileManager::~FileManager()
 
 }
 
-unsigned int FileManager::open(QString fileName,
+void FileManager::open(QString fileName,
                                   FileManager::FilePurpose filepurpose)
 {
         //read the data from the file if filepurpose is Import

@@ -1317,6 +1317,7 @@ int View::getGridPosition(int pos)
 {
 	if(pos < grid_positions.size())
 		return grid_positions.at(pos);
+	return -1;
 }
 
 } // namespace view

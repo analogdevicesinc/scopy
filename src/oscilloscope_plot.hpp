@@ -119,7 +119,7 @@ namespace adiscope {
 
 		void setTimeTriggerInterval(double min, double max);
 		bool labelsEnabled();
-		bool trackModeEnabled(bool enabled);
+		void trackModeEnabled(bool enabled);
 		void repositionCursors();
 
 		void setGraticuleEnabled(bool enabled);

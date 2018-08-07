@@ -3623,8 +3623,8 @@ bool Oscilloscope::autosetFindFrequency()
 			autosetMaxIndexAmpl = max;
 			return true; // found valid frequency
 		}
-		return false;
 	}
+	return false;
 }
 
 void Oscilloscope::autosetFindPeaks()

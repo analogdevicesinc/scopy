@@ -104,6 +104,7 @@ public:
 		case GENERIC: return new DeviceWidget(uri, name, parent);
 		case M2K: return new M2kDeviceWidget(uri, name, parent);
 		}
+		return nullptr;
 	}
 };
 

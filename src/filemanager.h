@@ -51,7 +51,7 @@ public:
         FileManager(QString toolName);
         ~FileManager();
 
-        unsigned int open(QString fileName, FileManager::FilePurpose filepurpose = EXPORT);
+	void open(QString fileName, FileManager::FilePurpose filepurpose = EXPORT);
 
         void save(QVector<double> data, QString name);
         void save(QVector<QVector<double>> data, QStringList column_names);

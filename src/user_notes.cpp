@@ -163,6 +163,7 @@ int UserNotes::getNoteIndex(Note *note)
                         return i;
                 }
         }
+	return -1;
 }
 
 void UserNotes::note_selected(bool selected)

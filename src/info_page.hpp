@@ -133,6 +133,7 @@ public:
 		case M2K: return new M2kInfoPage(uri, prefPanel,
 						 ctx, parent);
 		}
+		return nullptr;
 	}
 };
 }
