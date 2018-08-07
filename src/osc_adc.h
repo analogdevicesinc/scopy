@@ -148,6 +148,7 @@ public:
 		case GENERIC: return std::make_shared<GenericAdc>(ctx, adc);
 		case M2K: return std::make_shared<M2kAdc>(ctx, adc);
 		}
+		return nullptr;
 	}
 };
 

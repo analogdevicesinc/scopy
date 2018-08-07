@@ -844,6 +844,7 @@ ChannelWidget * SpectrumAnalyzer::getChannelWidgetAt(unsigned int id)
 		if (channels.at(i).get()->widget()->id() == id)
 			return channels.at(i).get()->widget();
 	}
+	return nullptr;
 }
 
 void SpectrumAnalyzer::onChannelSelected(bool en)

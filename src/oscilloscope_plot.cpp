@@ -855,7 +855,7 @@ void CapturePlot::setGraticuleEnabled(bool enabled){
 	replot();
 }
 
-bool CapturePlot::trackModeEnabled(bool enabled)
+void CapturePlot::trackModeEnabled(bool enabled)
 {
 	d_trackMode = !enabled;
 	if (d_horizCursorsEnabled) {
