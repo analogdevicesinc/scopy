@@ -674,14 +674,27 @@ void Channel_API::setProbeAttenuation(double val)
 	}
 }
 
-void Channel_API::setColor(int colorIdx)
+void Channel_API::setColor(int r, int g, int b, int a)
 {
 	int index = osc->channels_api.indexOf(const_cast<Channel_API*>(this));
 	QWidget *obj = osc->ui->channelsList->itemAt(index)->widget();
 	ChannelWidget *cw = static_cast<ChannelWidget *>(obj);
-	osc->plot.setLineColor(index, colorIdx);
-	if (cw) {
-		cw->setColor(osc->plot.getLineColor(index));
+	QColor color(r, g, b, a);
+	if (color.isValid()) {
+		osc->plot.setLineColor(index, color);
+		osc->plot.d_offsetHandles.at(index)->setRoundRectColor(color);
+		osc->plot.d_offsetHandles.at(index)->setPen(QPen(color, 2, Qt::SolidLine));
+		static_cast<QLabel *>(
+			osc->ui->chn_scales->itemAt(index)->widget())->setStyleSheet(QString("QLabel {"
+						"color: %1;"
+						"font-weight: bold;"
+						"}").arg(color.name()));
+		if (cw) {
+			cw->setColor(osc->plot.getLineColor(index));
+		}
+		if (!osc->runButton()->isChecked()) {
+			osc->plot.replot();
+		}
 	}
 }
 
