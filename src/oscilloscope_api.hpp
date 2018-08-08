@@ -301,7 +301,7 @@ public:
 	double measured_neg_duty() const;
 	QList<double> data() const;
 
-	Q_INVOKABLE void setColor(int);
+	Q_INVOKABLE void setColor(int, int, int, int a = 255);
 
 private:
 	Oscilloscope *osc;
