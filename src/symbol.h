@@ -78,6 +78,7 @@ public:
 	virtual void draw(QPainter *painter) const = 0;
 	virtual bool moveWith(double plotDeltaX, double plotDeltaY) = 0;
 
+	void triggerMove();
 Q_SIGNALS:
 	void positionChanged(double x, double y);
 	void pixelPositionChanged(int x, int y);
