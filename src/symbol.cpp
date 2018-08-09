@@ -246,6 +246,12 @@ void Symbol::updatePlotCoordFromSurfacePos()
 	setPlotCoord(plotCoord);
 }
 
+/* emit a signal for the handle to update position */
+void Symbol::triggerMove(){
+	QPoint pixelPos = transform(d_plotCoord).toPoint();
+	Q_EMIT pixelPositionChanged(pixelPos.x(), pixelPos.y());
+}
+
 void Symbol::onFixedScaleChanged()
 {
 	QwtInterval interval = plot()->axisInterval(fixedAxis());

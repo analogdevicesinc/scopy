@@ -79,6 +79,7 @@ namespace adiscope {
 		HorizBar *levelTriggerB();
 
 		QWidget *topArea();
+		QWidget *topHandlesArea();
 		QWidget *bottomHandlesArea();
 		QWidget *leftHandlesArea();
 		QWidget *rightHandlesArea();
@@ -208,6 +209,7 @@ namespace adiscope {
 		int d_selected_channel;
 
 		QWidget *d_topWidget;
+		HorizHandlesArea *d_topHandlesArea;
 		HorizHandlesArea *d_bottomHandlesArea;
 		VertHandlesArea *d_leftHandlesArea;
 		VertHandlesArea *d_rightHandlesArea;

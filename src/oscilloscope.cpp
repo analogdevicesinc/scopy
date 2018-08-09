@@ -303,14 +303,18 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		QSizePolicy::Fixed, QSizePolicy::Fixed);
 
 	ui->gridLayoutPlot->addWidget(measurePanel, 0, 1, 1, 1);
-	ui->gridLayoutPlot->addWidget(plot.topArea(), 1, 0, 1, 3);
-	ui->gridLayoutPlot->addWidget(plot.leftHandlesArea(), 1, 0, 3, 1);
-	ui->gridLayoutPlot->addWidget(&plot, 2, 1, 1, 1);
-	ui->gridLayoutPlot->addWidget(&hist_plot, 2, 2, 1, 1);
-	ui->gridLayoutPlot->addWidget(plot.rightHandlesArea(), 1, 3, 3, 1);
-	ui->gridLayoutPlot->addWidget(plot.bottomHandlesArea(), 3, 0, 1, 4);
-	ui->gridLayoutPlot->addItem(plotSpacer, 4, 0, 1, 3);
-	ui->gridLayoutPlot->addWidget(statisticsPanel, 5, 1, 1, 1);
+	ui->gridLayoutPlot->addWidget(plot.topArea(), 1, 0, 1, 4);
+	ui->gridLayoutPlot->addWidget(plot.topHandlesArea(), 2, 0, 1, 4);
+
+	ui->gridLayoutPlot->addWidget(plot.leftHandlesArea(), 1, 0, 4, 1);
+	ui->gridLayoutPlot->addWidget(plot.rightHandlesArea(), 1, 3, 4, 1);
+
+	ui->gridLayoutPlot->addWidget(&plot, 3, 1, 1, 1);
+	ui->gridLayoutPlot->addWidget(&hist_plot, 3, 2, 1, 1);
+
+	ui->gridLayoutPlot->addWidget(plot.bottomHandlesArea(), 4, 0, 1, 4);
+	ui->gridLayoutPlot->addItem(plotSpacer, 5, 0, 1, 4);
+	ui->gridLayoutPlot->addWidget(statisticsPanel, 6, 1, 1, 1);
 
 	plot.setBonusWidthForHistogram(25);
 
@@ -2353,6 +2357,7 @@ void adiscope::Oscilloscope::on_boxMeasure_toggled(bool on)
 	// Set the visibility of the cursor readouts owned by the plot
 	if (ui->boxCursors->isChecked())
 		plot.setCursorReadoutsVisible(!on);
+	// set the gates enable / disable
 	plot.setGatingEnabled(on && gatingEnabled);
 	buffer_previewer->setGatingEnabled(on && gatingEnabled);
 
@@ -3762,6 +3767,7 @@ void Oscilloscope::onStatisticsReset()
 }
 
 void Oscilloscope::onGatingEnabled(bool on){
+//enable / disable gatings
 	gatingEnabled = on;
 	buffer_previewer->setGatingEnabled(on);
 	plot.setGatingEnabled(on);
