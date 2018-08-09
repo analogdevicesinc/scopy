@@ -228,8 +228,8 @@ namespace adiscope {
 		PlotLineHandleH *d_hCursorHandle1;
 		PlotLineHandleH *d_hCursorHandle2;
 
-		PlotLineHandleH *d_hGatingHandle1;
-		PlotLineHandleH *d_hGatingHandle2;
+		PlotGateHandle *d_hGatingHandle1;
+		PlotGateHandle *d_hGatingHandle2;
 
 		VertBar *d_vBar1;
 		VertBar *d_vBar2;

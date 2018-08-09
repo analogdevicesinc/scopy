@@ -90,6 +90,91 @@ void PlotLineHandle::setGrabbed(bool grabbed)
 	}
 }
 
+PlotGateHandle::PlotGateHandle(const QPixmap &handleIcon, QWidget *parent):
+	PlotLineHandle(handleIcon, parent)
+{
+	m_width = m_image.width();
+	m_height = m_image.height();
+	setMinimumSize(m_width, m_height);
+	setMaximumSize(m_width, m_height);
+}
+
+void PlotGateHandle::triggerMove()
+{
+	Q_EMIT positionChanged(m_current_pos);
+}
+
+void PlotGateHandle::setPosition(int pos)
+{
+	if (m_current_pos != pos)
+		moveWithinParent(centerPosToOrigin(pos), 0);
+}
+
+void PlotGateHandle::setPositionSilenty(int pos)
+{
+	if (m_current_pos != pos)
+		moveSilently(QPoint(centerPosToOrigin(pos), 0));
+}
+
+void PlotGateHandle::moveWithinParent(int x, int y)
+{
+	Q_UNUSED(y);
+
+	HorizHandlesArea *area = static_cast<HorizHandlesArea *>(parent());
+
+	int lower_limit = 0 + area->leftPadding() - width() / 2;
+	int upper_limit = area->width() - area->rightPadding() - width() / 2 - 1;
+
+	if (x < lower_limit)
+		x = lower_limit;
+	else if (x > upper_limit)
+		x = upper_limit;
+
+
+	int centerPos = originPosToCenter(x);
+	int oldCenterPos = originPosToCenter(this->x());
+
+	if (centerPos != oldCenterPos) {
+		move(x, this->y());
+
+		if (!m_enable_silent_move)
+			Q_EMIT positionChanged(centerPos);
+	}
+	m_enable_silent_move = false;
+	m_current_pos = centerPos;
+}
+
+void PlotGateHandle::setInnerSpacing(int value)
+{
+	m_innerSpacing = value;
+}
+
+void PlotGateHandle::paintEvent(QPaintEvent *event)
+{
+	QPainter p(this);
+	QPoint imageTopLeft;
+
+	imageTopLeft = QPoint(0, 0);
+	p.drawPixmap(imageTopLeft, m_image);
+}
+
+int PlotGateHandle::originPosToCenter(int origin)
+{
+	HorizHandlesArea *area = static_cast<HorizHandlesArea *>(parent());
+	int offset = -area->leftPadding() + width() / 2;
+
+	return (origin + offset);
+}
+
+int PlotGateHandle::centerPosToOrigin(int center)
+{
+	HorizHandlesArea *area = static_cast<HorizHandlesArea *>(parent());
+	int offset = -area->leftPadding() + width() / 2;
+
+	return (center - offset);
+}
+
+
 PlotLineHandleH::PlotLineHandleH(const QPixmap &handleIcon, QWidget *parent,
 			bool facingBottom):
 	PlotLineHandle(handleIcon, parent),
