@@ -193,6 +193,7 @@ private:
 	QList<ChannelGroup_API *> channel_groups_api;
 	LogicAnalyzerChannelManager chm;
 	LogicAnalyzerChannelManagerUI *chm_ui;
+	bool apiLoading;
 
 	void disconnectAll();
 	static unsigned int get_no_channels(struct iio_device *dev);

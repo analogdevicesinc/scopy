@@ -179,7 +179,7 @@ void ChannelGroup_API::setChEnabled(bool en)
 {
 	auto chGroupUI = lga->chm_ui->getUiFromChGroup(
 		lga->chm.get_channel_group(getIndex()));
-	if(chGroupUI) {
+	if(chGroupUI && !(lga->apiLoading)) {
 		chGroupUI->ui->btnEnableChannel->setChecked(en);
 	}
 	else

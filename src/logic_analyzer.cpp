@@ -125,7 +125,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	offline_mode(offline_mode_),
 	zoomed_in(false),
 	triggerUpdater(new StateUpdater(250, this)),
-	trigger_is_forced(false)
+	trigger_is_forced(false),
+	apiLoading(false)
 {
 	ui->setupUi(this);
 	setDynamicProperty(ui->btnCursorsLock, "use_icon", true);
@@ -435,10 +436,13 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	init_export_settings();
 	installWheelEventGuard();
 
+	// workaround - prevents UI updates while API is loading
+	apiLoading=true;
 	api->setObjectName(QString::fromStdString(Filter::tool_name(
 			TOOL_LOGIC_ANALYZER)));
 	api->load(*settings);
 	api->js_register(engine);
+	apiLoading = false;
 
 	ui->btnPrint->setFixedWidth(40);
 	connect(ui->btnPrint, &QPushButton::clicked, [=]() {
