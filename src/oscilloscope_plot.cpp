@@ -285,11 +285,11 @@ CapturePlot::CapturePlot(QWidget *parent,
 				QPixmap(":/icons/h_cursor_handle.svg"),
 				d_bottomHandlesArea);
 
-	d_hGatingHandle1 = new PlotLineHandleH(
+	d_hGatingHandle1 = new PlotGateHandle(
 				QPixmap(":/icons/h_cursor_handle.svg"),
 				d_bottomHandlesArea);
 
-	d_hGatingHandle2 = new PlotLineHandleH(
+	d_hGatingHandle2 = new PlotGateHandle(
 				QPixmap(":/icons/h_cursor_handle.svg"),
 				d_bottomHandlesArea);
 

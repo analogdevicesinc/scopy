@@ -68,6 +68,20 @@ private:
 	void setGrabbed(bool);
 };
 
+class PlotGateHandle: public PlotLineHandle{
+public:
+	PlotGateHandle(const QPixmap &handleIcon, QWidget *parent = 0);
+	void triggerMove();
+	void setPosition(int);
+	void setPositionSilenty(int);
+	void moveWithinParent(int x, int y);
+	void setInnerSpacing(int value);
+protected:
+	void paintEvent(QPaintEvent *event);
+	int originPosToCenter(int origin);
+	int centerPosToOrigin(int center);
+};
+
 class PlotLineHandleH: public PlotLineHandle
 {
 public:
