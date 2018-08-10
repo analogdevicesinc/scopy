@@ -1132,6 +1132,9 @@ void CapturePlot::updateHandleAreaPadding(bool enabled)
 		d_topHandlesArea->setRightPadding(50 + fmw/2 + d_bonusWidth);
 		d_rightHandlesArea->setTopPadding(50 + 6);
 		d_rightHandlesArea->setBottomPadding(50 + fmh);
+		QMargins margins = d_topWidget->layout()->contentsMargins();
+		margins.setLeft(d_leftHandlesArea->minimumWidth()+100);
+		d_topWidget->layout()->setContentsMargins(margins);
 	} else {
 		if(d_topHandlesArea->leftPadding() != 50)
 			d_topHandlesArea->setLeftPadding(50);
