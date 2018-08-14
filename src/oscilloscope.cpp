@@ -118,7 +118,9 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	lastFunctionValid(false),
 	import_error(""),
 	hCursorsEnabled(true),
-	vCursorsEnabled(true)
+	vCursorsEnabled(true),
+	horiz_offset(0),
+	reset_horiz_offset(true)
 {
 	ui->setupUi(this);
 	int triggers_panel = ui->stackedWidget->insertWidget(-1, &trigger_settings);
@@ -601,6 +603,14 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		if (isZoomOut) {
 			updateGainMode();
 		}
+
+		if (zoom_level == 0) {
+			onTimePositionChanged(timePosition->value());
+		}
+
+		updateBufferPreviewer();
+		horiz_offset = plot.HorizOffset();
+		time_trigger_offset = horiz_offset;
 	});
 
 	connect(ch_ui->probe_attenuation, QOverload<int>::of(&QComboBox::currentIndexChanged),
@@ -629,6 +639,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		onTriggerSourceChanged(trigger_settings.currentChannel());
 
 	});
+
+	init_buffer_scrolling();
 
 	export_settings_init();
 	cursor_panel_init();
@@ -688,6 +700,38 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	}
 
 }
+
+void Oscilloscope::init_buffer_scrolling()
+{
+	connect(&plot, &CapturePlot::canvasSizeChanged, [=](){
+		buffer_previewer->setFixedWidth(plot.width());
+	});
+	connect(buffer_previewer, &BufferPreviewer::bufferMovedBy, [=](int value) {
+		reset_horiz_offset = false;
+		double moveTo = 0.0;
+		double min = plot.Curve(0)->sample(0).x();
+		double max = plot.Curve(0)->sample(plot.Curve(0)->data()->size() - 1).x();
+		int width = buffer_previewer->width();
+		QwtInterval xBot = plot.axisInterval(QwtPlot::xBottom);
+		double xAxisWidth = max - min;
+
+		moveTo = value * xAxisWidth / width;
+		plot.setHorizOffset(moveTo + horiz_offset);
+		plot.replot();
+		updateBufferPreviewer();
+	});
+	connect(buffer_previewer, &BufferPreviewer::bufferStopDrag, [=](){
+		horiz_offset = plot.HorizOffset();
+		reset_horiz_offset = true;
+	});
+	connect(buffer_previewer, &BufferPreviewer::bufferResetPosition, [=](){
+		plot.setHorizOffset(time_trigger_offset);
+		plot.replot();
+		updateBufferPreviewer();
+		horiz_offset = time_trigger_offset;
+	});
+}
+
 
 void Oscilloscope::init_selected_measurements(int chnIdx,
 					      std::vector<int> measureIdx)
@@ -2740,6 +2784,7 @@ void adiscope::Oscilloscope::onTimePositionChanged(double value)
 
 	// Realign plot data based on the new time position
 	plot.setHorizOffset(value);
+	time_trigger_offset = value;
 
 	plot.setXAxisNumPoints(plot_samples_sequentially ? active_plot_sample_count : 0);
 	plot.realignReferenceWaveforms(timeBase->value(), timePosition->value());
@@ -2755,6 +2800,9 @@ void adiscope::Oscilloscope::onTimePositionChanged(double value)
 		last_set_time_pos = active_time_pos;
 	}
 	updateBufferPreviewer();
+	if (reset_horiz_offset) {
+		horiz_offset = value;
+	}
 
 	if (active_sample_rate == adc->sampleRate() &&
 			(active_plot_sample_count == oldSampleCount))
