@@ -47,7 +47,8 @@ BufferPreviewer::BufferPreviewer(int pixelsPerPeriod, double wavePhase,
 	m_pixelsPerPeriod(pixelsPerPeriod),
 	m_startingPhase(wavePhase),
 	m_fullWaveNumPoints(1),
-	m_fullWavePoints(new QPointF[m_fullWaveNumPoints])
+	m_fullWavePoints(new QPointF[m_fullWaveNumPoints]),
+	m_rightBtnClick(false)
 {
 }
 
@@ -221,6 +222,45 @@ void BufferPreviewer::resizeEvent(QResizeEvent *)
 	m_fullWaveNumPoints = contentsRect().width();
 	m_fullWavePoints = new QPointF[m_fullWaveNumPoints];
 	buildFullWaveform(m_fullWavePoints, m_fullWaveNumPoints);
+}
+
+void BufferPreviewer::mousePressEvent(QMouseEvent *event)
+{
+	if (event->button() == Qt::RightButton) {
+			m_rightBtnClick = true;
+	} else {
+		setCursor(Qt::ClosedHandCursor);
+		m_offset = event->pos();
+	}
+}
+
+void BufferPreviewer::mouseMoveEvent(QMouseEvent *event)
+{
+	if (!m_rightBtnClick) {
+		int value = (event->pos() - m_offset).x();
+		Q_EMIT bufferMovedBy(value);
+	}
+}
+
+void BufferPreviewer::mouseReleaseEvent(QMouseEvent *event)
+{
+	if (m_rightBtnClick) {
+		Q_EMIT bufferResetPosition();
+		m_rightBtnClick = false;
+	} else {
+		setCursor(Qt::OpenHandCursor);
+		Q_EMIT bufferStopDrag();
+	}
+}
+
+void BufferPreviewer::enterEvent(QEvent *event)
+{
+	setCursor(Qt::OpenHandCursor);
+}
+
+void BufferPreviewer::leaveEvent(QEvent *event)
+{
+	setCursor(Qt::ArrowCursor);
 }
 
 /*
