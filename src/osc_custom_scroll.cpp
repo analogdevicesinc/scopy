@@ -30,20 +30,20 @@ OscCustomScrollArea::OscCustomScrollArea(QWidget *parent):
 		switch (newstate) {
 		case QScroller::Inactive :
 			if (inside)
-				QApplication::setOverrideCursor(Qt::OpenHandCursor);
+				setCursor(Qt::OpenHandCursor);
 			break;
 		case QScroller::Pressed :
-			QApplication::setOverrideCursor(Qt::ClosedHandCursor);
+			setCursor(Qt::ClosedHandCursor);
 			break;
 		case QScroller::Dragging :
-			QApplication::setOverrideCursor(Qt::ClosedHandCursor);
+			setCursor(Qt::ClosedHandCursor);
 			break;
 		case QScroller::Scrolling :
 			if (inside)
-				QApplication::setOverrideCursor(Qt::OpenHandCursor);
+				setCursor(Qt::OpenHandCursor);
 			break;
 		default:
-			QApplication::setOverrideCursor(Qt::ArrowCursor);
+			setCursor(Qt::ArrowCursor);
 			break;
 		}
 	});
@@ -59,14 +59,14 @@ OscCustomScrollArea::OscCustomScrollArea(QWidget *parent):
 void OscCustomScrollArea::enterEvent(QEvent *event)
 {
 	if (!disableCursor)
-		QApplication::setOverrideCursor(Qt::OpenHandCursor);
+		setCursor(Qt::OpenHandCursor);
 	inside = true;
 }
 
 void OscCustomScrollArea::leaveEvent(QEvent *event)
 {
 	if (!disableCursor)
-		QApplication::setOverrideCursor(Qt::ArrowCursor);
+		setCursor(Qt::ArrowCursor);
 	inside = false;
 }
 
