@@ -51,10 +51,21 @@ public:
 	int pixelsPerPeriod() const;
 	double wavePhase() const;
 
+Q_SIGNALS:
+	void bufferMovedBy(int);
+	void bufferStopDrag();
+	void bufferResetPosition();
+
 protected:
 	void paintEvent(QPaintEvent *) Q_DECL_OVERRIDE;
 	void resizeEvent(QResizeEvent *) Q_DECL_OVERRIDE;
 	virtual void buildFullWaveform(QPointF *wavePoints, int numPts) = 0;
+
+	void mousePressEvent(QMouseEvent *event);
+	void mouseMoveEvent(QMouseEvent *event);
+	void mouseReleaseEvent(QMouseEvent *event);
+	void enterEvent(QEvent *event);
+	void leaveEvent(QEvent *event);
 
 private:
 	double m_waveformPos;
@@ -69,6 +80,11 @@ private:
 
 	int m_fullWaveNumPoints;
 	QPointF *m_fullWavePoints;
+
+	QPoint m_offset;
+	int m_pixelLeft;
+	int m_pixelRight;
+	bool m_rightBtnClick;
 };
 
 class AnalogBufferPreviewer: public BufferPreviewer
