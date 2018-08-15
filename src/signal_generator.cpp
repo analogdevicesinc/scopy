@@ -17,6 +17,7 @@
  * Boston, MA 02110-1301, USA.
  */
 
+#include "logging_categories.h"
 #include "dynamicWidget.hpp"
 #include "signal_generator.hpp"
 #include "spinbox_a.hpp"
@@ -967,7 +968,7 @@ void SignalGenerator::updatePreview()
 	QElapsedTimer timer;
 	timer.start();
 	top->run();
-	qDebug() << "The slow operation took" << timer.elapsed() << "milliseconds";
+	qDebug(CAT_SIGNAL_GENERATOR) << "The slow operation took" << timer.elapsed() << "milliseconds";
 	top->disconnect_all();
 
 	if (ui->run_button->isChecked()) {
@@ -1119,7 +1120,7 @@ bool SignalGenerator::loadParametersFromFile(
 		matfp = Mat_Open(filePath.toStdString().c_str(),MAT_ACC_RDONLY);
 
 		if (NULL == matfp) {
-			qDebug()<<"Error opening MAT file "<<filePath;
+			qDebug(CAT_SIGNAL_GENERATOR)<<"Error opening MAT file "<<filePath;
 			ptr->file_nr_of_samples.push_back(0);
 			ptr->file_message = "MAT file could not be parsed";
 			return false;
@@ -1133,7 +1134,7 @@ bool SignalGenerator::loadParametersFromFile(
 				Mat_VarReadDataAll(matfp, matvar);
 
 				if (!matvar->isComplex) {
-					qDebug()<<"Complex buffers not supported";
+					qDebug(CAT_SIGNAL_GENERATOR)<<"Complex buffers not supported";
 					ptr->file_message="Complex buffers not supported";
 					ptr->file_channel_names.push_back(QString(matvar->name));
 					ptr->file_nr_of_samples.push_back(*matvar->dims);
@@ -1292,7 +1293,7 @@ void SignalGenerator::start()
 			throw std::runtime_error("Unable to create buffer");
 		}
 
-		qDebug() << QString("Created buffer with %1 samples at %2 SPS for device %3")
+		qDebug(CAT_SIGNAL_GENERATOR) << QString("Created buffer with %1 samples at %2 SPS for device %3")
 		         .arg(samples_count).arg(best_rate).arg(
 		                 iio_device_get_name(dev) ?:
 		                 iio_device_get_id(dev));
@@ -1372,7 +1373,7 @@ void SignalGenerator::start()
 		iio_device_attr_write_longlong(dev, "sampling_frequency",
 		                               final_rate);
 
-		qDebug() << "Pushed cyclic buffer";
+		qDebug(CAT_SIGNAL_GENERATOR) << "Pushed cyclic buffer";
 
 		iio_buffer_push_partial(buf, samples_count);
 		buffers.append(buf);
@@ -1498,7 +1499,7 @@ void SignalGenerator::loadFileChannelData(QWidget *obj)
 	auto ptr = getData(obj);
 
 	if (ptr->type!=SIGNAL_TYPE_BUFFER) {
-		qDebug()<<"loadFileChannelData called without having SIGNAL_TYPE_BUFFER";
+		qDebug(CAT_SIGNAL_GENERATOR)<<"loadFileChannelData called without having SIGNAL_TYPE_BUFFER";
 		return;
 	}
 
@@ -1522,7 +1523,7 @@ void SignalGenerator::loadFileChannelData(QWidget *obj)
 		matfp = Mat_Open(ptr->file.toStdString().c_str(),MAT_ACC_RDONLY);
 
 		if (NULL == matfp) {
-			qDebug()<<"Error opening MAT file "<<ptr->file;
+			qDebug(CAT_SIGNAL_GENERATOR)<<"Error opening MAT file "<<ptr->file;
 			return;
 		}
 
@@ -2008,7 +2009,7 @@ double SignalGenerator::get_best_sample_rate(
 			return rate;
 		}
 
-		qDebug() << QString("Rate %1 not ideal").arg(rate);
+		qDebug(CAT_SIGNAL_GENERATOR) << QString("Rate %1 not ideal").arg(rate);
 	}
 
 	/* If we can't find a perfect sample rate, use the highest one */
@@ -2024,7 +2025,7 @@ double SignalGenerator::get_best_sample_rate(
 			return rate;
 		}
 
-		qDebug() << QString("Rate %1 not possible").arg(rate);
+		qDebug(CAT_SIGNAL_GENERATOR) << QString("Rate %1 not possible").arg(rate);
 	}
 
 	throw std::runtime_error("Unable to calculate best sample rate");
@@ -2093,7 +2094,7 @@ void SignalGenerator::calc_sampling_params(const iio_device *dev,
 		out_oversampling_ratio = max_sample_rate / rate;
 		out_sample_rate = max_sample_rate;
 
-		qDebug() << QString("Using oversampling with a ratio of %1")
+		qDebug(CAT_SIGNAL_GENERATOR) << QString("Using oversampling with a ratio of %1")
 		         .arg(out_oversampling_ratio);
 	} else {
 		out_sample_rate = rate;
@@ -2155,7 +2156,7 @@ double SignalGenerator::get_best_ratio(double ratio, double max, double *fract)
 		}
 	}
 
-	qDebug() << QString("Input ratio %1, ratio: %2 (fract left %3)")
+	qDebug(CAT_SIGNAL_GENERATOR) << QString("Input ratio %1, ratio: %2 (fract left %3)")
 	         .arg(ratio).arg(best_ratio).arg(best_fract);
 
 	if (fract) {

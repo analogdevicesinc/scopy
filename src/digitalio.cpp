@@ -28,6 +28,7 @@
 #include <QtQml/QJSEngine>
 #include <QtQml/QQmlEngine>
 
+#include "logging_categories.h"
 #include "digitalio.hpp"
 #include "dynamicWidget.hpp"
 #include "digitalio_api.hpp"
@@ -248,7 +249,7 @@ void DigitalIO::updateUi()
 
 void adiscope::DigitalIoGroup::changeDirection()
 {
-	qDebug()<<"PB";
+	qDebug(CAT_DIGITAL_IO)<<"PB";
 	auto chk = ui->inout->isChecked();
 
 	ui->lineEdit->setEnabled(!chk);
@@ -274,7 +275,7 @@ void adiscope::DigitalIoGroup::changeDirection()
 
 void adiscope::DigitalIoGroup::on_horizontalSlider_valueChanged(int value)
 {
-	qDebug()<<"horizontalSlider";
+	qDebug(CAT_DIGITAL_IO)<<"horizontalSlider";
 
 	if (ui->horizontalSlider->hasTracking()) {
 		ui->lineEdit->setText(QString::number(value));
@@ -289,7 +290,7 @@ void adiscope::DigitalIoGroup::on_horizontalSlider_valueChanged(int value)
 
 void adiscope::DigitalIoGroup::on_lineEdit_editingFinished()
 {
-	qDebug()<<"lineedit";
+	qDebug(CAT_DIGITAL_IO)<<"lineedit";
 	ui->horizontalSlider->setValue(ui->lineEdit->text().toInt());
 }
 

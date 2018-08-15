@@ -17,6 +17,7 @@
  * Boston, MA 02110-1301, USA.
  */
 
+#include "logging_categories.h"
 #include "calibration.hpp"
 #include "osc_adc.h"
 #include "hw_dac.h"
@@ -228,11 +229,11 @@ bool Calibration::calibrateADCoffset()
 	bool calibrated = false;
 
 	if (!m_initialized) {
-		qDebug() << "Rx path is not initialized for calibration.";
+		qDebug(CAT_CALIBRATION) << "Rx path is not initialized for calibration.";
 		return false;
 	}
 
-	qDebug() << "Starting ADC OFFSET CALIBRATION";
+	qDebug(CAT_CALIBRATION) << "Starting ADC OFFSET CALIBRATION";
 
 	// Ground ADC inputs
 	setCalibrationMode(ADC_GND);
@@ -250,7 +251,7 @@ bool Calibration::calibrateADCoffset()
 
 	bool ret = adc_data_capture(dataCh0, dataCh1, num_samples);
 		if (!ret) {
-		qDebug() << "failed to get samples";
+		qDebug(CAT_CALIBRATION) << "failed to get samples";
 		return false;
 	}
 
@@ -276,9 +277,9 @@ bool Calibration::calibrateADCoffset()
 	m_adc_ch0_offset = (int)(2048 - ((voltage0 * 4096 * gain) / range));
 	m_adc_ch1_offset = (int)(2048 - ((voltage1 * 4096 * gain) / range));
 
-	qDebug() << "Before Fine-Tunning";
-	qDebug() << "ADC channel 0 offset(raw):" << m_adc_ch0_offset;
-	qDebug() << "ADC channel 1 offset(raw):" << m_adc_ch1_offset;
+	qDebug(CAT_CALIBRATION) << "Before Fine-Tunning";
+	qDebug(CAT_CALIBRATION) << "ADC channel 0 offset(raw):" << m_adc_ch0_offset;
+	qDebug(CAT_CALIBRATION) << "ADC channel 1 offset(raw):" << m_adc_ch1_offset;
 
 	fine_tune(20, m_adc_ch0_offset, m_adc_ch1_offset, num_samples);
 
@@ -292,11 +293,11 @@ bool Calibration::calibrateADCgain()
 	bool calibrated = false;
 
 	if (!m_initialized) {
-	qDebug() << "Rx path is not initialized for calibration.";
+	qDebug(CAT_CALIBRATION) << "Rx path is not initialized for calibration.";
 	return false;
 	}
 
-	qDebug() << "Starting ADC GAIN CALIBRATION";
+	qDebug(CAT_CALIBRATION) << "Starting ADC GAIN CALIBRATION";
 
 	setCalibrationMode(ADC_REF1);
 
@@ -309,7 +310,7 @@ bool Calibration::calibrateADCgain()
 
 	ret = adc_data_capture(dataCh0, dataCh1, num_samples);
 	if (!ret) {
-		qDebug() << "failed to get samples";
+		qDebug(CAT_CALIBRATION) << "failed to get samples";
 		return false;
 	}
 
@@ -330,8 +331,8 @@ bool Calibration::calibrateADCgain()
 	m_adc_ch0_gain = vref1 / avg0;
 	m_adc_ch1_gain = vref1 / avg1;
 
-	qDebug() << "Gain for channel0: " << m_adc_ch0_gain;
-	qDebug() << "Gain for channel1: " << m_adc_ch1_gain;
+	qDebug(CAT_CALIBRATION) << "Gain for channel0: " << m_adc_ch0_gain;
+	qDebug(CAT_CALIBRATION) << "Gain for channel1: " << m_adc_ch1_gain;
 
 	setCalibrationMode(NONE);
 
@@ -388,7 +389,7 @@ void Calibration::updateCorrections()
 bool Calibration::resetCalibration()
 {
 	if (!m_initialized) {
-		qDebug() << "Rx path is not initialized for calibration.";
+		qDebug(CAT_CALIBRATION) << "Rx path is not initialized for calibration.";
 		return false;
 	}
 
@@ -432,7 +433,7 @@ bool Calibration::adc_data_capture(int16_t *dataCh0, int16_t *dataCh1,
 	size_t num_sampl_per_chn)
 {
 	if (!dataCh0 && !dataCh1) {
-		qDebug() << "At least one channels needs to be activated."
+		qDebug(CAT_CALIBRATION) << "At least one channels needs to be activated."
 			" Aborting calibration.";
 		return false;
 	}
@@ -449,7 +450,7 @@ bool Calibration::adc_data_capture(int16_t *dataCh0, int16_t *dataCh1,
 		num_sampl_per_chn, false);
 
 	if (!buffer) {
-		qDebug() << "Could not create m2k-adc buffer!" <<
+		qDebug(CAT_CALIBRATION) << "Could not create m2k-adc buffer!" <<
 			strerror(errno) << "Aborting calibration.";
 		setChannelEnableState(m_adc_channel0, channel0Enabled);
 		setChannelEnableState(m_adc_channel1, channel1Enabled);
@@ -459,7 +460,7 @@ bool Calibration::adc_data_capture(int16_t *dataCh0, int16_t *dataCh1,
 	int ret = iio_buffer_refill(buffer);
 
 	if (ret < 0) {
-		qDebug() << "Could not refill m2k-adc buffer! Error:" << ret <<
+		qDebug(CAT_CALIBRATION) << "Could not refill m2k-adc buffer! Error:" << ret <<
 			"Aborting calibration";
 		iio_buffer_destroy(buffer);
 		setChannelEnableState(m_adc_channel0, channel0Enabled);
@@ -526,7 +527,7 @@ bool Calibration::fine_tune(size_t span, int16_t centerVal0, int16_t centerVal1,
 		ret = adc_data_capture(dataCh0, dataCh1, num_samples);
 
 		if (!ret) {
-			qDebug() << "failed to get samples";
+			qDebug(CAT_CALIBRATION) << "failed to get samples";
 			goto out_cleanup;
 		}
 
@@ -553,9 +554,9 @@ bool Calibration::fine_tune(size_t span, int16_t centerVal0, int16_t centerVal1,
 	m_adc_ch0_offset = candidateOffsets0[i0];
 	m_adc_ch1_offset = candidateOffsets1[i1];
 
-	qDebug() << "After Fine-Tunning";
-	qDebug() << "ADC channel 0 offset(raw):" << m_adc_ch0_offset;
-	qDebug() << "ADC channel 1 offset(raw):" << m_adc_ch1_offset;
+	qDebug(CAT_CALIBRATION) << "After Fine-Tunning";
+	qDebug(CAT_CALIBRATION) << "ADC channel 0 offset(raw):" << m_adc_ch0_offset;
+	qDebug(CAT_CALIBRATION) << "ADC channel 1 offset(raw):" << m_adc_ch1_offset;
 
 	iio_channel_attr_write_longlong(m_ad5625_channel2, "raw",
 		m_adc_ch0_offset);
@@ -596,11 +597,11 @@ bool Calibration::calibrateDACoffset()
 	bool calibrated = false;
 
 	if (!m_initialized) {
-		qDebug() << "Tx path is not initialized for calibration.";
+		qDebug(CAT_CALIBRATION) << "Tx path is not initialized for calibration.";
 		return false;
 	}
 
-	qDebug() << "Starting DAC OFFSET CALIBRATION";
+	qDebug(CAT_CALIBRATION) << "Starting DAC OFFSET CALIBRATION";
 
 	// connect ADC to DAC
 	setCalibrationMode(DAC);
@@ -622,7 +623,7 @@ bool Calibration::calibrateDACoffset()
 
 	bool ret = adc_data_capture(dataCh0, dataCh1, num_samples);
 		if (!ret) {
-		qDebug() << "failed to get samples";
+		qDebug(CAT_CALIBRATION) << "failed to get samples";
 		return false;
 	}
 
@@ -650,9 +651,9 @@ bool Calibration::calibrateDACoffset()
 	iio_channel_attr_write_longlong(m_ad5625_channel1, "raw",
 		m_dac_b_ch_offset);
 
-	qDebug() << "DAC calib offset results:";
-	qDebug() << "DAC channel 0 offset(raw):" << m_dac_a_ch_offset;
-	qDebug() << "DAC channel 1 offset(raw):" << m_dac_b_ch_offset;
+	qDebug(CAT_CALIBRATION) << "DAC calib offset results:";
+	qDebug(CAT_CALIBRATION) << "DAC channel 0 offset(raw):" << m_dac_a_ch_offset;
+	qDebug(CAT_CALIBRATION) << "DAC channel 1 offset(raw):" << m_dac_b_ch_offset;
 
 	if (m_dac_a_buffer) {
 		iio_buffer_destroy(m_dac_a_buffer);
@@ -694,7 +695,7 @@ bool Calibration::calibrateDACgain()
 
 	bool ret = adc_data_capture(dataCh0, dataCh1, num_samples);
 		if (!ret) {
-		qDebug() << "failed to get samples";
+		qDebug(CAT_CALIBRATION) << "failed to get samples";
 		return false;
 	}
 
@@ -757,7 +758,7 @@ void Calibration::dacOutputDC(struct iio_device *dac,
 	*buffer = iio_device_create_buffer(dac,
 			size, true);
 	if (!(*buffer)) {
-		qDebug() << "Could not create buffer for: "  <<
+		qDebug(CAT_CALIBRATION) << "Could not create buffer for: "  <<
 			 iio_device_get_name(dac);
 		return;
 	}
