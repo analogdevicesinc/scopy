@@ -17,6 +17,7 @@
  * Boston, MA 02110-1301, USA.
  */
 
+#include "logging_categories.h"
 #include "config.h"
 #include "connectDialog.hpp"
 #include "dynamicWidget.hpp"
@@ -1282,7 +1283,7 @@ bool ToolLauncher::loadDecoders(QString path)
 	}
 
 	if (srd_init(path.toStdString().c_str()) != SRD_OK) {
-		qDebug() << "ERROR: libsigrokdecode init failed.";
+		qDebug(CAT_TOOL_LAUNCHER) << "ERROR: libsigrokdecode init failed.";
 		return false;
 	} else {
 		srd_loaded = true;

@@ -34,6 +34,7 @@
 #include <QCheckBox>
 
 /* Local includes */
+#include "logging_categories.h"
 #include "spectrum_analyzer.hpp"
 #include "filter.hpp"
 #include "math.hpp"
@@ -745,7 +746,7 @@ void SpectrumAnalyzer::on_comboBox_type_currentIndexChanged(const QString& s)
 	int crt_channel = channelIdOfOpenedSettings();
 
 	if (crt_channel < 0) {
-		qDebug() << "invalid channel ID for the opened Settings menu";
+		qDebug(CAT_SPECTRUM_ANALYZER) << "invalid channel ID for the opened Settings menu";
 		return;
 	}
 
@@ -770,7 +771,7 @@ void SpectrumAnalyzer::on_comboBox_window_currentIndexChanged(const QString& s)
 	int crt_channel = channelIdOfOpenedSettings();
 
 	if (crt_channel < 0) {
-		qDebug() << "invalid channel ID for the opened Settings menu";
+		qDebug(CAT_SPECTRUM_ANALYZER) << "invalid channel ID for the opened Settings menu";
 		return;
 	}
 
@@ -790,7 +791,7 @@ void SpectrumAnalyzer::on_spinBox_averaging_valueChanged(int n)
 	int crt_channel = channelIdOfOpenedSettings();
 
 	if (crt_channel < 0) {
-		qDebug() << "invalid channel ID for the opened Settings menu";
+		qDebug(CAT_SPECTRUM_ANALYZER) << "invalid channel ID for the opened Settings menu";
 		return;
 	}
 

@@ -39,6 +39,7 @@
 #include <QComboBox>
 
 /* Local includes */
+#include "logging_categories.h"
 #include "adc_sample_conv.hpp"
 #include "customPushButton.hpp"
 #include "oscilloscope.hpp"
@@ -172,7 +173,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	iio = iio_manager::get_instance(ctx,
 			filt->device_name(TOOL_OSCILLOSCOPE));
 	gr::hier_block2_sptr hier = iio->to_hier_block2();
-	qDebug() << "Manager created:\n" << gr::dot_graph(hier).c_str();
+	qDebug(CAT_OSCILLOSCOPE) << "Manager created:\n" << gr::dot_graph(hier).c_str();
 
 	auto adc_channels = adc->adcChannelList();
 	for (unsigned int i = 0; i < adc_channels.size(); i++) {
@@ -859,7 +860,7 @@ Oscilloscope::~Oscilloscope()
 		iio->unlock();
 
 	gr::hier_block2_sptr hier = iio->to_hier_block2();
-	qDebug() << "OSC disconnected:\n" << gr::dot_graph(hier).c_str();
+	qDebug(CAT_OSCILLOSCOPE) << "OSC disconnected:\n" << gr::dot_graph(hier).c_str();
 
 	if (saveOnExit) {
 		api->save(*settings);
@@ -3676,7 +3677,7 @@ void Oscilloscope::periodicFlowRestart(bool force)
 		t.start();
 		iio->lock();
 		iio->unlock();
-		qDebug()<<"Restarted flow @ " << QTime::currentTime().toString("hh:mm:ss") <<"restart took " << t.elapsed() << "ms";
+		qDebug(CAT_OSCILLOSCOPE)<<"Restarted flow @ " << QTime::currentTime().toString("hh:mm:ss") <<"restart took " << t.elapsed() << "ms";
 	}
 	restartFlowCounter--;
 }

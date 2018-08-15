@@ -17,6 +17,7 @@
  * Boston, MA 02110-1301, USA.
  */
 
+#include "logging_categories.h"
 #include "dynamicWidget.hpp"
 #include "network_analyzer.hpp"
 #include "signal_generator.hpp"
@@ -569,7 +570,7 @@ void NetworkAnalyzer::run()
 		size_t buffer_size = get_sin_samples_count(
 				adc, adc_rate, frequency);
 		if(buffer_size == 0) {
-			qDebug() << "Network analyzer buffer size 0";
+			qDebug(CAT_NETWORK_ANALYZER) << "buffer size 0";
 			return;
 		}
 
@@ -679,7 +680,7 @@ void NetworkAnalyzer::run()
 			mag = 10.0 * log10(mag1) - 10.0 * log10(mag2);
 		}
 
-		qDebug() << "Frequency" << frequency << "Hz," <<
+		qDebug(CAT_NETWORK_ANALYZER) << "Frequency" << frequency << "Hz," <<
 			adc_rate << "SPS," << buffer_size << "samples," <<
 			mag << "Mag," << phase << "Deg";
 
@@ -794,7 +795,7 @@ unsigned long NetworkAnalyzer::get_best_sample_rate(
 		if (buf_size)
 			return rate;
 
-		qDebug() << QString("Rate %1 too high, trying lower")
+		qDebug(CAT_NETWORK_ANALYZER) << QString("Rate %1 too high, trying lower")
 			.arg(rate);
 	}
 
