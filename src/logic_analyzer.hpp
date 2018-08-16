@@ -176,6 +176,11 @@ private:
 	QPushButton *active_settings_btn;
 	QPushButton *triggerBtn;
 
+	bool reset_horiz_offset;
+	double horiz_offset_after_drop;
+	double scrolling_offset;
+	double trigger_offset;
+
 	static std::vector<std::string> trigger_mapping;
 	std::vector<std::string> trigger_cache;
 
@@ -281,6 +286,7 @@ private:
 	void init_export_settings();
 	bool exportTabCsv(QString separator, QString);
 	bool exportVCD(QString, QString, QString);
+	void init_buffer_scrolling();
 };
 }
 Q_DECLARE_METATYPE(std::shared_ptr<sigrok::OutputFormat>);

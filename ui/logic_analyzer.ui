@@ -946,13 +946,13 @@ background-color: qlineargradient(spread:pad, x1:0.9, y1:0, x2:0, y2:0, stop:0 r
                        <number>0</number>
                       </property>
                       <property name="leftMargin">
-                       <number>0</number>
+                       <number>10</number>
                       </property>
                       <property name="topMargin">
                        <number>5</number>
                       </property>
                       <property name="rightMargin">
-                       <number>20</number>
+                       <number>10</number>
                       </property>
                       <property name="bottomMargin">
                        <number>5</number>
@@ -1743,7 +1743,7 @@ color: #FFFFFF;</string>
                     <rect>
                      <x>0</x>
                      <y>0</y>
-                     <width>100</width>
+                     <width>92</width>
                      <height>30</height>
                     </rect>
                    </property>
