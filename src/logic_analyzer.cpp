@@ -126,7 +126,12 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	zoomed_in(false),
 	triggerUpdater(new StateUpdater(250, this)),
 	trigger_is_forced(false),
-	apiLoading(false)
+	apiLoading(false),
+	reset_horiz_offset(true),
+	horiz_offset_after_drop(0.0),
+	scrolling_offset(0.0),
+	trigger_offset(0.0)
+
 {
 	ui->setupUi(this);
 	setDynamicProperty(ui->btnCursorsLock, "use_icon", true);
@@ -460,6 +465,35 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 		img.invertPixels(QImage::InvertRgb);
 		img.save(fileName, 0, -1);
 	});
+
+	init_buffer_scrolling();
+}
+
+void LogicAnalyzer::init_buffer_scrolling()
+{
+	connect(buffer_previewer, &DigitalBufferPreviewer::bufferMovedBy, [=](int value){
+		reset_horiz_offset = false;
+		double xWidth = timeBase->value() * 10;
+		int bWidth = buffer_previewer->width();
+		double moveBy = value * xWidth / bWidth;
+		main_win->view_->set_offset(moveBy + horiz_offset_after_drop, active_plot_timebase * 10, false);
+
+		scrolling_offset = moveBy + horiz_offset_after_drop;
+		updateBufferPreviewer();
+	});
+
+	connect(buffer_previewer, &DigitalBufferPreviewer::bufferStopDrag, [=](){
+
+		horiz_offset_after_drop = scrolling_offset;
+		reset_horiz_offset = true;
+	});
+
+	connect(buffer_previewer, &DigitalBufferPreviewer::bufferResetPosition, [=](){
+		main_win->view_->set_offset(trigger_offset, active_plot_timebase * 10, false);
+		horiz_offset_after_drop = 0;
+		scrolling_offset = 0;
+		updateBufferPreviewer();
+	});
 }
 
 void LogicAnalyzer::init_export_settings()
@@ -593,6 +627,8 @@ void LogicAnalyzer::resizeEvent()
 	d_timeTriggerHandle->setPositionSilenty(trigX);
 	main_win->view_->viewport()->setTimeTriggerPixel(trigX);
 	main_win->view_->time_item_appearance_changed(true, true);
+
+	buffer_previewer->setFixedWidth(main_win->view_->viewport()->width());
 }
 
 void LogicAnalyzer::updateAreaTimeTrigger()
@@ -1010,6 +1046,15 @@ QWidget* LogicAnalyzer::bottomHandlesArea()
 void LogicAnalyzer::refreshTriggerPos(int px)
 {
 	d_timeTriggerHandle->setPositionSilenty(px);
+	if (running && reset_horiz_offset) {
+		if (std::abs(active_plot_timebase - timeBase->value()) < 0.001) {
+			horiz_offset_after_drop = 0;
+			scrolling_offset = 0;
+			main_win->view_->set_offset(trigger_offset, active_plot_timebase * 10, false);
+			updateBufferPreviewer();
+		}
+
+	}
 }
 
 void LogicAnalyzer::configParams(double timebase, double timepos)
@@ -1174,6 +1219,10 @@ void LogicAnalyzer::configParams(double timebase, double timepos)
 
 void LogicAnalyzer::onTimePositionSpinboxChanged(double value)
 {
+	if (reset_horiz_offset) {
+		scrolling_offset = 0;
+		horiz_offset_after_drop = 0;
+	}
         configParams(active_plot_timebase, value);
 }
 
@@ -1187,6 +1236,7 @@ void LogicAnalyzer::onTimeTriggerHandlePosChanged(int pos)
 	{
 		timePosition->setValue(time + active_plot_timebase * 10 / 2);
 	}
+	trigger_offset = timePosition->value();
 	main_win->view_->viewport()->setTimeTriggerPixel(pos);
 	setTriggerDelay();
 }
@@ -1221,6 +1271,10 @@ void LogicAnalyzer::startStop(bool start)
 		iio_device_attr_write_bool(dev, "streaming", false);
 		if(acquisition_mode != REPEATED){
 			iio_device_attr_write_bool(dev, "streaming", true);
+		}
+		if (reset_horiz_offset) {
+			scrolling_offset = 0;
+			horiz_offset_after_drop = 0;
 		}
 		buffer_previewer->setWaveformWidth(0);
 		if(ui->btnSingleRun->isChecked()) {
@@ -1525,8 +1579,8 @@ void LogicAnalyzer::requestUpdateBufferPreviewer()
 void LogicAnalyzer::updateBufferPreviewer()
 {
 	// Time interval within the plot canvas
-	double plotMin = -(active_plot_timebase * 10 / 2 - active_timePos);
-	double plotMax = (active_plot_timebase * 10 / 2 + active_timePos);
+	double plotMin = -(active_plot_timebase * 10 / 2 - active_timePos - scrolling_offset);
+	double plotMax = (active_plot_timebase * 10 / 2 + active_timePos + scrolling_offset);
 
 	// Time interval that represents the captured data
 	double dataMin = 0;
