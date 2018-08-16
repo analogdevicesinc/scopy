@@ -206,6 +206,16 @@ void BufferPreviewer::paintEvent(QPaintEvent *)
 	p.setPen(linePen);
 	p.drawPolyline(m_fullWavePoints + hlightedWaveStartPos , hlightedWaveWidth);
 
+	//Draw two vertical lines at the start and end of the highlight;
+	if (hlight_start + hlight_width > wave_start
+			&& wave_start + wave_width > hlight_start) {
+		int line_w = 2;
+		p.setPen(rectPen);
+		p.setBrush(palette().color(QPalette::HighlightedText));
+		p.drawRect(hlight_start - line_w, 0, line_w, h);
+		p.drawRect(hlight_start + hlight_width, 0, line_w, h);
+	}
+
 	//Draw Cursor
 	p.setRenderHint(QPainter::Antialiasing, false);
 	int cur_head_w = 8;
