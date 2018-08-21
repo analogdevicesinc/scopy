@@ -66,6 +66,7 @@ public:
 	Q_INVOKABLE void show();
 
 	QList<int> data() const;
+	void load(QSettings &s);
 
 private:
 	LogicAnalyzer *lga;

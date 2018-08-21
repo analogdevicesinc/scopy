@@ -164,6 +164,12 @@ void LogicAnalyzer_API::setExportAll(bool en)
 	lga->exportSettings->getExportAllButton()->setChecked(en);
 }
 
+void LogicAnalyzer_API::load(QSettings &s)
+{
+	lga->apiLoading = true;
+	ApiObject::load(s);
+	lga->apiLoading = false;
+}
 
 /*
  * ChannelGroup_API

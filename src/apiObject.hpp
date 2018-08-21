@@ -38,8 +38,8 @@ namespace adiscope {
 		void load();
 		void save();
 
-		void load(QSettings& settings);
-		void save(QSettings& settings);
+		virtual void load(QSettings& settings);
+		virtual void save(QSettings& settings);
 
 		void js_register(QJSEngine *engine);
 
