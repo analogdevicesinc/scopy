@@ -1157,6 +1157,11 @@ void CapturePlot::updateHandleAreaPadding(bool enabled)
 		margins.setLeft(d_leftHandlesArea->minimumWidth());
 		d_topWidget->layout()->setContentsMargins(margins);
 	}
+	d_hCursorHandle1->updatePosition();
+	d_hCursorHandle2->updatePosition();
+
+	d_vCursorHandle1->updatePosition();
+	d_vCursorHandle2->updatePosition();
 }
 
 double CapturePlot::getHorizontalCursorIntersection(double time)

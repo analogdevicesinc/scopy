@@ -204,6 +204,11 @@ void PlotLineHandleH::setPositionSilenty(int pos)
 		moveSilently(QPoint(centerPosToOrigin(pos), 0));
 }
 
+void PlotLineHandleH::updatePosition()
+{
+	moveSilently(QPoint(centerPosToOrigin(m_current_pos), 0));
+}
+
 void PlotLineHandleH::setInnerSpacing(int value)
 {
 	m_innerSpacing = value;
@@ -309,6 +314,11 @@ void PlotLineHandleV::setPositionSilenty(int pos)
 {
 	if (m_current_pos != pos)
 		moveSilently(QPoint(0, centerPosToOrigin(pos)));
+}
+
+void PlotLineHandleV::updatePosition()
+{
+	moveSilently(QPoint(0, centerPosToOrigin(m_current_pos)));
 }
 
 void PlotLineHandleV::moveWithinParent(int x, int y)

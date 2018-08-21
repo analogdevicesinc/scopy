@@ -90,6 +90,7 @@ public:
 	void triggerMove();
 	void setPosition(int);
 	void setPositionSilenty(int);
+	void updatePosition();
 	void moveWithinParent(int x, int y);
 	void setInnerSpacing(int value);
 
@@ -111,6 +112,7 @@ public:
 	void triggerMove();
 	void setPosition(int);
 	void setPositionSilenty(int);
+	void updatePosition();
 	void moveWithinParent(int x, int y);
 
 protected:
