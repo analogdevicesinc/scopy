@@ -123,6 +123,8 @@ void InfoPage::getDeviceInfo()
                         temp_ctx = nullptr;
                 }
         }
+
+	ui->btnIdentify->setEnabled(supportsIdentification());
         refreshInfoWidget();
 }
 
@@ -159,18 +161,28 @@ QPair<bool, QString> InfoPage::translateInfoParams(QString key)
                    key.startsWith("cal,offset")) {
                 key = "";
         }
-        return QPair<bool, QString>(advanced, key);
+	return QPair<bool, QString>(advanced, key);
+}
+
+void InfoPage::setStatusLabel(QString str, QString color)
+{
+	ui->lblConnectionStatus->setText(str);
+	ui->lblConnectionStatus->setStyleSheet("color: " + color);
 }
 
 void InfoPage::setConnectionStatus(bool failed)
 {
-        (failed) ? ui->lblConnectionStatus->setText("Error: Connection failed!") :
-                   ui->lblConnectionStatus->setText("");
+	(failed) ? setStatusLabel("Error: Connection failed!") :
+		   setStatusLabel("");
 }
 
 void InfoPage::refreshInfoWidget()
 {
-        ui->lblConnectionStatus->setText("");
+	if(supportsIdentification())
+		setStatusLabel("");
+	else
+		setStatusLabel("Your hardware revision does not support the identify feature", "white");
+
         if ( ui->paramLayout != NULL )
         {
             QLayoutItem* item;
@@ -230,7 +242,7 @@ QPushButton* InfoPage::forgetDeviceButton()
 
 void InfoPage::identifyDevice(bool clicked)
 {
-	ui->lblConnectionStatus->setText("");
+	setStatusLabel("");
 	if (clicked) {
 		/* If identification is already on for
 		 * this device, don't start it again
@@ -260,7 +272,7 @@ void InfoPage::blinkTimeout()
 
 void InfoPage::startIdentification(bool start)
 {
-	ui->lblConnectionStatus->setText("Can't identify this device.");
+	setStatusLabel("Can't identify this device.");
 	if (!m_connected) {
 		iio_context_destroy(m_ctx);
 		m_ctx = nullptr;
@@ -308,6 +320,14 @@ QPushButton* InfoPage::connectButton()
         return ui->btnConnect;
 }
 
+bool InfoPage::supportsIdentification()
+{
+	QString model = m_info_params["Model"];
+	if(identifySupportedModels.contains(model))
+		return true;
+	return false;
+}
+
 M2kInfoPage::M2kInfoPage(QString uri,
                      Preferences* prefPanel,
                      struct iio_context *ctx,
@@ -329,51 +349,57 @@ M2kInfoPage::~M2kInfoPage()
 
 void M2kInfoPage::startIdentification(bool start)
 {
-        if (start) {
-                struct iio_device *m2k_fabric = iio_context_find_device(m_ctx,
-                                                                        "m2k-fabric");
+	if(supportsIdentification()) {
+		if (start) {
+			struct iio_device *m2k_fabric = iio_context_find_device(m_ctx,
+										"m2k-fabric");
+			if (!m2k_fabric) {
+				setStatusLabel("Can't identify this device.");
+				if (!m_connected) {
+					iio_context_destroy(m_ctx);
+					m_ctx = nullptr;
+				}
+				m_fabric_channel = nullptr;
 
-		if (!m2k_fabric) {
-			ui->lblConnectionStatus->setText("Can't identify this device.");
-			if (!m_connected) {
-				iio_context_destroy(m_ctx);
-				m_ctx = nullptr;
+				if (m_search_interrupted) {
+					m_search_interrupted = false;
+					Q_EMIT stopSearching(false);
+				}
+				return;
 			}
-			m_fabric_channel = nullptr;
 
-			if (m_search_interrupted) {
-				m_search_interrupted = false;
-				Q_EMIT stopSearching(false);
+			m_fabric_channel = iio_device_find_channel(m2k_fabric, "voltage4", true);
+			if (m_fabric_channel) {
+				m_led_timer->start(3000);
+				m_blink_timer->start(100);
+			} else {
+				setStatusLabel("Can't identify device. Please try to update your firmware!");
+
+				if (!m_connected) {
+					iio_context_destroy(m_ctx);
+					m_ctx = nullptr;
+				}
+				m_fabric_channel = nullptr;
+
+				if (m_search_interrupted) {
+					m_search_interrupted = false;
+					Q_EMIT stopSearching(false);
+				}
 			}
-			return;
-		}
-
-		m_fabric_channel = iio_device_find_channel(m2k_fabric, "voltage4", true);
-		if (m_fabric_channel) {
-			m_led_timer->start(3000);
-			m_blink_timer->start(100);
 		} else {
-			ui->lblConnectionStatus->setText("Can't identify device. Please try to update your firmware!");
-			if (!m_connected) {
-				iio_context_destroy(m_ctx);
-				m_ctx = nullptr;
+			if (!m_fabric_channel)
+				return;
+			if (m_ctx) {
+				iio_channel_attr_write_bool(m_fabric_channel,
+							    "done_led_overwrite_powerdown",
+							    false);
 			}
 			m_fabric_channel = nullptr;
-
-			if (m_search_interrupted) {
-				m_search_interrupted = false;
-				Q_EMIT stopSearching(false);
-			}
 		}
-	} else {
-		if (!m_fabric_channel)
-			return;
-		if (m_ctx) {
-			iio_channel_attr_write_bool(m_fabric_channel,
-						    "done_led_overwrite_powerdown",
-						    false);
-		}
-		m_fabric_channel = nullptr;
+	}
+	else
+	{
+		setStatusLabel("Your hardware revision does not support the identify feature", "white");
 	}
 }
 
