@@ -59,6 +59,7 @@ public:
         void refreshInfoWidget();
 
         void setConnectionStatus(bool);
+	bool supportsIdentification();
 
 public Q_SLOTS:
         void readPreferences();
@@ -76,8 +77,10 @@ protected:
 
 private:
         QPair<bool, QString> translateInfoParams(QString);
+	const QStringList identifySupportedModels = {"Analog Devices M2k Rev.C (Z7010)","Analog Devices M2k Rev.D (Z7010)"};
 
 protected:
+	void setStatusLabel(QString str, QString color="red");
         Ui::InfoPage *ui;
         QString m_uri;
         struct iio_context *m_ctx;
@@ -109,7 +112,7 @@ private Q_SLOTS:
         void blinkTimeout();
 
 private:
-         struct iio_channel *m_fabric_channel;
+	struct iio_channel *m_fabric_channel;
 };
 
 
