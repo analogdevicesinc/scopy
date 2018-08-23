@@ -209,7 +209,7 @@ namespace adiscope {
 		int d_selected_channel;
 
 		QWidget *d_topWidget;
-		HorizHandlesArea *d_topHandlesArea;
+		GateHandlesArea *d_topHandlesArea;
 		HorizHandlesArea *d_bottomHandlesArea;
 		VertHandlesArea *d_leftHandlesArea;
 		VertHandlesArea *d_rightHandlesArea;

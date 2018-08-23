@@ -101,7 +101,7 @@ CapturePlot::CapturePlot(QWidget *parent,
 
 	/* Adjacent areas (top/bottom/left/right) */
 	d_topWidget = new QWidget(this);
-	d_topHandlesArea = new HorizHandlesArea(this->canvas());
+	d_topHandlesArea = new GateHandlesArea(this->canvas());
 	d_bottomHandlesArea = new HorizHandlesArea(this->canvas());
 	d_leftHandlesArea = new VertHandlesArea(this->canvas());
 	d_rightHandlesArea = new VertHandlesArea(this->canvas());
@@ -109,7 +109,7 @@ CapturePlot::CapturePlot(QWidget *parent,
 	d_topWidget->setStyleSheet("QWidget {background-color: transparent}");
 	d_topWidget->setMinimumHeight(50);
 	d_topHandlesArea->setMinimumHeight(20);
-	d_topHandlesArea->setLargestChildWidth(60);
+	d_topHandlesArea->setLargestChildWidth(80);
 	d_bottomHandlesArea->setMinimumHeight(50);
 	d_leftHandlesArea->setMinimumWidth(50);
 	d_rightHandlesArea->setMinimumWidth(50);
@@ -289,6 +289,7 @@ CapturePlot::CapturePlot(QWidget *parent,
 				QPixmap(":/icons/h_cursor_handle.svg"),
 				d_bottomHandlesArea);
 
+	/* Measurement gate cursors */
 	d_hGatingHandle1 = new PlotGateHandle(
 				QPixmap(":/icons/gate_handle.svg"),
 				d_topHandlesArea);
@@ -297,6 +298,7 @@ CapturePlot::CapturePlot(QWidget *parent,
 				QPixmap(":/icons/gate_handle.svg"),
 				d_topHandlesArea);
 
+	d_hGatingHandle1->setCenterLeft(false);
 	d_vBar1 = new VertBar(this, true);
 	d_vBar2 = new VertBar(this, true);
 	d_hBar1 = new HorizBar(this, true);
@@ -327,12 +329,15 @@ CapturePlot::CapturePlot(QWidget *parent,
 	d_hCursorHandle1->setPen(cursorsLinePen);
 	d_hCursorHandle2->setPen(cursorsLinePen);
 
+
+	/* gate bars */
 	QPen gatePen = QPen(QColor(255,255,255),1,Qt::SolidLine);
 	d_gateBar1->setPen(gatePen);
 	d_gateBar2->setPen(gatePen);
 
 	d_gateBar1->setVisible(false);
 	d_gateBar2->setVisible(false);
+
 	d_hGatingHandle1->hide();
 	d_hGatingHandle2->hide();
 
@@ -412,7 +417,10 @@ CapturePlot::CapturePlot(QWidget *parent,
 	});
 
 	connect(d_hGatingHandle1, &PlotLineHandleH::positionChanged,[=](int value){
+		d_hGatingHandle2->setOtherCursorPosition(d_hGatingHandle1->position());
+		/* make sure that the gate handles don't cross each other */
 		if(d_hGatingHandle1->position() <= d_hGatingHandle2->position()){
+
 			d_gateBar1->setPixelPosition(value);
 
 		}
@@ -423,6 +431,8 @@ CapturePlot::CapturePlot(QWidget *parent,
 	});
 
 	connect(d_hGatingHandle2, &PlotLineHandleH::positionChanged,[=](int value){
+		d_hGatingHandle1->setOtherCursorPosition(d_hGatingHandle2->position());
+		/* make sure that the gate handles don't cross each other */
 		if(d_hGatingHandle2->position() >= d_hGatingHandle1->position()){
 			d_gateBar2->setPixelPosition(value);
 		}
@@ -439,6 +449,10 @@ CapturePlot::CapturePlot(QWidget *parent,
 
 	d_gateBar1->setPosition(0 - 4 * secPerDiv);
 	d_gateBar2->setPosition(0 + 4 * secPerDiv);
+
+	/* initialise gate handle positions */
+	d_hGatingHandle1->setOtherCursorPosition(d_hGatingHandle2->position());
+	d_hGatingHandle2->setOtherCursorPosition(d_hGatingHandle1->position());
 
 	/* When bar position changes due to plot resizes update the handle */
 	connect(d_hBar1, SIGNAL(pixelPositionChanged(int)),
@@ -498,6 +512,7 @@ CapturePlot::CapturePlot(QWidget *parent,
 	QBrush gateBrush = QBrush(QColor(0,30,150,90));
 	gateBrush.setStyle(Qt::SolidPattern);
 
+	/* configure the measurement gates */
 	leftGate = new QwtPlotShapeItem();
 	leftGate->setAxes(QwtPlot::xBottom,QwtPlot::yRight);
 	leftGateRect.setTop(axisScaleDiv(yRight).upperBound());
@@ -696,6 +711,7 @@ void CapturePlot::onGateBar2PixelPosChanged(int pos)
 
 void CapturePlot::onGateBar1Moved(double value)
 {
+	//update gate handle
 	leftGateRect.setTop(axisScaleDiv(yRight).upperBound());
 	leftGateRect.setBottom(axisScaleDiv(yRight).lowerBound());
 	leftGateRect.setLeft(axisScaleDiv(xBottom).lowerBound());
@@ -706,6 +722,7 @@ void CapturePlot::onGateBar1Moved(double value)
 	double maxTime = Curve(d_selected_channel)->data()->sample(n-1).x();
 	double minTime = Curve(d_selected_channel)->data()->sample(0).x();
 
+	//data index to start measurement
 	int currentIndex = (value - minTime) / (maxTime-minTime) * n;
 
 	for (int i = 0; i < d_measureObjs.size(); i++) {
@@ -713,6 +730,7 @@ void CapturePlot::onGateBar1Moved(double value)
 		measure->setStartIndex(currentIndex);
 	}
 
+	//find the percentage of the gate in relation with plot width
 	double width = (value - axisScaleDiv(xBottom).lowerBound()) / (axisScaleDiv(xBottom).upperBound() - axisScaleDiv(xBottom).lowerBound());
 	Q_EMIT leftGateChanged(width);
 	d_hGatingHandle1->setTimeValue(d_gateBar1->plotCoord().x());
@@ -722,6 +740,7 @@ void CapturePlot::onGateBar1Moved(double value)
 
 void CapturePlot::onGateBar2Moved(double value)
 {
+	//update gate handle
 	rightGateRect.setTop(axisScaleDiv(yRight).upperBound());
 	rightGateRect.setBottom(axisScaleDiv(yRight).lowerBound());
 	rightGateRect.setLeft(value);
@@ -732,6 +751,7 @@ void CapturePlot::onGateBar2Moved(double value)
 	double maxTime = Curve(d_selected_channel)->data()->sample(n-1).x();
 	double minTime = Curve(d_selected_channel)->data()->sample(0).x();
 
+	//data index to end measurement
 	int currentIndex = (value - minTime) / (maxTime-minTime) * n;
 
 	for (int i = 0; i < d_measureObjs.size(); i++) {
@@ -739,6 +759,7 @@ void CapturePlot::onGateBar2Moved(double value)
 		measure->setEndIndex(currentIndex);
 	}
 
+	//find the percentage of the gate in relation with plot width
 	double width = (axisScaleDiv(xBottom).upperBound() - value) / (axisScaleDiv(xBottom).upperBound() - axisScaleDiv(xBottom).lowerBound());
 	Q_EMIT rightGateChanged(width);
 	d_hGatingHandle2->setTimeValue(d_gateBar2->plotCoord().x());
@@ -752,7 +773,7 @@ QWidget * CapturePlot::topArea()
 }
 
 QWidget * CapturePlot::topHandlesArea()
-{
+{/* handle area for gate cursors */
 	return d_topHandlesArea;
 }
 
@@ -1043,6 +1064,7 @@ void CapturePlot::setGatingEnabled(bool enabled){
 			leftGate->attach(this);
 			rightGate->attach(this);
 			d_topHandlesArea->show();
+			//update handle
 			onGateBar1Moved(leftGateRect.right());
 			onGateBar2Moved(rightGateRect.left());
 		}
@@ -1055,6 +1077,7 @@ void CapturePlot::setGatingEnabled(bool enabled){
 			Measure *measure = d_measureObjs[i];
 			measure->setGatingEnabled(enabled);
 		}
+
 		d_gateBar1->triggerMove();
 		d_gateBar2->triggerMove();
 
@@ -1127,7 +1150,7 @@ void CapturePlot::updateHandleAreaPadding(bool enabled)
 {
 	if (enabled) {
 		d_bottomHandlesArea->setLeftPadding(50 + axisWidget(QwtAxisId(QwtPlot::yLeft, d_activeVertAxis))->width());
-		d_topHandlesArea->setLeftPadding(50 + axisWidget(QwtAxisId(QwtPlot::yLeft, d_activeVertAxis))->width());
+		d_topHandlesArea->setLeftPadding(90 + axisWidget(QwtAxisId(QwtPlot::yLeft, d_activeVertAxis))->width());
 		QwtScaleWidget *scaleWidget = axisWidget(QwtPlot::xBottom);
 		const int fmw = QFontMetrics(scaleWidget->font()).width("-XX.XX XX");
 		const int fmh = QFontMetrics(scaleWidget->font()).height();
@@ -1139,10 +1162,10 @@ void CapturePlot::updateHandleAreaPadding(bool enabled)
 		margins.setLeft(d_leftHandlesArea->minimumWidth()+100);
 		d_topWidget->layout()->setContentsMargins(margins);
 	} else {
-		if(d_topHandlesArea->leftPadding() != 50)
-			d_topHandlesArea->setLeftPadding(50);
-		if(d_topHandlesArea->rightPadding() != 50)
-			d_topHandlesArea->setRightPadding(50);
+		if(d_topHandlesArea->leftPadding() != 90)
+			d_topHandlesArea->setLeftPadding(90);
+		if(d_topHandlesArea->rightPadding() != 90)
+			d_topHandlesArea->setRightPadding(90);
 		if (d_bottomHandlesArea->leftPadding() != 50)
 			d_bottomHandlesArea->setLeftPadding(50);
 		if (d_bottomHandlesArea->rightPadding() != 50 + d_bonusWidth)
@@ -1160,6 +1183,7 @@ void CapturePlot::updateHandleAreaPadding(bool enabled)
 		margins.setLeft(d_leftHandlesArea->minimumWidth());
 		d_topWidget->layout()->setContentsMargins(margins);
 	}
+	//update handle position to avoid cursors getting out of the plot bounds when changing the padding;
 	d_hCursorHandle1->updatePosition();
 	d_hCursorHandle2->updatePosition();
 
@@ -1266,6 +1290,7 @@ void CapturePlot::displayIntersection()
 }
 
 void CapturePlot::updateGateMargins(){
+	/* update the size of the gates */
 	leftGateRect.setTop(axisScaleDiv(yRight).upperBound());
 	leftGateRect.setBottom(axisScaleDiv(yRight).lowerBound());
 	leftGate->setRect(leftGateRect);
@@ -1289,6 +1314,7 @@ bool CapturePlot::eventFilter(QObject *object, QEvent *event)
 		d_vCursorHandle1->triggerMove();
 		d_vCursorHandle2->triggerMove();
 
+		/* update the size of the gates when the plot canvas is resized */
 		updateGateMargins();
 
 		Q_EMIT canvasSizeChanged();

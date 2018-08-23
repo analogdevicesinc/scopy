@@ -90,4 +90,14 @@ private:
 	int largest_child_width;
 };
 
+class GateHandlesArea: public HorizHandlesArea
+{
+public:
+	GateHandlesArea(QWidget *parent = 0);
+protected:
+	void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+private:
+};
+
+
 #endif // HANDLES_AREA_H
