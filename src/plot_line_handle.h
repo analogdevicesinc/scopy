@@ -22,6 +22,7 @@
 
 #include <QWidget>
 #include <QPen>
+#include <plot_utils.hpp>
 
 class HandlesArea;
 
@@ -74,12 +75,17 @@ public:
 	void triggerMove();
 	void setPosition(int);
 	void setPositionSilenty(int);
+	void updatePosition();
 	void moveWithinParent(int x, int y);
 	void setInnerSpacing(int value);
+	void setTimeValue(double val);
 protected:
 	void paintEvent(QPaintEvent *event);
 	int originPosToCenter(int origin);
 	int centerPosToOrigin(int center);
+private:
+	double m_timeValue;
+	adiscope::TimePrefixFormatter d_timeFormatter;
 };
 
 class PlotLineHandleH: public PlotLineHandle
