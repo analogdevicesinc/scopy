@@ -108,7 +108,7 @@ CapturePlot::CapturePlot(QWidget *parent,
 
 	d_topWidget->setStyleSheet("QWidget {background-color: transparent}");
 	d_topWidget->setMinimumHeight(50);
-	d_topHandlesArea->setMinimumHeight(30);
+	d_topHandlesArea->setMinimumHeight(20);
 	d_topHandlesArea->setLargestChildWidth(60);
 	d_bottomHandlesArea->setMinimumHeight(50);
 	d_leftHandlesArea->setMinimumWidth(50);
@@ -290,11 +290,11 @@ CapturePlot::CapturePlot(QWidget *parent,
 				d_bottomHandlesArea);
 
 	d_hGatingHandle1 = new PlotGateHandle(
-				QPixmap(":/icons/h_cursor_handle.svg"),
+				QPixmap(":/icons/gate_handle.svg"),
 				d_topHandlesArea);
 
 	d_hGatingHandle2 = new PlotGateHandle(
-				QPixmap(":/icons/h_cursor_handle.svg"),
+				QPixmap(":/icons/gate_handle.svg"),
 				d_topHandlesArea);
 
 	d_vBar1 = new VertBar(this, true);
@@ -414,6 +414,7 @@ CapturePlot::CapturePlot(QWidget *parent,
 	connect(d_hGatingHandle1, &PlotLineHandleH::positionChanged,[=](int value){
 		if(d_hGatingHandle1->position() <= d_hGatingHandle2->position()){
 			d_gateBar1->setPixelPosition(value);
+
 		}
 		else{
 			d_gateBar1->setPixelPosition(d_hGatingHandle2->position());
@@ -714,6 +715,7 @@ void CapturePlot::onGateBar1Moved(double value)
 
 	double width = (value - axisScaleDiv(xBottom).lowerBound()) / (axisScaleDiv(xBottom).upperBound() - axisScaleDiv(xBottom).lowerBound());
 	Q_EMIT leftGateChanged(width);
+	d_hGatingHandle1->setTimeValue(d_gateBar1->plotCoord().x());
 
 	replot();
 }
@@ -739,6 +741,7 @@ void CapturePlot::onGateBar2Moved(double value)
 
 	double width = (axisScaleDiv(xBottom).upperBound() - value) / (axisScaleDiv(xBottom).upperBound() - axisScaleDiv(xBottom).lowerBound());
 	Q_EMIT rightGateChanged(width);
+	d_hGatingHandle2->setTimeValue(d_gateBar2->plotCoord().x());
 
 	replot();
 }

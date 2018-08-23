@@ -116,6 +116,11 @@ void PlotGateHandle::setPositionSilenty(int pos)
 		moveSilently(QPoint(centerPosToOrigin(pos), 0));
 }
 
+void PlotGateHandle::updatePosition()
+{
+	moveSilently(QPoint(0, centerPosToOrigin(m_current_pos)));
+}
+
 void PlotGateHandle::moveWithinParent(int x, int y)
 {
 	Q_UNUSED(y);
@@ -149,6 +154,12 @@ void PlotGateHandle::setInnerSpacing(int value)
 	m_innerSpacing = value;
 }
 
+void PlotGateHandle::setTimeValue(double val)
+{
+	m_timeValue = val;
+	repaint();
+}
+
 void PlotGateHandle::paintEvent(QPaintEvent *event)
 {
 	QPainter p(this);
@@ -156,6 +167,15 @@ void PlotGateHandle::paintEvent(QPaintEvent *event)
 
 	imageTopLeft = QPoint(0, 0);
 	p.drawPixmap(imageTopLeft, m_image);
+
+	p.setPen(QPen(QColor(Qt::black)));
+	QString handleText = d_timeFormatter.format(m_timeValue,"",2);
+
+	QFontMetrics fm = p.fontMetrics();
+	int textWidth = fm.width(handleText);
+	int textHeight = fm.height();
+
+	p.drawText(QPoint((width()-textWidth)/2,height()-textHeight/2),handleText);
 }
 
 int PlotGateHandle::originPosToCenter(int origin)
