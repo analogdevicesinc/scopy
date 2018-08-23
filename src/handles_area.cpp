@@ -183,3 +183,31 @@ void HorizHandlesArea::resizeMask(QSize size)
 			largest_child_width, size.height());
 	setMask(activeRegion);
 }
+
+
+/*
+ * Class GateHandlesArea implementation
+ */
+GateHandlesArea::GateHandlesArea(QWidget *parent):
+	HorizHandlesArea(parent)
+{}
+
+void GateHandlesArea::mousePressEvent(QMouseEvent *event)
+{
+	PlotLineHandle *child = static_cast<PlotLineHandle*>
+						(childAt(event->pos()));
+	if (child) {
+		child->raise();
+		selectedItem = child;
+
+		PlotGateHandle *handle = static_cast<PlotGateHandle*>(child);
+
+		if(handle->reachedLimit())
+			/*if the handle reached the limit update the hotspot so we can still change the bar position */
+			hotspot = event->pos() - QPoint(handle->getCurrentPos(),handle->y());
+		else{
+			hotspot = event->pos() - child->pos();
+		}
+		child->setGrabbed(true);
+	}
+}

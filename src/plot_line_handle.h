@@ -31,6 +31,7 @@ class PlotLineHandle: public QWidget
 	Q_OBJECT
 
 	friend class HandlesArea;
+	friend class GateHandlesArea;
 
 public:
 	PlotLineHandle(const QPixmap &handleIcon, QWidget *parent = 0);
@@ -78,12 +79,21 @@ public:
 	void updatePosition();
 	void moveWithinParent(int x, int y);
 	void setInnerSpacing(int value);
+	int position();
 	void setTimeValue(double val);
+	void setCenterLeft(bool val);
+	int getCurrentPos();
+	bool reachedLimit();
+	void setOtherCursorPosition(int position);
 protected:
 	void paintEvent(QPaintEvent *event);
 	int originPosToCenter(int origin);
 	int centerPosToOrigin(int center);
 private:
+	int m_position;
+	int m_otherCursorPos;
+	bool m_reachLimit;
+	bool m_alignLeft;
 	double m_timeValue;
 	adiscope::TimePrefixFormatter d_timeFormatter;
 };
