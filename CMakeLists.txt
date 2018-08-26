@@ -271,6 +271,14 @@ configure_file(Info.plist.cmakein ${CMAKE_CURRENT_BINARY_DIR}/Info.plist @ONLY)
 # Compiler options
 target_compile_options(${PROJECT_NAME} PUBLIC -Wall)
 
+#List of warnings to be treated as errors
+target_compile_options(${PROJECT_NAME} PUBLIC
+	-Werror=return-type
+	-Werror=uninitialized
+	-Werror=init-self
+	-Werror=switch
+)
+
 set_target_properties(${PROJECT_NAME} PROPERTIES
 		CXX_STANDARD 11
 		CXX_STANDARD_REQUIRED ON
