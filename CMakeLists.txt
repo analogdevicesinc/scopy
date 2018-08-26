@@ -268,6 +268,9 @@ endif()
 
 configure_file(Info.plist.cmakein ${CMAKE_CURRENT_BINARY_DIR}/Info.plist @ONLY)
 
+# Compiler options
+target_compile_options(${PROJECT_NAME} PUBLIC -Wall)
+
 set_target_properties(${PROJECT_NAME} PROPERTIES
 		CXX_STANDARD 11
 		CXX_STANDARD_REQUIRED ON
