@@ -1058,7 +1058,7 @@ void adiscope::ToolLauncher::resetStylesheets()
 
 void adiscope::ToolLauncher::deviceBtn_clicked(bool pressed)
 {
-	DeviceWidget *dev;
+	DeviceWidget *dev = nullptr;
 	for (auto d : devices) {
 		if (d == sender()) {
 			dev = d;
