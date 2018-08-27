@@ -771,13 +771,15 @@ void PhaseSpinButton::setValue(double value)
 		}
 	}
 
-	int index;
-	auto scale = inSeconds() ? findUnitOfValue(value, &index)
-	             : m_units.at(ui->SBA_Combobox->currentIndex()).second;
 	double period = 360;
+	double scale;
 
 	if (inSeconds()) {
+		int index;
+		scale = findUnitOfValue(value, &index);
 		value = computeSecondsTransformation(scale, index, value);
+	} else {
+		scale = m_units.at(ui->SBA_Combobox->currentIndex()).second;
 	}
 
 	// Update line edit

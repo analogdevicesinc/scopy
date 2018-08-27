@@ -487,7 +487,7 @@ void SpectrumAnalyzer::triggerRightMenuToggle(CustomPushButton *btn, bool checke
 
 void SpectrumAnalyzer::toggleRightMenu(CustomPushButton *btn, bool checked)
 {
-	int index;
+	int index = 0;
 	bool chSettings = false;
 	int id = -1;
 
@@ -514,8 +514,6 @@ void SpectrumAnalyzer::toggleRightMenu(CustomPushButton *btn, bool checked)
 		} else if (btn == ui->btnMarkers) {
 			index = 3;
 		}
-	} else {
-		index = 0;
 	}
 
 	if (id != -1) {
