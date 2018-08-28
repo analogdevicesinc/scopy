@@ -1300,6 +1300,9 @@ uint16_t UARTPattern::encapsulateUartFrame(char chr, uint16_t *bits_per_frame)
 		parity_bit_available = true;
 		parity_bit_value = 0;
 		break;
+
+	case SP_PARITY_INVALID:
+		qDebug() << "Invalid parity setting detected";
 	}
 
 	if (!msb_first) {
