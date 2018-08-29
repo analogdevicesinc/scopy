@@ -59,10 +59,17 @@ const QPen& PlotLineHandle::pen()
 	return m_pen;
 }
 
+void PlotLineHandle::enterEvent(QEvent *event)
+{
+	setCursor(Qt::OpenHandCursor);
+	QWidget::enterEvent(event);
+}
+
 void PlotLineHandle::mousePressEvent(QMouseEvent *event)
 {
 	QWidget *parent = static_cast<QWidget *>(this->parent());
 
+	setCursor(Qt::ClosedHandCursor);
 	parent->raise();
 
 	QWidget::mousePressEvent(event);
@@ -71,7 +78,7 @@ void PlotLineHandle::mousePressEvent(QMouseEvent *event)
 void PlotLineHandle::mouseReleaseEvent(QMouseEvent *event)
 {
 	Q_EMIT mouseReleased();
-
+	setCursor(Qt::OpenHandCursor);
 	QWidget::mouseReleaseEvent(event);
 }
 

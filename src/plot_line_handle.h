@@ -47,6 +47,7 @@ Q_SIGNALS:
 	void mouseReleased();
 
 protected:
+	void enterEvent(QEvent *event);
 	void mousePressEvent(QMouseEvent *event);
 	void mouseReleaseEvent(QMouseEvent *event);
 
