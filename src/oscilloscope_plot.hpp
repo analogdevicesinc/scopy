@@ -266,6 +266,7 @@ namespace adiscope {
 	        QList<Measure *> d_measureObjs;
 
 		double value_v1, value_v2, value_h1, value_h2;
+		double value_gateLeft, value_gateRight;
 		double d_minOffsetValue, d_maxOffsetValue;
 		double d_timeTriggerMinValue, d_timeTriggerMaxValue;
 
