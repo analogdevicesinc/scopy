@@ -106,6 +106,8 @@ FftDisplayPlot::FftDisplayPlot(int nplots, QWidget *parent) :
 	d_numPoints = 1024;
 	x_data = new double[d_numPoints];
 
+	d_firstInit = true;
+
 	dBFormatter.setTwoDecimalMode(false);
 	freqFormatter.setTwoDecimalMode(true);
 
@@ -226,7 +228,8 @@ void FftDisplayPlot::plotData(const std::vector<double *> pts,
 	if (d_stop || halfNumPoints == 0)
 		return;
 
-	if (halfNumPoints != d_numPoints) {
+	if (halfNumPoints != d_numPoints || d_firstInit) {
+		d_firstInit = false;
 		d_numPoints = halfNumPoints;
 		numPointsChanged = true;
 

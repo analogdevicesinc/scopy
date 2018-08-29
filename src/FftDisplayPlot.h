@@ -92,6 +92,8 @@ namespace adiscope {
 		double d_sampl_rate;
 		double d_preset_sampl_rate;
 
+		bool d_firstInit;
+
 		double m_sweepStart;
 		double m_sweepStop;
 		bool m_visiblePeakSearch;
