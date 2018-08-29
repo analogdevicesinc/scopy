@@ -45,6 +45,10 @@ class Oscilloscope_API : public ApiObject
 	Q_PROPERTY(int cursors_transparency READ getCursorsTransparency
 		  WRITE setCursorsTransparency)
 
+	Q_PROPERTY(bool gating_enabled READ gatingEnabled WRITE setGatingEnabled);
+	Q_PROPERTY(double cursor_gateLeft READ cursorGateLeft WRITE setCursorGateLeft);
+	Q_PROPERTY(double cursor_gateRight READ cursorGateRight WRITE setCursorGateRight);
+
 	Q_PROPERTY(bool auto_trigger
 			READ autoTrigger WRITE setAutoTrigger)
 	Q_PROPERTY(bool internal_trigger
@@ -135,6 +139,14 @@ public:
 	void setCursorV2(double val);
 	void setCursorH1(double val);
 	void setCursorH2(double val);
+
+	bool gatingEnabled() const;
+	void setGatingEnabled(bool en);
+
+	double cursorGateLeft() const;
+	double cursorGateRight() const;
+	void setCursorGateLeft(double val);
+	void setCursorGateRight(double val);
 
 	bool autoTrigger() const;
 	void setAutoTrigger(bool en);

@@ -530,6 +530,36 @@ void Oscilloscope_API::setCursorsTransparency(int val)
 	osc->cr_ui->horizontalSlider->setValue(val);
 }
 
+bool Oscilloscope_API::gatingEnabled() const
+{
+	return osc->measure_settings->m_ui->button_GatingEnable->isChecked();
+}
+
+void Oscilloscope_API::setGatingEnabled(bool en)
+{
+	osc->measure_settings->m_ui->button_GatingEnable->setChecked(en);
+}
+
+double Oscilloscope_API::cursorGateLeft() const
+{
+	return osc->plot.value_gateLeft;
+}
+
+double Oscilloscope_API::cursorGateRight() const
+{
+	return osc->plot.value_gateRight;
+}
+
+void Oscilloscope_API::setCursorGateLeft(double val)
+{
+	osc->plot.d_gateBar1->setPosition(val);
+}
+
+void Oscilloscope_API::setCursorGateRight(double val)
+{
+	osc->plot.d_gateBar2->setPosition(val);
+}
+
 QVariantList Oscilloscope_API::getChannels()
 {
 	QVariantList list;
