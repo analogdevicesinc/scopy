@@ -298,6 +298,8 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
     connect(ui->boxCursors,SIGNAL(toggled(bool)),
             SLOT(toggleCursors(bool)));
 
+	connect(ui->cmb_graphs,SIGNAL(currentIndexChanged(int)),SLOT(onGraphIndexChanged(int)));
+
     readPreferences();
 
 	api->setObjectName(QString::fromStdString(Filter::tool_name(
@@ -314,7 +316,6 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
     connect(&m_dBgraph,SIGNAL(resetZoom()),&m_phaseGraph,SLOT(onResetZoom()));
     connect(&m_phaseGraph,SIGNAL(resetZoom()),&m_dBgraph,SLOT(onResetZoom()));
 
-    connect(ui->cmb_graphs,SIGNAL(currentIndexChanged(int)),SLOT(onGraphIndexChanged(int)));
 
     connect(ui->rightMenu, &MenuAnim::finished, this, &NetworkAnalyzer::rightMenuFinished);
 
