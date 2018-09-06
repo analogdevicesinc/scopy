@@ -3973,7 +3973,7 @@ void Oscilloscope::updateGainMode()
 		return;
 	}
 
-	QwtInterval hw_input_itv(-2.5, 2.5);
+	QwtInterval hw_input_itv(-5, 5);
 	QwtInterval plot_vert_itv = plot.axisScaleDiv(
 		QwtAxisId(QwtPlot::yLeft, current_ch_widget)).interval();
 
