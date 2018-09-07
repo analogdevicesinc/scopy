@@ -134,7 +134,7 @@ void LogicAnalyzerSymmetricBufferMode::configParamsOnTimeBaseChanged()
 	long long triggPosInBuffer = qRound64(m_triggerPos * sampleRate) +
 		triggOffset;
 
-	double trigBuffSize = triggPosInBuffer;
+	long long trigBuffSize = triggPosInBuffer;
 	if (triggPosInBuffer < 0) {
 		bufferSize = qRound64(qAbs(m_triggerPos) * sampleRate) +
 			triggOffset;
@@ -143,9 +143,6 @@ void LogicAnalyzerSymmetricBufferMode::configParamsOnTimeBaseChanged()
 			trigBuffSize = -(bufferSize - m_entireBufferMaxSize);
 			bufferSize = m_entireBufferMaxSize;
 		} else {
-			bufferSize = m_entireBufferMaxSize;
-			triggPosInBuffer = -m_entireBufferMaxSize +
-					2 * triggOffset;
 			trigBuffSize = 0;
 		}
 	} else if (triggPosInBuffer > m_triggerBufferMaxSize) {
