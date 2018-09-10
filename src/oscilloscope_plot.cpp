@@ -68,7 +68,8 @@ CapturePlot::CapturePlot(QWidget *parent,
 	horizCursorsLocked(false),
 	vertCursorsLocked(false),
 	d_horizCursorsEnabled(false),
-	d_vertCursorsEnabled(false)
+	d_vertCursorsEnabled(false),
+	d_bonusWidth(0)
 {
 	setMinimumHeight(250);
 	setMinimumWidth(500);
@@ -618,6 +619,11 @@ QWidget * CapturePlot::rightHandlesArea()
 	return d_rightHandlesArea;
 }
 
+void CapturePlot::setBonusWidthForHistogram(int width)
+{
+	d_bonusWidth = width;
+}
+
 void CapturePlot::setTriggerAEnabled(bool en)
 {
 	if (d_triggerAEnabled != en) {
@@ -940,14 +946,15 @@ void CapturePlot::updateHandleAreaPadding(bool enabled)
 		QwtScaleWidget *scaleWidget = axisWidget(QwtPlot::xBottom);
 		const int fmw = QFontMetrics(scaleWidget->font()).width("-XX.XX XX");
 		const int fmh = QFontMetrics(scaleWidget->font()).height();
-		d_bottomHandlesArea->setRightPadding(50 + fmw/2);
+		d_bottomHandlesArea->setRightPadding(50 + fmw/2 + d_bonusWidth);
 		d_rightHandlesArea->setTopPadding(50 + 6);
 		d_rightHandlesArea->setBottomPadding(50 + fmh);
 	} else {
+//		qDebug() << d_bottomHandlesArea->rightPadding() << " ... " << 50 + d_bonusWidth;
 		if (d_bottomHandlesArea->leftPadding() != 50)
 			d_bottomHandlesArea->setLeftPadding(50);
-		if (d_bottomHandlesArea->rightPadding() != 50)
-			d_bottomHandlesArea->setRightPadding(50);
+		if (d_bottomHandlesArea->rightPadding() != 50 + d_bonusWidth)
+			d_bottomHandlesArea->setRightPadding(50 + d_bonusWidth);
 		if (d_rightHandlesArea->topPadding() != 50)
 			d_rightHandlesArea->setTopPadding(50);
 		if (d_rightHandlesArea->bottomPadding() != 50)
