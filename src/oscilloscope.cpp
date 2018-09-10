@@ -2742,6 +2742,27 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 	updateBufferPreviewer();
 }
 
+bool adiscope::Oscilloscope::gainUpdateNeeded()
+{
+	double offset = plot.VertOffset(current_ch_widget);
+	QwtInterval hw_input_itv(-2.5 + offset, 2.5 + offset);
+	QwtInterval plot_vert_itv = plot.axisScaleDiv(
+		QwtAxisId(QwtPlot::yLeft, current_ch_widget)).interval();
+
+	if (plot_vert_itv.minValue() < hw_input_itv.minValue() ||
+			plot_vert_itv.maxValue() > hw_input_itv.maxValue() ||
+			std::abs(offset) > 5.0) {
+		if (high_gain_modes[current_ch_widget]) {
+			return true;
+		}
+		return false;
+	} else if (!high_gain_modes[current_ch_widget]) {
+		return true;
+	}
+
+	return false;
+
+}
 void adiscope::Oscilloscope::onVertOffsetValueChanged(double value)
 {
 	cancelZoom();
@@ -2756,6 +2777,11 @@ void adiscope::Oscilloscope::onVertOffsetValueChanged(double value)
 
 	// Switch between high and low gain modes only for the M2K channels
 	if (m2k_adc && current_ch_widget < nb_channels) {
+
+		if(!gainUpdateNeeded()) {
+			return;
+		}
+
 		if (ui->runSingleWidget->runButtonChecked())
 			toggle_blockchain_flow(false);
 
