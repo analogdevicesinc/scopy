@@ -118,6 +118,66 @@ private:
 };
 
 
+
+Histogram::Histogram(const QString& title, const QColor& color)
+	: QwtPlotHistogram(title)
+{
+	setStyle(QwtPlotHistogram::Columns);
+	setPen(color, 0.1);
+	setColor(color);
+}
+
+void
+Histogram::setColor(const QColor& color)
+{
+	QColor c = color;
+	c.setAlpha(255 / 2);
+	setBrush(QBrush(c));
+}
+
+void
+Histogram::setValues(const double *xData, const double *yData, unsigned int nr_bins)
+{
+	QVector<QwtIntervalSample> samples(nr_bins - 1);
+	if (m_samples.size() != samples.size()) {
+		m_samples.clear();
+		m_samples.resize(samples.size());
+	}
+	for (unsigned int i = 0; i < nr_bins - 1; ++i) {
+		QwtInterval interval(xData[i], xData[i + 1]);
+		interval.setBorderFlags(QwtInterval::IncludeBorders);
+
+		int sign = orientation() == Qt::Horizontal ? -1 : 1;
+		samples[i] = QwtIntervalSample(sign * yData[i], interval);
+	}
+
+	m_samples = samples;
+	setData(new QwtIntervalSeriesData(samples));
+}
+
+void Histogram::setOrientation(Qt::Orientation orientation)
+{
+	if (this->orientation() == orientation) {
+		return;
+	}
+
+	QwtPlotSeriesItem::setOrientation(orientation);
+	for (int i = 0; i < m_samples.size(); ++i) {
+		m_samples[i].value = (-1) * m_samples[i].value;
+	}
+	setData(new QwtIntervalSeriesData(m_samples));
+}
+
+int Histogram::getMaxHeight()
+{
+	double max_h = 0;
+	int sign = orientation() == Qt::Horizontal ? -1 : 1;
+	for (int i = 0; i < m_samples.size(); ++i) {
+		max_h = std::max(max_h, sign * m_samples[i].value);
+	}
+	return max_h;
+}
+
 /***********************************************************************
  * Main Time domain plotter widget
  **********************************************************************/
@@ -126,6 +186,13 @@ HistogramDisplayPlot::HistogramDisplayPlot(int nplots, QWidget* parent)
 {
   d_bins = 100;
   d_accum = false;
+  d_height = 0;
+  stop = false;
+  d_orientation = Qt::Horizontal;
+  d_minPos = 0;
+  d_maxPos = 0;
+
+  setLeftVertAxesCount(2);
 
   // Initialize x-axis data array
   d_xdata = new double[d_bins];
@@ -140,24 +207,45 @@ HistogramDisplayPlot::HistogramDisplayPlot(int nplots, QWidget* parent)
   d_zoomer[0]->setMousePattern(QwtEventPattern::MouseSelect2,
                             Qt::RightButton, Qt::ControlModifier);
   d_zoomer[0]->setMousePattern(QwtEventPattern::MouseSelect3,
-                            Qt::RightButton);
+			    Qt::RightButton);
 
   const QColor c(Qt::darkRed);
   d_zoomer[0]->setRubberBandPen(c);
   d_zoomer[0]->setTrackerPen(c);
+
+  d_zoomer[0]->setEnabled(false);
 
   d_semilogx = false;
   d_semilogy = false;
   d_autoscale_state = false;
   d_autoscalex_state = false;
 
-  //setAxisScaleEngine(QwtPlot::xBottom, new QwtLinearScaleEngine);
-  //setXaxis(-1, 1);
-  //setAxisTitle(QwtPlot::xBottom, "Value");
+  setAxesCount(QwtPlot::xBottom, 2);
+  horizAxes.resize(2);
+  PrefixFormatter *pf = new MetricPrefixFormatter();
+  pf->setTwoDecimalMode(true);
+  for (int i = 0; i < 2; ++i) {
+	  horizAxes[i] = new PlotAxisConfiguration(QwtPlot::xBottom, i, this);
+	  configureAxis(QwtPlot::xBottom, i);
+	  setAxisVisible(QwtAxisId(QwtPlot::xBottom, i),
+			 d_usingLeftAxisScales);
+	  connect(axisWidget(horizAxes[i]->axis()), SIGNAL(scaleDivChanged()),
+			this, SLOT(_onXbottomAxisWidgetScaleDivChanged()));
+	  QwtScaleWidget *scaleWidget = axisWidget(QwtAxisId(QwtPlot::xBottom, i));
+	  OscScaleDraw* osd = dynamic_cast<OscScaleDraw*>(scaleWidget->scaleDraw());
+	  osd->setFormatter(pf);
+	  osd->setUnitType("V");
+	  osd->setFloatPrecision(2);
+	  osd->setColor(d_CurveColors[i]);
+	  const int fmw = QFontMetrics(scaleWidget->font()).width("-XX.XX XX");
+	  scaleWidget->setMinBorderDist(fmw / 2, fmw / 2);
+  }
+  for (int i = 0; i < 2; ++i) {
+	  HistogramScaleDraw *hsd = new HistogramScaleDraw();
+	  hsd->setColor(d_CurveColors[i]);
+	  setAxisScaleDraw(QwtAxisId(QwtPlot::yLeft, i), hsd);
+  }
 
-  //setAxisScaleEngine(QwtPlot::yLeft, new QwtLinearScaleEngine);
-  //setYaxis(-2.0, d_bins);
-  //setAxisTitle(QwtPlot::yLeft, "Count");
 
   // Setup dataPoints and plot vectors
   // Automatically deleted when parent is deleted
@@ -165,8 +253,15 @@ HistogramDisplayPlot::HistogramDisplayPlot(int nplots, QWidget* parent)
     d_ydata.push_back(new double[d_bins]);
     memset(d_ydata[i], 0, d_bins*sizeof(double));
 
+    d_histograms.push_back(new Histogram(QString("Data %1").arg(i), d_CurveColors[i]));
+    d_histograms[i]->setXAxis(QwtAxisId(QwtPlot::xBottom, i));
+    d_histograms[i]->setYAxis(QwtAxisId(QwtPlot::yLeft, i));
+	d_histograms[i]->setOrientation(Qt::Horizontal);
+    d_histograms[i]->attach(this);
+
+
     d_plot_curve.push_back(new QwtPlotCurve(QString("Data %1").arg(i)));
-    d_plot_curve[i]->attach(this);
+   // d_plot_curve[i]->attach(this);
     d_plot_curve[i]->setPen(QPen(d_CurveColors[i]));
     d_plot_curve[i]->setRenderHint(QwtPlotItem::RenderAntialiased);
 
@@ -189,6 +284,73 @@ HistogramDisplayPlot::HistogramDisplayPlot(int nplots, QWidget* parent)
   }
 
   _resetXAxisPoints(-1, 1);
+  setAxisScale(QwtPlot::yLeft, -10, 10);
+
+  setAxisVisible(QwtAxisId(QwtPlot::yLeft, 0), false);
+  setAxisVisible(QwtAxisId(QwtPlot::yLeft, 1), false);
+  setAxisVisible(QwtAxisId(QwtPlot::xBottom, 0), false);
+  setAxisVisible(QwtAxisId(QwtPlot::xBottom, 1), false);
+
+  insertLegend(nullptr);
+
+  d_grid->detach();
+  for(QwtPlotScaleItem* scale : scaleItems){
+	  scale->detach();
+  }
+}
+
+void HistogramDisplayPlot::setOrientation(Qt::Orientation orientation)
+{
+	d_orientation = orientation;
+
+	for (int i = 0; i < d_histograms.size(); ++i) {
+		d_histograms[i]->setOrientation(orientation);
+	}
+
+	if (orientation == Qt::Vertical) {
+		d_grid->attach(this);
+		for(QwtPlotScaleItem* scale : scaleItems){
+			scale->attach(this);
+		}
+	} else {
+		d_grid->detach();
+		for(QwtPlotScaleItem* scale : scaleItems){
+			scale->detach();
+		}
+	}
+
+	QwtInterval xInt = axisInterval(QwtPlot::xBottom);
+	QwtInterval yInt = axisInterval(QwtPlot::yLeft);
+	QwtInterval xInt2 = axisInterval(QwtAxisId(QwtPlot::xBottom, 1));
+	QwtInterval yInt2 = axisInterval(QwtAxisId(QwtPlot::yLeft, 1));
+
+
+	if (orientation == Qt::Vertical) {
+		setAxisScale(QwtAxisId(QwtPlot::xBottom, 0), yInt.minValue(), yInt.maxValue());
+		setAxisScale(QwtAxisId(QwtPlot::yLeft, 0), xInt.maxValue(), -xInt.minValue());
+		setAxisScale(QwtAxisId(QwtPlot::xBottom, 1), yInt2.minValue(), yInt2.maxValue());
+		setAxisScale(QwtAxisId(QwtPlot::yLeft, 1), xInt2.maxValue(), -xInt2.minValue());
+
+		setAxisVisible(QwtAxisId(QwtPlot::yLeft, d_selected_channel), true);
+		setAxisVisible(QwtAxisId(QwtPlot::xBottom, d_selected_channel), true);
+	} else {
+		setAxisScale(QwtPlot::xBottom, 0, yInt.maxValue());
+		setAxisScale(QwtAxisId(QwtPlot::yLeft, 0), xInt.minValue(), xInt.maxValue());
+		setAxisScale(QwtAxisId(QwtPlot::yLeft, 1), xInt.minValue(), xInt.maxValue());
+
+		setAxisVisible(QwtAxisId(QwtPlot::yLeft, 0), false);
+		setAxisVisible(QwtAxisId(QwtPlot::yLeft, 1), false);
+		setAxisVisible(QwtAxisId(QwtPlot::xBottom, 0), false);
+		setAxisVisible(QwtAxisId(QwtPlot::xBottom, 1), false);
+	}
+
+	_orientationChanged();
+	replot();
+}
+
+Qt::Orientation HistogramDisplayPlot::getOrientation()
+{
+	return d_orientation;
 }
 
 HistogramDisplayPlot::~HistogramDisplayPlot()
@@ -198,6 +360,54 @@ HistogramDisplayPlot::~HistogramDisplayPlot()
   delete[] d_xdata;
 
   // d_zoomer and _panner deleted when parent deleted
+}
+
+void
+HistogramDisplayPlot::enableChannel(unsigned int chIdx, bool enable)
+{
+	if (chIdx < 0 || chIdx > 1) {
+		return;
+	}
+
+	if (enable) {
+		d_histograms[chIdx]->attach(this);
+	} else {
+		d_histograms[chIdx]->detach();
+	}
+	replot();
+}
+
+void HistogramDisplayPlot::setYaxisSpan(unsigned int chIdx, double bot, double top)
+{
+	if (chIdx < 0 || chIdx > 1) {
+		return;
+	}
+
+	if (d_orientation == Qt::Vertical) {
+		setAxisScale(QwtAxisId(QwtPlot::xBottom, chIdx), bot, top);
+		replot();
+		return;
+	}
+
+	setAxisScale(QwtAxisId(QwtPlot::yLeft, chIdx), bot, top);
+	replot();
+}
+
+void HistogramDisplayPlot::setXaxisSpan(double start, double stop)
+{
+	if (d_orientation == Qt::Vertical) {
+		return;
+	}
+
+	for (int i = 0; i < d_histograms.size(); ++i) {
+		setAxisScale(QwtAxisId(QwtPlot::xBottom, i), start, stop);
+	}
+}
+
+void HistogramDisplayPlot::setDataInterval(int min, int max)
+{
+	d_minPos = min;
+	d_maxPos = max;
 }
 
 void
@@ -214,19 +424,31 @@ HistogramDisplayPlot::plotNewData(const std::vector<double*> dataPoints,
   if(!d_stop) {
     if((numDataPoints > 0)) {
 
+	    _updateXScales(numDataPoints);
+	    if (d_minPos < 0) {
+		    d_minPos = 0;
+	    }
+	    if (d_maxPos > numDataPoints || d_maxPos == 0) {
+		    d_maxPos = numDataPoints;
+	    }
+	    if (d_minPos > d_maxPos) {
+		    d_minPos = 0;
+		    d_maxPos = numDataPoints;
+	    }
+
       // keep track of the min/max values for when autoscaleX is called.
       d_xmin = 1e20;
       d_xmax = -1e20;
       for(int n = 0; n < d_nplots; n++) {
-        d_xmin = std::min(d_xmin, *std::min_element(dataPoints[n], dataPoints[n]+numDataPoints));
-        d_xmax = std::max(d_xmax, *std::max_element(dataPoints[n], dataPoints[n]+numDataPoints));
+	d_xmin = std::min(d_xmin, *std::min_element(dataPoints[n] + d_minPos, dataPoints[n]+d_maxPos));
+	d_xmax = std::max(d_xmax, *std::max_element(dataPoints[n] + d_minPos, dataPoints[n]+d_maxPos));
       }
 
       // If autoscalex has been clicked, clear the data for the new
       // bin widths and reset the x-axis.
       if(d_autoscalex_state) {
         for(int n = 0; n < d_nplots; n++)
-          memset(d_ydata[n], 0, d_bins*sizeof(double));
+	  memset(d_ydata[n], 0, d_bins*sizeof(double));
         _resetXAxisPoints(d_xmin, d_xmax);
         d_autoscalex_state = false;
       }
@@ -234,23 +456,56 @@ HistogramDisplayPlot::plotNewData(const std::vector<double*> dataPoints,
       int index;
       for(int n = 0; n < d_nplots; n++) {
         if(!d_accum)
-          memset(d_ydata[n], 0, d_bins*sizeof(double));
-        for(int64_t point = 0; point < numDataPoints; point++) {
+	  memset(d_ydata[n], 0, d_bins*sizeof(double));
+	for(int64_t point = d_minPos; point < d_maxPos; point++) {
           index = boost::math::iround(1e-20 + (dataPoints[n][point] - d_left)/d_width);
           if((index >= 0) && (index < d_bins))
-            d_ydata[n][static_cast<int>(index)] += 1;
+	    d_ydata[n][index] += 1;
         }
+	d_histograms[n]->setValues(d_xdata, d_ydata[n], d_bins);
       }
 
-      double height = *std::max_element(d_ydata[0], d_ydata[0]+d_bins);
-      for(int n = 1; n < d_nplots; n++) {
-        height = std::max(height, *std::max_element(d_ydata[n], d_ydata[n]+d_bins));
+      double height = 0;
+      double histogramHeights[d_nplots];
+      for(int n = 0; n < d_nplots; n++) {
+		histogramHeights[n] = *std::max_element(d_ydata[n], d_ydata[n]+d_bins);
+      }
+      for (int n = 0; n < d_nplots - 1; n++) {
+	      if (histogramHeights[n] != 0) {
+		  height = histogramHeights[n];
+		  break;
+	      }
+      }
+      for (int n = 0; n < d_nplots; n++) {
+	      if (d_histograms[n]->plot()) {
+		  height = std::min(height, histogramHeights[n]);
+	      }
       }
 
-      if(d_autoscale_state)
-        _autoScaleY(0, height);
+      d_height = height;
 
-      replot();
+      if (d_orientation == Qt::Vertical) {
+	      for (int i = 0; i < d_histograms.size(); ++i) {
+		      double h = histogramHeights[i] + (0.2 * histogramHeights[i]);
+		      if (h > numDataPoints) {
+			      h = numDataPoints;
+		      }
+		      double pr = h * 0.15;
+
+		      if (abs(h - axisInterval(QwtAxisId(QwtPlot::yLeft, i)).maxValue()) > pr) {
+			setAxisScale(QwtAxisId(QwtPlot::yLeft, i), 0, h);
+		      }
+	      }
+      }
+
+      if(d_autoscale_state) {
+	_autoScaleY(0, height);
+      }
+
+	setXaxisSpan(-d_height, 0);
+
+	replot();
+
     }
   }
 }
@@ -315,9 +570,9 @@ HistogramDisplayPlot::_resetXAxisPoints(double left, double right)
   }
 
   zbase.setRight(d_right);
-  d_zoomer[0]->zoom(zbase);
-  d_zoomer[0]->setZoomBase(zbase);
-  d_zoomer[0]->zoom(0);
+//  d_zoomer[0]->zoom(zbase);
+//  d_zoomer[0]->setZoomBase(zbase);
+//  d_zoomer[0]->zoom(0);
 }
 
 void
@@ -339,16 +594,73 @@ HistogramDisplayPlot::_autoScaleY(double bottom, double top)
   }
 }
 
+void HistogramDisplayPlot::_updateXScales(unsigned int totalSamples)
+{
+	for (int i = 0; i < d_histograms.size(); ++i) {
+		HistogramScaleDraw *hsd = dynamic_cast<HistogramScaleDraw*>(
+					axisWidget(QwtAxisId(QwtPlot::yLeft, i))->scaleDraw());
+		if (hsd) {
+			hsd->setTotalSamples(totalSamples);
+			hsd->invalidateCache();
+		}
+	}
+}
+
+void HistogramDisplayPlot::_orientationChanged()
+{
+	if (d_orientation == Qt::Horizontal) {
+		int min_h = d_histograms[0]->getMaxHeight();
+		for (int i = 1; i < d_histograms.size(); ++i) {
+			min_h = std::min(min_h, d_histograms[i]->getMaxHeight());
+		}
+		for (int i = 0; i < d_histograms.size(); ++i) {
+			setAxisScale(QwtAxisId(QwtPlot::xBottom, i), -min_h, 0);
+		}
+
+
+	} else {
+		//big histogram
+		for (int i = 0; i < d_histograms.size(); ++i) {
+			int h = d_histograms[i]->getMaxHeight();
+			h += h * 0.2;
+			setAxisScale(QwtAxisId(QwtPlot::yLeft, i), 0, h);
+		}
+	}
+}
+
+void HistogramDisplayPlot::setSelectedChannel(unsigned int value)
+{
+	if (value >= d_histograms.size()) {
+
+	}
+
+	d_selected_channel = value;
+
+	d_histograms[value]->detach();
+	d_histograms[value]->attach(this);
+
+	if (d_orientation == Qt::Horizontal) {
+		return;
+	}
+
+	for (int i = 0; i < d_histograms.size(); ++i) {
+		setAxisVisible(QwtAxisId(QwtPlot::yLeft, i), value == i);
+		setAxisVisible(QwtAxisId(QwtPlot::xBottom, i), value == i);
+	}
+}
+
 void
 HistogramDisplayPlot::setAutoScaleX()
 {
-  d_autoscalex_state = true;
+	if(d_orientation == Qt::Horizontal) {
+		d_autoscalex_state = true;
+	}
 }
 
 void
 HistogramDisplayPlot::setAutoScale(bool state)
 {
-  d_autoscale_state = state;
+	d_autoscale_state = state;
 }
 
 void
@@ -493,9 +805,50 @@ HistogramDisplayPlot::setNumBins(int bins)
 #if QWT_VERSION < 0x060000
     d_plot_curve[i]->setRawData(d_xdata, d_ydata[i], d_bins);
 #else
-    d_plot_curve[i]->setRawSamples(d_xdata, d_ydata[i], d_bins);
+    d_plot_curve[i]->setRawSamples(d_ydata[i], d_xdata, d_bins);
 #endif
   }
 }
 
 #endif /* HISTOGRAM_DISPLAY_PLOT_C */
+
+HistogramScaleDraw::HistogramScaleDraw() :
+	QwtScaleDraw(),
+	m_color(Qt::gray),
+	m_totalSamples(0)
+{
+	enableComponent(QwtAbstractScaleDraw::Backbone, false);
+	enableComponent(QwtAbstractScaleDraw::Ticks, false);
+}
+
+QwtText HistogramScaleDraw::label(double value) const
+{
+	QString prefix = "%";
+
+	double displayValue = 0;
+
+	if (!m_totalSamples) {
+		QwtText text("--");
+		text.setColor(m_color);
+		return text;
+	}
+
+	displayValue = value * 100 / m_totalSamples;
+
+	QwtText text(QLocale().toString(displayValue, 'f', 2) + prefix);
+	if (m_color != Qt::gray) {
+		text.setColor(m_color);
+	}
+
+	return text;
+}
+
+void HistogramScaleDraw::setColor(const QColor &color)
+{
+	m_color = color;
+}
+
+void HistogramScaleDraw::setTotalSamples(unsigned int totalSamples)
+{
+	m_totalSamples = totalSamples;
+}
