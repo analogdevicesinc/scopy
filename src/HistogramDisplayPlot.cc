@@ -208,6 +208,8 @@ HistogramDisplayPlot::HistogramDisplayPlot(int nplots, QWidget* parent)
   d_minPos = 0;
   d_maxPos = 0;
   d_zoomed = false;
+  d_xmin = 1e20;
+  d_xmax = -1e20;
 
   setLeftVertAxesCount(2);
 
@@ -246,6 +248,7 @@ HistogramDisplayPlot::HistogramDisplayPlot(int nplots, QWidget* parent)
 	  setAxisScaleDraw(QwtAxisId(QwtPlot::yLeft, i), hsd);
   }
 
+  this->_updateXScales(100);
 
   // Setup dataPoints and plot vectors
   // Automatically deleted when parent is deleted
@@ -295,7 +298,11 @@ HistogramDisplayPlot::HistogramDisplayPlot(int nplots, QWidget* parent)
 
 
   _resetXAxisPoints(-1, 1);
-  setAxisScale(QwtPlot::yLeft, -10, 10);
+
+  for (unsigned int i = 0; i < d_histograms.size(); ++i) {
+	  setAxisScale(QwtAxisId(QwtPlot::xBottom, i), 0, 100);
+	  setAxisScale(QwtAxisId(QwtPlot::yLeft, i), -10, 10);
+  }
 
   setAxisVisible(QwtAxisId(QwtPlot::yLeft, 0), false);
   setAxisVisible(QwtAxisId(QwtPlot::yLeft, 1), false);
@@ -463,12 +470,22 @@ HistogramDisplayPlot::plotNewData(const std::vector<double*> dataPoints,
 	    }
 
       // keep track of the min/max values for when autoscaleX is called.
-      d_xmin = 1e20;
-      d_xmax = -1e20;
+      double xminTemp = 1e20;
+      double xmaxTemp = -1e20;
       for(int n = 0; n < d_nplots; n++) {
-	d_xmin = std::min(d_xmin, *std::min_element(dataPoints[n] + d_minPos, dataPoints[n]+d_maxPos));
-	d_xmax = std::max(d_xmax, *std::max_element(dataPoints[n] + d_minPos, dataPoints[n]+d_maxPos));
+	xminTemp = std::min(xminTemp, *std::min_element(dataPoints[n] + d_minPos, dataPoints[n]+d_maxPos));
+	xmaxTemp = std::max(xmaxTemp, *std::max_element(dataPoints[n] + d_minPos, dataPoints[n]+d_maxPos));
       }
+
+      const double EPS = 0.1;
+      if (std::abs(xminTemp - d_xmin) > EPS ||
+	  std::abs(xmaxTemp - d_xmax) > EPS) {
+	  if (d_minPos == 0 && d_maxPos == numDataPoints) {
+		d_autoscalex_state = true;
+	  }
+      }
+      d_xmin = xminTemp;
+      d_xmax = xmaxTemp;
 
       // If autoscalex has been clicked, clear the data for the new
       // bin widths and reset the x-axis.
