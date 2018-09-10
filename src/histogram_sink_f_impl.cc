@@ -142,6 +142,7 @@ namespace adiscope {
 	d_index = 0;
 
       }
+      plot->setDataInterval(0, d_size);
     }
 
     void
