@@ -426,6 +426,7 @@ namespace adiscope {
 		void add_ref_waveform(unsigned int chIdx);
 		void init_selected_measurements(int, std::vector<int>);
 		void init_buffer_scrolling();
+		bool gainUpdateNeeded();
 	};
 }
 #endif /* M2K_OSCILLOSCOPE_H */
