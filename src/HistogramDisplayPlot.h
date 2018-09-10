@@ -30,7 +30,36 @@
 #include "DisplayPlot.h"
 #include "spectrumUpdateEvents.h"
 
+#include <qwt_plot_histogram.h>
+
 namespace adiscope {
+
+
+class HistogramScaleDraw: public QwtScaleDraw
+{
+public:
+	HistogramScaleDraw();
+	QwtText label( double ) const;
+	void setColor(const QColor &color);
+	void setTotalSamples(unsigned int totalSamples);
+private:
+	unsigned int m_totalSamples;
+	QColor m_color;
+};
+
+class Histogram: public QwtPlotHistogram
+{
+public:
+	Histogram(const QString& title, const QColor& color);
+	void setColor(const QColor& color);
+	void setValues(const double *xData, const double *yData, unsigned int nr_bins);
+	void setOrientation(Qt::Orientation orientation);
+	int getMaxHeight();
+
+private:
+	QVector<QwtIntervalSample> m_samples;
+
+};
 
 /*!
  * \brief QWidget for displaying time domain plots.
@@ -49,6 +78,11 @@ public:
 
   void replot();
 
+  void setXaxisSpan(double start, double stop);
+  void setDataInterval(int min, int max);
+  void setOrientation(Qt::Orientation orientation);
+  Qt::Orientation getOrientation();
+
 public Q_SLOTS:
   void setAutoScale(bool state);
   void setAutoScaleX();
@@ -65,12 +99,22 @@ public Q_SLOTS:
 
   void customEvent(QEvent * e);
 
+  void enableChannel(unsigned int chIdx, bool enable);
+  void setYaxisSpan(unsigned int chIdx, double bot, double top);
+    void setSelectedChannel(unsigned int value);
+
 private Q_SLOTS:
   void newData(const QEvent*);
 
 private:
   void _resetXAxisPoints(double left, double right);
   void _autoScaleY(double bottom, double top);
+  void _updateXScales(unsigned int totalSamples);
+  void _orientationChanged();
+
+  std::vector<Histogram *> d_histograms;
+  std::vector<PlotAxisConfiguration *> rightVertAxes;
+  double d_height;
 
   double* d_xdata;
   std::vector<double*> d_ydata;
@@ -79,10 +123,16 @@ private:
   bool d_accum;
   double d_xmin, d_xmax, d_left, d_right;
   double d_width;
+  int d_minPos, d_maxPos;
 
   bool d_semilogx;
   bool d_semilogy;
   bool d_autoscalex_state;
+  bool stop;
+
+  Qt::Orientation d_orientation;
+  std::vector<PlotAxisConfiguration *> horizAxes;
+  unsigned int d_selected_channel;
 };
 } //adiscope
 
