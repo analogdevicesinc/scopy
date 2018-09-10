@@ -311,6 +311,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	ui->gridLayoutPlot->addItem(plotSpacer, 4, 0, 1, 3);
 	ui->gridLayoutPlot->addWidget(statisticsPanel, 5, 1, 1, 1);
 
+	plot.setBonusWidthForHistogram(25);
+
 	/* Default plot settings */
 	plot.setSampleRate(adc->sampleRate(), 1, "");
 	plot.setActiveVertAxis(0);
@@ -1030,6 +1032,7 @@ void Oscilloscope::toggleMiniHistogramPlotVisible(bool enabled)
 	miniHistogram = enabled;
 	if (hist_plot.getOrientation() == Qt::Horizontal) {
 		hist_plot.setVisible(enabled);
+		plot.setBonusWidthForHistogram(enabled ? 25 : 0);
 	}
 }
 
@@ -2199,6 +2202,7 @@ void Oscilloscope::onHistogram_view_toggled(bool visible)
 		ui->hist_layout->removeWidget(&hist_plot);
 		ui->gridLayoutPlot->addWidget(&hist_plot, 2, 2, 1, 1);
 		ui->gridLayoutPlot->addWidget(plot.rightHandlesArea(), 1, 3, 3, 1);
+		plot.setBonusWidthForHistogram(25);
 		scaleHistogramPlot();
 		toggleMiniHistogramPlotVisible(miniHistogram);
 
@@ -2210,6 +2214,7 @@ void Oscilloscope::onHistogram_view_toggled(bool visible)
 		ui->gridLayoutPlot->removeWidget(&hist_plot);
 		ui->gridLayoutPlot->addWidget(plot.rightHandlesArea(), 1, 2, 3, 1);
 		ui->hist_layout->addWidget(&hist_plot);
+		plot.setBonusWidthForHistogram(0);
 		scaleHistogramPlot();
 		hist_plot.setVisible(true);
 	}

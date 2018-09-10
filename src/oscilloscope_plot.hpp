@@ -83,6 +83,8 @@ namespace adiscope {
 		QWidget *leftHandlesArea();
 		QWidget *rightHandlesArea();
 
+		void setBonusWidthForHistogram(int width);
+
 		bool triggerAEnabled();
 		bool triggerBEnabled();
 		bool vertCursorsEnabled();
@@ -199,6 +201,7 @@ namespace adiscope {
 		HorizHandlesArea *d_bottomHandlesArea;
 		VertHandlesArea *d_leftHandlesArea;
 		VertHandlesArea *d_rightHandlesArea;
+		int d_bonusWidth;
 
 		QLabel *d_timeBaseLabel;
 		QLabel *d_sampleRateLabel;
