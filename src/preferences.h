@@ -89,6 +89,9 @@ public:
 	bool getOsc_filtering_enabled() const;
 	void setOsc_filtering_enabled(bool value);
 
+	bool getMini_hist_enabled() const;
+	void setMini_hist_enabled(bool value);
+
 Q_SIGNALS:
 
 	void notify();
@@ -117,6 +120,7 @@ private:
 	bool manual_calib_enabled;
 	bool animations_enabled;
 	bool osc_filtering_enabled;
+	bool mini_hist_enabled;
 
 	Preferences_API *pref_api;
 	QString getPreferenceIniFile() const;
@@ -140,6 +144,7 @@ class Preferences_API : public ApiObject
 	Q_PROPERTY(bool manual_calib_script_enabled READ getManualCalibScript WRITE setManualCalibScript)
 	Q_PROPERTY(bool animations_enabled READ getAnimationsEnabled WRITE setAnimationsEnabled)
 	Q_PROPERTY(bool osc_filtering_enabled READ getOscFilteringEnabled WRITE setOscFilteringEnabled)
+	Q_PROPERTY(bool mini_hist_enabled READ getMiniHist WRITE setMiniHist)
 
 public:
 
@@ -185,6 +190,9 @@ public:
 
 	bool getOscFilteringEnabled() const;
 	void setOscFilteringEnabled(const bool& enabled);
+
+	bool getMiniHist() const;
+	void setMiniHist(const bool& enabled);
 
 private:
 	Preferences *preferencePanel;
