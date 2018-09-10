@@ -124,7 +124,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	vCursorsEnabled(true),
 	horiz_offset(0),
 	reset_horiz_offset(true),
-	wheelEventGuard(nullptr)
+	wheelEventGuard(nullptr),
+	miniHistogram(true)
 {
 	ui->setupUi(this);
 	int triggers_panel = ui->stackedWidget->insertWidget(-1, &trigger_settings);
@@ -156,7 +157,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	this->qt_fft_block = adiscope::scope_sink_f::make(fft_plot_size, adc->sampleRate(),
 			"Osc Frequency", nb_channels, (QObject *)&fft_plot);
 
-	this->qt_hist_block = adiscope::histogram_sink_f::make(1024, 100, 0, 20,
+	this->qt_hist_block = adiscope::histogram_sink_f::make(1024, 250, 0, 20,
 			"Osc Histogram", nb_channels, (QObject *)&hist_plot);
 
 	this->qt_xy_block = adiscope::xy_sink_c::make(
@@ -268,6 +269,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		ids[i] = iio->connect(adc_samp_conv, i, i,
 				true, qt_time_block->nsamps());
 		iio->connect(adc_samp_conv, i, qt_time_block, i);
+
+		iio->connect(adc_samp_conv, i, qt_hist_block, i);
 	}
 
 	adc_samp_conv_block = adc_samp_conv;
@@ -302,8 +305,9 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	ui->gridLayoutPlot->addWidget(plot.topArea(), 1, 0, 1, 3);
 	ui->gridLayoutPlot->addWidget(plot.leftHandlesArea(), 1, 0, 3, 1);
 	ui->gridLayoutPlot->addWidget(&plot, 2, 1, 1, 1);
-	ui->gridLayoutPlot->addWidget(plot.rightHandlesArea(), 1, 2, 3, 1);
-	ui->gridLayoutPlot->addWidget(plot.bottomHandlesArea(), 3, 0, 1, 3);
+	ui->gridLayoutPlot->addWidget(&hist_plot, 2, 2, 1, 1);
+	ui->gridLayoutPlot->addWidget(plot.rightHandlesArea(), 1, 3, 3, 1);
+	ui->gridLayoutPlot->addWidget(plot.bottomHandlesArea(), 3, 0, 1, 4);
 	ui->gridLayoutPlot->addItem(plotSpacer, 4, 0, 1, 3);
 	ui->gridLayoutPlot->addWidget(statisticsPanel, 5, 1, 1, 1);
 
@@ -333,8 +337,9 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	fft_plot.setMinimumHeight(250);
 	fft_plot.setMinimumWidth(500);
 
-	hist_plot.setMinimumHeight(200);
-	hist_plot.setMinimumWidth(300);
+	hist_plot.setMinimumHeight(60);
+	hist_plot.setMinimumWidth(25);
+	hist_plot.setMaximumWidth(25);
 
 	xy_plot.setMinimumHeight(50);
 	xy_plot.setMinimumWidth(50);
@@ -356,9 +361,6 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 
 	ui->hlayout_fft->addWidget(&fft_plot);
 	ui->container_fft_plot->hide();
-
-	ui->gridLayoutHist->addWidget(&hist_plot, 0, 0);
-	hist_plot.hide();
 
 	QGridLayout *gridL = static_cast<QGridLayout *>(
 		ui->xy_plot_container->layout());
@@ -447,8 +449,6 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	int gsettings_panel = ui->stackedWidget->indexOf(ui->generalSettings);
 	ui->btnGeneralSettings->setProperty("id", QVariant(-gsettings_panel));
 
-	gsettings_ui->Histogram_view->hide();
-
 	connect(gsettings_ui->FFT_view, SIGNAL(toggled(bool)),
 		SLOT(onFFT_view_toggled(bool)));
 	connect(gsettings_ui->XY_view, SIGNAL(toggled(bool)),
@@ -506,6 +506,9 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 
 	connect(this, SIGNAL(selectedChannelChanged(int)),
 		&plot, SLOT(setSelectedChannel(int)));
+	connect(this, &Oscilloscope::selectedChannelChanged,
+		&hist_plot, &HistogramDisplayPlot::setSelectedChannel);
+
 	connect(this, SIGNAL(selectedChannelChanged(int)),
 		&plot, SLOT(setZoomerVertAxis(int)));
 
@@ -615,6 +618,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		horiz_offset = plot.HorizOffset();
 		time_trigger_offset = horiz_offset;
 
+		scaleHistogramPlot();
+		resetHistogramDataPoints();
 	});
 
 	connect(ch_ui->probe_attenuation, QOverload<int>::of(&QComboBox::currentIndexChanged),
@@ -713,6 +718,44 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	toolDetached(false);
 }
 
+int Oscilloscope::binSearchPointOnXaxis(double time)
+{
+	int n = plot.Curve(0)->data()->size();
+	if (time <= plot.Curve(0)->data()->sample(0).x()) {
+		return 0;
+	}
+	if (time >= plot.Curve(0)->data()->sample(n - 1).x()) {
+		return n - 1;
+	}
+
+	int left = 0;
+	int right = n - 1;
+	while (left <= right) {
+		int mid = (left + right) / 2;
+		double xData = plot.Curve(0)->data()->sample(mid).x();
+		if (xData == time) {
+			return mid;
+		} else if (xData < time) {
+			left = mid + 1;
+		} else {
+			right = mid - 1;
+		}
+	}
+	return left;
+}
+
+void Oscilloscope::resetHistogramDataPoints()
+{
+	QwtInterval xBot = plot.axisInterval(QwtPlot::xBottom);
+	double zoomMinTime = xBot.minValue();
+	double zoomMaxTime = xBot.maxValue();
+
+	int posMin = binSearchPointOnXaxis(zoomMinTime);
+	int posMax = binSearchPointOnXaxis(zoomMaxTime);
+
+	hist_plot.setDataInterval(posMin, posMax + 1);
+}
+
 void Oscilloscope::init_buffer_scrolling()
 {
 	connect(&plot, &CapturePlot::canvasSizeChanged, [=](){
@@ -724,13 +767,13 @@ void Oscilloscope::init_buffer_scrolling()
 		double min = plot.Curve(0)->sample(0).x();
 		double max = plot.Curve(0)->sample(plot.Curve(0)->data()->size() - 1).x();
 		int width = buffer_previewer->width();
-		QwtInterval xBot = plot.axisInterval(QwtPlot::xBottom);
 		double xAxisWidth = max - min;
 
 		moveTo = value * xAxisWidth / width;
 		plot.setHorizOffset(moveTo + horiz_offset);
 		plot.replot();
 		updateBufferPreviewer();
+		resetHistogramDataPoints();
 	});
 	connect(buffer_previewer, &BufferPreviewer::bufferStopDrag, [=](){
 		horiz_offset = plot.HorizOffset();
@@ -741,6 +784,7 @@ void Oscilloscope::init_buffer_scrolling()
 		plot.replot();
 		updateBufferPreviewer();
 		horiz_offset = time_trigger_offset;
+		resetHistogramDataPoints();
 	});
 }
 
@@ -908,9 +952,6 @@ Oscilloscope::~Oscilloscope()
 	if (fft_is_visible)
 		for (unsigned int i = 0; i < nb_channels; i++)
 			iio->disconnect(fft_ids[i]);
-	if (hist_is_visible)
-		for (unsigned int i = 0; i < nb_channels; i++)
-			iio->disconnect(hist_ids[i]);
 	if (started)
 		iio->unlock();
 
@@ -962,6 +1003,10 @@ void Oscilloscope::settingsLoaded()
 void Oscilloscope::readPreferences()
 {
 	plot.setGraticuleEnabled(prefPanel->getOsc_graticule_enabled());
+
+	// enable/disable mini histogram plot
+	toggleMiniHistogramPlotVisible(prefPanel->getMini_hist_enabled());
+
 	for (unsigned int i = 0; i < nb_channels + nb_math_channels + nb_ref_channels;
 	     i++) {
 		ChannelWidget *cw = static_cast<ChannelWidget *>(
@@ -978,6 +1023,14 @@ void Oscilloscope::readPreferences()
 	/* No channel is enabled, so we disable the labels */
 	enableLabels(false);
 	m2k_adc->setFilteringEnabled(prefPanel->getOsc_filtering_enabled());
+}
+
+void Oscilloscope::toggleMiniHistogramPlotVisible(bool enabled)
+{
+	miniHistogram = enabled;
+	if (hist_plot.getOrientation() == Qt::Horizontal) {
+		hist_plot.setVisible(enabled);
+	}
 }
 
 void Oscilloscope::init_channel_settings()
@@ -1960,13 +2013,11 @@ void Oscilloscope::toggle_blockchain_flow(bool en)
 		for (unsigned int i = 0; i < nb_channels; i++)
 			iio->start(ids[i]);
 
-		if (hist_is_visible)
-			for (unsigned int i = 0; i < nb_channels; i++)
-				iio->start(hist_ids[i]);
-
 		if(active_sample_count >= fft_size && fft_is_visible)
 			for (unsigned int i = 0; i < nb_channels; i++)
 				iio->start(fft_ids[i]);
+
+		scaleHistogramPlot();
 
 	} else {
 		if(active_sample_count > fft_size && fft_is_visible)
@@ -1978,10 +2029,6 @@ void Oscilloscope::toggle_blockchain_flow(bool en)
 		if (autosetRequested) {
 			iio->stop(autoset_id[0]);			
 		}
-
-		if (hist_is_visible)
-			for (unsigned int i = 0; i < nb_channels; i++)
-				iio->stop(hist_ids[i]);
 
 		if(active_sample_count <= fft_size && fft_is_visible)
 			for (unsigned int i = 0; i < nb_channels; i++)
@@ -2027,6 +2074,8 @@ void Oscilloscope::runStopToggled(bool checked)
 		toggle_blockchain_flow(true);
 		resetStreamingFlag(symmBufferMode->isEnhancedMemDepth()
 				   || plot_samples_sequentially);
+
+		scaleHistogramPlot();
 	} else {
 		toggle_blockchain_flow(false);
 		resetStreamingFlag(symmBufferMode->isEnhancedMemDepth()
@@ -2140,31 +2189,31 @@ void Oscilloscope::onFFT_view_toggled(bool visible)
 
 void Oscilloscope::onHistogram_view_toggled(bool visible)
 {
-	/* Lock the flowgraph if we are already started */
-	bool started = iio->started();
-	if (started)
-		iio->lock();
+	cancelZoom();
 
-	if (visible) {
-		for (unsigned int i = 0; i < nb_channels; i++) {
-			hist_ids[i] = iio->connect(qt_hist_block, i, i, true);
+	if(!visible){
+		hist_plot.setOrientation(Qt::Horizontal);
+		hist_plot.setMinimumWidth(25);
+		hist_plot.setMaximumWidth(25);
+		hist_plot.setMaximumHeight(1000);
+		ui->hist_layout->removeWidget(&hist_plot);
+		ui->gridLayoutPlot->addWidget(&hist_plot, 2, 2, 1, 1);
+		ui->gridLayoutPlot->addWidget(plot.rightHandlesArea(), 1, 3, 3, 1);
+		scaleHistogramPlot();
+		toggleMiniHistogramPlotVisible(miniHistogram);
 
-			if (ui->runSingleWidget->runButtonChecked())
-				iio->start(hist_ids[i]);
-		}
-
-		hist_plot.show();
 	} else {
-		hist_plot.hide();
-
-		for (unsigned int i = 0; i < nb_channels; i++)
-			iio->disconnect(hist_ids[i]);
+		hist_plot.setOrientation(Qt::Vertical);
+		hist_plot.setMinimumWidth(plot.width());
+		hist_plot.setMaximumHeight(300);
+		hist_plot.setMaximumWidth(2000);
+		ui->gridLayoutPlot->removeWidget(&hist_plot);
+		ui->gridLayoutPlot->addWidget(plot.rightHandlesArea(), 1, 2, 3, 1);
+		ui->hist_layout->addWidget(&hist_plot);
+		scaleHistogramPlot();
+		hist_plot.setVisible(true);
 	}
-
 	hist_is_visible = visible;
-
-	if (started)
-		iio->unlock();
 }
 
 void Oscilloscope::onXY_view_toggled(bool visible)
@@ -2356,6 +2405,9 @@ void adiscope::Oscilloscope::onChannelWidgetEnabled(bool en)
 	ChannelWidget *w = static_cast<ChannelWidget *>(QObject::sender());
 	int id = w->id();
 
+	hist_plot.enableChannel(id, en);
+
+
 	if (en) {
 		plot.AttachCurve(id);
 		fft_plot.AttachCurve(id);
@@ -2501,6 +2553,8 @@ void adiscope::Oscilloscope::onVertScaleValueChanged(double value)
 		plot.zoomBaseUpdate();
 	}
 	voltsPosition->setStep(value / 10);
+
+	scaleHistogramPlot();
 
 	// TO DO: refactor this once the source of the X and Y axes can be configured
 	if (current_ch_widget == index_x) {
@@ -2665,6 +2719,9 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 	plot.zoomBaseUpdate();
 	plot.setXAxisNumPoints(0);
 
+	hist_plot.zoomBaseUpdate();
+	hist_plot.replot();
+
 	ch_ui->cmbMemoryDepth->setCurrentIndex(0);
 	if (timeBase->value() >= TIMEBASE_THRESHOLD) {
 		plot_samples_sequentially = true;
@@ -2763,6 +2820,7 @@ bool adiscope::Oscilloscope::gainUpdateNeeded()
 	return false;
 
 }
+
 void adiscope::Oscilloscope::onVertOffsetValueChanged(double value)
 {
 	cancelZoom();
@@ -2774,6 +2832,8 @@ void adiscope::Oscilloscope::onVertOffsetValueChanged(double value)
 	if (zoom_level == 0) {
 		plot.zoomBaseUpdate();
 	}
+
+	scaleHistogramPlot();
 
 	// Switch between high and low gain modes only for the M2K channels
 	if (m2k_adc && current_ch_widget < nb_channels) {
@@ -2986,6 +3046,8 @@ void Oscilloscope::settings_panel_size_adjust()
 void Oscilloscope::onChannelOffsetChanged(double value)
 {
 	voltsPosition->setValue(-plot.VertOffset(current_ch_widget));
+
+	scaleHistogramPlot();
 }
 
 ChannelWidget *Oscilloscope::channelWidgetAtId(int id)
@@ -3871,6 +3933,17 @@ void Oscilloscope::singleCaptureDone()
 	}
 }
 
+void Oscilloscope::scaleHistogramPlot()
+{
+	for (int i = 0; i < nb_channels; i++) {
+		double min = plot.axisInterval(QwtAxisId(QwtPlot::yLeft, i)).minValue();
+		double max = plot.axisInterval(QwtAxisId(QwtPlot::yLeft, i)).maxValue();
+
+		hist_plot.setYaxisSpan(i, min, max);
+	}
+	hist_plot.setAutoScaleX();
+}
+
 void Oscilloscope::onFilledScreen(bool full, unsigned int nb_samples)
 {
 	if (nb_samples == active_plot_sample_count) {
@@ -4109,6 +4182,7 @@ void Oscilloscope::setAllSinksSampleCount(unsigned long sample_count)
 {
 	this->qt_time_block->set_nsamps(sample_count);
 	this->qt_xy_block->set_nsamps(sample_count);
+	this->qt_hist_block->set_nsamps(sample_count);
 
 	auto it = math_sinks.constBegin();
 	while (it != math_sinks.constEnd()) {

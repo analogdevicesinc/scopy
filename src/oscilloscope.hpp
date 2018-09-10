@@ -240,6 +240,7 @@ namespace adiscope {
 		bool reset_horiz_offset;
 		double time_trigger_offset;
 		int min_detached_width;
+		bool miniHistogram;
 
 		int autosetMaxIndexAmpl;
 		int autosetFFTIndex;
@@ -427,6 +428,10 @@ namespace adiscope {
 		void init_selected_measurements(int, std::vector<int>);
 		void init_buffer_scrolling();
 		bool gainUpdateNeeded();
+		int binSearchPointOnXaxis(double time);
+		void scaleHistogramPlot();
+		void toggleMiniHistogramPlotVisible(bool enabled);
+		void resetHistogramDataPoints();
 	};
 }
 #endif /* M2K_OSCILLOSCOPE_H */
