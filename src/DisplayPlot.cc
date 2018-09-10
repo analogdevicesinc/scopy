@@ -93,6 +93,11 @@ void OscScaleDraw::setDisplayScale(double value)
 	m_displayScale = value;
 }
 
+void OscScaleDraw::setFormatter(PrefixFormatter *formatter)
+{
+	m_formatter = formatter;
+}
+
 void OscScaleDraw::draw(QPainter *painter, const QPalette &) const
 {
 	QList<double> ticks = scaleDiv().ticks(QwtScaleDiv::MajorTick);
