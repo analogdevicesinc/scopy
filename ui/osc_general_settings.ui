@@ -227,14 +227,24 @@
          </property>
         </widget>
        </item>
+       <item row="3" column="1">
+        <widget class="adiscope::CustomSwitch" name="Histogram_view">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_8">
+         <property name="styleSheet">
+          <string notr="true">font-size: 13px;</string>
+         </property>
+         <property name="text">
+          <string>Histogram</string>
+         </property>
+        </widget>
+       </item>
       </layout>
-     </item>
-     <item>
-      <widget class="adiscope::CustomSwitch" name="Histogram_view">
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
      </item>
      <item>
       <layout class="QVBoxLayout" name="export_2">
