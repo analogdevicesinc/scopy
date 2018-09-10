@@ -90,7 +90,7 @@ QPolygon ExtendingPlotZoomer::adjustedPoints(const QPolygon &points) const
 
 	if (extendWidth && !extendHeight) {
 		QPoint topLeft(0, points[0].y());
-		QPoint bottomRight(canvas()->width() - 2, points[1].y());
+		QPoint bottomRight(canvas()->width() - 1, points[1].y());
 		adjusted += topLeft;
 		adjusted += bottomRight;
 
@@ -134,7 +134,7 @@ QPolygon ExtendingPlotZoomer::adjustedPoints(const QPolygon &points) const
 
 	if (extendHeight && !extendWidth) {
 		QPoint topLeft(points[0].x(), 0);
-		QPoint bottomRight(points[1].x(), canvas()->height() - 2);
+		QPoint bottomRight(points[1].x(), canvas()->height() - 1);
 		adjusted += topLeft;
 		adjusted += bottomRight;
 
