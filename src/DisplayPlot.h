@@ -584,6 +584,7 @@ public:
 	void setColor(QColor color);
 
 	void setDisplayScale(double value);
+	void setFormatter(PrefixFormatter *formatter);
 
 protected:
 	virtual void draw(QPainter *, const QPalette &) const;
