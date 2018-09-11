@@ -429,7 +429,7 @@ namespace adiscope {
 		void init_buffer_scrolling();
 		bool gainUpdateNeeded();
 		int binSearchPointOnXaxis(double time);
-		void scaleHistogramPlot();
+		void scaleHistogramPlot(bool newData = false);
 		void toggleMiniHistogramPlotVisible(bool enabled);
 		void resetHistogramDataPoints();
 	};

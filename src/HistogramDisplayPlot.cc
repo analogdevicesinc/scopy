@@ -66,17 +66,32 @@ protected:
 };
 
 
-class HistogramDisplayZoomer: public QwtPlotZoomer, public TimePrecisionClass
+class HistogramDisplayZoomer: public LimitedPlotZoomer, public TimePrecisionClass
 {
 public:
 #if QWT_VERSION < 0x060100
   HistogramDisplayZoomer(QwtPlotCanvas* canvas, const unsigned int timeprecision)
 #else /* QWT_VERSION < 0x060100 */
-  HistogramDisplayZoomer(QWidget* canvas, const unsigned int timeprecision)
+  HistogramDisplayZoomer(QWidget* canvas, const unsigned int timeprecision,
+			QColor c)
 #endif /* QWT_VERSION < 0x060100 */
-    : QwtPlotZoomer(canvas),TimePrecisionClass(timeprecision)
+    : LimitedPlotZoomer(canvas),TimePrecisionClass(timeprecision)
   {
-    setTrackerMode(QwtPicker::AlwaysOn);
+    setTrackerMode(QwtPicker::AlwaysOff);
+#if QWT_VERSION < 0x060000
+    setSelectionFlags(QwtPicker::RectSelection | QwtPicker::DragSelection);
+#endif
+
+    setMousePattern(QwtEventPattern::MouseSelect2,
+			    Qt::RightButton, Qt::ControlModifier);
+    setMousePattern(QwtEventPattern::MouseSelect3,
+			    Qt::RightButton);
+
+    setRubberBandPen(QColor("#999999"));
+    setTrackerPen(c);
+
+    setEnabled(false);
+
   }
 
   virtual ~HistogramDisplayZoomer()
@@ -100,16 +115,17 @@ protected:
     QwtText t;
     QwtDoublePoint dp = QwtPlotZoomer::invTransform(p);
     if((dp.y() > 0.0001) && (dp.y() < 10000)) {
-      t.setText(QString("%1, %2").
-		arg(dp.x(), 0, 'f', 4).
+      t.setText(QString("%1 V, %2 pts").
+		arg(dp.x(), 0, 'f', 2).
 		arg(dp.y(), 0, 'f', 0));
     }
     else {
-      t.setText(QString("%1, %2").
+      t.setText(QString("%1 V, %2 pts").
 		arg(dp.x(), 0, 'f', 4).
-		arg(dp.y(), 0, 'e', 0));
+		arg(0));
     }
 
+    t.setBackgroundBrush(QBrush(QColor(0, 0, 0 ,155)));
     return t;
   }
 
@@ -191,29 +207,13 @@ HistogramDisplayPlot::HistogramDisplayPlot(int nplots, QWidget* parent)
   d_orientation = Qt::Horizontal;
   d_minPos = 0;
   d_maxPos = 0;
+  d_zoomed = false;
 
   setLeftVertAxesCount(2);
 
   // Initialize x-axis data array
   d_xdata = new double[d_bins];
   memset(d_xdata, 0x0, d_bins*sizeof(double));
-
-  d_zoomer.push_back(new HistogramDisplayZoomer(canvas(), 0));
-
-#if QWT_VERSION < 0x060000
-  d_zoomer[0]->setSelectionFlags(QwtPicker::RectSelection | QwtPicker::DragSelection);
-#endif
-
-  d_zoomer[0]->setMousePattern(QwtEventPattern::MouseSelect2,
-                            Qt::RightButton, Qt::ControlModifier);
-  d_zoomer[0]->setMousePattern(QwtEventPattern::MouseSelect3,
-			    Qt::RightButton);
-
-  const QColor c(Qt::darkRed);
-  d_zoomer[0]->setRubberBandPen(c);
-  d_zoomer[0]->setTrackerPen(c);
-
-  d_zoomer[0]->setEnabled(false);
 
   d_semilogx = false;
   d_semilogy = false;
@@ -283,6 +283,17 @@ HistogramDisplayPlot::HistogramDisplayPlot(int nplots, QWidget* parent)
 #endif
   }
 
+  for (unsigned int i = 0; i < d_histograms.size(); ++i) {
+	  d_zoomer.push_back(new HistogramDisplayZoomer(canvas(), 0,
+							getLineColor(i)));
+	  d_zoomer[i]->setAxes(QwtAxisId(QwtPlot::xBottom, i),
+			       QwtAxisId(QwtPlot::yLeft, i));
+
+	  connect(d_zoomer[i], SIGNAL(zoomed(QRectF)),
+		  this, SLOT(_onZoom(QRectF)));
+  }
+
+
   _resetXAxisPoints(-1, 1);
   setAxisScale(QwtPlot::yLeft, -10, 10);
 
@@ -297,6 +308,12 @@ HistogramDisplayPlot::HistogramDisplayPlot(int nplots, QWidget* parent)
   for(QwtPlotScaleItem* scale : scaleItems){
 	  scale->detach();
   }
+}
+
+void HistogramDisplayPlot::_onZoom(const QRectF &rect)
+{
+	QwtPlotZoomer *zoomer = static_cast<QwtPlotZoomer*>(sender());
+	d_zoomed = (rect != zoomer->zoomBase());
 }
 
 void HistogramDisplayPlot::setOrientation(Qt::Orientation orientation)
@@ -353,6 +370,11 @@ Qt::Orientation HistogramDisplayPlot::getOrientation()
 	return d_orientation;
 }
 
+bool HistogramDisplayPlot::isZoomed()
+{
+	return d_zoomed;
+}
+
 HistogramDisplayPlot::~HistogramDisplayPlot()
 {
   for(int i = 0; i < d_nplots; i++)
@@ -383,14 +405,18 @@ void HistogramDisplayPlot::setYaxisSpan(unsigned int chIdx, double bot, double t
 		return;
 	}
 
+	_resetZoom();
 	if (d_orientation == Qt::Vertical) {
 		setAxisScale(QwtAxisId(QwtPlot::xBottom, chIdx), bot, top);
 		replot();
+		zoomBaseUpdate();
 		return;
 	}
 
 	setAxisScale(QwtAxisId(QwtPlot::yLeft, chIdx), bot, top);
+
 	replot();
+	zoomBaseUpdate();
 }
 
 void HistogramDisplayPlot::setXaxisSpan(double start, double stop)
@@ -617,7 +643,6 @@ void HistogramDisplayPlot::_orientationChanged()
 			setAxisScale(QwtAxisId(QwtPlot::xBottom, i), -min_h, 0);
 		}
 
-
 	} else {
 		//big histogram
 		for (int i = 0; i < d_histograms.size(); ++i) {
@@ -626,12 +651,30 @@ void HistogramDisplayPlot::_orientationChanged()
 			setAxisScale(QwtAxisId(QwtPlot::yLeft, i), 0, h);
 		}
 	}
+
+	zoomBaseUpdate();
+	for (int i = 0; i < d_zoomer.size(); ++i) {
+		d_zoomer[i]->setEnabled(d_orientation == Qt::Horizontal
+					? false : true);
+	}
+}
+
+void HistogramDisplayPlot::_resetZoom()
+{
+	for (int i = 0; i < d_zoomer.size(); ++i) {
+		static_cast<LimitedPlotZoomer*>(d_zoomer[i])->resetZoom();
+	}
 }
 
 void HistogramDisplayPlot::setSelectedChannel(unsigned int value)
 {
 	if (value >= d_histograms.size()) {
+		return;
+	}
 
+	for (int i = 0; i < d_zoomer.size(); ++i) {
+		d_zoomer[i]->setTrackerMode(
+				(i == value) ? QwtPicker::AlwaysOn : QwtPicker::AlwaysOff);
 	}
 
 	d_selected_channel = value;
