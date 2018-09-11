@@ -82,6 +82,7 @@ public:
   void setDataInterval(int min, int max);
   void setOrientation(Qt::Orientation orientation);
   Qt::Orientation getOrientation();
+  bool isZoomed();
 
 public Q_SLOTS:
   void setAutoScale(bool state);
@@ -106,11 +107,13 @@ public Q_SLOTS:
 private Q_SLOTS:
   void newData(const QEvent*);
 
+  void _onZoom(const QRectF &rect);
 private:
   void _resetXAxisPoints(double left, double right);
   void _autoScaleY(double bottom, double top);
   void _updateXScales(unsigned int totalSamples);
   void _orientationChanged();
+  void _resetZoom();
 
   std::vector<Histogram *> d_histograms;
   std::vector<PlotAxisConfiguration *> rightVertAxes;
@@ -129,6 +132,7 @@ private:
   bool d_semilogy;
   bool d_autoscalex_state;
   bool stop;
+  bool d_zoomed;
 
   Qt::Orientation d_orientation;
   std::vector<PlotAxisConfiguration *> horizAxes;
