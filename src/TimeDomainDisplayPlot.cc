@@ -572,7 +572,7 @@ TimeDomainDisplayPlot::addZoomer(unsigned int zoomerIdx)
 	d_zoomer[zoomerIdx]->setTrackerMode(QwtPicker::AlwaysOff);
 	const QColor c("#999999");
 	d_zoomer[zoomerIdx]->setRubberBandPen(c);
-	d_zoomer[zoomerIdx]->setTrackerPen(c);
+	d_zoomer[zoomerIdx]->setTrackerPen(getLineColor(zoomerIdx));
 
 	d_zoomer[zoomerIdx]->setEnabled(true);
 	d_zoomer[zoomerIdx]->setAxes(QwtAxisId(QwtPlot::xBottom, 0), QwtAxisId(QwtPlot::yLeft, zoomerIdx));
@@ -599,8 +599,10 @@ TimeDomainDisplayPlot::removeZoomer(unsigned int zoomerIdx)
 	}
 
 	for (int i = 0; i < d_zoomer.size(); ++i) {
-		if (d_zoomer[i]->isEnabled())
+		if (d_zoomer[i]->isEnabled()) {
 			d_zoomer[i]->setAxes(QwtAxisId(QwtPlot::xBottom, 0), QwtAxisId(QwtPlot::yLeft, i));
+			d_zoomer[i]->setTrackerPen(getLineColor(i));
+		}
 	}
 }
 
