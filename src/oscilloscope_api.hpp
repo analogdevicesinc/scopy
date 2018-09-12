@@ -83,6 +83,7 @@ class Oscilloscope_API : public ApiObject
 
 	Q_PROPERTY(bool fft_en READ getFftEn WRITE setFftEn)
 	Q_PROPERTY(bool xy_en READ getXyEn WRITE setXyEn)
+	Q_PROPERTY(bool hist_en READ getHistEn WRITE setHistEn)
 	Q_PROPERTY(bool export_all READ getExportAll
 		   WRITE setExportAll)
 	Q_PROPERTY(bool autoset_en READ autosetEnabled WRITE enableAutoset)
@@ -188,6 +189,9 @@ public:
 
 	bool getXyEn() const;
 	void setXyEn(bool en);
+
+	bool getHistEn() const;
+	void setHistEn(bool en);
 
 	bool getExportAll() const;
 	void setExportAll(bool en);
