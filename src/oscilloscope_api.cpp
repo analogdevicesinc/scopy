@@ -460,6 +460,16 @@ void Oscilloscope_API::setXyEn(bool en)
 	osc->gsettings_ui->XY_view->setChecked(en);
 }
 
+bool Oscilloscope_API::getHistEn() const
+{
+	return osc->hist_is_visible;
+}
+
+void Oscilloscope_API::setHistEn(bool en)
+{
+	osc->gsettings_ui->Histogram_view->setChecked(en);
+}
+
 bool Oscilloscope_API::getExportAll() const
 {
 	return osc->exportSettings->getExportAllButton()->isChecked();
