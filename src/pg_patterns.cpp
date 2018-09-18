@@ -108,7 +108,7 @@ short *Pattern::get_buffer()
 void Pattern::delete_buffer()
 {
 	if (buffer) {
-		delete buffer;
+		delete[] buffer;
 	}
 
 	buffer=nullptr;
