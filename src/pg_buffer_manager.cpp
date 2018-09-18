@@ -17,7 +17,7 @@ PatternGeneratorBufferManager::PatternGeneratorBufferManager(
 
 PatternGeneratorBufferManager::~PatternGeneratorBufferManager()
 {
-	delete buffer;
+	delete[] buffer;
 }
 
 void PatternGeneratorBufferManager::update(PatternGeneratorChannelGroup *chg)
@@ -50,7 +50,7 @@ void PatternGeneratorBufferManager::update(PatternGeneratorChannelGroup *chg)
 
 	if (bufferSizeChanged) {
 		// recreate local buffer
-		delete buffer;
+		delete[] buffer;
 		buffer = new short[bufferSize];
 	}
 
