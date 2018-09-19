@@ -168,6 +168,10 @@ bool ToolLauncher_API::connect(const QString& uri)
 		done = true;
 	});
 
+	if (!dev) {
+		return false;
+	}
+
 	tl->ui->btnConnect->click();
 	dev->click();
 	dev->connectButton()->click();
