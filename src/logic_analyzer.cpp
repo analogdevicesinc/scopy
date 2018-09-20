@@ -1462,7 +1462,7 @@ void LogicAnalyzer::setHWTrigger(int chid, std::string trigger_val)
 std::string LogicAnalyzer::get_trigger_from_device(int chid)
 {
 	if(!dev)
-		"none";
+		return "none";
 	std::string name = "voltage" + to_string(chid);
 	struct iio_channel *triggerch = iio_device_find_channel(dev, name.c_str(), false);
 	if( !triggerch )
