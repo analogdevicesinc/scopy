@@ -441,7 +441,8 @@ DisplayPlot::DisplayPlot(int nplots, QWidget* parent,
 			 unsigned int xNumDivs, unsigned int yNumDivs)
   : PrintablePlot(parent), d_nplots(nplots), d_stop(false),
     d_coloredLabels(false), d_mouseGesturesEnabled(false),
-    d_displayScale(1)
+    d_displayScale(1), d_xAxisNumDiv(1),
+    d_yAxisNumDiv(1)
 {
   d_CurveColors << QColor("#ff7200") << QColor("#9013fe") << QColor(Qt::green)
        << QColor(Qt::cyan) << QColor(Qt::magenta)
@@ -569,6 +570,14 @@ DisplayPlot::~DisplayPlot()
 		qpc->detach();
 		delete qpc;
 	}
+
+	// delete vertAxes
+	for (auto it = vertAxes.begin(); it != vertAxes.end(); ++it) {
+		delete *it;
+	}
+
+	//delete horizAxis
+	delete horizAxis;
 }
 
 void
