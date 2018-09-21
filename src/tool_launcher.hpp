@@ -184,6 +184,7 @@ private:
 
 	QMap<QString, MenuOption*> toolMenu;
 	QList<DetachedWindow *> detachedWindows;
+	QList<DetachedWindow *> oldDetachedWindows;
 	QList<DetachedWindowState *> detachedWindowsStates;
 	bool closeEventTriggered;
 	QVector<int> position;

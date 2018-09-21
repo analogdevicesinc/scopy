@@ -70,6 +70,7 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	logic_analyzer(nullptr), pattern_generator(nullptr), dio(nullptr),
 	network_analyzer(nullptr), spectrum_analyzer(nullptr), debugger(nullptr),
 	manual_calibration(nullptr), tl_api(new ToolLauncher_API(this)),
+	dioManager(nullptr),
 	notifier(STDIN_FILENO, QSocketNotifier::Read),
 	infoWidget(nullptr),
 	calib(nullptr),
@@ -728,6 +729,14 @@ ToolLauncher::~ToolLauncher()
 
 	tl_api->ApiObject::save(*settings);
 
+	for (auto it = oldDetachedWindows.begin(); it != oldDetachedWindows.end(); ++it) {
+		delete *it;
+	}
+
+	for (auto it = detachedWindows.begin(); it != detachedWindows.end(); ++it) {
+		delete *it;
+	}
+
 	for (auto it = detachedWindowsStates.begin(); it != detachedWindowsStates.end(); ++it) {
 		delete *it;
 	}
@@ -1108,6 +1117,9 @@ void adiscope::ToolLauncher::disconnect()
 
 		//??TODO
 		if (!closeEventTriggered) {
+			for (auto it = detachedWindowsStates.begin(); it != detachedWindowsStates.end(); ++it) {
+				delete *it;
+			}
 			detachedWindowsStates.clear();
 		}
 
@@ -1269,6 +1281,11 @@ void adiscope::ToolLauncher::destroyContext()
 			dev->setConnected(false, false);
 		iio_context_destroy(ctx);
 		ctx = nullptr;
+	}
+
+	if (dioManager) {
+		delete dioManager;
+		dioManager = nullptr;
 	}
 
 	toolList.clear();
@@ -1690,6 +1707,7 @@ void ToolLauncher::toolDetached(bool detached)
 		connect(window, &DetachedWindow::closed, [=](){
 			tool->attached();
 			detachedWindows.removeOne(window);
+			oldDetachedWindows.push_back(window);
 		});
 		connect(mo->getToolBtn(), &QPushButton::clicked,
 			[=](){
@@ -1705,6 +1723,9 @@ void ToolLauncher::toolDetached(bool detached)
 void ToolLauncher::closeEvent(QCloseEvent *event)
 {
 	closeEventTriggered = true;
+	for (auto it = detachedWindowsStates.begin(); it != detachedWindowsStates.end(); ++it) {
+		delete *it;
+	}
 	detachedWindowsStates.clear();
 
 	for (auto x : detachedWindows){
