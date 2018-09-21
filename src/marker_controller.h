@@ -36,9 +36,9 @@ public:
 	QwtPlot *plot();
 
 Q_SIGNALS:
-	void markerSelected(std::shared_ptr<SpectrumMarker>);
-	void markerPositionChanged(std::shared_ptr<SpectrumMarker>);
-	void markerReleased(std::shared_ptr<SpectrumMarker>);
+	void markerSelected(std::shared_ptr<SpectrumMarker>&);
+	void markerPositionChanged(std::shared_ptr<SpectrumMarker>&);
+	void markerReleased(std::shared_ptr<SpectrumMarker>&);
 
 private Q_SLOTS:
 	void onPickerSelected(QPointF);

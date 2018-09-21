@@ -64,7 +64,7 @@ using namespace adiscope;
 using namespace gr;
 
 NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
-		std::shared_ptr<GenericAdc> adc_dev,
+		std::shared_ptr<GenericAdc> &adc_dev,
 		QPushButton *runButton, QJSEngine *engine,
 		ToolLauncher *parent) :
 	Tool(ctx, runButton, new NetworkAnalyzer_API(this), "Network Analyzer", parent),

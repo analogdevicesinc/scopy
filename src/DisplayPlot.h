@@ -83,7 +83,7 @@ public:
 		updateDivision();
 	}
 
-	ScaleDivisions(std::vector<double> steps):
+	ScaleDivisions(const std::vector<double> &steps):
 		m_divLowerLimit(1E-9),
 		m_divUpperLimit(1E9),
 		m_power(0.0),
@@ -99,7 +99,7 @@ public:
 
 	}
 
-	void setDivisioList(std::vector<double> newSteps)
+	void setDivisioList(const std::vector<double> &newSteps)
 	{
 		m_templateSteps = newSteps;
 		m_currentStep = m_templateSteps.begin();

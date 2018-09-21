@@ -35,7 +35,7 @@ namespace adiscope {
 
 class Sink{
 public:
-	Sink(std::string name, unsigned int numChannels, unsigned long long channelsDataLength):
+	Sink(const std::string &name, unsigned int numChannels, unsigned long long channelsDataLength):
 		d_name(name), d_numChannels(numChannels), d_channelsDataLength(channelsDataLength) { }
 
 	std::string name() { return d_name; }
@@ -84,8 +84,8 @@ public:
   TimeDomainDisplayPlot(QWidget*, unsigned int xNumDivs = 10, unsigned int yNumDivs = 10);
   virtual ~TimeDomainDisplayPlot();
 
-  void plotNewData(const std::string sender,
-		   const std::vector<double*> dataPoints,
+  void plotNewData(const std::string &sender,
+		   const std::vector<double*> &dataPoints,
 		   const int64_t numDataPoints, const double timeInterval,
                    const std::vector< std::vector<gr::tag_t> > &tags \
 		   = std::vector< std::vector<gr::tag_t> >());

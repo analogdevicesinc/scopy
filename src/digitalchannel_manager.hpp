@@ -64,13 +64,13 @@ private:
 	QColor lowcolor;
 	QColor bgcolor;
 public:
-	Channel(uint16_t id_, std::string label_);
+	Channel(uint16_t id_,const std::string &label_);
 	virtual ~Channel();
 	uint16_t get_mask();
 	virtual uint16_t get_id();
 	virtual void set_id(int val);
 	std::string get_label();
-	void set_label(std::string);
+	void set_label(const std::string&);
 	QColor getBgcolor() const;
 	void setBgcolor(const QColor& value);
 	QColor getEdgecolor() const;
@@ -112,7 +112,7 @@ public:
 	ChannelGroup();
 	virtual ~ChannelGroup();
 	std::string label;
-	void set_label(std::string label);
+	void set_label(const std::string &label);
 	std::string get_label();
 
 	void add_channel(Channel *channel);

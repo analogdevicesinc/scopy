@@ -45,7 +45,7 @@ class MouseWheelWidgetGuard;
 class LogicAnalyzerChannel : public Channel
 {
 public:
-	LogicAnalyzerChannel(uint16_t id_, std::string label_);
+	LogicAnalyzerChannel(uint16_t id_, const std::string &label_);
 	const srd_channel *channel_role;
 	std::string trigger;
 
@@ -85,7 +85,7 @@ public:
 	~LogicAnalyzerChannelUI();
 	Ui::LAChannelGroup *ui;
 	LogicAnalyzerChannel *getChannel();
-	void setTrace(std::shared_ptr<pv::view::LogicSignal> item);
+	void setTrace(std::shared_ptr<pv::view::LogicSignal> &item);
 	std::shared_ptr<pv::view::LogicSignal> getTrace();
 
 	void channelRoleChanged(const QString);
@@ -192,10 +192,10 @@ public:
 	bool eventFilter(QObject *watched, QEvent *event);
 
 	std::shared_ptr<pv::binding::Decoder> getBinding();
-	void setBinding(std::shared_ptr<pv::binding::Decoder>);
+	void setBinding(std::shared_ptr<pv::binding::Decoder>&);
 
 private Q_SLOTS:
-	void set_decoder(std::string value);
+	void set_decoder(const std::string &value);
 	void collapse_group();
 	void decoderChanged(const QString);
 	void triggerChanged(int);

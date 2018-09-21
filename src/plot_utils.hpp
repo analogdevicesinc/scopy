@@ -27,7 +27,7 @@ namespace adiscope {
 	class PrefixFormatter
 	{
 	public:
-		PrefixFormatter(std::vector<std::pair<QString, double>>);
+		PrefixFormatter(const std::vector<std::pair<QString, double>>&);
 		void setTwoDecimalMode(bool);
 		bool getTwoDecimalMode();
 		virtual QString format(double value, QString unitType, int precision) const;

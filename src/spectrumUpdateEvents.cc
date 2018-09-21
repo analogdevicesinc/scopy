@@ -203,9 +203,9 @@ SpectrumFrequencyRangeEvent::GetStopFrequency() const
 /***************************************************************************/
 
 
-TimeUpdateEvent::TimeUpdateEvent(const std::vector<double*> timeDomainPoints,
+TimeUpdateEvent::TimeUpdateEvent(const std::vector<double*> &timeDomainPoints,
 				 const uint64_t numTimeDomainDataPoints,
-                                 const std::vector< std::vector<gr::tag_t> > tags)
+				 const std::vector< std::vector<gr::tag_t> > &tags)
   : QEvent(QEvent::Type(SpectrumUpdateEventType))
 {
   if(numTimeDomainDataPoints < 1) {
@@ -255,10 +255,10 @@ TimeUpdateEvent::getTags() const
 /***************************************************************************/
 
 
-IdentifiableTimeUpdateEvent::IdentifiableTimeUpdateEvent(const std::vector<double*> timeDomainPoints,
+IdentifiableTimeUpdateEvent::IdentifiableTimeUpdateEvent(const std::vector<double*> &timeDomainPoints,
 				 const uint64_t numTimeDomainDataPoints,
-				 const std::vector< std::vector<gr::tag_t> > tags,
-				 const std::string senderName)
+				 const std::vector< std::vector<gr::tag_t> > &tags,
+				 const std::string &senderName)
   : TimeUpdateEvent(timeDomainPoints, numTimeDomainDataPoints, tags),
     _senderName(senderName)
 {
@@ -277,7 +277,7 @@ IdentifiableTimeUpdateEvent::IdentifiableTimeUpdateEvent(const std::vector<doubl
 /***************************************************************************/
 
 
-FreqUpdateEvent::FreqUpdateEvent(const std::vector<double*> dataPoints,
+FreqUpdateEvent::FreqUpdateEvent(const std::vector<double*> &dataPoints,
 				 const uint64_t numDataPoints)
   : QEvent(QEvent::Type(SpectrumUpdateEventType))
 {
@@ -347,8 +347,8 @@ SetFreqEvent::getBandwidth() const
 /***************************************************************************/
 
 
-ConstUpdateEvent::ConstUpdateEvent(const std::vector<double*> realDataPoints,
-				   const std::vector<double*> imagDataPoints,
+ConstUpdateEvent::ConstUpdateEvent(const std::vector<double*> &realDataPoints,
+				   const std::vector<double*> &imagDataPoints,
 				   const uint64_t numDataPoints)
   : QEvent(QEvent::Type(SpectrumUpdateEventType))
 {
@@ -402,7 +402,7 @@ ConstUpdateEvent::getNumDataPoints() const
 /***************************************************************************/
 
 
-WaterfallUpdateEvent::WaterfallUpdateEvent(const std::vector<double*> dataPoints,
+WaterfallUpdateEvent::WaterfallUpdateEvent(const std::vector<double*> &dataPoints,
 					   const uint64_t numDataPoints,
 					   const gr::high_res_timer_type dataTimestamp)
   : QEvent(QEvent::Type(SpectrumUpdateEventType))
@@ -455,7 +455,7 @@ WaterfallUpdateEvent::getDataTimestamp() const
 /***************************************************************************/
 
 
-TimeRasterUpdateEvent::TimeRasterUpdateEvent(const std::vector<double*> dataPoints,
+TimeRasterUpdateEvent::TimeRasterUpdateEvent(const std::vector<double*> &dataPoints,
 					     const uint64_t numDataPoints)
   : QEvent(QEvent::Type(SpectrumUpdateEventType))
 {
@@ -498,7 +498,7 @@ TimeRasterUpdateEvent::getNumDataPoints() const
 /***************************************************************************/
 
 
-HistogramUpdateEvent::HistogramUpdateEvent(const std::vector<double*> points,
+HistogramUpdateEvent::HistogramUpdateEvent(const std::vector<double*> &points,
                                            const uint64_t npoints)
   : QEvent(QEvent::Type(SpectrumUpdateEventType))
 {
@@ -542,11 +542,11 @@ HistogramUpdateEvent::getNumDataPoints() const
 /***************************************************************************/
 
 
-NumberUpdateEvent::NumberUpdateEvent(const std::vector<float> samples)
-  : QEvent(QEvent::Type(SpectrumUpdateEventType))
+NumberUpdateEvent::NumberUpdateEvent(const std::vector<float> &samples)
+  : QEvent(QEvent::Type(SpectrumUpdateEventType)),
+    _samples(samples),
+    _nplots(samples.size())
 {
-  _samples = samples;
-  _nplots = samples.size();
 }
 
 NumberUpdateEvent::~NumberUpdateEvent()

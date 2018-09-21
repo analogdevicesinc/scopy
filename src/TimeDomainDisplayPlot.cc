@@ -238,8 +238,8 @@ TimeDomainDisplayPlot::replot()
 }
 
 void
-TimeDomainDisplayPlot::plotNewData(const std::string sender,
-				   const std::vector<double*> dataPoints,
+TimeDomainDisplayPlot::plotNewData(const std::string &sender,
+				   const std::vector<double*> &dataPoints,
 				   const int64_t numDataPoints,
 				   const double timeInterval,
 				   const std::vector< std::vector<gr::tag_t> > &tags)

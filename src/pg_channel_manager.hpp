@@ -44,7 +44,7 @@ class PatternGeneratorChannel : public Channel
 {
 	bool outputMode;
 public:
-	PatternGeneratorChannel(uint16_t id_, std::string label_);
+	PatternGeneratorChannel(uint16_t id_, std::string &label_);
 	qreal getCh_thickness() const;
 	void setCh_thickness(const qreal value);
 	bool getOutputMode() const;
@@ -82,7 +82,7 @@ public:
 	PatternGeneratorChannelGroup *getChannelGroup();
 	void enableControls(bool val);
 
-	void setTrace(std::shared_ptr<pv::view::LogicSignal> item);
+	void setTrace(std::shared_ptr<pv::view::LogicSignal> &item);
 	std::shared_ptr<pv::view::LogicSignal> getTrace();
 	void highlight(bool val);
 

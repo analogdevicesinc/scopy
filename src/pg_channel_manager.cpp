@@ -60,7 +60,7 @@ void PatternGeneratorChannel::setOutputMode(bool value)
 }
 
 PatternGeneratorChannel::PatternGeneratorChannel(uint16_t id_,
-                std::string label_) : Channel(id_,label_),
+		std::string &label_) : Channel(id_,label_),
 
 	ch_thickness(1.0), outputMode(0)
 {}
@@ -91,7 +91,7 @@ PatternGeneratorChannelUI::PatternGeneratorChannelUI(PatternGeneratorChannel
 }
 
 void PatternGeneratorChannelUI::setTrace(
-        std::shared_ptr<pv::view::LogicSignal> item)
+	std::shared_ptr<pv::view::LogicSignal> &item)
 {
 	trace = item;
 }

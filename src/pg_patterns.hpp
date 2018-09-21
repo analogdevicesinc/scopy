@@ -132,9 +132,9 @@ public:
 	Pattern(/*string name_, string description_*/);
 	virtual ~Pattern();
 	std::string get_name();
-	void set_name(std::string name_);
+	void set_name(const std::string &name_);
 	std::string get_description();
-	void set_description(std::string description_);
+	void set_description(const std::string &description_);
 	void set_periodic(bool periodic_);
 	short *get_buffer();
 	void delete_buffer();
@@ -378,7 +378,7 @@ public:
 	unsigned int get_stop_bits();
 	enum sp_parity get_parity();
 
-	void set_string(std::string str_);
+	void set_string(const std::string &str_);
 	std::string get_string();
 	std::string get_params();
 	int set_params(std::string params_);

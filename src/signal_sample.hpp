@@ -42,7 +42,7 @@ namespace adiscope {
 				gr_vector_void_star &output_items);
 
 	Q_SIGNALS:
-		void triggered(const std::vector<float> values);
+		void triggered(const std::vector<float> &values);
 	};
 }
 

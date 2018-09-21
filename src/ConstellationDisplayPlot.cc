@@ -176,8 +176,8 @@ ConstellationDisplayPlot::replot()
 
 
 void
-ConstellationDisplayPlot::plotNewData(const std::vector<double*> realDataPoints,
-				      const std::vector<double*> imagDataPoints,
+ConstellationDisplayPlot::plotNewData(const std::vector<double*> &realDataPoints,
+				      const std::vector<double*> &imagDataPoints,
 				      const int64_t numDataPoints,
 				      const double timeInterval)
 {

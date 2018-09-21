@@ -116,7 +116,7 @@ namespace adiscope {
 
 		QList<QColor> d_markerColors;
 
-		void plotData(const std::vector<double *> pts,
+		void plotData(const std::vector<double *> &pts,
 				uint64_t num_points);
 		void _resetXAxisPoints();
 
@@ -130,17 +130,17 @@ namespace adiscope {
 		void add_marker(int chn);
 		void remove_marker(int chn, int which);
 		void marker_set_pos_source(uint chIdx, uint mkIdx,
-			std::shared_ptr<struct marker_data> source_sptr);
+			std::shared_ptr<struct marker_data> &source_sptr);
 		void findPeaks(int chn);
 		void calculate_fixed_markers(int chn);
 		int getMarkerPos(const QList<marker>& marker_list,
-			 std::shared_ptr<SpectrumMarker> marker) const;
+			 std::shared_ptr<SpectrumMarker> &marker) const;
 		void detectMarkers();
 
 	private Q_SLOTS:
-		void onMrkCtrlMarkerSelected(std::shared_ptr<SpectrumMarker>);
-		void onMrkCtrlMarkerPosChanged(std::shared_ptr<SpectrumMarker>);
-		void onMrkCtrlMarkerReleased(std::shared_ptr<SpectrumMarker>);
+		void onMrkCtrlMarkerSelected(std::shared_ptr<SpectrumMarker> &);
+		void onMrkCtrlMarkerPosChanged(std::shared_ptr<SpectrumMarker> &);
+		void onMrkCtrlMarkerReleased(std::shared_ptr<SpectrumMarker> &);
 
 	public:
 		explicit FftDisplayPlot(int nplots, QWidget *parent = nullptr);

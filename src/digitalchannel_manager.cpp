@@ -197,7 +197,7 @@ void Channel::setLowcolor(const QColor& value)
 	lowcolor = value;
 }
 
-Channel::Channel(uint16_t id_, std::string label_)
+Channel::Channel(uint16_t id_,const std::string &label_)
 {
 	label = label_;
 	id =id_;
@@ -244,7 +244,7 @@ std::string Channel::get_label()
 	return label;
 }
 
-void Channel::set_label(std::string label)
+void Channel::set_label(const std::string &label)
 {
 	this->label = label;
 }
@@ -364,7 +364,7 @@ ChannelGroup::~ChannelGroup()
 	//qDebug()<<"ChannelGroup destroyed";
 }
 
-void ChannelGroup::set_label(std::string label)
+void ChannelGroup::set_label(const std::string &label)
 {
 	this->label = label;
 }

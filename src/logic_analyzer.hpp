@@ -112,7 +112,7 @@ public:
 	std::string get_trigger_from_device(int chid);
 	void startTimeout();
 	void stopTimeout();
-	void setTriggerCache(int chid, std::string trigger_value);
+	void setTriggerCache(int chid, const std::string &trigger_value);
 	void get_channel_groups_api();
 	void installWheelEventGuard();
 	void bufferSentSignal(bool lastBuffer);

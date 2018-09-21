@@ -29,7 +29,7 @@ using namespace std;
  * PrefixFormatter class implementation
  */
 
-PrefixFormatter::PrefixFormatter(vector<pair<QString, double>> prefixes):
+PrefixFormatter::PrefixFormatter(const vector<pair<QString, double>> &prefixes):
 	m_prefixes(prefixes),
 	m_twoDecimalMode(false)
 {

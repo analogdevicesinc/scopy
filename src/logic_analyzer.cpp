@@ -1691,7 +1691,7 @@ void LogicAnalyzer::autoCaptureEnable(bool check)
 	armed = check;
 }
 
-void LogicAnalyzer::setTriggerCache(int chid, std::string trigger_value)
+void LogicAnalyzer::setTriggerCache(int chid, const std::string &trigger_value)
 {
 	trigger_cache[chid] = trigger_value;
 }
