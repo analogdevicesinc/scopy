@@ -228,6 +228,10 @@ TimeDomainDisplayPlot::~TimeDomainDisplayPlot()
 		unregisterSink(sink->name());
 	}
 
+	//TODO: prob remove d_trigger_lines -> not used.
+	delete d_trigger_lines[0];
+	delete d_trigger_lines[1];
+
   // d_zoomer and _panner deleted when parent deleted
 }
 
@@ -938,6 +942,7 @@ void TimeDomainDisplayPlot::unregisterReferenceWaveform(QString name)
 	}
 	cleanUpJustBeforeChannelRemoval(i);
 
+	delete[] d_ref_ydata[pos];
 	d_ref_ydata.erase(d_ref_ydata.begin() + pos);
 	curve->detach();
 	delete curve;
