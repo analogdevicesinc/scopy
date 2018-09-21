@@ -301,6 +301,8 @@ Note::~Note()
 		delete m_page;
 		m_page = nullptr;
 	}
+
+	delete pageUi;
 	delete ui;
 }
 
