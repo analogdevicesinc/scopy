@@ -109,7 +109,10 @@ ManualCalibration::ManualCalibration(struct iio_context *ctx, Filter *filt,
 
 ManualCalibration::~ManualCalibration()
 {
-
+	delete TempWidget;
+	delete TempUi;
+	delete api;
+	delete ui;
 }
 
 void ManualCalibration::startCalibration()
