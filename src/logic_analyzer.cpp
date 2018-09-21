@@ -130,7 +130,9 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	reset_horiz_offset(true),
 	horiz_offset_after_drop(0.0),
 	scrolling_offset(0.0),
-	trigger_offset(0.0)
+	trigger_offset(0.0),
+	wheelEventGuard(nullptr),
+	active_plot_timebase(0.001)
 
 {
 	ui->setupUi(this);
@@ -213,7 +215,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	this->no_channels = get_no_channels(dev);
 
 	/* sigrok and sigrokdecode initialisation */
-	std::string open_file, open_file_format;
+	std::string open_file = "", open_file_format = "";
 	context = sigrok::Context::create();
 
 	device_manager = new pv::DeviceManager(context);
@@ -425,6 +427,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	timeBase->setValue(1e-3);
 	setTimebaseLabel(timeBase->value());
 	onHorizScaleValueChanged(timeBase->value());
+	d_bufferSizeLabelVal = active_sampleCount;
+	d_sampleRateLabelVal = active_sampleRate;
 	setBuffersizeLabelValue(active_sampleCount);
 	setSamplerateLabelValue(active_sampleRate);
 	setSampleRate();
