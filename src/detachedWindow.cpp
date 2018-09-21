@@ -78,6 +78,14 @@ void DetachedWindow::showWindow()
 	activateWindow();
 }
 
+DetachedWindowState::DetachedWindowState():
+	name(""),
+	geometry(QRect()),
+	maximized(false),
+	minimized(true)
+{
+}
+
 DetachedWindowState::DetachedWindowState(DetachedWindow *detachedWindow)
 {
 	name = detachedWindow->getName();

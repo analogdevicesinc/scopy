@@ -54,7 +54,7 @@ private:
 class DetachedWindowState {
 public:
 
-	DetachedWindowState() {}
+	DetachedWindowState();
 	~DetachedWindowState() {}
 
 	DetachedWindowState(DetachedWindow *detachedWindow);
