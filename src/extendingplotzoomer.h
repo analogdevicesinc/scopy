@@ -10,6 +10,7 @@ class ExtendingPlotZoomer : public LimitedPlotZoomer
 {
 public:
 	explicit ExtendingPlotZoomer(QWidget*, bool doReplot = false);
+	virtual ~ExtendingPlotZoomer();
 
 protected:
 	virtual QPolygon adjustedPoints(const QPolygon &) const;

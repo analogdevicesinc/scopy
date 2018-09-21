@@ -19,6 +19,17 @@ ExtendingPlotZoomer::ExtendingPlotZoomer(QWidget *parent, bool doReplot):
 	cornerMarkers.push_back(new QwtPlotShapeItem());
 }
 
+ExtendingPlotZoomer::~ExtendingPlotZoomer()
+{
+	for (auto it = extendMarkers.begin(); it != extendMarkers.end(); ++it) {
+		delete *it;
+	}
+
+	for (auto it = cornerMarkers.begin(); it != cornerMarkers.end(); ++it) {
+		delete *it;
+	}
+}
+
 void ExtendingPlotZoomer::zoom(const QRectF &rect)
 {
 	widthPass = false;
