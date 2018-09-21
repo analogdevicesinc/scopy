@@ -313,6 +313,10 @@ PatternGenerator::~PatternGenerator()
 	}
 	delete api;
 
+	delete singleRunTimer;
+
+	delete cgSettings;
+	delete pgSettings;
 	delete ui;
 	delete bufman;
 	srd_exit();
