@@ -33,6 +33,7 @@ class Graticule : public QObject
 	Q_OBJECT
 public:
 	Graticule(QwtPlot *plot);
+	~Graticule();
 	void toggleGraticule();
 	void enableGraticule(bool enable);
 public Q_SLOTS:

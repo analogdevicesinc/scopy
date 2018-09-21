@@ -67,6 +67,14 @@ Graticule::Graticule(QwtPlot *plot):
 	horizScale2->setPalette(palette);
 }
 
+Graticule::~Graticule()
+{
+	delete vertScale;
+	delete vertScale2;
+	delete horizScale;
+	delete horizScale2;
+}
+
 void Graticule::toggleGraticule(){
 	enabled = !enabled;
 
