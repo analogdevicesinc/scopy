@@ -50,7 +50,8 @@ TriggerSettings::TriggerSettings(std::shared_ptr<GenericAdc> adc,
 	trigger(adc->getTrigger()),
 	current_channel(0),
 	temporarily_disabled(false),
-	adc_running(false)
+	adc_running(false),
+	trigger_raw_delay(0)
 {
 	ui->setupUi(this);
 
