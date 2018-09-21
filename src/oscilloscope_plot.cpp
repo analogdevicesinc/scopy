@@ -66,7 +66,9 @@ CapturePlot::CapturePlot(QWidget *parent,
 	d_timeTriggerMaxValue(1),
 	d_trackMode(false),
 	horizCursorsLocked(false),
-	vertCursorsLocked(false)
+	vertCursorsLocked(false),
+	d_horizCursorsEnabled(false),
+	d_vertCursorsEnabled(false)
 {
 	setMinimumHeight(250);
 	setMinimumWidth(500);
@@ -82,13 +84,14 @@ CapturePlot::CapturePlot(QWidget *parent,
 
 	markerIntersection1 = new QwtPlotMarker();
 	markerIntersection2 = new QwtPlotMarker();
-	QwtSymbol *symbol = new QwtSymbol(
+	markerIntersection1->setSymbol(new QwtSymbol(
 			QwtSymbol::Ellipse, QColor(237, 28, 36),
 			QPen(QColor(255, 255 ,255, 140), 2, Qt::SolidLine),
-			QSize(18, 18));
-		symbol->setSize(5, 5);
-	markerIntersection1->setSymbol(symbol);
-	markerIntersection2->setSymbol(symbol);
+			QSize(5, 5)));
+	markerIntersection2->setSymbol(new QwtSymbol(
+		       QwtSymbol::Ellipse, QColor(237, 28, 36),
+		       QPen(QColor(255, 255 ,255, 140), 2, Qt::SolidLine),
+		       QSize(5, 5)));
 
 	d_symbolCtrl = new SymbolController(this);
 
@@ -427,6 +430,12 @@ CapturePlot::~CapturePlot()
 	removeEventFilter(this);
 	canvas()->removeEventFilter(d_cursorReadouts);
 	canvas()->removeEventFilter(d_symbolCtrl);
+	delete markerIntersection1;
+	delete markerIntersection2;
+	for (auto it = d_measureObjs.begin(); it != d_measureObjs.end(); ++it) {
+		delete *it;
+	}
+	delete graticule;
 }
 
 HorizBar *CapturePlot::levelTriggerA()
