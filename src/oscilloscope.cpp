@@ -121,7 +121,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	hCursorsEnabled(true),
 	vCursorsEnabled(true),
 	horiz_offset(0),
-	reset_horiz_offset(true)
+	reset_horiz_offset(true),
+	wheelEventGuard(nullptr)
 {
 	ui->setupUi(this);
 	int triggers_panel = ui->stackedWidget->insertWidget(-1, &trigger_settings);
@@ -911,15 +912,23 @@ Oscilloscope::~Oscilloscope()
 	}
 	delete api;
 
+	for (auto it = channels_api.begin(); it != channels_api.end(); ++it) {
+		delete *it;
+	}
+
+	delete math_pair;
+
 	filterBlocks.clear();
 	subBlocks.clear();
 	delete[] hist_ids;
 	delete[] fft_ids;
 	delete[] ids;
+	delete autoset_id;
 	delete ch_ui;
 	delete gsettings_ui;
 	delete measure_panel_ui;
 	delete cursor_readouts_ui;
+	delete statistics_panel_ui;
 	delete cr_ui;
 	delete ui;
 }
