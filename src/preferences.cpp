@@ -124,7 +124,7 @@ Preferences::~Preferences()
 	QString preference_ini_file = getPreferenceIniFile();
 	QSettings settings(preference_ini_file, QSettings::IniFormat);
 	pref_api->save(settings);
-
+	delete pref_api;
 	delete ui;
 }
 
