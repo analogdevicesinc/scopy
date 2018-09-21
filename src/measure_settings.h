@@ -58,6 +58,7 @@ class MeasureSettings : public QWidget
 
 public:
 	explicit MeasureSettings(CapturePlot *plot, QWidget *parent = 0);
+	~MeasureSettings();
 
 	QString channelName() const;
 	void setChannelName(const QString& name);

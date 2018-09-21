@@ -85,6 +85,11 @@ MeasureSettings::MeasureSettings(CapturePlot *plot, QWidget *parent) :
 		SLOT(onMeasurementPropertyChanged(QStandardItem*)));
 }
 
+MeasureSettings::~MeasureSettings()
+{
+	delete m_ui;
+}
+
 QString MeasureSettings::channelName() const
 {
 	return m_channelName;
