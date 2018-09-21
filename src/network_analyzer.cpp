@@ -71,7 +71,8 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	ui(new Ui::NetworkAnalyzer),
 	adc_dev(adc_dev),
 	d_cursorsEnabled(false),
-	stop(true), amp1(nullptr), amp2(nullptr)
+	stop(true), amp1(nullptr), amp2(nullptr),
+	wheelEventGuard(nullptr)
 {
 	iio = iio_manager::get_instance(ctx,
 			filt->device_name(TOOL_NETWORK_ANALYZER, 2));
