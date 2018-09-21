@@ -12,6 +12,13 @@ void PatternGenerator_API::refreshApi()
 	PatternGeneratorChannelManagerUI *chmui = pg->chmui;
 	PatternGeneratorChannelManager *chm = chmui->chm;
 
+	for (auto it = pg_cga.begin(); it != pg_cga.end(); ++it) {
+		delete *it;
+	}
+	for (auto it = pg_cha.begin(); it != pg_cha.end(); ++it) {
+		delete *it;
+	}
+
 	pg_cga.clear();
 	pg_cha.clear();
 
@@ -114,6 +121,16 @@ QVariantList PatternGenerator_API::getChannelGroups()
 	}
 
 	return list;
+}
+
+PatternGenerator_API::~PatternGenerator_API()
+{
+	for (auto it = pg_cga.begin(); it != pg_cga.end(); ++it) {
+		delete *it;
+	}
+	for (auto it = pg_cha.begin(); it != pg_cha.end(); ++it) {
+		delete *it;
+	}
 }
 
 int PatternGenerator_API::channel_groups_size()

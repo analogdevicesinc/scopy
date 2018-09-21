@@ -166,7 +166,7 @@ class PatternGenerator_API : public ApiObject
 public:
 	explicit PatternGenerator_API(PatternGenerator *pg) :
 		ApiObject(), pg(pg) {}
-	~PatternGenerator_API() {}
+	~PatternGenerator_API();
 
 
 	int channel_groups_size();
