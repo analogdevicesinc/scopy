@@ -9,7 +9,7 @@ InfoWidget::InfoWidget(QWidget *parent) :
 	ui(new Ui::InfoWidget)
 {
 	ui->setupUi(this);
-	timer =  new QTimer();
+	timer =  new QTimer(this);
 	connect(timer, SIGNAL(timeout()), this,
 		SLOT(updatePosition()));
 	this->hide();
