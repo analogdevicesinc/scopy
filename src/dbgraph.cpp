@@ -27,9 +27,62 @@
 
 using namespace adiscope;
 
+void dBgraph::setupCursors()
+{
+	d_symbolCtrl = new SymbolController(this);
+
+	d_vBar1 = new VertBar(this,true);
+	d_vBar2 = new VertBar(this,true);
+	d_symbolCtrl->attachSymbol(d_vBar1);
+	d_symbolCtrl->attachSymbol(d_vBar2);
+
+	QPen cursorsLinePen = QPen(QColor(155,155,155),1,Qt::DashLine);
+
+	d_vBar1->setPen(cursorsLinePen);
+	d_vBar2->setPen(cursorsLinePen);
+	d_vBar1->setVisible(false);
+	d_vBar2->setVisible(false);
+
+	connect(d_vBar1, SIGNAL(pixelPositionChanged(int)),
+		SLOT(onVbar1PixelPosChanged(int)));
+	connect(d_vBar1, SIGNAL(pixelPositionChanged(int)),
+		SLOT(onCursor1Moved(int)));
+
+	connect(d_vBar2, SIGNAL(pixelPositionChanged(int)),
+		SLOT(onVbar2PixelPosChanged(int)));
+	connect(d_vBar2, SIGNAL(pixelPositionChanged(int)),
+		SLOT(onCursor2Moved(int)));
+}
+
+void dBgraph::setupReadouts()
+{
+	d_cursorReadouts = new CursorReadouts(this);
+	d_cursorReadouts->setAxis(QwtPlot::xTop,QwtPlot::yLeft);
+	d_cursorReadouts->setTopLeftStartingPoint(QPoint(8, 8));
+	d_cursorReadouts->moveToPosition(CustomPlotPositionButton::topLeft);
+
+	d_cursorReadouts->setTimeReadoutVisible(false);
+	d_cursorReadouts->setVoltageReadoutVisible(false);
+
+	d_cursorReadouts->setTimeCursor1LabelText("F1= ");
+	d_cursorReadouts->setTimeCursor2LabelText("F2= ");
+	d_cursorReadouts->setVoltageCursor1LabelText("Mag1= ");
+	d_cursorReadouts->setVoltageCursor2LabelText("Mag2= ");
+	d_cursorReadouts->setDeltaVoltageLabelText("ΔMag= ");
+
+	d_cursorReadouts->setFrequencyDeltaVisible(false);
+	d_cursorReadouts->setTimeDeltaVisible(false);
+	d_cursorReadouts->setTransparency(0);
+}
+
 dBgraph::dBgraph(QWidget *parent) : QwtPlot(parent),
     curve("data"),
-    d_cursorsCentered(false)
+    d_cursorsCentered(false),
+    d_cursorsEnabled(false),
+    xmin(10),
+    xmax(10),
+    ymin(10),
+    ymax(10)
 {
 	enableAxis(QwtPlot::xBottom, false);
 	enableAxis(QwtPlot::xTop, true);
@@ -106,48 +159,6 @@ dBgraph::dBgraph(QWidget *parent) : QwtPlot(parent),
 	static_cast<QFrame *>(canvas())->setLineWidth(0);
 	setContentsMargins(10, 10, 24, 20);
 
-	d_symbolCtrl = new SymbolController(this);
-
-	d_vBar1 = new VertBar(this,true);
-	d_vBar2 = new VertBar(this,true);
-	d_symbolCtrl->attachSymbol(d_vBar1);
-	d_symbolCtrl->attachSymbol(d_vBar2);
-
-	QPen cursorsLinePen = QPen(QColor(155,155,155),1,Qt::DashLine);
-
-	d_vBar1->setPen(cursorsLinePen);
-	d_vBar2->setPen(cursorsLinePen);
-	d_vBar1->setVisible(false);
-	d_vBar2->setVisible(false);
-
-	connect(d_vBar1, SIGNAL(pixelPositionChanged(int)),
-	        SLOT(onVbar1PixelPosChanged(int)));
-	connect(d_vBar1, SIGNAL(pixelPositionChanged(int)),
-	        SLOT(onCursor1Moved(int)));
-
-	connect(d_vBar2, SIGNAL(pixelPositionChanged(int)),
-	        SLOT(onVbar2PixelPosChanged(int)));
-	connect(d_vBar2, SIGNAL(pixelPositionChanged(int)),
-	        SLOT(onCursor2Moved(int)));
-
-    d_cursorReadouts = new CursorReadouts(this);
-    d_cursorReadouts->setAxis(QwtPlot::xTop,QwtPlot::yLeft);
-    d_cursorReadouts->setTopLeftStartingPoint(QPoint(8, 8));
-    d_cursorReadouts->moveToPosition(CustomPlotPositionButton::topLeft);
-
-    d_cursorReadouts->setTimeReadoutVisible(false);
-    d_cursorReadouts->setVoltageReadoutVisible(false);
-
-    d_cursorReadouts->setTimeCursor1LabelText("F1= ");
-    d_cursorReadouts->setTimeCursor2LabelText("F2= ");
-    d_cursorReadouts->setVoltageCursor1LabelText("Mag1= ");
-    d_cursorReadouts->setVoltageCursor2LabelText("Mag2= ");
-    d_cursorReadouts->setDeltaVoltageLabelText("ΔMag= ");
-
-    d_cursorReadouts->setFrequencyDeltaVisible(false);
-    d_cursorReadouts->setTimeDeltaVisible(false);
-    d_cursorReadouts->setTransparency(0);
-
 	picker = new PlotPickerWrapper(QwtPlot::xTop,QwtPlot::yLeft,this->canvas());
 
     QMargins margins = contentsMargins();
@@ -160,16 +171,21 @@ dBgraph::dBgraph(QWidget *parent) : QwtPlot(parent),
 
     markerIntersection1 = new QwtPlotMarker();
     markerIntersection2 = new QwtPlotMarker();
-    QwtSymbol *symbol = new QwtSymbol(
+    markerIntersection1->setSymbol(new QwtSymbol(
                     QwtSymbol::Ellipse, QColor(237, 28, 36),
                     QPen(QColor(255, 255 ,255, 140), 2, Qt::SolidLine),
-                    QSize(18, 18));
-            symbol->setSize(5, 5);
-    markerIntersection1->setSymbol(symbol);
-    markerIntersection2->setSymbol(symbol);
+		    QSize(5, 5)));
+    markerIntersection2->setSymbol(new QwtSymbol(
+		    QwtSymbol::Ellipse, QColor(237, 28, 36),
+		    QPen(QColor(255, 255 ,255, 140), 2, Qt::SolidLine),
+		    QSize(5, 5)));
+
     markerIntersection1->setAxes(QwtPlot::xTop, QwtPlot::yLeft);
     markerIntersection2->setAxes(QwtPlot::xTop, QwtPlot::yLeft);
 
+    setupCursors();
+
+    setupReadouts();
 
 }
 
@@ -179,6 +195,8 @@ dBgraph::~dBgraph()
 	markerIntersection2->detach();
 	canvas()->removeEventFilter(d_cursorReadouts);
 	canvas()->removeEventFilter(d_symbolCtrl);
+	delete markerIntersection1;
+	delete markerIntersection2;
 	delete formatter;
     delete picker;
 }
@@ -227,12 +245,12 @@ int dBgraph::getNumSamples() const
 
 void dBgraph::setShowZero(bool en)
 {
-    OscScaleEngine *scaleLeft = new OscScaleEngine;
+    OscScaleEngine *scaleLeft = new OscScaleEngine();
     scaleLeft->setMajorTicksCount(7);
     scaleLeft->showZero(en);
 
     this->setAxisScaleEngine(QwtPlot::yLeft,
-            static_cast<QwtScaleEngine *>(scaleLeft));
+	    static_cast<QwtScaleEngine *>(scaleLeft));
 
     replot();
 }

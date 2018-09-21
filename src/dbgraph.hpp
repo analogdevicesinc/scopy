@@ -153,7 +153,9 @@ Q_SIGNALS:
         PlotPickerWrapper* picker;
 
         CursorReadouts *d_cursorReadouts;
-	};
+        void setupCursors();
+        void setupReadouts();
+        };
 }
 
 #endif /* DBGRAPH_HPP */
