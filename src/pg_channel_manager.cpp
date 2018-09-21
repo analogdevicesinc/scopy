@@ -1521,6 +1521,7 @@ PatternGeneratorChannelManagerUI::PatternGeneratorChannelManagerUI(
 }
 PatternGeneratorChannelManagerUI::~PatternGeneratorChannelManagerUI()
 {
+	delete chmHeader;
 	delete ui;
 }
 QFrame *PatternGeneratorChannelManagerUI::addSeparator(QVBoxLayout *lay,
