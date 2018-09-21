@@ -120,7 +120,8 @@ View::View(Session &session, QWidget *parent) :
 	next_flag_text_('A'),
 	trigger_markers_(),
 	hover_point_(-1, -1),
-	start_plot_offset_(0)
+	start_plot_offset_(0),
+	scroll_needs_defaults(true)
 {
 	setFrameShape(QFrame::NoFrame);
 
