@@ -83,6 +83,12 @@ DigitalIoGroup::DigitalIoGroup(QString label, int ch_mask,int io_mask,
 }
 DigitalIoGroup::~DigitalIoGroup()
 {
+	for (auto it = chui.begin(); it != chui.end(); ++it) {
+		//delete Ui::dioChannel from pair<QWidget*, Ui::dioChannel>
+		delete (*it)->second;
+		//delete the pair<QWidget*, Ui::dioChannel>
+		delete *it;
+	}
 	delete ui;
 }
 
@@ -218,7 +224,7 @@ void DigitalIO::updateUi()
 
 		for (auto i=0; i<16; i++) {
 			Ui::dioChannel *chui = findIndividualUi(i)->second;
-			auto chk = gpi&0x01;
+			bool chk = gpi&0x01;
 			gpi >>= 1;
 
 			setDynamicProperty(chui->input,"high",chk);
