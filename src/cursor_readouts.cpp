@@ -55,6 +55,8 @@ CursorReadouts::CursorReadouts(QwtPlot *plot):
 
 CursorReadouts::~CursorReadouts()
 {
+	delete anim;
+	delete anim2;
 	delete ui;
 }
 
