@@ -416,6 +416,12 @@ SpectrumAnalyzer::~SpectrumAnalyzer()
 	}
 
 	delete api;
+	for (auto it = ch_api.begin(); it != ch_api.end(); ++it) {
+		delete *it;
+	}
+	for (auto it = marker_api.begin(); it != marker_api.end(); ++it) {
+		delete *it;
+	}
 
 	if (iio) {
 		bool started = iio->started();
