@@ -17,6 +17,13 @@ for pak in $PACKAGES ; do
 	brew_install_or_upgrade $pak
 done
 
+# use glib 2.56.2
+glib="https://raw.githubusercontent.com/Homebrew/homebrew-core/8a4cb5d7d5e13cc56da454f4b3aec35ecae5ca72/Formula/glib.rb"
+brew unlink glib
+brew install $glib
+brew switch glib 2.56.2
+
+
 for pkg in qt gcc bison gettext ; do
 	brew link --overwrite --force $pkg
 done
