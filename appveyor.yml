@@ -23,9 +23,9 @@ install:
 
     # Install an older version of Qt due to uic.exe issues
     - C:\msys64\usr\bin\bash -lc "wget -q http://repo.msys2.org/mingw/x86_64/mingw-w64-x86_64-qt5-5.9.1-1-any.pkg.tar.xz"
-    - C:\msys64\usr\bin\bash -lc "pacman -U --noconfirm mingw-w64-x86_64-qt5-5.9.1-1-any.pkg.tar.xz"
+    - C:\msys64\usr\bin\bash -lc "pacman -U --force --noconfirm mingw-w64-x86_64-qt5-5.9.1-1-any.pkg.tar.xz"
     - C:\msys64\usr\bin\bash -lc "wget -q http://repo.msys2.org/mingw/i686/mingw-w64-i686-qt5-5.9.1-1-any.pkg.tar.xz"
-    - C:\msys64\usr\bin\bash -lc "pacman -U --noconfirm mingw-w64-i686-qt5-5.9.1-1-any.pkg.tar.xz"
+    - C:\msys64\usr\bin\bash -lc "pacman -U --force --noconfirm mingw-w64-i686-qt5-5.9.1-1-any.pkg.tar.xz"
 
     # Install 32-bit pre-compiled libraries
     - 'appveyor DownloadFile "https://ci.appveyor.com/api/projects/analogdevicesinc/scopy-mingw-build-deps/artifacts/scopy-mingw32-build-deps.tar.xz?branch=master&job=Environment: MINGW_VERSION=mingw32, ARCH=i686" -FileName C:\scopy-mingw32-build-deps.tar.xz'
