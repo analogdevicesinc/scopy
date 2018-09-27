@@ -223,8 +223,8 @@ TimeDomainDisplayPlot::TimeDomainDisplayPlot(QWidget* parent, unsigned int xNumD
 
 TimeDomainDisplayPlot::~TimeDomainDisplayPlot()
 {
-	for (int i = 0; i < d_sinkManager.sinkListLength(); i++) {
-		Sink *sink = d_sinkManager.sink(i);
+	while (d_sinkManager.sinkListLength()) {
+		Sink *sink = d_sinkManager.sink(0);
 		unregisterSink(sink->name());
 	}
 
