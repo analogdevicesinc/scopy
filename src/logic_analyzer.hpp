@@ -22,6 +22,8 @@
 
 /* Qt includes */
 #include <QWidget>
+#include <QQueue>
+#include <QPair>
 
 /* Local includes */
 #include "apiObject.hpp"
@@ -34,6 +36,7 @@
 #include "la_capture_params.hpp"
 #include "plot_utils.hpp"
 #include "tool.hpp"
+#include "customPushButton.hpp"
 
 using namespace pv;
 using namespace pv::toolbars;
@@ -123,7 +126,7 @@ public:
 
 private Q_SLOTS:
 	void startStop(bool start);
-	void toggleRightMenu();
+	void toggleRightMenu(bool);
 	void rightMenuFinished(bool opened);
 	void toggleLeftMenu(bool val);
 	void leftMenuFinished(bool opened);
@@ -175,6 +178,7 @@ private:
 	QButtonGroup *settings_group;
 	QPushButton *active_settings_btn;
 	QPushButton *triggerBtn;
+	QQueue<QPair<CustomPushButton *, bool>> menuButtonActions;
 
 	bool reset_horiz_offset;
 	double horiz_offset_after_drop;
@@ -217,7 +221,7 @@ private:
         double active_timePos;
 
 	void settings_panel_update(int id);
-	void toggleRightMenu(QPushButton *btn);
+	void toggleRightMenu(QPushButton *btn, bool checked);
 
 	bool menuOpened;
 
@@ -287,6 +291,7 @@ private:
 	bool exportTabCsv(QString separator, QString);
 	bool exportVCD(QString, QString, QString);
 	void init_buffer_scrolling();
+	void triggerRightMenuToggle(CustomPushButton *btn, bool checked);
 };
 }
 Q_DECLARE_METATYPE(std::shared_ptr<sigrok::OutputFormat>);

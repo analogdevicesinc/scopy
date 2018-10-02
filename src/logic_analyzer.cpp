@@ -329,8 +329,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 		this, SLOT(setupTriggerSettingsUI(bool)));
 	connect(trigger_settings_ui->cmb_trigg_logic, SIGNAL(currentTextChanged(const QString)),
 		this, SLOT(setHWTriggerLogic(const QString)));
-	connect(ui->btnTrigger, SIGNAL(pressed()),
-		this, SLOT(toggleRightMenu()));
+	connect(ui->btnTrigger, SIGNAL(toggled(bool)),
+		this, SLOT(toggleRightMenu(bool)));
 	connect(ui->btnRunStop, SIGNAL(toggled(bool)),
 	        this, SLOT(startStop(bool)));
 	connect(ui->btnSingleRun, SIGNAL(toggled(bool)),
@@ -339,10 +339,10 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	        SLOT(setChecked(bool)));
 	connect(ui->btnRunStop, SIGNAL(toggled(bool)), runBtn,
 	        SLOT(setChecked(bool)));
-	connect(ui->btnSettings, SIGNAL(pressed()),
-	        this, SLOT(toggleRightMenu()));
-	connect(ui->btnChSettings, SIGNAL(pressed()),
-	        this, SLOT(toggleRightMenu()));
+	connect(ui->btnSettings, SIGNAL(toggled(bool)),
+		this, SLOT(toggleRightMenu(bool)));
+	connect(ui->btnChSettings, SIGNAL(toggled(bool)),
+		this, SLOT(toggleRightMenu(bool)));
 	connect(ui->rightWidget, SIGNAL(finished(bool)),
 	        this, SLOT(rightMenuFinished(bool)));
 	connect(ui->btnShowHideMenu, SIGNAL(clicked(bool)),
@@ -1420,19 +1420,16 @@ void LogicAnalyzer::clearLayout(QLayout *layout)
 	delete layout;
 }
 
-void LogicAnalyzer::toggleRightMenu(QPushButton *btn)
+void LogicAnalyzer::toggleRightMenu(QPushButton *btn, bool checked)
 {
 	int id = btn->property("id").toInt();
-	bool btn_old_state = btn->isChecked();
-	bool open = !menuOpened;
-
-	settings_group->setExclusive(!btn_old_state);
 
 	if( open )
 		settings_panel_update(id);
 
 	active_settings_btn = btn;
-	ui->rightWidget->toggleMenu(open);
+	menuOpened = checked;
+	ui->rightWidget->toggleMenu(checked);
 }
 
 void LogicAnalyzer::settings_panel_update(int id)
@@ -1445,9 +1442,25 @@ void LogicAnalyzer::settings_panel_update(int id)
 	}
 }
 
-void LogicAnalyzer::toggleRightMenu()
+void LogicAnalyzer::triggerRightMenuToggle(CustomPushButton *btn, bool checked)
 {
-	toggleRightMenu(static_cast<QPushButton *>(QObject::sender()));
+	// Queue the action, if right menu animation is in progress. This way
+	// the action will be remembered and performed right after the animation
+	// finishes
+	if (ui->rightWidget->animInProgress()) {
+		menuButtonActions.enqueue(
+			QPair<CustomPushButton *, bool>(btn, checked));
+	} else {
+		toggleRightMenu(btn, checked);
+	}
+}
+
+
+void LogicAnalyzer::toggleRightMenu(bool selected)
+{
+	auto btn = static_cast<CustomPushButton*>(sender());
+
+	triggerRightMenuToggle(btn, selected);
 }
 
 void LogicAnalyzer::setHWTrigger(int chid, std::string trigger_val)
@@ -1519,12 +1532,14 @@ void LogicAnalyzer::toggleLeftMenu(bool val)
 
 void LogicAnalyzer::rightMenuFinished(bool opened)
 {
-	menuOpened = opened;
+	Q_UNUSED(opened)
 
-	if (!opened && active_settings_btn && active_settings_btn->isChecked()) {
-		int id = active_settings_btn->property("id").toInt();
-		settings_panel_update(id);
-		ui->rightWidget->toggleMenu(true);
+	// At the end of each animation, check if there are other button check
+	// actions that might have happened while animating and execute all
+	// these queued actions
+	while (menuButtonActions.size()) {
+		auto pair = menuButtonActions.dequeue();
+		toggleRightMenu(pair.first, pair.second);
 	}
 }
 

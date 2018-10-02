@@ -695,7 +695,7 @@ QPushButton:checked:hover {
             <number>0</number>
            </property>
            <item>
-            <widget class="QPushButton" name="btnSettings">
+            <widget class="adiscope::CustomPushButton" name="btnSettings">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -744,7 +744,7 @@ QPushButton:checked:hover {
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="btnChSettings">
+            <widget class="adiscope::CustomPushButton" name="btnChSettings">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -1507,8 +1507,8 @@ background-color: qlineargradient(spread:pad, x1:0.6, y1:0, x2:0, y2:0, stop:0 r
                     <rect>
                      <x>0</x>
                      <y>0</y>
-                     <width>180</width>
-                     <height>571</height>
+                     <width>187</width>
+                     <height>569</height>
                     </rect>
                    </property>
                    <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -1743,7 +1743,7 @@ color: #FFFFFF;</string>
                     <rect>
                      <x>0</x>
                      <y>0</y>
-                     <width>92</width>
+                     <width>100</width>
                      <height>30</height>
                     </rect>
                    </property>
@@ -1997,6 +1997,11 @@ QPushButton:checked { border-image: url(:/icons/setup_btn_checked.svg); }
    <class>adiscope::SmallOnOffSwitch</class>
    <extends>QPushButton</extends>
    <header>smallOnOffSwitch.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::CustomPushButton</class>
+   <extends>QPushButton</extends>
+   <header>customPushButton.hpp</header>
   </customwidget>
  </customwidgets>
  <resources>
