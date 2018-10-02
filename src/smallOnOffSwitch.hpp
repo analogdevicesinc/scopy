@@ -21,7 +21,7 @@
 #define SMALL_ON_OFF_SWITCH_HPP
 
 #include <QColor>
-#include <QPropertyAnimation>
+#include "customanimation.h"
 #include <QPushButton>
 #include <QWidget>
 #include <QLabel>
@@ -48,8 +48,8 @@ namespace adiscope {
 		QColor color_start, color_end, color;
 		QLabel on, off;
 		QWidget handle;
-		QPropertyAnimation anim;
-		QPropertyAnimation color_anim;
+		CustomAnimation anim;
+		CustomAnimation color_anim;
 		QString stylesheet;
 		int duration_ms;
 		bool show_icon;

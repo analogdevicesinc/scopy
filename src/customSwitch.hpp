@@ -21,7 +21,7 @@
 #define CUSTOM_SWITCH_HPP
 
 #include <QLabel>
-#include <QPropertyAnimation>
+#include "customanimation.h"
 #include <QPushButton>
 #include <QWidget>
 
@@ -42,7 +42,7 @@ namespace adiscope {
 	private:
 		QLabel on, off;
 		QWidget handle;
-		QPropertyAnimation anim;
+		CustomAnimation anim;
 		int duration_ms;
 		bool polarity;
 

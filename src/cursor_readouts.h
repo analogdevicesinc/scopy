@@ -21,7 +21,7 @@
 #define CURSOR_READOUTS_H
 
 #include <QWidget>
-#include <QPropertyAnimation>
+#include "customanimation.h"
 #include <QShowEvent>
 #include <qwt_axis_id.h>
 #include "customplotpositionbutton.h"
@@ -99,7 +99,7 @@ namespace adiscope {
 		void moveBottomLeft(bool resize = false);
 		void moveBottomRight(bool resize = false);
 		CustomPlotPositionButton::ReadoutsPosition currentPosition;
-		QPropertyAnimation *anim, *anim2;
+		CustomAnimation *anim, *anim2;
 		QRect lastTimeRect, lastVoltageRect;
         QwtAxisId hAxis,vAxis;
 	};

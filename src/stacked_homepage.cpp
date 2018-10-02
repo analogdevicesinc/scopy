@@ -20,7 +20,7 @@
 #include "stacked_homepage.h"
 
 #include <QDebug>
-#include <QPropertyAnimation>
+#include "customanimation.h"
 #include <QParallelAnimationGroup>
 #include <QFileDialog>
 #include <QTextBrowser>
@@ -216,12 +216,12 @@ void StackedHomepage::slideInWidget(QWidget *newWidget, StackedHomepage::s_direc
 	widget(next)->show();
 	widget(next)->raise();
 
-	QPropertyAnimation *animNow = new QPropertyAnimation(widget(current), "pos");
+	CustomAnimation *animNow = new CustomAnimation(widget(current), "pos");
 	animNow->setDuration(s_speed);
 	animNow->setEasingCurve(s_animationType);
 	animNow->setStartValue(QPoint(pcurrent.x(), pcurrent.y()));
 	animNow->setEndValue(QPoint(offsetx + pcurrent.x(), offsety + pcurrent.y()));
-	QPropertyAnimation *animNext = new QPropertyAnimation(widget(next), "pos");
+	CustomAnimation *animNext = new CustomAnimation(widget(next), "pos");
 	animNext->setDuration(s_speed);
 	animNext->setEasingCurve(s_animationType);
 	animNext->setStartValue(QPoint(-offsetx + pnext.x(), offsety + pnext.y()));
