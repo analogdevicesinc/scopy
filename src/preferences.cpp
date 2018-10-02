@@ -44,7 +44,8 @@ Preferences::Preferences(QWidget *parent) :
 	manual_calib_script_enabled(false),
 	debugger_enabled(false),
 	manual_calib_enabled(false),
-	graticule_enabled(false)
+	graticule_enabled(false),
+	animations_enabled(true)
 {
 	ui->setupUi(this);
 
@@ -111,6 +112,11 @@ Preferences::Preferences(QWidget *parent) :
 		manual_calib_script_enabled = (!state ? false : true);
 		Q_EMIT notify();
 	});
+
+	connect(ui->enableAnimCheckBox, &QCheckBox::stateChanged, [=](int state) {
+		animations_enabled = (!state ? false : true);
+		Q_EMIT notify();
+	});
 	QString preference_ini_file = getPreferenceIniFile();
 	QSettings settings(preference_ini_file, QSettings::IniFormat);
 
@@ -148,6 +154,7 @@ void Preferences::showEvent(QShowEvent *event)
 	ui->oscGraticuleCheckBox->setChecked(graticule_enabled);
 	ui->extScriptCheckBox->setChecked(external_script_enabled);
 	ui->manualCalibCheckBox->setChecked(manual_calib_script_enabled);
+	ui->enableAnimCheckBox->setChecked(animations_enabled);
 
 	QWidget::showEvent(event);
 }
@@ -174,14 +181,24 @@ void Preferences::resetScopy()
 	}
 }
 
+bool Preferences::getAnimations_enabled() const
+{
+    return animations_enabled;
+}
+
+void Preferences::setAnimations_enabled(bool value)
+{
+    animations_enabled = value;
+}
+
 bool Preferences::getAdvanced_device_info() const
 {
-	return advanced_device_info;
+    return advanced_device_info;
 }
 
 void Preferences::setAdvanced_device_info(bool value)
 {
-	advanced_device_info = value;
+    advanced_device_info = value;
 }
 
 bool Preferences::getUser_notes_active() const
@@ -308,6 +325,16 @@ bool Preferences::getOsc_graticule_enabled() const
 void Preferences::setOsc_graticule_enabled(bool value)
 {
 	graticule_enabled = value;
+}
+
+bool Preferences_API::getAnimationsEnabled() const
+{
+	return preferencePanel->animations_enabled;
+}
+
+void Preferences_API::setAnimationsEnabled(const bool &enabled)
+{
+	preferencePanel->animations_enabled = enabled;
 }
 
 bool Preferences_API::getOscLabelsEnabled() const

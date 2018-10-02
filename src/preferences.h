@@ -83,6 +83,9 @@ public:
 	void setDebugger_enabled(bool value);
 	void setManual_calib_enabled(bool value);
 
+	bool getAnimations_enabled() const;
+	void setAnimations_enabled(bool value);
+
 Q_SIGNALS:
 
 	void notify();
@@ -109,6 +112,7 @@ private:
 	bool debugger_enabled;
 	bool manual_calib_script_enabled;
 	bool manual_calib_enabled;
+	bool animations_enabled;
 
 	Preferences_API *pref_api;
 	QString getPreferenceIniFile() const;
@@ -130,12 +134,16 @@ class Preferences_API : public ApiObject
 	Q_PROPERTY(bool graticule_enabled READ getGraticuleEnabled WRITE setGraticuleEnabled)
 	Q_PROPERTY(bool external_script_enabled READ getExternalScript WRITE setExternalScript)
 	Q_PROPERTY(bool manual_calib_script_enabled READ getManualCalibScript WRITE setManualCalibScript)
+	Q_PROPERTY(bool animations_enabled READ getAnimationsEnabled WRITE setAnimationsEnabled)
 
 public:
 
 	explicit Preferences_API(Preferences *preferencePanel) :
 		ApiObject(),
 		preferencePanel(preferencePanel) {}
+
+	bool getAnimationsEnabled() const;
+	void setAnimationsEnabled(const bool& enabled);
 
 	bool getOscLabelsEnabled() const;
 	void setOscLabelsEnabled(const bool& enabled);

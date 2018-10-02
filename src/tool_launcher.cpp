@@ -36,6 +36,7 @@
 #include "device_widget.hpp"
 #include "user_notes.hpp"
 #include "external_script_api.hpp"
+#include "animationmanager.h"
 
 #include "ui_device.h"
 #include "ui_tool_launcher.h"
@@ -288,6 +289,8 @@ void ToolLauncher::readPreferences()
 		manual_calibration->allowManualCalibScript(manual_calibration_enabled,
 				prefPanel->getManual_calib_script_enabled());
 	}
+
+	AnimationManager::getInstance().toggleAnimations(prefPanel->getAnimations_enabled());
 }
 
 void ToolLauncher::loadIndexPageFromContent(QString fileLocation)
