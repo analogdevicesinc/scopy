@@ -288,6 +288,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	stop_freq->setMaxValue(max_sr);
 	center_freq->setMaxValue(max_sr);
 	span_freq->setMaxValue(max_sr);
+	span_freq->setMinValue(1);
 
 	start_freq->setStep(1e6);
 	stop_freq->setStep(1e6);
@@ -943,6 +944,12 @@ void SpectrumAnalyzer::onStartStopChanged()
 	double stop = stop_freq->value();
 	double span = stop - start;
 	double center = start + (span / 2);
+
+	start_freq->setMaxValue(stop - 1);
+	stop_freq->setMinValue(start + 1);
+
+	start_freq->setValue(start);
+	stop_freq->setValue(stop);
 
 	if (start > stop) {
 		start = stop;
