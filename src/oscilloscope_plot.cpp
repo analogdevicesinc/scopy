@@ -404,6 +404,14 @@ CapturePlot::CapturePlot(QWidget *parent,
 	connect(d_hBar2, SIGNAL(positionChanged(double)),
 			SLOT(onVoltageCursor2Moved(double)));
 
+	connect(d_timeTriggerHandle, &FreePlotLineHandleH::reset, [=](){
+		Q_EMIT timeTriggerValueChanged(0);
+	});
+	connect(d_levelTriggerAHandle, &FreePlotLineHandleV::reset, [=](){
+		d_levelTriggerABar->setPlotCoord(
+					QPointF(d_levelTriggerABar->plotCoord().x(), 0));
+	});
+
 	/* Apply measurements for every new batch of data */
 	connect(this, SIGNAL(newData()),
 		SLOT(onNewDataReceived()));
@@ -1127,6 +1135,14 @@ void CapturePlot::onChannelAdded(int chnIdx)
 
 				Q_EMIT channelOffsetChanged(offset);
 			}
+	});
+
+	connect(chOffsetHdl, &RoundedHandleV::reset, [=](){
+		int chn_id = d_offsetHandles.indexOf(chOffsetHdl);
+		this->setVertOffset(0, chn_id);
+		this->replot();
+
+		Q_EMIT channelOffsetChanged(0);
 	});
 
 	/* Add Measure ojbect that handles all channel measurements */
