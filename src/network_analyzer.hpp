@@ -87,6 +87,7 @@ namespace adiscope {
         PositionSpinButton *magMin;
         PositionSpinButton *phaseMax;
         PositionSpinButton *phaseMin;
+	void setMinimumDistanceBetween(SpinBoxA *min, SpinBoxA *max, double distance);
 
         HorizHandlesArea *d_bottomHandlesArea;
 

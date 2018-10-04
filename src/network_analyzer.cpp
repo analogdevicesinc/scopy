@@ -205,18 +205,9 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
     ui->phaseMaxLayout->addWidget(phaseMax);
     ui->phaseMinLayout->addWidget(phaseMin);
 
-    connect(magMax, &PositionSpinButton::valueChanged,
-            magMin, &PositionSpinButton::setMaxValue);
-    connect(magMin, &PositionSpinButton::valueChanged,
-            magMax, &PositionSpinButton::setMinValue);
-    connect(phaseMax, &PositionSpinButton::valueChanged,
-            phaseMin, &PositionSpinButton::setMaxValue);
-    connect(phaseMin, &PositionSpinButton::valueChanged,
-            phaseMax, &PositionSpinButton::setMinValue);
-    connect(minFreq, &ScaleSpinButton::valueChanged,
-            maxFreq, &ScaleSpinButton::setMinValue);
-    connect(maxFreq, &ScaleSpinButton::valueChanged,
-            minFreq, &ScaleSpinButton::setMaxValue);
+    setMinimumDistanceBetween(magMin, magMax, 1);
+    setMinimumDistanceBetween(phaseMin, phaseMax, 1);
+    setMinimumDistanceBetween(minFreq, maxFreq, 0);
 
     connect(magMax, &PositionSpinButton::valueChanged,
             ui->xygraph, &NyquistGraph::setMax);
@@ -381,6 +372,19 @@ NetworkAnalyzer::~NetworkAnalyzer()
 	delete api;
 
 	delete ui;
+}
+
+void NetworkAnalyzer::setMinimumDistanceBetween(SpinBoxA *min, SpinBoxA *max, double distance)
+{
+
+	connect(max, &SpinBoxA::valueChanged, [=](double value) {
+	    min->setMaxValue(value - distance);
+	    min->setValue(min->value());
+	});
+	connect(min, &SpinBoxA::valueChanged, [=](double value) {
+	    max->setMinValue(value + distance);
+	    max->setValue(max->value());
+	});
 }
 
 void NetworkAnalyzer::triggerRightMenuToggle(CustomPushButton *btn, bool checked)
