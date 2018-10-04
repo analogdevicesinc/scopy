@@ -53,6 +53,8 @@
 #include <QDir>
 #include <QDesktopWidget>
 #include <QJsonDocument>
+#include <QDesktopServices>
+#include <QSpacerItem>
 
 #include <iio.h>
 
@@ -915,15 +917,61 @@ void ToolLauncher::highlightDevice(QPushButton *btn)
 void ToolLauncher::setupHomepage()
 {
 	// Welcome page
-	welcome = new QTextBrowser(ui->stackedWidget);
+
+	QWidget *homepage = new QWidget(ui->stackedWidget);
+	QVBoxLayout *layout = new QVBoxLayout(homepage);
+	welcome = new QTextBrowser(homepage);
 	welcome->setFrameShape(QFrame::NoFrame);
 	welcome->setOpenExternalLinks(true);
 	welcome->setSource(QUrl("qrc:/scopy.html"));
+	layout->addWidget(welcome);
+
+	QWidget *reportRegion = new QWidget(homepage);
+	QHBoxLayout *reportLayout = new QHBoxLayout(reportRegion);
+	QPushButton *reportBtn = new QPushButton(reportRegion);
+	reportBtn->setText("Report a bug!");
+	reportBtn->setStyleSheet("QPushButton {"
+			     "border: 0px;"
+			     "border-radius: 4px;"
+			     "background-color: #4a64ff;"
+			     "color: #ffffff;"
+			     "font-size: 14px;}"
+		     "QPushButton:hover"
+		     "{background-color: #4a34ff;}");
+	reportBtn->setMinimumHeight(30);
+	reportBtn->setMinimumWidth(100);
+	reportLayout->addItem(new QSpacerItem(20, 20, QSizePolicy::Expanding, QSizePolicy::Fixed));
+	reportLayout->addWidget(reportBtn);
+	layout->addWidget(reportRegion);
+
+	connect(reportBtn, &QPushButton::clicked, [=](){
+		std::string os = QSysInfo::prettyProductName().toStdString();
+		std::string gittag = SCOPY_VERSION_GIT;
+		std::string fw = "";
+		if (ctx) {
+			fw = std::string(iio_context_get_attr_value(ctx, "fw_version"));
+		}
+		QSettings settings;
+		QFileInfo info(settings.fileName());
+		std::string head = "https://github.com/analogdevicesinc/scopy/issues/new?title=%3CInstrument%3E:%20%3CShort%20description%20of%20the%20bug%3E&body=";
+		std::string os_version_urlstring = "OS%20Version: " + os;
+		std::string fw_version_urlstring = "%0AFW%20Version: " + fw;
+		std::string gittag_urlstring = "%0ASW%20Version: " + gittag;
+		std::string description_urlstring = "%0A%0ADescription%20of%20the%20bug:%3Cdescription%3E%0ASteps%20to%20reproduce:"
+					  "%0A-%0A-%0A%0AThe%20ini%20files%20might%20be%20useful%20to%20reproduce%20the%20error.";
+		std::string ini_file_urlstring = "%0AThe%20ini%20file%20is%20located%20at: " + info.absoluteFilePath().toStdString();
+		std::string finalpart = "%0APlease%20consider%20attaching%20it.&labels=bug,reported-from-scopy";
+		QUrl url(QString::fromStdString(head + os_version_urlstring +
+						fw_version_urlstring + gittag_urlstring +
+						description_urlstring + ini_file_urlstring +
+						finalpart));
+		QDesktopServices::openUrl(url);
+	});
 
 	if (ui->stackedWidget->count() == (devices.size()+2)) {
 		ui->stackedWidget->removeWidget(0);
 	}
-	ui->stackedWidget->insertWidget(0, welcome);
+	ui->stackedWidget->insertWidget(0, homepage);
 	ui->btnHomepage->setChecked(true);
 
 	// Index page
