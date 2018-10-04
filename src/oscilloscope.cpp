@@ -2304,6 +2304,7 @@ void Oscilloscope::onTriggerSourceChanged(int chnIdx)
 		deactivateAcCouplingTrigger();
 		activateAcCouplingTrigger(chnIdx);
 	}
+	plot.replot();
 
 }
 
