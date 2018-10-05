@@ -2741,6 +2741,8 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 
 void adiscope::Oscilloscope::onVertOffsetValueChanged(double value)
 {
+	cancelZoom();
+
 	if (value != -plot.VertOffset(current_ch_widget)) {
 		plot.setVertOffset(-value, current_ch_widget);
 		plot.replot();
@@ -2769,6 +2771,8 @@ void adiscope::Oscilloscope::onVertOffsetValueChanged(double value)
 
 void adiscope::Oscilloscope::onTimePositionChanged(double value)
 {
+	cancelZoom();
+
 	bool started = iio->started();
 	bool enhancedMemDepth = symmBufferMode->isEnhancedMemDepth();
 
