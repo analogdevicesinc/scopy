@@ -602,9 +602,6 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 			double value = probe_attenuation[i] * plot.VertUnitsPerDiv(i);
 			label->setText(vertMeasureFormat.format(value, "V/div", 3));
 		}
-		if (isZoomOut) {
-			updateGainMode();
-		}
 
 		if (zoom_level == 0) {
 			onTimePositionChanged(timePosition->value());
@@ -613,6 +610,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		updateBufferPreviewer();
 		horiz_offset = plot.HorizOffset();
 		time_trigger_offset = horiz_offset;
+
 	});
 
 	connect(ch_ui->probe_attenuation, QOverload<int>::of(&QComboBox::currentIndexChanged),
@@ -2747,13 +2745,19 @@ void adiscope::Oscilloscope::onVertOffsetValueChanged(double value)
 		plot.setVertOffset(-value, current_ch_widget);
 		plot.replot();
 	}
+	if (zoom_level == 0) {
+		plot.zoomBaseUpdate();
+	}
 
 	// Switch between high and low gain modes only for the M2K channels
 	if (m2k_adc && current_ch_widget < nb_channels) {
 		if (ui->pushButtonRunStop->isChecked())
 			toggle_blockchain_flow(false);
 
-		updateGainMode();
+		if (zoom_level == 0) {
+			// Only change gain mode when the plot is not zoomed
+			updateGainMode();
+		}
 		setChannelHwOffset(current_ch_widget, value);
 
 		trigger_settings.updateHwVoltLevels(current_ch_widget);
