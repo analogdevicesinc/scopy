@@ -664,6 +664,9 @@ void SignalGenerator::rescale()
 	long startSample=sample_rate*zoomT1;
 	plot->setDataStartingPoint(startSample);
 	plot->setSampleRate(sample_rate,1,"Hz");
+	if (nb_points < 16) {
+		nb_points = 16;
+	}
 	time_block_data->time_block->set_nsamps(nb_points);
 	time_block_data->time_block->set_samp_rate(sample_rate);
 	updatePreview();
