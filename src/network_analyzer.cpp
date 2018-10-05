@@ -565,8 +565,7 @@ void NetworkAnalyzer::run()
 		}
 
 		adc_rate = get_best_sample_rate(adc, frequency);
-		iio_device_attr_write_longlong(adc,
-				"sampling_frequency", adc_rate);
+		adc_dev->setSampleRate(adc_rate);
 
 		/* Lock the flowgraph if we are already started */
 		bool started = iio->started();
