@@ -3982,14 +3982,16 @@ void Oscilloscope::updateGainMode()
 		return;
 	}
 
-	QwtInterval hw_input_itv(-5, 5);
+	double offset = plot.VertOffset(current_ch_widget);
+	QwtInterval hw_input_itv(-2.5 + offset, 2.5 + offset);
 	QwtInterval plot_vert_itv = plot.axisScaleDiv(
 		QwtAxisId(QwtPlot::yLeft, current_ch_widget)).interval();
 
 	// If max signal span that can be captured is smaller than the plot
 	// screen try to increase the range (switch to low gain mode)
 	if (plot_vert_itv.minValue() < hw_input_itv.minValue() ||
-		plot_vert_itv.maxValue() > hw_input_itv.maxValue()) {
+		plot_vert_itv.maxValue() > hw_input_itv.maxValue() ||
+			std::abs(offset) > 5.0) {
 		if (high_gain_modes[current_ch_widget]) {
 			high_gain_modes[current_ch_widget] = false;
 			bool running = ui->pushButtonRunStop->isChecked();
