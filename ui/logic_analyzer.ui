@@ -1952,7 +1952,7 @@ QLabel {
          </spacer>
         </item>
         <item>
-         <widget class="QPushButton" name="btnTrigger">
+         <widget class="adiscope::CustomPushButton" name="btnTrigger">
           <property name="styleSheet">
            <string notr="true">QPushButton {
   width: 40px;
