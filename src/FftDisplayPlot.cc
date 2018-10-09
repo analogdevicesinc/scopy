@@ -673,6 +673,7 @@ void FftDisplayPlot::remove_marker(int chn, int which)
 		d_markers[chn][which].ui->detach();
 		d_markers[chn].removeAt(which);
 	}
+
 }
 
 void FftDisplayPlot::marker_set_pos_source(uint chIdx, uint mkIdx,
@@ -752,6 +753,37 @@ void FftDisplayPlot::setMarkerCount(uint chIdx, uint count)
 bool FftDisplayPlot::markerEnabled(uint chIdx, uint mkIdx) const
 {
 	return !!d_markers[chIdx][mkIdx].data;
+}
+
+
+bool FftDisplayPlot:: markerVisible(uint chIdx, uint mkIdx) const
+{
+	if (chIdx >= d_markers.size()) {
+		qDebug() << "Invalid channel index!";
+		return false;
+	}
+
+	if (mkIdx >= d_markers[chIdx].size()) {
+		qDebug() << "Invalid marker index";
+		return false;
+	}
+
+	return d_markers[chIdx][mkIdx].ui->isVisible();
+}
+
+void FftDisplayPlot::setMarkerVisible(uint chIdx, uint mkIdx, bool en)
+{
+	if (chIdx >= d_markers.size()) {
+		qDebug() << "Invalid channel index!";
+		return;
+	}
+
+	if (mkIdx >= d_markers[chIdx].size()) {
+		qDebug() << "Invalid marker index";
+		return;
+	}
+
+	d_markers[chIdx][mkIdx].ui->setVisible(en);
 }
 
 void FftDisplayPlot::setMarkerEnabled(uint chIdx, uint mkIdx, bool en)

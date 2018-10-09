@@ -915,6 +915,11 @@ void SpectrumAnalyzer::onChannelEnabled(bool en)
 		fft_plot->DetachCurve(cw->id());
 	}
 
+	for (int i = 0; i < fft_plot->markerCount(cw->id()); i++) {
+		fft_plot->setMarkerVisible(cw->id(), i, en);
+	}
+
+
 	fft_plot->replot();
 	updateRunButton(en);
 }

@@ -21,6 +21,7 @@
 #define FFT_DISPLAY_PLOT_H
 
 #include "DisplayPlot.h"
+#include "spectrum_marker.hpp"
 #include <boost/shared_ptr.hpp>
 
 namespace adiscope {
@@ -79,8 +80,8 @@ namespace adiscope {
 		};
 
 	typedef boost::shared_ptr<SpectrumAverage> average_sptr;
-
 	private:
+		QList<QList<marker>> d_markers;
 		double* x_data;
 		std::vector<double*> y_data;
 		std::vector<double*> y_original_data;
@@ -109,7 +110,7 @@ namespace adiscope {
 
 		MarkerController *d_mrkCtrl;
 		QList<int> d_num_markers;
-		QList<QList<marker>> d_markers;
+
 		QList<QList<std::shared_ptr<struct marker_data>>> d_peaks;
 		QList<QList<std::shared_ptr<struct marker_data>>> d_freq_asc_sorted_peaks;
 		bool d_emitNewMkrData;
@@ -174,6 +175,9 @@ namespace adiscope {
 
 		bool markerEnabled(uint chIdx, uint mkIdx) const;
 		void setMarkerEnabled(uint chIdx, uint mkIdx, bool en);
+
+		bool markerVisible(uint chIdx, uint mkIdx) const;
+		void setMarkerVisible(uint chIdx, uint mkIdx, bool en);
 
 		double markerFrequency(uint chIdx, uint mkIdx) const;
 		double markerMagnitude(uint chIdx, uint mkIdx) const;
