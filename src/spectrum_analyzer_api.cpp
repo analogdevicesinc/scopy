@@ -166,6 +166,7 @@ void SpectrumMarker_API::setEnabled(bool en)
 	sp->marker_selector->setButtonChecked(m_mkid, en);
 	sp->updateWidgetsRelatedToMarker(m_mkid);
 	sp->fft_plot->updateMarkerUi(m_chid, m_mkid);
+}
 
 bool SpectrumMarker_API::visible()
 {
