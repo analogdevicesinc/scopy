@@ -118,6 +118,7 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, std::shared_ptr<GenericAdc> adc,
 	});
 
 	data_logging_timer->setValue(0);
+	enableDataLogging(false);
 
 	connect(ui->btn_ch1_ac, SIGNAL(toggled(bool)), this, SLOT(toggleAC()));
 	connect(ui->btn_ch2_ac, SIGNAL(toggled(bool)), this, SLOT(toggleAC()));
@@ -241,9 +242,9 @@ void DMM::checkPeakValues(int ch, double peak)
 void DMM::collapseDataLog(bool checked)
 {
 	if(checked)
-		ui->gridLayout_3Widget->hide();
+		ui->dataLogWidget->hide();
 	else
-		ui->gridLayout_3Widget->show();
+		ui->dataLogWidget->show();
 }
 
 void DMM::collapsePeakHold(bool checked)
@@ -285,6 +286,7 @@ void DMM::resetPeakHold(bool clicked)
 }
 void DMM::toggleTimer(bool start)
 {
+	enableDataLogging(start);
 	if (start) {
 		writeAllSettingsToHardware();
 		manager->start(id_ch1);
@@ -302,6 +304,7 @@ void DMM::toggleTimer(bool start)
 
 	setDynamicProperty(ui->run_button, "running", start);
 }
+
 
 gr::basic_block_sptr DMM::configureGraph(gr::basic_block_sptr s2f,
 		bool is_low_ac, bool is_high_ac)
@@ -395,16 +398,27 @@ void DMM::chooseFile()
 
 }
 
+void DMM::enableDataLogging(bool en)
+{
+	ui->gridLayout_3Widget->setEnabled(en);
+	if (!en) {
+		setDynamicProperty(ui->filename, "invalid", false);
+	}
+}
+
 void DMM::toggleDataLogging(bool en)
 {
 	data_logging = en;
 	if (en) {
+		enableDataLogging(en);
 		setDynamicProperty(ui->filename, "invalid", false);
+	} else if (!ui->run_button->isChecked()) {
+		enableDataLogging(en);
 	}
 
 	/* If DMM is already running, check all the parameters before
 	 * starting the data logging */
-	if(filename.isEmpty()) {
+	if(filename.isEmpty() && ui->filename->isEnabled()) {
 		ui->filename->setText("No file selected");
 		setDynamicProperty(ui->filename, "invalid", true);
 		if(ui->run_button->isChecked()) {

@@ -100,6 +100,8 @@ namespace adiscope {
 
 		void toggleAC();
 
+		void enableDataLogging(bool);
+
 		void toggleDataLogging(bool);
 
 		void startDataLogging(bool);
