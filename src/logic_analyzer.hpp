@@ -156,6 +156,7 @@ private Q_SLOTS:
 	void onFrameEnded();
 	void onTriggerModeChanged(bool);
 	void checkEnabledChannels();
+	void toolDetached(bool);
 public Q_SLOTS:
 	void onTimeTriggerHandlePosChanged(int);
 	void onTimePositionSpinboxChanged(double value);
@@ -281,6 +282,7 @@ private:
 	bool offline_mode;
 	int acquisition_mode;
 	bool zoomed_in;
+	int min_detached_width;
 
 	void configParams(double timebase, double timepos);
 	StateUpdater *triggerUpdater;

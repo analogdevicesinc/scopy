@@ -374,6 +374,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 		this, SLOT(setTimeout(bool)));
 	connect(trigger_settings_ui->btnTriggerMode, SIGNAL(toggled(bool)),
 		this, SLOT(onTriggerModeChanged(bool)));
+	connect(this, SIGNAL(detachedState(bool)), this,
+			SLOT(toolDetached(bool)));
 
 	connect(this, SIGNAL(starttimeout()),
 		this, SLOT(startTimer()));
@@ -444,6 +446,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	chm_ui->update_ui();
 	init_export_settings();
 	installWheelEventGuard();
+	min_detached_width = this->minimumWidth();
+	toolDetached(false);
 
 	api->setObjectName(QString::fromStdString(Filter::tool_name(
 			TOOL_LOGIC_ANALYZER)));
@@ -471,6 +475,19 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	});
 
 	init_buffer_scrolling();
+}
+
+void LogicAnalyzer::toolDetached(bool detached)
+{
+	if (detached) {
+		this->setMinimumWidth(min_detached_width);
+		this->setSizePolicy(QSizePolicy::Preferred,
+				    QSizePolicy::MinimumExpanding);
+	} else {
+		this->setMinimumWidth(0);
+		this->setSizePolicy(QSizePolicy::MinimumExpanding,
+				    QSizePolicy::MinimumExpanding);
+	}
 }
 
 void LogicAnalyzer::init_buffer_scrolling()
