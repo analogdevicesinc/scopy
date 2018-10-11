@@ -173,6 +173,7 @@ private:
 	double nr_of_periods;
 
 	QButtonGroup *settings_group;
+	QButtonGroup *channels_group;
 	QQueue<QPair<int, bool>> menuButtonActions;
 
 	QVector<struct iio_buffer *> buffers;

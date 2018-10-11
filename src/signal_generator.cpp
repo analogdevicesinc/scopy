@@ -121,7 +121,8 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 	dacs(dacs),
 	nr_of_periods(2),
 	currentChannel(0), sample_rate(0),
-	settings_group(new QButtonGroup(this)),nb_points(NB_POINTS)
+	settings_group(new QButtonGroup(this)),nb_points(NB_POINTS),
+	channels_group(new QButtonGroup(this))
 {
 	zoomT1=0;
 	zoomT2=1;
@@ -376,7 +377,9 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 		ptr->type = SIGNAL_TYPE_CONSTANT;
 		ptr->id = i;
 
-		ChannelWidget *cw = new ChannelWidget(i, false, true, QColor());
+		ChannelWidget *cw = new ChannelWidget(i, false, false, QColor());
+		cw->setShortName(QString("CH %1").arg(i + 1));
+		cw->nameButton()->setText(cw->shortName());
 
 		const char *ch_name = iio_channel_get_name(chn);
 		std::string s = "Channel ";
@@ -387,8 +390,6 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 		}
 
 		cw->setFullName(ch_name);
-		cw->enableButton()->setText(cw->fullName());
-
 
 		cw->setProperty("signal_generator_data",
 		                QVariant::fromValue(ptr));
@@ -404,9 +405,15 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 		connect(cw, SIGNAL(menuToggled(bool)),
 		        SLOT(channelWidgetMenuToggled(bool)));
 
+		channels_group->addButton(cw->nameButton());
 		settings_group->addButton(cw->menuButton());
 
 		channels.append(cw);
+
+		connect(cw->nameButton(), &QAbstractButton::toggled,
+			cw->menuButton(), &QAbstractButton::setChecked);
+		connect(cw->menuButton(), &QAbstractButton::toggled,
+			cw->nameButton(), &QAbstractButton::setChecked);
 
 		if (i == 0) {
 			cw->menuButton()->setChecked(true);
@@ -519,6 +526,9 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 	phase->setFrequency(ptr->frequency);
 
 	readPreferences();
+
+	// Reduce the extent of the yLeft axis because it is not needed
+	plot->axisWidget(QwtPlot::yLeft)->scaleDraw()->setMinimumExtent(65);
 }
 
 SignalGenerator::~SignalGenerator()
@@ -1791,7 +1801,6 @@ void adiscope::SignalGenerator::channelWidgetMenuToggled(bool checked)
 {
 	ChannelWidget *cw = static_cast<ChannelWidget *>(QObject::sender());
 
-	currentChannel = cw->id();
 	plot->setActiveVertAxis(cw->id());
 
 	triggerRightMenuToggle(cw->id(), checked);
@@ -1915,6 +1924,7 @@ void adiscope::SignalGenerator::rightMenuFinished(bool opened)
 		int chIdx = pair.first;
 		bool open = pair.second;
 
+		currentChannel = chIdx;
 		updateAndToggleMenu(chIdx, open);
 	}
 }

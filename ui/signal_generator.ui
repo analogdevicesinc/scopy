@@ -154,16 +154,16 @@ QPushButton:disabled {
             <number>0</number>
            </property>
            <property name="leftMargin">
-            <number>75</number>
+            <number>9</number>
            </property>
            <property name="topMargin">
-            <number>75</number>
+            <number>25</number>
            </property>
            <property name="rightMargin">
-            <number>75</number>
+            <number>9</number>
            </property>
            <property name="bottomMargin">
-            <number>75</number>
+            <number>9</number>
            </property>
           </layout>
          </widget>
@@ -669,7 +669,6 @@ QTabBar::tab:selected {
                          </property>
                          <property name="font">
                           <font>
-                           
                            <pointsize>10</pointsize>
                           </font>
                          </property>
@@ -701,7 +700,6 @@ QTabBar::tab:selected {
                         <widget class="QLabel" name="label_9">
                          <property name="font">
                           <font>
-                           
                            <pointsize>10</pointsize>
                           </font>
                          </property>
@@ -733,7 +731,6 @@ QTabBar::tab:selected {
                         <widget class="QLabel" name="label_7">
                          <property name="font">
                           <font>
-                           
                            <pointsize>10</pointsize>
                           </font>
                          </property>
