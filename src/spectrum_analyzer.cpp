@@ -902,16 +902,29 @@ void SpectrumAnalyzer::onChannelEnabled(bool en)
 
 	if (en) {
 		fft_plot->AttachCurve(cw->id());
+		if (!ui->btnMarkers->isEnabled()) {
+			ui->btnMarkers->blockSignals(true);
+			ui->btnMarkers->setEnabled(true);
+			ui->btnMarkers->blockSignals(false);
+		}
 	} else {
+		bool allDisabled = true;
 		for (int i = 0; i < channels.size(); i++) {
 			ChannelWidget *cw = channels[i]->widget();
 
 			if (cw->enableButton()->isChecked()) {
 				cw->nameButton()->setChecked(true);
+				allDisabled = false;
 				break;
 			}
 		}
-
+		if (allDisabled) {
+			ui->btnMarkers->blockSignals(true);
+			ui->btnMarkers->setChecked(false);
+			ui->btnMarkers->setDisabled(true);
+			ui->btnMarkers->blockSignals(false);
+			marker_menu_opened = false;
+		}
 		fft_plot->DetachCurve(cw->id());
 	}
 
