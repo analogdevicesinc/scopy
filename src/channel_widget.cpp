@@ -27,6 +27,7 @@ ChannelWidget::ChannelWidget(int id, bool deletable, bool simplified,
 	m_ref(false)
 {
 	init();
+	nameButton()->installEventFilter(this);
 }
 
 ChannelWidget::~ChannelWidget()
@@ -176,6 +177,27 @@ bool ChannelWidget::isReferenceChannel() const
 void ChannelWidget::setReferenceChannel(const bool &ref)
 {
 	m_ref = ref;
+}
+
+bool ChannelWidget::eventFilter(QObject *object, QEvent *event)
+{
+	if (event->type() == QEvent::MouseButtonPress) {
+		if (!m_ui->box->isChecked()) {
+			m_ui->box->setChecked(true);
+			m_ui->name->setChecked(true);
+		} else if (!m_ui->btn->isChecked() &&
+			   m_ui->name->isChecked()){
+			m_ui->btn->setChecked(true);
+		}
+	} else if (event->type() == QEvent::MouseButtonDblClick) {
+		if (!m_ui->box->isChecked()) {
+			m_ui->box->setChecked(true);
+			m_ui->name->setChecked(true);
+		}
+		m_ui->btn->setChecked(true);
+	}
+
+	return QObject::eventFilter(object, event);
 }
 
 void ChannelWidget::on_box_toggled(bool checked)

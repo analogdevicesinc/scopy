@@ -45,6 +45,9 @@ public:
 	bool isReferenceChannel() const;
 	void setReferenceChannel(const bool&);
 
+protected:
+	bool eventFilter(QObject *object, QEvent *event) override;
+
 Q_SIGNALS:
 	void enabled(bool en);
 	void selected(bool on);
