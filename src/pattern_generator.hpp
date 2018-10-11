@@ -31,6 +31,7 @@
 #include "pg_channel_manager.hpp"
 #include "pg_buffer_manager.hpp"
 #include "tool.hpp"
+#include "scroll_filter.hpp"
 
 
 extern "C" {
@@ -120,6 +121,7 @@ private:
 	Ui::PatternGenerator *ui;
 	Ui::PGSettings *pgSettings;
 	Ui::PGCGSettings *cgSettings;
+	MouseWheelWidgetGuard* wheelEventGuard;
 
 	QButtonGroup *settings_group;
 

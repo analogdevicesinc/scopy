@@ -152,7 +152,8 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 	pgSettings(new Ui::PGSettings),
 	cgSettings(new Ui::PGCGSettings),
 	txbuf(0), buffer_created(0), currentUI(nullptr), offline_mode(offline_mode_),
-	diom(diom), suppressCGSettingsUpdate(false), no_channels(16), selected_channel_group(0), dev(nullptr)
+	diom(diom), suppressCGSettingsUpdate(false), no_channels(16), selected_channel_group(0), dev(nullptr),
+	wheelEventGuard(nullptr)
 {
 	// IIO
 	if (!offline_mode) {
@@ -294,6 +295,11 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 	ui->btnPGSettings->setVisible(false);
 	setPGStatus(STOPPED);
 	settingsLoaded();
+
+	if (!wheelEventGuard) {
+		wheelEventGuard = new MouseWheelWidgetGuard(ui->plotWidget);
+	}
+	wheelEventGuard->installEventRecursively(ui->plotWidget);
 
 }
 
@@ -621,6 +627,8 @@ void PatternGenerator::createSettingsWidget()
 	currentUI->get_pattern()->init();
 	currentUI->post_load_ui();
 	currentUI->setVisible(true);
+
+
 
 	connect(currentUI,SIGNAL(decoderChanged()),chmui,SLOT(triggerUpdateUiNoSettings()));
 
