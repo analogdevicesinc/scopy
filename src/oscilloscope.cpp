@@ -2986,7 +2986,9 @@ void Oscilloscope::update_chn_settings_panel(int id)
 	voltsPerDiv->setValue(plot.VertUnitsPerDiv(id));
 	connect(voltsPerDiv, SIGNAL(valueChanged(double)),
 		SLOT(onVertScaleValueChanged(double)));
+	voltsPosition->blockSignals(true);
 	voltsPosition->setValue(-plot.VertOffset(id));
+	voltsPosition->blockSignals(false);
 
 	QString name = chn_widget->fullName();
 	ch_ui->label_channelName->setText(name);
