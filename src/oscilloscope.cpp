@@ -699,6 +699,10 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		ui->btnTrigger->setChecked(false);
 	}
 
+	connect(this, &Tool::detachedState,
+		this, &Oscilloscope::toolDetached);
+	min_detached_width = this->minimumWidth();
+	toolDetached(false);
 }
 
 void Oscilloscope::init_buffer_scrolling()
@@ -1267,6 +1271,19 @@ void Oscilloscope::toggleCursorsMode(bool toggled)
 
 	cr_ui->btnLockVertical->setEnabled(toggled);
 	plot.trackModeEnabled(toggled);
+}
+
+void Oscilloscope::toolDetached(bool detached)
+{
+	if (detached) {
+		this->setMinimumWidth(min_detached_width);
+		this->setSizePolicy(QSizePolicy::Preferred,
+				    QSizePolicy::MinimumExpanding);
+	} else {
+		this->setMinimumWidth(0);
+		this->setSizePolicy(QSizePolicy::MinimumExpanding,
+				    QSizePolicy::MinimumExpanding);
+	}
 }
 
 void Oscilloscope::pause(bool paused)

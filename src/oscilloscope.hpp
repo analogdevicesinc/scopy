@@ -213,6 +213,7 @@ namespace adiscope {
 		void onFilledScreen(bool, unsigned int);
 
 		void toggleCursorsMode(bool toggled);
+		void toolDetached(bool);
 	public Q_SLOTS:
 		void requestAutoset();
 		void enableLabels(bool);
@@ -238,6 +239,7 @@ namespace adiscope {
 		double horiz_offset;
 		bool reset_horiz_offset;
 		double time_trigger_offset;
+		int min_detached_width;
 
 		int autosetMaxIndexAmpl;
 		int autosetFFTIndex;
