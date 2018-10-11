@@ -407,6 +407,8 @@ bool SpinBoxA::eventFilter(QObject *obj, QEvent *event)
 				stepDown();
 				return true;
 			}
+		} else if (event->type() == QEvent::FocusOut) {
+			setValue(m_value);
 		}
 	}
 
