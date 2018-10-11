@@ -916,7 +916,9 @@ void SpectrumAnalyzer::onChannelEnabled(bool en)
 	}
 
 	for (int i = 0; i < fft_plot->markerCount(cw->id()); i++) {
-		fft_plot->setMarkerVisible(cw->id(), i, en);
+		if (fft_plot->markerEnabled(cw->id(), i)) {
+			fft_plot->setMarkerVisible(cw->id(), i, en);
+		}
 	}
 
 
