@@ -1793,6 +1793,7 @@ void adiscope::SignalGenerator::triggerRightMenuToggle(int chIdx, bool checked)
 		        QPair<int, bool>(chIdx, checked));
 	} else {
 		phaseIndexChanged();
+		currentChannel = chIdx;
 		updateAndToggleMenu(chIdx, checked);
 	}
 }
