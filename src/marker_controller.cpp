@@ -167,6 +167,8 @@ const QwtPlot *MarkerController::plot() const
 
 void MarkerController::selectMarker(marker_sptr marker)
 {
-	d_selected_mkr = marker;
-	Q_EMIT markerSelected(marker);
+	if (marker->isVisible()) {
+		d_selected_mkr = marker;
+		Q_EMIT markerSelected(marker);
+	}
 }
