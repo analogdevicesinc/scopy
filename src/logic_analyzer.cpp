@@ -1903,6 +1903,9 @@ void LogicAnalyzer::runModeChanged(bool repeated)
         bool en;
         bool shouldUpdate = d_timeTriggerHandle->position() == 0;
 
+	bool isRunning = running;
+	if(isRunning)
+		startStop(false);
         if (repeated) {
                 acquisition_mode = REPEATED;
 
@@ -1931,6 +1934,9 @@ void LogicAnalyzer::runModeChanged(bool repeated)
         }
         frequencySpinButton->setEnabled(!repeated);
         chm_ui->set_streaming_mode(en);
+
+	if(isRunning)
+		startStop(true);
 }
 
 void LogicAnalyzer::validateSamplingFrequency(double value)
