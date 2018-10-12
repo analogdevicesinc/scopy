@@ -442,7 +442,7 @@ pair<Timestamp, Timestamp> View::get_time_extents() const
 	if (!left_time || !right_time)
 		return make_pair(0, 0);
 
-	assert(*left_time < *right_time);
+//	assert(*left_time < *right_time);
 	return make_pair(*left_time, *right_time);
 }
 

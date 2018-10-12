@@ -289,7 +289,7 @@ void LogicSegment::append_payload_to_mipmap(uint64_t prev_active)
 
 uint64_t LogicSegment::get_sample(uint64_t index) const
 {
-	assert(index < sample_count_);
+//	assert(index < sample_count_);
 
 	return unpack_sample((uint8_t*)data_.data() + index * unit_size_);
 }

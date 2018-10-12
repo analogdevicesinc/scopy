@@ -145,8 +145,11 @@ void BinaryStream::run()
                 }
 
                 lock_guard<recursive_mutex> lock(data_mutex_);
-                if(data_)
+		if(data_)
+		{
                         nbytes_rx = iio_buffer_refill(data_);
+			std::this_thread::sleep_for(std::chrono::milliseconds(5)); // implement soft holdoff of 5ms
+		}
 
                 if( nbytes_rx > 0 ) {
                         if( actual_buffersize != buffersize_ ) {

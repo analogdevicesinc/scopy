@@ -2016,6 +2016,9 @@ void LogicAnalyzerChannelManagerUI::setupGroupedChannel(LogicAnalyzerChannelGrou
 
 void LogicAnalyzerChannelManagerUI::update_ui()
 {
+	bool isRunning = la->isRunning();
+	if(isRunning)
+		la->startStop(false);
 	for (auto ch : chg_ui) {
 		ch->hide();
 		// prevent hovering after the channel is deleted
@@ -2093,6 +2096,8 @@ void LogicAnalyzerChannelManagerUI::update_ui()
 	if(!eventFilterGuard)
 		eventFilterGuard = new MouseWheelWidgetGuard(this);
 	eventFilterGuard->installEventRecursively(this);
+	if(isRunning)
+		la->startStop(true);
 }
 
 void LogicAnalyzerChannelManagerUI::remove_trace_clones()

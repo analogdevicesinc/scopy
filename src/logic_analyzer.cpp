@@ -970,7 +970,13 @@ void LogicAnalyzer::onTriggerModeChanged(bool val)
 void LogicAnalyzer::onHorizScaleValueChanged(double value)
 {
 	zoomed_in = false;
+	bool isRunning = running;
+	if(isRunning)
+		startStop(false);
 	configParams(value, active_timePos);
+
+	if(isRunning)
+		startStop(true);
 }
 
 void LogicAnalyzer::setSampleRate()
@@ -1024,6 +1030,11 @@ void LogicAnalyzer::setSamplerateLabelValue(double value)
 {
 	d_sampleRateLabelVal = value;
 	updateBuffersizeSamplerateLabel(d_bufferSizeLabelVal, value);
+}
+
+bool LogicAnalyzer::isRunning() const
+{
+	return running;
 }
 
 void LogicAnalyzer::onRulerChanged(double ruler_value, bool silent)

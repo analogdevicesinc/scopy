@@ -123,9 +123,9 @@ public:
 	void setCurrent_acquisition_mode(int value);
 	QString saveToFile();
 	std::vector<std::string> get_iio_trigger_options();
+	bool isRunning() const;
 
 private Q_SLOTS:
-	void startStop(bool start);
 	void toggleRightMenu(bool);
 	void rightMenuFinished(bool opened);
 	void toggleLeftMenu(bool val);
@@ -158,6 +158,7 @@ private Q_SLOTS:
 	void checkEnabledChannels();
 	void toolDetached(bool);
 public Q_SLOTS:
+	void startStop(bool start);
 	void onTimeTriggerHandlePosChanged(int);
 	void onTimePositionSpinboxChanged(double value);
 	void refreshTriggerPos(int);

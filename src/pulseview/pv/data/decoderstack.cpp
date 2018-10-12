@@ -329,7 +329,9 @@ optional<int64_t> DecoderStack::wait_for_data() const
 		(samples_decoded_ >= sample_count_) &&
 		(session_.get_capture_state() != Session::Stopped)) {
 
-		input_cond_.wait(input_lock);
+		//input_cond_.wait(input_lock);
+		std::chrono::milliseconds t(10);
+		input_cond_.wait_for(input_lock,t);
 	}
 
 	// Return value is valid if we're not aborting the decode,
