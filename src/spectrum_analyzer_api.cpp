@@ -160,12 +160,14 @@ bool SpectrumMarker_API::enabled()
 
 void SpectrumMarker_API::setEnabled(bool en)
 {
+	bool enabled = sp->channels[m_chid]->widget()->enableButton()->isChecked();
+	sp->channels[m_chid]->widget()->enableButton()->setChecked(true);
 	sp->channels[m_chid]->widget()->nameButton()->setChecked(true);
-	sp->channels[m_chid]->widget()->selected(true);
 	sp->fft_plot->setMarkerEnabled(m_chid,m_mkid,en);
 	sp->marker_selector->setButtonChecked(m_mkid, en);
 	sp->updateWidgetsRelatedToMarker(m_mkid);
 	sp->fft_plot->updateMarkerUi(m_chid, m_mkid);
+	sp->channels[m_chid]->widget()->enableButton()->setChecked(enabled);
 }
 
 bool SpectrumMarker_API::visible()

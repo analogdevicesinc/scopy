@@ -230,8 +230,6 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 		ch_api.append(new SpectrumChannel_API(this,channel));
 	}
 
-	channels_group->setExclusive(true);
-
 	if (num_adc_channels > 0)
 		channels[crt_channel_id]->widget()->nameButton()->
 		setChecked(true);
