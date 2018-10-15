@@ -463,8 +463,8 @@ void NetworkAnalyzer::updateNumSamples()
 
 	unsigned int num_samples = (unsigned int) samplesCount->value();
 
-    m_dBgraph.setNumSamples(num_samples);
-    m_phaseGraph.setNumSamples(num_samples);
+	m_dBgraph.setNumSamples(num_samples);
+	m_phaseGraph.setNumSamples(num_samples);
 	ui->xygraph->setNumSamples(num_samples);
 	ui->nicholsgraph->setNumSamples(num_samples);
 }
@@ -516,7 +516,7 @@ void NetworkAnalyzer::run()
 	double log10_max_freq = log10(max_freq);
 	double step;
 
-    bool is_log = ui->btnIsLog->isChecked();
+bool is_log = ui->btnIsLog->isChecked();
 	if (is_log)
 		step = (log10_max_freq - log10_min_freq) / (double)(steps - 1);
 	else
