@@ -443,6 +443,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	timer->setInterval(timer_timeout_ms);
 
 	chm_ui->setWidgetMinimumNrOfChars(ui->triggerStateLabel, 9);
+	chm.highlightChannel(chm.get_channel_group(0));
 	chm_ui->update_ui();
 	init_export_settings();
 	installWheelEventGuard();
