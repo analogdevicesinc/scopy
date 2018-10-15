@@ -760,7 +760,7 @@ void NetworkAnalyzer::startStop(bool pressed)
 size_t NetworkAnalyzer::get_sin_samples_count(const struct iio_device *dev,
 		unsigned long rate, double frequency)
 {
-	size_t max_buffer_size = 4 * 1024 * 1024 /
+	size_t max_buffer_size = 128 * 1024 /
 		(size_t) iio_device_get_sample_size(dev);
 	double ratio = (double) rate / frequency;
 	size_t size;
