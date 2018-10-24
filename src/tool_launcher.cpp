@@ -544,8 +544,10 @@ void ToolLauncher::updateListOfDevices(const QVector<QString>& uris)
 	int pos = 0;
 	while (pos < devices.size()) {
 		auto dev = devices.at(pos);
-		if (dev->connected())
+		if (dev->connected()) {
+			pos++;
 			continue;
+		}
 		QString uri = dev->uri();
 		if (uri.startsWith("usb:") && !uris.contains(uri)) {
 			ui->stackedWidget->removeWidget(dev->infoPage());
