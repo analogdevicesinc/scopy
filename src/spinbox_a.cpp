@@ -63,6 +63,7 @@ SpinBoxA::SpinBoxA(QWidget *parent) : QWidget(parent),
 	this->setStyleSheet(currentStylesheet + styleSheet);
 
 	ui->SBA_LineEdit->installEventFilter(this);
+	ui->SBA_CompletionCircle->installEventFilter(this);
 
 	connect(ui->SBA_Combobox, SIGNAL(currentIndexChanged(int)),
 	        SLOT(onComboboxIndexChanged(int)));
@@ -407,13 +408,37 @@ bool SpinBoxA::eventFilter(QObject *obj, QEvent *event)
 
 			if (wheelE->angleDelta().y() > 0) {
 				stepUp();
+				event->accept();
 				return true;
 			} else if (wheelE->angleDelta().y() < 0) {
 				stepDown();
+				event->accept();
 				return true;
 			}
 		} else if (event->type() == QEvent::FocusOut) {
 			setValue(m_value);
+
+		}
+	}
+
+	if (obj == ui->SBA_CompletionCircle) {
+		if (event->type() == QEvent::Enter) {
+			setCursor(Qt::SizeVerCursor);
+		} else if (event->type() == QEvent::Leave) {
+			setCursor(Qt::ArrowCursor);
+
+		} else if (event->type() == QEvent::Wheel) {
+			QWheelEvent *wheelE = static_cast<QWheelEvent *>(event);
+
+			if (wheelE->angleDelta().y() > 0) {
+				stepUp();
+				event->accept();
+				return true;
+			} else if (wheelE->angleDelta().y() < 0) {
+				stepDown();
+				event->accept();
+				return true;
+			}
 		}
 	}
 
