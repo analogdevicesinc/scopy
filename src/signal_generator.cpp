@@ -59,7 +59,8 @@
 #include <gnuradio/blocks/vector_sink_s.h>
 #include <gnuradio/blocks/null_source.h>
 #include <gnuradio/iio/device_sink.h>
-#include <gnuradio/iio/math.h>
+#include <gnuradio/scopy/math.h>
+#include <gnuradio/scopy/trapezoidal.h>
 #include <matio.h>
 
 #include <iio.h>
@@ -1793,8 +1794,8 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
 				int full_periods=(int)((double)zoomT1OnScreen*ptr->math_freq);
 				double phase_in_time = zoomT1OnScreen - full_periods/ptr->math_freq;
 				phase = (phase_in_time*ptr->math_freq) * 360.0;
-				auto src = iio::iio_math_gen::make(samp_rate,
-				                                   ptr->math_freq, str);
+				auto src = scopy::iio_math_gen::make(samp_rate,
+								   ptr->math_freq, str);
 
 				uint64_t to_skip = samp_rate * phase / (ptr->math_freq * 360.0);
 				auto skip_head = blocks::skiphead::make(sizeof(float),(uint64_t)to_skip);
@@ -1802,8 +1803,8 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
 				generated_wave = skip_head;
 
 			} else {
-				generated_wave = iio::iio_math_gen::make(samp_rate,
-				                               ptr->math_freq, str);
+				generated_wave = scopy::iio_math_gen::make(samp_rate,
+							       ptr->math_freq, str);
 			}
 			break;
 		}

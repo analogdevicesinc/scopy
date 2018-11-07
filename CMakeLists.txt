@@ -110,11 +110,12 @@ find_package(Qt5Svg REQUIRED)
 find_package(Qt5UiTools REQUIRED)
 find_package(Qt5Xml REQUIRED)
 
-set(GR_REQUIRED_COMPONENTS RUNTIME ANALOG BLOCKS FFT FILTER IIO VOLK PMT)
+set(GR_REQUIRED_COMPONENTS RUNTIME ANALOG BLOCKS FFT FILTER IIO VOLK PMT SCOPY)
 find_package(Gnuradio PATHS "c:/Program Files/gnuradio/lib/cmake/gnuradio" REQUIRED)
 
 
 GR_MODULE(IIO gnuradio-iio gnuradio/iio/api.h gnuradio-iio)
+GR_MODULE(SCOPY gr-scopy gnuradio/scopy/api.h gnuradio-scopy)
 
 add_definitions(-DBOOST_ALL_DYN_LINK)
 find_package(Boost "1.53" COMPONENTS system filesystem thread REQUIRED)
@@ -151,6 +152,7 @@ include_directories(
 	${Qt5Svg_INCLUDE_DIRS}
 	${Qt5Xml_INCLUDE_DIRS}
 	${IIO_INCLUDE_DIRS}
+	${SCOPY_INCLUDE_DIRS}
 	${LIBSIGROK_DECODE_INCLUDE_DIRS}
 	${LIBSIGROKCXX_INCLUDE_DIRS}
 	${LIBSIGROK_INCLUDE_DIRS}
