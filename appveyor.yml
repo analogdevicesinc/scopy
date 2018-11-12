@@ -18,15 +18,20 @@ install:
     - C:\msys64\usr\bin\bash -lc "pacman -U --noconfirm http://repo.msys2.org/mingw/x86_64/mingw-w64-x86_64-icu-debug-libs-58.2-3-any.pkg.tar.xz"
 
     # Update to GCC 6.2 and install dependencies
-    - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -Sy mingw-w64-i686-gcc mingw-w64-i686-libusb mingw-w64-i686-boost mingw-w64-i686-python3 mingw-w64-i686-fftw mingw-w64-i686-libzip mingw-w64-i686-glibmm mingw-w64-i686-matio"
-    - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -Sy mingw-w64-x86_64-gcc mingw-w64-x86_64-libusb mingw-w64-x86_64-boost mingw-w64-x86_64-python3 mingw-w64-x86_64-fftw mingw-w64-x86_64-libzip mingw-w64-x86_64-glibmm mingw-w64-x86_64-matio"
+    - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -Sy mingw-w64-i686-gcc  mingw-w64-i686-boost mingw-w64-i686-python3 mingw-w64-i686-fftw mingw-w64-i686-libzip mingw-w64-i686-glibmm mingw-w64-i686-matio"
+    - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -Sy mingw-w64-x86_64-gcc mingw-w64-x86_64-boost mingw-w64-x86_64-python3 mingw-w64-x86_64-fftw mingw-w64-x86_64-libzip mingw-w64-x86_64-glibmm mingw-w64-x86_64-matio"
 
     # Install an older version of Qt due to uic.exe issues
     - C:\msys64\usr\bin\bash -lc "wget -q http://repo.msys2.org/mingw/x86_64/mingw-w64-x86_64-qt5-5.9.1-1-any.pkg.tar.xz"
     - C:\msys64\usr\bin\bash -lc "pacman -U --force --noconfirm mingw-w64-x86_64-qt5-5.9.1-1-any.pkg.tar.xz"
     - C:\msys64\usr\bin\bash -lc "wget -q http://repo.msys2.org/mingw/i686/mingw-w64-i686-qt5-5.9.1-1-any.pkg.tar.xz"
     - C:\msys64\usr\bin\bash -lc "pacman -U --force --noconfirm mingw-w64-i686-qt5-5.9.1-1-any.pkg.tar.xz"
+    - C:\msys64\usr\bin\bash -lc "wget -q http://repo.msys2.org/mingw/i686/mingw-w64-i686-libusb-1.0.21-2-any.pkg.tar.xz"
+    - C:\msys64\usr\bin\bash -lc "pacman -U --force --noconfirm mingw-w64-i686-libusb-1.0.21-2-any.pkg.tar.xz"
 
+    - C:\msys64\usr\bin\bash -lc "wget -q http://repo.msys2.org/mingw/x86_64/mingw-w64-x86_64-libusb-1.0.21-2-any.pkg.tar.xz"
+    - C:\msys64\usr\bin\bash -lc "pacman -U --force --noconfirm mingw-w64-x86_64-libusb-1.0.21-2-any.pkg.tar.xz"
+ 
     # Install 32-bit pre-compiled libraries
     - 'appveyor DownloadFile "https://ci.appveyor.com/api/projects/analogdevicesinc/scopy-mingw-build-deps/artifacts/scopy-mingw32-build-deps.tar.xz?branch=master&job=Environment: MINGW_VERSION=mingw32, ARCH=i686" -FileName C:\scopy-mingw32-build-deps.tar.xz'
     - C:\msys64\usr\bin\bash -lc "cd /c ; tar xJf scopy-mingw32-build-deps.tar.xz"
@@ -60,7 +65,7 @@ build_script:
     - C:\msys64\usr\bin\bash -lc "cp -r /c/projects/scopy/resources/decoders  /c/scopy_64/"
 
     - C:\msys64\usr\bin\bash -lc "tar -C /c/scopy_64 --strip-components=3 -xJf /c/scopy-mingw64-build-deps.tar.xz msys64/mingw64/bin"
-    - C:\msys64\usr\bin\bash -lc "cd /mingw64/bin ; cp -r libmatio-*.dll libhdf5-*.dll libszip*.dll libwinpthread-*.dll libgcc_*.dll libstdc++-*.dll libboost_{system,filesystem,atomic,program_options,regex,thread}-*.dll libglib-*.dll libintl-*.dll libiconv-*.dll libpcre-*.dll libpcre16-*.dll libglibmm-2.*.dll libgmodule-2.*.dll libgobject-2.*.dll libffi-*.dll libsigc-2.*.dll libfftw3f-*.dll libicu{in,uc,dt}[!d]*.dll zlib*.dll libharfbuzz-*.dll libfreetype-*.dll libbz2-*.dll libpng16-*.dll libgraphite2.dll libjpeg-*.dll libsqlite3-*.dll libwebp-*.dll libxml2-*.dll liblzma-*.dll libxslt-*.dll libzip*.dll libpython3.*.dll libeay32.dll libgnutls*.dll libnettle*.dll libhogweed*.dll libgmp*.dll libidn*.dll libp11*.dll libtasn*.dll libunistring*.dll ssleay32.dll libusb-*.dll /mingw64/lib/python3.* /c/scopy_64/"
+    - C:\msys64\usr\bin\bash -lc "cd /mingw64/bin ; cp -r libmatio-*.dll libhdf5-*.dll libszip*.dll libwinpthread-*.dll libgcc_*.dll libstdc++-*.dll libboost_{system,filesystem,atomic,program_options,regex,thread}-*.dll libglib-*.dll libintl-*.dll libiconv-*.dll libpcre-*.dll libpcre16-*.dll libglibmm-2.*.dll libgmodule-2.*.dll libgobject-2.*.dll libffi-*.dll libsigc-2.*.dll libfftw3f-*.dll libicu{in,uc,dt}[!d]*.dll zlib*.dll libharfbuzz-*.dll libfreetype-*.dll libbz2-*.dll libpng16-*.dll libgraphite2.dll libjpeg-*.dll libsqlite3-*.dll libwebp-*.dll libxml2-*.dll liblzma-*.dll libxslt-*.dll libzip*.dll libpython3.*.dll libgnutls*.dll libnettle*.dll libhogweed*.dll libgmp*.dll libidn*.dll libp11*.dll libtasn*.dll libunistring*.dll libusb-*.dll /mingw64/lib/python3.* /c/scopy_64/"
 
     - 7z a "c:\scopy-64bit.zip" c:\scopy_64
     - appveyor PushArtifact c:\scopy-64bit.zip
@@ -77,7 +82,7 @@ build_script:
     - C:\msys64\usr\bin\bash -lc "cp -r /c/projects/scopy/resources/decoders  /c/scopy_32/"
 
     - C:\msys64\usr\bin\bash -lc "tar -C /c/scopy_32 --strip-components=3 -xJf /c/scopy-mingw32-build-deps.tar.xz msys64/mingw32/bin"
-    - C:\msys64\usr\bin\bash -lc "cd /mingw32/bin ; cp -r libmatio-*.dll libhdf5-*.dll libszip*.dll libwinpthread-*.dll libgcc_*.dll libstdc++-*.dll libboost_{system,filesystem,atomic,program_options,regex,thread}-*.dll libglib-*.dll libintl-*.dll libiconv-*.dll libpcre-*.dll libpcre16-*.dll libglibmm-2.*.dll libgmodule-2.*.dll libgobject-2.*.dll libffi-*.dll libsigc-2.*.dll libfftw3f-*.dll libicu{in,uc,dt}[!d]*.dll zlib*.dll libharfbuzz-*.dll libfreetype-*.dll libbz2-*.dll libpng16-*.dll libgraphite2.dll libjpeg-*.dll libsqlite3-*.dll libwebp-*.dll libxml2-*.dll liblzma-*.dll libxslt-*.dll libzip*.dll libpython3.*.dll libeay32.dll libgnutls*.dll libnettle*.dll libhogweed*.dll libgmp*.dll libidn*.dll libp11*.dll libtasn*.dll libunistring*.dll ssleay32.dll libusb-*.dll /mingw32/lib/python3.* /c/scopy_32/"
+    - C:\msys64\usr\bin\bash -lc "cd /mingw32/bin ; cp -r libmatio-*.dll libhdf5-*.dll libszip*.dll libwinpthread-*.dll libgcc_*.dll libstdc++-*.dll libboost_{system,filesystem,atomic,program_options,regex,thread}-*.dll libglib-*.dll libintl-*.dll libiconv-*.dll libpcre-*.dll libpcre16-*.dll libglibmm-2.*.dll libgmodule-2.*.dll libgobject-2.*.dll libffi-*.dll libsigc-2.*.dll libfftw3f-*.dll libicu{in,uc,dt}[!d]*.dll zlib*.dll libharfbuzz-*.dll libfreetype-*.dll libbz2-*.dll libpng16-*.dll libgraphite2.dll libjpeg-*.dll libsqlite3-*.dll libwebp-*.dll libxml2-*.dll liblzma-*.dll libxslt-*.dll libzip*.dll libpython3.*.dll libgnutls*.dll libnettle*.dll libhogweed*.dll libgmp*.dll libidn*.dll libp11*.dll libtasn*.dll libunistring*.dll libusb-*.dll /mingw32/lib/python3.* /c/scopy_32/"
 
     - 7z a "c:\scopy-32bit.zip" c:\scopy_32
     - appveyor PushArtifact c:\scopy-32bit.zip
