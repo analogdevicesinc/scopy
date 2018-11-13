@@ -98,6 +98,7 @@ dBgraph::dBgraph(QWidget *parent) : QwtPlot(parent),
 	plotLayout()->setAlignCanvasToScales(true);
 
 	curve.attach(this);
+	curve.setRenderHint(QwtPlotItem::RenderAntialiased);
 	curve.setXAxis(QwtPlot::xTop);
 	curve.setYAxis(QwtPlot::yLeft);
 
