@@ -25,12 +25,11 @@
 
 /* GNU Radio includes */
 #include <gnuradio/blocks/short_to_float.h>
-#include <gnuradio/iio/device_source.h>
+#include <iio/device_source.h>
 #include <gnuradio/blocks/complex_to_mag_squared.h>
 #include <gnuradio/blocks/keep_one_in_n.h>
-#include <gnuradio/blocks/vector_sink_f.h>
-#include <gnuradio/blocks/multiply_const_ff.h>
-#include <gnuradio/analog/rail_ff.h>
+#include <gnuradio/blocks/vector_sink.h>
+
 
 /* Qt includes */
 #include <QPair>

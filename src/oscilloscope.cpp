@@ -24,7 +24,7 @@
 /* GNU Radio includes */
 #include <gnuradio/blocks/float_to_complex.h>
 #include <gnuradio/scopy/math.h>
-#include <gnuradio/blocks/sub_ff.h>
+#include <gnuradio/blocks/sub.h>
 #include <gnuradio/filter/iir_filter_ffd.h>
 #include <gnuradio/blocks/nlog10_ff.h>
 #include <gnuradio/blocks/head.h>

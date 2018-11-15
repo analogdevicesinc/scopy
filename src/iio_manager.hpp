@@ -24,7 +24,7 @@
 #include <QObject>
 
 #include <gnuradio/top_block.h>
-#include <gnuradio/iio/device_source.h>
+#include <iio/device_source.h>
 #include <gnuradio/blocks/copy.h>
 #include <gnuradio/blocks/float_to_complex.h>
 #include <frequency_compensation_filter.h>

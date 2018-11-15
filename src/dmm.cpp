@@ -27,10 +27,10 @@
 #include "utils.h"
 
 #include <gnuradio/blocks/keep_one_in_n.h>
-#include <gnuradio/blocks/moving_average_ff.h>
+#include <gnuradio/blocks/moving_average.h>
 #include <gnuradio/blocks/rms_ff.h>
 #include <gnuradio/blocks/short_to_float.h>
-#include <gnuradio/blocks/sub_ff.h>
+#include <gnuradio/blocks/sub.h>
 #include <gnuradio/filter/dc_blocker_ff.h>
 
 #include <boost/make_shared.hpp>
