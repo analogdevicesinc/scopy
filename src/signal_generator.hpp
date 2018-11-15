@@ -78,7 +78,7 @@ enum sg_waveform {
 	SG_SIN_WAVE = gr::analog::GR_SIN_WAVE,
 	SG_SQR_WAVE = gr::analog::GR_SQR_WAVE,
 	SG_TRI_WAVE = gr::analog::GR_TRI_WAVE,
-	SG_TRA_WAVE = gr::analog::GR_TRA_WAVE,
+	SG_TRA_WAVE = 109,
 	SG_SAW_WAVE = gr::analog::GR_SAW_WAVE,
 	SG_INV_SAW_WAVE = 108,
 

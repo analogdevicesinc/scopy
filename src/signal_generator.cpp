@@ -34,31 +34,31 @@
 #include <QSharedPointer>
 #include <QElapsedTimer>
 
-#include <gnuradio/analog/sig_source_f.h>
+#include <gnuradio/analog/sig_source.h>
 #include <gnuradio/analog/sig_source_waveform.h>
-#include <gnuradio/analog/noise_source_f.h>
+#include <gnuradio/analog/noise_source.h>
 #include <gnuradio/analog/noise_type.h>
 #include <gnuradio/analog/rail_ff.h>
 #include <gnuradio/blocks/delay.h>
 #include <gnuradio/blocks/file_source.h>
-#include <gnuradio/blocks/vector_source_f.h>
+#include <gnuradio/blocks/vector_source.h>
 #include <gnuradio/blocks/wavfile_source.h>
 #include <gnuradio/blocks/float_to_short.h>
 #include <gnuradio/blocks/head.h>
 #include <gnuradio/blocks/null_sink.h>
 #include <gnuradio/blocks/int_to_float.h>
 #include <gnuradio/blocks/throttle.h>
-#include <gnuradio/blocks/multiply_const_ff.h>
+#include <gnuradio/blocks/multiply_const.h>
 #include <gnuradio/blocks/add_const_ff.h>
-#include <gnuradio/blocks/add_ff.h>
+#include <gnuradio/blocks/add_blk.h>
 #include <gnuradio/blocks/repeat.h>
 #include <gnuradio/blocks/keep_one_in_n.h>
 #include <gnuradio/blocks/nop.h>
 #include <gnuradio/blocks/copy.h>
 #include <gnuradio/blocks/skiphead.h>
-#include <gnuradio/blocks/vector_sink_s.h>
+#include <gnuradio/blocks/vector_sink.h>
 #include <gnuradio/blocks/null_source.h>
-#include <gnuradio/iio/device_sink.h>
+#include <iio/device_sink.h>
 #include <gnuradio/scopy/math.h>
 #include <gnuradio/scopy/trapezoidal.h>
 #include <matio.h>
@@ -1511,14 +1511,6 @@ basic_block_sptr SignalGenerator::getSignalSource(gr::top_block_sptr top,
 		phase=phase+360.0;
 	}
 
-	if(data.waveform==SG_SIN_WAVE)
-		waveform=analog::GR_SIN_WAVE;
-	else
-		waveform=analog::GR_TRA_WAVE;
-
-	boost::shared_ptr<analog::sig_source_f> src = analog::sig_source_f::make(samp_rate, waveform,
-					      data.frequency, amplitude, offset,phase*0.01745329);
-
 	switch(data.waveform)
 	{
 	case SG_SQR_WAVE:
@@ -1550,7 +1542,15 @@ basic_block_sptr SignalGenerator::getSignalSource(gr::top_block_sptr top,
 		break;
 	}
 
-	src->set_tra_params(rise,holdh,fall,holdl);
+	basic_block_sptr src = nullptr;
+	if(data.waveform==SG_SIN_WAVE)
+		src = analog::sig_source_f::make(samp_rate, analog::GR_SIN_WAVE,
+			data.frequency, amplitude, offset, phase*0.01745329);
+	else
+		src = scopy::trapezoidal::make(samp_rate, data.frequency, amplitude,
+					       rise, holdh, fall, holdl, offset,
+					       phase*0.01745329);
+
 	return src;
 
 }

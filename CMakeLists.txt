@@ -110,12 +110,12 @@ find_package(Qt5Svg REQUIRED)
 find_package(Qt5UiTools REQUIRED)
 find_package(Qt5Xml REQUIRED)
 
-set(GR_REQUIRED_COMPONENTS RUNTIME ANALOG BLOCKS FFT FILTER IIO VOLK PMT SCOPY)
+find_package(Gnuradio "3.8" REQUIRED COMPONENTS runtime analog blocks fft filter volk pmt scopy iio)
 find_package(Gnuradio PATHS "c:/Program Files/gnuradio/lib/cmake/gnuradio" REQUIRED)
-
-
-GR_MODULE(IIO gnuradio-iio gnuradio/iio/api.h gnuradio-iio)
-GR_MODULE(SCOPY gr-scopy gnuradio/scopy/api.h gnuradio-scopy)
+set(CMAKE_PREFIX_PATH /usr/local/lib/cmake/iio)
+find_package(gnuradio-iio)
+set(CMAKE_PREFIX_PATH /usr/local/lib/cmake/scopy)
+find_package(gnuradio-scopy)
 
 add_definitions(-DBOOST_ALL_DYN_LINK)
 find_package(Boost "1.53" COMPONENTS system filesystem thread REQUIRED)
@@ -139,9 +139,8 @@ pkg_check_modules(SIGCPP REQUIRED sigc++-2.0)
 pkg_check_modules(LIBSIGROK REQUIRED libsigrok)
 pkg_check_modules(LIBSIGROKCXX REQUIRED libsigrokcxx)
 pkg_check_modules(LIBSIGROK_DECODE REQUIRED libsigrokdecode)
-
+message(CMAKE_PATH ${CMAKE_INCLUDE_PATH})
 include_directories(
-	${GNURADIO_ALL_INCLUDE_DIRS}
 	${Boost_INCLUDE_DIRS}
 	${Qt5Widgets_INCLUDE_DIRS}
 	${Qt5Concurrent_INCLUDE_DIRS}
@@ -281,7 +280,14 @@ target_link_libraries(${PROJECT_NAME} LINK_PRIVATE
 		${Qt5Concurrent_LIBRARIES}
 		${Qt5Qml_LIBRARIES}
 		${Qt5UiTools_LIBRARIES}
-		${GNURADIO_ALL_LIBRARIES}
+                gnuradio::gnuradio-runtime
+                gnuradio::gnuradio-analog
+                gnuradio::gnuradio-blocks
+                gnuradio::gnuradio-fft
+                gnuradio::gnuradio-filter
+                gnuradio::gnuradio-pmt
+                gnuradio::gnuradio-iio
+                gnuradio::gnuradio-scopy
 		${Boost_LIBRARIES}
 		${QWT_LIBRARIES}
 		${QWTPOLAR_LIBRARIES}
