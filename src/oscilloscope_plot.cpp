@@ -704,11 +704,13 @@ void CapturePlot::onVoltageCursor2Moved(double value)
 void CapturePlot::onGateBar1PixelPosChanged(int pos)
 {
 	d_hGatingHandle1->setPositionSilenty(pos);
+	d_hGatingHandle2->setOtherCursorPosition(d_hGatingHandle1->position());
 }
 
 void CapturePlot::onGateBar2PixelPosChanged(int pos)
 {
 	d_hGatingHandle2->setPositionSilenty(pos);
+	d_hGatingHandle1->setOtherCursorPosition(d_hGatingHandle2->position());
 }
 
 void CapturePlot::onGateBar1Moved(double value)
