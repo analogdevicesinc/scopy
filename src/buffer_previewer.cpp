@@ -49,7 +49,9 @@ BufferPreviewer::BufferPreviewer(int pixelsPerPeriod, double wavePhase,
 	m_fullWaveNumPoints(1),
 	m_fullWavePoints(new QPointF[m_fullWaveNumPoints]),
 	m_rightBtnClick(false),
-	m_gatingEnabled(false)
+	m_gatingEnabled(false),
+	m_leftGateWidth(0),
+	m_rightGateWidth(0)
 {
 }
 

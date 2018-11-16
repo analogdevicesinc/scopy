@@ -69,7 +69,8 @@ CapturePlot::CapturePlot(QWidget *parent,
 	vertCursorsLocked(false),
 	d_horizCursorsEnabled(false),
 	d_vertCursorsEnabled(false),
-	d_bonusWidth(0)
+	d_bonusWidth(0),
+	d_gatingEnabled(false)
 {
 	setMinimumHeight(250);
 	setMinimumWidth(500);
@@ -720,8 +721,17 @@ void CapturePlot::onGateBar1Moved(double value)
 	leftGate->setRect(leftGateRect);
 
 	int n = Curve(d_selected_channel)->data()->size();
-	double maxTime = Curve(d_selected_channel)->data()->sample(n-1).x();
-	double minTime = Curve(d_selected_channel)->data()->sample(0).x();
+
+	double maxTime = 0;
+	double minTime = 0;
+
+	if (n == 0) {
+		maxTime = axisScaleDiv(xBottom).upperBound();
+		minTime = axisScaleDiv(xBottom).lowerBound();
+	} else {
+		maxTime = Curve(d_selected_channel)->data()->sample(n-1).x();
+		minTime = Curve(d_selected_channel)->data()->sample(0).x();
+	}
 
 	//data index to start measurement
 	int currentIndex = (value - minTime) / (maxTime-minTime) * n;
@@ -750,8 +760,17 @@ void CapturePlot::onGateBar2Moved(double value)
 	rightGate->setRect(rightGateRect);
 
 	int n = Curve(d_selected_channel)->data()->size();
-	double maxTime = Curve(d_selected_channel)->data()->sample(n-1).x();
-	double minTime = Curve(d_selected_channel)->data()->sample(0).x();
+
+	double maxTime = 0;
+	double minTime = 0;
+
+	if (n == 0) {
+		maxTime = axisScaleDiv(xBottom).upperBound();
+		minTime = axisScaleDiv(xBottom).lowerBound();
+	} else {
+		maxTime = Curve(d_selected_channel)->data()->sample(n-1).x();
+		minTime = Curve(d_selected_channel)->data()->sample(0).x();
+	}
 
 	//data index to end measurement
 	int currentIndex = (value - minTime) / (maxTime-minTime) * n;
