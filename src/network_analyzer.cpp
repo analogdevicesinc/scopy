@@ -768,8 +768,8 @@ size_t NetworkAnalyzer::get_sin_samples_count(const struct iio_device *dev,
 	if (ratio < 2.5)
 		return 0; /* rate too low */
 
-	if (rate <= 10000)
-		max_buffer_size = rate / 2; /* 500ms */
+//	if (rate <= 10000)
+//		max_buffer_size = rate / 2; /* 500ms */
 
 	size = (size_t) SignalGenerator::get_best_ratio(ratio,
 			(double) (max_buffer_size / 4), nullptr);
