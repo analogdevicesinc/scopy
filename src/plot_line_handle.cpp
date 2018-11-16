@@ -164,7 +164,7 @@ void PlotGateHandle::moveWithinParent(int x, int y)
 				/*move the handle only if it doens't hit the other handle */
 				move(x, this->y());
 			}
-			else if(x > m_otherCursorPos + 1.5*width() && m_alignLeft){
+			else if(x > m_otherCursorPos && m_alignLeft){
 				/*move the handle only if it doens't hit the other handle */
 				move(x,this->y());
 			}
