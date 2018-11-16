@@ -224,8 +224,8 @@ HistogramDisplayPlot::HistogramDisplayPlot(int nplots, QWidget* parent)
 
   setAxesCount(QwtPlot::xBottom, 2);
   horizAxes.resize(2);
-  PrefixFormatter *pf = new MetricPrefixFormatter();
-  pf->setTwoDecimalMode(true);
+  d_pf = new MetricPrefixFormatter();
+  d_pf->setTwoDecimalMode(true);
   for (int i = 0; i < 2; ++i) {
 	  horizAxes[i] = new PlotAxisConfiguration(QwtPlot::xBottom, i, this);
 	  configureAxis(QwtPlot::xBottom, i);
@@ -235,7 +235,7 @@ HistogramDisplayPlot::HistogramDisplayPlot(int nplots, QWidget* parent)
 			this, SLOT(_onXbottomAxisWidgetScaleDivChanged()));
 	  QwtScaleWidget *scaleWidget = axisWidget(QwtAxisId(QwtPlot::xBottom, i));
 	  OscScaleDraw* osd = dynamic_cast<OscScaleDraw*>(scaleWidget->scaleDraw());
-	  osd->setFormatter(pf);
+	  osd->setFormatter(d_pf);
 	  osd->setUnitType("V");
 	  osd->setFloatPrecision(2);
 	  osd->setColor(d_CurveColors[i]);
@@ -384,9 +384,14 @@ bool HistogramDisplayPlot::isZoomed()
 
 HistogramDisplayPlot::~HistogramDisplayPlot()
 {
-  for(int i = 0; i < d_nplots; i++)
-    delete[] d_ydata[i];
-  delete[] d_xdata;
+	for(int i = 0; i < d_nplots; i++) {
+		delete[] d_ydata[i];
+		delete horizAxes[i];
+		delete d_histograms[i];
+	}
+
+	delete d_pf;
+	delete[] d_xdata;
 
   // d_zoomer and _panner deleted when parent deleted
 }
