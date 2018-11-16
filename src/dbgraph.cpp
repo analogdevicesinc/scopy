@@ -33,15 +33,22 @@ void dBgraph::setupCursors()
 
 	d_vBar1 = new VertBar(this,true);
 	d_vBar2 = new VertBar(this,true);
+	d_plotBar = new VertBar(this, true);
 	d_symbolCtrl->attachSymbol(d_vBar1);
 	d_symbolCtrl->attachSymbol(d_vBar2);
+	d_symbolCtrl->attachSymbol(d_plotBar);
 
 	QPen cursorsLinePen = QPen(QColor(155,155,155),1,Qt::DashLine);
+	QPen plotLinePen = QPen(QColor(211, 211, 211, 50), 5, Qt::SolidLine);
 
 	d_vBar1->setPen(cursorsLinePen);
 	d_vBar2->setPen(cursorsLinePen);
 	d_vBar1->setVisible(false);
 	d_vBar2->setVisible(false);
+	d_plotBar->setVisible(false);
+
+	d_plotBar->setPen(plotLinePen);
+	d_plotBar->setMobileAxis(QwtPlot::xTop);
 
 	connect(d_vBar1, SIGNAL(pixelPositionChanged(int)),
 		SLOT(onVbar1PixelPosChanged(int)));
@@ -82,7 +89,9 @@ dBgraph::dBgraph(QWidget *parent) : QwtPlot(parent),
     ymin(10),
     ymax(10),
     d_cursorsEnabled(false),
-    d_cursorsCentered(false)
+    d_cursorsCentered(false),
+    d_plotPosition(0),
+    numSamples(0),
 {
 	enableAxis(QwtPlot::xBottom, false);
 	enableAxis(QwtPlot::xTop, true);
@@ -224,11 +233,27 @@ void dBgraph::setAxesTitles(const QString& x, const QString& y)
 
 void dBgraph::plot(double x, double y)
 {
-	if (xdata.size() == numSamples + 1)
-		return;
+	if (!d_plotBar->isVisible() && !xdata.size()) {
+		d_plotBar->setVisible(true);
+	}
 
-	xdata.push(x);
-	ydata.push(y);
+	if (xdata.size() == numSamples) {
+		xdata[d_plotPosition] = x;
+		ydata[d_plotPosition] = y;
+
+		// Advance to next point
+		d_plotPosition++;
+
+		// Return to first point when reaching the end
+		if (d_plotPosition == numSamples) {
+			d_plotPosition = 0;
+		}
+	} else {
+		xdata.push_back(x);
+		ydata.push_back(y);
+	}
+
+	d_plotBar->setPlotCoord(QPointF(x, d_plotBar->plotCoord().y()));
 
 	curve.setRawSamples(xdata.data(), ydata.data(), xdata.size());
 
@@ -283,11 +308,13 @@ const QwtScaleWidget *dBgraph::getAxisWidget(QwtAxisId id)
 
 void dBgraph::setNumSamples(int num)
 {
-	numSamples = num;
+	if (numSamples == num) {
+		return;
+	}
+
+	numSamples = (unsigned int) num;
 
 	reset();
-	ydata.reserve(numSamples + 1);
-	xdata.reserve(numSamples + 1);
 
 	replot();
 }
@@ -298,6 +325,7 @@ void dBgraph::reset()
 	ydata.clear();
 	markerIntersection1->detach();
 	markerIntersection2->detach();
+	d_plotPosition = 0;
 }
 
 void dBgraph::setColor(const QColor& color)
@@ -457,6 +485,11 @@ void dBgraph::useDeltaLabel(bool use_delta)
 			sw->repaint();
 		}
 	}
+}
+
+void dBgraph::sweepDone()
+{
+	d_plotBar->setVisible(false);
 }
 
 void dBgraph::onCursor1PositionChanged(int pos)

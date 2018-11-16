@@ -116,6 +116,7 @@ Q_SIGNALS:
 
 		void useLogFreq(bool use_log_freq);
 		void useDeltaLabel(bool use_delta);
+		void sweepDone();
 
         void onVbar1PixelPosChanged(int pos);
         void onVbar2PixelPosChanged(int pos);
@@ -153,11 +154,13 @@ Q_SIGNALS:
 		PrefixFormatter *formatter;
 		OscScaleZoomer *zoomer;
 
-		CustomFifo<double> xdata, ydata;
+		QVector<double> xdata, ydata;
+		unsigned int d_plotPosition;
 
         SymbolController *d_symbolCtrl;
         VertBar *d_vBar1;
         VertBar *d_vBar2;
+	VertBar *d_plotBar;
 
         PlotPickerWrapper* picker;
 
