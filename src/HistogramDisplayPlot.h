@@ -118,6 +118,7 @@ private:
   std::vector<Histogram *> d_histograms;
   std::vector<PlotAxisConfiguration *> rightVertAxes;
   double d_height;
+  PrefixFormatter *d_pf;
 
   double* d_xdata;
   std::vector<double*> d_ydata;
