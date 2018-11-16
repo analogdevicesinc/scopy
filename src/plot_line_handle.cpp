@@ -93,7 +93,8 @@ void PlotLineHandle::setGrabbed(bool grabbed)
 PlotGateHandle::PlotGateHandle(const QPixmap &handleIcon, QWidget *parent):
 	PlotLineHandle(handleIcon, parent),
 	m_alignLeft(true),
-	m_reachLimit(false)
+	m_reachLimit(false),
+	m_timeValue(0)
 {
 	m_width = m_image.width();
 	m_height = m_image.height();
