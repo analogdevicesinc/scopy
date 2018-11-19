@@ -334,9 +334,12 @@ void SpinBoxA::setMinValue(double value)
 
 	if (m_value < m_min_value) {
 		setValue(m_min_value);
+	} else if (m_value > m_min_value) {
+		ui->SBA_DownButton->setEnabled(true);
 	}
 
 	ui->SBA_CompletionCircle->setMinimumDouble(value);
+
 }
 
 int SpinBoxA::decimalCount() const
@@ -362,6 +365,8 @@ void SpinBoxA::setMaxValue(double value)
 
 	if (m_value > m_max_value) {
 		setValue(m_max_value);
+	} else if (m_value < m_max_value) {
+		ui->SBA_UpButton->setEnabled(true);
 	}
 
 	ui->SBA_CompletionCircle->setMaximumDouble(value);
