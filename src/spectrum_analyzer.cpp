@@ -381,6 +381,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	top->setValue(0);
 	range->setValue(200);
 
+	marker_freq_pos->setMinValue(1);
 	marker_freq_pos->setMaxValue(stop_freq->value());
 	marker_freq_pos->setStep(2 * (stop_freq->value() -
 					  start_freq->value()) / bin_sizes[ui->cmb_rbw->currentIndex()]);
@@ -1010,6 +1011,10 @@ void SpectrumAnalyzer::onStartStopChanged()
 
 	ui->cmb_rbw->blockSignals(false);
 	ui->cmb_rbw->setCurrentIndex(i - 1);
+
+	marker_freq_pos->setMaxValue(stop_freq->value());
+	marker_freq_pos->setStep(2 * (stop_freq->value() -
+					  start_freq->value()) / bin_sizes[ui->cmb_rbw->currentIndex()]);
 }
 
 void SpectrumAnalyzer::onCenterSpanChanged()
@@ -1105,6 +1110,8 @@ void SpectrumAnalyzer::on_btnLeftPeak_clicked()
 		fft_plot->updateMarkerUi(crt_channel_id, crt_marker);
 		fft_plot->replot();
 	}
+
+	updateMrkFreqPosSpinBtnValue();
 }
 
 void SpectrumAnalyzer::on_btnRightPeak_clicked()
@@ -1117,6 +1124,8 @@ void SpectrumAnalyzer::on_btnRightPeak_clicked()
 		fft_plot->updateMarkerUi(crt_channel_id, crt_marker);
 		fft_plot->replot();
 	}
+
+	updateMrkFreqPosSpinBtnValue();
 }
 
 void SpectrumAnalyzer::on_btnMaxPeak_clicked()
@@ -1129,6 +1138,8 @@ void SpectrumAnalyzer::on_btnMaxPeak_clicked()
 		fft_plot->updateMarkerUi(crt_channel_id, crt_marker);
 		fft_plot->replot();
 	}
+
+	updateMrkFreqPosSpinBtnValue();
 }
 
 void SpectrumAnalyzer::on_cmb_rbw_currentIndexChanged(int index)
@@ -1138,6 +1149,10 @@ void SpectrumAnalyzer::on_cmb_rbw_currentIndexChanged(int index)
 	if (new_fft_size != fft_size) {
 		setFftSize(new_fft_size);
 	}
+
+	marker_freq_pos->setMaxValue(stop_freq->value());
+	marker_freq_pos->setStep(2 * (stop_freq->value() -
+					  start_freq->value()) / bin_sizes[ui->cmb_rbw->currentIndex()]);
 }
 
 void SpectrumAnalyzer::setSampleRate(double sr)
@@ -1222,6 +1237,8 @@ void SpectrumAnalyzer::on_btnDnAmplPeak_clicked()
 		fft_plot->updateMarkerUi(crt_channel_id, crt_marker);
 		fft_plot->replot();
 	}
+
+	updateMrkFreqPosSpinBtnValue();
 }
 
 void SpectrumAnalyzer::on_btnUpAmplPeak_clicked()
@@ -1234,6 +1251,8 @@ void SpectrumAnalyzer::on_btnUpAmplPeak_clicked()
 		fft_plot->updateMarkerUi(crt_channel_id, crt_marker);
 		fft_plot->replot();
 	}
+
+	updateMrkFreqPosSpinBtnValue();
 }
 
 void SpectrumAnalyzer::onMarkerToggled(int id, bool on)
@@ -1397,9 +1416,9 @@ void SpectrumAnalyzer::updateMrkFreqPosSpinBtnValue()
 		return;
 	}
 
-	if (!fft_plot->markerType(crt_channel_id, crt_marker) == 0) {
-		return;
-	}
+//	if (!fft_plot->markerType(crt_channel_id, crt_marker) == 0) {
+//		return;
+//	}
 
 	double freq = fft_plot->markerFrequency(crt_channel_id, crt_marker);
 
