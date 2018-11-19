@@ -138,6 +138,7 @@ namespace adiscope {
 			 std::shared_ptr<SpectrumMarker> &marker) const;
 		void detectMarkers();
 
+		void _editFirstPoint();
 	private Q_SLOTS:
 		void onMrkCtrlMarkerSelected(std::shared_ptr<SpectrumMarker> &);
 		void onMrkCtrlMarkerPosChanged(std::shared_ptr<SpectrumMarker> &);

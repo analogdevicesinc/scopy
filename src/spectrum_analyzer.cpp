@@ -283,6 +283,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	double max_sr = 50e6; // TO DO: adc should detect max sampl rate and use that
 	start_freq->setMaxValue(max_sr);
+	start_freq->setMinValue(1);
 	stop_freq->setMaxValue(max_sr);
 	center_freq->setMaxValue(max_sr);
 	span_freq->setMaxValue(max_sr);
@@ -403,6 +404,9 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	connect(ui->btnPrint, &QPushButton::clicked, [=](){
 		fft_plot->printWithNoBackground(api->objectName(), false);
 	});
+
+	connect(ui->logBtn, &QPushButton::toggled,
+		fft_plot, &FftDisplayPlot::useLogFreq);
 }
 
 SpectrumAnalyzer::~SpectrumAnalyzer()
