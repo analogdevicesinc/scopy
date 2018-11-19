@@ -214,6 +214,7 @@ namespace adiscope {
 		void setSampleRate(double sr, double units,
 			const std::string &strunits);
 		void presetSampleRate(double sr);
+		void useLogFreq(bool use_log_freq);
 		void customEvent(QEvent *e);
 	};
 }

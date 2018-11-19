@@ -24,6 +24,7 @@
 #include "spectrum_marker.hpp"
 #include "marker_controller.h"
 #include "limitedplotzoomer.h"
+#include "osc_scale_engine.h"
 
 #include <qwt_symbol.h>
 #include <boost/make_shared.hpp>
@@ -200,6 +201,22 @@ void FftDisplayPlot::setZoomerEnabled()
 void FftDisplayPlot::setNumPoints(uint64_t num_points)
 {
 	d_numPoints = num_points;
+}
+
+void FftDisplayPlot::useLogFreq(bool use_log_freq)
+{
+	if (use_log_freq) {
+		setAxisScaleEngine(QwtPlot::xBottom, new QwtLogScaleEngine);
+		OscScaleDraw *xScaleDraw = new OscScaleDraw(&freqFormatter, "Hz");
+		setAxisScaleDraw(QwtPlot::xBottom, xScaleDraw);
+		xScaleDraw->setFloatPrecision(2);
+	} else {
+		OscScaleEngine *scaleEngine = new OscScaleEngine();
+		this->setAxisScaleEngine(QwtPlot::xBottom, (QwtScaleEngine *)scaleEngine);
+		OscScaleDraw *xScaleDraw = new OscScaleDraw(&freqFormatter, "Hz");
+		setAxisScaleDraw(QwtPlot::xBottom, xScaleDraw);
+		xScaleDraw->setFloatPrecision(2);
+	}
 }
 
 void FftDisplayPlot::plotData(const std::vector<double *> &pts,
