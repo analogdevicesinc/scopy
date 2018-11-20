@@ -304,4 +304,14 @@ void SpectrumAnalyzer_API::setMarkerTableVisible(bool en)
 {
 	sp->ui->btnMarkerTable->setChecked(en);
 }
+
+bool SpectrumAnalyzer_API::getLogScale() const
+{
+	return sp->fft_plot->getLogScale();
+}
+
+void SpectrumAnalyzer_API::setLogScale(bool useLogScale)
+{
+	sp->ui->logBtn->setChecked(useLogScale);
+}
 }

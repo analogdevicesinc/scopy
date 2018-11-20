@@ -98,6 +98,7 @@ namespace adiscope {
 		double m_sweepStart;
 		double m_sweepStop;
 		bool m_visiblePeakSearch;
+		bool d_logScaleEnabled;
 
 		MetricPrefixFormatter dBFormatter;
 		MetricPrefixFormatter freqFormatter;
@@ -217,6 +218,7 @@ namespace adiscope {
 		void presetSampleRate(double sr);
 		void useLogFreq(bool use_log_freq);
 		void customEvent(QEvent *e);
+		bool getLogScale() const;
 	};
 }
 

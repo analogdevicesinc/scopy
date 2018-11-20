@@ -393,6 +393,9 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 		ch->setFftWindow(FftWinType::HAMMING, fft_size);
 	}
 
+	connect(ui->logBtn, &QPushButton::toggled,
+		fft_plot, &FftDisplayPlot::useLogFreq);
+
 	api->setObjectName(QString::fromStdString(Filter::tool_name(
 	                           TOOL_SPECTRUM_ANALYZER)));
 	api->load(*settings);
@@ -405,9 +408,6 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	connect(ui->btnPrint, &QPushButton::clicked, [=](){
 		fft_plot->printWithNoBackground(api->objectName(), false);
 	});
-
-	connect(ui->logBtn, &QPushButton::toggled,
-		fft_plot, &FftDisplayPlot::useLogFreq);
 }
 
 SpectrumAnalyzer::~SpectrumAnalyzer()

@@ -72,7 +72,8 @@ FftDisplayPlot::FftDisplayPlot(int nplots, QWidget *parent) :
 	d_presetMagType(MagnitudeType::DBFS),
 	d_mrkCtrl(nullptr),
 	d_emitNewMkrData(true),
-	m_visiblePeakSearch(true)
+	m_visiblePeakSearch(true),
+	d_logScaleEnabled(false)
 {
 	// TO DO: Add more colors
 	d_markerColors << QColor(255, 242, 0) << QColor(210, 155, 210);
@@ -217,6 +218,8 @@ void FftDisplayPlot::useLogFreq(bool use_log_freq)
 		setAxisScaleDraw(QwtPlot::xBottom, xScaleDraw);
 		xScaleDraw->setFloatPrecision(2);
 	}
+
+	d_logScaleEnabled = use_log_freq;
 }
 
 void FftDisplayPlot::plotData(const std::vector<double *> &pts,
@@ -455,6 +458,11 @@ void FftDisplayPlot::customEvent(QEvent *e)
 		this->plotData(ev->getTimeDomainPoints(),
 				ev->getNumTimeDomainDataPoints());
 	}
+}
+
+bool FftDisplayPlot::getLogScale() const
+{
+	return d_logScaleEnabled;
 }
 
 void FftDisplayPlot::setSampleRate(double sr, double units,

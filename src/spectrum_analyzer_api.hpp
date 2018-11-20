@@ -21,6 +21,7 @@ class SpectrumAnalyzer_API : public ApiObject
 	Q_PROPERTY(bool markerTableVisible READ markerTableVisible WRITE
 	           setMarkerTableVisible);
 	Q_PROPERTY(QVariantList markers READ getMarkers);
+	Q_PROPERTY(bool logScale READ getLogScale WRITE setLogScale)
 public:
 	Q_INVOKABLE void show();
 	explicit SpectrumAnalyzer_API(SpectrumAnalyzer *sp) :
@@ -61,6 +62,9 @@ private:
 
 	bool markerTableVisible();
 	void setMarkerTableVisible(bool);
+
+	bool getLogScale() const;
+	void setLogScale(bool useLogScale);
 
 };
 
