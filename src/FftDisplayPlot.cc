@@ -579,6 +579,10 @@ void FftDisplayPlot::findPeaks(int chn)
 	double *x = x_data;
 	double *y = y_data[chn];
 
+	if (!x || !y) {
+		return;
+	}
+
 	for (int i = 0; i <= marker_count; i++) {
 		maxX[i] = 0;
 		maxY[i] = -200.0;
@@ -601,6 +605,9 @@ void FftDisplayPlot::findPeaks(int chn)
 
 	for (int i = start; i < stop; i++) {
 		for (int j = 0; j < marker_count; j++ ) {
+			if (i < 2) {
+				continue;
+			}
 			if  ((y[i - 1] > maxY[j]) &&
 					((!((y[i - 2] > y[i - 1]) &&
 					 (y[i - 1] > y[i]))) &&
