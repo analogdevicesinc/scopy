@@ -1929,7 +1929,7 @@ void LogicAnalyzer::runModeChanged(bool repeated)
                 frequencySpinButton->setEnabled(true);
                 en = true;
         }
-        if (running && shouldUpdate) {
+	if (shouldUpdate) {
                 configParams(timeBase->value(), timePosition->value());
         }
         frequencySpinButton->setEnabled(!repeated);
