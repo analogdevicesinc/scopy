@@ -30,8 +30,10 @@ class XAxisScaleZoomer : public OscScaleZoomer
 public:
 	explicit XAxisScaleZoomer(QWidget *parent);
 	~XAxisScaleZoomer();
+
 protected:
 	virtual void zoom(const QRectF&);
+	virtual QwtText trackerText( const QPoint& p ) const;
 };
 }
 #endif // X_AXIS_SCALE_ZOOMER_H
