@@ -71,6 +71,10 @@ namespace adiscope {
 		void setAxesTitles(const QString& x, const QString& y);
 
 		int getNumSamples() const;
+
+		QString getScaleValueFormat(double value, QwtAxisId scale) const;
+		QString getScaleValueFormat(double value, QwtAxisId scale, int precision) const;
+
         void setShowZero(bool en);
         const QwtScaleWidget* getAxisWidget(QwtAxisId id);
 
