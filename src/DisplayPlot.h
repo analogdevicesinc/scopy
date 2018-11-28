@@ -592,6 +592,9 @@ private:
 	PrefixFormatter *m_formatter;
 	QColor m_color;
 	double m_displayScale;
+	mutable unsigned int m_nrTicks;
+	mutable bool m_shouldDrawMiddleDelta;
+
 };
 
 class OscPlotZoomer: public ExtendingPlotZoomer
