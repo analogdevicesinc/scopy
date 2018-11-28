@@ -243,6 +243,26 @@ int dBgraph::getNumSamples() const
 	return numSamples;
 }
 
+QString dBgraph::getScaleValueFormat(double value, QwtAxisId scale) const
+{
+	auto *scaleDraw = static_cast<const OscScaleDraw *>(
+				axisScaleDraw(scale));
+
+	return formatter->format(value,
+				 scaleDraw->getUnitType(),
+				 scaleDraw->getFloatPrecison());
+}
+
+QString dBgraph::getScaleValueFormat(double value, QwtAxisId scale, int precision) const
+{
+	auto *scaleDraw = static_cast<const OscScaleDraw *>(
+				axisScaleDraw(scale));
+
+	return formatter->format(value,
+				 scaleDraw->getUnitType(),
+				 precision);
+}
+
 void dBgraph::setShowZero(bool en)
 {
     OscScaleEngine *scaleLeft = new OscScaleEngine();
