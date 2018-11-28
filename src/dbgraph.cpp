@@ -361,8 +361,10 @@ void dBgraph::setYMin(double val)
 	setAxisScale(QwtPlot::yLeft, val, ymax);
 	ymin = val;
 	replot();
-	zoomer->setZoomBase(QRect(xmin,ymin,xmax,ymax-ymin));
 
+	double width = xmax - xmin;
+	double height = ymax - ymin;
+	zoomer->setZoomBase(QRectF(xmin, ymin, width, height));
 }
 
 void dBgraph::setYMax(double val)
@@ -370,8 +372,10 @@ void dBgraph::setYMax(double val)
 	setAxisScale(QwtPlot::yLeft, ymin, val);
 	ymax = val;
 	replot();
-	zoomer->setZoomBase(QRect(xmin,ymin,xmax,ymax-ymin));
 
+	double width = xmax - xmin;
+	double height = ymax - ymin;
+	zoomer->setZoomBase(QRectF(xmin, ymin, width, height));
 }
 
 QString dBgraph::xUnit() const
