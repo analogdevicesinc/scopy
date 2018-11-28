@@ -48,7 +48,9 @@ OscScaleDraw::OscScaleDraw(const QString &unit) : QwtScaleDraw(),
 	m_unit(unit),
 	m_formatter(NULL),
 	m_color(Qt::gray),
-	m_displayScale(1)
+	m_displayScale(1),
+	m_shouldDrawMiddleDelta(false),
+	m_nrTicks(0)
 {
 	enableComponent(QwtAbstractScaleDraw::Backbone, false);
 	enableComponent(QwtAbstractScaleDraw::Ticks, false);
@@ -102,6 +104,18 @@ void OscScaleDraw::setFormatter(PrefixFormatter *formatter)
 
 void OscScaleDraw::draw(QPainter *painter, const QPalette &) const
 {
+	int nrMajorTicks = scaleDiv().ticks(QwtScaleDiv::MajorTick).size();
+
+	m_nrTicks = nrMajorTicks;
+
+	double lower = scaleDiv().interval().minValue();
+	double upper = scaleDiv().interval().maxValue();
+	double diff = upper - lower;
+	double middle = (upper + lower) / 2;
+	double step = diff / (m_nrTicks - 1);
+
+	m_shouldDrawMiddleDelta = (middle > (step * 100));
+
 	QList<double> ticks = scaleDiv().ticks(QwtScaleDiv::MajorTick);
 	QList<QRect> labels;
 
@@ -119,6 +133,8 @@ void OscScaleDraw::draw(QPainter *painter, const QPalette &) const
 
 	bool overlap = false;
 
+	int midLabelPos = nrMajorTicks / 2;
+
 	do {
 		overlap = false;
 		for(int i = 1; i < labels.size(); ++i){
@@ -131,25 +147,49 @@ void OscScaleDraw::draw(QPainter *painter, const QPalette &) const
 			}
 		}
 
-		if (overlap){
-			if ((ticks.size() % 2) == 0){
-				if (ticks.size() > 2){
-					labels.removeAt(ticks.size() - 1);
-					ticks.removeAt(ticks.size() - 1);
+		if (overlap) {
+			if (m_shouldDrawMiddleDelta) {
+				// If the middle delta label is to be drawn we are sure that
+				// ticks.size() is an odd number
+				int center = midLabelPos;
+				for (int i = center - 1; i >= 0; i -= 2) {
+					// Remove the tick and make sure to update the center
+					// label position
+					ticks.removeAt(i);
+					labels.removeAt(i);
+					--center;
 				}
-			}
-
-			for (int i = (ticks.size() / 2) * 2; i >= 0; i -= 2){
-				labels.removeAt(i);
-				ticks.removeAt(i);
+				for (int j = center + 1; j < ticks.size(); j += 1) {
+					ticks.removeAt(j);
+					labels.removeAt(j);
+				}
+			} else {
+				for (int i = 1; i < ticks.size(); ++i) {
+					ticks.removeAt(i);
+					labels.removeAt(i);
+				}
 			}
 		}
 
 	} while (overlap);
 
-	for (int i = 0; i < ticks.size(); ++i){
-		drawLabel(painter, ticks[i]);
+	double delta = -INFINITY;
+
+	if (m_shouldDrawMiddleDelta && m_nrTicks > midLabelPos) {
+		delta = scaleDiv().ticks(QwtScaleDiv::MajorTick)[midLabelPos];
+		bool temp = m_shouldDrawMiddleDelta;
+		m_shouldDrawMiddleDelta = false;
+		drawLabel(painter, delta);
+		m_shouldDrawMiddleDelta = temp;
 	}
+
+	for (const auto &tick : ticks) {
+		if (tick != delta) {
+			drawLabel(painter, tick);
+		}
+	}
+
+	m_shouldDrawMiddleDelta = false;
 }
 
 
@@ -165,24 +205,27 @@ QwtText OscScaleDraw::label( double value ) const
 	double upper = scaleDiv().interval().maxValue();
 	double diff = upper - lower;
 	double middle = (upper + lower) / 2;
-	double step = diff / 10.0;
-	if (middle > (100 * step) ) {
+	double step = diff / (m_nrTicks ? (m_nrTicks - 1) : 1);
+
+	int mid = (m_nrTicks / 2 + 1);
+
+	if (middle > (100 * step)) {
 		int current = 0;
 		while (value > (lower + current * step)) current++;
-		int position = current - 1;
+		int position = current + 1;
 
-		if (position == 4) {
+		if (position == mid){
 			// center label with extra precision
 			center = true;
-			bonusPrecision = 3;
-		} else if (position < 4){
+			bonusPrecision = 1;
+		} else if (position < mid){
 			sign = "-";
 			// negative delta label
-			value = step * (4 - position);
-		} else if (position > 4) {
+			value = step * (mid - position);
+		} else if (position > mid) {
 			sign = "+";
 			// positive delta label
-			value = step * (position - 4);
+			value = step * (position - mid);
 		}
 	}
 
@@ -217,6 +260,7 @@ QwtText OscScaleDraw::label( double value ) const
 	if (center) {
 		text.setColor(QColor(255, 255,255));
 	}
+
 
 	return text;
 }
