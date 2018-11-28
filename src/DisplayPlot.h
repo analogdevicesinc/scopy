@@ -573,7 +573,7 @@ public:
 	QwtText label( double ) const;
 
 	void setFloatPrecision(unsigned int numDigits);
-	unsigned int getFloatPrecison();
+	unsigned int getFloatPrecison() const;
 
 	void setUnitType(const QString& unit);
 	QString getUnitType() const;
