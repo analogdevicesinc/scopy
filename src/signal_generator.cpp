@@ -2224,6 +2224,10 @@ size_t SignalGenerator::get_samples_count(const struct iio_device *dev,
 					&& ratio < 2.5)
 				return 0; /* rate too low */
 			//else
+
+			// for less than max sample rates, generate at least 10 samples per period
+			if (ratio < 10.0 && sample_rate < max_sample_rate)
+				return 0;
 			if (ratio < 2.0) {
 				return 0;        /* rate too low */
 			}
