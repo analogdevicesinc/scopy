@@ -424,7 +424,7 @@ void dBgraph::useLogFreq(bool use_log_freq)
 		this->setAxisScaleEngine(QwtPlot::xTop, new QwtLogScaleEngine);
 	} else {
 		auto scaleTop = new OscScaleEngine;
-		scaleTop->setMajorTicksCount(8);
+		scaleTop->setMajorTicksCount(9);
 		this->setAxisScaleEngine(QwtPlot::xTop, scaleTop);
 	}
 
@@ -433,7 +433,12 @@ void dBgraph::useLogFreq(bool use_log_freq)
 		onCursor1Moved(d_vBar1->transform(d_vBar1->plotCoord()).x());
 		onCursor2Moved(d_vBar2->transform(d_vBar2->plotCoord()).x());
 	}
+
 	replot();
+
+	auto sw = axisWidget(QwtPlot::xTop);
+	sw->scaleDraw()->invalidateCache();
+	sw->repaint();
 }
 
 void dBgraph::onCursor1PositionChanged(int pos)
@@ -635,4 +640,11 @@ void dBgraph::mousePressEvent(QMouseEvent *event)
 void dBgraph::onResetZoom()
 {
 	zoomer->resetZoom();
+}
+
+void dBgraph::showEvent(QShowEvent *event)
+{
+	auto sw = axisWidget(QwtPlot::xTop);
+	sw->scaleDraw()->invalidateCache();
+	sw->repaint();
 }

@@ -132,6 +132,9 @@ Q_SIGNALS:
         void mousePressEvent(QMouseEvent *event);
         void onResetZoom();
 
+	protected Q_SLOTS:
+		void showEvent(QShowEvent *event);
+
 	private:
 		QwtPlotCurve curve;
 		QwtPlotMarker *markerIntersection1;
