@@ -45,7 +45,8 @@ Preferences::Preferences(QWidget *parent) :
 	debugger_enabled(false),
 	manual_calib_enabled(false),
 	graticule_enabled(false),
-	animations_enabled(true)
+	animations_enabled(true),
+	osc_filtering_enabled(true)
 {
 	ui->setupUi(this);
 
@@ -117,6 +118,12 @@ Preferences::Preferences(QWidget *parent) :
 		animations_enabled = (!state ? false : true);
 		Q_EMIT notify();
 	});
+
+	connect(ui->oscFilteringCheckBox, &QCheckBox::stateChanged, [=](int state) {
+		osc_filtering_enabled = (!state ? false : true);
+		Q_EMIT notify();
+	});
+
 	QString preference_ini_file = getPreferenceIniFile();
 	QSettings settings(preference_ini_file, QSettings::IniFormat);
 
@@ -155,6 +162,7 @@ void Preferences::showEvent(QShowEvent *event)
 	ui->extScriptCheckBox->setChecked(external_script_enabled);
 	ui->manualCalibCheckBox->setChecked(manual_calib_script_enabled);
 	ui->enableAnimCheckBox->setChecked(animations_enabled);
+	ui->oscFilteringCheckBox->setChecked(osc_filtering_enabled);
 
 	QWidget::showEvent(event);
 }
@@ -181,9 +189,19 @@ void Preferences::resetScopy()
 	}
 }
 
+bool Preferences::getOsc_filtering_enabled() const
+{
+	return osc_filtering_enabled;
+}
+
+void Preferences::setOsc_filtering_enabled(bool value)
+{
+	osc_filtering_enabled = value;
+}
+
 bool Preferences::getAnimations_enabled() const
 {
-    return animations_enabled;
+	return animations_enabled;
 }
 
 void Preferences::setAnimations_enabled(bool value)
@@ -443,4 +461,15 @@ bool Preferences_API::getManualCalibScript() const
 void Preferences_API::setManualCalibScript(const bool &enabled)
 {
 	preferencePanel->manual_calib_script_enabled = enabled;
+}
+
+
+bool Preferences_API::getOscFilteringEnabled() const
+{
+	return preferencePanel->osc_filtering_enabled;
+}
+
+void Preferences_API::setOscFilteringEnabled(const bool &enabled)
+{
+	preferencePanel->osc_filtering_enabled = enabled;
 }

@@ -66,11 +66,12 @@ public:
 
 protected:
 	std::shared_ptr<HardwareTrigger> m_trigger;
-
-private:
 	struct iio_context *m_ctx;
 	struct iio_device *m_adc;
 	QList<struct iio_channel *> m_adc_channels;
+
+
+private:
 	uint m_adc_bits;
 	double m_sample_rate;
 };
@@ -110,8 +111,17 @@ public:
 	double gainAt(GainMode gain_mode) const;
 	QPair<double, double> inputRange(GainMode gain_mode) const;
 
+	void setFilteringEnabled(bool set);
+	bool filteringEnabled() const;
+
+	uint32_t oversamplingRatio() const;
+	void setOversamplingRatio(uint32_t ratio) const;
+
 	QList<double> availSamplRates() const;
+	double maxSampleRate() const;
 	double compTable(double samplRate) const;
+	void setSampleRate(double);
+	double readSampleRate() const;
 
 	virtual double convSampleToVolts(uint chnIdx, double sample) const;
 	virtual double convVoltsToSample(uint chnIdx, double volts) const;
@@ -131,6 +141,10 @@ private:
 	QList<double> m_chn_corr_gains;
 	QList<double> m_chn_hw_offsets;
 	QList<GainMode> m_chn_hw_gain_modes;
+	bool filtering_enabled;
+	double max_sample_rate;
+	double m2k_sample_rate;
+
 };
 
 class AdcBuilder

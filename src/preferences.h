@@ -86,6 +86,9 @@ public:
 	bool getAnimations_enabled() const;
 	void setAnimations_enabled(bool value);
 
+	bool getOsc_filtering_enabled() const;
+	void setOsc_filtering_enabled(bool value);
+
 Q_SIGNALS:
 
 	void notify();
@@ -113,6 +116,7 @@ private:
 	bool manual_calib_script_enabled;
 	bool manual_calib_enabled;
 	bool animations_enabled;
+	bool osc_filtering_enabled;
 
 	Preferences_API *pref_api;
 	QString getPreferenceIniFile() const;
@@ -135,6 +139,7 @@ class Preferences_API : public ApiObject
 	Q_PROPERTY(bool external_script_enabled READ getExternalScript WRITE setExternalScript)
 	Q_PROPERTY(bool manual_calib_script_enabled READ getManualCalibScript WRITE setManualCalibScript)
 	Q_PROPERTY(bool animations_enabled READ getAnimationsEnabled WRITE setAnimationsEnabled)
+	Q_PROPERTY(bool osc_filtering_enabled READ getOscFilteringEnabled WRITE setOscFilteringEnabled)
 
 public:
 
@@ -177,6 +182,9 @@ public:
 
 	bool getManualCalibScript() const;
 	void setManualCalibScript(const bool& enabled);
+
+	bool getOscFilteringEnabled() const;
+	void setOscFilteringEnabled(const bool& enabled);
 
 private:
 	Preferences *preferencePanel;

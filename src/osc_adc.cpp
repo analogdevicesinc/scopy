@@ -223,8 +223,14 @@ M2kAdc::M2kAdc(struct iio_context *ctx, struct iio_device *adc_dev):
 	// Available frequencies list
 	QStringList list = IioUtils::available_options_list(adc_dev,
 					"sampling_frequency_available");
+	max_sample_rate = 1;
 	for (int i = 0; i < list.size(); i++)
-		m_availSampRates.append(list.at(i).toDouble());
+	{
+		auto sr = list.at(i).toDouble();
+		m_availSampRates.append(sr);
+		if(max_sample_rate< sr)
+			max_sample_rate = sr;
+	}
 
 
 	// Filters applied while decimating affect the amplitude of the received
@@ -353,9 +359,33 @@ QList<double> M2kAdc::availSamplRates() const
 	return m_availSampRates;
 }
 
+double M2kAdc::maxSampleRate() const
+{
+	return max_sample_rate;
+}
+
 double M2kAdc::compTable(double samplRate) const
 {
 	return m_filt_comp_table.at(samplRate);
+}
+
+void M2kAdc::setSampleRate(double sr)
+{
+	m2k_sample_rate = sr;
+	if(filteringEnabled())
+	{
+		GenericAdc::setSampleRate(sr);
+	}
+	else
+	{
+		GenericAdc::setSampleRate(maxSampleRate());
+		setOversamplingRatio(maxSampleRate()/sr);
+	}
+}
+
+double M2kAdc::readSampleRate() const
+{
+	return m2k_sample_rate;
 }
 
 double M2kAdc::convSampleToVolts(uint chnIdx, double sample) const
@@ -421,4 +451,39 @@ void M2kAdc::setHwSettings(GenericAdc::Settings *settings)
 			setChnHwOffset(i, m2k_settings->channel_hw_offset[i]);
 		}
 	}
+}
+
+void M2kAdc::setFilteringEnabled(bool set)
+{
+	filtering_enabled = set;
+	if(set == false)
+	{
+		GenericAdc::setSampleRate(maxSampleRate());
+		setOversamplingRatio(maxSampleRate()/m2k_sample_rate);
+	}
+	else
+	{
+		GenericAdc::setSampleRate(m2k_sample_rate);
+		setOversamplingRatio(1);
+	}
+
+
+}
+bool M2kAdc::filteringEnabled() const
+{
+	return filtering_enabled;
+}
+
+uint32_t M2kAdc::oversamplingRatio() const
+{
+	long long int val;
+	iio_device_attr_read_longlong(m_adc,
+				       "oversampling_ratio", &val);
+	return val;
+}
+
+void M2kAdc::setOversamplingRatio(uint32_t ratio) const
+{
+	iio_device_attr_write_longlong(m_adc,
+				       "oversampling_ratio", ratio);
 }
