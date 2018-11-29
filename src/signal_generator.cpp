@@ -1474,21 +1474,21 @@ basic_block_sptr SignalGenerator::getSignalSource(gr::top_block_sptr top,
 	switch(data.waveform)
 	{
 	case SG_SQR_WAVE:
-		rise=fall=0.0001;
+		rise=fall=0;
 		holdh=(data.dutycycle/100.0);
 		holdl=1.0-(data.dutycycle/100.0);
 		break;
 	case SG_TRI_WAVE:
 		rise=fall=1;
-		holdh=0.001;
-		holdl=0.001;
+		holdh=0;
+		holdl=0;
 		break;
 	case SG_SAW_WAVE:
-		fall=holdh=holdl=0.001;
+		fall=holdh=holdl=0;
 		rise=1;
 		break;
 	case SG_INV_SAW_WAVE:
-		rise=holdh=holdl=0.001;
+		rise=holdh=holdl=0;
 		fall=1;
 		break;
 	case SG_TRA_WAVE:
