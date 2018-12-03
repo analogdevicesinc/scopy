@@ -31,52 +31,52 @@
 #include "plotpickerwrapper.h"
 
 namespace adiscope {
-	class OscScaleDraw;
-	class PrefixFormatter;
-	class OscScaleZoomer;
+class OscScaleDraw;
+class PrefixFormatter;
+class OscScaleZoomer;
 
-	class dBgraph : public QwtPlot
-	{
-		Q_OBJECT
+class dBgraph : public QwtPlot
+{
+	Q_OBJECT
 
-		Q_PROPERTY(int numSamples
-				READ getNumSamples
-				WRITE setNumSamples
-		)
+	Q_PROPERTY(int numSamples
+		   READ getNumSamples
+		   WRITE setNumSamples
+		  )
 
-		Q_PROPERTY(QColor color
-				READ getColor
-				WRITE setColor
-		)
+	Q_PROPERTY(QColor color
+		   READ getColor
+		   WRITE setColor
+		  )
 
-		Q_PROPERTY(QString xaxis_title READ xTitle WRITE setXTitle);
-		Q_PROPERTY(QString yaxis_title READ yTitle WRITE setYTitle);
+	Q_PROPERTY(QString xaxis_title READ xTitle WRITE setXTitle);
+	Q_PROPERTY(QString yaxis_title READ yTitle WRITE setYTitle);
 
-		Q_PROPERTY(double xmin MEMBER xmin WRITE setXMin);
-		Q_PROPERTY(double xmax MEMBER xmax WRITE setXMax);
-		Q_PROPERTY(double ymin MEMBER ymin WRITE setYMin);
-		Q_PROPERTY(double ymax MEMBER ymax WRITE setYMax);
+	Q_PROPERTY(double xmin MEMBER xmin WRITE setXMin);
+	Q_PROPERTY(double xmax MEMBER xmax WRITE setXMax);
+	Q_PROPERTY(double ymin MEMBER ymin WRITE setYMin);
+	Q_PROPERTY(double ymax MEMBER ymax WRITE setYMax);
 
-		Q_PROPERTY(QString xunit READ xUnit WRITE setXUnit);
-		Q_PROPERTY(QString yunit READ yUnit WRITE setYUnit);
+	Q_PROPERTY(QString xunit READ xUnit WRITE setXUnit);
+	Q_PROPERTY(QString yunit READ yUnit WRITE setYUnit);
 
-		Q_PROPERTY(bool log_freq MEMBER log_freq WRITE useLogFreq);
+	Q_PROPERTY(bool log_freq MEMBER log_freq WRITE useLogFreq);
 
-	public:
-		explicit dBgraph(QWidget *parent = nullptr);
-		~dBgraph();
+public:
+	explicit dBgraph(QWidget *parent = nullptr);
+	~dBgraph();
 
-		void setAxesScales(double xmin, double xmax,
-				double ymin, double ymax);
-		void setAxesTitles(const QString& x, const QString& y);
+	void setAxesScales(double xmin, double xmax,
+			   double ymin, double ymax);
+	void setAxesTitles(const QString& x, const QString& y);
 
-		int getNumSamples() const;
+	int getNumSamples() const;
 
-		QString getScaleValueFormat(double value, QwtAxisId scale) const;
-		QString getScaleValueFormat(double value, QwtAxisId scale, int precision) const;
+	QString getScaleValueFormat(double value, QwtAxisId scale) const;
+	QString getScaleValueFormat(double value, QwtAxisId scale, int precision) const;
 
-        void setShowZero(bool en);
-        const QwtScaleWidget* getAxisWidget(QwtAxisId id);
+	void setShowZero(bool en);
+	const QwtScaleWidget *getAxisWidget(QwtAxisId id);
 
 	const QColor& getColor() const;
 	double getThickness();
@@ -84,7 +84,7 @@ namespace adiscope {
 	QString yTitle() const;
 
 	void toggleCursors(bool);
-    CustomPlotPositionButton::ReadoutsPosition getCursorReadoutCurrentPosition();
+	CustomPlotPositionButton::ReadoutsPosition getCursorReadoutCurrentPosition();
 
 	QString cursorIntersection(qreal text);
 	QVector<double> getXAxisData();
@@ -93,81 +93,82 @@ namespace adiscope {
 Q_SIGNALS:
 	void VBar1PixelPosChanged(int);
 	void VBar2PixelPosChanged(int);
-    void resetZoom();
 
-    public Q_SLOTS:
-		void plot(double x, double y);
-		void reset();
+	void resetZoom();
 
-		void setNumSamples(int num);
-		void setColor(const QColor& color);
-		void setThickness(int index);
-		void setXTitle(const QString& title);
-		void setYTitle(const QString& title);
-		void setXMin(double val);
-		void setXMax(double val);
-		void setYMin(double val);
-		void setYMax(double val);
+public Q_SLOTS:
+	void plot(double x, double y);
+	void reset();
 
-		QString xUnit() const;
-		QString yUnit() const;
-		void setXUnit(const QString& unit);
-		void setYUnit(const QString& unit);
+	void setNumSamples(int num);
+	void setColor(const QColor& color);
+	void setThickness(int index);
+	void setXTitle(const QString& title);
+	void setYTitle(const QString& title);
+	void setXMin(double val);
+	void setXMax(double val);
+	void setYMin(double val);
+	void setYMax(double val);
 
-		void useLogFreq(bool use_log_freq);
-		void useDeltaLabel(bool use_delta);
-		void sweepDone();
+	QString xUnit() const;
+	QString yUnit() const;
+	void setXUnit(const QString& unit);
+	void setYUnit(const QString& unit);
 
-        void onVbar1PixelPosChanged(int pos);
-        void onVbar2PixelPosChanged(int pos);
+	void useLogFreq(bool use_log_freq);
+	void useDeltaLabel(bool use_delta);
+	void sweepDone();
 
-        void onCursor1PositionChanged(int pos);
-        void onCursor2PositionChanged(int pos);
+	void onVbar1PixelPosChanged(int pos);
+	void onVbar2PixelPosChanged(int pos);
 
-        void onCursor1Moved(int);
-        void onCursor2Moved(int);
+	void onCursor1PositionChanged(int pos);
+	void onCursor2PositionChanged(int pos);
 
-        void setCursorReadoutsTransparency(int value);
-        void moveCursorReadouts(CustomPlotPositionButton::ReadoutsPosition position);
+	void onCursor1Moved(int);
+	void onCursor2Moved(int);
 
-        void scaleDivChanged();
-        void mousePressEvent(QMouseEvent *event);
-        void onResetZoom();
+	void setCursorReadoutsTransparency(int value);
+	void moveCursorReadouts(CustomPlotPositionButton::ReadoutsPosition position);
 
-	protected Q_SLOTS:
-		void showEvent(QShowEvent *event);
+	void scaleDivChanged();
+	void mousePressEvent(QMouseEvent *event);
+	void onResetZoom();
 
-	private:
-		QwtPlotCurve curve;
-		QwtPlotMarker *markerIntersection1;
-		QwtPlotMarker *markerIntersection2;
-		int numSamples;
-		double xmin, xmax, ymin, ymax;
-		QColor color;
-		double thickness;
-		bool log_freq;
-		bool delta_label;
+protected Q_SLOTS:
+	void showEvent(QShowEvent *event);
 
-        bool d_cursorsEnabled;
-        bool d_cursorsCentered;
-		OscScaleDraw *draw_x, *draw_y;
-		PrefixFormatter *formatter;
-		OscScaleZoomer *zoomer;
+private:
+	QwtPlotCurve curve;
+	QwtPlotMarker *markerIntersection1;
+	QwtPlotMarker *markerIntersection2;
+	unsigned int numSamples;
+	double xmin, xmax, ymin, ymax;
+	QColor color;
+	double thickness;
+	bool log_freq;
+	bool delta_label;
 
-		QVector<double> xdata, ydata;
-		unsigned int d_plotPosition;
+	bool d_cursorsEnabled;
+	bool d_cursorsCentered;
+	OscScaleDraw *draw_x, *draw_y;
+	PrefixFormatter *formatter;
+	OscScaleZoomer *zoomer;
 
-        SymbolController *d_symbolCtrl;
-        VertBar *d_vBar1;
-        VertBar *d_vBar2;
+	QVector<double> xdata, ydata;
+	unsigned int d_plotPosition;
+
+	SymbolController *d_symbolCtrl;
+	VertBar *d_vBar1;
+	VertBar *d_vBar2;
 	VertBar *d_plotBar;
 
-        PlotPickerWrapper* picker;
+	PlotPickerWrapper *picker;
 
-        CursorReadouts *d_cursorReadouts;
-        void setupCursors();
-        void setupReadouts();
-        };
+	CursorReadouts *d_cursorReadouts;
+	void setupCursors();
+	void setupReadouts();
+};
 }
 
 #endif /* DBGRAPH_HPP */

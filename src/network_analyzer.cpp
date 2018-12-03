@@ -64,9 +64,9 @@ using namespace adiscope;
 using namespace gr;
 
 NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
-		std::shared_ptr<GenericAdc> &adc_dev,
-		QPushButton *runButton, QJSEngine *engine,
-		ToolLauncher *parent) :
+				 std::shared_ptr<GenericAdc>& adc_dev,
+				 QPushButton *runButton, QJSEngine *engine,
+				 ToolLauncher *parent) :
 	Tool(ctx, runButton, new NetworkAnalyzer_API(this), "Network Analyzer", parent),
 	ui(new Ui::NetworkAnalyzer),
 	adc_dev(adc_dev),
@@ -75,13 +75,14 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	wheelEventGuard(nullptr), wasChecked(false)
 {
 	iio = iio_manager::get_instance(ctx,
-			filt->device_name(TOOL_NETWORK_ANALYZER, 2));
+					filt->device_name(TOOL_NETWORK_ANALYZER, 2));
 
 	adc = filt->find_device(ctx, TOOL_NETWORK_ANALYZER, 2);
 
 	dac_channels.push_back(filt->find_channel(ctx, TOOL_NETWORK_ANALYZER, 0, true));
 	dac_channels.push_back(filt->find_channel(ctx, TOOL_NETWORK_ANALYZER, 1, true));
-	for (const auto &channel : dac_channels) {
+
+	for (const auto& channel : dac_channels) {
 		if (!channel) {
 			throw std::runtime_error("Unable to find channels in filter file");
 		}
@@ -89,9 +90,11 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	/* FIXME: TODO: Move this into a HW class / lib M2k */
 	struct iio_device *fabric = iio_context_find_device(ctx, "m2k-fabric");
+
 	if (fabric) {
 		this->amp1 = iio_device_find_channel(fabric, "voltage0", true);
 		this->amp2 = iio_device_find_channel(fabric, "voltage1", true);
+
 		if (amp1 && amp2) {
 			iio_channel_attr_write_bool(amp1, "powerdown", true);
 			iio_channel_attr_write_bool(amp2, "powerdown", true);
@@ -102,17 +105,17 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
 
 	connect(ui->run_button, SIGNAL(toggled(bool)),
-			runButton, SLOT(setChecked(bool)));
+		runButton, SLOT(setChecked(bool)));
 	connect(runButton, SIGNAL(toggled(bool)),
-			ui->run_button, SLOT(setChecked(bool)));
+		ui->run_button, SLOT(setChecked(bool)));
 	connect(ui->run_button, SIGNAL(toggled(bool)),
-			this, SLOT(startStop(bool)));
+		this, SLOT(startStop(bool)));
 
 	connect(ui->single_button, &QPushButton::toggled,
 		this, &NetworkAnalyzer::startStop);
 
 	connect(this, &NetworkAnalyzer::sweepDone,
-			[=]() {
+	[=]() {
 		if (ui->run_button->isChecked()) {
 			startStop(true);
 			return;
@@ -130,277 +133,292 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	rates.resize(dac_channels.size());
 	std::transform(dac_channels.begin(), dac_channels.end(),
 		       rates.begin(),
-		       [](struct iio_channel *ch){
+	[](struct iio_channel *ch) {
 		return SignalGenerator::get_max_sample_rate(
-					iio_channel_get_device(ch));
+			       iio_channel_get_device(ch));
 	});
 
 	unsigned long max_samplerate = *std::max_element(rates.begin(), rates.end());
 
-    m_dBgraph.setColor(QColor(255,114,0));
-    m_dBgraph.setXTitle("Frequency (Hz)");
-    m_dBgraph.setYTitle("Magnitude(dB)");
-    m_dBgraph.setXMin(1000.000000);
-    m_dBgraph.setXMax(50000.000000);
-    m_dBgraph.setYMin(-90.000000);
-    m_dBgraph.setYMax(10.000000);
-    m_dBgraph.useLogFreq(true);
+	m_dBgraph.setColor(QColor(255,114,0));
+	m_dBgraph.setXTitle("Frequency (Hz)");
+	m_dBgraph.setYTitle("Magnitude(dB)");
+	m_dBgraph.setXMin(1000.000000);
+	m_dBgraph.setXMax(50000.000000);
+	m_dBgraph.setYMin(-90.000000);
+	m_dBgraph.setYMax(10.000000);
+	m_dBgraph.useLogFreq(true);
 
-    m_phaseGraph.setColor(QColor(144,19,254));
-    m_phaseGraph.setYTitle("Phase (°)");
-    m_phaseGraph.setYUnit("°");
-    m_phaseGraph.setXMin(1000.000000);
-    m_phaseGraph.setXMax(50000.000000);
-    m_phaseGraph.setYMin(-180.000000);
-    m_phaseGraph.setYMax(180.000000);
-    m_phaseGraph.useLogFreq(true);
+	m_phaseGraph.setColor(QColor(144,19,254));
+	m_phaseGraph.setYTitle("Phase (°)");
+	m_phaseGraph.setYUnit("°");
+	m_phaseGraph.setXMin(1000.000000);
+	m_phaseGraph.setXMax(50000.000000);
+	m_phaseGraph.setYMin(-180.000000);
+	m_phaseGraph.setYMax(180.000000);
+	m_phaseGraph.useLogFreq(true);
 
-    samplesCount = new ScaleSpinButton({
-	    {"samples",1e0},
-    }, "Samples count", 10, 1000, false, false, this);
-    samplesCount->setValue(1000);
+	samplesCount = new ScaleSpinButton({
+		{"samples",1e0},
+	}, "Samples count", 10, 1000, false, false, this);
+	samplesCount->setValue(1000);
 
-    minFreq = new ScaleSpinButton({
-	    {"Hz",1e0},
-	    {"kHz",1e3},
-	    {"MHz",1e6}
-    },"Min Freq", 1e0, 5e7, false, false, this);
-    minFreq->setValue(1000);
+	minFreq = new ScaleSpinButton({
+		{"Hz",1e0},
+		{"kHz",1e3},
+		{"MHz",1e6}
+	},"Min Freq", 1e0, 5e7, false, false, this);
+	minFreq->setValue(1000);
 
-    maxFreq = new ScaleSpinButton({
-	    {"Hz",1e0},
-	    {"kHz",1e3},
-	    {"MHz",1e6}
-    },"Max Freq", 1e0, 5e7, false, false, this);
-    maxFreq->setValue(50000);
+	maxFreq = new ScaleSpinButton({
+		{"Hz",1e0},
+		{"kHz",1e3},
+		{"MHz",1e6}
+	},"Max Freq", 1e0, 5e7, false, false, this);
+	maxFreq->setValue(50000);
 
-    amplitude = new ScaleSpinButton({
-	    {"μVolts",1e-6},
-	    {"mVolts",1e-3},
-	    {"Volts",1e0}
-    },"Amplitude", 1e-6, 1e1, false, false, this);
-    amplitude->setValue(1);
+	amplitude = new ScaleSpinButton({
+		{"μVolts",1e-6},
+		{"mVolts",1e-3},
+		{"Volts",1e0}
+	},"Amplitude", 1e-6, 1e1, false, false, this);
+	amplitude->setValue(1);
 
-    offset = new PositionSpinButton({
-	    {"μVolts",1e-6},
-	    {"mVolts",1e-3},
-	    {"Volts",1e0}
-    },"Offset", -5, 5, false, false, this);
+	offset = new PositionSpinButton({
+		{"μVolts",1e-6},
+		{"mVolts",1e-3},
+		{"Volts",1e0}
+	},"Offset", -5, 5, false, false, this);
 
-    offset->setValue(0);
+	offset->setValue(0);
 
-    magMax = new PositionSpinButton({
-	    {"dB",1e0}
-    }, "Max. Magnitude", -120, 120, false, false, this);
-    magMax->setValue(10);
+	magMax = new PositionSpinButton({
+		{"dB",1e0}
+	}, "Max. Magnitude", -120, 120, false, false, this);
+	magMax->setValue(10);
 
-    magMin = new PositionSpinButton({
-	    {"dB",1e0}
-    }, "Min. Magnitude", -120, 120, false, false, this);
-    magMin->setValue(-90);
+	magMin = new PositionSpinButton({
+		{"dB",1e0}
+	}, "Min. Magnitude", -120, 120, false, false, this);
+	magMin->setValue(-90);
 
-    phaseMax = new PositionSpinButton({
-	    {"dB",1e0}
-    }, "Max. Phase", -180, 180, false, false, this);
-    phaseMax->setValue(180);
+	phaseMax = new PositionSpinButton({
+		{"dB",1e0}
+	}, "Max. Phase", -180, 180, false, false, this);
+	phaseMax->setValue(180);
 
-    phaseMin = new PositionSpinButton({
-	    {"dB",1e0}
-    }, "Min. Phase", -180, 180, false, false, this);
-    phaseMin->setValue(-180);
-
-
-    ui->samplesCountLayout->addWidget(samplesCount);
-    ui->minFreqLayout->addWidget(minFreq);
-    ui->maxFreqLayout->addWidget(maxFreq);
-    ui->amplitudeLayout->addWidget(amplitude);
-    ui->offsetLayout->addWidget(offset);
-    ui->magMaxLayout->addWidget(magMax);
-    ui->magMinLayout->addWidget(magMin);
-    ui->phaseMaxLayout->addWidget(phaseMax);
-    ui->phaseMinLayout->addWidget(phaseMin);
-
-    setMinimumDistanceBetween(magMin, magMax, 1);
-    setMinimumDistanceBetween(phaseMin, phaseMax, 1);
-    setMinimumDistanceBetween(minFreq, maxFreq, 0);
-
-    connect(magMax, &PositionSpinButton::valueChanged,
-	    ui->xygraph, &NyquistGraph::setMax);
-    connect(magMax, &PositionSpinButton::valueChanged,
-	    ui->nicholsgraph, &dBgraph::setYMax);
-    connect(magMin, &PositionSpinButton::valueChanged,
-	    ui->xygraph, &NyquistGraph::setMin);
-    connect(magMin, &PositionSpinButton::valueChanged,
-	    ui->nicholsgraph, &dBgraph::setYMin);
-    connect(phaseMax, &PositionSpinButton::valueChanged,
-	    ui->nicholsgraph, &dBgraph::setXMax);
-    connect(phaseMin, &PositionSpinButton::valueChanged,
-	    ui->nicholsgraph, &dBgraph::setXMin);
-
-    connect(minFreq, SIGNAL(valueChanged(double)),
-	    &m_dBgraph, SLOT(setXMin(double)));
-    connect(maxFreq, SIGNAL(valueChanged(double)),
-	    &m_dBgraph, SLOT(setXMax(double)));
-    connect(magMin, SIGNAL(valueChanged(double)),
-	    &m_dBgraph, SLOT(setYMin(double)));
-    connect(magMax, SIGNAL(valueChanged(double)),
-	    &m_dBgraph, SLOT(setYMax(double)));
-    connect(ui->btnIsLog, SIGNAL(toggled(bool)),
-	    &m_dBgraph, SLOT(useLogFreq(bool)));
-
-    connect(minFreq, SIGNAL(valueChanged(double)),
-	    &m_phaseGraph, SLOT(setXMin(double)));
-    connect(maxFreq, SIGNAL(valueChanged(double)),
-	    &m_phaseGraph, SLOT(setXMax(double)));
-    connect(phaseMin, SIGNAL(valueChanged(double)),
-	    &m_phaseGraph, SLOT(setYMin(double)));
-    connect(phaseMax, SIGNAL(valueChanged(double)),
-	    &m_phaseGraph, SLOT(setYMax(double)));
-    connect(ui->btnIsLog, SIGNAL(toggled(bool)),
-	    &m_phaseGraph, SLOT(useLogFreq(bool)));
+	phaseMin = new PositionSpinButton({
+		{"dB",1e0}
+	}, "Min. Phase", -180, 180, false, false, this);
+	phaseMin->setValue(-180);
 
 
-    connect(ui->cbLineThickness,SIGNAL(currentIndexChanged(int)),&m_dBgraph,SLOT(setThickness(int)));
-    connect(ui->cbLineThickness,SIGNAL(currentIndexChanged(int)),&m_phaseGraph,SLOT(setThickness(int)));
-    connect(ui->cbLineThickness,SIGNAL(currentIndexChanged(int)),ui->nicholsgraph,SLOT(setThickness(int)));
-    connect(ui->cbLineThickness,SIGNAL(currentIndexChanged(int)),ui->xygraph,SLOT(setThickness(int)));
+	ui->samplesCountLayout->addWidget(samplesCount);
+	ui->minFreqLayout->addWidget(minFreq);
+	ui->maxFreqLayout->addWidget(maxFreq);
+	ui->amplitudeLayout->addWidget(amplitude);
+	ui->offsetLayout->addWidget(offset);
+	ui->magMaxLayout->addWidget(magMax);
+	ui->magMinLayout->addWidget(magMin);
+	ui->phaseMaxLayout->addWidget(phaseMax);
+	ui->phaseMinLayout->addWidget(phaseMin);
 
-    d_bottomHandlesArea = new HorizHandlesArea(this);
-    d_bottomHandlesArea->setMinimumHeight(50);
+	setMinimumDistanceBetween(magMin, magMax, 1);
+	setMinimumDistanceBetween(phaseMin, phaseMax, 1);
+	setMinimumDistanceBetween(minFreq, maxFreq, 0);
 
-    ui->gridLayout_plots->addWidget(&m_dBgraph,0,0,1,1);
-    ui->gridLayout_plots->addWidget(&m_phaseGraph,1,0,1,1);
-    ui->gridLayout_plots->addWidget(d_bottomHandlesArea,2,0,1,1);
+	connect(magMax, &PositionSpinButton::valueChanged,
+		ui->xygraph, &NyquistGraph::setMax);
+	connect(magMax, &PositionSpinButton::valueChanged,
+		ui->nicholsgraph, &dBgraph::setYMax);
+	connect(magMin, &PositionSpinButton::valueChanged,
+		ui->xygraph, &NyquistGraph::setMin);
+	connect(magMin, &PositionSpinButton::valueChanged,
+		ui->nicholsgraph, &dBgraph::setYMin);
+	connect(phaseMax, &PositionSpinButton::valueChanged,
+		ui->nicholsgraph, &dBgraph::setXMax);
+	connect(phaseMin, &PositionSpinButton::valueChanged,
+		ui->nicholsgraph, &dBgraph::setXMin);
 
-    d_hCursorHandle1 = new PlotLineHandleH(
-	    QPixmap(":/icons/h_cursor_handle.svg"),
-	    d_bottomHandlesArea);
-    d_hCursorHandle2 = new PlotLineHandleH(
-	    QPixmap(":/icons/h_cursor_handle.svg"),
-	    d_bottomHandlesArea);
+	connect(minFreq, SIGNAL(valueChanged(double)),
+		&m_dBgraph, SLOT(setXMin(double)));
+	connect(maxFreq, SIGNAL(valueChanged(double)),
+		&m_dBgraph, SLOT(setXMax(double)));
+	connect(magMin, SIGNAL(valueChanged(double)),
+		&m_dBgraph, SLOT(setYMin(double)));
+	connect(magMax, SIGNAL(valueChanged(double)),
+		&m_dBgraph, SLOT(setYMax(double)));
+	connect(ui->btnIsLog, SIGNAL(toggled(bool)),
+		&m_dBgraph, SLOT(useLogFreq(bool)));
 
-    QPen cursorsLinePen = QPen(QColor(155,155,155),1,Qt::DashLine);
-    d_hCursorHandle1->setPen(cursorsLinePen);
-    d_hCursorHandle2->setPen(cursorsLinePen);
-    d_hCursorHandle1->setVisible(false);
-    d_hCursorHandle2->setVisible(false);
+	connect(minFreq, SIGNAL(valueChanged(double)),
+		&m_phaseGraph, SLOT(setXMin(double)));
+	connect(maxFreq, SIGNAL(valueChanged(double)),
+		&m_phaseGraph, SLOT(setXMax(double)));
+	connect(phaseMin, SIGNAL(valueChanged(double)),
+		&m_phaseGraph, SLOT(setYMin(double)));
+	connect(phaseMax, SIGNAL(valueChanged(double)),
+		&m_phaseGraph, SLOT(setYMax(double)));
+	connect(ui->btnIsLog, SIGNAL(toggled(bool)),
+		&m_phaseGraph, SLOT(useLogFreq(bool)));
 
-    connect(&m_dBgraph,SIGNAL(VBar1PixelPosChanged(int)),
-	    SLOT(onVbar1PixelPosChanged(int)));
-    connect(&m_dBgraph,SIGNAL(VBar2PixelPosChanged(int)),
-	    SLOT(onVbar2PixelPosChanged(int)));
 
-    connect(d_hCursorHandle1, SIGNAL(positionChanged(int)),&m_dBgraph, SLOT(onCursor1PositionChanged(int)));
-    connect(d_hCursorHandle2, SIGNAL(positionChanged(int)),&m_dBgraph, SLOT(onCursor2PositionChanged(int)));
-    connect(d_hCursorHandle1, SIGNAL(positionChanged(int)),&m_phaseGraph, SLOT(onCursor1PositionChanged(int)));
-    connect(d_hCursorHandle2, SIGNAL(positionChanged(int)),&m_phaseGraph, SLOT(onCursor2PositionChanged(int)));
+	connect(ui->cbLineThickness,SIGNAL(currentIndexChanged(int)),&m_dBgraph,
+		SLOT(setThickness(int)));
+	connect(ui->cbLineThickness,SIGNAL(currentIndexChanged(int)),&m_phaseGraph,
+		SLOT(setThickness(int)));
+	connect(ui->cbLineThickness,SIGNAL(currentIndexChanged(int)),ui->nicholsgraph,
+		SLOT(setThickness(int)));
+	connect(ui->cbLineThickness,SIGNAL(currentIndexChanged(int)),ui->xygraph,
+		SLOT(setThickness(int)));
+
+	d_bottomHandlesArea = new HorizHandlesArea(this);
+	d_bottomHandlesArea->setMinimumHeight(50);
+
+	ui->gridLayout_plots->addWidget(&m_dBgraph,0,0,1,1);
+	ui->gridLayout_plots->addWidget(&m_phaseGraph,1,0,1,1);
+	ui->gridLayout_plots->addWidget(d_bottomHandlesArea,2,0,1,1);
+
+	d_hCursorHandle1 = new PlotLineHandleH(
+		QPixmap(":/icons/h_cursor_handle.svg"),
+		d_bottomHandlesArea);
+	d_hCursorHandle2 = new PlotLineHandleH(
+		QPixmap(":/icons/h_cursor_handle.svg"),
+		d_bottomHandlesArea);
+
+	QPen cursorsLinePen = QPen(QColor(155,155,155),1,Qt::DashLine);
+	d_hCursorHandle1->setPen(cursorsLinePen);
+	d_hCursorHandle2->setPen(cursorsLinePen);
+	d_hCursorHandle1->setVisible(false);
+	d_hCursorHandle2->setVisible(false);
+
+	connect(&m_dBgraph,SIGNAL(VBar1PixelPosChanged(int)),
+		SLOT(onVbar1PixelPosChanged(int)));
+	connect(&m_dBgraph,SIGNAL(VBar2PixelPosChanged(int)),
+		SLOT(onVbar2PixelPosChanged(int)));
+
+	connect(d_hCursorHandle1, SIGNAL(positionChanged(int)),&m_dBgraph,
+		SLOT(onCursor1PositionChanged(int)));
+	connect(d_hCursorHandle2, SIGNAL(positionChanged(int)),&m_dBgraph,
+		SLOT(onCursor2PositionChanged(int)));
+	connect(d_hCursorHandle1, SIGNAL(positionChanged(int)),&m_phaseGraph,
+		SLOT(onCursor1PositionChanged(int)));
+	connect(d_hCursorHandle2, SIGNAL(positionChanged(int)),&m_phaseGraph,
+		SLOT(onCursor2PositionChanged(int)));
 
 	maxFreq->setMaxValue((double) max_samplerate / 3.0 - 1.0);
 
 	connect(minFreq, SIGNAL(valueChanged(double)),
-			this, SLOT(updateNumSamples()));
+		this, SLOT(updateNumSamples()));
 	connect(maxFreq, SIGNAL(valueChanged(double)),
-			this, SLOT(updateNumSamples()));
+		this, SLOT(updateNumSamples()));
 	connect(samplesCount, SIGNAL(valueChanged(double)),
-			this, SLOT(updateNumSamples()));
-    connect(ui->boxCursors,SIGNAL(toggled(bool)),
-	    SLOT(toggleCursors(bool)));
+		this, SLOT(updateNumSamples()));
+	connect(ui->boxCursors,SIGNAL(toggled(bool)),
+		SLOT(toggleCursors(bool)));
 
-	connect(ui->cmb_graphs,SIGNAL(currentIndexChanged(int)),SLOT(onGraphIndexChanged(int)));
+	connect(ui->cmb_graphs,SIGNAL(currentIndexChanged(int)),
+		SLOT(onGraphIndexChanged(int)));
 
-    readPreferences();
+	readPreferences();
 
 	api->setObjectName(QString::fromStdString(Filter::tool_name(
-			TOOL_NETWORK_ANALYZER)));
+				   TOOL_NETWORK_ANALYZER)));
 
 	ui->xygraph->enableZooming(ui->btnZoomIn, ui->btnZoomOut);
 
 	api->load(*settings);
 	api->js_register(engine);
 
-    connect((m_dBgraph.getAxisWidget(QwtPlot::xTop)) , SIGNAL(scaleDivChanged () ), &m_phaseGraph, SLOT(scaleDivChanged() ));
-    connect((m_phaseGraph.getAxisWidget(QwtPlot::xTop)) , SIGNAL(scaleDivChanged () ), &m_dBgraph, SLOT(scaleDivChanged() ));
+	connect((m_dBgraph.getAxisWidget(QwtPlot::xTop)), SIGNAL(scaleDivChanged()),
+		&m_phaseGraph, SLOT(scaleDivChanged()));
+	connect((m_phaseGraph.getAxisWidget(QwtPlot::xTop)), SIGNAL(scaleDivChanged()),
+		&m_dBgraph, SLOT(scaleDivChanged()));
 
-    connect(&m_dBgraph,SIGNAL(resetZoom()),&m_phaseGraph,SLOT(onResetZoom()));
-    connect(&m_phaseGraph,SIGNAL(resetZoom()),&m_dBgraph,SLOT(onResetZoom()));
-
-
-    connect(ui->rightMenu, &MenuAnim::finished, this, &NetworkAnalyzer::rightMenuFinished);
-
-    connect(ui->btnSettings, &CustomPushButton::toggled, [=](bool checked){
-	    triggerRightMenuToggle(ui->btnSettings, checked);
-    });
-    connect(ui->btnGeneralSettings, &CustomPushButton::toggled, [=](bool checked){
-	    triggerRightMenuToggle(ui->btnGeneralSettings, checked);
-    });
-    connect(ui->btnCursors, &CustomPushButton::toggled, [=](bool checked){
-	    triggerRightMenuToggle(ui->btnCursors, checked);
-    });
-
-    ui->btnSettings->setProperty("id",QVariant(-1));
-    ui->btnGeneralSettings->setProperty("id",QVariant(-2));
-    ui->btnCursors->setProperty("id",QVariant(-3));
+	connect(&m_dBgraph,SIGNAL(resetZoom()),&m_phaseGraph,SLOT(onResetZoom()));
+	connect(&m_phaseGraph,SIGNAL(resetZoom()),&m_dBgraph,SLOT(onResetZoom()));
 
 
-    connect(ui->horizontalSlider, &QSlider::valueChanged, [=](int value){
-	ui->transLabel->setText("Transparency " + QString::number(value) + "%");
-	m_dBgraph.setCursorReadoutsTransparency(value);
-	m_phaseGraph.setCursorReadoutsTransparency(value);
-    });
+	connect(ui->rightMenu, &MenuAnim::finished, this,
+		&NetworkAnalyzer::rightMenuFinished);
 
-    connect(ui->posSelect, &CustomPlotPositionButton::positionChanged,
-	[=](CustomPlotPositionButton::ReadoutsPosition position){
-	m_dBgraph.moveCursorReadouts(position);
-	m_phaseGraph.moveCursorReadouts(position);
-    });
+	connect(ui->btnSettings, &CustomPushButton::toggled, [=](bool checked) {
+		triggerRightMenuToggle(ui->btnSettings, checked);
+	});
+	connect(ui->btnGeneralSettings, &CustomPushButton::toggled, [=](bool checked) {
+		triggerRightMenuToggle(ui->btnGeneralSettings, checked);
+	});
+	connect(ui->btnCursors, &CustomPushButton::toggled, [=](bool checked) {
+		triggerRightMenuToggle(ui->btnCursors, checked);
+	});
 
-    if (!wheelEventGuard)
-	    wheelEventGuard = new MouseWheelWidgetGuard(ui->mainWidget);
-    wheelEventGuard->installEventRecursively(ui->mainWidget);
+	ui->btnSettings->setProperty("id",QVariant(-1));
+	ui->btnGeneralSettings->setProperty("id",QVariant(-2));
+	ui->btnCursors->setProperty("id",QVariant(-3));
 
-    connect(ui->btnPrint, &QPushButton::clicked, [=]() {
-	QWidget *widget = ui->stackedWidget->currentWidget();
-	QImage img (widget->width(), widget->height(), QImage::Format_ARGB32);
-	QPainter painter(&img);
-	img.fill(Qt::black);
-	widget->render(&painter);
-	QString date = QDateTime::currentDateTime().toString("yyyy-MM-dd-hh-mm-ss");
 
-	QString fileNameHint = "Scopy-" + api->objectName() + "-" + date + ".png";
+	connect(ui->horizontalSlider, &QSlider::valueChanged, [=](int value) {
+		ui->transLabel->setText("Transparency " + QString::number(value) + "%");
+		m_dBgraph.setCursorReadoutsTransparency(value);
+		m_phaseGraph.setCursorReadoutsTransparency(value);
+	});
 
-	QString fileName = QFileDialog::getSaveFileName(this,
-				tr("Save to"), fileNameHint,
-				tr({"(*.png);;"}));
-	painter.end();
-	img.invertPixels(QImage::InvertRgb);
-	img.save(fileName, 0, -1);
-    });
+	connect(ui->posSelect, &CustomPlotPositionButton::positionChanged,
+	[=](CustomPlotPositionButton::ReadoutsPosition position) {
+		m_dBgraph.moveCursorReadouts(position);
+		m_phaseGraph.moveCursorReadouts(position);
+	});
 
-    connect(ui->deltaBtn, &QPushButton::toggled,
-	    &m_dBgraph, &dBgraph::useDeltaLabel);
-    connect(ui->deltaBtn, &QPushButton::toggled,
-	    &m_phaseGraph, &dBgraph::useDeltaLabel);
-    connect(ui->btnIsLog, &QPushButton::toggled, [=](bool checked) {
-	    ui->deltaBtn->setDisabled(checked);
-	    if (checked) {
-		    wasChecked = ui->deltaBtn->isChecked();
-		    ui->deltaBtn->setChecked(false);
-	    } else {
-		    ui->deltaBtn->setChecked(wasChecked);
-	    }
-    });
+	if (!wheelEventGuard) {
+		wheelEventGuard = new MouseWheelWidgetGuard(ui->mainWidget);
+	}
+
+	wheelEventGuard->installEventRecursively(ui->mainWidget);
+
+	connect(ui->btnPrint, &QPushButton::clicked, [=]() {
+		QWidget *widget = ui->stackedWidget->currentWidget();
+		QImage img(widget->width(), widget->height(), QImage::Format_ARGB32);
+		QPainter painter(&img);
+		img.fill(Qt::black);
+		widget->render(&painter);
+		QString date = QDateTime::currentDateTime().toString("yyyy-MM-dd-hh-mm-ss");
+
+		QString fileNameHint = "Scopy-" + api->objectName() + "-" + date + ".png";
+
+		QString fileName = QFileDialog::getSaveFileName(this,
+				   tr("Save to"), fileNameHint,
+				   tr({"(*.png);;"}));
+		painter.end();
+		img.invertPixels(QImage::InvertRgb);
+		img.save(fileName, 0, -1);
+	});
+
+	connect(ui->deltaBtn, &QPushButton::toggled,
+		&m_dBgraph, &dBgraph::useDeltaLabel);
+	connect(ui->deltaBtn, &QPushButton::toggled,
+		&m_phaseGraph, &dBgraph::useDeltaLabel);
+	connect(ui->btnIsLog, &QPushButton::toggled, [=](bool checked) {
+		ui->deltaBtn->setDisabled(checked);
+
+		if (checked) {
+			wasChecked = ui->deltaBtn->isChecked();
+			ui->deltaBtn->setChecked(false);
+		} else {
+			ui->deltaBtn->setChecked(wasChecked);
+		}
+	});
 
 	// Create the blocks that are used to generate sine waves
 	top_block = make_top_block("Signal Generator");
 	source_block = analog::sig_source_f::make(1, analog::GR_SIN_WAVE,
-						  1, 1, 1);
+			1, 1, 1);
 
 	// DAC_RAW = (-Vout * 2^11) / 5V
 	// Multiplying with 16 because the HDL considers the DAC data as 16 bit
 	// instead of 12 bit(data is shifted to the left).
 	f2s_block = blocks::float_to_short::make(1,
-						 -1 * (1 << (DAC_BIT_COUNT - 1)) /
-						 AMPLITUDE_VOLTS * 16 / INTERP_BY_100_CORR);
+			-1 * (1 << (DAC_BIT_COUNT - 1)) /
+			AMPLITUDE_VOLTS * 16 / INTERP_BY_100_CORR);
 	head_block = blocks::head::make(sizeof(short), 1);
 	vector_block = blocks::vector_sink_s::make();
 
@@ -418,8 +436,10 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
 NetworkAnalyzer::~NetworkAnalyzer()
 {
-    disconnect(prefPanel,&Preferences::notify,this,&NetworkAnalyzer::readPreferences);
+	disconnect(prefPanel,&Preferences::notify,this,
+		   &NetworkAnalyzer::readPreferences);
 	ui->run_button->setChecked(false);
+
 	if (saveOnExit) {
 		api->save(*settings);
 	}
@@ -431,20 +451,22 @@ NetworkAnalyzer::~NetworkAnalyzer()
 	delete ui;
 }
 
-void NetworkAnalyzer::setMinimumDistanceBetween(SpinBoxA *min, SpinBoxA *max, double distance)
+void NetworkAnalyzer::setMinimumDistanceBetween(SpinBoxA *min, SpinBoxA *max,
+		double distance)
 {
 
 	connect(max, &SpinBoxA::valueChanged, [=](double value) {
-	    min->setMaxValue(value - distance);
-	    min->setValue(min->value());
+		min->setMaxValue(value - distance);
+		min->setValue(min->value());
 	});
 	connect(min, &SpinBoxA::valueChanged, [=](double value) {
-	    max->setMinValue(value + distance);
-	    max->setValue(max->value());
+		max->setMinValue(value + distance);
+		max->setValue(max->value());
 	});
 }
 
-void NetworkAnalyzer::triggerRightMenuToggle(CustomPushButton *btn, bool checked)
+void NetworkAnalyzer::triggerRightMenuToggle(CustomPushButton *btn,
+		bool checked)
 {
 	if (ui->rightMenu->animInProgress()) {
 		menuButtonActions.enqueue(
@@ -456,19 +478,20 @@ void NetworkAnalyzer::triggerRightMenuToggle(CustomPushButton *btn, bool checked
 
 void NetworkAnalyzer::toggleRightMenu(CustomPushButton *btn, bool checked)
 {
-    int id = btn->property("id").toInt();
+	int id = btn->property("id").toInt();
 
-    if(checked)
-	ui->stackedWidget_2->setCurrentIndex(-id-1);
+	if (checked) {
+		ui->stackedWidget_2->setCurrentIndex(-id-1);
+	}
 
-    ui->rightMenu->toggleMenu(checked);
+	ui->rightMenu->toggleMenu(checked);
 }
 
 void NetworkAnalyzer::rightMenuFinished(bool opened)
 {
 	Q_UNUSED(opened)
 
-	while(menuButtonActions.size()) {
+	while (menuButtonActions.size()) {
 		auto pair = menuButtonActions.dequeue();
 		toggleRightMenu(pair.first, pair.second);
 	}
@@ -476,13 +499,14 @@ void NetworkAnalyzer::rightMenuFinished(bool opened)
 
 void NetworkAnalyzer::showEvent(QShowEvent *event)
 {
-	d_bottomHandlesArea->setLeftPadding(m_dBgraph.axisWidget(QwtAxisId(QwtPlot::yLeft, 0))->width()
-				+ ui->gridLayout_plots->margin()
-				+ ui->widgetPlotContainer->layout()->margin() + 1);
+	d_bottomHandlesArea->setLeftPadding(m_dBgraph.axisWidget(QwtAxisId(
+			QwtPlot::yLeft, 0))->width()
+					    + ui->gridLayout_plots->margin()
+					    + ui->widgetPlotContainer->layout()->margin() + 1);
 	int rightPadding = 0;
 	rightPadding = rightPadding + m_dBgraph.width()
-			- m_dBgraph.axisWidget(QwtPlot::yLeft)->width() - m_dBgraph.canvas()->width()
-			- ui->widgetPlotContainer->layout()->margin() ;
+		       - m_dBgraph.axisWidget(QwtPlot::yLeft)->width() - m_dBgraph.canvas()->width()
+		       - ui->widgetPlotContainer->layout()->margin() ;
 	d_bottomHandlesArea->setRightPadding(rightPadding);
 	d_hCursorHandle1->setPosition(d_hCursorHandle1->pos().x());
 	d_hCursorHandle2->setPosition(d_hCursorHandle2->pos().x());
@@ -491,19 +515,20 @@ void NetworkAnalyzer::showEvent(QShowEvent *event)
 
 void NetworkAnalyzer::on_btnExport_clicked()
 {
-	auto export_dialog( new QFileDialog( this ) );
-	export_dialog->setWindowModality( Qt::WindowModal );
-	export_dialog->setFileMode( QFileDialog::AnyFile );
-	export_dialog->setAcceptMode( QFileDialog::AcceptSave );
+	auto export_dialog(new QFileDialog(this));
+	export_dialog->setWindowModality(Qt::WindowModal);
+	export_dialog->setFileMode(QFileDialog::AnyFile);
+	export_dialog->setAcceptMode(QFileDialog::AcceptSave);
 	export_dialog->setNameFilters({"Comma-separated values files (*.csv)",
-					       "Tab-delimited values files (*.txt)"});
+				       "Tab-delimited values files (*.txt)"});
 
 	if (export_dialog->exec()) {
 		FileManager fm("Network Analyzer");
 
 		fm.open(export_dialog->selectedFiles().at(0), FileManager::EXPORT);
 
-		fm.setAdditionalInformation(ui->btnRefChn->isChecked() ? "Reference channel: 1" : "Reference channel: 2");
+		fm.setAdditionalInformation(ui->btnRefChn->isChecked() ?
+					    "Reference channel: 1" : "Reference channel: 2");
 
 		fm.save(m_dBgraph.getXAxisData(), "Frequency(Hz)");
 		fm.save(m_dBgraph.getYAxisData(), "Magnitude(dB)");
@@ -526,29 +551,35 @@ void NetworkAnalyzer::computeFrequencyArray()
 	double step;
 
 	bool is_log = ui->btnIsLog->isChecked();
-	if (is_log)
+
+	if (is_log) {
 		step = (log10_max_freq - log10_min_freq) / (double)(steps - 1);
-	else
+	} else {
 		step = (max_freq - min_freq) / (double)(steps - 1);
+	}
 
 	for (unsigned int i = 0; i < steps; ++i) {
 		double frequency;
+
 		if (is_log) {
 			frequency = pow(10.0,
 					log10_min_freq + (double) i * step);
 		} else {
 			frequency = min_freq + (double) i * step;
 		}
+
 		ret.push_back(frequency);
 	}
 
 	QVector<double> adjFreq;
 	adjFreq.resize(ret.size());
 
-	auto sampleRates = SignalGenerator::get_available_sample_rates(iio_channel_get_device(dac_channels[0]));
+	auto sampleRates = SignalGenerator::get_available_sample_rates(
+				   iio_channel_get_device(dac_channels[0]));
 	qSort(sampleRates.begin(), sampleRates.end(), qLess<unsigned int>());
 
 	uint32_t lastRate = sampleRates[0];
+
 	for (int i = 0; i < ret.size(); ++i) {
 		double freq = ret[i];
 
@@ -570,15 +601,19 @@ void NetworkAnalyzer::computeFrequencyArray()
 				if (rate < lastRate) {
 					continue;
 				}
+
 				modf(rate / freq, &integral);
+
 				if (integral < 2.5) {
 					continue;
 				}
+
 				if (integral < 14 && lastRate < sampleRates.back()) {
 					continue;
 				}
 
 				double newFrequency = rate / (integral + fract);
+
 				if (newFrequency > prev && newFrequency < next && (integral * j > 2)) {
 					stop = true;
 					adjFreq[i] = newFrequency;
@@ -587,6 +622,7 @@ void NetworkAnalyzer::computeFrequencyArray()
 					while (bufferSize & 0x3) {
 						bufferSize <<= 1;
 					}
+
 					while (bufferSize < 1280) {
 						bufferSize <<= 1;
 					}
@@ -599,16 +635,18 @@ void NetworkAnalyzer::computeFrequencyArray()
 
 		}
 	}
+
 	// Needs to be invoked on the main thread
 	QMetaObject::invokeMethod(this,
-				"updateNumSamples",
-				Qt::QueuedConnection,
-				Q_ARG(bool, true));
+				  "updateNumSamples",
+				  Qt::QueuedConnection,
+				  Q_ARG(bool, true));
 }
 
 void NetworkAnalyzer::updateNumSamples(bool force)
 {
 	unsigned int num_samples;
+
 	if (force) {
 		num_samples = iterations.size();
 	} else {
@@ -624,17 +662,20 @@ void NetworkAnalyzer::updateNumSamples(bool force)
 void NetworkAnalyzer::updateGainMode()
 {
 	auto m2k_adc = std::dynamic_pointer_cast<M2kAdc>(adc_dev);
+
 	if (m2k_adc) {
 		double sweep_ampl = amplitude->value();
 		QPair<double, double> range = m2k_adc->inputRange(
-				M2kAdc::HIGH_GAIN_MODE);
+						      M2kAdc::HIGH_GAIN_MODE);
 		double threshold = range.second - range.first;
 		M2kAdc::GainMode gain_mode;
+
 		if (sweep_ampl > threshold) {
 			gain_mode = M2kAdc::LOW_GAIN_MODE;
 		} else {
 			gain_mode = M2kAdc::HIGH_GAIN_MODE;
 		}
+
 		for (int chn = 0; chn < m2k_adc->numAdcChannels(); chn++) {
 			m2k_adc->setChnHwGainMode(chn, gain_mode);
 		}
@@ -644,7 +685,7 @@ void NetworkAnalyzer::updateGainMode()
 void NetworkAnalyzer::run()
 {
 	// Enable the available dac channels
-	for (auto &channel : dac_channels) {
+	for (auto& channel : dac_channels) {
 		iio_channel_enable(channel);
 	}
 
@@ -655,6 +696,7 @@ void NetworkAnalyzer::run()
 	computeFrequencyArray();
 
 	fixedRate = sampleRates[0];
+
 	for (unsigned int i = 0; !stop && i < iterations.size(); ++i) {
 
 
@@ -669,17 +711,20 @@ void NetworkAnalyzer::run()
 		// Create and push the generated sine waves on
 		// the devices
 		QVector<struct iio_buffer *> buffers;
-		for (const auto &channel : dac_channels) {
+
+		for (const auto& channel : dac_channels) {
 			const struct iio_device *dev = iio_channel_get_device(channel);
 			iio_device_attr_write_bool(dev, "dma_sync", true);
 			struct iio_buffer *buf_dac = generateSinWave(dev,
-					frequency, amplitudeValue, offsetValue,
-					rate, samples_count);
+						     frequency, amplitudeValue, offsetValue,
+						     rate, samples_count);
 			buffers.push_back(buf_dac);
+
 			if (!buf_dac) {
 				qCritical() << "Unable to create DAC buffer";
 				break;
 			}
+
 			iio_device_attr_write_bool(dev, "dma_sync", false);
 		}
 
@@ -700,23 +745,25 @@ void NetworkAnalyzer::run()
 
 		// Lock the flowgraph if we are already started
 		bool started = iio->started();
-		if (started)
+
+		if (started) {
 			iio->lock();
+		}
 
 		auto f2c1 = blocks::float_to_complex::make();
 		auto f2c2 = blocks::float_to_complex::make();
 		auto id1 = iio->connect(f2c1, 0, 0, true,
-				buffer_size);
+					buffer_size);
 		auto id2 = iio->connect(f2c2, 1, 0, true,
-				buffer_size);
+					buffer_size);
 
 		auto null = blocks::null_source::make(sizeof(float));
 		iio->connect(null, 0, f2c1, 1);
 		iio->connect(null, 0, f2c2, 1);
 
 		auto cosine = analog::sig_source_c::make(
-				(unsigned int) adc_rate,
-				gr::analog::GR_COS_WAVE, -frequency, 1.0);
+				      (unsigned int) adc_rate,
+				      gr::analog::GR_COS_WAVE, -frequency, 1.0);
 
 		auto mult1 = blocks::multiply_cc::make();
 		iio->connect(f2c1, 0, mult1, 0);
@@ -732,7 +779,7 @@ void NetworkAnalyzer::run()
 		auto avg1 = blocks::moving_average_cc::make(buffer_size,
 				2.0 / buffer_size, buffer_size);
 		auto skiphead3 = blocks::skiphead::make(sizeof(gr_complex),
-				buffer_size - 1);
+							buffer_size - 1);
 		auto c2m1 = blocks::complex_to_mag_squared::make();
 
 		iio->connect(mult1, 0, avg1, 0);
@@ -744,7 +791,7 @@ void NetworkAnalyzer::run()
 		auto avg2 = blocks::moving_average_cc::make(buffer_size,
 				2.0 / buffer_size, buffer_size);
 		auto skiphead4 = blocks::skiphead::make(sizeof(gr_complex),
-				buffer_size - 1);
+							buffer_size - 1);
 		auto c2m2 = blocks::complex_to_mag_squared::make();
 
 		iio->connect(mult2, 0, avg2, 0);
@@ -761,7 +808,7 @@ void NetworkAnalyzer::run()
 		float mag1 = 0.0f, mag2 = 0.0f, phase = 0.0f;
 
 		connect(&*signal, &signal_sample::triggered,
-				[&](const std::vector<float> values) {
+		[&](const std::vector<float> values) {
 			mag1 = values[0];
 			mag2 = values[1];
 			phase = values[2];
@@ -775,8 +822,9 @@ void NetworkAnalyzer::run()
 		iio->start(id2);
 
 
-		if (started)
+		if (started) {
 			iio->unlock();
+		}
 
 		// Wait for the signal_sample sink block to capture the data
 		do {
@@ -797,17 +845,20 @@ void NetworkAnalyzer::run()
 			  << " s" << std::endl;
 
 		started = iio->started();
-		if (started)
+
+		if (started) {
 			iio->lock();
+		}
 
 		iio->disconnect(id1);
 		iio->disconnect(id2);
 
-		if (started)
+		if (started) {
 			iio->unlock();
+		}
 
 		// Clear the iio_buffers that were created
-		for (auto &buffer : buffers) {
+		for (auto& buffer : buffers) {
 			iio_buffer_destroy(buffer);
 		}
 
@@ -819,24 +870,25 @@ void NetworkAnalyzer::run()
 
 		// Plot the data captured for this iteration
 		QMetaObject::invokeMethod(this,
-					"plot",
-					Qt::QueuedConnection,
-					Q_ARG(double, frequency),
-					Q_ARG(double, mag1),
-					Q_ARG(double, mag2),
-					Q_ARG(double, phase));
+					  "plot",
+					  Qt::QueuedConnection,
+					  Q_ARG(double, frequency),
+					  Q_ARG(double, mag1),
+					  Q_ARG(double, mag2),
+					  Q_ARG(double, phase));
 
 	}
 
 	Q_EMIT sweepDone();
 }
 
-void NetworkAnalyzer::computeCaptureParams(double frequency, size_t &buffer_size, size_t &adc_rate)
+void NetworkAnalyzer::computeCaptureParams(double frequency,
+		size_t& buffer_size, size_t& adc_rate)
 {
 	adc_rate = fixedRate;
 	size_t nrOfPeriods = 2;
 
-	for (const auto &rate : sampleRates) {
+	for (const auto& rate : sampleRates) {
 
 		double ratio = rate / frequency;
 		buffer_size = ratio * nrOfPeriods;
@@ -867,9 +919,11 @@ void NetworkAnalyzer::computeCaptureParams(double frequency, size_t &buffer_size
 	}
 }
 
-void NetworkAnalyzer::plot(double frequency, double mag1, double mag2, double phase)
+void NetworkAnalyzer::plot(double frequency, double mag1, double mag2,
+			   double phase)
 {
 	double mag;
+
 	if (ui->btnRefChn->isChecked()) {
 		phase = -phase;
 		mag = 10.0 * log10(mag2) - 10.0 * log10(mag1);
@@ -889,6 +943,7 @@ void NetworkAnalyzer::startStop(bool pressed)
 {
 
 	QPushButton *btn = dynamic_cast<QPushButton *>(QObject::sender());
+
 	if (btn) {
 		setDynamicProperty(btn, "running", pressed);
 
@@ -937,6 +992,7 @@ void NetworkAnalyzer::startStop(bool pressed)
 			updateNumSamples();
 			configHwForNetworkAnalyzing();
 		}
+
 		thd = QtConcurrent::run(this, &NetworkAnalyzer::run);
 	} else {
 		btn->setEnabled(false);
@@ -953,16 +1009,18 @@ void NetworkAnalyzer::startStop(bool pressed)
 	}
 }
 
-struct iio_buffer * NetworkAnalyzer::generateSinWave(
-		const struct iio_device *dev, double frequency,
-		double amplitude, double offset,
-		unsigned long rate, size_t samples_count)
+struct iio_buffer *NetworkAnalyzer::generateSinWave(
+	const struct iio_device *dev, double frequency,
+	double amplitude, double offset,
+	unsigned long rate, size_t samples_count)
 {
 	/* Create the IIO buffer */
 	struct iio_buffer *buf = iio_device_create_buffer(
-			dev, samples_count, true);
-	if (!buf)
+					 dev, samples_count, true);
+
+	if (!buf) {
 		return buf;
+	}
 
 
 	iio_device_attr_write_longlong(dev, "oversampling_ratio", 1);
@@ -980,7 +1038,7 @@ struct iio_buffer * NetworkAnalyzer::generateSinWave(
 	head_block->set_length(samples_count);
 	top_block->run();
 
-	const std::vector<short> &samples = vector_block->data();
+	const std::vector<short>& samples = vector_block->data();
 	const short *data = samples.data();
 
 	for (unsigned int i = 0; i < iio_device_get_channels_count(dev); i++) {
@@ -988,7 +1046,7 @@ struct iio_buffer * NetworkAnalyzer::generateSinWave(
 
 		if (iio_channel_is_enabled(chn)) {
 			iio_channel_write(chn, buf, data,
-					samples_count * sizeof(short));
+					  samples_count * sizeof(short));
 		}
 	}
 
@@ -1002,9 +1060,11 @@ struct iio_buffer * NetworkAnalyzer::generateSinWave(
 void NetworkAnalyzer::configHwForNetworkAnalyzing()
 {
 	auto trigger = adc_dev->getTrigger();
+
 	if (trigger) {
-		for (uint i = 0; i < trigger->numChannels(); i++)
+		for (uint i = 0; i < trigger->numChannels(); i++) {
 			trigger->setTriggerMode(i, HardwareTrigger::ALWAYS);
+		}
 	}
 
 	auto m2k_adc = std::dynamic_pointer_cast<M2kAdc>(adc_dev);
@@ -1016,36 +1076,38 @@ void NetworkAnalyzer::configHwForNetworkAnalyzing()
 
 void NetworkAnalyzer::onVbar1PixelPosChanged(int pos)
 {
-    d_hCursorHandle1->setPositionSilenty(pos);
+	d_hCursorHandle1->setPositionSilenty(pos);
 }
 
 void NetworkAnalyzer::onVbar2PixelPosChanged(int pos)
 {
-    d_hCursorHandle2->setPositionSilenty(pos);
+	d_hCursorHandle2->setPositionSilenty(pos);
 }
 
 void NetworkAnalyzer::toggleCursors(bool en)
 {
-    if(!en){
-	ui->btnCursors->setChecked(en);
-    }
-    if (d_cursorsEnabled != en) {
-	d_cursorsEnabled = en;
-	m_dBgraph.toggleCursors(en);
-	m_phaseGraph.toggleCursors(en);
-	d_hCursorHandle1->setVisible(en);
-	d_hCursorHandle2->setVisible(en);
-	ui->btnCursors->setEnabled(en);
-    }
+	if (!en) {
+		ui->btnCursors->setChecked(en);
+	}
+
+	if (d_cursorsEnabled != en) {
+		d_cursorsEnabled = en;
+		m_dBgraph.toggleCursors(en);
+		m_phaseGraph.toggleCursors(en);
+		d_hCursorHandle1->setVisible(en);
+		d_hCursorHandle2->setVisible(en);
+		ui->btnCursors->setEnabled(en);
+	}
 
 }
 
 void NetworkAnalyzer::readPreferences()
 {
-    m_dBgraph.setShowZero(prefPanel->getNa_show_zero());
-    m_phaseGraph.setShowZero(prefPanel->getNa_show_zero());
+	m_dBgraph.setShowZero(prefPanel->getNa_show_zero());
+	m_phaseGraph.setShowZero(prefPanel->getNa_show_zero());
 }
 
-void NetworkAnalyzer::onGraphIndexChanged(int index){
-    ui->stackedWidget->setCurrentIndex(index);
+void NetworkAnalyzer::onGraphIndexChanged(int index)
+{
+	ui->stackedWidget->setCurrentIndex(index);
 }
