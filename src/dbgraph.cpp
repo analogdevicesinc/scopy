@@ -103,8 +103,6 @@ dBgraph::dBgraph(QWidget *parent) : QwtPlot(parent),
 
 	thickness = 1;
 
-	useLogFreq(false);
-
 	OscScaleEngine *scaleLeft = new OscScaleEngine;
     scaleLeft->setMajorTicksCount(7);
 	this->setAxisScaleEngine(QwtPlot::yLeft,
@@ -124,6 +122,8 @@ dBgraph::dBgraph(QWidget *parent) : QwtPlot(parent),
 	draw_y->enableComponent(QwtAbstractScaleDraw::Backbone, false);
     draw_y->setMinimumExtent(50);
 	setAxisScaleDraw(QwtPlot::yLeft, draw_y);
+
+	useLogFreq(false);
 
 	/* Create 4 scales within the plot itself. Only draw the ticks */
 	for (unsigned int i = 0; i < 4; i++) {
@@ -434,11 +434,28 @@ void dBgraph::useLogFreq(bool use_log_freq)
 		onCursor2Moved(d_vBar2->transform(d_vBar2->plotCoord()).x());
 	}
 
-	replot();
-
+	// Use delta only when log scale is disabled and delta
+	// label mode is enabled
 	auto sw = axisWidget(QwtPlot::xTop);
-	sw->scaleDraw()->invalidateCache();
+	auto *sd = dynamic_cast<OscScaleDraw *>(sw->scaleDraw());
+	sd->enableDeltaLabel(delta_label & (!use_log_freq));
 	sw->repaint();
+
+	replot();
+}
+
+void dBgraph::useDeltaLabel(bool use_delta)
+{
+	if (delta_label != use_delta) {
+		delta_label = use_delta;
+
+		if (!log_freq) {
+			auto sw = axisWidget(QwtPlot::xTop);
+			auto *sd = dynamic_cast<OscScaleDraw *>(sw->scaleDraw());
+			sd->enableDeltaLabel(use_delta);
+			sw->repaint();
+		}
+	}
 }
 
 void dBgraph::onCursor1PositionChanged(int pos)
@@ -446,8 +463,8 @@ void dBgraph::onCursor1PositionChanged(int pos)
 	pos = std::min(pos,QwtPlot::canvas()->width()-1);
 	d_vBar1->setPixelPosition(pos);
 	onCursor1Moved(pos);
-
 }
+
 void dBgraph::onCursor2PositionChanged(int pos)
 {
 	pos = std::min(pos,QwtPlot::canvas()->width()-1);

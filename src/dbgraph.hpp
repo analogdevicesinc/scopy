@@ -115,6 +115,7 @@ Q_SIGNALS:
 		void setYUnit(const QString& unit);
 
 		void useLogFreq(bool use_log_freq);
+		void useDeltaLabel(bool use_delta);
 
         void onVbar1PixelPosChanged(int pos);
         void onVbar2PixelPosChanged(int pos);
@@ -144,6 +145,7 @@ Q_SIGNALS:
 		QColor color;
 		double thickness;
 		bool log_freq;
+		bool delta_label;
 
         bool d_cursorsEnabled;
         bool d_cursorsCentered;
