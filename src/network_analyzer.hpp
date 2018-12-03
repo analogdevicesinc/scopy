@@ -72,7 +72,8 @@ namespace adiscope {
 		std::shared_ptr<GenericAdc> adc_dev;
 		boost::shared_ptr<iio_manager> iio;
         dBgraph m_dBgraph;
-        dBgraph m_phaseGraph;
+	dBgraph m_phaseGraph;
+	bool wasChecked;
 
         PlotLineHandleH *d_hCursorHandle1;
         PlotLineHandleH *d_hCursorHandle2;
