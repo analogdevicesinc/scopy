@@ -46,48 +46,48 @@ extern "C" {
 }
 
 namespace Ui {
-	class NetworkAnalyzer;
+class NetworkAnalyzer;
 }
 
 class QPushButton;
 class QJSEngine;
 
 namespace adiscope {
-	class NetworkAnalyzer_API;
-	class Filter;
-	class GenericAdc;
+class NetworkAnalyzer_API;
+class Filter;
+class GenericAdc;
 
-	class NetworkAnalyzer : public Tool
-	{
-		friend class NetworkAnalyzer_API;
-		friend class ToolLauncher_API;
+class NetworkAnalyzer : public Tool
+{
+	friend class NetworkAnalyzer_API;
+	friend class ToolLauncher_API;
 
-		Q_OBJECT
+	Q_OBJECT
 
-	public:
-		explicit NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
-				std::shared_ptr<GenericAdc> &adc_dev,
-				QPushButton *runButton, QJSEngine *engine,
-				ToolLauncher *parent);
-		~NetworkAnalyzer();
+public:
+	explicit NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
+				 std::shared_ptr<GenericAdc>& adc_dev,
+				 QPushButton *runButton, QJSEngine *engine,
+				 ToolLauncher *parent);
+	~NetworkAnalyzer();
 
-	private:
-		Ui::NetworkAnalyzer *ui;
-		struct iio_channel *amp1, *amp2;
-		std::vector<iio_channel *> dac_channels;
-		struct iio_device *adc;
-		std::shared_ptr<GenericAdc> adc_dev;
-		boost::shared_ptr<iio_manager> iio;
+private:
+	Ui::NetworkAnalyzer *ui;
+	struct iio_channel *amp1, *amp2;
+	std::vector<iio_channel *> dac_channels;
+	struct iio_device *adc;
+	std::shared_ptr<GenericAdc> adc_dev;
+	boost::shared_ptr<iio_manager> iio;
 
-		// Sine generation blocks
-		gr::top_block_sptr top_block;
-		gr::analog::sig_source_f::sptr source_block;
-		gr::blocks::float_to_short::sptr f2s_block;
-		gr::blocks::head::sptr head_block;
-		gr::blocks::vector_sink_s::sptr vector_block;
+	// Sine generation blocks
+	gr::top_block_sptr top_block;
+	gr::analog::sig_source_f::sptr source_block;
+	gr::blocks::float_to_short::sptr f2s_block;
+	gr::blocks::head::sptr head_block;
+	gr::blocks::vector_sink_s::sptr vector_block;
 
-		QVector<unsigned long> sampleRates;
-		size_t fixedRate;
+	QVector<unsigned long> sampleRates;
+	size_t fixedRate;
 
 
 
@@ -139,32 +139,33 @@ namespace adiscope {
 
 	MouseWheelWidgetGuard *wheelEventGuard;
 
-		QFuture<void> thd;
-		bool stop;
+	QFuture<void> thd;
+	bool stop;
 
-		void run();
+	void run();
 
-		struct iio_buffer * generateSinWave(
-				const struct iio_device *dev,
-				double frequency,
-				double amplitude,
-				double offset,
-				unsigned long rate,
-				size_t samples_count);
+	struct iio_buffer *generateSinWave(
+		const struct iio_device *dev,
+		double frequency,
+		double amplitude,
+		double offset,
+		unsigned long rate,
+		size_t samples_count);
 
-		void configHwForNetworkAnalyzing();
+	void configHwForNetworkAnalyzing();
 
-		void triggerRightMenuToggle(CustomPushButton *btn, bool checked);
-		void toggleRightMenu(CustomPushButton *btn, bool checked);
+	void triggerRightMenuToggle(CustomPushButton *btn, bool checked);
+	void toggleRightMenu(CustomPushButton *btn, bool checked);
 
-		void computeFrequencyArray();
-                void updateGainMode();
-		void computeCaptureParams(double frequency, size_t &buffer_size, size_t &adc_rate);
+	void computeFrequencyArray();
+	void updateGainMode();
+	void computeCaptureParams(double frequency, size_t& buffer_size,
+				  size_t& adc_rate);
 
-	private Q_SLOTS:
-		void startStop(bool start);
-		void updateNumSamples(bool force = false);
-		void plot(double frequency, double mag, double mag2, double phase);
+private Q_SLOTS:
+	void startStop(bool start);
+	void updateNumSamples(bool force = false);
+	void plot(double frequency, double mag, double mag2, double phase);
 
 	void toggleCursors(bool en);
 	void onVbar1PixelPosChanged(int pos);
@@ -174,14 +175,14 @@ namespace adiscope {
 	void on_btnExport_clicked();
 	void rightMenuFinished(bool opened);
 
-	public Q_SLOTS:
+public Q_SLOTS:
 
 	void showEvent(QShowEvent *event);
 
-	Q_SIGNALS:
-		void sweepDone();
-		void showTool();
-	};
+Q_SIGNALS:
+	void sweepDone();
+	void showTool();
+};
 } /* namespace adiscope */
 
 #endif /* SCOPY_NETWORK_ANALYZER_HPP */
