@@ -703,6 +703,12 @@ border: 5px solid white;
              </property>
              <item>
               <widget class="QStackedWidget" name="stackedWidget_2">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
                <property name="minimumSize">
                 <size>
                  <width>60</width>
@@ -710,7 +716,7 @@ border: 5px solid white;
                 </size>
                </property>
                <property name="currentIndex">
-                <number>1</number>
+                <number>0</number>
                </property>
                <widget class="QWidget" name="page_3">
                 <layout class="QVBoxLayout" name="verticalLayout_14">
@@ -755,7 +761,7 @@ border: 5px solid white;
                       <x>0</x>
                       <y>0</y>
                       <width>322</width>
-                      <height>514</height>
+                      <height>557</height>
                      </rect>
                     </property>
                     <layout class="QVBoxLayout" name="verticalLayout_11">
@@ -1307,11 +1313,14 @@ color: rgba(255,255,255,51);
                        <property name="topMargin">
                         <number>0</number>
                        </property>
+                       <property name="bottomMargin">
+                        <number>0</number>
+                       </property>
                        <property name="spacing">
                         <number>15</number>
                        </property>
-                       <item row="1" column="0">
-                        <layout class="QVBoxLayout" name="magMaxLayout"/>
+                       <item row="0" column="1">
+                        <layout class="QVBoxLayout" name="phaseMinLayout"/>
                        </item>
                        <item row="0" column="0">
                         <layout class="QVBoxLayout" name="magMinLayout"/>
@@ -1319,8 +1328,43 @@ color: rgba(255,255,255,51);
                        <item row="1" column="1">
                         <layout class="QVBoxLayout" name="phaseMaxLayout"/>
                        </item>
-                       <item row="0" column="1">
-                        <layout class="QVBoxLayout" name="phaseMinLayout"/>
+                       <item row="2" column="0">
+                        <widget class="QLabel" name="label_11">
+                         <property name="sizePolicy">
+                          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                           <horstretch>0</horstretch>
+                           <verstretch>0</verstretch>
+                          </sizepolicy>
+                         </property>
+                         <property name="styleSheet">
+                          <string notr="true">font-size: 13px;</string>
+                         </property>
+                         <property name="text">
+                          <string>Delta Label</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="1" column="0">
+                        <layout class="QVBoxLayout" name="magMaxLayout"/>
+                       </item>
+                       <item row="2" column="1">
+                        <widget class="adiscope::CustomSwitch" name="deltaBtn">
+                         <property name="text">
+                          <string/>
+                         </property>
+                         <property name="leftText" stdset="0">
+                          <string>On</string>
+                         </property>
+                         <property name="rightText" stdset="0">
+                          <string>Off</string>
+                         </property>
+                         <property name="duration_ms" stdset="0">
+                          <number>0</number>
+                         </property>
+                         <property name="polarity" stdset="0">
+                          <bool>false</bool>
+                         </property>
+                        </widget>
                        </item>
                       </layout>
                      </item>

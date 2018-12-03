@@ -72,7 +72,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	adc_dev(adc_dev),
 	d_cursorsEnabled(false),
 	stop(true), amp1(nullptr), amp2(nullptr),
-	wheelEventGuard(nullptr)
+	wheelEventGuard(nullptr), wasChecked(false)
 {
 	iio = iio_manager::get_instance(ctx,
 			filt->device_name(TOOL_NETWORK_ANALYZER, 2));
@@ -244,6 +244,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
     connect(ui->btnIsLog, SIGNAL(toggled(bool)),
             &m_phaseGraph, SLOT(useLogFreq(bool)));
 
+
     connect(ui->cbLineThickness,SIGNAL(currentIndexChanged(int)),&m_dBgraph,SLOT(setThickness(int)));
     connect(ui->cbLineThickness,SIGNAL(currentIndexChanged(int)),&m_phaseGraph,SLOT(setThickness(int)));
     connect(ui->cbLineThickness,SIGNAL(currentIndexChanged(int)),ui->nicholsgraph,SLOT(setThickness(int)));
@@ -360,6 +361,20 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	img.save(fileName, 0, -1);
     });
 
+
+    connect(ui->deltaBtn, &QPushButton::toggled,
+	    &m_dBgraph, &dBgraph::useDeltaLabel);
+    connect(ui->deltaBtn, &QPushButton::toggled,
+	    &m_phaseGraph, &dBgraph::useDeltaLabel);
+    connect(ui->btnIsLog, &QPushButton::toggled, [=](bool checked) {
+	    ui->deltaBtn->setDisabled(checked);
+	    if (checked) {
+		    wasChecked = ui->deltaBtn->isChecked();
+		    ui->deltaBtn->setChecked(false);
+	    } else {
+		    ui->deltaBtn->setChecked(wasChecked);
+	    }
+    });
 }
 
 NetworkAnalyzer::~NetworkAnalyzer()
