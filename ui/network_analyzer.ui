@@ -809,7 +809,7 @@ border: 5px solid white;
                       <x>0</x>
                       <y>0</y>
                       <width>322</width>
-                      <height>557</height>
+                      <height>574</height>
                      </rect>
                     </property>
                     <layout class="QVBoxLayout" name="verticalLayout_11">
@@ -1081,7 +1081,7 @@ color: rgba(255,255,255,51);
                        <property name="spacing">
                         <number>15</number>
                        </property>
-                       <item row="3" column="0">
+                       <item row="4" column="0">
                         <spacer name="verticalSpacer_2">
                          <property name="orientation">
                           <enum>Qt::Vertical</enum>
@@ -1097,15 +1097,8 @@ color: rgba(255,255,255,51);
                          </property>
                         </spacer>
                        </item>
-                       <item row="1" column="1">
-                        <widget class="QRadioButton" name="isLinear">
-                         <property name="text">
-                          <string>Linear</string>
-                         </property>
-                         <attribute name="buttonGroup">
-                          <string notr="true">buttonGroup</string>
-                         </attribute>
-                        </widget>
+                       <item row="2" column="0">
+                        <layout class="QVBoxLayout" name="minFreqLayout"/>
                        </item>
                        <item row="1" column="0">
                         <widget class="QRadioButton" name="isLog">
@@ -1120,14 +1113,21 @@ color: rgba(255,255,255,51);
                          </attribute>
                         </widget>
                        </item>
-                       <item row="3" column="1">
+                       <item row="4" column="1">
                         <layout class="QVBoxLayout" name="samplesCountLayout"/>
-                       </item>
-                       <item row="2" column="0">
-                        <layout class="QVBoxLayout" name="minFreqLayout"/>
                        </item>
                        <item row="2" column="1">
                         <layout class="QVBoxLayout" name="maxFreqLayout"/>
+                       </item>
+                       <item row="1" column="1">
+                        <widget class="QRadioButton" name="isLinear">
+                         <property name="text">
+                          <string>Linear</string>
+                         </property>
+                         <attribute name="buttonGroup">
+                          <string notr="true">buttonGroup</string>
+                         </attribute>
+                        </widget>
                        </item>
                        <item row="1" column="0" colspan="2">
                         <widget class="adiscope::CustomSwitch" name="btnIsLog">
@@ -1214,6 +1214,12 @@ color: rgba(255,255,255,51);
                           <number>0</number>
                          </property>
                         </widget>
+                       </item>
+                       <item row="3" column="0">
+                        <layout class="QVBoxLayout" name="centerFreqLayout"/>
+                       </item>
+                       <item row="3" column="1">
+                        <layout class="QVBoxLayout" name="spanFreqLayout"/>
                        </item>
                       </layout>
                      </item>

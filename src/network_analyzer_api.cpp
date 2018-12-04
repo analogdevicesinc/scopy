@@ -9,12 +9,12 @@ void NetworkAnalyzer_API::show()
 
 double NetworkAnalyzer_API::getMinFreq() const
 {
-        return net->minFreq->value();
+	return net->start_freq->value();
 }
 
 double NetworkAnalyzer_API::getMaxFreq() const
 {
-        return net->maxFreq->value();
+	return net->stop_freq->value();
 }
 
 double NetworkAnalyzer_API::getSamplesCount() const
@@ -34,14 +34,14 @@ double NetworkAnalyzer_API::getOffset() const
 
 void NetworkAnalyzer_API::setMinFreq(double freq)
 {
-        net->minFreq->setValue(freq);
+	net->start_freq->setValue(freq);
     net->m_dBgraph.setXMin(freq);
     net->m_phaseGraph.setXMin(freq);
 }
 
 void NetworkAnalyzer_API::setMaxFreq(double freq)
 {
-        net->maxFreq->setValue(freq);
+	net->stop_freq->setValue(freq);
     net->m_dBgraph.setXMax(freq);
     net->m_phaseGraph.setXMax(freq);
 }
