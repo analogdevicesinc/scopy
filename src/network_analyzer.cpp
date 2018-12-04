@@ -163,19 +163,43 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	}, "Samples count", 10, 1000, false, false, this);
 	samplesCount->setValue(1000);
 
-	minFreq = new ScaleSpinButton({
+	start_freq = new ScaleSpinButton({
 		{"Hz",1e0},
 		{"kHz",1e3},
 		{"MHz",1e6}
-	},"Min Freq", 1e0, 5e7, false, false, this);
-	minFreq->setValue(1000);
+	},"Min Freq", 1e0, 5e7, false, false, this,
+	{1, 2.5, 5, 7.5});
+	start_freq->setValue(1000);
 
-	maxFreq = new ScaleSpinButton({
+	stop_freq = new ScaleSpinButton({
 		{"Hz",1e0},
 		{"kHz",1e3},
 		{"MHz",1e6}
-	},"Max Freq", 1e0, 5e7, false, false, this);
-	maxFreq->setValue(50000);
+	},"Max Freq", 1e0, 5e7, false, false, this,
+	{1, 2.5, 5, 7.5});
+	stop_freq->setValue(50000);
+
+	start_freq->enableNumberSeriesRebuild(false);
+	stop_freq->enableNumberSeriesRebuild(false);
+
+	span_freq = new ScaleSpinButton({
+		{"Hz",1e0},
+		{"kHz",1e3},
+		{"MHz",1e6}
+	}, "Span", 1e0, 5e7, false, false, this,
+	{1, 2.5, 5, 7.5});
+	ui->spanFreqLayout->addWidget(span_freq);
+
+	center_freq = new ScaleSpinButton({
+		{"Hz",1e0},
+		{"kHz",1e3},
+		{"MHz",1e6}
+	}, "Center", 1e0, 5e7, false, false, this,
+	{1, 2.5, 5, 7.5});
+	ui->centerFreqLayout->addWidget(center_freq);
+
+	center_freq->enableNumberSeriesRebuild(false);
+	span_freq->enableNumberSeriesRebuild(false);
 
 	amplitude = new ScaleSpinButton({
 		{"μVolts",1e-6},
@@ -203,19 +227,19 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	magMin->setValue(-90);
 
 	phaseMax = new PositionSpinButton({
-		{"dB",1e0}
-	}, "Max. Phase", -180, 180, false, false, this);
+		{"°",1e0}
+	}, "Max. Phase", -360, 360, false, false, this);
 	phaseMax->setValue(180);
 
 	phaseMin = new PositionSpinButton({
-		{"dB",1e0}
-	}, "Min. Phase", -180, 180, false, false, this);
+		{"°",1e0}
+	}, "Min. Phase", -360, 360, false, false, this);
 	phaseMin->setValue(-180);
 
 
 	ui->samplesCountLayout->addWidget(samplesCount);
-	ui->minFreqLayout->addWidget(minFreq);
-	ui->maxFreqLayout->addWidget(maxFreq);
+	ui->minFreqLayout->addWidget(start_freq);
+	ui->maxFreqLayout->addWidget(stop_freq);
 	ui->amplitudeLayout->addWidget(amplitude);
 	ui->offsetLayout->addWidget(offset);
 	ui->magMaxLayout->addWidget(magMax);
@@ -225,7 +249,6 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	setMinimumDistanceBetween(magMin, magMax, 1);
 	setMinimumDistanceBetween(phaseMin, phaseMax, 1);
-	setMinimumDistanceBetween(minFreq, maxFreq, 0);
 
 	connect(magMax, &PositionSpinButton::valueChanged,
 		ui->xygraph, &NyquistGraph::setMax);
@@ -240,10 +263,6 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	connect(phaseMin, &PositionSpinButton::valueChanged,
 		ui->nicholsgraph, &dBgraph::setXMin);
 
-	connect(minFreq, SIGNAL(valueChanged(double)),
-		&m_dBgraph, SLOT(setXMin(double)));
-	connect(maxFreq, SIGNAL(valueChanged(double)),
-		&m_dBgraph, SLOT(setXMax(double)));
 	connect(magMin, SIGNAL(valueChanged(double)),
 		&m_dBgraph, SLOT(setYMin(double)));
 	connect(magMax, SIGNAL(valueChanged(double)),
@@ -251,10 +270,6 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	connect(ui->btnIsLog, SIGNAL(toggled(bool)),
 		&m_dBgraph, SLOT(useLogFreq(bool)));
 
-	connect(minFreq, SIGNAL(valueChanged(double)),
-		&m_phaseGraph, SLOT(setXMin(double)));
-	connect(maxFreq, SIGNAL(valueChanged(double)),
-		&m_phaseGraph, SLOT(setXMax(double)));
 	connect(phaseMin, SIGNAL(valueChanged(double)),
 		&m_phaseGraph, SLOT(setYMin(double)));
 	connect(phaseMax, SIGNAL(valueChanged(double)),
@@ -262,6 +277,14 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	connect(ui->btnIsLog, SIGNAL(toggled(bool)),
 		&m_phaseGraph, SLOT(useLogFreq(bool)));
 
+	connect(start_freq, &ScaleSpinButton::valueChanged,
+		this, &NetworkAnalyzer::onStartStopFrequencyChanged);
+	connect(stop_freq, &ScaleSpinButton::valueChanged,
+		this, &NetworkAnalyzer::onStartStopFrequencyChanged);
+	connect(center_freq, &ScaleSpinButton::valueChanged,
+		this, &NetworkAnalyzer::onCenterSpanFrequencyChanged);
+	connect(span_freq, &ScaleSpinButton::valueChanged,
+		this, &NetworkAnalyzer::onCenterSpanFrequencyChanged);
 
 	connect(ui->cbLineThickness,SIGNAL(currentIndexChanged(int)),&m_dBgraph,
 		SLOT(setThickness(int)));
@@ -306,12 +329,12 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	connect(d_hCursorHandle2, SIGNAL(positionChanged(int)),&m_phaseGraph,
 		SLOT(onCursor2PositionChanged(int)));
 
-	maxFreq->setMaxValue((double) max_samplerate / 3.0 - 1.0);
+	stop_freq->setMaxValue((double) max_samplerate / 3.0 - 1.0);
+	center_freq->setMinValue(2);
+	center_freq->setMaxValue((double) max_samplerate / 3.0 - 2.0);
+	span_freq->setMinValue(1);
+	span_freq->setMaxValue((double) max_samplerate / 3.0 - 1.0);
 
-	connect(minFreq, SIGNAL(valueChanged(double)),
-		this, SLOT(updateNumSamples()));
-	connect(maxFreq, SIGNAL(valueChanged(double)),
-		this, SLOT(updateNumSamples()));
 	connect(samplesCount, SIGNAL(valueChanged(double)),
 		this, SLOT(updateNumSamples()));
 	connect(ui->boxCursors,SIGNAL(toggled(bool)),
@@ -451,17 +474,95 @@ NetworkAnalyzer::~NetworkAnalyzer()
 	delete ui;
 }
 
+void NetworkAnalyzer::onStartStopFrequencyChanged(double value)
+{
+	if (QObject::sender() == start_freq) {
+		qDebug() << " start freq changed to: " << value;
+	} else {
+		qDebug() << " stop freq changed to: " << value;
+	}
+
+	double start = start_freq->value();
+	double stop = stop_freq->value();
+
+	start_freq->setMaxValue(stop - 1);
+	stop_freq->setMinValue(start + 1);
+
+	double span = stop - start;
+	double center = start + (span / 2);
+
+	span_freq->silentSetValue(span);
+	center_freq->silentSetValue(center);
+
+	// Update plot settings
+	m_dBgraph.setXMin(start);
+	m_dBgraph.setXMax(stop);
+	m_phaseGraph.setXMin(start);
+	m_phaseGraph.setXMax(stop);
+	updateNumSamples();
+}
+
+void NetworkAnalyzer::onCenterSpanFrequencyChanged(double value)
+{
+	double span = span_freq->value();
+	double center = center_freq->value();
+	double start = center - (span / 2);
+	double stop = center + (span / 2);
+
+	if (QObject::sender() == center_freq) {
+		// Center value was changed by the user, so we
+		// check if the span value is valid, if not we
+		// adjust it
+		if (start < 0) {
+			start = 1;
+			span = (center - start) * 2;
+			stop = center + (span / 2);
+		} else if (stop > stop_freq->maxValue()) {
+			stop = stop_freq->maxValue();
+			span = (stop - center) * 2;
+			start = center - (span / 2);
+		}
+		span_freq->silentSetValue(span);
+	} else {
+		// Span value was changed by the user, so we
+		// check if the center value is valid, if not we
+		// adjust it
+		if (start < 0) {
+			start = 1;
+			center = start + (span / 2);
+			stop = center + (span / 2);
+		} else if (stop > stop_freq->maxValue()) {
+			stop = stop_freq->maxValue();
+			center = stop - (span / 2);
+			start = center - (span / 2);
+		}
+		center_freq->silentSetValue(center);
+	}
+
+	start_freq->silentSetMaxValue(stop - 1);
+	stop_freq->silentSetMinValue(start + 1);
+
+	start_freq->silentSetValue(start);
+	stop_freq->silentSetValue(stop);
+
+	// Update plot settings
+	m_dBgraph.setXMin(start);
+	m_dBgraph.setXMax(stop);
+	m_phaseGraph.setXMin(start);
+	m_phaseGraph.setXMax(stop);
+	updateNumSamples();
+}
 void NetworkAnalyzer::setMinimumDistanceBetween(SpinBoxA *min, SpinBoxA *max,
 		double distance)
 {
 
 	connect(max, &SpinBoxA::valueChanged, [=](double value) {
 		min->setMaxValue(value - distance);
-		min->setValue(min->value());
+//		min->setValue(min->value());
 	});
 	connect(min, &SpinBoxA::valueChanged, [=](double value) {
 		max->setMinValue(value + distance);
-		max->setValue(max->value());
+//		max->setValue(max->value());
 	});
 }
 
@@ -544,8 +645,8 @@ void NetworkAnalyzer::computeFrequencyArray()
 	iterations.clear();
 
 	unsigned int steps = (unsigned int) samplesCount->value();
-	double min_freq = minFreq->value();
-	double max_freq = maxFreq->value();
+	double min_freq = start_freq->value();
+	double max_freq = stop_freq->value();
 	double log10_min_freq = log10(min_freq);
 	double log10_max_freq = log10(max_freq);
 	double step;
@@ -977,11 +1078,13 @@ void NetworkAnalyzer::startStop(bool pressed)
 
 	ui->btnRefChn->setEnabled(!pressed);
 	ui->btnIsLog->setEnabled(!pressed);
-	maxFreq->setEnabled(!pressed);
-	minFreq->setEnabled(!pressed);
+	stop_freq->setEnabled(!pressed);
+	start_freq->setEnabled(!pressed);
 	samplesCount->setEnabled(!pressed);
 	amplitude->setEnabled(!pressed);
 	offset->setEnabled(!pressed);
+	center_freq->setEnabled(!pressed);
+	span_freq->setEnabled(!pressed);
 
 	if (pressed) {
 		if (btn) {

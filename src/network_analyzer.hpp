@@ -122,8 +122,10 @@ private:
 	bool d_cursorsEnabled;
 
 	ScaleSpinButton *samplesCount;
-	ScaleSpinButton *minFreq;
-	ScaleSpinButton *maxFreq;
+	ScaleSpinButton *start_freq;
+	ScaleSpinButton *stop_freq;
+	ScaleSpinButton *center_freq;
+	ScaleSpinButton *span_freq;
 	ScaleSpinButton *amplitude;
 	PositionSpinButton *offset;
 	PositionSpinButton *magMax;
@@ -175,6 +177,8 @@ private Q_SLOTS:
 	void on_btnExport_clicked();
 	void rightMenuFinished(bool opened);
 
+	void onStartStopFrequencyChanged(double value);
+	void onCenterSpanFrequencyChanged(double value);
 public Q_SLOTS:
 
 	void showEvent(QShowEvent *event);
