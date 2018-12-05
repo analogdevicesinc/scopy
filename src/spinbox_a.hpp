@@ -109,6 +109,11 @@ public:
 	static unsigned int current_id;
 
 	void updateCompletionCircle(double value);
+
+	void silentSetValue(double value);
+	void silentSetMinValue(double value);
+	void silentSetMaxValue(double value);
+
 public Q_SLOTS:
 	virtual void setValue(double);
 	void setFineMode(bool);
@@ -218,9 +223,12 @@ public Q_SLOTS:
 	void setMinValue(double);
 	void setMaxValue(double);
 
+	void enableNumberSeriesRebuild(bool enable);
+
 protected:
 	adiscope::NumberSeries m_steps;
 	double m_fine_increment;
+	bool m_numberSeriesRebuild;
 };
 
 class PositionSpinButton: public SpinBoxA
