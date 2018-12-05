@@ -179,6 +179,7 @@ private Q_SLOTS:
 
 	void onStartStopFrequencyChanged(double value);
 	void onCenterSpanFrequencyChanged(double value);
+	void onMinMaxPhaseChanged(double value);
 public Q_SLOTS:
 
 	void showEvent(QShowEvent *event);
