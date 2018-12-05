@@ -26,6 +26,7 @@
 #include "hardware_trigger.hpp"
 #include "ui_network_analyzer.h"
 #include "filemanager.h"
+#include "cancel_dc_offset_block.h"
 
 #include <gnuradio/analog/sig_source_c.h>
 #include <gnuradio/analog/sig_source_waveform.h>
@@ -872,12 +873,19 @@ void NetworkAnalyzer::run()
 			iio->lock();
 		}
 
+		auto dc1 = gnuradio::get_initial_sptr(
+					new cancel_dc_offset_block(buffer_size, true));
+		auto dc2 = gnuradio::get_initial_sptr(
+					new cancel_dc_offset_block(buffer_size, true));
+
 		auto f2c1 = blocks::float_to_complex::make();
 		auto f2c2 = blocks::float_to_complex::make();
-		auto id1 = iio->connect(f2c1, 0, 0, true,
+		auto id1 = iio->connect(dc1, 0, 0, true,
 					buffer_size);
-		auto id2 = iio->connect(f2c2, 1, 0, true,
+		auto id2 = iio->connect(dc2, 1, 0, true,
 					buffer_size);
+		iio->connect(dc1, 0, f2c1, 0);
+		iio->connect(dc2, 0, f2c2, 0);
 
 		auto null = blocks::null_source::make(sizeof(float));
 		iio->connect(null, 0, f2c1, 1);
