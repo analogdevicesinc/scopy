@@ -91,7 +91,8 @@ dBgraph::dBgraph(QWidget *parent) : QwtPlot(parent),
 	ymin(10),
 	ymax(10),
 	d_plotPosition(0),
-	numSamples(0)
+	numSamples(0),
+	delta_label(false)
 {
 	enableAxis(QwtPlot::xBottom, false);
 	enableAxis(QwtPlot::xTop, true);
