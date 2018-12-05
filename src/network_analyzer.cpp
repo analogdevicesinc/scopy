@@ -286,6 +286,12 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	connect(span_freq, &ScaleSpinButton::valueChanged,
 		this, &NetworkAnalyzer::onCenterSpanFrequencyChanged);
 
+	connect(phaseMin, &PositionSpinButton::valueChanged,
+		this, &NetworkAnalyzer::onMinMaxPhaseChanged);
+	connect(phaseMax, &PositionSpinButton::valueChanged,
+		this, &NetworkAnalyzer::onMinMaxPhaseChanged);
+
+
 	connect(ui->cbLineThickness,SIGNAL(currentIndexChanged(int)),&m_dBgraph,
 		SLOT(setThickness(int)));
 	connect(ui->cbLineThickness,SIGNAL(currentIndexChanged(int)),&m_phaseGraph,
@@ -552,6 +558,21 @@ void NetworkAnalyzer::onCenterSpanFrequencyChanged(double value)
 	m_phaseGraph.setXMax(stop);
 	updateNumSamples();
 }
+void NetworkAnalyzer::onMinMaxPhaseChanged(double value) {
+
+	if (QObject::sender() == phaseMin) {
+		double phaseMaxValue = phaseMax->value();
+		if (qAbs(phaseMaxValue - value) > 360) {
+			phaseMax->setValue(phaseMaxValue - ((int)qAbs(phaseMaxValue - value) % 360));
+		}
+	} else {
+		double phaseMinValue = phaseMin->value();
+		if (qAbs(value - phaseMinValue) > 360) {
+			phaseMin->setValue(phaseMinValue + ((int)qAbs(value - phaseMinValue) % 360));
+		}
+	} 
+}
+
 void NetworkAnalyzer::setMinimumDistanceBetween(SpinBoxA *min, SpinBoxA *max,
 		double distance)
 {
@@ -1033,9 +1054,16 @@ void NetworkAnalyzer::plot(double frequency, double mag1, double mag2,
 	}
 
 	double phase_deg = phase * 180.0 / M_PI;
+	double adjusted_phase_deg = phase_deg;
+
+//	if (phase_deg > phaseMax->value()) {
+//		adjusted_phase_deg = (int)phase_deg - 360;
+//	} else if (phase_deg < phaseMin->value()) {
+//		adjusted_phase_deg = (int)phase_deg + 360;
+//	}
 
 	m_dBgraph.plot(frequency, mag);
-	m_phaseGraph.plot(frequency, phase_deg);
+	m_phaseGraph.plot(frequency, adjusted_phase_deg);
 	ui->xygraph->plot(frequency, mag);
 	ui->nicholsgraph->plot(phase_deg, mag);
 }
