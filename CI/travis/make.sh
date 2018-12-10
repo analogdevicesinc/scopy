@@ -1,8 +1,10 @@
 #!/bin/bash
+set -e
 
-# if we have a Qt59 installation use it
+handle_default() {
+	# if we have a Qt59 installation use it
 if [ -f /opt/qt59/bin/qt59-env.sh ] ; then
-	source /opt/qt59/bin/qt59-env.sh
+	. /opt/qt59/bin/qt59-env.sh
 fi
 
 set -e
@@ -12,7 +14,7 @@ if command -v brew ; then
 	export PATH="${QT_PATH}:$PATH"
 fi
 
-source ./CI/travis/lib.sh
+. /$LIBNAME/CI/travis/lib.sh
 
 NUM_JOBS=4
 
@@ -30,3 +32,17 @@ else
 fi
 
 popd
+}
+
+handle_ubuntu_docker() {
+	sudo docker run --rm=true \
+			-v `pwd`:/scopy:rw \
+			ubuntu:${OS_VERSION} \
+			/bin/bash -xe /scopy/CI/travis/inside_ubuntu_docker.sh scopy
+}
+
+LIBNAME=${1:-home/travis/build/analogdevicesinc/scopy}
+OS_TYPE=${2:-default}
+OS_VERSION="$3"
+
+handle_${OS_TYPE}
