@@ -1,7 +1,16 @@
 #!/bin/bash
 set -e
 
-source ./CI/travis/lib.sh
+handle_ubuntu_docker() {
+	sudo apt-get -qq update
+	sudo service docker restart
+	sudo docker pull ubuntu:${OS_VERSION}
+}
+
+handle_default() {
+	pwd
+	ls
+	. /$LIBNAME/CI/travis/lib.sh
 
 if ! is_new_ubuntu ; then
 	sudo add-apt-repository --yes ppa:beineri/opt-qt592${LDIST}
@@ -30,7 +39,7 @@ done
 
 sudo apt-get install -y $BOOST_PACKAGES
 
-source ./CI/travis/before_install_lib.sh
+. /$LIBNAME/CI/travis/before_install_lib.sh
 
 if ! is_new_ubuntu ; then
 	sudo apt-get install -y qt59base qt59declarative qt59quickcontrols \
@@ -40,7 +49,7 @@ if ! is_new_ubuntu ; then
 	QMAKE=/opt/qt59/bin/qmake
 	$QMAKE -set QMAKE $QMAKE
 	set +e
-	source /opt/qt59/bin/qt59-env.sh
+	. /opt/qt59/bin/qt59-env.sh
 	set -e
 else
 	sudo apt-get install -y qt5-default qttools5-dev qtdeclarative5-dev \
@@ -97,3 +106,10 @@ else
 fi
 
 cmake_build_git "gr-iio" "https://github.com/analogdevicesinc/gr-iio"
+}
+
+OS_TYPE=${1:-default}
+OS_VERSION=${2}
+LIBNAME=${3:-home/travis/build/analogdevicesinc/scopy}
+
+handle_${OS_TYPE}

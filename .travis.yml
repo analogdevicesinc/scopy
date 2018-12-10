@@ -10,6 +10,9 @@ cache:
 python:
   - "3.5"
 
+services:
+  - docker
+
 matrix:
   fast_finish: true
   include:
@@ -29,13 +32,17 @@ matrix:
       os: linux
       dist: xenial
       env: LDIST=-xenial
+    - os: linux
+      env:
+        - OS_TYPE=ubuntu_docker
+        - OS_VERSION=bionic
 
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./CI/travis/before_install_darwin.sh ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./CI/travis/before_install_linux.sh ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./CI/travis/before_install_linux.sh "$OS_TYPE" "$OS_VERSION" ; fi
 
 script:
-  - ${TRAVIS_BUILD_DIR}/CI/travis/make.sh
+  - ${TRAVIS_BUILD_DIR}/CI/travis/make.sh scopy "$OS_TYPE" "$OS_VERSION"
 
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cd ${TRAVIS_BUILD_DIR}/build; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ${TRAVIS_BUILD_DIR}/CI/travis/package_darwin.sh; fi
