@@ -807,9 +807,9 @@ border: 5px solid white;
                     <property name="geometry">
                      <rect>
                       <x>0</x>
-                      <y>0</y>
+                      <y>-45</y>
                       <width>322</width>
-                      <height>574</height>
+                      <height>613</height>
                      </rect>
                     </property>
                     <layout class="QVBoxLayout" name="verticalLayout_11">
@@ -1403,6 +1403,35 @@ color: rgba(255,255,255,51);
                        </item>
                        <item row="2" column="1">
                         <widget class="adiscope::CustomSwitch" name="deltaBtn">
+                         <property name="text">
+                          <string/>
+                         </property>
+                         <property name="leftText" stdset="0">
+                          <string>On</string>
+                         </property>
+                         <property name="rightText" stdset="0">
+                          <string>Off</string>
+                         </property>
+                         <property name="duration_ms" stdset="0">
+                          <number>0</number>
+                         </property>
+                         <property name="polarity" stdset="0">
+                          <bool>false</bool>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="3" column="0">
+                        <widget class="QLabel" name="label_12">
+                         <property name="styleSheet">
+                          <string notr="true">font-size: 13px;</string>
+                         </property>
+                         <property name="text">
+                          <string>Dc Filtering</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="3" column="1">
+                        <widget class="adiscope::CustomSwitch" name="dcFilterBtn">
                          <property name="text">
                           <string/>
                          </property>

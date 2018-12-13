@@ -43,6 +43,9 @@
 #include <gnuradio/blocks/vector_sink_f.h>
 #include <gnuradio/top_block.h>
 #include <boost/make_shared.hpp>
+#include "filter_dc_offset_block.h"
+#include <gnuradio/blocks/stream_to_vector.h>
+#include <gnuradio/blocks/vector_to_stream.h>
 
 #include <algorithm>
 
@@ -873,34 +876,64 @@ void NetworkAnalyzer::run()
 			iio->lock();
 		}
 
-		auto dc1 = gnuradio::get_initial_sptr(
-					new cancel_dc_offset_block(buffer_size, true));
-		auto dc2 = gnuradio::get_initial_sptr(
-					new cancel_dc_offset_block(buffer_size, true));
+//		auto filter_dc1 = gnuradio::get_initial_sptr(
+//				new filter_dc_offset_block(buffer_size));
+//		auto filter_dc2 = gnuradio::get_initial_sptr(
+//				new filter_dc_offset_block(buffer_size));
+
+		auto s2v1 = blocks::stream_to_vector::make(sizeof(float), buffer_size);
+		auto s2v2 = blocks::stream_to_vector::make(sizeof(float), buffer_size);
+		auto v2s1 = blocks::vector_to_stream::make(sizeof(float), buffer_size);
+		auto v2s2 = blocks::vector_to_stream::make(sizeof(float), buffer_size);
+
+		auto copy1 = blocks::copy::make(sizeof(float));
+		auto copy2 = blocks::copy::make(sizeof(float));
 
 		auto f2c1 = blocks::float_to_complex::make();
 		auto f2c2 = blocks::float_to_complex::make();
-		auto id1 = iio->connect(dc1, 0, 0, true,
-					buffer_size);
-		auto id2 = iio->connect(dc2, 1, 0, true,
-					buffer_size);
-		iio->connect(dc1, 0, f2c1, 0);
-		iio->connect(dc2, 0, f2c2, 0);
+
+//		auto test1 = blocks::vector_sink_f::make();
+
+		auto dc_blocker1 = gnuradio::get_initial_sptr(
+					new filter_dc_offset_block(buffer_size));
+		auto dc_blocker2 = gnuradio::get_initial_sptr(
+					new filter_dc_offset_block(buffer_size));
 
 		auto null = blocks::null_source::make(sizeof(float));
 		iio->connect(null, 0, f2c1, 1);
 		iio->connect(null, 0, f2c2, 1);
+
+		auto id1 = iio->connect(copy1, 0, 0, true,
+					buffer_size);
+		auto id2 = iio->connect(copy2, 1, 0, true,
+					buffer_size);
 
 		auto cosine = analog::sig_source_c::make(
 				      (unsigned int) adc_rate,
 				      gr::analog::GR_COS_WAVE, -frequency, 1.0);
 
 		auto mult1 = blocks::multiply_cc::make();
+		auto mult2 = blocks::multiply_cc::make();
+
+		if (ui->dcFilterBtn->isChecked()) {
+			iio->connect(copy1, 0, s2v1, 0);
+			iio->connect(copy2, 0, s2v2, 0);
+			iio->connect(s2v1, 0, dc_blocker1, 0);
+			iio->connect(s2v2, 0, dc_blocker2, 0);
+			iio->connect(dc_blocker1, 0, v2s1, 0);
+			iio->connect(dc_blocker2, 0, v2s2, 0);
+			iio->connect(v2s1, 0, f2c1, 0);
+			iio->connect(v2s2, 0, f2c2, 0);
+		} else {
+			iio->connect(copy1, 0, f2c1, 0);
+			iio->connect(copy2, 0, f2c2, 0);
+		}
+
 		iio->connect(f2c1, 0, mult1, 0);
+		iio->connect(f2c2, 0, mult2, 0);
+
 		iio->connect(cosine, 0, mult1, 1);
 
-		auto mult2 = blocks::multiply_cc::make();
-		iio->connect(f2c2, 0, mult2, 0);
 		iio->connect(cosine, 0, mult2, 1);
 
 		auto signal = boost::make_shared<signal_sample>();
