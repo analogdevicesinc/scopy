@@ -192,7 +192,8 @@ void GenericAdc::setHwSettings(GenericAdc::Settings *settings)
  */
 
 M2kAdc::M2kAdc(struct iio_context *ctx, struct iio_device *adc_dev):
-	GenericAdc(ctx, adc_dev)
+	GenericAdc(ctx, adc_dev),
+	filtering_enabled(false)
 {
 	apply_m2k_fixes();
 
