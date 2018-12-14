@@ -132,6 +132,8 @@ private:
 	PositionSpinButton *magMin;
 	PositionSpinButton *phaseMax;
 	PositionSpinButton *phaseMin;
+	PositionSpinButton *pushDelay;
+	PositionSpinButton *captureDelay;
 
 	void setMinimumDistanceBetween(SpinBoxA *min, SpinBoxA *max, double distance);
 
