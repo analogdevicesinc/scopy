@@ -240,7 +240,22 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	}, "Min. Phase", -360, 360, false, false, this);
 	phaseMin->setValue(-180);
 
+	pushDelay = new PositionSpinButton({
+		{"ms",1e0},
+		{"s",1e3}
+	}, "Push Delay", 0, 2000, false, false, this);
+	pushDelay->setValue(0);
+	pushDelay->setStep(10);
 
+	captureDelay = new PositionSpinButton({
+		{"ms",1e0},
+		{"s",1e3}
+	}, "Capture Delay", 0, 2000, false, false, this);
+	captureDelay->setValue(0);
+	captureDelay->setStep(10);
+
+	ui->pushDelayLayout->addWidget(pushDelay);
+	ui->captureDelayLayout->addWidget(captureDelay);
 	ui->samplesCountLayout->addWidget(samplesCount);
 	ui->minFreqLayout->addWidget(start_freq);
 	ui->maxFreqLayout->addWidget(stop_freq);
@@ -851,8 +866,16 @@ void NetworkAnalyzer::run()
 				break;
 			}
 
+//			iio_device_attr_write_bool(dev, "dma_sync", false);
+		}
+
+
+		QThread::msleep(pushDelay->value());
+		for (const auto& channel : dac_channels) {
+			const struct iio_device *dev = iio_channel_get_device(channel);
 			iio_device_attr_write_bool(dev, "dma_sync", false);
 		}
+
 
 		size_t buffer_size = 0;
 		size_t adc_rate = 0;
@@ -981,6 +1004,7 @@ void NetworkAnalyzer::run()
 		QElapsedTimer t;
 		t.start();
 
+		QThread::msleep(captureDelay->value());
 		iio->start(id1);
 		iio->start(id2);
 

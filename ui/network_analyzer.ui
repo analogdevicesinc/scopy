@@ -807,9 +807,9 @@ border: 5px solid white;
                     <property name="geometry">
                      <rect>
                       <x>0</x>
-                      <y>-45</y>
+                      <y>-115</y>
                       <width>322</width>
-                      <height>613</height>
+                      <height>661</height>
                      </rect>
                     </property>
                     <layout class="QVBoxLayout" name="verticalLayout_11">
@@ -1376,11 +1376,27 @@ color: rgba(255,255,255,51);
                        <item row="0" column="1">
                         <layout class="QVBoxLayout" name="phaseMinLayout"/>
                        </item>
-                       <item row="0" column="0">
-                        <layout class="QVBoxLayout" name="magMinLayout"/>
+                       <item row="3" column="1">
+                        <widget class="adiscope::CustomSwitch" name="dcFilterBtn">
+                         <property name="text">
+                          <string/>
+                         </property>
+                         <property name="leftText" stdset="0">
+                          <string>On</string>
+                         </property>
+                         <property name="rightText" stdset="0">
+                          <string>Off</string>
+                         </property>
+                         <property name="duration_ms" stdset="0">
+                          <number>0</number>
+                         </property>
+                         <property name="polarity" stdset="0">
+                          <bool>false</bool>
+                         </property>
+                        </widget>
                        </item>
-                       <item row="1" column="1">
-                        <layout class="QVBoxLayout" name="phaseMaxLayout"/>
+                       <item row="1" column="0">
+                        <layout class="QVBoxLayout" name="magMaxLayout"/>
                        </item>
                        <item row="2" column="0">
                         <widget class="QLabel" name="label_11">
@@ -1397,9 +1413,6 @@ color: rgba(255,255,255,51);
                           <string>Delta Label</string>
                          </property>
                         </widget>
-                       </item>
-                       <item row="1" column="0">
-                        <layout class="QVBoxLayout" name="magMaxLayout"/>
                        </item>
                        <item row="2" column="1">
                         <widget class="adiscope::CustomSwitch" name="deltaBtn">
@@ -1430,24 +1443,27 @@ color: rgba(255,255,255,51);
                          </property>
                         </widget>
                        </item>
-                       <item row="3" column="1">
-                        <widget class="adiscope::CustomSwitch" name="dcFilterBtn">
+                       <item row="0" column="0">
+                        <layout class="QVBoxLayout" name="magMinLayout"/>
+                       </item>
+                       <item row="1" column="1">
+                        <layout class="QVBoxLayout" name="phaseMaxLayout"/>
+                       </item>
+                       <item row="5" column="0">
+                        <widget class="QLabel" name="label_13">
+                         <property name="styleSheet">
+                          <string notr="true">font-size: 13px;</string>
+                         </property>
                          <property name="text">
                           <string/>
                          </property>
-                         <property name="leftText" stdset="0">
-                          <string>On</string>
-                         </property>
-                         <property name="rightText" stdset="0">
-                          <string>Off</string>
-                         </property>
-                         <property name="duration_ms" stdset="0">
-                          <number>0</number>
-                         </property>
-                         <property name="polarity" stdset="0">
-                          <bool>false</bool>
-                         </property>
                         </widget>
+                       </item>
+                       <item row="4" column="0">
+                        <layout class="QVBoxLayout" name="pushDelayLayout"/>
+                       </item>
+                       <item row="4" column="1">
+                        <layout class="QVBoxLayout" name="captureDelayLayout"/>
                        </item>
                       </layout>
                      </item>
