@@ -16,25 +16,25 @@ services:
 matrix:
   fast_finish: true
   include:
-    - compiler: clang
+    - compiler: "gcc"
       os: osx
-      osx_image: xcode7.3
-      env: LDIST=-osx_10.11
-    - compiler: clang
+      osx_image: xcode9.2
+    - compiler: "gcc"
       os: osx
-      osx_image: xcode8.3
-      env: LDIST=-osx_10.12
-    - compiler: gcc
+      osx_images: xcode10.1
+    - compiler: "gcc"
       os: linux
       dist: trusty
-      env: LDIST=-trusty
-    - compiler: gcc
+    - compiler: "gcc"
       os: linux
       dist: xenial
-      env: LDIST=-xenial
     - os: linux
       env:
         - OS_TYPE=ubuntu_docker
+        - OS_VERSION=bionic
+    - os: linux
+      env:
+        - OS_TYPE=ubuntu_flatpak_docker
         - OS_VERSION=bionic
 
 before_install:
@@ -42,7 +42,8 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./CI/travis/before_install_linux.sh "$OS_TYPE" "$OS_VERSION" ; fi
 
 script:
-  - ${TRAVIS_BUILD_DIR}/CI/travis/make.sh scopy "$OS_TYPE" "$OS_VERSION"
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ${TRAVIS_BUILD_DIR}/CI/travis/make_linux.sh scopy "$OS_TYPE" "$OS_VERSION" ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ${TRAVIS_BUILD_DIR}/CI/travis/make_darwin.sh ; fi
 
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cd ${TRAVIS_BUILD_DIR}/build; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ${TRAVIS_BUILD_DIR}/CI/travis/package_darwin.sh; fi

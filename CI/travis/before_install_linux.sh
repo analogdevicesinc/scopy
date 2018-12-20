@@ -1,6 +1,12 @@
 #!/bin/bash
 set -e
 
+handle_ubuntu_flatpak_docker() {
+	sudo apt-get -qq update
+	sudo service docker restart
+	sudo docker pull alexandratr/ubuntu-flatpak-kde:latest
+}
+
 handle_ubuntu_docker() {
 	sudo apt-get -qq update
 	sudo service docker restart
@@ -12,9 +18,18 @@ handle_default() {
 	ls
 	. /$LIBNAME/CI/travis/lib.sh
 
-if ! is_new_ubuntu ; then
-	sudo add-apt-repository --yes ppa:beineri/opt-qt592${LDIST}
-fi
+
+	if [ -z "${LDIST}" -a -f "build/.LDIST" ] ; then
+		export LDIST="-$(cat build/.LDIST)"
+	fi
+	if [ -z "${LDIST}" ] ; then
+		export LDIST="-$(get_ldist)"
+	fi
+
+	if ! is_new_ubuntu ; then
+		CODENAME=-"$(get_codename)"
+		sudo add-apt-repository --yes ppa:beineri/opt-qt592${CODENAME}
+	fi
 
 sudo apt-get -qq update
 sudo apt-get install -y build-essential g++ bison flex libxml2-dev libglibmm-2.4-dev \
@@ -92,13 +107,17 @@ qmake_build_git "qwt" "https://github.com/osakared/qwt.git" "qwt-6.1-multiaxes" 
 
 qmake_build_wget "qwtpolar-1.1.1" "https://downloads.sourceforge.net/project/qwtpolar/qwtpolar/1.1.1/qwtpolar-1.1.1.tar.bz2" "qwtpolar.pro" "patch_qwtpolar_linux"
 
-cmake_build_git "gnuradio" "https://github.com/analogdevicesinc/gnuradio" "signal_source_phase_rebased" "-DENABLE_INTERNAL_VOLK:BOOL=OFF -DENABLE_GR_FEC:BOOL=OFF -DENABLE_GR_DIGITAL:BOOL=OFF -DENABLE_GR_DTV:BOOL=OFF -DENABLE_GR_ATSC:BOOL=OFF -DENABLE_GR_AUDIO:BOOL=OFF -DENABLE_GR_CHANNELS:BOOL=OFF -DENABLE_GR_NOAA:BOOL=OFF -DENABLE_GR_PAGER:BOOL=OFF -DENABLE_GR_TRELLIS:BOOL=OFF -DENABLE_GR_VOCODER:BOOL=OFF"
+cmake_build_git "gnuradio" "https://github.com/analogdevicesinc/gnuradio" "scopy" "-DENABLE_INTERNAL_VOLK:BOOL=OFF -DENABLE_GR_FEC:BOOL=OFF -DENABLE_GR_DIGITAL:BOOL=OFF -DENABLE_GR_DTV:BOOL=OFF -DENABLE_GR_ATSC:BOOL=OFF -DENABLE_GR_AUDIO:BOOL=OFF -DENABLE_GR_CHANNELS:BOOL=OFF -DENABLE_GR_NOAA:BOOL=OFF -DENABLE_GR_PAGER:BOOL=OFF -DENABLE_GR_TRELLIS:BOOL=OFF -DENABLE_GR_VOCODER:BOOL=OFF"
 
 if [ "$TRAVIS" == "true" ] ; then
-	for pkg in libiio libad9361-iio ; do
-		wget http://swdownloads.analog.com/cse/travis_builds/master_latest_${pkg}${LDIST}.deb
-		sudo dpkg -i ./master_latest_${pkg}${LDIST}.deb
-	done
+#	for pkg in libiio libad9361-iio ; do
+#		wget http://swdownloads.analog.com/cse/travis_builds/master_latest_${pkg}${LDIST}.deb
+#		sudo dpkg -i ./master_latest_${pkg}${LDIST}.deb
+#	done
+	wget http://swdownloads.analog.com/cse/travis_builds/master_latest_libiio${LDIST}.deb
+	sudo dpkg -i ./master_latest_libiio${LDIST}.deb
+	wget http://swdownloads.analog.com/cse/travis_builds/master_latest_libad9361-iio${CODENAME}.deb
+	sudo dpkg -i ./master_latest_libad9361-iio${CODENAME}.deb
 else
 	cmake_build_git "libiio" "https://github.com/analogdevicesinc/libiio" "" "-DINSTALL_UDEV_RULE:BOOL=OFF"
 

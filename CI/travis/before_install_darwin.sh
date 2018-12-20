@@ -1,6 +1,14 @@
 #!/bin/sh
 set -e
 
+source ./CI/travis/lib.sh
+if [ -z "${LDIST}" -a -f "build/.LDIST" ] ; then
+	export LDIST="-$(cat build/.LDIST)"
+fi
+if [ -z "${LDIST}" ] ; then
+	export LDIST="-$(get_ldist)"
+fi
+
 brew update
 
 brew_install_or_upgrade() {
@@ -10,7 +18,7 @@ brew_install_or_upgrade() {
 }
 
 PYTHON="python3 python@2 python brew-pip"
-PACKAGES="qt cmake fftw bison gettext autoconf automake libtool libzip glib libusb $PYTHON"
+PACKAGES="qt@5.11.2 cmake fftw bison gettext autoconf automake libtool libzip glib libusb $PYTHON"
 PACKAGES="$PACKAGES glibmm doxygen wget boost gnu-sed libmatio dylibbundler libxml2 pkg-config"
 
 for pak in $PACKAGES ; do
@@ -73,7 +81,7 @@ qmake_build_wget "qwtpolar-1.1.1" "https://downloads.sourceforge.net/project/qwt
 
 cmake_build_wget "volk-1.3" "http://libvolk.org/releases/volk-1.3.tar.gz"
 
-cmake_build_git "gnuradio" "https://github.com/analogdevicesinc/gnuradio" "signal_source_phase_rebased" "-DENABLE_INTERNAL_VOLK:BOOL=OFF -DENABLE_GR_FEC:BOOL=OFF -DENABLE_GR_DIGITAL:BOOL=OFF -DENABLE_GR_DTV:BOOL=OFF -DENABLE_GR_ATSC:BOOL=OFF -DENABLE_GR_AUDIO:BOOL=OFF -DENABLE_GR_CHANNELS:BOOL=OFF -DENABLE_GR_NOAA:BOOL=OFF -DENABLE_GR_PAGER:BOOL=OFF -DENABLE_GR_TRELLIS:BOOL=OFF -DENABLE_GR_VOCODER:BOOL=OFF"
+cmake_build_git "gnuradio" "https://github.com/analogdevicesinc/gnuradio" "scopy" "-DENABLE_INTERNAL_VOLK:BOOL=OFF -DENABLE_GR_FEC:BOOL=OFF -DENABLE_GR_DIGITAL:BOOL=OFF -DENABLE_GR_DTV:BOOL=OFF -DENABLE_GR_ATSC:BOOL=OFF -DENABLE_GR_AUDIO:BOOL=OFF -DENABLE_GR_CHANNELS:BOOL=OFF -DENABLE_GR_NOAA:BOOL=OFF -DENABLE_GR_PAGER:BOOL=OFF -DENABLE_GR_TRELLIS:BOOL=OFF -DENABLE_GR_VOCODER:BOOL=OFF"
 
 if [ "$TRAVIS" == "true" ] ; then
 	for pkg in libiio libad9361-iio ; do
