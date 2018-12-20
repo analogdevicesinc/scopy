@@ -11,6 +11,6 @@ pwd
 ls
 /$LIBNAME/CI/travis/before_install_linux.sh default bionic "$LIBNAME"
 
-/$LIBNAME/CI/travis/make.sh "$LIBNAME" default
+/$LIBNAME/CI/travis/make_linux.sh "$LIBNAME" default
 . /${LIBNAME}/CI/travis/lib.sh
 echo "$(get_ldist)" > /${LIBNAME}/build/.LDIST
