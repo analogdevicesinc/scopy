@@ -92,8 +92,8 @@ namespace adiscope {
 		 * are not properly routed to the blocks connected during the
 		 * reconfiguration. So until GNU Radio gets fixed, we just force
 		 * the whole flowgraph to stop when connecting new blocks. */
-		void lock() {  gr::top_block::stop(); gr::top_block::wait(); _started=false;}
-		void unlock() { _started=true; gr::top_block::start();  }
+		void lock() { gr::top_block::stop(); gr::top_block::wait(); }
+		void unlock() { gr::top_block::start(); }
 
 		/* Set the timeout for the source device */
 		void set_device_timeout(unsigned int mseconds);
