@@ -579,7 +579,7 @@ void DMM::dataLoggingThread()
 
 void DMM::toggleAC()
 {
-	bool started = manager->started();
+	bool started = manager->started() && ui->run_button->isChecked();
 	if (started)
 		manager->lock();
 

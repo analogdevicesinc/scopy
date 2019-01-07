@@ -1166,7 +1166,7 @@ void SpectrumAnalyzer::setSampleRate(double sr)
 		return;
 	}
 
-	if (iio->started()) {
+	if (iio->started() && ui->run_button->isChecked()) {
 		stop_blockchain_flow();
 
 		auto m2k_adc = std::dynamic_pointer_cast<M2kAdc>(adc);
