@@ -372,8 +372,6 @@ void DMM::configureModes()
 	auto block1 = configureGraph(s2f1, is_low_ac_ch1, is_high_ac_ch1);
 	auto block2 = configureGraph(s2f2, is_low_ac_ch2, is_high_ac_ch2);
 
-	writeAllSettingsToHardware();
-
 	manager->connect(block1, 0, signal, 0);
 	manager->connect(block2, 0, signal, 1);
 }
@@ -589,6 +587,7 @@ void DMM::toggleAC()
 	configureModes();
 
 	if (started) {
+		writeAllSettingsToHardware();
 		manager->start(id_ch1);
 		manager->start(id_ch2);
 		manager->unlock();
