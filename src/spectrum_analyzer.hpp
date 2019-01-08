@@ -34,6 +34,7 @@
 #include "plot_utils.hpp"
 #include "spinbox_a.hpp"
 #include "customPushButton.hpp"
+#include "startstoprangewidget.h"
 
 #include <QWidget>
 #include <QQueue>
@@ -112,8 +113,6 @@ private Q_SLOTS:
 	void onChannelSettingsToggled(bool);
 	void onChannelSelected(bool);
 	void onChannelEnabled(bool);
-	void onStartStopChanged();
-	void onCenterSpanChanged();
 	void onMarkerToggled(int, bool);
 	void onMarkerSelected(int);
 	void on_btnLeftPeak_clicked();
@@ -169,13 +168,11 @@ private:
 	QButtonGroup *channels_group;
 	FftDisplayPlot *fft_plot;
 
-	PositionSpinButton *stop_freq;
-	PositionSpinButton *span_freq;
-	PositionSpinButton *start_freq;
-	PositionSpinButton *center_freq;
 	PositionSpinButton *range;
 	PositionSpinButton *top;
 	PositionSpinButton *marker_freq_pos;
+
+	StartStopRangeWidget *startStopRange;
 
 	QList<channel_sptr> channels;
 

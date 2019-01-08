@@ -241,20 +241,20 @@ void SpectrumAnalyzer_API::setCurrentChannel(int ch)
 
 double SpectrumAnalyzer_API::startFreq()
 {
-	return sp->start_freq->value();
+	return sp->startStopRange->getStartValue();
 }
 void SpectrumAnalyzer_API::setStartFreq(double val)
 {
-	sp->start_freq->setValue(val);
+	sp->startStopRange->setStartValue(val);
 }
 
 double SpectrumAnalyzer_API::stopFreq()
 {
-	return sp->stop_freq->value();
+	return sp->startStopRange->getStopValue();
 }
 void SpectrumAnalyzer_API::setStopFreq(double val)
 {
-	sp->stop_freq->setValue(val);
+	sp->startStopRange->setStopValue(val);
 }
 
 QString SpectrumAnalyzer_API::resBW()

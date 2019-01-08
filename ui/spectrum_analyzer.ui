@@ -624,7 +624,7 @@ QWidget {
               </sizepolicy>
              </property>
              <property name="currentIndex">
-              <number>1</number>
+              <number>2</number>
              </property>
              <widget class="QWidget" name="channelSettings">
               <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -1202,18 +1202,6 @@ color: rgba(255,255,255,51);
                  <property name="spacing">
                   <number>15</number>
                  </property>
-                 <item row="1" column="0">
-                  <layout class="QHBoxLayout" name="centerFreqLayout"/>
-                 </item>
-                 <item row="1" column="1">
-                  <layout class="QHBoxLayout" name="spanFreqLayout"/>
-                 </item>
-                 <item row="0" column="0">
-                  <layout class="QHBoxLayout" name="startFreqLayout"/>
-                 </item>
-                 <item row="0" column="1">
-                  <layout class="QHBoxLayout" name="stopFreqLayout"/>
-                 </item>
                 </layout>
                </item>
                <item>
