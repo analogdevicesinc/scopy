@@ -21,16 +21,19 @@
 
 #include <QHBoxLayout>
 
+#include <QApplication>
+
 using namespace adiscope;
 
-DetachedWindow::DetachedWindow(QIcon icon, QString name, QWidget *parent):
+DetachedWindow::DetachedWindow(QWidget *parent):
 	QMainWindow(parent),
 	state(Qt::WindowState::WindowNoState),
-	name(name)
+	name("")
 {
-	this->setWindowIcon(icon);
+	this->setWindowIcon(QApplication::windowIcon());
 	this->setWindowTitle("Scopy - " + getName());
 }
+
 
 DetachedWindow::~DetachedWindow()
 {

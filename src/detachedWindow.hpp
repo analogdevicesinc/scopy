@@ -25,7 +25,6 @@
 
 class QCloseEvent;
 
-
 namespace adiscope {
 class DetachedWindow: public QMainWindow
 {
@@ -35,7 +34,7 @@ Q_SIGNALS:
 	void closed();
 
 public:
-	explicit DetachedWindow(QIcon icon, QString name, QWidget *parent = Q_NULLPTR);
+	explicit DetachedWindow(QWidget *parent = Q_NULLPTR);
 	~DetachedWindow();
 
 	void setCentralWidget(QWidget *widget);
