@@ -26,6 +26,7 @@
 #include <QDragMoveEvent>
 #include <QDropEvent>
 #include <QString>
+#include <QMainWindow>
 
 #include "preferences.h"
 
@@ -63,6 +64,10 @@ public Q_SLOTS:
 	virtual void detached();
 	virtual void readPreferences();
 
+private Q_SLOTS:
+	void saveState();
+	void loadState();
+
 protected:
 	struct iio_context *ctx;
 	QPushButton *run_button;
@@ -71,8 +76,8 @@ protected:
 	QString name;
 	Preferences *prefPanel;
 	bool saveOnExit;
-
+	bool isDetached;
+	QMainWindow *window;
 };
 }
-
 #endif /* SCOPY_TOOL_HPP */

@@ -19,6 +19,7 @@
 
 #include "tool.hpp"
 #include "tool_launcher.hpp"
+#include "detachedwindowsmanager.h"
 
 #include <QMimeData>
 
@@ -30,12 +31,15 @@ Tool::Tool(struct iio_context *ctx, QPushButton *runButton,
 		ToolLauncher *parent) :
 	QWidget(static_cast<QWidget *>(parent)),
 	ctx(ctx), run_button(runButton), api(api),
-	name(name), saveOnExit(true)
+	name(name), saveOnExit(true), isDetached(false),
+	window(nullptr)
 {
         run_button->parentWidget()->setDisabled(false);
 
-	connect(this, SIGNAL(detachedState(bool)), parent,
-			SLOT(toolDetached(bool)));
+	connect(this, &Tool::detachedState,
+		parent, &ToolLauncher::toolDetached);
+	connect(parent, &ToolLauncher::launcherClosed,
+		this, &Tool::saveState);
 
 	QSettings oldSettings;
 	QFile tempFile(oldSettings.fileName() + ".bak");
@@ -45,6 +49,9 @@ Tool::Tool(struct iio_context *ctx, QPushButton *runButton,
 	connect(prefPanel, &Preferences::notify, this, &Tool::readPreferences);
 
 	readPreferences();
+
+	connect(api, &ApiObject::loadingFinished,
+		this, &Tool::loadState);
 }
 
 Tool::~Tool()
@@ -54,8 +61,13 @@ Tool::~Tool()
 	run_button->parentWidget()->setDisabled(true);
 
 	delete settings;
-}
 
+	if (window) {
+		// If the tool is in a DetachedWindow when it gets
+		// destroyed make sure to close the window
+		window->close();
+	}
+}
 
 const QString &Tool::getName()
 {
@@ -77,14 +89,55 @@ void Tool::readPreferences()
 	saveOnExit = prefPanel->getSave_session_on_exit();
 }
 
+void Tool::saveState()
+{
+	if (!window) {
+		settings->setValue(name + "/detached", isDetached);
+		return;
+	}
+
+	settings->setValue(name + "/detached", isDetached);
+	settings->setValue(name + "/geometry", window->saveGeometry());
+
+	settings->sync();
+}
+
+void Tool::loadState()
+{
+	bool isDetached = settings->value(name + "/detached").toBool();
+	if (isDetached) {
+		detached();
+		window->restoreGeometry(settings->value(name + "/geometry").toByteArray());
+	}
+}
+
 void Tool::attached()
 {
 	Q_EMIT detachedState(false);
+	isDetached = false;
+	auto window = static_cast<DetachedWindow*>(this->window);
+	disconnect(window, &DetachedWindow::closed,
+		   this, &Tool::attached);
+	DetachedWindowsManager::getInstance().returnWindow(window);
+	this->window = nullptr;
 }
 
 void Tool::detached()
 {
-	Q_EMIT detachedState(true);
+	if (isDetached) {
+		// If it is already detached force it in the foreground
+		static_cast<DetachedWindow*>(parent())->showWindow();
+	} else {
+		Q_EMIT detachedState(true);
+		isDetached = true;
+		auto window = DetachedWindowsManager::getInstance().getWindow();
+		window->setCentralWidget(this);
+		window->setWindowTitle("Scopy - " + name);
+		window->show();
+		connect(window, &DetachedWindow::closed,
+			this, &Tool::attached);
+		this->window = window;
+	}
 }
 
 
