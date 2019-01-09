@@ -83,8 +83,7 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	indexFile(""), deviceInfo(""), pathToFile(""),
 	manual_calibration_enabled(false),
 	devices_btn_group(new QButtonGroup(this)),
-	selectedDev(nullptr),
-	closeEventTriggered(false)
+	selectedDev(nullptr)
 {
 	if (!isatty(STDIN_FILENO))
 		notifier.setEnabled(false);
@@ -182,7 +181,6 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 		SLOT(btnDebugger_clicked()));
 	connect(toolMenu["Calibration"]->getToolBtn(), SIGNAL(clicked()), this,
 		SLOT(btnCalibration_clicked()));
-
 
 
 		//option background
@@ -736,19 +734,6 @@ ToolLauncher::~ToolLauncher()
 
 	tl_api->ApiObject::save(*settings);
 
-	for (auto it = oldDetachedWindows.begin(); it != oldDetachedWindows.end(); ++it) {
-		delete *it;
-	}
-
-	for (auto it = detachedWindows.begin(); it != detachedWindows.end(); ++it) {
-		delete *it;
-	}
-
-	for (auto it = detachedWindowsStates.begin(); it != detachedWindowsStates.end(); ++it) {
-		delete *it;
-	}
-	detachedWindowsStates.clear();
-
 	delete settings;
 	delete tl_api;
 	delete ui;
@@ -1018,8 +1003,11 @@ void ToolLauncher::swapMenu(QWidget *menu)
 	if (tl){
 
 		MenuOption *mo = static_cast<MenuOption *>(tl->runButton()->parentWidget());
-		if (mo->isDetached())
+		if (mo->isDetached()) {
+			// Force the tool to come to the foreground
+			tl->detached();
 			return;
+		}
 
 	}
 
@@ -1167,19 +1155,6 @@ void adiscope::ToolLauncher::disconnect()
 		toolMenu["Calibration"]->getToolStopBtn()->setChecked(false);
 
 		ui->saveBtn->parentWidget()->setEnabled(false);
-
-		//??TODO
-		if (!closeEventTriggered) {
-			for (auto it = detachedWindowsStates.begin(); it != detachedWindowsStates.end(); ++it) {
-				delete *it;
-			}
-			detachedWindowsStates.clear();
-		}
-
-		for (auto x : detachedWindows){
-			detachedWindowsStates.push_back(new DetachedWindowState(x));
-			x->close();
-		}
 
 		destroyContext();
 		loadToolTips(false);
@@ -1488,34 +1463,6 @@ void adiscope::ToolLauncher::enableDacBasedTools()
 	Q_EMIT dacToolsCreated();
 	selectedDev->connectButton()->setText("Disconnect");
 	selectedDev->connectButton()->setEnabled(true);
-
-	toolsCreated();
-}
-
-void ToolLauncher::toolsCreated()
-{
-	int totalScreenWidth = QApplication::desktop()->geometry().width();
-	int totalScreenHeight = QApplication::desktop()->geometry().height();
-	for (auto &dws : detachedWindowsStates) {
-		if ((dws->getGeometry().x() + dws->getGeometry().width()) > totalScreenWidth ||
-				dws->getGeometry().y() > totalScreenHeight ) {
-			continue;
-		}
-
-		this->toolMenu[dws->getName()]->detach(toolMenu[dws->getName()]->getPosition());
-
-		for (auto &dw : detachedWindows) {
-			if (dw->getName() == dws->getName()) {
-				dw->setGeometry(dws->getGeometry());
-				if (dws->getMaximized()) {
-					dw->setWindowState(Qt::WindowMaximized);
-				} else if (dws->getMinimized()) {
-					dw->setWindowState(Qt::WindowMinimized);
-				}
-				break;
-			}
-		}
-	}
 }
 
 bool adiscope::ToolLauncher::switchContext(const QString& uri)
@@ -1735,13 +1682,7 @@ void ToolLauncher::toolDetached(bool detached)
 	Tool *tool = static_cast<Tool *>(QObject::sender());
 
 	MenuOption *mo = static_cast<MenuOption *>(tool->runButton()->parentWidget());
-	if (mo->isDetached() && detached){
-		for (auto x : detachedWindows)
-			if (x->windowTitle().contains(tool->getName())){
-				x->showWindow();
-				return;
-			}
-	}
+
 	mo->setDetached(detached);
 
 	if (detached) {
@@ -1750,24 +1691,12 @@ void ToolLauncher::toolDetached(bool detached)
 			ui->btnHome->click();
 
 		setDynamicProperty(tool->runButton()->parentWidget(), "selected", false);
+	}
 
-		DetachedWindow *window = new DetachedWindow(this->windowIcon(), tool->getName());
-		window->setCentralWidget(tool);
-		window->resize(sizeHint());
-		window->show();
-		detachedWindows.push_back(window);
-
-		connect(window, &DetachedWindow::closed, [=](){
-			tool->attached();
-			detachedWindows.removeOne(window);
-			oldDetachedWindows.push_back(window);
-		});
-		connect(mo->getToolBtn(), &QPushButton::clicked,
-			[=](){
-			if (detachedWindows.contains(window)){
-				window->showWindow();
-			}
-		});
+	if (detached) {
+		ui->buttonGroup_2->removeButton(mo->getToolBtn());
+	} else {
+		ui->buttonGroup_2->addButton(mo->getToolBtn());
 	}
 
 	tool->setVisible(detached);
@@ -1775,17 +1704,11 @@ void ToolLauncher::toolDetached(bool detached)
 
 void ToolLauncher::closeEvent(QCloseEvent *event)
 {
-	closeEventTriggered = true;
-	for (auto it = detachedWindowsStates.begin(); it != detachedWindowsStates.end(); ++it) {
-		delete *it;
-	}
-	detachedWindowsStates.clear();
+	// Notify tools that the launcher is closing
+	Q_EMIT launcherClosed();
 
-	for (auto x : detachedWindows){
-		detachedWindowsStates.push_back(new DetachedWindowState(x));
-		x->close();
-	}
-	detachedWindows.clear();
+	// Close all detached windows
+	QApplication::closeAllWindows();
 
 	for (auto iterator : debugInstances) {
 		delete iterator;

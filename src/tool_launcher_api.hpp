@@ -30,13 +30,10 @@ class ToolLauncher_API: public ApiObject
 	Q_PROPERTY(QString index_file READ getIndexFile WRITE setIndexFile)
 
 	Q_PROPERTY(bool manual_calibration READ manual_calibration_enabled WRITE enable_manual_calibration)
-	Q_PROPERTY(QList<QString> detachedWindows READ getDetachedWindows WRITE setDetachedWindows)
+
 public:
 	explicit ToolLauncher_API(ToolLauncher *tl) : ApiObject(), tl(tl) {}
 	~ToolLauncher_API() {}
-
-	QList<QString> getDetachedWindows() const;
-	void setDetachedWindows(const QList<QString> &detachedWindows);
 
 	QString getIndexFile() const;
 	void setIndexFile(const QString &indexFile);

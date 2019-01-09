@@ -94,12 +94,16 @@ Q_SIGNALS:
 	void adcToolsCreated();
 	void dacToolsCreated();
 
+	void launcherClosed();
+
 public Q_SLOTS:
 	void detachToolOnPosition(int);
 	void addDebugWindow(void);
 
 	void loadSession();
 	void saveSession();
+
+	void toolDetached(bool detached);
 
 private Q_SLOTS:
 	void search();
@@ -133,8 +137,6 @@ private Q_SLOTS:
 	void hasText();
 
 	void btnDigitalIO_clicked();
-
-	void toolDetached(bool detached);
 
 	void swapMenuOptions(int source, int destination, bool dropAfter);
 	void highlight(bool on, int position);
@@ -183,10 +185,6 @@ private:
 	struct iio_context *ctx;
 
 	QMap<QString, MenuOption*> toolMenu;
-	QList<DetachedWindow *> detachedWindows;
-	QList<DetachedWindow *> oldDetachedWindows;
-	QList<DetachedWindowState *> detachedWindowsStates;
-	bool closeEventTriggered;
 	QVector<int> position;
 	QVector<Debugger*> debugInstances;
 	QVector<DetachedWindow *> debugWindows;
@@ -247,7 +245,6 @@ private:
 	QButtonGroup *devices_btn_group;
 
 	DeviceWidget* selectedDev;
-	void toolsCreated();
 };
 }
 #endif // M2K_TOOL_LAUNCHER_H

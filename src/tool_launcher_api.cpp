@@ -18,53 +18,6 @@ void ToolLauncher_API::setOrder(QList<QString> list)
 	tl->setOrder(list);
 }
 
-QList<QString> ToolLauncher_API::getDetachedWindows() const
-{
-	QList<QString> list;
-
-	for (auto &x : tl->detachedWindowsStates) {
-		QJsonObject obj;
-		obj["name"] = x->getName();
-		obj["posX"] = QJsonValue(x->getGeometry().x());
-		obj["posY"] = QJsonValue(x->getGeometry().y());
-		obj["width"] = QJsonValue(x->getGeometry().width());
-		obj["height"] = QJsonValue(x->getGeometry().height());
-		obj["maximized"] = QJsonValue(x->getMaximized());
-		obj["minimized"] = QJsonValue(x->getMinimized());
-		QJsonDocument doc(QJsonValue(obj).toObject());
-		list.push_back(doc.toJson(QJsonDocument::Compact));
-	}
-
-	return list;
-}
-
-void ToolLauncher_API::setDetachedWindows(const QList<QString> &detachedWindows)
-{
-	for (auto &dw : detachedWindows) {
-		QJsonObject obj;
-		QJsonDocument doc = QJsonDocument::fromJson(dw.toUtf8());
-		if (!doc.isNull()) {
-			if (doc.isObject()) {
-				obj = doc.object();
-			} else {
-				qDebug() << "Document is not an object" << endl;
-			}
-		} else {
-			qDebug() << "Invalid JSON...\n";
-		}
-		DetachedWindowState *dws = new DetachedWindowState();
-		dws->setName(obj["name"].toString());
-		dws->setMaximized(obj["maximized"].toBool());
-		dws->setMinimized(obj["minimized"].toBool());
-		double x = obj["posX"].toDouble();
-		double y = obj["posY"].toDouble();
-		int width = obj["width"].toInt();
-		int height = obj["height"].toInt();
-		dws->setGeometry(QRect(x, y, width, height));
-		tl->detachedWindowsStates.push_back(dws);
-	}
-}
-
 QString ToolLauncher_API::getIndexFile() const
 {
 	return tl->indexFile;
@@ -314,7 +267,8 @@ void ToolLauncher_API::save(const QString& file)
 
 void ToolLauncher::addDebugWindow()
 {
-	DetachedWindow *window = new DetachedWindow(this->windowIcon(), "Debugger");
+	DetachedWindow *window = new DetachedWindow();
+	window->setWindowTitle("Debugger");
 	Debugger *debug = new Debugger(ctx, filter,toolMenu["Debugger"]->getToolStopBtn(),
 			&js_engine, this);
 	QObject::connect(debug, &Debugger::newDebuggerInstance, this,
