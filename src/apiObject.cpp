@@ -193,6 +193,8 @@ void ApiObject::load(QSettings& settings)
 	load_nogroup(this, settings);
 
 	settings.endGroup();
+
+	Q_EMIT loadingFinished();
 }
 
 void ApiObject::save(QSettings& settings)

@@ -31,6 +31,9 @@ namespace adiscope {
 	{
 		Q_OBJECT
 
+	Q_SIGNALS:
+		void loadingFinished();
+
 	public:
 		ApiObject();
 		~ApiObject();
