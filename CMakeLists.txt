@@ -80,6 +80,13 @@ if (NOT "${OUT_CONSTEXPR}" STREQUAL "-1")
 	add_definitions(-DHAS_CONSTEXPR=1)
 endif()
 
+find_library(BREAKPAD_LIBRARIES NAMES breakpad PATHS/home/adi/google-breakpad/breakpad/src/src)
+find_library(BREAKPADCLIENT_LIBRARIES breakpad_client PATHS /home/adi/google-breakpad/breakpad/src/src )
+
+
+set(BREAKPAD_INCLUDE_DIRS1 /home/adi/google-breakpad/breakpad/src/src)
+message(${BREAKPAD_INCLUDE_DIRS1})
+
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Concurrent REQUIRED)
 find_package(Qwt REQUIRED)
@@ -117,6 +124,8 @@ pkg_check_modules(LIBSIGROK REQUIRED libsigrok)
 pkg_check_modules(LIBSIGROKCXX REQUIRED libsigrokcxx)
 pkg_check_modules(LIBSIGROK_DECODE REQUIRED libsigrokdecode)
 
+
+
 include_directories(
 	${GNURADIO_ALL_INCLUDE_DIRS}
 	${Boost_INCLUDE_DIRS}
@@ -139,12 +148,14 @@ include_directories(
 	${SIGCPP_INCLUDE_DIRS}
 	${SIGCPPCONFIG_INCLUDE_DIRS}
 	${CMAKE_SOURCE_DIR}/src
+	${BREAKPAD_INCLUDE_DIRS1}
 )
 
 link_directories(
 	${Boost_LIBRARY_DIRS}
 	${GNURADIO_RUNTIME_LIBRARY_DIRS}
-)
+	${BREAKPAD_LIBRARIES}
+	)
 
 FILE(GLOB SRC_LIST  src/*.cpp src/*.cc
 	src/pulseview/pv/*.cpp
@@ -236,9 +247,14 @@ endif()
 link_directories(
 	${Boost_LIBRARY_DIRS}
 	${GNURADIO_RUNTIME_LIBRARY_DIRS}
+	${BREAKPAD_LIBRARIES}
 )
 
+
+message(${BREAKPADCLIENT_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} LINK_PRIVATE
+		${BREAKPAD_LIBRARIES}
+		${BREAKPADCLIENT_LIBRARIES}
 		${Qt5Widgets_LIBRARIES}
 		${Qt5Concurrent_LIBRARIES}
 		${Qt5Qml_LIBRARIES}
@@ -256,7 +272,7 @@ target_link_libraries(${PROJECT_NAME} LINK_PRIVATE
 		${LIBSIGROK_DECODE_LIBRARIES}
 		${GLIBMM_LIBRARIES}
 		${SIGCPP_LIBRARIES}
-		${GLIB_LIBRARIES}
+		${GLIB_LIBRARIES}		
 )
 
 if (NOT WIN32)
@@ -322,3 +338,4 @@ if (NOT ENABLE_APPLICATION_BUNDLE)
 	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/scopy.desktop DESTINATION share/applications)
 	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/icon_small.svg DESTINATION share/icons/hicolor/apps/scalable RENAME scopy.svg)
 endif()
+
