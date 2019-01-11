@@ -21,14 +21,29 @@
 #include <QCommandLineParser>
 #include <QSettings>
 #include <QtGlobal>
+#include <QProcess>
 
 #include "config.h"
 #include "tool_launcher.hpp"
 
+#define __STDC_FORMAT_MACROS
+#include "client/linux/handler/exception_handler.h"
+
 using namespace adiscope;
+
+
+static bool dumpCallback(const google_breakpad::MinidumpDescriptor& descriptor,
+void* context, bool succeeded) {
+  //printf("Dump path: %s\n", descriptor.path());
+  QProcess::start("echo ",descriptor.path());
+  return succeeded;
+}
 
 int main(int argc, char **argv)
 {
+	google_breakpad::MinidumpDescriptor descriptor("/tmp");
+	google_breakpad::ExceptionHandler eh(descriptor, NULL, dumpCallback, NULL, true, -1);
+
 	QApplication app(argc, argv);
 
 	QFont font("Open Sans");
