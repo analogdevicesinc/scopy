@@ -744,8 +744,12 @@ bool LogicAnalyzer::exportVCD(QString filename, QString startSep, QString endSep
 	int current_bit, prev_bit, p;
 	QString timescaleFormat;
 	double timescale;
-	double timestamp;
 	bool timestamp_written = false;
+
+        if( active_sampleRate == 0 ) {
+                return false;
+        }
+
 
 	QFile file(filename);
 	if( !file.open(QIODevice::Append)) {
@@ -755,30 +759,29 @@ bool LogicAnalyzer::exportVCD(QString filename, QString startSep, QString endSep
 	QTextStream out(&file);
 
 	/* Write the specific header */
-	if( active_plot_timebase < 1e-6 ) {
+	timescale = 1 / active_sampleRate;
+	if( timescale < 1e-6 ) {
 		timescaleFormat = "ns";
-		timescale = 1e-9;
+		timescale *= 1e9;
 	}
-	else if( active_plot_timebase < 1e-3 ) {
+	else if( timescale < 1e-3 ) {
 		timescaleFormat = "us";
-		timescale = 1e-6;
+		timescale *= 1e6;
 	}
-	else if( active_plot_timebase < 1 ) {
+	else if( timescale < 1 ) {
 		timescaleFormat = "ms";
-		timescale = 1e-3;
+		timescale *= 1e3;
 	}
-	else {
+	else
 		timescaleFormat = "s";
-		timescale = 1;
-	}
 
-	out << startSep << "timescale 1 " << timescaleFormat << endSep;
+	out << startSep << "timescale " << QString::number(timescale) << " " << timescaleFormat << endSep;
 	out << startSep << "scope module Scopy" << endSep;
 	int counter = 0;
 	for(int ch = 0; ch < no_channels; ch++) {
 		if( exportConfig[ch] ) {
 			char c = '!' + counter;
-			out << startSep << "var wire 1" << c << " DIO" <<
+			out << startSep << "var wire 1 " << c << " DIO" <<
 			       QString::number(ch) << endSep;
 			counter++;
 		}
@@ -791,7 +794,7 @@ bool LogicAnalyzer::exportVCD(QString filename, QString startSep, QString endSep
 	if(logic_data) {
 		shared_ptr<pv::data::LogicSegment> segment = logic_data->logic_segments().front();
 		uint64_t sample_count = segment->get_sample_count();
-		for(int i = 0; i < sample_count; i++) {
+		for(uint64_t i = 0; i < sample_count; i++) {
 			current_sample = segment->get_sample(i);
 			if( i == 0)
 				prev_sample = current_sample;
@@ -799,18 +802,17 @@ bool LogicAnalyzer::exportVCD(QString filename, QString startSep, QString endSep
 				prev_sample = segment->get_sample(i-1);
 			timestamp_written = false;
 			p = 0;
-			timestamp = ((i * active_plot_timebase * 10) / sample_count)/timescale;
-
 			for(int ch = 0; ch < no_channels; ch++) {
+
 				current_bit = (current_sample >> ch) & 1;
 				prev_bit = (prev_sample >> ch) & 1;
 
-				if((current_bit == prev_bit) && (i != 0))
+				if((current_bit == prev_bit) && (i != 0)) {
+					p++;
 					continue;
-
+				}
 				if( !timestamp_written )
-					out << "#" << QString::number(timestamp);
-
+					out << "#" << QString::number(i);
 				if(exportConfig[ch]) {
 					char c = '0' + current_bit;
 					char c2 = '!' + p;
