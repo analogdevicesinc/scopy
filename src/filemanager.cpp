@@ -281,7 +281,7 @@ void FileManager::performWrite()
         for (int i = 0; i < data.size(); ++i) {
                 exportStream << QString::number(i) << separator;
                 for (int j = 0; j < data[i].size(); ++j) {
-                        exportStream << data[i][j] << separator;
+                        exportStream << data[i][j] << ((j < data[i].size()-1) ? separator : "");
                 }
                 exportStream << "\n";
         }
