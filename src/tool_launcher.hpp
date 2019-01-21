@@ -77,7 +77,7 @@ class ToolLauncher : public QMainWindow
 	Q_OBJECT
 
 public:
-	explicit ToolLauncher(QWidget *parent = 0);
+	explicit ToolLauncher(QString prevCrashDump = "", QWidget *parent = 0);
 	~ToolLauncher();
 
 	Q_INVOKABLE void runProgram(const QString& program, const QString& fn);

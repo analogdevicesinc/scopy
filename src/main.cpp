@@ -22,6 +22,8 @@
 #include <QSettings>
 #include <QtGlobal>
 #include <QProcess>
+#include <QDir>
+#include <QDateTime>
 
 #include "config.h"
 #include "tool_launcher.hpp"
@@ -34,17 +36,42 @@ using namespace adiscope;
 
 static bool dumpCallback(const google_breakpad::MinidumpDescriptor& descriptor,
 void* context, bool succeeded) {
-  //printf("Dump path: %s\n", descriptor.path());
-  QProcess::start("echo ",descriptor.path());
+  printf("Dump path: %s\n", descriptor.path());
   return succeeded;
 }
 
 int main(int argc, char **argv)
 {
-	google_breakpad::MinidumpDescriptor descriptor("/tmp");
-	google_breakpad::ExceptionHandler eh(descriptor, NULL, dumpCallback, NULL, true, -1);
-
 	QApplication app(argc, argv);
+
+	QString prevCrashDump="";
+	QString appDir = QCoreApplication::applicationDirPath();
+	QDir qd(appDir);
+	if(qd.exists()) {
+		qd.mkdir("crashdmp");
+	}
+	qd.cd("crashdmp");
+	QStringList dumps= qd.entryList();
+	for(QString dump : dumps)
+	{
+		if(dump=="." || dump == "..") continue;
+		if(dump.startsWith("ScopyCrashDump"))
+			continue;
+		QString dumpFullPath = qd.path()+qd.separator()+dump;
+		QFileInfo fi(dumpFullPath);
+		QString dumpDateAndTime = fi.lastModified().toString(Qt::ISODate).replace("T","--").replace(":","-");
+		prevCrashDump = qd.path()+qd.separator()+"ScopyCrashDump--"+dumpDateAndTime+".dmp";
+		QFile::rename(dumpFullPath, prevCrashDump);
+
+
+	}
+
+
+
+	QByteArray ba = qd.path().toLocal8Bit();
+	const char *appDirStr = ba.data();
+	google_breakpad::MinidumpDescriptor descriptor(appDirStr);
+	google_breakpad::ExceptionHandler eh(descriptor, NULL, dumpCallback, NULL, true, -1);
 
 	QFont font("Open Sans");
 	app.setFont(font);
@@ -79,7 +106,7 @@ int main(int argc, char **argv)
 
 	parser.process(app);
 
-	ToolLauncher launcher;
+	ToolLauncher launcher(prevCrashDump);
 
 	bool nogui = parser.isSet("nogui");
 	QString script = parser.value("script");

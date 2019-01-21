@@ -65,7 +65,7 @@
 
 using namespace adiscope;
 
-ToolLauncher::ToolLauncher(QWidget *parent) :
+ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 	QMainWindow(parent),
 	ui(new Ui::ToolLauncher), ctx(nullptr),
 	power_control(nullptr), dmm(nullptr), signal_generator(nullptr),
@@ -243,6 +243,10 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	QFile tempFile(oldSettings.fileName() + ".bak");
 	if (tempFile.exists())
 		tempFile.remove();
+
+	if(!prevCrashDump.isEmpty())
+		scopy.copy(prevCrashDump+".ini");
+
 	scopy.copy(tempFile.fileName());
 	settings = new QSettings(tempFile.fileName(), QSettings::IniFormat);
 
