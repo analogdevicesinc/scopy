@@ -1610,8 +1610,8 @@ void Oscilloscope::add_math_channel(const std::string& function)
 	std::string name = qname.toStdString();
 
 	auto math_sink = adiscope::scope_sink_f::make(
-			noZoomXAxisWidth * adc->sampleRate(),
-			adc->sampleRate(), name, 1, (QObject *)&plot);
+			noZoomXAxisWidth * m2k_adc->sampleRate() / m2k_adc->oversamplingRatio(),
+			m2k_adc->sampleRate() / m2k_adc->oversamplingRatio(), name, 1, (QObject *)&plot);
 
 	/* Add the math block and the math scope sink into a container, so that
 	 * we can disconnect them when removing the math channel later */
