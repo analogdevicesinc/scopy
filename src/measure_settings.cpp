@@ -435,6 +435,7 @@ void MeasureSettings::updateMeasurementsOnChannelDel(QList<MeasurementItem>& lis
 	while (idx < listSize) {
 		auto item = m_selectedMeasurements.at(currentItemIdx);
 		if (item.channel_id() > chnIdx) {
+			Q_EMIT measurementDeactivated(item.id(), item.channel_id());
 			m_selectedMeasurements.push_back(MeasurementItem(item.id(),
 									 item.channel_id() - 1));
 			Q_EMIT measurementActivated(item.id(), item.channel_id() - 1);

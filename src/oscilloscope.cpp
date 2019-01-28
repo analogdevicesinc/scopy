@@ -646,7 +646,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	cursor_panel_init();
 	setFFT_params(true);
 
-	for (unsigned int i = 0; i < nb_channels; i++) {
+	for (unsigned int i = 0; i < nb_channels + nb_math_channels; i++) {
 		init_selected_measurements(i, {0, 1, 4, 5});
 	}
 
@@ -668,6 +668,10 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 					ui->chn_scales->itemAt(i)->widget());
 		double value = probe_attenuation[i] * plot.VertUnitsPerDiv(i);
 		label->setText(vertMeasureFormat.format(value, "V/div", 3));
+	}
+
+	for (unsigned int i = nb_channels; i < nb_channels + nb_math_channels; i++) {
+		init_selected_measurements(i, {0, 1, 4, 5});
 	}
 
 	if (!wheelEventGuard)
@@ -2441,6 +2445,8 @@ void adiscope::Oscilloscope::onChannelWidgetEnabled(bool en)
 			w->menuButton()));
 	}
 
+	measureLabelsRearrange();
+
 	plot.setOffsetWidgetVisible(id, en);
 
 	plot.replot();
@@ -3269,6 +3275,14 @@ void Oscilloscope::measureLabelsRearrange()
 	for (int i = 0; i < measurements_data.size(); i++) {
 
 		int channel = measurements_data[i]->channel();
+		if (channel >= nb_channels + nb_math_channels) {
+			continue;
+		}
+
+		ChannelWidget *chn_widget = channelWidgetAtId(channel);
+		if (!chn_widget->enableButton()->isChecked()) {
+			continue;
+		}
 
 		QLabel *name = new QLabel();
 		QLabel *value = new QLabel();
@@ -3285,8 +3299,12 @@ void Oscilloscope::measureLabelsRearrange()
 		gLayout->addLayout(value_layout, row, 2 * col + 1);
 
 		measurements_gui[i]->init(name, value);
+		double pb_atten = 1;
+		if (channel < probe_attenuation.size()) {
+			pb_atten = probe_attenuation[channel];
+		}
 		measurements_gui[i]->update(*(measurements_data[i]),
-					    probe_attenuation[channel]);
+					    pb_atten);
 		measurements_gui[i]->setLabelsColor(plot.getLineColor(channel));
 
 		nb_meas_added++;
@@ -3297,6 +3315,10 @@ void Oscilloscope::measureUpdateValues()
 {
 	for (int i = 0; i < measurements_data.size(); i++) {
 		int channel = measurements_data[i]->channel();
+		ChannelWidget *chn_widget = channelWidgetAtId(channel);
+		if (!chn_widget->enableButton()->isChecked()) {
+			continue;
+		}
 		measurements_gui[i]->update(*(measurements_data[i]),
 					    probe_attenuation[channel]);
 	}
