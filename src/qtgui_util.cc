@@ -84,10 +84,10 @@ QwtDblClickPlotPicker::stateMachine(int n) const
   return new QwtPickerDblClickPointMachine;
 }
 
-void Util::retainWidgetSizeWhenHidden(QWidget *w)
+void Util::retainWidgetSizeWhenHidden(QWidget *w, bool retain)
 {
 	QSizePolicy sp_retain = w->sizePolicy();
-	sp_retain.setRetainSizeWhenHidden(true);
+	sp_retain.setRetainSizeWhenHidden(retain);
 	w->setSizePolicy(sp_retain);
 }
 

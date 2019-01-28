@@ -60,7 +60,7 @@ public:
 class Util
 {
 public:
-	static void retainWidgetSizeWhenHidden(QWidget *w);
+	static void retainWidgetSizeWhenHidden(QWidget *w, bool retain = true);
 	static void setWidgetNrOfChars(QWidget *w, int minNrOfChars, int maxNrOfChars=0);
 	static void loadStylesheetFromFile(QString path, QWidget* widget);
 };
