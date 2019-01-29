@@ -54,7 +54,7 @@ namespace adiscope {
 		const int AVERAGE_COUNT = 5;
 
 		explicit PowerController(struct iio_context *ctx,
-				QPushButton *runButton, QJSEngine *engine,
+				ToolMenuItem *toolMenuItem, QJSEngine *engine,
 				ToolLauncher *parent = 0);
 		~PowerController();
 

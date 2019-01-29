@@ -95,11 +95,11 @@ std::vector<std::string> LogicAnalyzer::trigger_mapping = {
 
 LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
                              Filter *filt,
-                             QPushButton *runBtn,
+			     ToolMenuItem *toolMenuItem,
                              QJSEngine *engine,
                              ToolLauncher *parent,
                              bool offline_mode_) :
-	Tool(ctx, runBtn, new LogicAnalyzer_API(this), "Logic Analyzer", parent),
+	Tool(ctx, toolMenuItem, new LogicAnalyzer_API(this), "Logic Analyzer", parent),
 	itemsize(sizeof(uint16_t)),
 	dev_name(),
 	dev(nullptr),
@@ -335,9 +335,9 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	        this, SLOT(startStop(bool)));
 	connect(ui->btnSingleRun, SIGNAL(toggled(bool)),
 		this, SLOT(singleRun(bool)));
-	connect(runBtn, SIGNAL(toggled(bool)), ui->btnRunStop,
+	connect(runButton(), SIGNAL(toggled(bool)), ui->btnRunStop,
 	        SLOT(setChecked(bool)));
-	connect(ui->btnRunStop, SIGNAL(toggled(bool)), runBtn,
+	connect(ui->btnRunStop, SIGNAL(toggled(bool)), runButton(),
 	        SLOT(setChecked(bool)));
 	connect(ui->btnSettings, SIGNAL(toggled(bool)),
 		this, SLOT(toggleRightMenu(bool)));

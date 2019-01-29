@@ -90,7 +90,7 @@ public:
 	typedef boost::shared_ptr<SpectrumChannel> channel_sptr;
 
 	explicit SpectrumAnalyzer(struct iio_context *iio, Filter *filt,
-	                          std::shared_ptr<GenericAdc> adc, QPushButton *runButton,
+	                          std::shared_ptr<GenericAdc> adc, ToolMenuItem *toolMenuItem,
 	                          QJSEngine *engine, ToolLauncher *parent);
 	~SpectrumAnalyzer();
 

@@ -113,8 +113,8 @@ static double temp_sample_rate;
 
 SignalGenerator::SignalGenerator(struct iio_context *_ctx,
                                  QList<std::shared_ptr<GenericDac>> dacs, Filter *filt,
-                                 QPushButton *runButton, QJSEngine *engine, ToolLauncher *parent) :
-	Tool(_ctx, runButton, new SignalGenerator_API(this), "Signal Generator",
+				 ToolMenuItem *toolMenuItem, QJSEngine *engine, ToolLauncher *parent) :
+	Tool(_ctx, toolMenuItem, new SignalGenerator_API(this), "Signal Generator",
 	     parent),
 	ui(new Ui::SignalGenerator),
 	time_block_data(new adiscope::time_block_data),
@@ -509,11 +509,11 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 	connect(ui->mathWidget, SIGNAL(functionValid(const QString&)),
 	        this, SLOT(setFunction(const QString&)));
 
-	connect(ui->run_button, SIGNAL(toggled(bool)), runButton,
+	connect(ui->run_button, SIGNAL(toggled(bool)), runButton(),
 	        SLOT(setChecked(bool)));
-	connect(runButton, SIGNAL(toggled(bool)), ui->run_button,
+	connect(runButton(), SIGNAL(toggled(bool)), ui->run_button,
 	        SLOT(setChecked(bool)));
-	connect(runButton, SIGNAL(toggled(bool)),
+	connect(runButton(), SIGNAL(toggled(bool)),
 	        this, SLOT(startStop(bool)));
 
 	time_block_data->time_block->set_update_time(0.001);

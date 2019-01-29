@@ -61,7 +61,7 @@ namespace adiscope {
 	public:
 		explicit NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 				std::shared_ptr<GenericAdc> &adc_dev,
-				QPushButton *runButton, QJSEngine *engine,
+				ToolMenuItem *toolMenuItem, QJSEngine *engine,
 				ToolLauncher *parent);
 		~NetworkAnalyzer();
 

@@ -65,9 +65,9 @@ using namespace gr;
 
 NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 		std::shared_ptr<GenericAdc> &adc_dev,
-		QPushButton *runButton, QJSEngine *engine,
+		ToolMenuItem *toolMenuItem, QJSEngine *engine,
 		ToolLauncher *parent) :
-	Tool(ctx, runButton, new NetworkAnalyzer_API(this), "Network Analyzer", parent),
+	Tool(ctx, toolMenuItem, new NetworkAnalyzer_API(this), "Network Analyzer", parent),
 	ui(new Ui::NetworkAnalyzer),
 	adc_dev(adc_dev),
 	d_cursorsEnabled(false),
@@ -98,8 +98,8 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
 
 	connect(ui->run_button, SIGNAL(toggled(bool)),
-			runButton, SLOT(setChecked(bool)));
-	connect(runButton, SIGNAL(toggled(bool)),
+			runButton(), SLOT(setChecked(bool)));
+	connect(runButton(), SIGNAL(toggled(bool)),
 			ui->run_button, SLOT(setChecked(bool)));
 	connect(ui->run_button, SIGNAL(toggled(bool)),
 			this, SLOT(startStop(bool)));

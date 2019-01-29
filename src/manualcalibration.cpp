@@ -58,9 +58,9 @@ enter the value in the field below.
 The value should be around -4.5V)");
 
 ManualCalibration::ManualCalibration(struct iio_context *ctx, Filter *filt,
-				     QPushButton *runButton, QJSEngine *engine,
+				     ToolMenuItem *toolMenuItem, QJSEngine *engine,
 				     ToolLauncher *parent, Calibration *cal) :
-	Tool(ctx, runButton, new ManualCalibration_API(this), "Calibration", parent),
+	Tool(ctx, toolMenuItem, new ManualCalibration_API(this), "Calibration", parent),
 	ui(new Ui::ManualCalibration), filter(filt),
 	eng(engine), calib(cal),
 	calibrationFilePath("")

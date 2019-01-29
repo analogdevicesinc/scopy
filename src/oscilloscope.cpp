@@ -78,9 +78,9 @@ using namespace gr;
 using namespace std;
 
 Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
-			   std::shared_ptr<GenericAdc> adc, QPushButton *runButton,
+			   std::shared_ptr<GenericAdc> adc, ToolMenuItem *toolMenuItem,
 			   QJSEngine *engine, ToolLauncher *parent) :
-	Tool(ctx, runButton, new Oscilloscope_API(this), "Oscilloscope", parent),
+	Tool(ctx, toolMenuItem, new Oscilloscope_API(this), "Oscilloscope", parent),
 	adc(adc),
 	m2k_adc(dynamic_pointer_cast<M2kAdc>(adc)),
 	nb_channels(Oscilloscope::adc->numAdcChannels()),
@@ -464,15 +464,16 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		SLOT(onHistogram_view_toggled(bool)));
 
 	ch_ui->btnAutoset->setEnabled(false);
+
 	connect(ui->runSingleWidget, &RunSingleWidget::toggled,
 		ch_ui->btnAutoset, &QPushButton::setEnabled);
 
 	connect(ui->runSingleWidget, &RunSingleWidget::toggled,
 		[=](bool checked){
-		auto btn = dynamic_cast<CustomPushButton *>(runButton);
+		auto btn = dynamic_cast<CustomPushButton *>(run_button);
 		btn->setChecked(checked);
 	});
-	connect(runButton, &QPushButton::toggled,
+	connect(run_button, &QPushButton::toggled,
 		ui->runSingleWidget, &RunSingleWidget::toggle);
 	connect(ui->runSingleWidget, &RunSingleWidget::toggled,
 		this, &Oscilloscope::runStopToggled);
@@ -648,7 +649,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		voltsPerDiv->setDisplayScale(probe_attenuation[current_ch_widget]);
 		voltsPosition->setDisplayScale(probe_attenuation[current_ch_widget]);
 
-		if (!runButton->isChecked() && plot.measurementsEnabled()) {
+		if (!runButton()->isChecked() && plot.measurementsEnabled()) {
 			measureUpdateValues();
 		}
 

@@ -130,7 +130,7 @@ class SignalGenerator : public Tool
 public:
 	explicit SignalGenerator(struct iio_context *ctx,
 	                         QList<std::shared_ptr<GenericDac>> dacs,
-	                         Filter *filt, QPushButton *runButton,
+	                         Filter *filt, ToolMenuItem *toolMenuItem,
 	                         QJSEngine *engine, ToolLauncher *parent);
 	~SignalGenerator();
 

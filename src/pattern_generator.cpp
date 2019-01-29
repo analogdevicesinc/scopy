@@ -144,10 +144,10 @@ void PatternGenerator::setPGStatus(PatternGenerator::runState val)
 }
 
 PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
-                                   QPushButton *runBtn, QJSEngine *engine,
+				  ToolMenuItem *toolMenuItem, QJSEngine *engine,
                                    DIOManager *diom, ToolLauncher *parent,
                                    bool offline_mode_) :
-	Tool(ctx, runBtn, new PatternGenerator_API(this), "Pattern Generator", parent),
+	Tool(ctx, toolMenuItem, new PatternGenerator_API(this), "Pattern Generator", parent),
 	settings_group(new QButtonGroup(this)),
 	ui(new Ui::PatternGenerator),
 	pgSettings(new Ui::PGSettings),
@@ -282,8 +282,8 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 	connect(chmui,SIGNAL(channelsChanged()),bufui,SLOT(updateUi()));
 	connect(chmui,SIGNAL(channelsChanged()),this,SLOT(checkEnabledChannels()));
 	connect(ui->btnRunStop, SIGNAL(toggled(bool)), this, SLOT(startStop(bool)));
-	connect(runBtn, SIGNAL(toggled(bool)), ui->btnRunStop, SLOT(setChecked(bool)));
-	connect(ui->btnRunStop, SIGNAL(toggled(bool)), runBtn, SLOT(setChecked(bool)));
+	connect(runButton(), SIGNAL(toggled(bool)), ui->btnRunStop, SLOT(setChecked(bool)));
+	connect(ui->btnRunStop, SIGNAL(toggled(bool)), runButton(), SLOT(setChecked(bool)));
 	connect(ui->btnSingleRun, SIGNAL(pressed()), this, SLOT(singleRun()));
 
 	//main_win->view_->viewport()->disableDrag();
