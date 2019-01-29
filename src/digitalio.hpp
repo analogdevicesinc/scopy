@@ -99,7 +99,7 @@ private:
 	QPair<QWidget *,Ui::dioChannel *>  *findIndividualUi(int ch);
 
 public:
-	explicit DigitalIO(struct iio_context *ctx, Filter *filt, QPushButton *runBtn,
+	explicit DigitalIO(struct iio_context *ctx, Filter *filt, ToolMenuItem *toolMenuItem,
 	                   DIOManager *diom, QJSEngine *engine,
 	                   ToolLauncher *parent, bool offline_mode = 0);
 	~DigitalIO();

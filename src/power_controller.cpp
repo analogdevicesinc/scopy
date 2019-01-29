@@ -31,9 +31,9 @@
 using namespace adiscope;
 
 PowerController::PowerController(struct iio_context *ctx,
-		QPushButton *runButton, QJSEngine *engine,
+		ToolMenuItem *toolMenuItem, QJSEngine *engine,
 		ToolLauncher *parent) :
-	Tool(ctx, runButton, new PowerController_API(this), "Power Supply", parent),
+	Tool(ctx, toolMenuItem, new PowerController_API(this), "Power Supply", parent),
 	ui(new Ui::PowerController), in_sync(false)
 {
 	ui->setupUi(this);
@@ -117,7 +117,7 @@ PowerController::PowerController(struct iio_context *ctx,
 	connect(ui->trackingRatio, SIGNAL(valueChanged(int)), this,
 			SLOT(ratioChanged(int)));
 
-	connect(runButton, SIGNAL(clicked(bool)), this, SLOT(startStop(bool)));
+	connect(runButton(), SIGNAL(clicked(bool)), this, SLOT(startStop(bool)));
 
 	valuePos->setValue(0);
 	valueNeg->setValue(0);

@@ -86,7 +86,7 @@ class ManualCalibration : public Tool
 
 public:
 	explicit ManualCalibration(struct iio_context *ctx, Filter *filt,
-				   QPushButton *runButton, QJSEngine *engine,
+				   ToolMenuItem *toolMenuItem, QJSEngine *engine,
 				   ToolLauncher *parent = 0, Calibration *cal = 0);
 
 	~ManualCalibration();

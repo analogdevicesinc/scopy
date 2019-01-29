@@ -104,7 +104,7 @@ public:
 
 	explicit LogicAnalyzer(struct iio_context *ctx,
 	                       Filter *filt,
-	                       QPushButton *runButton,
+	                       ToolMenuItem *toolMenuItem,
 			       QJSEngine *engine,
 	                       ToolLauncher *parent,
 	                       bool offline_mode_ = 0);
