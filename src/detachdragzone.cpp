@@ -2,6 +2,8 @@
 #include "tool_launcher.hpp"
 #include <QMimeData>
 
+#include "basemenuitem.h"
+
 using namespace adiscope;
 
 DetachDragZone::DetachDragZone(QWidget *parent) :
@@ -11,8 +13,6 @@ DetachDragZone::DetachDragZone(QWidget *parent) :
 	if (tl->infoWidget != nullptr){
 		connect(this, SIGNAL(changeText(QString)), tl->infoWidget,
 			SLOT(setText(QString)));
-		connect(this, SIGNAL(detachWidget(int)), tl,
-			SLOT(detachToolOnPosition(int)));
 	}
 
 	setAcceptDrops(true);
@@ -27,7 +27,7 @@ bool DetachDragZone::eventFilter(QObject *watched, QEvent *event)
 {
 	if (event->type() == QEvent::DragEnter){
 		QDragEnterEvent *enterEvent = static_cast<QDragEnterEvent *>(event);
-		if (!enterEvent->mimeData()->hasFormat("menu/option"))
+		if (!enterEvent->mimeData()->hasFormat(BaseMenuItem::menuItemMimeDataType))
 			return true;
 		}
 	return QWidget::event(event);
@@ -35,6 +35,10 @@ bool DetachDragZone::eventFilter(QObject *watched, QEvent *event)
 
 void DetachDragZone::dragEnterEvent(QDragEnterEvent *event)
 {
+	if (!event->source()) {
+		event->ignore();
+		return;
+	}
 
 	Q_EMIT changeText(" Detach");
 	event->accept();
@@ -53,12 +57,13 @@ void DetachDragZone::dragLeaveEvent(QDragLeaveEvent *event)
 
 void DetachDragZone::dropEvent(QDropEvent *event)
 {
-	short position;
 	if (event->source() == this && event->possibleActions() & Qt::MoveAction){
 		return;
 	}
-	if (event->mimeData()->hasFormat("menu/option")){
-		position = (short)event->mimeData()->data("menu/option")[1];
-		Q_EMIT detachWidget(position);
+	if (event->mimeData()->hasFormat(BaseMenuItem::menuItemMimeDataType)){
+		QObject *source = event->source();
+		if (source) {
+			static_cast<ToolMenuItem *>(source)->detach();
+		}
 	}
 }
