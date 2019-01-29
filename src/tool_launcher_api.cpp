@@ -8,16 +8,6 @@
 #include <QJsonDocument>
 
 namespace adiscope {
-QList<QString> ToolLauncher_API::order()
-{
-	return tl->getOrder();
-}
-
-void ToolLauncher_API::setOrder(QList<QString> list)
-{
-	tl->setOrder(list);
-}
-
 QString ToolLauncher_API::getIndexFile() const
 {
 	return tl->indexFile;
@@ -269,7 +259,7 @@ void ToolLauncher::addDebugWindow()
 {
 	DetachedWindow *window = new DetachedWindow();
 	window->setWindowTitle("Debugger");
-	Debugger *debug = new Debugger(ctx, filter,toolMenu["Debugger"]->getToolStopBtn(),
+	Debugger *debug = new Debugger(ctx, filter,menu->getToolMenuItemFor(TOOL_DEBUGGER),
 			&js_engine, this);
 	QObject::connect(debug, &Debugger::newDebuggerInstance, this,
 			 &ToolLauncher::addDebugWindow);

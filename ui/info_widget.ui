@@ -32,7 +32,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>TextLabel</string>
+    <string>Move</string>
    </property>
   </widget>
  </widget>

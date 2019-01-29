@@ -21,8 +21,6 @@ class ToolLauncher_API: public ApiObject
 
 	Q_PROPERTY(bool always_on_top READ alwaysOnTop WRITE setAlwaysOnTop);
 
-	Q_PROPERTY(QList<QString> tool_list READ order WRITE setOrder);
-
 	Q_PROPERTY(bool skip_calibration READ calibration_skipped WRITE skip_calibration);
 
 	Q_PROPERTY(bool debugger READ debugger_enabled WRITE enable_debugger)
@@ -40,9 +38,6 @@ public:
 
 	bool menu_opened() const;
 	void open_menu(bool open);
-
-	QList<QString> order();
-	void setOrder(QList<QString> list);
 
 	bool hidden() const;
 	void hide(bool hide);

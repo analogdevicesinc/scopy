@@ -25,7 +25,7 @@ void InfoWidget::updatePosition()
 	QPoint p = this->parentWidget()->mapFromGlobal(QCursor::pos());
 	//Position the widget in the bottom right corner of the pixmap
 	//that is dragged
-	this->move(p.x() + 150, p.y() + 52);
+	this->move(p.x() + 159, p.y() + 54);
 }
 
 void InfoWidget::setText(QString text)
