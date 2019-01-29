@@ -155,9 +155,9 @@ void NetworkAnalyzer::_configureAdcFlowgraph(size_t buffer_size)
 NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 				 std::shared_ptr<GenericAdc>& adc_dev,
 				 QList<std::shared_ptr<GenericDac>> dacs,
-				 QPushButton *runButton, QJSEngine *engine,
+				 ToolMenuItem *toolMenuItem, QJSEngine *engine,
 				 ToolLauncher *parent) :
-	Tool(ctx, runButton, new NetworkAnalyzer_API(this), "Network Analyzer", parent),
+	Tool(ctx, toolMenuItem, new NetworkAnalyzer_API(this), "Network Analyzer", parent),
 	ui(new Ui::NetworkAnalyzer),
 	adc_dev(adc_dev),
 	d_cursorsEnabled(false),
@@ -214,10 +214,10 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	connect(ui->runSingleWidget, &RunSingleWidget::toggled,
 		[=](bool checked){
-		auto btn = dynamic_cast<CustomPushButton *>(runButton);
+		auto btn = dynamic_cast<CustomPushButton *>(runButton());
 		btn->setChecked(checked);
 	});
-	connect(runButton, &QPushButton::toggled,
+	connect(runButton(), &QPushButton::toggled,
 		ui->runSingleWidget, &RunSingleWidget::toggle);
 	connect(ui->runSingleWidget, &RunSingleWidget::toggled,
 		this, &NetworkAnalyzer::startStop);

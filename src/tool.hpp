@@ -30,6 +30,8 @@
 
 #include "preferences.h"
 
+#include "toolmenuitem.h"
+
 class QJSEngine;
 class QPushButton;
 
@@ -46,12 +48,12 @@ class Tool : public QWidget
 	Q_OBJECT
 
 public:
-	explicit Tool(struct iio_context *ctx, QPushButton *runButton,
+	explicit Tool(struct iio_context *ctx, ToolMenuItem *toolMenuItem,
 			ApiObject *api, const QString& name,
 			ToolLauncher *parent);
 	~Tool();
 
-	QPushButton *runButton() { return this->run_button; }
+	QPushButton *runButton() { return toolMenuItem->getToolStopBtn(); }
 	const QString& getName();
 	void setName(const QString& name);
 	virtual void settingsLoaded();
@@ -78,6 +80,7 @@ protected:
 	bool saveOnExit;
 	bool isDetached;
 	QMainWindow *window;
+	ToolMenuItem *toolMenuItem;
 };
 }
 #endif /* SCOPY_TOOL_HPP */

@@ -105,7 +105,7 @@ namespace adiscope {
 	public:
 		explicit Oscilloscope(struct iio_context *ctx, Filter *filt,
 				std::shared_ptr<GenericAdc> adc,
-				QPushButton *runButton, QJSEngine *engine,
+				ToolMenuItem *toolMenuItem, QJSEngine *engine,
 				ToolLauncher *parent = 0);
 		~Oscilloscope();
 

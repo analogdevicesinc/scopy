@@ -49,7 +49,7 @@ class Debugger : public Tool
 
 public:
 	explicit Debugger(struct iio_context *ctx, Filter *filt,
-	                  QPushButton *runButton, QJSEngine *engine,
+			  ToolMenuItem *toolMenuItem, QJSEngine *engine,
 	                  ToolLauncher *parent = 0);
 	~Debugger();
 

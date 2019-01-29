@@ -48,12 +48,11 @@
 using namespace adiscope;
 
 DMM::DMM(struct iio_context *ctx, Filter *filt, std::shared_ptr<GenericAdc> adc,
-		QPushButton *runButton, QJSEngine *engine, ToolLauncher *parent)
-	: Tool(ctx, runButton, new DMM_API(this), "Voltmeter", parent),
-	ui(new Ui::DMM),
+		ToolMenuItem *toolMenuItem, QJSEngine *engine, ToolLauncher *parent)
+	: Tool(ctx, toolMenuItem, new DMM_API(this), "Voltmeter", parent),
+	ui(new Ui::DMM), signal(boost::make_shared<signal_sample>()),
 	manager(iio_manager::get_instance(ctx, filt->device_name(TOOL_DMM))),
 	adc(adc),
-	signal(boost::make_shared<signal_sample>()),
 	interrupt_data_logging(false),
 	data_logging(false),
 	filename(""),
@@ -85,10 +84,10 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, std::shared_ptr<GenericAdc> adc,
 	}
 
 	connect(ui->run_button, SIGNAL(toggled(bool)),
-			runButton, SLOT(setChecked(bool)));
-	connect(ui->run_button, SIGNAL(toggled(bool)),
 			this, SLOT(toggleTimer(bool)));
-	connect(runButton, SIGNAL(toggled(bool)), ui->run_button,
+	connect(ui->run_button, SIGNAL(toggled(bool)),
+			runButton(), SLOT(setChecked(bool)));
+	connect(runButton(), SIGNAL(toggled(bool)), ui->run_button,
 			SLOT(setChecked(bool)));
 	connect(ui->run_button, SIGNAL(toggled(bool)),
 		this, SLOT(startDataLogging(bool)));

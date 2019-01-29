@@ -26,15 +26,15 @@
 
 using namespace adiscope;
 
-Tool::Tool(struct iio_context *ctx, QPushButton *runButton,
+Tool::Tool(struct iio_context *ctx, ToolMenuItem *toolMenuItem,
 		ApiObject *api, const QString& name,
 		ToolLauncher *parent) :
 	QWidget(static_cast<QWidget *>(parent)),
-	ctx(ctx), run_button(runButton), api(api),
+	ctx(ctx), run_button(toolMenuItem->getToolStopBtn()), api(api),
 	name(name), saveOnExit(true), isDetached(false),
-	window(nullptr)
+	window(nullptr), toolMenuItem(toolMenuItem)
 {
-        run_button->parentWidget()->setDisabled(false);
+	toolMenuItem->setDisabled(false);
 
 	connect(this, &Tool::detachedState,
 		parent, &ToolLauncher::toolDetached);
@@ -52,13 +52,18 @@ Tool::Tool(struct iio_context *ctx, QPushButton *runButton,
 
 	connect(api, &ApiObject::loadingFinished,
 		this, &Tool::loadState);
+
+	connect(toolMenuItem, &ToolMenuItem::detach,
+		this, &Tool::detached);
+	connect(this, &Tool::detachedState,
+		toolMenuItem, &ToolMenuItem::setDetached);
 }
 
 Tool::~Tool()
 {
 	disconnect(prefPanel, &Preferences::notify, this, &Tool::readPreferences);
 
-	run_button->parentWidget()->setDisabled(true);
+	toolMenuItem->setDisabled(true);
 
 	delete settings;
 

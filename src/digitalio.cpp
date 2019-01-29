@@ -147,10 +147,10 @@ void DigitalIO::setOutput()
 	}
 }
 
-DigitalIO::DigitalIO(struct iio_context *ctx, Filter *filt, QPushButton *runBtn,
+DigitalIO::DigitalIO(struct iio_context *ctx, Filter *filt, ToolMenuItem *toolMenuItem,
                      DIOManager *diom, QJSEngine *engine,
                      ToolLauncher *parent, bool offline_mode) :
-	Tool(ctx, runBtn, new DigitalIO_API(this), "Digital IO", parent),
+	Tool(ctx, toolMenuItem, new DigitalIO_API(this), "Digital IO", parent),
 	ui(new Ui::DigitalIO),
 	offline_mode(offline_mode),
 	diom(diom)
@@ -165,8 +165,8 @@ DigitalIO::DigitalIO(struct iio_context *ctx, Filter *filt, QPushButton *runBtn,
 	ui->containerLayout->addWidget(groups.last());
 
 	connect(ui->btnRunStop, SIGNAL(toggled(bool)), this, SLOT(btnRunStop_toggled()));
-	connect(runBtn, SIGNAL(toggled(bool)), ui->btnRunStop, SLOT(setChecked(bool)));
-	connect(ui->btnRunStop, SIGNAL(toggled(bool)), runBtn, SLOT(setChecked(bool)));	
+	connect(runButton(), SIGNAL(toggled(bool)), ui->btnRunStop, SLOT(setChecked(bool)));
+	connect(ui->btnRunStop, SIGNAL(toggled(bool)), runButton(), SLOT(setChecked(bool)));
 
 	if (!offline_mode) {
 		connect(diom,SIGNAL(locked()),this,SLOT(lockUi()));
