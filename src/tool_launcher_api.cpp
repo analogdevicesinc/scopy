@@ -155,6 +155,16 @@ bool ToolLauncher_API::connect(const QString& uri)
 
 	if (!dev) {
 		btn = tl->addContext(uri);
+
+		if (!btn) {
+			return false;
+		}
+		for (auto d : tl->devices) {
+			if (d->uri() == uri) {
+				dev = d;
+				break;
+			}
+		}
 	}
 
 	tl->connect(tl, &ToolLauncher::connectionDone,
