@@ -4125,11 +4125,11 @@ void Oscilloscope::writeAllSettingsToHardware()
 	// Offset and Gain
 	if (m2k_adc) {
 		for (uint i = 0; i < nb_channels; i++) {
-			m2k_adc->setChnHwOffset(i, channel_offset[i]);
-
 			M2kAdc::GainMode mode = high_gain_modes[i] ?
 				M2kAdc::HIGH_GAIN_MODE : M2kAdc::LOW_GAIN_MODE;
 			m2k_adc->setChnHwGainMode(i, mode);
+
+			m2k_adc->setChnHwOffset(i, channel_offset[i]);
 		}
 
 		iio_device_attr_write_longlong(adc->iio_adc_dev(),
