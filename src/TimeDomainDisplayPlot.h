@@ -93,6 +93,9 @@ public:
 
   void stemPlot(bool en);
 
+  void setPlotLineStyle(unsigned int chIdx, unsigned int style);
+  int getLineStyle(unsigned int chIdx);
+
   double sampleRate() const;
 
   void setYaxisUnit(QString unitType);
