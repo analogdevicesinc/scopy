@@ -106,7 +106,7 @@ font-weight: normal;
         <x>0</x>
         <y>0</y>
         <width>461</width>
-        <height>574</height>
+        <height>588</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -777,7 +777,7 @@ color: rgba(255, 255, 255, 70);
            </item>
           </layout>
          </item>
-         <item row="0" column="1">
+         <item row="1" column="1">
           <widget class="QWidget" name="probeWidget" native="true">
            <layout class="QHBoxLayout" name="horizontalLayout">
             <property name="spacing">
@@ -848,6 +848,50 @@ Attenuation</string>
             </item>
            </layout>
           </widget>
+         </item>
+         <item row="0" column="1">
+          <layout class="QVBoxLayout" name="verticalLayout_3">
+           <property name="spacing">
+            <number>3</number>
+           </property>
+           <property name="bottomMargin">
+            <number>10</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="label_4">
+             <property name="styleSheet">
+              <string notr="true">font-size: 13px;</string>
+             </property>
+             <property name="text">
+              <string>Curve Style</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="lineStyle">
+             <item>
+              <property name="text">
+               <string>Lines</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Dots</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Steps</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Sticks</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+          </layout>
          </item>
         </layout>
        </item>

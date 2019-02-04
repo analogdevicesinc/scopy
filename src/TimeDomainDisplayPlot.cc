@@ -681,6 +681,54 @@ TimeDomainDisplayPlot::stemPlot(bool en)
   }
 }
 
+void TimeDomainDisplayPlot::setPlotLineStyle(unsigned int chIdx, unsigned int style)
+{
+	if (chIdx < 0 || chIdx >= d_plot_curve.size()) {
+		return;
+	}
+
+	auto curve = d_plot_curve[chIdx];
+
+	switch (style) {
+		case 0:
+		curve->setStyle(QwtPlotCurve::CurveStyle::Lines);
+		break;
+		case 1:
+		curve->setStyle(QwtPlotCurve::CurveStyle::Dots);
+		break;
+		case 2:
+		curve->setStyle(QwtPlotCurve::CurveStyle::Steps);
+		break;
+		case 3:
+		curve->setStyle(QwtPlotCurve::CurveStyle::Sticks);
+		break;
+	}
+}
+
+int TimeDomainDisplayPlot::getLineStyle(unsigned int chIdx)
+{
+	if (chIdx < 0 || chIdx >= d_plot_curve.size()) {
+		return -1;
+	}
+
+	auto style = d_plot_curve[chIdx]->style();
+	switch (style) {
+		case QwtPlotCurve::CurveStyle::Lines:
+		return 0;
+
+		case QwtPlotCurve::CurveStyle::Dots:
+		return 1;
+
+		case QwtPlotCurve::CurveStyle::Steps:
+		return 2;
+
+		case QwtPlotCurve::CurveStyle::Sticks:
+		return 3;
+	default:
+		return -1;
+	}
+}
+
 void
 TimeDomainDisplayPlot::setSemilogx(bool en)
 {
