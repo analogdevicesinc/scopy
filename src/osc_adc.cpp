@@ -376,6 +376,7 @@ void M2kAdc::setSampleRate(double sr)
 	if(filteringEnabled())
 	{
 		GenericAdc::setSampleRate(sr);
+		setOversamplingRatio(1);
 	}
 	else
 	{
