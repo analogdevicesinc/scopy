@@ -58,6 +58,8 @@
 
 #include "oscilloscope_api.hpp"
 
+#include "runsinglewidget.h"
+
 /* Generated UI */
 #include "ui_channel_settings.h"
 #include "ui_cursors_settings.h"
@@ -455,18 +457,20 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		SLOT(onHistogram_view_toggled(bool)));
 
 	ch_ui->btnAutoset->setEnabled(false);
-	connect(ui->pushButtonRunStop, SIGNAL(toggled(bool)),
-		ch_ui->btnAutoset,SLOT(setEnabled(bool)));
-	connect(runButton, SIGNAL(toggled(bool)), ui->pushButtonRunStop,
-			SLOT(setChecked(bool)));
-	connect(ui->pushButtonRunStop, SIGNAL(toggled(bool)), runButton,
-			SLOT(setChecked(bool)));
-	connect(ui->pushButtonRunStop, SIGNAL(toggled(bool)), this,
-			SLOT(runStopToggled(bool)));
-	connect(ui->pushButtonSingle, SIGNAL(toggled(bool)), this,
-			SLOT(runStopToggled(bool)));
-	connect(this, SIGNAL(isRunning(bool)), runButton,
-			SLOT(setChecked(bool)));
+	connect(ui->runSingleWidget, &RunSingleWidget::toggled,
+		ch_ui->btnAutoset, &QPushButton::setEnabled);
+
+	connect(ui->runSingleWidget, &RunSingleWidget::toggled,
+		[=](bool checked){
+		auto btn = dynamic_cast<CustomPushButton *>(runButton);
+		btn->setChecked(checked);
+	});
+	connect(runButton, &QPushButton::toggled,
+		ui->runSingleWidget, &RunSingleWidget::toggle);
+	connect(ui->runSingleWidget, &RunSingleWidget::toggled,
+		this, &Oscilloscope::runStopToggled);
+	connect(this, &Oscilloscope::isRunning,
+		ui->runSingleWidget, &RunSingleWidget::toggle);
 
 	connect(gsettings_ui->xyPlotLineType, SIGNAL(toggled(bool)),
 		this, SLOT(on_xyPlotLineType_toggled(bool)));
@@ -892,7 +896,7 @@ Oscilloscope::~Oscilloscope()
 	disconnect(prefPanel, &Preferences::notify, this, &Oscilloscope::readPreferences);
 
 
-	ui->pushButtonRunStop->setChecked(false);
+	ui->runSingleWidget->toggle(false);
 	setDynamicProperty(runButton(), "disabled", false);
 
 	bool started = iio->started();
@@ -1293,7 +1297,7 @@ void Oscilloscope::toolDetached(bool detached)
 
 void Oscilloscope::pause(bool paused)
 {
-	if (ui->pushButtonRunStop->isChecked()){
+	if (ui->runSingleWidget->runButtonChecked()){
 		toggle_blockchain_flow(!paused);
 		trigger_settings.setAdcRunningState(!paused);
 	}
@@ -1987,29 +1991,6 @@ void Oscilloscope::toggle_blockchain_flow(bool en)
 
 void Oscilloscope::runStopToggled(bool checked)
 {
-
-	QPushButton *btn = static_cast<QPushButton *>(QObject::sender());
-	setDynamicProperty(btn, "running", checked);
-
-	// When switching between continuous run and single or vice versa there
-	// is no need to reconfigure anything besides the GUI of the buttons
-	if (btn == ui->pushButtonSingle && ui->pushButtonRunStop->isChecked()) {
-		ui->pushButtonRunStop->blockSignals(true);
-		ui->pushButtonRunStop->setChecked(false);
-		ui->pushButtonRunStop->blockSignals(false);
-		setDynamicProperty(ui->pushButtonRunStop, "running",
-			false);
-		return;
-	} else if (btn == ui->pushButtonRunStop &&
-			ui->pushButtonSingle->isChecked()) {
-		ui->pushButtonSingle->blockSignals(true);
-		ui->pushButtonSingle->setChecked(false);
-		ui->pushButtonSingle->blockSignals(false);
-		setDynamicProperty(ui->pushButtonSingle, "running",
-			false);
-		return;
-	}
-
 	Q_EMIT activateExportButton();
 
 	if (checked) {
@@ -2168,7 +2149,7 @@ void Oscilloscope::onHistogram_view_toggled(bool visible)
 		for (unsigned int i = 0; i < nb_channels; i++) {
 			hist_ids[i] = iio->connect(qt_hist_block, i, i, true);
 
-			if (ui->pushButtonRunStop->isChecked())
+			if (ui->runSingleWidget->runButtonChecked())
 				iio->start(hist_ids[i]);
 		}
 
@@ -2360,15 +2341,13 @@ void adiscope::Oscilloscope::updateRunButton(bool ch_enabled)
 		ch_enabled = box->isChecked();
 	}
 
-	ui->pushButtonRunStop->setEnabled(ch_enabled);
+	ui->runSingleWidget->setEnabled(ch_enabled);
 	run_button->setEnabled(ch_enabled);
 	setDynamicProperty(run_button, "disabled", !ch_enabled);
-	ui->pushButtonSingle->setEnabled(ch_enabled);
 
 	if (!ch_enabled) {
-		ui->pushButtonRunStop->setChecked(false);
 		run_button->setChecked(false);
-		ui->pushButtonSingle->setChecked(false);
+		ui->runSingleWidget->toggle(false);
 	}
 }
 
@@ -2777,7 +2756,7 @@ void adiscope::Oscilloscope::onVertOffsetValueChanged(double value)
 
 	// Switch between high and low gain modes only for the M2K channels
 	if (m2k_adc && current_ch_widget < nb_channels) {
-		if (ui->pushButtonRunStop->isChecked())
+		if (ui->runSingleWidget->runButtonChecked())
 			toggle_blockchain_flow(false);
 
 		if (zoom_level == 0) {
@@ -2788,7 +2767,7 @@ void adiscope::Oscilloscope::onVertOffsetValueChanged(double value)
 
 		trigger_settings.updateHwVoltLevels(current_ch_widget);
 
-		if (ui->pushButtonRunStop->isChecked())
+		if (ui->runSingleWidget->runButtonChecked())
 			toggle_blockchain_flow(true);
 	}
 }
@@ -3818,7 +3797,7 @@ void Oscilloscope::autosetFinalStep() {
 		autoset_id[0] = nullptr;
 	}
 	autosetRequested = false;
-	if(ui->pushButtonRunStop->isChecked())
+	if(ui->runSingleWidget->runButtonChecked())
 		runStopToggled(true);
 
 	// autoset frequency found
@@ -3849,8 +3828,7 @@ void Oscilloscope::singleCaptureDone()
 	if (!symmBufferMode->isEnhancedMemDepth()
 			&& !plot_samples_sequentially) {
 		Q_EMIT activateExportButton();
-		if (ui->pushButtonSingle->isChecked()){
-			ui->pushButtonSingle->setChecked(false);
+		if (ui->runSingleWidget->singleButtonChecked()){
 			Q_EMIT isRunning(false);
 		}
 	}
@@ -3895,8 +3873,7 @@ void Oscilloscope::resetStreamingFlag(bool enable)
 	if ((symmBufferMode->isEnhancedMemDepth() || plot_samples_sequentially)
 			&& d_shouldResetStreaming) {
 		Q_EMIT activateExportButton();
-		if (ui->pushButtonSingle->isChecked() && started){
-			ui->pushButtonSingle->setChecked(false);
+		if (ui->runSingleWidget->singleButtonChecked() && started){
 			Q_EMIT isRunning(false);
 		}
 	}
@@ -4036,7 +4013,7 @@ void Oscilloscope::updateGainMode()
 			std::abs(offset) > 5.0) {
 		if (high_gain_modes[current_ch_widget]) {
 			high_gain_modes[current_ch_widget] = false;
-			bool running = ui->pushButtonRunStop->isChecked();
+			bool running = ui->runSingleWidget->runButtonChecked();
 
 			if (running)
 				toggle_blockchain_flow(false);
@@ -4056,7 +4033,7 @@ void Oscilloscope::updateGainMode()
 	} else {
 		if (!high_gain_modes[current_ch_widget]) {
 			high_gain_modes[current_ch_widget] = true;
-			bool running = ui->pushButtonRunStop->isChecked();
+			bool running = ui->runSingleWidget->runButtonChecked();
 
 			if (running)
 				toggle_blockchain_flow(false);
@@ -4078,7 +4055,7 @@ void Oscilloscope::updateGainMode()
 
 void Oscilloscope::setGainMode(uint chnIdx, M2kAdc::GainMode gain_mode)
 {
-	if (ui->pushButtonRunStop->isChecked())
+	if (ui->runSingleWidget->runButtonChecked())
 		m2k_adc->setChnHwGainMode(chnIdx, gain_mode);
 
 	boost::shared_ptr<adc_sample_conv> block =
@@ -4092,7 +4069,7 @@ void Oscilloscope::setGainMode(uint chnIdx, M2kAdc::GainMode gain_mode)
 void Oscilloscope::setChannelHwOffset(uint chnIdx, double offset)
 {
 	channel_offset[chnIdx] = offset;
-	if (ui->pushButtonRunStop->isChecked())
+	if (ui->runSingleWidget->runButtonChecked())
 		m2k_adc->setChnHwOffset(chnIdx, offset);
 
 	// Compensate the offset set in hardware
@@ -4122,6 +4099,7 @@ void Oscilloscope::writeAllSettingsToHardware()
 	// Sample Rate
 	if (active_sample_rate != adc->sampleRate())
 		adc->setSampleRate(active_sample_rate);
+
 
 	// Offset and Gain
 	if (m2k_adc) {

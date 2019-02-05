@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1017</width>
+    <width>1280</width>
     <height>654</height>
    </rect>
   </property>
@@ -158,102 +158,7 @@ QPushButton:hover {
          </spacer>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButtonRunStop">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="layoutDirection">
-           <enum>Qt::RightToLeft</enum>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">QPushButton {
-  width: 80px;
-  height: 40px;
-  border-radius: 4px;
-  background-color: #27b34f;
-  color: white;
-  
-  font-weight: bold;
-
-  text-align: left;
-  padding-left: 20px;
-  padding-right: 20px;
-  qproperty-text: &quot;Run&quot;;
-}
-
-QPushButton[running=true] {
-  qproperty-text: &quot;Stop&quot;;
-  background-color: #F45000;
-}
-
-QPushButton:disabled {
-  background-color: grey;
-}</string>
-          </property>
-          <property name="icon">
-           <iconset resource="../resources/resources.qrc">
-            <normaloff>:/icons/ico-play.svg</normaloff>
-            <normalon>:/icons/ico-stop.svg</normalon>:/icons/ico-play.svg</iconset>
-          </property>
-          <property name="iconSize">
-           <size>
-            <width>8</width>
-            <height>10</height>
-           </size>
-          </property>
-          <property name="checkable">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButtonSingle">
-          <property name="layoutDirection">
-           <enum>Qt::RightToLeft</enum>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">QPushButton {
-  width: 80px;
-  height: 40px;
-  border-radius: 4px;
-  background-color: #ff7200;
-  color: white;
-  
-  font-weight: bold;
-
-  text-align: left;
-  padding-left: 20px;
-  padding-right: 20px;
-  qproperty-text: &quot;Single&quot;;
-}
-
-QPushButton[running=true] {
-  qproperty-text: &quot;Stop&quot;;
-  background-color: #F45000;
-}
-
-QPushButton:disabled {
-  background-color: grey;
-}</string>
-          </property>
-          <property name="icon">
-           <iconset resource="../resources/resources.qrc">
-            <normaloff>:/icons/ico-oneshot.svg</normaloff>
-            <normalon>:/icons/ico-stop.svg</normalon>:/icons/ico-oneshot.svg</iconset>
-          </property>
-          <property name="iconSize">
-           <size>
-            <width>10</width>
-            <height>10</height>
-           </size>
-          </property>
-          <property name="checkable">
-           <bool>true</bool>
-          </property>
-         </widget>
+         <widget class="adiscope::RunSingleWidget" name="runSingleWidget" native="true"/>
         </item>
         <item>
          <widget class="QWidget" name="widget" native="true">
@@ -1039,6 +944,12 @@ QLabel {
    <class>adiscope::CustomPushButton</class>
    <extends>QPushButton</extends>
    <header>customPushButton.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::RunSingleWidget</class>
+   <extends>QWidget</extends>
+   <header>runsinglewidget.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>

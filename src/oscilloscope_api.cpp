@@ -319,22 +319,22 @@ void Oscilloscope_API::show()
 
 bool Oscilloscope_API::running() const
 {
-	return osc->ui->pushButtonRunStop->isChecked() || osc->ui->pushButtonSingle->isChecked();
+	return osc->ui->runSingleWidget->runButtonChecked() || osc->ui->runSingleWidget->singleButtonChecked();
 }
 
 void Oscilloscope_API::run(bool en)
 {
-	osc->ui->pushButtonRunStop->setChecked(en);
+	osc->ui->runSingleWidget->toggle(en);
 }
 
 bool Oscilloscope_API::isSingle() const
 {
-	return osc->ui->pushButtonSingle->isChecked();
+	return osc->ui->runSingleWidget->singleButtonChecked();
 }
 void Oscilloscope_API::single(bool en)
 {
-	if(!osc->ui->pushButtonSingle->isChecked())
-		osc->ui->pushButtonSingle->setChecked(true);
+	if(!osc->ui->runSingleWidget->singleButtonChecked())
+		osc->ui->runSingleWidget->single();
 }
 
 QList<int> Oscilloscope_API::measureEn() const
