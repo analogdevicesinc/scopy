@@ -333,16 +333,18 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 		build_gnuradio_block_chain_no_ctx();
 	}
 
-	connect(ui->run_button, SIGNAL(toggled(bool)), this,
-	        SLOT(runStopToggled(bool)));
-	connect(ui->run_button, SIGNAL(toggled(bool)), runButton,
-	        SLOT(setChecked(bool)));
-	connect(run_button, SIGNAL(toggled(bool)), ui->run_button,
-	        SLOT(setChecked(bool)));
-	connect(ui->btnSingle, SIGNAL(toggled(bool)),
-	        SLOT(runStopToggled(bool)));
-	connect(this, SIGNAL(isRunning(bool)), run_button,
-	        SLOT(setChecked(bool)));
+	connect(ui->runSingleWidget, &RunSingleWidget::toggled,
+		[=](bool checked){
+		auto btn = dynamic_cast<CustomPushButton *>(run_button);
+		btn->setChecked(checked);
+	});
+	connect(run_button, &QPushButton::toggled,
+		ui->runSingleWidget, &RunSingleWidget::toggle);
+	connect(ui->runSingleWidget, &RunSingleWidget::toggled,
+		this, &SpectrumAnalyzer::runStopToggled);
+	connect(this, &SpectrumAnalyzer::isRunning,
+		ui->runSingleWidget, &RunSingleWidget::toggle);
+
 
 	connect(fft_plot, SIGNAL(newData()),
 	        SLOT(singleCaptureDone()));
@@ -394,7 +396,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 SpectrumAnalyzer::~SpectrumAnalyzer()
 {
-	ui->run_button->setChecked(false);
+	ui->runSingleWidget->toggle(false);
 	setDynamicProperty(runButton(), "disabled", false);
 
 	if (saveOnExit) {
@@ -576,23 +578,7 @@ void SpectrumAnalyzer::on_btnMarkers_toggled(bool checked)
 
 void SpectrumAnalyzer::runStopToggled(bool checked)
 {
-	QPushButton *btn = static_cast<QPushButton *>(QObject::sender());
-	setDynamicProperty(btn, "running", checked);
-
 	if (checked) {
-		if (btn == ui->btnSingle && ui->run_button->isChecked()) {
-			ui->run_button->blockSignals(true);
-			ui->run_button->setChecked(false);
-			ui->run_button->blockSignals(false);
-			setDynamicProperty(ui->run_button, "running", false);
-		} else if (btn == ui->run_button &&
-		           ui->btnSingle->isChecked()) {
-			ui->btnSingle->blockSignals(true);
-			ui->btnSingle->setChecked(false);
-			ui->btnSingle->blockSignals(false);
-			setDynamicProperty(ui->btnSingle, "running", false);
-		}
-
 		if (iio) {
 			writeAllSettingsToHardware();
 		}
@@ -856,7 +842,7 @@ void SpectrumAnalyzer::updateMarkerMenu(unsigned int id)
 	ChannelWidget *cw = getChannelWidgetAt(id);
 
 	// Is this if branch required?
-	if (!ui->run_button->isChecked()) {
+	if (!ui->runSingleWidget->runButtonChecked()) {
 		fft_plot->replot();
 	}
 
@@ -931,15 +917,14 @@ void SpectrumAnalyzer::updateRunButton(bool ch_en)
 		QCheckBox *box = parent->findChild<QCheckBox *>("box");
 		ch_en = box->isChecked();
 	}
-	ui->run_button->setEnabled(ch_en);
+	ui->runSingleWidget->setEnabled(ch_en);
 	runButton()->setEnabled(ch_en);
 	setDynamicProperty(runButton(), "disabled", !ch_en);
-	ui->btnSingle->setEnabled(ch_en);
+
 
 	if (!ch_en) {
-		ui->run_button->setChecked(false);
 		runButton()->setChecked(false);
-		ui->btnSingle->setChecked(false);
+		ui->runSingleWidget->toggle(false);
 	}
 }
 
@@ -988,7 +973,7 @@ void SpectrumAnalyzer::on_btnLeftPeak_clicked()
 
 	fft_plot->marker_to_next_lower_freq_peak(crt_channel_id, crt_marker);
 
-	if (!ui->run_button->isChecked()) {
+	if (!ui->runSingleWidget->runButtonChecked()) {
 		fft_plot->updateMarkerUi(crt_channel_id, crt_marker);
 		fft_plot->replot();
 	}
@@ -1002,7 +987,7 @@ void SpectrumAnalyzer::on_btnRightPeak_clicked()
 
 	fft_plot->marker_to_next_higher_freq_peak(crt_channel_id, crt_marker);
 
-	if (!ui->run_button->isChecked()) {
+	if (!ui->runSingleWidget->runButtonChecked()) {
 		fft_plot->updateMarkerUi(crt_channel_id, crt_marker);
 		fft_plot->replot();
 	}
@@ -1016,7 +1001,7 @@ void SpectrumAnalyzer::on_btnMaxPeak_clicked()
 
 	fft_plot->marker_to_max_peak(crt_channel_id, crt_marker);
 
-	if (!ui->run_button->isChecked()) {
+	if (!ui->runSingleWidget->runButtonChecked()) {
 		fft_plot->updateMarkerUi(crt_channel_id, crt_marker);
 		fft_plot->replot();
 	}
@@ -1048,7 +1033,7 @@ void SpectrumAnalyzer::setSampleRate(double sr)
 		return;
 	}
 
-	if (iio->started() && ui->run_button->isChecked()) {
+	if (iio->started() && ui->runSingleWidget->runButtonChecked()) {
 		stop_blockchain_flow();
 
 		auto m2k_adc = std::dynamic_pointer_cast<M2kAdc>(adc);
@@ -1115,7 +1100,7 @@ void SpectrumAnalyzer::on_btnDnAmplPeak_clicked()
 
 	fft_plot->marker_to_next_lower_mag_peak(crt_channel_id, crt_marker);
 
-	if (!ui->run_button->isChecked()) {
+	if (!ui->runSingleWidget->runButtonChecked()) {
 		fft_plot->updateMarkerUi(crt_channel_id, crt_marker);
 		fft_plot->replot();
 	}
@@ -1129,7 +1114,7 @@ void SpectrumAnalyzer::on_btnUpAmplPeak_clicked()
 
 	fft_plot->marker_to_next_higher_mag_peak(crt_channel_id, crt_marker);
 
-	if (!ui->run_button->isChecked()) {
+	if (!ui->runSingleWidget->runButtonChecked()) {
 		fft_plot->updateMarkerUi(crt_channel_id, crt_marker);
 		fft_plot->replot();
 	}
@@ -1323,8 +1308,7 @@ void SpectrumAnalyzer::onPlotSampleCountUpdated(uint)
 
 void SpectrumAnalyzer::singleCaptureDone()
 {
-	if (ui->btnSingle->isChecked()) {
-		ui->btnSingle->setChecked(false);
+	if (ui->runSingleWidget->singleButtonChecked()) {
 		Q_EMIT isRunning(false);
 	}
 }

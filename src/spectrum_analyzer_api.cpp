@@ -204,16 +204,16 @@ bool SpectrumAnalyzer_API::running()
 
 void SpectrumAnalyzer_API::run(bool chk)
 {
-	sp->ui->run_button->setChecked(chk);
+	sp->ui->runSingleWidget->toggle(chk);
 }
 
 bool SpectrumAnalyzer_API::isSingle()
 {
-	return sp->ui->btnSingle->isChecked();
+	return sp->ui->runSingleWidget->singleButtonChecked();
 }
 void SpectrumAnalyzer_API::single(bool chk)
 {
-	sp->ui->btnSingle->setChecked(chk);
+	sp->ui->runSingleWidget->single();
 }
 
 QVariantList SpectrumAnalyzer_API::getChannels()
