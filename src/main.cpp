@@ -63,12 +63,10 @@ void* context, bool succeeded) {
 #endif
 
 
-int main(int argc, char **argv)
+QString initBreakPadHandler(QString crashDumpPath)
 {
-
-	QApplication app(argc, argv);
 	QString prevCrashDump="";
-	QString appDir = QCoreApplication::applicationDirPath();
+	QString appDir = crashDumpPath;
 	QDir qd(appDir);
 	if(qd.exists()) {
 		qd.mkdir("crashdmp");
@@ -89,8 +87,6 @@ int main(int argc, char **argv)
 
 	}
 
-
-
 	QByteArray ba = qd.path().toLocal8Bit();
 	const char *appDirStr = ba.data();
 
@@ -108,14 +104,20 @@ int main(int argc, char **argv)
 #endif
 #ifdef Q_OS_WIN
 	handler = new google_breakpad::ExceptionHandler(qd.path().toStdWString()/*L"C:/dumps/"*/,
-                                                         NULL,
+														 NULL,
 														 NULL/*ShowDumpResults*/ ,
-                                                         NULL,
+														 NULL,
 														 google_breakpad::ExceptionHandler::HANDLER_ALL,
-                                                         MiniDumpNormal,
-                                                         (wchar_t*)NULL,
+														 MiniDumpNormal,
+														 (wchar_t*)NULL,
 														 &custom_info/*NULL*/);
 #endif
+	return prevCrashDump;
+}
+
+int main(int argc, char **argv)
+{
+	QApplication app(argc, argv);
 
 	QFont font("Open Sans");
 	app.setFont(font);
@@ -137,6 +139,13 @@ int main(int argc, char **argv)
 	QCoreApplication::setApplicationName("Scopy");
 	QCoreApplication::setApplicationVersion(SCOPY_VERSION_GIT);
 	QSettings::setDefaultFormat(QSettings::IniFormat);
+
+	QSettings test;
+	QString path = test.fileName();
+	QString fn("Scopy.ini");
+	path.chop(fn.length());
+
+	QString prevCrashDump = initBreakPadHandler(path);
 
 	QCommandLineParser parser;
 
