@@ -21,6 +21,12 @@ install:
     - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -Sy mingw-w64-i686-gcc  mingw-w64-i686-boost mingw-w64-i686-python3 mingw-w64-i686-fftw mingw-w64-i686-libzip mingw-w64-i686-glibmm mingw-w64-i686-matio"
     - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -Sy mingw-w64-x86_64-gcc mingw-w64-x86_64-boost mingw-w64-x86_64-python3 mingw-w64-x86_64-fftw mingw-w64-x86_64-libzip mingw-w64-x86_64-glibmm mingw-w64-x86_64-matio"
 
+    # Install breakpad lib
+    - C:\msys64\usr\bin\bash -lc "wget -q http://repo.msys2.org/mingw/i686/mingw-w64-i686-breakpad-git-r1680.70914b2d-1-any.pkg.tar.xz"
+    - C:\msys64\usr\bin\bash -lc "pacman -U --force --noconfirm mingw-w64-i686-breakpad-git-r1680.70914b2d-1-any.pkg.tar.xz"
+    - C:\msys64\usr\bin\bash -lc "wget -q http://repo.msys2.org/mingw/x86_64/mingw-w64-x86_64-breakpad-git-r1680.70914b2d-1-any.pkg.tar.xz"
+    - C:\msys64\usr\bin\bash -lc "pacman -U --force --noconfirm mingw-w64-x86_64-breakpad-git-r1680.70914b2d-1-any.pkg.tar.xz"
+
     # Install an older version of Qt due to uic.exe issues
     - C:\msys64\usr\bin\bash -lc "wget -q http://repo.msys2.org/mingw/x86_64/mingw-w64-x86_64-qt5-5.9.1-1-any.pkg.tar.xz"
     - C:\msys64\usr\bin\bash -lc "pacman -U --force --noconfirm mingw-w64-x86_64-qt5-5.9.1-1-any.pkg.tar.xz"
@@ -33,11 +39,11 @@ install:
     - C:\msys64\usr\bin\bash -lc "pacman -U --force --noconfirm mingw-w64-x86_64-libusb-1.0.21-2-any.pkg.tar.xz"
  
     # Install 32-bit pre-compiled libraries
-    - 'appveyor DownloadFile "https://ci.appveyor.com/api/projects/analogdevicesinc/scopy-mingw-build-deps/artifacts/scopy-mingw32-build-deps.tar.xz?branch=breakpad&job=Environment: MINGW_VERSION=mingw32, ARCH=i686" -FileName C:\scopy-mingw32-build-deps.tar.xz'
+    - 'appveyor DownloadFile "https://ci.appveyor.com/api/projects/analogdevicesinc/scopy-mingw-build-deps/artifacts/scopy-mingw32-build-deps.tar.xz?branch=master&job=Environment: MINGW_VERSION=mingw32, ARCH=i686" -FileName C:\scopy-mingw32-build-deps.tar.xz'
     - C:\msys64\usr\bin\bash -lc "cd /c ; tar xJf scopy-mingw32-build-deps.tar.xz"
 
     # Install 64-bit pre-compiled libraries
-    - 'appveyor DownloadFile "https://ci.appveyor.com/api/projects/analogdevicesinc/scopy-mingw-build-deps/artifacts/scopy-mingw64-build-deps.tar.xz?branch=breakpad&job=Environment: MINGW_VERSION=mingw64, ARCH=x86_64" -FileName C:\scopy-mingw64-build-deps.tar.xz'
+    - 'appveyor DownloadFile "https://ci.appveyor.com/api/projects/analogdevicesinc/scopy-mingw-build-deps/artifacts/scopy-mingw64-build-deps.tar.xz?branch=master&job=Environment: MINGW_VERSION=mingw64, ARCH=x86_64" -FileName C:\scopy-mingw64-build-deps.tar.xz'
     - C:\msys64\usr\bin\bash -lc "cd /c ; tar xJf scopy-mingw64-build-deps.tar.xz"
 
     # Download a 32-bit version of windres.exe
