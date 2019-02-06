@@ -80,12 +80,9 @@ if (NOT "${OUT_CONSTEXPR}" STREQUAL "-1")
 	add_definitions(-DHAS_CONSTEXPR=1)
 endif()
 
-find_library(BREAKPAD_LIBRARIES NAMES breakpad PATHS/home/adi/google-breakpad/breakpad/src/src)
-find_library(BREAKPADCLIENT_LIBRARIES breakpad_client PATHS /home/adi/google-breakpad/breakpad/src/src )
+find_library(BREAKPAD_LIBRARIES NAMES breakpad)
+find_library(BREAKPADCLIENT_LIBRARIES breakpad_client)
 
-
-set(BREAKPAD_INCLUDE_DIRS1 /home/adi/google-breakpad/breakpad/src/src)
-message(${BREAKPAD_INCLUDE_DIRS1})
 
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Concurrent REQUIRED)
@@ -148,7 +145,7 @@ include_directories(
 	${SIGCPP_INCLUDE_DIRS}
 	${SIGCPPCONFIG_INCLUDE_DIRS}
 	${CMAKE_SOURCE_DIR}/src
-	${BREAKPAD_INCLUDE_DIRS1}
+        ${BREAKPAD_INCLUDE_DIRS}
 )
 
 link_directories(
