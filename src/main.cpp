@@ -29,21 +29,44 @@
 #include "tool_launcher.hpp"
 
 #define __STDC_FORMAT_MACROS
+#ifdef Q_OS_WIN
+#include "breakpad/client/windows/handler/exception_handler.h"
+#endif
+
+#ifdef Q_OS_LINUX
 #include "client/linux/handler/exception_handler.h"
-
+#endif
 using namespace adiscope;
+using namespace google_breakpad;
 
+static ExceptionHandler* handler = NULL;
+#ifdef Q_OS_WIN
+bool ShowDumpResults(const wchar_t* dump_path,
+                     const wchar_t* minidump_id,
+                     void* context,
+                     EXCEPTION_POINTERS* exinfo,
+                     MDRawAssertionInfo* assertion,
+                     bool succeeded) {
+    printf("Dump path: %s\n", dump_path);
+    return succeeded;
+}
+#endif
 
+#ifdef Q_OS_LINUX
 static bool dumpCallback(const google_breakpad::MinidumpDescriptor& descriptor,
 void* context, bool succeeded) {
-  printf("Dump path: %s\n", descriptor.path());
-  return succeeded;
+    printf("Dump path: %s\n", descriptor.path());
+    return succeeded;
 }
+
+
+#endif
+
 
 int main(int argc, char **argv)
 {
-	QApplication app(argc, argv);
 
+	QApplication app(argc, argv);
 	QString prevCrashDump="";
 	QString appDir = QCoreApplication::applicationDirPath();
 	QDir qd(appDir);
@@ -70,8 +93,29 @@ int main(int argc, char **argv)
 
 	QByteArray ba = qd.path().toLocal8Bit();
 	const char *appDirStr = ba.data();
-	google_breakpad::MinidumpDescriptor descriptor(appDirStr);
+
+	static size_t google_custom_count = 3;
+	static google_breakpad::CustomInfoEntry google_custom_entries[] = {
+		google_breakpad::CustomInfoEntry(L"prod", L"Scopy"),
+		google_breakpad::CustomInfoEntry(L"ver", L"1.0.3"),
+	};
+
+	google_breakpad::CustomClientInfo custom_info = {google_custom_entries,
+													 google_custom_count};
+
+#ifdef Q_OS_LINUX
 	google_breakpad::ExceptionHandler eh(descriptor, NULL, dumpCallback, NULL, true, -1);
+#endif
+#ifdef Q_OS_WIN
+	handler = new google_breakpad::ExceptionHandler(qd.path().toStdWString()/*L"C:/dumps/"*/,
+                                                         NULL,
+														 NULL/*ShowDumpResults*/ ,
+                                                         NULL,
+														 google_breakpad::ExceptionHandler::HANDLER_ALL,
+                                                         MiniDumpNormal,
+                                                         (wchar_t*)NULL,
+														 &custom_info/*NULL*/);
+#endif
 
 	QFont font("Open Sans");
 	app.setFont(font);
