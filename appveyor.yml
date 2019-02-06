@@ -67,6 +67,7 @@ build_script:
     - C:\msys64\usr\bin\bash -lc "tar -C /c/scopy_64 --strip-components=3 -xJf /c/scopy-mingw64-build-deps.tar.xz msys64/mingw64/bin"
     - C:\msys64\usr\bin\bash -lc "cd /mingw64/bin ; cp -r libmatio-*.dll libhdf5-*.dll libszip*.dll libwinpthread-*.dll libgcc_*.dll libstdc++-*.dll libboost_{system,filesystem,atomic,program_options,regex,thread}-*.dll libglib-*.dll libintl-*.dll libiconv-*.dll libpcre-*.dll libpcre16-*.dll libglibmm-2.*.dll libgmodule-2.*.dll libgobject-2.*.dll libffi-*.dll libsigc-2.*.dll libfftw3f-*.dll libicu{in,uc,dt}[!d]*.dll zlib*.dll libharfbuzz-*.dll libfreetype-*.dll libbz2-*.dll libpng16-*.dll libgraphite2.dll libjpeg-*.dll libsqlite3-*.dll libwebp-*.dll libxml2-*.dll liblzma-*.dll libxslt-*.dll libzip*.dll libpython3.*.dll libgnutls*.dll libnettle*.dll libhogweed*.dll libgmp*.dll libidn*.dll libp11*.dll libtasn*.dll libunistring*.dll libusb-*.dll /mingw64/lib/python3.* /c/scopy_64/"
     - C:\msys64\usr\bin\bash -lc "dump_syms /c/scopy_64/Scopy.exe > /c/scopy_64/Scopy.sym"
+    - mkdir c:\scopy64\crashdmp
 
     - 7z a "c:\scopy-64bit.zip" c:\scopy_64
     - appveyor PushArtifact c:\scopy-64bit.zip
@@ -85,7 +86,7 @@ build_script:
     - C:\msys64\usr\bin\bash -lc "tar -C /c/scopy_32 --strip-components=3 -xJf /c/scopy-mingw32-build-deps.tar.xz msys64/mingw32/bin"
     - C:\msys64\usr\bin\bash -lc "cd /mingw32/bin ; cp -r libmatio-*.dll libhdf5-*.dll libszip*.dll libwinpthread-*.dll libgcc_*.dll libstdc++-*.dll libboost_{system,filesystem,atomic,program_options,regex,thread}-*.dll libglib-*.dll libintl-*.dll libiconv-*.dll libpcre-*.dll libpcre16-*.dll libglibmm-2.*.dll libgmodule-2.*.dll libgobject-2.*.dll libffi-*.dll libsigc-2.*.dll libfftw3f-*.dll libicu{in,uc,dt}[!d]*.dll zlib*.dll libharfbuzz-*.dll libfreetype-*.dll libbz2-*.dll libpng16-*.dll libgraphite2.dll libjpeg-*.dll libsqlite3-*.dll libwebp-*.dll libxml2-*.dll liblzma-*.dll libxslt-*.dll libzip*.dll libpython3.*.dll libgnutls*.dll libnettle*.dll libhogweed*.dll libgmp*.dll libidn*.dll libp11*.dll libtasn*.dll libunistring*.dll libusb-*.dll /mingw32/lib/python3.* /c/scopy_32/"
     - C:\msys64\usr\bin\bash -lc "dump_syms /c/scopy_32/Scopy.exe > /c/scopy_32/Scopy.sym"
-
+    - mkdir c:\scopy_32\crashdmp
     - 7z a "c:\scopy-32bit.zip" c:\scopy_32
     - appveyor PushArtifact c:\scopy-32bit.zip
 
