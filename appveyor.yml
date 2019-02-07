@@ -60,7 +60,7 @@ install:
 build_script:
     - set OLD_PATH=%PATH%
     - set PATH=C:\msys64\mingw64\bin;%PATH%
-    - C:\msys64\usr\bin\bash -lc "mkdir /c/build_64 ; cd /c/build_64 ; cmake -G 'Unix Makefiles' -DCMAKE_BUILD_TYPE=Release -DGIT_EXECUTABLE=/c/Program\\ Files/Git/cmd/git.exe -DPKG_CONFIG_EXECUTABLE=/mingw64/bin/pkg-config.exe -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc.exe -DCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++.exe /c/projects/scopy"
+    - C:\msys64\usr\bin\bash -lc "mkdir /c/build_64 ; cd /c/build_64 ; cmake -G 'Unix Makefiles' -DCMAKE_BUILD_TYPE=RelWithDebInfo -DGIT_EXECUTABLE=/c/Program\\ Files/Git/cmd/git.exe -DPKG_CONFIG_EXECUTABLE=/mingw64/bin/pkg-config.exe -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc.exe -DCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++.exe /c/projects/scopy"
     - C:\msys64\usr\bin\bash -lc "cd /c/build_64/resources && sed -i 's/^\(FILEVERSION .*\)$/\1,0,"{build}"/' properties.rc"
     - C:\msys64\usr\bin\bash -lc "cd /c/build_64 && make -j3"
 
@@ -79,7 +79,7 @@ build_script:
     - appveyor PushArtifact c:\scopy-64bit.zip
 
     - set PATH=C:\msys64\mingw32\bin;%OLD_PATH%
-    - C:\msys64\usr\bin\bash -lc "mkdir /c/build_32 ; cd /c/build_32 ; cmake -G 'Unix Makefiles' -DCMAKE_RC_COMPILER=/c/windres.exe -DCMAKE_BUILD_TYPE=Release -DGIT_EXECUTABLE=/c/Program\\ Files/Git/cmd/git.exe -DPKG_CONFIG_EXECUTABLE=/mingw32/bin/pkg-config.exe -DCMAKE_C_COMPILER=i686-w64-mingw32-gcc.exe -DCMAKE_CXX_COMPILER=i686-w64-mingw32-g++.exe /c/projects/scopy"
+    - C:\msys64\usr\bin\bash -lc "mkdir /c/build_32 ; cd /c/build_32 ; cmake -G 'Unix Makefiles' -DCMAKE_RC_COMPILER=/c/windres.exe -DCMAKE_BUILD_TYPE=RelWithDebInfo -DGIT_EXECUTABLE=/c/Program\\ Files/Git/cmd/git.exe -DPKG_CONFIG_EXECUTABLE=/mingw32/bin/pkg-config.exe -DCMAKE_C_COMPILER=i686-w64-mingw32-gcc.exe -DCMAKE_CXX_COMPILER=i686-w64-mingw32-g++.exe /c/projects/scopy"
     - C:\msys64\usr\bin\bash -lc "cd /c/build_32/resources && sed -i 's/^\(FILEVERSION .*\)$/\1,0,"{build}"/' properties.rc"
     - C:\msys64\usr\bin\bash -lc "cd /c/build_32 && make -j3"
 
