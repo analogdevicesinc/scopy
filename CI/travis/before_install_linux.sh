@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+. CI/travis/lib.sh
+
 handle_ubuntu_flatpak_docker() {
 	sudo apt-get -qq update
 	sudo service docker restart
@@ -16,8 +18,6 @@ handle_ubuntu_docker() {
 handle_default() {
 	pwd
 	ls
-	. /$LIBNAME/CI/travis/lib.sh
-
 
 	if [ -z "${LDIST}" -a -f "build/.LDIST" ] ; then
 		export LDIST="-$(cat build/.LDIST)"
@@ -54,7 +54,7 @@ done
 
 sudo apt-get install -y $BOOST_PACKAGES
 
-. /$LIBNAME/CI/travis/before_install_lib.sh
+. CI/travis/before_install_lib.sh
 
 if ! is_new_ubuntu ; then
 	sudo apt-get install -y qt59base qt59declarative qt59quickcontrols \
