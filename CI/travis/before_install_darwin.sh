@@ -1,7 +1,8 @@
 #!/bin/sh
 set -e
 
-source ./CI/travis/lib.sh
+. CI/travis/lib.sh
+
 if [ -z "${LDIST}" -a -f "build/.LDIST" ] ; then
 	export LDIST="-$(cat build/.LDIST)"
 fi
@@ -18,21 +19,14 @@ brew_install_or_upgrade() {
 }
 
 PYTHON="python3 python@2 python brew-pip"
-PACKAGES="qt@5.11.2 cmake fftw bison gettext autoconf automake libtool libzip glib libusb $PYTHON"
+PACKAGES="qt cmake fftw bison gettext autoconf automake libtool libzip glib libusb $PYTHON"
 PACKAGES="$PACKAGES glibmm doxygen wget boost gnu-sed libmatio dylibbundler libxml2 pkg-config"
 
 for pak in $PACKAGES ; do
 	brew_install_or_upgrade $pak
 done
 
-# use glib 2.56.2
-glib="https://raw.githubusercontent.com/Homebrew/homebrew-core/8a4cb5d7d5e13cc56da454f4b3aec35ecae5ca72/Formula/glib.rb"
-brew unlink glib
-brew install $glib
-brew switch glib 2.56.2
-
-
-for pkg in qt gcc bison gettext ; do
+for pkg in qt gcc bison gettext; do
 	brew link --overwrite --force $pkg
 done
 
@@ -40,6 +34,7 @@ done
 
 QT_PATH="$(brew --prefix qt)/bin"
 export PATH="${QT_PATH}:$PATH"
+export PATH="/usr/local/opt/bison/bin:$PATH"
 
 patch_qwtpolar_mac() {
 	patch_qwtpolar
