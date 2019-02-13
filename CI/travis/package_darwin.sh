@@ -44,7 +44,7 @@ sudo install_name_tool -change ${libusbpath} @executable_path/../Frameworks/${li
 
 sudo /usr/local/opt/qt/bin/macdeployqt Scopy.app
 
-brew install python@2
+brew install python@2 || brew ls --versions python@2
 curl -o /tmp/macdeployqtfix.py https://raw.githubusercontent.com/aurelien-rainone/macdeployqtfix/master/macdeployqtfix.py
 sudo /usr/local/opt/python2/bin/python2 /tmp/macdeployqtfix.py ./Scopy.app/Contents/MacOS/Scopy /usr/local/opt/qt/
 sudo /usr/local/opt/python2/bin/python2 /tmp/macdeployqtfix.py ./Scopy.app/Contents/MacOS/Scopy ./Scopy.app/Contents/Frameworks/
