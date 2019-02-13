@@ -326,6 +326,8 @@ endif()
 
 
 configure_file(scopy.iss.cmakein ${CMAKE_CURRENT_BINARY_DIR}/scopy.iss @ONLY)
+configure_file(scopy-32.iss.cmakein ${CMAKE_CURRENT_BINARY_DIR}/scopy-32.iss @ONLY)
+configure_file(scopy-64.iss.cmakein ${CMAKE_CURRENT_BINARY_DIR}/scopy-64.iss @ONLY)
 configure_file(config.h.cmakein ${CMAKE_CURRENT_BINARY_DIR}/config.h @ONLY)
 
 if (NOT ENABLE_APPLICATION_BUNDLE)

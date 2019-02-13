@@ -1,127 +1,147 @@
 clone_depth: 1
 
 #init:
-    #- ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+#    - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
+
+environment:
+    matrix:
+        - MINGW_VERSION: mingw32
+          ARCH: i686
+          ARCH_BIT: 32
+          
+        - MINGW_VERSION: mingw64
+          ARCH: x86_64
+          ARCH_BIT: 64
+          
+matrix:
+    fast_finish: true
+
+    
 install:
-    # Remove dependencies that prevent us from upgrading to GCC 6.2
-    - C:\msys64\usr\bin\bash -lc "pacman -Rs --noconfirm mingw-w64-i686-gcc-ada mingw-w64-i686-gcc-fortran mingw-w64-i686-gcc-libgfortran mingw-w64-i686-gcc-objc"
-    - C:\msys64\usr\bin\bash -lc "pacman -Rs --noconfirm mingw-w64-x86_64-gcc-ada mingw-w64-x86_64-gcc-fortran mingw-w64-x86_64-gcc-libgfortran mingw-w64-x86_64-gcc-objc"
+    # Remove dependencies that prevent us from upgrading to GCC 6.2    
+    - C:\msys64\usr\bin\bash -lc "pacman -Rs --noconfirm mingw-w64-%ARCH%-gcc-ada mingw-w64-%ARCH%-gcc-fortran mingw-w64-%ARCH%-gcc-libgfortran mingw-w64-%ARCH%-gcc-objc"
 
     # Remove existing file that causes GCC install to fail
     - C:\msys64\usr\bin\bash -lc "rm /mingw32/etc/gdbinit /mingw64/etc/gdbinit"
 
     # Install an older version of icu library
-    - C:\msys64\usr\bin\bash -lc "pacman -U --noconfirm http://repo.msys2.org/mingw/i686/mingw-w64-i686-icu-58.2-3-any.pkg.tar.xz"
-    - C:\msys64\usr\bin\bash -lc "pacman -U --noconfirm http://repo.msys2.org/mingw/i686/mingw-w64-i686-icu-debug-libs-58.2-3-any.pkg.tar.xz"
-    - C:\msys64\usr\bin\bash -lc "pacman -U --noconfirm http://repo.msys2.org/mingw/x86_64/mingw-w64-x86_64-icu-58.2-3-any.pkg.tar.xz"
-    - C:\msys64\usr\bin\bash -lc "pacman -U --noconfirm http://repo.msys2.org/mingw/x86_64/mingw-w64-x86_64-icu-debug-libs-58.2-3-any.pkg.tar.xz"
+    - C:\msys64\usr\bin\bash -lc "pacman -U --noconfirm http://repo.msys2.org/mingw/%ARCH%/mingw-w64-%ARCH%-icu-58.2-3-any.pkg.tar.xz"
+    - C:\msys64\usr\bin\bash -lc "pacman -U --noconfirm http://repo.msys2.org/mingw/%ARCH%/mingw-w64-%ARCH%-icu-debug-libs-58.2-3-any.pkg.tar.xz"
 
     # Install olderversion of binutils
-    - C:\msys64\usr\bin\bash -lc "pacman -U --noconfirm http://repo.msys2.org/msys/x86_64/binutils-2.28-1-x86_64.pkg.tar.xz" 
+    #- C:\msys64\usr\bin\bash -lc "pacman -U --noconfirm http://repo.msys2.org/msys/%ARCH%/binutils-2.28-1-%ARCH%.pkg.tar.xz" 
 
     # Update to GCC 6.2 and install dependencies
-    - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -Sy mingw-w64-i686-gcc  mingw-w64-i686-boost mingw-w64-i686-python3 mingw-w64-i686-fftw mingw-w64-i686-libzip mingw-w64-i686-glibmm mingw-w64-i686-matio"
-    - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -Sy mingw-w64-x86_64-gcc mingw-w64-x86_64-boost mingw-w64-x86_64-python3 mingw-w64-x86_64-fftw mingw-w64-x86_64-libzip mingw-w64-x86_64-glibmm mingw-w64-x86_64-matio"
+    - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -Sy mingw-w64-%ARCH%-gcc mingw-w64-%ARCH%-boost mingw-w64-%ARCH%-python3 mingw-w64-%ARCH%-fftw mingw-w64-%ARCH%-libzip mingw-w64-%ARCH%-glibmm mingw-w64-%ARCH%-matio"
 
     # Install breakpad lib
-    - C:\msys64\usr\bin\bash -lc "wget -q http://repo.msys2.org/mingw/i686/mingw-w64-i686-breakpad-git-r1680.70914b2d-1-any.pkg.tar.xz"
-    - C:\msys64\usr\bin\bash -lc "pacman -U --force --noconfirm mingw-w64-i686-breakpad-git-r1680.70914b2d-1-any.pkg.tar.xz"
-    - C:\msys64\usr\bin\bash -lc "wget -q http://repo.msys2.org/mingw/x86_64/mingw-w64-x86_64-breakpad-git-r1680.70914b2d-1-any.pkg.tar.xz"
-    - C:\msys64\usr\bin\bash -lc "pacman -U --force --noconfirm mingw-w64-x86_64-breakpad-git-r1680.70914b2d-1-any.pkg.tar.xz"
+    - C:\msys64\usr\bin\bash -lc "wget -q http://repo.msys2.org/mingw/%ARCH%/mingw-w64-%ARCH%-breakpad-git-r1680.70914b2d-1-any.pkg.tar.xz"
+    - C:\msys64\usr\bin\bash -lc "pacman -U --force --noconfirm mingw-w64-%ARCH%-breakpad-git-r1680.70914b2d-1-any.pkg.tar.xz"
 
     # Install an older version of Qt due to uic.exe issues
-    - C:\msys64\usr\bin\bash -lc "wget -q http://repo.msys2.org/mingw/x86_64/mingw-w64-x86_64-qt5-5.9.1-1-any.pkg.tar.xz"
-    - C:\msys64\usr\bin\bash -lc "pacman -U --force --noconfirm mingw-w64-x86_64-qt5-5.9.1-1-any.pkg.tar.xz"
-    - C:\msys64\usr\bin\bash -lc "wget -q http://repo.msys2.org/mingw/i686/mingw-w64-i686-qt5-5.9.1-1-any.pkg.tar.xz"
-    - C:\msys64\usr\bin\bash -lc "pacman -U --force --noconfirm mingw-w64-i686-qt5-5.9.1-1-any.pkg.tar.xz"
-    - C:\msys64\usr\bin\bash -lc "wget -q http://repo.msys2.org/mingw/i686/mingw-w64-i686-libusb-1.0.21-2-any.pkg.tar.xz"
-    - C:\msys64\usr\bin\bash -lc "pacman -U --force --noconfirm mingw-w64-i686-libusb-1.0.21-2-any.pkg.tar.xz"
+    - C:\msys64\usr\bin\bash -lc "wget -q http://repo.msys2.org/mingw/%ARCH%/mingw-w64-%ARCH%-qt5-5.9.1-1-any.pkg.tar.xz"
+    - C:\msys64\usr\bin\bash -lc "pacman -U --force --noconfirm mingw-w64-%ARCH%-qt5-5.9.1-1-any.pkg.tar.xz"    
 
-    - C:\msys64\usr\bin\bash -lc "wget -q http://repo.msys2.org/mingw/x86_64/mingw-w64-x86_64-libusb-1.0.21-2-any.pkg.tar.xz"
-    - C:\msys64\usr\bin\bash -lc "pacman -U --force --noconfirm mingw-w64-x86_64-libusb-1.0.21-2-any.pkg.tar.xz"
+    - C:\msys64\usr\bin\bash -lc "wget -q http://repo.msys2.org/mingw/%ARCH%/mingw-w64-%ARCH%-libusb-1.0.21-2-any.pkg.tar.xz"
+    - C:\msys64\usr\bin\bash -lc "pacman -U --force --noconfirm mingw-w64-%ARCH%-libusb-1.0.21-2-any.pkg.tar.xz"
+    
+#    - C:\msys64\usr\bin\bash -lc "wget -q http://repo.msys2.org/msys/%ARCH%/glib2-2.54.3-1-%ARCH%.pkg.tar.xz"
+#    - C:\msys64\usr\bin\bash -lc "pacman -U --force --noconfirm glib2-2.54.3-1-%ARCH%.pkg.tar.xz"
+    
  
     # Install 32-bit pre-compiled libraries
-    - 'appveyor DownloadFile "https://ci.appveyor.com/api/projects/analogdevicesinc/scopy-mingw-build-deps/artifacts/scopy-mingw32-build-deps.tar.xz?branch=master&job=Environment: MINGW_VERSION=mingw32, ARCH=i686" -FileName C:\scopy-mingw32-build-deps.tar.xz'
-    - C:\msys64\usr\bin\bash -lc "cd /c ; tar xJf scopy-mingw32-build-deps.tar.xz"
+    #- 'appveyor DownloadFile "https://ci.appveyor.com/api/projects/analogdevicesinc/scopy-mingw-build-deps/artifacts/scopy-mingw32-build-deps.tar.xz?branch=master&job=Environment: MINGW_VERSION=mingw32, ARCH=i686" -FileName C:\scopy-mingw32-build-deps.tar.xz'
+    #- C:\msys64\usr\bin\bash -lc "cd /c ; tar xJf scopy-mingw32-build-deps.tar.xz"
 
     # Install 64-bit pre-compiled libraries
-    - 'appveyor DownloadFile "https://ci.appveyor.com/api/projects/analogdevicesinc/scopy-mingw-build-deps/artifacts/scopy-mingw64-build-deps.tar.xz?branch=master&job=Environment: MINGW_VERSION=mingw64, ARCH=x86_64" -FileName C:\scopy-mingw64-build-deps.tar.xz'
-    - C:\msys64\usr\bin\bash -lc "cd /c ; tar xJf scopy-mingw64-build-deps.tar.xz"
+    - 'appveyor DownloadFile "https://ci.appveyor.com/api/projects/analogdevicesinc/scopy-mingw-build-deps/artifacts/scopy-%MINGW_VERSION%-build-deps.tar.xz?branch=master&job=Environment: MINGW_VERSION=%MINGW_VERSION%, ARCH=%ARCH%" -FileName C:\scopy-%MINGW_VERSION%-build-deps.tar.xz'
+    - C:\msys64\usr\bin\bash -lc "cd /c ; tar xJf scopy-%MINGW_VERSION%-build-deps.tar.xz"
 
     # Download a 32-bit version of windres.exe
     - appveyor DownloadFile http://swdownloads.analog.com/cse/build/windres.exe.gz -FileName C:\windres.exe.gz
     - C:\msys64\usr\bin\bash -lc "cd /c ; gunzip windres.exe.gz"
 
     # Hack: Qt5Qml CMake script throws errors when loading its plugins. So let's just drop those plugins.
-    - C:\msys64\usr\bin\bash -lc "rm -f /mingw32/lib/cmake/Qt5Qml/*Factory.cmake"
-    - C:\msys64\usr\bin\bash -lc "rm -f /mingw64/lib/cmake/Qt5Qml/*Factory.cmake"
+    - C:\msys64\usr\bin\bash -lc "rm -f /%MINGW_VERSION%/lib/cmake/Qt5Qml/*Factory.cmake"    
 
     # Install Inno Setup
     - choco install InnoSetup
 
 build_script:
     - set OLD_PATH=%PATH%
-    - set PATH=C:\msys64\mingw64\bin;%PATH%
-    - C:\msys64\usr\bin\bash -lc "mkdir /c/build_64 ; cd /c/build_64 ; cmake -G 'Unix Makefiles' -DCMAKE_BUILD_TYPE=RelWithDebInfo -DGIT_EXECUTABLE=/c/Program\\ Files/Git/cmd/git.exe -DPKG_CONFIG_EXECUTABLE=/mingw64/bin/pkg-config.exe -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc.exe -DCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++.exe /c/projects/scopy"
-    - C:\msys64\usr\bin\bash -lc "cd /c/build_64/resources && sed -i 's/^\(FILEVERSION .*\)$/\1,0,"{build}"/' properties.rc"
-    - C:\msys64\usr\bin\bash -lc "cd /c/build_64 && make -j3"
+    - set DEST_FOLDER=scopy_%ARCH_BIT%
+    - set BUILD_FOLDER=build_%ARCH_BIT%
+    - set DEBUG_FOLDER=debug_%ARCH_BIT%
+    
+    - set RC_COMPILER=
+    - IF "%ARCH_BIT%"=="32" (
+        set RC_COMPILER="-DCMAKE_RC_COMPILER=/c/windres.exe"
+        )
+    
+    - set PATH=C:\msys64\%MINGW_VERSION%\bin;%PATH%
+    - C:\msys64\usr\bin\bash -lc "mkdir /c/%BUILD_FOLDER% ; cd /c/%BUILD_FOLDER% ; cmake -G 'Unix Makefiles' %RC_COMPILER% -DCMAKE_BUILD_TYPE=RelWithDebInfo -DGIT_EXECUTABLE=/c/Program\\ Files/Git/cmd/git.exe -DPKG_CONFIG_EXECUTABLE=/%MINGW_VERSION%/bin/pkg-config.exe -DCMAKE_C_COMPILER=%ARCH%-w64-mingw32-gcc.exe -DCMAKE_CXX_COMPILER=%ARCH%-w64-mingw32-g++.exe /c/projects/scopy"
+    - C:\msys64\usr\bin\bash -lc "cd /c/%BUILD_FOLDER%/resources && sed -i 's/^\(FILEVERSION .*\)$/\1,0,"{build}"/' properties.rc"
+    - C:\msys64\usr\bin\bash -lc "cd /c/build_%ARCH_BIT% && make -j3"
 
     # Copy the dependencies
-    - mkdir c:\scopy_64
-    - copy c:\build_64\Scopy.exe c:\scopy_64\
-    - c:\msys64\mingw64\bin\windeployqt.exe --dir c:\scopy_64 --release --no-system-d3d-compiler --no-compiler-runtime --no-quick-import --opengl --printsupport c:\build_64\Scopy.exe
-    - C:\msys64\usr\bin\bash -lc "cp -r /c/projects/scopy/resources/decoders  /c/scopy_64/"
 
-    - C:\msys64\usr\bin\bash -lc "tar -C /c/scopy_64 --strip-components=3 -xJf /c/scopy-mingw64-build-deps.tar.xz msys64/mingw64/bin"
-    - C:\msys64\usr\bin\bash -lc "cd /mingw64/bin ; cp -r libmatio-*.dll libhdf5-*.dll libszip*.dll libwinpthread-*.dll libgcc_*.dll libstdc++-*.dll libboost_{system,filesystem,atomic,program_options,regex,thread}-*.dll libglib-*.dll libintl-*.dll libiconv-*.dll libpcre-*.dll libpcre16-*.dll libglibmm-2.*.dll libgmodule-2.*.dll libgobject-2.*.dll libffi-*.dll libsigc-2.*.dll libfftw3f-*.dll libicu{in,uc,dt}[!d]*.dll zlib*.dll libharfbuzz-*.dll libfreetype-*.dll libbz2-*.dll libpng16-*.dll libgraphite2.dll libjpeg-*.dll libsqlite3-*.dll libwebp-*.dll libxml2-*.dll liblzma-*.dll libxslt-*.dll libzip*.dll libpython3.*.dll libgnutls*.dll libnettle*.dll libhogweed*.dll libgmp*.dll libidn*.dll libp11*.dll libtasn*.dll libunistring*.dll libusb-*.dll /mingw64/lib/python3.* /c/scopy_64/"
-    - mkdir C:\scopy_64\.debug
-      #    - C:\msys64\usr\bin\bash -lc "/mingw64/bin/objcopy -v --only-keep-debug /c/scopy_64/Scopy.exe /c/scopy_64/.debug/Scopy.exe.debug"
-    - C:\msys64\usr\bin\bash -lc "dump_syms /c/scopy_64/Scopy.exe > /c/scopy_64/Scopy.exe.sym"
-    - timeout 4  
-      #    - ps: C:\msys64\mingw64\bin\strip.exe --strip-debug --strip-unneeded "C:\scopy_64\Scopy.exe"
-      #    - ps: C:\msys64\mingw64\bin\objcopy.exe -v --add-gnu-debuglink="C:\scopy_64\.debug\Scopy.exe.debug" "C:\scopy_64\Scopy.exe"
-    - mkdir C:\debug_64
-    - mv C:\scopy_64\Scopy.exe.sym C:\debug_64
-    - mv C:\scopy_64\.debug C:\debug_64
+    - mkdir c:\%DEST_FOLDER%
+    - copy c:\%BUILD_FOLDER%\Scopy.exe c:\%DEST_FOLDER%\
+    - c:\msys64\%MINGW_VERSION%\bin\windeployqt.exe --dir c:\%DEST_FOLDER% --release --no-system-d3d-compiler --no-compiler-runtime --no-quick-import --opengl --printsupport c:\%BUILD_FOLDER%\Scopy.exe
+    - C:\msys64\usr\bin\bash -lc "cp -r /c/projects/scopy/resources/decoders  /c/%DEST_FOLDER%/"
 
-    - 7z a "c:\scopy-64bit.zip" c:\scopy_64
-    - appveyor PushArtifact c:\scopy-64bit.zip
-    - 7z a "C:\debug-64bit.zip" c:\debug_64
-    - appveyor PushArtifact C:\debug-64bit.zip
+    - C:\msys64\usr\bin\bash -lc "tar -C /c/%DEST_FOLDER% --strip-components=3 -xJf /c/scopy-%MINGW_VERSION%-build-deps.tar.xz msys64/%MINGW_VERSION%/bin"
+    - C:\msys64\usr\bin\bash -lc "cd /%MINGW_VERSION%/bin ; cp -r libmatio-*.dll libhdf5-*.dll libszip*.dll libwinpthread-*.dll libgcc_*.dll libstdc++-*.dll libboost_{system,filesystem,atomic,program_options,regex,thread}-*.dll libglib-*.dll libintl-*.dll libiconv-*.dll libpcre-*.dll libpcre16-*.dll libglibmm-2.*.dll libgmodule-2.*.dll libgobject-2.*.dll libffi-*.dll libsigc-2.*.dll libfftw3f-*.dll libicu{in,uc,dt}[!d]*.dll zlib*.dll libharfbuzz-*.dll libfreetype-*.dll libbz2-*.dll libpng16-*.dll libgraphite2.dll libjpeg-*.dll libsqlite3-*.dll libwebp-*.dll libxml2-*.dll liblzma-*.dll libxslt-*.dll libzip*.dll libpython3.*.dll libgnutls*.dll libnettle*.dll libhogweed*.dll libgmp*.dll libidn*.dll libp11*.dll libtasn*.dll libunistring*.dll libusb-*.dll /%MINGW_VERSION%/lib/python3.* /c/%DEST_FOLDER%/"
+    - mkdir C:\scopy_%ARCH_BIT%\.debug
+      #    - C:\msys64\usr\bin\bash -lc "/%MINGW_VERSION%/bin/objcopy -v --only-keep-debug /c/%DEST_FOLDER%/Scopy.exe /c/%DEST_FOLDER%/.debug/Scopy.exe.debug"
+    - C:\msys64\usr\bin\bash -lc "dump_syms /c/%DEST_FOLDER%/Scopy.exe > /c/%DEST_FOLDER%/Scopy.exe.sym"
+      #    - ps: C:\msys64\%MINGW_VERSION%\bin\strip.exe --strip-debug --strip-unneeded "C:\%DEST_FOLDER%\Scopy.exe"
+      #    - ps: C:\msys64\%MINGW_VERSION%\bin\objcopy.exe -v --add-gnu-debuglink="C:\%DEST_FOLDER%\.debug\Scopy.exe.debug" "C:\%DEST_FOLDER%\Scopy.exe"
+    - mkdir C:\%DEBUG_FOLDER%
+    - mv C:\%DEST_FOLDER%\Scopy.exe.sym C:\%DEBUG_FOLDER%
+    - mv C:\%DEST_FOLDER%\.debug C:\%DEBUG_FOLDER%
 
-    - set PATH=C:\msys64\mingw32\bin;%OLD_PATH%
-    - C:\msys64\usr\bin\bash -lc "mkdir /c/build_32 ; cd /c/build_32 ; cmake -G 'Unix Makefiles' -DCMAKE_RC_COMPILER=/c/windres.exe -DCMAKE_BUILD_TYPE=RelWithDebInfo -DGIT_EXECUTABLE=/c/Program\\ Files/Git/cmd/git.exe -DPKG_CONFIG_EXECUTABLE=/mingw32/bin/pkg-config.exe -DCMAKE_C_COMPILER=i686-w64-mingw32-gcc.exe -DCMAKE_CXX_COMPILER=i686-w64-mingw32-g++.exe /c/projects/scopy"
-    - C:\msys64\usr\bin\bash -lc "cd /c/build_32/resources && sed -i 's/^\(FILEVERSION .*\)$/\1,0,"{build}"/' properties.rc"
-    - C:\msys64\usr\bin\bash -lc "cd /c/build_32 && make -j3"
+    - 7z a "c:\scopy-%ARCH_BIT%bit.zip" c:\%DEST_FOLDER%
+    - appveyor PushArtifact c:\scopy-%ARCH_BIT%bit.zip
+    - 7z a "C:\debug-%ARCH_BIT%bit.zip" c:\%DEBUG_FOLDER%
+    - appveyor PushArtifact C:\debug-%ARCH_BIT%bit.zip
+
+    
+    
+    
+#    - set PATH=C:\msys64\mingw32\bin;%OLD_PATH%
+#    - C:\msys64\usr\bin\bash -lc "mkdir /c/build_32 ; cd /c/build_32 ; cmake -G 'Unix Makefiles' -DCMAKE_RC_COMPILER=/c/windres.exe -DCMAKE_BUILD_TYPE=RelWithDebInfo -DGIT_EXECUTABLE=/c/Program\\ Files/Git/cmd/git.exe -DPKG_CONFIG_EXECUTABLE=/mingw32/bin/pkg-config.exe -DCMAKE_C_COMPILER=i686-w64-mingw32-gcc.exe -DCMAKE_CXX_COMPILER=i686-w64-mingw32-g++.exe /c/projects/scopy"
+#    - C:\msys64\usr\bin\bash -lc "cd /c/build_32/resources && sed -i 's/^\(FILEVERSION .*\)$/\1,0,"{build}"/' properties.rc"
+#    - C:\msys64\usr\bin\bash -lc "cd /c/build_32 && make -j3"
 
     # Copy the dependencies
-    - mkdir c:\scopy_32
-    - copy c:\build_32\Scopy.exe c:\scopy_32\
-    - c:\msys64\mingw32\bin\windeployqt.exe --dir c:\scopy_32 --release --no-system-d3d-compiler --no-compiler-runtime --no-quick-import --opengl --printsupport c:\build_32\Scopy.exe
-    - C:\msys64\usr\bin\bash -lc "cp -r /c/projects/scopy/resources/decoders  /c/scopy_32/"
+#    - mkdir c:\scopy_32
+#    - copy c:\build_32\Scopy.exe c:\scopy_32\
+#    - c:\msys64\mingw32\bin\windeployqt.exe --dir c:\scopy_32 --release --no-system-d3d-compiler --no-compiler-runtime --no-quick-import --opengl --printsupport c:\build_32\Scopy.exe
+#    - C:\msys64\usr\bin\bash -lc "cp -r /c/projects/scopy/resources/decoders  /c/scopy_32/"
 
-    - C:\msys64\usr\bin\bash -lc "tar -C /c/scopy_32 --strip-components=3 -xJf /c/scopy-mingw32-build-deps.tar.xz msys64/mingw32/bin"
-    - C:\msys64\usr\bin\bash -lc "cd /mingw32/bin ; cp -r libmatio-*.dll libhdf5-*.dll libszip*.dll libwinpthread-*.dll libgcc_*.dll libstdc++-*.dll libboost_{system,filesystem,atomic,program_options,regex,thread}-*.dll libglib-*.dll libintl-*.dll libiconv-*.dll libpcre-*.dll libpcre16-*.dll libglibmm-2.*.dll libgmodule-2.*.dll libgobject-2.*.dll libffi-*.dll libsigc-2.*.dll libfftw3f-*.dll libicu{in,uc,dt}[!d]*.dll zlib*.dll libharfbuzz-*.dll libfreetype-*.dll libbz2-*.dll libpng16-*.dll libgraphite2.dll libjpeg-*.dll libsqlite3-*.dll libwebp-*.dll libxml2-*.dll liblzma-*.dll libxslt-*.dll libzip*.dll libpython3.*.dll libgnutls*.dll libnettle*.dll libhogweed*.dll libgmp*.dll libidn*.dll libp11*.dll libtasn*.dll libunistring*.dll libusb-*.dll /mingw32/lib/python3.* /c/scopy_32/"
-    - mkdir C:\scopy_32\.debug
-    - C:\msys64\usr\bin\bash -lc "dump_syms /c/scopy_32/Scopy.exe > /c/scopy_32/Scopy.exe.sym"
-    - timeout 4
+#    - C:\msys64\usr\bin\bash -lc "tar -C /c/scopy_32 --strip-components=3 -xJf /c/scopy-mingw32-build-deps.tar.xz msys64/mingw32/bin"
+#    - C:\msys64\usr\bin\bash -lc "cd /mingw32/bin ; cp -r libmatio-*.dll libhdf5-*.dll libszip*.dll libwinpthread-*.dll libgcc_*.dll libstdc++-*.dll libboost_{system,filesystem,atomic,program_options,regex,thread}-*.dll libglib-*.dll libintl-*.dll libiconv-*.dll libpcre-*.dll libpcre16-*.dll libglibmm-2.*.dll libgmodule-2.*.dll libgobject-2.*.dll libffi-*.dll libsigc-2.*.dll libfftw3f-*.dll libicu{in,uc,dt}[!d]*.dll zlib*.dll libharfbuzz-*.dll libfreetype-*.dll libbz2-*.dll libpng16-*.dll libgraphite2.dll libjpeg-*.dll libsqlite3-*.dll libwebp-*.dll libxml2-*.dll liblzma-*.dll libxslt-*.dll libzip*.dll libpython3.*.dll libgnutls*.dll libnettle*.dll libhogweed*.dll libgmp*.dll libidn*.dll libp11*.dll libtasn*.dll libunistring*.dll libusb-*.dll /mingw32/lib/python3.* /c/scopy_32/"
+#    - mkdir C:\scopy_32\.debug
+#    - C:\msys64\usr\bin\bash -lc "dump_syms /c/scopy_32/Scopy.exe > /c/scopy_32/Scopy.exe.sym"
+#    - timeout 4
       #    - ps: C:\msys64\mingw32\bin\objcopy.exe -v --only-keep-debug "C:\scopy_32\Scopy.exe" "C:\scopy_32\.debug\Scopy.exe.debug"
       #- ps: C:\msys64\mingw64\bin\strip.exe --strip-debug --strip-unneeded "C:\scopy_32\Scopy.exe"
       #    - ps: C:\msys64\mingw32\bin\objcopy.exe -v --add-gnu-debuglink="C:\scopy_32\.debug\Scopy.exe.debug" "C:\scopy_32\Scopy.exe"
-    - mkdir C:\debug_32
-    - mv C:\scopy_32\Scopy.exe.sym C:\debug_32
-    - mv C:\scopy_32\.debug C:\debug_32
+#    - mkdir C:\debug_32
+#    - mv C:\scopy_32\Scopy.exe.sym C:\debug_32
+#    - mv C:\scopy_32\.debug C:\debug_32
 
-    - 7z a "c:\scopy-32bit.zip" c:\scopy_32
-    - appveyor PushArtifact c:\scopy-32bit.zip
-    - 7z a "C:\debug-32bit.zip" c:\debug_32
-    - appveyor PushArtifact C:\debug-32bit.zip
+#    - 7z a "c:\scopy-32bit.zip" c:\scopy_32
+#    - appveyor PushArtifact c:\scopy-32bit.zip
+#    - 7z a "C:\debug-32bit.zip" c:\debug_32
+#    - appveyor PushArtifact C:\debug-32bit.zip
 
     # Build the installer
     - set PATH=%PATH%;"C:\Program Files (x86)\Inno Setup 5"
-    - ISCC /Q C:\build_32\scopy.iss
-    - appveyor PushArtifact C:\scopy-setup.exe
+    - ISCC /Q C:\%BUILD_FOLDER%\scopy-%ARCH_BIT%.iss
+    - appveyor PushArtifact C:\scopy-%ARCH_BIT%-setup.exe
 
 #on_finish:
-    #- ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+#- ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
