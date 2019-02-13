@@ -36,7 +36,7 @@ for pkg in qt gcc bison gettext ; do
 	brew link --overwrite --force $pkg
 done
 
-source ./CI/travis/before_install_lib.sh
+. CI/travis/before_install_lib.sh
 
 QT_PATH="$(brew --prefix qt)/bin"
 export PATH="${QT_PATH}:$PATH"

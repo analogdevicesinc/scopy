@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+. CI/travis/lib.sh
+
 # if we have a Qt59 installation use it
 if [ -f /opt/qt59/bin/qt59-env.sh ] ; then
 	. /opt/qt59/bin/qt59-env.sh
@@ -10,8 +12,6 @@ if command -v brew ; then
 	QT_PATH="$(brew --prefix qt)/bin"
 	export PATH="${QT_PATH}:$PATH"
 fi
-
-. /$LIBNAME/CI/travis/lib.sh
 
 NUM_JOBS=4
 
