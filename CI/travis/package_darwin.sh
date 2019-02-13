@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
 
+sudo cp -a /usr/local/opt/icu4c/lib/. /usr/local/lib
 sudo echo "/usr/local/lib" | dylibbundler -od -b -x ./Scopy.app/Contents/MacOS/Scopy -d ./Scopy.app/Contents/Frameworks/ -p @executable_path/../Frameworks/ >/dev/null
 
 sudo cp -R /usr/local/opt/python/Frameworks/Python.framework Scopy.app/Contents/Frameworks/
