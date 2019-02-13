@@ -17,25 +17,18 @@ matrix:
   fast_finish: true
   include:
     - compiler: "gcc"
-      os: osx
-      osx_image: xcode9.2
-    - compiler: "gcc"
-      os: osx
-      osx_images: xcode10.1
-    - compiler: "gcc"
-      os: linux
-      dist: trusty
-    - compiler: "gcc"
       os: linux
       dist: xenial
     - os: linux
       env:
         - OS_TYPE=ubuntu_docker
         - OS_VERSION=bionic
-    - os: linux
-      env:
-        - OS_TYPE=ubuntu_flatpak_docker
-        - OS_VERSION=bionic
+    - compiler: "clang"
+      os: osx
+      osx_image: xcode10.1
+    - compiler: "clang"
+      os: osx
+      osx_image: xcode9.2
 
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./CI/travis/before_install_darwin.sh ; fi
