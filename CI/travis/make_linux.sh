@@ -28,6 +28,20 @@ fi
 popd
 }
 
+handle_centos() {
+	export PATH=/usr/lib64:/usr/local/lib/pkgconfig:$PATH
+	export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:/usr/local/lib64/pkgconfig
+
+	handle_default
+}
+
+handle_centos_docker() {
+		sudo docker run --rm=true \
+			-v `pwd`:/scopy:rw \
+			centos:${OS_VERSION} \
+			/bin/bash -xe /scopy/CI/travis/inside_centos_docker.sh scopy
+}
+
 handle_ubuntu_docker() {
 	sudo docker run --rm=true \
 			-v `pwd`:/scopy:rw \

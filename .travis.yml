@@ -23,6 +23,10 @@ matrix:
       env:
         - OS_TYPE=ubuntu_docker
         - OS_VERSION=bionic
+    - os: linux
+      env:
+        - OS_TYPE=centos_docker
+        - OS_VERSION=centos7
     - compiler: "clang"
       os: osx
       osx_image: xcode10.1

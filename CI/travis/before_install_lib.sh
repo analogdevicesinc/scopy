@@ -87,7 +87,7 @@ wget_and_untar() {
 git_clone_update() {
 	[ -d "$WORKDIR/$dir" ] || {
 		[ -z "$branch" ] || branch="-b $branch"
-		git clone $branch "$url" "$dir"
+		git clone --recursive $branch "$url" "$dir"
 		[ -z "$patchfunc" ] || {
 			pushd $dir
 			$patchfunc
