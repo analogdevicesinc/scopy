@@ -15,6 +15,12 @@ handle_ubuntu_docker() {
 	sudo docker pull ubuntu:${OS_VERSION}
 }
 
+handle_centos_docker() {
+	sudo apt-get -qq update
+	sudo service docker restart
+	sudo docker pull centos:${OS_VERSION}
+}
+
 handle_default() {
 	pwd
 	ls
@@ -125,6 +131,91 @@ else
 fi
 
 cmake_build_git "gr-iio" "https://github.com/analogdevicesinc/gr-iio"
+}
+
+handle_centos() {
+	pwd 
+	ls
+
+	yum install -y epel-release
+
+	yum -y groupinstall 'Development Tools'
+
+	yum -y update
+
+	yum -y install cmake3 gcc bison boost-devel python2-devel python36 libxml2-devel libzip-devel \
+		fftw-devel bison flex yum matio-devel glibmm24-devel glib2-devel doxygen \
+		swig git libusb1-devel doxygen python-six python-mako \
+		rpm rpm-build libxml2-devel \
+		python-cheetah wget tar autoconf autoconf-archive \
+		libffi-devel libmount-devel pcre2-devel
+
+	yum -y install python36 python36-pip python36-devel
+
+	ln -s /usr/bin/cmake3 /usr/bin/cmake
+
+	. CI/travis/before_install_lib.sh
+
+	yum -y install qt5-qtbase qt5-qtbase-common qt5-qtbase-devel qt5-qtbase-gui \
+	qt5-qtdeclarative-devel qt5-qtquickcontrols \
+	qt5-qtsvg-devel qt5-qttools-devel qt5-qttools-static qt5-qtscript automake libtool libglvnd-glx libstdc++ \
+	mesa-libEGL
+
+	QMAKE=/usr/lib64/qt5/bin/qmake
+	$QMAKE -set QMAKE $QMAKE
+
+	export TRAVIS="true"
+
+patch_qwtpolar_linux() {
+	patch_qwtpolar
+
+	patch -p1 <<-EOF
+--- a/qwtpolarconfig.pri
++++ b/qwtpolarconfig.pri
+@@ -16,7 +16,9 @@ QWT_POLAR_VER_PAT      = 1
+ QWT_POLAR_VERSION      = \$\${QWT_POLAR_VER_MAJ}.\$\${QWT_POLAR_VER_MIN}.\$\${QWT_POLAR_VER_PAT}
+ 
+ unix {
+-    QWT_POLAR_INSTALL_PREFIX    = /usr/local/qwtpolar-\$\$QWT_POLAR_VERSION
++    QWT_POLAR_INSTALL_PREFIX    = $STAGINGDIR
++    QMAKE_CXXFLAGS              = -I${STAGINGDIR}/include
++    QMAKE_LFLAGS                = -L${STAGINGDIR}/lib
+ }
+ 
+ win32 {
+EOF
+}
+
+	make_build_git "libsigrok" "https://github.com/sigrokproject/libsigrok" "" "" "./autogen.sh"
+
+	make_build_wget "libsigrokdecode-0.4.1" "http://sigrok.org/download/source/libsigrokdecode/libsigrokdecode-0.4.1.tar.gz"
+
+
+	qmake_build_git "qwt" "https://github.com/osakared/qwt.git" "qwt-6.1-multiaxes" "qwt.pro" "patch_qwt"
+
+	qmake_build_wget "qwtpolar-1.1.1" "https://downloads.sourceforge.net/project/qwtpolar/qwtpolar/1.1.1/qwtpolar-1.1.1.tar.bz2" "qwtpolar.pro" "patch_qwtpolar_linux"
+
+	cmake_build_git "gnuradio" \
+	"https://github.com/analogdevicesinc/gnuradio" \
+	"scopy" \
+	"-DENABLE_INTERNAL_VOLK:BOOL=ON -DENABLE_GR_FEC:BOOL=OFF -DENABLE_GR_DIGITAL:BOOL=OFF -DENABLE_GR_DTV:BOOL=OFF -DENABLE_GR_ATSC:BOOL=OFF -DENABLE_GR_AUDIO:BOOL=OFF -DENABLE_GR_CHANNELS:BOOL=OFF -DENABLE_GR_NOAA:BOOL=OFF -DENABLE_GR_PAGER:BOOL=OFF -DENABLE_GR_TRELLIS:BOOL=OFF -DENABLE_GR_VOCODER:BOOL=OFF"
+
+	if [ "$TRAVIS" == "true" ] ; then
+	#	for pkg in libiio libad9361-iio ; do
+	#		wget http://swdownloads.analog.com/cse/travis_builds/master_latest_${pkg}${LDIST}.deb
+	#		sudo dpkg -i ./master_latest_${pkg}${LDIST}.deb
+	#	done
+		wget http://swdownloads.analog.com/cse/travis_builds/master_latest_libiio${LDIST}.rpm
+		sudo yum localinstall -y ./master_latest_libiio${LDIST}.rpm
+		wget http://swdownloads.analog.com/cse/travis_builds/master_latest_libad9361-iio${LDIST}.rpm
+		sudo yum localinstall -y ./master_latest_libad9361-iio${LDIST}.rpm
+	else
+		cmake_build_git "libiio" "https://github.com/analogdevicesinc/libiio" "" "-DINSTALL_UDEV_RULE:BOOL=OFF"
+
+		cmake_build_git "libad9361-iio" "https://github.com/analogdevicesinc/libad9361-iio" "" "-DLIBIIO_INCLUDEDIR:PATH=$STAGINGDIR/include -DLIBIIO_LIBRARIES:FILEPATH=$STAGINGDIR/lib/libiio.so"
+	fi
+
+	cmake_build_git "gr-iio" "https://github.com/analogdevicesinc/gr-iio"
 }
 
 OS_TYPE=${1:-default}
