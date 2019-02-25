@@ -27,99 +27,29 @@
 
 #include "config.h"
 #include "tool_launcher.hpp"
+#include "scopyApplication.hpp"
 
-#define __STDC_FORMAT_MACROS
-#ifdef Q_OS_WIN
-#include "breakpad/client/windows/handler/exception_handler.h"
-#endif
-
-#ifdef Q_OS_LINUX
-#include "client/linux/handler/exception_handler.h"
-#endif
 using namespace adiscope;
-using namespace google_breakpad;
-
-static ExceptionHandler* handler = NULL;
-#ifdef Q_OS_WIN
-bool ShowDumpResults(const wchar_t* dump_path,
-                     const wchar_t* minidump_id,
-                     void* context,
-                     EXCEPTION_POINTERS* exinfo,
-                     MDRawAssertionInfo* assertion,
-                     bool succeeded) {
-    printf("Dump path: %s\n", dump_path);
-    return succeeded;
-}
-#endif
-
-#ifdef Q_OS_LINUX
-static bool dumpCallback(const google_breakpad::MinidumpDescriptor& descriptor,
-void* context, bool succeeded) {
-    printf("Dump path: %s\n", descriptor.path());
-    return succeeded;
-}
-
-
-#endif
-
-
-QString initBreakPadHandler(QString crashDumpPath)
-{
-	QString prevCrashDump="";
-	QString appDir = crashDumpPath;
-	QDir qd(appDir);
-	if(qd.exists()) {
-		qd.mkdir("crashdmp");
-	}
-	qd.cd("crashdmp");
-	QStringList dumps= qd.entryList();
-	for(QString dump : dumps)
-	{
-		if(dump=="." || dump == "..") continue;
-		if(dump.startsWith("ScopyCrashDump"))
-			continue;
-		QString dumpFullPath = qd.path()+qd.separator()+dump;
-		QFileInfo fi(dumpFullPath);
-		QString dumpDateAndTime = fi.lastModified().toString(Qt::ISODate).replace("T","--").replace(":","-");
-		prevCrashDump = qd.path()+qd.separator()+"ScopyCrashDump--"+dumpDateAndTime+".dmp";
-		QFile::rename(dumpFullPath, prevCrashDump);
-
-
-	}
-
-	QByteArray ba = qd.path().toLocal8Bit();
-	const char *appDirStr = ba.data();
-
-	static size_t google_custom_count = 3;
-	static google_breakpad::CustomInfoEntry google_custom_entries[] = {
-		google_breakpad::CustomInfoEntry(L"prod", L"Scopy"),
-		google_breakpad::CustomInfoEntry(L"ver", L"1.0.3"),
-	};
-
-	google_breakpad::CustomClientInfo custom_info = {google_custom_entries,
-													 google_custom_count};
-
-	handler->set_dump_path(qd.path().toStdWString());
-	return prevCrashDump;
-}
 
 int main(int argc, char **argv)
 {
 #ifdef Q_OS_LINUX
 	google_breakpad::ExceptionHandler eh(descriptor, NULL, dumpCallback, NULL, true, -1);
 #endif
+
 #ifdef Q_OS_WIN
-	handler = new google_breakpad::ExceptionHandler(L"C:/dumps/",
-														 NULL,
-														 ShowDumpResults,
-														 NULL,
-														 google_breakpad::ExceptionHandler::HANDLER_ALL,
-														 MiniDumpNormal,
-														 (wchar_t*)NULL,
-														 NULL);
+	google_breakpad::ExceptionHandler eh(L"C:/dumps/",
+										NULL,
+										ScopyApplication::dumpCallback,
+										NULL,
+										google_breakpad::ExceptionHandler::HANDLER_ALL,
+										MiniDumpNormal,
+										(wchar_t*)NULL,
+										NULL);
 #endif
 
-	QApplication app(argc, argv);
+	ScopyApplication app(argc, argv);
+	app.setExceptionHandler(&eh);
 
 	QFont font("Open Sans");
 	app.setFont(font);
@@ -147,7 +77,7 @@ int main(int argc, char **argv)
 	QString fn("Scopy.ini");
 	path.chop(fn.length());
 
-	QString prevCrashDump = initBreakPadHandler(path);
+	QString prevCrashDump = app.initBreakPadHandler(path);
 
 	QCommandLineParser parser;
 
@@ -193,7 +123,9 @@ int main(int argc, char **argv)
 				 Q_ARG(QString, script));
 	}
 
-	return app.exec();
-	delete handler;
+
+	int ret = 0;
+	ret = app.exec();
+	return ret;
 
 }
