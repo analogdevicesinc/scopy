@@ -893,61 +893,61 @@ void PatternGeneratorChannelGroupUI::setupUARTDecoder()
 	if(uart==nullptr)
 		return;
 
-	auto chMap = setupDecoder("uart",ids);
+	if (getManagerUi()->getUse_decoders()) {
+		auto chMap = setupDecoder("uart",ids);
 
-	auto uartdecoderstack = decodeTrace->decoder()->stack();
-	auto uartdecoder = decodeTrace->decoder()->stack().front();
+		auto uartdecoderstack = decodeTrace->decoder()->stack();
+		auto uartdecoder = decodeTrace->decoder()->stack().front();
 
-	uartdecoder->set_option("baudrate",
-				g_variant_new_int64(uart->get_baud_rate()));
-	uartdecoder->set_option("num_data_bits",g_variant_new_int64(8));
-	GVariant *parityStr = g_variant_new_string("none");;
-	auto par = uart->get_parity();
+		uartdecoder->set_option("baudrate",
+					g_variant_new_int64(uart->get_baud_rate()));
+		uartdecoder->set_option("num_data_bits",g_variant_new_int64(8));
+		GVariant *parityStr = g_variant_new_string("none");;
+		auto par = uart->get_parity();
 
-	switch (par) {
+		switch (par) {
 
-	case UARTPattern::SP_PARITY_ODD:
-		parityStr = g_variant_new_string("odd");
-		break;
+		case UARTPattern::SP_PARITY_ODD:
+			parityStr = g_variant_new_string("odd");
+			break;
 
-	case UARTPattern::SP_PARITY_EVEN:
-		parityStr = g_variant_new_string("even");
-		break;
+		case UARTPattern::SP_PARITY_EVEN:
+			parityStr = g_variant_new_string("even");
+			break;
 
-	case UARTPattern::SP_PARITY_MARK:
-		parityStr = g_variant_new_string("mark");
-		break;
+		case UARTPattern::SP_PARITY_MARK:
+			parityStr = g_variant_new_string("mark");
+			break;
 
-	case UARTPattern::SP_PARITY_SPACE:
-		parityStr = g_variant_new_string("space");
-		break;
+		case UARTPattern::SP_PARITY_SPACE:
+			parityStr = g_variant_new_string("space");
+			break;
 
-	case UARTPattern::SP_PARITY_NONE:
-	default:
-		parityStr = g_variant_new_string("none");
-		uartdecoder->set_option("parity_check",g_variant_new_string("no"));
-		break;
+		case UARTPattern::SP_PARITY_NONE:
+		default:
+			parityStr = g_variant_new_string("none");
+			uartdecoder->set_option("parity_check",g_variant_new_string("no"));
+			break;
 
+		}
+
+		uartdecoder->set_option("parity_type",parityStr);
+		uartdecoder->set_option("num_stop_bits",
+					g_variant_new_double(uart->get_stop_bits()));
+
+		// Add the decoder rows
+
+		auto decc = uartdecoder->decoder();
+
+		auto decoderAnnotations = 3;
+
+		for (auto i=0; i<decoderAnnotations; i++) {
+			ui->ann_row_layout->addWidget(new QLabel("",this));
+
+		}
+
+		decodeTrace->set_channel_map(chMap);
 	}
-
-	uartdecoder->set_option("parity_type",parityStr);
-	uartdecoder->set_option("num_stop_bits",
-				g_variant_new_double(uart->get_stop_bits()));
-
-	// Add the decoder rows
-
-	auto decc = uartdecoder->decoder();
-
-	auto decoderAnnotations = 3;
-
-	for (auto i=0; i<decoderAnnotations; i++) {
-		ui->ann_row_layout->addWidget(new QLabel("",this));
-
-	}
-
-	decodeTrace->set_channel_map(chMap);
-
-
 }
 
 void PatternGeneratorChannelGroupUI::setupParallelDecoder()
@@ -960,9 +960,11 @@ void PatternGeneratorChannelGroupUI::setupParallelDecoder()
 		ids.push_back(chg->get_channel(i)->get_id());
 	}
 
-	auto chMap = setupDecoder("parallel",ids);
+	if (getManagerUi()->getUse_decoders()) {
+		auto chMap = setupDecoder("parallel",ids);
 
-	decodeTrace->set_channel_map(chMap);
+		decodeTrace->set_channel_map(chMap);
+	}
 }
 
 void PatternGeneratorChannelGroupUI::setupSPIDecoder()
@@ -978,42 +980,44 @@ void PatternGeneratorChannelGroupUI::setupSPIDecoder()
 			ids.push_back(chg->get_channel(2)->get_id());
 		}
 
-		auto chMap = setupDecoder("spi",ids);
-		auto spidecoder = decodeTrace->decoder()->stack().front();
-		auto spipattern = dynamic_cast<SPIPattern *>(getChannelGroup()->pattern);
+		if (getManagerUi()->getUse_decoders()) {
+			auto chMap = setupDecoder("spi",ids);
+			auto spidecoder = decodeTrace->decoder()->stack().front();
+			auto spipattern = dynamic_cast<SPIPattern *>(getChannelGroup()->pattern);
 
-		if(spipattern == nullptr)
-			return;
+			if(spipattern == nullptr)
+				return;
 
-		GVariant *cspolstr, *bitorderstr;
+			GVariant *cspolstr, *bitorderstr;
 
-		if (spipattern->getCSPol()) {
-			cspolstr = g_variant_new_string("active-high");
-		} else {
-			cspolstr = g_variant_new_string("active-low");
+			if (spipattern->getCSPol()) {
+				cspolstr = g_variant_new_string("active-high");
+			} else {
+				cspolstr = g_variant_new_string("active-low");
+			}
+
+			if (spipattern->getMsbFirst()) {
+				bitorderstr = g_variant_new_string("msb-first");
+			} else {
+				bitorderstr = g_variant_new_string("lsb-first");
+			}
+
+			spidecoder->set_option("cs_polarity", cspolstr);
+			spidecoder->set_option("bitorder", bitorderstr);
+			spidecoder->set_option("cpol", g_variant_new_int64(spipattern->getCPOL()));
+			spidecoder->set_option("cpha", g_variant_new_int64(!spipattern->getCPHA()));
+			//spidecoder->set_option("wordsize", g_variant_new_int64(spipattern->getBytesPerFrame()*8));
+
+			auto decc = spidecoder->decoder();
+			auto decoderAnnotations = 3;
+
+			for (auto i=0; i<decoderAnnotations; i++) {
+				ui->ann_row_layout->addWidget(new QLabel("",this));
+
+			}
+
+			decodeTrace->set_channel_map(chMap);
 		}
-
-		if (spipattern->getMsbFirst()) {
-			bitorderstr = g_variant_new_string("msb-first");
-		} else {
-			bitorderstr = g_variant_new_string("lsb-first");
-		}
-
-		spidecoder->set_option("cs_polarity", cspolstr);
-		spidecoder->set_option("bitorder", bitorderstr);
-		spidecoder->set_option("cpol", g_variant_new_int64(spipattern->getCPOL()));
-		spidecoder->set_option("cpha", g_variant_new_int64(!spipattern->getCPHA()));
-		//spidecoder->set_option("wordsize", g_variant_new_int64(spipattern->getBytesPerFrame()*8));
-
-		auto decc = spidecoder->decoder();
-		auto decoderAnnotations = 3;
-
-		for (auto i=0; i<decoderAnnotations; i++) {
-			ui->ann_row_layout->addWidget(new QLabel("",this));
-
-		}
-
-		decodeTrace->set_channel_map(chMap);
 	}
 }
 
@@ -1026,19 +1030,21 @@ void PatternGeneratorChannelGroupUI::setupI2CDecoder()
 		ids.push_back(chg->get_channel(1)->get_id());
 
 
-		auto chMap = setupDecoder("i2c",ids);
+		if (getManagerUi()->getUse_decoders()) {
+			auto chMap = setupDecoder("i2c",ids);
 
-		auto i2cdecoder = decodeTrace->decoder()->stack().front();
-		auto i2cpattern = dynamic_cast<I2CPattern *>(getChannelGroup()->pattern);
+			auto i2cdecoder = decodeTrace->decoder()->stack().front();
+			auto i2cpattern = dynamic_cast<I2CPattern *>(getChannelGroup()->pattern);
 
-		auto decoderAnnotations = 2;
+			auto decoderAnnotations = 2;
 
-		for (auto i=0; i<decoderAnnotations; i++) {
-			ui->ann_row_layout->addWidget(new QLabel("",this));
+			for (auto i=0; i<decoderAnnotations; i++) {
+				ui->ann_row_layout->addWidget(new QLabel("",this));
 
+			}
+
+			decodeTrace->set_channel_map(chMap);
 		}
-
-		decodeTrace->set_channel_map(chMap);
 	}
 }
 
@@ -1517,7 +1523,8 @@ PatternGeneratorChannelManagerUI::PatternGeneratorChannelManagerUI(
         Ui::PGCGSettings *cgSettings, PatternGenerator *pg)  : QWidget(parent),
 	ui(new Ui::PGChannelManager), cgSettings(cgSettings),
 	settingsWidget(cgSettings->patternSettings),
-	main_win(main_win_)
+	main_win(main_win_),
+	m_use_decoders(true)
 {
 	ui->setupUi(this);
 	this->chm = chm;
@@ -1547,6 +1554,16 @@ QFrame *PatternGeneratorChannelManagerUI::addSeparator(QVBoxLayout *lay,
 	Util::retainWidgetSizeWhenHidden(line);
 	line->setVisible(false);
 	return line;
+}
+
+bool PatternGeneratorChannelManagerUI::getUse_decoders() const
+{
+	return m_use_decoders;
+}
+
+void PatternGeneratorChannelManagerUI::setUse_decoders(bool use_decoders)
+{
+	m_use_decoders = use_decoders;
 }
 
 void PatternGeneratorChannelManagerUI::updateUi()

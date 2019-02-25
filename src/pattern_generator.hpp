@@ -101,6 +101,9 @@ public:
 	void settingsLoaded();
 	bool suppressCGSettingsUpdate;
 
+	bool getUse_decoders() const;
+	void setUse_decoders(bool use_decoders);
+
 private Q_SLOTS:
 
 	void generatePattern();
@@ -189,6 +192,8 @@ private:
 	void createSettingsWidget();
 	void showColorSettings(bool check);
 	void enableCgSettings(bool en);
+
+	bool m_use_decoders;
 
 private Q_SLOTS:
 

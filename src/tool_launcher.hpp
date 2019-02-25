@@ -86,6 +86,9 @@ public:
 	Preferences *getPrefPanel() const;
 	bool eventFilter(QObject *watched, QEvent *event);
 
+	bool getUse_decoders() const;
+	void setUse_decoders(bool use_decoders);
+
 Q_SIGNALS:
 	void connectionDone(bool success);
 	void adcCalibrationDone();
@@ -245,6 +248,7 @@ private:
 	QButtonGroup *devices_btn_group;
 
 	DeviceWidget* selectedDev;
+	bool m_use_decoders;
 };
 }
 #endif // M2K_TOOL_LAUNCHER_H

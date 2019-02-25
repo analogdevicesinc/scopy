@@ -58,6 +58,7 @@
 #include "filter.hpp"
 #include "pattern_generator.hpp"
 #include "dynamicWidget.hpp"
+#include "tool_launcher.hpp"
 #include "pattern_generator_api.hpp"
 
 // Generated UI
@@ -242,6 +243,7 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 	chmui = new PatternGeneratorChannelManagerUI(ui->channelManagerWidget, main_win,
 	                &chm, cgSettings, this);
 
+	setUse_decoders(parent->getUse_decoders());
 	ui->channelManagerWidgetLayout->addWidget(chmui);
 	ui->btnChSettings->setChecked(true);
 	ui->rightWidget->setCurrentIndex(1);
@@ -446,6 +448,19 @@ void PatternGenerator::enableCgSettings(bool en)
 	colour_button_edge->setEnabled(en);
 	colour_button_high->setEnabled(en);
 	colour_button_low->setEnabled(en);
+}
+
+bool PatternGenerator::getUse_decoders() const
+{
+	return m_use_decoders;
+}
+
+void PatternGenerator::setUse_decoders(bool use_decoders)
+{
+	m_use_decoders = use_decoders;
+	if (chmui) {
+		chmui->setUse_decoders(m_use_decoders);
+	}
 }
 
 void PatternGenerator::checkEnabledChannels()
