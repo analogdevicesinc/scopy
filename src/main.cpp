@@ -99,24 +99,26 @@ QString initBreakPadHandler(QString crashDumpPath)
 	google_breakpad::CustomClientInfo custom_info = {google_custom_entries,
 													 google_custom_count};
 
-#ifdef Q_OS_LINUX
-	google_breakpad::ExceptionHandler eh(descriptor, NULL, dumpCallback, NULL, true, -1);
-#endif
-#ifdef Q_OS_WIN
-	handler = new google_breakpad::ExceptionHandler(qd.path().toStdWString()/*L"C:/dumps/"*/,
-														 NULL,
-														 NULL/*ShowDumpResults*/ ,
-														 NULL,
-														 google_breakpad::ExceptionHandler::HANDLER_ALL,
-														 MiniDumpNormal,
-														 (wchar_t*)NULL,
-														 &custom_info/*NULL*/);
-#endif
+	handler->set_dump_path(qd.path().toStdWString());
 	return prevCrashDump;
 }
 
 int main(int argc, char **argv)
 {
+#ifdef Q_OS_LINUX
+	google_breakpad::ExceptionHandler eh(descriptor, NULL, dumpCallback, NULL, true, -1);
+#endif
+#ifdef Q_OS_WIN
+	handler = new google_breakpad::ExceptionHandler(L"C:/dumps/",
+														 NULL,
+														 ShowDumpResults,
+														 NULL,
+														 google_breakpad::ExceptionHandler::HANDLER_ALL,
+														 MiniDumpNormal,
+														 (wchar_t*)NULL,
+														 NULL);
+#endif
+
 	QApplication app(argc, argv);
 
 	QFont font("Open Sans");
@@ -197,4 +199,6 @@ int main(int argc, char **argv)
 	}
 
 	return app.exec();
+	delete handler;
+
 }
