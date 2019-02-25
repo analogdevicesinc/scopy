@@ -60,6 +60,7 @@ int main(int argc, char **argv)
 	parser.addOptions({
 		{ {"s", "script"}, "Run given script.", "script" },
 		{ {"n", "nogui"}, "Run Scopy without GUI" },
+		{ {"d", "nodecoders"}, "Run Scopy without digital decoders"}
 	});
 
 	parser.process(app);
@@ -67,6 +68,10 @@ int main(int argc, char **argv)
 	ToolLauncher launcher;
 
 	bool nogui = parser.isSet("nogui");
+	bool nodecoders = parser.isSet("nodecoders");
+	if (nodecoders) {
+		launcher.setUse_decoders(false);
+	}
 	QString script = parser.value("script");
 	if (nogui) {
 		launcher.hide();

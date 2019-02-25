@@ -83,7 +83,8 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 	indexFile(""), deviceInfo(""), pathToFile(""),
 	manual_calibration_enabled(false),
 	devices_btn_group(new QButtonGroup(this)),
-	selectedDev(nullptr)
+	selectedDev(nullptr),
+	m_use_decoders(true)
 {
 	if (!isatty(STDIN_FILENO))
 		notifier.setEnabled(false);
@@ -357,6 +358,16 @@ void ToolLauncher::allowExternalScript(bool prefEnabled)
 			js_engine.globalObject().deleteProperty("extern");
 		}
 	}
+}
+
+bool ToolLauncher::getUse_decoders() const
+{
+	return m_use_decoders;
+}
+
+void ToolLauncher::setUse_decoders(bool use_decoders)
+{
+	m_use_decoders = use_decoders;
 }
 
 void ToolLauncher::loadSession()
@@ -1545,15 +1556,24 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 
 	if (filter->compatible(TOOL_LOGIC_ANALYZER)
 	    || filter->compatible(TOOL_PATTERN_GENERATOR)) {
-		bool success = loadDecoders(QCoreApplication::applicationDirPath() +
-					"/decoders");
 
-		if (!success) {
+		if (!m_use_decoders) {
 			search_timer->stop();
 
-			QMessageBox error(this);
-			error.setText("There was a problem initializing libsigrokdecode. Some features may be missing");
-			error.exec();
+			QMessageBox info(this);
+			info.setText("Digital decoders support is disabled. Some features may be missing");
+			info.exec();
+		} else {
+			bool success = loadDecoders(QCoreApplication::applicationDirPath() +
+						    "/decoders");
+
+			if (!success) {
+				search_timer->stop();
+
+				QMessageBox error(this);
+				error.setText("There was a problem initializing libsigrokdecode. Some features may be missing");
+				error.exec();
+			}
 		}
 	}
 
