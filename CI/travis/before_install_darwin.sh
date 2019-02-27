@@ -18,13 +18,20 @@ brew_install_or_upgrade() {
 		brew ls --versions $1 # check if installed last-ly
 }
 
+brew_install() {
+	brew install $1 || \
+		brew ls --versions $1
+}
+
 PYTHON="python3 python@2 python brew-pip"
 PACKAGES="qt cmake fftw bison gettext autoconf automake libtool libzip glib libusb $PYTHON"
 PACKAGES="$PACKAGES glibmm doxygen wget boost gnu-sed libmatio dylibbundler libxml2 pkg-config"
 
 for pak in $PACKAGES ; do
-	brew_install_or_upgrade $pak
+	brew_install $pak
 done
+
+brew upgrade python3
 
 for pkg in qt gcc bison gettext; do
 	brew link --overwrite --force $pkg
