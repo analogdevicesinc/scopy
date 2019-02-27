@@ -126,7 +126,7 @@ class Decoder(srd.Decoder):
 
     def __init__(self):
         self.samplerate = None
-        self.oldclk = -1
+        self.oldclk = 1
         self.bitcount = 0
         self.misodata = self.mosidata = 0
         self.misobits = []
@@ -152,6 +152,7 @@ class Decoder(srd.Decoder):
         self.out_binary = self.register(srd.OUTPUT_BINARY)
         self.out_bitrate = self.register(srd.OUTPUT_META,
                 meta=(int, 'Bitrate', 'Bitrate during transfers'))
+        self.bw = (self.options['wordsize'] + 7) // 8
 
     def putw(self, data):
         self.put(self.ss_block, self.samplenum, self.out_ann, data)
@@ -165,10 +166,12 @@ class Decoder(srd.Decoder):
 
         if self.have_miso:
             ss, es = self.misobits[-1][1], self.misobits[0][2]
-            self.put(ss, es, self.out_binary, [0, bytes([so])])
+            bdata = so.to_bytes(self.bw, byteorder='big')
+            self.put(ss, es, self.out_binary, [0, bdata])
         if self.have_mosi:
             ss, es = self.mosibits[-1][1], self.mosibits[0][2]
-            self.put(ss, es, self.out_binary, [1, bytes([si])])
+            bdata = si.to_bytes(self.bw, byteorder='big')
+            self.put(ss, es, self.out_binary, [1, bdata])
 
         self.put(ss, es, self.out_python, ['BITS', si_bits, so_bits])
         self.put(ss, es, self.out_python, ['DATA', si, so])

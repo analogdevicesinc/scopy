@@ -1005,7 +1005,7 @@ void PatternGeneratorChannelGroupUI::setupSPIDecoder()
 			spidecoder->set_option("cs_polarity", cspolstr);
 			spidecoder->set_option("bitorder", bitorderstr);
 			spidecoder->set_option("cpol", g_variant_new_int64(spipattern->getCPOL()));
-			spidecoder->set_option("cpha", g_variant_new_int64(!spipattern->getCPHA()));
+			spidecoder->set_option("cpha", g_variant_new_int64(spipattern->getCPHA()));
 			//spidecoder->set_option("wordsize", g_variant_new_int64(spipattern->getBytesPerFrame()*8));
 
 			auto decc = spidecoder->decoder();
