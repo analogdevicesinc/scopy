@@ -136,6 +136,7 @@ public:
 
 	static const size_t min_buffer_size = 1024;
 	static const unsigned long default_sample_rate = 1000000;
+	static constexpr float max_frequency = 30000000;
 
 	static QVector<unsigned long> get_available_sample_rates(
 	        const struct iio_device *dev);

@@ -297,8 +297,8 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 
 	/* Set max frequency according to max sample rate */
 	fileSampleRate->setMinValue(0.1);
-	frequency->setMaxValue((sample_rate / 2) - 1);
-	mathFrequency->setMaxValue((sample_rate / 2) - 1);
+	frequency->setMaxValue(max_frequency);
+	mathFrequency->setMaxValue(max_frequency);
 	fileSampleRate->setMaxValue((sample_rate / 2) - 1);
 
 	/* (lowest freq * 100 * 1000) frequency by default */
@@ -308,10 +308,10 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 	fileOffset->setValue(0);
 	filePhase->setValue(0);
 
-    fileAmplitude->setDisabled(true);
-    filePhase->setDisabled(true);
-    fileOffset->setDisabled(true);
-    fileSampleRate->setDisabled(true);
+	fileAmplitude->setDisabled(true);
+	filePhase->setDisabled(true);
+	fileOffset->setDisabled(true);
+	fileSampleRate->setDisabled(true);
 
 	fallTime->setMinValue(0.00000001);
 	riseTime->setMinValue(0.00000001);
@@ -326,8 +326,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 	dutycycle->setValue(50);
 	dutycycle->setVisible(false);
 	ui->wtrapezparams->setVisible(false);
-	mathFrequency->setValue(
-		mathFrequency->minValue() * 100 * 1000.0);
+	mathFrequency->setValue(mathFrequency->minValue() * 100 * 1000.0);
 
 	ui->cbNoiseType->setCurrentIndex(0);
 	noiseAmplitude->setMinValue(1e-06);
