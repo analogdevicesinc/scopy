@@ -81,7 +81,9 @@ if (NOT "${OUT_CONSTEXPR}" STREQUAL "-1")
 endif()
 
 find_library(BREAKPAD_LIBRARIES NAMES breakpad)
-find_library(BREAKPADCLIENT_LIBRARIES breakpad_client)
+find_library(BREAKPADCLIENT_LIBRARIES NAMES breakpad_client)
+
+find_path(BREAKPAD_INCLUDE_DIRS breakpad)
 
 
 find_package(Qt5Widgets REQUIRED)
@@ -121,8 +123,6 @@ pkg_check_modules(LIBSIGROK REQUIRED libsigrok)
 pkg_check_modules(LIBSIGROKCXX REQUIRED libsigrokcxx)
 pkg_check_modules(LIBSIGROK_DECODE REQUIRED libsigrokdecode)
 
-
-
 include_directories(
 	${GNURADIO_ALL_INCLUDE_DIRS}
 	${Boost_INCLUDE_DIRS}
@@ -145,7 +145,8 @@ include_directories(
 	${SIGCPP_INCLUDE_DIRS}
 	${SIGCPPCONFIG_INCLUDE_DIRS}
 	${CMAKE_SOURCE_DIR}/src
-        ${BREAKPAD_INCLUDE_DIRS}
+	${BREAKPAD_INCLUDE_DIRS}
+	${BREAKPAD_INCLUDE_DIRS}/breakpad
 )
 
 link_directories(
@@ -241,14 +242,12 @@ if (WIN32 OR ENABLE_APPLICATION_BUNDLE)
 	set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME Scopy)
 endif()
 
-link_directories(
-	${Boost_LIBRARY_DIRS}
-	${GNURADIO_RUNTIME_LIBRARY_DIRS}
-	${BREAKPAD_LIBRARIES}
-)
+#link_directories(
+#	${Boost_LIBRARY_DIRS}
+#	${GNURADIO_RUNTIME_LIBRARY_DIRS}
+#	${BREAKPAD_LIBRARIES}
+#)
 
-
-message(${BREAKPADCLIENT_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} LINK_PRIVATE
 		${BREAKPAD_LIBRARIES}
 		${BREAKPADCLIENT_LIBRARIES}
@@ -269,7 +268,7 @@ target_link_libraries(${PROJECT_NAME} LINK_PRIVATE
 		${LIBSIGROK_DECODE_LIBRARIES}
 		${GLIBMM_LIBRARIES}
 		${SIGCPP_LIBRARIES}
-		${GLIB_LIBRARIES}		
+		${GLIB_LIBRARIES}
 )
 
 if (NOT WIN32)
