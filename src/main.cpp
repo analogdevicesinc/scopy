@@ -34,7 +34,8 @@ using namespace adiscope;
 int main(int argc, char **argv)
 {
 #ifdef Q_OS_LINUX
-	google_breakpad::ExceptionHandler eh(descriptor, NULL, dumpCallback, NULL, true, -1);
+	google_breakpad::MinidumpDescriptor descriptor("/tmp");
+	google_breakpad::ExceptionHandler eh(descriptor, NULL, ScopyApplication::dumpCallback, NULL, true, -1);
 #endif
 
 #ifdef Q_OS_WIN
@@ -124,8 +125,5 @@ int main(int argc, char **argv)
 	}
 
 
-	int ret = 0;
-	ret = app.exec();
-	return ret;
-
+	return app.exec();
 }
