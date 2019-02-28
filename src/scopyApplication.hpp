@@ -12,7 +12,7 @@
 #include "client/linux/handler/exception_handler.h"
 #endif
 
-//#ifdef CATCH_UNHANDLED_EXCEPTIONS
+//#define CATCH_UNHANDLED_EXCEPTIONS
 
 
 class ScopyApplication final : public QApplication {
