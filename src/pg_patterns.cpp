@@ -1576,9 +1576,10 @@ uint32_t I2CPattern::get_required_nr_of_samples(uint32_t sample_rate,
 {
 	auto samples_per_bit = 2*(sample_rate/clkFrequency);
 	auto IFS=interFrameSpace*samples_per_bit;
-//	return v.size()*samples_per_bit*8 + 2*IFS + IFS *(v.size()/bytesPerFrame);
-//	return 500;
-	return samples_per_bit * (interFrameSpace+1+7+1+v.size()*9+2+interFrameSpace);
+
+	// size = samples/bit * (IFS+start(2), address(7), ack(1), (data(8) + ack(1))*data_len, stop(2)+IFS)
+	uint32_t samples=samples_per_bit * (interFrameSpace+2+7+1+(8+1)*v.size()+2+interFrameSpace);
+	return samples;
 }
 
 
