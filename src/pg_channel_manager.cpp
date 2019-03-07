@@ -230,6 +230,11 @@ void PatternGeneratorChannelUI::mouseMoveEvent(QMouseEvent *event)
 
 void PatternGeneratorChannelUI::dragEnterEvent(QDragEnterEvent *event)
 {
+	if (!event->source()) {
+		event->ignore();
+		return;
+	}
+
 	auto w = ui->widget_2->geometry().width();
 	auto h = ui->widget_2->geometry().height();
 	topDragbox.setRect(0, 0, w, h/2);
@@ -760,6 +765,11 @@ void PatternGeneratorChannelGroupUI::mouseMoveEvent(QMouseEvent *event)
 
 void PatternGeneratorChannelGroupUI::dragEnterEvent(QDragEnterEvent *event)
 {
+	if (!event->source()) {
+		event->ignore();
+		return;
+	}
+
 	auto w = ui->widget_2->geometry().width();
 	auto h = ui->widget_2->geometry().height(); // include lines
 	topDragbox.setRect(0, 0, w, h/3);

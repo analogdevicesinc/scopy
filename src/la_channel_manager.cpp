@@ -189,6 +189,11 @@ void LogicAnalyzerChannelUI::mouseMoveEvent(QMouseEvent *event)
 
 void LogicAnalyzerChannelUI::dragEnterEvent(QDragEnterEvent *event)
 {
+	if (!event->source()) {
+		event->ignore();
+		return;
+	}
+
 	auto w = ui->baseWidget->geometry().width();
 	auto h = ui->baseWidget->geometry().height();
 
@@ -936,6 +941,11 @@ void LogicAnalyzerChannelGroupUI::mouseMoveEvent(QMouseEvent *event)
 
 void LogicAnalyzerChannelGroupUI::dragEnterEvent(QDragEnterEvent *event)
 {
+	if (!event->source()) {
+		event->ignore();
+		return;
+	}
+
 	auto w = ui->baseWidget->geometry().width();
 	auto h = ui->baseWidget->geometry().height();
 	topDragbox.setRect(0, 0, w, h/3);
