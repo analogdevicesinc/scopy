@@ -535,12 +535,14 @@ void Measure::measure()
 		m_cross_detect->crossDetectStep(data, i);
 
 		// Min
-		if (data[i] < min)
+		if (data[i] < min) {
 			min = data[i];
+		}
 
 		// Max
-		if (data[i] > max)
+		if (data[i] > max) {
 			max = data[i];
+		}
 
 		// Sum of values
 		sum += data[i];
