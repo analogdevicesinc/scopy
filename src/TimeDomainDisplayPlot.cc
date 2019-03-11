@@ -1085,6 +1085,11 @@ bool TimeDomainDisplayPlot::registerSink(std::string sinkUniqueNme, unsigned int
 			QwtSymbol *symbol = new QwtSymbol(QwtSymbol::NoSymbol, QBrush(color),
 							QPen(color), QSize(7,7));
 
+			if (sinkIndex >= 1) {
+				d_plot_curve.back()->setPaintAttribute(QwtPlotCurve::ClipPolygons, false);
+				d_plot_curve.back()->setPaintAttribute(QwtPlotCurve::FilterPointsAggressive, true);
+			}
+
 			d_plot_curve.back()->setRawSamples(d_xdata[sinkIndex], d_ydata[n], channelsDataLength);
 			d_plot_curve.back()->setSymbol(symbol);
 
