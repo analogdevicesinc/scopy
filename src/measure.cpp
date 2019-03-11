@@ -491,6 +491,7 @@ void Measure::measure()
 	// Cache buffer address, length, ADC bit count
 	double *data = m_buffer;
 	size_t data_length = m_buf_length;
+	size_t count = data_length;
 	int adc_span = 1 << m_adc_bit_count;
 	int hlf_scale = adc_span / 2;
 	bool using_histogram_method = (adc_span > 1);
@@ -524,6 +525,10 @@ void Measure::measure()
 		endIndex = data_length;
 	}
 
+	if (isnanl(data[0])) {
+		return;
+	}
+
 	m_cross_detect = new CrossingDetection(m_cross_level, m_hysteresis_span,
 			"P");
 	if (using_histogram_method)
@@ -531,6 +536,10 @@ void Measure::measure()
 
 	for (size_t i = startIndex; i < endIndex; i++) {
 
+		if (isnanl(data[i])) {
+			count--;
+			continue;
+		}
 		// Find level crossings (period detection)
 		m_cross_detect->crossDetectStep(data, i);
 
@@ -567,16 +576,16 @@ void Measure::measure()
 	m_measurements[PEAK_PEAK]->setValue(peak_to_peak);
 
 	// Mean
-	mean = sum / data_length;
+	mean = sum / count;
 	m_measurements[MEAN]->setValue(mean);
 
 	// RMS
-	rms = sqrt(sqr_sum / data_length);
+	rms = sqrt(sqr_sum / count);
 	m_measurements[RMS]->setValue(rms);
 
 	// AC RMS
 	rms_ac = sqrt((sqr_sum - 2 * mean * sum +
-		data_length *  mean * mean) / data_length);
+		count *  mean * mean) / count);
 	m_measurements[AC_RMS]->setValue(rms_ac);
 
 	low = min;
