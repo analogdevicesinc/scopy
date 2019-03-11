@@ -29,9 +29,9 @@ using namespace adiscope;
 FileManager::FileManager(QString toolName) :
         hasHeader(false),
         sampleRate(0),
+	nrOfSamples(0),
         toolName(toolName),
-        additionalInformation(""),
-        nrOfSamples(0)
+        additionalInformation("")
 {
 
 }
