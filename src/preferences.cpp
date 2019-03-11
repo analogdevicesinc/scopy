@@ -47,7 +47,8 @@ Preferences::Preferences(QWidget *parent) :
 	graticule_enabled(false),
 	animations_enabled(true),
 	osc_filtering_enabled(true),
-	mini_hist_enabled(false)
+	mini_hist_enabled(false),
+	digital_decoders_enabled(true)
 {
 	ui->setupUi(this);
 
@@ -127,6 +128,10 @@ Preferences::Preferences(QWidget *parent) :
 		mini_hist_enabled = (!state ? false : true);
 		Q_EMIT notify();
 	});
+	connect(ui->decodersCheckBox, &QCheckBox::stateChanged, [=](int state){
+		digital_decoders_enabled = (!state ? false : true);
+		Q_EMIT notify();
+	});
 
 	QString preference_ini_file = getPreferenceIniFile();
 	QSettings settings(preference_ini_file, QSettings::IniFormat);
@@ -167,6 +172,7 @@ void Preferences::showEvent(QShowEvent *event)
 	ui->enableAnimCheckBox->setChecked(animations_enabled);
 	ui->oscFilteringCheckBox->setChecked(osc_filtering_enabled);
 	ui->histCheckBox->setChecked(mini_hist_enabled);
+	ui->decodersCheckBox->setChecked(digital_decoders_enabled);
 
 	QWidget::showEvent(event);
 }
@@ -191,6 +197,16 @@ void Preferences::resetScopy()
 	if (ret == QMessageBox::Ok) {
 		Q_EMIT reset();
 	}
+}
+
+bool Preferences::getDigital_decoders_enabled() const
+{
+	return digital_decoders_enabled;
+}
+
+void Preferences::setDigital_decoders_enabled(bool value)
+{
+	digital_decoders_enabled = value;
 }
 
 bool Preferences::getOsc_filtering_enabled() const
@@ -495,4 +511,14 @@ bool Preferences_API::getMiniHist() const
 void Preferences_API::setMiniHist(const bool &enabled)
 {
 	preferencePanel->mini_hist_enabled = enabled;
+}
+
+bool Preferences_API::getDigitalDecoders() const
+{
+	return preferencePanel->digital_decoders_enabled;
+}
+
+void Preferences_API::setDigitalDecoders(const bool &enabled)
+{
+	preferencePanel->digital_decoders_enabled = enabled;
 }

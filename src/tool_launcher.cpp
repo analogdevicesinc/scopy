@@ -281,6 +281,8 @@ ToolLauncher::ToolLauncher(QWidget *parent) :
 
 void ToolLauncher::readPreferences()
 {
+	m_use_decoders = prefPanel->getDigital_decoders_enabled();
+
 	ui->btnNotes->setVisible(prefPanel->getUser_notes_active());
 	for (auto tool : toolMenu) {
 		tool->enableDoubleClick(prefPanel->getDouble_click_to_detach());
@@ -368,6 +370,7 @@ bool ToolLauncher::getUse_decoders() const
 void ToolLauncher::setUse_decoders(bool use_decoders)
 {
 	m_use_decoders = use_decoders;
+	prefPanel->setDigital_decoders_enabled(use_decoders);
 }
 
 void ToolLauncher::loadSession()
