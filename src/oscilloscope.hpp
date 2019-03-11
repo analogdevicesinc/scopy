@@ -303,6 +303,7 @@ namespace adiscope {
 
 		QMap<QString, QPair<gr::basic_block_sptr,
 			gr::basic_block_sptr>> math_sinks;
+		QMap<QString, gr::basic_block_sptr> math_rails;
 
 		iio_manager::port_id *ids;
 		iio_manager::port_id *fft_ids;
