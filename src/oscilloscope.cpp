@@ -30,6 +30,7 @@
 #include <gnuradio/blocks/null_source.h>
 #include <gnuradio/blocks/null_sink.h>
 #include <gnuradio/analog/rail_ff.h>
+#include <gnuradio/blocks/multiply_const_ff.h>
 
 /* Qt includes */
 #include <QtWidgets>
@@ -75,6 +76,7 @@
 #define MAX_MATH_CHANNELS 4
 #define MAX_MATH_RANGE 500
 #define MIN_MATH_RANGE -500
+#define MAX_AMPL 25
 
 using namespace adiscope;
 using namespace gr;
@@ -325,14 +327,27 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	plot.setSampleRate(adc->sampleRate(), 1, "");
 	plot.setActiveVertAxis(0);
 
+	started = iio->started();
+	if (started)
+		iio->lock();
+
 	for (unsigned int i = 0; i < nb_channels; i++) {
 		plot.Curve(i)->setAxes(
 				QwtAxisId(QwtPlot::xBottom, 0),
 				QwtAxisId(QwtPlot::yLeft, i));
 		plot.addZoomer(i);
 		probe_attenuation.push_back(1);
+		auto multiply = gr::blocks::multiply_const_ff::make(1);
+		auto null_sink = gr::blocks::null_sink::make(sizeof(float));
+		math_probe_atten.push_back(multiply);
+		iio->connect(adc_samp_conv_block, i, math_probe_atten.at(i), 0);
+		iio->connect(math_probe_atten.at(i), 0, null_sink, 0);
+
 		plot.Curve(i)->setTitle("CH " + QString::number(i + 1));
 	}
+
+	if (started)
+		iio->unlock();
 
 
 	plot.levelTriggerA()->setMobileAxis(QwtAxisId(QwtPlot::yLeft, 0));
@@ -641,11 +656,39 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 			plot.setDisplayScale(probe_attenuation[current_ch_widget]);
 		}
 
+		bool started = iio->started();
+		if (started)
+			iio->lock();
+
+		// Update the multiplier value for this channel
+		if (current_ch_widget < math_probe_atten.size()) {
+			math_probe_atten[current_ch_widget]->set_k(value);
+		}
+
+		if (started)
+			iio->unlock();
+
 		for (int i = 0; i < nb_channels + nb_math_channels + nb_ref_channels; ++i) {
 			QLabel *label = static_cast<QLabel *>(
 						ui->chn_scales->itemAt(i)->widget());
 			double value = probe_attenuation[i] * plot.VertUnitsPerDiv(i);
 			label->setText(vertMeasureFormat.format(value, "V/div", 3));
+
+			ChannelWidget *cw = channelWidgetAtId(i);
+			if (cw->isMathChannel()) {
+				editMathChannelFunction(i, cw->function().toStdString());
+			}
+		}
+
+		auto max_elem = max_element(probe_attenuation.begin(), probe_attenuation.begin() + nb_channels);
+		if (channelWidgetAtId(current_ch_widget)->isMathChannel()) {
+			voltsPerDiv->silentSetMaxValue((*max_elem) * 10);
+			voltsPosition->silentSetMaxValue((*max_elem) * MAX_AMPL);
+			voltsPosition->silentSetMinValue((*max_elem) * (-MAX_AMPL));
+		} else {
+			voltsPerDiv->silentSetMaxValue(10);
+			voltsPosition->silentSetMaxValue(MAX_AMPL);
+			voltsPosition->silentSetMinValue(-MAX_AMPL);
 		}
 
 		voltsPerDiv->setDisplayScale(probe_attenuation[current_ch_widget]);
@@ -1099,6 +1142,9 @@ void Oscilloscope::activateAcCoupling(int i)
 	iio->connect(filterBlocks.at(i), 0, subBlocks.at(i), 1);
 	iio->connect(subBlocks.at(i), 0, qt_time_block, i);
 
+	iio->disconnect(adc_samp_conv_block, i, math_probe_atten.at(i), 0);
+	iio->connect(subBlocks.at(i), 0, math_probe_atten.at(i), 0);
+
 	if (trigger && !triggerLevelSink.first) {
 		triggerLevelSink.first = boost::make_shared<signal_sample>();
 		triggerLevelSink.second = i;
@@ -1107,12 +1153,6 @@ void Oscilloscope::activateAcCoupling(int i)
 			this, SLOT(updateTriggerLevelValue(std::vector<float>)));
 		iio->connect(filterBlocks.at(i), 0, keep_one, 0);
 		iio->connect(keep_one, 0, triggerLevelSink.first, 0);
-	}
-
-	for (auto pair = math_sinks.begin(); pair != math_sinks.end(); pair++) {
-		auto math = pair.value().first;
-		iio->disconnect(adc_samp_conv_block, i, math, i);
-		iio->connect(subBlocks.at(i), 0, math, i);
 	}
 
 	for(int ch = 0; ch < nb_channels; ch++)
@@ -1140,11 +1180,8 @@ void Oscilloscope::deactivateAcCoupling(int i)
 	dynamic_pointer_cast<adc_sample_conv>(
 					adc_samp_conv_block);
 
-	for (auto pair = math_sinks.begin(); pair != math_sinks.end(); pair++) {
-		auto math = pair.value().first;
-		iio->disconnect(subBlocks.at(i), 0, math, i);
-		iio->connect(adc_samp_conv_block, i, math, i);
-	}
+	iio->disconnect(subBlocks.at(i), 0, math_probe_atten.at(i), 0);
+	iio->connect(adc_samp_conv_block, i, math_probe_atten.at(i), 0);
 
 	iio->disconnect(block, i, subBlocks.at(i), 0);
 	iio->disconnect(block, i, filterBlocks.at(i), 0);
@@ -1702,11 +1739,7 @@ void Oscilloscope::add_math_channel(const std::string& function)
 	math_sink->set_trigger_mode(TRIG_MODE_TAG, 0, "buffer_start");
 
 	for (unsigned int i = 0; i < nb_channels; i++) {
-		if(subBlocks.at(i) != nullptr) {
-			iio->connect(subBlocks.at(i), 0, math, i);
-		} else {
-			iio->connect(adc_samp_conv_block, i, math, i);
-		}
+		iio->connect(math_probe_atten.at(i), 0, math, i);
 	}
 	iio->connect(math, 0, rail, 0);
 	iio->connect(rail, 0, math_sink, 0);
@@ -1877,11 +1910,7 @@ void Oscilloscope::onChannelWidgetDeleteClicked()
 		auto rail = math_rails.take(qname);
 
 		for (unsigned int i = 0; i < nb_channels; i++) {
-			if (subBlocks.at(i) != nullptr) {
-				iio->disconnect(subBlocks.at(i), 0, pair.first, i);
-			} else {
-				iio->disconnect(adc_samp_conv_block, i, pair.first, i);
-			}
+			iio->disconnect(math_probe_atten.at(i), 0, pair.first, i);
 		}
 
 		iio->disconnect(pair.first, 0, rail, 0);
@@ -3166,6 +3195,17 @@ void Oscilloscope::update_chn_settings_panel(int id)
 		ch_ui->btnAutoset->setVisible(true);
 	}
 
+	auto max_elem = max_element(probe_attenuation.begin(), probe_attenuation.begin() + nb_channels);
+	if (chn_widget->isMathChannel()) {
+		voltsPerDiv->silentSetMaxValue((*max_elem) * 10);
+		voltsPosition->silentSetMaxValue((*max_elem) * MAX_AMPL);
+		voltsPosition->silentSetMinValue((*max_elem) * (-MAX_AMPL));
+	} else {
+		voltsPerDiv->silentSetMaxValue(10);
+		voltsPosition->silentSetMaxValue(MAX_AMPL);
+		voltsPosition->silentSetMinValue(-MAX_AMPL);
+	}
+
 	voltsPerDiv->setDisplayScale(probe_attenuation[id]);
 	voltsPosition->setDisplayScale(probe_attenuation[id]);
 }
@@ -3207,9 +3247,6 @@ void Oscilloscope::editMathChannelFunction(int id, const std::string& new_functi
 	addChannel = true;
 	ch_ui->btnEditMath->setChecked(false);
 
-	if (chn_widget->function().toStdString() == new_function)
-		return;
-
 	QString qname = chn_widget->deleteButton()->property("curve_name").toString();
 	std::string name = qname.toStdString();
 
@@ -3236,11 +3273,7 @@ void Oscilloscope::editMathChannelFunction(int id, const std::string& new_functi
 	auto pair = math_sinks.value(qname);
 	auto rail_old = math_rails.value(qname);
 	for (unsigned int i = 0; i < nb_channels; ++i) {
-		if(subBlocks.at(i) != nullptr) {
-			iio->disconnect(subBlocks.at(i), 0, pair.first, i);
-		} else {
-			iio->disconnect(adc_samp_conv_block, i, pair.first, i);
-		}
+		iio->disconnect(math_probe_atten.at(i), 0, pair.first, i);
 	}
 	iio->disconnect(pair.first, 0, rail_old, 0);
 	iio->disconnect(rail_old, 0, pair.second, 0);
@@ -3252,11 +3285,7 @@ void Oscilloscope::editMathChannelFunction(int id, const std::string& new_functi
 	math_rails.insert(qname, rail);
 
 	for (unsigned int i = 0; i < nb_channels; ++i) {
-		if(subBlocks.at(i) != nullptr) {
-			iio->connect(subBlocks.at(i), 0, math, i);
-		} else {
-			iio->connect(adc_samp_conv_block, i, math, i);
-		}
+		iio->connect(math_probe_atten.at(i), 0, math, i);
 	}
 	iio->connect(math, 0, rail, 0);
 	iio->connect(rail, 0, pair.second, 0);

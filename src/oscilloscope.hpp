@@ -28,6 +28,7 @@
 #include <gnuradio/blocks/complex_to_mag_squared.h>
 #include <gnuradio/blocks/keep_one_in_n.h>
 #include <gnuradio/blocks/vector_sink_f.h>
+#include <gnuradio/blocks/multiply_const_ff.h>
 
 /* Qt includes */
 #include <QPair>
@@ -304,6 +305,7 @@ namespace adiscope {
 		QMap<QString, QPair<gr::basic_block_sptr,
 			gr::basic_block_sptr>> math_sinks;
 		QMap<QString, gr::basic_block_sptr> math_rails;
+		std::vector<boost::shared_ptr<gr::blocks::multiply_const_ff>> math_probe_atten;
 
 		iio_manager::port_id *ids;
 		iio_manager::port_id *fft_ids;
