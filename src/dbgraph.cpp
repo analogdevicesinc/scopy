@@ -77,12 +77,12 @@ void dBgraph::setupReadouts()
 
 dBgraph::dBgraph(QWidget *parent) : QwtPlot(parent),
     curve("data"),
-    d_cursorsCentered(false),
-    d_cursorsEnabled(false),
     xmin(10),
     xmax(10),
     ymin(10),
-    ymax(10)
+    ymax(10),
+    d_cursorsEnabled(false),
+    d_cursorsCentered(false)
 {
 	enableAxis(QwtPlot::xBottom, false);
 	enableAxis(QwtPlot::xTop, true);

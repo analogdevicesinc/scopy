@@ -37,14 +37,14 @@ Calibration::Calibration(struct iio_context *ctx, QJSEngine *engine,
 			 std::shared_ptr<M2kDac> dac_a,
 			 std::shared_ptr<M2kDac> dac_b):
 	m_api(new Calibration_API(this)),
-	m_ctx(ctx),
-	m_dac_a_buffer(NULL),
-	m_dac_b_buffer(NULL),
-	m_initialized(false),
+	m_cancel(false),
 	m2k_adc(adc),
 	m2k_dac_a(dac_a),
 	m2k_dac_b(dac_b),
-	m_cancel(false)
+	m_ctx(ctx),
+	m_dac_a_buffer(NULL),
+	m_dac_b_buffer(NULL),
+	m_initialized(false)
 {
 	m_api->setObjectName("calib");
 	m_api->js_register(engine);
