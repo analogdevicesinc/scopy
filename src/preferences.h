@@ -92,6 +92,9 @@ public:
 	bool getMini_hist_enabled() const;
 	void setMini_hist_enabled(bool value);
 
+	bool getDigital_decoders_enabled() const;
+	void setDigital_decoders_enabled(bool value);
+
 Q_SIGNALS:
 
 	void notify();
@@ -121,6 +124,7 @@ private:
 	bool animations_enabled;
 	bool osc_filtering_enabled;
 	bool mini_hist_enabled;
+	bool digital_decoders_enabled;
 
 	Preferences_API *pref_api;
 	QString getPreferenceIniFile() const;
@@ -145,6 +149,7 @@ class Preferences_API : public ApiObject
 	Q_PROPERTY(bool animations_enabled READ getAnimationsEnabled WRITE setAnimationsEnabled)
 	Q_PROPERTY(bool osc_filtering_enabled READ getOscFilteringEnabled WRITE setOscFilteringEnabled)
 	Q_PROPERTY(bool mini_hist_enabled READ getMiniHist WRITE setMiniHist)
+	Q_PROPERTY(bool digital_decoders READ getDigitalDecoders WRITE setDigitalDecoders)
 
 public:
 
@@ -193,6 +198,9 @@ public:
 
 	bool getMiniHist() const;
 	void setMiniHist(const bool& enabled);
+
+	bool getDigitalDecoders() const;
+	void setDigitalDecoders(const bool& enabled);
 
 private:
 	Preferences *preferencePanel;
