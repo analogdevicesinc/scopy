@@ -296,7 +296,6 @@ void Debugger::on_writeRegPushButton_clicked()
 {
 	QString device = ui->DevicecomboBox->currentText();
 	uint32_t address = ui->addressSpinBox->value();
-	uint32_t value = ui->valueSpinBox->value();
 
 	reg->writeRegister(&device, address, ui->valueSpinBox->value());
 

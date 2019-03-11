@@ -91,7 +91,6 @@ void BitfieldWidget::createWidget()
 		/*set spinBox*/
 		ui->stackedWidget->setCurrentIndex(1);
 		int temp = (int)pow(2, width) - 1;
-		long temp2= ui->valueSpinBox->maximum();
 		ui->valueSpinBox->setMaximum(temp);
 		connect(ui->valueSpinBox, SIGNAL(valueChanged(int)), this,
 		        SLOT(setValue(int))); //connect spinBox singnal to the value changed signal
