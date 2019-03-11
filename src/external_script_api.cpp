@@ -38,7 +38,6 @@ ExternalScript_API::ExternalScript_API(QObject *parent):
 QString ExternalScript_API::start(const QString& cmd)
 {
 	QString ret = "";
-	bool procRet;
 	if (m_external_process != nullptr) {
 		m_external_process->deleteLater();
 		m_external_process = nullptr;
@@ -51,12 +50,12 @@ QString ExternalScript_API::start(const QString& cmd)
 	m_external_process->start("/bin/sh", arguments);
 
 	if (m_process_timeout > 0) {
-		procRet = m_external_process->waitForFinished(m_process_timeout);
+		m_external_process->waitForFinished(m_process_timeout);
 		ret = m_external_process->readAll();
 		m_external_process->deleteLater();
 		m_external_process = nullptr;
 	} else {
-		procRet = m_external_process->waitForFinished(-1);
+		m_external_process->waitForFinished(-1);
 		ret = m_external_process->readAll();
 	}
 	return ret;
