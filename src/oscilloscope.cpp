@@ -3238,17 +3238,17 @@ void Oscilloscope::editMathChannelFunction(int id, const std::string& new_functi
 	int current_x = index_x;
 	int current_y = index_y;
 
+	triggerRightMenuToggle(
+				static_cast<CustomPushButton* >(ui->btnAddMath), false);
+	triggerRightMenuToggle(
+				static_cast<CustomPushButton* >(chn_widget->menuButton()), true);
+	math_pair->first.btnAddChannel->setText("Add Channel");
+	math_pair->second->setFunction("");
+	addChannel = true;
+	ch_ui->btnEditMath->setChecked(false);
 
-	if (new_function != chn_widget->function().toStdString()) {
-		triggerRightMenuToggle(
-					static_cast<CustomPushButton* >(ui->btnAddMath), false);
-		triggerRightMenuToggle(
-					static_cast<CustomPushButton* >(chn_widget->menuButton()), true);
-		math_pair->first.btnAddChannel->setText("Add Channel");
-		math_pair->second->setFunction("");
-		addChannel = true;
-		ch_ui->btnEditMath->setChecked(false);
-	}
+	if (chn_widget->function().toStdString() == new_function)
+		return;
 
 	QString qname = chn_widget->deleteButton()->property("curve_name").toString();
 	std::string name = qname.toStdString();
