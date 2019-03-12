@@ -125,6 +125,7 @@ private:
 	bool osc_filtering_enabled;
 	bool mini_hist_enabled;
 	bool digital_decoders_enabled;
+	bool m_initialized;
 
 	Preferences_API *pref_api;
 	QString getPreferenceIniFile() const;
@@ -200,7 +201,7 @@ public:
 	void setMiniHist(const bool& enabled);
 
 	bool getDigitalDecoders() const;
-	void setDigitalDecoders(const bool& enabled);
+	void setDigitalDecoders(bool enabled);
 
 private:
 	Preferences *preferencePanel;

@@ -48,7 +48,8 @@ Preferences::Preferences(QWidget *parent) :
 	animations_enabled(true),
 	osc_filtering_enabled(true),
 	mini_hist_enabled(false),
-	digital_decoders_enabled(true)
+	digital_decoders_enabled(true),
+	m_initialized(false)
 {
 	ui->setupUi(this);
 
@@ -131,6 +132,14 @@ Preferences::Preferences(QWidget *parent) :
 	connect(ui->decodersCheckBox, &QCheckBox::stateChanged, [=](int state){
 		digital_decoders_enabled = (!state ? false : true);
 		Q_EMIT notify();
+
+		if (m_initialized) {
+			QMessageBox info(this);
+			info.setText("This changes will be applied only after a Scopy reset.");
+			info.exec();
+		} else {
+			m_initialized = true;
+		}
 	});
 
 	QString preference_ini_file = getPreferenceIniFile();
@@ -518,7 +527,7 @@ bool Preferences_API::getDigitalDecoders() const
 	return preferencePanel->digital_decoders_enabled;
 }
 
-void Preferences_API::setDigitalDecoders(const bool &enabled)
+void Preferences_API::setDigitalDecoders(bool enabled)
 {
 	preferencePanel->digital_decoders_enabled = enabled;
 }
