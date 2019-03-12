@@ -29,6 +29,7 @@
 #include <gnuradio/blocks/keep_one_in_n.h>
 #include <gnuradio/blocks/vector_sink_f.h>
 #include <gnuradio/blocks/multiply_const_ff.h>
+#include <gnuradio/analog/rail_ff.h>
 
 /* Qt includes */
 #include <QPair>
@@ -304,7 +305,7 @@ namespace adiscope {
 
 		QMap<QString, QPair<gr::basic_block_sptr,
 			gr::basic_block_sptr>> math_sinks;
-		QMap<QString, gr::basic_block_sptr> math_rails;
+		QMap<QString, boost::shared_ptr<gr::analog::rail_ff>> math_rails;
 		std::vector<boost::shared_ptr<gr::blocks::multiply_const_ff>> math_probe_atten;
 
 		iio_manager::port_id *ids;

@@ -29,7 +29,6 @@
 #include <gnuradio/blocks/head.h>
 #include <gnuradio/blocks/null_source.h>
 #include <gnuradio/blocks/null_sink.h>
-#include <gnuradio/analog/rail_ff.h>
 #include <gnuradio/blocks/multiply_const_ff.h>
 
 /* Qt includes */
@@ -74,8 +73,8 @@
 #include "ui_trigger_settings.h"
 
 #define MAX_MATH_CHANNELS 4
-#define MAX_MATH_RANGE 500
-#define MIN_MATH_RANGE -500
+#define MAX_MATH_RANGE 100
+#define MIN_MATH_RANGE -100
 #define MAX_AMPL 25
 
 using namespace adiscope;
@@ -665,6 +664,12 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 			math_probe_atten[current_ch_widget]->set_k(value);
 		}
 
+		auto max_elem = max_element(probe_attenuation.begin(), probe_attenuation.begin() + nb_channels);
+		for (auto rail : math_rails.values()) {
+			rail->set_lo(MIN_MATH_RANGE * (*max_elem));
+			rail->set_hi(MAX_MATH_RANGE * (*max_elem));
+		}
+
 		if (started)
 			iio->unlock();
 
@@ -673,14 +678,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 						ui->chn_scales->itemAt(i)->widget());
 			double value = probe_attenuation[i] * plot.VertUnitsPerDiv(i);
 			label->setText(vertMeasureFormat.format(value, "V/div", 3));
-
-			ChannelWidget *cw = channelWidgetAtId(i);
-			if (cw->isMathChannel()) {
-				editMathChannelFunction(i, cw->function().toStdString());
-			}
 		}
 
-		auto max_elem = max_element(probe_attenuation.begin(), probe_attenuation.begin() + nb_channels);
 		if (channelWidgetAtId(current_ch_widget)->isMathChannel()) {
 			voltsPerDiv->silentSetMaxValue((*max_elem) * 10);
 			voltsPosition->silentSetMaxValue((*max_elem) * MAX_AMPL);
