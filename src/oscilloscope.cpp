@@ -1747,7 +1747,7 @@ void Oscilloscope::add_math_channel(const std::string& function)
 	if (started)
 		iio->unlock();
 
-	plot.registerSink(name, 1,
+	plot.registerMathWaveform(name, 1,
 			noZoomXAxisWidth *
 			adc->sampleRate());
 
@@ -1874,7 +1874,7 @@ void Oscilloscope::onChannelWidgetDeleteClicked()
 	measure_settings->onChannelRemoved(curve_id);
 
 	if (cw->isMathChannel()) {
-		plot.unregisterSink(qname.toStdString());
+		plot.unregisterMathWaveform(qname.toStdString());
 
 		exportSettings->removeChannel(curve_id - nb_ref_channels);
 		exportConfig.remove(curve_id - nb_ref_channels);

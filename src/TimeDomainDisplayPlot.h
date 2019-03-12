@@ -111,6 +111,10 @@ public:
 	unsigned long long channelsDataLength, bool curvesAttached = true);
   bool unregisterSink(std::string sinkName);
 
+  bool registerMathWaveform(std::string sinkUniqueNme, unsigned int numChannels,
+	unsigned long long channelsDataLength, bool curvesAttached = true);
+  bool unregisterMathWaveform(std::string sinkName);
+
   long dataStartingPoint() const;
 
   void addZoomer(unsigned int zoomerIdx);
@@ -185,6 +189,7 @@ protected:
   QVector<QVector<double>> d_preview_ydata;
   QVector<QwtPlotCurve *> d_preview_curves;
   bool isReferenceWaveform(QwtPlotCurve *curve);
+  bool isMathWaveform(QwtPlotCurve *curve);
   int countReferenceWaveform(int position);
 
 private:
@@ -220,6 +225,7 @@ private:
   QColor getChannelColor();
 
   QMap<QString, QwtPlotCurve *> d_ref_curves;
+  QMap<QString, QwtPlotCurve *> d_math_curves;
   int d_nb_ref_curves;
   int getCurveNextTo(int pos);
 };
