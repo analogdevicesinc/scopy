@@ -1436,6 +1436,7 @@ void CapturePlot::onChannelAdded(int chnIdx)
 		measure = new Measure(chnIdx, d_ydata[chnIdx - count],
 			Curve(chnIdx)->data()->size());
 	}
+
 	measure->setAdcBitCount(12);
 	d_measureObjs.push_back(measure);
 }
@@ -1511,6 +1512,11 @@ void CapturePlot::onNewDataReceived()
 			measure->setDataSource(d_ydata[chn - count],
 					Curve(chn)->data()->size());
 		}
+
+		if (isMathWaveform(Curve(chn))) {
+			measure->setAdcBitCount(0);
+		}
+
 		measure->setSampleRate(this->sampleRate());
 		measure->measure();
 	}
