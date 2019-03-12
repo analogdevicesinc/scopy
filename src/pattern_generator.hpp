@@ -101,8 +101,8 @@ public:
 	void settingsLoaded();
 	bool suppressCGSettingsUpdate;
 
-	bool getUse_decoders() const;
-	void setUse_decoders(bool use_decoders);
+	bool getUseDecoders() const;
+	void setUseDecoders(bool use_decoders);
 
 private Q_SLOTS:
 

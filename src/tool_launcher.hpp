@@ -86,8 +86,8 @@ public:
 	Preferences *getPrefPanel() const;
 	bool eventFilter(QObject *watched, QEvent *event);
 
-	bool getUse_decoders() const;
-	void setUse_decoders(bool use_decoders);
+	bool getUseDecoders() const;
+	void setUseDecoders(bool use_decoders);
 
 Q_SIGNALS:
 	void connectionDone(bool success);

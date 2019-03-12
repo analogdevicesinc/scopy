@@ -243,7 +243,7 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 	chmui = new PatternGeneratorChannelManagerUI(ui->channelManagerWidget, main_win,
 	                &chm, cgSettings, this);
 
-	setUse_decoders(parent->getUse_decoders());
+	setUseDecoders(parent->getUseDecoders());
 	ui->channelManagerWidgetLayout->addWidget(chmui);
 	ui->btnChSettings->setChecked(true);
 	ui->rightWidget->setCurrentIndex(1);
@@ -450,16 +450,16 @@ void PatternGenerator::enableCgSettings(bool en)
 	colour_button_low->setEnabled(en);
 }
 
-bool PatternGenerator::getUse_decoders() const
+bool PatternGenerator::getUseDecoders() const
 {
 	return m_use_decoders;
 }
 
-void PatternGenerator::setUse_decoders(bool use_decoders)
+void PatternGenerator::setUseDecoders(bool use_decoders)
 {
 	m_use_decoders = use_decoders;
 	if (chmui) {
-		chmui->setUse_decoders(m_use_decoders);
+		chmui->setUseDecoders(m_use_decoders);
 	}
 }
 
