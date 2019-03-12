@@ -18,6 +18,7 @@
  */
 
 #include "measure.h"
+#include <cmath>
 #include "adc_sample_conv.hpp"
 #include <qmath.h>
 #include <QDebug>
@@ -499,6 +500,10 @@ void Measure::measure()
 	int startIndex;
 	int endIndex;
 
+	if (isnanf(data[0])) {
+		return;
+	}
+
 	//if gating is enabled measure only on data between the gates
 	if(m_gatingEnabled){
 		//make sure that start/end indexes are valid
@@ -525,10 +530,6 @@ void Measure::measure()
 		endIndex = data_length;
 	}
 
-	if (isnanl(data[0])) {
-		return;
-	}
-
 	m_cross_detect = new CrossingDetection(m_cross_level, m_hysteresis_span,
 			"P");
 	if (using_histogram_method)
@@ -536,7 +537,7 @@ void Measure::measure()
 
 	for (size_t i = startIndex; i < endIndex; i++) {
 
-		if (isnanl(data[i])) {
+		if (isnanf(data[i])) {
 			count--;
 			continue;
 		}
