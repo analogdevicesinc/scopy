@@ -362,12 +362,12 @@ void ToolLauncher::allowExternalScript(bool prefEnabled)
 	}
 }
 
-bool ToolLauncher::getUse_decoders() const
+bool ToolLauncher::getUseDecoders() const
 {
 	return m_use_decoders;
 }
 
-void ToolLauncher::setUse_decoders(bool use_decoders)
+void ToolLauncher::setUseDecoders(bool use_decoders)
 {
 	m_use_decoders = use_decoders;
 	prefPanel->setDigital_decoders_enabled(use_decoders);

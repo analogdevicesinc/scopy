@@ -893,7 +893,7 @@ void PatternGeneratorChannelGroupUI::setupUARTDecoder()
 	if(uart==nullptr)
 		return;
 
-	if (getManagerUi()->getUse_decoders()) {
+	if (getManagerUi()->getUseDecoders()) {
 		auto chMap = setupDecoder("uart",ids);
 
 		auto uartdecoderstack = decodeTrace->decoder()->stack();
@@ -960,7 +960,7 @@ void PatternGeneratorChannelGroupUI::setupParallelDecoder()
 		ids.push_back(chg->get_channel(i)->get_id());
 	}
 
-	if (getManagerUi()->getUse_decoders()) {
+	if (getManagerUi()->getUseDecoders()) {
 		auto chMap = setupDecoder("parallel",ids);
 
 		decodeTrace->set_channel_map(chMap);
@@ -980,7 +980,7 @@ void PatternGeneratorChannelGroupUI::setupSPIDecoder()
 			ids.push_back(chg->get_channel(2)->get_id());
 		}
 
-		if (getManagerUi()->getUse_decoders()) {
+		if (getManagerUi()->getUseDecoders()) {
 			auto chMap = setupDecoder("spi",ids);
 			auto spidecoder = decodeTrace->decoder()->stack().front();
 			auto spipattern = dynamic_cast<SPIPattern *>(getChannelGroup()->pattern);
@@ -1030,7 +1030,7 @@ void PatternGeneratorChannelGroupUI::setupI2CDecoder()
 		ids.push_back(chg->get_channel(1)->get_id());
 
 
-		if (getManagerUi()->getUse_decoders()) {
+		if (getManagerUi()->getUseDecoders()) {
 			auto chMap = setupDecoder("i2c",ids);
 
 			auto i2cdecoder = decodeTrace->decoder()->stack().front();
@@ -1556,12 +1556,12 @@ QFrame *PatternGeneratorChannelManagerUI::addSeparator(QVBoxLayout *lay,
 	return line;
 }
 
-bool PatternGeneratorChannelManagerUI::getUse_decoders() const
+bool PatternGeneratorChannelManagerUI::getUseDecoders() const
 {
 	return m_use_decoders;
 }
 
-void PatternGeneratorChannelManagerUI::setUse_decoders(bool use_decoders)
+void PatternGeneratorChannelManagerUI::setUseDecoders(bool use_decoders)
 {
 	m_use_decoders = use_decoders;
 }

@@ -70,7 +70,7 @@ int main(int argc, char **argv)
 	bool nogui = parser.isSet("nogui");
 	bool nodecoders = parser.isSet("nodecoders");
 	if (nodecoders) {
-		launcher.setUse_decoders(false);
+		launcher.setUseDecoders(false);
 	}
 	QString script = parser.value("script");
 	if (nogui) {

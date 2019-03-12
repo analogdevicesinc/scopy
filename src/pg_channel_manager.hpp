@@ -296,8 +296,8 @@ public:
 
 	std::vector<PatternGeneratorChannelGroupUI*> getEnabledChannelGroups();
 
-	bool getUse_decoders() const;
-	void setUse_decoders(bool use_decoders);
+	bool getUseDecoders() const;
+	void setUseDecoders(bool use_decoders);
 
 private:
 	QFrame *addSeparator(QVBoxLayout *lay, int pos);
