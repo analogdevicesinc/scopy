@@ -37,6 +37,10 @@ PrefixFormatter::PrefixFormatter(const vector<pair<QString, double>> &prefixes):
 				[](const pair<QString, double>& element) {return element.second == 1E0;} ) - m_prefixes.begin();
 }
 
+PrefixFormatter::~PrefixFormatter()
+{
+}
+
 void PrefixFormatter::setTwoDecimalMode(bool enable)
 {
 	m_twoDecimalMode = enable;
