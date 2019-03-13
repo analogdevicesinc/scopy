@@ -111,9 +111,9 @@ public:
 	unsigned long long channelsDataLength, bool curvesAttached = true);
   bool unregisterSink(std::string sinkName);
 
-  bool registerMathWaveform(std::string sinkUniqueNme, unsigned int numChannels,
+  bool registerMathWaveform(const std::string &sinkUniqueNme, unsigned int numChannels,
 	unsigned long long channelsDataLength, bool curvesAttached = true);
-  bool unregisterMathWaveform(std::string sinkName);
+  bool unregisterMathWaveform(const std::string &sinkName);
 
   long dataStartingPoint() const;
 
@@ -189,7 +189,7 @@ protected:
   QVector<QVector<double>> d_preview_ydata;
   QVector<QwtPlotCurve *> d_preview_curves;
   bool isReferenceWaveform(QwtPlotCurve *curve);
-  bool isMathWaveform(QwtPlotCurve *curve);
+  bool isMathWaveform(QwtPlotCurve *curve) const;
   int countReferenceWaveform(int position);
 
 private:
