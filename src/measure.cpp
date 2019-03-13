@@ -500,7 +500,7 @@ void Measure::measure()
 	int startIndex;
 	int endIndex;
 
-	if (isnanf(data[0])) {
+	if (qIsNaN(data[0])) {
 		return;
 	}
 
@@ -537,7 +537,7 @@ void Measure::measure()
 
 	for (size_t i = startIndex; i < endIndex; i++) {
 
-		if (isnanf(data[i])) {
+		if (qIsNaN(data[i])) {
 			count--;
 			continue;
 		}
