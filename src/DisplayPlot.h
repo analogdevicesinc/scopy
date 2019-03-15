@@ -64,9 +64,6 @@ namespace adiscope {
 
 class PlotAxisConfiguration;
 
-static QwtScaleDiv getEdgelessScaleDiv(const QwtScaleDiv& from_scaleDiv);
-
-
 class ScaleDivisions: public QObject
 {
 Q_OBJECT

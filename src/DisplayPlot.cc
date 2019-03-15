@@ -37,6 +37,8 @@
 
 using namespace adiscope;
 
+static QwtScaleDiv getEdgelessScaleDiv(const QwtScaleDiv& from_scaleDiv);
+
 /*
  * OscScaleDraw class implementation
  */
@@ -1424,7 +1426,7 @@ void DisplayPlot::bottomHorizAxisInit()
 		      this, SLOT(_onXbottomAxisWidgetScaleDivChanged()));
 }
 
-QwtScaleDiv adiscope::getEdgelessScaleDiv(const QwtScaleDiv& from_scaleDiv)
+static QwtScaleDiv getEdgelessScaleDiv(const QwtScaleDiv& from_scaleDiv)
 {
 	double lowerBound;
 	double upperBound;
