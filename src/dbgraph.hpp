@@ -132,7 +132,7 @@ Q_SIGNALS:
 		QwtPlotCurve curve;
 		QwtPlotMarker *markerIntersection1;
 		QwtPlotMarker *markerIntersection2;
-		unsigned int numSamples;
+		int numSamples;
 		double xmin, xmax, ymin, ymax;
 		QColor color;
 		double thickness;

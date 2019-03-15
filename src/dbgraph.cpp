@@ -262,7 +262,7 @@ const QwtScaleWidget *dBgraph::getAxisWidget(QwtAxisId id)
 
 void dBgraph::setNumSamples(int num)
 {
-	numSamples = (unsigned int) num;
+	numSamples = num;
 
 	reset();
 	ydata.reserve(numSamples + 1);
