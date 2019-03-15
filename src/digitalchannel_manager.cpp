@@ -254,7 +254,7 @@ std::vector<Channel *> *ChannelGroup::get_channels()
 	return &channels;
 }
 
-Channel *ChannelGroup::get_channel(int index)
+Channel *ChannelGroup::get_channel(unsigned int index)
 {
 	if (index < channels.size()) {
 		return channels[index];
