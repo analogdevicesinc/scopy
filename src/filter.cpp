@@ -126,7 +126,7 @@ bool Filter::usable(enum tool tool, const std::string &dev) const
 	return hdl.toArray().contains(QString::fromStdString(dev));
 }
 
-const std::string Filter::device_name(enum tool tool, unsigned int idx) const
+const std::string Filter::device_name(enum tool tool, int idx) const
 {
 	auto hdl = root[QString::fromStdString(tool_names[tool] + "-devices")];
 	if (hdl.isNull() || !hdl.isArray())
@@ -140,13 +140,13 @@ const std::string Filter::device_name(enum tool tool, unsigned int idx) const
 }
 
 struct iio_device * Filter::find_device(const struct iio_context *ctx,
-		enum tool tool, unsigned int idx) const
+		enum tool tool, int idx) const
 {
 	return iio_context_find_device(ctx, device_name(tool, idx).c_str());
 }
 
 struct iio_channel * Filter::find_channel(const struct iio_context *ctx,
-		enum tool tool, unsigned int idx, bool output) const
+		enum tool tool, int idx, bool output) const
 {
 	QString name = QString::fromStdString(device_name(tool, idx));
 
