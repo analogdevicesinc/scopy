@@ -124,14 +124,7 @@ GraticulePlotScaleItem::GraticulePlotScaleItem(
 {
 }
 
-void GraticulePlotScaleItem::updateScaleDiv( const QwtScaleDiv& xScaleDiv,
-    const QwtScaleDiv& yScaleDiv )
-{
-	QwtPlotScaleItem::updateScaleDiv(getGraticuleScaleDiv(xScaleDiv),
-					getGraticuleScaleDiv(yScaleDiv));
-}
-
-QwtScaleDiv adiscope::getGraticuleScaleDiv(const QwtScaleDiv& from_scaleDiv)
+static QwtScaleDiv getGraticuleScaleDiv(const QwtScaleDiv& from_scaleDiv)
 {
 	double lowerBound;
 	double upperBound;
@@ -153,5 +146,9 @@ QwtScaleDiv adiscope::getGraticuleScaleDiv(const QwtScaleDiv& from_scaleDiv)
 	return QwtScaleDiv(lowerBound, upperBound, minorTicks, mediumTicks, majorTicks);
 }
 
-
-
+void GraticulePlotScaleItem::updateScaleDiv( const QwtScaleDiv& xScaleDiv,
+    const QwtScaleDiv& yScaleDiv )
+{
+	QwtPlotScaleItem::updateScaleDiv(getGraticuleScaleDiv(xScaleDiv),
+					getGraticuleScaleDiv(yScaleDiv));
+}

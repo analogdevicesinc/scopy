@@ -26,8 +26,6 @@
 
 namespace adiscope {
 
-static QwtScaleDiv getGraticuleScaleDiv(const QwtScaleDiv& from_scaleDiv);
-
 class Graticule : public QObject
 {
 	Q_OBJECT
