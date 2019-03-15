@@ -575,7 +575,7 @@ void dBgraph::moveCursorReadouts(CustomPlotPositionButton::ReadoutsPosition posi
 QVector<double> dBgraph::getXAxisData()
 {
 	QVector<double> data;
-	for (int i = 0; i < curve.data()->size(); ++i) {
+	for (unsigned int i = 0; i < curve.data()->size(); ++i) {
 		data.push_back(curve.data()->sample(i).x());
 	}
 	return data;
@@ -584,7 +584,7 @@ QVector<double> dBgraph::getXAxisData()
 QVector<double> dBgraph::getYAxisData()
 {
 	QVector<double> data;
-	for (int i = 0; i < curve.data()->size(); ++i) {
+	for (unsigned int i = 0; i < curve.data()->size(); ++i) {
 		data.push_back(curve.data()->sample(i).y());
 	}
 	return data;

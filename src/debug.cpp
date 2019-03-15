@@ -146,7 +146,7 @@ void Debug::scanChannelAttributes(QString devName, QString& channel)
 	struct iio_device *device;
 	struct iio_channel *ch;
 	const char *attr;
-	int Count = 0;
+	unsigned int nb_attrs;
 	bool isOutput;
 
 	if (connected) { //check if M2K is connected
@@ -166,9 +166,9 @@ void Debug::scanChannelAttributes(QString devName, QString& channel)
 		if (channel != QString("Global")) {
 			ch = iio_device_find_channel(device, channel.toLatin1().data(), isOutput);
 
-			unsigned int nb_attrs = iio_channel_get_attrs_count(ch);
+			nb_attrs = iio_channel_get_attrs_count(ch);
 
-			for (int k = 0; k < nb_attrs; k++) {
+			for (unsigned int k = 0; k < nb_attrs; k++) {
 				attr = iio_channel_get_attr(ch, k);
 
 				if (QString(attr).contains("available", Qt::CaseInsensitive)) {
@@ -179,9 +179,9 @@ void Debug::scanChannelAttributes(QString devName, QString& channel)
 				}
 			}
 		} else {
-			Count = iio_device_get_attrs_count(device);
+			nb_attrs = iio_device_get_attrs_count(device);
 
-			for (int k = 0; k < Count; k++) {
+			for (unsigned int k = 0; k < nb_attrs; k++) {
 				attr = iio_device_get_attr(device, k);
 
 				if (QString(attr).contains("available", Qt::CaseInsensitive)) {
