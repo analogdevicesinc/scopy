@@ -378,7 +378,7 @@ uint16_t ChannelGroup::get_mask()
 {
 	uint16_t mask = 0;
 
-	for (auto i=0; i<channels.size(); i++) {
+	for (unsigned int i=0; i<channels.size(); i++) {
 		mask = mask | channels[i]->get_mask();
 	}
 

@@ -40,7 +40,7 @@ template <typename T> void ApiObject::save(QSettings& settings,
 {
 	settings.beginWriteArray(prop, list.size());
 
-	for (unsigned int i = 0; i < list.size(); i++) {
+	for (int i = 0; i < list.size(); i++) {
 		settings.setArrayIndex(i);
 		settings.setValue("idx", QVariant(list.at(i)));
 	}
@@ -53,7 +53,7 @@ void ApiObject::save(QSettings& settings, const QString& prop,
 {
 	settings.beginWriteArray(prop, list.size());
 
-	for (unsigned int i = 0; i < list.size(); i++) {
+	for (int i = 0; i < list.size(); i++) {
 		settings.setArrayIndex(i);
 		save_nogroup(list.at(i).value<ApiObject *>(), settings);
 	}
@@ -67,7 +67,7 @@ template <typename T> QList<T> ApiObject::load(
 	int nb = settings.beginReadArray(prop);
 	QList<T> list;
 
-	for (unsigned int i = 0; i < nb; i++) {
+	for (int i = 0; i < nb; i++) {
 		settings.setArrayIndex(i);
 		list.append(settings.value("idx").value<T>());
 	}
@@ -81,7 +81,7 @@ void ApiObject::load(QSettings& settings, const QString& prop,
 {
 	int nb = settings.beginReadArray(prop);
 
-	for (unsigned int i = 0; i < nb; i++) {
+	for (int i = 0; i < nb; i++) {
 		settings.setArrayIndex(i);
 		load_nogroup(list.at(i).value<ApiObject *>(), settings);
 	}
@@ -92,7 +92,7 @@ void ApiObject::load(QSettings& settings, const QString& prop,
 void ApiObject::load_nogroup(ApiObject *obj, QSettings& settings)
 {
 	auto meta = obj->metaObject();
-	for (unsigned int i = meta->propertyOffset();
+	for (int i = meta->propertyOffset();
 			i < meta->propertyCount(); i++) {
 		auto prop = meta->property(i);
 		if (!prop.isStored() || !prop.isReadable())
@@ -143,7 +143,7 @@ void ApiObject::load_nogroup(ApiObject *obj, QSettings& settings)
 void ApiObject::save_nogroup(ApiObject *obj, QSettings& settings)
 {
 	auto meta = obj->metaObject();
-	for (unsigned int i = meta->propertyOffset();
+	for (int i = meta->propertyOffset();
 			i < meta->propertyCount(); i++) {
 		auto prop = meta->property(i);
 

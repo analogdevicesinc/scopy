@@ -77,7 +77,7 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, std::shared_ptr<GenericAdc> adc,
 
 	ui->horizontalLayout_2->addWidget(data_logging_timer);
 
-	for(int i = 0; i < adc->numAdcChannels(); i++)
+	for (unsigned int i = 0; i < adc->numAdcChannels(); i++)
 	{
 		m_min.push_back(0);
 		m_max.push_back(0);
@@ -271,7 +271,7 @@ void DMM::displayPeakHold(bool checked)
 
 void DMM::resetPeakHold(bool clicked)
 {
-	for(int ch = 0; ch < adc->numAdcChannels(); ch++) {
+	for(unsigned int ch = 0; ch < adc->numAdcChannels(); ch++) {
 		m_min[ch] = 0;
 		m_max[ch] = 0;
 		if(ch == 0) {

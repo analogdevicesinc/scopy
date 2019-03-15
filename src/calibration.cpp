@@ -506,7 +506,7 @@ bool Calibration::fine_tune(size_t span, int16_t centerVal0, int16_t centerVal1,
 	int16_t *dataCh0 = new int16_t[num_samples];
 	int16_t *dataCh1 = new int16_t[num_samples];
 	int16_t offset0, offset1;
-	int i, i0 = 0, i1 = 0;
+	size_t i, i0 = 0, i1 = 0;
 	bool ret = true;
 
 	offset0 = centerVal0 - span / 2;
@@ -538,7 +538,7 @@ bool Calibration::fine_tune(size_t span, int16_t centerVal0, int16_t centerVal1,
 	minAvg0 = qAbs(averagesCh0[0]);
 	minAvg1 = qAbs(averagesCh1[0]);
 
-	for (int i = 1; i < span + 1; i++) {
+	for (i = 1; i < span + 1; i++) {
 		if (averagesCh0[i] < minAvg0) {
 			minAvg0 = averagesCh0[i];
 			i0 = i;
