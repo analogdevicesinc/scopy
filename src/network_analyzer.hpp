@@ -35,8 +35,11 @@
 #include <gnuradio/blocks/vector_sink_s.h>
 #include <gnuradio/analog/sig_source_f.h>
 #include <gnuradio/blocks/float_to_short.h>
+#include "oscilloscope.hpp"
 
+#include "TimeDomainDisplayPlot.h"
 
+#include "networkanalyzerbufferviewer.h"
 
 extern "C" {
 	struct iio_buffer;
@@ -56,6 +59,7 @@ namespace adiscope {
 class NetworkAnalyzer_API;
 class Filter;
 class GenericAdc;
+class GenericDac;
 
 class NetworkAnalyzer : public Tool
 {
@@ -67,9 +71,12 @@ class NetworkAnalyzer : public Tool
 public:
 	explicit NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 				 std::shared_ptr<GenericAdc>& adc_dev,
+				 QList<std::shared_ptr<GenericDac>> dacs,
 				 QPushButton *runButton, QJSEngine *engine,
 				 ToolLauncher *parent);
 	~NetworkAnalyzer();
+
+	void setOscilloscope(Oscilloscope *osc);
 
 private:
 	Ui::NetworkAnalyzer *ui;
@@ -78,6 +85,7 @@ private:
 	struct iio_device *adc;
 	std::shared_ptr<GenericAdc> adc_dev;
 	boost::shared_ptr<iio_manager> iio;
+	QList<std::shared_ptr<GenericDac>> dacs;
 
 	// Sine generation blocks
 	gr::top_block_sptr top_block;
@@ -88,8 +96,6 @@ private:
 
 	QVector<unsigned long> sampleRates;
 	size_t fixedRate;
-
-
 
 	dBgraph m_dBgraph;
 	dBgraph m_phaseGraph;
@@ -116,9 +122,25 @@ private:
 
 	QVector<networkIteration> iterations;
 
+	boost::thread *iterationsThread;
+	bool iterationsThreadCanceled;
+	bool iterationsThreadReady;
+
+	bool isIterationsThreadReady();
+	bool isIterationsThreadCanceled();
+
+	boost::mutex iterationsReadyMutex;
+	boost::condition_variable iterationsReadyCv;
+
+	NetworkAnalyzerBufferViewer *bufferPreviewer;
+	QVector<Buffer> capturedData;
+
+	bool justStarted;
+	bool autoAdjustGain;
 
 	PlotLineHandleH *d_hCursorHandle1;
 	PlotLineHandleH *d_hCursorHandle2;
+	FreePlotLineHandleH *d_frequencyHandle;
 	bool d_cursorsEnabled;
 
 	ScaleSpinButton *samplesCount;
@@ -166,10 +188,16 @@ private:
 	void computeCaptureParams(double frequency, size_t& buffer_size,
 				  size_t& adc_rate);
 
+	QPair<double, double> getPhaseInterval();
+	void computeIterations();
+
+	double autoUpdateGainMode(double magnitude, double magnitudeGain);
+
 private Q_SLOTS:
 	void startStop(bool start);
 	void updateNumSamples(bool force = false);
 	void plot(double frequency, double mag, double mag2, double phase);
+	void _saveChannelBuffers(double frequency, double sample_rate, std::vector<float> data1, std::vector<float> data2);
 
 	void toggleCursors(bool en);
 	void onVbar1PixelPosChanged(int pos);
@@ -182,6 +210,9 @@ private Q_SLOTS:
 	void onStartStopFrequencyChanged(double value);
 	void onCenterSpanFrequencyChanged(double value);
 	void onMinMaxPhaseChanged(double value);
+	void onFrequencyBarMoved(int pos);
+	void toggleBufferPreview(bool toggle = false);
+
 public Q_SLOTS:
 
 	void showEvent(QShowEvent *event);

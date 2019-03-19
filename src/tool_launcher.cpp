@@ -1448,13 +1448,14 @@ void adiscope::ToolLauncher::enableAdcBasedTools()
 	}
 
 	if (filter->compatible((TOOL_NETWORK_ANALYZER))) {
-		network_analyzer = new NetworkAnalyzer(ctx, filter, adc,
+		network_analyzer = new NetworkAnalyzer(ctx, filter, adc, dacs,
 			toolMenu["Network Analyzer"]->getToolStopBtn(), &js_engine, this);
 		adc_users_group.addButton(toolMenu["Network Analyzer"]->getToolStopBtn());
 		toolList.push_back(network_analyzer);
 		connect(network_analyzer, &NetworkAnalyzer::showTool, [=]() {
 			toolMenu["Network Analyzer"]->getToolBtn()->click();
 		});
+		network_analyzer->setOscilloscope(oscilloscope);
 	}
 
 	Q_EMIT adcToolsCreated();
