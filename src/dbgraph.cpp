@@ -686,6 +686,27 @@ QVector<double> dBgraph::getYAxisData()
 	return data;
 }
 
+void dBgraph::setYAxisInterval(double min, double max, double correction)
+{
+	for (size_t i = 0; i < ydata.size(); ++i) {
+		double value = ydata[i];
+		bool modified = false;
+		if (value > max) {
+			value = value - correction;
+			modified = true;
+		} else if (value < min) {
+			value = value + correction;
+			modified = true;
+		}
+
+		if (modified) {
+			ydata[i] = value;
+			curve.setRawSamples(xdata.data(), ydata.data(), xdata.size());
+			replot();
+		}
+	}
+}
+
 void dBgraph::scaleDivChanged()
 {
 	QwtPlot *plt = static_cast<QwtPlot *>((sender())->parent());

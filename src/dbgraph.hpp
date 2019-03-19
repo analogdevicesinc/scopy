@@ -90,6 +90,7 @@ public:
 	QVector<double> getXAxisData();
 	QVector<double> getYAxisData();
 
+	void setYAxisInterval(double min, double max, double correction);
 Q_SIGNALS:
 	void VBar1PixelPosChanged(int);
 	void VBar2PixelPosChanged(int);
