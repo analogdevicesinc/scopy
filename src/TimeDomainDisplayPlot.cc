@@ -1005,6 +1005,12 @@ void TimeDomainDisplayPlot::registerReferenceWaveform(QString name, QVector<doub
 
 void TimeDomainDisplayPlot::unregisterReferenceWaveform(QString name)
 {
+	auto it = std::find(d_plot_curve.begin(), d_plot_curve.end(), d_ref_curves[name]);
+
+	if (it == d_plot_curve.end()) {
+		return;
+	}
+
 	d_plot_curve.erase(std::find(d_plot_curve.begin(), d_plot_curve.end(), d_ref_curves[name]));
 	QwtPlotCurve *curve = d_ref_curves[name];
 	d_ref_curves.remove(name);
