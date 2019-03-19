@@ -856,6 +856,100 @@ void Oscilloscope::init_selected_measurements(int chnIdx,
 	onMeasurementSelectionListChanged();
 }
 
+void Oscilloscope::remove_ref_waveform(QString name)
+{
+	int maxChnId = nb_channels + nb_math_channels + nb_ref_channels;
+	for (int i = 0; i < maxChnId; ++i) {
+		ChannelWidget *cw = channelWidgetAtId(i);
+		if (cw->fullName() == name) {
+			qDebug() << "deleted channel with name: " << cw->fullName();
+			cw->deleteButton()->click();
+		}
+	}
+}
+
+void Oscilloscope::add_ref_waveform(QString name, QVector<double> xData, QVector<double> yData, unsigned int sampleRate)
+{
+	plot.cancelZoom();
+
+	probe_attenuation.push_back(1);
+
+	plot.registerReferenceWaveform(name, xData, yData);
+
+	int curve_id = nb_channels + nb_math_channels + nb_ref_channels;
+
+	ChannelWidget *channel_widget = new ChannelWidget(curve_id, true, false,
+			plot.getLineColor(curve_id).name(), this);
+
+	channel_widget->setFullName(name);
+	channel_widget->setShortName(name);
+	channel_widget->nameButton()->setText(channel_widget->shortName());
+	channel_widget->setReferenceChannel(true);
+
+
+	channel_widget->setProperty("curve_nb", QVariant(curve_id));
+	channel_widget->deleteButton()->setProperty(
+		"curve_name", QVariant(name));
+
+	connect(channel_widget, SIGNAL(enabled(bool)),
+		SLOT(onChannelWidgetEnabled(bool)));
+	connect(channel_widget, SIGNAL(selected(bool)),
+		SLOT(onChannelWidgetSelected(bool)));
+	connect(channel_widget, SIGNAL(menuToggled(bool)),
+		SLOT(onChannelWidgetMenuToggled(bool)));
+	connect(channel_widget, SIGNAL(deleteClicked()),
+		SLOT(onChannelWidgetDeleteClicked()));
+	connect(channel_widget, &ChannelWidget::menuToggled,
+	[=](bool on) {
+		if (!on) {
+			ch_ui->btnEditMath->setChecked(false);
+		}
+	});
+
+	ui->channelsList->addWidget(channel_widget);
+
+	channels_group->addButton(channel_widget->nameButton());
+	ui->settings_group->addButton(channel_widget->menuButton());
+	channel_widget->nameButton()->setChecked(true);
+
+	QLabel *label= new QLabel(this);
+	label->setText(vertMeasureFormat.format(
+			       plot.VertUnitsPerDiv(curve_id), "V/div", 3));
+	label->setStyleSheet(QString("QLabel {"
+				     "color: %1;"
+				     "font-weight: bold;"
+				     "}").arg(plot.getLineColor(curve_id).name()));
+	ui->chn_scales->addWidget(label);
+	probe_attenuation.push_back(1);
+
+	plot.Curve(curve_id)->setAxes(
+		QwtAxisId(QwtPlot::xBottom, 0),
+		QwtAxisId(QwtPlot::yLeft, curve_id));
+	plot.Curve(curve_id)->setTitle("REF " + QString::number(nb_ref_channels + 1));
+	plot.addZoomer(curve_id);
+	plot.replot();
+
+	nb_ref_channels++;
+
+	plot.setPeriodDetectHyst(2, 1.0 / 5);
+
+	if (nb_math_channels + nb_ref_channels == MAX_MATH_CHANNELS) {
+		if (ui->btnAddMath->isChecked()) {
+			ui->btnAddMath->setChecked(false);
+		}
+
+		ui->btnAddMath->hide();
+		menuOrder.removeOne(ui->btnAddMath);
+	}
+
+	plot.showYAxisWidget(curve_id, true);
+	plot.setVertUnitsPerDiv(1, curve_id); // force v/div to 1
+	plot.zoomBaseUpdate();
+	init_selected_measurements(curve_id, {0, 1, 4, 5});
+
+	plot.computeMeasurementsForChannel(curve_id, sampleRate);
+}
+
 void Oscilloscope::add_ref_waveform(unsigned int chIdx)
 {
 	if (nb_math_channels + nb_ref_channels == MAX_MATH_CHANNELS) {
@@ -891,8 +985,15 @@ void Oscilloscope::add_ref_waveform(unsigned int chIdx)
 	if (!refChannelTimeBase->isEnabled()) chIdx++;
 
 	for (int i = 0; i < import_data.size(); ++i) {
+		if (chIdx >= import_data[i].size()) {
+			continue;
+		}
 		yData.push_back(import_data[i][chIdx]);
 	}
+
+	qDebug() << "Added ref waveform with nr of samples: " << yData.size();
+	qDebug() << "TimeBase: " << refChannelTimeBase->value();
+	qDebug() << "Number of samples in file: " << nr_of_samples_in_file;
 
 	plot.registerReferenceWaveform(qname, xData, yData);
 
@@ -3404,7 +3505,7 @@ void Oscilloscope::measureLabelsRearrange()
 	for (int i = 0; i < measurements_data.size(); i++) {
 
 		int channel = measurements_data[i]->channel();
-		if (channel >= nb_channels + nb_math_channels) {
+		if (channel >= nb_channels + nb_math_channels + nb_ref_channels) {
 			continue;
 		}
 
@@ -3442,6 +3543,7 @@ void Oscilloscope::measureLabelsRearrange()
 
 void Oscilloscope::measureUpdateValues()
 {
+
 	for (int i = 0; i < measurements_data.size(); i++) {
 		int channel = measurements_data[i]->channel();
 		ChannelWidget *chn_widget = channelWidgetAtId(channel);

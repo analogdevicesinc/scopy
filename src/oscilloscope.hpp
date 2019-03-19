@@ -114,6 +114,8 @@ namespace adiscope {
 		bool getTrigger_input() const;
 		void setTrigger_input(bool value);
 
+		void add_ref_waveform(QString name, QVector<double> xData, QVector<double> yData, unsigned int sampleRate);
+		void remove_ref_waveform(QString name);
 	Q_SIGNALS:
 		void triggerALevelChanged(double);
 		void triggerBLevelChanged(double);
