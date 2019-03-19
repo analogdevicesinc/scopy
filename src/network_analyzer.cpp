@@ -1602,6 +1602,7 @@ void NetworkAnalyzer::readPreferences()
 {
 	m_dBgraph.setShowZero(prefPanel->getNa_show_zero());
 	m_phaseGraph.setShowZero(prefPanel->getNa_show_zero());
+	autoAdjustGain = prefPanel->getNaGainUpdateEnabled();
 }
 
 void NetworkAnalyzer::onGraphIndexChanged(int index)
