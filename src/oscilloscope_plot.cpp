@@ -1441,6 +1441,19 @@ void CapturePlot::onChannelAdded(int chnIdx)
 	d_measureObjs.push_back(measure);
 }
 
+void CapturePlot::computeMeasurementsForChannel(unsigned int chnIdx, unsigned int sampleRate)
+{
+	if (chnIdx >= d_measureObjs.size()) {
+		return;
+	}
+
+	Measure *measure = d_measureObjs[chnIdx];
+	measure->setSampleRate(sampleRate);
+	measure->measure();
+
+	Q_EMIT measurementsAvailable();
+}
+
 void CapturePlot::cleanUpJustBeforeChannelRemoval(int chnIdx)
 {
 	Measure *measure = measureOfChannel(chnIdx);
