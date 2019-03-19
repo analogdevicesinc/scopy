@@ -34,18 +34,26 @@ void dBgraph::setupCursors()
 	d_vBar1 = new VertBar(this,true);
 	d_vBar2 = new VertBar(this,true);
 	d_plotBar = new VertBar(this, true);
+	d_frequencyBar = new VertBar(this, true);
 	d_symbolCtrl->attachSymbol(d_vBar1);
 	d_symbolCtrl->attachSymbol(d_vBar2);
 	d_symbolCtrl->attachSymbol(d_plotBar);
+	d_symbolCtrl->attachSymbol(d_frequencyBar);
 
 	QPen cursorsLinePen = QPen(QColor(155,155,155),1,Qt::DashLine);
 	QPen plotLinePen = QPen(QColor(211, 211, 211, 50), 5, Qt::SolidLine);
+	QPen frequencyLinePen = QPen(QColor(74, 100, 255, 150), 2, Qt::DashLine);
 
 	d_vBar1->setPen(cursorsLinePen);
 	d_vBar2->setPen(cursorsLinePen);
 	d_vBar1->setVisible(false);
 	d_vBar2->setVisible(false);
 	d_plotBar->setVisible(false);
+
+	d_frequencyBar->setPen(frequencyLinePen);
+	d_frequencyBar->setVisible(false);
+	d_frequencyBar->setMobileAxis(QwtPlot::xTop);
+	d_frequencyBar->setPixelPosition(canvas()->width()/2-30);
 
 	d_plotBar->setPen(plotLinePen);
 	d_plotBar->setMobileAxis(QwtPlot::xTop);
@@ -59,6 +67,9 @@ void dBgraph::setupCursors()
 		SLOT(onVbar2PixelPosChanged(int)));
 	connect(d_vBar2, SIGNAL(pixelPositionChanged(int)),
 		SLOT(onCursor2Moved(int)));
+
+	connect(d_frequencyBar, &VertBar::pixelPositionChanged,
+		this, &dBgraph::frequencyBarPositionChanged);
 }
 
 void dBgraph::setupReadouts()
@@ -499,6 +510,19 @@ void dBgraph::sweepDone()
 	d_plotBar->setVisible(false);
 }
 
+void dBgraph::onFrequencyCursorPositionChanged(int pos)
+{
+	d_frequencyBar->setPixelPosition(pos);
+
+	Q_EMIT frequencySelected(d_frequencyBar->plotCoord().x());
+}
+
+void dBgraph::onFrequencyBarMoved(double frequency)
+{
+	auto oldY = d_frequencyBar->plotCoord().y();
+	d_frequencyBar->setPlotCoord(QPointF(frequency, oldY));
+}
+
 void dBgraph::onCursor1PositionChanged(int pos)
 {
 	pos = std::min(pos,QwtPlot::canvas()->width()-1);
@@ -525,6 +549,7 @@ void dBgraph::onVbar2PixelPosChanged(int pos)
 
 void dBgraph::toggleCursors(bool en)
 {
+	d_frequencyBar->setPixelPosition(canvas()->width()/2-30);
 	if (d_cursorsEnabled != en) {
 		if (!d_cursorsCentered) {
 			d_cursorsCentered=true;
@@ -684,6 +709,12 @@ QVector<double> dBgraph::getYAxisData()
 	}
 
 	return data;
+}
+
+void dBgraph::enableFrequencyBar(bool enable)
+{
+	d_frequencyBar->setVisible(enable);
+	d_frequencyBar->setPixelPosition(canvas()->width() / 2);
 }
 
 void dBgraph::setYAxisInterval(double min, double max, double correction)
