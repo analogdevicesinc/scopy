@@ -547,6 +547,8 @@ CapturePlot::~CapturePlot()
 		delete *it;
 	}
 	delete graticule;
+	delete leftGate;
+	delete rightGate;
 }
 
 HorizBar *CapturePlot::levelTriggerA()
