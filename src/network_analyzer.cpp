@@ -893,6 +893,7 @@ void NetworkAnalyzer::updateNumSamples(bool force)
 	m_phaseGraph.setNumSamples(num_samples);
 	ui->xygraph->setNumSamples(num_samples);
 	ui->nicholsgraph->setNumSamples(num_samples);
+	bufferPreviewer->setNumBuffers(num_samples);
 
 	if (QObject::sender() == samplesCount) {
 		computeIterations();
@@ -946,8 +947,6 @@ void NetworkAnalyzer::run()
 
 
 	fixedRate = sampleRates[0];
-
-	bufferPreviewer->clear();
 
 	justStarted = true;
 
@@ -1450,6 +1449,7 @@ void NetworkAnalyzer::startStop(bool pressed)
 			ui->nicholsgraph->reset();
 			updateNumSamples(true);
 		}
+		bufferPreviewer->clear();
 		configHwForNetworkAnalyzing();
 		thd = QtConcurrent::run(this, &NetworkAnalyzer::run);
 		stop = false;
