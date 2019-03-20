@@ -232,6 +232,10 @@ TimeDomainDisplayPlot::~TimeDomainDisplayPlot()
 	delete d_trigger_lines[0];
 	delete d_trigger_lines[1];
 
+	for (int i = 0; i < d_ref_ydata.size(); ++i) {
+		delete[] d_ref_ydata[i];
+	}
+
   // d_zoomer and _panner deleted when parent deleted
 }
 
