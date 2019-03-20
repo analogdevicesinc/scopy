@@ -40,6 +40,7 @@
 #include "TimeDomainDisplayPlot.h"
 
 #include "networkanalyzerbufferviewer.h"
+#include "startstoprangewidget.h"
 
 extern "C" {
 	struct iio_buffer;
@@ -135,6 +136,8 @@ private:
 	NetworkAnalyzerBufferViewer *bufferPreviewer;
 	QVector<Buffer> capturedData;
 
+	StartStopRangeWidget *startStopRange;
+
 	bool justStarted;
 	bool autoAdjustGain;
 
@@ -144,10 +147,6 @@ private:
 	bool d_cursorsEnabled;
 
 	ScaleSpinButton *samplesCount;
-	ScaleSpinButton *start_freq;
-	ScaleSpinButton *stop_freq;
-	ScaleSpinButton *center_freq;
-	ScaleSpinButton *span_freq;
 	ScaleSpinButton *amplitude;
 	PositionSpinButton *offset;
 	PositionSpinButton *magMax;
@@ -206,9 +205,6 @@ private Q_SLOTS:
 	void onGraphIndexChanged(int);
 	void on_btnExport_clicked();
 	void rightMenuFinished(bool opened);
-
-	void onStartStopFrequencyChanged(double value);
-	void onCenterSpanFrequencyChanged(double value);
 	void onMinMaxPhaseChanged(double value);
 	void onFrequencyBarMoved(int pos);
 	void toggleBufferPreview(bool toggle = false);
