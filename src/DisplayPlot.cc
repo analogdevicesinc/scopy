@@ -581,6 +581,12 @@ DisplayPlot::~DisplayPlot()
 		delete *it;
 	}
 
+	for (auto it = scaleItems.begin(); it != scaleItems.end(); ++it) {
+		delete *it;
+	}
+
+	delete d_grid;
+
 	//delete horizAxis
 	delete horizAxis;
 }
