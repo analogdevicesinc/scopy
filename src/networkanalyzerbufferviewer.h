@@ -61,6 +61,7 @@ public:
 	void selectBuffersAtIndex(int index);
 	void selectBuffers(double frequency);
 
+	void setNumBuffers(unsigned int numBuffers);
 Q_SIGNALS:
 	void moveHandleAt(double);
 
@@ -79,6 +80,7 @@ private:
 	int d_selectedBuffersIndex;
 	Oscilloscope *d_osc;
 	QVector<double> d_currentXdata;
+	int d_numBuffers;
 };
 }
 

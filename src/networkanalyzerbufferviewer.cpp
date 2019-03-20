@@ -26,7 +26,8 @@ NetworkAnalyzerBufferViewer::NetworkAnalyzerBufferViewer(QWidget *parent) :
 	QWidget(parent),
 	d_ui(new Ui::NetworkAnalyzerBufferViewer),
 	d_osc(nullptr),
-	d_selectedBuffersIndex(-1)
+	d_selectedBuffersIndex(-1),
+	d_numBuffers(0)
 {
 	d_ui->setupUi(this);
 
@@ -51,9 +52,22 @@ NetworkAnalyzerBufferViewer::~NetworkAnalyzerBufferViewer()
 	delete d_ui;
 }
 
+void NetworkAnalyzerBufferViewer::setNumBuffers(unsigned int numBuffers)
+{
+	d_numBuffers = numBuffers;
+}
+
 void NetworkAnalyzerBufferViewer::pushBuffers(QPair<Buffer, Buffer> buffers)
 {
-	d_data.push_back(buffers);
+	if (d_data.size() < d_numBuffers) {
+		d_data.push_back(buffers);
+	} else {
+		static int currentBuffer = 0;
+		d_data[currentBuffer++] = buffers;
+		if (currentBuffer == d_numBuffers) {
+			currentBuffer = 0;
+		}
+	}
 
 	if (d_selectedBuffersIndex == -1) {
 		d_selectedBuffersIndex = 0;
