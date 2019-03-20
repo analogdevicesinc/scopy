@@ -149,11 +149,12 @@ void NetworkAnalyzer_API::setCursors(bool enabled)
 
 bool NetworkAnalyzer_API::running() const
 {
-	return net->ui->run_button->isChecked();
+	return net->ui->runSingleWidget->runButtonChecked()
+			|| net->ui->runSingleWidget->singleButtonChecked();
 }
 void NetworkAnalyzer_API::run(bool enabled)
 {
-	net->ui->run_button->setChecked(enabled);
+	net->ui->runSingleWidget->toggle(enabled);
 }
 
 int NetworkAnalyzer_API::getCursorsPosition() const

@@ -120,24 +120,22 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	connect(ui->bufferPreviewSwitch, &QCheckBox::toggled,
 		this, &NetworkAnalyzer::toggleBufferPreview);
 
-	connect(ui->run_button, SIGNAL(toggled(bool)),
-		runButton, SLOT(setChecked(bool)));
-	connect(runButton, SIGNAL(toggled(bool)),
-		ui->run_button, SLOT(setChecked(bool)));
-	connect(ui->run_button, SIGNAL(toggled(bool)),
-		this, SLOT(startStop(bool)));
-
-	connect(ui->single_button, &QPushButton::toggled,
+	connect(ui->runSingleWidget, &RunSingleWidget::toggled,
+		[=](bool checked){
+		auto btn = dynamic_cast<CustomPushButton *>(runButton);
+		btn->setChecked(checked);
+	});
+	connect(runButton, &QPushButton::toggled,
+		ui->runSingleWidget, &RunSingleWidget::toggle);
+	connect(ui->runSingleWidget, &RunSingleWidget::toggled,
 		this, &NetworkAnalyzer::startStop);
 
 	connect(this, &NetworkAnalyzer::sweepDone,
 	[=]() {
-		if (ui->run_button->isChecked()) {
-			startStop(true);
+		if (ui->runSingleWidget->runButtonChecked()) {
+			thd = QtConcurrent::run(this, &NetworkAnalyzer::run);
 			return;
 		}
-
-		ui->single_button->setChecked(false);
 
 		dynamic_cast<CustomPushButton *>(this->runButton())->setChecked(false);
 	});
@@ -1148,8 +1146,7 @@ void NetworkAnalyzer::run()
 			QCoreApplication::processEvents();
 			QThread::msleep(10);
 
-			if (!(ui->run_button->isChecked() ||
-			      ui->single_button->isChecked())) {
+			if (stop) {
 				break;
 			}
 		} while (!got_it);
@@ -1414,37 +1411,25 @@ double NetworkAnalyzer::autoUpdateGainMode(double magnitude, double magnitudeGai
 
 void NetworkAnalyzer::startStop(bool pressed)
 {
-	QPushButton *btn = dynamic_cast<QPushButton *>(QObject::sender());
-
-	if (btn) {
-		setDynamicProperty(btn, "running", pressed);
-
-		bool runToSingle = (btn == ui->single_button) & ui->run_button->isChecked();
-		bool singleToRun = (btn == ui->run_button) & ui->single_button->isChecked();
-
-		if (runToSingle) {
-			{
-				const QSignalBlocker blocker(ui->run_button);
-				ui->run_button->setChecked(false);
-			}
-			setDynamicProperty(ui->run_button, "running", false);
-			return;
-		} else if (singleToRun) {
-			{
-				const QSignalBlocker blocker(ui->single_button);
-				ui->single_button->setChecked(false);
-			}
-			setDynamicProperty(ui->single_button, "running", false);
-			return;
-		}
-	}
-
 	stop = !pressed;
 
 	if (amp1 && amp2) {
 		/* FIXME: TODO: Move this into a HW class / lib M2k */
 		iio_channel_attr_write_bool(amp1, "powerdown", !pressed);
 		iio_channel_attr_write_bool(amp2, "powerdown", !pressed);
+	}
+
+	static bool running = false;
+
+	if (running == pressed) {
+		return;
+	}
+
+	running = pressed;
+
+	bool shouldClear = false;
+	if (QObject::sender() == ui->runSingleWidget) {
+		shouldClear = true;
 	}
 
 	ui->btnRefChn->setEnabled(!pressed);
@@ -1458,36 +1443,25 @@ void NetworkAnalyzer::startStop(bool pressed)
 	span_freq->setEnabled(!pressed);
 
 	if (pressed) {
-		if (btn) {
+		if (shouldClear) {
 			m_dBgraph.reset();
 			m_phaseGraph.reset();
 			ui->xygraph->reset();
 			ui->nicholsgraph->reset();
 			updateNumSamples(true);
-			configHwForNetworkAnalyzing();
 		}
-
+		configHwForNetworkAnalyzing();
 		thd = QtConcurrent::run(this, &NetworkAnalyzer::run);
+		stop = false;
 	} else {
-		if (btn) {
-			btn->setEnabled(false);
-			btn->setText("Stopping");
-		}
 		QCoreApplication::processEvents();
 		thd.waitForFinished();
-		if (btn) {
-			btn->setEnabled(true);
-		}
 		m_dBgraph.sweepDone();
 		m_phaseGraph.sweepDone();
 		ui->currentFrequencyLabel->setVisible(pressed);
 		ui->currentSampleLabel->setVisible(pressed);
+		stop = true;
 	}
-
-	if (btn) {
-		setDynamicProperty(btn, "running", pressed);
-	}
-
 }
 
 struct iio_buffer *NetworkAnalyzer::generateSinWave(
