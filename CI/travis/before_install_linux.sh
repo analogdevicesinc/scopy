@@ -20,15 +20,16 @@ handle_centos_docker() {
 	sudo service docker restart
 	sudo docker pull centos:${OS_VERSION}
 }
-install_breakpad()
-{
-git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
-export PATH=$PATH:$(pwd)/depot_tools
-mkdir breakpad && cd breakpad
-fetch breakpad
-cd src
-./configure && make
-sudo make install
+
+install_breakpad() {
+	git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+	export PATH=$PATH:$(pwd)/depot_tools
+	mkdir breakpad && cd breakpad
+	fetch breakpad
+	cd src
+	./configure CXXFLAGS="-Wno-error"
+	make
+	sudo make install
 }
 
 handle_default() {
@@ -146,7 +147,6 @@ cmake_build_git "gr-iio" "https://github.com/analogdevicesinc/gr-iio"
 }
 
 handle_centos() {
-	export DIR=$(pwd)
 	ls
 
 	yum install -y epel-release
@@ -163,11 +163,6 @@ handle_centos() {
 		libffi-devel libmount-devel pcre2-devel
 
 	yum -y install python36 python36-pip python36-devel 
-	
-	cd /etc/yum.repos.d/
-	wget https://download.opensuse.org/repositories/home:danimo/CentOS_7/home:danimo.repo
-	yum -y install google-breakpad
-	cd $DIR
 
 	ln -s /usr/bin/cmake3 /usr/bin/cmake
 
@@ -181,7 +176,7 @@ handle_centos() {
 	QMAKE=/usr/lib64/qt5/bin/qmake
 	$QMAKE -set QMAKE $QMAKE
 
-#	install_breakpad
+	install_breakpad
 	export TRAVIS="true"
 
 patch_qwtpolar_linux() {
