@@ -160,7 +160,7 @@ handle_centos() {
 		swig git libusb1-devel doxygen python-six python-mako \
 		rpm rpm-build libxml2-devel \
 		python-cheetah wget tar autoconf autoconf-archive \
-		libffi-devel libmount-devel pcre2-devel
+		libffi-devel libmount-devel pcre2-devel cppunit-devel
 
 	yum -y install python36 python36-pip python36-devel 
 
