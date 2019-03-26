@@ -34,6 +34,8 @@
 #include "TimeDomainDisplayPlot.h"
 #include "osc_scale_engine.h"
 
+#include "smoothcurvefitter.h"
+
 using namespace adiscope;
 
 class TimeDomainDisplayZoomer: public OscPlotZoomer
@@ -689,23 +691,36 @@ void TimeDomainDisplayPlot::setPlotLineStyle(unsigned int chIdx, unsigned int st
 
 	auto curve = d_plot_curve[chIdx];
 
+	curve->setPaintAttribute(QwtPlotCurve::ClipPolygons, true);
+	curve->setCurveAttribute(QwtPlotCurve::Fitted, false);
+
 	switch (style) {
 		case 0:
 		curve->setStyle(QwtPlotCurve::CurveStyle::Lines);
+		replot();
 		break;
 		case 1:
 		curve->setStyle(QwtPlotCurve::CurveStyle::Dots);
+		replot();
 		break;
 		case 2:
 		curve->setStyle(QwtPlotCurve::CurveStyle::Steps);
+		replot();
 		break;
 		case 3:
 		curve->setStyle(QwtPlotCurve::CurveStyle::Sticks);
+		replot();
+		break;
+		case 4:
+		curve->setPaintAttribute(QwtPlotCurve::ClipPolygons, false);
+		curve->setCurveAttribute(QwtPlotCurve::Fitted, true);
+		curve->setStyle(QwtPlotCurve::CurveStyle::Lines);
+		replot();
 		break;
 	}
 }
 
-int TimeDomainDisplayPlot::getLineStyle(unsigned int chIdx)
+int TimeDomainDisplayPlot::getPlotLineStyle(unsigned int chIdx) const
 {
 	if (chIdx < 0 || chIdx >= d_plot_curve.size()) {
 		return -1;
@@ -714,7 +729,11 @@ int TimeDomainDisplayPlot::getLineStyle(unsigned int chIdx)
 	auto style = d_plot_curve[chIdx]->style();
 	switch (style) {
 		case QwtPlotCurve::CurveStyle::Lines:
-		return 0;
+		if (d_plot_curve[chIdx]->testCurveAttribute(QwtPlotCurve::Fitted)) {
+			return 4;
+		} else {
+			return 0;
+		}
 
 		case QwtPlotCurve::CurveStyle::Dots:
 		return 1;
@@ -1157,6 +1176,8 @@ bool TimeDomainDisplayPlot::registerSink(std::string sinkUniqueNme, unsigned int
 
 			d_plot_curve.back()->setRawSamples(d_xdata[sinkIndex], d_ydata[n], channelsDataLength);
 			d_plot_curve.back()->setSymbol(symbol);
+
+			d_plot_curve.back()->setCurveFitter(new SmoothCurveFitter());
 
 			if (curvesAttached)
 				d_plot_curve.back()->attach(this);
