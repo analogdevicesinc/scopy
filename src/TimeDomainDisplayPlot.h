@@ -94,7 +94,7 @@ public:
   void stemPlot(bool en);
 
   void setPlotLineStyle(unsigned int chIdx, unsigned int style);
-  int getLineStyle(unsigned int chIdx);
+  int getPlotLineStyle(unsigned int chIdx) const;
 
   double sampleRate() const;
 
