@@ -889,6 +889,11 @@ Attenuation</string>
                <string>Sticks</string>
               </property>
              </item>
+             <item>
+              <property name="text">
+               <string>Smooth</string>
+              </property>
+             </item>
             </widget>
            </item>
           </layout>
