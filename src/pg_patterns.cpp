@@ -320,7 +320,7 @@ Pattern *Pattern_API::fromJson(QJsonObject obj)
 		sp->setMsbFirst(params["MSB"].toBool());
 
 		for (auto val : params["v"].toArray()) {
-			sp->v.push_front(val.toInt());
+			sp->v.push_back(val.toInt());
 		}
 	} else if (ip) {
 		ip->setBytesPerFrame(params["BPF"].toInt());
@@ -331,7 +331,7 @@ Pattern *Pattern_API::fromJson(QJsonObject obj)
 		ip->setWrite(params["write"].toBool());
 
 		for (auto val : params["v"].toArray()) {
-			ip->v.push_front(val.toInt());
+			ip->v.push_back(val.toInt());
 		}
 	} else if (imp) {
 		imp->fileName = params["file"].toString();
