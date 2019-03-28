@@ -23,7 +23,11 @@
 #include "pulseview/pv/view/tracepalette.hpp"
 #include "pulseview/pv/binding/decoder.hpp"
 #include "scroll_filter.hpp"
+#include "logging_categories.h"
+#include <QJsonDocument>
+#include <glib.h>
 
+using Glib::ustring;
 using std::dynamic_pointer_cast;
 
 namespace pv {
@@ -639,6 +643,65 @@ void LogicAnalyzerChannelGroup::setCh_thickness(qreal value)
 	ch_thickness = value;
 }
 
+void LogicAnalyzerChannelGroup::saveDecoderSettings()
+{
+	QJsonObject obj;
+	QJsonArray propArray;
+	for(auto p : properties_) {
+		QJsonObject propObj;
+		QString prop_name(p->name());
+		QString prop_type;
+		QString prop_val;
+		int64_t val;
+		double d_val;
+
+		std::string typ=p->get().get_type_string();
+		const void *cptr = p->get().get_data();
+		prop_type=QString::fromStdString(typ);
+		switch(typ[0])
+		{
+		case 's':
+			prop_val=QString::fromUtf8((const char*)cptr);
+
+			break;
+		case 'x':
+			val = *((int64_t*)cptr);
+			prop_val=QString::number(val);
+			break;
+
+		case 'd':
+			d_val = *((double*)cptr);
+			prop_val=QString::number(d_val);
+			break;
+
+		// case bool & enum /string
+		// decode all
+		default:
+			qDebug()<<"error";
+			break;
+
+		}
+		propObj["name"] = prop_name;
+		propObj["type"] = prop_type;
+		propObj["val"] = prop_val;
+		propArray.append(propObj);
+		qDebug()<<propObj;
+	}
+	obj["properties"] = propArray;
+	QJsonValue val(obj);
+	QJsonDocument doc(obj);
+	QString ret(doc.toJson(QJsonDocument::Compact));
+	decoderSettingsString = ret;
+}
+QString LogicAnalyzerChannelGroup::getDecoderSettings()
+{
+	return decoderSettingsString;
+}
+void LogicAnalyzerChannelGroup::setDecoderSettings(QString val)
+{
+	decoderSettingsString = val;
+}
+
 void LogicAnalyzerChannelGroup::setChannelForDecoder(const srd_channel* ch,
 		uint16_t ch_id)
 {
@@ -1041,6 +1104,68 @@ void LogicAnalyzerChannelGroupUI::updateTrace()
 	chm_ui->main_win->view_->time_item_appearance_changed(true, true);
 }
 
+void LogicAnalyzerChannelGroupUI::setupDecoderSettings()
+{
+	QString val = lchg->getDecoderSettings();
+	if(!val.isEmpty())
+		qDebug()<<val;
+
+	QJsonObject obj;
+	QJsonDocument doc = QJsonDocument::fromJson(val.toUtf8());
+
+	if (!doc.isNull()) {
+		if (doc.isObject()) {
+			obj = doc.object();
+		} else {
+			qDebug(CAT_LOGIC_ANALYZER) << "Document is not an object" << endl;
+		}
+	} else {
+		qDebug(CAT_LOGIC_ANALYZER) << "Invalid JSON...\n";
+	}
+
+	QJsonArray propArray = obj["properties"].toArray();
+	for (auto propRef : propArray) {
+		auto prop = propRef.toObject();
+		for(auto p : lchg->properties_)
+		{
+			qDebug()<<p->name();
+			if(p->name() == prop["name"].toString())
+			{
+				QByteArray ba;
+				GVariant *new_value = nullptr;
+				Glib::VariantBase value_;
+
+				switch(prop["type"].toString()[0].toLatin1())
+				{
+				case 's':
+					ba =prop["val"].toString().toLocal8Bit();
+					p->set(Glib::Variant<ustring>::create(ba.data()));
+					break;
+
+				case 'd':
+					new_value = g_variant_new_double(prop["val"].toString().toDouble());
+					value_ = Glib::VariantBase(new_value);
+					p->set(value_);
+					break;
+
+				case 'x':
+
+					new_value = g_variant_new_int64(prop["val"].toString().toLongLong());
+					value_ = Glib::VariantBase(new_value);
+					p->set(value_);
+					break;
+				default:
+					qDebug(CAT_LOGIC_ANALYZER)<<"ERROR";
+					break;
+				}
+
+			}
+
+		}
+
+	}
+}
+
 void LogicAnalyzerChannelGroupUI::setupDecoder()
 {
 	auto decoder = lchg->getDecoder();
@@ -1068,6 +1193,7 @@ void LogicAnalyzerChannelGroupUI::setupDecoder()
 						getDecodeTrace()->pv_decoder(),
 						lchg->properties_);
 			lchg->properties_ = binding_->properties();
+			setupDecoderSettings();
 		}
 	}
 }

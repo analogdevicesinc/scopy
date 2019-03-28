@@ -290,6 +290,20 @@ void ChannelGroup_API::setDecoder(QString val)
 		lga->chm.get_decoder_from_name(val.toUtf8()));
 }
 
+
+QString ChannelGroup_API::getDecoderSettings() const
+{
+	if(lga->chm.get_channel_group(this->getIndex())->getDecoder()) {
+		lga->chm.get_channel_group(this->getIndex())->saveDecoderSettings();
+		return lga->chm.get_channel_group(this->getIndex())->getDecoderSettings();
+	}
+	return "";
+}
+void ChannelGroup_API::setDecoderSettings(QString val)
+{
+	lga->chm.get_channel_group(getIndex())->setDecoderSettings(val);
+}
+
 /*
  * Channel_API
  */

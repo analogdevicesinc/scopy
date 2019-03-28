@@ -45,5 +45,11 @@ Glib::VariantBase Property::get()
 	return getter_();
 }
 
+
+void Property::set(Glib::VariantBase val)
+{
+	return setter_(val);
+}
+
 } // prop
 } // pv

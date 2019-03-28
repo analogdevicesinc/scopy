@@ -77,6 +77,7 @@ class ChannelGroup_API : public ApiObject
 	friend class LogicChannel_API;
 	Q_OBJECT
 	Q_PROPERTY(QString decoder READ getDecoder WRITE setDecoder)
+	Q_PROPERTY(QString decoderSettings READ getDecoderSettings WRITE setDecoderSettings)
 	Q_PROPERTY(int channels_list_size READ channels_list_size WRITE
 		   setChannelsListSize SCRIPTABLE false)
 	Q_PROPERTY(QVariantList channels READ getChannels)
@@ -119,6 +120,9 @@ public:
 
 	QString getDecoder() const;
 	void setDecoder(QString val);
+
+	QString getDecoderSettings() const;
+	void setDecoderSettings(QString val);
 private:
 	LogicAnalyzer *lga;
 	QList<LogicChannel_API *> channels_api;

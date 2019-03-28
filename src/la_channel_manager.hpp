@@ -124,10 +124,12 @@ private:
 	bool collapsed;
 	const srd_decoder *decoder;
 	QStringList decoderRolesNameList;
+	QString decoderSettingsString;
 	std::map<const srd_channel*,uint16_t> channels_;
 	const srd_channel* findByValue(uint16_t ch_id);
 	qreal ch_thickness;
 	std::vector<LogicAnalyzerChannel*> logicChannels;
+
 public:
 	LogicAnalyzerChannelGroup(LogicAnalyzerChannel *ch);
 	LogicAnalyzerChannelGroup();
@@ -147,6 +149,9 @@ public:
 	std::map<const srd_channel*, uint16_t> get_decoder_channels();
 	qreal getCh_thickness() const;
 	void setCh_thickness(qreal value);
+	void saveDecoderSettings();
+	QString getDecoderSettings();
+	void setDecoderSettings(QString val);
 	std::vector<const srd_channel *> decoderOptChannels;
 	std::vector<const srd_channel *> decoderReqChannels;
 	std::vector< std::shared_ptr<pv::prop::Property> > properties_;
@@ -183,6 +188,7 @@ public:
 
 	void updateTrace();
 	int getTraceOffset();
+	void setupDecoderSettings();
 	void setupDecoder();
 
 	void highlightTopSeparator();
