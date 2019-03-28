@@ -56,6 +56,7 @@ public:
 
 	virtual void commit() = 0;
 	Glib::VariantBase get();
+	void set(Glib::VariantBase val);
 
 protected:
 	const Getter getter_;
