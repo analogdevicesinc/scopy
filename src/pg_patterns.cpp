@@ -1853,13 +1853,15 @@ uint32_t SPIPattern::get_min_sampling_freq()
 }
 
 uint32_t SPIPattern::get_required_nr_of_samples(uint32_t sample_rate,
-                uint32_t number_of_channels)
+		uint32_t number_of_channels)
 {
 
 	auto samples_per_bit = 2*(sample_rate/clkFrequency);
 	auto IFS=waitClocks*samples_per_bit;
 
-	return v.size()*samples_per_bit*8 + 2*IFS + IFS *(v.size()/bytesPerFrame);
+	// number of bytes * samples per bit * 9 (8 bits + 1 account for extra padding) +
+	// 2 * interframespace(beginning and end) + extra frame space between each frame
+	return (v.size()*samples_per_bit*9) + 2*IFS + IFS *(v.size()/bytesPerFrame);
 
 }
 
@@ -1904,19 +1906,27 @@ uint8_t SPIPattern::generate_pattern(uint32_t sample_rate,
 
 	short *buf_ptr = buffer;
 
-	auto samples_per_bit = 2*(sample_rate/clkFrequency);
-	buf_ptr+=waitClocks*samples_per_bit;
-	auto k=0;
+	auto samples_per_bit = 2 * (sample_rate/clkFrequency);
+	buf_ptr += waitClocks * samples_per_bit;
+	auto frameBytesLeft = bytesPerFrame;
+	bool start_new_frame = 1;
 
 	for (std::deque<uint8_t>::iterator it = v.begin(); it != v.end();
 	     ++it) {
 		uint8_t val = *it;
 		bool oldbit = 0;
-		//buf_ptr+=samples_per_bit;
-		k++;
+		bool bit;
+
+		if(CPHA && start_new_frame)
+		{
+			for (auto i=samples_per_bit/2; i<samples_per_bit; i++,buf_ptr++) {
+				*buf_ptr = changeBit(*buf_ptr,csBit,CSPOL);
+				*buf_ptr = changeBit(*buf_ptr,clkActiveBit,!CPOL);
+				*buf_ptr = changeBit(*buf_ptr,outputBit,oldbit);
+			}
+		}
 
 		for (auto j=0; j<8; j++) {
-			bool bit;
 
 			if (msbFirst) {
 				bit = (val & 0x80) >> 7;
@@ -1930,7 +1940,7 @@ uint8_t SPIPattern::generate_pattern(uint32_t sample_rate,
 				*buf_ptr = changeBit(*buf_ptr,csBit,CSPOL);
 				*buf_ptr = changeBit(*buf_ptr,clkActiveBit,CPOL);
 
-				if (CPHA) {
+				if (!CPHA) {
 					*buf_ptr = changeBit(*buf_ptr,outputBit,oldbit);
 				} else {
 					*buf_ptr = changeBit(*buf_ptr,outputBit,bit);
@@ -1946,11 +1956,25 @@ uint8_t SPIPattern::generate_pattern(uint32_t sample_rate,
 			oldbit = bit;
 		}
 
-		if (k==bytesPerFrame) {
-			k=0;
-			buf_ptr+=waitClocks*samples_per_bit;
-		}
+		frameBytesLeft--;
 
+		if (frameBytesLeft == 0) {
+			if(!CPHA)
+			{
+				for (auto i=samples_per_bit/2; i<samples_per_bit; i++,buf_ptr++) {
+					*buf_ptr = changeBit(*buf_ptr,csBit,CSPOL);
+					*buf_ptr = changeBit(*buf_ptr,clkActiveBit,!CPOL);
+					*buf_ptr = changeBit(*buf_ptr,outputBit,bit);
+				}
+			}
+			buf_ptr += waitClocks * samples_per_bit;
+			frameBytesLeft = bytesPerFrame;
+			start_new_frame = 1;
+		}
+		else
+		{
+			start_new_frame = 0;
+		}
 	}
 
 	return 0;
