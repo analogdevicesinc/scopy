@@ -73,8 +73,8 @@
 #include "ui_trigger_settings.h"
 
 #define MAX_MATH_CHANNELS 4
-#define MAX_MATH_RANGE 100
-#define MIN_MATH_RANGE -100
+#define MAX_MATH_RANGE SHRT_MAX
+#define MIN_MATH_RANGE SHRT_MIN
 #define MAX_AMPL 25
 
 using namespace adiscope;
@@ -666,8 +666,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 
 		auto max_elem = max_element(probe_attenuation.begin(), probe_attenuation.begin() + nb_channels);
 		for (auto rail : math_rails.values()) {
-			rail->set_lo(MIN_MATH_RANGE * (*max_elem));
-			rail->set_hi(MAX_MATH_RANGE * (*max_elem));
+			rail->set_lo(MIN_MATH_RANGE);
+			rail->set_hi(MAX_MATH_RANGE);
 		}
 
 		if (started)
@@ -1707,8 +1707,7 @@ void Oscilloscope::add_math_channel(const std::string& function)
 	}
 
 	auto max_elem = max_element(probe_attenuation.begin(), probe_attenuation.begin() + nb_channels);
-	auto rail = gr::analog::rail_ff::make(MIN_MATH_RANGE * (*max_elem),
-					      MAX_MATH_RANGE * (*max_elem));
+	auto rail = gr::analog::rail_ff::make(MIN_MATH_RANGE, MAX_MATH_RANGE);
 	auto math = iio::iio_math::make(function, nb_channels);
 	unsigned int curve_id = nb_channels + nb_math_channels + nb_ref_channels;
 	unsigned int curve_number = find_curve_number();
@@ -3253,8 +3252,7 @@ void Oscilloscope::editMathChannelFunction(int id, const std::string& new_functi
 	std::string name = qname.toStdString();
 
 	auto max_elem = max_element(probe_attenuation.begin(), probe_attenuation.begin() + nb_channels);
-	auto rail = gr::analog::rail_ff::make(MIN_MATH_RANGE * (*max_elem),
-					      MAX_MATH_RANGE * (*max_elem));
+	auto rail = gr::analog::rail_ff::make(MIN_MATH_RANGE, MAX_MATH_RANGE);
 	auto math = iio::iio_math::make(new_function, nb_channels);
 
 	bool started = iio->started();
