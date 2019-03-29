@@ -73,6 +73,7 @@ double LogicAnalyzer_API::getTimePos() const
 void LogicAnalyzer_API::setTimePos(double value)
 {
 	lga->timePosition->setValue(value);
+	lga->initialised = true;
 }
 
 double LogicAnalyzer_API::getTimeBase() const
