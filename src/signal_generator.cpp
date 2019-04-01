@@ -1249,6 +1249,12 @@ void SignalGenerator::start()
 {
 	QVector<struct iio_channel *> enabled_channels;
 
+	if (amp1 && amp2) {
+		/* FIXME: TODO: Move this into a HW class / lib M2k */
+		iio_channel_attr_write_bool(amp1, "powerdown", /*!(ui->run_button->isChecked() && */ !channels[0]->enableButton()->isChecked());
+		iio_channel_attr_write_bool(amp2, "powerdown", /*!(ui->run_button->isChecked() && */ !channels[1]->enableButton()->isChecked());
+	}
+
 	/* Avoid from being started twice */
 	if (buffers.size() > 0) {
 		return;
@@ -1403,21 +1409,23 @@ void SignalGenerator::start()
 
 void SignalGenerator::stop()
 {
+
 	for (auto each : buffers) {
 		iio_buffer_destroy(each);
 	}
 
 	buffers.clear();
+
+
+	if (amp1 && amp2) {
+		/* FIXME: TODO: Move this into a HW class / lib M2k */
+		iio_channel_attr_write_bool(amp1, "powerdown", true);//!(ui->run_button->isChecked() && channels[0]->enableButton()->isChecked()));
+		iio_channel_attr_write_bool(amp2, "powerdown", true);//!(ui->run_button->isChecked() && channels[1]->enableButton()->isChecked()));
+	}
 }
 
 void SignalGenerator::startStop(bool pressed)
 {
-	if (amp1 && amp2) {
-		/* FIXME: TODO: Move this into a HW class / lib M2k */
-		iio_channel_attr_write_bool(amp1, "powerdown", !(pressed && channels[0]->enableButton()->isChecked()));
-		iio_channel_attr_write_bool(amp2, "powerdown", !(pressed && channels[1]->enableButton()->isChecked()));
-	}
-
 	if (pressed) {
 		start();
 	} else {
