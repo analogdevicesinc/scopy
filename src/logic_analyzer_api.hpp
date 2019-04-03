@@ -28,6 +28,8 @@ public:
 		ApiObject(), lga(lga) {}
 	~LogicAnalyzer_API() {}
 
+	void save(QSettings& settings);
+
 	int channel_groups_list_size() const;
 	void setChannelGroupsListSize(int size);
 

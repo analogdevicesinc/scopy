@@ -12,6 +12,12 @@ namespace adiscope {
  * class LogicAnalyzer_API
  */
 
+void LogicAnalyzer_API::save(QSettings& settings)
+{
+	lga->get_channel_groups_api();
+	ApiObject::save(settings);
+}
+
 void LogicAnalyzer_API::show()
 {
         Q_EMIT lga->showTool();
