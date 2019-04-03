@@ -168,6 +168,8 @@ public:
 		ApiObject(), pg(pg) {}
 	~PatternGenerator_API();
 
+	void save(QSettings& settings);
+
 
 	int channel_groups_size();
 	void set_channel_groups_size(int val);

@@ -2,6 +2,12 @@
 #include "ui_pattern_generator.h"
 
 namespace adiscope {
+
+void PatternGenerator_API::save(QSettings& settings)
+{
+	refreshApi();
+	ApiObject::save(settings);
+}
 void PatternGenerator_API::show()
 {
 	Q_EMIT pg->showTool();
