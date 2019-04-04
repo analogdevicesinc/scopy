@@ -1783,11 +1783,11 @@ void I2CPatternUI::parse_ui()
 		val = str.toULongLong(&ok,16);
 
 		if (ok) {
-			while (val) {
+			do {
 				auto u8val = val & 0xff;
 				val = val >> 8;
 				b.push_back(u8val);
-			}
+			} while (val);
 
 			for (auto u8val : b) {
 				pattern->v.push_front(u8val);
@@ -2101,11 +2101,11 @@ void SPIPatternUI::parse_ui()
 		val = str.toULongLong(&ok,16);
 
 		if (ok) {
-			while (val) {
+			do {
 				auto u8val = val & 0xff;
 				val = val >> 8;
 				b.push_back(u8val);
-			}
+			} while (val);
 
 			for (auto u8val : b) {
 				pattern->v.push_front(u8val);
