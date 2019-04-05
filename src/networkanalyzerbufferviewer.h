@@ -58,20 +58,23 @@ public:
 
 	QPair<Buffer, Buffer> getSelectedBuffers() const;
 
-	void selectBuffersAtIndex(int index);
+	void selectBuffersAtIndex(int index, bool moveHandle = true);
 	void selectBuffers(double frequency);
 
 	void setNumBuffers(unsigned int numBuffers);
 Q_SIGNALS:
 	void moveHandleAt(double);
+	void indexChanged(int);
 
 public Q_SLOTS:
 	void setVisible(bool visible) Q_DECL_OVERRIDE;
 
-private Q_SLOTS:
 	void sendBufferToOscilloscope();
 	void btnPreviousClicked();
 	void btnNextClicked();
+
+private:
+	void _setupPlot();
 
 private:
 	Ui::NetworkAnalyzerBufferViewer *d_ui;
