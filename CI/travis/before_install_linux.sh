@@ -22,6 +22,7 @@ handle_centos_docker() {
 }
 
 install_breakpad() {
+	pushd "$WORKDIR"
 	git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
 	export PATH=$PATH:$(pwd)/depot_tools
 	mkdir breakpad && cd breakpad
@@ -30,6 +31,7 @@ install_breakpad() {
 	./configure CXXFLAGS="-Wno-error"
 	make
 	sudo make install
+	popd
 }
 
 handle_default() {
