@@ -36,9 +36,9 @@ InfoPage::InfoPage(QString uri, Preferences *pref,
         m_ctx(ctx),
         m_advanced(false),
         prefPanel(pref),
-        m_connected(false),
         m_led_timer(new QTimer(this)),
         m_blink_timer(new QTimer(this)),
+        m_connected(false),
         m_search_interrupted(false)
 {
         ui->setupUi(this);
