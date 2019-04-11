@@ -381,7 +381,7 @@ QList<int> LogicAnalyzer_API::data() const
 		std::shared_ptr<pv::data::LogicSegment> segment = logic_data->logic_segments().front();
 		if(!segment)
 			return list;
-		for (int i = 0; i < segment->get_sample_count(); ++i) {
+		for (unsigned int i = 0; i < segment->get_sample_count(); ++i) {
 			uint64_t sample = segment->get_sample(i);
 			list.append((int)sample);
 		}

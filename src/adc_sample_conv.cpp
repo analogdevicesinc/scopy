@@ -71,14 +71,14 @@ int adc_sample_conv::work(int noutput_items,
 		float *out = static_cast<float *>(output_items[i]);
 
 		if (inverse)
-			for (unsigned int j = 0; j < noutput_items; j++)
+			for (int j = 0; j < noutput_items; j++)
 				out[j] = convVoltsToSample(in[j],
 						d_correction_gains[i],
 						d_filter_compensations[i],
 						d_offsets[i],
 						d_hardware_gains[i]);
 		else
-			for (unsigned int j = 0; j < noutput_items; j++)
+			for (int j = 0; j < noutput_items; j++)
 				out[j] = convSampleToVolts(in[j],
 					d_correction_gains[i],
 					d_filter_compensations[i],

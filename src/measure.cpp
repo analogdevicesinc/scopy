@@ -535,7 +535,7 @@ void Measure::measure()
 	if (using_histogram_method)
 		m_histogram = new int[adc_span]{};
 
-	for (size_t i = startIndex; i < endIndex; i++) {
+	for (ssize_t i = startIndex; i < endIndex; i++) {
 
 		if (qIsNaN(data[i])) {
 			count--;
