@@ -45,6 +45,6 @@ private:
 	google_breakpad::ExceptionHandler *handler;
 #ifdef Q_OS_LINUX
 	google_breakpad::MinidumpDescriptor *descriptor;
-#endif;
+#endif
 };
 #endif
