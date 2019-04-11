@@ -523,7 +523,7 @@ void LogicAnalyzer::init_export_settings()
 	exportSettings = new ExportSettings(this);
 	exportSettings->enableExportButton(false);
 	ui->verticalLayout_5->addWidget(exportSettings);
-	for(int i = 0; i < no_channels; i++){
+	for(unsigned int i = 0; i < no_channels; i++){
 		exportSettings->addChannel(i, "DIO" + QString::number(i));
 	}
 
@@ -591,7 +591,7 @@ void LogicAnalyzer::get_channel_groups_api()
 {
 	qDeleteAll(channel_groups_api);
 	channel_groups_api.clear();
-	for(int i=0; i < chm.get_channel_group_count(); i++) {
+	for(unsigned int i=0; i < chm.get_channel_group_count(); i++) {
 		channel_groups_api.append(new ChannelGroup_API(this, i, false));
 	}
 }
@@ -778,7 +778,7 @@ bool LogicAnalyzer::exportVCD(QString filename, QString startSep, QString endSep
 	out << startSep << "timescale " << QString::number(timescale) << " " << timescaleFormat << endSep;
 	out << startSep << "scope module Scopy" << endSep;
 	int counter = 0;
-	for(int ch = 0; ch < no_channels; ch++) {
+	for(unsigned int ch = 0; ch < no_channels; ch++) {
 		if( exportConfig[ch] ) {
 			char c = '!' + counter;
 			out << startSep << "var wire 1 " << c << " DIO" <<
@@ -802,7 +802,7 @@ bool LogicAnalyzer::exportVCD(QString filename, QString startSep, QString endSep
 				prev_sample = segment->get_sample(i-1);
 			timestamp_written = false;
 			p = 0;
-			for(int ch = 0; ch < no_channels; ch++) {
+			for(unsigned int ch = 0; ch < no_channels; ch++) {
 
 				current_bit = (current_sample >> ch) & 1;
 				prev_bit = (prev_sample >> ch) & 1;
@@ -839,7 +839,7 @@ bool LogicAnalyzer::exportTabCsv(QString separator, QString filename)
 	fm.open(filename, FileManager::EXPORT);
 
 	QStringList chNames;
-	for(int ch = 0; ch < no_channels; ch++) {
+	for(unsigned int ch = 0; ch < no_channels; ch++) {
 		if( exportConfig[ch] ) {
 			chNames.push_back("Channel " + QString::number(ch));
 		}
@@ -852,10 +852,10 @@ bool LogicAnalyzer::exportTabCsv(QString separator, QString filename)
 		return false;
 	} else {
 		shared_ptr<pv::data::LogicSegment> segment = logic_data->logic_segments().front();
-		for (int i = 0; i < segment->get_sample_count(); ++i) {
+		for (unsigned int i = 0; i < segment->get_sample_count(); ++i) {
 			uint64_t sample = segment->get_sample(i);
 			QVector<double> line;
-			for (int ch = 0; ch < no_channels; ++ch) {
+			for (unsigned int ch = 0; ch < no_channels; ++ch) {
 				int bit = (sample >> ch) & 1;
 				if(exportConfig[ch]) {
 					line.push_back(bit);
@@ -1703,7 +1703,7 @@ void LogicAnalyzer::setupTriggerSettingsUI(bool enabled)
 
 void LogicAnalyzer::cleanTrigger()
 {
-	for(int i = 0; i < get_no_channels(dev) + 2; i++) {
+	for(unsigned int i = 0; i < get_no_channels(dev) + 2; i++) {
 		setHWTrigger(i, trigger_mapping[0]);
 		if(i < get_no_channels(dev))
 			chm.get_channel(i)->setTrigger(trigger_mapping[0]);
@@ -1728,12 +1728,12 @@ void LogicAnalyzer::bufferSentSignal(bool lastBuffer)
 void LogicAnalyzer::autoCaptureEnable(bool check)
 {
 	if(check) {
-		for(int i = 0; i < get_no_channels(dev) + 2; i++) {
+		for(unsigned int i = 0; i < get_no_channels(dev) + 2; i++) {
 			setHWTrigger(i, trigger_cache[i]);
 		}
 	}
 	if(!check && armed){
-		for(int i = 0; i < get_no_channels(dev) + 2; i++) {
+		for(unsigned int i = 0; i < get_no_channels(dev) + 2; i++) {
 			trigger_cache[i] = get_trigger_from_device(i);
 			setHWTrigger(i, trigger_mapping[0]);
 		}
@@ -1770,7 +1770,7 @@ void LogicAnalyzer::triggerChanged(int index)
 
 void LogicAnalyzer::cleanHWParams()
 {
-	for(int i = 0; i < get_no_channels(dev) + 2; i++) {
+	for(unsigned int i = 0; i < get_no_channels(dev) + 2; i++) {
 		setHWTrigger(i, trigger_mapping[0]);
 	}
 	setHWTriggerDelay(active_triggerSampleCount);
@@ -1868,7 +1868,7 @@ void LogicAnalyzer::resetInstrumentToDefault()
 	chm.clearChannelGroups();
 	cleanHWParams();
 	chm.clearTrigger();
-	for(int i = 0; i < no_channels; i++) {
+	for(unsigned int i = 0; i < no_channels; i++) {
 		chm.add_channel_group(new LogicAnalyzerChannelGroup(chm.get_channel(i)));
 	}
 	chm.highlightChannel(chm.get_channel_group(0));

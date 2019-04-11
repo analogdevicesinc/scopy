@@ -105,7 +105,7 @@ LogicAnalyzerChannelUI::LogicAnalyzerChannelUI(LogicAnalyzerChannel *ch,
 	this->installEventFilter(this);
 
 	std::string trigger_val = chm_ui->chm->get_channel(get_channel()->get_id())->getTrigger();
-	for(int i = 0; i < chm_ui->getTriggerMapping().size(); i++)
+	for(unsigned int i = 0; i < chm_ui->getTriggerMapping().size(); i++)
 	{
 		if( trigger_val == chm_ui->getTriggerMapping(i) )
 		{
@@ -283,7 +283,7 @@ void LogicAnalyzerChannelUI::dropEvent(QDropEvent *event)
 		short from = (short)event->mimeData()->data("la/channelgroup")[1];
 		auto fromNrOfChannels = chm_ui->chm->get_channel_group(from)->get_channel_count();
 
-		for(int i = 0; i < fromNrOfChannels; i++) {
+		for(unsigned int i = 0; i < fromNrOfChannels; i++) {
 			/* Check for duplicates */
 			auto chToBeAdded = chm_ui->chm->get_channel_group(from)->get_channel(i);
 			auto ids = chm_ui->chm->get_channel_group(chgIndex)->get_ids();

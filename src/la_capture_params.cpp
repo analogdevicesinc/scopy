@@ -117,7 +117,7 @@ void LogicAnalyzerSymmetricBufferMode::configParamsOnTimeBaseChanged()
 	int sr_divider = 1;
 	sampleRate = m_maxSampleRate / sr_divider;
 
-	unsigned long bufferSize = getVisibleBufferSize(sampleRate);
+	long bufferSize = getVisibleBufferSize(sampleRate);
 	while ((m_triggerBufferMaxSize < bufferSize) && (sr_divider <
 			m_maxSampleRate)) {
 		sr_divider++;

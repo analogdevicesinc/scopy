@@ -55,8 +55,8 @@ private:
 	int m_current_divider;
 
 	unsigned int m_timeDivsCount;
-	unsigned long long m_entireBufferMaxSize;
-	unsigned long long m_triggerBufferMaxSize;
+	long long m_entireBufferMaxSize;
+	long long m_triggerBufferMaxSize;
 
 	double m_timeBase;
 	double m_triggerPos;

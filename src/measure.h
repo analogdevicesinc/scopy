@@ -130,7 +130,7 @@ namespace adiscope {
 	private:
 		int m_channel;
 		double *m_buffer;
-		size_t m_buf_length;
+		ssize_t m_buf_length;
 		double m_sample_rate;
 		unsigned int m_adc_bit_count;
 		double m_cross_level;
