@@ -31,9 +31,6 @@ QString ScopyApplication::initBreakPadHandler(QString crashDumpPath) {
 
 	}
 
-	QByteArray ba = qd.path().toLocal8Bit();
-	const char *appDirStr = ba.data();
-
 #ifdef Q_OS_LINUX
 	descriptor = new google_breakpad::MinidumpDescriptor(qd.path().toStdString().c_str());
 	handler->set_minidump_descriptor(*descriptor);

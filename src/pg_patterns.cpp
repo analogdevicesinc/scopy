@@ -449,9 +449,7 @@ uint8_t ClockPattern::generate_pattern(uint32_t sample_rate,
 
 
 	int period_number_of_samples = (int)round(f_period_number_of_samples);
-	int number_of_periods = (int)round(f_number_of_periods);
 	int low_number_of_samples = (int)round(f_low_number_of_samples);
-	int high_number_of_samples = (int)round(f_high_number_of_samples);
 
 	if (period_number_of_samples==0) {
 		period_number_of_samples=1;
@@ -539,9 +537,6 @@ void ClockPatternUI::destroy_ui()
 
 void ClockPatternUI::parse_ui()
 {
-	bool ok =0;
-
-
 	QObject *obj = sender();
 
 	bool freqStepDown = false;
@@ -1019,7 +1014,7 @@ Pattern *BinaryCounterPatternUI::get_pattern()
 
 void BinaryCounterPatternUI::parse_ui()
 {
-	bool ok = false;
+	/*bool ok = false;*/
 	pattern->set_frequency(frequencySpinButton->value());
 
 
@@ -1117,7 +1112,7 @@ void GrayCounterPatternUI::destroy_ui()
 
 void GrayCounterPatternUI::parse_ui()
 {
-	bool ok = false;
+	/*bool ok = false;*/
 	pattern->set_frequency(frequencySpinButton->value());
 
 
@@ -1361,7 +1356,6 @@ uint8_t UARTPattern::generate_pattern(uint32_t sample_rate,
                                       uint32_t number_of_samples, uint16_t number_of_channels)
 {
 	delete_buffer();
-	uint16_t number_of_frames = str.length();
 	uint32_t samples_per_bit = sample_rate/baud_rate;
 	qDebug()<< "samples_per_bit - "<<(float)sample_rate/(float)baud_rate;
 	uint16_t bits_per_frame;
@@ -1369,7 +1363,6 @@ uint8_t UARTPattern::generate_pattern(uint32_t sample_rate,
 	uint32_t samples_per_frame = samples_per_bit * bits_per_frame;
 
 	buffer = new short[number_of_samples]; // no need to recreate buffer
-	auto buffersize = (number_of_samples)*sizeof(short);
 	memset(buffer, 0xff, (number_of_samples)*sizeof(short));
 
 	short *buf_ptr = buffer;
@@ -1638,8 +1631,6 @@ void I2CPattern::sample_payload()
 			val = *it;
 		}
 
-		bool oldbit;
-
 		for (auto j=0; j<8; j++) {
 			bool bit;
 
@@ -1676,7 +1667,6 @@ uint8_t I2CPattern::generate_pattern(uint32_t sample_rate,
 
 	buffer = new short[number_of_samples]; // no need to recreate buffer
 	buf_ptr = buffer;
-	auto buffersize = (number_of_samples)*sizeof(short);
 	memset(buffer, (0xff), (number_of_samples)*sizeof(short));
 
 	samples_per_bit = 2*(sample_rate/clkFrequency);
@@ -1890,7 +1880,6 @@ uint8_t SPIPattern::generate_pattern(uint32_t sample_rate,
 	delete_buffer();
 
 	buffer = new short[number_of_samples]; // no need to recreate buffer
-	auto buffersize = (number_of_samples)*sizeof(short);
 
 	auto clkActiveBit = 0;
 	auto outputBit = 1;
@@ -2228,7 +2217,6 @@ bool JSPattern::is_periodic()
 
 uint8_t JSPattern::pre_generate()
 {
-	bool ok;
 	QString fileName(obj["filepath"].toString() +
 	                 obj["generate_script"].toString());
 	qDebug()<<fileName;
@@ -3330,8 +3318,6 @@ void ImportPatternUI::destroy_ui()
 
 void ImportPatternUI::parse_ui()
 {
-
-	bool ok =0;
 	QObject *obj = sender();
 	bool freqStepDown = false;
 

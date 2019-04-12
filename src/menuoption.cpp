@@ -202,7 +202,7 @@ void MenuOption::mouseMoveEvent(QMouseEvent *event)
 
 	drag->setMimeData(mimeData);
 	Q_EMIT enableInfoWidget(true);
-	Qt::DropAction dropAction = drag->exec(Qt::MoveAction);
+	drag->exec(Qt::MoveAction);
 	Q_EMIT enableInfoWidget(false);
 	this->setVisible(true);
 

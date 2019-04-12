@@ -1263,9 +1263,6 @@ void LogicAnalyzer::onTimePositionSpinboxChanged(double value)
 
 void LogicAnalyzer::onTimeTriggerHandlePosChanged(int pos)
 {
-	int width = bottomHandlesArea()->geometry().width() -
-			d_bottomHandlesArea->leftPadding() -
-			d_bottomHandlesArea->rightPadding();
 	double time = pixelToTime(pos);
 	if( (time + active_plot_timebase * 10 / 2) != active_timePos )
 	{

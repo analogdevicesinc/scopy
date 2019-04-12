@@ -483,7 +483,6 @@ void Measure::measure()
 	double rms;
 	double cycle_rms;
 	double rms_ac;
-	double cycle_rms_ac;
 	double area;
 	double cycle_area;
 	double sum;

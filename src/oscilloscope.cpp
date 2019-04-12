@@ -623,8 +623,6 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 			plot.setTimeBaseZoomed(false);
 	});
 	connect(plot.getZoomer(), &OscPlotZoomer::zoomFinished, [=](bool isZoomOut) {
-		ChannelWidget *channel_widget = channelWidgetAtId(current_ch_widget);
-
 		plot.setTimeBaseLabelValue(plot.HorizUnitsPerDiv());
 
 		for (int i = 0; i < nb_channels + nb_math_channels + nb_ref_channels; ++i) {
@@ -868,7 +866,6 @@ void Oscilloscope::add_ref_waveform(unsigned int chIdx)
 
 	int curve_id = nb_channels + nb_math_channels + nb_ref_channels;
 
-	unsigned int curve_number = find_curve_number();
 	QString qname = QString("REF %1").arg(nb_ref_channels + 1);
 
 	probe_attenuation.push_back(1);
@@ -977,7 +974,6 @@ void Oscilloscope::updateTriggerLevelValue(std::vector<float> value)
 	triggerLevelSink.first->blockSignals(true);
 
 	double m_dc_level = trigger_settings.dcLevel();
-	int val = value.at(0) * 1e3;
 	if ((int)(value.at(0)*1e3) == (int)(m_dc_level*1e3)) {
 		triggerLevelSink.first->blockSignals(false);
 		return;
@@ -1709,7 +1705,6 @@ void Oscilloscope::add_math_channel(const std::string& function)
 		return;
 	}
 
-	auto max_elem = max_element(probe_attenuation.begin(), probe_attenuation.begin() + nb_channels);
 	auto rail = gr::analog::rail_ff::make(MIN_MATH_RANGE, MAX_MATH_RANGE);
 	auto math = iio::iio_math::make(function, nb_channels);
 	unsigned int curve_id = nb_channels + nb_math_channels + nb_ref_channels;
@@ -2167,7 +2162,6 @@ void Oscilloscope::setChannelWidgetIndex(int chnIdx)
 
 void Oscilloscope::autosetFFT()
 {
-	bool started = iio->started();
 	auto fft = gnuradio::get_initial_sptr(
 				new fft_block(false, autoset_fft_size));
 
@@ -3256,7 +3250,6 @@ void Oscilloscope::editMathChannelFunction(int id, const std::string& new_functi
 	QString qname = chn_widget->deleteButton()->property("curve_name").toString();
 	std::string name = qname.toStdString();
 
-	auto max_elem = max_element(probe_attenuation.begin(), probe_attenuation.begin() + nb_channels);
 	auto rail = gr::analog::rail_ff::make(MIN_MATH_RANGE, MAX_MATH_RANGE);
 	auto math = iio::iio_math::make(new_function, nb_channels);
 

@@ -109,8 +109,6 @@ bool SignalGenerator::chunkCompare(chunk_header_t& ptr,const char *id2)
 	return true;
 }
 
-static double temp_sample_rate;
-
 SignalGenerator::SignalGenerator(struct iio_context *_ctx,
                                  QList<std::shared_ptr<GenericDac>> dacs, Filter *filt,
                                  QPushButton *runButton, QJSEngine *engine, ToolLauncher *parent) :
@@ -1449,7 +1447,6 @@ basic_block_sptr SignalGenerator::getSignalSource(gr::top_block_sptr top,
 		double samp_rate, struct signal_generator_data& data,
                 double phase_correction)
 {
-	bool inv_saw_wave = data.waveform == SG_INV_SAW_WAVE;
 	analog::gr_waveform_t waveform;
 	double phase;
 	double amplitude;
@@ -1670,7 +1667,6 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
 				break;
 			}
 
-			auto ratio=ptr->file_sr/samp_rate;
 			auto mult = blocks::multiply_const_ff::make(ptr->file_amplitude);
 			top->connect(buffer,0,mult,0);
 			auto add = blocks::add_const_ff::make(ptr->file_offset);
@@ -1680,7 +1676,7 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
 
 			if (preview) {
 				auto ratio = sample_rate/ptr->file_sr;
-				long m,n,integral;
+				long m,n;
 				bool ok=false;
 				for(auto precision=8;precision<2048;precision<<=1)
 				{

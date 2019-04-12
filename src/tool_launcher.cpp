@@ -586,8 +586,6 @@ void ToolLauncher::updateListOfDevices(const QVector<QString>& uris)
 		if (!uri.startsWith("usb:"))
 			continue;
 
-		bool found = false;
-
 		auto dev = getDevice(uri);
 
 		if (!dev)
@@ -995,7 +993,6 @@ void ToolLauncher::setupAddPage()
 	connectWidget = new ConnectDialog(ui->stackedWidget);
 	connect(connectWidget, &ConnectDialog::newContext,
 		[=](const QString& uri) {
-		bool found = false;
 		auto dev = getDevice(uri);
 		if (dev) {
 			highlightDevice(dev->deviceButton());

@@ -211,7 +211,7 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 	connect(pgSettings->PB_Reset,SIGNAL(clicked(bool)),this,
 	        SLOT(resetPGToDefault()));
 
-	auto i=0;
+	/*auto i=0;*/
 
 	for (auto var : PatternFactory::get_ui_list()) {
 		cgSettings->CBPattern->addItem(var);
@@ -908,7 +908,6 @@ bool PatternGenerator::startPatternGeneration(bool cyclic)
 
 	buffer_created = true;
 	short *p_dat;
-	ptrdiff_t p_inc;
 
 	int i = 0;
 
