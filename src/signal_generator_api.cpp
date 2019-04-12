@@ -23,7 +23,7 @@ QList<int> SignalGenerator_API::getMode() const
 {
 	QList<int> list;
 
-	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+	for (int i = 0; i < gen->channels.size(); i++) {
 		auto ptr = gen->getData(gen->channels[i]);
 
 		list.append(static_cast<int>(ptr->type));
@@ -38,7 +38,7 @@ void SignalGenerator_API::setMode(const QList<int>& list)
 		return;
 	}
 
-	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+	for (int i = 0; i < gen->channels.size(); i++) {
 		auto ptr = gen->getData(gen->channels[i]);
 
 		ptr->type = static_cast<enum SIGNAL_TYPE>(list.at(i));
@@ -52,7 +52,7 @@ QList<bool> SignalGenerator_API::enabledChannels() const
 {
 	QList<bool> list;
 
-	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+	for (int i = 0; i < gen->channels.size(); i++) {
 		list.append(static_cast<bool>(gen->channels[i]->enableButton()->isChecked()));
 	}
 
@@ -65,7 +65,7 @@ void SignalGenerator_API::enableChannels(const QList<bool>& list)
 		return;
 	}
 
-	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+	for (int i = 0; i < gen->channels.size(); i++) {
 		gen->channels[i]->enableButton()->setChecked(list.at(i));
 	}
 }
@@ -75,7 +75,7 @@ QList<double> SignalGenerator_API::getConstantValue() const
 {
 	QList<double> list;
 
-	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+	for (int i = 0; i < gen->channels.size(); i++) {
 		auto ptr = gen->getData(gen->channels[i]);
 
 		list.append(static_cast<double>(ptr->constant));
@@ -90,7 +90,7 @@ void SignalGenerator_API::setConstantValue(const QList<double>& list)
 		return;
 	}
 
-	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+	for (int i = 0; i < gen->channels.size(); i++) {
 		auto ptr = gen->getData(gen->channels[i]);
 
 		ptr->constant = static_cast<float>(list.at(i));
@@ -103,7 +103,7 @@ QList<int> SignalGenerator_API::getWaveformType() const
 {
 	QList<int> list;
 
-	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+	for (int i = 0; i < gen->channels.size(); i++) {
 		auto ptr = gen->getData(gen->channels[i]);
 		list.append(SignalGenerator::sg_waveform_to_idx(ptr->waveform));
 	}
@@ -126,7 +126,7 @@ void SignalGenerator_API::setWaveformType(const QList<int>& list)
 		SG_INV_SAW_WAVE,
 	};
 
-	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+	for (int i = 0; i < gen->channels.size(); i++) {
 		auto ptr = gen->getData(gen->channels[i]);
 
 		ptr->waveform = types[list.at(i)];
@@ -142,7 +142,7 @@ QList<double> SignalGenerator_API::getWaveformAmpl() const
 {
 	QList<double> list;
 
-	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+	for (int i = 0; i < gen->channels.size(); i++) {
 		auto ptr = gen->getData(gen->channels[i]);
 
 		list.append(ptr->amplitude);
@@ -157,7 +157,7 @@ void SignalGenerator_API::setWaveformAmpl(const QList<double>& list)
 		return;
 	}
 
-	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+	for (int i = 0; i < gen->channels.size(); i++) {
 		auto ptr = gen->getData(gen->channels[i]);
 
 		ptr->amplitude = list.at(i);
@@ -170,7 +170,7 @@ QList<double> SignalGenerator_API::getWaveformFreq() const
 {
 	QList<double> list;
 
-	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+	for (int i = 0; i < gen->channels.size(); i++) {
 		auto ptr = gen->getData(gen->channels[i]);
 
 		list.append(ptr->frequency);
@@ -185,7 +185,7 @@ void SignalGenerator_API::setWaveformFreq(const QList<double>& list)
 		return;
 	}
 
-	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+	for (int i = 0; i < gen->channels.size(); i++) {
 		auto ptr = gen->getData(gen->channels[i]);
 
 		ptr->frequency = list.at(i);
@@ -198,7 +198,7 @@ QList<double> SignalGenerator_API::getWaveformOfft() const
 {
 	QList<double> list;
 
-	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+	for (int i = 0; i < gen->channels.size(); i++) {
 		auto ptr = gen->getData(gen->channels[i]);
 
 		list.append(static_cast<double>(ptr->offset));
@@ -213,7 +213,7 @@ void SignalGenerator_API::setWaveformOfft(const QList<double>& list)
 		return;
 	}
 
-	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+	for (int i = 0; i < gen->channels.size(); i++) {
 		auto ptr = gen->getData(gen->channels[i]);
 
 		ptr->offset = static_cast<float>(list.at(i));
@@ -226,7 +226,7 @@ QList<double> SignalGenerator_API::getWaveformPhase() const
 {
 	QList<double> list;
 
-	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+	for (int i = 0; i < gen->channels.size(); i++) {
 		auto ptr = gen->getData(gen->channels[i]);
 
 		list.append(ptr->phase);
@@ -241,7 +241,7 @@ void SignalGenerator_API::setWaveformPhase(const QList<double>& list)
 		return;
 	}
 
-	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+	for (int i = 0; i < gen->channels.size(); i++) {
 		auto ptr = gen->getData(gen->channels[i]);
 
 		ptr->phase = list.at(i);
@@ -255,7 +255,7 @@ QList<double> SignalGenerator_API::getWaveformDuty() const
 {
 	QList<double> list;
 
-	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+	for (int i = 0; i < gen->channels.size(); i++) {
 		auto ptr = gen->getData(gen->channels[i]);
 
 		list.append(ptr->dutycycle);
@@ -270,7 +270,7 @@ void SignalGenerator_API::setWaveformDuty(const QList<double>& list)
 		return;
 	}
 
-	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+	for (int i = 0; i < gen->channels.size(); i++) {
 		auto ptr = gen->getData(gen->channels[i]);
 
 		ptr->dutycycle = list.at(i);
@@ -283,7 +283,7 @@ QList<int> SignalGenerator_API::getNoiseType() const
 {
 	QList<int> list;
 
-	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+	for (int i = 0; i < gen->channels.size(); i++) {
 		auto ptr = gen->getData(gen->channels[i]);
 		list.append(ptr->noiseType);
 	}
@@ -297,7 +297,7 @@ void SignalGenerator_API::setNoiseType(const QList<int>& list)
 		return;
 	}
 
-	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+	for (int i = 0; i < gen->channels.size(); i++) {
 		auto ptr = gen->getData(gen->channels[i]);
 
 		ptr->noiseType = qvariant_cast<gr::analog::noise_type_t>(list.at(i));
@@ -313,7 +313,7 @@ QList<double> SignalGenerator_API::getNoiseAmpl() const
 {
 	QList<double> list;
 
-	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+	for (int i = 0; i < gen->channels.size(); i++) {
 		auto ptr = gen->getData(gen->channels[i]);
 
 		list.append(ptr->noiseAmplitude);
@@ -328,7 +328,7 @@ void SignalGenerator_API::setNoiseAmpl(const QList<double>& list)
 		return;
 	}
 
-	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+	for (int i = 0; i < gen->channels.size(); i++) {
 		auto ptr = gen->getData(gen->channels[i]);
 		ptr->noiseAmplitude = list.at(i);
 	}
@@ -342,7 +342,7 @@ QList<double> SignalGenerator_API::getWaveformRise() const
 {
 	QList<double> list;
 
-	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+	for (int i = 0; i < gen->channels.size(); i++) {
 		auto ptr = gen->getData(gen->channels[i]);
 
 		list.append(ptr->rise);
@@ -357,7 +357,7 @@ void SignalGenerator_API::setWaveformRise(const QList<double>& list)
 		return;
 	}
 
-	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+	for (int i = 0; i < gen->channels.size(); i++) {
 		auto ptr = gen->getData(gen->channels[i]);
 
 		ptr->rise = list.at(i);
@@ -371,7 +371,7 @@ QList<double> SignalGenerator_API::getWaveformFall() const
 {
 	QList<double> list;
 
-	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+	for (int i = 0; i < gen->channels.size(); i++) {
 		auto ptr = gen->getData(gen->channels[i]);
 
 		list.append(ptr->fall);
@@ -386,7 +386,7 @@ void SignalGenerator_API::setWaveformFall(const QList<double>& list)
 		return;
 	}
 
-	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+	for (int i = 0; i < gen->channels.size(); i++) {
 		auto ptr = gen->getData(gen->channels[i]);
 
 		ptr->fall = list.at(i);
@@ -400,7 +400,7 @@ QList<double> SignalGenerator_API::getWaveformHoldHigh() const
 {
 	QList<double> list;
 
-	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+	for (int i = 0; i < gen->channels.size(); i++) {
 		auto ptr = gen->getData(gen->channels[i]);
 
 		list.append(ptr->holdh);
@@ -415,7 +415,7 @@ void SignalGenerator_API::setWaveformHoldHigh(const QList<double>& list)
 		return;
 	}
 
-	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+	for (int i = 0; i < gen->channels.size(); i++) {
 		auto ptr = gen->getData(gen->channels[i]);
 
 		ptr->holdh = list.at(i);
@@ -429,7 +429,7 @@ QList<double> SignalGenerator_API::getWaveformHoldLow() const
 {
 	QList<double> list;
 
-	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+	for (int i = 0; i < gen->channels.size(); i++) {
 		auto ptr = gen->getData(gen->channels[i]);
 
 		list.append(ptr->holdl);
@@ -444,7 +444,7 @@ void SignalGenerator_API::setWaveformHoldLow(const QList<double>& list)
 		return;
 	}
 
-	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+	for (int i = 0; i < gen->channels.size(); i++) {
 		auto ptr = gen->getData(gen->channels[i]);
 
 		ptr->holdl = list.at(i);
@@ -459,7 +459,7 @@ QList<double> SignalGenerator_API::getMathFreq() const
 {
 	QList<double> list;
 
-	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+	for (int i = 0; i < gen->channels.size(); i++) {
 		auto ptr = gen->getData(gen->channels[i]);
 
 		list.append(ptr->math_freq);
@@ -474,7 +474,7 @@ void SignalGenerator_API::setMathFreq(const QList<double>& list)
 		return;
 	}
 
-	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+	for (int i = 0; i < gen->channels.size(); i++) {
 		auto ptr = gen->getData(gen->channels[i]);
 
 		ptr->math_freq = list.at(i);
@@ -487,7 +487,7 @@ QList<QString> SignalGenerator_API::getMathFunction() const
 {
 	QList<QString> list;
 
-	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+	for (int i = 0; i < gen->channels.size(); i++) {
 		auto ptr = gen->getData(gen->channels[i]);
 
 		list.append(ptr->function);
@@ -502,7 +502,7 @@ void SignalGenerator_API::setMathFunction(const QList<QString>& list)
 		return;
 	}
 
-	for (unsigned int i = 0; i < gen->channels.size(); i++) {
+	for (int i = 0; i < gen->channels.size(); i++) {
 		auto ptr = gen->getData(gen->channels[i]);
 
 		ptr->function = list.at(i);
@@ -519,7 +519,7 @@ void SignalGenerator_API::setMathFunction(const QList<QString>& list)
 QList<QString> SignalGenerator_API::getBufferFilePath() const{
     QList<QString> list;
 
-    for (unsigned int i = 0; i < gen->channels.size(); i++) {
+    for (int i = 0; i < gen->channels.size(); i++) {
         auto ptr = gen->getData(gen->channels[i]);
 
         if(ptr->file!="" && ptr->file_type!=FORMAT_NO_FILE){
@@ -539,7 +539,7 @@ void SignalGenerator_API::setBufferFilePath(const QList<QString>& list){
     }
 
     auto currentChannel = gen->currentChannel;
-    for (unsigned int i = 0; i < gen->channels.size(); i++) {
+    for (int i = 0; i < gen->channels.size(); i++) {
         if(list.at(i) != ""){
             gen->currentChannel = i;
             gen->loadFileFromPath(list.at(i));
@@ -552,7 +552,7 @@ void SignalGenerator_API::setBufferFilePath(const QList<QString>& list){
 QList<double> SignalGenerator_API::getBufferAmplitude() const{
     QList<double> list;
 
-    for (unsigned int i = 0; i < gen->channels.size(); i++) {
+    for (int i = 0; i < gen->channels.size(); i++) {
         auto ptr = gen->getData(gen->channels[i]);
 
         list.append(ptr->file_amplitude);
@@ -566,7 +566,7 @@ void SignalGenerator_API::setBufferAmplitude(const QList<double>& list){
         return;
     }
 
-    for (unsigned int i = 0; i < gen->channels.size(); i++) {
+    for (int i = 0; i < gen->channels.size(); i++) {
         auto ptr = gen->getData(gen->channels[i]);
 
         ptr->file_amplitude = list.at(i);
@@ -581,7 +581,7 @@ void SignalGenerator_API::setBufferAmplitude(const QList<double>& list){
 QList<double> SignalGenerator_API::getBufferOffset() const{
     QList<double> list;
 
-    for (unsigned int i = 0; i < gen->channels.size(); i++) {
+    for (int i = 0; i < gen->channels.size(); i++) {
         auto ptr = gen->getData(gen->channels[i]);
 
         list.append(ptr->file_offset);
@@ -595,7 +595,7 @@ void SignalGenerator_API::setBufferOffset(const QList<double>& list){
         return;
     }
 
-    for (unsigned int i = 0; i < gen->channels.size(); i++) {
+    for (int i = 0; i < gen->channels.size(); i++) {
         auto ptr = gen->getData(gen->channels[i]);
 
         ptr->file_offset = list.at(i);
@@ -609,7 +609,7 @@ void SignalGenerator_API::setBufferOffset(const QList<double>& list){
 QList<double> SignalGenerator_API::getBufferSampleRate() const{
     QList<double> list;
 
-    for (unsigned int i = 0; i < gen->channels.size(); i++) {
+    for (int i = 0; i < gen->channels.size(); i++) {
         auto ptr = gen->getData(gen->channels[i]);
 
         list.append(ptr->file_sr);
@@ -623,7 +623,7 @@ void SignalGenerator_API::setBufferSampleRate(const QList<double>& list){
         return;
     }
 
-    for (unsigned int i = 0; i < gen->channels.size(); i++) {
+    for (int i = 0; i < gen->channels.size(); i++) {
         auto ptr = gen->getData(gen->channels[i]);
 
         ptr->file_sr = list.at(i);
@@ -637,7 +637,7 @@ void SignalGenerator_API::setBufferSampleRate(const QList<double>& list){
 QList<double> SignalGenerator_API::getBufferPhase() const{
     QList<double> list;
 
-    for (unsigned int i = 0; i < gen->channels.size(); i++) {
+    for (int i = 0; i < gen->channels.size(); i++) {
         auto ptr = gen->getData(gen->channels[i]);
 
         list.append(ptr->file_phase);
@@ -651,7 +651,7 @@ void SignalGenerator_API::setBufferPhase(const QList<double>& list){
         return;
     }
 
-    for (unsigned int i = 0; i < gen->channels.size(); i++) {
+    for (int i = 0; i < gen->channels.size(); i++) {
         auto ptr = gen->getData(gen->channels[i]);
 
         ptr->file_phase = list.at(i);

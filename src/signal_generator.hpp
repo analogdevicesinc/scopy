@@ -167,7 +167,7 @@ private:
 
 	FileManager *fileManager;
 
-	unsigned int currentChannel;
+	int currentChannel;
 	double sample_rate;
 	double max_sample_rate;
 	unsigned long nb_points;
