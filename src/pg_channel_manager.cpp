@@ -935,8 +935,6 @@ void PatternGeneratorChannelGroupUI::setupUARTDecoder()
 
 		// Add the decoder rows
 
-		auto decc = uartdecoder->decoder();
-
 		auto decoderAnnotations = 3;
 
 		for (auto i=0; i<decoderAnnotations; i++) {
@@ -1006,7 +1004,6 @@ void PatternGeneratorChannelGroupUI::setupSPIDecoder()
 			spidecoder->set_option("cpha", g_variant_new_int64(!spipattern->getCPHA()));
 			//spidecoder->set_option("wordsize", g_variant_new_int64(spipattern->getBytesPerFrame()*8));
 
-			auto decc = spidecoder->decoder();
 			auto decoderAnnotations = 3;
 
 			for (auto i=0; i<decoderAnnotations; i++) {
