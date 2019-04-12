@@ -187,7 +187,7 @@ void LogicAnalyzerChannelUI::mouseMoveEvent(QMouseEvent *event)
 		drag->setPixmap(pix);
 	}
 	drag->setMimeData(mimeData);
-	Qt::DropAction dropAction = drag->exec( Qt::MoveAction );
+	drag->exec( Qt::MoveAction );
 	this->setVisible(true);
 }
 
@@ -271,8 +271,6 @@ void LogicAnalyzerChannelUI::dropEvent(QDropEvent *event)
 	auto chgIter = std::find(channelGroups->begin(), channelGroups->end(), chgroup);
 	auto chgIndex = chgIter - channelGroups->begin();
 
-	auto toNrOfChannels = (*chgIter)->get_channel_count();
-
 	auto channels = (*chgIter)->get_channels();
 	auto chIter = std::find(channels->begin(), channels->end(), lch);
 	auto chIndex = chIter - channels->begin();
@@ -324,7 +322,6 @@ void LogicAnalyzerChannelUI::dropEvent(QDropEvent *event)
 		}
 		else {
 			chgIndex = chgIndex + (chgIndex > fromChg ? -1 : 0);
-			auto chgIter = std::find(channelGroups->begin(), channelGroups->end(), chgroup);
 			chm_ui->chm->moveChannel(chgIndex, fromCh, chIndex, dropAfter);
 		}
 	}
@@ -998,7 +995,7 @@ void LogicAnalyzerChannelGroupUI::mouseMoveEvent(QMouseEvent *event)
 		drag->setPixmap(pix);
 	}
 
-	Qt::DropAction dropAction = drag->exec( Qt::MoveAction );
+	drag->exec( Qt::MoveAction );
 	this->setVisible(true);
 }
 
@@ -1480,7 +1477,6 @@ void LogicAnalyzerChannelManager::split(int index)
 void LogicAnalyzerChannelManager::removeChannel(int grIndex, int chIndex)
 {
 	auto grIt = std::next(channel_group.begin(), grIndex);
-	auto channels = (*grIt)->get_channels();
 	(*grIt)->remove_channel(chIndex);
 
 	if ((*grIt)->get_channel_count() == 0) {
@@ -1530,7 +1526,6 @@ void LogicAnalyzerChannelManager::splitChannel(int chgIndex, int chIndex)
 
 	// Use this to insert split channel after channelgroup
 	auto it = channel_group.begin() + chgIndex + 1;
-	auto subch = channel_group[chgIndex]->get_channel(chIndex);
 	auto chIt = channel_group[chgIndex]->get_channels()->begin() + chIndex;
 
 	auto newChgIndex =
@@ -2764,7 +2759,6 @@ void LogicAnalyzerChannelManagerUI::deleteSettingsWidget()
 
 void LogicAnalyzerChannelManagerUI::highlightPrevious()
 {
-	bool update = false;
 	if( chm->getHighlightedChannelGroup() ) {
 		auto chgroup = chm->getHighlightedChannelGroup();
 		auto chgIter = std::find(chm->get_channel_groups()->begin(),
@@ -2776,7 +2770,6 @@ void LogicAnalyzerChannelManagerUI::highlightPrevious()
 				showHighlight(false);
 				chm->highlightChannel(prevChgroup);
 				showHighlight(true);
-				update = true;
 			}
 		}
 	}
@@ -2794,7 +2787,6 @@ void LogicAnalyzerChannelManagerUI::highlightPrevious()
 				chm->highlightChannel(nullptr,
 					static_cast<LogicAnalyzerChannel*>(prevCh));
 				showHighlight(true);
-				update = true;
 			}
 		}
 	}
@@ -2802,7 +2794,6 @@ void LogicAnalyzerChannelManagerUI::highlightPrevious()
 
 void LogicAnalyzerChannelManagerUI::highlightNext()
 {
-	bool update = false;
 	if( chm->getHighlightedChannelGroup() ) {
 		auto chgroup = chm->getHighlightedChannelGroup();
 		auto chgIter = std::find(chm->get_channel_groups()->begin(),
@@ -2814,7 +2805,6 @@ void LogicAnalyzerChannelManagerUI::highlightNext()
 				showHighlight(false);
 				chm->highlightChannel(nextChgroup);
 				showHighlight(true);
-				update = true;
 			}
 		}
 	}
@@ -2832,7 +2822,6 @@ void LogicAnalyzerChannelManagerUI::highlightNext()
 				chm->highlightChannel(nullptr,
 					static_cast<LogicAnalyzerChannel*>(prevCh));
 				showHighlight(true);
-				update = true;
 			}
 		}
 	}

@@ -82,7 +82,6 @@ int ManualCalibration_API::next()
 int ManualCalibration_API::finish()
 {
 	auto currentStory = calib->stCalibrationStory;
-	int ret;
 
 	// If a story was not yet started, return -1
 	if (step_in_progress < 0) {
@@ -91,7 +90,7 @@ int ManualCalibration_API::finish()
 
 	// Finish the story, if not all the steps are done yet
 	while (step_in_progress < currentStory.story.count()) {
-		ret = next();
+		next();
 	}
 
 	calib->TempUi->finishButton->click();

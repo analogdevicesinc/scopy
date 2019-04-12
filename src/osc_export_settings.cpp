@@ -64,8 +64,6 @@ void ExportSettings::clear()
 
 void ExportSettings::onExportChannelChanged(QStandardItem *item)
 {
-	QStandardItemModel *model =
-		static_cast<QStandardItemModel *>(exportChannels->model());
 	bool en = item->data(Qt::EditRole).toBool();
 
 	if (ui->btnExportAll->isChecked()){

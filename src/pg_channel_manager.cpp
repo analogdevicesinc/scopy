@@ -223,7 +223,7 @@ void PatternGeneratorChannelUI::mouseMoveEvent(QMouseEvent *event)
 	}
 
 	drag->setMimeData(mimeData);
-	Qt::DropAction dropAction = drag->exec(Qt::MoveAction);
+	drag->exec(Qt::MoveAction);
 	this->setVisible(true);
 
 }
@@ -306,8 +306,6 @@ void PatternGeneratorChannelUI::dropEvent(QDropEvent *event)
 	auto channelGroups = getManagerUi()->chm->get_channel_groups();
 	auto chgIter = std::find(channelGroups->begin(),channelGroups->end(),chg);
 	auto chgIndex = chgIter-channelGroups->begin();
-
-	auto toNrOfChannels = (*chgIter)->get_channel_count();
 
 	auto channels = (*chgIter)->get_channels();
 	auto chIter = std::find(channels->begin(),channels->end(),ch);
@@ -758,7 +756,7 @@ void PatternGeneratorChannelGroupUI::mouseMoveEvent(QMouseEvent *event)
 		drag->setPixmap(pix);
 	}
 
-	Qt::DropAction dropAction = drag->exec(Qt::MoveAction);
+	drag->exec(Qt::MoveAction);
 	this->setVisible(true);
 
 }
@@ -1033,8 +1031,7 @@ void PatternGeneratorChannelGroupUI::setupI2CDecoder()
 		if (getManagerUi()->getUseDecoders()) {
 			auto chMap = setupDecoder("i2c",ids);
 
-			auto i2cdecoder = decodeTrace->decoder()->stack().front();
-			auto i2cpattern = dynamic_cast<I2CPattern *>(getChannelGroup()->pattern);
+			decodeTrace->decoder()->stack().front();
 
 			auto decoderAnnotations = 2;
 
@@ -1416,8 +1413,7 @@ void PatternGeneratorChannelManager::commitBuffer(PatternGeneratorChannelGroup
 	uint8_t channel_mapping[16];
 	memset(channel_mapping,0x00,16*sizeof(uint8_t));
 	short *bufferPtr = chg->pattern->get_buffer();
-	int i=0,j=0;
-	auto channel_enable_mask_temp = chg->get_mask();
+	int i=0;
 	auto buffer_channel_mask = (1<<chg->get_channel_count())-1;
 
 	for (i=0; i<chg->get_channel_count(); i++) {
@@ -1570,8 +1566,6 @@ void PatternGeneratorChannelManagerUI::updateUi()
 {
 	static const int channelGroupLabelMaxLength = pg->channelGroupLabelMaxLength;
 	static const int dioLabelMaxLength = 2;
-	static const int channelComboMaxLength = 15;
-	static const int outputComboMaxLength = 5;
 
 	if (pg->getCurrentPatternUI())
 		disconnect(pg->getCurrentPatternUI(),SIGNAL(decoderChanged()),this,
@@ -1661,8 +1655,6 @@ void PatternGeneratorChannelManagerUI::updateUi()
 
 		currentChannelGroupUI->ui->ChannelGroupLabel->setText(channelGroupLabel);
 		Util::setWidgetNrOfChars(currentChannelGroupUI->ui->DioLabel, dioLabelMaxLength);
-
-		int i = 0;
 
 		connect(static_cast<PatternGeneratorChannelGroupUI *>(chg_ui.back()),
 		        SIGNAL(channel_enabled()),this,SIGNAL(channelsChanged())); // TEMP

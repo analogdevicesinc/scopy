@@ -350,9 +350,9 @@ void Viewport::paint_grid(QPainter &p, const ViewItemPaintParams &pp)
 
 	int division_height = divisionHeight;
 	int division_count = divisionCount;
-	int division_offset = divisionOffset;
+	/*int division_offset = divisionOffset;
 
-	int division_width = w / division_count;    
+	int division_width = w / division_count;*/
 	int row_count = view_.height() / division_height;
 
 	QPointF p1, p2;
