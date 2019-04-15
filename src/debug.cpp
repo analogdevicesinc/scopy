@@ -19,6 +19,8 @@
 
 #include "debug.h"
 
+static const size_t maxAttrSize = 512;
+
 using namespace adiscope;
 
 Debug::Debug(QObject *parent) : QObject(parent)
@@ -203,7 +205,7 @@ QStringList Debug::getAvailableValues(const QString& devName, QString& channel,
 {
 	struct iio_device *device;
 	struct iio_channel *ch;
-	char value[100];
+	char value[maxAttrSize];
 	QStringList values;
 	bool isOutput;
 
@@ -218,7 +220,7 @@ QStringList Debug::getAvailableValues(const QString& devName, QString& channel,
 		device = iio_context_find_device(ctx, devName.toLatin1().data());
 
 		if (channel.isNull()) {
-			iio_device_attr_read(device, attribute.toLatin1().data(), value, 100);
+			iio_device_attr_read(device, attribute.toLatin1().data(), value, maxAttrSize);
 		} else {
 			isOutput = channel.contains("output", Qt::CaseInsensitive);
 
@@ -229,7 +231,7 @@ QStringList Debug::getAvailableValues(const QString& devName, QString& channel,
 			}
 
 			ch = iio_device_find_channel(device, channel.toLatin1().data(), isOutput);
-			iio_channel_attr_read(ch, attribute.toLatin1().data(),value, 100);
+			iio_channel_attr_read(ch, attribute.toLatin1().data(), value, maxAttrSize);
 		}
 
 		values = QString(value).split(' ');
@@ -247,14 +249,14 @@ QString Debug::readAttribute(const QString& devName, QString& channel,
 {
 	struct iio_device *device;
 	struct iio_channel *ch;
-	char value[100];
+	char value[maxAttrSize];
 	bool isOutput;
 
 	if (connected) {
 		device = iio_context_find_device(ctx, devName.toLatin1().data());
 
 		if (channel.isNull()) {
-			iio_device_attr_read(device, attribute.toLatin1().data(), value, 100);
+			iio_device_attr_read(device, attribute.toLatin1().data(), value, maxAttrSize);
 		} else {
 			isOutput = channel.contains("output", Qt::CaseInsensitive);
 
@@ -265,7 +267,7 @@ QString Debug::readAttribute(const QString& devName, QString& channel,
 			}
 
 			ch = iio_device_find_channel(device, channel.toLatin1().data(), isOutput);
-			iio_channel_attr_read(ch, attribute.toLatin1().data(),value, 100);
+			iio_channel_attr_read(ch, attribute.toLatin1().data(),value, maxAttrSize);
 		}
 	}
 
