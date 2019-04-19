@@ -93,6 +93,8 @@ public:
 	void enableFrequencyBar(bool enable);
 	void setYAxisInterval(double min, double max, double correction);
 
+	void setPlotBarEnabled(bool enabled);
+	void parametersOverrange(bool enable);
 Q_SIGNALS:
 	void VBar1PixelPosChanged(int);
 	void VBar2PixelPosChanged(int);
@@ -156,6 +158,7 @@ private:
 	double thickness;
 	bool log_freq;
 	bool delta_label;
+	bool d_plotBarEnabled;
 
 	bool d_cursorsEnabled;
 	bool d_cursorsCentered;

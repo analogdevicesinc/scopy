@@ -51,9 +51,9 @@ void dBgraph::setupCursors()
 	d_plotBar->setVisible(false);
 
 	d_frequencyBar->setPen(frequencyLinePen);
-	d_frequencyBar->setVisible(false);
+	d_frequencyBar->setVisible(true);
 	d_frequencyBar->setMobileAxis(QwtPlot::xTop);
-	d_frequencyBar->setPixelPosition(canvas()->width()/2-30);
+	d_frequencyBar->setPixelPosition(0);
 
 	d_plotBar->setPen(plotLinePen);
 	d_plotBar->setMobileAxis(QwtPlot::xTop);
@@ -70,6 +70,15 @@ void dBgraph::setupCursors()
 
 	connect(d_frequencyBar, &VertBar::pixelPositionChanged,
 		this, &dBgraph::frequencyBarPositionChanged);
+}
+
+void dBgraph::parametersOverrange(bool enable)
+{
+	if (enable) {
+		d_plotBar->setPen(QPen(QColor(250, 0, 0, 50), 5, Qt::SolidLine));
+	} else {
+		d_plotBar->setPen(QPen(QColor(211, 211, 211, 50), 5, Qt::SolidLine));
+	}
 }
 
 void dBgraph::setupReadouts()
@@ -103,7 +112,8 @@ dBgraph::dBgraph(QWidget *parent) : QwtPlot(parent),
 	ymax(10),
 	d_plotPosition(0),
 	numSamples(0),
-	delta_label(false)
+	delta_label(false),
+	d_plotBarEnabled(true)
 {
 	enableAxis(QwtPlot::xBottom, false);
 	enableAxis(QwtPlot::xTop, true);
@@ -247,7 +257,9 @@ void dBgraph::setAxesTitles(const QString& x, const QString& y)
 void dBgraph::plot(double x, double y)
 {
 	if (!d_plotBar->isVisible() && !xdata.size()) {
-		d_plotBar->setVisible(true);
+		if (d_plotBarEnabled) {
+			d_plotBar->setVisible(true);
+		}
 	}
 
 	if (xdata.size() == numSamples) {
@@ -507,7 +519,9 @@ void dBgraph::useDeltaLabel(bool use_delta)
 
 void dBgraph::sweepDone()
 {
-	d_plotBar->setVisible(false);
+	if (d_plotBarEnabled) {
+		d_plotBar->setVisible(false);
+	}
 }
 
 void dBgraph::onFrequencyCursorPositionChanged(int pos)
@@ -549,7 +563,7 @@ void dBgraph::onVbar2PixelPosChanged(int pos)
 
 void dBgraph::toggleCursors(bool en)
 {
-	d_frequencyBar->setPixelPosition(canvas()->width()/2-30);
+	d_frequencyBar->setPixelPosition(0);
 	if (d_cursorsEnabled != en) {
 		if (!d_cursorsCentered) {
 			d_cursorsCentered=true;
@@ -714,7 +728,7 @@ QVector<double> dBgraph::getYAxisData()
 void dBgraph::enableFrequencyBar(bool enable)
 {
 	d_frequencyBar->setVisible(enable);
-	d_frequencyBar->setPixelPosition(canvas()->width() / 2);
+	d_frequencyBar->setPixelPosition(0);
 }
 
 void dBgraph::setYAxisInterval(double min, double max, double correction)
@@ -766,4 +780,9 @@ void dBgraph::showEvent(QShowEvent *event)
 	auto sw = axisWidget(QwtPlot::xTop);
 	sw->scaleDraw()->invalidateCache();
 	sw->repaint();
+}
+
+void dBgraph::setPlotBarEnabled(bool enabled)
+{
+	d_plotBarEnabled = enabled;
 }
