@@ -95,9 +95,6 @@ public:
 	bool getDigital_decoders_enabled() const;
 	void setDigital_decoders_enabled(bool value);
 
-	bool getNaGainUpdateEnabled() const;
-	void setNaGainUpdateEnabled(bool value);
-
 Q_SIGNALS:
 
 	void notify();
@@ -129,7 +126,6 @@ private:
 	bool mini_hist_enabled;
 	bool digital_decoders_enabled;
 	bool m_initialized;
-	bool na_update_gain_enabled;
 
 	Preferences_API *pref_api;
 	QString getPreferenceIniFile() const;
@@ -155,16 +151,12 @@ class Preferences_API : public ApiObject
 	Q_PROPERTY(bool osc_filtering_enabled READ getOscFilteringEnabled WRITE setOscFilteringEnabled)
 	Q_PROPERTY(bool mini_hist_enabled READ getMiniHist WRITE setMiniHist)
 	Q_PROPERTY(bool digital_decoders READ getDigitalDecoders WRITE setDigitalDecoders)
-	Q_PROPERTY(bool na_gain_update_enabled READ getNaGainUpdateEnabled WRITE setNaGainUpdateEnabled)
 
 public:
 
 	explicit Preferences_API(Preferences *preferencePanel) :
 		ApiObject(),
 		preferencePanel(preferencePanel) {}
-
-	bool getNaGainUpdateEnabled() const;
-	void setNaGainUpdateEnabled(bool enabled);
 
 	bool getAnimationsEnabled() const;
 	void setAnimationsEnabled(const bool& enabled);

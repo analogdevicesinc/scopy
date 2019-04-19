@@ -49,8 +49,7 @@ Preferences::Preferences(QWidget *parent) :
 	osc_filtering_enabled(true),
 	mini_hist_enabled(false),
 	digital_decoders_enabled(true),
-	m_initialized(false),
-	na_update_gain_enabled(false)
+	m_initialized(false)
 {
 	ui->setupUi(this);
 
@@ -143,11 +142,6 @@ Preferences::Preferences(QWidget *parent) :
 		}
 	});
 
-	connect(ui->na_gainCheckBox, &QCheckBox::stateChanged, [=](int state) {
-		na_update_gain_enabled = (!state ? false : true);
-		Q_EMIT notify();
-	});
-
 	QString preference_ini_file = getPreferenceIniFile();
 	QSettings settings(preference_ini_file, QSettings::IniFormat);
 
@@ -188,7 +182,6 @@ void Preferences::showEvent(QShowEvent *event)
 	ui->oscFilteringCheckBox->setChecked(osc_filtering_enabled);
 	ui->histCheckBox->setChecked(mini_hist_enabled);
 	ui->decodersCheckBox->setChecked(digital_decoders_enabled);
-	ui->na_gainCheckBox->setChecked(na_update_gain_enabled);
 
 	QWidget::showEvent(event);
 }
@@ -223,16 +216,6 @@ bool Preferences::getDigital_decoders_enabled() const
 void Preferences::setDigital_decoders_enabled(bool value)
 {
 	digital_decoders_enabled = value;
-}
-
-bool Preferences::getNaGainUpdateEnabled() const
-{
-    return na_update_gain_enabled;
-}
-
-void Preferences::setNaGainUpdateEnabled(bool value)
-{
-    na_update_gain_enabled = value;
 }
 
 bool Preferences::getOsc_filtering_enabled() const
@@ -399,16 +382,6 @@ bool Preferences::getOsc_graticule_enabled() const
 void Preferences::setOsc_graticule_enabled(bool value)
 {
 	graticule_enabled = value;
-}
-
-bool Preferences_API::getNaGainUpdateEnabled() const
-{
-	return preferencePanel->getNaGainUpdateEnabled();
-}
-
-void Preferences_API::setNaGainUpdateEnabled(bool enabled)
-{
-	preferencePanel->setNaGainUpdateEnabled(enabled);
 }
 
 bool Preferences_API::getAnimationsEnabled() const
