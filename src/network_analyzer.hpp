@@ -35,12 +35,26 @@
 #include <gnuradio/blocks/vector_sink_s.h>
 #include <gnuradio/analog/sig_source_f.h>
 #include <gnuradio/blocks/float_to_short.h>
+#include <gnuradio/fft/goertzel_fc.h>
+#include <gnuradio/blocks/vector_source_f.h>
+#include <gnuradio/blocks/vector_sink_f.h>
+#include <gnuradio/blocks/multiply_cc.h>
+#include <gnuradio/blocks/multiply_conjugate_cc.h>
+#include <gnuradio/blocks/complex_to_arg.h>
+#include <gnuradio/blocks/complex_to_mag_squared.h>
+#include <gnuradio/filter/dc_blocker_ff.h>
+#include <gnuradio/blocks/moving_average_cc.h>
+#include <gnuradio/blocks/moving_average_ff.h>
+#include <gnuradio/blocks/skiphead.h>
+#include "cancel_dc_offset_block.h"
+
 #include "oscilloscope.hpp"
 
 #include "TimeDomainDisplayPlot.h"
 
 #include "networkanalyzerbufferviewer.h"
 #include "startstoprangewidget.h"
+#include "adc_sample_conv.hpp"
 
 extern "C" {
 	struct iio_buffer;
@@ -117,11 +131,27 @@ private:
 		double frequency;
 		size_t rate;
 		size_t bufferSize;
-		size_t adcRate;
-		size_t adcBuffer;
 	} networkIteration;
 
+	typedef struct NetworkAnalyzerIterationStats {
+		NetworkAnalyzerIterationStats(double dcVoltage,
+					      M2kAdc::GainMode gain,
+					      bool hasError):
+			dcVoltage(dcVoltage),
+			gain(gain),
+			hasError(hasError) {}
+		NetworkAnalyzerIterationStats():
+			dcVoltage(0),
+			gain(M2kAdc::LOW_GAIN_MODE),
+			hasError(false) {}
+
+		double dcVoltage;
+		M2kAdc::GainMode gain;
+		bool hasError;
+	} NetworkIterationStats;
+
 	QVector<networkIteration> iterations;
+	QVector<NetworkIterationStats> iterationStats;
 
 	boost::thread *iterationsThread;
 	bool iterationsThreadCanceled;
@@ -130,8 +160,33 @@ private:
 	bool isIterationsThreadReady();
 	bool isIterationsThreadCanceled();
 
+	gr::fft::goertzel_fc::sptr goertzel1;
+	gr::fft::goertzel_fc::sptr goertzel2;
+	gr::blocks::copy::sptr copy1;
+	gr::blocks::copy::sptr copy2;
+	iio_manager::port_id id1;
+	iio_manager::port_id id2;
+	gr::blocks::head::sptr head1;
+	gr::blocks::head::sptr head2;
+	gr::blocks::vector_sink_f::sptr sink1;
+	gr::blocks::vector_sink_f::sptr sink2;
+	gr::blocks::complex_to_mag_squared::sptr c2m1;
+	gr::blocks::complex_to_mag_squared::sptr c2m2;
+	gr::blocks::multiply_conjugate_cc::sptr conj;
+	gr::filter::dc_blocker_ff::sptr dcBlocker1;
+	gr::filter::dc_blocker_ff::sptr dcBlocker2;
+	gr::blocks::complex_to_arg::sptr c2a;
+	boost::shared_ptr<signal_sample> signal;
+	boost::shared_ptr<adc_sample_conv> adc_conv;
+	boost::shared_ptr<cancel_dc_offset_block> dc_cancel1;
+	boost::shared_ptr<cancel_dc_offset_block> dc_cancel2;
+	float mag1, mag2, phase;
+	bool captureDone;
+	bool filterDc;
+
 	boost::mutex iterationsReadyMutex;
 	boost::condition_variable iterationsReadyCv;
+	boost::mutex bufferMutex;
 
 	NetworkAnalyzerBufferViewer *bufferPreviewer;
 	QVector<Buffer> capturedData;
@@ -166,8 +221,7 @@ private:
 
 	QFuture<void> thd;
 	bool stop;
-
-	void run();
+	void goertzel();
 
 	struct iio_buffer *generateSinWave(
 		const struct iio_device *dev,
@@ -181,8 +235,6 @@ private:
 
 	void triggerRightMenuToggle(CustomPushButton *btn, bool checked);
 	void toggleRightMenu(CustomPushButton *btn, bool checked);
-
-	void computeFrequencyArray();
 	void updateGainMode();
 	void computeCaptureParams(double frequency, size_t& buffer_size,
 				  size_t& adc_rate);
@@ -190,12 +242,20 @@ private:
 	QPair<double, double> getPhaseInterval();
 	void computeIterations();
 
-	double autoUpdateGainMode(double magnitude, double magnitudeGain);
+	double autoUpdateGainMode(double magnitude, double magnitudeGain, float dcVoltage);
 
+	void _configureDacFlowgraph();
+
+	void _configureAdcFlowgraph(size_t bufferSize = 0);
+	unsigned long _getBestSampleRate(double frequency, const iio_device *dev);
+	size_t _getSamplesCount(double frequency, unsigned long rate, bool perfect = false);
+	void computeFrequencyArray();
+
+	bool _checkMagForOverrange(double magnitude);
 private Q_SLOTS:
 	void startStop(bool start);
 	void updateNumSamples(bool force = false);
-	void plot(double frequency, double mag, double mag2, double phase);
+	void plot(double frequency, double mag, double mag2, double phase, float dcVoltage);
 	void _saveChannelBuffers(double frequency, double sample_rate, std::vector<float> data1, std::vector<float> data2);
 
 	void toggleCursors(bool en);
