@@ -7,8 +7,10 @@ namespace adiscope {
 class filter_dc_offset_block : public gr::sync_block
 {
 public:
-	explicit filter_dc_offset_block(unsigned int buffer_size);
+	explicit filter_dc_offset_block(unsigned int buffer_size, bool enabled);
 	~filter_dc_offset_block();
+
+	float get_dc_offset() const;
 
 	int work(int noutput_items,
 		 gr_vector_const_void_star &input_items,
@@ -16,6 +18,8 @@ public:
 
 private:
 	unsigned d_buffer_size;
+	float d_dc_offset;
+	bool d_enabled;
 };
 }
 
