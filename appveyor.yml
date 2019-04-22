@@ -41,6 +41,10 @@ install:
     - C:\msys64\usr\bin\bash -lc "wget -q http://repo.msys2.org/mingw/%ARCH%/mingw-w64-%ARCH%-libusb-1.0.21-2-any.pkg.tar.xz"
     - C:\msys64\usr\bin\bash -lc "pacman -U --force --noconfirm mingw-w64-%ARCH%-libusb-1.0.21-2-any.pkg.tar.xz"
 
+    # Install an older version of boost for gnuradio to use (currently not working with 1.70)
+    - C:\msys64\usr\bin\bash -lc "wget -q http://repo.msys2.org/mingw/${ARCH}/mingw-w64-${ARCH}-boost-1.69.0-2-any.pkg.tar.xz"
+    - C:\msys64\usr\bin\bash -lc "pacman -U --force --noconfirm mingw-w64-${ARCH}-boost-1.69.0-2-any.pkg.tar.xz"
+
     # Install pre-compiled libraries
     - 'appveyor DownloadFile "https://ci.appveyor.com/api/projects/analogdevicesinc/scopy-mingw-build-deps/artifacts/scopy-%MINGW_VERSION%-build-deps.tar.xz?branch=master&job=Environment: MINGW_VERSION=%MINGW_VERSION%, ARCH=%ARCH%" -FileName C:\scopy-%MINGW_VERSION%-build-deps.tar.xz'
     - C:\msys64\usr\bin\bash -lc "cd /c ; tar xJf scopy-%MINGW_VERSION%-build-deps.tar.xz"
