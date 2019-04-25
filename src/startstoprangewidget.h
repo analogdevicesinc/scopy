@@ -48,6 +48,8 @@ public:
 
 	double getCenterValue() const;
 
+	void insertWidgetIntoLayout(QWidget *widget, int row, int column);
+
 public Q_SLOTS:
 	void setMinimumSpanValue(double value);
 

@@ -335,7 +335,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	ui->pushDelayLayout->addWidget(pushDelay);
 	ui->captureDelayLayout->addWidget(captureDelay);
-	ui->samplesCountLayout->addWidget(samplesCount);
+	startStopRange->insertWidgetIntoLayout(samplesCount, 2, 1);
 	ui->amplitudeLayout->addWidget(amplitude);
 	ui->offsetLayout->addWidget(offset);
 	ui->magMaxLayout->addWidget(magMax);
