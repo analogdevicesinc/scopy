@@ -1379,8 +1379,6 @@ LogicAnalyzerChannelManager::LogicAnalyzerChannelManager() :
 		channel.push_back(new LogicAnalyzerChannel(i,temp));
 	}
 
-	auto temp = static_cast<LogicAnalyzerChannel *>(channel.back());
-
 	for (auto&& ch : channel) {
 		lchannels.push_back(static_cast<LogicAnalyzerChannel*>(ch));
 		channel_group.push_back(new LogicAnalyzerChannelGroup(
@@ -1573,7 +1571,7 @@ void LogicAnalyzerChannelManager::move(int from, int to, bool after)
 	try
 	{
 		auto fromElement = channel_group[from];
-		auto it = channel_group.erase(channel_group.begin() + from);
+		channel_group.erase(channel_group.begin() + from);
 		channel_group.insert(channel_group.begin() +
 			to + ((after) ? 1 : 0) + ((from<to) ? -1 : 0), fromElement);
 	}
