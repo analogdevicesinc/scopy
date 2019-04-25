@@ -1452,8 +1452,7 @@ void LogicAnalyzer::toggleRightMenu(QPushButton *btn, bool checked)
 {
 	int id = btn->property("id").toInt();
 
-	if( open )
-		settings_panel_update(id);
+	settings_panel_update(id);
 
 	active_settings_btn = btn;
 	menuOpened = checked;
