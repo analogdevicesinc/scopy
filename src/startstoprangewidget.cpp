@@ -67,6 +67,11 @@ double StartStopRangeWidget::getCenterValue() const
 	return center_freq->value();
 }
 
+void StartStopRangeWidget::insertWidgetIntoLayout(QWidget *widget, int row, int column)
+{
+	ui->gridLayout->addWidget(widget, row, column);
+}
+
 void StartStopRangeWidget::setMinimumSpanValue(double value)
 {
 	minSpan = value;
