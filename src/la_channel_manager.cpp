@@ -566,7 +566,7 @@ LogicAnalyzerChannel* LogicAnalyzerChannelGroup::get_logic_channel_by_id(int id)
 	return nullptr;
 }
 
-LogicAnalyzerChannel* LogicAnalyzerChannelGroup::get_channel_at_index(int index)
+LogicAnalyzerChannel* LogicAnalyzerChannelGroup::get_channel_at_index(unsigned int index)
 {
 	auto channels = get_channels();
 	if(index < channels->size()) {
@@ -782,7 +782,7 @@ LogicAnalyzerChannelGroupUI::LogicAnalyzerChannelGroupUI(
 	{
 		ch = static_cast<LogicAnalyzerChannel*>(lchg->get_channel());
 		std::string trigger_val = chm_ui->chm->get_channel(ch->get_id())->getTrigger();
-		for(int i = 0; i < chm_ui->getTriggerMapping().size(); i++)
+		for(unsigned int i = 0; i < chm_ui->getTriggerMapping().size(); i++)
 		{
 			if( trigger_val == chm_ui->getTriggerMapping(i) )
 			{
@@ -1404,7 +1404,7 @@ LogicAnalyzerChannelManager::~LogicAnalyzerChannelManager()
 }
 
 LogicAnalyzerChannelGroup *LogicAnalyzerChannelManager::get_channel_group(
-        int index)
+        unsigned int index)
 {
 	if(index < channel_group.size())
 		return static_cast<LogicAnalyzerChannelGroup *>(
@@ -1416,8 +1416,8 @@ void LogicAnalyzerChannelManager::join(std::vector<int> index)
 {
 	LogicAnalyzerChannelGroup *new_ch_group = new LogicAnalyzerChannelGroup();
 
-	for (auto i=0; i<index.size(); i++) {
-		for (auto j = 0; j < get_channel_group(index[i])->get_channels()->size(); j++)
+	for (unsigned int i=0; i<index.size(); i++) {
+		for (unsigned j = 0; j < get_channel_group(index[i])->get_channels()->size(); j++)
 		{
 			uint16_t someId = get_channel_group(index[i])->get_channels()->at(j)->get_id();
 			std::vector<uint16_t> vec = new_ch_group->get_ids();
@@ -1437,7 +1437,7 @@ void LogicAnalyzerChannelManager::join(std::vector<int> index)
 	channel_group.push_back(new_ch_group);
 }
 
-LogicAnalyzerChannel *LogicAnalyzerChannelManager::get_channel(int index)
+LogicAnalyzerChannel *LogicAnalyzerChannelManager::get_channel(unsigned int index)
 {
 	if(index < lchannels.size())
 		return lchannels[index];
@@ -2621,7 +2621,7 @@ void LogicAnalyzerChannelManagerUI::createSettingsWidget()
 			else
 				settingsUI->optionalChn->hide();
 
-			int index = 0;
+			unsigned int index = 0;
 			for (auto optch : chGroup->decoderOptChannels) {
 
 				if (optch == nullptr) {
