@@ -686,7 +686,7 @@ void Measure::measure()
 		for (int i = 1; i < crossSequence.size(); i++) {
 			CrossPoint &p0 = crossSequence[i - 1];
 			CrossPoint &p1 = crossSequence[i];
-			if (p1.m_bufIdx == p1.m_bufIdx && p1.m_onRising == p0.m_onRising) {
+			if ((p1.m_bufIdx == p0.m_bufIdx) && (p1.m_onRising == p0.m_onRising)) {
 				if (p0.m_name == "MR" && p1.m_name == "LR" ||
 						p0.m_name == "HR" && p1.m_name == "MR")
 					crossSequence.swap(i, i - 1);
