@@ -141,7 +141,7 @@ public:
 	QStringList get_decoder_roles_list();
 	const srd_channel *get_srd_channel_from_name(const char*);
 	LogicAnalyzerChannel* get_channel_by_id(int id);
-	LogicAnalyzerChannel* get_channel_at_index(int index);
+	LogicAnalyzerChannel* get_channel_at_index(unsigned int index);
 	LogicAnalyzerChannel* get_logic_channel_by_id(int id);
 	void add_logic_channel(LogicAnalyzerChannel *chn);
 	void remove_logic_channel(int chnIndex);
@@ -248,9 +248,9 @@ public:
 	void move(int from, int to, bool after = true);
 	void splitChannel(int chgIndex, int chIndex);
 
-	LogicAnalyzerChannelGroup *get_channel_group(int index);
+	LogicAnalyzerChannelGroup *get_channel_group(unsigned int index);
 	void add_channel_group(LogicAnalyzerChannelGroup *chg);
-	LogicAnalyzerChannel *get_channel(int);
+	LogicAnalyzerChannel *get_channel(unsigned int);
 	void clearChannelGroups();
 	void clearTrigger();
 private:

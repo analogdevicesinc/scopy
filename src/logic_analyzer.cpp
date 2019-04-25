@@ -166,7 +166,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 
 	buffer_previewer->setCursorPos(0.5);
 
-	for(int i=0; i < get_no_channels(dev)+2; i++) {
+	for(unsigned int i=0; i < get_no_channels(dev)+2; i++) {
 		trigger_cache.push_back(trigger_mapping[0]);
 	}
 
