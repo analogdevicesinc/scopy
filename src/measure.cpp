@@ -82,19 +82,21 @@ namespace adiscope {
 			if (samp > prevSamp) {
 				if (prevSamp <= low_trhold && samp >= low_trhold)
 					cross_type = POS_CROSS_LOW;
-				if (prevSamp <= high_trhold && samp >= high_trhold)
+				if (prevSamp <= high_trhold && samp >= high_trhold) {
 					if (cross_type == POS_CROSS_LOW)
 						cross_type = POS_CROSS_FULL;
 					else
 						cross_type = POS_CROSS_HIGH;
+				}
 			} else if (samp < prevSamp) {
 				if (prevSamp >= low_trhold && samp <= low_trhold)
 					cross_type = NEG_CROSS_LOW;
-				if (prevSamp >= high_trhold && samp <= high_trhold)
+				if (prevSamp >= high_trhold && samp <= high_trhold) {
 					if (cross_type == NEG_CROSS_LOW)
 						cross_type = NEG_CROSS_FULL;
 					else
 						cross_type = NEG_CROSS_HIGH;
+				}
 			}
 
 			return cross_type;
