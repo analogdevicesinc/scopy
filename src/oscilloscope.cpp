@@ -1490,7 +1490,7 @@ void Oscilloscope::toolDetached(bool detached)
 	if (detached) {
 		this->setMinimumWidth(min_detached_width);
 		this->setSizePolicy(QSizePolicy::Preferred,
-				    QSizePolicy::MinimumExpanding);
+				    QSizePolicy::Preferred);
 	} else {
 		this->setMinimumWidth(0);
 		this->setSizePolicy(QSizePolicy::MinimumExpanding,
