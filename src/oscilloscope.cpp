@@ -2343,8 +2343,8 @@ void Oscilloscope::onHistogram_view_toggled(bool visible)
 		hist_plot.setMaximumWidth(25);
 		hist_plot.setMaximumHeight(1000);
 		ui->hist_layout->removeWidget(&hist_plot);
-		ui->gridLayoutPlot->addWidget(&hist_plot, 2, 2, 1, 1);
-		ui->gridLayoutPlot->addWidget(plot.rightHandlesArea(), 1, 3, 3, 1);
+		ui->gridLayoutPlot->addWidget(&hist_plot, 3, 2, 1, 1);
+		ui->gridLayoutPlot->addWidget(plot.rightHandlesArea(), 1, 3, 4, 1);
 		plot.setBonusWidthForHistogram(25);
 		scaleHistogramPlot();
 		toggleMiniHistogramPlotVisible(miniHistogram);
