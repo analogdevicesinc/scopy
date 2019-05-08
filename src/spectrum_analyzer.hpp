@@ -209,6 +209,7 @@ private:
 	void updateChannelSettingsPanel(unsigned int id);
 	ChannelWidget *getChannelWidgetAt(unsigned int id);
 	void updateMarkerMenu(unsigned int id);
+	bool isIioManagerStarted() const;
 };
 
 class SpectrumChannel: public QObject
