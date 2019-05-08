@@ -88,6 +88,7 @@ namespace adiscope {
 		int numSamplesFromIdx(int idx);
 		void writeAllSettingsToHardware();
 		void checkPeakValues(int, double);
+		bool isIioManagerStarted() const;
 
 	public Q_SLOTS:
 		void toggleTimer(bool start);

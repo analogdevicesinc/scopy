@@ -152,7 +152,7 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, std::shared_ptr<GenericAdc> adc,
 	setHistorySizeCh2(ui->historySizeCh2->currentIndex());
 
 	/* Lock the flowgraph if we are already started */
-	bool started = manager->started();
+	bool started = isIioManagerStarted();
 	if (started)
 		manager->lock();
 
@@ -176,7 +176,7 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, std::shared_ptr<GenericAdc> adc,
 
 void DMM::disconnectAll()
 {
-	bool started = manager->started();
+	bool started = isIioManagerStarted();
 	if (started)
 		manager->lock();
 
@@ -238,6 +238,11 @@ void DMM::checkPeakValues(int ch, double peak)
 		if(ch == 0) ui->maxCh1->display(m_max[ch]);
 		if(ch == 1) ui->maxCh2->display(m_max[ch]);
 	}
+}
+
+bool DMM::isIioManagerStarted() const
+{
+	return manager->started() && ui->run_button->isChecked();
 }
 
 void DMM::collapseDataLog(bool checked)
@@ -578,7 +583,7 @@ void DMM::dataLoggingThread()
 
 void DMM::toggleAC()
 {
-	bool started = manager->started() && ui->run_button->isChecked();
+	bool started = isIioManagerStarted();
 	if (started)
 		manager->lock();
 
