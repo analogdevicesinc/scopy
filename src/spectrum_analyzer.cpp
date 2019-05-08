@@ -412,7 +412,7 @@ SpectrumAnalyzer::~SpectrumAnalyzer()
 	}
 
 	if (iio) {
-		bool started = iio->started();
+		bool started = isIioManagerStarted();
 
 		if (started) {
 			iio->lock();
@@ -603,7 +603,7 @@ void SpectrumAnalyzer::build_gnuradio_block_chain()
 	                                        (QObject *)fft_plot);
 	fft_sink->set_trigger_mode(TRIG_MODE_TAG, 0, "buffer_start");
 
-	bool started = iio->started();
+	bool started = isIioManagerStarted();
 
 	if (started) {
 		iio->lock();
@@ -867,6 +867,12 @@ void SpectrumAnalyzer::updateMarkerMenu(unsigned int id)
 	}
 }
 
+bool SpectrumAnalyzer::isIioManagerStarted() const
+{
+	return iio->started() && (ui->runSingleWidget->singleButtonChecked()
+						  || ui->runSingleWidget->runButtonChecked());
+}
+
 void SpectrumAnalyzer::onChannelEnabled(bool en)
 {
 	ChannelWidget *cw = static_cast<ChannelWidget *>(QObject::sender());
@@ -1033,7 +1039,7 @@ void SpectrumAnalyzer::setSampleRate(double sr)
 		return;
 	}
 
-	if (iio->started() && ui->runSingleWidget->runButtonChecked()) {
+	if (isIioManagerStarted()) {
 		stop_blockchain_flow();
 
 		auto m2k_adc = std::dynamic_pointer_cast<M2kAdc>(adc);
@@ -1061,7 +1067,7 @@ void SpectrumAnalyzer::setFftSize(uint size)
 	//        block chain every time we need to change the FFT size. A
 	//        spectrum_sink block similar to scope_sink_f would be better
 
-	bool started = iio->started();
+	bool started = isIioManagerStarted();
 
 	if (started) {
 		iio->lock();
