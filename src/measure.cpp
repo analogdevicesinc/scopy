@@ -521,6 +521,8 @@ void Measure::measure()
 		sqr_sum = data[m_startIndex] * data[m_startIndex];
 		startIndex = m_startIndex+1;
 		endIndex = m_endIndex;
+
+		count = (m_endIndex - m_startIndex) ?: 1;
 	}
 	else{
 		max = data[0];
