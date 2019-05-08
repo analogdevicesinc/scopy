@@ -256,7 +256,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	/* Gnuradio Blocks Connections */
 
 	/* Lock the flowgraph if we are already started */
-	bool started = iio->started();
+	bool started = isIioManagerStarted();
 	if (started)
 		iio->lock();
 
@@ -326,7 +326,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	plot.setSampleRate(adc->sampleRate(), 1, "");
 	plot.setActiveVertAxis(0);
 
-	started = iio->started();
+	started = isIioManagerStarted();
 	if (started)
 		iio->lock();
 
@@ -653,7 +653,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 			plot.setDisplayScale(probe_attenuation[current_ch_widget]);
 		}
 
-		bool started = iio->started();
+		bool started = isIioManagerStarted();
 		if (started)
 			iio->lock();
 
@@ -807,6 +807,12 @@ void Oscilloscope::resetHistogramDataPoints()
 	int posMax = binSearchPointOnXaxis(zoomMaxTime);
 
 	hist_plot.setDataInterval(posMin, posMax + 1);
+}
+
+bool Oscilloscope::isIioManagerStarted() const
+{
+	return iio->started() && (ui->runSingleWidget->singleButtonChecked()
+						  || ui->runSingleWidget->runButtonChecked());
 }
 
 void Oscilloscope::init_buffer_scrolling()
@@ -1095,7 +1101,7 @@ Oscilloscope::~Oscilloscope()
 	ui->runSingleWidget->toggle(false);
 	setDynamicProperty(runButton(), "disabled", false);
 
-	bool started = iio->started();
+	bool started = isIioManagerStarted();
 	if (started)
 		iio->lock();
 
@@ -1216,7 +1222,7 @@ void Oscilloscope::activateAcCoupling(int i)
 		trigger_settings.setAcCoupled(true, i);
 	}
 
-	bool started = iio->started();
+	bool started = isIioManagerStarted();
 	if(started) {
 		iio->lock();
 	}
@@ -1270,7 +1276,7 @@ void Oscilloscope::deactivateAcCoupling(int i)
 		trigger_settings.setAcCoupled(false, i);
 	}
 
-	bool started = iio->started();
+	bool started = isIioManagerStarted();
 	if(started) {
 		iio->lock();
 	}
@@ -1325,7 +1331,7 @@ void Oscilloscope::activateAcCouplingTrigger(int chIdx)
 {
 	trigger_settings.setAcCoupled(true, chIdx);
 	if (!triggerLevelSink.first) {
-		bool started = iio->started();
+		bool started = isIioManagerStarted();
 		if (started) {
 			iio->lock();
 		}
@@ -1347,7 +1353,7 @@ void Oscilloscope::deactivateAcCouplingTrigger()
 {
 	trigger_settings.setAcCoupled(false, triggerLevelSink.second);
 	if (triggerLevelSink.first) {
-		bool started = iio->started();
+		bool started = isIioManagerStarted();
 		if (started) {
 			iio->lock();
 		}
@@ -1829,7 +1835,7 @@ void Oscilloscope::add_math_channel(const std::string& function)
 	math_rails.insert(qname, rail);
 
 	/* Lock the flowgraph if we are already started */
-	bool started = iio->started();
+	bool started = isIioManagerStarted();
 	if (started)
 		iio->lock();
 
@@ -1977,7 +1983,7 @@ void Oscilloscope::onChannelWidgetDeleteClicked()
 		exportConfig.remove(curve_id - nb_ref_channels);
 
 		/* Lock the flowgraph if we are already started */
-		bool started = iio->started();
+		bool started = isIioManagerStarted();
 
 		if (started) {
 			iio->lock();
@@ -2285,7 +2291,7 @@ void Oscilloscope::autosetFFT()
 void Oscilloscope::onFFT_view_toggled(bool visible)
 {
 	/* Lock the flowgraph if we are already started */
-	bool started = iio->started();
+	bool started = isIioManagerStarted();
 	if (started)
 		iio->lock();
 
@@ -2373,7 +2379,7 @@ void Oscilloscope::onXY_view_toggled(bool visible)
 	}
 
 	/* Lock the flowgraph if we are already started */
-	bool started = iio->started();
+	bool started = isIioManagerStarted();
 	if (started && !locked)
 		iio->lock();
 
@@ -2756,7 +2762,7 @@ void Oscilloscope::onCmbMemoryDepthChanged(QString value)
 		return;
 	}
 
-	started = iio->started();
+	started = isIioManagerStarted();
 	if (started) {
 		toggle_blockchain_flow(false);
 	}
@@ -2895,7 +2901,7 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 	}
 
 	/* Reconfigure the GNU Radio block to receive a different number of samples  */
-	bool started = iio->started();
+	bool started = isIioManagerStarted();
 	if (started)
 		iio->lock();
 	setAllSinksSampleCount(active_plot_sample_count);
@@ -3014,7 +3020,7 @@ void adiscope::Oscilloscope::onTimePositionChanged(double value)
 {
 	cancelZoom();
 
-	bool started = iio->started();
+	bool started = isIioManagerStarted();
 	bool enhancedMemDepth = symmBufferMode->isEnhancedMemDepth();
 
 	unsigned long oldSampleCount = symmBufferMode->captureParameters().entireBufferSize;
@@ -3354,7 +3360,7 @@ void Oscilloscope::editMathChannelFunction(int id, const std::string& new_functi
 	auto rail = gr::analog::rail_ff::make(MIN_MATH_RANGE, MAX_MATH_RANGE);
 	auto math = iio::iio_math::make(new_function, nb_channels);
 
-	bool started = iio->started();
+	bool started = isIioManagerStarted();
 	if (started)
 		iio->lock();
 	locked = true;
@@ -3930,7 +3936,7 @@ void Oscilloscope::onRightGateChanged(double width)
 }
 
 void Oscilloscope::setupAutosetFreqSweep()
-{	bool started = iio->started();
+{	bool started = isIioManagerStarted();
 	if(started)		
 		iio->lock();
 	qt_time_block->reset();
@@ -4140,7 +4146,7 @@ void Oscilloscope::onFilledScreen(bool full, unsigned int nb_samples)
 
 void Oscilloscope::resetStreamingFlag(bool enable)
 {
-	bool started = iio->started();
+	bool started = isIioManagerStarted();
 	if (started)
 		iio->lock();
 
