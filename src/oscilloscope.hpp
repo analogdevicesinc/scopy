@@ -442,6 +442,7 @@ namespace adiscope {
 		void scaleHistogramPlot(bool newData = false);
 		void toggleMiniHistogramPlotVisible(bool enabled);
 		void resetHistogramDataPoints();
+		bool isIioManagerStarted() const;
 	};
 }
 #endif /* M2K_OSCILLOSCOPE_H */
