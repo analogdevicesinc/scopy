@@ -3921,8 +3921,8 @@ void Oscilloscope::onStatisticsReset()
 void Oscilloscope::onGatingEnabled(bool on){
 //enable / disable gatings
 	gatingEnabled = on;
-	buffer_previewer->setGatingEnabled(on);
-	plot.setGatingEnabled(on);
+	buffer_previewer->setGatingEnabled(on && ui->boxMeasure->isChecked());
+	plot.setGatingEnabled(on && ui->boxMeasure->isChecked());
 }
 
 void Oscilloscope::onLeftGateChanged(double width)
