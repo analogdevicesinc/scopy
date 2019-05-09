@@ -1165,6 +1165,7 @@ void Oscilloscope::readPreferences()
 	// enable/disable mini histogram plot
 	toggleMiniHistogramPlotVisible(prefPanel->getMini_hist_enabled());
 
+	bool foundChannel = false;
 	for (unsigned int i = 0; i < nb_channels + nb_math_channels + nb_ref_channels;
 	     i++) {
 		ChannelWidget *cw = static_cast<ChannelWidget *>(
@@ -1174,12 +1175,16 @@ void Oscilloscope::readPreferences()
 			/* At least one channel is enabled,
 			 * so we can enable/disable labels */
 			enableLabels(prefPanel->getOsc_labels_enabled());
+			foundChannel = true;
 			break;
 		}
 	}
 
-	/* No channel is enabled, so we disable the labels */
-	enableLabels(false);
+	if (!foundChannel) {
+		/* No channel is enabled, so we disable the labels */
+		enableLabels(false);
+	}
+
 	m2k_adc->setFilteringEnabled(prefPanel->getOsc_filtering_enabled());
 }
 
