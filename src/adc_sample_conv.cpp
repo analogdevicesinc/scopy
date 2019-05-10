@@ -66,6 +66,9 @@ int adc_sample_conv::work(int noutput_items,
 		gr_vector_void_star &output_items)
 {
 	updateCorrectionGain();
+
+	gr::thread::scoped_lock lock(d_setlock);
+
 	for (unsigned int i = 0; i < input_items.size(); i++) {
 		const float* in = static_cast<const float *>(input_items[i]);
 		float *out = static_cast<float *>(output_items[i]);
