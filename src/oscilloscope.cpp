@@ -2992,32 +2992,20 @@ void adiscope::Oscilloscope::onVertOffsetValueChanged(double value)
 		plot.setVertOffset(-value, current_ch_widget);
 		plot.replot();
 	}
-	if (zoom_level == 0) {
-		plot.zoomBaseUpdate();
-	}
+
+	plot.zoomBaseUpdate();
 
 	scaleHistogramPlot();
 
 	// Switch between high and low gain modes only for the M2K channels
 	if (m2k_adc && current_ch_widget < nb_channels) {
 
-		if(!gainUpdateNeeded()) {
-			return;
-		}
-
-		if (ui->runSingleWidget->runButtonChecked())
-			toggle_blockchain_flow(false);
-
-		if (zoom_level == 0) {
-			// Only change gain mode when the plot is not zoomed
+		if (gainUpdateNeeded()) {
 			updateGainMode();
 		}
 		setChannelHwOffset(current_ch_widget, value);
 
 		trigger_settings.updateHwVoltLevels(current_ch_widget);
-
-		if (ui->runSingleWidget->runButtonChecked())
-			toggle_blockchain_flow(true);
 	}
 }
 
