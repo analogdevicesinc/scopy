@@ -1518,6 +1518,7 @@ void NetworkAnalyzer::configHwForNetworkAnalyzing()
 	if (trigger) {
 		for (uint i = 0; i < trigger->numChannels(); i++) {
 			trigger->setTriggerMode(i, HardwareTrigger::ALWAYS);
+			trigger->setDelay(0);
 		}
 	}
 
@@ -1525,6 +1526,9 @@ void NetworkAnalyzer::configHwForNetworkAnalyzing()
 	if (m2k_adc) {
 		iio_device_attr_write_longlong(m2k_adc->iio_adc_dev(),
 			"oversampling_ratio", 1);
+		for (int i = 0; i < m2k_adc->numAdcChannels(); ++i) {
+			m2k_adc->setChnHwOffset(i, 0);
+		}
 	}
 }
 
