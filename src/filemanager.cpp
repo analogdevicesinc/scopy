@@ -273,15 +273,23 @@ void FileManager::performWrite()
 
         //column names row
         exportStream << "Sample" << separator;
+	bool skipFirstSeparator=true;
         for (QString columnName : columnNames) {
-                exportStream << columnName << separator;
+		if(!skipFirstSeparator)
+			exportStream << separator;
+		exportStream << columnName;
+		skipFirstSeparator = false;
         }
         exportStream << "\n";
 
         for (int i = 0; i < data.size(); ++i) {
+		skipFirstSeparator = true;
                 exportStream << QString::number(i) << separator;
                 for (int j = 0; j < data[i].size(); ++j) {
-                        exportStream << data[i][j] << ((j < data[i].size()-1) ? separator : "");
+			if(!skipFirstSeparator)
+				exportStream << separator;
+			exportStream << data[i][j];
+			skipFirstSeparator = false;
                 }
                 exportStream << "\n";
         }
