@@ -85,9 +85,9 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, std::shared_ptr<GenericAdc> adc,
 	}
 
 	connect(ui->run_button, SIGNAL(toggled(bool)),
-			this, SLOT(toggleTimer(bool)));
-	connect(ui->run_button, SIGNAL(toggled(bool)),
 			runButton, SLOT(setChecked(bool)));
+	connect(ui->run_button, SIGNAL(toggled(bool)),
+			this, SLOT(toggleTimer(bool)));
 	connect(runButton, SIGNAL(toggled(bool)), ui->run_button,
 			SLOT(setChecked(bool)));
 	connect(ui->run_button, SIGNAL(toggled(bool)),
