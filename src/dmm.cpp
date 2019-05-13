@@ -80,8 +80,8 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, std::shared_ptr<GenericAdc> adc,
 
 	for (unsigned int i = 0; i < adc->numAdcChannels(); i++)
 	{
-		m_min.push_back(0);
-		m_max.push_back(0);
+		m_min.push_back(Q_INFINITY);
+		m_max.push_back(-Q_INFINITY);
 	}
 
 	connect(ui->run_button, SIGNAL(toggled(bool)),
@@ -278,15 +278,15 @@ void DMM::displayPeakHold(bool checked)
 void DMM::resetPeakHold(bool clicked)
 {
 	for(unsigned int ch = 0; ch < adc->numAdcChannels(); ch++) {
-		m_min[ch] = 0;
-		m_max[ch] = 0;
+		m_min[ch] = Q_INFINITY;
+		m_max[ch] = -Q_INFINITY;
 		if(ch == 0) {
-			ui->maxCh1->display(m_max[ch]);
-			ui->minCh1->display(m_min[ch]);
+			ui->maxCh1->display(0);
+			ui->minCh1->display(0);
 		}
 		if(ch == 1) {
-			ui->maxCh2->display(m_max[ch]);
-			ui->minCh2->display(m_min[ch]);
+			ui->maxCh2->display(0);
+			ui->minCh2->display(0);
 		}
 	}
 }
