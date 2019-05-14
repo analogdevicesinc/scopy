@@ -110,7 +110,6 @@ private:
 	gr::blocks::vector_sink_s::sptr vector_block;
 
 	QVector<unsigned long> sampleRates;
-	size_t fixedRate;
 
 	dBgraph m_dBgraph;
 	dBgraph m_phaseGraph;

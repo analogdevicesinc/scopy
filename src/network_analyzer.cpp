@@ -80,7 +80,6 @@ void NetworkAnalyzer::_configureAdcFlowgraph(size_t buffer_size)
 		// Make sure the values are sorted in ascending order (1000,..,100e6)
 		sampleRates = SignalGenerator::get_available_sample_rates(adc);
 		qSort(sampleRates.begin(), sampleRates.end(), qLess<unsigned long>());
-		fixedRate = sampleRates[0];
 
 		auto m2k_adc = std::dynamic_pointer_cast<M2kAdc>(adc_dev);
 
@@ -974,8 +973,6 @@ void NetworkAnalyzer::goertzel()
 		iterationsThread = nullptr;
 	}
 
-	fixedRate = sampleRates[0];
-
 	justStarted = true;
 
 	for (int i = 0; !stop && i < iterations.size(); ++i) {
@@ -1028,9 +1025,6 @@ void NetworkAnalyzer::goertzel()
 
 		corr_gain = m2k_adc->chnCorrectionGain(1);
 		hw_gain = m2k_adc->gainAt(m2k_adc->chnHwGainMode(1));
-
-		double vlsb = adc_sample_conv::convSampleToVolts(1,
-								 corr_gain, 1, 0, hw_gain);
 
 		if (buffer_size == 0) {
 			qDebug(CAT_NETWORK_ANALYZER) << "buffer size 0";
@@ -1163,7 +1157,6 @@ void NetworkAnalyzer::_saveChannelBuffers(double frequency, double sample_rate, 
 void NetworkAnalyzer::computeCaptureParams(double frequency,
 		size_t& buffer_size, size_t& adc_rate)
 {
-	adc_rate = fixedRate;
 	size_t nrOfPeriods = 2;
 
 	for (const auto& rate : sampleRates) {
