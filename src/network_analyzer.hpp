@@ -101,6 +101,7 @@ private:
 	std::shared_ptr<GenericAdc> adc_dev;
 	boost::shared_ptr<iio_manager> iio;
 	QList<std::shared_ptr<GenericDac>> dacs;
+	bool m_initFlowgraph;
 
 	// Sine generation blocks
 	gr::top_block_sptr top_block;
