@@ -1258,7 +1258,7 @@ void NetworkAnalyzer::plot(double frequency, double mag1, double mag2,
 
 	m_dBgraph.plot(frequency, mag + magBonus);
 	m_phaseGraph.plot(frequency, adjusted_phase_deg);
-	ui->xygraph->plot(frequency, mag + magBonus);
+	ui->xygraph->plot(phase_deg, mag + magBonus);
 	ui->nicholsgraph->plot(phase_deg, mag + magBonus);
 
 	d_frequencyHandle->triggerMove();
