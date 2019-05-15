@@ -72,9 +72,7 @@ void NetworkAnalyzer::_configureDacFlowgraph()
 
 void NetworkAnalyzer::_configureAdcFlowgraph(size_t buffer_size)
 {
-	static bool initFlowgraph = true;
-
-	if (initFlowgraph) {
+	if (m_initFlowgraph) {
 
 		// Get the available sample rates for the m2k-adc
 		// Make sure the values are sorted in ascending order (1000,..,100e6)
@@ -146,7 +144,7 @@ void NetworkAnalyzer::_configureAdcFlowgraph(size_t buffer_size)
 	}
 
 	// Build the flowgraph only once
-	initFlowgraph = false;
+	m_initFlowgraph = false;
 }
 
 NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
@@ -163,7 +161,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	dacs(dacs), justStarted(false),
 	iterationsThreadCanceled(false), iterationsThreadReady(false),
 	iterationsThread(nullptr), autoAdjustGain(true),
-	filterDc(false)
+	filterDc(false), m_initFlowgraph(true)
 {
 	iio = iio_manager::get_instance(ctx,
 					filt->device_name(TOOL_NETWORK_ANALYZER, 2));
