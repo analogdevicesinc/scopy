@@ -250,6 +250,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 		{"MHz",1e6}
 	}, "Frequency Position", 0.0, 5e7, true, false, this);
 	ui->markerFreqPosLayout->addWidget(marker_freq_pos);
+	marker_freq_pos->setFineModeAvailable(false);
 
 	startStopRange = new StartStopRangeWidget();
 	connect(startStopRange, &StartStopRangeWidget::rangeChanged, [=](double start, double stop){
