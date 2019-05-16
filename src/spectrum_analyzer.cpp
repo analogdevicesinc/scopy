@@ -1023,6 +1023,7 @@ void SpectrumAnalyzer::on_cmb_rbw_currentIndexChanged(int index)
 		setFftSize(new_fft_size);
 	}
 
+	marker_freq_pos->setMinValue(startStopRange->getStartValue());
 	marker_freq_pos->setMaxValue(startStopRange->getStopValue());
 	marker_freq_pos->setStep(2 * (startStopRange->getStopValue() -
 					  startStopRange->getStartValue()) / bin_sizes[ui->cmb_rbw->currentIndex()]);
@@ -1265,9 +1266,7 @@ void SpectrumAnalyzer::onMarkerFreqPosChanged(double freq)
 	double actual_freq = fft_plot->markerFrequency(crt_channel_id,
 	                     crt_marker);
 
-	marker_freq_pos->blockSignals(true);
-	marker_freq_pos->setValue(actual_freq);
-	marker_freq_pos->blockSignals(false);
+	marker_freq_pos->silentSetValue(actual_freq);
 
 	fft_plot->replot();
 }
@@ -1296,9 +1295,7 @@ void SpectrumAnalyzer::updateMrkFreqPosSpinBtnValue()
 	double freq = fft_plot->markerFrequency(crt_channel_id, crt_marker);
 
 	if (freq != marker_freq_pos->value()) {
-		marker_freq_pos->blockSignals(true);
-		marker_freq_pos->setValue(freq);
-		marker_freq_pos->blockSignals(false);
+		marker_freq_pos->silentSetValue(freq);
 	}
 }
 
