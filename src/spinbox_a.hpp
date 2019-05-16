@@ -100,6 +100,7 @@ public:
 
 	bool isStepDown() const;
 
+	void triggerCircleRedraw();
 
 	QString getName() const;
 	void setName(const QString& name);
