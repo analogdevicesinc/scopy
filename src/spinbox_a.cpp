@@ -145,6 +145,7 @@ void SpinBoxA::silentSetValue(double value)
 	// emitting any signals.
 	QSignalBlocker signalBlocker(this);
 	setValue(value);
+	triggerCircleRedraw();
 }
 
 void SpinBoxA::silentSetMinValue(double value)
@@ -519,6 +520,11 @@ void SpinBoxA::setFineModeAvailable(bool tog)
 bool SpinBoxA::isStepDown() const
 {
 	return m_is_step_down;
+}
+
+void SpinBoxA::triggerCircleRedraw()
+{
+	ui->SBA_CompletionCircle->setValueDouble(value());
 }
 
 QString SpinBoxA::getName() const
