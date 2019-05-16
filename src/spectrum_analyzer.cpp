@@ -462,7 +462,9 @@ void SpectrumAnalyzer::on_btnExport_clicked()
 			for (int j = 0; j < nr_samples; ++j) {
 				data.push_back(fft_plot->Curve(i)->sample(j).y());
 			}
-			fm.save(data, "Amplitude CH" + QString::number(i + 1) + "(db)");
+			QString unit = ui->lblMagUnit->text();
+			fm.save(data, "Amplitude CH" + QString::number(i + 1)
+				+ "(" + unit + ")");
 		}
 
 		fm.performWrite();
