@@ -123,7 +123,7 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 	setWindowIcon(QIcon(":/icon.ico"));
 
 	// TO DO: remove this when the About menu becomes available
-	setWindowTitle(QString("Scopy - ") + QString(SCOPY_VERSION_GIT));
+	setWindowTitle(QString("Scopy - ") + QString("v"+QString(PROJECT_VERSION)) + " - " + QString(SCOPY_VERSION_GIT));
 
 	prefPanel = new Preferences(this);
 	prefPanel->setVisible(false);
