@@ -1,10 +1,12 @@
 #include <QApplication>
 #include "scopyApplication.hpp"
+
 #include <QDir>
 #include <QFileInfo>
 #include <QDateTime>
 #include <QDebug>
 
+#if BREAKPAD_HANDLER
 using namespace google_breakpad;
 
 ScopyApplication::ScopyApplication(int& argc, char** argv) : QApplication(argc, argv) {}
@@ -92,5 +94,5 @@ bool ScopyApplication::dumpCallback(const google_breakpad::MinidumpDescriptor& d
 	return succeeded;
 }
 #endif
-
+#endif
 
