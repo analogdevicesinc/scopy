@@ -2,8 +2,11 @@
 #define SCOPYAPPLICATION_H
 
 #include <QtGlobal>
+#include "config.h"
 
 #define __STDC_FORMAT_MACROS
+
+#if BREAKPAD_HANDLER
 #ifdef Q_OS_WIN
 #include "breakpad/client/windows/handler/exception_handler.h"
 #endif
@@ -47,4 +50,5 @@ private:
 	google_breakpad::MinidumpDescriptor *descriptor;
 #endif
 };
+#endif
 #endif

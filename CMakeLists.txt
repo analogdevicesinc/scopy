@@ -80,11 +80,15 @@ if (NOT "${OUT_CONSTEXPR}" STREQUAL "-1")
 	add_definitions(-DHAS_CONSTEXPR=1)
 endif()
 
-find_library(BREAKPAD_LIBRARIES NAMES breakpad)
-find_library(BREAKPADCLIENT_LIBRARIES NAMES breakpad_client)
 
-find_path(BREAKPAD_INCLUDE_DIRS breakpad)
-
+option(BREAKPAD_HANDLER "Build with breakpad exception handler " ON)
+set(BREAKPAD_HANDLER_BOOL 0)
+if (BREAKPAD_HANDLER)
+	set(BREAKPAD_HANDLER_BOOL 1)
+	find_library(BREAKPAD_LIBRARIES NAMES breakpad)
+	find_library(BREAKPADCLIENT_LIBRARIES NAMES breakpad_client)
+	find_path(BREAKPAD_INCLUDE_DIRS breakpad)
+endif()
 
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Concurrent REQUIRED)
