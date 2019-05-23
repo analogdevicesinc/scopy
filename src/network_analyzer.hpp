@@ -47,6 +47,7 @@
 #include <gnuradio/blocks/moving_average_ff.h>
 #include <gnuradio/blocks/skiphead.h>
 #include "cancel_dc_offset_block.h"
+#include <gnuradio/blocks/vector_source_s.h>
 
 #include "oscilloscope.hpp"
 
@@ -160,6 +161,11 @@ private:
 	bool isIterationsThreadReady();
 	bool isIterationsThreadCanceled();
 
+	gr::top_block_sptr capture_top_block;
+	gr::blocks::vector_source_s::sptr capture1;
+	gr::blocks::vector_source_s::sptr capture2;
+	gr::blocks::short_to_float::sptr s2f1;
+	gr::blocks::short_to_float::sptr s2f2;
 	gr::fft::goertzel_fc::sptr goertzel1;
 	gr::fft::goertzel_fc::sptr goertzel2;
 	gr::blocks::copy::sptr copy1;
