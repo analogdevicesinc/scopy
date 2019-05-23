@@ -1,8 +1,10 @@
 #include "cancel_dc_offset_block.h"
 
+#include <gnuradio/blocks/moving_average_ff.h>
+#include <gnuradio/blocks/skiphead.h>
+#include <gnuradio/blocks/repeat.h>
+#include <gnuradio/blocks/sub_ff.h>
 #include <gnuradio/blocks/copy.h>
-#include <gnuradio/blocks/stream_to_vector.h>
-#include <gnuradio/blocks/vector_to_stream.h>
 
 #include <iostream>
 
@@ -17,6 +19,7 @@ cancel_dc_offset_block::cancel_dc_offset_block(size_t buffer_size, bool enabled)
 	d_buffer_size(buffer_size),
 	d_dc_offset(0.0)
 {
+	d_vs = gr::blocks::vector_sink_f::make();
 	_build_and_connect_blocks();
 }
 
@@ -42,7 +45,11 @@ void cancel_dc_offset_block::set_buffer_size(size_t buffer_size)
 
 float cancel_dc_offset_block::get_dc_offset() const
 {
-	return d_cancel_dc->get_dc_offset();
+	if (d_vs->data().size()) {
+		return d_vs->data()[0];
+	} else {
+		return 0.0;
+	}
 }
 
 void cancel_dc_offset_block::_build_and_connect_blocks()
@@ -50,14 +57,31 @@ void cancel_dc_offset_block::_build_and_connect_blocks()
 	// Remove all connections
 	hier_block2::disconnect_all();
 
-	auto s2v = gr::blocks::stream_to_vector::make(sizeof(float), d_buffer_size);
-	auto v2s = gr::blocks::vector_to_stream::make(sizeof(float), d_buffer_size);
+	d_vs->reset();
 
-	d_cancel_dc = gnuradio::get_initial_sptr(
-				new filter_dc_offset_block(d_buffer_size, d_enabled));
+	if (d_enabled) {
+		auto avg = gr::blocks::moving_average_ff::make(d_buffer_size, 1.0 / d_buffer_size, d_buffer_size);
+		auto skip = gr::blocks::skiphead::make(sizeof(float), d_buffer_size - 1);
+		auto repeat = gr::blocks::repeat::make(sizeof(float), d_buffer_size);
+		auto sub = gr::blocks::sub_ff::make();
 
-	hier_block2::connect(this->self(), 0, s2v, 0);
-	hier_block2::connect(s2v, 0, d_cancel_dc, 0);
-	hier_block2::connect(d_cancel_dc, 0, v2s, 0);
-	hier_block2::connect(v2s, 0, this->self(), 0);
+		hier_block2::connect(this->self(), 0, avg, 0);
+		hier_block2::connect(avg, 0, skip, 0);
+		hier_block2::connect(skip, 0, d_vs, 0);
+		hier_block2::connect(skip, 0, repeat, 0);
+		hier_block2::connect(this->self(), 0, sub, 0);
+		hier_block2::connect(repeat, 0, sub, 1);
+		hier_block2::connect(sub, 0, this->self(), 0);
+	} else {
+		auto avg = gr::blocks::moving_average_ff::make(d_buffer_size, 1.0 / d_buffer_size, d_buffer_size);
+		auto skip = gr::blocks::skiphead::make(sizeof(float), d_buffer_size - 1);
+
+		hier_block2::connect(this->self(), 0, avg, 0);
+		hier_block2::connect(avg, 0, skip, 0);
+		hier_block2::connect(skip, 0, d_vs, 0);
+
+		auto copy = gr::blocks::copy::make(sizeof(float));
+		hier_block2::connect(this->self(), 0, copy, 0);
+		hier_block2::connect(copy, 0, this->self(), 0);
+	}
 }
