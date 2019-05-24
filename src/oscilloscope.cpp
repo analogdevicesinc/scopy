@@ -2718,6 +2718,7 @@ void adiscope::Oscilloscope::onVertScaleValueChanged(double value)
 	voltsPosition->setStep(value / 10);
 
 	scaleHistogramPlot();
+	updateXyPlotScales();
 
 	// TO DO: refactor this once the source of the X and Y axes can be configured
 	if (current_ch_widget == index_x) {
@@ -2984,6 +2985,16 @@ bool adiscope::Oscilloscope::gainUpdateNeeded()
 
 }
 
+void Oscilloscope::updateXyPlotScales()
+{
+	int x = gsettings_ui->cmb_x_channel->currentIndex();
+	int y = gsettings_ui->cmb_y_channel->currentIndex();
+	auto xInterval = plot.axisInterval(QwtAxisId(QwtPlot::yLeft, x));
+	auto yInterval = plot.axisInterval(QwtAxisId(QwtPlot::yLeft, y));
+	xy_plot.set_axis(xInterval.minValue(), xInterval.maxValue(),
+			 yInterval.minValue(), yInterval.maxValue());
+}
+
 void adiscope::Oscilloscope::onVertOffsetValueChanged(double value)
 {
 	cancelZoom();
@@ -2994,8 +3005,9 @@ void adiscope::Oscilloscope::onVertOffsetValueChanged(double value)
 	}
 
 	plot.zoomBaseUpdate();
-
 	scaleHistogramPlot();
+
+	updateXyPlotScales();
 
 	// Switch between high and low gain modes only for the M2K channels
 	if (m2k_adc && current_ch_widget < nb_channels) {
@@ -3199,6 +3211,7 @@ void Oscilloscope::onChannelOffsetChanged(double value)
 	voltsPosition->setValue(-plot.VertOffset(current_ch_widget));
 
 	scaleHistogramPlot();
+	updateXyPlotScales();
 }
 
 ChannelWidget *Oscilloscope::channelWidgetAtId(int id)
@@ -4435,6 +4448,8 @@ void Oscilloscope::setup_xy_channels()
 
 	xy_plot.setHorizUnitsPerDiv(plot.VertUnitsPerDiv(x));
 	xy_plot.setVertUnitsPerDiv(plot.VertUnitsPerDiv(y), QwtPlot::yLeft);
+
+	updateXyPlotScales();
 }
 
 void Oscilloscope::on_btnAddMath_toggled(bool checked)
