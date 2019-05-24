@@ -443,6 +443,7 @@ namespace adiscope {
 		void toggleMiniHistogramPlotVisible(bool enabled);
 		void resetHistogramDataPoints();
 		bool isIioManagerStarted() const;
+		void updateXyPlotScales();
 	};
 }
 #endif /* M2K_OSCILLOSCOPE_H */
