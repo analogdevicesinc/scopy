@@ -36,7 +36,6 @@
 #include <gnuradio/blocks/skiphead.h>
 #include <gnuradio/top_block.h>
 #include <boost/make_shared.hpp>
-#include "filter_dc_offset_block.h"
 #include <gnuradio/blocks/stream_to_vector.h>
 #include <gnuradio/blocks/vector_to_stream.h>
 #include <gnuradio/fft/goertzel_fc.h>
@@ -60,6 +59,10 @@ using namespace gr;
 
 void NetworkAnalyzer::_configureDacFlowgraph()
 {
+	// Create the blocks that are used to generate sine waves
+	top_block = make_top_block("Signal Generator");
+	source_block = analog::sig_source_f::make(1, analog::GR_SIN_WAVE,
+			1, 1, 1);
 	f2s_block = blocks::float_to_short::make(1, 1);
 	head_block = blocks::head::make(sizeof(short), 1);
 	vector_block = blocks::vector_sink_s::make();
@@ -74,6 +77,8 @@ void NetworkAnalyzer::_configureAdcFlowgraph(size_t buffer_size)
 {
 	if (m_initFlowgraph) {
 
+		capture_top_block = make_top_block("Network capture processing");
+
 		// Get the available sample rates for the m2k-adc
 		// Make sure the values are sorted in ascending order (1000,..,100e6)
 		sampleRates = SignalGenerator::get_available_sample_rates(adc);
@@ -86,6 +91,10 @@ void NetworkAnalyzer::_configureAdcFlowgraph(size_t buffer_size)
 		dc_cancel2 = gnuradio::get_initial_sptr(
 					new cancel_dc_offset_block(1, false));
 
+		capture1 = gr::blocks::vector_source_s::make(std::vector<short>(), false, 1);
+		capture2 = gr::blocks::vector_source_s::make(std::vector<short>(), false, 1);
+		s2f1 = gr::blocks::short_to_float::make();
+		s2f2 = gr::blocks::short_to_float::make();
 		goertzel1 = gr::fft::goertzel_fc::make(1, 1, 1);
 		goertzel2 = gr::fft::goertzel_fc::make(1, 1, 1);
 		copy1 = gr::blocks::copy::make(sizeof(float));
@@ -106,27 +115,22 @@ void NetworkAnalyzer::_configureAdcFlowgraph(size_t buffer_size)
 		adc_conv->setCorrectionGain(1,
 			m2k_adc->chnCorrectionGain(1));
 
-		id1 = iio->connect(dc_cancel1, 0, 0, true,
-				   1);
-		id2 = iio->connect(dc_cancel2, 1, 0, true,
-				   1);
+		capture_top_block->connect(capture1, 0, s2f1, 0);
+		capture_top_block->connect(capture2, 0, s2f2, 0);
+		capture_top_block->connect(s2f1, 0, dc_cancel1, 0);
+		capture_top_block->connect(s2f2, 0, dc_cancel2, 0);
 
-		iio->connect(dc_cancel1, 0, head1, 0);
-		iio->connect(dc_cancel2, 0, head2, 0);
-		iio->connect(head1, 0, copy1, 0);
-		iio->connect(head2, 0, copy2, 0);
+		capture_top_block->connect(dc_cancel1, 0, goertzel1, 0);
+		capture_top_block->connect(dc_cancel2, 0, goertzel2, 0);
+		capture_top_block->connect(goertzel1, 0, c2m1, 0);
+		capture_top_block->connect(c2m1, 0, signal, 0);
+		capture_top_block->connect(goertzel2, 0, c2m2, 0);
+		capture_top_block->connect(c2m2, 0, signal, 1);
 
-		iio->connect(copy1, 0, goertzel1, 0);
-		iio->connect(copy2, 0, goertzel2, 0);
-		iio->connect(goertzel1, 0, c2m1, 0);
-		iio->connect(c2m1, 0, signal, 0);
-		iio->connect(goertzel2, 0, c2m2, 0);
-		iio->connect(c2m2, 0, signal, 1);
-
-		iio->connect(goertzel1, 0, conj, 0);
-		iio->connect(goertzel2, 0, conj, 1);
-		iio->connect(conj, 0, c2a, 0);
-		iio->connect(c2a, 0, signal, 2);
+		capture_top_block->connect(goertzel1, 0, conj, 0);
+		capture_top_block->connect(goertzel2, 0, conj, 1);
+		capture_top_block->connect(conj, 0, c2a, 0);
+		capture_top_block->connect(c2a, 0, signal, 2);
 
 		mag1 = 0.0, mag2 = 0.0, phase = 0.0;
 		connect(&*signal, &signal_sample::triggered,
@@ -137,10 +141,10 @@ void NetworkAnalyzer::_configureAdcFlowgraph(size_t buffer_size)
 			captureDone = true;
 		});
 
-		iio->connect(copy1, 0, adc_conv, 0);
-		iio->connect(copy2, 0, adc_conv, 1);
-		iio->connect(adc_conv, 0, sink1, 0);
-		iio->connect(adc_conv, 1, sink2, 0);
+		capture_top_block->connect(dc_cancel1, 0, adc_conv, 0);
+		capture_top_block->connect(dc_cancel2, 0, adc_conv, 1);
+		capture_top_block->connect(adc_conv, 0, sink1, 0);
+		capture_top_block->connect(adc_conv, 1, sink2, 0);
 	}
 
 	// Build the flowgraph only once
@@ -596,11 +600,6 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 		autoAdjustGain = (value == 0);
 	});
 
-	// Create the blocks that are used to generate sine waves
-	top_block = make_top_block("Signal Generator");
-	source_block = analog::sig_source_f::make(1, analog::GR_SIN_WAVE,
-			1, 1, 1);
-
 	_configureDacFlowgraph();
 	_configureAdcFlowgraph();
 }
@@ -1029,13 +1028,6 @@ void NetworkAnalyzer::goertzel()
 			return;
 		}
 
-		// Lock the flowgraph if we are already started
-		bool started = iio->started();
-
-		if (started) {
-			iio->lock();
-		}
-
 		dc_cancel1->set_buffer_size(buffer_size);
 		dc_cancel2->set_buffer_size(buffer_size);
 
@@ -1046,22 +1038,60 @@ void NetworkAnalyzer::goertzel()
 		goertzel1->set_rate(adc_rate);
 		goertzel2->set_rate(adc_rate);
 
-		head1->reset();
-		head2->reset();
-		head1->set_length(buffer_size);
-		head2->set_length(buffer_size);
 
-		iio->set_buffer_size(id1, buffer_size);
-		iio->set_buffer_size(id2, buffer_size);
+		// TODO: Use libm2k here
+
+		std::vector<struct iio_channel *> adc_channels;
+
+		unsigned int nb_channels = iio_device_get_channels_count(adc);
+		for (unsigned int i = 0; i < nb_channels; i++) {
+			iio_channel_disable(iio_device_get_channel(adc, i));
+		}
+		for (unsigned int i = 0; i < nb_channels; i++) {
+			struct iio_channel *chn =
+					iio_device_get_channel(adc, i);
+			iio_channel_enable(chn);
+			adc_channels.push_back(chn);
+		}
+
+
+		struct iio_buffer *adc_buffer = iio_device_create_buffer(adc, buffer_size, false);
+
+		size_t ret = iio_buffer_refill(adc_buffer);
+
+		std::vector<std::vector<short>> data;
+
+		for (int i = 0; i < 2; ++i) {
+			std::vector<short> d;
+			for (int j = 0; j < buffer_size; ++j) {
+				d.push_back(j);
+			}
+			data.push_back(d);
+		}
+
+		for (auto chn : adc_channels) {
+			ptrdiff_t p_inc = iio_buffer_step(adc_buffer);
+			uintptr_t p_dat;
+			uintptr_t p_end = (uintptr_t)iio_buffer_end(adc_buffer);
+			unsigned int i;
+			for (i = 0, p_dat = (uintptr_t)iio_buffer_first(adc_buffer, adc_channels[0]);
+					p_dat < p_end; p_dat += p_inc, i++)
+			{
+				for (unsigned int ch = 0; ch < data.size(); ch++) {
+					data[ch][i] = ((int16_t*)p_dat)[ch];
+				}
+			}
+		}
+
+		capture1->rewind();
+		capture1->set_data(data[0]);
+		capture2->rewind();
+		capture2->set_data(data[1]);
 
 		{
 			boost::unique_lock<boost::mutex> lock(bufferMutex);
 			sink1->reset();
 			sink2->reset();
-		}
-
-		if (started) {
-			iio->unlock();
 		}
 
 		captureDone = false;
@@ -1070,32 +1100,21 @@ void NetworkAnalyzer::goertzel()
 		t.start();
 		// Sleep before ADC capture
 		QThread::msleep(captureDelay->value());
-		iio->start(id1);
-		iio->start(id2);
 
-		// Wait for the signal_sample sink block to capture the data
-		do {
-			QCoreApplication::processEvents();
-			QThread::msleep(10);
-
-			if (stop) {
-				break;
-			}
-		} while (!captureDone);
+		capture_top_block->run();
 
 		float dcOffset = 0.0;
-
 		dcOffset = dc_cancel2->get_dc_offset();
 		dcOffset = adc_sample_conv::convSampleToVolts(dcOffset,
 							corr_gain, 1, 0, hw_gain);
 
-		iio->stop(id1);
-		iio->stop(id2);
 
 		// Clear the iio_buffers that were created
 		for (auto& buffer : buffers) {
 			iio_buffer_destroy(buffer);
 		}
+
+		iio_buffer_destroy(adc_buffer);
 
 		// Process was cancelled
 		if (stop) {

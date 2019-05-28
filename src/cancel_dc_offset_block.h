@@ -2,8 +2,7 @@
 #define CANCEL_DC_OFFSET_BLOCK_H
 
 #include <gnuradio/hier_block2.h>
-
-#include "filter_dc_offset_block.h"
+#include <gnuradio/blocks/vector_sink_f.h>
 
 namespace adiscope {
 class cancel_dc_offset_block : public gr::hier_block2
@@ -22,7 +21,7 @@ private:
         bool d_enabled;
         size_t d_buffer_size;
 	float d_dc_offset;
-	boost::shared_ptr<filter_dc_offset_block> d_cancel_dc;
+	gr::blocks::vector_sink_f::sptr d_vs;
 
         void _build_and_connect_blocks();
 

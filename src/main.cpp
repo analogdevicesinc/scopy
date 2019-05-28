@@ -33,6 +33,7 @@ using namespace adiscope;
 
 int main(int argc, char **argv)
 {
+#if BREAKPAD_HANDLER
 #ifdef Q_OS_LINUX
 	google_breakpad::MinidumpDescriptor descriptor("/tmp");
 	google_breakpad::ExceptionHandler eh(descriptor, NULL, ScopyApplication::dumpCallback, NULL, true, -1);
@@ -51,6 +52,9 @@ int main(int argc, char **argv)
 
 	ScopyApplication app(argc, argv);
 	app.setExceptionHandler(&eh);
+#else
+	QApplication app(argc, argv);
+#endif
 
 	QFont font("Open Sans");
 	app.setFont(font);
@@ -78,7 +82,12 @@ int main(int argc, char **argv)
 	QString fn("Scopy.ini");
 	path.chop(fn.length());
 
+#if BREAKPAD_HANDLER
 	QString prevCrashDump = app.initBreakPadHandler(path);
+#else
+	QString prevCrashDump = "";
+#endif
+
 
 	QCommandLineParser parser;
 
