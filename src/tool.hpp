@@ -36,7 +36,7 @@ class QJSEngine;
 class QPushButton;
 
 extern "C" {
-	struct iio_context;
+struct iio_context;
 }
 
 namespace adiscope {
@@ -49,11 +49,11 @@ class Tool : public QWidget
 
 public:
 	explicit Tool(struct iio_context *ctx, ToolMenuItem *toolMenuItem,
-			ApiObject *api, const QString& name,
-			ToolLauncher *parent);
+		      ApiObject *api, const QString& name,
+		      ToolLauncher *parent);
 	~Tool();
 
-	QPushButton *runButton() { return toolMenuItem->getToolStopBtn(); }	
+	QPushButton *runButton() { return toolMenuItem->getToolStopBtn(); }
 	const QString& getName();
 	void setName(const QString& name);
 	virtual void settingsLoaded();
