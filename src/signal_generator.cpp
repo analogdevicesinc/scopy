@@ -1890,15 +1890,6 @@ void SignalGenerator::updateRightMenuForChn(int chIdx)
 	ui->fileChannel->setCurrentIndex(ptr->file_channel);
 	fileAmplitude->setValue(ptr->file_amplitude);
 
-	if (!ptr->file.isNull()) {
-		auto info = QFileInfo(ptr->file);
-		ui->label_size->setText(QString("%1 ").arg(
-		                                info.size() / sizeof(float))
-		                        + tr("samples"));
-	} else {
-		ui->label_size->setText("");
-	}
-
 	ui->type->setCurrentIndex(sg_waveform_to_idx(ptr->waveform));
 	waveformUpdateUi(ptr->waveform);
 	renameConfigPanel();
