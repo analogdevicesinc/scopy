@@ -17,8 +17,13 @@ matrix:
     fast_finish: true
 
 install:
+
     # Remove dependencies that prevent us from upgrading to GCC 6.2    
-    - C:\msys64\usr\bin\bash -lc "pacman -Rs --noconfirm mingw-w64-%ARCH%-gcc-ada mingw-w64-%ARCH%-gcc-fortran mingw-w64-%ARCH%-gcc-libgfortran mingw-w64-%ARCH%-gcc-objc"
+    - C:\msys64\usr\bin\bash -lc "pacman -Rs --noconfirm mingw-w64-i686-gcc-ada mingw-w64-i686-gcc-fortran mingw-w64-i686-gcc-libgfortran mingw-w64-i686-gcc-objc"
+    - C:\msys64\usr\bin\bash -lc "pacman -Rs --noconfirm mingw-w64-x86_64-gcc-ada mingw-w64-x86_64-gcc-fortran mingw-w64-x86_64-gcc-libgfortran mingw-w64-x86_64-gcc-objc"
+
+    - C:\msys64\usr\bin\bash -lc "pacman -Syu --noconfirm "
+    - C:\msys64\usr\bin\bash -lc "pacman -Syu --noconfirm "
 
     # Remove existing file that causes GCC install to fail
     - C:\msys64\usr\bin\bash -lc "rm /mingw32/etc/gdbinit /mingw64/etc/gdbinit"
@@ -103,5 +108,5 @@ build_script:
     - ISCC /Q C:\%BUILD_FOLDER%\scopy-%ARCH_BIT%.iss
     - appveyor PushArtifact C:\scopy-%ARCH_BIT%-setup.exe
 
-#on_finish:
-#- ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+      #on_finish:
+      #- ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
