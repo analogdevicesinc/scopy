@@ -1212,50 +1212,68 @@ bool ToolLauncher::loadDecoders(QString path)
 	return true;
 }
 
-void adiscope::ToolLauncher::calibrate()
+void adiscope::ToolLauncher::requestCalibration(){
+	bool dmm_was_running = dmm->runButton()->isChecked();
+
+	dmm->stop();
+	calibration_thread = QtConcurrent::run(std::bind(&ToolLauncher::calibrate,
+					       this));
+
+	if(dmm_was_running) dmm->run();
+}
+
+void adiscope::ToolLauncher::initialCalibration()
 {
-	bool ok=true;
-
+	bool ok = true;
+	getConnectedDevice()->calibrateButton()->setEnabled(false);
 	if (!skip_calibration) {
-		ok=false;
-		calibrating=true;
-
-		QPushButton *dmm_btn = menu->getToolMenuItemFor(TOOL_DMM)->getToolBtn();
-		QPushButton *osc_btn = menu->getToolMenuItemFor(TOOL_OSCILLOSCOPE)->getToolBtn();
-		QPushButton *siggen_btn = menu->getToolMenuItemFor(TOOL_SIGNAL_GENERATOR)->getToolBtn();
-		QPushButton *spectrum_btn = menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER)->getToolBtn();
-		QPushButton *network_btn = menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER)->getToolBtn();
-		auto old_dmm_text = dmm_btn->text();
-		auto old_osc_text = osc_btn->text();
-		auto old_siggen_text = siggen_btn->text();
-		auto old_spectrum_text = spectrum_btn->text();
-		auto old_network_text = network_btn->text();
-		QString status = "Calibrating...";
-		dmm_btn->setText(status);
-		osc_btn->setText(status);
-		siggen_btn->setText(status);
-		spectrum_btn->setText(status);
-		network_btn->setText(status);
-
-		if (calib->isInitialized()) {
-			calib->setHardwareInCalibMode();
-			ok = calib->calibrateAll();
-			calib->restoreHardwareFromCalibMode();
-		}
-
-		dmm_btn->setText(old_dmm_text);
-		osc_btn->setText(old_osc_text);
-		siggen_btn->setText(old_siggen_text);
-		spectrum_btn->setText(old_spectrum_text);
-		network_btn->setText(old_network_text);
+		ok = calibrate();
 	}
-
-	calibrating=false;
-
 	if (ok) {
 		Q_EMIT adcCalibrationDone();
 		Q_EMIT dacCalibrationDone();
 	}
+	getConnectedDevice()->calibrateButton()->setEnabled(true);
+	connect(getConnectedDevice()->calibrateButton(), SIGNAL(clicked()),this, SLOT(requestCalibration()));
+
+}
+
+bool adiscope::ToolLauncher::calibrate()
+{
+	bool ok=false;
+	calibrating=true;
+
+	QPushButton *dmm_btn = menu->getToolMenuItemFor(TOOL_DMM)->getToolBtn();
+	QPushButton *osc_btn = menu->getToolMenuItemFor(TOOL_OSCILLOSCOPE)->getToolBtn();
+	QPushButton *siggen_btn = menu->getToolMenuItemFor(TOOL_SIGNAL_GENERATOR)->getToolBtn();
+	QPushButton *spectrum_btn = menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER)->getToolBtn();
+	QPushButton *network_btn = menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER)->getToolBtn();
+	auto old_dmm_text = dmm_btn->text();
+	auto old_osc_text = osc_btn->text();
+	auto old_siggen_text = siggen_btn->text();
+	auto old_spectrum_text = spectrum_btn->text();
+	auto old_network_text = network_btn->text();
+	QString status = "Calibrating...";
+	dmm_btn->setText(status);
+	osc_btn->setText(status);
+	siggen_btn->setText(status);
+	spectrum_btn->setText(status);
+	network_btn->setText(status);
+
+	if (calib->isInitialized()) {
+		calib->setHardwareInCalibMode();
+		ok = calib->calibrateAll();
+		calib->restoreHardwareFromCalibMode();
+	}
+
+	dmm_btn->setText(old_dmm_text);
+	osc_btn->setText(old_osc_text);
+	siggen_btn->setText(old_siggen_text);
+	spectrum_btn->setText(old_spectrum_text);
+	network_btn->setText(old_network_text);
+
+	calibrating=false;
+	return ok;
 }
 
 void adiscope::ToolLauncher::enableAdcBasedTools()
@@ -1502,7 +1520,7 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 	});
 
 	loadToolTips(true);
-	calibration_thread = QtConcurrent::run(std::bind(&ToolLauncher::calibrate,
+	calibration_thread = QtConcurrent::run(std::bind(&ToolLauncher::initialCalibration,
 					       this));
 
 	return true;
@@ -1600,6 +1618,11 @@ void ToolLauncher::closeEvent(QCloseEvent *event)
 Preferences *ToolLauncher::getPrefPanel() const
 {
 	return prefPanel;
+}
+
+Calibration *ToolLauncher::getCalibration() const
+{
+	return calib;
 }
 
 bool ToolLauncher::eventFilter(QObject *watched, QEvent *event)

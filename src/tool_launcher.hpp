@@ -84,6 +84,7 @@ public:
 	InfoWidget *infoWidget;
 
 	Preferences *getPrefPanel() const;
+	Calibration *getCalibration() const;
 	bool eventFilter(QObject *watched, QEvent *event);
 
 	bool getUseDecoders() const;
@@ -104,6 +105,7 @@ public Q_SLOTS:
 
 	void loadSession();
 	void saveSession();
+	void requestCalibration();
 
 	void toolDetached(bool detached);
 
@@ -155,7 +157,8 @@ private:
 	bool loadDecoders(QString path);
 	bool switchContext(const QString& uri);
 	void resetStylesheets();
-	void calibrate();
+	void initialCalibration();
+	bool calibrate();
 	void checkIp(const QString& ip);
 	void disconnect();
 	void saveSettings();

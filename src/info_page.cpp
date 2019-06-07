@@ -23,63 +23,67 @@
 
 #include <QString>
 #include <QTimer>
+#include <QtConcurrentRun>
 
 using namespace std;
 using namespace adiscope;
 
 InfoPage::InfoPage(QString uri, Preferences *pref,
-                   struct iio_context *ctx,
-                   QWidget *parent) :
-        QWidget(parent),
-        ui(new Ui::InfoPage),
-        m_uri(uri),
-        m_ctx(ctx),
-        m_advanced(false),
-        prefPanel(pref),
-        m_led_timer(new QTimer(this)),
-        m_blink_timer(new QTimer(this)),
-        m_connected(false),
-        m_search_interrupted(false)
+		   struct iio_context *ctx,
+		   QWidget *parent) :
+	QWidget(parent),
+	ui(new Ui::InfoPage),
+	m_uri(uri),
+	m_ctx(ctx),
+	m_advanced(false),
+	prefPanel(pref),
+	m_led_timer(new QTimer(this)),
+	m_blink_timer(new QTimer(this)),
+	m_connected(false),
+	m_search_interrupted(false)
 {
-        ui->setupUi(this);
-        ui->paramLabel->setText(uri);
+	ui->setupUi(this);
+	ui->paramLabel->setText(uri);
 
-        if (uri.startsWith("usb:")) {
-                ui->btnForget->setEnabled(false);
-        }
-        connect(prefPanel, &Preferences::notify, this, &InfoPage::readPreferences);
-        connect(ui->btnIdentify, SIGNAL(pressed()),
-                this, SLOT(identifyDevice()));
-        connect(m_led_timer, SIGNAL(timeout()),
-                this, SLOT(ledTimeout()));
-        connect(m_blink_timer, SIGNAL(timeout()),
-                this, SLOT(blinkTimeout()));
-        readPreferences();
+	if (uri.startsWith("usb:")) {
+		ui->btnForget->setEnabled(false);
+	}
+
+	ui->btnCalibrate->setEnabled(false);
+	ui->btnCalibrate->setVisible(false);
+	connect(prefPanel, &Preferences::notify, this, &InfoPage::readPreferences);
+	connect(ui->btnIdentify, SIGNAL(pressed()),
+		this, SLOT(identifyDevice()));
+	connect(m_led_timer, SIGNAL(timeout()),
+		this, SLOT(ledTimeout()));
+	connect(m_blink_timer, SIGNAL(timeout()),
+		this, SLOT(blinkTimeout()));
+	readPreferences();
 }
 
 void InfoPage::readPreferences() {
-        m_advanced = prefPanel->getAdvanced_device_info();
-        getDeviceInfo();
+	m_advanced = prefPanel->getAdvanced_device_info();
+	getDeviceInfo();
 }
 
 InfoPage::~InfoPage()
 {
-        if (m_ctx) {
-                m_ctx = nullptr;
-        }
-        delete ui;
+	if (m_ctx) {
+		m_ctx = nullptr;
+	}
+	delete ui;
 }
 
 struct iio_context *InfoPage::ctx() const
 {
-        return m_ctx;
+	return m_ctx;
 }
 
 void InfoPage::setCtx(struct iio_context *ctx)
 {
-        identifyDevice(false);
-        (!ctx) ? m_connected = false : m_connected = true;
-        m_ctx = ctx;
+	identifyDevice(false);
+	(!ctx) ? m_connected = false : m_connected = true;
+	m_ctx = ctx;
 }
 
 void InfoPage::getDeviceInfo()
@@ -99,7 +103,7 @@ void InfoPage::getDeviceInfo()
 
 		m_info_params.insert("IIO version",
 				     QString::fromStdString(to_string(ctx_major) + "." +
-				     to_string(ctx_minor)));
+							    to_string(ctx_minor)));
 
 		QString description(iio_context_get_description(temp_ctx));
 		m_info_params.insert("Linux", description);
@@ -118,49 +122,49 @@ void InfoPage::getDeviceInfo()
 			}
 		}
 
-                if (!m_ctx) {
-                        iio_context_destroy(temp_ctx);
-                        temp_ctx = nullptr;
-                }
-        }
+		if (!m_ctx) {
+			iio_context_destroy(temp_ctx);
+			temp_ctx = nullptr;
+		}
+	}
 
 	ui->btnIdentify->setEnabled(supportsIdentification());
-        refreshInfoWidget();
+	refreshInfoWidget();
 }
 
 QPair<bool, QString> InfoPage::translateInfoParams(QString key)
 {
-        bool advanced = false;
-        if (key.contains("fw_version")) {
-                key = "Firmware version";
-        } else if (key == "hw_model") {
-                key = "Model";
-        } else if (key.contains("hw_model_variant")) {
-                key = "Model variant";
-                advanced = true;
-        } else if (key.contains("serial")) {
-                key = "Serial";
-        } else if (key.contains("local,kernel")) {
-                key = "";
-        } else if (key.contains("idProduct")) {
-                key = "Product ID";
-                advanced = true;
-        } else if (key.contains("idVendor")) {
-                key = "Vendor ID";
-                advanced = true;
-        } else if (key.contains("usb,product")) {
-                key = "Product name";
-        } else if (key.contains("usb,vendor")) {
-                key = "Vendor";
-        } else if (key.contains("release")) {
-                key = "Release";
-                advanced = true;
-        } else if (key.contains("ip")) {
-                key = "IP Address";
-        } else if (key.startsWith("cal,gain") ||
-                   key.startsWith("cal,offset")) {
-                key = "";
-        }
+	bool advanced = false;
+	if (key.contains("fw_version")) {
+		key = "Firmware version";
+	} else if (key == "hw_model") {
+		key = "Model";
+	} else if (key.contains("hw_model_variant")) {
+		key = "Model variant";
+		advanced = true;
+	} else if (key.contains("serial")) {
+		key = "Serial";
+	} else if (key.contains("local,kernel")) {
+		key = "";
+	} else if (key.contains("idProduct")) {
+		key = "Product ID";
+		advanced = true;
+	} else if (key.contains("idVendor")) {
+		key = "Vendor ID";
+		advanced = true;
+	} else if (key.contains("usb,product")) {
+		key = "Product name";
+	} else if (key.contains("usb,vendor")) {
+		key = "Vendor";
+	} else if (key.contains("release")) {
+		key = "Release";
+		advanced = true;
+	} else if (key.contains("ip")) {
+		key = "IP Address";
+	} else if (key.startsWith("cal,gain") ||
+		   key.startsWith("cal,offset")) {
+		key = "";
+	}
 	return QPair<bool, QString>(advanced, key);
 }
 
@@ -183,61 +187,64 @@ void InfoPage::refreshInfoWidget()
 	else
 		setStatusLabel("Your hardware revision does not support the identify feature", "white");
 
-        if ( ui->paramLayout != NULL )
-        {
-            QLayoutItem* item;
-            while ( ( item = ui->paramLayout->takeAt( 0 ) ) != NULL )
-            {
-                delete item->widget();
-                delete item;
-            }
-        }
+	if(supportsCalibration())
+		ui->btnCalibrate->setVisible(true);
 
-        int pos = 0;
-        for (auto key : m_info_params.keys()) {
-                QLabel *valueLbl = new QLabel(this);
-                QLabel *keyLbl = new QLabel(this);
-                valueLbl->setText(m_info_params.value(key));
-                valueLbl->setStyleSheet("color: white");
-                keyLbl->setText(key);
-                keyLbl->setMinimumWidth(240);
-                keyLbl->setMaximumWidth(240);
-                ui->paramLayout->addWidget(keyLbl, pos, 0, 1, 1);
-                ui->paramLayout->addWidget(valueLbl, pos, 1, 1, 1);
-                pos++;
-        }
+	if ( ui->paramLayout != NULL )
+	{
+		QLayoutItem* item;
+		while ( ( item = ui->paramLayout->takeAt( 0 ) ) != NULL )
+		{
+			delete item->widget();
+			delete item;
+		}
+	}
 
-        if (m_advanced) {
-                ui->paramLayout->setRowMinimumHeight(pos, 20);
-                pos++;
-                ui->paramLayout->addWidget(new QLabel("Advanced"), pos, 0, 1, 1);
-                pos++;
-                for (auto key : m_info_params_advanced.keys()) {
-                        QLabel *valueLbl = new QLabel(this);
-                        QLabel *keyLbl = new QLabel(this);
-                        valueLbl->setText(m_info_params_advanced.value(key));
-                        valueLbl->setStyleSheet("color: white");
-                        keyLbl->setText(key);
-                        ui->paramLayout->addWidget(keyLbl, pos, 0, 1, 1);
-                        ui->paramLayout->addWidget(valueLbl, pos, 1, 1, 1);
-                        pos++;
-                }
-        }
+	int pos = 0;
+	for (auto key : m_info_params.keys()) {
+		QLabel *valueLbl = new QLabel(this);
+		QLabel *keyLbl = new QLabel(this);
+		valueLbl->setText(m_info_params.value(key));
+		valueLbl->setStyleSheet("color: white");
+		keyLbl->setText(key);
+		keyLbl->setMinimumWidth(240);
+		keyLbl->setMaximumWidth(240);
+		ui->paramLayout->addWidget(keyLbl, pos, 0, 1, 1);
+		ui->paramLayout->addWidget(valueLbl, pos, 1, 1, 1);
+		pos++;
+	}
+
+	if (m_advanced) {
+		ui->paramLayout->setRowMinimumHeight(pos, 20);
+		pos++;
+		ui->paramLayout->addWidget(new QLabel("Advanced"), pos, 0, 1, 1);
+		pos++;
+		for (auto key : m_info_params_advanced.keys()) {
+			QLabel *valueLbl = new QLabel(this);
+			QLabel *keyLbl = new QLabel(this);
+			valueLbl->setText(m_info_params_advanced.value(key));
+			valueLbl->setStyleSheet("color: white");
+			keyLbl->setText(key);
+			ui->paramLayout->addWidget(keyLbl, pos, 0, 1, 1);
+			ui->paramLayout->addWidget(valueLbl, pos, 1, 1, 1);
+			pos++;
+		}
+	}
 }
 
 QString InfoPage::uri() const
 {
-        return m_uri;
+	return m_uri;
 }
 
 void InfoPage::setUri(QString uri)
 {
-        m_uri = uri;
+	m_uri = uri;
 }
 
 QPushButton* InfoPage::forgetDeviceButton()
 {
-        return ui->btnForget;
+	return ui->btnForget;
 }
 
 void InfoPage::identifyDevice(bool clicked)
@@ -312,13 +319,19 @@ void InfoPage::ledTimeout()
 
 QPushButton* InfoPage::identifyDeviceButton()
 {
-        return ui->btnIdentify;
+	return ui->btnIdentify;
 }
 
 QPushButton* InfoPage::connectButton()
 {
-        return ui->btnConnect;
+	return ui->btnConnect;
 }
+
+QPushButton* InfoPage::calibrateButton()
+{
+	return ui->btnCalibrate;
+}
+
 
 bool InfoPage::supportsIdentification()
 {
@@ -328,18 +341,28 @@ bool InfoPage::supportsIdentification()
 	return false;
 }
 
-M2kInfoPage::M2kInfoPage(QString uri,
-                     Preferences* prefPanel,
-                     struct iio_context *ctx,
-                     QWidget *parent) :
-        InfoPage(uri, prefPanel, ctx, parent),
-        m_fabric_channel(nullptr)
+bool InfoPage::supportsCalibration()
 {
+	QString model = m_info_params["Model"];
+	if(calibrateSupportedModels.contains(model))
+		return true;
+	return false;
+}
+
+M2kInfoPage::M2kInfoPage(QString uri,
+			 Preferences* prefPanel,
+			 struct iio_context *ctx,
+			 QWidget *parent) :
+	InfoPage(uri, prefPanel, ctx, parent),
+	m_fabric_channel(nullptr)
+{
+	ui->btnCalibrate->setEnabled(false);
 	ui->extraWidget->setFrameShape(QFrame::NoFrame);
 	ui->extraWidget->setOpenExternalLinks(true);
 	ui->extraWidget->setSource(QUrl("qrc:/m2k.html"));
 	ui->extraWidget->setMaximumHeight(700);
 	ui->extraWidget->setMinimumHeight(700);
+
 }
 
 M2kInfoPage::~M2kInfoPage()
@@ -409,9 +432,9 @@ void M2kInfoPage::blinkTimeout()
 		return;
 	bool oldVal;
 	iio_channel_attr_read_bool(m_fabric_channel,
-				       "done_led_overwrite_powerdown",
-				       &oldVal);
+				   "done_led_overwrite_powerdown",
+				   &oldVal);
 	iio_channel_attr_write_bool(m_fabric_channel,
-					"done_led_overwrite_powerdown",
-					!oldVal);
+				    "done_led_overwrite_powerdown",
+				    !oldVal);
 }

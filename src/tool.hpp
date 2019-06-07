@@ -53,7 +53,7 @@ public:
 			ToolLauncher *parent);
 	~Tool();
 
-	QPushButton *runButton() { return toolMenuItem->getToolStopBtn(); }
+	QPushButton *runButton() { return toolMenuItem->getToolStopBtn(); }	
 	const QString& getName();
 	void setName(const QString& name);
 	virtual void settingsLoaded();
@@ -62,6 +62,12 @@ Q_SIGNALS:
 	void detachedState(bool detached);
 
 public Q_SLOTS:
+	virtual void run() { if(runButton())
+			if(!(runButton()->isChecked()))
+				runButton()->toggle();}
+	virtual void stop() { if(runButton())
+			if((runButton()->isChecked()))
+				runButton()->setChecked(false);}
 	virtual void attached();
 	virtual void detached();
 	virtual void readPreferences();

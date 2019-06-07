@@ -53,7 +53,7 @@ DeviceWidget::DeviceWidget(QString uri, QString name,
 DeviceWidget::~DeviceWidget()
 {
         delete m_infoPage;
-        delete m_ui;
+	delete m_ui;
 }
 
 void DeviceWidget::identifyDevice_clicked(bool pressed)
@@ -77,6 +77,14 @@ QPushButton* DeviceWidget::connectButton() const
                 return m_infoPage->connectButton();
         }
         return nullptr;
+}
+
+QPushButton* DeviceWidget::calibrateButton() const
+{
+	if (m_infoPage) {
+		return m_infoPage->calibrateButton();
+	}
+	return nullptr;
 }
 
 void DeviceWidget::on_btn_toggled(bool toggled)
@@ -105,6 +113,7 @@ void DeviceWidget::setConnected(bool connected, bool failed,
         setDynamicProperty(m_ui->label, "failed", failed);
         setDynamicProperty(m_ui->line, "failed", failed);
         setDynamicProperty(connectButton(), "connected", connected);
+	calibrateButton()->setEnabled(false);
         m_infoPage->setConnectionStatus(failed);
 }
 
@@ -171,8 +180,9 @@ void DeviceWidget::click()
  {
          m_ui->name->setText("M2K");
          m_infoPage = InfoPageBuilder::newPage(InfoPageBuilder::M2K,
-                                               m_uri,
-                                               parent->getPrefPanel());
+					       m_uri,
+					       parent->getPrefPanel(),
+					       nullptr);
 
          connect(m_infoPage->forgetDeviceButton(), SIGNAL(clicked(bool)),
                  this, SLOT(forgetDevice_clicked(bool)));

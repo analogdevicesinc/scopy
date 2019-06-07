@@ -43,6 +43,7 @@ public:
 
         QPushButton* deviceButton() const;
         QPushButton* connectButton() const;
+	QPushButton* calibrateButton() const;
 
         void setChecked(bool);
         bool isChecked();
@@ -65,6 +66,7 @@ Q_SIGNALS:
         void selected(bool);
         void forgetDevice(QString);
         void identifyDevice(QString);
+	void calibrateDevice();
 
 public Q_SLOTS:
         void on_btn_toggled(bool);

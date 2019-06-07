@@ -24,6 +24,7 @@
 #include <QWidget>
 #include <QMap>
 #include <QPushButton>
+#include <QFuture>
 
 #include "iio.h"
 
@@ -33,14 +34,15 @@ class InfoPage;
 
 namespace adiscope {
 class Preferences;
+class Calibration;
 class InfoPage : public QWidget
 {
         Q_OBJECT
 
 public:
         explicit InfoPage(QString uri,
-                          Preferences* prefPanel,
-                          struct iio_context *ctx = nullptr,
+			  Preferences* prefPanel,
+			  struct iio_context *ctx = nullptr,
                           QWidget *parent = 0);
         virtual ~InfoPage();
 
@@ -54,12 +56,14 @@ public:
         QPushButton *forgetDeviceButton();
         QPushButton *identifyDeviceButton();
         QPushButton *connectButton();
+	QPushButton *calibrateButton();
 
         void getDeviceInfo();
         void refreshInfoWidget();
 
         void setConnectionStatus(bool);
 	bool supportsIdentification();
+	bool supportsCalibration();
 
 public Q_SLOTS:
         void readPreferences();
@@ -78,6 +82,7 @@ protected:
 private:
         QPair<bool, QString> translateInfoParams(QString);
 	const QStringList identifySupportedModels = {"Analog Devices M2k Rev.C (Z7010)","Analog Devices M2k Rev.D (Z7010)"};
+	const QStringList calibrateSupportedModels = {"Analog Devices M2k Rev.C (Z7010)","Analog Devices M2k Rev.D (Z7010)"};
 
 protected:
 	void setStatusLabel(QString str, QString color="red");
@@ -89,7 +94,7 @@ protected:
         QMap<QString, QString> m_info_params;
         QMap<QString, QString> m_info_params_advanced;
         QTimer *m_led_timer;
-        QTimer *m_blink_timer;
+	QTimer *m_blink_timer;
         bool m_connected;
         bool m_search_interrupted;
 };
@@ -101,7 +106,7 @@ class M2kInfoPage : public InfoPage
 public:
         explicit M2kInfoPage(QString uri,
                              Preferences* prefPanel,
-                             struct iio_context *ctx = nullptr,
+			      struct iio_context *ctx = nullptr,
                              QWidget *parent = 0);
         ~M2kInfoPage();
 
@@ -113,6 +118,7 @@ private Q_SLOTS:
 
 private:
 	struct iio_channel *m_fabric_channel;
+	QFuture<void> calibration_thread;
 };
 
 
