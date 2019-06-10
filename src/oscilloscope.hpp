@@ -122,7 +122,7 @@ namespace adiscope {
 		void triggerPositionChanged(double);
 		void selectedChannelChanged(int);
 		void activateExportButton();
-		void isRunning(bool);
+		void startRunning(bool);
 		void importFileLoaded(bool);
 		void showTool();
 
@@ -224,8 +224,9 @@ namespace adiscope {
 	public Q_SLOTS:
 		void requestAutoset();
 		void enableLabels(bool);
-
-		void import();
+		void import();		
+		void run() override;
+		void stop() override;
 
 	private:
 		std::shared_ptr<GenericAdc> adc;

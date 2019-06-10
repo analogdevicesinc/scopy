@@ -31,7 +31,7 @@ Tool::Tool(struct iio_context *ctx, ToolMenuItem *toolMenuItem,
 		ToolLauncher *parent) :
 	QWidget(static_cast<QWidget *>(parent)),
 	ctx(ctx), run_button(toolMenuItem->getToolStopBtn()), api(api),
-	name(name), saveOnExit(true), isDetached(false),
+	name(name), saveOnExit(true), isDetached(false), m_running(false),
 	window(nullptr), toolMenuItem(toolMenuItem)
 {
 	toolMenuItem->setDisabled(false);
@@ -144,5 +144,23 @@ void Tool::detached()
 		this->window = window;
 	}
 }
+
+void Tool::run()
+{
+
+}
+void Tool::stop()
+{
+
+}
+void Tool::single()
+{
+
+}
+bool Tool::isRunning()
+{
+	return m_running;
+}
+
 
 

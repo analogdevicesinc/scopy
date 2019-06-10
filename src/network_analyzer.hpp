@@ -226,7 +226,7 @@ private:
 	MouseWheelWidgetGuard *wheelEventGuard;
 
 	QFuture<void> thd;
-	bool stop;
+	bool m_stop;
 	void goertzel();
 
 	struct iio_buffer *generateSinWave(
@@ -278,6 +278,8 @@ private Q_SLOTS:
 public Q_SLOTS:
 
 	void showEvent(QShowEvent *event);
+	void run() override;
+	void stop() override;
 
 Q_SIGNALS:
 	void sweepDone();

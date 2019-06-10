@@ -343,7 +343,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 		ui->runSingleWidget, &RunSingleWidget::toggle);
 	connect(ui->runSingleWidget, &RunSingleWidget::toggled,
 		this, &SpectrumAnalyzer::runStopToggled);
-	connect(this, &SpectrumAnalyzer::isRunning,
+	connect(this, &SpectrumAnalyzer::started,
 		ui->runSingleWidget, &RunSingleWidget::toggle);
 
 
@@ -579,6 +579,16 @@ void SpectrumAnalyzer::on_btnMarkers_toggled(bool checked)
 		static_cast<CustomPushButton *>(QObject::sender()), checked);
 }
 
+void SpectrumAnalyzer::run()
+{
+	runStopToggled(true);
+}
+
+void SpectrumAnalyzer::stop()
+{
+	runStopToggled(false);
+}
+
 void SpectrumAnalyzer::runStopToggled(bool checked)
 {
 	if (checked) {
@@ -596,6 +606,7 @@ void SpectrumAnalyzer::runStopToggled(bool checked)
 	if (!checked) {
 		fft_plot->resetAverageHistory();
 	}
+	m_running = checked;
 }
 
 void SpectrumAnalyzer::build_gnuradio_block_chain()
@@ -1315,7 +1326,7 @@ void SpectrumAnalyzer::onPlotSampleCountUpdated(uint)
 void SpectrumAnalyzer::singleCaptureDone()
 {
 	if (ui->runSingleWidget->singleButtonChecked()) {
-		Q_EMIT isRunning(false);
+		Q_EMIT started(false);
 	}
 }
 

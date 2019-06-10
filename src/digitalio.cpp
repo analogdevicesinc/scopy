@@ -164,7 +164,7 @@ DigitalIO::DigitalIO(struct iio_context *ctx, Filter *filt, ToolMenuItem *toolMe
 	                                 ui->dioContainer));
 	ui->containerLayout->addWidget(groups.last());
 
-	connect(ui->btnRunStop, SIGNAL(toggled(bool)), this, SLOT(btnRunStop_toggled()));
+	connect(ui->btnRunStop, SIGNAL(toggled(bool)), this, SLOT(startStop(bool)));
 	connect(runButton(), SIGNAL(toggled(bool)), ui->btnRunStop, SLOT(setChecked(bool)));
 	connect(ui->btnRunStop, SIGNAL(toggled(bool)), runButton(), SLOT(setChecked(bool)));
 
@@ -339,9 +339,18 @@ void adiscope::DigitalIO::lockUi()
 
 }
 
-void adiscope::DigitalIO::btnRunStop_toggled()
+void adiscope::DigitalIO::run()
 {
-	if (ui->btnRunStop->isChecked()) {
+	startStop(true);
+}
+void adiscope::DigitalIO::stop()
+{
+	startStop(false);
+}
+
+void adiscope::DigitalIO::startStop(bool checked)
+{
+	if (checked) {
 		ui->btnRunStop->setText("Stop");
 		diom->enableOutput(true);
 	} else {

@@ -161,7 +161,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	ui(new Ui::NetworkAnalyzer),
 	adc_dev(adc_dev),
 	d_cursorsEnabled(false),
-	stop(true), amp1(nullptr), amp2(nullptr),
+	m_stop(true), amp1(nullptr), amp2(nullptr),
 	wheelEventGuard(nullptr), wasChecked(false),
 	dacs(dacs), justStarted(false),
 	iterationsThreadCanceled(false), iterationsThreadReady(false),
@@ -973,7 +973,7 @@ void NetworkAnalyzer::goertzel()
 
 	justStarted = true;
 
-	for (int i = 0; !stop && i < iterations.size(); ++i) {
+	for (int i = 0; !m_stop && i < iterations.size(); ++i) {
 
 		// Get current sweep settings
 		unsigned long rate = iterations[i].rate;
@@ -1118,7 +1118,7 @@ void NetworkAnalyzer::goertzel()
 		iio_buffer_destroy(adc_buffer);
 
 		// Process was cancelled
-		if (stop) {
+		if (m_stop) {
 			return;
 		}
 
@@ -1399,9 +1399,19 @@ double NetworkAnalyzer::autoUpdateGainMode(double magnitude, double magnitudeGai
 	return magnitudeGain;
 }
 
+
+void NetworkAnalyzer::run()
+{
+	startStop(true);
+}
+void NetworkAnalyzer::stop()
+{
+	startStop(false);
+}
+
 void NetworkAnalyzer::startStop(bool pressed)
 {
-	stop = !pressed;
+	m_stop = !pressed;
 
 	if (amp1 && amp2) {
 		/* FIXME: TODO: Move this into a HW class / lib M2k */
@@ -1409,13 +1419,11 @@ void NetworkAnalyzer::startStop(bool pressed)
 		iio_channel_attr_write_bool(amp2, "powerdown", !pressed);
 	}
 
-	static bool running = false;
-
-	if (running == pressed) {
+	if (m_running == pressed) {
 		return;
 	}
 
-	running = pressed;
+	m_running = pressed;
 
 	bool shouldClear = false;
 	if (QObject::sender() == ui->runSingleWidget) {
@@ -1444,13 +1452,13 @@ void NetworkAnalyzer::startStop(bool pressed)
 		iterationStats.clear();
 		bufferPreviewer->clear();
 		configHwForNetworkAnalyzing();
-		stop = false;
+		m_stop = false;
 		thd = QtConcurrent::run(this, &NetworkAnalyzer::goertzel);
 		ui->statusLabel->setText("Running");
 	} else {
 		ui->statusLabel->setText("Stopping...");
 		QCoreApplication::processEvents();
-		stop = true;
+		m_stop = true;
 		thd.waitForFinished();
 		m_dBgraph.sweepDone();
 		m_phaseGraph.sweepDone();

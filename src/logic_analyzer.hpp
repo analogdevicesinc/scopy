@@ -159,6 +159,8 @@ private Q_SLOTS:
 	void toolDetached(bool);
 public Q_SLOTS:
 	void startStop(bool start);
+	void run() override;
+	void stop() override;
 	void onTimeTriggerHandlePosChanged(int);
 	void onTimePositionSpinboxChanged(double value);
 	void refreshTriggerPos(int);
@@ -250,7 +252,7 @@ private:
 	int d_bufferSizeLabelVal;
 	double d_sampleRateLabelVal;
 
-	bool running = false;
+	bool m_running = false;
 	void setSampleRate();
 	void setTriggerDelay(bool silent = false);
 	void setHWTriggerDelay(long long delay);

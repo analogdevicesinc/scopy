@@ -62,12 +62,10 @@ Q_SIGNALS:
 	void detachedState(bool detached);
 
 public Q_SLOTS:
-	virtual void run() { if(runButton())
-			if(!(runButton()->isChecked()))
-				runButton()->toggle();}
-	virtual void stop() { if(runButton())
-			if((runButton()->isChecked()))
-				runButton()->setChecked(false);}
+	virtual void run();
+	virtual void stop();
+	virtual void single();
+	virtual bool isRunning();
 	virtual void attached();
 	virtual void detached();
 	virtual void readPreferences();
@@ -85,6 +83,7 @@ protected:
 	Preferences *prefPanel;
 	bool saveOnExit;
 	bool isDetached;
+	bool m_running;
 	QMainWindow *window;
 	ToolMenuItem *toolMenuItem;
 };

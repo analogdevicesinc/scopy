@@ -108,12 +108,14 @@ public:
 	void setVisible(bool visible);
 
 public Q_SLOTS:
+	void run() override;
+	void stop() override;
 	void updateUi();
 	void setDirection();
 	void setOutput();
 	void setSlider(int val);
 	void lockUi();
-	void btnRunStop_toggled();
+	void startStop(bool);
 Q_SIGNALS:
 	void showTool();
 };

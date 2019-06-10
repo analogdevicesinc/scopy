@@ -186,8 +186,7 @@ private:
 	QSharedPointer<signal_generator_data> getCurrentData();
 	void renameConfigPanel();
 
-	void start();
-	void stop();
+	void start();	
 	void resetZoom();
 
 	void updatePreview();
@@ -238,6 +237,10 @@ private:
 	void loadFileChannelData(QWidget *obj);
 	bool riffCompare(riff_header_t& ptr, const char *id2);
 	bool chunkCompare(chunk_header_t& ptr, const char *id2);
+public Q_SLOTS:
+	void run() override;
+	void stop() override;
+
 private Q_SLOTS:
 	void constantValueChanged(double val);
 	void amplitudeChanged(double val);
