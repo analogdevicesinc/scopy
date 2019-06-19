@@ -94,6 +94,7 @@ Q_SIGNALS:
 	void connectionDone(bool success);
 	void adcCalibrationDone();
 	void dacCalibrationDone();
+	void calibrationDone();
 
 	void adcToolsCreated();
 	void dacToolsCreated();
@@ -147,9 +148,11 @@ private Q_SLOTS:
 	int getDeviceIndex(DeviceWidget*);
 	void pageMoved(int);
 	void stopSearching(bool);
-
 	void _toolSelected(tool tool);
+	void restartToolsAfterCalibration();
+
 private:
+	QList<Tool*> calibration_saved_tools;
 	void loadToolTips(bool connected);
 	QVector<QString> searchDevices();
 	void swapMenu(QWidget *menu);
@@ -245,7 +248,9 @@ private:
 	DeviceWidget* selectedDev;
 	bool m_use_decoders;
 
-        void _setupToolMenu();
+	void _setupToolMenu();
+	void saveRunningToolsBeforeCalibration();
+	void stopToolsBeforeCalibration();
 };
 }
 #endif // M2K_TOOL_LAUNCHER_H

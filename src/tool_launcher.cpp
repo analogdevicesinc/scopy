@@ -128,10 +128,6 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 	devices_btn_group->addButton(ui->btnAdd);
 	devices_btn_group->addButton(ui->btnHomepage);
 
-	connect(this, SIGNAL(adcCalibrationDone()),
-		this, SLOT(enableAdcBasedTools()));
-	connect(this, SIGNAL(dacCalibrationDone()),
-		this, SLOT(enableDacBasedTools()));
 	connect(ui->btnAdd, SIGNAL(toggled(bool)), this, SLOT(btnAdd_toggled(bool)));
 	connect(ui->btnHomepage, SIGNAL(toggled(bool)), this, SLOT(btnHomepage_toggled(bool)));
 
@@ -1212,27 +1208,66 @@ bool ToolLauncher::loadDecoders(QString path)
 	return true;
 }
 
-void adiscope::ToolLauncher::requestCalibration(){
-	bool dmm_was_running = dmm->runButton()->isChecked();
 
-	dmm->stop();
+void adiscope::ToolLauncher::saveRunningToolsBeforeCalibration()
+{
+	if(dmm->isRunning()) calibration_saved_tools.push_back(dmm);
+	if(oscilloscope->isRunning()) calibration_saved_tools.push_back(oscilloscope);
+	if(signal_generator->isRunning()) calibration_saved_tools.push_back(signal_generator);
+	if(spectrum_analyzer->isRunning()) calibration_saved_tools.push_back(spectrum_analyzer);
+	if(network_analyzer->isRunning()) calibration_saved_tools.push_back(network_analyzer);
+}
+
+void adiscope::ToolLauncher::stopToolsBeforeCalibration()
+{
+	for(Tool* tool : calibration_saved_tools)
+		tool->stop();
+}
+void adiscope::ToolLauncher::restartToolsAfterCalibration()
+{
+	while(!calibration_saved_tools.empty())
+	{
+		Tool* tool = calibration_saved_tools.back();
+		calibration_saved_tools.pop_back();
+		tool->run();
+	}
+
+}
+void adiscope::ToolLauncher::requestCalibration(){
+	bool dmm_was_running = dmm->isRunning();
+
+
+	saveRunningToolsBeforeCalibration();
+	stopToolsBeforeCalibration();
+	connect(this,SIGNAL(calibrationDone()),this,SLOT(restartToolsAfterCalibration()));
+
 	calibration_thread = QtConcurrent::run(std::bind(&ToolLauncher::calibrate,
 					       this));
 
-	if(dmm_was_running) dmm->run();
+
+
+	//if(dmm_was_running) dmm->run();
 }
 
 void adiscope::ToolLauncher::initialCalibration()
 {
 	bool ok = true;
+
+	connect(this, SIGNAL(adcCalibrationDone()),
+		this, SLOT(enableAdcBasedTools()));
+	connect(this, SIGNAL(dacCalibrationDone()),
+		this, SLOT(enableDacBasedTools()));
+
 	getConnectedDevice()->calibrateButton()->setEnabled(false);
 	if (!skip_calibration) {
 		ok = calibrate();
 	}
-	if (ok) {
-		Q_EMIT adcCalibrationDone();
-		Q_EMIT dacCalibrationDone();
-	}
+
+	QObject::disconnect(this, SIGNAL(adcCalibrationDone()),
+		   this, SLOT(enableAdcBasedTools()));
+	QObject::disconnect(this, SIGNAL(dacCalibrationDone()),
+		   this, SLOT(enableDacBasedTools()));
+
 	getConnectedDevice()->calibrateButton()->setEnabled(true);
 	connect(getConnectedDevice()->calibrateButton(), SIGNAL(clicked()),this, SLOT(requestCalibration()));
 
@@ -1273,6 +1308,13 @@ bool adiscope::ToolLauncher::calibrate()
 	network_btn->setText(old_network_text);
 
 	calibrating=false;
+
+	if (ok) {
+		Q_EMIT adcCalibrationDone();
+		Q_EMIT dacCalibrationDone();
+		Q_EMIT calibrationDone();
+	}
+
 	return ok;
 }
 
