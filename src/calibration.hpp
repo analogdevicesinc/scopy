@@ -115,7 +115,7 @@ private:
 	void configHwSamplerate();
 
 	ApiObject *m_api;
-	bool m_cancel;
+	volatile bool m_cancel;
 
 	std::shared_ptr<M2kAdc> m2k_adc;
 	std::shared_ptr<M2kDac> m2k_dac_a;

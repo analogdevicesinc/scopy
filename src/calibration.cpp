@@ -879,6 +879,7 @@ bool Calibration::calibrateAll()
 	return true;
 
 calibration_fail:
+	dacOutputStop();
 	m_cancel=false;
 	return false;
 }
