@@ -1231,22 +1231,25 @@ void adiscope::ToolLauncher::restartToolsAfterCalibration()
 		calibration_saved_tools.pop_back();
 		tool->run();
 	}
-
 }
-void adiscope::ToolLauncher::requestCalibration(){
-	bool dmm_was_running = dmm->isRunning();
-
-
+void adiscope::ToolLauncher::requestCalibration()
+{
 	saveRunningToolsBeforeCalibration();
 	stopToolsBeforeCalibration();
-	connect(this,SIGNAL(calibrationDone()),this,SLOT(restartToolsAfterCalibration()));
-
 	calibration_thread = QtConcurrent::run(std::bind(&ToolLauncher::calibrate,
 					       this));
+}
 
+void adiscope::ToolLauncher::requestCalibrationCancel()
+{
+	calib->cancelCalibration();
+}
 
-
-	//if(dmm_was_running) dmm->run();
+void adiscope::ToolLauncher::calibrationFailedCallback()
+{
+	selectedDev->infoPage()->setStatusLabel("Calibration Failed");
+	selectedDev->connectButton()->setText("Disconnect");
+	selectedDev->connectButton()->setEnabled(true);
 }
 
 void adiscope::ToolLauncher::initialCalibration()
@@ -1257,6 +1260,10 @@ void adiscope::ToolLauncher::initialCalibration()
 		this, SLOT(enableAdcBasedTools()));
 	connect(this, SIGNAL(dacCalibrationDone()),
 		this, SLOT(enableDacBasedTools()));
+	connect(this, SIGNAL(calibrationFailed()),
+		this, SLOT(calibrationFailedCallback()));
+	connect(this, SIGNAL(calibrationDone()),
+		this, SLOT(restartToolsAfterCalibration()));
 
 	getConnectedDevice()->calibrateButton()->setEnabled(false);
 	if (!skip_calibration) {
@@ -1313,6 +1320,9 @@ bool adiscope::ToolLauncher::calibrate()
 		Q_EMIT adcCalibrationDone();
 		Q_EMIT dacCalibrationDone();
 		Q_EMIT calibrationDone();
+	}
+	else {
+		Q_EMIT calibrationFailed();
 	}
 
 	return ok;
@@ -1562,6 +1572,7 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 	});
 
 	loadToolTips(true);
+
 	calibration_thread = QtConcurrent::run(std::bind(&ToolLauncher::initialCalibration,
 					       this));
 

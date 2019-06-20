@@ -95,6 +95,7 @@ Q_SIGNALS:
 	void adcCalibrationDone();
 	void dacCalibrationDone();
 	void calibrationDone();
+	void calibrationFailed();
 
 	void adcToolsCreated();
 	void dacToolsCreated();
@@ -107,6 +108,7 @@ public Q_SLOTS:
 	void loadSession();
 	void saveSession();
 	void requestCalibration();
+	void requestCalibrationCancel();
 
 	void toolDetached(bool detached);
 
@@ -150,7 +152,7 @@ private Q_SLOTS:
 	void stopSearching(bool);
 	void _toolSelected(tool tool);
 	void restartToolsAfterCalibration();
-
+	void calibrationFailedCallback();
 private:
 	QList<Tool*> calibration_saved_tools;
 	void loadToolTips(bool connected);

@@ -68,6 +68,7 @@ public:
 public Q_SLOTS:
 	void readPreferences();
 	void identifyDevice(bool clicked = true);
+	void setStatusLabel(QString str, QString color="red");
 
 private Q_SLOTS:
 	virtual void blinkTimeout();
@@ -85,7 +86,6 @@ private:
 	const QStringList calibrateSupportedModels = {"Analog Devices M2k Rev.C (Z7010)","Analog Devices M2k Rev.D (Z7010)"};
 
 protected:
-	void setStatusLabel(QString str, QString color="red");
 	Ui::InfoPage *ui;
 	QString m_uri;
 	struct iio_context *m_ctx;
