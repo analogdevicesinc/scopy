@@ -436,7 +436,9 @@ void Oscilloscope_API::setCurrentChannel(int chn_id)
 
 	if (chn_widget->enableButton()->isChecked()) {
 		osc->setChannelWidgetIndex(chn_id);
+		osc->current_channel = chn_id;
 		chn_widget->nameButton()->setChecked(true);
+		chn_widget->menuButton()->setChecked(true);
 	}
 }
 
