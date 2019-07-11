@@ -427,6 +427,10 @@ bool SpinBoxA::eventFilter(QObject *obj, QEvent *event)
 				return true;
 			}
 		} else if (event->type() == QEvent::Wheel) {
+			if (!isEnabled()) {
+				return QWidget::eventFilter(obj, event);
+			}
+
 			QWheelEvent *wheelE = static_cast<QWheelEvent *>(event);
 
 			if (wheelE->angleDelta().y() > 0) {
@@ -445,6 +449,10 @@ bool SpinBoxA::eventFilter(QObject *obj, QEvent *event)
 	}
 
 	if (obj == ui->SBA_CompletionCircle) {
+		if (!isEnabled()) {
+			return QWidget::eventFilter(obj, event);
+		}
+
 		if (event->type() == QEvent::Enter) {
 			setCursor(Qt::SizeVerCursor);
 		} else if (event->type() == QEvent::Leave) {
