@@ -595,11 +595,13 @@ double Calibration::dacBvlsb() const
 void Calibration::turnDACOutputOff()
 {
 	if (m_dac_a_buffer) {
+		iio_buffer_cancel(m_dac_a_buffer);
 		iio_buffer_destroy(m_dac_a_buffer);
 		m_dac_a_buffer = NULL;
 	}
 
 	if (m_dac_b_buffer) {
+		iio_buffer_cancel(m_dac_b_buffer);
 		iio_buffer_destroy(m_dac_b_buffer);
 		m_dac_b_buffer = NULL;
 	}
