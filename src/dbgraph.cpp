@@ -104,6 +104,7 @@ void dBgraph::setupReadouts()
 
 dBgraph::dBgraph(QWidget *parent) : QwtPlot(parent),
 	curve("data"),
+	reference("reference"),
 	d_cursorsCentered(false),
 	d_cursorsEnabled(false),
 	xmin(10),
@@ -132,6 +133,11 @@ dBgraph::dBgraph(QWidget *parent) : QwtPlot(parent),
 	curve.setRenderHint(QwtPlotItem::RenderAntialiased);
 	curve.setXAxis(QwtPlot::xTop);
 	curve.setYAxis(QwtPlot::yLeft);
+
+	reference.setRenderHint(QwtPlotItem::RenderAntialiased);
+	reference.setXAxis(QwtPlot::xTop);
+	reference.setYAxis(QwtPlot::yLeft);
+	reference.setPen(Qt::red, 1.5);
 
 	thickness = 1;
 
@@ -535,6 +541,24 @@ void dBgraph::onFrequencyBarMoved(double frequency)
 {
 	auto oldY = d_frequencyBar->plotCoord().y();
 	d_frequencyBar->setPlotCoord(QPointF(frequency, oldY));
+}
+
+void dBgraph::addReferenceWaveform(QVector<double> xData, QVector<double> yData)
+{
+	reference.setSamples(xData, yData);
+	reference.attach(this);
+	replot();
+}
+
+void dBgraph::removeReferenceWaveform()
+{
+	reference.detach();
+	replot();
+}
+
+void dBgraph::addReferenceWaveformFromPlot()
+{
+	addReferenceWaveform(xdata, ydata);
 }
 
 void dBgraph::onCursor1PositionChanged(int pos)

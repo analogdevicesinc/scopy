@@ -145,11 +145,17 @@ public Q_SLOTS:
 	void onFrequencyCursorPositionChanged(int pos);
 	void onFrequencyBarMoved(double frequency);
 
+	void addReferenceWaveform(QVector<double> xData, QVector<double> yData);
+	void removeReferenceWaveform();
+	void addReferenceWaveformFromPlot();
+
+
 protected Q_SLOTS:
 	void showEvent(QShowEvent *event);
 
 private:
 	QwtPlotCurve curve;
+	QwtPlotCurve reference;
 	QwtPlotMarker *markerIntersection1;
 	QwtPlotMarker *markerIntersection2;
 	unsigned int numSamples;
