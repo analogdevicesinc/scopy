@@ -166,7 +166,8 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	dacs(dacs), justStarted(false),
 	iterationsThreadCanceled(false), iterationsThreadReady(false),
 	iterationsThread(nullptr), autoAdjustGain(true),
-	filterDc(false), m_initFlowgraph(true)
+	filterDc(false), m_initFlowgraph(true), m_hasReference(false),
+	m_importDataLoaded(false)
 {
 	iio = iio_manager::get_instance(ctx,
 					filt->device_name(TOOL_NETWORK_ANALYZER, 2));
@@ -599,6 +600,67 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	connect(ui->responseGainCmb, QOverload<int>::of(&QComboBox::currentIndexChanged),
 		[=](int value) {
 		autoAdjustGain = (value == 0);
+	});
+
+	connect(ui->addCurrentPlotCheckBox, &QCheckBox::toggled, [=](bool checked){
+		ui->addReference->setEnabled(checked || m_hasReference);
+		ui->importBtn->setDisabled(checked);
+	});
+
+	connect(ui->addReference, &QPushButton::clicked, [=](){
+		if (!m_hasReference && ui->addCurrentPlotCheckBox->isChecked()) {
+			m_hasReference = true;
+			m_dBgraph.addReferenceWaveformFromPlot();
+			m_phaseGraph.addReferenceWaveformFromPlot();
+		} else if (m_hasReference) {
+			m_hasReference = false;
+			m_dBgraph.removeReferenceWaveform();
+			m_phaseGraph.removeReferenceWaveform();
+			ui->addReference->setEnabled(ui->addCurrentPlotCheckBox->isChecked());
+			ui->importFileLineEdit->setText("");
+			ui->importFileLineEdit->setToolTip("");
+		} else if (m_importDataLoaded) {
+
+			QVector<double> frequency, magnitude, phase;
+
+			for (size_t i = 0; i < m_importData.size(); ++i) {
+				frequency.push_back(m_importData[i][0]);
+				magnitude.push_back(m_importData[i][1]);
+				phase.push_back(m_importData[i][2]);
+			}
+
+			m_dBgraph.addReferenceWaveform(frequency, magnitude);
+			m_phaseGraph.addReferenceWaveform(frequency, phase);
+
+			m_hasReference = true;
+			m_importDataLoaded = false;
+		}
+		ui->addReference->setText((m_hasReference ? "Remove Reference" :
+						     "Add Reference"));
+	});
+
+	connect(ui->importBtn, &QPushButton::clicked, [=](){
+		QString fileName = QFileDialog::getOpenFileName(this,
+				   tr("Open import file"), "",
+				   tr({"Comma-separated values files (*.csv);;"
+				       "Tab-delimited values files (*.txt)"}));
+
+		FileManager fm("Network Analyzer");
+
+		try {
+			fm.open(fileName, FileManager::IMPORT);
+
+			ui->addReference->setEnabled(true);
+
+			ui->importFileLineEdit->setText(fileName);
+			ui->importFileLineEdit->setToolTip(fileName);
+
+			m_importDataLoaded = true;
+			m_importData = fm.read();
+		} catch (FileManagerException &e) {
+			ui->importFileLineEdit->setText(e.what());
+		}
+
 	});
 
 	_configureDacFlowgraph();
