@@ -226,7 +226,13 @@ private:
 	MouseWheelWidgetGuard *wheelEventGuard;
 
 	QFuture<void> thd;
+
 	bool m_stop;
+
+	bool m_hasReference;
+	bool m_importDataLoaded;
+	QVector<QVector<double>> m_importData;
+
 	void goertzel();
 
 	struct iio_buffer *generateSinWave(
