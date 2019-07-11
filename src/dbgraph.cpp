@@ -149,7 +149,7 @@ dBgraph::dBgraph(QWidget *parent) : QwtPlot(parent),
 	setAxisScaleDraw(QwtPlot::xTop, draw_x);
 
 	draw_y = new OscScaleDraw("dB");
-	draw_y->setFloatPrecision(0);
+	draw_y->setFloatPrecision(2);
 	draw_y->enableComponent(QwtAbstractScaleDraw::Ticks, false);
 	draw_y->enableComponent(QwtAbstractScaleDraw::Backbone, false);
 	draw_y->setMinimumExtent(50);
