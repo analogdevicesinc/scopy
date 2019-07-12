@@ -1149,6 +1149,7 @@ void Oscilloscope::settingsLoaded()
 		if (channelWidgetAtId(i)->menuButton()->isChecked() &&
 				!channelWidgetAtId(i)->isReferenceChannel()) {
 			current_ch_widget = i;
+			channelWidgetAtId(i)->menuButton()->setChecked(true);
 			break;
 		}
 
