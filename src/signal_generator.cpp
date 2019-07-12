@@ -71,6 +71,9 @@
 
 #define AMPLITUDE_VOLTS	5.0
 
+#define MAX_PREVIEW_RANGE (float)(SHRT_MAX)
+#define MIN_PREVIEW_RANGE (float)(SHRT_MIN)
+
 using namespace adiscope;
 using namespace gr;
 
@@ -426,6 +429,12 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 	/* Attach all curves by default */
 	plot->registerSink(time_block_data->time_block->name(),
 	                   nb_channels, nb_points);
+
+	for(auto i = 0; i < nb_channels; i++) {
+		plot->Curve(i)->setPaintAttribute(QwtPlotCurve::ClipPolygons, false);
+		plot->Curve(i)->setPaintAttribute(QwtPlotCurve::FilterPointsAggressive, true);
+	}
+
 
 	/* This must be done after attaching the curves; otherwise
 	 * plot->getLineColor(i) returns black. */
@@ -971,12 +980,15 @@ void SignalGenerator::updatePreview()
 		}
 
 		auto head = blocks::head::make(sizeof(float), nb_points + nb_points_correction);
-		top->connect(source, 0, head, 0);
+		auto clamp = analog::rail_ff::make(MIN_PREVIEW_RANGE, MAX_PREVIEW_RANGE); // prevent plotting infinite values
+		top->connect(source, 0, clamp, 0);
+		top->connect(clamp, 0, head ,0);
 		top->connect(head, 0, time_block_data->time_block, i++);
 	}
 
 	QElapsedTimer timer;
 	timer.start();
+
 	top->run();
 	qDebug(CAT_SIGNAL_GENERATOR) << "The slow operation took" << timer.elapsed() << "milliseconds";
 	top->disconnect_all();
