@@ -1173,7 +1173,7 @@ bool SignalGenerator::loadParametersFromFile(
 
 
 	if (ptr->file_nr_of_channels==0) {
-		ptr->file_message+=" File not loaded due to errors ";
+		ptr->file_message+="File not loaded due to errors";
 		ptr->file_nr_of_samples.push_back(0);
 		ptr->file_type=FORMAT_NO_FILE;
         return false;
@@ -1242,8 +1242,8 @@ void SignalGenerator::loadFileFromPath(QString filename){
     ui->fileChannel->setEnabled(ptr->file_nr_of_channels>1);
     ui->fileChannel->setCurrentIndex(ptr->file_channel);
     ui->fileChannel->blockSignals(false);
+    loadFileChannelData(currentChannel);
     updateRightMenuForChn(currentChannel);
-    resetZoom();
 }
 
 void SignalGenerator::loadFile()
@@ -1253,6 +1253,7 @@ void SignalGenerator::loadFile()
 		return;
     loadFileFromPath(filename);
     updateRightMenuForChn(currentChannel);
+    resetZoom();
 }
 
 void SignalGenerator::start()
@@ -1530,9 +1531,9 @@ basic_block_sptr SignalGenerator::getSignalSource(gr::top_block_sptr top,
 
 }
 
-void SignalGenerator::loadFileChannelData(QWidget *obj)
+void SignalGenerator::loadFileChannelData(int chIdx)
 {
-	auto ptr = getData(obj);
+	auto ptr = getData(channels[chIdx]);
 
 	if (ptr->type!=SIGNAL_TYPE_BUFFER) {
 		qDebug(CAT_SIGNAL_GENERATOR)<<"loadFileChannelData called without having SIGNAL_TYPE_BUFFER";
@@ -1675,7 +1676,6 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
 
 			case FORMAT_CSV:
 			case FORMAT_MAT:
-				loadFileChannelData(obj);
 				fs = blocks::vector_source_f::make(ptr->file_data,true);
 				top->connect(fs,0,buffer,0);
 				break;
@@ -1882,10 +1882,10 @@ void SignalGenerator::updateRightMenuForChn(int chIdx)
 		phase->setValue(phase->changeValueFromDegreesToSeconds(ptr->phase));
 	}
 
-    fileAmplitude->setEnabled(ptr->file_type != FORMAT_NO_FILE);
-    fileSampleRate->setEnabled(ptr->file_type != FORMAT_NO_FILE);
-    filePhase->setEnabled(ptr->file_type != FORMAT_NO_FILE);
-    fileOffset->setEnabled(ptr->file_type != FORMAT_NO_FILE);
+	fileAmplitude->setEnabled(ptr->file_type != FORMAT_NO_FILE);
+	fileSampleRate->setEnabled(ptr->file_type != FORMAT_NO_FILE);
+	filePhase->setEnabled(ptr->file_type != FORMAT_NO_FILE);
+	fileOffset->setEnabled(ptr->file_type != FORMAT_NO_FILE);
 
 	offset->setValue(ptr->offset);
 	amplitude->setValue(ptr->amplitude);
@@ -1901,7 +1901,10 @@ void SignalGenerator::updateRightMenuForChn(int chIdx)
 	holdLowTime->setValue(ptr->holdl);
 
 	ui->label_path->setText(ptr->file);
-    ui->label_format->setText(ptr->file_message);
+	ui->label_format->setText(ptr->file_message);
+	if(!ptr->file_nr_of_samples.empty())
+		ui->label_size->setText(QString::number(ptr->file_nr_of_samples[ptr->file_channel]) +
+				tr(" samples"));
 	ui->mathWidget->setFunction(ptr->function);
 	mathFrequency->setValue(ptr->math_freq);
 	fileSampleRate->setValue(ptr->file_sr);
