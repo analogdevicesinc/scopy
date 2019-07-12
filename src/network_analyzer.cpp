@@ -1308,12 +1308,12 @@ void NetworkAnalyzer::plot(double frequency, double mag1, double mag2,
 
 	static int index = 0;
 	if (justStarted) {
-		magBonus = 0;
 		currentSample = 0;
 		justStarted = false;
 		ui->currentFrequencyLabel->setVisible(true);
 		ui->currentSampleLabel->setVisible(true);
 		index = 0;
+		magBonus = autoUpdateGainMode(mag, magBonus, dcVoltage);
 	}
 
 	ui->currentSampleLabel->setText(QString("Sample: " + QString::number(1 + currentSample++ )
@@ -1384,10 +1384,6 @@ bool NetworkAnalyzer::_checkMagForOverrange(double magnitude)
 
 double NetworkAnalyzer::autoUpdateGainMode(double magnitude, double magnitudeGain, float dcVoltage)
 {
-	if (!autoAdjustGain) {
-		return 0.0;
-	}
-
 	auto m2k_adc = std::dynamic_pointer_cast<M2kAdc>(adc_dev);
 
 	// compute Vout knowing that magnitude = 20 * log(Vout / Vin);
@@ -1434,7 +1430,14 @@ double NetworkAnalyzer::autoUpdateGainMode(double magnitude, double magnitudeGai
 
 
 	if (m2k_adc->chnHwGainMode(responseChannel) != gain) {
-		m2k_adc->setChnHwGainMode(responseChannel, gain);
+		if (autoAdjustGain) {
+			m2k_adc->setChnHwGainMode(responseChannel, gain);
+		} else {
+			int selectedResponseGain = ui->responseGainCmb->currentIndex();
+			gain = (selectedResponseGain == 1 ? M2kAdc::LOW_GAIN_MODE
+							  : M2kAdc::HIGH_GAIN_MODE);
+		}
+
 		if (gain == M2kAdc::LOW_GAIN_MODE) {
 			if (gain != m2k_adc->chnHwGainMode(1 - responseChannel)) {
 				return magnitudeGainBetweenGainModes;
