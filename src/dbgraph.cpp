@@ -606,8 +606,8 @@ void dBgraph::onCursor1Moved(int value)
 	text = cursorIntersection(point.x());
 	d_cursorReadouts->setVoltageCursor1Text(text);
 
-	int d1 = d_cursorReadouts->voltageCursor1Text().split(" ")[0].toInt();
-	int d2 = d_cursorReadouts->voltageCursor2Text().split(" ")[0].toInt();
+	double d1 = d_cursorReadouts->voltageCursor1Text().split(" ")[0].toDouble();
+	double d2 = d_cursorReadouts->voltageCursor2Text().split(" ")[0].toDouble();
 
 	if (text == "-") {
 		markerIntersection1->detach();
@@ -635,8 +635,8 @@ void dBgraph::onCursor2Moved(int value)
 	text = cursorIntersection(point.x());
 	d_cursorReadouts->setVoltageCursor2Text(text);
 
-	int d1 = d_cursorReadouts->voltageCursor1Text().split(" ")[0].toInt();
-	int d2 = d_cursorReadouts->voltageCursor2Text().split(" ")[0].toInt();
+	double d1 = d_cursorReadouts->voltageCursor1Text().split(" ")[0].toDouble();
+	double d2 = d_cursorReadouts->voltageCursor2Text().split(" ")[0].toDouble();
 
 	if (text == "-") {
 		markerIntersection2->detach();
@@ -688,7 +688,7 @@ QString dBgraph::cursorIntersection(qreal freq)
 		double val = (rightCustom - leftCustom)/(rightFreq - leftFreq)*
 			     (freq-leftFreq)+leftCustom;
 
-		return QString::number(val,'f',0) +" "+ draw_y->getUnitType();
+		return QString::number(val,'f',2) +" "+ draw_y->getUnitType();
 	}
 }
 
