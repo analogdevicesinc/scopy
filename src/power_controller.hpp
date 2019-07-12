@@ -65,6 +65,8 @@ namespace adiscope {
 		void dac2_set_value(double value);
 		void update_lcd();
 		void sync_enabled(bool enabled);
+		void run() override;
+		void stop() override;
 
 	private Q_SLOTS:
 		void startStop(bool start);

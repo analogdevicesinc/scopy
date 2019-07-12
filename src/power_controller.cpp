@@ -331,6 +331,15 @@ void PowerController::update_lcd()
 	timer.start(TIMER_TIMEOUT_MS);
 }
 
+void PowerController::run()
+{
+	startStop(true);
+}
+void PowerController::stop()
+{
+	startStop(false);
+}
+
 void PowerController::startStop(bool start)
 {
 	dac1_set_enabled(start);
@@ -338,5 +347,6 @@ void PowerController::startStop(bool start)
 
 	dac2_set_enabled(start);
 	ui->dac2->setChecked(start);
+	m_running = start;
 }
 

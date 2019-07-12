@@ -95,10 +95,12 @@ public:
 	~SpectrumAnalyzer();
 
 public Q_SLOTS:
-	void readPreferences();
+	void readPreferences();	
+	void run() override;
+	void stop() override;
 
 Q_SIGNALS:
-	void isRunning(bool);
+	void started(bool);
 	void showTool();
 
 private Q_SLOTS:

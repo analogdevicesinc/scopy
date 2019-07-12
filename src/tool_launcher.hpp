@@ -84,6 +84,7 @@ public:
 	InfoWidget *infoWidget;
 
 	Preferences *getPrefPanel() const;
+	Calibration *getCalibration() const;
 	bool eventFilter(QObject *watched, QEvent *event);
 
 	bool getUseDecoders() const;
@@ -93,6 +94,8 @@ Q_SIGNALS:
 	void connectionDone(bool success);
 	void adcCalibrationDone();
 	void dacCalibrationDone();
+	void calibrationDone();
+	void calibrationFailed();
 
 	void adcToolsCreated();
 	void dacToolsCreated();
@@ -104,6 +107,8 @@ public Q_SLOTS:
 
 	void loadSession();
 	void saveSession();
+	void requestCalibration();
+	void requestCalibrationCancel();
 
 	void toolDetached(bool detached);
 
@@ -145,9 +150,11 @@ private Q_SLOTS:
 	int getDeviceIndex(DeviceWidget*);
 	void pageMoved(int);
 	void stopSearching(bool);
-
 	void _toolSelected(tool tool);
+	void restartToolsAfterCalibration();
+	void calibrationFailedCallback();
 private:
+	QList<Tool*> calibration_saved_tools;
 	void loadToolTips(bool connected);
 	QVector<QString> searchDevices();
 	void swapMenu(QWidget *menu);
@@ -155,7 +162,8 @@ private:
 	bool loadDecoders(QString path);
 	bool switchContext(const QString& uri);
 	void resetStylesheets();
-	void calibrate();
+	void initialCalibration();
+	bool calibrate();
 	void checkIp(const QString& ip);
 	void disconnect();
 	void saveSettings();
@@ -242,7 +250,9 @@ private:
 	DeviceWidget* selectedDev;
 	bool m_use_decoders;
 
-        void _setupToolMenu();
+	void _setupToolMenu();
+	void saveRunningToolsBeforeCalibration();
+	void stopToolsBeforeCalibration();
 };
 }
 #endif // M2K_TOOL_LAUNCHER_H

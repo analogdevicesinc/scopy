@@ -92,6 +92,8 @@ namespace adiscope {
 
 	public Q_SLOTS:
 		void toggleTimer(bool start);
+		void run() override;
+		void stop() override;
 
 	private Q_SLOTS:
 		void setHistorySizeCh1(int idx);

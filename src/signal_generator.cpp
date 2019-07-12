@@ -1405,6 +1405,13 @@ void SignalGenerator::start()
 	}
 }
 
+
+void SignalGenerator::run()
+{
+	m_running = true;
+	start();
+}
+
 void SignalGenerator::stop()
 {
 
@@ -1420,6 +1427,7 @@ void SignalGenerator::stop()
 		iio_channel_attr_write_bool(amp1, "powerdown", true);//!(ui->run_button->isChecked() && channels[0]->enableButton()->isChecked()));
 		iio_channel_attr_write_bool(amp2, "powerdown", true);//!(ui->run_button->isChecked() && channels[1]->enableButton()->isChecked()));
 	}
+	m_running = false;
 }
 
 void SignalGenerator::startStop(bool pressed)

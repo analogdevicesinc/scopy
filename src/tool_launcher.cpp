@@ -128,10 +128,6 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 	devices_btn_group->addButton(ui->btnAdd);
 	devices_btn_group->addButton(ui->btnHomepage);
 
-	connect(this, SIGNAL(adcCalibrationDone()),
-		this, SLOT(enableAdcBasedTools()));
-	connect(this, SIGNAL(dacCalibrationDone()),
-		this, SLOT(enableDacBasedTools()));
 	connect(ui->btnAdd, SIGNAL(toggled(bool)), this, SLOT(btnAdd_toggled(bool)));
 	connect(ui->btnHomepage, SIGNAL(toggled(bool)), this, SLOT(btnHomepage_toggled(bool)));
 
@@ -1212,50 +1208,124 @@ bool ToolLauncher::loadDecoders(QString path)
 	return true;
 }
 
-void adiscope::ToolLauncher::calibrate()
+
+void adiscope::ToolLauncher::saveRunningToolsBeforeCalibration()
 {
-	bool ok=true;
+	if(dmm->isRunning()) calibration_saved_tools.push_back(dmm);
+	if(oscilloscope->isRunning()) calibration_saved_tools.push_back(oscilloscope);
+	if(signal_generator->isRunning()) calibration_saved_tools.push_back(signal_generator);
+	if(spectrum_analyzer->isRunning()) calibration_saved_tools.push_back(spectrum_analyzer);
+	if(network_analyzer->isRunning()) calibration_saved_tools.push_back(network_analyzer);
+}
 
-	if (!skip_calibration) {
-		ok=false;
-		calibrating=true;
-
-		QPushButton *dmm_btn = menu->getToolMenuItemFor(TOOL_DMM)->getToolBtn();
-		QPushButton *osc_btn = menu->getToolMenuItemFor(TOOL_OSCILLOSCOPE)->getToolBtn();
-		QPushButton *siggen_btn = menu->getToolMenuItemFor(TOOL_SIGNAL_GENERATOR)->getToolBtn();
-		QPushButton *spectrum_btn = menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER)->getToolBtn();
-		QPushButton *network_btn = menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER)->getToolBtn();
-		auto old_dmm_text = dmm_btn->text();
-		auto old_osc_text = osc_btn->text();
-		auto old_siggen_text = siggen_btn->text();
-		auto old_spectrum_text = spectrum_btn->text();
-		auto old_network_text = network_btn->text();
-		QString status = "Calibrating...";
-		dmm_btn->setText(status);
-		osc_btn->setText(status);
-		siggen_btn->setText(status);
-		spectrum_btn->setText(status);
-		network_btn->setText(status);
-
-		if (calib->isInitialized()) {
-			calib->setHardwareInCalibMode();
-			ok = calib->calibrateAll();
-			calib->restoreHardwareFromCalibMode();
-		}
-
-		dmm_btn->setText(old_dmm_text);
-		osc_btn->setText(old_osc_text);
-		siggen_btn->setText(old_siggen_text);
-		spectrum_btn->setText(old_spectrum_text);
-		network_btn->setText(old_network_text);
+void adiscope::ToolLauncher::stopToolsBeforeCalibration()
+{
+	for(Tool* tool : calibration_saved_tools)
+		tool->stop();
+}
+void adiscope::ToolLauncher::restartToolsAfterCalibration()
+{
+	while(!calibration_saved_tools.empty())
+	{
+		Tool* tool = calibration_saved_tools.back();
+		calibration_saved_tools.pop_back();
+		tool->run();
 	}
+}
+void adiscope::ToolLauncher::requestCalibration()
+{
+	saveRunningToolsBeforeCalibration();
+	stopToolsBeforeCalibration();
+	calibration_thread = QtConcurrent::run(std::bind(&ToolLauncher::calibrate,
+					       this));
+}
+
+void adiscope::ToolLauncher::requestCalibrationCancel()
+{
+	calib->cancelCalibration();
+}
+
+void adiscope::ToolLauncher::calibrationFailedCallback()
+{
+	selectedDev->infoPage()->setStatusLabel("Calibration Failed");
+	selectedDev->connectButton()->setText("Disconnect");
+	selectedDev->connectButton()->setEnabled(true);
+}
+
+void adiscope::ToolLauncher::initialCalibration()
+{
+	bool ok = true;
+
+	connect(this, SIGNAL(adcCalibrationDone()),
+		this, SLOT(enableAdcBasedTools()));
+	connect(this, SIGNAL(dacCalibrationDone()),
+		this, SLOT(enableDacBasedTools()));
+	connect(this, SIGNAL(calibrationFailed()),
+		this, SLOT(calibrationFailedCallback()));
+	connect(this, SIGNAL(calibrationDone()),
+		this, SLOT(restartToolsAfterCalibration()));
+
+	getConnectedDevice()->calibrateButton()->setEnabled(false);
+	if (!skip_calibration) {
+		ok = calibrate();
+	}
+
+	QObject::disconnect(this, SIGNAL(adcCalibrationDone()),
+		   this, SLOT(enableAdcBasedTools()));
+	QObject::disconnect(this, SIGNAL(dacCalibrationDone()),
+		   this, SLOT(enableDacBasedTools()));
+
+	getConnectedDevice()->calibrateButton()->setEnabled(true);
+	connect(getConnectedDevice()->calibrateButton(), SIGNAL(clicked()),this, SLOT(requestCalibration()));
+
+}
+
+bool adiscope::ToolLauncher::calibrate()
+{
+	bool ok=false;
+	calibrating=true;
+
+	QPushButton *dmm_btn = menu->getToolMenuItemFor(TOOL_DMM)->getToolBtn();
+	QPushButton *osc_btn = menu->getToolMenuItemFor(TOOL_OSCILLOSCOPE)->getToolBtn();
+	QPushButton *siggen_btn = menu->getToolMenuItemFor(TOOL_SIGNAL_GENERATOR)->getToolBtn();
+	QPushButton *spectrum_btn = menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER)->getToolBtn();
+	QPushButton *network_btn = menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER)->getToolBtn();
+	auto old_dmm_text = dmm_btn->text();
+	auto old_osc_text = osc_btn->text();
+	auto old_siggen_text = siggen_btn->text();
+	auto old_spectrum_text = spectrum_btn->text();
+	auto old_network_text = network_btn->text();
+	QString status = "Calibrating...";
+	dmm_btn->setText(status);
+	osc_btn->setText(status);
+	siggen_btn->setText(status);
+	spectrum_btn->setText(status);
+	network_btn->setText(status);
+
+	if (calib->isInitialized()) {
+		calib->setHardwareInCalibMode();
+		ok = calib->calibrateAll();
+		calib->restoreHardwareFromCalibMode();
+	}
+
+	dmm_btn->setText(old_dmm_text);
+	osc_btn->setText(old_osc_text);
+	siggen_btn->setText(old_siggen_text);
+	spectrum_btn->setText(old_spectrum_text);
+	network_btn->setText(old_network_text);
 
 	calibrating=false;
 
 	if (ok) {
 		Q_EMIT adcCalibrationDone();
 		Q_EMIT dacCalibrationDone();
+		Q_EMIT calibrationDone();
 	}
+	else {
+		Q_EMIT calibrationFailed();
+	}
+
+	return ok;
 }
 
 void adiscope::ToolLauncher::enableAdcBasedTools()
@@ -1502,7 +1572,8 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 	});
 
 	loadToolTips(true);
-	calibration_thread = QtConcurrent::run(std::bind(&ToolLauncher::calibrate,
+
+	calibration_thread = QtConcurrent::run(std::bind(&ToolLauncher::initialCalibration,
 					       this));
 
 	return true;
@@ -1600,6 +1671,11 @@ void ToolLauncher::closeEvent(QCloseEvent *event)
 Preferences *ToolLauncher::getPrefPanel() const
 {
 	return prefPanel;
+}
+
+Calibration *ToolLauncher::getCalibration() const
+{
+	return calib;
 }
 
 bool ToolLauncher::eventFilter(QObject *watched, QEvent *event)

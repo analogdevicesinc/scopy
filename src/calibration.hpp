@@ -98,8 +98,9 @@ public:
 
 	bool setCalibrationMode(int);
 	bool setGainMode(int ch, int);
-	void dacAOutputDCVolts(int16_t volts);
-	void dacBOutputDCVolts(int16_t volts);
+	bool dacAOutputDCVolts(int16_t volts);
+	bool dacBOutputDCVolts(int16_t volts);
+	void turnDACOutputOff();
 	void dacOutputStop();
 
 private:
@@ -108,14 +109,14 @@ private:
 	bool fine_tune(size_t span, int16_t centerVal0, int16_t centerVal1,
 		size_t num_samples);
 
-	void dacOutputDC(struct iio_device *dac, struct iio_channel *channel,
+	bool dacOutputDC(struct iio_device *dac, struct iio_channel *channel,
 		struct iio_buffer** buffer, size_t value);
-	void dacAOutputDC(int16_t value);
-	void dacBOutputDC(int16_t value);
+	bool dacAOutputDC(int16_t value);
+	bool dacBOutputDC(int16_t value);
 	void configHwSamplerate();
 
 	ApiObject *m_api;
-	bool m_cancel;
+	volatile bool m_cancel;
 
 	std::shared_ptr<M2kAdc> m2k_adc;
 	std::shared_ptr<M2kDac> m2k_dac_a;

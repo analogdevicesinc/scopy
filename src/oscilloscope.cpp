@@ -494,7 +494,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		ui->runSingleWidget, &RunSingleWidget::toggle);
 	connect(ui->runSingleWidget, &RunSingleWidget::toggled,
 		this, &Oscilloscope::runStopToggled);
-	connect(this, &Oscilloscope::isRunning,
+	connect(this, &Oscilloscope::startRunning,
 		ui->runSingleWidget, &RunSingleWidget::toggle);
 
 	connect(gsettings_ui->xyPlotLineType, SIGNAL(toggled(bool)),
@@ -2196,6 +2196,15 @@ void Oscilloscope::toggle_blockchain_flow(bool en)
 	}
 }
 
+void Oscilloscope::run()
+{
+	runStopToggled(true);
+}
+void Oscilloscope::stop()
+{
+	runStopToggled(false);
+}
+
 void Oscilloscope::runStopToggled(bool checked)
 {
 	Q_EMIT activateExportButton();
@@ -2244,6 +2253,7 @@ void Oscilloscope::runStopToggled(bool checked)
 	}
 
 	// Update trigger status
+	m_running = checked;
 	triggerUpdater->setEnabled(checked);
 }
 
@@ -4112,7 +4122,7 @@ void Oscilloscope::singleCaptureDone()
 			&& !plot_samples_sequentially) {
 		Q_EMIT activateExportButton();
 		if (ui->runSingleWidget->singleButtonChecked()){
-			Q_EMIT isRunning(false);
+			Q_EMIT startRunning(false);
 		}
 	}
 
@@ -4173,7 +4183,7 @@ void Oscilloscope::resetStreamingFlag(bool enable)
 			&& d_shouldResetStreaming) {
 		Q_EMIT activateExportButton();
 		if (ui->runSingleWidget->singleButtonChecked() && started){
-			Q_EMIT isRunning(false);
+			Q_EMIT startRunning(false);
 		}
 	}
 	d_shouldResetStreaming = false;

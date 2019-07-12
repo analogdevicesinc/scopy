@@ -308,6 +308,7 @@ void DMM::toggleTimer(bool start)
 	}
 
 	setDynamicProperty(ui->run_button, "running", start);
+	m_running = start;
 }
 
 
@@ -646,3 +647,14 @@ void DMM::writeAllSettingsToHardware()
 	}
 }
 
+void DMM::run()
+{
+	//ui->run_button->setChecked(true);
+	toggleTimer(true);
+}
+
+void DMM::stop()
+{
+	//ui->run_button->setChecked(false);
+	toggleTimer(false);
+}

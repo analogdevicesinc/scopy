@@ -35,57 +35,59 @@ class ToolLauncher;
 
 class DeviceWidget : public QWidget
 {
-        Q_OBJECT
+	Q_OBJECT
 public:
-        explicit DeviceWidget(QString uri, QString name,
-                              ToolLauncher *parent = nullptr);
-        virtual ~DeviceWidget();
+	explicit DeviceWidget(QString uri, QString name,
+			      ToolLauncher *parent = nullptr);
+	virtual ~DeviceWidget();
 
-        QPushButton* deviceButton() const;
-        QPushButton* connectButton() const;
+	QPushButton* deviceButton() const;
+	QPushButton* connectButton() const;
+	QPushButton* calibrateButton() const;
 
-        void setChecked(bool);
-        bool isChecked();
+	void setChecked(bool);
+	bool isChecked();
 
-        QString uri() const;
-        void setUri(const QString &uri);
+	QString uri() const;
+	void setUri(const QString &uri);
 
-        void highlightDevice();
-        void click();
+	void highlightDevice();
+	void click();
 
-        InfoPage *infoPage() const;
-        void setInfoPage(InfoPage *infoPage);
+	InfoPage *infoPage() const;
+	void setInfoPage(InfoPage *infoPage);
 
-        bool connected() const;
-        void setConnected(bool, bool, struct iio_context* ctx = nullptr);
+	bool connected() const;
+	void setConnected(bool, bool, struct iio_context* ctx = nullptr);
 
-        void setName(QString);
+	void setName(QString);
 
 Q_SIGNALS:
-        void selected(bool);
-        void forgetDevice(QString);
-        void identifyDevice(QString);
+	void selected(bool);
+	void forgetDevice(QString);
+	void identifyDevice(QString);
+	void calibrateDevice();
 
 public Q_SLOTS:
-        void on_btn_toggled(bool);
-        void forgetDevice_clicked(bool);
-        void identifyDevice_clicked(bool);
+	void on_btn_toggled(bool);
+	void forgetDevice_clicked(bool);
+	void identifyDevice_clicked(bool);
 
 protected:
-        Ui::Device *m_ui;
-        QString m_uri;
-        InfoPage *m_infoPage;
-        bool m_connected;
-        bool m_selected;
+	Ui::Device *m_ui;
+	QString m_uri;
+	InfoPage *m_infoPage;
+	bool m_connected;
+	bool m_selected;
 };
 
 class M2kDeviceWidget : public DeviceWidget
 {
-        Q_OBJECT
+	Q_OBJECT
 public:
-        explicit M2kDeviceWidget(QString uri, QString name,
-                              ToolLauncher *parent = nullptr);
-        ~M2kDeviceWidget();
+	explicit M2kDeviceWidget(QString uri, QString name,
+				 ToolLauncher *parent = nullptr);
+	~M2kDeviceWidget();
 };
 
 class DeviceBuilder

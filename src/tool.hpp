@@ -36,7 +36,7 @@ class QJSEngine;
 class QPushButton;
 
 extern "C" {
-	struct iio_context;
+struct iio_context;
 }
 
 namespace adiscope {
@@ -49,8 +49,8 @@ class Tool : public QWidget
 
 public:
 	explicit Tool(struct iio_context *ctx, ToolMenuItem *toolMenuItem,
-			ApiObject *api, const QString& name,
-			ToolLauncher *parent);
+		      ApiObject *api, const QString& name,
+		      ToolLauncher *parent);
 	~Tool();
 
 	QPushButton *runButton() { return toolMenuItem->getToolStopBtn(); }
@@ -62,6 +62,10 @@ Q_SIGNALS:
 	void detachedState(bool detached);
 
 public Q_SLOTS:
+	virtual void run();
+	virtual void stop();
+	virtual void single();
+	virtual bool isRunning();
 	virtual void attached();
 	virtual void detached();
 	virtual void readPreferences();
@@ -79,6 +83,7 @@ protected:
 	Preferences *prefPanel;
 	bool saveOnExit;
 	bool isDetached;
+	bool m_running;
 	QMainWindow *window;
 	ToolMenuItem *toolMenuItem;
 };

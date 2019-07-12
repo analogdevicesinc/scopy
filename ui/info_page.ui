@@ -27,7 +27,7 @@
      </property>
      <property name="minimumSize">
       <size>
-       <width>240</width>
+       <width>180</width>
        <height>30</height>
       </size>
      </property>
@@ -78,7 +78,7 @@ QPushButton:disabled {
      </property>
      <property name="minimumSize">
       <size>
-       <width>240</width>
+       <width>180</width>
        <height>30</height>
       </size>
      </property>
@@ -162,7 +162,7 @@ QPushButton:disabled {
      </property>
      <property name="minimumSize">
       <size>
-       <width>240</width>
+       <width>180</width>
        <height>30</height>
       </size>
      </property>
@@ -206,7 +206,7 @@ QPushButton:disabled {
      </property>
     </widget>
    </item>
-   <item row="0" column="3" rowspan="2">
+   <item row="0" column="4" rowspan="2">
     <spacer name="horizontalSpacer">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -219,7 +219,7 @@ QPushButton:disabled {
      </property>
     </spacer>
    </item>
-   <item row="3" column="0" colspan="4">
+   <item row="3" column="0" colspan="5">
     <widget class="QScrollArea" name="scrollArea">
      <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
@@ -232,8 +232,8 @@ QPushButton:disabled {
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>767</width>
-        <height>308</height>
+        <width>771</width>
+        <height>314</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -360,6 +360,45 @@ QPushButton:disabled {
        </item>
       </layout>
      </widget>
+    </widget>
+   </item>
+   <item row="0" column="3">
+    <widget class="QPushButton" name="btnCalibrate">
+     <property name="minimumSize">
+      <size>
+       <width>180</width>
+       <height>30</height>
+      </size>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QPushButton {
+  min-height: 30px;
+  max-height: 30px;
+
+  border: 0px;
+  border-radius: 4px;
+
+  background-color: #4a64ff;
+  color: #ffffff;
+
+  font-size: 14px;
+}
+
+QPushButton:pressed {
+  background-color: #2a44df;
+}
+
+QPushButton:hover {
+	background-color: #4a34ff;
+}
+
+QPushButton:disabled {
+  background-color:  #727273;
+}</string>
+     </property>
+     <property name="text">
+      <string>Calibrate</string>
+     </property>
     </widget>
    </item>
   </layout>

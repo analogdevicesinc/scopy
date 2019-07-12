@@ -592,6 +592,26 @@ double Calibration::dacBvlsb() const
 	return m_dac_b_ch_vlsb;
 }
 
+void Calibration::turnDACOutputOff()
+{
+	if (m_dac_a_buffer) {
+		iio_buffer_cancel(m_dac_a_buffer);
+		iio_buffer_destroy(m_dac_a_buffer);
+		m_dac_a_buffer = NULL;
+	}
+
+	if (m_dac_b_buffer) {
+		iio_buffer_cancel(m_dac_b_buffer);
+		iio_buffer_destroy(m_dac_b_buffer);
+		m_dac_b_buffer = NULL;
+	}
+
+	setChannelEnableState(m_dac_a_channel, false);
+	setChannelEnableState(m_dac_b_channel, false);
+
+	setCalibrationMode(NONE);
+}
+
 bool Calibration::calibrateDACoffset()
 {
 	bool calibrated = false;
@@ -611,8 +631,16 @@ bool Calibration::calibrateDACoffset()
 	iio_channel_attr_write_longlong(m_ad5625_channel1, "raw", 2048);
 
 	// write to DAC
-	dacAOutputDC(0);
-	dacBOutputDC(0);
+	bool ok1, ok2;
+	ok1 = dacAOutputDC(0);
+	ok2 = dacBOutputDC(0);
+
+	if(!ok1 || !ok2)
+	{
+		turnDACOutputOff();
+		return false;
+	}
+
 
 	// Allow some time for the voltage to settle
 	QThread::msleep(50);
@@ -655,23 +683,8 @@ bool Calibration::calibrateDACoffset()
 	qDebug(CAT_CALIBRATION) << "DAC channel 0 offset(raw):" << m_dac_a_ch_offset;
 	qDebug(CAT_CALIBRATION) << "DAC channel 1 offset(raw):" << m_dac_b_ch_offset;
 
-	if (m_dac_a_buffer) {
-		iio_buffer_destroy(m_dac_a_buffer);
-		m_dac_a_buffer = NULL;
-	}
-
-	if (m_dac_b_buffer) {
-		iio_buffer_destroy(m_dac_b_buffer);
-		m_dac_b_buffer = NULL;
-	}
-
-	setChannelEnableState(m_dac_a_channel, false);
-	setChannelEnableState(m_dac_b_channel, false);
-
-	setCalibrationMode(NONE);
-
 	calibrated = true;
-
+	turnDACOutputOff();
 	return calibrated;
 }
 
@@ -683,8 +696,15 @@ bool Calibration::calibrateDACgain()
 	setCalibrationMode(DAC);
 
 	// Use the positive half scale point for gain calibration
-	dacAOutputDC(1024);
-	dacBOutputDC(1024);
+	bool ok1, ok2;
+	ok1 = dacAOutputDC(1024);
+	ok2 = dacBOutputDC(1024);
+
+	if(!ok1 || !ok2)
+	{
+		turnDACOutputOff();
+		return false;
+	}
 
 	// Allow some time for the voltage to settle
 	QThread::msleep(50);
@@ -722,27 +742,13 @@ bool Calibration::calibrateDACgain()
 	m_dac_a_ch_vlsb = voltage0 / 1024;
 	m_dac_b_ch_vlsb = voltage1 / 1024;
 
-	if (m_dac_a_buffer) {
-		iio_buffer_destroy(m_dac_a_buffer);
-		m_dac_a_buffer = NULL;
-	}
-
-	if (m_dac_b_buffer) {
-		iio_buffer_destroy(m_dac_b_buffer);
-		m_dac_b_buffer = NULL;
-	}
-
-	setChannelEnableState(m_dac_a_channel, false);
-	setChannelEnableState(m_dac_b_channel, false);
-
-	setCalibrationMode(NONE);
-
 	calibrated = true;
 
+	turnDACOutputOff();
 	return calibrated;
 }
 
-void Calibration::dacOutputDC(struct iio_device *dac,
+bool Calibration::dacOutputDC(struct iio_device *dac,
 	struct iio_channel *channel, struct iio_buffer** buffer, size_t value)
 {
 	const size_t size = 256;
@@ -760,74 +766,65 @@ void Calibration::dacOutputDC(struct iio_device *dac,
 	if (!(*buffer)) {
 		qDebug(CAT_CALIBRATION) << "Could not create buffer for: "  <<
 			 iio_device_get_name(dac);
-		return;
+		return false;
 	}
 
 	std::fill_n(data, size, value);
 	iio_channel_write(channel, *buffer, data, size * sizeof(data[0]));
 
+
 	iio_buffer_push(*buffer);
+	return true;
 }
 
-void Calibration::dacAOutputDCVolts(int16_t dac_a_volts)
+bool Calibration::dacAOutputDCVolts(int16_t dac_a_volts)
 {
 	int dac_a_raw;
 	setCalibrationMode(NONE);
 	setChannelEnableState(m_dac_a_channel, true);
 	iio_device_attr_write_bool(m_m2k_dac_a, "dma_sync", true);
 	dac_a_raw = (dac_a_volts / m_dac_a_ch_vlsb);
-	dacAOutputDC(dac_a_raw);
+	bool ok = dacAOutputDC(dac_a_raw);
 
 	iio_device_attr_write_bool(m_m2k_dac_a, "dma_sync", false);
 
 	iio_channel_attr_write_bool(m_dac_a_fabric, "powerdown", false);
+	return ok;
 }
 
-void Calibration::dacBOutputDCVolts(int16_t dac_b_volts)
+bool Calibration::dacBOutputDCVolts(int16_t dac_b_volts)
 {
 	int dac_b_raw;
 	setCalibrationMode(NONE);
 	setChannelEnableState(m_dac_b_channel, true);
 	iio_device_attr_write_bool(m_m2k_dac_b, "dma_sync", true);
 	dac_b_raw = (dac_b_volts / m_dac_b_ch_vlsb);
-	dacBOutputDC(dac_b_raw);
+	bool ok = dacBOutputDC(dac_b_raw);
 
 	iio_device_attr_write_bool(m_m2k_dac_b, "dma_sync", false);
 
 	iio_channel_attr_write_bool(m_dac_b_fabric, "powerdown", false);
+	return ok;
 }
 
-void Calibration::dacAOutputDC(int16_t value)
+bool Calibration::dacAOutputDC(int16_t value)
 {
-	dacOutputDC(m_m2k_dac_a, m_dac_a_channel, &m_dac_a_buffer, value);
+	return dacOutputDC(m_m2k_dac_a, m_dac_a_channel, &m_dac_a_buffer, value);
 }
 
 void Calibration::dacOutputStop()
 {
-	if (m_dac_a_buffer) {
-		iio_buffer_cancel(m_dac_a_buffer);
-		iio_buffer_destroy(m_dac_a_buffer);
-		m_dac_a_buffer = NULL;
-	}
 
-	if (m_dac_b_buffer) {
-		iio_buffer_cancel(m_dac_b_buffer);
-		iio_buffer_destroy(m_dac_b_buffer);
-		m_dac_b_buffer = NULL;
-	}
-	setChannelEnableState(m_dac_a_channel, false);
-	setChannelEnableState(m_dac_b_channel, false);
+	turnDACOutputOff();
 
 	/* FIXME: TODO: Move this into a HW class / lib M2k */
 	iio_channel_attr_write_bool(m_dac_a_fabric, "powerdown", true);
 	iio_channel_attr_write_bool(m_dac_b_fabric, "powerdown", true);
-
-	setCalibrationMode(NONE);
 }
 
-void Calibration::dacBOutputDC(int16_t value)
+bool Calibration::dacBOutputDC(int16_t value)
 {
-	dacOutputDC(m_m2k_dac_b, m_dac_b_channel, &m_dac_b_buffer, value);
+	return dacOutputDC(m_m2k_dac_b, m_dac_b_channel, &m_dac_b_buffer, value);
 }
 
 float Calibration::convSampleToVolts(float sample, float correctionGain)
@@ -879,6 +876,7 @@ bool Calibration::calibrateAll()
 	return true;
 
 calibration_fail:
+	dacOutputStop();
 	m_cancel=false;
 	return false;
 }

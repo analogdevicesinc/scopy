@@ -948,6 +948,15 @@ void PatternGenerator::stopPatternGeneration()
 
 }
 
+void PatternGenerator::run()
+{
+	startStop(true);
+}
+void PatternGenerator::stop()
+{
+	startStop(false);
+}
+
 void PatternGenerator::startStop(bool start)
 {
 //	main_win->action_view_zoom_fit()->trigger();
@@ -970,6 +979,7 @@ void PatternGenerator::startStop(bool start)
 		setPGStatus(STOPPED);
 		ui->btnRunStop->setText("Run");
 	}
+	m_running = start;
 }
 
 void PatternGenerator::singleRun()

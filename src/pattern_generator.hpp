@@ -209,6 +209,10 @@ private Q_SLOTS:
 	void updateBufferSize();
 	void resetPGToDefault();
 
+public Q_SLOTS:
+	void run() override;
+	void stop() override;
+
 Q_SIGNALS:
 	void showTool();
 };
