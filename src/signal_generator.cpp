@@ -71,9 +71,6 @@
 
 #define AMPLITUDE_VOLTS	5.0
 
-#define MAX_PREVIEW_RANGE (float)(SHRT_MAX)
-#define MIN_PREVIEW_RANGE (float)(SHRT_MIN)
-
 using namespace adiscope;
 using namespace gr;
 
@@ -962,6 +959,9 @@ void SignalGenerator::tabChanged(int index)
 
 void SignalGenerator::updatePreview()
 {
+	static const float MAX_PREVIEW_RANGE = (float)(SHRT_MAX);
+	static const float MIN_PREVIEW_RANGE = (float)(SHRT_MIN);
+
 	const int nb_points_correction = 16; // generate slightly more points to avoid incomplete scope_sink_f buffer
 	gr::top_block_sptr top = make_top_block("Signal Generator Update");
 	unsigned int i = 0;
