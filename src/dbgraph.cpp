@@ -556,9 +556,15 @@ void dBgraph::removeReferenceWaveform()
 	replot();
 }
 
-void dBgraph::addReferenceWaveformFromPlot()
+bool dBgraph::addReferenceWaveformFromPlot()
 {
+	if (xdata.size() == 0 || ydata.size() == 0) {
+		return false;
+	}
+
 	addReferenceWaveform(xdata, ydata);
+
+	return true;
 }
 
 void dBgraph::onCursor1PositionChanged(int pos)

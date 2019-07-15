@@ -147,7 +147,7 @@ public Q_SLOTS:
 
 	void addReferenceWaveform(QVector<double> xData, QVector<double> yData);
 	void removeReferenceWaveform();
-	void addReferenceWaveformFromPlot();
+	bool addReferenceWaveformFromPlot();
 
 
 protected Q_SLOTS:
