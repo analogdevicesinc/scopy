@@ -2517,35 +2517,35 @@ background-color: #727273;
                     </spacer>
                    </item>
                    <item>
-                    <widget class="QCheckBox" name="addCurrentPlotCheckBox">
+                    <widget class="QPushButton" name="snapshotBtn">
                      <property name="styleSheet">
-                      <string notr="true">QCheckBox {
-  spacing: 8px;
-  background-color: transparent;
-  font-size: 14px;
-  font-weight: bold;
+                      <string notr="true">QPushButton {
+  min-height: 30px;
+  max-height: 30px;
 
-  color: rgba(255, 255, 255, 153);
-}
-
-QCheckBox::indicator {
-  width: 14px;
-  height: 14px;
-  border: 2px solid rgb(74,100,255);
+  border: 0px;
   border-radius: 4px;
-}
-QCheckBox::indicator:unchecked { background-color: transparent; }
-QCheckBox::indicator:checked { background-color: rgb(74,100,255); }
 
-QLabel {
+  background-color: #4a64ff;
+  color: #ffffff;
+
   font-size: 14px;
-  font-weight: bold;
+}
 
-  color: rgba(255, 255, 255, 153);
+QPushButton:pressed {
+  background-color: #2a44df;
+}
+
+QPushButton:hover {
+	background-color: #4a34ff;
+}
+
+QPushButton:disabled {
+background-color: #727273;
 }</string>
                      </property>
                      <property name="text">
-                      <string>Add current plot</string>
+                      <string>Snapshot</string>
                      </property>
                     </widget>
                    </item>
@@ -2566,7 +2566,7 @@ QLabel {
                     </spacer>
                    </item>
                    <item>
-                    <widget class="QPushButton" name="addReference">
+                    <widget class="QPushButton" name="removeReferenceBtn">
                      <property name="enabled">
                       <bool>false</bool>
                      </property>
@@ -2597,7 +2597,7 @@ background-color: #727273;
 }</string>
                      </property>
                      <property name="text">
-                      <string>Add Reference</string>
+                      <string>Remove Reference</string>
                      </property>
                      <property name="checkable">
                       <bool>false</bool>
