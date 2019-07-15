@@ -127,7 +127,7 @@ void FileManager::open(QString fileName,
 
                                 for (int i = 8; i < raw_data.size(); ++i) {
                                         for (int j = 1; j < raw_data[i].size(); ++j) {
-                                              data[i - 8][j - 1] = std::stod(raw_data[i][j].toStdString());
+						data[i - 8][j - 1] = raw_data[i][j].toDouble();
                                         }
                                 }
                         } else {
