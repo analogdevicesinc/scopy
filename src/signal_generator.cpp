@@ -514,6 +514,9 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 	connect(runButton(), SIGNAL(toggled(bool)),
 	        this, SLOT(startStop(bool)));
 
+	connect(ui->refreshBtn, SIGNAL(clicked()),
+		this, SLOT(loadFileCurrentChannelData()));
+
 	time_block_data->time_block->set_update_time(0.001);
 
 	plot->addZoomer(0);
@@ -1519,6 +1522,12 @@ basic_block_sptr SignalGenerator::getSignalSource(gr::top_block_sptr top,
 
 }
 
+void SignalGenerator::loadFileCurrentChannelData()
+{
+	loadFileChannelData(currentChannel);
+	resetZoom();
+}
+
 void SignalGenerator::loadFileChannelData(int chIdx)
 {
 	auto ptr = getData(channels[chIdx]);
@@ -1529,6 +1538,8 @@ void SignalGenerator::loadFileChannelData(int chIdx)
 	}
 
 	ptr->file_data.clear();
+
+	fileManager->open(ptr->file, FileManager::IMPORT);
 
 	if (ptr->file_type==FORMAT_CSV) {
 

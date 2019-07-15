@@ -261,6 +261,7 @@ private Q_SLOTS:
 	void fallChanged(double value);
 	void holdHighChanged(double value);
 	void holdLowChanged(double value);
+	void loadFileCurrentChannelData();
 
 
 	void mathFreqChanged(double val);
