@@ -134,6 +134,7 @@
         <file>menu/ADALM2000Pinout.png</file>
         <file>icons/ic printer.svg</file>
         <file>icons/gate_handle.svg</file>
+        <file>icons/refresh.svg</file>
     </qresource>
     <qresource prefix="/stylesheets">
         <file>stylesheets/global.qss</file>

@@ -758,7 +758,116 @@ QTabBar::tab:selected {
                          </property>
                         </widget>
                        </item>
-                       <item row="4" column="0" colspan="2">
+                       <item row="3" column="1">
+                        <widget class="QWidget" name="load_file_btn_widget" native="true">
+                         <layout class="QHBoxLayout" name="horizontalLayout_12">
+                          <property name="leftMargin">
+                           <number>0</number>
+                          </property>
+                          <property name="topMargin">
+                           <number>0</number>
+                          </property>
+                          <property name="rightMargin">
+                           <number>0</number>
+                          </property>
+                          <property name="bottomMargin">
+                           <number>0</number>
+                          </property>
+                          <item>
+                           <widget class="QPushButton" name="load_file">
+                            <property name="sizePolicy">
+                             <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
+                              <horstretch>8</horstretch>
+                              <verstretch>0</verstretch>
+                             </sizepolicy>
+                            </property>
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>0</height>
+                             </size>
+                            </property>
+                            <property name="maximumSize">
+                             <size>
+                              <width>16777215</width>
+                              <height>16777215</height>
+                             </size>
+                            </property>
+                            <property name="styleSheet">
+                             <string notr="true">QPushButton{
+
+/*height: 128px;
+width: 128px;
+background-image: url(:/icons/floppy.svg);*/
+background-position: center center;
+background-repeat: no-repeat;
+background-color: #4a64ff;
+  height: 30px;
+  border-radius: 4px;
+  
+  font-size: 14px;
+  font-weight: normal;
+  font-style: normal;
+  text-align: center;
+  color: #ffffff;
+}
+
+
+QPushButton:hover
+{
+	 background-color: #4a34ff;
+}
+</string>
+                            </property>
+                            <property name="text">
+                             <string>Load file</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item>
+                           <widget class="QPushButton" name="refreshBtn">
+                            <property name="sizePolicy">
+                             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                              <horstretch>2</horstretch>
+                              <verstretch>0</verstretch>
+                             </sizepolicy>
+                            </property>
+                            <property name="styleSheet">
+                             <string notr="true">QPushButton{
+
+/*height: 128px;
+width: 128px;*/
+image: url(:/icons/refresh.svg);
+
+background-position: center center;
+background-repeat: no-repeat;
+background-color: #4a64ff;
+  height: 30px;
+  border-radius: 4px;
+  
+  font-size: 14px;
+  font-weight: normal;
+  font-style: normal;
+  text-align: center;
+  color: #ffffff;
+}
+
+
+QPushButton:hover
+{
+	 background-color: #4a34ff;
+}
+</string>
+                            </property>
+                            <property name="text">
+                             <string/>
+                            </property>
+                           </widget>
+                          </item>
+                         </layout>
+                        </widget>
+                       </item>
+                       <item row="5" column="0" colspan="2">
                         <layout class="QHBoxLayout" name="horizontalLayout_4">
                          <property name="spacing">
                           <number>10</number>
@@ -793,57 +902,6 @@ QTabBar::tab:selected {
                           </widget>
                          </item>
                         </layout>
-                       </item>
-                       <item row="3" column="1">
-                        <widget class="QPushButton" name="load_file">
-                         <property name="sizePolicy">
-                          <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
-                           <horstretch>0</horstretch>
-                           <verstretch>0</verstretch>
-                          </sizepolicy>
-                         </property>
-                         <property name="minimumSize">
-                          <size>
-                           <width>0</width>
-                           <height>0</height>
-                          </size>
-                         </property>
-                         <property name="maximumSize">
-                          <size>
-                           <width>16777215</width>
-                           <height>16777215</height>
-                          </size>
-                         </property>
-                         <property name="styleSheet">
-                          <string notr="true">QPushButton{
-
-/*height: 128px;
-width: 128px;
-background-image: url(:/icons/floppy.svg);*/
-background-position: center center;
-background-repeat: no-repeat;
-background-color: #4a64ff;
-  height: 30px;
-  border-radius: 4px;
-  
-  font-size: 14px;
-  font-weight: normal;
-  font-style: normal;
-  text-align: center;
-  color: #ffffff;
-}
-
-
-QPushButton:hover
-{
-	 background-color: #4a34ff;
-}
-</string>
-                         </property>
-                         <property name="text">
-                          <string>Load file</string>
-                         </property>
-                        </widget>
                        </item>
                       </layout>
                      </item>
