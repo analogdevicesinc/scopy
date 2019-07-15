@@ -3258,6 +3258,22 @@ Pattern *ImportPatternUI::get_pattern()
 	return pattern;
 }
 
+void ImportPatternUI::reloadFileData()
+{
+	loadFileData();
+	parse_ui();
+}
+
+void ImportPatternUI::loadFileData()
+{
+
+	FileManager fm("Pattern Generator");
+	fm.open(pattern->fileName, FileManager::IMPORT);
+	fileName = pattern->fileName;
+	data.clear();
+	data = fm.read();
+}
+
 void ImportPatternUI::build_ui(QWidget *parent,uint16_t number_of_channels)
 {
 	parent_ = parent;
@@ -3266,13 +3282,7 @@ void ImportPatternUI::build_ui(QWidget *parent,uint16_t number_of_channels)
 	frequencySpinButton->setValue(pattern->get_frequency());
 
 	try {
-		FileManager fm("Pattern Generator");
-
-		fm.open(pattern->fileName, FileManager::IMPORT);
-		fileName = pattern->fileName;
-		data.clear();
-		data = fm.read();
-
+		loadFileData();
 		import_settings->clear();
 		for (int i = 0; i < data[0].size(); ++i) {
 			import_settings->addChannel(i, "CH" + QString::number(i));
@@ -3332,7 +3342,7 @@ void ImportPatternUI::build_ui(QWidget *parent,uint16_t number_of_channels)
 	});
 
 	connect(frequencySpinButton,SIGNAL(valueChanged(double)),this,SLOT(parse_ui()));
-	connect(importBtn, &QPushButton::clicked, this, &ImportPatternUI::parse_ui);
+	connect(importBtn, &QPushButton::clicked, this, &ImportPatternUI::reloadFileData);
 
 }
 void ImportPatternUI::destroy_ui()
