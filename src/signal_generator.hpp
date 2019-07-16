@@ -193,7 +193,8 @@ private:
 	void updateRightMenuForChn(int chIdx);
 	void updateAndToggleMenu(int chIdx, bool open);
 	void triggerRightMenuToggle(int chIdx, bool checked);
-    void loadFileFromPath(QString filename);
+	void loadFileFromPath(QString filename);
+	void reloadFileFromPath();
 
 	gr::basic_block_sptr getSignalSource(
 	        gr::top_block_sptr top,
