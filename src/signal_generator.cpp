@@ -955,6 +955,10 @@ void SignalGenerator::tabChanged(int index)
 
 	if (ptr->type != (enum SIGNAL_TYPE) index) {
 		ptr->type = (enum SIGNAL_TYPE) index;
+		if(ptr->type == SIGNAL_TYPE_BUFFER)
+		{
+			loadFileCurrentChannelData();
+		}
 		resizeTabWidget(index);
 		resetZoom();
 	}
@@ -1204,6 +1208,12 @@ bool SignalGenerator::loadParametersFromFile(
 	ptr->file_phase=0;
 
 	return true;
+}
+
+void SignalGenerator::reloadFileFromPath()
+{
+	auto ptr = getCurrentData();
+	loadFileFromPath(ptr->file);
 }
 
 void SignalGenerator::loadFileFromPath(QString filename){
@@ -1536,8 +1546,10 @@ basic_block_sptr SignalGenerator::getSignalSource(gr::top_block_sptr top,
 
 void SignalGenerator::loadFileCurrentChannelData()
 {
-	loadFileChannelData(currentChannel);
+	reloadFileFromPath();
+	updateRightMenuForChn(currentChannel);
 	resetZoom();
+
 }
 
 void SignalGenerator::loadFileChannelData(int chIdx)
@@ -1550,41 +1562,47 @@ void SignalGenerator::loadFileChannelData(int chIdx)
 	}
 
 	ptr->file_data.clear();
+	try {
+		fileManager->open(ptr->file, FileManager::IMPORT);
 
-	fileManager->open(ptr->file, FileManager::IMPORT);
+		if (ptr->file_type==FORMAT_CSV) {
 
-	if (ptr->file_type==FORMAT_CSV) {
+			if (ptr->file_channel >= ptr->file_nr_of_channels) {
+				return;
+			}
 
-		if (ptr->file_channel >= ptr->file_nr_of_channels) {
+			for (auto x : fileManager->read(ptr->file_channel)) {
+				ptr->file_data.push_back(x);
+			}
+		}
+
+		if (ptr->file_type==FORMAT_MAT) {
+			mat_t *matfp;
+			matvar_t *matvar;
+
+			matfp = Mat_Open(ptr->file.toStdString().c_str(),MAT_ACC_RDONLY);
+
+			if (NULL == matfp) {
+				qDebug(CAT_SIGNAL_GENERATOR)<<"Error opening MAT file "<<ptr->file;
+				return;
+			}
+
+			matvar=Mat_VarRead(matfp,
+					   ptr->file_channel_names[ptr->file_channel].toStdString().c_str());
+			const double *xData = static_cast<const double *>(matvar->data) ;
+
+			for (auto i=0; i<ptr->file_nr_of_samples[ptr->file_channel]; ++i) {
+				ptr->file_data.push_back(xData[i]);
+			}
+
+			Mat_Close(matfp);
 			return;
 		}
 
-		for (auto x : fileManager->read(ptr->file_channel)) {
-			ptr->file_data.push_back(x);
-		}
-	}
-
-	if (ptr->file_type==FORMAT_MAT) {
-		mat_t *matfp;
-		matvar_t *matvar;
-
-		matfp = Mat_Open(ptr->file.toStdString().c_str(),MAT_ACC_RDONLY);
-
-		if (NULL == matfp) {
-			qDebug(CAT_SIGNAL_GENERATOR)<<"Error opening MAT file "<<ptr->file;
-			return;
-		}
-
-		matvar=Mat_VarRead(matfp,
-		                   ptr->file_channel_names[ptr->file_channel].toStdString().c_str());
-		const double *xData = static_cast<const double *>(matvar->data) ;
-
-		for (auto i=0; i<ptr->file_nr_of_samples[ptr->file_channel]; ++i) {
-			ptr->file_data.push_back(xData[i]);
-		}
-
-		Mat_Close(matfp);
-		return;
+	} catch(FileManagerException &e) {
+		ptr->file_message=QString::fromLocal8Bit(e.what());
+		ptr->file_nr_of_samples.push_back(0);
+		ptr->file_type=FORMAT_NO_FILE;
 	}
 }
 
