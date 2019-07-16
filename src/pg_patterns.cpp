@@ -3260,19 +3260,25 @@ Pattern *ImportPatternUI::get_pattern()
 
 void ImportPatternUI::reloadFileData()
 {
-	loadFileData();
-	parse_ui();
+	try {
+		loadFileData();
+		parse_ui();
+	} catch (FileManagerException &e) {
+		fileLineEdit->setText(QString(e.what()));
+		fileLineEdit->setToolTip("");
+		importBtn->setDisabled(true);
+	}
 }
 
 void ImportPatternUI::loadFileData()
 {
-
-	FileManager fm("Pattern Generator");
-	fm.open(pattern->fileName, FileManager::IMPORT);
-	fileName = pattern->fileName;
-	data.clear();
-	data = fm.read();
+		FileManager fm("Pattern Generator");
+		fm.open(fileName, FileManager::IMPORT);
+		data.clear();
+		data = fm.read();
+		pattern->fileName = fileName;
 }
+
 
 void ImportPatternUI::build_ui(QWidget *parent,uint16_t number_of_channels)
 {
@@ -3315,13 +3321,8 @@ void ImportPatternUI::build_ui(QWidget *parent,uint16_t number_of_channels)
 				   tr("Open import file"), "",
 				   tr({"Comma-separated values files (*.csv);;"
 				       "Tab-delimited values files (*.txt)"}));
-		FileManager fm("Pattern Generator");
-
 		try {
-			fm.open(fileName, FileManager::IMPORT);
-
-			data.clear();
-			data = fm.read();
+			loadFileData();
 
 			import_settings->clear();
 			for (int i = 0; i < data[0].size(); ++i) {
