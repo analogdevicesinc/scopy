@@ -104,9 +104,9 @@ font-weight: normal;
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>0</y>
+        <y>-138</y>
         <width>461</width>
-        <height>588</height>
+        <height>633</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -953,6 +953,9 @@ AC Coupling</string>
        </item>
        <item>
         <widget class="QPushButton" name="btnAutoset">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
          <property name="styleSheet">
           <string notr="true">QPushButton{
   width: 175px;
@@ -997,10 +1000,45 @@ QPushButton:hover {
          <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
-           <height>5</height>
+           <height>20</height>
           </size>
          </property>
         </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="snapshotBtn">
+         <property name="styleSheet">
+          <string notr="true">QPushButton{
+  width: 175px;
+  height: 30px;
+  border-radius: 4px;
+  background-color: #4a64ff;
+  
+  font-size: 14px;
+  font-weight: normal;
+  font-style: normal;
+  text-align: center;
+  color: #ffffff;
+}
+
+
+QPushButton:disabled {
+  background-color: grey;
+  color:white;
+}
+
+QPushButton:pressed {
+  background-color: #2a44df;
+}
+
+QPushButton:hover {
+	background-color: #4a34ff;
+}</string>
+         </property>
+         <property name="text">
+          <string>Snapshot</string>
+         </property>
+        </widget>
        </item>
        <item>
         <spacer name="verticalSpacer_2">

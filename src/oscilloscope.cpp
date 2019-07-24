@@ -1224,6 +1224,62 @@ void Oscilloscope::init_channel_settings()
 	connect(ch_ui->lineStyle, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index) {
 		plot.setPlotLineStyle(current_ch_widget, index);
 	});
+
+	connect(ch_ui->snapshotBtn, &QPushButton::clicked, [=](){
+		ChannelWidget *cw = channelWidgetAtId(current_ch_widget);
+		if (current_ch_widget > 1 && cw->isReferenceChannel()) {
+			// export
+			auto export_dialog( new QFileDialog( this ) );
+			export_dialog->setWindowModality( Qt::WindowModal );
+			export_dialog->setFileMode( QFileDialog::AnyFile );
+			export_dialog->setAcceptMode( QFileDialog::AcceptSave );
+			export_dialog->setNameFilters({"Comma-separated values files (*.csv)",
+							       "Tab-delimited values files (*.txt)"});
+
+			if (export_dialog->exec()) {
+				FileManager fm("Oscilloscope");
+				fm.open(export_dialog->selectedFiles().at(0), FileManager::EXPORT);
+
+				QVector<double> time_data, volts_data;
+
+				QwtPlotCurve *curve = plot.Curve(current_ch_widget);
+
+				for (size_t i = 0; i < curve->data()->size(); ++i) {
+					time_data.push_back(curve->sample(i).x());
+					volts_data.push_back(curve->sample(i).y());
+				}
+
+				fm.save(time_data, "Time(S)");
+				fm.save(volts_data, "Ref");
+
+				fm.setSampleRate(active_sample_rate);
+
+				fm.performWrite();
+			}
+		} else {
+			// snapshot
+			if (nb_math_channels + nb_ref_channels == MAX_MATH_CHANNELS) {
+				return;
+			}
+
+			QwtPlotCurve *curve = plot.Curve(current_ch_widget);
+
+			if (!curve->data()->size()) {
+				return;
+			}
+
+			QVector<double> xData;
+			QVector<double> yData;
+			for (size_t i = 0; i < curve->data()->size(); ++i) {
+				xData.push_back(curve->data()->sample(i).x());
+				yData.push_back(curve->data()->sample(i).y());
+			}
+
+			QString qname = QString("REF %1").arg(nb_ref_channels + 1);
+
+			add_ref_waveform(qname, xData, yData, active_sample_rate);
+		}
+	});
 }
 
 void Oscilloscope::activateAcCoupling(int i)
@@ -2161,7 +2217,9 @@ void Oscilloscope::onChannelWidgetDeleteClicked()
 		/*If the deleted math channel is before the current channel,
 		we will need to update the current channel to its new value.*/
 		current_channel -= 1;
-		current_ch_widget -= 1;
+		if (curve_id < current_ch_widget) {
+			current_ch_widget -= 1;
+		}
 		channelsEnabled = true;
 		Q_EMIT selectedChannelChanged(current_channel);
 		update_measure_for_channel(current_channel);
@@ -3365,8 +3423,12 @@ void Oscilloscope::update_chn_settings_panel(int id)
 		ch_ui->function_2->setText(chn_widget->function());
 		ch_ui->wCoupling->setVisible(false);
 		timePosition->setEnabled(true);
+
+		ch_ui->snapshotBtn->setText("Snapshot");
+
 	} else if (chn_widget->isReferenceChannel()) {
 
+		ch_ui->snapshotBtn->setText("Export");
 
 		timePosition->setEnabled(false);
 
@@ -3384,6 +3446,8 @@ void Oscilloscope::update_chn_settings_panel(int id)
 		}
 
 		timePosition->setEnabled(true);
+
+		ch_ui->snapshotBtn->setText("Snapshot");
 	}
 
 	if (chn_widget->isMathChannel() || chn_widget->isReferenceChannel()) {
