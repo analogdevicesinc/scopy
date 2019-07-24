@@ -1120,9 +1120,16 @@ void NetworkAnalyzer::goertzel()
 		}
 
 
-		struct iio_buffer *adc_buffer = iio_device_create_buffer(adc, buffer_size, false);
+		adc_buffer = iio_device_create_buffer(adc, buffer_size, false);
 
 		size_t ret = iio_buffer_refill(adc_buffer);
+		if (m_stop) {
+			iio_buffer_destroy(adc_buffer);
+			for (auto& buffer : buffers) {
+				iio_buffer_destroy(buffer);
+			}
+			return;
+		}
 
 		std::vector<std::vector<short>> data;
 
@@ -1526,6 +1533,9 @@ void NetworkAnalyzer::startStop(bool pressed)
 		ui->statusLabel->setText("Stopping...");
 		QCoreApplication::processEvents();
 		m_stop = true;
+		if (adc_buffer) {
+			iio_buffer_cancel(adc_buffer);
+		}
 		thd.waitForFinished();
 		m_dBgraph.sweepDone();
 		m_phaseGraph.sweepDone();

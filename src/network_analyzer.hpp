@@ -98,6 +98,7 @@ private:
 	Ui::NetworkAnalyzer *ui;
 	struct iio_channel *amp1, *amp2;
 	std::vector<iio_channel *> dac_channels;
+	iio_buffer *adc_buffer;
 	struct iio_device *adc;
 	std::shared_ptr<GenericAdc> adc_dev;
 	boost::shared_ptr<iio_manager> iio;
