@@ -672,6 +672,16 @@ NetworkAnalyzer::~NetworkAnalyzer()
 
 	top_block->disconnect_all();
 
+	if (iterationsThread) {
+		if (iterationsThread->joinable()) {
+			iterationsThreadCanceled = true;
+			iterationsThread->join();
+		}
+
+		delete iterationsThread;
+		iterationsThread = nullptr;
+	}
+
 	delete api;
 
 	delete ui;
