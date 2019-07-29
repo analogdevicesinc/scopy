@@ -1,10 +1,10 @@
 #include "cancel_dc_offset_block.h"
 
 #include <gnuradio/blocks/moving_average_ff.h>
-#include <gnuradio/blocks/skiphead.h>
 #include <gnuradio/blocks/repeat.h>
 #include <gnuradio/blocks/sub_ff.h>
 #include <gnuradio/blocks/copy.h>
+#include <gnuradio/blocks/keep_one_in_n.h>
 
 #include <iostream>
 
@@ -61,24 +61,24 @@ void cancel_dc_offset_block::_build_and_connect_blocks()
 
 	if (d_enabled) {
 		auto avg = gr::blocks::moving_average_ff::make(d_buffer_size, 1.0 / d_buffer_size, d_buffer_size);
-		auto skip = gr::blocks::skiphead::make(sizeof(float), d_buffer_size - 1);
+		auto keep = gr::blocks::keep_one_in_n::make(sizeof(float), d_buffer_size);
 		auto repeat = gr::blocks::repeat::make(sizeof(float), d_buffer_size);
 		auto sub = gr::blocks::sub_ff::make();
 
 		hier_block2::connect(this->self(), 0, avg, 0);
-		hier_block2::connect(avg, 0, skip, 0);
-		hier_block2::connect(skip, 0, d_vs, 0);
-		hier_block2::connect(skip, 0, repeat, 0);
+		hier_block2::connect(avg, 0, keep, 0);
+		hier_block2::connect(keep, 0, d_vs, 0);
+		hier_block2::connect(keep, 0, repeat, 0);
 		hier_block2::connect(this->self(), 0, sub, 0);
 		hier_block2::connect(repeat, 0, sub, 1);
 		hier_block2::connect(sub, 0, this->self(), 0);
 	} else {
 		auto avg = gr::blocks::moving_average_ff::make(d_buffer_size, 1.0 / d_buffer_size, d_buffer_size);
-		auto skip = gr::blocks::skiphead::make(sizeof(float), d_buffer_size - 1);
+		auto keep = gr::blocks::keep_one_in_n::make(sizeof(float), d_buffer_size);
 
 		hier_block2::connect(this->self(), 0, avg, 0);
-		hier_block2::connect(avg, 0, skip, 0);
-		hier_block2::connect(skip, 0, d_vs, 0);
+		hier_block2::connect(avg, 0, keep, 0);
+		hier_block2::connect(keep, 0, d_vs, 0);
 
 		auto copy = gr::blocks::copy::make(sizeof(float));
 		hier_block2::connect(this->self(), 0, copy, 0);
