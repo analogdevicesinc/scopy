@@ -313,7 +313,6 @@ namespace adiscope {
 		std::vector<boost::shared_ptr<gr::blocks::multiply_const_ff>> math_probe_atten;
 
 		iio_manager::port_id *ids;
-		iio_manager::port_id *fft_ids;
 		iio_manager::port_id *hist_ids;
 		iio_manager::port_id *autoset_id;
 
@@ -423,9 +422,12 @@ namespace adiscope {
 
 		std::vector<boost::shared_ptr<cancel_dc_offset_block>> dc_cancel;
 		std::vector<QPair<gr::basic_block_sptr, int> > xy_channels;
+		std::vector<QPair<gr::basic_block_sptr, int> > fft_channels;
 		int index_x, index_y;
 		bool locked;
 		boost::shared_ptr<gr::blocks::float_to_complex> ftc;
+		std::vector<gr::basic_block_sptr> fft_blocks;
+		std::vector<gr::basic_block_sptr> ctm_blocks;
 
 		void cancelZoom();
 

@@ -99,7 +99,6 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	hist_plot(nb_channels, this),
 	ids(new iio_manager::port_id[nb_channels]),
 	autoset_id(new iio_manager::port_id),
-	fft_ids(new iio_manager::port_id[nb_channels]),
 	hist_ids(new iio_manager::port_id[nb_channels]),
 	fft_is_visible(false), hist_is_visible(false), xy_is_visible(false),
 	statistics_enabled(false),
@@ -1111,9 +1110,15 @@ Oscilloscope::~Oscilloscope()
 
 	for (unsigned int i = 0; i < nb_channels; i++)
 		iio->disconnect(ids[i]);
-	if (fft_is_visible)
-		for (unsigned int i = 0; i < nb_channels; i++)
-			iio->disconnect(fft_ids[i]);
+
+	if (fft_is_visible) {
+		if (fft_channels.size() > 0) {
+			fft_channels.clear();
+			fft_blocks.clear();
+			ctm_blocks.clear();
+		}
+	}
+
 	if (started)
 		iio->unlock();
 
@@ -1132,7 +1137,6 @@ Oscilloscope::~Oscilloscope()
 	delete math_pair;
 
 	delete[] hist_ids;
-	delete[] fft_ids;
 	delete[] ids;
 	delete autoset_id;
 	delete ch_ui;
@@ -1278,6 +1282,26 @@ void Oscilloscope::activateAcCoupling(int i)
 		iio->connect(xy_channels.at(index_y).first, xy_channels.at(index_y).second,
 			     ftc, 1);
 	}
+
+	if (fft_is_visible) {
+		for (unsigned int i = 0; i < nb_channels; i++) {
+			iio->disconnect(fft_channels.at(i).first, fft_channels.at(i).second,
+					fft_blocks.at(i), 0);
+		}
+		fft_channels.clear();
+
+		for(unsigned int ch = 0; ch < nb_channels; ch++) {
+			if (chnAcCoupled.at(ch)) {
+				fft_channels.push_back(QPair<gr::basic_block_sptr, int>(
+							      dc_cancel.at(ch), 0));
+			} else {
+				fft_channels.push_back(QPair<gr::basic_block_sptr, int>(
+							      adc_samp_conv_block, ch));
+			}
+
+			iio->connect(fft_channels.at(ch).first, fft_channels.at(ch).second,
+				     fft_blocks.at(ch), 0);
+		}
 	}
 
 	for(int ch = 0; ch < nb_channels; ch++) {
@@ -1347,6 +1371,27 @@ void Oscilloscope::deactivateAcCoupling(int i)
 			     ftc, 0);
 		iio->connect(xy_channels.at(index_y).first, xy_channels.at(index_y).second,
 			     ftc, 1);
+	}
+
+	if (fft_is_visible) {
+		for (unsigned int ch = 0; ch < nb_channels; ch++) {
+			iio->disconnect(fft_channels.at(ch).first, fft_channels.at(ch).second,
+					fft_blocks.at(ch), 0);
+		}
+		fft_channels.clear();
+
+		for(unsigned int ch = 0; ch < nb_channels; ch++) {
+			if (chnAcCoupled.at(ch) && ch != i) {
+				fft_channels.push_back(QPair<gr::basic_block_sptr, int>(
+							      dc_cancel.at(ch), 0));
+			} else {
+				fft_channels.push_back(QPair<gr::basic_block_sptr, int>(
+							      adc_samp_conv_block, ch));
+			}
+
+			iio->connect(fft_channels.at(ch).first, fft_channels.at(ch).second,
+				     fft_blocks.at(ch), 0);
+		}
 	}
 
 	for(int ch = 0; ch < nb_channels; ch++) {
@@ -2197,10 +2242,6 @@ void Oscilloscope::on_actionClose_triggered()
 void Oscilloscope::toggle_blockchain_flow(bool en)
 {
 	if (en) {
-		if(active_sample_count < fft_size && fft_is_visible)
-			for (unsigned int i = 0; i < nb_channels; i++)
-				iio->start(fft_ids[i]);
-
 		if (autosetRequested) {
 			iio->start(autoset_id[0]);
 		}
@@ -2208,26 +2249,15 @@ void Oscilloscope::toggle_blockchain_flow(bool en)
 		for (unsigned int i = 0; i < nb_channels; i++)
 			iio->start(ids[i]);
 
-		if(active_sample_count >= fft_size && fft_is_visible)
-			for (unsigned int i = 0; i < nb_channels; i++)
-				iio->start(fft_ids[i]);
-
 		scaleHistogramPlot();
 
 	} else {
-		if(active_sample_count > fft_size && fft_is_visible)
-			for (unsigned int i = 0; i < nb_channels; i++)
-				iio->stop(fft_ids[i]);
 		for (unsigned int i = 0; i < nb_channels; i++)
 			iio->stop(ids[i]);
 
 		if (autosetRequested) {
 			iio->stop(autoset_id[0]);			
 		}
-
-		if(active_sample_count <= fft_size && fft_is_visible)
-			for (unsigned int i = 0; i < nb_channels; i++)
-				iio->stop(fft_ids[i]);
 	}
 }
 
@@ -2349,39 +2379,51 @@ void Oscilloscope::onFFT_view_toggled(bool visible)
 
 	if (visible) {
 		qt_fft_block->set_nsamps(fft_plot_size);
-		if (fft_is_visible) {
-			for (unsigned int i = 0; i < nb_channels; i++)
-				iio->disconnect(fft_ids[i]);
-		}
 
+		if (fft_is_visible && (fft_channels.size() > 0)) {
+			for (unsigned int i = 0; i < nb_channels; i++) {
+				/** GNU Radio flow: iio(i) ->  fft -> ctm -> qt_fft_block */
+				iio->disconnect(fft_channels.at(i).first, fft_channels.at(i).second,
+						fft_blocks.at(i), 0);
+				iio->disconnect(fft_blocks.at(i), 0, ctm_blocks.at(i), 0);
+				iio->disconnect(ctm_blocks.at(i), 0, qt_fft_block, i);
+			}
+		}
 		setFFT_params();
-		for (unsigned int i = 0; i < nb_channels; i++) {
-			auto fft = gnuradio::get_initial_sptr(
-					new fft_block(false, fft_plot_size));
-
-			auto ctm = blocks::complex_to_mag_squared::make(1);
-
-			/** GNU Radio flow: iio(i) ->  fft -> ctm -> qt_fft_block */
-			fft_ids[i] = iio->connect(fft, i, 0, true);
-			iio->connect(fft, 0, ctm, 0);
-			iio->connect(ctm, 0, qt_fft_block, i);
-
-			if(started)
-				iio->start(fft_ids[i]);
-		}
 
 		for (unsigned int i = 0; i < nb_channels; i++) {
-			iio->set_buffer_size(fft_ids[i], active_sample_count);
+			fft_blocks.push_back(gnuradio::get_initial_sptr(
+						     new fft_block(false, fft_plot_size)));
+			ctm_blocks.push_back(blocks::complex_to_mag_squared::make(1));
+
+			if (chnAcCoupled.at(i)) {
+				fft_channels.push_back(QPair<gr::basic_block_sptr, int>(
+							       dc_cancel.at(i), 0));
+			} else {
+				fft_channels.push_back(QPair<gr::basic_block_sptr, int>(
+							       adc_samp_conv_block, i));
+			}
+
+			iio->connect(fft_channels.at(i).first, fft_channels.at(i).second,
+					fft_blocks.at(i), 0);
+			iio->connect(fft_blocks.at(i), 0, ctm_blocks.at(i), 0);
+			iio->connect(ctm_blocks.at(i), 0, qt_fft_block, i);
 		}
 
 		ui->container_fft_plot->show();
 	} else {
 		ui->container_fft_plot->hide();
 
-		if (fft_is_visible) {
+		if (fft_is_visible && (fft_channels.size() > 0)) {
 			for (unsigned int i = 0; i < nb_channels; i++) {
-				iio->disconnect(fft_ids[i]);
+				iio->disconnect(fft_channels.at(i).first, fft_channels.at(i).second,
+						fft_blocks.at(i), 0);
+				iio->disconnect(fft_blocks.at(i), 0, ctm_blocks.at(i), 0);
+				iio->disconnect(ctm_blocks.at(i), 0, qt_fft_block, i);
 			}
+			fft_channels.clear();
+			fft_blocks.clear();
+			ctm_blocks.clear();
 		}
 	}
 
