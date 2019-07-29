@@ -1080,6 +1080,7 @@ void Oscilloscope::updateTriggerLevelValue(std::vector<float> value)
 	if (!triggerLevelSink.first) {
 		return;
 	}
+
 	triggerLevelSink.first->blockSignals(true);
 
 	float val = dc_cancel.at(triggerLevelSink.second)->get_dc_offset();
@@ -1250,6 +1251,8 @@ void Oscilloscope::activateAcCoupling(int i)
 	iio->connect(dc_cancel.at(i), 0, qt_time_block, i);
 	iio->connect(dc_cancel.at(i), 0, math_probe_atten.at(i), 0);
 
+	iio->disconnect(block, i, qt_hist_block, i);
+	iio->connect(dc_cancel.at(i), 0, qt_hist_block, i);
 
 	if (trigger && !triggerLevelSink.first) {
 		triggerLevelSink.first = boost::make_shared<signal_sample>();
@@ -1338,6 +1341,9 @@ void Oscilloscope::deactivateAcCoupling(int i)
 	iio->disconnect(dc_cancel.at(i), 0, qt_time_block, i);
 
 	iio->connect(block, i, qt_time_block, i);
+
+	iio->disconnect(dc_cancel.at(i), 0, qt_hist_block, i);
+	iio->connect(block, i, qt_hist_block, i);
 
 	if (trigger && triggerLevelSink.first) {
 		disconnect(&*triggerLevelSink.first, SIGNAL(triggered(std::vector<float>)),
@@ -1472,6 +1478,7 @@ void Oscilloscope::configureAcCoupling(int i, bool coupled)
 		deactivateAcCoupling(i);
 		activateAcCoupling(i);
 	}
+	scaleHistogramPlot();
 }
 
 void Oscilloscope::enableLabels(bool enable)
