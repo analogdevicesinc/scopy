@@ -61,6 +61,7 @@
 #include "osc_import_settings.h"
 #include "math.hpp"
 #include "scroll_filter.hpp"
+#include "cancel_dc_offset_block.h"
 
 #include "oscilloscope_api.hpp"
 
@@ -334,8 +335,6 @@ namespace adiscope {
 
 		std::vector<bool> chnAcCoupled;
 		bool triggerAcCoupled;
-		std::vector<gr::basic_block_sptr> filterBlocks;
-		std::vector<gr::basic_block_sptr> subBlocks;
 		QPair<boost::shared_ptr<signal_sample>, int> triggerLevelSink;
 		boost::shared_ptr<gr::blocks::keep_one_in_n> keep_one;
 		boost::shared_ptr<gr::blocks::vector_sink_f> autosetFFTSink;
@@ -422,6 +421,7 @@ namespace adiscope {
 		void init_channel_settings();
 		void editMathChannelFunction(int id, const std::string &new_function);
 
+		std::vector<boost::shared_ptr<cancel_dc_offset_block>> dc_cancel;
 		std::vector<QPair<gr::basic_block_sptr, int> > xy_channels;
 		int index_x, index_y;
 		bool locked;

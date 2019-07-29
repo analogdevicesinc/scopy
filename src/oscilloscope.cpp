@@ -143,6 +143,10 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		symmBufferMode->setTriggerBufferMaxSize(8192); // 8192 is what hardware supports
 		symmBufferMode->setTimeDivisionCount(plot.xAxisNumDiv());
 	}
+	dc_cancel.push_back(gnuradio::get_initial_sptr(
+			new cancel_dc_offset_block(1, true)));
+	dc_cancel.push_back(gnuradio::get_initial_sptr(
+			new cancel_dc_offset_block(1, true)));
 
 	/* Measurements Settings */
 	measure_settings_init();
@@ -226,8 +230,6 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		high_gain_modes.push_back(false);
 		channel_offset.push_back(0.0);
 		chnAcCoupled.push_back(false);
-		filterBlocks.push_back(nullptr);
-		subBlocks.push_back(nullptr);
 
 		channels_api.append(new Channel_API(this));
 	}
@@ -1081,13 +1083,14 @@ void Oscilloscope::updateTriggerLevelValue(std::vector<float> value)
 	}
 	triggerLevelSink.first->blockSignals(true);
 
+	float val = dc_cancel.at(triggerLevelSink.second)->get_dc_offset();
 	double m_dc_level = trigger_settings.dcLevel();
-	if ((int)(value.at(0)*1e3) == (int)(m_dc_level*1e3)) {
+	if ((int)(val*1e3) == (int)(m_dc_level*1e3)) {
 		triggerLevelSink.first->blockSignals(false);
 		return;
 	}
 	if (trigger_settings.analogEnabled()) {
-		trigger_settings.setDcLevelCoupled(value.at(0));
+		trigger_settings.setDcLevelCoupled(val);
 		trigger_settings.onSpinboxTriggerLevelChanged(
 					trigger_settings.level());
 	}
@@ -1128,8 +1131,6 @@ Oscilloscope::~Oscilloscope()
 
 	delete math_pair;
 
-	filterBlocks.clear();
-	subBlocks.clear();
 	delete[] hist_ids;
 	delete[] fft_ids;
 	delete[] ids;
@@ -1234,28 +1235,17 @@ void Oscilloscope::activateAcCoupling(int i)
 		iio->lock();
 	}
 
-	if (active_sample_rate <= 1e6) {
-		alpha = 1 / active_sample_rate;
-	} else {
-		alpha = 60 / (active_sample_rate + 60);
-	}
-	beta = 1 - alpha;
-
-	filterBlocks[i] = gr::filter::iir_filter_ffd::make({alpha}, {1, -beta}, false);
-	subBlocks[i] = gr::blocks::sub_ff::make();
-
 	boost::shared_ptr<adc_sample_conv> block =
 	dynamic_pointer_cast<adc_sample_conv>(
 					adc_samp_conv_block);
 
 	iio->disconnect(block, i, qt_time_block, i);
-	iio->connect(block, i, subBlocks.at(i), 0);
-	iio->connect(block, i, filterBlocks.at(i), 0);
-	iio->connect(filterBlocks.at(i), 0, subBlocks.at(i), 1);
-	iio->connect(subBlocks.at(i), 0, qt_time_block, i);
-
 	iio->disconnect(adc_samp_conv_block, i, math_probe_atten.at(i), 0);
-	iio->connect(subBlocks.at(i), 0, math_probe_atten.at(i), 0);
+
+	iio->connect(block, i, dc_cancel.at(i), 0);
+	iio->connect(dc_cancel.at(i), 0, qt_time_block, i);
+	iio->connect(dc_cancel.at(i), 0, math_probe_atten.at(i), 0);
+
 
 	if (trigger && !triggerLevelSink.first) {
 		triggerLevelSink.first = boost::make_shared<signal_sample>();
@@ -1263,12 +1253,14 @@ void Oscilloscope::activateAcCoupling(int i)
 		keep_one = gr::blocks::keep_one_in_n::make(sizeof(float), 100);
 		connect(&*triggerLevelSink.first, SIGNAL(triggered(std::vector<float>)),
 			this, SLOT(updateTriggerLevelValue(std::vector<float>)));
-		iio->connect(filterBlocks.at(i), 0, keep_one, 0);
-		iio->connect(keep_one, 0, triggerLevelSink.first, 0);
+		iio->connect(dc_cancel.at(i), 0, triggerLevelSink.first, 0);
+	}
 	}
 
-	for(int ch = 0; ch < nb_channels; ch++)
+	for(int ch = 0; ch < nb_channels; ch++) {
 		iio->set_buffer_size(ids[ch], active_sample_count);
+		dc_cancel.at(ch)->set_buffer_size(active_sample_count);
+	}
 
 	if(started) {
 		iio->unlock();
@@ -1292,30 +1284,28 @@ void Oscilloscope::deactivateAcCoupling(int i)
 	dynamic_pointer_cast<adc_sample_conv>(
 					adc_samp_conv_block);
 
-	iio->disconnect(subBlocks.at(i), 0, math_probe_atten.at(i), 0);
+	iio->disconnect(dc_cancel.at(i), 0, math_probe_atten.at(i), 0);
 	iio->connect(adc_samp_conv_block, i, math_probe_atten.at(i), 0);
 
-	iio->disconnect(block, i, subBlocks.at(i), 0);
-	iio->disconnect(block, i, filterBlocks.at(i), 0);
-	iio->disconnect(filterBlocks.at(i), 0, subBlocks.at(i), 1);
-	iio->disconnect(subBlocks.at(i), 0, qt_time_block, i);
+	iio->disconnect(block, i, dc_cancel.at(i), 0);
+	iio->disconnect(dc_cancel.at(i), 0, qt_time_block, i);
+
+	iio->connect(block, i, qt_time_block, i);
+
 	if (trigger && triggerLevelSink.first) {
 		disconnect(&*triggerLevelSink.first, SIGNAL(triggered(std::vector<float>)),
 			this, SLOT(updateTriggerLevelValue(std::vector<float>)));
 
-		iio->disconnect(filterBlocks.at(triggerLevelSink.second), 0, keep_one, 0);
-		iio->disconnect(keep_one, 0, triggerLevelSink.first, 0);
+		iio->disconnect(dc_cancel.at(i), 0, triggerLevelSink.first, 0);
 		trigger_settings.updateHwVoltLevels(i);
 		triggerLevelSink.first = nullptr;
 		triggerLevelSink.second = -1;
 		keep_one = nullptr;
 	}
-	filterBlocks[i] = nullptr;
-	subBlocks[i] = nullptr;
-	iio->connect(block, i, qt_time_block, i);
 
 	for(int ch = 0; ch < nb_channels; ch++) {
 		iio->set_buffer_size(ids[ch], active_sample_count);
+		dc_cancel.at(ch)->set_buffer_size(active_sample_count);
 	}
 
 	if(started) {
@@ -1347,8 +1337,7 @@ void Oscilloscope::activateAcCouplingTrigger(int chIdx)
 		keep_one = gr::blocks::keep_one_in_n::make(sizeof(float), 100);
 		connect(&*triggerLevelSink.first, SIGNAL(triggered(std::vector<float>)),
 			this, SLOT(updateTriggerLevelValue(std::vector<float>)));
-		iio->connect(filterBlocks.at(chIdx), 0, keep_one, 0);
-		iio->connect(keep_one, 0, triggerLevelSink.first, 0);
+		iio->connect(dc_cancel.at(triggerLevelSink.second), 0, triggerLevelSink.first, 0);
 
 		if (started) {
 			iio->unlock();
@@ -1368,8 +1357,7 @@ void Oscilloscope::deactivateAcCouplingTrigger()
 		disconnect(&*triggerLevelSink.first, SIGNAL(triggered(std::vector<float>)),
 			this, SLOT(updateTriggerLevelValue(std::vector<float>)));
 		/* Disconnect the GNU Radio block */
-		iio->disconnect(filterBlocks.at(triggerLevelSink.second), 0, keep_one, 0);
-		iio->disconnect(keep_one, 0, triggerLevelSink.first, 0);
+		iio->disconnect(dc_cancel.at(triggerLevelSink.second), 0, triggerLevelSink.first, 0);
 		trigger_settings.updateHwVoltLevels(triggerLevelSink.second);
 		if (started) {
 			iio->unlock();
@@ -1382,16 +1370,17 @@ void Oscilloscope::deactivateAcCouplingTrigger()
 
 void Oscilloscope::configureAcCoupling(int i, bool coupled)
 {
-	if (coupled && !chnAcCoupled.at(i)) {
+	bool tmp = chnAcCoupled[i];
+	chnAcCoupled[i] = coupled;
+
+	if (coupled && !tmp) {
 		activateAcCoupling(i);
-	} else if (!coupled && chnAcCoupled.at(i)) {
+	} else if (!coupled && tmp) {
 		deactivateAcCoupling(i);
-	} else if (coupled && chnAcCoupled.at(i)) {
+	} else if (coupled && tmp) {
 		deactivateAcCoupling(i);
 		activateAcCoupling(i);
 	}
-
-	chnAcCoupled[i] = coupled;
 }
 
 void Oscilloscope::enableLabels(bool enable)
@@ -2828,6 +2817,7 @@ void Oscilloscope::onCmbMemoryDepthChanged(QString value)
 
 	for (unsigned int i = 0; i < nb_channels; i++) {
 		iio->set_buffer_size(ids[i], active_sample_count);
+		dc_cancel.at(i)->set_buffer_size(active_sample_count);
 	}
 
 	for(int ch = 0; ch < nb_channels; ch++) {
@@ -2941,6 +2931,7 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 
 	for (unsigned int i = 0; i < nb_channels; i++) {
 		iio->set_buffer_size(ids[i], active_sample_count);
+		dc_cancel.at(i)->set_buffer_size(active_sample_count);
 	}
 
 	/* timeout = how long a buffer capture takes + transmission latency. The
@@ -3115,6 +3106,7 @@ void adiscope::Oscilloscope::onTimePositionChanged(double value)
 
 	for (unsigned int i = 0; i < nb_channels; i++) {
 		iio->set_buffer_size(ids[i], active_sample_count);
+		dc_cancel.at(i)->set_buffer_size(active_sample_count);
 	}
 
 	if (started) {
@@ -3974,8 +3966,10 @@ void Oscilloscope::setupAutosetFreqSweep()
 	last_set_sample_count = active_sample_count;
 	autosetFFT();
 	iio->set_buffer_size(autoset_id[0], autoset_fft_size);
-	for (unsigned int i = 0; i < nb_channels; i++)
+	for (unsigned int i = 0; i < nb_channels; i++) {
 		iio->set_buffer_size(ids[i], autoset_fft_size);
+		dc_cancel.at(i)->set_buffer_size(active_sample_count);
+	}
 	if(started)
 		iio->unlock();
 }
