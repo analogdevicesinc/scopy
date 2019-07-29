@@ -1255,6 +1255,29 @@ void Oscilloscope::activateAcCoupling(int i)
 			this, SLOT(updateTriggerLevelValue(std::vector<float>)));
 		iio->connect(dc_cancel.at(i), 0, triggerLevelSink.first, 0);
 	}
+
+	if (xy_is_visible) {
+		iio->disconnect(xy_channels.at(index_x).first, xy_channels.at(index_x).second,
+				ftc, 0);
+		iio->disconnect(xy_channels.at(index_y).first, xy_channels.at(index_y).second,
+				ftc, 1);
+		xy_channels.clear();
+
+		for(unsigned int ch = 0; ch < nb_channels; ch++) {
+			if (chnAcCoupled.at(ch)) {
+				xy_channels.push_back(QPair<gr::basic_block_sptr, int>(
+							      dc_cancel.at(ch), 0));
+			} else {
+				xy_channels.push_back(QPair<gr::basic_block_sptr, int>(
+							      adc_samp_conv_block, ch));
+			}
+		}
+
+		iio->connect(xy_channels.at(index_x).first, xy_channels.at(index_x).second,
+			     ftc, 0);
+		iio->connect(xy_channels.at(index_y).first, xy_channels.at(index_y).second,
+			     ftc, 1);
+	}
 	}
 
 	for(int ch = 0; ch < nb_channels; ch++) {
@@ -1301,6 +1324,29 @@ void Oscilloscope::deactivateAcCoupling(int i)
 		triggerLevelSink.first = nullptr;
 		triggerLevelSink.second = -1;
 		keep_one = nullptr;
+	}
+
+	if (xy_is_visible) {
+		iio->disconnect(xy_channels.at(index_x).first, xy_channels.at(index_x).second,
+				ftc, 0);
+		iio->disconnect(xy_channels.at(index_y).first, xy_channels.at(index_y).second,
+				ftc, 1);
+		xy_channels.clear();
+
+		for(unsigned int ch = 0; ch < nb_channels; ch++) {
+			if (chnAcCoupled.at(ch) && (ch != i)) {
+				xy_channels.push_back(QPair<gr::basic_block_sptr, int>(
+							      dc_cancel.at(ch), 0));
+			} else {
+				xy_channels.push_back(QPair<gr::basic_block_sptr, int>(
+							      adc_samp_conv_block, ch));
+			}
+		}
+
+		iio->connect(xy_channels.at(index_x).first, xy_channels.at(index_x).second,
+			     ftc, 0);
+		iio->connect(xy_channels.at(index_y).first, xy_channels.at(index_y).second,
+			     ftc, 1);
 	}
 
 	for(int ch = 0; ch < nb_channels; ch++) {
@@ -2426,9 +2472,15 @@ void Oscilloscope::onXY_view_toggled(bool visible)
 		index_y = gsettings_ui->cmb_y_channel->currentIndex();
 
 		if(xy_channels.size() == 0) {
-			for(unsigned int i = 0; i < nb_channels; i++)
-				xy_channels.push_back(QPair<gr::basic_block_sptr, int>(
-							      adc_samp_conv_block, i));
+			for(unsigned int i = 0; i < nb_channels; i++) {
+				if (chnAcCoupled.at(i)) {
+					xy_channels.push_back(QPair<gr::basic_block_sptr, int>(
+								      dc_cancel.at(i), 0));
+				} else {
+					xy_channels.push_back(QPair<gr::basic_block_sptr, int>(
+								      adc_samp_conv_block, i));
+				}
+			}
 			for(auto p : math_sinks) {
 				auto math = p.first;
 				xy_channels.push_back(QPair<gr::basic_block_sptr, int>(
