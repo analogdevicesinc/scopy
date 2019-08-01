@@ -186,9 +186,10 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	ui->comboBox_window->blockSignals(false);
 
-	settings_group->addButton(ui->btnToolSettings);;
+	settings_group->addButton(ui->btnToolSettings);
 	settings_group->addButton(ui->btnSweep);
 	settings_group->addButton(ui->btnMarkers);
+	settings_group->addButton(ui->btnAddRef);
 	settings_group->setExclusive(true);
 
 	fft_plot = new FftDisplayPlot(num_adc_channels, this);
@@ -511,6 +512,8 @@ void SpectrumAnalyzer::toggleRightMenu(CustomPushButton *btn, bool checked)
 			index = 2;
 		} else if (btn == ui->btnMarkers) {
 			index = 3;
+		} else if (btn == ui->btnAddRef) {
+			index = 4;
 		}
 	}
 
@@ -575,6 +578,12 @@ void SpectrumAnalyzer::on_btnMarkers_toggled(bool checked)
 {
 	marker_menu_opened = checked;
 
+	triggerRightMenuToggle(
+		static_cast<CustomPushButton *>(QObject::sender()), checked);
+}
+
+void SpectrumAnalyzer::on_btnAddRef_toggled(bool checked)
+{
 	triggerRightMenuToggle(
 		static_cast<CustomPushButton *>(QObject::sender()), checked);
 }
