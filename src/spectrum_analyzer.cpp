@@ -1431,8 +1431,8 @@ SpectrumChannel::SpectrumChannel(int id, const QString& name,
 	m_widget(new ChannelWidget(id, false, false, m_color))
 {
 	m_widget->setFullName(name);
-	m_widget->setShortName(QString("CH %1").arg(id));
-	m_widget->nameButton()->setText(m_widget->fullName());
+	m_widget->setShortName(QString("CH %1").arg(id + 1));
+	m_widget->nameButton()->setText(m_widget->shortName());
 }
 
 bool SpectrumChannel::isSettingsOn() const
