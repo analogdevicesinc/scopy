@@ -41,18 +41,10 @@
       </size>
      </property>
      <property name="styleSheet">
-      <string notr="true">QWidget
-{
-  background-color: none;
-  color: rgb(190, 190, 190);
-  /*font: 10pt;*/
-  font-style: normal;
-  font-weight: normal;
-}
-
+      <string notr="true">
 QWidget#mainWidget
 {
-background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 rgba(35, 35, 43, 255), stop:1 rgba(39, 39, 48, 255));
+background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 rgba(0, 0, 0, 40), stop:1 transparent);
 }
 
 /* QComboBoxes*/
@@ -420,15 +412,15 @@ QPushButton:checked:hover {
            <property name="verticalSpacing">
             <number>10</number>
            </property>
+           <item row="2" column="0">
+            <widget class="adiscope::MarkerTable" name="markerTable" native="true"/>
+           </item>
            <item row="3" column="0">
             <layout class="QHBoxLayout" name="hLayout_plotBottomBar">
              <property name="spacing">
               <number>0</number>
              </property>
             </layout>
-           </item>
-           <item row="2" column="0">
-            <widget class="adiscope::MarkerTable" name="markerTable" native="true"/>
            </item>
            <item row="0" column="0">
             <layout class="QHBoxLayout" name="hLayout_plotTopBar">
@@ -513,7 +505,7 @@ QWidget {
               </sizepolicy>
              </property>
              <property name="currentIndex">
-              <number>2</number>
+              <number>0</number>
              </property>
              <widget class="QWidget" name="channelSettings">
               <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -571,22 +563,6 @@ QWidget {
                   <enum>Qt::Horizontal</enum>
                  </property>
                 </widget>
-               </item>
-               <item>
-                <spacer name="verticalSpacer_3">
-                 <property name="orientation">
-                  <enum>Qt::Vertical</enum>
-                 </property>
-                 <property name="sizeType">
-                  <enum>QSizePolicy::Fixed</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>10</width>
-                   <height>0</height>
-                  </size>
-                 </property>
-                </spacer>
                </item>
                <item>
                 <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -703,6 +679,41 @@ border-bottom: 1px solid rgba(255,255,255,100);</string>
                 </layout>
                </item>
                <item>
+                <widget class="QPushButton" name="btnSnapshot">
+                 <property name="styleSheet">
+                  <string notr="true">QPushButton{
+  width: 175px;
+  height: 30px;
+  border-radius: 4px;
+  background-color: #4a64ff;
+  
+  font-size: 14px;
+  font-weight: normal;
+  font-style: normal;
+  text-align: center;
+  color: #ffffff;
+}
+
+
+QPushButton:disabled {
+  background-color: grey;
+  color:white;
+}
+
+QPushButton:pressed {
+  background-color: #2a44df;
+}
+
+QPushButton:hover {
+	background-color: #4a34ff;
+}</string>
+                 </property>
+                 <property name="text">
+                  <string>Snapshot</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
                 <spacer name="verticalSpacer_4">
                  <property name="orientation">
                   <enum>Qt::Vertical</enum>
@@ -711,6 +722,22 @@ border-bottom: 1px solid rgba(255,255,255,100);</string>
                   <size>
                    <width>10</width>
                    <height>10</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <spacer name="verticalSpacer_3">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::Fixed</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>10</width>
+                   <height>0</height>
                   </size>
                  </property>
                 </spacer>
@@ -1467,39 +1494,7 @@ QPushButton:hover
                 </layout>
                </item>
                <item>
-                <spacer name="verticalSpacer_7">
-                 <property name="orientation">
-                  <enum>Qt::Vertical</enum>
-                 </property>
-                 <property name="sizeType">
-                  <enum>QSizePolicy::Fixed</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>0</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item>
                 <layout class="QVBoxLayout" name="markerFreqPosLayout"/>
-               </item>
-               <item>
-                <spacer name="verticalSpacer_8">
-                 <property name="orientation">
-                  <enum>Qt::Vertical</enum>
-                 </property>
-                 <property name="sizeType">
-                  <enum>QSizePolicy::Fixed</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>0</width>
-                   <height>15</height>
-                  </size>
-                 </property>
-                </spacer>
                </item>
                <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_10">
@@ -1872,6 +1867,223 @@ QPushButton:hover
                  </property>
                 </spacer>
                </item>
+               <item>
+                <spacer name="verticalSpacer_7">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::Fixed</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>0</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <spacer name="verticalSpacer_8">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::Fixed</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>0</width>
+                   <height>15</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+             </widget>
+             <widget class="QWidget" name="addReference">
+              <layout class="QVBoxLayout" name="verticalLayout_13">
+               <property name="leftMargin">
+                <number>18</number>
+               </property>
+               <property name="topMargin">
+                <number>20</number>
+               </property>
+               <property name="rightMargin">
+                <number>18</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
+               <item>
+                <layout class="QVBoxLayout" name="verticalLayout_14">
+                 <item>
+                  <widget class="QLabel" name="label">
+                   <property name="styleSheet">
+                    <string notr="true"> color: white;
+    font-size: 14px;
+    font-weight: normal;</string>
+                   </property>
+                   <property name="text">
+                    <string>Import Reference Channels</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="verticalSpacer_13">
+                   <property name="orientation">
+                    <enum>Qt::Vertical</enum>
+                   </property>
+                   <property name="sizeType">
+                    <enum>QSizePolicy::Fixed</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>20</width>
+                     <height>8</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item>
+                  <widget class="Line" name="line_5">
+                   <property name="maximumSize">
+                    <size>
+                     <width>16777215</width>
+                     <height>1</height>
+                    </size>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">color: #4A64FF;</string>
+                   </property>
+                   <property name="frameShadow">
+                    <enum>QFrame::Plain</enum>
+                   </property>
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="verticalSpacer_14">
+                   <property name="orientation">
+                    <enum>Qt::Vertical</enum>
+                   </property>
+                   <property name="sizeType">
+                    <enum>QSizePolicy::Fixed</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>20</width>
+                     <height>14</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="fileLineEdit">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
+                   <property name="text">
+                    <string>No file selected!</string>
+                   </property>
+                   <property name="readOnly">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="btnBrowseFile">
+                   <property name="styleSheet">
+                    <string notr="true">QPushButton {
+  min-height: 30px;
+  max-height: 30px;
+
+  border: 0px;
+  border-radius: 4px;
+
+  background-color: #4a64ff;
+  color: #ffffff;
+
+  font-size: 14px;
+}
+
+QPushButton:pressed {
+  background-color: #2a44df;
+}
+
+QPushButton:hover {
+	background-color: #4a34ff;
+}
+
+QPushButton:disabled {
+background-color: #727273;
+}</string>
+                   </property>
+                   <property name="text">
+                    <string>Browse</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="adiscope::ImportSettings" name="importSettings" native="true">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="btnImport">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">QPushButton {
+  min-height: 30px;
+  max-height: 30px;
+
+  border: 0px;
+  border-radius: 4px;
+
+  background-color: #4a64ff;
+  color: #ffffff;
+
+  font-size: 14px;
+}
+
+QPushButton:pressed {
+  background-color: #2a44df;
+}
+
+QPushButton:hover {
+	background-color: #4a34ff;
+}
+
+QPushButton:disabled {
+background-color: #727273;
+}</string>
+                   </property>
+                   <property name="text">
+                    <string>Import</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="verticalSpacer_12">
+                   <property name="orientation">
+                    <enum>Qt::Vertical</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>20</width>
+                     <height>40</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </item>
               </layout>
              </widget>
             </widget>
@@ -1897,6 +2109,26 @@ QPushButton:hover
         </property>
         <item>
          <layout class="QHBoxLayout" name="channelsList"/>
+        </item>
+        <item>
+         <widget class="adiscope::CustomPushButton" name="btnAddRef">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="../resources/resources.qrc">
+            <normaloff>:/menu/add.svg</normaloff>:/menu/add.svg</iconset>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <property name="checked">
+           <bool>false</bool>
+          </property>
+          <property name="flat">
+           <bool>true</bool>
+          </property>
+         </widget>
         </item>
         <item>
          <spacer name="horizontalSpacer_6">
@@ -2041,6 +2273,12 @@ QLabel {
    <header>customPushButton.hpp</header>
   </customwidget>
   <customwidget>
+   <class>adiscope::RunSingleWidget</class>
+   <extends>QWidget</extends>
+   <header>runsinglewidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>adiscope::CustomSwitch</class>
    <extends>QPushButton</extends>
    <header>customSwitch.hpp</header>
@@ -2052,9 +2290,9 @@ QLabel {
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>adiscope::RunSingleWidget</class>
+   <class>adiscope::ImportSettings</class>
    <extends>QWidget</extends>
-   <header>runsinglewidget.h</header>
+   <header>osc_import_settings.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

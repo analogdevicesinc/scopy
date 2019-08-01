@@ -136,6 +136,7 @@ private Q_SLOTS:
 	void rightMenuFinished(bool opened);	
 	void on_btnExport_clicked();
 	void updateRunButton(bool);
+	void on_btnAddRef_toggled(bool checked);
 
 private:
 	void build_gnuradio_block_chain();
