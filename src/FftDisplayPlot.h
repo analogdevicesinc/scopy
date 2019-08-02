@@ -118,6 +118,11 @@ namespace adiscope {
 
 		QList<QColor> d_markerColors;
 
+		QMap<QString, QwtPlotCurve *> d_ref_curves;
+		unsigned int n_ref_curves;
+		std::vector<double *> d_refXdata;
+		std::vector<double *> d_refYdata;
+
 		void plotData(const std::vector<double *> &pts,
 				uint64_t num_points);
 		void _resetXAxisPoints();
@@ -153,7 +158,7 @@ namespace adiscope {
 		double channelScaleFactor(int chIdx) const;
 		void setScaleFactor(int chIdx, double scale);
 
-		int64_t posAtFrequency(double freq) const;
+		int64_t posAtFrequency(double freq, int chIdx = -1) const;
 		QString leftVerAxisUnit() const;
 		void setLeftVertAxisUnit(const QString& unit);
 
@@ -204,6 +209,9 @@ namespace adiscope {
 		void setZoomerEnabled();
 		double sampleRate();
 		void setNumPoints(uint64_t num_points);
+
+		void registerReferenceWaveform(QString name, QVector<double> xData, QVector<double> yData);
+		void unregisterReferenceWaveform(QString name);
 
 	Q_SIGNALS:
 		void newData();
