@@ -137,6 +137,9 @@ private Q_SLOTS:
 	void on_btnExport_clicked();
 	void updateRunButton(bool);
 	void on_btnAddRef_toggled(bool checked);
+	void on_btnBrowseFile_clicked();
+	void on_btnImport_clicked();
+	void onReferenceChannelDeleted();
 
 private:
 	void build_gnuradio_block_chain();
@@ -153,6 +156,8 @@ private:
 	void updateCrtMrkLblVisibility();
 	void updateMrkFreqPosSpinBtnLimits();
 	void updateMrkFreqPosSpinBtnValue();
+	void add_ref_waveform(QVector<double> xData, QVector<double> yData);
+	void add_ref_waveform(unsigned int chIdx);
 
 	QList<SpectrumChannel_API *> ch_api;
 	QList<SpectrumMarker_API *> marker_api;
@@ -162,6 +167,11 @@ private:
 
 	QQueue<QPair<CustomPushButton *, bool>> menuButtonActions;
 	QList<CustomPushButton *> menuOrder;
+
+	QVector<QVector<double>> import_data;
+	unsigned int nb_ref_channels;
+	QVector<ChannelWidget *> referenceChannels;
+	unsigned int selected_ch_settings;
 
 private:
 	Ui::SpectrumAnalyzer *ui;

@@ -54,6 +54,8 @@
 #include <iio.h>
 #include <iostream>
 
+static const int MAX_REF_CHANNELS = 4;
+
 using namespace adiscope;
 using namespace std;
 
@@ -119,7 +121,8 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	marker_menu_opened(false),
 	bin_sizes({
 	256, 512, 1024, 2048, 4096, 8192, 16384, 32768
-})
+	}), nb_ref_channels(0),
+	selected_ch_settings(-1)
 
 {
 
@@ -394,6 +397,56 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	connect(ui->btnPrint, &QPushButton::clicked, [=](){
 		fft_plot->printWithNoBackground(api->objectName(), false);
 	});
+
+	connect(ui->btnSnapshot, &QPushButton::clicked, [=](){
+		QwtPlotCurve *curve = fft_plot->Curve(selected_ch_settings);
+		if (selected_ch_settings < 2) {
+			if (nb_ref_channels == MAX_REF_CHANNELS) {
+				return;
+			}
+
+			if (!curve->data()->size()) {
+				return;
+			}
+
+			QVector<double> xData;
+			QVector<double> yData;
+			for (size_t i = 0; i < curve->data()->size(); ++i) {
+				xData.push_back(curve->data()->sample(i).x());
+				yData.push_back(curve->data()->sample(i).y());
+			}
+
+			add_ref_waveform(xData, yData);
+
+		} else {
+			// export
+			auto export_dialog( new QFileDialog( this ) );
+			export_dialog->setWindowModality( Qt::WindowModal );
+			export_dialog->setFileMode( QFileDialog::AnyFile );
+			export_dialog->setAcceptMode( QFileDialog::AcceptSave );
+			export_dialog->setNameFilters({"Comma-separated values files (*.csv)",
+							       "Tab-delimited values files (*.txt)"});
+
+			if (export_dialog->exec()) {
+				FileManager fm("Spectrum Analyzer");
+				fm.open(export_dialog->selectedFiles().at(0), FileManager::EXPORT);
+
+				QVector<double> freq_data, mag_data;
+
+				for (size_t i = 0; i < curve->data()->size(); ++i) {
+					freq_data.push_back(curve->sample(i).x());
+					mag_data.push_back(curve->sample(i).y());
+				}
+
+				QString unit = ui->lblMagUnit->text();
+				fm.save(freq_data, "Frequency(Hz)");
+				fm.save(mag_data, "REF" + QString::number(selected_ch_settings - num_adc_channels + 1)
+					+ "(" + unit + ")");
+
+				fm.performWrite();
+			}
+		}
+	});
 }
 
 SpectrumAnalyzer::~SpectrumAnalyzer()
@@ -505,6 +558,17 @@ void SpectrumAnalyzer::toggleRightMenu(CustomPushButton *btn, bool checked)
 			id = channels.at(i).get()->widget()->id();
 		}
 	}
+
+	/* Also check if one of the reference channels settings btn
+	 * was toggled */
+	for (unsigned int i = 0; i < nb_ref_channels; ++i) {
+		ChannelWidget *cw = referenceChannels.at(i);
+		if (cw->menuButton() == btn) {
+			chSettings = true;
+			id = cw->id();
+		}
+	}
+
 	if (!chSettings) {
 		if (btn == ui->btnToolSettings) {
 			index = 1;
@@ -565,7 +629,9 @@ void SpectrumAnalyzer::on_btnSettings_clicked(bool checked)
 			settings_group->checkedButton());
 	}
 
-	btn->setChecked(checked);
+	if (btn) {
+		btn->setChecked(checked);
+	}
 }
 
 void SpectrumAnalyzer::on_btnSweep_toggled(bool checked)
@@ -586,6 +652,182 @@ void SpectrumAnalyzer::on_btnAddRef_toggled(bool checked)
 {
 	triggerRightMenuToggle(
 		static_cast<CustomPushButton *>(QObject::sender()), checked);
+}
+
+void SpectrumAnalyzer::on_btnBrowseFile_clicked()
+{
+	QString fileName = QFileDialog::getOpenFileName(this,
+			   tr("Open import file"), "",
+			   tr({"Comma-separated values files (*.csv);;"
+			       "Tab-delimited values files (*.txt)"}));
+
+	FileManager fm("Spectrum Analyzer");
+
+	ui->importSettings->clear();
+	import_data.clear();
+
+	try {
+		fm.open(fileName, FileManager::IMPORT);
+
+		for (int i = 0; i < fm.getNrOfChannels(); ++i) {
+			/* Amplitude CHX UNIT => mid(10, 3) strip CHX from column name */
+			ui->importSettings->addChannel(i, fm.getColumnName(i).mid(10, 3));
+		}
+
+		QVector<QVector<double>> data = fm.read();
+		for (int i = 0; i < data.size(); ++i) {
+			import_data.push_back(data[i]);
+		}
+
+		ui->fileLineEdit->setText(fileName);
+		ui->fileLineEdit->setToolTip(fileName);
+
+		ui->btnImport->setEnabled(true);
+		ui->importSettings->setEnabled(true);
+
+
+	} catch (FileManagerException &e) {
+		ui->fileLineEdit->setText(e.what());
+		ui->fileLineEdit->setToolTip("");
+		ui->btnImport->setDisabled(true);
+		ui->importSettings->setDisabled(true);
+	}
+}
+
+void SpectrumAnalyzer::on_btnImport_clicked()
+{
+	QMap<int, bool> import_map = ui->importSettings->getExportConfig();
+
+	for (int key : import_map.keys()) {
+		if (import_map[key]) {
+			add_ref_waveform(key);
+		}
+	}
+}
+
+void SpectrumAnalyzer::add_ref_waveform(QVector<double> xData, QVector<double> yData)
+{
+	if (nb_ref_channels == MAX_REF_CHANNELS) {
+		return;
+	}
+
+	unsigned int curve_id = num_adc_channels + nb_ref_channels;
+
+	QString qname = QString("REF %1").arg(nb_ref_channels + 1);
+
+	fft_plot->registerReferenceWaveform(qname, xData, yData);
+
+	auto channelWidget = new ChannelWidget(curve_id, true, false, fft_plot->getLineColor(curve_id));
+	channelWidget->setShortName(qname);
+	channelWidget->nameButton()->setText(channelWidget->shortName());
+	channelWidget->setReferenceChannel(true);
+	channelWidget->deleteButton()->setProperty(
+		"curve_name", QVariant(qname));
+
+	settings_group->addButton(channelWidget->menuButton());
+	channels_group->addButton(channelWidget->nameButton());
+	referenceChannels.push_back(channelWidget);
+
+	connect(channelWidget, &ChannelWidget::menuToggled,
+		this, &SpectrumAnalyzer::onChannelSettingsToggled);
+	connect(channelWidget, &ChannelWidget::selected,
+		this, &SpectrumAnalyzer::onChannelSelected);
+	connect(channelWidget, &ChannelWidget::deleteClicked,
+		this, &SpectrumAnalyzer::onReferenceChannelDeleted);
+	connect(channelWidget, &ChannelWidget::enabled,
+		this, &SpectrumAnalyzer::onChannelEnabled);
+
+	ui->channelsList->addWidget(channelWidget);
+
+	/* Increase ref channels count */
+	nb_ref_channels++;
+
+	if (!ui->btnMarkers->isEnabled()) {
+		QSignalBlocker(ui->btnMarkers);
+		ui->btnMarkers->setEnabled(true);
+	}
+
+	if (nb_ref_channels == MAX_REF_CHANNELS) {
+		ui->btnAddRef->hide();
+	}
+}
+
+void SpectrumAnalyzer::add_ref_waveform(unsigned int chIdx)
+{
+	QVector<double> xData;
+	QVector<double> yData;
+
+	for (int i = 0; i < import_data.size(); ++i) {
+		xData.push_back(import_data[i][0]);
+		yData.push_back(import_data[i][chIdx + 1]);
+	}
+
+	add_ref_waveform(xData, yData);
+}
+
+void SpectrumAnalyzer::onReferenceChannelDeleted()
+{
+	if (nb_ref_channels - 1 < MAX_REF_CHANNELS) {
+		ui->btnAddRef->show();
+	}
+
+	ChannelWidget *channelWidget = static_cast<ChannelWidget *>(QObject::sender());
+	QAbstractButton *delBtn = channelWidget->deleteButton();
+	QString qname = delBtn->property("curve_name").toString();
+
+	fft_plot->unregisterReferenceWaveform(qname);
+	ui->channelsList->removeWidget(channelWidget);
+
+	/* Check if there are other channel widgets that are enabled */
+	bool channelsEnabled = false;
+
+	referenceChannels.erase(std::find(referenceChannels.begin(),
+					  referenceChannels.end(),
+					  channelWidget));
+
+	/* Update the id of the remaining channels */
+	int id = num_adc_channels;
+	for (auto iter = referenceChannels.begin();
+	     iter != referenceChannels.end(); ++iter) {
+		(*iter)->setId(id++);
+	}
+
+	nb_ref_channels--;
+
+	if (channelWidget->id() < crt_channel_id) {
+		crt_channel_id--;
+	} else if (channelWidget->id() == crt_channel_id) {
+		for (int i = 0; i < num_adc_channels + nb_ref_channels; ++i) {
+			auto cw = getChannelWidgetAt(i);
+			if (cw == channelWidget) {
+				continue;
+			}
+			if (cw->enableButton()->isChecked()) {
+				channelsEnabled = true;
+				cw->nameButton()->setChecked(true);
+				break;
+			}
+		}
+	}
+
+	if (ui->btnMarkers->isChecked() && !channelsEnabled) {
+		ui->btnMarkers->setChecked(false);
+		menuButtonActions.removeAll(QPair<CustomPushButton*, bool>
+					    (ui->btnMarkers, true));
+		menuOrder.removeAll(ui->btnMarkers);
+		ui->btnMarkers->blockSignals(true);
+		ui->btnMarkers->setDisabled(true);
+		ui->btnMarkers->blockSignals(false);
+	}
+
+	if (channelWidget->menuButton()->isChecked()) {
+		channelWidget->menuButton()->setChecked(false);
+		menuButtonActions.removeAll(QPair<CustomPushButton*, bool>
+					    (static_cast<CustomPushButton*>(channelWidget->menuButton()), true));
+		menuOrder.removeAll(static_cast<CustomPushButton *>(channelWidget->menuButton()));
+	}
+
+	delete channelWidget;
 }
 
 void SpectrumAnalyzer::run()
@@ -809,33 +1051,57 @@ void SpectrumAnalyzer::onChannelSettingsToggled(bool en)
 
 void SpectrumAnalyzer::updateChannelSettingsPanel(unsigned int id)
 {
-	channel_sptr sc = channels.at(id);
-
 	ChannelWidget *cw = getChannelWidgetAt(id);
 
-	QString style = QString("border: 2px solid %1").arg(cw->color().name());
-	ui->lineChannelSettingsTitle->setStyleSheet(style);
-	ui->channelSettingsTitle->setText(sc->name());
+	selected_ch_settings = id;
 
-	auto it = std::find_if(avg_types.begin(), avg_types.end(),
-	[&](const std::pair<QString, FftDisplayPlot::AverageType>& p) {
-		return p.second == sc->averageType();
-	});
-
-	if (it != avg_types.end()) {
-		ui->comboBox_type->setCurrentText((*it).first);
+	if (cw->isReferenceChannel()) {
+		ui->btnSnapshot->setText("Export");
+	} else {
+		ui->btnSnapshot->setText("Snapshot");
 	}
 
-	auto it2 = std::find_if(win_types.begin(), win_types.end(),
-	[&](const std::pair<QString, FftWinType>& p) {
-		return p.second == sc->fftWindow();
-	});
+	if (id < num_adc_channels) {
+		channel_sptr sc = channels.at(id);
 
-	if (it2 != win_types.end()) {
-		ui->comboBox_window->setCurrentText((*it2).first);
+		QString style = QString("border: 2px solid %1").arg(cw->color().name());
+		ui->lineChannelSettingsTitle->setStyleSheet(style);
+		ui->channelSettingsTitle->setText(sc->name());
+
+		/* Might be disabled */
+		ui->comboBox_type->setEnabled(true);
+		ui->comboBox_window->setEnabled(true);
+		ui->spinBox_averaging->setEnabled(true);
+
+		auto it = std::find_if(avg_types.begin(), avg_types.end(),
+		[&](const std::pair<QString, FftDisplayPlot::AverageType>& p) {
+			return p.second == sc->averageType();
+		});
+
+		if (it != avg_types.end()) {
+			ui->comboBox_type->setCurrentText((*it).first);
+		}
+
+		auto it2 = std::find_if(win_types.begin(), win_types.end(),
+		[&](const std::pair<QString, FftWinType>& p) {
+			return p.second == sc->fftWindow();
+		});
+
+		if (it2 != win_types.end()) {
+			ui->comboBox_window->setCurrentText((*it2).first);
+		}
+
+		ui->spinBox_averaging->setValue(sc->averaging());
+	} else {
+		QString style = QString("border: 2px solid %1").arg(cw->color().name());
+		ui->lineChannelSettingsTitle->setStyleSheet(style);
+		ui->channelSettingsTitle->setText(cw->nameButton()->text());
+
+		ui->comboBox_type->setDisabled(true);
+		ui->comboBox_window->setDisabled(true);
+		ui->spinBox_averaging->setDisabled(true);
 	}
 
-	ui->spinBox_averaging->setValue(sc->averaging());
 }
 
 ChannelWidget * SpectrumAnalyzer::getChannelWidgetAt(unsigned int id)
@@ -844,6 +1110,19 @@ ChannelWidget * SpectrumAnalyzer::getChannelWidgetAt(unsigned int id)
 		if (channels.at(i).get()->widget()->id() == id)
 			return channels.at(i).get()->widget();
 	}
+
+	/* Also check if the id corresponds to one of the reference
+	 * channel widgets and get an iterator pointing to that widget */
+	auto cwIter = std::find_if(referenceChannels.begin(),
+			       referenceChannels.end(),
+			       [&id](ChannelWidget *referenceChannelWidget){
+		return referenceChannelWidget->id() == id;
+	});
+
+	if (cwIter != referenceChannels.end()) {
+		return *cwIter;
+	}
+
 	return nullptr;
 }
 
@@ -909,8 +1188,8 @@ void SpectrumAnalyzer::onChannelEnabled(bool en)
 		}
 	} else {
 		bool allDisabled = true;
-		for (int i = 0; i < channels.size(); i++) {
-			ChannelWidget *cw = channels[i]->widget();
+		for (int i = 0; i < channels.size() + nb_ref_channels; i++) {
+			ChannelWidget *cw = getChannelWidgetAt(i);
 
 			if (cw->enableButton()->isChecked()) {
 				cw->nameButton()->setChecked(true);
@@ -919,11 +1198,16 @@ void SpectrumAnalyzer::onChannelEnabled(bool en)
 			}
 		}
 		if (allDisabled) {
-			ui->btnMarkers->blockSignals(true);
+			QSignalBlocker(ui->btnMarkers);
+			if (!ui->btnSweep->isChecked()) {
+				QSignalBlocker(ui->btnSettings);
+				ui->btnSettings->setChecked(false);
+			}
 			ui->btnMarkers->setChecked(false);
 			ui->btnMarkers->setDisabled(true);
-			ui->btnMarkers->blockSignals(false);
-			marker_menu_opened = false;
+			menuButtonActions.removeAll(QPair<CustomPushButton*, bool>
+						    (ui->btnMarkers, false));
+			menuOrder.removeAll(ui->btnMarkers);
 		}
 		fft_plot->DetachCurve(cw->id());
 	}
