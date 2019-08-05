@@ -230,7 +230,7 @@ QVariantList SpectrumAnalyzer_API::getChannels()
 
 int SpectrumAnalyzer_API::currentChannel()
 {
-	return sp->crt_channel_id;
+	return (sp->crt_channel_id < 2 ? sp->crt_channel_id : 0);
 }
 
 void SpectrumAnalyzer_API::setCurrentChannel(int ch)
