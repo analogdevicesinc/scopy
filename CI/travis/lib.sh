@@ -12,13 +12,26 @@ fi
 
 export PYTHON3=python3
 
+version_gt() { test "$(echo "$@" | tr " " "\n" | sort -V | head -n 1)" != "$1"; }
+version_le() { test "$(echo "$@" | tr " " "\n" | sort -V | head -n 1)" == "$1"; }
+version_lt() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" != "$1"; }
+version_ge() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" == "$1"; }
+
 get_codename() {
-	lsb_release -a 2>/dev/null | grep Codename | cut -f2
+	lsb_release -c -s
+}
+
+get_dist_id() {
+	lsb_release -i -s
+}
+
+get_version() {
+	lsb_release -r -s
 }
 
 is_new_ubuntu() {
-	[ "$(uname -s)" == "Linux" ] || return 1
-	[ "$(get_codename)" == "bionic" ]
+	[ "$(get_dist_id)" == "Ubuntu" ] || return 1
+	version_ge "$(get_version)" "18.04"
 }
 
 TRAVIS_BUILD_DIR=${TRAVIS_BUILD_DIR:-'./'}
