@@ -30,8 +30,7 @@ FileManager::FileManager(QString toolName) :
         hasHeader(false),
         sampleRate(0),
 	nrOfSamples(0),
-        toolName(toolName),
-        additionalInformation("")
+	toolName(toolName)
 {
 
 }
@@ -113,6 +112,9 @@ void FileManager::open(QString fileName,
                                 format = SCOPY;
 
                                 //first column in data is the time!!! when retrieving channel data start from data[1]
+				for (int i = 1; i < raw_data[6].size(); ++i) {
+					additionalInformation.push_back(raw_data[6][i]);
+				}
 
                                 sampleRate = std::stod(raw_data[4][1].toStdString());
                                 //should be 0 if read from network/spectrum analyzer exported file
@@ -269,7 +271,7 @@ void FileManager::performWrite()
         exportStream << header[3] << separator << data.size() << "\n";
         exportStream << header[4] << separator << sampleRate << "\n";
         exportStream << header[5] << separator << toolName << "\n";
-        exportStream << header[6] << separator << additionalInformation << "\n";
+	exportStream << header[6] << separator << additionalInformation[0] << "\n";
 
         //column names row
         exportStream << "Sample" << separator;
@@ -297,7 +299,7 @@ void FileManager::performWrite()
         exportFile.close();
 }
 
-QString FileManager::getAdditionalInformation() const
+QStringList FileManager::getAdditionalInformation() const
 {
         return additionalInformation;
 }
@@ -305,7 +307,7 @@ QString FileManager::getAdditionalInformation() const
 void FileManager::setAdditionalInformation(const QString &value)
 {
 
-        additionalInformation = value;
+	additionalInformation.push_back(value);
 }
 
 FileManager::FileFormat FileManager::getFormat() const
