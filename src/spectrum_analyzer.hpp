@@ -134,7 +134,7 @@ private Q_SLOTS:
 	void onTopValueChanged(double);
 	void onRangeValueChanged(double);
 	void rightMenuFinished(bool opened);	
-	void on_btnExport_clicked();
+	void btnExportClicked();
 	void updateRunButton(bool);
 	void on_btnAddRef_toggled(bool checked);
 	void on_btnBrowseFile_clicked();
@@ -172,6 +172,7 @@ private:
 	unsigned int nb_ref_channels;
 	QVector<ChannelWidget *> referenceChannels;
 	unsigned int selected_ch_settings;
+	QVector<QStringList> importedChannelDetails;
 
 private:
 	Ui::SpectrumAnalyzer *ui;

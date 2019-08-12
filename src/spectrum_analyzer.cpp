@@ -416,6 +416,32 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 				yData.push_back(curve->data()->sample(i).y());
 			}
 
+			channel_sptr sc = channels.at(selected_ch_settings);
+
+			QStringList channelDetails;
+
+			auto iterAvg = std::find_if(avg_types.begin(), avg_types.end(),
+			[&](const std::pair<QString, FftDisplayPlot::AverageType>& p) {
+				return p.second == sc->averageType();
+			});
+
+			if (iterAvg != avg_types.end()) {
+				channelDetails.push_back((*iterAvg).first);
+			}
+
+			auto iterWin = std::find_if(win_types.begin(), win_types.end(),
+			[&](const std::pair<QString, FftWinType>& p) {
+				return p.second == sc->fftWindow();
+			});
+
+			if (iterWin != win_types.end()) {
+				channelDetails.push_back((*iterWin).first);
+			}
+
+			channelDetails.push_back(QString::number(sc->averaging()));
+
+			importedChannelDetails.push_back(channelDetails);
+
 			add_ref_waveform(xData, yData);
 
 		} else {
@@ -443,10 +469,40 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 				fm.save(mag_data, "REF" + QString::number(selected_ch_settings - num_adc_channels + 1)
 					+ "(" + unit + ")");
 
+				QString channelDetails;
+
+				auto iterAvg = std::find_if(avg_types.begin(), avg_types.end(),
+				[&](const std::pair<QString, FftDisplayPlot::AverageType>& p) {
+					return p.first == importedChannelDetails[selected_ch_settings - num_adc_channels][0];
+				});
+
+				if (iterAvg != avg_types.end()) {
+					channelDetails += (*iterAvg).first;
+					channelDetails += ",";
+				}
+
+				auto iterWin = std::find_if(win_types.begin(), win_types.end(),
+				[&](const std::pair<QString, FftWinType>& p) {
+					return p.first == importedChannelDetails[selected_ch_settings - num_adc_channels][1];
+				});
+
+				if (iterWin != win_types.end()) {
+					channelDetails += (*iterWin).first;
+					channelDetails += ",";
+				}
+
+				channelDetails += importedChannelDetails[selected_ch_settings - num_adc_channels][2];
+				channelDetails += ",";
+
+				fm.setAdditionalInformation(channelDetails);
+
 				fm.performWrite();
 			}
 		}
 	});
+
+	connect(ui->btnExport, &QPushButton::clicked,
+		this, &SpectrumAnalyzer::btnExportClicked);
 }
 
 SpectrumAnalyzer::~SpectrumAnalyzer()
@@ -491,7 +547,7 @@ void SpectrumAnalyzer::readPreferences() {
 	fft_plot->setVisiblePeakSearch(prefPanel->getSpectrum_visible_peak_search());
 }
 
-void SpectrumAnalyzer::on_btnExport_clicked()
+void SpectrumAnalyzer::btnExportClicked()
 {
 	auto export_dialog( new QFileDialog( this ) );
 	export_dialog->setWindowModality( Qt::WindowModal );
@@ -512,6 +568,8 @@ void SpectrumAnalyzer::on_btnExport_clicked()
 
 		fm.save(frequency_data, "Frequency(Hz)");
 
+		QString channelDetails = "";
+
 		for (int i = 0; i < channels.size(); ++i) {
 			QVector<double> data;
 			for (int j = 0; j < nr_samples; ++j) {
@@ -520,7 +578,37 @@ void SpectrumAnalyzer::on_btnExport_clicked()
 			QString unit = ui->lblMagUnit->text();
 			fm.save(data, "Amplitude CH" + QString::number(i + 1)
 				+ "(" + unit + ")");
+
+			/* Save information about the channels averaging type, window and
+			* averaging value */
+			channel_sptr sc = channels.at(i);
+
+			auto iterAvg = std::find_if(avg_types.begin(), avg_types.end(),
+			[&](const std::pair<QString, FftDisplayPlot::AverageType>& p) {
+				return p.second == sc->averageType();
+			});
+
+			if (iterAvg != avg_types.end()) {
+				channelDetails += (*iterAvg).first;
+				channelDetails += ",";
+			}
+
+			auto iterWin = std::find_if(win_types.begin(), win_types.end(),
+			[&](const std::pair<QString, FftWinType>& p) {
+				return p.second == sc->fftWindow();
+			});
+
+			if (iterWin != win_types.end()) {
+				channelDetails += (*iterWin).first;
+				channelDetails += ",";
+			}
+
+			channelDetails += QString::number(sc->averaging());
+			channelDetails += ",";
+
 		}
+
+		fm.setAdditionalInformation(channelDetails);
 
 		fm.performWrite();
 	}
@@ -677,6 +765,15 @@ void SpectrumAnalyzer::on_btnBrowseFile_clicked()
 		QVector<QVector<double>> data = fm.read();
 		for (int i = 0; i < data.size(); ++i) {
 			import_data.push_back(data[i]);
+		}
+
+		QStringList channelDetails = fm.getAdditionalInformation();
+		for (int i = 0; i < channelDetails.size() / 3; ++i) {
+			QStringList currentChannelDetails;
+			for (int j = 0; j < 3; ++j) {
+				currentChannelDetails.push_back(channelDetails[i * 3 + j]);
+			}
+			importedChannelDetails.push_back(currentChannelDetails);
 		}
 
 		ui->fileLineEdit->setText(fileName);
@@ -1096,6 +1193,10 @@ void SpectrumAnalyzer::updateChannelSettingsPanel(unsigned int id)
 		QString style = QString("border: 2px solid %1").arg(cw->color().name());
 		ui->lineChannelSettingsTitle->setStyleSheet(style);
 		ui->channelSettingsTitle->setText(cw->nameButton()->text());
+
+		ui->comboBox_type->setCurrentText(importedChannelDetails[id - num_adc_channels][0]);
+		ui->comboBox_window->setCurrentText(importedChannelDetails[id - num_adc_channels][1]);
+		ui->spinBox_averaging->setValue(importedChannelDetails[id - num_adc_channels][2].toInt());
 
 		ui->comboBox_type->setDisabled(true);
 		ui->comboBox_window->setDisabled(true);
