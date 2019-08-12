@@ -70,7 +70,7 @@ public:
 
         void performWrite();
 
-        QString getAdditionalInformation() const;
+	QStringList getAdditionalInformation() const;
         void setAdditionalInformation(const QString& value);
 
         FileFormat getFormat() const;
@@ -89,7 +89,7 @@ private:
         FileType fileType;
         QString separator;
         QString toolName;
-        QString additionalInformation;
+	QStringList additionalInformation;
 
 };
 
