@@ -1125,6 +1125,7 @@ void NetworkAnalyzer::goertzel()
 		size_t ret = iio_buffer_refill(adc_buffer);
 		if (m_stop) {
 			iio_buffer_destroy(adc_buffer);
+			adc_buffer = nullptr;
 			for (auto& buffer : buffers) {
 				iio_buffer_destroy(buffer);
 			}
@@ -1187,6 +1188,7 @@ void NetworkAnalyzer::goertzel()
 		}
 
 		iio_buffer_destroy(adc_buffer);
+		adc_buffer = nullptr;
 
 		// Process was cancelled
 		if (m_stop) {
