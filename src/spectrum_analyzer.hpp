@@ -212,6 +212,8 @@ private:
 
 	bool marker_menu_opened;
 
+	unsigned int ref_channel_counter;
+
 	static std::vector<std::pair<QString,
 	       FftDisplayPlot::MagnitudeType>> mag_types;
 	static std::vector<std::pair<QString,
