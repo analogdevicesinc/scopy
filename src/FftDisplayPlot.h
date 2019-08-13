@@ -145,6 +145,8 @@ namespace adiscope {
 		void detectMarkers();
 
 		void _editFirstPoint();
+		QColor getChannelColor();
+
 	private Q_SLOTS:
 		void onMrkCtrlMarkerSelected(std::shared_ptr<SpectrumMarker> &);
 		void onMrkCtrlMarkerPosChanged(std::shared_ptr<SpectrumMarker> &);
