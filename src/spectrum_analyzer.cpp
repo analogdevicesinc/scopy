@@ -1171,6 +1171,15 @@ void SpectrumAnalyzer::updateChannelSettingsPanel(unsigned int id)
 		ui->comboBox_window->setEnabled(true);
 		ui->spinBox_averaging->setEnabled(true);
 
+		/* Migh be hidden */
+		ui->comboBox_type->setVisible(true);
+		ui->comboBox_window->setVisible(true);
+		ui->spinBox_averaging->setVisible(true);
+
+		ui->label_type->setVisible(true);
+		ui->label_window->setVisible(true);
+		ui->label_averaging->setVisible(true);
+
 		auto it = std::find_if(avg_types.begin(), avg_types.end(),
 		[&](const std::pair<QString, FftDisplayPlot::AverageType>& p) {
 			return p.second == sc->averageType();
@@ -1195,13 +1204,25 @@ void SpectrumAnalyzer::updateChannelSettingsPanel(unsigned int id)
 		ui->lineChannelSettingsTitle->setStyleSheet(style);
 		ui->channelSettingsTitle->setText(cw->nameButton()->text());
 
-		ui->comboBox_type->setCurrentText(importedChannelDetails[id - num_adc_channels][0]);
-		ui->comboBox_window->setCurrentText(importedChannelDetails[id - num_adc_channels][1]);
-		ui->spinBox_averaging->setValue(importedChannelDetails[id - num_adc_channels][2].toInt());
 
-		ui->comboBox_type->setDisabled(true);
-		ui->comboBox_window->setDisabled(true);
-		ui->spinBox_averaging->setDisabled(true);
+		if ((id - num_adc_channels) < importedChannelDetails.size() &&
+				importedChannelDetails[id - num_adc_channels].size() == 3) {
+			ui->comboBox_type->setCurrentText(importedChannelDetails[id - num_adc_channels][0]);
+			ui->comboBox_window->setCurrentText(importedChannelDetails[id - num_adc_channels][1]);
+			ui->spinBox_averaging->setValue(importedChannelDetails[id - num_adc_channels][2].toInt());
+
+			ui->comboBox_type->setDisabled(true);
+			ui->comboBox_window->setDisabled(true);
+			ui->spinBox_averaging->setDisabled(true);
+		} else {
+			ui->comboBox_type->setVisible(false);
+			ui->comboBox_window->setVisible(false);
+			ui->spinBox_averaging->setVisible(false);
+
+			ui->label_type->setVisible(false);
+			ui->label_window->setVisible(false);
+			ui->label_averaging->setVisible(false);
+		}
 	}
 
 }
