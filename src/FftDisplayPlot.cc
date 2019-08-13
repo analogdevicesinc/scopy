@@ -212,9 +212,26 @@ void FftDisplayPlot::setNumPoints(uint64_t num_points)
 	d_numPoints = num_points;
 }
 
+QColor FftDisplayPlot::getChannelColor()
+{
+	for (QList<QColor>::const_iterator it = d_CurveColors.cbegin();
+			it != d_CurveColors.cend(); ++it) {
+		bool used = false;
+
+		for (std::vector<QwtPlotCurve *>::const_iterator it2 = d_plot_curve.cbegin();
+				!used && it2 != d_plot_curve.cend(); ++it2)
+			used = (*it2)->pen().color() == (*it);
+
+		if (!used)
+			return *it;
+	}
+
+	return Qt::black;
+}
+
 void FftDisplayPlot::registerReferenceWaveform(QString name, QVector<double> xData, QVector<double> yData)
 {
-	QColor color = d_CurveColors[d_nplots + n_ref_curves];
+	QColor color = getChannelColor();
 
 	QwtPlotCurve *curve = new QwtPlotCurve();
 	curve->setSamples(xData, yData);
