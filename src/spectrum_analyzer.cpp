@@ -1082,6 +1082,10 @@ void SpectrumAnalyzer::on_comboBox_type_currentIndexChanged(const QString& s)
 		return;
 	}
 
+	const bool visible = ((*it).second != FftDisplayPlot::AverageType::SAMPLE);
+	ui->spinBox_averaging->setVisible(visible);
+	ui->label_averaging->setVisible(visible);
+
 	int crt_channel = channelIdOfOpenedSettings();
 
 	if (crt_channel < 0) {
@@ -1184,6 +1188,10 @@ void SpectrumAnalyzer::updateChannelSettingsPanel(unsigned int id)
 		[&](const std::pair<QString, FftDisplayPlot::AverageType>& p) {
 			return p.second == sc->averageType();
 		});
+
+		const bool visible = (sc->averageType() != FftDisplayPlot::AverageType::SAMPLE);
+		ui->spinBox_averaging->setVisible(visible);
+		ui->label_averaging->setVisible(visible);
 
 		if (it != avg_types.end()) {
 			ui->comboBox_type->setCurrentText((*it).first);
