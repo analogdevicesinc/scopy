@@ -1213,7 +1213,9 @@ bool SignalGenerator::loadParametersFromFile(
 void SignalGenerator::reloadFileFromPath()
 {
 	auto ptr = getCurrentData();
-	loadFileFromPath(ptr->file);
+	if (!ptr->file.isEmpty()) {
+		loadFileFromPath(ptr->file);
+	}
 }
 
 void SignalGenerator::loadFileFromPath(QString filename){
