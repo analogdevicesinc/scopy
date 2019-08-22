@@ -122,9 +122,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	bin_sizes({
 	256, 512, 1024, 2048, 4096, 8192, 16384, 32768
 	}), nb_ref_channels(0),
-	selected_ch_settings(-1),
-	ref_channel_counter(0)
-
+	selected_ch_settings(-1)
 {
 
 	// Get the list of names of the available channels
@@ -803,6 +801,27 @@ void SpectrumAnalyzer::on_btnImport_clicked()
 	}
 }
 
+QString SpectrumAnalyzer::getReferenceChannelName() const
+{
+	int current = 1;
+	for (; current <= MAX_REF_CHANNELS; ++current) {
+		bool isOk = true;
+		for (const auto &ref_channel : referenceChannels) {
+			QString shortName = ref_channel->shortName();
+			int channel_counter = shortName.mid(shortName.size() - 1).toInt();
+			if (current == channel_counter) {
+				isOk = false;
+				break;
+			}
+		}
+		if (isOk) {
+			return QString("REF %1").arg(current);
+		}
+	}
+
+	return QString("REF %1").arg(current);
+}
+
 void SpectrumAnalyzer::add_ref_waveform(QVector<double> xData, QVector<double> yData)
 {
 	if (nb_ref_channels == MAX_REF_CHANNELS) {
@@ -811,7 +830,7 @@ void SpectrumAnalyzer::add_ref_waveform(QVector<double> xData, QVector<double> y
 
 	unsigned int curve_id = num_adc_channels + nb_ref_channels;
 
-	QString qname = QString("REF %1").arg(++ref_channel_counter);
+	QString qname = getReferenceChannelName();
 
 	fft_plot->registerReferenceWaveform(qname, xData, yData);
 
