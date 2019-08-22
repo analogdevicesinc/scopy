@@ -1009,6 +1009,11 @@ void adiscope::ToolLauncher::disconnect()
 	/* Switch back to home screen */
 	ui->btnHome->click();
 
+	QObject::disconnect(this, SIGNAL(calibrationFailed()),
+		this, SLOT(calibrationFailedCallback()));
+	QObject::disconnect(this, SIGNAL(calibrationDone()),
+		this, SLOT(restartToolsAfterCalibration()));
+
 	if (ctx) {
 		if (calibrating) {
 			calib->cancelCalibration();
@@ -1060,6 +1065,8 @@ void adiscope::ToolLauncher::connectBtn_clicked(bool pressed)
 
 	/* Disconnect connected device, if any */
 	if (ctx) {
+		QObject::disconnect(connectedDev->calibrateButton(),
+			   SIGNAL(clicked()),this, SLOT(requestCalibration()));
 		connectedDev->setConnected(false, false);
 		disconnect();
 		connectedDev->connectButton()->setToolTip(QString("Click to connect the device"));
