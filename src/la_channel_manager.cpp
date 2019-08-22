@@ -1925,6 +1925,7 @@ void LogicAnalyzerChannelManagerUI::setupChannel(LogicAnalyzerChannelGroup* ch,
 			la, SLOT(triggerChanged(int)));
 
 	}
+	lachannelgroupUI->ui->selectCheckBox->setChecked(ch->is_selected());
 	lachannelgroupUI->ui->btnEnableChannel->setChecked(ch->is_enabled());
 	lachannelgroupUI->enableControls(ch->is_enabled());
 	connect(lachannelgroupUI->ui->btnEnableChannel, SIGNAL(toggled(bool)),
