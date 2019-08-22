@@ -177,9 +177,9 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 	}, "Phase", 0, 360, true, true, this);
 
 	amplitude = new ScaleSpinButton({
-		{"μVolts",1e-6},
-		{"mVolts",1e-3},
-		{"Volts",1e0}
+		{"μVolts p-p",1e-6},
+		{"mVolts p-p",1e-3},
+		{"Volts p-p",1e0}
 	}, "Amplitude", 0.000001, 10, true, true, this);
 
 	offset = new PositionSpinButton({
