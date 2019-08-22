@@ -158,6 +158,7 @@ private:
 	void updateMrkFreqPosSpinBtnValue();
 	void add_ref_waveform(QVector<double> xData, QVector<double> yData);
 	void add_ref_waveform(unsigned int chIdx);
+	QString getReferenceChannelName() const;
 
 	QList<SpectrumChannel_API *> ch_api;
 	QList<SpectrumMarker_API *> marker_api;
@@ -211,8 +212,6 @@ private:
 	gr::top_block_sptr top_block;
 
 	bool marker_menu_opened;
-
-	unsigned int ref_channel_counter;
 
 	static std::vector<std::pair<QString,
 	       FftDisplayPlot::MagnitudeType>> mag_types;
