@@ -444,7 +444,6 @@ bool SpinBoxA::eventFilter(QObject *obj, QEvent *event)
 			}
 		} else if (event->type() == QEvent::FocusOut) {
 			setValue(m_value);
-
 		}
 	}
 
@@ -834,6 +833,14 @@ PhaseSpinButton::PhaseSpinButton(std::vector<std::pair<QString, double> > units,
 
 void PhaseSpinButton::setValue(double value)
 {
+	/* This method might be called when the PhaseSpinButton looses focus with
+	* value = m_value. In this case value would be the real value (m_value)
+	* not the one that is displayed. In this case we ignore the call and
+	* return immediately */
+	if (m_value == value && QObject::sender() == this) {
+		return;
+	}
+
 	bool emitValueChanged = false;
 
 	if (isZero(value, 1E-12)) {
