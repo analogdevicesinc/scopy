@@ -112,6 +112,7 @@ public:
 	void updateAreaTimeTrigger();
 
 	void setHWTrigger(int chid, std::string trigger_val);
+	void setHWTriggerMux(int chid, std::string mux_val);
 	std::string get_trigger_from_device(int chid);
 	void startTimeout();
 	void stopTimeout();
@@ -139,6 +140,7 @@ private Q_SLOTS:
 	void setupTriggerSettingsUI(bool enabled = false);
 	void cleanTrigger();
 	void setExternalTrigger(int);
+	void setExternalSource(int index);
 	void cursorValueChanged_1(int);
 	void cursorValueChanged_2(int);
 	void setCursorsActive(bool);
@@ -157,6 +159,7 @@ private Q_SLOTS:
 	void onTriggerModeChanged(bool);
 	void checkEnabledChannels();
 	void toolDetached(bool);
+	void toggleExternalTriggerConditionsWidget(int index);
 public Q_SLOTS:
 	void startStop(bool start);
 	void run() override;
@@ -190,6 +193,7 @@ private:
 	double trigger_offset;
 
 	static std::vector<std::string> trigger_mapping;
+	static std::vector<std::pair<std::string,std::string>> externalTriggerSourceMap;
 	std::vector<std::string> trigger_cache;
 
 	ScaleSpinButton *timeBase;
