@@ -36,6 +36,31 @@ public:
 		N_DIGITAL_AND_ANALOG = 7,
 		N_DIGITAL_XOR_ANALOG = 8,
 	};
+	/*enum mode {
+			ALWAYS = 0,
+			ANALOG = 1,
+			DIGITAL = 2,
+			DIGITAL_OR_ANALOG = 3,
+			DIGITAL_AND_ANALOG = 4,
+			DIGITAL_XOR_ANALOG = 5,
+			TRIGGER_IN = 6,
+			ANALOG_OR_TRIGGER_IN = 7,
+			DIGITAL_OR_TRIGGER_IN = 8,
+			DIGITAL_OR_ANALOG_OR_TRIGGER_IN = 9,
+		};*/
+
+	enum direction {
+		TRIGGER_IN = 0,
+		TRIGGER_OUT = 1,
+	};
+
+	enum out_select {
+		sw_trigger = 0,
+		trigger_i_same_channel = 1,
+		trigger_i_swap_channel = 2,
+		trigger_adc = 3,
+		trigger_in = 4,
+	};
 
 	struct Settings {
 		QList<condition> analog_condition;
@@ -76,6 +101,9 @@ public:
 	int sourceChannel() const;
 	void setSourceChannel(uint chnIdx);
 
+	bool triggerIn() const;
+	void setTriggerIn(bool bo);
+
 	int delay() const;
 	void setDelay(int delay);
 
@@ -85,6 +113,13 @@ public:
 	void setStreamingFlag(bool);
 	bool getStreamingFlag();
 
+	bool hasExternalTriggerIn();
+	bool hasExternalTriggerOut();
+	bool hasCrossInstrumentTrigger();
+	void setExternalDirection(uint chnIdx, direction dir);
+	void setExternalOutSelect(uint chnIdx, out_select out);
+
+
 private:
 	struct iio_device *m_trigger_device;
 	QList<struct iio_channel *> m_analog_channels;
@@ -92,11 +127,14 @@ private:
 	QList<struct iio_channel *> m_logic_channels;
 	struct iio_channel *m_delay_trigger;
 	bool m_streaming_flag;
+	bool m_trigger_in;
 
 	uint m_num_channels;
 
 	static QVector<QString> lut_analog_trigg_cond;
 	static QVector<QString> lut_digital_trigg_cond;
+	static QVector<QString> lut_digital_out_direction;
+	static QVector<QString> lut_digital_out_select;
 	static QVector<QString> lut_trigg_mode;
 	static QVector<QString> lut_trigg_source;
 };

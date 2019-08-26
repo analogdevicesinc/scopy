@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>277</width>
-    <height>491</height>
+    <width>306</width>
+    <height>810</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -114,8 +114,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>251</width>
-        <height>637</height>
+        <width>266</width>
+        <height>828</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -519,7 +519,7 @@ color: rgba(255,255,255,51);
         }</string>
              </property>
              <property name="text">
-              <string>EXTERNAL (DIGITAL) </string>
+              <string>DIGITAL</string>
              </property>
             </widget>
            </item>
@@ -576,6 +576,19 @@ color: rgba(255,255,255,51);
              <number>0</number>
             </property>
             <item>
+             <widget class="QLabel" name="label_6">
+              <property name="styleSheet">
+               <string notr="true">font-size: 13px;</string>
+              </property>
+              <property name="text">
+               <string>Source</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="cmb_extern_src"/>
+            </item>
+            <item>
              <widget class="QLabel" name="lbl_extern_condition">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -629,35 +642,189 @@ color: rgba(255,255,255,51);
               </item>
              </widget>
             </item>
+            <item>
+             <widget class="QLabel" name="label_7">
+              <property name="text">
+               <string>Daisychain order</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="spin_daisyChain"/>
+            </item>
            </layout>
           </widget>
          </item>
         </layout>
        </item>
        <item>
-        <layout class="QVBoxLayout" name="verticalLayout_7">
-         <property name="spacing">
-          <number>15</number>
+        <widget class="QWidget" name="trigger_logic_controls" native="true">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
          </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_7">
+          <property name="spacing">
+           <number>15</number>
+          </property>
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_6">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="label_4">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QLabel {
+                font-size: 12px;
+                color: rgba(255, 255, 255, 70);
+        }</string>
+              </property>
+              <property name="text">
+               <string>TRIGGER LOGIC </string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="Line" name="line_3">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>1</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>1</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
+              </property>
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QVBoxLayout" name="verticalLayout_5">
+            <property name="spacing">
+             <number>5</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="lbl_analog_extern">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">font-size: 13px;</string>
+              </property>
+              <property name="text">
+               <string>Analog - Digital</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="cmb_analog_extern">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="currentIndex">
+               <number>0</number>
+              </property>
+              <item>
+               <property name="text">
+                <string>Digital OR Analog</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Digital AND Analog</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Digital XOR Analog</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>!Digital OR Analog</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>!Digital AND Analog</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>!Digital XOR Analog</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_10">
          <property name="topMargin">
           <number>0</number>
          </property>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_6">
+          <layout class="QHBoxLayout" name="horizontalLayout_2">
            <property name="spacing">
-            <number>0</number>
+            <number>5</number>
            </property>
-           <property name="topMargin">
+           <property name="bottomMargin">
             <number>0</number>
            </property>
            <item>
-            <widget class="QLabel" name="label_4">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
+            <widget class="QLabel" name="label_5">
              <property name="styleSheet">
               <string notr="true">QLabel {
                 font-size: 12px;
@@ -665,12 +832,12 @@ color: rgba(255,255,255,51);
         }</string>
              </property>
              <property name="text">
-              <string>TRIGGER LOGIC </string>
+              <string>EXTERNAL TRIGGER OUT</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="Line" name="line_3">
+            <widget class="Line" name="line_4">
              <property name="minimumSize">
               <size>
                <width>0</width>
@@ -686,6 +853,9 @@ color: rgba(255,255,255,51);
              <property name="styleSheet">
               <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
              </property>
+             <property name="frameShadow">
+              <enum>QFrame::Sunken</enum>
+             </property>
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
              </property>
@@ -694,73 +864,45 @@ color: rgba(255,255,255,51);
           </layout>
          </item>
          <item>
-          <layout class="QVBoxLayout" name="verticalLayout_5">
-           <property name="spacing">
-            <number>5</number>
+          <widget class="adiscope::CustomSwitch" name="extern_to_en">
+           <property name="text">
+            <string/>
            </property>
-           <property name="topMargin">
-            <number>0</number>
+          </widget>
+         </item>
+         <item>
+          <widget class="QWidget" name="external_to_controls" native="true">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
            </property>
-           <item>
-            <widget class="QLabel" name="lbl_analog_extern">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="styleSheet">
-              <string notr="true">font-size: 13px;</string>
-             </property>
-             <property name="text">
-              <string>Analog - Digital</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QComboBox" name="cmb_analog_extern">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="currentIndex">
-              <number>0</number>
-             </property>
-             <item>
-              <property name="text">
-               <string>Digital OR Analog</string>
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QComboBox" name="cmb_extern_to_src">
+              <property name="enabled">
+               <bool>false</bool>
               </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Digital AND Analog</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Digital XOR Analog</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>!Digital OR Analog</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>!Digital AND Analog</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>!Digital XOR Analog</string>
-              </property>
-             </item>
-            </widget>
-           </item>
-          </layout>
+             </widget>
+            </item>
+           </layout>
+          </widget>
          </item>
         </layout>
        </item>
@@ -780,6 +922,8 @@ color: rgba(255,255,255,51);
       </layout>
       <zorder></zorder>
       <zorder>verticalSpacer_3</zorder>
+      <zorder></zorder>
+      <zorder>trigger_logic_controls</zorder>
      </widget>
     </widget>
    </item>
