@@ -22,6 +22,8 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <vector>
+#include <string>
+#include <map>
 #include <iio.h>
 
 /* Qt includes */
@@ -92,6 +94,10 @@ std::vector<std::string> LogicAnalyzer::trigger_mapping = {
 		"level-low",
 		"level-high",
 };
+
+std::vector<std::pair<std::string,std::string>> LogicAnalyzer::externalTriggerSourceMap = { {"External Trigger In", "trigger-logic"},
+									      {"Oscilloscope", "trigger-in"}
+									    };
 
 LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
                              Filter *filt,
@@ -311,20 +317,21 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	trigger_settings_ui->setupUi(trigger_settings);
 	ui->triggerSettingsLayout->insertWidget(0, trigger_settings);
 	setupTriggerSettingsUI();
-	QAbstractItemView *trigVw = trigger_settings_ui->cmb_trigg_extern_cond_1->view();
-	QListView* listVw = qobject_cast<QListView*>(trigVw);
-	listVw->setSpacing(2);
-	trigVw = trigger_settings_ui->cmb_trigg_extern_cond_2->view();
-	listVw = qobject_cast<QListView*>(trigVw);
-	listVw->setSpacing(2);
+
+	trigger_settings_ui->extern_to->setVisible(false);
 
 	/* Cursor Settings */
 	connect(trigger_settings_ui->cmb_trigg_extern_cond_1,
 		SIGNAL(currentIndexChanged(int)),
 		this, SLOT(setExternalTrigger(int)));
-	connect(trigger_settings_ui->cmb_trigg_extern_cond_2,
+
+	for(auto val : externalTriggerSourceMap) {
+		trigger_settings_ui->cmb_extern_src->addItem(QString::fromStdString(val.first));
+	}
+	connect(trigger_settings_ui->cmb_extern_src,
 		SIGNAL(currentIndexChanged(int)),
-		this, SLOT(setExternalTrigger(int)));
+		this, SLOT(setExternalSource(int)));
+
 	connect(trigger_settings_ui->trigg_extern_en, SIGNAL(toggled(bool)),
 		this, SLOT(setupTriggerSettingsUI(bool)));
 	connect(trigger_settings_ui->cmb_trigg_logic, SIGNAL(currentTextChanged(const QString)),
@@ -1512,6 +1519,19 @@ void LogicAnalyzer::setHWTrigger(int chid, std::string trigger_val)
 	iio_channel_attr_write(triggerch, "trigger", trigger_val.c_str());
 }
 
+void LogicAnalyzer::setHWTriggerMux(int chid, std::string mux_val)
+{
+	if(!dev)
+		return;
+	std::string name = "voltage" + to_string(chid);
+	struct iio_channel *triggerch = iio_device_find_channel(dev, name.c_str(), false);
+
+	if( !triggerch )
+		return;
+
+	iio_channel_attr_write(triggerch, "trigger_mux_out", mux_val.c_str());
+}
+
 std::string LogicAnalyzer::get_trigger_from_device(int chid)
 {
 	if(!dev)
@@ -1693,16 +1713,16 @@ void LogicAnalyzer::updateBufferPreviewer()
 
 void LogicAnalyzer::setupTriggerSettingsUI(bool enabled)
 {
+	trigger_settings_ui->cmb_extern_src->setEnabled(enabled);
 	trigger_settings_ui->cmb_trigg_extern_cond_1->setEnabled(enabled);
-	trigger_settings_ui->cmb_trigg_extern_cond_2->setEnabled(enabled);
+
 	if( !enabled ) {
 		trigger_settings_ui->cmb_trigg_extern_cond_1->setCurrentIndex(0);
-		trigger_settings_ui->cmb_trigg_extern_cond_2->setCurrentIndex(0);
 		setHWTrigger(16, trigger_mapping[0]);
-		setHWTrigger(17, trigger_mapping[0]);
 	}
-	else {
+	else {		
 		cleanTrigger();
+		setExternalSource(trigger_settings_ui->cmb_extern_src->currentIndex());
 	}
 }
 
@@ -1754,16 +1774,32 @@ void LogicAnalyzer::setTriggerCache(int chid, const std::string &trigger_value)
 void LogicAnalyzer::setExternalTrigger(int index)
 {
 	int ext_1 = trigger_settings_ui->cmb_trigg_extern_cond_1->currentIndex();
-	int ext_2 = trigger_settings_ui->cmb_trigg_extern_cond_2->currentIndex();
+	//int ext_2 = trigger_settings_ui->cmb_trigg_extern_cond_2->currentIndex();
 	std::string trigger_val;
 	if( ext_1 == index ) {
 		trigger_val = trigger_mapping[ext_1];
 		setHWTrigger(16, trigger_val);
 	}
-	if( ext_2 == index ) {
+	/*if( ext_2 == index ) {
 		trigger_val = trigger_mapping[ext_2];
 		setHWTrigger(17, trigger_val);
+	}*/
+}
+
+void LogicAnalyzer::toggleExternalTriggerConditionsWidget(int index)
+{
+	// enable trigger conditions when receiving triggers external pin
+	if(externalTriggerSourceMap[index].second == "trigger-logic") {
+		trigger_settings_ui->cmb_trigg_extern_cond_1->setEnabled(true);
+	} else	{
+		trigger_settings_ui->cmb_trigg_extern_cond_1->setEnabled(false);
 	}
+}
+
+void LogicAnalyzer::setExternalSource(int index)
+{
+	setHWTriggerMux(16,externalTriggerSourceMap[index].second);
+	toggleExternalTriggerConditionsWidget(index);
 }
 
 void LogicAnalyzer::triggerChanged(int index)

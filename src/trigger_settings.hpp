@@ -23,7 +23,10 @@
 #include "hardware_trigger.hpp"
 
 #include <QWidget>
+#include <QButtonGroup>
 #include <string>
+#include <vector>
+#include <map>
 #include <memory>
 
 extern "C" {
@@ -63,6 +66,7 @@ namespace adiscope {
 		int currentChannel() const;
 		bool analogEnabled() const;
 		bool digitalEnabled() const;
+		bool externalOutEnabled() const;
 		double level() const;
 		double dcLevel() const;
 		double hysteresis() const;
@@ -82,6 +86,7 @@ namespace adiscope {
 
 	public Q_SLOTS:
 		void setTriggerDelay(long long);
+		void setDaisyChainCompensation();
 		void setTriggerLevel(double);
 		void setTriggerHysteresis(double);
 		void setTriggerLevelRange(int chn,
@@ -105,10 +110,16 @@ namespace adiscope {
 		void on_intern_en_toggled(bool);
 		void on_cmb_source_currentIndexChanged(int);
 		void on_extern_en_toggled(bool);
+		void on_extern_to_en_toggled(bool);
 		void on_cmb_analog_extern_currentIndexChanged(int);
+		void on_cmb_extern_to_src_currentIndexChanged(int);
 		void on_btnAuto_toggled(bool);
 
+		void on_cmb_extern_src_currentIndexChanged(int idx);
+		void on_spin_daisyChain_valueChanged(int arg1);
+
 	private:
+		void setupExternalTriggerDirection();
 		void delay_hw_write(long long delay);
 		void level_hw_write(double level);
 		void hysteresis_hw_write(double level);
@@ -123,6 +134,7 @@ namespace adiscope {
 		void trigg_level_write_hardware(int chn, double value);
 		HardwareTrigger::mode determineTriggerMode(bool intern_checked,
 			bool extern_checked) const;
+		void enableExternalTriggerOut(bool);
 
 	private:
 		struct trigg_channel_config;
@@ -130,6 +142,9 @@ namespace adiscope {
 		Ui::TriggerSettings *ui;
 		std::shared_ptr<GenericAdc> adc;
 		std::shared_ptr<HardwareTrigger> trigger;
+
+		static const std::vector<std::pair<std::string, HardwareTrigger::out_select>> externalTriggerOutMapping;
+
 		QList<trigg_channel_config> trigg_configs;
 		PositionSpinButton *trigger_level;
 		PositionSpinButton *trigger_hysteresis;
@@ -137,6 +152,7 @@ namespace adiscope {
 		bool temporarily_disabled;
 		bool trigger_auto_mode;
 		long long trigger_raw_delay;
+		long long daisyChainCompensation;
 		bool adc_running;
 		bool m_ac_coupled;
 		double m_displayScale;
