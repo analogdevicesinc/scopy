@@ -164,6 +164,44 @@ void Oscilloscope_API::setExternalTrigger(bool en)
 	osc->trigger_settings.ui->extern_en->setChecked(en);
 }
 
+
+int Oscilloscope_API::externalTriggerSource() const
+{
+	return osc->trigger_settings.ui->cmb_extern_src->currentIndex();
+}
+void Oscilloscope_API::setExternalTriggerSource(int src)
+{
+	osc->trigger_settings.ui->cmb_extern_src->setCurrentIndex(src);
+}
+
+int Oscilloscope_API::externalTriggerDaisyOrder() const
+{
+	return osc->trigger_settings.ui->spin_daisyChain->value();
+}
+
+void Oscilloscope_API::setExternalTriggerDaisyOrder(int src)
+{
+	osc->trigger_settings.ui->spin_daisyChain->setValue(src);
+}
+
+bool Oscilloscope_API::externalTriggerOut() const
+{
+	return osc->trigger_settings.ui->extern_to_en->isChecked();
+}
+void Oscilloscope_API::setExternalTriggerOut(bool en)
+{
+	osc->trigger_settings.ui->extern_to_en->setChecked(en);
+}
+
+int Oscilloscope_API::externalTriggerOutSource() const
+{
+	return osc->trigger_settings.ui->cmb_extern_to_src->currentIndex();
+}
+void Oscilloscope_API::setExternalTriggerOutSource(int src)
+{
+	osc->trigger_settings.ui->cmb_extern_to_src->setCurrentIndex(src);
+}
+
 int Oscilloscope_API::triggerSource() const
 {
 	return osc->trigger_settings.ui->cmb_source->currentIndex();

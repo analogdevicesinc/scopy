@@ -17,6 +17,8 @@ class LogicAnalyzer_API : public ApiObject
 	Q_PROPERTY(double time_base READ getTimeBase WRITE setTimeBase)
 	Q_PROPERTY(QString run_mode READ runMode WRITE setRunMode)
 	Q_PROPERTY(bool external_trigger READ externalTrigger WRITE setExternalTrigger)
+	Q_PROPERTY(int external_trigger_source READ externalTriggerSource WRITE setExternalTriggerSource)
+	Q_PROPERTY(int external_trigger_cnd READ externalTriggerCnd WRITE setExternalTriggerCnd)
 	Q_PROPERTY(bool cursors_active READ cursorsActive WRITE setCursorsActive)
 	Q_PROPERTY(bool cursors_locked READ cursorsLocked WRITE setCursorsLocked)
 	Q_PROPERTY(bool inactive_hidden READ inactiveHidden WRITE setInactiveHidden)
@@ -52,6 +54,12 @@ public:
 
 	bool externalTrigger() const;
 	void setExternalTrigger(bool val);
+
+	int externalTriggerSource() const;
+	void setExternalTriggerSource(int val);
+
+	int externalTriggerCnd() const;
+	void setExternalTriggerCnd(int val);
 
 	bool cursorsActive() const;
 	void setCursorsActive(bool en);

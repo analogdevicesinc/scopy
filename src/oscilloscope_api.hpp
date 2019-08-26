@@ -55,6 +55,15 @@ class Oscilloscope_API : public ApiObject
 			READ internalTrigger WRITE setInternalTrigger)
 	Q_PROPERTY(bool external_trigger
 			READ externalTrigger WRITE setExternalTrigger)
+	Q_PROPERTY(int external_trigger_source
+			READ externalTriggerSource WRITE setExternalTriggerSource)
+	Q_PROPERTY(int external_trigger_daisy_order
+			READ externalTriggerDaisyOrder WRITE setExternalTriggerDaisyOrder)
+	Q_PROPERTY(bool external_trigger_out
+		   READ externalTriggerOut WRITE setExternalTriggerOut)
+	Q_PROPERTY(int external_trigger_out_source
+		   READ externalTriggerOutSource WRITE setExternalTriggerOutSource)
+
 	Q_PROPERTY(int trigger_source
 			READ triggerSource WRITE setTriggerSource)
 	Q_PROPERTY(double trigger_level
@@ -156,6 +165,18 @@ public:
 
 	bool externalTrigger() const;
 	void setExternalTrigger(bool en);
+
+	int externalTriggerSource() const;
+	void setExternalTriggerSource(int src);
+
+	int externalTriggerDaisyOrder() const;
+	void setExternalTriggerDaisyOrder(int src);
+
+	bool externalTriggerOut() const;
+	void setExternalTriggerOut(bool en);
+
+	int externalTriggerOutSource() const;
+	void setExternalTriggerOutSource(int src);
 
 	int triggerSource() const;
 	void setTriggerSource(int idx);
