@@ -102,6 +102,28 @@ void LogicAnalyzer_API::setExternalTrigger(bool en)
 	lga->trigger_settings_ui->trigg_extern_en->setChecked(en);
 }
 
+
+int LogicAnalyzer_API::externalTriggerSource() const
+{
+	return lga->trigger_settings_ui->cmb_extern_src->currentIndex();
+}
+
+void LogicAnalyzer_API::setExternalTriggerSource(int en)
+{
+	lga->trigger_settings_ui->cmb_extern_src->setCurrentIndex(en);
+}
+
+
+int LogicAnalyzer_API::externalTriggerCnd() const
+{
+	return lga->trigger_settings_ui->cmb_trigg_extern_cond_1->currentIndex();
+}
+
+void LogicAnalyzer_API::setExternalTriggerCnd(int en)
+{
+	lga->trigger_settings_ui->cmb_trigg_extern_cond_1->setCurrentIndex(en);
+}
+
 bool LogicAnalyzer_API::cursorsActive() const
 {
 	return lga->ui->boxCursors->isChecked();
