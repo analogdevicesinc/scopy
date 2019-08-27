@@ -131,7 +131,7 @@ TriggerSettings::TriggerSettings(std::shared_ptr<GenericAdc> adc,
 		ui->cmb_extern_src->addItem("Logic Analyzer");
 
 	if(trigger->hasExternalTriggerOut()){
-		for(auto val : externalTriggerOutMapping)
+		for(const auto &val : externalTriggerOutMapping)
 		{
 			ui->cmb_extern_to_src->addItem(QString::fromStdString(val.first));
 			connect(ui->extern_to_en,SIGNAL(toggled(bool)),ui->cmb_extern_to_src,SLOT(setEnabled(bool)));
