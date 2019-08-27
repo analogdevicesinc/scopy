@@ -113,9 +113,9 @@ public:
 	void setStreamingFlag(bool);
 	bool getStreamingFlag();
 
-	bool hasExternalTriggerIn();
-	bool hasExternalTriggerOut();
-	bool hasCrossInstrumentTrigger();
+	bool hasExternalTriggerIn() const;
+	bool hasExternalTriggerOut() const;
+	bool hasCrossInstrumentTrigger() const;
 	void setExternalDirection(uint chnIdx, direction dir);
 	void setExternalOutSelect(uint chnIdx, out_select out);
 

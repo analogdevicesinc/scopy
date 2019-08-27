@@ -203,22 +203,18 @@ HardwareTrigger::condition HardwareTrigger::digitalCondition(uint chnIdx)
 	return static_cast<condition>(it - lut_digital_trigg_cond.begin());
 }
 
-
-
-bool HardwareTrigger::hasExternalTriggerOut()
+bool HardwareTrigger::hasExternalTriggerOut() const
 {
 	auto ret = iio_channel_find_attr(m_logic_channels[1], "out_select");
-
 	return (ret==NULL) ? false : true;
-
-
 }
-bool HardwareTrigger::hasExternalTriggerIn()
+
+bool HardwareTrigger::hasExternalTriggerIn() const
 {
 	return true;
 }
 
-bool HardwareTrigger::hasCrossInstrumentTrigger()
+bool HardwareTrigger::hasCrossInstrumentTrigger() const
 {
 	auto ret = iio_channel_find_attr(m_logic_channels[1], "logic_mode");
 	return true;
@@ -363,8 +359,8 @@ void HardwareTrigger::setSource(const QString& source)
 bool HardwareTrigger::triggerIn() const
 {
 	return m_trigger_in;
-
 }
+
 void HardwareTrigger::setTriggerIn(bool bo)
 {
 	m_trigger_in = bo;
