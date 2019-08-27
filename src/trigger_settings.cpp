@@ -254,11 +254,6 @@ void TriggerSettings::setTriggerHysteresis(double hyst)
 		trigg_configs[current_channel].hyst_val = hyst;
 	}
 }
-/*
-void TriggerSettings::on_cmb_extern_src_currentIndexChanged(int index)
-{
-
-}*/
 
 void TriggerSettings::on_cmb_source_currentIndexChanged(int index)
 {
@@ -357,8 +352,6 @@ HardwareTrigger::mode TriggerSettings::determineTriggerMode(bool intern_checked,
 
 	return mode;
 }
-
-
 
 void TriggerSettings::enableExternalTriggerOut(bool enabled)
 {
