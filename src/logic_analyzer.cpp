@@ -1720,7 +1720,7 @@ void LogicAnalyzer::setupTriggerSettingsUI(bool enabled)
 		trigger_settings_ui->cmb_trigg_extern_cond_1->setCurrentIndex(0);
 		setHWTrigger(16, trigger_mapping[0]);
 	}
-	else {		
+	else {
 		cleanTrigger();
 		setExternalSource(trigger_settings_ui->cmb_extern_src->currentIndex());
 	}

@@ -23,7 +23,6 @@
 #include "hardware_trigger.hpp"
 
 #include <QWidget>
-#include <QButtonGroup>
 #include <string>
 #include <vector>
 #include <map>
