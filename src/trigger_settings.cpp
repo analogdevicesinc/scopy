@@ -99,7 +99,7 @@ TriggerSettings::TriggerSettings(std::shared_ptr<GenericAdc> adc,
 		setTriggerLevelRange(current_channel, adc_range);
 		setTriggerHystRange(current_channel, hyst_range);
 		if(trigger->hasExternalTriggerIn())
-			trigger->setExternalDirection(0,HardwareTrigger::direction::TRIGGER_IN);
+			trigger->setExternalDirection(0,HardwareTrigger::direction::TRIGGER_INPUT);
 		if(trigger->hasExternalTriggerOut())
 			trigger->setExternalDirection(1,HardwareTrigger::direction::TRIGGER_OUT);
 	}
@@ -541,7 +541,7 @@ void TriggerSettings::write_ui_settings_to_hawrdware()
 void TriggerSettings::setupExternalTriggerDirection()
 {
 	try {
-		trigger->setExternalDirection(0,HardwareTrigger::direction::TRIGGER_IN);
+		trigger->setExternalDirection(0,HardwareTrigger::direction::TRIGGER_INPUT);
 		trigger->setExternalDirection(1,HardwareTrigger::direction::TRIGGER_OUT);
 	}
 	catch (std::exception& e) {
