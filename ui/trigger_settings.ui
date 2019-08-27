@@ -113,7 +113,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>0</y>
+        <y>-62</y>
         <width>266</width>
         <height>828</height>
        </rect>
@@ -645,7 +645,7 @@ color: rgba(255,255,255,51);
             <item>
              <widget class="QLabel" name="label_7">
               <property name="text">
-               <string>Daisychain order</string>
+               <string>M2K daisychain position</string>
               </property>
              </widget>
             </item>
