@@ -217,7 +217,7 @@ bool HardwareTrigger::hasExternalTriggerIn() const
 bool HardwareTrigger::hasCrossInstrumentTrigger() const
 {
 	auto ret = iio_channel_find_attr(m_logic_channels[1], "logic_mode");
-	return true;
+	return ret;
 }
 
 void HardwareTrigger::setExternalDirection(uint chnIdx, direction dir)
