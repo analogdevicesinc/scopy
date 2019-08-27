@@ -139,8 +139,8 @@ TriggerSettings::TriggerSettings(std::shared_ptr<GenericAdc> adc,
 	}
 	else
 	{
-		ui->cmb_extern_src->addItem("None");
-		ui->cmb_extern_src->setEnabled(false);
+		ui->cmb_extern_to_src->addItem("None");
+		ui->cmb_extern_to_src->setEnabled(false);
 		ui->extern_to_en->setEnabled(false);
 	}
 
