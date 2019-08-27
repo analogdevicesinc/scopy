@@ -325,7 +325,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 		SIGNAL(currentIndexChanged(int)),
 		this, SLOT(setExternalTrigger(int)));
 
-	for(auto val : externalTriggerSourceMap) {
+	for(const auto &val : externalTriggerSourceMap) {
 		trigger_settings_ui->cmb_extern_src->addItem(QString::fromStdString(val.first));
 	}
 	connect(trigger_settings_ui->cmb_extern_src,
