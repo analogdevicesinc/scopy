@@ -26,17 +26,6 @@ public:
 	};
 
 	enum mode {
-		ALWAYS = 0,
-		ANALOG = 1,
-		DIGITAL = 2,
-		DIGITAL_OR_ANALOG = 3,
-		DIGITAL_AND_ANALOG = 4,
-		DIGITAL_XOR_ANALOG = 5,
-		N_DIGITAL_OR_ANALOG = 6,
-		N_DIGITAL_AND_ANALOG = 7,
-		N_DIGITAL_XOR_ANALOG = 8,
-	};
-	/*enum mode {
 			ALWAYS = 0,
 			ANALOG = 1,
 			DIGITAL = 2,
@@ -47,10 +36,10 @@ public:
 			ANALOG_OR_TRIGGER_IN = 7,
 			DIGITAL_OR_TRIGGER_IN = 8,
 			DIGITAL_OR_ANALOG_OR_TRIGGER_IN = 9,
-		};*/
+	};
 
 	enum direction {
-		TRIGGER_IN = 0,
+		TRIGGER_INPUT = 0,
 		TRIGGER_OUT = 1,
 	};
 
