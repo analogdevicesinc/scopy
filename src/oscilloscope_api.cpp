@@ -199,7 +199,8 @@ int Oscilloscope_API::externalTriggerOutSource() const
 }
 void Oscilloscope_API::setExternalTriggerOutSource(int src)
 {
-	osc->trigger_settings.ui->cmb_extern_to_src->setCurrentIndex(src);
+	if(src > 0)
+		osc->trigger_settings.ui->cmb_extern_to_src->setCurrentIndex(src);
 }
 
 int Oscilloscope_API::triggerSource() const
@@ -209,7 +210,8 @@ int Oscilloscope_API::triggerSource() const
 
 void Oscilloscope_API::setTriggerSource(int idx)
 {
-	osc->trigger_settings.ui->cmb_source->setCurrentIndex(idx);
+	if(idx > 0)
+		osc->trigger_settings.ui->cmb_source->setCurrentIndex(idx);
 }
 
 double Oscilloscope_API::getTriggerLevel() const
