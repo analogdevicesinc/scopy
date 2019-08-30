@@ -125,6 +125,9 @@ TriggerSettings::TriggerSettings(std::shared_ptr<GenericAdc> adc,
 	ui->cmb_analog_extern->setCurrentIndex(0);
 	on_cmb_analog_extern_currentIndexChanged(0);
 
+	ui->label_daisyChain->setVisible(false);
+	ui->spin_daisyChain->setVisible(false);
+
 	if(trigger->hasExternalTriggerIn())
 		ui->cmb_extern_src->addItem("External Trigger In");
 	if(trigger->hasCrossInstrumentTrigger())
