@@ -216,12 +216,13 @@ bool HardwareTrigger::hasExternalTriggerIn() const
 
 bool HardwareTrigger::hasCrossInstrumentTrigger() const
 {
-	auto ret = iio_channel_find_attr(m_logic_channels[1], "logic_mode");
-	return ret;
+	auto ret = iio_channel_find_attr(m_logic_channels[1], "out_select");
+	return (ret==NULL) ? false : true;
 }
 
 void HardwareTrigger::setExternalDirection(uint chnIdx, direction dir)
 {
+	if(hasExternalTriggerOut()) {
 	if (chnIdx >= numChannels()) {
 		throw std::invalid_argument("Channel index is out of range");
 	}
@@ -229,6 +230,7 @@ void HardwareTrigger::setExternalDirection(uint chnIdx, direction dir)
 	QByteArray byteArray =  lut_digital_out_direction[dir].toLatin1();
 	iio_channel_attr_write(m_logic_channels[chnIdx], "out_direction",
 		byteArray.data());
+	}
 }
 
 void HardwareTrigger::setExternalOutSelect(uint chnIdx, out_select out)
