@@ -233,6 +233,7 @@ void HardwareTrigger::setExternalDirection(uint chnIdx, direction dir)
 
 void HardwareTrigger::setExternalOutSelect(uint chnIdx, out_select out)
 {
+	if(hasExternalTriggerOut()) {
 	if (chnIdx >= numChannels()) {
 		throw std::invalid_argument("Channel index is out of range");
 	}
@@ -240,6 +241,7 @@ void HardwareTrigger::setExternalOutSelect(uint chnIdx, out_select out)
 	QByteArray byteArray =  lut_digital_out_select[out].toLatin1();
 	iio_channel_attr_write(m_logic_channels[chnIdx], "out_select",
 		byteArray.data());
+	}
 }
 
 void HardwareTrigger::setDigitalCondition(uint chnIdx, condition cond)
