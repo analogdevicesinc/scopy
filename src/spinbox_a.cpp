@@ -837,7 +837,7 @@ void PhaseSpinButton::setValue(double value)
 	* value = m_value. In this case value would be the real value (m_value)
 	* not the one that is displayed. In this case we ignore the call and
 	* return immediately */
-	if (m_value == value && QObject::sender() == this) {
+	if (m_value == value && !QObject::sender()) {
 		return;
 	}
 
