@@ -1275,6 +1275,7 @@ void SignalGenerator::start()
 {
 	QVector<struct iio_channel *> enabled_channels;
 
+	m_running = true;
 	if (amp1 && amp2) {
 		/* FIXME: TODO: Move this into a HW class / lib M2k */
 		iio_channel_attr_write_bool(amp1, "powerdown", /*!(ui->run_button->isChecked() && */ !channels[0]->enableButton()->isChecked());
@@ -1436,7 +1437,6 @@ void SignalGenerator::start()
 
 void SignalGenerator::run()
 {
-	m_running = true;
 	start();
 }
 
