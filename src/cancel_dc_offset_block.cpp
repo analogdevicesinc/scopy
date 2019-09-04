@@ -6,8 +6,6 @@
 #include <gnuradio/blocks/copy.h>
 #include <gnuradio/blocks/keep_one_in_n.h>
 
-#include <iostream>
-
 using namespace adiscope;
 using namespace gr;
 
@@ -15,12 +13,17 @@ cancel_dc_offset_block::cancel_dc_offset_block(size_t buffer_size, bool enabled)
 	hier_block2("DCOFFSET",
 		    io_signature::make(1, 1, sizeof(float)),
 		    io_signature::make(1, 1, sizeof(float))),
+	QObject(),
 	d_enabled(enabled),
 	d_buffer_size(buffer_size),
-	d_dc_offset(0.0)
+	d_dc_offset(0.0),
+	d_signal(boost::make_shared<signal_sample>())
 {
-	d_vs = gr::blocks::vector_sink_f::make();
 	_build_and_connect_blocks();
+
+	QObject::connect(&*d_signal, &signal_sample::triggered, [=](std::vector<float> samples){
+		d_dc_offset = samples[0];
+	});
 }
 
 cancel_dc_offset_block::~cancel_dc_offset_block()
@@ -45,19 +48,13 @@ void cancel_dc_offset_block::set_buffer_size(size_t buffer_size)
 
 float cancel_dc_offset_block::get_dc_offset() const
 {
-	if (d_vs->data().size()) {
-		return d_vs->data()[0];
-	} else {
-		return 0.0;
-	}
+	return d_dc_offset;
 }
 
 void cancel_dc_offset_block::_build_and_connect_blocks()
 {
 	// Remove all connections
 	hier_block2::disconnect_all();
-
-	d_vs->reset();
 
 	if (d_enabled) {
 		auto avg = gr::blocks::moving_average_ff::make(d_buffer_size, 1.0 / d_buffer_size, d_buffer_size);
@@ -67,7 +64,7 @@ void cancel_dc_offset_block::_build_and_connect_blocks()
 
 		hier_block2::connect(this->self(), 0, avg, 0);
 		hier_block2::connect(avg, 0, keep, 0);
-		hier_block2::connect(keep, 0, d_vs, 0);
+		hier_block2::connect(keep, 0, d_signal, 0);
 		hier_block2::connect(keep, 0, repeat, 0);
 		hier_block2::connect(this->self(), 0, sub, 0);
 		hier_block2::connect(repeat, 0, sub, 1);
@@ -78,7 +75,7 @@ void cancel_dc_offset_block::_build_and_connect_blocks()
 
 		hier_block2::connect(this->self(), 0, avg, 0);
 		hier_block2::connect(avg, 0, keep, 0);
-		hier_block2::connect(keep, 0, d_vs, 0);
+		hier_block2::connect(keep, 0, d_signal, 0);
 
 		auto copy = gr::blocks::copy::make(sizeof(float));
 		hier_block2::connect(this->self(), 0, copy, 0);
