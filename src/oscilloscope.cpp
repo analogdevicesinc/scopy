@@ -1313,10 +1313,11 @@ void Oscilloscope::activateAcCoupling(int i)
 	if (trigger && !triggerLevelSink.first) {
 		triggerLevelSink.first = boost::make_shared<signal_sample>();
 		triggerLevelSink.second = i;
-		keep_one = gr::blocks::keep_one_in_n::make(sizeof(float), 100);
+		keep_one = gr::blocks::keep_one_in_n::make(sizeof(float), active_sample_count);
 		connect(&*triggerLevelSink.first, SIGNAL(triggered(std::vector<float>)),
 			this, SLOT(updateTriggerLevelValue(std::vector<float>)));
-		iio->connect(dc_cancel.at(i), 0, triggerLevelSink.first, 0);
+		iio->connect(dc_cancel.at(i), 0, keep_one, 0);
+		iio->connect(keep_one, 0, triggerLevelSink.first, 0);
 	}
 
 	if (xy_is_visible) {
@@ -1405,7 +1406,8 @@ void Oscilloscope::deactivateAcCoupling(int i)
 		disconnect(&*triggerLevelSink.first, SIGNAL(triggered(std::vector<float>)),
 			this, SLOT(updateTriggerLevelValue(std::vector<float>)));
 
-		iio->disconnect(dc_cancel.at(i), 0, triggerLevelSink.first, 0);
+		iio->disconnect(dc_cancel.at(i), 0, keep_one, 0);
+		iio->disconnect(keep_one, 0, triggerLevelSink.first, 0);
 		trigger_settings.updateHwVoltLevels(i);
 		triggerLevelSink.first = nullptr;
 		triggerLevelSink.second = -1;
@@ -1490,7 +1492,8 @@ void Oscilloscope::activateAcCouplingTrigger(int chIdx)
 		keep_one = gr::blocks::keep_one_in_n::make(sizeof(float), 100);
 		connect(&*triggerLevelSink.first, SIGNAL(triggered(std::vector<float>)),
 			this, SLOT(updateTriggerLevelValue(std::vector<float>)));
-		iio->connect(dc_cancel.at(triggerLevelSink.second), 0, triggerLevelSink.first, 0);
+		iio->connect(dc_cancel.at(triggerLevelSink.second), 0, keep_one, 0);
+		iio->connect(keep_one, 0, triggerLevelSink.first, 0);
 
 		if (started) {
 			iio->unlock();
@@ -1510,7 +1513,8 @@ void Oscilloscope::deactivateAcCouplingTrigger()
 		disconnect(&*triggerLevelSink.first, SIGNAL(triggered(std::vector<float>)),
 			this, SLOT(updateTriggerLevelValue(std::vector<float>)));
 		/* Disconnect the GNU Radio block */
-		iio->disconnect(dc_cancel.at(triggerLevelSink.second), 0, triggerLevelSink.first, 0);
+		iio->disconnect(dc_cancel.at(triggerLevelSink.second), 0, keep_one, 0);
+		iio->disconnect(keep_one, 0, triggerLevelSink.first, 0);
 		trigger_settings.updateHwVoltLevels(triggerLevelSink.second);
 		if (started) {
 			iio->unlock();
@@ -4134,6 +4138,13 @@ void Oscilloscope::setupAutosetFreqSweep()
 	for (unsigned int i = 0; i < nb_channels; i++) {
 		iio->set_buffer_size(ids[i], autoset_fft_size);
 		dc_cancel.at(i)->set_buffer_size(active_sample_count);
+	}
+	if (keep_one) {
+		iio->disconnect(dc_cancel.at(triggerLevelSink.second), 0, keep_one, 0);
+		iio->disconnect(keep_one, 0, triggerLevelSink.first, 0);
+		keep_one = gr::blocks::keep_one_in_n::make(sizeof(float), active_sample_count);
+		iio->connect(dc_cancel.at(triggerLevelSink.second), 0, keep_one, 0);
+		iio->connect(keep_one, 0, triggerLevelSink.first, 0);
 	}
 	if(started)
 		iio->unlock();
