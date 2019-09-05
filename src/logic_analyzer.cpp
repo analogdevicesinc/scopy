@@ -325,9 +325,10 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 		SIGNAL(currentIndexChanged(int)),
 		this, SLOT(setExternalTrigger(int)));
 
-	for(const auto &val : externalTriggerSourceMap) {
-		trigger_settings_ui->cmb_extern_src->addItem(QString::fromStdString(val.first));
-	}
+	trigger_settings_ui->cmb_extern_src->addItem(QString::fromStdString(externalTriggerSourceMap[0].first));
+	if(hasCrossInstrumentTrigger())
+		trigger_settings_ui->cmb_extern_src->addItem(QString::fromStdString(externalTriggerSourceMap[1].first));
+
 	connect(trigger_settings_ui->cmb_extern_src,
 		SIGNAL(currentIndexChanged(int)),
 		this, SLOT(setExternalSource(int)));
@@ -483,6 +484,14 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 	});
 
 	init_buffer_scrolling();
+}
+
+bool LogicAnalyzer::hasCrossInstrumentTrigger()
+{
+	auto dev = iio_context_find_device(ctx, "m2k-adc-trigger");
+	auto ch = iio_device_find_channel(dev, "voltage4", false);
+	auto ret = iio_channel_find_attr(ch, "out_select");
+	return (ret==NULL) ? false : true;
 }
 
 void LogicAnalyzer::toolDetached(bool detached)
