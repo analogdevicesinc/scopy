@@ -63,6 +63,7 @@ Tool::~Tool()
 {
 	disconnect(prefPanel, &Preferences::notify, this, &Tool::readPreferences);
 
+	run_button->setChecked(false);
 	toolMenuItem->setDisabled(true);
 
 	delete settings;
