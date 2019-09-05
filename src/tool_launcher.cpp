@@ -1241,6 +1241,7 @@ void adiscope::ToolLauncher::restartToolsAfterCalibration()
 }
 void adiscope::ToolLauncher::requestCalibration()
 {
+	getConnectedDevice()->calibrateButton()->setEnabled(false);
 	saveRunningToolsBeforeCalibration();
 	stopToolsBeforeCalibration();
 	calibration_thread = QtConcurrent::run(std::bind(&ToolLauncher::calibrate,
@@ -1250,6 +1251,7 @@ void adiscope::ToolLauncher::requestCalibration()
 void adiscope::ToolLauncher::requestCalibrationCancel()
 {
 	calib->cancelCalibration();
+	getConnectedDevice()->calibrateButton()->setEnabled(true);
 }
 
 void adiscope::ToolLauncher::calibrationFailedCallback()
@@ -1312,6 +1314,7 @@ bool adiscope::ToolLauncher::calibrate()
 	else {
 		Q_EMIT calibrationFailed();
 	}
+	getConnectedDevice()->calibrateButton()->setEnabled(true);
 
 	return ok;
 }
