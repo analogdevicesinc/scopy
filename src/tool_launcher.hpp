@@ -199,6 +199,7 @@ private:
 	QFutureWatcher<QVector<QString>> watcher;
 	QFuture<QVector<QString>> future;
 	QFuture<void> calibration_thread;
+	QFutureWatcher<void> calibration_thread_watcher;
 
 	DMM *dmm;
 	PowerController *power_control;
