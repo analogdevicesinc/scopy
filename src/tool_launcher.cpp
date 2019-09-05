@@ -1232,6 +1232,7 @@ void adiscope::ToolLauncher::stopToolsBeforeCalibration()
 }
 void adiscope::ToolLauncher::restartToolsAfterCalibration()
 {
+	getConnectedDevice()->calibrateButton()->setEnabled(true);
 	while(!calibration_saved_tools.empty())
 	{
 		Tool* tool = calibration_saved_tools.back();
@@ -1259,6 +1260,7 @@ void adiscope::ToolLauncher::calibrationFailedCallback()
 	selectedDev->infoPage()->setStatusLabel("Calibration Failed");
 	selectedDev->connectButton()->setText("Disconnect");
 	selectedDev->connectButton()->setEnabled(true);
+	getConnectedDevice()->calibrateButton()->setEnabled(true);
 }
 
 void adiscope::ToolLauncher::initialCalibration()
@@ -1314,7 +1316,6 @@ bool adiscope::ToolLauncher::calibrate()
 	else {
 		Q_EMIT calibrationFailed();
 	}
-	getConnectedDevice()->calibrateButton()->setEnabled(true);
 
 	return ok;
 }
