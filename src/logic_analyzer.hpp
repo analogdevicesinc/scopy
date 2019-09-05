@@ -125,6 +125,7 @@ public:
 	QString saveToFile();
 	std::vector<std::string> get_iio_trigger_options();
 	bool isRunning() const;
+	bool hasCrossInstrumentTrigger();
 
 private Q_SLOTS:
 	void toggleRightMenu(bool);
