@@ -1263,28 +1263,9 @@ void adiscope::ToolLauncher::initialCalibration()
 {
 	bool ok = true;
 
-	connect(this, SIGNAL(adcCalibrationDone()),
-		this, SLOT(enableAdcBasedTools()));
-	connect(this, SIGNAL(dacCalibrationDone()),
-		this, SLOT(enableDacBasedTools()));
-	connect(this, SIGNAL(calibrationFailed()),
-		this, SLOT(calibrationFailedCallback()));
-	connect(this, SIGNAL(calibrationDone()),
-		this, SLOT(restartToolsAfterCalibration()));
-
-	getConnectedDevice()->calibrateButton()->setEnabled(false);
 	if (!skip_calibration) {
 		ok = calibrate();
 	}
-
-	QObject::disconnect(this, SIGNAL(adcCalibrationDone()),
-		   this, SLOT(enableAdcBasedTools()));
-	QObject::disconnect(this, SIGNAL(dacCalibrationDone()),
-		   this, SLOT(enableDacBasedTools()));
-
-	getConnectedDevice()->calibrateButton()->setEnabled(true);
-	connect(getConnectedDevice()->calibrateButton(), SIGNAL(clicked()),this, SLOT(requestCalibration()));
-
 }
 
 bool adiscope::ToolLauncher::calibrate()
@@ -1580,8 +1561,29 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 
 	loadToolTips(true);
 
+	connect(this, SIGNAL(adcCalibrationDone()),
+		this, SLOT(enableAdcBasedTools()));
+	connect(this, SIGNAL(dacCalibrationDone()),
+		this, SLOT(enableDacBasedTools()));
+	connect(this, SIGNAL(calibrationFailed()),
+		this, SLOT(calibrationFailedCallback()));
+	connect(this, SIGNAL(calibrationDone()),
+		this, SLOT(restartToolsAfterCalibration()));
+
+	selectedDev->calibrateButton()->setEnabled(false);
+
 	calibration_thread = QtConcurrent::run(std::bind(&ToolLauncher::initialCalibration,
 					       this));
+	calibration_thread_watcher.setFuture(calibration_thread);
+	connect(&calibration_thread_watcher, &QFutureWatcher<void>::finished, [=](){
+		QObject::disconnect(this, SIGNAL(adcCalibrationDone()),
+			   this, SLOT(enableAdcBasedTools()));
+		QObject::disconnect(this, SIGNAL(dacCalibrationDone()),
+			   this, SLOT(enableDacBasedTools()));
+
+		getConnectedDevice()->calibrateButton()->setEnabled(true);
+		connect(getConnectedDevice()->calibrateButton(), SIGNAL(clicked()),this, SLOT(requestCalibration()));
+	});
 
 	return true;
 }
