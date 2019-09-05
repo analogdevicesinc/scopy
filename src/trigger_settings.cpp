@@ -523,12 +523,18 @@ void TriggerSettings::setAdcRunningState(bool on)
 
 void TriggerSettings::write_ui_settings_to_hawrdware()
 {
+	int extern_cnd;
+
 	setDaisyChainCompensation();
 	source_hw_write(ui->cmb_source->currentIndex());
 	mode_hw_write(determineTriggerMode(ui->intern_en->isChecked(),
 		ui->extern_en->isChecked()));
 	analog_cond_hw_write(ui->cmb_condition->currentIndex());
-	digital_cond_hw_write(ui->cmb_extern_condition->currentIndex());
+	if(ui->cmb_extern_src->currentIndex() == 0)
+		extern_cnd = ui->cmb_extern_condition->currentIndex();
+	else
+		extern_cnd = HardwareTrigger::FALLING_EDGE; // when logic analyzer is selected set condition to falling edge
+	digital_cond_hw_write(extern_cnd);
 	level_hw_write(trigger_level->value());
 	hysteresis_hw_write(trigger_hysteresis->value());
 	delay_hw_write(trigger_raw_delay + daisyChainCompensation);
