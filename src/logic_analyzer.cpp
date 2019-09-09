@@ -476,8 +476,9 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 		QString fileNameHint = "Scopy-" + api->objectName() + "-" + date + ".png";
 
 		QString fileName = QFileDialog::getSaveFileName(this,
-				   tr("Save to"), fileNameHint,
-				   tr({"(*.png);;"}));
+		    tr("Export"), fileNameHint, tr({"(*.png);;"}),
+		    nullptr, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+
 		painter.end();
 		img.invertPixels(QImage::InvertRgb);
 		img.save(fileName, 0, -1);
@@ -703,12 +704,13 @@ QString LogicAnalyzer::saveToFile()
 		startStop(false);
 	}
 
-	QString filename = QFileDialog::getSaveFileName(this,
-		tr("Scopy Logic Analyzer export"), "",
-		tr("Comma-separated values files (*.csv);;Tab-delimited values files(*.txt);;Value Change Dump(*.vcd);;All Files(*)"),
-		&selectedFilter);
+	QString fileName = QFileDialog::getSaveFileName(this,
+	    tr("Export"), "", tr("Comma-separated values files (*.csv)",
+				       "Tab-delimited values files (*.txt)"),
+	    &selectedFilter, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 
-	if(filename.isEmpty())
+
+	if(fileName.isEmpty())
 		return "";
 
 	// Check the selected file type
@@ -725,10 +727,10 @@ QString LogicAnalyzer::saveToFile()
 
 
 	if( separator != "" ) {
-		done = exportTabCsv(separator, filename);
+		done = exportTabCsv(separator, fileName);
 
 	} else {
-		QFile file(filename);
+		QFile file(fileName);
 		if( !file.open(QIODevice::WriteOnly)) {
 			return "";
 		}
@@ -745,13 +747,13 @@ QString LogicAnalyzer::saveToFile()
 
 		file.close();
 
-		done = exportVCD(filename, startRow, endRow);
+		done = exportVCD(fileName, startRow, endRow);
 	}
 
 	if(paused)
 		startStop(true);
 
-	return (done ? filename : "");
+	return (done ? fileName : "");
 }
 
 bool LogicAnalyzer::exportVCD(QString filename, QString startSep, QString endSep)
