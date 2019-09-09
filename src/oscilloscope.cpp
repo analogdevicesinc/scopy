@@ -876,6 +876,12 @@ void Oscilloscope::remove_ref_waveform(QString name)
 	}
 }
 
+void Oscilloscope::setNativeDialogs(bool nativeDialogs)
+{
+	Tool::setNativeDialogs(nativeDialogs);
+	plot.setUseNativeDialog(nativeDialogs);
+}
+
 void Oscilloscope::add_ref_waveform(QString name, QVector<double> xData, QVector<double> yData, unsigned int sampleRate)
 {
 	plot.cancelZoom();
@@ -1229,16 +1235,13 @@ void Oscilloscope::init_channel_settings()
 		ChannelWidget *cw = channelWidgetAtId(current_ch_widget);
 		if (current_ch_widget > 1 && cw->isReferenceChannel()) {
 			// export
-			auto export_dialog( new QFileDialog( this ) );
-			export_dialog->setWindowModality( Qt::WindowModal );
-			export_dialog->setFileMode( QFileDialog::AnyFile );
-			export_dialog->setAcceptMode( QFileDialog::AcceptSave );
-			export_dialog->setNameFilters({"Comma-separated values files (*.csv)",
-							       "Tab-delimited values files (*.txt)"});
-
-			if (export_dialog->exec()) {
+			QString fileName = QFileDialog::getSaveFileName(this,
+			    tr("Export"), "", tr("Comma-separated values files (*.csv)",
+						       "Tab-delimited values files (*.txt)"),
+			    nullptr, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+			if (!fileName.isEmpty()) {
 				FileManager fm("Oscilloscope");
-				fm.open(export_dialog->selectedFiles().at(0), FileManager::EXPORT);
+				fm.open(fileName, FileManager::EXPORT);
 
 				QVector<double> time_data, volts_data;
 
@@ -1690,12 +1693,10 @@ void Oscilloscope::btnExport_clicked(){
 
 	exportConfig = exportSettings->getExportConfig();
 	pause(true);
-	auto export_dialog( new QFileDialog( this ) );
-	export_dialog->setWindowModality( Qt::WindowModal );
-	export_dialog->setFileMode( QFileDialog::AnyFile );
-	export_dialog->setAcceptMode( QFileDialog::AcceptSave );
-	export_dialog->setNameFilters({"Comma-separated values files (*.csv)",
-					       "Tab-delimited values files (*.txt)"});
+	QString fileName = QFileDialog::getSaveFileName(this,
+	    tr("Export"), "", tr("Comma-separated values files (*.csv)",
+				       "Tab-delimited values files (*.txt)"),
+	    nullptr, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 	bool atleastOneChannelEnabled = false;
 	for (auto x : exportConfig.keys())
 		if (exportConfig[x]){
@@ -1706,9 +1707,9 @@ void Oscilloscope::btnExport_clicked(){
 		return;
 	}
 
-	if (export_dialog->exec()){
+	if (!fileName.isEmpty()){
 		FileManager fm("Oscilloscope");
-		fm.open(export_dialog->selectedFiles().at(0), FileManager::EXPORT);
+		fm.open(fileName, FileManager::EXPORT);
 
 		int channels_number = nb_channels + nb_math_channels;
 		QVector<double> time_data;
@@ -1888,9 +1889,9 @@ void Oscilloscope::create_add_channel_panel()
 void Oscilloscope::import()
 {
 	QString fileName = QFileDialog::getOpenFileName(this,
-	                   tr("Open import file"), "",
-			   tr({"Comma-separated values files (*.csv);;"
-			       "Tab-delimited values files (*.txt)"}));
+	    tr("Import"), "", tr("Comma-separated values files (*.csv)",
+				       "Tab-delimited values files (*.txt)"),
+	    nullptr, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 
 	FileManager fm("Oscilloscope");
 
