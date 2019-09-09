@@ -94,6 +94,8 @@ public:
 	                          QJSEngine *engine, ToolLauncher *parent);
 	~SpectrumAnalyzer();
 
+	void setNativeDialogs(bool nativeDialogs) override;
+
 public Q_SLOTS:
 	void readPreferences();	
 	void run() override;
