@@ -100,7 +100,8 @@ int main(int argc, char **argv)
 	parser.addOptions({
 		{ {"s", "script"}, "Run given script.", "script" },
 		{ {"n", "nogui"}, "Run Scopy without GUI" },
-		{ {"d", "nodecoders"}, "Run Scopy without digital decoders"}
+		{ {"d", "nodecoders"}, "Run Scopy without digital decoders"},
+		{ {"nd", "nonativedialog"}, "Run Scopy without native file dialogs"}
 	});
 
 	parser.process(app);
@@ -112,6 +113,11 @@ int main(int argc, char **argv)
 	if (nodecoders) {
 		launcher.setUseDecoders(false);
 	}
+
+	bool nonativedialog = parser.isSet("nonativedialog");
+	qDebug() << "Using" << (nonativedialog ? "Qt" : "Native") << "file dialogs";
+	launcher.setNativeDialogs(!nonativedialog);
+
 	QString script = parser.value("script");
 	if (nogui) {
 		launcher.hide();
