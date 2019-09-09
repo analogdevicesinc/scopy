@@ -36,6 +36,7 @@ public:
         PrintablePlot(QWidget *parent);
 
         void dropBackground(bool drop);
+	void setUseNativeDialog(bool nativeDialog);
 
 public Q_SLOTS:
         void printPlot(const QString& toolName = "");
@@ -43,6 +44,7 @@ public Q_SLOTS:
 private:
         QwtPlotRenderer d_plotRenderer;
         QwtLegend *legendDisplay;
+	bool d_useNativeDialog;
 };
 }
 
