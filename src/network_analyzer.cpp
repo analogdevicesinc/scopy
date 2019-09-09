@@ -566,8 +566,9 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 		QString fileNameHint = "Scopy-" + api->objectName() + "-" + date + ".png";
 
 		QString fileName = QFileDialog::getSaveFileName(this,
-				   tr("Save to"), fileNameHint,
-				   tr({"(*.png);;"}));
+		    tr("Save to"), fileNameHint, tr({"(*.png);;"}),
+		    nullptr, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+
 		painter.end();
 		img.invertPixels(QImage::InvertRgb);
 		img.save(fileName, 0, -1);
@@ -620,9 +621,9 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	connect(ui->importBtn, &QPushButton::clicked, [=](){
 		QString fileName = QFileDialog::getOpenFileName(this,
-				   tr("Open import file"), "",
-				   tr({"Comma-separated values files (*.csv);;"
-				       "Tab-delimited values files (*.txt)"}));
+		    tr("Import"), "", tr("Comma-separated values files (*.csv)",
+					       "Tab-delimited values files (*.txt)"),
+		    nullptr, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 
 		FileManager fm("Network Analyzer");
 
@@ -805,17 +806,15 @@ void NetworkAnalyzer::showEvent(QShowEvent *event)
 
 void NetworkAnalyzer::on_btnExport_clicked()
 {
-	auto export_dialog(new QFileDialog(this));
-	export_dialog->setWindowModality(Qt::WindowModal);
-	export_dialog->setFileMode(QFileDialog::AnyFile);
-	export_dialog->setAcceptMode(QFileDialog::AcceptSave);
-	export_dialog->setNameFilters({"Comma-separated values files (*.csv)",
-				       "Tab-delimited values files (*.txt)"});
+	QString fileName = QFileDialog::getSaveFileName(this,
+	    tr("Export"), "", tr("Comma-separated values files (*.csv)",
+				       "Tab-delimited values files (*.txt)"),
+	    nullptr, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 
-	if (export_dialog->exec()) {
+	if (!fileName.isEmpty()) {
 		FileManager fm("Network Analyzer");
 
-		fm.open(export_dialog->selectedFiles().at(0), FileManager::EXPORT);
+		fm.open(fileName, FileManager::EXPORT);
 
 		fm.setAdditionalInformation(ui->btnRefChn->isChecked() ?
 					    "Reference channel: 1" : "Reference channel: 2");
