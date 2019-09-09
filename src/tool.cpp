@@ -90,6 +90,13 @@ void Tool::settingsLoaded()
 
 }
 
+/* Tools that use file dialogs should overload this method
+to ensure their file dialogs are configured correspondingly */
+void Tool::setNativeDialogs(bool nativeDialogs)
+{
+	m_useNativeDialogs = nativeDialogs;
+}
+
 void Tool::readPreferences()
 {
 	saveOnExit = prefPanel->getSave_session_on_exit();
