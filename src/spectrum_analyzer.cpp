@@ -445,16 +445,14 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 		} else {
 			// export
-			auto export_dialog( new QFileDialog( this ) );
-			export_dialog->setWindowModality( Qt::WindowModal );
-			export_dialog->setFileMode( QFileDialog::AnyFile );
-			export_dialog->setAcceptMode( QFileDialog::AcceptSave );
-			export_dialog->setNameFilters({"Comma-separated values files (*.csv)",
-							       "Tab-delimited values files (*.txt)"});
+			QString fileName = QFileDialog::getSaveFileName(this,
+			    tr("Export"), "", tr("Comma-separated values files (*.csv)",
+						       "Tab-delimited values files (*.txt)"),
+			    nullptr, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 
-			if (export_dialog->exec()) {
+			if (!fileName.isEmpty()) {
 				FileManager fm("Spectrum Analyzer");
-				fm.open(export_dialog->selectedFiles().at(0), FileManager::EXPORT);
+				fm.open(fileName, FileManager::EXPORT);
 
 				QVector<double> freq_data, mag_data;
 
@@ -542,22 +540,27 @@ SpectrumAnalyzer::~SpectrumAnalyzer()
 	delete ui;
 }
 
+void SpectrumAnalyzer::setNativeDialogs(bool nativeDialogs)
+{
+	Tool::setNativeDialogs(nativeDialogs);
+	fft_plot->setUseNativeDialog(nativeDialogs);
+}
+
 void SpectrumAnalyzer::readPreferences() {
 	fft_plot->setVisiblePeakSearch(prefPanel->getSpectrum_visible_peak_search());
 }
 
 void SpectrumAnalyzer::btnExportClicked()
 {
-	auto export_dialog( new QFileDialog( this ) );
-	export_dialog->setWindowModality( Qt::WindowModal );
-	export_dialog->setFileMode( QFileDialog::AnyFile );
-	export_dialog->setAcceptMode( QFileDialog::AcceptSave );
-	export_dialog->setNameFilters({"Comma-separated values files (*.csv)",
-					       "Tab-delimited values files (*.txt)"});
+	QString fileName = QFileDialog::getSaveFileName(this,
+	    tr("Export"), "", tr("Comma-separated values files (*.csv)",
+				       "Tab-delimited values files (*.txt)"),
+	    nullptr, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 
-	if (export_dialog->exec()) {
+
+	if (!fileName.isEmpty()) {
 		FileManager fm("Spectrum Analyzer");
-		fm.open(export_dialog->selectedFiles().at(0), FileManager::EXPORT);
+		fm.open(fileName, FileManager::EXPORT);
 
 		QVector<double> frequency_data;
 		int nr_samples = fft_plot->Curve(0)->data()->size();
@@ -744,9 +747,9 @@ void SpectrumAnalyzer::on_btnAddRef_toggled(bool checked)
 void SpectrumAnalyzer::on_btnBrowseFile_clicked()
 {
 	QString fileName = QFileDialog::getOpenFileName(this,
-			   tr("Open import file"), "",
-			   tr({"Comma-separated values files (*.csv);;"
-			       "Tab-delimited values files (*.txt)"}));
+	    tr("Export"), "", tr("Comma-separated values files (*.csv)",
+				       "Tab-delimited values files (*.txt)"),
+	    nullptr, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 
 	FileManager fm("Spectrum Analyzer");
 
