@@ -57,6 +57,7 @@ public:
 	const QString& getName();
 	void setName(const QString& name);
 	virtual void settingsLoaded();
+	virtual void setNativeDialogs(bool nativeDialogs);
 
 Q_SIGNALS:
 	void detachedState(bool detached);
@@ -86,6 +87,7 @@ protected:
 	bool m_running;
 	QMainWindow *window;
 	ToolMenuItem *toolMenuItem;
+	bool m_useNativeDialogs;
 };
 }
 #endif /* SCOPY_TOOL_HPP */
