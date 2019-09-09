@@ -1263,10 +1263,15 @@ void SignalGenerator::loadFileFromPath(QString filename){
 
 void SignalGenerator::loadFile()
 {
-	QString filename = QFileDialog::getOpenFileName(this, tr("Open File"));
-	if(filename.isEmpty()) // user hit cancel
+	QString fileName = QFileDialog::getOpenFileName(this,
+	    tr("Open File"), "", tr("Comma-separated values files (*.csv)",
+				       "Tab-delimited values files (*.txt)"),
+	    nullptr, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+
+	if(fileName.isEmpty()) { // user hit cancel
 		return;
-    loadFileFromPath(filename);
+	}
+    loadFileFromPath(fileName);
     updateRightMenuForChn(currentChannel);
     resetZoom();
 }
