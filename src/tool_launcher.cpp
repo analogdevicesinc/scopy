@@ -87,8 +87,8 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 	devices_btn_group(new QButtonGroup(this)),
 	selectedDev(nullptr),
 	m_use_decoders(true),
-	menu(nullptr)
-
+	menu(nullptr),
+	m_useNativeDialogs(true)
 {
 	if (!isatty(STDIN_FILENO))
 		notifier.setEnabled(false);
@@ -341,14 +341,11 @@ void ToolLauncher::pageMoved(int direction)
 void ToolLauncher::saveSession()
 {
 	if (ctx) {
-		auto export_dialog( new QFileDialog( this ) );
-		export_dialog->setWindowModality( Qt::WindowModal );
-		export_dialog->setFileMode( QFileDialog::AnyFile );
-		export_dialog->setAcceptMode( QFileDialog::AcceptSave );
-		export_dialog->setNameFilters({"Scopy-Files (*.ini)"});
-		if (export_dialog->exec()){
-			QFile f(export_dialog->selectedFiles().at(0));
-			this->tl_api->save(f.fileName());
+		QString fileName = QFileDialog::getSaveFileName(this,
+		    tr("Save session"), "", tr("Scopy-Files (*.ini)"),
+		    nullptr, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+		if (!fileName.isEmpty()) {
+			this->tl_api->save(fileName);
 		}
 	}
 }
@@ -376,28 +373,23 @@ void ToolLauncher::setUseDecoders(bool use_decoders)
 	prefPanel->setDigital_decoders_enabled(use_decoders);
 }
 
+bool ToolLauncher::hasNativeDialogs() const
+{
+	return m_useNativeDialogs;
+}
+
+void ToolLauncher::setNativeDialogs(bool nativeDialogs)
+{
+	m_useNativeDialogs = nativeDialogs;
+}
+
 void ToolLauncher::loadSession()
 {
-	auto export_dialog( new QFileDialog( this ) );
-	export_dialog->setWindowModality( Qt::WindowModal );
-	export_dialog->setFileMode( QFileDialog::AnyFile );
-	export_dialog->setAcceptMode( QFileDialog::AcceptOpen );
-	export_dialog->setNameFilters({"Scopy-Files (*.ini)"});
-	if (export_dialog->exec()){
-		QFile f(export_dialog->selectedFiles().at(0));
-//		QStack<QPushButton*> enabledTools;
-//		for (auto tool : toolMenu)
-//			if (tool->getToolStopBtn()->isEnabled()) {
-//				enabledTools.push(tool->getToolStopBtn());
-//				tool->getToolStopBtn()->setDisabled(true);
-//			}
-		pathToFile = f.fileName();
-		this->tl_api->load(pathToFile);
-//		while (!enabledTools.isEmpty()) {
-//			QPushButton *btn = enabledTools.back();
-//			btn->setEnabled(true);
-//			enabledTools.pop();
-//		}
+	QString fileName = QFileDialog::getOpenFileName(this,
+	    tr("Load session"), "", tr("Scopy-Files (*.ini)"),
+	    nullptr, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+	if (!fileName.isEmpty()) {
+		this->tl_api->load(fileName);
 		updateHomepage();
 		setupHomepage();
 	}
@@ -1401,6 +1393,11 @@ void adiscope::ToolLauncher::enableDacBasedTools()
 	Q_EMIT dacToolsCreated();
 	selectedDev->connectButton()->setText("Disconnect");
 	selectedDev->connectButton()->setEnabled(true);
+
+	for (auto &tool : toolList) {
+		tool->setNativeDialogs(m_useNativeDialogs);
+		qDebug() << tool << " will use native dialogs: " << m_useNativeDialogs;
+	}
 }
 
 bool adiscope::ToolLauncher::switchContext(const QString& uri)

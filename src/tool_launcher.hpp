@@ -90,6 +90,9 @@ public:
 	bool getUseDecoders() const;
 	void setUseDecoders(bool use_decoders);
 
+	bool hasNativeDialogs() const;
+	void setNativeDialogs(bool nativeDialogs);
+
 Q_SIGNALS:
 	void connectionDone(bool success);
 	void adcCalibrationDone();
@@ -250,6 +253,8 @@ private:
 
 	DeviceWidget* selectedDev;
 	bool m_use_decoders;
+
+	bool m_useNativeDialogs;
 
 	void _setupToolMenu();
 	void saveRunningToolsBeforeCalibration();
