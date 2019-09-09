@@ -385,11 +385,12 @@ void DMM::configureModes()
 void DMM::chooseFile()
 {
 	QString selectedFilter;
-	filename = QFileDialog::getSaveFileName(this,
-		tr("Scopy DMM data logging"), "",
-		tr("Comma-separated values files (*.csv);;All Files(*)"),
-		&selectedFilter);
-	ui->filename->setText(filename);
+
+	QString fileName = QFileDialog::getSaveFileName(this,
+	    tr("Export"), "", tr("Comma-separated values files (*.csv);;All Files(*)"),
+	    &selectedFilter, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+
+	ui->filename->setText(fileName);
 
 	if(!ui->run_button->isChecked()) {
 		toggleDataLogging(data_logging);
