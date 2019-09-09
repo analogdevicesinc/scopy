@@ -3151,9 +3151,20 @@ void ImportPattern::setFrequency(float value)
 	frequency = value;
 }
 
+bool ImportPattern::useNativeDialog() const
+{
+	return nativeDialog;
+}
+
+void ImportPattern::setNativeDialog(bool nativeDialog)
+{
+	this->nativeDialog = nativeDialog;
+}
+
 ImportPattern::ImportPattern():
 	fileName(""),
-	channel_mapping(0)
+	channel_mapping(0),
+	nativeDialog(true)
 {
 	set_name("Import");
 	set_description("Import pattern");
@@ -3317,10 +3328,10 @@ void ImportPatternUI::build_ui(QWidget *parent,uint16_t number_of_channels)
 	}
 
 	connect(openFileBtn, &QPushButton::clicked, [=](){
-		fileName = QFileDialog::getOpenFileName(this,
-				   tr("Open import file"), "",
-				   tr({"Comma-separated values files (*.csv);;"
-				       "Tab-delimited values files (*.txt)"}));
+		QString fileName = QFileDialog::getOpenFileName(this,
+		    tr("Export"), "", tr("Comma-separated values files (*.csv)",
+					       "Tab-delimited values files (*.txt)"),
+		    nullptr, (pattern->useNativeDialog() ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 		try {
 			loadFileData();
 
