@@ -643,7 +643,10 @@ void PatternGenerator::createSettingsWidget()
 	currentUI->post_load_ui();
 	currentUI->setVisible(true);
 
-
+	ImportPattern *importPattern = dynamic_cast<ImportPattern *>(chg->pattern);
+	if (importPattern) {
+		importPattern->setNativeDialog(m_useNativeDialogs);
+	}
 
 	connect(currentUI,SIGNAL(decoderChanged()),chmui,SLOT(triggerUpdateUiNoSettings()));
 

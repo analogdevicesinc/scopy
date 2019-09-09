@@ -814,6 +814,7 @@ public:
 class ImportPattern : virtual public Pattern
 {
 	float frequency;
+	bool nativeDialog;
 public:
 	ImportPattern();
 	virtual ~ImportPattern();
@@ -830,6 +831,9 @@ public:
 
 	float getFrequency() const;
 	void setFrequency(float value);
+
+	bool useNativeDialog() const;
+	void setNativeDialog(bool nativeDialog);
 };
 
 class ImportPatternUI : public PatternUI
