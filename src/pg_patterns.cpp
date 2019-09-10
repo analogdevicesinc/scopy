@@ -393,7 +393,8 @@ float ClockPattern::get_frequency() const
 
 void ClockPattern::set_frequency(float value)
 {
-	frequency = value;
+	static const int frequency_precision = 1000;
+	frequency = round(value * frequency_precision)/ frequency_precision;
 }
 
 int ClockPattern::get_phase() const
