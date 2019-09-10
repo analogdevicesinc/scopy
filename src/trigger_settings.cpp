@@ -306,9 +306,7 @@ void TriggerSettings::on_cmb_extern_to_src_currentIndexChanged(int index)
 
 void TriggerSettings::on_intern_en_toggled(bool checked)
 {
-	HardwareTrigger::mode mode = determineTriggerMode(checked,
-				ui->extern_en->isChecked());
-	mode_hw_write(mode);
+	write_ui_settings_to_hawrdware();
 
 	ui_reconf_on_intern_toggled(checked);
 
@@ -317,9 +315,7 @@ void TriggerSettings::on_intern_en_toggled(bool checked)
 
 void TriggerSettings::on_extern_en_toggled(bool checked)
 {
-	HardwareTrigger::mode mode = determineTriggerMode(
-				ui->intern_en->isChecked(), checked);
-	mode_hw_write(mode);
+	write_ui_settings_to_hawrdware();
 	setTriggerDelay(trigger_raw_delay);
 	ui_reconf_on_extern_toggled(checked);
 }
@@ -642,7 +638,8 @@ void TriggerSettings:: mode_hw_write(int mode)
 
 void TriggerSettings::on_cmb_extern_src_currentIndexChanged(int idx)
 {
-	trigger->setTriggerIn(idx);
+	// set trigger in when both logic analyzer src and extern trig is on
+	trigger->setTriggerIn(idx && ui->extern_en->isChecked());
 	ui->cmb_extern_condition->setEnabled(idx==0);
 	if (adc_running)
 		write_ui_settings_to_hawrdware();
@@ -652,7 +649,9 @@ void TriggerSettings::source_hw_write(int source)
 {
 	if (adc_running) {
 		try {
-			trigger->setSourceChannel(source);
+			trigger->setSourceChannel(source,
+						  ui->intern_en->isChecked(), // analog trigger on
+						  (ui->extern_en->isChecked() && ui->cmb_extern_src->currentIndex()==0)); // extern trigger on & ext trigger in
 		}
 		catch (std::exception& e) {
 			qDebug() << e.what();
