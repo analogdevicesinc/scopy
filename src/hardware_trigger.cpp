@@ -389,7 +389,7 @@ int HardwareTrigger::sourceChannel() const
  * Convenience function to be used when willing to enable the trigger for only
  * one channel at a time.
  */
-void HardwareTrigger::setSourceChannel(uint chnIdx)
+void HardwareTrigger::setSourceChannel(uint chnIdx, bool intern_checked, bool extern_trigger_in_checked)
 {
 	if (chnIdx >= numChannels()) {
 		throw std::invalid_argument("Channel index is out of range");
@@ -401,7 +401,10 @@ void HardwareTrigger::setSourceChannel(uint chnIdx)
 	QChar chn('a' + chnIdx);
 	QString source = QString(chn);
 	if(m_trigger_in) {
-		source = source + "_OR_trigger_in";
+		if(!intern_checked && !extern_trigger_in_checked)
+			source = "trigger_in";
+		else
+			source = source + "_OR_trigger_in";
 	}
 	setSource(source);
 }
