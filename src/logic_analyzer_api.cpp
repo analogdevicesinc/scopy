@@ -110,7 +110,11 @@ int LogicAnalyzer_API::externalTriggerSource() const
 
 void LogicAnalyzer_API::setExternalTriggerSource(int en)
 {
-	lga->trigger_settings_ui->cmb_extern_src->setCurrentIndex(en);
+	if (en >= 0 && en < lga->trigger_settings_ui->cmb_extern_src->count()) {
+		lga->trigger_settings_ui->cmb_extern_src->setCurrentIndex(en);
+	} else {
+		lga->trigger_settings_ui->cmb_extern_src->setCurrentIndex(0);
+	}
 }
 
 
@@ -121,7 +125,11 @@ int LogicAnalyzer_API::externalTriggerCnd() const
 
 void LogicAnalyzer_API::setExternalTriggerCnd(int en)
 {
-	lga->trigger_settings_ui->cmb_trigg_extern_cond_1->setCurrentIndex(en);
+	if (en >= 0 && en < lga->trigger_settings_ui->cmb_trigg_extern_cond_1->count()) {
+		lga->trigger_settings_ui->cmb_trigg_extern_cond_1->setCurrentIndex(en);
+	} else {
+		lga->trigger_settings_ui->cmb_trigg_extern_cond_1->setCurrentIndex(0);
+	}
 }
 
 bool LogicAnalyzer_API::cursorsActive() const
