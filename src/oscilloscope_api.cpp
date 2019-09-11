@@ -171,7 +171,12 @@ int Oscilloscope_API::externalTriggerSource() const
 }
 void Oscilloscope_API::setExternalTriggerSource(int src)
 {
-	osc->trigger_settings.ui->cmb_extern_src->setCurrentIndex(src);
+	if (src >= 0 && src < osc->trigger_settings.ui->cmb_extern_src->count()) {
+		osc->trigger_settings.ui->cmb_extern_src->setCurrentIndex(src);
+	} else {
+		osc->trigger_settings.ui->cmb_extern_src->setCurrentIndex(0);
+	}
+
 }
 
 int Oscilloscope_API::externalTriggerDaisyOrder() const
@@ -199,8 +204,11 @@ int Oscilloscope_API::externalTriggerOutSource() const
 }
 void Oscilloscope_API::setExternalTriggerOutSource(int src)
 {
-	if(src > 0)
+	if (src >= 0 && src < osc->trigger_settings.ui->cmb_extern_to_src->count()) {
 		osc->trigger_settings.ui->cmb_extern_to_src->setCurrentIndex(src);
+	} else {
+		osc->trigger_settings.ui->cmb_extern_to_src->setCurrentIndex(0);
+	}
 }
 
 int Oscilloscope_API::triggerSource() const
