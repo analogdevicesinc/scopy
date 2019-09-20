@@ -1059,6 +1059,8 @@ void adiscope::ToolLauncher::connectBtn_clicked(bool pressed)
 	if (ctx) {
 		QObject::disconnect(connectedDev->calibrateButton(),
 			   SIGNAL(clicked()),this, SLOT(requestCalibration()));
+		QObject::disconnect(&calibration_thread_watcher, SIGNAL(finished()),
+				    this, SLOT(calibrationThreadWatcherFinished()));
 		connectedDev->setConnected(false, false);
 		disconnect();
 		connectedDev->connectButton()->setToolTip(QString("Click to connect the device"));
@@ -1575,18 +1577,23 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 
 	calibration_thread = QtConcurrent::run(std::bind(&ToolLauncher::initialCalibration,
 					       this));
-	calibration_thread_watcher.setFuture(calibration_thread);
-	connect(&calibration_thread_watcher, &QFutureWatcher<void>::finished, [=](){
-		QObject::disconnect(this, SIGNAL(adcCalibrationDone()),
-			   this, SLOT(enableAdcBasedTools()));
-		QObject::disconnect(this, SIGNAL(dacCalibrationDone()),
-			   this, SLOT(enableDacBasedTools()));
 
-		getConnectedDevice()->calibrateButton()->setEnabled(true);
-		connect(getConnectedDevice()->calibrateButton(), SIGNAL(clicked()),this, SLOT(requestCalibration()));
-	});
+	calibration_thread_watcher.setFuture(calibration_thread);
+
+	connect(&calibration_thread_watcher, SIGNAL(finished()), this, SLOT(calibrationThreadWatcherFinished()));
 
 	return true;
+}
+
+void ToolLauncher::calibrationThreadWatcherFinished()
+{
+	QObject::disconnect(this, SIGNAL(adcCalibrationDone()),
+		   this, SLOT(enableAdcBasedTools()));
+	QObject::disconnect(this, SIGNAL(dacCalibrationDone()),
+		   this, SLOT(enableDacBasedTools()));
+
+	getConnectedDevice()->calibrateButton()->setEnabled(true);
+	connect(getConnectedDevice()->calibrateButton(), SIGNAL(clicked()),this, SLOT(requestCalibration()));
 }
 
 void ToolLauncher::hasText()
