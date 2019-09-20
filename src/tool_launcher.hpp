@@ -156,6 +156,7 @@ private Q_SLOTS:
 	void _toolSelected(tool tool);
 	void restartToolsAfterCalibration();
 	void calibrationFailedCallback();
+	void calibrationThreadWatcherFinished();
 private:
 	QList<Tool*> calibration_saved_tools;
 	void loadToolTips(bool connected);
