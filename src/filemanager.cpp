@@ -252,6 +252,7 @@ int FileManager::getNrOfChannels() const
 
 void FileManager::performWrite()
 {
+	QString additionalInfo = "";
         if (openedFor == IMPORT) {
                 qDebug() << "Can't write when opened for import!";
                 return;
@@ -261,6 +262,7 @@ void FileManager::performWrite()
         exportFile.open(QIODevice::WriteOnly);
         QTextStream exportStream(&exportFile);
 
+	additionalInfo = (additionalInformation.size() != 0) ? additionalInformation[0] : "";
 
         QStringList header = ScopyFileHeader::getHeader();
 
@@ -271,7 +273,7 @@ void FileManager::performWrite()
         exportStream << header[3] << separator << data.size() << "\n";
         exportStream << header[4] << separator << sampleRate << "\n";
         exportStream << header[5] << separator << toolName << "\n";
-	exportStream << header[6] << separator << additionalInformation[0] << "\n";
+	exportStream << header[6] << separator << additionalInfo << "\n";
 
         //column names row
         exportStream << "Sample" << separator;
