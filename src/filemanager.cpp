@@ -48,6 +48,8 @@ void FileManager::open(QString fileName,
         //columns with different sizes etc..
 
         QVector<QVector<QString>> raw_data;
+	bool srOk = true;
+	bool dataOk = true;
 
         openedFor = filepurpose;
 
@@ -106,56 +108,59 @@ void FileManager::open(QString fileName,
                 *       ;Additional Information
                 */
 
-                hasHeader = ScopyFileHeader::hasValidHeader(raw_data);
-                try {
-                        if (hasHeader) {
+		hasHeader = ScopyFileHeader::hasValidHeader(raw_data);
+		if (hasHeader) {
 
-                                format = SCOPY;
+			format = SCOPY;
 
-                                //first column in data is the time!!! when retrieving channel data start from data[1]
-				for (int i = 1; i < raw_data[6].size(); ++i) {
-					additionalInformation.push_back(raw_data[6][i]);
+			//first column in data is the time!!! when retrieving channel data start from data[1]
+			for (int i = 1; i < raw_data[6].size(); ++i) {
+				additionalInformation.push_back(raw_data[6][i]);
+			}
+
+			sampleRate = raw_data[4][1].toDouble(&srOk);
+			if (!srOk) {
+				throw FileManagerException("File is corrupted!");
+			}
+			//should be 0 if read from network/spectrum analyzer exported file
+
+			for (int j = 1; j < raw_data[7].size(); ++j)
+				columnNames.push_back(raw_data[7][j]);
+
+			data.resize(raw_data.size() - 8);
+			for (int i = 0; i < data.size(); ++i) {
+				data[i].resize(raw_data[i + 8].size() - 1);
+			}
+
+			for (int i = 8; i < raw_data.size(); ++i) {
+				for (int j = 1; j < raw_data[i].size(); ++j) {
+					data[i - 8][j - 1] = raw_data[i][j].toDouble(&dataOk);
+					if (!dataOk) {
+						throw FileManagerException("File is corrupted!");
+					}
 				}
+			}
+		} else {
 
-                                sampleRate = std::stod(raw_data[4][1].toStdString());
-                                //should be 0 if read from network/spectrum analyzer exported file
+			format = RAW;
 
-                                for (int j = 1; j < raw_data[7].size(); ++j)
-                                        columnNames.push_back(raw_data[7][j]);
+			data.resize(raw_data.size());
+			for (int i = 0; i < data.size(); ++i) {
+				data[i].resize(raw_data[i].size());
+			}
 
-                                data.resize(raw_data.size() - 8);
-                                for (int i = 0; i < data.size(); ++i) {
-                                        data[i].resize(raw_data[i + 8].size() - 1);
-                                }
+			for (int i = 0; i < raw_data.size(); ++i) {
+				for (int j = 0; j < raw_data[i].size(); ++j) {
+					data[i][j] = raw_data[i][j].toDouble(&dataOk);
+					if (!dataOk) {
+						throw FileManagerException("File is corrupted!");
+					}
+				}
+			}
+		}
 
-                                for (int i = 8; i < raw_data.size(); ++i) {
-                                        for (int j = 1; j < raw_data[i].size(); ++j) {
-						data[i - 8][j - 1] = raw_data[i][j].toDouble();
-                                        }
-                                }
-                        } else {
-
-                                format = RAW;
-
-                                data.resize(raw_data.size());
-                                for (int i = 0; i < data.size(); ++i) {
-                                        data[i].resize(raw_data[i].size());
-                                }
-
-                                for (int i = 0; i < raw_data.size(); ++i) {
-                                        for (int j = 0; j < raw_data[i].size(); ++j) {
-                                              data[i][j] = std::stod(raw_data[i][j].toStdString());
-                                        }
-                                }
-                        }
-                } catch (std::invalid_argument &i) {
-                        // if stod fails to convert a value to double it will throw an invalid argument exception
-                        // in this case it means that the file is corrupted
-                        throw FileManagerException("File is corrupted!");
-                }
-
-                nrOfSamples = data.size();
-        }
+		nrOfSamples = data.size();
+	}
 }
 
 void FileManager::save(QVector<double> data, QString name)
