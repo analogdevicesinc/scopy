@@ -48,61 +48,61 @@ public:
 		TXT
 	};
 
-        FileManager(QString toolName);
-        ~FileManager();
+	FileManager(QString toolName);
+	~FileManager();
 
 	void open(QString fileName, FileManager::FilePurpose filepurpose = EXPORT);
 
-        void save(QVector<double> data, QString name);
-        void save(QVector<QVector<double>> data, QStringList column_names);
+	void save(QVector<double> data, QString name);
+	void save(QVector<QVector<double>> data, QStringList column_names);
 
-        QVector<double> read(int index);
-        QVector<QVector<double>> read();
+	QVector<double> read(int index);
+	QVector<QVector<double>> read();
 
-        void setColumnName(int index, QString name);
-        QString getColumnName(int index);
+	void setColumnName(int index, QString name);
+	QString getColumnName(int index);
 
-        double getSampleRate() const;
-        void setSampleRate(double sampleRate);
+	double getSampleRate() const;
+	void setSampleRate(double sampleRate);
 
-        double getNrOfSamples() const;
-        int getNrOfChannels() const;
+	double getNrOfSamples() const;
+	int getNrOfChannels() const;
 
-        void performWrite();
+	void performWrite();
 
 	QStringList getAdditionalInformation() const;
-        void setAdditionalInformation(const QString& value);
+	void setAdditionalInformation(const QString& value);
 
-        FileFormat getFormat() const;
-        void setFormat(const FileFormat &value);
+	FileFormat getFormat() const;
+	void setFormat(const FileFormat &value);
 
 private:
 
-        QVector<QVector<double>> data;
-        QStringList columnNames;
-        QString filename;
-        bool hasHeader;
-        double sampleRate;
-        double nrOfSamples;
-        FilePurpose openedFor;
-        FileFormat format;
-        FileType fileType;
-        QString separator;
-        QString toolName;
+	QVector<QVector<double>> data;
+	QStringList columnNames;
+	QString filename;
+	bool hasHeader;
+	double sampleRate;
+	double nrOfSamples;
+	FilePurpose openedFor;
+	FileFormat format;
+	FileType fileType;
+	QString separator;
+	QString toolName;
 	QStringList additionalInformation;
 
 };
 
 class ScopyFileHeader {
 public:
-        static bool hasValidHeader(QVector<QVector<QString>> data);
-        static QStringList getHeader();
+	static bool hasValidHeader(QVector<QVector<QString>> data);
+	static QStringList getHeader();
 };
 
 class FileManagerException : public std::runtime_error {
 public:
-        FileManagerException(const char* msg) : std::runtime_error(msg) {}
-        ~FileManagerException() throw() {}
+	FileManagerException(const char* msg) : std::runtime_error(msg) {}
+	~FileManagerException() throw() {}
 };
 }
 
