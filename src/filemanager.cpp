@@ -244,6 +244,10 @@ double FileManager::getNrOfSamples() const
 
 int FileManager::getNrOfChannels() const
 {
+	if (data.size() == 0) {
+		return 0;
+	}
+
         if (hasHeader) {
                 return data[0].size() - 1;
         } else {
