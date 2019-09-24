@@ -747,7 +747,7 @@ void SpectrumAnalyzer::on_btnAddRef_toggled(bool checked)
 void SpectrumAnalyzer::on_btnBrowseFile_clicked()
 {
 	QString fileName = QFileDialog::getOpenFileName(this,
-	    tr("Export"), "", tr("Comma-separated values files (*.csv)",
+	    tr("Export"), "", tr("Comma-separated values files (*.csv);;"
 				       "Tab-delimited values files (*.txt)"),
 	    nullptr, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 
