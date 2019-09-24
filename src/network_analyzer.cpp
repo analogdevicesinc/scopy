@@ -621,7 +621,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	connect(ui->importBtn, &QPushButton::clicked, [=](){
 		QString fileName = QFileDialog::getOpenFileName(this,
-		    tr("Import"), "", tr("Comma-separated values files (*.csv)",
+		    tr("Import"), "", tr("Comma-separated values files (*.csv);;"
 					       "Tab-delimited values files (*.txt)"),
 		    nullptr, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 

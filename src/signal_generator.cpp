@@ -1264,8 +1264,10 @@ void SignalGenerator::loadFileFromPath(QString filename){
 void SignalGenerator::loadFile()
 {
 	QString fileName = QFileDialog::getOpenFileName(this,
-	    tr("Open File"), "", tr("Comma-separated values files (*.csv)",
-				       "Tab-delimited values files (*.txt)"),
+	    tr("Open File"), "", tr("Comma-separated values files (*.csv);;"
+				    "Tab-delimited values files (*.txt);;"
+				    "Waveform Audio File Format (*.wav);;"
+				    "Matlab files (*.mat)"),
 	    nullptr, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 
 	if(fileName.isEmpty()) { // user hit cancel

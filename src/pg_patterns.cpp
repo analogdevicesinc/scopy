@@ -3330,7 +3330,7 @@ void ImportPatternUI::build_ui(QWidget *parent,uint16_t number_of_channels)
 
 	connect(openFileBtn, &QPushButton::clicked, [=](){
 		QString fileName = QFileDialog::getOpenFileName(this,
-		    tr("Export"), "", tr("Comma-separated values files (*.csv)",
+		    tr("Export"), "", tr("Comma-separated values files (*.csv);;"
 					       "Tab-delimited values files (*.txt)"),
 		    nullptr, (pattern->useNativeDialog() ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 		try {
