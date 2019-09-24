@@ -88,8 +88,9 @@ void FileManager::open(QString fileName,
                         for (QString list_item : list) {
                                 line_data.push_back(list_item);
                         }
-
-                        raw_data.push_back(line_data);
+			if (line_data.size() > 0) {
+				raw_data.push_back(line_data);
+			}
                 }
 
                 //check if it has a header or not
