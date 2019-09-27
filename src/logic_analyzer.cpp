@@ -685,7 +685,6 @@ QString LogicAnalyzer::saveToFile()
 	QString endRow = "\n";
 	QString selectedFilter;
 	bool done = false;
-	bool paused = false;
 	bool noChannelEnabled = true;
 	
 	exportConfig = exportSettings->getExportConfig();
@@ -699,19 +698,15 @@ QString LogicAnalyzer::saveToFile()
 	if( noChannelEnabled )
 		return "";
 
-	if(m_running) {
-		paused = true;
-		startStop(false);
-	}
-
 	QString fileName = QFileDialog::getSaveFileName(this,
 	    tr("Export"), "", tr("Comma-separated values files (*.csv)",
 				       "Tab-delimited values files (*.txt)"),
 	    &selectedFilter, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 
 
-	if(fileName.isEmpty())
+	if(fileName.isEmpty()) {
 		return "";
+	}
 
 	// Check the selected file type
 	if(selectedFilter != "") {
@@ -749,9 +744,6 @@ QString LogicAnalyzer::saveToFile()
 
 		done = exportVCD(fileName, startRow, endRow);
 	}
-
-	if(paused)
-		startStop(true);
 
 	return (done ? fileName : "");
 }
@@ -894,10 +886,21 @@ bool LogicAnalyzer::exportTabCsv(QString separator, QString filename)
 
 void LogicAnalyzer::btnExportPressed()
 {
+	bool paused = false;
+
 	if( !main_win->session_.is_data())
 		return;
 
+	if(m_running) {
+		paused = true;
+		startStop(false);
+	}
+
 	QString filename = saveToFile();
+
+	if(paused) {
+		startStop(true);
+	}
 }
 
 void LogicAnalyzer::startTimer()
