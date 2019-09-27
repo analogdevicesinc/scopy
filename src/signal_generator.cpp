@@ -1571,6 +1571,8 @@ void SignalGenerator::loadFileChannelData(int chIdx)
 	}
 
 	ptr->file_data.clear();
+	if(ptr->file_type == FORMAT_WAVE || ptr->file_type == FORMAT_MAT) // let GR flow load data
+		return;
 	try {
 		fileManager->open(ptr->file, FileManager::IMPORT);
 
