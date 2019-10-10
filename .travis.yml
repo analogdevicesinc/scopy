@@ -16,23 +16,23 @@ services:
 matrix:
   fast_finish: true
   include:
-    - compiler: "gcc"
-      os: linux
-      dist: xenial
-    - os: linux
-      env:
-        - OS_TYPE=ubuntu_docker
-        - OS_VERSION=bionic
-    - os: linux
-      env:
-        - OS_TYPE=centos_docker
-        - OS_VERSION=centos7
-    - compiler: "clang"
-      os: osx
-      osx_image: xcode10.1
-    - compiler: "clang"
-      os: osx
-      osx_image: xcode9.2
+    # - compiler: "gcc"
+    #   os: linux
+    #   dist: xenial
+    # - os: linux
+    #   env:
+    #     - OS_TYPE=ubuntu_docker
+    #     - OS_VERSION=bionic
+    # - os: linux
+    #   env:
+    #     - OS_TYPE=centos_docker
+    #     - OS_VERSION=centos7
+    # - compiler: "clang"
+    #   os: osx
+    #   osx_image: xcode10.1
+    # - compiler: "clang"
+    #   os: osx
+    #   osx_image: xcode9.2
     - dist: xenial
       env: OS_TYPE=clang_format
       addons: { apt: { packages: ["clang-format-6.0"], sources: ["llvm-toolchain-xenial-6.0"] } }
