@@ -3,6 +3,10 @@ set -e
 
 . CI/travis/lib.sh
 
+handle_clang_format() {
+	echo_green "Clang-format version: " "$(/usr/bin/clang-format-6.0 --version)"
+}
+
 handle_ubuntu_flatpak_docker() {
 	sudo apt-get -qq update
 	sudo service docker restart

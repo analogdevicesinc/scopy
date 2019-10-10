@@ -3,6 +3,10 @@ set -e
 
 . CI/travis/lib.sh
 
+handle_clang_format() {
+	check_clangformat
+}
+
 handle_default() {
 echo "HANDLE DEFAULT"
 	# if we have a Qt59 installation use it

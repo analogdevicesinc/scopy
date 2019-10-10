@@ -33,6 +33,9 @@ matrix:
     - compiler: "clang"
       os: osx
       osx_image: xcode9.2
+    - dist: xenial
+      env: OS_TYPE=clang_format
+      addons: { apt: { packages: ["clang-format-6.0"], sources: ["llvm-toolchain-xenial-6.0"] } }
 
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./CI/travis/before_install_darwin.sh ; fi
