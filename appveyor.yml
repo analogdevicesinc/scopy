@@ -29,11 +29,7 @@ install:
     - C:\msys64\usr\bin\bash -lc "rm /mingw32/etc/gdbinit /mingw64/etc/gdbinit"
 
     # Update to GCC 6.2 and install dependencies
-    - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -Sy mingw-w64-%ARCH%-gcc mingw-w64-%ARCH%-boost mingw-w64-%ARCH%-python3 mingw-w64-%ARCH%-fftw mingw-w64-%ARCH%-libzip mingw-w64-%ARCH%-glibmm mingw-w64-%ARCH%-matio"
-
-    # Install older version of hdf5
-    - C:\msys64\usr\bin\bash -lc "wget -q http://repo.msys2.org/mingw/${ARCH}/mingw-w64-${ARCH}-hdf5-1.8.21-2-any.pkg.tar.xz"
-    - C:\msys64\usr\bin\bash -lc "pacman -U --force --noconfirm mingw-w64-${ARCH}-hdf5-1.8.21-2-any.pkg.tar.xz"
+    - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -Sy mingw-w64-%ARCH%-gcc mingw-w64-%ARCH%-boost mingw-w64-%ARCH%-python3 mingw-w64-%ARCH%-fftw mingw-w64-%ARCH%-libzip mingw-w64-%ARCH%-glibmm mingw-w64-%ARCH%-matio mingw-w64-%ARCH%-hdf5"
 
     # Install breakpad lib
     - C:\msys64\usr\bin\bash -lc "wget -q http://repo.msys2.org/mingw/%ARCH%/mingw-w64-%ARCH%-breakpad-git-r1680.70914b2d-1-any.pkg.tar.xz"
@@ -82,7 +78,7 @@ build_script:
     - C:\msys64\usr\bin\bash -lc "cp -r /c/projects/scopy/resources/decoders  /c/%DEST_FOLDER%/"
 
     - C:\msys64\usr\bin\bash -lc "tar -C /c/%DEST_FOLDER% --strip-components=3 -xJf /c/scopy-%MINGW_VERSION%-build-deps.tar.xz msys64/%MINGW_VERSION%/bin"
-    - C:\msys64\usr\bin\bash -lc "cd /%MINGW_VERSION%/bin ; cp -r libmatio-*.dll libhdf5-*.dll libszip*.dll libpcre*.dll libdouble-conversion*.dll libwinpthread-*.dll libgcc_*.dll libstdc++-*.dll libboost_{system,filesystem,atomic,program_options,regex,thread}-*.dll libglib-*.dll libintl-*.dll libiconv-*.dll libglibmm-2.*.dll libgmodule-2.*.dll libgobject-2.*.dll libffi-*.dll libsigc-2.*.dll libfftw3f-*.dll libicu{in,uc,dt}[!d]*.dll zlib*.dll libharfbuzz-*.dll libfreetype-*.dll libbz2-*.dll libpng16-*.dll libgraphite2.dll libjpeg-*.dll libsqlite3-*.dll libwebp-*.dll libxml2-*.dll liblzma-*.dll libxslt-*.dll libzip*.dll libpython3.*.dll libgnutls*.dll libnettle*.dll libhogweed*.dll libgmp*.dll libidn*.dll libp11*.dll libtasn*.dll libunistring*.dll libusb-*.dll /%MINGW_VERSION%/lib/python3.* /c/%DEST_FOLDER%/"
+    - C:\msys64\usr\bin\bash -lc "cd /%MINGW_VERSION%/bin ; cp -r libmatio-*.dll libhdf5-*.dll libszip*.dll libpcre*.dll libdouble-conversion*.dll libwinpthread-*.dll libgcc_*.dll libstdc++-*.dll libboost_{system,filesystem,atomic,program_options,regex,thread}-*.dll libglib-*.dll libintl-*.dll libiconv-*.dll libglibmm-2.*.dll libgmodule-2.*.dll libgobject-2.*.dll libffi-*.dll libsigc-2.*.dll libfftw3f-*.dll libicu{in,uc,dt}[!d]*.dll zlib*.dll libharfbuzz-*.dll libfreetype-*.dll libbz2-*.dll libpng16-*.dll libgraphite2.dll libjpeg-*.dll libsqlite3-*.dll libwebp-*.dll libxml2-*.dll liblzma-*.dll libxslt-*.dll libzip*.dll libpython3.*.dll libgnutls*.dll libnettle*.dll libhogweed*.dll libgmp*.dll libidn*.dll libp11*.dll libtasn*.dll libunistring*.dll libusb-*.dll libzstd*.dll /%MINGW_VERSION%/lib/python3.* /c/%DEST_FOLDER%/"
     - mkdir C:\scopy_%ARCH_BIT%\.debug
       #    - C:\msys64\usr\bin\bash -lc "/%MINGW_VERSION%/bin/objcopy -v --only-keep-debug /c/%DEST_FOLDER%/Scopy.exe /c/%DEST_FOLDER%/.debug/Scopy.exe.debug"
     - C:\msys64\usr\bin\bash -lc "dump_syms /c/%DEST_FOLDER%/Scopy.exe > /c/%DEST_FOLDER%/Scopy.exe.sym"
