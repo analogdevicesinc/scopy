@@ -1,6 +1,5 @@
 #ifndef PHONEHOME_H
 #define PHONEHOME_H
-#include "src/pulseview/pv/devices/device.hpp"
 #include "preferences.h"
 #include <QNetworkAccessManager>
 #include <QNetworkReply>

@@ -64,7 +64,10 @@ Preferences::Preferences(QWidget *parent) :
 	m_instrument_notes_active(false),
 	m_debug_messages_active(false),
 	m_attemptTempLutCalib(false),
-	m_skipCalIfCalibrated(true)
+	m_skipCalIfCalibrated(true),
+	automatical_version_checking_enabled(false),
+	first_application_run(true),
+	check_updates_url("https://analog-applications-versions.herokuapp.com/all")
 {
 	ui->setupUi(this);
 
@@ -176,6 +179,10 @@ Preferences::Preferences(QWidget *parent) :
 			info.setText(tr("This change will be applied only after a Scopy reset."));
 			info.exec();
 		}
+	});
+	connect(ui->autoUpdatesCheckBox, &QCheckBox::stateChanged, [=](int state) {
+		automatical_version_checking_enabled = (!state ? false : true);
+		Q_EMIT notify();
 	});
 
 	connect(ui->instrumentNotesCheckbox, &QCheckBox::stateChanged, [=](int state) {
@@ -325,6 +332,8 @@ void Preferences::showEvent(QShowEvent *event)
 	ui->skipCalCheckbox->setChecked(m_skipCalIfCalibrated);
 	// by this point the preferences menu is initialized
 	m_initialized = true;
+	ui->autoUpdatesCheckBox->setChecked(automatical_version_checking_enabled);
+
 
 	QWidget::showEvent(event);
 }
@@ -334,7 +343,6 @@ QString Preferences::getPreferenceIniFile()
 	QSettings settings;
 	QFileInfo fileInfo(settings.fileName());
 	QString preference_ini_file = fileInfo.absolutePath() + "/Preferences.ini";
-
 	return preference_ini_file;
 }
 
@@ -570,6 +578,34 @@ bool Preferences::getSkipCalIfCalibrated() const
 void Preferences::setSkipCalIfCalibrated(bool val)
 {
 	m_skipCalIfCalibrated = val;
+bool Preferences::getAutomatical_version_checking_enabled() const
+{
+	return automatical_version_checking_enabled;
+}
+
+void Preferences::setAutomatical_version_checking_enabled(bool value)
+{
+	automatical_version_checking_enabled = value;
+}
+
+QString Preferences::getCheck_updates_url() const
+{
+	return check_updates_url;
+}
+
+void Preferences::setCheck_update_url(const QString& link)
+{
+	check_updates_url = link;
+}
+
+bool Preferences::getFirst_application_run() const
+{
+	return first_application_run;
+}
+
+void Preferences::setFirst_application_run(bool value)
+{
+	first_application_run = value;
 }
 bool Preferences::getAutomatical_version_checking_enabled() const
 {
@@ -835,4 +871,33 @@ bool Preferences_API::getDebugMessagesActive() const
 void Preferences_API::setDebugMessagesActive(bool val)
 {
 	preferencePanel->setDebugMessagesActive(val);
+}
+bool Preferences_API::getAutomaticalVersionCheckingEnabled() const
+{
+	return preferencePanel->automatical_version_checking_enabled;
+}
+
+void Preferences_API::setAutomaticalVersionCheckingEnabled(const bool &enabled)
+{
+	preferencePanel->automatical_version_checking_enabled = enabled;
+}
+
+QString Preferences_API::getCheckUpdatesUrl() const
+{
+	return preferencePanel->check_updates_url;
+}
+
+void Preferences_API::setCheckUpdatesUrl(const QString &link)
+{
+	preferencePanel->check_updates_url = link;
+}
+
+bool Preferences_API::getFirstApplicationRun() const
+{
+	return preferencePanel->first_application_run;
+}
+
+void Preferences_API::setFirstApplicationRun(const bool &first)
+{
+	preferencePanel->first_application_run = first;
 }
