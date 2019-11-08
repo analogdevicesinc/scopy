@@ -212,7 +212,7 @@ QPushButton:disabled {
         <x>0</x>
         <y>0</y>
         <width>771</width>
-        <height>255</height>
+        <height>238</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -388,6 +388,13 @@ QPushButton:disabled {
      <property name="topMargin">
       <number>0</number>
      </property>
+     <item>
+      <widget class="QLabel" name="lblFirmware">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
      <item>
       <widget class="QLabel" name="lblCalibrationInfo">
        <property name="text">
