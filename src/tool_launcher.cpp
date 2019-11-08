@@ -36,6 +36,7 @@
 #include "external_script_api.hpp"
 #include "animationmanager.h"
 #include "singletone_wrapper.h"
+#include "phonehome.h"
 
 #include "ui_device.h"
 #include "ui_tool_launcher.h"
@@ -142,9 +143,6 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 	connect(prefPanel, &Preferences::reset, this, &ToolLauncher::resetSession);
 	connect(prefPanel, &Preferences::notify, this, &ToolLauncher::readPreferences);
 
-	const QVector<QString>& uris = searchDevices();
-	for (const QString& each : uris)
-		addContext(each);
 
 	current = ui->homeWidget;
 
@@ -224,13 +222,26 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 		this, SLOT(pageMoved(int)));
 
 
+	m_phoneHome = new PhoneHome(settings, prefPanel);
+	if (prefPanel->getFirst_application_run()) {
+		prefPanel->setFirst_application_run(false);
+		QMessageBox* msgBox = new QMessageBox();
+		msgBox->setText("Do you want to automatically check for newer Scopy and m2k-firmware versions?");
+		msgBox->setInformativeText("You can change this anytime from the Preferences menu.");
+		msgBox->setStandardButtons(msgBox->Yes | msgBox->No);
+		msgBox->setModal(false);
+		msgBox->show();
+		msgBox->activateWindow();
+		connect(msgBox->button(QMessageBox::Yes), &QAbstractButton::pressed, [&] () { prefPanel->setAutomatical_version_checking_enabled(true); });
+	}
+
 	setupHomepage();
 	ui->stackedWidget->setCurrentIndex(0);
 	setupAddPage();
 	readPreferences();
 	ui->stackedWidget->setStyleSheet("background-color:black;");
 	this->installEventFilter(this);
-	ui->btnConnect->hide();
+	ui->btnConnect->hide();	
 
 	_setupToolMenu();
 
@@ -250,6 +261,16 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 			selectedDev->infoPage()->setCalibrationStatusLabel(tr("Calibrated"));
 		}
 	});
+
+
+	const QVector<QString>& uris = searchDevices();
+	for (const QString& each : uris)
+		addContext(each);
+
+	if (prefPanel->getAutomatical_version_checking_enabled()) {
+		m_phoneHome->setPreferences(prefPanel);
+		m_phoneHome->versionsRequest();
+	}
 
 }
 
@@ -642,10 +663,10 @@ ToolLauncher::~ToolLauncher()
 	delete alive_timer;
 
 	delete infoWidget;
-
+	delete m_phoneHome;
 	tl_api->ApiObject::save(*settings);
 
-	delete settings;
+	delete settings;	
 	SingleToneWrapper<QSettings *>::getInstance().setWrapped(nullptr);
 
 	delete tl_api;
@@ -819,6 +840,29 @@ void ToolLauncher::setupHomepage()
 
 	QWidget *homepage = new QWidget(ui->stackedWidget);
 	QVBoxLayout *layout = new QVBoxLayout(homepage);
+
+	connect(m_phoneHome, &PhoneHome::scopyVersionChanged, this, [=] () {
+		QLabel* versionLabel = new QLabel();
+
+		if (m_phoneHome->getScopyVersion().isEmpty()) {
+			versionLabel->setStyleSheet("{ color : white; }");
+			versionLabel->setText("Unable to check for latest Scopy version!");
+		} else if (m_phoneHome->getScopyVersion() != QString("v" + QString(PROJECT_VERSION))) {
+			versionLabel->setText("There is a new scopy version! Version " + m_phoneHome->getScopyVersion() + " is out! " +
+								  "<a style=\"color:white\" href=\"" + m_phoneHome->getScopyLink() +
+								  "\">CLICK TO UPDATE </a>");
+			versionLabel->setTextFormat(Qt::RichText);
+			versionLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
+			versionLabel->setOpenExternalLinks(true);
+		} else {
+			versionLabel->setStyleSheet("{ color : white; }");
+			versionLabel->setText("Scopy is up to date! Current version: " + m_phoneHome->getScopyVersion());
+		}
+
+		layout->addWidget(versionLabel);
+		versionLabel->raise();
+	});
+
 	welcome = new QTextBrowser(homepage);
 	welcome->setFrameShape(QFrame::NoFrame);
 	welcome->setOpenExternalLinks(true);
@@ -1758,6 +1802,11 @@ Preferences *ToolLauncher::getPrefPanel() const
 Calibration *ToolLauncher::getCalibration() const
 {
 	return calib;
+}
+
+PhoneHome *ToolLauncher::getPhoneHome() const
+{
+	return m_phoneHome;
 }
 
 bool ToolLauncher::eventFilter(QObject *watched, QEvent *event)
