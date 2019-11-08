@@ -27,6 +27,7 @@
 #include <QFuture>
 
 #include "iio.h"
+#include "phonehome.h"
 
 namespace Ui {
 class InfoPage;
@@ -42,6 +43,7 @@ class InfoPage : public QWidget
 public:
 	explicit InfoPage(QString uri,
 			  Preferences* prefPanel,
+			  PhoneHome* phoneHome,
 			  struct iio_context *ctx = nullptr,
 			  QWidget *parent = 0);
 	virtual ~InfoPage();
@@ -97,6 +99,7 @@ protected:
 	QTimer *m_blink_timer;
 	bool m_connected;
 	bool m_search_interrupted;
+	PhoneHome* m_phoneHome;
 };
 
 
@@ -106,9 +109,11 @@ class M2kInfoPage : public InfoPage
 public:
 	explicit M2kInfoPage(QString uri,
 			     Preferences* prefPanel,
+				 PhoneHome* phoneHome,
 			     struct iio_context *ctx = nullptr,
-			     QWidget *parent = 0);
+				 QWidget *parent = 0);
 	~M2kInfoPage();
+	int checkLatestFwVersion(QString currentVersion) const;
 
 protected:
 	virtual void startIdentification(bool);
@@ -133,13 +138,14 @@ public:
 	static InfoPage* newPage(InfoPageType page_type,
 				 QString uri,
 				 Preferences* prefPanel,
+				 PhoneHome* phoneHome,
 				 struct iio_context *ctx = nullptr,
 				 QWidget *parent = 0)
 	{
 		switch (page_type) {
-		case GENERIC: return new InfoPage(uri, prefPanel,
+		case GENERIC: return new InfoPage(uri, prefPanel, phoneHome,
 						  ctx, parent);
-		case M2K: return new M2kInfoPage(uri, prefPanel,
+		case M2K: return new M2kInfoPage(uri, prefPanel, phoneHome,
 						 ctx, parent);
 		}
 		return nullptr;

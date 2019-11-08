@@ -28,7 +28,7 @@
 using namespace std;
 using namespace adiscope;
 
-InfoPage::InfoPage(QString uri, Preferences *pref,
+InfoPage::InfoPage(QString uri, Preferences *pref, PhoneHome* phoneHome,
 		   struct iio_context *ctx,
 		   QWidget *parent) :
 	QWidget(parent),
@@ -40,7 +40,8 @@ InfoPage::InfoPage(QString uri, Preferences *pref,
 	m_led_timer(new QTimer(this)),
 	m_blink_timer(new QTimer(this)),
 	m_connected(false),
-	m_search_interrupted(false)
+	m_search_interrupted(false),
+	m_phoneHome(phoneHome)
 {
 	ui->setupUi(this);
 	ui->paramLabel->setText(uri);
@@ -58,6 +59,20 @@ InfoPage::InfoPage(QString uri, Preferences *pref,
 		this, SLOT(ledTimeout()));
 	connect(m_blink_timer, SIGNAL(timeout()),
 		this, SLOT(blinkTimeout()));
+	connect(m_phoneHome, &PhoneHome::m2kVersionChanged, this, [=] {
+		int checked = dynamic_cast<M2kInfoPage*>(this)->checkLatestFwVersion(m_info_params.value("Firmware version"));
+		if (checked == 1) {
+			ui->lblFirmware->setText("Firmware is up to date!");
+		} else if (checked == 0) {
+			QString message = "Your firmware is outdated. "
+							  "Version " + m_phoneHome->getM2kVersion() + " was released. "
+							  "<a style=\"color:white\" href=\"";
+			ui->lblFirmware->setText(message + m_phoneHome->getM2kLink() + "\"> CLICK TO UPDATE </a>");
+			ui->lblFirmware->setTextFormat(Qt::RichText);
+			ui->lblFirmware->setTextInteractionFlags(Qt::TextBrowserInteraction);
+			ui->lblFirmware->setOpenExternalLinks(true);
+		}
+	});
 	readPreferences();
 }
 
@@ -351,9 +366,10 @@ bool InfoPage::supportsCalibration()
 
 M2kInfoPage::M2kInfoPage(QString uri,
 			 Preferences* prefPanel,
+			 PhoneHome* phoneHome,
 			 struct iio_context *ctx,
 			 QWidget *parent) :
-	InfoPage(uri, prefPanel, ctx, parent),
+	InfoPage(uri, prefPanel, phoneHome, ctx, parent),
 	m_fabric_channel(nullptr)
 {
 	ui->btnCalibrate->setEnabled(false);
@@ -437,4 +453,16 @@ void M2kInfoPage::blinkTimeout()
 	iio_channel_attr_write_bool(m_fabric_channel,
 				    "done_led_overwrite_powerdown",
 				    !oldVal);
+}
+
+int M2kInfoPage::checkLatestFwVersion(QString currentVersion) const {
+	if (m_phoneHome->getM2kVersion().isEmpty()) {
+		return -1;
+	}
+
+	if (m_phoneHome->getM2kVersion() == QString(currentVersion)) {
+		return 1;
+	}
+
+	return 0;
 }
