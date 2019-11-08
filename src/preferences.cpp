@@ -49,6 +49,9 @@ Preferences::Preferences(QWidget *parent) :
 	osc_filtering_enabled(true),
 	mini_hist_enabled(false),
 	digital_decoders_enabled(true),
+	automatical_version_checking_enabled(false),
+	first_application_run(true),
+	check_updates_url("https://analog-applications-versions.herokuapp.com/all"),
 	m_initialized(false)
 {
 	ui->setupUi(this);
@@ -141,6 +144,10 @@ Preferences::Preferences(QWidget *parent) :
 			m_initialized = true;
 		}
 	});
+	connect(ui->autoUpdatesCheckBox, &QCheckBox::stateChanged, [=](int state) {
+		automatical_version_checking_enabled = (!state ? false : true);
+		Q_EMIT notify();
+	});
 
 	QString preference_ini_file = getPreferenceIniFile();
 	QSettings settings(preference_ini_file, QSettings::IniFormat);
@@ -182,6 +189,7 @@ void Preferences::showEvent(QShowEvent *event)
 	ui->oscFilteringCheckBox->setChecked(osc_filtering_enabled);
 	ui->histCheckBox->setChecked(mini_hist_enabled);
 	ui->decodersCheckBox->setChecked(digital_decoders_enabled);
+	ui->autoUpdatesCheckBox->setChecked(automatical_version_checking_enabled);
 
 	QWidget::showEvent(event);
 }
@@ -191,7 +199,6 @@ QString Preferences::getPreferenceIniFile() const
 	QSettings settings;
 	QFileInfo fileInfo(settings.fileName());
 	QString preference_ini_file = fileInfo.absolutePath() + "/Preferences.ini";
-
 	return preference_ini_file;
 }
 
@@ -384,6 +391,36 @@ void Preferences::setOsc_graticule_enabled(bool value)
 	graticule_enabled = value;
 }
 
+bool Preferences::getAutomatical_version_checking_enabled() const
+{
+	return automatical_version_checking_enabled;
+}
+
+void Preferences::setAutomatical_version_checking_enabled(bool value)
+{
+	automatical_version_checking_enabled = value;
+}
+
+QString Preferences::getCheck_updates_url() const
+{
+	return check_updates_url;
+}
+
+void Preferences::setCheck_update_url(const QString& link)
+{
+	check_updates_url = link;
+}
+
+bool Preferences::getFirst_application_run() const
+{
+	return first_application_run;
+}
+
+void Preferences::setFirst_application_run(bool value)
+{
+	first_application_run = value;
+}
+
 bool Preferences_API::getAnimationsEnabled() const
 {
 	return preferencePanel->animations_enabled;
@@ -530,4 +567,34 @@ bool Preferences_API::getDigitalDecoders() const
 void Preferences_API::setDigitalDecoders(bool enabled)
 {
 	preferencePanel->digital_decoders_enabled = enabled;
+}
+
+bool Preferences_API::getAutomaticalVersionCheckingEnabled() const
+{
+	return preferencePanel->automatical_version_checking_enabled;
+}
+
+void Preferences_API::setAutomaticalVersionCheckingEnabled(const bool &enabled)
+{
+	preferencePanel->automatical_version_checking_enabled = enabled;
+}
+
+QString Preferences_API::getCheckUpdatesUrl() const
+{
+	return preferencePanel->check_updates_url;
+}
+
+void Preferences_API::setCheckUpdatesUrl(const QString &link)
+{
+	preferencePanel->check_updates_url = link;
+}
+
+bool Preferences_API::getFirstApplicationRun() const
+{
+	return preferencePanel->first_application_run;
+}
+
+void Preferences_API::setFirstApplicationRun(const bool &first)
+{
+	preferencePanel->first_application_run = first;
 }
