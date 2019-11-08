@@ -93,6 +93,8 @@ public:
 	bool hasNativeDialogs() const;
 	void setNativeDialogs(bool nativeDialogs);
 
+	PhoneHome *getPhoneHome() const;
+
 Q_SIGNALS:
 	void connectionDone(bool success);
 	void adcCalibrationDone();
@@ -260,6 +262,8 @@ private:
 	void _setupToolMenu();
 	void saveRunningToolsBeforeCalibration();
 	void stopToolsBeforeCalibration();
+
+	PhoneHome* m_phoneHome;
 };
 }
 #endif // M2K_TOOL_LAUNCHER_H

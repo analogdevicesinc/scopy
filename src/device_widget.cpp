@@ -42,7 +42,8 @@ DeviceWidget::DeviceWidget(QString uri, QString name,
 	if (name.compare("M2K") != 0) {
 		m_infoPage = InfoPageBuilder::newPage(InfoPageBuilder::GENERIC,
 						      m_uri,
-						      parent->getPrefPanel());
+						      parent->getPrefPanel(),
+						      parent->getPhoneHome());
 		connect(m_infoPage->forgetDeviceButton(), SIGNAL(clicked(bool)),
 			this, SLOT(forgetDevice_clicked(bool)));
 		connect(m_infoPage->identifyDeviceButton(), SIGNAL(clicked(bool)),
@@ -182,6 +183,7 @@ M2kDeviceWidget::M2kDeviceWidget(QString uri, QString name, ToolLauncher *parent
 	m_infoPage = InfoPageBuilder::newPage(InfoPageBuilder::M2K,
 					      m_uri,
 					      parent->getPrefPanel(),
+					      parent->getPhoneHome(),
 					      nullptr);
 
 	connect(m_infoPage->forgetDeviceButton(), SIGNAL(clicked(bool)),
