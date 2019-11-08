@@ -571,6 +571,35 @@ void Preferences::setSkipCalIfCalibrated(bool val)
 {
 	m_skipCalIfCalibrated = val;
 }
+bool Preferences::getAutomatical_version_checking_enabled() const
+{
+	return automatical_version_checking_enabled;
+}
+
+void Preferences::setAutomatical_version_checking_enabled(bool value)
+{
+	automatical_version_checking_enabled = value;
+}
+
+QString Preferences::getCheck_updates_url() const
+{
+	return check_updates_url;
+}
+
+void Preferences::setCheck_update_url(const QString& link)
+{
+	check_updates_url = link;
+}
+
+bool Preferences::getFirst_application_run() const
+{
+	return first_application_run;
+}
+
+void Preferences::setFirst_application_run(bool value)
+{
+	first_application_run = value;
+}
 
 bool Preferences_API::getAnimationsEnabled() const
 {
