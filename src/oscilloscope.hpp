@@ -63,7 +63,7 @@
 #include "math.hpp"
 #include "scroll_filter.hpp"
 #include "cancel_dc_offset_block.h"
-
+#include "frequency_compensation_filter.h"
 #include "oscilloscope_api.hpp"
 
 /*Generated UI */
@@ -313,6 +313,8 @@ namespace adiscope {
 			gr::basic_block_sptr>> math_sinks;
 		QMap<QString, boost::shared_ptr<gr::analog::rail_ff>> math_rails;
 		std::vector<boost::shared_ptr<gr::blocks::multiply_const_ff>> math_probe_atten;
+
+		adiscope::frequency_compensation_filter::sptr freq_comp_filt[2][2];
 
 		iio_manager::port_id *ids;
 		iio_manager::port_id *hist_ids;
