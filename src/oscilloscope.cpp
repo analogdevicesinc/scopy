@@ -682,7 +682,9 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 			QLabel *label = static_cast<QLabel *>(
 			                        ui->chn_scales->itemAt(i)->widget());
 			double value = probe_attenuation[i] * plot.VertUnitsPerDiv(i);
-			label->setText(vertMeasureFormat.format(value, "V/div", 3));
+			QString str = vertMeasureFormat.format(value, "V/div", 3);
+			str.append(getChannelRangeStringVDivHelper(i));
+			label->setText(str);
 		}
 
 		if (zoom_level == 0) {
@@ -728,7 +730,9 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 			QLabel *label = static_cast<QLabel *>(
 						ui->chn_scales->itemAt(i)->widget());
 			double value = probe_attenuation[i] * plot.VertUnitsPerDiv(i);
-			label->setText(vertMeasureFormat.format(value, "V/div", 3));
+			QString str = vertMeasureFormat.format(value, "V/div", 3);
+			str.append(getChannelRangeStringVDivHelper(i));
+			label->setText(str);
 		}
 
 		if (channelWidgetAtId(current_ch_widget)->isMathChannel()) {
@@ -779,7 +783,9 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		QLabel *label = static_cast<QLabel *>(
 					ui->chn_scales->itemAt(i)->widget());
 		double value = probe_attenuation[i] * plot.VertUnitsPerDiv(i);
-		label->setText(vertMeasureFormat.format(value, "V/div", 3));
+		QString str = vertMeasureFormat.format(value, "V/div", 3);
+		str.append(getChannelRangeStringVDivHelper(i));
+		label->setText(str);
 	}
 
 	for (unsigned int i = nb_channels; i < nb_channels + nb_math_channels; i++) {
@@ -2912,7 +2918,10 @@ void Oscilloscope::cancelZoom()
 		QLabel *label = static_cast<QLabel *>(
 					ui->chn_scales->itemAt(i)->widget());
 		double value = probe_attenuation[i] * plot.VertUnitsPerDiv(i);
-		label->setText(vertMeasureFormat.format(value, "V/div", 3));
+		QString str = vertMeasureFormat.format(value, "V/div", 3);
+		str.append(getChannelRangeStringVDivHelper(i));
+		label->setText(str);
+
 	}
 }
 
@@ -2921,6 +2930,19 @@ void adiscope::Oscilloscope::onChannelCouplingChanged(bool en)
 	if (en && chnAcCoupled.at(current_ch_widget))
 		return;
 	configureAcCoupling(current_ch_widget, en);
+}
+
+QString adiscope::Oscilloscope::getChannelRangeStringVDivHelper(int ch)
+{
+	QString str ="";
+	if(ch >= 0 && ch < nb_channels)
+	{
+		str = " (±";
+		double range = (high_gain_modes[ch])? 2.5 : 25;
+		range = range * probe_attenuation[ch];
+		str += QString::number(range,'f',1) + ")";
+	}
+	return str;
 }
 
 void adiscope::Oscilloscope::onVertScaleValueChanged(double value)
@@ -2958,7 +2980,7 @@ void adiscope::Oscilloscope::onVertScaleValueChanged(double value)
 			ui->chn_scales->itemAt(current_ch_widget)->widget());
 	double labelValue = probe_attenuation[current_ch_widget]
 			* plot.VertUnitsPerDiv(current_ch_widget);
-	label->setText(vertMeasureFormat.format(labelValue, "V/div", 3));
+	QString str = vertMeasureFormat.format(labelValue, "V/div", 3);
 
 	// Switch between high and low gain modes only for the M2K channels
 	if (m2k_adc && current_ch_widget < nb_channels) {
@@ -2967,6 +2989,8 @@ void adiscope::Oscilloscope::onVertScaleValueChanged(double value)
 			voltsPosition->value());
 		trigger_settings.updateHwVoltLevels(current_ch_widget);
 	}
+	str.append(getChannelRangeStringVDivHelper(current_ch_widget));
+	label->setText(str);
 }
 
 
