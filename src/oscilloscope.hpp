@@ -394,6 +394,7 @@ namespace adiscope {
 		unsigned int find_curve_number();
 		ChannelWidget *channelWidgetAtId(int id);
 		void update_measure_for_channel(int ch_idx);
+		QString getChannelRangeStringVDivHelper(int ch);
 		void setAllSinksSampleCount(unsigned long sample_count);
 		void autosetFFT();
 
