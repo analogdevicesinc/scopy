@@ -49,7 +49,6 @@
 #include "pulseview/pv/view/ruler.hpp"
 #include "pulseview/pv/data/logic.hpp"
 #include "pulseview/pv/data/logicsegment.hpp"
-#include "streams_to_short.h"
 #include "logic_analyzer.hpp"
 #include "spinbox_a.hpp"
 #include "scroll_filter.hpp"
