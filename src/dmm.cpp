@@ -386,11 +386,11 @@ void DMM::chooseFile()
 {
 	QString selectedFilter;
 
-	QString fileName = QFileDialog::getSaveFileName(this,
+	filename = QFileDialog::getSaveFileName(this,
 	    tr("Export"), "", tr("Comma-separated values files (*.csv);;All Files(*)"),
 	    &selectedFilter, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 
-	ui->filename->setText(fileName);
+	ui->filename->setText(filename);
 
 	if(!ui->run_button->isChecked()) {
 		toggleDataLogging(data_logging);
