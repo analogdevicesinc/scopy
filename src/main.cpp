@@ -24,6 +24,7 @@
 #include <QProcess>
 #include <QDir>
 #include <QDateTime>
+#include <QFontDatabase>
 
 #include "config.h"
 #include "tool_launcher.hpp"
@@ -59,6 +60,7 @@ int main(int argc, char **argv)
 	QApplication app(argc, argv);
 #endif
 
+	QFontDatabase::addApplicationFont(":/open-sans-regular.ttf");
 	QFont font("Open Sans");
 	app.setFont(font);
 

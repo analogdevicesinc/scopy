@@ -135,6 +135,7 @@
         <file>icons/ic printer.svg</file>
         <file>icons/gate_handle.svg</file>
         <file>icons/refresh.svg</file>
+        <file>open-sans-regular.ttf</file>
     </qresource>
     <qresource prefix="/stylesheets">
         <file>stylesheets/global.qss</file>
