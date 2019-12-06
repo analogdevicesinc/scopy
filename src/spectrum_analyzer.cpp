@@ -1181,9 +1181,9 @@ void SpectrumAnalyzer::updateChannelSettingsPanel(unsigned int id)
 	selected_ch_settings = id;
 
 	if (cw->isReferenceChannel()) {
-		ui->btnSnapshot->setText("Export");
+		ui->btnSnapshot->setText(tr("Export"));
 	} else {
-		ui->btnSnapshot->setText("Snapshot");
+		ui->btnSnapshot->setText(tr("Snapshot"));
 	}
 
 	if (id < num_adc_channels) {

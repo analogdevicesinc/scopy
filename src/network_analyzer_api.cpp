@@ -227,7 +227,7 @@ void NetworkAnalyzer_API::setCursorsTransparency(int val)
         return;
     }
     net->ui->horizontalSlider->setValue(val);
-    net->ui->transLabel->setText("Transparency " + QString::number(val) + "%");
+    net->ui->transLabel->setText(tr("Transparency ") + QString::number(val) + "%");
     net->m_dBgraph.setCursorReadoutsTransparency(val);
     net->m_phaseGraph.setCursorReadoutsTransparency(val);
 }

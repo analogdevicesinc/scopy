@@ -405,7 +405,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 				{"μs", 1E-6},
 				{"ms", 1E-3},
 				{"s", 1E0}
-				}, "Time Base", 100e-9, 1E0,
+				}, tr("Time Base"), 100e-9, 1E0,
 				true, false, this);
 	timePosition = new PositionSpinButton({
 				{"ns", 1E-9},
@@ -414,7 +414,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 				{"s", 1E0},
 				{"min", 60E0},
 				{"h", 36E2}
-				}, "Position",
+				}, tr("Position"),
 				-timeBase->maxValue() * 5,
 				36E2,
 				true, false, this);
@@ -422,13 +422,13 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 //				{"μVolts", 1E-6},
 				{"mVolts", 1E-3},
 				{"Volts", 1E0}
-				}, "Volts/Div", 1e-3, 1e1,
+				}, tr("Volts/Div"), 1e-3, 1e1,
 				true, false, this);
 	voltsPosition  = new PositionSpinButton({
 				{"μVolts", 1E-6},
 				{"mVolts", 1E-3},
 				{"Volts", 1E0}
-				}, "Position",
+				}, tr("Position"),
 				-25, 25, true, false, this);
 
 	plot.setOffsetInterval(-25, 25);
@@ -1273,7 +1273,7 @@ void Oscilloscope::init_channel_settings()
 	connect(ui->btnAddMath, &QPushButton::toggled, [=](bool on){
 		if (on && !addChannel) {
 			addChannel = true;
-			math_pair->first.btnAddChannel->setText("Add Channel");
+			math_pair->first.btnAddChannel->setText(tr("Add Channel"));
 			ch_ui->math_settings_widget->setVisible(false);
 			ch_ui->btnAutoset->setVisible(autosetEnabled);
 		}
@@ -1665,7 +1665,7 @@ void Oscilloscope::cursor_panel_init()
 	cr_ui->horizontalSlider->setMinimum(0);
 	cr_ui->horizontalSlider->setSingleStep(1);
 	connect(cr_ui->horizontalSlider, &QSlider::valueChanged, [=](int value){
-		cr_ui->transLabel->setText("Transparency " + QString::number(value) + "%");
+		cr_ui->transLabel->setText(tr("Transparency ") + QString::number(value) + "%");
 		plot.setCursorReadoutsTransparency(value);
 	});
 	cr_ui->horizontalSlider->setSliderPosition(0);
@@ -1823,7 +1823,7 @@ void Oscilloscope::create_add_channel_panel()
 	layout->insertWidget(0, tabWidget);
 	//set top margin to 0 and the rest to 9
 	layout->setContentsMargins(9, 0, 9, 9);
-	tabWidget->addTab(math, "Math");
+	tabWidget->addTab(math, tr("Math"));
 
 	ref = new QWidget(panel);
 
@@ -1847,7 +1847,7 @@ void Oscilloscope::create_add_channel_panel()
 				   "QPushButton:hover{"
 					"background-color: #4a34ff;"
 				   "}");
-	btnOpenFile->setText("Browse");
+	btnOpenFile->setText(tr("Browse"));
 	layout_file_select->addWidget(btnOpenFile);
 
 	refChannelTimeBase = new ScaleSpinButton({
@@ -1855,7 +1855,7 @@ void Oscilloscope::create_add_channel_panel()
 				{"μs", 1E-6},
 				{"ms", 1E-3},
 				{"s", 1E0}
-				}, "Time Base", 100e-9, 1E0,
+				}, tr("Time Base"), 100e-9, 1E0,
 				true, false, this);
 
 	refChannelTimeBase->setValue(1e-3);
@@ -1873,19 +1873,19 @@ void Oscilloscope::create_add_channel_panel()
 
 	importSettings->setDisabled(true);
 
-	fileLineEdit->setText("No file selected");
+	fileLineEdit->setText(tr("No file selected"));
 	fileLineEdit->setDisabled(true);
 
-	tabWidget->addTab(ref, "Reference");
+	tabWidget->addTab(ref, tr("Reference"));
 
 	connect(btnOpenFile, &QPushButton::clicked, this, &Oscilloscope::import);
 
 	connect(tabWidget, &QTabWidget::currentChanged, [=](int index) {
 		if (index == 0) {
-			btn->setText("Add channel");
+			btn->setText(tr("Add channel"));
 			btn->setEnabled(lastFunctionValid);
 		} else if (index == 1) {
-			btn->setText("Import selected channels");
+			btn->setText(tr("Import selected channels"));
 			btn->setEnabled(importSettings->isEnabled());
 		}
 	});
@@ -3510,13 +3510,13 @@ void Oscilloscope::update_chn_settings_panel(int id)
 		ch_ui->wCoupling->setVisible(false);
 		timePosition->setEnabled(true);
 
-		ch_ui->snapshotBtn->setText("Snapshot");
+		ch_ui->snapshotBtn->setText(tr("Snapshot"));
 
 	} else if (chn_widget->isReferenceChannel()) {
 		ch_ui->filter1->setVisible(false);
 		ch_ui->filter2->setVisible(false);
 
-		ch_ui->snapshotBtn->setText("Export");
+		ch_ui->snapshotBtn->setText(tr("Export"));
 
 		timePosition->setEnabled(false);
 
@@ -3537,7 +3537,7 @@ void Oscilloscope::update_chn_settings_panel(int id)
 
 		timePosition->setEnabled(true);
 
-		ch_ui->snapshotBtn->setText("Snapshot");
+		ch_ui->snapshotBtn->setText(tr("Snapshot"));
 	}
 
 	if (chn_widget->isMathChannel() || chn_widget->isReferenceChannel()) {
@@ -3595,16 +3595,16 @@ void Oscilloscope::openEditMathPanel(bool on)
 		addChannel = false;
 		triggerRightMenuToggle(
 			static_cast<CustomPushButton* >(chn_widget->menuButton()), false);
-		math_pair->first.btnAddChannel->setText("Save");
+		math_pair->first.btnAddChannel->setText(tr("Save"));
 		math_pair->second->setFunction(chn_widget->function());
 		triggerRightMenuToggle(
 			static_cast<CustomPushButton* >(ui->btnAddMath), true);
 
 		tabWidget->removeTab(1);
 		tabWidget->tabBar()->hide();
-		math_pair->first.btnAddChannel->setText("Save");
+		math_pair->first.btnAddChannel->setText(tr("Save"));
 	} else {
-		tabWidget->addTab(ref, "Reference");
+		tabWidget->addTab(ref, tr("Reference"));
 		tabWidget->tabBar()->show();
 	}
 }
@@ -3619,7 +3619,7 @@ void Oscilloscope::editMathChannelFunction(int id, const std::string& new_functi
 				static_cast<CustomPushButton* >(ui->btnAddMath), false);
 	triggerRightMenuToggle(
 				static_cast<CustomPushButton* >(chn_widget->menuButton()), true);
-	math_pair->first.btnAddChannel->setText("Add Channel");
+	math_pair->first.btnAddChannel->setText(tr("Add Channel"));
 	math_pair->second->setFunction("");
 	addChannel = true;
 	ch_ui->btnEditMath->setChecked(false);

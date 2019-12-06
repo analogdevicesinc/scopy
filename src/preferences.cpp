@@ -51,7 +51,8 @@ Preferences::Preferences(QWidget *parent) :
 	mini_hist_enabled(false),
 	digital_decoders_enabled(true),
 	m_initialized(false),
-	show_ADC_digital_filters(false)
+	show_ADC_digital_filters(false),
+	language("english")
 {
 	ui->setupUi(this);
 
@@ -143,18 +144,42 @@ Preferences::Preferences(QWidget *parent) :
 
 		if (m_initialized) {
 			QMessageBox info(this);
-			info.setText("This changes will be applied only after a Scopy reset.");
+			info.setText(tr("This change will be applied only after a Scopy reset."));
 			info.exec();
 		} else {
 			m_initialized = true;
 		}
 	});
 
+	ui->label_restart->setVisible(false);
+	ui->languageCombo->addItems(getLanguageList());
+
 	QString preference_ini_file = getPreferenceIniFile();
 	QSettings settings(preference_ini_file, QSettings::IniFormat);
 
 	pref_api->setObjectName(QString("Preferences"));
 	pref_api->load(settings);
+
+	connect(ui->languageCombo, &QComboBox::currentTextChanged, [=](QString lang) {
+		language = lang;
+		if (m_initialized)
+			ui->label_restart->setVisible(true);
+		else
+			m_initialized = true;
+		Q_EMIT notify();
+	});
+}
+
+
+QStringList Preferences::getLanguageList()
+{
+	QDir directory("resources/languages");
+	QStringList languages = directory.entryList(QStringList() << "*.qm",QDir::Files);
+	for(auto &s : languages)
+	{
+		s.remove(".qm");
+	}
+	return languages;
 }
 
 Preferences::~Preferences()
@@ -191,6 +216,7 @@ void Preferences::showEvent(QShowEvent *event)
 	ui->histCheckBox->setChecked(mini_hist_enabled);
 	ui->decodersCheckBox->setChecked(digital_decoders_enabled);
 	ui->oscADCFiltersCheckBox->setChecked(show_ADC_digital_filters);
+	ui->languageCombo->setCurrentText(language);
 
 	QWidget::showEvent(event);
 }
@@ -207,8 +233,8 @@ QString Preferences::getPreferenceIniFile() const
 void Preferences::resetScopy()
 {
 	QMessageBox msgBox;
-	msgBox.setText("By resetting scopy you will lose the current configuration!");
-	msgBox.setInformativeText("Do you want to reset?");
+	msgBox.setText(tr("By resetting scopy you will lose the current configuration!"));
+	msgBox.setInformativeText(tr("Do you want to reset?"));
 	msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
 	int ret = msgBox.exec();
 
@@ -561,4 +587,13 @@ bool Preferences_API::getDigitalDecoders() const
 void Preferences_API::setDigitalDecoders(bool enabled)
 {
 	preferencePanel->digital_decoders_enabled = enabled;
+}
+
+QString Preferences_API::getLanguage() const
+{
+	return preferencePanel->language;
+}
+void Preferences_API::setLanguage(QString lang)
+{
+	preferencePanel->language=lang;
 }

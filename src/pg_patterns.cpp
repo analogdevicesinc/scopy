@@ -487,15 +487,15 @@ ClockPatternUI::ClockPatternUI(ClockPattern *pattern,
 		{"Hz", 1E0},
 		{"kHz", 1E+3},
 		{"MHz", 1E+6}
-	}, "Frequency", 1e0, PGMaxSampleRate/2,true,false,this, {1,2.5,5});
+	}, tr("Frequency"), 1e0, PGMaxSampleRate/2,true,false,this, {1,2.5,5});
 	ui->verticalLayout->addWidget(frequencySpinButton);
 	phaseSpinButton = new PhaseSpinButton({
 		{"deg",1},
 		{"π rad",180}
-	},"Phase",0,360,true,true,this);
+	},tr("Phase"),0,360,true,true,this);
 	phaseSpinButton->setFineModeAvailable(false);
 	ui->verticalLayout->addWidget(phaseSpinButton);
-	dutySpinButton = new PositionSpinButton({{"%",1}},"Duty",0,100,true,false,this);
+	dutySpinButton = new PositionSpinButton({{"%",1}},tr("Duty"),0,100,true,false,this);
 	dutySpinButton->setFineModeAvailable(false);
 	ui->verticalLayout->addWidget(dutySpinButton);
 	requestedDuty = 50;
@@ -820,7 +820,7 @@ RandomPatternUI::RandomPatternUI(RandomPattern *pattern,
 		{"Hz", 1E0},
 		{"kHz", 1E+3},
 		{"MHz", 1E+6}
-	}, "Frequency", 1e0, PGMaxSampleRate/2,true,false,this, {1,2.5,5});
+	}, tr("Frequency"), 1e0, PGMaxSampleRate/2,true,false,this, {1,2.5,5});
 	ui->verticalLayout->addWidget(frequencySpinButton);
 }
 RandomPatternUI::~RandomPatternUI()
@@ -982,7 +982,7 @@ BinaryCounterPatternUI::BinaryCounterPatternUI(BinaryCounterPattern *pattern,
 		{"Hz", 1E0},
 		{"kHz", 1E+3},
 		{"MHz", 1E+6}
-	}, "Frequency", 1e0, PGMaxSampleRate/2,true,false,this, {1,2.5,5});
+	}, tr("Frequency"), 1e0, PGMaxSampleRate/2,true,false,this, {1,2.5,5});
 	ui->verticalLayout->addWidget(frequencySpinButton);
 }
 
@@ -1082,7 +1082,7 @@ GrayCounterPatternUI::GrayCounterPatternUI(GrayCounterPattern *pattern,
 		{"Hz", 1E0},
 		{"kHz", 1E+3},
 		{"MHz", 1E+6}
-	}, "Frequency", 1e0, PGMaxSampleRate/2,true,false,this, {1,2.5,5});
+	}, tr("Frequency"), 1e0, PGMaxSampleRate/2,true,false,this, {1,2.5,5});
 	ui->verticalLayout->addWidget(frequencySpinButton);
 }
 GrayCounterPatternUI::~GrayCounterPatternUI()
@@ -1695,7 +1695,7 @@ I2CPatternUI::I2CPatternUI(I2CPattern *pattern,
 		{"Hz", 1E0},
 		{"kHz", 1E+3},
 		{"MHz", 1E+6}
-	}, "Frequency", 1e0, PGMaxSampleRate/2,true,false,this, {1,2.5,5});
+	}, tr("Frequency"), 1e0, PGMaxSampleRate/2,true,false,this, {1,2.5,5});
 	ui->verticalLayout->insertWidget(0,frequencySpinButton);
 	setVisible(false);
 }
@@ -2024,7 +2024,7 @@ SPIPatternUI::SPIPatternUI(SPIPattern *pattern,
 		{"Hz", 1E0},
 		{"kHz", 1E+3},
 		{"MHz", 1E+6}
-	}, "Frequency", 1e0, PGMaxSampleRate/2,true,false,this, {1,2.5,5});
+	}, tr("Frequency"), 1e0, PGMaxSampleRate/2,true,false,this, {1,2.5,5});
 	ui->verticalLayout->insertWidget(0,frequencySpinButton);
 	setVisible(false);
 }
@@ -3216,13 +3216,13 @@ ImportPatternUI::ImportPatternUI(ImportPattern *pattern,
 		{"Hz", 1E0},
 		{"kHz", 1E+3},
 		{"MHz", 1E+6}
-	}, "Frequency", 1e0, PGMaxSampleRate/2,true,false,this, {1,2.5,5});
+	}, tr("Frequency"), 1e0, PGMaxSampleRate/2,true,false,this, {1,2.5,5});
 	import_settings = new ImportSettings(this);
 	fileLineEdit = new QLineEdit(this);
-	openFileBtn = new QPushButton("Open file", this);
-	importBtn = new QPushButton("Import selected channels", this);
+	openFileBtn = new QPushButton(tr("Open file"), this);
+	importBtn = new QPushButton(tr("Import selected channels"), this);
 	fileLineEdit->setDisabled(true);
-	fileLineEdit->setText("No file selected");
+	fileLineEdit->setText(tr("No file selected"));
 	import_settings->setDisabled(true);
 	importBtn->setDisabled(true);
 	ui->verticalLayout->setSpacing(10);

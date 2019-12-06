@@ -35,9 +35,9 @@ ExportSettings::ExportSettings(QWidget *parent) :
 	ui->setupUi(this);
 
 	exportChannels = new DropdownSwitchList();
-	exportChannels->setTitle("Channels");
-	exportChannels->setColumnTitle(0, "Name");
-	exportChannels->setColumnTitle(1, "Export");
+	exportChannels->setTitle(tr("Channels"));
+	exportChannels->setColumnTitle(0, tr("Name"));
+	exportChannels->setColumnTitle(1, tr("Export"));
 	exportChannels->setMaxVisibleItems(3);
 
 	QTreeView *treeView;

@@ -179,7 +179,7 @@ void DeviceWidget::setName(QString name)
 M2kDeviceWidget::M2kDeviceWidget(QString uri, QString name, ToolLauncher *parent) :
 	DeviceWidget(uri, name, parent)
 {
-	m_ui->name->setText("M2K");
+	m_ui->name->setText(tr("M2K"));
 	m_infoPage = InfoPageBuilder::newPage(InfoPageBuilder::M2K,
 					      m_uri,
 					      parent->getPrefPanel(),

@@ -243,7 +243,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 		{"μs", 1E-6},
 		{"ms", 1E-3},
 		{"s", 1E0}
-	}, "Time Base", 10e-9, 10e0,
+	}, tr("Time Base"), 10e-9, 10e0,
 	true, false, this);
 	timePosition = new PositionSpinButton({
 		{"ns", 1E-9},
@@ -252,7 +252,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 		{"s", 1E0},
 		{"min", 60E0},
 		{"h", 36E2}
-	}, "Position",
+	}, tr("Position"),
 	-timeBase->maxValue() * 5,
 	36E2,
 	true,
@@ -263,7 +263,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 		{"Hz", 1E0},
 		{"kHz", 1E+3},
 		{"MHz", 1E+6}
-	}, "Frequency", 10e0,
+	}, tr("Frequency"), 10e0,
 	maxSamplingFrequency / 33,
 	true, false, this, {1,2.5,5});
 
@@ -953,19 +953,19 @@ void LogicAnalyzer::setTriggerState(int triggerState)
 	ui->triggerStateLabel->hide();
 	switch (triggerState) {
 	case Waiting:
-		ui->triggerStateLabel->setText("Waiting");
+		ui->triggerStateLabel->setText(tr("Waiting"));
 		break;
 	case Triggered:
-		ui->triggerStateLabel->setText("Triggered");
+		ui->triggerStateLabel->setText(tr("Triggered"));
 		break;
 	case Stop:
-		ui->triggerStateLabel->setText("Stop");
+		ui->triggerStateLabel->setText(tr("Stop"));
 		break;
 	case Auto:
-		ui->triggerStateLabel->setText("Auto");
+		ui->triggerStateLabel->setText(tr("Auto"));
 		break;
 	case Stream:
-		ui->triggerStateLabel->setText("Scan");
+		ui->triggerStateLabel->setText(tr("Scan"));
 		break;
 	default:
 		break;
@@ -1078,7 +1078,7 @@ void LogicAnalyzer::onRulerChanged(double ruler_value, bool silent)
 		if( active_plot_timebase != timeBase->value()) {
 			QString text = d_cursorTimeFormatter.format(
 						active_plot_timebase, "", 3);
-			ui->timebaseLabel->setText("Zoom: " + text + "/div");
+			ui->timebaseLabel->setText(tr("Zoom: ") + text + tr("/div"));
 			recomputeCursorsValue(true);
 		}
 		else {
@@ -1352,7 +1352,7 @@ void LogicAnalyzer::startStop(bool start)
 		setSamplerateLabelValue(active_sampleRate);
 		setSampleRate();
 		m_running = true;
-		ui->btnRunStop->setText("Stop");
+		ui->btnRunStop->setText(tr("Stop"));
 		setHWTriggerDelay(active_triggerSampleCount);
 		setTriggerDelay();
 		if(!armed)
@@ -1361,7 +1361,7 @@ void LogicAnalyzer::startStop(bool start)
 	} else {
 		main_win->view_->viewport()->enableDrag();
 		m_running = false;
-		ui->btnRunStop->setText("Run");
+		ui->btnRunStop->setText(tr("Run"));
 		if(timer->isActive()) {
 			timer->stop();
 		}
@@ -1407,7 +1407,7 @@ void LogicAnalyzer::singleRun(bool checked)
 	if(checked) {
 		if(!armed)
 			autoCaptureEnable(true);
-		ui->btnSingleRun->setText("Stop");
+		ui->btnSingleRun->setText(tr("Stop"));
 		buffer_previewer->setWaveformWidth(0);
 		if(!dev)
 			return;
@@ -1435,7 +1435,7 @@ void LogicAnalyzer::singleRun(bool checked)
 		updateBufferPreviewer();
 	}
 	else {
-		ui->btnSingleRun->setText("Single");
+		ui->btnSingleRun->setText(tr("Single"));
 		if(logic_analyzer_ptr->get_single()
 				&& logic_analyzer_ptr->is_running()) {
 			main_win->run_stop();
@@ -1629,9 +1629,9 @@ void LogicAnalyzer::leftMenuFinished(bool closed)
 void LogicAnalyzer::on_btnShowChannelsClicked(bool check)
 {
 	if (check) {
-		ui->btnShowChannels->setText("Show all");
+		ui->btnShowChannels->setText(tr("Show all"));
 	} else {
-		ui->btnShowChannels->setText("Hide inactive");
+		ui->btnShowChannels->setText(tr("Hide inactive"));
 	}
 }
 
