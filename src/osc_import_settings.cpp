@@ -26,9 +26,9 @@ ImportSettings::ImportSettings(QWidget *parent) :
         ExportSettings(parent)
 {
         getExportButton()->setVisible(false);
-        exportChannels->setColumnTitle(1, "Import");
+	exportChannels->setColumnTitle(1, tr("Import"));
         setTitleLabelVisible(false);
-        setExportAllButtonLabel("Import all");
+	setExportAllButtonLabel(tr("Import all"));
 }
 
 ImportSettings::~ImportSettings()

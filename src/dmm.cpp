@@ -425,7 +425,7 @@ void DMM::toggleDataLogging(bool en)
 	/* If DMM is already running, check all the parameters before
 	 * starting the data logging */
 	if(filename.isEmpty() && ui->filename->isEnabled()) {
-		ui->filename->setText("No file selected");
+		ui->filename->setText(tr("No file selected"));
 		setDynamicProperty(ui->filename, "invalid", true);
 		if(ui->run_button->isChecked()) {
 			ui->btnDataLogging->setChecked(false);
@@ -443,14 +443,14 @@ void DMM::toggleDataLogging(bool en)
 
 		if(ui->btn_overwrite->isChecked() || file.size() == 0) {
 			if( !file.open(QIODevice::WriteOnly)) {
-				ui->lblFileStatus->setText("File is open in another program");
+				ui->lblFileStatus->setText(tr("File is open in another program"));
 				setDynamicProperty(ui->filename, "invalid", true);
 				if(ui->run_button->isChecked()) {
 					ui->btnDataLogging->setChecked(false);
 				}
 				return;
 			} else {
-				ui->lblFileStatus->setText("Choose a file");
+				ui->lblFileStatus->setText(tr("Choose a file"));
 				setDynamicProperty(ui->filename, "invalid", false);
 			}
 			QTextStream out(&file);
@@ -526,14 +526,14 @@ void DMM::dataLoggingThread()
 	while(!interrupt_data_logging) {
 		if (!file.isOpen()) {
 			if (!file.open(QIODevice::Append)) {
-				ui->lblFileStatus->setText("File is open in another program");
+				ui->lblFileStatus->setText(tr("File is open in another program"));
 				setDynamicProperty(ui->filename, "invalid", true);
 				if(ui->run_button->isChecked()) {
 					ui->btnDataLogging->setChecked(false);
 				}
 				return;
 			} else {
-				ui->lblFileStatus->setText("Choose a file");
+				ui->lblFileStatus->setText(tr("Choose a file"));
 			}
 		}
 		bool is_low_ac_ch1 = ui->btn_ch1_ac->isChecked();

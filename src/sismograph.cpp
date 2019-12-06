@@ -31,8 +31,8 @@ Sismograph::Sismograph(QWidget *parent) : QwtPlot(parent),
 	enableAxis(QwtPlot::xBottom, false);
 	enableAxis(QwtPlot::xTop, true);
 
-	setAxisTitle(QwtPlot::xTop, "Voltage (V)");
-	setAxisTitle(QwtPlot::yLeft, "Time (s)");
+	setAxisTitle(QwtPlot::xTop, tr("Voltage (V)"));
+	setAxisTitle(QwtPlot::yLeft, tr("Time (s)"));
 
 	setAxisAutoScale(QwtPlot::yLeft, false);
 

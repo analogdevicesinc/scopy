@@ -26,6 +26,7 @@
 #include <QDir>
 #include <QDateTime>
 #include <QFontDatabase>
+#include <QTranslator>
 
 #include "config.h"
 #include "tool_launcher.hpp"
@@ -111,6 +112,27 @@ int main(int argc, char **argv)
 
 	parser.process(app);
 
+	QTranslator myappTranslator;
+	QFile f(path+"Preferences.ini");
+	f.open(QFile::ReadOnly);
+	QTextStream in (&f);
+	const QStringList content = in.readAll().split("\n");
+	QString language="default";
+	for(auto s : content)
+	{
+		if(s.startsWith("language"))
+		{
+			language=s.split("=")[1];
+		}
+	}
+
+	qDebug()<<language;
+
+	QString languageFileName=QDir(QCoreApplication::applicationDirPath()+"/resources/languages/"+language+".qm").path();
+	myappTranslator.load(languageFileName);
+	app.installTranslator(&myappTranslator);
+
+
 	ToolLauncher launcher(prevCrashDump);
 
 	bool nogui = parser.isSet("nogui");
@@ -151,7 +173,5 @@ int main(int argc, char **argv)
 				 Q_ARG(QString, contents),
 				 Q_ARG(QString, script));
 	}
-
-
 	return app.exec();
 }

@@ -77,10 +77,10 @@ MeasureSettings::MeasureSettings(CapturePlot *plot, QWidget *parent) :
 	m_ui->hLayout_hMeasurements->addWidget(m_horizMeasurements);
 	m_ui->hLayout_vMeasurements->addWidget(m_vertMeasurements);
 
-	m_horizMeasurements->setTitle("Horizontal");
-	m_horizMeasurements->setColumnTitle(0, "Name");
-	m_horizMeasurements->setColumnTitle(1, "Measure");
-	m_horizMeasurements->setColumnTitle(2, "Stats");
+	m_horizMeasurements->setTitle(tr("Horizontal"));
+	m_horizMeasurements->setColumnTitle(0, tr("Name"));
+	m_horizMeasurements->setColumnTitle(1, tr("Measure"));
+	m_horizMeasurements->setColumnTitle(2, tr("Stats"));
 	m_horizMeasurements->setMaxVisibleItems(4);
 	treeView = static_cast<QTreeView *>(m_horizMeasurements->view());
 	treeView->header()->resizeSection(0, 122);
@@ -90,10 +90,10 @@ MeasureSettings::MeasureSettings(CapturePlot *plot, QWidget *parent) :
 		SIGNAL(itemChanged(QStandardItem*)),
 		SLOT(onMeasurementPropertyChanged(QStandardItem*)));
 
-	m_vertMeasurements->setTitle("Vertical");
-	m_vertMeasurements->setColumnTitle(0, "Name");
-	m_vertMeasurements->setColumnTitle(1, "Measure");
-	m_vertMeasurements->setColumnTitle(2, "Stats");
+	m_vertMeasurements->setTitle(tr("Vertical"));
+	m_vertMeasurements->setColumnTitle(0, tr("Name"));
+	m_vertMeasurements->setColumnTitle(1, tr("Measure"));
+	m_vertMeasurements->setColumnTitle(2, tr("Stats"));
 	m_vertMeasurements->setMaxVisibleItems(4);
 	treeView = static_cast<QTreeView *>(m_vertMeasurements->view());
 	treeView->header()->resizeSection(0, 122);
@@ -210,9 +210,9 @@ void MeasureSettings::on_button_measDeleteAll_toggled(bool checked)
 {
 	QPushButton *button = static_cast<QPushButton*>(QObject::sender());
 	if (checked)
-		button->setText("Recover");
+		button->setText(tr("Recover"));
 	else
-		button->setText("Delete All");
+		button->setText(tr("Delete All"));
 
 	if (!m_emitDeleteAll) {
 		m_emitDeleteAll = true;
@@ -492,9 +492,9 @@ void MeasureSettings::on_button_statsDeleteAll_toggled(bool checked)
 {
 	QPushButton *button = static_cast<QPushButton*>(QObject::sender());
 	if (checked)
-		button->setText("Recover");
+		button->setText(tr("Recover"));
 	else
-		button->setText("Delete All");
+		button->setText(tr("Delete All"));
 
 	if (!m_emitStatsDeleteAll) {
 		m_emitStatsDeleteAll = true;

@@ -34,7 +34,7 @@ ConnectDialog::ConnectDialog(QWidget *widget) : QWidget(widget),
 	ui(new Ui::Connect), connected(false)
 {
 	ui->setupUi(this);
-	ui->connectBtn->setText("Connect");
+	ui->connectBtn->setText(tr("Connect"));
 	//The connect button will be disabled untill we write something in the hostname line edit
 	ui->connectBtn->setDisabled(true);
 
@@ -62,7 +62,7 @@ void ConnectDialog::btnClicked()
 	if (!ui->connectBtn->isEnabled()) {
 		return;
 	} else {
-		ui->infoSection->setText("Waiting for connection ...");
+		ui->infoSection->setText(tr("Waiting for connection ..."));
 	}
 
 	if (connected) {
@@ -81,11 +81,11 @@ void ConnectDialog::discardSettings()
 		ui->connectBtn->setDisabled(true);
 	}
 
-	ui->infoSection->setText("Context info");
+	ui->infoSection->setText(tr("Context info"));
 	setDynamicProperty(ui->connectBtn, "failed", false);
 	setDynamicProperty(ui->hostname, "invalid", false);
 	setDynamicProperty(ui->hostname, "valid", false);
-	ui->connectBtn->setText("Connect");
+	ui->connectBtn->setText(tr("Connect"));
 
 	ui->infoSection->hide();
 	ui->description->setText(QString(""));
@@ -124,17 +124,17 @@ void ConnectDialog::updatePopUp(struct iio_context *ctx)
 		ui->connectBtn->setDisabled(false);
 		QString description(iio_context_get_description(ctx));
 		ui->description->setText(description);
-		ui->infoSection->setText("Context info");
+		ui->infoSection->setText(tr("Context info"));
 		setDynamicProperty(ui->hostname, "invalid", false);
 		setDynamicProperty(ui->hostname, "valid", true);
-		ui->connectBtn->setText("Add");
+		ui->connectBtn->setText(tr("Add"));
 
 		iio_context_destroy(ctx);
 	} else {
 		setDynamicProperty(ui->hostname, "valid", false);
 		setDynamicProperty(ui->hostname, "invalid", true);
-		ui->infoSection->setText("Warning");
-		ui->description->setText("Error: Unable to find host: No such host is known!");
+		ui->infoSection->setText(tr("Warning"));
+		ui->description->setText(tr("Error: Unable to find host: No such host is known!"));
 	}
 }
 bool ConnectDialog::eventFilter(QObject *watched, QEvent *event)

@@ -352,10 +352,10 @@ void adiscope::DigitalIO::stop()
 void adiscope::DigitalIO::startStop(bool checked)
 {
 	if (checked) {
-		ui->btnRunStop->setText("Stop");
+		ui->btnRunStop->setText(tr("Stop"));
 		diom->enableOutput(true);
 	} else {
-		ui->btnRunStop->setText("Run");
+		ui->btnRunStop->setText(tr("Run"));
 		diom->enableOutput(false);
 	}
 }

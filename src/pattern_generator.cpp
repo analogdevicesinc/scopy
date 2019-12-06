@@ -966,7 +966,7 @@ void PatternGenerator::startStop(bool start)
 //	main_win->action_view_zoom_fit()->trigger();
 
 	if (start) {
-		ui->btnRunStop->setText("Stop");
+		ui->btnRunStop->setText(tr("Stop"));
 		if(singleRunTimer->isActive())
 		{
 			singleRunTimer->stop();
@@ -981,7 +981,7 @@ void PatternGenerator::startStop(bool start)
 	} else {
 		stopPatternGeneration();
 		setPGStatus(STOPPED);
-		ui->btnRunStop->setText("Run");
+		ui->btnRunStop->setText(tr("Run"));
 	}
 	m_running = start;
 }
@@ -1027,10 +1027,10 @@ void PatternGenerator::on_btnHideInactive_clicked()
 {
 	if (chmui->isDisabledShown()) {
 		chmui->hideDisabled();
-		ui->btnHideInactive->setText("Show All");
+		ui->btnHideInactive->setText(tr("Show All"));
 	} else {
 		chmui->showDisabled();
-		ui->btnHideInactive->setText("Hide Inactive");
+		ui->btnHideInactive->setText(tr("Hide Inactive"));
 
 	}
 

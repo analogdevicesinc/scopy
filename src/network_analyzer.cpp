@@ -210,7 +210,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	bufferPreviewer = new NetworkAnalyzerBufferViewer();
 	bufferPreviewer->setVisible(false);
 
-	ui->statusLabel->setText("Stopped");
+	ui->statusLabel->setText(tr("Stopped"));
 
 	connect(ui->bufferPreviewSwitch, &QCheckBox::toggled,
 		this, &NetworkAnalyzer::toggleBufferPreview);
@@ -272,8 +272,8 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	unsigned long max_samplerate = *std::max_element(rates.begin(), rates.end());
 
 	m_dBgraph.setColor(QColor(255,114,0));
-	m_dBgraph.setXTitle("Frequency (Hz)");
-	m_dBgraph.setYTitle("Magnitude(dB)");
+	m_dBgraph.setXTitle(tr("Frequency (Hz)"));
+	m_dBgraph.setYTitle(tr("Magnitude(dB)"));
 	m_dBgraph.setXMin(1000.000000);
 	m_dBgraph.setXMax(50000.000000);
 	m_dBgraph.setYMin(-80.000000);
@@ -281,7 +281,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	m_dBgraph.useLogFreq(true);
 
 	m_phaseGraph.setColor(QColor(144,19,254));
-	m_phaseGraph.setYTitle("Phase (°)");
+	m_phaseGraph.setYTitle(tr("Phase (°)"));
 	m_phaseGraph.setYUnit("°");
 	m_phaseGraph.setXMin(1000.000000);
 	m_phaseGraph.setXMax(50000.000000);
@@ -291,59 +291,59 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	samplesCount = new ScaleSpinButton({
 		{"samples",1e0},
-	}, "Samples count", 10, 1000, false, false, this);
+	}, tr("Samples count"), 10, 1000, false, false, this);
 	samplesCount->setValue(1000);
 
 	amplitude = new ScaleSpinButton({
 		{"μVolts",1e-6},
 		{"mVolts",1e-3},
 		{"Volts",1e0}
-	},"Amplitude", 1e-6, 1e1, false, false, this);
+	},tr("Amplitude"), 1e-6, 1e1, false, false, this);
 	amplitude->setValue(1);
 
 	offset = new PositionSpinButton({
 		{"μVolts",1e-6},
 		{"mVolts",1e-3},
 		{"Volts",1e0}
-	},"Offset", -5, 5, false, false, this);
+	},tr("Offset"), -5, 5, false, false, this);
 
 	offset->setValue(0);
 
 	magMax = new PositionSpinButton({
 		{"dB",1e0}
-	}, "Max. Magnitude", -120, 120, false, false, this);
+	}, tr("Max. Magnitude"), -120, 120, false, false, this);
 	magMax->setValue(20);
 
 	magMin = new PositionSpinButton({
 		{"dB",1e0}
-	}, "Min. Magnitude", -120, 120, false, false, this);
+	}, tr("Min. Magnitude"), -120, 120, false, false, this);
 	magMin->setValue(-80);
 
 	phaseMax = new PositionSpinButton({
 		{"°",1e0}
-	}, "Max. Phase", -360, 360, false, false, this);
+	}, tr("Max. Phase"), -360, 360, false, false, this);
 	phaseMax->setValue(180);
 
 	phaseMin = new PositionSpinButton({
 		{"°",1e0}
-	}, "Min. Phase", -360, 360, false, false, this);
+	}, tr("Min. Phase"), -360, 360, false, false, this);
 	phaseMin->setValue(-180);
 
 	pushDelay = new PositionSpinButton({
 		{"ms",1e0},
 		{"s",1e3}
-	}, "Settling time", 0, 2000, false, false, this);
+	}, tr("Settling time"), 0, 2000, false, false, this);
 	pushDelay->setValue(0);
 	pushDelay->setStep(10);
-	pushDelay->setToolTip("Before Buffer");
+	pushDelay->setToolTip(tr("Before Buffer"));
 
 	captureDelay = new PositionSpinButton({
 		{"ms",1e0},
 		{"s",1e3}
-	}, "Settling time", 0, 2000, false, false, this);
+	}, tr("Settling time"), 0, 2000, false, false, this);
 	captureDelay->setValue(0);
 	captureDelay->setStep(10);
-	captureDelay->setToolTip("After Buffer");
+	captureDelay->setToolTip(tr("After Buffer"));
 
 	ui->pushDelayLayout->addWidget(pushDelay);
 	ui->captureDelayLayout->addWidget(captureDelay);
@@ -452,26 +452,26 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 		[=](int value) {
 		ui->currentFrequencyLabel->setVisible(true);
 		ui->currentSampleLabel->setVisible(true);
-		ui->currentSampleLabel->setText(QString("Sample: " + QString::number(1 + value)
+		ui->currentSampleLabel->setText(QString(tr("Sample: ") + QString::number(1 + value)
 							+ " / " + QString::number(m_dBgraph.getNumSamples()) + " "));
 		MetricPrefixFormatter d_cursorTimeFormatter;
 		d_cursorTimeFormatter.setTwoDecimalMode(false);
 		QString text = d_cursorTimeFormatter.format(iterations[value].frequency, "Hz", 3);
-		ui->currentFrequencyLabel->setText(QString("Current Frequency: " + text));
+		ui->currentFrequencyLabel->setText(QString(tr("Current Frequency: ") + text));
 
 		if (value < iterationStats.size()) {
 			double dcVoltage = iterationStats[value].dcVoltage;
 			text = d_cursorTimeFormatter.format(dcVoltage, "V", 2);
-			ui->dcLabel->setText("DC Voltage: " + text);
+			ui->dcLabel->setText(tr("DC Voltage: ") + text);
 
 			if (iterationStats[value].hasError) {
-				ui->errorLabel->setText("Response channel voltage < 50mV!");
+				ui->errorLabel->setText(tr("Response channel voltage < 50mV!"));
 			} else {
 				ui->errorLabel->setText("");
 			}
 			auto gain = iterationStats[value].gain;
-			QString gainText = !gain ? "Low" : "High";
-			ui->gainLabel->setText("Gain Mode: " + gainText);
+			QString gainText = !gain ? tr("Low") : tr("High");
+			ui->gainLabel->setText(tr("Gain Mode: ") + gainText);
 		}
 	});
 
@@ -547,7 +547,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
 
 	connect(ui->horizontalSlider, &QSlider::valueChanged, [=](int value) {
-		ui->transLabel->setText("Transparency " + QString::number(value) + "%");
+		ui->transLabel->setText(tr("Transparency ") + QString::number(value) + "%");
 		m_dBgraph.setCursorReadoutsTransparency(value);
 		m_phaseGraph.setCursorReadoutsTransparency(value);
 	});
@@ -1376,17 +1376,17 @@ void NetworkAnalyzer::plot(double frequency, double mag1, double mag2,
 		magBonus = autoUpdateGainMode(mag, magBonus, dcVoltage);
 	}
 
-	ui->currentSampleLabel->setText(QString("Sample: " + QString::number(1 + currentSample++ )
+	ui->currentSampleLabel->setText(QString(tr("Sample: ") + QString::number(1 + currentSample++ )
 						+ " / " + QString::number(m_dBgraph.getNumSamples()) + " "));
 
 	MetricPrefixFormatter d_cursorTimeFormatter;
 	d_cursorTimeFormatter.setTwoDecimalMode(false);
 	QString text = d_cursorTimeFormatter.format(frequency, "Hz", 3);
-	ui->currentFrequencyLabel->setText(QString("Current Frequency: " + text));
+	ui->currentFrequencyLabel->setText(QString(tr("Current Frequency: ") + text));
 
 	d_cursorTimeFormatter.setTwoDecimalMode(true);
 	text = d_cursorTimeFormatter.format(dcVoltage, "V", 2);
-	ui->dcLabel->setText("DC Voltage: " + text);
+	ui->dcLabel->setText(tr("DC Voltage: ") + text);
 
 	bool hasError = _checkMagForOverrange(mag + magBonus);
 
@@ -1399,8 +1399,8 @@ void NetworkAnalyzer::plot(double frequency, double mag1, double mag2,
 
 	int responseChanel = ui->btnRefChn->isChecked() ? 1 : 0;
 	auto m2k_adc = std::dynamic_pointer_cast<M2kAdc>(adc_dev);
-	QString gain = !m2k_adc->chnHwGainMode(responseChanel) ? "Low" : "High";
-	ui->gainLabel->setText("Gain Mode: " + gain);
+	QString gain = !m2k_adc->chnHwGainMode(responseChanel) ? tr("Low") : tr("High");
+	ui->gainLabel->setText(tr("Gain Mode: ") + gain);
 
 	if (iterationStats.size() < samplesCount->value()) {
 		iterationStats.push_back(NetworkIterationStats(dcVoltage, m2k_adc->chnHwGainMode(responseChanel), hasError));
@@ -1429,7 +1429,7 @@ bool NetworkAnalyzer::_checkMagForOverrange(double magnitude)
 	double magnitudeThreshold = 20 * std::log10(3 * vlsb / amplitude->value());
 
 	if (magnitude < magnitudeThreshold) {
-		ui->errorLabel->setText("Response channel voltage < 50mV!");
+		ui->errorLabel->setText(tr("Response channel voltage < 50mV!"));
 		m_dBgraph.parametersOverrange(true);
 		m_phaseGraph.parametersOverrange(true);
 		return true;
@@ -1571,9 +1571,9 @@ void NetworkAnalyzer::startStop(bool pressed)
 		configHwForNetworkAnalyzing();
 		m_stop = false;
 		thd = QtConcurrent::run(this, &NetworkAnalyzer::goertzel);
-		ui->statusLabel->setText("Running");
+		ui->statusLabel->setText(tr("Running"));
 	} else {
-		ui->statusLabel->setText("Stopping...");
+		ui->statusLabel->setText(tr("Stopping..."));
 		QCoreApplication::processEvents();
 		m_stop = true;
 		if (adc_buffer) {
@@ -1582,7 +1582,7 @@ void NetworkAnalyzer::startStop(bool pressed)
 		thd.waitForFinished();
 		m_dBgraph.sweepDone();
 		m_phaseGraph.sweepDone();
-		ui->statusLabel->setText("Stopped");
+		ui->statusLabel->setText(tr("Stopped"));
 	}
 }
 

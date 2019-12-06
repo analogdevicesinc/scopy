@@ -121,7 +121,7 @@ void UserNotes::browse_btn_clicked(bool clicked)
 void UserNotes::save_btn_clicked(bool clicked)
 {
         if (ui->nameLineEdit->text() == "") {
-                ui->nameLineEdit->setText("Note " +
+		ui->nameLineEdit->setText(tr("Note ") +
                                           QString::number(m_note_count));
         }
 
@@ -141,7 +141,7 @@ void UserNotes::save_btn_clicked(bool clicked)
                 note->click();
         } else {
                 setDynamicProperty(ui->pathLineEdit, "invalid", true);
-                ui->pathWarning->setText(" Invalid or empty file!");
+		ui->pathWarning->setText(tr(" Invalid or empty file!"));
         }
 }
 
@@ -249,15 +249,15 @@ void UserNotes::loadPageForNote(Note *note, QString path)
 			indexFile.close();
 			index->setSource(QUrl::fromLocalFile(fileInfo.filePath()));
 			index->setOpenExternalLinks(true);
-			note->getPageUi()->label->setText("Path: " + path);
+			note->getPageUi()->label->setText(tr("Path: ") + path);
 		} else {
 			indexFile.close();
 			index->clear();
-			note->getPageUi()->label->setText("Warning: The file is empty!");
+			note->getPageUi()->label->setText(tr("Warning: The file is empty!"));
 		}
 	} else {
 		index->clear();
-		note->getPageUi()->label->setText("Warning: The path is invalid!");
+		note->getPageUi()->label->setText(tr("Warning: The path is invalid!"));
 	}
 
         if (index) {

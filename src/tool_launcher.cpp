@@ -566,15 +566,15 @@ void ToolLauncher::updateListOfDevices(const QVector<QString>& uris)
 
 void ToolLauncher::loadToolTips(bool connected){
 	if (connected){
-		ui->btnHome->setToolTip(QString("Click to open the home menu"));
-		ui->btnConnect->setToolTip(QString("Click to disconnect the device"));
-		ui->saveBtn->setToolTip(QString("Click to save the current session"));
-		ui->loadBtn->setToolTip(QString("Click to load a session"));
+		ui->btnHome->setToolTip(QString(tr("Click to open the home menu")));
+		ui->btnConnect->setToolTip(QString(tr("Click to disconnect the device")));
+		ui->saveBtn->setToolTip(QString(tr("Click to save the current session")));
+		ui->loadBtn->setToolTip(QString(tr("Click to load a session")));
 	} else {
 		ui->btnHome->setToolTip(QString());
 		ui->saveBtn->setToolTip(QString());
-		ui->loadBtn->setToolTip(QString("Click to load a session"));
-		ui->btnConnect->setToolTip(QString("Select a device first"));
+		ui->loadBtn->setToolTip(QString(tr("Click to load a session")));
+		ui->btnConnect->setToolTip(QString(tr("Select a device first")));
 	}
 }
 
@@ -640,7 +640,7 @@ void ToolLauncher::forgetDeviceBtn_clicked(QString uri)
 		if (ctx) {
 			connectedDev->setConnected(false, false);
 			disconnect();
-			connectedDev->connectButton()->setToolTip(QString("Click to connect the device"));
+			connectedDev->connectButton()->setToolTip(QString(tr("Click to connect the device")));
 		}
 	}
 
@@ -790,7 +790,7 @@ void ToolLauncher::setupHomepage()
 	QWidget *reportRegion = new QWidget(homepage);
 	QHBoxLayout *reportLayout = new QHBoxLayout(reportRegion);
 	QPushButton *reportBtn = new QPushButton(reportRegion);
-	reportBtn->setText("Report a bug!");
+	reportBtn->setText(tr("Report a bug!"));
 	reportBtn->setStyleSheet("QPushButton {"
 			     "border: 0px;"
 			     "border-radius: 4px;"
@@ -991,9 +991,9 @@ void adiscope::ToolLauncher::deviceBtn_clicked(bool pressed)
 	}
 
 	if (pressed){
-		ui->btnConnect->setToolTip(QString("Click to connect the device"));
+		ui->btnConnect->setToolTip(QString(tr("Click to connect the device")));
 	} else {
-		ui->btnConnect->setToolTip(QString("Select a device first"));
+		ui->btnConnect->setToolTip(QString(tr("Select a device first")));
 	}
 }
 
@@ -1050,9 +1050,9 @@ void adiscope::ToolLauncher::connectBtn_clicked(bool pressed)
 	}
 	selectedDev->connectButton()->setEnabled(false);
 	if (selectedDev != connectedDev) {
-		selectedDev->connectButton()->setText("Connecting...");
+		selectedDev->connectButton()->setText(tr("Connecting..."));
 	} else {
-		selectedDev->connectButton()->setText("Disconnecting...");
+		selectedDev->connectButton()->setText(tr("Disconnecting..."));
 	}
 	QApplication::processEvents();
 
@@ -1064,7 +1064,7 @@ void adiscope::ToolLauncher::connectBtn_clicked(bool pressed)
 				    this, SLOT(calibrationThreadWatcherFinished()));
 		connectedDev->setConnected(false, false);
 		disconnect();
-		connectedDev->connectButton()->setToolTip(QString("Click to connect the device"));
+		connectedDev->connectButton()->setToolTip(QString(tr("Click to connect the device")));
 	}
 
 	if (connectedDev != selectedDev) {
@@ -1075,7 +1075,7 @@ void adiscope::ToolLauncher::connectBtn_clicked(bool pressed)
 			bool success = switchContext(uri);
 			if (success) {
 				selectedDev->setConnected(true, false, ctx);
-				selectedDev->connectButton()->setText("Calibrating...");
+				selectedDev->connectButton()->setText(tr("Calibrating..."));
 				selectedDev->setName(filter->hw_name());
 				selectedDev->infoPage()->identifyDevice(true);
 				setDynamicProperty(ui->btnConnect, "connected", true);
@@ -1252,8 +1252,8 @@ void adiscope::ToolLauncher::requestCalibrationCancel()
 
 void adiscope::ToolLauncher::calibrationFailedCallback()
 {
-	selectedDev->infoPage()->setStatusLabel("Calibration Failed");
-	selectedDev->connectButton()->setText("Disconnect");
+	selectedDev->infoPage()->setStatusLabel(tr("Calibration Failed"));
+	selectedDev->connectButton()->setText(tr("Disconnect"));
 	selectedDev->connectButton()->setEnabled(true);
 	getConnectedDevice()->calibrateButton()->setEnabled(true);
 }
@@ -1394,7 +1394,7 @@ void adiscope::ToolLauncher::enableDacBasedTools()
 	}
 
 	Q_EMIT dacToolsCreated();
-	selectedDev->connectButton()->setText("Disconnect");
+	selectedDev->connectButton()->setText(tr("Disconnect"));
 	selectedDev->connectButton()->setEnabled(true);
 
 	for (auto &tool : toolList) {
@@ -1488,7 +1488,7 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 			search_timer->stop();
 
 			QMessageBox info(this);
-			info.setText("Digital decoders support is disabled. Some features may be missing");
+			info.setText(tr("Digital decoders support is disabled. Some features may be missing"));
 			info.exec();
 		} else {
 			bool success = loadDecoders(QCoreApplication::applicationDirPath() +
@@ -1498,7 +1498,7 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 				search_timer->stop();
 
 				QMessageBox error(this);
-				error.setText("There was a problem initializing libsigrokdecode. Some features may be missing");
+				error.setText(tr("There was a problem initializing libsigrokdecode. Some features may be missing"));
 				error.exec();
 			}
 		}

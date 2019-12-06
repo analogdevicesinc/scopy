@@ -151,28 +151,28 @@ void StartStopRangeWidget::_createSpinButtons(bool hasProgressWidget)
 		{"Hz",1e0},
 		{"kHz",1e3},
 		{"MHz",1e6}
-	},"Start", minValue, maxValue,
+	},tr("Start"), minValue, maxValue,
 	hasProgressWidget, false, this,
 	{1, 2.5, 5, 7.5});
 	stop_freq = new ScaleSpinButton({
 		{"Hz",1e0},
 		{"kHz",1e3},
 		{"MHz",1e6}
-	},"Stop", minValue, maxValue,
+	},tr("Stop"), minValue, maxValue,
 	hasProgressWidget, false, this,
 	{1, 2.5, 5, 7.5});
 	center_freq = new ScaleSpinButton({
 		{"Hz",1e0},
 		{"kHz",1e3},
 		{"MHz",1e6}
-	},"Center", minValue, maxValue - 1,
+	},tr("Center"), minValue, maxValue - 1,
 	hasProgressWidget, false, this,
 	{1, 2.5, 5, 7.5});
 	span_freq = new ScaleSpinButton({
 		{"Hz",1e0},
 		{"kHz",1e3},
 		{"MHz",1e6}
-	},"Span", minValue, maxValue - 1,
+	},tr("Span"), minValue, maxValue - 1,
 	hasProgressWidget, false, this,
 	{1, 2.5, 5, 7.5});
 

@@ -174,102 +174,102 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 		{"ns",1e-9},
 		{"μs",1e-6},
 		{"ms",1e-3},
-		{"seconds",1e0}
-	}, "Phase", 0, 360, true, true, this);
+		{"s",1e0}
+	}, tr("Phase"), 0, 360, true, true, this);
 
 	amplitude = new ScaleSpinButton({
 		{"μVolts p-p",1e-6},
 		{"mVolts p-p",1e-3},
 		{"Volts p-p",1e0}
-	}, "Amplitude", 0.000001, 10, true, true, this);
+	}, tr("Amplitude"), 0.000001, 10, true, true, this);
 
 	offset = new PositionSpinButton({
 		{"μVolts",1e-6},
 		{"mVolts",1e-3},
 		{"Volts",1e0}
-	}, "Offset", -5, 5, true, true, this);
+	}, tr("Offset"), -5, 5, true, true, this);
 
 	frequency = new ScaleSpinButton({
 		{"mHz",1e-3},
 		{"Hz",1e0},
 		{"kHz",1e3},
 		{"MHz",1e6}
-	},"Frequency", 0.001, 0.0, true, false, this);
+	},tr("Frequency"), 0.001, 0.0, true, false, this);
 
 	/* Create trapezoidal waveform control widgets */
 	riseTime = new ScaleSpinButton({
 		{"ns",1e-9},
 		{"μs",1e-6},
 		{"ms",1e-3},
-		{"seconds",1e0}
-	},"Rise Time", 0, 10, true, false, this);
+		{"s",1e0}
+	},tr("Rise Time"), 0, 10, true, false, this);
 
 	fallTime = new ScaleSpinButton({
 		{"ns",1e-9},
 		{"μs",1e-6},
 		{"ms",1e-3},
-		{"seconds",1e0}
-	},"Fall Time", 0, 10, true, false, this);
+		{"s",1e0}
+	},tr("Fall Time"), 0, 10, true, false, this);
 
 	holdHighTime = new ScaleSpinButton({
 		{"ns",1e-9},
 		{"μs",1e-6},
 		{"ms",1e-3},
-		{"seconds",1e0}
-	},"High Time", 0, 10, true, false, this);
+		{"s",1e0}
+	},tr("High Time"), 0, 10, true, false, this);
 
 	holdLowTime = new ScaleSpinButton({
 		{"ns",1e-9},
 		{"μs",1e-6},
 		{"ms",1e-3},
-		{"seconds",1e0}
-	},"Low Time", 0, 10, true, false, this);
+		{"s",1e0}
+	},tr("Low Time"), 0, 10, true, false, this);
 
 	/* Create file control widgets */
 	filePhase = new PhaseSpinButton({
 		{"samples",1e0}
-	}, "Phase", 0.0, 360.0, true, false, this);
+	}, tr("Phase"), 0.0, 360.0, true, false, this);
 
 	fileOffset = new PositionSpinButton({
 		{"μVolts",1e-6},
 		{"mVolts",1e-3},
 		{"Volts",1e0}
-	}, "Offset", -5, 5, true, true, this);
+	}, tr("Offset"), -5, 5, true, true, this);
 
 	fileSampleRate = new ScaleSpinButton({
 		{"mHz",1e-3},
 		{"Hz",1e0},
 		{"kHz",1e3},
 		{"MHz",1e6}
-	},"SampleRate", 0.001, 0.0, true, false, this);
+	},tr("SampleRate"), 0.001, 0.0, true, false, this);
 
 	fileAmplitude = new ScaleSpinButton({
 		{"μVolts",1e-6},
 		{"mVolts",1e-3},
 		{"Volts",1e0}
-	}, "Amplitude", 0.000001, 10, true, true, this);
+	}, tr("Amplitude"), 0.000001, 10, true, true, this);
 
 	mathFrequency = new ScaleSpinButton({
 		{"mHz",1e-3},
 		{"Hz",1e0},
 		{"kHz",1e3},
 		{"MHz",1e6}
-	},"Frequency", 0.001, 0.0, true, false, this);
+	}, tr("Frequency"), 0.001, 0.0, true, false, this);
 
 	noiseAmplitude = new ScaleSpinButton({
 		{"μVolts",1e-6},
 		{"mVolts",1e-3},
 		{"Volts",1e0}
-	}, "Amplitude", 0.000001, 10, true, true, this);
+	}, tr("Amplitude"), 0.000001, 10, true, true, this);
 
 	constantValue = new PositionSpinButton({
 		{"mVolts",1e-3},
 		{"Volts",1e0}
-	}, "Value", -5, 5, true, true, this);
+	}, tr("Value"), -5, 5, true, true, this);
 
 	dutycycle = new PositionSpinButton({
 		{"%",1e0}
-	}, "Duty Cycle", -5, 100, true, false, this);
+	}, tr("Duty Cycle"), -5, 100, true, false, this);
 
 	ui->waveformGrid->addWidget(amplitude, 0, 0, 1, 1);
 	ui->waveformGrid->addWidget(offset, 0, 1, 1, 1);

@@ -1602,22 +1602,22 @@ struct cursorReadoutsText CapturePlot::allCursorReadouts() const
 void CapturePlot::setTimeBaseLabelValue(double value)
 {
 	QString text = d_cursorTimeFormatter.format(value, "", 3);
-	if (d_timeBaseLabel->text().contains("Zoom: ")) {
-		d_timeBaseLabel->setText("Zoom: " + text + "/div");
+	if (d_timeBaseLabel->text().contains(tr("Zoom: "))) {
+		d_timeBaseLabel->setText(tr("Zoom: ") + text + tr("/div"));
 	} else {
-		d_timeBaseLabel->setText(text + "/div");
+		d_timeBaseLabel->setText(text + tr("/div"));
 	}
 }
 
 void CapturePlot::setTimeBaseZoomed(bool zoomed)
 {
 	if (zoomed) {
-		if (!d_timeBaseLabel->text().contains("Zoom: "))
-			d_timeBaseLabel->setText("Zoom: " + d_timeBaseLabel->text());
+		if (!d_timeBaseLabel->text().contains(tr("Zoom: ")))
+			d_timeBaseLabel->setText(tr("Zoom: ") + d_timeBaseLabel->text());
 	} else {
 		QString text = d_timeBaseLabel->text();
-		if (text.contains("Zoom: ")) {
-			text = text.remove("Zoom: ");
+		if (text.contains(tr("Zoom: "))) {
+			text = text.remove(tr("Zoom: "));
 			d_timeBaseLabel->setText(text);
 		}
 	}
@@ -1640,16 +1640,16 @@ void CapturePlot::setTriggerState(int triggerState)
 	d_triggerStateLabel->hide();
 	switch (triggerState) {
 	case Waiting:
-		d_triggerStateLabel->setText("Waiting");
+		d_triggerStateLabel->setText(tr("Waiting"));
 		break;
 	case Triggered:
-		d_triggerStateLabel->setText("Triggered");
+		d_triggerStateLabel->setText(tr("Triggered"));
 		break;
 	case Stop:
-		d_triggerStateLabel->setText("Stop");
+		d_triggerStateLabel->setText(tr("Stop"));
 		break;
 	case Auto:
-		d_triggerStateLabel->setText("Auto");
+		d_triggerStateLabel->setText(tr("Auto"));
 		break;
 	default:
 		break;
