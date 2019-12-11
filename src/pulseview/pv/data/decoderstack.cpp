@@ -388,7 +388,14 @@ void DecoderStack::decode_proc()
 	assert(segment_);
 
 	// Prevent any other decode threads from accessing libsigrokdecode
-	lock_guard<mutex> srd_lock(global_srd_mutex_);
+	unique_lock<mutex> srd_lock(global_srd_mutex_, std::defer_lock);
+	do {
+		std::this_thread::sleep_for(std::chrono::milliseconds(1));
+	} while (!interrupt_ && !srd_lock.try_lock());
+
+	if (interrupt_) {
+		return;
+	}
 
 	// Create the session
 	srd_session_new(&session);
