@@ -30,9 +30,9 @@ namespace adiscope
 						 float sample_rate)
 
 	: sync_block("overshoot_filter",
-		io_signature::make(1,1, sizeof(float)),
-		io_signature::make (1, 1, sizeof(float))),
-	  enable(enable), TC(TC), gain(gain), sample_rate(sample_rate)
+		io_signature::make(1,1, sizeof(short)),
+		io_signature::make (1, 1, sizeof(short))),
+	  enable(enable), TC(TC), gain(gain), sample_rate(sample_rate), high_gain(false)
 
     {
     }
@@ -51,31 +51,33 @@ namespace adiscope
                        gr_vector_const_void_star &input_items,
                        gr_vector_void_star &output_items)
     {
-	const float *in = (const float*) input_items[0];
-	float *out = (float*) output_items[0];
+	const short *in = (const short*) input_items[0];
+	float *out_f = new float[noutput_items];
+	short *out = (short*) output_items[0];
 
 	float delta = 1.0 / sample_rate;
 	float TC1 = TC * float(1.0E-6);
 	float Alpha = TC1/(TC1+delta);
-	out[0]=(in[1]-in[0]);
+	out_f[0]=(in[1]-in[0]);
 
 	int i = 1;
 
-	if(enable)
+	if(enable && !high_gain)
 	{
 		for(i = 1; i < noutput_items; i++) {
-			out[i]=Alpha*(out[i-1]+(in[i]-in[i-1]));
+			out_f[i]=(Alpha*(out_f[i-1]+(float)(in[i]-in[i-1])));
 		}
 
 		for(i = 0; i < noutput_items;i++){
-			out[i]=in[i]+(out[i]*gain);
+			out[i]=in[i]+(short)((out_f[i])*gain);
 		}
 
 	}
 	else
 	{
-		memcpy(out,in,noutput_items*sizeof(float));
+		memcpy(out,in,noutput_items*sizeof(short));
 	}
+	delete []out_f;
         return noutput_items;
     }
 
@@ -112,5 +114,14 @@ namespace adiscope
     void frequency_compensation_filter_impl::set_sample_rate(float sample_rate)
     {
 	    this->sample_rate = sample_rate;
+    }
+
+    bool frequency_compensation_filter_impl::get_high_gain()
+    {
+	    return this->high_gain;
+    }
+    void frequency_compensation_filter_impl::set_high_gain(bool en)
+    {
+	    this->high_gain=en;
     }
 }

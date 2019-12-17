@@ -271,24 +271,14 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 			m2k_adc->chnCorrectionGain(1));
 	}
 
-	freq_comp_filt[0][0] = adiscope::frequency_compensation_filter::make();
-	freq_comp_filt[0][1] = adiscope::frequency_compensation_filter::make();
-	freq_comp_filt[1][0] = adiscope::frequency_compensation_filter::make();
-	freq_comp_filt[1][1] = adiscope::frequency_compensation_filter::make();
-
-	freq_comp_filt[0][1]->set_enable(false);
-	freq_comp_filt[1][1]->set_enable(false);
 
 	for (unsigned int i = 0; i < nb_channels; i++) {
 		ids[i] = iio->connect(adc_samp_conv, i, i,
 				true, qt_time_block->nsamps());
 
-		iio->connect(adc_samp_conv, i , freq_comp_filt[i][0], 0);
-		iio->connect(freq_comp_filt[i][0], 0 , freq_comp_filt[i][1], 0);
+		iio->connect(adc_samp_conv, i, qt_time_block, i);
 
-		iio->connect(freq_comp_filt[i][1], 0, qt_time_block, i);
-
-		iio->connect(freq_comp_filt[i][1], 0, qt_hist_block, i);
+		iio->connect(adc_samp_conv, i, qt_hist_block, i);
 	}
 
 	adc_samp_conv_block = adc_samp_conv;
@@ -457,14 +447,14 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	init_channel_settings();
 
 	connect(ch_ui->filter_en, &QCheckBox::toggled, [&](bool en) {
-			freq_comp_filt[current_ch_widget][0]->set_enable(en);
+			iio->freq_comp_filt[current_ch_widget][0]->set_enable(en);
 	});
 	connect(ch_ui->filter_TC, &QLineEdit::textChanged, [&](QString str) {
 		bool ok;
 		float val = str.toFloat(&ok);
 		if(!ok)
 			return;
-		freq_comp_filt[current_ch_widget][0]->set_TC(val);
+		iio->freq_comp_filt[current_ch_widget][0]->set_TC(val);
 
 	});
 	connect(ch_ui->filter_gain, &QLineEdit::textChanged, [&](QString str) {
@@ -472,19 +462,19 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		float val = str.toFloat(&ok);
 		if(!ok)
 			return;
-		freq_comp_filt[current_ch_widget][0]->set_gain(val);
+		iio->freq_comp_filt[current_ch_widget][0]->set_gain(val);
 	});
 
 
 	connect(ch_ui->filter2_en, &QCheckBox::toggled, [&](bool en) {
-			freq_comp_filt[current_ch_widget][1]->set_enable(en);
+			iio->freq_comp_filt[current_ch_widget][1]->set_enable(en);
 	});
 	connect(ch_ui->filter2_TC, &QLineEdit::textChanged, [&](QString str) {
 		bool ok;
 		float val = str.toFloat(&ok);
 		if(!ok)
 			return;
-		freq_comp_filt[current_ch_widget][1]->set_TC(val);
+		iio->freq_comp_filt[current_ch_widget][1]->set_TC(val);
 
 	});
 	connect(ch_ui->filter2_gain, &QLineEdit::textChanged, [&](QString str) {
@@ -492,7 +482,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		float val = str.toFloat(&ok);
 		if(!ok)
 			return;
-		freq_comp_filt[current_ch_widget][1]->set_gain(val);
+		iio->freq_comp_filt[current_ch_widget][1]->set_gain(val);
 	});
 
 	timeBase->setValue(plot.HorizUnitsPerDiv());
@@ -1256,6 +1246,7 @@ void Oscilloscope::readPreferences()
 		enableLabels(false);
 	}
 
+	update_chn_settings_panel(current_ch_widget);
 	m2k_adc->setFilteringEnabled(prefPanel->getOsc_filtering_enabled());
 }
 
@@ -3162,8 +3153,8 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 		adc->setSampleRate(active_sample_rate);
 		for(auto i=0;i<nb_channels;i++)
 		{
-			freq_comp_filt[i][0]->set_sample_rate(active_sample_rate);
-			freq_comp_filt[i][1]->set_sample_rate(active_sample_rate);
+			iio->freq_comp_filt[i][0]->set_sample_rate(active_sample_rate);
+			iio->freq_comp_filt[i][1]->set_sample_rate(active_sample_rate);
 		}
 		trigger_settings.setTriggerDelay(active_trig_sample_count);
 		last_set_time_pos = active_time_pos;
@@ -3348,8 +3339,8 @@ void adiscope::Oscilloscope::onTimePositionChanged(double value)
 		adc->setSampleRate(active_sample_rate);
 		for(auto i=0;i<nb_channels;i++)
 		{
-			freq_comp_filt[i][0]->set_sample_rate(active_sample_rate);
-			freq_comp_filt[i][1]->set_sample_rate(active_sample_rate);
+			iio->freq_comp_filt[i][0]->set_sample_rate(active_sample_rate);
+			iio->freq_comp_filt[i][1]->set_sample_rate(active_sample_rate);
 		}
 	}
 
@@ -3566,12 +3557,12 @@ void Oscilloscope::update_chn_settings_panel(int id)
 		ch_ui->label_3->setVisible(true);
 		ch_ui->cmbMemoryDepth->setVisible(true);
 		ch_ui->btnAutoset->setVisible(true);
-		ch_ui->filter_TC->setText(QString::number(freq_comp_filt[current_ch_widget][0]->get_TC()));
-		ch_ui->filter2_TC->setText(QString::number(freq_comp_filt[current_ch_widget][1]->get_TC()));
-		ch_ui->filter_gain->setText(QString::number(freq_comp_filt[current_ch_widget][0]->get_gain()));
-		ch_ui->filter2_gain->setText(QString::number(freq_comp_filt[current_ch_widget][1]->get_gain()));
-		ch_ui->filter_en->setChecked(freq_comp_filt[current_ch_widget][0]->get_enable());
-		ch_ui->filter2_en->setChecked(freq_comp_filt[current_ch_widget][1]->get_enable());
+		ch_ui->filter_TC->setText(QString::number(iio->freq_comp_filt[current_ch_widget][0]->get_TC()));
+		ch_ui->filter2_TC->setText(QString::number(iio->freq_comp_filt[current_ch_widget][1]->get_TC()));
+		ch_ui->filter_gain->setText(QString::number(iio->freq_comp_filt[current_ch_widget][0]->get_gain()));
+		ch_ui->filter2_gain->setText(QString::number(iio->freq_comp_filt[current_ch_widget][1]->get_gain()));
+		ch_ui->filter_en->setChecked(iio->freq_comp_filt[current_ch_widget][0]->get_enable());
+		ch_ui->filter2_en->setChecked(iio->freq_comp_filt[current_ch_widget][1]->get_enable());
 	}
 
 	auto max_elem = max_element(probe_attenuation.begin(), probe_attenuation.begin() + nb_channels);
@@ -4640,6 +4631,8 @@ void Oscilloscope::setGainMode(uint chnIdx, M2kAdc::GainMode gain_mode)
 					adc_samp_conv_block);
 
 	block->setHardwareGain(chnIdx, m2k_adc->gainAt(gain_mode));
+	iio->freq_comp_filt[chnIdx][0]->set_high_gain(gain_mode);
+	iio->freq_comp_filt[chnIdx][1]->set_high_gain(gain_mode);
 	trigger_settings.updateHwVoltLevels(chnIdx);
 }
 
@@ -4696,8 +4689,8 @@ void Oscilloscope::writeAllSettingsToHardware()
 	}
 	for(auto i=0;i<nb_channels;i++)
 	{
-		freq_comp_filt[i][0]->set_sample_rate(active_sample_rate);
-		freq_comp_filt[i][1]->set_sample_rate(active_sample_rate);
+		iio->freq_comp_filt[i][0]->set_sample_rate(active_sample_rate);
+		iio->freq_comp_filt[i][1]->set_sample_rate(active_sample_rate);
 	}
 
 	// Writes all trigger settings to hardware

@@ -49,7 +49,7 @@ iio_manager::iio_manager(unsigned int block_id,
 	if (!dev)
 		throw std::runtime_error("Device not found");
 
-	unsigned int nb_channels = iio_device_get_channels_count(dev);
+	nb_channels = iio_device_get_channels_count(dev);
 
 	iio_block = iio::device_source::make_from(ctx, _dev,
 			std::vector<std::string>(), _dev,
@@ -59,9 +59,22 @@ iio_manager::iio_manager(unsigned int block_id,
 	/* Avoid unconnected channel errors by connecting a dummy sink */
 	auto dummy_copy = blocks::copy::make(sizeof(short));
 	auto dummy = blocks::null_sink::make(sizeof(short));
+
+
+	//TODO - make dynamic
+	freq_comp_filt[0][0] = adiscope::frequency_compensation_filter::make(false);
+	freq_comp_filt[0][1] = adiscope::frequency_compensation_filter::make(false);
+	freq_comp_filt[1][0] = adiscope::frequency_compensation_filter::make(false);
+	freq_comp_filt[1][1] = adiscope::frequency_compensation_filter::make(false);
+
 	for (unsigned i = 0; i < nb_channels; i++) {
-		hier_block2::connect(iio_block, i, dummy_copy, i);
+		hier_block2::connect(iio_block,i,freq_comp_filt[i][0],0);
+		hier_block2::connect(freq_comp_filt[i][0],0,freq_comp_filt[i][1],0);
+
+		hier_block2::connect(freq_comp_filt[i][1], 0, dummy_copy, i);
+
 		hier_block2::connect(dummy_copy, i, dummy, i);
+
 	}
 
 	dummy_copy->set_enabled(true);
@@ -125,7 +138,7 @@ iio_manager::port_id iio_manager::connect(basic_block_sptr dst,
 
 	/* Connect the IIO block to the valve, and the valve to the
 	 * destination block */
-	iio_manager::connect(iio_block, src_port, copy, 0);
+	iio_manager::connect(freq_comp_filt[src_port][1], 0, copy, 0);
 
 	/* TODO: Find a way to share one short_to_float block per channel,
 	 * instead of having each client instanciate its own */
@@ -192,6 +205,14 @@ void iio_manager::start(iio_manager::port_id copy)
 	}
 
 	_started = true;
+}
+
+void iio_manager::set_filter_parameters(int channel, int index, bool enable, float TC, float gain, float sample_rate )
+{
+	freq_comp_filt[channel][index]->set_enable(enable);
+	freq_comp_filt[channel][index]->set_TC(TC);
+	freq_comp_filt[channel][index]->set_gain(gain);
+	freq_comp_filt[channel][index]->set_sample_rate(sample_rate);
 }
 
 void iio_manager::stop(iio_manager::port_id copy)
@@ -265,7 +286,7 @@ void iio_manager::del_connection(gr::basic_block_sptr block, bool reverse)
 		for (auto it = connections.begin();
 				it != connections.end(); ++it) {
 			if (reverse) {
-				if (block != it->dst || it->src == iio_block)
+				if (block != it->dst || it->src == freq_comp_filt[0][1] || it->src == freq_comp_filt[1][1])
 					continue;
 			} else if (block != it->src) {
 				continue;
