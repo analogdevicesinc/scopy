@@ -314,8 +314,6 @@ namespace adiscope {
 		QMap<QString, boost::shared_ptr<gr::analog::rail_ff>> math_rails;
 		std::vector<boost::shared_ptr<gr::blocks::multiply_const_ff>> math_probe_atten;
 
-		adiscope::frequency_compensation_filter::sptr freq_comp_filt[2][2];
-
 		iio_manager::port_id *ids;
 		iio_manager::port_id *hist_ids;
 		iio_manager::port_id *autoset_id;

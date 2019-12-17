@@ -27,6 +27,7 @@
 #include <gnuradio/iio/device_source.h>
 #include <gnuradio/blocks/copy.h>
 #include <gnuradio/blocks/float_to_complex.h>
+#include <frequency_compensation_filter.h>
 
 #include <mutex>
 
@@ -87,6 +88,7 @@ namespace adiscope {
 		/* Change the buffer size at runtime.
 		 * Warning: the flowgraph needs to be locked first! */
 		void set_buffer_size(port_id id, unsigned long size);
+		void set_filter_parameters(int channel, int index, bool enable, float TC, float gain, float sample_rate );
 
 		/* VERY ugly hack. The reconfiguration that happens after
 		 * locking/unlocking the flowgraph is sort of broken; the tags
@@ -98,6 +100,8 @@ namespace adiscope {
 
 		/* Set the timeout for the source device */
 		void set_device_timeout(unsigned int mseconds);
+
+		adiscope::frequency_compensation_filter::sptr freq_comp_filt[2][2];
 
 	private:
 		static std::map<const std::string, map_entry> dev_map;
@@ -111,6 +115,7 @@ namespace adiscope {
 		std::vector<std::pair<port_id, unsigned long> > copy_blocks;
 
 		gr::iio::device_source::sptr iio_block;
+		unsigned int nb_channels;
 
 		struct connection {
 			gr::basic_block_sptr src;

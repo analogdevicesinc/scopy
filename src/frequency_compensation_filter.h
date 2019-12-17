@@ -47,6 +47,8 @@ namespace adiscope {
       virtual void set_gain(float gain) = 0;
       virtual float get_gain() = 0;
       virtual void set_sample_rate(float sample_rate) = 0;
+      virtual bool get_high_gain() = 0;
+      virtual void set_high_gain(bool en) = 0;
     };
 
 } /* namespace adiscope */

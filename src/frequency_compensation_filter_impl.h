@@ -34,6 +34,7 @@ namespace adiscope {
 	    float TC, gain;
 	    float sample_rate;
 	    int iterations;
+	    bool high_gain;
 
     public:
 	typedef boost::shared_ptr<frequency_compensation_filter> sptr;
@@ -50,6 +51,8 @@ namespace adiscope {
 	void set_gain(float gain);
 	float get_gain() override;
 	void set_sample_rate(float sample_rate);
+	bool get_high_gain() override;
+	void set_high_gain(bool en);
     };
 }
 #endif
