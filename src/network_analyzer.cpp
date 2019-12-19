@@ -95,6 +95,10 @@ void NetworkAnalyzer::_configureAdcFlowgraph(size_t buffer_size)
 
 		capture1 = gr::blocks::vector_source_s::make(std::vector<short>(), false, 1);
 		capture2 = gr::blocks::vector_source_s::make(std::vector<short>(), false, 1);
+		f11 = adiscope::frequency_compensation_filter::make(false);
+		f12 = adiscope::frequency_compensation_filter::make(false);
+		f21 = adiscope::frequency_compensation_filter::make(false);
+		f22 = adiscope::frequency_compensation_filter::make(false);
 		s2f1 = gr::blocks::short_to_float::make();
 		s2f2 = gr::blocks::short_to_float::make();
 		goertzel1 = gr::fft::goertzel_fc::make(1, 1, 1);
@@ -117,8 +121,12 @@ void NetworkAnalyzer::_configureAdcFlowgraph(size_t buffer_size)
 		adc_conv->setCorrectionGain(1,
 			m2k_adc->chnCorrectionGain(1));
 
-		capture_top_block->connect(capture1, 0, s2f1, 0);
-		capture_top_block->connect(capture2, 0, s2f2, 0);
+		capture_top_block->connect(capture1, 0, f11, 0);
+		capture_top_block->connect(capture2, 0, f21, 0);
+		capture_top_block->connect(f11, 0, f12, 0);
+		capture_top_block->connect(f21, 0, f22, 0);
+		capture_top_block->connect(f12, 0, s2f1, 0);
+		capture_top_block->connect(f22, 0, s2f2, 0);
 		capture_top_block->connect(s2f1, 0, dc_cancel1, 0);
 		capture_top_block->connect(s2f2, 0, dc_cancel2, 0);
 
@@ -1014,6 +1022,37 @@ void NetworkAnalyzer::computeFrequencyArray()
 	iterationsReadyCv.notify_one();
 }
 
+void NetworkAnalyzer::setFilterParameters()
+{
+
+	auto m2k_adc = std::dynamic_pointer_cast<M2kAdc>(adc_dev);
+
+	f11->set_enable(iio->freq_comp_filt[0][0]->get_enable());
+	f12->set_enable(iio->freq_comp_filt[0][1]->get_enable());
+	f21->set_enable(iio->freq_comp_filt[1][0]->get_enable());
+	f22->set_enable(iio->freq_comp_filt[1][1]->get_enable());
+
+	f11->set_TC(iio->freq_comp_filt[0][0]->get_TC());
+	f12->set_TC(iio->freq_comp_filt[0][1]->get_TC());
+	f21->set_TC(iio->freq_comp_filt[1][0]->get_TC());
+	f22->set_TC(iio->freq_comp_filt[1][1]->get_TC());
+
+	f11->set_gain(iio->freq_comp_filt[0][0]->get_gain());
+	f12->set_gain(iio->freq_comp_filt[0][1]->get_gain());
+	f21->set_gain(iio->freq_comp_filt[1][0]->get_gain());
+	f22->set_gain(iio->freq_comp_filt[1][1]->get_gain());
+
+	f11->set_sample_rate(m2k_adc->sampleRate());
+	f12->set_sample_rate(m2k_adc->sampleRate());
+	f21->set_sample_rate(m2k_adc->sampleRate());
+	f22->set_sample_rate(m2k_adc->sampleRate());
+
+	f11->set_high_gain(m2k_adc->chnHwGainMode(0));
+	f12->set_high_gain(m2k_adc->chnHwGainMode(0));
+	f21->set_high_gain(m2k_adc->chnHwGainMode(1));
+	f22->set_high_gain(m2k_adc->chnHwGainMode(1));
+}
+
 void NetworkAnalyzer::goertzel()
 {
 	// Network Analyzer run method using the Goertzel Algorithm (single bin DFT)
@@ -1025,6 +1064,7 @@ void NetworkAnalyzer::goertzel()
 
 	// Adjust the gain of the ADC channels based on sweep settings
 	updateGainMode();
+	setFilterParameters();
 
 	// Wait for the iterations thread to finish
 	boost::unique_lock<boost::mutex> lock(iterationsReadyMutex);
@@ -1104,6 +1144,7 @@ void NetworkAnalyzer::goertzel()
 		goertzel2->set_rate(adc_rate);
 
 
+		setFilterParameters();
 		// TODO: Use libm2k here
 
 		std::vector<struct iio_channel *> adc_channels;
