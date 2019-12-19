@@ -825,6 +825,55 @@ void Channel_API::setAcCoupling(bool val)
 	}
 }
 
+bool Channel_API::filter1Enable() const {
+	int index = osc->channels_api.indexOf(const_cast<Channel_API*>(this));
+	return osc->iio->freq_comp_filt[index][0]->get_enable();
+}
+bool Channel_API::filter2Enable() const {
+	int index = osc->channels_api.indexOf(const_cast<Channel_API*>(this));
+	return osc->iio->freq_comp_filt[index][1]->get_enable();
+}
+void Channel_API::setFilter1Enable(bool en) {
+	int index = osc->channels_api.indexOf(const_cast<Channel_API*>(this));
+	osc->iio->freq_comp_filt[index][0]->set_enable(en);
+}
+void Channel_API::setFilter2Enable(bool en){
+	int index = osc->channels_api.indexOf(const_cast<Channel_API*>(this));
+	osc->iio->freq_comp_filt[index][1]->set_enable(en);
+}
+float Channel_API::filter1TC() const {
+	int index = osc->channels_api.indexOf(const_cast<Channel_API*>(this));
+	return osc->iio->freq_comp_filt[index][0]->get_TC();
+}
+float Channel_API::filter2TC() const {
+	int index = osc->channels_api.indexOf(const_cast<Channel_API*>(this));
+	return osc->iio->freq_comp_filt[index][1]->get_TC();
+}
+void Channel_API::setFilter1TC(float tc){
+	int index = osc->channels_api.indexOf(const_cast<Channel_API*>(this));
+	osc->iio->freq_comp_filt[index][0]->set_TC(tc);
+}
+void Channel_API::setFilter2TC(float tc){
+	int index = osc->channels_api.indexOf(const_cast<Channel_API*>(this));
+	osc->iio->freq_comp_filt[index][1]->set_TC(tc);
+}
+float Channel_API::filter1Gain() const {
+	int index = osc->channels_api.indexOf(const_cast<Channel_API*>(this));
+	return osc->iio->freq_comp_filt[index][0]->get_gain();
+}
+float Channel_API::filter2Gain() const {
+	int index = osc->channels_api.indexOf(const_cast<Channel_API*>(this));
+	return osc->iio->freq_comp_filt[index][1]->get_gain();
+}
+void Channel_API::setFilter1Gain(float gain){
+	int index = osc->channels_api.indexOf(const_cast<Channel_API*>(this));
+	osc->iio->freq_comp_filt[index][0]->set_gain(gain);
+}
+void Channel_API::setFilter2Gain(float gain){
+	int index = osc->channels_api.indexOf(const_cast<Channel_API*>(this));
+	osc->iio->freq_comp_filt[index][1]->set_gain(gain);
+}
+
 QList<double> Channel_API::data() const
 {
 	QList<double> list;
