@@ -308,6 +308,14 @@ public:
 	Q_PROPERTY(double pos_duty READ measured_pos_duty)
 	Q_PROPERTY(double neg_duty READ measured_neg_duty)
 	Q_PROPERTY(QList<double> data READ data STORED false)
+	Q_PROPERTY(bool filter1_en READ filter1Enable WRITE setFilter1Enable)
+	Q_PROPERTY(float filter1_tc READ filter1TC WRITE setFilter1TC)
+	Q_PROPERTY(float filter1_gain READ filter1Gain WRITE setFilter1Gain)
+	Q_PROPERTY(bool filter2_en READ filter2Enable WRITE setFilter2Enable)
+	Q_PROPERTY(float filter2_tc READ filter2TC WRITE setFilter2TC)
+	Q_PROPERTY(float filter2_gain READ filter2Gain WRITE setFilter2Gain)
+
+
 public:
 	explicit Channel_API(Oscilloscope *osc) :
 		ApiObject(), osc(osc) {}
@@ -356,6 +364,20 @@ public:
 	double measured_pos_duty() const;
 	double measured_neg_duty() const;
 	QList<double> data() const;
+	bool filter1Enable() const;
+	bool filter2Enable() const;
+	void setFilter1Enable(bool en);
+	void setFilter2Enable(bool en);
+	float filter1TC() const;
+	float filter2TC() const;
+	void setFilter1TC(float tc);
+	void setFilter2TC(float tc);
+	float filter1Gain() const;
+	float filter2Gain() const;
+	void setFilter1Gain(float gain);
+	void setFilter2Gain(float gain);
+
+
 
 	Q_INVOKABLE void setColor(int, int, int, int a = 255);
 
