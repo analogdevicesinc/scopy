@@ -50,7 +50,8 @@ Preferences::Preferences(QWidget *parent) :
 	osc_filtering_enabled(true),
 	mini_hist_enabled(false),
 	digital_decoders_enabled(true),
-	m_initialized(false)
+	m_initialized(false),
+	show_ADC_digital_filters(false)
 {
 	ui->setupUi(this);
 
