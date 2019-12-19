@@ -1587,6 +1587,7 @@ struct iio_buffer *NetworkAnalyzer::generateSinWave(
 	source_block->set_frequency(frequency);
 	source_block->set_amplitude(amplitude / 2.0);
 	source_block->set_offset(offset);
+	source_block->set_phase(0);
 	head_block->set_length(samples_count);
 	top_block->run();
 
