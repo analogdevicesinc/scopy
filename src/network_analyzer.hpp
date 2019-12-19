@@ -49,6 +49,7 @@
 #include <gnuradio/blocks/skiphead.h>
 #include "cancel_dc_offset_block.h"
 #include <gnuradio/blocks/vector_source_s.h>
+#include "frequency_compensation_filter.h"
 
 #include "oscilloscope.hpp"
 
@@ -166,6 +167,7 @@ private:
 	gr::top_block_sptr capture_top_block;
 	gr::blocks::vector_source_s::sptr capture1;
 	gr::blocks::vector_source_s::sptr capture2;
+	adiscope::frequency_compensation_filter::sptr f11,f12,f21,f22;
 	gr::blocks::short_to_float::sptr s2f1;
 	gr::blocks::short_to_float::sptr s2f2;
 	gr::fft::goertzel_fc::sptr goertzel1;
@@ -236,6 +238,7 @@ private:
 	QVector<QVector<double>> m_importData;
 
 	void goertzel();
+	void setFilterParameters();
 
 	struct iio_buffer *generateSinWave(
 		const struct iio_device *dev,
