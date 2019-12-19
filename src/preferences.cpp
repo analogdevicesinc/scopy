@@ -63,6 +63,12 @@ Preferences::Preferences(QWidget *parent) :
 		osc_labels_enabled = (!state ? false : true);
 		Q_EMIT notify();
 	});
+
+	connect(ui->oscADCFiltersCheckBox, &QCheckBox::stateChanged, [=](int state) {
+		show_ADC_digital_filters = (!state ? false : true);
+		Q_EMIT notify();
+	});
+
 	connect(ui->sigGenNrPeriods, &QLineEdit::returnPressed, [=]() {
 		bool isNumber = false;
 		QString text = ui->sigGenNrPeriods->text();
@@ -183,6 +189,7 @@ void Preferences::showEvent(QShowEvent *event)
 	ui->oscFilteringCheckBox->setChecked(osc_filtering_enabled);
 	ui->histCheckBox->setChecked(mini_hist_enabled);
 	ui->decodersCheckBox->setChecked(digital_decoders_enabled);
+	ui->oscADCFiltersCheckBox->setChecked(show_ADC_digital_filters);
 
 	QWidget::showEvent(event);
 }
@@ -237,6 +244,17 @@ bool Preferences::getAnimations_enabled() const
 void Preferences::setAnimations_enabled(bool value)
 {
     animations_enabled = value;
+}
+
+
+bool Preferences::getShowADCFilters() const
+{
+	return show_ADC_digital_filters;
+}
+
+void Preferences::setShowADCFilters(bool value)
+{
+    show_ADC_digital_filters = value;
 }
 
 bool Preferences::getMini_hist_enabled() const
@@ -512,6 +530,17 @@ void Preferences_API::setOscFilteringEnabled(const bool &enabled)
 {
 	preferencePanel->osc_filtering_enabled = enabled;
 }
+
+bool Preferences_API::getShowADCDigitalFilters() const
+{
+	return preferencePanel->show_ADC_digital_filters;
+}
+
+void Preferences_API::setShowADCDigitalFilters(const bool &enabled)
+{
+	preferencePanel->show_ADC_digital_filters = enabled;
+}
+
 
 bool Preferences_API::getMiniHist() const
 {

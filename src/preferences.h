@@ -96,6 +96,9 @@ public:
 	bool getDigital_decoders_enabled() const;
 	void setDigital_decoders_enabled(bool value);
 
+	bool getShowADCFilters() const ;
+	void setShowADCFilters(bool value);
+
 Q_SIGNALS:
 
 	void notify();
@@ -124,6 +127,7 @@ private:
 	bool manual_calib_enabled;
 	bool animations_enabled;
 	bool osc_filtering_enabled;
+	bool show_ADC_digital_filters;
 	bool mini_hist_enabled;
 	bool digital_decoders_enabled;
 	bool m_initialized;
@@ -152,6 +156,7 @@ class Preferences_API : public ApiObject
 	Q_PROPERTY(bool osc_filtering_enabled READ getOscFilteringEnabled WRITE setOscFilteringEnabled)
 	Q_PROPERTY(bool mini_hist_enabled READ getMiniHist WRITE setMiniHist)
 	Q_PROPERTY(bool digital_decoders READ getDigitalDecoders WRITE setDigitalDecoders)
+	Q_PROPERTY(bool show_ADC_digital_filters READ getShowADCDigitalFilters WRITE setShowADCDigitalFilters)
 
 public:
 
@@ -197,6 +202,9 @@ public:
 
 	bool getOscFilteringEnabled() const;
 	void setOscFilteringEnabled(const bool& enabled);
+
+	bool getShowADCDigitalFilters() const;
+	void setShowADCDigitalFilters(const bool& enabled);
 
 	bool getMiniHist() const;
 	void setMiniHist(const bool& enabled);

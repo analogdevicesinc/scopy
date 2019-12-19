@@ -438,6 +438,9 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	ch_ui = new Ui::ChannelSettings();
 	ch_ui->setupUi(ui->channelSettings);
 
+	ch_ui->filter1->setVisible(prefPanel->getShowADCFilters());
+	ch_ui->filter2->setVisible(prefPanel->getShowADCFilters());
+
 	ch_ui->horizontal->insertWidget(1, timeBase, 0, Qt::AlignLeft);
 	ch_ui->horizontal->insertWidget(2, timePosition, 0, Qt::AlignLeft);
 	ch_ui->vertical->insertWidget(1, voltsPerDiv, 0, Qt::AlignLeft);
@@ -3522,8 +3525,8 @@ void Oscilloscope::update_chn_settings_panel(int id)
 
 
 	} else {
-		ch_ui->filter1->setVisible(true);
-		ch_ui->filter2->setVisible(true);
+		ch_ui->filter1->setVisible(prefPanel->getShowADCFilters());
+		ch_ui->filter2->setVisible(prefPanel->getShowADCFilters());
 		ch_ui->math_settings_widget->setVisible(false);
 		ch_ui->btnAutoset->setVisible(autosetEnabled);
 		ch_ui->wCoupling->setVisible(true);
