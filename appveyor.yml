@@ -66,7 +66,8 @@ build_script:
         )
     
     - set PATH=C:\msys64\%MINGW_VERSION%\bin;%PATH%
-    - C:\msys64\usr\bin\bash -lc "mkdir /c/%BUILD_FOLDER% ; cd /c/%BUILD_FOLDER% ; cmake -G 'Unix Makefiles' %RC_COMPILER% -DCMAKE_BUILD_TYPE=RelWithDebInfo -DGIT_EXECUTABLE=/c/Program\\ Files/Git/cmd/git.exe -DPKG_CONFIG_EXECUTABLE=/%MINGW_VERSION%/bin/pkg-config.exe -DCMAKE_C_COMPILER=%ARCH%-w64-mingw32-gcc.exe -DCMAKE_CXX_COMPILER=%ARCH%-w64-mingw32-g++.exe -DBREAKPAD_HANDLER=ON /c/projects/scopy"
+    - C:\msys64\usr\bin\bash -lc "/%MINGW_VERSION%/bin/python3.exe --version"
+    - C:\msys64\usr\bin\bash -lc "mkdir /c/%BUILD_FOLDER% ; cd /c/%BUILD_FOLDER% ; cmake -G 'Unix Makefiles' %RC_COMPILER% -DCMAKE_BUILD_TYPE=RelWithDebInfo -DGIT_EXECUTABLE=/c/Program\\ Files/Git/cmd/git.exe -DPKG_CONFIG_EXECUTABLE=/%MINGW_VERSION%/bin/pkg-config.exe -DCMAKE_C_COMPILER=%ARCH%-w64-mingw32-gcc.exe -DCMAKE_CXX_COMPILER=%ARCH%-w64-mingw32-g++.exe -DBREAKPAD_HANDLER=ON -DPYTHON_EXECUTABLE=/%MINGW_VERSION%/bin/python3.exe /c/projects/scopy"
     - C:\msys64\usr\bin\bash -lc "cd /c/%BUILD_FOLDER%/resources && sed -i 's/^\(FILEVERSION .*\)$/\1,0,"{build}"/' properties.rc"
     - C:\msys64\usr\bin\bash -lc "cd /c/build_%ARCH_BIT% && make -j3"
 
