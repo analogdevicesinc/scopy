@@ -1056,7 +1056,7 @@ text-align: center;
                </sizepolicy>
               </property>
               <property name="text">
-               <string>10</string>
+               <string>1</string>
               </property>
              </widget>
             </item>
@@ -1102,7 +1102,7 @@ text-align: center;
                </sizepolicy>
               </property>
               <property name="text">
-               <string>0.1</string>
+               <string>0</string>
               </property>
              </widget>
             </item>
@@ -1219,7 +1219,7 @@ text-align: center;
                </sizepolicy>
               </property>
               <property name="text">
-               <string>10</string>
+               <string>1</string>
               </property>
              </widget>
             </item>
@@ -1268,7 +1268,7 @@ text-align: center;
                </sizepolicy>
               </property>
               <property name="text">
-               <string>0.1</string>
+               <string>0</string>
               </property>
              </widget>
             </item>

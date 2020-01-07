@@ -211,7 +211,7 @@ void iio_manager::set_filter_parameters(int channel, int index, bool enable, flo
 {
 	freq_comp_filt[channel][index]->set_enable(enable);
 	freq_comp_filt[channel][index]->set_TC(TC);
-	freq_comp_filt[channel][index]->set_gain(gain);
+	freq_comp_filt[channel][index]->set_filter_gain(gain);
 	freq_comp_filt[channel][index]->set_sample_rate(sample_rate);
 }
 

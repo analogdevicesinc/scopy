@@ -38,14 +38,14 @@ namespace adiscope {
        * \param itemsize the item size of the stream
        * \param nstreams number of streams to combine into a vector (vector size)
        */
-      static sptr make(bool enable = true, float TC = 1, float gain = -1,
+      static sptr make(bool enable = true, float TC = 1, float gain = 0,
 		       float sample_rate = 100000000);
-      virtual void set_enable(bool en) = 0;
-      virtual bool get_enable() = 0;
-      virtual void set_TC(float TC) = 0;
-      virtual float get_TC() = 0;
-      virtual void set_gain(float gain) = 0;
-      virtual float get_gain() = 0;
+      virtual void set_enable(bool en, int gain_mode = 2) = 0;
+      virtual bool get_enable(int gain_mode = 2) = 0;
+      virtual void set_TC(float TC, int gain_mode = 2) = 0;
+      virtual float get_TC(int gain_mode = 2) = 0;
+      virtual void set_filter_gain(float gain, int gain_mode = 2) = 0;
+      virtual float get_filter_gain(int gain_mode = 2) = 0;
       virtual void set_sample_rate(float sample_rate) = 0;
       virtual bool get_high_gain() = 0;
       virtual void set_high_gain(bool en) = 0;

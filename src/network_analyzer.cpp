@@ -1037,10 +1037,10 @@ void NetworkAnalyzer::setFilterParameters()
 	f21->set_TC(iio->freq_comp_filt[1][0]->get_TC());
 	f22->set_TC(iio->freq_comp_filt[1][1]->get_TC());
 
-	f11->set_gain(iio->freq_comp_filt[0][0]->get_gain());
-	f12->set_gain(iio->freq_comp_filt[0][1]->get_gain());
-	f21->set_gain(iio->freq_comp_filt[1][0]->get_gain());
-	f22->set_gain(iio->freq_comp_filt[1][1]->get_gain());
+	f11->set_filter_gain(iio->freq_comp_filt[0][0]->get_filter_gain());
+	f12->set_filter_gain(iio->freq_comp_filt[0][1]->get_filter_gain());
+	f21->set_filter_gain(iio->freq_comp_filt[1][0]->get_filter_gain());
+	f22->set_filter_gain(iio->freq_comp_filt[1][1]->get_filter_gain());
 
 	f11->set_sample_rate(m2k_adc->sampleRate());
 	f12->set_sample_rate(m2k_adc->sampleRate());
