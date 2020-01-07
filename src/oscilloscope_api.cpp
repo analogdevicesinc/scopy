@@ -639,6 +639,17 @@ QVariantList Oscilloscope_API::getChannels()
 	return list;
 }
 
+QVariantList Channel_API::getDigFilters() const
+{
+	QVariantList list;
+
+	for (Channel_Digital_Filter_API *each : digFilters)
+		list.append(QVariant::fromValue(each));
+	return list;
+}
+
+
+
 /*
  * Channel_API
  */
@@ -825,53 +836,54 @@ void Channel_API::setAcCoupling(bool val)
 	}
 }
 
-bool Channel_API::filter1Enable() const {
-	int index = osc->channels_api.indexOf(const_cast<Channel_API*>(this));
-	return osc->iio->freq_comp_filt[index][0]->get_enable();
+
+bool Channel_Digital_Filter_API::isEnableLow() const {
+	int channel = osc->channels_api.indexOf(const_cast<Channel_API*>(ch_api));
+	return osc->iio->freq_comp_filt[channel][filterIndex]->get_enable(0);
 }
-bool Channel_API::filter2Enable() const {
-	int index = osc->channels_api.indexOf(const_cast<Channel_API*>(this));
-	return osc->iio->freq_comp_filt[index][1]->get_enable();
+bool Channel_Digital_Filter_API::isEnableHigh() const {
+	int channel = osc->channels_api.indexOf(const_cast<Channel_API*>(ch_api));
+	return osc->iio->freq_comp_filt[channel][filterIndex]->get_enable(1);
 }
-void Channel_API::setFilter1Enable(bool en) {
-	int index = osc->channels_api.indexOf(const_cast<Channel_API*>(this));
-	osc->iio->freq_comp_filt[index][0]->set_enable(en);
+void Channel_Digital_Filter_API::setEnableLow(bool en) {
+	int channel = osc->channels_api.indexOf(const_cast<Channel_API*>(ch_api));
+	osc->iio->freq_comp_filt[channel][filterIndex]->set_enable(en, 0);
 }
-void Channel_API::setFilter2Enable(bool en){
-	int index = osc->channels_api.indexOf(const_cast<Channel_API*>(this));
-	osc->iio->freq_comp_filt[index][1]->set_enable(en);
+void Channel_Digital_Filter_API::setEnableHigh(bool en){
+	int channel = osc->channels_api.indexOf(const_cast<Channel_API*>(ch_api));
+	osc->iio->freq_comp_filt[channel][filterIndex]->set_enable(en, 1);
 }
-float Channel_API::filter1TC() const {
-	int index = osc->channels_api.indexOf(const_cast<Channel_API*>(this));
-	return osc->iio->freq_comp_filt[index][0]->get_TC();
+float Channel_Digital_Filter_API::TCLow() const {
+	int channel = osc->channels_api.indexOf(const_cast<Channel_API*>(ch_api));
+	return osc->iio->freq_comp_filt[channel][filterIndex]->get_TC(0);
 }
-float Channel_API::filter2TC() const {
-	int index = osc->channels_api.indexOf(const_cast<Channel_API*>(this));
-	return osc->iio->freq_comp_filt[index][1]->get_TC();
+float Channel_Digital_Filter_API::TCHigh() const {
+	int channel = osc->channels_api.indexOf(const_cast<Channel_API*>(ch_api));
+	return osc->iio->freq_comp_filt[channel][filterIndex]->get_TC(1);
 }
-void Channel_API::setFilter1TC(float tc){
-	int index = osc->channels_api.indexOf(const_cast<Channel_API*>(this));
-	osc->iio->freq_comp_filt[index][0]->set_TC(tc);
+void Channel_Digital_Filter_API::setTCLow(float tc){
+	int channel = osc->channels_api.indexOf(const_cast<Channel_API*>(ch_api));
+	osc->iio->freq_comp_filt[channel][filterIndex]->set_TC(tc, 0);
 }
-void Channel_API::setFilter2TC(float tc){
-	int index = osc->channels_api.indexOf(const_cast<Channel_API*>(this));
-	osc->iio->freq_comp_filt[index][1]->set_TC(tc);
+void Channel_Digital_Filter_API::setTCHigh(float tc){
+	int channel = osc->channels_api.indexOf(const_cast<Channel_API*>(ch_api));
+	osc->iio->freq_comp_filt[channel][filterIndex]->set_TC(tc, 1);
 }
-float Channel_API::filter1Gain() const {
-	int index = osc->channels_api.indexOf(const_cast<Channel_API*>(this));
-	return osc->iio->freq_comp_filt[index][0]->get_gain();
+float Channel_Digital_Filter_API::gainLow() const {
+	int channel = osc->channels_api.indexOf(const_cast<Channel_API*>(ch_api));
+	return osc->iio->freq_comp_filt[channel][filterIndex]->get_filter_gain(0);
 }
-float Channel_API::filter2Gain() const {
-	int index = osc->channels_api.indexOf(const_cast<Channel_API*>(this));
-	return osc->iio->freq_comp_filt[index][1]->get_gain();
+float Channel_Digital_Filter_API::gainHigh() const {
+	int channel = osc->channels_api.indexOf(const_cast<Channel_API*>(ch_api));
+	return osc->iio->freq_comp_filt[channel][filterIndex]->get_filter_gain(1);
 }
-void Channel_API::setFilter1Gain(float gain){
-	int index = osc->channels_api.indexOf(const_cast<Channel_API*>(this));
-	osc->iio->freq_comp_filt[index][0]->set_gain(gain);
+void Channel_Digital_Filter_API::setGainLow(float gain){
+	int channel = osc->channels_api.indexOf(const_cast<Channel_API*>(ch_api));
+	osc->iio->freq_comp_filt[channel][filterIndex]->set_filter_gain(gain, 0);
 }
-void Channel_API::setFilter2Gain(float gain){
-	int index = osc->channels_api.indexOf(const_cast<Channel_API*>(this));
-	osc->iio->freq_comp_filt[index][1]->set_gain(gain);
+void Channel_Digital_Filter_API::setGainHigh(float gain){
+	int channel = osc->channels_api.indexOf(const_cast<Channel_API*>(ch_api));
+	osc->iio->freq_comp_filt[channel][filterIndex]->set_filter_gain(gain, 1);
 }
 
 QList<double> Channel_API::data() const

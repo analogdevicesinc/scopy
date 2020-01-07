@@ -100,6 +100,7 @@ namespace adiscope {
 	{
 		friend class Oscilloscope_API;
 		friend class Channel_API;
+		friend class Channel_Digital_Filter_API;
 		friend class ToolLauncher_API;
 
 		Q_OBJECT
