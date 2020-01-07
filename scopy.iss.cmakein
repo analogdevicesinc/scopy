@@ -1,7 +1,7 @@
 #define AppExeName "Scopy.exe"
 #define AppName "Scopy"
 #define AppDev "Analog Devices"
-#define Python "python3.7"
+#define Python "@PYTHON_VERSION@"
 
 [Setup]
 AppId={{02A7A7F9-F068-4B1C-85F6-B6D325938E19}

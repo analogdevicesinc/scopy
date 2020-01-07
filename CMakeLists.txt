@@ -18,6 +18,10 @@
 cmake_minimum_required(VERSION 3.1.3)
 project(scopy LANGUAGES CXX VERSION 1.1.1)
 
+set(Python_ADDITIONAL_VERSIONS 3)
+FIND_PACKAGE(PythonInterp REQUIRED)
+set(PYTHON_VERSION python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR})
+
 # Get the GIT hash of the latest commit
 include(FindGit OPTIONAL)
 if (GIT_FOUND)
