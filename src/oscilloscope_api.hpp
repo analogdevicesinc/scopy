@@ -26,6 +26,7 @@ namespace adiscope {
 
 class ApiObject;
 class Oscilloscope;
+class Channel_API;
 /**
   * @brief osc object
   */
@@ -263,6 +264,40 @@ public:
 		Oscilloscope *osc;
 	};
 
+	class Channel_Digital_Filter_API : public ApiObject
+	{
+		Q_OBJECT
+
+		Q_PROPERTY(bool enLow READ isEnableLow WRITE setEnableLow)
+		Q_PROPERTY(float tcLow READ TCLow WRITE setTCLow)
+		Q_PROPERTY(float gainLow READ gainLow WRITE setGainLow)
+		Q_PROPERTY(bool enHigh READ isEnableHigh WRITE setEnableHigh)
+		Q_PROPERTY(float tcHigh READ TCHigh WRITE setTCHigh)
+		Q_PROPERTY(float gainHigh READ gainHigh WRITE setGainHigh)
+	public:
+		explicit Channel_Digital_Filter_API(Oscilloscope *osc, Channel_API *ch_api, int index) :
+			ApiObject(), osc(osc), ch_api(ch_api), filterIndex(index) {}
+		~Channel_Digital_Filter_API() {}
+		bool isEnableLow() const;
+		bool isEnableHigh() const;
+		void setEnableLow(bool en);
+		void setEnableHigh(bool en);
+		float TCLow() const;
+		float TCHigh() const;
+		void setTCLow(float tc);
+		void setTCHigh(float tc);
+		float gainLow() const;
+		float gainHigh() const;
+		void setGainLow(float gain);
+		void setGainHigh(float gain);
+
+	private:
+		Oscilloscope *osc;
+		Channel_API *ch_api;
+		int filterIndex;
+	};
+
+
 	class Channel_API : public ApiObject
 	{
 		Q_OBJECT
@@ -308,18 +343,21 @@ public:
 	Q_PROPERTY(double pos_duty READ measured_pos_duty)
 	Q_PROPERTY(double neg_duty READ measured_neg_duty)
 	Q_PROPERTY(QList<double> data READ data STORED false)
-	Q_PROPERTY(bool filter1_en READ filter1Enable WRITE setFilter1Enable)
-	Q_PROPERTY(float filter1_tc READ filter1TC WRITE setFilter1TC)
-	Q_PROPERTY(float filter1_gain READ filter1Gain WRITE setFilter1Gain)
-	Q_PROPERTY(bool filter2_en READ filter2Enable WRITE setFilter2Enable)
-	Q_PROPERTY(float filter2_tc READ filter2TC WRITE setFilter2TC)
-	Q_PROPERTY(float filter2_gain READ filter2Gain WRITE setFilter2Gain)
+
+	Q_PROPERTY(QVariantList digFilter READ getDigFilters /*WRITE setDigFilter1 */)
 
 
 public:
 	explicit Channel_API(Oscilloscope *osc) :
-		ApiObject(), osc(osc) {}
-	~Channel_API() {}
+		ApiObject(), osc(osc) {
+			for(auto i=0;i<2;i++)
+				digFilters.append(new Channel_Digital_Filter_API(osc,this,i));
+		}
+
+	~Channel_API() {
+			for(auto it = digFilters.begin();it != digFilters.end(); it++ )
+				delete *it;
+		}
 
 	bool channelEn() const;
 	void setChannelEn(bool en);
@@ -364,25 +402,14 @@ public:
 	double measured_pos_duty() const;
 	double measured_neg_duty() const;
 	QList<double> data() const;
-	bool filter1Enable() const;
-	bool filter2Enable() const;
-	void setFilter1Enable(bool en);
-	void setFilter2Enable(bool en);
-	float filter1TC() const;
-	float filter2TC() const;
-	void setFilter1TC(float tc);
-	void setFilter2TC(float tc);
-	float filter1Gain() const;
-	float filter2Gain() const;
-	void setFilter1Gain(float gain);
-	void setFilter2Gain(float gain);
-
-
+	QVariantList getDigFilters() const;
 
 	Q_INVOKABLE void setColor(int, int, int, int a = 255);
 
 private:
 	Oscilloscope *osc;
+	QList<Channel_Digital_Filter_API*> digFilters;
+
 };
 }
 
