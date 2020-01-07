@@ -465,7 +465,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		float val = str.toFloat(&ok);
 		if(!ok)
 			return;
-		iio->freq_comp_filt[current_ch_widget][0]->set_gain(val);
+		iio->freq_comp_filt[current_ch_widget][0]->set_filter_gain(val);
 	});
 
 
@@ -485,7 +485,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		float val = str.toFloat(&ok);
 		if(!ok)
 			return;
-		iio->freq_comp_filt[current_ch_widget][1]->set_gain(val);
+		iio->freq_comp_filt[current_ch_widget][1]->set_filter_gain(val);
 	});
 
 	timeBase->setValue(plot.HorizUnitsPerDiv());
@@ -3562,8 +3562,10 @@ void Oscilloscope::update_chn_settings_panel(int id)
 		ch_ui->btnAutoset->setVisible(true);
 		ch_ui->filter_TC->setText(QString::number(iio->freq_comp_filt[current_ch_widget][0]->get_TC()));
 		ch_ui->filter2_TC->setText(QString::number(iio->freq_comp_filt[current_ch_widget][1]->get_TC()));
-		ch_ui->filter_gain->setText(QString::number(iio->freq_comp_filt[current_ch_widget][0]->get_gain()));
-		ch_ui->filter2_gain->setText(QString::number(iio->freq_comp_filt[current_ch_widget][1]->get_gain()));
+		ch_ui->filter_gain->setText(QString::number(iio->freq_comp_filt[current_ch_widget][0]->get_filter_gain()));
+		ch_ui->filter2_gain->setText(QString::number(iio->freq_comp_filt[current_ch_widget][1]->get_filter_gain()));
+		ch_ui->filter_en->setText(tr("Filter 1 - Enable - ") + getChannelRangeStringVDivHelper(id));
+		ch_ui->filter2_en->setText(tr("Filter 2 - Enable - ") + getChannelRangeStringVDivHelper(id));
 		ch_ui->filter_en->setChecked(iio->freq_comp_filt[current_ch_widget][0]->get_enable());
 		ch_ui->filter2_en->setChecked(iio->freq_comp_filt[current_ch_widget][1]->get_enable());
 	}
@@ -4636,6 +4638,7 @@ void Oscilloscope::setGainMode(uint chnIdx, M2kAdc::GainMode gain_mode)
 	block->setHardwareGain(chnIdx, m2k_adc->gainAt(gain_mode));
 	iio->freq_comp_filt[chnIdx][0]->set_high_gain(gain_mode);
 	iio->freq_comp_filt[chnIdx][1]->set_high_gain(gain_mode);
+	update_chn_settings_panel(chnIdx);
 	trigger_settings.updateHwVoltLevels(chnIdx);
 }
 

@@ -30,10 +30,13 @@ namespace adiscope {
     class frequency_compensation_filter_impl : public frequency_compensation_filter
     {
     private:
+	    typedef struct {
 	    bool enable;
 	    float TC, gain;
-	    float sample_rate;
-	    int iterations;
+	    } filter_config_t;
+
+	    filter_config_t config[2];
+	    float sample_rate;	    
 	    bool high_gain;
 
     public:
@@ -44,12 +47,12 @@ namespace adiscope {
              gr_vector_const_void_star &input_items,
              gr_vector_void_star &output_items);
 
-	void set_enable(bool en);
-	bool get_enable() override;
-	void set_TC(float TC);
-	float get_TC() override;
-	void set_gain(float gain);
-	float get_gain() override;
+	void set_enable(bool en, int gain_mode);
+	bool get_enable(int gain_mode) override;
+	void set_TC(float TC, int gain_mode);
+	float get_TC(int gain_mode) override;
+	void set_filter_gain(float gain, int gain_mode);
+	float get_filter_gain(int gain_mode) override;
 	void set_sample_rate(float sample_rate);
 	bool get_high_gain() override;
 	void set_high_gain(bool en);
