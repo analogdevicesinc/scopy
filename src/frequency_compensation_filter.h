@@ -26,30 +26,33 @@
 
 namespace adiscope {
 
-    class frequency_compensation_filter : virtual public gr::sync_block
-    {
-    public:
-      // gr::blocks::streams_to_vector::sptr
-      typedef boost::shared_ptr<frequency_compensation_filter> sptr;
+class frequency_compensation_filter : virtual public gr::sync_block
+{
+public:
+	// gr::blocks::streams_to_vector::sptr
+	typedef boost::shared_ptr<frequency_compensation_filter> sptr;
 
-      /*!
-       * Make a stream-to-vector block.
-       *
-       * \param itemsize the item size of the stream
-       * \param nstreams number of streams to combine into a vector (vector size)
-       */
-      static sptr make(bool enable = true, float TC = 1, float gain = 0,
-		       float sample_rate = 100000000);
-      virtual void set_enable(bool en, int gain_mode = 2) = 0;
-      virtual bool get_enable(int gain_mode = 2) = 0;
-      virtual void set_TC(float TC, int gain_mode = 2) = 0;
-      virtual float get_TC(int gain_mode = 2) = 0;
-      virtual void set_filter_gain(float gain, int gain_mode = 2) = 0;
-      virtual float get_filter_gain(int gain_mode = 2) = 0;
-      virtual void set_sample_rate(float sample_rate) = 0;
-      virtual bool get_high_gain() = 0;
-      virtual void set_high_gain(bool en) = 0;
-    };
+	/*!
+	 * Make a frequency_compensation_filter block
+	 *
+	 * These parameters apply on both high and low gain settings
+	 * \param enable - enable state of the filter
+	 * \param TC - time constant in uS
+	 * \param gain - gain of the filter
+	 * \param sample_rate - sample rate used in filter response
+	 */
+	static sptr make(bool enable = true, float TC = 1, float gain = 0,
+			 float sample_rate = 100000000);
+	virtual void set_enable(bool en, int gain_mode = 2) = 0;
+	virtual bool get_enable(int gain_mode = 2) = 0;
+	virtual void set_TC(float TC, int gain_mode = 2) = 0;
+	virtual float get_TC(int gain_mode = 2) = 0;
+	virtual void set_filter_gain(float gain, int gain_mode = 2) = 0;
+	virtual float get_filter_gain(int gain_mode = 2) = 0;
+	virtual void set_sample_rate(float sample_rate) = 0;
+	virtual bool get_high_gain() = 0;
+	virtual void set_high_gain(bool en) = 0;
+};
 
 } /* namespace adiscope */
 #endif /* INCLUDED_BLOCKS_STREAMS_TO_SHORT_H */

@@ -27,25 +27,25 @@
 using namespace gr;
 
 namespace adiscope {
-    class frequency_compensation_filter_impl : public frequency_compensation_filter
-    {
-    private:
-	    typedef struct {
-	    bool enable;
-	    float TC, gain;
-	    } filter_config_t;
+class frequency_compensation_filter_impl : public frequency_compensation_filter
+{
+private:
+	typedef struct {
+		bool enable;
+		float TC, gain;
+	} filter_config_t;
 
-	    filter_config_t config[2];
-	    float sample_rate;	    
-	    bool high_gain;
+	filter_config_t config[2];
+	float sample_rate;
+	bool high_gain;
 
-    public:
+public:
 	typedef boost::shared_ptr<frequency_compensation_filter> sptr;
 	frequency_compensation_filter_impl(bool enable, float TC, float gain,
-			      float sample_rate);
-        int work(int noutput_items,
-             gr_vector_const_void_star &input_items,
-             gr_vector_void_star &output_items);
+					   float sample_rate);
+	int work(int noutput_items,
+		 gr_vector_const_void_star& input_items,
+		 gr_vector_void_star& output_items);
 
 	void set_enable(bool en, int gain_mode);
 	bool get_enable(int gain_mode) override;
@@ -56,6 +56,6 @@ namespace adiscope {
 	void set_sample_rate(float sample_rate);
 	bool get_high_gain() override;
 	void set_high_gain(bool en);
-    };
+};
 }
 #endif

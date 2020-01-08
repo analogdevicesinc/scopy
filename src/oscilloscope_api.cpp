@@ -633,9 +633,9 @@ QVariantList Oscilloscope_API::getChannels()
 {
 	QVariantList list;
 
-	for (Channel_API *each : osc->channels_api)
+	for (Channel_API *each : osc->channels_api) {
 		list.append(QVariant::fromValue(each));
-
+	}
 	return list;
 }
 
@@ -643,8 +643,9 @@ QVariantList Channel_API::getDigFilters() const
 {
 	QVariantList list;
 
-	for (Channel_Digital_Filter_API *each : digFilters)
+	for (Channel_Digital_Filter_API *each : digFilters) {
 		list.append(QVariant::fromValue(each));
+	}
 	return list;
 }
 
