@@ -24,42 +24,43 @@
 
 using namespace gr;
 
-namespace adiscope
-{
-frequency_compensation_filter_impl::frequency_compensation_filter_impl(bool enable, float TC, float gain,
-								       float sample_rate)
+namespace adiscope {
+frequency_compensation_filter_impl::frequency_compensation_filter_impl(
+	bool enable, float TC, float gain,
+	float sample_rate)
 
 	: sync_block("overshoot_filter",
 		     io_signature::make(1,1, sizeof(short)),
-		     io_signature::make (1, 1, sizeof(short))),
+		     io_signature::make(1, 1, sizeof(short))),
 	  sample_rate(sample_rate), high_gain(false)
 
-    {
-	for(auto i=0;i<2;i++) {
+{
+	for (auto i=0; i < 2; i++) {
 		config[i].enable = enable;
 		config[i].TC = TC;
 		config[i].gain = gain;
 	}
+
 	set_history(1);
-    }
+}
 
-    frequency_compensation_filter::sptr
-    frequency_compensation_filter::make(bool enable, float TC, float gain,
-			   float sample_rate)
-    {
-        return gnuradio::get_initial_sptr
-		(new frequency_compensation_filter_impl(enable, TC, gain,
-					   sample_rate));
-    }
+frequency_compensation_filter::sptr
+frequency_compensation_filter::make(bool enable, float TC, float gain,
+				    float sample_rate)
+{
+	return gnuradio::get_initial_sptr
+	       (new frequency_compensation_filter_impl(enable, TC, gain,
+			       sample_rate));
+}
 
-    int
-    frequency_compensation_filter_impl::work(int noutput_items,
-                       gr_vector_const_void_star &input_items,
-                       gr_vector_void_star &output_items)
-    {
-	const short *in = (const short*) input_items[0];
+int
+frequency_compensation_filter_impl::work(int noutput_items,
+		gr_vector_const_void_star& input_items,
+		gr_vector_void_star& output_items)
+{
+	const short *in = (const short *) input_items[0];
 	float *out_f = new float[noutput_items];
-	short *out = (short*) output_items[0];
+	short *out = (short *) output_items[0];
 
 	float delta = 1.0 / sample_rate;
 	float TC1 = config[high_gain].TC * float(1.0E-6);
@@ -67,72 +68,89 @@ frequency_compensation_filter_impl::frequency_compensation_filter_impl(bool enab
 	out_f[0]=(in[1]-in[0]);
 	int i = 1;
 
-	if(config[high_gain].enable)
-	{
-		for(i = 1; i < noutput_items; i++) {
+	if (config[high_gain].enable) {
+		for (i = 1; i < noutput_items; i++) {
 			out_f[i]=(Alpha*(out_f[i-1]+(float)(in[i]-in[i-1])));
 		}
 
-		for(i = 0; i < noutput_items;i++){
+		for (i = 0; i < noutput_items; i++) {
 			out[i]=in[i]+(short)((out_f[i])*config[high_gain].gain);
 		}
 
-	}
-	else
-	{
+	} else {
 		memcpy(out,in,noutput_items*sizeof(short));
 	}
+
 	delete []out_f;
-        return noutput_items;
-    }
+	return noutput_items;
+}
 
-    void frequency_compensation_filter_impl::set_enable(bool en, int gain_mode)
-    {
-	    if(gain_mode == 2) gain_mode = high_gain;
-	    this->config[gain_mode].enable = en;
-    }
+void frequency_compensation_filter_impl::set_enable(bool en, int gain_mode)
+{
+	if (gain_mode == 2) {
+		gain_mode = high_gain;
+	}
 
-    bool frequency_compensation_filter_impl::get_enable(int gain_mode)
-    {
-	    if(gain_mode == 2) gain_mode = high_gain;
-	    return this->config[gain_mode].enable;
-    }
+	this->config[gain_mode].enable = en;
+}
 
-    void frequency_compensation_filter_impl::set_TC(float TC, int gain_mode)
-    {
-	    if(gain_mode == 2) gain_mode = high_gain;
-	    this->config[gain_mode].TC = TC;
-    }
+bool frequency_compensation_filter_impl::get_enable(int gain_mode)
+{
+	if (gain_mode == 2) {
+		gain_mode = high_gain;
+	}
 
-    float frequency_compensation_filter_impl::get_TC(int gain_mode)
-    {
-	    if(gain_mode == 2) gain_mode = high_gain;
-	    return this->config[gain_mode].TC;
-    }
+	return this->config[gain_mode].enable;
+}
 
-    void frequency_compensation_filter_impl::set_filter_gain(float gain, int gain_mode)
-    {
-	    if(gain_mode == 2) gain_mode = high_gain;
-	    this->config[gain_mode].gain = gain;
-    }
+void frequency_compensation_filter_impl::set_TC(float TC, int gain_mode)
+{
+	if (gain_mode == 2) {
+		gain_mode = high_gain;
+	}
 
-    float frequency_compensation_filter_impl::get_filter_gain(int gain_mode)
-    {
-	    if(gain_mode == 2) gain_mode = high_gain;
-	    return this->config[gain_mode].gain;
-    }
+	this->config[gain_mode].TC = TC;
+}
 
-    void frequency_compensation_filter_impl::set_sample_rate(float sample_rate)
-    {
-	    this->sample_rate = sample_rate;
-    }
+float frequency_compensation_filter_impl::get_TC(int gain_mode)
+{
+	if (gain_mode == 2) {
+		gain_mode = high_gain;
+	}
 
-    bool frequency_compensation_filter_impl::get_high_gain()
-    {
-	    return this->high_gain;
-    }
-    void frequency_compensation_filter_impl::set_high_gain(bool en)
-    {
-	    this->high_gain=en;
-    }
+	return this->config[gain_mode].TC;
+}
+
+void frequency_compensation_filter_impl::set_filter_gain(float gain,
+		int gain_mode)
+{
+	if (gain_mode == 2) {
+		gain_mode = high_gain;
+	}
+
+	this->config[gain_mode].gain = gain;
+}
+
+float frequency_compensation_filter_impl::get_filter_gain(int gain_mode)
+{
+	if (gain_mode == 2) {
+		gain_mode = high_gain;
+	}
+
+	return this->config[gain_mode].gain;
+}
+
+void frequency_compensation_filter_impl::set_sample_rate(float sample_rate)
+{
+	this->sample_rate = sample_rate;
+}
+
+bool frequency_compensation_filter_impl::get_high_gain()
+{
+	return this->high_gain;
+}
+void frequency_compensation_filter_impl::set_high_gain(bool en)
+{
+	this->high_gain=en;
+}
 }
