@@ -18,7 +18,7 @@
 
 
 cmake_minimum_required(VERSION 3.5)
-project(scopy LANGUAGES CXX VERSION 1.1.1)
+project(scopy LANGUAGES CXX VERSION 1.1.2)
 
 set(Python_ADDITIONAL_VERSIONS 3)
 FIND_PACKAGE(PythonInterp REQUIRED)
