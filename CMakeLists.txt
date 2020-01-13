@@ -253,7 +253,10 @@ set(LANGUAGES
 # Run this to update translation files
 #add_custom_target(TS_FILES ALL ${CMAKE_PREFIX_PATH}/bin/lupdate -no-recursive ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/ui -ts ${LANGUAGES} WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/resources COMMENT "Generating TS files")
 # Run this to generate qm files which are used by the app
-add_custom_target(QM_FILES ALL ${CMAKE_PREFIX_PATH}/bin/lrelease ${CMAKE_SOURCE_DIR}/resources/*.ts COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/resources/languages COMMAND mv ${CMAKE_SOURCE_DIR}/resources/*.qm ${CMAKE_CURRENT_BINARY_DIR}/resources/languages COMMENT "Generating qm files")
+message(CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH})
+message(Qt5LinguistTools_DIR=${Qt5LinguistTools_DIR})
+message(QT5_DIR=${Qt5_DIR})
+add_custom_target(QM_FILES ALL ${Qt5_DIR}/../../../bin/lrelease ${CMAKE_SOURCE_DIR}/resources/*.ts COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/resources/languages COMMAND mv ${CMAKE_SOURCE_DIR}/resources/*.qm ${CMAKE_CURRENT_BINARY_DIR}/resources/languages COMMENT "Generating qm files")
 
 add_executable(${PROJECT_NAME} WIN32 ${OSX_BUNDLE}
 		${SRC_LIST}

@@ -98,6 +98,5 @@ build_script:
     - set PATH=%PATH%;"C:\Program Files (x86)\Inno Setup 5"
     - ISCC /Q C:\%BUILD_FOLDER%\scopy-%ARCH_BIT%.iss
     - appveyor PushArtifact C:\scopy-%ARCH_BIT%-setup.exe
-
-      #on_finish:
-      #- ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+#on_finish:
+#      - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
