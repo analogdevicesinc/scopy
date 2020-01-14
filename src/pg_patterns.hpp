@@ -863,7 +863,7 @@ public:
 private Q_SLOTS:
 	void parse_ui();
 	void reloadFileData();
-	void loadFileData();
+	void loadFileData(QString fileName);
 };
 
 class PatternFactory
