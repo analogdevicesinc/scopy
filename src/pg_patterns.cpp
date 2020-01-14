@@ -3274,7 +3274,7 @@ Pattern *ImportPatternUI::get_pattern()
 void ImportPatternUI::reloadFileData()
 {
 	try {
-		loadFileData();
+		loadFileData(this->fileName);
 		parse_ui();
 	} catch (FileManagerException &e) {
 		fileLineEdit->setText(QString(e.what()));
@@ -3283,7 +3283,7 @@ void ImportPatternUI::reloadFileData()
 	}
 }
 
-void ImportPatternUI::loadFileData()
+void ImportPatternUI::loadFileData(QString fileName)
 {
 		FileManager fm("Pattern Generator");
 		fm.open(fileName, FileManager::IMPORT);
@@ -3301,7 +3301,7 @@ void ImportPatternUI::build_ui(QWidget *parent,uint16_t number_of_channels)
 	frequencySpinButton->setValue(pattern->get_frequency());
 
 	try {
-		loadFileData();
+		loadFileData(fileName);
 		import_settings->clear();
 		for (int i = 0; i < data[0].size(); ++i) {
 			import_settings->addChannel(i, "CH" + QString::number(i));
@@ -3335,7 +3335,7 @@ void ImportPatternUI::build_ui(QWidget *parent,uint16_t number_of_channels)
 					       "Tab-delimited values files (*.txt)"),
 		    nullptr, (pattern->useNativeDialog() ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 		try {
-			loadFileData();
+			loadFileData(fileName);
 
 			import_settings->clear();
 			for (int i = 0; i < data[0].size(); ++i) {
