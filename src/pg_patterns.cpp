@@ -3289,6 +3289,7 @@ void ImportPatternUI::loadFileData(QString fileName)
 		fm.open(fileName, FileManager::IMPORT);
 		data.clear();
 		data = fm.read();
+		this->fileName = fileName;
 		pattern->fileName = fileName;
 }
 
