@@ -361,3 +361,4 @@ if (NOT ENABLE_APPLICATION_BUNDLE)
 	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/icon_small.svg DESTINATION share/icons/hicolor/apps/scalable RENAME scopy.svg)
 endif()
 
+configure_file(qt.conf.cmakein ${CMAKE_CURRENT_BINARY_DIR}/qt.conf @ONLY)
