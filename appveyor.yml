@@ -75,6 +75,7 @@ build_script:
 
     - mkdir c:\%DEST_FOLDER%
     - copy c:\%BUILD_FOLDER%\Scopy.exe c:\%DEST_FOLDER%\
+    - copy c:\%BUILD_FOLDER%\qt.conf c:\%DEST_FOLDER%\
     - c:\msys64\%MINGW_VERSION%\bin\windeployqt.exe --dir c:\%DEST_FOLDER% --release --no-system-d3d-compiler --no-compiler-runtime --no-quick-import --opengl --printsupport c:\%BUILD_FOLDER%\Scopy.exe
     - C:\msys64\usr\bin\bash -lc "cp -r /c/projects/scopy/resources/decoders  /c/%DEST_FOLDER%/"
 
