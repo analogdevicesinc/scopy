@@ -247,17 +247,15 @@ if (ENABLE_APPLICATION_BUNDLE)
 	set(EXTRA_BUNDLE_FILES ${QT_PLUGINS} ${ICON_FILE} ${PKGINFO} ${QT_CONF} ${DECODERS})
 endif()
 
-set(LANGUAGES
-	english.ts
-	)
+FILE(GLOB TS_FILES ${CMAKE_SOURCE_DIR}/resources/*.ts)
+set_source_files_properties(${TS_FILES} PROPERTIES OUTPUT_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/resources/languages)
 
-# Run this to update translation files
-#add_custom_target(TS_FILES ALL ${CMAKE_PREFIX_PATH}/bin/lupdate -no-recursive ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/ui -ts ${LANGUAGES} WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/resources COMMENT "Generating TS files")
-# Run this to generate qm files which are used by the app
-message(CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH})
-message(Qt5LinguistTools_DIR=${Qt5LinguistTools_DIR})
-message(QT5_DIR=${Qt5_DIR})
-add_custom_target(QM_FILES ALL ${Qt5_DIR}/../../../bin/lrelease ${CMAKE_SOURCE_DIR}/resources/*.ts COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/resources/languages COMMAND mv ${CMAKE_SOURCE_DIR}/resources/*.qm ${CMAKE_CURRENT_BINARY_DIR}/resources/languages COMMENT "Generating qm files")
+# Creates translation .ts files from ${CMAKE_SOURCE_DIR}
+#qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
+
+# Generate .qm files from the .ts files
+qt5_add_translation(QM_FILES ${TS_FILES})
+
 
 add_executable(${PROJECT_NAME} WIN32 ${OSX_BUNDLE}
 		${SRC_LIST}
