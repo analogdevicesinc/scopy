@@ -36,11 +36,6 @@ using namespace adiscope;
 
 int main(int argc, char **argv)
 {
-#ifdef Q_OS_WIN
-	/* Set environment variable QT_AUTO_SCREEN_SCALE_FACTOR to 1(true) thus
-	 * making Scopy aware of the scaling settings set by the OS */
-	qputenv("QT_AUTO_SCREEN_SCALE_FACTOR", QString("1").toLocal8Bit());
-#endif
 #if BREAKPAD_HANDLER
 #ifdef Q_OS_LINUX
 	google_breakpad::MinidumpDescriptor descriptor("/tmp");
