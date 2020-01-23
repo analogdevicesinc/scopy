@@ -54,7 +54,7 @@ void PrintablePlot::printPlot(const QString& toolName)
 
         QString date = QDateTime::currentDateTime().toString("yyyy-MM-dd-hh-mm-ss");
 
-        QString fileName = "Scopy-" + toolName + "-" + date + ".png";
+        QString fileName = "Scopy-" + toolName + "-" + date;
 
 	// https://github.com/osakared/qwt/blob/qwt-6.1-multiaxes/src/qwt_plot_renderer.cpp#L1023
 	// QwtPlotRenderer does not expose an option to select which file dialog to use
@@ -69,26 +69,26 @@ void PrintablePlot::printPlot(const QString& toolName)
 	filter += QString( "Postscript " ) + tr( "Documents" ) + " (*.ps)";
 
 	if ( imageFormats.size() > 0 ) {
-	    QString imageFilter( tr( "Images" ) );
-	    imageFilter += " (";
 	    for ( int i = 0; i < imageFormats.size(); i++ ) {
-		if ( i > 0 ) {
-		    imageFilter += " ";
-		}
-		imageFilter += "*.";
-		imageFilter += imageFormats[i];
+            filter += (imageFormats[i].toUpper() + " "
+                    + tr("Image") + " (*." +  imageFormats[i] + ")");
 	    }
-	    imageFilter += ")";
 
-	    filter += imageFilter;
 	}
 
+    QString selectedFilter = QString( "PDF " ) + tr( "Documents" ) + " (*.pdf)";
 	fileName = QFileDialog::getSaveFileName(
 	    nullptr, tr( "Export File Name" ), fileName,
-	    filter.join( ";;" ), nullptr,
+        filter.join( ";;" ), &selectedFilter,
 	    (d_useNativeDialog ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 
-	d_plotRenderer.renderDocument(this, fileName, QSizeF( 300, 200 ));
+    if (fileName.split(".").size() <= 1) {
+        // file name w/o extension. Let's append it
+        QString ext = selectedFilter.split(".")[1].split(")")[0];
+        fileName += "." + ext;
+    }
+
+    d_plotRenderer.renderDocument(this, fileName, QSizeF( 300, 200 ));
 
         insertLegend(nullptr);
 }
