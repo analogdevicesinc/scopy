@@ -137,6 +137,9 @@ int main(int argc, char **argv)
 	}
 
 	bool nonativedialog = parser.isSet("nonativedialog");
+#ifdef NONATIVE
+    nonativedialog = true;
+#endif
 	qDebug() << "Using" << (nonativedialog ? "Qt" : "Native") << "file dialogs";
 	launcher.setNativeDialogs(!nonativedialog);
 

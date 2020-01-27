@@ -304,6 +304,12 @@ endif()
 
 configure_file(Info.plist.cmakein ${CMAKE_CURRENT_BINARY_DIR}/Info.plist @ONLY)
 
+option(WITH_NATIVEDIALOGS "Enable native file dialogs for Scopy" ON)
+
+if (NOT ${WITH_NATIVEDIALOGS})
+	add_definitions(-DNONATIVE)
+endif()
+
 # Compiler options
 target_compile_options(${PROJECT_NAME} PUBLIC -Wall)
 
