@@ -49,6 +49,7 @@
 #include <QFileDialog>
 #include <QDateTime>
 #include <QSignalBlocker>
+#include <QImageWriter>
 
 #include <iio.h>
 #include <network_analyzer_api.hpp>
@@ -572,11 +573,29 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 		widget->render(&painter);
 		QString date = QDateTime::currentDateTime().toString("yyyy-MM-dd-hh-mm-ss");
 
-		QString fileNameHint = "Scopy-" + api->objectName() + "-" + date + ".png";
+		QString fileNameHint = "Scopy-" + api->objectName() + "-" + date;
 
-		QString fileName = QFileDialog::getSaveFileName(this,
-		    tr("Save to"), fileNameHint, tr({"(*.png);;"}),
-		    nullptr, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+		const QList<QByteArray> imageFormats =
+		    QImageWriter::supportedImageFormats();
+
+		QStringList filter;
+		if ( imageFormats.size() > 0 ) {
+		    for ( int i = 0; i < imageFormats.size(); i++ ) {
+			filter += (imageFormats[i].toUpper() + " "
+				+ tr("Image") + " (*." +  imageFormats[i] + ")");
+		    }
+		}
+
+		QString selectedFilter = filter[0];
+			QString fileName = QFileDialog::getSaveFileName(this,
+		    tr("Save to"), fileNameHint, filter.join(";;"),
+		    &selectedFilter, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+
+		if (fileName.split(".").size() <= 1) {
+		    // file name w/o extension. Let's append it
+		    QString ext = selectedFilter.split(".")[1].split(")")[0];
+		    fileName += "." + ext;
+		}
 
 		painter.end();
 		img.invertPixels(QImage::InvertRgb);
@@ -815,10 +834,22 @@ void NetworkAnalyzer::showEvent(QShowEvent *event)
 
 void NetworkAnalyzer::on_btnExport_clicked()
 {
+	QStringList filter;
+	filter += QString(tr("Comma-separated values files (*.csv)"));
+	filter += QString(tr("Tab-delimited values files (*.txt)"));
+	filter += QString(tr("All Files(*)"));
+
+	QString selectedFilter = filter[0];
+
 	QString fileName = QFileDialog::getSaveFileName(this,
-	    tr("Export"), "", tr("Comma-separated values files (*.csv)",
-				       "Tab-delimited values files (*.txt)"),
-	    nullptr, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+	    tr("Export"), "", filter.join(";;"),
+	    &selectedFilter, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+
+	if (fileName.split(".").size() <= 1) {
+		// file name w/o extension. Let's append it
+		QString ext = selectedFilter.split(".")[1].split(")")[0];
+		fileName += "." + ext;
+	}
 
 	if (!fileName.isEmpty()) {
 		FileManager fm("Network Analyzer");
