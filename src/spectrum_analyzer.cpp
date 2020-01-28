@@ -446,10 +446,23 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 		} else {
 			// export
+
+			QStringList filter;
+			filter += QString(tr("Comma-separated values files (*.csv)"));
+			filter += QString(tr("Tab-delimited values files (*.txt)"));
+			filter += QString(tr("All Files(*)"));
+
+			QString selectedFilter = filter[0];
+
 			QString fileName = QFileDialog::getSaveFileName(this,
-			    tr("Export"), "", tr("Comma-separated values files (*.csv)",
-						       "Tab-delimited values files (*.txt)"),
-			    nullptr, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+			    tr("Export"), "", filter.join(";;"),
+			    &selectedFilter, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+
+			if (fileName.split(".").size() <= 1) {
+				// file name w/o extension. Let's append it
+				QString ext = selectedFilter.split(".")[1].split(")")[0];
+				fileName += "." + ext;
+			}
 
 			if (!fileName.isEmpty()) {
 				FileManager fm("Spectrum Analyzer");
@@ -553,11 +566,22 @@ void SpectrumAnalyzer::readPreferences() {
 
 void SpectrumAnalyzer::btnExportClicked()
 {
-	QString fileName = QFileDialog::getSaveFileName(this,
-	    tr("Export"), "", tr("Comma-separated values files (*.csv)",
-				       "Tab-delimited values files (*.txt)"),
-	    nullptr, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+	QStringList filter;
+	filter += QString(tr("Comma-separated values files (*.csv)"));
+	filter += QString(tr("Tab-delimited values files (*.txt)"));
+	filter += QString(tr("All Files(*)"));
 
+	QString selectedFilter = filter[0];
+
+	QString fileName = QFileDialog::getSaveFileName(this,
+	    tr("Export"), "", filter.join(";;"),
+	    &selectedFilter, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+
+	if (fileName.split(".").size() <= 1) {
+		// file name w/o extension. Let's append it
+		QString ext = selectedFilter.split(".")[1].split(")")[0];
+		fileName += "." + ext;
+	}
 
 	if (!fileName.isEmpty()) {
 		FileManager fm("Spectrum Analyzer");
