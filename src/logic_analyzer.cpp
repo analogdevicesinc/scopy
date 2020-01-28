@@ -38,6 +38,7 @@
 #include <QDateTime>
 #include <QButtonGroup>
 #include <QDateTime>
+#include <QImageWriter>
 
 /* Local includes */
 #include "pulseview/pv/mainwindow.hpp"
@@ -473,11 +474,29 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx,
 
 		QString date = QDateTime::currentDateTime().toString("yyyy-MM-dd-hh-mm-ss");
 
-		QString fileNameHint = "Scopy-" + api->objectName() + "-" + date + ".png";
+		QString fileNameHint = "Scopy-" + api->objectName() + "-" + date;
 
-		QString fileName = QFileDialog::getSaveFileName(this,
-		    tr("Export"), fileNameHint, tr({"(*.png);;"}),
-		    nullptr, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+		const QList<QByteArray> imageFormats =
+		    QImageWriter::supportedImageFormats();
+
+		QStringList filter;
+		if ( imageFormats.size() > 0 ) {
+		    for ( int i = 0; i < imageFormats.size(); i++ ) {
+			filter += (imageFormats[i].toUpper() + " "
+				+ tr("Image") + " (*." +  imageFormats[i] + ")");
+		    }
+		}
+
+		QString selectedFilter = filter[0];
+			QString fileName = QFileDialog::getSaveFileName(this,
+		    tr("Export"), fileNameHint, filter.join(";;"),
+		    &selectedFilter, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+
+		if (fileName.split(".").size() <= 1) {
+		    // file name w/o extension. Let's append it
+		    QString ext = selectedFilter.split(".")[1].split(")")[0];
+		    fileName += "." + ext;
+		}
 
 		painter.end();
 		img.invertPixels(QImage::InvertRgb);
@@ -698,11 +717,15 @@ QString LogicAnalyzer::saveToFile()
 	if( noChannelEnabled )
 		return "";
 
-	QString fileName = QFileDialog::getSaveFileName(this,
-	    tr("Export"), "", tr("Comma-separated values files (*.csv)",
-				       "Tab-delimited values files (*.txt)"),
-	    &selectedFilter, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+	QStringList filter;
+	filter += QString(tr("Comma-separated values files (*.csv)"));
+	filter += QString(tr("Tab-delimited values files (*.txt)"));
+	filter += QString(tr("Value Change Dump(*.vcd)"));
+	filter += QString(tr("All Files(*)"));
 
+	QString fileName = QFileDialog::getSaveFileName(this,
+        tr("Export"), "", filter.join(";;"),
+	    &selectedFilter, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 
 	if(fileName.isEmpty()) {
 		return "";
@@ -710,13 +733,18 @@ QString LogicAnalyzer::saveToFile()
 
 	// Check the selected file type
 	if(selectedFilter != "") {
-		if(selectedFilter.contains("comma", Qt::CaseInsensitive))
+		if(selectedFilter.contains("comma", Qt::CaseInsensitive)) {
+			fileName += ".csv";
 			separator = ",";
-		if(selectedFilter.contains("tab", Qt::CaseInsensitive))
+		}
+		if(selectedFilter.contains("tab", Qt::CaseInsensitive)) {
+			fileName += ".txt";
 			separator = "\t";
+		}
 		if(selectedFilter.contains("Change Dump", Qt::CaseInsensitive)) {
 			endRow = " $end\n";
 			startRow = "$";
+			fileName += ".vcd";
 		}
 	}
 
