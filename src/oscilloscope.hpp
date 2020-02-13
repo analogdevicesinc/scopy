@@ -27,8 +27,10 @@
 #include <gnuradio/blocks/short_to_float.h>
 #include <iio/device_source.h>
 #include <gnuradio/blocks/complex_to_mag_squared.h>
+#include <gnuradio/analog/rail_ff.h>
 #include <gnuradio/blocks/keep_one_in_n.h>
 #include <gnuradio/blocks/vector_sink.h>
+#include <gnuradio/blocks/multiply_const.h>
 
 
 /* Qt includes */
@@ -310,7 +312,7 @@ namespace adiscope {
 		gr::basic_block_sptr adc_samp_conv_block;
 
 		QMap<QString, QPair<gr::basic_block_sptr,
-			gr::basic_block_sptr>> math_sinks;
+		gr::basic_block_sptr>> math_sinks;
 		QMap<QString, boost::shared_ptr<gr::analog::rail_ff>> math_rails;
 		std::vector<boost::shared_ptr<gr::blocks::multiply_const_ff>> math_probe_atten;
 

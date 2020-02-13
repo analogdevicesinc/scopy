@@ -23,14 +23,14 @@
 
 /* GNU Radio includes */
 #include <gnuradio/blocks/float_to_complex.h>
-#include <gnuradio/scopy/math.h>
+#include <scopy/math.h>
 #include <gnuradio/blocks/sub.h>
 #include <gnuradio/filter/iir_filter_ffd.h>
 #include <gnuradio/blocks/nlog10_ff.h>
 #include <gnuradio/blocks/head.h>
 #include <gnuradio/blocks/null_source.h>
 #include <gnuradio/blocks/null_sink.h>
-#include <gnuradio/blocks/multiply_const_ff.h>
+#include <gnuradio/blocks/multiply_const.h>
 
 /* Qt includes */
 #include <QtWidgets>

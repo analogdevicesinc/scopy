@@ -19,9 +19,9 @@
  */
 #include "cancel_dc_offset_block.h"
 
-#include <gnuradio/blocks/moving_average_ff.h>
+#include <gnuradio/blocks/moving_average.h>
 #include <gnuradio/blocks/repeat.h>
-#include <gnuradio/blocks/sub_ff.h>
+#include <gnuradio/blocks/sub.h>
 #include <gnuradio/blocks/copy.h>
 #include <gnuradio/blocks/keep_one_in_n.h>
 

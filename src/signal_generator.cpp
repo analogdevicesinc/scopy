@@ -59,8 +59,8 @@
 #include <gnuradio/blocks/vector_sink.h>
 #include <gnuradio/blocks/null_source.h>
 #include <iio/device_sink.h>
-#include <gnuradio/scopy/math.h>
-#include <gnuradio/scopy/trapezoidal.h>
+#include <scopy/math.h>
+#include <scopy/trapezoidal.h>
 #include <matio.h>
 
 #include <iio.h>
