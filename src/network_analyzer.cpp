@@ -45,7 +45,7 @@
 #include <boost/make_shared.hpp>
 #include <gnuradio/blocks/stream_to_vector.h>
 #include <gnuradio/blocks/vector_to_stream.h>
-#include <gnuradio/fft/goertzel_fc.h>
+#include <scopy/goertzel_scopy_fc.h>
 
 #include "hw_dac.h"
 
@@ -108,8 +108,8 @@ void NetworkAnalyzer::_configureAdcFlowgraph(size_t buffer_size)
 		f22 = adiscope::frequency_compensation_filter::make(false);
 		s2f1 = gr::blocks::short_to_float::make();
 		s2f2 = gr::blocks::short_to_float::make();
-		goertzel1 = gr::fft::goertzel_fc::make(1, 1, 1);
-		goertzel2 = gr::fft::goertzel_fc::make(1, 1, 1);
+		goertzel1 = gr::scopy::goertzel_scopy_fc::make(1, 1, 1);
+		goertzel2 = gr::scopy::goertzel_scopy_fc::make(1, 1, 1);
 		copy1 = gr::blocks::copy::make(sizeof(float));
 		copy2 = gr::blocks::copy::make(sizeof(float));
 		head1 = gr::blocks::head::make(sizeof(float), 1);

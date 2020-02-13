@@ -22,7 +22,7 @@
 #include <gnuradio/blocks/float_to_complex.h>
 #include <gnuradio/blocks/complex_to_mag_squared.h>
 #include <gnuradio/blocks/add_blk.h>
-#include <gnuradio/scopy/math.h>
+#include <scopy/math.h>
 #include <gnuradio/analog/sig_source.h>
 #include <gnuradio/analog/fastnoise_source.h>
 

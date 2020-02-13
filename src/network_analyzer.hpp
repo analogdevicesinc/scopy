@@ -31,24 +31,25 @@
 #include <QtConcurrentRun>
 #include "customPushButton.hpp"
 #include "scroll_filter.hpp"
+#include <scopy/goertzel_scopy_fc.h>
 #include <gnuradio/top_block.h>
 #include <gnuradio/blocks/head.h>
-#include <gnuradio/blocks/vector_sink_s.h>
-#include <gnuradio/analog/sig_source_f.h>
+#include <gnuradio/blocks/vector_sink.h>
+#include <gnuradio/analog/sig_source.h>
 #include <gnuradio/blocks/float_to_short.h>
 #include <gnuradio/fft/goertzel_fc.h>
-#include <gnuradio/blocks/vector_source_f.h>
-#include <gnuradio/blocks/vector_sink_f.h>
-#include <gnuradio/blocks/multiply_cc.h>
+#include <gnuradio/blocks/vector_source.h>
+#include <gnuradio/blocks/vector_sink.h>
+#include <gnuradio/blocks/multiply.h>
 #include <gnuradio/blocks/multiply_conjugate_cc.h>
 #include <gnuradio/blocks/complex_to_arg.h>
 #include <gnuradio/blocks/complex_to_mag_squared.h>
 #include <gnuradio/filter/dc_blocker_ff.h>
-#include <gnuradio/blocks/moving_average_cc.h>
-#include <gnuradio/blocks/moving_average_ff.h>
+#include <gnuradio/blocks/moving_average.h>
+#include <gnuradio/blocks/moving_average.h>
 #include <gnuradio/blocks/skiphead.h>
 #include "cancel_dc_offset_block.h"
-#include <gnuradio/blocks/vector_source_s.h>
+#include <gnuradio/blocks/vector_source.h>
 #include "frequency_compensation_filter.h"
 
 #include "oscilloscope.hpp"
@@ -170,8 +171,8 @@ private:
 	adiscope::frequency_compensation_filter::sptr f11,f12,f21,f22;
 	gr::blocks::short_to_float::sptr s2f1;
 	gr::blocks::short_to_float::sptr s2f2;
-	gr::fft::goertzel_fc::sptr goertzel1;
-	gr::fft::goertzel_fc::sptr goertzel2;
+	gr::scopy::goertzel_scopy_fc::sptr goertzel1;
+	gr::scopy::goertzel_scopy_fc::sptr goertzel2;
 	gr::blocks::copy::sptr copy1;
 	gr::blocks::copy::sptr copy2;
 	iio_manager::port_id id1;

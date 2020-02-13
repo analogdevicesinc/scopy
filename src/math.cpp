@@ -24,7 +24,7 @@
 #include <QLocale>
 #include <QMenu>
 
-#include <gnuradio/scopy/math.h>
+#include <scopy/math.h>
 
 using namespace adiscope;
 
