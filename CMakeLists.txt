@@ -20,6 +20,8 @@
 cmake_minimum_required(VERSION 3.5)
 project(scopy LANGUAGES CXX VERSION 1.1.2)
 
+message(${CMAKE_SYSTEM_PREFIX_PATH})
+
 set(Python_ADDITIONAL_VERSIONS 3)
 FIND_PACKAGE(PythonInterp REQUIRED)
 set(PYTHON_VERSION python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR})
@@ -110,15 +112,15 @@ find_package(Qt5Svg REQUIRED)
 find_package(Qt5UiTools REQUIRED)
 find_package(Qt5Xml REQUIRED)
 
-find_package(Gnuradio "3.8" REQUIRED COMPONENTS runtime analog blocks fft filter volk pmt scopy iio)
-find_package(Gnuradio PATHS "c:/Program Files/gnuradio/lib/cmake/gnuradio" REQUIRED)
-set(CMAKE_PREFIX_PATH /usr/local/lib/cmake/iio)
-find_package(gnuradio-iio)
-set(CMAKE_PREFIX_PATH /usr/local/lib/cmake/scopy)
-find_package(gnuradio-scopy)
+set(CMAKE_VERBOSE_MAKEFILE TRUE)
+find_package(Gnuradio "3.8" REQUIRED COMPONENTS runtime analog blocks fft filter volk pmt )
+
+set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH};/usr/local/lib/cmake)
+find_package(gnuradio-iio REQUIRED PATH_SUFFIXES iio)
+find_package(gnuradio-scopy REQUIRED PATH_SUFFIXES scopy)
 
 add_definitions(-DBOOST_ALL_DYN_LINK)
-find_package(Boost "1.53" COMPONENTS system filesystem thread REQUIRED)
+find_package(Boost COMPONENTS system filesystem thread REQUIRED)
 
 set(VC_PATH "$ENV{VS120COMNTOOLS}/../../VC")
 find_library(IIO_LIBRARIES NAMES iio libiio PATHS ${VC_PATH}/lib ${VC_PATH}/lib/amd64)
@@ -139,7 +141,7 @@ pkg_check_modules(SIGCPP REQUIRED sigc++-2.0)
 pkg_check_modules(LIBSIGROK REQUIRED libsigrok)
 pkg_check_modules(LIBSIGROKCXX REQUIRED libsigrokcxx)
 pkg_check_modules(LIBSIGROK_DECODE REQUIRED libsigrokdecode)
-message(CMAKE_PATH ${CMAKE_INCLUDE_PATH})
+message(CMAKE_PATH ${CMAKE_PREFIX_PATH})
 include_directories(
 	${Boost_INCLUDE_DIRS}
 	${Qt5Widgets_INCLUDE_DIRS}
@@ -270,7 +272,6 @@ add_executable(${PROJECT_NAME} WIN32 ${OSX_BUNDLE}
 if (WIN32 OR ENABLE_APPLICATION_BUNDLE)
 	set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME Scopy)
 endif()
-
 target_link_libraries(${PROJECT_NAME} LINK_PRIVATE
 		${BREAKPAD_LIBRARIES}
 		${BREAKPADCLIENT_LIBRARIES}
@@ -278,14 +279,14 @@ target_link_libraries(${PROJECT_NAME} LINK_PRIVATE
 		${Qt5Concurrent_LIBRARIES}
 		${Qt5Qml_LIBRARIES}
 		${Qt5UiTools_LIBRARIES}
-                gnuradio::gnuradio-runtime
-                gnuradio::gnuradio-analog
-                gnuradio::gnuradio-blocks
-                gnuradio::gnuradio-fft
-                gnuradio::gnuradio-filter
-                gnuradio::gnuradio-pmt
-                gnuradio::gnuradio-iio
-                gnuradio::gnuradio-scopy
+		gnuradio::gnuradio-runtime
+		gnuradio::gnuradio-analog
+		gnuradio::gnuradio-blocks
+		gnuradio::gnuradio-fft
+		gnuradio::gnuradio-filter
+		gnuradio::gnuradio-pmt
+		gnuradio::gnuradio-iio
+		gnuradio::gnuradio-scopy
 		${Boost_LIBRARIES}
 		${QWT_LIBRARIES}
 		${QWTPOLAR_LIBRARIES}
