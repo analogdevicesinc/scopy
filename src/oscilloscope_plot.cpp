@@ -757,6 +757,11 @@ void CapturePlot::onGateBar1Moved(double value)
 
 void CapturePlot::onGateBar2Moved(double value)
 {
+
+	if (d_selected_channel < 0) {
+		return;
+	}
+
 	//update gate handle
 	rightGateRect.setTop(axisScaleDiv(yRight).upperBound());
 	rightGateRect.setBottom(axisScaleDiv(yRight).lowerBound());

@@ -43,7 +43,7 @@
 #include "power_controller.hpp"
 #include "signal_generator.hpp"
 
-//#include "logic_analyzer.hpp"
+#include "logicanalyzer/logic_analyzer.h"
 
 #include "pattern_generator.hpp"
 #include "network_analyzer.hpp"
@@ -213,7 +213,7 @@ private:
 	SignalGenerator *signal_generator;
 	Oscilloscope *oscilloscope;
 
-//	LogicAnalyzer *logic_analyzer;
+	logic::LogicAnalyzer *logic_analyzer;
 
 	DigitalIO *dio;
 	DIOManager *dioManager;

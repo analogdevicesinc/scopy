@@ -507,6 +507,9 @@ Q_SIGNALS:
 
   void plotPointSelected(const QPointF p);
 
+  // signals that the plot size changed
+  void plotSizeChanged();
+
 protected Q_SLOTS:
   virtual void legendEntryChecked(QwtPlotItem *plotItem, bool on);
   virtual void legendEntryChecked(const QVariant &plotItem, bool on, int index);
@@ -573,6 +576,8 @@ protected:
   void setYaxisNumDiv(unsigned int);
   void bottomHorizAxisInit();
   virtual void configureAxis(int axisPos, int axisIdx);
+
+  void resizeEvent(QResizeEvent *event);
 
 private:
   void AddAxisOffset(int axisPos, int axisIdx, double offset);

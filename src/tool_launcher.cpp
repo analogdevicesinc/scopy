@@ -73,7 +73,7 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 	ui(new Ui::ToolLauncher), ctx(nullptr),
 	power_control(nullptr), dmm(nullptr), signal_generator(nullptr),
 	oscilloscope(nullptr), current(nullptr), filter(nullptr),
-    /*logic_analyzer(nullptr),*/ pattern_generator(nullptr), dio(nullptr),
+	logic_analyzer(nullptr), pattern_generator(nullptr), dio(nullptr),
 	network_analyzer(nullptr), spectrum_analyzer(nullptr), debugger(nullptr),
 	manual_calibration(nullptr), tl_api(new ToolLauncher_API(this)),
 	dioManager(nullptr),
@@ -256,7 +256,7 @@ void ToolLauncher::_toolSelected(enum tool tool)
 		selectedTool = signal_generator;
 		break;
 	case TOOL_LOGIC_ANALYZER:
-//		selectedTool = logic_analyzer;
+		selectedTool = logic_analyzer;
 		break;
 	case TOOL_PATTERN_GENERATOR:
 		selectedTool = pattern_generator;
@@ -914,7 +914,7 @@ void ToolLauncher::btnPowerControl_clicked()
 
 void ToolLauncher::btnLogicAnalyzer_clicked()
 {
-//	swapMenu(static_cast<QWidget *>(logic_analyzer));
+	swapMenu(static_cast<QWidget *>(logic_analyzer));
 }
 
 void adiscope::ToolLauncher::btnPatternGenerator_clicked()
@@ -1129,10 +1129,10 @@ void adiscope::ToolLauncher::destroyContext()
 		oscilloscope = nullptr;
 	}
 
-//	if (logic_analyzer) {
-//		delete logic_analyzer;
-//		logic_analyzer = nullptr;
-//	}
+	if (logic_analyzer) {
+		delete logic_analyzer;
+		logic_analyzer = nullptr;
+	}
 
 	if (pattern_generator) {
 		delete pattern_generator;
@@ -1526,12 +1526,12 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 //	}
 
     if (filter->compatible(TOOL_LOGIC_ANALYZER)) {
-//        logic_analyzer = new LogicAnalyzer(ctx, filter, menu->getToolMenuItemFor(TOOL_LOGIC_ANALYZER),
-//                &js_engine, this);
-//        toolList.push_back(logic_analyzer);
-//        connect(logic_analyzer, &LogicAnalyzer::showTool, [=]() {
-//             menu->getToolMenuItemFor(TOOL_LOGIC_ANALYZER)->getToolBtn()->click();
-//        });
+	logic_analyzer = new logic::LogicAnalyzer(ctx, filter, menu->getToolMenuItemFor(TOOL_LOGIC_ANALYZER),
+		&js_engine, this);
+	toolList.push_back(logic_analyzer);
+//	connect(logic_analyzer, &LogicAnalyzer::showTool, [=]() {
+//	     menu->getToolMenuItemFor(TOOL_LOGIC_ANALYZER)->getToolBtn()->click();
+//	});
     }
 
 

@@ -1483,6 +1483,13 @@ void DisplayPlot::configureAxis(int axisPos, int axisIdx)
 	this->setAxisScaleDraw(axis, scaleDraw);
 }
 
+void DisplayPlot::resizeEvent(QResizeEvent *event)
+{
+	PrintablePlot::resizeEvent(event);
+
+	Q_EMIT plotSizeChanged();
+}
+
 void DisplayPlot::bottomHorizAxisInit()
 {
 	horizAxis = new PlotAxisConfiguration(QwtPlot::xBottom, 0, this);
