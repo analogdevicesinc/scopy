@@ -30,7 +30,8 @@ using namespace adiscope;
 RunSingleWidget::RunSingleWidget(QWidget *parent) :
 	QWidget(parent),
 	d_ui(new Ui::RunSingleWidget),
-	d_singleButtonEnabled(true)
+	d_singleButtonEnabled(true),
+	d_runButtonEnabled(true)
 {
 	d_ui->setupUi(this);
 
@@ -58,6 +59,18 @@ bool RunSingleWidget::singleButtonEnabled() const
 	return d_singleButtonEnabled;
 }
 
+void RunSingleWidget::enableRunButton(bool enable)
+{
+	d_ui->runButton->setEnabled(enable);
+	d_ui->runButton->setVisible(enable);
+	d_runButtonEnabled = enable;
+}
+
+bool RunSingleWidget::runButtonEnabled() const
+{
+	return d_runButtonEnabled;
+}
+
 bool RunSingleWidget::singleButtonChecked() const
 {
 	return d_ui->singleButton->isChecked();
@@ -67,8 +80,6 @@ bool RunSingleWidget::runButtonChecked() const
 {
 	return d_ui->runButton->isChecked();
 }
-
-
 
 void RunSingleWidget::toggle(bool checked)
 {

@@ -39,6 +39,9 @@ public:
 	void enableSingleButton(bool enable);
 	bool singleButtonEnabled() const;
 
+	void enableRunButton(bool enable);
+	bool runButtonEnabled() const;
+
 	bool singleButtonChecked() const;
 	bool runButtonChecked() const;
 
@@ -55,6 +58,7 @@ private Q_SLOTS:
 private:
 	Ui::RunSingleWidget *d_ui;
 	bool d_singleButtonEnabled;
+	bool d_runButtonEnabled;
 };
 }
 
