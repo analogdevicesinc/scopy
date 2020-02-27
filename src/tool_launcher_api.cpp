@@ -184,8 +184,8 @@ void ToolLauncher_API::load(const QString& file)
 		tl->power_control->api->load(settings);
 	if (tl->signal_generator)
 		tl->signal_generator->api->load(settings);
-	if (tl->logic_analyzer)
-		tl->logic_analyzer->api->load(settings);
+//	if (tl->logic_analyzer)
+//		tl->logic_analyzer->api->load(settings);
 	if (tl->dio)
 		tl->dio->api->load(settings);
 	if (tl->pattern_generator)
@@ -260,8 +260,8 @@ void ToolLauncher_API::save(const QString& file)
 		tl->power_control->api->save(settings);
 	if (tl->signal_generator)
 		tl->signal_generator->api->save(settings);
-	if (tl->logic_analyzer)
-		tl->logic_analyzer->api->save(settings);
+//	if (tl->logic_analyzer)
+//		tl->logic_analyzer->api->save(settings);
 	if (tl->dio)
 		tl->dio->api->save(settings);
 	if (tl->pattern_generator)

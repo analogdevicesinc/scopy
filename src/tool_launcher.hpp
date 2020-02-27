@@ -42,7 +42,9 @@
 #include "pulseview/pv/widgets/popup.hpp"
 #include "power_controller.hpp"
 #include "signal_generator.hpp"
-#include "logic_analyzer.hpp"
+
+//#include "logic_analyzer.hpp"
+
 #include "pattern_generator.hpp"
 #include "network_analyzer.hpp"
 #include "digitalio.hpp"
@@ -210,7 +212,9 @@ private:
 	PowerController *power_control;
 	SignalGenerator *signal_generator;
 	Oscilloscope *oscilloscope;
-	LogicAnalyzer *logic_analyzer;
+
+//	LogicAnalyzer *logic_analyzer;
+
 	DigitalIO *dio;
 	DIOManager *dioManager;
 	PatternGenerator *pattern_generator;
