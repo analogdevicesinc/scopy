@@ -2,8 +2,8 @@
 
 set -e
 
-SCOPY_MINGW_BUILD_DEPS_FORK=adisuciu
-SCOPY_MINGW_BUILD_DEPS_BRANCH=master
+SCOPY_MINGW_BUILD_DEPS_FORK=analogdevicesinc
+SCOPY_MINGW_BUILD_DEPS_BRANCH=upgrade-gr38
 
 export PATH=/bin:/usr/bin:/${MINGW_VERSION}/bin:/c/Program\ Files/Git/cmd:/c/Windows/System32:/c/Program\ Files/7-Zip:/c/Program\ Files\ \(x86\)/Inno\ Setup\ \5:/c/Program\ Files/Appveyor/BuildAgent
 echo $PATH
