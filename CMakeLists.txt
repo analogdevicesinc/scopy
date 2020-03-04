@@ -118,15 +118,18 @@ find_package(Gnuradio "3.8" REQUIRED COMPONENTS runtime analog blocks fft filter
 set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH};/usr/local/lib/cmake)
 find_package(gnuradio-iio REQUIRED PATH_SUFFIXES iio)
 find_package(gnuradio-scopy REQUIRED PATH_SUFFIXES scopy)
+find_package(gnuradio-m2k REQUIRED PATH_SUFFIXES m2k)
 
 add_definitions(-DBOOST_ALL_DYN_LINK)
 find_package(Boost COMPONENTS system filesystem thread REQUIRED)
 
 set(VC_PATH "$ENV{VS120COMNTOOLS}/../../VC")
 find_library(IIO_LIBRARIES NAMES iio libiio PATHS ${VC_PATH}/lib ${VC_PATH}/lib/amd64)
+find_library(M2K_LIBRARIES NAMES m2k libm2k)
 find_library(MATIO_LIBRARIES NAMES matio)
 
 find_path(IIO_INCLUDE_DIRS iio.h PATHS ${VC_PATH}/include)
+find_path(M2K_INCLUDE_DIRS libm2k/m2k.hpp)
 
 find_library(QWTPOLAR_LIBRARIES qwtpolar)
 find_path(QWTPOLAR_INCLUDE_DIRS qwt_polar_plot.h PATH_SUFFIXES qwt)
@@ -166,6 +169,7 @@ include_directories(
 	${CMAKE_SOURCE_DIR}/src
 	${BREAKPAD_INCLUDE_DIRS}
 	${BREAKPAD_INCLUDE_DIRS}/breakpad
+	${M2K_INCLUDE_DIRS}
 )
 
 link_directories(
@@ -287,6 +291,7 @@ target_link_libraries(${PROJECT_NAME} LINK_PRIVATE
 		gnuradio::gnuradio-pmt
 		gnuradio::gnuradio-iio
 		gnuradio::gnuradio-scopy
+		gnuradio::gnuradio-m2k
 		${Boost_LIBRARIES}
 		${QWT_LIBRARIES}
 		${QWTPOLAR_LIBRARIES}
@@ -300,6 +305,7 @@ target_link_libraries(${PROJECT_NAME} LINK_PRIVATE
 		${GLIBMM_LIBRARIES}
 		${SIGCPP_LIBRARIES}
 		${GLIB_LIBRARIES}
+		${M2K_LIBRARIES}
 )
 
 if (NOT WIN32)
