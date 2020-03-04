@@ -39,13 +39,13 @@
 #include "filter.hpp"
 #include "calibration.hpp"
 #include "oscilloscope.hpp"
-#include "pulseview/pv/widgets/popup.hpp"
+//#include "pulseview/pv/widgets/popup.hpp"
 #include "power_controller.hpp"
 #include "signal_generator.hpp"
 
 #include "logicanalyzer/logic_analyzer.h"
 
-#include "pattern_generator.hpp"
+//#include "pattern_generator.hpp"
 #include "network_analyzer.hpp"
 #include "digitalio.hpp"
 #include "detachedWindow.hpp"
@@ -217,7 +217,7 @@ private:
 
 	DigitalIO *dio;
 	DIOManager *dioManager;
-	PatternGenerator *pattern_generator;
+//	PatternGenerator *pattern_generator;
 	NetworkAnalyzer *network_analyzer;
 	SpectrumAnalyzer *spectrum_analyzer;
 	Debugger *debugger;

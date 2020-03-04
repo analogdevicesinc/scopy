@@ -63,6 +63,8 @@
 #include "toolmenu.h"
 #include "toolmenuitem.h"
 
+#include <libsigrokdecode/libsigrokdecode.h>
+
 #define TIMER_TIMEOUT_MS 5000
 #define ALIVE_TIMER_TIMEOUT_MS 5000
 
@@ -73,7 +75,7 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 	ui(new Ui::ToolLauncher), ctx(nullptr),
 	power_control(nullptr), dmm(nullptr), signal_generator(nullptr),
 	oscilloscope(nullptr), current(nullptr), filter(nullptr),
-	logic_analyzer(nullptr), pattern_generator(nullptr), dio(nullptr),
+	logic_analyzer(nullptr), /*pattern_generator(nullptr),*/ dio(nullptr),
 	network_analyzer(nullptr), spectrum_analyzer(nullptr), debugger(nullptr),
 	manual_calibration(nullptr), tl_api(new ToolLauncher_API(this)),
 	dioManager(nullptr),
@@ -259,7 +261,7 @@ void ToolLauncher::_toolSelected(enum tool tool)
 		selectedTool = logic_analyzer;
 		break;
 	case TOOL_PATTERN_GENERATOR:
-		selectedTool = pattern_generator;
+//		selectedTool = pattern_generator;
 		break;
 	case TOOL_DIGITALIO:
 		selectedTool = dio;
@@ -611,9 +613,9 @@ ToolLauncher::~ToolLauncher()
 
 void ToolLauncher::destroyPopup()
 {
-	auto *popup = static_cast<pv::widgets::Popup *>(QObject::sender());
+//	auto *popup = static_cast<pv::widgets::Popup *>(QObject::sender());
 
-	popup->deleteLater();
+//	popup->deleteLater();
 }
 
 void ToolLauncher::forgetDeviceBtn_clicked(QString uri)
@@ -919,7 +921,7 @@ void ToolLauncher::btnLogicAnalyzer_clicked()
 
 void adiscope::ToolLauncher::btnPatternGenerator_clicked()
 {
-	swapMenu(static_cast<QWidget *>(pattern_generator));
+//	swapMenu(static_cast<QWidget *>(pattern_generator));
 }
 
 void adiscope::ToolLauncher::btnNetworkAnalyzer_clicked()
@@ -1134,10 +1136,10 @@ void adiscope::ToolLauncher::destroyContext()
 		logic_analyzer = nullptr;
 	}
 
-	if (pattern_generator) {
-		delete pattern_generator;
-		pattern_generator = nullptr;
-	}
+//	if (pattern_generator) {
+//		delete pattern_generator;
+//		pattern_generator = nullptr;
+//	}
 
 	if (network_analyzer) {
 		delete network_analyzer;

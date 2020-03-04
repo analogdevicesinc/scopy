@@ -30,7 +30,6 @@
 #include <vector>
 #include <string>
 
-#include "src/pulseview/pv/devices/binarybuffer.hpp"
 #include "filter.hpp"
 
 //#include "pg_patterns.hpp"
@@ -45,21 +44,6 @@ extern "C" {
 	struct iio_device;
 	struct iio_channel;
 	struct iio_buffer;
-}
-
-namespace pv {
-class MainWindow;
-class DeviceManager;
-namespace toolbars {
-class MainBar;
-}
-namespace view {
-class TraceTreeItem;
-}
-}
-
-namespace sigrok {
-class Context;
 }
 
 namespace Ui {

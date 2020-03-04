@@ -39,13 +39,6 @@
 
 ///* pulseview and sigrok */
 #include <boost/math/common_factor.hpp>
-#include "pulseview/pv/mainwindow.hpp"
-#include "pulseview/pv/devices/binarybuffer.hpp"
-#include "pulseview/pv/devicemanager.hpp"
-#include "pulseview/pv/view/view.hpp"
-#include "pulseview/pv/toolbars/mainbar.hpp"
-#include "libsigrokcxx/libsigrokcxx.hpp"
-#include "libsigrokdecode/libsigrokdecode.h"
 
 //#include "pattern_generator.hpp"
 
@@ -53,27 +46,6 @@
 
 using namespace std;
 using namespace adiscope;
-
-namespace pv {
-class MainWindow;
-class DeviceManager;
-class Session;
-
-namespace view {
-class View;
-class TraceTreeItem;
-}
-namespace toolbars {
-class MainBar;
-}
-namespace widgets {
-class DeviceToolButton;
-}
-}
-
-namespace sigrok {
-class Context;
-}
 
 namespace adiscope {
 
