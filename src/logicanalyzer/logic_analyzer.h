@@ -37,6 +37,9 @@ public:
 			 ToolLauncher *parent, bool offline_mode_ = 0);
 	~LogicAnalyzer();
 
+public:
+	uint16_t * getData();
+
 private Q_SLOTS:
 
 	void on_btnChannelSettings_toggled(bool);

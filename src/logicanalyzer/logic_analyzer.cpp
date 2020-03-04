@@ -33,7 +33,7 @@ LogicAnalyzer::LogicAnalyzer(iio_context *ctx, adiscope::Filter *filt,
 					}, tr("Samples"), 1,
 					10e8,
 					true, false, this, {1, 2, 5})),
-	m_m2kContext(m2kOpen(ctx, "")
+	m_m2kContext(m2kOpen(ctx, ""))
 
 {
 	// setup ui
@@ -51,12 +51,19 @@ LogicAnalyzer::LogicAnalyzer(iio_context *ctx, adiscope::Filter *filt,
 			ui->channelEnumeratorLayout->addWidget(new QCheckBox("DIO " + QString::number(i)), i % 8, 1);
 		}
 	}
+
+
 }
 
 LogicAnalyzer::~LogicAnalyzer()
 {
 	delete cr_ui;
 	delete ui;
+}
+
+uint16_t *LogicAnalyzer::getData()
+{
+	return nullptr;
 }
 
 void LogicAnalyzer::on_btnChannelSettings_toggled(bool checked)

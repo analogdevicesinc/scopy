@@ -199,6 +199,7 @@ FILE(GLOB SRC_LIST  src/*.cpp src/*.cc
 	src/pulseview/pv/view/*.cpp
 	src/pulseview/pv/widgets/*.cpp
 	src/logicanalyzer/*.cpp
+	src/logicanalyzer/*/*.cpp
 )
 
 FILE(GLOB M2KSCOPE_UIS ui/patterns/*.ui ui/*.ui src/pulseview/pv/dialogs/*.ui)
