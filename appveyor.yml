@@ -1,35 +1,43 @@
 clone_depth: 1
 
-init:
-    - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+#init:
+#    - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 environment:
+    BUILD_NO: $(appveyor_build_number)
     matrix:
         - MINGW_VERSION: mingw64
           ARCH: x86_64
           ARCH_BIT: 64
-          BUILD_NO: $(appveyor_build_number)
+          APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
 
-#        - MINGW_VERSION: mingw32
-#          ARCH: i686
-#          ARCH_BIT: 32
-          
+        - MINGW_VERSION: mingw32
+          ARCH: i686
+          ARCH_BIT: 32
+          APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+
+        - ARCH: x86_64
+          ARCH_BIT: 64
+          APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu1804
+
+         
 matrix:
     fast_finish: true
 
 install:
     # Install Inno Setup
-    - choco install InnoSetup
+    - cmd: choco install InnoSetup
 
 build_script:
-    - set PATH=%PATH%;"C:\Program Files (x86)\Inno Setup 5"
-    - C:\msys64\usr\bin\bash build.sh
-
-    - echo "### Push artifacts ... "
-    - appveyor PushArtifact c:\scopy-%ARCH_BIT%bit.zip
-    - appveyor PushArtifact C:\debug-%ARCH_BIT%bit.zip
+    - cmd: set PATH=%PATH%;"C:\Program Files (x86)\Inno Setup 5"
+    - cmd: C:\msys64\usr\bin\bash build_appveyor_mingw.sh
+    - sh: /home/appveyor/projects/scopy/install_deps.sh
+    - sh: /home/appveyor/projects/scopy/build_appveyor_ubuntu.sh
+    - cmd: echo "### Push artifacts ... "
+    - cmd: appveyor PushArtifact c:\scopy-%ARCH_BIT%bit.zip
+    - cmd: appveyor PushArtifact C:\debug-%ARCH_BIT%bit.zip
    
     # Build the installer
-    - appveyor PushArtifact C:\scopy-%ARCH_BIT%-setup.exe
-on_finish:
-    - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+    - cmd: appveyor PushArtifact C:\scopy-%ARCH_BIT%-setup.exe
+#on_finish:
+#    - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
