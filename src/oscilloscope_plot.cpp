@@ -23,6 +23,8 @@
 #include "handles_area.hpp"
 #include "plot_line_handle.h"
 
+#include "logicanalyzer/logicdatacurve.h"
+
 #include <QHBoxLayout>
 #include <QLabel>
 
@@ -502,10 +504,13 @@ CapturePlot::CapturePlot(QWidget *parent,
 	connect(this, SIGNAL(channelAdded(int)),
 		SLOT(onChannelAdded(int)));
 
+	connect(this, &TimeDomainDisplayPlot::digitalPlotCurveAdded,
+		this, &CapturePlot::onDigitalChannelAdded);
+
 	installEventFilter(this);
 	QwtScaleWidget *scaleWidget = axisWidget(QwtPlot::xBottom);
-	const int fmw = QFontMetrics(scaleWidget->font()).width("-XX.XX XX");
-	scaleWidget->setMinBorderDist(fmw / 2, fmw / 2);
+    const int fmw = QFontMetrics(scaleWidget->font()).width("-XXX.XXX XX");
+    scaleWidget->setMinBorderDist(fmw / 2 + 30, fmw / 2 + 30);
 
 	displayGraticule = false;
 
@@ -718,6 +723,11 @@ void CapturePlot::onGateBar2PixelPosChanged(int pos)
 
 void CapturePlot::onGateBar1Moved(double value)
 {
+
+	if (d_selected_channel < 0) {
+		return;
+	}
+
 	//update gate handle
 	leftGateRect.setTop(axisScaleDiv(yRight).upperBound());
 	leftGateRect.setBottom(axisScaleDiv(yRight).lowerBound());
@@ -1034,6 +1044,37 @@ void CapturePlot::enableLabels(bool enabled)
 	enableColoredLabels(enabled);
 }
 
+void CapturePlot::enableXaxisLabels()
+{
+    enableAxis(QwtPlot::xBottom, true);
+
+//	setUsingLeftAxisScales(true);
+//	enableLabels(true);
+//	enableAxisLabels(true);
+
+//    d_bottomHandlesArea->setLeftPadding(0);
+//    d_topHandlesArea->setLeftPadding(90 + axisWidget(QwtAxisId(QwtPlot::yLeft, d_activeVertAxis))->width());
+//    QwtScaleWidget *scaleWidget = axisWidget(QwtPlot::xBottom);
+//    const int fmw = QFontMetrics(scaleWidget->font()).width("-XX.XX XX");
+//    const int fmh = QFontMetrics(scaleWidget->font()).height();
+//    d_bottomHandlesArea->setRightPadding(50 + fmw/2 + d_bonusWidth);
+//    d_topHandlesArea->setRightPadding(50 + fmw/2 + d_bonusWidth);
+//    d_rightHandlesArea->setTopPadding(50 + 6);
+//    d_rightHandlesArea->setBottomPadding(50 + fmh);
+//    QMargins margins = d_topWidget->layout()->contentsMargins();
+//    margins.setLeft(d_leftHandlesArea->minimumWidth()+100);
+//    d_topWidget->layout()->setContentsMargins(margins);
+
+////    QwtScaleWidget *yScaleWidget = axisWidget(QwtPlot::yLeft);
+////    yScaleWidget->scaleDraw()->setMinimumExtent(100);
+
+//    d_hCursorHandle1->updatePosition();
+//    d_hCursorHandle2->updatePosition();
+
+//    d_vCursorHandle1->updatePosition();
+//    d_vCursorHandle2->updatePosition();
+}
+
 void CapturePlot::enableAxisLabels(bool enabled)
 {
 	enableAxis(QwtPlot::xBottom, enabled);
@@ -1180,6 +1221,14 @@ void CapturePlot::showYAxisWidget(unsigned int axisIdx, bool en)
 
 void CapturePlot::updateHandleAreaPadding(bool enabled)
 {
+	double xAxisBonusWidth = 0.0;
+
+	if (axisEnabled(QwtPlot::xBottom)) {
+		if (!axisEnabled(QwtPlot::yLeft)) {
+			xAxisBonusWidth = 65.0;
+		}
+	}
+
 	if (enabled) {
 		d_bottomHandlesArea->setLeftPadding(50 + axisWidget(QwtAxisId(QwtPlot::yLeft, d_activeVertAxis))->width());
 		d_topHandlesArea->setLeftPadding(90 + axisWidget(QwtAxisId(QwtPlot::yLeft, d_activeVertAxis))->width());
@@ -1198,10 +1247,10 @@ void CapturePlot::updateHandleAreaPadding(bool enabled)
 			d_topHandlesArea->setLeftPadding(90);
 		if(d_topHandlesArea->rightPadding() != 90)
 			d_topHandlesArea->setRightPadding(90);
-		if (d_bottomHandlesArea->leftPadding() != 50)
-			d_bottomHandlesArea->setLeftPadding(50);
-		if (d_bottomHandlesArea->rightPadding() != 50 + d_bonusWidth)
-			d_bottomHandlesArea->setRightPadding(50 + d_bonusWidth);
+		if (d_bottomHandlesArea->leftPadding() != 50 + xAxisBonusWidth)
+			d_bottomHandlesArea->setLeftPadding(50 + xAxisBonusWidth);
+		if (d_bottomHandlesArea->rightPadding() != 50 + d_bonusWidth + xAxisBonusWidth)
+			d_bottomHandlesArea->setRightPadding(50 + d_bonusWidth + xAxisBonusWidth);
 		if (d_rightHandlesArea->topPadding() != 50)
 			d_rightHandlesArea->setTopPadding(50);
 		if (d_rightHandlesArea->bottomPadding() != 50)
@@ -1353,6 +1402,69 @@ bool CapturePlot::eventFilter(QObject *object, QEvent *event)
 
 	}
 	return QObject::eventFilter(object, event);
+}
+
+void CapturePlot::onDigitalChannelAdded(int chnIdx)
+{
+	qDebug() << "Digital Channel Added!";
+
+	QColor chnColor;
+	const int h = (55 * chnIdx) % 360;
+	const int s = 180;
+	const int v = 170;
+	chnColor.setHsl(h, s, v);
+
+	/* Channel offset widget */
+	HorizBar *chOffsetBar = new HorizBar(this);
+	d_symbolCtrl->attachSymbol(chOffsetBar);
+	chOffsetBar->setCanLeavePlot(true);
+	chOffsetBar->setVisible(false);
+	chOffsetBar->setMobileAxis(QwtAxisId(QwtPlot::yLeft, 0));
+	d_offsetBars.push_back(chOffsetBar);
+
+	RoundedHandleV *chOffsetHdl = new RoundedHandleV(
+				QPixmap(":/icons/handle_right_arrow.svg"),
+				QPixmap(":/icons/handle_up_arrow.svg"),
+				QPixmap(":/icons/handle_down_arrow.svg"),
+				d_leftHandlesArea, true);
+	chOffsetHdl->setRoundRectColor(chnColor);
+	chOffsetHdl->setPen(QPen(chnColor, 2, Qt::SolidLine));
+	chOffsetHdl->setVisible(true);
+	d_offsetHandles.push_back(chOffsetHdl);
+
+	connect(chOffsetHdl, &RoundedHandleV::positionChanged,
+		[=](int pos) {
+			int chn_id = d_offsetHandles.indexOf(chOffsetHdl);
+			if (chn_id < 0)
+				return;
+
+//			qDebug() << pos;
+
+			QwtScaleMap yMap = this->canvasMap(QwtAxisId(QwtPlot::yLeft, 0));
+			double min = -(yAxisNumDiv() / 2.0) * VertUnitsPerDiv(0);
+			double max = (yAxisNumDiv() / 2.0) * VertUnitsPerDiv(0);
+
+			qDebug() << min << " " << max;
+
+			yMap.setScaleInterval(min, max);
+			double offset = yMap.invTransform(pos);
+
+			auto x = axisInterval(QwtAxisId(QwtPlot::yLeft, 0));
+
+			qDebug() << x.minValue() << " " << x.maxValue();
+
+			QwtPlotCurve *curve = getDigitalPlotCurve(chnIdx);
+			LogicDataCurve *logicCurve = dynamic_cast<LogicDataCurve *>(curve);
+
+			if (logicCurve) {
+				logicCurve->setPixelOffset(offset);
+			}
+
+			replot();
+
+//			Q_EMIT channelOffsetChanged(-offset);
+		});
+
 }
 
 void CapturePlot::onChannelAdded(int chnIdx)

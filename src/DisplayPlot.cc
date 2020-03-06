@@ -1354,6 +1354,17 @@ QwtPlotZoomer *DisplayPlot::getZoomer() const
 	return d_zoomer[0];
 }
 
+void DisplayPlot::setZoomerParams(bool bounded, int maxStackDepth)
+{
+	if (d_zoomer.isEmpty()) {
+		return;
+	}
+
+	auto zoomer = dynamic_cast<LimitedPlotZoomer*>(d_zoomer[0]);
+	zoomer->setMaxStackDepth(maxStackDepth);
+	zoomer->setBoundVertical(bounded);
+}
+
 void DisplayPlot::horizAxisScaleIncrease()
 {
 	double div = HorizUnitsPerDiv();

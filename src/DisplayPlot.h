@@ -378,6 +378,7 @@ public:
   // class:
   // void PlotNewData(...);
   QwtPlotZoomer *getZoomer() const;
+  void setZoomerParams(bool bounded, int maxStackDepth);
 
 
 

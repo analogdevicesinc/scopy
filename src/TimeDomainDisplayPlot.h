@@ -150,10 +150,14 @@ public:
   void clearPreview();
   void realignReferenceWaveforms(double timebase, double timeposition);
 
+  void addDigitalPlotCurve(QwtPlotCurve *curve, bool visible);
+  void enableDigitalPlotCurve(int curveId, bool enable);
+  QwtPlotCurve *getDigitalPlotCurve(int curveId);
 Q_SIGNALS:
   void channelAdded(int);
   void newData();
   void filledScreen(bool, unsigned int);
+  void digitalPlotCurveAdded(int);
 
 public Q_SLOTS:
   void setSampleRate(double sr, double units,
@@ -248,6 +252,7 @@ private:
 
   QMap<QString, QwtPlotCurve *> d_ref_curves;
   QMap<QString, QwtPlotCurve *> d_math_curves;
+  QVector<QwtPlotCurve *> d_logic_curves;
   int d_nb_ref_curves;
   int getCurveNextTo(int pos);
 };

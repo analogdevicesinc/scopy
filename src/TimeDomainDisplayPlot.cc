@@ -1054,6 +1054,39 @@ void TimeDomainDisplayPlot::unregisterReferenceWaveform(QString name)
 	d_nb_ref_curves--;
 }
 
+void TimeDomainDisplayPlot::addDigitalPlotCurve(QwtPlotCurve *curve, bool visible)
+{
+	d_logic_curves.push_back(curve);
+
+	if (visible) {
+		curve->attach(this);
+	}
+
+	Q_EMIT digitalPlotCurveAdded(d_logic_curves.size() - 1);
+}
+
+void TimeDomainDisplayPlot::enableDigitalPlotCurve(int curveId, bool enable)
+{
+	if (curveId < 0 || curveId > d_logic_curves.size() - 1) {
+		return;
+	}
+
+	if (enable)  {
+		d_logic_curves[curveId]->attach(this);
+	} else {
+		d_logic_curves[curveId]->detach();
+	}
+}
+
+QwtPlotCurve * TimeDomainDisplayPlot::getDigitalPlotCurve(int curveId)
+{
+	if (curveId < 0 || curveId > d_logic_curves.size() - 1) {
+		return nullptr;
+	}
+
+	return d_logic_curves[curveId];
+}
+
 void TimeDomainDisplayPlot::addPreview(QVector<QVector<double> > curvesToBePreviewed, double reftimebase,
 				       double timebase, double timeposition)
 {
