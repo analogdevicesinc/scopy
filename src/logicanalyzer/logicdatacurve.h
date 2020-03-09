@@ -19,6 +19,8 @@ public:
     void setPixelOffset(double pixelOffset);
     void setTraceHeight(double traceHeight);
 
+    void setPlotConfiguration(double sampleRate, uint64_t bufferSize, double timeTriggerOffset);
+
 protected:
     void drawLines( QPainter *painter,
         const QwtScaleMap &xMap, const QwtScaleMap &yMap,
@@ -27,6 +29,9 @@ protected:
 private:
     void getSubsampledEdges(std::vector<std::pair<uint64_t, bool> > &edges, const QwtScaleMap &xMap) const;
     uint64_t edgeAtX(int x, const std::vector<std::pair<uint64_t, bool> > &edges) const;
+
+    uint64_t fromTimeToSample(double time) const;
+    double fromSampleToTime(uint64_t sample) const;
 
 private:
 
@@ -49,6 +54,10 @@ private:
     // We have no notion of V/div? use a pixel height value to draw
     // the distance between the "0" and "1"
     double m_traceHeight;
+
+    double m_sampleRate;
+    uint64_t m_bufferSize;
+    double m_timeTriggerOffset;
 
 };
 
