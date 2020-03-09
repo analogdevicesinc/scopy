@@ -52,12 +52,16 @@ private Q_SLOTS:
 	void on_btnGeneralSettings_toggled(bool);
 	void rightMenuFinished(bool opened);
 
+	void onTimeTriggerValueChanged(double value);
+
 private:
 	void setupUi();
 	void connectSignalsAndSlots();
 	void triggerRightMenuToggle(CustomPushButton *, bool checked);
 	void toggleRightMenu(CustomPushButton *, bool checked);
 	void settingsPanelUpdate(int id);
+	void updateBufferPreviewer();
+	void initBufferScrolling();
 
 private:
 	// TODO: consisten naming (m_ui, m_crUi)
@@ -74,6 +78,12 @@ private:
 	ScaleSpinButton *m_bufferSize;
 
 	M2k *m_m2kContext;
+
+	uint16_t *m_buffer;
+
+	double m_horizOffset;
+	double m_timeTriggerOffset;
+	bool m_resetHorizAxisOffset;
 
 };
 } // namespace logic

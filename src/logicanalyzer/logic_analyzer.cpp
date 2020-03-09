@@ -2,6 +2,9 @@
 
 #include "ui_logic_analyzer.h"
 #include "ui_cursors_settings.h"
+#include "oscilloscope_plot.hpp"
+
+#include "logicanalyzer/logicdatacurve.h"
 
 #include "dynamicWidget.hpp"
 
@@ -33,7 +36,11 @@ LogicAnalyzer::LogicAnalyzer(iio_context *ctx, adiscope::Filter *filt,
 					}, tr("Samples"), 1,
 					10e8,
 					true, false, this, {1, 2, 5})),
-	m_m2kContext(m2kOpen(ctx, ""))
+	m_m2kContext(m2kOpen(ctx, "")),
+	m_buffer(nullptr),
+	m_horizOffset(0.0),
+	m_timeTriggerOffset(0.0),
+	m_resetHorizAxisOffset(true)
 
 {
 	// setup ui
@@ -42,16 +49,65 @@ LogicAnalyzer::LogicAnalyzer(iio_context *ctx, adiscope::Filter *filt,
 	// setup signals slots
 	connectSignalsAndSlots();
 
+	m_plot.setLeftVertAxesCount(1);
+
+	// TODO: query libm2k for number of channels
 	// TODO: Add channels on the plot
-	M2kDigital *dig = m_m2kContext->getDigital();
-	for (uint8_t i = 0; i < 16; ++i) {
-		if (i < 8) {
-			ui->channelEnumeratorLayout->addWidget(new QCheckBox("DIO " + QString::number(i)), i % 8, 0);
-		} else {
-			ui->channelEnumeratorLayout->addWidget(new QCheckBox("DIO " + QString::number(i)), i % 8, 1);
-		}
+
+	m_buffer = new uint16_t[1000000];
+	for (int i = 0; i < 1000000; ++i) {
+		m_buffer[i] = rand() % (255 * 255);
 	}
 
+	double sampleRate = 100000; // 100kHz
+	uint64_t bufferSize = 1000000;
+
+
+
+	m_plot.setHorizUnitsPerDiv(1.0 / sampleRate * bufferSize / 16.0);
+
+	M2kDigital *dig = m_m2kContext->getDigital();
+	for (uint8_t i = 0; i < 3; ++i) {
+		QCheckBox *channelBox = new QCheckBox("DIO " + QString::number(i));
+		if (i < 8) {
+			ui->channelEnumeratorLayout->addWidget(channelBox, i % 8, 0);
+		} else {
+			ui->channelEnumeratorLayout->addWidget(channelBox, i % 8, 1);
+		}
+
+		channelBox->setChecked(true);
+
+		// 1 for each channel
+		// m_plot.addGenericPlotCurve()
+		LogicDataCurve *curve = new LogicDataCurve(nullptr, i, this);
+		curve->setTraceHeight(1);
+		m_plot.addDigitalPlotCurve(curve, true);
+		curve->dataAvailable(0, 1000000);
+
+		curve->setPlotConfiguration(sampleRate, 1000000, 0.0);
+
+		connect(channelBox, &QCheckBox::toggled, [=](bool toggled){
+			m_plot.enableDigitalPlotCurve(i, toggled);
+			m_plot.setOffsetWidgetVisible(i, toggled);
+			m_plot.replot();
+		});
+	}
+
+	// Add propper zoomer
+	m_plot.addZoomer(0);
+
+	m_plot.setZoomerParams(true, 20);
+
+	m_plot.zoomBaseUpdate();
+
+	connect(&m_plot, &CapturePlot::timeTriggerValueChanged,
+		this, &LogicAnalyzer::onTimeTriggerValueChanged);
+
+	m_plot.enableXaxisLabels();
+
+	m_plot.setTimeTriggerInterval(-500000, 500000);
+
+	initBufferScrolling();
 
 }
 
@@ -63,7 +119,7 @@ LogicAnalyzer::~LogicAnalyzer()
 
 uint16_t *LogicAnalyzer::getData()
 {
-	return nullptr;
+	return m_buffer;
 }
 
 void LogicAnalyzer::on_btnChannelSettings_toggled(bool checked)
@@ -124,6 +180,22 @@ void LogicAnalyzer::rightMenuFinished(bool opened)
 		auto pair = m_menuButtonActions.dequeue();
 		toggleRightMenu(pair.first, pair.second);
 	}
+}
+
+void LogicAnalyzer::onTimeTriggerValueChanged(double value)
+{
+	m_plot.cancelZoom();
+	m_plot.zoomBaseUpdate();
+
+	qDebug() << "timeTriggermoved: " << value;
+	m_plot.setHorizOffset(value);
+	m_plot.replot();
+
+	if (m_resetHorizAxisOffset) {
+		m_horizOffset = value;
+	}
+
+	updateBufferPreviewer();
 }
 
 void LogicAnalyzer::setupUi()
@@ -234,6 +306,8 @@ void LogicAnalyzer::setupUi()
 	cr_ui->horizontalSlider->setMinimum(0);
 	cr_ui->horizontalSlider->setSingleStep(1);
 	cr_ui->horizontalSlider->setSliderPosition(0);
+
+
 }
 
 void LogicAnalyzer::connectSignalsAndSlots()
@@ -260,7 +334,7 @@ void LogicAnalyzer::connectSignalsAndSlots()
 	});
 
 	connect(&m_plot, &CapturePlot::plotSizeChanged, [=](){
-		m_bufferPreviewer->setFixedWidth(m_plot.size().width());
+		m_bufferPreviewer->setFixedWidth(m_plot.canvas()->size().width());
 	});
 
 	// some conenctions for the cursors menu
@@ -272,6 +346,10 @@ void LogicAnalyzer::connectSignalsAndSlots()
 	connect(cr_ui->horizontalSlider, &QSlider::valueChanged, [=](int value){
 		cr_ui->transLabel->setText(tr("Transparency ") + QString::number(value) + "%");
 		m_plot.setCursorReadoutsTransparency(value);
+	});
+
+	connect(m_plot.getZoomer(), &OscPlotZoomer::zoomFinished, [=](bool isZoomOut){
+		updateBufferPreviewer();
 	});
 
 }
@@ -330,4 +408,77 @@ void LogicAnalyzer::settingsPanelUpdate(int id)
 		widget->setSizePolicy(policy, policy);
 	}
 	ui->stackedWidget->adjustSize();
+}
+
+void LogicAnalyzer::updateBufferPreviewer()
+{
+	// Time interval within the plot canvas
+	QwtInterval plotInterval = m_plot.axisInterval(QwtPlot::xBottom);
+
+	// Time interval that represents the captured data
+	QwtInterval dataInterval(0.0, 0.0);
+	long long triggerSamples = /*trigger_settings.triggerDelay();*/0;
+	long long totalSamples = /*last_set_sample_count*/ 1000000;
+
+	if (totalSamples > 0) {
+		dataInterval.setMinValue(-5);
+		dataInterval.setMaxValue(5);
+	}
+
+	// Use the two intervals to determine the width and position of the
+	// waveform and of the highlighted area
+	QwtInterval fullInterval = plotInterval | dataInterval;
+	double wPos = 1 - (fullInterval.maxValue() - dataInterval.minValue()) /
+		fullInterval.width();
+	double wWidth = dataInterval.width() / fullInterval.width();
+
+	double hPos = 1 - (fullInterval.maxValue() - plotInterval.minValue()) /
+		fullInterval.width();
+	double hWidth = plotInterval.width() / fullInterval.width();
+
+	// Determine the cursor position
+	QwtInterval containerInterval = (totalSamples > 0) ? dataInterval :
+		fullInterval;
+	double containerWidth = (totalSamples > 0) ? wWidth : 1;
+	double containerPos = (totalSamples > 0) ? wPos : 0;
+	double cPosInContainer = 1 - (containerInterval.maxValue() - 0) /
+		containerInterval.width();
+	double cPos = cPosInContainer * containerWidth + containerPos;
+
+	// Update the widget
+	m_bufferPreviewer->setWaveformWidth(wWidth);
+	m_bufferPreviewer->setWaveformPos(wPos);
+	m_bufferPreviewer->setHighlightWidth(hWidth);
+	m_bufferPreviewer->setHighlightPos(hPos);
+	m_bufferPreviewer->setCursorPos(cPos);
+}
+
+void LogicAnalyzer::initBufferScrolling()
+{
+	// TODO: remove extra signal for plot size changeee!!!!!!!
+
+	connect(m_bufferPreviewer, &BufferPreviewer::bufferMovedBy, [=](int value) {
+		m_resetHorizAxisOffset = false;
+		double moveTo = 0.0;
+		auto interval = m_plot.axisInterval(QwtPlot::xBottom);
+		double min = interval.minValue();
+		double max = interval.maxValue();
+		int width = m_bufferPreviewer->width();
+		double xAxisWidth = max - min;
+
+		moveTo = value * xAxisWidth / width;
+		m_plot.setHorizOffset(moveTo + m_horizOffset);
+		m_plot.replot();
+		updateBufferPreviewer();
+	});
+	connect(m_bufferPreviewer, &BufferPreviewer::bufferStopDrag, [=](){
+		m_horizOffset = m_plot.HorizOffset();
+		m_resetHorizAxisOffset = true;
+	});
+	connect(m_bufferPreviewer, &BufferPreviewer::bufferResetPosition, [=](){
+		m_plot.setHorizOffset(m_timeTriggerOffset);
+		m_plot.replot();
+		updateBufferPreviewer();
+		m_horizOffset = m_timeTriggerOffset;
+	});
 }
