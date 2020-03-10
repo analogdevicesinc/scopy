@@ -1,13 +1,33 @@
 clone_depth: 1
-
 #init:
 #    - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+
 
 environment:
     BUILD_NO: $(APPVEYOR_BUILD_NUMBER)
     BRANCH: $(APPVEYOR_REPO_BRANCH)
     REPO: $(APPVEYOR_REPO_NAME)
     matrix:
+        - ARCH: x86_64
+          ARCH_BIT: 64
+          APPVEYOR_BUILD_WORKER_IMAGE: macos
+          BUILD_DEPS_CMD: "/Users/appveyor/projects/scopy/CI/appveyor/install_macos_deps.sh"
+          BUILD_CMD: "/Users/appveyor/projects/scopy/CI/appveyor/build_appveyor_macos.sh"
+          PACKAGE_CMD: "/Users/appveyor/projects/scopy/CI/appveyor/package_darwin.sh"
+          DEPLOY_FILE: "/Users/appveyor/projects/scopy/build/Scopy.dmg"
+          C_COMPILER: -DCMAKE_C_COMPILER=/usr/bin/gcc
+          CXX_COMPILER: -DCMAKE_CXX_COMPILER=/usr/bin/g++
+
+        - ARCH: x86_64
+          ARCH_BIT: 64
+          APPVEYOR_BUILD_WORKER_IMAGE: macos-mojave
+          BUILD_DEPS_CMD: "/Users/appveyor/projects/scopy/CI/appveyor/install_macos_deps.sh"
+          BUILD_CMD: "/Users/appveyor/projects/scopy/CI/appveyor/build_appveyor_macos.sh"
+          PACKAGE_CMD: "/Users/appveyor/projects/scopy/CI/appveyor/package_darwin.sh"
+          DEPLOY_FILE: "/Users/appveyor/projects/scopy/build/Scopy.dmg"
+          C_COMPILER: -DCMAKE_C_COMPILER=/usr/bin/gcc
+          CXX_COMPILER: -DCMAKE_CXX_COMPILER=/usr/bin/g++
+
         - MINGW_VERSION: mingw64
           ARCH: x86_64
           ARCH_BIT: 64
@@ -27,6 +47,7 @@ environment:
           APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu1804
           BUILD_DEPS_CMD: "/home/appveyor/projects/scopy/CI/appveyor/install_ubuntu_deps.sh"
           BUILD_CMD: "/home/appveyor/projects/scopy/CI/appveyor/build_appveyor_ubuntu.sh"
+          PACKAGE_CMD: ""
           DEPLOY_FILE: ""
 
         - ARCH: x86_64
@@ -34,15 +55,16 @@ environment:
           APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu1804
           BUILD_DEPS_CMD: "/home/appveyor/projects/scopy/CI/appveyor/build_appveyor_flatpak.sh $BRANCH $REPO"
           BUILD_CMD: ""
+          PACKAGE_CMD: ""
           DEPLOY_FILE: "/home/appveyor/projects/scopy/Scopy.flatpak"
-         
+
+
 matrix:
     fast_finish: true
 
 install:
     # Install Inno Setup
     - cmd: choco install InnoSetup
-    - sh: docker version
 
 build_script:
     - cmd: C:\msys64\usr\bin\bash -lc "pacman --noconfirm -U http://repo.msys2.org/msys/x86_64/pacman-5.2.1-6-x86_64.pkg.tar.xz"
@@ -53,6 +75,7 @@ build_script:
     - sh: echo $BUILD_DEPS_CMD
     - sh: $BUILD_DEPS_CMD
     - sh: $BUILD_CMD
+    - sh: $PACKAGE_CMD
 
     - echo "### Push artifacts ... "
     - cmd: appveyor PushArtifact c:\scopy-%ARCH_BIT%bit.zip
