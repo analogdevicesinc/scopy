@@ -594,6 +594,7 @@ DisplayPlot::DisplayPlot(int nplots, QWidget* parent,
 	scaleItem->setBorderDistance(0);
 	scaleItem->attach(this);
 	scaleItems.push_back(scaleItem);
+	scaleItem->setZ(200);
   }
 
   this->plotLayout()->setCanvasMargin(0, QwtPlot::yLeft);
