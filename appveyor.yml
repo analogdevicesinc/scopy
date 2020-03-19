@@ -4,22 +4,37 @@ clone_depth: 1
 #    - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 environment:
-    BUILD_NO: $(appveyor_build_number)
+    BUILD_NO: $(APPVEYOR_BUILD_NUMBER)
+    BRANCH: $(APPVEYOR_REPO_BRANCH)
+    REPO: $(APPVEYOR_REPO_NAME)
     matrix:
         - MINGW_VERSION: mingw64
           ARCH: x86_64
           ARCH_BIT: 64
           APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+          BUILD_DEPS_CMD: "C:\\msys64\\usr\\bin\\bash CI\\appveyor\\build_appveyor_mingw.sh"
+          DEPLOY_FILE: "C:\\scopy-%ARCH_BIT%-setup.exe"
 
         - MINGW_VERSION: mingw32
           ARCH: i686
           ARCH_BIT: 32
           APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+          BUILD_DEPS_CMD: "C:\\msys64\\usr\\bin\\bash CI\\appveyor\\build_appveyor_mingw.sh"
+          DEPLOY_FILE: "C:\\scopy-%ARCH_BIT%-setup.exe"
 
         - ARCH: x86_64
           ARCH_BIT: 64
           APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu1804
+          BUILD_DEPS_CMD: "/home/appveyor/projects/scopy/CI/appveyor/install_ubuntu_deps.sh"
+          BUILD_CMD: "/home/appveyor/projects/scopy/CI/appveyor/build_appveyor_ubuntu.sh"
+          DEPLOY_FILE: ""
 
+        - ARCH: x86_64
+          ARCH_BIT: 64
+          APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu1804
+          BUILD_DEPS_CMD: "/home/appveyor/projects/scopy/CI/appveyor/build_appveyor_flatpak.sh $BRANCH $REPO"
+          BUILD_CMD: ""
+          DEPLOY_FILE: "/home/appveyor/projects/scopy/Scopy.flatpak"
          
 matrix:
     fast_finish: true
@@ -27,17 +42,22 @@ matrix:
 install:
     # Install Inno Setup
     - cmd: choco install InnoSetup
+    - sh: docker version
 
 build_script:
     - cmd: set PATH=%PATH%;"C:\Program Files (x86)\Inno Setup 5"
-    - cmd: C:\msys64\usr\bin\bash build_appveyor_mingw.sh
-    - sh: /home/appveyor/projects/scopy/install_deps.sh
-    - sh: /home/appveyor/projects/scopy/build_appveyor_ubuntu.sh
-    - cmd: echo "### Push artifacts ... "
+    - cmd: "%BUILD_DEPS_CMD%"
+
+    - sh: echo $BUILD_DEPS_CMD
+    - sh: $BUILD_DEPS_CMD
+    - sh: $BUILD_CMD
+
+    - echo "### Push artifacts ... "
     - cmd: appveyor PushArtifact c:\scopy-%ARCH_BIT%bit.zip
     - cmd: appveyor PushArtifact C:\debug-%ARCH_BIT%bit.zip
    
-    # Build the installer
-    - cmd: appveyor PushArtifact C:\scopy-%ARCH_BIT%-setup.exe
+    - cmd: appveyor PushArtifact %DEPLOY_FILE%
+    - sh: if [[ $DEPLOY_FILE != "" ]]; then appveyor PushArtifact $DEPLOY_FILE; fi
+
 #on_finish:
 #    - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
