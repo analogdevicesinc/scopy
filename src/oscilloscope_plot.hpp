@@ -132,6 +132,7 @@ namespace adiscope {
 		void computeMeasurementsForChannel(unsigned int chnIdx, unsigned int sampleRate);
 
 		void enableXaxisLabels();
+		void enableTimeTrigger(bool enable);
 	Q_SIGNALS:
 		void timeTriggerValueChanged(double);
 		void channelOffsetChanged(double);

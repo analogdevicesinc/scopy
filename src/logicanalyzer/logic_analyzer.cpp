@@ -28,7 +28,7 @@ LogicAnalyzer::LogicAnalyzer(iio_context *ctx, adiscope::Filter *filt,
 					}, tr("Sample Rate"), 1,
 					10e7,
 					true, false, this, {1, 2, 5})),
-	m_bufferSize(new ScaleSpinButton({
+	m_bufferSizeButton(new ScaleSpinButton({
 					{"samples", 1E0},
 					{"k samples", 1E+3},
 					{"M samples", 1E+6},
@@ -36,13 +36,29 @@ LogicAnalyzer::LogicAnalyzer(iio_context *ctx, adiscope::Filter *filt,
 					}, tr("Samples"), 1,
 					10e8,
 					true, false, this, {1, 2, 5})),
+	m_timePositionButton(new ScaleSpinButton({
+					 {"samples", 1E0},
+					 {"k samples", 1E+3},
+					 }, tr("Delay"), - (1 << 13),
+					 (1 << 13) - 1,
+					 true, false, this, {1, 2, 5})),
+	m_sampleRate(1.0),
+	m_bufferSize(1),
 	m_m2kContext(m2kOpen(ctx, "")),
+	m_m2kDigital(m_m2kContext->getDigital()),
 	m_buffer(nullptr),
 	m_horizOffset(0.0),
 	m_timeTriggerOffset(0.0),
-	m_resetHorizAxisOffset(true)
+	m_resetHorizAxisOffset(true),
+	m_captureThread(nullptr),
+	m_stopRequested(false),
+	m_plotScrollBar(new QScrollBar(Qt::Vertical, this)),
+	m_started(false)
 
 {
+
+	qDebug() << m_m2kDigital << " " << m_m2kContext;
+
 	// setup ui
 	setupUi();
 
@@ -54,20 +70,23 @@ LogicAnalyzer::LogicAnalyzer(iio_context *ctx, adiscope::Filter *filt,
 	// TODO: query libm2k for number of channels
 	// TODO: Add channels on the plot
 
-	m_buffer = new uint16_t[1000000];
-	for (int i = 0; i < 1000000; ++i) {
-		m_buffer[i] = rand() % (255 * 255);
-	}
+//	m_buffer = new uint16_t[1000000];
+//	for (int i = 0; i < 1000000; ++i) {
+//		m_buffer[i] = rand() % (255 * 255);
+//	}
 
-	double sampleRate = 100000; // 100kHz
-	uint64_t bufferSize = 1000000;
+//	double sampleRate = 100000; // 100kHz
+//	uint64_t bufferSize = 1000000;
 
 
 
-	m_plot.setHorizUnitsPerDiv(1.0 / sampleRate * bufferSize / 16.0);
+//	m_plot.setHorizUnitsPerDiv(1.0 / sampleRate * bufferSize / 16.0);
 
-	M2kDigital *dig = m_m2kContext->getDigital();
-	for (uint8_t i = 0; i < 3; ++i) {
+//	M2kDigital *dig = m_m2kContext->getDigital();
+
+	// TODO: get number of channels from libm2k;
+
+	for (uint8_t i = 0; i < 16; ++i) {
 		QCheckBox *channelBox = new QCheckBox("DIO " + QString::number(i));
 		if (i < 8) {
 			ui->channelEnumeratorLayout->addWidget(channelBox, i % 8, 0);
@@ -82,15 +101,27 @@ LogicAnalyzer::LogicAnalyzer(iio_context *ctx, adiscope::Filter *filt,
 		LogicDataCurve *curve = new LogicDataCurve(nullptr, i, this);
 		curve->setTraceHeight(1);
 		m_plot.addDigitalPlotCurve(curve, true);
-		curve->dataAvailable(0, 1000000);
+//		curve->dataAvailable(0, 1000000);
 
-		curve->setPlotConfiguration(sampleRate, 1000000, 0.0);
+		// use direct connection we want the processing
+		// of the available data to be done in the capture thread
+		connect(this, &LogicAnalyzer::dataAvailable, this,
+			[=](uint64_t from, uint64_t to){
+			curve->dataAvailable(from, to);
+		}, Qt::DirectConnection);
+
+//		connect(m_sampleRateButton, &ScaleSpinButton::valueChanged, [=](double value){
+//			curve->
+//		});
+
+//		curve->setPlotConfiguration(sampleRate, 1000000, 0.0);
 
 		connect(channelBox, &QCheckBox::toggled, [=](bool toggled){
 			m_plot.enableDigitalPlotCurve(i, toggled);
 			m_plot.setOffsetWidgetVisible(i, toggled);
 			m_plot.replot();
 		});
+		channelBox->setChecked(false);
 	}
 
 	// Add propper zoomer
@@ -100,19 +131,39 @@ LogicAnalyzer::LogicAnalyzer(iio_context *ctx, adiscope::Filter *filt,
 
 	m_plot.zoomBaseUpdate();
 
-	connect(&m_plot, &CapturePlot::timeTriggerValueChanged,
-		this, &LogicAnalyzer::onTimeTriggerValueChanged);
+	connect(&m_plot, &CapturePlot::timeTriggerValueChanged, [=](double value){
+		double delay = value / (1.0 / m_sampleRate);
+		onTimeTriggerValueChanged(delay);
+	});
+
 
 	m_plot.enableXaxisLabels();
 
-	m_plot.setTimeTriggerInterval(-500000, 500000);
+//	m_plot.setTimeTriggerInterval(-500000, 500000);
 
 	initBufferScrolling();
+
+
+	// TODO: scroll area on plot canvas
+	// TODO: channel groups
+	m_plotScrollBar->setRange(0, 100);
 
 }
 
 LogicAnalyzer::~LogicAnalyzer()
 {
+	if (m_captureThread) {
+		m_stopRequested = true;
+		m_captureThread->join();
+		delete m_captureThread;
+		m_captureThread = nullptr;
+	}
+
+	if (m_buffer) {
+		delete[] m_buffer;
+		m_buffer = nullptr;
+	}
+
 	delete cr_ui;
 	delete ui;
 }
@@ -184,18 +235,79 @@ void LogicAnalyzer::rightMenuFinished(bool opened)
 
 void LogicAnalyzer::onTimeTriggerValueChanged(double value)
 {
+	if (value > m_timePositionButton->maxValue() ||
+			value < m_timePositionButton->minValue()) {
+		return;
+	}
+
 	m_plot.cancelZoom();
 	m_plot.zoomBaseUpdate();
 
-	qDebug() << "timeTriggermoved: " << value;
-	m_plot.setHorizOffset(value);
+//	qDebug() << "timeTriggermoved sample: " << value << "  time: " << value * (1.0 / m_sampleRate);
+	m_plot.setHorizOffset(value * (1.0 / m_sampleRate));
 	m_plot.replot();
 
 	if (m_resetHorizAxisOffset) {
-		m_horizOffset = value;
+		m_horizOffset = value * (1.0 / m_sampleRate);
 	}
 
+	m_m2kDigital->getTrigger()->setDigitalDelay(value);
+
 	updateBufferPreviewer();
+}
+
+void LogicAnalyzer::onSampleRateValueChanged(double value)
+{
+	qDebug() << "Sample rate: " << value;
+	m_sampleRate = value;
+	m_plot.setHorizUnitsPerDiv(1.0 / m_sampleRate * m_bufferSize / 16.0);
+
+	m_plot.cancelZoom();
+	m_plot.zoomBaseUpdate();
+	m_plot.replot();
+
+	updateBufferPreviewer();
+
+	double minT = -(1 << 13) * (1.0 / m_sampleRate); // 8192 * time between samples
+	double maxT = ((1 << 13) - 1) * (1.0 / m_sampleRate); // (2 << 13) - 1 max hdl fifo depth
+	m_plot.setTimeTriggerInterval(-maxT, -minT);
+}
+
+void LogicAnalyzer::onBufferSizeChanged(double value)
+{
+	qDebug() << "Buffer size: " << value;
+	m_bufferSize = value;
+	m_plot.setHorizUnitsPerDiv(1.0 / m_sampleRate * m_bufferSize / 16.0);
+
+	m_plot.cancelZoom();
+	m_plot.zoomBaseUpdate();
+	m_plot.replot();
+
+	updateBufferPreviewer();
+}
+
+void LogicAnalyzer::on_btnStreamOneShot_toggled(bool toggled)
+{
+	qDebug() << "Btn stream one shot toggled !!!!!: " << toggled;
+
+	m_plot.enableTimeTrigger(toggled);
+	m_timePositionButton->setVisible(toggled);
+
+	m_m2kDigital->getTrigger()->setDigitalStreamingFlag(toggled);
+
+	if (toggled) { // oneshot
+		m_plot.cancelZoom();
+		m_timePositionButton->setValue(0);
+		m_plot.setHorizOffset(0);
+		m_plot.replot();
+		m_plot.zoomBaseUpdate();
+	} else { // streaming
+		m_plot.cancelZoom();
+		m_plot.setHorizUnitsPerDiv(1.0 / m_sampleRate * m_bufferSize / 16.0);
+		m_plot.setHorizOffset(1.0 / m_sampleRate * m_bufferSize / 2.0);
+		m_plot.replot();
+		m_plot.zoomBaseUpdate();
+	}
 }
 
 void LogicAnalyzer::setupUi()
@@ -243,8 +355,9 @@ void LogicAnalyzer::setupUi()
 	ui->gridLayoutPlot->addWidget(m_plot.leftHandlesArea(), 0, 0, 4, 1);
 	ui->gridLayoutPlot->addWidget(m_plot.rightHandlesArea(), 0, 3, 4, 1);
 
+
 	ui->gridLayoutPlot->addWidget(&m_plot, 2, 1, 1, 1);
-//	ui->gridLayoutPlot->addWidget(&hist_plot, 3, 2, 1, 1);
+	ui->gridLayoutPlot->addWidget(m_plotScrollBar, 2, 2, 1, 1);
 
 	ui->gridLayoutPlot->addWidget(m_plot.bottomHandlesArea(), 3, 0, 1, 4);
 	ui->gridLayoutPlot->addItem(plotSpacer, 4, 0, 1, 4);
@@ -275,7 +388,8 @@ void LogicAnalyzer::setupUi()
 	// Setup sweep settings menu
 
 	ui->sweepSettingLayout->addWidget(m_sampleRateButton);
-	ui->sweepSettingLayout->addWidget(m_bufferSize);
+	ui->sweepSettingLayout->addWidget(m_bufferSizeButton);
+	ui->sweepSettingLayout->addWidget(m_timePositionButton);
 
 	// Setup trigger menu
 
@@ -313,7 +427,17 @@ void LogicAnalyzer::setupUi()
 void LogicAnalyzer::connectSignalsAndSlots()
 {
 	// connect all the signals and slots here
-	// between UI (View) and it's implementation (Controller)
+
+	connect(ui->runSingleWidget, &RunSingleWidget::toggled,
+		[=](bool checked){
+		auto btn = dynamic_cast<CustomPushButton *>(run_button);
+		btn->setChecked(checked);
+	});
+	connect(run_button, &QPushButton::toggled,
+		ui->runSingleWidget, &RunSingleWidget::toggle);
+	connect(ui->runSingleWidget, &RunSingleWidget::toggled,
+		this, &LogicAnalyzer::startStop);
+
 
 	connect(ui->rightMenu, &MenuAnim::finished,
 		this, &LogicAnalyzer::rightMenuFinished);
@@ -335,6 +459,7 @@ void LogicAnalyzer::connectSignalsAndSlots()
 
 	connect(&m_plot, &CapturePlot::plotSizeChanged, [=](){
 		m_bufferPreviewer->setFixedWidth(m_plot.canvas()->size().width());
+		m_plotScrollBar->setFixedHeight(m_plot.canvas()->size().height());
 	});
 
 	// some conenctions for the cursors menu
@@ -352,7 +477,29 @@ void LogicAnalyzer::connectSignalsAndSlots()
 		updateBufferPreviewer();
 	});
 
+	connect(m_sampleRateButton, &ScaleSpinButton::valueChanged,
+		this, &LogicAnalyzer::onSampleRateValueChanged);
+	connect(m_bufferSizeButton, &ScaleSpinButton::valueChanged,
+		this, &LogicAnalyzer::onBufferSizeChanged);
+
+	connect(&m_plot, &CapturePlot::timeTriggerValueChanged, [=](double value){
+//		if (m_timePositionButton->value() != value) {
+		m_timePositionButton->setValue(value / (1.0 / m_sampleRate));
+//	}
+	});
+
+	connect(m_timePositionButton, &PositionSpinButton::valueChanged,
+		this, &LogicAnalyzer::onTimeTriggerValueChanged);
+
+
+	connect(m_plotScrollBar, &QScrollBar::valueChanged, [=](double value) {
+		m_plot.setYaxis(-5 - (value * 0.05), 5 - (value * 0.05));
+		m_plot.replot();
+		qDebug() << "ScrollBar value: " << value;
+	});
 }
+
+
 
 void LogicAnalyzer::triggerRightMenuToggle(CustomPushButton *btn, bool checked)
 {
@@ -417,12 +564,11 @@ void LogicAnalyzer::updateBufferPreviewer()
 
 	// Time interval that represents the captured data
 	QwtInterval dataInterval(0.0, 0.0);
-	long long triggerSamples = /*trigger_settings.triggerDelay();*/0;
-	long long totalSamples = /*last_set_sample_count*/ 1000000;
+	long long totalSamples = m_bufferSize;
 
 	if (totalSamples > 0) {
-		dataInterval.setMinValue(-5);
-		dataInterval.setMaxValue(5);
+		dataInterval.setMinValue(-((m_bufferSize / m_sampleRate) / 2.0 - (m_timePositionButton->value() * (1.0 / m_sampleRate))));
+		dataInterval.setMaxValue((m_bufferSize / m_sampleRate) / 2.0 + (m_timePositionButton->value() * (1.0 / m_sampleRate)));
 	}
 
 	// Use the two intervals to determine the width and position of the
@@ -457,6 +603,10 @@ void LogicAnalyzer::initBufferScrolling()
 {
 	// TODO: remove extra signal for plot size changeee!!!!!!!
 
+	connect(m_plot.getZoomer(), &OscPlotZoomer::zoomFinished, [=](bool isZoomOut){
+		m_horizOffset = m_plot.HorizOffset();
+	});
+
 	connect(m_bufferPreviewer, &BufferPreviewer::bufferMovedBy, [=](int value) {
 		m_resetHorizAxisOffset = false;
 		double moveTo = 0.0;
@@ -481,4 +631,124 @@ void LogicAnalyzer::initBufferScrolling()
 		updateBufferPreviewer();
 		m_horizOffset = m_timeTriggerOffset;
 	});
+}
+
+void LogicAnalyzer::startStop(bool start)
+{
+	if (m_started == start) {
+		return;
+	}
+
+	m_started = start;
+
+	if (start) {
+		m_stopRequested = false;
+
+		m_m2kDigital->flushBufferIn();
+
+		double sampleRate = m_sampleRateButton->value();
+		uint64_t bufferSize = m_bufferSizeButton->value();
+
+		bool oneShotOrStream = ui->btnStreamOneShot->isChecked();
+		qDebug() << "stream one shot is set to: " << oneShotOrStream;
+
+		m_m2kDigital->setSampleRateIn(sampleRate);
+
+//		for (int i = 0; i < 16; ++i) {
+		// TODO: move in trigger menu
+		m_m2kDigital->getTrigger()->setDigitalCondition(0, M2K_TRIGGER_CONDITION_DIGITAL::FALLING_EDGE_DIGITAL);
+//		}
+
+		qDebug() << m_timePositionButton->value();
+
+//		m_m2kDigital->getTrigger()->setDigitalDelay(m_timePositionButton->value());
+		for (int i = 0; i < 16; ++i) {
+			QwtPlotCurve *curve = m_plot.getDigitalPlotCurve(i);
+			LogicDataCurve *logic_curve = dynamic_cast<LogicDataCurve *>(curve);
+			logic_curve->reset();
+			const double delay = oneShotOrStream ? m_timePositionButton->value()
+						       : (m_bufferSize / 2.0);
+			logic_curve->setPlotConfiguration(sampleRate, bufferSize, delay);
+		}
+
+		m_captureThread = new std::thread([=](){
+
+			if (m_buffer) {
+				delete[] m_buffer;
+				m_buffer = nullptr;
+			}
+
+			m_buffer = new uint16_t[bufferSize];
+
+			if (ui->btnStreamOneShot->isChecked()) {
+				try {
+					const uint16_t * const temp = m_m2kDigital->getSamplesP(bufferSize);
+					memcpy(m_buffer, temp, bufferSize * sizeof(uint16_t));
+				} catch (std::invalid_argument &e) {
+					qDebug() << e.what();
+				}
+
+				Q_EMIT dataAvailable(0, bufferSize);
+
+			} else {
+				uint64_t chunks = 4;
+				while ((bufferSize >> chunks) > (1 << 19)) {
+					chunks++; // select a small size for the chunks
+					// example: 2^19 samples in each chunk
+				}
+				const uint64_t chunk_size = bufferSize >> chunks;
+				uint64_t totalSamples = bufferSize;
+				m_m2kDigital->setKernelBuffersCountIn(64);
+				uint64_t absIndex = 0;
+				do {
+					const uint64_t captureSize = std::min(chunk_size, totalSamples);
+					try {
+						const uint16_t * const temp = m_m2kDigital->getSamplesP(captureSize);
+						memcpy(m_buffer + absIndex, temp, sizeof(uint16_t) * captureSize);
+						absIndex += captureSize;
+						totalSamples -= captureSize;
+					} catch (std::invalid_argument &e) {
+						qDebug() << e.what();
+					}
+
+					if (m_stopRequested) {
+						break;
+					}
+
+					Q_EMIT dataAvailable(absIndex - captureSize, absIndex);
+
+					QMetaObject::invokeMethod(&m_plot, // trigger replot on Main Thread
+								  "replot",
+								  Qt::QueuedConnection);
+
+				} while (totalSamples);
+			}
+
+
+			if (m_stopRequested) {
+				return;
+			}
+
+
+			//
+			QMetaObject::invokeMethod(ui->runSingleWidget,
+						  "toggle",
+						  Qt::QueuedConnection,
+						  Q_ARG(bool, false));
+
+			QMetaObject::invokeMethod(&m_plot,
+						  "replot");
+
+		});
+
+	} else {
+		if (m_captureThread) {
+			m_stopRequested = true;
+			m_m2kDigital->cancelBufferIn();
+			m_captureThread->join();
+			delete m_captureThread;
+			m_captureThread = nullptr;
+		}
+	}
+
 }

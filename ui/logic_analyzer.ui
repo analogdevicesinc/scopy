@@ -690,6 +690,13 @@ font-weight: normal;
                     <property name="bottomMargin">
                      <number>0</number>
                     </property>
+                    <item row="1" column="0">
+                     <widget class="QLabel" name="labelTraceHeight">
+                      <property name="text">
+                       <string>Trace Height</string>
+                      </property>
+                     </widget>
+                    </item>
                     <item row="0" column="0">
                      <widget class="QLabel" name="labelName">
                       <property name="sizePolicy">
@@ -700,16 +707,6 @@ font-weight: normal;
                       </property>
                       <property name="text">
                        <string>Name</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="0" column="1">
-                     <widget class="QLineEdit" name="nameLineEdit"/>
-                    </item>
-                    <item row="1" column="0">
-                     <widget class="QLabel" name="labelTraceHeight">
-                      <property name="text">
-                       <string>Trace Height</string>
                       </property>
                      </widget>
                     </item>
@@ -725,6 +722,9 @@ font-weight: normal;
                     </item>
                     <item row="2" column="1">
                      <widget class="QComboBox" name="triggerComboBox"/>
+                    </item>
+                    <item row="0" column="1">
+                     <widget class="QLineEdit" name="nameLineEdit"/>
                     </item>
                    </layout>
                   </widget>
@@ -777,40 +777,7 @@ font-weight: normal;
                  </size>
                 </property>
                 <property name="styleSheet">
-                 <string notr="true">QCheckBox {
-  spacing: 8px;
-  background-color: transparent;
-  font-size: 14px;
-  font-weight: bold;
-
-color: rgba(255, 255, 255, 153);
-}
-
-QCheckBox::indicator {
-width: 14px;
-  height: 14px;
-  border: 2px solid rgb(74,100,255);
-  border-radius: 4px;
-}
-QCheckBox::indicator:unchecked { background-color: transparent; }
-QCheckBox::indicator:checked { background-color: rgb(74,100,255); }
-
-QPushButton {
-width: 40px;
-  height: 20px;
-  background-color: transparent;
-}
-QPushButton:pressed { border-image: url(:/icons/setup_btn_checked.svg); }
-QPushButton:!pressed { border-image: url(:/icons/setup_btn_unchecked.svg); }
-QPushButton:hover:!pressed:!checked { border-image: url(:/icons/setup_btn_hover.svg); }
-QPushButton:checked { border-image: url(:/icons/setup_btn_checked.svg); }
-
-QLabel {
-font-size: 14px;
-  font-weight: bold;
-
-color: rgba(255, 255, 255, 153);
-}</string>
+                 <string notr="true"/>
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_4">
                  <property name="spacing">
@@ -841,7 +808,7 @@ color: rgba(255, 255, 255, 153);
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>233</width>
+                      <width>300</width>
                       <height>467</height>
                      </rect>
                     </property>
@@ -910,6 +877,92 @@ font-weight: normal;
                       </layout>
                      </item>
                      <item>
+                      <widget class="adiscope::CustomSwitch" name="btnStreamOneShot">
+                       <property name="styleSheet">
+                        <string notr="true">QPushButton {
+min-height: 30px;
+max-height: 30px;
+min-width: 280px;
+max-width: 280px;
+background-color: black;
+border-radius: 4px;
+}
+
+QPushButton:disabled {
+background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.501, y2:0, stop:0 #727273, stop:1 #141416);
+}
+
+QWidget#handle {
+min-height: 30px;
+max-height: 30px;
+min-width: 142px;
+max-width: 142px;
+background-color: #4a64ff;
+border-radius: 2px;
+}
+
+QWidget#handle:disabled {
+background-color: #aaaaaa;
+}
+
+QLabel {
+margin-top: 6px;
+background-color: transparent;
+line-height: 19px;
+}
+
+QLabel#on {
+margin-top: 0px;
+min-height:30px;
+max-height:30px;
+min-width:140px;
+max-width:140px;
+qproperty-alignment: AlignCenter AlignCenter;
+margin-left: 0px;
+color: white;
+}
+
+QLabel#on:disabled {
+color: rgba(255,255,255,102);
+}
+
+QLabel#off {
+margin-top: 0px;
+min-height:30px;
+max-height:30px;
+min-width:140px;
+max-width:140px;
+margin-left: 140px;
+color: white;
+qproperty-alignment: AlignCenter AlignCenter;
+}
+
+QLabel#off:disabled {
+color: rgba(255,255,255,51);
+}
+</string>
+                       </property>
+                       <property name="text">
+                        <string/>
+                       </property>
+                       <property name="checkable">
+                        <bool>true</bool>
+                       </property>
+                       <property name="checked">
+                        <bool>true</bool>
+                       </property>
+                       <property name="leftText" stdset="0">
+                        <string>OneShot</string>
+                       </property>
+                       <property name="rightText" stdset="0">
+                        <string>Stream</string>
+                       </property>
+                       <property name="duration" stdset="0">
+                        <number>200</number>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
                       <layout class="QHBoxLayout" name="subTitleLayout">
                        <property name="topMargin">
                         <number>20</number>
@@ -953,11 +1006,71 @@ font-weight: normal;
                       </layout>
                      </item>
                      <item>
-                      <layout class="QGridLayout" name="channelEnumeratorLayout">
-                       <property name="topMargin">
-                        <number>0</number>
+                      <widget class="QWidget" name="widget_2" native="true">
+                       <property name="styleSheet">
+                        <string notr="true">QCheckBox {
+  spacing: 8px;
+  background-color: transparent;
+  font-size: 14px;
+  font-weight: bold;
+
+color: rgba(255, 255, 255, 153);
+}
+
+QCheckBox::indicator {
+width: 14px;
+  height: 14px;
+  border: 2px solid rgb(74,100,255);
+  border-radius: 4px;
+}
+QCheckBox::indicator:unchecked { background-color: transparent; }
+QCheckBox::indicator:checked { background-color: rgb(74,100,255); }
+
+QPushButton {
+width: 40px;
+  height: 20px;
+  background-color: transparent;
+}
+QPushButton:pressed { border-image: url(:/icons/setup_btn_checked.svg); }
+QPushButton:!pressed { border-image: url(:/icons/setup_btn_unchecked.svg); }
+QPushButton:hover:!pressed:!checked { border-image: url(:/icons/setup_btn_hover.svg); }
+QPushButton:checked { border-image: url(:/icons/setup_btn_checked.svg); }
+
+QLabel {
+font-size: 14px;
+  font-weight: bold;
+
+color: rgba(255, 255, 255, 153);
+}</string>
                        </property>
-                      </layout>
+                       <layout class="QVBoxLayout" name="verticalLayout_7">
+                        <property name="spacing">
+                         <number>0</number>
+                        </property>
+                        <property name="leftMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="topMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="rightMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="bottomMargin">
+                         <number>0</number>
+                        </property>
+                        <item>
+                         <layout class="QGridLayout" name="channelEnumeratorLayout">
+                          <property name="topMargin">
+                           <number>0</number>
+                          </property>
+                          <property name="spacing">
+                           <number>15</number>
+                          </property>
+                         </layout>
+                        </item>
+                       </layout>
+                      </widget>
                      </item>
                      <item>
                       <spacer name="verticalSpacer">
@@ -1229,6 +1342,11 @@ color: rgba(255, 255, 255, 153);
   </action>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>adiscope::CustomSwitch</class>
+   <extends>QPushButton</extends>
+   <header>customSwitch.hpp</header>
+  </customwidget>
   <customwidget>
    <class>adiscope::DetachDragZone</class>
    <extends>QWidget</extends>

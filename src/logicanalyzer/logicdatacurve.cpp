@@ -61,7 +61,9 @@ void LogicDataCurve::dataAvailable(uint64_t from, uint64_t to)
 
 void LogicDataCurve::reset()
 {
-
+	m_edges.clear();
+	m_startSample = 0;
+	m_endSample = 0;
 }
 
 double LogicDataCurve::getPixelOffset() const
@@ -100,7 +102,7 @@ void LogicDataCurve::setPlotConfiguration(double sampleRate, uint64_t bufferSize
 {
 	m_sampleRate = sampleRate;
 	m_bufferSize = bufferSize;
-	m_timeTriggerOffset = timeTriggerOffset;
+	m_timeTriggerOffset = timeTriggerOffset; // sample
 }
 
 void LogicDataCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap,
@@ -119,7 +121,7 @@ void LogicDataCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap,
     std::vector<std::pair<uint64_t, bool>> edges;
     getSubsampledEdges(edges, xMap);
 
-    qDebug() << "Subsampled edges: " << edges.size();
+//    qDebug() << "Subsampled edges: " << edges.size();
 
     if (!edges.size()) {
         return;
@@ -159,7 +161,7 @@ void LogicDataCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap,
 
     delete d;
 
-    qDebug() << "Drawing of edge took: " << tt.elapsed();
+//    qDebug() << "Drawing of edge took: " << tt.elapsed();
     tt.restart();
 
     // Draw sampling points
@@ -167,7 +169,7 @@ void LogicDataCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap,
     // knowing from segment.second if it is "1" or "0"
     double dist = xMap.transform(fromSampleToTime(1)) - xMap.transform(fromSampleToTime(0));
 
-    qDebug() << "dist is: " << dist;
+//    qDebug() << "dist is: " << dist;
 
     if (dist <= 4.0) {
         return;
@@ -199,7 +201,7 @@ void LogicDataCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap,
 
     painter->restore();
 
-    qDebug() << "Drawing of points took: " << tt.elapsed();
+//    qDebug() << "Drawing of points took: " << tt.elapsed();
 
 }
 
@@ -214,8 +216,8 @@ void LogicDataCurve::getSubsampledEdges(std::vector<std::pair<uint64_t, bool>> &
     uint64_t firstEdge = edgeAtX(fromTimeToSample(interval.minValue()), m_edges);
     uint64_t lastEdge = edgeAtX(fromTimeToSample(interval.maxValue()), m_edges);
 
-    qDebug() << "First edge is: " << firstEdge;
-    qDebug() << "Last edge is: " << lastEdge;
+//    qDebug() << "First edge is: " << firstEdge;
+//    qDebug() << "Last edge is: " << lastEdge;
 
 //    qDebug() << "first edge: " << firstEdge;
 //    qDebug() << "last edge: " << lastEdge;
@@ -317,10 +319,12 @@ uint64_t LogicDataCurve::edgeAtX(int x, const std::vector<std::pair<uint64_t, bo
 uint64_t LogicDataCurve::fromTimeToSample(double time) const
 {
 	double totalTime = static_cast<double>(m_bufferSize) / m_sampleRate;
-	double tmin = -(totalTime / 2.0 - m_timeTriggerOffset);
-	double tmax = totalTime / 2.0 - m_timeTriggerOffset;
+	double tmin = -(totalTime / 2.0 - (m_timeTriggerOffset * (1.0 / m_sampleRate)));
+	double tmax = totalTime / 2.0 + (m_timeTriggerOffset * (1.0 / m_sampleRate));
 	double smin = 0;
 	double smax = m_bufferSize;
+
+//	qDebug() << "tmin: " << tmin << " tmax: " << tmax;
 
 	if (time > tmax) {
 		time = tmax;
@@ -343,8 +347,8 @@ uint64_t LogicDataCurve::fromTimeToSample(double time) const
 double LogicDataCurve::fromSampleToTime(uint64_t sample) const
 {
 	double totalTime = static_cast<double>(m_bufferSize) / m_sampleRate;
-	double tmin = -(totalTime / 2.0 - m_timeTriggerOffset);
-	double tmax = totalTime / 2.0 - m_timeTriggerOffset;
+	double tmin = -(totalTime / 2.0 - (m_timeTriggerOffset * (1.0 / m_sampleRate)));
+	double tmax = totalTime / 2.0 + (m_timeTriggerOffset * (1.0 / m_sampleRate));
 	double smin = 0;
 	double smax = m_bufferSize;
 

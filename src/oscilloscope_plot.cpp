@@ -567,6 +567,12 @@ HorizBar *CapturePlot::levelTriggerB()
 	return d_levelTriggerBBar;
 }
 
+void CapturePlot::enableTimeTrigger(bool enable)
+{
+	d_timeTriggerBar->setVisible(enable);
+	d_timeTriggerHandle->setVisible(enable);
+}
+
 void CapturePlot::onHbar1PixelPosChanged(int pos)
 {
 	d_vCursorHandle1->setPositionSilenty(pos);
@@ -1414,6 +1420,9 @@ void CapturePlot::onDigitalChannelAdded(int chnIdx)
 	const int v = 170;
 	chnColor.setHsl(h, s, v);
 
+	QwtPlotCurve *curve = getDigitalPlotCurve(chnIdx);
+	LogicDataCurve *logicCurve = dynamic_cast<LogicDataCurve *>(curve);
+
 	/* Channel offset widget */
 	HorizBar *chOffsetBar = new HorizBar(this);
 	d_symbolCtrl->attachSymbol(chOffsetBar);
@@ -1432,6 +1441,12 @@ void CapturePlot::onDigitalChannelAdded(int chnIdx)
 	chOffsetHdl->setVisible(true);
 	d_offsetHandles.push_back(chOffsetHdl);
 
+	/* When bar position changes due to plot resizes update the handle */
+	connect(chOffsetBar, &HorizBar::pixelPositionChanged,
+		[=](int pos) {
+			chOffsetHdl->setPositionSilenty(pos);
+		});
+
 	connect(chOffsetHdl, &RoundedHandleV::positionChanged,
 		[=](int pos) {
 			int chn_id = d_offsetHandles.indexOf(chOffsetHdl);
@@ -1444,21 +1459,26 @@ void CapturePlot::onDigitalChannelAdded(int chnIdx)
 			double min = -(yAxisNumDiv() / 2.0) * VertUnitsPerDiv(0);
 			double max = (yAxisNumDiv() / 2.0) * VertUnitsPerDiv(0);
 
-			qDebug() << min << " " << max;
+//			qDebug() << min << " " << max;
 
 			yMap.setScaleInterval(min, max);
 			double offset = yMap.invTransform(pos);
 
 			auto x = axisInterval(QwtAxisId(QwtPlot::yLeft, 0));
 
-			qDebug() << x.minValue() << " " << x.maxValue();
+//			qDebug() << x.minValue() << " " << x.maxValue();
 
 			QwtPlotCurve *curve = getDigitalPlotCurve(chnIdx);
 			LogicDataCurve *logicCurve = dynamic_cast<LogicDataCurve *>(curve);
 
 			if (logicCurve) {
-				logicCurve->setPixelOffset(offset);
+				double plotOffset = VertOffset(0);
+				double pixelOffset = offset - logicCurve->getTraceHeight() / 2.0;
+				logicCurve->setPixelOffset(pixelOffset + plotOffset);
+				QSignalBlocker blocker(chOffsetBar);
+				chOffsetBar->setPosition(pixelOffset + plotOffset);
 			}
+
 
 			replot();
 

@@ -93,7 +93,11 @@ void RunSingleWidget::toggle(bool checked)
 
 	} else if (!d_ui->singleButton->isChecked()) {
 		QSignalBlocker blockerRunButton(d_ui->runButton);
-		d_ui->runButton->setChecked(true);
+		if (runButtonEnabled()) {
+			d_ui->runButton->setChecked(true);
+		} else if (singleButtonEnabled()) {
+			d_ui->singleButton->setChecked(true);
+		}
 		setDynamicProperty(d_ui->runButton, "running", true);
 	}
 

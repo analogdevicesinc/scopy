@@ -1,8 +1,13 @@
 #ifndef LOGIC_ANALYZER_H
 #define LOGIC_ANALYZER_H
 
+#include <thread>
+#include <mutex>
+#include <condition_variable>
+
 #include <QList>
 #include <QQueue>
+#include <QScrollBar>
 
 #include "tool.hpp"
 #include "oscilloscope_plot.hpp"
@@ -40,6 +45,9 @@ public:
 public:
 	uint16_t * getData();
 
+Q_SIGNALS:
+	void dataAvailable(uint64_t, uint64_t);
+
 private Q_SLOTS:
 
 	void on_btnChannelSettings_toggled(bool);
@@ -54,6 +62,11 @@ private Q_SLOTS:
 
 	void onTimeTriggerValueChanged(double value);
 
+	void onSampleRateValueChanged(double value);
+	void onBufferSizeChanged(double value);
+
+	void on_btnStreamOneShot_toggled(bool);
+
 private:
 	void setupUi();
 	void connectSignalsAndSlots();
@@ -62,6 +75,8 @@ private:
 	void settingsPanelUpdate(int id);
 	void updateBufferPreviewer();
 	void initBufferScrolling();
+
+	void startStop(bool start);
 
 private:
 	// TODO: consisten naming (m_ui, m_crUi)
@@ -73,17 +88,31 @@ private:
 
 	CapturePlot m_plot;
 	BufferPreviewer *m_bufferPreviewer;
+	QScrollBar *m_plotScrollBar;
 
 	ScaleSpinButton *m_sampleRateButton;
-	ScaleSpinButton *m_bufferSize;
+	ScaleSpinButton *m_bufferSizeButton;
+	ScaleSpinButton *m_timePositionButton;
+	double m_sampleRate;
+	uint64_t m_bufferSize;
 
 	M2k *m_m2kContext;
+	M2kDigital *m_m2kDigital;
 
 	uint16_t *m_buffer;
 
 	double m_horizOffset;
 	double m_timeTriggerOffset;
 	bool m_resetHorizAxisOffset;
+
+	// capture
+	std::thread *m_captureThread;
+	std::atomic<bool> m_stopRequested;
+	// prob not needed
+	std::mutex m_captureMutex;
+	std::condition_variable m_captureCv;
+
+	bool m_started;
 
 };
 } // namespace logic
