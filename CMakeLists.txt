@@ -20,7 +20,6 @@
 cmake_minimum_required(VERSION 3.5)
 project(scopy LANGUAGES CXX VERSION 1.1.2)
 
-message(${CMAKE_SYSTEM_PREFIX_PATH})
 
 set(Python_ADDITIONAL_VERSIONS 3)
 FIND_PACKAGE(PythonInterp REQUIRED)
