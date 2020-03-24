@@ -24,6 +24,8 @@
 #include <QPainter>
 #include <QMoveEvent>
 
+#include <QApplication>
+
 #include <QDebug>
 
 PlotLineHandle::PlotLineHandle(const QPixmap &handleIcon, QWidget *parent):
@@ -560,12 +562,14 @@ void FreePlotLineHandleH::paintEvent(QPaintEvent *)
 FreePlotLineHandleV::FreePlotLineHandleV(const QPixmap &handleIcon,
 			const QPixmap &beyondTopIcon,
 			const QPixmap &beyondBottomIcon,
-			QWidget *parent, bool facingRight):
+			QWidget *parent, bool facingRight,
+			const QString &name):
 		PlotLineHandleV(handleIcon, parent, facingRight),
 		m_beyondTopImage(beyondTopIcon),
 		m_beyondBottomImage(beyondBottomIcon),
 		m_isBeyondTop(false),
-		m_isBeyondBottom(false)
+		m_isBeyondBottom(false),
+		m_name(name)
 {
 }
 
@@ -624,22 +628,57 @@ void FreePlotLineHandleV::paintEvent(QPaintEvent *)
 		p.drawPixmap(imageTopLeft, m_beyondBottomImage);
 	} else {
 		p.drawLine(lineStart, lineStart + QPoint(m_innerSpacing, 0));
-		p.drawPixmap(imageTopLeft, m_image);
+
+		if (!m_name.isEmpty()) {
+			int fontSize = 10;
+
+			const QString fontFamily = QApplication::font().family();
+
+			while (QFontMetrics(QFont(fontFamily, fontSize)).horizontalAdvance(m_name)
+					> m_image.width()) {
+				fontSize--;
+			}
+
+			if (fontSize < 7) {
+				// Set tool tip if size is to small as text
+				// won't be visible
+				setToolTip(m_name);
+			} else {
+				// disable tool tip if name changes
+				// with something smaller
+				setToolTip("");
+			}
+
+			const double textHeight = QFontMetrics(QFont(fontFamily, fontSize)).height();
+
+			QPointF textPos(0.0, m_height / 2.0 + textHeight / 4.0);
+
+			p.save();
+			p.setPen(QPen(QBrush(Qt::black), 20));
+			p.setFont(QFont(fontFamily, fontSize));
+			p.drawText(textPos, m_name);
+			p.restore();
+		} else {
+			p.drawPixmap(imageTopLeft, m_image);
+		}
 	}
 }
 
 RoundedHandleV::RoundedHandleV(const QPixmap &handleIcon,
 			const QPixmap &beyondTopIcon,
 			const QPixmap &beyondBottomIcon,
-			QWidget *parent, bool facingRight):
+			QWidget *parent, bool facingRight,
+			const QString &name, bool selectable):
 		FreePlotLineHandleV(handleIcon, beyondTopIcon, beyondBottomIcon,
-			 parent, facingRight)
+			 parent, facingRight, name)
 {
 	m_innerSpacing = m_image.height();
 	m_width = m_innerSpacing +  m_image.width()  + m_outerSpacing;
 	m_height = m_image.height();
 	setMinimumSize(m_width, m_height);
 	setMaximumSize(m_width, m_height);
+	m_selected = false;
+	m_selectable = selectable;
 }
 
 QColor RoundedHandleV::roundRectColor()
@@ -655,15 +694,46 @@ void RoundedHandleV::setRoundRectColor(const QColor &newColor)
 	}
 }
 
+void RoundedHandleV::setSelected(bool selected)
+{
+	if (m_selected != selected) {
+		m_selected = selected;
+		update();
+	}
+}
+
+bool RoundedHandleV::isSelected() const
+{
+	return m_selected;
+}
+
 void RoundedHandleV::paintEvent(QPaintEvent *pv)
 {
 	QPainter p(this);
 	QRect rect(0, 0, m_image.width() - 1, m_image.height() - 1);
 
-	p.setPen(QPen(m_roundRectColor, 1, Qt::SolidLine));
+	if (m_selected) {
+		p.setPen(QPen(Qt::white, 2, Qt::SolidLine));
+	} else {
+		p.setPen(QPen(m_roundRectColor, 1, Qt::SolidLine));
+	}
+
 	p.setBrush(m_roundRectColor);
 	p.setRenderHint(QPainter::Antialiasing);
 	p.drawRoundedRect(rect, 30, 30, Qt::RelativeSize);
 
 	FreePlotLineHandleV::paintEvent(pv);
+}
+
+void RoundedHandleV::mouseDoubleClickEvent(QMouseEvent *event)
+{
+	if (!m_selectable) {
+		FreePlotLineHandleV::mouseDoubleClickEvent(event);
+		return;
+	}
+
+	m_selected = !m_selected;
+	update();
+
+	Q_EMIT selected(m_selected);
 }

@@ -67,6 +67,8 @@ private Q_SLOTS:
 
 	void on_btnStreamOneShot_toggled(bool);
 
+	void on_btnGroupChannels_toggled(bool);
+
 private:
 	void setupUi();
 	void connectSignalsAndSlots();

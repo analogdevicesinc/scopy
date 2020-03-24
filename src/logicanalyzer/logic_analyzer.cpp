@@ -310,6 +310,18 @@ void LogicAnalyzer::on_btnStreamOneShot_toggled(bool toggled)
 	}
 }
 
+void LogicAnalyzer::on_btnGroupChannels_toggled(bool checked)
+{
+	qDebug() << checked;
+	ui->btnGroupChannels->setText(checked ? "Done" : "Group");
+
+	if (checked) {
+		m_plot.beginGroupSelection();
+	} else {
+		m_plot.endGroupSelection();
+	}
+}
+
 void LogicAnalyzer::setupUi()
 {
 	ui->setupUi(this);
@@ -668,7 +680,10 @@ void LogicAnalyzer::startStop(bool start)
 			logic_curve->reset();
 			const double delay = oneShotOrStream ? m_timePositionButton->value()
 						       : (m_bufferSize / 2.0);
-			logic_curve->setPlotConfiguration(sampleRate, bufferSize, delay);
+
+			logic_curve->setSampleRate(sampleRate);
+			logic_curve->setBufferSize(bufferSize);
+			logic_curve->setTimeTriggerOffset(delay);
 		}
 
 		m_captureThread = new std::thread([=](){

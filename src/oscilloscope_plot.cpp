@@ -73,7 +73,8 @@ CapturePlot::CapturePlot(QWidget *parent,
 	d_horizCursorsEnabled(false),
 	d_vertCursorsEnabled(false),
 	d_bonusWidth(0),
-	d_gatingEnabled(false)
+	d_gatingEnabled(false),
+	d_startedGrouping(false)
 {
 	setMinimumHeight(250);
 	setMinimumWidth(500);
@@ -1435,11 +1436,35 @@ void CapturePlot::onDigitalChannelAdded(int chnIdx)
 				QPixmap(":/icons/handle_right_arrow.svg"),
 				QPixmap(":/icons/handle_up_arrow.svg"),
 				QPixmap(":/icons/handle_down_arrow.svg"),
-				d_leftHandlesArea, true);
+				d_leftHandlesArea, true, logicCurve->getName(), true); // TODO: add name
 	chOffsetHdl->setRoundRectColor(chnColor);
 	chOffsetHdl->setPen(QPen(chnColor, 2, Qt::SolidLine));
 	chOffsetHdl->setVisible(true);
 	d_offsetHandles.push_back(chOffsetHdl);
+
+	connect(chOffsetHdl, &RoundedHandleV::selected, [=](bool selected){
+		if (!selected && !d_startedGrouping) {
+			return ;
+		}
+
+		if (d_startedGrouping) {
+			chOffsetHdl->setSelected(selected);
+			if (selected) {
+				d_groupHandles.back().push_back(chOffsetHdl);
+			} else {
+				d_groupHandles.back().removeOne(chOffsetHdl);
+			}
+			return;
+		}
+
+		for (auto &hdl : d_offsetHandles) {
+			if (hdl == chOffsetHdl) {
+				continue;
+			}
+
+			hdl->setSelected(false);
+		}
+	});
 
 	/* When bar position changes due to plot resizes update the handle */
 	connect(chOffsetBar, &HorizBar::pixelPositionChanged,
@@ -1456,27 +1481,29 @@ void CapturePlot::onDigitalChannelAdded(int chnIdx)
 //			qDebug() << pos;
 
 			QwtScaleMap yMap = this->canvasMap(QwtAxisId(QwtPlot::yLeft, 0));
-			double min = -(yAxisNumDiv() / 2.0) * VertUnitsPerDiv(0);
-			double max = (yAxisNumDiv() / 2.0) * VertUnitsPerDiv(0);
+
+			auto y = axisInterval(QwtAxisId(QwtPlot::yLeft, 0));
+
+//			double min = -(yAxisNumDiv() / 2.0) * VertUnitsPerDiv(0);
+//			double max = (yAxisNumDiv() / 2.0) * VertUnitsPerDiv(0);
+
+			double min = y.minValue();
+			double max = y.maxValue();
 
 //			qDebug() << min << " " << max;
 
 			yMap.setScaleInterval(min, max);
 			double offset = yMap.invTransform(pos);
 
-			auto x = axisInterval(QwtAxisId(QwtPlot::yLeft, 0));
-
-//			qDebug() << x.minValue() << " " << x.maxValue();
-
 			QwtPlotCurve *curve = getDigitalPlotCurve(chnIdx);
 			LogicDataCurve *logicCurve = dynamic_cast<LogicDataCurve *>(curve);
 
 			if (logicCurve) {
-				double plotOffset = VertOffset(0);
-				double pixelOffset = offset - logicCurve->getTraceHeight() / 2.0;
-				logicCurve->setPixelOffset(pixelOffset + plotOffset);
+//				double plotOffset = VertOffset(0);
+				double pixelOffset = offset /*- logicCurve->getTraceHeight() / 2.0*/;
+				logicCurve->setPixelOffset(pixelOffset /*+ plotOffset*/);
 				QSignalBlocker blocker(chOffsetBar);
-				chOffsetBar->setPosition(pixelOffset + plotOffset);
+				chOffsetBar->setPosition(pixelOffset /*+ plotOffset*/);
 			}
 
 
@@ -1484,6 +1511,128 @@ void CapturePlot::onDigitalChannelAdded(int chnIdx)
 
 //			Q_EMIT channelOffsetChanged(-offset);
 		});
+
+}
+
+void CapturePlot::beginGroupSelection()
+{
+	if (d_startedGrouping) {
+		qDebug() << "\"beginGroupSelection\" already called. Consider terminating current group"
+			    "creation using \"endGroupSelection\"!";
+	}
+
+	d_startedGrouping = true;
+
+	d_groupHandles.push_back(QList<RoundedHandleV *>());
+	for (auto &hdl : d_offsetHandles) {
+		if (hdl->isSelected()) {
+			d_groupHandles.back().push_back(hdl);
+		}
+	}
+}
+
+void CapturePlot::endGroupSelection()
+{
+	if (!d_startedGrouping) {
+		qDebug() << "\"endGroupSelection\" call not paired with \"beginGroupSelection\"!";
+		return;
+	}
+
+	d_startedGrouping = false;
+
+	if (d_groupHandles.back().isEmpty()) {
+		d_groupHandles.pop_back();
+		return;
+	}
+
+	QList<RoundedHandleV *> group = d_groupHandles.back();
+
+	// Move channels on top side of the plot
+	int currentPos = 5;
+	for (RoundedHandleV *hdl : group) {
+		const int chIdx = d_offsetHandles.indexOf(hdl);
+		QwtPlotCurve *curve = getDigitalPlotCurve(chIdx);
+		LogicDataCurve *logicCurve = dynamic_cast<LogicDataCurve *>(curve);
+		const double traceHeight = logicCurve->getTraceHeight();
+		QwtScaleMap yMap = this->canvasMap(QwtAxisId(QwtPlot::yLeft, 0));
+		const QwtInterval y = axisInterval(QwtAxisId(QwtPlot::yLeft, 0));
+		const double min = y.minValue();
+		const double max = y.maxValue();
+		yMap.setScaleInterval(min, max);
+		currentPos += qAbs(yMap.transform(traceHeight) - yMap.transform(0));
+		hdl->setPosition(currentPos);
+		hdl->setSelected(false);
+		currentPos += 5;
+
+		connect(hdl, &RoundedHandleV::positionChanged,
+			this, &CapturePlot::handleInGroupChangedPosition);
+	}
+
+	// Bind together
+}
+
+void CapturePlot::handleInGroupChangedPosition(int position)
+{
+	RoundedHandleV *hdl = dynamic_cast<RoundedHandleV *>(QObject::sender());
+
+	// is the sender a RoundedHandleV?
+	if (!hdl) {
+		qDebug() << "Invalid sender!";
+	}
+
+	// find the group of this handle
+	auto hdlGroup = std::find_if(d_groupHandles.begin(), d_groupHandles.end(),
+				     [&hdl](const QList<RoundedHandleV*> &group){
+		return group.contains(hdl);
+	});
+
+	// if no group return
+	if (hdlGroup == d_groupHandles.end()) {
+		qDebug() << "This handle is not in a group!";
+		return;
+	}
+
+	// index of handle in the group
+	const int index = hdlGroup->indexOf(hdl);
+
+	auto getTraceHeightInPixelsForHandle = [=](RoundedHandleV *handle) {
+		const int chIdx = d_offsetHandles.indexOf(handle);
+		QwtPlotCurve *curve = getDigitalPlotCurve(chIdx);
+		LogicDataCurve *logicCurve = dynamic_cast<LogicDataCurve *>(curve);
+		const double traceHeight = logicCurve->getTraceHeight();
+		QwtScaleMap yMap = this->canvasMap(QwtAxisId(QwtPlot::yLeft, 0));
+		const QwtInterval y = axisInterval(QwtAxisId(QwtPlot::yLeft, 0));
+		const double min = y.minValue();
+		const double max = y.maxValue();
+		yMap.setScaleInterval(min, max);
+
+		return qAbs(yMap.transform(traceHeight) - yMap.transform(0));
+
+	};
+
+	// update position of handles above the moved one
+	int currentPos = position - 5;
+	for (int i = index - 1; i >= 0; --i) {
+		currentPos -= getTraceHeightInPixelsForHandle(hdlGroup->at(i));
+		disconnect(hdlGroup->at(i), &RoundedHandleV::positionChanged,
+			   this, &CapturePlot::handleInGroupChangedPosition);
+		hdlGroup->at(i)->setPosition(currentPos);
+		connect(hdlGroup->at(i), &RoundedHandleV::positionChanged,
+			   this, &CapturePlot::handleInGroupChangedPosition);
+		currentPos -= 5;
+	}
+
+	// update position of handles below the moved one
+	currentPos = position + 5;
+	for (int i = index + 1; i < hdlGroup->size(); ++i) {
+		currentPos += getTraceHeightInPixelsForHandle(hdlGroup->at(i));
+		disconnect(hdlGroup->at(i), &RoundedHandleV::positionChanged,
+			   this, &CapturePlot::handleInGroupChangedPosition);
+		hdlGroup->at(i)->setPosition(currentPos);
+		connect(hdlGroup->at(i), &RoundedHandleV::positionChanged,
+			   this, &CapturePlot::handleInGroupChangedPosition);
+		currentPos += 5;
+	}
 
 }
 

@@ -145,6 +145,42 @@ background-color: #4a34ff;
          </widget>
         </item>
         <item>
+         <widget class="QPushButton" name="btnGroupChannels">
+          <property name="styleSheet">
+           <string notr="true">
+QPushButton {
+width: 80px;
+  height: 40px;
+
+text-align: left;
+  font-weight: bold;
+  padding-left: 15px;
+  padding-right: 15px;
+
+border-radius: 4px;
+
+background-color: #4a64ff;
+  color: #ffffff;
+
+}
+
+QPushButton:pressed {
+background-color: #2a44df;
+}
+
+QPushButton:hover {
+background-color: #4a34ff;
+}</string>
+          </property>
+          <property name="text">
+           <string>Group</string>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
          <spacer name="horizontalSpacer_11">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -809,7 +845,7 @@ font-weight: normal;
                       <x>0</x>
                       <y>0</y>
                       <width>300</width>
-                      <height>467</height>
+                      <height>178</height>
                      </rect>
                     </property>
                     <property name="sizePolicy">
