@@ -14,16 +14,11 @@ static const QColor LowColor(0xC0, 0x00, 0x00);
 static const QColor SamplingPointColor(0x77, 0x77, 0x77);
 
 LogicDataCurve::LogicDataCurve(uint16_t *data, uint8_t bit, adiscope::logic::LogicAnalyzer *logic) :
-    QwtPlotCurve(),
+    GenericLogicPlotCurve(QString("Dio " + QString::number(bit))),
     m_logic(logic),
     m_startSample(0),
     m_endSample(0),
-    m_bit(bit),
-    m_pixelOffset(0.0),
-    m_traceHeight(0.0),
-    m_sampleRate(0.0),
-    m_bufferSize(0),
-    m_timeTriggerOffset(0.0)
+    m_bit(bit)
 {
     // If there are no set samples, QwtPlot::replot() won't call our
     // draw() method. Trick the plot into thinking that we have data
@@ -66,43 +61,9 @@ void LogicDataCurve::reset()
 	m_endSample = 0;
 }
 
-double LogicDataCurve::getPixelOffset() const
+uint8_t LogicDataCurve::getBitId() const
 {
-    return m_pixelOffset;
-}
-
-double LogicDataCurve::getTraceHeight() const
-{
-    return m_traceHeight;
-}
-
-void LogicDataCurve::setPixelOffset(double pixelOffset)
-{
-    // TODO: maybe trigger something when pixelOffset
-    // changes
-    if (m_pixelOffset != pixelOffset) {
-            m_pixelOffset = pixelOffset;
-    }
-    setBaseline(m_pixelOffset + m_traceHeight);
-
-//    qDebug() << "Set pixel offset to: " << m_pixelOffset;
-}
-
-void LogicDataCurve::setTraceHeight(double traceHeight)
-{
-    // TODO: maybe trigger something when traceHeight
-    // changes
-    if (m_traceHeight != traceHeight) {
-            m_traceHeight = traceHeight;
-    }
-    setBaseline(m_pixelOffset + m_traceHeight);
-}
-
-void LogicDataCurve::setPlotConfiguration(double sampleRate, uint64_t bufferSize, double timeTriggerOffset)
-{
-	m_sampleRate = sampleRate;
-	m_bufferSize = bufferSize;
-	m_timeTriggerOffset = timeTriggerOffset; // sample
+	return m_bit;
 }
 
 void LogicDataCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap,
@@ -315,54 +276,3 @@ uint64_t LogicDataCurve::edgeAtX(int x, const std::vector<std::pair<uint64_t, bo
 
     return mid;
 }
-
-uint64_t LogicDataCurve::fromTimeToSample(double time) const
-{
-	double totalTime = static_cast<double>(m_bufferSize) / m_sampleRate;
-	double tmin = -(totalTime / 2.0 - (m_timeTriggerOffset * (1.0 / m_sampleRate)));
-	double tmax = totalTime / 2.0 + (m_timeTriggerOffset * (1.0 / m_sampleRate));
-	double smin = 0;
-	double smax = m_bufferSize;
-
-//	qDebug() << "tmin: " << tmin << " tmax: " << tmax;
-
-	if (time > tmax) {
-		time = tmax;
-	}
-
-	if (time < tmin) {
-		time = tmin;
-	}
-
-//	qDebug() << "tmin: " << tmin
-//		 << " tmax: " << tmax
-//		 << " smin: " << smin
-//		 << " smax: " << smax;
-
-//	qDebug() << "For time: " << time << " sample is: " << (time - tmin) / (tmax - tmin) * (smax - smin) + smin;
-
-	return (time - tmin) / (tmax - tmin) * (smax - smin) + smin;
-}
-
-double LogicDataCurve::fromSampleToTime(uint64_t sample) const
-{
-	double totalTime = static_cast<double>(m_bufferSize) / m_sampleRate;
-	double tmin = -(totalTime / 2.0 - (m_timeTriggerOffset * (1.0 / m_sampleRate)));
-	double tmax = totalTime / 2.0 + (m_timeTriggerOffset * (1.0 / m_sampleRate));
-	double smin = 0;
-	double smax = m_bufferSize;
-
-	if (sample > smax) {
-		sample = smax;
-	}
-
-//	qDebug() << "tmin: " << tmin
-//		 << " tmax: " << tmax
-//		 << " smin: " << smin
-//		 << " smax: " << smax;
-
-//	qDebug() << "For sample: " << sample << " time is: " << (sample - smin) / (smax - smin) * (tmax - tmin) + tmin;
-
-	return (sample - smin) / (smax - smin) * (tmax - tmin) + tmin;
-}
-
