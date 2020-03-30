@@ -7,6 +7,8 @@
 #include <libsigrokdecode/libsigrokdecode.h>
 
 #include "logicanalyzer/logicdatacurve.h"
+#include "logicanalyzer/annotationcurve.h"
+#include "logicanalyzer/decoder.h"
 
 #include "dynamicWidget.hpp"
 
@@ -905,6 +907,23 @@ void LogicAnalyzer::setupDecoders()
 		}
 
 		qDebug() << "Requested the following decoder: " << decoder;
+		std::shared_ptr<logic::Decoder> initialDecoder = nullptr;
+
+		GSList *decoderList = g_slist_copy((GSList *)srd_decoder_list());
+		for (const GSList *sl = decoderList; sl; sl = sl->next) {
+		    srd_decoder *dec = (struct srd_decoder *)sl->data;
+		    if (QString::fromUtf8(dec->id) == decoder) {
+			initialDecoder = std::make_shared<logic::Decoder>(dec);
+		    }
+		}
+
+		g_slist_free(decoderList);
+
+		AnnotationCurve *curve = new AnnotationCurve(this, initialDecoder);
+		curve->setTraceHeight(15);
+		m_plot.addDigitalPlotCurve(curve, true);
+
+		m_plotCurves.push_back(curve);
 
 		ui->addDecoderComboBox->setCurrentIndex(0);
 	});

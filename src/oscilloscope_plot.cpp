@@ -1439,7 +1439,7 @@ void CapturePlot::onDigitalChannelAdded(int chnIdx)
 	chnColor.setHsl(h, s, v);
 
 	QwtPlotCurve *curve = getDigitalPlotCurve(chnIdx);
-	LogicDataCurve *logicCurve = dynamic_cast<LogicDataCurve *>(curve);
+	GenericLogicPlotCurve *logicCurve = dynamic_cast<GenericLogicPlotCurve *>(curve);
 
 	/* Channel offset widget */
 	HorizBar *chOffsetBar = new HorizBar(this);
