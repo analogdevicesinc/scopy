@@ -10,7 +10,7 @@ class LogicDataCurve : public GenericLogicPlotCurve
 public:
 	LogicDataCurve(uint16_t *data, uint8_t bit, adiscope::logic::LogicAnalyzer *logic);
 
-    void dataAvailable(uint64_t from, uint64_t to);
+    virtual void dataAvailable(uint64_t from, uint64_t to) override;
     void reset();
 
     uint8_t getBitId() const;

@@ -99,9 +99,9 @@ void AnnotationCurve::annotationCallback(srd_proto_data *pdata, void *annotation
     //    qDebug() << "Pushed annotation with format: " << format << " to row: " << (*row_iter).first.index();
 }
 
-void AnnotationCurve::newData(uint64_t from, uint64_t to)
+void AnnotationCurve::dataAvailable(uint64_t from, uint64_t to)
 {
-    m_annotationDecoder->newData(from, to);
+    m_annotationDecoder->dataAvailable(from, to);
 }
 
 void AnnotationCurve::setClassRows(const map<std::pair<const srd_decoder *, int>, Row> &classRows)

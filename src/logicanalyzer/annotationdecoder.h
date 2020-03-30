@@ -28,7 +28,7 @@ public:
     void startDecode();
     void stopDecode();
 
-    void newData(uint64_t from, uint64_t to);
+    void dataAvailable(uint64_t from, uint64_t to);
 
     std::vector<std::shared_ptr<logic::Decoder>> getDecoderStack();
 

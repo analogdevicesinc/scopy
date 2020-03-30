@@ -180,7 +180,7 @@ void AnnotationDecoder::stopDecode()
     qDebug() << "finished stop decoder";
 }
 
-void AnnotationDecoder::newData(uint64_t from, uint64_t to)
+void AnnotationDecoder::dataAvailable(uint64_t from, uint64_t to)
 {
     // Emplace new data segment in a queue as new data might arrive
     // faster than libsigrokdecode can process

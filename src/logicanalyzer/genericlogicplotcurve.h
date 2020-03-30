@@ -31,6 +31,10 @@ public:
 	void setTimeTriggerOffset(double timeTriggerOffset);
 	void setBufferSize(uint64_t bufferSize);
 
+	// Classes who inherit from GenericLogicPlotCurve must provide behaviour
+	// when new data will be available
+	virtual void dataAvailable(uint64_t from, uint64_t to) {}
+
 protected:
 	uint64_t fromTimeToSample(double time) const;
 	double fromSampleToTime(uint64_t sample) const;

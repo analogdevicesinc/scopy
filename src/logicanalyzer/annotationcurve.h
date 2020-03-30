@@ -43,7 +43,7 @@ public:
 public:
     static void annotationCallback(srd_proto_data *pdata, void *annotationCurve);
 
-    void newData(uint64_t from, uint64_t to);
+    virtual void dataAvailable(uint64_t from, uint64_t to) override;
 
     void setClassRows(const std::map<std::pair<const srd_decoder*, int>, Row> &classRows);
     void setAnnotationRows(const std::map<const Row, RowData> &annotationRows);
