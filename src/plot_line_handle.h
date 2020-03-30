@@ -173,6 +173,9 @@ public:
 			const QString &name = {});
 	void moveWithinParent(int x, int y);
 
+	void setName(const QString &name);
+	QString getName() const;
+
 protected:
 	void paintEvent(QPaintEvent *event);
 

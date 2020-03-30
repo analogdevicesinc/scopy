@@ -30,6 +30,8 @@
 #include "customplotpositionbutton.h"
 #include "graticule.h"
 
+#include <qwt_plot_zoneitem.h>
+
 class QLabel;
 
 namespace adiscope {
@@ -133,6 +135,9 @@ namespace adiscope {
 
 		void enableXaxisLabels();
 		void enableTimeTrigger(bool enable);
+		QString getChannelName(int chIdx) const;
+		void setChannelName(const QString &name, int chIdx);
+
 	Q_SIGNALS:
 		void timeTriggerValueChanged(double);
 		void channelOffsetChanged(double);
@@ -141,6 +146,7 @@ namespace adiscope {
 		void canvasSizeChanged();
 		void leftGateChanged(double);
 		void rightGateChanged(double);
+		void channelSelected(int, bool);
 
 	public Q_SLOTS:
 		void setTriggerAEnabled(bool en);
@@ -164,7 +170,7 @@ namespace adiscope {
 		void printWithNoBackground(const QString& toolName = "", bool editScaleDraw = true);
 		void onDigitalChannelAdded(int chnIdx);
 		void beginGroupSelection();
-		void endGroupSelection();    // TODO: toggle group selection
+		bool endGroupSelection();    // TODO: toggle group selection
 
 	protected:
 		virtual void cleanUpJustBeforeChannelRemoval(int chnIdx);
@@ -237,6 +243,7 @@ namespace adiscope {
 		// Channel grouping
 		QVector<QList<RoundedHandleV*>> d_groupHandles;
 		bool d_startedGrouping;
+		QVector<QwtPlotZoneItem *> d_groupMarkers;
 
 		PlotLineHandleV *d_vCursorHandle1;
 		PlotLineHandleV *d_vCursorHandle2;

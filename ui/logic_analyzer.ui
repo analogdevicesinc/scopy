@@ -747,7 +747,26 @@ font-weight: normal;
                      </widget>
                     </item>
                     <item row="1" column="1">
-                     <widget class="QLineEdit" name="traceHeightLineEdit"/>
+                     <widget class="QLineEdit" name="traceHeightLineEdit">
+                      <property name="styleSheet">
+                       <string notr="true">
+QLineEdit[invalid=true] {
+border-color: red
+}
+QLineEdit[invalid=false] {
+border-color: grey;
+}</string>
+                      </property>
+                      <property name="text">
+                       <string>1</string>
+                      </property>
+                      <property name="maxLength">
+                       <number>3</number>
+                      </property>
+                      <property name="cursorPosition">
+                       <number>1</number>
+                      </property>
+                     </widget>
                     </item>
                     <item row="2" column="0">
                      <widget class="QLabel" name="labelTrigger">
@@ -757,7 +776,62 @@ font-weight: normal;
                      </widget>
                     </item>
                     <item row="2" column="1">
-                     <widget class="QComboBox" name="triggerComboBox"/>
+                     <widget class="QComboBox" name="triggerComboBox">
+                      <item>
+                       <property name="text">
+                        <string>-</string>
+                       </property>
+                      </item>
+                      <item>
+                       <property name="text">
+                        <string/>
+                       </property>
+                       <property name="icon">
+                        <iconset resource="../resources/resources.qrc">
+                         <normaloff>:/icons/trigger_rising_enabled.svg</normaloff>:/icons/trigger_rising_enabled.svg</iconset>
+                       </property>
+                      </item>
+                      <item>
+                       <property name="text">
+                        <string/>
+                       </property>
+                       <property name="icon">
+                        <iconset>
+                         <normalon>:/icons/trigger_falling_enabled.svg</normalon>
+                        </iconset>
+                       </property>
+                      </item>
+                      <item>
+                       <property name="text">
+                        <string/>
+                       </property>
+                       <property name="icon">
+                        <iconset>
+                         <normalon>:/icons/trigger_high_enabled.svg</normalon>
+                        </iconset>
+                       </property>
+                      </item>
+                      <item>
+                       <property name="text">
+                        <string/>
+                       </property>
+                       <property name="icon">
+                        <iconset>
+                         <normalon>:/icons/trigger_low_enabled.svg</normalon>
+                        </iconset>
+                       </property>
+                      </item>
+                      <item>
+                       <property name="text">
+                        <string/>
+                       </property>
+                       <property name="icon">
+                        <iconset>
+                         <normalon>:/icons/trigger_any_enabled.svg</normalon>
+                        </iconset>
+                       </property>
+                      </item>
+                     </widget>
                     </item>
                     <item row="0" column="1">
                      <widget class="QLineEdit" name="nameLineEdit"/>
@@ -845,7 +919,7 @@ font-weight: normal;
                       <x>0</x>
                       <y>0</y>
                       <width>300</width>
-                      <height>178</height>
+                      <height>467</height>
                      </rect>
                     </property>
                     <property name="sizePolicy">
@@ -1000,8 +1074,11 @@ color: rgba(255,255,255,51);
                      </item>
                      <item>
                       <layout class="QHBoxLayout" name="subTitleLayout">
+                       <property name="spacing">
+                        <number>0</number>
+                       </property>
                        <property name="topMargin">
-                        <number>20</number>
+                        <number>0</number>
                        </property>
                        <item>
                         <widget class="QLabel" name="label_6">
@@ -1109,6 +1186,61 @@ color: rgba(255, 255, 255, 153);
                       </widget>
                      </item>
                      <item>
+                      <layout class="QHBoxLayout" name="horizontalLayout_2">
+                       <property name="spacing">
+                        <number>0</number>
+                       </property>
+                       <property name="topMargin">
+                        <number>0</number>
+                       </property>
+                       <item>
+                        <widget class="QLabel" name="label_7">
+                         <property name="sizePolicy">
+                          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                           <horstretch>0</horstretch>
+                           <verstretch>0</verstretch>
+                          </sizepolicy>
+                         </property>
+                         <property name="styleSheet">
+                          <string notr="true">QLabel {
+  font-size: 12px;
+color: rgba(255, 255, 255, 70);
+font-weight: normal;
+}</string>
+                         </property>
+                         <property name="text">
+                          <string>DECODERS </string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="Line" name="line_4">
+                         <property name="sizePolicy">
+                          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                           <horstretch>0</horstretch>
+                           <verstretch>0</verstretch>
+                          </sizepolicy>
+                         </property>
+                         <property name="maximumSize">
+                          <size>
+                           <width>16777215</width>
+                           <height>1</height>
+                          </size>
+                         </property>
+                         <property name="styleSheet">
+                          <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
+                         </property>
+                         <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
+                     </item>
+                     <item>
+                      <widget class="QComboBox" name="addDecoderComboBox"/>
+                     </item>
+                     <item>
                       <spacer name="verticalSpacer">
                        <property name="orientation">
                         <enum>Qt::Vertical</enum>
@@ -1150,26 +1282,6 @@ color: rgba(255, 255, 255, 153);
            <number>0</number>
           </property>
          </layout>
-        </item>
-        <item>
-         <widget class="adiscope::CustomPushButton" name="btnAddMath">
-          <property name="text">
-           <string/>
-          </property>
-          <property name="icon">
-           <iconset resource="../resources/resources.qrc">
-            <normaloff>:/menu/add.svg</normaloff>:/menu/add.svg</iconset>
-          </property>
-          <property name="checkable">
-           <bool>true</bool>
-          </property>
-          <property name="flat">
-           <bool>true</bool>
-          </property>
-          <attribute name="buttonGroup">
-           <string notr="true">settings_group</string>
-          </attribute>
-         </widget>
         </item>
         <item>
          <widget class="QWidget" name="widget_3" native="true">
@@ -1379,15 +1491,15 @@ color: rgba(255, 255, 255, 153);
  </widget>
  <customwidgets>
   <customwidget>
-   <class>adiscope::CustomSwitch</class>
-   <extends>QPushButton</extends>
-   <header>customSwitch.hpp</header>
-  </customwidget>
-  <customwidget>
    <class>adiscope::DetachDragZone</class>
    <extends>QWidget</extends>
    <header>detachdragzone.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::CustomSwitch</class>
+   <extends>QPushButton</extends>
+   <header>customSwitch.hpp</header>
   </customwidget>
   <customwidget>
    <class>adiscope::MenuAnim</class>

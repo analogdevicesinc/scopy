@@ -4,6 +4,8 @@
 #include "ui_cursors_settings.h"
 #include "oscilloscope_plot.hpp"
 
+#include <libsigrokdecode/libsigrokdecode.h>
+
 #include "logicanalyzer/logicdatacurve.h"
 
 #include "dynamicWidget.hpp"
@@ -53,10 +55,11 @@ LogicAnalyzer::LogicAnalyzer(iio_context *ctx, adiscope::Filter *filt,
 	m_captureThread(nullptr),
 	m_stopRequested(false),
 	m_plotScrollBar(new QScrollBar(Qt::Vertical, this)),
-	m_started(false)
+	m_started(false),
+	m_selectedChannel(-1),
+	m_wheelEventGuard(nullptr)
 
 {
-
 	qDebug() << m_m2kDigital << " " << m_m2kContext;
 
 	// setup ui
@@ -67,26 +70,9 @@ LogicAnalyzer::LogicAnalyzer(iio_context *ctx, adiscope::Filter *filt,
 
 	m_plot.setLeftVertAxesCount(1);
 
-	// TODO: query libm2k for number of channels
-	// TODO: Add channels on the plot
-
-//	m_buffer = new uint16_t[1000000];
-//	for (int i = 0; i < 1000000; ++i) {
-//		m_buffer[i] = rand() % (255 * 255);
-//	}
-
-//	double sampleRate = 100000; // 100kHz
-//	uint64_t bufferSize = 1000000;
-
-
-
-//	m_plot.setHorizUnitsPerDiv(1.0 / sampleRate * bufferSize / 16.0);
-
-//	M2kDigital *dig = m_m2kContext->getDigital();
-
 	// TODO: get number of channels from libm2k;
 
-	for (uint8_t i = 0; i < 16; ++i) {
+	for (uint8_t i = 0; i < m_m2kDigital->getNbChannelsIn(); ++i) {
 		QCheckBox *channelBox = new QCheckBox("DIO " + QString::number(i));
 		if (i < 8) {
 			ui->channelEnumeratorLayout->addWidget(channelBox, i % 8, 0);
@@ -101,7 +87,6 @@ LogicAnalyzer::LogicAnalyzer(iio_context *ctx, adiscope::Filter *filt,
 		LogicDataCurve *curve = new LogicDataCurve(nullptr, i, this);
 		curve->setTraceHeight(1);
 		m_plot.addDigitalPlotCurve(curve, true);
-//		curve->dataAvailable(0, 1000000);
 
 		// use direct connection we want the processing
 		// of the available data to be done in the capture thread
@@ -110,11 +95,7 @@ LogicAnalyzer::LogicAnalyzer(iio_context *ctx, adiscope::Filter *filt,
 			curve->dataAvailable(from, to);
 		}, Qt::DirectConnection);
 
-//		connect(m_sampleRateButton, &ScaleSpinButton::valueChanged, [=](double value){
-//			curve->
-//		});
-
-//		curve->setPlotConfiguration(sampleRate, 1000000, 0.0);
+		m_plotCurves.push_back(curve);
 
 		connect(channelBox, &QCheckBox::toggled, [=](bool toggled){
 			m_plot.enableDigitalPlotCurve(i, toggled);
@@ -148,12 +129,16 @@ LogicAnalyzer::LogicAnalyzer(iio_context *ctx, adiscope::Filter *filt,
 	// TODO: channel groups
 	m_plotScrollBar->setRange(0, 100);
 
+	// setup decoders
+	setupDecoders();
+
 }
 
 LogicAnalyzer::~LogicAnalyzer()
 {
 	if (m_captureThread) {
 		m_stopRequested = true;
+		m_m2kDigital->cancelBufferIn();
 		m_captureThread->join();
 		delete m_captureThread;
 		m_captureThread = nullptr;
@@ -162,6 +147,10 @@ LogicAnalyzer::~LogicAnalyzer()
 	if (m_buffer) {
 		delete[] m_buffer;
 		m_buffer = nullptr;
+	}
+
+	if (srd_exit() != SRD_OK) {
+	    qDebug() << "Error: srd_exit failed in ~LogicAnalyzer()";
 	}
 
 	delete cr_ui;
@@ -177,6 +166,15 @@ void LogicAnalyzer::on_btnChannelSettings_toggled(bool checked)
 {
 	triggerRightMenuToggle(
 		static_cast<CustomPushButton *>(QObject::sender()), checked);
+
+	if (checked && m_selectedChannel != -1) {
+		ui->nameLineEdit->setText(m_plot.getChannelName(m_selectedChannel));
+		ui->traceHeightLineEdit->setText(QString::number(
+							 m_plotCurves[m_selectedChannel]->getTraceHeight()));
+		int condition = static_cast<int>(
+					m_m2kDigital->getTrigger()->getDigitalCondition(m_selectedChannel));
+		ui->triggerComboBox->setCurrentIndex((condition + 1) % 6);
+	}
 }
 
 void LogicAnalyzer::on_btnCursors_toggled(bool checked)
@@ -260,7 +258,20 @@ void LogicAnalyzer::onSampleRateValueChanged(double value)
 {
 	qDebug() << "Sample rate: " << value;
 	m_sampleRate = value;
-	m_plot.setHorizUnitsPerDiv(1.0 / m_sampleRate * m_bufferSize / 16.0);
+
+	if (ui->btnStreamOneShot->isChecked()) { // oneshot
+		m_plot.cancelZoom();
+		m_timePositionButton->setValue(0);
+		m_plot.setHorizOffset(0);
+		m_plot.replot();
+		m_plot.zoomBaseUpdate();
+	} else { // streaming
+		m_plot.cancelZoom();
+		m_plot.setHorizUnitsPerDiv(1.0 / m_sampleRate * m_bufferSize / 16.0);
+		m_plot.setHorizOffset(1.0 / m_sampleRate * m_bufferSize / 2.0);
+		m_plot.replot();
+		m_plot.zoomBaseUpdate();
+	}
 
 	m_plot.cancelZoom();
 	m_plot.zoomBaseUpdate();
@@ -277,7 +288,20 @@ void LogicAnalyzer::onBufferSizeChanged(double value)
 {
 	qDebug() << "Buffer size: " << value;
 	m_bufferSize = value;
-	m_plot.setHorizUnitsPerDiv(1.0 / m_sampleRate * m_bufferSize / 16.0);
+
+	if (ui->btnStreamOneShot->isChecked()) { // oneshot
+		m_plot.cancelZoom();
+		m_timePositionButton->setValue(0);
+		m_plot.setHorizOffset(0);
+		m_plot.replot();
+		m_plot.zoomBaseUpdate();
+	} else { // streaming
+		m_plot.cancelZoom();
+		m_plot.setHorizUnitsPerDiv(1.0 / m_sampleRate * m_bufferSize / 16.0);
+		m_plot.setHorizOffset(1.0 / m_sampleRate * m_bufferSize / 2.0);
+		m_plot.replot();
+		m_plot.zoomBaseUpdate();
+	}
 
 	m_plot.cancelZoom();
 	m_plot.zoomBaseUpdate();
@@ -318,7 +342,36 @@ void LogicAnalyzer::on_btnGroupChannels_toggled(bool checked)
 	if (checked) {
 		m_plot.beginGroupSelection();
 	} else {
-		m_plot.endGroupSelection();
+		if (m_plot.endGroupSelection()) {
+			channelSelectedChanged(m_selectedChannel, false);
+		}
+	}
+}
+
+void LogicAnalyzer::channelSelectedChanged(int chIdx, bool selected)
+{
+	QSignalBlocker nameLineEditBlocker(ui->nameLineEdit);
+	QSignalBlocker traceHeightLineEditBlocker(ui->traceHeightLineEdit);
+	QSignalBlocker triggerComboBoxBlocker(ui->triggerComboBox);
+	if (m_selectedChannel != chIdx && selected) {
+		m_selectedChannel = chIdx;
+		ui->nameLineEdit->setEnabled(true);
+		ui->nameLineEdit->setText(m_plotCurves[m_selectedChannel]->getName());
+		ui->traceHeightLineEdit->setEnabled(true);
+		ui->traceHeightLineEdit->setText(
+					QString::number(m_plotCurves[m_selectedChannel]->getTraceHeight()));
+		ui->triggerComboBox->setEnabled(true);
+		int condition = static_cast<int>(
+					m_m2kDigital->getTrigger()->getDigitalCondition(m_selectedChannel));
+		ui->triggerComboBox->setCurrentIndex((condition + 1) % 6);
+	} else if (m_selectedChannel == chIdx && !selected) {
+		m_selectedChannel = -1;
+		ui->nameLineEdit->setDisabled(true);
+		ui->nameLineEdit->setText("");
+		ui->traceHeightLineEdit->setDisabled(true);
+		ui->traceHeightLineEdit->setText(QString::number(1));
+		ui->triggerComboBox->setDisabled(true);
+		ui->triggerComboBox->setCurrentIndex(0);
 	}
 }
 
@@ -433,7 +486,16 @@ void LogicAnalyzer::setupUi()
 	cr_ui->horizontalSlider->setSingleStep(1);
 	cr_ui->horizontalSlider->setSliderPosition(0);
 
+	ui->triggerComboBox->setDisabled(true);
+	ui->nameLineEdit->setDisabled(true);
+	ui->traceHeightLineEdit->setDisabled(true);
 
+	ui->traceHeightLineEdit->setValidator(new QIntValidator(1, 100, ui->traceHeightLineEdit));
+	ui->traceHeightLineEdit->setText(QString::number(1));
+
+	// Scroll wheel event filter
+	m_wheelEventGuard = new MouseWheelWidgetGuard(ui->mainWidget);
+	m_wheelEventGuard->installEventRecursively(ui->mainWidget);
 }
 
 void LogicAnalyzer::connectSignalsAndSlots()
@@ -507,11 +569,36 @@ void LogicAnalyzer::connectSignalsAndSlots()
 	connect(m_plotScrollBar, &QScrollBar::valueChanged, [=](double value) {
 		m_plot.setYaxis(-5 - (value * 0.05), 5 - (value * 0.05));
 		m_plot.replot();
-		qDebug() << "ScrollBar value: " << value;
+	});
+
+	connect(&m_plot, &CapturePlot::channelSelected,
+		this, &LogicAnalyzer::channelSelectedChanged);
+
+	connect(ui->nameLineEdit, &QLineEdit::textChanged, [=](const QString &text){
+		m_plot.setChannelName(text, m_selectedChannel);
+		m_plotCurves[m_selectedChannel]->setName(text);
+	});
+
+	connect(ui->traceHeightLineEdit, &QLineEdit::textChanged, [=](const QString &text){
+		auto validator = ui->traceHeightLineEdit->validator();
+		QString toCheck = text;
+		int pos;
+
+		setDynamicProperty(ui->traceHeightLineEdit,
+				   "invalid",
+				   validator->validate(toCheck, pos) == QIntValidator::Intermediate);
+	});
+
+	connect(ui->traceHeightLineEdit, &QLineEdit::editingFinished, [=](){
+		int value = ui->traceHeightLineEdit->text().toInt();
+		m_plotCurves[m_selectedChannel]->setTraceHeight(value);
+	});
+
+	connect(ui->triggerComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index) {
+		m_m2kDigital->getTrigger()->setDigitalCondition(m_selectedChannel,
+								static_cast<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>((index + 5) % 6));
 	});
 }
-
-
 
 void LogicAnalyzer::triggerRightMenuToggle(CustomPushButton *btn, bool checked)
 {
@@ -765,5 +852,61 @@ void LogicAnalyzer::startStop(bool start)
 			m_captureThread = nullptr;
 		}
 	}
+
+}
+
+static gint sort_pds(gconstpointer a, gconstpointer b)
+{
+    const struct srd_decoder *sda, *sdb;
+
+    sda = (const struct srd_decoder *)a;
+    sdb = (const struct srd_decoder *)b;
+    return strcmp(sda->id, sdb->id);
+}
+
+void LogicAnalyzer::setupDecoders()
+{
+	if (srd_init(nullptr) != SRD_OK) {
+		qDebug() << "Error: libsigrokdecode init failed!";
+	}
+
+	if (srd_decoder_load_all() != SRD_OK) {
+		qDebug() << "Error: srd_decoder_load_all failed!";
+	}
+
+	ui->addDecoderComboBox->addItem("Select a decoder to add");
+
+
+	GSList *decoderList = g_slist_copy((GSList *)srd_decoder_list());
+	decoderList = g_slist_sort(decoderList, sort_pds);
+
+	for (const GSList *sl = decoderList; sl; sl = sl->next) {
+
+	    srd_decoder *dec = (struct srd_decoder *)sl->data;
+
+	    QString decoderInput = "";
+
+	    GSList *dec_channels = g_slist_copy(dec->inputs);
+	    for (const GSList *sl = dec_channels; sl; sl = sl->next) {
+		decoderInput = QString::fromUtf8((char*)sl->data);
+	    }
+	    g_slist_free(dec_channels);
+
+	    if (decoderInput == "logic") {
+		ui->addDecoderComboBox->addItem(QString::fromUtf8(dec->id));
+	    }
+	}
+
+	g_slist_free(decoderList);
+
+	connect(ui->addDecoderComboBox, QOverload<const QString &>::of(&QComboBox::currentIndexChanged), [=](const QString &decoder) {
+		if (!ui->addDecoderComboBox->currentIndex()) {
+			return;
+		}
+
+		qDebug() << "Requested the following decoder: " << decoder;
+
+		ui->addDecoderComboBox->setCurrentIndex(0);
+	});
 
 }

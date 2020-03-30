@@ -606,6 +606,19 @@ void FreePlotLineHandleV::moveWithinParent(int x, int y)
 	m_enable_silent_move = false;
 }
 
+void FreePlotLineHandleV::setName(const QString &name)
+{
+	if (m_name != name) {
+		m_name = name;
+		update();
+	}
+}
+
+QString FreePlotLineHandleV::getName() const
+{
+	return m_name;
+}
+
 void FreePlotLineHandleV::paintEvent(QPaintEvent *)
 {
 	QPainter p(this);

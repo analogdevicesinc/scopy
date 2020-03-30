@@ -13,6 +13,9 @@
 #include "oscilloscope_plot.hpp"
 #include "buffer_previewer.hpp"
 #include "spinbox_a.hpp"
+#include "scroll_filter.hpp"
+
+#include "genericlogicplotcurve.h"
 
 #include <libm2k/m2k.hpp>
 #include <libm2k/contextbuilder.hpp>
@@ -65,9 +68,10 @@ private Q_SLOTS:
 	void onSampleRateValueChanged(double value);
 	void onBufferSizeChanged(double value);
 
-	void on_btnStreamOneShot_toggled(bool);
+	void on_btnStreamOneShot_toggled(bool toggled);
 
-	void on_btnGroupChannels_toggled(bool);
+	void on_btnGroupChannels_toggled(bool checked);
+	void channelSelectedChanged(int chIdx, bool selected);
 
 private:
 	void setupUi();
@@ -79,6 +83,8 @@ private:
 	void initBufferScrolling();
 
 	void startStop(bool start);
+
+	void setupDecoders();
 
 private:
 	// TODO: consisten naming (m_ui, m_crUi)
@@ -102,6 +108,7 @@ private:
 	M2kDigital *m_m2kDigital;
 
 	uint16_t *m_buffer;
+	QVector<GenericLogicPlotCurve *> m_plotCurves;
 
 	double m_horizOffset;
 	double m_timeTriggerOffset;
@@ -115,6 +122,10 @@ private:
 	std::condition_variable m_captureCv;
 
 	bool m_started;
+
+	int m_selectedChannel;
+
+	MouseWheelWidgetGuard *m_wheelEventGuard;
 
 };
 } // namespace logic
