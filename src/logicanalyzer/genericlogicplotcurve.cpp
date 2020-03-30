@@ -1,7 +1,7 @@
 #include "genericlogicplotcurve.h"
 
 
-GenericLogicPlotCurve::GenericLogicPlotCurve(const QString &name, double pixelOffset,
+GenericLogicPlotCurve::GenericLogicPlotCurve(const QString &name, LogicPlotCurveType type, double pixelOffset,
 					     double traceHeight, double sampleRate,
 					     double timeTriggerOffset, uint64_t bufferSize):
 	QwtPlotCurve(),
@@ -10,9 +10,9 @@ GenericLogicPlotCurve::GenericLogicPlotCurve(const QString &name, double pixelOf
 	m_traceHeight(traceHeight),
 	m_sampleRate(sampleRate),
 	m_timeTriggerOffset(timeTriggerOffset),
-	m_bufferSize(bufferSize)
+	m_bufferSize(bufferSize),
+	m_type(type)
 {
-
 }
 
 QString GenericLogicPlotCurve::getName() const
@@ -43,6 +43,11 @@ double GenericLogicPlotCurve::getTimeTriggerOffset() const
 uint64_t GenericLogicPlotCurve::getBufferSize() const
 {
 	return m_bufferSize;
+}
+
+LogicPlotCurveType GenericLogicPlotCurve::getType() const
+{
+	return m_type;
 }
 
 void GenericLogicPlotCurve::setName(const QString &name)

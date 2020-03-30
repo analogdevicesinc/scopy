@@ -1,7 +1,6 @@
 #ifndef ANNOTATIONCURVE_H
 #define ANNOTATIONCURVE_H
 
-#include <qwt_plot_curve.h>
 #include <qwt_point_mapper.h>
 
 #include <map>
@@ -16,6 +15,7 @@
 #include "annotation.h"
 #include "row.h"
 #include "rowdata.h"
+#include "genericlogicplotcurve.h"
 
 namespace adiscope {
 namespace logic {
@@ -35,7 +35,7 @@ namespace adiscope {
 
 class AnnotationDecoder;
 
-class AnnotationCurve : public QwtPlotCurve
+class AnnotationCurve : public GenericLogicPlotCurve
 {
 public:
 	AnnotationCurve(logic::LogicAnalyzer *logic, std::shared_ptr<logic::Decoder> initialDecoder);
@@ -47,12 +47,6 @@ public:
 
     void setClassRows(const std::map<std::pair<const srd_decoder*, int>, Row> &classRows);
     void setAnnotationRows(const std::map<const Row, RowData> &annotationRows);
-
-    double getPixelOffset() const;
-    double getTraceHeight() const;
-
-    void setPixelOffset(double pixelOffset);
-    void setTraceHeight(double traceHeight);
 
     void sort_rows();
 
@@ -105,12 +99,6 @@ private:
 
 	std::vector<std::shared_ptr<adiscope::bind::Decoder>> m_bindings;
 
-    // pixelOffset for moving the curve up/down the plot
-    // using the handle of it
-    double m_pixelOffset;
-    // We have no notion of V/div? use a pixel height value to draw
-    // the distance between the "0" and "1"
-    double m_traceHeight;
 };
 }
 

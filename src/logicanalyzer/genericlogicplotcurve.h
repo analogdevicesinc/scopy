@@ -3,11 +3,16 @@
 
 #include <qwt_plot_curve.h>
 
+enum class LogicPlotCurveType : int {
+	Data = 0,
+	Annotations = 1,
+};
+
 class GenericLogicPlotCurve : public QwtPlotCurve
 {
 public:
-	GenericLogicPlotCurve(const QString &name = {}, double pixelOffset = 0.0,
-			      double traceHeight = 0.0, double sampleRate = 0.0,
+	GenericLogicPlotCurve(const QString &name = {}, LogicPlotCurveType type = LogicPlotCurveType::Data,
+			      double pixelOffset = 0.0, double traceHeight = 0.0, double sampleRate = 0.0,
 			      double timeTriggerOffset = 0.0, uint64_t bufferSize = 0.0);
 
 	QString getName() const;
@@ -16,6 +21,8 @@ public:
 	double getSampleRate() const;
 	double getTimeTriggerOffset() const;
 	uint64_t getBufferSize() const;
+
+	LogicPlotCurveType getType() const;
 
 	void setName(const QString &name);
 	void setPixelOffset(double pixelOffset);
@@ -35,6 +42,7 @@ protected:
 	double m_sampleRate;
 	double m_timeTriggerOffset;
 	uint64_t m_bufferSize;
+	LogicPlotCurveType m_type;
 };
 
 #endif // GENERICLOGICPLOTCURVE_H

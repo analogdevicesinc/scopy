@@ -22,9 +22,7 @@ using namespace adiscope;
 using namespace adiscope::logic;
 
 AnnotationCurve::AnnotationCurve(logic::LogicAnalyzer *logic, std::shared_ptr<logic::Decoder> initialDecoder):
-    QwtPlotCurve(),
-    m_pixelOffset(0),
-    m_traceHeight(0)
+    GenericLogicPlotCurve(initialDecoder->decoder()->name, LogicPlotCurveType::Annotations)
 {
     setSamples({0.0}, {0.0});
     setRenderHint(RenderAntialiased, true);
@@ -114,36 +112,6 @@ void AnnotationCurve::setClassRows(const map<std::pair<const srd_decoder *, int>
 void AnnotationCurve::setAnnotationRows(const map<const Row, RowData> &annotationRows)
 {
     m_annotationRows = annotationRows;
-}
-
-double AnnotationCurve::getPixelOffset() const
-{
-    return m_pixelOffset;
-}
-
-double AnnotationCurve::getTraceHeight() const
-{
-    return m_traceHeight;
-}
-
-void AnnotationCurve::setPixelOffset(double pixelOffset)
-{
-    // TODO: maybe trigger something when pixelOffset
-    // changes
-    if (m_pixelOffset != pixelOffset) {
-            m_pixelOffset = pixelOffset;
-    }
-    setBaseline(m_pixelOffset + m_traceHeight);
-}
-
-void AnnotationCurve::setTraceHeight(double traceHeight)
-{
-    // TODO: maybe trigger something when traceHeight
-    // changes
-    if (m_traceHeight != traceHeight) {
-            m_traceHeight = traceHeight;
-    }
-    setBaseline(m_pixelOffset + m_traceHeight);
 }
 
 void AnnotationCurve::sort_rows()
