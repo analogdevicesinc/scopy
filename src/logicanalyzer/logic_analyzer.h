@@ -85,6 +85,7 @@ private:
 	void startStop(bool start);
 
 	void setupDecoders();
+	void updateStackDecoderButton();
 
 private:
 	// TODO: consisten naming (m_ui, m_crUi)

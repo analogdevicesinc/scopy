@@ -380,6 +380,8 @@ void LogicAnalyzer::channelSelectedChanged(int chIdx, bool selected)
 				m_decoderMenu = nullptr;
 			}
 
+			updateStackDecoderButton();
+
 		} else {
 			ui->triggerComboBox->setVisible(false);
 			ui->labelTrigger->setVisible(false);
@@ -391,6 +393,8 @@ void LogicAnalyzer::channelSelectedChanged(int chIdx, bool selected)
 			AnnotationCurve *annCurve = dynamic_cast<AnnotationCurve *>(m_plotCurves[m_selectedChannel]);
 			m_decoderMenu = annCurve->getCurrentDecoderStackMenu();
 			ui->decoderSettingsLayout->addWidget(m_decoderMenu);
+
+			updateStackDecoderButton();
 		}
 	} else if (m_selectedChannel == chIdx && !selected) {
 		m_selectedChannel = -1;
@@ -400,6 +404,15 @@ void LogicAnalyzer::channelSelectedChanged(int chIdx, bool selected)
 		ui->traceHeightLineEdit->setText(QString::number(1));
 		ui->triggerComboBox->setDisabled(true);
 		ui->triggerComboBox->setCurrentIndex(0);
+
+
+		if (m_decoderMenu) {
+			ui->decoderSettingsLayout->removeWidget(m_decoderMenu);
+			m_decoderMenu->deleteLater();
+			m_decoderMenu = nullptr;
+		}
+
+		updateStackDecoderButton();
 	}
 }
 
@@ -625,6 +638,49 @@ void LogicAnalyzer::connectSignalsAndSlots()
 	connect(ui->triggerComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index) {
 		m_m2kDigital->getTrigger()->setDigitalCondition(m_selectedChannel,
 								static_cast<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>((index + 5) % 6));
+	});
+
+	connect(ui->stackDecoderComboBox, &QComboBox::currentTextChanged, [=](const QString &text) {
+		if (m_selectedChannel < m_m2kDigital->getNbChannelsIn()) {
+			return;
+		}
+
+		if (m_selectedChannel > m_plotCurves.size() - 1) {
+			return;
+		}
+
+		if (!ui->stackDecoderComboBox->currentIndex()) {
+			return;
+		}
+
+		AnnotationCurve *curve = dynamic_cast<AnnotationCurve *>(m_plotCurves[m_selectedChannel]);
+
+		if (!curve) {
+			return;
+		}
+
+		GSList *dl = g_slist_copy((GSList *)srd_decoder_list());
+		for (const GSList *sl = dl; sl; sl = sl->next) {
+		    srd_decoder *dec = (struct srd_decoder *)sl->data;
+		    if (QString::fromUtf8(dec->id) == text) {
+			curve->stackDecoder(std::make_shared<logic::Decoder>(dec));
+			break;
+		    }
+		}
+
+		// Update decoder menu. New decoder must be shown
+		// and it might also have some options that can
+		// be modified
+		if (m_decoderMenu) {
+			ui->decoderSettingsLayout->removeWidget(m_decoderMenu);
+			m_decoderMenu->deleteLater();
+			m_decoderMenu = nullptr;
+		}
+
+		m_decoderMenu = curve->getCurrentDecoderStackMenu();
+		ui->decoderSettingsLayout->addWidget(m_decoderMenu);
+
+		updateStackDecoderButton();
 	});
 }
 
@@ -961,4 +1017,65 @@ void LogicAnalyzer::setupDecoders()
 		ui->addDecoderComboBox->setCurrentIndex(0);
 	});
 
+}
+
+void LogicAnalyzer::updateStackDecoderButton()
+{
+	qDebug() << "updateStackDecoderButton called!";
+
+	const int nrChannels = m_m2kDigital->getNbChannelsIn();
+
+	if (m_selectedChannel < nrChannels) {
+		ui->stackDecoderComboBox->setVisible(false);
+		ui->stackDecoderLabel->setVisible(false);
+		return;
+	}
+
+	if (m_selectedChannel > m_plotCurves.size() - 1) {
+		return;
+	}
+
+	AnnotationCurve *curve = dynamic_cast<AnnotationCurve *>(m_plotCurves[m_selectedChannel]);
+
+	if (!curve) {
+		return;
+	}
+
+	auto stack = curve->getDecoderStack();
+	auto top = stack.back();
+
+	ui->stackDecoderComboBox->clear();
+	ui->stackDecoderComboBox->addItem("-");
+
+	QString decoderOutput = "";
+	GSList *decoderList = g_slist_copy((GSList *)srd_decoder_list());
+	decoderList = g_slist_sort(decoderList, sort_pds);
+	GSList *dec_channels = g_slist_copy(top->decoder()->outputs);
+	for (const GSList *sl = dec_channels; sl; sl = sl->next) {
+	    decoderOutput = QString::fromUtf8((char*)sl->data);
+	}
+	g_slist_free(dec_channels);
+	for (const GSList *sl = decoderList; sl; sl = sl->next) {
+
+	    srd_decoder *dec = (struct srd_decoder *)sl->data;
+
+	    QString decoderInput = "";
+
+	    GSList *dec_channels = g_slist_copy(dec->inputs);
+	    for (const GSList *sl = dec_channels; sl; sl = sl->next) {
+		decoderInput = QString::fromUtf8((char*)sl->data);
+	    }
+	    g_slist_free(dec_channels);
+
+	    if (decoderInput == decoderOutput) {
+		qDebug() << "Added: " << QString::fromUtf8(dec->id);
+		ui->stackDecoderComboBox->addItem(QString::fromUtf8(dec->id));
+	    }
+	}
+	g_slist_free(decoderList);
+
+	const bool shouldBeVisible = ui->stackDecoderComboBox->count() > 1;
+
+	ui->stackDecoderComboBox->setVisible(shouldBeVisible);
+	ui->stackDecoderLabel->setVisible(shouldBeVisible);
 }
