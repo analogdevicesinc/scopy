@@ -59,8 +59,8 @@ LogicAnalyzer::LogicAnalyzer(iio_context *ctx, adiscope::Filter *filt,
 	m_plotScrollBar(new QScrollBar(Qt::Vertical, this)),
 	m_started(false),
 	m_selectedChannel(-1),
-	m_wheelEventGuard(nullptr)
-
+	m_wheelEventGuard(nullptr),
+	m_decoderMenu(nullptr)
 {
 	qDebug() << m_m2kDigital << " " << m_m2kContext;
 
@@ -173,9 +173,11 @@ void LogicAnalyzer::on_btnChannelSettings_toggled(bool checked)
 		ui->nameLineEdit->setText(m_plot.getChannelName(m_selectedChannel));
 		ui->traceHeightLineEdit->setText(QString::number(
 							 m_plotCurves[m_selectedChannel]->getTraceHeight()));
-		int condition = static_cast<int>(
-					m_m2kDigital->getTrigger()->getDigitalCondition(m_selectedChannel));
-		ui->triggerComboBox->setCurrentIndex((condition + 1) % 6);
+		if (m_selectedChannel < m_m2kDigital->getNbChannelsIn()) {
+			int condition = static_cast<int>(
+						m_m2kDigital->getTrigger()->getDigitalCondition(m_selectedChannel));
+			ui->triggerComboBox->setCurrentIndex((condition + 1) % 6);
+		}
 	}
 }
 
@@ -264,16 +266,17 @@ void LogicAnalyzer::onSampleRateValueChanged(double value)
 	if (ui->btnStreamOneShot->isChecked()) { // oneshot
 		m_plot.cancelZoom();
 		m_timePositionButton->setValue(0);
-		m_plot.setHorizOffset(0);
+		m_plot.setHorizOffset(value * (1.0 / m_sampleRate));
 		m_plot.replot();
 		m_plot.zoomBaseUpdate();
 	} else { // streaming
 		m_plot.cancelZoom();
-		m_plot.setHorizUnitsPerDiv(1.0 / m_sampleRate * m_bufferSize / 16.0);
 		m_plot.setHorizOffset(1.0 / m_sampleRate * m_bufferSize / 2.0);
 		m_plot.replot();
 		m_plot.zoomBaseUpdate();
 	}
+
+	m_plot.setHorizUnitsPerDiv(1.0 / m_sampleRate * m_bufferSize / 16.0);
 
 	m_plot.cancelZoom();
 	m_plot.zoomBaseUpdate();
@@ -294,16 +297,17 @@ void LogicAnalyzer::onBufferSizeChanged(double value)
 	if (ui->btnStreamOneShot->isChecked()) { // oneshot
 		m_plot.cancelZoom();
 		m_timePositionButton->setValue(0);
-		m_plot.setHorizOffset(0);
+		m_plot.setHorizOffset(value * (1.0 / m_sampleRate));
 		m_plot.replot();
 		m_plot.zoomBaseUpdate();
 	} else { // streaming
 		m_plot.cancelZoom();
-		m_plot.setHorizUnitsPerDiv(1.0 / m_sampleRate * m_bufferSize / 16.0);
 		m_plot.setHorizOffset(1.0 / m_sampleRate * m_bufferSize / 2.0);
 		m_plot.replot();
 		m_plot.zoomBaseUpdate();
 	}
+
+	m_plot.setHorizUnitsPerDiv(1.0 / m_sampleRate * m_bufferSize / 16.0);
 
 	m_plot.cancelZoom();
 	m_plot.zoomBaseUpdate();
@@ -363,9 +367,31 @@ void LogicAnalyzer::channelSelectedChanged(int chIdx, bool selected)
 		ui->traceHeightLineEdit->setText(
 					QString::number(m_plotCurves[m_selectedChannel]->getTraceHeight()));
 		ui->triggerComboBox->setEnabled(true);
-		int condition = static_cast<int>(
-					m_m2kDigital->getTrigger()->getDigitalCondition(m_selectedChannel));
-		ui->triggerComboBox->setCurrentIndex((condition + 1) % 6);
+		if (m_selectedChannel < m_m2kDigital->getNbChannelsIn()) {
+			ui->triggerComboBox->setVisible(true);
+			ui->labelTrigger->setVisible(true);
+			int condition = static_cast<int>(
+						m_m2kDigital->getTrigger()->getDigitalCondition(m_selectedChannel));
+			ui->triggerComboBox->setCurrentIndex((condition + 1) % 6);
+
+			if (m_decoderMenu) {
+				ui->decoderSettingsLayout->removeWidget(m_decoderMenu);
+				m_decoderMenu->deleteLater();
+				m_decoderMenu = nullptr;
+			}
+
+		} else {
+			ui->triggerComboBox->setVisible(false);
+			ui->labelTrigger->setVisible(false);
+			if (m_decoderMenu) {
+				ui->decoderSettingsLayout->removeWidget(m_decoderMenu);
+				m_decoderMenu->deleteLater();
+				m_decoderMenu = nullptr;
+			}
+			AnnotationCurve *annCurve = dynamic_cast<AnnotationCurve *>(m_plotCurves[m_selectedChannel]);
+			m_decoderMenu = annCurve->getCurrentDecoderStackMenu();
+			ui->decoderSettingsLayout->addWidget(m_decoderMenu);
+		}
 	} else if (m_selectedChannel == chIdx && !selected) {
 		m_selectedChannel = -1;
 		ui->nameLineEdit->setDisabled(true);
@@ -763,9 +789,9 @@ void LogicAnalyzer::startStop(bool start)
 		qDebug() << m_timePositionButton->value();
 
 //		m_m2kDigital->getTrigger()->setDigitalDelay(m_timePositionButton->value());
-		for (int i = 0; i < 16; ++i) {
+		for (int i = 0; i < m_plotCurves.size(); ++i) {
 			QwtPlotCurve *curve = m_plot.getDigitalPlotCurve(i);
-			LogicDataCurve *logic_curve = dynamic_cast<LogicDataCurve *>(curve);
+			GenericLogicPlotCurve *logic_curve = dynamic_cast<GenericLogicPlotCurve *>(curve);
 			logic_curve->reset();
 			const double delay = oneShotOrStream ? m_timePositionButton->value()
 						       : (m_bufferSize / 2.0);
@@ -922,6 +948,13 @@ void LogicAnalyzer::setupDecoders()
 		AnnotationCurve *curve = new AnnotationCurve(this, initialDecoder);
 		curve->setTraceHeight(15);
 		m_plot.addDigitalPlotCurve(curve, true);
+
+		// use direct connection we want the processing
+		// of the available data to be done in the capture thread
+		connect(this, &LogicAnalyzer::dataAvailable, this,
+			[=](uint64_t from, uint64_t to){
+			curve->dataAvailable(from, to);
+		}, Qt::DirectConnection);
 
 		m_plotCurves.push_back(curve);
 

@@ -11,7 +11,7 @@ public:
 	LogicDataCurve(uint16_t *data, uint8_t bit, adiscope::logic::LogicAnalyzer *logic);
 
     virtual void dataAvailable(uint64_t from, uint64_t to) override;
-    void reset();
+    virtual void reset() override;
 
     uint8_t getBitId() const;
 

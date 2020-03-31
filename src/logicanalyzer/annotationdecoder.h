@@ -37,6 +37,8 @@ public:
 
     std::vector<DecodeChannel *> getDecoderChannels();
 
+    void reset();
+
 private:
     void stackChanged();
 

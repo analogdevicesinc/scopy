@@ -1515,7 +1515,7 @@ void CapturePlot::onDigitalChannelAdded(int chnIdx)
 			double offset = yMap.invTransform(pos);
 
 			QwtPlotCurve *curve = getDigitalPlotCurve(chnIdx);
-			LogicDataCurve *logicCurve = dynamic_cast<LogicDataCurve *>(curve);
+			GenericLogicPlotCurve *logicCurve = dynamic_cast<GenericLogicPlotCurve *>(curve);
 
 			if (logicCurve) {
 //				double plotOffset = VertOffset(0);
@@ -1569,7 +1569,7 @@ bool CapturePlot::endGroupSelection()
 	auto getTraceHeightInPixelsForHandle = [=](RoundedHandleV *handle) {
 		const int chIdx = d_offsetHandles.indexOf(handle);
 		QwtPlotCurve *curve = getDigitalPlotCurve(chIdx);
-		LogicDataCurve *logicCurve = dynamic_cast<LogicDataCurve *>(curve);
+		GenericLogicPlotCurve *logicCurve = dynamic_cast<GenericLogicPlotCurve *>(curve);
 		const double traceHeight = logicCurve->getTraceHeight();
 		QwtScaleMap yMap = this->canvasMap(QwtAxisId(QwtPlot::yLeft, 0));
 		const QwtInterval y = axisInterval(QwtAxisId(QwtPlot::yLeft, 0));
@@ -1643,7 +1643,7 @@ void CapturePlot::handleInGroupChangedPosition(int position)
 	auto getTraceHeightInPixelsForHandle = [=](RoundedHandleV *handle) {
 		const int chIdx = d_offsetHandles.indexOf(handle);
 		QwtPlotCurve *curve = getDigitalPlotCurve(chIdx);
-		LogicDataCurve *logicCurve = dynamic_cast<LogicDataCurve *>(curve);
+		GenericLogicPlotCurve *logicCurve = dynamic_cast<GenericLogicPlotCurve *>(curve);
 		const double traceHeight = logicCurve->getTraceHeight();
 		QwtScaleMap yMap = this->canvasMap(QwtAxisId(QwtPlot::yLeft, 0));
 		const QwtInterval y = axisInterval(QwtAxisId(QwtPlot::yLeft, 0));

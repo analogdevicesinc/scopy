@@ -15,6 +15,7 @@
 #include <QFormLayout>
 #include <QComboBox>
 #include <QLabel>
+#include <QSpacerItem>
 
 #include <QElapsedTimer>
 
@@ -96,7 +97,7 @@ void AnnotationCurve::annotationCallback(srd_proto_data *pdata, void *annotation
     std::unique_lock<std::mutex> lock(curve->m_mutex);
 
     (*row_iter).second.emplace_annotation(pdata, &((*row_iter).first));
-    //    qDebug() << "Pushed annotation with format: " << format << " to row: " << (*row_iter).first.index();
+//	qDebug() << "Pushed annotation with format: " << format << " to row: " << (*row_iter).first.index();
 }
 
 void AnnotationCurve::dataAvailable(uint64_t from, uint64_t to)
@@ -126,10 +127,11 @@ void AnnotationCurve::newAnnotations()
     QMetaObject::invokeMethod(plot(), "replot");
 }
 
-void AnnotationCurve::clear()
+void AnnotationCurve::reset()
 {
     m_classRows.clear();
     m_annotationRows.clear();
+	m_annotationDecoder->reset();
 }
 
 QWidget *AnnotationCurve::getCurrentDecoderStackMenu()
@@ -156,19 +158,25 @@ QWidget *AnnotationCurve::getCurrentDecoderStackMenu()
     for (auto &ch : channels) {
         QWidget *chls = new QWidget(widget);
         QHBoxLayout *lay = new QHBoxLayout(chls);
+	lay->setContentsMargins(0, 0, 0, 0);
         chls->setLayout(lay);
         QString required = (ch->is_optional ? "" : "*");
         QLabel *label = new QLabel(ch->name + "(" + ch->desc + ")" + required, chls);
         label->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
         lay->insertWidget(0, label);
         QComboBox *box = new QComboBox(chls);
-        lay->insertWidget(1, box);
+	lay->insertSpacerItem(1, new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+	lay->insertWidget(2, box);
         box->addItem(QString("x"));
         for (int i = 0; i < 16; ++i) {
             box->addItem(QString::number(i));
         }
 
-        box->setCurrentIndex(0);
+	if (!ch->assigned_signal) {
+		box->setCurrentIndex(0);
+	} else {
+		box->setCurrentIndex(ch->bit_id + 1);
+	}
 
         QObject::connect(box, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index){
            if (index == 0) {
@@ -239,7 +247,8 @@ void AnnotationCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap, cons
 
         uint64_t start, stop;
 
-        std::tie(start, stop) = (*it).second.get_annotation_subset(interval.minValue(), interval.maxValue());
+	std::tie(start, stop) = (*it).second.get_annotation_subset(fromTimeToSample(interval.minValue()),
+								   fromTimeToSample(interval.maxValue()));
 
 
         // Get title of this row
@@ -263,7 +272,7 @@ void AnnotationCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap, cons
         for (; start <= stop; ++start) {
             Annotation ann = ((*it).second.getAnnAt(start));
 
-            const double annotation_width = xMap.transform(ann.end_sample()) - xMap.transform(ann.start_sample());
+	    const double annotation_width = xMap.transform(fromSampleToTime(ann.end_sample())) - xMap.transform(fromSampleToTime(ann.start_sample()));
 
             bool shouldDraw = false;
 
@@ -272,7 +281,7 @@ void AnnotationCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap, cons
             }
 
             const double delta = (previous_end != -1 ?
-                        xMap.transform(ann.end_sample()) - xMap.transform(previous_end) :
+			xMap.transform(fromSampleToTime(ann.end_sample())) - xMap.transform(fromSampleToTime(previous_end)) :
                         0.0);
 
             if (qAbs(delta) > 1.5 || shouldDraw) {
@@ -318,7 +327,8 @@ void AnnotationCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap, cons
         }
 
         painter->save();
-        painter->setPen(QPen(QBrush(Qt::black), 20));
+	painter->setPen(QPen(QBrush(Qt::white), 2));
+	painter->setBrush(QBrush(Qt::black));
         painter->setFont(QFont("Times", 10, QFont::Bold));
 
         double HeightInPoints = yMap.invTransform(30) - yMap.invTransform(10);
@@ -344,11 +354,11 @@ void AnnotationCurve::drawBlock(int row, uint64_t start, uint64_t end, QPainter 
     double HeightInPoints = yMap.invTransform(30) - yMap.invTransform(10);
     double offset = m_pixelOffset + row * (HeightInPoints);
 
-    double width = xMap.transform(end) - xMap.transform(start);
+    double width = xMap.transform(fromSampleToTime(end)) - xMap.transform(fromSampleToTime(start));
 
     const int r = 20 / 4;
 
-    const QRectF rect(QPointF(xMap.transform(start), yMap.transform(offset) - 10), QSizeF(width, 20));
+    const QRectF rect(QPointF(xMap.transform(fromSampleToTime(start)), yMap.transform(offset) - 10), QSizeF(width, 20));
 
     painter->save();
 
@@ -446,8 +456,8 @@ void AnnotationCurve::drawTwoSampleAnnotation(int row, const Annotation &ann, QP
 {
     // DRAW MULTI POINT ANNOTATION
 
-    double first = ann.start_sample();
-    double last = ann.end_sample();
+    double first = fromSampleToTime(ann.start_sample());
+    double last = fromSampleToTime(ann.end_sample());
 
     double firstPlus1Px = xMap.invTransform(xMap.transform(first) + 3);
     double lastMinus1Px = xMap.invTransform(xMap.transform(last) - 3);
@@ -528,7 +538,7 @@ void AnnotationCurve::drawTwoSampleAnnotation(int row, const Annotation &ann, QP
 void AnnotationCurve::drawOneSampleAnnotation(int row, const Annotation &ann, QPainter *painter,
                                               const QwtScaleMap &xMap, const QwtScaleMap &yMap,
                                               const QRectF &canvasRect, const QwtPointMapper &mapper) const {
-    double xx = xMap.transform(ann.start_sample());
+    double xx = xMap.transform(fromSampleToTime(ann.start_sample()));
     // 20 px
     double HeightInPoints = yMap.invTransform(30) - yMap.invTransform(10);
     double yy = yMap.transform(m_pixelOffset + row * (HeightInPoints));

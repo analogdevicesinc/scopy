@@ -112,7 +112,7 @@ void AnnotationDecoder::startDecode()
 
     if (m_lastSample != 0) {
 
-        m_annotationCurve->clear();
+//	m_annotationCurve->reset();
         // set curves class rows and annotation rows
         m_annotationCurve->setClassRows(m_class_rows);
         m_annotationCurve->setAnnotationRows(m_annotation_rows);
@@ -237,6 +237,14 @@ std::vector<DecodeChannel *> AnnotationDecoder::getDecoderChannels()
     }
 
     return chls;
+}
+
+void AnnotationDecoder::reset()
+{
+	m_lastSample = 0;
+	stopDecode();
+	stackChanged();
+	startDecode();
 }
 
 void AnnotationDecoder::assignChannel(uint16_t chId, uint16_t bitId)

@@ -840,7 +840,11 @@ border-color: grey;
                   </widget>
                  </item>
                  <item>
-                  <widget class="QWidget" name="decoderSettingsWidget" native="true"/>
+                  <layout class="QVBoxLayout" name="decoderSettingsLayout">
+                   <property name="spacing">
+                    <number>0</number>
+                   </property>
+                  </layout>
                  </item>
                  <item>
                   <spacer name="verticalSpacer_2">
@@ -919,7 +923,7 @@ border-color: grey;
                       <x>0</x>
                       <y>0</y>
                       <width>300</width>
-                      <height>467</height>
+                      <height>231</height>
                      </rect>
                     </property>
                     <property name="sizePolicy">

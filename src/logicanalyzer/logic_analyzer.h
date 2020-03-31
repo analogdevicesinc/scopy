@@ -126,6 +126,7 @@ private:
 	int m_selectedChannel;
 
 	MouseWheelWidgetGuard *m_wheelEventGuard;
+	QWidget *m_decoderMenu;
 
 };
 } // namespace logic
