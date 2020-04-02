@@ -76,11 +76,7 @@ LogicAnalyzer::LogicAnalyzer(iio_context *ctx, adiscope::Filter *filt,
 
 	for (uint8_t i = 0; i < m_m2kDigital->getNbChannelsIn(); ++i) {
 		QCheckBox *channelBox = new QCheckBox("DIO " + QString::number(i));
-		if (i < 8) {
-			ui->channelEnumeratorLayout->addWidget(channelBox, i % 8, 0);
-		} else {
-			ui->channelEnumeratorLayout->addWidget(channelBox, i % 8, 1);
-		}
+		ui->channelEnumeratorLayout->addWidget(channelBox, i % 8, i / 8);
 
 		channelBox->setChecked(true);
 
@@ -618,6 +614,18 @@ void LogicAnalyzer::connectSignalsAndSlots()
 	connect(ui->nameLineEdit, &QLineEdit::textChanged, [=](const QString &text){
 		m_plot.setChannelName(text, m_selectedChannel);
 		m_plotCurves[m_selectedChannel]->setName(text);
+		if (m_selectedChannel < m_m2kDigital->getNbChannelsIn()) {
+			QWidget *widgetInLayout = ui->channelEnumeratorLayout->itemAtPosition(m_selectedChannel % 8,
+								    m_selectedChannel / 8)->widget();
+			auto channelBox = dynamic_cast<QCheckBox *>(widgetInLayout);
+			channelBox->setText(text);
+		} else {
+			const int selectedDecoder = m_selectedChannel - m_m2kDigital->getNbChannelsIn();
+			QWidget *widgetInLayout = ui->decoderEnumeratorLayout->itemAtPosition(selectedDecoder / 2,
+								    selectedDecoder % 2)->widget();
+			auto decoderBox = dynamic_cast<QCheckBox *>(widgetInLayout);
+			decoderBox->setText(text);
+		}
 	});
 
 	connect(ui->traceHeightLineEdit, &QLineEdit::textChanged, [=](const QString &text){
@@ -829,11 +837,14 @@ void LogicAnalyzer::startStop(bool start)
 
 		m_m2kDigital->flushBufferIn();
 
-		double sampleRate = m_sampleRateButton->value();
-		uint64_t bufferSize = m_bufferSizeButton->value();
+		const double sampleRate = m_sampleRateButton->value();
+		const uint64_t bufferSize = m_bufferSizeButton->value();
 
-		bool oneShotOrStream = ui->btnStreamOneShot->isChecked();
+		const bool oneShotOrStream = ui->btnStreamOneShot->isChecked();
 		qDebug() << "stream one shot is set to: " << oneShotOrStream;
+
+		const double delay = oneShotOrStream ? m_timePositionButton->value()
+					       : (m_bufferSize / 2.0);
 
 		m_m2kDigital->setSampleRateIn(sampleRate);
 
@@ -849,13 +860,13 @@ void LogicAnalyzer::startStop(bool start)
 			QwtPlotCurve *curve = m_plot.getDigitalPlotCurve(i);
 			GenericLogicPlotCurve *logic_curve = dynamic_cast<GenericLogicPlotCurve *>(curve);
 			logic_curve->reset();
-			const double delay = oneShotOrStream ? m_timePositionButton->value()
-						       : (m_bufferSize / 2.0);
 
 			logic_curve->setSampleRate(sampleRate);
 			logic_curve->setBufferSize(bufferSize);
 			logic_curve->setTimeTriggerOffset(delay);
 		}
+
+		m_lastCapturedSample = 0;
 
 		m_captureThread = new std::thread([=](){
 
@@ -906,6 +917,7 @@ void LogicAnalyzer::startStop(bool start)
 					QMetaObject::invokeMethod(&m_plot, // trigger replot on Main Thread
 								  "replot",
 								  Qt::QueuedConnection);
+					m_lastCapturedSample = absIndex;
 
 				} while (totalSamples);
 			}
@@ -988,7 +1000,6 @@ void LogicAnalyzer::setupDecoders()
 			return;
 		}
 
-		qDebug() << "Requested the following decoder: " << decoder;
 		std::shared_ptr<logic::Decoder> initialDecoder = nullptr;
 
 		GSList *decoderList = g_slist_copy((GSList *)srd_decoder_list());
@@ -1012,9 +1023,41 @@ void LogicAnalyzer::setupDecoders()
 			curve->dataAvailable(from, to);
 		}, Qt::DirectConnection);
 
+		curve->setSampleRate(m_sampleRate);
+		curve->setBufferSize(m_bufferSize);
+		curve->setTimeTriggerOffset(m_timeTriggerOffset);
+
+		curve->dataAvailable(0, m_lastCapturedSample);
+
 		m_plotCurves.push_back(curve);
 
+		QCheckBox *decoderBox = new QCheckBox(decoder);
+
+		const int itemsInLayout = ui->decoderEnumeratorLayout->count();
+		ui->decoderEnumeratorLayout->addWidget(decoderBox, itemsInLayout / 2,
+							itemsInLayout % 2);
+
 		ui->addDecoderComboBox->setCurrentIndex(0);
+
+		connect(decoderBox, &QCheckBox::toggled, [=](bool toggled){
+			m_plot.enableDigitalPlotCurve(m_m2kDigital->getNbChannelsIn() + itemsInLayout, toggled);
+			m_plot.setOffsetWidgetVisible(m_m2kDigital->getNbChannelsIn() + itemsInLayout, toggled);
+			m_plot.replot();
+		});
+
+		decoderBox->setChecked(true);
+
+		// TODO: not working :(
+//		ui->scrollAreaWidgetContents->update();
+//		ui->scrollAreaWidgetContents->repaint();
+//		ui->scrollAreaWidgetContents->updateGeometry();
+//		// Scroll to the bottom when adding new decoder, just to make sure we see
+//		// it there (in the menu) after it's added.
+//		QScrollBar *generalSettingsMenuScrollBar = ui->generalSettingsScrollArea->verticalScrollBar();
+//		const int maxValueOfScrollBar = generalSettingsMenuScrollBar->maximum();
+//		generalSettingsMenuScrollBar->setValue(maxValueOfScrollBar);
+
+//		ui->generalSettingsScrollArea->ensureWidgetVisible(decoderBox);
 	});
 
 }
@@ -1044,6 +1087,7 @@ void LogicAnalyzer::updateStackDecoderButton()
 	auto stack = curve->getDecoderStack();
 	auto top = stack.back();
 
+	QSignalBlocker stackDecoderComboBoxBlocker(ui->stackDecoderComboBox);
 	ui->stackDecoderComboBox->clear();
 	ui->stackDecoderComboBox->addItem("-");
 

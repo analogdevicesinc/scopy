@@ -182,18 +182,20 @@ void AnnotationDecoder::stopDecode()
 
 void AnnotationDecoder::dataAvailable(uint64_t from, uint64_t to)
 {
-    // Emplace new data segment in a queue as new data might arrive
-    // faster than libsigrokdecode can process
+//	Emplace new data segment in a queue as new data might arrive
+//	faster than libsigrokdecode can process
 
-    qDebug() << "queueing new data!";
+	qDebug() << "Data segment: ( " << from << " , " << to << " ) available";
+	if (from != to) {
+		std::unique_lock<std::mutex> lock(m_newDataMutex);
 
-    std::unique_lock<std::mutex> lock(m_newDataMutex);
 
-    m_lastSample = to;
+		m_lastSample = to;
 
-    m_newDataQueue.emplace(from, to);
-    lock.unlock();
-    m_newDataCv.notify_one();
+		m_newDataQueue.emplace(from, to);
+		lock.unlock();
+		m_newDataCv.notify_one();
+	}
 }
 
 std::vector<std::shared_ptr<logic::Decoder> > AnnotationDecoder::getDecoderStack()

@@ -104,6 +104,7 @@ private:
 	ScaleSpinButton *m_timePositionButton;
 	double m_sampleRate;
 	uint64_t m_bufferSize;
+	uint64_t m_lastCapturedSample;
 
 	M2k *m_m2kContext;
 	M2kDigital *m_m2kDigital;
