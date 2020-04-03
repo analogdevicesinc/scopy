@@ -692,7 +692,7 @@ image: url(:/icons/setup3_checked_hover.svg);
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>312</width>
+                      <width>310</width>
                       <height>467</height>
                      </rect>
                     </property>
@@ -784,7 +784,7 @@ font-weight: normal;
                          <number>0</number>
                         </property>
                         <property name="topMargin">
-                         <number>20</number>
+                         <number>0</number>
                         </property>
                         <property name="rightMargin">
                          <number>0</number>
@@ -907,9 +907,15 @@ border-color: grey;
                      </item>
                      <item>
                       <widget class="QWidget" name="groupWidget" native="true">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
                        <layout class="QVBoxLayout" name="groupWidgetLayout">
                         <property name="spacing">
-                         <number>0</number>
+                         <number>15</number>
                         </property>
                         <property name="leftMargin">
                          <number>0</number>
@@ -923,6 +929,52 @@ border-color: grey;
                         <property name="bottomMargin">
                          <number>0</number>
                         </property>
+                        <item>
+                         <layout class="QHBoxLayout" name="horizontalLayout_8">
+                          <property name="spacing">
+                           <number>0</number>
+                          </property>
+                          <property name="topMargin">
+                           <number>0</number>
+                          </property>
+                          <item>
+                           <widget class="QLabel" name="label_8">
+                            <property name="sizePolicy">
+                             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                              <horstretch>0</horstretch>
+                              <verstretch>0</verstretch>
+                             </sizepolicy>
+                            </property>
+                            <property name="styleSheet">
+                             <string notr="true">QLabel {
+  font-size: 12px;
+color: rgba(255, 255, 255, 70);
+font-weight: normal;
+}</string>
+                            </property>
+                            <property name="text">
+                             <string>GROUP </string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item>
+                           <widget class="Line" name="line_5">
+                            <property name="maximumSize">
+                             <size>
+                              <width>16777215</width>
+                              <height>1</height>
+                             </size>
+                            </property>
+                            <property name="styleSheet">
+                             <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
+                            </property>
+                            <property name="orientation">
+                             <enum>Qt::Horizontal</enum>
+                            </property>
+                           </widget>
+                          </item>
+                         </layout>
+                        </item>
                        </layout>
                       </widget>
                      </item>
@@ -934,40 +986,51 @@ border-color: grey;
                       </layout>
                      </item>
                      <item>
-                      <layout class="QHBoxLayout" name="horizontalLayout_5">
-                       <property name="topMargin">
-                        <number>0</number>
-                       </property>
-                       <item>
-                        <spacer name="horizontalSpacer_6">
-                         <property name="orientation">
-                          <enum>Qt::Horizontal</enum>
-                         </property>
-                         <property name="sizeHint" stdset="0">
-                          <size>
-                           <width>40</width>
-                           <height>20</height>
-                          </size>
-                         </property>
-                        </spacer>
-                       </item>
-                       <item>
-                        <widget class="QLabel" name="stackDecoderLabel">
-                         <property name="sizePolicy">
-                          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                           <horstretch>0</horstretch>
-                           <verstretch>0</verstretch>
-                          </sizepolicy>
-                         </property>
-                         <property name="text">
-                          <string>Stack Decoder:</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QComboBox" name="stackDecoderComboBox"/>
-                       </item>
-                      </layout>
+                      <widget class="QWidget" name="stackDecoderWidget" native="true">
+                       <layout class="QHBoxLayout" name="horizontalLayout_9">
+                        <property name="leftMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="topMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="rightMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="bottomMargin">
+                         <number>0</number>
+                        </property>
+                        <item>
+                         <spacer name="horizontalSpacer_6">
+                          <property name="orientation">
+                           <enum>Qt::Horizontal</enum>
+                          </property>
+                          <property name="sizeHint" stdset="0">
+                           <size>
+                            <width>40</width>
+                            <height>20</height>
+                           </size>
+                          </property>
+                         </spacer>
+                        </item>
+                        <item>
+                         <widget class="QLabel" name="stackDecoderLabel">
+                          <property name="sizePolicy">
+                           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                           </sizepolicy>
+                          </property>
+                          <property name="text">
+                           <string>Stack Decoder:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QComboBox" name="stackDecoderComboBox"/>
+                        </item>
+                       </layout>
+                      </widget>
                      </item>
                      <item>
                       <layout class="QHBoxLayout" name="horizontalLayout_7">
@@ -975,7 +1038,7 @@ border-color: grey;
                         <number>0</number>
                        </property>
                        <property name="topMargin">
-                        <number>0</number>
+                        <number>20</number>
                        </property>
                        <item>
                         <spacer name="horizontalSpacer_10">
@@ -987,7 +1050,7 @@ border-color: grey;
                          </property>
                          <property name="sizeHint" stdset="0">
                           <size>
-                           <width>300</width>
+                           <width>250</width>
                            <height>20</height>
                           </size>
                          </property>
@@ -999,6 +1062,9 @@ border-color: grey;
                       <spacer name="verticalSpacer_2">
                        <property name="orientation">
                         <enum>Qt::Vertical</enum>
+                       </property>
+                       <property name="sizeType">
+                        <enum>QSizePolicy::Expanding</enum>
                        </property>
                        <property name="sizeHint" stdset="0">
                         <size>

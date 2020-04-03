@@ -171,6 +171,9 @@ namespace adiscope {
 		void onDigitalChannelAdded(int chnIdx);
 		void beginGroupSelection();
 		bool endGroupSelection();    // TODO: toggle group selection
+		QVector<int> getGroupOfChannel(int chnIdx);
+		void removeFromGroup(int chnIdx, bool &didGroupVanish);
+		void positionInGroupChanged(int chnIdx, int from, int to);
 
 	protected:
 		virtual void cleanUpJustBeforeChannelRemoval(int chnIdx);

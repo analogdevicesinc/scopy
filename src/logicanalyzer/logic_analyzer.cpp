@@ -10,6 +10,9 @@
 #include "logicanalyzer/annotationcurve.h"
 #include "logicanalyzer/decoder.h"
 
+#include "basemenu.h"
+#include "logicgroupitem.h"
+
 #include "dynamicWidget.hpp"
 
 #include <QDebug>
@@ -131,6 +134,18 @@ LogicAnalyzer::LogicAnalyzer(iio_context *ctx, adiscope::Filter *filt,
 	// setup decoders
 	setupDecoders();
 
+	BaseMenu *menu = new BaseMenu(ui->groupWidget);
+	ui->groupWidgetLayout->addWidget(menu);
+
+	menu->insertMenuItem(new LogicGroupItem("Dio1", menu));
+	menu->insertMenuItem(new LogicGroupItem("Dio2", menu));
+	menu->insertMenuItem(new LogicGroupItem("Dio3", menu));
+
+	menu->setMaximumHeight(3 * 27);
+
+	connect(menu, &BaseMenu::itemMovedFromTo, [=](short from, short to){
+		qDebug() << "Position channel at: " << from << " to new posiition: " << to;
+	});
 }
 
 LogicAnalyzer::~LogicAnalyzer()
@@ -364,6 +379,9 @@ void LogicAnalyzer::channelSelectedChanged(int chIdx, bool selected)
 		ui->traceHeightLineEdit->setText(
 					QString::number(m_plotCurves[m_selectedChannel]->getTraceHeight()));
 		ui->triggerComboBox->setEnabled(true);
+
+		qDebug() << "SIze of group for this channel is: " << m_plot.getGroupOfChannel(m_selectedChannel).size();
+
 		if (m_selectedChannel < m_m2kDigital->getNbChannelsIn()) {
 			ui->triggerComboBox->setVisible(true);
 			ui->labelTrigger->setVisible(true);
@@ -534,6 +552,9 @@ void LogicAnalyzer::setupUi()
 	// Scroll wheel event filter
 	m_wheelEventGuard = new MouseWheelWidgetGuard(ui->mainWidget);
 	m_wheelEventGuard->installEventRecursively(ui->mainWidget);
+
+	ui->groupWidget->setVisible(false);
+	ui->stackDecoderWidget->setVisible(false);
 }
 
 void LogicAnalyzer::connectSignalsAndSlots()
@@ -1070,8 +1091,7 @@ void LogicAnalyzer::updateStackDecoderButton()
 	const int nrChannels = m_m2kDigital->getNbChannelsIn();
 
 	if (m_selectedChannel < nrChannels) {
-		ui->stackDecoderComboBox->setVisible(false);
-		ui->stackDecoderLabel->setVisible(false);
+		ui->stackDecoderWidget->setVisible(false);
 		return;
 	}
 
@@ -1121,6 +1141,5 @@ void LogicAnalyzer::updateStackDecoderButton()
 
 	const bool shouldBeVisible = ui->stackDecoderComboBox->count() > 1;
 
-	ui->stackDecoderComboBox->setVisible(shouldBeVisible);
-	ui->stackDecoderLabel->setVisible(shouldBeVisible);
+	ui->stackDecoderWidget->setVisible(shouldBeVisible);
 }

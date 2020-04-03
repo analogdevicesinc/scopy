@@ -1615,6 +1615,43 @@ bool CapturePlot::endGroupSelection()
 	return true;
 }
 
+QVector<int> CapturePlot::getGroupOfChannel(int chnIdx)
+{
+	QVector<int> groupIdxList;
+
+	if (chnIdx < 0 || chnIdx >= d_offsetHandles.size()) {
+		return groupIdxList; // empty
+	}
+
+	auto hdlGroup = std::find_if(d_groupHandles.begin(), d_groupHandles.end(),
+				     [=](const QList<RoundedHandleV*> &group){
+		return group.contains(d_offsetHandles[chnIdx]);
+	});
+
+	// if no group return
+	if (hdlGroup == d_groupHandles.end()) {
+		qDebug() << "This handle is not in a group!";
+		return groupIdxList;
+	}
+
+	for (const auto &hdl : *hdlGroup) {
+		groupIdxList.push_back(d_offsetHandles.indexOf(hdl));
+	}
+
+	return groupIdxList;
+
+}
+
+void CapturePlot::removeFromGroup(int chnIdx, bool &didGroupVanish)
+{
+
+}
+
+void CapturePlot::positionInGroupChanged(int chnIdx, int from, int to)
+{
+
+}
+
 void CapturePlot::handleInGroupChangedPosition(int position)
 {
 	RoundedHandleV *hdl = dynamic_cast<RoundedHandleV *>(QObject::sender());
