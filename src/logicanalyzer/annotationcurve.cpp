@@ -139,16 +139,13 @@ QWidget *AnnotationCurve::getCurrentDecoderStackMenu()
     // for each decoder append it s binding
     std::vector<std::shared_ptr<logic::Decoder>> stack = m_annotationDecoder->getDecoderStack();
 
-    // delete old layout
-//    if (m_menuLayout) {
-//        QWidget *temp = new QWidget();
-//        temp->setLayout(m_menuLayout);
-//        temp->deleteLater();
-//    }
-
     QWidget *widget = new QWidget();
-    QFormLayout *layout = new QFormLayout(widget);
-    widget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    QGridLayout *grid = new QGridLayout();
+    grid->setContentsMargins(0, 0, 0, 0);
+    grid->setColumnStretch(0, 1);
+    widget->setLayout(grid);
+    QFormLayout *layout = new QFormLayout();
+    grid->addLayout(layout, 1, 0, 1, 2);
 
     auto channels = m_annotationDecoder->getDecoderChannels();
 
@@ -185,8 +182,8 @@ QWidget *AnnotationCurve::getCurrentDecoderStackMenu()
                m_annotationDecoder->assignChannel(ch->id, index - 1);
            }
         });
-
-        layout->addRow(chls);
+	layout->addRow(label, box);
+//        layout->addRow(chls);
     }
 
     for (const auto &dec : stack) {
@@ -195,6 +192,7 @@ QWidget *AnnotationCurve::getCurrentDecoderStackMenu()
             layout->addRow(title);
         }
 	m_bindings.emplace_back(std::make_shared<adiscope::bind::Decoder>(m_annotationDecoder, dec));
+
         m_bindings.back()->add_properties_to_form(layout, true);
     }
 

@@ -64,6 +64,7 @@ void Binding::add_properties_to_form(QFormLayout *layout, bool auto_commit)
 		if (p->desc().isEmpty()) {
 			widget = p->get_widget(layout->parentWidget(), auto_commit);
 		} else {
+
 			QPushButton *help_btn = new QPushButton();
 			help_btn->setFlat(true);
 			help_btn->setIcon(QIcon(":/icons/help-browser.png"));
@@ -89,8 +90,9 @@ void Binding::add_properties_to_form(QFormLayout *layout, bool auto_commit)
 			layout->addRow(widget);
 		} else {
 			auto *lbl = new QLabel(p->name());
-			lbl->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+			lbl->setWordWrap(true);
 			layout->addRow(lbl, widget);
+			layout->setSpacing(10);
 		}
 
 		if (help_lbl)

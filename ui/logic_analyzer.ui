@@ -665,235 +665,352 @@ image: url(:/icons/setup3_checked_hover.svg);
                   <number>20</number>
                  </property>
                  <property name="rightMargin">
-                  <number>20</number>
+                  <number>10</number>
                  </property>
                  <property name="bottomMargin">
                   <number>20</number>
                  </property>
                  <item>
-                  <widget class="QLabel" name="label_5">
-                   <property name="styleSheet">
-                    <string notr="true">color: white;
-font-size: 14px;
-font-weight: normal;
-</string>
-                   </property>
-                   <property name="text">
-                    <string>Channel Settings</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="Line" name="line_2">
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>1</height>
-                    </size>
-                   </property>
-                   <property name="styleSheet">
-                    <string notr="true">border: 2px solid #4a64ff</string>
-                   </property>
-                   <property name="frameShadow">
-                    <enum>QFrame::Plain</enum>
-                   </property>
-                   <property name="lineWidth">
-                    <number>2</number>
-                   </property>
-                   <property name="orientation">
-                    <enum>Qt::Horizontal</enum>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QWidget" name="channelSettingsWidget" native="true">
+                  <widget class="QScrollArea" name="scrollArea">
                    <property name="sizePolicy">
-                    <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                      <horstretch>0</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
-                   <layout class="QGridLayout" name="gridLayout_2">
-                    <property name="leftMargin">
-                     <number>0</number>
+                   <property name="horizontalScrollBarPolicy">
+                    <enum>Qt::ScrollBarAlwaysOff</enum>
+                   </property>
+                   <property name="sizeAdjustPolicy">
+                    <enum>QAbstractScrollArea::AdjustToContents</enum>
+                   </property>
+                   <property name="widgetResizable">
+                    <bool>true</bool>
+                   </property>
+                   <widget class="QWidget" name="scrollAreaWidgetContents_2">
+                    <property name="geometry">
+                     <rect>
+                      <x>0</x>
+                      <y>0</y>
+                      <width>312</width>
+                      <height>467</height>
+                     </rect>
                     </property>
-                    <property name="topMargin">
-                     <number>20</number>
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
                     </property>
-                    <property name="rightMargin">
-                     <number>0</number>
+                    <property name="minimumSize">
+                     <size>
+                      <width>200</width>
+                      <height>0</height>
+                     </size>
                     </property>
-                    <property name="bottomMargin">
-                     <number>0</number>
+                    <property name="maximumSize">
+                     <size>
+                      <width>400</width>
+                      <height>16777215</height>
+                     </size>
                     </property>
-                    <item row="1" column="0">
-                     <widget class="QLabel" name="labelTraceHeight">
-                      <property name="text">
-                       <string>Trace Height</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="0" column="0">
-                     <widget class="QLabel" name="labelName">
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                      <property name="text">
-                       <string>Name</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="1" column="1">
-                     <widget class="QLineEdit" name="traceHeightLineEdit">
-                      <property name="styleSheet">
-                       <string notr="true">
+                    <layout class="QVBoxLayout" name="verticalLayout_9">
+                     <property name="spacing">
+                      <number>15</number>
+                     </property>
+                     <property name="leftMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="topMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="rightMargin">
+                      <number>10</number>
+                     </property>
+                     <property name="bottomMargin">
+                      <number>0</number>
+                     </property>
+                     <item>
+                      <widget class="QLabel" name="label_5">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="styleSheet">
+                        <string notr="true">color: white;
+font-size: 14px;
+font-weight: normal;
+</string>
+                       </property>
+                       <property name="text">
+                        <string>Channel Settings</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="Line" name="line_2">
+                       <property name="maximumSize">
+                        <size>
+                         <width>16777215</width>
+                         <height>1</height>
+                        </size>
+                       </property>
+                       <property name="styleSheet">
+                        <string notr="true">border: 2px solid #4a64ff</string>
+                       </property>
+                       <property name="frameShadow">
+                        <enum>QFrame::Plain</enum>
+                       </property>
+                       <property name="lineWidth">
+                        <number>2</number>
+                       </property>
+                       <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QWidget" name="channelSettingsWidget" native="true">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <layout class="QGridLayout" name="gridLayout_2">
+                        <property name="leftMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="topMargin">
+                         <number>20</number>
+                        </property>
+                        <property name="rightMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="bottomMargin">
+                         <number>0</number>
+                        </property>
+                        <item row="1" column="0">
+                         <widget class="QLabel" name="labelTraceHeight">
+                          <property name="text">
+                           <string>Trace Height</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item row="0" column="0">
+                         <widget class="QLabel" name="labelName">
+                          <property name="sizePolicy">
+                           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                           </sizepolicy>
+                          </property>
+                          <property name="text">
+                           <string>Name</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item row="1" column="1">
+                         <widget class="QLineEdit" name="traceHeightLineEdit">
+                          <property name="styleSheet">
+                           <string notr="true">
 QLineEdit[invalid=true] {
 border-color: red
 }
 QLineEdit[invalid=false] {
 border-color: grey;
 }</string>
-                      </property>
-                      <property name="text">
-                       <string>1</string>
-                      </property>
-                      <property name="maxLength">
-                       <number>3</number>
-                      </property>
-                      <property name="cursorPosition">
-                       <number>1</number>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="2" column="0">
-                     <widget class="QLabel" name="labelTrigger">
-                      <property name="text">
-                       <string>Trigger</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="2" column="1">
-                     <widget class="QComboBox" name="triggerComboBox">
-                      <item>
-                       <property name="text">
-                        <string>-</string>
+                          </property>
+                          <property name="text">
+                           <string>1</string>
+                          </property>
+                          <property name="maxLength">
+                           <number>3</number>
+                          </property>
+                          <property name="cursorPosition">
+                           <number>1</number>
+                          </property>
+                         </widget>
+                        </item>
+                        <item row="2" column="0">
+                         <widget class="QLabel" name="labelTrigger">
+                          <property name="text">
+                           <string>Trigger</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item row="2" column="1">
+                         <widget class="QComboBox" name="triggerComboBox">
+                          <item>
+                           <property name="text">
+                            <string>-</string>
+                           </property>
+                          </item>
+                          <item>
+                           <property name="text">
+                            <string/>
+                           </property>
+                           <property name="icon">
+                            <iconset resource="../resources/resources.qrc">
+                             <normaloff>:/icons/trigger_rising_enabled.svg</normaloff>:/icons/trigger_rising_enabled.svg</iconset>
+                           </property>
+                          </item>
+                          <item>
+                           <property name="text">
+                            <string/>
+                           </property>
+                           <property name="icon">
+                            <iconset>
+                             <normalon>:/icons/trigger_falling_enabled.svg</normalon>
+                            </iconset>
+                           </property>
+                          </item>
+                          <item>
+                           <property name="text">
+                            <string/>
+                           </property>
+                           <property name="icon">
+                            <iconset>
+                             <normalon>:/icons/trigger_high_enabled.svg</normalon>
+                            </iconset>
+                           </property>
+                          </item>
+                          <item>
+                           <property name="text">
+                            <string/>
+                           </property>
+                           <property name="icon">
+                            <iconset>
+                             <normalon>:/icons/trigger_low_enabled.svg</normalon>
+                            </iconset>
+                           </property>
+                          </item>
+                          <item>
+                           <property name="text">
+                            <string/>
+                           </property>
+                           <property name="icon">
+                            <iconset>
+                             <normalon>:/icons/trigger_any_enabled.svg</normalon>
+                            </iconset>
+                           </property>
+                          </item>
+                         </widget>
+                        </item>
+                        <item row="0" column="1">
+                         <widget class="QLineEdit" name="nameLineEdit"/>
+                        </item>
+                       </layout>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QWidget" name="groupWidget" native="true">
+                       <layout class="QVBoxLayout" name="groupWidgetLayout">
+                        <property name="spacing">
+                         <number>0</number>
+                        </property>
+                        <property name="leftMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="topMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="rightMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="bottomMargin">
+                         <number>0</number>
+                        </property>
+                       </layout>
+                      </widget>
+                     </item>
+                     <item>
+                      <layout class="QVBoxLayout" name="decoderSettingsLayout">
+                       <property name="spacing">
+                        <number>0</number>
                        </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string/>
+                      </layout>
+                     </item>
+                     <item>
+                      <layout class="QHBoxLayout" name="horizontalLayout_5">
+                       <property name="topMargin">
+                        <number>0</number>
                        </property>
-                       <property name="icon">
-                        <iconset resource="../resources/resources.qrc">
-                         <normaloff>:/icons/trigger_rising_enabled.svg</normaloff>:/icons/trigger_rising_enabled.svg</iconset>
+                       <item>
+                        <spacer name="horizontalSpacer_6">
+                         <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                         </property>
+                         <property name="sizeHint" stdset="0">
+                          <size>
+                           <width>40</width>
+                           <height>20</height>
+                          </size>
+                         </property>
+                        </spacer>
+                       </item>
+                       <item>
+                        <widget class="QLabel" name="stackDecoderLabel">
+                         <property name="sizePolicy">
+                          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                           <horstretch>0</horstretch>
+                           <verstretch>0</verstretch>
+                          </sizepolicy>
+                         </property>
+                         <property name="text">
+                          <string>Stack Decoder:</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QComboBox" name="stackDecoderComboBox"/>
+                       </item>
+                      </layout>
+                     </item>
+                     <item>
+                      <layout class="QHBoxLayout" name="horizontalLayout_7">
+                       <property name="spacing">
+                        <number>0</number>
                        </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string/>
+                       <property name="topMargin">
+                        <number>0</number>
                        </property>
-                       <property name="icon">
-                        <iconset>
-                         <normalon>:/icons/trigger_falling_enabled.svg</normalon>
-                        </iconset>
+                       <item>
+                        <spacer name="horizontalSpacer_10">
+                         <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                         </property>
+                         <property name="sizeType">
+                          <enum>QSizePolicy::Fixed</enum>
+                         </property>
+                         <property name="sizeHint" stdset="0">
+                          <size>
+                           <width>300</width>
+                           <height>20</height>
+                          </size>
+                         </property>
+                        </spacer>
+                       </item>
+                      </layout>
+                     </item>
+                     <item>
+                      <spacer name="verticalSpacer_2">
+                       <property name="orientation">
+                        <enum>Qt::Vertical</enum>
                        </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string/>
+                       <property name="sizeHint" stdset="0">
+                        <size>
+                         <width>20</width>
+                         <height>40</height>
+                        </size>
                        </property>
-                       <property name="icon">
-                        <iconset>
-                         <normalon>:/icons/trigger_high_enabled.svg</normalon>
-                        </iconset>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string/>
-                       </property>
-                       <property name="icon">
-                        <iconset>
-                         <normalon>:/icons/trigger_low_enabled.svg</normalon>
-                        </iconset>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string/>
-                       </property>
-                       <property name="icon">
-                        <iconset>
-                         <normalon>:/icons/trigger_any_enabled.svg</normalon>
-                        </iconset>
-                       </property>
-                      </item>
-                     </widget>
-                    </item>
-                    <item row="0" column="1">
-                     <widget class="QLineEdit" name="nameLineEdit"/>
-                    </item>
-                   </layout>
+                      </spacer>
+                     </item>
+                    </layout>
+                   </widget>
                   </widget>
-                 </item>
-                 <item>
-                  <layout class="QVBoxLayout" name="decoderSettingsLayout">
-                   <property name="spacing">
-                    <number>0</number>
-                   </property>
-                  </layout>
-                 </item>
-                 <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_5">
-                   <property name="topMargin">
-                    <number>0</number>
-                   </property>
-                   <item>
-                    <spacer name="horizontalSpacer_6">
-                     <property name="orientation">
-                      <enum>Qt::Horizontal</enum>
-                     </property>
-                     <property name="sizeHint" stdset="0">
-                      <size>
-                       <width>40</width>
-                       <height>20</height>
-                      </size>
-                     </property>
-                    </spacer>
-                   </item>
-                   <item>
-                    <widget class="QLabel" name="stackDecoderLabel">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="text">
-                      <string>Stack Decoder:</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QComboBox" name="stackDecoderComboBox"/>
-                   </item>
-                  </layout>
-                 </item>
-                 <item>
-                  <spacer name="verticalSpacer_2">
-                   <property name="orientation">
-                    <enum>Qt::Vertical</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>20</width>
-                     <height>40</height>
-                    </size>
-                   </property>
-                  </spacer>
                  </item>
                 </layout>
                </widget>
@@ -959,7 +1076,7 @@ border-color: grey;
                       <x>0</x>
                       <y>0</y>
                       <width>300</width>
-                      <height>467</height>
+                      <height>248</height>
                      </rect>
                     </property>
                     <property name="sizePolicy">

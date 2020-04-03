@@ -60,7 +60,8 @@ LogicAnalyzer::LogicAnalyzer(iio_context *ctx, adiscope::Filter *filt,
 	m_started(false),
 	m_selectedChannel(-1),
 	m_wheelEventGuard(nullptr),
-	m_decoderMenu(nullptr)
+	m_decoderMenu(nullptr),
+	m_lastCapturedSample(0)
 {
 	qDebug() << m_m2kDigital << " " << m_m2kContext;
 
