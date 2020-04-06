@@ -49,6 +49,7 @@ Calibration::Calibration(struct iio_context *ctx, QJSEngine *engine,
 {
 	m_api->setObjectName("calib");
 	m_api->js_register(engine);
+	m2k = libm2k::contexts::m2kOpen(ctx,"");
 }
 
 Calibration::~Calibration()
@@ -842,7 +843,7 @@ float Calibration::convVoltsToSample(float voltage, float correctionGain)
 
 bool Calibration::calibrateAll()
 {
-	bool ok;
+	/*bool ok;
 	configHwSamplerate();
 
 	ok = calibrateADCoffset();
@@ -879,7 +880,44 @@ bool Calibration::calibrateAll()
 calibration_fail:
 	dacOutputStop();
 	m_cancel=false;
-	return false;
+    return false;*/
+	bool ok = false;
+	ok = m2k->calibrateADC();
+	if(!ok || m_cancel)
+		goto calibration_fail;
+	ok = m2k->calibrateDAC();
+	if(!ok || m_cancel)
+		goto calibration_fail;
+
+
+
+	iio_channel_attr_read_longlong(m_ad5625_channel2, "raw",
+				       &m_adc_ch0_offset);
+	iio_channel_attr_read_longlong(m_ad5625_channel3, "raw",
+				       &m_adc_ch1_offset);
+
+	/*iio_channel_attr_read_longlong(m_ad5625_channel0, "raw",
+		      &m_dac_a_ch_offset);
+	iio_channel_attr_read_longlong(m_ad5625_channel1, "raw",
+		      &m_dac_b_ch_offset);*/
+
+	if(m2k_adc) {
+		m2k_adc->setChnCorrectionOffset(0, adcOffsetChannel0());
+		m2k_adc->setChnCorrectionOffset(1, adcOffsetChannel1());
+		/*m2k_adc->setChnCorrectionGain(0, adcGainChannel0());
+	m2k_adc->setChnCorrectionGain(1, adcGainChannel1());*/
+	}
+
+	/*if(m2k_dac_a)
+	m2k_dac_a->setVlsb(dacAvlsb());
+    if(m2k_dac_b)
+	m2k_dac_b->setVlsb(dacBvlsb());*/
+
+	return true;
+
+calibration_fail:
+	m_cancel=false;
+    return false;
 }
 
 void Calibration::cancelCalibration()

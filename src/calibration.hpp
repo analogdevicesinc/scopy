@@ -27,6 +27,8 @@
 #include <cstdlib>
 #include <string>
 #include <memory>
+#include <libm2k/m2k.hpp>
+#include <libm2k/contextbuilder.hpp>
 
 extern "C" {
 	struct iio_context;
@@ -130,6 +132,8 @@ private:
 	struct iio_device *m2k_ad5625;
 	struct iio_device *m_m2k_fabric;
 
+	libm2k::contexts::M2k *m2k;
+
 	struct iio_channel *m_adc_channel0;
 	struct iio_channel *m_adc_channel1;
 
@@ -147,10 +151,10 @@ private:
 	struct iio_buffer *m_dac_a_buffer;
 	struct iio_buffer *m_dac_b_buffer;
 
-	int m_adc_ch0_offset;
-	int m_adc_ch1_offset;
-	int m_dac_a_ch_offset;
-	int m_dac_b_ch_offset;
+	long long  m_adc_ch0_offset;
+	long long m_adc_ch1_offset;
+	long long m_dac_a_ch_offset;
+	long long m_dac_b_ch_offset;
 	double m_adc_ch0_gain;
 	double m_adc_ch1_gain;
 	double m_dac_a_ch_vlsb;
