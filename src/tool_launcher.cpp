@@ -1290,9 +1290,7 @@ bool adiscope::ToolLauncher::calibrate()
 	network_btn->setText(status);
 
 	if (calib->isInitialized()) {
-		calib->setHardwareInCalibMode();
 		ok = calib->calibrateAll();
-		calib->restoreHardwareFromCalibMode();
 	}
 
 	dmm_btn->setText(old_dmm_text);
