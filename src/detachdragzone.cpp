@@ -82,7 +82,10 @@ void DetachDragZone::dropEvent(QDropEvent *event)
 	if (event->mimeData()->hasFormat(BaseMenuItem::menuItemMimeDataType)){
 		QObject *source = event->source();
 		if (source) {
-			static_cast<ToolMenuItem *>(source)->detach();
+			ToolMenuItem *toolMenuItem = qobject_cast<ToolMenuItem *>(source);
+			if (toolMenuItem) {
+				toolMenuItem->detach();
+			}
 		}
 	}
 }
