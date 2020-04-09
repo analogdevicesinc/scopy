@@ -13,6 +13,8 @@ public:
 	LogicGroupItem(const QString &name, QWidget *parent = nullptr);
 
 	QString getName() const;
+
+public Q_SLOTS:
 	void setName(const QString &name);
 
 Q_SIGNALS:

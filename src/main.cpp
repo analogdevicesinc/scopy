@@ -27,6 +27,7 @@
 #include <QDateTime>
 #include <QFontDatabase>
 #include <QTranslator>
+#include <QLibraryInfo>
 
 #include "config.h"
 #include "tool_launcher.hpp"
@@ -124,6 +125,16 @@ int main(int argc, char **argv)
 	qDebug()<<language;
 
 	QString languageFileName=QDir(QCoreApplication::applicationDirPath()+"/resources/languages/"+language+".qm").path();
+
+	QDir directory(":/");
+	QStringList languages = directory.entryList(QStringList() << "*.qm" << "*.QM", QDir::Files);
+	for (const auto & file : languages) {
+		// file is of type QString
+		qDebug() << "Found language:" << file;
+	}
+
+	qDebug() << "Library info translations path: " << QLibraryInfo::location(QLibraryInfo::TranslationsPath);
+
 	myappTranslator.load(languageFileName);
 	app.installTranslator(&myappTranslator);
 

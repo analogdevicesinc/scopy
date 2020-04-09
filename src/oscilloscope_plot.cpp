@@ -1642,14 +1642,71 @@ QVector<int> CapturePlot::getGroupOfChannel(int chnIdx)
 
 }
 
-void CapturePlot::removeFromGroup(int chnIdx, bool &didGroupVanish)
+void CapturePlot::removeFromGroup(int chnIdx, int removedChnIdx, bool &didGroupVanish)
 {
+	qDebug() << "delete: chIndx: " << chnIdx << " removedChnIdx: " << removedChnIdx;
 
+	auto hdlGroup = std::find_if(d_groupHandles.begin(), d_groupHandles.end(),
+				     [=](const QList<RoundedHandleV*> &group){
+		return group.contains(d_offsetHandles[chnIdx]);
+	});
+
+	if (hdlGroup == d_groupHandles.end()) {
+		qDebug() << "This handle is not in a group!";
+		return;
+	}
+
+	const int positionOfFirstHandleInGroup = hdlGroup->at(0)->position();
+	const int positionOfLastHandleInGroup = hdlGroup->back()->position();
+
+	disconnect(hdlGroup->at(removedChnIdx), &RoundedHandleV::positionChanged,
+		   this, &CapturePlot::handleInGroupChangedPosition);
+
+	auto removedObj = hdlGroup->takeAt(removedChnIdx);
+
+	if (hdlGroup->size() < 2) {
+		didGroupVanish = true;
+		disconnect(hdlGroup->first(), &RoundedHandleV::positionChanged,
+			   this, &CapturePlot::handleInGroupChangedPosition);
+		const int indexOfCurrentGroup = d_groupHandles.indexOf(*hdlGroup);
+		d_groupHandles.removeOne(*hdlGroup);
+		auto marker = d_groupMarkers.takeAt(indexOfCurrentGroup);
+		marker->detach();
+		delete marker;
+
+		replot();
+
+		return;
+	}
+
+	hdlGroup->at(0)->setPosition(positionOfFirstHandleInGroup);
+	hdlGroup->at(0)->triggerMove();
+
+	removedObj->setPosition(positionOfLastHandleInGroup);
+	removedObj->triggerMove();
 }
 
 void CapturePlot::positionInGroupChanged(int chnIdx, int from, int to)
 {
+	qDebug() << "from: " << from << " to:" << to;
 
+	auto hdlGroup = std::find_if(d_groupHandles.begin(), d_groupHandles.end(),
+				     [=](const QList<RoundedHandleV*> &group){
+		return group.contains(d_offsetHandles[chnIdx]);
+	});
+
+	if (hdlGroup == d_groupHandles.end()) {
+		qDebug() << "This handle is not in a group!";
+		return;
+	}
+
+	const int positionOfFirstHandleInGroup = hdlGroup->at(0)->position();
+
+	auto item = hdlGroup->takeAt(from);
+	hdlGroup->insert(to, item);
+
+	hdlGroup->at(0)->setPosition(positionOfFirstHandleInGroup);
+	hdlGroup->at(0)->triggerMove();
 }
 
 void CapturePlot::handleInGroupChangedPosition(int position)
@@ -1729,6 +1786,7 @@ void CapturePlot::handleInGroupChangedPosition(int position)
 
 	d_groupMarkers.at(groupIndex)->setInterval(y2, y1);
 
+	replot();
 }
 
 void CapturePlot::onChannelAdded(int chnIdx)

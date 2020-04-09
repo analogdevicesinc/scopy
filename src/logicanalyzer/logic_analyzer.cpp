@@ -64,7 +64,8 @@ LogicAnalyzer::LogicAnalyzer(iio_context *ctx, adiscope::Filter *filt,
 	m_selectedChannel(-1),
 	m_wheelEventGuard(nullptr),
 	m_decoderMenu(nullptr),
-	m_lastCapturedSample(0)
+	m_lastCapturedSample(0),
+	m_currentGroupMenu(nullptr)
 {
 	qDebug() << m_m2kDigital << " " << m_m2kContext;
 
@@ -134,18 +135,8 @@ LogicAnalyzer::LogicAnalyzer(iio_context *ctx, adiscope::Filter *filt,
 	// setup decoders
 	setupDecoders();
 
-	BaseMenu *menu = new BaseMenu(ui->groupWidget);
-	ui->groupWidgetLayout->addWidget(menu);
-
-	menu->insertMenuItem(new LogicGroupItem("Dio1", menu));
-	menu->insertMenuItem(new LogicGroupItem("Dio2", menu));
-	menu->insertMenuItem(new LogicGroupItem("Dio3", menu));
-
-	menu->setMaximumHeight(3 * 27);
-
-	connect(menu, &BaseMenu::itemMovedFromTo, [=](short from, short to){
-		qDebug() << "Position channel at: " << from << " to new posiition: " << to;
-	});
+	// setup trigger
+	setupTriggerMenu();
 }
 
 LogicAnalyzer::~LogicAnalyzer()
@@ -382,6 +373,8 @@ void LogicAnalyzer::channelSelectedChanged(int chIdx, bool selected)
 
 		qDebug() << "SIze of group for this channel is: " << m_plot.getGroupOfChannel(m_selectedChannel).size();
 
+		updateChannelGroupWidget(true);
+
 		if (m_selectedChannel < m_m2kDigital->getNbChannelsIn()) {
 			ui->triggerComboBox->setVisible(true);
 			ui->labelTrigger->setVisible(true);
@@ -428,6 +421,8 @@ void LogicAnalyzer::channelSelectedChanged(int chIdx, bool selected)
 		}
 
 		updateStackDecoderButton();
+
+		updateChannelGroupWidget(false);
 	}
 }
 
@@ -441,14 +436,11 @@ void LogicAnalyzer::setupUi()
 	int gsettings_panel = ui->stackedWidget->indexOf(ui->generalSettings);
 	ui->btnGeneralSettings->setProperty("id", QVariant(-gsettings_panel));
 
-	int measure_panel = ui->stackedWidget->insertWidget(-1, new QWidget());
-	ui->btnChannelSettings->setProperty("id", QVariant(-measure_panel));
-
 	/* Cursors Settings */
 	ui->btnCursors->setProperty("id", QVariant(-1));
 
 	/* Trigger Settings */
-	int triggers_panel = ui->stackedWidget->insertWidget(-1, new QWidget());
+	int triggers_panel = ui->stackedWidget->indexOf(ui->triggerSettings);
 	ui->btnTrigger->setProperty("id", QVariant(-triggers_panel));
 
 	/* Channel Settings */
@@ -460,8 +452,6 @@ void LogicAnalyzer::setupUi()
 
 	// set default menu width to 0
 	ui->rightMenu->setMaximumWidth(0);
-
-
 
 	// Plot positioning and settings
 	m_plot.disableLegend();
@@ -1142,4 +1132,102 @@ void LogicAnalyzer::updateStackDecoderButton()
 	const bool shouldBeVisible = ui->stackDecoderComboBox->count() > 1;
 
 	ui->stackDecoderWidget->setVisible(shouldBeVisible);
+}
+
+void LogicAnalyzer::updateChannelGroupWidget(bool visible)
+{
+
+	QVector<int> channelsInGroup = m_plot.getGroupOfChannel(m_selectedChannel);
+
+	const bool shouldBeVisible = visible & (channelsInGroup.size() > 0);
+
+	ui->groupWidget->setVisible(shouldBeVisible);
+
+	qDebug() << "channel group widget should be visible: " << shouldBeVisible
+		 << " visible: " << visible << " channelsInGroup: " << channelsInGroup.size();
+
+	if (!shouldBeVisible) {
+		return;
+	}
+
+	if (channelsInGroup == m_currentGroup) {
+		return;
+	}
+
+	m_currentGroup = channelsInGroup;
+
+	if (m_currentGroupMenu) {
+		ui->groupWidgetLayout->removeWidget(m_currentGroupMenu);
+		m_currentGroupMenu->deleteLater();
+		m_currentGroupMenu = nullptr;
+	}
+
+	m_currentGroupMenu = new BaseMenu(ui->groupWidget);
+	ui->groupWidgetLayout->addWidget(m_currentGroupMenu);
+
+	connect(m_currentGroupMenu, &BaseMenu::itemMovedFromTo, [=](short from, short to){
+		m_plot.positionInGroupChanged(m_selectedChannel, from, to);
+	});
+
+	for (int i = 0; i < channelsInGroup.size(); ++i) {
+		QString name = m_plotCurves[channelsInGroup[i]]->getName();
+		LogicGroupItem *item = new LogicGroupItem(name, m_currentGroupMenu);
+		connect(m_plotCurves[channelsInGroup[i]], &GenericLogicPlotCurve::nameChanged,
+				item, &LogicGroupItem::setName);
+		connect(item, &LogicGroupItem::deleteBtnClicked, [=](){
+			bool groupDeleted = false;
+			m_plot.removeFromGroup(m_selectedChannel, item->position(), groupDeleted);
+
+			if (m_selectedChannel == m_currentGroup[item->position()] && !groupDeleted) {
+				ui->groupWidget->setVisible(false);
+			}
+
+			m_currentGroup.removeAt(item->position());
+			if (groupDeleted) {
+				ui->groupWidget->setVisible(false);
+				m_currentGroup.clear();
+				ui->groupWidgetLayout->removeWidget(m_currentGroupMenu);
+				m_currentGroupMenu->deleteLater();
+				m_currentGroupMenu = nullptr;
+			}
+		});
+		m_currentGroupMenu->insertMenuItem(item);
+	}
+
+	// TODO: fix hardcoded value
+	m_currentGroupMenu->setMaximumHeight(channelsInGroup.size() * 27);
+}
+
+void LogicAnalyzer::setupTriggerMenu()
+{
+	connect(ui->btnTriggerMode, &CustomSwitch::toggled, [=](bool toggled){
+		qDebug() << "Trigger mode: " << (toggled ? "auto" : "normal");
+	});
+
+	ui->triggerLogicComboBox->addItem("OR");
+	ui->triggerLogicComboBox->addItem("AND");
+
+	connect(ui->triggerLogicComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index){
+		m_m2kDigital->getTrigger()->setDigitalMode(static_cast<libm2k::digital::DIO_TRIGGER_MODE>(index));
+	});
+
+	ui->externalTriggerSourceComboBox->addItem("External Trigger In");
+	ui->externalTriggerSourceComboBox->addItem("Oscilloscope");
+
+	connect(ui->externalTriggerSourceComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index){
+		m_m2kDigital->getTrigger()->setDigitalSource(static_cast<M2K_TRIGGER_SOURCE_DIGITAL>(index));
+	});
+
+	connect(ui->externalTriggerConditionComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index) {
+		m_m2kDigital->getTrigger()->setDigitalExternalCondition(
+								static_cast<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>((index + 5) % 6));
+	});
+
+	QSignalBlocker blockerExternalTriggerConditionComboBox(ui->externalTriggerConditionComboBox);
+	const int condition = static_cast<int>(
+				m_m2kDigital->getTrigger()->getDigitalExternalCondition());
+	ui->externalTriggerConditionComboBox->setCurrentIndex((condition + 1) % 6);
+
+//	m_m2kDigital->getTrigger()->setDigitalMode();
+
 }

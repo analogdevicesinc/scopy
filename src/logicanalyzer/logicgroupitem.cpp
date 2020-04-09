@@ -3,6 +3,7 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QPushButton>
+#include <QDebug>
 
 #include "basemenu.h"
 
@@ -24,6 +25,7 @@ void LogicGroupItem::setName(const QString &name)
 {
 	if (m_nameLabel->text() != name) {
 		m_nameLabel->setText(name);
+		qDebug() << "Changing name to: " << name;
 	}
 }
 

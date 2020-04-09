@@ -34,6 +34,7 @@ class CursorsSettings;
 namespace adiscope {
 
 class Filter;
+class BaseMenu;
 
 namespace logic {
 
@@ -86,6 +87,9 @@ private:
 
 	void setupDecoders();
 	void updateStackDecoderButton();
+	void updateChannelGroupWidget(bool visible);
+
+	void setupTriggerMenu();
 
 private:
 	// TODO: consisten naming (m_ui, m_crUi)
@@ -129,6 +133,9 @@ private:
 
 	MouseWheelWidgetGuard *m_wheelEventGuard;
 	QWidget *m_decoderMenu;
+
+	QVector<int> m_currentGroup;
+	BaseMenu *m_currentGroupMenu;
 
 };
 } // namespace logic

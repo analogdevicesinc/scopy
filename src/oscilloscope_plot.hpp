@@ -172,7 +172,7 @@ namespace adiscope {
 		void beginGroupSelection();
 		bool endGroupSelection();    // TODO: toggle group selection
 		QVector<int> getGroupOfChannel(int chnIdx);
-		void removeFromGroup(int chnIdx, bool &didGroupVanish);
+		void removeFromGroup(int chnIdx, int removedChnIdx, bool &didGroupVanish);
 		void positionInGroupChanged(int chnIdx, int from, int to);
 
 	protected:

@@ -3,13 +3,16 @@
 
 #include <qwt_plot_curve.h>
 
+#include <QObject>
+
 enum class LogicPlotCurveType : int {
 	Data = 0,
 	Annotations = 1,
 };
 
-class GenericLogicPlotCurve : public QwtPlotCurve
+class GenericLogicPlotCurve : public QObject, public QwtPlotCurve
 {
+	Q_OBJECT
 public:
 	GenericLogicPlotCurve(const QString &name = {}, LogicPlotCurveType type = LogicPlotCurveType::Data,
 			      double pixelOffset = 0.0, double traceHeight = 0.0, double sampleRate = 0.0,
@@ -35,6 +38,9 @@ public:
 	// own behaviour for these methods
 	virtual void dataAvailable(uint64_t from, uint64_t to) {}
 	virtual void reset() {}
+
+Q_SIGNALS:
+	void nameChanged(QString);
 
 protected:
 	uint64_t fromTimeToSample(double time) const;

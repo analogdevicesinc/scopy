@@ -4,6 +4,7 @@
 GenericLogicPlotCurve::GenericLogicPlotCurve(const QString &name, LogicPlotCurveType type, double pixelOffset,
 					     double traceHeight, double sampleRate,
 					     double timeTriggerOffset, uint64_t bufferSize):
+	QObject(),
 	QwtPlotCurve(),
 	m_name(name),
 	m_pixelOffset(pixelOffset),
@@ -54,6 +55,7 @@ void GenericLogicPlotCurve::setName(const QString &name)
 {
 	if (m_name != name) {
 		m_name = name;
+		Q_EMIT nameChanged(name);
 	}
 }
 
