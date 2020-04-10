@@ -74,8 +74,27 @@ void LogicDataCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap,
 	QElapsedTimer tt;
 	tt.start();
 
+
+	QwtPointMapper mapper;
+	mapper.setFlag( QwtPointMapper::RoundPoints, QwtPainter::roundingAlignment( painter ) );
+	mapper.setBoundingRect(canvasRect);
+
+	QVector<QPointF> displayedData;
+
     // No data to plot
     if (!m_edges.size()) {
+	    if (m_startSample != m_endSample) {
+		const bool logicLevel = (m_logic->getData()[m_startSample] & (1 << m_bit)) >> m_bit;
+		displayedData += QPointF(fromSampleToTime(m_startSample), logicLevel * m_traceHeight + m_pixelOffset);
+		displayedData += QPointF(fromSampleToTime(m_endSample), logicLevel * m_traceHeight + m_pixelOffset);
+
+		QwtPointSeriesData *d = new QwtPointSeriesData(displayedData);
+		QPolygonF polyline = mapper.toPolygonF(xMap, yMap, d, 0, displayedData.size() - 1);
+		QwtPainter::drawPolyline(painter, polyline);
+
+		delete d;
+
+	    }
         return;
     }
 
@@ -85,16 +104,11 @@ void LogicDataCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap,
 //    qDebug() << "Subsampled edges: " << edges.size();
 
     if (!edges.size()) {
+	    qDebug() << "NO EDGE FOR CURVE: " << getName();
         return;
     }
 
 //    qDebug() << "Drawing: " << edges.size() << " edges!";
-
-    QwtPointMapper mapper;
-    mapper.setFlag( QwtPointMapper::RoundPoints, QwtPainter::roundingAlignment( painter ) );
-    mapper.setBoundingRect(canvasRect);
-
-    QVector<QPointF> displayedData;
 
     if (edges.front().first > 0) {
 	displayedData += QPointF(fromSampleToTime(0), edges.front().second * m_traceHeight + m_pixelOffset);
