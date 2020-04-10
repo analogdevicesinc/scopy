@@ -53,6 +53,7 @@ LogicAnalyzer::LogicAnalyzer(iio_context *ctx, adiscope::Filter *filt,
 	m_bufferSize(1),
 	m_m2kContext(m2kOpen(ctx, "")),
 	m_m2kDigital(m_m2kContext->getDigital()),
+	m_nbChannels(m_m2kDigital->getNbChannelsIn()),
 	m_buffer(nullptr),
 	m_horizOffset(0.0),
 	m_timeTriggerOffset(0.0),
@@ -65,7 +66,10 @@ LogicAnalyzer::LogicAnalyzer(iio_context *ctx, adiscope::Filter *filt,
 	m_wheelEventGuard(nullptr),
 	m_decoderMenu(nullptr),
 	m_lastCapturedSample(0),
-	m_currentGroupMenu(nullptr)
+	m_currentGroupMenu(nullptr),
+	m_autoMode(false),
+	m_timer(new QTimer(this)),
+	m_timerTimeout(100)
 {
 	qDebug() << m_m2kDigital << " " << m_m2kContext;
 
@@ -79,7 +83,7 @@ LogicAnalyzer::LogicAnalyzer(iio_context *ctx, adiscope::Filter *filt,
 
 	// TODO: get number of channels from libm2k;
 
-	for (uint8_t i = 0; i < m_m2kDigital->getNbChannelsIn(); ++i) {
+	for (uint8_t i = 0; i < m_nbChannels; ++i) {
 		QCheckBox *channelBox = new QCheckBox("DIO " + QString::number(i));
 		ui->channelEnumeratorLayout->addWidget(channelBox, i % 8, i / 8);
 
@@ -176,7 +180,7 @@ void LogicAnalyzer::on_btnChannelSettings_toggled(bool checked)
 		ui->nameLineEdit->setText(m_plot.getChannelName(m_selectedChannel));
 		ui->traceHeightLineEdit->setText(QString::number(
 							 m_plotCurves[m_selectedChannel]->getTraceHeight()));
-		if (m_selectedChannel < m_m2kDigital->getNbChannelsIn()) {
+		if (m_selectedChannel < m_nbChannels) {
 			int condition = static_cast<int>(
 						m_m2kDigital->getTrigger()->getDigitalCondition(m_selectedChannel));
 			ui->triggerComboBox->setCurrentIndex((condition + 1) % 6);
@@ -281,6 +285,8 @@ void LogicAnalyzer::onSampleRateValueChanged(double value)
 
 	m_plot.setHorizUnitsPerDiv(1.0 / m_sampleRate * m_bufferSize / 16.0);
 
+	m_timerTimeout = 1.0 / m_sampleRate * m_bufferSize * 1000.0;
+
 	m_plot.cancelZoom();
 	m_plot.zoomBaseUpdate();
 	m_plot.replot();
@@ -311,6 +317,7 @@ void LogicAnalyzer::onBufferSizeChanged(double value)
 	}
 
 	m_plot.setHorizUnitsPerDiv(1.0 / m_sampleRate * m_bufferSize / 16.0);
+	m_timerTimeout = 1.0 / m_sampleRate * m_bufferSize * 1000.0;
 
 	m_plot.cancelZoom();
 	m_plot.zoomBaseUpdate();
@@ -375,7 +382,7 @@ void LogicAnalyzer::channelSelectedChanged(int chIdx, bool selected)
 
 		updateChannelGroupWidget(true);
 
-		if (m_selectedChannel < m_m2kDigital->getNbChannelsIn()) {
+		if (m_selectedChannel < m_nbChannels) {
 			ui->triggerComboBox->setVisible(true);
 			ui->labelTrigger->setVisible(true);
 			int condition = static_cast<int>(
@@ -626,13 +633,13 @@ void LogicAnalyzer::connectSignalsAndSlots()
 	connect(ui->nameLineEdit, &QLineEdit::textChanged, [=](const QString &text){
 		m_plot.setChannelName(text, m_selectedChannel);
 		m_plotCurves[m_selectedChannel]->setName(text);
-		if (m_selectedChannel < m_m2kDigital->getNbChannelsIn()) {
+		if (m_selectedChannel < m_nbChannels) {
 			QWidget *widgetInLayout = ui->channelEnumeratorLayout->itemAtPosition(m_selectedChannel % 8,
 								    m_selectedChannel / 8)->widget();
 			auto channelBox = dynamic_cast<QCheckBox *>(widgetInLayout);
 			channelBox->setText(text);
 		} else {
-			const int selectedDecoder = m_selectedChannel - m_m2kDigital->getNbChannelsIn();
+			const int selectedDecoder = m_selectedChannel - m_nbChannels;
 			QWidget *widgetInLayout = ui->decoderEnumeratorLayout->itemAtPosition(selectedDecoder / 2,
 								    selectedDecoder % 2)->widget();
 			auto decoderBox = dynamic_cast<QCheckBox *>(widgetInLayout);
@@ -661,7 +668,7 @@ void LogicAnalyzer::connectSignalsAndSlots()
 	});
 
 	connect(ui->stackDecoderComboBox, &QComboBox::currentTextChanged, [=](const QString &text) {
-		if (m_selectedChannel < m_m2kDigital->getNbChannelsIn()) {
+		if (m_selectedChannel < m_nbChannels) {
 			return;
 		}
 
@@ -860,14 +867,8 @@ void LogicAnalyzer::startStop(bool start)
 
 		m_m2kDigital->setSampleRateIn(sampleRate);
 
-//		for (int i = 0; i < 16; ++i) {
-		// TODO: move in trigger menu
-		m_m2kDigital->getTrigger()->setDigitalCondition(0, M2K_TRIGGER_CONDITION_DIGITAL::FALLING_EDGE_DIGITAL);
-//		}
+		m_m2kDigital->getTrigger()->setDigitalStreamingFlag(!oneShotOrStream);
 
-		qDebug() << m_timePositionButton->value();
-
-//		m_m2kDigital->getTrigger()->setDigitalDelay(m_timePositionButton->value());
 		for (int i = 0; i < m_plotCurves.size(); ++i) {
 			QwtPlotCurve *curve = m_plot.getDigitalPlotCurve(i);
 			GenericLogicPlotCurve *logic_curve = dynamic_cast<GenericLogicPlotCurve *>(curve);
@@ -879,6 +880,10 @@ void LogicAnalyzer::startStop(bool start)
 		}
 
 		m_lastCapturedSample = 0;
+
+		if (m_autoMode) {
+			m_timer->start(m_timerTimeout);
+		}
 
 		m_captureThread = new std::thread([=](){
 
@@ -934,11 +939,11 @@ void LogicAnalyzer::startStop(bool start)
 				} while (totalSamples);
 			}
 
+			m_started = false;
 
-			if (m_stopRequested) {
-				return;
-			}
-
+			QMetaObject::invokeMethod(this,
+						  "restoreTriggerState",
+						  Qt::DirectConnection);
 
 			//
 			QMetaObject::invokeMethod(ui->runSingleWidget,
@@ -958,6 +963,7 @@ void LogicAnalyzer::startStop(bool start)
 			m_captureThread->join();
 			delete m_captureThread;
 			m_captureThread = nullptr;
+			restoreTriggerState();
 		}
 	}
 
@@ -1052,8 +1058,8 @@ void LogicAnalyzer::setupDecoders()
 		ui->addDecoderComboBox->setCurrentIndex(0);
 
 		connect(decoderBox, &QCheckBox::toggled, [=](bool toggled){
-			m_plot.enableDigitalPlotCurve(m_m2kDigital->getNbChannelsIn() + itemsInLayout, toggled);
-			m_plot.setOffsetWidgetVisible(m_m2kDigital->getNbChannelsIn() + itemsInLayout, toggled);
+			m_plot.enableDigitalPlotCurve(m_nbChannels + itemsInLayout, toggled);
+			m_plot.setOffsetWidgetVisible(m_nbChannels + itemsInLayout, toggled);
 			m_plot.replot();
 		});
 
@@ -1078,9 +1084,7 @@ void LogicAnalyzer::updateStackDecoderButton()
 {
 	qDebug() << "updateStackDecoderButton called!";
 
-	const int nrChannels = m_m2kDigital->getNbChannelsIn();
-
-	if (m_selectedChannel < nrChannels) {
+	if (m_selectedChannel < m_nbChannels) {
 		ui->stackDecoderWidget->setVisible(false);
 		return;
 	}
@@ -1200,8 +1204,23 @@ void LogicAnalyzer::updateChannelGroupWidget(bool visible)
 
 void LogicAnalyzer::setupTriggerMenu()
 {
+	/*
+	 * TODO: explain some things maybe
+	 *
+	 *
+	 *
+	 *
+	 * */
+
+
 	connect(ui->btnTriggerMode, &CustomSwitch::toggled, [=](bool toggled){
-		qDebug() << "Trigger mode: " << (toggled ? "auto" : "normal");
+		m_autoMode = toggled;
+
+		qDebug() << "auto mode: " << m_autoMode << " with timeout: "
+			 << m_timerTimeout << " when logic is started: " << m_started;
+		if (m_autoMode && m_started) {
+			m_timer->start(m_timerTimeout);
+		}
 	});
 
 	ui->triggerLogicComboBox->addItem("OR");
@@ -1216,6 +1235,18 @@ void LogicAnalyzer::setupTriggerMenu()
 
 	connect(ui->externalTriggerSourceComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index){
 		m_m2kDigital->getTrigger()->setDigitalSource(static_cast<M2K_TRIGGER_SOURCE_DIGITAL>(index));
+		if (index) { // oscilloscope
+			/* set external trigger condition to none if the source is
+			* set to oscilloscope (trigger in)
+			* */
+			ui->externalTriggerConditionComboBox->setCurrentIndex(0); // None
+		}
+
+		/*
+		 * Disable the condition combo box if oscilloscope (trigger in) is selected
+		 * and enable it if external trigger in is selected (trigger logic)
+		 * */
+		ui->externalTriggerConditionComboBox->setDisabled(index);
 	});
 
 	connect(ui->externalTriggerConditionComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index) {
@@ -1223,11 +1254,56 @@ void LogicAnalyzer::setupTriggerMenu()
 								static_cast<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>((index + 5) % 6));
 	});
 
+	connect(ui->btnEnableExternalTrigger, &CustomSwitch::toggled, [=](bool on){
+		if (on) {
+			int source = ui->externalTriggerSourceComboBox->currentIndex();
+			int condition = ui->externalTriggerConditionComboBox->currentIndex();
+			m_m2kDigital->getTrigger()->setDigitalSource(static_cast<M2K_TRIGGER_SOURCE_DIGITAL>(source));
+			m_m2kDigital->getTrigger()->setDigitalExternalCondition(
+						static_cast<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>((condition + 5) % 6));
+		} else {
+			m_m2kDigital->getTrigger()->setDigitalSource(M2K_TRIGGER_SOURCE_DIGITAL::SRC_NONE);
+		}
+	});
+
 	QSignalBlocker blockerExternalTriggerConditionComboBox(ui->externalTriggerConditionComboBox);
 	const int condition = static_cast<int>(
 				m_m2kDigital->getTrigger()->getDigitalExternalCondition());
 	ui->externalTriggerConditionComboBox->setCurrentIndex((condition + 1) % 6);
 
-//	m_m2kDigital->getTrigger()->setDigitalMode();
+	QSignalBlocker blockerExternalTriggerSourceComboBox(ui->externalTriggerSourceComboBox);
+	ui->externalTriggerSourceComboBox->setCurrentIndex(0);
+	m_m2kDigital->getTrigger()->setDigitalSource(M2K_TRIGGER_SOURCE_DIGITAL::SRC_NONE);
 
+	m_timer->setSingleShot(true);
+	connect(m_timer, &QTimer::timeout,
+		this, &LogicAnalyzer::saveTriggerState);
+
+}
+
+void LogicAnalyzer::saveTriggerState()
+{
+	// save trigger state and set to no trigger each channel
+	if (m_started) {
+		qDebug() << "#################################Trigger state saved!!!#################################";
+
+		for (int i = 0; i < m_nbChannels; ++i) {
+			m_triggerState.push_back(m_m2kDigital->getTrigger()->getDigitalCondition(i));
+			m_m2kDigital->getTrigger()->setDigitalCondition(i, M2K_TRIGGER_CONDITION_DIGITAL::NO_TRIGGER_DIGITAL);
+		}
+	}
+}
+
+void LogicAnalyzer::restoreTriggerState()
+{
+	// restored saved trigger state
+	if (!m_started && m_triggerState.size()) {
+		qDebug() << "#################################Trigger state restored!!!#################################";
+		for (int i = 0; i < m_nbChannels; ++i) {
+			m_triggerState.push_back(m_m2kDigital->getTrigger()->getDigitalCondition(i));
+			m_m2kDigital->getTrigger()->setDigitalCondition(i, m_triggerState[i]);
+		}
+
+		m_triggerState.clear();
+	}
 }

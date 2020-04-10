@@ -8,6 +8,7 @@
 #include <QList>
 #include <QQueue>
 #include <QScrollBar>
+#include <QTimer>
 
 #include "tool.hpp"
 #include "oscilloscope_plot.hpp"
@@ -20,6 +21,7 @@
 #include <libm2k/m2k.hpp>
 #include <libm2k/contextbuilder.hpp>
 #include <libm2k/digital/m2kdigital.hpp>
+#include <libm2k/enums.hpp>
 
 // TODO
 using namespace libm2k;
@@ -74,6 +76,9 @@ private Q_SLOTS:
 	void on_btnGroupChannels_toggled(bool checked);
 	void channelSelectedChanged(int chIdx, bool selected);
 
+	void saveTriggerState();
+	void restoreTriggerState();
+
 private:
 	void setupUi();
 	void connectSignalsAndSlots();
@@ -112,6 +117,7 @@ private:
 
 	M2k *m_m2kContext;
 	M2kDigital *m_m2kDigital;
+	int m_nbChannels;
 
 	uint16_t *m_buffer;
 	QVector<GenericLogicPlotCurve *> m_plotCurves;
@@ -136,6 +142,11 @@ private:
 
 	QVector<int> m_currentGroup;
 	BaseMenu *m_currentGroupMenu;
+
+	bool m_autoMode;
+	QTimer *m_timer;
+	double m_timerTimeout;
+	QVector<M2K_TRIGGER_CONDITION_DIGITAL> m_triggerState;
 
 };
 } // namespace logic
