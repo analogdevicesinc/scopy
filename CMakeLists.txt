@@ -63,6 +63,25 @@ if (MSVC)
 	add_definitions(-DQWT_DLL)
 endif (MSVC)
 
+find_package(Qt5Widgets REQUIRED)
+find_package(Qt5 COMPONENTS LinguistTools REQUIRED)
+find_package(Qt5Concurrent REQUIRED)
+
+FILE(GLOB TS_FILES ${CMAKE_SOURCE_DIR}/resources/translations/*.ts)
+set_source_files_properties(${TS_FILES} PROPERTIES OUTPUT_LOCATION ${CMAKE_CURRENT_BINARY_DIR})
+
+# Creates translation .ts files from ${CMAKE_SOURCE_DIR}
+#qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
+
+# Generate .qm files from the .ts files
+qt5_add_translation(QM_FILES ${TS_FILES})
+
+configure_file(${CMAKE_SOURCE_DIR}/resources/translations.qrc
+	${CMAKE_BINARY_DIR}/translations.qrc
+	COPYONLY)
+
+qt5_add_resources(TRANSLATION_RESOURCES ${CMAKE_BINARY_DIR}/translations.qrc)
+
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 #set(CMAKE_AUTOUIC ON)  - Can't figure out how to configure it to look under ui/
@@ -101,9 +120,6 @@ else()
 
 endif()
 
-find_package(Qt5Widgets REQUIRED)
-find_package(Qt5 COMPONENTS LinguistTools REQUIRED)
-find_package(Qt5Concurrent REQUIRED)
 find_package(Qwt REQUIRED)
 find_package(Qt5Qml REQUIRED)
 find_package(Qt5Svg REQUIRED)
@@ -265,10 +281,6 @@ set_source_files_properties(${TS_FILES} PROPERTIES OUTPUT_LOCATION ${CMAKE_CURRE
 #qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 
 # Generate .qm files from the .ts files
-qt5_add_translation(QM_FILES ${TS_FILES})
-
-
-
 
 add_executable(${PROJECT_NAME} WIN32 ${OSX_BUNDLE}
 		${SRC_LIST}
@@ -276,8 +288,7 @@ add_executable(${PROJECT_NAME} WIN32 ${OSX_BUNDLE}
 		${m2kscope_RESOURCES}
 		${m2kscope_FORMS_HEADERS}
 		${EXTRA_BUNDLE_FILES}
-		${TS_FILES}
-		${QM_FILES}
+		${TRANSLATION_RESOURCES}
 )
 
 if (WIN32 OR ENABLE_APPLICATION_BUNDLE)
