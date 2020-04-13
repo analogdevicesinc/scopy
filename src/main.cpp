@@ -31,6 +31,7 @@
 #include "config.h"
 #include "tool_launcher.hpp"
 #include "scopyApplication.hpp"
+#include <stdio.h>
 
 
 using namespace adiscope;
@@ -105,32 +106,30 @@ int main(int argc, char **argv)
 
 	QTranslator myappTranslator;
 
+	// TODO: Use Preferences_API to get language key - cannot be done right now
+	// as this involves instantiating Preferences object
 	QSettings pref(Preferences::getPreferenceIniFile(), QSettings::IniFormat);
 	QString language = pref.value(QString("Preferences/language")).toString();
 
-	QString languageFileName;
+	QString languageFileName = ":/translations/";
 	QString osLanguage = QLocale::system().name().split("_")[0];
-	QDir directory(QCoreApplication::applicationDirPath()+"/resources/languages");
 
-	QStringList languages = directory.entryList(QStringList() << "*.qm",QDir::Files);
-	if(language == "auto"){
-		if(languages.contains("scopy_"+osLanguage+".qm")) {
-			languageFileName = QDir(QCoreApplication::applicationDirPath()+"/resources/languages/scopy_"+osLanguage+".qm").path();
-		}
-		else{
-			languageFileName = QDir(QCoreApplication::applicationDirPath()+"/resources/languages/scopy_en.qm").path();
-		}
-	}
-	else if(languages.contains(language+".qm")) {
-		languageFileName=QDir(QCoreApplication::applicationDirPath()+"/resources/languages/"+language+".qm").path();
-	}
-	else { 
+	QDir directory(":/translations");
+	QStringList languages = directory.entryList(QStringList() << "*.qm" << "*.QM", QDir::Files);
+
+	if(languages.contains(language+".qm")) {
+		// use one of the precompiled languages - no .qm extension
+		languageFileName += language+".qm";
+	} else if(language == "auto") {
+		// use auto from precompiled languages using the system locale
+		languageFileName += osLanguage + ".qm";
+	} else {
+		// use language using absolute path
 		languageFileName = language;
 	}
 
 	myappTranslator.load(languageFileName);
 	app.installTranslator(&myappTranslator);
-
 
 	ToolLauncher launcher(prevCrashDump);
 
