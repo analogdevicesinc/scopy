@@ -1570,14 +1570,7 @@ bool CapturePlot::endGroupSelection()
 		const int chIdx = d_offsetHandles.indexOf(handle);
 		QwtPlotCurve *curve = getDigitalPlotCurve(chIdx);
 		GenericLogicPlotCurve *logicCurve = dynamic_cast<GenericLogicPlotCurve *>(curve);
-		const double traceHeight = logicCurve->getTraceHeight();
-		QwtScaleMap yMap = this->canvasMap(QwtAxisId(QwtPlot::yLeft, 0));
-		const QwtInterval y = axisInterval(QwtAxisId(QwtPlot::yLeft, 0));
-		const double min = y.minValue();
-		const double max = y.maxValue();
-		yMap.setScaleInterval(min, max);
-
-		return qAbs(yMap.transform(traceHeight) - yMap.transform(0));
+		return logicCurve->getTraceHeight();
 	};
 
 	// Move channels on top side of the plot
@@ -1738,14 +1731,7 @@ void CapturePlot::handleInGroupChangedPosition(int position)
 		const int chIdx = d_offsetHandles.indexOf(handle);
 		QwtPlotCurve *curve = getDigitalPlotCurve(chIdx);
 		GenericLogicPlotCurve *logicCurve = dynamic_cast<GenericLogicPlotCurve *>(curve);
-		const double traceHeight = logicCurve->getTraceHeight();
-		QwtScaleMap yMap = this->canvasMap(QwtAxisId(QwtPlot::yLeft, 0));
-		const QwtInterval y = axisInterval(QwtAxisId(QwtPlot::yLeft, 0));
-		const double min = y.minValue();
-		const double max = y.maxValue();
-		yMap.setScaleInterval(min, max);
-
-		return qAbs(yMap.transform(traceHeight) - yMap.transform(0));
+		return logicCurve->getTraceHeight();
 	};
 
 	// update position of handles above the moved one

@@ -43,6 +43,10 @@ void LogicDataCurve::dataAvailable(uint64_t from, uint64_t to)
         }
     }
 
+    if (from == to) {
+	    return;
+    }
+
     for (; currentSample < to - 1; ++currentSample) {
         bool transition = (m_data[currentSample] & (1 << m_bit)) ^ (m_data[currentSample + 1] & (1 << m_bit));
         bool high = (m_data[currentSample] & (1 << m_bit)) > (m_data[currentSample + 1] & (1 << m_bit));
@@ -81,16 +85,23 @@ void LogicDataCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap,
 
 	QVector<QPointF> displayedData;
 
+	const double heightInPoints = yMap.invTransform(0) - yMap.invTransform(m_traceHeight);
+
     // No data to plot
     if (!m_edges.size()) {
 	    if (m_startSample != m_endSample) {
 		const bool logicLevel = (m_logic->getData()[m_startSample] & (1 << m_bit)) >> m_bit;
-		displayedData += QPointF(fromSampleToTime(m_startSample), logicLevel * m_traceHeight + m_pixelOffset);
-		displayedData += QPointF(fromSampleToTime(m_endSample), logicLevel * m_traceHeight + m_pixelOffset);
+		displayedData += QPointF(fromSampleToTime(m_startSample), logicLevel * heightInPoints + m_pixelOffset);
+		displayedData += QPointF(fromSampleToTime(m_endSample), logicLevel * heightInPoints + m_pixelOffset);
+
+		painter->save();
+		painter->setPen(QColor(74, 100, 255));
 
 		QwtPointSeriesData *d = new QwtPointSeriesData(displayedData);
 		QPolygonF polyline = mapper.toPolygonF(xMap, yMap, d, 0, displayedData.size() - 1);
 		QwtPainter::drawPolyline(painter, polyline);
+
+		painter->restore();
 
 		delete d;
 
@@ -111,12 +122,12 @@ void LogicDataCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap,
 //    qDebug() << "Drawing: " << edges.size() << " edges!";
 
     if (edges.front().first > 0) {
-	displayedData += QPointF(fromSampleToTime(0), edges.front().second * m_traceHeight + m_pixelOffset);
+	displayedData += QPointF(fromSampleToTime(0), edges.front().second * heightInPoints + m_pixelOffset);
     }
 
     for (const auto & edge : edges) {
-        double y1 = edge.second * m_traceHeight + m_pixelOffset;
-        double y2 = !edge.second * m_traceHeight + m_pixelOffset;
+	double y1 = edge.second * heightInPoints + m_pixelOffset;
+	double y2 = !edge.second * heightInPoints + m_pixelOffset;
 
 	double t1 = fromSampleToTime(edge.first);
 	double t2 = fromSampleToTime(edge.first + 1);
@@ -127,12 +138,17 @@ void LogicDataCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap,
     }
 
     if (edges.back().first + 1 < m_endSample - 1) {
-	displayedData += QPointF(fromSampleToTime(m_endSample - 1), (!edges.back().second) * m_traceHeight + m_pixelOffset);
+	displayedData += QPointF(fromSampleToTime(m_endSample - 1), (!edges.back().second) * heightInPoints + m_pixelOffset);
     }
+
+    painter->save();
+    painter->setPen(QColor(74, 100, 255)); //4a64ff
 
     QwtPointSeriesData *d = new QwtPointSeriesData(displayedData);
     QPolygonF polyline = mapper.toPolygonF(xMap, yMap, d, 0, displayedData.size() - 1);
     QwtPainter::drawPolyline(painter, polyline);
+
+    painter->restore();
 
     delete d;
 
@@ -160,7 +176,7 @@ void LogicDataCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap,
 
     QVector<QPointF> points;
     for (; start <= end; ++start) {
-        double y = ((m_logic->getData()[start] & (1 << m_bit)) >> m_bit) * m_traceHeight + m_pixelOffset;
+	double y = ((m_logic->getData()[start] & (1 << m_bit)) >> m_bit) * heightInPoints + m_pixelOffset;
 	points += QPointF(fromSampleToTime(start), y);
     }
 

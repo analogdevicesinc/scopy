@@ -69,7 +69,7 @@ LogicAnalyzer::LogicAnalyzer(iio_context *ctx, adiscope::Filter *filt,
 	m_currentGroupMenu(nullptr),
 	m_autoMode(false),
 	m_timer(new QTimer(this)),
-	m_timerTimeout(100)
+	m_timerTimeout(1000)
 {
 	qDebug() << m_m2kDigital << " " << m_m2kContext;
 
@@ -92,7 +92,7 @@ LogicAnalyzer::LogicAnalyzer(iio_context *ctx, adiscope::Filter *filt,
 		// 1 for each channel
 		// m_plot.addGenericPlotCurve()
 		LogicDataCurve *curve = new LogicDataCurve(nullptr, i, this);
-		curve->setTraceHeight(1);
+		curve->setTraceHeight(25);
 		m_plot.addDigitalPlotCurve(curve, true);
 
 		// use direct connection we want the processing
@@ -285,7 +285,7 @@ void LogicAnalyzer::onSampleRateValueChanged(double value)
 
 	m_plot.setHorizUnitsPerDiv(1.0 / m_sampleRate * m_bufferSize / 16.0);
 
-	m_timerTimeout = 1.0 / m_sampleRate * m_bufferSize * 1000.0;
+	m_timerTimeout = 1.0 / m_sampleRate * m_bufferSize * 1000.0 + 100;
 
 	m_plot.cancelZoom();
 	m_plot.zoomBaseUpdate();
@@ -317,7 +317,7 @@ void LogicAnalyzer::onBufferSizeChanged(double value)
 	}
 
 	m_plot.setHorizUnitsPerDiv(1.0 / m_sampleRate * m_bufferSize / 16.0);
-	m_timerTimeout = 1.0 / m_sampleRate * m_bufferSize * 1000.0;
+	m_timerTimeout = 1.0 / m_sampleRate * m_bufferSize * 1000.0 + 100;
 
 	m_plot.cancelZoom();
 	m_plot.zoomBaseUpdate();
@@ -660,6 +660,8 @@ void LogicAnalyzer::connectSignalsAndSlots()
 	connect(ui->traceHeightLineEdit, &QLineEdit::editingFinished, [=](){
 		int value = ui->traceHeightLineEdit->text().toInt();
 		m_plotCurves[m_selectedChannel]->setTraceHeight(value);
+		m_plot.replot();
+		m_plot.positionInGroupChanged(m_selectedChannel, 0, 0);
 	});
 
 	connect(ui->triggerComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index) {
@@ -858,6 +860,8 @@ void LogicAnalyzer::startStop(bool start)
 
 		const double sampleRate = m_sampleRateButton->value();
 		const uint64_t bufferSize = m_bufferSizeButton->value();
+		const int bufferSizeAdjusted = static_cast<int>(((bufferSize + 3 ) / 4) * 4);
+		m_bufferSizeButton->setValue(bufferSizeAdjusted);
 
 		const bool oneShotOrStream = ui->btnStreamOneShot->isChecked();
 		qDebug() << "stream one shot is set to: " << oneShotOrStream;
@@ -865,7 +869,8 @@ void LogicAnalyzer::startStop(bool start)
 		const double delay = oneShotOrStream ? m_timePositionButton->value()
 					       : (m_bufferSize / 2.0);
 
-		m_m2kDigital->setSampleRateIn(sampleRate);
+		const double setSampleRate = m_m2kDigital->setSampleRateIn(sampleRate);
+		m_sampleRateButton->setValue(setSampleRate);
 
 		m_m2kDigital->getTrigger()->setDigitalStreamingFlag(!oneShotOrStream);
 
@@ -875,14 +880,28 @@ void LogicAnalyzer::startStop(bool start)
 			logic_curve->reset();
 
 			logic_curve->setSampleRate(sampleRate);
-			logic_curve->setBufferSize(bufferSize);
+			logic_curve->setBufferSize(bufferSizeAdjusted);
 			logic_curve->setTimeTriggerOffset(delay);
 		}
 
 		m_lastCapturedSample = 0;
 
 		if (m_autoMode) {
-			m_timer->start(m_timerTimeout);
+
+			double oneBufferTimeOut = m_timerTimeout;
+
+			if (!oneShotOrStream) {
+				uint64_t chunks = 4;
+				while ((bufferSizeAdjusted >> chunks) > (1 << 19)) {
+					chunks++; // select a small size for the chunks
+					// example: 2^19 samples in each chunk
+				}
+				const uint64_t chunk_size = (bufferSizeAdjusted >> chunks) > 0 ? (bufferSizeAdjusted >> chunks) : 4 ;
+				const uint64_t buffersCount = bufferSizeAdjusted / chunk_size;
+				oneBufferTimeOut /= buffersCount;
+			}
+
+			m_timer->start(oneBufferTimeOut);
 		}
 
 		m_captureThread = new std::thread([=](){
@@ -897,7 +916,7 @@ void LogicAnalyzer::startStop(bool start)
 			if (ui->btnStreamOneShot->isChecked()) {
 				try {
 					const uint16_t * const temp = m_m2kDigital->getSamplesP(bufferSize);
-					memcpy(m_buffer, temp, bufferSize * sizeof(uint16_t));
+					memcpy(m_buffer, temp, bufferSizeAdjusted * sizeof(uint16_t));
 				} catch (std::invalid_argument &e) {
 					qDebug() << e.what();
 				}
@@ -906,14 +925,15 @@ void LogicAnalyzer::startStop(bool start)
 
 			} else {
 				uint64_t chunks = 4;
-				while ((bufferSize >> chunks) > (1 << 19)) {
+				while ((bufferSizeAdjusted >> chunks) > (1 << 19)) {
 					chunks++; // select a small size for the chunks
 					// example: 2^19 samples in each chunk
 				}
-				const uint64_t chunk_size = bufferSize >> chunks;
-				uint64_t totalSamples = bufferSize;
+				const uint64_t chunk_size = (bufferSizeAdjusted >> chunks) > 0 ? (bufferSizeAdjusted >> chunks) : 4 ;
+				uint64_t totalSamples = bufferSizeAdjusted;
 				m_m2kDigital->setKernelBuffersCountIn(64);
 				uint64_t absIndex = 0;
+
 				do {
 					const uint64_t captureSize = std::min(chunk_size, totalSamples);
 					try {
@@ -1031,7 +1051,7 @@ void LogicAnalyzer::setupDecoders()
 		g_slist_free(decoderList);
 
 		AnnotationCurve *curve = new AnnotationCurve(this, initialDecoder);
-		curve->setTraceHeight(15);
+		curve->setTraceHeight(25);
 		m_plot.addDigitalPlotCurve(curve, true);
 
 		// use direct connection we want the processing
@@ -1216,10 +1236,25 @@ void LogicAnalyzer::setupTriggerMenu()
 	connect(ui->btnTriggerMode, &CustomSwitch::toggled, [=](bool toggled){
 		m_autoMode = toggled;
 
-		qDebug() << "auto mode: " << m_autoMode << " with timeout: "
-			 << m_timerTimeout << " when logic is started: " << m_started;
 		if (m_autoMode && m_started) {
-			m_timer->start(m_timerTimeout);
+
+			double oneBufferTimeOut = m_timerTimeout;
+
+			if (!ui->btnStreamOneShot->isChecked()) {
+				uint64_t chunks = 4;
+				while ((m_bufferSize >> chunks) > (1 << 19)) {
+					chunks++; // select a small size for the chunks
+					// example: 2^19 samples in each chunk
+				}
+				const uint64_t chunk_size = (m_bufferSize >> chunks) > 0 ? (m_bufferSize >> chunks) : 4 ;
+				const uint64_t buffersCount = m_bufferSize / chunk_size;
+				oneBufferTimeOut /= buffersCount;
+			}
+
+			m_timer->start(oneBufferTimeOut);
+
+			qDebug() << "auto mode: " << m_autoMode << " with timeout: "
+				 << oneBufferTimeOut << " when logic is started: " << m_started;
 		}
 	});
 
@@ -1291,6 +1326,10 @@ void LogicAnalyzer::saveTriggerState()
 			m_triggerState.push_back(m_m2kDigital->getTrigger()->getDigitalCondition(i));
 			m_m2kDigital->getTrigger()->setDigitalCondition(i, M2K_TRIGGER_CONDITION_DIGITAL::NO_TRIGGER_DIGITAL);
 		}
+
+		auto externalTriggerCondition = m_m2kDigital->getTrigger()->getDigitalExternalCondition();
+		m_triggerState.push_back(externalTriggerCondition);
+		m_m2kDigital->getTrigger()->setDigitalExternalCondition(M2K_TRIGGER_CONDITION_DIGITAL::NO_TRIGGER_DIGITAL);
 	}
 }
 
@@ -1303,6 +1342,8 @@ void LogicAnalyzer::restoreTriggerState()
 			m_triggerState.push_back(m_m2kDigital->getTrigger()->getDigitalCondition(i));
 			m_m2kDigital->getTrigger()->setDigitalCondition(i, m_triggerState[i]);
 		}
+
+		m_m2kDigital->getTrigger()->setDigitalExternalCondition(m_triggerState.back());
 
 		m_triggerState.clear();
 	}
