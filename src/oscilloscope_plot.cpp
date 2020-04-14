@@ -1404,6 +1404,26 @@ void CapturePlot::setChannelName(const QString &name, int chIdx) {
 	d_offsetHandles.at(chIdx)->setName(name);
 }
 
+void CapturePlot::removeDigitalPlotCurve(QwtPlotCurve *curve)
+{
+	for (int i = 0; i < d_offsetHandles.size(); ++i) {
+		if (curve == getDigitalPlotCurve(i)) {
+			auto hdl = d_offsetHandles.at(i);
+			qDebug() << "Removed id: " << i;
+			for (QList<RoundedHandleV *> group : d_groupHandles) {
+				group.removeOne(hdl);
+				group.first()->triggerMove();
+			}
+			removeOffsetWidgets(i);
+			break;
+		}
+	}
+
+	TimeDomainDisplayPlot::removeDigitalPlotCurve(curve);
+
+	replot();
+}
+
 void CapturePlot::onDigitalChannelAdded(int chnIdx)
 {
 	qDebug() << "Digital Channel Added!";

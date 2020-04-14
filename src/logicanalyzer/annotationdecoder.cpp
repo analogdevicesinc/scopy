@@ -68,6 +68,24 @@ AnnotationDecoder::AnnotationDecoder(AnnotationCurve *annotationCurve, std::shar
     startDecode();
 }
 
+AnnotationDecoder::~AnnotationDecoder()
+{
+	if (m_srdSession) {
+	    m_decodeCanceled = true;
+	    srd_session_terminate_reset(m_srdSession);
+	    {
+		std::unique_lock<std::mutex> lock(m_newDataMutex);
+		m_newDataCv.notify_one();
+	    }
+
+	    // TODO: set samplerate
+	    for (const std::shared_ptr<logic::Decoder> &dec : m_stack) {
+		dec->apply_all_options();
+	    }
+	}
+	stopDecode();
+}
+
 void AnnotationDecoder::stackDecoder(std::shared_ptr<logic::Decoder> decoder)
 {
     if (m_srdSession) {

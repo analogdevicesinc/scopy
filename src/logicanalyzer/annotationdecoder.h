@@ -22,6 +22,7 @@ class AnnotationDecoder
 public:
     AnnotationDecoder(AnnotationCurve *annotationCurve, std::shared_ptr<logic::Decoder> initialDecoder,
 	logic::LogicAnalyzer *logic);
+    ~AnnotationDecoder();
 
     void stackDecoder(std::shared_ptr<logic::Decoder> decoder);
 

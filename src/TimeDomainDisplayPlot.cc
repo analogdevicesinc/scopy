@@ -1065,6 +1065,12 @@ void TimeDomainDisplayPlot::addDigitalPlotCurve(QwtPlotCurve *curve, bool visibl
 	Q_EMIT digitalPlotCurveAdded(d_logic_curves.size() - 1);
 }
 
+void TimeDomainDisplayPlot::removeDigitalPlotCurve(QwtPlotCurve *curve)
+{
+	curve->detach();
+	d_logic_curves.erase(std::find(d_logic_curves.begin(), d_logic_curves.end(), curve));
+}
+
 void TimeDomainDisplayPlot::enableDigitalPlotCurve(int curveId, bool enable)
 {
 	if (curveId < 0 || curveId > d_logic_curves.size() - 1) {

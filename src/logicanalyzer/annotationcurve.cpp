@@ -33,6 +33,11 @@ AnnotationCurve::AnnotationCurve(logic::LogicAnalyzer *logic, std::shared_ptr<lo
     m_annotationDecoder = new AnnotationDecoder(this, initialDecoder, logic);
 }
 
+AnnotationCurve::~AnnotationCurve()
+{
+	delete m_annotationDecoder;
+}
+
 void AnnotationCurve::annotationCallback(srd_proto_data *pdata, void *annotationCurve)
 {
     if (!pdata) {

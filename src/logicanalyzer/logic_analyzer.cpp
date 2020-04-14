@@ -1061,8 +1061,8 @@ void LogicAnalyzer::setupDecoders()
 
 		// use direct connection we want the processing
 		// of the available data to be done in the capture thread
-		connect(this, &LogicAnalyzer::dataAvailable, this,
-			[=](uint64_t from, uint64_t to){
+		auto connectionHandle = connect(this, &LogicAnalyzer::dataAvailable,
+			this, [=](uint64_t from, uint64_t to){
 			curve->dataAvailable(from, to);
 		}, Qt::DirectConnection);
 
@@ -1074,10 +1074,35 @@ void LogicAnalyzer::setupDecoders()
 
 		m_plotCurves.push_back(curve);
 
+		QSpacerItem *spacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+		QWidget *decoderMenuItem = new QWidget();
+		QHBoxLayout *layout = new QHBoxLayout(decoderMenuItem);
 		QCheckBox *decoderBox = new QCheckBox(decoder);
+		decoderBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+		layout->addWidget(decoderBox);
+
+		QPushButton *deleteBtn = new QPushButton(this);
+		deleteBtn->setFlat(true);
+		deleteBtn->setIcon(QIcon(":/icons/close.svg"));
+		deleteBtn->setMaximumSize(QSize(16, 16));
+
+		layout->addWidget(deleteBtn);
+		layout->insertSpacerItem(2, spacer);
+
+		connect(deleteBtn, &QPushButton::clicked, [=](){
+			ui->decoderEnumeratorLayout->removeWidget(decoderMenuItem);
+			decoderMenuItem->deleteLater();
+
+			m_plot.removeDigitalPlotCurve(curve);
+			m_plotCurves.removeOne(curve);
+
+			disconnect(connectionHandle);
+
+			delete curve;
+		});
 
 		const int itemsInLayout = ui->decoderEnumeratorLayout->count();
-		ui->decoderEnumeratorLayout->addWidget(decoderBox, itemsInLayout / 2,
+		ui->decoderEnumeratorLayout->addWidget(decoderMenuItem, itemsInLayout / 2,
 							itemsInLayout % 2);
 
 		ui->addDecoderComboBox->setCurrentIndex(0);
@@ -1325,8 +1350,6 @@ void LogicAnalyzer::saveTriggerState()
 {
 	// save trigger state and set to no trigger each channel
 	if (m_started) {
-		qDebug() << "#################################Trigger state saved!!!#################################";
-
 		for (int i = 0; i < m_nbChannels; ++i) {
 			m_triggerState.push_back(m_m2kDigital->getTrigger()->getDigitalCondition(i));
 			m_m2kDigital->getTrigger()->setDigitalCondition(i, M2K_TRIGGER_CONDITION_DIGITAL::NO_TRIGGER_DIGITAL);
@@ -1342,7 +1365,6 @@ void LogicAnalyzer::restoreTriggerState()
 {
 	// restored saved trigger state
 	if (!m_started && m_triggerState.size()) {
-		qDebug() << "#################################Trigger state restored!!!#################################";
 		for (int i = 0; i < m_nbChannels; ++i) {
 			m_triggerState.push_back(m_m2kDigital->getTrigger()->getDigitalCondition(i));
 			m_m2kDigital->getTrigger()->setDigitalCondition(i, m_triggerState[i]);

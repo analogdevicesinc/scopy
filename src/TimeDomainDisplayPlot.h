@@ -151,6 +151,7 @@ public:
   void realignReferenceWaveforms(double timebase, double timeposition);
 
   void addDigitalPlotCurve(QwtPlotCurve *curve, bool visible);
+  void removeDigitalPlotCurve(QwtPlotCurve *curve);
   void enableDigitalPlotCurve(int curveId, bool enable);
   QwtPlotCurve *getDigitalPlotCurve(int curveId);
 Q_SIGNALS:
