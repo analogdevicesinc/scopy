@@ -28,6 +28,8 @@
 #include <QHBoxLayout>
 #include <QLabel>
 
+#include <algorithm>
+
 #define ERROR_VALUE -10000000
 
 using namespace adiscope;
@@ -1054,32 +1056,6 @@ void CapturePlot::enableLabels(bool enabled)
 void CapturePlot::enableXaxisLabels()
 {
     enableAxis(QwtPlot::xBottom, true);
-
-//	setUsingLeftAxisScales(true);
-//	enableLabels(true);
-//	enableAxisLabels(true);
-
-//    d_bottomHandlesArea->setLeftPadding(0);
-//    d_topHandlesArea->setLeftPadding(90 + axisWidget(QwtAxisId(QwtPlot::yLeft, d_activeVertAxis))->width());
-//    QwtScaleWidget *scaleWidget = axisWidget(QwtPlot::xBottom);
-//    const int fmw = QFontMetrics(scaleWidget->font()).width("-XX.XX XX");
-//    const int fmh = QFontMetrics(scaleWidget->font()).height();
-//    d_bottomHandlesArea->setRightPadding(50 + fmw/2 + d_bonusWidth);
-//    d_topHandlesArea->setRightPadding(50 + fmw/2 + d_bonusWidth);
-//    d_rightHandlesArea->setTopPadding(50 + 6);
-//    d_rightHandlesArea->setBottomPadding(50 + fmh);
-//    QMargins margins = d_topWidget->layout()->contentsMargins();
-//    margins.setLeft(d_leftHandlesArea->minimumWidth()+100);
-//    d_topWidget->layout()->setContentsMargins(margins);
-
-////    QwtScaleWidget *yScaleWidget = axisWidget(QwtPlot::yLeft);
-////    yScaleWidget->scaleDraw()->setMinimumExtent(100);
-
-//    d_hCursorHandle1->updatePosition();
-//    d_hCursorHandle2->updatePosition();
-
-//    d_vCursorHandle1->updatePosition();
-//    d_vCursorHandle2->updatePosition();
 }
 
 void CapturePlot::enableAxisLabels(bool enabled)
@@ -1564,7 +1540,70 @@ bool CapturePlot::endGroupSelection()
 		return false;
 	}
 
-	QList<RoundedHandleV *> group = d_groupHandles.back();
+	for (auto & grp : d_groupHandles) {
+		for (RoundedHandleV *hdl : grp) {
+			disconnect(hdl, &RoundedHandleV::positionChanged,
+				this, &CapturePlot::handleInGroupChangedPosition);
+		}
+	}
+
+	// merge new group if selected channels already have a group
+	QList<RoundedHandleV *> group = d_groupHandles.takeLast();
+	QList<RoundedHandleV *> updatedGroup;
+	for (RoundedHandleV *hdl : group) {
+		auto hdlGroup = std::find_if(d_groupHandles.begin(), d_groupHandles.end(),
+					     [&hdl](const QList<RoundedHandleV*> &group){
+			return group.contains(hdl);
+		});
+
+		if (hdlGroup == d_groupHandles.end()) {
+			if (!updatedGroup.contains(hdl)) {
+				updatedGroup.push_back(hdl);
+			}
+			continue;
+		}
+
+		for (const auto &grpHdl : *hdlGroup) {
+			if (!updatedGroup.contains(grpHdl)) {
+				updatedGroup.push_back(grpHdl);
+			}
+		}
+
+		d_groupHandles.removeOne(*hdlGroup);
+	}
+	group = updatedGroup;
+	d_groupHandles.push_back(group);
+
+
+//	bool merged = false;
+//	do {
+//		merged = false;
+//		for (const auto & handle : group) {
+//			for (auto & otherGroup : d_groupHandles) {
+//				if (group == otherGroup) {
+//					continue;
+//				}
+//				if (otherGroup.contains(handle)) {
+//					for (const auto &hdl : group) {
+//						if (!otherGroup.contains(hdl)) {
+//							otherGroup.push_back(hdl);
+//						}
+//					}
+
+//					merged = true;
+//					break;
+//				}
+//			}
+//			if (merged) {
+//				break;
+//			}
+//		}
+//		if (merged) {
+//			d_groupHandles.pop_back();
+//			group = d_groupHandles.back();
+//		}
+
+//	} while (merged);
 
 	auto getTraceHeightInPixelsForHandle = [=](RoundedHandleV *handle) {
 		const int chIdx = d_offsetHandles.indexOf(handle);
@@ -1573,37 +1612,61 @@ bool CapturePlot::endGroupSelection()
 		return logicCurve->getTraceHeight();
 	};
 
-	// Move channels on top side of the plot
-	int currentPos = 5;
-	for (RoundedHandleV *hdl : group) {
-		currentPos += getTraceHeightInPixelsForHandle(hdl);
-		hdl->setPosition(currentPos);
-		hdl->setSelected(false);
-		currentPos += 5;
+	const bool newGroup = (d_groupHandles.size() != d_groupMarkers.size());
 
-		// Bind together
-		connect(hdl, &RoundedHandleV::positionChanged,
-			this, &CapturePlot::handleInGroupChangedPosition);
+
+	if (newGroup) {
+		// Move channels on top side of the plot
+		int currentPos = 5;
+		for (RoundedHandleV *hdl : group) {
+			currentPos += getTraceHeightInPixelsForHandle(hdl);
+			hdl->setPosition(currentPos);
+			currentPos += 5;
+
+		}
 	}
 
-	// Add group marker
-	QwtScaleMap yMap = this->canvasMap(QwtAxisId(QwtPlot::yLeft, 0));
-	const QwtInterval y = axisInterval(QwtAxisId(QwtPlot::yLeft, 0));
-	const double min = y.minValue();
-	const double max = y.maxValue();
-	yMap.setScaleInterval(min, max);
-	double y1 = yMap.invTransform(group.front()->position() -
-					    getTraceHeightInPixelsForHandle(group.front()) - 5);
-	double y2 = yMap.invTransform(group.back()->position() + 5);
+	for (auto & grp : d_groupHandles) {
+		for (RoundedHandleV *hdl : grp) {
+			connect(hdl, &RoundedHandleV::positionChanged,
+				this, &CapturePlot::handleInGroupChangedPosition);
+			hdl->setSelected(false);
+		}
+	}
 
-	QwtPlotZoneItem *groupMarker = new QwtPlotZoneItem();
-	d_groupMarkers.push_back(groupMarker);
-	groupMarker->setAxes(QwtPlot::xBottom, QwtAxisId(QwtPlot::yLeft, 0));
-	groupMarker->setPen(QColor(74, 100, 255, 30), 2.0);
-	groupMarker->setBrush(QBrush(QColor(74, 100, 255, 10)));
-	groupMarker->setInterval(y2, y1);
-	groupMarker->setOrientation(Qt::Horizontal);
-	groupMarker->attach(this);
+	for (QwtPlotZoneItem *groupMarker : d_groupMarkers) {
+		groupMarker->detach();
+		delete groupMarker;
+	}
+
+	d_groupMarkers.clear();
+
+	for (const auto &group : d_groupHandles) {
+		// Add group marker
+		QwtScaleMap yMap = this->canvasMap(QwtAxisId(QwtPlot::yLeft, 0));
+		const QwtInterval y = axisInterval(QwtAxisId(QwtPlot::yLeft, 0));
+		const double min = y.minValue();
+		const double max = y.maxValue();
+		yMap.setScaleInterval(min, max);
+		double y1 = yMap.invTransform(group.front()->position() -
+						    getTraceHeightInPixelsForHandle(group.front()) - 5);
+		double y2 = yMap.invTransform(group.back()->position() + 5);
+
+		QwtPlotZoneItem *groupMarker = new QwtPlotZoneItem();
+		d_groupMarkers.push_back(groupMarker);
+		groupMarker->setAxes(QwtPlot::xBottom, QwtAxisId(QwtPlot::yLeft, 0));
+		groupMarker->setPen(QColor(74, 100, 255, 30), 2.0);
+		groupMarker->setBrush(QBrush(QColor(74, 100, 255, 10)));
+		groupMarker->setInterval(y2, y1);
+		groupMarker->setOrientation(Qt::Horizontal);
+		groupMarker->attach(this);
+	}
+
+	if (!newGroup) {
+		for (const auto &group : d_groupHandles) {
+			group.first()->triggerMove();
+		}
+	}
 
 	return true;
 }
