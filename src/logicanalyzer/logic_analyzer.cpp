@@ -370,6 +370,11 @@ void LogicAnalyzer::channelSelectedChanged(int chIdx, bool selected)
 	QSignalBlocker traceHeightLineEditBlocker(ui->traceHeightLineEdit);
 	QSignalBlocker triggerComboBoxBlocker(ui->triggerComboBox);
 	if (m_selectedChannel != chIdx && selected) {
+
+		if (!ui->btnChannelSettings->isChecked()) {
+			ui->btnChannelSettings->setChecked(true);
+		}
+
 		m_selectedChannel = chIdx;
 		ui->nameLineEdit->setEnabled(true);
 		ui->nameLineEdit->setText(m_plotCurves[m_selectedChannel]->getName());

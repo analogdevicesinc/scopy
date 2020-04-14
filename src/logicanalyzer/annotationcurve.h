@@ -74,15 +74,18 @@ private:
 
     void drawTwoSampleAnnotation(int row, const Annotation &ann, QPainter *painter,
                                  const QwtScaleMap &xMap, const QwtScaleMap &yMap,
-                                 const QRectF &canvasRect, const QwtPointMapper &mapper) const;
+				 const QRectF &canvasRect, const QwtPointMapper &mapper,
+				 const QSizeF &titleSize) const;
 
     void drawOneSampleAnnotation(int row, const Annotation &ann, QPainter *painter,
                                  const QwtScaleMap &xMap, const QwtScaleMap &yMap,
-                                 const QRectF &canvasRect, const QwtPointMapper &mapper) const;
+				 const QRectF &canvasRect, const QwtPointMapper &mapper,
+				 const QSizeF &titleSize) const;
 
     void drawAnnotation(int row, const Annotation &ann, QPainter *painter,
                         const QwtScaleMap &xMap, const QwtScaleMap &yMap,
-                        const QRectF &canvasRect, const QwtPointMapper &mapper) const;
+			const QRectF &canvasRect, const QwtPointMapper &mapper,
+			const QSizeF &titleSize) const;
 
     void drawBlock(int row, uint64_t start, uint64_t end, QPainter *painter,
                    const QwtScaleMap &xMap, const QwtScaleMap &yMap,
