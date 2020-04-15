@@ -418,7 +418,6 @@ void AnnotationDecoder::decodeProc()
         m_newDataQueue.pop();
         lock.unlock(); // unlock to allow new data to enter the queue
 
-
         uint64_t chunkSize = stop - start;
         std::unique_ptr<uint16_t []> chunk(new uint16_t[chunkSize]);
 

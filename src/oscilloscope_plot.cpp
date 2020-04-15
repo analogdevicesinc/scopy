@@ -24,6 +24,7 @@
 #include "plot_line_handle.h"
 
 #include "logicanalyzer/logicdatacurve.h"
+#include "logicanalyzer/annotationcurve.h"
 
 #include <QHBoxLayout>
 #include <QLabel>
@@ -1408,13 +1409,34 @@ void CapturePlot::removeDigitalPlotCurve(QwtPlotCurve *curve)
 {
 	for (int i = 0; i < d_offsetHandles.size(); ++i) {
 		if (curve == getDigitalPlotCurve(i)) {
-			auto hdl = d_offsetHandles.at(i);
-			qDebug() << "Removed id: " << i;
-			for (QList<RoundedHandleV *> group : d_groupHandles) {
-				group.removeOne(hdl);
-				group.first()->triggerMove();
-			}
+
+//			auto hdl = d_offsetHandles.at(i);
+//			qDebug() << "Removed id: " << i;
+//			for (auto &group : d_groupHandles) {
+//				group.removeOne(hdl);
+//				if (!group.isEmpty()) {
+//					group.first()->triggerMove();
+//				}
+//			}
 			removeOffsetWidgets(i);
+
+//			int groupIndx = -1;
+//			for (int i = 0; i < d_groupHandles.size(); ++i) {
+//				if (d_groupHandles[i].size() < 2) {
+//					groupIndx = i;
+//				}
+//			}
+
+//			if (groupIndx != -1) {
+//				d_groupHandles.removeAt(groupIndx);
+//			}
+
+//			if (d_groupMarkers.size() > d_groupHandles.size()){
+//				auto marker = d_groupMarkers.takeLast();
+//				marker->detach();
+//				delete marker;
+//			}
+
 			break;
 		}
 	}
@@ -1594,41 +1616,16 @@ bool CapturePlot::endGroupSelection()
 	group = updatedGroup;
 	d_groupHandles.push_back(group);
 
-
-//	bool merged = false;
-//	do {
-//		merged = false;
-//		for (const auto & handle : group) {
-//			for (auto & otherGroup : d_groupHandles) {
-//				if (group == otherGroup) {
-//					continue;
-//				}
-//				if (otherGroup.contains(handle)) {
-//					for (const auto &hdl : group) {
-//						if (!otherGroup.contains(hdl)) {
-//							otherGroup.push_back(hdl);
-//						}
-//					}
-
-//					merged = true;
-//					break;
-//				}
-//			}
-//			if (merged) {
-//				break;
-//			}
-//		}
-//		if (merged) {
-//			d_groupHandles.pop_back();
-//			group = d_groupHandles.back();
-//		}
-
-//	} while (merged);
-
-	auto getTraceHeightInPixelsForHandle = [=](RoundedHandleV *handle) {
+	auto getTraceHeightInPixelsForHandle = [=](RoundedHandleV *handle, double &bonusHeight) {
 		const int chIdx = d_offsetHandles.indexOf(handle);
 		QwtPlotCurve *curve = getDigitalPlotCurve(chIdx);
 		GenericLogicPlotCurve *logicCurve = dynamic_cast<GenericLogicPlotCurve *>(curve);
+		AnnotationCurve *annCurve = dynamic_cast<AnnotationCurve*>(logicCurve);
+		if (annCurve) {
+			bonusHeight = annCurve->getTraceHeight() * annCurve->getVisibleRows();
+			return static_cast<double>(handle->size().height());
+		}
+		bonusHeight = 0.0;
 		return logicCurve->getTraceHeight();
 	};
 
@@ -1638,9 +1635,13 @@ bool CapturePlot::endGroupSelection()
 	if (newGroup) {
 		// Move channels on top side of the plot
 		int currentPos = 5;
-		for (RoundedHandleV *hdl : group) {
-			currentPos += getTraceHeightInPixelsForHandle(hdl);
-			hdl->setPosition(currentPos);
+		double bonusHeight = 0.0;
+		currentPos += getTraceHeightInPixelsForHandle(group.first(), bonusHeight);
+		group.first()->setPosition(currentPos);
+		for (int i = 1; i < group.size(); ++i) {
+			currentPos += bonusHeight;
+			currentPos += getTraceHeightInPixelsForHandle(group[i], bonusHeight);
+			group[i]->setPosition(currentPos);
 			currentPos += 5;
 
 		}
@@ -1668,9 +1669,11 @@ bool CapturePlot::endGroupSelection()
 		const double min = y.minValue();
 		const double max = y.maxValue();
 		yMap.setScaleInterval(min, max);
+		double bonusHeight = 0.0;
 		double y1 = yMap.invTransform(group.front()->position() -
-						    getTraceHeightInPixelsForHandle(group.front()) - 5);
-		double y2 = yMap.invTransform(group.back()->position() + 5);
+						    getTraceHeightInPixelsForHandle(group.front(), bonusHeight) - 5);
+		getTraceHeightInPixelsForHandle(group.back(), bonusHeight);
+		double y2 = yMap.invTransform(group.back()->position() + 5 + bonusHeight);
 
 		QwtPlotZoneItem *groupMarker = new QwtPlotZoneItem();
 		d_groupMarkers.push_back(groupMarker);
@@ -1764,8 +1767,6 @@ void CapturePlot::removeFromGroup(int chnIdx, int removedChnIdx, bool &didGroupV
 
 void CapturePlot::positionInGroupChanged(int chnIdx, int from, int to)
 {
-	qDebug() << "from: " << from << " to:" << to;
-
 	auto hdlGroup = std::find_if(d_groupHandles.begin(), d_groupHandles.end(),
 				     [=](const QList<RoundedHandleV*> &group){
 		return group.contains(d_offsetHandles[chnIdx]);
@@ -1810,30 +1811,55 @@ void CapturePlot::handleInGroupChangedPosition(int position)
 	const int index = hdlGroup->indexOf(hdl);
 	const int groupIndex = d_groupHandles.indexOf(*hdlGroup);
 
-	auto getTraceHeightInPixelsForHandle = [=](RoundedHandleV *handle) {
+	auto getTraceHeightInPixelsForHandle = [=](RoundedHandleV *handle, double &bonusHeight) {
 		const int chIdx = d_offsetHandles.indexOf(handle);
 		QwtPlotCurve *curve = getDigitalPlotCurve(chIdx);
 		GenericLogicPlotCurve *logicCurve = dynamic_cast<GenericLogicPlotCurve *>(curve);
+		AnnotationCurve *annCurve = dynamic_cast<AnnotationCurve*>(logicCurve);
+		if (annCurve) {
+			bonusHeight = annCurve->getTraceHeight() * annCurve->getVisibleRows();
+			return static_cast<double>(handle->size().height());
+		}
+		bonusHeight = 0.0;
 		return logicCurve->getTraceHeight();
 	};
 
 	// update position of handles above the moved one
+	double bonusHeight = 0.0;
 	int currentPos = position - 5;
-	currentPos -= getTraceHeightInPixelsForHandle(hdl);
+	currentPos -= getTraceHeightInPixelsForHandle(hdl, bonusHeight);
 	for (int i = index - 1; i >= 0; --i) {
+		if (!hdlGroup->at(i)->isVisible()) {
+			continue;
+		}
 		disconnect(hdlGroup->at(i), &RoundedHandleV::positionChanged,
 			   this, &CapturePlot::handleInGroupChangedPosition);
 		hdlGroup->at(i)->setPosition(currentPos);
+		int temp = getTraceHeightInPixelsForHandle(hdlGroup->at(i), bonusHeight);
+		qDebug() << "handle: " << i << " gets bonus: " << bonusHeight;
+		if (bonusHeight != 0.0) {
+			hdlGroup->at(i)->setPosition(currentPos - bonusHeight);
+			currentPos -= bonusHeight;
+			bonusHeight = 0.0;
+		}
+		currentPos -= temp;
+		currentPos -= 5;
 		connect(hdlGroup->at(i), &RoundedHandleV::positionChanged,
 			   this, &CapturePlot::handleInGroupChangedPosition);
-		currentPos -= getTraceHeightInPixelsForHandle(hdlGroup->at(i));
-		currentPos -= 5;
 	}
 
 	// update position of handles below the moved one
 	currentPos = position + 5;
+	getTraceHeightInPixelsForHandle(hdl, bonusHeight);
 	for (int i = index + 1; i < hdlGroup->size(); ++i) {
-		currentPos += getTraceHeightInPixelsForHandle(hdlGroup->at(i));
+		if (!hdlGroup->at(i)->isVisible()) {
+			continue;
+		}
+		if (bonusHeight != 0.0) {
+			currentPos += bonusHeight;
+			bonusHeight = 0.0;
+		}
+		currentPos += getTraceHeightInPixelsForHandle(hdlGroup->at(i), bonusHeight);
 		disconnect(hdlGroup->at(i), &RoundedHandleV::positionChanged,
 			   this, &CapturePlot::handleInGroupChangedPosition);
 		hdlGroup->at(i)->setPosition(currentPos);
@@ -1848,10 +1874,25 @@ void CapturePlot::handleInGroupChangedPosition(int position)
 	const double min = y.minValue();
 	const double max = y.maxValue();
 	yMap.setScaleInterval(min, max);
-	double y1 = yMap.invTransform(hdlGroup->front()->position() -
-					    getTraceHeightInPixelsForHandle(hdlGroup->front()) - 5);
-	double y2 = yMap.invTransform(hdlGroup->back()->position() + 5);
 
+	RoundedHandleV *bottomHandle = nullptr, *topHandle = nullptr;
+	for (int i = 0; i < hdlGroup->size(); ++i) {
+		if (hdlGroup->at(i)->isVisible()) {
+			topHandle = hdlGroup->at(i);
+			break;
+		}
+	}
+	for (int i = hdlGroup->size() - 1; i >= 0; --i) {
+		if (hdlGroup->at(i)->isVisible()) {
+			bottomHandle = hdlGroup->at(i);
+			break;
+		}
+	}
+
+	double y1 = yMap.invTransform(topHandle->position() -
+					    getTraceHeightInPixelsForHandle(topHandle, bonusHeight) - 5);
+	getTraceHeightInPixelsForHandle(bottomHandle, bonusHeight);
+	double y2 = yMap.invTransform(bottomHandle->position() + 5 + bonusHeight);
 
 	d_groupMarkers.at(groupIndex)->setInterval(y2, y1);
 
@@ -1983,6 +2024,33 @@ void CapturePlot::setOffsetWidgetVisible(int chnIdx, bool visible)
 		return;
 
 	d_offsetHandles[chnIdx]->setVisible(visible);
+
+	// find the group of this handle
+	auto hdlGroup = std::find_if(d_groupHandles.begin(), d_groupHandles.end(),
+				     [=](const QList<RoundedHandleV*> &group){
+		return group.contains(d_offsetHandles[chnIdx]);
+	});
+
+	// if no group return
+	if (hdlGroup == d_groupHandles.end()) {
+		qDebug() << "This handle is not in a group!";
+		return;
+	}
+
+	int count = 0;
+	for (const auto &handle : *hdlGroup) {
+		if (handle->isVisible()) {
+			count++;
+		}
+	}
+
+	const bool detach = (count < 2);
+	const int groupIdx = d_groupHandles.indexOf(*hdlGroup);
+	if (detach) {
+		d_groupMarkers[groupIdx]->detach();
+	} else {
+		d_groupMarkers[groupIdx]->attach(this);
+	}
 }
 
 void CapturePlot::removeOffsetWidgets(int chnIdx)

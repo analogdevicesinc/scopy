@@ -37,11 +37,14 @@ namespace adiscope {
 
 class Filter;
 class BaseMenu;
+class LogicAnalyzer_API;
 
 namespace logic {
 
 class LogicAnalyzer : public Tool {
 	Q_OBJECT
+
+	friend class LogicAnalyzer_API;
 public:
 	explicit LogicAnalyzer(struct iio_context *ctx, Filter *filt,
 			 ToolMenuItem *toolMenuItem, QJSEngine *engine,

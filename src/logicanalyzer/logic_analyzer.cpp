@@ -12,6 +12,7 @@
 
 #include "basemenu.h"
 #include "logicgroupitem.h"
+#include "logicanalyzer_api.h"
 
 #include "dynamicWidget.hpp"
 
@@ -20,11 +21,14 @@
 using namespace adiscope;
 using namespace adiscope::logic;
 
+constexpr int MAX_BUFFER_SIZE_ONESHOT = 4 * 1024 * 1024; // 4M
+constexpr int MAX_BUFFER_SIZE_STREAM = 1 * 1024 * 1024 * 1024; // 1G
+
 LogicAnalyzer::LogicAnalyzer(iio_context *ctx, adiscope::Filter *filt,
 			     adiscope::ToolMenuItem *toolMenuItem,
 			     QJSEngine *engine, adiscope::ToolLauncher *parent,
 			     bool offline_mode_):
-	Tool(ctx, toolMenuItem, nullptr, "Logic Analyzer", parent),
+	Tool(ctx, toolMenuItem, new LogicAnalyzer_API(this), "Logic Analyzer", parent),
 	ui(new Ui::LogicAnalyzer),
 	m_plot(this, 16, 10),
 	m_bufferPreviewer(new DigitalBufferPreviewer(40, this)),
@@ -41,7 +45,7 @@ LogicAnalyzer::LogicAnalyzer(iio_context *ctx, adiscope::Filter *filt,
 					{"M samples", 1E+6},
 					{"G samples", 1E+9},
 					}, tr("Samples"), 1,
-					10e8,
+					MAX_BUFFER_SIZE_ONESHOT,
 					true, false, this, {1, 2, 5})),
 	m_timePositionButton(new ScaleSpinButton({
 					 {"samples", 1E0},
@@ -107,6 +111,7 @@ LogicAnalyzer::LogicAnalyzer(iio_context *ctx, adiscope::Filter *filt,
 		connect(channelBox, &QCheckBox::toggled, [=](bool toggled){
 			m_plot.enableDigitalPlotCurve(i, toggled);
 			m_plot.setOffsetWidgetVisible(i, toggled);
+			m_plot.positionInGroupChanged(i, 0, 0);
 			m_plot.replot();
 		});
 		channelBox->setChecked(false);
@@ -145,6 +150,11 @@ LogicAnalyzer::LogicAnalyzer(iio_context *ctx, adiscope::Filter *filt,
 
 LogicAnalyzer::~LogicAnalyzer()
 {
+	for (auto &curve : m_plotCurves) {
+		m_plot.removeDigitalPlotCurve(curve);
+		delete curve;
+	}
+
 	if (m_captureThread) {
 		m_stopRequested = true;
 		m_m2kDigital->cancelBufferIn();
@@ -348,6 +358,9 @@ void LogicAnalyzer::on_btnStreamOneShot_toggled(bool toggled)
 		m_plot.replot();
 		m_plot.zoomBaseUpdate();
 	}
+
+	m_bufferSizeButton->setMaxValue(toggled ? MAX_BUFFER_SIZE_ONESHOT
+						: MAX_BUFFER_SIZE_STREAM);
 }
 
 void LogicAnalyzer::on_btnGroupChannels_toggled(bool checked)
@@ -374,6 +387,8 @@ void LogicAnalyzer::channelSelectedChanged(int chIdx, bool selected)
 		if (!ui->btnChannelSettings->isChecked()) {
 			ui->btnChannelSettings->setChecked(true);
 		}
+
+		qDebug() << "Selected channel: " << chIdx;
 
 		m_selectedChannel = chIdx;
 		ui->nameLineEdit->setEnabled(true);
@@ -1093,10 +1108,25 @@ void LogicAnalyzer::setupDecoders()
 			ui->decoderEnumeratorLayout->removeWidget(decoderMenuItem);
 			decoderMenuItem->deleteLater();
 
+			int chIdx = m_plotCurves.indexOf(curve);
+			bool groupDeleted = false;
+			m_plot.removeFromGroup(chIdx,
+					       m_plot.getGroupOfChannel(chIdx).indexOf(chIdx),
+					       groupDeleted);
+
+			if (groupDeleted) {
+				ui->groupWidget->setVisible(false);
+				m_currentGroup.clear();
+				ui->groupWidgetLayout->removeWidget(m_currentGroupMenu);
+				m_currentGroupMenu->deleteLater();
+				m_currentGroupMenu = nullptr;
+			}
+
 			m_plot.removeDigitalPlotCurve(curve);
 			m_plotCurves.removeOne(curve);
 
 			disconnect(connectionHandle);
+
 
 			delete curve;
 		});
@@ -1110,6 +1140,7 @@ void LogicAnalyzer::setupDecoders()
 		connect(decoderBox, &QCheckBox::toggled, [=](bool toggled){
 			m_plot.enableDigitalPlotCurve(m_nbChannels + itemsInLayout, toggled);
 			m_plot.setOffsetWidgetVisible(m_nbChannels + itemsInLayout, toggled);
+			m_plot.positionInGroupChanged(m_nbChannels + itemsInLayout, 0, 0);
 			m_plot.replot();
 		});
 
@@ -1232,6 +1263,7 @@ void LogicAnalyzer::updateChannelGroupWidget(bool visible)
 			bool groupDeleted = false;
 			m_plot.removeFromGroup(m_selectedChannel, item->position(), groupDeleted);
 
+			qDebug() << "m_selectedChannel: " << m_selectedChannel << " deleted: " << m_currentGroup[item->position()];
 			if (m_selectedChannel == m_currentGroup[item->position()] && !groupDeleted) {
 				ui->groupWidget->setVisible(false);
 			}

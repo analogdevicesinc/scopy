@@ -22,8 +22,9 @@
 using namespace adiscope;
 using namespace adiscope::logic;
 
-AnnotationCurve::AnnotationCurve(logic::LogicAnalyzer *logic, std::shared_ptr<logic::Decoder> initialDecoder):
-    GenericLogicPlotCurve(initialDecoder->decoder()->name, LogicPlotCurveType::Annotations)
+AnnotationCurve::AnnotationCurve(logic::LogicAnalyzer *logic, std::shared_ptr<logic::Decoder> initialDecoder)
+	: GenericLogicPlotCurve(initialDecoder->decoder()->name, LogicPlotCurveType::Annotations)
+	, m_visibleRows(0)
 {
     setSamples({0.0}, {0.0});
     setRenderHint(RenderAntialiased, true);
@@ -137,6 +138,7 @@ void AnnotationCurve::reset()
     m_classRows.clear();
     m_annotationRows.clear();
 	m_annotationDecoder->reset();
+	m_visibleRows = 0;
 }
 
 QWidget *AnnotationCurve::getCurrentDecoderStackMenu()
@@ -211,7 +213,12 @@ void AnnotationCurve::stackDecoder(std::shared_ptr<logic::Decoder> decoder)
 
 std::vector<std::shared_ptr<adiscope::logic::Decoder> > AnnotationCurve::getDecoderStack()
 {
-    return m_annotationDecoder->getDecoderStack();
+	return m_annotationDecoder->getDecoderStack();
+}
+
+int AnnotationCurve::getVisibleRows() const
+{
+	return m_visibleRows;
 }
 
 void AnnotationCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &canvasRect, int from, int to) const
@@ -336,6 +343,8 @@ void AnnotationCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap, cons
         // if no annotations are generated for it
         currentRowOnPlot++;
     }
+
+    m_visibleRows = currentRowOnPlot;
 
 	painter->save();
 
