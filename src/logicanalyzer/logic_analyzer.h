@@ -115,7 +115,7 @@ private:
 
 	ScaleSpinButton *m_sampleRateButton;
 	ScaleSpinButton *m_bufferSizeButton;
-	ScaleSpinButton *m_timePositionButton;
+	PositionSpinButton *m_timePositionButton;
 	double m_sampleRate;
 	uint64_t m_bufferSize;
 	uint64_t m_lastCapturedSample;

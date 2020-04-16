@@ -18,6 +18,8 @@
 
 #include <QDebug>
 
+#include "filter.hpp"
+
 using namespace adiscope;
 using namespace adiscope::logic;
 
@@ -47,12 +49,11 @@ LogicAnalyzer::LogicAnalyzer(iio_context *ctx, adiscope::Filter *filt,
 					}, tr("Samples"), 1,
 					MAX_BUFFER_SIZE_ONESHOT,
 					true, false, this, {1, 2, 5})),
-	m_timePositionButton(new ScaleSpinButton({
+	m_timePositionButton(new PositionSpinButton({
 					 {"samples", 1E0},
-					 {"k samples", 1E+3},
 					 }, tr("Delay"), - (1 << 13),
 					 (1 << 13) - 1,
-					 true, false, this, {1, 2, 5})),
+					 true, false, this)),
 	m_sampleRate(1.0),
 	m_bufferSize(1),
 	m_m2kContext(m2kOpen(ctx, "")),
@@ -126,7 +127,7 @@ LogicAnalyzer::LogicAnalyzer(iio_context *ctx, adiscope::Filter *filt,
 
 	connect(&m_plot, &CapturePlot::timeTriggerValueChanged, [=](double value){
 		double delay = value / (1.0 / m_sampleRate);
-		onTimeTriggerValueChanged(delay);
+		onTimeTriggerValueChanged(static_cast<int>(delay));
 	});
 
 
@@ -146,10 +147,23 @@ LogicAnalyzer::LogicAnalyzer(iio_context *ctx, adiscope::Filter *filt,
 
 	// setup trigger
 	setupTriggerMenu();
+
+	m_timePositionButton->setStep(1);
+
+	api->setObjectName(QString::fromStdString(Filter::tool_name(
+							  TOOL_LOGIC_ANALYZER)));
+	api->load(*settings);
+	api->js_register(engine);
 }
 
 LogicAnalyzer::~LogicAnalyzer()
 {
+	if (saveOnExit) {
+		api->save(*settings);
+	}
+
+	delete api;
+
 	disconnect(prefPanel, &Preferences::notify, this, &LogicAnalyzer::readPreferences);
 
 	for (auto &curve : m_plotCurves) {
@@ -635,9 +649,8 @@ void LogicAnalyzer::connectSignalsAndSlots()
 		this, &LogicAnalyzer::onBufferSizeChanged);
 
 	connect(&m_plot, &CapturePlot::timeTriggerValueChanged, [=](double value){
-//		if (m_timePositionButton->value() != value) {
-		m_timePositionButton->setValue(value / (1.0 / m_sampleRate));
-//	}
+		double delay = value / (1.0 / m_sampleRate);
+		m_timePositionButton->setValue(static_cast<int>(delay));
 	});
 
 	connect(m_timePositionButton, &PositionSpinButton::valueChanged,
@@ -732,6 +745,10 @@ void LogicAnalyzer::connectSignalsAndSlots()
 		ui->decoderSettingsLayout->addWidget(m_decoderMenu);
 
 		updateStackDecoderButton();
+	});
+
+	connect(ui->printBtn, &QPushButton::clicked, [=](){
+		m_plot.printWithNoBackground("Logic Analyzer");
 	});
 }
 
@@ -910,6 +927,8 @@ void LogicAnalyzer::startStop(bool start)
 
 		if (m_autoMode) {
 
+			m_plot.setTriggerState(CapturePlot::Auto);
+
 			double oneBufferTimeOut = m_timerTimeout;
 
 			if (!oneShotOrStream) {
@@ -935,10 +954,19 @@ void LogicAnalyzer::startStop(bool start)
 
 			m_buffer = new uint16_t[bufferSize];
 
+			QMetaObject::invokeMethod(this, [=](){
+				m_plot.setTriggerState(CapturePlot::Waiting);
+			}, Qt::QueuedConnection);
+
 			if (ui->btnStreamOneShot->isChecked()) {
 				try {
 					const uint16_t * const temp = m_m2kDigital->getSamplesP(bufferSize);
 					memcpy(m_buffer, temp, bufferSizeAdjusted * sizeof(uint16_t));
+
+					QMetaObject::invokeMethod(this, [=](){
+						m_plot.setTriggerState(CapturePlot::Triggered);
+					}, Qt::QueuedConnection);
+
 				} catch (std::invalid_argument &e) {
 					qDebug() << e.what();
 				}
@@ -963,6 +991,11 @@ void LogicAnalyzer::startStop(bool start)
 						memcpy(m_buffer + absIndex, temp, sizeof(uint16_t) * captureSize);
 						absIndex += captureSize;
 						totalSamples -= captureSize;
+
+						QMetaObject::invokeMethod(this, [=](){
+							m_plot.setTriggerState(CapturePlot::Triggered);
+						}, Qt::QueuedConnection);
+
 					} catch (std::invalid_argument &e) {
 						qDebug() << e.what();
 					}
@@ -996,6 +1029,10 @@ void LogicAnalyzer::startStop(bool start)
 			QMetaObject::invokeMethod(&m_plot,
 						  "replot");
 
+			QMetaObject::invokeMethod(this, [=](){
+				m_plot.setTriggerState(CapturePlot::Stop);
+			}, Qt::QueuedConnection);
+
 		});
 
 	} else {
@@ -1006,6 +1043,8 @@ void LogicAnalyzer::startStop(bool start)
 			delete m_captureThread;
 			m_captureThread = nullptr;
 			restoreTriggerState();
+
+			m_plot.setTriggerState(CapturePlot::Stop);
 		}
 	}
 
@@ -1377,6 +1416,8 @@ void LogicAnalyzer::setupTriggerMenu()
 	m_timer->setSingleShot(true);
 	connect(m_timer, &QTimer::timeout,
 		this, &LogicAnalyzer::saveTriggerState);
+
+	m_plot.setTriggerState(CapturePlot::Stop);
 
 }
 
