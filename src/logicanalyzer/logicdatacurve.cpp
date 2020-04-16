@@ -18,7 +18,8 @@ LogicDataCurve::LogicDataCurve(uint16_t *data, uint8_t bit, adiscope::logic::Log
     m_logic(logic),
     m_startSample(0),
     m_endSample(0),
-    m_bit(bit)
+    m_bit(bit),
+    m_displaySampling(false)
 {
     // If there are no set samples, QwtPlot::replot() won't call our
     // draw() method. Trick the plot into thinking that we have data
@@ -68,6 +69,11 @@ void LogicDataCurve::reset()
 uint8_t LogicDataCurve::getBitId() const
 {
 	return m_bit;
+}
+
+void LogicDataCurve::setDisplaySampling(bool display)
+{
+	m_displaySampling = display;
 }
 
 void LogicDataCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap,
@@ -160,9 +166,8 @@ void LogicDataCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap,
     // knowing from segment.second if it is "1" or "0"
     double dist = xMap.transform(fromSampleToTime(1)) - xMap.transform(fromSampleToTime(0));
 
-//    qDebug() << "dist is: " << dist;
 
-    if (dist <= 4.0) {
+    if (dist <= 4.0 || !m_displaySampling) {
         return;
     }
 

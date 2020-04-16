@@ -15,6 +15,8 @@ public:
 
     uint8_t getBitId() const;
 
+    void setDisplaySampling(bool display);
+
 
 protected:
     void drawLines( QPainter *painter,
@@ -40,6 +42,8 @@ private:
 
     // false -> ,,|'' true -> ''|,,
     std::vector<std::pair<uint64_t, bool>> m_edges;
+
+    bool m_displaySampling;
 
 };
 

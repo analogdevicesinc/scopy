@@ -82,6 +82,8 @@ private Q_SLOTS:
 	void saveTriggerState();
 	void restoreTriggerState();
 
+	void readPreferences();
+
 private:
 	void setupUi();
 	void connectSignalsAndSlots();

@@ -150,6 +150,8 @@ LogicAnalyzer::LogicAnalyzer(iio_context *ctx, adiscope::Filter *filt,
 
 LogicAnalyzer::~LogicAnalyzer()
 {
+	disconnect(prefPanel, &Preferences::notify, this, &LogicAnalyzer::readPreferences);
+
 	for (auto &curve : m_plotCurves) {
 		m_plot.removeDigitalPlotCurve(curve);
 		delete curve;
@@ -1406,4 +1408,21 @@ void LogicAnalyzer::restoreTriggerState()
 
 		m_triggerState.clear();
 	}
+}
+
+void LogicAnalyzer::readPreferences()
+{
+	qDebug() << "reading preferences!!!!";
+	for (GenericLogicPlotCurve *curve : m_plotCurves) {
+		if (curve->getType() == LogicPlotCurveType::Data) {
+			LogicDataCurve *ldc = dynamic_cast<LogicDataCurve*>(curve);
+			if (!ldc) {
+				continue;
+			}
+
+			ldc->setDisplaySampling(prefPanel->getDisplaySamplingPoints());
+		}
+	}
+
+	m_plot.replot();
 }

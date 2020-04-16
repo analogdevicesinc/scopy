@@ -52,7 +52,8 @@ Preferences::Preferences(QWidget *parent) :
 	digital_decoders_enabled(true),
 	m_initialized(false),
 	show_ADC_digital_filters(false),
-	language("english")
+	language("english"),
+	m_displaySamplingPoints(false)
 {
 	ui->setupUi(this);
 
@@ -168,6 +169,11 @@ Preferences::Preferences(QWidget *parent) :
 			m_initialized = true;
 		Q_EMIT notify();
 	});
+
+	connect(ui->logicAnalyzerDisplaySamplingPoints, &QCheckBox::stateChanged, [=](int state){
+		m_displaySamplingPoints = (!state ? false : true);
+		Q_EMIT notify();
+	});
 }
 
 
@@ -180,6 +186,16 @@ QStringList Preferences::getLanguageList()
 		s.remove(".qm");
 	}
 	return languages;
+}
+
+bool Preferences::getDisplaySamplingPoints() const
+{
+	return m_displaySamplingPoints;
+}
+
+void Preferences::setDisplaySamplingPoints(bool display)
+{
+	m_displaySamplingPoints = display;
 }
 
 Preferences::~Preferences()
@@ -217,6 +233,7 @@ void Preferences::showEvent(QShowEvent *event)
 	ui->decodersCheckBox->setChecked(digital_decoders_enabled);
 	ui->oscADCFiltersCheckBox->setChecked(show_ADC_digital_filters);
 	ui->languageCombo->setCurrentText(language);
+	ui->logicAnalyzerDisplaySamplingPoints->setChecked(m_displaySamplingPoints);
 
 	QWidget::showEvent(event);
 }
@@ -596,4 +613,14 @@ QString Preferences_API::getLanguage() const
 void Preferences_API::setLanguage(QString lang)
 {
 	preferencePanel->language=lang;
+}
+
+bool Preferences_API::getDisplaySampling() const
+{
+	return preferencePanel->m_displaySamplingPoints;
+}
+
+void Preferences_API::setDisplaySampling(bool display)
+{
+	preferencePanel->m_displaySamplingPoints = display;
 }

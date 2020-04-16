@@ -100,6 +100,9 @@ public:
 	void setShowADCFilters(bool value);
 	QStringList getLanguageList();
 
+	bool getDisplaySamplingPoints() const;
+	void setDisplaySamplingPoints(bool display);
+
 Q_SIGNALS:
 
 	void notify();
@@ -133,6 +136,7 @@ private:
 	bool digital_decoders_enabled;
 	bool m_initialized;
 	QString language;
+	bool m_displaySamplingPoints;
 
 	Preferences_API *pref_api;
 	QString getPreferenceIniFile() const;
@@ -160,6 +164,7 @@ class Preferences_API : public ApiObject
 	Q_PROPERTY(bool digital_decoders READ getDigitalDecoders WRITE setDigitalDecoders)
 	Q_PROPERTY(bool show_ADC_digital_filters READ getShowADCDigitalFilters WRITE setShowADCDigitalFilters)
 	Q_PROPERTY(QString language READ getLanguage WRITE setLanguage);
+	Q_PROPERTY(bool displaySamplingPoints READ getDisplaySampling WRITE setDisplaySampling)
 
 public:
 
@@ -217,6 +222,9 @@ public:
 
 	QString getLanguage() const;
 	void setLanguage(QString lang);
+
+	bool getDisplaySampling() const;
+	void setDisplaySampling(bool display);
 
 private:
 	Preferences *preferencePanel;
