@@ -15,64 +15,36 @@ namespace adiscope {
  * class Oscilloscope_API
  */
 
-bool Oscilloscope_API::hasCursors() const {
-	return osc->ui->boxCursors->isChecked();
-}
+bool Oscilloscope_API::hasCursors() const { return osc->ui->boxCursors->isChecked(); }
 
-void Oscilloscope_API::setCursors(bool en) {
-	osc->ui->boxCursors->setChecked(en);
-}
+void Oscilloscope_API::setCursors(bool en) { osc->ui->boxCursors->setChecked(en); }
 
 bool Oscilloscope_API::autosetEnabled() const { return osc->autosetEnabled; }
 void Oscilloscope_API::enableAutoset(bool en) { osc->autosetEnabled = en; }
 
-bool Oscilloscope_API::hasMeasure() const {
-	return osc->ui->boxMeasure->isChecked();
-}
+bool Oscilloscope_API::hasMeasure() const { return osc->ui->boxMeasure->isChecked(); }
 
-void Oscilloscope_API::setMeasure(bool en) {
-	osc->ui->boxMeasure->setChecked(en);
-}
+void Oscilloscope_API::setMeasure(bool en) { osc->ui->boxMeasure->setChecked(en); }
 
-bool Oscilloscope_API::measureAll() const {
-	return osc->measure_settings->m_ui->button_measDisplayAll->isChecked();
-}
+bool Oscilloscope_API::measureAll() const { return osc->measure_settings->m_ui->button_measDisplayAll->isChecked(); }
 
-void Oscilloscope_API::setMeasureAll(bool en) {
-	osc->measure_settings->m_ui->button_measDisplayAll->setChecked(en);
-}
+void Oscilloscope_API::setMeasureAll(bool en) { osc->measure_settings->m_ui->button_measDisplayAll->setChecked(en); }
 
-bool Oscilloscope_API::hasCounter() const {
-	return osc->measure_settings->m_ui->button_Counter->isChecked();
-}
+bool Oscilloscope_API::hasCounter() const { return osc->measure_settings->m_ui->button_Counter->isChecked(); }
 
-void Oscilloscope_API::setCounter(bool en) {
-	osc->measure_settings->m_ui->button_Counter->setChecked(en);
-}
+void Oscilloscope_API::setCounter(bool en) { osc->measure_settings->m_ui->button_Counter->setChecked(en); }
 
-bool Oscilloscope_API::hasStatistics() const {
-	return osc->measure_settings->m_ui->button_StatisticsEn->isChecked();
-}
+bool Oscilloscope_API::hasStatistics() const { return osc->measure_settings->m_ui->button_StatisticsEn->isChecked(); }
 
-void Oscilloscope_API::setStatistics(bool en) {
-	osc->measure_settings->m_ui->button_StatisticsEn->setChecked(en);
-}
+void Oscilloscope_API::setStatistics(bool en) { osc->measure_settings->m_ui->button_StatisticsEn->setChecked(en); }
 
-bool Oscilloscope_API::horizontalCursors() const {
-	return osc->cr_ui->hCursorsEnable->isChecked();
-}
+bool Oscilloscope_API::horizontalCursors() const { return osc->cr_ui->hCursorsEnable->isChecked(); }
 
-void Oscilloscope_API::setHorizontalCursors(bool en) {
-	osc->cr_ui->hCursorsEnable->setChecked(en);
-}
+void Oscilloscope_API::setHorizontalCursors(bool en) { osc->cr_ui->hCursorsEnable->setChecked(en); }
 
-bool Oscilloscope_API::verticalCursors() const {
-	return osc->cr_ui->vCursorsEnable->isChecked();
-}
+bool Oscilloscope_API::verticalCursors() const { return osc->cr_ui->vCursorsEnable->isChecked(); }
 
-void Oscilloscope_API::setVerticalCursors(bool en) {
-	osc->cr_ui->vCursorsEnable->setChecked(en);
-}
+void Oscilloscope_API::setVerticalCursors(bool en) { osc->cr_ui->vCursorsEnable->setChecked(en); }
 
 double Oscilloscope_API::cursorV1() const { return osc->plot.value_v1; }
 
@@ -82,114 +54,71 @@ double Oscilloscope_API::cursorH1() const { return osc->plot.value_h1; }
 
 double Oscilloscope_API::cursorH2() const { return osc->plot.value_h2; }
 
-void Oscilloscope_API::setCursorV1(double val) {
-	osc->plot.d_vBar1->setPosition(val);
-}
+void Oscilloscope_API::setCursorV1(double val) { osc->plot.d_vBar1->setPosition(val); }
 
-void Oscilloscope_API::setCursorV2(double val) {
-	osc->plot.d_vBar2->setPosition(val);
-}
+void Oscilloscope_API::setCursorV2(double val) { osc->plot.d_vBar2->setPosition(val); }
 
-void Oscilloscope_API::setCursorH1(double val) {
-	osc->plot.d_hBar1->setPosition(val);
-}
+void Oscilloscope_API::setCursorH1(double val) { osc->plot.d_hBar1->setPosition(val); }
 
-void Oscilloscope_API::setCursorH2(double val) {
-	osc->plot.d_hBar2->setPosition(val);
-}
+void Oscilloscope_API::setCursorH2(double val) { osc->plot.d_hBar2->setPosition(val); }
 
-bool Oscilloscope_API::autoTrigger() const {
-	return osc->trigger_settings.ui->btnTrigger->isChecked();
-}
+bool Oscilloscope_API::autoTrigger() const { return osc->trigger_settings.ui->btnTrigger->isChecked(); }
 
-void Oscilloscope_API::setAutoTrigger(bool en) {
-	osc->trigger_settings.ui->btnTrigger->setChecked(en);
-}
+void Oscilloscope_API::setAutoTrigger(bool en) { osc->trigger_settings.ui->btnTrigger->setChecked(en); }
 
-bool Oscilloscope_API::internalTrigger() const {
-	return osc->trigger_settings.ui->intern_en->isChecked();
-}
+bool Oscilloscope_API::internalTrigger() const { return osc->trigger_settings.ui->intern_en->isChecked(); }
 
-void Oscilloscope_API::setInternalTrigger(bool en) {
-	osc->trigger_settings.ui->intern_en->setChecked(en);
-}
+void Oscilloscope_API::setInternalTrigger(bool en) { osc->trigger_settings.ui->intern_en->setChecked(en); }
 
-bool Oscilloscope_API::externalTrigger() const {
-	return osc->trigger_settings.ui->extern_en->isChecked();
-}
+bool Oscilloscope_API::externalTrigger() const { return osc->trigger_settings.ui->extern_en->isChecked(); }
 
-void Oscilloscope_API::setExternalTrigger(bool en) {
-	osc->trigger_settings.ui->extern_en->setChecked(en);
-}
+void Oscilloscope_API::setExternalTrigger(bool en) { osc->trigger_settings.ui->extern_en->setChecked(en); }
 
-int Oscilloscope_API::externalTriggerSource() const {
-	return osc->trigger_settings.ui->cmb_extern_src->currentIndex();
-}
+int Oscilloscope_API::externalTriggerSource() const { return osc->trigger_settings.ui->cmb_extern_src->currentIndex(); }
 void Oscilloscope_API::setExternalTriggerSource(int src) {
-	if (src >= 0 &&
-	    src < osc->trigger_settings.ui->cmb_extern_src->count()) {
+	if (src >= 0 && src < osc->trigger_settings.ui->cmb_extern_src->count()) {
 		osc->trigger_settings.ui->cmb_extern_src->setCurrentIndex(src);
 	} else {
 		osc->trigger_settings.ui->cmb_extern_src->setCurrentIndex(0);
 	}
 }
 
-int Oscilloscope_API::externalTriggerDaisyOrder() const {
-	return osc->trigger_settings.ui->spin_daisyChain->value();
-}
+int Oscilloscope_API::externalTriggerDaisyOrder() const { return osc->trigger_settings.ui->spin_daisyChain->value(); }
 
 void Oscilloscope_API::setExternalTriggerDaisyOrder(int src) {
 	osc->trigger_settings.ui->spin_daisyChain->setValue(src);
 }
 
-bool Oscilloscope_API::externalTriggerOut() const {
-	return osc->trigger_settings.ui->extern_to_en->isChecked();
-}
-void Oscilloscope_API::setExternalTriggerOut(bool en) {
-	osc->trigger_settings.ui->extern_to_en->setChecked(en);
-}
+bool Oscilloscope_API::externalTriggerOut() const { return osc->trigger_settings.ui->extern_to_en->isChecked(); }
+void Oscilloscope_API::setExternalTriggerOut(bool en) { osc->trigger_settings.ui->extern_to_en->setChecked(en); }
 
 int Oscilloscope_API::externalTriggerOutSource() const {
 	return osc->trigger_settings.ui->cmb_extern_to_src->currentIndex();
 }
 void Oscilloscope_API::setExternalTriggerOutSource(int src) {
-	if (src >= 0 &&
-	    src < osc->trigger_settings.ui->cmb_extern_to_src->count()) {
-		osc->trigger_settings.ui->cmb_extern_to_src->setCurrentIndex(
-			src);
+	if (src >= 0 && src < osc->trigger_settings.ui->cmb_extern_to_src->count()) {
+		osc->trigger_settings.ui->cmb_extern_to_src->setCurrentIndex(src);
 	} else {
 		osc->trigger_settings.ui->cmb_extern_to_src->setCurrentIndex(0);
 	}
 }
 
-int Oscilloscope_API::triggerSource() const {
-	return osc->trigger_settings.ui->cmb_source->currentIndex();
-}
+int Oscilloscope_API::triggerSource() const { return osc->trigger_settings.ui->cmb_source->currentIndex(); }
 
 void Oscilloscope_API::setTriggerSource(int idx) {
 	if (idx > 0)
 		osc->trigger_settings.ui->cmb_source->setCurrentIndex(idx);
 }
 
-double Oscilloscope_API::getTriggerLevel() const {
-	return osc->trigger_settings.trigger_level->value();
-}
+double Oscilloscope_API::getTriggerLevel() const { return osc->trigger_settings.trigger_level->value(); }
 
-void Oscilloscope_API::setTriggerLevel(double level) {
-	osc->trigger_settings.trigger_level->setValue(level);
-}
+void Oscilloscope_API::setTriggerLevel(double level) { osc->trigger_settings.trigger_level->setValue(level); }
 
-double Oscilloscope_API::getTriggerHysteresis() const {
-	return osc->trigger_settings.trigger_hysteresis->value();
-}
+double Oscilloscope_API::getTriggerHysteresis() const { return osc->trigger_settings.trigger_hysteresis->value(); }
 
-void Oscilloscope_API::setTriggerHysteresis(double hyst) {
-	osc->trigger_settings.trigger_hysteresis->setValue(hyst);
-}
+void Oscilloscope_API::setTriggerHysteresis(double hyst) { osc->trigger_settings.trigger_hysteresis->setValue(hyst); }
 
-int Oscilloscope_API::internalCondition() const {
-	return osc->trigger_settings.ui->cmb_condition->currentIndex();
-}
+int Oscilloscope_API::internalCondition() const { return osc->trigger_settings.ui->cmb_condition->currentIndex(); }
 
 void Oscilloscope_API::setInternalCondition(int cond) {
 	if (cond >= osc->trigger_settings.ui->cmb_condition->count()) {
@@ -202,23 +131,18 @@ int Oscilloscope_API::externalCondition() const {
 	return osc->trigger_settings.ui->cmb_extern_condition->currentIndex();
 }
 
-bool Oscilloscope_API::getTriggerInput() const {
-	return osc->getTrigger_input();
-}
+bool Oscilloscope_API::getTriggerInput() const { return osc->getTrigger_input(); }
 
 void Oscilloscope_API::setTriggerInput(bool en) { osc->setTrigger_input(en); }
 
 void Oscilloscope_API::setExternalCondition(int cond) {
 	if (cond >= osc->trigger_settings.ui->cmb_extern_condition->count()) {
-		cond = osc->trigger_settings.ui->cmb_extern_condition->count() -
-			1;
+		cond = osc->trigger_settings.ui->cmb_extern_condition->count() - 1;
 	}
 	osc->trigger_settings.ui->cmb_extern_condition->setCurrentIndex(cond);
 }
 
-int Oscilloscope_API::internExtern() const {
-	return osc->trigger_settings.ui->cmb_analog_extern->currentIndex();
-}
+int Oscilloscope_API::internExtern() const { return osc->trigger_settings.ui->cmb_analog_extern->currentIndex(); }
 
 void Oscilloscope_API::setInternExtern(int option) {
 	osc->trigger_settings.ui->cmb_analog_extern->setCurrentIndex(option);
@@ -227,11 +151,8 @@ void Oscilloscope_API::setInternExtern(int option) {
 QList<QString> Oscilloscope_API::getMathChannels() const {
 	QList<QString> list;
 
-	for (unsigned int i = 0;
-	     i < osc->nb_math_channels + osc->nb_ref_channels; i++) {
-		QWidget *obj =
-			osc->ui->channelsList->itemAt(osc->nb_channels + i)
-				->widget();
+	for (unsigned int i = 0; i < osc->nb_math_channels + osc->nb_ref_channels; i++) {
+		QWidget *obj = osc->ui->channelsList->itemAt(osc->nb_channels + i)->widget();
 		ChannelWidget *cw = static_cast<ChannelWidget *>(obj);
 
 		if (cw->isMathChannel()) {
@@ -248,19 +169,13 @@ void Oscilloscope_API::setMathChannels(const QList<QString> &list) {
 		osc->add_math_channel(list.at(i).toStdString());
 }
 
-double Oscilloscope_API::getTimePos() const {
-	return osc->timePosition->value();
-}
+double Oscilloscope_API::getTimePos() const { return osc->timePosition->value(); }
 
-void Oscilloscope_API::setTimePos(double value) {
-	osc->timePosition->setValue(value);
-}
+void Oscilloscope_API::setTimePos(double value) { osc->timePosition->setValue(value); }
 
 double Oscilloscope_API::getTimeBase() const { return osc->timeBase->value(); }
 
-void Oscilloscope_API::setTimeBase(double value) {
-	osc->timeBase->setValue(value);
-}
+void Oscilloscope_API::setTimeBase(double value) { osc->timeBase->setValue(value); }
 
 void Oscilloscope_API::setMemoryDepth(int val) {
 	bool ok = false;
@@ -291,15 +206,12 @@ int Oscilloscope_API::getMemoryDepth() {
 void Oscilloscope_API::show() { Q_EMIT osc->showTool(); }
 
 bool Oscilloscope_API::running() const {
-	return osc->ui->runSingleWidget->runButtonChecked() ||
-		osc->ui->runSingleWidget->singleButtonChecked();
+	return osc->ui->runSingleWidget->runButtonChecked() || osc->ui->runSingleWidget->singleButtonChecked();
 }
 
 void Oscilloscope_API::run(bool en) { osc->ui->runSingleWidget->toggle(en); }
 
-bool Oscilloscope_API::isSingle() const {
-	return osc->ui->runSingleWidget->singleButtonChecked();
-}
+bool Oscilloscope_API::isSingle() const { return osc->ui->runSingleWidget->singleButtonChecked(); }
 void Oscilloscope_API::single(bool en) {
 	if (!osc->ui->runSingleWidget->singleButtonChecked())
 		osc->ui->runSingleWidget->single();
@@ -341,8 +253,7 @@ void Oscilloscope_API::setMeasureEn(const QList<int> &list) {
 
 		for (unsigned int j = 0; j < measurements.size(); j++) {
 			measurements[j]->setEnabled(!!(mask & (1 << j)));
-			osc->measure_settings->onMeasurementActivated(
-				i, j, !!(mask & (1 << j)));
+			osc->measure_settings->onMeasurementActivated(i, j, !!(mask & (1 << j)));
 		}
 	}
 
@@ -382,8 +293,7 @@ void Oscilloscope_API::setStatisticEn(const QList<int> &list) {
 		}
 	}
 
-	osc->measure_settings->loadStatisticStatesForChannel(
-		osc->current_channel);
+	osc->measure_settings->loadStatisticStatesForChannel(osc->current_channel);
 	osc->onStatisticSelectionListChanged();
 }
 
@@ -404,29 +314,19 @@ void Oscilloscope_API::setCurrentChannel(int chn_id) {
 
 bool Oscilloscope_API::getFftEn() const { return osc->fft_is_visible; }
 
-void Oscilloscope_API::setFftEn(bool en) {
-	osc->gsettings_ui->FFT_view->setChecked(en);
-}
+void Oscilloscope_API::setFftEn(bool en) { osc->gsettings_ui->FFT_view->setChecked(en); }
 
 bool Oscilloscope_API::getXyEn() const { return osc->xy_is_visible; }
 
-void Oscilloscope_API::setXyEn(bool en) {
-	osc->gsettings_ui->XY_view->setChecked(en);
-}
+void Oscilloscope_API::setXyEn(bool en) { osc->gsettings_ui->XY_view->setChecked(en); }
 
 bool Oscilloscope_API::getHistEn() const { return osc->hist_is_visible; }
 
-void Oscilloscope_API::setHistEn(bool en) {
-	osc->gsettings_ui->Histogram_view->setChecked(en);
-}
+void Oscilloscope_API::setHistEn(bool en) { osc->gsettings_ui->Histogram_view->setChecked(en); }
 
-bool Oscilloscope_API::getExportAll() const {
-	return osc->exportSettings->getExportAllButton()->isChecked();
-}
+bool Oscilloscope_API::getExportAll() const { return osc->exportSettings->getExportAllButton()->isChecked(); }
 
-void Oscilloscope_API::setExportAll(bool en) {
-	osc->exportSettings->getExportAllButton()->setChecked(en);
-}
+void Oscilloscope_API::setExportAll(bool en) { osc->exportSettings->getExportAllButton()->setChecked(en); }
 
 int Oscilloscope_API::getCursorsPosition() const {
 	if (!hasCursors()) {
@@ -473,29 +373,17 @@ void Oscilloscope_API::setCursorsTransparency(int val) {
 	osc->cr_ui->horizontalSlider->setValue(val);
 }
 
-bool Oscilloscope_API::gatingEnabled() const {
-	return osc->measure_settings->m_ui->button_GatingEnable->isChecked();
-}
+bool Oscilloscope_API::gatingEnabled() const { return osc->measure_settings->m_ui->button_GatingEnable->isChecked(); }
 
-void Oscilloscope_API::setGatingEnabled(bool en) {
-	osc->measure_settings->m_ui->button_GatingEnable->setChecked(en);
-}
+void Oscilloscope_API::setGatingEnabled(bool en) { osc->measure_settings->m_ui->button_GatingEnable->setChecked(en); }
 
-double Oscilloscope_API::cursorGateLeft() const {
-	return osc->plot.value_gateLeft;
-}
+double Oscilloscope_API::cursorGateLeft() const { return osc->plot.value_gateLeft; }
 
-double Oscilloscope_API::cursorGateRight() const {
-	return osc->plot.value_gateRight;
-}
+double Oscilloscope_API::cursorGateRight() const { return osc->plot.value_gateRight; }
 
-void Oscilloscope_API::setCursorGateLeft(double val) {
-	osc->plot.d_gateBar1->setPosition(val);
-}
+void Oscilloscope_API::setCursorGateLeft(double val) { osc->plot.d_gateBar1->setPosition(val); }
 
-void Oscilloscope_API::setCursorGateRight(double val) {
-	osc->plot.d_gateBar2->setPosition(val);
-}
+void Oscilloscope_API::setCursorGateRight(double val) { osc->plot.d_gateBar2->setPosition(val); }
 
 QVariantList Oscilloscope_API::getChannels() {
 	QVariantList list;
@@ -552,8 +440,7 @@ void Channel_API::setVoltsPerDiv(double val) {
 	if (prevSelectedChannel < 0) {
 		return;
 	}
-	QWidget *prevObj =
-		osc->ui->channelsList->itemAt(prevSelectedChannel)->widget();
+	QWidget *prevObj = osc->ui->channelsList->itemAt(prevSelectedChannel)->widget();
 	ChannelWidget *prevCw = static_cast<ChannelWidget *>(prevObj);
 	if (prevCw) {
 		prevCw->menuButton()->setChecked(true);
@@ -587,8 +474,7 @@ void Channel_API::setVOffset(double val) {
 	if (prevSelectedChannel < 0) {
 		return;
 	}
-	QWidget *prevObj =
-		osc->ui->channelsList->itemAt(prevSelectedChannel)->widget();
+	QWidget *prevObj = osc->ui->channelsList->itemAt(prevSelectedChannel)->widget();
 	ChannelWidget *prevCw = static_cast<ChannelWidget *>(prevObj);
 	if (prevCw) {
 		prevCw->menuButton()->setChecked(true);
@@ -650,10 +536,8 @@ void Channel_API::setColor(int r, int g, int b, int a) {
 	if (color.isValid()) {
 		osc->plot.setLineColor(index, color);
 		osc->plot.d_offsetHandles.at(index)->setRoundRectColor(color);
-		osc->plot.d_offsetHandles.at(index)->setPen(
-			QPen(color, 2, Qt::SolidLine));
-		static_cast<QLabel *>(
-			osc->ui->chn_scales->itemAt(index)->widget())
+		osc->plot.d_offsetHandles.at(index)->setPen(QPen(color, 2, Qt::SolidLine));
+		static_cast<QLabel *>(osc->ui->chn_scales->itemAt(index)->widget())
 			->setStyleSheet(QString("QLabel {"
 						"color: %1;"
 						"font-weight: bold;"
@@ -700,12 +584,11 @@ QList<double> Channel_API::data() const {
 	return list;
 }
 
-#define DECLARE_MEASURE(m, t)                                                  \
-	double Channel_API::measured_##m() const {                             \
-		int index = osc->channels_api.indexOf(                         \
-			const_cast<Channel_API *>(this));                      \
-		auto measData = osc->plot.measurement(Measure::t, index);      \
-		return measData->value();                                      \
+#define DECLARE_MEASURE(m, t)                                                                                          \
+	double Channel_API::measured_##m() const {                                                                     \
+		int index = osc->channels_api.indexOf(const_cast<Channel_API *>(this));                                \
+		auto measData = osc->plot.measurement(Measure::t, index);                                              \
+		return measData->value();                                                                              \
 	}
 DECLARE_MEASURE(period, PERIOD)
 DECLARE_MEASURE(frequency, FREQUENCY)

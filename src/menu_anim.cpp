@@ -44,10 +44,8 @@ MenuAnim::MenuAnim(QWidget *parent)
 	close_anim_min.setDuration(500);
 	close_anim_min.setEasingCurve(QEasingCurve::InOutExpo);
 
-	connect(&open_anim_max, SIGNAL(finished()), this,
-		SLOT(openAnimFinished()));
-	connect(&close_anim_max, SIGNAL(finished()), this,
-		SLOT(closeAnimFinished()));
+	connect(&open_anim_max, SIGNAL(finished()), this, SLOT(openAnimFinished()));
+	connect(&close_anim_max, SIGNAL(finished()), this, SLOT(closeAnimFinished()));
 }
 
 void MenuAnim::toggleMenu(bool open) {

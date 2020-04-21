@@ -39,14 +39,10 @@ UserNotes::UserNotes(QWidget *parent)
 	, m_note_count(0) {
 	ui->setupUi(this);
 
-	connect(ui->addBtn, SIGNAL(toggled(bool)), this,
-		SLOT(add_btn_clicked(bool)));
-	connect(ui->browseBtn, SIGNAL(clicked(bool)),
-		SLOT(browse_btn_clicked(bool)));
-	connect(ui->saveBtn, SIGNAL(clicked(bool)),
-		SLOT(save_btn_clicked(bool)));
-	connect(ui->stackedWidget, SIGNAL(moved(int)), this,
-		SLOT(pageMoved(int)));
+	connect(ui->addBtn, SIGNAL(toggled(bool)), this, SLOT(add_btn_clicked(bool)));
+	connect(ui->browseBtn, SIGNAL(clicked(bool)), SLOT(browse_btn_clicked(bool)));
+	connect(ui->saveBtn, SIGNAL(clicked(bool)), SLOT(save_btn_clicked(bool)));
+	connect(ui->stackedWidget, SIGNAL(moved(int)), this, SLOT(pageMoved(int)));
 
 	notes_group->addButton(ui->addBtn);
 	ui->addBtn->setChecked(true);
@@ -112,8 +108,7 @@ void UserNotes::browse_btn_clicked(bool clicked) {
 
 void UserNotes::save_btn_clicked(bool clicked) {
 	if (ui->nameLineEdit->text() == "") {
-		ui->nameLineEdit->setText("Note " +
-					  QString::number(m_note_count));
+		ui->nameLineEdit->setText("Note " + QString::number(m_note_count));
 	}
 
 	if (ui->pathLineEdit->text() == "") {
@@ -160,8 +155,7 @@ void UserNotes::note_selected(bool selected) {
 		Note *n = getSelectedNote();
 		if (n) {
 			loadPageForNote(n, n->getPath());
-			ui->stackedWidget->slideToIndex(
-				getNoteIndex(getSelectedNote()) + 1);
+			ui->stackedWidget->slideToIndex(getNoteIndex(getSelectedNote()) + 1);
 		} else {
 			ui->stackedWidget->slideToIndex(0);
 		}
@@ -190,8 +184,7 @@ void UserNotes::pageMoved(int direction) {
 	} else {
 		int selectedIdx = getNoteIndex(getSelectedNote()) + direction;
 		if (selectedIdx < (int)m_notes.size()) {
-			(selectedIdx >= 0) ? m_notes.at(selectedIdx)->click()
-					   : ui->addBtn->click();
+			(selectedIdx >= 0) ? m_notes.at(selectedIdx)->click() : ui->addBtn->click();
 		}
 	}
 }
@@ -199,11 +192,9 @@ void UserNotes::pageMoved(int direction) {
 Note *UserNotes::addNote(QString name, QString path) {
 	Note *newNote = new Note(name, path, this);
 
-	connect(newNote->getPageUi()->btnRemove, SIGNAL(clicked(bool)), this,
-		SLOT(remove_btn_clicked(bool)));
+	connect(newNote->getPageUi()->btnRemove, SIGNAL(clicked(bool)), this, SLOT(remove_btn_clicked(bool)));
 
-	connect(newNote, SIGNAL(selected(bool)), this,
-		SLOT(note_selected(bool)));
+	connect(newNote, SIGNAL(selected(bool)), this, SLOT(note_selected(bool)));
 
 	notes_group->addButton(newNote->noteButton());
 	ui->notesList->insertWidget(ui->notesList->count() - 1, newNote);
@@ -229,23 +220,19 @@ void UserNotes::loadPageForNote(Note *note, QString path) {
 		indexFile.open(QFile::ReadOnly);
 		if (!indexFile.readAll().isEmpty()) {
 			index->clear();
-			index->setSearchPaths(
-				QStringList(fileInfo.dir().absolutePath()));
+			index->setSearchPaths(QStringList(fileInfo.dir().absolutePath()));
 			indexFile.close();
-			index->setSource(
-				QUrl::fromLocalFile(fileInfo.filePath()));
+			index->setSource(QUrl::fromLocalFile(fileInfo.filePath()));
 			index->setOpenExternalLinks(true);
 			note->getPageUi()->label->setText("Path: " + path);
 		} else {
 			indexFile.close();
 			index->clear();
-			note->getPageUi()->label->setText(
-				"Warning: The file is empty!");
+			note->getPageUi()->label->setText("Warning: The file is empty!");
 		}
 	} else {
 		index->clear();
-		note->getPageUi()->label->setText(
-			"Warning: The path is invalid!");
+		note->getPageUi()->label->setText("Warning: The path is invalid!");
 	}
 
 	if (index) {
@@ -266,12 +253,7 @@ void UserNotes::clearAllNotes() {
  */
 
 Note::Note(QString name, QString path, QWidget *parent)
-	: QWidget(parent)
-	, ui(new Ui::Note)
-	, m_selected(false)
-	, m_name(name)
-	, m_path(path)
-	, m_page(nullptr) {
+	: QWidget(parent), ui(new Ui::Note), m_selected(false), m_name(name), m_path(path), m_page(nullptr) {
 	ui->setupUi(this);
 	ui->name->setText(name);
 	connect(ui->btn, SIGNAL(toggled(bool)), this, SLOT(setSelected(bool)));

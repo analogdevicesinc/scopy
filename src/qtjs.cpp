@@ -23,17 +23,14 @@ QtJs::QtJs(QJSEngine *engine) : QObject(engine) {
 	auto meta = metaObject();
 	input = "";
 
-	for (unsigned int i = meta->methodOffset(); i < meta->methodCount();
-	     i++) {
+	for (unsigned int i = meta->methodOffset(); i < meta->methodCount(); i++) {
 		QString name(meta->method(i).name());
 
 		engine->globalObject().setProperty(name, js_obj.property(name));
 	}
 
-	engine->globalObject().setProperty(
-		"inspect",
-		engine->evaluate(
-			"function(o) { for (each in o) { print(each); } }"));
+	engine->globalObject().setProperty("inspect",
+					   engine->evaluate("function(o) { for (each in o) { print(each); } }"));
 }
 
 void QtJs::exit() { QApplication::closeAllWindows(); }
@@ -50,9 +47,7 @@ void QtJs::msleep(unsigned long ms) {
 	}
 }
 
-void QtJs::printToConsole(const QString &text) {
-	cout << text.toStdString() << std::endl;
-}
+void QtJs::printToConsole(const QString &text) { cout << text.toStdString() << std::endl; }
 
 QString QtJs::readFromConsole(const QString &request) {
 	bool done = false;

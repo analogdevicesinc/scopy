@@ -48,8 +48,7 @@ private Q_SLOTS:
 	void openAnimFinished();
 
 private:
-	CustomAnimation close_anim_max, close_anim_min, open_anim_max,
-		open_anim_min;
+	CustomAnimation close_anim_max, close_anim_min, open_anim_max, open_anim_min;
 	int min_width;
 	bool animInProg;
 };

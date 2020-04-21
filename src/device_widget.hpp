@@ -36,8 +36,7 @@ class ToolLauncher;
 class DeviceWidget : public QWidget {
 	Q_OBJECT
 public:
-	explicit DeviceWidget(QString uri, QString name,
-			      ToolLauncher *parent = nullptr);
+	explicit DeviceWidget(QString uri, QString name, ToolLauncher *parent = nullptr);
 	virtual ~DeviceWidget();
 
 	QPushButton *deviceButton() const;
@@ -83,8 +82,7 @@ protected:
 class M2kDeviceWidget : public DeviceWidget {
 	Q_OBJECT
 public:
-	explicit M2kDeviceWidget(QString uri, QString name,
-				 ToolLauncher *parent = nullptr);
+	explicit M2kDeviceWidget(QString uri, QString name, ToolLauncher *parent = nullptr);
 	~M2kDeviceWidget();
 };
 
@@ -95,9 +93,7 @@ public:
 		M2K = 1,
 	};
 
-	static DeviceWidget *newDevice(DeviceType dev_type, QString uri,
-				       QString name,
-				       ToolLauncher *parent = nullptr) {
+	static DeviceWidget *newDevice(DeviceType dev_type, QString uri, QString name, ToolLauncher *parent = nullptr) {
 		switch (dev_type) {
 		case GENERIC:
 			return new DeviceWidget(uri, name, parent);

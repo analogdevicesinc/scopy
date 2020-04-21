@@ -7,10 +7,8 @@ namespace adiscope {
 class DigitalIO_API : public ApiObject {
 	Q_OBJECT
 
-	Q_PROPERTY(QList<bool> group READ grouped WRITE setGrouped
-			   SCRIPTABLE false);
-	Q_PROPERTY(QList<bool> dir READ direction WRITE setDirection
-			   SCRIPTABLE true);
+	Q_PROPERTY(QList<bool> group READ grouped WRITE setGrouped SCRIPTABLE false);
+	Q_PROPERTY(QList<bool> dir READ direction WRITE setDirection SCRIPTABLE true);
 	Q_PROPERTY(QList<bool> out READ output WRITE setOutput SCRIPTABLE true);
 
 	Q_PROPERTY(QList<bool> gpi READ gpi STORED false);

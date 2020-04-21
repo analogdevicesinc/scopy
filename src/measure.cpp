@@ -58,26 +58,20 @@ public:
 		NEG_CROSS_FULL,
 	};
 
-	HystLevelCross()
-		: m_low_trhold_crossed(false)
-		, m_high_trhold_crossed(false)
-		, m_is_between_trholds(false) {}
+	HystLevelCross() : m_low_trhold_crossed(false), m_high_trhold_crossed(false), m_is_between_trholds(false) {}
 
 	bool isBetweenThresholds() { return m_is_between_trholds; }
 
 	virtual inline bool updateState(enum crossEvents crsEvent) = 0;
 
-	static inline enum crossEvents get_crossing_type(double samp,
-							 double prevSamp,
-							 double low_trhold,
+	static inline enum crossEvents get_crossing_type(double samp, double prevSamp, double low_trhold,
 							 double high_trhold) {
 		enum crossEvents cross_type = NO_CROSS;
 
 		if (samp > prevSamp) {
 			if ((prevSamp <= low_trhold) && (samp >= low_trhold))
 				cross_type = POS_CROSS_LOW;
-			if ((prevSamp <= high_trhold) &&
-			    (samp >= high_trhold)) {
+			if ((prevSamp <= high_trhold) && (samp >= high_trhold)) {
 				if (cross_type == POS_CROSS_LOW)
 					cross_type = POS_CROSS_FULL;
 				else
@@ -86,8 +80,7 @@ public:
 		} else if (samp < prevSamp) {
 			if ((prevSamp >= low_trhold) && (samp <= low_trhold))
 				cross_type = NEG_CROSS_LOW;
-			if ((prevSamp >= high_trhold) &&
-			    (samp <= high_trhold)) {
+			if ((prevSamp >= high_trhold) && (samp <= high_trhold)) {
 				if (cross_type == NEG_CROSS_LOW)
 					cross_type = NEG_CROSS_FULL;
 				else
@@ -172,8 +165,7 @@ public:
 
 class CrossingDetection {
 public:
-	CrossingDetection(double level, double hysteresis_span,
-			  const QString &name)
+	CrossingDetection(double level, double hysteresis_span, const QString &name)
 		: m_posCrossFound(false)
 		, m_negCrossFound(false)
 		, m_crossed(false)
@@ -206,14 +198,11 @@ public:
 		}
 	}
 
-	void setExternalList(QList<CrossPoint> *externList) {
-		m_externList = externList;
-	}
+	void setExternalList(QList<CrossPoint> *externList) { m_externList = externList; }
 
 	QList<CrossPoint> detectedCrossings() { return m_detectedCrossings; }
 
-	inline void store_closest_val_to_cross_lvl(double *data, size_t i,
-						   size_t &point) {
+	inline void store_closest_val_to_cross_lvl(double *data, size_t i, size_t &point) {
 		double diff1 = qAbs(data[i - 1] - m_level);
 		double diff2 = qAbs(data[i] - m_level);
 		double diff;
@@ -232,8 +221,7 @@ public:
 			point = idx;
 	}
 
-	inline void store_first_closest_val_to_cross_lvl(double *data, size_t i,
-							 size_t &point) {
+	inline void store_first_closest_val_to_cross_lvl(double *data, size_t i, size_t &point) {
 		double diff1 = qAbs(data[i - 1] - m_level);
 		double diff2 = qAbs(data[i] - m_level);
 
@@ -244,68 +232,47 @@ public:
 	}
 
 	inline void crossDetectStep(double *data, size_t i) {
-		auto cross_type = HystLevelCross::get_crossing_type(
-			data[i], data[i - 1], m_low_level, m_high_level);
+		auto cross_type = HystLevelCross::get_crossing_type(data[i], data[i - 1], m_low_level, m_high_level);
 
 		if (m_posCross.isBetweenThresholds())
-			store_closest_val_to_cross_lvl(data, i,
-						       m_posCrossPoint);
+			store_closest_val_to_cross_lvl(data, i, m_posCrossPoint);
 		if (m_negCross.isBetweenThresholds())
-			store_closest_val_to_cross_lvl(data, i,
-						       m_negCrossPoint);
+			store_closest_val_to_cross_lvl(data, i, m_negCrossPoint);
 
 		if (cross_type != HystLevelCross::NO_CROSS) {
 			if (!m_posCrossFound) {
-				bool old_between_thresh =
-					m_posCross.isBetweenThresholds();
+				bool old_between_thresh = m_posCross.isBetweenThresholds();
 				m_crossed = m_posCross.updateState(cross_type);
-				if (!old_between_thresh &&
-				    m_posCross.isBetweenThresholds())
-					store_first_closest_val_to_cross_lvl(
-						data, i, m_posCrossPoint);
+				if (!old_between_thresh && m_posCross.isBetweenThresholds())
+					store_first_closest_val_to_cross_lvl(data, i, m_posCrossPoint);
 
 				if (m_crossed) {
 					m_posCrossFound = true;
 					m_negCrossFound = false;
 					m_negCross.resetState();
-					if (cross_type ==
-					    HystLevelCross::POS_CROSS_FULL)
+					if (cross_type == HystLevelCross::POS_CROSS_FULL)
 						m_posCrossPoint = i;
 					m_detectedCrossings.push_back(
-						CrossPoint(
-							data[m_posCrossPoint],
-							m_posCrossPoint, true,
-							m_name + "R"));
+						CrossPoint(data[m_posCrossPoint], m_posCrossPoint, true, m_name + "R"));
 					if (m_externList)
-						m_externList->push_back(
-							m_detectedCrossings
-								.last());
+						m_externList->push_back(m_detectedCrossings.last());
 				}
 			}
 			if (!m_negCrossFound) {
-				bool old_between_thresh =
-					m_negCross.isBetweenThresholds();
+				bool old_between_thresh = m_negCross.isBetweenThresholds();
 				m_crossed = m_negCross.updateState(cross_type);
-				if (!old_between_thresh &&
-				    m_negCross.isBetweenThresholds())
-					store_first_closest_val_to_cross_lvl(
-						data, i, m_negCrossPoint);
+				if (!old_between_thresh && m_negCross.isBetweenThresholds())
+					store_first_closest_val_to_cross_lvl(data, i, m_negCrossPoint);
 				if (m_crossed) {
 					m_negCrossFound = true;
 					m_posCrossFound = false;
 					m_posCross.resetState();
-					if (cross_type ==
-					    HystLevelCross::NEG_CROSS_FULL)
+					if (cross_type == HystLevelCross::NEG_CROSS_FULL)
 						m_negCrossPoint = i - 1;
-					m_detectedCrossings.push_back(
-						CrossPoint(
-							data[m_negCrossPoint],
-							m_negCrossPoint, false,
-							m_name + "F"));
+					m_detectedCrossings.push_back(CrossPoint(data[m_negCrossPoint], m_negCrossPoint,
+										 false, m_name + "F"));
 					if (m_externList)
-						m_externList->push_back(
-							m_detectedCrossings
-								.last());
+						m_externList->push_back(m_detectedCrossings.last());
 				}
 			}
 		}
@@ -347,58 +314,42 @@ Measure::Measure(int channel, double *buffer, size_t length)
 	, m_gatingEnabled(false) {
 
 	// Create a set of measurements
-	m_measurements.push_back(std::make_shared<MeasurementData>(
-		"Period", MeasurementData::HORIZONTAL, "s", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>(
-		"Frequency", MeasurementData::HORIZONTAL, "Hz", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>(
-		"Min", MeasurementData::VERTICAL, "V", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>(
-		"Max", MeasurementData::VERTICAL, "V", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>(
-		"Peak-peak", MeasurementData::VERTICAL, "V", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>(
-		"Mean", MeasurementData::VERTICAL, "V", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>(
-		"Cycle Mean", MeasurementData::VERTICAL, "V", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>(
-		"RMS", MeasurementData::VERTICAL, "V", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>(
-		"Cycle RMS", MeasurementData::VERTICAL, "V", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>(
-		"AC RMS", MeasurementData::VERTICAL, "V", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>(
-		"Area", MeasurementData::VERTICAL, "Vs", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>(
-		"Cycle Area", MeasurementData::VERTICAL, "Vs", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>(
-		"Low", MeasurementData::VERTICAL, "V", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>(
-		"High", MeasurementData::VERTICAL, "V", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>(
-		"Amplitude", MeasurementData::VERTICAL, "V", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>(
-		"Middle", MeasurementData::VERTICAL, "V", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>(
-		"+Over", MeasurementData::VERTICAL, "%", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>(
-		"-Over", MeasurementData::VERTICAL, "%", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>(
-		"Rise", MeasurementData::HORIZONTAL, "s", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>(
-		"Fall", MeasurementData::HORIZONTAL, "s", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>(
-		"+Width", MeasurementData::HORIZONTAL, "s", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>(
-		"-Width", MeasurementData::HORIZONTAL, "s", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>(
-		"+Duty", MeasurementData::HORIZONTAL, "%", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>(
-		"-Duty", MeasurementData::HORIZONTAL, "%", channel));
+	m_measurements.push_back(
+		std::make_shared<MeasurementData>("Period", MeasurementData::HORIZONTAL, "s", channel));
+	m_measurements.push_back(
+		std::make_shared<MeasurementData>("Frequency", MeasurementData::HORIZONTAL, "Hz", channel));
+	m_measurements.push_back(std::make_shared<MeasurementData>("Min", MeasurementData::VERTICAL, "V", channel));
+	m_measurements.push_back(std::make_shared<MeasurementData>("Max", MeasurementData::VERTICAL, "V", channel));
+	m_measurements.push_back(
+		std::make_shared<MeasurementData>("Peak-peak", MeasurementData::VERTICAL, "V", channel));
+	m_measurements.push_back(std::make_shared<MeasurementData>("Mean", MeasurementData::VERTICAL, "V", channel));
+	m_measurements.push_back(
+		std::make_shared<MeasurementData>("Cycle Mean", MeasurementData::VERTICAL, "V", channel));
+	m_measurements.push_back(std::make_shared<MeasurementData>("RMS", MeasurementData::VERTICAL, "V", channel));
+	m_measurements.push_back(
+		std::make_shared<MeasurementData>("Cycle RMS", MeasurementData::VERTICAL, "V", channel));
+	m_measurements.push_back(std::make_shared<MeasurementData>("AC RMS", MeasurementData::VERTICAL, "V", channel));
+	m_measurements.push_back(std::make_shared<MeasurementData>("Area", MeasurementData::VERTICAL, "Vs", channel));
+	m_measurements.push_back(
+		std::make_shared<MeasurementData>("Cycle Area", MeasurementData::VERTICAL, "Vs", channel));
+	m_measurements.push_back(std::make_shared<MeasurementData>("Low", MeasurementData::VERTICAL, "V", channel));
+	m_measurements.push_back(std::make_shared<MeasurementData>("High", MeasurementData::VERTICAL, "V", channel));
+	m_measurements.push_back(
+		std::make_shared<MeasurementData>("Amplitude", MeasurementData::VERTICAL, "V", channel));
+	m_measurements.push_back(std::make_shared<MeasurementData>("Middle", MeasurementData::VERTICAL, "V", channel));
+	m_measurements.push_back(std::make_shared<MeasurementData>("+Over", MeasurementData::VERTICAL, "%", channel));
+	m_measurements.push_back(std::make_shared<MeasurementData>("-Over", MeasurementData::VERTICAL, "%", channel));
+	m_measurements.push_back(std::make_shared<MeasurementData>("Rise", MeasurementData::HORIZONTAL, "s", channel));
+	m_measurements.push_back(std::make_shared<MeasurementData>("Fall", MeasurementData::HORIZONTAL, "s", channel));
+	m_measurements.push_back(
+		std::make_shared<MeasurementData>("+Width", MeasurementData::HORIZONTAL, "s", channel));
+	m_measurements.push_back(
+		std::make_shared<MeasurementData>("-Width", MeasurementData::HORIZONTAL, "s", channel));
+	m_measurements.push_back(std::make_shared<MeasurementData>("+Duty", MeasurementData::HORIZONTAL, "%", channel));
+	m_measurements.push_back(std::make_shared<MeasurementData>("-Duty", MeasurementData::HORIZONTAL, "%", channel));
 }
 
-bool Measure::highLowFromHistogram(double &low, double &high, double min,
-				   double max) {
+bool Measure::highLowFromHistogram(double &low, double &high, double min, double max) {
 	bool success = false;
 	int *hist = m_histogram;
 	int adc_span = 1 << m_adc_bit_count;
@@ -418,8 +369,7 @@ bool Measure::highLowFromHistogram(double &low, double &high, double min,
 	   clearly identified (weight of a level should be 5 times
 	   greater than a peak weight - there probably is a better method) */
 
-	if (hist[lowRaw] / 5.0 >= hist[minRaw] &&
-	    hist[highRaw] / 5.0 >= hist[maxRaw]) {
+	if (hist[lowRaw] / 5.0 >= hist[minRaw] && hist[highRaw] / 5.0 >= hist[maxRaw]) {
 		low = adc_sample_conv::convSampleToVolts(lowRaw - hlf_scale);
 		high = adc_sample_conv::convSampleToVolts(highRaw - hlf_scale);
 		success = true;
@@ -513,8 +463,7 @@ void Measure::measure() {
 		endIndex = data_length;
 	}
 
-	m_cross_detect =
-		new CrossingDetection(m_cross_level, m_hysteresis_span, "P");
+	m_cross_detect = new CrossingDetection(m_cross_level, m_hysteresis_span, "P");
 	if (using_histogram_method)
 		m_histogram = new int[adc_span]{};
 
@@ -545,9 +494,7 @@ void Measure::measure() {
 
 		// Build histogram
 		if (using_histogram_method) {
-			int raw = hlf_scale +
-				(int)adiscope::adc_sample_conv::
-					convVoltsToSample(data[i]);
+			int raw = hlf_scale + (int)adiscope::adc_sample_conv::convVoltsToSample(data[i]);
 			if (raw >= 0 && raw < adc_span)
 				m_histogram[raw] += 1;
 		}
@@ -611,8 +558,7 @@ void Measure::measure() {
 		int k = 0;
 
 		for (int i = 0; i < n - 1; i++) {
-			size_t diff = periodPoints[i + 1].m_bufIdx -
-				periodPoints[i].m_bufIdx;
+			size_t diff = periodPoints[i + 1].m_bufIdx - periodPoints[i].m_bufIdx;
 			if (i % 2) {
 				secnd_hlf_cycl += diff;
 				j++;
@@ -622,8 +568,7 @@ void Measure::measure() {
 			}
 		}
 
-		sample_period = first_hlf_cycl / (n / 2) +
-			secnd_hlf_cycl / ((n + 1) / 2 - 1);
+		sample_period = first_hlf_cycl / (n / 2) + secnd_hlf_cycl / ((n + 1) / 2 - 1);
 		period = sample_period * (1 / m_sample_rate);
 		m_measurements[PERIOD]->setValue(period);
 
@@ -651,8 +596,7 @@ void Measure::measure() {
 		double period_sum = data[period_start];
 		double period_sqr_sum = data[period_start] * data[period_start];
 
-		for (size_t i = period_start + 1;
-		     i <= period_start + 2 * length; i++) {
+		for (size_t i = period_start + 1; i <= period_start + 2 * length; i++) {
 			size_t idx = period_start + (i % length);
 
 			cdLow.crossDetectStep(data, idx);
@@ -668,15 +612,12 @@ void Measure::measure() {
 		for (int i = 1; i < crossSequence.size(); i++) {
 			CrossPoint &p0 = crossSequence[i - 1];
 			CrossPoint &p1 = crossSequence[i];
-			if ((p1.m_bufIdx == p0.m_bufIdx) &&
-			    (p1.m_onRising == p0.m_onRising)) {
+			if ((p1.m_bufIdx == p0.m_bufIdx) && (p1.m_onRising == p0.m_onRising)) {
 				if ((p0.m_name == "MR" && p1.m_name == "LR") ||
 				    (p0.m_name == "HR" && p1.m_name == "MR"))
 					crossSequence.swap(i, i - 1);
-				else if ((p0.m_name == "MF" &&
-					  p1.m_name == "HF") ||
-					 (p0.m_name == "LF" &&
-					  p1.m_name == "MF"))
+				else if ((p0.m_name == "MF" && p1.m_name == "HF") ||
+					 (p0.m_name == "LF" && p1.m_name == "MF"))
 					crossSequence.swap(i, i - 1);
 			}
 		}
@@ -717,24 +658,21 @@ void Measure::measure() {
 			m_measurements[CYCLE_AREA]->setValue(cycle_area);
 
 			// Rise Time
-			long long rise = (long long)(highRising.m_bufIdx -
-						     lowRising.m_bufIdx);
+			long long rise = (long long)(highRising.m_bufIdx - lowRising.m_bufIdx);
 			if (rise < 0)
 				rise += length;
 			rise_time = rise / m_sample_rate;
 			m_measurements[RISE]->setValue(rise_time);
 
 			// Fall Time
-			long long fall = (long long)(lowFalling.m_bufIdx -
-						     highFalling.m_bufIdx);
+			long long fall = (long long)(lowFalling.m_bufIdx - highFalling.m_bufIdx);
 			if (fall < 0)
 				fall += length;
 			fall_time = fall / m_sample_rate;
 			m_measurements[FALL]->setValue(fall_time);
 
 			// Positive Width
-			long long posWidth = (long long)(midFalling.m_bufIdx -
-							 midRising.m_bufIdx);
+			long long posWidth = (long long)(midFalling.m_bufIdx - midRising.m_bufIdx);
 			if (posWidth < 0)
 				posWidth += length;
 			width_p = posWidth / m_sample_rate;
@@ -791,13 +729,9 @@ void Measure::setEndIndex(int index) { m_endIndex = index; }
 
 void Measure::setGatingEnabled(bool enable) { m_gatingEnabled = enable; }
 
-QList<std::shared_ptr<MeasurementData>> Measure::measurments() {
-	return m_measurements;
-}
+QList<std::shared_ptr<MeasurementData>> Measure::measurments() { return m_measurements; }
 
-std::shared_ptr<MeasurementData> Measure::measurement(int id) {
-	return m_measurements[id];
-}
+std::shared_ptr<MeasurementData> Measure::measurement(int id) { return m_measurements[id]; }
 
 int Measure::activeMeasurementsCount() const {
 	int count = 0;
@@ -813,8 +747,7 @@ int Measure::activeMeasurementsCount() const {
  * Class MeasurementData implementation
  */
 
-MeasurementData::MeasurementData(const QString &name, axisType axis,
-				 const QString &unit, int channel)
+MeasurementData::MeasurementData(const QString &name, axisType axis, const QString &unit, int channel)
 	: m_name(name)
 	, m_value(0)
 	, m_measured(false)
@@ -852,9 +785,7 @@ void MeasurementData::setEnabled(bool en) { m_enabled = en; }
 
 QString MeasurementData::unit() const { return m_unit; }
 
-MeasurementData::unitTypes MeasurementData::unitType() const {
-	return m_unitType;
-}
+MeasurementData::unitTypes MeasurementData::unitType() const { return m_unitType; }
 
 int MeasurementData::channel() const { return m_channel; }
 
@@ -866,8 +797,7 @@ MeasurementData::axisType MeasurementData::axis() const { return m_axis; }
  * Class Statistic implementation
  */
 
-Statistic::Statistic()
-	: m_sum(0), m_min(0), m_max(0), m_dataCount(0), m_average(0) {}
+Statistic::Statistic() : m_sum(0), m_min(0), m_max(0), m_dataCount(0), m_average(0) {}
 
 void Statistic::pushNewData(double data) {
 	m_sum += data;

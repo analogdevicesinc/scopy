@@ -48,8 +48,8 @@
 
 using namespace adiscope;
 
-DMM::DMM(struct iio_context *ctx, Filter *filt, std::shared_ptr<GenericAdc> adc,
-	 ToolMenuItem *toolMenuItem, QJSEngine *engine, ToolLauncher *parent)
+DMM::DMM(struct iio_context *ctx, Filter *filt, std::shared_ptr<GenericAdc> adc, ToolMenuItem *toolMenuItem,
+	 QJSEngine *engine, ToolLauncher *parent)
 	: Tool(ctx, toolMenuItem, new DMM_API(this), "Voltmeter", parent)
 	, ui(new Ui::DMM)
 	, signal(boost::make_shared<signal_sample>())
@@ -70,8 +70,7 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, std::shared_ptr<GenericAdc> adc,
 	ui->sismograph_ch2->setColor(QColor("#9013fe"));
 
 	data_logging_timer =
-		new PositionSpinButton({{"s", 1}, {"min", 60}, {"h", 3600}},
-				       "Timer", 0, 3600, true, false, this);
+		new PositionSpinButton({{"s", 1}, {"min", 60}, {"h", 3600}}, "Timer", 0, 3600, true, false, this);
 
 	ui->horizontalLayout_2->addWidget(data_logging_timer);
 
@@ -80,17 +79,12 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, std::shared_ptr<GenericAdc> adc,
 		m_max.push_back(-Q_INFINITY);
 	}
 
-	connect(ui->run_button, SIGNAL(toggled(bool)), this,
-		SLOT(toggleTimer(bool)));
-	connect(ui->run_button, SIGNAL(toggled(bool)), runButton(),
-		SLOT(setChecked(bool)));
-	connect(runButton(), SIGNAL(toggled(bool)), ui->run_button,
-		SLOT(setChecked(bool)));
-	connect(ui->run_button, SIGNAL(toggled(bool)), this,
-		SLOT(startDataLogging(bool)));
+	connect(ui->run_button, SIGNAL(toggled(bool)), this, SLOT(toggleTimer(bool)));
+	connect(ui->run_button, SIGNAL(toggled(bool)), runButton(), SLOT(setChecked(bool)));
+	connect(runButton(), SIGNAL(toggled(bool)), ui->run_button, SLOT(setChecked(bool)));
+	connect(ui->run_button, SIGNAL(toggled(bool)), this, SLOT(startDataLogging(bool)));
 
-	connect(ui->btnDataLogging, SIGNAL(toggled(bool)), this,
-		SLOT(toggleDataLogging(bool)));
+	connect(ui->btnDataLogging, SIGNAL(toggled(bool)), this, SLOT(toggleDataLogging(bool)));
 
 	connect(ui->btnChooseFile, SIGNAL(clicked()), this, SLOT(chooseFile()));
 
@@ -106,14 +100,13 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, std::shared_ptr<GenericAdc> adc,
 		}
 	});
 
-	connect(data_logging_timer, &PositionSpinButton::valueChanged,
-		[&](double value) {
-			if (value == 0)
-				use_timer = false;
-			else
-				use_timer = true;
-			logging_refresh_rate = value * 1000;
-		});
+	connect(data_logging_timer, &PositionSpinButton::valueChanged, [&](double value) {
+		if (value == 0)
+			use_timer = false;
+		else
+			use_timer = true;
+		logging_refresh_rate = value * 1000;
+	});
 
 	data_logging_timer->setValue(0);
 	enableDataLogging(false);
@@ -124,24 +117,16 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, std::shared_ptr<GenericAdc> adc,
 	connect(ui->btn_ch1_ac2, SIGNAL(toggled(bool)), this, SLOT(toggleAC()));
 	connect(ui->btn_ch2_ac2, SIGNAL(toggled(bool)), this, SLOT(toggleAC()));
 
-	connect(ui->btn_ch1_dc, &QPushButton::toggled,
-		[&](bool en) { setDynamicProperty(ui->labelCh1, "ac", !en); });
-	connect(ui->btn_ch2_dc, &QPushButton::toggled,
-		[&](bool en) { setDynamicProperty(ui->labelCh2, "ac", !en); });
+	connect(ui->btn_ch1_dc, &QPushButton::toggled, [&](bool en) { setDynamicProperty(ui->labelCh1, "ac", !en); });
+	connect(ui->btn_ch2_dc, &QPushButton::toggled, [&](bool en) { setDynamicProperty(ui->labelCh2, "ac", !en); });
 
-	connect(ui->historySizeCh1, SIGNAL(currentIndexChanged(int)), this,
-		SLOT(setHistorySizeCh1(int)));
-	connect(ui->historySizeCh2, SIGNAL(currentIndexChanged(int)), this,
-		SLOT(setHistorySizeCh2(int)));
+	connect(ui->historySizeCh1, SIGNAL(currentIndexChanged(int)), this, SLOT(setHistorySizeCh1(int)));
+	connect(ui->historySizeCh2, SIGNAL(currentIndexChanged(int)), this, SLOT(setHistorySizeCh2(int)));
 
-	connect(ui->btnResetPeakHold, SIGNAL(clicked(bool)),
-		SLOT(resetPeakHold(bool)));
-	connect(ui->btnDisplayPeakHold, SIGNAL(toggled(bool)),
-		SLOT(displayPeakHold(bool)));
-	connect(ui->btnCollapseDataLog, SIGNAL(toggled(bool)),
-		SLOT(collapseDataLog(bool)));
-	connect(ui->btnCollapsePeakHold, SIGNAL(toggled(bool)),
-		SLOT(collapsePeakHold(bool)));
+	connect(ui->btnResetPeakHold, SIGNAL(clicked(bool)), SLOT(resetPeakHold(bool)));
+	connect(ui->btnDisplayPeakHold, SIGNAL(toggled(bool)), SLOT(displayPeakHold(bool)));
+	connect(ui->btnCollapseDataLog, SIGNAL(toggled(bool)), SLOT(collapseDataLog(bool)));
+	connect(ui->btnCollapsePeakHold, SIGNAL(toggled(bool)), SLOT(collapsePeakHold(bool)));
 
 	setHistorySizeCh1(ui->historySizeCh1->currentIndex());
 	setHistorySizeCh2(ui->historySizeCh2->currentIndex());
@@ -153,8 +138,7 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, std::shared_ptr<GenericAdc> adc,
 
 	configureModes();
 
-	connect(&*signal, SIGNAL(triggered(std::vector<float>)), this,
-		SLOT(updateValuesList(std::vector<float>)));
+	connect(&*signal, SIGNAL(triggered(std::vector<float>)), this, SLOT(updateValuesList(std::vector<float>)));
 
 	if (started)
 		manager->unlock();
@@ -232,9 +216,7 @@ void DMM::checkPeakValues(int ch, double peak) {
 	}
 }
 
-bool DMM::isIioManagerStarted() const {
-	return manager->started() && ui->run_button->isChecked();
-}
+bool DMM::isIioManagerStarted() const { return manager->started() && ui->run_button->isChecked(); }
 
 void DMM::collapseDataLog(bool checked) {
 	if (checked)
@@ -297,11 +279,9 @@ void DMM::toggleTimer(bool start) {
 	m_running = start;
 }
 
-gr::basic_block_sptr DMM::configureGraph(gr::basic_block_sptr s2f,
-					 bool is_low_ac, bool is_high_ac) {
+gr::basic_block_sptr DMM::configureGraph(gr::basic_block_sptr s2f, bool is_low_ac, bool is_high_ac) {
 	/* 10 fps refresh rate for the plot */
-	auto keep_one = gr::blocks::keep_one_in_n::make(
-		sizeof(float), is_high_ac ? (sample_rate / 10.0) : 1000.0);
+	auto keep_one = gr::blocks::keep_one_in_n::make(sizeof(float), is_high_ac ? (sample_rate / 10.0) : 1000.0);
 
 	/* TODO: figure out best value for the blocker parameter */
 	auto blocker = gr::filter::dc_blocker_ff::make(1000, true);
@@ -338,10 +318,8 @@ void DMM::configureModes() {
 		id_ch1 = manager->connect(s2f1, 0, 0, false, sample_rate / 10);
 	} else {
 		/* Low-frequency AC: decimate data rate */
-		auto keep_one1 = gr::blocks::keep_one_in_n::make(
-			sizeof(short), sample_rate / 1e4);
-		id_ch1 = manager->connect(keep_one1, 0, 0, false,
-					  sample_rate / 10);
+		auto keep_one1 = gr::blocks::keep_one_in_n::make(sizeof(short), sample_rate / 1e4);
+		id_ch1 = manager->connect(keep_one1, 0, 0, false, sample_rate / 10);
 
 		manager->connect(keep_one1, 0, s2f1, 0);
 	}
@@ -350,10 +328,8 @@ void DMM::configureModes() {
 		id_ch2 = manager->connect(s2f2, 1, 0, false, sample_rate / 10);
 	} else {
 		/* Low-frequency AC: decimate data rate */
-		auto keep_one2 = gr::blocks::keep_one_in_n::make(
-			sizeof(short), sample_rate / 1e4);
-		id_ch2 = manager->connect(keep_one2, 1, 0, false,
-					  sample_rate / 10);
+		auto keep_one2 = gr::blocks::keep_one_in_n::make(sizeof(short), sample_rate / 1e4);
+		id_ch2 = manager->connect(keep_one2, 1, 0, false, sample_rate / 10);
 
 		manager->connect(keep_one2, 0, s2f2, 0);
 	}
@@ -369,11 +345,8 @@ void DMM::chooseFile() {
 	QString selectedFilter;
 
 	QString fileName = QFileDialog::getSaveFileName(
-		this, tr("Export"), "",
-		tr("Comma-separated values files (*.csv);;All Files(*)"),
-		&selectedFilter,
-		(m_useNativeDialogs ? QFileDialog::Options()
-				    : QFileDialog::DontUseNativeDialog));
+		this, tr("Export"), "", tr("Comma-separated values files (*.csv);;All Files(*)"), &selectedFilter,
+		(m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 
 	ui->filename->setText(fileName);
 
@@ -424,26 +397,21 @@ void DMM::toggleDataLogging(bool en) {
 
 		if (ui->btn_overwrite->isChecked() || file.size() == 0) {
 			if (!file.open(QIODevice::WriteOnly)) {
-				ui->lblFileStatus->setText(
-					"File is open in another program");
-				setDynamicProperty(ui->filename, "invalid",
-						   true);
+				ui->lblFileStatus->setText("File is open in another program");
+				setDynamicProperty(ui->filename, "invalid", true);
 				if (ui->run_button->isChecked()) {
 					ui->btnDataLogging->setChecked(false);
 				}
 				return;
 			} else {
 				ui->lblFileStatus->setText("Choose a file");
-				setDynamicProperty(ui->filename, "invalid",
-						   false);
+				setDynamicProperty(ui->filename, "invalid", false);
 			}
 			QTextStream out(&file);
 
 			/* Write the header */
-			out << ";Generated by Scopy-"
-			    << QString(SCOPY_VERSION_GIT) << "\n"
-			    << ";Started on "
-			    << QDateTime::currentDateTime().toString() << "\n";
+			out << ";Generated by Scopy-" << QString(SCOPY_VERSION_GIT) << "\n"
+			    << ";Started on " << QDateTime::currentDateTime().toString() << "\n";
 			out << "Timestamp,Channel_0_DC_RMS,Channel_0_AC_RMS,"
 			       "Channel_1_DC_RMS,Channel_1_AC_RMS\n";
 
@@ -460,8 +428,7 @@ void DMM::toggleDataLogging(bool en) {
 			return;
 
 		interrupt_data_logging = false;
-		data_logging_thread =
-			std::thread(&DMM::dataLoggingThread, this);
+		data_logging_thread = std::thread(&DMM::dataLoggingThread, this);
 	} else if (!en) {
 		if (!use_timer)
 			data_cond.notify_all();
@@ -486,8 +453,7 @@ void DMM::startDataLogging(bool start) {
 		interrupt_data_logging = false;
 		ui->btn_overwrite->setEnabled(false);
 		ui->btn_append->setEnabled(false);
-		data_logging_thread =
-			std::thread(&DMM::dataLoggingThread, this);
+		data_logging_thread = std::thread(&DMM::dataLoggingThread, this);
 
 	} else {
 		if (!use_timer)
@@ -510,10 +476,8 @@ void DMM::dataLoggingThread() {
 	while (!interrupt_data_logging) {
 		if (!file.isOpen()) {
 			if (!file.open(QIODevice::Append)) {
-				ui->lblFileStatus->setText(
-					"File is open in another program");
-				setDynamicProperty(ui->filename, "invalid",
-						   true);
+				ui->lblFileStatus->setText("File is open in another program");
+				setDynamicProperty(ui->filename, "invalid", true);
 				if (ui->run_button->isChecked()) {
 					ui->btnDataLogging->setChecked(false);
 				}
@@ -526,11 +490,9 @@ void DMM::dataLoggingThread() {
 		bool is_low_ac_ch2 = ui->btn_ch2_ac->isChecked();
 		bool is_high_ac_ch1 = ui->btn_ch1_ac2->isChecked();
 		bool is_high_ac_ch2 = ui->btn_ch2_ac2->isChecked();
-		QString ch1_dc_rms = "-", ch2_dc_rms = "-", ch1_ac_rms = "-",
-			ch2_ac_rms = "-";
+		QString ch1_dc_rms = "-", ch2_dc_rms = "-", ch1_ac_rms = "-", ch2_ac_rms = "-";
 
-		out << QDateTime::currentDateTime().time().toString()
-		    << separator;
+		out << QDateTime::currentDateTime().time().toString() << separator;
 
 		if (!use_timer) {
 			boost::unique_lock<boost::mutex> lock(data_mutex);
@@ -550,8 +512,8 @@ void DMM::dataLoggingThread() {
 		}
 
 		/* Write the values to file */
-		out << ch1_dc_rms << separator << ch1_ac_rms << separator
-		    << ch2_dc_rms << separator << ch2_ac_rms << "\n";
+		out << ch1_dc_rms << separator << ch1_ac_rms << separator << ch2_dc_rms << separator << ch2_ac_rms
+		    << "\n";
 
 		if (file.isOpen()) {
 			file.close();

@@ -40,8 +40,8 @@ public:
 	// adiscope::scope_sink_f::sptr
 	typedef boost::shared_ptr<scope_sink_f> sptr;
 
-	static sptr make(int size, double samp_rate, const std::string &name,
-			 int nconnections = 1, QObject *plot = NULL);
+	static sptr make(int size, double samp_rate, const std::string &name, int nconnections = 1,
+			 QObject *plot = NULL);
 
 	virtual void exec_() = 0;
 
@@ -49,8 +49,7 @@ public:
 	virtual void set_nsamps(const int newsize) = 0;
 	virtual void set_samp_rate(const double samp_rate) = 0;
 
-	virtual void set_trigger_mode(trigger_mode mode, int channel,
-				      const std::string &tag_key = "") = 0;
+	virtual void set_trigger_mode(trigger_mode mode, int channel, const std::string &tag_key = "") = 0;
 
 	virtual int nsamps() const = 0;
 	virtual std::string name() const = 0;

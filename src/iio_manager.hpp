@@ -44,9 +44,8 @@ public:
 
 	/* Get a shared pointer to the instance of iio_manager that
 	 * manages the requested device */
-	static boost::shared_ptr<iio_manager>
-	get_instance(struct iio_context *ctx, const std::string &dev,
-		     unsigned long buffer_size = IIO_BUFFER_SIZE);
+	static boost::shared_ptr<iio_manager> get_instance(struct iio_context *ctx, const std::string &dev,
+							   unsigned long buffer_size = IIO_BUFFER_SIZE);
 
 	~iio_manager();
 
@@ -54,20 +53,17 @@ public:
 	 * This function returns the ID, that can later be used with
 	 * start() and stop().
 	 * Warning: the flowgraph needs to be locked first! */
-	port_id connect(gr::basic_block_sptr dst, int src_port, int dst_port,
-			bool use_float = false,
+	port_id connect(gr::basic_block_sptr dst, int src_port, int dst_port, bool use_float = false,
 			unsigned long buffer_size = IIO_BUFFER_SIZE);
 
 	/* Connect two regular blocks between themselves. */
-	void connect(gr::basic_block_sptr src, int src_port,
-		     gr::basic_block_sptr dst, int dst_port);
+	void connect(gr::basic_block_sptr src, int src_port, gr::basic_block_sptr dst, int dst_port);
 
 	/* Disconnect the whole tree of blocks connected to this port ID */
 	void disconnect(port_id id);
 
 	/* Disconnect two regular blocks. */
-	void disconnect(gr::basic_block_sptr src, int src_port,
-			gr::basic_block_sptr dst, int dst_port);
+	void disconnect(gr::basic_block_sptr src, int src_port, gr::basic_block_sptr dst, int dst_port);
 
 	/* Start feeding data to the client connected at [port, id] */
 	void start(port_id id);
@@ -120,8 +116,7 @@ private:
 
 	std::vector<connection> connections;
 
-	iio_manager(unsigned int id, struct iio_context *ctx,
-		    const std::string &dev, unsigned long buffer_size);
+	iio_manager(unsigned int id, struct iio_context *ctx, const std::string &dev, unsigned long buffer_size);
 
 	void del_connection(gr::basic_block_sptr block, bool reverse);
 

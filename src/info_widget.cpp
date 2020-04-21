@@ -6,8 +6,7 @@
 
 using namespace adiscope;
 
-InfoWidget::InfoWidget(QWidget *parent)
-	: QWidget(parent), ui(new Ui::InfoWidget) {
+InfoWidget::InfoWidget(QWidget *parent) : QWidget(parent), ui(new Ui::InfoWidget) {
 	ui->setupUi(this);
 	timer = new QTimer(this);
 	connect(timer, SIGNAL(timeout()), this, SLOT(updatePosition()));

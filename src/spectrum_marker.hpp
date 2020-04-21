@@ -27,8 +27,7 @@ namespace adiscope {
 class SpectrumMarker : public QwtPlotMarker {
 public:
 	SpectrumMarker(const QString &title, bool movable = true);
-	SpectrumMarker(const QString &title, QwtAxisId xAxis, QwtAxisId yAxis,
-		       bool movable = true);
+	SpectrumMarker(const QString &title, QwtAxisId xAxis, QwtAxisId yAxis, bool movable = true);
 	virtual ~SpectrumMarker();
 
 	QColor defaultColor() const;

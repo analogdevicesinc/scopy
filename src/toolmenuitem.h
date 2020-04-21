@@ -27,8 +27,7 @@ namespace adiscope {
 class ToolMenuItem : public BaseMenuItem {
 	Q_OBJECT
 public:
-	explicit ToolMenuItem(QString name, QString iconPath,
-			      QWidget *parent = nullptr);
+	explicit ToolMenuItem(QString name, QString iconPath, QWidget *parent = nullptr);
 	virtual ~ToolMenuItem();
 
 	QPushButton *getToolBtn() const;

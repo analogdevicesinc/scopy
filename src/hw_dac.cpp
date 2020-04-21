@@ -12,12 +12,10 @@ using namespace adiscope;
 
 GenericDac::GenericDac(struct iio_context *ctx, struct iio_device *dac_dev)
 	: m_ctx(ctx), m_dac(dac_dev), m_dac_bits(0) {
-	m_dac_channels = IioUtils::pick_channels_with_direction(
-		IioUtils::scan_elem_channel_list(dac_dev), true);
+	m_dac_channels = IioUtils::pick_channels_with_direction(IioUtils::scan_elem_channel_list(dac_dev), true);
 
 	if (m_dac_channels.size() > 0) {
-		m_dac_bits =
-			iio_channel_get_data_format(m_dac_channels[0])->bits;
+		m_dac_bits = iio_channel_get_data_format(m_dac_channels[0])->bits;
 	}
 	setVOutH(5.0);
 	setVOutL(-5.0);
@@ -37,25 +35,20 @@ struct iio_device *GenericDac::iio_dac_dev() const {
 
 uint GenericDac::numDacChannels() const { return m_dac_channels.size(); }
 
-QList<struct iio_channel *> GenericDac::dacChannelList() const {
-	return m_dac_channels;
-}
+QList<struct iio_channel *> GenericDac::dacChannelList() const { return m_dac_channels; }
 
 uint GenericDac::numDacBits() const { return m_dac_bits; }
 
 double GenericDac::sampleRate() const { return m_sample_rate; }
 
 double GenericDac::readSampleRate() {
-	iio_device_attr_read_double(m_dac, "sampling_frequency",
-				    &m_sample_rate);
+	iio_device_attr_read_double(m_dac, "sampling_frequency", &m_sample_rate);
 
 	return m_sample_rate;
 }
 
 size_t GenericDac::maxNumberOfSamples() { return m_maxNumberOfSamples; }
-void GenericDac::setMaxNumberOfSamples(size_t val) {
-	m_maxNumberOfSamples = val;
-}
+void GenericDac::setMaxNumberOfSamples(size_t val) { m_maxNumberOfSamples = val; }
 
 void GenericDac::setSampleRate(double sr) {
 	iio_device_attr_write_double(m_dac, "sampling_frequency", sr);
@@ -85,8 +78,7 @@ void GenericDac::setVOutH(double value) { m_vOutH = value; }
  * Class M2kDac
  */
 
-M2kDac::M2kDac(struct iio_context *ctx, struct iio_device *dac_dev)
-	: GenericDac(ctx, dac_dev) {
+M2kDac::M2kDac(struct iio_context *ctx, struct iio_device *dac_dev) : GenericDac(ctx, dac_dev) {
 	// Filters applied while interpolating affect the amplitude of the
 	// transmitted data
 
@@ -104,14 +96,10 @@ M2kDac::M2kDac(struct iio_context *ctx, struct iio_device *dac_dev)
 
 M2kDac::~M2kDac() {}
 
-double M2kDac::compTable(double samplRate) const {
-	return m_filt_comp_table.at(samplRate);
-}
+double M2kDac::compTable(double samplRate) const { return m_filt_comp_table.at(samplRate); }
 
 double M2kDac::vlsb() const { return m_vlsb; }
 
 void M2kDac::setVlsb(double vlsb) { m_vlsb = vlsb; }
 
-double M2kDac::convVoltsToSample(double volts) {
-	return (-1 * (1 / vlsb()) * 16) / compTable(sampleRate());
-}
+double M2kDac::convVoltsToSample(double volts) { return (-1 * (1 / vlsb()) * 16) / compTable(sampleRate()); }

@@ -32,8 +32,7 @@
 
 using namespace adiscope;
 
-ConnectDialog::ConnectDialog(QWidget *widget)
-	: QWidget(widget), ui(new Ui::Connect), connected(false) {
+ConnectDialog::ConnectDialog(QWidget *widget) : QWidget(widget), ui(new Ui::Connect), connected(false) {
 	ui->setupUi(this);
 	ui->connectBtn->setText("Connect");
 	// The connect button will be disabled untill we write something in the
@@ -41,12 +40,9 @@ ConnectDialog::ConnectDialog(QWidget *widget)
 	ui->connectBtn->setDisabled(true);
 
 	connect(ui->connectBtn, SIGNAL(clicked()), this, SLOT(btnClicked()));
-	connect(ui->hostname, SIGNAL(returnPressed()), this,
-		SLOT(btnClicked()));
-	connect(ui->hostname, SIGNAL(textChanged(const QString &)), this,
-		SLOT(discardSettings()));
-	connect(this, SIGNAL(finished(struct iio_context *)), this,
-		SLOT(updatePopUp(struct iio_context *)));
+	connect(ui->hostname, SIGNAL(returnPressed()), this, SLOT(btnClicked()));
+	connect(ui->hostname, SIGNAL(textChanged(const QString &)), this, SLOT(discardSettings()));
+	connect(this, SIGNAL(finished(struct iio_context *)), this, SLOT(updatePopUp(struct iio_context *)));
 	ui->hostname->activateWindow();
 	ui->hostname->setFocus();
 	setDynamicProperty(ui->hostname, "invalid", false);
@@ -94,16 +90,14 @@ void ConnectDialog::validateInput() {
 
 	QString new_uri = "ip:" + ui->hostname->text();
 	this->ui->hostname->setDisabled(true);
-	QtConcurrent::run(
-		std::bind(&ConnectDialog::createContext, this, new_uri));
+	QtConcurrent::run(std::bind(&ConnectDialog::createContext, this, new_uri));
 }
 
 void ConnectDialog::createContext(const QString &uri) {
 
 	this->parent()->installEventFilter(this);
 
-	struct iio_context *ctx_from_uri =
-		iio_create_context_from_uri(uri.toStdString().c_str());
+	struct iio_context *ctx_from_uri = iio_create_context_from_uri(uri.toStdString().c_str());
 
 	this->parent()->removeEventFilter(this);
 
@@ -128,13 +122,11 @@ void ConnectDialog::updatePopUp(struct iio_context *ctx) {
 		setDynamicProperty(ui->hostname, "valid", false);
 		setDynamicProperty(ui->hostname, "invalid", true);
 		ui->infoSection->setText("Warning");
-		ui->description->setText(
-			"Error: Unable to find host: No such host is known!");
+		ui->description->setText("Error: Unable to find host: No such host is known!");
 	}
 }
 bool ConnectDialog::eventFilter(QObject *watched, QEvent *event) {
-	if (event->type() == QEvent::MouseButtonPress ||
-	    event->type() == QEvent::MouseButtonDblClick ||
+	if (event->type() == QEvent::MouseButtonPress || event->type() == QEvent::MouseButtonDblClick ||
 	    event->type() == QEvent::MouseButtonRelease) {
 		return true;
 	}

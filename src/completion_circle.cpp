@@ -146,8 +146,7 @@ void CompletionCircle::keyPressEvent(QKeyEvent *) {}
 
 void CompletionCircle::wheelEvent(QWheelEvent *) {}
 
-bool CompletionCircle::pointInsideCircle(const QPoint &p, int xc, int yc,
-					 int r) {
+bool CompletionCircle::pointInsideCircle(const QPoint &p, int xc, int yc, int r) {
 	int x = p.x();
 	int y = p.y();
 

@@ -24,12 +24,9 @@
 
 using namespace adiscope;
 
-CheckboxDelegate::CheckboxDelegate(QObject *parent)
-	: QStyledItemDelegate(parent) {}
+CheckboxDelegate::CheckboxDelegate(QObject *parent) : QStyledItemDelegate(parent) {}
 
-QWidget *CheckboxDelegate::createEditor(QWidget *parent,
-					const QStyleOptionViewItem &,
-					const QModelIndex &) const {
+QWidget *CheckboxDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &, const QModelIndex &) const {
 	QCheckBox *editor = new QCheckBox(parent);
 	editor->setAutoFillBackground(true);
 
@@ -38,16 +35,14 @@ QWidget *CheckboxDelegate::createEditor(QWidget *parent,
 	return editor;
 }
 
-void CheckboxDelegate::setEditorData(QWidget *editor,
-				     const QModelIndex &index) const {
+void CheckboxDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const {
 	bool state = index.model()->data(index, Qt::EditRole).toBool();
 
 	QCheckBox *checkBox = static_cast<QCheckBox *>(editor);
 	checkBox->setChecked(state);
 }
 
-void CheckboxDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
-				    const QModelIndex &index) const {
+void CheckboxDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const {
 	QCheckBox *checkBox = static_cast<QCheckBox *>(editor);
 	int val;
 

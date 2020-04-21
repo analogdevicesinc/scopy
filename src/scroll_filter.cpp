@@ -28,8 +28,7 @@
 
 using namespace adiscope;
 
-MouseWheelWidgetGuard::MouseWheelWidgetGuard(QObject *parent)
-	: QObject(parent) {}
+MouseWheelWidgetGuard::MouseWheelWidgetGuard(QObject *parent) : QObject(parent) {}
 
 bool MouseWheelWidgetGuard::eventFilter(QObject *o, QEvent *e) {
 	const QWidget *widget = dynamic_cast<QWidget *>(o);
@@ -44,15 +43,13 @@ void MouseWheelWidgetGuard::installEventRecursively(QWidget *parentWidget) {
 	if (parentWidget->children().count() == 0) {
 		return;
 	}
-	QList<QComboBox *> comboBoxes =
-		parentWidget->findChildren<QComboBox *>();
+	QList<QComboBox *> comboBoxes = parentWidget->findChildren<QComboBox *>();
 	for (auto ch : comboBoxes) {
 		ch->installEventFilter(new MouseWheelWidgetGuard(ch));
 		ch->setFocusPolicy(Qt::StrongFocus);
 	}
 
-	QList<QDoubleSpinBox *> doubleSpinBoxes =
-		parentWidget->findChildren<QDoubleSpinBox *>();
+	QList<QDoubleSpinBox *> doubleSpinBoxes = parentWidget->findChildren<QDoubleSpinBox *>();
 	for (auto ch : doubleSpinBoxes) {
 		ch->installEventFilter(new MouseWheelWidgetGuard(ch));
 		ch->setFocusPolicy(Qt::StrongFocus);
@@ -64,8 +61,7 @@ void MouseWheelWidgetGuard::installEventRecursively(QWidget *parentWidget) {
 		ch->setFocusPolicy(Qt::StrongFocus);
 	}
 
-	QList<QLineEdit *> lineEdits =
-		parentWidget->findChildren<QLineEdit *>();
+	QList<QLineEdit *> lineEdits = parentWidget->findChildren<QLineEdit *>();
 	for (auto ch : lineEdits) {
 		ch->installEventFilter(new MouseWheelWidgetGuard(ch));
 		ch->setFocusPolicy(Qt::StrongFocus);

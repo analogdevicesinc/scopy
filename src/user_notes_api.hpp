@@ -8,13 +8,11 @@ namespace adiscope {
 class UserNotes_API : public ApiObject {
 	Q_OBJECT
 
-	Q_PROPERTY(int notes_list_size READ notes_list_size WRITE
-			   set_notes_list_size SCRIPTABLE false)
+	Q_PROPERTY(int notes_list_size READ notes_list_size WRITE set_notes_list_size SCRIPTABLE false)
 	Q_PROPERTY(QVariantList notes READ getNotes)
 
 public:
-	explicit UserNotes_API(UserNotes *notesPanel)
-		: ApiObject(), notesPanel(notesPanel) {}
+	explicit UserNotes_API(UserNotes *notesPanel) : ApiObject(), notesPanel(notesPanel) {}
 	~UserNotes_API() {
 		qDeleteAll(notes_list_api);
 		notes_list_api.clear();

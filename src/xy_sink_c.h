@@ -39,8 +39,7 @@ public:
 	// gr::qtgui::xy_sink_c::sptr
 	typedef boost::shared_ptr<xy_sink_c> sptr;
 
-	static sptr make(int size, const std::string &name,
-			 int nconnections = 1, QObject *plot = NULL);
+	static sptr make(int size, const std::string &name, int nconnections = 1, QObject *plot = NULL);
 
 	virtual void exec_() = 0;
 

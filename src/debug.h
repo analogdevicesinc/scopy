@@ -42,17 +42,12 @@ public:
 	void setIioContext(struct iio_context *ctx);
 	~Debug();
 
-	QString readAttribute(const QString &devName, QString &channel,
-			      const QString &attribute);
-	void writeAttribute(const QString &devName, QString &channel,
-			    const QString &attribute, const QString &value);
-	QStringList getAvailableValues(const QString &devName, QString &channel,
-				       QString &attribute) const;
-	QString getAttributeValue(const QString &devName,
-				  const QString &channel,
-				  const QString &attribute) const;
-	void setAttributeValue(const QString &devName, const QString &channel,
-			       const QString &attribute, const QString &value);
+	QString readAttribute(const QString &devName, QString &channel, const QString &attribute);
+	void writeAttribute(const QString &devName, QString &channel, const QString &attribute, const QString &value);
+	QStringList getAvailableValues(const QString &devName, QString &channel, QString &attribute) const;
+	QString getAttributeValue(const QString &devName, const QString &channel, const QString &attribute) const;
+	void setAttributeValue(const QString &devName, const QString &channel, const QString &attribute,
+			       const QString &value);
 
 Q_SIGNALS:
 	void channelsChanged(const QStringList channelList);

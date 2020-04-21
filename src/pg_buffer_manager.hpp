@@ -78,9 +78,8 @@ class PatternGeneratorBufferManagerUi : public QWidget {
 	pv::MainWindow *main_win;
 
 public:
-	PatternGeneratorBufferManagerUi(
-		QWidget *parent, PatternGeneratorBufferManager *bufmananger,
-		QWidget *settingsWidget, PatternGenerator *pg);
+	PatternGeneratorBufferManagerUi(QWidget *parent, PatternGeneratorBufferManager *bufmananger,
+					QWidget *settingsWidget, PatternGenerator *pg);
 
 	~PatternGeneratorBufferManagerUi();
 	void createBinaryBuffer();

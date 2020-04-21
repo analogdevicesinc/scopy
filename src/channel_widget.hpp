@@ -15,8 +15,7 @@ class ChannelWidget : public QWidget {
 	Q_OBJECT
 
 public:
-	explicit ChannelWidget(int id, bool deletable, bool simplified,
-			       QColor color, QWidget *parent = 0);
+	explicit ChannelWidget(int id, bool deletable, bool simplified, QColor color, QWidget *parent = 0);
 	~ChannelWidget();
 
 	QAbstractButton *enableButton() const;

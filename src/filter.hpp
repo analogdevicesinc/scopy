@@ -63,10 +63,8 @@ public:
 	bool usable(enum tool tool, const std::string &dev) const;
 	const std::string device_name(enum tool tool, int idx = 0) const;
 
-	struct iio_device *find_device(const struct iio_context *ctx,
-				       enum tool tool, int idx = 0) const;
-	struct iio_channel *find_channel(const struct iio_context *ctx,
-					 enum tool tool, int idx = 0,
+	struct iio_device *find_device(const struct iio_context *ctx, enum tool tool, int idx = 0) const;
+	struct iio_channel *find_channel(const struct iio_context *ctx, enum tool tool, int idx = 0,
 					 bool output = false) const;
 
 	static const std::string &tool_name(enum tool tool);

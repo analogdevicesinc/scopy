@@ -16,8 +16,7 @@ class FrequencyDelegate : public QStyledItemDelegate {
 public:
 	FrequencyDelegate(QObject *parent = 0) : QStyledItemDelegate(parent) {}
 
-	virtual QString displayText(const QVariant &value,
-				    const QLocale &locale) const {
+	virtual QString displayText(const QVariant &value, const QLocale &locale) const {
 		Q_UNUSED(locale)
 
 		double freq = value.toDouble();
@@ -35,8 +34,7 @@ class ChannelDelegate : public QStyledItemDelegate {
 public:
 	ChannelDelegate(QObject *parent = 0) : QStyledItemDelegate(parent) {}
 
-	virtual QString displayText(const QVariant &value,
-				    const QLocale &locale) const {
+	virtual QString displayText(const QVariant &value, const QLocale &locale) const {
 		Q_UNUSED(locale)
 
 		int mkId = value.toInt();
@@ -48,8 +46,7 @@ public:
  * Class MarkerTable
  */
 
-MarkerTable::MarkerTable(QWidget *parent)
-	: QWidget(parent), ui(new Ui::MarkerTable) {
+MarkerTable::MarkerTable(QWidget *parent) : QWidget(parent), ui(new Ui::MarkerTable) {
 	ui->setupUi(this);
 
 	model = new QStandardItemModel(0, Columns::NUM_COLUMNS, this);
@@ -65,8 +62,7 @@ MarkerTable::MarkerTable(QWidget *parent)
 	ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
 	ui->tableView->horizontalHeader()->setStretchLastSection(true);
-	ui->tableView->horizontalHeader()->setSectionResizeMode(
-		QHeaderView::ResizeToContents);
+	ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	ui->tableView->horizontalHeader()->setHighlightSections(false);
 	ui->tableView->horizontalHeader()->setDefaultAlignment(Qt::AlignLeft);
 	ui->tableView->verticalHeader()->hide();
@@ -100,8 +96,7 @@ int MarkerTable::rowOfMarker(int mkIdx, int chIdx) const {
 	return markerRow;
 }
 
-void MarkerTable::addMarker(int mkIdx, int chIdx, const QString &name,
-			    double frequency, double magnitude,
+void MarkerTable::addMarker(int mkIdx, int chIdx, const QString &name, double frequency, double magnitude,
 			    const QString &type) {
 	model->insertRow(0);
 	model->setData(model->index(0, COL_ID), mkIdx);
@@ -122,8 +117,7 @@ void MarkerTable::removeMarker(int mkIdx, int chIdx) {
 	model->removeRow(row);
 }
 
-void MarkerTable::updateMarker(int mkIdx, int chIdx, double frequency,
-			       double magnitude, const QString &type) {
+void MarkerTable::updateMarker(int mkIdx, int chIdx, double frequency, double magnitude, const QString &type) {
 	int row = rowOfMarker(mkIdx, chIdx);
 
 	if (row < 0) {

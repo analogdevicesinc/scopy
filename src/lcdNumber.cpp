@@ -25,10 +25,7 @@
 
 using namespace adiscope;
 
-LcdNumber::LcdNumber(QWidget *parent, unsigned precision)
-	: QLCDNumber(parent), precision(precision) {
-	display(0.0);
-}
+LcdNumber::LcdNumber(QWidget *parent, unsigned precision) : QLCDNumber(parent), precision(precision) { display(0.0); }
 
 void LcdNumber::display(double num) {
 	std::stringstream str;

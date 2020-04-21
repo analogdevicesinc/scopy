@@ -24,8 +24,7 @@
 
 using namespace adiscope;
 
-Sismograph::Sismograph(QWidget *parent)
-	: QwtPlot(parent), curve("data"), sampleRate(10.0) {
+Sismograph::Sismograph(QWidget *parent) : QwtPlot(parent), curve("data"), sampleRate(10.0) {
 	enableAxis(QwtPlot::xBottom, false);
 	enableAxis(QwtPlot::xTop, true);
 
@@ -46,8 +45,7 @@ Sismograph::Sismograph(QWidget *parent)
 
 	scaler = new AutoScaler(this, divs);
 
-	connect(scaler, SIGNAL(updateScale(const QwtScaleDiv)), this,
-		SLOT(updateScale(const QwtScaleDiv)));
+	connect(scaler, SIGNAL(updateScale(const QwtScaleDiv)), this, SLOT(updateScale(const QwtScaleDiv)));
 
 	setNumSamples(100);
 
@@ -66,9 +64,7 @@ void Sismograph::plot(double sample) {
 	xdata.push(sample);
 	scaler->setValue(sample);
 
-	curve.setRawSamples(xdata.data(),
-			    ydata.data() + (ydata.size() - xdata.size()),
-			    xdata.size());
+	curve.setRawSamples(xdata.data(), ydata.data() + (ydata.size() - xdata.size()), xdata.size());
 	replot();
 }
 
@@ -105,6 +101,4 @@ void Sismograph::reset() {
 
 void Sismograph::setColor(const QColor &color) { curve.setPen(QPen(color)); }
 
-void Sismograph::updateScale(const QwtScaleDiv div) {
-	setAxisScale(QwtPlot::xTop, div.lowerBound(), div.upperBound());
-}
+void Sismograph::updateScale(const QwtScaleDiv div) { setAxisScale(QwtPlot::xTop, div.lowerBound(), div.upperBound()); }

@@ -18,8 +18,7 @@ class PatternGeneratorChannel_API : public ApiObject {
 	PatternGeneratorChannelManager *chm;
 
 public:
-	PatternGeneratorChannel_API(PatternGeneratorChannel *_ch,
-				    PatternGeneratorChannelManagerUI *_chmui)
+	PatternGeneratorChannel_API(PatternGeneratorChannel *_ch, PatternGeneratorChannelManagerUI *_chmui)
 		: ch(_ch), chmui(_chmui), chm(_chmui->chm), pg(_chmui->pg) {}
 
 	QList<int> color();
@@ -61,9 +60,7 @@ class PatternGeneratorChannelGroup_API : public ApiObject {
 	PatternGeneratorChannelManager *chm;
 
 public:
-	PatternGeneratorChannelGroup_API(
-		PatternGeneratorChannelGroup *_chg,
-		PatternGeneratorChannelManagerUI *chmui)
+	PatternGeneratorChannelGroup_API(PatternGeneratorChannelGroup *_chg, PatternGeneratorChannelManagerUI *chmui)
 		: chg(_chg), chmui(chmui), chm(chmui->chm) {}
 
 	QString label() { return QString::fromStdString(chg->get_label()); }
@@ -93,22 +90,18 @@ public:
 class PatternGenerator_API : public ApiObject {
 	Q_OBJECT
 
-	Q_PROPERTY(int channel_size READ channel_size WRITE set_channel_size
-			   SCRIPTABLE false);
+	Q_PROPERTY(int channel_size READ channel_size WRITE set_channel_size SCRIPTABLE false);
 	Q_PROPERTY(QVariantList channel_list READ getChannels);
 
-	Q_PROPERTY(int channel_groups_size READ channel_groups_size WRITE
-			   set_channel_groups_size SCRIPTABLE false);
+	Q_PROPERTY(int channel_groups_size READ channel_groups_size WRITE set_channel_groups_size SCRIPTABLE false);
 	Q_PROPERTY(QVariantList channel_groups_list READ getChannelGroups);
 
 	Q_PROPERTY(bool running READ running WRITE run STORED false);
 	Q_PROPERTY(bool single READ single WRITE run_single STORED false);
-	Q_PROPERTY(bool inactive_hidden READ inactiveHidden WRITE
-			   setInactiveHidden);
+	Q_PROPERTY(bool inactive_hidden READ inactiveHidden WRITE setInactiveHidden);
 
 public:
-	explicit PatternGenerator_API(PatternGenerator *pg)
-		: ApiObject(), pg(pg) {}
+	explicit PatternGenerator_API(PatternGenerator *pg) : ApiObject(), pg(pg) {}
 	~PatternGenerator_API();
 
 	void save(QSettings &settings);

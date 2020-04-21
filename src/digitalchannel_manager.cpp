@@ -123,19 +123,13 @@ std::vector<int> ChannelManager::get_enabled_indexes() {
 	return selection;
 }
 
-size_t ChannelManager::get_channel_group_count() {
-	return channel_group.size();
-}
+size_t ChannelManager::get_channel_group_count() { return channel_group.size(); }
 
 size_t ChannelManager::get_channel_count() { return channel.size(); }
 
-std::vector<ChannelGroup *> *ChannelManager::get_channel_groups() {
-	return &channel_group;
-}
+std::vector<ChannelGroup *> *ChannelManager::get_channel_groups() { return &channel_group; }
 
-ChannelGroup *ChannelManager::get_channel_group(int index) {
-	return channel_group[index];
-}
+ChannelGroup *ChannelManager::get_channel_group(int index) { return channel_group[index]; }
 
 void ChannelManager::deselect_all() {
 	for (auto &&ch : channel_group) {
@@ -170,9 +164,7 @@ Channel::Channel(uint16_t id_, const std::string &label_) {
 }
 Channel::~Channel() {}
 
-ChannelUI::ChannelUI(Channel *ch, QWidget *parent) : QWidget(parent) {
-	this->ch = ch;
-}
+ChannelUI::ChannelUI(Channel *ch, QWidget *parent) : QWidget(parent) { this->ch = ch; }
 ChannelUI::~ChannelUI() {}
 
 Channel *ChannelUI::get_channel() { return ch; }
@@ -267,13 +259,9 @@ uint16_t ChannelGroup::get_mask() {
 	return mask;
 }
 
-void ChannelGroup::add_channel(Channel *channel) {
-	channels.push_back(channel);
-}
+void ChannelGroup::add_channel(Channel *channel) { channels.push_back(channel); }
 
-void ChannelGroup::remove_channel(int chIndex) {
-	channels.erase(channels.begin() + chIndex);
-}
+void ChannelGroup::remove_channel(int chIndex) { channels.erase(channels.begin() + chIndex); }
 
 size_t ChannelGroup::get_channel_count() { return channels.size(); }
 
@@ -287,10 +275,7 @@ std::vector<uint16_t> ChannelGroup::get_ids() {
 	return ret;
 }
 
-ChannelGroupUI::ChannelGroupUI(ChannelGroup *chg, QWidget *parent)
-	: QWidget(parent) {
-	this->chg = chg;
-}
+ChannelGroupUI::ChannelGroupUI(ChannelGroup *chg, QWidget *parent) : QWidget(parent) { this->chg = chg; }
 ChannelGroupUI::~ChannelGroupUI() {}
 
 ChannelGroup *ChannelGroupUI::get_group() { return chg; }
@@ -300,11 +285,9 @@ void ChannelGroupUI::enable(bool enabled) { chg->enable(enabled); }
 
 void DIOManager::init() {}
 
-const char *DIOManager::channelNames[] = {
-	"voltage0",  "voltage1",  "voltage2",  "voltage3",
-	"voltage4",  "voltage5",  "voltage6",  "voltage7",
-	"voltage8",  "voltage9",  "voltage10", "voltage11",
-	"voltage12", "voltage13", "voltage14", "voltage15"};
+const char *DIOManager::channelNames[] = {"voltage0",  "voltage1",  "voltage2",  "voltage3", "voltage4",  "voltage5",
+					  "voltage6",  "voltage7",  "voltage8",  "voltage9", "voltage10", "voltage11",
+					  "voltage12", "voltage13", "voltage14", "voltage15"};
 
 DIOManager::DIOManager(iio_context *ctx, Filter *filt) : ctx(ctx) {
 	dev = filt->find_device(ctx, TOOL_DIGITALIO);
@@ -322,9 +305,7 @@ DIOManager::DIOManager(iio_context *ctx, Filter *filt) : ctx(ctx) {
 
 DIOManager::~DIOManager() {}
 
-iio_channel *DIOManager::getChannel(int ch) {
-	return iio_device_find_channel(dev, channelNames[ch], 0);
-}
+iio_channel *DIOManager::getChannel(int ch) { return iio_device_find_channel(dev, channelNames[ch], 0); }
 
 void DIOManager::setOutputMode(int chid, bool mode) {
 	auto ch = getChannel(chid);

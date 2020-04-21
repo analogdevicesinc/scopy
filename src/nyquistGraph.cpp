@@ -37,9 +37,7 @@ class NyquistSamplesArray : public QwtArraySeriesData<QwtPointPolar> {
 public:
 	NyquistSamplesArray() : QwtArraySeriesData<QwtPointPolar>() {}
 
-	void addSample(const QwtPointPolar &point) {
-		d_samples.push_back(point);
-	}
+	void addSample(const QwtPointPolar &point) { d_samples.push_back(point); }
 	void clear() { d_samples.clear(); }
 	void reserve(unsigned int nb) { d_samples.reserve(nb); }
 	QRectF boundingRect() const;
@@ -114,8 +112,7 @@ NyquistGraph::NyquistGraph(QWidget *parent)
 
 NyquistGraph::~NyquistGraph() {}
 
-void NyquistGraph::enableZooming(QPushButton *btnZoomIn,
-				 QPushButton *btnZoomOut) {
+void NyquistGraph::enableZooming(QPushButton *btnZoomIn, QPushButton *btnZoomOut) {
 	connect(btnZoomIn, &QPushButton::clicked, [=]() {
 		zoomer->zoomIn();
 		if (zoomer->isZoomed())
@@ -138,9 +135,7 @@ void NyquistGraph::enableZooming(QPushButton *btnZoomIn,
 
 const QColor NyquistGraph::getColor() const { return curve.pen().color(); }
 
-const QColor &NyquistGraph::getBgColor() const {
-	return plotBackground().color();
-}
+const QColor &NyquistGraph::getBgColor() const { return plotBackground().color(); }
 
 void NyquistGraph::setColor(const QColor &color) {
 	QPen pen(color);
@@ -148,9 +143,7 @@ void NyquistGraph::setColor(const QColor &color) {
 	curve.setPen(pen);
 }
 
-void NyquistGraph::setBgColor(const QColor &color) {
-	setPlotBackground(QBrush(color));
-}
+void NyquistGraph::setBgColor(const QColor &color) { setPlotBackground(QBrush(color)); }
 
 void NyquistGraph::plot(double azimuth, double radius) {
 	if (curve.dataSize() == numSamples + 1)
@@ -197,17 +190,11 @@ void NyquistGraph::setMax(double max) {
 	replot();
 }
 
-QFont NyquistGraph::getFontAzimuth() const {
-	return grid->axisFont(QwtPolar::AxisAzimuth);
-}
+QFont NyquistGraph::getFontAzimuth() const { return grid->axisFont(QwtPolar::AxisAzimuth); }
 
-QFont NyquistGraph::getFontRadius() const {
-	return grid->axisFont(QwtPolar::AxisRight);
-}
+QFont NyquistGraph::getFontRadius() const { return grid->axisFont(QwtPolar::AxisRight); }
 
-void NyquistGraph::setFontAzimuth(const QFont &font) {
-	grid->setAxisFont(QwtPolar::AxisAzimuth, font);
-}
+void NyquistGraph::setFontAzimuth(const QFont &font) { grid->setAxisFont(QwtPolar::AxisAzimuth, font); }
 
 void NyquistGraph::setFontRadius(const QFont &font) {
 	grid->setAxisFont(QwtPolar::AxisRight, font);

@@ -21,8 +21,7 @@ public:
 	QString value() const;
 	void setLabelsColor(const QColor &color);
 	virtual void init(QLabel *name, QLabel *value);
-	virtual void update(const MeasurementData &data,
-			    double displayScale) = 0;
+	virtual void update(const MeasurementData &data, double displayScale) = 0;
 
 protected:
 	QString m_name;

@@ -29,18 +29,14 @@ RegisterWidget::RegisterWidget(QWidget *parent, Debug *debug)
 
 	regMap.setIioContext(debug->getIioContext());
 
-	QObject::connect(this, &RegisterWidget::valueChanged, this,
-			 &RegisterWidget::updateBitfields);
+	QObject::connect(this, &RegisterWidget::valueChanged, this, &RegisterWidget::updateBitfields);
 }
 
 RegisterWidget::~RegisterWidget() { delete ui; }
 
-uint32_t RegisterWidget::getLastAddress(void) const {
-	return regMap.getLastAddress();
-}
+uint32_t RegisterWidget::getLastAddress(void) const { return regMap.getLastAddress(); }
 
-void RegisterWidget::createRegMap(const QString *device, int *address,
-				  const QString *source) {
+void RegisterWidget::createRegMap(const QString *device, int *address, const QString *source) {
 	QString filename;
 	QString addr;
 	bool goHigh = false;
@@ -49,8 +45,7 @@ void RegisterWidget::createRegMap(const QString *device, int *address,
 		goHigh = true;
 	}
 
-	for (auto iterator = bitfieldsVector.rbegin();
-	     iterator != bitfieldsVector.rend(); ++iterator) {
+	for (auto iterator = bitfieldsVector.rbegin(); iterator != bitfieldsVector.rend(); ++iterator) {
 		ui->horizontalLayout->removeWidget(*iterator);
 		delete (*iterator);
 	}
@@ -83,10 +78,7 @@ void RegisterWidget::createRegMap(const QString *device, int *address,
 		}
 
 		bool status;
-		this->address = regNode->firstChildElement("Address")
-					.text()
-					.split("0x")[1]
-					.toUInt(&status, 16);
+		this->address = regNode->firstChildElement("Address").text().split("0x")[1].toUInt(&status, 16);
 
 		/*get register information from the node*/
 		name = regNode->firstChildElement("Name").text();
@@ -94,33 +86,26 @@ void RegisterWidget::createRegMap(const QString *device, int *address,
 		description = regNode->firstChildElement("Description").text();
 		notes = regNode->firstChildElement("Notes").text();
 
-		QDomElement bitfieldList =
-			regNode->firstChildElement("BitFields");
-		QDomElement bitfieldElement =
-			bitfieldList.firstChildElement("BitField");
+		QDomElement bitfieldList = regNode->firstChildElement("BitFields");
+		QDomElement bitfieldElement = bitfieldList.firstChildElement("BitField");
 
 		while (bitfieldList.lastChildElement() != bitfieldElement) {
-			bitfieldsVector.append(
-				new BitfieldWidget(this, &bitfieldElement));
+			bitfieldsVector.append(new BitfieldWidget(this, &bitfieldElement));
 			bitfieldElement = bitfieldElement.nextSiblingElement();
 		}
 
 		if (!bitfieldElement.isNull()) {
-			bitfieldsVector.append(
-				new BitfieldWidget(this, &bitfieldElement));
+			bitfieldsVector.append(new BitfieldWidget(this, &bitfieldElement));
 		}
 
 		checkRegisterMap();
 
 		defaultValue = 0;
 
-		for (auto iterator = bitfieldsVector.rbegin();
-		     iterator != bitfieldsVector.rend(); ++iterator) {
+		for (auto iterator = bitfieldsVector.rbegin(); iterator != bitfieldsVector.rend(); ++iterator) {
 
-			defaultValue += (*iterator)->getDefaultValue()
-				<< (*iterator)->getRegOffset();
-			connect(*iterator,
-				SIGNAL(valueChanged(uint32_t, uint32_t)), this,
+			defaultValue += (*iterator)->getDefaultValue() << (*iterator)->getRegOffset();
+			connect(*iterator, SIGNAL(valueChanged(uint32_t, uint32_t)), this,
 				SLOT(setValue(uint32_t, uint32_t)));
 			ui->horizontalLayout->addWidget(*iterator);
 		}
@@ -147,8 +132,7 @@ void RegisterWidget::checkRegisterMap(void) {
 	/*sort vector using bit number*/
 	qSort(bitfieldsVector.begin(), bitfieldsVector.end(), lessThan);
 
-	for (auto iterator = bitfieldsVector.begin();
-	     iterator != bitfieldsVector.end(); ++iterator) {
+	for (auto iterator = bitfieldsVector.begin(); iterator != bitfieldsVector.end(); ++iterator) {
 		size += (*iterator)->getSliceWidth();
 		slice[count] = (*iterator)->getSliceWidth();
 		regOffsets[count] = (*iterator)->getRegOffset();
@@ -169,8 +153,7 @@ void RegisterWidget::checkRegisterMap(void) {
 		size = 0;
 		count = 0;
 
-		for (auto iterator = bitfieldsVector.begin();
-		     iterator != bitfieldsVector.end(); ++iterator) {
+		for (auto iterator = bitfieldsVector.begin(); iterator != bitfieldsVector.end(); ++iterator) {
 			size += (*iterator)->getSliceWidth();
 			slice[count] = (*iterator)->getSliceWidth();
 			regOffsets[count] = (*iterator)->getRegOffset();
@@ -188,11 +171,7 @@ void RegisterWidget::checkRegisterMap(void) {
 			gap = (regOffsets[i] - before) - slice[i - 1];
 
 			for (int j = 0; j < gap; j++) {
-				bitfieldsVector.insert(
-					i + j,
-					new BitfieldWidget(
-						this,
-						i + j + slice[i - 1] - 1));
+				bitfieldsVector.insert(i + j, new BitfieldWidget(this, i + j + slice[i - 1] - 1));
 				size++;
 			}
 
@@ -203,8 +182,7 @@ void RegisterWidget::checkRegisterMap(void) {
 		size = 0;
 		count = 0;
 
-		for (auto iterator = bitfieldsVector.begin();
-		     iterator != bitfieldsVector.end(); ++iterator) {
+		for (auto iterator = bitfieldsVector.begin(); iterator != bitfieldsVector.end(); ++iterator) {
 			size += (*iterator)->getSliceWidth();
 			slice[count] = (*iterator)->getSliceWidth();
 			regOffsets[count] = (*iterator)->getRegOffset();
@@ -214,8 +192,7 @@ void RegisterWidget::checkRegisterMap(void) {
 		bit = size;
 
 		while (size < width) {
-			bitfieldsVector.insert(count,
-					       new BitfieldWidget(this, bit++));
+			bitfieldsVector.insert(count, new BitfieldWidget(this, bit++));
 			count++;
 			size++;
 		}
@@ -258,8 +235,7 @@ void RegisterWidget::setValue(uint32_t var, uint32_t mask) {
 	Q_EMIT valueChanged((int)value);
 }
 
-uint32_t RegisterWidget::readRegister(const QString *device,
-				      const uint32_t address) {
+uint32_t RegisterWidget::readRegister(const QString *device, const uint32_t address) {
 	/*Read register*/
 	value = regMap.readRegister(device, address);
 
@@ -268,8 +244,7 @@ uint32_t RegisterWidget::readRegister(const QString *device,
 	return value;
 }
 
-void RegisterWidget::writeRegister(const QString *device,
-				   const uint32_t address, uint32_t regVal) {
+void RegisterWidget::writeRegister(const QString *device, const uint32_t address, uint32_t regVal) {
 	regMap.writeRegister(device, address, regVal);
 	value = regVal;
 }
@@ -278,8 +253,7 @@ void RegisterWidget::updateBitfields() {
 	uint32_t temp = value;
 
 	/*Update bitfield widgets*/
-	for (auto iterator = bitfieldsVector.begin();
-	     iterator != bitfieldsVector.end(); ++iterator) {
+	for (auto iterator = bitfieldsVector.begin(); iterator != bitfieldsVector.end(); ++iterator) {
 		(*iterator)->updateValue(temp);
 	}
 }

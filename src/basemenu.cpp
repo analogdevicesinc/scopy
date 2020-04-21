@@ -27,8 +27,7 @@
 
 using namespace adiscope;
 
-BaseMenu::BaseMenu(QWidget *parent)
-	: QWidget(parent), d_ui(new Ui::BaseMenu), d_items(0) {
+BaseMenu::BaseMenu(QWidget *parent) : QWidget(parent), d_ui(new Ui::BaseMenu), d_items(0) {
 	d_ui->setupUi(this);
 	setAcceptDrops(true);
 
@@ -55,8 +54,7 @@ void BaseMenu::insertMenuItem(BaseMenuItem *menuItem, int position) {
 	_updateItemsPosition();
 }
 
-void BaseMenu::insertMenuItem(QVector<BaseMenuItem *> items,
-			      QVector<int> positions) {
+void BaseMenu::insertMenuItem(QVector<BaseMenuItem *> items, QVector<int> positions) {
 	if (!positions.empty()) {
 		int i = 0;
 		while (i < items.size() && positions.size()) {
@@ -76,8 +74,7 @@ void BaseMenu::insertMenuItem(QVector<BaseMenuItem *> items,
 
 void BaseMenu::removeMenuItem(BaseMenuItem *menuItem) {
 	d_ui->mainLayout->removeWidget(menuItem);
-	disconnect(menuItem, &BaseMenuItem::moveItem, this,
-		   &BaseMenu::moveItem);
+	disconnect(menuItem, &BaseMenuItem::moveItem, this, &BaseMenu::moveItem);
 	d_items = d_ui->mainLayout->count();
 	menuItem->setVisible(false);
 
@@ -101,9 +98,7 @@ void BaseMenu::setMargins(int left, int top, int right, int bottom) {
 
 int BaseMenu::spacing() const { return d_ui->mainLayout->spacing(); }
 
-void BaseMenu::setSpacing(int spacing) {
-	d_ui->mainLayout->setSpacing(spacing);
-}
+void BaseMenu::setSpacing(int spacing) { d_ui->mainLayout->setSpacing(spacing); }
 
 void BaseMenu::dragEnterEvent(QDragEnterEvent *event) {
 	if (!event->source()) {
@@ -120,9 +115,7 @@ void BaseMenu::dragEnterEvent(QDragEnterEvent *event) {
 	event->accept();
 }
 
-void BaseMenu::dragLeaveEvent(QDragLeaveEvent *event) {
-	d_ui->bottomSeparator->setVisible(false);
-}
+void BaseMenu::dragLeaveEvent(QDragLeaveEvent *event) { d_ui->bottomSeparator->setVisible(false); }
 
 void BaseMenu::dropEvent(QDropEvent *event) {
 	d_ui->bottomSeparator->setVisible(false);
@@ -132,8 +125,7 @@ void BaseMenu::dropEvent(QDropEvent *event) {
 	}
 
 	if (event->mimeData()->hasFormat(BaseMenuItem::menuItemMimeDataType)) {
-		short from = (short)event->mimeData()->data(
-			BaseMenuItem::menuItemMimeDataType)[1];
+		short from = (short)event->mimeData()->data(BaseMenuItem::menuItemMimeDataType)[1];
 		moveItem(from, d_items);
 	}
 }

@@ -29,14 +29,10 @@ using namespace adiscope;
 using namespace gr;
 
 fft_block::fft_block(bool use_complex, size_t fft_size, unsigned int nbthreads)
-	: hier_block2("FFT",
-		      io_signature::make(1, 1,
-					 use_complex ? sizeof(gr_complex)
-						     : sizeof(float)),
+	: hier_block2("FFT", io_signature::make(1, 1, use_complex ? sizeof(gr_complex) : sizeof(float)),
 		      io_signature::make(1, 1, sizeof(gr_complex)))
 	, d_complex(use_complex) {
-	auto s2v = blocks::stream_to_vector::make(
-		use_complex ? sizeof(gr_complex) : sizeof(float), fft_size);
+	auto s2v = blocks::stream_to_vector::make(use_complex ? sizeof(gr_complex) : sizeof(float), fft_size);
 	auto v2s = blocks::vector_to_stream::make(sizeof(gr_complex), fft_size);
 
 	/* We use a Hamming window for now */
@@ -44,8 +40,7 @@ fft_block::fft_block(bool use_complex, size_t fft_size, unsigned int nbthreads)
 
 	// basic_block_sptr fft;
 	if (use_complex)
-		d_fft = fft::fft_vcc::make(fft_size, true, window, false,
-					   nbthreads);
+		d_fft = fft::fft_vcc::make(fft_size, true, window, false, nbthreads);
 	else
 		d_fft = fft::fft_vfc::make(fft_size, true, window, nbthreads);
 
@@ -60,10 +55,8 @@ fft_block::~fft_block() {}
 
 void fft_block::set_window(const std::vector<float> &window) {
 	if (d_complex) {
-		boost::dynamic_pointer_cast<fft::fft_vcc>(d_fft)->set_window(
-			window);
+		boost::dynamic_pointer_cast<fft::fft_vcc>(d_fft)->set_window(window);
 	} else {
-		boost::dynamic_pointer_cast<fft::fft_vfc>(d_fft)->set_window(
-			window);
+		boost::dynamic_pointer_cast<fft::fft_vfc>(d_fft)->set_window(window);
 	}
 }

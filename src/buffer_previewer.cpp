@@ -30,11 +30,9 @@ using namespace adiscope;
  * Class BufferPreviewer implementation
  */
 
-BufferPreviewer::BufferPreviewer(QWidget *parent)
-	: BufferPreviewer(50, 0.0, parent) {}
+BufferPreviewer::BufferPreviewer(QWidget *parent) : BufferPreviewer(50, 0.0, parent) {}
 
-BufferPreviewer::BufferPreviewer(int pixelsPerPeriod, double wavePhase,
-				 QWidget *parent)
+BufferPreviewer::BufferPreviewer(int pixelsPerPeriod, double wavePhase, QWidget *parent)
 	: QFrame(parent)
 	, m_waveformPos(0.0)
 	, m_waveformWidth(1.0)
@@ -158,8 +156,7 @@ void BufferPreviewer::paintEvent(QPaintEvent *) {
 
 	// Get intersection between the visible wave and the highlight rectangle
 	int hlightedWaveStartPos = qMax(hlight_start, wave_start);
-	int hlightedWaveEndPos =
-		qMin((hlight_start + hlight_width), (wave_start + wave_width));
+	int hlightedWaveEndPos = qMin((hlight_start + hlight_width), (wave_start + wave_width));
 	int hlightedWaveWidth = hlightedWaveEndPos - hlightedWaveStartPos;
 
 	/* Start drawing */
@@ -184,12 +181,10 @@ void BufferPreviewer::paintEvent(QPaintEvent *) {
 	p.setRenderHint(QPainter::Antialiasing, true);
 	linePen.setColor(palette().color(QPalette::HighlightedText));
 	p.setPen(linePen);
-	p.drawPolyline(m_fullWavePoints + hlightedWaveStartPos,
-		       hlightedWaveWidth);
+	p.drawPolyline(m_fullWavePoints + hlightedWaveStartPos, hlightedWaveWidth);
 
 	// Draw two vertical lines at the start and end of the highlight;
-	if (hlight_start + hlight_width > wave_start &&
-	    wave_start + wave_width > hlight_start) {
+	if (hlight_start + hlight_width > wave_start && wave_start + wave_width > hlight_start) {
 		int line_w = 2;
 		p.setPen(rectPen);
 		p.setBrush(palette().color(QPalette::HighlightedText));
@@ -203,14 +198,12 @@ void BufferPreviewer::paintEvent(QPaintEvent *) {
 	int cur_head_h = 4;
 	p.setPen(rectPen);
 	p.setBrush(palette().color(QPalette::AlternateBase));
-	p.drawRect((cursor_start - 1) - cur_head_w / 2 + 1, 0, cur_head_w,
-		   cur_head_h);
+	p.drawRect((cursor_start - 1) - cur_head_w / 2 + 1, 0, cur_head_w, cur_head_h);
 	p.drawRect((cursor_start - 1), cur_head_h, 2, h - cur_head_h);
 
 	// Draw gatings if enabled
 	if (m_gatingEnabled) {
-		int leftGateWidth =
-			hlight_width * m_leftGateWidth + hlight_start;
+		int leftGateWidth = hlight_width * m_leftGateWidth + hlight_start;
 		int rightGateWidth = hlight_width * m_rightGateWidth;
 		QBrush gateBrush(QColor(0, 15, 150, 130));
 		p.setRenderHint(QPainter::Antialiasing, true);
@@ -218,8 +211,7 @@ void BufferPreviewer::paintEvent(QPaintEvent *) {
 		p.fillRect(0, 0, leftGateWidth, h, gateBrush);
 		// draw right gate
 		p.fillRect(hlight_start + hlight_width - rightGateWidth, 0,
-			   rightGateWidth + (w - hlight_start + hlight_width),
-			   h, gateBrush);
+			   rightGateWidth + (w - hlight_start + hlight_width), h, gateBrush);
 	}
 }
 
@@ -256,9 +248,7 @@ void BufferPreviewer::mouseReleaseEvent(QMouseEvent *event) {
 	}
 }
 
-void BufferPreviewer::enterEvent(QEvent *event) {
-	setCursor(Qt::OpenHandCursor);
-}
+void BufferPreviewer::enterEvent(QEvent *event) { setCursor(Qt::OpenHandCursor); }
 
 void BufferPreviewer::leaveEvent(QEvent *event) { setCursor(Qt::ArrowCursor); }
 
@@ -266,11 +256,9 @@ void BufferPreviewer::leaveEvent(QEvent *event) { setCursor(Qt::ArrowCursor); }
  * Class AnalogBufferPrevier implementation
  */
 
-AnalogBufferPreviewer::AnalogBufferPreviewer(QWidget *parent)
-	: BufferPreviewer(parent) {}
+AnalogBufferPreviewer::AnalogBufferPreviewer(QWidget *parent) : BufferPreviewer(parent) {}
 
-AnalogBufferPreviewer::AnalogBufferPreviewer(int pixelsPerPeriod,
-					     double wavePhase, QWidget *parent)
+AnalogBufferPreviewer::AnalogBufferPreviewer(int pixelsPerPeriod, double wavePhase, QWidget *parent)
 	: BufferPreviewer(pixelsPerPeriod, wavePhase, parent) {}
 
 void AnalogBufferPreviewer::buildFullWaveform(QPointF *wavePoints, int numPts) {
@@ -278,10 +266,7 @@ void AnalogBufferPreviewer::buildFullWaveform(QPointF *wavePoints, int numPts) {
 	int amplitude = middle - verticalSpacing() / 2;
 
 	for (int i = 0; i < numPts; i++) {
-		qreal y = middle +
-			amplitude *
-				qSin(2 * M_PI * i / pixelsPerPeriod() +
-				     wavePhase());
+		qreal y = middle + amplitude * qSin(2 * M_PI * i / pixelsPerPeriod() + wavePhase());
 		wavePoints[i] = QPointF(i, y);
 	}
 }
@@ -290,19 +275,16 @@ void AnalogBufferPreviewer::buildFullWaveform(QPointF *wavePoints, int numPts) {
  * Class DigitalBufferPreviewer implementation
  */
 
-DigitalBufferPreviewer::DigitalBufferPreviewer(QWidget *parent)
-	: BufferPreviewer(parent), m_noOfSteps(0) {}
+DigitalBufferPreviewer::DigitalBufferPreviewer(QWidget *parent) : BufferPreviewer(parent), m_noOfSteps(0) {}
 
-DigitalBufferPreviewer::DigitalBufferPreviewer(int pixelsPerPeriod,
-					       QWidget *parent)
+DigitalBufferPreviewer::DigitalBufferPreviewer(int pixelsPerPeriod, QWidget *parent)
 	: BufferPreviewer(pixelsPerPeriod, M_PI / 2, parent), m_noOfSteps(0) {}
 
 void DigitalBufferPreviewer::setNoOfSteps(double val) { m_noOfSteps = val; }
 
 double DigitalBufferPreviewer::noOfSteps() { return m_noOfSteps; }
 
-void DigitalBufferPreviewer::buildFullWaveform(QPointF *wavePoints,
-					       int numPts) {
+void DigitalBufferPreviewer::buildFullWaveform(QPointF *wavePoints, int numPts) {
 	for (int i = 0; i < numPts; i++) {
 		qreal y;
 		int pos = i % pixelsPerPeriod();

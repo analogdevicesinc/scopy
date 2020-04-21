@@ -23,8 +23,7 @@
 #include <QVariant>
 #include <QWidget>
 
-void adiscope::setDynamicProperty(QWidget *widget, const char *property,
-				  bool set) {
+void adiscope::setDynamicProperty(QWidget *widget, const char *property, bool set) {
 	widget->setProperty(property, QVariant(set));
 	widget->style()->unpolish(widget);
 	widget->style()->polish(widget);

@@ -23,17 +23,12 @@
 
 using namespace adiscope;
 
-CustomAnimation::CustomAnimation(QObject *target)
-	: QPropertyAnimation(target), m_enabled(true), m_duration(0) {
+CustomAnimation::CustomAnimation(QObject *target) : QPropertyAnimation(target), m_enabled(true), m_duration(0) {
 	AnimationManager::getInstance().registerAnimation(this);
 }
 
-CustomAnimation::CustomAnimation(QObject *target,
-				 const QByteArray &propertyName,
-				 QObject *parent)
-	: QPropertyAnimation(target, propertyName, parent)
-	, m_enabled(true)
-	, m_duration(0) {
+CustomAnimation::CustomAnimation(QObject *target, const QByteArray &propertyName, QObject *parent)
+	: QPropertyAnimation(target, propertyName, parent), m_enabled(true), m_duration(0) {
 	AnimationManager::getInstance().registerAnimation(this);
 }
 

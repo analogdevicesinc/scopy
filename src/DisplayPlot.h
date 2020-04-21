@@ -160,8 +160,7 @@ private:
 	std::vector<double>::iterator m_currentStep;
 
 	void updateDivision() {
-		m_currentDiv =
-			(*m_currentStep) * pow(m_magnitude_step, m_power);
+		m_currentDiv = (*m_currentStep) * pow(m_magnitude_step, m_power);
 		Q_EMIT divisionChanged(m_currentDiv);
 	}
 
@@ -197,46 +196,28 @@ class DisplayPlot : public PrintablePlot {
 	Q_PROPERTY(int line_width8 READ getLineWidth8 WRITE setLineWidth8)
 	Q_PROPERTY(int line_width9 READ getLineWidth9 WRITE setLineWidth9)
 
-	Q_PROPERTY(
-		Qt::PenStyle line_style1 READ getLineStyle1 WRITE setLineStyle1)
-	Q_PROPERTY(
-		Qt::PenStyle line_style2 READ getLineStyle2 WRITE setLineStyle2)
-	Q_PROPERTY(
-		Qt::PenStyle line_style3 READ getLineStyle3 WRITE setLineStyle3)
-	Q_PROPERTY(
-		Qt::PenStyle line_style4 READ getLineStyle4 WRITE setLineStyle4)
-	Q_PROPERTY(
-		Qt::PenStyle line_style5 READ getLineStyle5 WRITE setLineStyle5)
-	Q_PROPERTY(
-		Qt::PenStyle line_style6 READ getLineStyle6 WRITE setLineStyle6)
-	Q_PROPERTY(
-		Qt::PenStyle line_style7 READ getLineStyle7 WRITE setLineStyle7)
-	Q_PROPERTY(
-		Qt::PenStyle line_style8 READ getLineStyle8 WRITE setLineStyle8)
-	Q_PROPERTY(
-		Qt::PenStyle line_style9 READ getLineStyle9 WRITE setLineStyle9)
+	Q_PROPERTY(Qt::PenStyle line_style1 READ getLineStyle1 WRITE setLineStyle1)
+	Q_PROPERTY(Qt::PenStyle line_style2 READ getLineStyle2 WRITE setLineStyle2)
+	Q_PROPERTY(Qt::PenStyle line_style3 READ getLineStyle3 WRITE setLineStyle3)
+	Q_PROPERTY(Qt::PenStyle line_style4 READ getLineStyle4 WRITE setLineStyle4)
+	Q_PROPERTY(Qt::PenStyle line_style5 READ getLineStyle5 WRITE setLineStyle5)
+	Q_PROPERTY(Qt::PenStyle line_style6 READ getLineStyle6 WRITE setLineStyle6)
+	Q_PROPERTY(Qt::PenStyle line_style7 READ getLineStyle7 WRITE setLineStyle7)
+	Q_PROPERTY(Qt::PenStyle line_style8 READ getLineStyle8 WRITE setLineStyle8)
+	Q_PROPERTY(Qt::PenStyle line_style9 READ getLineStyle9 WRITE setLineStyle9)
 
 	typedef QwtSymbol::Style QwtSymbolStyle;
 
 	Q_ENUMS(QwtSymbolStyle)
-	Q_PROPERTY(QwtSymbolStyle line_marker1 READ getLineMarker1 WRITE
-			   setLineMarker1)
-	Q_PROPERTY(QwtSymbolStyle line_marker2 READ getLineMarker2 WRITE
-			   setLineMarker2)
-	Q_PROPERTY(QwtSymbolStyle line_marker3 READ getLineMarker3 WRITE
-			   setLineMarker3)
-	Q_PROPERTY(QwtSymbolStyle line_marker4 READ getLineMarker4 WRITE
-			   setLineMarker4)
-	Q_PROPERTY(QwtSymbolStyle line_marker5 READ getLineMarker5 WRITE
-			   setLineMarker5)
-	Q_PROPERTY(QwtSymbolStyle line_marker6 READ getLineMarker6 WRITE
-			   setLineMarker6)
-	Q_PROPERTY(QwtSymbolStyle line_marker7 READ getLineMarker7 WRITE
-			   setLineMarker7)
-	Q_PROPERTY(QwtSymbolStyle line_marker8 READ getLineMarker8 WRITE
-			   setLineMarker8)
-	Q_PROPERTY(QwtSymbolStyle line_marker9 READ getLineMarker9 WRITE
-			   setLineMarker9)
+	Q_PROPERTY(QwtSymbolStyle line_marker1 READ getLineMarker1 WRITE setLineMarker1)
+	Q_PROPERTY(QwtSymbolStyle line_marker2 READ getLineMarker2 WRITE setLineMarker2)
+	Q_PROPERTY(QwtSymbolStyle line_marker3 READ getLineMarker3 WRITE setLineMarker3)
+	Q_PROPERTY(QwtSymbolStyle line_marker4 READ getLineMarker4 WRITE setLineMarker4)
+	Q_PROPERTY(QwtSymbolStyle line_marker5 READ getLineMarker5 WRITE setLineMarker5)
+	Q_PROPERTY(QwtSymbolStyle line_marker6 READ getLineMarker6 WRITE setLineMarker6)
+	Q_PROPERTY(QwtSymbolStyle line_marker7 READ getLineMarker7 WRITE setLineMarker7)
+	Q_PROPERTY(QwtSymbolStyle line_marker8 READ getLineMarker8 WRITE setLineMarker8)
+	Q_PROPERTY(QwtSymbolStyle line_marker9 READ getLineMarker9 WRITE setLineMarker9)
 
 	Q_PROPERTY(int marker_alpha1 READ getMarkerAlpha1 WRITE setMarkerAlpha1)
 	Q_PROPERTY(int marker_alpha2 READ getMarkerAlpha2 WRITE setMarkerAlpha2)
@@ -249,18 +230,13 @@ class DisplayPlot : public PrintablePlot {
 	Q_PROPERTY(int marker_alpha9 READ getMarkerAlpha9 WRITE setMarkerAlpha9)
 
 	Q_PROPERTY(QColor zoomer_color READ getZoomerColor WRITE setZoomerColor)
-	Q_PROPERTY(
-		QColor palette_color READ getPaletteColor WRITE setPaletteColor)
-	Q_PROPERTY(int yaxis_label_font_size READ getYaxisLabelFontSize WRITE
-			   setYaxisLabelFontSize)
-	Q_PROPERTY(int xaxis_label_font_size READ getXaxisLabelFontSize WRITE
-			   setXaxisLabelFontSize)
-	Q_PROPERTY(int axes_label_font_size READ getAxesLabelFontSize WRITE
-			   setAxesLabelFontSize)
+	Q_PROPERTY(QColor palette_color READ getPaletteColor WRITE setPaletteColor)
+	Q_PROPERTY(int yaxis_label_font_size READ getYaxisLabelFontSize WRITE setYaxisLabelFontSize)
+	Q_PROPERTY(int xaxis_label_font_size READ getXaxisLabelFontSize WRITE setXaxisLabelFontSize)
+	Q_PROPERTY(int axes_label_font_size READ getAxesLabelFontSize WRITE setAxesLabelFontSize)
 
 public:
-	DisplayPlot(int nplots, QWidget *, unsigned int xNumDivs = 10,
-		    unsigned int yNumDivs = 10);
+	DisplayPlot(int nplots, QWidget *, unsigned int xNumDivs = 10, unsigned int yNumDivs = 10);
 	virtual ~DisplayPlot();
 
 	virtual void replot() = 0;
@@ -444,8 +420,7 @@ public Q_SLOTS:
 	void setMarkerAlpha8(int);
 	void setMarkerAlpha9(int);
 
-	void printWithNoBackground(const QString &toolName = "",
-				   bool editScaleDraw = true);
+	void printWithNoBackground(const QString &toolName = "", bool editScaleDraw = true);
 
 	void setZoomerColor(QColor c);
 	void setPaletteColor(QColor c);
@@ -479,8 +454,7 @@ Q_SIGNALS:
 
 protected Q_SLOTS:
 	virtual void legendEntryChecked(QwtPlotItem *plotItem, bool on);
-	virtual void legendEntryChecked(const QVariant &plotItem, bool on,
-					int index);
+	virtual void legendEntryChecked(const QVariant &plotItem, bool on, int index);
 
 	void onHorizAxisOffsetDecrease();
 	void onHorizAxisOffsetIncrease();
@@ -637,9 +611,7 @@ private:
  */
 class EdgelessPlotScaleItem : public QwtPlotScaleItem {
 public:
-	explicit EdgelessPlotScaleItem(
-		QwtScaleDraw::Alignment = QwtScaleDraw::BottomScale,
-		const double pos = 0.0);
+	explicit EdgelessPlotScaleItem(QwtScaleDraw::Alignment = QwtScaleDraw::BottomScale, const double pos = 0.0);
 	virtual void updateScaleDiv(const QwtScaleDiv &, const QwtScaleDiv &);
 };
 

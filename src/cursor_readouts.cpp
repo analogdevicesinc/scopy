@@ -77,8 +77,7 @@ void CursorReadouts::setTransparency(int value) {
 					  "}");
 }
 
-void CursorReadouts::moveToPosition(
-	CustomPlotPositionButton::ReadoutsPosition position) {
+void CursorReadouts::moveToPosition(CustomPlotPositionButton::ReadoutsPosition position) {
 	switch (position) {
 
 	case CustomPlotPositionButton::topLeft:
@@ -101,10 +100,7 @@ void CursorReadouts::moveToPosition(
 	currentPosition = position;
 }
 
-CustomPlotPositionButton::ReadoutsPosition
-CursorReadouts::getCurrentPosition() {
-	return currentPosition;
-}
+CustomPlotPositionButton::ReadoutsPosition CursorReadouts::getCurrentPosition() { return currentPosition; }
 
 void CursorReadouts::showEvent(QShowEvent *event) {
 	updateSizeAndPosition(true);
@@ -114,9 +110,7 @@ void CursorReadouts::showEvent(QShowEvent *event) {
 
 QwtPlot *CursorReadouts::plot() { return static_cast<QwtPlot *>(parent()); }
 
-const QwtPlot *CursorReadouts::plot() const {
-	return static_cast<const QwtPlot *>(parent());
-}
+const QwtPlot *CursorReadouts::plot() const { return static_cast<const QwtPlot *>(parent()); }
 
 void CursorReadouts::setVoltageReadoutVisible(bool on) {
 	if (d_voltage_rd_visible != on) {
@@ -138,51 +132,35 @@ void CursorReadouts::setTimeReadoutVisible(bool on) {
 
 bool CursorReadouts::isTimeReadoutVisible() { return d_time_rd_visible; }
 
-void CursorReadouts::setTopLeftStartingPoint(QPoint point) {
-	d_topLeft = point;
-}
+void CursorReadouts::setTopLeftStartingPoint(QPoint point) { d_topLeft = point; }
 
 QPoint CursorReadouts::topLeftStartingPoint() { return d_topLeft; }
 
-void CursorReadouts::setTimeCursor1Text(const QString &text) {
-	ui->cursorT1->setText(text);
-}
+void CursorReadouts::setTimeCursor1Text(const QString &text) { ui->cursorT1->setText(text); }
 
 QString CursorReadouts::timeCursor1Text() { return ui->cursorT1->text(); }
 
-void CursorReadouts::setTimeCursor2Text(const QString &text) {
-	ui->cursorT2->setText(text);
-}
+void CursorReadouts::setTimeCursor2Text(const QString &text) { ui->cursorT2->setText(text); }
 
 QString CursorReadouts::timeCursor2Text() { return ui->cursorT2->text(); }
 
-void CursorReadouts::setTimeDeltaText(const QString &text) {
-	ui->timeDelta->setText(text);
-}
+void CursorReadouts::setTimeDeltaText(const QString &text) { ui->timeDelta->setText(text); }
 
 QString CursorReadouts::timeDeltaText() { return ui->timeDelta->text(); }
 
-void CursorReadouts::setFreqDeltaText(const QString &text) {
-	ui->frequencyDelta->setText(text);
-}
+void CursorReadouts::setFreqDeltaText(const QString &text) { ui->frequencyDelta->setText(text); }
 
 QString CursorReadouts::freqDeltaText() { return ui->frequencyDelta->text(); }
 
-void CursorReadouts::setVoltageCursor1Text(const QString &text) {
-	ui->cursorV1->setText(text);
-}
+void CursorReadouts::setVoltageCursor1Text(const QString &text) { ui->cursorV1->setText(text); }
 
 QString CursorReadouts::voltageCursor1Text() { return ui->cursorV1->text(); }
 
-void CursorReadouts::setVoltageCursor2Text(const QString &text) {
-	ui->cursorV2->setText(text);
-}
+void CursorReadouts::setVoltageCursor2Text(const QString &text) { ui->cursorV2->setText(text); }
 
 QString CursorReadouts::voltageCursor2Text() { return ui->cursorV2->text(); }
 
-void CursorReadouts::setVoltageDeltaText(const QString &text) {
-	ui->voltageDelta->setText(text);
-}
+void CursorReadouts::setVoltageDeltaText(const QString &text) { ui->voltageDelta->setText(text); }
 
 QString CursorReadouts::voltageDeltaText() { return ui->voltageDelta->text(); }
 
@@ -196,45 +174,25 @@ void CursorReadouts::setFrequencyDeltaVisible(bool visible) {
 	ui->frequencyDelta->setVisible(visible);
 }
 
-void CursorReadouts::setTimeCursor1LabelText(const QString &text) {
-	ui->cursorT1label->setText(text);
-}
+void CursorReadouts::setTimeCursor1LabelText(const QString &text) { ui->cursorT1label->setText(text); }
 
-QString CursorReadouts::timeCursor1LabelText() {
-	return ui->cursorT1label->text();
-}
+QString CursorReadouts::timeCursor1LabelText() { return ui->cursorT1label->text(); }
 
-void CursorReadouts::setTimeCursor2LabelText(const QString &text) {
-	ui->cursorT2label->setText(text);
-}
+void CursorReadouts::setTimeCursor2LabelText(const QString &text) { ui->cursorT2label->setText(text); }
 
-QString CursorReadouts::timeCursor2LabelText() {
-	return ui->cursorT2label->text();
-}
+QString CursorReadouts::timeCursor2LabelText() { return ui->cursorT2label->text(); }
 
-void CursorReadouts::setVoltageCursor1LabelText(const QString &text) {
-	ui->cursorV1label->setText(text);
-}
+void CursorReadouts::setVoltageCursor1LabelText(const QString &text) { ui->cursorV1label->setText(text); }
 
-QString CursorReadouts::voltageCursor1LabelText() {
-	return ui->cursorV2label->text();
-}
+QString CursorReadouts::voltageCursor1LabelText() { return ui->cursorV2label->text(); }
 
-void CursorReadouts::setVoltageCursor2LabelText(const QString &text) {
-	ui->cursorV2label->setText(text);
-}
+void CursorReadouts::setVoltageCursor2LabelText(const QString &text) { ui->cursorV2label->setText(text); }
 
-QString CursorReadouts::voltageCursor2LabelText() {
-	return ui->cursorV2label->text();
-}
+QString CursorReadouts::voltageCursor2LabelText() { return ui->cursorV2label->text(); }
 
-void CursorReadouts::setDeltaVoltageLabelText(const QString &text) {
-	ui->deltaVlabel->setText(text);
-}
+void CursorReadouts::setDeltaVoltageLabelText(const QString &text) { ui->deltaVlabel->setText(text); }
 
-QString CursorReadouts::deltaVoltageLabelText() {
-	return ui->deltaVlabel->text();
-}
+QString CursorReadouts::deltaVoltageLabelText() { return ui->deltaVlabel->text(); }
 
 void CursorReadouts::setAxis(QwtAxisId hAxis, QwtAxisId vAxis) {
 	this->hAxis = hAxis;
@@ -295,21 +253,17 @@ void CursorReadouts::moveTopLeft(bool resize) {
 	QRect timeRect, voltageRect;
 
 	if (!d_time_rd_visible && d_voltage_rd_visible) {
-		voltageRect = QRect(
-			d_topLeft,
-			QPoint(d_topLeft.x() + ui->VoltageCursors->width(),
-			       d_topLeft.y() + ui->VoltageCursors->height()));
+		voltageRect = QRect(d_topLeft,
+				    QPoint(d_topLeft.x() + ui->VoltageCursors->width(),
+					   d_topLeft.y() + ui->VoltageCursors->height()));
 		timeRect = QRect(0, 0, 0, 0);
 	} else {
 		timeRect = QRect(
 			d_topLeft,
-			QPoint(ui->TimeCursors->width() + d_topLeft.x(),
-			       ui->TimeCursors->height() + d_topLeft.y()));
-		voltageRect = QRect(
-			QPoint(d_topLeft.x() + timeRect.width(), d_topLeft.y()),
-			QPoint(d_topLeft.x() + timeRect.width() +
-				       ui->VoltageCursors->width(),
-			       ui->VoltageCursors->height() + d_topLeft.y()));
+			QPoint(ui->TimeCursors->width() + d_topLeft.x(), ui->TimeCursors->height() + d_topLeft.y()));
+		voltageRect = QRect(QPoint(d_topLeft.x() + timeRect.width(), d_topLeft.y()),
+				    QPoint(d_topLeft.x() + timeRect.width() + ui->VoltageCursors->width(),
+					   ui->VoltageCursors->height() + d_topLeft.y()));
 	}
 
 	int diff = voltageRect.x() - lastVoltageRect.x();
@@ -345,16 +299,12 @@ void CursorReadouts::moveTopRight(bool resize) {
 
 	if (d_time_rd_visible && !d_voltage_rd_visible) {
 		voltageRect = QRect(0, 0, 0, 0);
-		timeRect = QRect(d_topLeft.x() - ui->TimeCursors->width(),
-				 d_topLeft.y(), d_topLeft.x(),
+		timeRect = QRect(d_topLeft.x() - ui->TimeCursors->width(), d_topLeft.y(), d_topLeft.x(),
 				 d_topLeft.y() + ui->TimeCursors->height());
 	} else {
-		voltageRect =
-			QRect(d_topLeft.x() - ui->VoltageCursors->width(),
-			      d_topLeft.y(), d_topLeft.x(),
-			      d_topLeft.y() + ui->VoltageCursors->height());
-		timeRect = QRect(voltageRect.x() - ui->TimeCursors->width(),
-				 d_topLeft.y(), voltageRect.x(),
+		voltageRect = QRect(d_topLeft.x() - ui->VoltageCursors->width(), d_topLeft.y(), d_topLeft.x(),
+				    d_topLeft.y() + ui->VoltageCursors->height());
+		timeRect = QRect(voltageRect.x() - ui->TimeCursors->width(), d_topLeft.y(), voltageRect.x(),
 				 d_topLeft.y() + ui->VoltageCursors->height());
 	}
 
@@ -390,26 +340,15 @@ void CursorReadouts::moveBottomLeft(bool resize) {
 	d_topLeft.setX(8);
 
 	if (!d_time_rd_visible && d_voltage_rd_visible) {
-		voltageRect = QRect(
-			QPoint(d_topLeft.x(),
-			       d_topLeft.y() - ui->VoltageCursors->height() -
-				       20),
-			QPoint(d_topLeft.x() + ui->VoltageCursors->width(),
-			       d_topLeft.y()));
+		voltageRect = QRect(QPoint(d_topLeft.x(), d_topLeft.y() - ui->VoltageCursors->height() - 20),
+				    QPoint(d_topLeft.x() + ui->VoltageCursors->width(), d_topLeft.y()));
 		timeRect = QRect(0, 0, 0, 0);
 	} else {
-		timeRect = QRect(
-			QPoint(d_topLeft.x(),
-			       d_topLeft.y() - ui->TimeCursors->height() - 20),
-			QPoint(ui->TimeCursors->width() + d_topLeft.x(),
-			       d_topLeft.y()));
-		voltageRect =
-			QRect(QPoint(d_topLeft.x() + timeRect.width(),
-				     d_topLeft.y() -
-					     ui->VoltageCursors->height() - 20),
-			      QPoint(d_topLeft.x() + timeRect.width() +
-					     ui->VoltageCursors->width(),
-				     d_topLeft.y()));
+		timeRect = QRect(QPoint(d_topLeft.x(), d_topLeft.y() - ui->TimeCursors->height() - 20),
+				 QPoint(ui->TimeCursors->width() + d_topLeft.x(), d_topLeft.y()));
+		voltageRect = QRect(
+			QPoint(d_topLeft.x() + timeRect.width(), d_topLeft.y() - ui->VoltageCursors->height() - 20),
+			QPoint(d_topLeft.x() + timeRect.width() + ui->VoltageCursors->width(), d_topLeft.y()));
 	}
 
 	int diff = voltageRect.x() - lastVoltageRect.x();
@@ -446,15 +385,11 @@ void CursorReadouts::moveBottomRight(bool resize) {
 	if (d_time_rd_visible && !d_voltage_rd_visible) {
 		voltageRect = QRect(0, 0, 0, 0);
 		timeRect = QRect(d_topLeft.x() - ui->TimeCursors->width(),
-				 d_topLeft.y() - ui->TimeCursors->height() - 20,
-				 d_topLeft.x(), d_topLeft.y());
+				 d_topLeft.y() - ui->TimeCursors->height() - 20, d_topLeft.x(), d_topLeft.y());
 	} else {
-		voltageRect =
-			QRect(d_topLeft.x() - ui->VoltageCursors->width(),
-			      d_topLeft.y() - ui->VoltageCursors->height() - 20,
-			      d_topLeft.x(), d_topLeft.y());
-		timeRect = QRect(voltageRect.x() - ui->TimeCursors->width(),
-				 voltageRect.y(), voltageRect.x(),
+		voltageRect = QRect(d_topLeft.x() - ui->VoltageCursors->width(),
+				    d_topLeft.y() - ui->VoltageCursors->height() - 20, d_topLeft.x(), d_topLeft.y());
+		timeRect = QRect(voltageRect.x() - ui->TimeCursors->width(), voltageRect.y(), voltageRect.x(),
 				 voltageRect.y() + ui->TimeCursors->height());
 	}
 

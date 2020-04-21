@@ -40,8 +40,7 @@ void DragZone::dragLeaveEvent(QDragLeaveEvent *event) {
 void DragZone::dropEvent(QDropEvent *event) {
 	Q_EMIT highlightLastSeparator(false);
 	short from, to;
-	if (event->source() == this &&
-	    event->possibleActions() & Qt::MoveAction) {
+	if (event->source() == this && event->possibleActions() & Qt::MoveAction) {
 		return;
 	}
 	if (event->mimeData()->hasFormat("menu/option")) {
@@ -57,8 +56,7 @@ void DragZone::setPosition(int value) { position = value; }
 
 bool DragZone::eventFilter(QObject *watched, QEvent *event) {
 	if (event->type() == QEvent::DragEnter) {
-		QDragEnterEvent *enterEvent =
-			static_cast<QDragEnterEvent *>(event);
+		QDragEnterEvent *enterEvent = static_cast<QDragEnterEvent *>(event);
 		if (!enterEvent->mimeData()->hasFormat("menu/option"))
 			return true;
 	}

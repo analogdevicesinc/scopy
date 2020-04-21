@@ -64,8 +64,7 @@ class DigitalIoGroup : public QWidget {
 	DigitalIO *dio;
 
 public:
-	DigitalIoGroup(QString label, int ch_mask, int io_mask, DigitalIO *dio,
-		       QWidget *parent = 0);
+	DigitalIoGroup(QString label, int ch_mask, int io_mask, DigitalIO *dio, QWidget *parent = 0);
 	~DigitalIoGroup();
 	Ui::dioElement *ui;
 	QList<QPair<QWidget *, Ui::dioChannel *> *> chui;
@@ -98,10 +97,8 @@ private:
 	QPair<QWidget *, Ui::dioChannel *> *findIndividualUi(int ch);
 
 public:
-	explicit DigitalIO(struct iio_context *ctx, Filter *filt,
-			   ToolMenuItem *toolMenuItem, DIOManager *diom,
-			   QJSEngine *engine, ToolLauncher *parent,
-			   bool offline_mode = 0);
+	explicit DigitalIO(struct iio_context *ctx, Filter *filt, ToolMenuItem *toolMenuItem, DIOManager *diom,
+			   QJSEngine *engine, ToolLauncher *parent, bool offline_mode = 0);
 	~DigitalIO();
 	void setDirection(int ch, int direction);
 	void setOutput(int ch, int out);

@@ -26,21 +26,16 @@
 using namespace adiscope;
 
 PrintablePlot::PrintablePlot(QWidget *parent)
-	: QwtPlot(parent)
-	, d_plotRenderer(new QwtPlotRenderer(this))
-	, d_useNativeDialog(true) {
+	: QwtPlot(parent), d_plotRenderer(new QwtPlotRenderer(this)), d_useNativeDialog(true) {
 	dropBackground(true);
 }
 
 void PrintablePlot::dropBackground(bool drop) {
 	d_plotRenderer.setDiscardFlag(QwtPlotRenderer::DiscardBackground, drop);
-	d_plotRenderer.setDiscardFlag(QwtPlotRenderer::DiscardCanvasBackground,
-				      drop);
+	d_plotRenderer.setDiscardFlag(QwtPlotRenderer::DiscardCanvasBackground, drop);
 }
 
-void PrintablePlot::setUseNativeDialog(bool nativeDialog) {
-	d_useNativeDialog = nativeDialog;
-}
+void PrintablePlot::setUseNativeDialog(bool nativeDialog) { d_useNativeDialog = nativeDialog; }
 
 void PrintablePlot::printPlot(const QString &toolName) {
 	legendDisplay = new QwtLegend(this);
@@ -49,8 +44,7 @@ void PrintablePlot::printPlot(const QString &toolName) {
 
 	updateLegend();
 
-	QString date =
-		QDateTime::currentDateTime().toString("yyyy-MM-dd-hh-mm-ss");
+	QString date = QDateTime::currentDateTime().toString("yyyy-MM-dd-hh-mm-ss");
 
 	QString fileName = "Scopy-" + toolName + "-" + date + ".png";
 
@@ -59,8 +53,7 @@ void PrintablePlot::printPlot(const QString &toolName) {
 	// to use native or qt based. So we reconstruct the file formats used by
 	// it and use our own call of QFileDialog::getSaveFileName(...) where we
 	// take into account the d_useNativeDialog boolean
-	const QList<QByteArray> imageFormats =
-		QImageWriter::supportedImageFormats();
+	const QList<QByteArray> imageFormats = QImageWriter::supportedImageFormats();
 	QStringList filter;
 	filter += QString("PDF ") + tr("Documents") + " (*.pdf)";
 	filter += QString("SVG ") + tr("Documents") + " (*.svg)";
@@ -82,10 +75,8 @@ void PrintablePlot::printPlot(const QString &toolName) {
 	}
 
 	fileName = QFileDialog::getSaveFileName(
-		nullptr, tr("Export File Name"), fileName, filter.join(";;"),
-		nullptr,
-		(d_useNativeDialog ? QFileDialog::Options()
-				   : QFileDialog::DontUseNativeDialog));
+		nullptr, tr("Export File Name"), fileName, filter.join(";;"), nullptr,
+		(d_useNativeDialog ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 
 	d_plotRenderer.renderDocument(this, fileName, QSizeF(300, 200));
 

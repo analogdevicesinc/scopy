@@ -54,8 +54,7 @@ class TriggerSettings : public QWidget {
 public:
 	enum TriggerMode { NORMAL, AUTO };
 
-	explicit TriggerSettings(std::shared_ptr<GenericAdc> adc,
-				 QWidget *parent = nullptr);
+	explicit TriggerSettings(std::shared_ptr<GenericAdc> adc, QWidget *parent = nullptr);
 	~TriggerSettings();
 
 	int currentChannel() const;
@@ -125,8 +124,7 @@ private:
 	void ui_reconf_on_extern_toggled(bool);
 	void write_ui_settings_to_hawrdware();
 	void trigg_level_write_hardware(int chn, double value);
-	HardwareTrigger::mode determineTriggerMode(bool intern_checked,
-						   bool extern_checked) const;
+	HardwareTrigger::mode determineTriggerMode(bool intern_checked, bool extern_checked) const;
 	void enableExternalTriggerOut(bool);
 
 private:
@@ -136,9 +134,7 @@ private:
 	std::shared_ptr<GenericAdc> adc;
 	std::shared_ptr<HardwareTrigger> trigger;
 
-	static const std::vector<
-		std::pair<std::string, HardwareTrigger::out_select>>
-		externalTriggerOutMapping;
+	static const std::vector<std::pair<std::string, HardwareTrigger::out_select>> externalTriggerOutMapping;
 
 	QList<trigg_channel_config> trigg_configs;
 	PositionSpinButton *trigger_level;

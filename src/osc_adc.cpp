@@ -13,8 +13,7 @@ using namespace adiscope;
  * class IioUtils
  */
 
-QStringList IioUtils::available_options_list(struct iio_device *dev,
-					     const char *attr_name) {
+QStringList IioUtils::available_options_list(struct iio_device *dev, const char *attr_name) {
 	char buffer[8192];
 	ssize_t ret;
 	QStringList list;
@@ -28,8 +27,7 @@ QStringList IioUtils::available_options_list(struct iio_device *dev,
 	return list;
 }
 
-QList<struct iio_channel *>
-IioUtils::scan_elem_channel_list(struct iio_device *dev) {
+QList<struct iio_channel *> IioUtils::scan_elem_channel_list(struct iio_device *dev) {
 	QList<struct iio_channel *> list;
 
 	for (unsigned int i = 0; i < iio_device_get_channels_count(dev); i++) {
@@ -44,9 +42,8 @@ IioUtils::scan_elem_channel_list(struct iio_device *dev) {
 	return list;
 }
 
-QList<struct iio_channel *>
-IioUtils::pick_channels_with_direction(const QList<struct iio_channel *> &list,
-				       bool output) {
+QList<struct iio_channel *> IioUtils::pick_channels_with_direction(const QList<struct iio_channel *> &list,
+								   bool output) {
 	QList<struct iio_channel *> return_list;
 
 	for (int i = 0; i < list.size(); i++) {
@@ -62,8 +59,7 @@ IioUtils::pick_channels_with_direction(const QList<struct iio_channel *> &list,
 }
 
 std::string IioUtils::hardware_revision(struct iio_context *ctx) {
-	const char *hw_rev_attr_val =
-		iio_context_get_attr_value(ctx, "hw_model");
+	const char *hw_rev_attr_val = iio_context_get_attr_value(ctx, "hw_model");
 	std::string rev;
 
 	if (hw_rev_attr_val) {
@@ -86,12 +82,10 @@ std::string IioUtils::hardware_revision(struct iio_context *ctx) {
 
 GenericAdc::GenericAdc(struct iio_context *ctx, struct iio_device *adc_dev)
 	: m_ctx(ctx), m_adc(adc_dev), m_adc_bits(0) {
-	m_adc_channels = IioUtils::pick_channels_with_direction(
-		IioUtils::scan_elem_channel_list(adc_dev), false);
+	m_adc_channels = IioUtils::pick_channels_with_direction(IioUtils::scan_elem_channel_list(adc_dev), false);
 
 	if (m_adc_channels.size() > 0) {
-		m_adc_bits =
-			iio_channel_get_data_format(m_adc_channels[0])->bits;
+		m_adc_bits = iio_channel_get_data_format(m_adc_channels[0])->bits;
 	}
 
 	m_sample_rate = readSampleRate();
@@ -107,13 +101,9 @@ struct iio_device *GenericAdc::iio_adc_dev() const {
 	return m_adc;
 }
 
-std::shared_ptr<HardwareTrigger> GenericAdc::getTrigger() const {
-	return m_trigger;
-}
+std::shared_ptr<HardwareTrigger> GenericAdc::getTrigger() const { return m_trigger; }
 
-QList<struct iio_channel *> GenericAdc::adcChannelList() const {
-	return m_adc_channels;
-}
+QList<struct iio_channel *> GenericAdc::adcChannelList() const { return m_adc_channels; }
 
 uint GenericAdc::numAdcChannels() const { return m_adc_channels.size(); }
 
@@ -122,8 +112,7 @@ uint GenericAdc::numAdcBits() const { return m_adc_bits; }
 double GenericAdc::sampleRate() const { return m_sample_rate; }
 
 double GenericAdc::readSampleRate() {
-	iio_device_attr_read_double(m_adc, "sampling_frequency",
-				    &m_sample_rate);
+	iio_device_attr_read_double(m_adc, "sampling_frequency", &m_sample_rate);
 
 	return m_sample_rate;
 }
@@ -133,21 +122,13 @@ void GenericAdc::setSampleRate(double sr) {
 	m_sample_rate = sr;
 }
 
-double GenericAdc::convSampleToVolts(uint chnIdx, double sample) const {
-	return sample;
-}
+double GenericAdc::convSampleToVolts(uint chnIdx, double sample) const { return sample; }
 
-double GenericAdc::convVoltsToSample(uint chnIdx, double volts) const {
-	return volts;
-}
+double GenericAdc::convVoltsToSample(uint chnIdx, double volts) const { return volts; }
 
-double GenericAdc::convSampleDiffToVoltsDiff(uint chnIdx, double smpl) const {
-	return smpl;
-}
+double GenericAdc::convSampleDiffToVoltsDiff(uint chnIdx, double smpl) const { return smpl; }
 
-double GenericAdc::convVoltsDiffToSampleDiff(uint chnIdx, double v) const {
-	return v;
-}
+double GenericAdc::convVoltsDiffToSampleDiff(uint chnIdx, double v) const { return v; }
 
 GenericAdc::settings_uptr GenericAdc::getCurrentHwSettings() {
 	settings_uptr settings_uptr(new Settings);
@@ -157,9 +138,7 @@ GenericAdc::settings_uptr GenericAdc::getCurrentHwSettings() {
 	return settings_uptr;
 }
 
-void GenericAdc::setHwSettings(GenericAdc::Settings *settings) {
-	setSampleRate(settings->sample_rate);
-}
+void GenericAdc::setHwSettings(GenericAdc::Settings *settings) { setSampleRate(settings->sample_rate); }
 
 /*
  * Class M2kAdc
@@ -170,23 +149,17 @@ M2kAdc::M2kAdc(struct iio_context *ctx, struct iio_device *adc_dev)
 	apply_m2k_fixes();
 
 	// Hardware gain channels
-	struct iio_device *m2k_fabric =
-		iio_context_find_device(ctx, "m2k-fabric");
-	m_gain_channels.push_back(
-		iio_device_find_channel(m2k_fabric, "voltage0", false));
-	m_gain_channels.push_back(
-		iio_device_find_channel(m2k_fabric, "voltage1", false));
+	struct iio_device *m2k_fabric = iio_context_find_device(ctx, "m2k-fabric");
+	m_gain_channels.push_back(iio_device_find_channel(m2k_fabric, "voltage0", false));
+	m_gain_channels.push_back(iio_device_find_channel(m2k_fabric, "voltage1", false));
 
 	// Hardware offset cannels
 	struct iio_device *ad5625 = iio_context_find_device(ctx, "ad5625");
-	m_offset_channels.push_back(
-		iio_device_find_channel(ad5625, "voltage2", true));
-	m_offset_channels.push_back(
-		iio_device_find_channel(ad5625, "voltage3", true));
+	m_offset_channels.push_back(iio_device_find_channel(ad5625, "voltage2", true));
+	m_offset_channels.push_back(iio_device_find_channel(ad5625, "voltage3", true));
 
 	// Check for hardware triggering support
-	struct iio_device *m2k_trigger =
-		iio_context_find_device(ctx, "m2k-adc-trigger");
+	struct iio_device *m2k_trigger = iio_context_find_device(ctx, "m2k-adc-trigger");
 	try {
 		m_trigger = std::make_shared<HardwareTrigger>(m2k_trigger);
 	} catch (std::exception &e) {
@@ -194,8 +167,7 @@ M2kAdc::M2kAdc(struct iio_context *ctx, struct iio_device *adc_dev)
 	}
 
 	// Available frequencies list
-	QStringList list = IioUtils::available_options_list(
-		adc_dev, "sampling_frequency_available");
+	QStringList list = IioUtils::available_options_list(adc_dev, "sampling_frequency_available");
 	max_sample_rate = 1;
 	for (int i = 0; i < list.size(); i++) {
 		auto sr = list.at(i).toDouble();
@@ -227,8 +199,7 @@ M2kAdc::~M2kAdc() {}
 void M2kAdc::apply_m2k_fixes() {
 	std::string hw_rev = IioUtils::hardware_revision(iio_context());
 
-	struct iio_device *dev =
-		iio_context_find_device(iio_context(), "ad9963");
+	struct iio_device *dev = iio_context_find_device(iio_context(), "ad9963");
 
 	int config1 = 0x05;
 	int config2 = 0x05;
@@ -247,50 +218,34 @@ void M2kAdc::apply_m2k_fixes() {
 	iio_device_reg_write(dev, 0x6D, 0x20);
 }
 
-double M2kAdc::chnCorrectionOffset(uint chnIdx) const {
-	return m_chn_corr_offsets[chnIdx];
-}
+double M2kAdc::chnCorrectionOffset(uint chnIdx) const { return m_chn_corr_offsets[chnIdx]; }
 
-void M2kAdc::setChnCorrectionOffset(uint chnIdx, double offset) {
-	m_chn_corr_offsets[chnIdx] = offset;
-}
+void M2kAdc::setChnCorrectionOffset(uint chnIdx, double offset) { m_chn_corr_offsets[chnIdx] = offset; }
 
-double M2kAdc::chnCorrectionGain(uint chnIdx) const {
-	return m_chn_corr_gains[chnIdx];
-}
+double M2kAdc::chnCorrectionGain(uint chnIdx) const { return m_chn_corr_gains[chnIdx]; }
 
-void M2kAdc::setChnCorrectionGain(uint chnIdx, double gain) {
-	m_chn_corr_gains[chnIdx] = gain;
-}
+void M2kAdc::setChnCorrectionGain(uint chnIdx, double gain) { m_chn_corr_gains[chnIdx] = gain; }
 
-double M2kAdc::chnHwOffset(uint chnIdx) const {
-	return m_chn_hw_offsets[chnIdx];
-}
+double M2kAdc::chnHwOffset(uint chnIdx) const { return m_chn_hw_offsets[chnIdx]; }
 
 void M2kAdc::setChnHwOffset(uint chnIdx, double offset) {
 	double gain = 1.3;
 	double vref = 1.2;
 	double hw_chn_gain = gainAt(chnHwGainMode(chnIdx));
-	int raw_offset = (int)(offset * (1 << numAdcBits()) * hw_chn_gain *
-			       gain / 2.693 / vref) +
-		m_chn_corr_offsets[chnIdx];
+	int raw_offset =
+		(int)(offset * (1 << numAdcBits()) * hw_chn_gain * gain / 2.693 / vref) + m_chn_corr_offsets[chnIdx];
 
-	iio_channel_attr_write_longlong(m_offset_channels[chnIdx], "raw",
-					(long long)raw_offset);
+	iio_channel_attr_write_longlong(m_offset_channels[chnIdx], "raw", (long long)raw_offset);
 
 	m_chn_hw_offsets[chnIdx] = offset;
 }
 
-M2kAdc::GainMode M2kAdc::chnHwGainMode(uint chnIdx) const {
-	return m_chn_hw_gain_modes[chnIdx];
-}
+M2kAdc::GainMode M2kAdc::chnHwGainMode(uint chnIdx) const { return m_chn_hw_gain_modes[chnIdx]; }
 
 void M2kAdc::setChnHwGainMode(uint chnIdx, GainMode gain_mode) {
-	const char *str_gain_mode =
-		(gain_mode == GainMode::HIGH_GAIN_MODE) ? "high" : "low";
+	const char *str_gain_mode = (gain_mode == GainMode::HIGH_GAIN_MODE) ? "high" : "low";
 
-	iio_channel_attr_write_raw(m_gain_channels[chnIdx], "gain",
-				   str_gain_mode, strlen(str_gain_mode));
+	iio_channel_attr_write_raw(m_gain_channels[chnIdx], "gain", str_gain_mode, strlen(str_gain_mode));
 
 	m_chn_hw_gain_modes[chnIdx] = gain_mode;
 }
@@ -317,9 +272,7 @@ QList<double> M2kAdc::availSamplRates() const { return m_availSampRates; }
 
 double M2kAdc::maxSampleRate() const { return max_sample_rate; }
 
-double M2kAdc::compTable(double samplRate) const {
-	return m_filt_comp_table.at(samplRate);
-}
+double M2kAdc::compTable(double samplRate) const { return m_filt_comp_table.at(samplRate); }
 
 void M2kAdc::setSampleRate(double sr) {
 	m2k_sample_rate = sr;
@@ -337,34 +290,29 @@ double M2kAdc::readSampleRate() const { return m2k_sample_rate; }
 double M2kAdc::convSampleToVolts(uint chnIdx, double sample) const {
 	double hw_gain = gainAt(m_chn_hw_gain_modes[chnIdx]);
 
-	return (((sample * 0.78) /
-		 ((1 << (numAdcBits() - 1)) * 1.3 * hw_gain)) *
-		m_chn_corr_gains[chnIdx] * m_filt_comp_table.at(sampleRate())) -
+	return (((sample * 0.78) / ((1 << (numAdcBits() - 1)) * 1.3 * hw_gain)) * m_chn_corr_gains[chnIdx] *
+		m_filt_comp_table.at(sampleRate())) -
 		m_chn_hw_offsets[chnIdx];
 }
 
 double M2kAdc::convVoltsToSample(uint chnIdx, double volts) const {
 	double hw_gain = gainAt(m_chn_hw_gain_modes[chnIdx]);
 
-	return (volts + m_chn_hw_offsets[chnIdx]) /
-		(m_chn_corr_gains[chnIdx] *
-		 m_filt_comp_table.at(sampleRate())) *
+	return (volts + m_chn_hw_offsets[chnIdx]) / (m_chn_corr_gains[chnIdx] * m_filt_comp_table.at(sampleRate())) *
 		((1 << (numAdcBits() - 1)) * 1.3 * hw_gain) / 0.78;
 }
 
 double M2kAdc::convSampleDiffToVoltsDiff(uint chnIdx, double smp) const {
 	double hw_gain = gainAt(m_chn_hw_gain_modes[chnIdx]);
 
-	return (smp * 0.78) / ((1 << (numAdcBits() - 1)) * 1.3 * hw_gain) *
-		m_chn_corr_gains[chnIdx] * m_filt_comp_table.at(sampleRate());
+	return (smp * 0.78) / ((1 << (numAdcBits() - 1)) * 1.3 * hw_gain) * m_chn_corr_gains[chnIdx] *
+		m_filt_comp_table.at(sampleRate());
 }
 
 double M2kAdc::convVoltsDiffToSampleDiff(uint chnIdx, double v) const {
 	double hw_gain = gainAt(m_chn_hw_gain_modes[chnIdx]);
 
-	return v /
-		(m_chn_corr_gains[chnIdx] *
-		 m_filt_comp_table.at(sampleRate())) *
+	return v / (m_chn_corr_gains[chnIdx] * m_filt_comp_table.at(sampleRate())) *
 		((1 << (numAdcBits() - 1)) * 1.3 * hw_gain) / 0.78;
 }
 
@@ -388,8 +336,7 @@ void M2kAdc::setHwSettings(GenericAdc::Settings *settings) {
 	M2KSettings *m2k_settings = dynamic_cast<M2KSettings *>(settings);
 	if (m2k_settings) {
 		for (int i = 0; i < numAdcChannels(); i++) {
-			setChnHwGainMode(i,
-					 m2k_settings->channel_hw_gain_mode[i]);
+			setChnHwGainMode(i, m2k_settings->channel_hw_gain_mode[i]);
 			setChnHwOffset(i, m2k_settings->channel_hw_offset[i]);
 		}
 	}

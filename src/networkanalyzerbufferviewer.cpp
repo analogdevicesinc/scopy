@@ -38,9 +38,7 @@ NetworkAnalyzerBufferViewer::NetworkAnalyzerBufferViewer(QWidget *parent)
 
 NetworkAnalyzerBufferViewer::~NetworkAnalyzerBufferViewer() { delete d_ui; }
 
-void NetworkAnalyzerBufferViewer::setNumBuffers(unsigned int numBuffers) {
-	d_numBuffers = numBuffers;
-}
+void NetworkAnalyzerBufferViewer::setNumBuffers(unsigned int numBuffers) { d_numBuffers = numBuffers; }
 
 void NetworkAnalyzerBufferViewer::pushBuffers(QPair<Buffer, Buffer> buffers) {
 	if (d_data.size() < d_numBuffers) {
@@ -54,8 +52,7 @@ void NetworkAnalyzerBufferViewer::pushBuffers(QPair<Buffer, Buffer> buffers) {
 	}
 }
 
-void NetworkAnalyzerBufferViewer::selectBuffersAtIndex(int index,
-						       bool moveHandle) {
+void NetworkAnalyzerBufferViewer::selectBuffersAtIndex(int index, bool moveHandle) {
 	if (index != d_selectedBuffersIndex) {
 		Q_EMIT indexChanged(index);
 	}
@@ -118,8 +115,7 @@ void NetworkAnalyzerBufferViewer::selectBuffersAtIndex(int index,
 void NetworkAnalyzerBufferViewer::selectBuffers(double frequency) {
 	int index = -1;
 	for (int i = 0; i < d_data.size() - 1; ++i) {
-		if (d_data[i].first.frequency <= frequency &&
-		    frequency <= d_data[i + 1].first.frequency) {
+		if (d_data[i].first.frequency <= frequency && frequency <= d_data[i + 1].first.frequency) {
 			index = i;
 			break;
 		}
@@ -151,9 +147,7 @@ void NetworkAnalyzerBufferViewer::setVisible(bool visible) {
 	}
 }
 
-void NetworkAnalyzerBufferViewer::setOscilloscope(Oscilloscope *osc) {
-	d_osc = osc;
-}
+void NetworkAnalyzerBufferViewer::setOscilloscope(Oscilloscope *osc) { d_osc = osc; }
 
 void NetworkAnalyzerBufferViewer::clear() {
 	d_data.clear();
@@ -161,8 +155,7 @@ void NetworkAnalyzerBufferViewer::clear() {
 }
 
 void NetworkAnalyzerBufferViewer::sendBufferToOscilloscope() {
-	if (d_selectedBuffersIndex < 0 ||
-	    d_selectedBuffersIndex >= d_data.size()) {
+	if (d_selectedBuffersIndex < 0 || d_selectedBuffersIndex >= d_data.size()) {
 		return;
 	}
 
@@ -177,10 +170,8 @@ void NetworkAnalyzerBufferViewer::sendBufferToOscilloscope() {
 	for (int i = 0; i < d_data[index].second.buffer.size(); ++i) {
 		yData2.push_back(d_data[index].second.buffer[i]);
 	}
-	d_osc->add_ref_waveform("NA1", d_currentXdata, yData1,
-				d_data[index].first.sampleRate);
-	d_osc->add_ref_waveform("NA2", d_currentXdata, yData2,
-				d_data[index].second.sampleRate);
+	d_osc->add_ref_waveform("NA1", d_currentXdata, yData1, d_data[index].first.sampleRate);
+	d_osc->add_ref_waveform("NA2", d_currentXdata, yData2, d_data[index].second.sampleRate);
 
 	d_osc->detached();
 }

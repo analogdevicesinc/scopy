@@ -87,20 +87,15 @@ const unsigned long LogicAnalyzer::maxBuffersize = 16000;
 const unsigned long LogicAnalyzer::maxTriggerBufferSize = 8192;
 
 std::vector<std::string> LogicAnalyzer::trigger_mapping = {
-	"none",		"edge-any",  "edge-rising",
-	"edge-falling", "level-low", "level-high",
+	"none", "edge-any", "edge-rising", "edge-falling", "level-low", "level-high",
 };
 
-std::vector<std::pair<std::string, std::string>>
-	LogicAnalyzer::externalTriggerSourceMap = {
-		{"External Trigger In", "trigger-logic"},
-		{"Oscilloscope", "trigger-in"}};
+std::vector<std::pair<std::string, std::string>> LogicAnalyzer::externalTriggerSourceMap = {
+	{"External Trigger In", "trigger-logic"}, {"Oscilloscope", "trigger-in"}};
 
-LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, Filter *filt,
-			     ToolMenuItem *toolMenuItem, QJSEngine *engine,
+LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, Filter *filt, ToolMenuItem *toolMenuItem, QJSEngine *engine,
 			     ToolLauncher *parent, bool offline_mode_)
-	: Tool(ctx, toolMenuItem, new LogicAnalyzer_API(this), "Logic Analyzer",
-	       parent)
+	: Tool(ctx, toolMenuItem, new LogicAnalyzer_API(this), "Logic Analyzer", parent)
 	, itemsize(sizeof(uint16_t))
 	, dev_name()
 	, dev(nullptr)
@@ -152,8 +147,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, Filter *filt,
 	symmBufferMode = make_shared<LogicAnalyzerSymmetricBufferMode>();
 	symmBufferMode->setMaxSampleRate(maxSamplingFrequency);
 	symmBufferMode->setEntireBufferMaxSize(500000);
-	symmBufferMode->setTriggerBufferMaxSize(
-		8192); // 8192 is what hardware supports
+	symmBufferMode->setTriggerBufferMaxSize(8192); // 8192 is what hardware supports
 	symmBufferMode->setTimeDivisionCount(10);
 
 	/* Buffer Previewer widget */
@@ -177,25 +171,21 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, Filter *filt,
 	this->d_bottomHandlesArea->setLeftPadding(20);
 	this->d_bottomHandlesArea->setRightPadding(20);
 
-	d_timeTriggerHandle = new FreePlotLineHandleH(
-		QPixmap(":/icons/time_trigger_handle.svg"),
-		QPixmap(":/icons/time_trigger_left.svg"),
-		QPixmap(":/icons/time_trigger_right.svg"), d_bottomHandlesArea);
+	d_timeTriggerHandle = new FreePlotLineHandleH(QPixmap(":/icons/time_trigger_handle.svg"),
+						      QPixmap(":/icons/time_trigger_left.svg"),
+						      QPixmap(":/icons/time_trigger_right.svg"), d_bottomHandlesArea);
 
 	d_timeTriggerHandle->setPen(QPen(QColor(74, 100, 255)));
 	d_timeTriggerHandle->setInnerSpacing(0);
 
-	connect(d_timeTriggerHandle, SIGNAL(positionChanged(int)), this,
-		SLOT(onTimeTriggerHandlePosChanged(int)));
+	connect(d_timeTriggerHandle, SIGNAL(positionChanged(int)), this, SLOT(onTimeTriggerHandlePosChanged(int)));
 
 	d_cursorMetricFormatter.setTwoDecimalMode(false);
 	d_cursorTimeFormatter.setTwoDecimalMode(false);
 
 	/* Cursors */
-	d_hCursorHandle1 = new PlotLineHandleH(
-		QPixmap(":/icons/h_cursor_handle.svg"), d_bottomHandlesArea);
-	d_hCursorHandle2 = new PlotLineHandleH(
-		QPixmap(":/icons/h_cursor_handle.svg"), d_bottomHandlesArea);
+	d_hCursorHandle1 = new PlotLineHandleH(QPixmap(":/icons/h_cursor_handle.svg"), d_bottomHandlesArea);
+	d_hCursorHandle2 = new PlotLineHandleH(QPixmap(":/icons/h_cursor_handle.svg"), d_bottomHandlesArea);
 
 	QPen cursorsLinePen = QPen(QColor(155, 155, 155), 1, Qt::DashLine);
 	d_hCursorHandle1->setPen(cursorsLinePen);
@@ -218,51 +208,37 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, Filter *filt,
 	context = sigrok::Context::create();
 
 	device_manager = new pv::DeviceManager(context);
-	pv::MainWindow *w = new pv::MainWindow(*device_manager, filt, open_file,
-					       open_file_format, this);
+	pv::MainWindow *w = new pv::MainWindow(*device_manager, filt, open_file, open_file_format, this);
 
 	for (unsigned int j = 0; j < get_no_channels(dev); j++) {
 		struct iio_channel *chn = iio_device_get_channel(dev, j);
 
-		if (!iio_channel_is_output(chn) &&
-		    iio_channel_is_scan_element(chn)) {
+		if (!iio_channel_is_output(chn) && iio_channel_is_scan_element(chn)) {
 			iio_channel_enable(chn);
 		}
 	}
 
 	// Controls for scale/division and position
-	timeBase = new ScaleSpinButton(
-		{{"ns", 1E-9}, {"μs", 1E-6}, {"ms", 1E-3}, {"s", 1E0}},
-		"Time Base", 10e-9, 10e0, true, false, this);
+	timeBase = new ScaleSpinButton({{"ns", 1E-9}, {"μs", 1E-6}, {"ms", 1E-3}, {"s", 1E0}}, "Time Base", 10e-9, 10e0,
+				       true, false, this);
 	timePosition = new PositionSpinButton(
-		{{"ns", 1E-9},
-		 {"μs", 1E-6},
-		 {"ms", 1E-3},
-		 {"s", 1E0},
-		 {"min", 60E0},
-		 {"h", 36E2}},
-		"Position", -timeBase->maxValue() * 5, 36E2, true, false, this);
+		{{"ns", 1E-9}, {"μs", 1E-6}, {"ms", 1E-3}, {"s", 1E0}, {"min", 60E0}, {"h", 36E2}}, "Position",
+		-timeBase->maxValue() * 5, 36E2, true, false, this);
 
-	frequencySpinButton = new ScaleSpinButton(
-		{{"Hz", 1E0}, {"kHz", 1E+3}, {"MHz", 1E+6}}, "Frequency", 10e0,
-		maxSamplingFrequency / 33, true, false, this, {1, 2.5, 5});
+	frequencySpinButton = new ScaleSpinButton({{"Hz", 1E0}, {"kHz", 1E+3}, {"MHz", 1E+6}}, "Frequency", 10e0,
+						  maxSamplingFrequency / 33, true, false, this, {1, 2.5, 5});
 
-	ui->verticalLayout_7->insertWidget(ui->verticalLayout_7->count() - 5,
-					   timeBase, 0, Qt::AlignLeft);
-	ui->verticalLayout_7->insertWidget(ui->verticalLayout_7->count() - 4,
-					   timePosition, 0, Qt::AlignLeft);
+	ui->verticalLayout_7->insertWidget(ui->verticalLayout_7->count() - 5, timeBase, 0, Qt::AlignLeft);
+	ui->verticalLayout_7->insertWidget(ui->verticalLayout_7->count() - 4, timePosition, 0, Qt::AlignLeft);
 	ui->verticalLayout_6->addWidget(frequencySpinButton, 0, Qt::AlignLeft);
 
-	connect(frequencySpinButton, SIGNAL(valueChanged(double)), this,
-		SLOT(validateSamplingFrequency(double)));
+	connect(frequencySpinButton, SIGNAL(valueChanged(double)), this, SLOT(validateSamplingFrequency(double)));
 
 	int chn = (no_channels == 0) ? 16 : no_channels;
-	options["numchannels"] =
-		Glib::Variant<gint32>(g_variant_new_int32(chn), true);
+	options["numchannels"] = Glib::Variant<gint32>(g_variant_new_int32(chn), true);
 
 	logic_analyzer_ptr = std::make_shared<pv::devices::BinaryStream>(
-		context, dev, maxBuffersize,
-		w->get_format_from_string("binary"), options, this);
+		context, dev, maxBuffersize, w->get_format_from_string("binary"), options, this);
 
 	/* setup view */
 	main_win = w;
@@ -300,116 +276,75 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, Filter *filt,
 	trigger_settings_ui->extern_to->setVisible(false);
 
 	/* Cursor Settings */
-	connect(trigger_settings_ui->cmb_trigg_extern_cond_1,
-		SIGNAL(currentIndexChanged(int)), this,
+	connect(trigger_settings_ui->cmb_trigg_extern_cond_1, SIGNAL(currentIndexChanged(int)), this,
 		SLOT(setExternalTrigger(int)));
 
-	trigger_settings_ui->cmb_extern_src->addItem(
-		QString::fromStdString(externalTriggerSourceMap[0].first));
+	trigger_settings_ui->cmb_extern_src->addItem(QString::fromStdString(externalTriggerSourceMap[0].first));
 	if (hasCrossInstrumentTrigger())
-		trigger_settings_ui->cmb_extern_src->addItem(
-			QString::fromStdString(
-				externalTriggerSourceMap[1].first));
+		trigger_settings_ui->cmb_extern_src->addItem(QString::fromStdString(externalTriggerSourceMap[1].first));
 
-	connect(trigger_settings_ui->cmb_extern_src,
-		SIGNAL(currentIndexChanged(int)), this,
+	connect(trigger_settings_ui->cmb_extern_src, SIGNAL(currentIndexChanged(int)), this,
 		SLOT(setExternalSource(int)));
 
-	connect(trigger_settings_ui->trigg_extern_en, SIGNAL(toggled(bool)),
-		this, SLOT(setupTriggerSettingsUI(bool)));
-	connect(trigger_settings_ui->cmb_trigg_logic,
-		SIGNAL(currentTextChanged(const QString)), this,
+	connect(trigger_settings_ui->trigg_extern_en, SIGNAL(toggled(bool)), this, SLOT(setupTriggerSettingsUI(bool)));
+	connect(trigger_settings_ui->cmb_trigg_logic, SIGNAL(currentTextChanged(const QString)), this,
 		SLOT(setHWTriggerLogic(const QString)));
-	connect(ui->btnTrigger, SIGNAL(toggled(bool)), this,
-		SLOT(toggleRightMenu(bool)));
-	connect(ui->btnRunStop, SIGNAL(toggled(bool)), this,
-		SLOT(startStop(bool)));
-	connect(ui->btnSingleRun, SIGNAL(toggled(bool)), this,
-		SLOT(singleRun(bool)));
-	connect(runButton(), SIGNAL(toggled(bool)), ui->btnRunStop,
-		SLOT(setChecked(bool)));
-	connect(ui->btnRunStop, SIGNAL(toggled(bool)), runButton(),
-		SLOT(setChecked(bool)));
-	connect(ui->btnSettings, SIGNAL(toggled(bool)), this,
-		SLOT(toggleRightMenu(bool)));
-	connect(ui->btnChSettings, SIGNAL(toggled(bool)), this,
-		SLOT(toggleRightMenu(bool)));
-	connect(ui->rightWidget, SIGNAL(finished(bool)), this,
-		SLOT(rightMenuFinished(bool)));
-	connect(ui->btnShowHideMenu, SIGNAL(clicked(bool)), this,
-		SLOT(toggleLeftMenu(bool)));
-	connect(timeBase, SIGNAL(valueChanged(double)), main_win->view_,
-		SLOT(set_timebase(double)));
-	connect(timeBase, SIGNAL(valueChanged(double)), this,
-		SLOT(onHorizScaleValueChanged(double)));
-	connect(timeBase, SIGNAL(valueChanged(double)), this,
-		SLOT(setTimebaseLabel(double)));
-	connect(timePosition, SIGNAL(valueChanged(double)), this,
-		SLOT(onTimePositionSpinboxChanged(double)));
-	connect(main_win->view_, SIGNAL(repaintTriggerHandle(double, bool)),
-		this, SLOT(onRulerChanged(double, bool)));
-	connect(main_win->view_->viewport(), SIGNAL(repaintTriggerHandle(int)),
-		this, SLOT(refreshTriggerPos(int)));
-	connect(d_hCursorHandle1, SIGNAL(positionChanged(int)), this,
-		SLOT(cursorValueChanged_1(int)));
-	connect(d_hCursorHandle2, SIGNAL(positionChanged(int)), this,
-		SLOT(cursorValueChanged_2(int)));
-	connect(ui->boxCursors, SIGNAL(toggled(bool)), this,
-		SLOT(setCursorsActive(bool)));
+	connect(ui->btnTrigger, SIGNAL(toggled(bool)), this, SLOT(toggleRightMenu(bool)));
+	connect(ui->btnRunStop, SIGNAL(toggled(bool)), this, SLOT(startStop(bool)));
+	connect(ui->btnSingleRun, SIGNAL(toggled(bool)), this, SLOT(singleRun(bool)));
+	connect(runButton(), SIGNAL(toggled(bool)), ui->btnRunStop, SLOT(setChecked(bool)));
+	connect(ui->btnRunStop, SIGNAL(toggled(bool)), runButton(), SLOT(setChecked(bool)));
+	connect(ui->btnSettings, SIGNAL(toggled(bool)), this, SLOT(toggleRightMenu(bool)));
+	connect(ui->btnChSettings, SIGNAL(toggled(bool)), this, SLOT(toggleRightMenu(bool)));
+	connect(ui->rightWidget, SIGNAL(finished(bool)), this, SLOT(rightMenuFinished(bool)));
+	connect(ui->btnShowHideMenu, SIGNAL(clicked(bool)), this, SLOT(toggleLeftMenu(bool)));
+	connect(timeBase, SIGNAL(valueChanged(double)), main_win->view_, SLOT(set_timebase(double)));
+	connect(timeBase, SIGNAL(valueChanged(double)), this, SLOT(onHorizScaleValueChanged(double)));
+	connect(timeBase, SIGNAL(valueChanged(double)), this, SLOT(setTimebaseLabel(double)));
+	connect(timePosition, SIGNAL(valueChanged(double)), this, SLOT(onTimePositionSpinboxChanged(double)));
+	connect(main_win->view_, SIGNAL(repaintTriggerHandle(double, bool)), this, SLOT(onRulerChanged(double, bool)));
+	connect(main_win->view_->viewport(), SIGNAL(repaintTriggerHandle(int)), this, SLOT(refreshTriggerPos(int)));
+	connect(d_hCursorHandle1, SIGNAL(positionChanged(int)), this, SLOT(cursorValueChanged_1(int)));
+	connect(d_hCursorHandle2, SIGNAL(positionChanged(int)), this, SLOT(cursorValueChanged_2(int)));
+	connect(ui->boxCursors, SIGNAL(toggled(bool)), this, SLOT(setCursorsActive(bool)));
 	connect(main_win->view_, SIGNAL(resized()), this, SLOT(resizeEvent()));
 	ui->btnResetInstrument->setVisible(false);
-	connect(ui->btnResetInstrument, SIGNAL(clicked(bool)), this,
-		SLOT(resetInstrumentToDefault()));
-	connect(trigger_settings_ui->btnTriggerMode, SIGNAL(toggled(bool)),
-		this, SLOT(setTimeout(bool)));
-	connect(trigger_settings_ui->btnTriggerMode, SIGNAL(toggled(bool)),
-		this, SLOT(onTriggerModeChanged(bool)));
-	connect(this, SIGNAL(detachedState(bool)), this,
-		SLOT(toolDetached(bool)));
+	connect(ui->btnResetInstrument, SIGNAL(clicked(bool)), this, SLOT(resetInstrumentToDefault()));
+	connect(trigger_settings_ui->btnTriggerMode, SIGNAL(toggled(bool)), this, SLOT(setTimeout(bool)));
+	connect(trigger_settings_ui->btnTriggerMode, SIGNAL(toggled(bool)), this, SLOT(onTriggerModeChanged(bool)));
+	connect(this, SIGNAL(detachedState(bool)), this, SLOT(toolDetached(bool)));
 
 	connect(this, SIGNAL(starttimeout()), this, SLOT(startTimer()));
 	connect(this, SIGNAL(stoptimeout()), this, SLOT(stopTimer()));
 	connect(timer, &QTimer::timeout, this, &LogicAnalyzer::triggerTimeout);
 
-	connect(main_win->view_, SIGNAL(new_segment_received()), this,
-		SLOT(requestUpdateBufferPreviewer()));
-	connect(main_win->view_, SIGNAL(new_segment_received()), this,
-		SLOT(onDataReceived()));
-	connect(main_win->view_, SIGNAL(frame_ended()), this,
-		SLOT(onFrameEnded()));
-	connect(ui->btnRepeated, SIGNAL(toggled(bool)), this,
-		SLOT(runModeChanged(bool)));
+	connect(main_win->view_, SIGNAL(new_segment_received()), this, SLOT(requestUpdateBufferPreviewer()));
+	connect(main_win->view_, SIGNAL(new_segment_received()), this, SLOT(onDataReceived()));
+	connect(main_win->view_, SIGNAL(frame_ended()), this, SLOT(onFrameEnded()));
+	connect(ui->btnRepeated, SIGNAL(toggled(bool)), this, SLOT(runModeChanged(bool)));
 
 	ui->btnRepeated->setChecked(true);
 	ui->btnStream->setChecked(false);
 
 	triggerUpdater->setOffState(Stop);
-	connect(triggerUpdater, SIGNAL(outputChanged(int)), this,
-		SLOT(setTriggerState(int)));
+	connect(triggerUpdater, SIGNAL(outputChanged(int)), this, SLOT(setTriggerState(int)));
 
 	cleanHWParams();
-	chm_ui = new LogicAnalyzerChannelManagerUI(0, main_win, &chm,
-						   ui->scrollAreaWidgetContents,
+	chm_ui = new LogicAnalyzerChannelManagerUI(0, main_win, &chm, ui->scrollAreaWidgetContents,
 						   ui->scrollAreaLayout, this);
 	ui->leftLayout->addWidget(chm_ui);
 	chm_ui->update_ui();
 	chm_ui->setVisible(true);
 
-	connect(ui->btnGroupChannels, SIGNAL(pressed()), chm_ui,
-		SLOT(groupSplit_clicked()));
-	connect(ui->btnShowChannels, SIGNAL(clicked(bool)), chm_ui,
-		SLOT(hideInactive_clicked(bool)));
-	connect(ui->btnShowChannels, SIGNAL(clicked(bool)), this,
-		SLOT(on_btnShowChannelsClicked(bool)));
-	connect(chm_ui, SIGNAL(widthChanged(int)), this,
-		SLOT(onChmWidthChanged(int)));
-	connect(chm_ui, SIGNAL(channels_changed()), this,
-		SLOT(checkEnabledChannels()));
+	connect(ui->btnGroupChannels, SIGNAL(pressed()), chm_ui, SLOT(groupSplit_clicked()));
+	connect(ui->btnShowChannels, SIGNAL(clicked(bool)), chm_ui, SLOT(hideInactive_clicked(bool)));
+	connect(ui->btnShowChannels, SIGNAL(clicked(bool)), this, SLOT(on_btnShowChannelsClicked(bool)));
+	connect(chm_ui, SIGNAL(widthChanged(int)), this, SLOT(onChmWidthChanged(int)));
+	connect(chm_ui, SIGNAL(channels_changed()), this, SLOT(checkEnabledChannels()));
 
 	trigger_settings_ui->btnTriggerMode->setChecked(false);
 	main_win->view_->viewport()->setTimeTriggerPosActive(true);
-	ui->areaTimeTriggerLayout->addWidget(this->bottomHandlesArea(), 0, 1, 1,
-					     3);
+	ui->areaTimeTriggerLayout->addWidget(this->bottomHandlesArea(), 0, 1, 1, 3);
 	updateAreaTimeTrigger();
 
 	ensurePolished();
@@ -426,8 +361,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	timePosition->setValue(0);
 	timePosition->valueChanged(timePosition->value());
-	main_win->view_->viewport()->setTimeTriggerSample(
-		-active_triggerSampleCount);
+	main_win->view_->viewport()->setTimeTriggerSample(-active_triggerSampleCount);
 	setCursorsActive(false);
 
 	timer->setInterval(timer_timeout_ms);
@@ -440,32 +374,25 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, Filter *filt,
 	min_detached_width = this->minimumWidth();
 	toolDetached(false);
 
-	api->setObjectName(
-		QString::fromStdString(Filter::tool_name(TOOL_LOGIC_ANALYZER)));
+	api->setObjectName(QString::fromStdString(Filter::tool_name(TOOL_LOGIC_ANALYZER)));
 	api->load(*settings);
 	api->js_register(engine);
 
 	ui->btnPrint->setFixedWidth(40);
 	connect(ui->btnPrint, &QPushButton::clicked, [=]() {
-		QImage img(ui->plotWidget->width(), ui->plotWidget->height(),
-			   QImage::Format_ARGB32);
+		QImage img(ui->plotWidget->width(), ui->plotWidget->height(), QImage::Format_ARGB32);
 		QPainter painter(&img);
 		img.fill(Qt::black);
 
 		ui->plotWidget->render(&painter);
 
-		QString date = QDateTime::currentDateTime().toString(
-			"yyyy-MM-dd-hh-mm-ss");
+		QString date = QDateTime::currentDateTime().toString("yyyy-MM-dd-hh-mm-ss");
 
-		QString fileNameHint =
-			"Scopy-" + api->objectName() + "-" + date + ".png";
+		QString fileNameHint = "Scopy-" + api->objectName() + "-" + date + ".png";
 
 		QString fileName = QFileDialog::getSaveFileName(
-			this, tr("Export"), fileNameHint, tr({"(*.png);;"}),
-			nullptr,
-			(m_useNativeDialogs
-				 ? QFileDialog::Options()
-				 : QFileDialog::DontUseNativeDialog));
+			this, tr("Export"), fileNameHint, tr({"(*.png);;"}), nullptr,
+			(m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 
 		painter.end();
 		img.invertPixels(QImage::InvertRgb);
@@ -485,45 +412,36 @@ bool LogicAnalyzer::hasCrossInstrumentTrigger() {
 void LogicAnalyzer::toolDetached(bool detached) {
 	if (detached) {
 		this->setMinimumWidth(min_detached_width);
-		this->setSizePolicy(QSizePolicy::Preferred,
-				    QSizePolicy::MinimumExpanding);
+		this->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
 	} else {
 		this->setMinimumWidth(0);
-		this->setSizePolicy(QSizePolicy::MinimumExpanding,
-				    QSizePolicy::MinimumExpanding);
+		this->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 	}
 }
 
 void LogicAnalyzer::init_buffer_scrolling() {
-	connect(buffer_previewer, &DigitalBufferPreviewer::bufferMovedBy,
-		[=](int value) {
-			reset_horiz_offset = false;
-			double xWidth = timeBase->value() * 10;
-			int bWidth = buffer_previewer->width();
-			double moveBy = value * xWidth / bWidth;
-			main_win->view_->set_offset(
-				moveBy + horiz_offset_after_drop,
-				active_plot_timebase * 10, false);
+	connect(buffer_previewer, &DigitalBufferPreviewer::bufferMovedBy, [=](int value) {
+		reset_horiz_offset = false;
+		double xWidth = timeBase->value() * 10;
+		int bWidth = buffer_previewer->width();
+		double moveBy = value * xWidth / bWidth;
+		main_win->view_->set_offset(moveBy + horiz_offset_after_drop, active_plot_timebase * 10, false);
 
-			scrolling_offset = moveBy + horiz_offset_after_drop;
-			updateBufferPreviewer();
-		});
+		scrolling_offset = moveBy + horiz_offset_after_drop;
+		updateBufferPreviewer();
+	});
 
-	connect(buffer_previewer, &DigitalBufferPreviewer::bufferStopDrag,
-		[=]() {
-			horiz_offset_after_drop = scrolling_offset;
-			reset_horiz_offset = true;
-		});
+	connect(buffer_previewer, &DigitalBufferPreviewer::bufferStopDrag, [=]() {
+		horiz_offset_after_drop = scrolling_offset;
+		reset_horiz_offset = true;
+	});
 
-	connect(buffer_previewer, &DigitalBufferPreviewer::bufferResetPosition,
-		[=]() {
-			main_win->view_->set_offset(trigger_offset,
-						    active_plot_timebase * 10,
-						    false);
-			horiz_offset_after_drop = 0;
-			scrolling_offset = 0;
-			updateBufferPreviewer();
-		});
+	connect(buffer_previewer, &DigitalBufferPreviewer::bufferResetPosition, [=]() {
+		main_win->view_->set_offset(trigger_offset, active_plot_timebase * 10, false);
+		horiz_offset_after_drop = 0;
+		scrolling_offset = 0;
+		updateBufferPreviewer();
+	});
 }
 
 void LogicAnalyzer::init_export_settings() {
@@ -534,23 +452,19 @@ void LogicAnalyzer::init_export_settings() {
 		exportSettings->addChannel(i, "DIO" + QString::number(i));
 	}
 
-	connect(exportSettings->getExportButton(), SIGNAL(clicked()), this,
-		SLOT(btnExportPressed()));
-	connect(this, &LogicAnalyzer::activateExportButton,
-		[=]() { exportSettings->enableExportButton(true); });
+	connect(exportSettings->getExportButton(), SIGNAL(clicked()), this, SLOT(btnExportPressed()));
+	connect(this, &LogicAnalyzer::activateExportButton, [=]() { exportSettings->enableExportButton(true); });
 
 	exportSettings->disableUIMargins();
 }
 
 void LogicAnalyzer::configureMaxSampleRate() {
 	if (!offline_mode) {
-		auto logic_analyzer_dev =
-			iio_context_find_device(ctx, "m2k-logic-analyzer");
+		auto logic_analyzer_dev = iio_context_find_device(ctx, "m2k-logic-analyzer");
 		if (!logic_analyzer_dev)
 			return;
 		long long maxSampling;
-		int ret = iio_device_attr_read_longlong(
-			logic_analyzer_dev, "sampling_frequency", &maxSampling);
+		int ret = iio_device_attr_read_longlong(logic_analyzer_dev, "sampling_frequency", &maxSampling);
 		if (ret < 0)
 			return;
 		maxSamplingFrequency = maxSampling;
@@ -580,8 +494,7 @@ LogicAnalyzer::~LogicAnalyzer() {
 
 void LogicAnalyzer::set_buffersize() {
 	if (logic_analyzer_ptr) {
-		main_win->view_->session().set_buffersize(
-			logic_analyzer_ptr->get_buffersize());
+		main_win->view_->session().set_buffersize(logic_analyzer_ptr->get_buffersize());
 		if (m_running) {
 			// restart acquisition to recreate buffer
 			main_win->restart_acquisition();
@@ -652,11 +565,8 @@ void LogicAnalyzer::resizeEvent() {
 }
 
 void LogicAnalyzer::updateAreaTimeTrigger() {
-	int cursorsWidth = ui->boxCursors->isChecked()
-		? ui->cursorsStatusWidget->width()
-		: 0;
-	int newValue = chm_ui->sizeHint().width() - cursorsWidth -
-		d_bottomHandlesArea->leftPadding() +
+	int cursorsWidth = ui->boxCursors->isChecked() ? ui->cursorsStatusWidget->width() : 0;
+	int newValue = chm_ui->sizeHint().width() - cursorsWidth - d_bottomHandlesArea->leftPadding() +
 		main_win->view_->getViewportMargins().left();
 	ui->areaTimeTriggerLayout->setContentsMargins(newValue, 0, 0, 0);
 }
@@ -682,11 +592,8 @@ QString LogicAnalyzer::saveToFile() {
 
 	QString fileName = QFileDialog::getSaveFileName(
 		this, tr("Export"), "",
-		tr("Comma-separated values files (*.csv)",
-		   "Tab-delimited values files (*.txt)"),
-		&selectedFilter,
-		(m_useNativeDialogs ? QFileDialog::Options()
-				    : QFileDialog::DontUseNativeDialog));
+		tr("Comma-separated values files (*.csv)", "Tab-delimited values files (*.txt)"), &selectedFilter,
+		(m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 
 	if (fileName.isEmpty()) {
 		return "";
@@ -698,8 +605,7 @@ QString LogicAnalyzer::saveToFile() {
 			separator = ",";
 		if (selectedFilter.contains("tab", Qt::CaseInsensitive))
 			separator = "\t";
-		if (selectedFilter.contains("Change Dump",
-					    Qt::CaseInsensitive)) {
+		if (selectedFilter.contains("Change Dump", Qt::CaseInsensitive)) {
 			endRow = " $end\n";
 			startRow = "$";
 		}
@@ -717,16 +623,11 @@ QString LogicAnalyzer::saveToFile() {
 		QTextStream out(&file);
 
 		/* Write the general information */
-		out << startRow << "date "
-		    << QDateTime::currentDateTime().toString() << endRow;
-		out << startRow << "version Scopy - "
-		    << QString(SCOPY_VERSION_GIT) << endRow;
-		out << startRow << "comment "
-		    << QString::number(
-			       main_win->session_.get_logic_sample_count())
-		    << " samples acquired at "
-		    << QString::number(main_win->session_.get_samplerate())
-		    << " Hz " << endRow;
+		out << startRow << "date " << QDateTime::currentDateTime().toString() << endRow;
+		out << startRow << "version Scopy - " << QString(SCOPY_VERSION_GIT) << endRow;
+		out << startRow << "comment " << QString::number(main_win->session_.get_logic_sample_count())
+		    << " samples acquired at " << QString::number(main_win->session_.get_samplerate()) << " Hz "
+		    << endRow;
 
 		file.close();
 
@@ -736,8 +637,7 @@ QString LogicAnalyzer::saveToFile() {
 	return (done ? fileName : "");
 }
 
-bool LogicAnalyzer::exportVCD(QString filename, QString startSep,
-			      QString endSep) {
+bool LogicAnalyzer::exportVCD(QString filename, QString startSep, QString endSep) {
 	uint64_t current_sample, prev_sample;
 	int current_bit, prev_bit, p;
 	QString timescaleFormat;
@@ -769,15 +669,13 @@ bool LogicAnalyzer::exportVCD(QString filename, QString startSep,
 	} else
 		timescaleFormat = "s";
 
-	out << startSep << "timescale " << QString::number(timescale) << " "
-	    << timescaleFormat << endSep;
+	out << startSep << "timescale " << QString::number(timescale) << " " << timescaleFormat << endSep;
 	out << startSep << "scope module Scopy" << endSep;
 	int counter = 0;
 	for (unsigned int ch = 0; ch < no_channels; ch++) {
 		if (exportConfig[ch]) {
 			char c = '!' + counter;
-			out << startSep << "var wire 1 " << c << " DIO"
-			    << QString::number(ch) << endSep;
+			out << startSep << "var wire 1 " << c << " DIO" << QString::number(ch) << endSep;
 			counter++;
 		}
 	}
@@ -785,11 +683,9 @@ bool LogicAnalyzer::exportVCD(QString filename, QString startSep,
 	out << startSep << "enddefinitions" << endSep;
 
 	/* Write the values */
-	std::shared_ptr<pv::data::Logic> logic_data =
-		main_win->session_.get_logic_data();
+	std::shared_ptr<pv::data::Logic> logic_data = main_win->session_.get_logic_data();
 	if (logic_data) {
-		shared_ptr<pv::data::LogicSegment> segment =
-			logic_data->logic_segments().front();
+		shared_ptr<pv::data::LogicSegment> segment = logic_data->logic_segments().front();
 		uint64_t sample_count = segment->get_sample_count();
 		for (uint64_t i = 0; i < sample_count; i++) {
 			current_sample = segment->get_sample(i);
@@ -842,13 +738,11 @@ bool LogicAnalyzer::exportTabCsv(QString separator, QString filename) {
 
 	QVector<QVector<double>> data;
 
-	std::shared_ptr<pv::data::Logic> logic_data =
-		main_win->session_.get_logic_data();
+	std::shared_ptr<pv::data::Logic> logic_data = main_win->session_.get_logic_data();
 	if (!logic_data) {
 		return false;
 	} else {
-		shared_ptr<pv::data::LogicSegment> segment =
-			logic_data->logic_segments().front();
+		shared_ptr<pv::data::LogicSegment> segment = logic_data->logic_segments().front();
 		for (unsigned int i = 0; i < segment->get_sample_count(); ++i) {
 			uint64_t sample = segment->get_sample(i);
 			QVector<double> line;
@@ -981,34 +875,26 @@ void LogicAnalyzer::setSampleRate() {
 	if (acquisition_mode != REPEATED)
 		validateSamplingFrequency(frequencySpinButton->value());
 
-	options["samplerate"] = Glib::Variant<guint64>(
-		g_variant_new_uint64(active_sampleRate), true);
+	options["samplerate"] = Glib::Variant<guint64>(g_variant_new_uint64(active_sampleRate), true);
 	Glib::VariantBase tmp = logic_analyzer_ptr->get_options()["samplerate"];
 
 	if (logic_analyzer_ptr) {
 		if (!tmp.equal(options["samplerate"])) {
-			main_win->view_->session().set_samplerate(
-				active_sampleRate);
+			main_win->view_->session().set_samplerate(active_sampleRate);
 			logic_analyzer_ptr->set_options(options);
 		}
 	}
 
 	/* Set IIO device parameters */
-	iio_device_attr_write_longlong(dev, "sampling_frequency",
-				       active_sampleRate);
+	iio_device_attr_write_longlong(dev, "sampling_frequency", active_sampleRate);
 	active_hw_sampleRate = active_sampleRate;
 }
 
-void LogicAnalyzer::updateBuffersizeSamplerateLabel(int samples,
-						    double samplerate) {
-	QString txtSamplerate =
-		d_cursorMetricFormatter.format(samplerate, "Hz", 0);
-	QString txtSampleperiod =
-		d_cursorTimeFormatter.format(1 / samplerate, "", 0);
-	QString text = QString("%1 Samples at ").arg(samples) + txtSamplerate +
-		"/" + txtSampleperiod;
-	text = (acquisition_mode == REPEATED) ? text
-					      : "Streaming at " + txtSamplerate;
+void LogicAnalyzer::updateBuffersizeSamplerateLabel(int samples, double samplerate) {
+	QString txtSamplerate = d_cursorMetricFormatter.format(samplerate, "Hz", 0);
+	QString txtSampleperiod = d_cursorTimeFormatter.format(1 / samplerate, "", 0);
+	QString text = QString("%1 Samples at ").arg(samples) + txtSamplerate + "/" + txtSampleperiod;
+	text = (acquisition_mode == REPEATED) ? text : "Streaming at " + txtSamplerate;
 	ui->samplerateLabel->setText(text);
 }
 
@@ -1042,8 +928,7 @@ void LogicAnalyzer::onRulerChanged(double ruler_value, bool silent) {
 			d_timeTriggerHandle->setPositionSilenty(pix);
 		}
 		if (active_plot_timebase != timeBase->value()) {
-			QString text = d_cursorTimeFormatter.format(
-				active_plot_timebase, "", 3);
+			QString text = d_cursorTimeFormatter.format(active_plot_timebase, "", 3);
 			ui->timebaseLabel->setText("Zoom: " + text + "/div");
 			recomputeCursorsValue(true);
 		} else {
@@ -1064,13 +949,10 @@ QWidget *LogicAnalyzer::bottomHandlesArea() { return d_bottomHandlesArea; }
 void LogicAnalyzer::refreshTriggerPos(int px) {
 	d_timeTriggerHandle->setPositionSilenty(px);
 	if (m_running && reset_horiz_offset) {
-		if (std::abs(active_plot_timebase - timeBase->value()) <
-		    0.001) {
+		if (std::abs(active_plot_timebase - timeBase->value()) < 0.001) {
 			horiz_offset_after_drop = 0;
 			scrolling_offset = 0;
-			main_win->view_->set_offset(trigger_offset,
-						    active_plot_timebase * 10,
-						    false);
+			main_win->view_->set_offset(trigger_offset, active_plot_timebase * 10, false);
 			updateBufferPreviewer();
 		}
 	}
@@ -1090,17 +972,14 @@ void LogicAnalyzer::configParams(double timebase, double timepos) {
 
 	symmBufferMode->setTriggerPos(-timepos);
 	symmBufferMode->setTimeBase(timebase);
-	LogicAnalyzerSymmetricBufferMode::capture_parameters params =
-		symmBufferMode->captureParameters();
+	LogicAnalyzerSymmetricBufferMode::capture_parameters params = symmBufferMode->captureParameters();
 
 	double plotTimeSpan = timebase * 10;
 	timer_timeout_ms = plotTimeSpan * 1000 + 100; // transfer time
 
 	acquisition_mode = ui->btnRepeated->isChecked() ? REPEATED : STREAM;
-	acquisition_mode = (acquisition_mode == REPEATED &&
-			    plotTimeSpan >= timespanLimitStream)
-		? SCREEN
-		: acquisition_mode;
+	acquisition_mode =
+		(acquisition_mode == REPEATED && plotTimeSpan >= timespanLimitStream) ? SCREEN : acquisition_mode;
 
 	main_win->session_.set_screen_mode(false);
 
@@ -1143,23 +1022,16 @@ void LogicAnalyzer::configParams(double timebase, double timepos) {
 			active_triggerSampleCount = 0;
 			custom_sampleCount = 4096;
 
-			double bufferTimeSpan =
-				custom_sampleCount / active_sampleRate;
-			buffer_previewer->setNoOfSteps(
-				plotTimeSpan / bufferTimeSpan + 1);
-			active_sampleCount = (plotTimeSpan / bufferTimeSpan) *
-				custom_sampleCount;
+			double bufferTimeSpan = custom_sampleCount / active_sampleRate;
+			buffer_previewer->setNoOfSteps(plotTimeSpan / bufferTimeSpan + 1);
+			active_sampleCount = (plotTimeSpan / bufferTimeSpan) * custom_sampleCount;
 
-			timer_timeout_ms =
-				bufferTimeSpan * 1000 + 100; // transfer time
+			timer_timeout_ms = bufferTimeSpan * 1000 + 100; // transfer time
 
-			main_win->session_.set_entire_buffersize(
-				active_sampleCount);
+			main_win->session_.set_entire_buffersize(active_sampleCount);
 			if (logic_analyzer_ptr) {
-				logic_analyzer_ptr->set_buffersize(
-					custom_sampleCount, false);
-				logic_analyzer_ptr->set_entire_buffersize(
-					active_sampleCount);
+				logic_analyzer_ptr->set_buffersize(custom_sampleCount, false);
+				logic_analyzer_ptr->set_entire_buffersize(active_sampleCount);
 				set_buffersize();
 			}
 			setSampleRate();
@@ -1173,8 +1045,7 @@ void LogicAnalyzer::configParams(double timebase, double timepos) {
 			setTriggerDelay();
 			d_timeTriggerHandle->setPosition(trigX);
 			main_win->view_->viewport()->setTimeTriggerPixel(trigX);
-			main_win->view_->time_item_appearance_changed(true,
-								      true);
+			main_win->view_->time_item_appearance_changed(true, true);
 
 			// Change the sensitivity of time position control
 			timePosition->setStep(timebase / 10);
@@ -1199,16 +1070,13 @@ void LogicAnalyzer::configParams(double timebase, double timepos) {
 
 		active_sampleRate = params.sampleRate;
 		active_sampleCount = params.entireBufferSize;
-		active_triggerSampleCount =
-			-(long long)params.triggerBufferSize;
+		active_triggerSampleCount = -(long long)params.triggerBufferSize;
 		buffer_previewer->setNoOfSteps(0);
 
 		main_win->session_.set_entire_buffersize(0);
 		if (logic_analyzer_ptr) {
-			if (logic_analyzer_ptr->get_buffersize() !=
-			    active_sampleCount) {
-				logic_analyzer_ptr->set_buffersize(
-					active_sampleCount, true);
+			if (logic_analyzer_ptr->get_buffersize() != active_sampleCount) {
+				logic_analyzer_ptr->set_buffersize(active_sampleCount, true);
 				set_buffersize();
 			}
 		}
@@ -1261,8 +1129,7 @@ void LogicAnalyzer::onTimeTriggerHandlePosChanged(int pos) {
 
 double LogicAnalyzer::pixelToTime(int pix) {
 	double timeSpan = active_plot_timebase * 10;
-	int width = bottomHandlesArea()->geometry().width() -
-		d_bottomHandlesArea->leftPadding() -
+	int width = bottomHandlesArea()->geometry().width() - d_bottomHandlesArea->leftPadding() -
 		d_bottomHandlesArea->rightPadding();
 	double timestamp = timeSpan * pix / width;
 	return -timestamp;
@@ -1270,8 +1137,7 @@ double LogicAnalyzer::pixelToTime(int pix) {
 
 int LogicAnalyzer::timeToPixel(double time) {
 	double timeSpan = active_plot_timebase * 10;
-	int width = bottomHandlesArea()->geometry().width() -
-		d_bottomHandlesArea->leftPadding() -
+	int width = bottomHandlesArea()->geometry().width() - d_bottomHandlesArea->leftPadding() -
 		d_bottomHandlesArea->rightPadding();
 	int pix = width * time / timeSpan + width / 2;
 	return pix;
@@ -1321,8 +1187,7 @@ void LogicAnalyzer::startStop(bool start) {
 		if (timer->isActive()) {
 			timer->stop();
 		}
-		if (!armed &&
-		    trigger_settings_ui->btnTriggerMode->isChecked()) {
+		if (!armed && trigger_settings_ui->btnTriggerMode->isChecked()) {
 			autoCaptureEnable(true);
 		}
 	}
@@ -1336,14 +1201,11 @@ void LogicAnalyzer::setTriggerDelay(bool silent) {
 	double val = timePosition->value();
 	if (!silent) {
 		if (m_running)
-			main_win->view_->viewport()->setTimeTriggerSample(
-				-active_triggerSampleCount);
+			main_win->view_->viewport()->setTimeTriggerSample(-active_triggerSampleCount);
 		if (active_triggerSampleCount > 0) {
-			val = active_triggerSampleCount / active_sampleRate +
-				active_plot_timebase * 5;
+			val = active_triggerSampleCount / active_sampleRate + active_plot_timebase * 5;
 		}
-		main_win->view_->set_offset(val, active_plot_timebase * 10,
-					    m_running);
+		main_win->view_->set_offset(val, active_plot_timebase * 10, m_running);
 	}
 }
 
@@ -1351,11 +1213,9 @@ void LogicAnalyzer::setHWTriggerDelay(long long delay) {
 	if (!dev)
 		return;
 	std::string name = "voltage0";
-	struct iio_channel *triggerch =
-		iio_device_find_channel(dev, name.c_str(), false);
+	struct iio_channel *triggerch = iio_device_find_channel(dev, name.c_str(), false);
 	QString s = QString::number(delay);
-	iio_channel_attr_write(triggerch, "trigger_delay",
-			       s.toLocal8Bit().QByteArray::constData());
+	iio_channel_attr_write(triggerch, "trigger_delay", s.toLocal8Bit().QByteArray::constData());
 	active_hw_trigger_sample_count = delay;
 }
 
@@ -1390,15 +1250,13 @@ void LogicAnalyzer::singleRun(bool checked) {
 		updateBufferPreviewer();
 	} else {
 		ui->btnSingleRun->setText("Single");
-		if (logic_analyzer_ptr->get_single() &&
-		    logic_analyzer_ptr->is_running()) {
+		if (logic_analyzer_ptr->get_single() && logic_analyzer_ptr->is_running()) {
 			main_win->run_stop();
 		}
 		m_running = false;
 		if (timer->isActive())
 			timer->stop();
-		if (!armed &&
-		    trigger_settings_ui->btnTriggerMode->isChecked()) {
+		if (!armed && trigger_settings_ui->btnTriggerMode->isChecked()) {
 			autoCaptureEnable(true);
 		}
 		Q_EMIT activateExportButton();
@@ -1414,8 +1272,7 @@ unsigned int LogicAnalyzer::get_no_channels(struct iio_device *dev) {
 	for (unsigned int i = 0; i < iio_device_get_channels_count(dev); i++) {
 		struct iio_channel *chn = iio_device_get_channel(dev, i);
 
-		if (!iio_channel_is_output(chn) &&
-		    iio_channel_is_scan_element(chn)) {
+		if (!iio_channel_is_output(chn) && iio_channel_is_scan_element(chn)) {
 			nb++;
 		}
 	}
@@ -1449,14 +1306,12 @@ void LogicAnalyzer::settings_panel_update(int id) {
 	}
 }
 
-void LogicAnalyzer::triggerRightMenuToggle(CustomPushButton *btn,
-					   bool checked) {
+void LogicAnalyzer::triggerRightMenuToggle(CustomPushButton *btn, bool checked) {
 	// Queue the action, if right menu animation is in progress. This way
 	// the action will be remembered and performed right after the animation
 	// finishes
 	if (ui->rightWidget->animInProgress()) {
-		menuButtonActions.enqueue(
-			QPair<CustomPushButton *, bool>(btn, checked));
+		menuButtonActions.enqueue(QPair<CustomPushButton *, bool>(btn, checked));
 	} else {
 		toggleRightMenu(btn, checked);
 	}
@@ -1472,8 +1327,7 @@ void LogicAnalyzer::setHWTrigger(int chid, std::string trigger_val) {
 	if (!dev)
 		return;
 	std::string name = "voltage" + to_string(chid);
-	struct iio_channel *triggerch =
-		iio_device_find_channel(dev, name.c_str(), false);
+	struct iio_channel *triggerch = iio_device_find_channel(dev, name.c_str(), false);
 
 	if (!triggerch)
 		return;
@@ -1485,8 +1339,7 @@ void LogicAnalyzer::setHWTriggerMux(int chid, std::string mux_val) {
 	if (!dev)
 		return;
 	std::string name = "voltage" + to_string(chid);
-	struct iio_channel *triggerch =
-		iio_device_find_channel(dev, name.c_str(), false);
+	struct iio_channel *triggerch = iio_device_find_channel(dev, name.c_str(), false);
 
 	if (!triggerch)
 		return;
@@ -1498,13 +1351,11 @@ std::string LogicAnalyzer::get_trigger_from_device(int chid) {
 	if (!dev)
 		return "none";
 	std::string name = "voltage" + to_string(chid);
-	struct iio_channel *triggerch =
-		iio_device_find_channel(dev, name.c_str(), false);
+	struct iio_channel *triggerch = iio_device_find_channel(dev, name.c_str(), false);
 	if (!triggerch)
 		return "";
 	char trigger_val[4096];
-	iio_channel_attr_read(triggerch, "trigger", trigger_val,
-			      sizeof(trigger_val));
+	iio_channel_attr_read(triggerch, "trigger", trigger_val, sizeof(trigger_val));
 	string res(trigger_val);
 	return res;
 }
@@ -1516,12 +1367,10 @@ std::vector<std::string> LogicAnalyzer::get_iio_trigger_options() {
 	if (!dev)
 		return trigger_mapping;
 	std::string name = "voltage0";
-	struct iio_channel *triggerch =
-		iio_device_find_channel(dev, name.c_str(), false);
+	struct iio_channel *triggerch = iio_device_find_channel(dev, name.c_str(), false);
 	if (!triggerch)
 		return trigger_mapping;
-	int ret = iio_channel_attr_read(triggerch, "trigger_available", buf,
-					sizeof(buf));
+	int ret = iio_channel_attr_read(triggerch, "trigger_available", buf, sizeof(buf));
 
 	if (ret > 0) {
 		QStringList list = QString::fromUtf8(buf).split(' ');
@@ -1584,15 +1433,11 @@ void LogicAnalyzer::on_btnShowChannelsClicked(bool check) {
 void LogicAnalyzer::onChmWidthChanged(int value) {
 	int l, r, b, t;
 	ui->areaTimeTriggerLayout->getContentsMargins(&l, &t, &r, &b);
-	int cursorsWidth = ui->boxCursors->isChecked()
-		? ui->cursorsStatusWidget->width()
-		: 0;
-	int newValue = value - cursorsWidth -
-		d_bottomHandlesArea->leftPadding() +
+	int cursorsWidth = ui->boxCursors->isChecked() ? ui->cursorsStatusWidget->width() : 0;
+	int newValue = value - cursorsWidth - d_bottomHandlesArea->leftPadding() +
 		main_win->view_->getViewportMargins().left();
 	if (l != newValue) {
-		ui->areaTimeTriggerLayout->setContentsMargins(newValue, 0, 0,
-							      0);
+		ui->areaTimeTriggerLayout->setContentsMargins(newValue, 0, 0, 0);
 		timePosition->valueChanged(timePosition->value());
 	}
 }
@@ -1601,11 +1446,9 @@ void LogicAnalyzer::setHWTriggerLogic(const QString value) {
 	if (!dev)
 		return;
 	std::string name = "voltage0";
-	struct iio_channel *triggerch =
-		iio_device_find_channel(dev, name.c_str(), false);
+	struct iio_channel *triggerch = iio_device_find_channel(dev, name.c_str(), false);
 	QString s = value.toLower();
-	iio_channel_attr_write(triggerch, "trigger_logic_mode",
-			       s.toLocal8Bit().QByteArray::constData());
+	iio_channel_attr_write(triggerch, "trigger_logic_mode", s.toLocal8Bit().QByteArray::constData());
 }
 
 void LogicAnalyzer::requestUpdateBufferPreviewer() {
@@ -1615,23 +1458,19 @@ void LogicAnalyzer::requestUpdateBufferPreviewer() {
 
 void LogicAnalyzer::updateBufferPreviewer() {
 	// Time interval within the plot canvas
-	double plotMin = -(active_plot_timebase * 10 / 2 - active_timePos -
-			   scrolling_offset);
-	double plotMax = (active_plot_timebase * 10 / 2 + active_timePos +
-			  scrolling_offset);
+	double plotMin = -(active_plot_timebase * 10 / 2 - active_timePos - scrolling_offset);
+	double plotMax = (active_plot_timebase * 10 / 2 + active_timePos + scrolling_offset);
 
 	// Time interval that represents the captured data
 	double dataMin = 0;
 	double dataMax = 0;
 	long long triggerSamples = active_hw_trigger_sample_count;
 	long long totalSamples = last_set_sample_count;
-	long long bufferSamples =
-		(acquisition_mode == REPEATED) ? 0 : custom_sampleCount;
+	long long bufferSamples = (acquisition_mode == REPEATED) ? 0 : custom_sampleCount;
 
 	if (totalSamples > 0) {
 		dataMin = triggerSamples / active_hw_sampleRate;
-		dataMax = (triggerSamples + totalSamples + bufferSamples) /
-			active_hw_sampleRate;
+		dataMax = (triggerSamples + totalSamples + bufferSamples) / active_hw_sampleRate;
 	}
 
 	double fullMin, fullMax;
@@ -1655,8 +1494,7 @@ void LogicAnalyzer::updateBufferPreviewer() {
 	double containerWidth = (totalSamples > 0) ? wWidth : 1;
 	double containerPos = (totalSamples > 0) ? wPos : 0;
 
-	double cPosInContainer =
-		1 - (containerMax - 0) / (containerMax - containerMin);
+	double cPosInContainer = 1 - (containerMax - 0) / (containerMax - containerMin);
 	double cPos = cPosInContainer * containerWidth + containerPos;
 
 	// Update the widget
@@ -1680,13 +1518,11 @@ void LogicAnalyzer::setupTriggerSettingsUI(bool enabled) {
 	trigger_settings_ui->cmb_trigg_extern_cond_1->setEnabled(enabled);
 
 	if (!enabled) {
-		trigger_settings_ui->cmb_trigg_extern_cond_1->setCurrentIndex(
-			0);
+		trigger_settings_ui->cmb_trigg_extern_cond_1->setCurrentIndex(0);
 		setHWTrigger(16, trigger_mapping[0]);
 	} else {
 		cleanTrigger();
-		setExternalSource(
-			trigger_settings_ui->cmb_extern_src->currentIndex());
+		setExternalSource(trigger_settings_ui->cmb_extern_src->currentIndex());
 	}
 }
 
@@ -1726,14 +1562,10 @@ void LogicAnalyzer::autoCaptureEnable(bool check) {
 	armed = check;
 }
 
-void LogicAnalyzer::setTriggerCache(int chid,
-				    const std::string &trigger_value) {
-	trigger_cache[chid] = trigger_value;
-}
+void LogicAnalyzer::setTriggerCache(int chid, const std::string &trigger_value) { trigger_cache[chid] = trigger_value; }
 
 void LogicAnalyzer::setExternalTrigger(int index) {
-	int ext_1 =
-		trigger_settings_ui->cmb_trigg_extern_cond_1->currentIndex();
+	int ext_1 = trigger_settings_ui->cmb_trigg_extern_cond_1->currentIndex();
 	// int ext_2 =
 	// trigger_settings_ui->cmb_trigg_extern_cond_2->currentIndex();
 	std::string trigger_val;
@@ -1776,14 +1608,12 @@ void LogicAnalyzer::cleanHWParams() {
 }
 
 void LogicAnalyzer::cursorValueChanged_1(int pos) {
-	value_cursor1 = -(pixelToTime(pos) + active_plot_timebase * 10 / 2 -
-			  active_timePos);
+	value_cursor1 = -(pixelToTime(pos) + active_plot_timebase * 10 / 2 - active_timePos);
 	if (ui->btnCursorsLock->isChecked()) {
 		value_cursor2 = value_cursor1 - value_cursors_delta;
 		int pairPos = timeToPixel(value_cursor2 - active_timePos);
 		d_hCursorHandle2->setPositionSilenty(pairPos);
-		QString text =
-			d_cursorTimeFormatter.format(value_cursor2, "", 3);
+		QString text = d_cursorTimeFormatter.format(value_cursor2, "", 3);
 		ui->lblCursor2->setText(text);
 		main_win->view_->viewport()->cursorValueChanged_2(pairPos);
 	} else {
@@ -1796,15 +1626,13 @@ void LogicAnalyzer::cursorValueChanged_1(int pos) {
 }
 
 void LogicAnalyzer::cursorValueChanged_2(int pos) {
-	value_cursor2 = -(pixelToTime(pos) + active_plot_timebase * 10 / 2 -
-			  active_timePos);
+	value_cursor2 = -(pixelToTime(pos) + active_plot_timebase * 10 / 2 - active_timePos);
 	if (ui->btnCursorsLock->isChecked()) {
 
 		value_cursor1 = value_cursors_delta + value_cursor2;
 		int pairPos = timeToPixel(value_cursor1 - active_timePos);
 		d_hCursorHandle1->setPositionSilenty(pairPos);
-		QString text =
-			d_cursorTimeFormatter.format(value_cursor1, "", 3);
+		QString text = d_cursorTimeFormatter.format(value_cursor1, "", 3);
 		ui->lblCursor1->setText(text);
 		main_win->view_->viewport()->cursorValueChanged_1(pairPos);
 	} else {
@@ -1819,10 +1647,8 @@ void LogicAnalyzer::cursorValueChanged_2(int pos) {
 void LogicAnalyzer::recomputeCursorsValue(bool zoom) {
 	int x1 = d_hCursorHandle1->position();
 	int x2 = d_hCursorHandle2->position();
-	value_cursor2 = -(pixelToTime(x2) + active_plot_timebase * 10 / 2 -
-			  active_timePos);
-	value_cursor1 = -(pixelToTime(x1) + active_plot_timebase * 10 / 2 -
-			  active_timePos);
+	value_cursor2 = -(pixelToTime(x2) + active_plot_timebase * 10 / 2 - active_timePos);
+	value_cursor1 = -(pixelToTime(x1) + active_plot_timebase * 10 / 2 - active_timePos);
 	QString text = d_cursorTimeFormatter.format(value_cursor2, "", 3);
 	ui->lblCursor2->setText(text);
 	text = d_cursorTimeFormatter.format(value_cursor1, "", 3);
@@ -1837,8 +1663,7 @@ void LogicAnalyzer::cursorsFormatDelta() {
 	QString text = d_cursorTimeFormatter.format(value_cursors_delta, "", 3);
 	QString freqDeltaText;
 	if (value_cursors_delta != 0)
-		freqDeltaText = d_cursorMetricFormatter.format(
-			1 / value_cursors_delta, "Hz", 3);
+		freqDeltaText = d_cursorMetricFormatter.format(1 / value_cursors_delta, "Hz", 3);
 	else
 		freqDeltaText = "Infinity";
 	ui->lblCursorDiff->setText(text);
@@ -1864,8 +1689,7 @@ void LogicAnalyzer::resetInstrumentToDefault() {
 	cleanHWParams();
 	chm.clearTrigger();
 	for (unsigned int i = 0; i < no_channels; i++) {
-		chm.add_channel_group(
-			new LogicAnalyzerChannelGroup(chm.get_channel(i)));
+		chm.add_channel_group(new LogicAnalyzerChannelGroup(chm.get_channel(i)));
 	}
 	chm.highlightChannel(chm.get_channel_group(0));
 	chm_ui->update_ui();

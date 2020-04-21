@@ -62,9 +62,7 @@ void DbClickButtons::setSelectedButton(int btnId) {
 	}
 }
 
-bool DbClickButtons::buttonChecked(int btnId) const {
-	return btn_states[btnId];
-}
+bool DbClickButtons::buttonChecked(int btnId) const { return btn_states[btnId]; }
 
 void DbClickButtons::setButtonChecked(int btnId, bool checked) {
 	btn_states[btnId] = checked;
@@ -88,24 +86,21 @@ void DbClickButtons::setButtonCount(int count) {
 		for (int i = 0; i < count; i++) {
 			QPushButton *btn = new QPushButton(this);
 			btn->setText(QString::number(i));
-			btn->setSizePolicy(QSizePolicy::Fixed,
-					   QSizePolicy::Fixed);
+			btn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 			btn->setProperty("id", QVariant(i));
 			btn->setProperty("is_checked", QVariant(false));
 			btn->setProperty("is_selected", QVariant(false));
 			QString color = color_codes[i % color_codes.size()];
-			QString stylesheet =
-				QString("QPushButton"
-					"{\n  border: 2px solid %1;\n}\n"
-					"\nQPushButton[is_checked=true] {\n  "
-					"background-color: %1;\n}\n"
-					"\nQPushButton[is_selected=true] "
-					"{\n	"
-					"border: 4px solid white;\n}\n")
-					.arg(color);
+			QString stylesheet = QString("QPushButton"
+						     "{\n  border: 2px solid %1;\n}\n"
+						     "\nQPushButton[is_checked=true] {\n  "
+						     "background-color: %1;\n}\n"
+						     "\nQPushButton[is_selected=true] "
+						     "{\n	"
+						     "border: 4px solid white;\n}\n")
+						     .arg(color);
 			btn->setStyleSheet(stylesheet);
-			connect(btn, SIGNAL(clicked()), this,
-				SLOT(onButtonClicked()));
+			connect(btn, SIGNAL(clicked()), this, SLOT(onButtonClicked()));
 
 			int row = i / max_row_btn_cnt;
 			int col = i % max_row_btn_cnt;
@@ -129,6 +124,4 @@ void DbClickButtons::onButtonClicked() {
 	}
 }
 
-void DbClickButtons::toggleButton(int btnId) {
-	setButtonChecked(btnId, !btn_states[btnId]);
-}
+void DbClickButtons::toggleButton(int btnId) { setButtonChecked(btnId, !btn_states[btnId]); }

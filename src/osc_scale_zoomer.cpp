@@ -43,10 +43,8 @@ OscScaleZoomer::OscScaleZoomer(QWidget *parent) : LimitedPlotZoomer(parent) {
 OscScaleZoomer::~OscScaleZoomer() {}
 
 QwtText OscScaleZoomer::trackerText(const QPoint &pos) const {
-	const OscScaleDraw *draw_x = static_cast<const OscScaleDraw *>(
-		plot()->axisScaleDraw(QwtPlot::xTop));
-	const OscScaleDraw *draw_y = static_cast<const OscScaleDraw *>(
-		plot()->axisScaleDraw(QwtPlot::yLeft));
+	const OscScaleDraw *draw_x = static_cast<const OscScaleDraw *>(plot()->axisScaleDraw(QwtPlot::xTop));
+	const OscScaleDraw *draw_y = static_cast<const OscScaleDraw *>(plot()->axisScaleDraw(QwtPlot::yLeft));
 	QwtDoublePoint dp = QwtPlotZoomer::invTransform(pos);
 	QString text;
 

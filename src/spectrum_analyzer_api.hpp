@@ -16,16 +16,13 @@ class SpectrumAnalyzer_API : public ApiObject {
 	Q_PROPERTY(double topScale READ topScale WRITE setTopScale);
 	Q_PROPERTY(double range READ range WRITE setRange);
 	Q_PROPERTY(QVariantList channels READ getChannels);
-	Q_PROPERTY(
-		int currentChannel READ currentChannel WRITE setCurrentChannel);
-	Q_PROPERTY(bool markerTableVisible READ markerTableVisible WRITE
-			   setMarkerTableVisible);
+	Q_PROPERTY(int currentChannel READ currentChannel WRITE setCurrentChannel);
+	Q_PROPERTY(bool markerTableVisible READ markerTableVisible WRITE setMarkerTableVisible);
 	Q_PROPERTY(QVariantList markers READ getMarkers);
 	Q_PROPERTY(bool logScale READ getLogScale WRITE setLogScale)
 public:
 	Q_INVOKABLE void show();
-	explicit SpectrumAnalyzer_API(SpectrumAnalyzer *sp)
-		: ApiObject(), sp(sp) {}
+	explicit SpectrumAnalyzer_API(SpectrumAnalyzer *sp) : ApiObject(), sp(sp) {}
 	~SpectrumAnalyzer_API() {}
 
 private:
@@ -77,8 +74,7 @@ class SpectrumChannel_API : public ApiObject {
 	Q_PROPERTY(QList<double> freq READ freq STORED false)
 
 public:
-	explicit SpectrumChannel_API(SpectrumAnalyzer *sp,
-				     boost::shared_ptr<SpectrumChannel> spch)
+	explicit SpectrumChannel_API(SpectrumAnalyzer *sp, boost::shared_ptr<SpectrumChannel> spch)
 		: ApiObject(), spch(spch), sp(sp) {}
 	~SpectrumChannel_API() {}
 

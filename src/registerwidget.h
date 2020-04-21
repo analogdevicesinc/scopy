@@ -42,8 +42,7 @@ public:
 	uint32_t getValue(void) const;
 	QStringList getSources(void) const;
 	uint32_t readRegister(const QString *device, const uint32_t address);
-	void writeRegister(const QString *device, const uint32_t address,
-			   uint32_t regVal);
+	void writeRegister(const QString *device, const uint32_t address, uint32_t regVal);
 	void verifyAvailableSources(const QString device);
 	QString getDescription() const;
 	uint32_t getDefaultValue(void) const;
@@ -53,8 +52,7 @@ Q_SIGNALS:
 	void valueChanged(int);
 
 public Q_SLOTS:
-	void createRegMap(const QString *device, int *address,
-			  const QString *source);
+	void createRegMap(const QString *device, int *address, const QString *source);
 	void setValue(int var);
 	void setValue(uint32_t var, uint32_t mask);
 	void updateBitfields(void);

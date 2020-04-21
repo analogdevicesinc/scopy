@@ -8,9 +8,7 @@
 namespace adiscope {
 void SignalGenerator_API::show() { Q_EMIT gen->showTool(); }
 
-bool SignalGenerator_API::running() const {
-	return gen->ui->run_button->isChecked();
-}
+bool SignalGenerator_API::running() const { return gen->ui->run_button->isChecked(); }
 
 void SignalGenerator_API::run(bool en) { gen->ui->run_button->setChecked(en); }
 
@@ -44,8 +42,7 @@ QList<bool> SignalGenerator_API::enabledChannels() const {
 	QList<bool> list;
 
 	for (int i = 0; i < gen->channels.size(); i++) {
-		list.append(static_cast<bool>(
-			gen->channels[i]->enableButton()->isChecked()));
+		list.append(static_cast<bool>(gen->channels[i]->enableButton()->isChecked()));
 	}
 
 	return list;
@@ -104,8 +101,7 @@ void SignalGenerator_API::setWaveformType(const QList<int> &list) {
 	}
 
 	enum sg_waveform types[] = {
-		SG_SIN_WAVE, SG_SQR_WAVE, SG_TRI_WAVE,
-		SG_TRA_WAVE, SG_SAW_WAVE, SG_INV_SAW_WAVE,
+		SG_SIN_WAVE, SG_SQR_WAVE, SG_TRI_WAVE, SG_TRA_WAVE, SG_SAW_WAVE, SG_INV_SAW_WAVE,
 	};
 
 	for (int i = 0; i < gen->channels.size(); i++) {
@@ -269,8 +265,7 @@ void SignalGenerator_API::setNoiseType(const QList<int> &list) {
 	for (int i = 0; i < gen->channels.size(); i++) {
 		auto ptr = gen->getData(gen->channels[i]);
 
-		ptr->noiseType =
-			qvariant_cast<gr::analog::noise_type_t>(list.at(i));
+		ptr->noiseType = qvariant_cast<gr::analog::noise_type_t>(list.at(i));
 
 		if (i == gen->currentChannel) {
 			gen->updateRightMenuForChn(i);
@@ -458,8 +453,7 @@ void SignalGenerator_API::setMathFunction(const QList<QString> &list) {
 	}
 
 	if (gen->getCurrentData()->type == SIGNAL_TYPE_MATH) {
-		gen->ui->mathWidget->setFunction(
-			gen->getCurrentData()->function);
+		gen->ui->mathWidget->setFunction(gen->getCurrentData()->function);
 		gen->resetZoom();
 	}
 }

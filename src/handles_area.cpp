@@ -28,14 +28,12 @@
  * Class HandlesArea implementation
  */
 
-HandlesArea::HandlesArea(QWidget *parent)
-	: QWidget(parent), canvas(parent), selectedItem(NULL) {
+HandlesArea::HandlesArea(QWidget *parent) : QWidget(parent), canvas(parent), selectedItem(NULL) {
 	this->setStyleSheet("QWidget {background-color: transparent}");
 }
 
 void HandlesArea::mousePressEvent(QMouseEvent *event) {
-	PlotLineHandle *child =
-		static_cast<PlotLineHandle *>(childAt(event->pos()));
+	PlotLineHandle *child = static_cast<PlotLineHandle *>(childAt(event->pos()));
 
 	if (child) {
 		child->raise();
@@ -103,8 +101,7 @@ void VertHandlesArea::setBottomPadding(int new_padding) {
 }
 
 void VertHandlesArea::resizeMask(QSize size) {
-	QRegion activeRegion(0, largest_child_height / 2, size.width(),
-			     size.height() - largest_child_height);
+	QRegion activeRegion(0, largest_child_height / 2, size.width(), size.height() - largest_child_height);
 	setMask(activeRegion);
 }
 
@@ -144,8 +141,7 @@ void HorizHandlesArea::setLargestChildWidth(int width) {
 int HorizHandlesArea::largestChildWidth() { return largest_child_width; }
 
 void HorizHandlesArea::resizeMask(QSize size) {
-	QRegion activeRegion(largest_child_width / 2, 0,
-			     size.width() - largest_child_width, size.height());
+	QRegion activeRegion(largest_child_width / 2, 0, size.width() - largest_child_width, size.height());
 	setMask(activeRegion);
 }
 
@@ -155,8 +151,7 @@ void HorizHandlesArea::resizeMask(QSize size) {
 GateHandlesArea::GateHandlesArea(QWidget *parent) : HorizHandlesArea(parent) {}
 
 void GateHandlesArea::mousePressEvent(QMouseEvent *event) {
-	PlotLineHandle *child =
-		static_cast<PlotLineHandle *>(childAt(event->pos()));
+	PlotLineHandle *child = static_cast<PlotLineHandle *>(childAt(event->pos()));
 	if (child) {
 		child->raise();
 		selectedItem = child;
@@ -166,8 +161,7 @@ void GateHandlesArea::mousePressEvent(QMouseEvent *event) {
 		if (handle->reachedLimit())
 			/*if the handle reached the limit update the hotspot so
 			 * we can still change the bar position */
-			hotspot = event->pos() -
-				QPoint(handle->getCurrentPos(), handle->y());
+			hotspot = event->pos() - QPoint(handle->getCurrentPos(), handle->y());
 		else {
 			hotspot = event->pos() - child->pos();
 		}

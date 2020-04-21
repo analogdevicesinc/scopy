@@ -65,9 +65,8 @@ class SpinBoxA : public QWidget {
 
 public:
 	explicit SpinBoxA(QWidget *parent = nullptr);
-	explicit SpinBoxA(std::vector<std::pair<QString, double>> units,
-			  const QString &name = "", double min_value = 0.0,
-			  double max_value = 0.0, bool hasProgressWidget = true,
+	explicit SpinBoxA(std::vector<std::pair<QString, double>> units, const QString &name = "",
+			  double min_value = 0.0, double max_value = 0.0, bool hasProgressWidget = true,
 			  bool invertCircle = false, QWidget *parent = 0);
 	~SpinBoxA();
 
@@ -161,16 +160,12 @@ private:
 class SpinBoxA_API : public ApiObject {
 	Q_OBJECT
 
-	Q_PROPERTY(
-		double min_value READ minValue WRITE setMinValue STORED false)
-	Q_PROPERTY(
-		double max_value READ maxValue WRITE setMaxValue STORED false)
+	Q_PROPERTY(double min_value READ minValue WRITE setMinValue STORED false)
+	Q_PROPERTY(double max_value READ maxValue WRITE setMaxValue STORED false)
 	Q_PROPERTY(double value READ value WRITE setValue STORED false)
 	Q_PROPERTY(bool fine_mode READ isInFineMode WRITE setFineMode)
-	Q_PROPERTY(bool invert_circle READ isCircleInverted WRITE invertCircle
-			   STORED false)
-	Q_PROPERTY(bool show_progress READ progressShown WRITE showProgress
-			   STORED false)
+	Q_PROPERTY(bool invert_circle READ isCircleInverted WRITE invertCircle STORED false)
+	Q_PROPERTY(bool show_progress READ progressShown WRITE showProgress STORED false)
 	Q_PROPERTY(QString name READ getName WRITE setName STORED false)
 
 public:
@@ -212,12 +207,9 @@ class ScaleSpinButton : public SpinBoxA {
 	Q_OBJECT
 public:
 	explicit ScaleSpinButton(QWidget *parent = nullptr);
-	explicit ScaleSpinButton(std::vector<std::pair<QString, double>> units,
-				 const QString &name = "",
-				 double min_value = 0.0, double max_value = 0.0,
-				 bool hasProgressWidget = true,
-				 bool invertCircle = false, QWidget *parent = 0,
-				 std::vector<double> steps = {1, 2, 5});
+	explicit ScaleSpinButton(std::vector<std::pair<QString, double>> units, const QString &name = "",
+				 double min_value = 0.0, double max_value = 0.0, bool hasProgressWidget = true,
+				 bool invertCircle = false, QWidget *parent = 0, std::vector<double> steps = {1, 2, 5});
 
 public Q_SLOTS:
 	void stepUp();
@@ -238,11 +230,9 @@ class PositionSpinButton : public SpinBoxA {
 	Q_OBJECT
 public:
 	explicit PositionSpinButton(QWidget *parent = nullptr);
-	explicit PositionSpinButton(
-		std::vector<std::pair<QString, double>> units,
-		const QString &name = "", double min_value = 0.0,
-		double max_value = 0.0, bool hasProgressWidget = true,
-		bool invertCircle = false, QWidget *parent = 0);
+	explicit PositionSpinButton(std::vector<std::pair<QString, double>> units, const QString &name = "",
+				    double min_value = 0.0, double max_value = 0.0, bool hasProgressWidget = true,
+				    bool invertCircle = false, QWidget *parent = 0);
 
 	double step();
 	void setStep(double);
@@ -259,13 +249,9 @@ class PhaseSpinButton : public SpinBoxA {
 	Q_OBJECT
 public:
 	explicit PhaseSpinButton(QWidget *parent = nullptr);
-	explicit PhaseSpinButton(std::vector<std::pair<QString, double>> units,
-				 const QString &name = "",
-				 double min_value = 0.0,
-				 double max_value = 360.0,
-				 bool hasProgressWidget = true,
-				 bool invertCircle = false,
-				 QWidget *parent = 0);
+	explicit PhaseSpinButton(std::vector<std::pair<QString, double>> units, const QString &name = "",
+				 double min_value = 0.0, double max_value = 360.0, bool hasProgressWidget = true,
+				 bool invertCircle = false, QWidget *parent = 0);
 
 	void setStep(double);
 
@@ -277,8 +263,7 @@ public Q_SLOTS:
 	void setComboboxIndex(int index);
 	void onComboboxIndexChanged(int index);
 	void updatePhaseAfterFrequenceChanged(double val);
-	double computeSecondsTransformation(double scale, int index,
-					    double value);
+	double computeSecondsTransformation(double scale, int index, double value);
 	void setInSeconds(bool val);
 	bool inSeconds();
 	void setSecondsValue(double val);

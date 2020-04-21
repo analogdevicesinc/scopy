@@ -46,8 +46,7 @@ using namespace adiscope;
 
 namespace adiscope {
 
-DigitalIoGroup::DigitalIoGroup(QString label, int ch_mask, int io_mask,
-			       DigitalIO *dio, QWidget *parent)
+DigitalIoGroup::DigitalIoGroup(QString label, int ch_mask, int io_mask, DigitalIO *dio, QWidget *parent)
 	: QWidget(parent), ch_mask(ch_mask), io_mask(io_mask), dio(dio) {
 	ui = new Ui::dioElement();
 	ui->setupUi(this);
@@ -66,12 +65,9 @@ DigitalIoGroup::DigitalIoGroup(QString label, int ch_mask, int io_mask,
 			wid->setProperty("dio", j);
 			dioUi->label->setText(QString::number(j));
 			wid->setProperty("locked", false);
-			chui.append(new QPair<QWidget *, Ui::dioChannel *>(
-				wid, dioUi));
-			connect(chui.last()->second->inout, SIGNAL(clicked()),
-				dio, SLOT(setDirection()));
-			connect(chui.last()->second->output, SIGNAL(clicked()),
-				dio, SLOT(setOutput()));
+			chui.append(new QPair<QWidget *, Ui::dioChannel *>(wid, dioUi));
+			connect(chui.last()->second->inout, SIGNAL(clicked()), dio, SLOT(setDirection()));
+			connect(chui.last()->second->output, SIGNAL(clicked()), dio, SLOT(setOutput()));
 		}
 
 		ch_mask_temp >>= 1;
@@ -139,15 +135,12 @@ void DigitalIO::setOutput() {
 	auto ch = sender()->parent()->property("dio").toInt();
 	setOutput(ch, output);
 
-	if (diom->getDirection(ch) &&
-	    diom->getOutputEnabled()) { // only if output
-		setDynamicProperty(findIndividualUi(ch)->second->input, "high",
-				   output);
+	if (diom->getDirection(ch) && diom->getOutputEnabled()) { // only if output
+		setDynamicProperty(findIndividualUi(ch)->second->input, "high", output);
 	}
 }
 
-DigitalIO::DigitalIO(struct iio_context *ctx, Filter *filt,
-		     ToolMenuItem *toolMenuItem, DIOManager *diom,
+DigitalIO::DigitalIO(struct iio_context *ctx, Filter *filt, ToolMenuItem *toolMenuItem, DIOManager *diom,
 		     QJSEngine *engine, ToolLauncher *parent, bool offline_mode)
 	: Tool(ctx, toolMenuItem, new DigitalIO_API(this), "Digital IO", parent)
 	, ui(new Ui::DigitalIO)
@@ -156,19 +149,14 @@ DigitalIO::DigitalIO(struct iio_context *ctx, Filter *filt,
 
 	// UI
 	ui->setupUi(this);
-	groups.append(new DigitalIoGroup("DIO 0 - 7 ", 0xff, 0xff, this,
-					 ui->dioContainer));
+	groups.append(new DigitalIoGroup("DIO 0 - 7 ", 0xff, 0xff, this, ui->dioContainer));
 	ui->containerLayout->addWidget(groups.last());
-	groups.append(new DigitalIoGroup("DIO 8 - 15", 0xff00, 0xff00, this,
-					 ui->dioContainer));
+	groups.append(new DigitalIoGroup("DIO 8 - 15", 0xff00, 0xff00, this, ui->dioContainer));
 	ui->containerLayout->addWidget(groups.last());
 
-	connect(ui->btnRunStop, SIGNAL(toggled(bool)), this,
-		SLOT(startStop(bool)));
-	connect(runButton(), SIGNAL(toggled(bool)), ui->btnRunStop,
-		SLOT(setChecked(bool)));
-	connect(ui->btnRunStop, SIGNAL(toggled(bool)), runButton(),
-		SLOT(setChecked(bool)));
+	connect(ui->btnRunStop, SIGNAL(toggled(bool)), this, SLOT(startStop(bool)));
+	connect(runButton(), SIGNAL(toggled(bool)), ui->btnRunStop, SLOT(setChecked(bool)));
+	connect(ui->btnRunStop, SIGNAL(toggled(bool)), runButton(), SLOT(setChecked(bool)));
 
 	if (!offline_mode) {
 		connect(diom, SIGNAL(locked()), this, SLOT(lockUi()));
@@ -178,8 +166,7 @@ DigitalIO::DigitalIO(struct iio_context *ctx, Filter *filt,
 	poll = new QTimer(this);
 	connect(poll, SIGNAL(timeout()), this, SLOT(updateUi()));
 
-	api->setObjectName(
-		QString::fromStdString(Filter::tool_name(TOOL_DIGITALIO)));
+	api->setObjectName(QString::fromStdString(Filter::tool_name(TOOL_DIGITALIO)));
 	api->load(*settings);
 	api->js_register(engine);
 	updateUi();
@@ -232,11 +219,9 @@ void DigitalIO::updateUi() {
 
 			if (!isLocked && isOutput && diom->getOutputEnabled())
 				if (chk != diom->getOutRaw(i)) {
-					setDynamicProperty(chui->input, "short",
-							   true);
+					setDynamicProperty(chui->input, "short", true);
 				} else {
-					setDynamicProperty(chui->input, "short",
-							   false);
+					setDynamicProperty(chui->input, "short", false);
 				}
 			else {
 				setDynamicProperty(chui->input, "short", false);

@@ -61,9 +61,7 @@ BaseMenuItem::~BaseMenuItem() {
 	delete d_ui;
 }
 
-void BaseMenuItem::setWidget(QWidget *widget) {
-	d_ui->contentsLayout->addWidget(widget);
-}
+void BaseMenuItem::setWidget(QWidget *widget) { d_ui->contentsLayout->addWidget(widget); }
 
 int BaseMenuItem::position() const { return d_position; }
 
@@ -80,8 +78,7 @@ void BaseMenuItem::mouseMoveEvent(QMouseEvent *event) {
 		return;
 	}
 
-	if ((event->pos() - d_dragStartPosition).manhattanLength() <
-	    QApplication::startDragDistance()) {
+	if ((event->pos() - d_dragStartPosition).manhattanLength() < QApplication::startDragDistance()) {
 		return;
 	}
 
@@ -169,16 +166,14 @@ void BaseMenuItem::dropEvent(QDropEvent *event) {
 		return;
 	}
 
-	if (event->source() == this &&
-	    event->possibleActions() & Qt::MoveAction) {
+	if (event->source() == this && event->possibleActions() & Qt::MoveAction) {
 		return;
 	}
 
 	bool dropAfter = d_botDragbox.contains(event->pos());
 
 	if (event->mimeData()->hasFormat(menuItemMimeDataType)) {
-		short from =
-			(short)event->mimeData()->data(menuItemMimeDataType)[1];
+		short from = (short)event->mimeData()->data(menuItemMimeDataType)[1];
 		short to = d_position;
 		if (dropAfter)
 			to++;
@@ -198,23 +193,17 @@ void BaseMenuItem::setDragWidget(QWidget *widget) {
 
 bool BaseMenuItem::eventFilter(QObject *watched, QEvent *event) {
 	if (event->type() == QEvent::DragEnter) {
-		QDragEnterEvent *enterEvent =
-			static_cast<QDragEnterEvent *>(event);
+		QDragEnterEvent *enterEvent = static_cast<QDragEnterEvent *>(event);
 		if (!enterEvent->mimeData()->hasFormat(menuItemMimeDataType))
 			return true;
 	}
 
-	if (watched == d_dragWidget &&
-	    event->type() == QEvent::MouseButtonPress) {
+	if (watched == d_dragWidget && event->type() == QEvent::MouseButtonPress) {
 		d_allowDrag = true;
 	}
 	return QWidget::eventFilter(watched, event);
 }
 
-void BaseMenuItem::_enableBotSeparator(bool enable) {
-	d_ui->botSep->setVisible(enable);
-}
+void BaseMenuItem::_enableBotSeparator(bool enable) { d_ui->botSep->setVisible(enable); }
 
-void BaseMenuItem::_enableTopSeparator(bool enable) {
-	d_ui->topSep->setVisible(enable);
-}
+void BaseMenuItem::_enableTopSeparator(bool enable) { d_ui->topSep->setVisible(enable); }

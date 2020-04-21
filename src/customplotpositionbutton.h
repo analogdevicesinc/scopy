@@ -22,8 +22,7 @@ public:
 	void setPosition(ReadoutsPosition position);
 
 Q_SIGNALS:
-	void
-	positionChanged(CustomPlotPositionButton::ReadoutsPosition position);
+	void positionChanged(CustomPlotPositionButton::ReadoutsPosition position);
 
 private:
 	Ui::CustomPlotPositionButton *ui;

@@ -33,8 +33,7 @@ CustomScale::CustomScale(QWidget *parent) : QwtThermo(parent) {
 
 	scaler = new AutoScaler(this, divs);
 
-	connect(scaler, SIGNAL(updateScale(const QwtScaleDiv)), this,
-		SLOT(updateScale(const QwtScaleDiv)));
+	connect(scaler, SIGNAL(updateScale(const QwtScaleDiv)), this, SLOT(updateScale(const QwtScaleDiv)));
 }
 
 CustomScale::~CustomScale() { delete scaler; }

@@ -90,10 +90,8 @@ class PatternGenerator : public Tool {
 
 public:
 	static const int channelGroupLabelMaxLength = 13;
-	explicit PatternGenerator(struct iio_context *ctx, Filter *filt,
-				  ToolMenuItem *toolMenuItem, QJSEngine *engine,
-				  DIOManager *diom, ToolLauncher *parent,
-				  bool offline_mode_ = 0);
+	explicit PatternGenerator(struct iio_context *ctx, Filter *filt, ToolMenuItem *toolMenuItem, QJSEngine *engine,
+				  DIOManager *diom, ToolLauncher *parent, bool offline_mode_ = 0);
 	~PatternGenerator();
 	void updateCGSettings();
 	PatternUI *getCurrentPatternUI();
@@ -127,14 +125,9 @@ private:
 
 	QButtonGroup *settings_group;
 
-	pv::widgets::ColourButton *colour_button_edge, *colour_button_high,
-		*colour_button_BG, *colour_button_low;
+	pv::widgets::ColourButton *colour_button_edge, *colour_button_high, *colour_button_BG, *colour_button_low;
 
-	typedef enum rightMenuState_t {
-		CLOSED,
-		OPENED_PG,
-		OPENED_CG
-	} rightMenuState;
+	typedef enum rightMenuState_t { CLOSED, OPENED_PG, OPENED_CG } rightMenuState;
 
 	typedef enum runState_t {
 		STOPPED,

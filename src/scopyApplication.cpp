@@ -9,8 +9,7 @@
 #if BREAKPAD_HANDLER
 using namespace google_breakpad;
 
-ScopyApplication::ScopyApplication(int &argc, char **argv)
-	: QApplication(argc, argv) {}
+ScopyApplication::ScopyApplication(int &argc, char **argv) : QApplication(argc, argv) {}
 QString ScopyApplication::initBreakPadHandler(QString crashDumpPath) {
 	QString prevCrashDump = "";
 	QString appDir = crashDumpPath;
@@ -27,18 +26,13 @@ QString ScopyApplication::initBreakPadHandler(QString crashDumpPath) {
 			continue;
 		QString dumpFullPath = qd.path() + qd.separator() + dump;
 		QFileInfo fi(dumpFullPath);
-		QString dumpDateAndTime = fi.lastModified()
-						  .toString(Qt::ISODate)
-						  .replace("T", "--")
-						  .replace(":", "-");
-		prevCrashDump = qd.path() + qd.separator() +
-			"ScopyCrashDump--" + dumpDateAndTime + ".dmp";
+		QString dumpDateAndTime = fi.lastModified().toString(Qt::ISODate).replace("T", "--").replace(":", "-");
+		prevCrashDump = qd.path() + qd.separator() + "ScopyCrashDump--" + dumpDateAndTime + ".dmp";
 		QFile::rename(dumpFullPath, prevCrashDump);
 	}
 
 #ifdef Q_OS_LINUX
-	descriptor = new google_breakpad::MinidumpDescriptor(
-		qd.path().toStdString().c_str());
+	descriptor = new google_breakpad::MinidumpDescriptor(qd.path().toStdString().c_str());
 	handler->set_minidump_descriptor(*descriptor);
 #endif
 #ifdef Q_OS_WIN
@@ -69,27 +63,19 @@ bool ScopyApplication::notify(QObject *receiver, QEvent *e) {
 #endif
 
 #ifdef Q_OS_WIN
-bool ScopyApplication::dumpCallback(const wchar_t *dump_path,
-				    const wchar_t *minidump_id, void *context,
-				    EXCEPTION_POINTERS *exinfo,
-				    MDRawAssertionInfo *assertion,
-				    bool succeeded) {
+bool ScopyApplication::dumpCallback(const wchar_t *dump_path, const wchar_t *minidump_id, void *context,
+				    EXCEPTION_POINTERS *exinfo, MDRawAssertionInfo *assertion, bool succeeded) {
 	printf("Dump path: %s\n", dump_path);
 	return succeeded;
 }
 #endif
-ExceptionHandler *ScopyApplication::getExceptionHandler() const {
-	return handler;
-}
+ExceptionHandler *ScopyApplication::getExceptionHandler() const { return handler; }
 
-void ScopyApplication::setExceptionHandler(ExceptionHandler *value) {
-	handler = value;
-}
+void ScopyApplication::setExceptionHandler(ExceptionHandler *value) { handler = value; }
 
 #ifdef Q_OS_LINUX
-bool ScopyApplication::dumpCallback(
-	const google_breakpad::MinidumpDescriptor &descriptor, void *context,
-	bool succeeded) {
+bool ScopyApplication::dumpCallback(const google_breakpad::MinidumpDescriptor &descriptor, void *context,
+				    bool succeeded) {
 	printf("Dump path: %s\n", descriptor.path());
 	return succeeded;
 }

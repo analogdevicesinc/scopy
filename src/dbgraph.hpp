@@ -65,8 +65,7 @@ public:
 	int getNumSamples() const;
 
 	QString getScaleValueFormat(double value, QwtAxisId scale) const;
-	QString getScaleValueFormat(double value, QwtAxisId scale,
-				    int precision) const;
+	QString getScaleValueFormat(double value, QwtAxisId scale, int precision) const;
 
 	void setShowZero(bool en);
 	const QwtScaleWidget *getAxisWidget(QwtAxisId id);
@@ -77,8 +76,7 @@ public:
 	QString yTitle() const;
 
 	void toggleCursors(bool);
-	CustomPlotPositionButton::ReadoutsPosition
-	getCursorReadoutCurrentPosition();
+	CustomPlotPositionButton::ReadoutsPosition getCursorReadoutCurrentPosition();
 
 	QString cursorIntersection(qreal text);
 	QVector<double> getXAxisData();
@@ -130,8 +128,7 @@ public Q_SLOTS:
 	void onCursor2Moved(int);
 
 	void setCursorReadoutsTransparency(int value);
-	void
-	moveCursorReadouts(CustomPlotPositionButton::ReadoutsPosition position);
+	void moveCursorReadouts(CustomPlotPositionButton::ReadoutsPosition position);
 
 	void scaleDivChanged();
 	void mousePressEvent(QMouseEvent *event);

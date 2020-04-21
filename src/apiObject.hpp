@@ -48,15 +48,12 @@ public:
 
 private:
 	template <typename T>
-	void save(QSettings &settings, const QString &prop,
-		  const QList<T> &list);
+	void save(QSettings &settings, const QString &prop, const QList<T> &list);
 	template <typename T>
 	QList<T> load(QSettings &settings, const QString &prop);
 
-	void save(QSettings &settings, const QString &prop,
-		  const QVariantList &list);
-	void load(QSettings &settings, const QString &prop,
-		  const QVariantList &list);
+	void save(QSettings &settings, const QString &prop, const QVariantList &list);
+	void load(QSettings &settings, const QString &prop, const QVariantList &list);
 
 	void save_nogroup(ApiObject *, QSettings &);
 	void load_nogroup(ApiObject *, QSettings &);

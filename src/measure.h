@@ -34,8 +34,7 @@ public:
 
 	enum axisType { HORIZONTAL, VERTICAL };
 
-	MeasurementData(const QString &name, axisType axis,
-			const QString &unit = "", int channel = -1);
+	MeasurementData(const QString &name, axisType axis, const QString &unit = "", int channel = -1);
 
 	QString name() const;
 	double value() const;
@@ -114,8 +113,7 @@ public:
 	int activeMeasurementsCount() const;
 
 private:
-	bool highLowFromHistogram(double &low, double &high, double min,
-				  double max);
+	bool highLowFromHistogram(double &low, double &high, double min, double max);
 	void clearMeasurements();
 
 private:

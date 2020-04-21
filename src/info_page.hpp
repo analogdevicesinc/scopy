@@ -38,9 +38,7 @@ class InfoPage : public QWidget {
 	Q_OBJECT
 
 public:
-	explicit InfoPage(QString uri, Preferences *prefPanel,
-			  struct iio_context *ctx = nullptr,
-			  QWidget *parent = 0);
+	explicit InfoPage(QString uri, Preferences *prefPanel, struct iio_context *ctx = nullptr, QWidget *parent = 0);
 	virtual ~InfoPage();
 
 	struct iio_context *ctx() const;
@@ -78,12 +76,10 @@ protected:
 
 private:
 	QPair<bool, QString> translateInfoParams(QString);
-	const QStringList identifySupportedModels = {
-		"Analog Devices M2k Rev.C (Z7010)",
-		"Analog Devices M2k Rev.D (Z7010)"};
-	const QStringList calibrateSupportedModels = {
-		"Analog Devices M2k Rev.C (Z7010)",
-		"Analog Devices M2k Rev.D (Z7010)"};
+	const QStringList identifySupportedModels = {"Analog Devices M2k Rev.C (Z7010)",
+						     "Analog Devices M2k Rev.D (Z7010)"};
+	const QStringList calibrateSupportedModels = {"Analog Devices M2k Rev.C (Z7010)",
+						      "Analog Devices M2k Rev.D (Z7010)"};
 
 protected:
 	Ui::InfoPage *ui;
@@ -102,8 +98,7 @@ protected:
 class M2kInfoPage : public InfoPage {
 	Q_OBJECT
 public:
-	explicit M2kInfoPage(QString uri, Preferences *prefPanel,
-			     struct iio_context *ctx = nullptr,
+	explicit M2kInfoPage(QString uri, Preferences *prefPanel, struct iio_context *ctx = nullptr,
 			     QWidget *parent = 0);
 	~M2kInfoPage();
 
@@ -125,10 +120,8 @@ public:
 		M2K = 1,
 	};
 
-	static InfoPage *newPage(InfoPageType page_type, QString uri,
-				 Preferences *prefPanel,
-				 struct iio_context *ctx = nullptr,
-				 QWidget *parent = 0) {
+	static InfoPage *newPage(InfoPageType page_type, QString uri, Preferences *prefPanel,
+				 struct iio_context *ctx = nullptr, QWidget *parent = 0) {
 		switch (page_type) {
 		case GENERIC:
 			return new InfoPage(uri, prefPanel, ctx, parent);

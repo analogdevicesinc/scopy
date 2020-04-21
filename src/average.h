@@ -27,8 +27,7 @@ public:
 	SpectrumAverage(unsigned int data_width, unsigned int history);
 	virtual ~SpectrumAverage();
 	virtual void pushNewData(double *data) = 0;
-	virtual void getAverage(double *out_data,
-				unsigned int num_samples) const;
+	virtual void getAverage(double *out_data, unsigned int num_samples) const;
 	virtual void reset() = 0;
 	unsigned int dataWidth() const;
 	unsigned int history() const;
@@ -112,8 +111,7 @@ public:
 	LinearRMS(unsigned int data_width, unsigned int history);
 	~LinearRMS();
 	virtual void pushNewData(double *data);
-	virtual void getAverage(double *out_data,
-				unsigned int num_samples) const;
+	virtual void getAverage(double *out_data, unsigned int num_samples) const;
 	virtual void reset();
 
 private:
@@ -125,8 +123,7 @@ public:
 	LinearAverage(unsigned int data_width, unsigned int history);
 	~LinearAverage();
 	virtual void pushNewData(double *data);
-	virtual void getAverage(double *out_data,
-				unsigned int num_samples) const;
+	virtual void getAverage(double *out_data, unsigned int num_samples) const;
 	virtual void reset();
 
 private:

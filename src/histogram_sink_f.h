@@ -72,8 +72,7 @@ public:
 	 * \param nconnections number of signals connected to sink
 	 * \param parent a QWidget parent object, if any
 	 */
-	static sptr make(int size, int bins, double xmin, double xmax,
-			 const std::string &name, int nconnections = 1,
+	static sptr make(int size, int bins, double xmin, double xmax, const std::string &name, int nconnections = 1,
 			 QObject *plot = NULL);
 
 	virtual void exec_() = 0;

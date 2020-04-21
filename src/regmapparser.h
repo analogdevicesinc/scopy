@@ -33,22 +33,18 @@ class RegmapParser : public QObject {
 	Q_OBJECT
 
 public:
-	explicit RegmapParser(QObject *parent = nullptr,
-			      struct iio_context *context = nullptr);
-	void deviceXmlFileSelection(const QString *device, QString *filename,
-				    const QString source);
+	explicit RegmapParser(QObject *parent = nullptr, struct iio_context *context = nullptr);
+	void deviceXmlFileSelection(const QString *device, QString *filename, const QString source);
 	int deviceXmlFileLoad(QString *filename);
 	void regMapChooserInit(QString *device);
 	QDomNode *getRegisterNode(const QString address);
 	void setIioContext(struct iio_context *ctx);
 	uint32_t readRegister(const QString *device, const uint32_t u8Address);
-	void writeRegister(const QString *device, const uint32_t u8Address,
-			   const uint32_t value);
+	void writeRegister(const QString *device, const uint32_t u8Address, const uint32_t value);
 	uint32_t getLastAddress(void) const;
 
 private:
-	void findDeviceXmlFile(const QString *xmlsFolderPath,
-			       const QString *device, QString *filename);
+	void findDeviceXmlFile(const QString *xmlsFolderPath, const QString *device, QString *filename);
 	int pcoreGetVersion(const QString *device, int *pcoreMajor);
 	bool xmlFileExists(char *filename);
 	bool isInputDevice(const struct iio_device *dev);

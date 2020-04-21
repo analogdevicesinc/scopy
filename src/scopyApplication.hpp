@@ -29,16 +29,12 @@ public:
 #endif
 
 #ifdef Q_OS_WIN
-	static bool dumpCallback(const wchar_t *dump_path,
-				 const wchar_t *minidump_id, void *context,
-				 EXCEPTION_POINTERS *exinfo,
-				 MDRawAssertionInfo *assertion, bool succeeded);
+	static bool dumpCallback(const wchar_t *dump_path, const wchar_t *minidump_id, void *context,
+				 EXCEPTION_POINTERS *exinfo, MDRawAssertionInfo *assertion, bool succeeded);
 #endif
 
 #ifdef Q_OS_LINUX
-	static bool
-	dumpCallback(const google_breakpad::MinidumpDescriptor &descriptor,
-		     void *context, bool succeeded);
+	static bool dumpCallback(const google_breakpad::MinidumpDescriptor &descriptor, void *context, bool succeeded);
 #endif
 	google_breakpad::ExceptionHandler *getExceptionHandler() const;
 	void setExceptionHandler(google_breakpad::ExceptionHandler *value);

@@ -87,10 +87,8 @@ public:
 
 	typedef boost::shared_ptr<SpectrumChannel> channel_sptr;
 
-	explicit SpectrumAnalyzer(struct iio_context *iio, Filter *filt,
-				  std::shared_ptr<GenericAdc> adc,
-				  ToolMenuItem *toolMenuItem, QJSEngine *engine,
-				  ToolLauncher *parent);
+	explicit SpectrumAnalyzer(struct iio_context *iio, Filter *filt, std::shared_ptr<GenericAdc> adc,
+				  ToolMenuItem *toolMenuItem, QJSEngine *engine, ToolLauncher *parent);
 	~SpectrumAnalyzer();
 
 	void setNativeDialogs(bool nativeDialogs) override;
@@ -164,8 +162,7 @@ private:
 	QList<SpectrumChannel_API *> ch_api;
 	QList<SpectrumMarker_API *> marker_api;
 
-	QPair<int, int> getGridLayoutPosFromIndex(QGridLayout *layout,
-						  int index) const;
+	QPair<int, int> getGridLayoutPosFromIndex(QGridLayout *layout, int index) const;
 
 	QQueue<QPair<CustomPushButton *, bool>> menuButtonActions;
 	QList<CustomPushButton *> menuOrder;
@@ -214,10 +211,8 @@ private:
 
 	bool marker_menu_opened;
 
-	static std::vector<std::pair<QString, FftDisplayPlot::MagnitudeType>>
-		mag_types;
-	static std::vector<std::pair<QString, FftDisplayPlot::AverageType>>
-		avg_types;
+	static std::vector<std::pair<QString, FftDisplayPlot::MagnitudeType>> mag_types;
+	static std::vector<std::pair<QString, FftDisplayPlot::AverageType>> avg_types;
 	static std::vector<std::pair<QString, FftWinType>> win_types;
 	static std::vector<QString> markerTypes;
 	void triggerRightMenuToggle(CustomPushButton *btn, bool checked);
@@ -274,8 +269,7 @@ private:
 	float calcCoherentPowerGain(const std::vector<float> &win) const;
 	void scaletFftWindow(std::vector<float> &win, float gain);
 
-	static std::vector<float> build_win(SpectrumAnalyzer::FftWinType type,
-					    int ntaps);
+	static std::vector<float> build_win(SpectrumAnalyzer::FftWinType type, int ntaps);
 };
 } // namespace adiscope
 

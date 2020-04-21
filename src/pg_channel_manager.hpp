@@ -72,10 +72,8 @@ class PatternGeneratorChannelUI : public ChannelUI {
 
 public:
 	Ui::PGChannelGroup *ui;
-	PatternGeneratorChannelUI(PatternGeneratorChannel *ch,
-				  PatternGeneratorChannelGroup *chg,
-				  PatternGeneratorChannelGroupUI *chgui,
-				  PatternGeneratorChannelManagerUI *managerUi,
+	PatternGeneratorChannelUI(PatternGeneratorChannel *ch, PatternGeneratorChannelGroup *chg,
+				  PatternGeneratorChannelGroupUI *chgui, PatternGeneratorChannelManagerUI *managerUi,
 				  QWidget *parent = 0);
 	~PatternGeneratorChannelUI();
 	PatternGeneratorChannelManagerUI *getManagerUi() const;
@@ -112,8 +110,7 @@ class PatternGeneratorChannelGroup : public ChannelGroup {
 	bool collapsed;
 
 public:
-	PatternGeneratorChannelGroup(PatternGeneratorChannel *ch = nullptr,
-				     bool en = false);
+	PatternGeneratorChannelGroup(PatternGeneratorChannel *ch = nullptr, bool en = false);
 	~PatternGeneratorChannelGroup();
 	Pattern *pattern;
 	PatternGeneratorChannel *get_channel(int index);
@@ -147,10 +144,8 @@ public:
 	std::shared_ptr<pv::view::DecodeTrace> decodeTrace;
 	Ui::PGChannelGroup *ui;
 	std::vector<PatternGeneratorChannelUI *> ch_ui;
-	PatternGeneratorChannelGroupUI(
-		PatternGeneratorChannelGroup *chg,
-		PatternGeneratorChannelManagerUI *managerUi,
-		QWidget *parent = 0);
+	PatternGeneratorChannelGroupUI(PatternGeneratorChannelGroup *chg, PatternGeneratorChannelManagerUI *managerUi,
+				       QWidget *parent = 0);
 	~PatternGeneratorChannelGroupUI();
 	PatternGeneratorChannelGroup *getChannelGroup();
 	PatternGeneratorChannelManagerUI *getManagerUi() const;
@@ -164,8 +159,8 @@ public:
 
 	void updateTrace();
 
-	std::map<const srd_channel *, std::shared_ptr<pv::view::TraceTreeItem>>
-	setupDecoder(const char *decoder, std::vector<int> ids);
+	std::map<const srd_channel *, std::shared_ptr<pv::view::TraceTreeItem>> setupDecoder(const char *decoder,
+											     std::vector<int> ids);
 
 	void setupUARTDecoder();
 	void setupSPIDecoder();
@@ -206,8 +201,7 @@ class PatternGeneratorChannelManager : public ChannelManager {
 	const uint32_t maxBufferSize = 1000000;
 
 public:
-	void highlightChannel(PatternGeneratorChannelGroup *chg,
-			      PatternGeneratorChannel *ch = nullptr);
+	void highlightChannel(PatternGeneratorChannelGroup *chg, PatternGeneratorChannel *ch = nullptr);
 	PatternGeneratorChannelGroup *getHighlightedChannelGroup();
 	PatternGeneratorChannel *getHighlightedChannel();
 	PatternGeneratorChannelManager();
@@ -221,10 +215,8 @@ public:
 	void moveChannel(int fromChgIndex, int from, int to, bool after = true);
 	void splitChannel(int chgIndex, int chIndex);
 	void preGenerate();
-	void generatePatterns(short *mainbuffer, uint32_t sampleRate,
-			      uint32_t bufferSize);
-	void commitBuffer(PatternGeneratorChannelGroup *chg, short *mainBuffer,
-			  uint32_t bufferSize);
+	void generatePatterns(short *mainbuffer, uint32_t sampleRate, uint32_t bufferSize);
+	void commitBuffer(PatternGeneratorChannelGroup *chg, short *mainBuffer, uint32_t bufferSize);
 	short remap_buffer(uint8_t *mapping, uint32_t val);
 
 	uint32_t computeSuggestedSampleRate();
@@ -255,25 +247,20 @@ public:
 	pv::MainWindow *main_win;
 	std::vector<PatternGeneratorChannelGroupUI *> chg_ui;
 	std::vector<QFrame *> separators;
-	PatternGeneratorChannelManagerUI(QWidget *parent,
-					 pv::MainWindow *main_win_,
-					 PatternGeneratorChannelManager *chm,
-					 Ui::PGCGSettings *cgSettings,
+	PatternGeneratorChannelManagerUI(QWidget *parent, pv::MainWindow *main_win_,
+					 PatternGeneratorChannelManager *chm, Ui::PGCGSettings *cgSettings,
 					 PatternGenerator *pg);
 	~PatternGeneratorChannelManagerUI();
 
-	PatternGeneratorChannelGroupUI *
-	findUiByChannelGroup(PatternGeneratorChannelGroup *toFind);
-	PatternGeneratorChannelUI *
-	findUiByChannel(PatternGeneratorChannel *toFind);
+	PatternGeneratorChannelGroupUI *findUiByChannelGroup(PatternGeneratorChannelGroup *toFind);
+	PatternGeneratorChannelUI *findUiByChannel(PatternGeneratorChannel *toFind);
 	PatternGeneratorChannelManager *chm;
 	PatternGenerator *pg;
 	Ui::PGChannelManager *ui;
 
 	QWidget *hoverWidget;
 
-	void highlightChannel(PatternGeneratorChannelGroup *chg,
-			      PatternGeneratorChannel *ch = nullptr);
+	void highlightChannel(PatternGeneratorChannelGroup *chg, PatternGeneratorChannel *ch = nullptr);
 
 	void updateUi();
 	void selectChannelGroup(PatternGeneratorChannelGroupUI *selected);

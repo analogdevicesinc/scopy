@@ -16,8 +16,7 @@ using namespace adiscope;
  * thin line which is visible only when the channel is selected, thus increasing
  * the visibility of the selected state of the channel.
  */
-ChannelWidget::ChannelWidget(int id, bool deletable, bool simplified,
-			     QColor color, QWidget *parent)
+ChannelWidget::ChannelWidget(int id, bool deletable, bool simplified, QColor color, QWidget *parent)
 	: QWidget(parent)
 	, m_ui(new Ui::Channel())
 	, m_id(id)
@@ -48,8 +47,7 @@ void ChannelWidget::init() {
 	if (m_simplified) {
 		m_ui->name->hide();
 		m_ui->line->hide();
-		m_ui->verticalSpacer->changeSize(0, 0, QSizePolicy::Fixed,
-						 QSizePolicy::Fixed);
+		m_ui->verticalSpacer->changeSize(0, 0, QSizePolicy::Fixed, QSizePolicy::Fixed);
 		QString stylesheet = styleSheet();
 		stylesheet += QString("QCheckBox#box { spacing: 12px; }");
 		setStyleSheet(stylesheet);
@@ -183,9 +181,7 @@ void ChannelWidget::on_box_toggled(bool checked) {
 
 void ChannelWidget::on_name_toggled(bool checked) { Q_EMIT selected(checked); }
 
-void ChannelWidget::on_btn_toggled(bool checked) {
-	Q_EMIT menuToggled(checked);
-}
+void ChannelWidget::on_btn_toggled(bool checked) { Q_EMIT menuToggled(checked); }
 
 void ChannelWidget::on_delBtn_clicked() {
 	setButtonNoGroup(m_ui->box);

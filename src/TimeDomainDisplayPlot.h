@@ -36,19 +36,14 @@ namespace adiscope {
 
 class Sink {
 public:
-	Sink(const std::string &name, unsigned int numChannels,
-	     unsigned long long channelsDataLength)
-		: d_name(name)
-		, d_numChannels(numChannels)
-		, d_channelsDataLength(channelsDataLength) {}
+	Sink(const std::string &name, unsigned int numChannels, unsigned long long channelsDataLength)
+		: d_name(name), d_numChannels(numChannels), d_channelsDataLength(channelsDataLength) {}
 
 	std::string name() { return d_name; }
 	unsigned int numChannels() { return d_numChannels; }
 	unsigned int channelsDataLength() { return d_channelsDataLength; }
 
-	void setChannelsDataLength(unsigned long long num) {
-		d_channelsDataLength = num;
-	}
+	void setChannelsDataLength(unsigned long long num) { d_channelsDataLength = num; }
 
 private:
 	std::string d_name;
@@ -61,8 +56,7 @@ public:
 	SinkManager();
 	~SinkManager();
 
-	bool addSink(const std::string &name, unsigned int numChannels,
-		     unsigned long long channelsDataLength);
+	bool addSink(const std::string &name, unsigned int numChannels, unsigned long long channelsDataLength);
 	bool removeSink(const std::string &name);
 	unsigned int sinkListLength();
 	Sink *sink(unsigned int index);
@@ -80,23 +74,17 @@ private:
 class TimeDomainDisplayPlot : public DisplayPlot {
 	Q_OBJECT
 
-	Q_PROPERTY(QColor tag_text_color READ getTagTextColor WRITE
-			   setTagTextColor)
-	Q_PROPERTY(QColor tag_background_color READ getTagBackgroundColor WRITE
-			   setTagBackgroundColor)
-	Q_PROPERTY(Qt::BrushStyle tag_background_style READ
-			   getTagBackgroundStyle WRITE setTagBackgroundStyle)
+	Q_PROPERTY(QColor tag_text_color READ getTagTextColor WRITE setTagTextColor)
+	Q_PROPERTY(QColor tag_background_color READ getTagBackgroundColor WRITE setTagBackgroundColor)
+	Q_PROPERTY(Qt::BrushStyle tag_background_style READ getTagBackgroundStyle WRITE setTagBackgroundStyle)
 
 public:
-	TimeDomainDisplayPlot(QWidget *, unsigned int xNumDivs = 10,
-			      unsigned int yNumDivs = 10);
+	TimeDomainDisplayPlot(QWidget *, unsigned int xNumDivs = 10, unsigned int yNumDivs = 10);
 	virtual ~TimeDomainDisplayPlot();
 
-	void plotNewData(const std::string &sender,
-			 const std::vector<double *> &dataPoints,
+	void plotNewData(const std::string &sender, const std::vector<double *> &dataPoints,
 			 const int64_t numDataPoints, const double timeInterval,
-			 const std::vector<std::vector<gr::tag_t>> &tags =
-				 std::vector<std::vector<gr::tag_t>>());
+			 const std::vector<std::vector<gr::tag_t>> &tags = std::vector<std::vector<gr::tag_t>>());
 	void replot();
 
 	void stemPlot(bool en);
@@ -118,15 +106,12 @@ public:
 	QString yAxisScaleValueFormat(double value, int precision) const;
 	QString yAxisScaleValueFormat(double value);
 
-	bool registerSink(std::string sinkUniqueNme, unsigned int numChannels,
-			  unsigned long long channelsDataLength,
+	bool registerSink(std::string sinkUniqueNme, unsigned int numChannels, unsigned long long channelsDataLength,
 			  bool curvesAttached = true);
 	bool unregisterSink(std::string sinkName);
 
-	bool registerMathWaveform(const std::string &sinkUniqueNme,
-				  unsigned int numChannels,
-				  unsigned long long channelsDataLength,
-				  bool curvesAttached = true);
+	bool registerMathWaveform(const std::string &sinkUniqueNme, unsigned int numChannels,
+				  unsigned long long channelsDataLength, bool curvesAttached = true);
 	bool unregisterMathWaveform(const std::string &sinkName);
 
 	long dataStartingPoint() const;
@@ -135,11 +120,9 @@ public:
 	void removeZoomer(unsigned int zoomerIdx);
 	void setXAxisNumPoints(unsigned int);
 
-	void registerReferenceWaveform(QString name, QVector<double> xData,
-				       QVector<double> yData);
+	void registerReferenceWaveform(QString name, QVector<double> xData, QVector<double> yData);
 	void unregisterReferenceWaveform(QString name);
-	void addPreview(QVector<QVector<double>> curvesToBePreviewed,
-			double reftimebase, double timebase,
+	void addPreview(QVector<QVector<double>> curvesToBePreviewed, double reftimebase, double timebase,
 			double timeposition);
 	void clearPreview();
 	void realignReferenceWaveforms(double timebase, double timeposition);
@@ -150,8 +133,7 @@ Q_SIGNALS:
 	void filledScreen(bool, unsigned int);
 
 public Q_SLOTS:
-	void setSampleRate(double sr, double units,
-			   const std::string &strunits);
+	void setSampleRate(double sr, double units, const std::string &strunits);
 
 	void setAutoScale(bool state);
 	void setAutoScaleShot();
@@ -187,8 +169,7 @@ public Q_SLOTS:
 	void resetXaxisOnNextReceivedData();
 	void hideCurvesUntilNewData();
 
-	void updatePreview(double reftimebase, double timebase,
-			   double timeposition);
+	void updatePreview(double reftimebase, double timebase, double timeposition);
 
 protected:
 	virtual void configureAxis(int axisPos, int axisIdx);
@@ -209,8 +190,7 @@ protected:
 	int countReferenceWaveform(int position);
 
 private:
-	void _resetXAxisPoints(double *&xAxis, unsigned long long numPoints,
-			       double sampleRate);
+	void _resetXAxisPoints(double *&xAxis, unsigned long long numPoints, double sampleRate);
 	void _autoScale(double bottom, double top);
 
 	double d_sample_rate;

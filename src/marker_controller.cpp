@@ -23,10 +23,8 @@ MarkerController::MarkerController(QwtPlot *plot)
 	, d_item_moving(nullptr)
 	, d_mrks_default_z(0.0) {
 	d_picker->setStateMachine(new QwtPickerDragPointMachine);
-	connect(d_picker, SIGNAL(selected(QPointF)), this,
-		SLOT(onPickerSelected(QPointF)));
-	connect(d_picker, SIGNAL(moved(QPoint)), this,
-		SLOT(onPickerMoved(QPoint)));
+	connect(d_picker, SIGNAL(selected(QPointF)), this, SLOT(onPickerSelected(QPointF)));
+	connect(d_picker, SIGNAL(moved(QPoint)), this, SLOT(onPickerMoved(QPoint)));
 }
 
 bool MarkerController::enabled() const { return d_picker->isEnabled(); }
@@ -48,9 +46,7 @@ void MarkerController::onPickerSelected(QPointF pf) {
 		QPoint p = mrks[i]->plotValueToPixels(pf);
 
 		QRect rect = mrks[i]->boundingRectPixels();
-		if (p.x() >= rect.topLeft().x() &&
-		    p.x() <= rect.bottomRight().x() &&
-		    p.y() >= rect.topLeft().y() &&
+		if (p.x() >= rect.topLeft().x() && p.x() <= rect.bottomRight().x() && p.y() >= rect.topLeft().y() &&
 		    p.y() <= rect.bottomRight().y() && !d_selected_mkr) {
 
 			markerBringToFront(mrks[i]);
@@ -69,10 +65,8 @@ void MarkerController::onPickerMoved(QPoint p) {
 
 		for (int i = 0; i < mrks.size(); i++) {
 			QRect rect = mrks[i]->boundingRectPixels();
-			if (p.x() >= rect.topLeft().x() &&
-			    p.x() <= rect.bottomRight().x() &&
-			    p.y() >= rect.topLeft().y() &&
-			    p.y() <= rect.bottomRight().y() && !d_picked_mrk) {
+			if (p.x() >= rect.topLeft().x() && p.x() <= rect.bottomRight().x() &&
+			    p.y() >= rect.topLeft().y() && p.y() <= rect.bottomRight().y() && !d_picked_mrk) {
 
 				markerBringToFront(mrks[i]);
 
@@ -87,10 +81,8 @@ void MarkerController::onPickerMoved(QPoint p) {
 
 	if (d_picked_mrk) {
 		QPointF val = d_picked_mrk->plotPixelsToValue(p);
-		QwtInterval xItv =
-			plot()->axisScaleDiv(QwtPlot::xBottom).interval();
-		QwtInterval yItv =
-			plot()->axisScaleDiv(QwtPlot::yLeft).interval();
+		QwtInterval xItv = plot()->axisScaleDiv(QwtPlot::xBottom).interval();
+		QwtInterval yItv = plot()->axisScaleDiv(QwtPlot::yLeft).interval();
 
 		// Make sure the marker does not leave the plot canvas
 		if (val.x() < xItv.minValue()) {
@@ -129,9 +121,7 @@ void MarkerController::unRegisterMarker(marker_sptr marker) {
 	}
 }
 
-MarkerController::marker_sptr MarkerController::selectedMarker() const {
-	return d_selected_mkr;
-}
+MarkerController::marker_sptr MarkerController::selectedMarker() const { return d_selected_mkr; }
 
 void MarkerController::markerBringToFront(marker_sptr marker) {
 	d_mrks_overlap_order.removeOne(marker);
@@ -143,9 +133,7 @@ void MarkerController::markerBringToFront(marker_sptr marker) {
 
 QwtPlot *MarkerController::plot() { return static_cast<QwtPlot *>(parent()); }
 
-const QwtPlot *MarkerController::plot() const {
-	return static_cast<const QwtPlot *>(parent());
-}
+const QwtPlot *MarkerController::plot() const { return static_cast<const QwtPlot *>(parent()); }
 
 void MarkerController::selectMarker(marker_sptr marker) {
 	if (marker->isVisible()) {

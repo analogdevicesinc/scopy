@@ -88,8 +88,7 @@ public:
 	void setSource(const QString &source);
 
 	int sourceChannel() const;
-	void setSourceChannel(uint chnIdx, bool intern_checked,
-			      bool extern_trigger_in_checked);
+	void setSourceChannel(uint chnIdx, bool intern_checked, bool extern_trigger_in_checked);
 
 	bool triggerIn() const;
 	void setTriggerIn(bool bo);

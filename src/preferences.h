@@ -132,39 +132,25 @@ private:
 class Preferences_API : public ApiObject {
 	Q_OBJECT
 
-	Q_PROPERTY(bool osc_labels READ getOscLabelsEnabled WRITE
-			   setOscLabelsEnabled);
-	Q_PROPERTY(int sig_gen_nr_periods READ getSigGenNrPeriods WRITE
-			   setSigGenNrPeriods);
-	Q_PROPERTY(bool save_session_on_exit READ getSaveSession WRITE
-			   setSaveSession);
-	Q_PROPERTY(bool double_click_to_detach READ getDoubleClickToDetach WRITE
-			   setDoubleClickToDetach);
+	Q_PROPERTY(bool osc_labels READ getOscLabelsEnabled WRITE setOscLabelsEnabled);
+	Q_PROPERTY(int sig_gen_nr_periods READ getSigGenNrPeriods WRITE setSigGenNrPeriods);
+	Q_PROPERTY(bool save_session_on_exit READ getSaveSession WRITE setSaveSession);
+	Q_PROPERTY(bool double_click_to_detach READ getDoubleClickToDetach WRITE setDoubleClickToDetach);
 	Q_PROPERTY(bool na_show_zero READ getNaShowZero WRITE setNaShowZero)
-	Q_PROPERTY(bool spectrum_visible_peak_search READ
-			   getSpectrumVisiblePeakSearch WRITE
-				   setSpectrumVisiblePeakSearch)
-	Q_PROPERTY(bool advanced_device_info READ getAdvancedDeviceInfo WRITE
-			   setAdvancedDeviceInfo)
-	Q_PROPERTY(bool user_notes_active READ getUserNotesActive WRITE
-			   setUserNotesActive)
-	Q_PROPERTY(bool graticule_enabled READ getGraticuleEnabled WRITE
-			   setGraticuleEnabled)
-	Q_PROPERTY(bool external_script_enabled READ getExternalScript WRITE
-			   setExternalScript)
-	Q_PROPERTY(bool manual_calib_script_enabled READ getManualCalibScript
-			   WRITE setManualCalibScript)
-	Q_PROPERTY(bool animations_enabled READ getAnimationsEnabled WRITE
-			   setAnimationsEnabled)
-	Q_PROPERTY(bool osc_filtering_enabled READ getOscFilteringEnabled WRITE
-			   setOscFilteringEnabled)
+	Q_PROPERTY(
+		bool spectrum_visible_peak_search READ getSpectrumVisiblePeakSearch WRITE setSpectrumVisiblePeakSearch)
+	Q_PROPERTY(bool advanced_device_info READ getAdvancedDeviceInfo WRITE setAdvancedDeviceInfo)
+	Q_PROPERTY(bool user_notes_active READ getUserNotesActive WRITE setUserNotesActive)
+	Q_PROPERTY(bool graticule_enabled READ getGraticuleEnabled WRITE setGraticuleEnabled)
+	Q_PROPERTY(bool external_script_enabled READ getExternalScript WRITE setExternalScript)
+	Q_PROPERTY(bool manual_calib_script_enabled READ getManualCalibScript WRITE setManualCalibScript)
+	Q_PROPERTY(bool animations_enabled READ getAnimationsEnabled WRITE setAnimationsEnabled)
+	Q_PROPERTY(bool osc_filtering_enabled READ getOscFilteringEnabled WRITE setOscFilteringEnabled)
 	Q_PROPERTY(bool mini_hist_enabled READ getMiniHist WRITE setMiniHist)
-	Q_PROPERTY(bool digital_decoders READ getDigitalDecoders WRITE
-			   setDigitalDecoders)
+	Q_PROPERTY(bool digital_decoders READ getDigitalDecoders WRITE setDigitalDecoders)
 
 public:
-	explicit Preferences_API(Preferences *preferencePanel)
-		: ApiObject(), preferencePanel(preferencePanel) {}
+	explicit Preferences_API(Preferences *preferencePanel) : ApiObject(), preferencePanel(preferencePanel) {}
 
 	bool getAnimationsEnabled() const;
 	void setAnimationsEnabled(const bool &enabled);

@@ -32,12 +32,8 @@ class NetworkAnalyzerBufferViewer;
 
 struct Buffer {
 	Buffer() {}
-	Buffer(double frequency, unsigned int sampleRate,
-	       unsigned int bufferSize, const std::vector<float> &buffer)
-		: frequency(frequency)
-		, sampleRate(sampleRate)
-		, bufferSize(bufferSize)
-		, buffer(buffer) {}
+	Buffer(double frequency, unsigned int sampleRate, unsigned int bufferSize, const std::vector<float> &buffer)
+		: frequency(frequency), sampleRate(sampleRate), bufferSize(bufferSize), buffer(buffer) {}
 
 	double frequency;
 	unsigned int sampleRate;

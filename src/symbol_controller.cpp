@@ -33,9 +33,7 @@ public:
 		: QwtWidgetOverlay(parent), d_symbolCtrl(symbolController) {}
 
 protected:
-	virtual void drawOverlay(QPainter *painter) const {
-		d_symbolCtrl->drawOverlay(painter);
-	}
+	virtual void drawOverlay(QPainter *painter) const { d_symbolCtrl->drawOverlay(painter); }
 
 	virtual QRegion maskHint() const { return d_symbolCtrl->maskHint(); }
 
@@ -44,10 +42,7 @@ private:
 };
 
 SymbolController::SymbolController(QwtPlot *plot)
-	: QObject(plot)
-	, d_isEnabled(false)
-	, d_selectedSymbol(NULL)
-	, axesCreated(0) {
+	: QObject(plot), d_isEnabled(false), d_selectedSymbol(NULL), axesCreated(0) {
 	setEnabled(true);
 
 	d_overlay = new Overlay(plot->canvas(), this);
@@ -59,19 +54,13 @@ SymbolController::~SymbolController() {
 
 QwtPlot *SymbolController::plot() { return static_cast<QwtPlot *>(parent()); }
 
-const QwtPlot *SymbolController::plot() const {
-	return static_cast<const QwtPlot *>(parent());
-}
+const QwtPlot *SymbolController::plot() const { return static_cast<const QwtPlot *>(parent()); }
 
 void SymbolController::attachSymbol(Symbol *symbol) {
 	if (d_symbols.indexOf(symbol) == -1) {
 		d_symbols.push_back(symbol);
-		QObject::connect((const QObject *)symbol,
-				 SIGNAL(positionChanged(double)), this,
-				 SLOT(updateOverlay()));
-		QObject::connect((const QObject *)symbol,
-				 SIGNAL(visibilityChanged(bool)), this,
-				 SLOT(updateOverlay()));
+		QObject::connect((const QObject *)symbol, SIGNAL(positionChanged(double)), this, SLOT(updateOverlay()));
+		QObject::connect((const QObject *)symbol, SIGNAL(visibilityChanged(bool)), this, SLOT(updateOverlay()));
 
 		d_overlay->updateOverlay();
 	}
@@ -79,12 +68,8 @@ void SymbolController::attachSymbol(Symbol *symbol) {
 
 void SymbolController::detachSymbol(Symbol *symbol) {
 	d_symbols.removeOne(symbol);
-	QObject::disconnect((const QObject *)symbol,
-			    SIGNAL(positionChanged(double)), this,
-			    SLOT(updateOverlay()));
-	QObject::disconnect((const QObject *)symbol,
-			    SIGNAL(visibilityChanged(bool)), this,
-			    SLOT(updateOverlay()));
+	QObject::disconnect((const QObject *)symbol, SIGNAL(positionChanged(double)), this, SLOT(updateOverlay()));
+	QObject::disconnect((const QObject *)symbol, SIGNAL(visibilityChanged(bool)), this, SLOT(updateOverlay()));
 	d_overlay->updateOverlay();
 }
 
@@ -114,12 +99,10 @@ bool SymbolController::eventFilter(QObject *object, QEvent *event) {
 	if (plot && object == plot->canvas()) {
 		switch (event->type()) {
 		case QEvent::MouseButtonPress: {
-			const QMouseEvent *mouseEvent =
-				dynamic_cast<QMouseEvent *>(event);
+			const QMouseEvent *mouseEvent = dynamic_cast<QMouseEvent *>(event);
 
 			if (mouseEvent->button() == Qt::LeftButton) {
-				const bool accepted =
-					pressed(mouseEvent->pos());
+				const bool accepted = pressed(mouseEvent->pos());
 
 				if (accepted) {
 					d_overlay->updateOverlay();
@@ -130,8 +113,7 @@ bool SymbolController::eventFilter(QObject *object, QEvent *event) {
 			break;
 		}
 		case QEvent::MouseMove: {
-			const QMouseEvent *mouseEvent =
-				dynamic_cast<QMouseEvent *>(event);
+			const QMouseEvent *mouseEvent = dynamic_cast<QMouseEvent *>(event);
 			const bool accepted = moved(mouseEvent->pos());
 
 			if (accepted)
@@ -140,8 +122,7 @@ bool SymbolController::eventFilter(QObject *object, QEvent *event) {
 			break;
 		}
 		case QEvent::MouseButtonRelease: {
-			const QMouseEvent *mouseEvent =
-				dynamic_cast<QMouseEvent *>(event);
+			const QMouseEvent *mouseEvent = dynamic_cast<QMouseEvent *>(event);
 
 			if (mouseEvent->button() == Qt::LeftButton) {
 				released(mouseEvent->pos());
@@ -184,8 +165,7 @@ bool SymbolController::moved(const QPoint &pos) {
 		return false;
 
 	if (d_selectedSymbol && d_selectedSymbol->isSelected()) {
-		QPointF delta = d_selectedSymbol->invTransform(pos) -
-			d_selectedSymbol->invTransform(d_prevPos);
+		QPointF delta = d_selectedSymbol->invTransform(pos) - d_selectedSymbol->invTransform(d_prevPos);
 		bool moved = d_selectedSymbol->moveWith(delta.x(), delta.y());
 		if (moved)
 			d_prevPos = pos;
@@ -209,8 +189,6 @@ void SymbolController::drawCursor(QPainter *painter) const {
 			d_symbols[i]->draw(painter);
 }
 
-void SymbolController::drawOverlay(QPainter *painter) const {
-	drawCursor(painter);
-}
+void SymbolController::drawOverlay(QPainter *painter) const { drawCursor(painter); }
 
 QRegion SymbolController::maskHint() const { return QRegion(); }

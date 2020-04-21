@@ -35,8 +35,7 @@ class BitfieldWidget : public QWidget {
 	Q_OBJECT
 
 public:
-	explicit BitfieldWidget(QWidget *parent = 0,
-				QDomElement *bitfield = nullptr);
+	explicit BitfieldWidget(QWidget *parent = 0, QDomElement *bitfield = nullptr);
 	explicit BitfieldWidget(QWidget *parent, int bitNumber);
 
 	~BitfieldWidget();

@@ -29,8 +29,7 @@ class AutoScaler : public QObject {
 	Q_OBJECT;
 
 public:
-	explicit AutoScaler(QObject *parent, const QVector<QwtScaleDiv> &divs,
-			    unsigned int timeout_ms = 3000);
+	explicit AutoScaler(QObject *parent, const QVector<QwtScaleDiv> &divs, unsigned int timeout_ms = 3000);
 	~AutoScaler();
 
 Q_SIGNALS:

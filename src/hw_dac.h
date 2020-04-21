@@ -75,9 +75,7 @@ public:
 		M2K = 1,
 	};
 
-	static std::shared_ptr<GenericDac> newDac(DacType dac_type,
-						  struct iio_context *ctx,
-						  struct iio_device *dac) {
+	static std::shared_ptr<GenericDac> newDac(DacType dac_type, struct iio_context *ctx, struct iio_device *dac) {
 		switch (dac_type) {
 		case GENERIC:
 			return std::make_shared<GenericDac>(ctx, dac);

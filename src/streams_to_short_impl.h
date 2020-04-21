@@ -37,8 +37,7 @@ private:
 
 public:
 	streams_to_short_impl(size_t itemsize, size_t nstreams);
-	int work(int noutput_items, gr_vector_const_void_star &input_items,
-		 gr_vector_void_star &output_items);
+	int work(int noutput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items);
 };
 } // namespace adiscope
 #endif

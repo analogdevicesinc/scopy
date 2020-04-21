@@ -35,8 +35,8 @@ using namespace gr;
 std::map<const std::string, iio_manager::map_entry> iio_manager::dev_map;
 unsigned iio_manager::_id = 0;
 
-iio_manager::iio_manager(unsigned int block_id, struct iio_context *ctx,
-			 const std::string &_dev, unsigned long _buffer_size)
+iio_manager::iio_manager(unsigned int block_id, struct iio_context *ctx, const std::string &_dev,
+			 unsigned long _buffer_size)
 	: QObject(nullptr)
 	, top_block("IIO Manager " + std::to_string(block_id))
 	, id(block_id)
@@ -51,9 +51,8 @@ iio_manager::iio_manager(unsigned int block_id, struct iio_context *ctx,
 
 	unsigned int nb_channels = iio_device_get_channels_count(dev);
 
-	iio_block = iio::device_source::make_from(
-		ctx, _dev, std::vector<std::string>(), _dev,
-		std::vector<std::string>(), _buffer_size);
+	iio_block = iio::device_source::make_from(ctx, _dev, std::vector<std::string>(), _dev,
+						  std::vector<std::string>(), _buffer_size);
 
 	/* Avoid unconnected channel errors by connecting a dummy sink */
 	auto dummy_copy = blocks::copy::make(sizeof(short));
@@ -68,15 +67,13 @@ iio_manager::iio_manager(unsigned int block_id, struct iio_context *ctx,
 	auto timeout_b = gnuradio::get_initial_sptr(new timeout_block("msg"));
 	hier_block2::msg_connect(iio_block, "msg", timeout_b, "msg");
 
-	QObject::connect(&*timeout_b, SIGNAL(timeout()), this,
-			 SLOT(got_timeout()));
+	QObject::connect(&*timeout_b, SIGNAL(timeout()), this, SLOT(got_timeout()));
 }
 
 iio_manager::~iio_manager() {}
 
-boost::shared_ptr<iio_manager>
-iio_manager::get_instance(struct iio_context *ctx, const std::string &_dev,
-			  unsigned long buffer_size) {
+boost::shared_ptr<iio_manager> iio_manager::get_instance(struct iio_context *ctx, const std::string &_dev,
+							 unsigned long buffer_size) {
 	/* Search the dev_map if we already have a manager for the
 	 * given device */
 	if (!dev_map.empty()) {
@@ -97,16 +94,14 @@ iio_manager::get_instance(struct iio_context *ctx, const std::string &_dev,
 	boost::shared_ptr<iio_manager> shared_manager(manager);
 
 	/* Add it to the map */
-	auto it = dev_map.insert(
-		std::pair<const std::string, map_entry>(_dev, shared_manager));
+	auto it = dev_map.insert(std::pair<const std::string, map_entry>(_dev, shared_manager));
 	if (it.second == false)
 		it.first->second = shared_manager;
 
 	return shared_manager;
 }
 
-iio_manager::port_id iio_manager::connect(basic_block_sptr dst, int src_port,
-					  int dst_port, bool use_float,
+iio_manager::port_id iio_manager::connect(basic_block_sptr dst, int src_port, int dst_port, bool use_float,
 					  unsigned long _buffer_size) {
 	std::unique_lock<std::mutex> lock(copy_mutex);
 
@@ -173,8 +168,7 @@ void iio_manager::start(iio_manager::port_id copy) {
 	if (copy->enabled())
 		return;
 
-	qDebug(CAT_IIO_MANAGER)
-		<< "Enabling copy block" << copy->alias().c_str();
+	qDebug(CAT_IIO_MANAGER) << "Enabling copy block" << copy->alias().c_str();
 	copy->set_enabled(true);
 
 	update_buffer_size_unlocked();
@@ -194,13 +188,11 @@ void iio_manager::stop(iio_manager::port_id copy) {
 	if (!_started || !copy->enabled())
 		return;
 
-	qDebug(CAT_IIO_MANAGER)
-		<< "Disabling copy block" << copy->alias().c_str();
+	qDebug(CAT_IIO_MANAGER) << "Disabling copy block" << copy->alias().c_str();
 	copy->set_enabled(false);
 
 	/* Verify whether all blocks are disabled */
-	for (auto it = copy_blocks.cbegin(); !inuse && it != copy_blocks.cend();
-	     ++it)
+	for (auto it = copy_blocks.cbegin(); !inuse && it != copy_blocks.cend(); ++it)
 		inuse = it->first->enabled();
 
 	if (!inuse) {
@@ -219,8 +211,7 @@ void iio_manager::stop_all() {
 		stop(it->first);
 }
 
-void iio_manager::connect(gr::basic_block_sptr src, int src_port,
-			  gr::basic_block_sptr dst, int dst_port) {
+void iio_manager::connect(gr::basic_block_sptr src, int src_port, gr::basic_block_sptr dst, int dst_port) {
 	struct connection entry;
 	entry.src = src;
 	entry.dst = dst;
@@ -231,11 +222,9 @@ void iio_manager::connect(gr::basic_block_sptr src, int src_port,
 	hier_block2::connect(src, src_port, dst, dst_port);
 }
 
-void iio_manager::disconnect(basic_block_sptr src, int src_port,
-			     basic_block_sptr dst, int dst_port) {
+void iio_manager::disconnect(basic_block_sptr src, int src_port, basic_block_sptr dst, int dst_port) {
 	for (auto it = connections.begin(); it != connections.end(); ++it) {
-		if (it->src == src && it->dst == dst &&
-		    it->src_port == src_port && it->dst_port == dst_port) {
+		if (it->src == src && it->dst == dst && it->src_port == src_port && it->dst_port == dst_port) {
 			connections.erase(it);
 			break;
 		}
@@ -250,8 +239,7 @@ void iio_manager::del_connection(gr::basic_block_sptr block, bool reverse) {
 	do {
 		found = false;
 
-		for (auto it = connections.begin(); it != connections.end();
-		     ++it) {
+		for (auto it = connections.begin(); it != connections.end(); ++it) {
 			if (reverse) {
 				if (block != it->dst || it->src == iio_block)
 					continue;
@@ -260,15 +248,10 @@ void iio_manager::del_connection(gr::basic_block_sptr block, bool reverse) {
 			}
 
 			qDebug(CAT_IIO_MANAGER)
-				<< "Removing"
-				<< (reverse ? "backwards" : "forward")
-				<< "connection between"
-				<< it->src->alias().c_str() << "port"
-				<< it->src_port << "and"
-				<< it->dst->alias().c_str() << "port"
-				<< it->dst_port;
-			hier_block2::disconnect(it->src, it->src_port, it->dst,
-						it->dst_port);
+				<< "Removing" << (reverse ? "backwards" : "forward") << "connection between"
+				<< it->src->alias().c_str() << "port" << it->src_port << "and"
+				<< it->dst->alias().c_str() << "port" << it->dst_port;
+			hier_block2::disconnect(it->src, it->src_port, it->dst, it->dst_port);
 
 			auto src = it->src, dst = it->dst;
 			connections.erase(it);
@@ -285,8 +268,7 @@ void iio_manager::del_connection(gr::basic_block_sptr block, bool reverse) {
 		del_connection(block, false);
 }
 
-void iio_manager::set_buffer_size(iio_manager::port_id copy,
-				  unsigned long size) {
+void iio_manager::set_buffer_size(iio_manager::port_id copy, unsigned long size) {
 	std::unique_lock<std::mutex> lock(copy_mutex);
 
 	for (auto it = copy_blocks.begin(); it != copy_blocks.end(); ++it) {
@@ -301,6 +283,4 @@ void iio_manager::set_buffer_size(iio_manager::port_id copy,
 
 void iio_manager::got_timeout() { Q_EMIT timeout(); }
 
-void iio_manager::set_device_timeout(unsigned int mseconds) {
-	iio_block->set_timeout_ms(mseconds);
-}
+void iio_manager::set_device_timeout(unsigned int mseconds) { iio_block->set_timeout_ms(mseconds); }

@@ -2,8 +2,7 @@
 
 using namespace adiscope;
 
-NyquistPlotZoomer::NyquistPlotZoomer(QwtPolarCanvas *parent)
-	: QwtPolarMagnifier(parent), zoom_count(0) {}
+NyquistPlotZoomer::NyquistPlotZoomer(QwtPolarCanvas *parent) : QwtPolarMagnifier(parent), zoom_count(0) {}
 
 void NyquistPlotZoomer::zoomIn() {
 	QwtPolarMagnifier::rescale(0.8);

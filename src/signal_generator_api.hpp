@@ -12,49 +12,29 @@ class SignalGenerator_API : public ApiObject {
 	Q_PROPERTY(bool running READ running WRITE run STORED false);
 
 	Q_PROPERTY(QList<int> mode READ getMode WRITE setMode);
-	Q_PROPERTY(
-		QList<bool> enabled READ enabledChannels WRITE enableChannels)
-	Q_PROPERTY(QList<double> constant_volts READ getConstantValue WRITE
-			   setConstantValue);
-	Q_PROPERTY(QList<int> waveform_type READ getWaveformType WRITE
-			   setWaveformType);
-	Q_PROPERTY(QList<double> waveform_amplitude READ getWaveformAmpl WRITE
-			   setWaveformAmpl);
-	Q_PROPERTY(QList<double> waveform_frequency READ getWaveformFreq WRITE
-			   setWaveformFreq);
-	Q_PROPERTY(QList<double> waveform_offset READ getWaveformOfft WRITE
-			   setWaveformOfft);
-	Q_PROPERTY(QList<double> waveform_phase READ getWaveformPhase WRITE
-			   setWaveformPhase);
-	Q_PROPERTY(QList<double> math_frequency READ getMathFreq WRITE
-			   setMathFreq);
-	Q_PROPERTY(QList<QString> math_function READ getMathFunction WRITE
-			   setMathFunction);
-	Q_PROPERTY(QList<double> waveform_duty READ getWaveformDuty WRITE
-			   setWaveformDuty);
+	Q_PROPERTY(QList<bool> enabled READ enabledChannels WRITE enableChannels)
+	Q_PROPERTY(QList<double> constant_volts READ getConstantValue WRITE setConstantValue);
+	Q_PROPERTY(QList<int> waveform_type READ getWaveformType WRITE setWaveformType);
+	Q_PROPERTY(QList<double> waveform_amplitude READ getWaveformAmpl WRITE setWaveformAmpl);
+	Q_PROPERTY(QList<double> waveform_frequency READ getWaveformFreq WRITE setWaveformFreq);
+	Q_PROPERTY(QList<double> waveform_offset READ getWaveformOfft WRITE setWaveformOfft);
+	Q_PROPERTY(QList<double> waveform_phase READ getWaveformPhase WRITE setWaveformPhase);
+	Q_PROPERTY(QList<double> math_frequency READ getMathFreq WRITE setMathFreq);
+	Q_PROPERTY(QList<QString> math_function READ getMathFunction WRITE setMathFunction);
+	Q_PROPERTY(QList<double> waveform_duty READ getWaveformDuty WRITE setWaveformDuty);
 
 	Q_PROPERTY(QList<int> noise_type READ getNoiseType WRITE setNoiseType);
-	Q_PROPERTY(QList<double> noise_amplitude READ getNoiseAmpl WRITE
-			   setNoiseAmpl);
-	Q_PROPERTY(QList<double> waveform_rise READ getWaveformRise WRITE
-			   setWaveformRise);
-	Q_PROPERTY(QList<double> waveform_fall READ getWaveformFall WRITE
-			   setWaveformFall);
-	Q_PROPERTY(QList<double> waveform_holdhigh READ getWaveformHoldHigh
-			   WRITE setWaveformHoldHigh);
-	Q_PROPERTY(QList<double> waveform_holdlow READ getWaveformHoldLow WRITE
-			   setWaveformHoldLow);
+	Q_PROPERTY(QList<double> noise_amplitude READ getNoiseAmpl WRITE setNoiseAmpl);
+	Q_PROPERTY(QList<double> waveform_rise READ getWaveformRise WRITE setWaveformRise);
+	Q_PROPERTY(QList<double> waveform_fall READ getWaveformFall WRITE setWaveformFall);
+	Q_PROPERTY(QList<double> waveform_holdhigh READ getWaveformHoldHigh WRITE setWaveformHoldHigh);
+	Q_PROPERTY(QList<double> waveform_holdlow READ getWaveformHoldLow WRITE setWaveformHoldLow);
 
-	Q_PROPERTY(QList<QString> buffer_file_path READ getBufferFilePath WRITE
-			   setBufferFilePath)
-	Q_PROPERTY(QList<double> buffer_amplitude READ getBufferAmplitude WRITE
-			   setBufferAmplitude)
-	Q_PROPERTY(QList<double> buffer_offset READ getBufferOffset WRITE
-			   setBufferOffset)
-	Q_PROPERTY(QList<double> buffer_sample_rate READ getBufferSampleRate
-			   WRITE setBufferSampleRate)
-	Q_PROPERTY(QList<double> buffer_phase READ getBufferPhase WRITE
-			   setBufferPhase)
+	Q_PROPERTY(QList<QString> buffer_file_path READ getBufferFilePath WRITE setBufferFilePath)
+	Q_PROPERTY(QList<double> buffer_amplitude READ getBufferAmplitude WRITE setBufferAmplitude)
+	Q_PROPERTY(QList<double> buffer_offset READ getBufferOffset WRITE setBufferOffset)
+	Q_PROPERTY(QList<double> buffer_sample_rate READ getBufferSampleRate WRITE setBufferSampleRate)
+	Q_PROPERTY(QList<double> buffer_phase READ getBufferPhase WRITE setBufferPhase)
 
 public:
 	bool running() const;
@@ -120,8 +100,7 @@ public:
 
 	Q_INVOKABLE void show();
 
-	explicit SignalGenerator_API(SignalGenerator *gen)
-		: ApiObject(), gen(gen) {}
+	explicit SignalGenerator_API(SignalGenerator *gen) : ApiObject(), gen(gen) {}
 	~SignalGenerator_API() {}
 
 private:

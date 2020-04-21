@@ -46,8 +46,7 @@ class Tool : public QWidget {
 	Q_OBJECT
 
 public:
-	explicit Tool(struct iio_context *ctx, ToolMenuItem *toolMenuItem,
-		      ApiObject *api, const QString &name,
+	explicit Tool(struct iio_context *ctx, ToolMenuItem *toolMenuItem, ApiObject *api, const QString &name,
 		      ToolLauncher *parent);
 	~Tool();
 

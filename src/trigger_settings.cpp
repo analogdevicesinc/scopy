@@ -45,17 +45,14 @@ struct TriggerSettings::trigg_channel_config {
 	double dc_level;
 };
 
-const std::vector<std::pair<std::string, HardwareTrigger::out_select>>
-	TriggerSettings::externalTriggerOutMapping = {
-		//{"None", HardwareTrigger::out_select::sw_trigger},
-		{"Forward Trigger In",
-		 HardwareTrigger::out_select::trigger_i_swap_channel},
-		{"Oscilloscope", HardwareTrigger::out_select::trigger_adc},
-		{"Logic Analyzer", HardwareTrigger::out_select::trigger_in},
+const std::vector<std::pair<std::string, HardwareTrigger::out_select>> TriggerSettings::externalTriggerOutMapping = {
+	//{"None", HardwareTrigger::out_select::sw_trigger},
+	{"Forward Trigger In", HardwareTrigger::out_select::trigger_i_swap_channel},
+	{"Oscilloscope", HardwareTrigger::out_select::trigger_adc},
+	{"Logic Analyzer", HardwareTrigger::out_select::trigger_in},
 };
 
-TriggerSettings::TriggerSettings(std::shared_ptr<GenericAdc> adc,
-				 QWidget *parent)
+TriggerSettings::TriggerSettings(std::shared_ptr<GenericAdc> adc, QWidget *parent)
 	: QWidget(parent)
 	, ui(new Ui::TriggerSettings)
 	, adc(adc)
@@ -72,13 +69,11 @@ TriggerSettings::TriggerSettings(std::shared_ptr<GenericAdc> adc,
 		trigg_configs.push_back(config);
 	}
 
-	trigger_level = new PositionSpinButton(
-		{{"μVolts", 1e-6}, {"mVolts", 1e-3}, {"Volts", 1e0}}, "Level",
-		0.0, 0.0, true, false, this);
+	trigger_level = new PositionSpinButton({{"μVolts", 1e-6}, {"mVolts", 1e-3}, {"Volts", 1e0}}, "Level", 0.0, 0.0,
+					       true, false, this);
 
-	trigger_hysteresis = new PositionSpinButton(
-		{{"μVolts", 1e-6}, {"mVolts", 1e-3}, {"Volts", 1e0}},
-		"Hysteresis", 0.0, 0.0, true, false, this);
+	trigger_hysteresis = new PositionSpinButton({{"μVolts", 1e-6}, {"mVolts", 1e-3}, {"Volts", 1e0}}, "Hysteresis",
+						    0.0, 0.0, true, false, this);
 
 	ui->controlsLayout->addWidget(trigger_level);
 	ui->controlsLayout->addWidget(trigger_hysteresis);
@@ -92,27 +87,20 @@ TriggerSettings::TriggerSettings(std::shared_ptr<GenericAdc> adc,
 
 	auto m2k_adc = dynamic_pointer_cast<M2kAdc>(adc);
 	if (m2k_adc) {
-		auto adc_range = m2k_adc->inputRange(
-			m2k_adc->chnHwGainMode(current_channel));
-		auto hyst_range =
-			QPair<double, double>(0, adc_range.second / 10);
+		auto adc_range = m2k_adc->inputRange(m2k_adc->chnHwGainMode(current_channel));
+		auto hyst_range = QPair<double, double>(0, adc_range.second / 10);
 		setTriggerLevelRange(current_channel, adc_range);
 		setTriggerHystRange(current_channel, hyst_range);
 		if (trigger->hasExternalTriggerIn())
-			trigger->setExternalDirection(
-				0, HardwareTrigger::direction::TRIGGER_INPUT);
+			trigger->setExternalDirection(0, HardwareTrigger::direction::TRIGGER_INPUT);
 		if (trigger->hasExternalTriggerOut())
-			trigger->setExternalDirection(
-				1, HardwareTrigger::direction::TRIGGER_OUT);
+			trigger->setExternalDirection(1, HardwareTrigger::direction::TRIGGER_OUT);
 	}
 
-	connect(trigger_level, SIGNAL(valueChanged(double)),
-		SLOT(onSpinboxTriggerLevelChanged(double)));
-	connect(trigger_hysteresis, SIGNAL(valueChanged(double)),
-		SLOT(onSpinboxTriggerHystChanged(double)));
+	connect(trigger_level, SIGNAL(valueChanged(double)), SLOT(onSpinboxTriggerLevelChanged(double)));
+	connect(trigger_hysteresis, SIGNAL(valueChanged(double)), SLOT(onSpinboxTriggerHystChanged(double)));
 
-	connect(ui->btnTrigger, SIGNAL(clicked()), this,
-		SLOT(autoTriggerEnable()));
+	connect(ui->btnTrigger, SIGNAL(clicked()), this, SLOT(autoTriggerEnable()));
 
 	// Default GUI settings
 	ui->cmb_source->setCurrentIndex(0);
@@ -137,10 +125,8 @@ TriggerSettings::TriggerSettings(std::shared_ptr<GenericAdc> adc,
 
 	if (trigger->hasExternalTriggerOut()) {
 		for (const auto &val : externalTriggerOutMapping) {
-			ui->cmb_extern_to_src->addItem(
-				QString::fromStdString(val.first));
-			connect(ui->extern_to_en, SIGNAL(toggled(bool)),
-				ui->cmb_extern_to_src, SLOT(setEnabled(bool)));
+			ui->cmb_extern_to_src->addItem(QString::fromStdString(val.first));
+			connect(ui->extern_to_en, SIGNAL(toggled(bool)), ui->cmb_extern_to_src, SLOT(setEnabled(bool)));
 		}
 	} else {
 		ui->cmb_extern_to_src->addItem("None");
@@ -151,8 +137,7 @@ TriggerSettings::TriggerSettings(std::shared_ptr<GenericAdc> adc,
 	trigger_level->setValue(0);
 	m_ac_coupled = false;
 	trigger_hysteresis->setValue(50e-3);
-	MouseWheelWidgetGuard *wheelEventGuard =
-		new MouseWheelWidgetGuard(this);
+	MouseWheelWidgetGuard *wheelEventGuard = new MouseWheelWidgetGuard(this);
 	wheelEventGuard->installEventRecursively(this);
 }
 
@@ -165,31 +150,23 @@ TriggerSettings::~TriggerSettings() {
 
 int TriggerSettings::currentChannel() const { return current_channel; }
 
-bool TriggerSettings::analogEnabled() const {
-	return ui->intern_en->isChecked();
-}
+bool TriggerSettings::analogEnabled() const { return ui->intern_en->isChecked(); }
 
-bool TriggerSettings::digitalEnabled() const {
-	return ui->extern_en->isChecked();
-}
+bool TriggerSettings::digitalEnabled() const { return ui->extern_en->isChecked(); }
 
-bool TriggerSettings::externalOutEnabled() const {
-	return ui->extern_to_en->isChecked();
-}
+bool TriggerSettings::externalOutEnabled() const { return ui->extern_to_en->isChecked(); }
 
 double TriggerSettings::level() const { return trigger_level->value(); }
 
 long long TriggerSettings::triggerDelay() const { return trigger_raw_delay; }
 
-double TriggerSettings::dcLevel() const {
-	return trigg_configs[current_channel].dc_level;
-}
+double TriggerSettings::dcLevel() const { return trigg_configs[current_channel].dc_level; }
 
 void TriggerSettings::setDaisyChainCompensation() {
 	const long long DELAY_PER_DEVICE = 23;
 	if (ui->extern_en->isChecked())
-		daisyChainCompensation = ui->spin_daisyChain->value() *
-			DELAY_PER_DEVICE; // if not enabled -> compensation 0
+		daisyChainCompensation =
+			ui->spin_daisyChain->value() * DELAY_PER_DEVICE; // if not enabled -> compensation 0
 	else
 		daisyChainCompensation = 0;
 }
@@ -197,8 +174,7 @@ void TriggerSettings::setDaisyChainCompensation() {
 void TriggerSettings::setTriggerDelay(long long raw_delay) {
 	static long long oldCompensation = 0;
 	setDaisyChainCompensation();
-	if ((trigger_raw_delay + oldCompensation) !=
-	    (raw_delay + daisyChainCompensation)) {
+	if ((trigger_raw_delay + oldCompensation) != (raw_delay + daisyChainCompensation)) {
 		trigger_raw_delay = raw_delay;
 		oldCompensation = daisyChainCompensation;
 		delay_hw_write(raw_delay + daisyChainCompensation);
@@ -268,13 +244,9 @@ void TriggerSettings::onSpinboxTriggerHystChanged(double value) {
 	trigg_configs[current_channel].hyst_val = value;
 }
 
-void TriggerSettings::on_cmb_condition_currentIndexChanged(int index) {
-	analog_cond_hw_write(index);
-}
+void TriggerSettings::on_cmb_condition_currentIndexChanged(int index) { analog_cond_hw_write(index); }
 
-void TriggerSettings::on_cmb_extern_condition_currentIndexChanged(int index) {
-	digital_cond_hw_write(index);
-}
+void TriggerSettings::on_cmb_extern_condition_currentIndexChanged(int index) { digital_cond_hw_write(index); }
 
 void TriggerSettings::on_cmb_extern_to_src_currentIndexChanged(int index) {
 	enableExternalTriggerOut(ui->extern_to_en->isChecked());
@@ -300,9 +272,7 @@ void TriggerSettings::on_extern_to_en_toggled(bool checked) {
 	setTriggerDelay(trigger_raw_delay);
 }
 
-HardwareTrigger::mode
-TriggerSettings::determineTriggerMode(bool intern_checked,
-				      bool extern_checked) const {
+HardwareTrigger::mode TriggerSettings::determineTriggerMode(bool intern_checked, bool extern_checked) const {
 	HardwareTrigger::mode mode;
 
 	if (intern_checked) {
@@ -329,15 +299,10 @@ void TriggerSettings::enableExternalTriggerOut(bool enabled) {
 	const int TRIGGER_OUT_PIN = 1;
 
 	if (enabled)
-		trigger->setExternalOutSelect(
-			TRIGGER_OUT_PIN,
-			externalTriggerOutMapping[ui->cmb_extern_to_src
-							  ->currentIndex()]
-				.second);
+		trigger->setExternalOutSelect(TRIGGER_OUT_PIN,
+					      externalTriggerOutMapping[ui->cmb_extern_to_src->currentIndex()].second);
 	else
-		trigger->setExternalOutSelect(
-			TRIGGER_OUT_PIN,
-			HardwareTrigger::out_select::sw_trigger);
+		trigger->setExternalOutSelect(TRIGGER_OUT_PIN, HardwareTrigger::out_select::sw_trigger);
 }
 
 void TriggerSettings::ui_reconf_on_intern_toggled(bool checked) {
@@ -381,18 +346,14 @@ void TriggerSettings::autoTriggerDisable() {
 void TriggerSettings::autoTriggerEnable() {
 	if (!ui->btnTrigger->isChecked()) {
 		if (temporarily_disabled) {
-			mode_hw_write(determineTriggerMode(
-				ui->intern_en->isChecked(),
-				ui->extern_en->isChecked()));
+			mode_hw_write(determineTriggerMode(ui->intern_en->isChecked(), ui->extern_en->isChecked()));
 
 			temporarily_disabled = false;
 		}
 	}
 }
 
-bool TriggerSettings::triggerIsArmed() const {
-	return ui->intern_en->isChecked() || ui->extern_en->isChecked();
-}
+bool TriggerSettings::triggerIsArmed() const { return ui->intern_en->isChecked() || ui->extern_en->isChecked(); }
 
 void TriggerSettings::on_btnAuto_toggled(bool checked) {
 	trigger_auto_mode = checked;
@@ -414,16 +375,14 @@ void TriggerSettings::updateHwVoltLevels(int chnIdx) {
 		int rawValue = (int)adc->convVoltsToSample(chnIdx, level);
 		trigger->setLevel(chnIdx, rawValue);
 
-		rawValue = (int)adc->convVoltsDiffToSampleDiff(
-			chnIdx, trigg_configs[chnIdx].hyst_val);
+		rawValue = (int)adc->convVoltsDiffToSampleDiff(chnIdx, trigg_configs[chnIdx].hyst_val);
 		trigger->setHysteresis(chnIdx, rawValue);
 	} catch (std::exception &e) {
 		qDebug() << e.what();
 	}
 }
 
-void TriggerSettings::setTriggerLevelRange(int chn,
-					   const QPair<double, double> &range) {
+void TriggerSettings::setTriggerLevelRange(int chn, const QPair<double, double> &range) {
 	trigg_configs[chn].level_min = range.first;
 	trigg_configs[chn].level_max = range.second;
 
@@ -433,8 +392,7 @@ void TriggerSettings::setTriggerLevelRange(int chn,
 	}
 }
 
-void TriggerSettings::setTriggerHystRange(int chn,
-					  const QPair<double, double> &range) {
+void TriggerSettings::setTriggerHystRange(int chn, const QPair<double, double> &range) {
 	trigg_configs[chn].hyst_min = range.first;
 	trigg_configs[chn].hyst_max = range.second;
 
@@ -483,16 +441,14 @@ void TriggerSettings::write_ui_settings_to_hawrdware() {
 
 	setDaisyChainCompensation();
 	source_hw_write(ui->cmb_source->currentIndex());
-	mode_hw_write(determineTriggerMode(ui->intern_en->isChecked(),
-					   ui->extern_en->isChecked()));
+	mode_hw_write(determineTriggerMode(ui->intern_en->isChecked(), ui->extern_en->isChecked()));
 	analog_cond_hw_write(ui->cmb_condition->currentIndex());
 	if (ui->cmb_extern_src->currentIndex() == 0)
 		extern_cnd = ui->cmb_extern_condition->currentIndex();
 	else
-		extern_cnd =
-			HardwareTrigger::FALLING_EDGE; // when logic analyzer is
-						       // selected set condition
-						       // to falling edge
+		extern_cnd = HardwareTrigger::FALLING_EDGE; // when logic analyzer is
+							    // selected set condition
+							    // to falling edge
 	digital_cond_hw_write(extern_cnd);
 	level_hw_write(trigger_level->value());
 	hysteresis_hw_write(trigger_hysteresis->value());
@@ -501,10 +457,8 @@ void TriggerSettings::write_ui_settings_to_hawrdware() {
 
 void TriggerSettings::setupExternalTriggerDirection() {
 	try {
-		trigger->setExternalDirection(
-			0, HardwareTrigger::direction::TRIGGER_INPUT);
-		trigger->setExternalDirection(
-			1, HardwareTrigger::direction::TRIGGER_OUT);
+		trigger->setExternalDirection(0, HardwareTrigger::direction::TRIGGER_INPUT);
+		trigger->setExternalDirection(1, HardwareTrigger::direction::TRIGGER_OUT);
 	} catch (std::exception &e) {
 		qDebug() << e.what();
 	}
@@ -525,8 +479,7 @@ void TriggerSettings::level_hw_write(double level) {
 		if (m_ac_coupled) {
 			level = level + trigg_configs[current_channel].dc_level;
 		}
-		int rawValue =
-			(int)adc->convVoltsToSample(current_channel, level);
+		int rawValue = (int)adc->convVoltsToSample(current_channel, level);
 
 		try {
 			trigger->setLevel(current_channel, rawValue);
@@ -538,8 +491,7 @@ void TriggerSettings::level_hw_write(double level) {
 
 void TriggerSettings::hysteresis_hw_write(double level) {
 	if (adc_running) {
-		int rawValue = (int)adc->convVoltsDiffToSampleDiff(
-			current_channel, level);
+		int rawValue = (int)adc->convVoltsDiffToSampleDiff(current_channel, level);
 
 		try {
 			trigger->setHysteresis(current_channel, rawValue);
@@ -551,8 +503,7 @@ void TriggerSettings::hysteresis_hw_write(double level) {
 
 void TriggerSettings::analog_cond_hw_write(int cond) {
 	if (adc_running) {
-		HardwareTrigger::condition t_cond =
-			static_cast<HardwareTrigger::condition>(cond);
+		HardwareTrigger::condition t_cond = static_cast<HardwareTrigger::condition>(cond);
 
 		try {
 			trigger->setAnalogCondition(current_channel, t_cond);
@@ -564,8 +515,7 @@ void TriggerSettings::analog_cond_hw_write(int cond) {
 
 void TriggerSettings::digital_cond_hw_write(int cond) {
 	if (adc_running) {
-		HardwareTrigger::condition t_cond =
-			static_cast<HardwareTrigger::condition>(cond);
+		HardwareTrigger::condition t_cond = static_cast<HardwareTrigger::condition>(cond);
 
 		try {
 			trigger->setDigitalCondition(current_channel, t_cond);
@@ -578,9 +528,7 @@ void TriggerSettings::digital_cond_hw_write(int cond) {
 void TriggerSettings::mode_hw_write(int mode) {
 	if (adc_running) {
 		try {
-			trigger->setTriggerMode(
-				current_channel,
-				static_cast<HardwareTrigger::mode>(mode));
+			trigger->setTriggerMode(current_channel, static_cast<HardwareTrigger::mode>(mode));
 		} catch (std::exception &e) {
 			qDebug() << e.what();
 		}
@@ -598,19 +546,15 @@ void TriggerSettings::on_cmb_extern_src_currentIndexChanged(int idx) {
 void TriggerSettings::source_hw_write(int source) {
 	if (adc_running) {
 		try {
-			trigger->setSourceChannel(
-				source,
-				ui->intern_en->isChecked(), // analog trigger on
-				(ui->extern_en->isChecked() &&
-				 ui->cmb_extern_src->currentIndex() ==
-					 0)); // extern trigger on & ext trigger
-					      // in
+			trigger->setSourceChannel(source,
+						  ui->intern_en->isChecked(), // analog trigger on
+						  (ui->extern_en->isChecked() &&
+						   ui->cmb_extern_src->currentIndex() == 0)); // extern trigger on & ext
+											      // trigger in
 		} catch (std::exception &e) {
 			qDebug() << e.what();
 		}
 	}
 }
 
-void adiscope::TriggerSettings::on_spin_daisyChain_valueChanged(int arg1) {
-	setTriggerDelay(trigger_raw_delay);
-}
+void adiscope::TriggerSettings::on_spin_daisyChain_valueChanged(int arg1) { setTriggerDelay(trigger_raw_delay); }

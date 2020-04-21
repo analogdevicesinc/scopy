@@ -28,15 +28,11 @@
 using namespace adiscope;
 
 RunSingleWidget::RunSingleWidget(QWidget *parent)
-	: QWidget(parent)
-	, d_ui(new Ui::RunSingleWidget)
-	, d_singleButtonEnabled(true) {
+	: QWidget(parent), d_ui(new Ui::RunSingleWidget), d_singleButtonEnabled(true) {
 	d_ui->setupUi(this);
 
-	connect(d_ui->runButton, &QPushButton::toggled, this,
-		&RunSingleWidget::_toggle);
-	connect(d_ui->singleButton, &QPushButton::toggled, this,
-		&RunSingleWidget::_toggle);
+	connect(d_ui->runButton, &QPushButton::toggled, this, &RunSingleWidget::_toggle);
+	connect(d_ui->singleButton, &QPushButton::toggled, this, &RunSingleWidget::_toggle);
 }
 
 RunSingleWidget::~RunSingleWidget() { delete d_ui; }
@@ -47,17 +43,11 @@ void RunSingleWidget::enableSingleButton(bool enable) {
 	d_singleButtonEnabled = enable;
 }
 
-bool RunSingleWidget::singleButtonEnabled() const {
-	return d_singleButtonEnabled;
-}
+bool RunSingleWidget::singleButtonEnabled() const { return d_singleButtonEnabled; }
 
-bool RunSingleWidget::singleButtonChecked() const {
-	return d_ui->singleButton->isChecked();
-}
+bool RunSingleWidget::singleButtonChecked() const { return d_ui->singleButton->isChecked(); }
 
-bool RunSingleWidget::runButtonChecked() const {
-	return d_ui->runButton->isChecked();
-}
+bool RunSingleWidget::runButtonChecked() const { return d_ui->runButton->isChecked(); }
 
 void RunSingleWidget::toggle(bool checked) {
 	if (!checked) {

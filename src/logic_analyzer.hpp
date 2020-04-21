@@ -97,8 +97,7 @@ public:
 		Stream,
 	};
 
-	explicit LogicAnalyzer(struct iio_context *ctx, Filter *filt,
-			       ToolMenuItem *toolMenuItem, QJSEngine *engine,
+	explicit LogicAnalyzer(struct iio_context *ctx, Filter *filt, ToolMenuItem *toolMenuItem, QJSEngine *engine,
 			       ToolLauncher *parent, bool offline_mode_ = 0);
 	~LogicAnalyzer();
 	void updateAreaTimeTrigger();
@@ -186,8 +185,7 @@ private:
 	double trigger_offset;
 
 	static std::vector<std::string> trigger_mapping;
-	static std::vector<std::pair<std::string, std::string>>
-		externalTriggerSourceMap;
+	static std::vector<std::pair<std::string, std::string>> externalTriggerSourceMap;
 	std::vector<std::string> trigger_cache;
 
 	ScaleSpinButton *timeBase;

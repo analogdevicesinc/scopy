@@ -83,10 +83,8 @@ class NetworkAnalyzer : public Tool {
 	Q_OBJECT
 
 public:
-	explicit NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
-				 std::shared_ptr<GenericAdc> &adc_dev,
-				 QList<std::shared_ptr<GenericDac>> dacs,
-				 ToolMenuItem *toolMenuItem, QJSEngine *engine,
+	explicit NetworkAnalyzer(struct iio_context *ctx, Filter *filt, std::shared_ptr<GenericAdc> &adc_dev,
+				 QList<std::shared_ptr<GenericDac>> dacs, ToolMenuItem *toolMenuItem, QJSEngine *engine,
 				 ToolLauncher *parent);
 	~NetworkAnalyzer();
 
@@ -117,13 +115,9 @@ private:
 	bool wasChecked;
 
 	typedef struct NetworkAnalyzerIteration {
-		NetworkAnalyzerIteration()
-			: frequency(0), rate(0), bufferSize(0) {}
-		NetworkAnalyzerIteration(double frequency, size_t rate,
-					 size_t bufferSize)
-			: frequency(frequency)
-			, rate(rate)
-			, bufferSize(bufferSize) {}
+		NetworkAnalyzerIteration() : frequency(0), rate(0), bufferSize(0) {}
+		NetworkAnalyzerIteration(double frequency, size_t rate, size_t bufferSize)
+			: frequency(frequency), rate(rate), bufferSize(bufferSize) {}
 
 		double frequency;
 		size_t rate;
@@ -131,16 +125,9 @@ private:
 	} networkIteration;
 
 	typedef struct NetworkAnalyzerIterationStats {
-		NetworkAnalyzerIterationStats(double dcVoltage,
-					      M2kAdc::GainMode gain,
-					      bool hasError)
-			: dcVoltage(dcVoltage)
-			, gain(gain)
-			, hasError(hasError) {}
-		NetworkAnalyzerIterationStats()
-			: dcVoltage(0)
-			, gain(M2kAdc::LOW_GAIN_MODE)
-			, hasError(false) {}
+		NetworkAnalyzerIterationStats(double dcVoltage, M2kAdc::GainMode gain, bool hasError)
+			: dcVoltage(dcVoltage), gain(gain), hasError(hasError) {}
+		NetworkAnalyzerIterationStats() : dcVoltage(0), gain(M2kAdc::LOW_GAIN_MODE), hasError(false) {}
 
 		double dcVoltage;
 		M2kAdc::GainMode gain;
@@ -213,8 +200,7 @@ private:
 	PositionSpinButton *pushDelay;
 	PositionSpinButton *captureDelay;
 
-	void setMinimumDistanceBetween(SpinBoxA *min, SpinBoxA *max,
-				       double distance);
+	void setMinimumDistanceBetween(SpinBoxA *min, SpinBoxA *max, double distance);
 
 	HorizHandlesArea *d_bottomHandlesArea;
 
@@ -232,42 +218,34 @@ private:
 
 	void goertzel();
 
-	struct iio_buffer *generateSinWave(const struct iio_device *dev,
-					   double frequency, double amplitude,
-					   double offset, unsigned long rate,
-					   size_t samples_count);
+	struct iio_buffer *generateSinWave(const struct iio_device *dev, double frequency, double amplitude,
+					   double offset, unsigned long rate, size_t samples_count);
 
 	void configHwForNetworkAnalyzing();
 
 	void triggerRightMenuToggle(CustomPushButton *btn, bool checked);
 	void toggleRightMenu(CustomPushButton *btn, bool checked);
 	void updateGainMode();
-	void computeCaptureParams(double frequency, size_t &buffer_size,
-				  size_t &adc_rate);
+	void computeCaptureParams(double frequency, size_t &buffer_size, size_t &adc_rate);
 
 	QPair<double, double> getPhaseInterval();
 	void computeIterations();
 
-	double autoUpdateGainMode(double magnitude, double magnitudeGain,
-				  float dcVoltage);
+	double autoUpdateGainMode(double magnitude, double magnitudeGain, float dcVoltage);
 
 	void _configureDacFlowgraph();
 
 	void _configureAdcFlowgraph(size_t bufferSize = 0);
-	unsigned long _getBestSampleRate(double frequency,
-					 const iio_device *dev);
-	size_t _getSamplesCount(double frequency, unsigned long rate,
-				bool perfect = false);
+	unsigned long _getBestSampleRate(double frequency, const iio_device *dev);
+	size_t _getSamplesCount(double frequency, unsigned long rate, bool perfect = false);
 	void computeFrequencyArray();
 
 	bool _checkMagForOverrange(double magnitude);
 private Q_SLOTS:
 	void startStop(bool start);
 	void updateNumSamples(bool force = false);
-	void plot(double frequency, double mag, double mag2, double phase,
-		  float dcVoltage);
-	void _saveChannelBuffers(double frequency, double sample_rate,
-				 std::vector<float> data1,
+	void plot(double frequency, double mag, double mag2, double phase, float dcVoltage);
+	void _saveChannelBuffers(double frequency, double sample_rate, std::vector<float> data1,
 				 std::vector<float> data2);
 
 	void toggleCursors(bool en);

@@ -27,37 +27,26 @@ static inline long double qwtIntervalWidthL(const QwtInterval &interval) {
 	if (!interval.isValid())
 		return 0.0;
 
-	return static_cast<long double>(interval.maxValue()) -
-		static_cast<long double>(interval.minValue());
+	return static_cast<long double>(interval.maxValue()) - static_cast<long double>(interval.minValue());
 }
 
-OscScaleEngine::OscScaleEngine()
-	: QwtLinearScaleEngine(10)
-	, m_majorTicks(11)
-	, m_minorTicks(9)
-	, m_showZero(false) {}
+OscScaleEngine::OscScaleEngine() : QwtLinearScaleEngine(10), m_majorTicks(11), m_minorTicks(9), m_showZero(false) {}
 
 OscScaleEngine::~OscScaleEngine() {}
 
-void OscScaleEngine::setMajorTicksCount(uint majorTicks) {
-	m_majorTicks = majorTicks;
-}
+void OscScaleEngine::setMajorTicksCount(uint majorTicks) { m_majorTicks = majorTicks; }
 
 uint OscScaleEngine::majorTicksCount() { return m_majorTicks; }
 
-void OscScaleEngine::setMinorTicksCount(uint minorTicks) {
-	m_minorTicks = minorTicks;
-}
+void OscScaleEngine::setMinorTicksCount(uint minorTicks) { m_minorTicks = minorTicks; }
 
 uint OscScaleEngine::minorTicksCount() { return m_minorTicks; }
 void OscScaleEngine::showZero(bool en) { m_showZero = en; }
 void OscScaleEngine::autoScale(int maxSteps, double &x1, double &x2,
-			       double &stepSize) const {
-	// No implementation is needed for now
-	Q_UNUSED(maxSteps) Q_UNUSED(x1) Q_UNUSED(x2) Q_UNUSED(stepSize)}
+			       double &stepSize) const {// No implementation is needed for now
+							Q_UNUSED(maxSteps) Q_UNUSED(x1) Q_UNUSED(x2) Q_UNUSED(stepSize)}
 
-QwtScaleDiv OscScaleEngine::divideScale(double x1, double x2, int maxMajorSteps,
-					int maxMinorSteps,
+QwtScaleDiv OscScaleEngine::divideScale(double x1, double x2, int maxMajorSteps, int maxMinorSteps,
 					double stepSize) const {
 	Q_UNUSED(maxMajorSteps);
 
@@ -86,14 +75,12 @@ QwtScaleDiv OscScaleEngine::divideScale(double x1, double x2, int maxMajorSteps,
 	return scaleDiv;
 }
 
-void OscScaleEngine::buildTicks(
-	const QwtInterval &interval, double stepSize, int maxMinorSteps,
-	QList<double> ticks[QwtScaleDiv::NTickTypes]) const {
+void OscScaleEngine::buildTicks(const QwtInterval &interval, double stepSize, int maxMinorSteps,
+				QList<double> ticks[QwtScaleDiv::NTickTypes]) const {
 	ticks[QwtScaleDiv::MajorTick] = buildMajorTicks(interval, stepSize);
 
 	if (maxMinorSteps > 0) {
-		buildMinorTicks(ticks[QwtScaleDiv::MajorTick], maxMinorSteps,
-				stepSize, ticks[QwtScaleDiv::MinorTick],
+		buildMinorTicks(ticks[QwtScaleDiv::MajorTick], maxMinorSteps, stepSize, ticks[QwtScaleDiv::MinorTick],
 				ticks[QwtScaleDiv::MediumTick]);
 	}
 
@@ -110,10 +97,8 @@ void OscScaleEngine::buildTicks(
 	}
 }
 
-void OscScaleEngine::buildMinorTicks(const QList<double> &majorTicks,
-				     int maxMinorSteps, double stepSize,
-				     QList<double> &minorTicks,
-				     QList<double> &mediumTicks) const {
+void OscScaleEngine::buildMinorTicks(const QList<double> &majorTicks, int maxMinorSteps, double stepSize,
+				     QList<double> &minorTicks, QList<double> &mediumTicks) const {
 	Q_UNUSED(maxMinorSteps)
 
 	int num_steps = m_minorTicks + 1;
@@ -159,8 +144,7 @@ void OscScaleEngine::buildMinorTicks(const QList<double> &majorTicks,
 	}
 }
 
-QList<double> OscScaleEngine::buildMajorTicks(const QwtInterval &interval,
-					      double stepSize) const {
+QList<double> OscScaleEngine::buildMajorTicks(const QwtInterval &interval, double stepSize) const {
 	if (m_showZero && interval.minValue() < 0 && interval.maxValue() > 0) {
 		QList<double> majorTicks;
 

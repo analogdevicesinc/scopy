@@ -9,10 +9,7 @@
 using namespace adiscope;
 
 ExportSettings::ExportSettings(QWidget *parent)
-	: QWidget(parent)
-	, ui(new Ui::ExportSettings)
-	, exportChannels(nullptr)
-	, nr_channels(0) {
+	: QWidget(parent), ui(new Ui::ExportSettings), exportChannels(nullptr), nr_channels(0) {
 	ui->setupUi(this);
 
 	exportChannels = new DropdownSwitchList();
@@ -37,8 +34,7 @@ ExportSettings::~ExportSettings() { delete ui; }
 void ExportSettings::addChannel(int id, QString name) {
 	exportChannels->addDropdownElement(QIcon(""), name, QVariant(id));
 	nr_channels++;
-	QStandardItemModel *model =
-		static_cast<QStandardItemModel *>(exportChannels->model());
+	QStandardItemModel *model = static_cast<QStandardItemModel *>(exportChannels->model());
 	model->item(id, 1)->setData(QVariant((int)true), Qt::EditRole);
 }
 
@@ -67,8 +63,7 @@ void ExportSettings::onExportChannelChanged(QStandardItem *item) {
 }
 
 void ExportSettings::checkIfAllActivated() {
-	QStandardItemModel *model =
-		static_cast<QStandardItemModel *>(exportChannels->model());
+	QStandardItemModel *model = static_cast<QStandardItemModel *>(exportChannels->model());
 	bool ok = true;
 	for (int i = 0; i < nr_channels; i++) {
 		if (!model->item(i, 1)->data(Qt::EditRole).toBool()) {
@@ -84,8 +79,7 @@ QPushButton *ExportSettings::getExportButton() { return ui->btnExport; }
 QPushButton *ExportSettings::getExportAllButton() { return ui->btnExportAll; }
 
 QMap<int, bool> ExportSettings::getExportConfig() {
-	QStandardItemModel *model =
-		static_cast<QStandardItemModel *>(exportChannels->model());
+	QStandardItemModel *model = static_cast<QStandardItemModel *>(exportChannels->model());
 	QMap<int, bool> result;
 	for (int i = 0; i < nr_channels; i++) {
 		result[i] = model->item(i, 1)->data(Qt::EditRole).toBool();
@@ -94,42 +88,33 @@ QMap<int, bool> ExportSettings::getExportConfig() {
 }
 
 void ExportSettings::setExportConfig(QMap<int, bool> config) {
-	QStandardItemModel *model =
-		static_cast<QStandardItemModel *>(exportChannels->model());
+	QStandardItemModel *model = static_cast<QStandardItemModel *>(exportChannels->model());
 	for (int key : config.keys()) {
-		model->item(key, 1)->setData(QVariant((int)config[key]),
-					     Qt::EditRole);
+		model->item(key, 1)->setData(QVariant((int)config[key]), Qt::EditRole);
 	}
 }
 
 void ExportSettings::on_btnExportAll_clicked() {
-	QStandardItemModel *model =
-		static_cast<QStandardItemModel *>(exportChannels->model());
+	QStandardItemModel *model = static_cast<QStandardItemModel *>(exportChannels->model());
 	if (ui->btnExportAll->isChecked()) {
 		oldSettings = getExportConfig();
 		for (int i = 0; i < model->rowCount(); i++) {
-			model->item(i, 1)->setData(QVariant((int)true),
-						   Qt::EditRole);
+			model->item(i, 1)->setData(QVariant((int)true), Qt::EditRole);
 		}
 	} else {
 		if (!oldSettings.empty())
 			for (int i = 0; i < model->rowCount(); i++) {
-				model->item(i, 1)->setData(
-					QVariant((int)oldSettings[i]),
-					Qt::EditRole);
+				model->item(i, 1)->setData(QVariant((int)oldSettings[i]), Qt::EditRole);
 			}
 		else {
 			for (int i = 0; i < model->rowCount(); i++) {
-				model->item(i, 1)->setData(QVariant((int)false),
-							   Qt::EditRole);
+				model->item(i, 1)->setData(QVariant((int)false), Qt::EditRole);
 			}
 		}
 	}
 }
 
-void ExportSettings::enableExportButton(bool on) {
-	ui->btnExport->setEnabled(on);
-}
+void ExportSettings::enableExportButton(bool on) { ui->btnExport->setEnabled(on); }
 
 void ExportSettings::disableUIMargins() { ui->verticalLayout_3->setMargin(0); }
 
@@ -138,6 +123,4 @@ void ExportSettings::setTitleLabelVisible(bool enabled) {
 	ui->line->setVisible(enabled);
 }
 
-void ExportSettings::setExportAllButtonLabel(const QString &text) {
-	ui->label_3->setText(text);
-}
+void ExportSettings::setExportAllButtonLabel(const QString &text) { ui->label_3->setText(text); }

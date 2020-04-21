@@ -42,15 +42,11 @@ public:
 	ConstellationDisplayPlot(int nplots, QWidget *);
 	virtual ~ConstellationDisplayPlot();
 
-	void plotNewData(const std::vector<double *> &realDataPoints,
-			 const std::vector<double *> &imagDataPoints,
-			 const int64_t numDataPoints,
-			 const double timeInterval);
+	void plotNewData(const std::vector<double *> &realDataPoints, const std::vector<double *> &imagDataPoints,
+			 const int64_t numDataPoints, const double timeInterval);
 
 	// Old method to be removed
-	void plotNewData(const double *realDataPoints,
-			 const double *imagDataPoints,
-			 const int64_t numDataPoints,
+	void plotNewData(const double *realDataPoints, const double *imagDataPoints, const int64_t numDataPoints,
 			 const double timeInterval);
 
 	void replot();

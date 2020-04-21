@@ -32,8 +32,7 @@ QVector<QString> HardwareTrigger::lut_trigg_mode = {
 QVector<QString> HardwareTrigger::lut_digital_out_direction = {"in", "out"};
 
 QVector<QString> HardwareTrigger::lut_digital_out_select = {
-	"sw-trigger",  "trigger-i-same-chn", "trigger-i-swap-chn",
-	"trigger-adc", "trigger-in",
+	"sw-trigger", "trigger-i-same-chn", "trigger-i-swap-chn", "trigger-adc", "trigger-in",
 };
 
 // This is still not generic. It is specific to only 2 channels!
@@ -52,8 +51,7 @@ QVector<QString> HardwareTrigger::lut_trigg_source = {
 
 typedef QPair<struct iio_channel *, QString> channel_pair;
 
-HardwareTrigger::HardwareTrigger(struct iio_device *trigg_dev)
-	: m_trigger_device(trigg_dev) {
+HardwareTrigger::HardwareTrigger(struct iio_device *trigg_dev) : m_trigger_device(trigg_dev) {
 	if (!trigg_dev) {
 		throw std::invalid_argument("trigger_device=NULL");
 	}
@@ -71,20 +69,15 @@ HardwareTrigger::HardwareTrigger(struct iio_device *trigg_dev)
 		QPair<struct iio_channel *, QString> chn_pair(chn, name);
 		channels.push_back(chn_pair);
 	}
-	std::sort(channels.begin(), channels.end(),
-		  [](channel_pair a, channel_pair b) {
-			  return a.second < b.second;
-		  });
+	std::sort(channels.begin(), channels.end(), [](channel_pair a, channel_pair b) { return a.second < b.second; });
 
 	// Pick the analog, digital, trigger_logic and delay channels
 	for (int i = 0; i < channels.size(); i++) {
 		struct iio_channel *chn = channels[i].first;
 		bool mode = iio_channel_find_attr(chn, "mode");
 		bool trigger = iio_channel_find_attr(chn, "trigger");
-		bool trigger_level =
-			iio_channel_find_attr(chn, "trigger_level");
-		bool trigger_hysteresis =
-			iio_channel_find_attr(chn, "trigger_hysteresis");
+		bool trigger_level = iio_channel_find_attr(chn, "trigger_level");
+		bool trigger_hysteresis = iio_channel_find_attr(chn, "trigger_hysteresis");
 
 		if (trigger) {
 			if (trigger_level && trigger_hysteresis) {
@@ -102,18 +95,15 @@ HardwareTrigger::HardwareTrigger(struct iio_device *trigg_dev)
 	m_num_channels = m_analog_channels.size();
 
 	if (m_analog_channels.size() < 1) {
-		throw std::runtime_error(
-			"hardware trigger has no analog channels");
+		throw std::runtime_error("hardware trigger has no analog channels");
 	}
 
 	if (m_digital_channels.size() < 1) {
-		throw std::runtime_error(
-			"hardware trigger has no digital channels");
+		throw std::runtime_error("hardware trigger has no digital channels");
 	}
 
 	if (m_logic_channels.size() < 1) {
-		throw std::runtime_error(
-			"hardware trigger has no trigger_logic channels");
+		throw std::runtime_error("hardware trigger has no trigger_logic channels");
 	}
 
 	if (!m_delay_trigger) {
@@ -133,16 +123,13 @@ HardwareTrigger::condition HardwareTrigger::analogCondition(uint chnIdx) const {
 	ssize_t ret;
 	char buf[4096];
 
-	ret = iio_channel_attr_read(m_analog_channels[chnIdx], "trigger", buf,
-				    sizeof(buf));
+	ret = iio_channel_attr_read(m_analog_channels[chnIdx], "trigger", buf, sizeof(buf));
 	if (ret < 0) {
 		throw std::runtime_error("failed to read attribute: trigger");
 	}
-	auto it = std::find(lut_analog_trigg_cond.begin(),
-			    lut_analog_trigg_cond.end(), buf);
+	auto it = std::find(lut_analog_trigg_cond.begin(), lut_analog_trigg_cond.end(), buf);
 	if (it == lut_analog_trigg_cond.end()) {
-		throw std::runtime_error(
-			"unexpected value read from attribute: trigger");
+		throw std::runtime_error("unexpected value read from attribute: trigger");
 	}
 
 	return static_cast<condition>(it - lut_analog_trigg_cond.begin());
@@ -158,12 +145,10 @@ void HardwareTrigger::setAnalogCondition(uint chnIdx, condition cond) {
 	}
 
 	QByteArray byteArray = lut_analog_trigg_cond[cond].toLatin1();
-	iio_channel_attr_write(m_analog_channels[chnIdx], "trigger",
-			       byteArray.data());
+	iio_channel_attr_write(m_analog_channels[chnIdx], "trigger", byteArray.data());
 }
 
-HardwareTrigger::condition
-HardwareTrigger::digitalCondition(uint chnIdx) const {
+HardwareTrigger::condition HardwareTrigger::digitalCondition(uint chnIdx) const {
 	if (chnIdx >= numChannels()) {
 		throw std::invalid_argument("Channel index is out of range");
 	}
@@ -171,12 +156,10 @@ HardwareTrigger::digitalCondition(uint chnIdx) const {
 	ssize_t ret;
 	char buf[4096];
 
-	ret = iio_channel_attr_read(m_digital_channels[chnIdx], "trigger", buf,
-				    sizeof(buf));
+	ret = iio_channel_attr_read(m_digital_channels[chnIdx], "trigger", buf, sizeof(buf));
 	if (ret < 0)
 		throw "failed to read attribute: trigger";
-	auto it = std::find(lut_digital_trigg_cond.begin(),
-			    lut_digital_trigg_cond.end(), buf);
+	auto it = std::find(lut_digital_trigg_cond.begin(), lut_digital_trigg_cond.end(), buf);
 	if (it == lut_digital_trigg_cond.end()) {
 		throw "unexpected value read from attribute: trigger";
 	}
@@ -199,27 +182,22 @@ bool HardwareTrigger::hasCrossInstrumentTrigger() const {
 void HardwareTrigger::setExternalDirection(uint chnIdx, direction dir) {
 	if (hasExternalTriggerOut()) {
 		if (chnIdx >= numChannels()) {
-			throw std::invalid_argument(
-				"Channel index is out of range");
+			throw std::invalid_argument("Channel index is out of range");
 		}
 
-		QByteArray byteArray =
-			lut_digital_out_direction[dir].toLatin1();
-		iio_channel_attr_write(m_logic_channels[chnIdx],
-				       "out_direction", byteArray.data());
+		QByteArray byteArray = lut_digital_out_direction[dir].toLatin1();
+		iio_channel_attr_write(m_logic_channels[chnIdx], "out_direction", byteArray.data());
 	}
 }
 
 void HardwareTrigger::setExternalOutSelect(uint chnIdx, out_select out) {
 	if (hasExternalTriggerOut()) {
 		if (chnIdx >= numChannels()) {
-			throw std::invalid_argument(
-				"Channel index is out of range");
+			throw std::invalid_argument("Channel index is out of range");
 		}
 
 		QByteArray byteArray = lut_digital_out_select[out].toLatin1();
-		iio_channel_attr_write(m_logic_channels[chnIdx], "out_select",
-				       byteArray.data());
+		iio_channel_attr_write(m_logic_channels[chnIdx], "out_select", byteArray.data());
 	}
 }
 
@@ -229,8 +207,7 @@ void HardwareTrigger::setDigitalCondition(uint chnIdx, condition cond) {
 	}
 
 	QByteArray byteArray = lut_digital_trigg_cond[cond].toLatin1();
-	iio_channel_attr_write(m_digital_channels[chnIdx], "trigger",
-			       byteArray.data());
+	iio_channel_attr_write(m_digital_channels[chnIdx], "trigger", byteArray.data());
 }
 
 int HardwareTrigger::level(uint chnIdx) const {
@@ -240,8 +217,7 @@ int HardwareTrigger::level(uint chnIdx) const {
 
 	long long val;
 
-	iio_channel_attr_read_longlong(m_analog_channels[chnIdx],
-				       "trigger_level", &val);
+	iio_channel_attr_read_longlong(m_analog_channels[chnIdx], "trigger_level", &val);
 
 	return static_cast<int>(val);
 }
@@ -251,9 +227,7 @@ void HardwareTrigger::setLevel(uint chnIdx, int level) {
 		throw std::invalid_argument("Channel index is out of range");
 	}
 
-	iio_channel_attr_write_longlong(m_analog_channels[chnIdx],
-					"trigger_level",
-					static_cast<long long>(level));
+	iio_channel_attr_write_longlong(m_analog_channels[chnIdx], "trigger_level", static_cast<long long>(level));
 }
 
 int HardwareTrigger::hysteresis(uint chnIdx) const {
@@ -263,8 +237,7 @@ int HardwareTrigger::hysteresis(uint chnIdx) const {
 
 	long long val;
 
-	iio_channel_attr_read_longlong(m_analog_channels[chnIdx],
-				       "trigger_hysteresis", &val);
+	iio_channel_attr_read_longlong(m_analog_channels[chnIdx], "trigger_hysteresis", &val);
 
 	return static_cast<int>(val);
 }
@@ -274,8 +247,7 @@ void HardwareTrigger::setHysteresis(uint chnIdx, int histeresis) {
 		throw std::invalid_argument("Channel index is out of range");
 	}
 
-	iio_channel_attr_write_longlong(m_analog_channels[chnIdx],
-					"trigger_hysteresis",
+	iio_channel_attr_write_longlong(m_analog_channels[chnIdx], "trigger_hysteresis",
 					static_cast<long long>(histeresis));
 }
 
@@ -287,8 +259,7 @@ HardwareTrigger::mode HardwareTrigger::triggerMode(uint chnIdx) const {
 	ssize_t ret;
 	char buf[4096];
 
-	ret = iio_channel_attr_read(m_logic_channels[chnIdx], "mode", buf,
-				    sizeof(buf));
+	ret = iio_channel_attr_read(m_logic_channels[chnIdx], "mode", buf, sizeof(buf));
 	if (ret < 0) {
 		throw("failed to read attribute: mode");
 	}
@@ -306,8 +277,7 @@ void HardwareTrigger::setTriggerMode(uint chnIdx, HardwareTrigger::mode mode) {
 	}
 
 	QByteArray byteArray = lut_trigg_mode[mode].toLatin1();
-	iio_channel_attr_write(m_logic_channels[chnIdx], "mode",
-			       byteArray.data());
+	iio_channel_attr_write(m_logic_channels[chnIdx], "mode", byteArray.data());
 }
 
 QString HardwareTrigger::source() const {
@@ -350,8 +320,7 @@ int HardwareTrigger::sourceChannel() const {
  * Convenience function to be used when willing to enable the trigger for only
  * one channel at a time.
  */
-void HardwareTrigger::setSourceChannel(uint chnIdx, bool intern_checked,
-				       bool extern_trigger_in_checked) {
+void HardwareTrigger::setSourceChannel(uint chnIdx, bool intern_checked, bool extern_trigger_in_checked) {
 	if (chnIdx >= numChannels()) {
 		throw std::invalid_argument("Channel index is out of range");
 	}
@@ -378,9 +347,7 @@ int HardwareTrigger::delay() const {
 	return static_cast<int>(delay);
 }
 
-void HardwareTrigger::setDelay(int delay) {
-	iio_channel_attr_write_longlong(m_delay_trigger, "delay", delay);
-}
+void HardwareTrigger::setDelay(int delay) { iio_channel_attr_write_longlong(m_delay_trigger, "delay", delay); }
 
 void HardwareTrigger::setStreamingFlag(bool val) {
 	m_streaming_flag = val;

@@ -65,9 +65,7 @@ void SmallOnOffSwitch::setDuration(int ms) {
 }
 
 void SmallOnOffSwitch::setHandleColor(const QColor &color) {
-	QString ss(stylesheet +
-		   QString("QWidget#handle { background-color: %1; }")
-			   .arg(color.name()));
+	QString ss(stylesheet + QString("QWidget#handle { background-color: %1; }").arg(color.name()));
 	this->setStyleSheet(ss);
 }
 
@@ -76,8 +74,7 @@ void SmallOnOffSwitch::toggleAnim(bool enabled) {
 		return;
 
 	QRect off_rect(0, handle.y(), handle.width(), handle.height());
-	QRect on_rect(width() - handle.width(), handle.y(), handle.width(),
-		      handle.height());
+	QRect on_rect(width() - handle.width(), handle.y(), handle.width(), handle.height());
 
 	anim.stop();
 	color_anim.stop();
@@ -107,8 +104,7 @@ void SmallOnOffSwitch::toggleAnim(bool enabled) {
 
 bool SmallOnOffSwitch::event(QEvent *e) {
 	if (e->type() == QEvent::DynamicPropertyChange) {
-		QDynamicPropertyChangeEvent *const propEvent =
-			static_cast<QDynamicPropertyChangeEvent *>(e);
+		QDynamicPropertyChangeEvent *const propEvent = static_cast<QDynamicPropertyChangeEvent *>(e);
 		QString propName = propEvent->propertyName();
 		if (propName == "leftText" && property("leftText").isValid())
 			on.setText(property("leftText").toString());
@@ -141,8 +137,7 @@ void SmallOnOffSwitch::paintEvent(QPaintEvent *e) {
 		w = 8;
 		h = 12;
 		pixmap = locked.pixmap(w, h);
-		p.drawPixmap(left + handle.x() + handle.width(),
-			     handle.y() + top, w, h, pixmap);
+		p.drawPixmap(left + handle.x() + handle.width(), handle.y() + top, w, h, pixmap);
 	} else {
 		w = 10;
 		h = 12;
@@ -153,8 +148,7 @@ void SmallOnOffSwitch::paintEvent(QPaintEvent *e) {
 
 void SmallOnOffSwitch::showEvent(QShowEvent *event) {
 	if (!isChecked()) {
-		handle.setGeometry(QRect(width() - handle.width(), handle.y(),
-					 handle.width(), handle.height()));
+		handle.setGeometry(QRect(width() - handle.width(), handle.y(), handle.width(), handle.height()));
 		if (bothValid) {
 			setHandleColor(color_start);
 		} else {
@@ -162,8 +156,7 @@ void SmallOnOffSwitch::showEvent(QShowEvent *event) {
 		}
 	} else {
 		setHandleColor(color_start);
-		handle.setGeometry(0, handle.y(), handle.width(),
-				   handle.height());
+		handle.setGeometry(0, handle.y(), handle.width(), handle.height());
 	}
 }
 

@@ -47,9 +47,7 @@ private:
 
 class GraticulePlotScaleItem : public QwtPlotScaleItem {
 public:
-	explicit GraticulePlotScaleItem(
-		QwtScaleDraw::Alignment = QwtScaleDraw::BottomScale,
-		const double pos = 0.0);
+	explicit GraticulePlotScaleItem(QwtScaleDraw::Alignment = QwtScaleDraw::BottomScale, const double pos = 0.0);
 	virtual void updateScaleDiv(const QwtScaleDiv &, const QwtScaleDiv &);
 };
 

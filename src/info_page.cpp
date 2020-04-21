@@ -30,8 +30,7 @@
 using namespace std;
 using namespace adiscope;
 
-InfoPage::InfoPage(QString uri, Preferences *pref, struct iio_context *ctx,
-		   QWidget *parent)
+InfoPage::InfoPage(QString uri, Preferences *pref, struct iio_context *ctx, QWidget *parent)
 	: QWidget(parent)
 	, ui(new Ui::InfoPage)
 	, m_uri(uri)
@@ -51,10 +50,8 @@ InfoPage::InfoPage(QString uri, Preferences *pref, struct iio_context *ctx,
 
 	ui->btnCalibrate->setEnabled(false);
 	ui->btnCalibrate->setVisible(false);
-	connect(prefPanel, &Preferences::notify, this,
-		&InfoPage::readPreferences);
-	connect(ui->btnIdentify, SIGNAL(pressed()), this,
-		SLOT(identifyDevice()));
+	connect(prefPanel, &Preferences::notify, this, &InfoPage::readPreferences);
+	connect(ui->btnIdentify, SIGNAL(pressed()), this, SLOT(identifyDevice()));
 	connect(m_led_timer, SIGNAL(timeout()), this, SLOT(ledTimeout()));
 	connect(m_blink_timer, SIGNAL(timeout()), this, SLOT(blinkTimeout()));
 	readPreferences();
@@ -85,8 +82,7 @@ void InfoPage::setCtx(struct iio_context *ctx) {
 void InfoPage::getDeviceInfo() {
 	struct iio_context *temp_ctx = m_ctx;
 	if (!m_ctx) {
-		temp_ctx = iio_create_context_from_uri(
-			m_uri.toStdString().c_str());
+		temp_ctx = iio_create_context_from_uri(m_uri.toStdString().c_str());
 	}
 
 	std::string str = "";
@@ -95,13 +91,10 @@ void InfoPage::getDeviceInfo() {
 		const char *value;
 		char ctx_git_tag[8];
 		unsigned int ctx_major, ctx_minor;
-		iio_context_get_version(temp_ctx, &ctx_major, &ctx_minor,
-					ctx_git_tag);
+		iio_context_get_version(temp_ctx, &ctx_major, &ctx_minor, ctx_git_tag);
 
-		m_info_params.insert(
-			"IIO version",
-			QString::fromStdString(to_string(ctx_major) + "." +
-					       to_string(ctx_minor)));
+		m_info_params.insert("IIO version",
+				     QString::fromStdString(to_string(ctx_major) + "." + to_string(ctx_minor)));
 
 		QString description(iio_context_get_description(temp_ctx));
 		m_info_params.insert("Linux", description);
@@ -109,18 +102,13 @@ void InfoPage::getDeviceInfo() {
 		int attr_no = iio_context_get_attrs_count(temp_ctx);
 		for (int i = 0; i < attr_no; i++) {
 			if (!iio_context_get_attr(temp_ctx, i, &name, &value)) {
-				auto pair = translateInfoParams(
-					QString::fromUtf8(name));
+				auto pair = translateInfoParams(QString::fromUtf8(name));
 				if (pair.second == "")
 					continue;
 				if (pair.first) {
-					m_info_params_advanced.insert(
-						pair.second,
-						QString::fromUtf8(value));
+					m_info_params_advanced.insert(pair.second, QString::fromUtf8(value));
 				} else {
-					m_info_params.insert(
-						pair.second,
-						QString::fromUtf8(value));
+					m_info_params.insert(pair.second, QString::fromUtf8(value));
 				}
 			}
 		}
@@ -175,8 +163,7 @@ void InfoPage::setStatusLabel(QString str, QString color) {
 }
 
 void InfoPage::setConnectionStatus(bool failed) {
-	(failed) ? setStatusLabel("Error: Connection failed!")
-		 : setStatusLabel("");
+	(failed) ? setStatusLabel("Error: Connection failed!") : setStatusLabel("");
 }
 
 void InfoPage::refreshInfoWidget() {
@@ -215,8 +202,7 @@ void InfoPage::refreshInfoWidget() {
 	if (m_advanced) {
 		ui->paramLayout->setRowMinimumHeight(pos, 20);
 		pos++;
-		ui->paramLayout->addWidget(new QLabel("Advanced"), pos, 0, 1,
-					   1);
+		ui->paramLayout->addWidget(new QLabel("Advanced"), pos, 0, 1, 1);
 		pos++;
 		for (auto key : m_info_params_advanced.keys()) {
 			QLabel *valueLbl = new QLabel(this);
@@ -250,8 +236,7 @@ void InfoPage::identifyDevice(bool clicked) {
 		Q_EMIT stopSearching(true);
 
 		if (!m_connected) {
-			m_ctx = iio_create_context_from_uri(
-				m_uri.toStdString().c_str());
+			m_ctx = iio_create_context_from_uri(m_uri.toStdString().c_str());
 		}
 
 		if (!m_ctx) {
@@ -323,8 +308,7 @@ bool InfoPage::supportsCalibration() {
 	return false;
 }
 
-M2kInfoPage::M2kInfoPage(QString uri, Preferences *prefPanel,
-			 struct iio_context *ctx, QWidget *parent)
+M2kInfoPage::M2kInfoPage(QString uri, Preferences *prefPanel, struct iio_context *ctx, QWidget *parent)
 	: InfoPage(uri, prefPanel, ctx, parent), m_fabric_channel(nullptr) {
 	ui->btnCalibrate->setEnabled(false);
 	ui->extraWidget->setFrameShape(QFrame::NoFrame);
@@ -339,8 +323,7 @@ M2kInfoPage::~M2kInfoPage() {}
 void M2kInfoPage::startIdentification(bool start) {
 	if (supportsIdentification()) {
 		if (start) {
-			struct iio_device *m2k_fabric =
-				iio_context_find_device(m_ctx, "m2k-fabric");
+			struct iio_device *m2k_fabric = iio_context_find_device(m_ctx, "m2k-fabric");
 			if (!m2k_fabric) {
 				setStatusLabel("Can't identify this device.");
 				if (!m_connected) {
@@ -356,8 +339,7 @@ void M2kInfoPage::startIdentification(bool start) {
 				return;
 			}
 
-			m_fabric_channel = iio_device_find_channel(
-				m2k_fabric, "voltage4", true);
+			m_fabric_channel = iio_device_find_channel(m2k_fabric, "voltage4", true);
 			if (m_fabric_channel) {
 				m_led_timer->start(3000);
 				m_blink_timer->start(100);
@@ -380,9 +362,7 @@ void M2kInfoPage::startIdentification(bool start) {
 			if (!m_fabric_channel)
 				return;
 			if (m_ctx) {
-				iio_channel_attr_write_bool(
-					m_fabric_channel,
-					"done_led_overwrite_powerdown", false);
+				iio_channel_attr_write_bool(m_fabric_channel, "done_led_overwrite_powerdown", false);
 			}
 			m_fabric_channel = nullptr;
 		}
@@ -397,8 +377,6 @@ void M2kInfoPage::blinkTimeout() {
 	if (!m_fabric_channel)
 		return;
 	bool oldVal;
-	iio_channel_attr_read_bool(m_fabric_channel,
-				   "done_led_overwrite_powerdown", &oldVal);
-	iio_channel_attr_write_bool(m_fabric_channel,
-				    "done_led_overwrite_powerdown", !oldVal);
+	iio_channel_attr_read_bool(m_fabric_channel, "done_led_overwrite_powerdown", &oldVal);
+	iio_channel_attr_write_bool(m_fabric_channel, "done_led_overwrite_powerdown", !oldVal);
 }

@@ -10,8 +10,7 @@ using namespace adiscope;
 using namespace gr;
 
 cancel_dc_offset_block::cancel_dc_offset_block(size_t buffer_size, bool enabled)
-	: hier_block2("DCOFFSET", io_signature::make(1, 1, sizeof(float)),
-		      io_signature::make(1, 1, sizeof(float)))
+	: hier_block2("DCOFFSET", io_signature::make(1, 1, sizeof(float)), io_signature::make(1, 1, sizeof(float)))
 	, QObject()
 	, d_enabled(enabled)
 	, d_buffer_size(buffer_size)
@@ -19,9 +18,8 @@ cancel_dc_offset_block::cancel_dc_offset_block(size_t buffer_size, bool enabled)
 	, d_signal(boost::make_shared<signal_sample>()) {
 	_build_and_connect_blocks();
 
-	QObject::connect(
-		&*d_signal, &signal_sample::triggered,
-		[=](std::vector<float> samples) { d_dc_offset = samples[0]; });
+	QObject::connect(&*d_signal, &signal_sample::triggered,
+			 [=](std::vector<float> samples) { d_dc_offset = samples[0]; });
 }
 
 cancel_dc_offset_block::~cancel_dc_offset_block() {}
@@ -47,12 +45,9 @@ void cancel_dc_offset_block::_build_and_connect_blocks() {
 	hier_block2::disconnect_all();
 
 	if (d_enabled) {
-		auto avg = gr::blocks::moving_average_ff::make(
-			d_buffer_size, 1.0 / d_buffer_size, d_buffer_size);
-		auto keep = gr::blocks::keep_one_in_n::make(sizeof(float),
-							    d_buffer_size);
-		auto repeat =
-			gr::blocks::repeat::make(sizeof(float), d_buffer_size);
+		auto avg = gr::blocks::moving_average_ff::make(d_buffer_size, 1.0 / d_buffer_size, d_buffer_size);
+		auto keep = gr::blocks::keep_one_in_n::make(sizeof(float), d_buffer_size);
+		auto repeat = gr::blocks::repeat::make(sizeof(float), d_buffer_size);
 		auto sub = gr::blocks::sub_ff::make();
 
 		hier_block2::connect(this->self(), 0, avg, 0);
@@ -63,10 +58,8 @@ void cancel_dc_offset_block::_build_and_connect_blocks() {
 		hier_block2::connect(repeat, 0, sub, 1);
 		hier_block2::connect(sub, 0, this->self(), 0);
 	} else {
-		auto avg = gr::blocks::moving_average_ff::make(
-			d_buffer_size, 1.0 / d_buffer_size, d_buffer_size);
-		auto keep = gr::blocks::keep_one_in_n::make(sizeof(float),
-							    d_buffer_size);
+		auto avg = gr::blocks::moving_average_ff::make(d_buffer_size, 1.0 / d_buffer_size, d_buffer_size);
+		auto keep = gr::blocks::keep_one_in_n::make(sizeof(float), d_buffer_size);
 
 		hier_block2::connect(this->self(), 0, avg, 0);
 		hier_block2::connect(avg, 0, keep, 0);

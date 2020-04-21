@@ -41,15 +41,10 @@ static const int SpectrumFrequencyRangeEventType = 10010;
 class SpectrumUpdateEvent : public QEvent {
 
 public:
-	SpectrumUpdateEvent(const float *fftPoints,
-			    const uint64_t numFFTDataPoints,
-			    const double *realTimeDomainPoints,
-			    const double *imagTimeDomainPoints,
-			    const uint64_t numTimeDomainDataPoints,
-			    const gr::high_res_timer_type dataTimestamp,
-			    const bool repeatDataFlag,
-			    const bool lastOfMultipleUpdateFlag,
-			    const gr::high_res_timer_type generatedTimestamp,
+	SpectrumUpdateEvent(const float *fftPoints, const uint64_t numFFTDataPoints, const double *realTimeDomainPoints,
+			    const double *imagTimeDomainPoints, const uint64_t numTimeDomainDataPoints,
+			    const gr::high_res_timer_type dataTimestamp, const bool repeatDataFlag,
+			    const bool lastOfMultipleUpdateFlag, const gr::high_res_timer_type generatedTimestamp,
 			    const int droppedFFTFrames);
 
 	~SpectrumUpdateEvent();
@@ -116,8 +111,7 @@ private:
 
 class TimeUpdateEvent : public QEvent {
 public:
-	TimeUpdateEvent(const std::vector<double *> &timeDomainPoints,
-			const uint64_t numTimeDomainDataPoints,
+	TimeUpdateEvent(const std::vector<double *> &timeDomainPoints, const uint64_t numTimeDomainDataPoints,
 			const std::vector<std::vector<gr::tag_t>> &tags);
 
 	~TimeUpdateEvent();
@@ -129,9 +123,7 @@ public:
 
 	const std::vector<std::vector<gr::tag_t>> getTags() const;
 
-	static QEvent::Type Type() {
-		return QEvent::Type(SpectrumUpdateEventType);
-	}
+	static QEvent::Type Type() { return QEvent::Type(SpectrumUpdateEventType); }
 
 protected:
 private:
@@ -145,11 +137,9 @@ private:
 
 class IdentifiableTimeUpdateEvent : public TimeUpdateEvent {
 public:
-	IdentifiableTimeUpdateEvent(
-		const std::vector<double *> &timeDomainPoints,
-		const uint64_t numTimeDomainDataPoints,
-		const std::vector<std::vector<gr::tag_t>> &tags,
-		const std::string &senderName);
+	IdentifiableTimeUpdateEvent(const std::vector<double *> &timeDomainPoints,
+				    const uint64_t numTimeDomainDataPoints,
+				    const std::vector<std::vector<gr::tag_t>> &tags, const std::string &senderName);
 
 	~IdentifiableTimeUpdateEvent();
 
@@ -164,8 +154,7 @@ private:
 
 class FreqUpdateEvent : public QEvent {
 public:
-	FreqUpdateEvent(const std::vector<double *> &dataPoints,
-			const uint64_t numDataPoints);
+	FreqUpdateEvent(const std::vector<double *> &dataPoints, const uint64_t numDataPoints);
 
 	~FreqUpdateEvent();
 
@@ -174,9 +163,7 @@ public:
 	uint64_t getNumDataPoints() const;
 	bool getRepeatDataFlag() const;
 
-	static QEvent::Type Type() {
-		return QEvent::Type(SpectrumUpdateEventType);
-	}
+	static QEvent::Type Type() { return QEvent::Type(SpectrumUpdateEventType); }
 
 protected:
 private:
@@ -201,8 +188,7 @@ private:
 
 class ConstUpdateEvent : public QEvent {
 public:
-	ConstUpdateEvent(const std::vector<double *> &realDataPoints,
-			 const std::vector<double *> &imagDataPoints,
+	ConstUpdateEvent(const std::vector<double *> &realDataPoints, const std::vector<double *> &imagDataPoints,
 			 const uint64_t numDataPoints);
 
 	~ConstUpdateEvent();
@@ -213,9 +199,7 @@ public:
 	uint64_t getNumDataPoints() const;
 	bool getRepeatDataFlag() const;
 
-	static QEvent::Type Type() {
-		return QEvent::Type(SpectrumUpdateEventType);
-	}
+	static QEvent::Type Type() { return QEvent::Type(SpectrumUpdateEventType); }
 
 protected:
 private:
@@ -229,8 +213,7 @@ private:
 
 class WaterfallUpdateEvent : public QEvent {
 public:
-	WaterfallUpdateEvent(const std::vector<double *> &dataPoints,
-			     const uint64_t numDataPoints,
+	WaterfallUpdateEvent(const std::vector<double *> &dataPoints, const uint64_t numDataPoints,
 			     const gr::high_res_timer_type dataTimestamp);
 
 	~WaterfallUpdateEvent();
@@ -242,9 +225,7 @@ public:
 
 	gr::high_res_timer_type getDataTimestamp() const;
 
-	static QEvent::Type Type() {
-		return QEvent::Type(SpectrumUpdateEventType);
-	}
+	static QEvent::Type Type() { return QEvent::Type(SpectrumUpdateEventType); }
 
 protected:
 private:
@@ -259,8 +240,7 @@ private:
 
 class TimeRasterUpdateEvent : public QEvent {
 public:
-	TimeRasterUpdateEvent(const std::vector<double *> &dataPoints,
-			      const uint64_t numDataPoints);
+	TimeRasterUpdateEvent(const std::vector<double *> &dataPoints, const uint64_t numDataPoints);
 	~TimeRasterUpdateEvent();
 
 	int which() const;
@@ -268,9 +248,7 @@ public:
 	uint64_t getNumDataPoints() const;
 	bool getRepeatDataFlag() const;
 
-	static QEvent::Type Type() {
-		return QEvent::Type(SpectrumUpdateEventType);
-	}
+	static QEvent::Type Type() { return QEvent::Type(SpectrumUpdateEventType); }
 
 protected:
 private:
@@ -283,8 +261,7 @@ private:
 
 class HistogramUpdateEvent : public QEvent {
 public:
-	HistogramUpdateEvent(const std::vector<double *> &points,
-			     const uint64_t npoints);
+	HistogramUpdateEvent(const std::vector<double *> &points, const uint64_t npoints);
 
 	~HistogramUpdateEvent();
 
@@ -293,9 +270,7 @@ public:
 	uint64_t getNumDataPoints() const;
 	bool getRepeatDataFlag() const;
 
-	static QEvent::Type Type() {
-		return QEvent::Type(SpectrumUpdateEventType);
-	}
+	static QEvent::Type Type() { return QEvent::Type(SpectrumUpdateEventType); }
 
 protected:
 private:
@@ -314,9 +289,7 @@ public:
 	int which() const;
 	const std::vector<float> getSamples() const;
 
-	static QEvent::Type Type() {
-		return QEvent::Type(SpectrumUpdateEventType);
-	}
+	static QEvent::Type Type() { return QEvent::Type(SpectrumUpdateEventType); }
 
 protected:
 private:

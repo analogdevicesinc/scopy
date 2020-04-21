@@ -31,11 +31,9 @@
 
 using namespace adiscope;
 
-PowerController::PowerController(struct iio_context *ctx,
-				 ToolMenuItem *toolMenuItem, QJSEngine *engine,
+PowerController::PowerController(struct iio_context *ctx, ToolMenuItem *toolMenuItem, QJSEngine *engine,
 				 ToolLauncher *parent)
-	: Tool(ctx, toolMenuItem, new PowerController_API(this), "Power Supply",
-	       parent)
+	: Tool(ctx, toolMenuItem, new PowerController_API(this), "Power Supply", parent)
 	, ui(new Ui::PowerController)
 	, in_sync(false) {
 	ui->setupUi(this);
@@ -51,8 +49,7 @@ PowerController::PowerController(struct iio_context *ctx,
 	this->ch1r = iio_device_find_channel(dev2, "voltage2", false);
 	this->ch2r = iio_device_find_channel(dev2, "voltage1", false);
 	this->pd_pos = iio_device_find_channel(dev3, "voltage2", true);
-	this->pd_neg = iio_device_find_channel(dev3, "voltage3",
-					       true); /* For HW Rev. >= C */
+	this->pd_neg = iio_device_find_channel(dev3, "voltage3", true); /* For HW Rev. >= C */
 
 	if (!ch1w || !ch2w || !ch1r || !ch2r || !pd_pos)
 		throw std::runtime_error("Unable to find channels\n");
@@ -77,8 +74,7 @@ PowerController::PowerController(struct iio_context *ctx,
 	/* Power down DACs by default */
 	iio_channel_attr_write_bool(pd_pos, "user_supply_powerdown", true);
 	if (pd_neg)
-		iio_channel_attr_write_bool(pd_neg, "user_supply_powerdown",
-					    true);
+		iio_channel_attr_write_bool(pd_neg, "user_supply_powerdown", true);
 	iio_channel_attr_write_bool(ch1w, "powerdown", true);
 	iio_channel_attr_write_bool(ch2w, "powerdown", true);
 
@@ -88,57 +84,42 @@ PowerController::PowerController(struct iio_context *ctx,
 
 	ui->btnSync->click();
 
-	valuePos = new PositionSpinButton({{"mVolts", 1e-3}, {"Volts", 1e0}},
-					  "Value", 0, 5, true, true, this);
+	valuePos = new PositionSpinButton({{"mVolts", 1e-3}, {"Volts", 1e0}}, "Value", 0, 5, true, true, this);
 
-	valueNeg = new PositionSpinButton({{"mVolts", 1e-3}, {"Volts", 1e0}},
-					  "Value", -5, 0, true, true, this);
+	valueNeg = new PositionSpinButton({{"mVolts", 1e-3}, {"Volts", 1e0}}, "Value", -5, 0, true, true, this);
 
 	ui->valuePosLayout->addWidget(valuePos);
 	ui->valueNegLayout->addWidget(valueNeg);
 
-	connect(valuePos, &PositionSpinButton::valueChanged, ui->lcd1_set,
-		&LcdNumber::display);
-	connect(valueNeg, &PositionSpinButton::valueChanged, ui->lcd2_set,
-		&LcdNumber::display);
+	connect(valuePos, &PositionSpinButton::valueChanged, ui->lcd1_set, &LcdNumber::display);
+	connect(valueNeg, &PositionSpinButton::valueChanged, ui->lcd2_set, &LcdNumber::display);
 
 	connect(&this->timer, SIGNAL(timeout()), this, SLOT(update_lcd()));
 
-	connect(ui->dac1, SIGNAL(toggled(bool)), this,
-		SLOT(dac1_set_enabled(bool)));
-	connect(ui->dac2, SIGNAL(toggled(bool)), this,
-		SLOT(dac2_set_enabled(bool)));
-	connect(ui->btnSync, SIGNAL(toggled(bool)), this,
-		SLOT(sync_enabled(bool)));
-	connect(valuePos, SIGNAL(valueChanged(double)), this,
-		SLOT(dac1_set_value(double)));
-	connect(valueNeg, SIGNAL(valueChanged(double)), this,
-		SLOT(dac2_set_value(double)));
-	connect(ui->trackingRatio, SIGNAL(valueChanged(int)), this,
-		SLOT(ratioChanged(int)));
+	connect(ui->dac1, SIGNAL(toggled(bool)), this, SLOT(dac1_set_enabled(bool)));
+	connect(ui->dac2, SIGNAL(toggled(bool)), this, SLOT(dac2_set_enabled(bool)));
+	connect(ui->btnSync, SIGNAL(toggled(bool)), this, SLOT(sync_enabled(bool)));
+	connect(valuePos, SIGNAL(valueChanged(double)), this, SLOT(dac1_set_value(double)));
+	connect(valueNeg, SIGNAL(valueChanged(double)), this, SLOT(dac2_set_value(double)));
+	connect(ui->trackingRatio, SIGNAL(valueChanged(int)), this, SLOT(ratioChanged(int)));
 
-	connect(runButton(), SIGNAL(clicked(bool)), this,
-		SLOT(startStop(bool)));
+	connect(runButton(), SIGNAL(clicked(bool)), this, SLOT(startStop(bool)));
 
 	valuePos->setValue(0);
 	valueNeg->setValue(0);
 
-	connect(ui->dac1, &QPushButton::toggled, this,
-		&PowerController::toggleRunButton);
-	connect(ui->dac2, &QPushButton::toggled, this,
-		&PowerController::toggleRunButton);
+	connect(ui->dac1, &QPushButton::toggled, this, &PowerController::toggleRunButton);
+	connect(ui->dac2, &QPushButton::toggled, this, &PowerController::toggleRunButton);
 
 	/*Load calibration parameters from iio context*/
 	const char *name;
 	const char *value;
 	for (int i = 4; i < 12; i++) {
 		if (!iio_context_get_attr(ctx, i, &name, &value))
-			calibrationParam[QString(name + 4)] =
-				QString(value).toDouble();
+			calibrationParam[QString(name + 4)] = QString(value).toDouble();
 	}
 
-	api->setObjectName(QString::fromStdString(
-		Filter::tool_name(TOOL_POWER_CONTROLLER)));
+	api->setObjectName(QString::fromStdString(Filter::tool_name(TOOL_POWER_CONTROLLER)));
 	api->load(*settings);
 	api->js_register(engine);
 }
@@ -152,8 +133,7 @@ PowerController::~PowerController() {
 	iio_channel_attr_write_bool(ch2w, "powerdown", true);
 	iio_channel_attr_write_bool(pd_pos, "user_supply_powerdown", true);
 	if (pd_neg)
-		iio_channel_attr_write_bool(pd_neg, "user_supply_powerdown",
-					    true);
+		iio_channel_attr_write_bool(pd_neg, "user_supply_powerdown", true);
 
 	/* FIXME: TODO: Move this into a HW class / lib M2k */
 	struct iio_device *dev3 = iio_context_find_device(ctx, "m2k-fabric");
@@ -190,9 +170,7 @@ void PowerController::toggleRunButton(bool enabled) {
 	}
 }
 
-void PowerController::showEvent(QShowEvent *event) {
-	timer.start(TIMER_TIMEOUT_MS);
-}
+void PowerController::showEvent(QShowEvent *event) { timer.start(TIMER_TIMEOUT_MS); }
 
 void PowerController::hideEvent(QHideEvent *event) { timer.stop(); }
 
@@ -237,15 +215,12 @@ void PowerController::dac1_set_enabled(bool enabled) {
 		dac2_set_enabled(enabled);
 
 	if (pd_neg) { /* For HW Rev. >= C */
-		iio_channel_attr_write_bool(pd_pos, "user_supply_powerdown",
-					    !enabled);
+		iio_channel_attr_write_bool(pd_pos, "user_supply_powerdown", !enabled);
 	} else {
 		if (enabled) {
-			iio_channel_attr_write_bool(
-				pd_pos, "user_supply_powerdown", false);
+			iio_channel_attr_write_bool(pd_pos, "user_supply_powerdown", false);
 		} else if (!ui->dac2->isChecked()) {
-			iio_channel_attr_write_bool(
-				pd_pos, "user_supply_powerdown", true);
+			iio_channel_attr_write_bool(pd_pos, "user_supply_powerdown", true);
 		}
 	}
 
@@ -257,15 +232,12 @@ void PowerController::dac2_set_enabled(bool enabled) {
 	averageVoltageCh2.clear();
 
 	if (pd_neg) { /* For HW Rev. >= C */
-		iio_channel_attr_write_bool(pd_neg, "user_supply_powerdown",
-					    !enabled);
+		iio_channel_attr_write_bool(pd_neg, "user_supply_powerdown", !enabled);
 	} else {
 		if (enabled) {
-			iio_channel_attr_write_bool(
-				pd_pos, "user_supply_powerdown", false);
+			iio_channel_attr_write_bool(pd_pos, "user_supply_powerdown", false);
 		} else if (!ui->dac1->isChecked()) {
-			iio_channel_attr_write_bool(
-				pd_pos, "user_supply_powerdown", true);
+			iio_channel_attr_write_bool(pd_pos, "user_supply_powerdown", true);
 		}
 	}
 
@@ -280,13 +252,10 @@ void PowerController::sync_enabled(bool enabled) {
 
 	in_sync = !enabled;
 	valueNeg->setDisabled(!enabled);
-	valueNeg->setValue(-valuePos->value() *
-			   (double)ui->trackingRatio->value() / 100.0);
+	valueNeg->setValue(-valuePos->value() * (double)ui->trackingRatio->value() / 100.0);
 }
 
-void PowerController::ratioChanged(int percent) {
-	valueNeg->setValue(-valuePos->value() * (double)percent / 100.0);
-}
+void PowerController::ratioChanged(int percent) { valueNeg->setValue(-valuePos->value() * (double)percent / 100.0); }
 
 void PowerController::update_lcd() {
 	double offset1 = calibrationParam[QString("offset_pos_adc")];
@@ -320,8 +289,7 @@ void PowerController::update_lcd() {
 	ui->lcd1->display(value1);
 	ui->scale_dac1->setValue(value1);
 
-	double value2 =
-		(((double)average2 * (-6.4) / 4095.0) + offset2) * gain2;
+	double value2 = (((double)average2 * (-6.4) / 4095.0) + offset2) * gain2;
 	ui->lcd2->display(value2);
 	ui->scale_dac2->setValue(value2);
 

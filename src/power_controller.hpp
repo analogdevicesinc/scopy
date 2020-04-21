@@ -52,8 +52,7 @@ class PowerController : public Tool {
 public:
 	const int AVERAGE_COUNT = 5;
 
-	explicit PowerController(struct iio_context *ctx,
-				 ToolMenuItem *toolMenuItem, QJSEngine *engine,
+	explicit PowerController(struct iio_context *ctx, ToolMenuItem *toolMenuItem, QJSEngine *engine,
 				 ToolLauncher *parent = 0);
 	~PowerController();
 

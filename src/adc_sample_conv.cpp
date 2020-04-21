@@ -24,13 +24,9 @@
 using namespace gr;
 using namespace adiscope;
 
-adc_sample_conv::adc_sample_conv(int nconnections, std::shared_ptr<M2kAdc> adc,
-				 bool inverse)
-	: gr::sync_block("adc_sample_conv",
-			 gr::io_signature::make(nconnections, nconnections,
-						sizeof(float)),
-			 gr::io_signature::make(nconnections, nconnections,
-						sizeof(float)))
+adc_sample_conv::adc_sample_conv(int nconnections, std::shared_ptr<M2kAdc> adc, bool inverse)
+	: gr::sync_block("adc_sample_conv", gr::io_signature::make(nconnections, nconnections, sizeof(float)),
+			 gr::io_signature::make(nconnections, nconnections, sizeof(float)))
 	, d_nconnections(nconnections)
 	, inverse(inverse)
 	, m2k_adc(adc) {
@@ -44,25 +40,19 @@ adc_sample_conv::adc_sample_conv(int nconnections, std::shared_ptr<M2kAdc> adc,
 
 adc_sample_conv::~adc_sample_conv() {}
 
-float adc_sample_conv::convSampleToVolts(float sample, float correctionGain,
-					 float filterCompensation, float offset,
+float adc_sample_conv::convSampleToVolts(float sample, float correctionGain, float filterCompensation, float offset,
 					 float hw_gain) {
 	// TO DO: explain this formula
-	return ((sample * 0.78) / ((1 << 11) * 1.3 * hw_gain) * correctionGain *
-		filterCompensation) +
-		offset;
+	return ((sample * 0.78) / ((1 << 11) * 1.3 * hw_gain) * correctionGain * filterCompensation) + offset;
 }
 
-float adc_sample_conv::convVoltsToSample(float voltage, float correctionGain,
-					 float filterCompensation, float offset,
+float adc_sample_conv::convVoltsToSample(float voltage, float correctionGain, float filterCompensation, float offset,
 					 float hw_gain) {
 	// TO DO: explain this formula
-	return ((voltage - offset) / (correctionGain * filterCompensation) *
-		(2048 * 1.3 * hw_gain) / 0.78);
+	return ((voltage - offset) / (correctionGain * filterCompensation) * (2048 * 1.3 * hw_gain) / 0.78);
 }
 
-int adc_sample_conv::work(int noutput_items,
-			  gr_vector_const_void_star &input_items,
+int adc_sample_conv::work(int noutput_items, gr_vector_const_void_star &input_items,
 			  gr_vector_void_star &output_items) {
 	updateCorrectionGain();
 
@@ -74,16 +64,12 @@ int adc_sample_conv::work(int noutput_items,
 
 		if (inverse)
 			for (int j = 0; j < noutput_items; j++)
-				out[j] = convVoltsToSample(
-					in[j], d_correction_gains[i],
-					d_filter_compensations[i], d_offsets[i],
-					d_hardware_gains[i]);
+				out[j] = convVoltsToSample(in[j], d_correction_gains[i], d_filter_compensations[i],
+							   d_offsets[i], d_hardware_gains[i]);
 		else
 			for (int j = 0; j < noutput_items; j++)
-				out[j] = convSampleToVolts(
-					in[j], d_correction_gains[i],
-					d_filter_compensations[i], d_offsets[i],
-					d_hardware_gains[i]);
+				out[j] = convSampleToVolts(in[j], d_correction_gains[i], d_filter_compensations[i],
+							   d_offsets[i], d_hardware_gains[i]);
 	}
 
 	return noutput_items;
@@ -93,10 +79,8 @@ void adc_sample_conv::updateCorrectionGain() {
 	if (m2k_adc) {
 		setCorrectionGain(0, m2k_adc->chnCorrectionGain(0));
 		setCorrectionGain(1, m2k_adc->chnCorrectionGain(1));
-		setFilterCompensation(
-			0, m2k_adc->compTable(m2k_adc->sampleRate()));
-		setFilterCompensation(
-			1, m2k_adc->compTable(m2k_adc->sampleRate()));
+		setFilterCompensation(0, m2k_adc->compTable(m2k_adc->sampleRate()));
+		setFilterCompensation(1, m2k_adc->compTable(m2k_adc->sampleRate()));
 		setHardwareGain(0, m2k_adc->gainAt(m2k_adc->chnHwGainMode(0)));
 		setHardwareGain(1, m2k_adc->gainAt(m2k_adc->chnHwGainMode(1)));
 	}

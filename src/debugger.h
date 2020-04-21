@@ -46,8 +46,7 @@ class Debugger : public Tool {
 	Q_OBJECT
 
 public:
-	explicit Debugger(struct iio_context *ctx, Filter *filt,
-			  ToolMenuItem *toolMenuItem, QJSEngine *engine,
+	explicit Debugger(struct iio_context *ctx, Filter *filt, ToolMenuItem *toolMenuItem, QJSEngine *engine,
 			  ToolLauncher *parent = 0);
 	~Debugger();
 

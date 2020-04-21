@@ -42,10 +42,8 @@ ToolMenuItem::ToolMenuItem(QString name, QString iconPath, QWidget *parent)
 	_buildUI();
 
 	// Load stylesheets
-	Util::loadStylesheetFromFile(
-		":stylesheets/stylesheets/toolMenuItem.qss", this);
-	Util::loadStylesheetFromFile(":stylesheets/stylesheets/stopButton.qss",
-				     d_toolStopBtn);
+	Util::loadStylesheetFromFile(":stylesheets/stylesheets/toolMenuItem.qss", this);
+	Util::loadStylesheetFromFile(":stylesheets/stylesheets/stopButton.qss", d_toolStopBtn);
 
 	setDynamicProperty(this, "allowHover", true);
 
@@ -104,9 +102,7 @@ bool ToolMenuItem::eventFilter(QObject *watched, QEvent *event) {
 	return QObject::event(event);
 }
 
-void ToolMenuItem::setDisabled(bool disabled) {
-	BaseMenuItem::setDisabled(disabled);
-}
+void ToolMenuItem::setDisabled(bool disabled) { BaseMenuItem::setDisabled(disabled); }
 
 void ToolMenuItem::mouseMoveEvent(QMouseEvent *event) {
 	BaseMenuItem::mouseMoveEvent(event);

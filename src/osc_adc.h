@@ -20,13 +20,10 @@ class HardwareTrigger;
 
 class IioUtils {
 public:
-	static QStringList available_options_list(struct iio_device *dev,
-						  const char *attr_name);
-	static QList<struct iio_channel *>
-	scan_elem_channel_list(struct iio_device *dev);
-	static QList<struct iio_channel *>
-	pick_channels_with_direction(const QList<struct iio_channel *> &list,
-				     bool output);
+	static QStringList available_options_list(struct iio_device *dev, const char *attr_name);
+	static QList<struct iio_channel *> scan_elem_channel_list(struct iio_device *dev);
+	static QList<struct iio_channel *> pick_channels_with_direction(const QList<struct iio_channel *> &list,
+									bool output);
 	static std::string hardware_revision(struct iio_context *);
 };
 
@@ -58,8 +55,7 @@ public:
 
 	virtual double convSampleToVolts(uint chnIdx, double sample) const;
 	virtual double convVoltsToSample(uint chnIdx, double volts) const;
-	virtual double convSampleDiffToVoltsDiff(uint chnIdx,
-						 double smpl) const;
+	virtual double convSampleDiffToVoltsDiff(uint chnIdx, double smpl) const;
 	virtual double convVoltsDiffToSampleDiff(uint chnIdx, double v) const;
 
 	virtual std::unique_ptr<Settings> getCurrentHwSettings();
@@ -151,9 +147,7 @@ public:
 		M2K = 1,
 	};
 
-	static std::shared_ptr<GenericAdc> newAdc(AdcType adc_type,
-						  struct iio_context *ctx,
-						  struct iio_device *adc) {
+	static std::shared_ptr<GenericAdc> newAdc(AdcType adc_type, struct iio_context *ctx, struct iio_device *adc) {
 		switch (adc_type) {
 		case GENERIC:
 			return std::make_shared<GenericAdc>(ctx, adc);

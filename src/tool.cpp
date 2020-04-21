@@ -26,8 +26,8 @@
 
 using namespace adiscope;
 
-Tool::Tool(struct iio_context *ctx, ToolMenuItem *toolMenuItem, ApiObject *api,
-	   const QString &name, ToolLauncher *parent)
+Tool::Tool(struct iio_context *ctx, ToolMenuItem *toolMenuItem, ApiObject *api, const QString &name,
+	   ToolLauncher *parent)
 	: QWidget(static_cast<QWidget *>(parent))
 	, ctx(ctx)
 	, run_button(toolMenuItem->getToolStopBtn())
@@ -40,8 +40,7 @@ Tool::Tool(struct iio_context *ctx, ToolMenuItem *toolMenuItem, ApiObject *api,
 	, toolMenuItem(toolMenuItem) {
 	toolMenuItem->setDisabled(false);
 
-	connect(this, &Tool::detachedState, parent,
-		&ToolLauncher::toolDetached);
+	connect(this, &Tool::detachedState, parent, &ToolLauncher::toolDetached);
 	connect(parent, &ToolLauncher::launcherClosed, this, &Tool::saveState);
 
 	QSettings oldSettings;
@@ -56,13 +55,11 @@ Tool::Tool(struct iio_context *ctx, ToolMenuItem *toolMenuItem, ApiObject *api,
 	connect(api, &ApiObject::loadingFinished, this, &Tool::loadState);
 
 	connect(toolMenuItem, &ToolMenuItem::detach, this, &Tool::detached);
-	connect(this, &Tool::detachedState, toolMenuItem,
-		&ToolMenuItem::setDetached);
+	connect(this, &Tool::detachedState, toolMenuItem, &ToolMenuItem::setDetached);
 }
 
 Tool::~Tool() {
-	disconnect(prefPanel, &Preferences::notify, this,
-		   &Tool::readPreferences);
+	disconnect(prefPanel, &Preferences::notify, this, &Tool::readPreferences);
 
 	run_button->setChecked(false);
 	toolMenuItem->setDisabled(true);
@@ -84,13 +81,9 @@ void Tool::settingsLoaded() {}
 
 /* Tools that use file dialogs should overload this method
 to ensure their file dialogs are configured correspondingly */
-void Tool::setNativeDialogs(bool nativeDialogs) {
-	m_useNativeDialogs = nativeDialogs;
-}
+void Tool::setNativeDialogs(bool nativeDialogs) { m_useNativeDialogs = nativeDialogs; }
 
-void Tool::readPreferences() {
-	saveOnExit = prefPanel->getSave_session_on_exit();
-}
+void Tool::readPreferences() { saveOnExit = prefPanel->getSave_session_on_exit(); }
 
 void Tool::saveState() {
 	if (!window) {
@@ -108,8 +101,7 @@ void Tool::loadState() {
 	bool isDetached = settings->value(name + "/detached").toBool();
 	if (isDetached) {
 		detached();
-		window->restoreGeometry(
-			settings->value(name + "/geometry").toByteArray());
+		window->restoreGeometry(settings->value(name + "/geometry").toByteArray());
 	}
 }
 

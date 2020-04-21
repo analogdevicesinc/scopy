@@ -48,10 +48,8 @@ public:
 
 	enum gain_mode { LOW, HIGH };
 
-	Calibration(struct iio_context *ctx, QJSEngine *engine,
-		    std::shared_ptr<M2kAdc> adc = nullptr,
-		    std::shared_ptr<M2kDac> dac_a = nullptr,
-		    std::shared_ptr<M2kDac> dac_b = nullptr);
+	Calibration(struct iio_context *ctx, QJSEngine *engine, std::shared_ptr<M2kAdc> adc = nullptr,
+		    std::shared_ptr<M2kDac> dac_a = nullptr, std::shared_ptr<M2kDac> dac_b = nullptr);
 	~Calibration();
 
 	bool initialize();
@@ -94,13 +92,10 @@ public:
 	void dacOutputStop();
 
 private:
-	bool adc_data_capture(int16_t *dataCh0, int16_t *dataCh1,
-			      size_t num_sampl_per_chn);
-	bool fine_tune(size_t span, int16_t centerVal0, int16_t centerVal1,
-		       size_t num_samples);
+	bool adc_data_capture(int16_t *dataCh0, int16_t *dataCh1, size_t num_sampl_per_chn);
+	bool fine_tune(size_t span, int16_t centerVal0, int16_t centerVal1, size_t num_samples);
 
-	bool dacOutputDC(struct iio_device *dac, struct iio_channel *channel,
-			 struct iio_buffer **buffer, size_t value);
+	bool dacOutputDC(struct iio_device *dac, struct iio_channel *channel, struct iio_buffer **buffer, size_t value);
 	bool dacAOutputDC(int16_t value);
 	bool dacBOutputDC(int16_t value);
 	void configHwSamplerate();

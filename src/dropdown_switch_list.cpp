@@ -80,8 +80,7 @@ DropdownSwitchList::DropdownSwitchList(int switchColCount, QWidget *parent)
 
 	// View size and alignment settings
 	m_treeView->header()->setSectionsMovable(false);
-	m_treeView->header()->setSectionResizeMode(
-		QHeaderView::ResizeToContents);
+	m_treeView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	m_treeView->header()->setStretchLastSection(false);
 	m_treeView->setAllColumnsShowFocus(false);
 	m_treeView->setRootIsDecorated(false);
@@ -117,8 +116,7 @@ void DropdownSwitchList::setColumnTitle(int col, const QString &title) {
 
 int DropdownSwitchList::switchColumnCount() const { return m_columns - 1; }
 
-void DropdownSwitchList::addDropdownElement(const QIcon &icon,
-					    const QString &name) {
+void DropdownSwitchList::addDropdownElement(const QIcon &icon, const QString &name) {
 	QStandardItem *item = new QStandardItem(icon, name);
 	m_model->setItem(m_rows, 0, item);
 	item->setFlags(item->flags() & ~Qt::ItemIsEditable);
@@ -136,9 +134,7 @@ void DropdownSwitchList::addDropdownElement(const QIcon &icon,
 	m_rows++;
 }
 
-void DropdownSwitchList::addDropdownElement(const QIcon &icon,
-					    const QString &name,
-					    const QVariant &user_data) {
+void DropdownSwitchList::addDropdownElement(const QIcon &icon, const QString &name, const QVariant &user_data) {
 	addDropdownElement(icon, name);
 	QModelIndex index = m_model->index(m_rows - 1, 0, QModelIndex());
 	m_model->setData(index, user_data, Qt::UserRole);

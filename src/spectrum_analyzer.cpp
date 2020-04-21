@@ -60,37 +60,31 @@ static const int MAX_REF_CHANNELS = 4;
 using namespace adiscope;
 using namespace std;
 
-std::vector<std::pair<QString, FftDisplayPlot::MagnitudeType>>
-	SpectrumAnalyzer::mag_types = {
-		{"dBFS", FftDisplayPlot::DBFS},
-		{"dBV", FftDisplayPlot::DBV},
-		{"dBu", FftDisplayPlot::DBU},
-		{"Vpeak", FftDisplayPlot::VPEAK},
-		{"Vrms", FftDisplayPlot::VRMS},
+std::vector<std::pair<QString, FftDisplayPlot::MagnitudeType>> SpectrumAnalyzer::mag_types = {
+	{"dBFS", FftDisplayPlot::DBFS},   {"dBV", FftDisplayPlot::DBV},   {"dBu", FftDisplayPlot::DBU},
+	{"Vpeak", FftDisplayPlot::VPEAK}, {"Vrms", FftDisplayPlot::VRMS},
 };
 
-std::vector<std::pair<QString, FftDisplayPlot::AverageType>>
-	SpectrumAnalyzer::avg_types = {
-		{"Sample", FftDisplayPlot::SAMPLE},
-		{"Peak Hold", FftDisplayPlot::PEAK_HOLD},
-		{"Peak Hold Continous", FftDisplayPlot::PEAK_HOLD_CONTINUOUS},
-		{"Min Hold", FftDisplayPlot::MIN_HOLD},
-		{"Min Hold Continous", FftDisplayPlot::MIN_HOLD_CONTINUOUS},
-		{"Linear RMS", FftDisplayPlot::LINEAR_RMS},
-		{"Linear dB", FftDisplayPlot::LINEAR_DB},
-		{"Exponential RMS", FftDisplayPlot::EXPONENTIAL_RMS},
-		{"Exponential dB", FftDisplayPlot::EXPONENTIAL_DB},
+std::vector<std::pair<QString, FftDisplayPlot::AverageType>> SpectrumAnalyzer::avg_types = {
+	{"Sample", FftDisplayPlot::SAMPLE},
+	{"Peak Hold", FftDisplayPlot::PEAK_HOLD},
+	{"Peak Hold Continous", FftDisplayPlot::PEAK_HOLD_CONTINUOUS},
+	{"Min Hold", FftDisplayPlot::MIN_HOLD},
+	{"Min Hold Continous", FftDisplayPlot::MIN_HOLD_CONTINUOUS},
+	{"Linear RMS", FftDisplayPlot::LINEAR_RMS},
+	{"Linear dB", FftDisplayPlot::LINEAR_DB},
+	{"Exponential RMS", FftDisplayPlot::EXPONENTIAL_RMS},
+	{"Exponential dB", FftDisplayPlot::EXPONENTIAL_DB},
 };
 
-std::vector<std::pair<QString, SpectrumAnalyzer::FftWinType>>
-	SpectrumAnalyzer::win_types = {
-		{"Flat top", FftWinType::FLAT_TOP},
-		{"Rectangular", FftWinType::RECTANGULAR},
-		{"Triangular (Bartlett)", FftWinType::TRIANGULAR},
-		{"Hamming", FftWinType::HAMMING},
-		{"Hann", FftWinType::HANN},
-		{"Blackman-Harris", FftWinType::BLACKMAN_HARRIS},
-		{"Kaiser", FftWinType::KAISER},
+std::vector<std::pair<QString, SpectrumAnalyzer::FftWinType>> SpectrumAnalyzer::win_types = {
+	{"Flat top", FftWinType::FLAT_TOP},
+	{"Rectangular", FftWinType::RECTANGULAR},
+	{"Triangular (Bartlett)", FftWinType::TRIANGULAR},
+	{"Hamming", FftWinType::HAMMING},
+	{"Hann", FftWinType::HANN},
+	{"Blackman-Harris", FftWinType::BLACKMAN_HARRIS},
+	{"Kaiser", FftWinType::KAISER},
 };
 
 std::vector<QString> SpectrumAnalyzer::markerTypes = {
@@ -100,12 +94,9 @@ std::vector<QString> SpectrumAnalyzer::markerTypes = {
 	"Fixed",
 };
 
-SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
-				   std::shared_ptr<GenericAdc> adc,
-				   ToolMenuItem *toolMenuItem,
-				   QJSEngine *engine, ToolLauncher *parent)
-	: Tool(ctx, toolMenuItem, new SpectrumAnalyzer_API(this),
-	       "Spectrum Analyzer", parent)
+SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt, std::shared_ptr<GenericAdc> adc,
+				   ToolMenuItem *toolMenuItem, QJSEngine *engine, ToolLauncher *parent)
+	: Tool(ctx, toolMenuItem, new SpectrumAnalyzer_API(this), "Spectrum Analyzer", parent)
 	, ui(new Ui::SpectrumAnalyzer)
 	, marker_selector(new DbClickButtons(this))
 	, fft_plot(nullptr)
@@ -139,8 +130,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 			const char *id = iio_channel_get_name(adc_channels[i]);
 
 			if (!id) {
-				channel_names.push_back(
-					QString("Channel %1").arg(i + 1));
+				channel_names.push_back(QString("Channel %1").arg(i + 1));
 			} else {
 				channel_names.push_back(QString(id));
 			}
@@ -150,8 +140,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 		adc_bits_count = 12;
 
 		for (int i = 0; i < num_adc_channels; i++)
-			channel_names.push_back(
-				QString("Channel %1").arg(i + 1));
+			channel_names.push_back(QString("Channel %1").arg(i + 1));
 	}
 
 	ui->setupUi(this);
@@ -195,9 +184,8 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	settings_group->setExclusive(true);
 
 	fft_plot = new FftDisplayPlot(num_adc_channels, this);
-	fft_plot->canvas()->setStyleSheet(
-		QString("QwtPlotCanvas { "
-			"background-color: #141416; }"));
+	fft_plot->canvas()->setStyleSheet(QString("QwtPlotCanvas { "
+						  "background-color: #141416; }"));
 	fft_plot->disableLegend();
 	fft_plot->setAxisScale(QwtPlot::yLeft, -200, 0, 10);
 	// Disable mouse interactions with the axes until they are in a working
@@ -208,14 +196,12 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 		fft_plot->setYaxisMouseGesturesEnabled(i, false);
 	}
 
-	QGridLayout *gLayout =
-		static_cast<QGridLayout *>(ui->widgetPlotContainer->layout());
+	QGridLayout *gLayout = static_cast<QGridLayout *>(ui->widgetPlotContainer->layout());
 	gLayout->addWidget(fft_plot, 1, 0, 1, 1);
 
 	// Initialize spectrum channels
 	for (int i = 0; i < num_adc_channels; i++) {
-		channel_sptr channel = boost::make_shared<SpectrumChannel>(
-			i, channel_names[i], fft_plot);
+		channel_sptr channel = boost::make_shared<SpectrumChannel>(i, channel_names[i], fft_plot);
 		channel->setColor(fft_plot->getLineColor(i));
 		ui->channelsList->addWidget(channel->widget());
 		channels.push_back(channel);
@@ -223,19 +209,15 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 		settings_group->addButton(channel->widget()->menuButton());
 		channels_group->addButton(channel->widget()->nameButton());
 
-		connect(channel.get()->widget(), SIGNAL(menuToggled(bool)),
-			SLOT(onChannelSettingsToggled(bool)));
-		connect(channel.get()->widget(), SIGNAL(selected(bool)),
-			SLOT(onChannelSelected(bool)));
-		connect(channel.get()->widget(), SIGNAL(enabled(bool)),
-			SLOT(onChannelEnabled(bool)));
+		connect(channel.get()->widget(), SIGNAL(menuToggled(bool)), SLOT(onChannelSettingsToggled(bool)));
+		connect(channel.get()->widget(), SIGNAL(selected(bool)), SLOT(onChannelSelected(bool)));
+		connect(channel.get()->widget(), SIGNAL(enabled(bool)), SLOT(onChannelEnabled(bool)));
 
 		ch_api.append(new SpectrumChannel_API(this, channel));
 	}
 
 	if (num_adc_channels > 0)
-		channels[crt_channel_id]->widget()->nameButton()->setChecked(
-			true);
+		channels[crt_channel_id]->widget()->nameButton()->setChecked(true);
 
 	// Initialize Sweep controls
 
@@ -253,47 +235,38 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 		"Top", -100.0, 100.0, false, false, this);
 	ui->topLayout->addWidget(top);
 
-	marker_freq_pos = new PositionSpinButton(
-		{{"Hz", 1e0}, {"kHz", 1e3}, {"MHz", 1e6}}, "Frequency Position",
-		0.0, 5e7, true, false, this);
+	marker_freq_pos = new PositionSpinButton({{"Hz", 1e0}, {"kHz", 1e3}, {"MHz", 1e6}}, "Frequency Position", 0.0,
+						 5e7, true, false, this);
 	ui->markerFreqPosLayout->addWidget(marker_freq_pos);
 	marker_freq_pos->setFineModeAvailable(false);
 
 	startStopRange = new StartStopRangeWidget();
-	connect(startStopRange, &StartStopRangeWidget::rangeChanged,
-		[=](double start, double stop) {
-			fft_plot->setStartStop(start, stop);
-			fft_plot->setAxisScale(QwtPlot::xBottom, start, stop);
-			fft_plot->replot();
+	connect(startStopRange, &StartStopRangeWidget::rangeChanged, [=](double start, double stop) {
+		fft_plot->setStartStop(start, stop);
+		fft_plot->setAxisScale(QwtPlot::xBottom, start, stop);
+		fft_plot->replot();
 
-			setSampleRate(2 * stop);
+		setSampleRate(2 * stop);
 
-			/* Re-populate the RBW list with the new available
-			 * values */
-			ui->cmb_rbw->blockSignals(true);
-			ui->cmb_rbw->clear();
-			int i = 0;
+		/* Re-populate the RBW list with the new available
+		 * values */
+		ui->cmb_rbw->blockSignals(true);
+		ui->cmb_rbw->clear();
+		int i = 0;
 
-			for (; i < bin_sizes.size(); i++) {
-				ui->cmb_rbw->addItem(freq_formatter.format(
-					sample_rate / bin_sizes[i], "Hz", 2));
-			}
+		for (; i < bin_sizes.size(); i++) {
+			ui->cmb_rbw->addItem(freq_formatter.format(sample_rate / bin_sizes[i], "Hz", 2));
+		}
 
-			ui->cmb_rbw->blockSignals(false);
-			ui->cmb_rbw->setCurrentIndex(i - 1);
+		ui->cmb_rbw->blockSignals(false);
+		ui->cmb_rbw->setCurrentIndex(i - 1);
 
-			marker_freq_pos->setMaxValue(stop);
-			marker_freq_pos->setStep(
-				2 * (stop - start) /
-				bin_sizes[ui->cmb_rbw->currentIndex()]);
-		});
+		marker_freq_pos->setMaxValue(stop);
+		marker_freq_pos->setStep(2 * (stop - start) / bin_sizes[ui->cmb_rbw->currentIndex()]);
+	});
 
-	connect(ui->cmb_rbw,
-		QOverload<int>::of(&QComboBox::currentIndexChanged),
-		[=](int index) {
-			startStopRange->setMinimumSpanValue(10 * sample_rate /
-							    bin_sizes[index]);
-		});
+	connect(ui->cmb_rbw, QOverload<int>::of(&QComboBox::currentIndexChanged),
+		[=](int index) { startStopRange->setMinimumSpanValue(10 * sample_rate / bin_sizes[index]); });
 
 	// Initialize vertical axis controls
 	range->setMinValue(1);
@@ -320,24 +293,17 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	// Initialize Marker controls
 	ui->hLayout_marker_selector->addWidget(marker_selector);
 
-	connect(marker_selector, SIGNAL(buttonToggled(int, bool)), this,
-		SLOT(onMarkerToggled(int, bool)));
-	connect(marker_selector, SIGNAL(buttonSelected(int)), this,
-		SLOT(onMarkerSelected(int)));
+	connect(marker_selector, SIGNAL(buttonToggled(int, bool)), this, SLOT(onMarkerToggled(int, bool)));
+	connect(marker_selector, SIGNAL(buttonSelected(int)), this, SLOT(onMarkerSelected(int)));
 	marker_selector->setSelectedButton(0);
 
-	connect(fft_plot, SIGNAL(newMarkerData()), this,
-		SLOT(onPlotNewMarkerData()));
-	connect(fft_plot, SIGNAL(markerSelected(uint, uint)), this,
-		SLOT(onPlotMarkerSelected(uint, uint)));
+	connect(fft_plot, SIGNAL(newMarkerData()), this, SLOT(onPlotNewMarkerData()));
+	connect(fft_plot, SIGNAL(markerSelected(uint, uint)), this, SLOT(onPlotMarkerSelected(uint, uint)));
 
-	connect(marker_freq_pos, SIGNAL(valueChanged(double)), this,
-		SLOT(onMarkerFreqPosChanged(double)));
+	connect(marker_freq_pos, SIGNAL(valueChanged(double)), this, SLOT(onMarkerFreqPosChanged(double)));
 
-	connect(fft_plot, SIGNAL(sampleRateUpdated(double)), this,
-		SLOT(onPlotSampleRateUpdated(double)));
-	connect(fft_plot, SIGNAL(sampleCountUpdated(uint)), this,
-		SLOT(onPlotSampleCountUpdated(uint)));
+	connect(fft_plot, SIGNAL(sampleRateUpdated(double)), this, SLOT(onPlotSampleRateUpdated(double)));
+	connect(fft_plot, SIGNAL(sampleCountUpdated(uint)), this, SLOT(onPlotSampleCountUpdated(uint)));
 
 	if (ctx) {
 		build_gnuradio_block_chain();
@@ -345,24 +311,18 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 		build_gnuradio_block_chain_no_ctx();
 	}
 
-	connect(ui->runSingleWidget, &RunSingleWidget::toggled,
-		[=](bool checked) {
-			auto btn = dynamic_cast<CustomPushButton *>(run_button);
-			btn->setChecked(checked);
-		});
-	connect(run_button, &QPushButton::toggled, ui->runSingleWidget,
-		&RunSingleWidget::toggle);
-	connect(ui->runSingleWidget, &RunSingleWidget::toggled, this,
-		&SpectrumAnalyzer::runStopToggled);
-	connect(this, &SpectrumAnalyzer::started, ui->runSingleWidget,
-		&RunSingleWidget::toggle);
+	connect(ui->runSingleWidget, &RunSingleWidget::toggled, [=](bool checked) {
+		auto btn = dynamic_cast<CustomPushButton *>(run_button);
+		btn->setChecked(checked);
+	});
+	connect(run_button, &QPushButton::toggled, ui->runSingleWidget, &RunSingleWidget::toggle);
+	connect(ui->runSingleWidget, &RunSingleWidget::toggled, this, &SpectrumAnalyzer::runStopToggled);
+	connect(this, &SpectrumAnalyzer::started, ui->runSingleWidget, &RunSingleWidget::toggle);
 
 	connect(fft_plot, SIGNAL(newData()), SLOT(singleCaptureDone()));
 
-	connect(top, SIGNAL(valueChanged(double)),
-		SLOT(onTopValueChanged(double)));
-	connect(range, SIGNAL(valueChanged(double)),
-		SLOT(onRangeValueChanged(double)));
+	connect(top, SIGNAL(valueChanged(double)), SLOT(onTopValueChanged(double)));
+	connect(range, SIGNAL(valueChanged(double)), SLOT(onRangeValueChanged(double)));
 
 	// UI default
 	ui->comboBox_window->setCurrentText("Hamming");
@@ -377,9 +337,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	marker_freq_pos->setMinValue(1);
 	marker_freq_pos->setMaxValue(startStopRange->getStopValue());
-	marker_freq_pos->setStep(2 *
-				 (startStopRange->getStopValue() -
-				  startStopRange->getStartValue()) /
+	marker_freq_pos->setStep(2 * (startStopRange->getStopValue() - startStopRange->getStartValue()) /
 				 bin_sizes[ui->cmb_rbw->currentIndex()]);
 
 	ui->lblMagUnit->setText(ui->cmb_units->currentText());
@@ -389,21 +347,17 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 		ch->setFftWindow(FftWinType::HAMMING, fft_size);
 	}
 
-	connect(ui->logBtn, &QPushButton::toggled, fft_plot,
-		&FftDisplayPlot::useLogFreq);
+	connect(ui->logBtn, &QPushButton::toggled, fft_plot, &FftDisplayPlot::useLogFreq);
 
-	api->setObjectName(QString::fromStdString(
-		Filter::tool_name(TOOL_SPECTRUM_ANALYZER)));
+	api->setObjectName(QString::fromStdString(Filter::tool_name(TOOL_SPECTRUM_ANALYZER)));
 	api->load(*settings);
 	api->js_register(engine);
 
-	connect(ui->rightMenu, &MenuAnim::finished, this,
-		&SpectrumAnalyzer::rightMenuFinished);
+	connect(ui->rightMenu, &MenuAnim::finished, this, &SpectrumAnalyzer::rightMenuFinished);
 	menuOrder.push_back(ui->btnSweep);
 
-	connect(ui->btnPrint, &QPushButton::clicked, [=]() {
-		fft_plot->printWithNoBackground(api->objectName(), false);
-	});
+	connect(ui->btnPrint, &QPushButton::clicked,
+		[=]() { fft_plot->printWithNoBackground(api->objectName(), false); });
 
 	connect(ui->btnSnapshot, &QPushButton::clicked, [=]() {
 		QwtPlotCurve *curve = fft_plot->Curve(selected_ch_settings);
@@ -427,13 +381,10 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 			QStringList channelDetails;
 
-			auto iterAvg = std::find_if(
-				avg_types.begin(), avg_types.end(),
-				[&](const std::pair<QString,
-						    FftDisplayPlot::AverageType>
-					    &p) {
-					return p.second == sc->averageType();
-				});
+			auto iterAvg = std::find_if(avg_types.begin(), avg_types.end(),
+						    [&](const std::pair<QString, FftDisplayPlot::AverageType> &p) {
+							    return p.second == sc->averageType();
+						    });
 
 			if (iterAvg != avg_types.end()) {
 				channelDetails.push_back((*iterAvg).first);
@@ -441,16 +392,13 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 			auto iterWin = std::find_if(
 				win_types.begin(), win_types.end(),
-				[&](const std::pair<QString, FftWinType> &p) {
-					return p.second == sc->fftWindow();
-				});
+				[&](const std::pair<QString, FftWinType> &p) { return p.second == sc->fftWindow(); });
 
 			if (iterWin != win_types.end()) {
 				channelDetails.push_back((*iterWin).first);
 			}
 
-			channelDetails.push_back(
-				QString::number(sc->averaging()));
+			channelDetails.push_back(QString::number(sc->averaging()));
 
 			importedChannelDetails.push_back(channelDetails);
 
@@ -460,12 +408,9 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 			// export
 			QString fileName = QFileDialog::getSaveFileName(
 				this, tr("Export"), "",
-				tr("Comma-separated values files (*.csv)",
-				   "Tab-delimited values files (*.txt)"),
+				tr("Comma-separated values files (*.csv)", "Tab-delimited values files (*.txt)"),
 				nullptr,
-				(m_useNativeDialogs
-					 ? QFileDialog::Options()
-					 : QFileDialog::DontUseNativeDialog));
+				(m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 
 			if (!fileName.isEmpty()) {
 				FileManager fm("Spectrum Analyzer");
@@ -473,62 +418,46 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 				QVector<double> freq_data, mag_data;
 
-				for (size_t i = 0; i < curve->data()->size();
-				     ++i) {
-					freq_data.push_back(
-						curve->sample(i).x());
-					mag_data.push_back(
-						curve->sample(i).y());
+				for (size_t i = 0; i < curve->data()->size(); ++i) {
+					freq_data.push_back(curve->sample(i).x());
+					mag_data.push_back(curve->sample(i).y());
 				}
 
 				QString unit = ui->lblMagUnit->text();
 				fm.save(freq_data, "Frequency(Hz)");
 				fm.save(mag_data,
-					"REF" +
-						QString::number(
-							selected_ch_settings -
-							num_adc_channels + 1) +
-						"(" + unit + ")");
+					"REF" + QString::number(selected_ch_settings - num_adc_channels + 1) + "(" +
+						unit + ")");
 
 				QString channelDetails;
 
-				auto iterAvg = std::find_if(
-					avg_types.begin(), avg_types.end(),
-					[&](const std::pair<
-						QString,
-						FftDisplayPlot::AverageType>
-						    &p) {
-						return p.first ==
-							importedChannelDetails
-								[selected_ch_settings -
-								 num_adc_channels]
-								[0];
-					});
+				auto iterAvg =
+					std::find_if(avg_types.begin(), avg_types.end(),
+						     [&](const std::pair<QString, FftDisplayPlot::AverageType> &p) {
+							     return p.first ==
+								     importedChannelDetails[selected_ch_settings -
+											    num_adc_channels][0];
+						     });
 
 				if (iterAvg != avg_types.end()) {
 					channelDetails += (*iterAvg).first;
 					channelDetails += ",";
 				}
 
-				auto iterWin = std::find_if(
-					win_types.begin(), win_types.end(),
-					[&](const std::pair<QString, FftWinType>
-						    &p) {
-						return p.first ==
-							importedChannelDetails
-								[selected_ch_settings -
-								 num_adc_channels]
-								[1];
-					});
+				auto iterWin =
+					std::find_if(win_types.begin(), win_types.end(),
+						     [&](const std::pair<QString, FftWinType> &p) {
+							     return p.first ==
+								     importedChannelDetails[selected_ch_settings -
+											    num_adc_channels][1];
+						     });
 
 				if (iterWin != win_types.end()) {
 					channelDetails += (*iterWin).first;
 					channelDetails += ",";
 				}
 
-				channelDetails += importedChannelDetails
-					[selected_ch_settings -
-					 num_adc_channels][2];
+				channelDetails += importedChannelDetails[selected_ch_settings - num_adc_channels][2];
 				channelDetails += ",";
 
 				fm.setAdditionalInformation(channelDetails);
@@ -538,8 +467,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 		}
 	});
 
-	connect(ui->btnExport, &QPushButton::clicked, this,
-		&SpectrumAnalyzer::btnExportClicked);
+	connect(ui->btnExport, &QPushButton::clicked, this, &SpectrumAnalyzer::btnExportClicked);
 }
 
 SpectrumAnalyzer::~SpectrumAnalyzer() {
@@ -585,18 +513,14 @@ void SpectrumAnalyzer::setNativeDialogs(bool nativeDialogs) {
 }
 
 void SpectrumAnalyzer::readPreferences() {
-	fft_plot->setVisiblePeakSearch(
-		prefPanel->getSpectrum_visible_peak_search());
+	fft_plot->setVisiblePeakSearch(prefPanel->getSpectrum_visible_peak_search());
 }
 
 void SpectrumAnalyzer::btnExportClicked() {
 	QString fileName = QFileDialog::getSaveFileName(
 		this, tr("Export"), "",
-		tr("Comma-separated values files (*.csv)",
-		   "Tab-delimited values files (*.txt)"),
-		nullptr,
-		(m_useNativeDialogs ? QFileDialog::Options()
-				    : QFileDialog::DontUseNativeDialog));
+		tr("Comma-separated values files (*.csv)", "Tab-delimited values files (*.txt)"), nullptr,
+		(m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 
 	if (!fileName.isEmpty()) {
 		FileManager fm("Spectrum Analyzer");
@@ -605,8 +529,7 @@ void SpectrumAnalyzer::btnExportClicked() {
 		QVector<double> frequency_data;
 		int nr_samples = fft_plot->Curve(0)->data()->size();
 		for (int i = 0; i < nr_samples; ++i) {
-			frequency_data.push_back(
-				fft_plot->Curve(0)->sample(i).x());
+			frequency_data.push_back(fft_plot->Curve(0)->sample(i).x());
 		}
 
 		fm.save(frequency_data, "Frequency(Hz)");
@@ -616,25 +539,19 @@ void SpectrumAnalyzer::btnExportClicked() {
 		for (int i = 0; i < channels.size(); ++i) {
 			QVector<double> data;
 			for (int j = 0; j < nr_samples; ++j) {
-				data.push_back(
-					fft_plot->Curve(i)->sample(j).y());
+				data.push_back(fft_plot->Curve(i)->sample(j).y());
 			}
 			QString unit = ui->lblMagUnit->text();
-			fm.save(data,
-				"Amplitude CH" + QString::number(i + 1) + "(" +
-					unit + ")");
+			fm.save(data, "Amplitude CH" + QString::number(i + 1) + "(" + unit + ")");
 
 			/* Save information about the channels averaging type,
 			 * window and averaging value */
 			channel_sptr sc = channels.at(i);
 
-			auto iterAvg = std::find_if(
-				avg_types.begin(), avg_types.end(),
-				[&](const std::pair<QString,
-						    FftDisplayPlot::AverageType>
-					    &p) {
-					return p.second == sc->averageType();
-				});
+			auto iterAvg = std::find_if(avg_types.begin(), avg_types.end(),
+						    [&](const std::pair<QString, FftDisplayPlot::AverageType> &p) {
+							    return p.second == sc->averageType();
+						    });
 
 			if (iterAvg != avg_types.end()) {
 				channelDetails += (*iterAvg).first;
@@ -643,9 +560,7 @@ void SpectrumAnalyzer::btnExportClicked() {
 
 			auto iterWin = std::find_if(
 				win_types.begin(), win_types.end(),
-				[&](const std::pair<QString, FftWinType> &p) {
-					return p.second == sc->fftWindow();
-				});
+				[&](const std::pair<QString, FftWinType> &p) { return p.second == sc->fftWindow(); });
 
 			if (iterWin != win_types.end()) {
 				channelDetails += (*iterWin).first;
@@ -662,11 +577,9 @@ void SpectrumAnalyzer::btnExportClicked() {
 	}
 }
 
-void SpectrumAnalyzer::triggerRightMenuToggle(CustomPushButton *btn,
-					      bool checked) {
+void SpectrumAnalyzer::triggerRightMenuToggle(CustomPushButton *btn, bool checked) {
 	if (ui->rightMenu->animInProgress()) {
-		menuButtonActions.enqueue(
-			QPair<CustomPushButton *, bool>(btn, checked));
+		menuButtonActions.enqueue(QPair<CustomPushButton *, bool>(btn, checked));
 	} else {
 		toggleRightMenu(btn, checked);
 	}
@@ -724,8 +637,7 @@ void SpectrumAnalyzer::toggleRightMenu(CustomPushButton *btn, bool checked) {
 	}
 
 	if (!ui->btnToolSettings->isChecked()) {
-		ui->btnSettings->setChecked(
-			!!this->settings_group->checkedButton());
+		ui->btnSettings->setChecked(!!this->settings_group->checkedButton());
 	}
 
 	if (checked) {
@@ -745,8 +657,7 @@ void SpectrumAnalyzer::rightMenuFinished(bool opened) {
 }
 
 void SpectrumAnalyzer::on_btnToolSettings_toggled(bool checked) {
-	triggerRightMenuToggle(
-		static_cast<CustomPushButton *>(QObject::sender()), checked);
+	triggerRightMenuToggle(static_cast<CustomPushButton *>(QObject::sender()), checked);
 	if (checked) {
 		ui->btnSettings->setChecked(!checked);
 	}
@@ -757,8 +668,7 @@ void SpectrumAnalyzer::on_btnSettings_clicked(bool checked) {
 	if (checked && !menuOrder.isEmpty()) {
 		btn = menuOrder.back();
 	} else {
-		btn = static_cast<CustomPushButton *>(
-			settings_group->checkedButton());
+		btn = static_cast<CustomPushButton *>(settings_group->checkedButton());
 	}
 
 	if (btn) {
@@ -767,20 +677,17 @@ void SpectrumAnalyzer::on_btnSettings_clicked(bool checked) {
 }
 
 void SpectrumAnalyzer::on_btnSweep_toggled(bool checked) {
-	triggerRightMenuToggle(
-		static_cast<CustomPushButton *>(QObject::sender()), checked);
+	triggerRightMenuToggle(static_cast<CustomPushButton *>(QObject::sender()), checked);
 }
 
 void SpectrumAnalyzer::on_btnMarkers_toggled(bool checked) {
 	marker_menu_opened = checked;
 
-	triggerRightMenuToggle(
-		static_cast<CustomPushButton *>(QObject::sender()), checked);
+	triggerRightMenuToggle(static_cast<CustomPushButton *>(QObject::sender()), checked);
 }
 
 void SpectrumAnalyzer::on_btnAddRef_toggled(bool checked) {
-	triggerRightMenuToggle(
-		static_cast<CustomPushButton *>(QObject::sender()), checked);
+	triggerRightMenuToggle(static_cast<CustomPushButton *>(QObject::sender()), checked);
 }
 
 void SpectrumAnalyzer::on_btnBrowseFile_clicked() {
@@ -788,9 +695,7 @@ void SpectrumAnalyzer::on_btnBrowseFile_clicked() {
 		this, tr("Export"), "",
 		tr("Comma-separated values files (*.csv);;"
 		   "Tab-delimited values files (*.txt)"),
-		nullptr,
-		(m_useNativeDialogs ? QFileDialog::Options()
-				    : QFileDialog::DontUseNativeDialog));
+		nullptr, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 
 	FileManager fm("Spectrum Analyzer");
 
@@ -803,8 +708,7 @@ void SpectrumAnalyzer::on_btnBrowseFile_clicked() {
 		for (int i = 0; i < fm.getNrOfChannels(); ++i) {
 			/* Amplitude CHX UNIT => mid(10, 3) strip CHX from
 			 * column name */
-			ui->importSettings->addChannel(
-				i, fm.getColumnName(i).mid(10, 3));
+			ui->importSettings->addChannel(i, fm.getColumnName(i).mid(10, 3));
 		}
 
 		QVector<QVector<double>> data = fm.read();
@@ -816,8 +720,7 @@ void SpectrumAnalyzer::on_btnBrowseFile_clicked() {
 		for (int i = 0; i < channelDetails.size() / 3; ++i) {
 			QStringList currentChannelDetails;
 			for (int j = 0; j < 3; ++j) {
-				currentChannelDetails.push_back(
-					channelDetails[i * 3 + j]);
+				currentChannelDetails.push_back(channelDetails[i * 3 + j]);
 			}
 			importedChannelDetails.push_back(currentChannelDetails);
 		}
@@ -852,8 +755,7 @@ QString SpectrumAnalyzer::getReferenceChannelName() const {
 		bool isOk = true;
 		for (const auto &ref_channel : referenceChannels) {
 			QString shortName = ref_channel->shortName();
-			int channel_counter =
-				shortName.mid(shortName.size() - 1).toInt();
+			int channel_counter = shortName.mid(shortName.size() - 1).toInt();
 			if (current == channel_counter) {
 				isOk = false;
 				break;
@@ -867,8 +769,7 @@ QString SpectrumAnalyzer::getReferenceChannelName() const {
 	return QString("REF %1").arg(current);
 }
 
-void SpectrumAnalyzer::add_ref_waveform(QVector<double> xData,
-					QVector<double> yData) {
+void SpectrumAnalyzer::add_ref_waveform(QVector<double> xData, QVector<double> yData) {
 	if (nb_ref_channels == MAX_REF_CHANNELS) {
 		return;
 	}
@@ -879,26 +780,20 @@ void SpectrumAnalyzer::add_ref_waveform(QVector<double> xData,
 
 	fft_plot->registerReferenceWaveform(qname, xData, yData);
 
-	auto channelWidget = new ChannelWidget(
-		curve_id, true, false, fft_plot->getLineColor(curve_id));
+	auto channelWidget = new ChannelWidget(curve_id, true, false, fft_plot->getLineColor(curve_id));
 	channelWidget->setShortName(qname);
 	channelWidget->nameButton()->setText(channelWidget->shortName());
 	channelWidget->setReferenceChannel(true);
-	channelWidget->deleteButton()->setProperty("curve_name",
-						   QVariant(qname));
+	channelWidget->deleteButton()->setProperty("curve_name", QVariant(qname));
 
 	settings_group->addButton(channelWidget->menuButton());
 	channels_group->addButton(channelWidget->nameButton());
 	referenceChannels.push_back(channelWidget);
 
-	connect(channelWidget, &ChannelWidget::menuToggled, this,
-		&SpectrumAnalyzer::onChannelSettingsToggled);
-	connect(channelWidget, &ChannelWidget::selected, this,
-		&SpectrumAnalyzer::onChannelSelected);
-	connect(channelWidget, &ChannelWidget::deleteClicked, this,
-		&SpectrumAnalyzer::onReferenceChannelDeleted);
-	connect(channelWidget, &ChannelWidget::enabled, this,
-		&SpectrumAnalyzer::onChannelEnabled);
+	connect(channelWidget, &ChannelWidget::menuToggled, this, &SpectrumAnalyzer::onChannelSettingsToggled);
+	connect(channelWidget, &ChannelWidget::selected, this, &SpectrumAnalyzer::onChannelSelected);
+	connect(channelWidget, &ChannelWidget::deleteClicked, this, &SpectrumAnalyzer::onReferenceChannelDeleted);
+	connect(channelWidget, &ChannelWidget::enabled, this, &SpectrumAnalyzer::onChannelEnabled);
 
 	ui->channelsList->addWidget(channelWidget);
 
@@ -932,8 +827,7 @@ void SpectrumAnalyzer::onReferenceChannelDeleted() {
 		ui->btnAddRef->show();
 	}
 
-	ChannelWidget *channelWidget =
-		static_cast<ChannelWidget *>(QObject::sender());
+	ChannelWidget *channelWidget = static_cast<ChannelWidget *>(QObject::sender());
 	QAbstractButton *delBtn = channelWidget->deleteButton();
 	QString qname = delBtn->property("curve_name").toString();
 
@@ -943,14 +837,11 @@ void SpectrumAnalyzer::onReferenceChannelDeleted() {
 	/* Check if there are other channel widgets that are enabled */
 	bool channelsEnabled = false;
 
-	referenceChannels.erase(std::find(referenceChannels.begin(),
-					  referenceChannels.end(),
-					  channelWidget));
+	referenceChannels.erase(std::find(referenceChannels.begin(), referenceChannels.end(), channelWidget));
 
 	/* Update the id of the remaining channels */
 	int id = num_adc_channels;
-	for (auto iter = referenceChannels.begin();
-	     iter != referenceChannels.end(); ++iter) {
+	for (auto iter = referenceChannels.begin(); iter != referenceChannels.end(); ++iter) {
 		(*iter)->setId(id++);
 	}
 
@@ -974,8 +865,7 @@ void SpectrumAnalyzer::onReferenceChannelDeleted() {
 
 	if (ui->btnMarkers->isChecked() && !channelsEnabled) {
 		ui->btnMarkers->setChecked(false);
-		menuButtonActions.removeAll(
-			QPair<CustomPushButton *, bool>(ui->btnMarkers, true));
+		menuButtonActions.removeAll(QPair<CustomPushButton *, bool>(ui->btnMarkers, true));
 		menuOrder.removeAll(ui->btnMarkers);
 		ui->btnMarkers->blockSignals(true);
 		ui->btnMarkers->setDisabled(true);
@@ -985,11 +875,8 @@ void SpectrumAnalyzer::onReferenceChannelDeleted() {
 	if (channelWidget->menuButton()->isChecked()) {
 		channelWidget->menuButton()->setChecked(false);
 		menuButtonActions.removeAll(QPair<CustomPushButton *, bool>(
-			static_cast<CustomPushButton *>(
-				channelWidget->menuButton()),
-			true));
-		menuOrder.removeAll(static_cast<CustomPushButton *>(
-			channelWidget->menuButton()));
+			static_cast<CustomPushButton *>(channelWidget->menuButton()), true));
+		menuOrder.removeAll(static_cast<CustomPushButton *>(channelWidget->menuButton()));
 	}
 
 	delete channelWidget;
@@ -1020,9 +907,8 @@ void SpectrumAnalyzer::runStopToggled(bool checked) {
 
 void SpectrumAnalyzer::build_gnuradio_block_chain() {
 	// TO DO: don't use the 100e6 hardcoded value anymore
-	fft_sink = adiscope::scope_sink_f::make(
-		fft_size, 100e6, "Osc Frequency", num_adc_channels,
-		(QObject *)fft_plot);
+	fft_sink =
+		adiscope::scope_sink_f::make(fft_size, 100e6, "Osc Frequency", num_adc_channels, (QObject *)fft_plot);
 	fft_sink->set_trigger_mode(TRIG_MODE_TAG, 0, "buffer_start");
 
 	bool started = isIioManagerStarted();
@@ -1042,13 +928,11 @@ void SpectrumAnalyzer::build_gnuradio_block_chain() {
 
 			if (m2k_adc) {
 				corr_gain = m2k_adc->chnCorrectionGain(i);
-				hw_gain = m2k_adc->gainAt(
-					m2k_adc->chnHwGainMode(i));
+				hw_gain = m2k_adc->gainAt(m2k_adc->chnHwGainMode(i));
 			}
 
 			// Calculate the VLSB for current channel
-			double vlsb = adc_sample_conv::convSampleToVolts(
-				1, corr_gain, 1, 0, hw_gain);
+			double vlsb = adc_sample_conv::convSampleToVolts(1, corr_gain, 1, 0, hw_gain);
 			fft_plot->setScaleFactor(i, vlsb);
 		}
 	}
@@ -1056,8 +940,7 @@ void SpectrumAnalyzer::build_gnuradio_block_chain() {
 	fft_ids = new iio_manager::port_id[num_adc_channels];
 
 	for (int i = 0; i < num_adc_channels; i++) {
-		auto fft = gnuradio::get_initial_sptr(
-			new fft_block(false, fft_size));
+		auto fft = gnuradio::get_initial_sptr(new fft_block(false, fft_size));
 		auto ctm = gr::blocks::complex_to_mag_squared::make(1);
 
 		// iio(i)->fft->ctm->fft_sink
@@ -1076,21 +959,17 @@ void SpectrumAnalyzer::build_gnuradio_block_chain() {
 
 void SpectrumAnalyzer::build_gnuradio_block_chain_no_ctx() {
 	// TO DO: don't use the 100e6 hardcoded value anymore
-	fft_sink = adiscope::scope_sink_f::make(
-		fft_size, 100e6, "Osc Frequency", num_adc_channels,
-		(QObject *)fft_plot);
+	fft_sink =
+		adiscope::scope_sink_f::make(fft_size, 100e6, "Osc Frequency", num_adc_channels, (QObject *)fft_plot);
 
 	top_block = gr::make_top_block("spectrum_analyzer");
 
 	for (int i = 0; i < num_adc_channels; i++) {
-		auto fft = gnuradio::get_initial_sptr(
-			new fft_block(false, fft_size));
+		auto fft = gnuradio::get_initial_sptr(new fft_block(false, fft_size));
 		auto ctm = gr::blocks::complex_to_mag_squared::make(1);
 
-		auto siggen = gr::analog::sig_source_f::make(
-			100e6, gr::analog::GR_SIN_WAVE, 5e6 + i * 5e6, 2048);
-		auto noise = gr::analog::fastnoise_source_f::make(
-			gr::analog::GR_GAUSSIAN, 1, 0, 8192);
+		auto siggen = gr::analog::sig_source_f::make(100e6, gr::analog::GR_SIN_WAVE, 5e6 + i * 5e6, 2048);
+		auto noise = gr::analog::fastnoise_source_f::make(gr::analog::GR_GAUSSIAN, 1, 0, 8192);
 		auto add = gr::blocks::add_ff::make();
 
 		// siggen->|
@@ -1128,26 +1007,21 @@ void SpectrumAnalyzer::stop_blockchain_flow() {
 }
 
 void SpectrumAnalyzer::on_comboBox_type_currentIndexChanged(const QString &s) {
-	auto it = std::find_if(
-		avg_types.begin(), avg_types.end(),
-		[&](const std::pair<QString, FftDisplayPlot::AverageType> &p) {
-			return p.first == s;
-		});
+	auto it = std::find_if(avg_types.begin(), avg_types.end(),
+			       [&](const std::pair<QString, FftDisplayPlot::AverageType> &p) { return p.first == s; });
 
 	if (it == avg_types.end()) {
 		return;
 	}
 
-	const bool visible =
-		((*it).second != FftDisplayPlot::AverageType::SAMPLE);
+	const bool visible = ((*it).second != FftDisplayPlot::AverageType::SAMPLE);
 	ui->spinBox_averaging->setVisible(visible);
 	ui->label_averaging->setVisible(visible);
 
 	int crt_channel = channelIdOfOpenedSettings();
 
 	if (crt_channel < 0) {
-		qDebug(CAT_SPECTRUM_ANALYZER)
-			<< "invalid channel ID for the opened Settings menu";
+		qDebug(CAT_SPECTRUM_ANALYZER) << "invalid channel ID for the opened Settings menu";
 		return;
 	}
 
@@ -1158,12 +1032,9 @@ void SpectrumAnalyzer::on_comboBox_type_currentIndexChanged(const QString &s) {
 	}
 }
 
-void SpectrumAnalyzer::on_comboBox_window_currentIndexChanged(
-	const QString &s) {
+void SpectrumAnalyzer::on_comboBox_window_currentIndexChanged(const QString &s) {
 	auto it = std::find_if(win_types.begin(), win_types.end(),
-			       [&](const std::pair<QString, FftWinType> &p) {
-				       return p.first == s;
-			       });
+			       [&](const std::pair<QString, FftWinType> &p) { return p.first == s; });
 
 	if (it == win_types.end()) {
 		return;
@@ -1172,8 +1043,7 @@ void SpectrumAnalyzer::on_comboBox_window_currentIndexChanged(
 	int crt_channel = channelIdOfOpenedSettings();
 
 	if (crt_channel < 0) {
-		qDebug(CAT_SPECTRUM_ANALYZER)
-			<< "invalid channel ID for the opened Settings menu";
+		qDebug(CAT_SPECTRUM_ANALYZER) << "invalid channel ID for the opened Settings menu";
 		return;
 	}
 
@@ -1192,8 +1062,7 @@ void SpectrumAnalyzer::on_spinBox_averaging_valueChanged(int n) {
 	int crt_channel = channelIdOfOpenedSettings();
 
 	if (crt_channel < 0) {
-		qDebug(CAT_SPECTRUM_ANALYZER)
-			<< "invalid channel ID for the opened Settings menu";
+		qDebug(CAT_SPECTRUM_ANALYZER) << "invalid channel ID for the opened Settings menu";
 		return;
 	}
 
@@ -1205,8 +1074,7 @@ void SpectrumAnalyzer::on_spinBox_averaging_valueChanged(int n) {
 void SpectrumAnalyzer::onChannelSettingsToggled(bool en) {
 	ChannelWidget *cw = static_cast<ChannelWidget *>(QObject::sender());
 
-	triggerRightMenuToggle(
-		static_cast<CustomPushButton *>(cw->menuButton()), en);
+	triggerRightMenuToggle(static_cast<CustomPushButton *>(cw->menuButton()), en);
 }
 
 void SpectrumAnalyzer::updateChannelSettingsPanel(unsigned int id) {
@@ -1223,8 +1091,7 @@ void SpectrumAnalyzer::updateChannelSettingsPanel(unsigned int id) {
 	if (id < num_adc_channels) {
 		channel_sptr sc = channels.at(id);
 
-		QString style =
-			QString("border: 2px solid %1").arg(cw->color().name());
+		QString style = QString("border: 2px solid %1").arg(cw->color().name());
 		ui->lineChannelSettingsTitle->setStyleSheet(style);
 		ui->channelSettingsTitle->setText(sc->name());
 
@@ -1242,15 +1109,12 @@ void SpectrumAnalyzer::updateChannelSettingsPanel(unsigned int id) {
 		ui->label_window->setVisible(true);
 		ui->label_averaging->setVisible(true);
 
-		auto it = std::find_if(
-			avg_types.begin(), avg_types.end(),
-			[&](const std::pair<QString,
-					    FftDisplayPlot::AverageType> &p) {
-				return p.second == sc->averageType();
-			});
+		auto it = std::find_if(avg_types.begin(), avg_types.end(),
+				       [&](const std::pair<QString, FftDisplayPlot::AverageType> &p) {
+					       return p.second == sc->averageType();
+				       });
 
-		const bool visible = (sc->averageType() !=
-				      FftDisplayPlot::AverageType::SAMPLE);
+		const bool visible = (sc->averageType() != FftDisplayPlot::AverageType::SAMPLE);
 		ui->spinBox_averaging->setVisible(visible);
 		ui->label_averaging->setVisible(visible);
 
@@ -1258,9 +1122,8 @@ void SpectrumAnalyzer::updateChannelSettingsPanel(unsigned int id) {
 			ui->comboBox_type->setCurrentText((*it).first);
 		}
 
-		auto it2 = std::find_if(
-			win_types.begin(), win_types.end(),
-			[&](const std::pair<QString, FftWinType> &p) {
+		auto it2 =
+			std::find_if(win_types.begin(), win_types.end(), [&](const std::pair<QString, FftWinType> &p) {
 				return p.second == sc->fftWindow();
 			});
 
@@ -1270,22 +1133,15 @@ void SpectrumAnalyzer::updateChannelSettingsPanel(unsigned int id) {
 
 		ui->spinBox_averaging->setValue(sc->averaging());
 	} else {
-		QString style =
-			QString("border: 2px solid %1").arg(cw->color().name());
+		QString style = QString("border: 2px solid %1").arg(cw->color().name());
 		ui->lineChannelSettingsTitle->setStyleSheet(style);
 		ui->channelSettingsTitle->setText(cw->nameButton()->text());
 
 		if ((id - num_adc_channels) < importedChannelDetails.size() &&
 		    importedChannelDetails[id - num_adc_channels].size() == 3) {
-			ui->comboBox_type->setCurrentText(
-				importedChannelDetails[id - num_adc_channels]
-						      [0]);
-			ui->comboBox_window->setCurrentText(
-				importedChannelDetails[id - num_adc_channels]
-						      [1]);
-			ui->spinBox_averaging->setValue(
-				importedChannelDetails[id - num_adc_channels][2]
-					.toInt());
+			ui->comboBox_type->setCurrentText(importedChannelDetails[id - num_adc_channels][0]);
+			ui->comboBox_window->setCurrentText(importedChannelDetails[id - num_adc_channels][1]);
+			ui->spinBox_averaging->setValue(importedChannelDetails[id - num_adc_channels][2].toInt());
 
 			ui->comboBox_type->setDisabled(true);
 			ui->comboBox_window->setDisabled(true);
@@ -1310,11 +1166,9 @@ ChannelWidget *SpectrumAnalyzer::getChannelWidgetAt(unsigned int id) {
 
 	/* Also check if the id corresponds to one of the reference
 	 * channel widgets and get an iterator pointing to that widget */
-	auto cwIter =
-		std::find_if(referenceChannels.begin(), referenceChannels.end(),
-			     [&id](ChannelWidget *referenceChannelWidget) {
-				     return referenceChannelWidget->id() == id;
-			     });
+	auto cwIter = std::find_if(
+		referenceChannels.begin(), referenceChannels.end(),
+		[&id](ChannelWidget *referenceChannelWidget) { return referenceChannelWidget->id() == id; });
 
 	if (cwIter != referenceChannels.end()) {
 		return *cwIter;
@@ -1330,8 +1184,7 @@ void SpectrumAnalyzer::onChannelSelected(bool en) {
 	crt_channel_id = chIdx;
 
 	if (marker_menu_opened) {
-		triggerRightMenuToggle(
-			static_cast<CustomPushButton *>(ui->btnMarkers), en);
+		triggerRightMenuToggle(static_cast<CustomPushButton *>(ui->btnMarkers), en);
 	}
 }
 
@@ -1346,15 +1199,13 @@ void SpectrumAnalyzer::updateMarkerMenu(unsigned int id) {
 	// Update markers settings menu based on current channel
 	if (cw->nameButton()->isChecked()) {
 		ui->labelMarkerSettingsTitle->setText(cw->fullName());
-		QString stylesheet =
-			QString("border: 2px solid %1").arg(cw->color().name());
+		QString stylesheet = QString("border: 2px solid %1").arg(cw->color().name());
 		ui->lineMarkerSettingsTitle->setStyleSheet(stylesheet);
 
 		marker_selector->blockSignals(true);
 
 		for (int i = 0; i < fft_plot->markerCount(id); i++) {
-			marker_selector->setButtonChecked(
-				i, fft_plot->markerEnabled(id, i));
+			marker_selector->setButtonChecked(i, fft_plot->markerEnabled(id, i));
 		}
 
 		marker_selector->blockSignals(false);
@@ -1365,8 +1216,7 @@ void SpectrumAnalyzer::updateMarkerMenu(unsigned int id) {
 
 bool SpectrumAnalyzer::isIioManagerStarted() const {
 	return iio->started() &&
-		(ui->runSingleWidget->singleButtonChecked() ||
-		 ui->runSingleWidget->runButtonChecked());
+		(ui->runSingleWidget->singleButtonChecked() || ui->runSingleWidget->runButtonChecked());
 }
 
 void SpectrumAnalyzer::onChannelEnabled(bool en) {
@@ -1398,9 +1248,7 @@ void SpectrumAnalyzer::onChannelEnabled(bool en) {
 			}
 			ui->btnMarkers->setChecked(false);
 			ui->btnMarkers->setDisabled(true);
-			menuButtonActions.removeAll(
-				QPair<CustomPushButton *, bool>(ui->btnMarkers,
-								false));
+			menuButtonActions.removeAll(QPair<CustomPushButton *, bool>(ui->btnMarkers, false));
 			menuOrder.removeAll(ui->btnMarkers);
 		}
 		fft_plot->DetachCurve(cw->id());
@@ -1443,9 +1291,7 @@ void SpectrumAnalyzer::writeAllSettingsToHardware() {
 			m2k_adc->setChnHwGainMode(i, M2kAdc::LOW_GAIN_MODE);
 		}
 
-		iio_device_attr_write_longlong(adc->iio_adc_dev(),
-					       "oversampling_ratio",
-					       sample_rate_divider);
+		iio_device_attr_write_longlong(adc->iio_adc_dev(), "oversampling_ratio", sample_rate_divider);
 	}
 
 	auto trigger = adc->getTrigger();
@@ -1518,15 +1364,12 @@ void SpectrumAnalyzer::on_cmb_rbw_currentIndexChanged(int index) {
 
 	marker_freq_pos->setMinValue(startStopRange->getStartValue());
 	marker_freq_pos->setMaxValue(startStopRange->getStopValue());
-	marker_freq_pos->setStep(2 *
-				 (startStopRange->getStopValue() -
-				  startStopRange->getStartValue()) /
+	marker_freq_pos->setStep(2 * (startStopRange->getStopValue() - startStopRange->getStartValue()) /
 				 bin_sizes[ui->cmb_rbw->currentIndex()]);
 }
 
 void SpectrumAnalyzer::setSampleRate(double sr) {
-	double max_sr =
-		100E6; // TO DO: make OscAdc figure out the max sr of an ADC
+	double max_sr = 100E6; // TO DO: make OscAdc figure out the max sr of an ADC
 
 	sample_rate_divider = (int)(max_sr / sr);
 	double new_sr = max_sr / sample_rate_divider;
@@ -1541,9 +1384,7 @@ void SpectrumAnalyzer::setSampleRate(double sr) {
 		auto m2k_adc = std::dynamic_pointer_cast<M2kAdc>(adc);
 
 		if (m2k_adc) {
-			iio_device_attr_write_longlong(adc->iio_adc_dev(),
-						       "oversampling_ratio",
-						       sample_rate_divider);
+			iio_device_attr_write_longlong(adc->iio_adc_dev(), "oversampling_ratio", sample_rate_divider);
 		} else {
 			adc->setSampleRate(sr);
 		}
@@ -1573,8 +1414,7 @@ void SpectrumAnalyzer::setFftSize(uint size) {
 	fft_sink->set_nsamps(size);
 
 	for (int i = 0; i < channels.size(); i++) {
-		auto fft =
-			gnuradio::get_initial_sptr(new fft_block(false, size));
+		auto fft = gnuradio::get_initial_sptr(new fft_block(false, size));
 
 		iio->disconnect(fft_ids[i]);
 		fft_ids[i] = iio->connect(fft, i, 0, true, size);
@@ -1633,17 +1473,13 @@ void SpectrumAnalyzer::onMarkerToggled(int id, bool on) {
 
 		bool mkExists = ui->markerTable->isMarker(id, crt_channel_id);
 		if (!mkExists) {
-			ui->markerTable->addMarker(
-				id, crt_channel_id, QString("M%1").arg(id + 1),
-				fft_plot->markerFrequency(crt_channel_id, id),
-				fft_plot->markerMagnitude(crt_channel_id, id),
-				markerTypes[mkType]);
+			ui->markerTable->addMarker(id, crt_channel_id, QString("M%1").arg(id + 1),
+						   fft_plot->markerFrequency(crt_channel_id, id),
+						   fft_plot->markerMagnitude(crt_channel_id, id), markerTypes[mkType]);
 		} else {
-			ui->markerTable->updateMarker(
-				id, crt_channel_id,
-				fft_plot->markerFrequency(crt_channel_id, id),
-				fft_plot->markerMagnitude(crt_channel_id, id),
-				markerTypes[mkType]);
+			ui->markerTable->updateMarker(id, crt_channel_id, fft_plot->markerFrequency(crt_channel_id, id),
+						      fft_plot->markerMagnitude(crt_channel_id, id),
+						      markerTypes[mkType]);
 		}
 	} else {
 		ui->markerTable->removeMarker(id, crt_channel_id);
@@ -1687,14 +1523,10 @@ void SpectrumAnalyzer::updateWidgetsRelatedToMarker(int mrk_idx) {
 }
 
 void SpectrumAnalyzer::setCurrentMarkerLabelData(int chIdx, int mkIdx) {
-	QString txtFreq = freq_formatter.format(
-		fft_plot->markerFrequency(chIdx, mkIdx), "Hz", 3);
-	QString txtMag =
-		QString::number(fft_plot->markerMagnitude(chIdx, mkIdx), 'f',
-				3) +
+	QString txtFreq = freq_formatter.format(fft_plot->markerFrequency(chIdx, mkIdx), "Hz", 3);
+	QString txtMag = QString::number(fft_plot->markerMagnitude(chIdx, mkIdx), 'f', 3) +
 		QString(" " + ui->cmb_units->currentText());
-	QString txt = QString("Marker %1 -> ").arg(mkIdx + 1) + txtFreq +
-		QString(" ") + txtMag;
+	QString txt = QString("Marker %1 -> ").arg(mkIdx + 1) + txtFreq + QString(" ") + txtMag;
 	ui->lbl_crtMarkerReading->setText(txt);
 }
 
@@ -1721,10 +1553,8 @@ void SpectrumAnalyzer::onPlotNewMarkerData() {
 		for (int m = 0; m < fft_plot->markerCount(c); m++) {
 			if (fft_plot->markerEnabled(c, m)) {
 				int mkType = fft_plot->markerType(c, m);
-				ui->markerTable->updateMarker(
-					m, c, fft_plot->markerFrequency(c, m),
-					fft_plot->markerMagnitude(c, m),
-					markerTypes[mkType]);
+				ui->markerTable->updateMarker(m, c, fft_plot->markerFrequency(c, m),
+							      fft_plot->markerMagnitude(c, m), markerTypes[mkType]);
 			}
 		}
 	}
@@ -1750,8 +1580,7 @@ void SpectrumAnalyzer::onMarkerFreqPosChanged(double freq) {
 
 	fft_plot->setMarkerAtFreq(crt_channel_id, crt_marker, freq);
 	fft_plot->updateMarkerUi(crt_channel_id, crt_marker);
-	double actual_freq =
-		fft_plot->markerFrequency(crt_channel_id, crt_marker);
+	double actual_freq = fft_plot->markerFrequency(crt_channel_id, crt_marker);
 
 	marker_freq_pos->silentSetValue(actual_freq);
 
@@ -1760,8 +1589,7 @@ void SpectrumAnalyzer::onMarkerFreqPosChanged(double freq) {
 
 void SpectrumAnalyzer::updateMrkFreqPosSpinBtnLimits() {
 	marker_freq_pos->setMaxValue(startStopRange->getStopValue());
-	marker_freq_pos->setStep(2 * startStopRange->getStopValue() /
-				 bin_sizes[ui->cmb_rbw->currentIndex()]);
+	marker_freq_pos->setStep(2 * startStopRange->getStopValue() / bin_sizes[ui->cmb_rbw->currentIndex()]);
 
 	updateMrkFreqPosSpinBtnValue();
 }
@@ -1784,13 +1612,9 @@ void SpectrumAnalyzer::updateMrkFreqPosSpinBtnValue() {
 	}
 }
 
-void SpectrumAnalyzer::onPlotSampleRateUpdated(double) {
-	updateMrkFreqPosSpinBtnLimits();
-}
+void SpectrumAnalyzer::onPlotSampleRateUpdated(double) { updateMrkFreqPosSpinBtnLimits(); }
 
-void SpectrumAnalyzer::onPlotSampleCountUpdated(uint) {
-	updateMrkFreqPosSpinBtnLimits();
-}
+void SpectrumAnalyzer::onPlotSampleCountUpdated(uint) { updateMrkFreqPosSpinBtnLimits(); }
 
 void SpectrumAnalyzer::singleCaptureDone() {
 	if (ui->runSingleWidget->singleButtonChecked()) {
@@ -1801,8 +1625,7 @@ void SpectrumAnalyzer::singleCaptureDone() {
 void SpectrumAnalyzer::on_cmb_units_currentIndexChanged(const QString &unit) {
 	auto it = std::find_if(
 		mag_types.begin(), mag_types.end(),
-		[&](const std::pair<QString, FftDisplayPlot::MagnitudeType>
-			    &p) { return p.first == unit; });
+		[&](const std::pair<QString, FftDisplayPlot::MagnitudeType> &p) { return p.first == unit; });
 
 	if (it == mag_types.end()) {
 		return;
@@ -1836,13 +1659,9 @@ void SpectrumAnalyzer::on_btnMarkerTable_toggled(bool checked) {
 	ui->markerTable->setVisible(checked);
 
 	// Set the Plot 3 times taller than the Marker Table (when visible)
-	QGridLayout *layout =
-		static_cast<QGridLayout *>(ui->widgetPlotContainer->layout());
-	int row1 = getGridLayoutPosFromIndex(layout,
-					     layout->indexOf(ui->markerTable))
-			   .first;
-	int row2 = getGridLayoutPosFromIndex(layout, layout->indexOf(fft_plot))
-			   .first;
+	QGridLayout *layout = static_cast<QGridLayout *>(ui->widgetPlotContainer->layout());
+	int row1 = getGridLayoutPosFromIndex(layout, layout->indexOf(ui->markerTable)).first;
+	int row2 = getGridLayoutPosFromIndex(layout, layout->indexOf(fft_plot)).first;
 
 	if (checked) {
 		layout->setRowStretch(row1, 1);
@@ -1853,8 +1672,7 @@ void SpectrumAnalyzer::on_btnMarkerTable_toggled(bool checked) {
 	}
 }
 
-QPair<int, int> SpectrumAnalyzer::getGridLayoutPosFromIndex(QGridLayout *layout,
-							    int index) const {
+QPair<int, int> SpectrumAnalyzer::getGridLayoutPosFromIndex(QGridLayout *layout, int index) const {
 	QPair<int, int> pos = qMakePair(-1, -1);
 
 	if (layout && index >= 0) {
@@ -1882,8 +1700,7 @@ void SpectrumAnalyzer::onRangeValueChanged(double range) {
 /*
  * class SpectrumChannel
  */
-SpectrumChannel::SpectrumChannel(int id, const QString &name,
-				 FftDisplayPlot *plot)
+SpectrumChannel::SpectrumChannel(int id, const QString &name, FftDisplayPlot *plot)
 	: m_id(id)
 	, m_name(name)
 	, m_line_width(1.0)
@@ -1898,13 +1715,9 @@ SpectrumChannel::SpectrumChannel(int id, const QString &name,
 	m_widget->nameButton()->setText(m_widget->shortName());
 }
 
-bool SpectrumChannel::isSettingsOn() const {
-	return m_widget->menuButton()->isChecked();
-}
+bool SpectrumChannel::isSettingsOn() const { return m_widget->menuButton()->isChecked(); }
 
-void SpectrumChannel::setSettingsOn(bool on) {
-	m_widget->enableButton()->setChecked(on);
-}
+void SpectrumChannel::setSettingsOn(bool on) { m_widget->enableButton()->setChecked(on); }
 
 float SpectrumChannel::lineWidth() const { return m_line_width; }
 
@@ -1924,9 +1737,7 @@ void SpectrumChannel::setAveraging(uint averaging) {
 	m_plot->setAverage(m_id, m_avg_type, averaging);
 }
 
-FftDisplayPlot::AverageType SpectrumChannel::averageType() const {
-	return m_avg_type;
-}
+FftDisplayPlot::AverageType SpectrumChannel::averageType() const { return m_avg_type; }
 
 void SpectrumChannel::setAverageType(FftDisplayPlot::AverageType avg_type) {
 	m_avg_type = avg_type;
@@ -1942,12 +1753,9 @@ void SpectrumChannel::setFftWindow(SpectrumAnalyzer::FftWinType win, int taps) {
 	fft_block->set_window(window);
 }
 
-SpectrumAnalyzer::FftWinType SpectrumChannel::fftWindow() const {
-	return m_fft_win;
-}
+SpectrumAnalyzer::FftWinType SpectrumChannel::fftWindow() const { return m_fft_win; }
 
-std::vector<float> SpectrumChannel::build_win(SpectrumAnalyzer::FftWinType type,
-					      int ntaps) {
+std::vector<float> SpectrumChannel::build_win(SpectrumAnalyzer::FftWinType type, int ntaps) {
 	switch (type) {
 	case SpectrumAnalyzer::FLAT_TOP:
 		return gr::fft::window::flattop(ntaps);
@@ -1976,8 +1784,7 @@ std::vector<float> SpectrumChannel::build_win(SpectrumAnalyzer::FftWinType type,
 	}
 }
 
-float SpectrumChannel::calcCoherentPowerGain(
-	const std::vector<float> &win) const {
+float SpectrumChannel::calcCoherentPowerGain(const std::vector<float> &win) const {
 	float sum = 0;
 
 	for (int i = 0; i < win.size(); i++) {

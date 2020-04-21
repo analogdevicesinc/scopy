@@ -102,10 +102,8 @@ class Oscilloscope : public Tool {
 	Q_OBJECT
 
 public:
-	explicit Oscilloscope(struct iio_context *ctx, Filter *filt,
-			      std::shared_ptr<GenericAdc> adc,
-			      ToolMenuItem *toolMenuItem, QJSEngine *engine,
-			      ToolLauncher *parent = 0);
+	explicit Oscilloscope(struct iio_context *ctx, Filter *filt, std::shared_ptr<GenericAdc> adc,
+			      ToolMenuItem *toolMenuItem, QJSEngine *engine, ToolLauncher *parent = 0);
 	~Oscilloscope();
 
 	void settingsLoaded();
@@ -113,8 +111,7 @@ public:
 	bool getTrigger_input() const;
 	void setTrigger_input(bool value);
 
-	void add_ref_waveform(QString name, QVector<double> xData,
-			      QVector<double> yData, unsigned int sampleRate);
+	void add_ref_waveform(QString name, QVector<double> xData, QVector<double> yData, unsigned int sampleRate);
 	void remove_ref_waveform(QString name);
 	void setNativeDialogs(bool nativeDialogs) override;
 Q_SIGNALS:
@@ -243,8 +240,7 @@ private:
 	double last_set_time_pos;
 	unsigned long last_set_sample_count;
 	int zoom_level;
-	bool plot_samples_sequentially, d_displayOneBuffer,
-		d_shouldResetStreaming;
+	bool plot_samples_sequentially, d_displayOneBuffer, d_shouldResetStreaming;
 	double horiz_offset;
 	bool reset_horiz_offset;
 	double time_trigger_offset;
@@ -307,11 +303,9 @@ private:
 	boost::shared_ptr<iio_manager> iio;
 	gr::basic_block_sptr adc_samp_conv_block;
 
-	QMap<QString, QPair<gr::basic_block_sptr, gr::basic_block_sptr>>
-		math_sinks;
+	QMap<QString, QPair<gr::basic_block_sptr, gr::basic_block_sptr>> math_sinks;
 	QMap<QString, boost::shared_ptr<gr::analog::rail_ff>> math_rails;
-	std::vector<boost::shared_ptr<gr::blocks::multiply_const_ff>>
-		math_probe_atten;
+	std::vector<boost::shared_ptr<gr::blocks::multiply_const_ff>> math_probe_atten;
 
 	iio_manager::port_id *ids;
 	iio_manager::port_id *hist_ids;
@@ -369,8 +363,7 @@ private:
 	QList<std::shared_ptr<MeasurementData>> measurements_data;
 	QList<std::shared_ptr<MeasurementGui>> measurements_gui;
 
-	QList<QPair<std::shared_ptr<MeasurementData>, Statistic>>
-		statistics_data;
+	QList<QPair<std::shared_ptr<MeasurementData>, Statistic>> statistics_data;
 
 	QList<CustomPushButton *> menuOrder;
 
@@ -380,8 +373,7 @@ private:
 
 	void writeAllSettingsToHardware();
 
-	void comboBoxUpdateToValue(QComboBox *box, double value,
-				   std::vector<double> list);
+	void comboBoxUpdateToValue(QComboBox *box, double value, std::vector<double> list);
 
 	void settings_panel_update(int id);
 	void settings_panel_size_adjust();

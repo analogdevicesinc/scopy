@@ -51,8 +51,7 @@ private:
 	void _npoints_resize();
 
 public:
-	xy_sink_c_impl(int size, const std::string &name, int nconnections,
-		       QObject *plot = NULL);
+	xy_sink_c_impl(int size, const std::string &name, int nconnections, QObject *plot = NULL);
 	~xy_sink_c_impl();
 
 	bool check_topology(int ninputs, int noutputs);
@@ -65,8 +64,7 @@ public:
 	int nsamps() const;
 	void reset();
 
-	int work(int noutput_items, gr_vector_const_void_star &input_items,
-		 gr_vector_void_star &output_items);
+	int work(int noutput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items);
 };
 
 } /* namespace adiscope */

@@ -60,9 +60,7 @@ void Pattern::set_name(const string &name_) { name = name_; }
 
 string Pattern::get_description() { return description; }
 
-void Pattern::set_description(const string &description_) {
-	description = description_;
-}
+void Pattern::set_description(const string &description_) { description = description_; }
 
 void Pattern::init() {}
 
@@ -92,8 +90,7 @@ uint32_t Pattern::get_min_sampling_freq() {
 	return 1; // minimum 1 hertz if not specified otherwise
 }
 
-uint32_t Pattern::get_required_nr_of_samples(uint32_t sample_rate,
-					     uint32_t number_of_channels) {
+uint32_t Pattern::get_required_nr_of_samples(uint32_t sample_rate, uint32_t number_of_channels) {
 	return 0; // 0 samples required
 }
 
@@ -293,9 +290,7 @@ Pattern *Pattern_API::fromJson(QJsonObject obj) {
 	return p;
 }
 
-PatternUI::PatternUI(QWidget *parent) : QWidget(parent) {
-	qDebug() << "PatternUICreated";
-}
+PatternUI::PatternUI(QWidget *parent) : QWidget(parent) { qDebug() << "PatternUICreated"; }
 
 PatternUI::~PatternUI() { qDebug() << "PatternUIDestroyed"; }
 
@@ -305,12 +300,10 @@ void PatternUI::parse_ui() {}
 void PatternUI::destroy_ui() {}
 
 uint32_t ClockPattern::get_min_sampling_freq() {
-	return frequency *
-		boost::math::lcm(duty_cycle_granularity, phase_granularity);
+	return frequency * boost::math::lcm(duty_cycle_granularity, phase_granularity);
 }
 
-uint32_t ClockPattern::get_required_nr_of_samples(uint32_t sample_rate,
-						  uint32_t number_of_channels) {
+uint32_t ClockPattern::get_required_nr_of_samples(uint32_t sample_rate, uint32_t number_of_channels) {
 	// greatest common divider duty cycle and 1000;0;
 	uint32_t period_number_of_samples = (uint32_t)sample_rate / frequency;
 	return period_number_of_samples;
@@ -362,19 +355,14 @@ ClockPattern::ClockPattern() {
 }
 ClockPattern::~ClockPattern() {}
 
-uint8_t ClockPattern::generate_pattern(uint32_t sample_rate,
-				       uint32_t number_of_samples,
-				       uint16_t number_of_channels) {
+uint8_t ClockPattern::generate_pattern(uint32_t sample_rate, uint32_t number_of_samples, uint16_t number_of_channels) {
 	float f_period_number_of_samples = (float)sample_rate / frequency;
 	qDebug() << "period_number_of_samples - " << f_period_number_of_samples;
-	float f_number_of_periods =
-		number_of_samples / f_period_number_of_samples;
+	float f_number_of_periods = number_of_samples / f_period_number_of_samples;
 	qDebug() << "number_of_periods - " << f_number_of_periods;
-	float f_low_number_of_samples =
-		(f_period_number_of_samples * (100 - duty_cycle)) / 100;
+	float f_low_number_of_samples = (f_period_number_of_samples * (100 - duty_cycle)) / 100;
 	qDebug() << "low_number_of_samples - " << f_low_number_of_samples;
-	float f_high_number_of_samples =
-		f_period_number_of_samples - f_low_number_of_samples;
+	float f_high_number_of_samples = f_period_number_of_samples - f_low_number_of_samples;
 	qDebug() << "high_number_of_samples - " << f_high_number_of_samples;
 
 	int period_number_of_samples = (int)round(f_period_number_of_samples);
@@ -392,8 +380,7 @@ uint8_t ClockPattern::generate_pattern(uint32_t sample_rate,
 	int phased = (period_number_of_samples * phase / 360);
 
 	while (i < number_of_samples) {
-		if ((i + phased) % ((int)period_number_of_samples) <
-		    low_number_of_samples) {
+		if ((i + phased) % ((int)period_number_of_samples) < low_number_of_samples) {
 			buffer[i] = 0;
 		} else {
 			buffer[i] = 0xffff;
@@ -410,17 +397,13 @@ ClockPatternUI::ClockPatternUI(ClockPattern *pattern, QWidget *parent)
 	: PatternUI(parent), pattern(pattern), parent_(parent) {
 	ui = new Ui::EmptyPatternUI();
 	ui->setupUi(this);
-	frequencySpinButton = new ScaleSpinButton(
-		{{"Hz", 1E0}, {"kHz", 1E+3}, {"MHz", 1E+6}}, "Frequency", 1e0,
-		PGMaxSampleRate / 2, true, false, this, {1, 2.5, 5});
+	frequencySpinButton = new ScaleSpinButton({{"Hz", 1E0}, {"kHz", 1E+3}, {"MHz", 1E+6}}, "Frequency", 1e0,
+						  PGMaxSampleRate / 2, true, false, this, {1, 2.5, 5});
 	ui->verticalLayout->addWidget(frequencySpinButton);
-	phaseSpinButton =
-		new PhaseSpinButton({{"deg", 1}, {"π rad", 180}}, "Phase", 0,
-				    360, true, true, this);
+	phaseSpinButton = new PhaseSpinButton({{"deg", 1}, {"π rad", 180}}, "Phase", 0, 360, true, true, this);
 	phaseSpinButton->setFineModeAvailable(false);
 	ui->verticalLayout->addWidget(phaseSpinButton);
-	dutySpinButton = new PositionSpinButton({{"%", 1}}, "Duty", 0, 100,
-						true, false, this);
+	dutySpinButton = new PositionSpinButton({{"%", 1}}, "Duty", 0, 100, true, false, this);
 	dutySpinButton->setFineModeAvailable(false);
 	ui->verticalLayout->addWidget(dutySpinButton);
 	requestedDuty = 50;
@@ -446,12 +429,9 @@ void ClockPatternUI::build_ui(QWidget *parent, uint16_t number_of_channels) {
 	phaseSpinButton->setValue(pattern->get_phase());
 	dutySpinButton->setValue(pattern->get_duty_cycle());
 
-	connect(frequencySpinButton, SIGNAL(valueChanged(double)), this,
-		SLOT(parse_ui()));
-	connect(phaseSpinButton, SIGNAL(valueChanged(double)), this,
-		SLOT(parse_ui()));
-	connect(dutySpinButton, SIGNAL(valueChanged(double)), this,
-		SLOT(parse_ui()));
+	connect(frequencySpinButton, SIGNAL(valueChanged(double)), this, SLOT(parse_ui()));
+	connect(phaseSpinButton, SIGNAL(valueChanged(double)), this, SLOT(parse_ui()));
+	connect(dutySpinButton, SIGNAL(valueChanged(double)), this, SLOT(parse_ui()));
 }
 void ClockPatternUI::destroy_ui() { parent_->layout()->removeWidget(this); }
 
@@ -550,14 +530,11 @@ void ClockPatternUI::parse_ui() {
 	if (fmod(requestedPhase, phaseStep) != 0) {
 		if (phaseStep > 45) {
 			if (phaseStepDown)
-				phaseVal = floor((phaseVal / phaseStep) - 0.5) *
-					phaseStep;
+				phaseVal = floor((phaseVal / phaseStep) - 0.5) * phaseStep;
 			else
-				phaseVal = ceil((phaseVal / phaseStep) + 0.5) *
-					phaseStep;
+				phaseVal = ceil((phaseVal / phaseStep) + 0.5) * phaseStep;
 		} else {
-			phaseVal =
-				floor((phaseVal / phaseStep) + 0.5) * phaseStep;
+			phaseVal = floor((phaseVal / phaseStep) + 0.5) * phaseStep;
 		}
 
 		requestedPhase = phaseVal;
@@ -582,9 +559,7 @@ NumberPattern::NumberPattern() : nr(0) {
 	set_description(NumberPatternDescription);
 	set_periodic(false);
 }
-uint8_t NumberPattern::generate_pattern(uint32_t sample_rate,
-					uint32_t number_of_samples,
-					uint16_t number_of_channels) {
+uint8_t NumberPattern::generate_pattern(uint32_t sample_rate, uint32_t number_of_samples, uint16_t number_of_channels) {
 	delete_buffer();
 	buffer = new short[number_of_samples];
 
@@ -617,8 +592,7 @@ void NumberPatternUI::build_ui(QWidget *parent, uint16_t number_of_channels) {
 	qDebug() << max;
 	// ui->numberLineEdit->setValidator(new QIntValidator(0, max, this));
 	ui->numberLineEdit->setText(QString::number(pattern->get_nr()));
-	connect(ui->numberLineEdit, SIGNAL(textChanged(QString)), this,
-		SLOT(parse_ui()));
+	connect(ui->numberLineEdit, SIGNAL(textChanged(QString)), this, SLOT(parse_ui()));
 }
 void NumberPatternUI::destroy_ui() { parent_->layout()->removeWidget(this); }
 
@@ -653,9 +627,7 @@ RandomPattern::~RandomPattern() {}
 
 uint32_t RandomPattern::get_min_sampling_freq() { return frequency; }
 
-uint32_t
-RandomPattern::get_required_nr_of_samples(uint32_t sample_rate,
-					  uint32_t number_of_channels) {
+uint32_t RandomPattern::get_required_nr_of_samples(uint32_t sample_rate, uint32_t number_of_channels) {
 	uint32_t period_number_of_samples = (uint32_t)sample_rate / frequency;
 	return period_number_of_samples * 10;
 }
@@ -664,13 +636,10 @@ uint32_t RandomPattern::get_frequency() const { return frequency; }
 
 void RandomPattern::set_frequency(const uint32_t &value) { frequency = value; }
 
-uint8_t RandomPattern::generate_pattern(uint32_t sample_rate,
-					uint32_t number_of_samples,
-					uint16_t number_of_channels) {
+uint8_t RandomPattern::generate_pattern(uint32_t sample_rate, uint32_t number_of_samples, uint16_t number_of_channels) {
 	delete_buffer();
 	buffer = new short[number_of_samples];
-	auto samples_per_count =
-		(int)round(((float)sample_rate / (float)frequency));
+	auto samples_per_count = (int)round(((float)sample_rate / (float)frequency));
 	int j = 0;
 
 	while (j < number_of_samples) {
@@ -688,15 +657,13 @@ uint8_t RandomPattern::generate_pattern(uint32_t sample_rate,
 	return 0;
 }
 
-RandomPatternUI::RandomPatternUI(RandomPattern *pattern, QWidget *parent)
-	: pattern(pattern), parent_(parent) {
+RandomPatternUI::RandomPatternUI(RandomPattern *pattern, QWidget *parent) : pattern(pattern), parent_(parent) {
 	// qDebug()<<"RandomPatternUI created";
 	ui = new Ui::EmptyPatternUI();
 	ui->setupUi(this);
 	setVisible(false);
-	frequencySpinButton = new ScaleSpinButton(
-		{{"Hz", 1E0}, {"kHz", 1E+3}, {"MHz", 1E+6}}, "Frequency", 1e0,
-		PGMaxSampleRate / 2, true, false, this, {1, 2.5, 5});
+	frequencySpinButton = new ScaleSpinButton({{"Hz", 1E0}, {"kHz", 1E+3}, {"MHz", 1E+6}}, "Frequency", 1e0,
+						  PGMaxSampleRate / 2, true, false, this, {1, 2.5, 5});
 	ui->verticalLayout->addWidget(frequencySpinButton);
 }
 RandomPatternUI::~RandomPatternUI() {
@@ -715,51 +682,37 @@ void RandomPatternUI::build_ui(QWidget *parent, uint16_t number_of_channels) {
 	parent_ = parent;
 	parent->layout()->addWidget(this);
 	frequencySpinButton->setValue(pattern->get_frequency());
-	connect(frequencySpinButton, SIGNAL(valueChanged(double)), this,
-		SLOT(parse_ui()));
+	connect(frequencySpinButton, SIGNAL(valueChanged(double)), this, SLOT(parse_ui()));
 }
 
 void RandomPatternUI::destroy_ui() { parent_->layout()->removeWidget(this); }
 
 uint32_t BinaryCounterPattern::get_min_sampling_freq() { return frequency; }
 
-uint32_t
-BinaryCounterPattern::get_required_nr_of_samples(uint32_t sample_rate,
-						 uint32_t number_of_channels) {
+uint32_t BinaryCounterPattern::get_required_nr_of_samples(uint32_t sample_rate, uint32_t number_of_channels) {
 	// greatest common divider duty cycle and 1000;0;
-	return ((float)sample_rate / (float)frequency) *
-		(1 << number_of_channels);
+	return ((float)sample_rate / (float)frequency) * (1 << number_of_channels);
 }
 
 uint32_t BinaryCounterPattern::get_frequency() const { return frequency; }
 
-void BinaryCounterPattern::set_frequency(const uint32_t &value) {
-	frequency = value;
-}
+void BinaryCounterPattern::set_frequency(const uint32_t &value) { frequency = value; }
 
 uint16_t BinaryCounterPattern::get_start_value() const { return start_value; }
 
-void BinaryCounterPattern::set_start_value(const uint16_t &value) {
-	start_value = value;
-}
+void BinaryCounterPattern::set_start_value(const uint16_t &value) { start_value = value; }
 
 uint16_t BinaryCounterPattern::get_end_value() const { return end_value; }
 
-void BinaryCounterPattern::set_end_value(const uint16_t &value) {
-	end_value = value;
-}
+void BinaryCounterPattern::set_end_value(const uint16_t &value) { end_value = value; }
 
 uint16_t BinaryCounterPattern::get_increment() const { return increment; }
 
-void BinaryCounterPattern::set_increment(const uint16_t &value) {
-	increment = value;
-}
+void BinaryCounterPattern::set_increment(const uint16_t &value) { increment = value; }
 
 uint16_t BinaryCounterPattern::get_init_value() const { return init_value; }
 
-void BinaryCounterPattern::set_init_value(const uint16_t &value) {
-	init_value = value;
-}
+void BinaryCounterPattern::set_init_value(const uint16_t &value) { init_value = value; }
 
 BinaryCounterPattern::BinaryCounterPattern() {
 	set_name(BinaryCounterPatternName);
@@ -774,13 +727,11 @@ BinaryCounterPattern::BinaryCounterPattern() {
 
 BinaryCounterPattern::~BinaryCounterPattern() {}
 
-uint8_t BinaryCounterPattern::generate_pattern(uint32_t sample_rate,
-					       uint32_t number_of_samples,
+uint8_t BinaryCounterPattern::generate_pattern(uint32_t sample_rate, uint32_t number_of_samples,
 					       uint16_t number_of_channels) {
 	delete_buffer();
 	buffer = new short[number_of_samples];
-	auto samples_per_count =
-		(int)round(((float)sample_rate / (float)frequency));
+	auto samples_per_count = (int)round(((float)sample_rate / (float)frequency));
 	// auto i=init_value;
 	auto i = 0;
 	auto increment = 1;
@@ -807,16 +758,14 @@ uint8_t BinaryCounterPattern::generate_pattern(uint32_t sample_rate,
 	return 0;
 }
 
-BinaryCounterPatternUI::BinaryCounterPatternUI(BinaryCounterPattern *pattern,
-					       QWidget *parent)
+BinaryCounterPatternUI::BinaryCounterPatternUI(BinaryCounterPattern *pattern, QWidget *parent)
 	: PatternUI(parent), pattern(pattern), parent_(parent) {
 	// qDebug()<<"BinaryCounterPatternUI Created";
 	ui = new Ui::EmptyPatternUI();
 	ui->setupUi(this);
 	setVisible(false);
-	frequencySpinButton = new ScaleSpinButton(
-		{{"Hz", 1E0}, {"kHz", 1E+3}, {"MHz", 1E+6}}, "Frequency", 1e0,
-		PGMaxSampleRate / 2, true, false, this, {1, 2.5, 5});
+	frequencySpinButton = new ScaleSpinButton({{"Hz", 1E0}, {"kHz", 1E+3}, {"MHz", 1E+6}}, "Frequency", 1e0,
+						  PGMaxSampleRate / 2, true, false, this, {1, 2.5, 5});
 	ui->verticalLayout->addWidget(frequencySpinButton);
 }
 
@@ -825,18 +774,14 @@ BinaryCounterPatternUI::~BinaryCounterPatternUI() {
 	delete ui;
 }
 
-void BinaryCounterPatternUI::build_ui(QWidget *parent,
-				      uint16_t number_of_channels) {
+void BinaryCounterPatternUI::build_ui(QWidget *parent, uint16_t number_of_channels) {
 	parent_ = parent;
 	parent->layout()->addWidget(this);
 	frequencySpinButton->setValue(pattern->get_frequency());
-	connect(frequencySpinButton, SIGNAL(valueChanged(double)), this,
-		SLOT(parse_ui()));
+	connect(frequencySpinButton, SIGNAL(valueChanged(double)), this, SLOT(parse_ui()));
 }
 
-void BinaryCounterPatternUI::destroy_ui() {
-	parent_->layout()->removeWidget(this);
-}
+void BinaryCounterPatternUI::destroy_ui() { parent_->layout()->removeWidget(this); }
 
 Pattern *BinaryCounterPatternUI::get_pattern() { return pattern; }
 
@@ -862,13 +807,11 @@ GrayCounterPattern::GrayCounterPattern() {
 	set_periodic(true);
 }
 
-uint8_t GrayCounterPattern::generate_pattern(uint32_t sample_rate,
-					     uint32_t number_of_samples,
+uint8_t GrayCounterPattern::generate_pattern(uint32_t sample_rate, uint32_t number_of_samples,
 					     uint16_t number_of_channels) {
 	delete_buffer();
 	buffer = new short[number_of_samples];
-	auto samples_per_count =
-		(int)round(((float)sample_rate / (float)frequency));
+	auto samples_per_count = (int)round(((float)sample_rate / (float)frequency));
 	init_value = 0;
 	end_value = (1 << (number_of_channels)) - 1;
 	increment = 1;
@@ -895,15 +838,13 @@ uint8_t GrayCounterPattern::generate_pattern(uint32_t sample_rate,
 	return 0;
 }
 
-GrayCounterPatternUI::GrayCounterPatternUI(GrayCounterPattern *pattern,
-					   QWidget *parent)
+GrayCounterPatternUI::GrayCounterPatternUI(GrayCounterPattern *pattern, QWidget *parent)
 	: PatternUI(parent), pattern(pattern), parent_(parent) {
 	ui = new Ui::EmptyPatternUI();
 	ui->setupUi(this);
 	setVisible(false);
-	frequencySpinButton = new ScaleSpinButton(
-		{{"Hz", 1E0}, {"kHz", 1E+3}, {"MHz", 1E+6}}, "Frequency", 1e0,
-		PGMaxSampleRate / 2, true, false, this, {1, 2.5, 5});
+	frequencySpinButton = new ScaleSpinButton({{"Hz", 1E0}, {"kHz", 1E+3}, {"MHz", 1E+6}}, "Frequency", 1e0,
+						  PGMaxSampleRate / 2, true, false, this, {1, 2.5, 5});
 	ui->verticalLayout->addWidget(frequencySpinButton);
 }
 GrayCounterPatternUI::~GrayCounterPatternUI() {
@@ -913,13 +854,11 @@ GrayCounterPatternUI::~GrayCounterPatternUI() {
 
 Pattern *GrayCounterPatternUI::get_pattern() { return pattern; }
 
-void GrayCounterPatternUI::build_ui(QWidget *parent,
-				    uint16_t number_of_channels) {
+void GrayCounterPatternUI::build_ui(QWidget *parent, uint16_t number_of_channels) {
 	parent_ = parent;
 	parent->layout()->addWidget(this);
 	frequencySpinButton->setValue(pattern->get_frequency());
-	connect(frequencySpinButton, SIGNAL(valueChanged(double)), this,
-		SLOT(parse_ui()));
+	connect(frequencySpinButton, SIGNAL(valueChanged(double)), this, SLOT(parse_ui()));
 }
 void GrayCounterPatternUI::destroy_ui() {
 	parent_->layout()->removeWidget(this);
@@ -1052,8 +991,7 @@ uint16_t UARTPattern::encapsulateUartFrame(char chr, uint16_t *bits_per_frame) {
 		parity_bit_available = true;
 
 		for (auto i = 0; i < data_bits; i++) {
-			parity_bit_value =
-				parity_bit_value ^ (chr_to_test & 0x01);
+			parity_bit_value = parity_bit_value ^ (chr_to_test & 0x01);
 			chr_to_test = chr_to_test >> 1;
 		}
 
@@ -1064,8 +1002,7 @@ uint16_t UARTPattern::encapsulateUartFrame(char chr, uint16_t *bits_per_frame) {
 		parity_bit_available = true;
 
 		for (auto i = 0; i < data_bits; i++) {
-			parity_bit_value =
-				parity_bit_value ^ (chr_to_test & 0x01);
+			parity_bit_value = parity_bit_value ^ (chr_to_test & 0x01);
 			chr_to_test = chr_to_test >> 1;
 		}
 
@@ -1099,10 +1036,8 @@ uint16_t UARTPattern::encapsulateUartFrame(char chr, uint16_t *bits_per_frame) {
 		    stop_bit_values = ((1<<stop_bits)-1); // if parity bit not
 		availabe, stop bits will not be incremented
 		*/
-		stop_bit_values =
-			((1 << (stop_bits + parity_bit_available)) - 1) &
-			((parity_bit_value) ? (0xffff)
-					    : (0xfffe)); // todo: Simplify this
+		stop_bit_values = ((1 << (stop_bits + parity_bit_available)) - 1) &
+			((parity_bit_value) ? (0xffff) : (0xfffe)); // todo: Simplify this
 		ret = ret | stop_bit_values << (data_bits + 1);
 
 	} else {
@@ -1125,8 +1060,7 @@ uint16_t UARTPattern::encapsulateUartFrame(char chr, uint16_t *bits_per_frame) {
 
 uint32_t UARTPattern::get_min_sampling_freq() { return baud_rate * 2; }
 
-uint32_t UARTPattern::get_required_nr_of_samples(uint32_t sample_rate,
-						 uint32_t number_of_channels) {
+uint32_t UARTPattern::get_required_nr_of_samples(uint32_t sample_rate, uint32_t number_of_channels) {
 	uint16_t number_of_frames = str.length();
 	uint32_t samples_per_bit = sample_rate / baud_rate;
 	uint16_t bits_per_frame;
@@ -1135,13 +1069,10 @@ uint32_t UARTPattern::get_required_nr_of_samples(uint32_t sample_rate,
 	return samples_per_frame * (number_of_frames + 1 /* padding */);
 }
 
-uint8_t UARTPattern::generate_pattern(uint32_t sample_rate,
-				      uint32_t number_of_samples,
-				      uint16_t number_of_channels) {
+uint8_t UARTPattern::generate_pattern(uint32_t sample_rate, uint32_t number_of_samples, uint16_t number_of_channels) {
 	delete_buffer();
 	uint32_t samples_per_bit = sample_rate / baud_rate;
-	qDebug() << "samples_per_bit - "
-		 << (float)sample_rate / (float)baud_rate;
+	qDebug() << "samples_per_bit - " << (float)sample_rate / (float)baud_rate;
 	uint16_t bits_per_frame;
 	encapsulateUartFrame(*(str.c_str()), &bits_per_frame);
 	uint32_t samples_per_frame = samples_per_bit * bits_per_frame;
@@ -1159,8 +1090,7 @@ uint8_t UARTPattern::generate_pattern(uint32_t sample_rate,
 	}
 
 	for (i = 0; i < str.length(); i++, str_ptr++) {
-		auto frame_to_send =
-			encapsulateUartFrame(*str_ptr, &bits_per_frame);
+		auto frame_to_send = encapsulateUartFrame(*str_ptr, &bits_per_frame);
 
 		for (auto j = 0; j < bits_per_frame; j++) {
 			short bit_to_send;
@@ -1169,10 +1099,7 @@ uint8_t UARTPattern::generate_pattern(uint32_t sample_rate,
 				bit_to_send = (frame_to_send & 0x01);
 				frame_to_send = frame_to_send >> 1;
 			} else {
-				bit_to_send = ((frame_to_send &
-						(1 << (bits_per_frame - 1)))
-						       ? 1
-						       : 0); // set bit here
+				bit_to_send = ((frame_to_send & (1 << (bits_per_frame - 1))) ? 1 : 0); // set bit here
 				frame_to_send = frame_to_send << 1;
 			}
 
@@ -1214,14 +1141,10 @@ void UARTPatternUI::build_ui(QWidget *parent, uint16_t number_of_channels) {
 	ui->CB_Parity->setCurrentIndex(pattern->get_parity());
 	ui->CB_Stop->setCurrentText(QString::number(pattern->get_stop_bits()));
 	ui->LE_Data->setText(QString::fromStdString(pattern->get_string()));
-	connect(ui->CB_baud, SIGNAL(activated(QString)), this,
-		SLOT(parse_ui()));
-	connect(ui->CB_Parity, SIGNAL(activated(QString)), this,
-		SLOT(parse_ui()));
-	connect(ui->CB_Stop, SIGNAL(activated(QString)), this,
-		SLOT(parse_ui()));
-	connect(ui->LE_Data, SIGNAL(textChanged(QString)), this,
-		SLOT(parse_ui()));
+	connect(ui->CB_baud, SIGNAL(activated(QString)), this, SLOT(parse_ui()));
+	connect(ui->CB_Parity, SIGNAL(activated(QString)), this, SLOT(parse_ui()));
+	connect(ui->CB_Stop, SIGNAL(activated(QString)), this, SLOT(parse_ui()));
+	connect(ui->LE_Data, SIGNAL(textChanged(QString)), this, SLOT(parse_ui()));
 	parse_ui();
 }
 void UARTPatternUI::destroy_ui() {
@@ -1234,8 +1157,7 @@ Pattern *UARTPatternUI::get_pattern() { return pattern; }
 void UARTPatternUI::parse_ui() {
 
 	auto oldStr = ui->LE_paramsOut->text();
-	auto newStr = ui->CB_baud->currentText() + "/8" +
-		ui->CB_Parity->currentText()[0] + ui->CB_Stop->currentText();
+	auto newStr = ui->CB_baud->currentText() + "/8" + ui->CB_Parity->currentText()[0] + ui->CB_Stop->currentText();
 	ui->LE_paramsOut->setText(newStr);
 	qDebug() << ui->LE_paramsOut->text();
 	pattern->set_params(ui->LE_paramsOut->text().toStdString());
@@ -1263,21 +1185,15 @@ void I2CPattern::setMsbFirst(bool value) { msbFirst = value; }
 
 uint8_t I2CPattern::getInterFrameSpace() const { return interFrameSpace; }
 
-void I2CPattern::setInterFrameSpace(const uint8_t &value) {
-	interFrameSpace = value;
-}
+void I2CPattern::setInterFrameSpace(const uint8_t &value) { interFrameSpace = value; }
 
 uint32_t I2CPattern::getClkFrequency() const { return clkFrequency; }
 
-void I2CPattern::setClkFrequency(const uint32_t &value) {
-	clkFrequency = value;
-}
+void I2CPattern::setClkFrequency(const uint32_t &value) { clkFrequency = value; }
 
 uint8_t I2CPattern::getBytesPerFrame() const { return bytesPerFrame; }
 
-void I2CPattern::setBytesPerFrame(const uint8_t &value) {
-	bytesPerFrame = value;
-}
+void I2CPattern::setBytesPerFrame(const uint8_t &value) { bytesPerFrame = value; }
 
 bool I2CPattern::getTenbit() const { return tenbit; }
 
@@ -1300,16 +1216,13 @@ I2CPattern::I2CPattern() {
 
 uint32_t I2CPattern::get_min_sampling_freq() { return clkFrequency * (2); }
 
-uint32_t I2CPattern::get_required_nr_of_samples(uint32_t sample_rate,
-						uint32_t number_of_channels) {
+uint32_t I2CPattern::get_required_nr_of_samples(uint32_t sample_rate, uint32_t number_of_channels) {
 	auto samples_per_bit = 2 * (sample_rate / clkFrequency);
 	auto IFS = interFrameSpace * samples_per_bit;
 
 	// size = samples/bit * (IFS+start(2), address(7), ack(1), (data(8) +
 	// ack(1))*data_len, stop(2)+IFS)
-	uint32_t samples = samples_per_bit *
-		(interFrameSpace + 2 + 7 + 1 + (8 + 1) * v.size() + 2 +
-		 interFrameSpace);
+	uint32_t samples = samples_per_bit * (interFrameSpace + 2 + 7 + 1 + (8 + 1) * v.size() + 2 + interFrameSpace);
 	return samples;
 }
 
@@ -1350,8 +1263,7 @@ void I2CPattern::sample_address() {
 void I2CPattern::sample_ack() { sample_bit(0); }
 
 void I2CPattern::sample_payload() {
-	for (std::deque<uint8_t>::iterator it = v.begin(); it != v.end();
-	     ++it) {
+	for (std::deque<uint8_t>::iterator it = v.begin(); it != v.end(); ++it) {
 		uint8_t val;
 
 		if (read) {
@@ -1388,9 +1300,7 @@ void I2CPattern::sample_stop() {
 	}
 }
 
-uint8_t I2CPattern::generate_pattern(uint32_t sample_rate,
-				     uint32_t number_of_samples,
-				     uint16_t number_of_channels) {
+uint8_t I2CPattern::generate_pattern(uint32_t sample_rate, uint32_t number_of_samples, uint16_t number_of_channels) {
 	delete_buffer();
 
 	buffer = new short[number_of_samples]; // no need to recreate buffer
@@ -1413,9 +1323,8 @@ I2CPatternUI::I2CPatternUI(I2CPattern *pattern, QWidget *parent)
 	qDebug() << "UARTPatternUI created";
 	ui = new Ui::I2CPatternUI();
 	ui->setupUi(this);
-	frequencySpinButton = new ScaleSpinButton(
-		{{"Hz", 1E0}, {"kHz", 1E+3}, {"MHz", 1E+6}}, "Frequency", 1e0,
-		PGMaxSampleRate / 2, true, false, this, {1, 2.5, 5});
+	frequencySpinButton = new ScaleSpinButton({{"Hz", 1E0}, {"kHz", 1E+3}, {"MHz", 1E+6}}, "Frequency", 1e0,
+						  PGMaxSampleRate / 2, true, false, this, {1, 2.5, 5});
 	ui->verticalLayout->insertWidget(0, frequencySpinButton);
 	setVisible(false);
 }
@@ -1447,16 +1356,12 @@ void I2CPatternUI::build_ui(QWidget *parent, uint16_t number_of_channels) {
 	ui->LE_toSend->setText(buf);
 
 	// ui->LE_toSend->setText(QString::fromStdString(pattern->get_string()));
-	connect(frequencySpinButton, SIGNAL(valueChanged(double)), this,
-		SLOT(parse_ui()));
+	connect(frequencySpinButton, SIGNAL(valueChanged(double)), this, SLOT(parse_ui()));
 	connect(ui->PB_MSB, SIGNAL(clicked()), this, SLOT(parse_ui()));
 	connect(ui->PB_readWrite, SIGNAL(clicked()), this, SLOT(parse_ui()));
-	connect(ui->LE_IFS, SIGNAL(textChanged(QString)), this,
-		SLOT(parse_ui()));
-	connect(ui->LE_address, SIGNAL(textChanged(QString)), this,
-		SLOT(parse_ui()));
-	connect(ui->LE_toSend, SIGNAL(textChanged(QString)), this,
-		SLOT(parse_ui()));
+	connect(ui->LE_IFS, SIGNAL(textChanged(QString)), this, SLOT(parse_ui()));
+	connect(ui->LE_address, SIGNAL(textChanged(QString)), this, SLOT(parse_ui()));
+	connect(ui->LE_toSend, SIGNAL(textChanged(QString)), this, SLOT(parse_ui()));
 	parse_ui();
 }
 void I2CPatternUI::destroy_ui() {
@@ -1484,8 +1389,7 @@ void I2CPatternUI::parse_ui() {
 
 	pattern->setMsbFirst(ui->PB_MSB->isChecked());
 	pattern->setWrite(ui->PB_readWrite->isChecked());
-	QStringList strList =
-		ui->LE_toSend->text().split(' ', QString::SkipEmptyParts);
+	QStringList strList = ui->LE_toSend->text().split(' ', QString::SkipEmptyParts);
 	pattern->v.clear();
 
 	bool fail = false;
@@ -1545,8 +1449,7 @@ SPIPattern::SPIPattern() {
 
 uint32_t SPIPattern::get_min_sampling_freq() { return clkFrequency * (2); }
 
-uint32_t SPIPattern::get_required_nr_of_samples(uint32_t sample_rate,
-						uint32_t number_of_channels) {
+uint32_t SPIPattern::get_required_nr_of_samples(uint32_t sample_rate, uint32_t number_of_channels) {
 
 	auto samples_per_bit = 2 * (sample_rate / clkFrequency);
 	auto IFS = waitClocks * samples_per_bit;
@@ -1554,8 +1457,7 @@ uint32_t SPIPattern::get_required_nr_of_samples(uint32_t sample_rate,
 	// number of bytes * samples per bit * 9 (8 bits + 1 account for extra
 	// padding) + 2 * interframespace(beginning and end) + extra frame space
 	// between each frame
-	return (v.size() * samples_per_bit * 9) + 2 * IFS +
-		IFS * (v.size() / bytesPerFrame);
+	return (v.size() * samples_per_bit * 9) + 2 * IFS + IFS * (v.size() / bytesPerFrame);
 }
 
 uint8_t SPIPattern::getWaitClocks() const { return waitClocks; }
@@ -1564,13 +1466,9 @@ void SPIPattern::setWaitClocks(const uint8_t &value) { waitClocks = value; }
 
 uint8_t SPIPattern::getBytesPerFrame() const { return bytesPerFrame; }
 
-void SPIPattern::setBytesPerFrame(const uint8_t &value) {
-	bytesPerFrame = value;
-}
+void SPIPattern::setBytesPerFrame(const uint8_t &value) { bytesPerFrame = value; }
 
-uint8_t SPIPattern::generate_pattern(uint32_t sample_rate,
-				     uint32_t number_of_samples,
-				     uint16_t number_of_channels) {
+uint8_t SPIPattern::generate_pattern(uint32_t sample_rate, uint32_t number_of_samples, uint16_t number_of_channels) {
 	delete_buffer();
 
 	buffer = new short[number_of_samples]; // no need to recreate buffer
@@ -1580,11 +1478,9 @@ uint8_t SPIPattern::generate_pattern(uint32_t sample_rate,
 	auto csBit = 2;
 
 	if (CSPOL) {
-		memset(buffer, (CPOL) ? 0xfffb : 0xfffa,
-		       (number_of_samples) * sizeof(short));
+		memset(buffer, (CPOL) ? 0xfffb : 0xfffa, (number_of_samples) * sizeof(short));
 	} else {
-		memset(buffer, (CPOL) ? 0xffff : 0xfffe,
-		       (number_of_samples) * sizeof(short));
+		memset(buffer, (CPOL) ? 0xffff : 0xfffe, (number_of_samples) * sizeof(short));
 	}
 
 	short *buf_ptr = buffer;
@@ -1594,20 +1490,16 @@ uint8_t SPIPattern::generate_pattern(uint32_t sample_rate,
 	auto frameBytesLeft = bytesPerFrame;
 	bool start_new_frame = 1;
 
-	for (std::deque<uint8_t>::iterator it = v.begin(); it != v.end();
-	     ++it) {
+	for (std::deque<uint8_t>::iterator it = v.begin(); it != v.end(); ++it) {
 		uint8_t val = *it;
 		bool oldbit = 0;
 		bool bit;
 
 		if (CPHA && start_new_frame) {
-			for (auto i = samples_per_bit / 2; i < samples_per_bit;
-			     i++, buf_ptr++) {
+			for (auto i = samples_per_bit / 2; i < samples_per_bit; i++, buf_ptr++) {
 				*buf_ptr = changeBit(*buf_ptr, csBit, CSPOL);
-				*buf_ptr = changeBit(*buf_ptr, clkActiveBit,
-						     !CPOL);
-				*buf_ptr =
-					changeBit(*buf_ptr, outputBit, oldbit);
+				*buf_ptr = changeBit(*buf_ptr, clkActiveBit, !CPOL);
+				*buf_ptr = changeBit(*buf_ptr, outputBit, oldbit);
 			}
 		}
 
@@ -1621,26 +1513,20 @@ uint8_t SPIPattern::generate_pattern(uint32_t sample_rate,
 				val = val >> 1;
 			}
 
-			for (auto i = 0; i < samples_per_bit / 2;
-			     i++, buf_ptr++) {
+			for (auto i = 0; i < samples_per_bit / 2; i++, buf_ptr++) {
 				*buf_ptr = changeBit(*buf_ptr, csBit, CSPOL);
-				*buf_ptr =
-					changeBit(*buf_ptr, clkActiveBit, CPOL);
+				*buf_ptr = changeBit(*buf_ptr, clkActiveBit, CPOL);
 
 				if (!CPHA) {
-					*buf_ptr = changeBit(*buf_ptr,
-							     outputBit, oldbit);
+					*buf_ptr = changeBit(*buf_ptr, outputBit, oldbit);
 				} else {
-					*buf_ptr = changeBit(*buf_ptr,
-							     outputBit, bit);
+					*buf_ptr = changeBit(*buf_ptr, outputBit, bit);
 				}
 			}
 
-			for (auto i = samples_per_bit / 2; i < samples_per_bit;
-			     i++, buf_ptr++) {
+			for (auto i = samples_per_bit / 2; i < samples_per_bit; i++, buf_ptr++) {
 				*buf_ptr = changeBit(*buf_ptr, csBit, CSPOL);
-				*buf_ptr = changeBit(*buf_ptr, clkActiveBit,
-						     !CPOL);
+				*buf_ptr = changeBit(*buf_ptr, clkActiveBit, !CPOL);
 				*buf_ptr = changeBit(*buf_ptr, outputBit, bit);
 			}
 
@@ -1651,14 +1537,10 @@ uint8_t SPIPattern::generate_pattern(uint32_t sample_rate,
 
 		if (frameBytesLeft == 0) {
 			if (!CPHA) {
-				for (auto i = samples_per_bit / 2;
-				     i < samples_per_bit; i++, buf_ptr++) {
-					*buf_ptr = changeBit(*buf_ptr, csBit,
-							     CSPOL);
-					*buf_ptr = changeBit(
-						*buf_ptr, clkActiveBit, !CPOL);
-					*buf_ptr = changeBit(*buf_ptr,
-							     outputBit, bit);
+				for (auto i = samples_per_bit / 2; i < samples_per_bit; i++, buf_ptr++) {
+					*buf_ptr = changeBit(*buf_ptr, csBit, CSPOL);
+					*buf_ptr = changeBit(*buf_ptr, clkActiveBit, !CPOL);
+					*buf_ptr = changeBit(*buf_ptr, outputBit, bit);
 				}
 			}
 			buf_ptr += waitClocks * samples_per_bit;
@@ -1682,9 +1564,7 @@ void SPIPattern::setCPHA(bool value) { CPHA = value; }
 
 uint32_t SPIPattern::getClkFrequency() const { return clkFrequency; }
 
-void SPIPattern::setClkFrequency(const uint32_t &value) {
-	clkFrequency = value;
-}
+void SPIPattern::setClkFrequency(const uint32_t &value) { clkFrequency = value; }
 
 bool SPIPattern::getCSPol() const { return CSPOL; }
 
@@ -1695,9 +1575,8 @@ SPIPatternUI::SPIPatternUI(SPIPattern *pattern, QWidget *parent)
 	qDebug() << "UARTPatternUI created";
 	ui = new Ui::SPIPatternUI();
 	ui->setupUi(this);
-	frequencySpinButton = new ScaleSpinButton(
-		{{"Hz", 1E0}, {"kHz", 1E+3}, {"MHz", 1E+6}}, "Frequency", 1e0,
-		PGMaxSampleRate / 2, true, false, this, {1, 2.5, 5});
+	frequencySpinButton = new ScaleSpinButton({{"Hz", 1E0}, {"kHz", 1E+3}, {"MHz", 1E+6}}, "Frequency", 1e0,
+						  PGMaxSampleRate / 2, true, false, this, {1, 2.5, 5});
 	ui->verticalLayout->insertWidget(0, frequencySpinButton);
 	setVisible(false);
 }
@@ -1727,21 +1606,17 @@ void SPIPatternUI::build_ui(QWidget *parent, uint16_t number_of_channels) {
 	ui->LE_toSend->setText(buf);
 
 	// ui->LE_toSend->setText(QString::fromStdString(pattern->get_string()));
-	connect(frequencySpinButton, SIGNAL(valueChanged(double)), this,
-		SLOT(parse_ui()));
+	connect(frequencySpinButton, SIGNAL(valueChanged(double)), this, SLOT(parse_ui()));
 
 	connect(ui->PB_CPHA, SIGNAL(clicked()), this, SLOT(parse_ui()));
 	connect(ui->PB_CPOL, SIGNAL(clicked()), this, SLOT(parse_ui()));
 	connect(ui->PB_CS, SIGNAL(clicked()), this, SLOT(parse_ui()));
 	connect(ui->PB_MSB, SIGNAL(clicked()), this, SLOT(parse_ui()));
 
-	connect(ui->LE_BPF, SIGNAL(textChanged(QString)), this,
-		SLOT(parse_ui()));
-	connect(ui->LE_IFS, SIGNAL(textChanged(QString)), this,
-		SLOT(parse_ui()));
+	connect(ui->LE_BPF, SIGNAL(textChanged(QString)), this, SLOT(parse_ui()));
+	connect(ui->LE_IFS, SIGNAL(textChanged(QString)), this, SLOT(parse_ui()));
 
-	connect(ui->LE_toSend, SIGNAL(textChanged(QString)), this,
-		SLOT(parse_ui()));
+	connect(ui->LE_toSend, SIGNAL(textChanged(QString)), this, SLOT(parse_ui()));
 	parse_ui();
 }
 void SPIPatternUI::destroy_ui() {
@@ -1777,8 +1652,7 @@ void SPIPatternUI::parse_ui() {
 	pattern->setCPOL(ui->PB_CPOL->isChecked());
 	pattern->setCSPol(ui->PB_CS->isChecked());
 	pattern->setMsbFirst(ui->PB_MSB->isChecked());
-	QStringList strList =
-		ui->LE_toSend->text().split(' ', QString::SkipEmptyParts);
+	QStringList strList = ui->LE_toSend->text().split(' ', QString::SkipEmptyParts);
 	pattern->v.clear();
 	bool fail = false;
 
@@ -1816,10 +1690,8 @@ void SPIPatternUI::parse_ui() {
 
 	Q_EMIT patternParamsChanged();
 
-	if (oldbpf != pattern->getBytesPerFrame() ||
-	    oldcpha != pattern->getCPHA() || oldcpol != pattern->getCPOL() ||
-	    oldcspol != pattern->getCSPol() ||
-	    oldmsb != pattern->getMsbFirst()) {
+	if (oldbpf != pattern->getBytesPerFrame() || oldcpha != pattern->getCPHA() || oldcpol != pattern->getCPOL() ||
+	    oldcspol != pattern->getCSPol() || oldmsb != pattern->getMsbFirst()) {
 		Q_EMIT decoderChanged();
 	}
 }
@@ -1863,8 +1735,7 @@ uint32_t JSPattern::get_min_sampling_freq() {
 			    "is a string - "
 			 << result.toString();
 	} else {
-		qDebug() << "Error - get_min_sampling_freq - "
-			 << result.toString();
+		qDebug() << "Error - get_min_sampling_freq - " << result.toString();
 	}
 
 	return 0;
@@ -1880,8 +1751,7 @@ uint32_t JSPattern::get_required_nr_of_samples() {
 			    "get_required_nr_of_samples() is a string - "
 			 << result.toString();
 	} else {
-		qDebug() << "Error - get_required_nr_of_samples - "
-			 << result.toString();
+		qDebug() << "Error - get_required_nr_of_samples - " << result.toString();
 	}
 
 	return 0;
@@ -1904,8 +1774,7 @@ bool JSPattern::is_periodic() {
 }
 
 uint8_t JSPattern::pre_generate() {
-	QString fileName(obj["filepath"].toString() +
-			 obj["generate_script"].toString());
+	QString fileName(obj["filepath"].toString() + obj["generate_script"].toString());
 	qDebug() << fileName;
 	QFile scriptFile(fileName);
 	scriptFile.open(QIODevice::ReadOnly);
@@ -1918,23 +1787,20 @@ uint8_t JSPattern::pre_generate() {
 	qEngine->evaluate("function get_required_nr_of_samples(){ "
 			  "status_window.print(\"get_required_nr_of_samples() "
 			  "not found\")}");
-	qEngine->evaluate(
-		"function get_min_sampling_freq(){ "
-		"status_window.print(\"get_min_sampling_freq() not found\")}");
+	qEngine->evaluate("function get_min_sampling_freq(){ "
+			  "status_window.print(\"get_min_sampling_freq() not found\")}");
 	qEngine->evaluate("function generate(){ "
 			  "status_window.print(\"generate() not found\")}");
 
 	// if file does not exist, stream will be empty
-	handle_result(qEngine->evaluate(contents, fileName),
-		      "Eval generatescript");
+	handle_result(qEngine->evaluate(contents, fileName), "Eval generatescript");
 
 	return 0;
 }
 
 bool JSPattern::handle_result(QJSValue result, QString str) {
 	if (result.isError()) {
-		qDebug() << "Uncaught exception at line"
-			 << result.property("lineNumber").toInt() << ":"
+		qDebug() << "Uncaught exception at line" << result.property("lineNumber").toInt() << ":"
 			 << result.toString();
 		return -2;
 	} else {
@@ -1943,16 +1809,13 @@ bool JSPattern::handle_result(QJSValue result, QString str) {
 	}
 }
 
-uint8_t JSPattern::generate_pattern(uint32_t sample_rate,
-				    uint32_t number_of_samples,
-				    uint16_t number_of_channels) {
+uint8_t JSPattern::generate_pattern(uint32_t sample_rate, uint32_t number_of_samples, uint16_t number_of_channels) {
 
 	this->sample_rate = sample_rate;
 	this->number_of_channels = number_of_channels;
 	this->number_of_samples = number_of_samples;
 	handle_result(qEngine->evaluate("generate()"), "Eval generate");
-	commitBuffer(qEngine->evaluate("pg.buffer"),
-		     qEngine->evaluate("pg.buffersize"));
+	commitBuffer(qEngine->evaluate("pg.buffer"), qEngine->evaluate("pg.buffersize"));
 	return 0;
 }
 
@@ -1962,9 +1825,7 @@ quint32 JSPattern::get_nr_of_channels() { return number_of_channels; }
 
 quint32 JSPattern::get_sample_rate() { return sample_rate; }
 
-void JSPattern::JSErrorDialog(QString errorMessage) {
-	qDebug() << "JSErrorDialog: " << errorMessage;
-}
+void JSPattern::JSErrorDialog(QString errorMessage) { qDebug() << "JSErrorDialog: " << errorMessage; }
 
 void JSPattern::commitBuffer(QJSValue jsBufferValue, QJSValue jsBufferSize) {
 	if (!jsBufferValue.isArray()) {
@@ -1990,8 +1851,7 @@ void JSPattern::commitBuffer(QJSValue jsBufferValue, QJSValue jsBufferSize) {
 	}
 }
 
-JSPatternUIScript_API::JSPatternUIScript_API(QObject *parent, JSPatternUI *pat)
-	: QObject(parent), pattern(pat) {}
+JSPatternUIScript_API::JSPatternUIScript_API(QObject *parent, JSPatternUI *pat) : QObject(parent), pattern(pat) {}
 
 void JSPatternUIScript_API::parse_ui() { pattern->parse_ui(); }
 
@@ -2012,8 +1872,7 @@ void JSPatternUI::build_ui(QWidget *parent, uint16_t number_of_channels) {
 	jspat_api = new JSPatternUIScript_API(this, this);
 	parent_ = parent;
 	parent->layout()->addWidget(this);
-	QFile file(pattern->obj["filepath"].toString() +
-		   pattern->obj["ui_form"].toString());
+	QFile file(pattern->obj["filepath"].toString() + pattern->obj["ui_form"].toString());
 	file.open(QFile::ReadOnly);
 
 	if (file.exists() && file.isReadable()) {
@@ -2050,18 +1909,15 @@ void JSPatternUI::find_all_children(QObject *parent, QJSValue property) {
 		if (child->objectName() != "") {
 			QJSValue jschild = pattern->qEngine->newQObject(child);
 			property.setProperty(child->objectName(), jschild);
-			QQmlEngine::setObjectOwnership(
-				child, QQmlEngine::CppOwnership);
+			QQmlEngine::setObjectOwnership(child, QQmlEngine::CppOwnership);
 
-			find_all_children(
-				child, property.property(child->objectName()));
+			find_all_children(child, property.property(child->objectName()));
 		}
 	}
 }
 
 void JSPatternUI::post_load_ui() {
-	QString fileName(pattern->obj["filepath"].toString() +
-			 pattern->obj["ui_script"].toString());
+	QString fileName(pattern->obj["filepath"].toString() + pattern->obj["ui_script"].toString());
 	qDebug() << fileName;
 	QFile scriptFile(fileName);
 	scriptFile.open(QIODevice::ReadOnly);
@@ -2079,48 +1935,36 @@ void JSPatternUI::post_load_ui() {
 		/*ui_form*/ ui->ui_form->findChild<QWidget *>(form_name));
 
 	pattern->qEngine->globalObject().setProperty("pg", pgObj);
-	QQmlEngine::setObjectOwnership(/*(QObject*)*/ pg,
-				       QQmlEngine::CppOwnership);
+	QQmlEngine::setObjectOwnership(/*(QObject*)*/ pg, QQmlEngine::CppOwnership);
 	pattern->qEngine->globalObject().setProperty("console", consoleObj);
-	QQmlEngine::setObjectOwnership(/*(QObject*)*/ pattern->console,
-				       QQmlEngine::CppOwnership);
+	QQmlEngine::setObjectOwnership(/*(QObject*)*/ pattern->console, QQmlEngine::CppOwnership);
 	pattern->qEngine->globalObject().setProperty("ui", uiObj);
-	QQmlEngine::setObjectOwnership(/*(QObject*)*/ pattern->ui_form,
-				       QQmlEngine::CppOwnership);
+	QQmlEngine::setObjectOwnership(/*(QObject*)*/ pattern->ui_form, QQmlEngine::CppOwnership);
 
 	pattern->qEngine->globalObject().setProperty("script", parseuiobj);
-	QQmlEngine::setObjectOwnership(/*(QObject*)*/ this,
-				       QQmlEngine::CppOwnership);
+	QQmlEngine::setObjectOwnership(/*(QObject*)*/ this, QQmlEngine::CppOwnership);
 
-	pattern->qEngine->globalObject().setProperty("status_window",
-						     statusTextObj);
-	QQmlEngine::setObjectOwnership(/*(QObject*)*/ status_window,
-				       QQmlEngine::CppOwnership);
+	pattern->qEngine->globalObject().setProperty("status_window", statusTextObj);
+	QQmlEngine::setObjectOwnership(/*(QObject*)*/ status_window, QQmlEngine::CppOwnership);
 
 	pattern->qEngine->evaluate("ui_elements = [];");
 
-	find_all_children(
-		ui->ui_form->findChild<QObject *>(form_name),
-		pattern->qEngine->globalObject().property("ui_elements"));
+	find_all_children(ui->ui_form->findChild<QObject *>(form_name),
+			  pattern->qEngine->globalObject().property("ui_elements"));
 
 	pattern->qEngine->evaluate("pg.buffer = [];").toString();
 	pattern->qEngine->evaluate("pg.buffersize = 0;").toString();
 
-	pattern->qEngine->evaluate(
-		"function post_load_ui(){ status_window.print(\"post_load_ui() "
-		"not found\")}");
-	pattern->qEngine->evaluate(
-		"function parse_ui(){ status_window.print(\"parse_ui() not "
-		"found\")}");
-	handle_result(pattern->qEngine->evaluate(contents, fileName),
-		      "eval ui_script");
-	handle_result(pattern->qEngine->evaluate("post_load_ui()"),
-		      "post_load_ui");
+	pattern->qEngine->evaluate("function post_load_ui(){ status_window.print(\"post_load_ui() "
+				   "not found\")}");
+	pattern->qEngine->evaluate("function parse_ui(){ status_window.print(\"parse_ui() not "
+				   "found\")}");
+	handle_result(pattern->qEngine->evaluate(contents, fileName), "eval ui_script");
+	handle_result(pattern->qEngine->evaluate("post_load_ui()"), "post_load_ui");
 }
 
 void JSPatternUI::parse_ui() {
-	handle_result(pattern->qEngine->evaluate("parse_ui_callback()"),
-		      "parse_ui");
+	handle_result(pattern->qEngine->evaluate("parse_ui_callback()"), "parse_ui");
 	Q_EMIT patternParamsChanged();
 }
 
@@ -2135,9 +1979,8 @@ bool JSPatternUI::handle_result(QJSValue result, QString str) {
 			    << result.property("lineNumber").toInt()
 			    << ":" << result.toString();
 		return -2;*/
-		textedit->print((QString) "Uncaught exception at line" +
-				result.property("lineNumber").toString() + ":" +
-				result.toString());
+		textedit->print((QString) "Uncaught exception at line" + result.property("lineNumber").toString() +
+				":" + result.toString());
 		return -2;
 
 	} else {
@@ -2146,9 +1989,7 @@ bool JSPatternUI::handle_result(QJSValue result, QString str) {
 	}
 }
 
-JSPatternUIStatusWindow::JSPatternUIStatusWindow(QTextEdit *textedit) {
-	con = textedit;
-}
+JSPatternUIStatusWindow::JSPatternUIStatusWindow(QTextEdit *textedit) { con = textedit; }
 void JSPatternUIStatusWindow::clear() { con->clear(); }
 
 void JSPatternUIStatusWindow::print(QString str) { con->append(str); }
@@ -2755,12 +2596,9 @@ void WalkingPatternUI::destroy_ui()
 
 uint32_t ImportPattern::get_min_sampling_freq() { return frequency; }
 
-uint32_t
-ImportPattern::get_required_nr_of_samples(uint32_t sample_rate,
-					  uint32_t number_of_channels) {
+uint32_t ImportPattern::get_required_nr_of_samples(uint32_t sample_rate, uint32_t number_of_channels) {
 	// greatest common divider duty cycle and 1000;0;
-	uint32_t period_number_of_samples =
-		((uint32_t)sample_rate / frequency) * data.size();
+	uint32_t period_number_of_samples = ((uint32_t)sample_rate / frequency) * data.size();
 	return period_number_of_samples;
 }
 
@@ -2774,12 +2612,9 @@ void ImportPattern::setFrequency(float value) { frequency = value; }
 
 bool ImportPattern::useNativeDialog() const { return nativeDialog; }
 
-void ImportPattern::setNativeDialog(bool nativeDialog) {
-	this->nativeDialog = nativeDialog;
-}
+void ImportPattern::setNativeDialog(bool nativeDialog) { this->nativeDialog = nativeDialog; }
 
-ImportPattern::ImportPattern()
-	: fileName(""), channel_mapping(0), nativeDialog(true) {
+ImportPattern::ImportPattern() : fileName(""), channel_mapping(0), nativeDialog(true) {
 	set_name("Import");
 	set_description("Import pattern");
 	set_periodic(false);
@@ -2788,9 +2623,7 @@ ImportPattern::ImportPattern()
 
 ImportPattern::~ImportPattern() {}
 
-uint8_t ImportPattern::generate_pattern(uint32_t sample_rate,
-					uint32_t number_of_samples,
-					uint16_t number_of_channels) {
+uint8_t ImportPattern::generate_pattern(uint32_t sample_rate, uint32_t number_of_samples, uint16_t number_of_channels) {
 	float f_period_number_of_samples = (float)sample_rate / frequency;
 	qDebug() << "period_number_of_samples - " << f_period_number_of_samples;
 
@@ -2815,13 +2648,11 @@ uint8_t ImportPattern::generate_pattern(uint32_t sample_rate,
 	return 0;
 }
 
-ImportPatternUI::ImportPatternUI(ImportPattern *pattern, QWidget *parent)
-	: PatternUI(parent), pattern(pattern) {
+ImportPatternUI::ImportPatternUI(ImportPattern *pattern, QWidget *parent) : PatternUI(parent), pattern(pattern) {
 	ui = new Ui::EmptyPatternUI();
 	ui->setupUi(this);
-	frequencySpinButton = new ScaleSpinButton(
-		{{"Hz", 1E0}, {"kHz", 1E+3}, {"MHz", 1E+6}}, "Frequency", 1e0,
-		PGMaxSampleRate / 2, true, false, this, {1, 2.5, 5});
+	frequencySpinButton = new ScaleSpinButton({{"Hz", 1E0}, {"kHz", 1E+3}, {"MHz", 1E+6}}, "Frequency", 1e0,
+						  PGMaxSampleRate / 2, true, false, this, {1, 2.5, 5});
 	import_settings = new ImportSettings(this);
 	fileLineEdit = new QLineEdit(this);
 	openFileBtn = new QPushButton("Open file", this);
@@ -2900,8 +2731,7 @@ void ImportPatternUI::build_ui(QWidget *parent, uint16_t number_of_channels) {
 		loadFileData();
 		import_settings->clear();
 		for (int i = 0; i < data[0].size(); ++i) {
-			import_settings->addChannel(i,
-						    "CH" + QString::number(i));
+			import_settings->addChannel(i, "CH" + QString::number(i));
 		}
 
 		fileLineEdit->setText(fileName);
@@ -2932,16 +2762,13 @@ void ImportPatternUI::build_ui(QWidget *parent, uint16_t number_of_channels) {
 			tr("Comma-separated values files (*.csv);;"
 			   "Tab-delimited values files (*.txt)"),
 			nullptr,
-			(pattern->useNativeDialog()
-				 ? QFileDialog::Options()
-				 : QFileDialog::DontUseNativeDialog));
+			(pattern->useNativeDialog() ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 		try {
 			loadFileData();
 
 			import_settings->clear();
 			for (int i = 0; i < data[0].size(); ++i) {
-				import_settings->addChannel(
-					i, "CH" + QString::number(i));
+				import_settings->addChannel(i, "CH" + QString::number(i));
 			}
 
 			fileLineEdit->setText(fileName);
@@ -2956,10 +2783,8 @@ void ImportPatternUI::build_ui(QWidget *parent, uint16_t number_of_channels) {
 		}
 	});
 
-	connect(frequencySpinButton, SIGNAL(valueChanged(double)), this,
-		SLOT(parse_ui()));
-	connect(importBtn, &QPushButton::clicked, this,
-		&ImportPatternUI::reloadFileData);
+	connect(frequencySpinButton, SIGNAL(valueChanged(double)), this, SLOT(parse_ui()));
+	connect(importBtn, &QPushButton::clicked, this, &ImportPatternUI::reloadFileData);
 }
 void ImportPatternUI::destroy_ui() { parent_->layout()->removeWidget(this); }
 
@@ -3060,8 +2885,7 @@ void PatternFactory::init() {
 	static_ui_limit = ui_list.count();
 
 	QString searchPattern = "generator.json";
-	QDirIterator it("patterngenerator", QStringList() << searchPattern,
-			QDir::Files, QDirIterator::Subdirectories);
+	QDirIterator it("patterngenerator", QStringList() << searchPattern, QDir::Files, QDirIterator::Subdirectories);
 	int i = 0;
 
 	while (it.hasNext()) {
@@ -3080,8 +2904,7 @@ void PatternFactory::init() {
 		if (obj["enabled"] == true) {
 			ui_list.append(obj["name"].toString());
 			description_list.append(obj["description"].toString());
-			pattern_object.insert(QString::number(i),
-					      QJsonValue(obj));
+			pattern_object.insert(QString::number(i), QJsonValue(obj));
 			i++;
 		}
 	}
@@ -3135,10 +2958,7 @@ Pattern *PatternFactory::create(int index) {
 
 	default:
 		if (index >= static_ui_limit) {
-			return new JSPattern(
-				patterns[QString::number(index -
-							 static_ui_limit)]
-					.toObject());
+			return new JSPattern(patterns[QString::number(index - static_ui_limit)].toObject());
 		} else {
 			return nullptr;
 		}
@@ -3181,55 +3001,40 @@ PatternUI *PatternFactory::create_ui(Pattern *pattern, QWidget *parent) {
 	return create_ui(pattern, 0, parent);
 }
 
-PatternUI *PatternFactory::create_ui(Pattern *pattern, int index,
-				     QWidget *parent) {
+PatternUI *PatternFactory::create_ui(Pattern *pattern, int index, QWidget *parent) {
 	switch (index) {
 	case ClockPatternId:
-		return new ClockPatternUI(dynamic_cast<ClockPattern *>(pattern),
-					  parent);
+		return new ClockPatternUI(dynamic_cast<ClockPattern *>(pattern), parent);
 
 	case RandomPatternId:
-		return new RandomPatternUI(
-			dynamic_cast<RandomPattern *>(pattern), parent);
+		return new RandomPatternUI(dynamic_cast<RandomPattern *>(pattern), parent);
 
 	case BinaryCounterId:
-		return new BinaryCounterPatternUI(
-			dynamic_cast<BinaryCounterPattern *>(pattern), parent);
+		return new BinaryCounterPatternUI(dynamic_cast<BinaryCounterPattern *>(pattern), parent);
 
 	case UARTPatternId:
-		return new UARTPatternUI(dynamic_cast<UARTPattern *>(pattern),
-					 parent);
+		return new UARTPatternUI(dynamic_cast<UARTPattern *>(pattern), parent);
 
 	case NumberPatternId:
-		return new NumberPatternUI(
-			dynamic_cast<NumberPattern *>(pattern), parent);
+		return new NumberPatternUI(dynamic_cast<NumberPattern *>(pattern), parent);
 
 	case GrayCounterId:
-		return new GrayCounterPatternUI(
-			dynamic_cast<GrayCounterPattern *>(pattern), parent);
+		return new GrayCounterPatternUI(dynamic_cast<GrayCounterPattern *>(pattern), parent);
 
 	case SPIPatternId:
-		return new SPIPatternUI(dynamic_cast<SPIPattern *>(pattern),
-					parent);
+		return new SPIPatternUI(dynamic_cast<SPIPattern *>(pattern), parent);
 
 	case I2CPatternId:
-		return new I2CPatternUI(dynamic_cast<I2CPattern *>(pattern),
-					parent);
+		return new I2CPatternUI(dynamic_cast<I2CPattern *>(pattern), parent);
 	case ImportPatternId:
-		return new ImportPatternUI(
-			dynamic_cast<ImportPattern *>(pattern), parent);
+		return new ImportPatternUI(dynamic_cast<ImportPattern *>(pattern), parent);
 
 	default:
 		if (index >= static_ui_limit) {
 			auto jspat = dynamic_cast<JSPattern *>(pattern);
 			if (jspat)
 				return new JSPatternUI(
-					jspat,
-					patterns[QString::number(
-							 static_ui_limit -
-							 index)]
-						.toObject(),
-					parent);
+					jspat, patterns[QString::number(static_ui_limit - index)].toObject(), parent);
 			else
 				return nullptr;
 		} else {

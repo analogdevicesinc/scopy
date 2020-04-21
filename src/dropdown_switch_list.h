@@ -43,8 +43,7 @@ public:
 	int switchColumnCount() const;
 
 	void addDropdownElement(const QIcon &, const QString &);
-	void addDropdownElement(const QIcon &, const QString &,
-				const QVariant &user_data);
+	void addDropdownElement(const QIcon &, const QString &, const QVariant &user_data);
 
 	void removeItem(int index);
 	void showPopup() override;

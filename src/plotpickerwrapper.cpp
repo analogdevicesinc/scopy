@@ -19,10 +19,7 @@
 
 #include "plotpickerwrapper.h"
 
-PlotPickerWrapper::PlotPickerWrapper(QwtAxisId xAxis, QwtAxisId yAxis,
-				     QWidget *canvas)
+PlotPickerWrapper::PlotPickerWrapper(QwtAxisId xAxis, QwtAxisId yAxis, QWidget *canvas)
 	: QwtPlotPicker(xAxis, yAxis, canvas) {}
 
-QPointF PlotPickerWrapper::pointCoordinates(const QPoint &pos) const {
-	return invTransform(pos);
-}
+QPointF PlotPickerWrapper::pointCoordinates(const QPoint &pos) const { return invTransform(pos); }

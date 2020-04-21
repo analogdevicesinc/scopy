@@ -53,10 +53,8 @@ class DMM : public Tool {
 	Q_OBJECT
 
 public:
-	explicit DMM(struct iio_context *ctx, Filter *filt,
-		     std::shared_ptr<GenericAdc> adc,
-		     ToolMenuItem *toolMenuItem, QJSEngine *engine,
-		     ToolLauncher *parent);
+	explicit DMM(struct iio_context *ctx, Filter *filt, std::shared_ptr<GenericAdc> adc, ToolMenuItem *toolMenuItem,
+		     QJSEngine *engine, ToolLauncher *parent);
 	~DMM();
 
 private:
@@ -82,8 +80,7 @@ private:
 	std::vector<double> m_min, m_max;
 
 	void disconnectAll();
-	gr::basic_block_sptr configureGraph(gr::basic_block_sptr s2f,
-					    bool is_low_ac, bool is_high_ac);
+	gr::basic_block_sptr configureGraph(gr::basic_block_sptr s2f, bool is_low_ac, bool is_high_ac);
 	void configureModes();
 	int numSamplesFromIdx(int idx);
 	void writeAllSettingsToHardware();

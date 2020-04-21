@@ -75,8 +75,7 @@ protected:
 class VertMouseGestures : public OscAdjuster {
 	Q_OBJECT
 public:
-	explicit VertMouseGestures(QWidget *parent, QwtAxisId axisId)
-		: OscAdjuster(parent, axisId) {}
+	explicit VertMouseGestures(QWidget *parent, QwtAxisId axisId) : OscAdjuster(parent, axisId) {}
 
 	virtual ~VertMouseGestures() {}
 
@@ -115,8 +114,7 @@ protected:
 class HorizMouseGestures : public OscAdjuster {
 	Q_OBJECT
 public:
-	explicit HorizMouseGestures(QWidget *parent, QwtAxisId axisId)
-		: OscAdjuster(parent, axisId) {}
+	explicit HorizMouseGestures(QWidget *parent, QwtAxisId axisId) : OscAdjuster(parent, axisId) {}
 
 	virtual ~HorizMouseGestures() {}
 

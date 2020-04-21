@@ -58,14 +58,10 @@ QString ExternalScript_API::start(const QString &cmd) {
 	return ret;
 }
 
-void ExternalScript_API::setWorkingDir(const QString &root) {
-	m_working_dir = root;
-}
+void ExternalScript_API::setWorkingDir(const QString &root) { m_working_dir = root; }
 
 QString ExternalScript_API::getWorkingDir() { return m_working_dir; }
 
-void ExternalScript_API::setProcessTimeout(int timeout_ms) {
-	m_process_timeout = timeout_ms;
-}
+void ExternalScript_API::setProcessTimeout(int timeout_ms) { m_process_timeout = timeout_ms; }
 
 int ExternalScript_API::getProcessTimeout() { return m_process_timeout; }

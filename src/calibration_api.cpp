@@ -2,8 +2,7 @@
 
 namespace adiscope {
 
-Calibration_API::Calibration_API(Calibration *calib)
-	: ApiObject(), calib(calib) {}
+Calibration_API::Calibration_API(Calibration *calib) : ApiObject(), calib(calib) {}
 
 QList<double> Calibration_API::get_adc_offsets() const {
 	QList<double> offsets;
@@ -15,8 +14,7 @@ QList<double> Calibration_API::get_adc_offsets() const {
 }
 
 QList<double> Calibration_API::get_adc_gains() const {
-	QList<double> gains = {calib->adcGainChannel0(),
-			       calib->adcGainChannel1()};
+	QList<double> gains = {calib->adcGainChannel0(), calib->adcGainChannel1()};
 
 	return gains;
 }
@@ -40,34 +38,20 @@ bool Calibration_API::calibrateAll() { return calib->calibrateAll(); }
 
 bool Calibration_API::resetCalibration() { return calib->resetCalibration(); }
 
-bool Calibration_API::setGainMode(int ch, int mode) {
-	return calib->setGainMode(ch, mode);
-}
+bool Calibration_API::setGainMode(int ch, int mode) { return calib->setGainMode(ch, mode); }
 
-bool Calibration_API::setCalibrationMode(int mode) {
-	return calib->setCalibrationMode(mode);
-}
+bool Calibration_API::setCalibrationMode(int mode) { return calib->setCalibrationMode(mode); }
 
-void Calibration_API::setHardwareInCalibMode() {
-	calib->setHardwareInCalibMode();
-}
+void Calibration_API::setHardwareInCalibMode() { calib->setHardwareInCalibMode(); }
 
-void Calibration_API::dacAOutputDCVolts(int value) {
-	calib->dacAOutputDCVolts(value);
-}
+void Calibration_API::dacAOutputDCVolts(int value) { calib->dacAOutputDCVolts(value); }
 
-void Calibration_API::dacBOutputDCVolts(int value) {
-	calib->dacBOutputDCVolts(value);
-}
+void Calibration_API::dacBOutputDCVolts(int value) { calib->dacBOutputDCVolts(value); }
 
 void Calibration_API::dacOutputStop() { calib->dacOutputStop(); }
 
-void Calibration_API::restoreHardwareFromCalibMode() {
-	calib->restoreHardwareFromCalibMode();
-}
+void Calibration_API::restoreHardwareFromCalibMode() { calib->restoreHardwareFromCalibMode(); }
 
-double Calibration_API::devTemp(const QString &devName) {
-	return calib->getIioDevTemp(devName);
-}
+double Calibration_API::devTemp(const QString &devName) { return calib->getIioDevTemp(devName); }
 
 } // namespace adiscope

@@ -40,9 +40,7 @@ public:
 
 	void setUnit(QString unit) { m_unit = unit; }
 
-	QString format(double value) const {
-		return m_formatter.format(value, m_unit, 3);
-	}
+	QString format(double value) const { return m_formatter.format(value, m_unit, 3); }
 
 private:
 	MetricPrefixFormatter m_formatter;
@@ -53,9 +51,7 @@ class TimeFormatter : public Formatter {
 public:
 	TimeFormatter() {}
 
-	QString format(double value) const {
-		return m_formatter.format(value, "", 3);
-	}
+	QString format(double value) const { return m_formatter.format(value, "", 3); }
 
 private:
 	TimePrefixFormatter m_formatter;

@@ -12,17 +12,11 @@ int SpectrumChannel_API::window() { return spch->fftWindow(); }
 
 int SpectrumChannel_API::averaging() { return spch->averaging(); }
 
-bool SpectrumChannel_API::enabled() {
-	return spch->widget()->enableButton()->isChecked();
-}
+bool SpectrumChannel_API::enabled() { return spch->widget()->enableButton()->isChecked(); }
 
-void SpectrumChannel_API::enable(bool en) {
-	spch->widget()->enableButton()->setChecked(en);
-}
+void SpectrumChannel_API::enable(bool en) { spch->widget()->enableButton()->setChecked(en); }
 
-void SpectrumChannel_API::setType(int type) {
-	spch->setAverageType((adiscope::FftDisplayPlot::AverageType)type);
-}
+void SpectrumChannel_API::setType(int type) { spch->setAverageType((adiscope::FftDisplayPlot::AverageType)type); }
 
 void SpectrumChannel_API::setWindow(int win) {
 	auto taps = sp->fft_size;
@@ -102,11 +96,9 @@ void SpectrumMarker_API::setFreq(double pos) {
 		}
 
 		if (m_type != 1) { // if type is not peak
-			sp->ui->markerTable->updateMarker(
-				m_mkid, m_chid,
-				sp->fft_plot->markerFrequency(m_chid, m_mkid),
-				sp->fft_plot->markerMagnitude(m_chid, m_mkid),
-				sp->markerTypes[m_type]);
+			sp->ui->markerTable->updateMarker(m_mkid, m_chid, sp->fft_plot->markerFrequency(m_chid, m_mkid),
+							  sp->fft_plot->markerMagnitude(m_chid, m_mkid),
+							  sp->markerTypes[m_type]);
 		}
 	}
 }
@@ -119,13 +111,10 @@ double SpectrumMarker_API::magnitude() {
 	}
 }
 
-bool SpectrumMarker_API::enabled() {
-	return sp->fft_plot->markerEnabled(m_chid, m_mkid);
-}
+bool SpectrumMarker_API::enabled() { return sp->fft_plot->markerEnabled(m_chid, m_mkid); }
 
 void SpectrumMarker_API::setEnabled(bool en) {
-	bool enabled =
-		sp->channels[m_chid]->widget()->enableButton()->isChecked();
+	bool enabled = sp->channels[m_chid]->widget()->enableButton()->isChecked();
 	sp->channels[m_chid]->widget()->enableButton()->setChecked(true);
 	sp->channels[m_chid]->widget()->nameButton()->setChecked(true);
 	sp->fft_plot->setMarkerEnabled(m_chid, m_mkid, en);
@@ -135,13 +124,9 @@ void SpectrumMarker_API::setEnabled(bool en) {
 	sp->channels[m_chid]->widget()->enableButton()->setChecked(enabled);
 }
 
-bool SpectrumMarker_API::visible() {
-	return sp->fft_plot->markerVisible(m_chid, m_mkid);
-}
+bool SpectrumMarker_API::visible() { return sp->fft_plot->markerVisible(m_chid, m_mkid); }
 
-void SpectrumMarker_API::setVisible(bool en) {
-	sp->fft_plot->setMarkerVisible(m_chid, m_mkid, en);
-}
+void SpectrumMarker_API::setVisible(bool en) { sp->fft_plot->setMarkerVisible(m_chid, m_mkid, en); }
 
 void SpectrumAnalyzer_API::show() { Q_EMIT sp->showTool(); }
 
@@ -157,16 +142,10 @@ QVariantList SpectrumAnalyzer_API::getMarkers() {
 
 bool SpectrumAnalyzer_API::running() { return sp->runButton()->isChecked(); }
 
-void SpectrumAnalyzer_API::run(bool chk) {
-	sp->ui->runSingleWidget->toggle(chk);
-}
+void SpectrumAnalyzer_API::run(bool chk) { sp->ui->runSingleWidget->toggle(chk); }
 
-bool SpectrumAnalyzer_API::isSingle() {
-	return sp->ui->runSingleWidget->singleButtonChecked();
-}
-void SpectrumAnalyzer_API::single(bool chk) {
-	sp->ui->runSingleWidget->single();
-}
+bool SpectrumAnalyzer_API::isSingle() { return sp->ui->runSingleWidget->singleButtonChecked(); }
+void SpectrumAnalyzer_API::single(bool chk) { sp->ui->runSingleWidget->single(); }
 
 QVariantList SpectrumAnalyzer_API::getChannels() {
 	QVariantList list;
@@ -178,41 +157,25 @@ QVariantList SpectrumAnalyzer_API::getChannels() {
 	return list;
 }
 
-int SpectrumAnalyzer_API::currentChannel() {
-	return (sp->crt_channel_id < 2 ? sp->crt_channel_id : 0);
-}
+int SpectrumAnalyzer_API::currentChannel() { return (sp->crt_channel_id < 2 ? sp->crt_channel_id : 0); }
 
 void SpectrumAnalyzer_API::setCurrentChannel(int ch) {
 	sp->channels[ch]->widget()->nameButton()->setChecked(true);
 	sp->channels[ch]->widget()->selected(true);
 }
 
-double SpectrumAnalyzer_API::startFreq() {
-	return sp->startStopRange->getStartValue();
-}
-void SpectrumAnalyzer_API::setStartFreq(double val) {
-	sp->startStopRange->setStartValue(val);
-}
+double SpectrumAnalyzer_API::startFreq() { return sp->startStopRange->getStartValue(); }
+void SpectrumAnalyzer_API::setStartFreq(double val) { sp->startStopRange->setStartValue(val); }
 
-double SpectrumAnalyzer_API::stopFreq() {
-	return sp->startStopRange->getStopValue();
-}
-void SpectrumAnalyzer_API::setStopFreq(double val) {
-	sp->startStopRange->setStopValue(val);
-}
+double SpectrumAnalyzer_API::stopFreq() { return sp->startStopRange->getStopValue(); }
+void SpectrumAnalyzer_API::setStopFreq(double val) { sp->startStopRange->setStopValue(val); }
 
 QString SpectrumAnalyzer_API::resBW() { return sp->ui->cmb_rbw->currentText(); }
-void SpectrumAnalyzer_API::setResBW(QString s) {
-	sp->ui->cmb_rbw->setCurrentText(s);
-}
+void SpectrumAnalyzer_API::setResBW(QString s) { sp->ui->cmb_rbw->setCurrentText(s); }
 
-QString SpectrumAnalyzer_API::units() {
-	return sp->ui->cmb_units->currentText();
-}
+QString SpectrumAnalyzer_API::units() { return sp->ui->cmb_units->currentText(); }
 
-void SpectrumAnalyzer_API::setUnits(QString s) {
-	sp->ui->cmb_units->setCurrentText(s);
-}
+void SpectrumAnalyzer_API::setUnits(QString s) { sp->ui->cmb_units->setCurrentText(s); }
 
 double SpectrumAnalyzer_API::topScale() { return sp->top->value(); }
 void SpectrumAnalyzer_API::setTopScale(double val) { sp->top->setValue(val); }
@@ -220,19 +183,11 @@ void SpectrumAnalyzer_API::setTopScale(double val) { sp->top->setValue(val); }
 double SpectrumAnalyzer_API::range() { return sp->range->value(); }
 void SpectrumAnalyzer_API::setRange(double val) { sp->range->setValue(val); }
 
-bool SpectrumAnalyzer_API::markerTableVisible() {
-	return sp->ui->btnMarkerTable->isChecked();
-}
+bool SpectrumAnalyzer_API::markerTableVisible() { return sp->ui->btnMarkerTable->isChecked(); }
 
-void SpectrumAnalyzer_API::setMarkerTableVisible(bool en) {
-	sp->ui->btnMarkerTable->setChecked(en);
-}
+void SpectrumAnalyzer_API::setMarkerTableVisible(bool en) { sp->ui->btnMarkerTable->setChecked(en); }
 
-bool SpectrumAnalyzer_API::getLogScale() const {
-	return sp->fft_plot->getLogScale();
-}
+bool SpectrumAnalyzer_API::getLogScale() const { return sp->fft_plot->getLogScale(); }
 
-void SpectrumAnalyzer_API::setLogScale(bool useLogScale) {
-	sp->ui->logBtn->setChecked(useLogScale);
-}
+void SpectrumAnalyzer_API::setLogScale(bool useLogScale) { sp->ui->logBtn->setChecked(useLogScale); }
 } // namespace adiscope

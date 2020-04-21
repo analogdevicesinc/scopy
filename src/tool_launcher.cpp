@@ -109,8 +109,7 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent)
 	QApplication::setWindowIcon(QIcon(":/icon.ico"));
 
 	// TO DO: remove this when the About menu becomes available
-	setWindowTitle(QString("Scopy - ") +
-		       QString("v" + QString(PROJECT_VERSION)) + " - " +
+	setWindowTitle(QString("Scopy - ") + QString("v" + QString(PROJECT_VERSION)) + " - " +
 		       QString(SCOPY_VERSION_GIT));
 
 	prefPanel = new Preferences(this);
@@ -120,15 +119,11 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent)
 
 	notesPanel->setVisible(false);
 
-	connect(ui->prefBtn, &QPushButton::clicked,
-		[=]() { swapMenu(static_cast<QWidget *>(prefPanel)); });
-	connect(ui->btnNotes, &QPushButton::clicked,
-		[=]() { swapMenu(static_cast<QWidget *>(notesPanel)); });
+	connect(ui->prefBtn, &QPushButton::clicked, [=]() { swapMenu(static_cast<QWidget *>(prefPanel)); });
+	connect(ui->btnNotes, &QPushButton::clicked, [=]() { swapMenu(static_cast<QWidget *>(notesPanel)); });
 
-	connect(prefPanel, &Preferences::reset, this,
-		&ToolLauncher::resetSession);
-	connect(prefPanel, &Preferences::notify, this,
-		&ToolLauncher::readPreferences);
+	connect(prefPanel, &Preferences::reset, this, &ToolLauncher::resetSession);
+	connect(prefPanel, &Preferences::notify, this, &ToolLauncher::readPreferences);
 
 	const QVector<QString> &uris = searchDevices();
 	for (const QString &each : uris)
@@ -140,21 +135,15 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent)
 	devices_btn_group->addButton(ui->btnAdd);
 	devices_btn_group->addButton(ui->btnHomepage);
 
-	connect(ui->btnAdd, SIGNAL(toggled(bool)), this,
-		SLOT(btnAdd_toggled(bool)));
-	connect(ui->btnHomepage, SIGNAL(toggled(bool)), this,
-		SLOT(btnHomepage_toggled(bool)));
+	connect(ui->btnAdd, SIGNAL(toggled(bool)), this, SLOT(btnAdd_toggled(bool)));
+	connect(ui->btnHomepage, SIGNAL(toggled(bool)), this, SLOT(btnHomepage_toggled(bool)));
 
-	tl_api->setObjectName(
-		QString::fromStdString(Filter::tool_name(TOOL_LAUNCHER)));
+	tl_api->setObjectName(QString::fromStdString(Filter::tool_name(TOOL_LAUNCHER)));
 
 	// option background
-	connect(ui->btnHome, SIGNAL(toggled(bool)), this,
-		SLOT(setButtonBackground(bool)));
-	connect(ui->prefBtn, SIGNAL(toggled(bool)), this,
-		SLOT(setButtonBackground(bool)));
-	connect(ui->btnNotes, SIGNAL(toggled(bool)), this,
-		SLOT(setButtonBackground(bool)));
+	connect(ui->btnHome, SIGNAL(toggled(bool)), this, SLOT(setButtonBackground(bool)));
+	connect(ui->prefBtn, SIGNAL(toggled(bool)), this, SLOT(setButtonBackground(bool)));
+	connect(ui->btnNotes, SIGNAL(toggled(bool)), this, SLOT(setButtonBackground(bool)));
 
 	ui->saveBtn->parentWidget()->setEnabled(false);
 	ui->loadBtn->parentWidget()->setEnabled(true);
@@ -167,8 +156,7 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent)
 	js_engine.installExtensions(QJSEngine::ConsoleExtension);
 #endif
 	QtJs *js_object = new QtJs(&js_engine);
-	js_engine.globalObject().setProperty(
-		"fileIO", js_engine.newQObject(new JsFileIo(this)));
+	js_engine.globalObject().setProperty("fileIO", js_engine.newQObject(new JsFileIo(this)));
 	tl_api->js_register(&js_engine);
 
 	connect(&notifier, SIGNAL(activated(int)), this, SLOT(hasText()));
@@ -200,10 +188,8 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent)
 	/* Show a smooth opening when the app starts */
 	ui->menu->toggleMenu(true);
 
-	connect(ui->saveBtn, &QPushButton::clicked, this,
-		&ToolLauncher::saveSession);
-	connect(ui->loadBtn, &QPushButton::clicked, this,
-		&ToolLauncher::loadSession);
+	connect(ui->saveBtn, &QPushButton::clicked, this, &ToolLauncher::saveSession);
+	connect(ui->loadBtn, &QPushButton::clicked, this, &ToolLauncher::loadSession);
 
 	connect(ui->menu, &MenuAnim::finished, [=](bool opened) {
 		ui->saveLbl->setVisible(opened);
@@ -211,8 +197,7 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent)
 		ui->prefBtn->setText(opened ? "Preferences" : "");
 	});
 
-	connect(ui->stackedWidget, SIGNAL(moved(int)), this,
-		SLOT(pageMoved(int)));
+	connect(ui->stackedWidget, SIGNAL(moved(int)), this, SLOT(pageMoved(int)));
 
 	setupHomepage();
 	ui->stackedWidget->setCurrentIndex(0);
@@ -235,22 +220,18 @@ void ToolLauncher::_setupToolMenu() {
 		menu->getToolMenuItemFor(TOOL_DEBUGGER)->setToolDisabled(true);
 	}
 	if (!manual_calibration_enabled) {
-		menu->getToolMenuItemFor(TOOL_CALIBRATION)
-			->setToolDisabled(true);
+		menu->getToolMenuItemFor(TOOL_CALIBRATION)->setToolDisabled(true);
 	}
 
-	connect(menu, &ToolMenu::toolSelected, this,
-		&ToolLauncher::_toolSelected);
+	connect(menu, &ToolMenu::toolSelected, this, &ToolLauncher::_toolSelected);
 
 	menu->getButtonGroup()->addButton(ui->btnHome);
 	menu->getButtonGroup()->addButton(ui->prefBtn);
 	menu->getButtonGroup()->addButton(ui->btnNotes);
 
 	infoWidget = new InfoWidget(this);
-	connect(ui->homeWidget, &DetachDragZone::changeText, infoWidget,
-		&InfoWidget::setText);
-	connect(menu, &ToolMenu::enableInfoWidget, infoWidget,
-		&InfoWidget::enable);
+	connect(ui->homeWidget, &DetachDragZone::changeText, infoWidget, &InfoWidget::setText);
+	connect(menu, &ToolMenu::enableInfoWidget, infoWidget, &InfoWidget::enable);
 }
 
 void ToolLauncher::_toolSelected(enum tool tool) {
@@ -304,13 +285,11 @@ void ToolLauncher::readPreferences() {
 	ui->btnNotes->setVisible(prefPanel->getUser_notes_active());
 	allowExternalScript(prefPanel->getExternal_script_enabled());
 	if (manual_calibration) {
-		manual_calibration->allowManualCalibScript(
-			manual_calibration_enabled,
-			prefPanel->getManual_calib_script_enabled());
+		manual_calibration->allowManualCalibScript(manual_calibration_enabled,
+							   prefPanel->getManual_calib_script_enabled());
 	}
 
-	AnimationManager::getInstance().toggleAnimations(
-		prefPanel->getAnimations_enabled());
+	AnimationManager::getInstance().toggleAnimations(prefPanel->getAnimations_enabled());
 }
 
 void ToolLauncher::loadIndexPageFromContent(QString fileLocation) {
@@ -319,13 +298,10 @@ void ToolLauncher::loadIndexPageFromContent(QString fileLocation) {
 		QFile indexFile(fileInfo.filePath());
 		indexFile.open(QFile::ReadOnly);
 		if (!indexFile.readAll().isEmpty()) {
-			index->setSearchPaths(
-				QStringList(fileInfo.dir().absolutePath()));
+			index->setSearchPaths(QStringList(fileInfo.dir().absolutePath()));
 			indexFile.close();
-			index->setSource(
-				QUrl::fromLocalFile(fileInfo.filePath()));
-			ui->stackedWidget->removeWidget(
-				ui->stackedWidget->widget(0));
+			index->setSource(QUrl::fromLocalFile(fileInfo.filePath()));
+			ui->stackedWidget->removeWidget(ui->stackedWidget->widget(0));
 			ui->stackedWidget->insertWidget(0, index);
 		} else {
 			indexFile.close();
@@ -338,14 +314,11 @@ void ToolLauncher::pageMoved(int direction) {
 		if (!devices.size() && direction > 0) {
 			return;
 		}
-		(direction > 0) ? devices.at(0)->click()
-				: ui->btnHomepage->click();
+		(direction > 0) ? devices.at(0)->click() : ui->btnHomepage->click();
 	} else if (ui->btnHomepage->isChecked()) {
-		(direction > 0) ? ui->btnAdd->click()
-				: ui->btnHomepage->click();
+		(direction > 0) ? ui->btnAdd->click() : ui->btnHomepage->click();
 	} else {
-		int selectedIdx =
-			getDeviceIndex(getSelectedDevice()) + direction;
+		int selectedIdx = getDeviceIndex(getSelectedDevice()) + direction;
 		if (selectedIdx < (int)devices.size()) {
 			if (selectedIdx >= 0) {
 				devices.at(selectedIdx)->click();
@@ -359,11 +332,8 @@ void ToolLauncher::pageMoved(int direction) {
 void ToolLauncher::saveSession() {
 	if (ctx) {
 		QString fileName = QFileDialog::getSaveFileName(
-			this, tr("Save session"), "", tr("Scopy-Files (*.ini)"),
-			nullptr,
-			(m_useNativeDialogs
-				 ? QFileDialog::Options()
-				 : QFileDialog::DontUseNativeDialog));
+			this, tr("Save session"), "", tr("Scopy-Files (*.ini)"), nullptr,
+			(m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 		if (!fileName.isEmpty()) {
 			this->tl_api->save(fileName);
 		}
@@ -372,9 +342,7 @@ void ToolLauncher::saveSession() {
 
 void ToolLauncher::allowExternalScript(bool prefEnabled) {
 	if (prefEnabled && debugger_enabled) {
-		js_engine.globalObject().setProperty(
-			"extern",
-			js_engine.newQObject(new ExternalScript_API(this)));
+		js_engine.globalObject().setProperty("extern", js_engine.newQObject(new ExternalScript_API(this)));
 	} else {
 		if (js_engine.globalObject().hasProperty("extern")) {
 			js_engine.globalObject().deleteProperty("extern");
@@ -391,16 +359,12 @@ void ToolLauncher::setUseDecoders(bool use_decoders) {
 
 bool ToolLauncher::hasNativeDialogs() const { return m_useNativeDialogs; }
 
-void ToolLauncher::setNativeDialogs(bool nativeDialogs) {
-	m_useNativeDialogs = nativeDialogs;
-}
+void ToolLauncher::setNativeDialogs(bool nativeDialogs) { m_useNativeDialogs = nativeDialogs; }
 
 void ToolLauncher::loadSession() {
 	QString fileName = QFileDialog::getOpenFileName(
-		this, tr("Load session"), "", tr("Scopy-Files (*.ini)"),
-		nullptr,
-		(m_useNativeDialogs ? QFileDialog::Options()
-				    : QFileDialog::DontUseNativeDialog));
+		this, tr("Load session"), "", tr("Scopy-Files (*.ini)"), nullptr,
+		(m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 	if (!fileName.isEmpty()) {
 		this->tl_api->load(fileName);
 		updateHomepage();
@@ -571,10 +535,8 @@ void ToolLauncher::updateListOfDevices(const QVector<QString> &uris) {
 void ToolLauncher::loadToolTips(bool connected) {
 	if (connected) {
 		ui->btnHome->setToolTip(QString("Click to open the home menu"));
-		ui->btnConnect->setToolTip(
-			QString("Click to disconnect the device"));
-		ui->saveBtn->setToolTip(
-			QString("Click to save the current session"));
+		ui->btnConnect->setToolTip(QString("Click to disconnect the device"));
+		ui->saveBtn->setToolTip(QString("Click to save the current session"));
 		ui->loadBtn->setToolTip(QString("Click to load a session"));
 	} else {
 		ui->btnHome->setToolTip(QString());
@@ -640,8 +602,7 @@ void ToolLauncher::forgetDeviceBtn_clicked(QString uri) {
 		if (ctx) {
 			connectedDev->setConnected(false, false);
 			disconnect();
-			connectedDev->connectButton()->setToolTip(
-				QString("Click to connect the device"));
+			connectedDev->connectButton()->setToolTip(QString("Click to connect the device"));
 		}
 	}
 
@@ -674,12 +635,9 @@ QPushButton *ToolLauncher::addContext(const QString &uri) {
 
 	DeviceWidget *deviceWidget = nullptr;
 	if (tempFilter->hw_name().compare("M2K") == 0) {
-		deviceWidget = DeviceBuilder::newDevice(
-			DeviceBuilder::M2K, uri, tempFilter->hw_name(), this);
+		deviceWidget = DeviceBuilder::newDevice(DeviceBuilder::M2K, uri, tempFilter->hw_name(), this);
 	} else {
-		deviceWidget =
-			DeviceBuilder::newDevice(DeviceBuilder::GENERIC, uri,
-						 tempFilter->hw_name(), this);
+		deviceWidget = DeviceBuilder::newDevice(DeviceBuilder::GENERIC, uri, tempFilter->hw_name(), this);
 	}
 
 	delete tempFilter;
@@ -689,21 +647,16 @@ QPushButton *ToolLauncher::addContext(const QString &uri) {
 	auto connectBtn = deviceWidget->connectButton();
 
 	if (connectBtn) {
-		connect(connectBtn, SIGNAL(clicked(bool)), this,
-			SLOT(connectBtn_clicked(bool)));
+		connect(connectBtn, SIGNAL(clicked(bool)), this, SLOT(connectBtn_clicked(bool)));
 	}
 
-	connect(deviceWidget, SIGNAL(forgetDevice(QString)), this,
-		SLOT(forgetDeviceBtn_clicked(QString)));
+	connect(deviceWidget, SIGNAL(forgetDevice(QString)), this, SLOT(forgetDeviceBtn_clicked(QString)));
 
-	connect(deviceWidget, SIGNAL(selected(bool)), this,
-		SLOT(deviceBtn_clicked(bool)));
+	connect(deviceWidget, SIGNAL(selected(bool)), this, SLOT(deviceBtn_clicked(bool)));
 
-	connect(deviceWidget->infoPage(), SIGNAL(stopSearching(bool)), this,
-		SLOT(stopSearching(bool)));
+	connect(deviceWidget->infoPage(), SIGNAL(stopSearching(bool)), this, SLOT(stopSearching(bool)));
 
-	ui->devicesList->insertWidget(ui->devicesList->count() - 1,
-				      deviceWidget);
+	ui->devicesList->insertWidget(ui->devicesList->count() - 1, deviceWidget);
 	ui->stackedWidget->addWidget(deviceWidget->infoPage());
 	devices_btn_group->addButton(deviceWidget->deviceButton());
 	devices.push_back(deviceWidget);
@@ -756,18 +709,10 @@ DeviceWidget *ToolLauncher::getDevice(QString uri) {
 void ToolLauncher::highlightDevice(QPushButton *btn) {
 	bool initialBtnState = btn->property("checked").toBool();
 
-	QTimer::singleShot(200, [=]() {
-		setDynamicProperty(btn, "checked", !initialBtnState);
-	});
-	QTimer::singleShot(400, [=]() {
-		setDynamicProperty(btn, "checked", initialBtnState);
-	});
-	QTimer::singleShot(600, [=]() {
-		setDynamicProperty(btn, "checked", !initialBtnState);
-	});
-	QTimer::singleShot(800, [=]() {
-		setDynamicProperty(btn, "checked", initialBtnState);
-	});
+	QTimer::singleShot(200, [=]() { setDynamicProperty(btn, "checked", !initialBtnState); });
+	QTimer::singleShot(400, [=]() { setDynamicProperty(btn, "checked", initialBtnState); });
+	QTimer::singleShot(600, [=]() { setDynamicProperty(btn, "checked", !initialBtnState); });
+	QTimer::singleShot(800, [=]() { setDynamicProperty(btn, "checked", initialBtnState); });
 }
 
 void ToolLauncher::setupHomepage() {
@@ -795,8 +740,7 @@ void ToolLauncher::setupHomepage() {
 				 "{background-color: #4a34ff;}");
 	reportBtn->setMinimumHeight(30);
 	reportBtn->setMinimumWidth(100);
-	reportLayout->addItem(new QSpacerItem(20, 20, QSizePolicy::Expanding,
-					      QSizePolicy::Fixed));
+	reportLayout->addItem(new QSpacerItem(20, 20, QSizePolicy::Expanding, QSizePolicy::Fixed));
 	reportLayout->addWidget(reportBtn);
 	layout->addWidget(reportRegion);
 
@@ -805,32 +749,26 @@ void ToolLauncher::setupHomepage() {
 		std::string gittag = SCOPY_VERSION_GIT;
 		std::string fw = "";
 		if (ctx) {
-			fw = std::string(
-				iio_context_get_attr_value(ctx, "fw_version"));
+			fw = std::string(iio_context_get_attr_value(ctx, "fw_version"));
 		}
 		QSettings settings;
 		QFileInfo info(settings.fileName());
-		std::string head =
-			"https://github.com/analogdevicesinc/scopy/issues/"
-			"new?title=%3CInstrument%3E:%20%3CShort%20description%"
-			"20of%20the%20bug%3E&body=";
+		std::string head = "https://github.com/analogdevicesinc/scopy/issues/"
+				   "new?title=%3CInstrument%3E:%20%3CShort%20description%"
+				   "20of%20the%20bug%3E&body=";
 		std::string os_version_urlstring = "OS%20Version: " + os;
 		std::string fw_version_urlstring = "%0AFW%20Version: " + fw;
 		std::string gittag_urlstring = "%0ASW%20Version: " + gittag;
-		std::string description_urlstring =
-			"%0A%0ADescription%20of%20the%20bug:%3Cdescription%3E%"
-			"0ASteps%20to%20reproduce:"
-			"%0A-%0A-%0A%0AThe%20ini%20files%20might%20be%20useful%"
-			"20to%20reproduce%20the%20error.";
+		std::string description_urlstring = "%0A%0ADescription%20of%20the%20bug:%3Cdescription%3E%"
+						    "0ASteps%20to%20reproduce:"
+						    "%0A-%0A-%0A%0AThe%20ini%20files%20might%20be%20useful%"
+						    "20to%20reproduce%20the%20error.";
 		std::string ini_file_urlstring =
-			"%0AThe%20ini%20file%20is%20located%20at: " +
-			info.absoluteFilePath().toStdString();
+			"%0AThe%20ini%20file%20is%20located%20at: " + info.absoluteFilePath().toStdString();
 		std::string finalpart = "%0APlease%20consider%20attaching%20it."
 					"&labels=bug,reported-from-scopy";
-		QUrl url(QString::fromStdString(
-			head + os_version_urlstring + fw_version_urlstring +
-			gittag_urlstring + description_urlstring +
-			ini_file_urlstring + finalpart));
+		QUrl url(QString::fromStdString(head + os_version_urlstring + fw_version_urlstring + gittag_urlstring +
+						description_urlstring + ini_file_urlstring + finalpart));
 		QDesktopServices::openUrl(url);
 	});
 
@@ -853,25 +791,22 @@ void ToolLauncher::setupHomepage() {
 
 void ToolLauncher::setupAddPage() {
 	connectWidget = new ConnectDialog(ui->stackedWidget);
-	connect(connectWidget, &ConnectDialog::newContext,
-		[=](const QString &uri) {
-			auto dev = getDevice(uri);
-			if (dev) {
-				highlightDevice(dev->deviceButton());
-			} else {
-				auto btn = addContext(uri);
-				if (btn) {
-					btn->setChecked(true);
-				}
+	connect(connectWidget, &ConnectDialog::newContext, [=](const QString &uri) {
+		auto dev = getDevice(uri);
+		if (dev) {
+			highlightDevice(dev->deviceButton());
+		} else {
+			auto btn = addContext(uri);
+			if (btn) {
+				btn->setChecked(true);
 			}
-		});
+		}
+	});
 
 	ui->stackedWidget->insertWidget(1, connectWidget);
 }
 
-void ToolLauncher::updateHomepage() {
-	ui->stackedWidget->removeWidget(ui->stackedWidget->widget(0));
-}
+void ToolLauncher::updateHomepage() { ui->stackedWidget->removeWidget(ui->stackedWidget->widget(0)); }
 
 void ToolLauncher::swapMenu(QWidget *menu) {
 	Tool *tl = dynamic_cast<Tool *>(menu);
@@ -893,49 +828,29 @@ void ToolLauncher::setButtonBackground(bool on) {
 	setDynamicProperty(btn->parentWidget(), "selected", on);
 }
 
-void ToolLauncher::btnOscilloscope_clicked() {
-	swapMenu(static_cast<QWidget *>(oscilloscope));
-}
+void ToolLauncher::btnOscilloscope_clicked() { swapMenu(static_cast<QWidget *>(oscilloscope)); }
 
-void ToolLauncher::btnSignalGenerator_clicked() {
-	swapMenu(static_cast<QWidget *>(signal_generator));
-}
+void ToolLauncher::btnSignalGenerator_clicked() { swapMenu(static_cast<QWidget *>(signal_generator)); }
 
 void ToolLauncher::btnDMM_clicked() { swapMenu(static_cast<QWidget *>(dmm)); }
 
-void ToolLauncher::btnPowerControl_clicked() {
-	swapMenu(static_cast<QWidget *>(power_control));
-}
+void ToolLauncher::btnPowerControl_clicked() { swapMenu(static_cast<QWidget *>(power_control)); }
 
-void ToolLauncher::btnLogicAnalyzer_clicked() {
-	swapMenu(static_cast<QWidget *>(logic_analyzer));
-}
+void ToolLauncher::btnLogicAnalyzer_clicked() { swapMenu(static_cast<QWidget *>(logic_analyzer)); }
 
-void adiscope::ToolLauncher::btnPatternGenerator_clicked() {
-	swapMenu(static_cast<QWidget *>(pattern_generator));
-}
+void adiscope::ToolLauncher::btnPatternGenerator_clicked() { swapMenu(static_cast<QWidget *>(pattern_generator)); }
 
-void adiscope::ToolLauncher::btnNetworkAnalyzer_clicked() {
-	swapMenu(static_cast<QWidget *>(network_analyzer));
-}
+void adiscope::ToolLauncher::btnNetworkAnalyzer_clicked() { swapMenu(static_cast<QWidget *>(network_analyzer)); }
 
-void adiscope::ToolLauncher::btnSpectrumAnalyzer_clicked() {
-	swapMenu(static_cast<QWidget *>(spectrum_analyzer));
-}
+void adiscope::ToolLauncher::btnSpectrumAnalyzer_clicked() { swapMenu(static_cast<QWidget *>(spectrum_analyzer)); }
 
-void adiscope::ToolLauncher::btnDigitalIO_clicked() {
-	swapMenu(static_cast<QWidget *>(dio));
-}
+void adiscope::ToolLauncher::btnDigitalIO_clicked() { swapMenu(static_cast<QWidget *>(dio)); }
 
 void adiscope::ToolLauncher::on_btnHome_clicked() { swapMenu(ui->homeWidget); }
 
-void adiscope::ToolLauncher::btnDebugger_clicked() {
-	swapMenu(static_cast<QWidget *>(debugger));
-}
+void adiscope::ToolLauncher::btnDebugger_clicked() { swapMenu(static_cast<QWidget *>(debugger)); }
 
-void adiscope::ToolLauncher::btnCalibration_clicked() {
-	swapMenu(static_cast<QWidget *>(manual_calibration));
-}
+void adiscope::ToolLauncher::btnCalibration_clicked() { swapMenu(static_cast<QWidget *>(manual_calibration)); }
 
 void adiscope::ToolLauncher::resetStylesheets() {
 	setDynamicProperty(ui->btnConnect, "connected", false);
@@ -962,8 +877,7 @@ void adiscope::ToolLauncher::deviceBtn_clicked(bool pressed) {
 
 	if (pressed && !getConnectedDevice()) {
 		if (dev) {
-			auto tempCtx = iio_create_context_from_uri(
-				dev->uri().toStdString().c_str());
+			auto tempCtx = iio_create_context_from_uri(dev->uri().toStdString().c_str());
 			if (tempCtx) {
 				auto tempFilter = new Filter(tempCtx);
 				menu->loadToolsFromFilter(tempFilter);
@@ -974,8 +888,7 @@ void adiscope::ToolLauncher::deviceBtn_clicked(bool pressed) {
 	}
 
 	if (pressed) {
-		ui->btnConnect->setToolTip(
-			QString("Click to connect the device"));
+		ui->btnConnect->setToolTip(QString("Click to connect the device"));
 	} else {
 		ui->btnConnect->setToolTip(QString("Select a device first"));
 	}
@@ -985,18 +898,15 @@ void adiscope::ToolLauncher::disconnect() {
 	/* Switch back to home screen */
 	ui->btnHome->click();
 
-	QObject::disconnect(this, SIGNAL(calibrationFailed()), this,
-			    SLOT(calibrationFailedCallback()));
-	QObject::disconnect(this, SIGNAL(calibrationDone()), this,
-			    SLOT(restartToolsAfterCalibration()));
+	QObject::disconnect(this, SIGNAL(calibrationFailed()), this, SLOT(calibrationFailedCallback()));
+	QObject::disconnect(this, SIGNAL(calibrationDone()), this, SLOT(restartToolsAfterCalibration()));
 
 	if (ctx) {
 		if (calibrating) {
 			calib->cancelCalibration();
 			calibration_thread.waitForFinished();
 		}
-		auto iio = iio_manager::get_instance(
-			ctx, filter->device_name(TOOL_DMM));
+		auto iio = iio_manager::get_instance(ctx, filter->device_name(TOOL_DMM));
 		iio->stop_all();
 		alive_timer->stop();
 
@@ -1039,16 +949,13 @@ void adiscope::ToolLauncher::connectBtn_clicked(bool pressed) {
 
 	/* Disconnect connected device, if any */
 	if (ctx) {
-		QObject::disconnect(connectedDev->calibrateButton(),
-				    SIGNAL(clicked()), this,
+		QObject::disconnect(connectedDev->calibrateButton(), SIGNAL(clicked()), this,
 				    SLOT(requestCalibration()));
-		QObject::disconnect(&calibration_thread_watcher,
-				    SIGNAL(finished()), this,
+		QObject::disconnect(&calibration_thread_watcher, SIGNAL(finished()), this,
 				    SLOT(calibrationThreadWatcherFinished()));
 		connectedDev->setConnected(false, false);
 		disconnect();
-		connectedDev->connectButton()->setToolTip(
-			QString("Click to connect the device"));
+		connectedDev->connectButton()->setToolTip(QString("Click to connect the device"));
 	}
 
 	if (connectedDev != selectedDev) {
@@ -1059,20 +966,17 @@ void adiscope::ToolLauncher::connectBtn_clicked(bool pressed) {
 			bool success = switchContext(uri);
 			if (success) {
 				selectedDev->setConnected(true, false, ctx);
-				selectedDev->connectButton()->setText(
-					"Calibrating...");
+				selectedDev->connectButton()->setText("Calibrating...");
 				selectedDev->setName(filter->hw_name());
 				selectedDev->infoPage()->identifyDevice(true);
-				setDynamicProperty(ui->btnConnect, "connected",
-						   true);
+				setDynamicProperty(ui->btnConnect, "connected", true);
 
 				search_timer->stop();
 
 				ui->saveBtn->parentWidget()->setEnabled(true);
 
 			} else {
-				setDynamicProperty(ui->btnConnect, "failed",
-						   true);
+				setDynamicProperty(ui->btnConnect, "failed", true);
 				selectedDev->setConnected(false, true);
 				selectedDev->connectButton()->setEnabled(true);
 			}
@@ -1179,8 +1083,7 @@ bool ToolLauncher::loadDecoders(QString path) {
 	}
 
 	if (srd_init(path.toStdString().c_str()) != SRD_OK) {
-		qDebug(CAT_TOOL_LAUNCHER)
-			<< "ERROR: libsigrokdecode init failed.";
+		qDebug(CAT_TOOL_LAUNCHER) << "ERROR: libsigrokdecode init failed.";
 		return false;
 	} else {
 		srd_loaded = true;
@@ -1225,8 +1128,7 @@ void adiscope::ToolLauncher::requestCalibration() {
 	getConnectedDevice()->calibrateButton()->setEnabled(false);
 	saveRunningToolsBeforeCalibration();
 	stopToolsBeforeCalibration();
-	calibration_thread =
-		QtConcurrent::run(std::bind(&ToolLauncher::calibrate, this));
+	calibration_thread = QtConcurrent::run(std::bind(&ToolLauncher::calibrate, this));
 }
 
 void adiscope::ToolLauncher::requestCalibrationCancel() {
@@ -1254,14 +1156,10 @@ bool adiscope::ToolLauncher::calibrate() {
 	calibrating = true;
 
 	QPushButton *dmm_btn = menu->getToolMenuItemFor(TOOL_DMM)->getToolBtn();
-	QPushButton *osc_btn =
-		menu->getToolMenuItemFor(TOOL_OSCILLOSCOPE)->getToolBtn();
-	QPushButton *siggen_btn =
-		menu->getToolMenuItemFor(TOOL_SIGNAL_GENERATOR)->getToolBtn();
-	QPushButton *spectrum_btn =
-		menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER)->getToolBtn();
-	QPushButton *network_btn =
-		menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER)->getToolBtn();
+	QPushButton *osc_btn = menu->getToolMenuItemFor(TOOL_OSCILLOSCOPE)->getToolBtn();
+	QPushButton *siggen_btn = menu->getToolMenuItemFor(TOOL_SIGNAL_GENERATOR)->getToolBtn();
+	QPushButton *spectrum_btn = menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER)->getToolBtn();
+	QPushButton *network_btn = menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER)->getToolBtn();
 	auto old_dmm_text = dmm_btn->text();
 	auto old_osc_text = osc_btn->text();
 	auto old_siggen_text = siggen_btn->text();
@@ -1301,87 +1199,51 @@ bool adiscope::ToolLauncher::calibrate() {
 
 void adiscope::ToolLauncher::enableAdcBasedTools() {
 	if (filter->compatible(TOOL_OSCILLOSCOPE)) {
-		oscilloscope = new Oscilloscope(
-			ctx, filter, adc,
-			menu->getToolMenuItemFor(TOOL_OSCILLOSCOPE), &js_engine,
-			this);
+		oscilloscope = new Oscilloscope(ctx, filter, adc, menu->getToolMenuItemFor(TOOL_OSCILLOSCOPE),
+						&js_engine, this);
 		toolList.push_back(oscilloscope);
-		adc_users_group.addButton(
-			menu->getToolMenuItemFor(TOOL_OSCILLOSCOPE)
-				->getToolStopBtn());
-		connect(oscilloscope, &Oscilloscope::showTool, [=]() {
-			menu->getToolMenuItemFor(TOOL_OSCILLOSCOPE)
-				->getToolBtn()
-				->click();
-		});
+		adc_users_group.addButton(menu->getToolMenuItemFor(TOOL_OSCILLOSCOPE)->getToolStopBtn());
+		connect(oscilloscope, &Oscilloscope::showTool,
+			[=]() { menu->getToolMenuItemFor(TOOL_OSCILLOSCOPE)->getToolBtn()->click(); });
 	}
 
 	if (filter->compatible(TOOL_DMM)) {
-		dmm = new DMM(ctx, filter, adc,
-			      menu->getToolMenuItemFor(TOOL_DMM), &js_engine,
-			      this);
-		adc_users_group.addButton(
-			menu->getToolMenuItemFor(TOOL_DMM)->getToolStopBtn());
+		dmm = new DMM(ctx, filter, adc, menu->getToolMenuItemFor(TOOL_DMM), &js_engine, this);
+		adc_users_group.addButton(menu->getToolMenuItemFor(TOOL_DMM)->getToolStopBtn());
 		toolList.push_back(dmm);
-		connect(dmm, &DMM::showTool, [=]() {
-			menu->getToolMenuItemFor(TOOL_DMM)
-				->getToolBtn()
-				->click();
-		});
+		connect(dmm, &DMM::showTool, [=]() { menu->getToolMenuItemFor(TOOL_DMM)->getToolBtn()->click(); });
 	}
 
 	if (filter->compatible(TOOL_DEBUGGER)) {
-		debugger = new Debugger(ctx, filter,
-					menu->getToolMenuItemFor(TOOL_DEBUGGER),
-					&js_engine, this);
-		adc_users_group.addButton(
-			menu->getToolMenuItemFor(TOOL_DEBUGGER)
-				->getToolStopBtn());
-		QObject::connect(debugger, &Debugger::newDebuggerInstance, this,
-				 &ToolLauncher::addDebugWindow);
+		debugger = new Debugger(ctx, filter, menu->getToolMenuItemFor(TOOL_DEBUGGER), &js_engine, this);
+		adc_users_group.addButton(menu->getToolMenuItemFor(TOOL_DEBUGGER)->getToolStopBtn());
+		QObject::connect(debugger, &Debugger::newDebuggerInstance, this, &ToolLauncher::addDebugWindow);
 	}
 
 	if (filter->compatible(TOOL_CALIBRATION)) {
-		manual_calibration = new ManualCalibration(
-			ctx, filter, menu->getToolMenuItemFor(TOOL_CALIBRATION),
-			&js_engine, this, calib);
-		adc_users_group.addButton(
-			menu->getToolMenuItemFor(TOOL_CALIBRATION)
-				->getToolStopBtn());
+		manual_calibration = new ManualCalibration(ctx, filter, menu->getToolMenuItemFor(TOOL_CALIBRATION),
+							   &js_engine, this, calib);
+		adc_users_group.addButton(menu->getToolMenuItemFor(TOOL_CALIBRATION)->getToolStopBtn());
 		toolList.push_back(manual_calibration);
 	}
 
 	if (filter->compatible(TOOL_SPECTRUM_ANALYZER)) {
 		spectrum_analyzer = new SpectrumAnalyzer(
-			ctx, filter, adc,
-			menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER),
-			&js_engine, this);
+			ctx, filter, adc, menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER), &js_engine, this);
 		toolList.push_back(spectrum_analyzer);
-		adc_users_group.addButton(
-			menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER)
-				->getToolStopBtn());
-		connect(spectrum_analyzer, &SpectrumAnalyzer::showTool, [=]() {
-			menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER)
-				->getToolBtn()
-				->click();
-		});
+		adc_users_group.addButton(menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER)->getToolStopBtn());
+		connect(spectrum_analyzer, &SpectrumAnalyzer::showTool,
+			[=]() { menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER)->getToolBtn()->click(); });
 	}
 
 	if (filter->compatible((TOOL_NETWORK_ANALYZER))) {
 
 		network_analyzer = new NetworkAnalyzer(
-			ctx, filter, adc, dacs,
-			menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER),
-			&js_engine, this);
-		adc_users_group.addButton(
-			menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER)
-				->getToolStopBtn());
+			ctx, filter, adc, dacs, menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER), &js_engine, this);
+		adc_users_group.addButton(menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER)->getToolStopBtn());
 		toolList.push_back(network_analyzer);
-		connect(network_analyzer, &NetworkAnalyzer::showTool, [=]() {
-			menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER)
-				->getToolBtn()
-				->click();
-		});
+		connect(network_analyzer, &NetworkAnalyzer::showTool,
+			[=]() { menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER)->getToolBtn()->click(); });
 		network_analyzer->setOscilloscope(oscilloscope);
 	}
 
@@ -1391,15 +1253,10 @@ void adiscope::ToolLauncher::enableAdcBasedTools() {
 void adiscope::ToolLauncher::enableDacBasedTools() {
 	if (filter->compatible(TOOL_SIGNAL_GENERATOR)) {
 		signal_generator = new SignalGenerator(
-			ctx, dacs, filter,
-			menu->getToolMenuItemFor(TOOL_SIGNAL_GENERATOR),
-			&js_engine, this);
+			ctx, dacs, filter, menu->getToolMenuItemFor(TOOL_SIGNAL_GENERATOR), &js_engine, this);
 		toolList.push_back(signal_generator);
-		connect(signal_generator, &SignalGenerator::showTool, [=]() {
-			menu->getToolMenuItemFor(TOOL_SIGNAL_GENERATOR)
-				->getToolBtn()
-				->click();
-		});
+		connect(signal_generator, &SignalGenerator::showTool,
+			[=]() { menu->getToolMenuItemFor(TOOL_SIGNAL_GENERATOR)->getToolBtn()->click(); });
 	}
 	if (pathToFile != "") {
 		this->tl_api->load(pathToFile);
@@ -1411,8 +1268,7 @@ void adiscope::ToolLauncher::enableDacBasedTools() {
 
 	for (auto &tool : toolList) {
 		tool->setNativeDialogs(m_useNativeDialogs);
-		qDebug() << tool
-			 << " will use native dialogs: " << m_useNativeDialogs;
+		qDebug() << tool << " will use native dialogs: " << m_useNativeDialogs;
 	}
 }
 
@@ -1445,8 +1301,7 @@ bool adiscope::ToolLauncher::switchContext(const QString &uri) {
 	for (unsigned int dev_id = 0;; dev_id++) {
 		struct iio_device *dev;
 		try {
-			dev = filter->find_device(ctx, TOOL_SIGNAL_GENERATOR,
-						  dev_id);
+			dev = filter->find_device(ctx, TOOL_SIGNAL_GENERATOR, dev_id);
 		} catch (std::exception &ex) {
 			break;
 		}
@@ -1454,22 +1309,16 @@ bool adiscope::ToolLauncher::switchContext(const QString &uri) {
 	}
 
 	if (filter->hw_name().compare("M2K") == 0) {
-		adc = AdcBuilder::newAdc(
-			AdcBuilder::M2K, ctx,
-			filter->find_device(ctx, TOOL_OSCILLOSCOPE));
+		adc = AdcBuilder::newAdc(AdcBuilder::M2K, ctx, filter->find_device(ctx, TOOL_OSCILLOSCOPE));
 
 		for (int i = 0; i < iio_dacs.size(); i++) {
-			auto dac = DacBuilder::newDac(DacBuilder::M2K, ctx,
-						      iio_dacs[i]);
+			auto dac = DacBuilder::newDac(DacBuilder::M2K, ctx, iio_dacs[i]);
 			dacs.push_back(dac);
 		}
 	} else {
-		adc = AdcBuilder::newAdc(
-			AdcBuilder::GENERIC, ctx,
-			filter->find_device(ctx, TOOL_OSCILLOSCOPE));
+		adc = AdcBuilder::newAdc(AdcBuilder::GENERIC, ctx, filter->find_device(ctx, TOOL_OSCILLOSCOPE));
 		for (int i = 0; i < iio_dacs.size(); i++) {
-			auto dac = DacBuilder::newDac(DacBuilder::GENERIC, ctx,
-						      iio_dacs[i]);
+			auto dac = DacBuilder::newDac(DacBuilder::GENERIC, ctx, iio_dacs[i]);
 			dacs.push_back(dac);
 		}
 	}
@@ -1479,24 +1328,20 @@ bool adiscope::ToolLauncher::switchContext(const QString &uri) {
 	std::shared_ptr<M2kDac> m2k_dac_b;
 	for (int i = 0; i < dacs.size(); i++) {
 		if (i == 0) {
-			m2k_dac_a =
-				std::dynamic_pointer_cast<M2kDac>(dacs.at(i));
+			m2k_dac_a = std::dynamic_pointer_cast<M2kDac>(dacs.at(i));
 		}
 		if (i == 1) {
-			m2k_dac_b =
-				std::dynamic_pointer_cast<M2kDac>(dacs.at(i));
+			m2k_dac_b = std::dynamic_pointer_cast<M2kDac>(dacs.at(i));
 		}
 	}
 	calib = new Calibration(ctx, &js_engine, m2k_adc, m2k_dac_a, m2k_dac_b);
 	calib->initialize();
 
-	if (filter->compatible(TOOL_PATTERN_GENERATOR) ||
-	    filter->compatible(TOOL_DIGITALIO)) {
+	if (filter->compatible(TOOL_PATTERN_GENERATOR) || filter->compatible(TOOL_DIGITALIO)) {
 		dioManager = new DIOManager(ctx, filter);
 	}
 
-	if (filter->compatible(TOOL_LOGIC_ANALYZER) ||
-	    filter->compatible(TOOL_PATTERN_GENERATOR)) {
+	if (filter->compatible(TOOL_LOGIC_ANALYZER) || filter->compatible(TOOL_PATTERN_GENERATOR)) {
 
 		if (!m_use_decoders) {
 			search_timer->stop();
@@ -1506,9 +1351,7 @@ bool adiscope::ToolLauncher::switchContext(const QString &uri) {
 				     "Some features may be missing");
 			info.exec();
 		} else {
-			bool success = loadDecoders(
-				QCoreApplication::applicationDirPath() +
-				"/decoders");
+			bool success = loadDecoders(QCoreApplication::applicationDirPath() + "/decoders");
 
 			if (!success) {
 				search_timer->stop();
@@ -1523,121 +1366,79 @@ bool adiscope::ToolLauncher::switchContext(const QString &uri) {
 	}
 
 	if (filter->compatible(TOOL_DIGITALIO)) {
-		dio = new DigitalIO(ctx, filter,
-				    menu->getToolMenuItemFor(TOOL_DIGITALIO),
-				    dioManager, &js_engine, this);
+		dio = new DigitalIO(ctx, filter, menu->getToolMenuItemFor(TOOL_DIGITALIO), dioManager, &js_engine,
+				    this);
 		toolList.push_back(dio);
-		connect(dio, &DigitalIO::showTool, [=]() {
-			menu->getToolMenuItemFor(TOOL_DIGITALIO)
-				->getToolBtn()
-				->click();
-		});
+		connect(dio, &DigitalIO::showTool,
+			[=]() { menu->getToolMenuItemFor(TOOL_DIGITALIO)->getToolBtn()->click(); });
 	}
 
 	if (filter->compatible(TOOL_POWER_CONTROLLER)) {
-		power_control = new PowerController(
-			ctx, menu->getToolMenuItemFor(TOOL_POWER_CONTROLLER),
-			&js_engine, this);
+		power_control =
+			new PowerController(ctx, menu->getToolMenuItemFor(TOOL_POWER_CONTROLLER), &js_engine, this);
 		toolList.push_back(power_control);
-		connect(power_control, &PowerController::showTool, [=]() {
-			menu->getToolMenuItemFor(TOOL_POWER_CONTROLLER)
-				->getToolBtn()
-				->click();
-		});
+		connect(power_control, &PowerController::showTool,
+			[=]() { menu->getToolMenuItemFor(TOOL_POWER_CONTROLLER)->getToolBtn()->click(); });
 	}
 
 	if (filter->compatible(TOOL_LOGIC_ANALYZER)) {
-		logic_analyzer = new LogicAnalyzer(
-			ctx, filter,
-			menu->getToolMenuItemFor(TOOL_LOGIC_ANALYZER),
-			&js_engine, this);
+		logic_analyzer =
+			new LogicAnalyzer(ctx, filter, menu->getToolMenuItemFor(TOOL_LOGIC_ANALYZER), &js_engine, this);
 		toolList.push_back(logic_analyzer);
-		connect(logic_analyzer, &LogicAnalyzer::showTool, [=]() {
-			menu->getToolMenuItemFor(TOOL_LOGIC_ANALYZER)
-				->getToolBtn()
-				->click();
-		});
+		connect(logic_analyzer, &LogicAnalyzer::showTool,
+			[=]() { menu->getToolMenuItemFor(TOOL_LOGIC_ANALYZER)->getToolBtn()->click(); });
 	}
 
 	if (filter->compatible((TOOL_PATTERN_GENERATOR))) {
-		pattern_generator = new PatternGenerator(
-			ctx, filter,
-			menu->getToolMenuItemFor(TOOL_PATTERN_GENERATOR),
-			&js_engine, dioManager, this);
+		pattern_generator = new PatternGenerator(ctx, filter, menu->getToolMenuItemFor(TOOL_PATTERN_GENERATOR),
+							 &js_engine, dioManager, this);
 		toolList.push_back(pattern_generator);
-		connect(pattern_generator, &PatternGenerator::showTool, [=]() {
-			menu->getToolMenuItemFor(TOOL_PATTERN_GENERATOR)
-				->getToolBtn()
-				->click();
-		});
+		connect(pattern_generator, &PatternGenerator::showTool,
+			[=]() { menu->getToolMenuItemFor(TOOL_PATTERN_GENERATOR)->getToolBtn()->click(); });
 	}
 
-	connect(menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER)
-			->getToolStopBtn(),
-		&QPushButton::toggled, [=](bool en) {
-			if (en) {
-				if (!menu->getToolMenuItemFor(
-						 TOOL_SIGNAL_GENERATOR)
-					     ->getToolStopBtn()
-					     ->isChecked())
-					return;
-				menu->getToolMenuItemFor(TOOL_SIGNAL_GENERATOR)
-					->getToolStopBtn()
-					->setChecked(false);
+	connect(menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER)->getToolStopBtn(), &QPushButton::toggled, [=](bool en) {
+		if (en) {
+			if (!menu->getToolMenuItemFor(TOOL_SIGNAL_GENERATOR)->getToolStopBtn()->isChecked())
+				return;
+			menu->getToolMenuItemFor(TOOL_SIGNAL_GENERATOR)->getToolStopBtn()->setChecked(false);
+		}
+	});
+	connect(menu->getToolMenuItemFor(TOOL_SIGNAL_GENERATOR)->getToolStopBtn(), &QPushButton::toggled, [=](bool en) {
+		if (en) {
+			if (adc_users_group.checkedId() ==
+			    adc_users_group.id(menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER)->getToolStopBtn())) {
+				auto btn = dynamic_cast<CustomPushButton *>(
+					menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER)->getToolStopBtn());
+				btn->setChecked(false);
 			}
-		});
-	connect(menu->getToolMenuItemFor(TOOL_SIGNAL_GENERATOR)
-			->getToolStopBtn(),
-		&QPushButton::toggled, [=](bool en) {
-			if (en) {
-				if (adc_users_group.checkedId() ==
-				    adc_users_group.id(
-					    menu->getToolMenuItemFor(
-							TOOL_NETWORK_ANALYZER)
-						    ->getToolStopBtn())) {
-					auto btn = dynamic_cast<
-						CustomPushButton *>(
-						menu->getToolMenuItemFor(
-							    TOOL_NETWORK_ANALYZER)
-							->getToolStopBtn());
-					btn->setChecked(false);
-				}
-			}
-		});
+		}
+	});
 
 	loadToolTips(true);
 
-	connect(this, SIGNAL(adcCalibrationDone()), this,
-		SLOT(enableAdcBasedTools()));
-	connect(this, SIGNAL(dacCalibrationDone()), this,
-		SLOT(enableDacBasedTools()));
-	connect(this, SIGNAL(calibrationFailed()), this,
-		SLOT(calibrationFailedCallback()));
-	connect(this, SIGNAL(calibrationDone()), this,
-		SLOT(restartToolsAfterCalibration()));
+	connect(this, SIGNAL(adcCalibrationDone()), this, SLOT(enableAdcBasedTools()));
+	connect(this, SIGNAL(dacCalibrationDone()), this, SLOT(enableDacBasedTools()));
+	connect(this, SIGNAL(calibrationFailed()), this, SLOT(calibrationFailedCallback()));
+	connect(this, SIGNAL(calibrationDone()), this, SLOT(restartToolsAfterCalibration()));
 
 	selectedDev->calibrateButton()->setEnabled(false);
 
-	calibration_thread = QtConcurrent::run(
-		std::bind(&ToolLauncher::initialCalibration, this));
+	calibration_thread = QtConcurrent::run(std::bind(&ToolLauncher::initialCalibration, this));
 
 	calibration_thread_watcher.setFuture(calibration_thread);
 
-	connect(&calibration_thread_watcher, SIGNAL(finished()), this,
-		SLOT(calibrationThreadWatcherFinished()));
+	connect(&calibration_thread_watcher, SIGNAL(finished()), this, SLOT(calibrationThreadWatcherFinished()));
 
 	return true;
 }
 
 void ToolLauncher::calibrationThreadWatcherFinished() {
-	QObject::disconnect(this, SIGNAL(adcCalibrationDone()), this,
-			    SLOT(enableAdcBasedTools()));
-	QObject::disconnect(this, SIGNAL(dacCalibrationDone()), this,
-			    SLOT(enableDacBasedTools()));
+	QObject::disconnect(this, SIGNAL(adcCalibrationDone()), this, SLOT(enableAdcBasedTools()));
+	QObject::disconnect(this, SIGNAL(dacCalibrationDone()), this, SLOT(enableDacBasedTools()));
 
 	getConnectedDevice()->calibrateButton()->setEnabled(true);
-	connect(getConnectedDevice()->calibrateButton(), SIGNAL(clicked()),
-		this, SLOT(requestCalibration()));
+	connect(getConnectedDevice()->calibrateButton(), SIGNAL(clicked()), this, SLOT(requestCalibration()));
 }
 
 void ToolLauncher::hasText() {
@@ -1684,8 +1485,7 @@ void ToolLauncher::checkIp(const QString &ip) {
 		}
 
 		if (!found)
-			QMetaObject::invokeMethod(this, "addContext",
-						  Qt::QueuedConnection,
+			QMetaObject::invokeMethod(this, "addContext", Qt::QueuedConnection,
 						  Q_ARG(const QString &, uri));
 	} else {
 		previousIp = "";
@@ -1700,8 +1500,7 @@ void ToolLauncher::toolDetached(bool detached) {
 		if (current == static_cast<QWidget *>(tool))
 			ui->btnHome->click();
 
-		setDynamicProperty(tool->runButton()->parentWidget(),
-				   "selected", false);
+		setDynamicProperty(tool->runButton()->parentWidget(), "selected", false);
 	}
 
 	tool->setVisible(detached);
@@ -1735,8 +1534,7 @@ bool ToolLauncher::eventFilter(QObject *watched, QEvent *event) {
 		QMouseEvent *me = static_cast<QMouseEvent *>(event);
 		QPoint mousePosLoad = ui->Load->mapFromGlobal(QCursor::pos());
 		QPoint mousePosSave = ui->Save->mapFromGlobal(QCursor::pos());
-		QPoint mousePosPref =
-			ui->preference->mapFromGlobal(QCursor::pos());
+		QPoint mousePosPref = ui->preference->mapFromGlobal(QCursor::pos());
 		QPoint mousePosNotes = ui->notes->mapFromGlobal(QCursor::pos());
 
 		if (ui->menuControl->rect().contains(me->pos())) {

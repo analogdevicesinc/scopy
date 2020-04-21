@@ -69,8 +69,7 @@ QList<bool> DigitalIO_API::grouped() const {
 
 	QList<bool> list;
 	for (int i = 0; i < dio->groups.size(); ++i) {
-		bool grouped =
-			dio->groups[i]->ui->stackedWidget->currentIndex() == 1;
+		bool grouped = dio->groups[i]->ui->stackedWidget->currentIndex() == 1;
 		list.push_back(grouped);
 	}
 	return list;

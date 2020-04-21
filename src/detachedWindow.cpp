@@ -24,8 +24,7 @@
 
 using namespace adiscope;
 
-DetachedWindow::DetachedWindow(QWidget *parent)
-	: QMainWindow(parent), state(Qt::WindowState::WindowNoState), name("") {
+DetachedWindow::DetachedWindow(QWidget *parent) : QMainWindow(parent), state(Qt::WindowState::WindowNoState), name("") {
 	this->setWindowIcon(QApplication::windowIcon());
 	this->setWindowTitle("Scopy - " + getName());
 }
@@ -62,8 +61,7 @@ void DetachedWindow::showWindow() {
 	activateWindow();
 }
 
-DetachedWindowState::DetachedWindowState()
-	: name(""), geometry(QRect()), maximized(false), minimized(true) {}
+DetachedWindowState::DetachedWindowState() : name(""), geometry(QRect()), maximized(false), minimized(true) {}
 
 DetachedWindowState::DetachedWindowState(DetachedWindow *detachedWindow) {
 	name = detachedWindow->getName();

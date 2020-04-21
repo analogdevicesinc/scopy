@@ -65,8 +65,7 @@ private:
 	void _test_trigger_tags(int nitems);
 
 public:
-	scope_sink_f_impl(int size, double samp_rate, const std::string &name,
-			  int nconnections, QObject *plot = NULL);
+	scope_sink_f_impl(int size, double samp_rate, const std::string &name, int nconnections, QObject *plot = NULL);
 	~scope_sink_f_impl();
 
 	bool check_topology(int ninputs, int noutputs);
@@ -76,8 +75,7 @@ public:
 	void set_update_time(double t);
 	void set_nsamps(const int size);
 	void set_samp_rate(const double samp_rate);
-	void set_trigger_mode(trigger_mode mode, int channel,
-			      const std::string &tag_key = "");
+	void set_trigger_mode(trigger_mode mode, int channel, const std::string &tag_key = "");
 
 	void set_displayOneBuffer(bool);
 
@@ -86,8 +84,7 @@ public:
 	void reset();
 	void clean_buffers();
 
-	int work(int noutput_items, gr_vector_const_void_star &input_items,
-		 gr_vector_void_star &output_items);
+	int work(int noutput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items);
 };
 
 } /* namespace adiscope */

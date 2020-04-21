@@ -76,10 +76,8 @@ class LogicAnalyzerChannelUI : public ChannelUI {
 	int traceHeight;
 
 public:
-	LogicAnalyzerChannelUI(LogicAnalyzerChannel *ch,
-			       LogicAnalyzerChannelGroup *chgroup,
-			       LogicAnalyzerChannelGroupUI *chgroupui,
-			       LogicAnalyzerChannelManagerUI *chm_ui,
+	LogicAnalyzerChannelUI(LogicAnalyzerChannel *ch, LogicAnalyzerChannelGroup *chgroup,
+			       LogicAnalyzerChannelGroupUI *chgroupui, LogicAnalyzerChannelManagerUI *chm_ui,
 			       QWidget *parent = 0);
 	~LogicAnalyzerChannelUI();
 	Ui::LAChannelGroup *ui;
@@ -165,8 +163,7 @@ class LogicAnalyzerChannelGroupUI : public ChannelGroupUI {
 	int traceHeight;
 
 public:
-	LogicAnalyzerChannelGroupUI(LogicAnalyzerChannelGroup *chg,
-				    LogicAnalyzerChannelManagerUI *chm_ui,
+	LogicAnalyzerChannelGroupUI(LogicAnalyzerChannelGroup *chg, LogicAnalyzerChannelManagerUI *chm_ui,
 				    QWidget *parent = 0);
 	~LogicAnalyzerChannelGroupUI();
 	LogicAnalyzerChannelGroup *getChannelGroup();
@@ -235,8 +232,7 @@ public:
 	void initDecoderList(bool first_level_decoder = true);
 	QStringList get_name_decoder_list();
 	const srd_decoder *get_decoder_from_name(const char *);
-	void highlightChannel(LogicAnalyzerChannelGroup *chg,
-			      LogicAnalyzerChannel *ch = nullptr);
+	void highlightChannel(LogicAnalyzerChannelGroup *chg, LogicAnalyzerChannel *ch = nullptr);
 	LogicAnalyzerChannelGroup *getHighlightedChannelGroup();
 	LogicAnalyzerChannel *getHighlightedChannel();
 	void moveChannel(int fromChgIndex, int from, int to, bool after = true);
@@ -281,11 +277,8 @@ public:
 	std::vector<QFrame *> separators;
 	QWidget *hoverWidget;
 
-	LogicAnalyzerChannelManagerUI(QWidget *parent,
-				      pv::MainWindow *main_win_,
-				      LogicAnalyzerChannelManager *chm,
-				      QWidget *locationSettingsWidget,
-				      QVBoxLayout *locationSettingsLayout,
+	LogicAnalyzerChannelManagerUI(QWidget *parent, pv::MainWindow *main_win_, LogicAnalyzerChannelManager *chm,
+				      QWidget *locationSettingsWidget, QVBoxLayout *locationSettingsLayout,
 				      LogicAnalyzer *la);
 	~LogicAnalyzerChannelManagerUI();
 	LogicAnalyzerChannelManager *chm;
@@ -298,8 +291,7 @@ public:
 	void setHoverWidget(QWidget *hover);
 	void clearHoverWidget();
 
-	LogicAnalyzerChannelGroupUI *
-	getUiFromChGroup(LogicAnalyzerChannelGroup *);
+	LogicAnalyzerChannelGroupUI *getUiFromChGroup(LogicAnalyzerChannelGroup *);
 	LogicAnalyzerChannelUI *getUiFromCh(LogicAnalyzerChannel *);
 	void createSettingsWidget();
 	void deleteSettingsWidget();
@@ -343,8 +335,7 @@ private:
 	std::vector<int> visibleItemsIndexes;
 	QButtonGroup *settings_exclusive_group;
 	bool streaming_mode;
-	pv::widgets::ColourButton *colour_button_edge, *colour_button_BG,
-		*colour_button_low, *colour_button_high;
+	pv::widgets::ColourButton *colour_button_edge, *colour_button_BG, *colour_button_low, *colour_button_high;
 	QFrame *addSeparator(QVBoxLayout *lay, int pos);
 	void createColorButtons();
 	void showColorSettings(bool);

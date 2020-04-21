@@ -30,12 +30,9 @@ using namespace adiscope;
 StackedHomepage::StackedHomepage(QWidget *parent) : QStackedWidget(parent) {
 	s_hc = new HomepageControls(this);
 	this->installEventFilter(s_hc);
-	connect(s_hc, &HomepageControls::goLeft, this,
-		&StackedHomepage::moveLeft);
-	connect(s_hc, &HomepageControls::goRight, this,
-		&StackedHomepage::moveRight);
-	connect(s_hc, &HomepageControls::openFile, this,
-		&StackedHomepage::openFile);
+	connect(s_hc, &HomepageControls::goLeft, this, &StackedHomepage::moveLeft);
+	connect(s_hc, &HomepageControls::goRight, this, &StackedHomepage::moveRight);
+	connect(s_hc, &HomepageControls::openFile, this, &StackedHomepage::openFile);
 
 	s_speed = 500;
 	s_animationType = QEasingCurve::InOutCubic;
@@ -99,8 +96,7 @@ void StackedHomepage::openFile() {
 		QTextBrowser *newWindow = new QTextBrowser(this);
 		newWindow->setOpenExternalLinks(true);
 		newWindow->setFrameShape(QFrame::NoFrame);
-		QString path =
-			f_info.absoluteFilePath().remove(f_info.fileName());
+		QString path = f_info.absoluteFilePath().remove(f_info.fileName());
 		newWindow->setSearchPaths(QStringList(path));
 		newWindow->setSource(QUrl(f_info.fileName()));
 		addWidget(newWindow);
@@ -110,9 +106,7 @@ void StackedHomepage::openFile() {
 
 void StackedHomepage::setSpeed(int speed) { s_speed = speed; }
 
-void StackedHomepage::setAnimation(QEasingCurve::Type animationType) {
-	s_animationType = animationType;
-}
+void StackedHomepage::setAnimation(QEasingCurve::Type animationType) { s_animationType = animationType; }
 
 void StackedHomepage::setWrap(bool wrap) { s_wrap = wrap; }
 
@@ -157,8 +151,7 @@ void StackedHomepage::slideToIndex(int index) {
 	slideInWidget(widget(index), direction);
 }
 
-void StackedHomepage::slideInWidget(QWidget *newWidget,
-				    StackedHomepage::s_directions direction) {
+void StackedHomepage::slideInWidget(QWidget *newWidget, StackedHomepage::s_directions direction) {
 	if (s_active) {
 		if (s_next != indexOf(newWidget)) {
 			animationDone();
@@ -203,21 +196,18 @@ void StackedHomepage::slideInWidget(QWidget *newWidget,
 	animNow->setDuration(s_speed);
 	animNow->setEasingCurve(s_animationType);
 	animNow->setStartValue(QPoint(pcurrent.x(), pcurrent.y()));
-	animNow->setEndValue(
-		QPoint(offsetx + pcurrent.x(), offsety + pcurrent.y()));
+	animNow->setEndValue(QPoint(offsetx + pcurrent.x(), offsety + pcurrent.y()));
 	CustomAnimation *animNext = new CustomAnimation(widget(next), "pos");
 	animNext->setDuration(s_speed);
 	animNext->setEasingCurve(s_animationType);
-	animNext->setStartValue(
-		QPoint(-offsetx + pnext.x(), offsety + pnext.y()));
+	animNext->setStartValue(QPoint(-offsetx + pnext.x(), offsety + pnext.y()));
 	animNext->setEndValue(QPoint(pnext.x(), pnext.y()));
 	QParallelAnimationGroup *animGroup = new QParallelAnimationGroup(this);
 
 	animGroup->addAnimation(animNow);
 	animGroup->addAnimation(animNext);
 
-	connect(animGroup, &QParallelAnimationGroup::finished, this,
-		&StackedHomepage::animationDone);
+	connect(animGroup, &QParallelAnimationGroup::finished, this, &StackedHomepage::animationDone);
 
 	s_next = next;
 	s_current = current;
@@ -225,10 +215,6 @@ void StackedHomepage::slideInWidget(QWidget *newWidget,
 	animGroup->start();
 }
 
-bool StackedHomepage::get_controls_enabled() const {
-	return s_controls_enabled;
-}
+bool StackedHomepage::get_controls_enabled() const { return s_controls_enabled; }
 
-void StackedHomepage::set_controls_enabled(bool value) {
-	s_controls_enabled = value;
-}
+void StackedHomepage::set_controls_enabled(bool value) { s_controls_enabled = value; }

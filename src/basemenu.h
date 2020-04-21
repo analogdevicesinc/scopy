@@ -37,8 +37,7 @@ public:
 	virtual ~BaseMenu();
 
 	void insertMenuItem(BaseMenuItem *menuItem, int position = -1);
-	void insertMenuItem(QVector<BaseMenuItem *> items,
-			    QVector<int> positions = QVector<int>());
+	void insertMenuItem(QVector<BaseMenuItem *> items, QVector<int> positions = QVector<int>());
 	void removeMenuItem(BaseMenuItem *menuItem);
 	void removeMenuItem(QVector<BaseMenuItem *> items);
 

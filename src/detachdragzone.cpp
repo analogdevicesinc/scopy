@@ -10,8 +10,7 @@ using namespace adiscope;
 DetachDragZone::DetachDragZone(QWidget *parent) : ColoredQWidget(parent) {
 	ToolLauncher *tl = static_cast<ToolLauncher *>(parent->parent());
 	if (tl->infoWidget != nullptr) {
-		connect(this, SIGNAL(changeText(QString)), tl->infoWidget,
-			SLOT(setText(QString)));
+		connect(this, SIGNAL(changeText(QString)), tl->infoWidget, SLOT(setText(QString)));
 	}
 
 	setAcceptDrops(true);
@@ -22,10 +21,8 @@ DetachDragZone::~DetachDragZone() {}
 
 bool DetachDragZone::eventFilter(QObject *watched, QEvent *event) {
 	if (event->type() == QEvent::DragEnter) {
-		QDragEnterEvent *enterEvent =
-			static_cast<QDragEnterEvent *>(event);
-		if (!enterEvent->mimeData()->hasFormat(
-			    BaseMenuItem::menuItemMimeDataType))
+		QDragEnterEvent *enterEvent = static_cast<QDragEnterEvent *>(event);
+		if (!enterEvent->mimeData()->hasFormat(BaseMenuItem::menuItemMimeDataType))
 			return true;
 	}
 	return QWidget::event(event);
@@ -49,8 +46,7 @@ void DetachDragZone::dragLeaveEvent(QDragLeaveEvent *event) {
 }
 
 void DetachDragZone::dropEvent(QDropEvent *event) {
-	if (event->source() == this &&
-	    event->possibleActions() & Qt::MoveAction) {
+	if (event->source() == this && event->possibleActions() & Qt::MoveAction) {
 		return;
 	}
 	if (event->mimeData()->hasFormat(BaseMenuItem::menuItemMimeDataType)) {

@@ -114,8 +114,7 @@ private:
 	QList<int> d_num_markers;
 
 	QList<QList<std::shared_ptr<struct marker_data>>> d_peaks;
-	QList<QList<std::shared_ptr<struct marker_data>>>
-		d_freq_asc_sorted_peaks;
+	QList<QList<std::shared_ptr<struct marker_data>>> d_freq_asc_sorted_peaks;
 	bool d_emitNewMkrData;
 
 	QList<QColor> d_markerColors;
@@ -129,21 +128,16 @@ private:
 	void _resetXAxisPoints();
 
 	void resetAverages();
-	void averageDataAndComputeMagnitude(std::vector<double *> in_data,
-					    std::vector<double *> out_data,
+	void averageDataAndComputeMagnitude(std::vector<double *> in_data, std::vector<double *> out_data,
 					    uint64_t nb_points);
-	average_sptr getNewAvgObject(enum AverageType avg_type, uint data_width,
-				     uint history);
+	average_sptr getNewAvgObject(enum AverageType avg_type, uint data_width, uint history);
 
 	void add_marker(int chn);
 	void remove_marker(int chn, int which);
-	void
-	marker_set_pos_source(uint chIdx, uint mkIdx,
-			      std::shared_ptr<struct marker_data> &source_sptr);
+	void marker_set_pos_source(uint chIdx, uint mkIdx, std::shared_ptr<struct marker_data> &source_sptr);
 	void findPeaks(int chn);
 	void calculate_fixed_markers(int chn);
-	int getMarkerPos(const QList<marker> &marker_list,
-			 std::shared_ptr<SpectrumMarker> &marker) const;
+	int getMarkerPos(const QList<marker> &marker_list, std::shared_ptr<SpectrumMarker> &marker) const;
 	void detectMarkers();
 
 	void _editFirstPoint();
@@ -213,8 +207,7 @@ public:
 	double sampleRate();
 	void setNumPoints(uint64_t num_points);
 
-	void registerReferenceWaveform(QString name, QVector<double> xData,
-				       QVector<double> yData);
+	void registerReferenceWaveform(QString name, QVector<double> xData, QVector<double> yData);
 	void unregisterReferenceWaveform(QString name);
 
 Q_SIGNALS:
@@ -225,8 +218,7 @@ Q_SIGNALS:
 	void markerSelected(uint chIdx, uint mkIdx);
 
 public Q_SLOTS:
-	void setSampleRate(double sr, double units,
-			   const std::string &strunits);
+	void setSampleRate(double sr, double units, const std::string &strunits);
 	void presetSampleRate(double sr);
 	void useLogFreq(bool use_log_freq);
 	void customEvent(QEvent *e);

@@ -33,9 +33,7 @@ using namespace adiscope;
 ManualCalibration_API::ManualCalibration_API(ManualCalibration *m_calib)
 	: ApiObject(), calib(m_calib), step_in_progress(-1) {}
 
-void ManualCalibration_API::autoCalibration() {
-	calib->ui->autoButton->click();
-}
+void ManualCalibration_API::autoCalibration() { calib->ui->autoButton->click(); }
 
 int ManualCalibration_API::start(int story) {
 	if (step_in_progress >= 0) {
@@ -87,8 +85,7 @@ int ManualCalibration_API::finish() {
 	calib->TempUi->finishButton->click();
 	step_in_progress = -1;
 
-	if ((currentStory.calibProcedure + 1) <
-	    calib->calibListString.count()) {
+	if ((currentStory.calibProcedure + 1) < calib->calibListString.count()) {
 		return currentStory.calibProcedure + 1;
 	}
 	return -1;
@@ -127,34 +124,18 @@ void ManualCalibration_API::loadCalibration() {
 	}
 }
 
-double ManualCalibration_API::getOffsetPosDac() const {
-	return calib->paramTable->item(0, 1)->text().toDouble();
-}
+double ManualCalibration_API::getOffsetPosDac() const { return calib->paramTable->item(0, 1)->text().toDouble(); }
 
-double ManualCalibration_API::getGainPosDac() const {
-	return calib->paramTable->item(1, 1)->text().toDouble();
-}
+double ManualCalibration_API::getGainPosDac() const { return calib->paramTable->item(1, 1)->text().toDouble(); }
 
-double ManualCalibration_API::getOffsetPosAdc() const {
-	return calib->paramTable->item(2, 1)->text().toDouble();
-}
+double ManualCalibration_API::getOffsetPosAdc() const { return calib->paramTable->item(2, 1)->text().toDouble(); }
 
-double ManualCalibration_API::getGainPosAdc() const {
-	return calib->paramTable->item(3, 1)->text().toDouble();
-}
+double ManualCalibration_API::getGainPosAdc() const { return calib->paramTable->item(3, 1)->text().toDouble(); }
 
-double ManualCalibration_API::getOffsetNegDac() const {
-	return calib->paramTable->item(4, 1)->text().toDouble();
-}
+double ManualCalibration_API::getOffsetNegDac() const { return calib->paramTable->item(4, 1)->text().toDouble(); }
 
-double ManualCalibration_API::getGainNegDac() const {
-	return calib->paramTable->item(5, 1)->text().toDouble();
-}
+double ManualCalibration_API::getGainNegDac() const { return calib->paramTable->item(5, 1)->text().toDouble(); }
 
-double ManualCalibration_API::getOffsetNegAdc() const {
-	return calib->paramTable->item(6, 1)->text().toDouble();
-}
+double ManualCalibration_API::getOffsetNegAdc() const { return calib->paramTable->item(6, 1)->text().toDouble(); }
 
-double ManualCalibration_API::getGainNegAdc() const {
-	return calib->paramTable->item(7, 1)->text().toDouble();
-}
+double ManualCalibration_API::getGainNegAdc() const { return calib->paramTable->item(7, 1)->text().toDouble(); }

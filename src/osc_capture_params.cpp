@@ -41,8 +41,7 @@ SymmetricBufferMode::SymmetricBufferMode()
 
 SymmetricBufferMode::~SymmetricBufferMode() {}
 
-SymmetricBufferMode::capture_parameters
-SymmetricBufferMode::captureParameters() const {
+SymmetricBufferMode::capture_parameters SymmetricBufferMode::captureParameters() const {
 	struct capture_parameters params;
 	double sampleRate;
 	long long bufferOffsetPos;
@@ -53,8 +52,7 @@ SymmetricBufferMode::captureParameters() const {
 
 	// If trigger position altered the buffer size, return the altered one
 	if (m_triggerBufferSize >= 0) {
-		bufferSize = qMax(m_visibleBufferSize,
-				  (unsigned long)m_triggerBufferSize);
+		bufferSize = qMax(m_visibleBufferSize, (unsigned long)m_triggerBufferSize);
 	} else {
 		bufferSize = m_visibleBufferSize;
 	}
@@ -72,23 +70,16 @@ SymmetricBufferMode::captureParameters() const {
 	return params;
 }
 
-void SymmetricBufferMode::setSampleRates(
-	const std::vector<double> &sampleRates) {
+void SymmetricBufferMode::setSampleRates(const std::vector<double> &sampleRates) {
 	m_sampleRates = sampleRates;
 	std::sort(m_sampleRates.begin(), m_sampleRates.end());
 }
 
-void SymmetricBufferMode::setEntireBufferMaxSize(unsigned long maxSize) {
-	m_entireBufferMaxSize = maxSize;
-}
+void SymmetricBufferMode::setEntireBufferMaxSize(unsigned long maxSize) { m_entireBufferMaxSize = maxSize; }
 
-void SymmetricBufferMode::setTriggerBufferMaxSize(unsigned long maxSize) {
-	m_triggerBufferMaxSize = maxSize;
-}
+void SymmetricBufferMode::setTriggerBufferMaxSize(unsigned long maxSize) { m_triggerBufferMaxSize = maxSize; }
 
-void SymmetricBufferMode::setTimeDivisionCount(int count) {
-	m_timeDivsCount = count;
-}
+void SymmetricBufferMode::setTimeDivisionCount(int count) { m_timeDivsCount = count; }
 
 void SymmetricBufferMode::setTimeBase(double secsPerDiv) {
 	if ((m_timeBase != secsPerDiv) || m_enhancedMemoryDepth) {
@@ -104,9 +95,7 @@ void SymmetricBufferMode::setCustomBufferSize(unsigned long customSize) {
 
 bool SymmetricBufferMode::isEnhancedMemDepth() { return m_enhancedMemoryDepth; }
 
-void SymmetricBufferMode::setEnhancedMemDepth(bool val) {
-	m_enhancedMemoryDepth = val;
-}
+void SymmetricBufferMode::setEnhancedMemDepth(bool val) { m_enhancedMemoryDepth = val; }
 
 void SymmetricBufferMode::setTriggerPos(double pos) {
 	if (m_triggerPos != pos) {
@@ -126,18 +115,15 @@ void SymmetricBufferMode::configParamsOnTimeBaseChanged() {
 	m_availableBufferSizes.clear();
 
 	unsigned long bufferSize = getVisibleBufferSize(sampleRate);
-	while ((m_triggerBufferMaxSize < bufferSize) &&
-	       (ratesIt != m_sampleRates.rend() - 1)) {
+	while ((m_triggerBufferMaxSize < bufferSize) && (ratesIt != m_sampleRates.rend() - 1)) {
 		if (bufferSize <= m_entireBufferMaxSize) {
-			m_availableBufferSizes.insert(
-				m_availableBufferSizes.begin(), bufferSize);
+			m_availableBufferSizes.insert(m_availableBufferSizes.begin(), bufferSize);
 		}
 		sampleRate = *(++ratesIt);
 		bufferSize = getVisibleBufferSize(sampleRate);
 	}
 	if (bufferSize <= m_entireBufferMaxSize) {
-		m_availableBufferSizes.insert(m_availableBufferSizes.begin(),
-					      bufferSize);
+		m_availableBufferSizes.insert(m_availableBufferSizes.begin(), bufferSize);
 	}
 
 	// The zero value of the trigger position (seconds) starts at the middle
@@ -146,13 +132,11 @@ void SymmetricBufferMode::configParamsOnTimeBaseChanged() {
 	long long triggOffset = bufferSize / 2;
 
 	// Make sure trigg pos stays inside the boundaries of the entire buffer
-	long long triggPosInBuffer =
-		qRound64(m_triggerPos * sampleRate) + triggOffset;
+	long long triggPosInBuffer = qRound64(m_triggerPos * sampleRate) + triggOffset;
 
 	long long trigBuffSize = triggPosInBuffer;
 	if (triggPosInBuffer < 0) {
-		bufferSize =
-			qRound64(qAbs(m_triggerPos) * sampleRate) + triggOffset;
+		bufferSize = qRound64(qAbs(m_triggerPos) * sampleRate) + triggOffset;
 
 		if (bufferSize > m_entireBufferMaxSize) {
 			trigBuffSize = -(bufferSize - m_entireBufferMaxSize);
@@ -178,8 +162,7 @@ double SymmetricBufferMode::getSamplerateFor(unsigned long buffersize) {
 	auto ratesIt = m_sampleRates.begin();
 	double sampleRate = *ratesIt;
 
-	while (sampleRate < desiredSamplrate &&
-	       (ratesIt != m_sampleRates.end() - 1)) {
+	while (sampleRate < desiredSamplrate && (ratesIt != m_sampleRates.end() - 1)) {
 		sampleRate = *(++ratesIt);
 	}
 	return sampleRate;
@@ -190,8 +173,7 @@ void SymmetricBufferMode::configParamsOnCustomSizeChanged() {
 	m_triggerBufferSize = m_triggerBufferMaxSize;
 	m_triggPosSR = m_sampleRate;
 	/* Move trigger to left such that we have 8192 before the trigger */
-	m_triggerPos = (m_timeBase * m_timeDivsCount / 2) -
-		(m_triggerBufferMaxSize / m_sampleRate);
+	m_triggerPos = (m_timeBase * m_timeDivsCount / 2) - (m_triggerBufferMaxSize / m_sampleRate);
 	m_enhancedMemoryDepth = true;
 }
 
@@ -207,22 +189,19 @@ void SymmetricBufferMode::configParamsOnTriggPosChanged() {
 	// edge of the plot
 	long long triggOffset = m_visibleBufferSize / 2;
 
-	long long triggPosInBuffer =
-		qRound64(m_triggerPos * m_sampleRate) + triggOffset;
+	long long triggPosInBuffer = qRound64(m_triggerPos * m_sampleRate) + triggOffset;
 
 	m_triggPosSR = m_sampleRate;
 
 	if (triggPosInBuffer < 0) {
 		unsigned long delaySamples = -triggPosInBuffer;
-		bufferSize = (m_timeBase * m_timeDivsCount) * m_sampleRate +
-			delaySamples;
+		bufferSize = (m_timeBase * m_timeDivsCount) * m_sampleRate + delaySamples;
 		m_triggerBufferSize = 0;
 
 		// Limit buffer size and recalculate trigger position
 		if (bufferSize > m_entireBufferMaxSize) {
 			/* Delayed acquisition */
-			m_triggerBufferSize =
-				-(bufferSize - m_entireBufferMaxSize);
+			m_triggerBufferSize = -(bufferSize - m_entireBufferMaxSize);
 			bufferSize = m_entireBufferMaxSize;
 		}
 
@@ -232,16 +211,13 @@ void SymmetricBufferMode::configParamsOnTriggPosChanged() {
 	}
 
 	// Find the highest sample rate that can be set based on trigger pos
-	auto ratesIt = find(m_sampleRates.rbegin(), m_sampleRates.rend(),
-			    m_sampleRate);
-	while ((triggPosInBuffer > m_triggerBufferMaxSize) &&
-	       (ratesIt < m_sampleRates.rend() - 1)) {
+	auto ratesIt = find(m_sampleRates.rbegin(), m_sampleRates.rend(), m_sampleRate);
+	while ((triggPosInBuffer > m_triggerBufferMaxSize) && (ratesIt < m_sampleRates.rend() - 1)) {
 		m_triggPosSR = *(++ratesIt);
 		// New sample rate -> new buffer size
 		m_visibleBufferSize = getVisibleBufferSize(m_triggPosSR);
 		triggOffset = m_visibleBufferSize / 2;
-		triggPosInBuffer =
-			qRound64(m_triggerPos * m_triggPosSR) + triggOffset;
+		triggPosInBuffer = qRound64(m_triggerPos * m_triggPosSR) + triggOffset;
 	}
 	m_triggerBufferSize = triggPosInBuffer;
 }

@@ -41,16 +41,14 @@ BitfieldWidget::BitfieldWidget(QWidget *parent, QDomElement *bitfield)
 	notes = bitfield->firstChildElement("Notes").text();
 	regOffset = bitfield->firstChildElement("RegOffset").text().toInt();
 	sliceWidth = bitfield->firstChildElement("SliceWidth").text().toInt();
-	defaultValue =
-		bitfield->firstChildElement("DefaultValue").text().toInt();
+	defaultValue = bitfield->firstChildElement("DefaultValue").text().toInt();
 
 	options = bitfield->firstChildElement("Options");
 
 	createWidget(); // build the widget
 }
 
-BitfieldWidget::BitfieldWidget(QWidget *parent, int bitNumber)
-	: QWidget(parent), ui(new Ui::BitfieldWidget()) {
+BitfieldWidget::BitfieldWidget(QWidget *parent, int bitNumber) : QWidget(parent), ui(new Ui::BitfieldWidget()) {
 	ui->setupUi(this);
 
 	ui->bitLabel->setText(QString(" Bit %1 ").arg(bitNumber, 0, 10));
@@ -99,16 +97,13 @@ void BitfieldWidget::createWidget() {
 		QDomElement temp = options.firstChildElement("Option");
 
 		while (options.lastChildElement() != temp) {
-			ui->valueComboBox->addItem(
-				temp.firstChildElement("Description").text());
+			ui->valueComboBox->addItem(temp.firstChildElement("Description").text());
 			temp = temp.nextSiblingElement();
 		}
 
-		ui->valueComboBox->addItem(
-			temp.firstChildElement("Description").text());
+		ui->valueComboBox->addItem(temp.firstChildElement("Description").text());
 
-		connect(ui->valueComboBox, SIGNAL(currentIndexChanged(int)),
-			this,
+		connect(ui->valueComboBox, SIGNAL(currentIndexChanged(int)), this,
 			SLOT(setValue(int))); // connect comboBox signal to the
 					      // value changed signal
 	}
@@ -120,8 +115,7 @@ void BitfieldWidget::updateValue(uint32_t &value) {
 	if (ui->stackedWidget->currentIndex() == 1) {
 		ui->valueSpinBox->setValue(temp);
 	} else {
-		ui->valueComboBox->setCurrentIndex(
-			value & ((uint32_t)pow(2, width) - 1));
+		ui->valueComboBox->setCurrentIndex(value & ((uint32_t)pow(2, width) - 1));
 	}
 
 	value = (value >> width);

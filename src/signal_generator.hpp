@@ -81,19 +81,13 @@ enum sg_waveform {
 
 };
 
-enum sg_file_format {
-	FORMAT_NO_FILE,
-	FORMAT_BIN_FLOAT,
-	FORMAT_CSV,
-	FORMAT_WAVE,
-	FORMAT_MAT
-};
+enum sg_file_format { FORMAT_NO_FILE, FORMAT_BIN_FLOAT, FORMAT_CSV, FORMAT_WAVE, FORMAT_MAT };
 
 typedef union {
 	struct {
-		uint16_t format; // Audio format 1=PCM,6=mulaw,7=alaw, 257=IBM
-				 // Mu-Law, 258=IBM A-Law, 259=ADPCM
-		uint16_t noChan; // Number of channels 1=Mono 2=Sterio
+		uint16_t format;	// Audio format 1=PCM,6=mulaw,7=alaw, 257=IBM
+					// Mu-Law, 258=IBM A-Law, 259=ADPCM
+		uint16_t noChan;	// Number of channels 1=Mono 2=Sterio
 		uint32_t SamplesPerSec; // Sampling Frequency in Hz
 		uint32_t bytesPerSec;   // bytes per second
 		uint16_t blockAlign;    // 2=16-bit mono, 4=16-bit stereo
@@ -126,18 +120,15 @@ class SignalGenerator : public Tool {
 	Q_OBJECT
 
 public:
-	explicit SignalGenerator(struct iio_context *ctx,
-				 QList<std::shared_ptr<GenericDac>> dacs,
-				 Filter *filt, ToolMenuItem *toolMenuItem,
-				 QJSEngine *engine, ToolLauncher *parent);
+	explicit SignalGenerator(struct iio_context *ctx, QList<std::shared_ptr<GenericDac>> dacs, Filter *filt,
+				 ToolMenuItem *toolMenuItem, QJSEngine *engine, ToolLauncher *parent);
 	~SignalGenerator();
 
 	static const size_t min_buffer_size = 1024;
 	static const unsigned long default_sample_rate = 1000000;
 	static constexpr float max_frequency = 30000000;
 
-	static QVector<unsigned long>
-	get_available_sample_rates(const struct iio_device *dev);
+	static QVector<unsigned long> get_available_sample_rates(const struct iio_device *dev);
 	static unsigned long get_max_sample_rate(const struct iio_device *dev);
 
 	static double get_best_ratio(double ratio, double max, double *fract);
@@ -175,9 +166,7 @@ private:
 
 	QVector<struct iio_buffer *> buffers;
 	QVector<ChannelWidget *> channels;
-	QVector<QPair<struct iio_channel *,
-		      std::shared_ptr<adiscope::GenericDac>>>
-		channel_dac;
+	QVector<QPair<struct iio_channel *, std::shared_ptr<adiscope::GenericDac>>> channel_dac;
 
 	QSharedPointer<signal_generator_data> getData(QWidget *obj);
 	QSharedPointer<signal_generator_data> getCurrentData();
@@ -193,30 +182,23 @@ private:
 	void loadFileFromPath(QString filename);
 	void reloadFileFromPath();
 
-	gr::basic_block_sptr getSignalSource(gr::top_block_sptr top,
-					     double sample_rate,
-					     struct signal_generator_data &data,
-					     double phase_correction = 0.0);
+	gr::basic_block_sptr getSignalSource(gr::top_block_sptr top, double sample_rate,
+					     struct signal_generator_data &data, double phase_correction = 0.0);
 
 	gr::basic_block_sptr getNoise(QWidget *obj, gr::top_block_sptr top);
-	gr::basic_block_sptr getSource(QWidget *obj, double sample_rate,
-				       gr::top_block_sptr top,
+	gr::basic_block_sptr getSource(QWidget *obj, double sample_rate, gr::top_block_sptr top,
 				       bool phase_correction = false);
 
-	static void reduceFraction(double input, long *numerator,
-				   long *denominator, long precision = 1000000);
+	static void reduceFraction(double input, long *numerator, long *denominator, long precision = 1000000);
 	static size_t gcd(size_t a, size_t b);
 	static size_t lcm(size_t a, size_t b);
 	static int sg_waveform_to_idx(enum sg_waveform wave);
 
-	size_t get_samples_count(const struct iio_device *dev,
-				 double sample_rate, bool perfect = false);
+	size_t get_samples_count(const struct iio_device *dev, double sample_rate, bool perfect = false);
 	double get_best_sample_rate(const struct iio_device *dev);
 	// int set_sample_rate(const struct iio_device *dev,
 	//		unsigned long sample_rate);
-	void calc_sampling_params(const struct iio_device *dev,
-				  double sample_rate,
-				  unsigned long &out_sample_rate,
+	void calc_sampling_params(const struct iio_device *dev, double sample_rate, unsigned long &out_sample_rate,
 				  unsigned long &out_oversampling_ratio);
 	bool use_oversampling(const struct iio_device *dev);
 
@@ -230,8 +212,7 @@ private:
 	double zoomT2OnScreen;
 
 	enum sg_file_format getFileFormat(QString filePath);
-	bool loadParametersFromFile(QSharedPointer<signal_generator_data> ptr,
-				    QString filePath);
+	bool loadParametersFromFile(QSharedPointer<signal_generator_data> ptr, QString filePath);
 	void loadFileChannelData(int chIdx);
 	bool riffCompare(riff_header_t &ptr, const char *id2);
 	bool chunkCompare(chunk_header_t &ptr, const char *id2);

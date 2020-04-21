@@ -31,21 +31,14 @@ SpectrumMarker::SpectrumMarker(const QString &title, bool movable)
 	, m_movable(movable)
 	, m_selected(false) {}
 
-SpectrumMarker::SpectrumMarker(const QString &title, QwtAxisId xAxis,
-			       QwtAxisId yAxis, bool movable)
-	: QwtPlotMarker(title)
-	, m_xAxis(xAxis)
-	, m_yAxis(yAxis)
-	, m_movable(movable)
-	, m_selected(false) {}
+SpectrumMarker::SpectrumMarker(const QString &title, QwtAxisId xAxis, QwtAxisId yAxis, bool movable)
+	: QwtPlotMarker(title), m_xAxis(xAxis), m_yAxis(yAxis), m_movable(movable), m_selected(false) {}
 
 SpectrumMarker::~SpectrumMarker() {}
 
 QColor SpectrumMarker::defaultColor() const { return m_default_color; }
 
-void SpectrumMarker::setDefaultColor(const QColor &color) {
-	m_default_color = color;
-}
+void SpectrumMarker::setDefaultColor(const QColor &color) { m_default_color = color; }
 
 bool SpectrumMarker::selected() const { return m_selected; }
 
@@ -60,9 +53,7 @@ void SpectrumMarker::setSelected(bool on) {
 			brush.setColor(symbol()->pen().color());
 		}
 
-		QwtSymbol *new_sym =
-			new QwtSymbol(symbol()->style(), brush, symbol()->pen(),
-				      symbol()->size());
+		QwtSymbol *new_sym = new QwtSymbol(symbol()->style(), brush, symbol()->pen(), symbol()->size());
 		setSymbol(new_sym);
 	}
 }

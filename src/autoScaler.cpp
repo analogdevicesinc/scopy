@@ -25,15 +25,13 @@
 
 using namespace adiscope;
 
-AutoScaler::AutoScaler(QObject *parent, const QVector<QwtScaleDiv> &divs,
-		       unsigned int timeout_ms)
+AutoScaler::AutoScaler(QObject *parent, const QVector<QwtScaleDiv> &divs, unsigned int timeout_ms)
 	: QObject(parent), divs(divs), timer(this) {
 	timer.setSingleShot(true);
 	timer.setInterval(timeout_ms);
 
 	if (divs.empty())
-		throw std::runtime_error(
-			"AutoScaler called with empty divs vector");
+		throw std::runtime_error("AutoScaler called with empty divs vector");
 
 	changeScaleDiv(&this->divs.at(0));
 

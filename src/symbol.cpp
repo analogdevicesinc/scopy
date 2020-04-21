@@ -24,8 +24,8 @@
 /*
  * Abstract Class Symbol
  */
-Symbol::Symbol(QObject *parent, const QSize &size, QwtAxisId fixedAxis,
-	       QwtAxisId mobileAxis, bool opposedToFixed, bool floats)
+Symbol::Symbol(QObject *parent, const QSize &size, QwtAxisId fixedAxis, QwtAxisId mobileAxis, bool opposedToFixed,
+	       bool floats)
 	: QObject(parent)
 	, d_surface(QRect(QPoint(0, 0), size))
 	, d_anchor(0, 0)
@@ -42,10 +42,8 @@ Symbol::Symbol(QObject *parent, const QSize &size, QwtAxisId fixedAxis,
 	const QwtScaleWidget *fAxis = plot()->axisWidget(d_fixedAxis);
 	const QwtScaleWidget *mAxis = plot()->axisWidget(d_mobileAxis);
 
-	QObject::connect((const QObject *)fAxis, SIGNAL(scaleDivChanged()),
-			 this, SLOT(onFixedScaleChanged()));
-	QObject::connect((const QObject *)mAxis, SIGNAL(scaleDivChanged()),
-			 this, SLOT(onMobileScaleChanged()));
+	QObject::connect((const QObject *)fAxis, SIGNAL(scaleDivChanged()), this, SLOT(onFixedScaleChanged()));
+	QObject::connect((const QObject *)mAxis, SIGNAL(scaleDivChanged()), this, SLOT(onMobileScaleChanged()));
 
 	onFixedScaleChanged();
 	onMobileScaleChanged();
@@ -55,9 +53,7 @@ Symbol::~Symbol() {}
 
 QwtPlot *Symbol::plot() { return static_cast<QwtPlot *>(parent()); }
 
-const QwtPlot *Symbol::plot() const {
-	return static_cast<const QwtPlot *>(parent());
-}
+const QwtPlot *Symbol::plot() const { return static_cast<const QwtPlot *>(parent()); }
 
 void Symbol::setSurface(const QRect &rect) { d_surface = rect; }
 
@@ -92,13 +88,11 @@ QwtAxisId Symbol::mobileAxis() const { return d_mobileAxis; }
 void Symbol::setMobileAxis(QwtAxisId newAxis) {
 	if (d_mobileAxis != newAxis) {
 		const QwtScaleWidget *mAxis = plot()->axisWidget(d_mobileAxis);
-		disconnect((const QObject *)mAxis, SIGNAL(scaleDivChanged()),
-			   this, SLOT(onMobileScaleChanged()));
+		disconnect((const QObject *)mAxis, SIGNAL(scaleDivChanged()), this, SLOT(onMobileScaleChanged()));
 
 		d_mobileAxis = newAxis;
 		mAxis = plot()->axisWidget(newAxis);
-		connect((const QObject *)mAxis, SIGNAL(scaleDivChanged()), this,
-			SLOT(onMobileScaleChanged()));
+		connect((const QObject *)mAxis, SIGNAL(scaleDivChanged()), this, SLOT(onMobileScaleChanged()));
 		onMobileScaleChanged();
 	}
 }
@@ -220,20 +214,16 @@ void Symbol::onMobileScaleChanged() {
  * Class VertDebugSymbol
  */
 
-VertDebugSymbol::VertDebugSymbol(QObject *parent, const QSize &size,
-				 bool opposedToFixed, bool floats)
-	: Symbol(parent, size, QwtPlot::xBottom, QwtPlot::yLeft, opposedToFixed,
-		 floats) {
+VertDebugSymbol::VertDebugSymbol(QObject *parent, const QSize &size, bool opposedToFixed, bool floats)
+	: Symbol(parent, size, QwtPlot::xBottom, QwtPlot::yLeft, opposedToFixed, floats) {
 	int x = opposedToFixed ? surface().width() : 0;
 
 	setAnchor(QPoint(x, surface().height() / 2));
 
 	// Pass the base positionChanged(double, double) signal as
 	// positionChanged(double)
-	connect(this, SIGNAL(positionChanged(double, double)), this,
-		SLOT(onBasePositionChanged(double, double)));
-	connect(this, SIGNAL(pixelPositionChanged(int, int)), this,
-		SLOT(onBasePixelPositionChanged(int, int)));
+	connect(this, SIGNAL(positionChanged(double, double)), this, SLOT(onBasePositionChanged(double, double)));
+	connect(this, SIGNAL(pixelPositionChanged(int, int)), this, SLOT(onBasePixelPositionChanged(int, int)));
 }
 
 void VertDebugSymbol::draw(QPainter *painter) const {
@@ -248,8 +238,7 @@ void VertDebugSymbol::draw(QPainter *painter) const {
 	painter->setBrush(QBrush(Qt::gray));
 	QwtPainter::drawRect(painter, x0, y0, w, h);
 	painter->setPen(QPen(Qt::red));
-	QwtPainter::drawLine(painter, x0 + e1, y0 + h / 2, x0 + w + e2,
-			     y0 + h / 2);
+	QwtPainter::drawLine(painter, x0 + e1, y0 + h / 2, x0 + w + e2, y0 + h / 2);
 }
 
 bool VertDebugSymbol::moveWith(double plotDeltaX, double plotDeltaY) {
@@ -307,19 +296,15 @@ void VertDebugSymbol::onBasePixelPositionChanged(int x, int y) {
  * Class HorizDebugSymbol
  */
 
-HorizDebugSymbol::HorizDebugSymbol(QObject *parent, const QSize &size,
-				   bool opposedToFixed, bool floats)
-	: Symbol(parent, size, QwtPlot::yLeft, QwtPlot::xBottom, opposedToFixed,
-		 floats) {
+HorizDebugSymbol::HorizDebugSymbol(QObject *parent, const QSize &size, bool opposedToFixed, bool floats)
+	: Symbol(parent, size, QwtPlot::yLeft, QwtPlot::xBottom, opposedToFixed, floats) {
 	int y = opposedToFixed ? 0 : surface().height();
 	setAnchor(QPoint(surface().width() / 2, y));
 
 	// Pass the base positionChanged(double, double) signal as
 	// positionChanged(double)
-	connect(this, SIGNAL(positionChanged(double, double)), this,
-		SLOT(onBasePositionChanged(double, double)));
-	connect(this, SIGNAL(pixelPositionChanged(int, int)), this,
-		SLOT(onBasePixelPositionChanged(int, int)));
+	connect(this, SIGNAL(positionChanged(double, double)), this, SLOT(onBasePositionChanged(double, double)));
+	connect(this, SIGNAL(pixelPositionChanged(int, int)), this, SLOT(onBasePixelPositionChanged(int, int)));
 }
 
 void HorizDebugSymbol::draw(QPainter *painter) const {
@@ -334,8 +319,7 @@ void HorizDebugSymbol::draw(QPainter *painter) const {
 	painter->setBrush(QBrush(Qt::gray));
 	QwtPainter::drawRect(painter, x0, y0, w, h);
 	painter->setPen(QPen(Qt::red));
-	QwtPainter::drawLine(painter, x0 + w / 2, y0 + e1, x0 + w / 2,
-			     y0 + h + e2);
+	QwtPainter::drawLine(painter, x0 + w / 2, y0 + e1, x0 + w / 2, y0 + h + e2);
 }
 
 bool HorizDebugSymbol::moveWith(double plotDeltaX, double plotDeltaY) {
@@ -394,8 +378,7 @@ void HorizDebugSymbol::onBasePixelPositionChanged(int x, int y) {
  */
 
 TriggerLevelCursor::TriggerLevelCursor(QObject *parent, const QPixmap &pixmap)
-	: VertDebugSymbol(parent, QSize(pixmap.size()), true)
-	, d_cursorPixmap(pixmap) {
+	: VertDebugSymbol(parent, QSize(pixmap.size()), true), d_cursorPixmap(pixmap) {
 	setAnchor(QPoint(surface().width() - 7, surface().height() / 2));
 }
 
@@ -431,9 +414,7 @@ void TriggerLevelCursor::draw(QPainter *painter) const {
 			p.setX(plot()->axisInterval(fixedAxis()).minValue());
 
 			painter->setPen(d_pen);
-			painter->drawLine(x0, y0 + d_anchor.y(),
-					  transform(p).toPoint().x(),
-					  y0 + d_anchor.y());
+			painter->drawLine(x0, y0 + d_anchor.y(), transform(p).toPoint().x(), y0 + d_anchor.y());
 		}
 	}
 }
@@ -443,8 +424,7 @@ void TriggerLevelCursor::draw(QPainter *painter) const {
  */
 
 TriggerDelayCursor::TriggerDelayCursor(QObject *parent, const QPixmap &pixmap)
-	: HorizDebugSymbol(parent, QSize(pixmap.size()), true)
-	, d_cursorPixmap(pixmap) {
+	: HorizDebugSymbol(parent, QSize(pixmap.size()), true), d_cursorPixmap(pixmap) {
 	setAnchor(QPoint(surface().width() / 2, surface().height() / 2 - 6));
 }
 
@@ -480,9 +460,7 @@ void TriggerDelayCursor::draw(QPainter *painter) const {
 
 		painter->drawPixmap(x0, y0, w, h, d_cursorPixmap);
 		painter->setPen(d_pen);
-		painter->drawLine(x0 + d_anchor.x(), y0 + h - 1,
-				  x0 + d_anchor.x(),
-				  transform(p).toPoint().y());
+		painter->drawLine(x0 + d_anchor.x(), y0 + h - 1, x0 + d_anchor.x(), transform(p).toPoint().y());
 	}
 }
 
@@ -490,8 +468,7 @@ void TriggerDelayCursor::draw(QPainter *painter) const {
  * Class VertBar
  */
 
-HorizBar::HorizBar(QObject *parent, bool floats)
-	: VertDebugSymbol(parent, QSize(0, 0), false, floats) {}
+HorizBar::HorizBar(QObject *parent, bool floats) : VertDebugSymbol(parent, QSize(0, 0), false, floats) {}
 
 void HorizBar::draw(QPainter *painter) const {
 	int w = plot()->canvas()->width();
@@ -507,8 +484,7 @@ void HorizBar::draw(QPainter *painter) const {
  * Class HorizBar
  */
 
-VertBar::VertBar(QObject *parent, bool floats)
-	: HorizDebugSymbol(parent, QSize(0, 0), true, floats) {}
+VertBar::VertBar(QObject *parent, bool floats) : HorizDebugSymbol(parent, QSize(0, 0), true, floats) {}
 
 void VertBar::draw(QPainter *painter) const {
 	int w = d_surface.width();

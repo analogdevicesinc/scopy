@@ -31,59 +31,36 @@ Graticule::Graticule(QwtPlot *plot) : enabled(false), plot(plot) {
 	palette.setBrush(QPalette::Foreground, QColor("#6E6E6F"));
 	palette.setBrush(QPalette::Text, QColor("#6E6E6F"));
 
-	double minTick =
-		vertScale->scaleDraw()->tickLength(QwtScaleDiv::MinorTick);
-	double medTick =
-		vertScale->scaleDraw()->tickLength(QwtScaleDiv::MediumTick);
-	double majTick =
-		vertScale->scaleDraw()->tickLength(QwtScaleDiv::MajorTick);
+	double minTick = vertScale->scaleDraw()->tickLength(QwtScaleDiv::MinorTick);
+	double medTick = vertScale->scaleDraw()->tickLength(QwtScaleDiv::MediumTick);
+	double majTick = vertScale->scaleDraw()->tickLength(QwtScaleDiv::MajorTick);
 
-	vertScale->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Backbone,
-						false);
-	vertScale->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Labels,
-						false);
-	vertScale->scaleDraw()->setTickLength(QwtScaleDiv::MinorTick,
-					      minTick * 3 / 4);
-	vertScale->scaleDraw()->setTickLength(QwtScaleDiv::MediumTick,
-					      medTick * 3 / 4);
-	vertScale->scaleDraw()->setTickLength(QwtScaleDiv::MajorTick,
-					      majTick * 3 / 4);
+	vertScale->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Backbone, false);
+	vertScale->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Labels, false);
+	vertScale->scaleDraw()->setTickLength(QwtScaleDiv::MinorTick, minTick * 3 / 4);
+	vertScale->scaleDraw()->setTickLength(QwtScaleDiv::MediumTick, medTick * 3 / 4);
+	vertScale->scaleDraw()->setTickLength(QwtScaleDiv::MajorTick, majTick * 3 / 4);
 	vertScale->setPalette(palette);
 
-	horizScale->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Backbone,
-						 false);
-	horizScale->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Labels,
-						 false);
-	horizScale->scaleDraw()->setTickLength(QwtScaleDiv::MinorTick,
-					       minTick * 3 / 4);
-	horizScale->scaleDraw()->setTickLength(QwtScaleDiv::MediumTick,
-					       medTick * 3 / 4);
-	horizScale->scaleDraw()->setTickLength(QwtScaleDiv::MajorTick,
-					       majTick * 3 / 4);
+	horizScale->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Backbone, false);
+	horizScale->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Labels, false);
+	horizScale->scaleDraw()->setTickLength(QwtScaleDiv::MinorTick, minTick * 3 / 4);
+	horizScale->scaleDraw()->setTickLength(QwtScaleDiv::MediumTick, medTick * 3 / 4);
+	horizScale->scaleDraw()->setTickLength(QwtScaleDiv::MajorTick, majTick * 3 / 4);
 	horizScale->setPalette(palette);
 
-	vertScale2->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Backbone,
-						 false);
-	vertScale2->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Labels,
-						 false);
-	vertScale2->scaleDraw()->setTickLength(QwtScaleDiv::MinorTick,
-					       minTick * 3 / 4);
-	vertScale2->scaleDraw()->setTickLength(QwtScaleDiv::MediumTick,
-					       medTick * 3 / 4);
-	vertScale2->scaleDraw()->setTickLength(QwtScaleDiv::MajorTick,
-					       majTick * 3 / 4);
+	vertScale2->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Backbone, false);
+	vertScale2->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Labels, false);
+	vertScale2->scaleDraw()->setTickLength(QwtScaleDiv::MinorTick, minTick * 3 / 4);
+	vertScale2->scaleDraw()->setTickLength(QwtScaleDiv::MediumTick, medTick * 3 / 4);
+	vertScale2->scaleDraw()->setTickLength(QwtScaleDiv::MajorTick, majTick * 3 / 4);
 	vertScale2->setPalette(palette);
 
-	horizScale2->scaleDraw()->enableComponent(
-		QwtAbstractScaleDraw::Backbone, false);
-	horizScale2->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Labels,
-						  false);
-	horizScale2->scaleDraw()->setTickLength(QwtScaleDiv::MinorTick,
-						minTick * 3 / 4);
-	horizScale2->scaleDraw()->setTickLength(QwtScaleDiv::MediumTick,
-						medTick * 3 / 4);
-	horizScale2->scaleDraw()->setTickLength(QwtScaleDiv::MajorTick,
-						majTick * 3 / 4);
+	horizScale2->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Backbone, false);
+	horizScale2->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Labels, false);
+	horizScale2->scaleDraw()->setTickLength(QwtScaleDiv::MinorTick, minTick * 3 / 4);
+	horizScale2->scaleDraw()->setTickLength(QwtScaleDiv::MediumTick, medTick * 3 / 4);
+	horizScale2->scaleDraw()->setTickLength(QwtScaleDiv::MajorTick, majTick * 3 / 4);
 	horizScale2->setPalette(palette);
 }
 
@@ -135,8 +112,7 @@ void Graticule::onCanvasSizeChanged() {
 	horizScale2->setBorderDistance(plot->canvas()->height() / 2);
 }
 
-GraticulePlotScaleItem::GraticulePlotScaleItem(
-	QwtScaleDraw::Alignment alignment, const double pos)
+GraticulePlotScaleItem::GraticulePlotScaleItem(QwtScaleDraw::Alignment alignment, const double pos)
 	: QwtPlotScaleItem(alignment, pos) {}
 
 static QwtScaleDiv getGraticuleScaleDiv(const QwtScaleDiv &from_scaleDiv) {
@@ -157,12 +133,9 @@ static QwtScaleDiv getGraticuleScaleDiv(const QwtScaleDiv &from_scaleDiv) {
 		majorTicks.erase(majorTicks.end() - 1);
 	}
 
-	return QwtScaleDiv(lowerBound, upperBound, minorTicks, mediumTicks,
-			   majorTicks);
+	return QwtScaleDiv(lowerBound, upperBound, minorTicks, mediumTicks, majorTicks);
 }
 
-void GraticulePlotScaleItem::updateScaleDiv(const QwtScaleDiv &xScaleDiv,
-					    const QwtScaleDiv &yScaleDiv) {
-	QwtPlotScaleItem::updateScaleDiv(getGraticuleScaleDiv(xScaleDiv),
-					 getGraticuleScaleDiv(yScaleDiv));
+void GraticulePlotScaleItem::updateScaleDiv(const QwtScaleDiv &xScaleDiv, const QwtScaleDiv &yScaleDiv) {
+	QwtPlotScaleItem::updateScaleDiv(getGraticuleScaleDiv(xScaleDiv), getGraticuleScaleDiv(yScaleDiv));
 }

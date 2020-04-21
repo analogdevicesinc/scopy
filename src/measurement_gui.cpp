@@ -10,11 +10,7 @@ using namespace adiscope;
  * Class MeasurementGui implementation
  */
 MeasurementGui::MeasurementGui()
-	: m_name("")
-	, m_value("")
-	, m_nameLabel(NULL)
-	, m_valueLabel(NULL)
-	, m_minValLableWidth(0) {}
+	: m_name(""), m_value(""), m_nameLabel(NULL), m_valueLabel(NULL), m_minValLableWidth(0) {}
 
 MeasurementGui::~MeasurementGui() {}
 
@@ -52,8 +48,7 @@ void MetricMeasurementGui::init(QLabel *name, QLabel *value) {
 	MeasurementGui::init(name, value);
 }
 
-void MetricMeasurementGui::update(const MeasurementData &data,
-				  double displayScale) {
+void MetricMeasurementGui::update(const MeasurementData &data, double displayScale) {
 	m_name = data.name() + ":";
 	if (data.measured() && data.enabled()) {
 		double value = data.value();
@@ -85,8 +80,7 @@ void TimeMeasurementGui::init(QLabel *name, QLabel *value) {
 	MeasurementGui::init(name, value);
 }
 
-void TimeMeasurementGui::update(const MeasurementData &data,
-				double displayScale) {
+void TimeMeasurementGui::update(const MeasurementData &data, double displayScale) {
 	m_name = data.name() + ":";
 
 	if (data.measured() && data.enabled()) {
@@ -119,8 +113,7 @@ void PercentageMeasurementGui::init(QLabel *name, QLabel *value) {
 	MeasurementGui::init(name, value);
 }
 
-void PercentageMeasurementGui::update(const MeasurementData &data,
-				      double displayScale) {
+void PercentageMeasurementGui::update(const MeasurementData &data, double displayScale) {
 	m_name = data.name() + ":";
 
 	if (data.measured() && data.enabled()) {
@@ -144,8 +137,7 @@ void PercentageMeasurementGui::update(const MeasurementData &data,
 
 DimensionlessMeasurementGui::DimensionlessMeasurementGui() : MeasurementGui() {}
 
-void DimensionlessMeasurementGui::update(const MeasurementData &data,
-					 double displayScale) {
+void DimensionlessMeasurementGui::update(const MeasurementData &data, double displayScale) {
 	m_name = data.name() + ":";
 
 	if (data.measured() && data.enabled()) {

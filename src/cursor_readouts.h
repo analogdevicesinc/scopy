@@ -81,8 +81,7 @@ public:
 	virtual bool eventFilter(QObject *, QEvent *);
 
 	void setTransparency(int value);
-	void
-	moveToPosition(CustomPlotPositionButton::ReadoutsPosition position);
+	void moveToPosition(CustomPlotPositionButton::ReadoutsPosition position);
 	CustomPlotPositionButton::ReadoutsPosition getCurrentPosition();
 
 	void showEvent(QShowEvent *event);

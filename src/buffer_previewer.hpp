@@ -30,8 +30,7 @@ class BufferPreviewer : public QFrame {
 
 public:
 	explicit BufferPreviewer(QWidget *parent = 0);
-	explicit BufferPreviewer(int pixelsPerPeriod, double wavePhase,
-				 QWidget *parent = 0);
+	explicit BufferPreviewer(int pixelsPerPeriod, double wavePhase, QWidget *parent = 0);
 	virtual ~BufferPreviewer();
 
 	double waveformPos() const;
@@ -97,8 +96,7 @@ private:
 class AnalogBufferPreviewer : public BufferPreviewer {
 public:
 	explicit AnalogBufferPreviewer(QWidget *parent = 0);
-	explicit AnalogBufferPreviewer(int pixelsPerPeriod, double wavePhase,
-				       QWidget *parent = 0);
+	explicit AnalogBufferPreviewer(int pixelsPerPeriod, double wavePhase, QWidget *parent = 0);
 
 protected:
 	virtual void buildFullWaveform(QPointF *wavePoints, int numPts);
@@ -107,8 +105,7 @@ protected:
 class DigitalBufferPreviewer : public BufferPreviewer {
 public:
 	explicit DigitalBufferPreviewer(QWidget *parent = 0);
-	explicit DigitalBufferPreviewer(int pixelsPerPeriod,
-					QWidget *parent = 0);
+	explicit DigitalBufferPreviewer(int pixelsPerPeriod, QWidget *parent = 0);
 	void setNoOfSteps(double val);
 	double noOfSteps();
 

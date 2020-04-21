@@ -62,12 +62,7 @@ struct stCalibParam {
 	double gain_neg_adc;
 };
 
-enum calibrations {
-	POSITIVE_OFFSET = 0,
-	NEGATIVE_OFFSET,
-	CALIB_PARAM,
-	START_CALIB_PARAM
-};
+enum calibrations { POSITIVE_OFFSET = 0, NEGATIVE_OFFSET, CALIB_PARAM, START_CALIB_PARAM };
 
 enum steps { STEP1 = 0, STEP2, STEP3, STEP4 };
 
@@ -79,10 +74,8 @@ class ManualCalibration : public Tool {
 	Q_OBJECT
 
 public:
-	explicit ManualCalibration(struct iio_context *ctx, Filter *filt,
-				   ToolMenuItem *toolMenuItem,
-				   QJSEngine *engine, ToolLauncher *parent = 0,
-				   Calibration *cal = 0);
+	explicit ManualCalibration(struct iio_context *ctx, Filter *filt, ToolMenuItem *toolMenuItem, QJSEngine *engine,
+				   ToolLauncher *parent = 0, Calibration *cal = 0);
 
 	~ManualCalibration();
 

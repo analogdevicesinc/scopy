@@ -70,11 +70,9 @@ class I2CPatternUI;
 namespace adiscope {
 
 #define ConstantPatternName "Constant"
-#define ConstantPatternDescription                                             \
-	"Samples a constant 0 or 1 on the active channels"
+#define ConstantPatternDescription "Samples a constant 0 or 1 on the active channels"
 #define NumberPatternName "Number"
-#define NumberPatternDescription                                               \
-	"Samples a constant number over the active channels"
+#define NumberPatternDescription "Samples a constant number over the active channels"
 #define ClockPatternName "Clock"
 #define ClockPatternDescription "Clock pattern generator"
 #define PulsePatternName "Pulse Pattern"
@@ -140,11 +138,8 @@ public:
 	virtual uint8_t pre_generate();
 	virtual bool is_periodic();
 	virtual uint32_t get_min_sampling_freq();
-	virtual uint32_t
-	get_required_nr_of_samples(uint32_t sample_rate,
-				   uint32_t number_of_channels);
-	virtual uint8_t generate_pattern(uint32_t sample_rate,
-					 uint32_t number_of_samples,
+	virtual uint32_t get_required_nr_of_samples(uint32_t sample_rate, uint32_t number_of_channels);
+	virtual uint8_t generate_pattern(uint32_t sample_rate, uint32_t number_of_samples,
 					 uint16_t number_of_channels) = 0;
 	virtual void deinit();
 
@@ -172,8 +167,7 @@ public:
 	PatternUI(QWidget *parent = 0);
 	virtual ~PatternUI();
 	// static PatternUI *create_ui(int index, QWidget *parent = 0);
-	virtual void build_ui(QWidget *parent = 0,
-			      uint16_t number_of_channels = 0);
+	virtual void build_ui(QWidget *parent = 0, uint16_t number_of_channels = 0);
 	virtual Pattern *get_pattern() = 0;
 	virtual void post_load_ui();
 	virtual void parse_ui();
@@ -193,9 +187,7 @@ class ClockPattern : virtual public Pattern {
 public:
 	ClockPattern();
 	virtual ~ClockPattern();
-	uint8_t generate_pattern(uint32_t sample_rate,
-				 uint32_t number_of_samples,
-				 uint16_t number_of_channels);
+	uint8_t generate_pattern(uint32_t sample_rate, uint32_t number_of_samples, uint16_t number_of_channels);
 	float get_frequency() const;
 	void set_frequency(float value);
 	float get_duty_cycle() const;
@@ -203,8 +195,7 @@ public:
 	int get_phase() const;
 	void set_phase(int value);
 	uint32_t get_min_sampling_freq();
-	uint32_t get_required_nr_of_samples(uint32_t sample_rate,
-					    uint32_t number_of_channels);
+	uint32_t get_required_nr_of_samples(uint32_t sample_rate, uint32_t number_of_channels);
 };
 
 class ClockPatternUI : public PatternUI {
@@ -236,11 +227,8 @@ public:
 	RandomPattern();
 	virtual ~RandomPattern();
 	uint32_t get_min_sampling_freq();
-	uint32_t get_required_nr_of_samples(uint32_t sample_rate,
-					    uint32_t number_of_channels);
-	uint8_t generate_pattern(uint32_t sample_rate,
-				 uint32_t number_of_samples,
-				 uint16_t number_of_channels);
+	uint32_t get_required_nr_of_samples(uint32_t sample_rate, uint32_t number_of_channels);
+	uint8_t generate_pattern(uint32_t sample_rate, uint32_t number_of_samples, uint16_t number_of_channels);
 
 	uint32_t get_frequency() const;
 	void set_frequency(const uint32_t &value);
@@ -275,12 +263,9 @@ protected:
 public:
 	BinaryCounterPattern();
 	virtual ~BinaryCounterPattern();
-	virtual uint8_t generate_pattern(uint32_t sample_rate,
-					 uint32_t number_of_samples,
-					 uint16_t number_of_channels);
+	virtual uint8_t generate_pattern(uint32_t sample_rate, uint32_t number_of_samples, uint16_t number_of_channels);
 	uint32_t get_min_sampling_freq();
-	uint32_t get_required_nr_of_samples(uint32_t sample_rate,
-					    uint32_t number_of_channels);
+	uint32_t get_required_nr_of_samples(uint32_t sample_rate, uint32_t number_of_channels);
 
 	uint32_t get_frequency() const;
 	void set_frequency(const uint32_t &value);
@@ -302,8 +287,7 @@ class BinaryCounterPatternUI : public PatternUI {
 	ScaleSpinButton *frequencySpinButton;
 
 public:
-	BinaryCounterPatternUI(BinaryCounterPattern *pattern,
-			       QWidget *parent = 0);
+	BinaryCounterPatternUI(BinaryCounterPattern *pattern, QWidget *parent = 0);
 	~BinaryCounterPatternUI();
 	Pattern *get_pattern();
 	void build_ui(QWidget *parent = 0, uint16_t number_of_channels = 0);
@@ -317,9 +301,7 @@ class GrayCounterPattern : virtual public BinaryCounterPattern {
 public:
 	GrayCounterPattern();
 	virtual ~GrayCounterPattern() {}
-	uint8_t generate_pattern(uint32_t sample_rate,
-				 uint32_t number_of_samples,
-				 uint16_t number_of_channels);
+	uint8_t generate_pattern(uint32_t sample_rate, uint32_t number_of_samples, uint16_t number_of_channels);
 };
 
 class GrayCounterPatternUI : public PatternUI {
@@ -361,12 +343,9 @@ public:
 	UARTPattern();
 	virtual ~UARTPattern() {}
 
-	virtual uint8_t generate_pattern(uint32_t sample_rate,
-					 uint32_t number_of_samples,
-					 uint16_t number_of_channels);
+	virtual uint8_t generate_pattern(uint32_t sample_rate, uint32_t number_of_samples, uint16_t number_of_channels);
 	uint32_t get_min_sampling_freq();
-	uint32_t get_required_nr_of_samples(uint32_t sample_rate,
-					    uint32_t number_of_channels);
+	uint32_t get_required_nr_of_samples(uint32_t sample_rate, uint32_t number_of_channels);
 
 	unsigned int get_baud_rate();
 	unsigned int get_data_bits();
@@ -433,12 +412,9 @@ public:
 	std::deque<uint8_t> v;
 	I2CPattern();
 	virtual ~I2CPattern() {}
-	virtual uint8_t generate_pattern(uint32_t sample_rate,
-					 uint32_t number_of_samples,
-					 uint16_t number_of_channels);
+	virtual uint8_t generate_pattern(uint32_t sample_rate, uint32_t number_of_samples, uint16_t number_of_channels);
 	uint32_t get_min_sampling_freq();
-	uint32_t get_required_nr_of_samples(uint32_t sample_rate,
-					    uint32_t number_of_channels);
+	uint32_t get_required_nr_of_samples(uint32_t sample_rate, uint32_t number_of_channels);
 	bool getTenbit() const;
 	void setTenbit(bool value);
 	uint8_t getAddress() const;
@@ -486,12 +462,9 @@ public:
 	std::deque<uint8_t> v;
 	SPIPattern();
 	virtual ~SPIPattern() {}
-	virtual uint8_t generate_pattern(uint32_t sample_rate,
-					 uint32_t number_of_samples,
-					 uint16_t number_of_channels);
+	virtual uint8_t generate_pattern(uint32_t sample_rate, uint32_t number_of_samples, uint16_t number_of_channels);
 	uint32_t get_min_sampling_freq();
-	uint32_t get_required_nr_of_samples(uint32_t sample_rate,
-					    uint32_t number_of_channels);
+	uint32_t get_required_nr_of_samples(uint32_t sample_rate, uint32_t number_of_channels);
 
 	bool getCSPol() const;
 	void setCSPol(bool value);
@@ -533,9 +506,7 @@ private:
 public:
 	NumberPattern();
 	virtual ~NumberPattern() {}
-	virtual uint8_t generate_pattern(uint32_t sample_rate,
-					 uint32_t number_of_samples,
-					 uint16_t number_of_channels);
+	virtual uint8_t generate_pattern(uint32_t sample_rate, uint32_t number_of_samples, uint16_t number_of_channels);
 	uint16_t get_nr() const;
 	void set_nr(const uint16_t &value);
 };
@@ -576,16 +547,13 @@ public:
 	Q_INVOKABLE quint32 get_nr_of_channels();
 	Q_INVOKABLE quint32 get_sample_rate();
 	/*Q_INVOKABLE*/ void JSErrorDialog(QString errorMessage);
-	/*Q_INVOKABLE*/ void commitBuffer(QJSValue jsBufferValue,
-					  QJSValue jsBufferSize);
+	/*Q_INVOKABLE*/ void commitBuffer(QJSValue jsBufferValue, QJSValue jsBufferSize);
 	bool is_periodic();
 	uint32_t get_min_sampling_freq();
 	uint32_t get_required_nr_of_samples();
 	void init();
 	uint8_t pre_generate();
-	uint8_t generate_pattern(uint32_t sample_rate,
-				 uint32_t number_of_samples,
-				 uint16_t number_of_channels);
+	uint8_t generate_pattern(uint32_t sample_rate, uint32_t number_of_samples, uint16_t number_of_channels);
 	void deinit();
 	virtual bool handle_result(QJSValue result, QString str = "");
 };
@@ -806,14 +774,11 @@ class ImportPattern : virtual public Pattern {
 public:
 	ImportPattern();
 	virtual ~ImportPattern();
-	uint8_t generate_pattern(uint32_t sample_rate,
-				 uint32_t number_of_samples,
-				 uint16_t number_of_channels);
+	uint8_t generate_pattern(uint32_t sample_rate, uint32_t number_of_samples, uint16_t number_of_channels);
 	float get_frequency() const;
 	void set_frequency(float value);
 	uint32_t get_min_sampling_freq();
-	uint32_t get_required_nr_of_samples(uint32_t sample_rate,
-					    uint32_t number_of_channels);
+	uint32_t get_required_nr_of_samples(uint32_t sample_rate, uint32_t number_of_channels);
 	unsigned short channel_mapping;
 	QVector<unsigned short> data;
 	QString fileName;
@@ -864,8 +829,7 @@ public:
 	static void init();
 	static Pattern *create(QString name);
 	static Pattern *create(int index);
-	static PatternUI *create_ui(Pattern *pattern, int index,
-				    QWidget *parent = 0);
+	static PatternUI *create_ui(Pattern *pattern, int index, QWidget *parent = 0);
 	static PatternUI *create_ui(Pattern *pattern, QWidget *parent = 0);
 	static QStringList get_ui_list();
 	static QStringList get_description_list();

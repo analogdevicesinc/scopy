@@ -31,14 +31,11 @@ public:
 	virtual ~PrefixFormatter();
 	void setTwoDecimalMode(bool);
 	bool getTwoDecimalMode();
-	virtual QString format(double value, QString unitType,
-			       int precision) const;
-	void getFormatAttributes(double value, QString &prefix,
-				 double &scale) const;
+	virtual QString format(double value, QString unitType, int precision) const;
+	void getFormatAttributes(double value, QString &prefix, double &scale) const;
 
 protected:
-	virtual QString buildString(double value, QString prefix,
-				    QString unitType, int precision) const;
+	virtual QString buildString(double value, QString prefix, QString unitType, int precision) const;
 	int findPrefixIndex(double value) const;
 
 private:
@@ -67,8 +64,7 @@ public:
  */
 class NumberSeries {
 public:
-	NumberSeries(double lower = 1E-3, double upper = 1E3,
-		     unsigned int powerStep = 10,
+	NumberSeries(double lower = 1E-3, double upper = 1E3, unsigned int powerStep = 10,
 		     const std::vector<double> &steps = {1, 2, 5});
 	~NumberSeries();
 

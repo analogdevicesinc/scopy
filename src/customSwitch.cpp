@@ -25,12 +25,7 @@
 using namespace adiscope;
 
 CustomSwitch::CustomSwitch(QWidget *parent)
-	: QPushButton(parent)
-	, on(this)
-	, off(this)
-	, handle(this)
-	, anim(&handle, "geometry")
-	, polarity(false) {
+	: QPushButton(parent), on(this), off(this), handle(this), anim(&handle, "geometry"), polarity(false) {
 	on.setObjectName("on");
 	off.setObjectName("off");
 	handle.setObjectName("handle");
@@ -59,8 +54,7 @@ void CustomSwitch::updateOnOffLabels() {
 
 bool CustomSwitch::event(QEvent *e) {
 	if (e->type() == QEvent::DynamicPropertyChange) {
-		QDynamicPropertyChangeEvent *const propEvent =
-			static_cast<QDynamicPropertyChangeEvent *>(e);
+		QDynamicPropertyChangeEvent *const propEvent = static_cast<QDynamicPropertyChangeEvent *>(e);
 		QString propName = propEvent->propertyName();
 		if (propName == "leftText" && property("leftText").isValid())
 			on.setText(property("leftText").toString());
@@ -75,8 +69,7 @@ bool CustomSwitch::event(QEvent *e) {
 				QFile file(":stylesheets/stylesheets/"
 					   "bigCustomSwitch.qss");
 				file.open(QFile::ReadOnly);
-				QString styleSheet =
-					QString::fromLatin1(file.readAll());
+				QString styleSheet = QString::fromLatin1(file.readAll());
 				this->setStyleSheet(styleSheet);
 			}
 		}
@@ -96,8 +89,7 @@ void CustomSwitch::toggleAnim(bool enabled) {
 		return;
 
 	QRect on_rect(0, handle.y(), handle.width(), handle.height());
-	QRect off_rect(width() - handle.width(), handle.y(), handle.width(),
-		       handle.height());
+	QRect off_rect(width() - handle.width(), handle.y(), handle.width(), handle.height());
 
 	anim.stop();
 
@@ -116,10 +108,8 @@ void CustomSwitch::toggleAnim(bool enabled) {
 void CustomSwitch::showEvent(QShowEvent *event) {
 	updateOnOffLabels();
 	if (isChecked() ^ polarity) {
-		handle.setGeometry(
-			QRect(0, handle.y(), handle.width(), handle.height()));
+		handle.setGeometry(QRect(0, handle.y(), handle.width(), handle.height()));
 	} else {
-		handle.setGeometry(QRect(width() - handle.width(), handle.y(),
-					 handle.width(), handle.height()));
+		handle.setGeometry(QRect(width() - handle.width(), handle.y(), handle.width(), handle.height()));
 	}
 }

@@ -7,32 +7,25 @@ namespace adiscope {
 
 class LogicAnalyzer_API : public ApiObject {
 	Q_OBJECT
-	Q_PROPERTY(int channel_groups_list_size READ channel_groups_list_size
-			   WRITE setChannelGroupsListSize SCRIPTABLE false)
+	Q_PROPERTY(int channel_groups_list_size READ channel_groups_list_size WRITE setChannelGroupsListSize
+			   SCRIPTABLE false)
 	Q_PROPERTY(QVariantList channel_groups READ getChannelGroups)
 	Q_PROPERTY(bool running READ running WRITE run STORED false)
 	Q_PROPERTY(bool single READ single WRITE runSingle STORED false)
 	Q_PROPERTY(double time_position READ getTimePos WRITE setTimePos)
 	Q_PROPERTY(double time_base READ getTimeBase WRITE setTimeBase)
 	Q_PROPERTY(QString run_mode READ runMode WRITE setRunMode)
-	Q_PROPERTY(bool external_trigger READ externalTrigger WRITE
-			   setExternalTrigger)
-	Q_PROPERTY(int external_trigger_source READ externalTriggerSource WRITE
-			   setExternalTriggerSource)
-	Q_PROPERTY(int external_trigger_cnd READ externalTriggerCnd WRITE
-			   setExternalTriggerCnd)
-	Q_PROPERTY(
-		bool cursors_active READ cursorsActive WRITE setCursorsActive)
-	Q_PROPERTY(
-		bool cursors_locked READ cursorsLocked WRITE setCursorsLocked)
-	Q_PROPERTY(bool inactive_hidden READ inactiveHidden WRITE
-			   setInactiveHidden)
+	Q_PROPERTY(bool external_trigger READ externalTrigger WRITE setExternalTrigger)
+	Q_PROPERTY(int external_trigger_source READ externalTriggerSource WRITE setExternalTriggerSource)
+	Q_PROPERTY(int external_trigger_cnd READ externalTriggerCnd WRITE setExternalTriggerCnd)
+	Q_PROPERTY(bool cursors_active READ cursorsActive WRITE setCursorsActive)
+	Q_PROPERTY(bool cursors_locked READ cursorsLocked WRITE setCursorsLocked)
+	Q_PROPERTY(bool inactive_hidden READ inactiveHidden WRITE setInactiveHidden)
 	Q_PROPERTY(bool export_all READ getExportAll WRITE setExportAll)
 	Q_PROPERTY(QList<int> data READ data STORED false)
 
 public:
-	explicit LogicAnalyzer_API(LogicAnalyzer *lga)
-		: ApiObject(), lga(lga) {}
+	explicit LogicAnalyzer_API(LogicAnalyzer *lga) : ApiObject(), lga(lga) {}
 	~LogicAnalyzer_API() {}
 
 	void save(QSettings &settings);
@@ -91,10 +84,8 @@ class ChannelGroup_API : public ApiObject {
 	friend class LogicChannel_API;
 	Q_OBJECT
 	Q_PROPERTY(QString decoder READ getDecoder WRITE setDecoder)
-	Q_PROPERTY(QString decoderSettings READ getDecoderSettings WRITE
-			   setDecoderSettings)
-	Q_PROPERTY(int channels_list_size READ channels_list_size WRITE
-			   setChannelsListSize SCRIPTABLE false)
+	Q_PROPERTY(QString decoderSettings READ getDecoderSettings WRITE setDecoderSettings)
+	Q_PROPERTY(int channels_list_size READ channels_list_size WRITE setChannelsListSize SCRIPTABLE false)
 	Q_PROPERTY(QVariantList channels READ getChannels)
 	Q_PROPERTY(bool enabled READ chEnabled WRITE setChEnabled)
 	Q_PROPERTY(bool grouped READ chGrouped WRITE setChGrouped)
@@ -102,8 +93,7 @@ class ChannelGroup_API : public ApiObject {
 	Q_PROPERTY(bool collapsed READ getChCollapsed WRITE setChCollapsed)
 
 public:
-	explicit ChannelGroup_API(LogicAnalyzer *lga, int index = -1,
-				  bool load = true)
+	explicit ChannelGroup_API(LogicAnalyzer *lga, int index = -1, bool load = true)
 		: ApiObject(), lga(lga), index(index) {
 		if (!load)
 			set_channels_api();
@@ -152,8 +142,7 @@ class LogicChannel_API : public ApiObject {
 	Q_PROPERTY(QString role READ getRole WRITE setRole)
 
 public:
-	explicit LogicChannel_API(LogicAnalyzer *lga, ChannelGroup_API *chg,
-				  int index = -1)
+	explicit LogicChannel_API(LogicAnalyzer *lga, ChannelGroup_API *chg, int index = -1)
 		: ApiObject(), lga(lga), lchg(chg), index(index) {}
 	~LogicChannel_API() {}
 

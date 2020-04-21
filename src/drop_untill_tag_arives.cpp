@@ -1,8 +1,7 @@
 #include "drop_untill_tag_arives.h"
 
 drop_untill_tag_arives::drop_untill_tag_arives(size_t itemsize)
-	: block("drop_untill_tags_arive",
-		gr::io_signature::make(1, 2, itemsize),
+	: block("drop_untill_tags_arive", gr::io_signature::make(1, 2, itemsize),
 		gr::io_signature::make(1, 2, itemsize)) {
 	/* By default there is no reason to further propagate tags */
 	set_tag_propagation_policy(TPP_DONT);
@@ -29,10 +28,8 @@ void drop_untill_tag_arives::set_buffer_size(unsigned int buffer_size) {
 	}
 }
 
-int drop_untill_tag_arives::general_work(int noutput_items,
-					 gr_vector_int &ninput_items_,
-					 gr_vector_const_void_star &input_items,
-					 gr_vector_void_star &output_items) {
+int drop_untill_tag_arives::general_work(int noutput_items, gr_vector_int &ninput_items_,
+					 gr_vector_const_void_star &input_items, gr_vector_void_star &output_items) {
 
 	int processed_items = 0;
 
@@ -42,9 +39,7 @@ int drop_untill_tag_arives::general_work(int noutput_items,
 		const float *in = static_cast<const float *>(input_items[i]);
 		float *out = static_cast<float *>(output_items[i]);
 
-		int ninput_items = (int)std::min((int)d_buffer_size[i] -
-							 (int)d_copied_items[i],
-						 noutput_items);
+		int ninput_items = (int)std::min((int)d_buffer_size[i] - (int)d_copied_items[i], noutput_items);
 
 		processed_items = ninput_items;
 

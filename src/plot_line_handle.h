@@ -102,8 +102,7 @@ private:
 
 class PlotLineHandleH : public PlotLineHandle {
 public:
-	PlotLineHandleH(const QPixmap &handleIcon, QWidget *parent = 0,
-			bool facingBottom = false);
+	PlotLineHandleH(const QPixmap &handleIcon, QWidget *parent = 0, bool facingBottom = false);
 	void triggerMove();
 	void setPosition(int);
 	void setPositionSilenty(int);
@@ -123,8 +122,7 @@ protected:
 
 class PlotLineHandleV : public PlotLineHandle {
 public:
-	PlotLineHandleV(const QPixmap &handleIcon, QWidget *parent = 0,
-			bool facingRight = false);
+	PlotLineHandleV(const QPixmap &handleIcon, QWidget *parent = 0, bool facingRight = false);
 	void triggerMove();
 	void setPosition(int);
 	void setPositionSilenty(int);
@@ -143,10 +141,8 @@ protected:
 
 class FreePlotLineHandleH : public PlotLineHandleH {
 public:
-	FreePlotLineHandleH(const QPixmap &handleIcon,
-			    const QPixmap &beyondLeftIcon,
-			    const QPixmap &beyondRightIcon, QWidget *parent = 0,
-			    bool facingRight = false);
+	FreePlotLineHandleH(const QPixmap &handleIcon, const QPixmap &beyondLeftIcon, const QPixmap &beyondRightIcon,
+			    QWidget *parent = 0, bool facingRight = false);
 	void moveWithinParent(int x, int y);
 
 protected:
@@ -161,9 +157,7 @@ private:
 
 class FreePlotLineHandleV : public PlotLineHandleV {
 public:
-	FreePlotLineHandleV(const QPixmap &handleIcon,
-			    const QPixmap &beyondTopIcon,
-			    const QPixmap &beyondBottomIcon,
+	FreePlotLineHandleV(const QPixmap &handleIcon, const QPixmap &beyondTopIcon, const QPixmap &beyondBottomIcon,
 			    QWidget *parent = 0, bool facingRight = false);
 	void moveWithinParent(int x, int y);
 
@@ -179,9 +173,8 @@ private:
 
 class RoundedHandleV : public FreePlotLineHandleV {
 public:
-	RoundedHandleV(const QPixmap &handleIcon, const QPixmap &beyondTopIcon,
-		       const QPixmap &beyondBottomIcon, QWidget *parent = 0,
-		       bool facingRight = false);
+	RoundedHandleV(const QPixmap &handleIcon, const QPixmap &beyondTopIcon, const QPixmap &beyondBottomIcon,
+		       QWidget *parent = 0, bool facingRight = false);
 
 	QColor roundRectColor();
 	void setRoundRectColor(const QColor &);

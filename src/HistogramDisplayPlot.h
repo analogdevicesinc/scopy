@@ -50,8 +50,7 @@ class Histogram : public QwtPlotHistogram {
 public:
 	Histogram(const QString &title, const QColor &color);
 	void setColor(const QColor &color);
-	void setValues(const double *xData, const double *yData,
-		       unsigned int nr_bins);
+	void setValues(const double *xData, const double *yData, unsigned int nr_bins);
 	void setOrientation(Qt::Orientation orientation);
 	int getMaxHeight();
 
@@ -70,8 +69,7 @@ public:
 	HistogramDisplayPlot(int nplots, QWidget *);
 	virtual ~HistogramDisplayPlot();
 
-	void plotNewData(const std::vector<double *> dataPoints,
-			 const int64_t numDataPoints,
+	void plotNewData(const std::vector<double *> dataPoints, const int64_t numDataPoints,
 			 const double timeInterval);
 
 	void replot();

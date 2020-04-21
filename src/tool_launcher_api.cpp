@@ -12,25 +12,17 @@
 namespace adiscope {
 QString ToolLauncher_API::getIndexFile() const { return tl->indexFile; }
 
-void ToolLauncher_API::setIndexFile(const QString &indexFile) {
-	tl->indexFile = indexFile;
-}
+void ToolLauncher_API::setIndexFile(const QString &indexFile) { tl->indexFile = indexFile; }
 
-bool ToolLauncher_API::menu_opened() const {
-	return tl->ui->btnMenu->isChecked();
-}
+bool ToolLauncher_API::menu_opened() const { return tl->ui->btnMenu->isChecked(); }
 
-void ToolLauncher_API::open_menu(bool open) {
-	tl->ui->btnMenu->setChecked(open);
-}
+void ToolLauncher_API::open_menu(bool open) { tl->ui->btnMenu->setChecked(open); }
 
 bool ToolLauncher_API::hidden() const { return !tl->isVisible(); }
 
 void ToolLauncher_API::hide(bool hide) { tl->setVisible(!hide); }
 
-void ToolLauncher_API::skip_calibration(bool skip) {
-	tl->skip_calibration = skip;
-}
+void ToolLauncher_API::skip_calibration(bool skip) { tl->skip_calibration = skip; }
 
 bool ToolLauncher_API::debugger_enabled() { return tl->debugger_enabled; }
 
@@ -39,9 +31,7 @@ void ToolLauncher_API::enable_debugger(bool enabled) {
 	tl->prefPanel->setDebugger_enabled(enabled);
 }
 
-bool ToolLauncher_API::manual_calibration_enabled() const {
-	return tl->manual_calibration_enabled;
-}
+bool ToolLauncher_API::manual_calibration_enabled() const { return tl->manual_calibration_enabled; }
 
 void ToolLauncher_API::enable_manual_calibration(bool enabled) {
 	tl->manual_calibration_enabled = enabled;
@@ -182,8 +172,7 @@ bool ToolLauncher_API::reset() {
 
 	tl->resetSession();
 
-	tl->connect(tl, &ToolLauncher::adcToolsCreated,
-		    [&]() { did_reconnect = true; });
+	tl->connect(tl, &ToolLauncher::adcToolsCreated, [&]() { did_reconnect = true; });
 
 	do {
 		QCoreApplication::processEvents();
@@ -225,11 +214,8 @@ void ToolLauncher_API::save(const QString &file) {
 void ToolLauncher::addDebugWindow() {
 	DetachedWindow *window = new DetachedWindow();
 	window->setWindowTitle("Debugger");
-	Debugger *debug = new Debugger(ctx, filter,
-				       menu->getToolMenuItemFor(TOOL_DEBUGGER),
-				       &js_engine, this);
-	QObject::connect(debug, &Debugger::newDebuggerInstance, this,
-			 &ToolLauncher::addDebugWindow);
+	Debugger *debug = new Debugger(ctx, filter, menu->getToolMenuItemFor(TOOL_DEBUGGER), &js_engine, this);
+	QObject::connect(debug, &Debugger::newDebuggerInstance, this, &ToolLauncher::addDebugWindow);
 
 	window->setCentralWidget(debug);
 	window->resize(sizeHint());

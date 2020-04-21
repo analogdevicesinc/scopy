@@ -27,8 +27,7 @@
 
 using namespace adiscope;
 
-FileManager::FileManager(QString toolName)
-	: hasHeader(false), sampleRate(0), nrOfSamples(0), toolName(toolName) {}
+FileManager::FileManager(QString toolName) : hasHeader(false), sampleRate(0), nrOfSamples(0), toolName(toolName) {}
 
 FileManager::~FileManager() {}
 
@@ -76,8 +75,7 @@ void FileManager::open(QString fileName, FileManager::FilePurpose filepurpose) {
 		while (!in.atEnd()) {
 			QVector<QString> line_data;
 			QString line = in.readLine();
-			QStringList list =
-				line.split(separator, QString::SkipEmptyParts);
+			QStringList list = line.split(separator, QString::SkipEmptyParts);
 			for (QString list_item : list) {
 				line_data.push_back(list_item);
 			}
@@ -112,8 +110,7 @@ void FileManager::open(QString fileName, FileManager::FilePurpose filepurpose) {
 
 			sampleRate = raw_data[4][1].toDouble(&srOk);
 			if (!srOk) {
-				throw FileManagerException(
-					"File is corrupted!");
+				throw FileManagerException("File is corrupted!");
 			}
 			// should be 0 if read from network/spectrum analyzer
 			// exported file
@@ -128,12 +125,9 @@ void FileManager::open(QString fileName, FileManager::FilePurpose filepurpose) {
 
 			for (int i = 8; i < raw_data.size(); ++i) {
 				for (int j = 1; j < raw_data[i].size(); ++j) {
-					data[i - 8][j - 1] =
-						raw_data[i][j].toDouble(
-							&dataOk);
+					data[i - 8][j - 1] = raw_data[i][j].toDouble(&dataOk);
 					if (!dataOk) {
-						throw FileManagerException(
-							"File is corrupted!");
+						throw FileManagerException("File is corrupted!");
 					}
 				}
 			}
@@ -148,11 +142,9 @@ void FileManager::open(QString fileName, FileManager::FilePurpose filepurpose) {
 
 			for (int i = 0; i < raw_data.size(); ++i) {
 				for (int j = 0; j < raw_data[i].size(); ++j) {
-					data[i][j] = raw_data[i][j].toDouble(
-						&dataOk);
+					data[i][j] = raw_data[i][j].toDouble(&dataOk);
 					if (!dataOk) {
-						throw FileManagerException(
-							"File is corrupted!");
+						throw FileManagerException("File is corrupted!");
 					}
 				}
 			}
@@ -225,9 +217,7 @@ QString FileManager::getColumnName(int index) {
 
 double FileManager::getSampleRate() const { return sampleRate; }
 
-void FileManager::setSampleRate(double sampleRate) {
-	this->sampleRate = sampleRate;
-}
+void FileManager::setSampleRate(double sampleRate) { this->sampleRate = sampleRate; }
 
 double FileManager::getNrOfSamples() const { return nrOfSamples; }
 
@@ -254,18 +244,13 @@ void FileManager::performWrite() {
 	exportFile.open(QIODevice::WriteOnly);
 	QTextStream exportStream(&exportFile);
 
-	additionalInfo = (additionalInformation.size() != 0)
-		? additionalInformation[0]
-		: "";
+	additionalInfo = (additionalInformation.size() != 0) ? additionalInformation[0] : "";
 
 	QStringList header = ScopyFileHeader::getHeader();
 
 	// prepare header
-	exportStream << header[0] << separator << QString(SCOPY_VERSION_GIT)
-		     << "\n";
-	exportStream << header[1] << separator
-		     << QDate::currentDate().toString("dddd MMMM dd/MM/yyyy")
-		     << "\n";
+	exportStream << header[0] << separator << QString(SCOPY_VERSION_GIT) << "\n";
+	exportStream << header[1] << separator << QDate::currentDate().toString("dddd MMMM dd/MM/yyyy") << "\n";
 	exportStream << header[2] << separator << "M2K"
 		     << "\n";
 	exportStream << header[3] << separator << data.size() << "\n";
@@ -299,20 +284,13 @@ void FileManager::performWrite() {
 	exportFile.close();
 }
 
-QStringList FileManager::getAdditionalInformation() const {
-	return additionalInformation;
-}
+QStringList FileManager::getAdditionalInformation() const { return additionalInformation; }
 
-void FileManager::setAdditionalInformation(const QString &value) {
-
-	additionalInformation.push_back(value);
-}
+void FileManager::setAdditionalInformation(const QString &value) { additionalInformation.push_back(value); }
 
 FileManager::FileFormat FileManager::getFormat() const { return format; }
 
-void FileManager::setFormat(const FileManager::FileFormat &value) {
-	format = value;
-}
+void FileManager::setFormat(const FileManager::FileFormat &value) { format = value; }
 
 bool ScopyFileHeader::hasValidHeader(QVector<QVector<QString>> data) {
 
@@ -333,13 +311,12 @@ bool ScopyFileHeader::hasValidHeader(QVector<QVector<QString>> data) {
 
 QStringList ScopyFileHeader::getHeader() {
 
-	QStringList header_elements = QStringList()
-		<< ";Scopy version"
-		<< ";Exported on"
-		<< ";Device"
-		<< ";Nr of samples"
-		<< ";Sample rate"
-		<< ";Tool"
-		<< ";Additional Information";
+	QStringList header_elements = QStringList() << ";Scopy version"
+						    << ";Exported on"
+						    << ";Device"
+						    << ";Nr of samples"
+						    << ";Sample rate"
+						    << ";Tool"
+						    << ";Additional Information";
 	return header_elements;
 }

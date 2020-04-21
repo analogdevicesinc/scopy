@@ -39,8 +39,7 @@ class OscilloscopePlot : public TimeDomainDisplayPlot {
 	Q_OBJECT
 
 public:
-	OscilloscopePlot(QWidget *parent, unsigned int xNumDivs = 10,
-			 unsigned int yNumDiv = 10);
+	OscilloscopePlot(QWidget *parent, unsigned int xNumDivs = 10, unsigned int yNumDiv = 10);
 	~OscilloscopePlot();
 };
 
@@ -69,8 +68,7 @@ public:
 	};
 
 public:
-	CapturePlot(QWidget *parent, unsigned int xNumDivs = 10,
-		    unsigned int yNumDivs = 10);
+	CapturePlot(QWidget *parent, unsigned int xNumDivs = 10, unsigned int yNumDivs = 10);
 	~CapturePlot();
 
 	HorizBar *levelTriggerA();
@@ -126,8 +124,7 @@ public:
 	void setGraticuleEnabled(bool enabled);
 	void setGatingEnabled(bool enabled);
 
-	void computeMeasurementsForChannel(unsigned int chnIdx,
-					   unsigned int sampleRate);
+	void computeMeasurementsForChannel(unsigned int chnIdx, unsigned int sampleRate);
 
 Q_SIGNALS:
 	void timeTriggerValueChanged(double);
@@ -153,13 +150,11 @@ public Q_SLOTS:
 	void setSampleRatelabelValue(double sampleRate);
 	void setTriggerState(int triggerState);
 	void setCursorReadoutsTransparency(int value);
-	void
-	moveCursorReadouts(CustomPlotPositionButton::ReadoutsPosition position);
+	void moveCursorReadouts(CustomPlotPositionButton::ReadoutsPosition position);
 	void setHorizCursorsLocked(bool value);
 	void setVertCursorsLocked(bool value);
 	void showEvent(QShowEvent *event);
-	void printWithNoBackground(const QString &toolName = "",
-				   bool editScaleDraw = true);
+	void printWithNoBackground(const QString &toolName = "", bool editScaleDraw = true);
 
 protected:
 	virtual void cleanUpJustBeforeChannelRemoval(int chnIdx);
