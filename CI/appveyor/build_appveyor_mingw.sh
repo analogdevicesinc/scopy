@@ -2,15 +2,12 @@
 
 set -e
 
-SCOPY_MINGW_BUILD_DEPS_FORK=analogdevicesinc
-SCOPY_MINGW_BUILD_DEPS_BRANCH=master
-
 export PATH=/bin:/usr/bin:/${MINGW_VERSION}/bin:/c/Program\ Files/Git/cmd:/c/Windows/System32:/c/Program\ Files/7-Zip:/c/Program\ Files\ \(x86\)/Inno\ Setup\ \5:/c/Program\ Files/Appveyor/BuildAgent
 echo $PATH
 
 WORKDIR=${PWD}
 echo BUILD_NO $BUILD_NO
-JOBS=-j3
+JOBS=$(nproc)
 
 CC=/${MINGW_VERSION}/bin/${ARCH}-w64-mingw32-gcc.exe
 CXX=/${MINGW_VERSION}/bin/${ARCH}-w64-mingw32-g++.exe
@@ -28,45 +25,21 @@ SCOPY_CMAKE_OPTS="
 	-DGIT_EXECUTABLE=/c/Program\\ Files/Git/cmd/git.exe \
 	-DPYTHON_EXECUTABLE=/$MINGW_VERSION/bin/python3.exe \
 	"
-
-echo "Download and install pre-compiled libraries ... "
-wget -q "https://ci.appveyor.com/api/projects/$SCOPY_MINGW_BUILD_DEPS_FORK/scopy-mingw-build-deps/artifacts/scopy-$MINGW_VERSION-build-deps-pacman.txt?branch=$SCOPY_MINGW_BUILD_DEPS_BRANCH&job=Environment: MINGW_VERSION=$MINGW_VERSION, ARCH=$ARCH" -O /c/scopy-$MINGW_VERSION-build-deps-pacman.txt
-wget -q "https://ci.appveyor.com/api/projects/$SCOPY_MINGW_BUILD_DEPS_FORK/scopy-mingw-build-deps/artifacts/scopy-$MINGW_VERSION-build-deps.tar.xz?branch=$SCOPY_MINGW_BUILD_DEPS_BRANCH&job=Environment: MINGW_VERSION=$MINGW_VERSION, ARCH=$ARCH" -O /c/scopy-$MINGW_VERSION-build-deps.tar.xz
-cd /c
-tar xJf scopy-$MINGW_VERSION-build-deps.tar.xz
-
-cd /c
-SCOPY_MINGW_BUILD_DEPS_PACMAN=$(<scopy-$MINGW_VERSION-build-deps-pacman.txt)
-PACMAN_SYNC_DEPS="
-	$SCOPY_MINGW_BUILD_DEPS_PACMAN\
-	mingw-w64-$ARCH-matio \
-"
-
-PACMAN_REPO_DEPS="
-	http://repo.msys2.org/mingw/$ARCH/mingw-w64-$ARCH-breakpad-git-r1680.70914b2d-1-any.pkg.tar.xz \
-	http://repo.msys2.org/mingw/$ARCH/mingw-w64-$ARCH-qt5-5.13.2-1-any.pkg.tar.xz \
-	http://repo.msys2.org/mingw/$ARCH/mingw-w64-$ARCH-libusb-1.0.21-2-any.pkg.tar.xz \
-"
-
-DLL_DEPS="libmatio-*.dll libhdf5-*.dll libszip*.dll libpcre*.dll libdouble-conversion*.dll libwinpthread-*.dll libgcc_*.dll libstdc++-*.dll libboost_*.dll libglib-*.dll libintl-*.dll libiconv-*.dll libglibmm-2.*.dll libgmodule-2.*.dll libgobject-2.*.dll libffi-*.dll libsigc-2.*.dll libfftw3f-*.dll libicu*.dll zlib*.dll libharfbuzz-*.dll libfreetype-*.dll libbz2-*.dll libpng16-*.dll libgraphite2.dll libjpeg-*.dll libsqlite3-*.dll libwebp-*.dll libxml2-*.dll liblzma-*.dll libxslt-*.dll libzip*.dll libpython3.*.dll libgnutls*.dll libnettle*.dll libhogweed*.dll libgmp*.dll libidn*.dll libp11*.dll libtasn*.dll libunistring*.dll libusb-*.dll libzstd*.dll libgnuradio-*.dll /$MINGW_VERSION/lib/python3.* libiio*.dll libvolk*.dll liblog4cpp*.dll libad9361*.dll liborc*.dll libsigrok*.dll qwt*.dll"
+DLL_DEPS="libmatio-*.dll libhdf5-*.dll libszip*.dll libpcre*.dll libdouble-conversion*.dll libwinpthread-*.dll libgcc_*.dll libstdc++-*.dll libboost_*.dll libglib-*.dll libintl-*.dll libiconv-*.dll libglibmm-2.*.dll libgmodule-2.*.dll libgobject-2.*.dll libffi-*.dll libsigc-2.*.dll libfftw3f-*.dll libicu*.dll zlib*.dll libharfbuzz-*.dll libfreetype-*.dll libbz2-*.dll libpng16-*.dll libgraphite2.dll libjpeg-*.dll libsqlite3-*.dll libwebp-*.dll libxml2-*.dll liblzma-*.dll libxslt-*.dll libzip*.dll libpython3.*.dll libgnutls*.dll libnettle*.dll libhogweed*.dll libgmp*.dll libidn*.dll libp11*.dll libtasn*.dll libunistring*.dll libusb-*.dll libzstd*.dll libgnuradio-*.dll /$MINGW_VERSION/lib/python3.* libiio*.dll libvolk*.dll liblog4cpp*.dll libad9361*.dll liborc*.dll libsigrok*.dll qwt*.dll libm2k*.dll"
 
 OLD_PATH=$PATH
 DEST_FOLDER=scopy_$ARCH_BIT
 BUILD_FOLDER=build_$ARCH_BIT
 DEBUG_FOLDER=debug_$ARCH_BIT
 
-PATH=/c/msys64/$MINGW_VERSION/bin:$PATH
-echo "### Installing the dependencies"
-pacman --noconfirm -Sy $PACMAN_SYNC_DEPS
-pacman --noconfirm -U  $PACMAN_REPO_DEPS
+cd /c
+source ${WORKDIR}/CI/appveyor/install_msys_deps.sh
 
 # Download a 32-bit version of windres.exe
-cd /c
+cd ${WORKDIR}
 wget http://swdownloads.analog.com/cse/build/windres.exe.gz
 gunzip windres.exe.gz
 
-# Hack: Qt5Qml CMake script throws errors when loading its plugins. So let's just drop those plugins.
-rm -f /$MINGW_VERSION/lib/cmake/Qt5Qml/*Factory.cmake
 
 echo "### Building Scopy ..."
 /$MINGW_VERSION/bin/python3.exe --version
@@ -77,7 +50,7 @@ cmake -G"Unix Makefiles" "$SCOPY_CMAKE_OPTS" $CMAKE_OPTS /c/projects/scopy
 cd /c/$BUILD_FOLDER/resources
 sed -i  's/^\(FILEVERSION .*\)$/\1,'$BUILD_NO'/' properties.rc
 cat properties.rc
-cd /c/build_$ARCH_BIT && make $JOBS
+cd /c/build_$ARCH_BIT && make -j $JOBS
 
 
 echo "### Deploy the application (copy the dependencies) ..."
