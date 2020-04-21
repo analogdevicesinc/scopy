@@ -20,10 +20,10 @@
 #ifndef DEVICE_WIDGET_HPP
 #define DEVICE_WIDGET_HPP
 
-#include <QWidget>
-#include <QPushButton>
-
 #include "iio.h"
+
+#include <QPushButton>
+#include <QWidget>
 
 namespace Ui {
 class Device;
@@ -33,17 +33,16 @@ namespace adiscope {
 class InfoPage;
 class ToolLauncher;
 
-class DeviceWidget : public QWidget
-{
+class DeviceWidget : public QWidget {
 	Q_OBJECT
 public:
 	explicit DeviceWidget(QString uri, QString name,
 			      ToolLauncher *parent = nullptr);
 	virtual ~DeviceWidget();
 
-	QPushButton* deviceButton() const;
-	QPushButton* connectButton() const;
-	QPushButton* calibrateButton() const;
+	QPushButton *deviceButton() const;
+	QPushButton *connectButton() const;
+	QPushButton *calibrateButton() const;
 
 	void setChecked(bool);
 	bool isChecked();
@@ -58,7 +57,7 @@ public:
 	void setInfoPage(InfoPage *infoPage);
 
 	bool connected() const;
-	void setConnected(bool, bool, struct iio_context* ctx = nullptr);
+	void setConnected(bool, bool, struct iio_context *ctx = nullptr);
 
 	void setName(QString);
 
@@ -81,8 +80,7 @@ protected:
 	bool m_selected;
 };
 
-class M2kDeviceWidget : public DeviceWidget
-{
+class M2kDeviceWidget : public DeviceWidget {
 	Q_OBJECT
 public:
 	explicit M2kDeviceWidget(QString uri, QString name,
@@ -90,21 +88,21 @@ public:
 	~M2kDeviceWidget();
 };
 
-class DeviceBuilder
-{
+class DeviceBuilder {
 public:
 	enum DeviceType {
 		GENERIC = 0,
 		M2K = 1,
 	};
 
-	static DeviceWidget* newDevice(DeviceType dev_type,
-				       QString uri, QString name,
-				       ToolLauncher *parent = nullptr)
-	{
+	static DeviceWidget *newDevice(DeviceType dev_type, QString uri,
+				       QString name,
+				       ToolLauncher *parent = nullptr) {
 		switch (dev_type) {
-		case GENERIC: return new DeviceWidget(uri, name, parent);
-		case M2K: return new M2kDeviceWidget(uri, name, parent);
+		case GENERIC:
+			return new DeviceWidget(uri, name, parent);
+		case M2K:
+			return new M2kDeviceWidget(uri, name, parent);
 		}
 		return nullptr;
 	}

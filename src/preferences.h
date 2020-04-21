@@ -20,12 +20,11 @@
 #ifndef PREFERENCE_PANEL_H
 #define PREFERENCE_PANEL_H
 
-#include <QWidget>
-#include <QString>
-#include <QSettings>
-
 #include "apiObject.hpp"
 
+#include <QSettings>
+#include <QString>
+#include <QWidget>
 
 namespace Ui {
 class Preferences;
@@ -34,8 +33,7 @@ class Preferences;
 namespace adiscope {
 class Preferences_API;
 
-class Preferences : public QWidget
-{
+class Preferences : public QWidget {
 	friend class Preferences_API;
 
 	Q_OBJECT
@@ -131,82 +129,91 @@ private:
 	QString getPreferenceIniFile() const;
 };
 
-class Preferences_API : public ApiObject
-{
+class Preferences_API : public ApiObject {
 	Q_OBJECT
 
-	Q_PROPERTY(bool osc_labels READ getOscLabelsEnabled WRITE setOscLabelsEnabled);
+	Q_PROPERTY(bool osc_labels READ getOscLabelsEnabled WRITE
+			   setOscLabelsEnabled);
 	Q_PROPERTY(int sig_gen_nr_periods READ getSigGenNrPeriods WRITE
-	           setSigGenNrPeriods);
-	Q_PROPERTY(bool save_session_on_exit READ getSaveSession WRITE setSaveSession);
-	Q_PROPERTY(bool double_click_to_detach READ getDoubleClickToDetach WRITE setDoubleClickToDetach);
+			   setSigGenNrPeriods);
+	Q_PROPERTY(bool save_session_on_exit READ getSaveSession WRITE
+			   setSaveSession);
+	Q_PROPERTY(bool double_click_to_detach READ getDoubleClickToDetach WRITE
+			   setDoubleClickToDetach);
 	Q_PROPERTY(bool na_show_zero READ getNaShowZero WRITE setNaShowZero)
-	Q_PROPERTY(bool spectrum_visible_peak_search READ getSpectrumVisiblePeakSearch WRITE setSpectrumVisiblePeakSearch)
-	Q_PROPERTY(bool advanced_device_info READ getAdvancedDeviceInfo WRITE setAdvancedDeviceInfo)
-	Q_PROPERTY(bool user_notes_active READ getUserNotesActive WRITE setUserNotesActive)
-	Q_PROPERTY(bool graticule_enabled READ getGraticuleEnabled WRITE setGraticuleEnabled)
-	Q_PROPERTY(bool external_script_enabled READ getExternalScript WRITE setExternalScript)
-	Q_PROPERTY(bool manual_calib_script_enabled READ getManualCalibScript WRITE setManualCalibScript)
-	Q_PROPERTY(bool animations_enabled READ getAnimationsEnabled WRITE setAnimationsEnabled)
-	Q_PROPERTY(bool osc_filtering_enabled READ getOscFilteringEnabled WRITE setOscFilteringEnabled)
+	Q_PROPERTY(bool spectrum_visible_peak_search READ
+			   getSpectrumVisiblePeakSearch WRITE
+				   setSpectrumVisiblePeakSearch)
+	Q_PROPERTY(bool advanced_device_info READ getAdvancedDeviceInfo WRITE
+			   setAdvancedDeviceInfo)
+	Q_PROPERTY(bool user_notes_active READ getUserNotesActive WRITE
+			   setUserNotesActive)
+	Q_PROPERTY(bool graticule_enabled READ getGraticuleEnabled WRITE
+			   setGraticuleEnabled)
+	Q_PROPERTY(bool external_script_enabled READ getExternalScript WRITE
+			   setExternalScript)
+	Q_PROPERTY(bool manual_calib_script_enabled READ getManualCalibScript
+			   WRITE setManualCalibScript)
+	Q_PROPERTY(bool animations_enabled READ getAnimationsEnabled WRITE
+			   setAnimationsEnabled)
+	Q_PROPERTY(bool osc_filtering_enabled READ getOscFilteringEnabled WRITE
+			   setOscFilteringEnabled)
 	Q_PROPERTY(bool mini_hist_enabled READ getMiniHist WRITE setMiniHist)
-	Q_PROPERTY(bool digital_decoders READ getDigitalDecoders WRITE setDigitalDecoders)
+	Q_PROPERTY(bool digital_decoders READ getDigitalDecoders WRITE
+			   setDigitalDecoders)
 
 public:
-
-	explicit Preferences_API(Preferences *preferencePanel) :
-		ApiObject(),
-		preferencePanel(preferencePanel) {}
+	explicit Preferences_API(Preferences *preferencePanel)
+		: ApiObject(), preferencePanel(preferencePanel) {}
 
 	bool getAnimationsEnabled() const;
-	void setAnimationsEnabled(const bool& enabled);
+	void setAnimationsEnabled(const bool &enabled);
 
 	bool getOscLabelsEnabled() const;
-	void setOscLabelsEnabled(const bool& enabled);
+	void setOscLabelsEnabled(const bool &enabled);
 
 	int getSigGenNrPeriods() const;
-	void setSigGenNrPeriods(const int& periods);
+	void setSigGenNrPeriods(const int &periods);
 
 	bool getSaveSession() const;
-	void setSaveSession(const bool& enabled);
+	void setSaveSession(const bool &enabled);
 
 	bool getDoubleClickToDetach() const;
-	void setDoubleClickToDetach(const bool& enabled);
+	void setDoubleClickToDetach(const bool &enabled);
 
 	bool getNaShowZero() const;
-	void setNaShowZero(const bool& enabled);
+	void setNaShowZero(const bool &enabled);
 
 	bool getSpectrumVisiblePeakSearch() const;
-	void setSpectrumVisiblePeakSearch(const bool& enabled);
+	void setSpectrumVisiblePeakSearch(const bool &enabled);
 
 	bool getAdvancedDeviceInfo() const;
-	void setAdvancedDeviceInfo(const bool& enabled);
+	void setAdvancedDeviceInfo(const bool &enabled);
 
 	bool getUserNotesActive() const;
-	void setUserNotesActive(const bool& enabled);
+	void setUserNotesActive(const bool &enabled);
 
 	bool getGraticuleEnabled() const;
-	void setGraticuleEnabled(const bool& enabled);
+	void setGraticuleEnabled(const bool &enabled);
 
 	bool getExternalScript() const;
-	void setExternalScript(const bool& enabled);
+	void setExternalScript(const bool &enabled);
 
 	bool getManualCalibScript() const;
-	void setManualCalibScript(const bool& enabled);
+	void setManualCalibScript(const bool &enabled);
 
 	bool getOscFilteringEnabled() const;
-	void setOscFilteringEnabled(const bool& enabled);
+	void setOscFilteringEnabled(const bool &enabled);
 
 	bool getMiniHist() const;
-	void setMiniHist(const bool& enabled);
+	void setMiniHist(const bool &enabled);
 
 	bool getDigitalDecoders() const;
 	void setDigitalDecoders(bool enabled);
 
 private:
 	Preferences *preferencePanel;
-
 };
-}
+} // namespace adiscope
 
 #endif // PREFERENCE_PANEL_H

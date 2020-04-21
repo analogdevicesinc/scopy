@@ -18,60 +18,55 @@
  */
 
 #include "scroll_filter.hpp"
-#include <QEvent>
-#include <QWidget>
+
 #include <QComboBox>
-#include <QSpinBox>
 #include <QDoubleSpinBox>
+#include <QEvent>
 #include <QLineEdit>
+#include <QSpinBox>
+#include <QWidget>
 
 using namespace adiscope;
 
-MouseWheelWidgetGuard::MouseWheelWidgetGuard(QObject *parent):
-	QObject(parent)
-{
-}
+MouseWheelWidgetGuard::MouseWheelWidgetGuard(QObject *parent)
+	: QObject(parent) {}
 
-bool MouseWheelWidgetGuard::eventFilter(QObject *o, QEvent *e)
-{
-	const QWidget* widget = dynamic_cast<QWidget*>(o);
-	if( e->type() == QEvent::Wheel && widget && !widget->hasFocus())
-	{
+bool MouseWheelWidgetGuard::eventFilter(QObject *o, QEvent *e) {
+	const QWidget *widget = dynamic_cast<QWidget *>(o);
+	if (e->type() == QEvent::Wheel && widget && !widget->hasFocus()) {
 		e->ignore();
 		return true;
 	}
 	return QObject::eventFilter(o, e);
 }
 
-void MouseWheelWidgetGuard::installEventRecursively(QWidget *parentWidget)
-{
-	if(parentWidget->children().count() == 0) {
+void MouseWheelWidgetGuard::installEventRecursively(QWidget *parentWidget) {
+	if (parentWidget->children().count() == 0) {
 		return;
 	}
-	QList<QComboBox*> comboBoxes = parentWidget->
-		findChildren<QComboBox*>();
-	for(auto ch : comboBoxes) {
+	QList<QComboBox *> comboBoxes =
+		parentWidget->findChildren<QComboBox *>();
+	for (auto ch : comboBoxes) {
 		ch->installEventFilter(new MouseWheelWidgetGuard(ch));
 		ch->setFocusPolicy(Qt::StrongFocus);
 	}
 
-	QList<QDoubleSpinBox*> doubleSpinBoxes = parentWidget->
-		findChildren<QDoubleSpinBox*>();
-	for(auto ch : doubleSpinBoxes) {
+	QList<QDoubleSpinBox *> doubleSpinBoxes =
+		parentWidget->findChildren<QDoubleSpinBox *>();
+	for (auto ch : doubleSpinBoxes) {
 		ch->installEventFilter(new MouseWheelWidgetGuard(ch));
 		ch->setFocusPolicy(Qt::StrongFocus);
 	}
 
-	QList<QSpinBox*> spinBoxes = parentWidget->
-		findChildren<QSpinBox*>();
-	for(auto ch : spinBoxes) {
+	QList<QSpinBox *> spinBoxes = parentWidget->findChildren<QSpinBox *>();
+	for (auto ch : spinBoxes) {
 		ch->installEventFilter(new MouseWheelWidgetGuard(ch));
 		ch->setFocusPolicy(Qt::StrongFocus);
 	}
 
-	QList<QLineEdit*> lineEdits = parentWidget->
-		findChildren<QLineEdit*>();
-	for(auto ch : lineEdits) {
+	QList<QLineEdit *> lineEdits =
+		parentWidget->findChildren<QLineEdit *>();
+	for (auto ch : lineEdits) {
 		ch->installEventFilter(new MouseWheelWidgetGuard(ch));
 		ch->setFocusPolicy(Qt::StrongFocus);
 	}

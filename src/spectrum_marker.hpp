@@ -24,16 +24,15 @@
 
 namespace adiscope {
 
-class SpectrumMarker: public QwtPlotMarker
-{
+class SpectrumMarker : public QwtPlotMarker {
 public:
-	SpectrumMarker(const QString& title, bool movable = true);
+	SpectrumMarker(const QString &title, bool movable = true);
 	SpectrumMarker(const QString &title, QwtAxisId xAxis, QwtAxisId yAxis,
-		bool movable = true);
+		       bool movable = true);
 	virtual ~SpectrumMarker();
 
 	QColor defaultColor() const;
-	void setDefaultColor(const QColor&);
+	void setDefaultColor(const QColor &);
 
 	bool selected() const;
 	void setSelected(bool on);
@@ -41,8 +40,8 @@ public:
 	bool movable() const;
 	void setMovable(bool on);
 
-	QPoint plotValueToPixels(const QPointF& point) const;
-	QPointF plotPixelsToValue(const QPoint& point) const;
+	QPoint plotValueToPixels(const QPointF &point) const;
+	QPointF plotPixelsToValue(const QPoint &point) const;
 
 	QRect boundingRectPixels() const;
 

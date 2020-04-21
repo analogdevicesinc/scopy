@@ -24,11 +24,11 @@
 #include "customPushButton.hpp"
 
 namespace adiscope {
-class ToolMenuItem : public BaseMenuItem
-{
+class ToolMenuItem : public BaseMenuItem {
 	Q_OBJECT
 public:
-	explicit ToolMenuItem(QString name, QString iconPath, QWidget *parent = nullptr);
+	explicit ToolMenuItem(QString name, QString iconPath,
+			      QWidget *parent = nullptr);
 	virtual ~ToolMenuItem();
 
 	QPushButton *getToolBtn() const;
@@ -59,6 +59,7 @@ protected:
 	void dragLeaveEvent(QDragLeaveEvent *event);
 
 	void mouseMoveEvent(QMouseEvent *event);
+
 private:
 	QPushButton *d_toolBtn;
 	CustomPushButton *d_toolStopBtn;
@@ -71,5 +72,5 @@ private:
 private:
 	void _buildUI();
 };
-}
+} // namespace adiscope
 #endif // TOOLMENUITEM_H

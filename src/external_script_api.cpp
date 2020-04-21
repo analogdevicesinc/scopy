@@ -20,23 +20,20 @@
 #include "external_script_api.hpp"
 
 #include <QApplication>
+#include <QElapsedTimer>
 #include <QJSEngine>
 #include <QMetaProperty>
 #include <QThread>
-#include <QElapsedTimer>
 
 using namespace adiscope;
 
-ExternalScript_API::ExternalScript_API(QObject *parent):
-        QObject(parent),
-        m_external_process(nullptr),
-        m_working_dir(QCoreApplication::applicationDirPath()),
-        m_process_timeout(0)
-{
-}
+ExternalScript_API::ExternalScript_API(QObject *parent)
+	: QObject(parent)
+	, m_external_process(nullptr)
+	, m_working_dir(QCoreApplication::applicationDirPath())
+	, m_process_timeout(0) {}
 
-QString ExternalScript_API::start(const QString& cmd)
-{
+QString ExternalScript_API::start(const QString &cmd) {
 	QString ret = "";
 	if (m_external_process != nullptr) {
 		m_external_process->deleteLater();
@@ -61,23 +58,14 @@ QString ExternalScript_API::start(const QString& cmd)
 	return ret;
 }
 
-void ExternalScript_API::setWorkingDir(const QString& root)
-{
+void ExternalScript_API::setWorkingDir(const QString &root) {
 	m_working_dir = root;
 }
 
-QString ExternalScript_API::getWorkingDir()
-{
-	return m_working_dir;
-}
+QString ExternalScript_API::getWorkingDir() { return m_working_dir; }
 
-void ExternalScript_API::setProcessTimeout(int timeout_ms)
-{
+void ExternalScript_API::setProcessTimeout(int timeout_ms) {
 	m_process_timeout = timeout_ms;
 }
 
-int ExternalScript_API::getProcessTimeout()
-{
-	return m_process_timeout;
-}
-
+int ExternalScript_API::getProcessTimeout() { return m_process_timeout; }

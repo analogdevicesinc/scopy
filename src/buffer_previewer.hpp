@@ -23,16 +23,15 @@
 
 #include <QFrame>
 
-namespace adiscope{
+namespace adiscope {
 
-class BufferPreviewer: public QFrame
-{
+class BufferPreviewer : public QFrame {
 	Q_OBJECT
 
 public:
 	explicit BufferPreviewer(QWidget *parent = 0);
 	explicit BufferPreviewer(int pixelsPerPeriod, double wavePhase,
-		QWidget *parent = 0);
+				 QWidget *parent = 0);
 	virtual ~BufferPreviewer();
 
 	double waveformPos() const;
@@ -95,27 +94,27 @@ private:
 	double m_rightGateWidth;
 };
 
-class AnalogBufferPreviewer: public BufferPreviewer
-{
+class AnalogBufferPreviewer : public BufferPreviewer {
 public:
 	explicit AnalogBufferPreviewer(QWidget *parent = 0);
 	explicit AnalogBufferPreviewer(int pixelsPerPeriod, double wavePhase,
-		QWidget *parent = 0);
+				       QWidget *parent = 0);
 
 protected:
 	virtual void buildFullWaveform(QPointF *wavePoints, int numPts);
 };
 
-class DigitalBufferPreviewer: public BufferPreviewer
-{
+class DigitalBufferPreviewer : public BufferPreviewer {
 public:
 	explicit DigitalBufferPreviewer(QWidget *parent = 0);
-	explicit DigitalBufferPreviewer(int pixelsPerPeriod, QWidget *parent = 0);
+	explicit DigitalBufferPreviewer(int pixelsPerPeriod,
+					QWidget *parent = 0);
 	void setNoOfSteps(double val);
 	double noOfSteps();
 
 protected:
 	virtual void buildFullWaveform(QPointF *wavePoints, int numPts);
+
 private:
 	double m_noOfSteps;
 };

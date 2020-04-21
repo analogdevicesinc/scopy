@@ -20,17 +20,16 @@
 #ifndef SCOPY_TOOL_HPP
 #define SCOPY_TOOL_HPP
 
-#include <QWidget>
-#include <QSettings>
-#include <QMouseEvent>
+#include "preferences.h"
+#include "toolmenuitem.h"
+
 #include <QDragMoveEvent>
 #include <QDropEvent>
-#include <QString>
 #include <QMainWindow>
-
-#include "preferences.h"
-
-#include "toolmenuitem.h"
+#include <QMouseEvent>
+#include <QSettings>
+#include <QString>
+#include <QWidget>
 
 class QJSEngine;
 class QPushButton;
@@ -43,19 +42,18 @@ namespace adiscope {
 class ApiObject;
 class ToolLauncher;
 
-class Tool : public QWidget
-{
+class Tool : public QWidget {
 	Q_OBJECT
 
 public:
 	explicit Tool(struct iio_context *ctx, ToolMenuItem *toolMenuItem,
-		      ApiObject *api, const QString& name,
+		      ApiObject *api, const QString &name,
 		      ToolLauncher *parent);
 	~Tool();
 
 	QPushButton *runButton() { return toolMenuItem->getToolStopBtn(); }
-	const QString& getName();
-	void setName(const QString& name);
+	const QString &getName();
+	void setName(const QString &name);
 	virtual void settingsLoaded();
 	virtual void setNativeDialogs(bool nativeDialogs);
 
@@ -89,5 +87,5 @@ protected:
 	ToolMenuItem *toolMenuItem;
 	bool m_useNativeDialogs;
 };
-}
+} // namespace adiscope
 #endif /* SCOPY_TOOL_HPP */

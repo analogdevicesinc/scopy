@@ -1,8 +1,9 @@
 #ifndef SCOPYAPPLICATION_H
 #define SCOPYAPPLICATION_H
 
-#include <QtGlobal>
 #include "config.h"
+
+#include <QtGlobal>
 
 #define __STDC_FORMAT_MACROS
 
@@ -17,29 +18,27 @@
 
 //#define CATCH_UNHANDLED_EXCEPTIONS
 
-
 class ScopyApplication final : public QApplication {
 
 public:
-	ScopyApplication(int& argc, char** argv);
+	ScopyApplication(int &argc, char **argv);
 	~ScopyApplication();
-	QString initBreakPadHandler(QString crashDumpPath) ;
+	QString initBreakPadHandler(QString crashDumpPath);
 #ifdef CATCH_UNHANDLED_EXCEPTIONS
-	virtual bool notify(QObject *receiver, QEvent *e) override ;
+	virtual bool notify(QObject *receiver, QEvent *e) override;
 #endif
 
 #ifdef Q_OS_WIN
-	static bool dumpCallback(const wchar_t* dump_path,
-							 const wchar_t* minidump_id,
-							 void* context,
-							 EXCEPTION_POINTERS* exinfo,
-							 MDRawAssertionInfo* assertion,
-							 bool succeeded) ;
+	static bool dumpCallback(const wchar_t *dump_path,
+				 const wchar_t *minidump_id, void *context,
+				 EXCEPTION_POINTERS *exinfo,
+				 MDRawAssertionInfo *assertion, bool succeeded);
 #endif
 
 #ifdef Q_OS_LINUX
-	static bool dumpCallback(const google_breakpad::MinidumpDescriptor& descriptor,
-							 void* context, bool succeeded) ;
+	static bool
+	dumpCallback(const google_breakpad::MinidumpDescriptor &descriptor,
+		     void *context, bool succeeded);
 #endif
 	google_breakpad::ExceptionHandler *getExceptionHandler() const;
 	void setExceptionHandler(google_breakpad::ExceptionHandler *value);

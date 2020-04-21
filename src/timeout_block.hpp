@@ -20,26 +20,25 @@
 #ifndef TIMEOUT_BLOCK_HPP
 #define TIMEOUT_BLOCK_HPP
 
-#include <QObject>
-
 #include <gnuradio/block.h>
 
+#include <QObject>
+
 namespace adiscope {
-	class timeout_block : public QObject, public gr::block
-	{
-		Q_OBJECT
+class timeout_block : public QObject, public gr::block {
+	Q_OBJECT
 
-	private:
-		void pmt_received(pmt::pmt_t pmt);
+private:
+	void pmt_received(pmt::pmt_t pmt);
 
-	public:
-		explicit timeout_block(const std::string &pmt_name,
-				QObject *parent = nullptr);
-		~timeout_block();
+public:
+	explicit timeout_block(const std::string &pmt_name,
+			       QObject *parent = nullptr);
+	~timeout_block();
 
-	Q_SIGNALS:
-		void timeout();
-	};
-}
+Q_SIGNALS:
+	void timeout();
+};
+} // namespace adiscope
 
 #endif

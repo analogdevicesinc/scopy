@@ -18,25 +18,19 @@
  */
 
 #include "regmapparser.h"
+
 #include "string.h"
 
-RegmapParser::RegmapParser(QObject *parent,
-                           struct iio_context *context) : QObject(parent),
-	ctx(context)
-{
+RegmapParser::RegmapParser(QObject *parent, struct iio_context *context)
+	: QObject(parent), ctx(context) {}
 
-}
-
-void RegmapParser::setIioContext(struct iio_context *ctx)
-{
-	this->ctx = ctx;
-}
+void RegmapParser::setIioContext(struct iio_context *ctx) { this->ctx = ctx; }
 
 void RegmapParser::deviceXmlFileSelection(const QString *device,
-                QString *filename, const QString source)
-{
-	struct iio_device *dev = iio_context_find_device(ctx,
-	                         device->toLatin1().data());
+					  QString *filename,
+					  const QString source) {
+	struct iio_device *dev =
+		iio_context_find_device(ctx, device->toLatin1().data());
 
 	filename->clear();
 
@@ -47,19 +41,27 @@ void RegmapParser::deviceXmlFileSelection(const QString *device,
 			QString adcRegmapName, dacRegmapName;
 			int pcoreMajor;
 
-			if (pcoreGetVersion(device, &pcoreMajor) && pcoreMajor > 8) {
-				adcRegmapName.append(QString("adi_regmap_adc_v%1.xml").arg(pcoreMajor));
-				dacRegmapName.append(QString("adi_regmap_dac_v%1.xml").arg(pcoreMajor));
+			if (pcoreGetVersion(device, &pcoreMajor) &&
+			    pcoreMajor > 8) {
+				adcRegmapName.append(
+					QString("adi_regmap_adc_v%1.xml")
+						.arg(pcoreMajor));
+				dacRegmapName.append(
+					QString("adi_regmap_dac_v%1.xml")
+						.arg(pcoreMajor));
 			} else {
 				adcRegmapName.append("adi_regmap_adc.xml");
 				dacRegmapName.append("adi_regmap_dac.xml");
 			}
 
-			/* Attempt to associate AXI Core ADC xml or AXI Core DAC xml to the device */
-			if (isInputDevice(dev) && xmlFileExists(adcRegmapName.toLatin1().data())) {
+			/* Attempt to associate AXI Core ADC xml or AXI Core DAC
+			 * xml to the device */
+			if (isInputDevice(dev) &&
+			    xmlFileExists(adcRegmapName.toLatin1().data())) {
 				filename->append(adcRegmapName);
-			} else if (isOutputDevice(dev)
-			           && xmlFileExists(dacRegmapName.toLatin1().data())) {
+			} else if (isOutputDevice(dev) &&
+				   xmlFileExists(
+					   dacRegmapName.toLatin1().data())) {
 				filename->append(dacRegmapName);
 			}
 		} else {
@@ -69,8 +71,7 @@ void RegmapParser::deviceXmlFileSelection(const QString *device,
 }
 
 void RegmapParser::findDeviceXmlFile(const QString *xmlsFolderPath,
-                                     const QString *device, QString *filename)
-{
+				     const QString *device, QString *filename) {
 	filename->append(xmlsFolderPath->toLatin1().data());
 	filename->append(device->toLatin1().data());
 	filename->append(".xml");
@@ -82,8 +83,7 @@ void RegmapParser::findDeviceXmlFile(const QString *xmlsFolderPath,
 	}
 }
 
-int RegmapParser::pcoreGetVersion(const QString *device, int *pcoreMajor)
-{
+int RegmapParser::pcoreGetVersion(const QString *device, int *pcoreMajor) {
 	struct iio_device *dev;
 	int ret;
 
@@ -97,8 +97,7 @@ int RegmapParser::pcoreGetVersion(const QString *device, int *pcoreMajor)
 	return ret;
 }
 
-bool RegmapParser::xmlFileExists(char *filename)
-{
+bool RegmapParser::xmlFileExists(char *filename) {
 	QString fileToOpen;
 
 	fileToOpen.append(xmlsFolderPath.toLatin1());
@@ -107,8 +106,7 @@ bool RegmapParser::xmlFileExists(char *filename)
 
 	return file.exists();
 }
-int RegmapParser::deviceXmlFileLoad(QString *filename)
-{
+int RegmapParser::deviceXmlFileLoad(QString *filename) {
 	if (!file.isOpen()) {
 		file.setFileName(*filename);
 
@@ -128,13 +126,15 @@ int RegmapParser::deviceXmlFileLoad(QString *filename)
 	return 1;
 }
 
-QDomNode *RegmapParser::getRegisterNode(const QString address)
-{
-	int i ;
+QDomNode *RegmapParser::getRegisterNode(const QString address) {
+	int i;
 	bool status;
 	QDomNodeList registers = doc.elementsByTagName("Register");
-	uint32_t lastAddress = registers.item(registers.size() -
-	                                      1).firstChildElement("Address").text().split("0x")[1].toUInt(&status,16);
+	uint32_t lastAddress = registers.item(registers.size() - 1)
+				       .firstChildElement("Address")
+				       .text()
+				       .split("0x")[1]
+				       .toUInt(&status, 16);
 	lastNode = registers.item(registers.size() - 1);
 
 	for (i = 0; i < registers.size(); i++) {
@@ -160,8 +160,7 @@ QDomNode *RegmapParser::getRegisterNode(const QString address)
 	return nullptr;
 }
 
-uint32_t RegmapParser::getLastAddress(void) const
-{
+uint32_t RegmapParser::getLastAddress(void) const {
 	bool status;
 
 	QDomNodeList registers = doc.elementsByTagName("Register");
@@ -169,23 +168,20 @@ uint32_t RegmapParser::getLastAddress(void) const
 	QDomElement addr = n.firstChildElement("Address");
 	QStringList temp = addr.text().split("0x");
 
-	uint32_t lastAddress = addr.text().split("0x")[1].toUInt(&status,16);
+	uint32_t lastAddress = addr.text().split("0x")[1].toUInt(&status, 16);
 
 	return lastAddress;
 }
 
-bool RegmapParser::isInputDevice(const struct iio_device *dev)
-{
+bool RegmapParser::isInputDevice(const struct iio_device *dev) {
 	return deviceTypeGet(dev, 1);
 }
 
-bool RegmapParser::isOutputDevice(const iio_device *dev)
-{
+bool RegmapParser::isOutputDevice(const iio_device *dev) {
 	return deviceTypeGet(dev, 0);
 }
 
-bool RegmapParser::deviceTypeGet(const iio_device *dev, int type)
-{
+bool RegmapParser::deviceTypeGet(const iio_device *dev, int type) {
 	struct iio_channel *ch;
 	int nbChannels, i;
 
@@ -199,7 +195,8 @@ bool RegmapParser::deviceTypeGet(const iio_device *dev, int type)
 		ch = iio_device_get_channel(dev, i);
 
 		if (iio_channel_is_scan_element(ch) &&
-		    (type ? !iio_channel_is_output(ch) : iio_channel_is_output(ch))) {
+		    (type ? !iio_channel_is_output(ch)
+			  : iio_channel_is_output(ch))) {
 			return true;
 		}
 	}
@@ -208,10 +205,9 @@ bool RegmapParser::deviceTypeGet(const iio_device *dev, int type)
 }
 
 uint32_t RegmapParser::readRegister(const QString *device,
-                                    const uint32_t u32Address)
-{
-	struct iio_device *dev = iio_context_find_device(ctx,
-	                         device->toLatin1().data());
+				    const uint32_t u32Address) {
+	struct iio_device *dev =
+		iio_context_find_device(ctx, device->toLatin1().data());
 	int ret;
 	uint32_t i;
 
@@ -227,10 +223,10 @@ uint32_t RegmapParser::readRegister(const QString *device,
 }
 
 void RegmapParser::writeRegister(const QString *device,
-                                 const uint32_t u32Address, const uint32_t value)
-{
-	struct iio_device *dev = iio_context_find_device(ctx,
-	                         device->toLatin1().data());
+				 const uint32_t u32Address,
+				 const uint32_t value) {
+	struct iio_device *dev =
+		iio_context_find_device(ctx, device->toLatin1().data());
 
 	iio_device_reg_write(dev, u32Address, value);
 }

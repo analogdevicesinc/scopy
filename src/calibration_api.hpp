@@ -5,8 +5,7 @@
 
 namespace adiscope {
 
-class Calibration_API: public ApiObject
-{
+class Calibration_API : public ApiObject {
 	Q_OBJECT
 
 	Q_PROPERTY(QList<double> adc_offsets READ get_adc_offsets)
@@ -32,11 +31,11 @@ public:
 	Q_INVOKABLE void dacBOutputDCVolts(int);
 	Q_INVOKABLE void dacOutputStop();
 
-	Q_INVOKABLE double devTemp(const QString& devName);
+	Q_INVOKABLE double devTemp(const QString &devName);
 
 private:
 	Calibration *calib;
 };
-}
+} // namespace adiscope
 
 #endif // CALIBRATION_API_HPP

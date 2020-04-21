@@ -23,77 +23,72 @@
 #ifndef M2K_SCOPE_SINK_F_IMPL_H
 #define M2K_SCOPE_SINK_F_IMPL_H
 
-#include <gnuradio/high_res_timer.h>
-
-#include "scope_sink_f.h"
-#include "TimeDomainDisplayPlot.h"
 #include "FftDisplayPlot.h"
+#include "TimeDomainDisplayPlot.h"
+#include "scope_sink_f.h"
+
+#include <gnuradio/high_res_timer.h>
 
 namespace adiscope {
 
-    class scope_sink_f_impl : public scope_sink_f
-    {
-    private:
-      void initialize();
+class scope_sink_f_impl : public scope_sink_f {
+private:
+	void initialize();
 
-      int d_size, d_buffer_size;
-      double d_samp_rate;
-      std::string d_name;
-      int d_nconnections;
+	int d_size, d_buffer_size;
+	double d_samp_rate;
+	std::string d_name;
+	int d_nconnections;
 
-      int d_index, d_start, d_end;
-      std::vector<float*> d_fbuffers;
-      std::vector<double*> d_buffers;
-      std::vector< std::vector<gr::tag_t> > d_tags;
+	int d_index, d_start, d_end;
+	std::vector<float *> d_fbuffers;
+	std::vector<double *> d_buffers;
+	std::vector<std::vector<gr::tag_t>> d_tags;
 
-      QObject *plot;
+	QObject *plot;
 
-      gr::high_res_timer_type d_update_time;
-      gr::high_res_timer_type d_last_time;
+	gr::high_res_timer_type d_update_time;
+	gr::high_res_timer_type d_last_time;
 
-      // Members used for triggering scope
-      trigger_mode d_trigger_mode;
-      int d_trigger_channel;
-      pmt::pmt_t d_trigger_tag_key;
-      bool d_triggered;
+	// Members used for triggering scope
+	trigger_mode d_trigger_mode;
+	int d_trigger_channel;
+	pmt::pmt_t d_trigger_tag_key;
+	bool d_triggered;
 
-      bool d_displayOneBuffer;
-      bool d_cleanBuffers;
+	bool d_displayOneBuffer;
+	bool d_cleanBuffers;
 
-      void _reset();
-      void _npoints_resize();
-      void _adjust_tags(int adj);
-      void _test_trigger_tags(int nitems);
+	void _reset();
+	void _npoints_resize();
+	void _adjust_tags(int adj);
+	void _test_trigger_tags(int nitems);
 
-    public:
-      scope_sink_f_impl(int size, double samp_rate,
-		       const std::string &name,
-		       int nconnections,
-		       QObject *plot = NULL);
-      ~scope_sink_f_impl();
+public:
+	scope_sink_f_impl(int size, double samp_rate, const std::string &name,
+			  int nconnections, QObject *plot = NULL);
+	~scope_sink_f_impl();
 
-      bool check_topology(int ninputs, int noutputs);
+	bool check_topology(int ninputs, int noutputs);
 
-      void exec_();
+	void exec_();
 
-      void set_update_time(double t);
-      void set_nsamps(const int size);
-      void set_samp_rate(const double samp_rate);
-      void set_trigger_mode(trigger_mode mode, int channel,
-			    const std::string &tag_key="");
+	void set_update_time(double t);
+	void set_nsamps(const int size);
+	void set_samp_rate(const double samp_rate);
+	void set_trigger_mode(trigger_mode mode, int channel,
+			      const std::string &tag_key = "");
 
-      void set_displayOneBuffer(bool);
+	void set_displayOneBuffer(bool);
 
-      int nsamps() const;
-      std::string name() const;
-      void reset();
-      void clean_buffers();
+	int nsamps() const;
+	std::string name() const;
+	void reset();
+	void clean_buffers();
 
-
-      int work(int noutput_items,
-	       gr_vector_const_void_star &input_items,
-	       gr_vector_void_star &output_items);
-    };
+	int work(int noutput_items, gr_vector_const_void_star &input_items,
+		 gr_vector_void_star &output_items);
+};
 
 } /* namespace adiscope */
 

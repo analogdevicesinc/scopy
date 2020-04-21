@@ -18,59 +18,48 @@
  */
 
 #include "runsinglewidget.h"
-#include "ui_runsinglewidget.h"
 
-#include "utils.h"
-#include "dynamicWidget.hpp"
 #include "customPushButton.hpp"
+#include "dynamicWidget.hpp"
+#include "utils.h"
+
+#include "ui_runsinglewidget.h"
 
 using namespace adiscope;
 
-RunSingleWidget::RunSingleWidget(QWidget *parent) :
-	QWidget(parent),
-	d_ui(new Ui::RunSingleWidget),
-	d_singleButtonEnabled(true)
-{
+RunSingleWidget::RunSingleWidget(QWidget *parent)
+	: QWidget(parent)
+	, d_ui(new Ui::RunSingleWidget)
+	, d_singleButtonEnabled(true) {
 	d_ui->setupUi(this);
 
-	connect(d_ui->runButton, &QPushButton::toggled,
-		this, &RunSingleWidget::_toggle);
-	connect(d_ui->singleButton, &QPushButton::toggled,
-		this, &RunSingleWidget::_toggle);
-
+	connect(d_ui->runButton, &QPushButton::toggled, this,
+		&RunSingleWidget::_toggle);
+	connect(d_ui->singleButton, &QPushButton::toggled, this,
+		&RunSingleWidget::_toggle);
 }
 
-RunSingleWidget::~RunSingleWidget()
-{
-	delete d_ui;
-}
+RunSingleWidget::~RunSingleWidget() { delete d_ui; }
 
-void RunSingleWidget::enableSingleButton(bool enable)
-{
+void RunSingleWidget::enableSingleButton(bool enable) {
 	d_ui->singleButton->setEnabled(enable);
 	d_ui->singleButton->setVisible(enable);
 	d_singleButtonEnabled = enable;
 }
 
-bool RunSingleWidget::singleButtonEnabled() const
-{
+bool RunSingleWidget::singleButtonEnabled() const {
 	return d_singleButtonEnabled;
 }
 
-bool RunSingleWidget::singleButtonChecked() const
-{
+bool RunSingleWidget::singleButtonChecked() const {
 	return d_ui->singleButton->isChecked();
 }
 
-bool RunSingleWidget::runButtonChecked() const
-{
+bool RunSingleWidget::runButtonChecked() const {
 	return d_ui->runButton->isChecked();
 }
 
-
-
-void RunSingleWidget::toggle(bool checked)
-{
+void RunSingleWidget::toggle(bool checked) {
 	if (!checked) {
 		QSignalBlocker blockerRunButton(d_ui->runButton);
 		QSignalBlocker blockerSingleButton(d_ui->singleButton);
@@ -88,13 +77,9 @@ void RunSingleWidget::toggle(bool checked)
 	Q_EMIT toggled(checked);
 }
 
-void RunSingleWidget::single()
-{
-	d_ui->singleButton->setChecked(true);
-}
+void RunSingleWidget::single() { d_ui->singleButton->setChecked(true); }
 
-void RunSingleWidget::_toggle(bool checked)
-{
+void RunSingleWidget::_toggle(bool checked) {
 	QPushButton *btn = dynamic_cast<QPushButton *>(QObject::sender());
 	setDynamicProperty(btn, "running", checked);
 

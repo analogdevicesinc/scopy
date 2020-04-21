@@ -1,14 +1,15 @@
 #ifndef LA_CHANNEL_MANAGER_H
 #define LA_CHANNEL_MANAGER_H
 
-#include <QDebug>
 #include "digitalchannel_manager.hpp"
 #include "libsigrokdecode/libsigrokdecode.h"
-#include <QMimeData>
-#include <QMimeType>
+
+#include <QBitmap>
+#include <QDebug>
 #include <QDrag>
 #include <QFrame>
-#include <QBitmap>
+#include <QMimeData>
+#include <QMimeType>
 #include <QVBoxLayout>
 
 namespace Ui {
@@ -18,14 +19,14 @@ class LASettingsWidget;
 class LARequiredChannel;
 class LChannelSettings;
 class LAManagerHeader;
-}
+} // namespace Ui
 namespace pv {
 namespace view {
 class View;
 class LogicSignal;
 class DecodeTrace;
-}
-namespace widgets{
+} // namespace view
+namespace widgets {
 class ColourButton;
 }
 namespace binding {
@@ -34,7 +35,7 @@ class Decoder;
 namespace prop {
 class Property;
 }
-}
+} // namespace pv
 namespace adiscope {
 class LogicAnalyzer;
 class LogicAnalyzerChannelGroup;
@@ -42,8 +43,7 @@ class LogicAnalyzerChannelGroupUI;
 class LogicAnalyzerChannelManagerUI;
 class MouseWheelWidgetGuard;
 
-class LogicAnalyzerChannel : public Channel
-{
+class LogicAnalyzerChannel : public Channel {
 public:
 	LogicAnalyzerChannel(uint16_t id_, const std::string &label_);
 	const srd_channel *channel_role;
@@ -52,7 +52,7 @@ public:
 	const srd_channel *getChannel_role();
 	void setChannel_role(const srd_channel *value);
 	std::string getTrigger() const;
-	void setTrigger(const std::string& value);
+	void setTrigger(const std::string &value);
 	qreal getCh_thickness() const;
 	void setCh_thickness(qreal value);
 
@@ -60,9 +60,7 @@ private:
 	qreal ch_thickness;
 };
 
-
-class LogicAnalyzerChannelUI : public ChannelUI
-{
+class LogicAnalyzerChannelUI : public ChannelUI {
 	Q_OBJECT
 	LogicAnalyzerChannel *lch;
 	LogicAnalyzerChannelManagerUI *chm_ui;
@@ -76,12 +74,13 @@ class LogicAnalyzerChannelUI : public ChannelUI
 
 	int traceOffset;
 	int traceHeight;
+
 public:
 	LogicAnalyzerChannelUI(LogicAnalyzerChannel *ch,
-	                       LogicAnalyzerChannelGroup *chgroup,
-	                       LogicAnalyzerChannelGroupUI *chgroupui,
-	                       LogicAnalyzerChannelManagerUI *chm_ui,
-	                       QWidget *parent = 0);
+			       LogicAnalyzerChannelGroup *chgroup,
+			       LogicAnalyzerChannelGroupUI *chgroupui,
+			       LogicAnalyzerChannelManagerUI *chm_ui,
+			       QWidget *parent = 0);
 	~LogicAnalyzerChannelUI();
 	Ui::LAChannelGroup *ui;
 	LogicAnalyzerChannel *getChannel();
@@ -89,9 +88,9 @@ public:
 	std::shared_ptr<pv::view::LogicSignal> getTrace();
 
 	void channelRoleChanged(const QString);
-	LogicAnalyzerChannelGroup* getChannelGroup();
+	LogicAnalyzerChannelGroup *getChannelGroup();
 	QPoint dragStartPosition;
-	QFrame *topSep,*botSep;
+	QFrame *topSep, *botSep;
 
 	void updateTrace();
 
@@ -117,18 +116,16 @@ Q_SIGNALS:
 	void requestUpdateUI();
 };
 
-
-class LogicAnalyzerChannelGroup : public ChannelGroup
-{
+class LogicAnalyzerChannelGroup : public ChannelGroup {
 private:
 	bool collapsed;
 	const srd_decoder *decoder;
 	QStringList decoderRolesNameList;
 	QString decoderSettingsString;
-	std::map<const srd_channel*,uint16_t> channels_;
-	const srd_channel* findByValue(uint16_t ch_id);
+	std::map<const srd_channel *, uint16_t> channels_;
+	const srd_channel *findByValue(uint16_t ch_id);
 	qreal ch_thickness;
-	std::vector<LogicAnalyzerChannel*> logicChannels;
+	std::vector<LogicAnalyzerChannel *> logicChannels;
 
 public:
 	LogicAnalyzerChannelGroup(LogicAnalyzerChannel *ch);
@@ -139,14 +136,14 @@ public:
 	bool isCollapsed();
 	void collapse(bool val);
 	QStringList get_decoder_roles_list();
-	const srd_channel *get_srd_channel_from_name(const char*);
-	LogicAnalyzerChannel* get_channel_by_id(int id);
-	LogicAnalyzerChannel* get_channel_at_index(unsigned int index);
-	LogicAnalyzerChannel* get_logic_channel_by_id(int id);
+	const srd_channel *get_srd_channel_from_name(const char *);
+	LogicAnalyzerChannel *get_channel_by_id(int id);
+	LogicAnalyzerChannel *get_channel_at_index(unsigned int index);
+	LogicAnalyzerChannel *get_logic_channel_by_id(int id);
 	void add_logic_channel(LogicAnalyzerChannel *chn);
 	void remove_logic_channel(int chnIndex);
-	void setChannelForDecoder(const srd_channel*, uint16_t);
-	std::map<const srd_channel*, uint16_t> get_decoder_channels();
+	void setChannelForDecoder(const srd_channel *, uint16_t);
+	std::map<const srd_channel *, uint16_t> get_decoder_channels();
 	qreal getCh_thickness() const;
 	void setCh_thickness(qreal value);
 	void saveDecoderSettings();
@@ -154,12 +151,10 @@ public:
 	void setDecoderSettings(QString val);
 	std::vector<const srd_channel *> decoderOptChannels;
 	std::vector<const srd_channel *> decoderReqChannels;
-	std::vector< std::shared_ptr<pv::prop::Property> > properties_;
+	std::vector<std::shared_ptr<pv::prop::Property>> properties_;
 };
 
-
-class LogicAnalyzerChannelGroupUI : public ChannelGroupUI
-{
+class LogicAnalyzerChannelGroupUI : public ChannelGroupUI {
 	Q_OBJECT
 	LogicAnalyzerChannelGroup *lchg;
 	LogicAnalyzerChannelManagerUI *chm_ui;
@@ -168,10 +163,11 @@ class LogicAnalyzerChannelGroupUI : public ChannelGroupUI
 	QRect botDragbox;
 	int traceOffset;
 	int traceHeight;
+
 public:
 	LogicAnalyzerChannelGroupUI(LogicAnalyzerChannelGroup *chg,
-	                            LogicAnalyzerChannelManagerUI *chm_ui,
-	                            QWidget *parent = 0);
+				    LogicAnalyzerChannelManagerUI *chm_ui,
+				    QWidget *parent = 0);
 	~LogicAnalyzerChannelGroupUI();
 	LogicAnalyzerChannelGroup *getChannelGroup();
 	std::vector<LogicAnalyzerChannelUI *> ch_ui;
@@ -182,9 +178,9 @@ public:
 	void setTrace();
 
 	std::shared_ptr<pv::view::TraceTreeItem> getTrace();
-	LogicAnalyzerChannelUI* findChannelWithRole(const QString role);
+	LogicAnalyzerChannelUI *findChannelWithRole(const QString role);
 	QPoint dragStartPosition;
-	QFrame *topSep,*botSep, *chUiSep;
+	QFrame *topSep, *botSep, *chUiSep;
 
 	void updateTrace();
 	int getTraceOffset();
@@ -198,7 +194,7 @@ public:
 	bool eventFilter(QObject *watched, QEvent *event);
 
 	std::shared_ptr<pv::binding::Decoder> getBinding();
-	void setBinding(std::shared_ptr<pv::binding::Decoder>&);
+	void setBinding(std::shared_ptr<pv::binding::Decoder> &);
 
 private Q_SLOTS:
 	void set_decoder(const std::string &value);
@@ -213,6 +209,7 @@ private Q_SLOTS:
 	void dropEvent(QDropEvent *event) override;
 	void enterEvent(QEvent *event) override;
 	void leaveEvent(QEvent *event) override;
+
 private:
 	std::shared_ptr<pv::view::TraceTreeItem> trace;
 	std::shared_ptr<pv::view::LogicSignal> logicTrace;
@@ -227,9 +224,7 @@ Q_SIGNALS:
 	void channel_enabled();
 };
 
-
-class LogicAnalyzerChannelManager : public ChannelManager
-{
+class LogicAnalyzerChannelManager : public ChannelManager {
 public:
 	LogicAnalyzerChannelManager();
 	~LogicAnalyzerChannelManager();
@@ -237,11 +232,11 @@ public:
 	void split(int index);
 	void remove(int index);
 	void removeChannel(int grIndex, int chIndex);
-	void initDecoderList(bool first_level_decoder=true);
+	void initDecoderList(bool first_level_decoder = true);
 	QStringList get_name_decoder_list();
 	const srd_decoder *get_decoder_from_name(const char *);
 	void highlightChannel(LogicAnalyzerChannelGroup *chg,
-	                      LogicAnalyzerChannel *ch=nullptr);
+			      LogicAnalyzerChannel *ch = nullptr);
 	LogicAnalyzerChannelGroup *getHighlightedChannelGroup();
 	LogicAnalyzerChannel *getHighlightedChannel();
 	void moveChannel(int fromChgIndex, int from, int to, bool after = true);
@@ -253,19 +248,19 @@ public:
 	LogicAnalyzerChannel *get_channel(unsigned int);
 	void clearChannelGroups();
 	void clearTrigger();
+
 private:
 	std::vector<const srd_decoder *> decoderList;
 	QStringList nameDecoderList;
 	static int decoder_name_cmp(const void *a, const void *b);
 	LogicAnalyzerChannelGroup *highlightedChannelGroup;
 	LogicAnalyzerChannel *highlightedChannel;
+
 protected:
 	std::vector<LogicAnalyzerChannel *> lchannels;
 };
 
-
-class LogicAnalyzerChannelManagerUI : public QWidget
-{
+class LogicAnalyzerChannelManagerUI : public QWidget {
 	Q_OBJECT
 public:
 	pv::MainWindow *main_win;
@@ -278,33 +273,33 @@ public:
 	Ui::LASettingsWidget *settingsUI;
 	Ui::LChannelSettings *generalSettingsUi;
 	Ui::LAManagerHeader *managerHeaderUI;
-	std::vector<Ui::LARequiredChannel*> decChannelsUi;
+	std::vector<Ui::LARequiredChannel *> decChannelsUi;
 	const bool pixmapEnable = true;
 	const bool pixmapGrab = true;
 	const bool pixmapRetainSize = true;
-	const int  pixmapScale = 1;
+	const int pixmapScale = 1;
 	std::vector<QFrame *> separators;
 	QWidget *hoverWidget;
 
 	LogicAnalyzerChannelManagerUI(QWidget *parent,
-	                              pv::MainWindow *main_win_,
-	                              LogicAnalyzerChannelManager *chm,
-	                              QWidget *locationSettingsWidget,
-	                              QVBoxLayout *locationSettingsLayout,
-	                              LogicAnalyzer *la);
+				      pv::MainWindow *main_win_,
+				      LogicAnalyzerChannelManager *chm,
+				      QWidget *locationSettingsWidget,
+				      QVBoxLayout *locationSettingsLayout,
+				      LogicAnalyzer *la);
 	~LogicAnalyzerChannelManagerUI();
 	LogicAnalyzerChannelManager *chm;
 	LogicAnalyzer *la;
 	Ui::LAChannelManager *ui;
 	void update_ui();
-	void update_ui_children(LogicAnalyzerChannelGroupUI*);
+	void update_ui_children(LogicAnalyzerChannelGroupUI *);
 	void collapse(bool);
 	void showHighlight(bool check);
 	void setHoverWidget(QWidget *hover);
 	void clearHoverWidget();
 
-	LogicAnalyzerChannelGroupUI *getUiFromChGroup(
-	        LogicAnalyzerChannelGroup *);
+	LogicAnalyzerChannelGroupUI *
+	getUiFromChGroup(LogicAnalyzerChannelGroup *);
 	LogicAnalyzerChannelUI *getUiFromCh(LogicAnalyzerChannel *);
 	void createSettingsWidget();
 	void deleteSettingsWidget();
@@ -319,10 +314,10 @@ public:
 	std::vector<std::string> getTriggerMapping();
 	std::string getTriggerMapping(int);
 	void remove_trace_clones();
-	void setupChannel(LogicAnalyzerChannelGroup*, QFrame*);
-	void setupGroupedChannel(LogicAnalyzerChannelGroupUI*, QFrame*);
+	void setupChannel(LogicAnalyzerChannelGroup *, QFrame *);
+	void setupGroupedChannel(LogicAnalyzerChannelGroupUI *, QFrame *);
 	void deselect_all();
-	std::vector<LogicAnalyzerChannelGroupUI*> getEnabledChannelGroups();
+	std::vector<LogicAnalyzerChannelGroupUI *> getEnabledChannelGroups();
 	bool checkChannelInGroup(int);
 
 public Q_SLOTS:
@@ -341,6 +336,7 @@ private Q_SLOTS:
 	void hideInactive_clicked(bool hide);
 	void chmRangeChanged(int min, int max);
 	void colorChanged(QColor color);
+
 private:
 	bool hidden;
 	bool collapsed;
@@ -349,7 +345,7 @@ private:
 	bool streaming_mode;
 	pv::widgets::ColourButton *colour_button_edge, *colour_button_BG,
 		*colour_button_low, *colour_button_high;
-	QFrame* addSeparator(QVBoxLayout *lay, int pos);
+	QFrame *addSeparator(QVBoxLayout *lay, int pos);
 	void createColorButtons();
 	void showColorSettings(bool);
 	MouseWheelWidgetGuard *eventFilterGuard;
@@ -359,5 +355,5 @@ Q_SIGNALS:
 	void widthChanged(int);
 	void channels_changed();
 };
-}
+} // namespace adiscope
 #endif // LA_CHANNEL_MANAGER_HPP

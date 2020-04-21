@@ -22,18 +22,17 @@
 
 #include "coloredQWidget.hpp"
 
-#include <QFrame>
-#include <QMouseEvent>
 #include <QDragMoveEvent>
 #include <QDropEvent>
+#include <QFrame>
+#include <QMouseEvent>
 
 namespace Ui {
 class BaseMenuItem;
 }
 
 namespace adiscope {
-class BaseMenuItem : public ColoredQWidget
-{
+class BaseMenuItem : public ColoredQWidget {
 	Q_OBJECT
 
 public:
@@ -72,12 +71,11 @@ protected:
 	void leaveEvent(QEvent *event);
 
 private:
-
 	void _enableBotSeparator(bool enable);
 	void _enableTopSeparator(bool enable);
 
 private:
-        Ui::BaseMenuItem *d_ui;
+	Ui::BaseMenuItem *d_ui;
 
 	int d_position;
 
@@ -89,6 +87,6 @@ private:
 	QWidget *d_dragWidget;
 	bool d_allowDrag;
 };
-}
+} // namespace adiscope
 
 #endif // BASEMENUITEM_H

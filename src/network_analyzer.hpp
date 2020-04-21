@@ -20,48 +20,47 @@
 #ifndef SCOPY_NETWORK_ANALYZER_HPP
 #define SCOPY_NETWORK_ANALYZER_HPP
 
-#include "spinbox_a.hpp"
+#include "TimeDomainDisplayPlot.h"
+#include "adc_sample_conv.hpp"
 #include "apiObject.hpp"
-#include "iio_manager.hpp"
-#include "signal_sample.hpp"
-#include "tool.hpp"
+#include "cancel_dc_offset_block.h"
+#include "customPushButton.hpp"
 #include "dbgraph.hpp"
 #include "handles_area.hpp"
-#include <QtConcurrentRun>
-#include "customPushButton.hpp"
+#include "iio_manager.hpp"
+#include "networkanalyzerbufferviewer.h"
+#include "oscilloscope.hpp"
 #include "scroll_filter.hpp"
-#include <gnuradio/top_block.h>
-#include <gnuradio/blocks/head.h>
-#include <gnuradio/blocks/vector_sink_s.h>
+#include "signal_sample.hpp"
+#include "spinbox_a.hpp"
+#include "startstoprangewidget.h"
+#include "tool.hpp"
+
 #include <gnuradio/analog/sig_source_f.h>
-#include <gnuradio/blocks/float_to_short.h>
-#include <gnuradio/fft/goertzel_fc.h>
-#include <gnuradio/blocks/vector_source_f.h>
-#include <gnuradio/blocks/vector_sink_f.h>
-#include <gnuradio/blocks/multiply_cc.h>
-#include <gnuradio/blocks/multiply_conjugate_cc.h>
 #include <gnuradio/blocks/complex_to_arg.h>
 #include <gnuradio/blocks/complex_to_mag_squared.h>
-#include <gnuradio/filter/dc_blocker_ff.h>
+#include <gnuradio/blocks/float_to_short.h>
+#include <gnuradio/blocks/head.h>
 #include <gnuradio/blocks/moving_average_cc.h>
 #include <gnuradio/blocks/moving_average_ff.h>
+#include <gnuradio/blocks/multiply_cc.h>
+#include <gnuradio/blocks/multiply_conjugate_cc.h>
 #include <gnuradio/blocks/skiphead.h>
-#include "cancel_dc_offset_block.h"
+#include <gnuradio/blocks/vector_sink_f.h>
+#include <gnuradio/blocks/vector_sink_s.h>
+#include <gnuradio/blocks/vector_source_f.h>
 #include <gnuradio/blocks/vector_source_s.h>
+#include <gnuradio/fft/goertzel_fc.h>
+#include <gnuradio/filter/dc_blocker_ff.h>
+#include <gnuradio/top_block.h>
 
-#include "oscilloscope.hpp"
-
-#include "TimeDomainDisplayPlot.h"
-
-#include "networkanalyzerbufferviewer.h"
-#include "startstoprangewidget.h"
-#include "adc_sample_conv.hpp"
+#include <QtConcurrentRun>
 
 extern "C" {
-	struct iio_buffer;
-	struct iio_channel;
-	struct iio_context;
-	struct iio_device;
+struct iio_buffer;
+struct iio_channel;
+struct iio_context;
+struct iio_device;
 }
 
 namespace Ui {
@@ -77,8 +76,7 @@ class Filter;
 class GenericAdc;
 class GenericDac;
 
-class NetworkAnalyzer : public Tool
-{
+class NetworkAnalyzer : public Tool {
 	friend class NetworkAnalyzer_API;
 	friend class ToolLauncher_API;
 
@@ -86,7 +84,7 @@ class NetworkAnalyzer : public Tool
 
 public:
 	explicit NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
-				 std::shared_ptr<GenericAdc>& adc_dev,
+				 std::shared_ptr<GenericAdc> &adc_dev,
 				 QList<std::shared_ptr<GenericDac>> dacs,
 				 ToolMenuItem *toolMenuItem, QJSEngine *engine,
 				 ToolLauncher *parent);
@@ -119,16 +117,13 @@ private:
 	bool wasChecked;
 
 	typedef struct NetworkAnalyzerIteration {
-		NetworkAnalyzerIteration():
-			frequency(0),
-			rate(0),
-			bufferSize(0) {}
-		NetworkAnalyzerIteration(double frequency,
-					 size_t rate,
-					 size_t bufferSize):
-			frequency(frequency),
-			rate(rate),
-			bufferSize(bufferSize) {}
+		NetworkAnalyzerIteration()
+			: frequency(0), rate(0), bufferSize(0) {}
+		NetworkAnalyzerIteration(double frequency, size_t rate,
+					 size_t bufferSize)
+			: frequency(frequency)
+			, rate(rate)
+			, bufferSize(bufferSize) {}
 
 		double frequency;
 		size_t rate;
@@ -138,14 +133,14 @@ private:
 	typedef struct NetworkAnalyzerIterationStats {
 		NetworkAnalyzerIterationStats(double dcVoltage,
 					      M2kAdc::GainMode gain,
-					      bool hasError):
-			dcVoltage(dcVoltage),
-			gain(gain),
-			hasError(hasError) {}
-		NetworkAnalyzerIterationStats():
-			dcVoltage(0),
-			gain(M2kAdc::LOW_GAIN_MODE),
-			hasError(false) {}
+					      bool hasError)
+			: dcVoltage(dcVoltage)
+			, gain(gain)
+			, hasError(hasError) {}
+		NetworkAnalyzerIterationStats()
+			: dcVoltage(0)
+			, gain(M2kAdc::LOW_GAIN_MODE)
+			, hasError(false) {}
 
 		double dcVoltage;
 		M2kAdc::GainMode gain;
@@ -218,7 +213,8 @@ private:
 	PositionSpinButton *pushDelay;
 	PositionSpinButton *captureDelay;
 
-	void setMinimumDistanceBetween(SpinBoxA *min, SpinBoxA *max, double distance);
+	void setMinimumDistanceBetween(SpinBoxA *min, SpinBoxA *max,
+				       double distance);
 
 	HorizHandlesArea *d_bottomHandlesArea;
 
@@ -236,40 +232,43 @@ private:
 
 	void goertzel();
 
-	struct iio_buffer *generateSinWave(
-		const struct iio_device *dev,
-		double frequency,
-		double amplitude,
-		double offset,
-		unsigned long rate,
-		size_t samples_count);
+	struct iio_buffer *generateSinWave(const struct iio_device *dev,
+					   double frequency, double amplitude,
+					   double offset, unsigned long rate,
+					   size_t samples_count);
 
 	void configHwForNetworkAnalyzing();
 
 	void triggerRightMenuToggle(CustomPushButton *btn, bool checked);
 	void toggleRightMenu(CustomPushButton *btn, bool checked);
 	void updateGainMode();
-	void computeCaptureParams(double frequency, size_t& buffer_size,
-				  size_t& adc_rate);
+	void computeCaptureParams(double frequency, size_t &buffer_size,
+				  size_t &adc_rate);
 
 	QPair<double, double> getPhaseInterval();
 	void computeIterations();
 
-	double autoUpdateGainMode(double magnitude, double magnitudeGain, float dcVoltage);
+	double autoUpdateGainMode(double magnitude, double magnitudeGain,
+				  float dcVoltage);
 
 	void _configureDacFlowgraph();
 
 	void _configureAdcFlowgraph(size_t bufferSize = 0);
-	unsigned long _getBestSampleRate(double frequency, const iio_device *dev);
-	size_t _getSamplesCount(double frequency, unsigned long rate, bool perfect = false);
+	unsigned long _getBestSampleRate(double frequency,
+					 const iio_device *dev);
+	size_t _getSamplesCount(double frequency, unsigned long rate,
+				bool perfect = false);
 	void computeFrequencyArray();
 
 	bool _checkMagForOverrange(double magnitude);
 private Q_SLOTS:
 	void startStop(bool start);
 	void updateNumSamples(bool force = false);
-	void plot(double frequency, double mag, double mag2, double phase, float dcVoltage);
-	void _saveChannelBuffers(double frequency, double sample_rate, std::vector<float> data1, std::vector<float> data2);
+	void plot(double frequency, double mag, double mag2, double phase,
+		  float dcVoltage);
+	void _saveChannelBuffers(double frequency, double sample_rate,
+				 std::vector<float> data1,
+				 std::vector<float> data2);
 
 	void toggleCursors(bool en);
 	void onVbar1PixelPosChanged(int pos);

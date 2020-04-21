@@ -27,8 +27,7 @@ class RunSingleWidget;
 }
 
 namespace adiscope {
-class RunSingleWidget : public QWidget
-{
+class RunSingleWidget : public QWidget {
 	Q_OBJECT
 
 public:
@@ -55,6 +54,6 @@ private:
 	Ui::RunSingleWidget *d_ui;
 	bool d_singleButtonEnabled;
 };
-}
+} // namespace adiscope
 
 #endif // RUNSINGLEWIDGET_H

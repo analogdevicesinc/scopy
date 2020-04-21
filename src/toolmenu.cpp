@@ -23,51 +23,54 @@
 
 using namespace adiscope;
 
-const QStringList ToolMenu::d_availableTools = QStringList() << "Oscilloscope" << "Spectrum Analyzer"
-							     << "Network Analyzer" << "Signal Generator"
-							     << "Logic Analyzer" << "Pattern Generator"
-							     << "Digital IO" << "Voltmeter"
-							     << "Power Supply" << "Debugger" << "Calibration";
+const QStringList ToolMenu::d_availableTools = QStringList()
+	<< "Oscilloscope"
+	<< "Spectrum Analyzer"
+	<< "Network Analyzer"
+	<< "Signal Generator"
+	<< "Logic Analyzer"
+	<< "Pattern Generator"
+	<< "Digital IO"
+	<< "Voltmeter"
+	<< "Power Supply"
+	<< "Debugger"
+	<< "Calibration";
 
-const QStringList ToolMenu::d_availableIcons = QStringList() << ":/menu/oscilloscope.png"
-							     << ":/menu/spectrum_analyzer.png"
-							     << ":/menu/network_analyzer.png"
-							     << ":/menu/signal_generator.png"
-							     << ":/menu/logic_analyzer.png"
-							     << ":/menu/pattern_generator.png"
-							     << ":/menu/io.png"
-							     << ":/menu/voltmeter.png"
-							     << ":/menu/power_supply.png"
-							     << ":/menu/debugger.png"
-							     << ":/menu/calibration.png";
+const QStringList ToolMenu::d_availableIcons = QStringList()
+	<< ":/menu/oscilloscope.png"
+	<< ":/menu/spectrum_analyzer.png"
+	<< ":/menu/network_analyzer.png"
+	<< ":/menu/signal_generator.png"
+	<< ":/menu/logic_analyzer.png"
+	<< ":/menu/pattern_generator.png"
+	<< ":/menu/io.png"
+	<< ":/menu/voltmeter.png"
+	<< ":/menu/power_supply.png"
+	<< ":/menu/debugger.png"
+	<< ":/menu/calibration.png";
 
-ToolMenu::ToolMenu(Preferences *preferences, QWidget *parent):
-	BaseMenu(parent),
-	d_current_hw_name(""),
-	d_buttonGroup(nullptr),
-	d_preferences(preferences)
-{
+ToolMenu::ToolMenu(Preferences *preferences, QWidget *parent)
+	: BaseMenu(parent)
+	, d_current_hw_name("")
+	, d_buttonGroup(nullptr)
+	, d_preferences(preferences) {
 	_loadState();
 
 	d_buttonGroup = new QButtonGroup(this);
 	_buildAllAvailableTools();
 
-	connect(this, &ToolMenu::itemMovedFromTo,
-		this, &ToolMenu::_updateToolList);
+	connect(this, &ToolMenu::itemMovedFromTo, this,
+		&ToolMenu::_updateToolList);
 
-	connect(preferences, &Preferences::notify,
-		this, &ToolMenu::_readPreferences);
+	connect(preferences, &Preferences::notify, this,
+		&ToolMenu::_readPreferences);
 
 	_readPreferences();
 }
 
-ToolMenu::~ToolMenu()
-{
-	_saveState();
-}
+ToolMenu::~ToolMenu() { _saveState(); }
 
-void ToolMenu::loadToolsFromFilter(Filter *filter)
-{
+void ToolMenu::loadToolsFromFilter(Filter *filter) {
 
 	if (!filter) {
 		for (int i = 0; i < d_tools.size(); ++i) {
@@ -102,23 +105,18 @@ void ToolMenu::loadToolsFromFilter(Filter *filter)
 	}
 }
 
-ToolMenuItem *ToolMenu::getToolMenuItemFor(enum tool tool)
-{
+ToolMenuItem *ToolMenu::getToolMenuItemFor(enum tool tool) {
 	for (int i = 0; i < d_tools.size(); ++i) {
 		if (d_tools[i].second == tool) {
-			return static_cast<ToolMenuItem*>(d_tools[i].first);
+			return static_cast<ToolMenuItem *>(d_tools[i].first);
 		}
 	}
 	return nullptr;
 }
 
-QButtonGroup *ToolMenu::getButtonGroup()
-{
-	return d_buttonGroup;
-}
+QButtonGroup *ToolMenu::getButtonGroup() { return d_buttonGroup; }
 
-void ToolMenu::_updateToolList(short from, short to)
-{
+void ToolMenu::_updateToolList(short from, short to) {
 	if (d_items == d_tools.size()) {
 		auto toMove = d_tools[from];
 		d_tools.remove(from);
@@ -126,8 +124,7 @@ void ToolMenu::_updateToolList(short from, short to)
 	}
 }
 
-void ToolMenu::_buildAllAvailableTools()
-{
+void ToolMenu::_buildAllAvailableTools() {
 	if (d_positions.empty()) {
 		for (int i = 0; i < d_availableTools.size(); ++i) {
 			d_positions.push_back(i);
@@ -138,36 +135,38 @@ void ToolMenu::_buildAllAvailableTools()
 		}
 	}
 
-	for (int i = 0 ; i < d_availableTools.size(); ++i) {
-		ToolMenuItem *item = new ToolMenuItem(d_availableTools[d_positions[i]],
-						      d_availableIcons[d_positions[i]],
-						      this);
-		connect(item->getToolBtn(), &QPushButton::clicked, [=](){
+	for (int i = 0; i < d_availableTools.size(); ++i) {
+		ToolMenuItem *item = new ToolMenuItem(
+			d_availableTools[d_positions[i]],
+			d_availableIcons[d_positions[i]], this);
+		connect(item->getToolBtn(), &QPushButton::clicked, [=]() {
 			if (item->isDetached()) {
 				item->detach();
 			} else {
-				Q_EMIT toolSelected(static_cast<tool>(d_positions[i]));
+				Q_EMIT toolSelected(
+					static_cast<tool>(d_positions[i]));
 			}
 		});
-		connect(item, &ToolMenuItem::toggleButtonGroup, [=](bool detached) {
-			if (detached) {
-				d_buttonGroup->removeButton(item->getToolBtn());
-			} else {
-				d_buttonGroup->addButton(item->getToolBtn());
-			}
-		});
-		connect(item, &ToolMenuItem::enableInfoWidget,
-			this, &ToolMenu::enableInfoWidget);
+		connect(item, &ToolMenuItem::toggleButtonGroup,
+			[=](bool detached) {
+				if (detached) {
+					d_buttonGroup->removeButton(
+						item->getToolBtn());
+				} else {
+					d_buttonGroup->addButton(
+						item->getToolBtn());
+				}
+			});
+		connect(item, &ToolMenuItem::enableInfoWidget, this,
+			&ToolMenu::enableInfoWidget);
 		d_buttonGroup->addButton(item->getToolBtn());
-		d_tools.push_back(QPair<BaseMenuItem*, tool>(item,
-							     static_cast<tool>(d_positions[i])));
+		d_tools.push_back(QPair<BaseMenuItem *, tool>(
+			item, static_cast<tool>(d_positions[i])));
 		d_tools[i].first->setVisible(false);
-
 	}
 }
 
-void ToolMenu::_saveState()
-{
+void ToolMenu::_saveState() {
 	QSettings settings;
 
 	settings.beginWriteArray("toolMenu/pos");
@@ -178,8 +177,7 @@ void ToolMenu::_saveState()
 	settings.endArray();
 }
 
-void ToolMenu::_loadState()
-{
+void ToolMenu::_loadState() {
 	QSettings settings;
 
 	int n = settings.beginReadArray("toolMenu/pos");
@@ -190,10 +188,11 @@ void ToolMenu::_loadState()
 	settings.endArray();
 }
 
-void ToolMenu::_readPreferences()
-{
+void ToolMenu::_readPreferences() {
 	for (int i = 0; i < d_tools.size(); ++i) {
-		ToolMenuItem *item = static_cast<ToolMenuItem *>(d_tools[i].first);
-		item->enableDoubleClickToDetach(d_preferences->getDouble_click_to_detach());
+		ToolMenuItem *item =
+			static_cast<ToolMenuItem *>(d_tools[i].first);
+		item->enableDoubleClickToDetach(
+			d_preferences->getDouble_click_to_detach());
 	}
 }

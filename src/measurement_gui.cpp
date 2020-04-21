@@ -1,4 +1,5 @@
 #include "measurement_gui.h"
+
 #include "measure.h"
 
 #include <QLabel>
@@ -8,31 +9,20 @@ using namespace adiscope;
 /*
  * Class MeasurementGui implementation
  */
-MeasurementGui::MeasurementGui():
-	m_name(""),
-	m_value(""),
-	m_nameLabel(NULL),
-	m_valueLabel(NULL),
-	m_minValLableWidth(0)
-{
-}
+MeasurementGui::MeasurementGui()
+	: m_name("")
+	, m_value("")
+	, m_nameLabel(NULL)
+	, m_valueLabel(NULL)
+	, m_minValLableWidth(0) {}
 
-MeasurementGui::~MeasurementGui()
-{
-}
+MeasurementGui::~MeasurementGui() {}
 
-QString MeasurementGui::name() const
-{
-	return m_name;
-}
+QString MeasurementGui::name() const { return m_name; }
 
-QString MeasurementGui::value() const
-{
-	return m_value;
-}
+QString MeasurementGui::value() const { return m_value; }
 
-void MeasurementGui::setLabelsColor(const QColor& color)
-{
+void MeasurementGui::setLabelsColor(const QColor &color) {
 	QString stylesheet = QString("color: %1;").arg(color.name());
 	if (m_nameLabel)
 		m_nameLabel->setStyleSheet(stylesheet);
@@ -40,24 +30,18 @@ void MeasurementGui::setLabelsColor(const QColor& color)
 		m_valueLabel->setStyleSheet(stylesheet);
 }
 
-void MeasurementGui::init(QLabel *name, QLabel *value)
-{
+void MeasurementGui::init(QLabel *name, QLabel *value) {
 	m_nameLabel = name;
 	m_valueLabel = value;
 }
-
 
 /*
  * Class MetricMeasurementGui implementation
  */
 
- MetricMeasurementGui::MetricMeasurementGui():
-		MeasurementGui()
-{
-}
+MetricMeasurementGui::MetricMeasurementGui() : MeasurementGui() {}
 
-void MetricMeasurementGui::init(QLabel *name, QLabel *value)
-{
+void MetricMeasurementGui::init(QLabel *name, QLabel *value) {
 	// Get the necessary label width so that the label will never resize
 	QLabel *label = new QLabel(value);
 	label->setText("-999.999 KHz");
@@ -68,8 +52,8 @@ void MetricMeasurementGui::init(QLabel *name, QLabel *value)
 	MeasurementGui::init(name, value);
 }
 
-void MetricMeasurementGui::update(const MeasurementData& data, double displayScale)
-{
+void MetricMeasurementGui::update(const MeasurementData &data,
+				  double displayScale) {
 	m_name = data.name() + ":";
 	if (data.measured() && data.enabled()) {
 		double value = data.value();
@@ -77,8 +61,7 @@ void MetricMeasurementGui::update(const MeasurementData& data, double displaySca
 			value *= displayScale;
 		}
 		m_value = m_formatter.format(value, data.unit(), 3);
-	}
-	else
+	} else
 		m_value = "--";
 
 	m_nameLabel->setText(m_name);
@@ -89,13 +72,9 @@ void MetricMeasurementGui::update(const MeasurementData& data, double displaySca
  * Class TimeMeasurementGui implementation
  */
 
- TimeMeasurementGui::TimeMeasurementGui():
-		MeasurementGui()
-{
-}
+TimeMeasurementGui::TimeMeasurementGui() : MeasurementGui() {}
 
-void TimeMeasurementGui::init(QLabel *name, QLabel *value)
-{
+void TimeMeasurementGui::init(QLabel *name, QLabel *value) {
 	// Get the necessary label width so that the label will never resize
 	QLabel *label = new QLabel(value);
 	label->setText("-999.999 ms");
@@ -106,8 +85,8 @@ void TimeMeasurementGui::init(QLabel *name, QLabel *value)
 	MeasurementGui::init(name, value);
 }
 
-void TimeMeasurementGui::update(const MeasurementData& data, double displayScale)
-{
+void TimeMeasurementGui::update(const MeasurementData &data,
+				double displayScale) {
 	m_name = data.name() + ":";
 
 	if (data.measured() && data.enabled()) {
@@ -127,13 +106,9 @@ void TimeMeasurementGui::update(const MeasurementData& data, double displayScale
  * Class PercentageMeasurementGui implementation
  */
 
- PercentageMeasurementGui::PercentageMeasurementGui():
-		MeasurementGui()
-{
-}
+PercentageMeasurementGui::PercentageMeasurementGui() : MeasurementGui() {}
 
-void PercentageMeasurementGui::init(QLabel *name, QLabel *value)
-{
+void PercentageMeasurementGui::init(QLabel *name, QLabel *value) {
 	// Get the necessary label width so that the label will never resize
 	QLabel *label = new QLabel(value);
 	label->setText("100.00 %");
@@ -144,8 +119,8 @@ void PercentageMeasurementGui::init(QLabel *name, QLabel *value)
 	MeasurementGui::init(name, value);
 }
 
-void PercentageMeasurementGui::update(const MeasurementData& data, double displayScale)
-{
+void PercentageMeasurementGui::update(const MeasurementData &data,
+				      double displayScale) {
 	m_name = data.name() + ":";
 
 	if (data.measured() && data.enabled()) {
@@ -167,13 +142,10 @@ void PercentageMeasurementGui::update(const MeasurementData& data, double displa
  * Class DimensionlessMeasurementGui implementation
  */
 
- DimensionlessMeasurementGui::DimensionlessMeasurementGui():
-		MeasurementGui()
-{
-}
+DimensionlessMeasurementGui::DimensionlessMeasurementGui() : MeasurementGui() {}
 
-void DimensionlessMeasurementGui::update(const MeasurementData& data, double displayScale)
-{
+void DimensionlessMeasurementGui::update(const MeasurementData &data,
+					 double displayScale) {
 	m_name = data.name() + ":";
 
 	if (data.measured() && data.enabled()) {

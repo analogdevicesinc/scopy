@@ -18,21 +18,21 @@
  */
 
 #include "dbgraph.hpp"
+
 #include "DisplayPlot.h"
 #include "osc_scale_engine.h"
-#include "x_axis_scale_zoomer.h"
 #include "plotpickerwrapper.h"
+#include "x_axis_scale_zoomer.h"
 
 #include <qwt_plot_layout.h>
 
 using namespace adiscope;
 
-void dBgraph::setupCursors()
-{
+void dBgraph::setupCursors() {
 	d_symbolCtrl = new SymbolController(this);
 
-	d_vBar1 = new VertBar(this,true);
-	d_vBar2 = new VertBar(this,true);
+	d_vBar1 = new VertBar(this, true);
+	d_vBar2 = new VertBar(this, true);
 	d_plotBar = new VertBar(this, true);
 	d_frequencyBar = new VertBar(this, true);
 	d_symbolCtrl->attachSymbol(d_vBar1);
@@ -40,9 +40,10 @@ void dBgraph::setupCursors()
 	d_symbolCtrl->attachSymbol(d_plotBar);
 	d_symbolCtrl->attachSymbol(d_frequencyBar);
 
-	QPen cursorsLinePen = QPen(QColor(155,155,155),1,Qt::DashLine);
+	QPen cursorsLinePen = QPen(QColor(155, 155, 155), 1, Qt::DashLine);
 	QPen plotLinePen = QPen(QColor(211, 211, 211, 50), 5, Qt::SolidLine);
-	QPen frequencyLinePen = QPen(QColor(74, 100, 255, 150), 2, Qt::DashLine);
+	QPen frequencyLinePen =
+		QPen(QColor(74, 100, 255, 150), 2, Qt::DashLine);
 
 	d_vBar1->setPen(cursorsLinePen);
 	d_vBar2->setPen(cursorsLinePen);
@@ -68,23 +69,23 @@ void dBgraph::setupCursors()
 	connect(d_vBar2, SIGNAL(pixelPositionChanged(int)),
 		SLOT(onCursor2Moved(int)));
 
-	connect(d_frequencyBar, &VertBar::pixelPositionChanged,
-		this, &dBgraph::frequencyBarPositionChanged);
+	connect(d_frequencyBar, &VertBar::pixelPositionChanged, this,
+		&dBgraph::frequencyBarPositionChanged);
 }
 
-void dBgraph::parametersOverrange(bool enable)
-{
+void dBgraph::parametersOverrange(bool enable) {
 	if (enable) {
-		d_plotBar->setPen(QPen(QColor(250, 0, 0, 50), 5, Qt::SolidLine));
+		d_plotBar->setPen(
+			QPen(QColor(250, 0, 0, 50), 5, Qt::SolidLine));
 	} else {
-		d_plotBar->setPen(QPen(QColor(211, 211, 211, 50), 5, Qt::SolidLine));
+		d_plotBar->setPen(
+			QPen(QColor(211, 211, 211, 50), 5, Qt::SolidLine));
 	}
 }
 
-void dBgraph::setupReadouts()
-{
+void dBgraph::setupReadouts() {
 	d_cursorReadouts = new CursorReadouts(this);
-	d_cursorReadouts->setAxis(QwtPlot::xTop,QwtPlot::yLeft);
+	d_cursorReadouts->setAxis(QwtPlot::xTop, QwtPlot::yLeft);
 	d_cursorReadouts->setTopLeftStartingPoint(QPoint(8, 8));
 	d_cursorReadouts->moveToPosition(CustomPlotPositionButton::topLeft);
 
@@ -102,20 +103,20 @@ void dBgraph::setupReadouts()
 	d_cursorReadouts->setTransparency(0);
 }
 
-dBgraph::dBgraph(QWidget *parent) : QwtPlot(parent),
-	curve("data"),
-	reference("reference"),
-	d_cursorsCentered(false),
-	d_cursorsEnabled(false),
-	xmin(10),
-	xmax(10),
-	ymin(10),
-	ymax(10),
-	d_plotPosition(0),
-	numSamples(0),
-	delta_label(false),
-	d_plotBarEnabled(true)
-{
+dBgraph::dBgraph(QWidget *parent)
+	: QwtPlot(parent)
+	, curve("data")
+	, reference("reference")
+	, d_cursorsCentered(false)
+	, d_cursorsEnabled(false)
+	, xmin(10)
+	, xmax(10)
+	, ymin(10)
+	, ymax(10)
+	, d_plotPosition(0)
+	, numSamples(0)
+	, delta_label(false)
+	, d_plotBarEnabled(true) {
 	enableAxis(QwtPlot::xBottom, false);
 	enableAxis(QwtPlot::xTop, true);
 
@@ -190,15 +191,15 @@ dBgraph::dBgraph(QWidget *parent) : QwtPlot(parent),
 	}
 
 	zoomer = new XAxisScaleZoomer(canvas());
-	zoomer->setMousePattern(QwtEventPattern::MouseSelect3,
-				Qt::RightButton);
-	zoomer->setMousePattern(QwtEventPattern::MouseSelect2,
-				Qt::RightButton, Qt::ControlModifier);
+	zoomer->setMousePattern(QwtEventPattern::MouseSelect3, Qt::RightButton);
+	zoomer->setMousePattern(QwtEventPattern::MouseSelect2, Qt::RightButton,
+				Qt::ControlModifier);
 
 	static_cast<QFrame *>(canvas())->setLineWidth(0);
 	setContentsMargins(10, 10, 24, 20);
 
-	picker = new PlotPickerWrapper(QwtPlot::xTop,QwtPlot::yLeft,this->canvas());
+	picker = new PlotPickerWrapper(QwtPlot::xTop, QwtPlot::yLeft,
+				       this->canvas());
 
 	QMargins margins = contentsMargins();
 	margins.setBottom(0);
@@ -211,13 +212,13 @@ dBgraph::dBgraph(QWidget *parent) : QwtPlot(parent),
 	markerIntersection1 = new QwtPlotMarker();
 	markerIntersection2 = new QwtPlotMarker();
 	markerIntersection1->setSymbol(new QwtSymbol(
-					       QwtSymbol::Ellipse, QColor(237, 28, 36),
-					       QPen(QColor(255, 255,255, 140), 2, Qt::SolidLine),
-					       QSize(5, 5)));
+		QwtSymbol::Ellipse, QColor(237, 28, 36),
+		QPen(QColor(255, 255, 255, 140), 2, Qt::SolidLine),
+		QSize(5, 5)));
 	markerIntersection2->setSymbol(new QwtSymbol(
-					       QwtSymbol::Ellipse, QColor(237, 28, 36),
-					       QPen(QColor(255, 255,255, 140), 2, Qt::SolidLine),
-					       QSize(5, 5)));
+		QwtSymbol::Ellipse, QColor(237, 28, 36),
+		QPen(QColor(255, 255, 255, 140), 2, Qt::SolidLine),
+		QSize(5, 5)));
 
 	markerIntersection1->setAxes(QwtPlot::xTop, QwtPlot::yLeft);
 	markerIntersection2->setAxes(QwtPlot::xTop, QwtPlot::yLeft);
@@ -225,11 +226,9 @@ dBgraph::dBgraph(QWidget *parent) : QwtPlot(parent),
 	setupCursors();
 
 	setupReadouts();
-
 }
 
-dBgraph::~dBgraph()
-{
+dBgraph::~dBgraph() {
 	markerIntersection1->detach();
 	markerIntersection2->detach();
 	canvas()->removeEventFilter(d_cursorReadouts);
@@ -240,14 +239,13 @@ dBgraph::~dBgraph()
 	delete picker;
 }
 
-void dBgraph::setAxesScales(double xmin, double xmax, double ymin, double ymax)
-{
+void dBgraph::setAxesScales(double xmin, double xmax, double ymin,
+			    double ymax) {
 	setAxisScale(QwtPlot::xTop, xmin, xmax);
 	setAxisScale(QwtPlot::yLeft, ymin, ymax);
 }
 
-void dBgraph::setAxesTitles(const QString& x, const QString& y)
-{
+void dBgraph::setAxesTitles(const QString &x, const QString &y) {
 	QwtText xTitle(x);
 	QwtText yTitle(y);
 
@@ -260,8 +258,7 @@ void dBgraph::setAxesTitles(const QString& x, const QString& y)
 	setAxisTitle(QwtPlot::yLeft, yTitle);
 }
 
-void dBgraph::plot(double x, double y)
-{
+void dBgraph::plot(double x, double y) {
 	if (!d_plotBar->isVisible() && !xdata.size()) {
 		if (d_plotBarEnabled) {
 			d_plotBar->setVisible(true);
@@ -296,34 +293,25 @@ void dBgraph::plot(double x, double y)
 	replot();
 }
 
-int dBgraph::getNumSamples() const
-{
-	return numSamples;
-}
+int dBgraph::getNumSamples() const { return numSamples; }
 
-QString dBgraph::getScaleValueFormat(double value, QwtAxisId scale) const
-{
-	auto *scaleDraw = static_cast<const OscScaleDraw *>(
-				  axisScaleDraw(scale));
+QString dBgraph::getScaleValueFormat(double value, QwtAxisId scale) const {
+	auto *scaleDraw =
+		static_cast<const OscScaleDraw *>(axisScaleDraw(scale));
 
-	return formatter->format(value,
-				 scaleDraw->getUnitType(),
+	return formatter->format(value, scaleDraw->getUnitType(),
 				 scaleDraw->getFloatPrecison());
 }
 
 QString dBgraph::getScaleValueFormat(double value, QwtAxisId scale,
-				     int precision) const
-{
-	auto *scaleDraw = static_cast<const OscScaleDraw *>(
-				  axisScaleDraw(scale));
+				     int precision) const {
+	auto *scaleDraw =
+		static_cast<const OscScaleDraw *>(axisScaleDraw(scale));
 
-	return formatter->format(value,
-				 scaleDraw->getUnitType(),
-				 precision);
+	return formatter->format(value, scaleDraw->getUnitType(), precision);
 }
 
-void dBgraph::setShowZero(bool en)
-{
+void dBgraph::setShowZero(bool en) {
 	OscScaleEngine *scaleLeft = new OscScaleEngine();
 	scaleLeft->setMajorTicksCount(7);
 	scaleLeft->showZero(en);
@@ -334,26 +322,23 @@ void dBgraph::setShowZero(bool en)
 	replot();
 }
 
-const QwtScaleWidget *dBgraph::getAxisWidget(QwtAxisId id)
-{
+const QwtScaleWidget *dBgraph::getAxisWidget(QwtAxisId id) {
 	return axisWidget(id);
 }
 
-void dBgraph::setNumSamples(int num)
-{
+void dBgraph::setNumSamples(int num) {
 	if (numSamples == num) {
 		return;
 	}
 
-	numSamples = (unsigned int) num;
+	numSamples = (unsigned int)num;
 
 	reset();
 
 	replot();
 }
 
-void dBgraph::reset()
-{
+void dBgraph::reset() {
 	xdata.clear();
 	ydata.clear();
 	markerIntersection1->detach();
@@ -361,42 +346,27 @@ void dBgraph::reset()
 	d_plotPosition = 0;
 }
 
-void dBgraph::setColor(const QColor& color)
-{
+void dBgraph::setColor(const QColor &color) {
 	this->color = color;
-	curve.setPen(QPen(color,thickness));
+	curve.setPen(QPen(color, thickness));
 }
 
-const QColor& dBgraph::getColor() const
-{
-	return this->color;
-}
+const QColor &dBgraph::getColor() const { return this->color; }
 
-void dBgraph::setThickness(int index)
-{
+void dBgraph::setThickness(int index) {
 	double thickness = 0.5 * (index + 1);
 	this->thickness = thickness;
-	curve.setPen(QPen(color,thickness));
+	curve.setPen(QPen(color, thickness));
 	replot();
 }
 
-double dBgraph::getThickness()
-{
-	return this->thickness;
-}
+double dBgraph::getThickness() { return this->thickness; }
 
-QString dBgraph::xTitle() const
-{
-	return axisTitle(QwtPlot::xTop).text();
-}
+QString dBgraph::xTitle() const { return axisTitle(QwtPlot::xTop).text(); }
 
-QString dBgraph::yTitle() const
-{
-	return axisTitle(QwtPlot::yLeft).text();
-}
+QString dBgraph::yTitle() const { return axisTitle(QwtPlot::yLeft).text(); }
 
-void dBgraph::setXTitle(const QString& title)
-{
+void dBgraph::setXTitle(const QString &title) {
 	QwtText xTitle(title);
 	QFont font = axisTitle(QwtPlot::xTop).font();
 	font.setWeight(QFont::Normal);
@@ -405,21 +375,20 @@ void dBgraph::setXTitle(const QString& title)
 	setAxisTitle(QwtPlot::xTop, xTitle);
 }
 
-void dBgraph::setYTitle(const QString& title)
-{
+void dBgraph::setYTitle(const QString &title) {
 	QwtText yTitle(title);
 	QFont font = axisTitle(QwtPlot::xTop).font();
 	font.setWeight(QFont::Normal);
 	yTitle.setFont(font);
 
 	setAxisTitle(QwtPlot::yLeft, yTitle);
-	d_cursorReadouts->setVoltageCursor1LabelText(title.mid(0,3)+"1= ");
-	d_cursorReadouts->setVoltageCursor2LabelText(title.mid(0,3)+"2= ");
-	d_cursorReadouts->setDeltaVoltageLabelText("Δ"+title.mid(0,3)+"= ");
+	d_cursorReadouts->setVoltageCursor1LabelText(title.mid(0, 3) + "1= ");
+	d_cursorReadouts->setVoltageCursor2LabelText(title.mid(0, 3) + "2= ");
+	d_cursorReadouts->setDeltaVoltageLabelText("Δ" + title.mid(0, 3) +
+						   "= ");
 }
 
-void dBgraph::setXMin(double val)
-{
+void dBgraph::setXMin(double val) {
 	zoomer->resetZoom();
 	setAxisScale(QwtPlot::xTop, val, xmax);
 	xmin = val;
@@ -429,8 +398,7 @@ void dBgraph::setXMin(double val)
 	replot();
 }
 
-void dBgraph::setXMax(double val)
-{
+void dBgraph::setXMax(double val) {
 	zoomer->resetZoom();
 	setAxisScale(QwtPlot::xTop, xmin, val);
 	xmax = val;
@@ -440,8 +408,7 @@ void dBgraph::setXMax(double val)
 	replot();
 }
 
-void dBgraph::setYMin(double val)
-{
+void dBgraph::setYMin(double val) {
 	setAxisScale(QwtPlot::yLeft, val, ymax);
 	ymin = val;
 	replot();
@@ -451,8 +418,7 @@ void dBgraph::setYMin(double val)
 	zoomer->setZoomBase(QRectF(xmin, ymin, width, height));
 }
 
-void dBgraph::setYMax(double val)
-{
+void dBgraph::setYMax(double val) {
 	setAxisScale(QwtPlot::yLeft, ymin, val);
 	ymax = val;
 	replot();
@@ -462,28 +428,15 @@ void dBgraph::setYMax(double val)
 	zoomer->setZoomBase(QRectF(xmin, ymin, width, height));
 }
 
-QString dBgraph::xUnit() const
-{
-	return draw_x->getUnitType();
-}
+QString dBgraph::xUnit() const { return draw_x->getUnitType(); }
 
-QString dBgraph::yUnit() const
-{
-	return draw_y->getUnitType();
-}
+QString dBgraph::yUnit() const { return draw_y->getUnitType(); }
 
-void dBgraph::setXUnit(const QString& unit)
-{
-	draw_x->setUnitType(unit);
-}
+void dBgraph::setXUnit(const QString &unit) { draw_x->setUnitType(unit); }
 
-void dBgraph::setYUnit(const QString& unit)
-{
-	draw_y->setUnitType(unit);
-}
+void dBgraph::setYUnit(const QString &unit) { draw_y->setUnitType(unit); }
 
-void dBgraph::useLogFreq(bool use_log_freq)
-{
+void dBgraph::useLogFreq(bool use_log_freq) {
 	if (use_log_freq) {
 		this->setAxisScaleEngine(QwtPlot::xTop, new QwtLogScaleEngine);
 	} else {
@@ -509,55 +462,50 @@ void dBgraph::useLogFreq(bool use_log_freq)
 	replot();
 }
 
-void dBgraph::useDeltaLabel(bool use_delta)
-{
+void dBgraph::useDeltaLabel(bool use_delta) {
 	if (delta_label != use_delta) {
 		delta_label = use_delta;
 
 		if (!log_freq) {
 			auto sw = axisWidget(QwtPlot::xTop);
-			auto *sd = dynamic_cast<OscScaleDraw *>(sw->scaleDraw());
+			auto *sd =
+				dynamic_cast<OscScaleDraw *>(sw->scaleDraw());
 			sd->enableDeltaLabel(use_delta);
 			sw->repaint();
 		}
 	}
 }
 
-void dBgraph::sweepDone()
-{
+void dBgraph::sweepDone() {
 	if (d_plotBarEnabled) {
 		d_plotBar->setVisible(false);
 	}
 }
 
-void dBgraph::onFrequencyCursorPositionChanged(int pos)
-{
+void dBgraph::onFrequencyCursorPositionChanged(int pos) {
 	d_frequencyBar->setPixelPosition(pos);
 
 	Q_EMIT frequencySelected(d_frequencyBar->plotCoord().x());
 }
 
-void dBgraph::onFrequencyBarMoved(double frequency)
-{
+void dBgraph::onFrequencyBarMoved(double frequency) {
 	auto oldY = d_frequencyBar->plotCoord().y();
 	d_frequencyBar->setPlotCoord(QPointF(frequency, oldY));
 }
 
-void dBgraph::addReferenceWaveform(QVector<double> xData, QVector<double> yData)
-{
+void dBgraph::addReferenceWaveform(QVector<double> xData,
+				   QVector<double> yData) {
 	reference.setSamples(xData, yData);
 	reference.attach(this);
 	replot();
 }
 
-void dBgraph::removeReferenceWaveform()
-{
+void dBgraph::removeReferenceWaveform() {
 	reference.detach();
 	replot();
 }
 
-bool dBgraph::addReferenceWaveformFromPlot()
-{
+bool dBgraph::addReferenceWaveformFromPlot() {
 	if (xdata.size() == 0 || ydata.size() == 0) {
 		return false;
 	}
@@ -567,38 +515,33 @@ bool dBgraph::addReferenceWaveformFromPlot()
 	return true;
 }
 
-void dBgraph::onCursor1PositionChanged(int pos)
-{
-	pos = std::min(pos,QwtPlot::canvas()->width()-1);
+void dBgraph::onCursor1PositionChanged(int pos) {
+	pos = std::min(pos, QwtPlot::canvas()->width() - 1);
 	d_vBar1->setPixelPosition(pos);
 	onCursor1Moved(pos);
 }
 
-void dBgraph::onCursor2PositionChanged(int pos)
-{
-	pos = std::min(pos,QwtPlot::canvas()->width()-1);
+void dBgraph::onCursor2PositionChanged(int pos) {
+	pos = std::min(pos, QwtPlot::canvas()->width() - 1);
 	d_vBar2->setPixelPosition(pos);
 	onCursor2Moved(pos);
 }
 
-void dBgraph::onVbar1PixelPosChanged(int pos)
-{
+void dBgraph::onVbar1PixelPosChanged(int pos) {
 	Q_EMIT VBar1PixelPosChanged(pos);
 }
 
-void dBgraph::onVbar2PixelPosChanged(int pos)
-{
+void dBgraph::onVbar2PixelPosChanged(int pos) {
 	Q_EMIT VBar2PixelPosChanged(pos);
 }
 
-void dBgraph::toggleCursors(bool en)
-{
+void dBgraph::toggleCursors(bool en) {
 	d_frequencyBar->setPixelPosition(0);
 	if (d_cursorsEnabled != en) {
 		if (!d_cursorsCentered) {
-			d_cursorsCentered=true;
-			d_vBar1->setPixelPosition(canvas()->width()/2-30);
-			d_vBar2->setPixelPosition(canvas()->width()/2+30);
+			d_cursorsCentered = true;
+			d_vBar1->setPixelPosition(canvas()->width() / 2 - 30);
+			d_vBar2->setPixelPosition(canvas()->width() / 2 + 30);
 		}
 
 		d_cursorsEnabled = en;
@@ -609,8 +552,10 @@ void dBgraph::toggleCursors(bool en)
 		d_cursorReadouts->setVoltageReadoutVisible(en);
 
 		if (en) {
-			onCursor1Moved(d_vBar1->transform(d_vBar1->plotCoord()).x());
-			onCursor2Moved(d_vBar2->transform(d_vBar2->plotCoord()).x());
+			onCursor1Moved(
+				d_vBar1->transform(d_vBar1->plotCoord()).x());
+			onCursor2Moved(
+				d_vBar2->transform(d_vBar2->plotCoord()).x());
 		} else {
 			markerIntersection1->detach();
 			markerIntersection2->detach();
@@ -620,24 +565,24 @@ void dBgraph::toggleCursors(bool en)
 }
 
 CustomPlotPositionButton::ReadoutsPosition
-dBgraph::getCursorReadoutCurrentPosition()
-{
+dBgraph::getCursorReadoutCurrentPosition() {
 	return d_cursorReadouts->getCurrentPosition();
 }
 
-void dBgraph::onCursor1Moved(int value)
-{
+void dBgraph::onCursor1Moved(int value) {
 	QString text;
 
-	auto point = picker->pointCoordinates(QPoint(value,0));
-	text = formatter->format(point.x(),"Hz",2);
+	auto point = picker->pointCoordinates(QPoint(value, 0));
+	text = formatter->format(point.x(), "Hz", 2);
 
 	d_cursorReadouts->setTimeCursor1Text(text);
 	text = cursorIntersection(point.x());
 	d_cursorReadouts->setVoltageCursor1Text(text);
 
-	double d1 = d_cursorReadouts->voltageCursor1Text().split(" ")[0].toDouble();
-	double d2 = d_cursorReadouts->voltageCursor2Text().split(" ")[0].toDouble();
+	double d1 =
+		d_cursorReadouts->voltageCursor1Text().split(" ")[0].toDouble();
+	double d2 =
+		d_cursorReadouts->voltageCursor2Text().split(" ")[0].toDouble();
 
 	if (text == "-") {
 		markerIntersection1->detach();
@@ -650,23 +595,24 @@ void dBgraph::onCursor1Moved(int value)
 
 	replot();
 
-	d_cursorReadouts->setVoltageDeltaText(QString::number(d2-d1)+" "+
+	d_cursorReadouts->setVoltageDeltaText(QString::number(d2 - d1) + " " +
 					      draw_y->getUnitType());
 }
 
-void dBgraph::onCursor2Moved(int value)
-{
+void dBgraph::onCursor2Moved(int value) {
 	QString text;
 
-	auto point = picker->pointCoordinates(QPoint(value,0));
-	text = formatter->format(point.x(),"Hz",2);
+	auto point = picker->pointCoordinates(QPoint(value, 0));
+	text = formatter->format(point.x(), "Hz", 2);
 
 	d_cursorReadouts->setTimeCursor2Text(text);
 	text = cursorIntersection(point.x());
 	d_cursorReadouts->setVoltageCursor2Text(text);
 
-	double d1 = d_cursorReadouts->voltageCursor1Text().split(" ")[0].toDouble();
-	double d2 = d_cursorReadouts->voltageCursor2Text().split(" ")[0].toDouble();
+	double d1 =
+		d_cursorReadouts->voltageCursor1Text().split(" ")[0].toDouble();
+	double d2 =
+		d_cursorReadouts->voltageCursor2Text().split(" ")[0].toDouble();
 
 	if (text == "-") {
 		markerIntersection2->detach();
@@ -679,23 +625,23 @@ void dBgraph::onCursor2Moved(int value)
 
 	replot();
 
-	d_cursorReadouts->setVoltageDeltaText(QString::number(d2-d1)+" "+
+	d_cursorReadouts->setVoltageDeltaText(QString::number(d2 - d1) + " " +
 					      draw_y->getUnitType());
 }
 
-QString dBgraph::cursorIntersection(qreal freq)
-{
-	if (xdata.size() == 0 || xdata.data()[xdata.size()-1] < freq) {
-		return QString("-");//for the case when there is no plot
+QString dBgraph::cursorIntersection(qreal freq) {
+	if (xdata.size() == 0 || xdata.data()[xdata.size() - 1] < freq) {
+		return QString("-"); // for the case when there is no plot
 	} else {
-		double leftFreq,rightFreq,leftCustom,rightCustom;
+		double leftFreq, rightFreq, leftCustom, rightCustom;
 		int rightIndex = -1;
 		int leftIndex = -1;
 
-		for (int i=1; i<xdata.size(); i++) {
-			if (xdata.data()[i-1] <= freq && freq <= xdata.data()[i]) {
-				leftIndex=i-1;
-				rightIndex=i;
+		for (int i = 1; i < xdata.size(); i++) {
+			if (xdata.data()[i - 1] <= freq &&
+			    freq <= xdata.data()[i]) {
+				leftIndex = i - 1;
+				rightIndex = i;
 			}
 		}
 
@@ -715,26 +661,25 @@ QString dBgraph::cursorIntersection(qreal freq)
 		leftCustom = ydata.data()[leftIndex];
 		rightCustom = ydata.data()[rightIndex];
 
-		double val = (rightCustom - leftCustom)/(rightFreq - leftFreq)*
-			     (freq-leftFreq)+leftCustom;
+		double val = (rightCustom - leftCustom) /
+				(rightFreq - leftFreq) * (freq - leftFreq) +
+			leftCustom;
 
-		return QString::number(val,'f',2) +" "+ draw_y->getUnitType();
+		return QString::number(val, 'f', 2) + " " +
+			draw_y->getUnitType();
 	}
 }
 
-void dBgraph::setCursorReadoutsTransparency(int value)
-{
+void dBgraph::setCursorReadoutsTransparency(int value) {
 	d_cursorReadouts->setTransparency(value);
 }
 
-void dBgraph::moveCursorReadouts(CustomPlotPositionButton::ReadoutsPosition
-				 position)
-{
+void dBgraph::moveCursorReadouts(
+	CustomPlotPositionButton::ReadoutsPosition position) {
 	d_cursorReadouts->moveToPosition(position);
 }
 
-QVector<double> dBgraph::getXAxisData()
-{
+QVector<double> dBgraph::getXAxisData() {
 	QVector<double> data;
 
 	for (int i = 0; i < curve.data()->size(); ++i) {
@@ -744,8 +689,7 @@ QVector<double> dBgraph::getXAxisData()
 	return data;
 }
 
-QVector<double> dBgraph::getYAxisData()
-{
+QVector<double> dBgraph::getYAxisData() {
 	QVector<double> data;
 
 	for (int i = 0; i < curve.data()->size(); ++i) {
@@ -755,14 +699,12 @@ QVector<double> dBgraph::getYAxisData()
 	return data;
 }
 
-void dBgraph::enableFrequencyBar(bool enable)
-{
+void dBgraph::enableFrequencyBar(bool enable) {
 	d_frequencyBar->setVisible(enable);
 	d_frequencyBar->setPixelPosition(0);
 }
 
-void dBgraph::setYAxisInterval(double min, double max, double correction)
-{
+void dBgraph::setYAxisInterval(double min, double max, double correction) {
 	for (size_t i = 0; i < ydata.size(); ++i) {
 		double value = ydata[i];
 		bool modified = false;
@@ -776,14 +718,14 @@ void dBgraph::setYAxisInterval(double min, double max, double correction)
 
 		if (modified) {
 			ydata[i] = value;
-			curve.setRawSamples(xdata.data(), ydata.data(), xdata.size());
+			curve.setRawSamples(xdata.data(), ydata.data(),
+					    xdata.size());
 			replot();
 		}
 	}
 }
 
-void dBgraph::scaleDivChanged()
-{
+void dBgraph::scaleDivChanged() {
 	QwtPlot *plt = static_cast<QwtPlot *>((sender())->parent());
 	QwtInterval intv = plt->axisInterval(QwtPlot::xTop);
 	this->setAxisScale(QwtPlot::xTop, intv.minValue(), intv.maxValue());
@@ -793,26 +735,18 @@ void dBgraph::scaleDivChanged()
 	onCursor2Moved(d_vBar2->transform(d_vBar2->plotCoord()).x());
 }
 
-void dBgraph::mousePressEvent(QMouseEvent *event)
-{
+void dBgraph::mousePressEvent(QMouseEvent *event) {
 	if (event->button() == Qt::RightButton) {
 		Q_EMIT resetZoom();
 	}
 }
 
-void dBgraph::onResetZoom()
-{
-	zoomer->resetZoom();
-}
+void dBgraph::onResetZoom() { zoomer->resetZoom(); }
 
-void dBgraph::showEvent(QShowEvent *event)
-{
+void dBgraph::showEvent(QShowEvent *event) {
 	auto sw = axisWidget(QwtPlot::xTop);
 	sw->scaleDraw()->invalidateCache();
 	sw->repaint();
 }
 
-void dBgraph::setPlotBarEnabled(bool enabled)
-{
-	d_plotBarEnabled = enabled;
-}
+void dBgraph::setPlotBarEnabled(bool enabled) { d_plotBarEnabled = enabled; }

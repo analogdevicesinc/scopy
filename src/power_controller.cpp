@@ -17,25 +17,27 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#include "dynamicWidget.hpp"
 #include "power_controller.hpp"
+
+#include "dynamicWidget.hpp"
 #include "filter.hpp"
+#include "power_controller_api.hpp"
 
 #include "ui_powercontrol.h"
 
 #include <iio.h>
-#include "power_controller_api.hpp"
 
-#define TIMER_TIMEOUT_MS	200
+#define TIMER_TIMEOUT_MS 200
 
 using namespace adiscope;
 
 PowerController::PowerController(struct iio_context *ctx,
-		ToolMenuItem *toolMenuItem, QJSEngine *engine,
-		ToolLauncher *parent) :
-	Tool(ctx, toolMenuItem, new PowerController_API(this), "Power Supply", parent),
-	ui(new Ui::PowerController), in_sync(false)
-{
+				 ToolMenuItem *toolMenuItem, QJSEngine *engine,
+				 ToolLauncher *parent)
+	: Tool(ctx, toolMenuItem, new PowerController_API(this), "Power Supply",
+	       parent)
+	, ui(new Ui::PowerController)
+	, in_sync(false) {
 	ui->setupUi(this);
 	struct iio_device *dev1 = iio_context_find_device(ctx, "ad5627");
 	struct iio_device *dev2 = iio_context_find_device(ctx, "ad9963");
@@ -49,7 +51,8 @@ PowerController::PowerController(struct iio_context *ctx,
 	this->ch1r = iio_device_find_channel(dev2, "voltage2", false);
 	this->ch2r = iio_device_find_channel(dev2, "voltage1", false);
 	this->pd_pos = iio_device_find_channel(dev3, "voltage2", true);
-	this->pd_neg = iio_device_find_channel(dev3, "voltage3", true); /* For HW Rev. >= C */
+	this->pd_neg = iio_device_find_channel(dev3, "voltage3",
+					       true); /* For HW Rev. >= C */
 
 	if (!ch1w || !ch2w || !ch1r || !ch2r || !pd_pos)
 		throw std::runtime_error("Unable to find channels\n");
@@ -74,7 +77,8 @@ PowerController::PowerController(struct iio_context *ctx,
 	/* Power down DACs by default */
 	iio_channel_attr_write_bool(pd_pos, "user_supply_powerdown", true);
 	if (pd_neg)
-		iio_channel_attr_write_bool(pd_neg, "user_supply_powerdown", true);
+		iio_channel_attr_write_bool(pd_neg, "user_supply_powerdown",
+					    true);
 	iio_channel_attr_write_bool(ch1w, "powerdown", true);
 	iio_channel_attr_write_bool(ch2w, "powerdown", true);
 
@@ -84,64 +88,62 @@ PowerController::PowerController(struct iio_context *ctx,
 
 	ui->btnSync->click();
 
-	valuePos = new PositionSpinButton({
-		{"mVolts",1e-3},
-		{"Volts",1e0}
-	}, "Value", 0, 5, true, true, this);
+	valuePos = new PositionSpinButton({{"mVolts", 1e-3}, {"Volts", 1e0}},
+					  "Value", 0, 5, true, true, this);
 
-	valueNeg = new PositionSpinButton({
-		{"mVolts",1e-3},
-		{"Volts",1e0}
-	}, "Value", -5, 0, true, true, this);
+	valueNeg = new PositionSpinButton({{"mVolts", 1e-3}, {"Volts", 1e0}},
+					  "Value", -5, 0, true, true, this);
 
 	ui->valuePosLayout->addWidget(valuePos);
 	ui->valueNegLayout->addWidget(valueNeg);
 
-	connect(valuePos, &PositionSpinButton::valueChanged,
-		ui->lcd1_set, &LcdNumber::display);
-	connect(valueNeg, &PositionSpinButton::valueChanged,
-		ui->lcd2_set, &LcdNumber::display);
+	connect(valuePos, &PositionSpinButton::valueChanged, ui->lcd1_set,
+		&LcdNumber::display);
+	connect(valueNeg, &PositionSpinButton::valueChanged, ui->lcd2_set,
+		&LcdNumber::display);
 
 	connect(&this->timer, SIGNAL(timeout()), this, SLOT(update_lcd()));
 
 	connect(ui->dac1, SIGNAL(toggled(bool)), this,
-			SLOT(dac1_set_enabled(bool)));
+		SLOT(dac1_set_enabled(bool)));
 	connect(ui->dac2, SIGNAL(toggled(bool)), this,
-			SLOT(dac2_set_enabled(bool)));
+		SLOT(dac2_set_enabled(bool)));
 	connect(ui->btnSync, SIGNAL(toggled(bool)), this,
-			SLOT(sync_enabled(bool)));
+		SLOT(sync_enabled(bool)));
 	connect(valuePos, SIGNAL(valueChanged(double)), this,
-			SLOT(dac1_set_value(double)));
+		SLOT(dac1_set_value(double)));
 	connect(valueNeg, SIGNAL(valueChanged(double)), this,
-			SLOT(dac2_set_value(double)));
+		SLOT(dac2_set_value(double)));
 	connect(ui->trackingRatio, SIGNAL(valueChanged(int)), this,
-			SLOT(ratioChanged(int)));
+		SLOT(ratioChanged(int)));
 
-	connect(runButton(), SIGNAL(clicked(bool)), this, SLOT(startStop(bool)));
+	connect(runButton(), SIGNAL(clicked(bool)), this,
+		SLOT(startStop(bool)));
 
 	valuePos->setValue(0);
 	valueNeg->setValue(0);
 
-	connect(ui->dac1, &QPushButton::toggled, this, &PowerController::toggleRunButton);
-	connect(ui->dac2, &QPushButton::toggled, this, &PowerController::toggleRunButton);
+	connect(ui->dac1, &QPushButton::toggled, this,
+		&PowerController::toggleRunButton);
+	connect(ui->dac2, &QPushButton::toggled, this,
+		&PowerController::toggleRunButton);
 
 	/*Load calibration parameters from iio context*/
 	const char *name;
 	const char *value;
 	for (int i = 4; i < 12; i++) {
 		if (!iio_context_get_attr(ctx, i, &name, &value))
-			calibrationParam[QString(name + 4)] = QString(value).toDouble();
+			calibrationParam[QString(name + 4)] =
+				QString(value).toDouble();
 	}
 
-	api->setObjectName(QString::fromStdString(Filter::tool_name(
-							  TOOL_POWER_CONTROLLER)));
+	api->setObjectName(QString::fromStdString(
+		Filter::tool_name(TOOL_POWER_CONTROLLER)));
 	api->load(*settings);
 	api->js_register(engine);
-
 }
 
-PowerController::~PowerController()
-{
+PowerController::~PowerController() {
 	ui->dac1->setChecked(false);
 	ui->dac2->setChecked(false);
 
@@ -150,7 +152,8 @@ PowerController::~PowerController()
 	iio_channel_attr_write_bool(ch2w, "powerdown", true);
 	iio_channel_attr_write_bool(pd_pos, "user_supply_powerdown", true);
 	if (pd_neg)
-		iio_channel_attr_write_bool(pd_neg, "user_supply_powerdown", true);
+		iio_channel_attr_write_bool(pd_neg, "user_supply_powerdown",
+					    true);
 
 	/* FIXME: TODO: Move this into a HW class / lib M2k */
 	struct iio_device *dev3 = iio_context_find_device(ctx, "m2k-fabric");
@@ -177,8 +180,7 @@ PowerController::~PowerController()
 	delete ui;
 }
 
-void PowerController::toggleRunButton(bool enabled)
-{
+void PowerController::toggleRunButton(bool enabled) {
 	bool dac1Enabled = ui->dac1->isChecked();
 	bool dac2Enabled = ui->dac2->isChecked();
 	if (enabled) {
@@ -188,24 +190,19 @@ void PowerController::toggleRunButton(bool enabled)
 	}
 }
 
-void PowerController::showEvent(QShowEvent *event)
-{
+void PowerController::showEvent(QShowEvent *event) {
 	timer.start(TIMER_TIMEOUT_MS);
 }
 
-void PowerController::hideEvent(QHideEvent *event)
-{
-	timer.stop();
-}
+void PowerController::hideEvent(QHideEvent *event) { timer.stop(); }
 
-void PowerController::dac1_set_value(double value)
-{
+void PowerController::dac1_set_value(double value) {
 	double offset = calibrationParam[QString("offset_pos_dac")];
 	double gain = calibrationParam[QString("gain_pos_dac")];
 
-	long long val = (value * gain + offset)  * 4095.0 / (5.02 * 1.2 ) ;
+	long long val = (value * gain + offset) * 4095.0 / (5.02 * 1.2);
 
-	if (val < 0 )
+	if (val < 0)
 		val = 0;
 
 	iio_channel_attr_write_longlong(ch1w, "raw", val);
@@ -219,22 +216,20 @@ void PowerController::dac1_set_value(double value)
 	}
 }
 
-void PowerController::dac2_set_value(double value)
-{
+void PowerController::dac2_set_value(double value) {
 	double offset = calibrationParam[QString("offset_neg_dac")];
 	double gain = calibrationParam[QString("gain_neg_dac")];
 
-	long long val = (value * gain + offset) * 4095.0 / (-5.1 * 1.2 );
+	long long val = (value * gain + offset) * 4095.0 / (-5.1 * 1.2);
 
-	if (val < 0 )
+	if (val < 0)
 		val = 0;
 
 	iio_channel_attr_write_longlong(ch2w, "raw", val);
 	averageVoltageCh2.clear();
 }
 
-void PowerController::dac1_set_enabled(bool enabled)
-{
+void PowerController::dac1_set_enabled(bool enabled) {
 	iio_channel_attr_write_bool(ch1w, "powerdown", !enabled);
 	averageVoltageCh1.clear();
 
@@ -242,38 +237,42 @@ void PowerController::dac1_set_enabled(bool enabled)
 		dac2_set_enabled(enabled);
 
 	if (pd_neg) { /* For HW Rev. >= C */
-		iio_channel_attr_write_bool(pd_pos, "user_supply_powerdown", !enabled);
+		iio_channel_attr_write_bool(pd_pos, "user_supply_powerdown",
+					    !enabled);
 	} else {
 		if (enabled) {
-			iio_channel_attr_write_bool(pd_pos, "user_supply_powerdown", false);
+			iio_channel_attr_write_bool(
+				pd_pos, "user_supply_powerdown", false);
 		} else if (!ui->dac2->isChecked()) {
-			iio_channel_attr_write_bool(pd_pos, "user_supply_powerdown", true);
+			iio_channel_attr_write_bool(
+				pd_pos, "user_supply_powerdown", true);
 		}
 	}
 
 	setDynamicProperty(ui->dac1, "running", enabled);
 }
 
-void PowerController::dac2_set_enabled(bool enabled)
-{
+void PowerController::dac2_set_enabled(bool enabled) {
 	iio_channel_attr_write_bool(ch2w, "powerdown", !enabled);
 	averageVoltageCh2.clear();
 
 	if (pd_neg) { /* For HW Rev. >= C */
-		iio_channel_attr_write_bool(pd_neg, "user_supply_powerdown", !enabled);
+		iio_channel_attr_write_bool(pd_neg, "user_supply_powerdown",
+					    !enabled);
 	} else {
 		if (enabled) {
-			iio_channel_attr_write_bool(pd_pos, "user_supply_powerdown", false);
+			iio_channel_attr_write_bool(
+				pd_pos, "user_supply_powerdown", false);
 		} else if (!ui->dac1->isChecked()) {
-			iio_channel_attr_write_bool(pd_pos, "user_supply_powerdown", true);
+			iio_channel_attr_write_bool(
+				pd_pos, "user_supply_powerdown", true);
 		}
 	}
 
 	setDynamicProperty(ui->dac2, "running", enabled);
 }
 
-void PowerController::sync_enabled(bool enabled)
-{
+void PowerController::sync_enabled(bool enabled) {
 	if (ui->dac1->isChecked()) {
 		dac2_set_enabled(!enabled);
 		ui->dac2->setChecked(!enabled);
@@ -282,17 +281,14 @@ void PowerController::sync_enabled(bool enabled)
 	in_sync = !enabled;
 	valueNeg->setDisabled(!enabled);
 	valueNeg->setValue(-valuePos->value() *
-			(double) ui->trackingRatio->value() / 100.0);
+			   (double)ui->trackingRatio->value() / 100.0);
 }
 
-void PowerController::ratioChanged(int percent)
-{
-	valueNeg->setValue(-valuePos->value() *
-			(double) percent / 100.0);
+void PowerController::ratioChanged(int percent) {
+	valueNeg->setValue(-valuePos->value() * (double)percent / 100.0);
 }
 
-void PowerController::update_lcd()
-{
+void PowerController::update_lcd() {
 	double offset1 = calibrationParam[QString("offset_pos_adc")];
 	double gain1 = calibrationParam[QString("gain_pos_adc")];
 	double offset2 = calibrationParam[QString("offset_neg_adc")];
@@ -307,9 +303,9 @@ void PowerController::update_lcd()
 	averageVoltageCh1.push_back(val1);
 	averageVoltageCh2.push_back(val2);
 
-	if(averageVoltageCh1.length() > AVERAGE_COUNT)
+	if (averageVoltageCh1.length() > AVERAGE_COUNT)
 		averageVoltageCh1.pop_front();
-	if(averageVoltageCh2.length() > AVERAGE_COUNT)
+	if (averageVoltageCh2.length() > AVERAGE_COUNT)
 		averageVoltageCh2.pop_front();
 
 	for (int i = 0; i < averageVoltageCh1.size(); ++i)
@@ -317,31 +313,25 @@ void PowerController::update_lcd()
 	for (int i = 0; i < averageVoltageCh2.size(); ++i)
 		average2 += averageVoltageCh2.at(i);
 
-	average1  /= averageVoltageCh1.length();
-	average2  /= averageVoltageCh2.length();
+	average1 /= averageVoltageCh1.length();
+	average2 /= averageVoltageCh2.length();
 
-	double value1 = (((double) average1 * 6.4 / 4095.0) + offset1) * gain1;
+	double value1 = (((double)average1 * 6.4 / 4095.0) + offset1) * gain1;
 	ui->lcd1->display(value1);
 	ui->scale_dac1->setValue(value1);
 
-	double value2 = (((double) average2 * (-6.4)  / 4095.0) + offset2) * gain2;
+	double value2 =
+		(((double)average2 * (-6.4) / 4095.0) + offset2) * gain2;
 	ui->lcd2->display(value2);
 	ui->scale_dac2->setValue(value2);
 
 	timer.start(TIMER_TIMEOUT_MS);
 }
 
-void PowerController::run()
-{
-	startStop(true);
-}
-void PowerController::stop()
-{
-	startStop(false);
-}
+void PowerController::run() { startStop(true); }
+void PowerController::stop() { startStop(false); }
 
-void PowerController::startStop(bool start)
-{
+void PowerController::startStop(bool start) {
 	dac1_set_enabled(start);
 	ui->dac1->setChecked(start);
 
@@ -349,4 +339,3 @@ void PowerController::startStop(bool start)
 	ui->dac2->setChecked(start);
 	m_running = start;
 }
-

@@ -1,44 +1,44 @@
 /*
-* Copyright 2016 Analog Devices, Inc.
-*
-* This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation; either version 3, or (at your option)
-* any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with GNU Radio; see the file LICENSE.  If not, write to
-* the Free Software Foundation, Inc., 51 Franklin Street,
-* Boston, MA 02110-1301, USA.
-*/
+ * Copyright 2016 Analog Devices, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with GNU Radio; see the file LICENSE.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street,
+ * Boston, MA 02110-1301, USA.
+ */
 
 #ifndef PATTERN_GENERATOR_H
 #define PATTERN_GENERATOR_H
 
-#include <QWidget>
-#include <QVector>
-#include <vector>
-#include <string>
-#include <QTimer>
-
 #include "apiObject.hpp"
-#include "pg_patterns.hpp"
-#include "pg_channel_manager.hpp"
 #include "pg_buffer_manager.hpp"
-#include "tool.hpp"
+#include "pg_channel_manager.hpp"
+#include "pg_patterns.hpp"
 #include "scroll_filter.hpp"
+#include "tool.hpp"
 
+#include <QTimer>
+#include <QVector>
+#include <QWidget>
+
+#include <string>
+#include <vector>
 
 extern "C" {
-	struct iio_context;
-	struct iio_device;
-	struct iio_channel;
-	struct iio_buffer;
+struct iio_context;
+struct iio_device;
+struct iio_channel;
+struct iio_buffer;
 }
 
 namespace pv {
@@ -53,7 +53,7 @@ class TracePalette;
 namespace widgets {
 class ColourButton;
 }
-}
+} // namespace pv
 
 namespace sigrok {
 class Context;
@@ -67,7 +67,7 @@ class PGSettings;
     class LFSRPatternUI;
     class ClockPatternUI;
     class GenericJSPatternUI;*/
-}
+} // namespace Ui
 
 class QJSEngine;
 class QPushButton;
@@ -80,8 +80,7 @@ class Filter;
 
 const uint32_t PGMaxSampleRate = 100000000;
 
-class PatternGenerator : public Tool
-{
+class PatternGenerator : public Tool {
 	friend class PatternGenerator_API;
 	friend class PatternGeneratorChannelGroup_API;
 	friend class PatternGeneratorChannel_API;
@@ -92,8 +91,9 @@ class PatternGenerator : public Tool
 public:
 	static const int channelGroupLabelMaxLength = 13;
 	explicit PatternGenerator(struct iio_context *ctx, Filter *filt,
-				  ToolMenuItem *toolMenuItem, QJSEngine *engine, DIOManager *diom,
-	                          ToolLauncher *parent, bool offline_mode_ = 0);
+				  ToolMenuItem *toolMenuItem, QJSEngine *engine,
+				  DIOManager *diom, ToolLauncher *parent,
+				  bool offline_mode_ = 0);
 	~PatternGenerator();
 	void updateCGSettings();
 	PatternUI *getCurrentPatternUI();
@@ -118,19 +118,17 @@ private Q_SLOTS:
 	void checkEnabledChannels();
 
 private:
-
 	// UI
 	static const char *channelNames[];
 	Ui::PatternGenerator *ui;
 	Ui::PGSettings *pgSettings;
 	Ui::PGCGSettings *cgSettings;
-	MouseWheelWidgetGuard* wheelEventGuard;
+	MouseWheelWidgetGuard *wheelEventGuard;
 
 	QButtonGroup *settings_group;
 
-	pv::widgets::ColourButton *colour_button_edge,
-	*colour_button_high, *colour_button_BG,
-	*colour_button_low;
+	pv::widgets::ColourButton *colour_button_edge, *colour_button_high,
+		*colour_button_BG, *colour_button_low;
 
 	typedef enum rightMenuState_t {
 		CLOSED,
@@ -148,7 +146,7 @@ private:
 	runState _pgStatus;
 	static QStringList strStatus;
 	QTimer *singleRunTimer;
-	//Q_PROPERTY(runState pgStatus READ pgStatus WRITE setPGStatus)
+	// Q_PROPERTY(runState pgStatus READ pgStatus WRITE setPGStatus)
 
 	void setPGStatus(runState _val);
 	runState pgStatus();
@@ -180,8 +178,8 @@ private:
 	static QStringList digital_trigger_conditions;
 	static QStringList possibleSampleRates;
 
-	//QList<PatternGeneratorChannelGroup_API*> getChgApi();
-	//void setChgApi();
+	// QList<PatternGeneratorChannelGroup_API*> getChgApi();
+	// void setChgApi();
 
 	QString toString();
 	QJsonValue chmToJson();
@@ -218,6 +216,4 @@ Q_SIGNALS:
 };
 } /* namespace adiscope */
 
-
 #endif // LOGIC_ANALYZER_H
-

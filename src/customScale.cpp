@@ -23,9 +23,7 @@
 
 using namespace adiscope;
 
-CustomScale::CustomScale(QWidget *parent) :
-	QwtThermo(parent)
-{
+CustomScale::CustomScale(QWidget *parent) : QwtThermo(parent) {
 	QVector<QwtScaleDiv> divs;
 
 	divs.push_back(scaleEngine()->divideScale(-0.1, +0.1, 5, 5));
@@ -35,32 +33,19 @@ CustomScale::CustomScale(QWidget *parent) :
 
 	scaler = new AutoScaler(this, divs);
 
-	connect(scaler, SIGNAL(updateScale(const QwtScaleDiv)),
-			this, SLOT(updateScale(const QwtScaleDiv)));
+	connect(scaler, SIGNAL(updateScale(const QwtScaleDiv)), this,
+		SLOT(updateScale(const QwtScaleDiv)));
 }
 
-CustomScale::~CustomScale()
-{
-	delete scaler;
-}
+CustomScale::~CustomScale() { delete scaler; }
 
-void CustomScale::updateScale(const QwtScaleDiv div)
-{
-	setScale(div);
-}
+void CustomScale::updateScale(const QwtScaleDiv div) { setScale(div); }
 
-void CustomScale::start()
-{
-	scaler->startTimer();
-}
+void CustomScale::start() { scaler->startTimer(); }
 
-void CustomScale::stop()
-{
-	scaler->stopTimer();
-}
+void CustomScale::stop() { scaler->stopTimer(); }
 
-void CustomScale::setValue(double value)
-{
+void CustomScale::setValue(double value) {
 	scaler->setValue(value);
 	QwtThermo::setValue(value);
 }

@@ -21,41 +21,38 @@
 #define AUTO_SCALER_HPP
 
 #include <QTimer>
-
 #include <qwt_scale_div.h>
 #include <qwt_thermo.h>
 
 namespace adiscope {
-	class AutoScaler : public QObject
-	{
-		Q_OBJECT;
+class AutoScaler : public QObject {
+	Q_OBJECT;
 
-	public:
-		explicit AutoScaler(QObject *parent,
-				const QVector<QwtScaleDiv> &divs,
-				unsigned int timeout_ms = 3000);
-		~AutoScaler();
+public:
+	explicit AutoScaler(QObject *parent, const QVector<QwtScaleDiv> &divs,
+			    unsigned int timeout_ms = 3000);
+	~AutoScaler();
 
-	Q_SIGNALS:
-		void updateScale(const QwtScaleDiv);
+Q_SIGNALS:
+	void updateScale(const QwtScaleDiv);
 
-	public Q_SLOTS:
-		void setValue(double val);
-		void startTimer();
-		void stopTimer();
-		void setTimeout(int timeout_ms);
+public Q_SLOTS:
+	void setValue(double val);
+	void startTimer();
+	void stopTimer();
+	void setTimeout(int timeout_ms);
 
-	private Q_SLOTS:
-		void timeout();
+private Q_SLOTS:
+	void timeout();
 
-	private:
-		QVector<QwtScaleDiv> divs;
-		QTimer timer;
-		double min, max, scale_min, scale_max;
-		const QwtScaleDiv *current_div;
+private:
+	QVector<QwtScaleDiv> divs;
+	QTimer timer;
+	double min, max, scale_min, scale_max;
+	const QwtScaleDiv *current_div;
 
-		void changeScaleDiv(const QwtScaleDiv *div);
-	};
+	void changeScaleDiv(const QwtScaleDiv *div);
 };
+}; // namespace adiscope
 
 #endif /* AUTO_SCALER_HPP */

@@ -22,8 +22,7 @@
 
 #include <qwt_scale_engine.h>
 
-class OscScaleEngine: public QwtLinearScaleEngine
-{
+class OscScaleEngine : public QwtLinearScaleEngine {
 public:
 	OscScaleEngine();
 	virtual ~OscScaleEngine();
@@ -33,27 +32,29 @@ public:
 
 	void setMinorTicksCount(uint minorTicks);
 	uint minorTicksCount();
-    void showZero(bool en);
-	virtual void autoScale( int maxSteps,
-		double &x1, double &x2, double &stepSize ) const;
+	void showZero(bool en);
+	virtual void autoScale(int maxSteps, double &x1, double &x2,
+			       double &stepSize) const;
 
 	virtual QwtScaleDiv divideScale(double x1, double x2, int maxMajorSteps,
-					int maxMinorSteps, double stepSize = 0.0) const;
+					int maxMinorSteps,
+					double stepSize = 0.0) const;
 
 protected:
-	void buildTicks(
-		const QwtInterval &, double stepSize, int maxMinSteps,
-		QList<double> ticks[QwtScaleDiv::NTickTypes] ) const;
+	void buildTicks(const QwtInterval &, double stepSize, int maxMinSteps,
+			QList<double> ticks[QwtScaleDiv::NTickTypes]) const;
 
-	void buildMinorTicks( const QList<double>& majorTicks,
-		int maxMinorSteps, double stepSize,
-		QList<double> &minorTicks, QList<double> &mediumTicks ) const;
+	void buildMinorTicks(const QList<double> &majorTicks, int maxMinorSteps,
+			     double stepSize, QList<double> &minorTicks,
+			     QList<double> &mediumTicks) const;
 
-    QList<double> buildMajorTicks(const QwtInterval &interval, double stepSize) const;
+	QList<double> buildMajorTicks(const QwtInterval &interval,
+				      double stepSize) const;
+
 private:
 	uint m_majorTicks; // number of major ticks a scale should have
 	uint m_minorTicks; // number of minor ticks between two major ticks
-    bool m_showZero;
+	bool m_showZero;
 };
 
 #endif /* M2K_OSC_SCALE_ENGINE_H */

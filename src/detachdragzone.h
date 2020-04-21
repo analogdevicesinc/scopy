@@ -1,17 +1,16 @@
 #ifndef DETACHDRAGZONE_H
 #define DETACHDRAGZONE_H
 
-#include <QWidget>
-#include <QMouseEvent>
-#include <QDragMoveEvent>
-#include <QDropEvent>
-#include <QString>
-
 #include "coloredQWidget.hpp"
 
+#include <QDragMoveEvent>
+#include <QDropEvent>
+#include <QMouseEvent>
+#include <QString>
+#include <QWidget>
+
 namespace adiscope {
-class DetachDragZone : public ColoredQWidget
-{
+class DetachDragZone : public ColoredQWidget {
 	Q_OBJECT
 
 public:
@@ -29,8 +28,7 @@ private Q_SLOTS:
 	void dragMoveEvent(QDragMoveEvent *event);
 	void dragLeaveEvent(QDragLeaveEvent *event);
 	void dropEvent(QDropEvent *event);
-
 };
-}
+} // namespace adiscope
 
 #endif // DETACHDRAGZONE_H

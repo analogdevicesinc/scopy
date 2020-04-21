@@ -2,6 +2,7 @@
 #define MEASUREMENT_GUI_H
 
 #include "plot_utils.hpp"
+
 #include <QString>
 
 class QLabel;
@@ -11,17 +12,17 @@ namespace adiscope {
 
 class MeasurementData;
 
-class MeasurementGui
-{
+class MeasurementGui {
 public:
 	MeasurementGui();
 	virtual ~MeasurementGui();
 
 	QString name() const;
 	QString value() const;
-	void setLabelsColor(const QColor& color);
+	void setLabelsColor(const QColor &color);
 	virtual void init(QLabel *name, QLabel *value);
-	virtual void update(const MeasurementData& data, double displayScale) = 0;
+	virtual void update(const MeasurementData &data,
+			    double displayScale) = 0;
 
 protected:
 	QString m_name;
@@ -31,45 +32,41 @@ protected:
 	int m_minValLableWidth;
 };
 
-class MetricMeasurementGui: public MeasurementGui
-{
+class MetricMeasurementGui : public MeasurementGui {
 public:
 	MetricMeasurementGui();
 
 	virtual void init(QLabel *name, QLabel *value);
-	virtual void update(const MeasurementData& data, double displayScale);
+	virtual void update(const MeasurementData &data, double displayScale);
 
 protected:
 	MetricPrefixFormatter m_formatter;
 };
 
-class TimeMeasurementGui: public MeasurementGui
-{
+class TimeMeasurementGui : public MeasurementGui {
 public:
 	TimeMeasurementGui();
 
 	virtual void init(QLabel *name, QLabel *value);
-	virtual void update(const MeasurementData& data, double displayScale);
+	virtual void update(const MeasurementData &data, double displayScale);
 
 protected:
 	TimePrefixFormatter m_formatter;
 };
 
-class PercentageMeasurementGui: public MeasurementGui
-{
+class PercentageMeasurementGui : public MeasurementGui {
 public:
 	PercentageMeasurementGui();
 
 	virtual void init(QLabel *name, QLabel *value);
-	virtual void update(const MeasurementData& data, double displayScale);
+	virtual void update(const MeasurementData &data, double displayScale);
 };
 
-class DimensionlessMeasurementGui: public MeasurementGui
-{
+class DimensionlessMeasurementGui : public MeasurementGui {
 public:
 	DimensionlessMeasurementGui();
 
-	virtual void update(const MeasurementData& data, double displayScale);
+	virtual void update(const MeasurementData &data, double displayScale);
 };
 
 } // namespace adiscope

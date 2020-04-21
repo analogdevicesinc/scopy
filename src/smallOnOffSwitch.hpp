@@ -20,54 +20,53 @@
 #ifndef SMALL_ON_OFF_SWITCH_HPP
 #define SMALL_ON_OFF_SWITCH_HPP
 
-#include <QColor>
 #include "customanimation.h"
+
+#include <QColor>
+#include <QLabel>
 #include <QPushButton>
 #include <QWidget>
-#include <QLabel>
 
 class QShowEvent;
 
 namespace adiscope {
-	class SmallOnOffSwitch : public QPushButton
-	{
-		Q_OBJECT
+class SmallOnOffSwitch : public QPushButton {
+	Q_OBJECT
 
-		Q_PROPERTY(int duration_ms MEMBER duration_ms
-				WRITE setDuration);
+	Q_PROPERTY(int duration_ms MEMBER duration_ms WRITE setDuration);
 
-		Q_PROPERTY(QColor color_start MEMBER color_start);
-		Q_PROPERTY(QColor color_end MEMBER color_end);
-		Q_PROPERTY(QColor color MEMBER color WRITE setHandleColor);
+	Q_PROPERTY(QColor color_start MEMBER color_start);
+	Q_PROPERTY(QColor color_end MEMBER color_end);
+	Q_PROPERTY(QColor color MEMBER color WRITE setHandleColor);
 
-	public:
-		explicit SmallOnOffSwitch(QWidget *parent = nullptr);
-		~SmallOnOffSwitch();
+public:
+	explicit SmallOnOffSwitch(QWidget *parent = nullptr);
+	~SmallOnOffSwitch();
 
-	private:
-		QColor color_start, color_end, color;
-		QLabel on, off;
-		QWidget handle;
-		CustomAnimation anim;
-		CustomAnimation color_anim;
-		QString stylesheet;
-		int duration_ms;
-		bool show_icon;
-		bool bothValid;
+private:
+	QColor color_start, color_end, color;
+	QLabel on, off;
+	QWidget handle;
+	CustomAnimation anim;
+	CustomAnimation color_anim;
+	QString stylesheet;
+	int duration_ms;
+	bool show_icon;
+	bool bothValid;
 
-		void setDuration(int ms);
-		void setHandleColor(const QColor& color);
-		void updateOnOffLabels();
+	void setDuration(int ms);
+	void setHandleColor(const QColor &color);
+	void updateOnOffLabels();
 
-		bool event(QEvent *e);
-		void showEvent(QShowEvent *event);
-		void paintEvent(QPaintEvent *);
+	bool event(QEvent *e);
+	void showEvent(QShowEvent *event);
+	void paintEvent(QPaintEvent *);
 
-	private Q_SLOTS:
-		void toggleAnim(bool enabled);
-	Q_SIGNALS:
-		void animationDone();
-	};
-}
+private Q_SLOTS:
+	void toggleAnim(bool enabled);
+Q_SIGNALS:
+	void animationDone();
+};
+} // namespace adiscope
 
 #endif /* SMALL_ON_OFF_SWITCH_HPP */

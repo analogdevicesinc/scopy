@@ -20,82 +20,82 @@
 #ifndef PLOT_UTILS_HPP
 #define PLOT_UTILS_HPP
 
-#include <vector>
 #include <qstring.h>
 
+#include <vector>
+
 namespace adiscope {
-	class PrefixFormatter
-	{
-	public:
-		PrefixFormatter(const std::vector<std::pair<QString, double>>&);
-		virtual ~PrefixFormatter();
-		void setTwoDecimalMode(bool);
-		bool getTwoDecimalMode();
-		virtual QString format(double value, QString unitType, int precision) const;
-		void getFormatAttributes(double value, QString& prefix, double& scale) const;
+class PrefixFormatter {
+public:
+	PrefixFormatter(const std::vector<std::pair<QString, double>> &);
+	virtual ~PrefixFormatter();
+	void setTwoDecimalMode(bool);
+	bool getTwoDecimalMode();
+	virtual QString format(double value, QString unitType,
+			       int precision) const;
+	void getFormatAttributes(double value, QString &prefix,
+				 double &scale) const;
 
-	protected:
-		virtual QString buildString(double value, QString prefix, QString unitType, int precision) const;
-		int findPrefixIndex(double value) const;
+protected:
+	virtual QString buildString(double value, QString prefix,
+				    QString unitType, int precision) const;
+	int findPrefixIndex(double value) const;
 
-	private:
-		std::vector<std::pair<QString, double>> m_prefixes;
-		int m_defaultPrefixIndex;
-		bool m_twoDecimalMode;
-	};
+private:
+	std::vector<std::pair<QString, double>> m_prefixes;
+	int m_defaultPrefixIndex;
+	bool m_twoDecimalMode;
+};
 
-	class MetricPrefixFormatter: public PrefixFormatter
-	{
-	public:
-		MetricPrefixFormatter();
-	};
+class MetricPrefixFormatter : public PrefixFormatter {
+public:
+	MetricPrefixFormatter();
+};
 
-	class TimePrefixFormatter: public PrefixFormatter
-	{
-	public:
-		TimePrefixFormatter();
-	};
+class TimePrefixFormatter : public PrefixFormatter {
+public:
+	TimePrefixFormatter();
+};
 
-	/*
-	 * CLASS NumberSeries contains a series of number that is being built
-	 * upon contruction. The series is being build by the following rules:
-	 * limits: [lower, upper]
-	 * step: {step1, step2, ..., stepN} X stepPower
-	 * E.g. powerStep = 10, steps = {1, 2, 5} -> ..., 0.1, 0.2, 0.5, 1.0,
-	 *      2.0, 5.0, 10.0, 20.0, 50.0, ...
-	 */
-	class NumberSeries
-	{
-	public:
-		NumberSeries(double lower = 1E-3, double upper = 1E3,
-			     unsigned int powerStep = 10,
-			     const std::vector<double>& steps = {1, 2, 5});
-		~NumberSeries();
+/*
+ * CLASS NumberSeries contains a series of number that is being built
+ * upon contruction. The series is being build by the following rules:
+ * limits: [lower, upper]
+ * step: {step1, step2, ..., stepN} X stepPower
+ * E.g. powerStep = 10, steps = {1, 2, 5} -> ..., 0.1, 0.2, 0.5, 1.0,
+ *      2.0, 5.0, 10.0, 20.0, 50.0, ...
+ */
+class NumberSeries {
+public:
+	NumberSeries(double lower = 1E-3, double upper = 1E3,
+		     unsigned int powerStep = 10,
+		     const std::vector<double> &steps = {1, 2, 5});
+	~NumberSeries();
 
-		const std::vector<double>& getNumbers();
+	const std::vector<double> &getNumbers();
 
-		double getNumberAfter(double value);
-		double getNumberBefore(double value);
+	double getNumberAfter(double value);
+	double getNumberBefore(double value);
 
-		void setLower(double value);
-		double lower();
+	void setLower(double value);
+	double lower();
 
-		void setUpper(double value);
-		double upper();
+	void setUpper(double value);
+	double upper();
 
-		void setPowerStep(unsigned int value);
-		unsigned int stepPower();
+	void setPowerStep(unsigned int value);
+	unsigned int stepPower();
 
-	protected:
-		void buildNumberSeries();
+protected:
+	void buildNumberSeries();
 
-	private:
-		double m_lowerLimit;
-		double m_upperLimit;
-		int m_powerStep;
-		std::vector<double> m_templateSteps;
-		std::vector<double>m_numbers;
-	};
-}
+private:
+	double m_lowerLimit;
+	double m_upperLimit;
+	int m_powerStep;
+	std::vector<double> m_templateSteps;
+	std::vector<double> m_numbers;
+};
+} // namespace adiscope
 
-#endif //PLOT_UTILS_HPP
+#endif // PLOT_UTILS_HPP

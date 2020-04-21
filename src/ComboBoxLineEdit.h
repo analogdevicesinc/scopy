@@ -5,8 +5,7 @@
 #include <QMouseEvent>
 
 namespace adiscope {
-class ComboBoxLineEdit : public QLineEdit
-{
+class ComboBoxLineEdit : public QLineEdit {
 	Q_OBJECT
 public:
 	ComboBoxLineEdit(QWidget *parent = 0);
@@ -17,6 +16,6 @@ protected Q_SLOTS:
 	void enterEvent(QEvent *event);
 	void leaveEvent(QEvent *event);
 };
-}
+} // namespace adiscope
 
 #endif // ComboBoxLineEdit_H

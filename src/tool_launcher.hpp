@@ -20,40 +20,41 @@
 #ifndef M2K_TOOL_LAUNCHER_H
 #define M2K_TOOL_LAUNCHER_H
 
+#include "apiObject.hpp"
+#include "calibration.hpp"
+#include "connectDialog.hpp"
+#include "detachedWindow.hpp"
+#include "device_widget.hpp"
+#include "digitalio.hpp"
+#include "dmm.hpp"
+#include "filter.hpp"
+#include "info_page.hpp"
+#include "logic_analyzer.hpp"
+#include "network_analyzer.hpp"
+#include "oscilloscope.hpp"
+#include "pattern_generator.hpp"
+#include "power_controller.hpp"
+#include "preferences.h"
+#include "pulseview/pv/widgets/popup.hpp"
+#include "signal_generator.hpp"
+#include "toolmenu.h"
+
+#include <QButtonGroup>
 #include <QFuture>
 #include <QFutureWatcher>
 #include <QJSEngine>
 #include <QMainWindow>
+#include <QMap>
 #include <QPair>
 #include <QSocketNotifier>
-#include <QVector>
-#include <QButtonGroup>
-#include <QMap>
 #include <QStringList>
-#include <info_widget.h>
 #include <QTextBrowser>
+#include <QVector>
 
-#include "apiObject.hpp"
-#include "dmm.hpp"
-#include "filter.hpp"
-#include "calibration.hpp"
-#include "oscilloscope.hpp"
-#include "pulseview/pv/widgets/popup.hpp"
-#include "power_controller.hpp"
-#include "signal_generator.hpp"
-#include "logic_analyzer.hpp"
-#include "pattern_generator.hpp"
-#include "network_analyzer.hpp"
-#include "digitalio.hpp"
-#include "detachedWindow.hpp"
-#include "preferences.h"
-#include "info_page.hpp"
-#include "device_widget.hpp"
-#include "connectDialog.hpp"
-#include "toolmenu.h"
+#include <info_widget.h>
 
 extern "C" {
-	struct iio_context;
+struct iio_context;
 }
 
 namespace Ui {
@@ -61,7 +62,7 @@ class ToolLauncher;
 class Device;
 class GenericAdc;
 class GenericDac;
-}
+} // namespace Ui
 
 namespace adiscope {
 class ToolLauncher_API;
@@ -70,8 +71,7 @@ class Debugger;
 class ManualCalibration;
 class UserNotes;
 
-class ToolLauncher : public QMainWindow
-{
+class ToolLauncher : public QMainWindow {
 	friend class ToolLauncher_API;
 
 	Q_OBJECT
@@ -80,7 +80,7 @@ public:
 	explicit ToolLauncher(QString prevCrashDump = "", QWidget *parent = 0);
 	~ToolLauncher();
 
-	Q_INVOKABLE void runProgram(const QString& program, const QString& fn);
+	Q_INVOKABLE void runProgram(const QString &program, const QString &fn);
 	InfoWidget *infoWidget;
 
 	Preferences *getPrefPanel() const;
@@ -148,32 +148,33 @@ private Q_SLOTS:
 	void btnDigitalIO_clicked();
 
 	void resetSession();
-	DeviceWidget* getConnectedDevice();
-	DeviceWidget* getSelectedDevice();
-	int getDeviceIndex(DeviceWidget*);
+	DeviceWidget *getConnectedDevice();
+	DeviceWidget *getSelectedDevice();
+	int getDeviceIndex(DeviceWidget *);
 	void pageMoved(int);
 	void stopSearching(bool);
 	void _toolSelected(tool tool);
 	void restartToolsAfterCalibration();
 	void calibrationFailedCallback();
 	void calibrationThreadWatcherFinished();
+
 private:
-	QList<Tool*> calibration_saved_tools;
+	QList<Tool *> calibration_saved_tools;
 	void loadToolTips(bool connected);
 	QVector<QString> searchDevices();
 	void swapMenu(QWidget *menu);
 	void destroyContext();
 	bool loadDecoders(QString path);
-	bool switchContext(const QString& uri);
+	bool switchContext(const QString &uri);
 	void resetStylesheets();
 	void initialCalibration();
 	bool calibrate();
-	void checkIp(const QString& ip);
+	void checkIp(const QString &ip);
 	void disconnect();
 	void saveSettings();
-	Q_INVOKABLE QPushButton *addContext(const QString& hostname);
+	Q_INVOKABLE QPushButton *addContext(const QString &hostname);
 
-	void updateListOfDevices(const QVector<QString>& uris);
+	void updateListOfDevices(const QVector<QString> &uris);
 	QStringList tools;
 	QStringList toolIcons;
 	void closeEvent(QCloseEvent *event);
@@ -182,7 +183,7 @@ private:
 	void updateHomepage();
 	void readPreferences();
 	void loadIndexPageFromContent(QString fileLocation);
-	DeviceWidget* getDevice(QString uri);
+	DeviceWidget *getDevice(QString uri);
 	void setupAddPage();
 	void allowExternalScript(bool);
 
@@ -193,11 +194,11 @@ private:
 	ToolMenu *menu;
 
 	QVector<int> position;
-	QVector<Debugger*> debugInstances;
+	QVector<Debugger *> debugInstances;
 	QVector<DetachedWindow *> debugWindows;
 
 	std::vector<DeviceWidget *> devices;
-	QVector<Tool*> toolList;
+	QVector<Tool *> toolList;
 
 	QTimer *search_timer, *alive_timer;
 	QFutureWatcher<QVector<QString>> watcher;
@@ -252,7 +253,7 @@ private:
 
 	QButtonGroup *devices_btn_group;
 
-	DeviceWidget* selectedDev;
+	DeviceWidget *selectedDev;
 	bool m_use_decoders;
 
 	bool m_useNativeDialogs;
@@ -261,5 +262,5 @@ private:
 	void saveRunningToolsBeforeCalibration();
 	void stopToolsBeforeCalibration();
 };
-}
+} // namespace adiscope
 #endif // M2K_TOOL_LAUNCHER_H

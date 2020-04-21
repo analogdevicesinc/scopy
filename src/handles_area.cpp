@@ -18,26 +18,24 @@
  */
 
 #include "handles_area.hpp"
+
 #include "plot_line_handle.h"
-#include <QtWidgets>
+
 #include <QDebug>
+#include <QtWidgets>
 
 /*
  * Class HandlesArea implementation
  */
 
-HandlesArea::HandlesArea(QWidget *parent):
-	QWidget(parent),
-	canvas(parent),
-	selectedItem(NULL)
-{
+HandlesArea::HandlesArea(QWidget *parent)
+	: QWidget(parent), canvas(parent), selectedItem(NULL) {
 	this->setStyleSheet("QWidget {background-color: transparent}");
 }
 
-void HandlesArea::mousePressEvent(QMouseEvent *event)
-{
-	PlotLineHandle *child = static_cast<PlotLineHandle*>
-						(childAt(event->pos()));
+void HandlesArea::mousePressEvent(QMouseEvent *event) {
+	PlotLineHandle *child =
+		static_cast<PlotLineHandle *>(childAt(event->pos()));
 
 	if (child) {
 		child->raise();
@@ -47,16 +45,14 @@ void HandlesArea::mousePressEvent(QMouseEvent *event)
 	}
 }
 
-void HandlesArea::mouseReleaseEvent(QMouseEvent *)
-{
+void HandlesArea::mouseReleaseEvent(QMouseEvent *) {
 	if (selectedItem) {
 		selectedItem->setGrabbed(false);
 		selectedItem = NULL;
 	}
 }
 
-void HandlesArea::mouseMoveEvent(QMouseEvent *event)
-{
+void HandlesArea::mouseMoveEvent(QMouseEvent *event) {
 	if (selectedItem) {
 		int x = event->pos().x() - hotspot.x();
 		int y = event->pos().y() - hotspot.y();
@@ -65,8 +61,7 @@ void HandlesArea::mouseMoveEvent(QMouseEvent *event)
 	}
 }
 
-void HandlesArea::resizeEvent(QResizeEvent *event)
-{
+void HandlesArea::resizeEvent(QResizeEvent *event) {
 	resizeMask(event->size());
 
 	Q_EMIT sizeChanged(event->size());
@@ -76,55 +71,40 @@ void HandlesArea::resizeEvent(QResizeEvent *event)
  * Class VertHandlesArea implementation
  */
 
-VertHandlesArea::VertHandlesArea(QWidget *parent):
-	HandlesArea(parent)
-{
+VertHandlesArea::VertHandlesArea(QWidget *parent) : HandlesArea(parent) {
 	largest_child_height = 0;
 	top_padding = 50;
 	bottom_padding = 50;
 }
 
-int VertHandlesArea::topPadding()
-{
-	return top_padding;
-}
+int VertHandlesArea::topPadding() { return top_padding; }
 
-void VertHandlesArea::setTopPadding(int new_padding)
-{
+void VertHandlesArea::setTopPadding(int new_padding) {
 	if (top_padding != new_padding) {
 		top_padding = new_padding;
 	}
 }
 
-int VertHandlesArea::bottomPadding()
-{
-	return bottom_padding;
-}
+int VertHandlesArea::bottomPadding() { return bottom_padding; }
 
-void VertHandlesArea::setLargestChildHeight(int height)
-{
+void VertHandlesArea::setLargestChildHeight(int height) {
 	if (largest_child_height != height) {
 		largest_child_height = height;
 		resizeMask(this->size());
 	}
 }
 
-int VertHandlesArea::largestChildHeight()
-{
-	return largest_child_height;
-}
+int VertHandlesArea::largestChildHeight() { return largest_child_height; }
 
-void VertHandlesArea::setBottomPadding(int new_padding)
-{
+void VertHandlesArea::setBottomPadding(int new_padding) {
 	if (bottom_padding != new_padding) {
 		bottom_padding = new_padding;
 	}
 }
 
-void VertHandlesArea::resizeMask(QSize size)
-{
+void VertHandlesArea::resizeMask(QSize size) {
 	QRegion activeRegion(0, largest_child_height / 2, size.width(),
-		size.height() - largest_child_height);
+			     size.height() - largest_child_height);
 	setMask(activeRegion);
 }
 
@@ -132,80 +112,63 @@ void VertHandlesArea::resizeMask(QSize size)
  * Class HorizHandlesArea implementation
  */
 
-HorizHandlesArea::HorizHandlesArea(QWidget *parent):
-	HandlesArea(parent)
-{
+HorizHandlesArea::HorizHandlesArea(QWidget *parent) : HandlesArea(parent) {
 	largest_child_width = 0;
 	left_padding = 50;
 	right_padding = 50;
 }
 
-int HorizHandlesArea::leftPadding()
-{
-	return left_padding;
-}
+int HorizHandlesArea::leftPadding() { return left_padding; }
 
-void HorizHandlesArea::setLeftPadding(int new_padding)
-{
+void HorizHandlesArea::setLeftPadding(int new_padding) {
 	if (left_padding != new_padding) {
 		left_padding = new_padding;
 	}
 }
 
-int HorizHandlesArea::rightPadding()
-{
-	return right_padding;
-}
+int HorizHandlesArea::rightPadding() { return right_padding; }
 
-void HorizHandlesArea::setRightPadding(int new_padding)
-{
+void HorizHandlesArea::setRightPadding(int new_padding) {
 	if (right_padding != new_padding) {
 		right_padding = new_padding;
 	}
 }
 
-void HorizHandlesArea::setLargestChildWidth(int width)
-{
+void HorizHandlesArea::setLargestChildWidth(int width) {
 	if (largest_child_width != width) {
 		largest_child_width = width;
 		resizeMask(this->size());
 	}
 }
 
-int HorizHandlesArea::largestChildWidth()
-{
-	return largest_child_width;
-}
+int HorizHandlesArea::largestChildWidth() { return largest_child_width; }
 
-void HorizHandlesArea::resizeMask(QSize size)
-{
-	QRegion activeRegion(largest_child_width / 2, 0, size.width() -
-			largest_child_width, size.height());
+void HorizHandlesArea::resizeMask(QSize size) {
+	QRegion activeRegion(largest_child_width / 2, 0,
+			     size.width() - largest_child_width, size.height());
 	setMask(activeRegion);
 }
-
 
 /*
  * Class GateHandlesArea implementation
  */
-GateHandlesArea::GateHandlesArea(QWidget *parent):
-	HorizHandlesArea(parent)
-{}
+GateHandlesArea::GateHandlesArea(QWidget *parent) : HorizHandlesArea(parent) {}
 
-void GateHandlesArea::mousePressEvent(QMouseEvent *event)
-{
-	PlotLineHandle *child = static_cast<PlotLineHandle*>
-						(childAt(event->pos()));
+void GateHandlesArea::mousePressEvent(QMouseEvent *event) {
+	PlotLineHandle *child =
+		static_cast<PlotLineHandle *>(childAt(event->pos()));
 	if (child) {
 		child->raise();
 		selectedItem = child;
 
-		PlotGateHandle *handle = static_cast<PlotGateHandle*>(child);
+		PlotGateHandle *handle = static_cast<PlotGateHandle *>(child);
 
-		if(handle->reachedLimit())
-			/*if the handle reached the limit update the hotspot so we can still change the bar position */
-			hotspot = event->pos() - QPoint(handle->getCurrentPos(),handle->y());
-		else{
+		if (handle->reachedLimit())
+			/*if the handle reached the limit update the hotspot so
+			 * we can still change the bar position */
+			hotspot = event->pos() -
+				QPoint(handle->getCurrentPos(), handle->y());
+		else {
 			hotspot = event->pos() - child->pos();
 		}
 		child->setGrabbed(true);

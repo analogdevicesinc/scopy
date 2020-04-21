@@ -1,21 +1,16 @@
 #include "x_axis_scale_zoomer.h"
+
 #include "qwt_scale_draw.h"
 
 #include <dbgraph.hpp>
 
 using namespace adiscope;
 
-XAxisScaleZoomer::XAxisScaleZoomer(QWidget *parent):
-	OscScaleZoomer(parent)
-{
-}
+XAxisScaleZoomer::XAxisScaleZoomer(QWidget *parent) : OscScaleZoomer(parent) {}
 
-XAxisScaleZoomer::~XAxisScaleZoomer()
-{
-}
+XAxisScaleZoomer::~XAxisScaleZoomer() {}
 
-void XAxisScaleZoomer::zoom(const QRectF& rect)
-{
+void XAxisScaleZoomer::zoom(const QRectF &rect) {
 	QRectF boundedRect = rect & zoomBase();
 	QRectF baseRect = zoomBase();
 
@@ -25,8 +20,7 @@ void XAxisScaleZoomer::zoom(const QRectF& rect)
 	QwtPlotZoomer::zoom(boundedRect);
 }
 
-QwtText XAxisScaleZoomer::trackerText(const QPoint &p) const
-{
+QwtText XAxisScaleZoomer::trackerText(const QPoint &p) const {
 	QwtText t;
 	QPointF dp = QwtPlotZoomer::invTransform(p);
 

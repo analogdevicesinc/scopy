@@ -11,19 +11,18 @@ class MarkerTable;
 
 namespace adiscope {
 
-class MarkerTable : public QWidget
-{
+class MarkerTable : public QWidget {
 	Q_OBJECT
 
 public:
 	explicit MarkerTable(QWidget *parent = 0);
 	~MarkerTable();
 
-	void addMarker(int mkIdx, int chIdx, const QString& name,
-		double frequency, double magnitude, const QString& type);
+	void addMarker(int mkIdx, int chIdx, const QString &name,
+		       double frequency, double magnitude, const QString &type);
 	void removeMarker(int mkIdx, int chIdx);
 	void updateMarker(int mkIdx, int chIdx, double frequency,
-		double magnitude, const QString& type);
+			  double magnitude, const QString &type);
 	bool isMarker(int mkIdx, int chIdx);
 
 private:

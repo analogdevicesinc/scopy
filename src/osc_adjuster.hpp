@@ -20,20 +20,19 @@
 #ifndef M2K_OSC_ADJUSTER_H
 #define M2K_OSC_ADJUSTER_H
 
-#include <qobject.h>
 #include <QWidget>
 #include <qevent.h>
+#include <qobject.h>
 #include <qwt_plot.h>
 
 class QWidget;
 class QMouseEvent;
 class QWheelEvent;
 
-class OscAdjuster: public QObject
-{
+class OscAdjuster : public QObject {
 	Q_OBJECT
 public:
-	explicit OscAdjuster(QWidget*, QwtAxisId axisId);
+	explicit OscAdjuster(QWidget *, QwtAxisId axisId);
 	virtual ~OscAdjuster();
 
 	QWidget *parentWidget();
@@ -73,29 +72,22 @@ protected:
 	QwtAxisId d_axisId;
 };
 
-class VertMouseGestures: public OscAdjuster
-{
+class VertMouseGestures : public OscAdjuster {
 	Q_OBJECT
 public:
-	explicit VertMouseGestures(QWidget *parent, QwtAxisId axisId):
-		OscAdjuster(parent, axisId)
-	{
-	}
+	explicit VertMouseGestures(QWidget *parent, QwtAxisId axisId)
+		: OscAdjuster(parent, axisId) {}
 
-	virtual ~VertMouseGestures()
-	{
-
-	}
+	virtual ~VertMouseGestures() {}
 
 Q_SIGNALS:
 	void upMovement(double);
 	void downMovement(double);
 
 protected:
-	virtual void rescale(double factor)
-	{
-		factor = qAbs( factor );
-		if ( factor == 1.0 || factor == 0.0 )
+	virtual void rescale(double factor) {
+		factor = qAbs(factor);
+		if (factor == 1.0 || factor == 0.0)
 			return;
 
 		if (factor > 1.0)
@@ -103,14 +95,12 @@ protected:
 		else
 			Q_EMIT downMovement(factor);
 	}
-	virtual void widgetMouseMoveEvent(QMouseEvent *mouseEvent)
-	{
+	virtual void widgetMouseMoveEvent(QMouseEvent *mouseEvent) {
 		if (!d_mousePressed)
 			return;
 
 		const int dy = mouseEvent->pos().y() - d_mousePos.y();
-		if (dy != 0)
-		{
+		if (dy != 0) {
 			double f = d_mouseFactor;
 			if (dy < 0)
 				f = 1 / f;
@@ -122,29 +112,22 @@ protected:
 	}
 };
 
-class HorizMouseGestures: public OscAdjuster
-{
+class HorizMouseGestures : public OscAdjuster {
 	Q_OBJECT
 public:
-	explicit HorizMouseGestures(QWidget *parent, QwtAxisId axisId):
-		OscAdjuster(parent, axisId)
-	{
-	}
+	explicit HorizMouseGestures(QWidget *parent, QwtAxisId axisId)
+		: OscAdjuster(parent, axisId) {}
 
-	virtual ~HorizMouseGestures()
-	{
-
-	}
+	virtual ~HorizMouseGestures() {}
 
 Q_SIGNALS:
 	void leftMovement(double);
 	void rightMovement(double);
 
 protected:
-	virtual void rescale(double factor)
-	{
-		factor = qAbs( factor );
-		if ( factor == 1.0 || factor == 0.0 )
+	virtual void rescale(double factor) {
+		factor = qAbs(factor);
+		if (factor == 1.0 || factor == 0.0)
 			return;
 
 		if (factor > 1.0)
@@ -153,22 +136,20 @@ protected:
 			Q_EMIT rightMovement(factor);
 	}
 
-	virtual void widgetMouseMoveEvent(QMouseEvent *mouseEvent)
-	{
-		if ( !d_mousePressed )
+	virtual void widgetMouseMoveEvent(QMouseEvent *mouseEvent) {
+		if (!d_mousePressed)
 			return;
 
-		    const int dx = mouseEvent->pos().x() - d_mousePos.x();
-		    if ( dx != 0 )
-		    {
+		const int dx = mouseEvent->pos().x() - d_mousePos.x();
+		if (dx != 0) {
 			double f = d_mouseFactor;
-			if ( dx < 0 )
-			    f = 1 / f;
+			if (dx < 0)
+				f = 1 / f;
 
-			rescale( f );
-		    }
+			rescale(f);
+		}
 
-		    d_mousePos = mouseEvent->pos();
+		d_mousePos = mouseEvent->pos();
 	}
 };
 

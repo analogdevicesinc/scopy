@@ -26,8 +26,7 @@
 
 namespace adiscope {
 
-class Graticule : public QObject
-{
+class Graticule : public QObject {
 	Q_OBJECT
 public:
 	Graticule(QwtPlot *plot);
@@ -46,16 +45,14 @@ private:
 	QwtPlotScaleItem *horizScale2;
 };
 
-class GraticulePlotScaleItem: public QwtPlotScaleItem
-{
+class GraticulePlotScaleItem : public QwtPlotScaleItem {
 public:
 	explicit GraticulePlotScaleItem(
-	        QwtScaleDraw::Alignment = QwtScaleDraw::BottomScale,
-	        const double pos = 0.0);
+		QwtScaleDraw::Alignment = QwtScaleDraw::BottomScale,
+		const double pos = 0.0);
 	virtual void updateScaleDiv(const QwtScaleDiv &, const QwtScaleDiv &);
 };
 
-}
-
+} // namespace adiscope
 
 #endif // GRATICULE_H

@@ -20,15 +20,15 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
-#include <QObject>
 #include <iio.h>
+
 #include <QDebug>
+#include <QObject>
 #include <QVector>
 
 namespace adiscope {
 
-class Debug : public QObject
-{
+class Debug : public QObject {
 	Q_OBJECT
 
 public:
@@ -42,26 +42,25 @@ public:
 	void setIioContext(struct iio_context *ctx);
 	~Debug();
 
-	QString readAttribute(const QString& devName, QString& channel,
-	                      const QString& attribute);
-	void writeAttribute(const QString& devName, QString& channel,
-	                    const QString& attribute,
-	                    const QString& value);
-	QStringList getAvailableValues(const QString& devName, QString& channel,
-	                               QString& attribute) const;
-	QString getAttributeValue(const QString& devName, const QString& channel,
-	                          const QString& attribute) const;
-	void setAttributeValue(const QString& devName, const QString& channel,
-	                       const QString& attribute,
-	                       const QString& value);
+	QString readAttribute(const QString &devName, QString &channel,
+			      const QString &attribute);
+	void writeAttribute(const QString &devName, QString &channel,
+			    const QString &attribute, const QString &value);
+	QStringList getAvailableValues(const QString &devName, QString &channel,
+				       QString &attribute) const;
+	QString getAttributeValue(const QString &devName,
+				  const QString &channel,
+				  const QString &attribute) const;
+	void setAttributeValue(const QString &devName, const QString &channel,
+			       const QString &attribute, const QString &value);
 
 Q_SIGNALS:
 	void channelsChanged(const QStringList channelList);
 
 public Q_SLOTS:
 	void scanDevices(void);
-	void scanChannels(const QString& devName);
-	void scanChannelAttributes(QString devName, QString& channel);
+	void scanChannels(const QString &devName);
+	void scanChannelAttributes(QString devName, QString &channel);
 
 private:
 	struct iio_context *ctx;
@@ -72,6 +71,6 @@ private:
 	bool connected = false;
 	QVector<QString> attributeAvailable;
 };
-}
+} // namespace adiscope
 
 #endif // DEBUG_H

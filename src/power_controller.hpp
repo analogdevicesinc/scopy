@@ -20,20 +20,20 @@
 #ifndef POWER_CONTROLLER_HPP
 #define POWER_CONTROLLER_HPP
 
-#include <QPushButton>
-#include <QTimer>
-
 #include "apiObject.hpp"
 #include "spinbox_a.hpp"
 #include "tool.hpp"
 
+#include <QPushButton>
+#include <QTimer>
+
 extern "C" {
-	struct iio_context;
-	struct iio_channel;
+struct iio_context;
+struct iio_channel;
 }
 
 namespace Ui {
-	class PowerController;
+class PowerController;
 }
 
 class QJSEngine;
@@ -41,54 +41,53 @@ class QShowEvent;
 class QHideEvent;
 
 namespace adiscope {
-	class PowerController_API;
+class PowerController_API;
 
-	class PowerController : public Tool
-	{
-		friend class PowerController_API;
-		friend class ToolLauncher_API;
+class PowerController : public Tool {
+	friend class PowerController_API;
+	friend class ToolLauncher_API;
 
-		Q_OBJECT
+	Q_OBJECT
 
-	public:
-		const int AVERAGE_COUNT = 5;
+public:
+	const int AVERAGE_COUNT = 5;
 
-		explicit PowerController(struct iio_context *ctx,
-				ToolMenuItem *toolMenuItem, QJSEngine *engine,
-				ToolLauncher *parent = 0);
-		~PowerController();
+	explicit PowerController(struct iio_context *ctx,
+				 ToolMenuItem *toolMenuItem, QJSEngine *engine,
+				 ToolLauncher *parent = 0);
+	~PowerController();
 
-	public Q_SLOTS:
-		void dac1_set_enabled(bool enabled);
-		void dac2_set_enabled(bool enabled);
-		void dac1_set_value(double value);
-		void dac2_set_value(double value);
-		void update_lcd();
-		void sync_enabled(bool enabled);
-		void run() override;
-		void stop() override;
+public Q_SLOTS:
+	void dac1_set_enabled(bool enabled);
+	void dac2_set_enabled(bool enabled);
+	void dac1_set_value(double value);
+	void dac2_set_value(double value);
+	void update_lcd();
+	void sync_enabled(bool enabled);
+	void run() override;
+	void stop() override;
 
-	private Q_SLOTS:
-		void startStop(bool start);
-		void ratioChanged(int percent);
-		void toggleRunButton(bool enabled);
+private Q_SLOTS:
+	void startStop(bool start);
+	void ratioChanged(int percent);
+	void toggleRunButton(bool enabled);
 
-	private:
-		Ui::PowerController *ui;
-		PositionSpinButton *valuePos;
-		PositionSpinButton *valueNeg;
-		struct iio_channel *ch1w, *ch2w, *ch1r, *ch2r, *pd_pos, *pd_neg;
-		QTimer timer;
-		bool in_sync;
-		QList<long long> averageVoltageCh1;
-		QList<long long> averageVoltageCh2;
-		QMap<QString, double> calibrationParam;
+private:
+	Ui::PowerController *ui;
+	PositionSpinButton *valuePos;
+	PositionSpinButton *valueNeg;
+	struct iio_channel *ch1w, *ch2w, *ch1r, *ch2r, *pd_pos, *pd_neg;
+	QTimer timer;
+	bool in_sync;
+	QList<long long> averageVoltageCh1;
+	QList<long long> averageVoltageCh2;
+	QMap<QString, double> calibrationParam;
 
-		void showEvent(QShowEvent *event);
-		void hideEvent(QHideEvent *event);
+	void showEvent(QShowEvent *event);
+	void hideEvent(QHideEvent *event);
 
-	Q_SIGNALS:
-		void showTool();
-	};
-}
+Q_SIGNALS:
+	void showTool();
+};
+} // namespace adiscope
 #endif /* POWER_CONTROLLER_HPP */

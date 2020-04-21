@@ -20,9 +20,10 @@
 #ifndef MANUAL_CALIBRATION_API_HPP
 #define MANUAL_CALIBRATION_API_HPP
 
+#include "manualcalibration.h"
+
 #include <QObject>
 #include <QProcess>
-#include "manualcalibration.h"
 
 class QJSEngine;
 
@@ -30,8 +31,7 @@ namespace adiscope {
 
 class ApiObject;
 class ManualCalibration;
-class ManualCalibration_API : public ApiObject
-{
+class ManualCalibration_API : public ApiObject {
 	Q_OBJECT
 
 	Q_PROPERTY(double offset_pos_dac READ getOffsetPosDac)
@@ -50,20 +50,17 @@ public:
 
 	Q_INVOKABLE void autoCalibration();
 
-
 	/* Starts a calib story.
 	 * Returns the number of steps in this story.
 	 * Returns -1 if there are no steps
 	 */
 	Q_INVOKABLE int start(int story);
 
-
 	/* Moves the execution from the current step, to the next one.
 	 * Returns the next step index for this story.
 	 * Returns -1 if this was the last step.
 	 */
 	Q_INVOKABLE int next();
-
 
 	/* Saves the params set for this story.
 	 * Should be run after the last step in the story.
@@ -72,11 +69,9 @@ public:
 	 */
 	Q_INVOKABLE int finish();
 
-
 	/* Save a value for the current step, in the current story.
 	 */
 	Q_INVOKABLE bool setParam(double value);
-
 
 	/* Write all the params in the .ini calibration file.
 	 */
@@ -100,7 +95,6 @@ private:
 	int step_in_progress;
 };
 
-}
+} // namespace adiscope
 
 #endif /* MANUAL_CALIBRATION_API_HPP */
-

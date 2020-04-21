@@ -20,59 +20,57 @@
 #ifndef FILTER_HPP
 #define FILTER_HPP
 
-#include <string>
-
 #include <QJsonObject>
 #include <QString>
 
+#include <string>
+
 extern "C" {
-	struct iio_channel;
-	struct iio_context;
-	struct iio_device;
+struct iio_channel;
+struct iio_context;
+struct iio_device;
 }
 
 namespace adiscope {
 
-	enum tool {
-		TOOL_OSCILLOSCOPE = 0,
-		TOOL_SPECTRUM_ANALYZER,
-		TOOL_NETWORK_ANALYZER,
-		TOOL_SIGNAL_GENERATOR,
-		TOOL_LOGIC_ANALYZER,
-		TOOL_PATTERN_GENERATOR,
-		TOOL_DIGITALIO,
-		TOOL_DMM,
-		TOOL_POWER_CONTROLLER,
-		TOOL_DEBUGGER,
-		TOOL_CALIBRATION,
-		TOOL_LAUNCHER,
-	};
+enum tool {
+	TOOL_OSCILLOSCOPE = 0,
+	TOOL_SPECTRUM_ANALYZER,
+	TOOL_NETWORK_ANALYZER,
+	TOOL_SIGNAL_GENERATOR,
+	TOOL_LOGIC_ANALYZER,
+	TOOL_PATTERN_GENERATOR,
+	TOOL_DIGITALIO,
+	TOOL_DMM,
+	TOOL_POWER_CONTROLLER,
+	TOOL_DEBUGGER,
+	TOOL_CALIBRATION,
+	TOOL_LAUNCHER,
+};
 
-	class Filter
-	{
-	private:
-		QJsonObject root;
-		QString hwname;
+class Filter {
+private:
+	QJsonObject root;
+	QString hwname;
 
-	public:
-		Filter(const struct iio_context *ctx);
-		~Filter();
+public:
+	Filter(const struct iio_context *ctx);
+	~Filter();
 
-		QString& hw_name();
+	QString &hw_name();
 
-		bool compatible(enum tool tool) const;
-		bool usable(enum tool tool, const std::string &dev) const;
-		const std::string device_name(enum tool tool,
-				int idx = 0) const;
+	bool compatible(enum tool tool) const;
+	bool usable(enum tool tool, const std::string &dev) const;
+	const std::string device_name(enum tool tool, int idx = 0) const;
 
-		struct iio_device * find_device(const struct iio_context *ctx,
-				enum tool tool, int idx = 0) const;
-		struct iio_channel * find_channel(const struct iio_context *ctx,
-				enum tool tool, int idx = 0,
-				bool output = false) const;
+	struct iio_device *find_device(const struct iio_context *ctx,
+				       enum tool tool, int idx = 0) const;
+	struct iio_channel *find_channel(const struct iio_context *ctx,
+					 enum tool tool, int idx = 0,
+					 bool output = false) const;
 
-		static const std::string& tool_name(enum tool tool);
-	};
-}
+	static const std::string &tool_name(enum tool tool);
+};
+} // namespace adiscope
 
 #endif /* FILTER_HPP */

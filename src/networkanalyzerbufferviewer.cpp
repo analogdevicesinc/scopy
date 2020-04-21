@@ -18,36 +18,31 @@
  */
 
 #include "networkanalyzerbufferviewer.h"
+
 #include "ui_networkanalyzerbufferviewer.h"
 
 #include <qwt_plot_layout.h>
 
 using namespace adiscope;
 
-NetworkAnalyzerBufferViewer::NetworkAnalyzerBufferViewer(QWidget *parent) :
-	QWidget(parent),
-	d_ui(new Ui::NetworkAnalyzerBufferViewer),
-	d_osc(nullptr),
-	d_selectedBuffersIndex(-1),
-	d_numBuffers(0)
-{
+NetworkAnalyzerBufferViewer::NetworkAnalyzerBufferViewer(QWidget *parent)
+	: QWidget(parent)
+	, d_ui(new Ui::NetworkAnalyzerBufferViewer)
+	, d_osc(nullptr)
+	, d_selectedBuffersIndex(-1)
+	, d_numBuffers(0) {
 	d_ui->setupUi(this);
 
 	_setupPlot();
 }
 
-NetworkAnalyzerBufferViewer::~NetworkAnalyzerBufferViewer()
-{
-	delete d_ui;
-}
+NetworkAnalyzerBufferViewer::~NetworkAnalyzerBufferViewer() { delete d_ui; }
 
-void NetworkAnalyzerBufferViewer::setNumBuffers(unsigned int numBuffers)
-{
+void NetworkAnalyzerBufferViewer::setNumBuffers(unsigned int numBuffers) {
 	d_numBuffers = numBuffers;
 }
 
-void NetworkAnalyzerBufferViewer::pushBuffers(QPair<Buffer, Buffer> buffers)
-{
+void NetworkAnalyzerBufferViewer::pushBuffers(QPair<Buffer, Buffer> buffers) {
 	if (d_data.size() < d_numBuffers) {
 		d_data.push_back(buffers);
 	} else {
@@ -59,8 +54,8 @@ void NetworkAnalyzerBufferViewer::pushBuffers(QPair<Buffer, Buffer> buffers)
 	}
 }
 
-void NetworkAnalyzerBufferViewer::selectBuffersAtIndex(int index, bool moveHandle)
-{
+void NetworkAnalyzerBufferViewer::selectBuffersAtIndex(int index,
+						       bool moveHandle) {
 	if (index != d_selectedBuffersIndex) {
 		Q_EMIT indexChanged(index);
 	}
@@ -120,18 +115,16 @@ void NetworkAnalyzerBufferViewer::selectBuffersAtIndex(int index, bool moveHandl
 	}
 }
 
-void NetworkAnalyzerBufferViewer::selectBuffers(double frequency)
-{
+void NetworkAnalyzerBufferViewer::selectBuffers(double frequency) {
 	int index = -1;
 	for (int i = 0; i < d_data.size() - 1; ++i) {
-		if (d_data[i].first.frequency <= frequency
-				&& frequency <= d_data[i + 1].first.frequency) {
+		if (d_data[i].first.frequency <= frequency &&
+		    frequency <= d_data[i + 1].first.frequency) {
 			index = i;
 			break;
 		}
 		if (d_data[i + 1].first.frequency < frequency) {
 			index = d_data.size() - 1;
-
 		}
 		if (frequency < d_data[i].first.frequency) {
 			index = 0;
@@ -149,8 +142,7 @@ void NetworkAnalyzerBufferViewer::selectBuffers(double frequency)
 	selectBuffersAtIndex(index, false);
 }
 
-void NetworkAnalyzerBufferViewer::setVisible(bool visible)
-{
+void NetworkAnalyzerBufferViewer::setVisible(bool visible) {
 	QWidget::setVisible(visible);
 
 	if (d_data.size() && d_selectedBuffersIndex == -1) {
@@ -159,20 +151,18 @@ void NetworkAnalyzerBufferViewer::setVisible(bool visible)
 	}
 }
 
-void NetworkAnalyzerBufferViewer::setOscilloscope(Oscilloscope *osc)
-{
+void NetworkAnalyzerBufferViewer::setOscilloscope(Oscilloscope *osc) {
 	d_osc = osc;
 }
 
-void NetworkAnalyzerBufferViewer::clear()
-{
+void NetworkAnalyzerBufferViewer::clear() {
 	d_data.clear();
 	d_selectedBuffersIndex = -1;
 }
 
-void NetworkAnalyzerBufferViewer::sendBufferToOscilloscope()
-{
-	if (d_selectedBuffersIndex  < 0 || d_selectedBuffersIndex >= d_data.size()) {
+void NetworkAnalyzerBufferViewer::sendBufferToOscilloscope() {
+	if (d_selectedBuffersIndex < 0 ||
+	    d_selectedBuffersIndex >= d_data.size()) {
 		return;
 	}
 
@@ -187,28 +177,27 @@ void NetworkAnalyzerBufferViewer::sendBufferToOscilloscope()
 	for (int i = 0; i < d_data[index].second.buffer.size(); ++i) {
 		yData2.push_back(d_data[index].second.buffer[i]);
 	}
-	d_osc->add_ref_waveform("NA1", d_currentXdata, yData1, d_data[index].first.sampleRate);
-	d_osc->add_ref_waveform("NA2", d_currentXdata, yData2, d_data[index].second.sampleRate);
+	d_osc->add_ref_waveform("NA1", d_currentXdata, yData1,
+				d_data[index].first.sampleRate);
+	d_osc->add_ref_waveform("NA2", d_currentXdata, yData2,
+				d_data[index].second.sampleRate);
 
 	d_osc->detached();
 }
 
-void NetworkAnalyzerBufferViewer::btnPreviousClicked()
-{
+void NetworkAnalyzerBufferViewer::btnPreviousClicked() {
 	if (d_selectedBuffersIndex - 1 >= 0) {
 		selectBuffersAtIndex(d_selectedBuffersIndex - 1);
 	}
 }
 
-void NetworkAnalyzerBufferViewer::btnNextClicked()
-{
+void NetworkAnalyzerBufferViewer::btnNextClicked() {
 	if (d_selectedBuffersIndex + 1 < d_data.size()) {
 		selectBuffersAtIndex(d_selectedBuffersIndex + 1);
 	}
 }
 
-void NetworkAnalyzerBufferViewer::_setupPlot()
-{
+void NetworkAnalyzerBufferViewer::_setupPlot() {
 	d_plot = new TimeDomainDisplayPlot(d_ui->mainWidget);
 	d_ui->mainLayout->addWidget(d_plot);
 
@@ -216,13 +205,10 @@ void NetworkAnalyzerBufferViewer::_setupPlot()
 	d_plot->setUsingLeftAxisScales(false);
 	int nrAxes = d_plot->axesCount(QwtPlot::yLeft);
 	for (int i = 0; i < nrAxes; ++i) {
-		d_plot->setAxisVisible(QwtAxisId(QwtPlot::yLeft, i),
-				false);
+		d_plot->setAxisVisible(QwtAxisId(QwtPlot::yLeft, i), false);
 	}
-	d_plot->setAxisVisible(QwtAxisId(QwtPlot::xBottom, 0),
-			false);
+	d_plot->setAxisVisible(QwtAxisId(QwtPlot::xBottom, 0), false);
 
 	d_plot->plotLayout()->setAlignCanvasToScales(true);
 	d_ui->mainWidget->setMinimumHeight(150);
 }
-

@@ -23,7 +23,7 @@
 #include <QLabel>
 
 namespace Ui {
-	class Statistic;
+class Statistic;
 }
 
 namespace adiscope {
@@ -32,8 +32,7 @@ class MeasurementData;
 class Statistic;
 class Formatter;
 
-class StatisticWidget: public QWidget
-{
+class StatisticWidget : public QWidget {
 public:
 	explicit StatisticWidget(QWidget *parent = nullptr);
 	~StatisticWidget();
@@ -42,11 +41,11 @@ public:
 	int channelId() const;
 	int positionIndex() const;
 
-	void setTitleColor(const QColor& color);
+	void setTitleColor(const QColor &color);
 	void setPositionIndex(int pos);
 
-	void initForMeasurement(const MeasurementData & data);
-	void updateStatistics(const Statistic & data);
+	void initForMeasurement(const MeasurementData &data);
+	void updateStatistics(const Statistic &data);
 
 private:
 	Ui::Statistic *m_ui;

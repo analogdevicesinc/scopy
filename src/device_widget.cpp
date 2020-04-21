@@ -18,94 +18,81 @@
  */
 
 #include "device_widget.hpp"
+
 #include "dynamicWidget.hpp"
 #include "info_page.hpp"
 #include "tool_launcher.hpp"
+
 #include "ui_device.h"
 
 #include <QTimer>
 
 using namespace adiscope;
 
-DeviceWidget::DeviceWidget(QString uri, QString name,
-			   ToolLauncher *parent) :
-	QWidget(parent),
-	m_ui(new Ui::Device()),
-	m_connected(false),
-	m_selected(false)
-{
+DeviceWidget::DeviceWidget(QString uri, QString name, ToolLauncher *parent)
+	: QWidget(parent)
+	, m_ui(new Ui::Device())
+	, m_connected(false)
+	, m_selected(false) {
 	m_ui->setupUi(this);
 	m_uri = uri;
 	m_ui->description->setText(uri);
 	m_ui->name->setText(name);
 
 	if (name.compare("M2K") != 0) {
-		m_infoPage = InfoPageBuilder::newPage(InfoPageBuilder::GENERIC,
-						      m_uri,
-						      parent->getPrefPanel());
+		m_infoPage =
+			InfoPageBuilder::newPage(InfoPageBuilder::GENERIC,
+						 m_uri, parent->getPrefPanel());
 		connect(m_infoPage->forgetDeviceButton(), SIGNAL(clicked(bool)),
 			this, SLOT(forgetDevice_clicked(bool)));
-		connect(m_infoPage->identifyDeviceButton(), SIGNAL(clicked(bool)),
-			this, SLOT(identifyDevice_clicked(bool)));
+		connect(m_infoPage->identifyDeviceButton(),
+			SIGNAL(clicked(bool)), this,
+			SLOT(identifyDevice_clicked(bool)));
 	}
 }
 
-DeviceWidget::~DeviceWidget()
-{
+DeviceWidget::~DeviceWidget() {
 	delete m_infoPage;
 	delete m_ui;
 }
 
-void DeviceWidget::identifyDevice_clicked(bool pressed)
-{
+void DeviceWidget::identifyDevice_clicked(bool pressed) {
 	Q_EMIT identifyDevice(m_uri);
 }
 
-void DeviceWidget::forgetDevice_clicked(bool pressed)
-{
+void DeviceWidget::forgetDevice_clicked(bool pressed) {
 	Q_EMIT forgetDevice(m_uri);
 }
 
-QPushButton* DeviceWidget::deviceButton() const
-{
-	return m_ui->btn;
-}
+QPushButton *DeviceWidget::deviceButton() const { return m_ui->btn; }
 
-QPushButton* DeviceWidget::connectButton() const
-{
+QPushButton *DeviceWidget::connectButton() const {
 	if (m_infoPage) {
 		return m_infoPage->connectButton();
 	}
 	return nullptr;
 }
 
-QPushButton* DeviceWidget::calibrateButton() const
-{
+QPushButton *DeviceWidget::calibrateButton() const {
 	if (m_infoPage) {
 		return m_infoPage->calibrateButton();
 	}
 	return nullptr;
 }
 
-void DeviceWidget::on_btn_toggled(bool toggled)
-{
+void DeviceWidget::on_btn_toggled(bool toggled) {
 	Q_EMIT selected(toggled);
 	m_selected = toggled;
-	setDynamicProperty(m_ui->widget, "selected",
-			   toggled);
+	setDynamicProperty(m_ui->widget, "selected", toggled);
 	if (toggled) {
 		m_infoPage->getDeviceInfo();
 	}
 }
 
-bool DeviceWidget::connected() const
-{
-	return m_connected;
-}
+bool DeviceWidget::connected() const { return m_connected; }
 
 void DeviceWidget::setConnected(bool connected, bool failed,
-				struct iio_context *ctx)
-{
+				struct iio_context *ctx) {
 	m_connected = connected;
 	m_infoPage->setCtx(ctx);
 	setDynamicProperty(m_ui->label, "connected", connected);
@@ -117,80 +104,50 @@ void DeviceWidget::setConnected(bool connected, bool failed,
 	m_infoPage->setConnectionStatus(failed);
 }
 
-InfoPage *DeviceWidget::infoPage() const
-{
-	return m_infoPage;
-}
+InfoPage *DeviceWidget::infoPage() const { return m_infoPage; }
 
-void DeviceWidget::setInfoPage(InfoPage *infoPage)
-{
-	m_infoPage = infoPage;
-}
+void DeviceWidget::setInfoPage(InfoPage *infoPage) { m_infoPage = infoPage; }
 
-QString DeviceWidget::uri() const
-{
-	return m_uri;
-}
+QString DeviceWidget::uri() const { return m_uri; }
 
-void DeviceWidget::setUri(const QString &uri)
-{
-	m_uri = uri;
-}
+void DeviceWidget::setUri(const QString &uri) { m_uri = uri; }
 
-void DeviceWidget::highlightDevice()
-{
+void DeviceWidget::highlightDevice() {
 	bool initialBtnState = m_ui->btn->property("checked").toBool();
 
-	QTimer::singleShot(200, [=](){
+	QTimer::singleShot(200, [=]() {
 		setDynamicProperty(m_ui->btn, "checked", !initialBtnState);
 	});
-	QTimer::singleShot(400, [=](){
+	QTimer::singleShot(400, [=]() {
 		setDynamicProperty(m_ui->btn, "checked", initialBtnState);
 	});
-	QTimer::singleShot(600, [=](){
+	QTimer::singleShot(600, [=]() {
 		setDynamicProperty(m_ui->btn, "checked", !initialBtnState);
 	});
-	QTimer::singleShot(800, [=](){
+	QTimer::singleShot(800, [=]() {
 		setDynamicProperty(m_ui->btn, "checked", initialBtnState);
 	});
 }
 
-void DeviceWidget::setChecked(bool checked)
-{
-	m_ui->btn->setChecked(checked);
-}
+void DeviceWidget::setChecked(bool checked) { m_ui->btn->setChecked(checked); }
 
-bool DeviceWidget::isChecked()
-{
-	return m_ui->btn->isChecked();
-}
+bool DeviceWidget::isChecked() { return m_ui->btn->isChecked(); }
 
-void DeviceWidget::click()
-{
-	m_ui->btn->click();
-}
+void DeviceWidget::click() { m_ui->btn->click(); }
 
-void DeviceWidget::setName(QString name)
-{
-	m_ui->name->setText(name);
-}
+void DeviceWidget::setName(QString name) { m_ui->name->setText(name); }
 
-M2kDeviceWidget::M2kDeviceWidget(QString uri, QString name, ToolLauncher *parent) :
-	DeviceWidget(uri, name, parent)
-{
+M2kDeviceWidget::M2kDeviceWidget(QString uri, QString name,
+				 ToolLauncher *parent)
+	: DeviceWidget(uri, name, parent) {
 	m_ui->name->setText("M2K");
-	m_infoPage = InfoPageBuilder::newPage(InfoPageBuilder::M2K,
-					      m_uri,
-					      parent->getPrefPanel(),
-					      nullptr);
+	m_infoPage = InfoPageBuilder::newPage(InfoPageBuilder::M2K, m_uri,
+					      parent->getPrefPanel(), nullptr);
 
-	connect(m_infoPage->forgetDeviceButton(), SIGNAL(clicked(bool)),
-		this, SLOT(forgetDevice_clicked(bool)));
-	connect(m_infoPage->identifyDeviceButton(), SIGNAL(clicked(bool)),
-		this, SLOT(identifyDevice_clicked(bool)));
+	connect(m_infoPage->forgetDeviceButton(), SIGNAL(clicked(bool)), this,
+		SLOT(forgetDevice_clicked(bool)));
+	connect(m_infoPage->identifyDeviceButton(), SIGNAL(clicked(bool)), this,
+		SLOT(identifyDevice_clicked(bool)));
 }
 
-
-M2kDeviceWidget::~M2kDeviceWidget()
-{
-}
+M2kDeviceWidget::~M2kDeviceWidget() {}

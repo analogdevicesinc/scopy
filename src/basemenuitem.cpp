@@ -18,9 +18,10 @@
  */
 
 #include "basemenuitem.h"
-#include "ui_basemenuitem.h"
 
 #include "utils.h"
+
+#include "ui_basemenuitem.h"
 
 #include <QDebug>
 #include <QDrag>
@@ -30,18 +31,17 @@ using namespace adiscope;
 
 const char *BaseMenuItem::menuItemMimeDataType = "menuItem";
 
-BaseMenuItem::BaseMenuItem(QWidget *parent) :
-	ColoredQWidget(parent),
-	d_ui(new Ui::BaseMenuItem),
-	d_position(0),
-	d_dragStartPosition(QPoint()),
-	d_topDragBox(QRect()),
-	d_centerDragBox(QRect()),
-	d_botDragbox(QRect()),
-	d_dragWidget(nullptr),
-	d_allowDrag(false)
-{
-        d_ui->setupUi(this);
+BaseMenuItem::BaseMenuItem(QWidget *parent)
+	: ColoredQWidget(parent)
+	, d_ui(new Ui::BaseMenuItem)
+	, d_position(0)
+	, d_dragStartPosition(QPoint())
+	, d_topDragBox(QRect())
+	, d_centerDragBox(QRect())
+	, d_botDragbox(QRect())
+	, d_dragWidget(nullptr)
+	, d_allowDrag(false) {
+	d_ui->setupUi(this);
 
 	// Retain widget size when not visible
 	Util::retainWidgetSizeWhenHidden(this);
@@ -55,43 +55,33 @@ BaseMenuItem::BaseMenuItem(QWidget *parent) :
 	installEventFilter(this);
 }
 
-BaseMenuItem::~BaseMenuItem()
-{
+BaseMenuItem::~BaseMenuItem() {
 	removeEventFilter(this);
 
 	delete d_ui;
 }
 
-void BaseMenuItem::setWidget(QWidget *widget)
-{
+void BaseMenuItem::setWidget(QWidget *widget) {
 	d_ui->contentsLayout->addWidget(widget);
 }
 
-int BaseMenuItem::position() const
-{
-	return d_position;
-}
+int BaseMenuItem::position() const { return d_position; }
 
-void BaseMenuItem::setPosition(int position)
-{
-	d_position = position;
-}
+void BaseMenuItem::setPosition(int position) { d_position = position; }
 
-void BaseMenuItem::mousePressEvent(QMouseEvent *event)
-{
+void BaseMenuItem::mousePressEvent(QMouseEvent *event) {
 	if (event->button() == Qt::LeftButton) {
 		d_dragStartPosition = event->pos();
 	}
 }
 
-void BaseMenuItem::mouseMoveEvent(QMouseEvent *event)
-{
+void BaseMenuItem::mouseMoveEvent(QMouseEvent *event) {
 	if (!(event->buttons() & Qt::LeftButton)) {
 		return;
 	}
 
-	if ((event->pos() - d_dragStartPosition).manhattanLength()
-			< QApplication::startDragDistance()) {
+	if ((event->pos() - d_dragStartPosition).manhattanLength() <
+	    QApplication::startDragDistance()) {
 		return;
 	}
 
@@ -108,8 +98,7 @@ void BaseMenuItem::mouseMoveEvent(QMouseEvent *event)
 	mimeData->setData(menuItemMimeDataType, itemData);
 
 	QPixmap pix;
-	pix = grab().scaled(geometry().width(),
-			    geometry().height());
+	pix = grab().scaled(geometry().width(), geometry().height());
 
 	// Hide this item while it is being dragged
 	setVisible(false);
@@ -123,7 +112,6 @@ void BaseMenuItem::mouseMoveEvent(QMouseEvent *event)
 
 	Q_EMIT enableInfoWidget(false);
 
-
 	// Make it visible again when the drag operation finishes
 	setVisible(true);
 
@@ -132,16 +120,13 @@ void BaseMenuItem::mouseMoveEvent(QMouseEvent *event)
 	}
 }
 
-void BaseMenuItem::dragLeaveEvent(QDragLeaveEvent *event)
-{
+void BaseMenuItem::dragLeaveEvent(QDragLeaveEvent *event) {
 	_enableBotSeparator(false);
 	_enableTopSeparator(false);
 	event->accept();
 }
 
-
-void BaseMenuItem::dragEnterEvent(QDragEnterEvent *event)
-{
+void BaseMenuItem::dragEnterEvent(QDragEnterEvent *event) {
 	if (!event->source()) {
 		event->ignore();
 		return;
@@ -160,8 +145,7 @@ void BaseMenuItem::dragEnterEvent(QDragEnterEvent *event)
 	event->accept();
 }
 
-void BaseMenuItem::dragMoveEvent(QDragMoveEvent *event)
-{
+void BaseMenuItem::dragMoveEvent(QDragMoveEvent *event) {
 	if (event->answerRect().intersects(d_topDragBox)) {
 		_enableBotSeparator(false);
 		_enableTopSeparator(true);
@@ -177,8 +161,7 @@ void BaseMenuItem::dragMoveEvent(QDragMoveEvent *event)
 	}
 }
 
-void BaseMenuItem::dropEvent(QDropEvent *event)
-{
+void BaseMenuItem::dropEvent(QDropEvent *event) {
 	_enableBotSeparator(false);
 	_enableTopSeparator(false);
 
@@ -186,58 +169,52 @@ void BaseMenuItem::dropEvent(QDropEvent *event)
 		return;
 	}
 
-	if (event->source() == this && event->possibleActions() & Qt::MoveAction) {
+	if (event->source() == this &&
+	    event->possibleActions() & Qt::MoveAction) {
 		return;
 	}
 
 	bool dropAfter = d_botDragbox.contains(event->pos());
 
 	if (event->mimeData()->hasFormat(menuItemMimeDataType)) {
-		short from = (short)event->mimeData()->data(menuItemMimeDataType)[1];
+		short from =
+			(short)event->mimeData()->data(menuItemMimeDataType)[1];
 		short to = d_position;
-		if (dropAfter) to++;
+		if (dropAfter)
+			to++;
 		Q_EMIT moveItem(from, to);
 	}
-
 }
 
-void BaseMenuItem::enterEvent(QEvent *event)
-{
-	event->accept();
-}
+void BaseMenuItem::enterEvent(QEvent *event) { event->accept(); }
 
-void BaseMenuItem::leaveEvent(QEvent *event)
-{
-	event->accept();
-}
+void BaseMenuItem::leaveEvent(QEvent *event) { event->accept(); }
 
-void BaseMenuItem::setDragWidget(QWidget *widget)
-{
+void BaseMenuItem::setDragWidget(QWidget *widget) {
 	// Set the widget that must be used for dragging
 	d_dragWidget = widget;
 	d_dragWidget->installEventFilter(this);
 }
 
-bool BaseMenuItem::eventFilter(QObject *watched, QEvent *event)
-{
-	if (event->type() == QEvent::DragEnter){
-		QDragEnterEvent *enterEvent = static_cast<QDragEnterEvent *>(event);
+bool BaseMenuItem::eventFilter(QObject *watched, QEvent *event) {
+	if (event->type() == QEvent::DragEnter) {
+		QDragEnterEvent *enterEvent =
+			static_cast<QDragEnterEvent *>(event);
 		if (!enterEvent->mimeData()->hasFormat(menuItemMimeDataType))
 			return true;
 	}
 
-	if (watched == d_dragWidget && event->type() == QEvent::MouseButtonPress) {
+	if (watched == d_dragWidget &&
+	    event->type() == QEvent::MouseButtonPress) {
 		d_allowDrag = true;
 	}
 	return QWidget::eventFilter(watched, event);
 }
 
-void BaseMenuItem::_enableBotSeparator(bool enable)
-{
+void BaseMenuItem::_enableBotSeparator(bool enable) {
 	d_ui->botSep->setVisible(enable);
 }
 
-void BaseMenuItem::_enableTopSeparator(bool enable)
-{
+void BaseMenuItem::_enableTopSeparator(bool enable) {
 	d_ui->topSep->setVisible(enable);
 }

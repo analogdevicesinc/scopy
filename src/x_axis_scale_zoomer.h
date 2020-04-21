@@ -20,20 +20,20 @@
 #ifndef X_AXIS_SCALE_ZOOMER_H
 #define X_AXIS_SCALE_ZOOMER_H
 
-#include <qwt_plot_zoomer.h>
 #include "osc_scale_zoomer.h"
 
+#include <qwt_plot_zoomer.h>
+
 namespace adiscope {
-class XAxisScaleZoomer : public OscScaleZoomer
-{
+class XAxisScaleZoomer : public OscScaleZoomer {
 	Q_OBJECT
 public:
 	explicit XAxisScaleZoomer(QWidget *parent);
 	~XAxisScaleZoomer();
 
 protected:
-	virtual void zoom(const QRectF&);
-	virtual QwtText trackerText( const QPoint& p ) const;
+	virtual void zoom(const QRectF &);
+	virtual QwtText trackerText(const QPoint &p) const;
 };
-}
+} // namespace adiscope
 #endif // X_AXIS_SCALE_ZOOMER_H

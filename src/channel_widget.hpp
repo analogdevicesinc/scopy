@@ -1,9 +1,9 @@
 #ifndef CHANNEL_WIDGET_HPP
 #define CHANNEL_WIDGET_HPP
 
-#include <QWidget>
-#include <QString>
 #include <QAbstractButton>
+#include <QString>
+#include <QWidget>
 
 namespace Ui {
 class Channel;
@@ -11,19 +11,18 @@ class Channel;
 
 namespace adiscope {
 
-class ChannelWidget: public QWidget
-{
+class ChannelWidget : public QWidget {
 	Q_OBJECT
 
 public:
 	explicit ChannelWidget(int id, bool deletable, bool simplified,
-		QColor color, QWidget *parent = 0);
+			       QColor color, QWidget *parent = 0);
 	~ChannelWidget();
 
-	QAbstractButton* enableButton() const;
-	QAbstractButton* nameButton() const;
-	QAbstractButton* menuButton() const;
-	QAbstractButton* deleteButton() const;
+	QAbstractButton *enableButton() const;
+	QAbstractButton *nameButton() const;
+	QAbstractButton *menuButton() const;
+	QAbstractButton *deleteButton() const;
 
 	int id() const;
 	void setId(int);
@@ -31,19 +30,19 @@ public:
 	QColor color() const;
 
 	QString fullName() const;
-	void setFullName(const QString&);
+	void setFullName(const QString &);
 
 	QString shortName() const;
-	void setShortName(const QString&);
+	void setShortName(const QString &);
 
 	QString function() const;
 	void setFunction(const QString &);
 
 	bool isMathChannel() const;
-	void setMathChannel(const bool&);
+	void setMathChannel(const bool &);
 
 	bool isReferenceChannel() const;
-	void setReferenceChannel(const bool&);
+	void setReferenceChannel(const bool &);
 
 protected:
 	bool eventFilter(QObject *object, QEvent *event) override;

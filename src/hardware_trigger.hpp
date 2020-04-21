@@ -2,20 +2,21 @@
 #define HARDWARE_TRIGGER_H
 
 #include <iio.h>
+
 #include <QList>
-#include <QVector>
 #include <QString>
+#include <QVector>
+
 #include <memory>
 
 extern "C" {
-	struct iio_device;
-	struct iio_channel;
+struct iio_device;
+struct iio_channel;
 }
 
 namespace adiscope {
 
-class HardwareTrigger
-{
+class HardwareTrigger {
 public:
 	enum condition {
 		RISING_EDGE = 0,
@@ -26,16 +27,16 @@ public:
 	};
 
 	enum mode {
-			ALWAYS = 0,
-			ANALOG = 1,
-			DIGITAL = 2,
-			DIGITAL_OR_ANALOG = 3,
-			DIGITAL_AND_ANALOG = 4,
-			DIGITAL_XOR_ANALOG = 5,
-			TRIGGER_IN = 6,
-			ANALOG_OR_TRIGGER_IN = 7,
-			DIGITAL_OR_TRIGGER_IN = 8,
-			DIGITAL_OR_ANALOG_OR_TRIGGER_IN = 9,
+		ALWAYS = 0,
+		ANALOG = 1,
+		DIGITAL = 2,
+		DIGITAL_OR_ANALOG = 3,
+		DIGITAL_AND_ANALOG = 4,
+		DIGITAL_XOR_ANALOG = 5,
+		TRIGGER_IN = 6,
+		ANALOG_OR_TRIGGER_IN = 7,
+		DIGITAL_OR_TRIGGER_IN = 8,
+		DIGITAL_OR_ANALOG_OR_TRIGGER_IN = 9,
 	};
 
 	enum direction {
@@ -64,7 +65,6 @@ public:
 	typedef std::unique_ptr<HardwareTrigger::Settings> settings_uptr;
 
 public:
-
 	HardwareTrigger(struct iio_device *trigger_dev);
 
 	uint numChannels() const;
@@ -85,10 +85,11 @@ public:
 	void setTriggerMode(uint chnIdx, mode mode);
 
 	QString source() const;
-	void setSource(const QString& source);
+	void setSource(const QString &source);
 
 	int sourceChannel() const;
-	void setSourceChannel(uint chnIdx, bool intern_checked, bool extern_trigger_in_checked);
+	void setSourceChannel(uint chnIdx, bool intern_checked,
+			      bool extern_trigger_in_checked);
 
 	bool triggerIn() const;
 	void setTriggerIn(bool bo);
@@ -107,7 +108,6 @@ public:
 	bool hasCrossInstrumentTrigger() const;
 	void setExternalDirection(uint chnIdx, direction dir);
 	void setExternalOutSelect(uint chnIdx, out_select out);
-
 
 private:
 	struct iio_device *m_trigger_device;

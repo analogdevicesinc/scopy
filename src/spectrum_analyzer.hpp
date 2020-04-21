@@ -20,30 +20,30 @@
 #ifndef SPECTRUM_ANALYZER_HPP
 #define SPECTRUM_ANALYZER_HPP
 
-#include <gnuradio/top_block.h>
-#include <gnuradio/fft/window.h>
-#include <gnuradio/blocks/complex_to_mag_squared.h>
-
-#include "apiObject.hpp"
-#include "iio_manager.hpp"
-#include "scope_sink_f.h"
-#include "fft_block.hpp"
 #include "FftDisplayPlot.h"
-#include "osc_adc.h"
-#include "tool.hpp"
-#include "plot_utils.hpp"
-#include "spinbox_a.hpp"
+#include "apiObject.hpp"
 #include "customPushButton.hpp"
+#include "fft_block.hpp"
+#include "iio_manager.hpp"
+#include "osc_adc.h"
+#include "plot_utils.hpp"
+#include "scope_sink_f.h"
+#include "spinbox_a.hpp"
 #include "startstoprangewidget.h"
+#include "tool.hpp"
 
-#include <QWidget>
+#include <gnuradio/blocks/complex_to_mag_squared.h>
+#include <gnuradio/fft/window.h>
+#include <gnuradio/top_block.h>
+
 #include <QQueue>
+#include <QWidget>
 
 extern "C" {
-	struct iio_buffer;
-	struct iio_channel;
-	struct iio_context;
-	struct iio_device;
+struct iio_buffer;
+struct iio_channel;
+struct iio_context;
+struct iio_device;
 }
 
 namespace Ui {
@@ -55,7 +55,7 @@ class SpectrumChannel;
 class Filter;
 class ChannelWidget;
 class DbClickButtons;
-}
+} // namespace adiscope
 
 class QPushButton;
 class QButtonGroup;
@@ -66,8 +66,7 @@ class SpectrumAnalyzer_API;
 class SpectrumChannel_API;
 class SpectrumMarker_API;
 
-class SpectrumAnalyzer: public Tool
-{
+class SpectrumAnalyzer : public Tool {
 	friend class SpectrumChannel_API;
 	friend class SpectrumAnalyzer_API;
 	friend class SpectrumMarker_API;
@@ -76,7 +75,6 @@ class SpectrumAnalyzer: public Tool
 	Q_OBJECT
 
 public:
-
 	enum FftWinType {
 		FLAT_TOP = 0,
 		RECTANGULAR = 1,
@@ -90,14 +88,15 @@ public:
 	typedef boost::shared_ptr<SpectrumChannel> channel_sptr;
 
 	explicit SpectrumAnalyzer(struct iio_context *iio, Filter *filt,
-	                          std::shared_ptr<GenericAdc> adc, ToolMenuItem *toolMenuItem,
-	                          QJSEngine *engine, ToolLauncher *parent);
+				  std::shared_ptr<GenericAdc> adc,
+				  ToolMenuItem *toolMenuItem, QJSEngine *engine,
+				  ToolLauncher *parent);
 	~SpectrumAnalyzer();
 
 	void setNativeDialogs(bool nativeDialogs) override;
 
 public Q_SLOTS:
-	void readPreferences();	
+	void readPreferences();
 	void run() override;
 	void stop() override;
 
@@ -110,8 +109,8 @@ private Q_SLOTS:
 	void on_btnSettings_clicked(bool checked);
 	void on_btnSweep_toggled(bool checked);
 	void on_btnMarkers_toggled(bool checked);
-	void on_comboBox_type_currentIndexChanged(const QString&);
-	void on_comboBox_window_currentIndexChanged(const QString&);
+	void on_comboBox_type_currentIndexChanged(const QString &);
+	void on_comboBox_window_currentIndexChanged(const QString &);
 	void on_spinBox_averaging_valueChanged(int);
 	void runStopToggled(bool);
 	void onChannelSettingsToggled(bool);
@@ -125,7 +124,7 @@ private Q_SLOTS:
 	void on_btnDnAmplPeak_clicked();
 	void on_btnMaxPeak_clicked();
 	void on_cmb_rbw_currentIndexChanged(int index);
-	void on_cmb_units_currentIndexChanged(const QString&);
+	void on_cmb_units_currentIndexChanged(const QString &);
 	void onPlotNewMarkerData();
 	void onPlotMarkerSelected(uint chIdx, uint mkIdx);
 	void onMarkerFreqPosChanged(double);
@@ -135,7 +134,7 @@ private Q_SLOTS:
 	void on_btnMarkerTable_toggled(bool checked);
 	void onTopValueChanged(double);
 	void onRangeValueChanged(double);
-	void rightMenuFinished(bool opened);	
+	void rightMenuFinished(bool opened);
 	void btnExportClicked();
 	void updateRunButton(bool);
 	void on_btnAddRef_toggled(bool checked);
@@ -166,7 +165,7 @@ private:
 	QList<SpectrumMarker_API *> marker_api;
 
 	QPair<int, int> getGridLayoutPosFromIndex(QGridLayout *layout,
-	                int index) const;
+						  int index) const;
 
 	QQueue<QPair<CustomPushButton *, bool>> menuButtonActions;
 	QList<CustomPushButton *> menuOrder;
@@ -215,10 +214,10 @@ private:
 
 	bool marker_menu_opened;
 
-	static std::vector<std::pair<QString,
-	       FftDisplayPlot::MagnitudeType>> mag_types;
-	static std::vector<std::pair<QString,
-	       FftDisplayPlot::AverageType>> avg_types;
+	static std::vector<std::pair<QString, FftDisplayPlot::MagnitudeType>>
+		mag_types;
+	static std::vector<std::pair<QString, FftDisplayPlot::AverageType>>
+		avg_types;
 	static std::vector<std::pair<QString, FftWinType>> win_types;
 	static std::vector<QString> markerTypes;
 	void triggerRightMenuToggle(CustomPushButton *btn, bool checked);
@@ -229,8 +228,7 @@ private:
 	bool isIioManagerStarted() const;
 };
 
-class SpectrumChannel: public QObject
-{
+class SpectrumChannel : public QObject {
 	Q_OBJECT
 	friend class SpectrumChannel_API;
 
@@ -238,20 +236,11 @@ public:
 	boost::shared_ptr<adiscope::fft_block> fft_block;
 	gr::blocks::complex_to_mag_squared::sptr ctm_block;
 
-	SpectrumChannel(int id, const QString& name, FftDisplayPlot *plot);
+	SpectrumChannel(int id, const QString &name, FftDisplayPlot *plot);
 
-	int id() const
-	{
-		return m_id;
-	}
-	QString name() const
-	{
-		return m_name;
-	}
-	ChannelWidget *widget() const
-	{
-		return m_widget;
-	}
+	int id() const { return m_id; }
+	QString name() const { return m_name; }
+	ChannelWidget *widget() const { return m_widget; }
 
 	bool isSettingsOn() const;
 	void setSettingsOn(bool on);
@@ -260,7 +249,7 @@ public:
 	void setLinewidth(float);
 
 	QColor color() const;
-	void setColor(const QColor&);
+	void setColor(const QColor &);
 
 	uint averaging() const;
 	void setAveraging(uint);
@@ -282,11 +271,11 @@ private:
 	FftDisplayPlot *m_plot;
 	ChannelWidget *m_widget;
 
-	float calcCoherentPowerGain(const std::vector<float>& win) const;
-	void scaletFftWindow(std::vector<float>& win, float gain);
+	float calcCoherentPowerGain(const std::vector<float> &win) const;
+	void scaletFftWindow(std::vector<float> &win, float gain);
 
 	static std::vector<float> build_win(SpectrumAnalyzer::FftWinType type,
-	                                    int ntaps);
+					    int ntaps);
 };
 } // namespace adiscope
 

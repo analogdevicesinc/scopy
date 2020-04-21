@@ -1,15 +1,15 @@
 #include "extendingplotzoomer.h"
+
 #include "oscilloscope_plot.hpp"
 
 using namespace adiscope;
 
-ExtendingPlotZoomer::ExtendingPlotZoomer(QWidget *parent, bool doReplot):
-    LimitedPlotZoomer(parent, doReplot),
-    widthPass(false),
-    heightPass(false),
-    extendWidth(false),
-    extendHeight(false)
-{
+ExtendingPlotZoomer::ExtendingPlotZoomer(QWidget *parent, bool doReplot)
+	: LimitedPlotZoomer(parent, doReplot)
+	, widthPass(false)
+	, heightPass(false)
+	, extendWidth(false)
+	, extendHeight(false) {
 	extendMarkers.push_back(new QwtPlotShapeItem());
 	extendMarkers.push_back(new QwtPlotShapeItem());
 
@@ -19,8 +19,7 @@ ExtendingPlotZoomer::ExtendingPlotZoomer(QWidget *parent, bool doReplot):
 	cornerMarkers.push_back(new QwtPlotShapeItem());
 }
 
-ExtendingPlotZoomer::~ExtendingPlotZoomer()
-{
+ExtendingPlotZoomer::~ExtendingPlotZoomer() {
 	for (auto it = extendMarkers.begin(); it != extendMarkers.end(); ++it) {
 		delete *it;
 	}
@@ -30,8 +29,7 @@ ExtendingPlotZoomer::~ExtendingPlotZoomer()
 	}
 }
 
-void ExtendingPlotZoomer::zoom(const QRectF &rect)
-{
+void ExtendingPlotZoomer::zoom(const QRectF &rect) {
 	widthPass = false;
 	heightPass = false;
 	extendHeight = false;
@@ -46,8 +44,7 @@ void ExtendingPlotZoomer::zoom(const QRectF &rect)
 	LimitedPlotZoomer::zoom(rect);
 }
 
-QPolygon ExtendingPlotZoomer::adjustedPoints(const QPolygon &points) const
-{
+QPolygon ExtendingPlotZoomer::adjustedPoints(const QPolygon &points) const {
 	QPolygon adjusted;
 	if (points.size() < 2)
 		return points;
@@ -57,7 +54,7 @@ QPolygon ExtendingPlotZoomer::adjustedPoints(const QPolygon &points) const
 		cornerMarkers[1]->detach();
 		cornerMarkers[2]->detach();
 		cornerMarkers[3]->detach();
-		static_cast<CapturePlot*>((QwtPlot*)plot())->replot();
+		static_cast<CapturePlot *>((QwtPlot *)plot())->replot();
 		return points;
 	}
 
@@ -72,7 +69,7 @@ QPolygon ExtendingPlotZoomer::adjustedPoints(const QPolygon &points) const
 		heightPass = true;
 	}
 
-	//Handle width extension
+	// Handle width extension
 	if (width < 40 && widthPass && !extendWidth && !extendHeight) {
 		extendWidth = true;
 	}
@@ -80,7 +77,7 @@ QPolygon ExtendingPlotZoomer::adjustedPoints(const QPolygon &points) const
 		extendWidth = false;
 	}
 
-	//Handle height extension
+	// Handle height extension
 	if (height < 40 && heightPass && !extendHeight && !extendWidth) {
 		extendHeight = true;
 	}
@@ -100,8 +97,10 @@ QPolygon ExtendingPlotZoomer::adjustedPoints(const QPolygon &points) const
 			cornerMarkers[2]->detach();
 			cornerMarkers[3]->detach();
 
-			QPointF x11 = invTransform(QPoint(points[0].x() - 40, points[1].y()));
-			QPointF x21 = invTransform(QPoint(points[0].x() + 40, points[1].y()));
+			QPointF x11 = invTransform(
+				QPoint(points[0].x() - 40, points[1].y()));
+			QPointF x21 = invTransform(
+				QPoint(points[0].x() + 40, points[1].y()));
 
 			QPainterPath path1;
 			path1.moveTo(x11);
@@ -110,11 +109,12 @@ QPolygon ExtendingPlotZoomer::adjustedPoints(const QPolygon &points) const
 			extendMarkers[0]->setShape(path1);
 			extendMarkers[0]->setPen(Qt::white, 3, Qt::SolidLine);
 			extendMarkers[0]->setZ(1000);
-			extendMarkers[0]->attach((QwtPlot*)plot());
+			extendMarkers[0]->attach((QwtPlot *)plot());
 
-
-			QPointF x12 = invTransform(QPoint(points[0].x() - 40, points[0].y()));
-			QPointF x22 = invTransform(QPoint(points[0].x() + 40, points[0].y()));
+			QPointF x12 = invTransform(
+				QPoint(points[0].x() - 40, points[0].y()));
+			QPointF x22 = invTransform(
+				QPoint(points[0].x() + 40, points[0].y()));
 
 			QPainterPath path2;
 			path2.moveTo(x12);
@@ -123,10 +123,9 @@ QPolygon ExtendingPlotZoomer::adjustedPoints(const QPolygon &points) const
 			extendMarkers[1]->setShape(path2);
 			extendMarkers[1]->setPen(Qt::white, 3, Qt::SolidLine);
 			extendMarkers[1]->setZ(1000);
-			extendMarkers[1]->attach((QwtPlot*)plot());
+			extendMarkers[1]->attach((QwtPlot *)plot());
 
-
-			static_cast<CapturePlot*>((QwtPlot*)plot())->replot();
+			static_cast<CapturePlot *>((QwtPlot *)plot())->replot();
 		}
 
 		return adjusted;
@@ -144,8 +143,10 @@ QPolygon ExtendingPlotZoomer::adjustedPoints(const QPolygon &points) const
 			cornerMarkers[2]->detach();
 			cornerMarkers[3]->detach();
 
-			QPointF x11 = invTransform(QPoint(points[0].x(), points[0].y() - 40));
-			QPointF x21 = invTransform(QPoint(points[0].x(), points[0].y() + 40));
+			QPointF x11 = invTransform(
+				QPoint(points[0].x(), points[0].y() - 40));
+			QPointF x21 = invTransform(
+				QPoint(points[0].x(), points[0].y() + 40));
 
 			QPainterPath path1;
 			path1.moveTo(x11);
@@ -154,11 +155,12 @@ QPolygon ExtendingPlotZoomer::adjustedPoints(const QPolygon &points) const
 			extendMarkers[0]->setShape(path1);
 			extendMarkers[0]->setPen(Qt::white, 3, Qt::SolidLine);
 			extendMarkers[0]->setZ(1000);
-			extendMarkers[0]->attach((QwtPlot*)plot());
+			extendMarkers[0]->attach((QwtPlot *)plot());
 
-
-			QPointF x12 = invTransform(QPoint(points[1].x(), points[0].y() - 40));
-			QPointF x22 = invTransform(QPoint(points[1].x(), points[0].y() + 40));
+			QPointF x12 = invTransform(
+				QPoint(points[1].x(), points[0].y() - 40));
+			QPointF x22 = invTransform(
+				QPoint(points[1].x(), points[0].y() + 40));
 
 			QPainterPath path2;
 			path2.moveTo(x12);
@@ -167,15 +169,13 @@ QPolygon ExtendingPlotZoomer::adjustedPoints(const QPolygon &points) const
 			extendMarkers[1]->setShape(path2);
 			extendMarkers[1]->setPen(Qt::white, 3, Qt::SolidLine);
 			extendMarkers[1]->setZ(1000);
-			extendMarkers[1]->attach((QwtPlot*)plot());
+			extendMarkers[1]->attach((QwtPlot *)plot());
 
-
-			static_cast<CapturePlot*>((QwtPlot*)plot())->replot();
+			static_cast<CapturePlot *>((QwtPlot *)plot())->replot();
 		}
 
 		return adjusted;
 	}
-
 
 	if (yAxis() == QwtAxisId(QwtPlot::yLeft, 0)) {
 
@@ -189,46 +189,61 @@ QPolygon ExtendingPlotZoomer::adjustedPoints(const QPolygon &points) const
 			QPointF origin1 = invTransform(points[0]);
 			QPointF bottom1;
 			if (points[0].y() < points[1].y())
-				bottom1 = invTransform(QPoint(points[0].x(), points[0].y() + 20));
+				bottom1 = invTransform(QPoint(
+					points[0].x(), points[0].y() + 20));
 			else
-				bottom1 = invTransform(QPoint(points[0].x(), points[0].y() - 20));
-			QPointF right1 = invTransform(QPoint(points[0].x() + 20, points[0].y()));
+				bottom1 = invTransform(QPoint(
+					points[0].x(), points[0].y() - 20));
+			QPointF right1 = invTransform(
+				QPoint(points[0].x() + 20, points[0].y()));
 
 			path1.moveTo(bottom1);
 			path1.lineTo(origin1);
 			path1.lineTo(right1);
 
-			QPointF origin2 = invTransform(QPoint(points[1].x(), points[0].y()));
+			QPointF origin2 = invTransform(
+				QPoint(points[1].x(), points[0].y()));
 			QPointF bottom2;
 			if (points[0].y() < points[1].y())
-				bottom2 = invTransform(QPoint(points[1].x(), points[0].y() + 20));
+				bottom2 = invTransform(QPoint(
+					points[1].x(), points[0].y() + 20));
 			else
-				bottom2 = invTransform(QPoint(points[1].x(), points[0].y() - 20));
-			QPointF right2 = invTransform(QPoint(points[1].x() - 20, points[0].y()));
+				bottom2 = invTransform(QPoint(
+					points[1].x(), points[0].y() - 20));
+			QPointF right2 = invTransform(
+				QPoint(points[1].x() - 20, points[0].y()));
 
 			path2.moveTo(bottom2);
 			path2.lineTo(origin2);
 			path2.lineTo(right2);
 
-			QPointF origin3 = invTransform(QPoint(points[1].x(), points[1].y()));
+			QPointF origin3 = invTransform(
+				QPoint(points[1].x(), points[1].y()));
 			QPointF bottom3;
 			if (points[0].y() < points[1].y())
-				bottom3 = invTransform(QPoint(points[1].x(), points[1].y() - 20));
+				bottom3 = invTransform(QPoint(
+					points[1].x(), points[1].y() - 20));
 			else
-				bottom3 = invTransform(QPoint(points[1].x(), points[1].y() + 20));
-			QPointF right3 = invTransform(QPoint(points[1].x() - 20, points[1].y()));
+				bottom3 = invTransform(QPoint(
+					points[1].x(), points[1].y() + 20));
+			QPointF right3 = invTransform(
+				QPoint(points[1].x() - 20, points[1].y()));
 
 			path3.moveTo(bottom3);
 			path3.lineTo(origin3);
 			path3.lineTo(right3);
 
-			QPointF origin4 = invTransform(QPoint(points[0].x(), points[1].y()));
+			QPointF origin4 = invTransform(
+				QPoint(points[0].x(), points[1].y()));
 			QPointF bottom4;
 			if (points[0].y() < points[1].y())
-				bottom4 = invTransform(QPoint(points[0].x(), points[1].y() - 20));
+				bottom4 = invTransform(QPoint(
+					points[0].x(), points[1].y() - 20));
 			else
-				bottom4 = invTransform(QPoint(points[0].x(), points[1].y() + 20));
-			QPointF right4 = invTransform(QPoint(points[0].x() + 20, points[1].y()));
+				bottom4 = invTransform(QPoint(
+					points[0].x(), points[1].y() + 20));
+			QPointF right4 = invTransform(
+				QPoint(points[0].x() + 20, points[1].y()));
 
 			path4.moveTo(bottom4);
 			path4.lineTo(origin4);
@@ -239,46 +254,61 @@ QPolygon ExtendingPlotZoomer::adjustedPoints(const QPolygon &points) const
 			QPointF origin1 = invTransform(points[0]);
 			QPointF bottom1;
 			if (points[0].y() < points[1].y())
-				bottom1 = invTransform(QPoint(points[0].x(), points[0].y() + 20));
+				bottom1 = invTransform(QPoint(
+					points[0].x(), points[0].y() + 20));
 			else
-				bottom1 = invTransform(QPoint(points[0].x(), points[0].y() - 20));
-			QPointF right1 = invTransform(QPoint(points[0].x() - 20, points[0].y()));
+				bottom1 = invTransform(QPoint(
+					points[0].x(), points[0].y() - 20));
+			QPointF right1 = invTransform(
+				QPoint(points[0].x() - 20, points[0].y()));
 
 			path1.moveTo(bottom1);
 			path1.lineTo(origin1);
 			path1.lineTo(right1);
 
-			QPointF origin2 = invTransform(QPoint(points[1].x(), points[0].y()));
+			QPointF origin2 = invTransform(
+				QPoint(points[1].x(), points[0].y()));
 			QPointF bottom2;
 			if (points[0].y() < points[1].y())
-				bottom2 = invTransform(QPoint(points[1].x(), points[0].y() + 20));
+				bottom2 = invTransform(QPoint(
+					points[1].x(), points[0].y() + 20));
 			else
-				bottom2 = invTransform(QPoint(points[1].x(), points[0].y() - 20));
-			QPointF right2 = invTransform(QPoint(points[1].x() + 20, points[0].y()));
+				bottom2 = invTransform(QPoint(
+					points[1].x(), points[0].y() - 20));
+			QPointF right2 = invTransform(
+				QPoint(points[1].x() + 20, points[0].y()));
 
 			path2.moveTo(bottom2);
 			path2.lineTo(origin2);
 			path2.lineTo(right2);
 
-			QPointF origin3 = invTransform(QPoint(points[1].x(), points[1].y()));
+			QPointF origin3 = invTransform(
+				QPoint(points[1].x(), points[1].y()));
 			QPointF bottom3;
 			if (points[0].y() < points[1].y())
-				bottom3 = invTransform(QPoint(points[1].x(), points[1].y() - 20));
+				bottom3 = invTransform(QPoint(
+					points[1].x(), points[1].y() - 20));
 			else
-				bottom3 = invTransform(QPoint(points[1].x(), points[1].y() + 20));
-			QPointF right3 = invTransform(QPoint(points[1].x() + 20, points[1].y()));
+				bottom3 = invTransform(QPoint(
+					points[1].x(), points[1].y() + 20));
+			QPointF right3 = invTransform(
+				QPoint(points[1].x() + 20, points[1].y()));
 
 			path3.moveTo(bottom3);
 			path3.lineTo(origin3);
 			path3.lineTo(right3);
 
-			QPointF origin4 = invTransform(QPoint(points[0].x(), points[1].y()));
+			QPointF origin4 = invTransform(
+				QPoint(points[0].x(), points[1].y()));
 			QPointF bottom4;
 			if (points[0].y() < points[1].y())
-				bottom4 = invTransform(QPoint(points[0].x(), points[1].y() - 20));
+				bottom4 = invTransform(QPoint(
+					points[0].x(), points[1].y() - 20));
 			else
-				bottom4 = invTransform(QPoint(points[0].x(), points[1].y() + 20));
-			QPointF right4 = invTransform(QPoint(points[0].x() - 20, points[1].y()));
+				bottom4 = invTransform(QPoint(
+					points[0].x(), points[1].y() + 20));
+			QPointF right4 = invTransform(
+				QPoint(points[0].x() - 20, points[1].y()));
 
 			path4.moveTo(bottom4);
 			path4.lineTo(origin4);
@@ -288,24 +318,24 @@ QPolygon ExtendingPlotZoomer::adjustedPoints(const QPolygon &points) const
 		cornerMarkers[0]->setShape(path1);
 		cornerMarkers[0]->setPen(Qt::white, 3, Qt::SolidLine);
 		cornerMarkers[0]->setZ(1000);
-		cornerMarkers[0]->attach((QwtPlot*)plot());
+		cornerMarkers[0]->attach((QwtPlot *)plot());
 
 		cornerMarkers[1]->setShape(path2);
 		cornerMarkers[1]->setPen(Qt::white, 3, Qt::SolidLine);
 		cornerMarkers[1]->setZ(1000);
-		cornerMarkers[1]->attach((QwtPlot*)plot());
+		cornerMarkers[1]->attach((QwtPlot *)plot());
 
 		cornerMarkers[2]->setShape(path3);
 		cornerMarkers[2]->setPen(Qt::white, 3, Qt::SolidLine);
 		cornerMarkers[2]->setZ(1000);
-		cornerMarkers[2]->attach((QwtPlot*)plot());
+		cornerMarkers[2]->attach((QwtPlot *)plot());
 
 		cornerMarkers[3]->setShape(path4);
 		cornerMarkers[3]->setPen(Qt::white, 3, Qt::SolidLine);
 		cornerMarkers[3]->setZ(1000);
-		cornerMarkers[3]->attach((QwtPlot*)plot());
+		cornerMarkers[3]->attach((QwtPlot *)plot());
 
-		static_cast<CapturePlot*>((QwtPlot*)plot())->replot();
+		static_cast<CapturePlot *>((QwtPlot *)plot())->replot();
 	}
 	return points;
 }

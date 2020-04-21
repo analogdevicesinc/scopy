@@ -1,19 +1,18 @@
 #ifndef DRAGZONE_H
 #define DRAGZONE_H
 
-#include <QWidget>
-#include <QMouseEvent>
 #include <QDragMoveEvent>
 #include <QDropEvent>
 #include <QMimeData>
+#include <QMouseEvent>
+#include <QWidget>
 
 namespace Ui {
 class DragZone;
 }
 
-namespace adiscope{
-class DragZone : public QWidget
-{
+namespace adiscope {
+class DragZone : public QWidget {
 	Q_OBJECT
 
 public:
@@ -39,5 +38,5 @@ private:
 	Ui::DragZone *ui;
 	int position;
 };
-}
+} // namespace adiscope
 #endif // DRAGZONE_H

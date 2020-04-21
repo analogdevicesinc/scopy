@@ -20,34 +20,27 @@
 #ifndef DBGRAPH_HPP
 #define DBGRAPH_HPP
 
+#include "cursor_readouts.h"
+#include "customFifo.hpp"
+#include "plot_line_handle.h"
+#include "plotpickerwrapper.h"
+#include "symbol_controller.h"
+
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_marker.h>
-
-#include "customFifo.hpp"
-#include "symbol_controller.h"
-#include "plot_line_handle.h"
-#include "cursor_readouts.h"
-#include "plotpickerwrapper.h"
 
 namespace adiscope {
 class OscScaleDraw;
 class PrefixFormatter;
 class OscScaleZoomer;
 
-class dBgraph : public QwtPlot
-{
+class dBgraph : public QwtPlot {
 	Q_OBJECT
 
-	Q_PROPERTY(int numSamples
-		   READ getNumSamples
-		   WRITE setNumSamples
-		  )
+	Q_PROPERTY(int numSamples READ getNumSamples WRITE setNumSamples)
 
-	Q_PROPERTY(QColor color
-		   READ getColor
-		   WRITE setColor
-		  )
+	Q_PROPERTY(QColor color READ getColor WRITE setColor)
 
 	Q_PROPERTY(QString xaxis_title READ xTitle WRITE setXTitle);
 	Q_PROPERTY(QString yaxis_title READ yTitle WRITE setYTitle);
@@ -66,25 +59,26 @@ public:
 	explicit dBgraph(QWidget *parent = nullptr);
 	~dBgraph();
 
-	void setAxesScales(double xmin, double xmax,
-			   double ymin, double ymax);
-	void setAxesTitles(const QString& x, const QString& y);
+	void setAxesScales(double xmin, double xmax, double ymin, double ymax);
+	void setAxesTitles(const QString &x, const QString &y);
 
 	int getNumSamples() const;
 
 	QString getScaleValueFormat(double value, QwtAxisId scale) const;
-	QString getScaleValueFormat(double value, QwtAxisId scale, int precision) const;
+	QString getScaleValueFormat(double value, QwtAxisId scale,
+				    int precision) const;
 
 	void setShowZero(bool en);
 	const QwtScaleWidget *getAxisWidget(QwtAxisId id);
 
-	const QColor& getColor() const;
+	const QColor &getColor() const;
 	double getThickness();
 	QString xTitle() const;
 	QString yTitle() const;
 
 	void toggleCursors(bool);
-	CustomPlotPositionButton::ReadoutsPosition getCursorReadoutCurrentPosition();
+	CustomPlotPositionButton::ReadoutsPosition
+	getCursorReadoutCurrentPosition();
 
 	QString cursorIntersection(qreal text);
 	QVector<double> getXAxisData();
@@ -108,10 +102,10 @@ public Q_SLOTS:
 	void reset();
 
 	void setNumSamples(int num);
-	void setColor(const QColor& color);
+	void setColor(const QColor &color);
 	void setThickness(int index);
-	void setXTitle(const QString& title);
-	void setYTitle(const QString& title);
+	void setXTitle(const QString &title);
+	void setYTitle(const QString &title);
 	void setXMin(double val);
 	void setXMax(double val);
 	void setYMin(double val);
@@ -119,8 +113,8 @@ public Q_SLOTS:
 
 	QString xUnit() const;
 	QString yUnit() const;
-	void setXUnit(const QString& unit);
-	void setYUnit(const QString& unit);
+	void setXUnit(const QString &unit);
+	void setYUnit(const QString &unit);
 
 	void useLogFreq(bool use_log_freq);
 	void useDeltaLabel(bool use_delta);
@@ -136,7 +130,8 @@ public Q_SLOTS:
 	void onCursor2Moved(int);
 
 	void setCursorReadoutsTransparency(int value);
-	void moveCursorReadouts(CustomPlotPositionButton::ReadoutsPosition position);
+	void
+	moveCursorReadouts(CustomPlotPositionButton::ReadoutsPosition position);
 
 	void scaleDivChanged();
 	void mousePressEvent(QMouseEvent *event);
@@ -148,7 +143,6 @@ public Q_SLOTS:
 	void addReferenceWaveform(QVector<double> xData, QVector<double> yData);
 	void removeReferenceWaveform();
 	bool addReferenceWaveformFromPlot();
-
 
 protected Q_SLOTS:
 	void showEvent(QShowEvent *event);
@@ -187,6 +181,6 @@ private:
 	void setupCursors();
 	void setupReadouts();
 };
-}
+} // namespace adiscope
 
 #endif /* DBGRAPH_HPP */

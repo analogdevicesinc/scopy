@@ -21,274 +21,272 @@
 #define M2K_OSCILLOSCOPE_PLOT_H
 
 #include "TimeDomainDisplayPlot.h"
-#include "symbol_controller.h"
-#include "handles_area.hpp"
-#include "plot_line_handle.h"
 #include "cursor_readouts.h"
-#include "measure.h"
 #include "customplotpositionbutton.h"
 #include "graticule.h"
+#include "handles_area.hpp"
+#include "measure.h"
+#include "plot_line_handle.h"
+#include "symbol_controller.h"
 
 class QLabel;
 
 namespace adiscope {
-	class Oscilloscope_API;
-	class PlotWidget;
+class Oscilloscope_API;
+class PlotWidget;
 
-	class OscilloscopePlot : public TimeDomainDisplayPlot
-	{
-		Q_OBJECT
+class OscilloscopePlot : public TimeDomainDisplayPlot {
+	Q_OBJECT
 
-	public:
-		OscilloscopePlot(QWidget *parent, unsigned int xNumDivs = 10,
-				 unsigned int yNumDiv = 10);
-		~OscilloscopePlot();
+public:
+	OscilloscopePlot(QWidget *parent, unsigned int xNumDivs = 10,
+			 unsigned int yNumDiv = 10);
+	~OscilloscopePlot();
+};
+
+struct cursorReadoutsText {
+	QString t1;
+	QString t2;
+	QString tDelta;
+	QString freq;
+	QString v1;
+	QString v2;
+	QString vDelta;
+};
+
+class CapturePlot : public OscilloscopePlot {
+	friend class Oscilloscope_API;
+	friend class Channel_API;
+
+	Q_OBJECT
+
+public:
+	enum TriggerState {
+		Waiting,
+		Triggered,
+		Stop,
+		Auto,
 	};
 
-	struct cursorReadoutsText {
-		QString t1;
-		QString t2;
-		QString tDelta;
-		QString freq;
-		QString v1;
-		QString v2;
-		QString vDelta;
-	};
+public:
+	CapturePlot(QWidget *parent, unsigned int xNumDivs = 10,
+		    unsigned int yNumDivs = 10);
+	~CapturePlot();
 
-	class CapturePlot: public OscilloscopePlot
-	{
-		friend class Oscilloscope_API;
-		friend class Channel_API;
+	HorizBar *levelTriggerA();
+	HorizBar *levelTriggerB();
 
-		Q_OBJECT
+	QWidget *topArea();
+	QWidget *topHandlesArea();
+	QWidget *bottomHandlesArea();
+	QWidget *leftHandlesArea();
+	QWidget *rightHandlesArea();
 
-	public:
-		enum TriggerState {
-			Waiting,
-			Triggered,
-			Stop,
-			Auto,
-		};
+	void setBonusWidthForHistogram(int width);
 
-	public:
-		CapturePlot(QWidget *parent, unsigned int xNumDivs = 10,
-			    unsigned int yNumDivs = 10);
-		~CapturePlot();
+	bool triggerAEnabled();
+	bool triggerBEnabled();
+	bool vertCursorsEnabled();
+	bool horizCursorsEnabled();
+	int selectedChannel();
+	bool measurementsEnabled();
+	struct cursorReadoutsText allCursorReadouts() const;
 
-		HorizBar *levelTriggerA();
-		HorizBar *levelTriggerB();
+	void setOffsetWidgetVisible(int chnIdx, bool visible);
+	void removeOffsetWidgets(int chnIdx);
+	void removeLeftVertAxis(unsigned int axis);
 
-		QWidget *topArea();
-		QWidget *topHandlesArea();
-		QWidget *bottomHandlesArea();
-		QWidget *leftHandlesArea();
-		QWidget *rightHandlesArea();
+	void measure();
+	int activeMeasurementsCount(int chnIdx);
+	QList<std::shared_ptr<MeasurementData>> measurements(int chnIdx);
+	std::shared_ptr<MeasurementData> measurement(int id, int chnIdx);
 
-		void setBonusWidthForHistogram(int width);
+	OscPlotZoomer *getZoomer();
+	void setOffsetInterval(double minValue, double maxValue);
+	double getMaxOffsetValue();
+	double getMinOffsetValue();
 
-		bool triggerAEnabled();
-		bool triggerBEnabled();
-		bool vertCursorsEnabled();
-		bool horizCursorsEnabled();
-		int selectedChannel();
-		bool measurementsEnabled();
-		struct cursorReadoutsText allCursorReadouts() const;
+	void bringCurveToFront(unsigned int curveIdx);
 
-		void setOffsetWidgetVisible(int chnIdx, bool visible);
-		void removeOffsetWidgets(int chnIdx);
-		void removeLeftVertAxis(unsigned int axis);
+	void setTimeBaseZoomed(bool zoomed);
 
-		void measure();
-		int activeMeasurementsCount(int chnIdx);
-		QList<std::shared_ptr<MeasurementData>> measurements(int chnIdx);
-		std::shared_ptr<MeasurementData> measurement(int id, int chnIdx);
+	void enableLabels(bool enabled);
+	bool eventFilter(QObject *, QEvent *);
+	void setActiveVertAxis(unsigned int axisIdx, bool selected = true);
+	void showYAxisWidget(unsigned int axisIdx, bool en);
+	void enableAxisLabels(bool enabled);
 
-		OscPlotZoomer* getZoomer();
-		void setOffsetInterval(double minValue, double maxValue);
-		double getMaxOffsetValue();
-		double getMinOffsetValue();
+	void setDisplayScale(double value);
 
-		void bringCurveToFront(unsigned int curveIdx);
+	void setTimeTriggerInterval(double min, double max);
+	bool labelsEnabled();
+	void trackModeEnabled(bool enabled);
+	void repositionCursors();
 
-		void setTimeBaseZoomed(bool zoomed);
+	void setGraticuleEnabled(bool enabled);
+	void setGatingEnabled(bool enabled);
 
-		void enableLabels(bool enabled);
-		bool eventFilter(QObject *, QEvent *);
-		void setActiveVertAxis(unsigned int axisIdx, bool selected = true);
-		void showYAxisWidget(unsigned int axisIdx, bool en);
-		void enableAxisLabels(bool enabled);
+	void computeMeasurementsForChannel(unsigned int chnIdx,
+					   unsigned int sampleRate);
 
-		void setDisplayScale(double value);
+Q_SIGNALS:
+	void timeTriggerValueChanged(double);
+	void channelOffsetChanged(double);
+	void measurementsAvailable();
+	void cursorReadoutsChanged(struct cursorReadoutsText);
+	void canvasSizeChanged();
+	void leftGateChanged(double);
+	void rightGateChanged(double);
 
-		void setTimeTriggerInterval(double min, double max);
-		bool labelsEnabled();
-		void trackModeEnabled(bool enabled);
-		void repositionCursors();
+public Q_SLOTS:
+	void setTriggerAEnabled(bool en);
+	void setTriggerBEnabled(bool en);
+	void setVertCursorsEnabled(bool en);
+	void setHorizCursorsEnabled(bool en);
+	void setSelectedChannel(int id);
+	void setMeasuremensEnabled(bool en);
+	void setPeriodDetectLevel(int chnIdx, double lvl);
+	void setPeriodDetectHyst(int chnIdx, double hyst);
+	void setCursorReadoutsVisible(bool en);
+	void setTimeBaseLabelValue(double timebase);
+	void setBufferSizeLabelValue(int numSamples);
+	void setSampleRatelabelValue(double sampleRate);
+	void setTriggerState(int triggerState);
+	void setCursorReadoutsTransparency(int value);
+	void
+	moveCursorReadouts(CustomPlotPositionButton::ReadoutsPosition position);
+	void setHorizCursorsLocked(bool value);
+	void setVertCursorsLocked(bool value);
+	void showEvent(QShowEvent *event);
+	void printWithNoBackground(const QString &toolName = "",
+				   bool editScaleDraw = true);
 
-		void setGraticuleEnabled(bool enabled);
-		void setGatingEnabled(bool enabled);
+protected:
+	virtual void cleanUpJustBeforeChannelRemoval(int chnIdx);
 
-		void computeMeasurementsForChannel(unsigned int chnIdx, unsigned int sampleRate);
+private:
+	Measure *measureOfChannel(int chnIdx) const;
+	void updateBufferSizeSampleRateLabel(int nsamples, double sr);
+	void updateHandleAreaPadding(bool);
+	double getHorizontalCursorIntersection(double time);
+	void displayIntersection();
+	void updateGateMargins();
 
-	Q_SIGNALS:
-		void timeTriggerValueChanged(double);
-		void channelOffsetChanged(double);
-		void measurementsAvailable();
-		void cursorReadoutsChanged(struct cursorReadoutsText);
-		void canvasSizeChanged();
-		void leftGateChanged(double);
-		void rightGateChanged(double);
+private Q_SLOTS:
+	void onChannelAdded(int);
+	void onNewDataReceived();
 
-	public Q_SLOTS:
-		void setTriggerAEnabled(bool en);
-		void setTriggerBEnabled(bool en);
-		void setVertCursorsEnabled(bool en);
-		void setHorizCursorsEnabled(bool en);
-		void setSelectedChannel(int id);
-		void setMeasuremensEnabled(bool en);
-		void setPeriodDetectLevel(int chnIdx, double lvl);
-		void setPeriodDetectHyst(int chnIdx, double hyst);
-		void setCursorReadoutsVisible(bool en);
-		void setTimeBaseLabelValue(double timebase);
-		void setBufferSizeLabelValue(int numSamples);
-		void setSampleRatelabelValue(double sampleRate);
-		void setTriggerState(int triggerState);
-		void setCursorReadoutsTransparency(int value);
-		void moveCursorReadouts(CustomPlotPositionButton::ReadoutsPosition position);
-		void setHorizCursorsLocked(bool value);
-		void setVertCursorsLocked(bool value);
-		void showEvent(QShowEvent *event);
-		void printWithNoBackground(const QString& toolName = "", bool editScaleDraw = true);
+	void onHbar1PixelPosChanged(int);
+	void onHbar2PixelPosChanged(int);
+	void onVbar1PixelPosChanged(int);
+	void onVbar2PixelPosChanged(int);
 
-	protected:
-		virtual void cleanUpJustBeforeChannelRemoval(int chnIdx);
+	void onTimeCursor1Moved(double);
+	void onTimeCursor2Moved(double);
+	void onVoltageCursor1Moved(double);
+	void onVoltageCursor2Moved(double);
 
-	private:
-		Measure* measureOfChannel(int chnIdx) const;
-		void updateBufferSizeSampleRateLabel(int nsamples, double sr);
-		void updateHandleAreaPadding(bool);
-		double getHorizontalCursorIntersection(double time);
-		void displayIntersection();
-		void updateGateMargins();
+	void onGateBar1PixelPosChanged(int);
+	void onGateBar2PixelPosChanged(int);
 
-	private Q_SLOTS:
-		void onChannelAdded(int);
-		void onNewDataReceived();
+	void onGateBar1Moved(double);
+	void onGateBar2Moved(double);
 
+	void onTimeTriggerHandlePosChanged(int);
+	void onTimeTriggerHandleGrabbed(bool);
 
-		void onHbar1PixelPosChanged(int);
-		void onHbar2PixelPosChanged(int);
-		void onVbar1PixelPosChanged(int);
-		void onVbar2PixelPosChanged(int);
+	void onTriggerAHandleGrabbed(bool);
+	void onTriggerBHandleGrabbed(bool);
 
-		void onTimeCursor1Moved(double);
-		void onTimeCursor2Moved(double);
-		void onVoltageCursor1Moved(double);
-		void onVoltageCursor2Moved(double);
+private:
+	SymbolController *d_symbolCtrl;
 
-		void onGateBar1PixelPosChanged(int);
-		void onGateBar2PixelPosChanged(int);
+	bool d_triggerAEnabled;
+	bool d_triggerBEnabled;
+	bool d_vertCursorsEnabled;
+	bool d_horizCursorsEnabled;
+	bool d_measurementsEnabled;
+	bool d_labelsEnabled;
 
-		void onGateBar1Moved(double);
-		void onGateBar2Moved(double);
+	int d_selected_channel;
 
-		void onTimeTriggerHandlePosChanged(int);
-		void onTimeTriggerHandleGrabbed(bool);
+	QWidget *d_topWidget;
+	GateHandlesArea *d_topHandlesArea;
+	HorizHandlesArea *d_bottomHandlesArea;
+	VertHandlesArea *d_leftHandlesArea;
+	VertHandlesArea *d_rightHandlesArea;
+	int d_bonusWidth;
 
-		void onTriggerAHandleGrabbed(bool);
-		void onTriggerBHandleGrabbed(bool);
+	QLabel *d_timeBaseLabel;
+	QLabel *d_sampleRateLabel;
+	QLabel *d_triggerStateLabel;
 
-	private:
-		SymbolController *d_symbolCtrl;
+	int d_bufferSizeLabelVal;
+	double d_sampleRateLabelVal;
 
-		bool d_triggerAEnabled;
-		bool d_triggerBEnabled;
-		bool d_vertCursorsEnabled;
-		bool d_horizCursorsEnabled;
-		bool d_measurementsEnabled;
-		bool d_labelsEnabled;
+	QList<HorizBar *> d_offsetBars;
+	QList<RoundedHandleV *> d_offsetHandles;
 
-		int d_selected_channel;
+	PlotLineHandleV *d_vCursorHandle1;
+	PlotLineHandleV *d_vCursorHandle2;
+	PlotLineHandleH *d_hCursorHandle1;
+	PlotLineHandleH *d_hCursorHandle2;
 
-		QWidget *d_topWidget;
-		GateHandlesArea *d_topHandlesArea;
-		HorizHandlesArea *d_bottomHandlesArea;
-		VertHandlesArea *d_leftHandlesArea;
-		VertHandlesArea *d_rightHandlesArea;
-		int d_bonusWidth;
+	PlotGateHandle *d_hGatingHandle1;
+	PlotGateHandle *d_hGatingHandle2;
 
-		QLabel *d_timeBaseLabel;
-		QLabel *d_sampleRateLabel;
-		QLabel *d_triggerStateLabel;
+	VertBar *d_vBar1;
+	VertBar *d_vBar2;
+	HorizBar *d_hBar1;
+	HorizBar *d_hBar2;
 
-		int d_bufferSizeLabelVal;
-		double d_sampleRateLabelVal;
+	VertBar *d_gateBar1;
+	VertBar *d_gateBar2;
 
-		QList<HorizBar*> d_offsetBars;
-		QList<RoundedHandleV*> d_offsetHandles;
+	VertBar *d_timeTriggerBar;
+	HorizBar *d_levelTriggerABar;
+	HorizBar *d_levelTriggerBBar;
+	FreePlotLineHandleH *d_timeTriggerHandle;
+	FreePlotLineHandleV *d_levelTriggerAHandle;
+	FreePlotLineHandleV *d_levelTriggerBHandle;
 
-		PlotLineHandleV *d_vCursorHandle1;
-		PlotLineHandleV *d_vCursorHandle2;
-		PlotLineHandleH *d_hCursorHandle1;
-		PlotLineHandleH *d_hCursorHandle2;
+	CursorReadouts *d_cursorReadouts;
+	MetricPrefixFormatter d_cursorMetricFormatter;
+	TimePrefixFormatter d_cursorTimeFormatter;
+	struct cursorReadoutsText d_cursorReadoutsText;
+	bool d_cursorReadoutsVisible;
 
-		PlotGateHandle *d_hGatingHandle1;
-		PlotGateHandle *d_hGatingHandle2;
+	QPen d_trigAactiveLinePen;
+	QPen d_trigAinactiveLinePen;
+	QPen d_trigBactiveLinePen;
+	QPen d_trigBinactiveLinePen;
+	QPen d_timeTriggerInactiveLinePen;
+	QPen d_timeTriggerActiveLinePen;
 
-		VertBar *d_vBar1;
-		VertBar *d_vBar2;
-		HorizBar *d_hBar1;
-		HorizBar *d_hBar2;
+	QList<Measure *> d_measureObjs;
 
-		VertBar *d_gateBar1;
-		VertBar *d_gateBar2;
+	double value_v1, value_v2, value_h1, value_h2;
+	double value_gateLeft, value_gateRight;
+	double d_minOffsetValue, d_maxOffsetValue;
+	double d_timeTriggerMinValue, d_timeTriggerMaxValue;
 
-		VertBar *d_timeTriggerBar;
-		HorizBar *d_levelTriggerABar;
-		HorizBar *d_levelTriggerBBar;
-		FreePlotLineHandleH *d_timeTriggerHandle;
-		FreePlotLineHandleV *d_levelTriggerAHandle;
-		FreePlotLineHandleV *d_levelTriggerBHandle;
+	bool displayGraticule;
+	Graticule *graticule;
 
+	bool d_trackMode;
+	QwtPlotMarker *markerIntersection1;
+	QwtPlotMarker *markerIntersection2;
+	bool horizCursorsLocked;
+	bool vertCursorsLocked;
+	int pixelPosHandleHoriz1;
+	int pixelPosHandleHoriz2;
+	int pixelPosHandleVert1;
+	int pixelPosHandleVert2;
 
-
-		CursorReadouts *d_cursorReadouts;
-		MetricPrefixFormatter d_cursorMetricFormatter;
-	        TimePrefixFormatter d_cursorTimeFormatter;
-	        struct cursorReadoutsText d_cursorReadoutsText;
-	        bool d_cursorReadoutsVisible;
-
-	        QPen d_trigAactiveLinePen;
-	        QPen d_trigAinactiveLinePen;
-	        QPen d_trigBactiveLinePen;
-	        QPen d_trigBinactiveLinePen;
-		QPen d_timeTriggerInactiveLinePen;
-		QPen d_timeTriggerActiveLinePen;
-
-	        QList<Measure *> d_measureObjs;
-
-		double value_v1, value_v2, value_h1, value_h2;
-		double value_gateLeft, value_gateRight;
-		double d_minOffsetValue, d_maxOffsetValue;
-		double d_timeTriggerMinValue, d_timeTriggerMaxValue;
-
-		bool displayGraticule;
-		Graticule *graticule;
-
-		bool d_trackMode;
-		QwtPlotMarker *markerIntersection1;
-		QwtPlotMarker *markerIntersection2;
-		bool horizCursorsLocked;
-		bool vertCursorsLocked;
-		int pixelPosHandleHoriz1;
-		int pixelPosHandleHoriz2;
-		int pixelPosHandleVert1;
-		int pixelPosHandleVert2;
-
-		QwtPlotShapeItem *leftGate, *rightGate;
-		QRectF leftGateRect, rightGateRect;
-		bool d_gatingEnabled;
-	};
-}
+	QwtPlotShapeItem *leftGate, *rightGate;
+	QRectF leftGateRect, rightGateRect;
+	bool d_gatingEnabled;
+};
+} // namespace adiscope
 
 #endif /* M2K_OSCILLOSCOPE_PLOT_H */

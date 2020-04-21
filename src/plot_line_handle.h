@@ -20,14 +20,14 @@
 #ifndef PLOT_LINE_HANDLE_H
 #define PLOT_LINE_HANDLE_H
 
-#include <QWidget>
 #include <QPen>
+#include <QWidget>
+
 #include <plot_utils.hpp>
 
 class HandlesArea;
 
-class PlotLineHandle: public QWidget
-{
+class PlotLineHandle : public QWidget {
 	Q_OBJECT
 
 	friend class HandlesArea;
@@ -40,8 +40,8 @@ public:
 	virtual void moveWithinParent(int x, int y) = 0;
 	virtual void setPosition(int) = 0;
 	int position();
-	void setPen(const QPen&);
-	const QPen& pen();
+	void setPen(const QPen &);
+	const QPen &pen();
 
 Q_SIGNALS:
 	void positionChanged(int);
@@ -70,7 +70,7 @@ private:
 	void setGrabbed(bool);
 };
 
-class PlotGateHandle: public PlotLineHandle{
+class PlotGateHandle : public PlotLineHandle {
 public:
 	PlotGateHandle(const QPixmap &handleIcon, QWidget *parent = 0);
 	void triggerMove();
@@ -85,10 +85,12 @@ public:
 	int getCurrentPos();
 	bool reachedLimit();
 	void setOtherCursorPosition(int position);
+
 protected:
 	void paintEvent(QPaintEvent *event);
 	int originPosToCenter(int origin);
 	int centerPosToOrigin(int center);
+
 private:
 	int m_position;
 	int m_otherCursorPos;
@@ -98,8 +100,7 @@ private:
 	adiscope::TimePrefixFormatter d_timeFormatter;
 };
 
-class PlotLineHandleH: public PlotLineHandle
-{
+class PlotLineHandleH : public PlotLineHandle {
 public:
 	PlotLineHandleH(const QPixmap &handleIcon, QWidget *parent = 0,
 			bool facingBottom = false);
@@ -120,8 +121,7 @@ protected:
 	bool m_facingBottom;
 };
 
-class PlotLineHandleV: public PlotLineHandle
-{
+class PlotLineHandleV : public PlotLineHandle {
 public:
 	PlotLineHandleV(const QPixmap &handleIcon, QWidget *parent = 0,
 			bool facingRight = false);
@@ -141,14 +141,12 @@ protected:
 	bool m_facingRight;
 };
 
-class FreePlotLineHandleH: public PlotLineHandleH
-{
+class FreePlotLineHandleH : public PlotLineHandleH {
 public:
-
 	FreePlotLineHandleH(const QPixmap &handleIcon,
-			const QPixmap &beyondLeftIcon,
-			const QPixmap &beyondRightIcon,
-			QWidget *parent = 0, bool facingRight = false);
+			    const QPixmap &beyondLeftIcon,
+			    const QPixmap &beyondRightIcon, QWidget *parent = 0,
+			    bool facingRight = false);
 	void moveWithinParent(int x, int y);
 
 protected:
@@ -161,14 +159,12 @@ private:
 	bool m_isBeyondLeft;
 };
 
-class FreePlotLineHandleV: public PlotLineHandleV
-{
+class FreePlotLineHandleV : public PlotLineHandleV {
 public:
-
 	FreePlotLineHandleV(const QPixmap &handleIcon,
-			const QPixmap &beyondTopIcon,
-			const QPixmap &beyondBottomIcon,
-			QWidget *parent = 0, bool facingRight = false);
+			    const QPixmap &beyondTopIcon,
+			    const QPixmap &beyondBottomIcon,
+			    QWidget *parent = 0, bool facingRight = false);
 	void moveWithinParent(int x, int y);
 
 protected:
@@ -181,13 +177,11 @@ private:
 	bool m_isBeyondBottom;
 };
 
-class RoundedHandleV: public FreePlotLineHandleV
-{
+class RoundedHandleV : public FreePlotLineHandleV {
 public:
-	RoundedHandleV(const QPixmap &handleIcon,
-			const QPixmap &beyondTopIcon,
-			const QPixmap &beyondBottomIcon,
-			QWidget *parent = 0, bool facingRight = false);
+	RoundedHandleV(const QPixmap &handleIcon, const QPixmap &beyondTopIcon,
+		       const QPixmap &beyondBottomIcon, QWidget *parent = 0,
+		       bool facingRight = false);
 
 	QColor roundRectColor();
 	void setRoundRectColor(const QColor &);

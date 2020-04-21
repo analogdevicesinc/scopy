@@ -20,23 +20,22 @@
 #ifndef SMOOTHCURVEFITTER_H
 #define SMOOTHCURVEFITTER_H
 
-#include <memory>
-
 #include <qwt_curve_fitter.h>
 #include <qwt_spline.h>
 
+#include <memory>
+
 namespace adiscope {
-class SmoothCurveFitter : public QwtCurveFitter
-{
+class SmoothCurveFitter : public QwtCurveFitter {
 public:
 	SmoothCurveFitter();
 
-	virtual QPolygonF fitCurve( const QPolygonF &points ) const;
-	virtual QPainterPath fitCurvePath( const QPolygonF &points ) const;
+	virtual QPolygonF fitCurve(const QPolygonF &points) const;
+	virtual QPainterPath fitCurvePath(const QPolygonF &points) const;
 
 private:
-        std::unique_ptr<QwtSpline> d_spline;
+	std::unique_ptr<QwtSpline> d_spline;
 };
-}
+} // namespace adiscope
 
 #endif // SMOOTHCURVEFITTER_H

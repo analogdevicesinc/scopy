@@ -21,25 +21,21 @@
 
 using namespace adiscope;
 
-timeout_block::timeout_block(const std::string &pmt_name, QObject *parent) :
-	QObject(parent), gr::block("timeout_block",
-			gr::io_signature::make(0, 0, 0),
-			gr::io_signature::make(0, 0, 0))
-{
+timeout_block::timeout_block(const std::string &pmt_name, QObject *parent)
+	: QObject(parent)
+	, gr::block("timeout_block", gr::io_signature::make(0, 0, 0),
+		    gr::io_signature::make(0, 0, 0)) {
 	pmt::pmt_t port_id = pmt::mp(pmt_name);
 
 	message_port_register_in(port_id);
 
-	set_msg_handler(port_id, boost::bind(
-				&timeout_block::pmt_received, this, _1));
+	set_msg_handler(port_id,
+			boost::bind(&timeout_block::pmt_received, this, _1));
 }
 
-timeout_block::~timeout_block()
-{
-}
+timeout_block::~timeout_block() {}
 
-void timeout_block::pmt_received(pmt::pmt_t pmt)
-{
+void timeout_block::pmt_received(pmt::pmt_t pmt) {
 	if (pmt::symbol_to_string(pmt).compare("timeout") == 0)
 		Q_EMIT timeout();
 }

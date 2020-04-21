@@ -20,11 +20,11 @@
 #ifndef LA_CAPTURE_PARAMS_H
 #define LA_CAPTURE_PARAMS_H
 
-#include <vector>
 #include "osc_capture_params.hpp"
 
-class LogicAnalyzerSymmetricBufferMode: public OscCaptureParams
-{
+#include <vector>
+
+class LogicAnalyzerSymmetricBufferMode : public OscCaptureParams {
 public:
 	LogicAnalyzerSymmetricBufferMode();
 	~LogicAnalyzerSymmetricBufferMode();
@@ -42,13 +42,11 @@ private:
 	void configParamsOnTimeBaseChanged();
 	void configParamsOnTriggPosChanged();
 
-	unsigned long getVisibleBufferSize(double sampleRate)
-	{
+	unsigned long getVisibleBufferSize(double sampleRate) {
 		return m_timeBase * m_timeDivsCount * // The time span
 			sampleRate +
 			0.5; // Round the positive value to nearest int
 	}
-
 
 private:
 	double m_maxSampleRate;

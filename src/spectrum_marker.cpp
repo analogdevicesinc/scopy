@@ -24,39 +24,32 @@
 
 using namespace adiscope;
 
-SpectrumMarker::SpectrumMarker(const QString &title, bool movable) :
-	QwtPlotMarker(title), m_xAxis(QwtPlot::xBottom),
-	m_yAxis(QwtPlot::yLeft), m_movable(movable), m_selected(false)
-{
-}
+SpectrumMarker::SpectrumMarker(const QString &title, bool movable)
+	: QwtPlotMarker(title)
+	, m_xAxis(QwtPlot::xBottom)
+	, m_yAxis(QwtPlot::yLeft)
+	, m_movable(movable)
+	, m_selected(false) {}
 
 SpectrumMarker::SpectrumMarker(const QString &title, QwtAxisId xAxis,
-	QwtAxisId yAxis, bool movable) :
-	QwtPlotMarker(title), m_xAxis(xAxis), m_yAxis(yAxis), m_movable(movable), m_selected(false)
-{
-}
+			       QwtAxisId yAxis, bool movable)
+	: QwtPlotMarker(title)
+	, m_xAxis(xAxis)
+	, m_yAxis(yAxis)
+	, m_movable(movable)
+	, m_selected(false) {}
 
-SpectrumMarker::~SpectrumMarker()
-{
-}
+SpectrumMarker::~SpectrumMarker() {}
 
-QColor SpectrumMarker::defaultColor() const
-{
-	return m_default_color;
-}
+QColor SpectrumMarker::defaultColor() const { return m_default_color; }
 
-void SpectrumMarker::setDefaultColor(const QColor& color)
-{
+void SpectrumMarker::setDefaultColor(const QColor &color) {
 	m_default_color = color;
 }
 
-bool SpectrumMarker::selected() const
-{
-	return m_selected;
-}
+bool SpectrumMarker::selected() const { return m_selected; }
 
-void SpectrumMarker::setSelected(bool on)
-{
+void SpectrumMarker::setSelected(bool on) {
 	if (m_selected != on) {
 		m_selected = on;
 
@@ -67,38 +60,31 @@ void SpectrumMarker::setSelected(bool on)
 			brush.setColor(symbol()->pen().color());
 		}
 
-		QwtSymbol *new_sym = new QwtSymbol(symbol()->style(),
-			brush, symbol()->pen(), symbol()->size());
+		QwtSymbol *new_sym =
+			new QwtSymbol(symbol()->style(), brush, symbol()->pen(),
+				      symbol()->size());
 		setSymbol(new_sym);
 	}
 }
 
-bool SpectrumMarker::movable() const
-{
-	return m_movable;
-}
+bool SpectrumMarker::movable() const { return m_movable; }
 
-void SpectrumMarker::setMovable(bool on)
-{
-	m_movable = on;
-}
+void SpectrumMarker::setMovable(bool on) { m_movable = on; }
 
-QPoint SpectrumMarker::plotValueToPixels(const QPointF& point) const
-{
+QPoint SpectrumMarker::plotValueToPixels(const QPointF &point) const {
 	QPoint pixelPoint(0, 0);
 
 	if (plot()) {
 		const QwtScaleMap xMap = plot()->canvasMap(m_xAxis);
 		const QwtScaleMap yMap = plot()->canvasMap(m_yAxis);
 		QPointF p = QwtScaleMap::transform(xMap, yMap, point);
-		pixelPoint = QPoint(p.x(),p.y());
+		pixelPoint = QPoint(p.x(), p.y());
 	}
 
 	return pixelPoint;
 }
 
-QPointF SpectrumMarker::plotPixelsToValue(const QPoint& point) const
-{
+QPointF SpectrumMarker::plotPixelsToValue(const QPoint &point) const {
 	QPointF valuePoint(0.0, 0.0);
 
 	if (plot()) {
@@ -111,11 +97,9 @@ QPointF SpectrumMarker::plotPixelsToValue(const QPoint& point) const
 	return valuePoint;
 }
 
-QRect SpectrumMarker::boundingRectPixels() const
-{
+QRect SpectrumMarker::boundingRectPixels() const {
 	QPoint markerPixPos = plotValueToPixels(value());
 	QRect symbolRect = symbol()->boundingRect();
-
 
 	return QRect(symbolRect.topLeft() + markerPixPos, symbolRect.size());
 }

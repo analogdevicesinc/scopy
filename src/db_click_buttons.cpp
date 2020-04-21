@@ -1,6 +1,8 @@
 #include "db_click_buttons.hpp"
-#include "ui_db_click_buttons.h"
+
 #include "dynamicWidget.hpp"
+
+#include "ui_db_click_buttons.h"
 
 #include <QGridLayout>
 
@@ -13,42 +15,35 @@ using namespace adiscope;
  * button has been selected it can be toggled.
  */
 
-DbClickButtons::DbClickButtons(QWidget *parent, int maxRowBtnCount) :
-	QWidget(parent),
-	ui(new Ui::DbClickButtons),
-	btn_states(),
-	selected_btn(-1),
-	max_row_btn_cnt(maxRowBtnCount > 0 ? maxRowBtnCount : 1)
-{
+DbClickButtons::DbClickButtons(QWidget *parent, int maxRowBtnCount)
+	: QWidget(parent)
+	, ui(new Ui::DbClickButtons)
+	, btn_states()
+	, selected_btn(-1)
+	, max_row_btn_cnt(maxRowBtnCount > 0 ? maxRowBtnCount : 1) {
 	ui->setupUi(this);
 
-	color_codes << "#F44336" << "#2096F3" << "#8BC34A" << "#FF5721" <<
-		"#607D8B";
+	color_codes << "#F44336"
+		    << "#2096F3"
+		    << "#8BC34A"
+		    << "#FF5721"
+		    << "#607D8B";
 
 	btn_list = findChildren<QPushButton *>();
 
 	int n = 0;
-	for (const auto& i : btn_list) {
+	for (const auto &i : btn_list) {
 		btn_states.push_back(false);
 		i->setProperty("id", QVariant(n++));
-		connect(i, SIGNAL(clicked()),
-			this, SLOT(onButtonClicked()));
-
+		connect(i, SIGNAL(clicked()), this, SLOT(onButtonClicked()));
 	}
 }
 
-DbClickButtons::~DbClickButtons()
-{
-	delete ui;
-}
+DbClickButtons::~DbClickButtons() { delete ui; }
 
-int DbClickButtons::selectedButton() const
-{
-	return selected_btn;
-}
+int DbClickButtons::selectedButton() const { return selected_btn; }
 
-void DbClickButtons::setSelectedButton(int btnId)
-{
+void DbClickButtons::setSelectedButton(int btnId) {
 	for (int i = 0; i < btn_list.size(); i++) {
 		bool selected;
 		if (i == btnId) {
@@ -67,13 +62,11 @@ void DbClickButtons::setSelectedButton(int btnId)
 	}
 }
 
-bool DbClickButtons::buttonChecked(int btnId) const
-{
+bool DbClickButtons::buttonChecked(int btnId) const {
 	return btn_states[btnId];
 }
 
-void DbClickButtons::setButtonChecked(int btnId, bool checked)
-{
+void DbClickButtons::setButtonChecked(int btnId, bool checked) {
 	btn_states[btnId] = checked;
 	setDynamicProperty(btn_list[btnId], "is_checked", checked);
 	btn_list[btnId]->update();
@@ -81,13 +74,9 @@ void DbClickButtons::setButtonChecked(int btnId, bool checked)
 	Q_EMIT buttonToggled(btnId, checked);
 }
 
-int DbClickButtons::buttonCount() const
-{
-	return btn_list.size();
-}
+int DbClickButtons::buttonCount() const { return btn_list.size(); }
 
-void DbClickButtons::setButtonCount(int count)
-{
+void DbClickButtons::setButtonCount(int count) {
 	if (count != btn_list.size()) {
 		for (int i = 0; i < btn_list.size(); i++) {
 			delete btn_list[i];
@@ -99,20 +88,24 @@ void DbClickButtons::setButtonCount(int count)
 		for (int i = 0; i < count; i++) {
 			QPushButton *btn = new QPushButton(this);
 			btn->setText(QString::number(i));
-			btn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+			btn->setSizePolicy(QSizePolicy::Fixed,
+					   QSizePolicy::Fixed);
 			btn->setProperty("id", QVariant(i));
 			btn->setProperty("is_checked", QVariant(false));
 			btn->setProperty("is_selected", QVariant(false));
 			QString color = color_codes[i % color_codes.size()];
-			QString stylesheet = QString ("QPushButton"
-				"{\n  border: 2px solid %1;\n}\n"
-				"\nQPushButton[is_checked=true] {\n  "
-				"background-color: %1;\n}\n"
-				"\nQPushButton[is_selected=true] {\n	"
-				"border: 4px solid white;\n}\n").arg(color);
+			QString stylesheet =
+				QString("QPushButton"
+					"{\n  border: 2px solid %1;\n}\n"
+					"\nQPushButton[is_checked=true] {\n  "
+					"background-color: %1;\n}\n"
+					"\nQPushButton[is_selected=true] "
+					"{\n	"
+					"border: 4px solid white;\n}\n")
+					.arg(color);
 			btn->setStyleSheet(stylesheet);
-			connect(btn, SIGNAL(clicked()),
-				this, SLOT(onButtonClicked()));
+			connect(btn, SIGNAL(clicked()), this,
+				SLOT(onButtonClicked()));
 
 			int row = i / max_row_btn_cnt;
 			int col = i % max_row_btn_cnt;
@@ -123,21 +116,19 @@ void DbClickButtons::setButtonCount(int count)
 	}
 }
 
-void DbClickButtons::onButtonClicked()
-{
+void DbClickButtons::onButtonClicked() {
 	QPushButton *btn = static_cast<QPushButton *>(QObject::sender());
 	int btnId = btn->property("id").toInt();
 
 	if (selected_btn < 0) {
 		setSelectedButton(btnId);
 	} else if (btn == btn_list[selected_btn]) {
-		 toggleButton(btnId);
+		toggleButton(btnId);
 	} else {
 		setSelectedButton(btnId);
 	}
 }
 
-void DbClickButtons::toggleButton(int btnId)
-{
+void DbClickButtons::toggleButton(int btnId) {
 	setButtonChecked(btnId, !btn_states[btnId]);
 }

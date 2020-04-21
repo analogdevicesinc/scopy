@@ -27,28 +27,25 @@ class QJSEngine;
 
 namespace adiscope {
 
-class ExternalScript_API : public QObject
-{
+class ExternalScript_API : public QObject {
 	Q_OBJECT
 
 public:
 	explicit ExternalScript_API(QObject *parent = 0);
 	~ExternalScript_API() {}
-	Q_INVOKABLE QString start(const QString& cmd);
-	Q_INVOKABLE void setWorkingDir(const QString& root);
+	Q_INVOKABLE QString start(const QString &cmd);
+	Q_INVOKABLE void setWorkingDir(const QString &root);
 	Q_INVOKABLE QString getWorkingDir();
 	Q_INVOKABLE void setProcessTimeout(int);
 	Q_INVOKABLE int getProcessTimeout();
 
-
 private:
-	QString run(const QString&, bool, bool);
+	QString run(const QString &, bool, bool);
 	QProcess *m_external_process;
 	QString m_working_dir;
 	int m_process_timeout;
 };
 
-}
+} // namespace adiscope
 
 #endif /* SCOPY_EXT_SCRIPT_HPP */
-

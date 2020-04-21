@@ -2,10 +2,11 @@
 #define MEASURE_SETTINGS_H
 
 #include <QWidget>
+
 #include <memory>
 
 namespace Ui {
-	class MeasureSettings;
+class MeasureSettings;
 }
 
 class QStandardItem;
@@ -17,26 +18,21 @@ class CapturePlot;
 class DropdownSwitchList;
 class MeasurementData;
 
-class MeasurementItem
-{
+class MeasurementItem {
 public:
-	MeasurementItem(int id = 0, int chn_id = 0):
-	m_id(id),
-	m_chn_id(chn_id)
-	{}
+	MeasurementItem(int id = 0, int chn_id = 0)
+		: m_id(id), m_chn_id(chn_id) {}
 
 	int id() { return m_id; }
 	int channel_id() { return m_chn_id; }
 
-	bool operator ==(const MeasurementItem& other) const
-	{
+	bool operator==(const MeasurementItem &other) const {
 		bool isEqual = (this->m_id == other.m_id) &&
 			(this->m_chn_id == other.m_chn_id);
 
 		return isEqual;
 	}
-	bool operator !=(const MeasurementItem& other) const
-	{
+	bool operator!=(const MeasurementItem &other) const {
 		return !(*this == other);
 	}
 
@@ -50,8 +46,7 @@ struct StatisticSelection {
 	MeasurementItem measurementItem;
 };
 
-class MeasureSettings : public QWidget
-{
+class MeasureSettings : public QWidget {
 	friend class Oscilloscope_API;
 
 	Q_OBJECT
@@ -61,10 +56,10 @@ public:
 	~MeasureSettings();
 
 	QString channelName() const;
-	void setChannelName(const QString& name);
+	void setChannelName(const QString &name);
 
 	QColor channelUnderlineColor() const;
-	void setChannelUnderlineColor(const QColor& color);
+	void setChannelUnderlineColor(const QColor &color);
 
 	void setHorizMeasurementActive(int idx, bool en);
 	void setVertMeasurementActive(int idx, bool en);
@@ -72,7 +67,7 @@ public:
 	bool emitActivated() const;
 	void setEmitActivated(bool en);
 
-	bool emitStatsChanged()const;
+	bool emitStatsChanged() const;
 	void setEmitStatsChanged(bool en);
 
 	void disableDisplayAll();
@@ -105,7 +100,7 @@ private Q_SLOTS:
 	void on_button_measDisplayAll_toggled(bool checked);
 	void on_button_measDeleteAll_toggled(bool checked);
 	void onStatisticActivated(DropdownSwitchList *dropdown, int id,
-		bool en);
+				  bool en);
 	void on_button_StatisticsEn_toggled(bool checked);
 	void on_button_StatisticsReset_pressed();
 	void on_button_statsDeleteAll_toggled(bool checked);
@@ -119,12 +114,12 @@ private:
 	void loadStatisticStatesForChannel(int chnIdx);
 	void setColumnData(QStandardItemModel *model, int column, bool en);
 	void setAllMeasurements(int col, bool en);
-	void deleteMeasurementsOfChannel(QList<MeasurementItem>& list,
-		int chnIdx);
-	void updateMeasurementsOnChannelDel(QList<MeasurementItem>& list,
+	void deleteMeasurementsOfChannel(QList<MeasurementItem> &list,
+					 int chnIdx);
+	void updateMeasurementsOnChannelDel(QList<MeasurementItem> &list,
 					    int chnIdx);
-	void deleteStatisticsOfChannel(QList<struct StatisticSelection>&
-		list, int chnIdx);
+	void deleteStatisticsOfChannel(QList<struct StatisticSelection> &list,
+				       int chnIdx);
 	void deleteAllStatistics();
 	void recoverAllStatistics();
 	void addStatistic(int measure_id, int ch_id);
@@ -143,7 +138,7 @@ private:
 	bool m_are_dropdowns_filled;
 	bool m_enableDisplayAll;
 
-	CapturePlot* m_plot;
+	CapturePlot *m_plot;
 	int m_selectedChannel;
 	QList<MeasurementItem> m_selectedMeasurements;
 	QList<MeasurementItem> m_deleteAllBackup;

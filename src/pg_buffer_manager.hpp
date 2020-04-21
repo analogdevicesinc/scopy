@@ -1,24 +1,23 @@
 #ifndef PG_BUFFER_MANAGER_H
 #define PG_BUFFER_MANAGER_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <fcntl.h>
-#include <vector>
-#include <string.h>
-
-#include <iio.h>
 #include "pg_channel_manager.hpp"
-
-#include "pulseview/pv/mainwindow.hpp"
-#include "pulseview/pv/devices/binarybuffer.hpp"
 #include "pulseview/pv/devicemanager.hpp"
+#include "pulseview/pv/devices/binarybuffer.hpp"
+#include "pulseview/pv/mainwindow.hpp"
 #include "pulseview/pv/toolbars/mainbar.hpp"
+#include "pulseview/pv/util.hpp"
+#include "pulseview/pv/view/ruler.hpp"
 #include "pulseview/pv/view/view.hpp"
 #include "pulseview/pv/view/viewport.hpp"
-#include "pulseview/pv/view/ruler.hpp"
-#include "pulseview/pv/util.hpp"
 
+#include <iio.h>
+
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <vector>
 
 namespace pv {
 class MainWindow;
@@ -28,21 +27,20 @@ class View;
 namespace view {
 class Viewport;
 class Ruler;
-}
+} // namespace view
 namespace toolbars {
 class MainBar;
 }
-}
+} // namespace pv
 
 namespace sigrok {
 class Context;
 class ConfigKey;
-}
+} // namespace sigrok
 
 namespace adiscope {
 
-class PatternGeneratorBufferManager
-{
+class PatternGeneratorBufferManager {
 
 	bool buffer_created;
 	bool autoSet;
@@ -66,12 +64,9 @@ public:
 
 	uint32_t bufferSize;
 	short *buffer;
-
-
 };
 
-class PatternGeneratorBufferManagerUi : public QWidget
-{
+class PatternGeneratorBufferManagerUi : public QWidget {
 	Q_OBJECT
 	QWidget *settingsWidget;
 	PatternGeneratorBufferManager *bufman;
@@ -83,9 +78,9 @@ class PatternGeneratorBufferManagerUi : public QWidget
 	pv::MainWindow *main_win;
 
 public:
-	PatternGeneratorBufferManagerUi(QWidget *parent,
-	                                PatternGeneratorBufferManager *bufmananger, QWidget *settingsWidget,
-	                                PatternGenerator *pg);
+	PatternGeneratorBufferManagerUi(
+		QWidget *parent, PatternGeneratorBufferManager *bufmananger,
+		QWidget *settingsWidget, PatternGenerator *pg);
 
 	~PatternGeneratorBufferManagerUi();
 	void createBinaryBuffer();
@@ -97,7 +92,6 @@ public Q_SLOTS:
 	void updateUi();
 };
 
-
-}
+} // namespace adiscope
 
 #endif // PG_BUFFER_MANAGER_H

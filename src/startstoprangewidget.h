@@ -20,17 +20,16 @@
 #ifndef STARTSTOPRANGEWIDGET_H
 #define STARTSTOPRANGEWIDGET_H
 
-#include <QWidget>
-
 #include "spinbox_a.hpp"
+
+#include <QWidget>
 
 namespace Ui {
 class StartStopRangeWidget;
 }
 
 namespace adiscope {
-class StartStopRangeWidget : public QWidget
-{
+class StartStopRangeWidget : public QWidget {
 	Q_OBJECT
 
 public:
@@ -75,6 +74,6 @@ private:
 	double maxValue;
 	double minSpan;
 };
-}
+} // namespace adiscope
 
 #endif // STARTSTOPRANGEWIDGET_H

@@ -23,46 +23,43 @@
 #ifndef M2K_UTILS_H
 #define M2K_UTILS_H
 
-#include <qevent.h>
-#include <qwt_plot_picker.h>
-#include <qwt_picker_machine.h>
 #include <QWidget>
+#include <qevent.h>
+#include <qwt_picker_machine.h>
+#include <qwt_plot_picker.h>
 
-class QwtDblClickPlotPicker: public QwtPlotPicker
-{
+class QwtDblClickPlotPicker : public QwtPlotPicker {
 public:
 #if QWT_VERSION < 0x060100
-    QwtDblClickPlotPicker(QwtPlotCanvas *);
-#else /* QWT_VERSION < 0x060100 */
-    QwtDblClickPlotPicker(QWidget *);
+	QwtDblClickPlotPicker(QwtPlotCanvas *);
+#else  /* QWT_VERSION < 0x060100 */
+	QwtDblClickPlotPicker(QWidget *);
 #endif /* QWT_VERSION < 0x060100 */
 
-    ~QwtDblClickPlotPicker();
+	~QwtDblClickPlotPicker();
 
-    virtual QwtPickerMachine * stateMachine(int) const;
+	virtual QwtPickerMachine *stateMachine(int) const;
 };
 
-class QwtPickerDblClickPointMachine: public QwtPickerMachine
-{
+class QwtPickerDblClickPointMachine : public QwtPickerMachine {
 public:
-  QwtPickerDblClickPointMachine();
-  ~QwtPickerDblClickPointMachine();
+	QwtPickerDblClickPointMachine();
+	~QwtPickerDblClickPointMachine();
 
 #if QWT_VERSION < 0x060000
-  virtual CommandList
+	virtual CommandList
 #else
-  virtual QList<QwtPickerMachine::Command>
+	virtual QList<QwtPickerMachine::Command>
 #endif
-    transition( const QwtEventPattern &eventPattern,
-				  const QEvent *e);
+	transition(const QwtEventPattern &eventPattern, const QEvent *e);
 };
 
-class Util
-{
+class Util {
 public:
 	static void retainWidgetSizeWhenHidden(QWidget *w, bool retain = true);
-	static void setWidgetNrOfChars(QWidget *w, int minNrOfChars, int maxNrOfChars=0);
-	static void loadStylesheetFromFile(QString path, QWidget* widget);
+	static void setWidgetNrOfChars(QWidget *w, int minNrOfChars,
+				       int maxNrOfChars = 0);
+	static void loadStylesheetFromFile(QString path, QWidget *widget);
 };
 
 #endif /* M2K_UTILS_H */

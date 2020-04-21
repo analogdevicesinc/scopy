@@ -17,40 +17,37 @@
  * Boston, MA 02110-1301, USA.
  */
 
+#include "config.h"
+#include "scopyApplication.hpp"
+#include "tool_launcher.hpp"
+
 #include <QApplication>
 #include <QCommandLineParser>
+#include <QDateTime>
+#include <QDir>
+#include <QProcess>
 #include <QSettings>
 #include <QtGlobal>
-#include <QProcess>
-#include <QDir>
-#include <QDateTime>
-
-#include "config.h"
-#include "tool_launcher.hpp"
-#include "scopyApplication.hpp"
 
 using namespace adiscope;
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
 	/* Set environment variable QT_AUTO_SCREEN_SCALE_FACTOR to 1(true) thus
 	 * making Scopy aware of the scaling settings set by the OS */
 	qputenv("QT_AUTO_SCREEN_SCALE_FACTOR", QString("1").toLocal8Bit());
 #if BREAKPAD_HANDLER
 #ifdef Q_OS_LINUX
 	google_breakpad::MinidumpDescriptor descriptor("/tmp");
-	google_breakpad::ExceptionHandler eh(descriptor, NULL, ScopyApplication::dumpCallback, NULL, true, -1);
+	google_breakpad::ExceptionHandler eh(descriptor, NULL,
+					     ScopyApplication::dumpCallback,
+					     NULL, true, -1);
 #endif
 
 #ifdef Q_OS_WIN
-	google_breakpad::ExceptionHandler eh(L"C:/dumps/",
-										NULL,
-										ScopyApplication::dumpCallback,
-										NULL,
-										google_breakpad::ExceptionHandler::HANDLER_ALL,
-										MiniDumpNormal,
-										(wchar_t*)NULL,
-										NULL);
+	google_breakpad::ExceptionHandler eh(
+		L"C:/dumps/", NULL, ScopyApplication::dumpCallback, NULL,
+		google_breakpad::ExceptionHandler::HANDLER_ALL, MiniDumpNormal,
+		(wchar_t *)NULL, NULL);
 #endif
 
 	ScopyApplication app(argc, argv);
@@ -91,18 +88,17 @@ int main(int argc, char **argv)
 	QString prevCrashDump = "";
 #endif
 
-
 	QCommandLineParser parser;
 
 	parser.addHelpOption();
 	parser.addVersionOption();
 
-	parser.addOptions({
-		{ {"s", "script"}, "Run given script.", "script" },
-		{ {"n", "nogui"}, "Run Scopy without GUI" },
-		{ {"d", "nodecoders"}, "Run Scopy without digital decoders"},
-		{ {"nd", "nonativedialog"}, "Run Scopy without native file dialogs"}
-	});
+	parser.addOptions(
+		{{{"s", "script"}, "Run given script.", "script"},
+		 {{"n", "nogui"}, "Run Scopy without GUI"},
+		 {{"d", "nodecoders"}, "Run Scopy without digital decoders"},
+		 {{"nd", "nonativedialog"},
+		  "Run Scopy without native file dialogs"}});
 
 	parser.process(app);
 
@@ -115,7 +111,8 @@ int main(int argc, char **argv)
 	}
 
 	bool nonativedialog = parser.isSet("nonativedialog");
-	qDebug() << "Using" << (nonativedialog ? "Qt" : "Native") << "file dialogs";
+	qDebug() << "Using" << (nonativedialog ? "Qt" : "Native")
+		 << "file dialogs";
 	launcher.setNativeDialogs(!nonativedialog);
 
 	QString script = parser.value("script");
@@ -140,13 +137,10 @@ int main(int argc, char **argv)
 		QString contents = stream.readAll();
 		file.close();
 
-		QMetaObject::invokeMethod(&launcher,
-				 "runProgram",
-				 Qt::QueuedConnection,
-				 Q_ARG(QString, contents),
-				 Q_ARG(QString, script));
+		QMetaObject::invokeMethod(
+			&launcher, "runProgram", Qt::QueuedConnection,
+			Q_ARG(QString, contents), Q_ARG(QString, script));
 	}
-
 
 	return app.exec();
 }

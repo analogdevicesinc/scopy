@@ -25,27 +25,24 @@
 
 using namespace adiscope;
 
-AutoScaler::AutoScaler(QObject *parent,
-		const QVector<QwtScaleDiv> &divs, unsigned int timeout_ms) :
-	QObject(parent), divs(divs), timer(this)
-{
+AutoScaler::AutoScaler(QObject *parent, const QVector<QwtScaleDiv> &divs,
+		       unsigned int timeout_ms)
+	: QObject(parent), divs(divs), timer(this) {
 	timer.setSingleShot(true);
 	timer.setInterval(timeout_ms);
 
 	if (divs.empty())
-		throw std::runtime_error("AutoScaler called with empty divs vector");
+		throw std::runtime_error(
+			"AutoScaler called with empty divs vector");
 
 	changeScaleDiv(&this->divs.at(0));
 
 	connect(&timer, SIGNAL(timeout()), this, SLOT(timeout()));
 }
 
-AutoScaler::~AutoScaler()
-{
-}
+AutoScaler::~AutoScaler() {}
 
-void AutoScaler::setValue(double val)
-{
+void AutoScaler::setValue(double val) {
 	if (val < min)
 		min = val;
 	else if (val > max)
@@ -68,26 +65,20 @@ void AutoScaler::setValue(double val)
 	}
 }
 
-void AutoScaler::changeScaleDiv(const QwtScaleDiv *div)
-{
+void AutoScaler::changeScaleDiv(const QwtScaleDiv *div) {
 	current_div = div;
 	Q_EMIT updateScale(*div);
 }
 
-void AutoScaler::startTimer()
-{
+void AutoScaler::startTimer() {
 	min = divs[0].lowerBound();
 	max = divs[0].upperBound();
 	timer.start();
 }
 
-void AutoScaler::stopTimer()
-{
-	timer.stop();
-}
+void AutoScaler::stopTimer() { timer.stop(); }
 
-void AutoScaler::timeout()
-{
+void AutoScaler::timeout() {
 	for (auto it = divs.cbegin(); it != divs.cend(); ++it) {
 		if (it->lowerBound() <= min && it->upperBound() >= max) {
 			if (&*it != current_div)
@@ -99,8 +90,7 @@ void AutoScaler::timeout()
 	startTimer();
 }
 
-void AutoScaler::setTimeout(int timeout_ms)
-{
+void AutoScaler::setTimeout(int timeout_ms) {
 	timer.setInterval(timeout_ms);
 
 	/* restart timer */

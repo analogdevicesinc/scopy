@@ -20,17 +20,16 @@
 #ifndef BASEMENU_H
 #define BASEMENU_H
 
-#include <QWidget>
-
 #include "basemenuitem.h"
+
+#include <QWidget>
 
 namespace Ui {
 class BaseMenu;
 }
 
 namespace adiscope {
-class BaseMenu : public QWidget
-{
+class BaseMenu : public QWidget {
 	Q_OBJECT
 
 public:
@@ -38,11 +37,12 @@ public:
 	virtual ~BaseMenu();
 
 	void insertMenuItem(BaseMenuItem *menuItem, int position = -1);
-	void insertMenuItem(QVector<BaseMenuItem *> items, QVector<int> positions = QVector<int>());
+	void insertMenuItem(QVector<BaseMenuItem *> items,
+			    QVector<int> positions = QVector<int>());
 	void removeMenuItem(BaseMenuItem *menuItem);
 	void removeMenuItem(QVector<BaseMenuItem *> items);
 
-	int positionOf(BaseMenuItem* menuItem);
+	int positionOf(BaseMenuItem *menuItem);
 
 	void setMargins(int left, int top, int right, int bottom);
 
@@ -65,6 +65,6 @@ protected:
 	int d_items;
 	void _updateItemsPosition();
 };
-}
+} // namespace adiscope
 
 #endif // BASEMENU_H

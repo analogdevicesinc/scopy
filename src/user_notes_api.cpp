@@ -5,47 +5,31 @@ namespace adiscope {
 /*
  * Note_API class
  */
-void Note_API::setPath(QString path)
-{
-	note->setPath(path);
-}
+void Note_API::setPath(QString path) { note->setPath(path); }
 
-QString Note_API::getPath()
-{
-	return note->getPath();
-}
+QString Note_API::getPath() { return note->getPath(); }
 
-void Note_API::setName(QString name)
-{
-	note->setName(name);
-}
+void Note_API::setName(QString name) { note->setName(name); }
 
-QString Note_API::getName()
-{
-	return note->getName();
-}
-
+QString Note_API::getName() { return note->getName(); }
 
 /*
  * UserNotes_API class
  */
 
-int UserNotes_API::notes_list_size()
-{
+int UserNotes_API::notes_list_size() {
 	refreshApi();
 	return notes_list_api.size();
 }
 
-void UserNotes_API::set_notes_list_size(int size)
-{
+void UserNotes_API::set_notes_list_size(int size) {
 	notesPanel->clearAllNotes();
-	for (int i = 0; i < size; i++){
+	for (int i = 0; i < size; i++) {
 		auto n = notesPanel->addNote("", "");
 	}
 }
 
-QVariantList UserNotes_API::getNotes()
-{
+QVariantList UserNotes_API::getNotes() {
 	QVariantList list;
 	refreshApi();
 
@@ -55,8 +39,7 @@ QVariantList UserNotes_API::getNotes()
 	return list;
 }
 
-void UserNotes_API::refreshApi()
-{
+void UserNotes_API::refreshApi() {
 	qDeleteAll(notes_list_api);
 	notes_list_api.clear();
 	for (auto note : notesPanel->m_notes) {
@@ -64,4 +47,4 @@ void UserNotes_API::refreshApi()
 	}
 }
 
-}
+} // namespace adiscope

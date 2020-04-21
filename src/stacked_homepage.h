@@ -20,26 +20,22 @@
 #ifndef STACKED_HOMEPAGE_H
 #define STACKED_HOMEPAGE_H
 
-#include <QWidget>
-#include <QStackedWidget>
-#include <QEasingCurve>
-
 #include "homepage_controls.h"
+
+#include <QEasingCurve>
+#include <QStackedWidget>
+#include <QWidget>
 
 namespace Ui {
 class StackedHomepage;
 }
 
 namespace adiscope {
-class StackedHomepage : public QStackedWidget
-{
+class StackedHomepage : public QStackedWidget {
 	Q_OBJECT
 
 public:
-	enum s_directions {
-		LEFT2RIGHT,
-		RIGHT2LEFT
-	};
+	enum s_directions { LEFT2RIGHT, RIGHT2LEFT };
 
 	explicit StackedHomepage(QWidget *parent = 0);
 	~StackedHomepage();
@@ -73,7 +69,7 @@ Q_SIGNALS:
 	void moved(int);
 
 private:
-	void slideInWidget(QWidget* newWidget, enum s_directions direction);
+	void slideInWidget(QWidget *newWidget, enum s_directions direction);
 
 	HomepageControls *s_hc;
 	enum QEasingCurve::Type s_animationType;
@@ -85,5 +81,5 @@ private:
 	int s_next;
 	bool s_controls_enabled;
 };
-}
+} // namespace adiscope
 #endif // STACKED_HOMEPAGE_H

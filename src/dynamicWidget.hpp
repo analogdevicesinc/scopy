@@ -23,10 +23,8 @@
 class QWidget;
 
 namespace adiscope {
-	void setDynamicProperty(QWidget *widget,
-			const char *property, bool set);
-	bool getDynamicProperty(QWidget *widget,
-				const char *property);
-}
+void setDynamicProperty(QWidget *widget, const char *property, bool set);
+bool getDynamicProperty(QWidget *widget, const char *property);
+} // namespace adiscope
 
 #endif /* DYNAMIC_WIDGET_HPP */

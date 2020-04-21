@@ -20,27 +20,27 @@
 #ifndef ANIMATIONMANAGER_H
 #define ANIMATIONMANAGER_H
 
-#include <customanimation.h>
 #include <QObject>
 
+#include <customanimation.h>
+
 namespace adiscope {
-class AnimationManager : public QObject
-{
-    Q_OBJECT
+class AnimationManager : public QObject {
+	Q_OBJECT
 
 public:
-    static AnimationManager& getInstance();
-    void toggleAnimations(bool on);
+	static AnimationManager &getInstance();
+	void toggleAnimations(bool on);
 
-    void registerAnimation(CustomAnimation *animation);
+	void registerAnimation(CustomAnimation *animation);
 
 Q_SIGNALS:
-    void toggle(bool);
+	void toggle(bool);
 
 private:
 	AnimationManager();
-        bool m_animationsEnabled;
+	bool m_animationsEnabled;
 };
-}
+} // namespace adiscope
 
 #endif // ANIMATIONMANAGER_H

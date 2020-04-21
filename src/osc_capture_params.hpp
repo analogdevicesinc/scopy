@@ -22,8 +22,7 @@
 
 #include <vector>
 
-class OscCaptureParams
-{
+class OscCaptureParams {
 public:
 	struct capture_parameters {
 		double sampleRate;
@@ -41,15 +40,14 @@ public:
 	virtual void setTriggerPos(double pos) = 0;
 };
 
-class SymmetricBufferMode: public OscCaptureParams
-{
+class SymmetricBufferMode : public OscCaptureParams {
 public:
 	SymmetricBufferMode();
 	~SymmetricBufferMode();
 
 	capture_parameters captureParameters() const;
 
-	void setSampleRates(const std::vector<double>& sampleRates);
+	void setSampleRates(const std::vector<double> &sampleRates);
 	void setEntireBufferMaxSize(unsigned long maxSize);
 	void setTriggerBufferMaxSize(unsigned long maxSize);
 	void setTimeDivisionCount(int count);
@@ -65,8 +63,7 @@ private:
 	void configParamsOnTriggPosChanged();
 	void configParamsOnCustomSizeChanged();
 
-	unsigned long getVisibleBufferSize(double sampleRate)
-	{
+	unsigned long getVisibleBufferSize(double sampleRate) {
 		return m_timeBase * m_timeDivsCount * // The time span
 			sampleRate +
 			0.5; // Round the positive value to nearest int

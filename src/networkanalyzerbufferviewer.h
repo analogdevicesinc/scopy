@@ -20,11 +20,11 @@
 #ifndef NETWORKANALYZERBUFFERVIEWER_H
 #define NETWORKANALYZERBUFFERVIEWER_H
 
-#include <QWidget>
-#include <QPushButton>
+#include "TimeDomainDisplayPlot.h"
 #include "oscilloscope.hpp"
 
-#include "TimeDomainDisplayPlot.h"
+#include <QPushButton>
+#include <QWidget>
 
 namespace Ui {
 class NetworkAnalyzerBufferViewer;
@@ -33,9 +33,11 @@ class NetworkAnalyzerBufferViewer;
 struct Buffer {
 	Buffer() {}
 	Buffer(double frequency, unsigned int sampleRate,
-	       unsigned int bufferSize, const std::vector<float> &buffer):
-		frequency(frequency), sampleRate(sampleRate),
-		bufferSize(bufferSize), buffer(buffer) {}
+	       unsigned int bufferSize, const std::vector<float> &buffer)
+		: frequency(frequency)
+		, sampleRate(sampleRate)
+		, bufferSize(bufferSize)
+		, buffer(buffer) {}
 
 	double frequency;
 	unsigned int sampleRate;
@@ -44,8 +46,7 @@ struct Buffer {
 };
 
 namespace adiscope {
-class NetworkAnalyzerBufferViewer : public QWidget
-{
+class NetworkAnalyzerBufferViewer : public QWidget {
 	Q_OBJECT
 
 public:
@@ -85,6 +86,6 @@ private:
 	QVector<double> d_currentXdata;
 	int d_numBuffers;
 };
-}
+} // namespace adiscope
 
 #endif // NETWORKANALYZERBUFFERVIEWER_H

@@ -21,31 +21,30 @@
 #define PRINTABLEPLOT_H
 
 /*Qwt includes*/
+#include <qwt_legend.h>
 #include <qwt_plot.h>
 #include <qwt_plot_renderer.h>
-#include <qwt_legend.h>
 
 /*Qt includes*/
 #include <QWidget>
 
 namespace adiscope {
-class PrintablePlot : public QwtPlot
-{
-        Q_OBJECT
+class PrintablePlot : public QwtPlot {
+	Q_OBJECT
 public:
-        PrintablePlot(QWidget *parent);
+	PrintablePlot(QWidget *parent);
 
-        void dropBackground(bool drop);
+	void dropBackground(bool drop);
 	void setUseNativeDialog(bool nativeDialog);
 
 public Q_SLOTS:
-        void printPlot(const QString& toolName = "");
+	void printPlot(const QString &toolName = "");
 
 private:
-        QwtPlotRenderer d_plotRenderer;
-        QwtLegend *legendDisplay;
+	QwtPlotRenderer d_plotRenderer;
+	QwtLegend *legendDisplay;
 	bool d_useNativeDialog;
 };
-}
+} // namespace adiscope
 
 #endif // PRINTABLEPLOT_H

@@ -17,60 +17,54 @@
  * Boston, MA 02110-1301, USA.
  */
 
-/* Boost 1.55 requires this explicitly */
-#include <boost/make_shared.hpp>
-
-/* GNU Radio includes */
-#include <gnuradio/blocks/float_to_complex.h>
-#include <gnuradio/iio/math.h>
-#include <gnuradio/blocks/sub_ff.h>
-#include <gnuradio/filter/iir_filter_ffd.h>
-#include <gnuradio/blocks/nlog10_ff.h>
-#include <gnuradio/blocks/head.h>
-#include <gnuradio/blocks/null_source.h>
-#include <gnuradio/blocks/null_sink.h>
-#include <gnuradio/blocks/multiply_const_ff.h>
-
-/* Qt includes */
-#include <QtWidgets>
-#include <QDebug>
-#include <QVBoxLayout>
-#include <QtWidgets/QSpacerItem>
-#include <QSignalBlocker>
-#include <QComboBox>
-
-/* Local includes */
-#include "logging_categories.h"
-#include "adc_sample_conv.hpp"
-#include "customPushButton.hpp"
 #include "oscilloscope.hpp"
-#include "dynamicWidget.hpp"
-#include "measurement_gui.h"
-#include "measure_settings.h"
-#include "statistic_widget.h"
-#include "state_updater.h"
-#include "osc_capture_params.hpp"
+
+#include "adc_sample_conv.hpp"
 #include "buffer_previewer.hpp"
-#include "config.h"
-#include "customplotpositionbutton.h"
 #include "channel_widget.hpp"
-#include "signal_sample.hpp"
+#include "config.h"
+#include "customPushButton.hpp"
+#include "customplotpositionbutton.h"
+#include "dynamicWidget.hpp"
 #include "filemanager.h"
-
+#include "logging_categories.h"
+#include "measure_settings.h"
+#include "measurement_gui.h"
+#include "osc_capture_params.hpp"
 #include "oscilloscope_api.hpp"
-
 #include "runsinglewidget.h"
+#include "signal_sample.hpp"
+#include "state_updater.h"
+#include "statistic_widget.h"
 
-/* Generated UI */
 #include "ui_channel_settings.h"
+#include "ui_cursor_readouts.h"
 #include "ui_cursors_settings.h"
-#include "ui_osc_general_settings.h"
 #include "ui_measure_panel.h"
 #include "ui_measure_settings.h"
-#include "ui_statistics_panel.h"
-#include "ui_cursor_readouts.h"
+#include "ui_osc_general_settings.h"
 #include "ui_oscilloscope.h"
+#include "ui_statistics_panel.h"
 #include "ui_trigger_settings.h"
+
+#include <gnuradio/blocks/float_to_complex.h>
+#include <gnuradio/blocks/head.h>
+#include <gnuradio/blocks/multiply_const_ff.h>
+#include <gnuradio/blocks/nlog10_ff.h>
+#include <gnuradio/blocks/null_sink.h>
+#include <gnuradio/blocks/null_source.h>
+#include <gnuradio/blocks/sub_ff.h>
+#include <gnuradio/filter/iir_filter_ffd.h>
+#include <gnuradio/iio/math.h>
+
+#include <QComboBox>
+#include <QDebug>
+#include <QSignalBlocker>
+#include <QVBoxLayout>
+#include <QtWidgets/QSpacerItem>
+#include <QtWidgets>
+
+#include <boost/make_shared.hpp>
 
 #define MAX_MATH_CHANNELS 4
 #define MAX_MATH_RANGE SHRT_MAX
@@ -82,70 +76,76 @@ using namespace gr;
 using namespace std;
 
 Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
-			   std::shared_ptr<GenericAdc> adc, ToolMenuItem *toolMenuItem,
-			   QJSEngine *engine, ToolLauncher *parent) :
-	Tool(ctx, toolMenuItem, new Oscilloscope_API(this), "Oscilloscope", parent),
-	adc(adc),
-	m2k_adc(dynamic_pointer_cast<M2kAdc>(adc)),
-	nb_channels(Oscilloscope::adc->numAdcChannels()),
-	active_sample_rate(adc->readSampleRate()),
-	nb_math_channels(0),
-	ui(new Ui::Oscilloscope),
-	trigger_settings(adc),
-	measure_settings(nullptr),
-	plot(this, 16, 10),
-	fft_plot(nb_channels, this),
-	xy_plot(nb_channels / 2, this),
-	hist_plot(nb_channels, this),
-	ids(new iio_manager::port_id[nb_channels]),
-	autoset_id(new iio_manager::port_id),
-	hist_ids(new iio_manager::port_id[nb_channels]),
-	fft_is_visible(false), hist_is_visible(false), xy_is_visible(false),
-	statistics_enabled(false),
-	trigger_is_forced(false),
-	new_data_is_triggered(false),
-	triggerUpdater(new StateUpdater(250, this)),
-	current_channel(-1), math_chn_counter(0),
-	channels_group(new QButtonGroup(this)),
-	zoom_level(0),
-	current_ch_widget(-1),
-	addChannel(true),
-	index_x(0),
-	index_y(1),
-	ftc(nullptr),
-	locked(false),
-	triggerAcCoupled(false),
-	autosetRequested(false),
-	autosetEnabled(true),
-	memory_adjusted_time_pos(0),
-	plot_samples_sequentially(false),
-	d_displayOneBuffer(true),
-	nb_ref_channels(0),
-	lastFunctionValid(false),
-	import_error(""),
-	hCursorsEnabled(true),
-	vCursorsEnabled(true),
-	horiz_offset(0),
-	reset_horiz_offset(true),
-	wheelEventGuard(nullptr),
-	miniHistogram(true),
-	gatingEnabled(false)
-{
+			   std::shared_ptr<GenericAdc> adc,
+			   ToolMenuItem *toolMenuItem, QJSEngine *engine,
+			   ToolLauncher *parent)
+	: Tool(ctx, toolMenuItem, new Oscilloscope_API(this), "Oscilloscope",
+	       parent)
+	, adc(adc)
+	, m2k_adc(dynamic_pointer_cast<M2kAdc>(adc))
+	, nb_channels(Oscilloscope::adc->numAdcChannels())
+	, active_sample_rate(adc->readSampleRate())
+	, nb_math_channels(0)
+	, ui(new Ui::Oscilloscope)
+	, trigger_settings(adc)
+	, measure_settings(nullptr)
+	, plot(this, 16, 10)
+	, fft_plot(nb_channels, this)
+	, xy_plot(nb_channels / 2, this)
+	, hist_plot(nb_channels, this)
+	, ids(new iio_manager::port_id[nb_channels])
+	, autoset_id(new iio_manager::port_id)
+	, hist_ids(new iio_manager::port_id[nb_channels])
+	, fft_is_visible(false)
+	, hist_is_visible(false)
+	, xy_is_visible(false)
+	, statistics_enabled(false)
+	, trigger_is_forced(false)
+	, new_data_is_triggered(false)
+	, triggerUpdater(new StateUpdater(250, this))
+	, current_channel(-1)
+	, math_chn_counter(0)
+	, channels_group(new QButtonGroup(this))
+	, zoom_level(0)
+	, current_ch_widget(-1)
+	, addChannel(true)
+	, index_x(0)
+	, index_y(1)
+	, ftc(nullptr)
+	, locked(false)
+	, triggerAcCoupled(false)
+	, autosetRequested(false)
+	, autosetEnabled(true)
+	, memory_adjusted_time_pos(0)
+	, plot_samples_sequentially(false)
+	, d_displayOneBuffer(true)
+	, nb_ref_channels(0)
+	, lastFunctionValid(false)
+	, import_error("")
+	, hCursorsEnabled(true)
+	, vCursorsEnabled(true)
+	, horiz_offset(0)
+	, reset_horiz_offset(true)
+	, wheelEventGuard(nullptr)
+	, miniHistogram(true)
+	, gatingEnabled(false) {
 	ui->setupUi(this);
-	int triggers_panel = ui->stackedWidget->insertWidget(-1, &trigger_settings);
+	int triggers_panel =
+		ui->stackedWidget->insertWidget(-1, &trigger_settings);
 
 	if (m2k_adc) {
 		symmBufferMode = make_shared<SymmetricBufferMode>();
 		symmBufferMode->setSampleRates(
 			m2k_adc->availSamplRates().toVector().toStdVector());
 		symmBufferMode->setEntireBufferMaxSize(64000);
-		symmBufferMode->setTriggerBufferMaxSize(8192); // 8192 is what hardware supports
+		symmBufferMode->setTriggerBufferMaxSize(
+			8192); // 8192 is what hardware supports
 		symmBufferMode->setTimeDivisionCount(plot.xAxisNumDiv());
 	}
 	dc_cancel.push_back(gnuradio::get_initial_sptr(
-			new cancel_dc_offset_block(1, true)));
+		new cancel_dc_offset_block(1, true)));
 	dc_cancel.push_back(gnuradio::get_initial_sptr(
-			new cancel_dc_offset_block(1, true)));
+		new cancel_dc_offset_block(1, true)));
 
 	/* Measurements Settings */
 	measure_settings_init();
@@ -159,21 +159,25 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 
 	/* Gnuradio Blocks */
 
-	this->qt_time_block = adiscope::scope_sink_f::make(0, adc->sampleRate(),
-		"Osc Time", nb_channels, (QObject *)&plot);
+	this->qt_time_block =
+		adiscope::scope_sink_f::make(0, adc->sampleRate(), "Osc Time",
+					     nb_channels, (QObject *)&plot);
 
-	this->qt_fft_block = adiscope::scope_sink_f::make(fft_plot_size, adc->sampleRate(),
-			"Osc Frequency", nb_channels, (QObject *)&fft_plot);
+	this->qt_fft_block = adiscope::scope_sink_f::make(
+		fft_plot_size, adc->sampleRate(), "Osc Frequency", nb_channels,
+		(QObject *)&fft_plot);
 
-	this->qt_hist_block = adiscope::histogram_sink_f::make(1024, 250, 0, 20,
-			"Osc Histogram", nb_channels, (QObject *)&hist_plot);
+	this->qt_hist_block = adiscope::histogram_sink_f::make(
+		1024, 250, 0, 20, "Osc Histogram", nb_channels,
+		(QObject *)&hist_plot);
 
 	this->qt_xy_block = adiscope::xy_sink_c::make(
-			400, "Osc XY", nb_channels / 2, (QObject*)&xy_plot);
+		400, "Osc XY", nb_channels / 2, (QObject *)&xy_plot);
 
 	this->qt_time_block->set_trigger_mode(TRIG_MODE_TAG, 0, "buffer_start");
 
-	// Prevent the application from hanging while waiting for a trigger condition
+	// Prevent the application from hanging while waiting for a trigger
+	// condition
 	iio_context_set_timeout(ctx, UINT_MAX);
 
 	plot.registerSink(qt_time_block->name(), nb_channels, 0);
@@ -185,9 +189,10 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		fft_plot.setYaxisMouseGesturesEnabled(i, false);
 
 	iio = iio_manager::get_instance(ctx,
-			filt->device_name(TOOL_OSCILLOSCOPE));
+					filt->device_name(TOOL_OSCILLOSCOPE));
 	gr::hier_block2_sptr hier = iio->to_hier_block2();
-	qDebug(CAT_OSCILLOSCOPE) << "Manager created:\n" << gr::dot_graph(hier).c_str();
+	qDebug(CAT_OSCILLOSCOPE) << "Manager created:\n"
+				 << gr::dot_graph(hier).c_str();
 
 	auto adc_channels = adc->adcChannelList();
 	for (unsigned int i = 0; i < adc_channels.size(); i++) {
@@ -198,8 +203,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 			id = s.c_str();
 		}
 
-		ChannelWidget *ch_widget = new ChannelWidget(i, false, false,
-			plot.getLineColor(i).name(), this);
+		ChannelWidget *ch_widget = new ChannelWidget(
+			i, false, false, plot.getLineColor(i).name(), this);
 
 		ch_widget->setFullName(id);
 		ch_widget->setShortName(QString("CH %1").arg(i + 1));
@@ -217,13 +222,14 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		channels_group->addButton(ch_widget->nameButton());
 		ui->settings_group->addButton(ch_widget->menuButton());
 
-		QLabel *label= new QLabel(this);
-		label->setText(vertMeasureFormat.format(
-			plot.VertUnitsPerDiv(i), "V/div", 3));
+		QLabel *label = new QLabel(this);
+		label->setText(vertMeasureFormat.format(plot.VertUnitsPerDiv(i),
+							"V/div", 3));
 		label->setStyleSheet(QString("QLabel {"
-				"color: %1;"
-				"font-weight: bold;"
-				"}").arg(plot.getLineColor(i).name()));
+					     "color: %1;"
+					     "font-weight: bold;"
+					     "}")
+					     .arg(plot.getLineColor(i).name()));
 		ui->chn_scales->addWidget(label);
 
 		high_gain_modes.push_back(false);
@@ -232,11 +238,11 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 
 		channels_api.append(new Channel_API(this));
 	}
-	triggerLevelSink = QPair<boost::shared_ptr<signal_sample>, int>(
-				nullptr, -1);
+	triggerLevelSink =
+		QPair<boost::shared_ptr<signal_sample>, int>(nullptr, -1);
 
 	connect(ui->rightMenu, SIGNAL(finished(bool)), this,
-			SLOT(rightMenuFinished(bool)));
+		SLOT(rightMenuFinished(bool)));
 
 	/* Cursors Settings */
 	ui->btnCursors->setProperty("id", QVariant(-1));
@@ -247,10 +253,10 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	/* Trigger Status Updater */
 	triggerUpdater->setOffState(CapturePlot::Stop);
 	onTriggerModeChanged(trigger_settings.triggerMode());
-	connect(triggerUpdater, SIGNAL(outputChanged(int)),
-		&plot, SLOT(setTriggerState(int)));
+	connect(triggerUpdater, SIGNAL(outputChanged(int)), &plot,
+		SLOT(setTriggerState(int)));
 
-	//plot.setZoomerEnabled(true);
+	// plot.setZoomerEnabled(true);
 	fft_plot.setZoomerEnabled();
 	create_add_channel_panel();
 
@@ -262,18 +268,17 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		iio->lock();
 
 	auto adc_samp_conv = gnuradio::get_initial_sptr(
-			new adc_sample_conv(nb_channels, m2k_adc));
+		new adc_sample_conv(nb_channels, m2k_adc));
 	if (m2k_adc) {
 		adc_samp_conv->setCorrectionGain(0,
-			m2k_adc->chnCorrectionGain(0));
+						 m2k_adc->chnCorrectionGain(0));
 		adc_samp_conv->setCorrectionGain(1,
-			m2k_adc->chnCorrectionGain(1));
+						 m2k_adc->chnCorrectionGain(1));
 	}
 
-
 	for (unsigned int i = 0; i < nb_channels; i++) {
-		ids[i] = iio->connect(adc_samp_conv, i, i,
-				true, qt_time_block->nsamps());
+		ids[i] = iio->connect(adc_samp_conv, i, i, true,
+				      qt_time_block->nsamps());
 		iio->connect(adc_samp_conv, i, qt_time_block, i);
 
 		iio->connect(adc_samp_conv, i, qt_hist_block, i);
@@ -304,8 +309,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 
 	/* Plot layout */
 
-	QSpacerItem *plotSpacer = new QSpacerItem(0, 5,
-		QSizePolicy::Fixed, QSizePolicy::Fixed);
+	QSpacerItem *plotSpacer =
+		new QSpacerItem(0, 5, QSizePolicy::Fixed, QSizePolicy::Fixed);
 
 	ui->gridLayoutPlot->addWidget(measurePanel, 0, 1, 1, 1);
 	ui->gridLayoutPlot->addWidget(plot.topArea(), 1, 0, 1, 4);
@@ -332,9 +337,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		iio->lock();
 
 	for (unsigned int i = 0; i < nb_channels; i++) {
-		plot.Curve(i)->setAxes(
-				QwtAxisId(QwtPlot::xBottom, 0),
-				QwtAxisId(QwtPlot::yLeft, i));
+		plot.Curve(i)->setAxes(QwtAxisId(QwtPlot::xBottom, 0),
+				       QwtAxisId(QwtPlot::yLeft, i));
 		plot.addZoomer(i);
 		probe_attenuation.push_back(1);
 		auto multiply = gr::blocks::multiply_const_ff::make(1);
@@ -348,7 +352,6 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 
 	if (started)
 		iio->unlock();
-
 
 	plot.levelTriggerA()->setMobileAxis(QwtAxisId(QwtPlot::yLeft, 0));
 	plot.setTriggerAEnabled(trigger_settings.analogEnabled());
@@ -377,7 +380,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	xy_plot.setLineStyle(0, Qt::SolidLine);
 	xy_plot.setLineMarker(0, QwtSymbol::NoSymbol);
 
-	// Disable mouse interactions with the axes until we figure out if we want to use them
+	// Disable mouse interactions with the axes until we figure out if we
+	// want to use them
 	xy_plot.setXaxisMouseGesturesEnabled(false);
 	for (uint i = 0; i < nb_channels; i++)
 		xy_plot.setYaxisMouseGesturesEnabled(i, false);
@@ -387,8 +391,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	ui->hlayout_fft->addWidget(&fft_plot);
 	ui->container_fft_plot->hide();
 
-	QGridLayout *gridL = static_cast<QGridLayout *>(
-		ui->xy_plot_container->layout());
+	QGridLayout *gridL =
+		static_cast<QGridLayout *>(ui->xy_plot_container->layout());
 	QWidget *w = gridL->itemAtPosition(1, 0)->widget();
 	gridL->addWidget(&xy_plot, 1, 0);
 	gridL->addWidget(w, 2, 0);
@@ -397,41 +401,31 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 
 	ui->rightMenu->setMaximumWidth(0);
 
-	// Controls for scale/division and position controls (Horizontal & Vertical)
-	timeBase = new ScaleSpinButton({
-				{"ns", 1E-9},
-				{"μs", 1E-6},
-				{"ms", 1E-3},
-				{"s", 1E0}
-				}, "Time Base", 100e-9, 1E0,
-				true, false, this);
-	timePosition = new PositionSpinButton({
-				{"ns", 1E-9},
-				{"μs", 1E-6},
-				{"ms", 1E-3},
-				{"s", 1E0},
-				{"min", 60E0},
-				{"h", 36E2}
-				}, "Position",
-				-timeBase->maxValue() * 5,
-				36E2,
-				true, false, this);
-	voltsPerDiv = new ScaleSpinButton({
-//				{"μVolts", 1E-6},
-				{"mVolts", 1E-3},
-				{"Volts", 1E0}
-				}, "Volts/Div", 1e-3, 1e1,
-				true, false, this);
-	voltsPosition  = new PositionSpinButton({
-				{"μVolts", 1E-6},
-				{"mVolts", 1E-3},
-				{"Volts", 1E0}
-				}, "Position",
-				-25, 25, true, false, this);
+	// Controls for scale/division and position controls (Horizontal &
+	// Vertical)
+	timeBase = new ScaleSpinButton(
+		{{"ns", 1E-9}, {"μs", 1E-6}, {"ms", 1E-3}, {"s", 1E0}},
+		"Time Base", 100e-9, 1E0, true, false, this);
+	timePosition = new PositionSpinButton(
+		{{"ns", 1E-9},
+		 {"μs", 1E-6},
+		 {"ms", 1E-3},
+		 {"s", 1E0},
+		 {"min", 60E0},
+		 {"h", 36E2}},
+		"Position", -timeBase->maxValue() * 5, 36E2, true, false, this);
+	voltsPerDiv = new ScaleSpinButton(
+		{//				{"μVolts", 1E-6},
+		 {"mVolts", 1E-3},
+		 {"Volts", 1E0}},
+		"Volts/Div", 1e-3, 1e1, true, false, this);
+	voltsPosition = new PositionSpinButton(
+		{{"μVolts", 1E-6}, {"mVolts", 1E-3}, {"Volts", 1E0}},
+		"Position", -25, 25, true, false, this);
 
 	plot.setOffsetInterval(-25, 25);
 	plot.setTimeTriggerInterval(-timeBase->maxValue() * 5,
-				     timeBase->maxValue() * 5);
+				    timeBase->maxValue() * 5);
 
 	ch_ui = new Ui::ChannelSettings();
 	ch_ui->setupUi(ui->channelSettings);
@@ -455,7 +449,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	gsettings_ui = new Ui::OscGeneralSettings();
 	gsettings_ui->setupUi(ui->generalSettings);
 
-	for(int i = 0; i < nb_channels + nb_math_channels; i++) {
+	for (int i = 0; i < nb_channels + nb_math_channels; i++) {
 		ChannelWidget *cw = static_cast<ChannelWidget *>(
 			ui->channelsList->itemAt(i)->widget());
 		gsettings_ui->cmb_x_channel->addItem(cw->shortName());
@@ -469,7 +463,6 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		this, SLOT(setup_xy_channels()));
 	connect(gsettings_ui->cmb_y_channel, SIGNAL(currentIndexChanged(int)),
 		this, SLOT(setup_xy_channels()));
-
 
 	int gsettings_panel = ui->stackedWidget->indexOf(ui->generalSettings);
 	ui->btnGeneralSettings->setProperty("id", QVariant(-gsettings_panel));
@@ -487,19 +480,19 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		ch_ui->btnAutoset, &QPushButton::setEnabled);
 
 	connect(ui->runSingleWidget, &RunSingleWidget::toggled,
-		[=](bool checked){
-		auto btn = dynamic_cast<CustomPushButton *>(run_button);
-		btn->setChecked(checked);
-	});
-	connect(run_button, &QPushButton::toggled,
-		ui->runSingleWidget, &RunSingleWidget::toggle);
-	connect(ui->runSingleWidget, &RunSingleWidget::toggled,
-		this, &Oscilloscope::runStopToggled);
-	connect(this, &Oscilloscope::startRunning,
-		ui->runSingleWidget, &RunSingleWidget::toggle);
+		[=](bool checked) {
+			auto btn = dynamic_cast<CustomPushButton *>(run_button);
+			btn->setChecked(checked);
+		});
+	connect(run_button, &QPushButton::toggled, ui->runSingleWidget,
+		&RunSingleWidget::toggle);
+	connect(ui->runSingleWidget, &RunSingleWidget::toggled, this,
+		&Oscilloscope::runStopToggled);
+	connect(this, &Oscilloscope::startRunning, ui->runSingleWidget,
+		&RunSingleWidget::toggle);
 
-	connect(gsettings_ui->xyPlotLineType, SIGNAL(toggled(bool)),
-		this, SLOT(on_xyPlotLineType_toggled(bool)));
+	connect(gsettings_ui->xyPlotLineType, SIGNAL(toggled(bool)), this,
+		SLOT(on_xyPlotLineType_toggled(bool)));
 
 	// Signal-Slot Connections
 
@@ -518,37 +511,36 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		SLOT(channelLineWidthChanged(int)));
 
 	/* Sync timePosition with plot time trigger bar */
-	connect(&plot, SIGNAL(timeTriggerValueChanged(double)),
-		this, SLOT(onTimeTriggerDelayChanged(double)));
-	connect(this, SIGNAL(triggerPositionChanged(double)),
-		timePosition, SLOT(setValue(double)));
+	connect(&plot, SIGNAL(timeTriggerValueChanged(double)), this,
+		SLOT(onTimeTriggerDelayChanged(double)));
+	connect(this, SIGNAL(triggerPositionChanged(double)), timePosition,
+		SLOT(setValue(double)));
 
 	/* Update Timebase label each time the oscilloscope timebase changes */
-	connect(timeBase, SIGNAL(valueChanged(double)),
-		&plot, SLOT(setTimeBaseLabelValue(double)));
+	connect(timeBase, SIGNAL(valueChanged(double)), &plot,
+		SLOT(setTimeBaseLabelValue(double)));
 
 	connect(&plot, SIGNAL(channelOffsetChanged(double)),
 		SLOT(onChannelOffsetChanged(double)));
 
-	connect(this, SIGNAL(selectedChannelChanged(int)),
-		&plot, SLOT(setSelectedChannel(int)));
-	connect(this, &Oscilloscope::selectedChannelChanged,
-		&hist_plot, &HistogramDisplayPlot::setSelectedChannel);
+	connect(this, SIGNAL(selectedChannelChanged(int)), &plot,
+		SLOT(setSelectedChannel(int)));
+	connect(this, &Oscilloscope::selectedChannelChanged, &hist_plot,
+		&HistogramDisplayPlot::setSelectedChannel);
 
-	connect(this, SIGNAL(selectedChannelChanged(int)),
-		&plot, SLOT(setZoomerVertAxis(int)));
+	connect(this, SIGNAL(selectedChannelChanged(int)), &plot,
+		SLOT(setZoomerVertAxis(int)));
 
-	connect(&plot,
-		SIGNAL(cursorReadoutsChanged(struct cursorReadoutsText)),
+	connect(&plot, SIGNAL(cursorReadoutsChanged(struct cursorReadoutsText)),
 		SLOT(onCursorReadoutsChanged(struct cursorReadoutsText)));
 
 	// Connections with Trigger Settings
 	connect(&trigger_settings, SIGNAL(sourceChanged(int)),
 		SLOT(onTriggerSourceChanged(int)));
-	connect(&trigger_settings, SIGNAL(analogTriggerEnabled(bool)),
-		&plot, SLOT(setTriggerAEnabled(bool)));
-	connect(&trigger_settings, SIGNAL(analogTriggerEnabled(bool)),
-		this, SLOT(configureAcCouplingTrigger(bool)));
+	connect(&trigger_settings, SIGNAL(analogTriggerEnabled(bool)), &plot,
+		SLOT(setTriggerAEnabled(bool)));
+	connect(&trigger_settings, SIGNAL(analogTriggerEnabled(bool)), this,
+		SLOT(configureAcCouplingTrigger(bool)));
 	connect(&trigger_settings, SIGNAL(levelChanged(double)),
 		plot.levelTriggerA(), SLOT(setPosition(double)));
 	connect(plot.levelTriggerA(), SIGNAL(positionChanged(double)),
@@ -557,20 +549,19 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	connect(&trigger_settings, SIGNAL(levelChanged(double)),
 		SLOT(onTriggerLevelChanged(double)));
 
-	connect(&trigger_settings, SIGNAL(triggerModeChanged(int)),
-		this, SLOT(onTriggerModeChanged(int)));
+	connect(&trigger_settings, SIGNAL(triggerModeChanged(int)), this,
+		SLOT(onTriggerModeChanged(int)));
 
-	connect(&*iio, SIGNAL(timeout()),
-			&trigger_settings, SLOT(autoTriggerDisable()));
-	connect(&plot, SIGNAL(newData()),
-			&trigger_settings, SLOT(autoTriggerEnable()));
+	connect(&*iio, SIGNAL(timeout()), &trigger_settings,
+		SLOT(autoTriggerDisable()));
+	connect(&plot, SIGNAL(newData()), &trigger_settings,
+		SLOT(autoTriggerEnable()));
 	connect(&plot, SIGNAL(newData()), this, SLOT(singleCaptureDone()));
 
 	connect(&plot, SIGNAL(filledScreen(bool, unsigned int)), this,
 		SLOT(onFilledScreen(bool, unsigned int)));
 
-	connect(&*iio, SIGNAL(timeout()),
-			SLOT(onIioDataRefillTimeout()));
+	connect(&*iio, SIGNAL(timeout()), SLOT(onIioDataRefillTimeout()));
 	connect(&plot, SIGNAL(newData()), this, SLOT(onPlotNewData()));
 
 	connect(ch_ui->cmbMemoryDepth, SIGNAL(currentTextChanged(QString)),
@@ -601,10 +592,10 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 			current_ch_widget = i;
 			updateGainMode();
 
-			auto adc_range = m2k_adc->inputRange(
-					m2k_adc->chnHwGainMode(i));
-			auto hyst_range = QPair<double, double>(
-				0, adc_range.second / 10);
+			auto adc_range =
+				m2k_adc->inputRange(m2k_adc->chnHwGainMode(i));
+			auto hyst_range =
+				QPair<double, double>(0, adc_range.second / 10);
 			double vscale = plot.VertUnitsPerDiv(i);
 			trigger_settings.setTriggerLevelRange(i, adc_range);
 			trigger_settings.setTriggerLevelStep(i, vscale);
@@ -615,91 +606,113 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		current_ch_widget = crt_chn_w_copy;
 	}
 
-	connect(plot.getZoomer(), &OscPlotZoomer::zoomIn, [=](){
+	connect(plot.getZoomer(), &OscPlotZoomer::zoomIn, [=]() {
 		zoom_level++;
 		plot.setTimeBaseZoomed(true);
 	});
-	connect(plot.getZoomer(), &OscPlotZoomer::zoomOut, [=](){
-		if (zoom_level != 0) zoom_level--;
+	connect(plot.getZoomer(), &OscPlotZoomer::zoomOut, [=]() {
+		if (zoom_level != 0)
+			zoom_level--;
 		if (zoom_level == 0)
 			plot.setTimeBaseZoomed(false);
 	});
-	connect(plot.getZoomer(), &OscPlotZoomer::zoomFinished, [=](bool isZoomOut) {
-		plot.setTimeBaseLabelValue(plot.HorizUnitsPerDiv());
+	connect(plot.getZoomer(), &OscPlotZoomer::zoomFinished,
+		[=](bool isZoomOut) {
+			plot.setTimeBaseLabelValue(plot.HorizUnitsPerDiv());
 
-		for (int i = 0; i < nb_channels + nb_math_channels + nb_ref_channels; ++i) {
-			QLabel *label = static_cast<QLabel *>(
-			                        ui->chn_scales->itemAt(i)->widget());
-			double value = probe_attenuation[i] * plot.VertUnitsPerDiv(i);
-			label->setText(vertMeasureFormat.format(value, "V/div", 3));
-		}
+			for (int i = 0; i <
+			     nb_channels + nb_math_channels + nb_ref_channels;
+			     ++i) {
+				QLabel *label = static_cast<QLabel *>(
+					ui->chn_scales->itemAt(i)->widget());
+				double value = probe_attenuation[i] *
+					plot.VertUnitsPerDiv(i);
+				label->setText(vertMeasureFormat.format(
+					value, "V/div", 3));
+			}
 
-		if (zoom_level == 0) {
-			onTimePositionChanged(timePosition->value());
-		}
+			if (zoom_level == 0) {
+				onTimePositionChanged(timePosition->value());
+			}
 
-		updateBufferPreviewer();
-		horiz_offset = plot.HorizOffset();
-		time_trigger_offset = horiz_offset;
+			updateBufferPreviewer();
+			horiz_offset = plot.HorizOffset();
+			time_trigger_offset = horiz_offset;
 
-		scaleHistogramPlot();
-		resetHistogramDataPoints();
-	});
+			scaleHistogramPlot();
+			resetHistogramDataPoints();
+		});
 
-	connect(ch_ui->probe_attenuation, QOverload<int>::of(&QComboBox::currentIndexChanged),
-		[=](int index){
-		double value = 0.1 * (std::pow(10, index));
+	connect(ch_ui->probe_attenuation,
+		QOverload<int>::of(&QComboBox::currentIndexChanged),
+		[=](int index) {
+			double value = 0.1 * (std::pow(10, index));
 
-		probe_attenuation[current_ch_widget] = value;
-		if (current_channel == current_ch_widget) {
-			plot.setDisplayScale(probe_attenuation[current_ch_widget]);
-		}
+			probe_attenuation[current_ch_widget] = value;
+			if (current_channel == current_ch_widget) {
+				plot.setDisplayScale(
+					probe_attenuation[current_ch_widget]);
+			}
 
-		bool started = isIioManagerStarted();
-		if (started)
-			iio->lock();
+			bool started = isIioManagerStarted();
+			if (started)
+				iio->lock();
 
-		// Update the multiplier value for this channel
-		if (current_ch_widget < math_probe_atten.size()) {
-			math_probe_atten[current_ch_widget]->set_k(value);
-		}
+			// Update the multiplier value for this channel
+			if (current_ch_widget < math_probe_atten.size()) {
+				math_probe_atten[current_ch_widget]->set_k(
+					value);
+			}
 
-		auto max_elem = max_element(probe_attenuation.begin(), probe_attenuation.begin() + nb_channels);
-		for (auto rail : math_rails.values()) {
-			rail->set_lo(MIN_MATH_RANGE);
-			rail->set_hi(MAX_MATH_RANGE);
-		}
+			auto max_elem = max_element(probe_attenuation.begin(),
+						    probe_attenuation.begin() +
+							    nb_channels);
+			for (auto rail : math_rails.values()) {
+				rail->set_lo(MIN_MATH_RANGE);
+				rail->set_hi(MAX_MATH_RANGE);
+			}
 
-		if (started)
-			iio->unlock();
+			if (started)
+				iio->unlock();
 
-		for (int i = 0; i < nb_channels + nb_math_channels + nb_ref_channels; ++i) {
-			QLabel *label = static_cast<QLabel *>(
-						ui->chn_scales->itemAt(i)->widget());
-			double value = probe_attenuation[i] * plot.VertUnitsPerDiv(i);
-			label->setText(vertMeasureFormat.format(value, "V/div", 3));
-		}
+			for (int i = 0; i <
+			     nb_channels + nb_math_channels + nb_ref_channels;
+			     ++i) {
+				QLabel *label = static_cast<QLabel *>(
+					ui->chn_scales->itemAt(i)->widget());
+				double value = probe_attenuation[i] *
+					plot.VertUnitsPerDiv(i);
+				label->setText(vertMeasureFormat.format(
+					value, "V/div", 3));
+			}
 
-		if (channelWidgetAtId(current_ch_widget)->isMathChannel()) {
-			voltsPerDiv->silentSetMaxValue((*max_elem) * 10);
-			voltsPosition->silentSetMaxValue((*max_elem) * MAX_AMPL);
-			voltsPosition->silentSetMinValue((*max_elem) * (-MAX_AMPL));
-		} else {
-			voltsPerDiv->silentSetMaxValue(10);
-			voltsPosition->silentSetMaxValue(MAX_AMPL);
-			voltsPosition->silentSetMinValue(-MAX_AMPL);
-		}
+			if (channelWidgetAtId(current_ch_widget)
+				    ->isMathChannel()) {
+				voltsPerDiv->silentSetMaxValue((*max_elem) *
+							       10);
+				voltsPosition->silentSetMaxValue((*max_elem) *
+								 MAX_AMPL);
+				voltsPosition->silentSetMinValue((*max_elem) *
+								 (-MAX_AMPL));
+			} else {
+				voltsPerDiv->silentSetMaxValue(10);
+				voltsPosition->silentSetMaxValue(MAX_AMPL);
+				voltsPosition->silentSetMinValue(-MAX_AMPL);
+			}
 
-		voltsPerDiv->setDisplayScale(probe_attenuation[current_ch_widget]);
-		voltsPosition->setDisplayScale(probe_attenuation[current_ch_widget]);
+			voltsPerDiv->setDisplayScale(
+				probe_attenuation[current_ch_widget]);
+			voltsPosition->setDisplayScale(
+				probe_attenuation[current_ch_widget]);
 
-		if (!runButton()->isChecked() && plot.measurementsEnabled()) {
-			measureUpdateValues();
-		}
+			if (!runButton()->isChecked() &&
+			    plot.measurementsEnabled()) {
+				measureUpdateValues();
+			}
 
-		onTriggerSourceChanged(trigger_settings.currentChannel());
-
-	});
+			onTriggerSourceChanged(
+				trigger_settings.currentChannel());
+		});
 
 	init_buffer_scrolling();
 
@@ -717,21 +730,23 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	gsettings_ui->xySettings->hide();
 	timePosition->setValue(0);
 
-	api->setObjectName(QString::fromStdString(Filter::tool_name(
-			TOOL_OSCILLOSCOPE)));
+	api->setObjectName(
+		QString::fromStdString(Filter::tool_name(TOOL_OSCILLOSCOPE)));
 	api->load(*settings);
 	api->js_register(engine);
 
 	plot.setDisplayScale(probe_attenuation[current_channel]);
 	onTriggerSourceChanged(trigger_settings.currentChannel());
-	for (int i = 0; i < nb_channels + nb_math_channels + nb_ref_channels; ++i) {
+	for (int i = 0; i < nb_channels + nb_math_channels + nb_ref_channels;
+	     ++i) {
 		QLabel *label = static_cast<QLabel *>(
-					ui->chn_scales->itemAt(i)->widget());
+			ui->chn_scales->itemAt(i)->widget());
 		double value = probe_attenuation[i] * plot.VertUnitsPerDiv(i);
 		label->setText(vertMeasureFormat.format(value, "V/div", 3));
 	}
 
-	for (unsigned int i = nb_channels; i < nb_channels + nb_math_channels; i++) {
+	for (unsigned int i = nb_channels; i < nb_channels + nb_math_channels;
+	     i++) {
 		init_selected_measurements(i, {0, 1, 4, 5});
 	}
 
@@ -744,14 +759,13 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	readPreferences();
 
 	connect(ui->printBtn, &QPushButton::clicked,
-		[=]() {
-		plot.printWithNoBackground(api->objectName());
-	});
+		[=]() { plot.printWithNoBackground(api->objectName()); });
 
-	//workaround for a bug that selected channel settings for disabled channels
+	// workaround for a bug that selected channel settings for disabled
+	// channels
 	bool found = false;
-	for (int i = 0; i < nb_channels + nb_math_channels +
-					nb_ref_channels; ++i) {
+	for (int i = 0; i < nb_channels + nb_math_channels + nb_ref_channels;
+	     ++i) {
 		ChannelWidget *cw = channelWidgetAtId(i);
 		if (cw->enableButton()->isChecked()) {
 			cw->menuButton()->setChecked(true);
@@ -764,17 +778,17 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		ui->btnTrigger->setChecked(false);
 	}
 
-	connect(this, &Tool::detachedState,
-		this, &Oscilloscope::toolDetached);
+	connect(this, &Tool::detachedState, this, &Oscilloscope::toolDetached);
 	min_detached_width = this->minimumWidth();
 	toolDetached(false);
 
-	connect(&plot,SIGNAL(leftGateChanged(double)),SLOT(onLeftGateChanged(double)));
-	connect(&plot,SIGNAL(rightGateChanged(double)),SLOT(onRightGateChanged(double)));
+	connect(&plot, SIGNAL(leftGateChanged(double)),
+		SLOT(onLeftGateChanged(double)));
+	connect(&plot, SIGNAL(rightGateChanged(double)),
+		SLOT(onRightGateChanged(double)));
 }
 
-int Oscilloscope::binSearchPointOnXaxis(double time)
-{
+int Oscilloscope::binSearchPointOnXaxis(double time) {
 	int n = plot.Curve(0)->data()->size();
 	if (time <= plot.Curve(0)->data()->sample(0).x()) {
 		return 0;
@@ -799,8 +813,7 @@ int Oscilloscope::binSearchPointOnXaxis(double time)
 	return left;
 }
 
-void Oscilloscope::resetHistogramDataPoints()
-{
+void Oscilloscope::resetHistogramDataPoints() {
 	QwtInterval xBot = plot.axisInterval(QwtPlot::xBottom);
 	double zoomMinTime = xBot.minValue();
 	double zoomMaxTime = xBot.maxValue();
@@ -811,36 +824,39 @@ void Oscilloscope::resetHistogramDataPoints()
 	hist_plot.setDataInterval(posMin, posMax + 1);
 }
 
-bool Oscilloscope::isIioManagerStarted() const
-{
-	return iio->started() && (ui->runSingleWidget->singleButtonChecked()
-						  || ui->runSingleWidget->runButtonChecked());
+bool Oscilloscope::isIioManagerStarted() const {
+	return iio->started() &&
+		(ui->runSingleWidget->singleButtonChecked() ||
+		 ui->runSingleWidget->runButtonChecked());
 }
 
-void Oscilloscope::init_buffer_scrolling()
-{
-	connect(&plot, &CapturePlot::canvasSizeChanged, [=](){
-		buffer_previewer->setFixedWidth(plot.width());
-	});
-	connect(buffer_previewer, &BufferPreviewer::bufferMovedBy, [=](int value) {
-		reset_horiz_offset = false;
-		double moveTo = 0.0;
-		double min = plot.Curve(0)->sample(0).x();
-		double max = plot.Curve(0)->sample(plot.Curve(0)->data()->size() - 1).x();
-		int width = buffer_previewer->width();
-		double xAxisWidth = max - min;
+void Oscilloscope::init_buffer_scrolling() {
+	connect(&plot, &CapturePlot::canvasSizeChanged,
+		[=]() { buffer_previewer->setFixedWidth(plot.width()); });
+	connect(buffer_previewer, &BufferPreviewer::bufferMovedBy,
+		[=](int value) {
+			reset_horiz_offset = false;
+			double moveTo = 0.0;
+			double min = plot.Curve(0)->sample(0).x();
+			double max =
+				plot.Curve(0)
+					->sample(plot.Curve(0)->data()->size() -
+						 1)
+					.x();
+			int width = buffer_previewer->width();
+			double xAxisWidth = max - min;
 
-		moveTo = value * xAxisWidth / width;
-		plot.setHorizOffset(moveTo + horiz_offset);
-		plot.replot();
-		updateBufferPreviewer();
-		resetHistogramDataPoints();
-	});
-	connect(buffer_previewer, &BufferPreviewer::bufferStopDrag, [=](){
+			moveTo = value * xAxisWidth / width;
+			plot.setHorizOffset(moveTo + horiz_offset);
+			plot.replot();
+			updateBufferPreviewer();
+			resetHistogramDataPoints();
+		});
+	connect(buffer_previewer, &BufferPreviewer::bufferStopDrag, [=]() {
 		horiz_offset = plot.HorizOffset();
 		reset_horiz_offset = true;
 	});
-	connect(buffer_previewer, &BufferPreviewer::bufferResetPosition, [=](){
+	connect(buffer_previewer, &BufferPreviewer::bufferResetPosition, [=]() {
 		plot.setHorizOffset(time_trigger_offset);
 		plot.replot();
 		updateBufferPreviewer();
@@ -849,41 +865,39 @@ void Oscilloscope::init_buffer_scrolling()
 	});
 }
 
-
 void Oscilloscope::init_selected_measurements(int chnIdx,
-					      std::vector<int> measureIdx)
-{
+					      std::vector<int> measureIdx) {
 	auto measurements = plot.measurements(chnIdx);
 
 	for (int i = 0; i < measureIdx.size(); i++) {
 		measurements[measureIdx[i]]->setEnabled(true);
-		measure_settings->onMeasurementActivated(
-					chnIdx, measureIdx[i], true);
+		measure_settings->onMeasurementActivated(chnIdx, measureIdx[i],
+							 true);
 	}
 	measure_settings->loadMeasurementStatesFromData();
 	onMeasurementSelectionListChanged();
 }
 
-void Oscilloscope::remove_ref_waveform(QString name)
-{
+void Oscilloscope::remove_ref_waveform(QString name) {
 	int maxChnId = nb_channels + nb_math_channels + nb_ref_channels;
 	for (int i = 0; i < maxChnId; ++i) {
 		ChannelWidget *cw = channelWidgetAtId(i);
 		if (cw->fullName() == name) {
-			qDebug() << "deleted channel with name: " << cw->fullName();
+			qDebug() << "deleted channel with name: "
+				 << cw->fullName();
 			cw->deleteButton()->click();
 		}
 	}
 }
 
-void Oscilloscope::setNativeDialogs(bool nativeDialogs)
-{
+void Oscilloscope::setNativeDialogs(bool nativeDialogs) {
 	Tool::setNativeDialogs(nativeDialogs);
 	plot.setUseNativeDialog(nativeDialogs);
 }
 
-void Oscilloscope::add_ref_waveform(QString name, QVector<double> xData, QVector<double> yData, unsigned int sampleRate)
-{
+void Oscilloscope::add_ref_waveform(QString name, QVector<double> xData,
+				    QVector<double> yData,
+				    unsigned int sampleRate) {
 	plot.cancelZoom();
 
 	probe_attenuation.push_back(1);
@@ -892,18 +906,18 @@ void Oscilloscope::add_ref_waveform(QString name, QVector<double> xData, QVector
 
 	int curve_id = nb_channels + nb_math_channels + nb_ref_channels;
 
-	ChannelWidget *channel_widget = new ChannelWidget(curve_id, true, false,
-			plot.getLineColor(curve_id).name(), this);
+	ChannelWidget *channel_widget =
+		new ChannelWidget(curve_id, true, false,
+				  plot.getLineColor(curve_id).name(), this);
 
 	channel_widget->setFullName(name);
 	channel_widget->setShortName(name);
 	channel_widget->nameButton()->setText(channel_widget->shortName());
 	channel_widget->setReferenceChannel(true);
 
-
 	channel_widget->setProperty("curve_nb", QVariant(curve_id));
-	channel_widget->deleteButton()->setProperty(
-		"curve_name", QVariant(name));
+	channel_widget->deleteButton()->setProperty("curve_name",
+						    QVariant(name));
 
 	connect(channel_widget, SIGNAL(enabled(bool)),
 		SLOT(onChannelWidgetEnabled(bool)));
@@ -913,8 +927,7 @@ void Oscilloscope::add_ref_waveform(QString name, QVector<double> xData, QVector
 		SLOT(onChannelWidgetMenuToggled(bool)));
 	connect(channel_widget, SIGNAL(deleteClicked()),
 		SLOT(onChannelWidgetDeleteClicked()));
-	connect(channel_widget, &ChannelWidget::menuToggled,
-	[=](bool on) {
+	connect(channel_widget, &ChannelWidget::menuToggled, [=](bool on) {
 		if (!on) {
 			ch_ui->btnEditMath->setChecked(false);
 		}
@@ -926,20 +939,21 @@ void Oscilloscope::add_ref_waveform(QString name, QVector<double> xData, QVector
 	ui->settings_group->addButton(channel_widget->menuButton());
 	channel_widget->nameButton()->setChecked(true);
 
-	QLabel *label= new QLabel(this);
-	label->setText(vertMeasureFormat.format(
-			       plot.VertUnitsPerDiv(curve_id), "V/div", 3));
+	QLabel *label = new QLabel(this);
+	label->setText(vertMeasureFormat.format(plot.VertUnitsPerDiv(curve_id),
+						"V/div", 3));
 	label->setStyleSheet(QString("QLabel {"
 				     "color: %1;"
 				     "font-weight: bold;"
-				     "}").arg(plot.getLineColor(curve_id).name()));
+				     "}")
+				     .arg(plot.getLineColor(curve_id).name()));
 	ui->chn_scales->addWidget(label);
 	probe_attenuation.push_back(1);
 
-	plot.Curve(curve_id)->setAxes(
-		QwtAxisId(QwtPlot::xBottom, 0),
-		QwtAxisId(QwtPlot::yLeft, curve_id));
-	plot.Curve(curve_id)->setTitle("REF " + QString::number(nb_ref_channels + 1));
+	plot.Curve(curve_id)->setAxes(QwtAxisId(QwtPlot::xBottom, 0),
+				      QwtAxisId(QwtPlot::yLeft, curve_id));
+	plot.Curve(curve_id)->setTitle("REF " +
+				       QString::number(nb_ref_channels + 1));
 	plot.addZoomer(curve_id);
 	plot.replot();
 
@@ -964,8 +978,7 @@ void Oscilloscope::add_ref_waveform(QString name, QVector<double> xData, QVector
 	plot.computeMeasurementsForChannel(curve_id, sampleRate);
 }
 
-void Oscilloscope::add_ref_waveform(unsigned int chIdx)
-{
+void Oscilloscope::add_ref_waveform(unsigned int chIdx) {
 	if (nb_math_channels + nb_ref_channels == MAX_MATH_CHANNELS) {
 		return;
 	}
@@ -985,18 +998,21 @@ void Oscilloscope::add_ref_waveform(unsigned int chIdx)
 
 	int nr_of_samples_in_file = import_data.size();
 
-	double mid_point_on_screen = (timeBase->value() * 8) - ((
-					     timeBase->value() * 8) - timePosition->value());
+	double mid_point_on_screen = (timeBase->value() * 8) -
+		((timeBase->value() * 8) - timePosition->value());
 
-	double x_axis_step_size = (ref_waveform_timebase /
-				   (nr_of_samples_in_file / plot.xAxisNumDiv()));
+	double x_axis_step_size =
+		(ref_waveform_timebase /
+		 (nr_of_samples_in_file / plot.xAxisNumDiv()));
 
-	for (int i = -(nr_of_samples_in_file / 2); i < (nr_of_samples_in_file / 2);
-	     ++i) {
-		xData.push_back(mid_point_on_screen + ((double)i * x_axis_step_size));
+	for (int i = -(nr_of_samples_in_file / 2);
+	     i < (nr_of_samples_in_file / 2); ++i) {
+		xData.push_back(mid_point_on_screen +
+				((double)i * x_axis_step_size));
 	}
 
-	if (!refChannelTimeBase->isEnabled()) chIdx++;
+	if (!refChannelTimeBase->isEnabled())
+		chIdx++;
 
 	for (int i = 0; i < import_data.size(); ++i) {
 		if (chIdx >= import_data[i].size()) {
@@ -1011,29 +1027,28 @@ void Oscilloscope::add_ref_waveform(unsigned int chIdx)
 
 	plot.registerReferenceWaveform(qname, xData, yData);
 
-	ChannelWidget *channel_widget = new ChannelWidget(curve_id, true, false,
-	                plot.getLineColor(curve_id).name(), this);
+	ChannelWidget *channel_widget =
+		new ChannelWidget(curve_id, true, false,
+				  plot.getLineColor(curve_id).name(), this);
 
 	channel_widget->setFullName(qname);
 	channel_widget->setShortName(qname);
 	channel_widget->nameButton()->setText(channel_widget->shortName());
 	channel_widget->setReferenceChannel(true);
 
-
 	channel_widget->setProperty("curve_nb", QVariant(curve_id));
-	channel_widget->deleteButton()->setProperty(
-	        "curve_name", QVariant(qname));
+	channel_widget->deleteButton()->setProperty("curve_name",
+						    QVariant(qname));
 
 	connect(channel_widget, SIGNAL(enabled(bool)),
-	        SLOT(onChannelWidgetEnabled(bool)));
+		SLOT(onChannelWidgetEnabled(bool)));
 	connect(channel_widget, SIGNAL(selected(bool)),
-	        SLOT(onChannelWidgetSelected(bool)));
+		SLOT(onChannelWidgetSelected(bool)));
 	connect(channel_widget, SIGNAL(menuToggled(bool)),
-	        SLOT(onChannelWidgetMenuToggled(bool)));
+		SLOT(onChannelWidgetMenuToggled(bool)));
 	connect(channel_widget, SIGNAL(deleteClicked()),
-	        SLOT(onChannelWidgetDeleteClicked()));
-	connect(channel_widget, &ChannelWidget::menuToggled,
-	[=](bool on) {
+		SLOT(onChannelWidgetDeleteClicked()));
+	connect(channel_widget, &ChannelWidget::menuToggled, [=](bool on) {
 		if (!on) {
 			ch_ui->btnEditMath->setChecked(false);
 		}
@@ -1045,20 +1060,21 @@ void Oscilloscope::add_ref_waveform(unsigned int chIdx)
 	ui->settings_group->addButton(channel_widget->menuButton());
 	channel_widget->nameButton()->setChecked(true);
 
-	QLabel *label= new QLabel(this);
-	label->setText(vertMeasureFormat.format(
-	                       plot.VertUnitsPerDiv(curve_id), "V/div", 3));
+	QLabel *label = new QLabel(this);
+	label->setText(vertMeasureFormat.format(plot.VertUnitsPerDiv(curve_id),
+						"V/div", 3));
 	label->setStyleSheet(QString("QLabel {"
-	                             "color: %1;"
-	                             "font-weight: bold;"
-	                             "}").arg(plot.getLineColor(curve_id).name()));
+				     "color: %1;"
+				     "font-weight: bold;"
+				     "}")
+				     .arg(plot.getLineColor(curve_id).name()));
 	ui->chn_scales->addWidget(label);
 	probe_attenuation.push_back(1);
 
-	plot.Curve(curve_id)->setAxes(
-	        QwtAxisId(QwtPlot::xBottom, 0),
-	        QwtAxisId(QwtPlot::yLeft, curve_id));
-	plot.Curve(curve_id)->setTitle("REF " + QString::number(nb_ref_channels + 1));
+	plot.Curve(curve_id)->setAxes(QwtAxisId(QwtPlot::xBottom, 0),
+				      QwtAxisId(QwtPlot::yLeft, curve_id));
+	plot.Curve(curve_id)->setTitle("REF " +
+				       QString::number(nb_ref_channels + 1));
 	plot.addZoomer(curve_id);
 	plot.replot();
 
@@ -1081,8 +1097,7 @@ void Oscilloscope::add_ref_waveform(unsigned int chIdx)
 	init_selected_measurements(curve_id, {0, 1, 4, 5});
 }
 
-void Oscilloscope::updateTriggerLevelValue(std::vector<float> value)
-{
+void Oscilloscope::updateTriggerLevelValue(std::vector<float> value) {
 	if (!triggerLevelSink.first) {
 		return;
 	}
@@ -1091,22 +1106,21 @@ void Oscilloscope::updateTriggerLevelValue(std::vector<float> value)
 
 	float val = dc_cancel.at(triggerLevelSink.second)->get_dc_offset();
 	double m_dc_level = trigger_settings.dcLevel();
-	if ((int)(val*1e3) == (int)(m_dc_level*1e3)) {
+	if ((int)(val * 1e3) == (int)(m_dc_level * 1e3)) {
 		triggerLevelSink.first->blockSignals(false);
 		return;
 	}
 	if (trigger_settings.analogEnabled()) {
 		trigger_settings.setDcLevelCoupled(val);
 		trigger_settings.onSpinboxTriggerLevelChanged(
-					trigger_settings.level());
+			trigger_settings.level());
 	}
 	triggerLevelSink.first->blockSignals(false);
 }
 
-Oscilloscope::~Oscilloscope()
-{
-	disconnect(prefPanel, &Preferences::notify, this, &Oscilloscope::readPreferences);
-
+Oscilloscope::~Oscilloscope() {
+	disconnect(prefPanel, &Preferences::notify, this,
+		   &Oscilloscope::readPreferences);
 
 	ui->runSingleWidget->toggle(false);
 	setDynamicProperty(runButton(), "disabled", false);
@@ -1130,7 +1144,8 @@ Oscilloscope::~Oscilloscope()
 		iio->unlock();
 
 	gr::hier_block2_sptr hier = iio->to_hier_block2();
-	qDebug(CAT_OSCILLOSCOPE) << "OSC disconnected:\n" << gr::dot_graph(hier).c_str();
+	qDebug(CAT_OSCILLOSCOPE) << "OSC disconnected:\n"
+				 << gr::dot_graph(hier).c_str();
 
 	if (saveOnExit) {
 		api->save(*settings);
@@ -1155,35 +1170,34 @@ Oscilloscope::~Oscilloscope()
 	delete ui;
 }
 
-void Oscilloscope::settingsLoaded()
-{
-	for (int i = 0; i < nb_channels + nb_math_channels + nb_ref_channels; ++i)
+void Oscilloscope::settingsLoaded() {
+	for (int i = 0; i < nb_channels + nb_math_channels + nb_ref_channels;
+	     ++i)
 		if (channelWidgetAtId(i)->menuButton()->isChecked() &&
-				!channelWidgetAtId(i)->isReferenceChannel()) {
+		    !channelWidgetAtId(i)->isReferenceChannel()) {
 			current_ch_widget = i;
 			channelWidgetAtId(i)->menuButton()->setChecked(true);
 			break;
 		}
 
 	disconnect(voltsPerDiv, SIGNAL(valueChanged(double)), this,
-		SLOT(onVertScaleValueChanged(double)));
+		   SLOT(onVertScaleValueChanged(double)));
 	voltsPerDiv->setValue(plot.VertUnitsPerDiv(current_ch_widget));
 	connect(voltsPerDiv, SIGNAL(valueChanged(double)),
 		SLOT(onVertScaleValueChanged(double)));
 }
 
-void Oscilloscope::readPreferences()
-{
+void Oscilloscope::readPreferences() {
 	plot.setGraticuleEnabled(prefPanel->getOsc_graticule_enabled());
 
 	// enable/disable mini histogram plot
 	toggleMiniHistogramPlotVisible(prefPanel->getMini_hist_enabled());
 
 	bool foundChannel = false;
-	for (unsigned int i = 0; i < nb_channels + nb_math_channels + nb_ref_channels;
-	     i++) {
+	for (unsigned int i = 0;
+	     i < nb_channels + nb_math_channels + nb_ref_channels; i++) {
 		ChannelWidget *cw = static_cast<ChannelWidget *>(
-					    ui->channelsList->itemAt(i)->widget());
+			ui->channelsList->itemAt(i)->widget());
 
 		if (cw->enableButton()->isChecked()) {
 			/* At least one channel is enabled,
@@ -1202,8 +1216,7 @@ void Oscilloscope::readPreferences()
 	m2k_adc->setFilteringEnabled(prefPanel->getOsc_filtering_enabled());
 }
 
-void Oscilloscope::toggleMiniHistogramPlotVisible(bool enabled)
-{
+void Oscilloscope::toggleMiniHistogramPlotVisible(bool enabled) {
 	miniHistogram = enabled;
 	if (hist_plot.getOrientation() == Qt::Horizontal) {
 		hist_plot.setVisible(enabled);
@@ -1211,15 +1224,14 @@ void Oscilloscope::toggleMiniHistogramPlotVisible(bool enabled)
 	}
 }
 
-void Oscilloscope::init_channel_settings()
-{
+void Oscilloscope::init_channel_settings() {
 	connect(ch_ui->btnEditMath, &QPushButton::toggled, this,
 		&Oscilloscope::openEditMathPanel);
 
 	connect(ch_ui->btnAutoset, &QPushButton::clicked, this,
 		&Oscilloscope::requestAutoset);
 
-	connect(ui->btnAddMath, &QPushButton::toggled, [=](bool on){
+	connect(ui->btnAddMath, &QPushButton::toggled, [=](bool on) {
 		if (on && !addChannel) {
 			addChannel = true;
 			math_pair->first.btnAddChannel->setText("Add Channel");
@@ -1227,29 +1239,39 @@ void Oscilloscope::init_channel_settings()
 			ch_ui->btnAutoset->setVisible(autosetEnabled);
 		}
 	});
-	connect(ch_ui->lineStyle, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index) {
-		plot.setPlotLineStyle(current_ch_widget, index);
-	});
+	connect(ch_ui->lineStyle,
+		QOverload<int>::of(&QComboBox::currentIndexChanged),
+		[=](int index) {
+			plot.setPlotLineStyle(current_ch_widget, index);
+		});
 
-	connect(ch_ui->snapshotBtn, &QPushButton::clicked, [=](){
+	connect(ch_ui->snapshotBtn, &QPushButton::clicked, [=]() {
 		ChannelWidget *cw = channelWidgetAtId(current_ch_widget);
 		if (current_ch_widget > 1 && cw->isReferenceChannel()) {
 			// export
-			QString fileName = QFileDialog::getSaveFileName(this,
-			    tr("Export"), "", tr("Comma-separated values files (*.csv)",
-						       "Tab-delimited values files (*.txt)"),
-			    nullptr, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+			QString fileName = QFileDialog::getSaveFileName(
+				this, tr("Export"), "",
+				tr("Comma-separated values files (*.csv)",
+				   "Tab-delimited values files (*.txt)"),
+				nullptr,
+				(m_useNativeDialogs
+					 ? QFileDialog::Options()
+					 : QFileDialog::DontUseNativeDialog));
 			if (!fileName.isEmpty()) {
 				FileManager fm("Oscilloscope");
 				fm.open(fileName, FileManager::EXPORT);
 
 				QVector<double> time_data, volts_data;
 
-				QwtPlotCurve *curve = plot.Curve(current_ch_widget);
+				QwtPlotCurve *curve =
+					plot.Curve(current_ch_widget);
 
-				for (size_t i = 0; i < curve->data()->size(); ++i) {
-					time_data.push_back(curve->sample(i).x());
-					volts_data.push_back(curve->sample(i).y());
+				for (size_t i = 0; i < curve->data()->size();
+				     ++i) {
+					time_data.push_back(
+						curve->sample(i).x());
+					volts_data.push_back(
+						curve->sample(i).y());
 				}
 
 				fm.save(time_data, "Time(S)");
@@ -1261,7 +1283,8 @@ void Oscilloscope::init_channel_settings()
 			}
 		} else {
 			// snapshot
-			if (nb_math_channels + nb_ref_channels == MAX_MATH_CHANNELS) {
+			if (nb_math_channels + nb_ref_channels ==
+			    MAX_MATH_CHANNELS) {
 				return;
 			}
 
@@ -1278,30 +1301,30 @@ void Oscilloscope::init_channel_settings()
 				yData.push_back(curve->data()->sample(i).y());
 			}
 
-			QString qname = QString("REF %1").arg(nb_ref_channels + 1);
+			QString qname =
+				QString("REF %1").arg(nb_ref_channels + 1);
 
-			add_ref_waveform(qname, xData, yData, active_sample_rate);
+			add_ref_waveform(qname, xData, yData,
+					 active_sample_rate);
 		}
 	});
 }
 
-void Oscilloscope::activateAcCoupling(int i)
-{
+void Oscilloscope::activateAcCoupling(int i) {
 	double alpha, beta;
-	bool trigger = (i == trigger_settings.currentChannel())
-			&& trigger_settings.analogEnabled();
+	bool trigger = (i == trigger_settings.currentChannel()) &&
+		trigger_settings.analogEnabled();
 	if (trigger) {
 		trigger_settings.setAcCoupled(true, i);
 	}
 
 	bool started = isIioManagerStarted();
-	if(started) {
+	if (started) {
 		iio->lock();
 	}
 
 	boost::shared_ptr<adc_sample_conv> block =
-	dynamic_pointer_cast<adc_sample_conv>(
-					adc_samp_conv_block);
+		dynamic_pointer_cast<adc_sample_conv>(adc_samp_conv_block);
 
 	iio->disconnect(block, i, qt_time_block, i);
 	iio->disconnect(adc_samp_conv_block, i, math_probe_atten.at(i), 0);
@@ -1316,83 +1339,89 @@ void Oscilloscope::activateAcCoupling(int i)
 	if (trigger && !triggerLevelSink.first) {
 		triggerLevelSink.first = boost::make_shared<signal_sample>();
 		triggerLevelSink.second = i;
-		keep_one = gr::blocks::keep_one_in_n::make(sizeof(float), active_sample_count);
-		connect(&*triggerLevelSink.first, SIGNAL(triggered(std::vector<float>)),
-			this, SLOT(updateTriggerLevelValue(std::vector<float>)));
+		keep_one = gr::blocks::keep_one_in_n::make(sizeof(float),
+							   active_sample_count);
+		connect(&*triggerLevelSink.first,
+			SIGNAL(triggered(std::vector<float>)), this,
+			SLOT(updateTriggerLevelValue(std::vector<float>)));
 		iio->connect(dc_cancel.at(i), 0, keep_one, 0);
 		iio->connect(keep_one, 0, triggerLevelSink.first, 0);
 	}
 
 	if (xy_is_visible) {
-		iio->disconnect(xy_channels.at(index_x).first, xy_channels.at(index_x).second,
-				ftc, 0);
-		iio->disconnect(xy_channels.at(index_y).first, xy_channels.at(index_y).second,
-				ftc, 1);
+		iio->disconnect(xy_channels.at(index_x).first,
+				xy_channels.at(index_x).second, ftc, 0);
+		iio->disconnect(xy_channels.at(index_y).first,
+				xy_channels.at(index_y).second, ftc, 1);
 		xy_channels.clear();
 
-		for(unsigned int ch = 0; ch < nb_channels; ch++) {
+		for (unsigned int ch = 0; ch < nb_channels; ch++) {
 			if (chnAcCoupled.at(ch)) {
-				xy_channels.push_back(QPair<gr::basic_block_sptr, int>(
-							      dc_cancel.at(ch), 0));
+				xy_channels.push_back(
+					QPair<gr::basic_block_sptr, int>(
+						dc_cancel.at(ch), 0));
 			} else {
-				xy_channels.push_back(QPair<gr::basic_block_sptr, int>(
-							      adc_samp_conv_block, ch));
+				xy_channels.push_back(
+					QPair<gr::basic_block_sptr, int>(
+						adc_samp_conv_block, ch));
 			}
 		}
 
-		iio->connect(xy_channels.at(index_x).first, xy_channels.at(index_x).second,
-			     ftc, 0);
-		iio->connect(xy_channels.at(index_y).first, xy_channels.at(index_y).second,
-			     ftc, 1);
+		iio->connect(xy_channels.at(index_x).first,
+			     xy_channels.at(index_x).second, ftc, 0);
+		iio->connect(xy_channels.at(index_y).first,
+			     xy_channels.at(index_y).second, ftc, 1);
 	}
 
 	if (fft_is_visible) {
 		for (unsigned int i = 0; i < nb_channels; i++) {
-			iio->disconnect(fft_channels.at(i).first, fft_channels.at(i).second,
+			iio->disconnect(fft_channels.at(i).first,
+					fft_channels.at(i).second,
 					fft_blocks.at(i), 0);
 		}
 		fft_channels.clear();
 
-		for(unsigned int ch = 0; ch < nb_channels; ch++) {
+		for (unsigned int ch = 0; ch < nb_channels; ch++) {
 			if (chnAcCoupled.at(ch)) {
-				fft_channels.push_back(QPair<gr::basic_block_sptr, int>(
-							      dc_cancel.at(ch), 0));
+				fft_channels.push_back(
+					QPair<gr::basic_block_sptr, int>(
+						dc_cancel.at(ch), 0));
 			} else {
-				fft_channels.push_back(QPair<gr::basic_block_sptr, int>(
-							      adc_samp_conv_block, ch));
+				fft_channels.push_back(
+					QPair<gr::basic_block_sptr, int>(
+						adc_samp_conv_block, ch));
 			}
 
-			iio->connect(fft_channels.at(ch).first, fft_channels.at(ch).second,
+			iio->connect(fft_channels.at(ch).first,
+				     fft_channels.at(ch).second,
 				     fft_blocks.at(ch), 0);
 		}
 	}
 
-	for(int ch = 0; ch < nb_channels; ch++) {
+	for (int ch = 0; ch < nb_channels; ch++) {
 		iio->set_buffer_size(ids[ch], active_sample_count);
 		dc_cancel.at(ch)->set_buffer_size(active_sample_count);
 	}
 
-	if(started) {
+	if (started) {
 		iio->unlock();
 	}
 }
 
-void Oscilloscope::deactivateAcCoupling(int i)
-{
-	bool trigger = (i == trigger_settings.currentChannel())
-			&& trigger_settings.analogEnabled();
+void Oscilloscope::deactivateAcCoupling(int i) {
+	bool trigger = (i == trigger_settings.currentChannel()) &&
+		trigger_settings.analogEnabled();
 	if (trigger) {
 		trigger_settings.setAcCoupled(false, i);
 	}
 
 	bool started = isIioManagerStarted();
-	if(started) {
+	if (started) {
 		iio->lock();
 	}
 
 	boost::shared_ptr<adc_sample_conv> block =
-	dynamic_pointer_cast<adc_sample_conv>(
-					adc_samp_conv_block);
+		dynamic_pointer_cast<adc_sample_conv>(adc_samp_conv_block);
 
 	iio->disconnect(dc_cancel.at(i), 0, math_probe_atten.at(i), 0);
 	iio->connect(adc_samp_conv_block, i, math_probe_atten.at(i), 0);
@@ -1406,8 +1435,9 @@ void Oscilloscope::deactivateAcCoupling(int i)
 	iio->connect(block, i, qt_hist_block, i);
 
 	if (trigger && triggerLevelSink.first) {
-		disconnect(&*triggerLevelSink.first, SIGNAL(triggered(std::vector<float>)),
-			this, SLOT(updateTriggerLevelValue(std::vector<float>)));
+		disconnect(&*triggerLevelSink.first,
+			   SIGNAL(triggered(std::vector<float>)), this,
+			   SLOT(updateTriggerLevelValue(std::vector<float>)));
 
 		iio->disconnect(dc_cancel.at(i), 0, keep_one, 0);
 		iio->disconnect(keep_one, 0, triggerLevelSink.first, 0);
@@ -1418,61 +1448,66 @@ void Oscilloscope::deactivateAcCoupling(int i)
 	}
 
 	if (xy_is_visible) {
-		iio->disconnect(xy_channels.at(index_x).first, xy_channels.at(index_x).second,
-				ftc, 0);
-		iio->disconnect(xy_channels.at(index_y).first, xy_channels.at(index_y).second,
-				ftc, 1);
+		iio->disconnect(xy_channels.at(index_x).first,
+				xy_channels.at(index_x).second, ftc, 0);
+		iio->disconnect(xy_channels.at(index_y).first,
+				xy_channels.at(index_y).second, ftc, 1);
 		xy_channels.clear();
 
-		for(unsigned int ch = 0; ch < nb_channels; ch++) {
+		for (unsigned int ch = 0; ch < nb_channels; ch++) {
 			if (chnAcCoupled.at(ch) && (ch != i)) {
-				xy_channels.push_back(QPair<gr::basic_block_sptr, int>(
-							      dc_cancel.at(ch), 0));
+				xy_channels.push_back(
+					QPair<gr::basic_block_sptr, int>(
+						dc_cancel.at(ch), 0));
 			} else {
-				xy_channels.push_back(QPair<gr::basic_block_sptr, int>(
-							      adc_samp_conv_block, ch));
+				xy_channels.push_back(
+					QPair<gr::basic_block_sptr, int>(
+						adc_samp_conv_block, ch));
 			}
 		}
 
-		iio->connect(xy_channels.at(index_x).first, xy_channels.at(index_x).second,
-			     ftc, 0);
-		iio->connect(xy_channels.at(index_y).first, xy_channels.at(index_y).second,
-			     ftc, 1);
+		iio->connect(xy_channels.at(index_x).first,
+			     xy_channels.at(index_x).second, ftc, 0);
+		iio->connect(xy_channels.at(index_y).first,
+			     xy_channels.at(index_y).second, ftc, 1);
 	}
 
 	if (fft_is_visible) {
 		for (unsigned int ch = 0; ch < nb_channels; ch++) {
-			iio->disconnect(fft_channels.at(ch).first, fft_channels.at(ch).second,
+			iio->disconnect(fft_channels.at(ch).first,
+					fft_channels.at(ch).second,
 					fft_blocks.at(ch), 0);
 		}
 		fft_channels.clear();
 
-		for(unsigned int ch = 0; ch < nb_channels; ch++) {
+		for (unsigned int ch = 0; ch < nb_channels; ch++) {
 			if (chnAcCoupled.at(ch) && ch != i) {
-				fft_channels.push_back(QPair<gr::basic_block_sptr, int>(
-							      dc_cancel.at(ch), 0));
+				fft_channels.push_back(
+					QPair<gr::basic_block_sptr, int>(
+						dc_cancel.at(ch), 0));
 			} else {
-				fft_channels.push_back(QPair<gr::basic_block_sptr, int>(
-							      adc_samp_conv_block, ch));
+				fft_channels.push_back(
+					QPair<gr::basic_block_sptr, int>(
+						adc_samp_conv_block, ch));
 			}
 
-			iio->connect(fft_channels.at(ch).first, fft_channels.at(ch).second,
+			iio->connect(fft_channels.at(ch).first,
+				     fft_channels.at(ch).second,
 				     fft_blocks.at(ch), 0);
 		}
 	}
 
-	for(int ch = 0; ch < nb_channels; ch++) {
+	for (int ch = 0; ch < nb_channels; ch++) {
 		iio->set_buffer_size(ids[ch], active_sample_count);
 		dc_cancel.at(ch)->set_buffer_size(active_sample_count);
 	}
 
-	if(started) {
+	if (started) {
 		iio->unlock();
 	}
 }
 
-void Oscilloscope::configureAcCouplingTrigger(bool enabled)
-{
+void Oscilloscope::configureAcCouplingTrigger(bool enabled) {
 	int chIdx = trigger_settings.currentChannel();
 	if (enabled && chnAcCoupled.at(chIdx)) {
 		activateAcCouplingTrigger(chIdx);
@@ -1482,8 +1517,7 @@ void Oscilloscope::configureAcCouplingTrigger(bool enabled)
 	triggerAcCoupled = enabled;
 }
 
-void Oscilloscope::activateAcCouplingTrigger(int chIdx)
-{
+void Oscilloscope::activateAcCouplingTrigger(int chIdx) {
 	trigger_settings.setAcCoupled(true, chIdx);
 	if (!triggerLevelSink.first) {
 		bool started = isIioManagerStarted();
@@ -1493,9 +1527,11 @@ void Oscilloscope::activateAcCouplingTrigger(int chIdx)
 		triggerLevelSink.first = boost::make_shared<signal_sample>();
 		triggerLevelSink.second = chIdx;
 		keep_one = gr::blocks::keep_one_in_n::make(sizeof(float), 100);
-		connect(&*triggerLevelSink.first, SIGNAL(triggered(std::vector<float>)),
-			this, SLOT(updateTriggerLevelValue(std::vector<float>)));
-		iio->connect(dc_cancel.at(triggerLevelSink.second), 0, keep_one, 0);
+		connect(&*triggerLevelSink.first,
+			SIGNAL(triggered(std::vector<float>)), this,
+			SLOT(updateTriggerLevelValue(std::vector<float>)));
+		iio->connect(dc_cancel.at(triggerLevelSink.second), 0, keep_one,
+			     0);
 		iio->connect(keep_one, 0, triggerLevelSink.first, 0);
 
 		if (started) {
@@ -1504,8 +1540,7 @@ void Oscilloscope::activateAcCouplingTrigger(int chIdx)
 	}
 }
 
-void Oscilloscope::deactivateAcCouplingTrigger()
-{
+void Oscilloscope::deactivateAcCouplingTrigger() {
 	trigger_settings.setAcCoupled(false, triggerLevelSink.second);
 	if (triggerLevelSink.first) {
 		bool started = isIioManagerStarted();
@@ -1513,10 +1548,12 @@ void Oscilloscope::deactivateAcCouplingTrigger()
 			iio->lock();
 		}
 		/* Disconnect the SLOT */
-		disconnect(&*triggerLevelSink.first, SIGNAL(triggered(std::vector<float>)),
-			this, SLOT(updateTriggerLevelValue(std::vector<float>)));
+		disconnect(&*triggerLevelSink.first,
+			   SIGNAL(triggered(std::vector<float>)), this,
+			   SLOT(updateTriggerLevelValue(std::vector<float>)));
 		/* Disconnect the GNU Radio block */
-		iio->disconnect(dc_cancel.at(triggerLevelSink.second), 0, keep_one, 0);
+		iio->disconnect(dc_cancel.at(triggerLevelSink.second), 0,
+				keep_one, 0);
 		iio->disconnect(keep_one, 0, triggerLevelSink.first, 0);
 		trigger_settings.updateHwVoltLevels(triggerLevelSink.second);
 		if (started) {
@@ -1528,8 +1565,7 @@ void Oscilloscope::deactivateAcCouplingTrigger()
 	keep_one = nullptr;
 }
 
-void Oscilloscope::configureAcCoupling(int i, bool coupled)
-{
+void Oscilloscope::configureAcCoupling(int i, bool coupled) {
 	bool tmp = chnAcCoupled[i];
 	chnAcCoupled[i] = coupled;
 
@@ -1544,18 +1580,18 @@ void Oscilloscope::configureAcCoupling(int i, bool coupled)
 	scaleHistogramPlot();
 }
 
-void Oscilloscope::enableLabels(bool enable)
-{
+void Oscilloscope::enableLabels(bool enable) {
 	plot.setUsingLeftAxisScales(enable);
 	plot.enableLabels(enable);
 
 	if (enable) {
 		bool allDisabled = true;
 
-		for (unsigned int i = 0; i < nb_channels + nb_math_channels + nb_ref_channels;
+		for (unsigned int i = 0;
+		     i < nb_channels + nb_math_channels + nb_ref_channels;
 		     i++) {
 			ChannelWidget *cw = static_cast<ChannelWidget *>(
-			                            ui->channelsList->itemAt(i)->widget());
+				ui->channelsList->itemAt(i)->widget());
 
 			if (cw->enableButton()->isChecked()) {
 				allDisabled = false;
@@ -1571,62 +1607,55 @@ void Oscilloscope::enableLabels(bool enable)
 		plot.enableAxisLabels(enable);
 }
 
-void Oscilloscope::setTrigger_input(bool value)
-{
-	trigger_input = value;
-}
+void Oscilloscope::setTrigger_input(bool value) { trigger_input = value; }
 
-bool Oscilloscope::getTrigger_input() const
-{
-	return trigger_input;
-}
+bool Oscilloscope::getTrigger_input() const { return trigger_input; }
 
-void Oscilloscope::cursor_panel_init()
-{
+void Oscilloscope::cursor_panel_init() {
 	cr_ui = new Ui::CursorsSettings;
 	cr_ui->setupUi(ui->cursorsSettings);
 	setDynamicProperty(cr_ui->btnLockHorizontal, "use_icon", true);
 	setDynamicProperty(cr_ui->btnLockVertical, "use_icon", true);
-	//cr_ui->posSelect->setStyleSheet("background-color:red;");
+	// cr_ui->posSelect->setStyleSheet("background-color:red;");
 
-	connect(cr_ui->btnLockHorizontal, &QPushButton::toggled,
-		&plot, &CapturePlot::setHorizCursorsLocked);
-	connect(cr_ui->btnLockVertical, &QPushButton::toggled,
-		&plot, &CapturePlot::setVertCursorsLocked);
+	connect(cr_ui->btnLockHorizontal, &QPushButton::toggled, &plot,
+		&CapturePlot::setHorizCursorsLocked);
+	connect(cr_ui->btnLockVertical, &QPushButton::toggled, &plot,
+		&CapturePlot::setVertCursorsLocked);
 
 	cursorsPositionButton = new CustomPlotPositionButton(cr_ui->posSelect);
 
-	connect(cr_ui->hCursorsEnable, SIGNAL(toggled(bool)),
-		&plot, SLOT(setVertCursorsEnabled(bool)));
-	connect(cr_ui->vCursorsEnable, SIGNAL(toggled(bool)),
-		&plot, SLOT(setHorizCursorsEnabled(bool)));
+	connect(cr_ui->hCursorsEnable, SIGNAL(toggled(bool)), &plot,
+		SLOT(setVertCursorsEnabled(bool)));
+	connect(cr_ui->vCursorsEnable, SIGNAL(toggled(bool)), &plot,
+		SLOT(setHorizCursorsEnabled(bool)));
 
 	connect(cr_ui->hCursorsEnable, SIGNAL(toggled(bool)),
-		cursor_readouts_ui->TimeCursors,
-		SLOT(setVisible(bool)));
+		cursor_readouts_ui->TimeCursors, SLOT(setVisible(bool)));
 	connect(cr_ui->vCursorsEnable, SIGNAL(toggled(bool)),
-		cursor_readouts_ui->VoltageCursors,
-		SLOT(setVisible(bool)));
-	connect(cr_ui->btnNormalTrack, &QPushButton::toggled,
-		this, &Oscilloscope::toggleCursorsMode);
+		cursor_readouts_ui->VoltageCursors, SLOT(setVisible(bool)));
+	connect(cr_ui->btnNormalTrack, &QPushButton::toggled, this,
+		&Oscilloscope::toggleCursorsMode);
 
 	cr_ui->horizontalSlider->setMaximum(100);
 	cr_ui->horizontalSlider->setMinimum(0);
 	cr_ui->horizontalSlider->setSingleStep(1);
-	connect(cr_ui->horizontalSlider, &QSlider::valueChanged, [=](int value){
-		cr_ui->transLabel->setText("Transparency " + QString::number(value) + "%");
-		plot.setCursorReadoutsTransparency(value);
-	});
+	connect(cr_ui->horizontalSlider, &QSlider::valueChanged,
+		[=](int value) {
+			cr_ui->transLabel->setText(
+				"Transparency " + QString::number(value) + "%");
+			plot.setCursorReadoutsTransparency(value);
+		});
 	cr_ui->horizontalSlider->setSliderPosition(0);
 
-	connect(cursorsPositionButton, &CustomPlotPositionButton::positionChanged,
-		[=](CustomPlotPositionButton::ReadoutsPosition position){
-		plot.moveCursorReadouts(position);
-	});
+	connect(cursorsPositionButton,
+		&CustomPlotPositionButton::positionChanged,
+		[=](CustomPlotPositionButton::ReadoutsPosition position) {
+			plot.moveCursorReadouts(position);
+		});
 }
 
-void Oscilloscope::toggleCursorsMode(bool toggled)
-{
+void Oscilloscope::toggleCursorsMode(bool toggled) {
 	cr_ui->hCursorsEnable->setEnabled(toggled);
 	cr_ui->vCursorsEnable->setEnabled(toggled);
 
@@ -1648,8 +1677,7 @@ void Oscilloscope::toggleCursorsMode(bool toggled)
 	plot.trackModeEnabled(toggled);
 }
 
-void Oscilloscope::toolDetached(bool detached)
-{
+void Oscilloscope::toolDetached(bool detached) {
 	if (detached) {
 		this->setMinimumWidth(min_detached_width);
 		this->setSizePolicy(QSizePolicy::Preferred,
@@ -1661,53 +1689,52 @@ void Oscilloscope::toolDetached(bool detached)
 	}
 }
 
-void Oscilloscope::pause(bool paused)
-{
-	if (ui->runSingleWidget->runButtonChecked()){
+void Oscilloscope::pause(bool paused) {
+	if (ui->runSingleWidget->runButtonChecked()) {
 		toggle_blockchain_flow(!paused);
 		trigger_settings.setAdcRunningState(!paused);
 	}
 }
 
-void Oscilloscope::export_settings_init()
-{
+void Oscilloscope::export_settings_init() {
 
 	exportSettings = new ExportSettings();
 	exportSettings->enableExportButton(false);
 	gsettings_ui->export_2->addWidget(exportSettings);
 
-	for (int i = 0; i < nb_channels; ++i){
-		exportSettings->addChannel(i, QString("Channel") +
-					   QString::number(i + 1));
+	for (int i = 0; i < nb_channels; ++i) {
+		exportSettings->addChannel(
+			i, QString("Channel") + QString::number(i + 1));
 	}
 
 	connect(exportSettings->getExportButton(), SIGNAL(clicked()), this,
 		SLOT(btnExport_clicked()));
 	connect(this, &Oscilloscope::activateExportButton,
-		[=](){
-		exportSettings->enableExportButton(true);
-	});
+		[=]() { exportSettings->enableExportButton(true); });
 }
 
-void Oscilloscope::btnExport_clicked(){
+void Oscilloscope::btnExport_clicked() {
 
 	exportConfig = exportSettings->getExportConfig();
 	pause(true);
-	QString fileName = QFileDialog::getSaveFileName(this,
-	    tr("Export"), "", tr("Comma-separated values files (*.csv)",
-				       "Tab-delimited values files (*.txt)"),
-	    nullptr, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+	QString fileName = QFileDialog::getSaveFileName(
+		this, tr("Export"), "",
+		tr("Comma-separated values files (*.csv)",
+		   "Tab-delimited values files (*.txt)"),
+		nullptr,
+		(m_useNativeDialogs ? QFileDialog::Options()
+				    : QFileDialog::DontUseNativeDialog));
 	bool atleastOneChannelEnabled = false;
 	for (auto x : exportConfig.keys())
-		if (exportConfig[x]){
+		if (exportConfig[x]) {
 			atleastOneChannelEnabled = true;
 			break;
 		}
-	if (!atleastOneChannelEnabled){
+	if (!atleastOneChannelEnabled) {
 		return;
 	}
 
-	if (!fileName.isEmpty()){
+	if (!fileName.isEmpty()) {
 		FileManager fm("Oscilloscope");
 		fm.open(fileName, FileManager::EXPORT);
 
@@ -1720,15 +1747,20 @@ void Oscilloscope::btnExport_clicked(){
 
 		fm.save(time_data, "Time(S)");
 
-		for (int i = 0; i < channels_number; ++i){
-			if (exportConfig[i]){
+		for (int i = 0; i < channels_number; ++i) {
+			if (exportConfig[i]) {
 				QVector<double> data;
 				int samples = plot.Curve(i)->data()->size();
 				for (int j = 0; j < samples; ++j)
-					data.push_back(plot.Curve(i)->data()->sample(j).y());
-				QString chNo = (i > 1) ? QString::number(i - 1) : QString::number(i + 1);
+					data.push_back(plot.Curve(i)
+							       ->data()
+							       ->sample(j)
+							       .y());
+				QString chNo = (i > 1) ? QString::number(i - 1)
+						       : QString::number(i + 1);
 
-				fm.save(data, ((i > 1) ? "M" : "CH") + chNo + "(V)");
+				fm.save(data,
+					((i > 1) ? "M" : "CH") + chNo + "(V)");
 			}
 		}
 
@@ -1738,8 +1770,7 @@ void Oscilloscope::btnExport_clicked(){
 	pause(false);
 }
 
-void Oscilloscope::create_add_channel_panel()
-{
+void Oscilloscope::create_add_channel_panel() {
 	/* Math stuff */
 
 	QWidget *panel = new QWidget(this);
@@ -1752,11 +1783,9 @@ void Oscilloscope::create_add_channel_panel()
 
 	math_pair = new QPair<Ui::MathPanel, Math *>(math_ui, math);
 
-	connect(math, &Math::functionValid,
-	[=](const QString &function) {
+	connect(math, &Math::functionValid, [=](const QString &function) {
 		btn->setEnabled(true);
-		btn->setProperty("function",
-		                 QVariant(function));
+		btn->setProperty("function", QVariant(function));
 		lastFunctionValid = true;
 	});
 
@@ -1770,7 +1799,7 @@ void Oscilloscope::create_add_channel_panel()
 						  QSizePolicy::Expanding);
 	tabWidget = new QTabWidget(panel);
 	layout->insertWidget(0, tabWidget);
-	//set top margin to 0 and the rest to 9
+	// set top margin to 0 and the rest to 9
 	layout->setContentsMargins(9, 0, 9, 9);
 	tabWidget->addTab(math, "Math");
 
@@ -1794,31 +1823,28 @@ void Oscilloscope::create_add_channel_panel()
 				   "line-height: 14px;"
 				   "color: #FFFFFF;}"
 				   "QPushButton:hover{"
-					"background-color: #4a34ff;"
+				   "background-color: #4a34ff;"
 				   "}");
 	btnOpenFile->setText("Browse");
 	layout_file_select->addWidget(btnOpenFile);
 
-	refChannelTimeBase = new ScaleSpinButton({
-				{"ns", 1E-9},
-				{"μs", 1E-6},
-				{"ms", 1E-3},
-				{"s", 1E0}
-				}, "Time Base", 100e-9, 1E0,
-				true, false, this);
+	refChannelTimeBase = new ScaleSpinButton(
+		{{"ns", 1E-9}, {"μs", 1E-6}, {"ms", 1E-3}, {"s", 1E0}},
+		"Time Base", 100e-9, 1E0, true, false, this);
 
 	refChannelTimeBase->setValue(1e-3);
 	refChannelTimeBase->setDisabled(true);
 
-	connect(refChannelTimeBase, &ScaleSpinButton::valueChanged, [=](double value){
-		plot.updatePreview(value, timeBase->value(), timePosition->value());
-	});
+	connect(refChannelTimeBase, &ScaleSpinButton::valueChanged,
+		[=](double value) {
+			plot.updatePreview(value, timeBase->value(),
+					   timePosition->value());
+		});
 
 	layout_ref->addWidget(file_select);
 	layout_ref->addWidget(importSettings);
 	layout_ref->addWidget(refChannelTimeBase);
 	layout_ref->addSpacerItem(spacerItem);
-
 
 	importSettings->setDisabled(true);
 
@@ -1827,7 +1853,8 @@ void Oscilloscope::create_add_channel_panel()
 
 	tabWidget->addTab(ref, "Reference");
 
-	connect(btnOpenFile, &QPushButton::clicked, this, &Oscilloscope::import);
+	connect(btnOpenFile, &QPushButton::clicked, this,
+		&Oscilloscope::import);
 
 	connect(tabWidget, &QTabWidget::currentChanged, [=](int index) {
 		if (index == 0) {
@@ -1839,10 +1866,10 @@ void Oscilloscope::create_add_channel_panel()
 		}
 	});
 
-	connect(btn, &QPushButton::clicked,
-	[=]() {
+	connect(btn, &QPushButton::clicked, [=]() {
 		if (tabWidget->currentIndex() != 0) {
-			QMap<int, bool> import_map = importSettings->getExportConfig();
+			QMap<int, bool> import_map =
+				importSettings->getExportConfig();
 
 			for (int key : import_map.keys()) {
 				if (import_map[key]) {
@@ -1850,8 +1877,9 @@ void Oscilloscope::create_add_channel_panel()
 				}
 			}
 			plot.clearPreview();
-			ChannelWidget *cw = channelWidgetAtId(nb_channels + nb_math_channels +
-							      nb_ref_channels - 1);
+			ChannelWidget *cw = channelWidgetAtId(
+				nb_channels + nb_math_channels +
+				nb_ref_channels - 1);
 			triggerRightMenuToggle(ui->btnAddMath, false);
 			cw->menuButton()->setChecked(true);
 			refChannelTimeBase->setDisabled(true);
@@ -1868,30 +1896,32 @@ void Oscilloscope::create_add_channel_panel()
 		} else {
 			QVariant var = btn->property("function");
 			editMathChannelFunction(current_ch_widget,
-			                        var.toString().toStdString());
+						var.toString().toStdString());
 		}
 	});
 
 	connect(this, &Oscilloscope::importFileLoaded, [=](bool loaded) {
-			btn->setEnabled(loaded);
-			importSettings->setEnabled(loaded);
-			fileLineEdit->setText(import_error);
-			fileLineEdit->setToolTip(loaded ? import_error : "");
-			if (!loaded) {
-				importSettings->clear();
-			}
+		btn->setEnabled(loaded);
+		importSettings->setEnabled(loaded);
+		fileLineEdit->setText(import_error);
+		fileLineEdit->setToolTip(loaded ? import_error : "");
+		if (!loaded) {
+			importSettings->clear();
+		}
 	});
 
 	int panel_id = ui->stackedWidget->insertWidget(-1, panel);
 	ui->btnAddMath->setProperty("id", QVariant(-panel_id));
 }
 
-void Oscilloscope::import()
-{
-	QString fileName = QFileDialog::getOpenFileName(this,
-	    tr("Import"), "", tr("Comma-separated values files (*.csv);;"
-				       "Tab-delimited values files (*.txt)"),
-	    nullptr, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+void Oscilloscope::import() {
+	QString fileName = QFileDialog::getOpenFileName(
+		this, tr("Import"), "",
+		tr("Comma-separated values files (*.csv);;"
+		   "Tab-delimited values files (*.txt)"),
+		nullptr,
+		(m_useNativeDialogs ? QFileDialog::Options()
+				    : QFileDialog::DontUseNativeDialog));
 
 	FileManager fm("Oscilloscope");
 
@@ -1921,12 +1951,14 @@ void Oscilloscope::import()
 		Q_EMIT importFileLoaded(true);
 
 		for (int i = 0; i < fm.getNrOfChannels(); ++i) {
-			importSettings->addChannel(i, fm.getColumnName(i).remove("(V)"));
+			importSettings->addChannel(
+				i, fm.getColumnName(i).remove("(V)"));
 		}
 
 		if (refChannelTimeBase->isEnabled()) {
-			plot.addPreview(import_data, refChannelTimeBase->value(),
-					this->timeBase->value(), timePosition->value());
+			plot.addPreview(
+				import_data, refChannelTimeBase->value(),
+				this->timeBase->value(), timePosition->value());
 		}
 
 	} catch (FileManagerException &ex) {
@@ -1935,18 +1967,21 @@ void Oscilloscope::import()
 	}
 }
 
-unsigned int Oscilloscope::find_curve_number()
-{
+unsigned int Oscilloscope::find_curve_number() {
 	unsigned int id = 0;
 	bool found;
 
 	do {
 		found = false;
 
-		for (unsigned int i = 0; !found && i < (nb_math_channels + nb_ref_channels); i++) {
-			QWidget *parent = ui->channelsList->itemAt(nb_channels + i)->widget();
+		for (unsigned int i = 0;
+		     !found && i < (nb_math_channels + nb_ref_channels); i++) {
+			QWidget *parent =
+				ui->channelsList->itemAt(nb_channels + i)
+					->widget();
 
-			ChannelWidget *cw = static_cast<ChannelWidget *>(parent);
+			ChannelWidget *cw =
+				static_cast<ChannelWidget *>(parent);
 
 			if (cw->isReferenceChannel()) {
 				continue;
@@ -1961,15 +1996,15 @@ unsigned int Oscilloscope::find_curve_number()
 	return id - 1;
 }
 
-void Oscilloscope::add_math_channel(const std::string& function)
-{
+void Oscilloscope::add_math_channel(const std::string &function) {
 	if (nb_math_channels + nb_ref_channels == MAX_MATH_CHANNELS) {
 		return;
 	}
 
 	auto rail = gr::analog::rail_ff::make(MIN_MATH_RANGE, MAX_MATH_RANGE);
 	auto math = iio::iio_math::make(function, nb_channels);
-	unsigned int curve_id = nb_channels + nb_math_channels + nb_ref_channels;
+	unsigned int curve_id =
+		nb_channels + nb_math_channels + nb_ref_channels;
 	unsigned int curve_number = find_curve_number();
 
 	nb_math_channels++;
@@ -1979,13 +2014,15 @@ void Oscilloscope::add_math_channel(const std::string& function)
 	std::string name = qname.toStdString();
 
 	auto math_sink = adiscope::scope_sink_f::make(
-			noZoomXAxisWidth * m2k_adc->sampleRate() / m2k_adc->oversamplingRatio(),
-			m2k_adc->sampleRate() / m2k_adc->oversamplingRatio(), name, 1, (QObject *)&plot);
+		noZoomXAxisWidth * m2k_adc->sampleRate() /
+			m2k_adc->oversamplingRatio(),
+		m2k_adc->sampleRate() / m2k_adc->oversamplingRatio(), name, 1,
+		(QObject *)&plot);
 
 	/* Add the math block and the math scope sink into a container, so that
 	 * we can disconnect them when removing the math channel later */
 	auto math_pair = QPair<gr::basic_block_sptr, gr::basic_block_sptr>(
-				math, math_sink);
+		math, math_sink);
 	math_sinks.insert(qname, math_pair);
 	math_rails.insert(qname, rail);
 
@@ -2006,11 +2043,11 @@ void Oscilloscope::add_math_channel(const std::string& function)
 		iio->unlock();
 
 	plot.registerMathWaveform(name, 1,
-			noZoomXAxisWidth *
-			adc->sampleRate());
+				  noZoomXAxisWidth * adc->sampleRate());
 
-	ChannelWidget *channel_widget = new ChannelWidget(curve_id, true, false,
-		plot.getLineColor(curve_id).name(), this);
+	ChannelWidget *channel_widget =
+		new ChannelWidget(curve_id, true, false,
+				  plot.getLineColor(curve_id).name(), this);
 
 	channel_widget->setMathChannel(true);
 	channel_widget->setFunction(QString::fromStdString(function));
@@ -2020,11 +2057,11 @@ void Oscilloscope::add_math_channel(const std::string& function)
 	channel_widget->nameButton()->setText(channel_widget->shortName());
 
 	exportSettings->addChannel(curve_id - nb_ref_channels,
-		channel_widget->fullName());
+				   channel_widget->fullName());
 
 	channel_widget->setProperty("curve_nb", QVariant(curve_number));
-	channel_widget->deleteButton()->setProperty(
-		"curve_name", QVariant(qname));
+	channel_widget->deleteButton()->setProperty("curve_name",
+						    QVariant(qname));
 
 	connect(channel_widget, SIGNAL(enabled(bool)),
 		SLOT(onChannelWidgetEnabled(bool)));
@@ -2034,8 +2071,7 @@ void Oscilloscope::add_math_channel(const std::string& function)
 		SLOT(onChannelWidgetMenuToggled(bool)));
 	connect(channel_widget, SIGNAL(deleteClicked()),
 		SLOT(onChannelWidgetDeleteClicked()));
-	connect(channel_widget, &ChannelWidget::menuToggled,
-		[=](bool on){
+	connect(channel_widget, &ChannelWidget::menuToggled, [=](bool on) {
 		if (!on)
 			ch_ui->btnEditMath->setChecked(false);
 	});
@@ -2046,19 +2082,20 @@ void Oscilloscope::add_math_channel(const std::string& function)
 	ui->settings_group->addButton(channel_widget->menuButton());
 	channel_widget->nameButton()->setChecked(true);
 
-	QLabel *label= new QLabel(this);
-		label->setText(vertMeasureFormat.format(
-			plot.VertUnitsPerDiv(curve_id), "V/div", 3));
-		label->setStyleSheet(QString("QLabel {"
-				"color: %1;"
-				"font-weight: bold;"
-				"}").arg(plot.getLineColor(curve_id).name()));
-		ui->chn_scales->addWidget(label);
+	QLabel *label = new QLabel(this);
+	label->setText(vertMeasureFormat.format(plot.VertUnitsPerDiv(curve_id),
+						"V/div", 3));
+	label->setStyleSheet(QString("QLabel {"
+				     "color: %1;"
+				     "font-weight: bold;"
+				     "}")
+				     .arg(plot.getLineColor(curve_id).name()));
+	ui->chn_scales->addWidget(label);
 
-	plot.Curve(curve_id)->setAxes(
-			QwtAxisId(QwtPlot::xBottom, 0),
-			QwtAxisId(QwtPlot::yLeft, curve_id));
-	plot.Curve(curve_id)->setTitle("M " + QString::number(curve_number + 1));
+	plot.Curve(curve_id)->setAxes(QwtAxisId(QwtPlot::xBottom, 0),
+				      QwtAxisId(QwtPlot::yLeft, curve_id));
+	plot.Curve(curve_id)->setTitle("M " +
+				       QString::number(curve_number + 1));
 	plot.addZoomer(curve_id);
 	plot.replot();
 
@@ -2070,7 +2107,8 @@ void Oscilloscope::add_math_channel(const std::string& function)
 	plot.setPeriodDetectHyst(curve_id, 1.0 / 5);
 
 	// Keep the current selected channels curve on top of the other ones
-	if (isVisible() && channelWidgetAtId(current_channel)->enableButton()->isChecked())
+	if (isVisible() &&
+	    channelWidgetAtId(current_channel)->enableButton()->isChecked())
 		plot.bringCurveToFront(current_channel);
 
 	if (nb_math_channels + nb_ref_channels == MAX_MATH_CHANNELS) {
@@ -2084,7 +2122,7 @@ void Oscilloscope::add_math_channel(const std::string& function)
 
 	gsettings_ui->cmb_x_channel->addItem(channel_widget->shortName());
 	gsettings_ui->cmb_y_channel->addItem(channel_widget->shortName());
-	if(xy_is_visible)
+	if (xy_is_visible)
 		setup_xy_channels();
 
 	plot.showYAxisWidget(curve_id, true);
@@ -2092,8 +2130,7 @@ void Oscilloscope::add_math_channel(const std::string& function)
 	init_selected_measurements(curve_id, {0, 1, 4, 5});
 }
 
-void Oscilloscope::onChannelWidgetDeleteClicked()
-{
+void Oscilloscope::onChannelWidgetDeleteClicked() {
 	if (nb_math_channels + nb_ref_channels - 1 < MAX_MATH_CHANNELS) {
 		ui->btnAddMath->show();
 	}
@@ -2104,20 +2141,22 @@ void Oscilloscope::onChannelWidgetDeleteClicked()
 	unsigned int curve_id = cw->id();
 
 	probe_attenuation.removeAt(curve_id);
-	if (curve_id == current_ch_widget &&
-			cw->menuButton()->isChecked()) {
-		menuButtonActions.removeAll(QPair<CustomPushButton*, bool>
-					    (static_cast<CustomPushButton*>(cw->menuButton()), true));
-		toggleRightMenu(static_cast<CustomPushButton*>(cw->menuButton()), false);
+	if (curve_id == current_ch_widget && cw->menuButton()->isChecked()) {
+		menuButtonActions.removeAll(QPair<CustomPushButton *, bool>(
+			static_cast<CustomPushButton *>(cw->menuButton()),
+			true));
+		toggleRightMenu(
+			static_cast<CustomPushButton *>(cw->menuButton()),
+			false);
 	}
-	menuOrder.removeOne(static_cast<CustomPushButton*>(cw->menuButton()));
+	menuOrder.removeOne(static_cast<CustomPushButton *>(cw->menuButton()));
 
 	/*If there are no more channels enabled, we should
 	disable the measurements.*/
 	bool shouldDisable = true;
 
-	for (unsigned int i = 0; i < nb_channels + nb_math_channels + nb_ref_channels;
-	     i++) {
+	for (unsigned int i = 0;
+	     i < nb_channels + nb_math_channels + nb_ref_channels; i++) {
 		ChannelWidget *cw = static_cast<ChannelWidget *>(
 			ui->channelsList->itemAt(i)->widget());
 		if (curve_id == cw->id())
@@ -2152,11 +2191,13 @@ void Oscilloscope::onChannelWidgetDeleteClicked()
 		gsettings_ui->cmb_y_channel->removeItem(curve_id);
 
 		if (index_x >= curve_id) {
-			gsettings_ui->cmb_x_channel->setCurrentIndex(curve_id-1);
+			gsettings_ui->cmb_x_channel->setCurrentIndex(curve_id -
+								     1);
 		}
 
 		if (index_y >= curve_id) {
-			gsettings_ui->cmb_y_channel->setCurrentIndex(curve_id-1);
+			gsettings_ui->cmb_y_channel->setCurrentIndex(curve_id -
+								     1);
 		}
 
 		gsettings_ui->cmb_x_channel->blockSignals(false);
@@ -2168,7 +2209,8 @@ void Oscilloscope::onChannelWidgetDeleteClicked()
 		auto rail = math_rails.take(qname);
 
 		for (unsigned int i = 0; i < nb_channels; i++) {
-			iio->disconnect(math_probe_atten.at(i), 0, pair.first, i);
+			iio->disconnect(math_probe_atten.at(i), 0, pair.first,
+					i);
 		}
 
 		iio->disconnect(pair.first, 0, rail, 0);
@@ -2185,9 +2227,10 @@ void Oscilloscope::onChannelWidgetDeleteClicked()
 		}
 
 		for (unsigned int i = curve_id + 1;
-		     i < nb_channels + nb_math_channels + nb_ref_channels; i++) {
+		     i < nb_channels + nb_math_channels + nb_ref_channels;
+		     i++) {
 			ChannelWidget *w = static_cast<ChannelWidget *>(
-			                           ui->channelsList->itemAt(i)->widget());
+				ui->channelsList->itemAt(i)->widget());
 
 			/* Update the IDs */
 			w->setId(i - 1);
@@ -2198,9 +2241,10 @@ void Oscilloscope::onChannelWidgetDeleteClicked()
 		plot.unregisterReferenceWaveform(qname);
 
 		for (unsigned int i = curve_id + 1;
-		     i < nb_channels + nb_math_channels + nb_ref_channels; i++) {
+		     i < nb_channels + nb_math_channels + nb_ref_channels;
+		     i++) {
 			ChannelWidget *w = static_cast<ChannelWidget *>(
-			                           ui->channelsList->itemAt(i)->widget());
+				ui->channelsList->itemAt(i)->widget());
 
 			/* Update the IDs */
 			w->setId(i - 1);
@@ -2229,10 +2273,11 @@ void Oscilloscope::onChannelWidgetDeleteClicked()
 		Q_EMIT selectedChannelChanged(current_channel);
 		update_measure_for_channel(current_channel);
 	} else if (curve_id == current_channel) {
-		for (unsigned int i = 0; i < nb_channels + nb_math_channels + nb_ref_channels;
+		for (unsigned int i = 0;
+		     i < nb_channels + nb_math_channels + nb_ref_channels;
 		     i++) {
 			ChannelWidget *cw = static_cast<ChannelWidget *>(
-			                            ui->channelsList->itemAt(i)->widget());
+				ui->channelsList->itemAt(i)->widget());
 
 			if (cw->enableButton()->isChecked()) {
 				channelsEnabled = true;
@@ -2280,9 +2325,8 @@ void Oscilloscope::onChannelWidgetDeleteClicked()
 	for (unsigned int i = nb_channels;
 	     i < nb_channels + nb_math_channels + nb_ref_channels; i++) {
 		/* Update the curve-to-axis map */
-		plot.Curve(i)->setAxes(
-		        QwtAxisId(QwtPlot::xBottom, 0),
-		        QwtAxisId(QwtPlot::yLeft, i));
+		plot.Curve(i)->setAxes(QwtAxisId(QwtPlot::xBottom, 0),
+				       QwtAxisId(QwtPlot::yLeft, i));
 	}
 
 	onMeasurementSelectionListChanged();
@@ -2291,8 +2335,7 @@ void Oscilloscope::onChannelWidgetDeleteClicked()
 	plot.replot();
 }
 
-void Oscilloscope::clearMathChannels()
-{
+void Oscilloscope::clearMathChannels() {
 	int idx = 2;
 	while (nb_math_channels) {
 		if (!channelWidgetAtId(idx)->isReferenceChannel()) {
@@ -2300,17 +2343,12 @@ void Oscilloscope::clearMathChannels()
 		} else {
 			idx++;
 		}
-
 	}
 }
 
-void Oscilloscope::on_actionClose_triggered()
-{
-	this->close();
-}
+void Oscilloscope::on_actionClose_triggered() { this->close(); }
 
-void Oscilloscope::toggle_blockchain_flow(bool en)
-{
+void Oscilloscope::toggle_blockchain_flow(bool en) {
 	if (en) {
 		if (autosetRequested) {
 			iio->start(autoset_id[0]);
@@ -2326,28 +2364,22 @@ void Oscilloscope::toggle_blockchain_flow(bool en)
 			iio->stop(ids[i]);
 
 		if (autosetRequested) {
-			iio->stop(autoset_id[0]);			
+			iio->stop(autoset_id[0]);
 		}
 	}
 }
 
-void Oscilloscope::run()
-{
-	runStopToggled(true);
-}
-void Oscilloscope::stop()
-{
-	runStopToggled(false);
-}
+void Oscilloscope::run() { runStopToggled(true); }
+void Oscilloscope::stop() { runStopToggled(false); }
 
-void Oscilloscope::runStopToggled(bool checked)
-{
+void Oscilloscope::runStopToggled(bool checked) {
 	Q_EMIT activateExportButton();
 
 	if (checked) {
 		periodicFlowRestart(true);
 		if (symmBufferMode->isEnhancedMemDepth()) {
-			onCmbMemoryDepthChanged(ch_ui->cmbMemoryDepth->currentText());
+			onCmbMemoryDepthChanged(
+				ch_ui->cmbMemoryDepth->currentText());
 		}
 
 		writeAllSettingsToHardware();
@@ -2355,35 +2387,35 @@ void Oscilloscope::runStopToggled(bool checked)
 		plot.setSampleRate(active_sample_rate, 1, "");
 		plot.setBufferSizeLabelValue(active_plot_sample_count);
 		plot.setSampleRatelabelValue(active_sample_rate);
-		if(fft_is_visible) {
+		if (fft_is_visible) {
 			setFFT_params();
 		}
 
 		last_set_sample_count = active_plot_sample_count;
 
 		if (active_trig_sample_count !=
-				trigger_settings.triggerDelay()) {
+		    trigger_settings.triggerDelay()) {
 			trigger_settings.setTriggerDelay(
 				active_trig_sample_count);
 			last_set_time_pos = active_time_pos;
 		}
 
-		if ((timePosition->value() != active_time_pos)
-				&& !symmBufferMode->isEnhancedMemDepth()) {
+		if ((timePosition->value() != active_time_pos) &&
+		    !symmBufferMode->isEnhancedMemDepth()) {
 			timePosition->setValue(active_time_pos);
 		}
 
 		setTrigger_input(false);
 
 		toggle_blockchain_flow(true);
-		resetStreamingFlag(symmBufferMode->isEnhancedMemDepth()
-				   || plot_samples_sequentially);
+		resetStreamingFlag(symmBufferMode->isEnhancedMemDepth() ||
+				   plot_samples_sequentially);
 
 		scaleHistogramPlot();
 	} else {
 		toggle_blockchain_flow(false);
-		resetStreamingFlag(symmBufferMode->isEnhancedMemDepth()
-				   || plot_samples_sequentially);
+		resetStreamingFlag(symmBufferMode->isEnhancedMemDepth() ||
+				   plot_samples_sequentially);
 		trigger_settings.setAdcRunningState(false);
 	}
 
@@ -2392,25 +2424,23 @@ void Oscilloscope::runStopToggled(bool checked)
 	triggerUpdater->setEnabled(checked);
 }
 
-void Oscilloscope::setFFT_params(bool force)
-{
-	if(fft_plot.sampleRate() != adc->sampleRate() || force) {
+void Oscilloscope::setFFT_params(bool force) {
+	if (fft_plot.sampleRate() != adc->sampleRate() || force) {
 		fft_plot.setSampleRate(adc->sampleRate(), 1, "");
 		double start = 0;
-		double stop =  adc->sampleRate() / 2;
+		double stop = adc->sampleRate() / 2;
 		fft_plot.setAxisScale(QwtPlot::xBottom, start, stop);
 		fft_plot.setAxisScale(QwtPlot::yLeft, -200, 0, 10);
 		fft_plot.zoomBaseUpdate();
 	}
 }
 
-void Oscilloscope::setChannelWidgetIndex(int chnIdx)
-{
+void Oscilloscope::setChannelWidgetIndex(int chnIdx) {
 	current_ch_widget = chnIdx;
 	plot.bringCurveToFront(chnIdx);
 
-	for (unsigned int i = 0; i < nb_channels + nb_math_channels + nb_ref_channels;
-	     ++i) {
+	for (unsigned int i = 0;
+	     i < nb_channels + nb_math_channels + nb_ref_channels; ++i) {
 		if (i == chnIdx) {
 			continue;
 		}
@@ -2419,29 +2449,27 @@ void Oscilloscope::setChannelWidgetIndex(int chnIdx)
 	}
 }
 
-void Oscilloscope::autosetFFT()
-{
+void Oscilloscope::autosetFFT() {
 	auto fft = gnuradio::get_initial_sptr(
-				new fft_block(false, autoset_fft_size));
+		new fft_block(false, autoset_fft_size));
 
 	auto ctm = blocks::complex_to_mag_squared::make(1);
 	auto log = blocks::nlog10_ff::make(10);
-	if(autoset_id[0]) {
+	if (autoset_id[0]) {
 		iio->disconnect(autoset_id[0]);
 		autoset_id[0] = nullptr;
 	}
 	boost::shared_ptr<adc_sample_conv> block =
-	dynamic_pointer_cast<adc_sample_conv>(adc_samp_conv_block);
+		dynamic_pointer_cast<adc_sample_conv>(adc_samp_conv_block);
 	autosetFFTSink = blocks::vector_sink_f::make();
 	autosetDataSink = blocks::vector_sink_f::make();
-	autoset_id[0] = iio->connect(fft,autosetChannel,0,true);
-	iio->connect(fft,0,ctm,0);
-	iio->connect(ctm,0,log,0);
-	iio->connect(log,0,autosetFFTSink,0);
+	autoset_id[0] = iio->connect(fft, autosetChannel, 0, true);
+	iio->connect(fft, 0, ctm, 0);
+	iio->connect(ctm, 0, log, 0);
+	iio->connect(log, 0, autosetFFTSink, 0);
 }
 
-void Oscilloscope::onFFT_view_toggled(bool visible)
-{
+void Oscilloscope::onFFT_view_toggled(bool visible) {
 	/* Lock the flowgraph if we are already started */
 	bool started = isIioManagerStarted();
 	if (started)
@@ -2452,30 +2480,38 @@ void Oscilloscope::onFFT_view_toggled(bool visible)
 
 		if (fft_is_visible && (fft_channels.size() > 0)) {
 			for (unsigned int i = 0; i < nb_channels; i++) {
-				/** GNU Radio flow: iio(i) ->  fft -> ctm -> qt_fft_block */
-				iio->disconnect(fft_channels.at(i).first, fft_channels.at(i).second,
+				/** GNU Radio flow: iio(i) ->  fft -> ctm ->
+				 * qt_fft_block */
+				iio->disconnect(fft_channels.at(i).first,
+						fft_channels.at(i).second,
 						fft_blocks.at(i), 0);
-				iio->disconnect(fft_blocks.at(i), 0, ctm_blocks.at(i), 0);
-				iio->disconnect(ctm_blocks.at(i), 0, qt_fft_block, i);
+				iio->disconnect(fft_blocks.at(i), 0,
+						ctm_blocks.at(i), 0);
+				iio->disconnect(ctm_blocks.at(i), 0,
+						qt_fft_block, i);
 			}
 		}
 		setFFT_params();
 
 		for (unsigned int i = 0; i < nb_channels; i++) {
 			fft_blocks.push_back(gnuradio::get_initial_sptr(
-						     new fft_block(false, fft_plot_size)));
-			ctm_blocks.push_back(blocks::complex_to_mag_squared::make(1));
+				new fft_block(false, fft_plot_size)));
+			ctm_blocks.push_back(
+				blocks::complex_to_mag_squared::make(1));
 
 			if (chnAcCoupled.at(i)) {
-				fft_channels.push_back(QPair<gr::basic_block_sptr, int>(
-							       dc_cancel.at(i), 0));
+				fft_channels.push_back(
+					QPair<gr::basic_block_sptr, int>(
+						dc_cancel.at(i), 0));
 			} else {
-				fft_channels.push_back(QPair<gr::basic_block_sptr, int>(
-							       adc_samp_conv_block, i));
+				fft_channels.push_back(
+					QPair<gr::basic_block_sptr, int>(
+						adc_samp_conv_block, i));
 			}
 
-			iio->connect(fft_channels.at(i).first, fft_channels.at(i).second,
-					fft_blocks.at(i), 0);
+			iio->connect(fft_channels.at(i).first,
+				     fft_channels.at(i).second,
+				     fft_blocks.at(i), 0);
 			iio->connect(fft_blocks.at(i), 0, ctm_blocks.at(i), 0);
 			iio->connect(ctm_blocks.at(i), 0, qt_fft_block, i);
 		}
@@ -2486,10 +2522,13 @@ void Oscilloscope::onFFT_view_toggled(bool visible)
 
 		if (fft_is_visible && (fft_channels.size() > 0)) {
 			for (unsigned int i = 0; i < nb_channels; i++) {
-				iio->disconnect(fft_channels.at(i).first, fft_channels.at(i).second,
+				iio->disconnect(fft_channels.at(i).first,
+						fft_channels.at(i).second,
 						fft_blocks.at(i), 0);
-				iio->disconnect(fft_blocks.at(i), 0, ctm_blocks.at(i), 0);
-				iio->disconnect(ctm_blocks.at(i), 0, qt_fft_block, i);
+				iio->disconnect(fft_blocks.at(i), 0,
+						ctm_blocks.at(i), 0);
+				iio->disconnect(ctm_blocks.at(i), 0,
+						qt_fft_block, i);
 			}
 			fft_channels.clear();
 			fft_blocks.clear();
@@ -2503,18 +2542,18 @@ void Oscilloscope::onFFT_view_toggled(bool visible)
 		iio->unlock();
 }
 
-void Oscilloscope::onHistogram_view_toggled(bool visible)
-{
+void Oscilloscope::onHistogram_view_toggled(bool visible) {
 	cancelZoom();
 
-	if(!visible){
+	if (!visible) {
 		hist_plot.setOrientation(Qt::Horizontal);
 		hist_plot.setMinimumWidth(25);
 		hist_plot.setMaximumWidth(25);
 		hist_plot.setMaximumHeight(1000);
 		ui->hist_layout->removeWidget(&hist_plot);
 		ui->gridLayoutPlot->addWidget(&hist_plot, 3, 2, 1, 1);
-		ui->gridLayoutPlot->addWidget(plot.rightHandlesArea(), 1, 3, 4, 1);
+		ui->gridLayoutPlot->addWidget(plot.rightHandlesArea(), 1, 3, 4,
+					      1);
 		plot.setBonusWidthForHistogram(25);
 		scaleHistogramPlot();
 		toggleMiniHistogramPlotVisible(miniHistogram);
@@ -2525,7 +2564,8 @@ void Oscilloscope::onHistogram_view_toggled(bool visible)
 		hist_plot.setMaximumHeight(300);
 		hist_plot.setMaximumWidth(2000);
 		ui->gridLayoutPlot->removeWidget(&hist_plot);
-		ui->gridLayoutPlot->addWidget(plot.rightHandlesArea(), 1, 2, 3, 1);
+		ui->gridLayoutPlot->addWidget(plot.rightHandlesArea(), 1, 2, 3,
+					      1);
 		ui->hist_layout->addWidget(&hist_plot);
 		plot.setBonusWidthForHistogram(0);
 		scaleHistogramPlot();
@@ -2534,8 +2574,7 @@ void Oscilloscope::onHistogram_view_toggled(bool visible)
 	hist_is_visible = visible;
 }
 
-void Oscilloscope::onXY_view_toggled(bool visible)
-{
+void Oscilloscope::onXY_view_toggled(bool visible) {
 	if (visible) {
 		gsettings_ui->xySettings->show();
 	} else {
@@ -2548,9 +2587,9 @@ void Oscilloscope::onXY_view_toggled(bool visible)
 		iio->lock();
 
 	if (visible) {
-		if(xy_is_visible && index_x == gsettings_ui->cmb_x_channel->currentIndex()
-				&& index_y == gsettings_ui->cmb_y_channel->currentIndex())
-		{
+		if (xy_is_visible &&
+		    index_x == gsettings_ui->cmb_x_channel->currentIndex() &&
+		    index_y == gsettings_ui->cmb_y_channel->currentIndex()) {
 			xy_is_visible = visible;
 			if (started && !locked)
 				iio->unlock();
@@ -2558,54 +2597,56 @@ void Oscilloscope::onXY_view_toggled(bool visible)
 		}
 
 		boost::shared_ptr<adc_sample_conv> block =
-		dynamic_pointer_cast<adc_sample_conv>(
-						adc_samp_conv_block);
+			dynamic_pointer_cast<adc_sample_conv>(
+				adc_samp_conv_block);
 		if (m2k_adc) {
 			block->setCorrectionGain(0,
-				m2k_adc->chnCorrectionGain(0));
+						 m2k_adc->chnCorrectionGain(0));
 			block->setCorrectionGain(1,
-				m2k_adc->chnCorrectionGain(1));
+						 m2k_adc->chnCorrectionGain(1));
 		}
 
-		if(!ftc)
+		if (!ftc)
 			ftc = blocks::float_to_complex::make(1);
 
-		if(xy_channels.size() > 0) {
+		if (xy_channels.size() > 0) {
 			iio->disconnect(xy_channels.at(index_x).first,
-					xy_channels.at(index_x).second,
-					ftc, 0);
+					xy_channels.at(index_x).second, ftc, 0);
 			iio->disconnect(xy_channels.at(index_y).first,
-					xy_channels.at(index_y).second,
-					ftc, 1);
+					xy_channels.at(index_y).second, ftc, 1);
 			xy_channels.clear();
 		}
 
 		index_x = gsettings_ui->cmb_x_channel->currentIndex();
 		index_y = gsettings_ui->cmb_y_channel->currentIndex();
 
-		if(xy_channels.size() == 0) {
-			for(unsigned int i = 0; i < nb_channels; i++) {
+		if (xy_channels.size() == 0) {
+			for (unsigned int i = 0; i < nb_channels; i++) {
 				if (chnAcCoupled.at(i)) {
-					xy_channels.push_back(QPair<gr::basic_block_sptr, int>(
-								      dc_cancel.at(i), 0));
+					xy_channels.push_back(
+						QPair<gr::basic_block_sptr,
+						      int>(dc_cancel.at(i), 0));
 				} else {
-					xy_channels.push_back(QPair<gr::basic_block_sptr, int>(
-								      adc_samp_conv_block, i));
+					xy_channels.push_back(
+						QPair<gr::basic_block_sptr,
+						      int>(adc_samp_conv_block,
+							   i));
 				}
 			}
-			for(auto p : math_sinks) {
+			for (auto p : math_sinks) {
 				auto math = p.first;
-				xy_channels.push_back(QPair<gr::basic_block_sptr, int>(
-							      math, 0));
+				xy_channels.push_back(
+					QPair<gr::basic_block_sptr, int>(math,
+									 0));
 			}
 		}
 
-		iio->connect(xy_channels.at(index_x).first, xy_channels.at(index_x).second,
-			     ftc, 0);
-		iio->connect(xy_channels.at(index_y).first, xy_channels.at(index_y).second,
-			     ftc, 1);
+		iio->connect(xy_channels.at(index_x).first,
+			     xy_channels.at(index_x).second, ftc, 0);
+		iio->connect(xy_channels.at(index_y).first,
+			     xy_channels.at(index_y).second, ftc, 1);
 
-		if(!xy_is_visible)
+		if (!xy_is_visible)
 			iio->connect(ftc, 0, this->qt_xy_block, 0);
 
 		ui->xy_plot_container->show();
@@ -2613,10 +2654,10 @@ void Oscilloscope::onXY_view_toggled(bool visible)
 		ui->xy_plot_container->hide();
 		// Disconnect the XY section from the running flowgraph
 
-		iio->disconnect(xy_channels.at(index_x).first, xy_channels.at(index_x).second,
-				ftc, 0);
-		iio->disconnect(xy_channels.at(index_y).first, xy_channels.at(index_y).second,
-				ftc, 1);
+		iio->disconnect(xy_channels.at(index_x).first,
+				xy_channels.at(index_x).second, ftc, 0);
+		iio->disconnect(xy_channels.at(index_y).first,
+				xy_channels.at(index_y).second, ftc, 1);
 
 		iio->disconnect(ftc, 0, this->qt_xy_block, 0);
 
@@ -2629,12 +2670,11 @@ void Oscilloscope::onXY_view_toggled(bool visible)
 		iio->unlock();
 }
 
-void adiscope::Oscilloscope::on_boxCursors_toggled(bool on)
-{
-	plot.setHorizCursorsEnabled(
-			on ? cr_ui->vCursorsEnable->isChecked() : false);
-	plot.setVertCursorsEnabled(
-			on ? cr_ui->hCursorsEnable->isChecked() : false);
+void adiscope::Oscilloscope::on_boxCursors_toggled(bool on) {
+	plot.setHorizCursorsEnabled(on ? cr_ui->vCursorsEnable->isChecked()
+				       : false);
+	plot.setVertCursorsEnabled(on ? cr_ui->hCursorsEnable->isChecked()
+				      : false);
 
 	plot.trackModeEnabled(on ? cr_ui->btnNormalTrack->isChecked() : true);
 
@@ -2651,8 +2691,7 @@ void adiscope::Oscilloscope::on_boxCursors_toggled(bool on)
 	measure_panel_ui->cursorReadouts->setVisible(on);
 }
 
-void adiscope::Oscilloscope::on_boxMeasure_toggled(bool on)
-{
+void adiscope::Oscilloscope::on_boxMeasure_toggled(bool on) {
 	if (on) {
 		update_measure_for_channel(current_channel);
 	} else {
@@ -2671,11 +2710,9 @@ void adiscope::Oscilloscope::on_boxMeasure_toggled(bool on)
 	// set the gates enable / disable
 	plot.setGatingEnabled(on && gatingEnabled);
 	buffer_previewer->setGatingEnabled(on && gatingEnabled);
-
 }
 
-void Oscilloscope::onTriggerSourceChanged(int chnIdx)
-{
+void Oscilloscope::onTriggerSourceChanged(int chnIdx) {
 	plot.levelTriggerA()->setMobileAxis(QwtAxisId(QwtPlot::yLeft, chnIdx));
 	trigger_settings.setChannelAttenuation(probe_attenuation[chnIdx]);
 	if (chnAcCoupled.at(chnIdx)) {
@@ -2683,36 +2720,37 @@ void Oscilloscope::onTriggerSourceChanged(int chnIdx)
 		activateAcCouplingTrigger(chnIdx);
 	}
 	plot.replot();
-
 }
 
-void Oscilloscope::onTimeTriggerDelayChanged(double value)
-{
+void Oscilloscope::onTimeTriggerDelayChanged(double value) {
 	if (timePosition->value() != value)
 		Q_EMIT triggerPositionChanged(value);
 }
 
-void Oscilloscope::onTriggerLevelChanged(double value)
-{
+void Oscilloscope::onTriggerLevelChanged(double value) {
 	int trigger_chn = trigger_settings.currentChannel();
 
 	if (trigger_chn > -1)
 		plot.setPeriodDetectLevel(trigger_chn, value);
 }
 
-void Oscilloscope::comboBoxUpdateToValue(QComboBox *box, double value, std::vector<double>list)
-{
-	int i = find_if( list.begin(), list.end(),
-				[&value](const double element) {return element == value;} ) - list.begin();
+void Oscilloscope::comboBoxUpdateToValue(QComboBox *box, double value,
+					 std::vector<double> list) {
+	int i = find_if(list.begin(), list.end(),
+			[&value](const double element) {
+				return element == value;
+			}) -
+		list.begin();
 	if (i < list.size())
 		box->setCurrentIndex(i);
 }
 
-void adiscope::Oscilloscope::updateRunButton(bool ch_enabled)
-{
+void adiscope::Oscilloscope::updateRunButton(bool ch_enabled) {
 	for (unsigned int i = 0; !ch_enabled &&
-	     i < nb_channels + nb_math_channels + nb_ref_channels; i++) {
-		if (channelWidgetAtId(i)->isReferenceChannel()) continue;
+	     i < nb_channels + nb_math_channels + nb_ref_channels;
+	     i++) {
+		if (channelWidgetAtId(i)->isReferenceChannel())
+			continue;
 		QWidget *parent = ui->channelsList->itemAt(i)->widget();
 		QCheckBox *box = parent->findChild<QCheckBox *>("box");
 		ch_enabled = box->isChecked();
@@ -2728,13 +2766,11 @@ void adiscope::Oscilloscope::updateRunButton(bool ch_enabled)
 	}
 }
 
-void adiscope::Oscilloscope::onChannelWidgetEnabled(bool en)
-{
+void adiscope::Oscilloscope::onChannelWidgetEnabled(bool en) {
 	ChannelWidget *w = static_cast<ChannelWidget *>(QObject::sender());
 	int id = w->id();
 
 	hist_plot.enableChannel(id, en);
-
 
 	if (en) {
 		plot.AttachCurve(id);
@@ -2742,10 +2778,11 @@ void adiscope::Oscilloscope::onChannelWidgetEnabled(bool en)
 		plot.showYAxisWidget(id, en);
 		bool shouldActivate = true;
 
-		for (unsigned int i = 0; i < nb_channels + nb_math_channels + nb_ref_channels;
+		for (unsigned int i = 0;
+		     i < nb_channels + nb_math_channels + nb_ref_channels;
 		     i++) {
 			ChannelWidget *cw = static_cast<ChannelWidget *>(
-			                            ui->channelsList->itemAt(i)->widget());
+				ui->channelsList->itemAt(i)->widget());
 
 			if (id == cw->id()) {
 				continue;
@@ -2769,10 +2806,11 @@ void adiscope::Oscilloscope::onChannelWidgetEnabled(bool en)
 		plot.showYAxisWidget(id, en);
 		bool shouldDisable = true;
 
-		for (unsigned int i = 0; i < nb_channels + nb_math_channels + nb_ref_channels;
+		for (unsigned int i = 0;
+		     i < nb_channels + nb_math_channels + nb_ref_channels;
 		     i++) {
 			ChannelWidget *cw = static_cast<ChannelWidget *>(
-			                            ui->channelsList->itemAt(i)->widget());
+				ui->channelsList->itemAt(i)->widget());
 
 			if (id == cw->id()) {
 				continue;
@@ -2790,9 +2828,13 @@ void adiscope::Oscilloscope::onChannelWidgetEnabled(bool en)
 		}
 
 		if (current_channel == id) {
-			for (int i = 0; i < nb_channels + nb_math_channels + nb_ref_channels; i++) {
-				ChannelWidget *cw = static_cast<ChannelWidget *>(
-				                            ui->channelsList->itemAt(i)->widget());
+			for (int i = 0; i <
+			     nb_channels + nb_math_channels + nb_ref_channels;
+			     i++) {
+				ChannelWidget *cw =
+					static_cast<ChannelWidget *>(
+						ui->channelsList->itemAt(i)
+							->widget());
 
 				if (cw->enableButton()->isChecked()) {
 					cw->nameButton()->setChecked(true);
@@ -2801,8 +2843,8 @@ void adiscope::Oscilloscope::onChannelWidgetEnabled(bool en)
 			}
 		}
 
-		menuOrder.removeOne(static_cast<CustomPushButton *>(
-			w->menuButton()));
+		menuOrder.removeOne(
+			static_cast<CustomPushButton *>(w->menuButton()));
 	}
 
 	measureLabelsRearrange();
@@ -2816,13 +2858,13 @@ void adiscope::Oscilloscope::onChannelWidgetEnabled(bool en)
 	}
 }
 
-void adiscope::Oscilloscope::onChannelWidgetSelected(bool checked)
-{
+void adiscope::Oscilloscope::onChannelWidgetSelected(bool checked) {
 	if (!checked) {
 		return;
 	}
 
-	if (isVisible() && plot.labelsEnabled() != prefPanel->getOsc_labels_enabled()) {
+	if (isVisible() &&
+	    plot.labelsEnabled() != prefPanel->getOsc_labels_enabled()) {
 		enableLabels(prefPanel->getOsc_labels_enabled());
 	}
 
@@ -2842,8 +2884,7 @@ void adiscope::Oscilloscope::onChannelWidgetSelected(bool checked)
 	}
 }
 
-void adiscope::Oscilloscope::onChannelWidgetMenuToggled(bool checked)
-{
+void adiscope::Oscilloscope::onChannelWidgetMenuToggled(bool checked) {
 	ChannelWidget *cw = static_cast<ChannelWidget *>(QObject::sender());
 
 	current_ch_widget = cw->id();
@@ -2852,28 +2893,26 @@ void adiscope::Oscilloscope::onChannelWidgetMenuToggled(bool checked)
 		static_cast<CustomPushButton *>(cw->menuButton()), checked);
 }
 
-void Oscilloscope::cancelZoom()
-{
+void Oscilloscope::cancelZoom() {
 	zoom_level = 0;
 	plot.cancelZoom();
 
-	for (int i = 0; i < nb_channels + nb_math_channels + nb_ref_channels; ++i) {
+	for (int i = 0; i < nb_channels + nb_math_channels + nb_ref_channels;
+	     ++i) {
 		QLabel *label = static_cast<QLabel *>(
-					ui->chn_scales->itemAt(i)->widget());
+			ui->chn_scales->itemAt(i)->widget());
 		double value = probe_attenuation[i] * plot.VertUnitsPerDiv(i);
 		label->setText(vertMeasureFormat.format(value, "V/div", 3));
 	}
 }
 
-void adiscope::Oscilloscope::onChannelCouplingChanged(bool en)
-{
+void adiscope::Oscilloscope::onChannelCouplingChanged(bool en) {
 	if (en && chnAcCoupled.at(current_ch_widget))
 		return;
 	configureAcCoupling(current_ch_widget, en);
 }
 
-void adiscope::Oscilloscope::onVertScaleValueChanged(double value)
-{
+void adiscope::Oscilloscope::onVertScaleValueChanged(double value) {
 	cancelZoom();
 	if (value != plot.VertUnitsPerDiv(current_ch_widget)) {
 		plot.setVertUnitsPerDiv(value, current_ch_widget);
@@ -2885,7 +2924,8 @@ void adiscope::Oscilloscope::onVertScaleValueChanged(double value)
 	scaleHistogramPlot();
 	updateXyPlotScales();
 
-	// TO DO: refactor this once the source of the X and Y axes can be configured
+	// TO DO: refactor this once the source of the X and Y axes can be
+	// configured
 	if (current_ch_widget == index_x) {
 		xy_plot.setHorizUnitsPerDiv(value);
 	}
@@ -2897,30 +2937,28 @@ void adiscope::Oscilloscope::onVertScaleValueChanged(double value)
 
 	if (current_ch_widget < adc->getTrigger()->numChannels()) {
 		trigger_settings.setTriggerLevelStep(current_ch_widget, value);
-		trigger_settings.setTriggerHystStep(current_ch_widget, value / 10);
+		trigger_settings.setTriggerHystStep(current_ch_widget,
+						    value / 10);
 	}
 
 	// Send scale information to the measure object
 	plot.setPeriodDetectHyst(current_ch_widget, value / 5);
 
 	QLabel *label = static_cast<QLabel *>(
-			ui->chn_scales->itemAt(current_ch_widget)->widget());
-	double labelValue = probe_attenuation[current_ch_widget]
-			* plot.VertUnitsPerDiv(current_ch_widget);
+		ui->chn_scales->itemAt(current_ch_widget)->widget());
+	double labelValue = probe_attenuation[current_ch_widget] *
+		plot.VertUnitsPerDiv(current_ch_widget);
 	label->setText(vertMeasureFormat.format(labelValue, "V/div", 3));
 
 	// Switch between high and low gain modes only for the M2K channels
 	if (m2k_adc && current_ch_widget < nb_channels) {
 		updateGainMode();
-		setChannelHwOffset(current_ch_widget,
-			voltsPosition->value());
+		setChannelHwOffset(current_ch_widget, voltsPosition->value());
 		trigger_settings.updateHwVoltLevels(current_ch_widget);
 	}
 }
 
-
-void Oscilloscope::onCmbMemoryDepthChanged(QString value)
-{
+void Oscilloscope::onCmbMemoryDepthChanged(QString value) {
 	bool ok, started;
 	unsigned long bufferSize = value.toInt(&ok);
 	if (!ok) {
@@ -2939,7 +2977,8 @@ void Oscilloscope::onCmbMemoryDepthChanged(QString value)
 	}
 
 	symmBufferMode->setCustomBufferSize(bufferSize);
-	SymmetricBufferMode::capture_parameters params = symmBufferMode->captureParameters();
+	SymmetricBufferMode::capture_parameters params =
+		symmBufferMode->captureParameters();
 	memory_adjusted_time_pos = params.timePos;
 	timePosition->setValue(params.timePos);
 	active_time_pos = params.timePos;
@@ -2952,7 +2991,7 @@ void Oscilloscope::onCmbMemoryDepthChanged(QString value)
 	if (timeBase->value() < TIMEBASE_THRESHOLD) {
 		active_sample_count = active_plot_sample_count;
 		setSinksDisplayOneBuffer(true);
-	} else  {
+	} else {
 		setSinksDisplayOneBuffer(false);
 	}
 
@@ -2984,7 +3023,7 @@ void Oscilloscope::onCmbMemoryDepthChanged(QString value)
 		dc_cancel.at(i)->set_buffer_size(active_sample_count);
 	}
 
-	for(int ch = 0; ch < nb_channels; ch++) {
+	for (int ch = 0; ch < nb_channels; ch++) {
 		configureAcCoupling(ch, chnAcCoupled.at(ch));
 	}
 
@@ -3007,26 +3046,25 @@ void Oscilloscope::onCmbMemoryDepthChanged(QString value)
 	resetStreamingFlag(true);
 }
 
-void Oscilloscope::setSinksDisplayOneBuffer(bool val)
-{
+void Oscilloscope::setSinksDisplayOneBuffer(bool val) {
 	d_displayOneBuffer = val;
 	qt_time_block->set_displayOneBuffer(val);
 
 	auto it = math_sinks.constBegin();
 	while (it != math_sinks.constEnd()) {
-		scope_sink_f::sptr math_sink = dynamic_pointer_cast<
-				scope_sink_f>(it.value().second);
+		scope_sink_f::sptr math_sink =
+			dynamic_pointer_cast<scope_sink_f>(it.value().second);
 		math_sink->set_displayOneBuffer(val);
 		++it;
 	}
 	qt_fft_block->set_displayOneBuffer(val);
 }
 
-void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
-{
+void adiscope::Oscilloscope::onHorizScaleValueChanged(double value) {
 	cancelZoom();
 	symmBufferMode->setTimeBase(value);
-	SymmetricBufferMode::capture_parameters params = symmBufferMode->captureParameters();
+	SymmetricBufferMode::capture_parameters params =
+		symmBufferMode->captureParameters();
 	active_sample_rate = params.sampleRate;
 	active_sample_count = params.entireBufferSize;
 	active_plot_sample_count = active_sample_count;
@@ -3056,7 +3094,8 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 	if (timeBase->value() >= TIMEBASE_THRESHOLD) {
 		plot_samples_sequentially = true;
 		if (active_sample_count != -active_trig_sample_count) {
-			active_sample_count = ((-active_trig_sample_count + 3) / 4) * 4;
+			active_sample_count =
+				((-active_trig_sample_count + 3) / 4) * 4;
 			setSinksDisplayOneBuffer(false);
 			plot.setXAxisNumPoints(active_plot_sample_count);
 			resetStreamingFlag(true);
@@ -3072,7 +3111,8 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 		noZoomXAxisWidth = plot.axisInterval(QwtPlot::xBottom).width();
 	}
 
-	/* Reconfigure the GNU Radio block to receive a different number of samples  */
+	/* Reconfigure the GNU Radio block to receive a different number of
+	 * samples  */
 	bool started = isIioManagerStarted();
 	if (started)
 		iio->lock();
@@ -3102,16 +3142,16 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 	latter is a guessed value. If we could get a feedback from hardware that
 	the acquisition has been made and it's on the way then we can drop this
 	approach. */
-	iio->set_device_timeout((active_sample_count / active_sample_rate) * 1000 + 100);
+	iio->set_device_timeout(
+		(active_sample_count / active_sample_rate) * 1000 + 100);
 
 	if (started) {
 		iio->unlock();
 	}
 
-	for(int ch = 0; ch < nb_channels; ch++) {
+	for (int ch = 0; ch < nb_channels; ch++) {
 		configureAcCoupling(ch, chnAcCoupled.at(ch));
 	}
-
 
 	// Compute the appropriate value for fft_size
 	double power;
@@ -3130,16 +3170,16 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 	updateBufferPreviewer();
 }
 
-bool adiscope::Oscilloscope::gainUpdateNeeded()
-{
+bool adiscope::Oscilloscope::gainUpdateNeeded() {
 	double offset = plot.VertOffset(current_ch_widget);
 	QwtInterval hw_input_itv(-2.5 + offset, 2.5 + offset);
-	QwtInterval plot_vert_itv = plot.axisScaleDiv(
-		QwtAxisId(QwtPlot::yLeft, current_ch_widget)).interval();
+	QwtInterval plot_vert_itv =
+		plot.axisScaleDiv(QwtAxisId(QwtPlot::yLeft, current_ch_widget))
+			.interval();
 
 	if (plot_vert_itv.minValue() < hw_input_itv.minValue() ||
-			plot_vert_itv.maxValue() > hw_input_itv.maxValue() ||
-			std::abs(offset) > 5.0) {
+	    plot_vert_itv.maxValue() > hw_input_itv.maxValue() ||
+	    std::abs(offset) > 5.0) {
 		if (high_gain_modes[current_ch_widget]) {
 			return true;
 		}
@@ -3149,11 +3189,9 @@ bool adiscope::Oscilloscope::gainUpdateNeeded()
 	}
 
 	return false;
-
 }
 
-void Oscilloscope::updateXyPlotScales()
-{
+void Oscilloscope::updateXyPlotScales() {
 	int x = gsettings_ui->cmb_x_channel->currentIndex();
 	int y = gsettings_ui->cmb_y_channel->currentIndex();
 	auto xInterval = plot.axisInterval(QwtAxisId(QwtPlot::yLeft, x));
@@ -3162,8 +3200,7 @@ void Oscilloscope::updateXyPlotScales()
 			 yInterval.minValue(), yInterval.maxValue());
 }
 
-void adiscope::Oscilloscope::onVertOffsetValueChanged(double value)
-{
+void adiscope::Oscilloscope::onVertOffsetValueChanged(double value) {
 	cancelZoom();
 
 	if (value != -plot.VertOffset(current_ch_widget)) {
@@ -3188,31 +3225,32 @@ void adiscope::Oscilloscope::onVertOffsetValueChanged(double value)
 	}
 }
 
-void adiscope::Oscilloscope::onTimePositionChanged(double value)
-{
+void adiscope::Oscilloscope::onTimePositionChanged(double value) {
 	cancelZoom();
 
 	bool started = isIioManagerStarted();
 	bool enhancedMemDepth = symmBufferMode->isEnhancedMemDepth();
 
-	unsigned long oldSampleCount = symmBufferMode->captureParameters().entireBufferSize;
+	unsigned long oldSampleCount =
+		symmBufferMode->captureParameters().entireBufferSize;
 	symmBufferMode->setTriggerPos(-value);
 
 	/* If the time position changes during enhanced memory depth mode,
-	 * the default settings are restored. (No enhanced memory depth, buffer size
-	 * is computed again, based on the current time trigger position.)
-	 * If the current timebase is greater than a threshold, the buffer size needs to
-	 * be computed again, in order to properly display samples.
+	 * the default settings are restored. (No enhanced memory depth, buffer
+	 * size is computed again, based on the current time trigger position.)
+	 * If the current timebase is greater than a threshold, the buffer size
+	 * needs to be computed again, in order to properly display samples.
 	 */
-	if ((enhancedMemDepth || (timeBase->value() >= TIMEBASE_THRESHOLD))
-			&& (value != memory_adjusted_time_pos)) {
+	if ((enhancedMemDepth || (timeBase->value() >= TIMEBASE_THRESHOLD)) &&
+	    (value != memory_adjusted_time_pos)) {
 		onHorizScaleValueChanged(timeBase->value());
 		if (enhancedMemDepth) {
 			return;
 		}
 	}
 
-	SymmetricBufferMode::capture_parameters params = symmBufferMode->captureParameters();
+	SymmetricBufferMode::capture_parameters params =
+		symmBufferMode->captureParameters();
 	active_sample_rate = params.sampleRate;
 	active_sample_count = params.entireBufferSize;
 	active_plot_sample_count = active_sample_count;
@@ -3224,8 +3262,10 @@ void adiscope::Oscilloscope::onTimePositionChanged(double value)
 	plot.setHorizOffset(value);
 	time_trigger_offset = value;
 
-	plot.setXAxisNumPoints(plot_samples_sequentially ? active_plot_sample_count : 0);
-	plot.realignReferenceWaveforms(timeBase->value(), timePosition->value());
+	plot.setXAxisNumPoints(
+		plot_samples_sequentially ? active_plot_sample_count : 0);
+	plot.realignReferenceWaveforms(timeBase->value(),
+				       timePosition->value());
 	plot.replot();
 	plot.setDataStartingPoint(active_trig_sample_count);
 	plot.resetXaxisOnNextReceivedData();
@@ -3243,12 +3283,13 @@ void adiscope::Oscilloscope::onTimePositionChanged(double value)
 	}
 
 	if (active_sample_rate == m2k_adc->readSampleRate() &&
-			(active_plot_sample_count == oldSampleCount))
+	    (active_plot_sample_count == oldSampleCount))
 		return;
 
-	/* Reconfigure the GNU Radio block to receive a different number of samples  */
+	/* Reconfigure the GNU Radio block to receive a different number of
+	 * samples  */
 	auto chnCoupled = chnAcCoupled;
-	for(int ch = 0; ch < nb_channels; ch++) {
+	for (int ch = 0; ch < nb_channels; ch++) {
 		if (chnAcCoupled.at(ch)) {
 			configureAcCoupling(ch, !chnAcCoupled.at(ch));
 		}
@@ -3277,7 +3318,7 @@ void adiscope::Oscilloscope::onTimePositionChanged(double value)
 		iio->unlock();
 	}
 
-	for(int ch = 0; ch < nb_channels; ch++) {
+	for (int ch = 0; ch < nb_channels; ch++) {
 		if (chnCoupled.at(ch)) {
 			configureAcCoupling(ch, chnCoupled.at(ch));
 		}
@@ -3295,8 +3336,7 @@ void adiscope::Oscilloscope::onTimePositionChanged(double value)
 	onFFT_view_toggled(fft_is_visible);
 }
 
-void adiscope::Oscilloscope::rightMenuFinished(bool opened)
-{
+void adiscope::Oscilloscope::rightMenuFinished(bool opened) {
 	Q_UNUSED(opened)
 
 	// At the end of each animation, check if there are other button check
@@ -3308,12 +3348,12 @@ void adiscope::Oscilloscope::rightMenuFinished(bool opened)
 	}
 }
 
-void adiscope::Oscilloscope::toggleRightMenu(CustomPushButton *btn, bool checked)
-{
+void adiscope::Oscilloscope::toggleRightMenu(CustomPushButton *btn,
+					     bool checked) {
 	int id = btn->property("id").toInt();
 
-	if (id != -ui->stackedWidget->indexOf(ui->generalSettings)){
-		if (!menuOrder.contains(btn)){
+	if (id != -ui->stackedWidget->indexOf(ui->generalSettings)) {
+		if (!menuOrder.contains(btn)) {
 			menuOrder.push_back(btn);
 		} else {
 			menuOrder.removeOne(btn);
@@ -3331,14 +3371,14 @@ void adiscope::Oscilloscope::toggleRightMenu(CustomPushButton *btn, bool checked
 	}
 
 	// Update Settings button state
-	if(!ui->btnGeneralSettings->isChecked())
-		ui->btnSettings->setChecked(!!ui->settings_group->checkedButton());
+	if (!ui->btnGeneralSettings->isChecked())
+		ui->btnSettings->setChecked(
+			!!ui->settings_group->checkedButton());
 
 	ui->rightMenu->toggleMenu(checked);
 }
 
-void Oscilloscope::triggerRightMenuToggle(CustomPushButton *btn, bool checked)
-{
+void Oscilloscope::triggerRightMenuToggle(CustomPushButton *btn, bool checked) {
 	// Queue the action, if right menu animation is in progress. This way
 	// the action will be remembered and performed right after the animation
 	// finishes
@@ -3350,18 +3390,16 @@ void Oscilloscope::triggerRightMenuToggle(CustomPushButton *btn, bool checked)
 	}
 }
 
-void Oscilloscope::settings_panel_update(int id)
-{
-        if (id >= 0)
-        ui->stackedWidget->setCurrentIndex(0);
-        else
-        ui->stackedWidget->setCurrentIndex(-id);
+void Oscilloscope::settings_panel_update(int id) {
+	if (id >= 0)
+		ui->stackedWidget->setCurrentIndex(0);
+	else
+		ui->stackedWidget->setCurrentIndex(-id);
 
-        settings_panel_size_adjust();
+	settings_panel_size_adjust();
 }
 
-void Oscilloscope::settings_panel_size_adjust()
-{
+void Oscilloscope::settings_panel_size_adjust() {
 	for (int i = 0; i < ui->stackedWidget->count(); i++) {
 		QSizePolicy::Policy policy = QSizePolicy::Ignored;
 
@@ -3374,38 +3412,36 @@ void Oscilloscope::settings_panel_size_adjust()
 	ui->stackedWidget->adjustSize();
 }
 
-void Oscilloscope::onChannelOffsetChanged(double value)
-{
+void Oscilloscope::onChannelOffsetChanged(double value) {
 	voltsPosition->setValue(-plot.VertOffset(current_ch_widget));
 
 	scaleHistogramPlot();
 	updateXyPlotScales();
 }
 
-ChannelWidget *Oscilloscope::channelWidgetAtId(int id)
-{
+ChannelWidget *Oscilloscope::channelWidgetAtId(int id) {
 	ChannelWidget *w = nullptr;
 	bool found = false;
 
-	for (unsigned int i = 0; !found &&
-	     i < nb_channels + nb_math_channels + nb_ref_channels; i++) {
+	for (unsigned int i = 0;
+	     !found && i < nb_channels + nb_math_channels + nb_ref_channels;
+	     i++) {
 
 		w = static_cast<ChannelWidget *>(
-		            ui->channelsList->itemAt(i)->widget());
+			ui->channelsList->itemAt(i)->widget());
 		found = w->id() == id;
 	}
 
 	return w;
 }
 
-void Oscilloscope::update_chn_settings_panel(int id)
-{
+void Oscilloscope::update_chn_settings_panel(int id) {
 	ChannelWidget *chn_widget = channelWidgetAtId(id);
 	if (!chn_widget)
 		return;
 
 	disconnect(voltsPerDiv, SIGNAL(valueChanged(double)), this,
-		SLOT(onVertScaleValueChanged(double)));
+		   SLOT(onVertScaleValueChanged(double)));
 	voltsPerDiv->setValue(plot.VertUnitsPerDiv(id));
 	connect(voltsPerDiv, SIGNAL(valueChanged(double)),
 		SLOT(onVertScaleValueChanged(double)));
@@ -3415,8 +3451,8 @@ void Oscilloscope::update_chn_settings_panel(int id)
 
 	QString name = chn_widget->fullName();
 	ch_ui->label_channelName->setText(name);
-	QString stylesheet = QString("border: 2px solid %1"
-					).arg(plot.getLineColor(id).name());
+	QString stylesheet = QString("border: 2px solid %1")
+				     .arg(plot.getLineColor(id).name());
 	ch_ui->line_channelColor->setStyleSheet(stylesheet);
 	int cmbIdx = (int)(plot.getLineWidthF(id) / 0.5) - 1;
 	ch_ui->cmbChnLineWidth->setCurrentIndex(cmbIdx);
@@ -3439,7 +3475,6 @@ void Oscilloscope::update_chn_settings_panel(int id)
 
 		ch_ui->math_settings_widget->setVisible(false);
 		ch_ui->wCoupling->setVisible(false);
-
 
 	} else {
 		ch_ui->math_settings_widget->setVisible(false);
@@ -3477,7 +3512,8 @@ void Oscilloscope::update_chn_settings_panel(int id)
 		ch_ui->btnAutoset->setVisible(true);
 	}
 
-	auto max_elem = max_element(probe_attenuation.begin(), probe_attenuation.begin() + nb_channels);
+	auto max_elem = max_element(probe_attenuation.begin(),
+				    probe_attenuation.begin() + nb_channels);
 	if (chn_widget->isMathChannel()) {
 		voltsPerDiv->silentSetMaxValue((*max_elem) * 10);
 		voltsPosition->silentSetMaxValue((*max_elem) * MAX_AMPL);
@@ -3494,18 +3530,18 @@ void Oscilloscope::update_chn_settings_panel(int id)
 	ch_ui->lineStyle->setCurrentIndex(plot.getPlotLineStyle(id));
 }
 
-void Oscilloscope::openEditMathPanel(bool on)
-{
+void Oscilloscope::openEditMathPanel(bool on) {
 	ChannelWidget *chn_widget = channelWidgetAtId(current_ch_widget);
 
 	if (on) {
 		addChannel = false;
-		triggerRightMenuToggle(
-			static_cast<CustomPushButton* >(chn_widget->menuButton()), false);
+		triggerRightMenuToggle(static_cast<CustomPushButton *>(
+					       chn_widget->menuButton()),
+				       false);
 		math_pair->first.btnAddChannel->setText("Save");
 		math_pair->second->setFunction(chn_widget->function());
 		triggerRightMenuToggle(
-			static_cast<CustomPushButton* >(ui->btnAddMath), true);
+			static_cast<CustomPushButton *>(ui->btnAddMath), true);
 
 		tabWidget->removeTab(1);
 		tabWidget->tabBar()->hide();
@@ -3516,16 +3552,17 @@ void Oscilloscope::openEditMathPanel(bool on)
 	}
 }
 
-void Oscilloscope::editMathChannelFunction(int id, const std::string& new_function)
-{
+void Oscilloscope::editMathChannelFunction(int id,
+					   const std::string &new_function) {
 	ChannelWidget *chn_widget = channelWidgetAtId(id);
 	int current_x = index_x;
 	int current_y = index_y;
 
+	triggerRightMenuToggle(static_cast<CustomPushButton *>(ui->btnAddMath),
+			       false);
 	triggerRightMenuToggle(
-				static_cast<CustomPushButton* >(ui->btnAddMath), false);
-	triggerRightMenuToggle(
-				static_cast<CustomPushButton* >(chn_widget->menuButton()), true);
+		static_cast<CustomPushButton *>(chn_widget->menuButton()),
+		true);
 	math_pair->first.btnAddChannel->setText("Add Channel");
 	math_pair->second->setFunction("");
 	addChannel = true;
@@ -3534,7 +3571,8 @@ void Oscilloscope::editMathChannelFunction(int id, const std::string& new_functi
 	if (chn_widget->function().toStdString() == new_function)
 		return;
 
-	QString qname = chn_widget->deleteButton()->property("curve_name").toString();
+	QString qname =
+		chn_widget->deleteButton()->property("curve_name").toString();
 	std::string name = qname.toStdString();
 
 	auto rail = gr::analog::rail_ff::make(MIN_MATH_RANGE, MAX_MATH_RANGE);
@@ -3544,13 +3582,13 @@ void Oscilloscope::editMathChannelFunction(int id, const std::string& new_functi
 	if (started)
 		iio->lock();
 	locked = true;
-	if(xy_is_visible) {
+	if (xy_is_visible) {
 		gsettings_ui->cmb_x_channel->blockSignals(true);
 		gsettings_ui->cmb_y_channel->blockSignals(true);
-		if(index_x == id)
-			gsettings_ui->cmb_x_channel->setCurrentIndex(id-1);
-		if(index_y == id)
-			gsettings_ui->cmb_y_channel->setCurrentIndex(id-1);
+		if (index_x == id)
+			gsettings_ui->cmb_x_channel->setCurrentIndex(id - 1);
+		if (index_y == id)
+			gsettings_ui->cmb_y_channel->setCurrentIndex(id - 1);
 		gsettings_ui->cmb_x_channel->blockSignals(false);
 		gsettings_ui->cmb_y_channel->blockSignals(false);
 		setup_xy_channels();
@@ -3564,7 +3602,7 @@ void Oscilloscope::editMathChannelFunction(int id, const std::string& new_functi
 	iio->disconnect(rail_old, 0, pair.second, 0);
 
 	auto math_pair = QPair<gr::basic_block_sptr, gr::basic_block_sptr>(
-				math, pair.second);
+		math, pair.second);
 
 	math_sinks.insert(qname, math_pair);
 	math_rails.insert(qname, rail);
@@ -3575,7 +3613,7 @@ void Oscilloscope::editMathChannelFunction(int id, const std::string& new_functi
 	iio->connect(math, 0, rail, 0);
 	iio->connect(rail, 0, pair.second, 0);
 
-	if(xy_is_visible) {
+	if (xy_is_visible) {
 		gsettings_ui->cmb_x_channel->blockSignals(true);
 		gsettings_ui->cmb_y_channel->blockSignals(true);
 		gsettings_ui->cmb_x_channel->setCurrentIndex(current_x);
@@ -3588,35 +3626,38 @@ void Oscilloscope::editMathChannelFunction(int id, const std::string& new_functi
 	if (started)
 		iio->unlock();
 
-	// If the oscilloscope is not running, create a single run situation only for
-	// the channel that is edited .
-//	else {
-//		QList<QString> keys = math_sinks.keys();
-//		for (const QString &key : keys)
-//			if (key != qname) {
-//				pair = math_sinks.value(key);
-//				for (unsigned int i = 0; i < nb_channels; ++i)
-//					iio->disconnect(adc_samp_conv_block, i, pair.first, i);
-//				iio->disconnect(pair.first, 0, pair.second, 0);
-//			}
+	// If the oscilloscope is not running, create a single run situation
+	// only for the channel that is edited .
+	//	else {
+	//		QList<QString> keys = math_sinks.keys();
+	//		for (const QString &key : keys)
+	//			if (key != qname) {
+	//				pair = math_sinks.value(key);
+	//				for (unsigned int i = 0; i <
+	// nb_channels;
+	//++i)
+	// iio->disconnect(adc_samp_conv_block, i, pair.first, i);
+	//				iio->disconnect(pair.first, 0,
+	// pair.second, 0);
+	//			}
 
-//		ui->pushButtonSingle->setChecked(true);
+	//		ui->pushButtonSingle->setChecked(true);
 
-//		for (const QString &key : keys)
-//			if (key != qname) {
-//				pair = math_sinks.value(key);
-//				for (unsigned int i = 0; i < nb_channels; ++i)
-//					iio->connect(adc_samp_conv_block, i, pair.first, i);
-//				iio->connect(pair.first, 0, pair.second, 0);
-//			}
-//	}
+	//		for (const QString &key : keys)
+	//			if (key != qname) {
+	//				pair = math_sinks.value(key);
+	//				for (unsigned int i = 0; i <
+	// nb_channels;
+	//++i) iio->connect(adc_samp_conv_block, i, pair.first, i);
+	// iio->connect(pair.first, 0, pair.second, 0);
+	//			}
+	//	}
 
 	chn_widget->setFunction(QString::fromStdString(new_function));
 	setSinksDisplayOneBuffer(d_displayOneBuffer);
 }
 
-void Oscilloscope::onMeasuremetsAvailable()
-{
+void Oscilloscope::onMeasuremetsAvailable() {
 	measureUpdateValues();
 
 	if (statistics_enabled) {
@@ -3625,20 +3666,18 @@ void Oscilloscope::onMeasuremetsAvailable()
 	}
 }
 
-void Oscilloscope::update_measure_for_channel(int ch_idx)
-{
+void Oscilloscope::update_measure_for_channel(int ch_idx) {
 	ChannelWidget *chn_widget = channelWidgetAtId(ch_idx);
 
 	measure_settings->setChannelName(chn_widget->fullName());
 	measure_settings->setChannelUnderlineColor(chn_widget->color());
 }
 
-void Oscilloscope::measureCreateAndAppendGuiFrom(const MeasurementData&
-		measurement)
-{
+void Oscilloscope::measureCreateAndAppendGuiFrom(
+	const MeasurementData &measurement) {
 	std::shared_ptr<MeasurementGui> p;
 
-	switch(measurement.unitType()) {
+	switch (measurement.unitType()) {
 
 	case MeasurementData::METRIC:
 		p = std::make_shared<MetricMeasurementGui>();
@@ -3659,21 +3698,22 @@ void Oscilloscope::measureCreateAndAppendGuiFrom(const MeasurementData&
 		measurements_gui.push_back(p);
 }
 
-void Oscilloscope::measureLabelsRearrange()
-{
-	QWidget *container = measure_panel_ui->measurements->
-					findChild<QWidget *>("container");
+void Oscilloscope::measureLabelsRearrange() {
+	QWidget *container =
+		measure_panel_ui->measurements->findChild<QWidget *>(
+			"container");
 
 	if (container) {
-		measure_panel_ui->measurements->layout()->removeWidget(container);
+		measure_panel_ui->measurements->layout()->removeWidget(
+			container);
 		delete container;
 	}
 
 	container = new QWidget();
 	container->setObjectName("container");
 	if (!measure_panel_ui->measurements->layout()) {
-		QVBoxLayout *measurementsLayout = new
-				QVBoxLayout(measure_panel_ui->measurements);
+		QVBoxLayout *measurementsLayout =
+			new QVBoxLayout(measure_panel_ui->measurements);
 		measurementsLayout->addWidget(container);
 		measurementsLayout->setContentsMargins(0, 0, 0, 0);
 	} else {
@@ -3691,7 +3731,8 @@ void Oscilloscope::measureLabelsRearrange()
 	for (int i = 0; i < measurements_data.size(); i++) {
 
 		int channel = measurements_data[i]->channel();
-		if (channel >= nb_channels + nb_math_channels + nb_ref_channels) {
+		if (channel >=
+		    nb_channels + nb_math_channels + nb_ref_channels) {
 			continue;
 		}
 
@@ -3702,7 +3743,6 @@ void Oscilloscope::measureLabelsRearrange()
 
 		QLabel *name = new QLabel();
 		QLabel *value = new QLabel();
-
 
 		int row = nb_meas_added % max_rows;
 		int col = nb_meas_added / max_rows;
@@ -3719,16 +3759,14 @@ void Oscilloscope::measureLabelsRearrange()
 		if (channel < probe_attenuation.size()) {
 			pb_atten = probe_attenuation[channel];
 		}
-		measurements_gui[i]->update(*(measurements_data[i]),
-					    pb_atten);
+		measurements_gui[i]->update(*(measurements_data[i]), pb_atten);
 		measurements_gui[i]->setLabelsColor(plot.getLineColor(channel));
 
 		nb_meas_added++;
 	}
 }
 
-void Oscilloscope::measureUpdateValues()
-{
+void Oscilloscope::measureUpdateValues() {
 
 	for (int i = 0; i < measurements_data.size(); i++) {
 		int channel = measurements_data[i]->channel();
@@ -3741,29 +3779,24 @@ void Oscilloscope::measureUpdateValues()
 	}
 }
 
-void Oscilloscope::measure_settings_init()
-{
+void Oscilloscope::measure_settings_init() {
 	measure_settings = new MeasureSettings(&plot, this);
 
-	int measure_panel = ui->stackedWidget->insertWidget(-1, measure_settings);
+	int measure_panel =
+		ui->stackedWidget->insertWidget(-1, measure_settings);
 
-	connect(measure_settings,
-		SIGNAL(measurementActivated(int, int)),
+	connect(measure_settings, SIGNAL(measurementActivated(int, int)),
 		SLOT(onMeasurementActivated(int, int)));
 
-	connect(measure_settings,
-		SIGNAL(measurementDeactivated(int, int)),
+	connect(measure_settings, SIGNAL(measurementDeactivated(int, int)),
 		SLOT(onMeasurementDeactivated(int, int)));
 
-	connect(measure_settings,
-		SIGNAL(measurementSelectionListChanged()),
+	connect(measure_settings, SIGNAL(measurementSelectionListChanged()),
 		SLOT(onMeasurementSelectionListChanged()));
 
-	connect(measure_settings,
-		SIGNAL(statisticActivated(int, int)),
+	connect(measure_settings, SIGNAL(statisticActivated(int, int)),
 		SLOT(onStatisticActivated(int, int)));
-	connect(measure_settings,
-		SIGNAL(statisticDeactivated(int, int)),
+	connect(measure_settings, SIGNAL(statisticDeactivated(int, int)),
 		SLOT(onStatisticDeactivated(int, int)));
 
 	connect(measure_settings, SIGNAL(statisticsEnabled(bool)),
@@ -3772,29 +3805,27 @@ void Oscilloscope::measure_settings_init()
 	connect(measure_settings, SIGNAL(statisticsReset()),
 		SLOT(onStatisticsReset()));
 
-	connect(measure_settings, SIGNAL(gatingEnabled(bool)),SLOT(onGatingEnabled(bool)));
+	connect(measure_settings, SIGNAL(gatingEnabled(bool)),
+		SLOT(onGatingEnabled(bool)));
 
-	connect(&plot, SIGNAL(channelAdded(int)),
-		measure_settings, SLOT(onChannelAdded(int)));
+	connect(&plot, SIGNAL(channelAdded(int)), measure_settings,
+		SLOT(onChannelAdded(int)));
 
-	connect(this, SIGNAL(selectedChannelChanged(int)),
-		measure_settings, SLOT(setSelectedChannel(int)));
+	connect(this, SIGNAL(selectedChannelChanged(int)), measure_settings,
+		SLOT(setSelectedChannel(int)));
 
-	connect(measure_settings,
-		SIGNAL(statisticSelectionListChanged()),
+	connect(measure_settings, SIGNAL(statisticSelectionListChanged()),
 		SLOT(onStatisticSelectionListChanged()));
 
 	ui->btnMeasure->setProperty("id", QVariant(-measure_panel));
 
-	connect(ui->boxMeasure, SIGNAL(toggled(bool)),
-		&plot, SLOT(setMeasuremensEnabled(bool)));
-	connect(ui->boxMeasure, &QCheckBox::toggled, [=](bool on){
-		cr_ui->readoutsWidget->setVisible(!on);
-	});
+	connect(ui->boxMeasure, SIGNAL(toggled(bool)), &plot,
+		SLOT(setMeasuremensEnabled(bool)));
+	connect(ui->boxMeasure, &QCheckBox::toggled,
+		[=](bool on) { cr_ui->readoutsWidget->setVisible(!on); });
 }
 
-void Oscilloscope::onMeasurementActivated(int id, int chnIdx)
-{
+void Oscilloscope::onMeasurementActivated(int id, int chnIdx) {
 	int oldActiveMeasCount = plot.activeMeasurementsCount(chnIdx);
 
 	auto mList = plot.measurements(chnIdx);
@@ -3811,16 +3842,17 @@ void Oscilloscope::onMeasurementActivated(int id, int chnIdx)
 	measureLabelsRearrange();
 }
 
-void Oscilloscope::onMeasurementDeactivated(int id, int chnIdx)
-{
+void Oscilloscope::onMeasurementDeactivated(int id, int chnIdx) {
 	auto mList = plot.measurements(chnIdx);
 	QString name = mList[id]->name();
 
 	mList[id]->setEnabled(false);
 
 	auto it = find_if(measurements_data.begin(), measurements_data.end(),
-		[&](std::shared_ptr<MeasurementData> const& p)
-		{ return  (p->name() == name) && (p->channel() == chnIdx); });
+			  [&](std::shared_ptr<MeasurementData> const &p) {
+				  return (p->name() == name) &&
+					  (p->channel() == chnIdx);
+			  });
 	if (it != measurements_data.end()) {
 		int i = it - measurements_data.begin();
 		measurements_data.removeAt(i);
@@ -3829,8 +3861,7 @@ void Oscilloscope::onMeasurementDeactivated(int id, int chnIdx)
 	}
 }
 
-void Oscilloscope::onMeasurementSelectionListChanged()
-{
+void Oscilloscope::onMeasurementSelectionListChanged() {
 	// Clear all measurements in list
 	for (int i = 0; i < measurements_data.size(); i++) {
 		measurements_data[i]->setEnabled(false);
@@ -3842,7 +3873,7 @@ void Oscilloscope::onMeasurementSelectionListChanged()
 	auto newList = measure_settings->measurementSelection();
 	for (int i = 0; i < newList.size(); i++) {
 		auto pMeasurement = plot.measurement(newList[i].id(),
-			newList[i].channel_id());
+						     newList[i].channel_id());
 		if (pMeasurement) {
 			pMeasurement->setEnabled(true);
 			measurements_data.push_back(pMeasurement);
@@ -3852,13 +3883,11 @@ void Oscilloscope::onMeasurementSelectionListChanged()
 	measureLabelsRearrange();
 }
 
-void Oscilloscope::onCursorReadoutsChanged(struct cursorReadoutsText data)
-{
+void Oscilloscope::onCursorReadoutsChanged(struct cursorReadoutsText data) {
 	fillCursorReadouts(data);
 }
 
-void Oscilloscope::fillCursorReadouts(const struct cursorReadoutsText& data)
-{
+void Oscilloscope::fillCursorReadouts(const struct cursorReadoutsText &data) {
 	cursor_readouts_ui->cursorT1->setText(data.t1);
 	cursor_readouts_ui->cursorT2->setText(data.t2);
 	cursor_readouts_ui->timeDelta->setText(data.tDelta);
@@ -3868,24 +3897,31 @@ void Oscilloscope::fillCursorReadouts(const struct cursorReadoutsText& data)
 	cursor_readouts_ui->voltageDelta->setText(data.vDelta);
 }
 
-void Oscilloscope::measure_panel_init()
-{
+void Oscilloscope::measure_panel_init() {
 	measurePanel = new QWidget(this);
 	measure_panel_ui = new Ui::MeasurementsPanel();
 	measure_panel_ui->setupUi(measurePanel);
 
-	connect(measure_panel_ui->scrollArea->horizontalScrollBar(), &QScrollBar::rangeChanged,
-		measure_panel_ui->scrollArea_2->horizontalScrollBar(), &QScrollBar::setRange);
+	connect(measure_panel_ui->scrollArea->horizontalScrollBar(),
+		&QScrollBar::rangeChanged,
+		measure_panel_ui->scrollArea_2->horizontalScrollBar(),
+		&QScrollBar::setRange);
 
-	connect(measure_panel_ui->scrollArea_2->horizontalScrollBar(), &QScrollBar::valueChanged,
-		measure_panel_ui->scrollArea->horizontalScrollBar(), &QScrollBar::setValue);
-	connect(measure_panel_ui->scrollArea->horizontalScrollBar(), &QScrollBar::valueChanged,
-		measure_panel_ui->scrollArea_2->horizontalScrollBar(), &QScrollBar::setValue);
+	connect(measure_panel_ui->scrollArea_2->horizontalScrollBar(),
+		&QScrollBar::valueChanged,
+		measure_panel_ui->scrollArea->horizontalScrollBar(),
+		&QScrollBar::setValue);
+	connect(measure_panel_ui->scrollArea->horizontalScrollBar(),
+		&QScrollBar::valueChanged,
+		measure_panel_ui->scrollArea_2->horizontalScrollBar(),
+		&QScrollBar::setValue);
 
-	connect(measure_panel_ui->scrollArea->horizontalScrollBar(), &QScrollBar::rangeChanged,
-		[=](double v1, double v2){
-		measure_panel_ui->scrollArea_2->widget()->setFixedWidth(measure_panel_ui->scrollAreaWidgetContents->width());
-	});
+	connect(measure_panel_ui->scrollArea->horizontalScrollBar(),
+		&QScrollBar::rangeChanged, [=](double v1, double v2) {
+			measure_panel_ui->scrollArea_2->widget()->setFixedWidth(
+				measure_panel_ui->scrollAreaWidgetContents
+					->width());
+		});
 
 	measurePanel->hide();
 
@@ -3898,10 +3934,12 @@ void Oscilloscope::measure_panel_init()
 	cursor_readouts_ui = new Ui::CursorReadouts();
 	cursor_readouts_ui->setupUi(cursorReadouts);
 
-	cursor_readouts_ui->TimeCursors->setStyleSheet("QWidget {"
+	cursor_readouts_ui->TimeCursors->setStyleSheet(
+		"QWidget {"
 		"background-color: transparent;"
 		"color: white;}");
-	cursor_readouts_ui->VoltageCursors->setStyleSheet("QWidget {"
+	cursor_readouts_ui->VoltageCursors->setStyleSheet(
+		"QWidget {"
 		"background-color: transparent;"
 		"color: white;}");
 
@@ -3934,8 +3972,7 @@ void Oscilloscope::measure_panel_init()
 	measure_panel_ui->cursorReadouts->hide();
 }
 
-void Oscilloscope::statistics_panel_init()
-{
+void Oscilloscope::statistics_panel_init() {
 	statisticsPanel = new QWidget(this);
 	statistics_panel_ui = new Ui::StatisticsPanel();
 	statistics_panel_ui->setupUi(statisticsPanel);
@@ -3952,25 +3989,24 @@ void Oscilloscope::statistics_panel_init()
 	statisticsPanel->hide();
 }
 
-void Oscilloscope::statisticsUpdateValues()
-{
+void Oscilloscope::statisticsUpdateValues() {
 	for (int i = 0; i < statistics_data.size(); i++) {
 		double meas_data = statistics_data[i].first->value();
 		statistics_data[i].second.pushNewData(meas_data);
 	}
 }
 
-void Oscilloscope::statisticsReset()
-{
+void Oscilloscope::statisticsReset() {
 	for (int i = 0; i < statistics_data.size(); i++)
 		statistics_data[i].second.clear();
 }
 
-void Oscilloscope::statisticsUpdateGui()
-{
-	QList<StatisticWidget *>statistics = statistics_panel_ui->
-		statistics->findChildren<StatisticWidget *>(
-			QString("Statistic"), Qt::FindDirectChildrenOnly);
+void Oscilloscope::statisticsUpdateGui() {
+	QList<StatisticWidget *> statistics =
+		statistics_panel_ui->statistics
+			->findChildren<StatisticWidget *>(
+				QString("Statistic"),
+				Qt::FindDirectChildrenOnly);
 	for (int i = 0; i < statistics.size(); i++)
 		statistics[i]->updateStatistics(statistics_data[i].second);
 
@@ -3978,38 +4014,40 @@ void Oscilloscope::statisticsUpdateGui()
 		statisticsPanel->hide();
 }
 
-void Oscilloscope::statisticsUpdateGuiTitleColor()
-{
-	QList<StatisticWidget *>statistics = statistics_panel_ui->
-		statistics->findChildren<StatisticWidget *>(
-			QString("Statistic"), Qt::FindDirectChildrenOnly);
+void Oscilloscope::statisticsUpdateGuiTitleColor() {
+	QList<StatisticWidget *> statistics =
+		statistics_panel_ui->statistics
+			->findChildren<StatisticWidget *>(
+				QString("Statistic"),
+				Qt::FindDirectChildrenOnly);
 	for (int i = 0; i < statistics.size(); i++)
-		statistics[i]->setTitleColor(plot.getLineColor(
-			statistics[i]->channelId()));
+		statistics[i]->setTitleColor(
+			plot.getLineColor(statistics[i]->channelId()));
 }
 
-void Oscilloscope::statisticsUpdateGuiPosIndex()
-{
-	QList<StatisticWidget *>statistics = statistics_panel_ui->
-		statistics->findChildren<StatisticWidget *>(
-			QString("Statistic"), Qt::FindDirectChildrenOnly);
+void Oscilloscope::statisticsUpdateGuiPosIndex() {
+	QList<StatisticWidget *> statistics =
+		statistics_panel_ui->statistics
+			->findChildren<StatisticWidget *>(
+				QString("Statistic"),
+				Qt::FindDirectChildrenOnly);
 	for (int i = 0; i < statistics.size(); i++)
 		statistics[i]->setPositionIndex(i + 1);
 }
 
-void Oscilloscope::onStatisticActivated(int id, int chnIdx)
-{
+void Oscilloscope::onStatisticActivated(int id, int chnIdx) {
 	std::shared_ptr<MeasurementData> pmd = plot.measurement(id, chnIdx);
 	if (!pmd)
 		return;
 
-	statistics_data.push_back(QPair<std::shared_ptr<MeasurementData>,
-		Statistic>(pmd, Statistic()));
+	statistics_data.push_back(
+		QPair<std::shared_ptr<MeasurementData>, Statistic>(
+			pmd, Statistic()));
 
 	/* Add a widget for the new statistic */
 	QWidget *statisticContainer = statistics_panel_ui->statistics;
-	QHBoxLayout *hLayout = static_cast<QHBoxLayout *>
-		(statisticContainer->layout());
+	QHBoxLayout *hLayout =
+		static_cast<QHBoxLayout *>(statisticContainer->layout());
 
 	StatisticWidget *statistic = new StatisticWidget(statisticContainer);
 	statistic->initForMeasurement(*pmd);
@@ -4019,15 +4057,15 @@ void Oscilloscope::onStatisticActivated(int id, int chnIdx)
 	hLayout->addWidget(statistic);
 }
 
-void Oscilloscope::onStatisticDeactivated(int id, int chnIdx)
-{
+void Oscilloscope::onStatisticDeactivated(int id, int chnIdx) {
 	std::shared_ptr<MeasurementData> pmd = plot.measurement(id, chnIdx);
 	if (!pmd)
 		return;
 
 	QString name = pmd->name();
 
-	auto it = std::find_if(statistics_data.begin(), statistics_data.end(),
+	auto it = std::find_if(
+		statistics_data.begin(), statistics_data.end(),
 		[&](QPair<std::shared_ptr<MeasurementData>, Statistic> pair) {
 			return pair.first->name() == name &&
 				pair.first->channel() == chnIdx;
@@ -4037,17 +4075,20 @@ void Oscilloscope::onStatisticDeactivated(int id, int chnIdx)
 	}
 
 	/* remove the widget corresponding to the statistic we deleted */
-	QList<StatisticWidget *>statistics = statistics_panel_ui->statistics->
-		findChildren<StatisticWidget *>(QString("Statistic"),
-		Qt::FindDirectChildrenOnly);
+	QList<StatisticWidget *> statistics =
+		statistics_panel_ui->statistics
+			->findChildren<StatisticWidget *>(
+				QString("Statistic"),
+				Qt::FindDirectChildrenOnly);
 
-	auto stat_it = std::find_if(statistics.begin(), statistics.end(),
-		[=](StatisticWidget *statistic){
-			return statistic->title() == name &&
-				statistic->channelId() == chnIdx;
-		});
+	auto stat_it =
+		std::find_if(statistics.begin(), statistics.end(),
+			     [=](StatisticWidget *statistic) {
+				     return statistic->title() == name &&
+					     statistic->channelId() == chnIdx;
+			     });
 	if (stat_it != statistics.end()) {
-		QWidget *w = static_cast<QWidget *> (*stat_it);
+		QWidget *w = static_cast<QWidget *>(*stat_it);
 		if (statistics_enabled) // Avoid flickers when panel is visible
 			statisticsPanel->hide(); // Avoid flickers
 		statistics_panel_ui->statistics->layout()->removeWidget(w);
@@ -4059,14 +4100,15 @@ void Oscilloscope::onStatisticDeactivated(int id, int chnIdx)
 	}
 }
 
-void Oscilloscope::onStatisticSelectionListChanged()
-{
+void Oscilloscope::onStatisticSelectionListChanged() {
 	// Clear all statistics in list
 	statistics_data.clear();
 
-	QList<StatisticWidget *>statistics = statistics_panel_ui->statistics->
-		findChildren<StatisticWidget *>(QString("Statistic"),
-		Qt::FindDirectChildrenOnly);
+	QList<StatisticWidget *> statistics =
+		statistics_panel_ui->statistics
+			->findChildren<StatisticWidget *>(
+				QString("Statistic"),
+				Qt::FindDirectChildrenOnly);
 	for (int i = 0; i < statistics.size(); i++) {
 		statistics_panel_ui->statistics->layout()->removeWidget(
 			statistics[i]);
@@ -4078,11 +4120,9 @@ void Oscilloscope::onStatisticSelectionListChanged()
 	for (int i = 0; i < newList.size(); i++)
 		onStatisticActivated(newList[i].id(), newList[i].channel_id());
 	statisticsUpdateGui();
-
 }
 
-void Oscilloscope::onStatisticsEnabled(bool on)
-{
+void Oscilloscope::onStatisticsEnabled(bool on) {
 	statistics_enabled = on;
 	statisticsPanel->setVisible(on);
 
@@ -4092,32 +4132,29 @@ void Oscilloscope::onStatisticsEnabled(bool on)
 		statisticsUpdateGui();
 }
 
-void Oscilloscope::onStatisticsReset()
-{
+void Oscilloscope::onStatisticsReset() {
 	statisticsReset();
 	statisticsUpdateGui();
 }
 
-void Oscilloscope::onGatingEnabled(bool on){
-//enable / disable gatings
+void Oscilloscope::onGatingEnabled(bool on) {
+	// enable / disable gatings
 	gatingEnabled = on;
 	buffer_previewer->setGatingEnabled(on && ui->boxMeasure->isChecked());
 	plot.setGatingEnabled(on && ui->boxMeasure->isChecked());
 }
 
-void Oscilloscope::onLeftGateChanged(double width)
-{
+void Oscilloscope::onLeftGateChanged(double width) {
 	buffer_previewer->setLeftGateWidth(width);
 }
 
-void Oscilloscope::onRightGateChanged(double width)
-{
+void Oscilloscope::onRightGateChanged(double width) {
 	buffer_previewer->setRightGateWidth(width);
 }
 
-void Oscilloscope::setupAutosetFreqSweep()
-{	bool started = isIioManagerStarted();
-	if(started)		
+void Oscilloscope::setupAutosetFreqSweep() {
+	bool started = isIioManagerStarted();
+	if (started)
 		iio->lock();
 	qt_time_block->reset();
 	qt_time_block->clean_buffers();
@@ -4141,36 +4178,40 @@ void Oscilloscope::setupAutosetFreqSweep()
 		dc_cancel.at(i)->set_buffer_size(active_sample_count);
 	}
 	if (keep_one) {
-		iio->disconnect(dc_cancel.at(triggerLevelSink.second), 0, keep_one, 0);
+		iio->disconnect(dc_cancel.at(triggerLevelSink.second), 0,
+				keep_one, 0);
 		iio->disconnect(keep_one, 0, triggerLevelSink.first, 0);
-		keep_one = gr::blocks::keep_one_in_n::make(sizeof(float), active_sample_count);
-		iio->connect(dc_cancel.at(triggerLevelSink.second), 0, keep_one, 0);
+		keep_one = gr::blocks::keep_one_in_n::make(sizeof(float),
+							   active_sample_count);
+		iio->connect(dc_cancel.at(triggerLevelSink.second), 0, keep_one,
+			     0);
 		iio->connect(keep_one, 0, triggerLevelSink.first, 0);
 	}
-	if(started)
+	if (started)
 		iio->unlock();
 }
 
-bool Oscilloscope::autosetFindFrequency()
-{
-	if(autosetFFTSink->data().size())
-	{
+bool Oscilloscope::autosetFindFrequency() {
+	if (autosetFFTSink->data().size()) {
 		toggle_blockchain_flow(false);
-		double max=-INFINITY;
-		size_t maxindex=1;
-		// try skipping the DC offset tones and last few tones that cause
-		// weird results
+		double max = -INFINITY;
+		size_t maxindex = 1;
+		// try skipping the DC offset tones and last few tones that
+		// cause weird results
 
-		for(int j=autosetNrOfSkippedTones ;j<((autoset_fft_size/2)-5);j++) {
-			if(autosetFFTSink->data()[j] > max) {
-			    max = autosetFFTSink->data()[j];
-			    maxindex=j;
-		    }
+		for (int j = autosetNrOfSkippedTones;
+		     j < ((autoset_fft_size / 2) - 5); j++) {
+			if (autosetFFTSink->data()[j] > max) {
+				max = autosetFFTSink->data()[j];
+				maxindex = j;
+			}
 		}
 
-		double frequency = (maxindex) * (active_sample_rate/autoset_fft_size);
+		double frequency =
+			(maxindex) * (active_sample_rate / autoset_fft_size);
 		autosetFFTIndex = maxindex;
-		if(autosetMaxIndexAmpl < max && (autosetFFTIndex > autosetValidTone)) {
+		if (autosetMaxIndexAmpl < max &&
+		    (autosetFFTIndex > autosetValidTone)) {
 			autosetFrequency = frequency;
 			autosetMaxIndexAmpl = max;
 			return true; // found valid frequency
@@ -4179,18 +4220,20 @@ bool Oscilloscope::autosetFindFrequency()
 	return false;
 }
 
-void Oscilloscope::autosetFindPeaks()
-{
-	if(autosetFFTSink->data().size())
-	{
+void Oscilloscope::autosetFindPeaks() {
+	if (autosetFFTSink->data().size()) {
 		double maxVolts = -INFINITY;
 		double minVolts = INFINITY;
 
-		for(auto j=autosetSkippedTimeSamples;j<active_sample_count;j++) {
-			auto data = plot.Curve(autosetChannel)->data()->sample(j).y();
-			if(data > maxVolts)
+		for (auto j = autosetSkippedTimeSamples;
+		     j < active_sample_count; j++) {
+			auto data = plot.Curve(autosetChannel)
+					    ->data()
+					    ->sample(j)
+					    .y();
+			if (data > maxVolts)
 				maxVolts = data;
-			if(data < minVolts)
+			if (data < minVolts)
 				minVolts = data;
 		}
 		autosetMaxAmpl = maxVolts;
@@ -4198,11 +4241,9 @@ void Oscilloscope::autosetFindPeaks()
 	}
 }
 
-
-
-void Oscilloscope::requestAutoset()
-{
-	if(!autosetRequested && current_ch_widget != -1 && current_ch_widget < nb_channels){
+void Oscilloscope::requestAutoset() {
+	if (!autosetRequested && current_ch_widget != -1 &&
+	    current_ch_widget < nb_channels) {
 		toggle_blockchain_flow(false);
 		autosetChannel = current_ch_widget;
 		autosetSampleRateCnt = m2k_adc->availSamplRates().count();
@@ -4214,37 +4255,36 @@ void Oscilloscope::requestAutoset()
 	}
 }
 
-void Oscilloscope::periodicFlowRestart(bool force)
-{
+void Oscilloscope::periodicFlowRestart(bool force) {
 	static uint64_t restartFlowCounter = 0;
 	const uint64_t NO_FLOW_BUFFERS = 1024;
-	if(force) {
+	if (force) {
 		restartFlowCounter = NO_FLOW_BUFFERS;
 	}
 
-	if(restartFlowCounter == 0) {
+	if (restartFlowCounter == 0) {
 		restartFlowCounter = NO_FLOW_BUFFERS;
 		QElapsedTimer t;
 		t.start();
 		iio->lock();
 		iio->unlock();
-		qDebug(CAT_OSCILLOSCOPE)<<"Restarted flow @ " << QTime::currentTime().toString("hh:mm:ss") <<"restart took " << t.elapsed() << "ms";
+		qDebug(CAT_OSCILLOSCOPE)
+			<< "Restarted flow @ "
+			<< QTime::currentTime().toString("hh:mm:ss")
+			<< "restart took " << t.elapsed() << "ms";
 	}
 	restartFlowCounter--;
 }
 
-void Oscilloscope::autosetNextStep()
-{
-	static int prevmaxindex=0;
+void Oscilloscope::autosetNextStep() {
+	static int prevmaxindex = 0;
 	// Only consider tone valid if it's index is higher than a preset value
 	// This ensures that a good enough resolution bandwidth is achieved
-	if(autosetSampleRateCnt > 1){
+	if (autosetSampleRateCnt > 1) {
 		prevmaxindex = autosetFFTIndex;
 		setupAutosetFreqSweep();
 		toggle_blockchain_flow(true);
-	}
-	else
-	{
+	} else {
 		autosetFinalStep();
 	}
 }
@@ -4256,43 +4296,42 @@ void Oscilloscope::autosetFinalStep() {
 	double voltsperdiv = 1;
 	double triggerlevel = 0;
 
-	if(autoset_id[0]) {
+	if (autoset_id[0]) {
 		iio->disconnect(autoset_id[0]);
 		autoset_id[0] = nullptr;
 	}
 	autosetRequested = false;
-	if(ui->runSingleWidget->runButtonChecked())
+	if (ui->runSingleWidget->runButtonChecked())
 		runStopToggled(true);
 
 	// autoset frequency found
-	if(autosetFFTIndex>1) {
-		timebaseval = (1/autosetFrequency)/2;
-		voltsperdiv = (max(abs(autosetMaxAmpl),
-				   abs(autosetMinAmpl)))/5;
-		triggerlevel = (autosetMaxAmpl+autosetMinAmpl)/2;
+	if (autosetFFTIndex > 1) {
+		timebaseval = (1 / autosetFrequency) / 2;
+		voltsperdiv =
+			(max(abs(autosetMaxAmpl), abs(autosetMinAmpl))) / 5;
+		triggerlevel = (autosetMaxAmpl + autosetMinAmpl) / 2;
 	}
 
 	timeBase->setValue(timebaseval);
 	timeBase->stepUp();
 	timePosition->setValue(timeposval);
 	voltsPosition->setValue(voltspos);
-	if(voltsperdiv < 2e-2)
+	if (voltsperdiv < 2e-2)
 		voltsperdiv = 2e-2;
 	voltsPerDiv->setValue(voltsperdiv);
 	voltsPerDiv->stepUp();
 	trigger_settings.setTriggerSource(autosetChannel);
 	trigger_settings.setTriggerLevel(triggerlevel);
 	trigger_settings.setTriggerEnable(true);
-	trigger_settings.autoTriggerEnable();	
+	trigger_settings.autoTriggerEnable();
 	onTimePositionChanged(timePosition->value());
 }
 
-void Oscilloscope::singleCaptureDone()
-{
-	if (!symmBufferMode->isEnhancedMemDepth()
-			&& !plot_samples_sequentially) {
+void Oscilloscope::singleCaptureDone() {
+	if (!symmBufferMode->isEnhancedMemDepth() &&
+	    !plot_samples_sequentially) {
 		Q_EMIT activateExportButton();
-		if (ui->runSingleWidget->singleButtonChecked()){
+		if (ui->runSingleWidget->singleButtonChecked()) {
 			Q_EMIT startRunning(false);
 		}
 	}
@@ -4301,40 +4340,38 @@ void Oscilloscope::singleCaptureDone()
 	plot.repositionCursors();
 	scaleHistogramPlot(true);
 
-	if(autosetRequested)
-	{
+	if (autosetRequested) {
 		bool found = autosetFindFrequency();
-		if(found)
+		if (found)
 			autosetFindPeaks();
 		autosetNextStep();
 	}
 }
 
-void Oscilloscope::scaleHistogramPlot(bool newData)
-{
+void Oscilloscope::scaleHistogramPlot(bool newData) {
 	if (hist_plot.isZoomed() && newData) {
 		return;
 	}
 
 	for (int i = 0; i < nb_channels; i++) {
-		double min = plot.axisInterval(QwtAxisId(QwtPlot::yLeft, i)).minValue();
-		double max = plot.axisInterval(QwtAxisId(QwtPlot::yLeft, i)).maxValue();
+		double min = plot.axisInterval(QwtAxisId(QwtPlot::yLeft, i))
+				     .minValue();
+		double max = plot.axisInterval(QwtAxisId(QwtPlot::yLeft, i))
+				     .maxValue();
 
 		hist_plot.setYaxisSpan(i, min, max);
 	}
 	hist_plot.setAutoScaleX();
 }
 
-void Oscilloscope::onFilledScreen(bool full, unsigned int nb_samples)
-{
+void Oscilloscope::onFilledScreen(bool full, unsigned int nb_samples) {
 	if (nb_samples == active_plot_sample_count) {
 		d_shouldResetStreaming = full;
 		resetStreamingFlag(full);
 	}
 }
 
-void Oscilloscope::resetStreamingFlag(bool enable)
-{
+void Oscilloscope::resetStreamingFlag(bool enable) {
 	bool started = isIioManagerStarted();
 	if (started)
 		iio->lock();
@@ -4345,43 +4382,41 @@ void Oscilloscope::resetStreamingFlag(bool enable)
 	if (started)
 		iio->unlock();
 
-        if (enable && !d_displayOneBuffer) {
-                adc->getTrigger()->setStreamingFlag(true);
-        }
+	if (enable && !d_displayOneBuffer) {
+		adc->getTrigger()->setStreamingFlag(true);
+	}
 
 	/* Single capture done */
-	if ((symmBufferMode->isEnhancedMemDepth() || plot_samples_sequentially)
-			&& d_shouldResetStreaming) {
+	if ((symmBufferMode->isEnhancedMemDepth() ||
+	     plot_samples_sequentially) &&
+	    d_shouldResetStreaming) {
 		Q_EMIT activateExportButton();
-		if (ui->runSingleWidget->singleButtonChecked() && started){
+		if (ui->runSingleWidget->singleButtonChecked() && started) {
 			Q_EMIT startRunning(false);
 		}
 	}
 	d_shouldResetStreaming = false;
 }
 
-void Oscilloscope::cleanBuffersAllSinks()
-{
+void Oscilloscope::cleanBuffersAllSinks() {
 	this->qt_time_block->clean_buffers();
 
 	auto it = math_sinks.constBegin();
 	while (it != math_sinks.constEnd()) {
-		scope_sink_f::sptr math_sink = dynamic_pointer_cast<
-				scope_sink_f>(it.value().second);
+		scope_sink_f::sptr math_sink =
+			dynamic_pointer_cast<scope_sink_f>(it.value().second);
 		math_sink->clean_buffers();
 		++it;
 	}
 	qt_fft_block->clean_buffers();
 }
 
-void Oscilloscope::onIioDataRefillTimeout()
-{
+void Oscilloscope::onIioDataRefillTimeout() {
 	if (trigger_settings.triggerMode() == TriggerSettings::AUTO)
 		trigger_is_forced = true;
 }
 
-void Oscilloscope::onPlotNewData()
-{
+void Oscilloscope::onPlotNewData() {
 	// Flag the new received data as Triggered or Untriggered.
 	bool triggerOn = trigger_settings.triggerIsArmed();
 
@@ -4401,11 +4436,10 @@ void Oscilloscope::onPlotNewData()
 
 	updateBufferPreviewer();
 
-	trigger_input = true; //used to read trigger status from Js
+	trigger_input = true; // used to read trigger status from Js
 }
 
-void Oscilloscope::onTriggerModeChanged(int mode)
-{
+void Oscilloscope::onTriggerModeChanged(int mode) {
 	if (mode == 0) { // normal
 		triggerUpdater->setIdleState(CapturePlot::Waiting);
 		triggerUpdater->setInput(CapturePlot::Waiting);
@@ -4415,8 +4449,7 @@ void Oscilloscope::onTriggerModeChanged(int mode)
 	}
 }
 
-void Oscilloscope::updateBufferPreviewer()
-{
+void Oscilloscope::updateBufferPreviewer() {
 	// Time interval within the plot canvas
 	QwtInterval plotInterval = plot.axisInterval(QwtPlot::xBottom);
 
@@ -4426,29 +4459,32 @@ void Oscilloscope::updateBufferPreviewer()
 	long long totalSamples = last_set_sample_count;
 
 	if (totalSamples > 0) {
-		dataInterval.setMinValue(triggerSamples / m2k_adc->readSampleRate());
-		dataInterval.setMaxValue((triggerSamples + totalSamples)
-			/ m2k_adc->readSampleRate());
+		dataInterval.setMinValue(triggerSamples /
+					 m2k_adc->readSampleRate());
+		dataInterval.setMaxValue((triggerSamples + totalSamples) /
+					 m2k_adc->readSampleRate());
 	}
 
 	// Use the two intervals to determine the width and position of the
 	// waveform and of the highlighted area
 	QwtInterval fullInterval = plotInterval | dataInterval;
-	double wPos = 1 - (fullInterval.maxValue() - dataInterval.minValue()) /
-		fullInterval.width();
+	double wPos = 1 -
+		(fullInterval.maxValue() - dataInterval.minValue()) /
+			fullInterval.width();
 	double wWidth = dataInterval.width() / fullInterval.width();
 
-	double hPos = 1 - (fullInterval.maxValue() - plotInterval.minValue()) /
-		fullInterval.width();
+	double hPos = 1 -
+		(fullInterval.maxValue() - plotInterval.minValue()) /
+			fullInterval.width();
 	double hWidth = plotInterval.width() / fullInterval.width();
 
 	// Determine the cursor position
-	QwtInterval containerInterval = (totalSamples > 0) ? dataInterval :
-		fullInterval;
+	QwtInterval containerInterval =
+		(totalSamples > 0) ? dataInterval : fullInterval;
 	double containerWidth = (totalSamples > 0) ? wWidth : 1;
 	double containerPos = (totalSamples > 0) ? wPos : 0;
-	double cPosInContainer = 1 - (containerInterval.maxValue() - 0) /
-		containerInterval.width();
+	double cPosInContainer = 1 -
+		(containerInterval.maxValue() - 0) / containerInterval.width();
 	double cPos = cPosInContainer * containerWidth + containerPos;
 
 	// Update the widget
@@ -4459,8 +4495,7 @@ void Oscilloscope::updateBufferPreviewer()
 	buffer_previewer->setCursorPos(cPos);
 }
 
-void Oscilloscope::on_btnSettings_clicked(bool checked)
-{
+void Oscilloscope::on_btnSettings_clicked(bool checked) {
 	CustomPushButton *btn = nullptr;
 
 	if (checked && !menuOrder.isEmpty()) {
@@ -4474,8 +4509,7 @@ void Oscilloscope::on_btnSettings_clicked(bool checked)
 	btn->setChecked(checked);
 }
 
-void Oscilloscope::updateGainMode()
-{
+void Oscilloscope::updateGainMode() {
 
 	if (current_ch_widget >= nb_channels) {
 		return;
@@ -4483,14 +4517,15 @@ void Oscilloscope::updateGainMode()
 
 	double offset = plot.VertOffset(current_ch_widget);
 	QwtInterval hw_input_itv(-2.5 + offset, 2.5 + offset);
-	QwtInterval plot_vert_itv = plot.axisScaleDiv(
-		QwtAxisId(QwtPlot::yLeft, current_ch_widget)).interval();
+	QwtInterval plot_vert_itv =
+		plot.axisScaleDiv(QwtAxisId(QwtPlot::yLeft, current_ch_widget))
+			.interval();
 
 	// If max signal span that can be captured is smaller than the plot
 	// screen try to increase the range (switch to low gain mode)
 	if (plot_vert_itv.minValue() < hw_input_itv.minValue() ||
-		plot_vert_itv.maxValue() > hw_input_itv.maxValue() ||
-			std::abs(offset) > 5.0) {
+	    plot_vert_itv.maxValue() > hw_input_itv.maxValue() ||
+	    std::abs(offset) > 5.0) {
 		if (high_gain_modes[current_ch_widget]) {
 			high_gain_modes[current_ch_widget] = false;
 			bool running = ui->runSingleWidget->runButtonChecked();
@@ -4501,14 +4536,14 @@ void Oscilloscope::updateGainMode()
 			if (running)
 				toggle_blockchain_flow(true);
 
-			auto adc_range = m2k_adc->inputRange(
-					M2kAdc::LOW_GAIN_MODE);
+			auto adc_range =
+				m2k_adc->inputRange(M2kAdc::LOW_GAIN_MODE);
 			trigger_settings.setTriggerLevelRange(current_ch_widget,
-				adc_range);
-			auto hyst_range = QPair<double, double>(
-				0, adc_range.second / 10);
+							      adc_range);
+			auto hyst_range =
+				QPair<double, double>(0, adc_range.second / 10);
 			trigger_settings.setTriggerHystRange(current_ch_widget,
-				hyst_range);
+							     hyst_range);
 		}
 	} else {
 		if (!high_gain_modes[current_ch_widget]) {
@@ -4521,72 +4556,66 @@ void Oscilloscope::updateGainMode()
 			if (running)
 				toggle_blockchain_flow(true);
 
-			auto adc_range = m2k_adc->inputRange(
-					M2kAdc::LOW_GAIN_MODE);
+			auto adc_range =
+				m2k_adc->inputRange(M2kAdc::LOW_GAIN_MODE);
 			trigger_settings.setTriggerLevelRange(current_ch_widget,
-				adc_range);
-			auto hyst_range = QPair<double, double>(
-				0, adc_range.second / 10);
+							      adc_range);
+			auto hyst_range =
+				QPair<double, double>(0, adc_range.second / 10);
 			trigger_settings.setTriggerHystRange(current_ch_widget,
-				hyst_range);
+							     hyst_range);
 		}
 	}
 }
 
-void Oscilloscope::setGainMode(uint chnIdx, M2kAdc::GainMode gain_mode)
-{
+void Oscilloscope::setGainMode(uint chnIdx, M2kAdc::GainMode gain_mode) {
 	if (ui->runSingleWidget->runButtonChecked())
 		m2k_adc->setChnHwGainMode(chnIdx, gain_mode);
 
 	boost::shared_ptr<adc_sample_conv> block =
-	dynamic_pointer_cast<adc_sample_conv>(
-					adc_samp_conv_block);
+		dynamic_pointer_cast<adc_sample_conv>(adc_samp_conv_block);
 
 	block->setHardwareGain(chnIdx, m2k_adc->gainAt(gain_mode));
 	trigger_settings.updateHwVoltLevels(chnIdx);
 }
 
-void Oscilloscope::setChannelHwOffset(uint chnIdx, double offset)
-{
+void Oscilloscope::setChannelHwOffset(uint chnIdx, double offset) {
 	channel_offset[chnIdx] = offset;
 	if (ui->runSingleWidget->runButtonChecked())
 		m2k_adc->setChnHwOffset(chnIdx, offset);
 
 	// Compensate the offset set in hardware
 	boost::shared_ptr<adc_sample_conv> block =
-		dynamic_pointer_cast<adc_sample_conv>(
-					adc_samp_conv_block);
+		dynamic_pointer_cast<adc_sample_conv>(adc_samp_conv_block);
 	block->setOffset(chnIdx, -offset);
 }
 
-void Oscilloscope::setAllSinksSampleCount(unsigned long sample_count)
-{
+void Oscilloscope::setAllSinksSampleCount(unsigned long sample_count) {
 	this->qt_time_block->set_nsamps(sample_count);
 	this->qt_xy_block->set_nsamps(sample_count);
 	this->qt_hist_block->set_nsamps(sample_count);
 
 	auto it = math_sinks.constBegin();
 	while (it != math_sinks.constEnd()) {
-		scope_sink_f::sptr math_sink = dynamic_pointer_cast<
-				scope_sink_f>(it.value().second);
+		scope_sink_f::sptr math_sink =
+			dynamic_pointer_cast<scope_sink_f>(it.value().second);
 		math_sink->set_nsamps(sample_count);
 		++it;
 	}
 	this->qt_fft_block->set_nsamps(fft_plot_size);
 }
 
-void Oscilloscope::writeAllSettingsToHardware()
-{
+void Oscilloscope::writeAllSettingsToHardware() {
 	// Sample Rate
 	if (active_sample_rate != adc->sampleRate())
 		adc->setSampleRate(active_sample_rate);
 
-
 	// Offset and Gain
 	if (m2k_adc) {
 		for (uint i = 0; i < nb_channels; i++) {
-			M2kAdc::GainMode mode = high_gain_modes[i] ?
-				M2kAdc::HIGH_GAIN_MODE : M2kAdc::LOW_GAIN_MODE;
+			M2kAdc::GainMode mode = high_gain_modes[i]
+				? M2kAdc::HIGH_GAIN_MODE
+				: M2kAdc::LOW_GAIN_MODE;
 			m2k_adc->setChnHwGainMode(i, mode);
 
 			m2k_adc->setChnHwOffset(i, channel_offset[i]);
@@ -4602,8 +4631,7 @@ void Oscilloscope::writeAllSettingsToHardware()
 	trigger_settings.setAdcRunningState(true);
 }
 
-void Oscilloscope::on_xyPlotLineType_toggled(bool checked)
-{
+void Oscilloscope::on_xyPlotLineType_toggled(bool checked) {
 	if (checked) {
 		xy_plot.setLineStyle(0, Qt::NoPen);
 		xy_plot.setLineMarker(0, QwtSymbol::Ellipse);
@@ -4614,8 +4642,7 @@ void Oscilloscope::on_xyPlotLineType_toggled(bool checked)
 	xy_plot.replot();
 }
 
-void Oscilloscope::setup_xy_channels()
-{
+void Oscilloscope::setup_xy_channels() {
 	int x = gsettings_ui->cmb_x_channel->currentIndex();
 	int y = gsettings_ui->cmb_y_channel->currentIndex();
 	QWidget *xsw = xy_plot.axisWidget(QwtPlot::xBottom);
@@ -4626,7 +4653,7 @@ void Oscilloscope::setup_xy_channels()
 		QString("color: %1").arg(plot.getLineColor(y).name()));
 
 	// If XY visible, reconnect the data flow
-	if(xy_is_visible)
+	if (xy_is_visible)
 		onXY_view_toggled(true);
 
 	xy_plot.setHorizUnitsPerDiv(plot.VertUnitsPerDiv(x));
@@ -4635,40 +4662,34 @@ void Oscilloscope::setup_xy_channels()
 	updateXyPlotScales();
 }
 
-void Oscilloscope::on_btnAddMath_toggled(bool checked)
-{
+void Oscilloscope::on_btnAddMath_toggled(bool checked) {
 	triggerRightMenuToggle(
 		static_cast<CustomPushButton *>(QObject::sender()), checked);
 }
 
-void Oscilloscope::on_btnCursors_toggled(bool checked)
-{
+void Oscilloscope::on_btnCursors_toggled(bool checked) {
 	triggerRightMenuToggle(
 		static_cast<CustomPushButton *>(QObject::sender()), checked);
 }
 
-void Oscilloscope::on_btnMeasure_toggled(bool checked)
-{
+void Oscilloscope::on_btnMeasure_toggled(bool checked) {
 	triggerRightMenuToggle(
 		static_cast<CustomPushButton *>(QObject::sender()), checked);
 }
 
-void Oscilloscope::on_btnTrigger_toggled(bool checked)
-{
+void Oscilloscope::on_btnTrigger_toggled(bool checked) {
 	triggerRightMenuToggle(
 		static_cast<CustomPushButton *>(QObject::sender()), checked);
 }
 
-void Oscilloscope::on_btnGeneralSettings_toggled(bool checked)
-{
+void Oscilloscope::on_btnGeneralSettings_toggled(bool checked) {
 	triggerRightMenuToggle(
 		static_cast<CustomPushButton *>(QObject::sender()), checked);
-	if(checked)
+	if (checked)
 		ui->btnSettings->setChecked(!checked);
 }
 
-void Oscilloscope::channelLineWidthChanged(int id)
-{
+void Oscilloscope::channelLineWidthChanged(int id) {
 	qreal width = 0.5 * (id + 1);
 
 	if (width != plot.getLineWidthF(current_ch_widget)) {

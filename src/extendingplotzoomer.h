@@ -6,10 +6,9 @@
 #include <qwt_plot_shapeitem.h>
 
 namespace adiscope {
-class ExtendingPlotZoomer : public LimitedPlotZoomer
-{
+class ExtendingPlotZoomer : public LimitedPlotZoomer {
 public:
-	explicit ExtendingPlotZoomer(QWidget*, bool doReplot = false);
+	explicit ExtendingPlotZoomer(QWidget *, bool doReplot = false);
 	virtual ~ExtendingPlotZoomer();
 
 protected:
@@ -22,9 +21,9 @@ private:
 	mutable bool extendWidth;
 	mutable bool extendHeight;
 
-	QVector<QwtPlotShapeItem*> cornerMarkers;
-	QVector<QwtPlotShapeItem*> extendMarkers;
+	QVector<QwtPlotShapeItem *> cornerMarkers;
+	QVector<QwtPlotShapeItem *> extendMarkers;
 };
-}
+} // namespace adiscope
 
 #endif // EXTENDINGPLOTZOOMER_H

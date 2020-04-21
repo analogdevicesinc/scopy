@@ -24,8 +24,7 @@
 
 namespace adiscope {
 
-class MouseWheelWidgetGuard : public QObject
-{
+class MouseWheelWidgetGuard : public QObject {
 public:
 	explicit MouseWheelWidgetGuard(QObject *parent);
 	void installEventRecursively(QWidget *parentWidget);
@@ -34,6 +33,6 @@ protected:
 	bool eventFilter(QObject *, QEvent *) override;
 };
 
-}
+} // namespace adiscope
 
 #endif

@@ -20,30 +20,29 @@
 #ifndef CUSTOM_SCALE_HPP
 #define CUSTOM_SCALE_HPP
 
-#include <qwt_thermo.h>
-
 #include "autoScaler.hpp"
 
+#include <qwt_thermo.h>
+
 namespace adiscope {
-	class CustomScale : public QwtThermo
-	{
-		Q_OBJECT
+class CustomScale : public QwtThermo {
+	Q_OBJECT
 
-		public:
-			explicit CustomScale(QWidget *parent = nullptr);
-			~CustomScale();
+public:
+	explicit CustomScale(QWidget *parent = nullptr);
+	~CustomScale();
 
-		public Q_SLOTS:
-			void setValue(double);
-			void start();
-			void stop();
+public Q_SLOTS:
+	void setValue(double);
+	void start();
+	void stop();
 
-		private Q_SLOTS:
-			void updateScale(const QwtScaleDiv);
+private Q_SLOTS:
+	void updateScale(const QwtScaleDiv);
 
-		private:
-			AutoScaler *scaler;
-	};
-}
+private:
+	AutoScaler *scaler;
+};
+} // namespace adiscope
 
 #endif /* CUSTOM_SCALE_HPP */

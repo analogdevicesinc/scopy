@@ -18,6 +18,7 @@
  */
 
 #include "average.h"
+
 #include <algorithm>
 #include <cstring>
 
@@ -26,9 +27,8 @@ using namespace adiscope;
 /*
  * class SpectrumAverage
  */
-SpectrumAverage::SpectrumAverage(unsigned int data_width, unsigned int history):
-	m_data_width(data_width), m_history_size(history)
-{
+SpectrumAverage::SpectrumAverage(unsigned int data_width, unsigned int history)
+	: m_data_width(data_width), m_history_size(history) {
 	if (data_width < 1)
 		m_data_width = 1;
 
@@ -38,83 +38,60 @@ SpectrumAverage::SpectrumAverage(unsigned int data_width, unsigned int history):
 	m_average = new double[m_data_width];
 }
 
-SpectrumAverage::~SpectrumAverage()
-{
-	delete[] m_average;
-}
+SpectrumAverage::~SpectrumAverage() { delete[] m_average; }
 
 void SpectrumAverage::getAverage(double *out_data,
-	unsigned int num_samples) const
-{
+				 unsigned int num_samples) const {
 	unsigned int size = std::min(m_data_width, num_samples);
 
 	std::memcpy(out_data, m_average, size * sizeof(double));
 }
 
-unsigned int SpectrumAverage::dataWidth() const
-{
-	return m_data_width;
-}
+unsigned int SpectrumAverage::dataWidth() const { return m_data_width; }
 
-unsigned int SpectrumAverage::history() const
-{
-	return m_history_size;
-}
+unsigned int SpectrumAverage::history() const { return m_history_size; }
 
 /*
  * class AverageHistoryOne
  */
-AverageHistoryOne::AverageHistoryOne(unsigned int data_width, unsigned history):
-	SpectrumAverage(data_width, history), m_anyDataPushed(false)
-{
-}
+AverageHistoryOne::AverageHistoryOne(unsigned int data_width, unsigned history)
+	: SpectrumAverage(data_width, history), m_anyDataPushed(false) {}
 
-void AverageHistoryOne::reset()
-{
-	m_anyDataPushed = false;
-}
+void AverageHistoryOne::reset() { m_anyDataPushed = false; }
 
 /*
  * class AverageHistoryN
  */
-AverageHistoryN::AverageHistoryN(unsigned int data_width, unsigned int history):
-	SpectrumAverage(data_width, history), m_insert_index(0),
-	m_inserted_count(0)
-{
+AverageHistoryN::AverageHistoryN(unsigned int data_width, unsigned int history)
+	: SpectrumAverage(data_width, history)
+	, m_insert_index(0)
+	, m_inserted_count(0) {
 	alloc_history(m_data_width, m_history_size);
 }
 
-AverageHistoryN::~AverageHistoryN()
-{
-	free_history();
-}
+AverageHistoryN::~AverageHistoryN() { free_history(); }
 
-void AverageHistoryN::reset()
-{
+void AverageHistoryN::reset() {
 	m_inserted_count = 0;
 	m_insert_index = 0;
 }
 
 void AverageHistoryN::alloc_history(unsigned int data_width,
-	unsigned int history_size)
-{
-	m_history = new double*[history_size];
+				    unsigned int history_size) {
+	m_history = new double *[history_size];
 	for (unsigned int i = 0; i < history_size; i++)
 		m_history[i] = new double[data_width];
-
 }
 
-void AverageHistoryN::free_history()
-{
+void AverageHistoryN::free_history() {
 	for (unsigned int i = 0; i < m_history_size; i++)
 		delete[] m_history[i];
 	delete[] m_history;
 }
 
-void AverageHistoryN::pushNewData(double *data)
-{
+void AverageHistoryN::pushNewData(double *data) {
 	std::memcpy(m_history[m_insert_index], data,
-		m_data_width * sizeof(double));
+		    m_data_width * sizeof(double));
 	m_insert_index = (m_insert_index + 1) % m_history_size;
 	m_inserted_count = std::min(m_inserted_count + 1, m_history_size);
 }
@@ -123,12 +100,10 @@ void AverageHistoryN::pushNewData(double *data)
  * class PeakHoldContinuous
  */
 PeakHoldContinuous::PeakHoldContinuous(unsigned int data_width,
-	unsigned int history): AverageHistoryOne(data_width, history)
-{
-}
+				       unsigned int history)
+	: AverageHistoryOne(data_width, history) {}
 
-void PeakHoldContinuous::pushNewData(double *data)
-{
+void PeakHoldContinuous::pushNewData(double *data) {
 	if (m_anyDataPushed) {
 		for (unsigned int i = 0; i < m_data_width; i++)
 			m_average[i] = std::max(data[i], m_average[i]);
@@ -142,12 +117,10 @@ void PeakHoldContinuous::pushNewData(double *data)
  * class MinHoldContinuous
  */
 MinHoldContinuous::MinHoldContinuous(unsigned int data_width,
-	unsigned int history): AverageHistoryOne(data_width, history)
-{
-}
+				     unsigned int history)
+	: AverageHistoryOne(data_width, history) {}
 
-void MinHoldContinuous::pushNewData(double *data)
-{
+void MinHoldContinuous::pushNewData(double *data) {
 	if (m_anyDataPushed) {
 		for (unsigned int i = 0; i < m_data_width; i++)
 			m_average[i] = std::min(data[i], m_average[i]);
@@ -160,17 +133,15 @@ void MinHoldContinuous::pushNewData(double *data)
 /*
  * class ExponentialRMS
  */
-ExponentialRMS::ExponentialRMS(unsigned int data_width, unsigned int history):
-	AverageHistoryOne(data_width, history)
-{
-}
+ExponentialRMS::ExponentialRMS(unsigned int data_width, unsigned int history)
+	: AverageHistoryOne(data_width, history) {}
 
-void ExponentialRMS::pushNewData(double *data)
-{
+void ExponentialRMS::pushNewData(double *data) {
 	if (m_anyDataPushed) {
 		for (unsigned int i = 0; i < m_data_width; i++)
-			m_average[i] = (data[i] * data[i] + (m_history_size - 1)
-				* m_average[i]) / m_history_size;
+			m_average[i] = (data[i] * data[i] +
+					(m_history_size - 1) * m_average[i]) /
+				m_history_size;
 	} else {
 		for (unsigned int i = 0; i < m_data_width; i++)
 			m_average[i] = data[i] * data[i];
@@ -181,17 +152,16 @@ void ExponentialRMS::pushNewData(double *data)
 /*
  * class ExponentialAverage
  */
-ExponentialAverage::ExponentialAverage(unsigned int data_width, unsigned int history):
-	AverageHistoryOne(data_width, history)
-{
-}
+ExponentialAverage::ExponentialAverage(unsigned int data_width,
+				       unsigned int history)
+	: AverageHistoryOne(data_width, history) {}
 
-void ExponentialAverage::pushNewData(double *data)
-{
+void ExponentialAverage::pushNewData(double *data) {
 	if (m_anyDataPushed) {
 		for (unsigned int i = 0; i < m_data_width; i++)
-			m_average[i] = (data[i] + (m_history_size - 1)
-				* m_average[i]) / m_history_size;
+			m_average[i] = (data[i] +
+					(m_history_size - 1) * m_average[i]) /
+				m_history_size;
 	} else {
 		std::memcpy(m_average, data, m_data_width * sizeof(double));
 		m_anyDataPushed = true;
@@ -201,13 +171,10 @@ void ExponentialAverage::pushNewData(double *data)
 /*
  * class PeakHold
  */
-PeakHold::PeakHold(unsigned int data_width, unsigned int history):
-	AverageHistoryN(data_width, history)
-{
-}
+PeakHold::PeakHold(unsigned int data_width, unsigned int history)
+	: AverageHistoryN(data_width, history) {}
 
-void PeakHold::pushNewData(double *data)
-{
+void PeakHold::pushNewData(double *data) {
 	double *peaks = m_average;
 
 	if (m_inserted_count == 0 || m_history_size == 1) {
@@ -231,8 +198,7 @@ void PeakHold::pushNewData(double *data)
 	AverageHistoryN::pushNewData(data);
 }
 
-double PeakHold::getPeakFromHistoryColumn(unsigned int col)
-{
+double PeakHold::getPeakFromHistoryColumn(unsigned int col) {
 	if (m_inserted_count < 2)
 		return m_history[0][col];
 
@@ -250,13 +216,10 @@ double PeakHold::getPeakFromHistoryColumn(unsigned int col)
 /*
  * class MinHold
  */
-MinHold::MinHold(unsigned int data_width, unsigned int history):
-	AverageHistoryN(data_width, history)
-{
-}
+MinHold::MinHold(unsigned int data_width, unsigned int history)
+	: AverageHistoryN(data_width, history) {}
 
-void MinHold::pushNewData(double *data)
-{
+void MinHold::pushNewData(double *data) {
 	double *mins = m_average;
 
 	if (m_inserted_count == 0 || m_history_size == 1) {
@@ -280,8 +243,7 @@ void MinHold::pushNewData(double *data)
 	AverageHistoryN::pushNewData(data);
 }
 
-double MinHold::getMinFromHistoryColumn(unsigned int col)
-{
+double MinHold::getMinFromHistoryColumn(unsigned int col) {
 	if (m_inserted_count < 2)
 		return m_history[0][col];
 
@@ -299,19 +261,14 @@ double MinHold::getMinFromHistoryColumn(unsigned int col)
 /*
  * class LinearRMS
  */
-LinearRMS::LinearRMS(unsigned int data_width, unsigned int history):
-	AverageHistoryN(data_width, history)
-{
+LinearRMS::LinearRMS(unsigned int data_width, unsigned int history)
+	: AverageHistoryN(data_width, history) {
 	m_sqr_sums = new double[data_width]();
 }
 
-LinearRMS::~LinearRMS()
-{
-	delete[] m_sqr_sums;
-}
+LinearRMS::~LinearRMS() { delete[] m_sqr_sums; }
 
-void LinearRMS::pushNewData(double *data)
-{
+void LinearRMS::pushNewData(double *data) {
 	if (m_inserted_count != m_history_size) {
 		for (unsigned int i = 0; i < m_data_width; i++) {
 			m_sqr_sums[i] += (data[i] * data[i]);
@@ -319,7 +276,7 @@ void LinearRMS::pushNewData(double *data)
 	} else {
 		for (unsigned int i = 0; i < m_data_width; i++) {
 			m_sqr_sums[i] -= (m_history[m_insert_index][i] *
-				m_history[m_insert_index][i]);
+					  m_history[m_insert_index][i]);
 			m_sqr_sums[i] += (data[i] * data[i]);
 		}
 	}
@@ -328,16 +285,14 @@ void LinearRMS::pushNewData(double *data)
 	AverageHistoryN::pushNewData(data);
 }
 
-void LinearRMS::getAverage(double *out_data, unsigned int num_samples) const
-{
+void LinearRMS::getAverage(double *out_data, unsigned int num_samples) const {
 	unsigned int num = std::min(m_data_width, num_samples);
 
 	for (unsigned int i = 0; i < num; i++)
 		out_data[i] = m_sqr_sums[i] / m_inserted_count;
 }
 
-void LinearRMS::reset()
-{
+void LinearRMS::reset() {
 	std::fill_n(m_sqr_sums, m_data_width, 0);
 	AverageHistoryN::reset();
 }
@@ -345,19 +300,14 @@ void LinearRMS::reset()
 /*
  * class LinearAverage
  */
-LinearAverage::LinearAverage(unsigned int data_width, unsigned int history):
-	AverageHistoryN(data_width, history)
-{
+LinearAverage::LinearAverage(unsigned int data_width, unsigned int history)
+	: AverageHistoryN(data_width, history) {
 	m_sums = new double[data_width]();
 }
 
-LinearAverage::~LinearAverage()
-{
-	delete[] m_sums;
-}
+LinearAverage::~LinearAverage() { delete[] m_sums; }
 
-void LinearAverage::pushNewData(double *data)
-{
+void LinearAverage::pushNewData(double *data) {
 	if (m_inserted_count != m_history_size) {
 		for (unsigned int i = 0; i < m_data_width; i++) {
 			m_sums[i] += data[i];
@@ -373,16 +323,15 @@ void LinearAverage::pushNewData(double *data)
 	AverageHistoryN::pushNewData(data);
 }
 
-void LinearAverage::getAverage(double *out_data, unsigned int num_samples) const
-{
+void LinearAverage::getAverage(double *out_data,
+			       unsigned int num_samples) const {
 	unsigned int num = std::min(m_data_width, num_samples);
 
 	for (unsigned int i = 0; i < num; i++)
 		out_data[i] = m_sums[i] / m_inserted_count;
 }
 
-void LinearAverage::reset()
-{
+void LinearAverage::reset() {
 	std::fill_n(m_sums, m_data_width, 0);
 	AverageHistoryN::reset();
 }

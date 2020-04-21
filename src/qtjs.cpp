@@ -6,46 +6,41 @@
 #include "qtjs.hpp"
 
 #include <QApplication>
+#include <QElapsedTimer>
 #include <QJSEngine>
 #include <QMetaProperty>
 #include <QThread>
-#include <QElapsedTimer>
 #include <QtConcurrent>
-#include <thread>
+
 #include <iostream>
+#include <thread>
 
 using std::cout;
 using namespace adiscope;
 
-QtJs::QtJs(QJSEngine *engine) : QObject(engine)
-{
+QtJs::QtJs(QJSEngine *engine) : QObject(engine) {
 	QJSValue js_obj = engine->newQObject(this);
 	auto meta = metaObject();
 	input = "";
 
-	for (unsigned int i = meta->methodOffset();
-			i < meta->methodCount(); i++) {
+	for (unsigned int i = meta->methodOffset(); i < meta->methodCount();
+	     i++) {
 		QString name(meta->method(i).name());
 
 		engine->globalObject().setProperty(name, js_obj.property(name));
 	}
 
-	engine->globalObject().setProperty("inspect",
-			engine->evaluate("function(o) { for (each in o) { print(each); } }"));
+	engine->globalObject().setProperty(
+		"inspect",
+		engine->evaluate(
+			"function(o) { for (each in o) { print(each); } }"));
 }
 
-void QtJs::exit()
-{
-	QApplication::closeAllWindows();
-}
+void QtJs::exit() { QApplication::closeAllWindows(); }
 
-void QtJs::sleep(unsigned long s)
-{
-	msleep(s * 1000);
-}
+void QtJs::sleep(unsigned long s) { msleep(s * 1000); }
 
-void QtJs::msleep(unsigned long ms)
-{
+void QtJs::msleep(unsigned long ms) {
 	QElapsedTimer timer;
 
 	timer.start();
@@ -55,13 +50,11 @@ void QtJs::msleep(unsigned long ms)
 	}
 }
 
-void QtJs::printToConsole(const QString& text)
-{
+void QtJs::printToConsole(const QString &text) {
 	cout << text.toStdString() << std::endl;
 }
 
-QString QtJs::readFromConsole(const QString& request)
-{
+QString QtJs::readFromConsole(const QString &request) {
 	bool done = false;
 	input = "";
 
@@ -81,8 +74,7 @@ QString QtJs::readFromConsole(const QString& request)
 	return input;
 }
 
-QString QtJs::readInput()
-{
+QString QtJs::readInput() {
 	std::string in;
 	std::cin >> in;
 	return QString::fromStdString(in);

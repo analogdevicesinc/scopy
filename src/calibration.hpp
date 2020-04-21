@@ -24,14 +24,14 @@
 
 #include <cstdint>
 #include <cstdlib>
-#include <string>
 #include <memory>
+#include <string>
 
 extern "C" {
-	struct iio_context;
-	struct iio_device;
-	struct iio_channel;
-	struct iio_buffer;
+struct iio_context;
+struct iio_device;
+struct iio_channel;
+struct iio_buffer;
 }
 
 namespace adiscope {
@@ -40,23 +40,13 @@ class M2kAdc;
 class M2kDac;
 class Calibration_API;
 
-class Calibration
-{
+class Calibration {
 	friend class Calibration_API;
 
 public:
-	enum calibration_mode {
-		ADC_REF1,
-		ADC_REF2,
-		ADC_GND,
-		DAC,
-		NONE
-	};
+	enum calibration_mode { ADC_REF1, ADC_REF2, ADC_GND, DAC, NONE };
 
-        enum gain_mode {
-                LOW,
-                HIGH
-        };
+	enum gain_mode { LOW, HIGH };
 
 	Calibration(struct iio_context *ctx, QJSEngine *engine,
 		    std::shared_ptr<M2kAdc> adc = nullptr,
@@ -89,7 +79,7 @@ public:
 	bool resetCalibration();
 	void updateCorrections();
 
-	double getIioDevTemp(const QString& devName) const;
+	double getIioDevTemp(const QString &devName) const;
 
 	static void setChannelEnableState(struct iio_channel *chn, bool en);
 	static double average(int16_t *data, size_t numElements);
@@ -107,10 +97,10 @@ private:
 	bool adc_data_capture(int16_t *dataCh0, int16_t *dataCh1,
 			      size_t num_sampl_per_chn);
 	bool fine_tune(size_t span, int16_t centerVal0, int16_t centerVal1,
-		size_t num_samples);
+		       size_t num_samples);
 
 	bool dacOutputDC(struct iio_device *dac, struct iio_channel *channel,
-		struct iio_buffer** buffer, size_t value);
+			 struct iio_buffer **buffer, size_t value);
 	bool dacAOutputDC(int16_t value);
 	bool dacBOutputDC(int16_t value);
 	void configHwSamplerate();
@@ -167,7 +157,6 @@ private:
 	bool m_initialized;
 	int m_calibration_mode;
 };
-
 
 } // namespace adiscope
 

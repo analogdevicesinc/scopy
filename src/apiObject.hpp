@@ -24,43 +24,44 @@
 
 class QJSEngine;
 class QSettings;
-template <typename T> class QList;
+template <typename T>
+class QList;
 
 namespace adiscope {
-	class ApiObject : public QObject
-	{
-		Q_OBJECT
+class ApiObject : public QObject {
+	Q_OBJECT
 
-	Q_SIGNALS:
-		void loadingFinished();
+Q_SIGNALS:
+	void loadingFinished();
 
-	public:
-		ApiObject();
-		~ApiObject();
+public:
+	ApiObject();
+	~ApiObject();
 
-		void load();
-		void save();
+	void load();
+	void save();
 
-		virtual void load(QSettings& settings);
-		virtual void save(QSettings& settings);
+	virtual void load(QSettings &settings);
+	virtual void save(QSettings &settings);
 
-		void js_register(QJSEngine *engine);
+	void js_register(QJSEngine *engine);
 
-	private:
-		template <typename T> void save(QSettings& settings,
-				const QString& prop, const QList<T>& list);
-		template <typename T> QList<T> load(QSettings& settings,
-				const QString& prop);
+private:
+	template <typename T>
+	void save(QSettings &settings, const QString &prop,
+		  const QList<T> &list);
+	template <typename T>
+	QList<T> load(QSettings &settings, const QString &prop);
 
-		void save(QSettings& settings, const QString& prop,
-				const QVariantList& list);
-		void load(QSettings& settings, const QString& prop,
-				const QVariantList& list);
+	void save(QSettings &settings, const QString &prop,
+		  const QVariantList &list);
+	void load(QSettings &settings, const QString &prop,
+		  const QVariantList &list);
 
-		void save_nogroup(ApiObject *, QSettings&);
-		void load_nogroup(ApiObject *, QSettings&);
-	};
-}
+	void save_nogroup(ApiObject *, QSettings &);
+	void load_nogroup(ApiObject *, QSettings &);
+};
+} // namespace adiscope
 
 Q_DECLARE_METATYPE(adiscope::ApiObject *)
 

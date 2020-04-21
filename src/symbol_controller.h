@@ -20,14 +20,14 @@
 #ifndef M2K_SYMBOL_CONTROLLER_H
 #define M2K_SYMBOL_CONTROLLER_H
 
+#include "symbol.h"
+
 #include <qpointer.h>
 #include <qwt_widget_overlay.h>
-#include "symbol.h"
 
 class QwtPlot;
 
-class SymbolController: public QObject
-{
+class SymbolController : public QObject {
 	Q_OBJECT
 
 public:

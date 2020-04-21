@@ -7,8 +7,7 @@ namespace Ui {
 class InfoWidget;
 }
 namespace adiscope {
-class InfoWidget : public QWidget
-{
+class InfoWidget : public QWidget {
 	Q_OBJECT
 
 public:
@@ -26,6 +25,6 @@ public Q_SLOTS:
 private Q_SLOTS:
 	void updatePosition();
 };
-}
+} // namespace adiscope
 
 #endif // INFO_WIDGET_H

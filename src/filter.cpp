@@ -19,34 +19,22 @@
 
 #include "filter.hpp"
 
-#include <cstdio>
+#include <iio.h>
 
 #include <QFile>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QStringList>
 
-#include <iio.h>
+#include <cstdio>
 
 using namespace adiscope;
 
 static const std::string tool_names[] = {
-	"osc",
-	"spectrum",
-	"network",
-	"siggen",
-	"logic",
-	"pattern",
-	"dio",
-	"dmm",
-	"power",
-	"debugger",
-	"calibration",
-	"launcher"
-};
+	"osc", "spectrum", "network", "siggen",   "logic",       "pattern",
+	"dio", "dmm",      "power",   "debugger", "calibration", "launcher"};
 
-Filter::Filter(const struct iio_context *ctx)
-{
+Filter::Filter(const struct iio_context *ctx) {
 	QFile file(":/filter.json");
 
 	file.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -73,8 +61,8 @@ Filter::Filter(const struct iio_context *ctx)
 			}
 
 			const auto str = value.toString().toStdString();
-			compatible = !!iio_context_find_device(
-					ctx, str.c_str());
+			compatible =
+				!!iio_context_find_device(ctx, str.c_str());
 			if (!compatible)
 				break;
 		}
@@ -91,32 +79,24 @@ Filter::Filter(const struct iio_context *ctx)
 	hwname = "generic";
 }
 
-Filter::~Filter()
-{
-}
+Filter::~Filter() {}
 
-QString& Filter::hw_name()
-{
-	return hwname;
-}
+QString &Filter::hw_name() { return hwname; }
 
-const std::string& Filter::tool_name(enum tool tool)
-{
+const std::string &Filter::tool_name(enum tool tool) {
 	return tool_names[tool];
 }
 
-bool Filter::compatible(enum tool tool) const
-{
+bool Filter::compatible(enum tool tool) const {
 	auto hdl = root["compatible"];
 	if (!hdl.isArray())
 		return false;
 	else
 		return hdl.toArray().contains(
-				QString::fromStdString((tool_names[tool])));
+			QString::fromStdString((tool_names[tool])));
 }
 
-bool Filter::usable(enum tool tool, const std::string &dev) const
-{
+bool Filter::usable(enum tool tool, const std::string &dev) const {
 	auto hdl = root[QString::fromStdString(tool_names[tool] + "-devices")];
 	if (hdl.isNull())
 		return true;
@@ -126,8 +106,7 @@ bool Filter::usable(enum tool tool, const std::string &dev) const
 	return hdl.toArray().contains(QString::fromStdString(dev));
 }
 
-const std::string Filter::device_name(enum tool tool, int idx) const
-{
+const std::string Filter::device_name(enum tool tool, int idx) const {
 	auto hdl = root[QString::fromStdString(tool_names[tool] + "-devices")];
 	if (hdl.isNull() || !hdl.isArray())
 		throw std::runtime_error("Tool not compatible");
@@ -139,25 +118,24 @@ const std::string Filter::device_name(enum tool tool, int idx) const
 	return array[idx].toString().toStdString();
 }
 
-struct iio_device * Filter::find_device(const struct iio_context *ctx,
-		enum tool tool, int idx) const
-{
+struct iio_device *Filter::find_device(const struct iio_context *ctx,
+				       enum tool tool, int idx) const {
 	return iio_context_find_device(ctx, device_name(tool, idx).c_str());
 }
 
-struct iio_channel * Filter::find_channel(const struct iio_context *ctx,
-		enum tool tool, int idx, bool output) const
-{
+struct iio_channel *Filter::find_channel(const struct iio_context *ctx,
+					 enum tool tool, int idx,
+					 bool output) const {
 	QString name = QString::fromStdString(device_name(tool, idx));
 
 	if (!name.contains(':'))
 		throw std::runtime_error("Filter entry not iio_channel");
 
-	struct iio_device *dev = iio_context_find_device(ctx,
-			name.section(':', 0, 0).toStdString().c_str());
+	struct iio_device *dev = iio_context_find_device(
+		ctx, name.section(':', 0, 0).toStdString().c_str());
 	if (!dev)
 		return nullptr;
 
-	return iio_device_find_channel(dev,
-			name.section(':', 1, 1).toStdString().c_str(), output);
+	return iio_device_find_channel(
+		dev, name.section(':', 1, 1).toStdString().c_str(), output);
 }

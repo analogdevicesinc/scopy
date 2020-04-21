@@ -2,27 +2,16 @@
 
 using namespace adiscope;
 
-ComboBoxLineEdit::ComboBoxLineEdit(QWidget *parent):
-	QLineEdit(parent)
-{
-}
+ComboBoxLineEdit::ComboBoxLineEdit(QWidget *parent) : QLineEdit(parent) {}
 
-void ComboBoxLineEdit::mouseReleaseEvent(QMouseEvent *event)
-{
+void ComboBoxLineEdit::mouseReleaseEvent(QMouseEvent *event) {
 	QWidget::mouseReleaseEvent(event);
 }
 
-void ComboBoxLineEdit::mousePressEvent(QMouseEvent *event)
-{
+void ComboBoxLineEdit::mousePressEvent(QMouseEvent *event) {
 	QWidget::mousePressEvent(event);
 }
 
-void ComboBoxLineEdit::enterEvent(QEvent *event)
-{
-	QWidget::enterEvent(event);
-}
+void ComboBoxLineEdit::enterEvent(QEvent *event) { QWidget::enterEvent(event); }
 
-void ComboBoxLineEdit::leaveEvent(QEvent *event)
-{
-	QWidget::leaveEvent(event);
-}
+void ComboBoxLineEdit::leaveEvent(QEvent *event) { QWidget::leaveEvent(event); }

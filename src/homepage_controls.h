@@ -20,16 +20,15 @@
 #ifndef HOMEPAGE_CONTROLS_H
 #define HOMEPAGE_CONTROLS_H
 
-#include <QWidget>
 #include <QString>
+#include <QWidget>
 
 namespace Ui {
 class HomepageControls;
 }
 
 namespace adiscope {
-class HomepageControls : public QWidget
-{
+class HomepageControls : public QWidget {
 	Q_OBJECT
 
 public:
@@ -50,5 +49,5 @@ Q_SIGNALS:
 private:
 	Ui::HomepageControls *ui;
 };
-}
+} // namespace adiscope
 #endif // HOMEPAGE_CONTROLS_H

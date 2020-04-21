@@ -1,10 +1,10 @@
 #ifndef DB_CLICK_BUTTONS_HPP
 #define DB_CLICK_BUTTONS_HPP
 
-#include <QWidget>
-#include <QPushButton>
 #include <QList>
+#include <QPushButton>
 #include <QString>
+#include <QWidget>
 
 namespace Ui {
 class DbClickButtons;
@@ -12,8 +12,7 @@ class DbClickButtons;
 
 namespace adiscope {
 
-class DbClickButtons: public QWidget
-{
+class DbClickButtons : public QWidget {
 	Q_OBJECT
 
 public:

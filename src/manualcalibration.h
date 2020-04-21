@@ -23,23 +23,23 @@
 #include <iio.h>
 
 /*Qt includes*/
+#include <QListWidgetItem>
 #include <QObject>
 #include <QString>
-#include <QListWidgetItem>
 #include <QTableWidget>
 
 /*Local includes*/
-#include "tool.hpp"
 #include "detachedWindow.hpp"
-#include "tool_launcher.hpp"
 #include "filter.hpp"
+#include "tool.hpp"
+#include "tool_launcher.hpp"
 
 class QJSEngine;
 
 namespace Ui {
 class ManualCalibration;
 class CalibrationTemplate;
-}
+} // namespace Ui
 
 namespace adiscope {
 
@@ -69,16 +69,10 @@ enum calibrations {
 	START_CALIB_PARAM
 };
 
-enum steps {
-	STEP1 = 0,
-	STEP2,
-	STEP3,
-	STEP4
-};
+enum steps { STEP1 = 0, STEP2, STEP3, STEP4 };
 
 class ManualCalibration_API;
-class ManualCalibration : public Tool
-{
+class ManualCalibration : public Tool {
 	friend class ManualCalibration_API;
 	friend class ToolLauncher_API;
 
@@ -86,8 +80,9 @@ class ManualCalibration : public Tool
 
 public:
 	explicit ManualCalibration(struct iio_context *ctx, Filter *filt,
-				   ToolMenuItem *toolMenuItem, QJSEngine *engine,
-				   ToolLauncher *parent = 0, Calibration *cal = 0);
+				   ToolMenuItem *toolMenuItem,
+				   QJSEngine *engine, ToolLauncher *parent = 0,
+				   Calibration *cal = 0);
 
 	~ManualCalibration();
 
@@ -149,7 +144,6 @@ private:
 	QMap<QString, int> calibOption;
 
 	QString calibrationFilePath;
-
 };
-}
+} // namespace adiscope
 #endif // MANUALCALIBRATION_H

@@ -24,9 +24,8 @@
 
 using namespace adiscope;
 
-Sismograph::Sismograph(QWidget *parent) : QwtPlot(parent),
-	curve("data"), sampleRate(10.0)
-{
+Sismograph::Sismograph(QWidget *parent)
+	: QwtPlot(parent), curve("data"), sampleRate(10.0) {
 	enableAxis(QwtPlot::xBottom, false);
 	enableAxis(QwtPlot::xTop, true);
 
@@ -47,8 +46,8 @@ Sismograph::Sismograph(QWidget *parent) : QwtPlot(parent),
 
 	scaler = new AutoScaler(this, divs);
 
-	connect(scaler, SIGNAL(updateScale(const QwtScaleDiv)),
-			this, SLOT(updateScale(const QwtScaleDiv)));
+	connect(scaler, SIGNAL(updateScale(const QwtScaleDiv)), this,
+		SLOT(updateScale(const QwtScaleDiv)));
 
 	setNumSamples(100);
 
@@ -58,70 +57,54 @@ Sismograph::Sismograph(QWidget *parent) : QwtPlot(parent),
 	curve.setXAxis(QwtPlot::xTop);
 }
 
-Sismograph::~Sismograph()
-{
-	delete scaler;
-}
+Sismograph::~Sismograph() { delete scaler; }
 
-void Sismograph::plot(double sample)
-{
+void Sismograph::plot(double sample) {
 	if (xdata.size() == numSamples + 1)
 		xdata.pop();
 
 	xdata.push(sample);
 	scaler->setValue(sample);
 
-	curve.setRawSamples(xdata.data(), ydata.data() + (ydata.size() -
-				xdata.size()), xdata.size());
+	curve.setRawSamples(xdata.data(),
+			    ydata.data() + (ydata.size() - xdata.size()),
+			    xdata.size());
 	replot();
 }
 
-int Sismograph::getNumSamples() const
-{
-	return numSamples;
-}
+int Sismograph::getNumSamples() const { return numSamples; }
 
-void Sismograph::setNumSamples(int num)
-{
-	numSamples = (unsigned int) num;
+void Sismograph::setNumSamples(int num) {
+	numSamples = (unsigned int)num;
 
 	reset();
 	ydata.resize(numSamples + 1);
 	xdata.reserve(numSamples + 1);
 
-	setAxisScale(QwtPlot::yLeft, (double) numSamples / sampleRate, 0.0);
+	setAxisScale(QwtPlot::yLeft, (double)numSamples / sampleRate, 0.0);
 
 	setSampleRate(sampleRate);
 	replot();
 
-	scaler->setTimeout((double) numSamples * 1000.0 / sampleRate);
+	scaler->setTimeout((double)numSamples * 1000.0 / sampleRate);
 }
 
-double Sismograph::getSampleRate() const
-{
-	return sampleRate;
-}
+double Sismograph::getSampleRate() const { return sampleRate; }
 
-void Sismograph::setSampleRate(double rate)
-{
+void Sismograph::setSampleRate(double rate) {
 	sampleRate = rate;
 
 	for (unsigned int i = 0; i <= numSamples; i++)
 		ydata[i] = (double)(numSamples - i) / sampleRate;
 }
 
-void Sismograph::reset()
-{
+void Sismograph::reset() {
 	xdata.clear();
 	scaler->startTimer();
 }
 
-void Sismograph::setColor(const QColor& color)
-{
-	curve.setPen(QPen(color));
-}
+void Sismograph::setColor(const QColor &color) { curve.setPen(QPen(color)); }
 
-void Sismograph::updateScale(const QwtScaleDiv div)
-{
+void Sismograph::updateScale(const QwtScaleDiv div) {
 	setAxisScale(QwtPlot::xTop, div.lowerBound(), div.upperBound());
 }

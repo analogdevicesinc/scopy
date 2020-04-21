@@ -25,8 +25,7 @@
 
 namespace adiscope {
 
-class StateUpdater: public QObject
-{
+class StateUpdater : public QObject {
 	Q_OBJECT
 
 public:

@@ -21,37 +21,26 @@
 #define FILEMANAGER_H
 
 #include <QString>
-#include <QVector>
 #include <QStringList>
+#include <QVector>
 
 #include <exception>
 #include <iostream>
 
-
 namespace adiscope {
-class FileManager
-{
+class FileManager {
 public:
+	enum FilePurpose { EXPORT, IMPORT };
 
-	enum FilePurpose {
-		EXPORT,
-		IMPORT
-	};
+	enum FileFormat { RAW, SCOPY };
 
-	enum FileFormat {
-		RAW,
-		SCOPY
-	};
-
-	enum FileType {
-		CSV,
-		TXT
-	};
+	enum FileType { CSV, TXT };
 
 	FileManager(QString toolName);
 	~FileManager();
 
-	void open(QString fileName, FileManager::FilePurpose filepurpose = EXPORT);
+	void open(QString fileName,
+		  FileManager::FilePurpose filepurpose = EXPORT);
 
 	void save(QVector<double> data, QString name);
 	void save(QVector<QVector<double>> data, QStringList column_names);
@@ -71,13 +60,12 @@ public:
 	void performWrite();
 
 	QStringList getAdditionalInformation() const;
-	void setAdditionalInformation(const QString& value);
+	void setAdditionalInformation(const QString &value);
 
 	FileFormat getFormat() const;
 	void setFormat(const FileFormat &value);
 
 private:
-
 	QVector<QVector<double>> data;
 	QStringList columnNames;
 	QString filename;
@@ -90,7 +78,6 @@ private:
 	QString separator;
 	QString toolName;
 	QStringList additionalInformation;
-
 };
 
 class ScopyFileHeader {
@@ -101,9 +88,9 @@ public:
 
 class FileManagerException : public std::runtime_error {
 public:
-	FileManagerException(const char* msg) : std::runtime_error(msg) {}
+	FileManagerException(const char *msg) : std::runtime_error(msg) {}
 	~FileManagerException() throw() {}
 };
-}
+} // namespace adiscope
 
 #endif // FILEMANAGER_H

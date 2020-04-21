@@ -20,55 +20,47 @@
 #ifndef SISMOGRAPH_HPP
 #define SISMOGRAPH_HPP
 
-#include <QVector>
-#include <QWidget>
-
-#include <qwt_plot.h>
-#include <qwt_plot_curve.h>
-
 #include "autoScaler.hpp"
 #include "customFifo.hpp"
 
+#include <QVector>
+#include <QWidget>
+#include <qwt_plot.h>
+#include <qwt_plot_curve.h>
+
 namespace adiscope {
-	class Sismograph : public QwtPlot
-	{
-		Q_OBJECT
+class Sismograph : public QwtPlot {
+	Q_OBJECT
 
-		Q_PROPERTY(int numSamples
-				READ getNumSamples
-				WRITE setNumSamples
-		)
+	Q_PROPERTY(int numSamples READ getNumSamples WRITE setNumSamples)
 
-		Q_PROPERTY(double sampleRate
-				READ getSampleRate
-				WRITE setSampleRate
-		)
+	Q_PROPERTY(double sampleRate READ getSampleRate WRITE setSampleRate)
 
-	public:
-		explicit Sismograph(QWidget *parent = nullptr);
-		~Sismograph();
+public:
+	explicit Sismograph(QWidget *parent = nullptr);
+	~Sismograph();
 
-		int getNumSamples() const;
-		void setNumSamples(int num);
+	int getNumSamples() const;
+	void setNumSamples(int num);
 
-		double getSampleRate() const;
-		void setSampleRate(double rate);
+	double getSampleRate() const;
+	void setSampleRate(double rate);
 
-	public Q_SLOTS:
-		void plot(double sample);
-		void reset();
-		void setColor(const QColor& color);
-		void updateScale(const QwtScaleDiv);
+public Q_SLOTS:
+	void plot(double sample);
+	void reset();
+	void setColor(const QColor &color);
+	void updateScale(const QwtScaleDiv);
 
-	private:
-		QwtPlotCurve curve;
-		unsigned int numSamples;
-		double sampleRate;
-		AutoScaler *scaler;
+private:
+	QwtPlotCurve curve;
+	unsigned int numSamples;
+	double sampleRate;
+	AutoScaler *scaler;
 
-		QVector<double> ydata;
-		CustomFifo<double> xdata;
-	};
-}
+	QVector<double> ydata;
+	CustomFifo<double> xdata;
+};
+} // namespace adiscope
 
 #endif /* SISMOGRAPH_HPP */

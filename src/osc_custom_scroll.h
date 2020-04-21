@@ -1,14 +1,13 @@
 #ifndef OSCCUSTOMSCROLL_H
 #define OSCCUSTOMSCROLL_H
 
-#include <QScrollArea>
 #include <QEvent>
-#include <QTimer>
+#include <QScrollArea>
 #include <QScroller>
+#include <QTimer>
 
 namespace adiscope {
-class OscCustomScrollArea : public QScrollArea
-{
+class OscCustomScrollArea : public QScrollArea {
 	Q_OBJECT
 public:
 	OscCustomScrollArea(QWidget *parent = 0);
@@ -20,9 +19,9 @@ public Q_SLOTS:
 private:
 	QScroller *scroll;
 	bool inside;
-	//QScrollBar *bar;
+	// QScrollBar *bar;
 	bool disableCursor;
 };
-}
+} // namespace adiscope
 
 #endif // OSCCUSTOMSCROLL_H

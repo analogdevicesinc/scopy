@@ -20,26 +20,25 @@
 #ifndef M2K_SYMBOL_H
 #define M2K_SYMBOL_H
 
-#include <qwt_plot.h>
 #include <qwt_painter.h>
+#include <qwt_plot.h>
 
-class Symbol: public QObject
-{
+class Symbol : public QObject {
 	Q_OBJECT
 
 public:
-	Symbol(QObject *parent, const QSize& size, QwtAxisId fixedAxis,
-		QwtAxisId mobileAxis, bool opposedToFixed = false,
-		bool floats = false);
+	Symbol(QObject *parent, const QSize &size, QwtAxisId fixedAxis,
+	       QwtAxisId mobileAxis, bool opposedToFixed = false,
+	       bool floats = false);
 	virtual ~Symbol();
 
 	const QwtPlot *plot() const;
 	QwtPlot *plot();
 
-	void setSurface(const QRect& rect);
+	void setSurface(const QRect &rect);
 	QRect surface();
 
-	void setAnchor(const QPoint& anchor);
+	void setAnchor(const QPoint &anchor);
 	QPoint anchor();
 
 	void setPlotCoord(const QPointF &pos);
@@ -66,8 +65,8 @@ public:
 	void setVisible(bool en);
 	bool isVisible();
 
-	void setPen(const QPen&);
-	const QPen& pen();
+	void setPen(const QPen &);
+	const QPen &pen();
 
 	QPointF invTransform(const QPointF &) const;
 	QPointF transform(const QPointF &) const;
@@ -90,31 +89,36 @@ protected Q_SLOTS:
 	void onMobileScaleChanged();
 
 protected:
-
 	QRect d_surface;
-	QPoint d_anchor;     // sets which point of d_surface to point exactly to d_plotCoord. Default point is: top-left of d_surface (d_anchor = (0, 0))
+	QPoint d_anchor; // sets which point of d_surface to point exactly to
+			 // d_plotCoord. Default point is: top-left of d_surface
+			 // (d_anchor = (0, 0))
 	QPointF d_plotCoord; // Position of symbol in plot coordinates
 	bool d_selected;
 
 	QwtAxisId d_fixedAxis;  // The axis on which the symbol must not move
 	QwtAxisId d_mobileAxis; // The axis on which the symbol can be shifted
-	double d_stepSize;   // Symbol position can take only values that are a multiple of d_stepSize. If d_stepSize = 0 symbol pos can take any value.
-	bool d_oppToFixed;   // If symbol should be placed diametrically opposed to the fixed axis
-	bool d_floats;       // If symbols floats on top of the plot or is attached to the plot
-	bool d_within_plot;  // If symbol position can only be within the plot visible area
+	double d_stepSize; // Symbol position can take only values that are a
+			   // multiple of d_stepSize. If d_stepSize = 0 symbol
+			   // pos can take any value.
+	bool d_oppToFixed; // If symbol should be placed diametrically opposed
+			   // to the fixed axis
+	bool d_floats; // If symbols floats on top of the plot or is attached to
+		       // the plot
+	bool d_within_plot; // If symbol position can only be within the plot
+			    // visible area
 
 	bool d_visible;
 
 	QPen d_pen;
 };
 
-class VertDebugSymbol: public Symbol
-{
+class VertDebugSymbol : public Symbol {
 	Q_OBJECT
 
 public:
-	VertDebugSymbol(QObject *parent, const QSize& size,
-		bool opposedToFixed = false, bool floats = false);
+	VertDebugSymbol(QObject *parent, const QSize &size,
+			bool opposedToFixed = false, bool floats = false);
 
 	void draw(QPainter *painter) const;
 
@@ -131,16 +135,14 @@ public Q_SLOTS:
 private Q_SLOTS:
 	void onBasePositionChanged(double, double);
 	void onBasePixelPositionChanged(int, int);
-
 };
 
-class HorizDebugSymbol: public Symbol
-{
+class HorizDebugSymbol : public Symbol {
 	Q_OBJECT
 
 public:
-	HorizDebugSymbol(QObject *parent, const QSize& size,
-		bool opposedToFixed = false, bool floats = false);
+	HorizDebugSymbol(QObject *parent, const QSize &size,
+			 bool opposedToFixed = false, bool floats = false);
 
 	void draw(QPainter *painter) const;
 
@@ -159,12 +161,11 @@ private Q_SLOTS:
 	void onBasePixelPositionChanged(int, int);
 };
 
-class TriggerLevelCursor: public VertDebugSymbol
-{
+class TriggerLevelCursor : public VertDebugSymbol {
 	Q_OBJECT
 
 public:
-	TriggerLevelCursor(QObject *parent, const QPixmap& pixmap);
+	TriggerLevelCursor(QObject *parent, const QPixmap &pixmap);
 
 	void draw(QPainter *painter) const;
 
@@ -172,12 +173,11 @@ private:
 	QPixmap d_cursorPixmap;
 };
 
-class TriggerDelayCursor: public HorizDebugSymbol
-{
+class TriggerDelayCursor : public HorizDebugSymbol {
 	Q_OBJECT
 
 public:
-	TriggerDelayCursor(QObject *parent, const QPixmap& pixmap);
+	TriggerDelayCursor(QObject *parent, const QPixmap &pixmap);
 
 	void draw(QPainter *painter) const;
 
@@ -185,8 +185,7 @@ private:
 	QPixmap d_cursorPixmap;
 };
 
-class HorizBar: public VertDebugSymbol
-{
+class HorizBar : public VertDebugSymbol {
 	Q_OBJECT
 
 public:
@@ -195,8 +194,7 @@ public:
 	void draw(QPainter *painter) const;
 };
 
-class VertBar: public HorizDebugSymbol
-{
+class VertBar : public HorizDebugSymbol {
 	Q_OBJECT
 
 public:

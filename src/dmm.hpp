@@ -20,109 +20,109 @@
 #ifndef DMM_HPP
 #define DMM_HPP
 
-#include <QPushButton>
-#include <QWidget>
-#include <atomic>
-
 #include "apiObject.hpp"
 #include "filter.hpp"
 #include "iio_manager.hpp"
-#include "signal_sample.hpp"
-#include "tool.hpp"
 #include "scroll_filter.hpp"
-#include <thread>
+#include "signal_sample.hpp"
 #include "spinbox_a.hpp"
-#include <boost/thread/mutex.hpp>
+#include "tool.hpp"
+
+#include <QPushButton>
+#include <QWidget>
+
+#include <atomic>
 #include <boost/thread/condition_variable.hpp>
+#include <boost/thread/mutex.hpp>
+#include <thread>
 
 namespace Ui {
-	class DMM;
+class DMM;
 }
 
 class QJSEngine;
 
 namespace adiscope {
-	class DMM_API;
-	class GenericAdc;
+class DMM_API;
+class GenericAdc;
 
-	class DMM : public Tool
-	{
-		friend class DMM_API;
-		friend class ToolLauncher_API;
+class DMM : public Tool {
+	friend class DMM_API;
+	friend class ToolLauncher_API;
 
-		Q_OBJECT
+	Q_OBJECT
 
-	public:
-		explicit DMM(struct iio_context *ctx, Filter *filt,
-				std::shared_ptr<GenericAdc> adc,
-				ToolMenuItem *toolMenuItem, QJSEngine *engine,
-				ToolLauncher *parent);
-		~DMM();
+public:
+	explicit DMM(struct iio_context *ctx, Filter *filt,
+		     std::shared_ptr<GenericAdc> adc,
+		     ToolMenuItem *toolMenuItem, QJSEngine *engine,
+		     ToolLauncher *parent);
+	~DMM();
 
-	private:
-		Ui::DMM *ui;
-		boost::shared_ptr<iio_manager> manager;
-		iio_manager::port_id id_ch1, id_ch2;
-		std::shared_ptr<GenericAdc> adc;
-		boost::shared_ptr<signal_sample> signal;
-		unsigned long sample_rate;
+private:
+	Ui::DMM *ui;
+	boost::shared_ptr<iio_manager> manager;
+	iio_manager::port_id id_ch1, id_ch2;
+	std::shared_ptr<GenericAdc> adc;
+	boost::shared_ptr<signal_sample> signal;
+	unsigned long sample_rate;
 
-		std::atomic<bool> interrupt_data_logging;
-		std::atomic<bool> data_logging;
-		QString filename;
-		std::thread data_logging_thread;
-		bool use_timer;
-		unsigned long logging_refresh_rate;
-		PositionSpinButton *data_logging_timer;
+	std::atomic<bool> interrupt_data_logging;
+	std::atomic<bool> data_logging;
+	QString filename;
+	std::thread data_logging_thread;
+	bool use_timer;
+	unsigned long logging_refresh_rate;
+	PositionSpinButton *data_logging_timer;
 
-		boost::mutex data_mutex;
-		boost::condition_variable data_cond;
-		MouseWheelWidgetGuard *wheelEventGuard;
+	boost::mutex data_mutex;
+	boost::condition_variable data_cond;
+	MouseWheelWidgetGuard *wheelEventGuard;
 
-		std::vector<double> m_min, m_max;
+	std::vector<double> m_min, m_max;
 
-		void disconnectAll();
-		gr::basic_block_sptr configureGraph(gr::basic_block_sptr s2f,
-				bool is_low_ac, bool is_high_ac);
-		void configureModes();
-		int numSamplesFromIdx(int idx);
-		void writeAllSettingsToHardware();
-		void checkPeakValues(int, double);
-		bool isIioManagerStarted() const;
+	void disconnectAll();
+	gr::basic_block_sptr configureGraph(gr::basic_block_sptr s2f,
+					    bool is_low_ac, bool is_high_ac);
+	void configureModes();
+	int numSamplesFromIdx(int idx);
+	void writeAllSettingsToHardware();
+	void checkPeakValues(int, double);
+	bool isIioManagerStarted() const;
 
-	public Q_SLOTS:
-		void toggleTimer(bool start);
-		void run() override;
-		void stop() override;
+public Q_SLOTS:
+	void toggleTimer(bool start);
+	void run() override;
+	void stop() override;
 
-	private Q_SLOTS:
-		void setHistorySizeCh1(int idx);
-		void setHistorySizeCh2(int idx);
+private Q_SLOTS:
+	void setHistorySizeCh1(int idx);
+	void setHistorySizeCh2(int idx);
 
-		void updateValuesList(std::vector<float> values);
+	void updateValuesList(std::vector<float> values);
 
-		void toggleAC();
+	void toggleAC();
 
-		void enableDataLogging(bool);
+	void enableDataLogging(bool);
 
-		void toggleDataLogging(bool);
+	void toggleDataLogging(bool);
 
-		void startDataLogging(bool);
+	void startDataLogging(bool);
 
-		void dataLoggingThread();
+	void dataLoggingThread();
 
-		void chooseFile();
+	void chooseFile();
 
-		void resetPeakHold(bool);
+	void resetPeakHold(bool);
 
-		void displayPeakHold(bool);
+	void displayPeakHold(bool);
 
-		void collapsePeakHold(bool);
-		void collapseDataLog(bool);
+	void collapsePeakHold(bool);
+	void collapseDataLog(bool);
 
-	Q_SIGNALS:
-		void showTool();
-	};
-}
+Q_SIGNALS:
+	void showTool();
+};
+} // namespace adiscope
 
 #endif /* DMM_HPP */

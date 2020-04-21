@@ -20,28 +20,28 @@
 #ifndef OSC_SCALE_ZOOMER_H
 #define OSC_SCALE_ZOOMER_H
 
-#include <qwt_plot_zoomer.h>
 #include "limitedplotzoomer.h"
 
+#include <qwt_plot_zoomer.h>
+
 namespace adiscope {
-	class OscScaleZoomer : public LimitedPlotZoomer
-	{
-		Q_OBJECT
+class OscScaleZoomer : public LimitedPlotZoomer {
+	Q_OBJECT
 
-		Q_PROPERTY(QColor color READ getColor WRITE setColor);
+	Q_PROPERTY(QColor color READ getColor WRITE setColor);
 
-	public:
-		explicit OscScaleZoomer(QWidget *parent);
-		~OscScaleZoomer();
+public:
+	explicit OscScaleZoomer(QWidget *parent);
+	~OscScaleZoomer();
 
-		void cancel();
+	void cancel();
 
-		QColor getColor() const;
-		void setColor(const QColor& color);
+	QColor getColor() const;
+	void setColor(const QColor &color);
 
-	private:
-		QwtText trackerText(const QPoint& pos) const;
-	};
-}
+private:
+	QwtText trackerText(const QPoint &pos) const;
+};
+} // namespace adiscope
 
 #endif /* OSC_SCALE_ZOOMER_H */

@@ -20,14 +20,13 @@
 #ifndef SCOPY_DETACHED_WINDOW_HPP
 #define SCOPY_DETACHED_WINDOW_HPP
 
-#include <QMainWindow>
 #include <QEvent>
+#include <QMainWindow>
 
 class QCloseEvent;
 
 namespace adiscope {
-class DetachedWindow: public QMainWindow
-{
+class DetachedWindow : public QMainWindow {
 	Q_OBJECT
 
 Q_SIGNALS:
@@ -52,7 +51,6 @@ private:
 
 class DetachedWindowState {
 public:
-
 	DetachedWindowState();
 	~DetachedWindowState() {}
 
@@ -77,6 +75,6 @@ private:
 	bool minimized;
 };
 
-}
+} // namespace adiscope
 
 #endif /* SCOPY_DETACHED_WINDOW_HPP */

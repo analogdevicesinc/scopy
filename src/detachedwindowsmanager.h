@@ -20,17 +20,16 @@
 #ifndef DETACHEDWINDOWSMANAGER_H
 #define DETACHEDWINDOWSMANAGER_H
 
-#include <QtGlobal>
-#include <QList>
-
 #include "detachedWindow.hpp"
 
+#include <QList>
+#include <QtGlobal>
+
 namespace adiscope {
-class DetachedWindowsManager
-{
+class DetachedWindowsManager {
 	Q_DISABLE_COPY(DetachedWindowsManager)
 public:
-	static DetachedWindowsManager& getInstance();
+	static DetachedWindowsManager &getInstance();
 	DetachedWindow *getWindow();
 	void returnWindow(DetachedWindow *window);
 
@@ -40,6 +39,6 @@ private:
 
 	QList<DetachedWindow *> pool;
 };
-}
+} // namespace adiscope
 
 #endif // DETACHEDWINDOWSMANAGER_H

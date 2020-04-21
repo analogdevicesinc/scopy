@@ -1,9 +1,10 @@
 #ifndef MARKER_CONTROLLER_H
 #define MARKER_CONTROLLER_H
 
-#include <QObject>
 #include <QList>
+#include <QObject>
 #include <qwt_plot.h>
+
 #include <memory>
 
 class QwtPlotPicker;
@@ -12,16 +13,15 @@ namespace adiscope {
 
 class SpectrumMarker;
 
-class MarkerController: public QObject
-{
+class MarkerController : public QObject {
 	Q_OBJECT
 
 public:
 	typedef std::shared_ptr<SpectrumMarker> marker_sptr;
 
 	explicit MarkerController(QwtPlot *plot);
-	MarkerController(const MarkerController&) = delete;
-	void operator=(const MarkerController&) = delete;
+	MarkerController(const MarkerController &) = delete;
+	void operator=(const MarkerController &) = delete;
 
 	bool enabled() const;
 	void setEnabled(bool en);
@@ -36,9 +36,9 @@ public:
 	QwtPlot *plot();
 
 Q_SIGNALS:
-	void markerSelected(std::shared_ptr<SpectrumMarker>&);
-	void markerPositionChanged(std::shared_ptr<SpectrumMarker>&);
-	void markerReleased(std::shared_ptr<SpectrumMarker>&);
+	void markerSelected(std::shared_ptr<SpectrumMarker> &);
+	void markerPositionChanged(std::shared_ptr<SpectrumMarker> &);
+	void markerReleased(std::shared_ptr<SpectrumMarker> &);
 
 private Q_SLOTS:
 	void onPickerSelected(QPointF);

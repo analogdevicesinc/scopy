@@ -24,10 +24,13 @@
 
 using namespace adiscope;
 
-CustomSwitch::CustomSwitch(QWidget *parent) : QPushButton(parent),
-	on(this), off(this), handle(this), anim(&handle, "geometry"),
-	polarity(false)
-{
+CustomSwitch::CustomSwitch(QWidget *parent)
+	: QPushButton(parent)
+	, on(this)
+	, off(this)
+	, handle(this)
+	, anim(&handle, "geometry")
+	, polarity(false) {
 	on.setObjectName("on");
 	off.setObjectName("off");
 	handle.setObjectName("handle");
@@ -49,31 +52,31 @@ CustomSwitch::CustomSwitch(QWidget *parent) : QPushButton(parent),
 	updateOnOffLabels();
 }
 
-void CustomSwitch::updateOnOffLabels()
-{
+void CustomSwitch::updateOnOffLabels() {
 	on.setEnabled(isChecked() ^ polarity);
 	off.setEnabled(!isChecked() ^ polarity);
 }
 
-bool CustomSwitch::event(QEvent *e)
-{
-	if (e->type() == QEvent::DynamicPropertyChange)
-	{
-		QDynamicPropertyChangeEvent *const propEvent = static_cast<QDynamicPropertyChangeEvent*>(e);
+bool CustomSwitch::event(QEvent *e) {
+	if (e->type() == QEvent::DynamicPropertyChange) {
+		QDynamicPropertyChangeEvent *const propEvent =
+			static_cast<QDynamicPropertyChangeEvent *>(e);
 		QString propName = propEvent->propertyName();
-		if(propName=="leftText" && property("leftText").isValid())
+		if (propName == "leftText" && property("leftText").isValid())
 			on.setText(property("leftText").toString());
-		if(propName=="rightText" && property("rightText").isValid())
+		if (propName == "rightText" && property("rightText").isValid())
 			off.setText(property("rightText").toString());
-		if(propName=="polarity" && property("polarity").isValid())
+		if (propName == "polarity" && property("polarity").isValid())
 			polarity = property("polarity").toBool();
-		if(propName=="duration" && property("duration").isValid())
+		if (propName == "duration" && property("duration").isValid())
 			setDuration(property("duration").toInt());
-		if(propName=="bigBtn" && property("bigBtn").isValid()) {
+		if (propName == "bigBtn" && property("bigBtn").isValid()) {
 			if (property("bigBtn").toBool()) {
-				QFile file(":stylesheets/stylesheets/bigCustomSwitch.qss");
+				QFile file(":stylesheets/stylesheets/"
+					   "bigCustomSwitch.qss");
 				file.open(QFile::ReadOnly);
-				QString styleSheet = QString::fromLatin1(file.readAll());
+				QString styleSheet =
+					QString::fromLatin1(file.readAll());
 				this->setStyleSheet(styleSheet);
 			}
 		}
@@ -81,24 +84,20 @@ bool CustomSwitch::event(QEvent *e)
 	return QPushButton::event(e);
 }
 
-CustomSwitch::~CustomSwitch()
-{
-}
+CustomSwitch::~CustomSwitch() {}
 
-void CustomSwitch::setDuration(int ms)
-{
+void CustomSwitch::setDuration(int ms) {
 	duration_ms = ms;
 	anim.setDuration(ms);
 }
 
-void CustomSwitch::toggleAnim(bool enabled)
-{
+void CustomSwitch::toggleAnim(bool enabled) {
 	if (!isVisible())
 		return;
 
 	QRect on_rect(0, handle.y(), handle.width(), handle.height());
-	QRect off_rect(width() - handle.width(), handle.y(),
-			handle.width(), handle.height());
+	QRect off_rect(width() - handle.width(), handle.y(), handle.width(),
+		       handle.height());
 
 	anim.stop();
 
@@ -114,16 +113,13 @@ void CustomSwitch::toggleAnim(bool enabled)
 	anim.start();
 }
 
-void CustomSwitch::showEvent(QShowEvent *event)
-{
+void CustomSwitch::showEvent(QShowEvent *event) {
 	updateOnOffLabels();
 	if (isChecked() ^ polarity) {
-		handle.setGeometry(QRect(0, handle.y(), handle.width(),
-					 handle.height()));
-	}
-	else {
+		handle.setGeometry(
+			QRect(0, handle.y(), handle.width(), handle.height()));
+	} else {
 		handle.setGeometry(QRect(width() - handle.width(), handle.y(),
-					handle.width(), handle.height()));
+					 handle.width(), handle.height()));
 	}
-
 }

@@ -22,148 +22,138 @@
 
 #include <QList>
 #include <QString>
+
 #include <memory>
 
 namespace adiscope {
-	class CrossingDetection;
+class CrossingDetection;
 
-	class MeasurementData
-	{
-	public:
-		enum unitTypes {
-			METRIC,
-			TIME,
-			PERCENTAGE,
-			DIMENSIONLESS
-		};
+class MeasurementData {
+public:
+	enum unitTypes { METRIC, TIME, PERCENTAGE, DIMENSIONLESS };
 
-		enum axisType {
-			HORIZONTAL,
-			VERTICAL
-		};
+	enum axisType { HORIZONTAL, VERTICAL };
 
-		MeasurementData(const QString& name, axisType axis,
-				const QString& unit = "", int channel = -1);
+	MeasurementData(const QString &name, axisType axis,
+			const QString &unit = "", int channel = -1);
 
-		QString name() const;
-		double value() const;
-		void setValue(double value);
-		bool measured() const;
-		void setMeasured(bool state);
-		bool enabled() const;
-		void setEnabled(bool en);
-		QString unit() const;
-		enum unitTypes unitType() const;
-		int channel() const;
-		void setChannel(int);
-		enum axisType axis() const;
+	QString name() const;
+	double value() const;
+	void setValue(double value);
+	bool measured() const;
+	void setMeasured(bool state);
+	bool enabled() const;
+	void setEnabled(bool en);
+	QString unit() const;
+	enum unitTypes unitType() const;
+	int channel() const;
+	void setChannel(int);
+	enum axisType axis() const;
 
-	private:
-		QString m_name;
-		double m_value;
-		bool m_measured;
-		bool m_enabled;
-		QString m_unit;
-		enum unitTypes m_unitType;
-		int m_channel;
-		enum axisType m_axis;
+private:
+	QString m_name;
+	double m_value;
+	bool m_measured;
+	bool m_enabled;
+	QString m_unit;
+	enum unitTypes m_unitType;
+	int m_channel;
+	enum axisType m_axis;
+};
+
+class Measure {
+public:
+	enum defaultMeasurements {
+		PERIOD = 0,
+		FREQUENCY,
+		MIN,
+		MAX,
+		PEAK_PEAK,
+		MEAN,
+		CYCLE_MEAN,
+		RMS,
+		CYCLE_RMS,
+		AC_RMS,
+		AREA,
+		CYCLE_AREA,
+		LOW,
+		HIGH,
+		AMPLITUDE,
+		MIDDLE,
+		P_OVER,
+		N_OVER,
+		RISE,
+		FALL,
+		P_WIDTH,
+		N_WIDTH,
+		P_DUTY,
+		N_DUTY,
+		DEFAULT_MEASUREMENT_COUNT
 	};
 
-	class Measure
-	{
-	public:
-		enum defaultMeasurements {
-			PERIOD = 0,
-			FREQUENCY,
-			MIN,
-			MAX,
-			PEAK_PEAK,
-			MEAN,
-			CYCLE_MEAN,
-			RMS,
-			CYCLE_RMS,
-			AC_RMS,
-			AREA,
-			CYCLE_AREA,
-			LOW,
-			HIGH,
-			AMPLITUDE,
-			MIDDLE,
-			P_OVER,
-			N_OVER,
-			RISE,
-			FALL,
-			P_WIDTH,
-			N_WIDTH,
-			P_DUTY,
-			N_DUTY,
-			DEFAULT_MEASUREMENT_COUNT
-		};
+	Measure(int channel, double *buffer = NULL, size_t length = 0);
 
-		Measure(int channel, double *buffer = NULL, size_t length = 0);
+	void setDataSource(double *buffer, size_t length);
+	void measure();
+	double sampleRate();
+	void setSampleRate(double);
+	unsigned int adcBitCount();
+	void setAdcBitCount(unsigned int);
+	double crossLevel();
+	void setCrossLevel(double);
+	double hysteresisSpan();
+	void setHysteresisSpan(double);
+	int channel() const;
+	void setChannel(int);
+	void setStartIndex(int);
+	void setEndIndex(int);
+	void setGatingEnabled(bool);
 
-		void setDataSource(double *buffer, size_t length);
-		void measure();
-		double sampleRate();
-		void setSampleRate(double);
-		unsigned int adcBitCount();
-		void setAdcBitCount(unsigned int);
-		double crossLevel();
-		void setCrossLevel(double);
-		double hysteresisSpan();
-		void setHysteresisSpan(double);
-		int channel() const;
-		void setChannel(int);
-		void setStartIndex(int);
-		void setEndIndex(int);
-		void setGatingEnabled(bool);
+	QList<std::shared_ptr<MeasurementData>> measurments();
+	std::shared_ptr<MeasurementData> measurement(int id);
+	int activeMeasurementsCount() const;
 
-		QList<std::shared_ptr<MeasurementData>> measurments();
-		std::shared_ptr<MeasurementData> measurement(int id);
-		int activeMeasurementsCount() const;
+private:
+	bool highLowFromHistogram(double &low, double &high, double min,
+				  double max);
+	void clearMeasurements();
 
-	private:
-		bool highLowFromHistogram(double &low, double &high,
-			double min, double max);
-		void clearMeasurements();
+private:
+	int m_channel;
+	double *m_buffer;
+	ssize_t m_buf_length;
+	double m_sample_rate;
+	unsigned int m_adc_bit_count;
+	double m_cross_level;
+	double m_hysteresis_span;
+	int m_startIndex;
+	int m_endIndex;
+	int m_gatingEnabled;
+	int *m_histogram;
+	CrossingDetection *m_cross_detect;
 
-	private:
-		int m_channel;
-		double *m_buffer;
-		ssize_t m_buf_length;
-		double m_sample_rate;
-		unsigned int m_adc_bit_count;
-		double m_cross_level;
-		double m_hysteresis_span;
-		int m_startIndex;
-		int m_endIndex;
-		int m_gatingEnabled;
-		int *m_histogram;
-		CrossingDetection *m_cross_detect;
+	QList<std::shared_ptr<MeasurementData>> m_measurements;
+};
 
-		QList<std::shared_ptr<MeasurementData>> m_measurements;
-	};
+class Statistic {
+public:
+	Statistic();
 
-	class Statistic
-	{
-	public:
-		Statistic();
+	void pushNewData(double data);
+	void clear();
 
-		void pushNewData(double data);
-		void clear();
+	double average() const;
+	double min() const;
+	double max() const;
+	double numPushedData() const;
 
-		double average() const;
-		double min() const;
-		double max() const;
-		double numPushedData() const;
-
-	private:
-		double m_sum;
-		double m_min;
-		double m_max;
-		double m_dataCount;
-		double m_average;
-	};
-}
+private:
+	double m_sum;
+	double m_min;
+	double m_max;
+	double m_dataCount;
+	double m_average;
+};
+} // namespace adiscope
 
 #endif // MEASURE_H

@@ -2,11 +2,11 @@
 #define OSC_EXPORT_SETTINGS_H
 
 /* Qt includes */
-#include <QWidget>
-#include <QString>
-#include <QStandardItem>
-#include <QPushButton>
 #include <QMap>
+#include <QPushButton>
+#include <QStandardItem>
+#include <QString>
+#include <QWidget>
 
 /* Local includes */
 #include "dropdown_switch_list.h"
@@ -16,8 +16,7 @@ class ExportSettings;
 }
 
 namespace adiscope {
-class ExportSettings : public QWidget
-{
+class ExportSettings : public QWidget {
 	Q_OBJECT
 
 public:
@@ -29,7 +28,7 @@ public:
 public Q_SLOTS:
 	void addChannel(int id, QString name);
 	void removeChannel(int id);
-	void onExportChannelChanged(QStandardItem*);
+	void onExportChannelChanged(QStandardItem *);
 
 	QPushButton *getExportButton();
 	QPushButton *getExportAllButton();
@@ -48,6 +47,6 @@ protected:
 	int nr_channels;
 	QMap<int, bool> oldSettings;
 };
-}
+} // namespace adiscope
 
 #endif // OSC_EXPORT_SETTINGS_H

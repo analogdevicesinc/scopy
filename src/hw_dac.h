@@ -1,27 +1,27 @@
 #ifndef HW_DAC_H
 #define HW_DAC_H
 
-#include <qglobal.h>
 #include <QList>
+#include <qglobal.h>
+
 #include <map>
 #include <memory>
 
 extern "C" {
-	struct iio_context;
-	struct iio_device;
-	struct iio_channel;
+struct iio_context;
+struct iio_device;
+struct iio_channel;
 }
 
 namespace adiscope {
 
-class GenericDac
-{
+class GenericDac {
 public:
 	GenericDac(struct iio_context *ctx, struct iio_device *dac_dev);
 	virtual ~GenericDac();
 
-	struct iio_context * iio_context() const;
-	struct iio_device * iio_dac_dev() const;
+	struct iio_context *iio_context() const;
+	struct iio_device *iio_dac_dev() const;
 
 	uint numDacChannels() const;
 	QList<struct iio_channel *> dacChannelList() const;
@@ -52,8 +52,7 @@ private:
 	double m_vOutH;
 };
 
-class M2kDac: public GenericDac
-{
+class M2kDac : public GenericDac {
 public:
 	M2kDac(struct iio_context *, struct iio_device *dac_dev);
 	~M2kDac();
@@ -69,8 +68,7 @@ private:
 	double m_vlsb;
 };
 
-class DacBuilder
-{
+class DacBuilder {
 public:
 	enum DacType {
 		GENERIC = 0,
@@ -78,11 +76,13 @@ public:
 	};
 
 	static std::shared_ptr<GenericDac> newDac(DacType dac_type,
-		struct iio_context *ctx, struct iio_device *dac)
-	{
+						  struct iio_context *ctx,
+						  struct iio_device *dac) {
 		switch (dac_type) {
-		case GENERIC: return std::make_shared<GenericDac>(ctx, dac);
-		case M2K: return std::make_shared<M2kDac>(ctx, dac);
+		case GENERIC:
+			return std::make_shared<GenericDac>(ctx, dac);
+		case M2K:
+			return std::make_shared<M2kDac>(ctx, dac);
 		}
 		return nullptr;
 	}

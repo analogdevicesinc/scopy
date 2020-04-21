@@ -22,16 +22,15 @@
 
 #include "basemenu.h"
 #include "filter.hpp"
-#include "toolmenuitem.h"
 #include "preferences.h"
+#include "toolmenuitem.h"
 
-#include <QString>
-#include <QLabel>
 #include <QButtonGroup>
+#include <QLabel>
+#include <QString>
 
 namespace adiscope {
-class ToolMenu : public BaseMenu
-{
+class ToolMenu : public BaseMenu {
 	Q_OBJECT
 public:
 	explicit ToolMenu(Preferences *preferences, QWidget *parent = nullptr);
@@ -54,8 +53,8 @@ private:
 	void _saveState();
 	void _loadState();
 	void _readPreferences();
-private:
 
+private:
 	static const QStringList d_availableTools;
 	static const QStringList d_availableIcons;
 
@@ -66,6 +65,6 @@ private:
 	QButtonGroup *d_buttonGroup;
 	Preferences *d_preferences;
 };
-}
+} // namespace adiscope
 
 #endif // TOOLMENU_H

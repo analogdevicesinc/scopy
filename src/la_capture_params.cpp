@@ -19,28 +19,26 @@
 
 #include "la_capture_params.hpp"
 
-#include <algorithm>
-#include <cmath>
 #include <QtGlobal>
 
-LogicAnalyzerSymmetricBufferMode::LogicAnalyzerSymmetricBufferMode() :
-	m_maxSampleRate(100000000),
-	m_current_divider(1),
-	m_timeDivsCount(10),
-	m_entireBufferMaxSize(0),
-	m_triggerBufferMaxSize(0),
-	m_timeBase(0.0),
-	m_triggerPos(0.0),
-	m_sampleRate(0.0),
-	m_triggPosSR(0.0),
-	m_visibleBufferSize(0),
-	m_triggerBufferSize(0)
-{
-}
+#include <algorithm>
+#include <cmath>
+
+LogicAnalyzerSymmetricBufferMode::LogicAnalyzerSymmetricBufferMode()
+	: m_maxSampleRate(100000000)
+	, m_current_divider(1)
+	, m_timeDivsCount(10)
+	, m_entireBufferMaxSize(0)
+	, m_triggerBufferMaxSize(0)
+	, m_timeBase(0.0)
+	, m_triggerPos(0.0)
+	, m_sampleRate(0.0)
+	, m_triggPosSR(0.0)
+	, m_visibleBufferSize(0)
+	, m_triggerBufferSize(0) {}
 
 LogicAnalyzerSymmetricBufferMode::capture_parameters
-LogicAnalyzerSymmetricBufferMode::captureParameters() const
-{
+LogicAnalyzerSymmetricBufferMode::captureParameters() const {
 	struct capture_parameters params;
 	double sampleRate;
 	unsigned long bufferSize;
@@ -52,65 +50,60 @@ LogicAnalyzerSymmetricBufferMode::captureParameters() const
 	// If trigger position altered the buffer size, return the altered one
 
 	if (m_triggerBufferSize >= 0) {
-		bufferSize = qMax(m_visibleBufferSize, (unsigned long)m_triggerBufferSize);
+		bufferSize = qMax(m_visibleBufferSize,
+				  (unsigned long)m_triggerBufferSize);
 	} else {
 		bufferSize = m_visibleBufferSize;
 	}
 
-	bufferStartingPoint = (m_triggerBufferSize < 0) ? 0 : m_triggerBufferSize;
+	bufferStartingPoint =
+		(m_triggerBufferSize < 0) ? 0 : m_triggerBufferSize;
 
 	params.entireBufferSize = bufferSize;
 	params.sampleRate = sampleRate;
 	params.timePos = m_triggerPos;
 	params.triggerBufferSize = m_triggerBufferSize;
 	params.maxBufferSize = m_triggerBufferSize;
-	params.dataStartingPoint =  bufferStartingPoint;
+	params.dataStartingPoint = bufferStartingPoint;
 
 	return params;
 }
 
-LogicAnalyzerSymmetricBufferMode::~LogicAnalyzerSymmetricBufferMode()
-{
-}
+LogicAnalyzerSymmetricBufferMode::~LogicAnalyzerSymmetricBufferMode() {}
 
-void LogicAnalyzerSymmetricBufferMode::setMaxSampleRate(double value)
-{
+void LogicAnalyzerSymmetricBufferMode::setMaxSampleRate(double value) {
 	m_maxSampleRate = value;
 }
 
-void LogicAnalyzerSymmetricBufferMode::setEntireBufferMaxSize(unsigned long maxSize)
-{
+void LogicAnalyzerSymmetricBufferMode::setEntireBufferMaxSize(
+	unsigned long maxSize) {
 	m_entireBufferMaxSize = maxSize;
 }
 
-void LogicAnalyzerSymmetricBufferMode::setTriggerBufferMaxSize(unsigned long maxSize)
-{
+void LogicAnalyzerSymmetricBufferMode::setTriggerBufferMaxSize(
+	unsigned long maxSize) {
 	m_triggerBufferMaxSize = maxSize;
 }
 
-void LogicAnalyzerSymmetricBufferMode::setTimeDivisionCount(int count)
-{
+void LogicAnalyzerSymmetricBufferMode::setTimeDivisionCount(int count) {
 	m_timeDivsCount = count;
 }
 
-void LogicAnalyzerSymmetricBufferMode::setTimeBase(double secsPerDiv)
-{
+void LogicAnalyzerSymmetricBufferMode::setTimeBase(double secsPerDiv) {
 	if (m_timeBase != secsPerDiv) {
 		m_timeBase = secsPerDiv;
 		configParamsOnTimeBaseChanged();
 	}
 }
 
-void LogicAnalyzerSymmetricBufferMode::setTriggerPos(double pos)
-{
+void LogicAnalyzerSymmetricBufferMode::setTriggerPos(double pos) {
 	if (m_triggerPos != pos) {
 		m_triggerPos = pos;
 		configParamsOnTriggPosChanged();
 	}
 }
 
-void LogicAnalyzerSymmetricBufferMode::configParamsOnTimeBaseChanged()
-{
+void LogicAnalyzerSymmetricBufferMode::configParamsOnTimeBaseChanged() {
 	double sampleRate;
 
 	// Get highest sample rate
@@ -118,8 +111,8 @@ void LogicAnalyzerSymmetricBufferMode::configParamsOnTimeBaseChanged()
 	sampleRate = m_maxSampleRate / sr_divider;
 
 	long bufferSize = getVisibleBufferSize(sampleRate);
-	while ((m_triggerBufferMaxSize < bufferSize) && (sr_divider <
-			m_maxSampleRate)) {
+	while ((m_triggerBufferMaxSize < bufferSize) &&
+	       (sr_divider < m_maxSampleRate)) {
 		sr_divider++;
 		sampleRate = ceil(m_maxSampleRate / sr_divider);
 		bufferSize = getVisibleBufferSize(sampleRate);
@@ -131,13 +124,13 @@ void LogicAnalyzerSymmetricBufferMode::configParamsOnTimeBaseChanged()
 	long long triggOffset = bufferSize / 2;
 
 	// Make sure trigg pos stays inside the boundaries of the entire buffer
-	long long triggPosInBuffer = qRound64(m_triggerPos * sampleRate) +
-		triggOffset;
+	long long triggPosInBuffer =
+		qRound64(m_triggerPos * sampleRate) + triggOffset;
 
 	long long trigBuffSize = triggPosInBuffer;
 	if (triggPosInBuffer < 0) {
-		bufferSize = qRound64(qAbs(m_triggerPos) * sampleRate) +
-			triggOffset;
+		bufferSize =
+			qRound64(qAbs(m_triggerPos) * sampleRate) + triggOffset;
 
 		if (bufferSize > m_entireBufferMaxSize) {
 			trigBuffSize = -(bufferSize - m_entireBufferMaxSize);
@@ -158,8 +151,7 @@ void LogicAnalyzerSymmetricBufferMode::configParamsOnTimeBaseChanged()
 	m_current_divider = sr_divider;
 }
 
-void LogicAnalyzerSymmetricBufferMode::configParamsOnTriggPosChanged()
-{
+void LogicAnalyzerSymmetricBufferMode::configParamsOnTriggPosChanged() {
 	m_visibleBufferSize = getVisibleBufferSize(m_sampleRate);
 
 	// The zero value of the trigger position (seconds) starts at the middle
@@ -168,19 +160,20 @@ void LogicAnalyzerSymmetricBufferMode::configParamsOnTriggPosChanged()
 	long long triggOffset = m_visibleBufferSize / 2;
 	double bufferSize;
 
-	long long triggPosInBuffer = qRound64(m_triggerPos * m_sampleRate) +
-		triggOffset;
+	long long triggPosInBuffer =
+		qRound64(m_triggerPos * m_sampleRate) + triggOffset;
 
 	m_triggPosSR = m_sampleRate;
 
 	if (triggPosInBuffer < 0) {
 		unsigned long delaySamples = -triggPosInBuffer;
-		bufferSize = (m_timeBase * m_timeDivsCount) *
-				m_sampleRate + delaySamples;
+		bufferSize = (m_timeBase * m_timeDivsCount) * m_sampleRate +
+			delaySamples;
 		m_triggerBufferSize = 0;
 
 		if (bufferSize > m_entireBufferMaxSize) {
-			m_triggerBufferSize = -(bufferSize - m_entireBufferMaxSize);
+			m_triggerBufferSize =
+				-(bufferSize - m_entireBufferMaxSize);
 			bufferSize = m_entireBufferMaxSize;
 		}
 		m_visibleBufferSize = bufferSize;
@@ -188,17 +181,17 @@ void LogicAnalyzerSymmetricBufferMode::configParamsOnTriggPosChanged()
 	}
 
 	// Get highest sample rate
-	int sr_divider =  m_current_divider;
+	int sr_divider = m_current_divider;
 
-	while ((triggPosInBuffer > m_triggerBufferMaxSize) && (sr_divider <
-			m_maxSampleRate)) {
+	while ((triggPosInBuffer > m_triggerBufferMaxSize) &&
+	       (sr_divider < m_maxSampleRate)) {
 		sr_divider++;
 		m_triggPosSR = m_maxSampleRate / sr_divider;
-		//New sample rate -> new buffer size
+		// New sample rate -> new buffer size
 		m_visibleBufferSize = getVisibleBufferSize(m_triggPosSR);
 		triggOffset = m_visibleBufferSize / 2;
-		triggPosInBuffer = qRound64(m_triggerPos * m_triggPosSR) +
-			triggOffset;
+		triggPosInBuffer =
+			qRound64(m_triggerPos * m_triggPosSR) + triggOffset;
 	}
 	m_triggerBufferSize = triggPosInBuffer;
 }

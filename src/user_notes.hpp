@@ -20,14 +20,15 @@
 #ifndef USER_NOTES_HPP
 #define USER_NOTES_HPP
 
-#include <QWidget>
+#include "apiObject.hpp"
+
 #include <QButtonGroup>
 #include <QPushButton>
-#include <QTextBrowser>
 #include <QSettings>
-#include <vector>
+#include <QTextBrowser>
+#include <QWidget>
 
-#include "apiObject.hpp"
+#include <vector>
 
 using namespace std;
 
@@ -35,22 +36,21 @@ namespace Ui {
 class UserNotes;
 class Note;
 class UserNotePage;
-}
+} // namespace Ui
 
-namespace adiscope  {
+namespace adiscope {
 class UserNotes_API;
 class Note;
 class Note_API;
 
-class UserNotes : public QWidget
-{
-        friend class UserNotes_API;
+class UserNotes : public QWidget {
+	friend class UserNotes_API;
 
-        Q_OBJECT
+	Q_OBJECT
 
 public:
-        explicit UserNotes(QWidget *parent = 0);
-        ~UserNotes();
+	explicit UserNotes(QWidget *parent = 0);
+	~UserNotes();
 
 	ApiObject *api();
 
@@ -61,63 +61,61 @@ public Q_SLOTS:
 	void remove_btn_clicked(bool);
 
 private Q_SLOTS:
-        void note_selected(bool);
-        void pageMoved(int);
+	void note_selected(bool);
+	void pageMoved(int);
 
 private:
-        void loadPageForNote(Note *note, QString path);
-        Note* getSelectedNote();
-        int getNoteIndex(Note *note);
+	void loadPageForNote(Note *note, QString path);
+	Note *getSelectedNote();
+	int getNoteIndex(Note *note);
 
-        Note* addNote(QString name, QString path);
-        void clearAllNotes();
+	Note *addNote(QString name, QString path);
+	void clearAllNotes();
 
 private:
-        Ui::UserNotes *ui;
-        UserNotes_API *notes_api;
-        vector<Note*> m_notes;
-        QButtonGroup *notes_group;
-        int m_note_count;
+	Ui::UserNotes *ui;
+	UserNotes_API *notes_api;
+	vector<Note *> m_notes;
+	QButtonGroup *notes_group;
+	int m_note_count;
 };
 
-
-class Note : public QWidget
-{
-        Q_OBJECT
+class Note : public QWidget {
+	Q_OBJECT
 
 public:
-        explicit Note(QString name, QString path, QWidget *parent = 0);
-        ~Note();
+	explicit Note(QString name, QString path, QWidget *parent = 0);
+	~Note();
 
-        QString getName() const;
-        void setName(const QString &name);
+	QString getName() const;
+	void setName(const QString &name);
 
-        QString getPath() const;
-        void setPath(const QString &path);
+	QString getPath() const;
+	void setPath(const QString &path);
 
-        bool getSelected() const;
-        QPushButton* noteButton();
+	bool getSelected() const;
+	QPushButton *noteButton();
 
-        void click();
+	void click();
 
-        QWidget *getPage() const;
-        void setPage(QWidget *page);
+	QWidget *getPage() const;
+	void setPage(QWidget *page);
 
-        Ui::UserNotePage *getPageUi();
+	Ui::UserNotePage *getPageUi();
 
 public Q_SLOTS:
-        void setSelected(bool selected);
+	void setSelected(bool selected);
 
 Q_SIGNALS:
-        void selected(bool);
+	void selected(bool);
 
 private:
-        Ui::Note *ui;
-        QString m_name;
-        QString m_path;
-        bool m_selected;
-        QWidget *m_page;
-        Ui::UserNotePage *pageUi;
+	Ui::Note *ui;
+	QString m_name;
+	QString m_path;
+	bool m_selected;
+	QWidget *m_page;
+	Ui::UserNotePage *pageUi;
 };
-}
+} // namespace adiscope
 #endif // USER_NOTES_HPP

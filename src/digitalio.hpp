@@ -20,26 +20,26 @@
 #ifndef DIGITAL_IO_H
 #define DIGITAL_IO_H
 
-#include <QWidget>
-#include <QPushButton>
-#include <QVector>
-#include <vector>
-#include <string>
-#include <QList>
-#include <QPair>
-#include <QTimer>
-#include "filter.hpp"
-#include "digitalchannel_manager.hpp"
-
 #include "apiObject.hpp"
+#include "digitalchannel_manager.hpp"
+#include "filter.hpp"
 #include "tool.hpp"
 
+#include <QList>
+#include <QPair>
+#include <QPushButton>
+#include <QTimer>
+#include <QVector>
+#include <QWidget>
+
+#include <string>
+#include <vector>
 
 extern "C" {
-	struct iio_context;
-	struct iio_device;
-	struct iio_channel;
-	struct iio_buffer;
+struct iio_context;
+struct iio_device;
+struct iio_channel;
+struct iio_buffer;
 }
 
 namespace Ui {
@@ -48,14 +48,13 @@ class DigitalIoMenu;
 class dioElement;
 class dioGroup;
 class dioChannel;
-}
+} // namespace Ui
 
 namespace adiscope {
 class DigitalIO;
 class DigitalIO_API;
 
-class DigitalIoGroup : public QWidget
-{
+class DigitalIoGroup : public QWidget {
 	friend class DigitalIO_API;
 
 	Q_OBJECT
@@ -63,12 +62,13 @@ class DigitalIoGroup : public QWidget
 	int ch_mask;
 	int io_mask;
 	DigitalIO *dio;
+
 public:
 	DigitalIoGroup(QString label, int ch_mask, int io_mask, DigitalIO *dio,
-	               QWidget *parent=0);
+		       QWidget *parent = 0);
 	~DigitalIoGroup();
 	Ui::dioElement *ui;
-	QList<QPair<QWidget *,Ui::dioChannel *>*> chui;
+	QList<QPair<QWidget *, Ui::dioChannel *> *> chui;
 
 Q_SIGNALS:
 	void slider(int val);
@@ -80,8 +80,7 @@ private Q_SLOTS:
 	void changeDirection();
 };
 
-class DigitalIO : public Tool
-{
+class DigitalIO : public Tool {
 	friend class DigitalIO_API;
 	friend class ToolLauncher_API;
 
@@ -96,12 +95,13 @@ private:
 	DIOManager *diom;
 	int polling_rate = 500; // ms
 
-	QPair<QWidget *,Ui::dioChannel *>  *findIndividualUi(int ch);
+	QPair<QWidget *, Ui::dioChannel *> *findIndividualUi(int ch);
 
 public:
-	explicit DigitalIO(struct iio_context *ctx, Filter *filt, ToolMenuItem *toolMenuItem,
-	                   DIOManager *diom, QJSEngine *engine,
-	                   ToolLauncher *parent, bool offline_mode = 0);
+	explicit DigitalIO(struct iio_context *ctx, Filter *filt,
+			   ToolMenuItem *toolMenuItem, DIOManager *diom,
+			   QJSEngine *engine, ToolLauncher *parent,
+			   bool offline_mode = 0);
 	~DigitalIO();
 	void setDirection(int ch, int direction);
 	void setOutput(int ch, int out);
@@ -122,4 +122,3 @@ Q_SIGNALS:
 } /* namespace adiscope */
 
 #endif // DIGITAL_IO_H
-

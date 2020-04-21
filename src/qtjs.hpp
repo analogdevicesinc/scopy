@@ -6,15 +6,14 @@
 #ifndef SCOPY_QTJS_HPP
 #define SCOPY_QTJS_HPP
 
-#include <QObject>
 #include <QFuture>
 #include <QFutureWatcher>
+#include <QObject>
 class QJSEngine;
 
 namespace adiscope {
 
-class QtJs : public QObject
-{
+class QtJs : public QObject {
 	Q_OBJECT
 
 public:
@@ -23,8 +22,8 @@ public:
 	Q_INVOKABLE void exit();
 	Q_INVOKABLE void sleep(unsigned long s);
 	Q_INVOKABLE void msleep(unsigned long ms);
-	Q_INVOKABLE void printToConsole(const QString& text);
-	Q_INVOKABLE QString readFromConsole(const QString& text);
+	Q_INVOKABLE void printToConsole(const QString &text);
+	Q_INVOKABLE QString readFromConsole(const QString &text);
 
 private:
 	QFutureWatcher<QString> watcher;
@@ -33,6 +32,6 @@ private:
 	QString readInput();
 };
 
-}
+} // namespace adiscope
 
 #endif /* SCOPY_QTJS_HPP */

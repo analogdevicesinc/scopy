@@ -20,13 +20,14 @@
 #ifndef SPIN_BOX_A_H
 #define SPIN_BOX_A_H
 
+#include "apiObject.hpp"
+#include "plot_utils.hpp"
+
+#include <QSettings>
 #include <QStringList>
 #include <QWidget>
-#include <vector>
-#include <QSettings>
 
-#include "plot_utils.hpp"
-#include "apiObject.hpp"
+#include <vector>
 
 class QHBoxLayout;
 class QVBoxLayout;
@@ -57,19 +58,17 @@ namespace adiscope {
  */
 class SpinBoxA_API;
 
-class SpinBoxA : public QWidget
-{
+class SpinBoxA : public QWidget {
 	friend class SpinBoxA_API;
 
 	Q_OBJECT
 
 public:
 	explicit SpinBoxA(QWidget *parent = nullptr);
-	explicit SpinBoxA(std::vector<std::pair<QString, double> >units,
-	                  const QString& name = "",
-	                  double min_value = 0.0, double max_value = 0.0,
-	                  bool hasProgressWidget = true,
-	                  bool invertCircle = false, QWidget *parent = 0);
+	explicit SpinBoxA(std::vector<std::pair<QString, double>> units,
+			  const QString &name = "", double min_value = 0.0,
+			  double max_value = 0.0, bool hasProgressWidget = true,
+			  bool invertCircle = false, QWidget *parent = 0);
 	~SpinBoxA();
 
 	QPushButton *upButton();
@@ -103,7 +102,7 @@ public:
 	void triggerCircleRedraw();
 
 	QString getName() const;
-	void setName(const QString& name);
+	void setName(const QString &name);
 
 	void setDisplayScale(double value);
 
@@ -136,9 +135,9 @@ protected Q_SLOTS:
 
 protected:
 	virtual bool eventFilter(QObject *obj, QEvent *event);
-	double findUnitOfValue(double val,int *posInUnitsList = NULL);
-	void setUnits(const QStringList& map);
-	bool isUnitMatched(const QString& unit, double value);
+	double findUnitOfValue(double val, int *posInUnitsList = NULL);
+	void setUnits(const QStringList &map);
+	bool isUnitMatched(const QString &unit, double value);
 
 protected:
 	Ui::SpinBoxA *ui;
@@ -148,7 +147,7 @@ protected:
 	double m_min_value;
 	double m_max_value;
 	int m_decimal_count;
-	std::vector<std::pair<QString, double> > m_units;
+	std::vector<std::pair<QString, double>> m_units;
 	QRegExpValidator *m_validator;
 	double m_displayScale;
 	SpinBoxA_API *m_sba_api;
@@ -159,16 +158,19 @@ private:
 	QSettings *m_settings;
 };
 
-class SpinBoxA_API : public ApiObject
-{
+class SpinBoxA_API : public ApiObject {
 	Q_OBJECT
 
-	Q_PROPERTY(double min_value READ minValue WRITE setMinValue STORED false)
-	Q_PROPERTY(double max_value READ maxValue WRITE setMaxValue STORED false)
+	Q_PROPERTY(
+		double min_value READ minValue WRITE setMinValue STORED false)
+	Q_PROPERTY(
+		double max_value READ maxValue WRITE setMaxValue STORED false)
 	Q_PROPERTY(double value READ value WRITE setValue STORED false)
 	Q_PROPERTY(bool fine_mode READ isInFineMode WRITE setFineMode)
-	Q_PROPERTY(bool invert_circle READ isCircleInverted WRITE invertCircle STORED false)
-	Q_PROPERTY(bool show_progress READ progressShown WRITE showProgress STORED false)
+	Q_PROPERTY(bool invert_circle READ isCircleInverted WRITE invertCircle
+			   STORED false)
+	Q_PROPERTY(bool show_progress READ progressShown WRITE showProgress
+			   STORED false)
 	Q_PROPERTY(QString name READ getName WRITE setName STORED false)
 
 public:
@@ -200,22 +202,22 @@ public:
 	void setFineModeAvailable(bool available);
 
 	QString getName() const;
-	void setName(const QString& name);
+	void setName(const QString &name);
 
 private:
 	SpinBoxA *sba;
 };
 
-class ScaleSpinButton: public SpinBoxA
-{
+class ScaleSpinButton : public SpinBoxA {
 	Q_OBJECT
 public:
 	explicit ScaleSpinButton(QWidget *parent = nullptr);
-	explicit ScaleSpinButton(std::vector<std::pair<QString, double> >units,
-	                         const QString& name = "",
-	                         double min_value = 0.0, double max_value = 0.0,
-	                         bool hasProgressWidget = true,
-	                         bool invertCircle = false, QWidget *parent = 0, std::vector<double> steps = {1,2,5});
+	explicit ScaleSpinButton(std::vector<std::pair<QString, double>> units,
+				 const QString &name = "",
+				 double min_value = 0.0, double max_value = 0.0,
+				 bool hasProgressWidget = true,
+				 bool invertCircle = false, QWidget *parent = 0,
+				 std::vector<double> steps = {1, 2, 5});
 
 public Q_SLOTS:
 	void stepUp();
@@ -232,16 +234,15 @@ protected:
 	bool m_numberSeriesRebuild;
 };
 
-class PositionSpinButton: public SpinBoxA
-{
+class PositionSpinButton : public SpinBoxA {
 	Q_OBJECT
 public:
 	explicit PositionSpinButton(QWidget *parent = nullptr);
-	explicit PositionSpinButton(std::vector<std::pair<QString, double> >units,
-	                            const QString& name ="",
-	                            double min_value = 0.0, double max_value = 0.0,
-	                            bool hasProgressWidget = true,
-	                            bool invertCircle = false, QWidget *parent = 0);
+	explicit PositionSpinButton(
+		std::vector<std::pair<QString, double>> units,
+		const QString &name = "", double min_value = 0.0,
+		double max_value = 0.0, bool hasProgressWidget = true,
+		bool invertCircle = false, QWidget *parent = 0);
 
 	double step();
 	void setStep(double);
@@ -254,17 +255,17 @@ protected:
 	double m_step;
 };
 
-
-class PhaseSpinButton: public SpinBoxA
-{
+class PhaseSpinButton : public SpinBoxA {
 	Q_OBJECT
 public:
 	explicit PhaseSpinButton(QWidget *parent = nullptr);
-	explicit PhaseSpinButton(std::vector<std::pair<QString, double> >units,
-	                         const QString& name ="",
-	                         double min_value = 0.0, double max_value = 360.0,
-	                         bool hasProgressWidget = true,
-	                         bool invertCircle = false, QWidget *parent = 0);
+	explicit PhaseSpinButton(std::vector<std::pair<QString, double>> units,
+				 const QString &name = "",
+				 double min_value = 0.0,
+				 double max_value = 360.0,
+				 bool hasProgressWidget = true,
+				 bool invertCircle = false,
+				 QWidget *parent = 0);
 
 	void setStep(double);
 
@@ -276,7 +277,8 @@ public Q_SLOTS:
 	void setComboboxIndex(int index);
 	void onComboboxIndexChanged(int index);
 	void updatePhaseAfterFrequenceChanged(double val);
-	double computeSecondsTransformation(double scale, int index, double value);
+	double computeSecondsTransformation(double scale, int index,
+					    double value);
 	void setInSeconds(bool val);
 	bool inSeconds();
 	void setSecondsValue(double val);
@@ -296,9 +298,8 @@ protected:
 	bool m_inSeconds;
 	double m_scale;
 	int m_indexValue;
-
 };
 
-}
+} // namespace adiscope
 
 #endif // SPIN_BOX_A_H

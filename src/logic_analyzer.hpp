@@ -1,4 +1,4 @@
- /*
+/*
  * Copyright 2016 Analog Devices, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -21,22 +21,22 @@
 #define LOGIC_ANALYZER_H
 
 /* Qt includes */
-#include <QWidget>
-#include <QQueue>
 #include <QPair>
+#include <QQueue>
+#include <QWidget>
 
 /* Local includes */
 #include "apiObject.hpp"
-#include "pulseview/pv/widgets/sweeptimingwidget.hpp"
+#include "customPushButton.hpp"
+#include "la_capture_params.hpp"
+#include "la_channel_manager.hpp"
+#include "plot_utils.hpp"
 #include "pulseview/pv/devicemanager.hpp"
+#include "pulseview/pv/devices/binarystream.hpp"
 #include "pulseview/pv/mainwindow.hpp"
 #include "pulseview/pv/view/viewport.hpp"
-#include "pulseview/pv/devices/binarystream.hpp"
-#include "la_channel_manager.hpp"
-#include "la_capture_params.hpp"
-#include "plot_utils.hpp"
+#include "pulseview/pv/widgets/sweeptimingwidget.hpp"
 #include "tool.hpp"
-#include "customPushButton.hpp"
 
 using namespace pv;
 using namespace pv::toolbars;
@@ -47,16 +47,16 @@ namespace pv {
 namespace view {
 class Viewport;
 class Ruler;
-}
+} // namespace view
 class Session;
-}
+} // namespace pv
 
 namespace Ui {
 class LogicAnalyzer;
 class Channel;
 class LChannelSettings;
 class DigitalTriggerSettings;
-}
+} // namespace Ui
 
 class QJSEngine;
 class QPushButton;
@@ -78,8 +78,7 @@ class PositionSpinButton;
 class StateUpdater;
 class ExportSettings;
 
-class LogicAnalyzer : public Tool
-{
+class LogicAnalyzer : public Tool {
 	friend class LogicAnalyzer_API;
 	friend class ToolLauncher_API;
 	friend class ChannelGroup_API;
@@ -88,11 +87,7 @@ class LogicAnalyzer : public Tool
 	Q_OBJECT
 
 public:
-	enum AcquisitionMode {
-                REPEATED,
-                STREAM,
-                SCREEN
-	};
+	enum AcquisitionMode { REPEATED, STREAM, SCREEN };
 
 	enum TriggerState {
 		Stop,
@@ -102,12 +97,9 @@ public:
 		Stream,
 	};
 
-	explicit LogicAnalyzer(struct iio_context *ctx,
-	                       Filter *filt,
-	                       ToolMenuItem *toolMenuItem,
-			       QJSEngine *engine,
-	                       ToolLauncher *parent,
-	                       bool offline_mode_ = 0);
+	explicit LogicAnalyzer(struct iio_context *ctx, Filter *filt,
+			       ToolMenuItem *toolMenuItem, QJSEngine *engine,
+			       ToolLauncher *parent, bool offline_mode_ = 0);
 	~LogicAnalyzer();
 	void updateAreaTimeTrigger();
 
@@ -194,7 +186,8 @@ private:
 	double trigger_offset;
 
 	static std::vector<std::string> trigger_mapping;
-	static std::vector<std::pair<std::string,std::string>> externalTriggerSourceMap;
+	static std::vector<std::pair<std::string, std::string>>
+		externalTriggerSourceMap;
 	std::vector<std::string> trigger_cache;
 
 	ScaleSpinButton *timeBase;
@@ -227,7 +220,7 @@ private:
 	unsigned long custom_sampleCount;
 	long long active_triggerSampleCount;
 	long long active_hw_trigger_sample_count;
-        double active_timePos;
+	double active_timePos;
 
 	void settings_panel_update(int id);
 	void toggleRightMenu(QPushButton *btn, bool checked);
@@ -243,7 +236,7 @@ private:
 
 	HorizHandlesArea *d_bottomHandlesArea;
 	FreePlotLineHandleH *d_timeTriggerHandle;
-	QWidget* bottomHandlesArea();
+	QWidget *bottomHandlesArea();
 
 	MetricPrefixFormatter d_cursorMetricFormatter;
 	TimePrefixFormatter d_cursorTimeFormatter;
@@ -268,7 +261,7 @@ private:
 	int timeToPixel(double time);
 
 	std::shared_ptr<LogicAnalyzerSymmetricBufferMode> symmBufferMode;
-	QWidget* trigger_settings;
+	QWidget *trigger_settings;
 	double active_plot_timebase;
 
 	double value_cursor1;
@@ -303,6 +296,6 @@ private:
 	void init_buffer_scrolling();
 	void triggerRightMenuToggle(CustomPushButton *btn, bool checked);
 };
-}
+} // namespace adiscope
 Q_DECLARE_METATYPE(std::shared_ptr<sigrok::OutputFormat>);
 #endif // LOGIC_ANALYZER_H

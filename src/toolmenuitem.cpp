@@ -19,84 +19,69 @@
 
 #include "toolmenuitem.h"
 
-#include <QHBoxLayout>
-#include <QSpacerItem>
-#include <QPaintEvent>
-#include <QPainter>
-#include <QStyle>
-#include <QStyleOption>
-
 #include "dynamicWidget.hpp"
 #include "utils.h"
 
+#include <QHBoxLayout>
+#include <QPaintEvent>
+#include <QPainter>
+#include <QSpacerItem>
+#include <QStyle>
+#include <QStyleOption>
+
 using namespace adiscope;
 
-ToolMenuItem::ToolMenuItem(QString name, QString iconPath, QWidget *parent):
-	BaseMenuItem(parent),
-	d_toolBtn(nullptr),
-	d_toolStopBtn(nullptr),
-	d_name(name),
-	d_iconPath(iconPath),
-	d_disabled(false),
-	d_detached(false)
-{
+ToolMenuItem::ToolMenuItem(QString name, QString iconPath, QWidget *parent)
+	: BaseMenuItem(parent)
+	, d_toolBtn(nullptr)
+	, d_toolStopBtn(nullptr)
+	, d_name(name)
+	, d_iconPath(iconPath)
+	, d_disabled(false)
+	, d_detached(false) {
 	_buildUI();
 
 	// Load stylesheets
-	Util::loadStylesheetFromFile(":stylesheets/stylesheets/toolMenuItem.qss", this);
-	Util::loadStylesheetFromFile(":stylesheets/stylesheets/stopButton.qss", d_toolStopBtn);
+	Util::loadStylesheetFromFile(
+		":stylesheets/stylesheets/toolMenuItem.qss", this);
+	Util::loadStylesheetFromFile(":stylesheets/stylesheets/stopButton.qss",
+				     d_toolStopBtn);
 
 	setDynamicProperty(this, "allowHover", true);
 
-	connect(d_toolBtn, &QPushButton::toggled, [=](bool on){
+	connect(d_toolBtn, &QPushButton::toggled, [=](bool on) {
 		if (!d_detached) {
 			setDynamicProperty(this, "selected", on);
 		}
 	});
 }
 
-ToolMenuItem::~ToolMenuItem()
-{
+ToolMenuItem::~ToolMenuItem() {}
 
-}
+QPushButton *ToolMenuItem::getToolBtn() const { return d_toolBtn; }
 
-QPushButton *ToolMenuItem::getToolBtn() const
-{
-	return d_toolBtn;
-}
+QPushButton *ToolMenuItem::getToolStopBtn() const { return d_toolStopBtn; }
 
-QPushButton *ToolMenuItem::getToolStopBtn() const
-{
-	return d_toolStopBtn;
-}
-
-void ToolMenuItem::setToolDisabled(bool disabled)
-{
+void ToolMenuItem::setToolDisabled(bool disabled) {
 	d_disabled = disabled;
 	BaseMenuItem::setVisible(!disabled);
 	Util::retainWidgetSizeWhenHidden(this, !disabled);
 }
 
-void ToolMenuItem::setVisible(bool visible)
-{
+void ToolMenuItem::setVisible(bool visible) {
 	if (!d_disabled) {
 		BaseMenuItem::setVisible(visible);
 	}
 }
 
-void ToolMenuItem::setDetached(bool detached)
-{
+void ToolMenuItem::setDetached(bool detached) {
 	d_detached = detached;
 	Q_EMIT toggleButtonGroup(detached);
 }
 
-bool ToolMenuItem::isDetached() const
-{
-	return  d_detached;
-}
+bool ToolMenuItem::isDetached() const { return d_detached; }
 
-void ToolMenuItem::enableDoubleClickToDetach(bool enable)
-{
+void ToolMenuItem::enableDoubleClickToDetach(bool enable) {
 	if (enable) {
 		d_toolBtn->installEventFilter(this);
 	} else {
@@ -105,8 +90,7 @@ void ToolMenuItem::enableDoubleClickToDetach(bool enable)
 	}
 }
 
-bool ToolMenuItem::eventFilter(QObject *watched, QEvent *event)
-{
+bool ToolMenuItem::eventFilter(QObject *watched, QEvent *event) {
 	if (event->type() == QEvent::MouseButtonDblClick) {
 		QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
 		if (mouseEvent->button() == Qt::LeftButton) {
@@ -120,43 +104,36 @@ bool ToolMenuItem::eventFilter(QObject *watched, QEvent *event)
 	return QObject::event(event);
 }
 
-void ToolMenuItem::setDisabled(bool disabled)
-{
+void ToolMenuItem::setDisabled(bool disabled) {
 	BaseMenuItem::setDisabled(disabled);
 }
 
-void ToolMenuItem::mouseMoveEvent(QMouseEvent *event)
-{
+void ToolMenuItem::mouseMoveEvent(QMouseEvent *event) {
 	BaseMenuItem::mouseMoveEvent(event);
 	setDynamicProperty(this, "allowHover", false);
 }
 
-void ToolMenuItem::enterEvent(QEvent *event)
-{
+void ToolMenuItem::enterEvent(QEvent *event) {
 	setDynamicProperty(this, "allowHover", true);
 	event->accept();
 }
 
-void ToolMenuItem::leaveEvent(QEvent *event)
-{
+void ToolMenuItem::leaveEvent(QEvent *event) {
 	setDynamicProperty(this, "allowHover", false);
 	event->accept();
 }
 
-void ToolMenuItem::dragMoveEvent(QDragMoveEvent *event)
-{
+void ToolMenuItem::dragMoveEvent(QDragMoveEvent *event) {
 	setDynamicProperty(this, "allowHover", false);
 	BaseMenuItem::dragMoveEvent(event);
 }
 
-void ToolMenuItem::dragLeaveEvent(QDragLeaveEvent *event)
-{
+void ToolMenuItem::dragLeaveEvent(QDragLeaveEvent *event) {
 	setDynamicProperty(this, "allowHover", true);
 	BaseMenuItem::dragLeaveEvent(event);
 }
 
-void ToolMenuItem::_buildUI()
-{
+void ToolMenuItem::_buildUI() {
 	QWidget *main = new QWidget(this);
 	QVBoxLayout *mainLayout = new QVBoxLayout(main);
 	mainLayout->setSpacing(0);
@@ -167,8 +144,7 @@ void ToolMenuItem::_buildUI()
 	layout->setSpacing(0);
 	layout->setContentsMargins(0, 0, 0, 0);
 	d_toolBtn = new QPushButton(d_name);
-	d_toolBtn->setSizePolicy(QSizePolicy::Minimum,
-				 QSizePolicy::Minimum);
+	d_toolBtn->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 	d_toolStopBtn = new CustomPushButton(this);
 	layout->addWidget(d_toolBtn);
 	layout->addWidget(d_toolStopBtn);

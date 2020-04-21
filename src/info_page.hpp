@@ -17,16 +17,15 @@
  * Boston, MA 02110-1301, USA.
  */
 
-
 #ifndef INFO_PAGE_HPP
 #define INFO_PAGE_HPP
 
-#include <QWidget>
+#include "iio.h"
+
+#include <QFuture>
 #include <QMap>
 #include <QPushButton>
-#include <QFuture>
-
-#include "iio.h"
+#include <QWidget>
 
 namespace Ui {
 class InfoPage;
@@ -35,17 +34,14 @@ class InfoPage;
 namespace adiscope {
 class Preferences;
 class Calibration;
-class InfoPage : public QWidget
-{
+class InfoPage : public QWidget {
 	Q_OBJECT
 
 public:
-	explicit InfoPage(QString uri,
-			  Preferences* prefPanel,
+	explicit InfoPage(QString uri, Preferences *prefPanel,
 			  struct iio_context *ctx = nullptr,
 			  QWidget *parent = 0);
 	virtual ~InfoPage();
-
 
 	struct iio_context *ctx() const;
 	void setCtx(iio_context *ctx);
@@ -68,7 +64,7 @@ public:
 public Q_SLOTS:
 	void readPreferences();
 	void identifyDevice(bool clicked = true);
-	void setStatusLabel(QString str, QString color="red");
+	void setStatusLabel(QString str, QString color = "red");
 
 private Q_SLOTS:
 	virtual void blinkTimeout();
@@ -82,8 +78,12 @@ protected:
 
 private:
 	QPair<bool, QString> translateInfoParams(QString);
-	const QStringList identifySupportedModels = {"Analog Devices M2k Rev.C (Z7010)","Analog Devices M2k Rev.D (Z7010)"};
-	const QStringList calibrateSupportedModels = {"Analog Devices M2k Rev.C (Z7010)","Analog Devices M2k Rev.D (Z7010)"};
+	const QStringList identifySupportedModels = {
+		"Analog Devices M2k Rev.C (Z7010)",
+		"Analog Devices M2k Rev.D (Z7010)"};
+	const QStringList calibrateSupportedModels = {
+		"Analog Devices M2k Rev.C (Z7010)",
+		"Analog Devices M2k Rev.D (Z7010)"};
 
 protected:
 	Ui::InfoPage *ui;
@@ -99,13 +99,10 @@ protected:
 	bool m_search_interrupted;
 };
 
-
-class M2kInfoPage : public InfoPage
-{
+class M2kInfoPage : public InfoPage {
 	Q_OBJECT
 public:
-	explicit M2kInfoPage(QString uri,
-			     Preferences* prefPanel,
+	explicit M2kInfoPage(QString uri, Preferences *prefPanel,
 			     struct iio_context *ctx = nullptr,
 			     QWidget *parent = 0);
 	~M2kInfoPage();
@@ -121,29 +118,25 @@ private:
 	QFuture<void> calibration_thread;
 };
 
-
-class InfoPageBuilder
-{
+class InfoPageBuilder {
 public:
 	enum InfoPageType {
 		GENERIC = 0,
 		M2K = 1,
 	};
 
-	static InfoPage* newPage(InfoPageType page_type,
-				 QString uri,
-				 Preferences* prefPanel,
+	static InfoPage *newPage(InfoPageType page_type, QString uri,
+				 Preferences *prefPanel,
 				 struct iio_context *ctx = nullptr,
-				 QWidget *parent = 0)
-	{
+				 QWidget *parent = 0) {
 		switch (page_type) {
-		case GENERIC: return new InfoPage(uri, prefPanel,
-						  ctx, parent);
-		case M2K: return new M2kInfoPage(uri, prefPanel,
-						 ctx, parent);
+		case GENERIC:
+			return new InfoPage(uri, prefPanel, ctx, parent);
+		case M2K:
+			return new M2kInfoPage(uri, prefPanel, ctx, parent);
 		}
 		return nullptr;
 	}
 };
-}
+} // namespace adiscope
 #endif // INFO_PAGE_HPP

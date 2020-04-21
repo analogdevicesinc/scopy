@@ -23,19 +23,18 @@
 #include <gnuradio/hier_block2.h>
 
 namespace adiscope {
-	class fft_block : public gr::hier_block2
-	{
-	public:
-		fft_block(bool use_complex, size_t fft_size,
-				unsigned int nbthreads = 1);
-		~fft_block();
+class fft_block : public gr::hier_block2 {
+public:
+	fft_block(bool use_complex, size_t fft_size,
+		  unsigned int nbthreads = 1);
+	~fft_block();
 
-		void set_window(const std::vector<float>& window);
+	void set_window(const std::vector<float> &window);
 
-	private:
-		bool d_complex;
-		gr::basic_block_sptr d_fft;
-	};
-}
+private:
+	bool d_complex;
+	gr::basic_block_sptr d_fft;
+};
+} // namespace adiscope
 
 #endif /* FFT_BLOCK_HPP */

@@ -24,36 +24,31 @@
 
 using namespace adiscope;
 
-CheckboxDelegate::CheckboxDelegate(QObject *parent):
-	QStyledItemDelegate(parent)
-{
-}
+CheckboxDelegate::CheckboxDelegate(QObject *parent)
+	: QStyledItemDelegate(parent) {}
 
 QWidget *CheckboxDelegate::createEditor(QWidget *parent,
-	const QStyleOptionViewItem &, const QModelIndex &) const
-{
+					const QStyleOptionViewItem &,
+					const QModelIndex &) const {
 	QCheckBox *editor = new QCheckBox(parent);
 	editor->setAutoFillBackground(true);
 
-	connect(editor, SIGNAL(toggled(bool)),
-		this, SLOT(commitDataToModel()));
+	connect(editor, SIGNAL(toggled(bool)), this, SLOT(commitDataToModel()));
 
 	return editor;
 }
 
 void CheckboxDelegate::setEditorData(QWidget *editor,
-		const QModelIndex &index) const
-{
+				     const QModelIndex &index) const {
 	bool state = index.model()->data(index, Qt::EditRole).toBool();
 
-	QCheckBox *checkBox = static_cast<QCheckBox*>(editor);
+	QCheckBox *checkBox = static_cast<QCheckBox *>(editor);
 	checkBox->setChecked(state);
 }
 
 void CheckboxDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
-		const QModelIndex &index) const
-{
-	QCheckBox *checkBox = static_cast<QCheckBox*>(editor);
+				    const QModelIndex &index) const {
+	QCheckBox *checkBox = static_cast<QCheckBox *>(editor);
 	int val;
 
 	if (checkBox->isChecked())
@@ -64,8 +59,7 @@ void CheckboxDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
 	model->setData(index, val, Qt::EditRole);
 }
 
-void CheckboxDelegate::commitDataToModel()
-{
+void CheckboxDelegate::commitDataToModel() {
 	QCheckBox *editor = qobject_cast<QCheckBox *>(sender());
 
 	Q_EMIT commitData(editor);

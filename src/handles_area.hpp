@@ -25,8 +25,7 @@
 class QPoint;
 class PlotLineHandle;
 
-class HandlesArea: public QWidget
-{
+class HandlesArea : public QWidget {
 	Q_OBJECT
 
 public:
@@ -48,8 +47,7 @@ protected:
 	QPoint hotspot;
 };
 
-class VertHandlesArea: public HandlesArea
-{
+class VertHandlesArea : public HandlesArea {
 public:
 	VertHandlesArea(QWidget *parent = 0);
 
@@ -69,8 +67,7 @@ private:
 	int largest_child_height;
 };
 
-class HorizHandlesArea: public HandlesArea
-{
+class HorizHandlesArea : public HandlesArea {
 public:
 	HorizHandlesArea(QWidget *parent = 0);
 
@@ -90,14 +87,14 @@ private:
 	int largest_child_width;
 };
 
-class GateHandlesArea: public HorizHandlesArea
-{
+class GateHandlesArea : public HorizHandlesArea {
 public:
 	GateHandlesArea(QWidget *parent = 0);
+
 protected:
 	void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+
 private:
 };
-
 
 #endif // HANDLES_AREA_H

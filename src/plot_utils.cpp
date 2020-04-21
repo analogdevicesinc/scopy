@@ -18,6 +18,7 @@
  */
 
 #include "plot_utils.hpp"
+
 #include <qlocale.h>
 
 #include <cmath>
@@ -29,35 +30,31 @@ using namespace std;
  * PrefixFormatter class implementation
  */
 
-PrefixFormatter::PrefixFormatter(const vector<pair<QString, double>> &prefixes):
-	m_prefixes(prefixes),
-	m_twoDecimalMode(false)
-{
-	m_defaultPrefixIndex = find_if( m_prefixes.begin(), m_prefixes.end(),
-				[](const pair<QString, double>& element) {return element.second == 1E0;} ) - m_prefixes.begin();
+PrefixFormatter::PrefixFormatter(const vector<pair<QString, double>> &prefixes)
+	: m_prefixes(prefixes), m_twoDecimalMode(false) {
+	m_defaultPrefixIndex =
+		find_if(m_prefixes.begin(), m_prefixes.end(),
+			[](const pair<QString, double> &element) {
+				return element.second == 1E0;
+			}) -
+		m_prefixes.begin();
 }
 
-PrefixFormatter::~PrefixFormatter()
-{
-}
+PrefixFormatter::~PrefixFormatter() {}
 
-void PrefixFormatter::setTwoDecimalMode(bool enable)
-{
+void PrefixFormatter::setTwoDecimalMode(bool enable) {
 	m_twoDecimalMode = enable;
 }
 
-bool PrefixFormatter::getTwoDecimalMode()
-{
-	return m_twoDecimalMode;
+bool PrefixFormatter::getTwoDecimalMode() { return m_twoDecimalMode; }
+
+QString PrefixFormatter::buildString(double value, QString prefix,
+				     QString unitType, int precision) const {
+	return QLocale().toString(value, 'f', precision) + " " + prefix +
+		unitType;
 }
 
-QString PrefixFormatter::buildString(double value, QString prefix, QString unitType, int precision) const
-{
-	return QLocale().toString(value, 'f', precision) + " " + prefix + unitType;
-}
-
-int PrefixFormatter::findPrefixIndex(double value) const
-{
+int PrefixFormatter::findPrefixIndex(double value) const {
 	int index = m_defaultPrefixIndex;
 
 	value = fabs(value);
@@ -65,7 +62,8 @@ int PrefixFormatter::findPrefixIndex(double value) const
 		if (value >= (*it).second) {
 			index = m_prefixes.rend() - it - 1;
 			if (m_twoDecimalMode)
-				if (value / (*it).second >= 100 && it != m_prefixes.rbegin())
+				if (value / (*it).second >= 100 &&
+				    it != m_prefixes.rbegin())
 					index++;
 			break;
 		}
@@ -74,15 +72,16 @@ int PrefixFormatter::findPrefixIndex(double value) const
 	return index;
 }
 
-QString PrefixFormatter::format(double value, QString unitType = "", int precision = 0) const
-{
+QString PrefixFormatter::format(double value, QString unitType = "",
+				int precision = 0) const {
 	int index = findPrefixIndex(value);
 
-	return buildString(value / m_prefixes[index].second, m_prefixes[index].first, unitType, precision);
+	return buildString(value / m_prefixes[index].second,
+			   m_prefixes[index].first, unitType, precision);
 }
 
-void PrefixFormatter::getFormatAttributes(double value, QString& prefix, double& scale) const
-{
+void PrefixFormatter::getFormatAttributes(double value, QString &prefix,
+					  double &scale) const {
 	int index = findPrefixIndex(value);
 
 	prefix = m_prefixes[index].first;
@@ -92,50 +91,40 @@ void PrefixFormatter::getFormatAttributes(double value, QString& prefix, double&
 /*
  * MetricPrefixFormatter class implementation
  */
-MetricPrefixFormatter::MetricPrefixFormatter():
-	PrefixFormatter({
-					{"p", 1E-12},
-					{"n", 1E-9},
-					{"μ", 1E-6},
-					{"m", 1E-3},
-					{"", 1E0},
-					{"k", 1E3},
-					{"M", 1E6},
-					{"G", 1E9},
-					{"T", 1E12} }
-				)
-{
-}
+MetricPrefixFormatter::MetricPrefixFormatter()
+	: PrefixFormatter({{"p", 1E-12},
+			   {"n", 1E-9},
+			   {"μ", 1E-6},
+			   {"m", 1E-3},
+			   {"", 1E0},
+			   {"k", 1E3},
+			   {"M", 1E6},
+			   {"G", 1E9},
+			   {"T", 1E12}}) {}
 
 /*
  * TimePrefixFormatter class implementation
  */
-TimePrefixFormatter::TimePrefixFormatter():
-	PrefixFormatter({
-					{"ps", 1E-12},
-					{"ns", 1E-9},
-					{"μs", 1E-6},
-					{"ms", 1E-3},
-					{"s", 1E0},
-					{"min", 60},
-					{"hr", 60 * 60},
-					{"days", 24 * 60 * 60} }
-				)
-{
-}
-
+TimePrefixFormatter::TimePrefixFormatter()
+	: PrefixFormatter({{"ps", 1E-12},
+			   {"ns", 1E-9},
+			   {"μs", 1E-6},
+			   {"ms", 1E-3},
+			   {"s", 1E0},
+			   {"min", 60},
+			   {"hr", 60 * 60},
+			   {"days", 24 * 60 * 60}}) {}
 
 /*
  * NumberSeries class implementation
  */
 
 NumberSeries::NumberSeries(double lower, double upper, unsigned int powerStep,
-			   const std::vector<double>& steps):
-	m_lowerLimit(qAbs(lower)),
-	m_upperLimit(qAbs(upper)),
-	m_powerStep(powerStep),
-	m_templateSteps(steps)
-{
+			   const std::vector<double> &steps)
+	: m_lowerLimit(qAbs(lower))
+	, m_upperLimit(qAbs(upper))
+	, m_powerStep(powerStep)
+	, m_templateSteps(steps) {
 	// Avoid infinite loop
 	if (powerStep < 2)
 		m_powerStep = 2;
@@ -147,19 +136,13 @@ NumberSeries::NumberSeries(double lower, double upper, unsigned int powerStep,
 	buildNumberSeries();
 }
 
-NumberSeries::~NumberSeries()
-{
+NumberSeries::~NumberSeries() {}
 
-}
+const std::vector<double> &NumberSeries::getNumbers() { return m_numbers; }
 
-const std::vector<double>& NumberSeries::getNumbers()
-{
-	return m_numbers;
-}
-
-double NumberSeries::getNumberBefore(double value)
-{
-	auto numberIt = std::lower_bound(m_numbers.begin(), m_numbers.end(), value);
+double NumberSeries::getNumberBefore(double value) {
+	auto numberIt =
+		std::lower_bound(m_numbers.begin(), m_numbers.end(), value);
 
 	if (numberIt != m_numbers.begin())
 		numberIt--;
@@ -167,9 +150,9 @@ double NumberSeries::getNumberBefore(double value)
 	return (*numberIt);
 }
 
-double NumberSeries::getNumberAfter(double value)
-{
-	auto numberIt = std::upper_bound(m_numbers.begin(), m_numbers.end(), value);
+double NumberSeries::getNumberAfter(double value) {
+	auto numberIt =
+		std::upper_bound(m_numbers.begin(), m_numbers.end(), value);
 
 	if (numberIt == m_numbers.end())
 		numberIt--;
@@ -177,45 +160,32 @@ double NumberSeries::getNumberAfter(double value)
 	return (*numberIt);
 }
 
-void NumberSeries::setLower(double value)
-{
+void NumberSeries::setLower(double value) {
 	if ((value != m_lowerLimit) && (value != 0)) {
 		m_lowerLimit = qAbs(value);
 		buildNumberSeries();
 	}
 }
-double NumberSeries::lower()
-{
-	return m_lowerLimit;
-}
+double NumberSeries::lower() { return m_lowerLimit; }
 
-void NumberSeries::setUpper(double value)
-{
+void NumberSeries::setUpper(double value) {
 	if (value != m_upperLimit) {
 		m_upperLimit = qAbs(value);
 		buildNumberSeries();
 	}
 }
 
-double NumberSeries::upper()
-{
-	return m_upperLimit;
-}
+double NumberSeries::upper() { return m_upperLimit; }
 
-void NumberSeries::setPowerStep(unsigned int value)
-{
+void NumberSeries::setPowerStep(unsigned int value) {
 	if (value != m_powerStep) {
 		m_powerStep = value;
 		buildNumberSeries();
 	}
 }
-unsigned int NumberSeries::stepPower()
-{
-	return m_powerStep;
-}
+unsigned int NumberSeries::stepPower() { return m_powerStep; }
 
-void NumberSeries::buildNumberSeries()
-{
+void NumberSeries::buildNumberSeries() {
 	m_numbers.clear();
 
 	for (double i = m_lowerLimit; i <= m_upperLimit; i *= m_powerStep)
