@@ -836,7 +836,8 @@ void SignalGenerator::dutyChanged(double value)
 void SignalGenerator::trapezoidalComputeFrequency()
 {
 	auto ptr = getCurrentData();
-	frequency->setValue(static_cast<double>(1/(ptr->rise+ptr->fall+ptr->holdh+ptr->holdl)));
+	double value = static_cast<double>((round(1/(ptr->rise+ptr->fall+ptr->holdh+ptr->holdl))*1000)/1000);
+	frequency->setValue(value);
 }
 
 void SignalGenerator::riseChanged(double value)
