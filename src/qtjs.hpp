@@ -13,17 +13,18 @@ class QJSEngine;
 
 namespace adiscope {
 
-class QtJs : public QObject {
+class QtJs : public QObject
+{
 	Q_OBJECT
 
 public:
-	explicit QtJs(QJSEngine *engine);
+	explicit QtJs(QJSEngine* engine);
 
 	Q_INVOKABLE void exit();
 	Q_INVOKABLE void sleep(unsigned long s);
 	Q_INVOKABLE void msleep(unsigned long ms);
-	Q_INVOKABLE void printToConsole(const QString &text);
-	Q_INVOKABLE QString readFromConsole(const QString &text);
+	Q_INVOKABLE void printToConsole(const QString& text);
+	Q_INVOKABLE QString readFromConsole(const QString& text);
 
 private:
 	QFutureWatcher<QString> watcher;

@@ -34,10 +34,14 @@
 
 namespace adiscope {
 
-class Sink {
+class Sink
+{
 public:
-	Sink(const std::string &name, unsigned int numChannels, unsigned long long channelsDataLength)
-		: d_name(name), d_numChannels(numChannels), d_channelsDataLength(channelsDataLength) {}
+	Sink(const std::string& name, unsigned int numChannels, unsigned long long channelsDataLength)
+		: d_name(name)
+		, d_numChannels(numChannels)
+		, d_channelsDataLength(channelsDataLength)
+	{}
 
 	std::string name() { return d_name; }
 	unsigned int numChannels() { return d_numChannels; }
@@ -51,17 +55,18 @@ private:
 	unsigned long long d_channelsDataLength;
 };
 
-class SinkManager {
+class SinkManager
+{
 public:
 	SinkManager();
 	~SinkManager();
 
-	bool addSink(const std::string &name, unsigned int numChannels, unsigned long long channelsDataLength);
-	bool removeSink(const std::string &name);
+	bool addSink(const std::string& name, unsigned int numChannels, unsigned long long channelsDataLength);
+	bool removeSink(const std::string& name);
 	unsigned int sinkListLength();
-	Sink *sink(unsigned int index);
-	int indexOfSink(const std::string &name);
-	int sinkFirstChannelPos(const std::string &name);
+	Sink* sink(unsigned int index);
+	int indexOfSink(const std::string& name);
+	int sinkFirstChannelPos(const std::string& name);
 
 private:
 	std::vector<Sink> d_sinkList;
@@ -71,7 +76,8 @@ private:
  * \brief QWidget for displaying time domain plots.
  * \ingroup qtgui_blk
  */
-class TimeDomainDisplayPlot : public DisplayPlot {
+class TimeDomainDisplayPlot : public DisplayPlot
+{
 	Q_OBJECT
 
 	Q_PROPERTY(QColor tag_text_color READ getTagTextColor WRITE setTagTextColor)
@@ -79,12 +85,12 @@ class TimeDomainDisplayPlot : public DisplayPlot {
 	Q_PROPERTY(Qt::BrushStyle tag_background_style READ getTagBackgroundStyle WRITE setTagBackgroundStyle)
 
 public:
-	TimeDomainDisplayPlot(QWidget *, unsigned int xNumDivs = 10, unsigned int yNumDivs = 10);
+	TimeDomainDisplayPlot(QWidget*, unsigned int xNumDivs = 10, unsigned int yNumDivs = 10);
 	virtual ~TimeDomainDisplayPlot();
 
-	void plotNewData(const std::string &sender, const std::vector<double *> &dataPoints,
-			 const int64_t numDataPoints, const double timeInterval,
-			 const std::vector<std::vector<gr::tag_t>> &tags = std::vector<std::vector<gr::tag_t>>());
+	void plotNewData(const std::string& sender, const std::vector<double*>& dataPoints, const int64_t numDataPoints,
+			 const double timeInterval,
+			 const std::vector<std::vector<gr::tag_t>>& tags = std::vector<std::vector<gr::tag_t>>());
 	void replot();
 
 	void stemPlot(bool en);
@@ -110,9 +116,9 @@ public:
 			  bool curvesAttached = true);
 	bool unregisterSink(std::string sinkName);
 
-	bool registerMathWaveform(const std::string &sinkUniqueNme, unsigned int numChannels,
+	bool registerMathWaveform(const std::string& sinkUniqueNme, unsigned int numChannels,
 				  unsigned long long channelsDataLength, bool curvesAttached = true);
-	bool unregisterMathWaveform(const std::string &sinkName);
+	bool unregisterMathWaveform(const std::string& sinkName);
 
 	long dataStartingPoint() const;
 
@@ -133,7 +139,7 @@ Q_SIGNALS:
 	void filledScreen(bool, unsigned int);
 
 public Q_SLOTS:
-	void setSampleRate(double sr, double units, const std::string &strunits);
+	void setSampleRate(double sr, double units, const std::string& strunits);
 
 	void setAutoScale(bool state);
 	void setAutoScaleShot();
@@ -143,12 +149,12 @@ public Q_SLOTS:
 	void setLineWidthF(int which, qreal widthF);
 	qreal getLineWidthF(int which) const;
 
-	void legendEntryChecked(QwtPlotItem *plotItem, bool on);
-	void legendEntryChecked(const QVariant &plotItem, bool on, int index);
+	void legendEntryChecked(QwtPlotItem* plotItem, bool on);
+	void legendEntryChecked(const QVariant& plotItem, bool on, int index);
 
 	void enableTagMarker(int which, bool en);
 
-	void setYLabel(const std::string &label, const std::string &unit = "");
+	void setYLabel(const std::string& label, const std::string& unit = "");
 
 	void attachTriggerLines(bool en);
 	void setTriggerLines(double x, double y);
@@ -161,7 +167,7 @@ public Q_SLOTS:
 	bool isZoomerEnabled();
 	void setZoomerVertAxis(int index);
 
-	void customEvent(QEvent *e);
+	void customEvent(QEvent* e);
 
 	void cancelZoom();
 
@@ -176,21 +182,21 @@ protected:
 	virtual void cleanUpJustBeforeChannelRemoval(int chnIdx);
 
 private Q_SLOTS:
-	void newData(const QEvent *);
+	void newData(const QEvent*);
 
 protected:
-	std::vector<double *> d_ydata;
-	std::vector<double *> d_xdata;
-	std::vector<double *> d_ref_ydata;
+	std::vector<double*> d_ydata;
+	std::vector<double*> d_xdata;
+	std::vector<double*> d_ref_ydata;
 	QVector<QVector<double>> d_preview_xdata;
 	QVector<QVector<double>> d_preview_ydata;
-	QVector<QwtPlotCurve *> d_preview_curves;
-	bool isReferenceWaveform(QwtPlotCurve *curve);
-	bool isMathWaveform(QwtPlotCurve *curve) const;
+	QVector<QwtPlotCurve*> d_preview_curves;
+	bool isReferenceWaveform(QwtPlotCurve* curve);
+	bool isMathWaveform(QwtPlotCurve* curve) const;
 	int countReferenceWaveform(int position);
 
 private:
-	void _resetXAxisPoints(double *&xAxis, unsigned long long numPoints, double sampleRate);
+	void _resetXAxisPoints(double*& xAxis, unsigned long long numPoints, double sampleRate);
 	void _autoScale(double bottom, double top);
 
 	double d_sample_rate;
@@ -202,7 +208,7 @@ private:
 	bool d_semilogy;
 	bool d_autoscale_shot;
 
-	std::vector<std::vector<QwtPlotMarker *>> d_tag_markers;
+	std::vector<std::vector<QwtPlotMarker*>> d_tag_markers;
 	std::vector<bool> d_tag_markers_en;
 
 	MetricPrefixFormatter d_metricFormatter;
@@ -212,7 +218,7 @@ private:
 	QColor d_tag_background_color;
 	Qt::BrushStyle d_tag_background_style;
 
-	QwtPlotMarker *d_trigger_lines[2];
+	QwtPlotMarker* d_trigger_lines[2];
 
 	SinkManager d_sinkManager;
 
@@ -221,8 +227,8 @@ private:
 
 	QColor getChannelColor();
 
-	QMap<QString, QwtPlotCurve *> d_ref_curves;
-	QMap<QString, QwtPlotCurve *> d_math_curves;
+	QMap<QString, QwtPlotCurve*> d_ref_curves;
+	QMap<QString, QwtPlotCurve*> d_math_curves;
 	int d_nb_ref_curves;
 	int getCurveNextTo(int pos);
 };

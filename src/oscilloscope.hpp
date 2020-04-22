@@ -94,7 +94,8 @@ class AnalogBufferPreviewer;
 class ChannelWidget;
 class signal_sample;
 
-class Oscilloscope : public Tool {
+class Oscilloscope : public Tool
+{
 	friend class Oscilloscope_API;
 	friend class Channel_API;
 	friend class ToolLauncher_API;
@@ -102,8 +103,8 @@ class Oscilloscope : public Tool {
 	Q_OBJECT
 
 public:
-	explicit Oscilloscope(struct iio_context *ctx, Filter *filt, std::shared_ptr<GenericAdc> adc,
-			      ToolMenuItem *toolMenuItem, QJSEngine *engine, ToolLauncher *parent = 0);
+	explicit Oscilloscope(struct iio_context* ctx, Filter* filt, std::shared_ptr<GenericAdc> adc,
+			      ToolMenuItem* toolMenuItem, QJSEngine* engine, ToolLauncher* parent = 0);
 	~Oscilloscope();
 
 	void settingsLoaded();
@@ -260,36 +261,36 @@ private:
 	const int autosetNrOfSkippedTones = 50;
 	const int autosetValidTone = 150;
 
-	Ui::Oscilloscope *ui;
-	Ui::OscGeneralSettings *gsettings_ui;
-	Ui::ChannelSettings *ch_ui;
+	Ui::Oscilloscope* ui;
+	Ui::OscGeneralSettings* gsettings_ui;
+	Ui::ChannelSettings* ch_ui;
 	adiscope::TriggerSettings trigger_settings;
-	adiscope::MeasureSettings *measure_settings;
+	adiscope::MeasureSettings* measure_settings;
 	CapturePlot plot;
 	FftDisplayPlot fft_plot;
 	ConstellationDisplayPlot xy_plot;
 	HistogramDisplayPlot hist_plot;
-	Ui::MeasurementsPanel *measure_panel_ui;
-	QWidget *measurePanel;
-	Ui::CursorReadouts *cursor_readouts_ui;
-	QWidget *cursorReadouts;
-	Ui::StatisticsPanel *statistics_panel_ui;
-	Ui::CursorsSettings *cr_ui;
-	QWidget *statisticsPanel;
-	AnalogBufferPreviewer *buffer_previewer;
-	ExportSettings *exportSettings;
-	CustomPlotPositionButton *cursorsPositionButton;
+	Ui::MeasurementsPanel* measure_panel_ui;
+	QWidget* measurePanel;
+	Ui::CursorReadouts* cursor_readouts_ui;
+	QWidget* cursorReadouts;
+	Ui::StatisticsPanel* statistics_panel_ui;
+	Ui::CursorsSettings* cr_ui;
+	QWidget* statisticsPanel;
+	AnalogBufferPreviewer* buffer_previewer;
+	ExportSettings* exportSettings;
+	CustomPlotPositionButton* cursorsPositionButton;
 
-	MouseWheelWidgetGuard *wheelEventGuard;
+	MouseWheelWidgetGuard* wheelEventGuard;
 
-	QPair<Ui::MathPanel, Math *> *math_pair;
+	QPair<Ui::MathPanel, Math*>* math_pair;
 	bool addChannel;
-	QTabWidget *tabWidget;
-	QWidget *ref;
+	QTabWidget* tabWidget;
+	QWidget* ref;
 
 	QVector<QVector<double>> import_data;
 	QString import_error;
-	ImportSettings *importSettings;
+	ImportSettings* importSettings;
 	bool lastFunctionValid;
 
 	QMap<int, bool> exportConfig;
@@ -307,16 +308,16 @@ private:
 	QMap<QString, boost::shared_ptr<gr::analog::rail_ff>> math_rails;
 	std::vector<boost::shared_ptr<gr::blocks::multiply_const_ff>> math_probe_atten;
 
-	iio_manager::port_id *ids;
-	iio_manager::port_id *hist_ids;
-	iio_manager::port_id *autoset_id;
+	iio_manager::port_id* ids;
+	iio_manager::port_id* hist_ids;
+	iio_manager::port_id* autoset_id;
 
-	ScaleSpinButton *timeBase;
-	PositionSpinButton *timePosition;
-	ScaleSpinButton *voltsPerDiv;
-	PositionSpinButton *voltsPosition;
+	ScaleSpinButton* timeBase;
+	PositionSpinButton* timePosition;
+	ScaleSpinButton* voltsPerDiv;
+	PositionSpinButton* voltsPosition;
 
-	ScaleSpinButton *refChannelTimeBase;
+	ScaleSpinButton* refChannelTimeBase;
 
 	bool fft_is_visible, hist_is_visible, xy_is_visible, autosetRequested;
 	bool statistics_enabled;
@@ -338,7 +339,7 @@ private:
 	bool new_data_is_triggered;
 	bool trigger_input;
 	CapturePlot::TriggerState trigger_state;
-	StateUpdater *triggerUpdater;
+	StateUpdater* triggerUpdater;
 
 	int fft_size;
 	int autoset_fft_size;
@@ -354,48 +355,48 @@ private:
 	int current_ch_widget;
 	unsigned int math_chn_counter;
 
-	QButtonGroup *channels_group; // selected state of each channel
+	QButtonGroup* channels_group; // selected state of each channel
 
-	QPushButton *menuRunButton;
+	QPushButton* menuRunButton;
 
-	QList<Channel_API *> channels_api;
+	QList<Channel_API*> channels_api;
 
 	QList<std::shared_ptr<MeasurementData>> measurements_data;
 	QList<std::shared_ptr<MeasurementGui>> measurements_gui;
 
 	QList<QPair<std::shared_ptr<MeasurementData>, Statistic>> statistics_data;
 
-	QList<CustomPushButton *> menuOrder;
+	QList<CustomPushButton*> menuOrder;
 
-	QQueue<QPair<CustomPushButton *, bool>> menuButtonActions;
+	QQueue<QPair<CustomPushButton*, bool>> menuButtonActions;
 
 	QVector<double> probe_attenuation;
 
 	void writeAllSettingsToHardware();
 
-	void comboBoxUpdateToValue(QComboBox *box, double value, std::vector<double> list);
+	void comboBoxUpdateToValue(QComboBox* box, double value, std::vector<double> list);
 
 	void settings_panel_update(int id);
 	void settings_panel_size_adjust();
-	void triggerRightMenuToggle(CustomPushButton *, bool checked);
-	void toggleRightMenu(CustomPushButton *, bool checked);
+	void triggerRightMenuToggle(CustomPushButton*, bool checked);
+	void toggleRightMenu(CustomPushButton*, bool checked);
 	void create_add_channel_panel();
-	void add_math_channel(const std::string &function);
+	void add_math_channel(const std::string& function);
 	unsigned int find_curve_number();
-	ChannelWidget *channelWidgetAtId(int id);
+	ChannelWidget* channelWidgetAtId(int id);
 	void update_measure_for_channel(int ch_idx);
 	void setAllSinksSampleCount(unsigned long sample_count);
 	void autosetFFT();
 
 	void updateRunButton(bool ch_enabled);
 
-	void fillCursorReadouts(const struct cursorReadoutsText &);
+	void fillCursorReadouts(const struct cursorReadoutsText&);
 
 	void measure_panel_init();
 	void measure_settings_init();
 	void measureLabelsRearrange();
 	void measureUpdateValues();
-	void measureCreateAndAppendGuiFrom(const MeasurementData &);
+	void measureCreateAndAppendGuiFrom(const MeasurementData&);
 
 	void statistics_panel_init();
 	void statisticsUpdateValues();
@@ -412,7 +413,7 @@ private:
 	void setChannelWidgetIndex(int chnIdx);
 
 	void init_channel_settings();
-	void editMathChannelFunction(int id, const std::string &new_function);
+	void editMathChannelFunction(int id, const std::string& new_function);
 
 	std::vector<boost::shared_ptr<cancel_dc_offset_block>> dc_cancel;
 	std::vector<QPair<gr::basic_block_sptr, int>> xy_channels;

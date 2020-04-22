@@ -31,7 +31,8 @@
 
 using namespace adiscope;
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv)
+{
 	/* Set environment variable QT_AUTO_SCREEN_SCALE_FACTOR to 1(true) thus
 	 * making Scopy aware of the scaling settings set by the OS */
 	qputenv("QT_AUTO_SCREEN_SCALE_FACTOR", QString("1").toLocal8Bit());
@@ -44,7 +45,7 @@ int main(int argc, char **argv) {
 #ifdef Q_OS_WIN
 	google_breakpad::ExceptionHandler eh(L"C:/dumps/", NULL, ScopyApplication::dumpCallback, NULL,
 					     google_breakpad::ExceptionHandler::HANDLER_ALL, MiniDumpNormal,
-					     (wchar_t *)NULL, NULL);
+					     (wchar_t*)NULL, NULL);
 #endif
 
 	ScopyApplication app(argc, argv);

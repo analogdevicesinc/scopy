@@ -27,43 +27,44 @@
 
 class QwtPlot;
 
-class SymbolController : public QObject {
+class SymbolController : public QObject
+{
 	Q_OBJECT
 
 public:
-	SymbolController(QwtPlot *);
+	SymbolController(QwtPlot*);
 	virtual ~SymbolController();
 
-	const QwtPlot *plot() const;
-	QwtPlot *plot();
+	const QwtPlot* plot() const;
+	QwtPlot* plot();
 
-	void attachSymbol(Symbol *symbol);
-	void detachSymbol(Symbol *symbol);
+	void attachSymbol(Symbol* symbol);
+	void detachSymbol(Symbol* symbol);
 
 	void setEnabled(bool);
 	bool isEnabled() const;
 
-	void drawOverlay(QPainter *) const;
+	void drawOverlay(QPainter*) const;
 	QRegion maskHint() const;
 
-	virtual bool eventFilter(QObject *, QEvent *);
+	virtual bool eventFilter(QObject*, QEvent*);
 
 public Q_SLOTS:
 	void updateOverlay();
 
 private:
-	void drawCursor(QPainter *) const;
+	void drawCursor(QPainter*) const;
 
-	void symbolPositionUpdate(Symbol *symbol) const;
+	void symbolPositionUpdate(Symbol* symbol) const;
 
-	bool pressed(const QPoint &);
-	bool moved(const QPoint &);
-	void released(const QPoint &);
+	bool pressed(const QPoint&);
+	bool moved(const QPoint&);
+	void released(const QPoint&);
 
 	bool d_isEnabled;
 	QPointer<QwtWidgetOverlay> d_overlay;
-	QList<Symbol *> d_symbols;
-	Symbol *d_selectedSymbol;
+	QList<Symbol*> d_symbols;
+	Symbol* d_selectedSymbol;
 	QPoint d_prevPos;
 	int axesCreated;
 };

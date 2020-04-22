@@ -21,7 +21,10 @@
 
 using namespace adiscope;
 
-Graticule::Graticule(QwtPlot *plot) : enabled(false), plot(plot) {
+Graticule::Graticule(QwtPlot* plot)
+	: enabled(false)
+	, plot(plot)
+{
 	vertScale = new GraticulePlotScaleItem(QwtScaleDraw::LeftScale, -1);
 	horizScale = new GraticulePlotScaleItem(QwtScaleDraw::BottomScale, -1);
 	vertScale2 = new GraticulePlotScaleItem(QwtScaleDraw::RightScale, -1);
@@ -64,14 +67,16 @@ Graticule::Graticule(QwtPlot *plot) : enabled(false), plot(plot) {
 	horizScale2->setPalette(palette);
 }
 
-Graticule::~Graticule() {
+Graticule::~Graticule()
+{
 	delete vertScale;
 	delete vertScale2;
 	delete horizScale;
 	delete horizScale2;
 }
 
-void Graticule::toggleGraticule() {
+void Graticule::toggleGraticule()
+{
 	enabled = !enabled;
 
 	if (enabled) {
@@ -87,7 +92,8 @@ void Graticule::toggleGraticule() {
 	}
 }
 
-void Graticule::enableGraticule(bool enable) {
+void Graticule::enableGraticule(bool enable)
+{
 	if (enable != enabled) {
 		enabled = enable;
 
@@ -105,7 +111,8 @@ void Graticule::enableGraticule(bool enable) {
 	}
 }
 
-void Graticule::onCanvasSizeChanged() {
+void Graticule::onCanvasSizeChanged()
+{
 	vertScale->setBorderDistance(plot->canvas()->width() / 2);
 	horizScale->setBorderDistance(plot->canvas()->height() / 2);
 	vertScale2->setBorderDistance(plot->canvas()->width() / 2);
@@ -113,9 +120,11 @@ void Graticule::onCanvasSizeChanged() {
 }
 
 GraticulePlotScaleItem::GraticulePlotScaleItem(QwtScaleDraw::Alignment alignment, const double pos)
-	: QwtPlotScaleItem(alignment, pos) {}
+	: QwtPlotScaleItem(alignment, pos)
+{}
 
-static QwtScaleDiv getGraticuleScaleDiv(const QwtScaleDiv &from_scaleDiv) {
+static QwtScaleDiv getGraticuleScaleDiv(const QwtScaleDiv& from_scaleDiv)
+{
 	double lowerBound;
 	double upperBound;
 	QList<double> minorTicks;
@@ -136,6 +145,7 @@ static QwtScaleDiv getGraticuleScaleDiv(const QwtScaleDiv &from_scaleDiv) {
 	return QwtScaleDiv(lowerBound, upperBound, minorTicks, mediumTicks, majorTicks);
 }
 
-void GraticulePlotScaleItem::updateScaleDiv(const QwtScaleDiv &xScaleDiv, const QwtScaleDiv &yScaleDiv) {
+void GraticulePlotScaleItem::updateScaleDiv(const QwtScaleDiv& xScaleDiv, const QwtScaleDiv& yScaleDiv)
+{
 	QwtPlotScaleItem::updateScaleDiv(getGraticuleScaleDiv(xScaleDiv), getGraticuleScaleDiv(yScaleDiv));
 }

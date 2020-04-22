@@ -27,11 +27,17 @@
 
 using namespace adiscope;
 
-FileManager::FileManager(QString toolName) : hasHeader(false), sampleRate(0), nrOfSamples(0), toolName(toolName) {}
+FileManager::FileManager(QString toolName)
+	: hasHeader(false)
+	, sampleRate(0)
+	, nrOfSamples(0)
+	, toolName(toolName)
+{}
 
 FileManager::~FileManager() {}
 
-void FileManager::open(QString fileName, FileManager::FilePurpose filepurpose) {
+void FileManager::open(QString fileName, FileManager::FilePurpose filepurpose)
+{
 	// read the data from the file if filepurpose is Import
 	// throws exception if the file is corrupted, has a header but not the
 	// scopy one columns with different sizes etc..
@@ -154,7 +160,8 @@ void FileManager::open(QString fileName, FileManager::FilePurpose filepurpose) {
 	}
 }
 
-void FileManager::save(QVector<double> data, QString name) {
+void FileManager::save(QVector<double> data, QString name)
+{
 	this->columnNames.push_back(name);
 
 	if (this->data.size() == 0) {
@@ -166,17 +173,19 @@ void FileManager::save(QVector<double> data, QString name) {
 	}
 }
 
-void FileManager::save(QVector<QVector<double>> data, QStringList columnNames) {
-	for (auto &column : data) {
+void FileManager::save(QVector<QVector<double>> data, QStringList columnNames)
+{
+	for (auto& column : data) {
 		this->data.push_back(column);
 	}
 
-	for (auto &column_name : columnNames) {
+	for (auto& column_name : columnNames) {
 		this->columnNames.push_back(column_name);
 	}
 }
 
-QVector<double> FileManager::read(int index) {
+QVector<double> FileManager::read(int index)
+{
 	if (index < 0 || index + 1 >= data.size()) {
 		return QVector<double>();
 	}
@@ -195,7 +204,8 @@ QVector<double> FileManager::read(int index) {
 
 QVector<QVector<double>> FileManager::read() { return data; }
 
-void FileManager::setColumnName(int index, QString name) {
+void FileManager::setColumnName(int index, QString name)
+{
 	if (index < 0 || index >= data.size()) {
 		return;
 	}
@@ -203,7 +213,8 @@ void FileManager::setColumnName(int index, QString name) {
 	columnNames[index] = name;
 }
 
-QString FileManager::getColumnName(int index) {
+QString FileManager::getColumnName(int index)
+{
 	if (index < 0 || index >= columnNames.size()) {
 		return "";
 	}
@@ -221,7 +232,8 @@ void FileManager::setSampleRate(double sampleRate) { this->sampleRate = sampleRa
 
 double FileManager::getNrOfSamples() const { return nrOfSamples; }
 
-int FileManager::getNrOfChannels() const {
+int FileManager::getNrOfChannels() const
+{
 	if (data.size() == 0) {
 		return 0;
 	}
@@ -233,7 +245,8 @@ int FileManager::getNrOfChannels() const {
 	}
 }
 
-void FileManager::performWrite() {
+void FileManager::performWrite()
+{
 	QString additionalInfo = "";
 	if (openedFor == IMPORT) {
 		qDebug() << "Can't write when opened for import!";
@@ -286,13 +299,14 @@ void FileManager::performWrite() {
 
 QStringList FileManager::getAdditionalInformation() const { return additionalInformation; }
 
-void FileManager::setAdditionalInformation(const QString &value) { additionalInformation.push_back(value); }
+void FileManager::setAdditionalInformation(const QString& value) { additionalInformation.push_back(value); }
 
 FileManager::FileFormat FileManager::getFormat() const { return format; }
 
-void FileManager::setFormat(const FileManager::FileFormat &value) { format = value; }
+void FileManager::setFormat(const FileManager::FileFormat& value) { format = value; }
 
-bool ScopyFileHeader::hasValidHeader(QVector<QVector<QString>> data) {
+bool ScopyFileHeader::hasValidHeader(QVector<QVector<QString>> data)
+{
 
 	QStringList header_elements = getHeader();
 
@@ -309,7 +323,8 @@ bool ScopyFileHeader::hasValidHeader(QVector<QVector<QString>> data) {
 	return true;
 }
 
-QStringList ScopyFileHeader::getHeader() {
+QStringList ScopyFileHeader::getHeader()
+{
 
 	QStringList header_elements = QStringList() << ";Scopy version"
 						    << ";Exported on"

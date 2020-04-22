@@ -31,15 +31,16 @@
 
 using namespace adiscope;
 
-PowerController::PowerController(struct iio_context *ctx, ToolMenuItem *toolMenuItem, QJSEngine *engine,
-				 ToolLauncher *parent)
+PowerController::PowerController(struct iio_context* ctx, ToolMenuItem* toolMenuItem, QJSEngine* engine,
+				 ToolLauncher* parent)
 	: Tool(ctx, toolMenuItem, new PowerController_API(this), "Power Supply", parent)
 	, ui(new Ui::PowerController)
-	, in_sync(false) {
+	, in_sync(false)
+{
 	ui->setupUi(this);
-	struct iio_device *dev1 = iio_context_find_device(ctx, "ad5627");
-	struct iio_device *dev2 = iio_context_find_device(ctx, "ad9963");
-	struct iio_device *dev3 = iio_context_find_device(ctx, "m2k-fabric");
+	struct iio_device* dev1 = iio_context_find_device(ctx, "ad5627");
+	struct iio_device* dev2 = iio_context_find_device(ctx, "ad9963");
+	struct iio_device* dev3 = iio_context_find_device(ctx, "m2k-fabric");
 
 	if (!dev1 || !dev2 || !dev3)
 		throw std::runtime_error("Unable to find device\n");
@@ -57,7 +58,7 @@ PowerController::PowerController(struct iio_context *ctx, ToolMenuItem *toolMenu
 	/* FIXME: TODO: Move this into a HW class / lib M2k
 	 * This should be part of some pre-init call, where*/
 	if (1) {
-		struct iio_channel *chan;
+		struct iio_channel* chan;
 		/* These are the two ADC amplifiers */
 		chan = iio_device_find_channel(dev3, "voltage0", false);
 		if (chan)
@@ -112,8 +113,8 @@ PowerController::PowerController(struct iio_context *ctx, ToolMenuItem *toolMenu
 	connect(ui->dac2, &QPushButton::toggled, this, &PowerController::toggleRunButton);
 
 	/*Load calibration parameters from iio context*/
-	const char *name;
-	const char *value;
+	const char* name;
+	const char* value;
 	for (int i = 4; i < 12; i++) {
 		if (!iio_context_get_attr(ctx, i, &name, &value))
 			calibrationParam[QString(name + 4)] = QString(value).toDouble();
@@ -124,7 +125,8 @@ PowerController::PowerController(struct iio_context *ctx, ToolMenuItem *toolMenu
 	api->js_register(engine);
 }
 
-PowerController::~PowerController() {
+PowerController::~PowerController()
+{
 	ui->dac1->setChecked(false);
 	ui->dac2->setChecked(false);
 
@@ -136,9 +138,9 @@ PowerController::~PowerController() {
 		iio_channel_attr_write_bool(pd_neg, "user_supply_powerdown", true);
 
 	/* FIXME: TODO: Move this into a HW class / lib M2k */
-	struct iio_device *dev3 = iio_context_find_device(ctx, "m2k-fabric");
+	struct iio_device* dev3 = iio_context_find_device(ctx, "m2k-fabric");
 	if (dev3) {
-		struct iio_channel *chan;
+		struct iio_channel* chan;
 		/* These are the two ADC amplifiers */
 		chan = iio_device_find_channel(dev3, "voltage0", false);
 		if (chan)
@@ -160,7 +162,8 @@ PowerController::~PowerController() {
 	delete ui;
 }
 
-void PowerController::toggleRunButton(bool enabled) {
+void PowerController::toggleRunButton(bool enabled)
+{
 	bool dac1Enabled = ui->dac1->isChecked();
 	bool dac2Enabled = ui->dac2->isChecked();
 	if (enabled) {
@@ -170,11 +173,12 @@ void PowerController::toggleRunButton(bool enabled) {
 	}
 }
 
-void PowerController::showEvent(QShowEvent *event) { timer.start(TIMER_TIMEOUT_MS); }
+void PowerController::showEvent(QShowEvent* event) { timer.start(TIMER_TIMEOUT_MS); }
 
-void PowerController::hideEvent(QHideEvent *event) { timer.stop(); }
+void PowerController::hideEvent(QHideEvent* event) { timer.stop(); }
 
-void PowerController::dac1_set_value(double value) {
+void PowerController::dac1_set_value(double value)
+{
 	double offset = calibrationParam[QString("offset_pos_dac")];
 	double gain = calibrationParam[QString("gain_pos_dac")];
 
@@ -194,7 +198,8 @@ void PowerController::dac1_set_value(double value) {
 	}
 }
 
-void PowerController::dac2_set_value(double value) {
+void PowerController::dac2_set_value(double value)
+{
 	double offset = calibrationParam[QString("offset_neg_dac")];
 	double gain = calibrationParam[QString("gain_neg_dac")];
 
@@ -207,7 +212,8 @@ void PowerController::dac2_set_value(double value) {
 	averageVoltageCh2.clear();
 }
 
-void PowerController::dac1_set_enabled(bool enabled) {
+void PowerController::dac1_set_enabled(bool enabled)
+{
 	iio_channel_attr_write_bool(ch1w, "powerdown", !enabled);
 	averageVoltageCh1.clear();
 
@@ -227,7 +233,8 @@ void PowerController::dac1_set_enabled(bool enabled) {
 	setDynamicProperty(ui->dac1, "running", enabled);
 }
 
-void PowerController::dac2_set_enabled(bool enabled) {
+void PowerController::dac2_set_enabled(bool enabled)
+{
 	iio_channel_attr_write_bool(ch2w, "powerdown", !enabled);
 	averageVoltageCh2.clear();
 
@@ -244,7 +251,8 @@ void PowerController::dac2_set_enabled(bool enabled) {
 	setDynamicProperty(ui->dac2, "running", enabled);
 }
 
-void PowerController::sync_enabled(bool enabled) {
+void PowerController::sync_enabled(bool enabled)
+{
 	if (ui->dac1->isChecked()) {
 		dac2_set_enabled(!enabled);
 		ui->dac2->setChecked(!enabled);
@@ -257,7 +265,8 @@ void PowerController::sync_enabled(bool enabled) {
 
 void PowerController::ratioChanged(int percent) { valueNeg->setValue(-valuePos->value() * (double)percent / 100.0); }
 
-void PowerController::update_lcd() {
+void PowerController::update_lcd()
+{
 	double offset1 = calibrationParam[QString("offset_pos_adc")];
 	double gain1 = calibrationParam[QString("gain_pos_adc")];
 	double offset2 = calibrationParam[QString("offset_neg_adc")];
@@ -299,7 +308,8 @@ void PowerController::update_lcd() {
 void PowerController::run() { startStop(true); }
 void PowerController::stop() { startStop(false); }
 
-void PowerController::startStop(bool start) {
+void PowerController::startStop(bool start)
+{
 	dac1_set_enabled(start);
 	ui->dac1->setChecked(start);
 

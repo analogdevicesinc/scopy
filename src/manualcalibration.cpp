@@ -59,14 +59,15 @@ Measure the Voltage on the "V-" and
 enter the value in the field below.
 The value should be around -4.5V)");
 
-ManualCalibration::ManualCalibration(struct iio_context *ctx, Filter *filt, ToolMenuItem *toolMenuItem,
-				     QJSEngine *engine, ToolLauncher *parent, Calibration *cal)
+ManualCalibration::ManualCalibration(struct iio_context* ctx, Filter* filt, ToolMenuItem* toolMenuItem,
+				     QJSEngine* engine, ToolLauncher* parent, Calibration* cal)
 	: Tool(ctx, toolMenuItem, new ManualCalibration_API(this), "Calibration", parent)
 	, ui(new Ui::ManualCalibration)
 	, filter(filt)
 	, eng(engine)
 	, calib(cal)
-	, calibrationFilePath("") {
+	, calibrationFilePath("")
+{
 	ui->setupUi(this);
 	calibListString << "Positive supply"
 			<< "Negative supply"
@@ -106,14 +107,16 @@ ManualCalibration::ManualCalibration(struct iio_context *ctx, Filter *filt, Tool
 	on_calibList_itemClicked(ui->calibList->currentItem());
 }
 
-ManualCalibration::~ManualCalibration() {
+ManualCalibration::~ManualCalibration()
+{
 	delete TempWidget;
 	delete TempUi;
 	delete api;
 	delete ui;
 }
 
-void ManualCalibration::startCalibration() {
+void ManualCalibration::startCalibration()
+{
 	qDebug(CAT_CALIBRATION_MANUAL) << "START: Calibration has started";
 
 	switch (stCalibrationStory.calibProcedure) {
@@ -130,7 +133,8 @@ void ManualCalibration::startCalibration() {
 	nextStep();
 }
 
-void ManualCalibration::nextStep() {
+void ManualCalibration::nextStep()
+{
 	if (stCalibrationStory.story.count() > (stCalibrationStory.calibStep + 1)) {
 		stCalibrationStory.calibStep++;
 		TempUi->instructionText->setText(stCalibrationStory.story[stCalibrationStory.calibStep]);
@@ -138,7 +142,8 @@ void ManualCalibration::nextStep() {
 		qDebug(CAT_CALIBRATION_MANUAL) << "Calibration procedure finished";
 	}
 }
-void ManualCalibration::on_calibList_itemClicked(QListWidgetItem *item) {
+void ManualCalibration::on_calibList_itemClicked(QListWidgetItem* item)
+{
 	qDebug(CAT_CALIBRATION_MANUAL) << "Calibration list item clicked" << item->text().toLocal8Bit();
 	QString temp = item->text();
 
@@ -184,7 +189,8 @@ void ManualCalibration::on_calibList_itemClicked(QListWidgetItem *item) {
 	}
 }
 
-void ManualCalibration::positivePowerSupplySetup() {
+void ManualCalibration::positivePowerSupplySetup()
+{
 	TempUi->restartButton->setVisible(false);
 	TempUi->nextButton->setVisible(true);
 	TempUi->finishButton->setVisible(false);
@@ -203,11 +209,12 @@ void ManualCalibration::positivePowerSupplySetup() {
 	setPositiveValue(0.1);
 }
 
-void ManualCalibration::setupPowerSupplyIio() {
+void ManualCalibration::setupPowerSupplyIio()
+{
 	/*For power supply calibration*/
-	struct iio_device *dev1 = iio_context_find_device(ctx, "ad5627");
-	struct iio_device *dev2 = iio_context_find_device(ctx, "ad9963");
-	struct iio_device *dev3 = iio_context_find_device(ctx, "m2k-fabric");
+	struct iio_device* dev1 = iio_context_find_device(ctx, "ad5627");
+	struct iio_device* dev2 = iio_context_find_device(ctx, "ad9963");
+	struct iio_device* dev3 = iio_context_find_device(ctx, "m2k-fabric");
 
 	if (!dev1 || !dev2 || !dev3) {
 		throw std::runtime_error("Unable to find device\n");
@@ -225,7 +232,7 @@ void ManualCalibration::setupPowerSupplyIio() {
 	}
 
 	/*enable ADCs*/
-	struct iio_channel *chan;
+	struct iio_channel* chan;
 	/* These are the two ADC amplifiers */
 	chan = iio_device_find_channel(dev3, "voltage0", false);
 
@@ -243,7 +250,8 @@ void ManualCalibration::setupPowerSupplyIio() {
 	iio_device_attr_write(dev3, "clk_powerdown", "0");
 }
 
-void ManualCalibration::positivePowerSupplyParam(const int step) {
+void ManualCalibration::positivePowerSupplyParam(const int step)
+{
 	double offset_Value;
 	long long val = 0;
 	double value = 0;
@@ -308,18 +316,21 @@ void ManualCalibration::positivePowerSupplyParam(const int step) {
 	TempUi->lineEdit->clear();
 }
 
-void ManualCalibration::setEnablePositiveSuppply(bool enabled) {
+void ManualCalibration::setEnablePositiveSuppply(bool enabled)
+{
 	iio_channel_attr_write_bool(ch1w, "powerdown", !enabled);
 	iio_channel_attr_write_bool(pd_pos, "user_supply_powerdown", !enabled);
 }
 
-void ManualCalibration::setPositiveValue(double value) {
+void ManualCalibration::setPositiveValue(double value)
+{
 	long long val = value * 4095.0 / (5.02 * 1.2);
 
 	iio_channel_attr_write_longlong(ch1w, "raw", val);
 }
 
-void ManualCalibration::negativePowerSupplySetup() {
+void ManualCalibration::negativePowerSupplySetup()
+{
 	TempUi->restartButton->setVisible(false);
 	TempUi->nextButton->setVisible(true);
 	TempUi->finishButton->setVisible(false);
@@ -337,7 +348,8 @@ void ManualCalibration::negativePowerSupplySetup() {
 	setNegativeValue(-0.1);
 }
 
-void ManualCalibration::negativePowerSupplyParam(const int step) {
+void ManualCalibration::negativePowerSupplyParam(const int step)
+{
 	double offset_Value;
 	long long val = 0;
 	double value = 0;
@@ -403,7 +415,8 @@ void ManualCalibration::negativePowerSupplyParam(const int step) {
 	TempUi->lineEdit->clear();
 }
 
-void ManualCalibration::setEnableNegativeSuppply(bool enabled) {
+void ManualCalibration::setEnableNegativeSuppply(bool enabled)
+{
 	iio_channel_attr_write_bool(ch2w, "powerdown", !enabled);
 
 	if (pd_neg) {
@@ -413,7 +426,8 @@ void ManualCalibration::setEnableNegativeSuppply(bool enabled) {
 	}
 }
 
-void ManualCalibration::setNegativeValue(double value) {
+void ManualCalibration::setNegativeValue(double value)
+{
 	long long val = value * 4095.0 / (-5.1 * 1.2);
 
 	iio_channel_attr_write_longlong(ch2w, "raw", val);
@@ -421,9 +435,10 @@ void ManualCalibration::setNegativeValue(double value) {
 
 void ManualCalibration::on_nextButton_clicked() { startCalibration(); }
 
-void ManualCalibration::setCalibration(Calibration *cal) { calib = cal; }
+void ManualCalibration::setCalibration(Calibration* cal) { calib = cal; }
 
-void ManualCalibration::allowManualCalibScript(bool calib_en, bool calib_pref_en) {
+void ManualCalibration::allowManualCalibScript(bool calib_en, bool calib_pref_en)
+{
 	if (calib_pref_en && calib_en) {
 		eng->globalObject().setProperty("manual_calib", eng->newQObject(api));
 	} else {
@@ -433,7 +448,8 @@ void ManualCalibration::allowManualCalibScript(bool calib_en, bool calib_pref_en
 	}
 }
 
-void ManualCalibration::displayStartUpCalibrationValues(void) {
+void ManualCalibration::displayStartUpCalibrationValues(void)
+{
 	QStringList tableHeader;
 
 	tableHeader << "Name"
@@ -469,11 +485,12 @@ void ManualCalibration::displayStartUpCalibrationValues(void) {
 	startParamTable->resizeColumnsToContents();
 }
 
-void ManualCalibration::initParameters(void) {
+void ManualCalibration::initParameters(void)
+{
 	QStringList tableHeader;
-	const char *name;
-	const char *value;
-	QTableWidgetItem *item;
+	const char* name;
+	const char* value;
+	QTableWidgetItem* item;
 
 	tableHeader << "Name"
 		    << "Value";
@@ -497,7 +514,8 @@ void ManualCalibration::updateParameters(void) {}
 
 void ManualCalibration::on_loadButton_clicked() { initParameters(); }
 
-void ManualCalibration::on_saveButton_clicked() {
+void ManualCalibration::on_saveButton_clicked()
+{
 	QString fileName;
 	if (calibrationFilePath == "") {
 		fileName = QFileDialog::getOpenFileName(this, tr("Save File"), "/home", tr("ini (*.ini)"));
@@ -528,7 +546,8 @@ void ManualCalibration::on_saveButton_clicked() {
 	}
 }
 
-void ManualCalibration::on_restartButton_clicked() {
+void ManualCalibration::on_restartButton_clicked()
+{
 	switch (stCalibrationStory.calibProcedure) {
 	case POSITIVE_OFFSET:
 		positivePowerSupplySetup();
@@ -542,7 +561,8 @@ void ManualCalibration::on_restartButton_clicked() {
 	TempUi->inputTableWidget->clearContents();
 }
 
-void ManualCalibration::on_finishButton_clicked() {
+void ManualCalibration::on_finishButton_clicked()
+{
 	ui->storyWidget->layout()->removeWidget(TempWidget);
 
 	QSizePolicy sp_retain = ui->storyWidget->sizePolicy();
@@ -559,7 +579,8 @@ void ManualCalibration::on_finishButton_clicked() {
 	setEnableNegativeSuppply(false);
 }
 
-void ManualCalibration::on_autoButton_clicked() {
+void ManualCalibration::on_autoButton_clicked()
+{
 	if (calib->isInitialized()) {
 		calib->setHardwareInCalibMode();
 		calib->calibrateAll();

@@ -25,7 +25,7 @@
 
 using namespace adiscope;
 
-BitfieldWidget::BitfieldWidget(QWidget *parent, QDomElement *bitfield)
+BitfieldWidget::BitfieldWidget(QWidget* parent, QDomElement* bitfield)
 	: QWidget(parent)
 	, ui(new Ui::BitfieldWidget())
 	, bitfield(bitfield)
@@ -48,7 +48,10 @@ BitfieldWidget::BitfieldWidget(QWidget *parent, QDomElement *bitfield)
 	createWidget(); // build the widget
 }
 
-BitfieldWidget::BitfieldWidget(QWidget *parent, int bitNumber) : QWidget(parent), ui(new Ui::BitfieldWidget()) {
+BitfieldWidget::BitfieldWidget(QWidget* parent, int bitNumber)
+	: QWidget(parent)
+	, ui(new Ui::BitfieldWidget())
+{
 	ui->setupUi(this);
 
 	ui->bitLabel->setText(QString(" Bit %1 ").arg(bitNumber, 0, 10));
@@ -69,8 +72,9 @@ BitfieldWidget::BitfieldWidget(QWidget *parent, int bitNumber) : QWidget(parent)
 
 BitfieldWidget::~BitfieldWidget() { delete ui; }
 
-void BitfieldWidget::createWidget() {
-	QLabel *label;
+void BitfieldWidget::createWidget()
+{
+	QLabel* label;
 
 	ui->descriptionLabel->setText(name);
 	ui->bitLabel->setText(QString("Bit %1 ").arg(regOffset));
@@ -109,7 +113,8 @@ void BitfieldWidget::createWidget() {
 	}
 }
 
-void BitfieldWidget::updateValue(uint32_t &value) {
+void BitfieldWidget::updateValue(uint32_t& value)
+{
 	int temp = value & ((uint32_t)pow(2, width) - 1);
 
 	if (ui->stackedWidget->currentIndex() == 1) {
@@ -125,7 +130,8 @@ int BitfieldWidget::getRegOffset() const { return regOffset; }
 
 int BitfieldWidget::getSliceWidth() const { return sliceWidth; }
 
-void BitfieldWidget::setValue(int value) {
+void BitfieldWidget::setValue(int value)
+{
 	this->value = value << regOffset;
 	uint32_t mask = (uint32_t)(pow(2, width) - 1) << regOffset;
 

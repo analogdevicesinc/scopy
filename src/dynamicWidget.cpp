@@ -23,13 +23,15 @@
 #include <QVariant>
 #include <QWidget>
 
-void adiscope::setDynamicProperty(QWidget *widget, const char *property, bool set) {
+void adiscope::setDynamicProperty(QWidget* widget, const char* property, bool set)
+{
 	widget->setProperty(property, QVariant(set));
 	widget->style()->unpolish(widget);
 	widget->style()->polish(widget);
 }
 
-bool adiscope::getDynamicProperty(QWidget *widget, const char *property) {
+bool adiscope::getDynamicProperty(QWidget* widget, const char* property)
+{
 	QVariant val = widget->property(property);
 	if (val.canConvert<bool>()) {
 		return val.toBool();

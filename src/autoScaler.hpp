@@ -25,11 +25,12 @@
 #include <qwt_thermo.h>
 
 namespace adiscope {
-class AutoScaler : public QObject {
+class AutoScaler : public QObject
+{
 	Q_OBJECT;
 
 public:
-	explicit AutoScaler(QObject *parent, const QVector<QwtScaleDiv> &divs, unsigned int timeout_ms = 3000);
+	explicit AutoScaler(QObject* parent, const QVector<QwtScaleDiv>& divs, unsigned int timeout_ms = 3000);
 	~AutoScaler();
 
 Q_SIGNALS:
@@ -48,9 +49,9 @@ private:
 	QVector<QwtScaleDiv> divs;
 	QTimer timer;
 	double min, max, scale_min, scale_max;
-	const QwtScaleDiv *current_div;
+	const QwtScaleDiv* current_div;
 
-	void changeScaleDiv(const QwtScaleDiv *div);
+	void changeScaleDiv(const QwtScaleDiv* div);
 };
 }; // namespace adiscope
 

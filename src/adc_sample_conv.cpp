@@ -29,7 +29,8 @@ adc_sample_conv::adc_sample_conv(int nconnections, std::shared_ptr<M2kAdc> adc, 
 			 gr::io_signature::make(nconnections, nconnections, sizeof(float)))
 	, d_nconnections(nconnections)
 	, inverse(inverse)
-	, m2k_adc(adc) {
+	, m2k_adc(adc)
+{
 	for (int i = 0; i < d_nconnections; i++) {
 		d_correction_gains.push_back(1.0);
 		d_filter_compensations.push_back(1.0);
@@ -41,26 +42,28 @@ adc_sample_conv::adc_sample_conv(int nconnections, std::shared_ptr<M2kAdc> adc, 
 adc_sample_conv::~adc_sample_conv() {}
 
 float adc_sample_conv::convSampleToVolts(float sample, float correctionGain, float filterCompensation, float offset,
-					 float hw_gain) {
+					 float hw_gain)
+{
 	// TO DO: explain this formula
 	return ((sample * 0.78) / ((1 << 11) * 1.3 * hw_gain) * correctionGain * filterCompensation) + offset;
 }
 
 float adc_sample_conv::convVoltsToSample(float voltage, float correctionGain, float filterCompensation, float offset,
-					 float hw_gain) {
+					 float hw_gain)
+{
 	// TO DO: explain this formula
 	return ((voltage - offset) / (correctionGain * filterCompensation) * (2048 * 1.3 * hw_gain) / 0.78);
 }
 
-int adc_sample_conv::work(int noutput_items, gr_vector_const_void_star &input_items,
-			  gr_vector_void_star &output_items) {
+int adc_sample_conv::work(int noutput_items, gr_vector_const_void_star& input_items, gr_vector_void_star& output_items)
+{
 	updateCorrectionGain();
 
 	gr::thread::scoped_lock lock(d_setlock);
 
 	for (unsigned int i = 0; i < input_items.size(); i++) {
-		const float *in = static_cast<const float *>(input_items[i]);
-		float *out = static_cast<float *>(output_items[i]);
+		const float* in = static_cast<const float*>(input_items[i]);
+		float* out = static_cast<float*>(output_items[i]);
 
 		if (inverse)
 			for (int j = 0; j < noutput_items; j++)
@@ -75,7 +78,8 @@ int adc_sample_conv::work(int noutput_items, gr_vector_const_void_star &input_it
 	return noutput_items;
 }
 
-void adc_sample_conv::updateCorrectionGain() {
+void adc_sample_conv::updateCorrectionGain()
+{
 	if (m2k_adc) {
 		setCorrectionGain(0, m2k_adc->chnCorrectionGain(0));
 		setCorrectionGain(1, m2k_adc->chnCorrectionGain(1));
@@ -86,7 +90,8 @@ void adc_sample_conv::updateCorrectionGain() {
 	}
 }
 
-void adc_sample_conv::setCorrectionGain(int connection, float gain) {
+void adc_sample_conv::setCorrectionGain(int connection, float gain)
+{
 	if (connection < 0 || connection >= d_nconnections)
 		return;
 
@@ -96,14 +101,16 @@ void adc_sample_conv::setCorrectionGain(int connection, float gain) {
 	}
 }
 
-float adc_sample_conv::correctionGain(int connection) {
+float adc_sample_conv::correctionGain(int connection)
+{
 	if (connection >= 0 && connection < d_nconnections)
 		return d_correction_gains[connection];
 
 	return 0.0;
 }
 
-void adc_sample_conv::setFilterCompensation(int connection, float val) {
+void adc_sample_conv::setFilterCompensation(int connection, float val)
+{
 	if (connection < 0 || connection >= d_nconnections)
 		return;
 
@@ -113,14 +120,16 @@ void adc_sample_conv::setFilterCompensation(int connection, float val) {
 	}
 }
 
-float adc_sample_conv::filterCompensation(int connection) {
+float adc_sample_conv::filterCompensation(int connection)
+{
 	if (connection >= 0 && connection < d_nconnections)
 		return d_filter_compensations[connection];
 
 	return 0.0;
 }
 
-void adc_sample_conv::setOffset(int connection, float offset) {
+void adc_sample_conv::setOffset(int connection, float offset)
+{
 	if (connection < 0 || connection >= d_nconnections)
 		return;
 
@@ -130,14 +139,16 @@ void adc_sample_conv::setOffset(int connection, float offset) {
 	}
 }
 
-float adc_sample_conv::offset(int connection) const {
+float adc_sample_conv::offset(int connection) const
+{
 	if (connection >= 0 && connection < d_nconnections)
 		return d_offsets[connection];
 
 	return 0;
 }
 
-void adc_sample_conv::setHardwareGain(int connection, float gain) {
+void adc_sample_conv::setHardwareGain(int connection, float gain)
+{
 	if (connection < 0 || connection >= d_nconnections)
 		return;
 
@@ -147,7 +158,8 @@ void adc_sample_conv::setHardwareGain(int connection, float gain) {
 	}
 }
 
-float adc_sample_conv::hardwareGain(int connection) const {
+float adc_sample_conv::hardwareGain(int connection) const
+{
 	if (connection >= 0 && connection < d_nconnections)
 		return d_hardware_gains[connection];
 

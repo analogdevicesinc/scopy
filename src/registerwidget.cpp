@@ -23,8 +23,12 @@
 
 using namespace adiscope;
 
-RegisterWidget::RegisterWidget(QWidget *parent, Debug *debug)
-	: QWidget(parent), ui(new Ui::RegisterWidget), address(0), value(0) {
+RegisterWidget::RegisterWidget(QWidget* parent, Debug* debug)
+	: QWidget(parent)
+	, ui(new Ui::RegisterWidget)
+	, address(0)
+	, value(0)
+{
 	ui->setupUi(this);
 
 	regMap.setIioContext(debug->getIioContext());
@@ -36,7 +40,8 @@ RegisterWidget::~RegisterWidget() { delete ui; }
 
 uint32_t RegisterWidget::getLastAddress(void) const { return regMap.getLastAddress(); }
 
-void RegisterWidget::createRegMap(const QString *device, int *address, const QString *source) {
+void RegisterWidget::createRegMap(const QString* device, int* address, const QString* source)
+{
 	QString filename;
 	QString addr;
 	bool goHigh = false;
@@ -112,7 +117,8 @@ void RegisterWidget::createRegMap(const QString *device, int *address, const QSt
 	}
 }
 
-bool lessThan(const BitfieldWidget *b1, const BitfieldWidget *b2) {
+bool lessThan(const BitfieldWidget* b1, const BitfieldWidget* b2)
+{
 	if (b1->getRegOffset() <= b2->getRegOffset()) {
 		return true;
 	} else {
@@ -120,7 +126,8 @@ bool lessThan(const BitfieldWidget *b1, const BitfieldWidget *b2) {
 	}
 }
 
-void RegisterWidget::checkRegisterMap(void) {
+void RegisterWidget::checkRegisterMap(void)
+{
 	int size = 0;
 	int regOffsets[32];
 	int slice[32];
@@ -199,7 +206,8 @@ void RegisterWidget::checkRegisterMap(void) {
 	}
 }
 
-void RegisterWidget::verifyAvailableSources(const QString device) {
+void RegisterWidget::verifyAvailableSources(const QString device)
+{
 	QString filename;
 
 	fileSources.clear(); // clear the fileSource list
@@ -221,21 +229,24 @@ QStringList RegisterWidget::getSources() const { return fileSources; }
 
 uint32_t RegisterWidget::getValue() const { return value; }
 
-void RegisterWidget::setValue(int var) {
+void RegisterWidget::setValue(int var)
+{
 	this->blockSignals(true);
 	value = var;
 	updateBitfields();
 	this->blockSignals(false);
 }
 
-void RegisterWidget::setValue(uint32_t var, uint32_t mask) {
+void RegisterWidget::setValue(uint32_t var, uint32_t mask)
+{
 	value &= ~mask;
 	value |= var;
 
 	Q_EMIT valueChanged((int)value);
 }
 
-uint32_t RegisterWidget::readRegister(const QString *device, const uint32_t address) {
+uint32_t RegisterWidget::readRegister(const QString* device, const uint32_t address)
+{
 	/*Read register*/
 	value = regMap.readRegister(device, address);
 
@@ -244,12 +255,14 @@ uint32_t RegisterWidget::readRegister(const QString *device, const uint32_t addr
 	return value;
 }
 
-void RegisterWidget::writeRegister(const QString *device, const uint32_t address, uint32_t regVal) {
+void RegisterWidget::writeRegister(const QString* device, const uint32_t address, uint32_t regVal)
+{
 	regMap.writeRegister(device, address, regVal);
 	value = regVal;
 }
 
-void RegisterWidget::updateBitfields() {
+void RegisterWidget::updateBitfields()
+{
 	uint32_t temp = value;
 
 	/*Update bitfield widgets*/

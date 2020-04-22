@@ -30,16 +30,17 @@
 #include <QString>
 
 namespace adiscope {
-class ToolMenu : public BaseMenu {
+class ToolMenu : public BaseMenu
+{
 	Q_OBJECT
 public:
-	explicit ToolMenu(Preferences *preferences, QWidget *parent = nullptr);
+	explicit ToolMenu(Preferences* preferences, QWidget* parent = nullptr);
 	~ToolMenu();
 
-	void loadToolsFromFilter(Filter *filter);
-	ToolMenuItem *getToolMenuItemFor(enum tool tool);
+	void loadToolsFromFilter(Filter* filter);
+	ToolMenuItem* getToolMenuItemFor(enum tool tool);
 
-	QButtonGroup *getButtonGroup();
+	QButtonGroup* getButtonGroup();
 
 Q_SIGNALS:
 	void toolSelected(tool);
@@ -58,12 +59,12 @@ private:
 	static const QStringList d_availableTools;
 	static const QStringList d_availableIcons;
 
-	QVector<QPair<BaseMenuItem *, tool>> d_tools;
+	QVector<QPair<BaseMenuItem*, tool>> d_tools;
 	QVector<int> d_positions;
-	QVector<BaseMenuItem *> d_compatibleTools;
+	QVector<BaseMenuItem*> d_compatibleTools;
 	QString d_current_hw_name;
-	QButtonGroup *d_buttonGroup;
-	Preferences *d_preferences;
+	QButtonGroup* d_buttonGroup;
+	Preferences* d_preferences;
 };
 } // namespace adiscope
 

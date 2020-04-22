@@ -23,12 +23,15 @@
 
 using namespace adiscope;
 
-CustomPushButton::CustomPushButton(QWidget *parent) : QPushButton(parent) {}
+CustomPushButton::CustomPushButton(QWidget* parent)
+	: QPushButton(parent)
+{}
 
 CustomPushButton::~CustomPushButton() {}
 
-void CustomPushButton::mouseReleaseEvent(QMouseEvent *event) {
-	QButtonGroup *btnGroup = group();
+void CustomPushButton::mouseReleaseEvent(QMouseEvent* event)
+{
+	QButtonGroup* btnGroup = group();
 
 	if (btnGroup) {
 		if (btnGroup->checkedId() == group()->id(this) && isDown())
@@ -42,8 +45,9 @@ void CustomPushButton::mouseReleaseEvent(QMouseEvent *event) {
 	}
 }
 
-void CustomPushButton::setChecked(bool checked) {
-	QButtonGroup *btnGroup = group();
+void CustomPushButton::setChecked(bool checked)
+{
+	QButtonGroup* btnGroup = group();
 
 	if (btnGroup) {
 		if (btnGroup->checkedId() == group()->id(this) && !checked)

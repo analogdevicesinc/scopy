@@ -28,10 +28,13 @@
 
 using namespace adiscope;
 
-MouseWheelWidgetGuard::MouseWheelWidgetGuard(QObject *parent) : QObject(parent) {}
+MouseWheelWidgetGuard::MouseWheelWidgetGuard(QObject* parent)
+	: QObject(parent)
+{}
 
-bool MouseWheelWidgetGuard::eventFilter(QObject *o, QEvent *e) {
-	const QWidget *widget = dynamic_cast<QWidget *>(o);
+bool MouseWheelWidgetGuard::eventFilter(QObject* o, QEvent* e)
+{
+	const QWidget* widget = dynamic_cast<QWidget*>(o);
 	if (e->type() == QEvent::Wheel && widget && !widget->hasFocus()) {
 		e->ignore();
 		return true;
@@ -39,29 +42,30 @@ bool MouseWheelWidgetGuard::eventFilter(QObject *o, QEvent *e) {
 	return QObject::eventFilter(o, e);
 }
 
-void MouseWheelWidgetGuard::installEventRecursively(QWidget *parentWidget) {
+void MouseWheelWidgetGuard::installEventRecursively(QWidget* parentWidget)
+{
 	if (parentWidget->children().count() == 0) {
 		return;
 	}
-	QList<QComboBox *> comboBoxes = parentWidget->findChildren<QComboBox *>();
+	QList<QComboBox*> comboBoxes = parentWidget->findChildren<QComboBox*>();
 	for (auto ch : comboBoxes) {
 		ch->installEventFilter(new MouseWheelWidgetGuard(ch));
 		ch->setFocusPolicy(Qt::StrongFocus);
 	}
 
-	QList<QDoubleSpinBox *> doubleSpinBoxes = parentWidget->findChildren<QDoubleSpinBox *>();
+	QList<QDoubleSpinBox*> doubleSpinBoxes = parentWidget->findChildren<QDoubleSpinBox*>();
 	for (auto ch : doubleSpinBoxes) {
 		ch->installEventFilter(new MouseWheelWidgetGuard(ch));
 		ch->setFocusPolicy(Qt::StrongFocus);
 	}
 
-	QList<QSpinBox *> spinBoxes = parentWidget->findChildren<QSpinBox *>();
+	QList<QSpinBox*> spinBoxes = parentWidget->findChildren<QSpinBox*>();
 	for (auto ch : spinBoxes) {
 		ch->installEventFilter(new MouseWheelWidgetGuard(ch));
 		ch->setFocusPolicy(Qt::StrongFocus);
 	}
 
-	QList<QLineEdit *> lineEdits = parentWidget->findChildren<QLineEdit *>();
+	QList<QLineEdit*> lineEdits = parentWidget->findChildren<QLineEdit*>();
 	for (auto ch : lineEdits) {
 		ch->installEventFilter(new MouseWheelWidgetGuard(ch));
 		ch->setFocusPolicy(Qt::StrongFocus);

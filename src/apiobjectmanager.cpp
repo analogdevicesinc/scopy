@@ -25,25 +25,29 @@ using namespace adiscope;
 
 ApiObjectManager::ApiObjectManager() {}
 
-void ApiObjectManager::registerApiObject(ApiObject *apiObject) { api_objects.push_back(apiObject); }
+void ApiObjectManager::registerApiObject(ApiObject* apiObject) { api_objects.push_back(apiObject); }
 
-void ApiObjectManager::unregisterApiObject(ApiObject *apiObject) {
+void ApiObjectManager::unregisterApiObject(ApiObject* apiObject)
+{
 	api_objects.erase(std::find(api_objects.begin(), api_objects.end(), apiObject));
 }
 
-void ApiObjectManager::save(QSettings &settings) {
-	for (auto &apiObject : api_objects) {
+void ApiObjectManager::save(QSettings& settings)
+{
+	for (auto& apiObject : api_objects) {
 		apiObject->save(settings);
 	}
 }
 
-void ApiObjectManager::load(QSettings &settings) {
-	for (auto &apiObject : api_objects) {
+void ApiObjectManager::load(QSettings& settings)
+{
+	for (auto& apiObject : api_objects) {
 		apiObject->load(settings);
 	}
 }
 
-ApiObjectManager &ApiObjectManager::getInstance() {
+ApiObjectManager& ApiObjectManager::getInstance()
+{
 	static ApiObjectManager Instance;
 
 	return Instance;

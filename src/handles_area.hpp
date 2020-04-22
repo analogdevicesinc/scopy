@@ -25,31 +25,33 @@
 class QPoint;
 class PlotLineHandle;
 
-class HandlesArea : public QWidget {
+class HandlesArea : public QWidget
+{
 	Q_OBJECT
 
 public:
-	HandlesArea(QWidget *parent);
+	HandlesArea(QWidget* parent);
 
 Q_SIGNALS:
 	void sizeChanged(QSize);
 
 protected:
-	void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
-	void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
-	void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
-	void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
+	void mousePressEvent(QMouseEvent* event) Q_DECL_OVERRIDE;
+	void mouseReleaseEvent(QMouseEvent* event) Q_DECL_OVERRIDE;
+	void mouseMoveEvent(QMouseEvent* event) Q_DECL_OVERRIDE;
+	void resizeEvent(QResizeEvent* event) Q_DECL_OVERRIDE;
 	virtual void resizeMask(QSize) = 0;
 
 protected:
-	QWidget *canvas;
-	PlotLineHandle *selectedItem;
+	QWidget* canvas;
+	PlotLineHandle* selectedItem;
 	QPoint hotspot;
 };
 
-class VertHandlesArea : public HandlesArea {
+class VertHandlesArea : public HandlesArea
+{
 public:
-	VertHandlesArea(QWidget *parent = 0);
+	VertHandlesArea(QWidget* parent = 0);
 
 	int topPadding();
 	void setTopPadding(int);
@@ -67,9 +69,10 @@ private:
 	int largest_child_height;
 };
 
-class HorizHandlesArea : public HandlesArea {
+class HorizHandlesArea : public HandlesArea
+{
 public:
-	HorizHandlesArea(QWidget *parent = 0);
+	HorizHandlesArea(QWidget* parent = 0);
 
 	int leftPadding();
 	void setLeftPadding(int);
@@ -87,12 +90,13 @@ private:
 	int largest_child_width;
 };
 
-class GateHandlesArea : public HorizHandlesArea {
+class GateHandlesArea : public HorizHandlesArea
+{
 public:
-	GateHandlesArea(QWidget *parent = 0);
+	GateHandlesArea(QWidget* parent = 0);
 
 protected:
-	void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+	void mousePressEvent(QMouseEvent* event) Q_DECL_OVERRIDE;
 
 private:
 };

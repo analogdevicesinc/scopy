@@ -15,12 +15,13 @@ using namespace adiscope;
  * button has been selected it can be toggled.
  */
 
-DbClickButtons::DbClickButtons(QWidget *parent, int maxRowBtnCount)
+DbClickButtons::DbClickButtons(QWidget* parent, int maxRowBtnCount)
 	: QWidget(parent)
 	, ui(new Ui::DbClickButtons)
 	, btn_states()
 	, selected_btn(-1)
-	, max_row_btn_cnt(maxRowBtnCount > 0 ? maxRowBtnCount : 1) {
+	, max_row_btn_cnt(maxRowBtnCount > 0 ? maxRowBtnCount : 1)
+{
 	ui->setupUi(this);
 
 	color_codes << "#F44336"
@@ -29,10 +30,10 @@ DbClickButtons::DbClickButtons(QWidget *parent, int maxRowBtnCount)
 		    << "#FF5721"
 		    << "#607D8B";
 
-	btn_list = findChildren<QPushButton *>();
+	btn_list = findChildren<QPushButton*>();
 
 	int n = 0;
-	for (const auto &i : btn_list) {
+	for (const auto& i : btn_list) {
 		btn_states.push_back(false);
 		i->setProperty("id", QVariant(n++));
 		connect(i, SIGNAL(clicked()), this, SLOT(onButtonClicked()));
@@ -43,7 +44,8 @@ DbClickButtons::~DbClickButtons() { delete ui; }
 
 int DbClickButtons::selectedButton() const { return selected_btn; }
 
-void DbClickButtons::setSelectedButton(int btnId) {
+void DbClickButtons::setSelectedButton(int btnId)
+{
 	for (int i = 0; i < btn_list.size(); i++) {
 		bool selected;
 		if (i == btnId) {
@@ -64,7 +66,8 @@ void DbClickButtons::setSelectedButton(int btnId) {
 
 bool DbClickButtons::buttonChecked(int btnId) const { return btn_states[btnId]; }
 
-void DbClickButtons::setButtonChecked(int btnId, bool checked) {
+void DbClickButtons::setButtonChecked(int btnId, bool checked)
+{
 	btn_states[btnId] = checked;
 	setDynamicProperty(btn_list[btnId], "is_checked", checked);
 	btn_list[btnId]->update();
@@ -74,7 +77,8 @@ void DbClickButtons::setButtonChecked(int btnId, bool checked) {
 
 int DbClickButtons::buttonCount() const { return btn_list.size(); }
 
-void DbClickButtons::setButtonCount(int count) {
+void DbClickButtons::setButtonCount(int count)
+{
 	if (count != btn_list.size()) {
 		for (int i = 0; i < btn_list.size(); i++) {
 			delete btn_list[i];
@@ -82,9 +86,9 @@ void DbClickButtons::setButtonCount(int count) {
 		selected_btn = -1;
 		btn_list.clear();
 
-		QGridLayout *gLayout = static_cast<QGridLayout *>(layout());
+		QGridLayout* gLayout = static_cast<QGridLayout*>(layout());
 		for (int i = 0; i < count; i++) {
-			QPushButton *btn = new QPushButton(this);
+			QPushButton* btn = new QPushButton(this);
 			btn->setText(QString::number(i));
 			btn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 			btn->setProperty("id", QVariant(i));
@@ -111,8 +115,9 @@ void DbClickButtons::setButtonCount(int count) {
 	}
 }
 
-void DbClickButtons::onButtonClicked() {
-	QPushButton *btn = static_cast<QPushButton *>(QObject::sender());
+void DbClickButtons::onButtonClicked()
+{
+	QPushButton* btn = static_cast<QPushButton*>(QObject::sender());
 	int btnId = btn->property("id").toInt();
 
 	if (selected_btn < 0) {

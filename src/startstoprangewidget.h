@@ -29,12 +29,13 @@ class StartStopRangeWidget;
 }
 
 namespace adiscope {
-class StartStopRangeWidget : public QWidget {
+class StartStopRangeWidget : public QWidget
+{
 	Q_OBJECT
 
 public:
 	explicit StartStopRangeWidget(double min = 1.0, double max = 5e07, double minSpan = 1000,
-				      bool hasProgressWidget = false, QWidget *parent = nullptr);
+				      bool hasProgressWidget = false, QWidget* parent = nullptr);
 	~StartStopRangeWidget();
 
 	double getStartValue() const;
@@ -45,7 +46,7 @@ public:
 
 	double getCenterValue() const;
 
-	void insertWidgetIntoLayout(QWidget *widget, int row, int column);
+	void insertWidgetIntoLayout(QWidget* widget, int row, int column);
 
 public Q_SLOTS:
 	void setMinimumSpanValue(double value);
@@ -62,11 +63,11 @@ private:
 	void _setupSignalsAndSlots();
 
 private:
-	Ui::StartStopRangeWidget *ui;
-	ScaleSpinButton *start_freq;
-	ScaleSpinButton *stop_freq;
-	ScaleSpinButton *center_freq;
-	ScaleSpinButton *span_freq;
+	Ui::StartStopRangeWidget* ui;
+	ScaleSpinButton* start_freq;
+	ScaleSpinButton* stop_freq;
+	ScaleSpinButton* center_freq;
+	ScaleSpinButton* span_freq;
 
 	double minValue;
 	double maxValue;

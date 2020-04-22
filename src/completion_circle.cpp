@@ -26,7 +26,7 @@
 
 using namespace adiscope;
 
-CompletionCircle::CompletionCircle(QWidget *parent, bool invert_circle)
+CompletionCircle::CompletionCircle(QWidget* parent, bool invert_circle)
 	: QDial(parent)
 	, m_double_value(0.5)
 	, m_double_minimum(1.0)
@@ -38,13 +38,15 @@ CompletionCircle::CompletionCircle(QWidget *parent, bool invert_circle)
 	, m_pressed(false)
 	, m_log_scale(false)
 	, invert_circle(invert_circle)
-	, m_toggleable(true) {
+	, m_toggleable(true)
+{
 	setWrapping(true);
 	setMinimumSize(50, 50);
 	setMaximumSize(50, 50);
 }
 
-void CompletionCircle::paintEvent(QPaintEvent *) {
+void CompletionCircle::paintEvent(QPaintEvent*)
+{
 	QPainter p(this);
 
 	double min;
@@ -126,7 +128,8 @@ void CompletionCircle::paintEvent(QPaintEvent *) {
 	p.drawLine(xc + x1, yc - y1, xc + x2, yc - y2);
 }
 
-void CompletionCircle::mousePressEvent(QMouseEvent *e) {
+void CompletionCircle::mousePressEvent(QMouseEvent* e)
+{
 	if (e->button() == Qt::LeftButton) {
 		if (pointInsideCircle(e->pos(), m_xc, m_yc, m_radius - 2)) {
 			if (m_toggleable) {
@@ -138,15 +141,16 @@ void CompletionCircle::mousePressEvent(QMouseEvent *e) {
 	}
 }
 
-void CompletionCircle::mouseReleaseEvent(QMouseEvent *) {}
+void CompletionCircle::mouseReleaseEvent(QMouseEvent*) {}
 
-void CompletionCircle::mouseMoveEvent(QMouseEvent *) {}
+void CompletionCircle::mouseMoveEvent(QMouseEvent*) {}
 
-void CompletionCircle::keyPressEvent(QKeyEvent *) {}
+void CompletionCircle::keyPressEvent(QKeyEvent*) {}
 
-void CompletionCircle::wheelEvent(QWheelEvent *) {}
+void CompletionCircle::wheelEvent(QWheelEvent*) {}
 
-bool CompletionCircle::pointInsideCircle(const QPoint &p, int xc, int yc, int r) {
+bool CompletionCircle::pointInsideCircle(const QPoint& p, int xc, int yc, int r)
+{
 	int x = p.x();
 	int y = p.y();
 
@@ -155,7 +159,8 @@ bool CompletionCircle::pointInsideCircle(const QPoint &p, int xc, int yc, int r)
 
 double CompletionCircle::valueDouble() { return m_double_value; }
 
-void CompletionCircle::setValueDouble(double value) {
+void CompletionCircle::setValueDouble(double value)
+{
 	if (value < m_double_minimum) {
 		value = m_double_minimum;
 	} else if (value > m_double_maximum) {
@@ -170,7 +175,8 @@ void CompletionCircle::setValueDouble(double value) {
 
 bool CompletionCircle::toggledState() { return m_pressed; }
 
-void CompletionCircle::setToggled(bool on) {
+void CompletionCircle::setToggled(bool on)
+{
 	if (m_pressed != on) {
 		m_pressed = on;
 		Q_EMIT toggled(on);
@@ -181,7 +187,8 @@ double CompletionCircle::minimumDouble() { return m_double_minimum; }
 
 void CompletionCircle::setOrigin(double value) { m_origin = value; }
 
-void CompletionCircle::setMinimumDouble(double value) {
+void CompletionCircle::setMinimumDouble(double value)
+{
 	m_double_minimum = value;
 
 	if (m_double_value < m_double_minimum) {
@@ -193,7 +200,8 @@ void CompletionCircle::setMinimumDouble(double value) {
 
 double CompletionCircle::maximumDouble() { return m_double_maximum; }
 
-void CompletionCircle::setMaximumDouble(double value) {
+void CompletionCircle::setMaximumDouble(double value)
+{
 	m_double_maximum = value;
 
 	if (m_double_value > m_double_maximum) {

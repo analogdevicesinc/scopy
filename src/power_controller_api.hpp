@@ -5,7 +5,8 @@
 
 namespace adiscope {
 
-class PowerController_API : public ApiObject {
+class PowerController_API : public ApiObject
+{
 	Q_OBJECT
 
 	Q_PROPERTY(bool sync READ syncEnabled WRITE enableSync);
@@ -16,7 +17,10 @@ class PowerController_API : public ApiObject {
 	Q_PROPERTY(bool dac2_enabled READ Dac2Enabled WRITE setDac2Enabled);
 
 public:
-	explicit PowerController_API(PowerController *pw) : ApiObject(), pw(pw) {}
+	explicit PowerController_API(PowerController* pw)
+		: ApiObject()
+		, pw(pw)
+	{}
 	~PowerController_API() {}
 
 	bool syncEnabled() const;
@@ -40,7 +44,7 @@ public:
 	Q_INVOKABLE void show();
 
 private:
-	PowerController *pw;
+	PowerController* pw;
 };
 } // namespace adiscope
 

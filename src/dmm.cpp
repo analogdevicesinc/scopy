@@ -48,8 +48,8 @@
 
 using namespace adiscope;
 
-DMM::DMM(struct iio_context *ctx, Filter *filt, std::shared_ptr<GenericAdc> adc, ToolMenuItem *toolMenuItem,
-	 QJSEngine *engine, ToolLauncher *parent)
+DMM::DMM(struct iio_context* ctx, Filter* filt, std::shared_ptr<GenericAdc> adc, ToolMenuItem* toolMenuItem,
+	 QJSEngine* engine, ToolLauncher* parent)
 	: Tool(ctx, toolMenuItem, new DMM_API(this), "Voltmeter", parent)
 	, ui(new Ui::DMM)
 	, signal(boost::make_shared<signal_sample>())
@@ -60,7 +60,8 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, std::shared_ptr<GenericAdc> adc,
 	, filename("")
 	, use_timer(false)
 	, logging_refresh_rate(0)
-	, wheelEventGuard(nullptr) {
+	, wheelEventGuard(nullptr)
+{
 	ui->setupUi(this);
 
 	/* TODO: avoid hardcoding sample rate */
@@ -152,7 +153,8 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, std::shared_ptr<GenericAdc> adc,
 	wheelEventGuard->installEventRecursively(ui->widget_2);
 }
 
-void DMM::disconnectAll() {
+void DMM::disconnectAll()
+{
 	bool started = isIioManagerStarted();
 	if (started)
 		manager->lock();
@@ -164,7 +166,8 @@ void DMM::disconnectAll() {
 		manager->unlock();
 }
 
-DMM::~DMM() {
+DMM::~DMM()
+{
 	ui->run_button->setChecked(false);
 	disconnectAll();
 
@@ -176,7 +179,8 @@ DMM::~DMM() {
 	delete ui;
 }
 
-void DMM::updateValuesList(std::vector<float> values) {
+void DMM::updateValuesList(std::vector<float> values)
+{
 	if (!use_timer)
 		boost::unique_lock<boost::mutex> lock(data_mutex);
 
@@ -199,7 +203,8 @@ void DMM::updateValuesList(std::vector<float> values) {
 		data_cond.notify_all();
 }
 
-void DMM::checkPeakValues(int ch, double peak) {
+void DMM::checkPeakValues(int ch, double peak)
+{
 	if (peak < m_min[ch]) {
 		m_min[ch] = peak;
 		if (ch == 0)
@@ -218,21 +223,24 @@ void DMM::checkPeakValues(int ch, double peak) {
 
 bool DMM::isIioManagerStarted() const { return manager->started() && ui->run_button->isChecked(); }
 
-void DMM::collapseDataLog(bool checked) {
+void DMM::collapseDataLog(bool checked)
+{
 	if (checked)
 		ui->dataLogWidget->hide();
 	else
 		ui->dataLogWidget->show();
 }
 
-void DMM::collapsePeakHold(bool checked) {
+void DMM::collapsePeakHold(bool checked)
+{
 	if (checked)
 		ui->gridLayout_4Widget->hide();
 	else
 		ui->gridLayout_4Widget->show();
 }
 
-void DMM::displayPeakHold(bool checked) {
+void DMM::displayPeakHold(bool checked)
+{
 	if (!checked) {
 		Util::retainWidgetSizeWhenHidden(ui->peakCh1Widget);
 		Util::retainWidgetSizeWhenHidden(ui->peakCh2Widget);
@@ -244,7 +252,8 @@ void DMM::displayPeakHold(bool checked) {
 	}
 }
 
-void DMM::resetPeakHold(bool clicked) {
+void DMM::resetPeakHold(bool clicked)
+{
 	for (unsigned int ch = 0; ch < adc->numAdcChannels(); ch++) {
 		m_min[ch] = Q_INFINITY;
 		m_max[ch] = -Q_INFINITY;
@@ -258,7 +267,8 @@ void DMM::resetPeakHold(bool clicked) {
 		}
 	}
 }
-void DMM::toggleTimer(bool start) {
+void DMM::toggleTimer(bool start)
+{
 	enableDataLogging(start);
 	if (start) {
 		writeAllSettingsToHardware();
@@ -279,7 +289,8 @@ void DMM::toggleTimer(bool start) {
 	m_running = start;
 }
 
-gr::basic_block_sptr DMM::configureGraph(gr::basic_block_sptr s2f, bool is_low_ac, bool is_high_ac) {
+gr::basic_block_sptr DMM::configureGraph(gr::basic_block_sptr s2f, bool is_low_ac, bool is_high_ac)
+{
 	/* 10 fps refresh rate for the plot */
 	auto keep_one = gr::blocks::keep_one_in_n::make(sizeof(float), is_high_ac ? (sample_rate / 10.0) : 1000.0);
 
@@ -305,7 +316,8 @@ gr::basic_block_sptr DMM::configureGraph(gr::basic_block_sptr s2f, bool is_low_a
 	return keep_one;
 }
 
-void DMM::configureModes() {
+void DMM::configureModes()
+{
 	auto s2f1 = gr::blocks::short_to_float::make();
 	auto s2f2 = gr::blocks::short_to_float::make();
 
@@ -341,7 +353,8 @@ void DMM::configureModes() {
 	manager->connect(block2, 0, signal, 1);
 }
 
-void DMM::chooseFile() {
+void DMM::chooseFile()
+{
 	QString selectedFilter;
 
 	QString fileName = QFileDialog::getSaveFileName(
@@ -360,14 +373,16 @@ void DMM::chooseFile() {
 	}
 }
 
-void DMM::enableDataLogging(bool en) {
+void DMM::enableDataLogging(bool en)
+{
 	ui->gridLayout_3Widget->setEnabled(en);
 	if (!en) {
 		setDynamicProperty(ui->filename, "invalid", false);
 	}
 }
 
-void DMM::toggleDataLogging(bool en) {
+void DMM::toggleDataLogging(bool en)
+{
 	data_logging = en;
 	if (en) {
 		enableDataLogging(en);
@@ -439,7 +454,8 @@ void DMM::toggleDataLogging(bool en) {
 	}
 }
 
-void DMM::startDataLogging(bool start) {
+void DMM::startDataLogging(bool start)
+{
 	if (!data_logging)
 		return;
 
@@ -454,7 +470,6 @@ void DMM::startDataLogging(bool start) {
 		ui->btn_overwrite->setEnabled(false);
 		ui->btn_append->setEnabled(false);
 		data_logging_thread = std::thread(&DMM::dataLoggingThread, this);
-
 	} else {
 		if (!use_timer)
 			data_cond.notify_all();
@@ -467,7 +482,8 @@ void DMM::startDataLogging(bool start) {
 	}
 }
 
-void DMM::dataLoggingThread() {
+void DMM::dataLoggingThread()
+{
 	QString separator = ",";
 	QFile file(filename);
 
@@ -527,7 +543,8 @@ void DMM::dataLoggingThread() {
 	}
 }
 
-void DMM::toggleAC() {
+void DMM::toggleAC()
+{
 	bool started = isIioManagerStarted();
 	if (started)
 		manager->lock();
@@ -545,7 +562,8 @@ void DMM::toggleAC() {
 	}
 }
 
-int DMM::numSamplesFromIdx(int idx) {
+int DMM::numSamplesFromIdx(int idx)
+{
 	switch (idx) {
 	case 0:
 		return 10;
@@ -558,19 +576,22 @@ int DMM::numSamplesFromIdx(int idx) {
 	}
 }
 
-void DMM::setHistorySizeCh1(int idx) {
+void DMM::setHistorySizeCh1(int idx)
+{
 	int num_samples = numSamplesFromIdx(idx);
 
 	ui->sismograph_ch1->setNumSamples(num_samples);
 }
 
-void DMM::setHistorySizeCh2(int idx) {
+void DMM::setHistorySizeCh2(int idx)
+{
 	int num_samples = numSamplesFromIdx(idx);
 
 	ui->sismograph_ch2->setNumSamples(num_samples);
 }
 
-void DMM::writeAllSettingsToHardware() {
+void DMM::writeAllSettingsToHardware()
+{
 	adc->setSampleRate(sample_rate);
 
 	auto m2k_adc = std::dynamic_pointer_cast<M2kAdc>(adc);
@@ -588,12 +609,14 @@ void DMM::writeAllSettingsToHardware() {
 	}
 }
 
-void DMM::run() {
+void DMM::run()
+{
 	// ui->run_button->setChecked(true);
 	toggleTimer(true);
 }
 
-void DMM::stop() {
+void DMM::stop()
+{
 	// ui->run_button->setChecked(false);
 	toggleTimer(false);
 }

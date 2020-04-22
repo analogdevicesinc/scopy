@@ -35,7 +35,8 @@ class OscScaleDraw;
 class PrefixFormatter;
 class OscScaleZoomer;
 
-class dBgraph : public QwtPlot {
+class dBgraph : public QwtPlot
+{
 	Q_OBJECT
 
 	Q_PROPERTY(int numSamples READ getNumSamples WRITE setNumSamples)
@@ -56,11 +57,11 @@ class dBgraph : public QwtPlot {
 	Q_PROPERTY(bool log_freq MEMBER log_freq WRITE useLogFreq);
 
 public:
-	explicit dBgraph(QWidget *parent = nullptr);
+	explicit dBgraph(QWidget* parent = nullptr);
 	~dBgraph();
 
 	void setAxesScales(double xmin, double xmax, double ymin, double ymax);
-	void setAxesTitles(const QString &x, const QString &y);
+	void setAxesTitles(const QString& x, const QString& y);
 
 	int getNumSamples() const;
 
@@ -68,9 +69,9 @@ public:
 	QString getScaleValueFormat(double value, QwtAxisId scale, int precision) const;
 
 	void setShowZero(bool en);
-	const QwtScaleWidget *getAxisWidget(QwtAxisId id);
+	const QwtScaleWidget* getAxisWidget(QwtAxisId id);
 
-	const QColor &getColor() const;
+	const QColor& getColor() const;
 	double getThickness();
 	QString xTitle() const;
 	QString yTitle() const;
@@ -100,10 +101,10 @@ public Q_SLOTS:
 	void reset();
 
 	void setNumSamples(int num);
-	void setColor(const QColor &color);
+	void setColor(const QColor& color);
 	void setThickness(int index);
-	void setXTitle(const QString &title);
-	void setYTitle(const QString &title);
+	void setXTitle(const QString& title);
+	void setYTitle(const QString& title);
 	void setXMin(double val);
 	void setXMax(double val);
 	void setYMin(double val);
@@ -111,8 +112,8 @@ public Q_SLOTS:
 
 	QString xUnit() const;
 	QString yUnit() const;
-	void setXUnit(const QString &unit);
-	void setYUnit(const QString &unit);
+	void setXUnit(const QString& unit);
+	void setYUnit(const QString& unit);
 
 	void useLogFreq(bool use_log_freq);
 	void useDeltaLabel(bool use_delta);
@@ -131,7 +132,7 @@ public Q_SLOTS:
 	void moveCursorReadouts(CustomPlotPositionButton::ReadoutsPosition position);
 
 	void scaleDivChanged();
-	void mousePressEvent(QMouseEvent *event);
+	void mousePressEvent(QMouseEvent* event);
 	void onResetZoom();
 
 	void onFrequencyCursorPositionChanged(int pos);
@@ -142,13 +143,13 @@ public Q_SLOTS:
 	bool addReferenceWaveformFromPlot();
 
 protected Q_SLOTS:
-	void showEvent(QShowEvent *event);
+	void showEvent(QShowEvent* event);
 
 private:
 	QwtPlotCurve curve;
 	QwtPlotCurve reference;
-	QwtPlotMarker *markerIntersection1;
-	QwtPlotMarker *markerIntersection2;
+	QwtPlotMarker* markerIntersection1;
+	QwtPlotMarker* markerIntersection2;
 	unsigned int numSamples;
 	double xmin, xmax, ymin, ymax;
 	QColor color;
@@ -160,21 +161,21 @@ private:
 	bool d_cursorsEnabled;
 	bool d_cursorsCentered;
 	OscScaleDraw *draw_x, *draw_y;
-	PrefixFormatter *formatter;
-	OscScaleZoomer *zoomer;
+	PrefixFormatter* formatter;
+	OscScaleZoomer* zoomer;
 
 	QVector<double> xdata, ydata;
 	unsigned int d_plotPosition;
 
-	SymbolController *d_symbolCtrl;
-	VertBar *d_vBar1;
-	VertBar *d_vBar2;
-	VertBar *d_plotBar;
-	VertBar *d_frequencyBar;
+	SymbolController* d_symbolCtrl;
+	VertBar* d_vBar1;
+	VertBar* d_vBar2;
+	VertBar* d_plotBar;
+	VertBar* d_frequencyBar;
 
-	PlotPickerWrapper *picker;
+	PlotPickerWrapper* picker;
 
-	CursorReadouts *d_cursorReadouts;
+	CursorReadouts* d_cursorReadouts;
 	void setupCursors();
 	void setupReadouts();
 };

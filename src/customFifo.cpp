@@ -22,7 +22,8 @@
 using namespace adiscope;
 
 template <typename T>
-CustomFifo<T>::CustomFifo() {
+CustomFifo<T>::CustomFifo()
+{
 	if (useQQueue)
 		queue = new QQueue<T>;
 	else
@@ -30,7 +31,8 @@ CustomFifo<T>::CustomFifo() {
 }
 
 template <typename T>
-CustomFifo<T>::~CustomFifo() {
+CustomFifo<T>::~CustomFifo()
+{
 	if (useQQueue)
 		delete queue;
 	else
@@ -38,7 +40,8 @@ CustomFifo<T>::~CustomFifo() {
 }
 
 template <typename T>
-void CustomFifo<T>::push(T &data) {
+void CustomFifo<T>::push(T& data)
+{
 	if (useQQueue)
 		queue->enqueue(data);
 	else
@@ -46,20 +49,22 @@ void CustomFifo<T>::push(T &data) {
 }
 
 template <typename T>
-T &CustomFifo<T>::pop() {
+T& CustomFifo<T>::pop()
+{
 	if (useQQueue) {
-		T &last = queue->last();
+		T& last = queue->last();
 		queue->dequeue();
 		return last;
 	} else {
-		T &last = vector->last();
+		T& last = vector->last();
 		vector->removeFirst();
 		return last;
 	}
 }
 
 template <typename T>
-void CustomFifo<T>::reserve(int size) {
+void CustomFifo<T>::reserve(int size)
+{
 	if (useQQueue)
 		queue->reserve(size);
 	else
@@ -67,7 +72,8 @@ void CustomFifo<T>::reserve(int size) {
 }
 
 template <typename T>
-int CustomFifo<T>::size() const {
+int CustomFifo<T>::size() const
+{
 	if (useQQueue)
 		return queue->size();
 	else
@@ -75,7 +81,8 @@ int CustomFifo<T>::size() const {
 }
 
 template <typename T>
-void CustomFifo<T>::clear() {
+void CustomFifo<T>::clear()
+{
 	if (useQQueue)
 		queue->clear();
 	else
@@ -83,7 +90,8 @@ void CustomFifo<T>::clear() {
 }
 
 template <typename T>
-T *CustomFifo<T>::data() {
+T* CustomFifo<T>::data()
+{
 	/* quick hack: we can deference queue.head(), because we know that
 	 * QQueue (since it inherits QList) stores the data sequentially
 	 * if the data elements are not bigger than the size of a pointer. */

@@ -34,23 +34,24 @@ class InfoPage;
 namespace adiscope {
 class Preferences;
 class Calibration;
-class InfoPage : public QWidget {
+class InfoPage : public QWidget
+{
 	Q_OBJECT
 
 public:
-	explicit InfoPage(QString uri, Preferences *prefPanel, struct iio_context *ctx = nullptr, QWidget *parent = 0);
+	explicit InfoPage(QString uri, Preferences* prefPanel, struct iio_context* ctx = nullptr, QWidget* parent = 0);
 	virtual ~InfoPage();
 
-	struct iio_context *ctx() const;
-	void setCtx(iio_context *ctx);
+	struct iio_context* ctx() const;
+	void setCtx(iio_context* ctx);
 
 	QString uri() const;
 	void setUri(QString uri);
 
-	QPushButton *forgetDeviceButton();
-	QPushButton *identifyDeviceButton();
-	QPushButton *connectButton();
-	QPushButton *calibrateButton();
+	QPushButton* forgetDeviceButton();
+	QPushButton* identifyDeviceButton();
+	QPushButton* connectButton();
+	QPushButton* calibrateButton();
 
 	void getDeviceInfo();
 	void refreshInfoWidget();
@@ -82,24 +83,25 @@ private:
 						      "Analog Devices M2k Rev.D (Z7010)"};
 
 protected:
-	Ui::InfoPage *ui;
+	Ui::InfoPage* ui;
 	QString m_uri;
-	struct iio_context *m_ctx;
+	struct iio_context* m_ctx;
 	bool m_advanced;
-	Preferences *prefPanel;
+	Preferences* prefPanel;
 	QMap<QString, QString> m_info_params;
 	QMap<QString, QString> m_info_params_advanced;
-	QTimer *m_led_timer;
-	QTimer *m_blink_timer;
+	QTimer* m_led_timer;
+	QTimer* m_blink_timer;
 	bool m_connected;
 	bool m_search_interrupted;
 };
 
-class M2kInfoPage : public InfoPage {
+class M2kInfoPage : public InfoPage
+{
 	Q_OBJECT
 public:
-	explicit M2kInfoPage(QString uri, Preferences *prefPanel, struct iio_context *ctx = nullptr,
-			     QWidget *parent = 0);
+	explicit M2kInfoPage(QString uri, Preferences* prefPanel, struct iio_context* ctx = nullptr,
+			     QWidget* parent = 0);
 	~M2kInfoPage();
 
 protected:
@@ -109,19 +111,22 @@ private Q_SLOTS:
 	void blinkTimeout();
 
 private:
-	struct iio_channel *m_fabric_channel;
+	struct iio_channel* m_fabric_channel;
 	QFuture<void> calibration_thread;
 };
 
-class InfoPageBuilder {
+class InfoPageBuilder
+{
 public:
-	enum InfoPageType {
+	enum InfoPageType
+	{
 		GENERIC = 0,
 		M2K = 1,
 	};
 
-	static InfoPage *newPage(InfoPageType page_type, QString uri, Preferences *prefPanel,
-				 struct iio_context *ctx = nullptr, QWidget *parent = 0) {
+	static InfoPage* newPage(InfoPageType page_type, QString uri, Preferences* prefPanel,
+				 struct iio_context* ctx = nullptr, QWidget* parent = 0)
+	{
 		switch (page_type) {
 		case GENERIC:
 			return new InfoPage(uri, prefPanel, ctx, parent);

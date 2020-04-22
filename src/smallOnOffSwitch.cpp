@@ -27,7 +27,7 @@
 
 using namespace adiscope;
 
-SmallOnOffSwitch::SmallOnOffSwitch(QWidget *parent)
+SmallOnOffSwitch::SmallOnOffSwitch(QWidget* parent)
 	: QPushButton(parent)
 	, color_start("grey")
 	, color_end("blue")
@@ -37,7 +37,8 @@ SmallOnOffSwitch::SmallOnOffSwitch(QWidget *parent)
 	, anim(&handle, "geometry")
 	, color_anim(this, "color")
 	, show_icon(false)
-	, bothValid(false) {
+	, bothValid(false)
+{
 	handle.setObjectName("handle");
 	on.setObjectName("on");
 	off.setObjectName("off");
@@ -58,18 +59,21 @@ SmallOnOffSwitch::SmallOnOffSwitch(QWidget *parent)
 
 SmallOnOffSwitch::~SmallOnOffSwitch() {}
 
-void SmallOnOffSwitch::setDuration(int ms) {
+void SmallOnOffSwitch::setDuration(int ms)
+{
 	duration_ms = ms;
 	anim.setDuration(ms);
 	color_anim.setDuration(ms);
 }
 
-void SmallOnOffSwitch::setHandleColor(const QColor &color) {
+void SmallOnOffSwitch::setHandleColor(const QColor& color)
+{
 	QString ss(stylesheet + QString("QWidget#handle { background-color: %1; }").arg(color.name()));
 	this->setStyleSheet(ss);
 }
 
-void SmallOnOffSwitch::toggleAnim(bool enabled) {
+void SmallOnOffSwitch::toggleAnim(bool enabled)
+{
 	if (!isVisible())
 		return;
 
@@ -102,9 +106,10 @@ void SmallOnOffSwitch::toggleAnim(bool enabled) {
 	color_anim.start();
 }
 
-bool SmallOnOffSwitch::event(QEvent *e) {
+bool SmallOnOffSwitch::event(QEvent* e)
+{
 	if (e->type() == QEvent::DynamicPropertyChange) {
-		QDynamicPropertyChangeEvent *const propEvent = static_cast<QDynamicPropertyChangeEvent *>(e);
+		QDynamicPropertyChangeEvent* const propEvent = static_cast<QDynamicPropertyChangeEvent*>(e);
 		QString propName = propEvent->propertyName();
 		if (propName == "leftText" && property("leftText").isValid())
 			on.setText(property("leftText").toString());
@@ -117,7 +122,8 @@ bool SmallOnOffSwitch::event(QEvent *e) {
 	}
 	return QPushButton::event(e);
 }
-void SmallOnOffSwitch::paintEvent(QPaintEvent *e) {
+void SmallOnOffSwitch::paintEvent(QPaintEvent* e)
+{
 	QPushButton::paintEvent(e);
 	show_icon = getDynamicProperty(this, "use_icon");
 
@@ -146,7 +152,8 @@ void SmallOnOffSwitch::paintEvent(QPaintEvent *e) {
 	}
 }
 
-void SmallOnOffSwitch::showEvent(QShowEvent *event) {
+void SmallOnOffSwitch::showEvent(QShowEvent* event)
+{
 	if (!isChecked()) {
 		handle.setGeometry(QRect(width() - handle.width(), handle.y(), handle.width(), handle.height()));
 		if (bothValid) {
@@ -160,7 +167,8 @@ void SmallOnOffSwitch::showEvent(QShowEvent *event) {
 	}
 }
 
-void SmallOnOffSwitch::updateOnOffLabels() {
+void SmallOnOffSwitch::updateOnOffLabels()
+{
 	if (!bothValid) {
 		on.setEnabled(isChecked());
 		off.setEnabled(!isChecked());

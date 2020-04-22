@@ -27,11 +27,12 @@
 #include <memory>
 #include <string>
 
-extern "C" {
-struct iio_context;
-struct iio_device;
-struct iio_channel;
-struct iio_buffer;
+extern "C"
+{
+	struct iio_context;
+	struct iio_device;
+	struct iio_channel;
+	struct iio_buffer;
 }
 
 namespace adiscope {
@@ -40,15 +41,27 @@ class M2kAdc;
 class M2kDac;
 class Calibration_API;
 
-class Calibration {
+class Calibration
+{
 	friend class Calibration_API;
 
 public:
-	enum calibration_mode { ADC_REF1, ADC_REF2, ADC_GND, DAC, NONE };
+	enum calibration_mode
+	{
+		ADC_REF1,
+		ADC_REF2,
+		ADC_GND,
+		DAC,
+		NONE
+	};
 
-	enum gain_mode { LOW, HIGH };
+	enum gain_mode
+	{
+		LOW,
+		HIGH
+	};
 
-	Calibration(struct iio_context *ctx, QJSEngine *engine, std::shared_ptr<M2kAdc> adc = nullptr,
+	Calibration(struct iio_context* ctx, QJSEngine* engine, std::shared_ptr<M2kAdc> adc = nullptr,
 		    std::shared_ptr<M2kDac> dac_a = nullptr, std::shared_ptr<M2kDac> dac_b = nullptr);
 	~Calibration();
 
@@ -77,10 +90,10 @@ public:
 	bool resetCalibration();
 	void updateCorrections();
 
-	double getIioDevTemp(const QString &devName) const;
+	double getIioDevTemp(const QString& devName) const;
 
-	static void setChannelEnableState(struct iio_channel *chn, bool en);
-	static double average(int16_t *data, size_t numElements);
+	static void setChannelEnableState(struct iio_channel* chn, bool en);
+	static double average(int16_t* data, size_t numElements);
 	static float convSampleToVolts(float sample, float correctionGain = 1);
 	static float convVoltsToSample(float sample, float correctionGain = 1);
 
@@ -92,44 +105,44 @@ public:
 	void dacOutputStop();
 
 private:
-	bool adc_data_capture(int16_t *dataCh0, int16_t *dataCh1, size_t num_sampl_per_chn);
+	bool adc_data_capture(int16_t* dataCh0, int16_t* dataCh1, size_t num_sampl_per_chn);
 	bool fine_tune(size_t span, int16_t centerVal0, int16_t centerVal1, size_t num_samples);
 
-	bool dacOutputDC(struct iio_device *dac, struct iio_channel *channel, struct iio_buffer **buffer, size_t value);
+	bool dacOutputDC(struct iio_device* dac, struct iio_channel* channel, struct iio_buffer** buffer, size_t value);
 	bool dacAOutputDC(int16_t value);
 	bool dacBOutputDC(int16_t value);
 	void configHwSamplerate();
 
-	ApiObject *m_api;
+	ApiObject* m_api;
 	volatile bool m_cancel;
 
 	std::shared_ptr<M2kAdc> m2k_adc;
 	std::shared_ptr<M2kDac> m2k_dac_a;
 	std::shared_ptr<M2kDac> m2k_dac_b;
 
-	struct iio_context *m_ctx;
-	struct iio_device *m_m2k_adc;
-	struct iio_device *m_m2k_dac_a;
-	struct iio_device *m_m2k_dac_b;
-	struct iio_device *m2k_ad5625;
-	struct iio_device *m_m2k_fabric;
+	struct iio_context* m_ctx;
+	struct iio_device* m_m2k_adc;
+	struct iio_device* m_m2k_dac_a;
+	struct iio_device* m_m2k_dac_b;
+	struct iio_device* m2k_ad5625;
+	struct iio_device* m_m2k_fabric;
 
-	struct iio_channel *m_adc_channel0;
-	struct iio_channel *m_adc_channel1;
+	struct iio_channel* m_adc_channel0;
+	struct iio_channel* m_adc_channel1;
 
-	struct iio_channel *m_dac_a_channel;
-	struct iio_channel *m_dac_b_channel;
+	struct iio_channel* m_dac_a_channel;
+	struct iio_channel* m_dac_b_channel;
 
-	struct iio_channel *m_dac_a_fabric;
-	struct iio_channel *m_dac_b_fabric;
+	struct iio_channel* m_dac_a_fabric;
+	struct iio_channel* m_dac_b_fabric;
 
-	struct iio_channel *m_ad5625_channel0;
-	struct iio_channel *m_ad5625_channel1;
-	struct iio_channel *m_ad5625_channel2;
-	struct iio_channel *m_ad5625_channel3;
+	struct iio_channel* m_ad5625_channel0;
+	struct iio_channel* m_ad5625_channel1;
+	struct iio_channel* m_ad5625_channel2;
+	struct iio_channel* m_ad5625_channel3;
 
-	struct iio_buffer *m_dac_a_buffer;
-	struct iio_buffer *m_dac_b_buffer;
+	struct iio_buffer* m_dac_a_buffer;
+	struct iio_buffer* m_dac_b_buffer;
 
 	int m_adc_ch0_offset;
 	int m_adc_ch1_offset;

@@ -5,7 +5,8 @@
 
 namespace adiscope {
 
-class LogicAnalyzer_API : public ApiObject {
+class LogicAnalyzer_API : public ApiObject
+{
 	Q_OBJECT
 	Q_PROPERTY(int channel_groups_list_size READ channel_groups_list_size WRITE setChannelGroupsListSize
 			   SCRIPTABLE false)
@@ -25,10 +26,13 @@ class LogicAnalyzer_API : public ApiObject {
 	Q_PROPERTY(QList<int> data READ data STORED false)
 
 public:
-	explicit LogicAnalyzer_API(LogicAnalyzer *lga) : ApiObject(), lga(lga) {}
+	explicit LogicAnalyzer_API(LogicAnalyzer* lga)
+		: ApiObject()
+		, lga(lga)
+	{}
 	~LogicAnalyzer_API() {}
 
-	void save(QSettings &settings);
+	void save(QSettings& settings);
 
 	int channel_groups_list_size() const;
 	void setChannelGroupsListSize(int size);
@@ -74,13 +78,14 @@ public:
 	Q_INVOKABLE void show();
 
 	QList<int> data() const;
-	void load(QSettings &s);
+	void load(QSettings& s);
 
 private:
-	LogicAnalyzer *lga;
+	LogicAnalyzer* lga;
 };
 
-class ChannelGroup_API : public ApiObject {
+class ChannelGroup_API : public ApiObject
+{
 	friend class LogicChannel_API;
 	Q_OBJECT
 	Q_PROPERTY(QString decoder READ getDecoder WRITE setDecoder)
@@ -93,12 +98,16 @@ class ChannelGroup_API : public ApiObject {
 	Q_PROPERTY(bool collapsed READ getChCollapsed WRITE setChCollapsed)
 
 public:
-	explicit ChannelGroup_API(LogicAnalyzer *lga, int index = -1, bool load = true)
-		: ApiObject(), lga(lga), index(index) {
+	explicit ChannelGroup_API(LogicAnalyzer* lga, int index = -1, bool load = true)
+		: ApiObject()
+		, lga(lga)
+		, index(index)
+	{
 		if (!load)
 			set_channels_api();
 	}
-	~ChannelGroup_API() {
+	~ChannelGroup_API()
+	{
 		qDeleteAll(channels_api);
 		channels_api.clear();
 	}
@@ -129,12 +138,13 @@ public:
 	void setDecoderSettings(QString val);
 
 private:
-	LogicAnalyzer *lga;
-	QList<LogicChannel_API *> channels_api;
+	LogicAnalyzer* lga;
+	QList<LogicChannel_API*> channels_api;
 	int index;
 };
 
-class LogicChannel_API : public ApiObject {
+class LogicChannel_API : public ApiObject
+{
 	Q_OBJECT
 	Q_PROPERTY(int index READ getIndex WRITE setIndex)
 	Q_PROPERTY(QString trigger READ getTrigger WRITE setTrigger)
@@ -142,8 +152,12 @@ class LogicChannel_API : public ApiObject {
 	Q_PROPERTY(QString role READ getRole WRITE setRole)
 
 public:
-	explicit LogicChannel_API(LogicAnalyzer *lga, ChannelGroup_API *chg, int index = -1)
-		: ApiObject(), lga(lga), lchg(chg), index(index) {}
+	explicit LogicChannel_API(LogicAnalyzer* lga, ChannelGroup_API* chg, int index = -1)
+		: ApiObject()
+		, lga(lga)
+		, lchg(chg)
+		, index(index)
+	{}
 	~LogicChannel_API() {}
 
 	QString getTrigger() const;
@@ -161,8 +175,8 @@ public:
 	QList<bool> data() const;
 
 private:
-	LogicAnalyzer *lga;
-	ChannelGroup_API *lchg;
+	LogicAnalyzer* lga;
+	ChannelGroup_API* lchg;
 	int index;
 };
 } // namespace adiscope

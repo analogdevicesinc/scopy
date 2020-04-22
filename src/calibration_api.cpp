@@ -2,9 +2,13 @@
 
 namespace adiscope {
 
-Calibration_API::Calibration_API(Calibration *calib) : ApiObject(), calib(calib) {}
+Calibration_API::Calibration_API(Calibration* calib)
+	: ApiObject()
+	, calib(calib)
+{}
 
-QList<double> Calibration_API::get_adc_offsets() const {
+QList<double> Calibration_API::get_adc_offsets() const
+{
 	QList<double> offsets;
 
 	offsets.push_back(static_cast<double>(calib->adcOffsetChannel0()));
@@ -13,13 +17,15 @@ QList<double> Calibration_API::get_adc_offsets() const {
 	return offsets;
 }
 
-QList<double> Calibration_API::get_adc_gains() const {
+QList<double> Calibration_API::get_adc_gains() const
+{
 	QList<double> gains = {calib->adcGainChannel0(), calib->adcGainChannel1()};
 
 	return gains;
 }
 
-QList<double> Calibration_API::get_dac_offsets() const {
+QList<double> Calibration_API::get_dac_offsets() const
+{
 	QList<double> offsets;
 
 	offsets.push_back(static_cast<double>(calib->dacAoffset()));
@@ -28,7 +34,8 @@ QList<double> Calibration_API::get_dac_offsets() const {
 	return offsets;
 }
 
-QList<double> Calibration_API::get_dac_gains() const {
+QList<double> Calibration_API::get_dac_gains() const
+{
 	QList<double> gains = {calib->dacAvlsb(), calib->dacBvlsb()};
 
 	return gains;
@@ -52,6 +59,6 @@ void Calibration_API::dacOutputStop() { calib->dacOutputStop(); }
 
 void Calibration_API::restoreHardwareFromCalibMode() { calib->restoreHardwareFromCalibMode(); }
 
-double Calibration_API::devTemp(const QString &devName) { return calib->getIioDevTemp(devName); }
+double Calibration_API::devTemp(const QString& devName) { return calib->getIioDevTemp(devName); }
 
 } // namespace adiscope

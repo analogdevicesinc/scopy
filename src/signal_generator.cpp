@@ -75,14 +75,17 @@
 using namespace adiscope;
 using namespace gr;
 
-enum { DATA_IIO_PTR,
-       DATA_SIGNAL_STRUCT,
-       DATA_TIME_BLOCK,
+enum
+{
+	DATA_IIO_PTR,
+	DATA_SIGNAL_STRUCT,
+	DATA_TIME_BLOCK,
 };
 
 Q_DECLARE_METATYPE(QSharedPointer<signal_generator_data>);
 
-bool SignalGenerator::riffCompare(riff_header_t &ptr, const char *id2) {
+bool SignalGenerator::riffCompare(riff_header_t& ptr, const char* id2)
+{
 	const char riff[] = "RIFF";
 
 	for (uint8_t i = 0; i < 4; i++)
@@ -98,7 +101,8 @@ bool SignalGenerator::riffCompare(riff_header_t &ptr, const char *id2) {
 	return true;
 }
 
-bool SignalGenerator::chunkCompare(chunk_header_t &ptr, const char *id2) {
+bool SignalGenerator::chunkCompare(chunk_header_t& ptr, const char* id2)
+{
 	for (uint8_t i = 0; i < 4; i++)
 		if (ptr.id[i] != id2[i]) {
 			return false;
@@ -107,8 +111,8 @@ bool SignalGenerator::chunkCompare(chunk_header_t &ptr, const char *id2) {
 	return true;
 }
 
-SignalGenerator::SignalGenerator(struct iio_context *_ctx, QList<std::shared_ptr<GenericDac>> dacs, Filter *filt,
-				 ToolMenuItem *toolMenuItem, QJSEngine *engine, ToolLauncher *parent)
+SignalGenerator::SignalGenerator(struct iio_context* _ctx, QList<std::shared_ptr<GenericDac>> dacs, Filter* filt,
+				 ToolMenuItem* toolMenuItem, QJSEngine* engine, ToolLauncher* parent)
 	: Tool(_ctx, toolMenuItem, new SignalGenerator_API(this), "Signal Generator", parent)
 	, ui(new Ui::SignalGenerator)
 	, time_block_data(new adiscope::time_block_data)
@@ -118,7 +122,8 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, QList<std::shared_ptr
 	, sample_rate(0)
 	, settings_group(new QButtonGroup(this))
 	, nb_points(NB_POINTS)
-	, channels_group(new QButtonGroup(this)) {
+	, channels_group(new QButtonGroup(this))
+{
 	zoomT1 = 0;
 	zoomT2 = 1;
 	ui->setupUi(this);
@@ -126,10 +131,10 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, QList<std::shared_ptr
 
 	this->plot = new OscilloscopePlot(this);
 
-	QVector<struct iio_channel *> iio_channels;
+	QVector<struct iio_channel*> iio_channels;
 
 	for (int i = 0; i < dacs.size(); i++) {
-		struct iio_device *dev = dacs[i]->iio_dac_dev();
+		struct iio_device* dev = dacs[i]->iio_dac_dev();
 
 		unsigned long dev_sample_rate = get_max_sample_rate(dev);
 
@@ -137,19 +142,19 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, QList<std::shared_ptr
 			sample_rate = dev_sample_rate;
 		}
 
-		QList<struct iio_channel *> dac_channels = dacs[i]->dacChannelList();
+		QList<struct iio_channel*> dac_channels = dacs[i]->dacChannelList();
 
 		for (int j = 0; j < dac_channels.size(); j++) {
 			iio_channels.append(dac_channels[j]);
 			channel_dac.push_back(
-				QPair<struct iio_channel *, std::shared_ptr<GenericDac>>(dac_channels[j], dacs[i]));
+				QPair<struct iio_channel*, std::shared_ptr<GenericDac>>(dac_channels[j], dacs[i]));
 		}
 	}
 
 	max_sample_rate = sample_rate;
 
 	/* FIXME: TODO: Move this into a HW class / lib M2k */
-	struct iio_device *fabric = iio_context_find_device(ctx, "m2k-fabric");
+	struct iio_device* fabric = iio_context_find_device(ctx, "m2k-fabric");
 
 	if (fabric) {
 		this->amp1 = iio_device_find_channel(fabric, "voltage0", true);
@@ -280,7 +285,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, QList<std::shared_ptr
 	unsigned int nb_channels = iio_channels.size();
 
 	for (unsigned int i = 0; i < nb_channels; i++) {
-		struct iio_channel *chn = iio_channels[i];
+		struct iio_channel* chn = iio_channels[i];
 
 		auto ptr = QSharedPointer<signal_generator_data>(new signal_generator_data);
 		ptr->iio_ch = chn;
@@ -310,11 +315,11 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, QList<std::shared_ptr
 		ptr->type = SIGNAL_TYPE_CONSTANT;
 		ptr->id = i;
 
-		ChannelWidget *cw = new ChannelWidget(i, false, false, QColor());
+		ChannelWidget* cw = new ChannelWidget(i, false, false, QColor());
 		cw->setShortName(QString("CH %1").arg(i + 1));
 		cw->nameButton()->setText(cw->shortName());
 
-		const char *ch_name = iio_channel_get_name(chn);
+		const char* ch_name = iio_channel_get_name(chn);
 		std::string s = "Channel ";
 
 		if (!ch_name) {
@@ -325,7 +330,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, QList<std::shared_ptr
 		cw->setFullName(ch_name);
 
 		cw->setProperty("signal_generator_data", QVariant::fromValue(ptr));
-		cw->setProperty("channel", qVariantFromValue((void *)chn));
+		cw->setProperty("channel", qVariantFromValue((void*)chn));
 		iio_channel_set_data(chn, cw);
 
 		ui->channelsList->addWidget(cw);
@@ -349,7 +354,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, QList<std::shared_ptr
 
 	time_block_data->nb_channels = nb_channels;
 	time_block_data->time_block = scope_sink_f::make(nb_points, sample_rate, "Signal Generator", nb_channels,
-							 static_cast<QWidget *>(plot));
+							 static_cast<QWidget*>(plot));
 
 	/* Attach all curves by default */
 	plot->registerSink(time_block_data->time_block->name(), nb_channels, nb_points);
@@ -412,7 +417,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, QList<std::shared_ptr
 	connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
 
 	connect(ui->load_file, SIGNAL(pressed()), this, SLOT(loadFile()));
-	connect(ui->mathWidget, SIGNAL(functionValid(const QString &)), this, SLOT(setFunction(const QString &)));
+	connect(ui->mathWidget, SIGNAL(functionValid(const QString&)), this, SLOT(setFunction(const QString&)));
 
 	connect(ui->run_button, SIGNAL(toggled(bool)), runButton(), SLOT(setChecked(bool)));
 	connect(runButton(), SIGNAL(toggled(bool)), ui->run_button, SLOT(setChecked(bool)));
@@ -434,7 +439,8 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, QList<std::shared_ptr
 	plot->axisWidget(QwtPlot::yLeft)->scaleDraw()->setMinimumExtent(65);
 }
 
-SignalGenerator::~SignalGenerator() {
+SignalGenerator::~SignalGenerator()
+{
 	disconnect(prefPanel, &Preferences::notify, this, &SignalGenerator::readPreferences);
 	ui->run_button->setChecked(false);
 	setDynamicProperty(runButton(), "disabled", false);
@@ -452,7 +458,8 @@ SignalGenerator::~SignalGenerator() {
 
 void SignalGenerator::settingsLoaded() { updatePreview(); }
 
-void SignalGenerator::readPreferences() {
+void SignalGenerator::readPreferences()
+{
 	double prefered_periods_nr = prefPanel->getSig_gen_periods_nr();
 	if (nr_of_periods != prefered_periods_nr) {
 		nr_of_periods = prefered_periods_nr;
@@ -460,7 +467,8 @@ void SignalGenerator::readPreferences() {
 	}
 }
 
-void SignalGenerator::resetZoom() {
+void SignalGenerator::resetZoom()
+{
 
 	disconnect(plot->getZoomer(), SIGNAL(zoomed(QRectF)), this, SLOT(rescale()));
 	bool disable_zoom = false;
@@ -542,7 +550,8 @@ void SignalGenerator::resetZoom() {
 	plot->AttachCurve(slowSignalId);
 }
 
-void SignalGenerator::rescale() {
+void SignalGenerator::rescale()
+{
 
 	auto hOffset = plot->HorizOffset();
 	auto hUnitsPerDiv = plot->HorizUnitsPerDiv();
@@ -577,7 +586,8 @@ void SignalGenerator::rescale() {
 	plot->replot();
 }
 
-void SignalGenerator::constantValueChanged(double value) {
+void SignalGenerator::constantValueChanged(double value)
+{
 	auto ptr = getCurrentData();
 
 	if (ptr->constant != (float)value) {
@@ -586,7 +596,8 @@ void SignalGenerator::constantValueChanged(double value) {
 	}
 }
 
-void SignalGenerator::amplitudeChanged(double value) {
+void SignalGenerator::amplitudeChanged(double value)
+{
 	auto ptr = getCurrentData();
 
 	if (ptr->amplitude != value) {
@@ -595,7 +606,8 @@ void SignalGenerator::amplitudeChanged(double value) {
 	}
 }
 
-void SignalGenerator::fileAmplitudeChanged(double value) {
+void SignalGenerator::fileAmplitudeChanged(double value)
+{
 	auto ptr = getCurrentData();
 
 	if (ptr->file_amplitude != value) {
@@ -604,7 +616,8 @@ void SignalGenerator::fileAmplitudeChanged(double value) {
 	}
 }
 
-void SignalGenerator::fileOffsetChanged(double value) {
+void SignalGenerator::fileOffsetChanged(double value)
+{
 	auto ptr = getCurrentData();
 
 	if (ptr->file_offset != value) {
@@ -613,7 +626,8 @@ void SignalGenerator::fileOffsetChanged(double value) {
 	}
 }
 
-void SignalGenerator::filePhaseChanged(double value) {
+void SignalGenerator::filePhaseChanged(double value)
+{
 	auto ptr = getCurrentData();
 
 	if (ptr->file_phase != value) {
@@ -622,7 +636,8 @@ void SignalGenerator::filePhaseChanged(double value) {
 	}
 }
 
-void SignalGenerator::offsetChanged(double value) {
+void SignalGenerator::offsetChanged(double value)
+{
 	auto ptr = getCurrentData();
 
 	if (ptr->offset != (float)value) {
@@ -631,7 +646,8 @@ void SignalGenerator::offsetChanged(double value) {
 	}
 }
 
-void SignalGenerator::fileChannelChanged(int value) {
+void SignalGenerator::fileChannelChanged(int value)
+{
 	auto ptr = getCurrentData();
 
 	if (ptr->file_channel != (int)value) {
@@ -641,7 +657,8 @@ void SignalGenerator::fileChannelChanged(int value) {
 		resetZoom();
 	}
 }
-void SignalGenerator::fileSampleRateChanged(double value) {
+void SignalGenerator::fileSampleRateChanged(double value)
+{
 	auto ptr = getCurrentData();
 
 	if (ptr->file_sr != value) {
@@ -650,7 +667,8 @@ void SignalGenerator::fileSampleRateChanged(double value) {
 	}
 }
 
-void SignalGenerator::frequencyChanged(double value) {
+void SignalGenerator::frequencyChanged(double value)
+{
 	auto ptr = getCurrentData();
 
 	if (ptr->frequency != value) {
@@ -664,7 +682,8 @@ void SignalGenerator::frequencyChanged(double value) {
 	}
 }
 
-void SignalGenerator::mathFreqChanged(double value) {
+void SignalGenerator::mathFreqChanged(double value)
+{
 	auto ptr = getCurrentData();
 
 	if (ptr->math_freq != value) {
@@ -673,7 +692,8 @@ void SignalGenerator::mathFreqChanged(double value) {
 	}
 }
 
-void SignalGenerator::noiseTypeChanged(int index) {
+void SignalGenerator::noiseTypeChanged(int index)
+{
 	auto ptr = getCurrentData();
 
 	gr::analog::noise_type_t value = qvariant_cast<gr::analog::noise_type_t>(ui->cbNoiseType->itemData(index));
@@ -683,7 +703,8 @@ void SignalGenerator::noiseTypeChanged(int index) {
 	}
 }
 
-void SignalGenerator::noiseAmplitudeChanged(double value) {
+void SignalGenerator::noiseAmplitudeChanged(double value)
+{
 
 	auto ptr = getCurrentData();
 
@@ -693,7 +714,8 @@ void SignalGenerator::noiseAmplitudeChanged(double value) {
 	}
 }
 
-void SignalGenerator::dutyChanged(double value) {
+void SignalGenerator::dutyChanged(double value)
+{
 	auto ptr = getCurrentData();
 
 	if (ptr->dutycycle != value) {
@@ -702,12 +724,14 @@ void SignalGenerator::dutyChanged(double value) {
 	}
 }
 
-void SignalGenerator::trapezoidalComputeFrequency() {
+void SignalGenerator::trapezoidalComputeFrequency()
+{
 	auto ptr = getCurrentData();
 	frequency->setValue(static_cast<double>(1 / (ptr->rise + ptr->fall + ptr->holdh + ptr->holdl)));
 }
 
-void SignalGenerator::riseChanged(double value) {
+void SignalGenerator::riseChanged(double value)
+{
 	auto ptr = getCurrentData();
 
 	if (ptr->rise != value) {
@@ -716,7 +740,8 @@ void SignalGenerator::riseChanged(double value) {
 	}
 }
 
-void SignalGenerator::fallChanged(double value) {
+void SignalGenerator::fallChanged(double value)
+{
 	auto ptr = getCurrentData();
 
 	if (ptr->fall != value) {
@@ -725,7 +750,8 @@ void SignalGenerator::fallChanged(double value) {
 	}
 }
 
-void SignalGenerator::holdHighChanged(double value) {
+void SignalGenerator::holdHighChanged(double value)
+{
 	auto ptr = getCurrentData();
 
 	if (ptr->holdh != value) {
@@ -734,7 +760,8 @@ void SignalGenerator::holdHighChanged(double value) {
 	}
 }
 
-void SignalGenerator::holdLowChanged(double value) {
+void SignalGenerator::holdLowChanged(double value)
+{
 	auto ptr = getCurrentData();
 
 	if (ptr->holdl != value) {
@@ -743,7 +770,8 @@ void SignalGenerator::holdLowChanged(double value) {
 	}
 }
 
-void SignalGenerator::phaseChanged(double value) {
+void SignalGenerator::phaseChanged(double value)
+{
 	auto ptr = getCurrentData();
 
 	ptr->indexValue = phase->indexValue();
@@ -753,13 +781,15 @@ void SignalGenerator::phaseChanged(double value) {
 	}
 }
 
-void SignalGenerator::phaseIndexChanged() {
+void SignalGenerator::phaseIndexChanged()
+{
 	auto ptr = getCurrentData();
 
 	ptr->indexValue = phase->indexValue();
 }
 
-void SignalGenerator::waveformUpdateUi(int val) {
+void SignalGenerator::waveformUpdateUi(int val)
+{
 	frequency->setEnabled(val != SG_TRA_WAVE);
 	ui->wtrapezparams->setVisible(val == SG_TRA_WAVE);
 	dutycycle->setVisible(val == SG_SQR_WAVE);
@@ -768,7 +798,8 @@ void SignalGenerator::waveformUpdateUi(int val) {
 	}
 }
 
-void SignalGenerator::waveformTypeChanged(int val) {
+void SignalGenerator::waveformTypeChanged(int val)
+{
 	enum sg_waveform types[] = {
 		SG_SIN_WAVE, SG_SQR_WAVE, SG_TRI_WAVE, SG_TRA_WAVE, SG_SAW_WAVE, SG_INV_SAW_WAVE,
 	};
@@ -785,12 +816,14 @@ void SignalGenerator::waveformTypeChanged(int val) {
 
 QSharedPointer<signal_generator_data> SignalGenerator::getCurrentData() { return getData(channels[currentChannel]); }
 
-QSharedPointer<signal_generator_data> SignalGenerator::getData(QWidget *obj) {
+QSharedPointer<signal_generator_data> SignalGenerator::getData(QWidget* obj)
+{
 	auto var = obj->property("signal_generator_data");
 	return var.value<QSharedPointer<signal_generator_data>>();
 }
 
-void SignalGenerator::resizeTabWidget(int index) {
+void SignalGenerator::resizeTabWidget(int index)
+{
 	for (int i = 0; i < ui->tabWidget->count(); i++)
 		if (i != index)
 			ui->tabWidget->widget(i)->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
@@ -799,7 +832,8 @@ void SignalGenerator::resizeTabWidget(int index) {
 	ui->tabWidget->widget(index)->adjustSize();
 }
 
-void SignalGenerator::tabChanged(int index) {
+void SignalGenerator::tabChanged(int index)
+{
 	auto ptr = getCurrentData();
 
 	if (ptr->type != (enum SIGNAL_TYPE)index) {
@@ -812,7 +846,8 @@ void SignalGenerator::tabChanged(int index) {
 	}
 }
 
-void SignalGenerator::updatePreview() {
+void SignalGenerator::updatePreview()
+{
 	static const float MAX_PREVIEW_RANGE = (float)(SHRT_MAX);
 	static const float MIN_PREVIEW_RANGE = (float)(SHRT_MIN);
 
@@ -859,7 +894,8 @@ void SignalGenerator::updatePreview() {
 	}
 }
 
-enum sg_file_format SignalGenerator::getFileFormat(QString filePath) {
+enum sg_file_format SignalGenerator::getFileFormat(QString filePath)
+{
 	if (filePath.isEmpty()) {
 		return FORMAT_NO_FILE;
 	}
@@ -888,7 +924,8 @@ enum sg_file_format SignalGenerator::getFileFormat(QString filePath) {
 	return FORMAT_BIN_FLOAT;
 }
 
-bool SignalGenerator::loadParametersFromFile(QSharedPointer<signal_generator_data> ptr, QString filePath) {
+bool SignalGenerator::loadParametersFromFile(QSharedPointer<signal_generator_data> ptr, QString filePath)
+{
 	ptr->file_message = "";
 	ptr->file = filePath;
 	ptr->file_type = getFileFormat(ptr->file);
@@ -909,7 +946,7 @@ bool SignalGenerator::loadParametersFromFile(QSharedPointer<signal_generator_dat
 		bool ok = true;
 		try {
 			auto fs = blocks::wavfile_source::make(ptr->file.toLocal8Bit(), true);
-		} catch (std::runtime_error &e) {
+		} catch (std::runtime_error& e) {
 			ok = false;
 			ptr->file_message = QString::fromLocal8Bit(e.what());
 			ptr->file_nr_of_samples.push_back(0);
@@ -964,7 +1001,7 @@ bool SignalGenerator::loadParametersFromFile(QSharedPointer<signal_generator_dat
 
 		try {
 			fileManager->open(ptr->file, FileManager::IMPORT);
-		} catch (FileManagerException &e) {
+		} catch (FileManagerException& e) {
 			ptr->file_message = QString::fromLocal8Bit(e.what());
 			ptr->file_nr_of_samples.push_back(0);
 			ptr->file_type = FORMAT_NO_FILE;
@@ -987,8 +1024,8 @@ bool SignalGenerator::loadParametersFromFile(QSharedPointer<signal_generator_dat
 	}
 
 	if (ptr->file_type == FORMAT_MAT) {
-		mat_t *matfp;
-		matvar_t *matvar;
+		mat_t* matfp;
+		matvar_t* matvar;
 		matfp = Mat_Open(filePath.toStdString().c_str(), MAT_ACC_RDONLY);
 
 		if (NULL == matfp) {
@@ -1052,14 +1089,16 @@ bool SignalGenerator::loadParametersFromFile(QSharedPointer<signal_generator_dat
 	return true;
 }
 
-void SignalGenerator::reloadFileFromPath() {
+void SignalGenerator::reloadFileFromPath()
+{
 	auto ptr = getCurrentData();
 	if (!ptr->file.isEmpty()) {
 		loadFileFromPath(ptr->file);
 	}
 }
 
-void SignalGenerator::loadFileFromPath(QString filename) {
+void SignalGenerator::loadFileFromPath(QString filename)
+{
 	auto ptr = getCurrentData();
 
 	ptr->file = filename;
@@ -1100,7 +1139,8 @@ void SignalGenerator::loadFileFromPath(QString filename) {
 	updateRightMenuForChn(currentChannel);
 }
 
-void SignalGenerator::loadFile() {
+void SignalGenerator::loadFile()
+{
 	QString fileName = QFileDialog::getOpenFileName(
 		this, tr("Open File"), "",
 		tr("Comma-separated values files (*.csv);;"
@@ -1117,8 +1157,9 @@ void SignalGenerator::loadFile() {
 	resetZoom();
 }
 
-void SignalGenerator::start() {
-	QVector<struct iio_channel *> enabled_channels;
+void SignalGenerator::start()
+{
+	QVector<struct iio_channel*> enabled_channels;
 
 	m_running = true;
 	if (amp1 && amp2) {
@@ -1147,8 +1188,8 @@ void SignalGenerator::start() {
 			continue;
 		}
 
-		void *ptr = (*it)->property("channel").value<void *>();
-		enabled_channels.append(static_cast<struct iio_channel *>(ptr));
+		void* ptr = (*it)->property("channel").value<void*>();
+		enabled_channels.append(static_cast<struct iio_channel*>(ptr));
 	}
 
 	if (enabled_channels.size() == 0) {
@@ -1156,7 +1197,7 @@ void SignalGenerator::start() {
 	}
 
 	do {
-		const struct iio_device *dev = iio_channel_get_device(enabled_channels[0]);
+		const struct iio_device* dev = iio_channel_get_device(enabled_channels[0]);
 
 		/* First, disable all the channels of this device */
 		unsigned int nb = iio_device_get_channels_count(dev);
@@ -1179,7 +1220,7 @@ void SignalGenerator::start() {
 		size_t samples_count = get_samples_count(dev, best_rate);
 
 		/* Create the IIO buffer */
-		struct iio_buffer *buf = iio_device_create_buffer(dev, samples_count, true);
+		struct iio_buffer* buf = iio_device_create_buffer(dev, samples_count, true);
 
 		if (!buf || best_rate == 0) {
 			throw std::runtime_error("Unable to create buffer");
@@ -1205,15 +1246,15 @@ void SignalGenerator::start() {
 
 			top_block = gr::make_top_block("Signal Generator");
 
-			void *ptr = iio_channel_get_data(each);
-			QWidget *w = static_cast<QWidget *>(ptr);
+			void* ptr = iio_channel_get_data(each);
+			QWidget* w = static_cast<QWidget*>(ptr);
 			auto source = getSource(w, best_rate, top_block);
 			float volts_to_raw_coef;
 			double vlsb = 1;
 			double corr = 1; // interpolation correction
 			auto pair_it = std::find_if(
 				channel_dac.begin(), channel_dac.end(),
-				[&each](const QPair<struct iio_channel *, std::shared_ptr<GenericDac>> &element) {
+				[&each](const QPair<struct iio_channel*, std::shared_ptr<GenericDac>>& element) {
 					return element.first == each;
 				});
 
@@ -1244,8 +1285,8 @@ void SignalGenerator::start() {
 			top_block->connect(head, 0, vector, 0);
 			top_block->run();
 
-			const std::vector<short> &samples = vector->data();
-			const short *data = samples.data();
+			const std::vector<short>& samples = vector->data();
+			const short* data = samples.data();
 
 			if (samples.size()) {
 				iio_channel_write(each, buf, data, samples_count * sizeof(short));
@@ -1268,7 +1309,7 @@ void SignalGenerator::start() {
 	/* Now that we pushed all the buffers, disable the (optional) DMA sync
 	 * for the devices that support it. */
 	for (auto buf : buffers) {
-		const struct iio_device *dev = iio_buffer_get_device(buf);
+		const struct iio_device* dev = iio_buffer_get_device(buf);
 
 		iio_device_attr_write_bool(dev, "dma_sync", false);
 	}
@@ -1276,7 +1317,8 @@ void SignalGenerator::start() {
 
 void SignalGenerator::run() { start(); }
 
-void SignalGenerator::stop() {
+void SignalGenerator::stop()
+{
 
 	for (auto each : buffers) {
 		iio_buffer_destroy(each);
@@ -1296,7 +1338,8 @@ void SignalGenerator::stop() {
 	m_running = false;
 }
 
-void SignalGenerator::startStop(bool pressed) {
+void SignalGenerator::startStop(bool pressed)
+{
 	if (pressed) {
 		start();
 	} else {
@@ -1306,7 +1349,8 @@ void SignalGenerator::startStop(bool pressed) {
 	setDynamicProperty(ui->run_button, "running", pressed);
 }
 
-void SignalGenerator::setFunction(const QString &function) {
+void SignalGenerator::setFunction(const QString& function)
+{
 	auto ptr = getCurrentData();
 
 	if (ptr->function != function) {
@@ -1316,7 +1360,8 @@ void SignalGenerator::setFunction(const QString &function) {
 }
 
 basic_block_sptr SignalGenerator::getSignalSource(gr::top_block_sptr top, double samp_rate,
-						  struct signal_generator_data &data, double phase_correction) {
+						  struct signal_generator_data& data, double phase_correction)
+{
 	analog::gr_waveform_t waveform;
 	double phase;
 	double amplitude;
@@ -1378,13 +1423,15 @@ basic_block_sptr SignalGenerator::getSignalSource(gr::top_block_sptr top, double
 	return src;
 }
 
-void SignalGenerator::loadFileCurrentChannelData() {
+void SignalGenerator::loadFileCurrentChannelData()
+{
 	reloadFileFromPath();
 	updateRightMenuForChn(currentChannel);
 	resetZoom();
 }
 
-void SignalGenerator::loadFileChannelData(int chIdx) {
+void SignalGenerator::loadFileChannelData(int chIdx)
+{
 	auto ptr = getData(channels[chIdx]);
 
 	if (ptr->type != SIGNAL_TYPE_BUFFER) {
@@ -1411,8 +1458,8 @@ void SignalGenerator::loadFileChannelData(int chIdx) {
 		}
 
 		if (ptr->file_type == FORMAT_MAT) {
-			mat_t *matfp;
-			matvar_t *matvar;
+			mat_t* matfp;
+			matvar_t* matvar;
 
 			matfp = Mat_Open(ptr->file.toStdString().c_str(), MAT_ACC_RDONLY);
 
@@ -1422,7 +1469,7 @@ void SignalGenerator::loadFileChannelData(int chIdx) {
 			}
 
 			matvar = Mat_VarRead(matfp, ptr->file_channel_names[ptr->file_channel].toStdString().c_str());
-			const double *xData = static_cast<const double *>(matvar->data);
+			const double* xData = static_cast<const double*>(matvar->data);
 
 			for (auto i = 0; i < ptr->file_nr_of_samples[ptr->file_channel]; ++i) {
 				ptr->file_data.push_back(xData[i]);
@@ -1431,15 +1478,15 @@ void SignalGenerator::loadFileChannelData(int chIdx) {
 			Mat_Close(matfp);
 			return;
 		}
-
-	} catch (FileManagerException &e) {
+	} catch (FileManagerException& e) {
 		ptr->file_message = QString::fromLocal8Bit(e.what());
 		ptr->file_nr_of_samples.push_back(0);
 		ptr->file_type = FORMAT_NO_FILE;
 	}
 }
 
-gr::basic_block_sptr SignalGenerator::getNoise(QWidget *obj, gr::top_block_sptr top) {
+gr::basic_block_sptr SignalGenerator::getNoise(QWidget* obj, gr::top_block_sptr top)
+{
 	auto ptr = getData(obj);
 	auto noiseaAmpl = ptr->noiseAmplitude / 2;
 	if ((int)ptr->noiseType != 0) {
@@ -1474,7 +1521,8 @@ gr::basic_block_sptr SignalGenerator::getNoise(QWidget *obj, gr::top_block_sptr 
 	}
 }
 
-gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj, double samp_rate, gr::top_block_sptr top, bool preview) {
+gr::basic_block_sptr SignalGenerator::getSource(QWidget* obj, double samp_rate, gr::top_block_sptr top, bool preview)
+{
 	auto ptr = getData(obj);
 	enum SIGNAL_TYPE type = ptr->type;
 	double phase = 0.0;
@@ -1514,7 +1562,7 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj, double samp_rate, 
 			case FORMAT_WAVE:
 				try {
 					fs = blocks::wavfile_source::make(str.c_str(), true);
-				} catch (std::runtime_error &e) {
+				} catch (std::runtime_error& e) {
 					ptr->file_message = QString::fromLocal8Bit(e.what());
 					fs = blocks::null_source::make(sizeof(float));
 				}
@@ -1606,7 +1654,6 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj, double samp_rate, 
 				auto skip_head = blocks::skiphead::make(sizeof(float), (uint64_t)to_skip);
 				top->connect(src, 0, skip_head, 0);
 				generated_wave = skip_head;
-
 			} else {
 				generated_wave = iio::iio_math_gen::make(samp_rate, ptr->math_freq, str);
 			}
@@ -1623,8 +1670,9 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj, double samp_rate, 
 	return noiseAdd;
 }
 
-void adiscope::SignalGenerator::channelWidgetEnabled(bool en) {
-	ChannelWidget *cw = static_cast<ChannelWidget *>(QObject::sender());
+void adiscope::SignalGenerator::channelWidgetEnabled(bool en)
+{
+	ChannelWidget* cw = static_cast<ChannelWidget*>(QObject::sender());
 	int id = cw->id();
 
 	if (en) {
@@ -1649,7 +1697,8 @@ void adiscope::SignalGenerator::channelWidgetEnabled(bool en) {
 	setDynamicProperty(run_button, "disabled", !enable_run);
 }
 
-void adiscope::SignalGenerator::triggerRightMenuToggle(int chIdx, bool checked) {
+void adiscope::SignalGenerator::triggerRightMenuToggle(int chIdx, bool checked)
+{
 	// Queue the action, if right menu animation is in progress. This way
 	// the action will be remembered and performed right after the animation
 	// finishes
@@ -1662,15 +1711,17 @@ void adiscope::SignalGenerator::triggerRightMenuToggle(int chIdx, bool checked) 
 	}
 }
 
-void adiscope::SignalGenerator::channelWidgetMenuToggled(bool checked) {
-	ChannelWidget *cw = static_cast<ChannelWidget *>(QObject::sender());
+void adiscope::SignalGenerator::channelWidgetMenuToggled(bool checked)
+{
+	ChannelWidget* cw = static_cast<ChannelWidget*>(QObject::sender());
 
 	plot->setActiveVertAxis(cw->id());
 
 	triggerRightMenuToggle(cw->id(), checked);
 }
 
-void adiscope::SignalGenerator::renameConfigPanel() {
+void adiscope::SignalGenerator::renameConfigPanel()
+{
 	/*ui->config_panel->setTitle(QString("Configuration for %1").arg(
 					   channels[currentChannel]->fullName()));*/
 	QString stylesheet = "QTabBar::tab:selected {\
@@ -1681,7 +1732,8 @@ void adiscope::SignalGenerator::renameConfigPanel() {
 	ui->tabWidget->setStyleSheet(stylesheet);
 }
 
-int SignalGenerator::sg_waveform_to_idx(enum sg_waveform wave) {
+int SignalGenerator::sg_waveform_to_idx(enum sg_waveform wave)
+{
 	switch (wave) {
 	case SG_SIN_WAVE:
 	default:
@@ -1704,7 +1756,8 @@ int SignalGenerator::sg_waveform_to_idx(enum sg_waveform wave) {
 	}
 }
 
-void SignalGenerator::updateRightMenuForChn(int chIdx) {
+void SignalGenerator::updateRightMenuForChn(int chIdx)
+{
 	auto ptr = getData(channels[chIdx]);
 
 	constantValue->setValue(ptr->constant);
@@ -1757,7 +1810,8 @@ void SignalGenerator::updateRightMenuForChn(int chIdx) {
 	resizeTabWidget((int)ptr->type);
 }
 
-void SignalGenerator::updateAndToggleMenu(int chIdx, bool open) {
+void SignalGenerator::updateAndToggleMenu(int chIdx, bool open)
+{
 	if (open) {
 		updateRightMenuForChn(chIdx);
 	}
@@ -1765,7 +1819,8 @@ void SignalGenerator::updateAndToggleMenu(int chIdx, bool open) {
 	ui->rightMenu->toggleMenu(open);
 }
 
-void adiscope::SignalGenerator::rightMenuFinished(bool opened) {
+void adiscope::SignalGenerator::rightMenuFinished(bool opened)
+{
 	Q_UNUSED(opened)
 
 	// At the end of each animation, check if there are other button check
@@ -1781,19 +1836,20 @@ void adiscope::SignalGenerator::rightMenuFinished(bool opened) {
 	}
 }
 
-bool SignalGenerator::use_oversampling(const struct iio_device *dev) {
+bool SignalGenerator::use_oversampling(const struct iio_device* dev)
+{
 	if (!iio_device_find_attr(dev, "oversampling_ratio")) {
 		return false;
 	}
 
 	for (unsigned int i = 0; i < iio_device_get_channels_count(dev); i++) {
-		struct iio_channel *chn = iio_device_get_channel(dev, i);
+		struct iio_channel* chn = iio_device_get_channel(dev, i);
 
 		if (!iio_channel_is_enabled(chn)) {
 			continue;
 		}
 
-		QWidget *w = static_cast<QWidget *>(iio_channel_get_data(chn));
+		QWidget* w = static_cast<QWidget*>(iio_channel_get_data(chn));
 		auto ptr = getData(w);
 
 		switch (ptr->type) {
@@ -1817,7 +1873,8 @@ bool SignalGenerator::use_oversampling(const struct iio_device *dev) {
 	return false;
 }
 
-QVector<unsigned long> SignalGenerator::get_available_sample_rates(const struct iio_device *dev) {
+QVector<unsigned long> SignalGenerator::get_available_sample_rates(const struct iio_device* dev)
+{
 	QVector<unsigned long> values;
 	char buf[1024];
 	int ret;
@@ -1845,7 +1902,8 @@ QVector<unsigned long> SignalGenerator::get_available_sample_rates(const struct 
 	return values;
 }
 
-double SignalGenerator::get_best_sample_rate(const struct iio_device *dev) {
+double SignalGenerator::get_best_sample_rate(const struct iio_device* dev)
+{
 	QVector<unsigned long> values = get_available_sample_rates(dev);
 
 	/* When using oversampling, we actually want to generate the
@@ -1888,15 +1946,16 @@ double SignalGenerator::get_best_sample_rate(const struct iio_device *dev) {
 	throw std::runtime_error("Unable to calculate best sample rate");
 }
 
-bool SignalGenerator::sample_rate_forced(const struct iio_device *dev) {
+bool SignalGenerator::sample_rate_forced(const struct iio_device* dev)
+{
 	for (unsigned int i = 0; i < iio_device_get_channels_count(dev); i++) {
-		struct iio_channel *chn = iio_device_get_channel(dev, i);
+		struct iio_channel* chn = iio_device_get_channel(dev, i);
 
 		if (!iio_channel_is_enabled(chn)) {
 			continue;
 		}
 
-		QWidget *w = static_cast<QWidget *>(iio_channel_get_data(chn));
+		QWidget* w = static_cast<QWidget*>(iio_channel_get_data(chn));
 		auto ptr = getData(w);
 
 		if (ptr->file_type && ptr->file_sr && ptr->type == SIGNAL_TYPE_BUFFER) {
@@ -1907,16 +1966,17 @@ bool SignalGenerator::sample_rate_forced(const struct iio_device *dev) {
 	return false;
 }
 
-double SignalGenerator::get_forced_sample_rate(const struct iio_device *dev) {
+double SignalGenerator::get_forced_sample_rate(const struct iio_device* dev)
+{
 
 	for (unsigned int i = 0; i < iio_device_get_channels_count(dev); i++) {
-		struct iio_channel *chn = iio_device_get_channel(dev, i);
+		struct iio_channel* chn = iio_device_get_channel(dev, i);
 
 		if (!iio_channel_is_enabled(chn)) {
 			continue;
 		}
 
-		QWidget *w = static_cast<QWidget *>(iio_channel_get_data(chn));
+		QWidget* w = static_cast<QWidget*>(iio_channel_get_data(chn));
 		auto ptr = getData(w);
 
 		if (ptr->file_type && ptr->file_sr && ptr->type == SIGNAL_TYPE_BUFFER) {
@@ -1927,7 +1987,8 @@ double SignalGenerator::get_forced_sample_rate(const struct iio_device *dev) {
 	return false;
 }
 
-unsigned long SignalGenerator::get_max_sample_rate(const struct iio_device *dev) {
+unsigned long SignalGenerator::get_max_sample_rate(const struct iio_device* dev)
+{
 	QVector<unsigned long> values = get_available_sample_rates(dev);
 
 	if (values.empty()) {
@@ -1937,8 +1998,9 @@ unsigned long SignalGenerator::get_max_sample_rate(const struct iio_device *dev)
 	return values.takeFirst();
 }
 
-void SignalGenerator::calc_sampling_params(const iio_device *dev, double rate, unsigned long &out_sample_rate,
-					   unsigned long &out_oversampling_ratio) {
+void SignalGenerator::calc_sampling_params(const iio_device* dev, double rate, unsigned long& out_sample_rate,
+					   unsigned long& out_oversampling_ratio)
+{
 	if (use_oversampling(dev)) {
 		/* We assume that the rate requested here will always be a
 		 * divider of the max sample rate */
@@ -1953,7 +2015,8 @@ void SignalGenerator::calc_sampling_params(const iio_device *dev, double rate, u
 	}
 }
 
-void SignalGenerator::reduceFraction(double input, long *numerator, long *denominator, long precision) {
+void SignalGenerator::reduceFraction(double input, long* numerator, long* denominator, long precision)
+{
 	double integral = std::floor(input);
 	double frac = input - integral;
 	long gcd_ = gcd(round(frac * precision), precision);
@@ -1962,7 +2025,8 @@ void SignalGenerator::reduceFraction(double input, long *numerator, long *denomi
 	*numerator = (round(frac * precision) / gcd_) + ((long)integral * (*denominator));
 }
 
-size_t SignalGenerator::gcd(size_t a, size_t b) {
+size_t SignalGenerator::gcd(size_t a, size_t b)
+{
 	for (;;) {
 		if (!a) {
 			return b;
@@ -1978,13 +2042,15 @@ size_t SignalGenerator::gcd(size_t a, size_t b) {
 	}
 }
 
-size_t SignalGenerator::lcm(size_t a, size_t b) {
+size_t SignalGenerator::lcm(size_t a, size_t b)
+{
 	size_t temp = gcd(a, b);
 
 	return temp ? (a / temp * b) : 0;
 }
 
-double SignalGenerator::get_best_ratio(double ratio, double max, double *fract) {
+double SignalGenerator::get_best_ratio(double ratio, double max, double* fract)
+{
 	double max_it = max / ratio;
 	double best_ratio = ratio;
 	double best_fract = 1.0;
@@ -2013,17 +2079,18 @@ double SignalGenerator::get_best_ratio(double ratio, double max, double *fract) 
 	return best_ratio;
 }
 
-size_t SignalGenerator::get_samples_count(const struct iio_device *dev, double rate, bool perfect) {
+size_t SignalGenerator::get_samples_count(const struct iio_device* dev, double rate, bool perfect)
+{
 
 	size_t size = 1;
 	size_t max_buffer_size = min_buffer_size << 1;
 
 	for (unsigned int i = 0; i < iio_device_get_channels_count(dev); i++) {
-		struct iio_channel *chn = iio_device_get_channel(dev, i);
+		struct iio_channel* chn = iio_device_get_channel(dev, i);
 
 		auto pair_it =
 			std::find_if(channel_dac.begin(), channel_dac.end(),
-				     [&chn](const QPair<struct iio_channel *, std::shared_ptr<GenericDac>> &element) {
+				     [&chn](const QPair<struct iio_channel*, std::shared_ptr<GenericDac>>& element) {
 					     return element.first == chn;
 				     });
 
@@ -2035,7 +2102,7 @@ size_t SignalGenerator::get_samples_count(const struct iio_device *dev, double r
 			continue;
 		}
 
-		QWidget *w = static_cast<QWidget *>(iio_channel_get_data(chn));
+		QWidget* w = static_cast<QWidget*>(iio_channel_get_data(chn));
 		auto ptr = getData(w);
 		double ratio, fract;
 

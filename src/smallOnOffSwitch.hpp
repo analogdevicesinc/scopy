@@ -30,7 +30,8 @@
 class QShowEvent;
 
 namespace adiscope {
-class SmallOnOffSwitch : public QPushButton {
+class SmallOnOffSwitch : public QPushButton
+{
 	Q_OBJECT
 
 	Q_PROPERTY(int duration_ms MEMBER duration_ms WRITE setDuration);
@@ -40,7 +41,7 @@ class SmallOnOffSwitch : public QPushButton {
 	Q_PROPERTY(QColor color MEMBER color WRITE setHandleColor);
 
 public:
-	explicit SmallOnOffSwitch(QWidget *parent = nullptr);
+	explicit SmallOnOffSwitch(QWidget* parent = nullptr);
 	~SmallOnOffSwitch();
 
 private:
@@ -55,12 +56,12 @@ private:
 	bool bothValid;
 
 	void setDuration(int ms);
-	void setHandleColor(const QColor &color);
+	void setHandleColor(const QColor& color);
 	void updateOnOffLabels();
 
-	bool event(QEvent *e);
-	void showEvent(QShowEvent *event);
-	void paintEvent(QPaintEvent *);
+	bool event(QEvent* e);
+	void showEvent(QShowEvent* event);
+	void paintEvent(QPaintEvent*);
 
 private Q_SLOTS:
 	void toggleAnim(bool enabled);

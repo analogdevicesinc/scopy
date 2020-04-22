@@ -31,15 +31,16 @@ class BitfieldWidget;
 
 namespace adiscope {
 
-class BitfieldWidget : public QWidget {
+class BitfieldWidget : public QWidget
+{
 	Q_OBJECT
 
 public:
-	explicit BitfieldWidget(QWidget *parent = 0, QDomElement *bitfield = nullptr);
-	explicit BitfieldWidget(QWidget *parent, int bitNumber);
+	explicit BitfieldWidget(QWidget* parent = 0, QDomElement* bitfield = nullptr);
+	explicit BitfieldWidget(QWidget* parent, int bitNumber);
 
 	~BitfieldWidget();
-	void updateValue(uint32_t &value);
+	void updateValue(uint32_t& value);
 	int getRegOffset(void) const;
 	int getSliceWidth(void) const;
 	uint32_t getDefaultValue(void) const;
@@ -54,8 +55,8 @@ private Q_SLOTS:
 	void setValue(int value);
 
 private:
-	Ui::BitfieldWidget *ui;
-	QDomElement *bitfield;
+	Ui::BitfieldWidget* ui;
+	QDomElement* bitfield;
 	QDomElement options;
 
 	int width;

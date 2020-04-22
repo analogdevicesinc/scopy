@@ -42,12 +42,13 @@ class Debugger;
 
 namespace adiscope {
 
-class Debugger : public Tool {
+class Debugger : public Tool
+{
 	Q_OBJECT
 
 public:
-	explicit Debugger(struct iio_context *ctx, Filter *filt, ToolMenuItem *toolMenuItem, QJSEngine *engine,
-			  ToolLauncher *parent = 0);
+	explicit Debugger(struct iio_context* ctx, Filter* filt, ToolMenuItem* toolMenuItem, QJSEngine* engine,
+			  ToolLauncher* parent = 0);
 	~Debugger();
 
 Q_SIGNALS:
@@ -77,16 +78,16 @@ private Q_SLOTS:
 	void on_runButton_clicked();
 
 private:
-	Ui::Debugger *ui;
-	QPushButton *menuRunButton;
-	Filter *filter;
-	QJSEngine *eng;
+	Ui::Debugger* ui;
+	QPushButton* menuRunButton;
+	Filter* filter;
+	QJSEngine* eng;
 
 	Debug debug;
 	QFile scriptFile;
 
-	RegisterWidget *reg;
-	QVector<BitfieldWidget *> bitfieldsVector;
+	RegisterWidget* reg;
+	QVector<BitfieldWidget*> bitfieldsVector;
 };
 } // namespace adiscope
 

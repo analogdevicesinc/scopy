@@ -25,7 +25,9 @@
 
 using namespace adiscope;
 
-OscScaleZoomer::OscScaleZoomer(QWidget *parent) : LimitedPlotZoomer(parent) {
+OscScaleZoomer::OscScaleZoomer(QWidget* parent)
+	: LimitedPlotZoomer(parent)
+{
 	setTrackerMode(QwtPicker::AlwaysOn);
 
 	QPen pen(QColor("#999999"));
@@ -42,9 +44,10 @@ OscScaleZoomer::OscScaleZoomer(QWidget *parent) : LimitedPlotZoomer(parent) {
 
 OscScaleZoomer::~OscScaleZoomer() {}
 
-QwtText OscScaleZoomer::trackerText(const QPoint &pos) const {
-	const OscScaleDraw *draw_x = static_cast<const OscScaleDraw *>(plot()->axisScaleDraw(QwtPlot::xTop));
-	const OscScaleDraw *draw_y = static_cast<const OscScaleDraw *>(plot()->axisScaleDraw(QwtPlot::yLeft));
+QwtText OscScaleZoomer::trackerText(const QPoint& pos) const
+{
+	const OscScaleDraw* draw_x = static_cast<const OscScaleDraw*>(plot()->axisScaleDraw(QwtPlot::xTop));
+	const OscScaleDraw* draw_y = static_cast<const OscScaleDraw*>(plot()->axisScaleDraw(QwtPlot::yLeft));
 	QwtDoublePoint dp = QwtPlotZoomer::invTransform(pos);
 	QString text;
 
@@ -59,7 +62,8 @@ void OscScaleZoomer::cancel() { reset(); }
 
 QColor OscScaleZoomer::getColor() const { return trackerPen().color(); }
 
-void OscScaleZoomer::setColor(const QColor &color) {
+void OscScaleZoomer::setColor(const QColor& color)
+{
 	QPen pen(color);
 	setRubberBandPen(pen);
 	setTrackerPen(pen);

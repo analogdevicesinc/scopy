@@ -24,8 +24,14 @@
 
 using namespace adiscope;
 
-CustomSwitch::CustomSwitch(QWidget *parent)
-	: QPushButton(parent), on(this), off(this), handle(this), anim(&handle, "geometry"), polarity(false) {
+CustomSwitch::CustomSwitch(QWidget* parent)
+	: QPushButton(parent)
+	, on(this)
+	, off(this)
+	, handle(this)
+	, anim(&handle, "geometry")
+	, polarity(false)
+{
 	on.setObjectName("on");
 	off.setObjectName("off");
 	handle.setObjectName("handle");
@@ -47,14 +53,16 @@ CustomSwitch::CustomSwitch(QWidget *parent)
 	updateOnOffLabels();
 }
 
-void CustomSwitch::updateOnOffLabels() {
+void CustomSwitch::updateOnOffLabels()
+{
 	on.setEnabled(isChecked() ^ polarity);
 	off.setEnabled(!isChecked() ^ polarity);
 }
 
-bool CustomSwitch::event(QEvent *e) {
+bool CustomSwitch::event(QEvent* e)
+{
 	if (e->type() == QEvent::DynamicPropertyChange) {
-		QDynamicPropertyChangeEvent *const propEvent = static_cast<QDynamicPropertyChangeEvent *>(e);
+		QDynamicPropertyChangeEvent* const propEvent = static_cast<QDynamicPropertyChangeEvent*>(e);
 		QString propName = propEvent->propertyName();
 		if (propName == "leftText" && property("leftText").isValid())
 			on.setText(property("leftText").toString());
@@ -79,12 +87,14 @@ bool CustomSwitch::event(QEvent *e) {
 
 CustomSwitch::~CustomSwitch() {}
 
-void CustomSwitch::setDuration(int ms) {
+void CustomSwitch::setDuration(int ms)
+{
 	duration_ms = ms;
 	anim.setDuration(ms);
 }
 
-void CustomSwitch::toggleAnim(bool enabled) {
+void CustomSwitch::toggleAnim(bool enabled)
+{
 	if (!isVisible())
 		return;
 
@@ -105,7 +115,8 @@ void CustomSwitch::toggleAnim(bool enabled) {
 	anim.start();
 }
 
-void CustomSwitch::showEvent(QShowEvent *event) {
+void CustomSwitch::showEvent(QShowEvent* event)
+{
 	updateOnOffLabels();
 	if (isChecked() ^ polarity) {
 		handle.setGeometry(QRect(0, handle.y(), handle.width(), handle.height()));

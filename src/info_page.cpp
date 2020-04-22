@@ -30,7 +30,7 @@
 using namespace std;
 using namespace adiscope;
 
-InfoPage::InfoPage(QString uri, Preferences *pref, struct iio_context *ctx, QWidget *parent)
+InfoPage::InfoPage(QString uri, Preferences* pref, struct iio_context* ctx, QWidget* parent)
 	: QWidget(parent)
 	, ui(new Ui::InfoPage)
 	, m_uri(uri)
@@ -40,7 +40,8 @@ InfoPage::InfoPage(QString uri, Preferences *pref, struct iio_context *ctx, QWid
 	, m_led_timer(new QTimer(this))
 	, m_blink_timer(new QTimer(this))
 	, m_connected(false)
-	, m_search_interrupted(false) {
+	, m_search_interrupted(false)
+{
 	ui->setupUi(this);
 	ui->paramLabel->setText(uri);
 
@@ -57,38 +58,40 @@ InfoPage::InfoPage(QString uri, Preferences *pref, struct iio_context *ctx, QWid
 	readPreferences();
 }
 
-void InfoPage::readPreferences() {
+void InfoPage::readPreferences()
+{
 	m_advanced = prefPanel->getAdvanced_device_info();
 	getDeviceInfo();
 }
 
-InfoPage::~InfoPage() {
+InfoPage::~InfoPage()
+{
 	if (m_ctx) {
 		m_ctx = nullptr;
 	}
 	delete ui;
 }
 
-struct iio_context *InfoPage::ctx() const {
-	return m_ctx;
-}
+struct iio_context* InfoPage::ctx() const { return m_ctx; }
 
-void InfoPage::setCtx(struct iio_context *ctx) {
+void InfoPage::setCtx(struct iio_context* ctx)
+{
 	identifyDevice(false);
 	(!ctx) ? m_connected = false : m_connected = true;
 	m_ctx = ctx;
 }
 
-void InfoPage::getDeviceInfo() {
-	struct iio_context *temp_ctx = m_ctx;
+void InfoPage::getDeviceInfo()
+{
+	struct iio_context* temp_ctx = m_ctx;
 	if (!m_ctx) {
 		temp_ctx = iio_create_context_from_uri(m_uri.toStdString().c_str());
 	}
 
 	std::string str = "";
 	if (temp_ctx) {
-		const char *name;
-		const char *value;
+		const char* name;
+		const char* value;
 		char ctx_git_tag[8];
 		unsigned int ctx_major, ctx_minor;
 		iio_context_get_version(temp_ctx, &ctx_major, &ctx_minor, ctx_git_tag);
@@ -123,7 +126,8 @@ void InfoPage::getDeviceInfo() {
 	refreshInfoWidget();
 }
 
-QPair<bool, QString> InfoPage::translateInfoParams(QString key) {
+QPair<bool, QString> InfoPage::translateInfoParams(QString key)
+{
 	bool advanced = false;
 	if (key.contains("fw_version")) {
 		key = "Firmware version";
@@ -157,16 +161,19 @@ QPair<bool, QString> InfoPage::translateInfoParams(QString key) {
 	return QPair<bool, QString>(advanced, key);
 }
 
-void InfoPage::setStatusLabel(QString str, QString color) {
+void InfoPage::setStatusLabel(QString str, QString color)
+{
 	ui->lblConnectionStatus->setText(str);
 	ui->lblConnectionStatus->setStyleSheet("color: " + color);
 }
 
-void InfoPage::setConnectionStatus(bool failed) {
+void InfoPage::setConnectionStatus(bool failed)
+{
 	(failed) ? setStatusLabel("Error: Connection failed!") : setStatusLabel("");
 }
 
-void InfoPage::refreshInfoWidget() {
+void InfoPage::refreshInfoWidget()
+{
 	if (supportsIdentification())
 		setStatusLabel("");
 	else
@@ -178,7 +185,7 @@ void InfoPage::refreshInfoWidget() {
 		ui->btnCalibrate->setVisible(true);
 
 	if (ui->paramLayout != NULL) {
-		QLayoutItem *item;
+		QLayoutItem* item;
 		while ((item = ui->paramLayout->takeAt(0)) != NULL) {
 			delete item->widget();
 			delete item;
@@ -187,8 +194,8 @@ void InfoPage::refreshInfoWidget() {
 
 	int pos = 0;
 	for (auto key : m_info_params.keys()) {
-		QLabel *valueLbl = new QLabel(this);
-		QLabel *keyLbl = new QLabel(this);
+		QLabel* valueLbl = new QLabel(this);
+		QLabel* keyLbl = new QLabel(this);
 		valueLbl->setText(m_info_params.value(key));
 		valueLbl->setStyleSheet("color: white");
 		keyLbl->setText(key);
@@ -205,8 +212,8 @@ void InfoPage::refreshInfoWidget() {
 		ui->paramLayout->addWidget(new QLabel("Advanced"), pos, 0, 1, 1);
 		pos++;
 		for (auto key : m_info_params_advanced.keys()) {
-			QLabel *valueLbl = new QLabel(this);
-			QLabel *keyLbl = new QLabel(this);
+			QLabel* valueLbl = new QLabel(this);
+			QLabel* keyLbl = new QLabel(this);
 			valueLbl->setText(m_info_params_advanced.value(key));
 			valueLbl->setStyleSheet("color: white");
 			keyLbl->setText(key);
@@ -221,9 +228,10 @@ QString InfoPage::uri() const { return m_uri; }
 
 void InfoPage::setUri(QString uri) { m_uri = uri; }
 
-QPushButton *InfoPage::forgetDeviceButton() { return ui->btnForget; }
+QPushButton* InfoPage::forgetDeviceButton() { return ui->btnForget; }
 
-void InfoPage::identifyDevice(bool clicked) {
+void InfoPage::identifyDevice(bool clicked)
+{
 	setStatusLabel("");
 	if (clicked) {
 		/* If identification is already on for
@@ -250,7 +258,8 @@ void InfoPage::identifyDevice(bool clicked) {
 
 void InfoPage::blinkTimeout() {}
 
-void InfoPage::startIdentification(bool start) {
+void InfoPage::startIdentification(bool start)
+{
 	setStatusLabel("Can't identify this device.");
 	if (!m_connected) {
 		iio_context_destroy(m_ctx);
@@ -262,7 +271,8 @@ void InfoPage::startIdentification(bool start) {
 	}
 }
 
-void InfoPage::ledTimeout() {
+void InfoPage::ledTimeout()
+{
 	if (m_led_timer->isActive()) {
 		m_led_timer->stop();
 	} else {
@@ -288,28 +298,32 @@ void InfoPage::ledTimeout() {
 	}
 }
 
-QPushButton *InfoPage::identifyDeviceButton() { return ui->btnIdentify; }
+QPushButton* InfoPage::identifyDeviceButton() { return ui->btnIdentify; }
 
-QPushButton *InfoPage::connectButton() { return ui->btnConnect; }
+QPushButton* InfoPage::connectButton() { return ui->btnConnect; }
 
-QPushButton *InfoPage::calibrateButton() { return ui->btnCalibrate; }
+QPushButton* InfoPage::calibrateButton() { return ui->btnCalibrate; }
 
-bool InfoPage::supportsIdentification() {
+bool InfoPage::supportsIdentification()
+{
 	QString model = m_info_params["Model"];
 	if (identifySupportedModels.contains(model))
 		return true;
 	return false;
 }
 
-bool InfoPage::supportsCalibration() {
+bool InfoPage::supportsCalibration()
+{
 	QString model = m_info_params["Model"];
 	if (calibrateSupportedModels.contains(model))
 		return true;
 	return false;
 }
 
-M2kInfoPage::M2kInfoPage(QString uri, Preferences *prefPanel, struct iio_context *ctx, QWidget *parent)
-	: InfoPage(uri, prefPanel, ctx, parent), m_fabric_channel(nullptr) {
+M2kInfoPage::M2kInfoPage(QString uri, Preferences* prefPanel, struct iio_context* ctx, QWidget* parent)
+	: InfoPage(uri, prefPanel, ctx, parent)
+	, m_fabric_channel(nullptr)
+{
 	ui->btnCalibrate->setEnabled(false);
 	ui->extraWidget->setFrameShape(QFrame::NoFrame);
 	ui->extraWidget->setOpenExternalLinks(true);
@@ -320,10 +334,11 @@ M2kInfoPage::M2kInfoPage(QString uri, Preferences *prefPanel, struct iio_context
 
 M2kInfoPage::~M2kInfoPage() {}
 
-void M2kInfoPage::startIdentification(bool start) {
+void M2kInfoPage::startIdentification(bool start)
+{
 	if (supportsIdentification()) {
 		if (start) {
-			struct iio_device *m2k_fabric = iio_context_find_device(m_ctx, "m2k-fabric");
+			struct iio_device* m2k_fabric = iio_context_find_device(m_ctx, "m2k-fabric");
 			if (!m2k_fabric) {
 				setStatusLabel("Can't identify this device.");
 				if (!m_connected) {
@@ -373,7 +388,8 @@ void M2kInfoPage::startIdentification(bool start) {
 	}
 }
 
-void M2kInfoPage::blinkTimeout() {
+void M2kInfoPage::blinkTimeout()
+{
 	if (!m_fabric_channel)
 		return;
 	bool oldVal;

@@ -28,7 +28,8 @@ template <typename T>
 class QList;
 
 namespace adiscope {
-class ApiObject : public QObject {
+class ApiObject : public QObject
+{
 	Q_OBJECT
 
 Q_SIGNALS:
@@ -41,25 +42,25 @@ public:
 	void load();
 	void save();
 
-	virtual void load(QSettings &settings);
-	virtual void save(QSettings &settings);
+	virtual void load(QSettings& settings);
+	virtual void save(QSettings& settings);
 
-	void js_register(QJSEngine *engine);
+	void js_register(QJSEngine* engine);
 
 private:
 	template <typename T>
-	void save(QSettings &settings, const QString &prop, const QList<T> &list);
+	void save(QSettings& settings, const QString& prop, const QList<T>& list);
 	template <typename T>
-	QList<T> load(QSettings &settings, const QString &prop);
+	QList<T> load(QSettings& settings, const QString& prop);
 
-	void save(QSettings &settings, const QString &prop, const QVariantList &list);
-	void load(QSettings &settings, const QString &prop, const QVariantList &list);
+	void save(QSettings& settings, const QString& prop, const QVariantList& list);
+	void load(QSettings& settings, const QString& prop, const QVariantList& list);
 
-	void save_nogroup(ApiObject *, QSettings &);
-	void load_nogroup(ApiObject *, QSettings &);
+	void save_nogroup(ApiObject*, QSettings&);
+	void load_nogroup(ApiObject*, QSettings&);
 };
 } // namespace adiscope
 
-Q_DECLARE_METATYPE(adiscope::ApiObject *)
+Q_DECLARE_METATYPE(adiscope::ApiObject*)
 
 #endif /* APIOBJECT_HPP */

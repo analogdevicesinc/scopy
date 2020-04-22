@@ -56,11 +56,12 @@
 
 #include <QtConcurrentRun>
 
-extern "C" {
-struct iio_buffer;
-struct iio_channel;
-struct iio_context;
-struct iio_device;
+extern "C"
+{
+	struct iio_buffer;
+	struct iio_channel;
+	struct iio_context;
+	struct iio_device;
 }
 
 namespace Ui {
@@ -76,26 +77,27 @@ class Filter;
 class GenericAdc;
 class GenericDac;
 
-class NetworkAnalyzer : public Tool {
+class NetworkAnalyzer : public Tool
+{
 	friend class NetworkAnalyzer_API;
 	friend class ToolLauncher_API;
 
 	Q_OBJECT
 
 public:
-	explicit NetworkAnalyzer(struct iio_context *ctx, Filter *filt, std::shared_ptr<GenericAdc> &adc_dev,
-				 QList<std::shared_ptr<GenericDac>> dacs, ToolMenuItem *toolMenuItem, QJSEngine *engine,
-				 ToolLauncher *parent);
+	explicit NetworkAnalyzer(struct iio_context* ctx, Filter* filt, std::shared_ptr<GenericAdc>& adc_dev,
+				 QList<std::shared_ptr<GenericDac>> dacs, ToolMenuItem* toolMenuItem, QJSEngine* engine,
+				 ToolLauncher* parent);
 	~NetworkAnalyzer();
 
-	void setOscilloscope(Oscilloscope *osc);
+	void setOscilloscope(Oscilloscope* osc);
 
 private:
-	Ui::NetworkAnalyzer *ui;
+	Ui::NetworkAnalyzer* ui;
 	struct iio_channel *amp1, *amp2;
-	std::vector<iio_channel *> dac_channels;
-	iio_buffer *adc_buffer;
-	struct iio_device *adc;
+	std::vector<iio_channel*> dac_channels;
+	iio_buffer* adc_buffer;
+	struct iio_device* adc;
 	std::shared_ptr<GenericAdc> adc_dev;
 	boost::shared_ptr<iio_manager> iio;
 	QList<std::shared_ptr<GenericDac>> dacs;
@@ -114,20 +116,36 @@ private:
 	dBgraph m_phaseGraph;
 	bool wasChecked;
 
-	typedef struct NetworkAnalyzerIteration {
-		NetworkAnalyzerIteration() : frequency(0), rate(0), bufferSize(0) {}
+	typedef struct NetworkAnalyzerIteration
+	{
+		NetworkAnalyzerIteration()
+			: frequency(0)
+			, rate(0)
+			, bufferSize(0)
+		{}
 		NetworkAnalyzerIteration(double frequency, size_t rate, size_t bufferSize)
-			: frequency(frequency), rate(rate), bufferSize(bufferSize) {}
+			: frequency(frequency)
+			, rate(rate)
+			, bufferSize(bufferSize)
+		{}
 
 		double frequency;
 		size_t rate;
 		size_t bufferSize;
 	} networkIteration;
 
-	typedef struct NetworkAnalyzerIterationStats {
+	typedef struct NetworkAnalyzerIterationStats
+	{
 		NetworkAnalyzerIterationStats(double dcVoltage, M2kAdc::GainMode gain, bool hasError)
-			: dcVoltage(dcVoltage), gain(gain), hasError(hasError) {}
-		NetworkAnalyzerIterationStats() : dcVoltage(0), gain(M2kAdc::LOW_GAIN_MODE), hasError(false) {}
+			: dcVoltage(dcVoltage)
+			, gain(gain)
+			, hasError(hasError)
+		{}
+		NetworkAnalyzerIterationStats()
+			: dcVoltage(0)
+			, gain(M2kAdc::LOW_GAIN_MODE)
+			, hasError(false)
+		{}
 
 		double dcVoltage;
 		M2kAdc::GainMode gain;
@@ -137,7 +155,7 @@ private:
 	QVector<networkIteration> iterations;
 	QVector<NetworkIterationStats> iterationStats;
 
-	boost::thread *iterationsThread;
+	boost::thread* iterationsThread;
 	bool iterationsThreadCanceled;
 	bool iterationsThreadReady;
 
@@ -177,36 +195,36 @@ private:
 	boost::condition_variable iterationsReadyCv;
 	boost::mutex bufferMutex;
 
-	NetworkAnalyzerBufferViewer *bufferPreviewer;
+	NetworkAnalyzerBufferViewer* bufferPreviewer;
 	QVector<Buffer> capturedData;
 
-	StartStopRangeWidget *startStopRange;
+	StartStopRangeWidget* startStopRange;
 
 	bool justStarted;
 	bool autoAdjustGain;
 
-	PlotLineHandleH *d_hCursorHandle1;
-	PlotLineHandleH *d_hCursorHandle2;
-	FreePlotLineHandleH *d_frequencyHandle;
+	PlotLineHandleH* d_hCursorHandle1;
+	PlotLineHandleH* d_hCursorHandle2;
+	FreePlotLineHandleH* d_frequencyHandle;
 	bool d_cursorsEnabled;
 
-	ScaleSpinButton *samplesCount;
-	ScaleSpinButton *amplitude;
-	PositionSpinButton *offset;
-	PositionSpinButton *magMax;
-	PositionSpinButton *magMin;
-	PositionSpinButton *phaseMax;
-	PositionSpinButton *phaseMin;
-	PositionSpinButton *pushDelay;
-	PositionSpinButton *captureDelay;
+	ScaleSpinButton* samplesCount;
+	ScaleSpinButton* amplitude;
+	PositionSpinButton* offset;
+	PositionSpinButton* magMax;
+	PositionSpinButton* magMin;
+	PositionSpinButton* phaseMax;
+	PositionSpinButton* phaseMin;
+	PositionSpinButton* pushDelay;
+	PositionSpinButton* captureDelay;
 
-	void setMinimumDistanceBetween(SpinBoxA *min, SpinBoxA *max, double distance);
+	void setMinimumDistanceBetween(SpinBoxA* min, SpinBoxA* max, double distance);
 
-	HorizHandlesArea *d_bottomHandlesArea;
+	HorizHandlesArea* d_bottomHandlesArea;
 
-	QQueue<QPair<CustomPushButton *, bool>> menuButtonActions;
+	QQueue<QPair<CustomPushButton*, bool>> menuButtonActions;
 
-	MouseWheelWidgetGuard *wheelEventGuard;
+	MouseWheelWidgetGuard* wheelEventGuard;
 
 	QFuture<void> thd;
 
@@ -218,15 +236,15 @@ private:
 
 	void goertzel();
 
-	struct iio_buffer *generateSinWave(const struct iio_device *dev, double frequency, double amplitude,
+	struct iio_buffer* generateSinWave(const struct iio_device* dev, double frequency, double amplitude,
 					   double offset, unsigned long rate, size_t samples_count);
 
 	void configHwForNetworkAnalyzing();
 
-	void triggerRightMenuToggle(CustomPushButton *btn, bool checked);
-	void toggleRightMenu(CustomPushButton *btn, bool checked);
+	void triggerRightMenuToggle(CustomPushButton* btn, bool checked);
+	void toggleRightMenu(CustomPushButton* btn, bool checked);
 	void updateGainMode();
-	void computeCaptureParams(double frequency, size_t &buffer_size, size_t &adc_rate);
+	void computeCaptureParams(double frequency, size_t& buffer_size, size_t& adc_rate);
 
 	QPair<double, double> getPhaseInterval();
 	void computeIterations();
@@ -236,7 +254,7 @@ private:
 	void _configureDacFlowgraph();
 
 	void _configureAdcFlowgraph(size_t bufferSize = 0);
-	unsigned long _getBestSampleRate(double frequency, const iio_device *dev);
+	unsigned long _getBestSampleRate(double frequency, const iio_device* dev);
 	size_t _getSamplesCount(double frequency, unsigned long rate, bool perfect = false);
 	void computeFrequencyArray();
 
@@ -261,7 +279,7 @@ private Q_SLOTS:
 
 public Q_SLOTS:
 
-	void showEvent(QShowEvent *event);
+	void showEvent(QShowEvent* event);
 	void run() override;
 	void stop() override;
 

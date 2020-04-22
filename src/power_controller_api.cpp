@@ -7,7 +7,8 @@ void PowerController_API::show() { Q_EMIT pw->showTool(); }
 
 bool PowerController_API::syncEnabled() const { return !pw->ui->btnSync->isChecked(); }
 
-void PowerController_API::enableSync(bool en) {
+void PowerController_API::enableSync(bool en)
+{
 	pw->ui->btnSync->setChecked(en);
 	pw->ui->btnSync->click();
 }
@@ -22,7 +23,8 @@ void PowerController_API::setValueDac1(double value) { pw->valuePos->setValue(va
 
 double PowerController_API::valueDac2() const { return pw->valueNeg->value(); }
 
-void PowerController_API::setValueDac2(double value) {
+void PowerController_API::setValueDac2(double value)
+{
 	if (!syncEnabled())
 		pw->valueNeg->setValue(value);
 }

@@ -33,17 +33,18 @@ class Preferences;
 namespace adiscope {
 class Preferences_API;
 
-class Preferences : public QWidget {
+class Preferences : public QWidget
+{
 	friend class Preferences_API;
 
 	Q_OBJECT
 
 public:
-	explicit Preferences(QWidget *parent = 0);
+	explicit Preferences(QWidget* parent = 0);
 	~Preferences();
 
 	void notifyChange();
-	void showEvent(QShowEvent *event);
+	void showEvent(QShowEvent* event);
 
 	bool getOsc_labels_enabled() const;
 	void setOsc_labels_enabled(bool value);
@@ -103,7 +104,7 @@ private Q_SLOTS:
 	void resetScopy();
 
 private:
-	Ui::Preferences *ui;
+	Ui::Preferences* ui;
 	QString preferencesFileName;
 
 	bool osc_labels_enabled;
@@ -125,11 +126,12 @@ private:
 	bool digital_decoders_enabled;
 	bool m_initialized;
 
-	Preferences_API *pref_api;
+	Preferences_API* pref_api;
 	QString getPreferenceIniFile() const;
 };
 
-class Preferences_API : public ApiObject {
+class Preferences_API : public ApiObject
+{
 	Q_OBJECT
 
 	Q_PROPERTY(bool osc_labels READ getOscLabelsEnabled WRITE setOscLabelsEnabled);
@@ -150,55 +152,58 @@ class Preferences_API : public ApiObject {
 	Q_PROPERTY(bool digital_decoders READ getDigitalDecoders WRITE setDigitalDecoders)
 
 public:
-	explicit Preferences_API(Preferences *preferencePanel) : ApiObject(), preferencePanel(preferencePanel) {}
+	explicit Preferences_API(Preferences* preferencePanel)
+		: ApiObject()
+		, preferencePanel(preferencePanel)
+	{}
 
 	bool getAnimationsEnabled() const;
-	void setAnimationsEnabled(const bool &enabled);
+	void setAnimationsEnabled(const bool& enabled);
 
 	bool getOscLabelsEnabled() const;
-	void setOscLabelsEnabled(const bool &enabled);
+	void setOscLabelsEnabled(const bool& enabled);
 
 	int getSigGenNrPeriods() const;
-	void setSigGenNrPeriods(const int &periods);
+	void setSigGenNrPeriods(const int& periods);
 
 	bool getSaveSession() const;
-	void setSaveSession(const bool &enabled);
+	void setSaveSession(const bool& enabled);
 
 	bool getDoubleClickToDetach() const;
-	void setDoubleClickToDetach(const bool &enabled);
+	void setDoubleClickToDetach(const bool& enabled);
 
 	bool getNaShowZero() const;
-	void setNaShowZero(const bool &enabled);
+	void setNaShowZero(const bool& enabled);
 
 	bool getSpectrumVisiblePeakSearch() const;
-	void setSpectrumVisiblePeakSearch(const bool &enabled);
+	void setSpectrumVisiblePeakSearch(const bool& enabled);
 
 	bool getAdvancedDeviceInfo() const;
-	void setAdvancedDeviceInfo(const bool &enabled);
+	void setAdvancedDeviceInfo(const bool& enabled);
 
 	bool getUserNotesActive() const;
-	void setUserNotesActive(const bool &enabled);
+	void setUserNotesActive(const bool& enabled);
 
 	bool getGraticuleEnabled() const;
-	void setGraticuleEnabled(const bool &enabled);
+	void setGraticuleEnabled(const bool& enabled);
 
 	bool getExternalScript() const;
-	void setExternalScript(const bool &enabled);
+	void setExternalScript(const bool& enabled);
 
 	bool getManualCalibScript() const;
-	void setManualCalibScript(const bool &enabled);
+	void setManualCalibScript(const bool& enabled);
 
 	bool getOscFilteringEnabled() const;
-	void setOscFilteringEnabled(const bool &enabled);
+	void setOscFilteringEnabled(const bool& enabled);
 
 	bool getMiniHist() const;
-	void setMiniHist(const bool &enabled);
+	void setMiniHist(const bool& enabled);
 
 	bool getDigitalDecoders() const;
 	void setDigitalDecoders(bool enabled);
 
 private:
-	Preferences *preferencePanel;
+	Preferences* preferencePanel;
 };
 } // namespace adiscope
 

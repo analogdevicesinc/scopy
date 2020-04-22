@@ -24,10 +24,13 @@
 
 using namespace adiscope;
 
-SmoothCurveFitter::SmoothCurveFitter() : QwtCurveFitter(QwtCurveFitter::Path), d_spline(new QwtSplineCubic()) {
+SmoothCurveFitter::SmoothCurveFitter()
+	: QwtCurveFitter(QwtCurveFitter::Path)
+	, d_spline(new QwtSplineCubic())
+{
 	d_spline->setParametrization(QwtSplineParametrization::ParameterUniform);
 }
 
-QPolygonF SmoothCurveFitter::fitCurve(const QPolygonF &points) const { return d_spline->polygon(points, 0.5); }
+QPolygonF SmoothCurveFitter::fitCurve(const QPolygonF& points) const { return d_spline->polygon(points, 0.5); }
 
-QPainterPath SmoothCurveFitter::fitCurvePath(const QPolygonF &points) const { return d_spline->painterPath(points); }
+QPainterPath SmoothCurveFitter::fitCurvePath(const QPolygonF& points) const { return d_spline->painterPath(points); }

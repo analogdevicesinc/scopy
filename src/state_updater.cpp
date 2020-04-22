@@ -21,7 +21,7 @@
 
 using namespace adiscope;
 
-StateUpdater::StateUpdater(int msecTimeout, QObject *parent)
+StateUpdater::StateUpdater(int msecTimeout, QObject* parent)
 	: QObject(parent)
 	, m_enabled(false)
 	, m_off_state(0)
@@ -37,14 +37,16 @@ StateUpdater::StateUpdater(int msecTimeout, QObject *parent)
 	connect(&m_timer, SIGNAL(timeout()), this, SLOT(onTimerTimeout()));
 }
 
-void StateUpdater::onTimerTimeout() {
+void StateUpdater::onTimerTimeout()
+{
 	m_output_state = m_idle_state;
 	Q_EMIT outputChanged(m_output_state);
 }
 
 bool StateUpdater::enabled() const { return m_enabled; }
 
-void StateUpdater::setEnabled(bool en) {
+void StateUpdater::setEnabled(bool en)
+{
 	if (m_enabled != en) {
 		m_enabled = en;
 
@@ -73,7 +75,8 @@ void StateUpdater::setOffState(int state) { m_off_state = state; }
 
 int StateUpdater::inputState() const { return m_last_input; }
 
-void StateUpdater::setInput(int input) {
+void StateUpdater::setInput(int input)
+{
 	if (!m_enabled)
 		return;
 

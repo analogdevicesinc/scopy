@@ -29,7 +29,8 @@
 #include <qwt_plot_curve.h>
 
 namespace adiscope {
-class Sismograph : public QwtPlot {
+class Sismograph : public QwtPlot
+{
 	Q_OBJECT
 
 	Q_PROPERTY(int numSamples READ getNumSamples WRITE setNumSamples)
@@ -37,7 +38,7 @@ class Sismograph : public QwtPlot {
 	Q_PROPERTY(double sampleRate READ getSampleRate WRITE setSampleRate)
 
 public:
-	explicit Sismograph(QWidget *parent = nullptr);
+	explicit Sismograph(QWidget* parent = nullptr);
 	~Sismograph();
 
 	int getNumSamples() const;
@@ -49,14 +50,14 @@ public:
 public Q_SLOTS:
 	void plot(double sample);
 	void reset();
-	void setColor(const QColor &color);
+	void setColor(const QColor& color);
 	void updateScale(const QwtScaleDiv);
 
 private:
 	QwtPlotCurve curve;
 	unsigned int numSamples;
 	double sampleRate;
-	AutoScaler *scaler;
+	AutoScaler* scaler;
 
 	QVector<double> ydata;
 	CustomFifo<double> xdata;

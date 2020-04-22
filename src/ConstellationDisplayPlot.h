@@ -35,18 +35,19 @@ namespace adiscope {
  * \brief QWidget for displaying constellaton (I&Q) plots.
  * \ingroup qtgui_blk
  */
-class ConstellationDisplayPlot : public DisplayPlot {
+class ConstellationDisplayPlot : public DisplayPlot
+{
 	Q_OBJECT
 
 public:
-	ConstellationDisplayPlot(int nplots, QWidget *);
+	ConstellationDisplayPlot(int nplots, QWidget*);
 	virtual ~ConstellationDisplayPlot();
 
-	void plotNewData(const std::vector<double *> &realDataPoints, const std::vector<double *> &imagDataPoints,
+	void plotNewData(const std::vector<double*>& realDataPoints, const std::vector<double*>& imagDataPoints,
 			 const int64_t numDataPoints, const double timeInterval);
 
 	// Old method to be removed
-	void plotNewData(const double *realDataPoints, const double *imagDataPoints, const int64_t numDataPoints,
+	void plotNewData(const double* realDataPoints, const double* imagDataPoints, const int64_t numDataPoints,
 			 const double timeInterval);
 
 	void replot();
@@ -59,16 +60,16 @@ public:
 public Q_SLOTS:
 	void setAutoScale(bool state);
 
-	void customEvent(QEvent *e);
+	void customEvent(QEvent* e);
 
 private Q_SLOTS:
-	void newData(const QEvent *);
+	void newData(const QEvent*);
 
 private:
 	void _autoScale(double bottom, double top);
 
-	std::vector<double *> d_real_data;
-	std::vector<double *> d_imag_data;
+	std::vector<double*> d_real_data;
+	std::vector<double*> d_imag_data;
 
 	int64_t d_pen_size;
 };

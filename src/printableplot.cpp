@@ -25,19 +25,24 @@
 
 using namespace adiscope;
 
-PrintablePlot::PrintablePlot(QWidget *parent)
-	: QwtPlot(parent), d_plotRenderer(new QwtPlotRenderer(this)), d_useNativeDialog(true) {
+PrintablePlot::PrintablePlot(QWidget* parent)
+	: QwtPlot(parent)
+	, d_plotRenderer(new QwtPlotRenderer(this))
+	, d_useNativeDialog(true)
+{
 	dropBackground(true);
 }
 
-void PrintablePlot::dropBackground(bool drop) {
+void PrintablePlot::dropBackground(bool drop)
+{
 	d_plotRenderer.setDiscardFlag(QwtPlotRenderer::DiscardBackground, drop);
 	d_plotRenderer.setDiscardFlag(QwtPlotRenderer::DiscardCanvasBackground, drop);
 }
 
 void PrintablePlot::setUseNativeDialog(bool nativeDialog) { d_useNativeDialog = nativeDialog; }
 
-void PrintablePlot::printPlot(const QString &toolName) {
+void PrintablePlot::printPlot(const QString& toolName)
+{
 	legendDisplay = new QwtLegend(this);
 	legendDisplay->setDefaultItemMode(QwtLegendData::ReadOnly);
 	insertLegend(legendDisplay, QwtPlot::TopLegend);

@@ -25,14 +25,15 @@
 #include <vector>
 
 namespace adiscope {
-class PrefixFormatter {
+class PrefixFormatter
+{
 public:
-	PrefixFormatter(const std::vector<std::pair<QString, double>> &);
+	PrefixFormatter(const std::vector<std::pair<QString, double>>&);
 	virtual ~PrefixFormatter();
 	void setTwoDecimalMode(bool);
 	bool getTwoDecimalMode();
 	virtual QString format(double value, QString unitType, int precision) const;
-	void getFormatAttributes(double value, QString &prefix, double &scale) const;
+	void getFormatAttributes(double value, QString& prefix, double& scale) const;
 
 protected:
 	virtual QString buildString(double value, QString prefix, QString unitType, int precision) const;
@@ -44,12 +45,14 @@ private:
 	bool m_twoDecimalMode;
 };
 
-class MetricPrefixFormatter : public PrefixFormatter {
+class MetricPrefixFormatter : public PrefixFormatter
+{
 public:
 	MetricPrefixFormatter();
 };
 
-class TimePrefixFormatter : public PrefixFormatter {
+class TimePrefixFormatter : public PrefixFormatter
+{
 public:
 	TimePrefixFormatter();
 };
@@ -62,13 +65,14 @@ public:
  * E.g. powerStep = 10, steps = {1, 2, 5} -> ..., 0.1, 0.2, 0.5, 1.0,
  *      2.0, 5.0, 10.0, 20.0, 50.0, ...
  */
-class NumberSeries {
+class NumberSeries
+{
 public:
 	NumberSeries(double lower = 1E-3, double upper = 1E3, unsigned int powerStep = 10,
-		     const std::vector<double> &steps = {1, 2, 5});
+		     const std::vector<double>& steps = {1, 2, 5});
 	~NumberSeries();
 
-	const std::vector<double> &getNumbers();
+	const std::vector<double>& getNumbers();
 
 	double getNumberAfter(double value);
 	double getNumberBefore(double value);

@@ -46,8 +46,12 @@ using namespace adiscope;
 
 namespace adiscope {
 
-DigitalIoGroup::DigitalIoGroup(QString label, int ch_mask, int io_mask, DigitalIO *dio, QWidget *parent)
-	: QWidget(parent), ch_mask(ch_mask), io_mask(io_mask), dio(dio) {
+DigitalIoGroup::DigitalIoGroup(QString label, int ch_mask, int io_mask, DigitalIO* dio, QWidget* parent)
+	: QWidget(parent)
+	, ch_mask(ch_mask)
+	, io_mask(io_mask)
+	, dio(dio)
+{
 	ui = new Ui::dioElement();
 	ui->setupUi(this);
 
@@ -58,14 +62,14 @@ DigitalIoGroup::DigitalIoGroup(QString label, int ch_mask, int io_mask, DigitalI
 	while (ch_mask_temp) {
 		if (ch_mask_temp & 0x01) {
 			nr_of_channels++;
-			QWidget *wid = new QWidget(this);
-			Ui::dioChannel *dioUi = new Ui::dioChannel;
+			QWidget* wid = new QWidget(this);
+			Ui::dioChannel* dioUi = new Ui::dioChannel;
 			dioUi->setupUi(wid);
 			ui->horizontalLayout_4->addWidget(wid);
 			wid->setProperty("dio", j);
 			dioUi->label->setText(QString::number(j));
 			wid->setProperty("locked", false);
-			chui.append(new QPair<QWidget *, Ui::dioChannel *>(wid, dioUi));
+			chui.append(new QPair<QWidget*, Ui::dioChannel*>(wid, dioUi));
 			connect(chui.last()->second->inout, SIGNAL(clicked()), dio, SLOT(setDirection()));
 			connect(chui.last()->second->output, SIGNAL(clicked()), dio, SLOT(setOutput()));
 		}
@@ -81,7 +85,8 @@ DigitalIoGroup::DigitalIoGroup(QString label, int ch_mask, int io_mask, DigitalI
 	ui->lineEdit->setText(QString::number(max / 2));
 	ui->horizontalSlider->setValue(max / 2);
 }
-DigitalIoGroup::~DigitalIoGroup() {
+DigitalIoGroup::~DigitalIoGroup()
+{
 	for (auto it = chui.begin(); it != chui.end(); ++it) {
 		// delete Ui::dioChannel from pair<QWidget*, Ui::dioChannel>
 		delete (*it)->second;
@@ -91,25 +96,29 @@ DigitalIoGroup::~DigitalIoGroup() {
 	delete ui;
 }
 
-void DigitalIO::setDirection(int ch, int direction) {
+void DigitalIO::setDirection(int ch, int direction)
+{
 	if (!offline_mode) {
 		diom->setDirection(ch, direction);
 	}
 }
 
-void DigitalIO::setDirection() {
-	auto direction = static_cast<QPushButton *>(sender())->isChecked();
+void DigitalIO::setDirection()
+{
+	auto direction = static_cast<QPushButton*>(sender())->isChecked();
 	auto ch = sender()->parent()->property("dio").toInt();
 	setDirection(ch, direction);
 }
 
-void DigitalIO::setOutput(int ch, int out) {
+void DigitalIO::setOutput(int ch, int out)
+{
 	if (!offline_mode) {
 		diom->setOutRaw(ch, out);
 	}
 }
 
-void DigitalIO::setVisible(bool visible) {
+void DigitalIO::setVisible(bool visible)
+{
 	if (visible)
 		poll->start(polling_rate);
 	else
@@ -117,8 +126,9 @@ void DigitalIO::setVisible(bool visible) {
 	Tool::setVisible(visible);
 }
 
-void DigitalIO::setSlider(int val) {
-	auto grp = static_cast<DigitalIoGroup *>(QObject::sender());
+void DigitalIO::setSlider(int val)
+{
+	auto grp = static_cast<DigitalIoGroup*>(QObject::sender());
 	auto v = groups.indexOf(grp);
 	auto tempval = val;
 
@@ -130,8 +140,9 @@ void DigitalIO::setSlider(int val) {
 	}
 }
 
-void DigitalIO::setOutput() {
-	auto output = static_cast<QPushButton *>(sender())->isChecked();
+void DigitalIO::setOutput()
+{
+	auto output = static_cast<QPushButton*>(sender())->isChecked();
 	auto ch = sender()->parent()->property("dio").toInt();
 	setOutput(ch, output);
 
@@ -140,12 +151,13 @@ void DigitalIO::setOutput() {
 	}
 }
 
-DigitalIO::DigitalIO(struct iio_context *ctx, Filter *filt, ToolMenuItem *toolMenuItem, DIOManager *diom,
-		     QJSEngine *engine, ToolLauncher *parent, bool offline_mode)
+DigitalIO::DigitalIO(struct iio_context* ctx, Filter* filt, ToolMenuItem* toolMenuItem, DIOManager* diom,
+		     QJSEngine* engine, ToolLauncher* parent, bool offline_mode)
 	: Tool(ctx, toolMenuItem, new DigitalIO_API(this), "Digital IO", parent)
 	, ui(new Ui::DigitalIO)
 	, offline_mode(offline_mode)
-	, diom(diom) {
+	, diom(diom)
+{
 
 	// UI
 	ui->setupUi(this);
@@ -172,7 +184,8 @@ DigitalIO::DigitalIO(struct iio_context *ctx, Filter *filt, ToolMenuItem *toolMe
 	updateUi();
 }
 
-DigitalIO::~DigitalIO() {
+DigitalIO::~DigitalIO()
+{
 	if (!offline_mode) {
 	}
 
@@ -184,9 +197,10 @@ DigitalIO::~DigitalIO() {
 	delete ui;
 }
 
-QPair<QWidget *, Ui::dioChannel *> *DigitalIO::findIndividualUi(int ch) {
+QPair<QWidget*, Ui::dioChannel*>* DigitalIO::findIndividualUi(int ch)
+{
 
-	for (auto &&group : groups) {
+	for (auto&& group : groups) {
 		auto i = 0;
 
 		for (auto wid : group->chui) {
@@ -201,14 +215,15 @@ QPair<QWidget *, Ui::dioChannel *> *DigitalIO::findIndividualUi(int ch) {
 	return nullptr;
 }
 
-void DigitalIO::updateUi() {
+void DigitalIO::updateUi()
+{
 	if (!offline_mode) {
 		auto gpi = diom->getGpi();
 		auto gpigrp1 = gpi & 0xff;
 		auto gpigrp2 = (gpi & 0xff00) >> 8;
 
 		for (auto i = 0; i < 16; i++) {
-			Ui::dioChannel *chui = findIndividualUi(i)->second;
+			Ui::dioChannel* chui = findIndividualUi(i)->second;
 			bool chk = gpi & 0x01;
 			gpi >>= 1;
 
@@ -238,7 +253,8 @@ void DigitalIO::updateUi() {
 	}
 }
 
-void adiscope::DigitalIoGroup::changeDirection() {
+void adiscope::DigitalIoGroup::changeDirection()
+{
 	qDebug(CAT_DIGITAL_IO) << "PB";
 	auto chk = ui->inout->isChecked();
 
@@ -262,7 +278,8 @@ void adiscope::DigitalIoGroup::changeDirection() {
 	}
 }
 
-void adiscope::DigitalIoGroup::on_horizontalSlider_valueChanged(int value) {
+void adiscope::DigitalIoGroup::on_horizontalSlider_valueChanged(int value)
+{
 	qDebug(CAT_DIGITAL_IO) << "horizontalSlider";
 
 	if (ui->horizontalSlider->hasTracking()) {
@@ -275,17 +292,20 @@ void adiscope::DigitalIoGroup::on_horizontalSlider_valueChanged(int value) {
 	}
 }
 
-void adiscope::DigitalIoGroup::on_lineEdit_editingFinished() {
+void adiscope::DigitalIoGroup::on_lineEdit_editingFinished()
+{
 	qDebug(CAT_DIGITAL_IO) << "lineedit";
 	ui->horizontalSlider->setValue(ui->lineEdit->text().toInt());
 }
 
-void adiscope::DigitalIoGroup::on_comboBox_activated(int index) {
+void adiscope::DigitalIoGroup::on_comboBox_activated(int index)
+{
 	ui->stackedWidget->setCurrentIndex(index);
 	changeDirection();
 }
 
-void adiscope::DigitalIO::lockUi() {
+void adiscope::DigitalIO::lockUi()
+{
 	auto lockmask = diom->getLockMask();
 	bool g0Lock = false;
 	bool g1Lock = false;
@@ -319,7 +339,8 @@ void adiscope::DigitalIO::lockUi() {
 void adiscope::DigitalIO::run() { startStop(true); }
 void adiscope::DigitalIO::stop() { startStop(false); }
 
-void adiscope::DigitalIO::startStop(bool checked) {
+void adiscope::DigitalIO::startStop(bool checked)
+{
 	if (checked) {
 		ui->btnRunStop->setText("Stop");
 		diom->enableOutput(true);

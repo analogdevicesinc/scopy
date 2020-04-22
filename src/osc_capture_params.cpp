@@ -37,11 +37,13 @@ SymmetricBufferMode::SymmetricBufferMode()
 	, m_visibleBufferSize(0)
 	, m_triggerBufferSize(0)
 	, m_enhancedMemoryDepth(false)
-	, m_timeDivsCount(10) {}
+	, m_timeDivsCount(10)
+{}
 
 SymmetricBufferMode::~SymmetricBufferMode() {}
 
-SymmetricBufferMode::capture_parameters SymmetricBufferMode::captureParameters() const {
+SymmetricBufferMode::capture_parameters SymmetricBufferMode::captureParameters() const
+{
 	struct capture_parameters params;
 	double sampleRate;
 	long long bufferOffsetPos;
@@ -70,7 +72,8 @@ SymmetricBufferMode::capture_parameters SymmetricBufferMode::captureParameters()
 	return params;
 }
 
-void SymmetricBufferMode::setSampleRates(const std::vector<double> &sampleRates) {
+void SymmetricBufferMode::setSampleRates(const std::vector<double>& sampleRates)
+{
 	m_sampleRates = sampleRates;
 	std::sort(m_sampleRates.begin(), m_sampleRates.end());
 }
@@ -81,14 +84,16 @@ void SymmetricBufferMode::setTriggerBufferMaxSize(unsigned long maxSize) { m_tri
 
 void SymmetricBufferMode::setTimeDivisionCount(int count) { m_timeDivsCount = count; }
 
-void SymmetricBufferMode::setTimeBase(double secsPerDiv) {
+void SymmetricBufferMode::setTimeBase(double secsPerDiv)
+{
 	if ((m_timeBase != secsPerDiv) || m_enhancedMemoryDepth) {
 		m_timeBase = secsPerDiv;
 		configParamsOnTimeBaseChanged();
 	}
 }
 
-void SymmetricBufferMode::setCustomBufferSize(unsigned long customSize) {
+void SymmetricBufferMode::setCustomBufferSize(unsigned long customSize)
+{
 	m_visibleBufferSize = customSize;
 	configParamsOnCustomSizeChanged();
 }
@@ -97,14 +102,16 @@ bool SymmetricBufferMode::isEnhancedMemDepth() { return m_enhancedMemoryDepth; }
 
 void SymmetricBufferMode::setEnhancedMemDepth(bool val) { m_enhancedMemoryDepth = val; }
 
-void SymmetricBufferMode::setTriggerPos(double pos) {
+void SymmetricBufferMode::setTriggerPos(double pos)
+{
 	if (m_triggerPos != pos) {
 		m_triggerPos = pos;
 		configParamsOnTriggPosChanged();
 	}
 }
 
-void SymmetricBufferMode::configParamsOnTimeBaseChanged() {
+void SymmetricBufferMode::configParamsOnTimeBaseChanged()
+{
 	double sampleRate;
 
 	// Get highest sample rate
@@ -144,7 +151,6 @@ void SymmetricBufferMode::configParamsOnTimeBaseChanged() {
 		} else {
 			trigBuffSize = 0;
 		}
-
 	} else if (triggPosInBuffer > m_triggerBufferMaxSize) {
 		triggPosInBuffer = m_triggerBufferMaxSize;
 		trigBuffSize = triggPosInBuffer;
@@ -157,7 +163,8 @@ void SymmetricBufferMode::configParamsOnTimeBaseChanged() {
 	m_triggPosSR = sampleRate;
 }
 
-double SymmetricBufferMode::getSamplerateFor(unsigned long buffersize) {
+double SymmetricBufferMode::getSamplerateFor(unsigned long buffersize)
+{
 	double desiredSamplrate = buffersize / (m_timeBase * m_timeDivsCount);
 	auto ratesIt = m_sampleRates.begin();
 	double sampleRate = *ratesIt;
@@ -168,7 +175,8 @@ double SymmetricBufferMode::getSamplerateFor(unsigned long buffersize) {
 	return sampleRate;
 }
 
-void SymmetricBufferMode::configParamsOnCustomSizeChanged() {
+void SymmetricBufferMode::configParamsOnCustomSizeChanged()
+{
 	m_sampleRate = getSamplerateFor(m_visibleBufferSize);
 	m_triggerBufferSize = m_triggerBufferMaxSize;
 	m_triggPosSR = m_sampleRate;
@@ -177,7 +185,8 @@ void SymmetricBufferMode::configParamsOnCustomSizeChanged() {
 	m_enhancedMemoryDepth = true;
 }
 
-void SymmetricBufferMode::configParamsOnTriggPosChanged() {
+void SymmetricBufferMode::configParamsOnTriggPosChanged()
+{
 	if (m_enhancedMemoryDepth)
 		return;
 	double bufferSize;

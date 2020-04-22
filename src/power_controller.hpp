@@ -27,9 +27,10 @@
 #include <QPushButton>
 #include <QTimer>
 
-extern "C" {
-struct iio_context;
-struct iio_channel;
+extern "C"
+{
+	struct iio_context;
+	struct iio_channel;
 }
 
 namespace Ui {
@@ -43,7 +44,8 @@ class QHideEvent;
 namespace adiscope {
 class PowerController_API;
 
-class PowerController : public Tool {
+class PowerController : public Tool
+{
 	friend class PowerController_API;
 	friend class ToolLauncher_API;
 
@@ -52,8 +54,8 @@ class PowerController : public Tool {
 public:
 	const int AVERAGE_COUNT = 5;
 
-	explicit PowerController(struct iio_context *ctx, ToolMenuItem *toolMenuItem, QJSEngine *engine,
-				 ToolLauncher *parent = 0);
+	explicit PowerController(struct iio_context* ctx, ToolMenuItem* toolMenuItem, QJSEngine* engine,
+				 ToolLauncher* parent = 0);
 	~PowerController();
 
 public Q_SLOTS:
@@ -72,9 +74,9 @@ private Q_SLOTS:
 	void toggleRunButton(bool enabled);
 
 private:
-	Ui::PowerController *ui;
-	PositionSpinButton *valuePos;
-	PositionSpinButton *valueNeg;
+	Ui::PowerController* ui;
+	PositionSpinButton* valuePos;
+	PositionSpinButton* valueNeg;
 	struct iio_channel *ch1w, *ch2w, *ch1r, *ch2r, *pd_pos, *pd_neg;
 	QTimer timer;
 	bool in_sync;
@@ -82,8 +84,8 @@ private:
 	QList<long long> averageVoltageCh2;
 	QMap<QString, double> calibrationParam;
 
-	void showEvent(QShowEvent *event);
-	void hideEvent(QHideEvent *event);
+	void showEvent(QShowEvent* event);
+	void hideEvent(QHideEvent* event);
 
 Q_SIGNALS:
 	void showTool();

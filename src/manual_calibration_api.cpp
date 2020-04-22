@@ -30,12 +30,16 @@
 
 using namespace adiscope;
 
-ManualCalibration_API::ManualCalibration_API(ManualCalibration *m_calib)
-	: ApiObject(), calib(m_calib), step_in_progress(-1) {}
+ManualCalibration_API::ManualCalibration_API(ManualCalibration* m_calib)
+	: ApiObject()
+	, calib(m_calib)
+	, step_in_progress(-1)
+{}
 
 void ManualCalibration_API::autoCalibration() { calib->ui->autoButton->click(); }
 
-int ManualCalibration_API::start(int story) {
+int ManualCalibration_API::start(int story)
+{
 	if (step_in_progress >= 0) {
 		// Reset the current step if another story
 		// was already started and did not end yet
@@ -53,7 +57,8 @@ int ManualCalibration_API::start(int story) {
 	return nb_steps;
 }
 
-int ManualCalibration_API::next() {
+int ManualCalibration_API::next()
+{
 	auto currentStory = calib->stCalibrationStory;
 
 	// If a story was not yet started, return -1
@@ -69,7 +74,8 @@ int ManualCalibration_API::next() {
 	return step_in_progress + 1;
 }
 
-int ManualCalibration_API::finish() {
+int ManualCalibration_API::finish()
+{
 	auto currentStory = calib->stCalibrationStory;
 
 	// If a story was not yet started, return -1
@@ -91,7 +97,8 @@ int ManualCalibration_API::finish() {
 	return -1;
 }
 
-bool ManualCalibration_API::setParam(double value) {
+bool ManualCalibration_API::setParam(double value)
+{
 	auto currentStory = calib->stCalibrationStory;
 	if (currentStory.story.count() > 0) {
 		calib->TempUi->lineEdit->setText(QString::number(value));
@@ -100,7 +107,8 @@ bool ManualCalibration_API::setParam(double value) {
 	return false;
 }
 
-void ManualCalibration_API::saveCalibration(QString path) {
+void ManualCalibration_API::saveCalibration(QString path)
+{
 	bool buttonEn = calib->ui->saveButton->isEnabled();
 	if (!buttonEn) {
 		calib->ui->saveButton->setEnabled(true);
@@ -113,7 +121,8 @@ void ManualCalibration_API::saveCalibration(QString path) {
 	}
 }
 
-void ManualCalibration_API::loadCalibration() {
+void ManualCalibration_API::loadCalibration()
+{
 	bool buttonEn = calib->ui->loadButton->isEnabled();
 	if (!buttonEn) {
 		calib->ui->loadButton->setEnabled(true);

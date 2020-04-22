@@ -93,8 +93,8 @@ std::vector<std::string> LogicAnalyzer::trigger_mapping = {
 std::vector<std::pair<std::string, std::string>> LogicAnalyzer::externalTriggerSourceMap = {
 	{"External Trigger In", "trigger-logic"}, {"Oscilloscope", "trigger-in"}};
 
-LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, Filter *filt, ToolMenuItem *toolMenuItem, QJSEngine *engine,
-			     ToolLauncher *parent, bool offline_mode_)
+LogicAnalyzer::LogicAnalyzer(struct iio_context* ctx, Filter* filt, ToolMenuItem* toolMenuItem, QJSEngine* engine,
+			     ToolLauncher* parent, bool offline_mode_)
 	: Tool(ctx, toolMenuItem, new LogicAnalyzer_API(this), "Logic Analyzer", parent)
 	, itemsize(sizeof(uint16_t))
 	, dev_name()
@@ -208,10 +208,10 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, Filter *filt, ToolMenuItem
 	context = sigrok::Context::create();
 
 	device_manager = new pv::DeviceManager(context);
-	pv::MainWindow *w = new pv::MainWindow(*device_manager, filt, open_file, open_file_format, this);
+	pv::MainWindow* w = new pv::MainWindow(*device_manager, filt, open_file, open_file_format, this);
 
 	for (unsigned int j = 0; j < get_no_channels(dev); j++) {
-		struct iio_channel *chn = iio_device_get_channel(dev, j);
+		struct iio_channel* chn = iio_device_get_channel(dev, j);
 
 		if (!iio_channel_is_output(chn) && iio_channel_is_scan_element(chn)) {
 			iio_channel_enable(chn);
@@ -243,14 +243,14 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, Filter *filt, ToolMenuItem
 	/* setup view */
 	main_win = w;
 	main_win->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	ui->centralWidgetLayout->addWidget(static_cast<QWidget *>(main_win));
+	ui->centralWidgetLayout->addWidget(static_cast<QWidget*>(main_win));
 	main_win->select_device(logic_analyzer_ptr);
 
 	set_buffersize();
 	main_win->session_.set_timespanLimit(timespanLimitStream);
 
 	ui->rightWidget->setMaximumWidth(0);
-	static_cast<QWidget *>(main_win->main_bar_)->setVisible(false);
+	static_cast<QWidget*>(main_win->main_bar_)->setVisible(false);
 
 	/* General settings */
 	settings_group->addButton(ui->btnSettings);
@@ -402,14 +402,16 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, Filter *filt, ToolMenuItem
 	init_buffer_scrolling();
 }
 
-bool LogicAnalyzer::hasCrossInstrumentTrigger() {
+bool LogicAnalyzer::hasCrossInstrumentTrigger()
+{
 	auto dev = iio_context_find_device(ctx, "m2k-adc-trigger");
 	auto ch = iio_device_find_channel(dev, "voltage4", false);
 	auto ret = iio_channel_find_attr(ch, "out_select");
 	return (ret == NULL) ? false : true;
 }
 
-void LogicAnalyzer::toolDetached(bool detached) {
+void LogicAnalyzer::toolDetached(bool detached)
+{
 	if (detached) {
 		this->setMinimumWidth(min_detached_width);
 		this->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
@@ -419,7 +421,8 @@ void LogicAnalyzer::toolDetached(bool detached) {
 	}
 }
 
-void LogicAnalyzer::init_buffer_scrolling() {
+void LogicAnalyzer::init_buffer_scrolling()
+{
 	connect(buffer_previewer, &DigitalBufferPreviewer::bufferMovedBy, [=](int value) {
 		reset_horiz_offset = false;
 		double xWidth = timeBase->value() * 10;
@@ -444,7 +447,8 @@ void LogicAnalyzer::init_buffer_scrolling() {
 	});
 }
 
-void LogicAnalyzer::init_export_settings() {
+void LogicAnalyzer::init_export_settings()
+{
 	exportSettings = new ExportSettings(this);
 	exportSettings->enableExportButton(false);
 	ui->verticalLayout_5->addWidget(exportSettings);
@@ -458,7 +462,8 @@ void LogicAnalyzer::init_export_settings() {
 	exportSettings->disableUIMargins();
 }
 
-void LogicAnalyzer::configureMaxSampleRate() {
+void LogicAnalyzer::configureMaxSampleRate()
+{
 	if (!offline_mode) {
 		auto logic_analyzer_dev = iio_context_find_device(ctx, "m2k-logic-analyzer");
 		if (!logic_analyzer_dev)
@@ -471,7 +476,8 @@ void LogicAnalyzer::configureMaxSampleRate() {
 	}
 }
 
-LogicAnalyzer::~LogicAnalyzer() {
+LogicAnalyzer::~LogicAnalyzer()
+{
 	if (saveOnExit) {
 		api->save(*settings);
 	}
@@ -492,7 +498,8 @@ LogicAnalyzer::~LogicAnalyzer() {
 	channel_groups_api.clear();
 }
 
-void LogicAnalyzer::set_buffersize() {
+void LogicAnalyzer::set_buffersize()
+{
 	if (logic_analyzer_ptr) {
 		main_win->view_->session().set_buffersize(logic_analyzer_ptr->get_buffersize());
 		if (m_running) {
@@ -502,7 +509,8 @@ void LogicAnalyzer::set_buffersize() {
 	}
 }
 
-void LogicAnalyzer::get_channel_groups_api() {
+void LogicAnalyzer::get_channel_groups_api()
+{
 	qDeleteAll(channel_groups_api);
 	channel_groups_api.clear();
 	for (unsigned int i = 0; i < chm.get_channel_group_count(); i++) {
@@ -510,13 +518,15 @@ void LogicAnalyzer::get_channel_groups_api() {
 	}
 }
 
-void LogicAnalyzer::installWheelEventGuard() {
+void LogicAnalyzer::installWheelEventGuard()
+{
 	if (!wheelEventGuard)
 		wheelEventGuard = new MouseWheelWidgetGuard(this);
 	wheelEventGuard->installEventRecursively(this);
 }
 
-void LogicAnalyzer::checkEnabledChannels() {
+void LogicAnalyzer::checkEnabledChannels()
+{
 	auto enabled = chm_ui->getEnabledChannelGroups();
 	if (enabled.size() > 0) {
 		ui->btnSingleRun->setEnabled(true);
@@ -537,7 +547,8 @@ void LogicAnalyzer::checkEnabledChannels() {
 	}
 }
 
-void LogicAnalyzer::resizeEvent() {
+void LogicAnalyzer::resizeEvent()
+{
 	if (!initialised) {
 		updateAreaTimeTrigger();
 		timePosition->setValue(0);
@@ -564,14 +575,16 @@ void LogicAnalyzer::resizeEvent() {
 	buffer_previewer->setFixedWidth(main_win->view_->viewport()->width());
 }
 
-void LogicAnalyzer::updateAreaTimeTrigger() {
+void LogicAnalyzer::updateAreaTimeTrigger()
+{
 	int cursorsWidth = ui->boxCursors->isChecked() ? ui->cursorsStatusWidget->width() : 0;
 	int newValue = chm_ui->sizeHint().width() - cursorsWidth - d_bottomHandlesArea->leftPadding() +
 		main_win->view_->getViewportMargins().left();
 	ui->areaTimeTriggerLayout->setContentsMargins(newValue, 0, 0, 0);
 }
 
-QString LogicAnalyzer::saveToFile() {
+QString LogicAnalyzer::saveToFile()
+{
 	QString separator = "";
 	QString startRow = ";";
 	QString endRow = "\n";
@@ -613,7 +626,6 @@ QString LogicAnalyzer::saveToFile() {
 
 	if (separator != "") {
 		done = exportTabCsv(separator, fileName);
-
 	} else {
 		QFile file(fileName);
 		if (!file.open(QIODevice::WriteOnly)) {
@@ -637,7 +649,8 @@ QString LogicAnalyzer::saveToFile() {
 	return (done ? fileName : "");
 }
 
-bool LogicAnalyzer::exportVCD(QString filename, QString startSep, QString endSep) {
+bool LogicAnalyzer::exportVCD(QString filename, QString startSep, QString endSep)
+{
 	uint64_t current_sample, prev_sample;
 	int current_bit, prev_bit, p;
 	QString timescaleFormat;
@@ -725,7 +738,8 @@ bool LogicAnalyzer::exportVCD(QString filename, QString startSep, QString endSep
 	return true;
 }
 
-bool LogicAnalyzer::exportTabCsv(QString separator, QString filename) {
+bool LogicAnalyzer::exportTabCsv(QString separator, QString filename)
+{
 	FileManager fm("Logic Analyzer");
 	fm.open(filename, FileManager::EXPORT);
 
@@ -765,7 +779,8 @@ bool LogicAnalyzer::exportTabCsv(QString separator, QString filename) {
 	return true;
 }
 
-void LogicAnalyzer::btnExportPressed() {
+void LogicAnalyzer::btnExportPressed()
+{
 	bool paused = false;
 
 	if (!main_win->session_.is_data())
@@ -783,14 +798,16 @@ void LogicAnalyzer::btnExportPressed() {
 	}
 }
 
-void LogicAnalyzer::startTimer() {
+void LogicAnalyzer::startTimer()
+{
 	if (!timer->isActive()) {
 		timer->setSingleShot(true);
 		timer->start(timer_timeout_ms);
 	}
 }
 
-void LogicAnalyzer::triggerTimeout() {
+void LogicAnalyzer::triggerTimeout()
+{
 	if (armed) {
 		trigger_is_forced = true;
 		autoCaptureEnable(false);
@@ -801,7 +818,8 @@ void LogicAnalyzer::startTimeout() { Q_EMIT starttimeout(); }
 
 void LogicAnalyzer::stopTimeout() { Q_EMIT stoptimeout(); }
 
-void LogicAnalyzer::stopTimer() {
+void LogicAnalyzer::stopTimer()
+{
 	if (trigger_settings_ui->btnTriggerMode->isChecked()) {
 		if (timer->isActive()) {
 			timer->stop();
@@ -815,7 +833,8 @@ void LogicAnalyzer::stopTimer() {
 	}
 }
 
-void LogicAnalyzer::setTriggerState(int triggerState) {
+void LogicAnalyzer::setTriggerState(int triggerState)
+{
 	if (!trigger_settings_ui)
 		return;
 
@@ -843,7 +862,8 @@ void LogicAnalyzer::setTriggerState(int triggerState) {
 	ui->triggerStateLabel->show();
 }
 
-void LogicAnalyzer::onTriggerModeChanged(bool val) {
+void LogicAnalyzer::onTriggerModeChanged(bool val)
+{
 	if (!trigger_settings_ui)
 		return;
 	if (trigger_settings_ui->btnTriggerMode->isChecked()) {
@@ -857,7 +877,8 @@ void LogicAnalyzer::onTriggerModeChanged(bool val) {
 		triggerUpdater->setIdleState(Stream);
 }
 
-void LogicAnalyzer::onHorizScaleValueChanged(double value) {
+void LogicAnalyzer::onHorizScaleValueChanged(double value)
+{
 	zoomed_in = false;
 	bool isRunning = m_running;
 	if (isRunning)
@@ -868,7 +889,8 @@ void LogicAnalyzer::onHorizScaleValueChanged(double value) {
 		startStop(true);
 }
 
-void LogicAnalyzer::setSampleRate() {
+void LogicAnalyzer::setSampleRate()
+{
 	if (!dev)
 		return;
 
@@ -890,7 +912,8 @@ void LogicAnalyzer::setSampleRate() {
 	active_hw_sampleRate = active_sampleRate;
 }
 
-void LogicAnalyzer::updateBuffersizeSamplerateLabel(int samples, double samplerate) {
+void LogicAnalyzer::updateBuffersizeSamplerateLabel(int samples, double samplerate)
+{
 	QString txtSamplerate = d_cursorMetricFormatter.format(samplerate, "Hz", 0);
 	QString txtSampleperiod = d_cursorTimeFormatter.format(1 / samplerate, "", 0);
 	QString text = QString("%1 Samples at ").arg(samples) + txtSamplerate + "/" + txtSampleperiod;
@@ -898,24 +921,28 @@ void LogicAnalyzer::updateBuffersizeSamplerateLabel(int samples, double samplera
 	ui->samplerateLabel->setText(text);
 }
 
-void LogicAnalyzer::setTimebaseLabel(double value) {
+void LogicAnalyzer::setTimebaseLabel(double value)
+{
 	QString text = d_cursorTimeFormatter.format(value, "", 3);
 	ui->timebaseLabel->setText(text + "/div");
 }
 
-void LogicAnalyzer::setBuffersizeLabelValue(double value) {
+void LogicAnalyzer::setBuffersizeLabelValue(double value)
+{
 	d_bufferSizeLabelVal = value;
 	updateBuffersizeSamplerateLabel(value, d_sampleRateLabelVal);
 }
 
-void LogicAnalyzer::setSamplerateLabelValue(double value) {
+void LogicAnalyzer::setSamplerateLabelValue(double value)
+{
 	d_sampleRateLabelVal = value;
 	updateBuffersizeSamplerateLabel(d_bufferSizeLabelVal, value);
 }
 
 bool LogicAnalyzer::isRunning() const { return m_running; }
 
-void LogicAnalyzer::onRulerChanged(double ruler_value, bool silent) {
+void LogicAnalyzer::onRulerChanged(double ruler_value, bool silent)
+{
 	double timePos = ruler_value + active_plot_timebase * 10 / 2;
 	if (!silent) {
 		if (timePosition->value() != timePos)
@@ -944,9 +971,10 @@ void LogicAnalyzer::onRulerChanged(double ruler_value, bool silent) {
 	updateBufferPreviewer();
 }
 
-QWidget *LogicAnalyzer::bottomHandlesArea() { return d_bottomHandlesArea; }
+QWidget* LogicAnalyzer::bottomHandlesArea() { return d_bottomHandlesArea; }
 
-void LogicAnalyzer::refreshTriggerPos(int px) {
+void LogicAnalyzer::refreshTriggerPos(int px)
+{
 	d_timeTriggerHandle->setPositionSilenty(px);
 	if (m_running && reset_horiz_offset) {
 		if (std::abs(active_plot_timebase - timeBase->value()) < 0.001) {
@@ -958,7 +986,8 @@ void LogicAnalyzer::refreshTriggerPos(int px) {
 	}
 }
 
-void LogicAnalyzer::configParams(double timebase, double timepos) {
+void LogicAnalyzer::configParams(double timebase, double timepos)
+{
 
 	timeBase->blockSignals(true);
 	timePosition->blockSignals(true);
@@ -1109,7 +1138,8 @@ void LogicAnalyzer::configParams(double timebase, double timepos) {
 	main_win->view_->time_item_appearance_changed(true, true);
 }
 
-void LogicAnalyzer::onTimePositionSpinboxChanged(double value) {
+void LogicAnalyzer::onTimePositionSpinboxChanged(double value)
+{
 	if (reset_horiz_offset) {
 		scrolling_offset = 0;
 		horiz_offset_after_drop = 0;
@@ -1117,7 +1147,8 @@ void LogicAnalyzer::onTimePositionSpinboxChanged(double value) {
 	configParams(active_plot_timebase, value);
 }
 
-void LogicAnalyzer::onTimeTriggerHandlePosChanged(int pos) {
+void LogicAnalyzer::onTimeTriggerHandlePosChanged(int pos)
+{
 	double time = pixelToTime(pos);
 	if ((time + active_plot_timebase * 10 / 2) != active_timePos) {
 		timePosition->setValue(time + active_plot_timebase * 10 / 2);
@@ -1127,7 +1158,8 @@ void LogicAnalyzer::onTimeTriggerHandlePosChanged(int pos) {
 	setTriggerDelay();
 }
 
-double LogicAnalyzer::pixelToTime(int pix) {
+double LogicAnalyzer::pixelToTime(int pix)
+{
 	double timeSpan = active_plot_timebase * 10;
 	int width = bottomHandlesArea()->geometry().width() - d_bottomHandlesArea->leftPadding() -
 		d_bottomHandlesArea->rightPadding();
@@ -1135,7 +1167,8 @@ double LogicAnalyzer::pixelToTime(int pix) {
 	return -timestamp;
 }
 
-int LogicAnalyzer::timeToPixel(double time) {
+int LogicAnalyzer::timeToPixel(double time)
+{
 	double timeSpan = active_plot_timebase * 10;
 	int width = bottomHandlesArea()->geometry().width() - d_bottomHandlesArea->leftPadding() -
 		d_bottomHandlesArea->rightPadding();
@@ -1146,7 +1179,8 @@ int LogicAnalyzer::timeToPixel(double time) {
 void LogicAnalyzer::run() { startStop(true); }
 void LogicAnalyzer::stop() { startStop(false); }
 
-void LogicAnalyzer::startStop(bool start) {
+void LogicAnalyzer::startStop(bool start)
+{
 	if (!dev)
 		return;
 
@@ -1197,7 +1231,8 @@ void LogicAnalyzer::startStop(bool start) {
 	triggerUpdater->setEnabled(start);
 }
 
-void LogicAnalyzer::setTriggerDelay(bool silent) {
+void LogicAnalyzer::setTriggerDelay(bool silent)
+{
 	double val = timePosition->value();
 	if (!silent) {
 		if (m_running)
@@ -1209,17 +1244,19 @@ void LogicAnalyzer::setTriggerDelay(bool silent) {
 	}
 }
 
-void LogicAnalyzer::setHWTriggerDelay(long long delay) {
+void LogicAnalyzer::setHWTriggerDelay(long long delay)
+{
 	if (!dev)
 		return;
 	std::string name = "voltage0";
-	struct iio_channel *triggerch = iio_device_find_channel(dev, name.c_str(), false);
+	struct iio_channel* triggerch = iio_device_find_channel(dev, name.c_str(), false);
 	QString s = QString::number(delay);
 	iio_channel_attr_write(triggerch, "trigger_delay", s.toLocal8Bit().QByteArray::constData());
 	active_hw_trigger_sample_count = delay;
 }
 
-void LogicAnalyzer::singleRun(bool checked) {
+void LogicAnalyzer::singleRun(bool checked)
+{
 	if (checked) {
 		if (!armed)
 			autoCaptureEnable(true);
@@ -1264,13 +1301,14 @@ void LogicAnalyzer::singleRun(bool checked) {
 	}
 }
 
-unsigned int LogicAnalyzer::get_no_channels(struct iio_device *dev) {
+unsigned int LogicAnalyzer::get_no_channels(struct iio_device* dev)
+{
 	if (!dev)
 		return 0;
 	unsigned int nb = 0;
 
 	for (unsigned int i = 0; i < iio_device_get_channels_count(dev); i++) {
-		struct iio_channel *chn = iio_device_get_channel(dev, i);
+		struct iio_channel* chn = iio_device_get_channel(dev, i);
 
 		if (!iio_channel_is_output(chn) && iio_channel_is_scan_element(chn)) {
 			nb++;
@@ -1280,7 +1318,8 @@ unsigned int LogicAnalyzer::get_no_channels(struct iio_device *dev) {
 	return nb;
 }
 
-void LogicAnalyzer::clearLayout(QLayout *layout) {
+void LogicAnalyzer::clearLayout(QLayout* layout)
+{
 	for (int i = 0; i < layout->children().size();) {
 		delete layout->takeAt(i);
 	}
@@ -1288,7 +1327,8 @@ void LogicAnalyzer::clearLayout(QLayout *layout) {
 	delete layout;
 }
 
-void LogicAnalyzer::toggleRightMenu(QPushButton *btn, bool checked) {
+void LogicAnalyzer::toggleRightMenu(QPushButton* btn, bool checked)
+{
 	int id = btn->property("id").toInt();
 
 	settings_panel_update(id);
@@ -1298,7 +1338,8 @@ void LogicAnalyzer::toggleRightMenu(QPushButton *btn, bool checked) {
 	ui->rightWidget->toggleMenu(checked);
 }
 
-void LogicAnalyzer::settings_panel_update(int id) {
+void LogicAnalyzer::settings_panel_update(int id)
+{
 	if (id < 0) {
 		ui->stackedWidget->setCurrentIndex(-id);
 	} else {
@@ -1306,28 +1347,31 @@ void LogicAnalyzer::settings_panel_update(int id) {
 	}
 }
 
-void LogicAnalyzer::triggerRightMenuToggle(CustomPushButton *btn, bool checked) {
+void LogicAnalyzer::triggerRightMenuToggle(CustomPushButton* btn, bool checked)
+{
 	// Queue the action, if right menu animation is in progress. This way
 	// the action will be remembered and performed right after the animation
 	// finishes
 	if (ui->rightWidget->animInProgress()) {
-		menuButtonActions.enqueue(QPair<CustomPushButton *, bool>(btn, checked));
+		menuButtonActions.enqueue(QPair<CustomPushButton*, bool>(btn, checked));
 	} else {
 		toggleRightMenu(btn, checked);
 	}
 }
 
-void LogicAnalyzer::toggleRightMenu(bool selected) {
-	auto btn = static_cast<CustomPushButton *>(sender());
+void LogicAnalyzer::toggleRightMenu(bool selected)
+{
+	auto btn = static_cast<CustomPushButton*>(sender());
 
 	triggerRightMenuToggle(btn, selected);
 }
 
-void LogicAnalyzer::setHWTrigger(int chid, std::string trigger_val) {
+void LogicAnalyzer::setHWTrigger(int chid, std::string trigger_val)
+{
 	if (!dev)
 		return;
 	std::string name = "voltage" + to_string(chid);
-	struct iio_channel *triggerch = iio_device_find_channel(dev, name.c_str(), false);
+	struct iio_channel* triggerch = iio_device_find_channel(dev, name.c_str(), false);
 
 	if (!triggerch)
 		return;
@@ -1335,11 +1379,12 @@ void LogicAnalyzer::setHWTrigger(int chid, std::string trigger_val) {
 	iio_channel_attr_write(triggerch, "trigger", trigger_val.c_str());
 }
 
-void LogicAnalyzer::setHWTriggerMux(int chid, std::string mux_val) {
+void LogicAnalyzer::setHWTriggerMux(int chid, std::string mux_val)
+{
 	if (!dev)
 		return;
 	std::string name = "voltage" + to_string(chid);
-	struct iio_channel *triggerch = iio_device_find_channel(dev, name.c_str(), false);
+	struct iio_channel* triggerch = iio_device_find_channel(dev, name.c_str(), false);
 
 	if (!triggerch)
 		return;
@@ -1347,11 +1392,12 @@ void LogicAnalyzer::setHWTriggerMux(int chid, std::string mux_val) {
 	iio_channel_attr_write(triggerch, "trigger_mux_out", mux_val.c_str());
 }
 
-std::string LogicAnalyzer::get_trigger_from_device(int chid) {
+std::string LogicAnalyzer::get_trigger_from_device(int chid)
+{
 	if (!dev)
 		return "none";
 	std::string name = "voltage" + to_string(chid);
-	struct iio_channel *triggerch = iio_device_find_channel(dev, name.c_str(), false);
+	struct iio_channel* triggerch = iio_device_find_channel(dev, name.c_str(), false);
 	if (!triggerch)
 		return "";
 	char trigger_val[4096];
@@ -1360,14 +1406,15 @@ std::string LogicAnalyzer::get_trigger_from_device(int chid) {
 	return res;
 }
 
-std::vector<std::string> LogicAnalyzer::get_iio_trigger_options() {
+std::vector<std::string> LogicAnalyzer::get_iio_trigger_options()
+{
 	char buf[1024];
 	std::vector<std::string> values;
 
 	if (!dev)
 		return trigger_mapping;
 	std::string name = "voltage0";
-	struct iio_channel *triggerch = iio_device_find_channel(dev, name.c_str(), false);
+	struct iio_channel* triggerch = iio_device_find_channel(dev, name.c_str(), false);
 	if (!triggerch)
 		return trigger_mapping;
 	int ret = iio_channel_attr_read(triggerch, "trigger_available", buf, sizeof(buf));
@@ -1386,7 +1433,8 @@ std::vector<std::string> LogicAnalyzer::get_iio_trigger_options() {
 	return values;
 }
 
-void LogicAnalyzer::toggleLeftMenu(bool val) {
+void LogicAnalyzer::toggleLeftMenu(bool val)
+{
 	if (val) {
 		ui->btnPrint->setFixedWidth(110);
 		ui->btnGroupChannels->hide();
@@ -1398,7 +1446,8 @@ void LogicAnalyzer::toggleLeftMenu(bool val) {
 	}
 }
 
-void LogicAnalyzer::rightMenuFinished(bool opened) {
+void LogicAnalyzer::rightMenuFinished(bool opened)
+{
 	Q_UNUSED(opened)
 
 	// At the end of each animation, check if there are other button check
@@ -1410,7 +1459,8 @@ void LogicAnalyzer::rightMenuFinished(bool opened) {
 	}
 }
 
-void LogicAnalyzer::leftMenuFinished(bool closed) {
+void LogicAnalyzer::leftMenuFinished(bool closed)
+{
 	if (ui->btnShowHideMenu->isChecked() && !closed) {
 		ui->btnGroupChannels->hide();
 		ui->btnShowChannels->hide();
@@ -1422,7 +1472,8 @@ void LogicAnalyzer::leftMenuFinished(bool closed) {
 	}
 }
 
-void LogicAnalyzer::on_btnShowChannelsClicked(bool check) {
+void LogicAnalyzer::on_btnShowChannelsClicked(bool check)
+{
 	if (check) {
 		ui->btnShowChannels->setText("Show all");
 	} else {
@@ -1430,7 +1481,8 @@ void LogicAnalyzer::on_btnShowChannelsClicked(bool check) {
 	}
 }
 
-void LogicAnalyzer::onChmWidthChanged(int value) {
+void LogicAnalyzer::onChmWidthChanged(int value)
+{
 	int l, r, b, t;
 	ui->areaTimeTriggerLayout->getContentsMargins(&l, &t, &r, &b);
 	int cursorsWidth = ui->boxCursors->isChecked() ? ui->cursorsStatusWidget->width() : 0;
@@ -1442,21 +1494,24 @@ void LogicAnalyzer::onChmWidthChanged(int value) {
 	}
 }
 
-void LogicAnalyzer::setHWTriggerLogic(const QString value) {
+void LogicAnalyzer::setHWTriggerLogic(const QString value)
+{
 	if (!dev)
 		return;
 	std::string name = "voltage0";
-	struct iio_channel *triggerch = iio_device_find_channel(dev, name.c_str(), false);
+	struct iio_channel* triggerch = iio_device_find_channel(dev, name.c_str(), false);
 	QString s = value.toLower();
 	iio_channel_attr_write(triggerch, "trigger_logic_mode", s.toLocal8Bit().QByteArray::constData());
 }
 
-void LogicAnalyzer::requestUpdateBufferPreviewer() {
+void LogicAnalyzer::requestUpdateBufferPreviewer()
+{
 	if (acquisition_mode != REPEATED)
 		updateBufferPreviewer();
 }
 
-void LogicAnalyzer::updateBufferPreviewer() {
+void LogicAnalyzer::updateBufferPreviewer()
+{
 	// Time interval within the plot canvas
 	double plotMin = -(active_plot_timebase * 10 / 2 - active_timePos - scrolling_offset);
 	double plotMax = (active_plot_timebase * 10 / 2 + active_timePos + scrolling_offset);
@@ -1513,7 +1568,8 @@ void LogicAnalyzer::updateBufferPreviewer() {
 	}
 }
 
-void LogicAnalyzer::setupTriggerSettingsUI(bool enabled) {
+void LogicAnalyzer::setupTriggerSettingsUI(bool enabled)
+{
 	trigger_settings_ui->cmb_extern_src->setEnabled(enabled);
 	trigger_settings_ui->cmb_trigg_extern_cond_1->setEnabled(enabled);
 
@@ -1526,7 +1582,8 @@ void LogicAnalyzer::setupTriggerSettingsUI(bool enabled) {
 	}
 }
 
-void LogicAnalyzer::cleanTrigger() {
+void LogicAnalyzer::cleanTrigger()
+{
 	for (unsigned int i = 0; i < get_no_channels(dev) + 2; i++) {
 		setHWTrigger(i, trigger_mapping[0]);
 		if (i < get_no_channels(dev))
@@ -1535,7 +1592,8 @@ void LogicAnalyzer::cleanTrigger() {
 	chm_ui->update_ui();
 }
 
-void LogicAnalyzer::bufferSentSignal(bool lastBuffer) {
+void LogicAnalyzer::bufferSentSignal(bool lastBuffer)
+{
 	if (acquisition_mode == REPEATED)
 		return;
 	if (!lastBuffer) {
@@ -1547,7 +1605,8 @@ void LogicAnalyzer::bufferSentSignal(bool lastBuffer) {
 	}
 }
 
-void LogicAnalyzer::autoCaptureEnable(bool check) {
+void LogicAnalyzer::autoCaptureEnable(bool check)
+{
 	if (check) {
 		for (unsigned int i = 0; i < get_no_channels(dev) + 2; i++) {
 			setHWTrigger(i, trigger_cache[i]);
@@ -1562,9 +1621,10 @@ void LogicAnalyzer::autoCaptureEnable(bool check) {
 	armed = check;
 }
 
-void LogicAnalyzer::setTriggerCache(int chid, const std::string &trigger_value) { trigger_cache[chid] = trigger_value; }
+void LogicAnalyzer::setTriggerCache(int chid, const std::string& trigger_value) { trigger_cache[chid] = trigger_value; }
 
-void LogicAnalyzer::setExternalTrigger(int index) {
+void LogicAnalyzer::setExternalTrigger(int index)
+{
 	int ext_1 = trigger_settings_ui->cmb_trigg_extern_cond_1->currentIndex();
 	// int ext_2 =
 	// trigger_settings_ui->cmb_trigg_extern_cond_2->currentIndex();
@@ -1579,7 +1639,8 @@ void LogicAnalyzer::setExternalTrigger(int index) {
 	}*/
 }
 
-void LogicAnalyzer::toggleExternalTriggerConditionsWidget(int index) {
+void LogicAnalyzer::toggleExternalTriggerConditionsWidget(int index)
+{
 	// enable trigger conditions when receiving triggers external pin
 	if (externalTriggerSourceMap[index].second == "trigger-logic") {
 		trigger_settings_ui->cmb_trigg_extern_cond_1->setEnabled(true);
@@ -1588,18 +1649,21 @@ void LogicAnalyzer::toggleExternalTriggerConditionsWidget(int index) {
 	}
 }
 
-void LogicAnalyzer::setExternalSource(int index) {
+void LogicAnalyzer::setExternalSource(int index)
+{
 	setHWTriggerMux(16, externalTriggerSourceMap[index].second);
 	toggleExternalTriggerConditionsWidget(index);
 }
 
-void LogicAnalyzer::triggerChanged(int index) {
+void LogicAnalyzer::triggerChanged(int index)
+{
 	if (index != 0 && trigger_settings_ui->trigg_extern_en->isChecked()) {
 		trigger_settings_ui->trigg_extern_en->setChecked(false);
 	}
 }
 
-void LogicAnalyzer::cleanHWParams() {
+void LogicAnalyzer::cleanHWParams()
+{
 	for (unsigned int i = 0; i < get_no_channels(dev) + 2; i++) {
 		setHWTrigger(i, trigger_mapping[0]);
 	}
@@ -1607,7 +1671,8 @@ void LogicAnalyzer::cleanHWParams() {
 	setHWTriggerLogic("or");
 }
 
-void LogicAnalyzer::cursorValueChanged_1(int pos) {
+void LogicAnalyzer::cursorValueChanged_1(int pos)
+{
 	value_cursor1 = -(pixelToTime(pos) + active_plot_timebase * 10 / 2 - active_timePos);
 	if (ui->btnCursorsLock->isChecked()) {
 		value_cursor2 = value_cursor1 - value_cursors_delta;
@@ -1625,7 +1690,8 @@ void LogicAnalyzer::cursorValueChanged_1(int pos) {
 	main_win->view_->viewport()->cursorValueChanged_1(pos);
 }
 
-void LogicAnalyzer::cursorValueChanged_2(int pos) {
+void LogicAnalyzer::cursorValueChanged_2(int pos)
+{
 	value_cursor2 = -(pixelToTime(pos) + active_plot_timebase * 10 / 2 - active_timePos);
 	if (ui->btnCursorsLock->isChecked()) {
 
@@ -1644,7 +1710,8 @@ void LogicAnalyzer::cursorValueChanged_2(int pos) {
 	main_win->view_->viewport()->cursorValueChanged_2(pos);
 }
 
-void LogicAnalyzer::recomputeCursorsValue(bool zoom) {
+void LogicAnalyzer::recomputeCursorsValue(bool zoom)
+{
 	int x1 = d_hCursorHandle1->position();
 	int x2 = d_hCursorHandle2->position();
 	value_cursor2 = -(pixelToTime(x2) + active_plot_timebase * 10 / 2 - active_timePos);
@@ -1659,7 +1726,8 @@ void LogicAnalyzer::recomputeCursorsValue(bool zoom) {
 	}
 }
 
-void LogicAnalyzer::cursorsFormatDelta() {
+void LogicAnalyzer::cursorsFormatDelta()
+{
 	QString text = d_cursorTimeFormatter.format(value_cursors_delta, "", 3);
 	QString freqDeltaText;
 	if (value_cursors_delta != 0)
@@ -1670,7 +1738,8 @@ void LogicAnalyzer::cursorsFormatDelta() {
 	ui->lblCursorDelta->setText(freqDeltaText);
 }
 
-void LogicAnalyzer::setCursorsActive(bool active) {
+void LogicAnalyzer::setCursorsActive(bool active)
+{
 	main_win->view_->viewport()->setCursorsActive(active);
 	ui->btnCursorsLock->setEnabled(active);
 	if (active) {
@@ -1684,7 +1753,8 @@ void LogicAnalyzer::setCursorsActive(bool active) {
 	}
 }
 
-void LogicAnalyzer::resetInstrumentToDefault() {
+void LogicAnalyzer::resetInstrumentToDefault()
+{
 	chm.clearChannelGroups();
 	cleanHWParams();
 	chm.clearTrigger();
@@ -1708,7 +1778,8 @@ void LogicAnalyzer::resetInstrumentToDefault() {
 	updateBufferPreviewer();
 }
 
-void LogicAnalyzer::setTimeout(bool checked) {
+void LogicAnalyzer::setTimeout(bool checked)
+{
 	if (!armed) {
 		autoCaptureEnable(true);
 	}
@@ -1719,7 +1790,8 @@ void LogicAnalyzer::setTimeout(bool checked) {
 		timer->stop();
 }
 
-void LogicAnalyzer::runModeChanged(bool repeated) {
+void LogicAnalyzer::runModeChanged(bool repeated)
+{
 	bool en;
 	bool shouldUpdate = d_timeTriggerHandle->position() == 0;
 
@@ -1759,7 +1831,8 @@ void LogicAnalyzer::runModeChanged(bool repeated) {
 		startStop(true);
 }
 
-void LogicAnalyzer::validateSamplingFrequency(double value) {
+void LogicAnalyzer::validateSamplingFrequency(double value)
+{
 	bool stepUp = false;
 	double srDivider = 0;
 	double actualFrequency = value;
@@ -1796,7 +1869,8 @@ void LogicAnalyzer::validateSamplingFrequency(double value) {
 	}
 }
 
-void LogicAnalyzer::onDataReceived() {
+void LogicAnalyzer::onDataReceived()
+{
 	bool new_data;
 	if (!trigger_settings_ui)
 		return;
@@ -1819,7 +1893,8 @@ void LogicAnalyzer::onDataReceived() {
 		triggerUpdater->setEnabled(m_running);
 }
 
-void LogicAnalyzer::onFrameEnded() {
+void LogicAnalyzer::onFrameEnded()
+{
 	/* Reset the Single button state when the frame ended
 	 * and data was received */
 	if (ui->btnSingleRun->isChecked() && main_win->session_.is_data())

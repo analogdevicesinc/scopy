@@ -25,7 +25,10 @@
 
 using namespace adiscope;
 
-HomepageControls::HomepageControls(QWidget *parent) : QWidget(parent), ui(new Ui::HomepageControls) {
+HomepageControls::HomepageControls(QWidget* parent)
+	: QWidget(parent)
+	, ui(new Ui::HomepageControls)
+{
 	ui->setupUi(this);
 
 	connect(ui->leftBtn, &QPushButton::clicked, [=]() { Q_EMIT goLeft(); });
@@ -41,7 +44,8 @@ HomepageControls::~HomepageControls() { delete ui; }
 
 void HomepageControls::updatePosition() { move(parentWidget()->width() - 150, geometry().topLeft().y()); }
 
-bool HomepageControls::eventFilter(QObject *watched, QEvent *event) {
+bool HomepageControls::eventFilter(QObject* watched, QEvent* event)
+{
 	if (event->type() == QEvent::Resize) {
 		updatePosition();
 		return false;

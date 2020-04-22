@@ -40,19 +40,20 @@ class ConfigKey;
 
 namespace adiscope {
 
-class PatternGeneratorBufferManager {
+class PatternGeneratorBufferManager
+{
 
 	bool buffer_created;
 	bool autoSet;
 	uint32_t start_sample;
 	uint32_t last_sample;
 	uint32_t sampleRate;
-	PatternGeneratorChannelManager *chm;
+	PatternGeneratorChannelManager* chm;
 
 public:
-	PatternGeneratorBufferManager(PatternGeneratorChannelManager *chman);
+	PatternGeneratorBufferManager(PatternGeneratorChannelManager* chman);
 	~PatternGeneratorBufferManager();
-	void update(PatternGeneratorChannelGroup *chg = nullptr);
+	void update(PatternGeneratorChannelGroup* chg = nullptr);
 
 	void enableAutoSet(bool);
 	uint32_t adjustSampleRate(uint32_t suggestedSampleRate);
@@ -63,28 +64,29 @@ public:
 	uint32_t getBufferSize();
 
 	uint32_t bufferSize;
-	short *buffer;
+	short* buffer;
 };
 
-class PatternGeneratorBufferManagerUi : public QWidget {
+class PatternGeneratorBufferManagerUi : public QWidget
+{
 	Q_OBJECT
-	QWidget *settingsWidget;
-	PatternGeneratorBufferManager *bufman;
-	PatternGenerator *pg;
+	QWidget* settingsWidget;
+	PatternGeneratorBufferManager* bufman;
+	PatternGenerator* pg;
 	std::shared_ptr<sigrok::Context> context;
 	std::shared_ptr<pv::devices::BinaryBuffer> pattern_generator_ptr;
 	std::shared_ptr<sigrok::InputFormat> binary_format;
 	std::map<std::string, Glib::VariantBase> options;
-	pv::MainWindow *main_win;
+	pv::MainWindow* main_win;
 
 public:
-	PatternGeneratorBufferManagerUi(QWidget *parent, PatternGeneratorBufferManager *bufmananger,
-					QWidget *settingsWidget, PatternGenerator *pg);
+	PatternGeneratorBufferManagerUi(QWidget* parent, PatternGeneratorBufferManager* bufmananger,
+					QWidget* settingsWidget, PatternGenerator* pg);
 
 	~PatternGeneratorBufferManagerUi();
 	void createBinaryBuffer();
 	void reloadPVDevice();
-	pv::MainWindow *getPVWindow();
+	pv::MainWindow* getPVWindow();
 Q_SIGNALS:
 	void uiUpdated();
 public Q_SLOTS:

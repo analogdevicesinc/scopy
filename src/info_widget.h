@@ -7,16 +7,17 @@ namespace Ui {
 class InfoWidget;
 }
 namespace adiscope {
-class InfoWidget : public QWidget {
+class InfoWidget : public QWidget
+{
 	Q_OBJECT
 
 public:
-	explicit InfoWidget(QWidget *parent = 0);
+	explicit InfoWidget(QWidget* parent = 0);
 	~InfoWidget();
 
 private:
-	Ui::InfoWidget *ui;
-	QTimer *timer;
+	Ui::InfoWidget* ui;
+	QTimer* timer;
 
 public Q_SLOTS:
 	void enable(bool);

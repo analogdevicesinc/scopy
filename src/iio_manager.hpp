@@ -33,7 +33,8 @@
 #define IIO_BUFFER_SIZE 0x400
 
 namespace adiscope {
-class iio_manager : public QObject, public gr::top_block {
+class iio_manager : public QObject, public gr::top_block
+{
 	Q_OBJECT
 
 public:
@@ -44,7 +45,7 @@ public:
 
 	/* Get a shared pointer to the instance of iio_manager that
 	 * manages the requested device */
-	static boost::shared_ptr<iio_manager> get_instance(struct iio_context *ctx, const std::string &dev,
+	static boost::shared_ptr<iio_manager> get_instance(struct iio_context* ctx, const std::string& dev,
 							   unsigned long buffer_size = IIO_BUFFER_SIZE);
 
 	~iio_manager();
@@ -86,7 +87,8 @@ public:
 	 * are not properly routed to the blocks connected during the
 	 * reconfiguration. So until GNU Radio gets fixed, we just force
 	 * the whole flowgraph to stop when connecting new blocks. */
-	void lock() {
+	void lock()
+	{
 		gr::top_block::stop();
 		gr::top_block::wait();
 	}
@@ -108,7 +110,8 @@ private:
 
 	gr::iio::device_source::sptr iio_block;
 
-	struct connection {
+	struct connection
+	{
 		gr::basic_block_sptr src;
 		gr::basic_block_sptr dst;
 		int src_port, dst_port;
@@ -116,7 +119,7 @@ private:
 
 	std::vector<connection> connections;
 
-	iio_manager(unsigned int id, struct iio_context *ctx, const std::string &dev, unsigned long buffer_size);
+	iio_manager(unsigned int id, struct iio_context* ctx, const std::string& dev, unsigned long buffer_size);
 
 	void del_connection(gr::basic_block_sptr block, bool reverse);
 

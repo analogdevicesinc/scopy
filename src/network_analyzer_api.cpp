@@ -15,13 +15,15 @@ double NetworkAnalyzer_API::getAmplitude() const { return net->amplitude->value(
 
 double NetworkAnalyzer_API::getOffset() const { return net->offset->value(); }
 
-void NetworkAnalyzer_API::setMinFreq(double freq) {
+void NetworkAnalyzer_API::setMinFreq(double freq)
+{
 	net->startStopRange->setStartValue(freq);
 	net->m_dBgraph.setXMin(freq);
 	net->m_phaseGraph.setXMin(freq);
 }
 
-void NetworkAnalyzer_API::setMaxFreq(double freq) {
+void NetworkAnalyzer_API::setMaxFreq(double freq)
+{
 	net->startStopRange->setStopValue(freq);
 	net->m_dBgraph.setXMax(freq);
 	net->m_phaseGraph.setXMax(freq);
@@ -41,27 +43,31 @@ double NetworkAnalyzer_API::getMinPhase() const { return net->phaseMin->value();
 
 double NetworkAnalyzer_API::getMaxPhase() const { return net->phaseMax->value(); }
 
-void NetworkAnalyzer_API::setMinMag(double val) {
+void NetworkAnalyzer_API::setMinMag(double val)
+{
 	net->magMin->setValue(val);
 	net->m_dBgraph.setYMin(val);
 	net->ui->xygraph->setMin(val);
 	net->ui->nicholsgraph->setYMin(val);
 }
 
-void NetworkAnalyzer_API::setMaxMag(double val) {
+void NetworkAnalyzer_API::setMaxMag(double val)
+{
 	net->magMax->setValue(val);
 	net->m_dBgraph.setYMax(val);
 	net->ui->xygraph->setMax(val);
 	net->ui->nicholsgraph->setYMax(val);
 }
 
-void NetworkAnalyzer_API::setMinPhase(double val) {
+void NetworkAnalyzer_API::setMinPhase(double val)
+{
 	net->phaseMin->setValue(val);
 	net->m_phaseGraph.setYMin(val);
 	net->ui->nicholsgraph->setXMin(val);
 }
 
-void NetworkAnalyzer_API::setMaxPhase(double val) {
+void NetworkAnalyzer_API::setMaxPhase(double val)
+{
 	net->phaseMax->setValue(val);
 	net->m_phaseGraph.setYMax(val);
 	net->ui->nicholsgraph->setXMax(val);
@@ -71,14 +77,16 @@ bool NetworkAnalyzer_API::isLogFreq() const { return net->ui->btnIsLog->isChecke
 
 void NetworkAnalyzer_API::setLogFreq(bool is_log) { net->ui->btnIsLog->setChecked(is_log); }
 
-int NetworkAnalyzer_API::getRefChannel() const {
+int NetworkAnalyzer_API::getRefChannel() const
+{
 	if (net->ui->btnRefChn->isChecked())
 		return 1;
 	else
 		return 2;
 }
 
-void NetworkAnalyzer_API::setRefChannel(int chn) {
+void NetworkAnalyzer_API::setRefChannel(int chn)
+{
 	if (chn == 1)
 		net->ui->btnRefChn->setChecked(true);
 	else
@@ -89,12 +97,14 @@ bool NetworkAnalyzer_API::getCursors() const { return net->d_cursorsEnabled; }
 
 void NetworkAnalyzer_API::setCursors(bool enabled) { net->ui->boxCursors->setChecked(enabled); }
 
-bool NetworkAnalyzer_API::running() const {
+bool NetworkAnalyzer_API::running() const
+{
 	return net->ui->runSingleWidget->runButtonChecked() || net->ui->runSingleWidget->singleButtonChecked();
 }
 void NetworkAnalyzer_API::run(bool enabled) { net->ui->runSingleWidget->toggle(enabled); }
 
-int NetworkAnalyzer_API::getCursorsPosition() const {
+int NetworkAnalyzer_API::getCursorsPosition() const
+{
 	if (!net->ui->boxCursors->isChecked()) {
 		return 0;
 	}
@@ -112,7 +122,8 @@ int NetworkAnalyzer_API::getCursorsPosition() const {
 	}
 }
 
-void NetworkAnalyzer_API::setCursorsPosition(int val) {
+void NetworkAnalyzer_API::setCursorsPosition(int val)
+{
 	if (!net->ui->boxCursors->isChecked()) {
 		return;
 	}
@@ -128,14 +139,16 @@ void NetworkAnalyzer_API::setCursorsPosition(int val) {
 	net->m_phaseGraph.replot();
 }
 
-int NetworkAnalyzer_API::getCursorsTransparency() const {
+int NetworkAnalyzer_API::getCursorsTransparency() const
+{
 	if (!net->ui->boxCursors->isChecked()) {
 		return 0;
 	}
 	return net->ui->horizontalSlider->value();
 }
 
-void NetworkAnalyzer_API::setCursorsTransparency(int val) {
+void NetworkAnalyzer_API::setCursorsTransparency(int val)
+{
 	if (!net->ui->boxCursors->isChecked()) {
 		return;
 	}
@@ -150,17 +163,20 @@ void NetworkAnalyzer_API::setPlotType(int val) { net->ui->cmb_graphs->setCurrent
 int NetworkAnalyzer_API::getLineThickness() const { return net->ui->cbLineThickness->currentIndex(); }
 void NetworkAnalyzer_API::setLineThickness(int index) { net->ui->cbLineThickness->setCurrentIndex(index); }
 
-QList<double> NetworkAnalyzer_API::data() const {
+QList<double> NetworkAnalyzer_API::data() const
+{
 	QList<double> list = net->m_dBgraph.getXAxisData().toList();
 	return list;
 }
 
-QList<double> NetworkAnalyzer_API::freq() const {
+QList<double> NetworkAnalyzer_API::freq() const
+{
 	QList<double> list = net->m_dBgraph.getYAxisData().toList();
 	return list;
 }
 
-QList<double> NetworkAnalyzer_API::phase() const {
+QList<double> NetworkAnalyzer_API::phase() const
+{
 	QList<double> list = net->m_phaseGraph.getXAxisData().toList();
 	return list;
 }

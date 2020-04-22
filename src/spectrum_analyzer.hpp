@@ -39,11 +39,12 @@
 #include <QQueue>
 #include <QWidget>
 
-extern "C" {
-struct iio_buffer;
-struct iio_channel;
-struct iio_context;
-struct iio_device;
+extern "C"
+{
+	struct iio_buffer;
+	struct iio_channel;
+	struct iio_context;
+	struct iio_device;
 }
 
 namespace Ui {
@@ -66,7 +67,8 @@ class SpectrumAnalyzer_API;
 class SpectrumChannel_API;
 class SpectrumMarker_API;
 
-class SpectrumAnalyzer : public Tool {
+class SpectrumAnalyzer : public Tool
+{
 	friend class SpectrumChannel_API;
 	friend class SpectrumAnalyzer_API;
 	friend class SpectrumMarker_API;
@@ -75,7 +77,8 @@ class SpectrumAnalyzer : public Tool {
 	Q_OBJECT
 
 public:
-	enum FftWinType {
+	enum FftWinType
+	{
 		FLAT_TOP = 0,
 		RECTANGULAR = 1,
 		TRIANGULAR = 2,
@@ -87,8 +90,8 @@ public:
 
 	typedef boost::shared_ptr<SpectrumChannel> channel_sptr;
 
-	explicit SpectrumAnalyzer(struct iio_context *iio, Filter *filt, std::shared_ptr<GenericAdc> adc,
-				  ToolMenuItem *toolMenuItem, QJSEngine *engine, ToolLauncher *parent);
+	explicit SpectrumAnalyzer(struct iio_context* iio, Filter* filt, std::shared_ptr<GenericAdc> adc,
+				  ToolMenuItem* toolMenuItem, QJSEngine* engine, ToolLauncher* parent);
 	~SpectrumAnalyzer();
 
 	void setNativeDialogs(bool nativeDialogs) override;
@@ -107,8 +110,8 @@ private Q_SLOTS:
 	void on_btnSettings_clicked(bool checked);
 	void on_btnSweep_toggled(bool checked);
 	void on_btnMarkers_toggled(bool checked);
-	void on_comboBox_type_currentIndexChanged(const QString &);
-	void on_comboBox_window_currentIndexChanged(const QString &);
+	void on_comboBox_type_currentIndexChanged(const QString&);
+	void on_comboBox_window_currentIndexChanged(const QString&);
 	void on_spinBox_averaging_valueChanged(int);
 	void runStopToggled(bool);
 	void onChannelSettingsToggled(bool);
@@ -122,7 +125,7 @@ private Q_SLOTS:
 	void on_btnDnAmplPeak_clicked();
 	void on_btnMaxPeak_clicked();
 	void on_cmb_rbw_currentIndexChanged(int index);
-	void on_cmb_units_currentIndexChanged(const QString &);
+	void on_cmb_units_currentIndexChanged(const QString&);
 	void onPlotNewMarkerData();
 	void onPlotMarkerSelected(uint chIdx, uint mkIdx);
 	void onMarkerFreqPosChanged(double);
@@ -159,38 +162,38 @@ private:
 	void add_ref_waveform(unsigned int chIdx);
 	QString getReferenceChannelName() const;
 
-	QList<SpectrumChannel_API *> ch_api;
-	QList<SpectrumMarker_API *> marker_api;
+	QList<SpectrumChannel_API*> ch_api;
+	QList<SpectrumMarker_API*> marker_api;
 
-	QPair<int, int> getGridLayoutPosFromIndex(QGridLayout *layout, int index) const;
+	QPair<int, int> getGridLayoutPosFromIndex(QGridLayout* layout, int index) const;
 
-	QQueue<QPair<CustomPushButton *, bool>> menuButtonActions;
-	QList<CustomPushButton *> menuOrder;
+	QQueue<QPair<CustomPushButton*, bool>> menuButtonActions;
+	QList<CustomPushButton*> menuOrder;
 
 	QVector<QVector<double>> import_data;
 	unsigned int nb_ref_channels;
-	QVector<ChannelWidget *> referenceChannels;
+	QVector<ChannelWidget*> referenceChannels;
 	unsigned int selected_ch_settings;
 	QVector<QStringList> importedChannelDetails;
 
 private:
-	Ui::SpectrumAnalyzer *ui;
-	adiscope::DbClickButtons *marker_selector;
+	Ui::SpectrumAnalyzer* ui;
+	adiscope::DbClickButtons* marker_selector;
 
-	QButtonGroup *settings_group;
-	QButtonGroup *channels_group;
-	FftDisplayPlot *fft_plot;
+	QButtonGroup* settings_group;
+	QButtonGroup* channels_group;
+	FftDisplayPlot* fft_plot;
 
-	PositionSpinButton *range;
-	PositionSpinButton *top;
-	PositionSpinButton *marker_freq_pos;
+	PositionSpinButton* range;
+	PositionSpinButton* top;
+	PositionSpinButton* marker_freq_pos;
 
-	StartStopRangeWidget *startStopRange;
+	StartStopRangeWidget* startStopRange;
 
 	QList<channel_sptr> channels;
 
 	adiscope::scope_sink_f::sptr fft_sink;
-	iio_manager::port_id *fft_ids;
+	iio_manager::port_id* fft_ids;
 
 	boost::shared_ptr<iio_manager> iio;
 	std::shared_ptr<GenericAdc> adc;
@@ -215,15 +218,16 @@ private:
 	static std::vector<std::pair<QString, FftDisplayPlot::AverageType>> avg_types;
 	static std::vector<std::pair<QString, FftWinType>> win_types;
 	static std::vector<QString> markerTypes;
-	void triggerRightMenuToggle(CustomPushButton *btn, bool checked);
-	void toggleRightMenu(CustomPushButton *btn, bool checked);
+	void triggerRightMenuToggle(CustomPushButton* btn, bool checked);
+	void toggleRightMenu(CustomPushButton* btn, bool checked);
 	void updateChannelSettingsPanel(unsigned int id);
-	ChannelWidget *getChannelWidgetAt(unsigned int id);
+	ChannelWidget* getChannelWidgetAt(unsigned int id);
 	void updateMarkerMenu(unsigned int id);
 	bool isIioManagerStarted() const;
 };
 
-class SpectrumChannel : public QObject {
+class SpectrumChannel : public QObject
+{
 	Q_OBJECT
 	friend class SpectrumChannel_API;
 
@@ -231,11 +235,11 @@ public:
 	boost::shared_ptr<adiscope::fft_block> fft_block;
 	gr::blocks::complex_to_mag_squared::sptr ctm_block;
 
-	SpectrumChannel(int id, const QString &name, FftDisplayPlot *plot);
+	SpectrumChannel(int id, const QString& name, FftDisplayPlot* plot);
 
 	int id() const { return m_id; }
 	QString name() const { return m_name; }
-	ChannelWidget *widget() const { return m_widget; }
+	ChannelWidget* widget() const { return m_widget; }
 
 	bool isSettingsOn() const;
 	void setSettingsOn(bool on);
@@ -244,7 +248,7 @@ public:
 	void setLinewidth(float);
 
 	QColor color() const;
-	void setColor(const QColor &);
+	void setColor(const QColor&);
 
 	uint averaging() const;
 	void setAveraging(uint);
@@ -263,11 +267,11 @@ private:
 	uint m_averaging;
 	FftDisplayPlot::AverageType m_avg_type;
 	SpectrumAnalyzer::FftWinType m_fft_win;
-	FftDisplayPlot *m_plot;
-	ChannelWidget *m_widget;
+	FftDisplayPlot* m_plot;
+	ChannelWidget* m_widget;
 
-	float calcCoherentPowerGain(const std::vector<float> &win) const;
-	void scaletFftWindow(std::vector<float> &win, float gain);
+	float calcCoherentPowerGain(const std::vector<float>& win) const;
+	void scaletFftWindow(std::vector<float>& win, float gain);
 
 	static std::vector<float> build_win(SpectrumAnalyzer::FftWinType type, int ntaps);
 };

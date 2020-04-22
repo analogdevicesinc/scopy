@@ -2,7 +2,8 @@
 
 drop_untill_tag_arives::drop_untill_tag_arives(size_t itemsize)
 	: block("drop_untill_tags_arive", gr::io_signature::make(1, 2, itemsize),
-		gr::io_signature::make(1, 2, itemsize)) {
+		gr::io_signature::make(1, 2, itemsize))
+{
 	/* By default there is no reason to further propagate tags */
 	set_tag_propagation_policy(TPP_DONT);
 
@@ -16,28 +17,31 @@ drop_untill_tag_arives::drop_untill_tag_arives(size_t itemsize)
 
 drop_untill_tag_arives::~drop_untill_tag_arives() {}
 
-void drop_untill_tag_arives::reset() {
+void drop_untill_tag_arives::reset()
+{
 	for (size_t i = 0; i < d_copied_items.size(); ++i) {
 		d_copied_items[i] = 0;
 	}
 }
 
-void drop_untill_tag_arives::set_buffer_size(unsigned int buffer_size) {
+void drop_untill_tag_arives::set_buffer_size(unsigned int buffer_size)
+{
 	for (size_t i = 0; i < d_buffer_size.size(); ++i) {
 		d_buffer_size[i] = buffer_size;
 	}
 }
 
-int drop_untill_tag_arives::general_work(int noutput_items, gr_vector_int &ninput_items_,
-					 gr_vector_const_void_star &input_items, gr_vector_void_star &output_items) {
+int drop_untill_tag_arives::general_work(int noutput_items, gr_vector_int& ninput_items_,
+					 gr_vector_const_void_star& input_items, gr_vector_void_star& output_items)
+{
 
 	int processed_items = 0;
 
 	for (int i = 0; i < ninput_items_.size(); ++i) {
 		//		std::cout << "Channel : " << i << std::endl;
 
-		const float *in = static_cast<const float *>(input_items[i]);
-		float *out = static_cast<float *>(output_items[i]);
+		const float* in = static_cast<const float*>(input_items[i]);
+		float* out = static_cast<float*>(output_items[i]);
 
 		int ninput_items = (int)std::min((int)d_buffer_size[i] - (int)d_copied_items[i], noutput_items);
 

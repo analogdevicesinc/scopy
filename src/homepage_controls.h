@@ -28,15 +28,16 @@ class HomepageControls;
 }
 
 namespace adiscope {
-class HomepageControls : public QWidget {
+class HomepageControls : public QWidget
+{
 	Q_OBJECT
 
 public:
-	explicit HomepageControls(QWidget *parent = 0);
+	explicit HomepageControls(QWidget* parent = 0);
 	~HomepageControls();
 
 	void updatePosition();
-	virtual bool eventFilter(QObject *, QEvent *);
+	virtual bool eventFilter(QObject*, QEvent*);
 
 	void enableLeft(bool);
 	void enableRight(bool);
@@ -47,7 +48,7 @@ Q_SIGNALS:
 	void openFile();
 
 private:
-	Ui::HomepageControls *ui;
+	Ui::HomepageControls* ui;
 };
 } // namespace adiscope
 #endif // HOMEPAGE_CONTROLS_H

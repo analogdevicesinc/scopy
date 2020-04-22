@@ -35,17 +35,18 @@ using namespace gr;
 std::map<const std::string, iio_manager::map_entry> iio_manager::dev_map;
 unsigned iio_manager::_id = 0;
 
-iio_manager::iio_manager(unsigned int block_id, struct iio_context *ctx, const std::string &_dev,
+iio_manager::iio_manager(unsigned int block_id, struct iio_context* ctx, const std::string& _dev,
 			 unsigned long _buffer_size)
 	: QObject(nullptr)
 	, top_block("IIO Manager " + std::to_string(block_id))
 	, id(block_id)
 	, _started(false)
-	, buffer_size(_buffer_size) {
+	, buffer_size(_buffer_size)
+{
 	if (!ctx)
 		throw std::runtime_error("IIO context not created");
 
-	struct iio_device *dev = iio_context_find_device(ctx, _dev.c_str());
+	struct iio_device* dev = iio_context_find_device(ctx, _dev.c_str());
 	if (!dev)
 		throw std::runtime_error("Device not found");
 
@@ -72,8 +73,9 @@ iio_manager::iio_manager(unsigned int block_id, struct iio_context *ctx, const s
 
 iio_manager::~iio_manager() {}
 
-boost::shared_ptr<iio_manager> iio_manager::get_instance(struct iio_context *ctx, const std::string &_dev,
-							 unsigned long buffer_size) {
+boost::shared_ptr<iio_manager> iio_manager::get_instance(struct iio_context* ctx, const std::string& _dev,
+							 unsigned long buffer_size)
+{
 	/* Search the dev_map if we already have a manager for the
 	 * given device */
 	if (!dev_map.empty()) {
@@ -102,7 +104,8 @@ boost::shared_ptr<iio_manager> iio_manager::get_instance(struct iio_context *ctx
 }
 
 iio_manager::port_id iio_manager::connect(basic_block_sptr dst, int src_port, int dst_port, bool use_float,
-					  unsigned long _buffer_size) {
+					  unsigned long _buffer_size)
+{
 	std::unique_lock<std::mutex> lock(copy_mutex);
 
 	/* The copy block is used as a valve to turn on/off this
@@ -132,7 +135,8 @@ iio_manager::port_id iio_manager::connect(basic_block_sptr dst, int src_port, in
 	return copy;
 }
 
-void iio_manager::disconnect(iio_manager::port_id copy) {
+void iio_manager::disconnect(iio_manager::port_id copy)
+{
 	std::unique_lock<std::mutex> lock(copy_mutex);
 
 	copy->set_enabled(false);
@@ -148,7 +152,8 @@ void iio_manager::disconnect(iio_manager::port_id copy) {
 	hier_block2::disconnect(copy);
 }
 
-void iio_manager::update_buffer_size_unlocked() {
+void iio_manager::update_buffer_size_unlocked()
+{
 	unsigned long size = 0;
 
 	for (auto it = copy_blocks.begin(); it != copy_blocks.end(); ++it) {
@@ -162,7 +167,8 @@ void iio_manager::update_buffer_size_unlocked() {
 	}
 }
 
-void iio_manager::start(iio_manager::port_id copy) {
+void iio_manager::start(iio_manager::port_id copy)
+{
 	std::unique_lock<std::mutex> lock(copy_mutex);
 
 	if (copy->enabled())
@@ -181,7 +187,8 @@ void iio_manager::start(iio_manager::port_id copy) {
 	_started = true;
 }
 
-void iio_manager::stop(iio_manager::port_id copy) {
+void iio_manager::stop(iio_manager::port_id copy)
+{
 	std::unique_lock<std::mutex> lock(copy_mutex);
 	bool inuse = false;
 
@@ -206,12 +213,14 @@ void iio_manager::stop(iio_manager::port_id copy) {
 	}
 }
 
-void iio_manager::stop_all() {
+void iio_manager::stop_all()
+{
 	for (auto it = copy_blocks.begin(); it != copy_blocks.end(); ++it)
 		stop(it->first);
 }
 
-void iio_manager::connect(gr::basic_block_sptr src, int src_port, gr::basic_block_sptr dst, int dst_port) {
+void iio_manager::connect(gr::basic_block_sptr src, int src_port, gr::basic_block_sptr dst, int dst_port)
+{
 	struct connection entry;
 	entry.src = src;
 	entry.dst = dst;
@@ -222,7 +231,8 @@ void iio_manager::connect(gr::basic_block_sptr src, int src_port, gr::basic_bloc
 	hier_block2::connect(src, src_port, dst, dst_port);
 }
 
-void iio_manager::disconnect(basic_block_sptr src, int src_port, basic_block_sptr dst, int dst_port) {
+void iio_manager::disconnect(basic_block_sptr src, int src_port, basic_block_sptr dst, int dst_port)
+{
 	for (auto it = connections.begin(); it != connections.end(); ++it) {
 		if (it->src == src && it->dst == dst && it->src_port == src_port && it->dst_port == dst_port) {
 			connections.erase(it);
@@ -233,7 +243,8 @@ void iio_manager::disconnect(basic_block_sptr src, int src_port, basic_block_spt
 	hier_block2::disconnect(src, src_port, dst, dst_port);
 }
 
-void iio_manager::del_connection(gr::basic_block_sptr block, bool reverse) {
+void iio_manager::del_connection(gr::basic_block_sptr block, bool reverse)
+{
 	bool found;
 
 	do {
@@ -268,7 +279,8 @@ void iio_manager::del_connection(gr::basic_block_sptr block, bool reverse) {
 		del_connection(block, false);
 }
 
-void iio_manager::set_buffer_size(iio_manager::port_id copy, unsigned long size) {
+void iio_manager::set_buffer_size(iio_manager::port_id copy, unsigned long size)
+{
 	std::unique_lock<std::mutex> lock(copy_mutex);
 
 	for (auto it = copy_blocks.begin(); it != copy_blocks.end(); ++it) {

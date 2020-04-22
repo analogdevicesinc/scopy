@@ -6,8 +6,10 @@
 
 using namespace adiscope;
 
-CustomPlotPositionButton::CustomPlotPositionButton(QWidget *parent)
-	: ColoredQWidget(parent), ui(new Ui::CustomPlotPositionButton) {
+CustomPlotPositionButton::CustomPlotPositionButton(QWidget* parent)
+	: ColoredQWidget(parent)
+	, ui(new Ui::CustomPlotPositionButton)
+{
 	ui->setupUi(this);
 
 	setDynamicProperty(ui->leftTop, "selected", true);
@@ -48,7 +50,8 @@ CustomPlotPositionButton::CustomPlotPositionButton(QWidget *parent)
 
 CustomPlotPositionButton::~CustomPlotPositionButton() { delete ui; }
 
-void CustomPlotPositionButton::setPosition(ReadoutsPosition position) {
+void CustomPlotPositionButton::setPosition(ReadoutsPosition position)
+{
 	switch (position) {
 	case topLeft:
 	default:

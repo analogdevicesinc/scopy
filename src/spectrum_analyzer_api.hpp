@@ -5,7 +5,8 @@
 
 namespace adiscope {
 
-class SpectrumAnalyzer_API : public ApiObject {
+class SpectrumAnalyzer_API : public ApiObject
+{
 	Q_OBJECT
 	Q_PROPERTY(bool running READ running WRITE run STORED false);
 	Q_PROPERTY(bool single READ isSingle WRITE single STORED false);
@@ -22,11 +23,14 @@ class SpectrumAnalyzer_API : public ApiObject {
 	Q_PROPERTY(bool logScale READ getLogScale WRITE setLogScale)
 public:
 	Q_INVOKABLE void show();
-	explicit SpectrumAnalyzer_API(SpectrumAnalyzer *sp) : ApiObject(), sp(sp) {}
+	explicit SpectrumAnalyzer_API(SpectrumAnalyzer* sp)
+		: ApiObject()
+		, sp(sp)
+	{}
 	~SpectrumAnalyzer_API() {}
 
 private:
-	SpectrumAnalyzer *sp;
+	SpectrumAnalyzer* sp;
 	bool running();
 	void run(bool);
 
@@ -64,7 +68,8 @@ private:
 	void setLogScale(bool useLogScale);
 };
 
-class SpectrumChannel_API : public ApiObject {
+class SpectrumChannel_API : public ApiObject
+{
 	Q_OBJECT
 	Q_PROPERTY(bool enabled READ enabled WRITE enable);
 	Q_PROPERTY(int type READ type WRITE setType);
@@ -74,8 +79,11 @@ class SpectrumChannel_API : public ApiObject {
 	Q_PROPERTY(QList<double> freq READ freq STORED false)
 
 public:
-	explicit SpectrumChannel_API(SpectrumAnalyzer *sp, boost::shared_ptr<SpectrumChannel> spch)
-		: ApiObject(), spch(spch), sp(sp) {}
+	explicit SpectrumChannel_API(SpectrumAnalyzer* sp, boost::shared_ptr<SpectrumChannel> spch)
+		: ApiObject()
+		, spch(spch)
+		, sp(sp)
+	{}
 	~SpectrumChannel_API() {}
 
 	bool enabled();
@@ -92,11 +100,12 @@ public:
 	QList<double> freq() const;
 
 private:
-	SpectrumAnalyzer *sp;
+	SpectrumAnalyzer* sp;
 	boost::shared_ptr<SpectrumChannel> spch;
 };
 
-class SpectrumMarker_API : public ApiObject {
+class SpectrumMarker_API : public ApiObject
+{
 	Q_OBJECT
 
 	Q_PROPERTY(int chId READ chId WRITE setChId);
@@ -112,8 +121,13 @@ class SpectrumMarker_API : public ApiObject {
 	int m_type;
 
 public:
-	explicit SpectrumMarker_API(SpectrumAnalyzer *sp, int chid, int mkid)
-		: ApiObject(), sp(sp), m_mkid(mkid), m_chid(chid), m_type(0) {}
+	explicit SpectrumMarker_API(SpectrumAnalyzer* sp, int chid, int mkid)
+		: ApiObject()
+		, sp(sp)
+		, m_mkid(mkid)
+		, m_chid(chid)
+		, m_type(0)
+	{}
 	~SpectrumMarker_API() {}
 
 	int chId();
@@ -136,7 +150,7 @@ public:
 
 	double magnitude();
 
-	SpectrumAnalyzer *sp;
+	SpectrumAnalyzer* sp;
 };
 } // namespace adiscope
 

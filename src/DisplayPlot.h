@@ -66,7 +66,8 @@ namespace adiscope {
 
 class PlotAxisConfiguration;
 
-class ScaleDivisions : public QObject {
+class ScaleDivisions : public QObject
+{
 	Q_OBJECT
 
 public:
@@ -76,23 +77,26 @@ public:
 		, m_power(0.0)
 		, m_magnitude_step(10.0)
 		, m_templateSteps({1, 2, 5})
-		, m_currentStep(m_templateSteps.begin()) {
+		, m_currentStep(m_templateSteps.begin())
+	{
 		updateDivision();
 	}
 
-	ScaleDivisions(const std::vector<double> &steps)
+	ScaleDivisions(const std::vector<double>& steps)
 		: m_divLowerLimit(1E-9)
 		, m_divUpperLimit(1E9)
 		, m_power(0.0)
 		, m_magnitude_step(10.0)
 		, m_templateSteps(steps)
-		, m_currentStep(m_templateSteps.begin()) {
+		, m_currentStep(m_templateSteps.begin())
+	{
 		updateDivision();
 	}
 
 	~ScaleDivisions() {}
 
-	void setDivisioList(const std::vector<double> &newSteps) {
+	void setDivisioList(const std::vector<double>& newSteps)
+	{
 		m_templateSteps = newSteps;
 		m_currentStep = m_templateSteps.begin();
 		updateDivision();
@@ -116,7 +120,8 @@ Q_SIGNALS:
 	void divisionChanged(double division);
 
 public Q_SLOTS:
-	void moveToNextDivision() {
+	void moveToNextDivision()
+	{
 		std::vector<double>::iterator templateStep;
 		int power = m_power;
 
@@ -133,7 +138,8 @@ public Q_SLOTS:
 		}
 	}
 
-	void moveToPreviousDivision() {
+	void moveToPreviousDivision()
+	{
 		std::vector<double>::iterator templateStep;
 		int power = m_power;
 
@@ -159,12 +165,14 @@ private:
 	std::vector<double> m_templateSteps;
 	std::vector<double>::iterator m_currentStep;
 
-	void updateDivision() {
+	void updateDivision()
+	{
 		m_currentDiv = (*m_currentStep) * pow(m_magnitude_step, m_power);
 		Q_EMIT divisionChanged(m_currentDiv);
 	}
 
-	double division(std::vector<double>::iterator step, int power) {
+	double division(std::vector<double>::iterator step, int power)
+	{
 		return ((*step) * pow(m_magnitude_step, power));
 	}
 };
@@ -173,7 +181,8 @@ private:
  * \brief QWidget base plot to build QTGUI plotting tools.
  * \ingroup qtgui_blk
  */
-class DisplayPlot : public PrintablePlot {
+class DisplayPlot : public PrintablePlot
+{
 	Q_OBJECT
 
 	Q_PROPERTY(QColor line_color1 READ getLineColor1 WRITE setLineColor1)
@@ -236,7 +245,7 @@ class DisplayPlot : public PrintablePlot {
 	Q_PROPERTY(int axes_label_font_size READ getAxesLabelFontSize WRITE setAxesLabelFontSize)
 
 public:
-	DisplayPlot(int nplots, QWidget *, unsigned int xNumDivs = 10, unsigned int yNumDivs = 10);
+	DisplayPlot(int nplots, QWidget*, unsigned int xNumDivs = 10, unsigned int yNumDivs = 10);
 	virtual ~DisplayPlot();
 
 	virtual void replot() = 0;
@@ -300,7 +309,7 @@ public:
 
 	void DetachCurve(unsigned int curveIdx);
 	void AttachCurve(unsigned int curveIdx);
-	QwtPlotCurve *Curve(unsigned int curveIdx);
+	QwtPlotCurve* Curve(unsigned int curveIdx);
 
 	void zoomBaseUpdate();
 
@@ -324,7 +333,7 @@ public:
 	// Make sure to create your won PlotNewData method in the derived
 	// class:
 	// void PlotNewData(...);
-	QwtPlotZoomer *getZoomer() const;
+	QwtPlotZoomer* getZoomer() const;
 
 	void bringCurveToFront(unsigned int curveIdx);
 	void enableColoredLabels(bool colored);
@@ -420,7 +429,7 @@ public Q_SLOTS:
 	void setMarkerAlpha8(int);
 	void setMarkerAlpha9(int);
 
-	void printWithNoBackground(const QString &toolName = "", bool editScaleDraw = true);
+	void printWithNoBackground(const QString& toolName = "", bool editScaleDraw = true);
 
 	void setZoomerColor(QColor c);
 	void setPaletteColor(QColor c);
@@ -433,13 +442,13 @@ public Q_SLOTS:
 
 	void setStop(bool on);
 
-	void resizeSlot(QSize *s);
+	void resizeSlot(QSize* s);
 
 	// Because of the preprocessing of slots in QT, these are not
 	// easily separated by the version check. Make one for each
 	// version until it's worked out.
-	void onPickerPointSelected(const QwtDoublePoint &p);
-	void onPickerPointSelected6(const QPointF &p);
+	void onPickerPointSelected(const QwtDoublePoint& p);
+	void onPickerPointSelected6(const QPointF& p);
 
 	unsigned int xAxisNumDiv();
 	unsigned int yAxisNumDiv();
@@ -453,8 +462,8 @@ Q_SIGNALS:
 	void plotPointSelected(const QPointF p);
 
 protected Q_SLOTS:
-	virtual void legendEntryChecked(QwtPlotItem *plotItem, bool on);
-	virtual void legendEntryChecked(const QVariant &plotItem, bool on, int index);
+	virtual void legendEntryChecked(QwtPlotItem* plotItem, bool on);
+	virtual void legendEntryChecked(const QVariant& plotItem, bool on, int index);
 
 	void onHorizAxisOffsetDecrease();
 	void onHorizAxisOffsetIncrease();
@@ -465,24 +474,30 @@ protected Q_SLOTS:
 	void _onYleftAxisWidgetScaleDivChanged();
 
 protected:
-	enum PlotMarker { V1Marker = 0, V2Marker, H1Marker, H2Marker };
+	enum PlotMarker
+	{
+		V1Marker = 0,
+		V2Marker,
+		H1Marker,
+		H2Marker
+	};
 
 	int d_nplots;
-	std::vector<QwtPlotCurve *> d_plot_curve;
+	std::vector<QwtPlotCurve*> d_plot_curve;
 
 	QString d_yAxisUnit;
 	QString d_xAxisUnit;
 
-	QwtPlotPanner *d_panner;
-	QVector<QwtPlotZoomer *> d_zoomer;
-	QwtPlotGrid *d_grid;
+	QwtPlotPanner* d_panner;
+	QVector<QwtPlotZoomer*> d_zoomer;
+	QwtPlotGrid* d_grid;
 
-	QwtDblClickPlotPicker *d_picker;
+	QwtDblClickPlotPicker* d_picker;
 
-	std::vector<PlotAxisConfiguration *> vertAxes;
-	PlotAxisConfiguration *horizAxis;
+	std::vector<PlotAxisConfiguration*> vertAxes;
+	PlotAxisConfiguration* horizAxis;
 
-	QVector<QwtPlotScaleItem *> scaleItems;
+	QVector<QwtPlotScaleItem*> scaleItems;
 
 	int64_t d_numPoints;
 
@@ -521,32 +536,33 @@ private:
 /*
  * OscScaleDraw class overrides the way the major values are being displayed.
  */
-class OscScaleDraw : public QwtScaleDraw {
+class OscScaleDraw : public QwtScaleDraw
+{
 public:
-	OscScaleDraw(const QString &unit_type = "");
-	OscScaleDraw(PrefixFormatter *, const QString &);
+	OscScaleDraw(const QString& unit_type = "");
+	OscScaleDraw(PrefixFormatter*, const QString&);
 	QwtText label(double) const;
 
 	void setFloatPrecision(unsigned int numDigits);
 	unsigned int getFloatPrecison() const;
 
-	void setUnitType(const QString &unit);
+	void setUnitType(const QString& unit);
 	QString getUnitType() const;
 
 	void setColor(QColor color);
 
 	void setDisplayScale(double value);
-	void setFormatter(PrefixFormatter *formatter);
+	void setFormatter(PrefixFormatter* formatter);
 
 	void enableDeltaLabel(bool enable);
 
 protected:
-	virtual void draw(QPainter *, const QPalette &) const;
+	virtual void draw(QPainter*, const QPalette&) const;
 
 private:
 	int m_floatPrecision;
 	QString m_unit;
-	PrefixFormatter *m_formatter;
+	PrefixFormatter* m_formatter;
 	QColor m_color;
 	double m_displayScale;
 	mutable unsigned int m_nrTicks;
@@ -554,10 +570,11 @@ private:
 	bool m_delta;
 };
 
-class OscPlotZoomer : public ExtendingPlotZoomer {
+class OscPlotZoomer : public ExtendingPlotZoomer
+{
 	Q_OBJECT
 public:
-	OscPlotZoomer(QWidget *, bool doReplot = true);
+	OscPlotZoomer(QWidget*, bool doReplot = true);
 
 	void cancel() { reset(); }
 
@@ -576,12 +593,13 @@ private:
 /*
  * PlotAxisConfiguration class holds a group of settings of an axis
  */
-class PlotAxisConfiguration {
+class PlotAxisConfiguration
+{
 public:
-	PlotAxisConfiguration(int axisPos, int axisIdx, DisplayPlot *plot);
+	PlotAxisConfiguration(int axisPos, int axisIdx, DisplayPlot* plot);
 	~PlotAxisConfiguration();
 
-	QwtAxisId &axis();
+	QwtAxisId& axis();
 
 	void setPtsPerDiv(double value);
 	double ptsPerDiv();
@@ -595,11 +613,11 @@ public:
 
 private:
 	QwtAxisId d_axis;
-	DisplayPlot *d_plot;
+	DisplayPlot* d_plot;
 
 	Qt::CursorShape d_hoverCursorShape;
 
-	OscAdjuster *d_mouseGestures;
+	OscAdjuster* d_mouseGestures;
 
 	double d_ptsPerDiv;
 	double d_offset;
@@ -609,20 +627,22 @@ private:
  * EdgelessPlotScaleItem class ensures that the first and last major ticks are
  * ignored
  */
-class EdgelessPlotScaleItem : public QwtPlotScaleItem {
+class EdgelessPlotScaleItem : public QwtPlotScaleItem
+{
 public:
 	explicit EdgelessPlotScaleItem(QwtScaleDraw::Alignment = QwtScaleDraw::BottomScale, const double pos = 0.0);
-	virtual void updateScaleDiv(const QwtScaleDiv &, const QwtScaleDiv &);
+	virtual void updateScaleDiv(const QwtScaleDiv&, const QwtScaleDiv&);
 };
 
 /*
  * EdgelessPlotGrid class ensures that the first and last major ticks are
  * ignored
  */
-class EdgelessPlotGrid : public QwtPlotGrid {
+class EdgelessPlotGrid : public QwtPlotGrid
+{
 public:
 	explicit EdgelessPlotGrid();
-	virtual void updateScaleDiv(const QwtScaleDiv &, const QwtScaleDiv &);
+	virtual void updateScaleDiv(const QwtScaleDiv&, const QwtScaleDiv&);
 };
 
 } // namespace adiscope

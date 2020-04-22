@@ -30,7 +30,7 @@
 
 using namespace adiscope;
 
-Preferences::Preferences(QWidget *parent)
+Preferences::Preferences(QWidget* parent)
 	: QWidget(parent)
 	, ui(new Ui::Preferences)
 	, sig_gen_periods_nr(2)
@@ -51,7 +51,8 @@ Preferences::Preferences(QWidget *parent)
 	, osc_filtering_enabled(true)
 	, mini_hist_enabled(false)
 	, digital_decoders_enabled(true)
-	, m_initialized(false) {
+	, m_initialized(false)
+{
 	ui->setupUi(this);
 
 	connect(ui->doubleClickCheckBox, &QCheckBox::stateChanged, [=](int state) {
@@ -149,7 +150,8 @@ Preferences::Preferences(QWidget *parent)
 	pref_api->load(settings);
 }
 
-Preferences::~Preferences() {
+Preferences::~Preferences()
+{
 	QString preference_ini_file = getPreferenceIniFile();
 	QSettings settings(preference_ini_file, QSettings::IniFormat);
 	pref_api->save(settings);
@@ -159,7 +161,8 @@ Preferences::~Preferences() {
 
 void Preferences::notifyChange() { Q_EMIT notify(); }
 
-void Preferences::showEvent(QShowEvent *event) {
+void Preferences::showEvent(QShowEvent* event)
+{
 	setDynamicProperty(ui->sigGenNrPeriods, "invalid", false);
 	setDynamicProperty(ui->sigGenNrPeriods, "valid", true);
 
@@ -181,7 +184,8 @@ void Preferences::showEvent(QShowEvent *event) {
 	QWidget::showEvent(event);
 }
 
-QString Preferences::getPreferenceIniFile() const {
+QString Preferences::getPreferenceIniFile() const
+{
 	QSettings settings;
 	QFileInfo fileInfo(settings.fileName());
 	QString preference_ini_file = fileInfo.absolutePath() + "/Preferences.ini";
@@ -189,7 +193,8 @@ QString Preferences::getPreferenceIniFile() const {
 	return preference_ini_file;
 }
 
-void Preferences::resetScopy() {
+void Preferences::resetScopy()
+{
 	QMessageBox msgBox;
 	msgBox.setText("By resetting scopy you will lose the current configuration!");
 	msgBox.setInformativeText("Do you want to reset?");
@@ -247,7 +252,8 @@ void Preferences::setOsc_labels_enabled(bool value) { osc_labels_enabled = value
 
 bool Preferences::getExternal_script_enabled() const { return external_script_enabled; }
 
-void Preferences::setExternal_script_enabled(bool value) {
+void Preferences::setExternal_script_enabled(bool value)
+{
 	external_script_enabled = value;
 	ui->extScriptCheckBox->setChecked(external_script_enabled);
 	Q_EMIT notify();
@@ -255,13 +261,15 @@ void Preferences::setExternal_script_enabled(bool value) {
 
 bool Preferences::getManual_calib_script_enabled() const { return manual_calib_script_enabled; }
 
-void Preferences::setManual_calib_script_enabled(bool value) {
+void Preferences::setManual_calib_script_enabled(bool value)
+{
 	manual_calib_script_enabled = value;
 	ui->manualCalibCheckBox->setChecked(manual_calib_script_enabled);
 	Q_EMIT notify();
 }
 
-void Preferences::setDebugger_enabled(bool value) {
+void Preferences::setDebugger_enabled(bool value)
+{
 	debugger_enabled = value;
 	if (debugger_enabled) {
 		ui->extScriptWidget->show();
@@ -271,7 +279,8 @@ void Preferences::setDebugger_enabled(bool value) {
 	setExternal_script_enabled(external_script_enabled);
 }
 
-void Preferences::setManual_calib_enabled(bool value) {
+void Preferences::setManual_calib_enabled(bool value)
+{
 	manual_calib_enabled = value;
 	if (manual_calib_enabled) {
 		ui->manualCalibWidget->show();
@@ -291,61 +300,63 @@ void Preferences::setOsc_graticule_enabled(bool value) { graticule_enabled = val
 
 bool Preferences_API::getAnimationsEnabled() const { return preferencePanel->animations_enabled; }
 
-void Preferences_API::setAnimationsEnabled(const bool &enabled) { preferencePanel->animations_enabled = enabled; }
+void Preferences_API::setAnimationsEnabled(const bool& enabled) { preferencePanel->animations_enabled = enabled; }
 
 bool Preferences_API::getOscLabelsEnabled() const { return preferencePanel->osc_labels_enabled; }
 
-void Preferences_API::setOscLabelsEnabled(const bool &enabled) { preferencePanel->osc_labels_enabled = enabled; }
+void Preferences_API::setOscLabelsEnabled(const bool& enabled) { preferencePanel->osc_labels_enabled = enabled; }
 
 int Preferences_API::getSigGenNrPeriods() const { return preferencePanel->sig_gen_periods_nr; }
 
-void Preferences_API::setSigGenNrPeriods(const int &periods) { preferencePanel->sig_gen_periods_nr = periods; }
+void Preferences_API::setSigGenNrPeriods(const int& periods) { preferencePanel->sig_gen_periods_nr = periods; }
 
 bool Preferences_API::getSaveSession() const { return preferencePanel->save_session_on_exit; }
 
-void Preferences_API::setSaveSession(const bool &enabled) { preferencePanel->save_session_on_exit = enabled; }
+void Preferences_API::setSaveSession(const bool& enabled) { preferencePanel->save_session_on_exit = enabled; }
 
 bool Preferences_API::getDoubleClickToDetach() const { return preferencePanel->double_click_to_detach; }
 
-void Preferences_API::setDoubleClickToDetach(const bool &enabled) { preferencePanel->double_click_to_detach = enabled; }
+void Preferences_API::setDoubleClickToDetach(const bool& enabled) { preferencePanel->double_click_to_detach = enabled; }
 
 bool Preferences_API::getNaShowZero() const { return preferencePanel->na_show_zero; }
 
-void Preferences_API::setNaShowZero(const bool &enabled) { preferencePanel->na_show_zero = enabled; }
+void Preferences_API::setNaShowZero(const bool& enabled) { preferencePanel->na_show_zero = enabled; }
 
 bool Preferences_API::getSpectrumVisiblePeakSearch() const { return preferencePanel->spectrum_visible_peak_search; }
 
-void Preferences_API::setSpectrumVisiblePeakSearch(const bool &enabled) {
+void Preferences_API::setSpectrumVisiblePeakSearch(const bool& enabled)
+{
 	preferencePanel->spectrum_visible_peak_search = enabled;
 }
 
 bool Preferences_API::getAdvancedDeviceInfo() const { return preferencePanel->advanced_device_info; }
 
-void Preferences_API::setAdvancedDeviceInfo(const bool &enabled) { preferencePanel->advanced_device_info = enabled; }
+void Preferences_API::setAdvancedDeviceInfo(const bool& enabled) { preferencePanel->advanced_device_info = enabled; }
 
 bool Preferences_API::getUserNotesActive() const { return preferencePanel->user_notes_active; }
 
-void Preferences_API::setUserNotesActive(const bool &enabled) { preferencePanel->user_notes_active = enabled; }
+void Preferences_API::setUserNotesActive(const bool& enabled) { preferencePanel->user_notes_active = enabled; }
 
 bool Preferences_API::getGraticuleEnabled() const { return preferencePanel->graticule_enabled; }
-void Preferences_API::setGraticuleEnabled(const bool &enabled) { preferencePanel->graticule_enabled = enabled; }
+void Preferences_API::setGraticuleEnabled(const bool& enabled) { preferencePanel->graticule_enabled = enabled; }
 
 bool Preferences_API::getExternalScript() const { return preferencePanel->external_script_enabled; }
-void Preferences_API::setExternalScript(const bool &enabled) { preferencePanel->external_script_enabled = enabled; }
+void Preferences_API::setExternalScript(const bool& enabled) { preferencePanel->external_script_enabled = enabled; }
 
 bool Preferences_API::getManualCalibScript() const { return preferencePanel->manual_calib_script_enabled; }
 
-void Preferences_API::setManualCalibScript(const bool &enabled) {
+void Preferences_API::setManualCalibScript(const bool& enabled)
+{
 	preferencePanel->manual_calib_script_enabled = enabled;
 }
 
 bool Preferences_API::getOscFilteringEnabled() const { return preferencePanel->osc_filtering_enabled; }
 
-void Preferences_API::setOscFilteringEnabled(const bool &enabled) { preferencePanel->osc_filtering_enabled = enabled; }
+void Preferences_API::setOscFilteringEnabled(const bool& enabled) { preferencePanel->osc_filtering_enabled = enabled; }
 
 bool Preferences_API::getMiniHist() const { return preferencePanel->mini_hist_enabled; }
 
-void Preferences_API::setMiniHist(const bool &enabled) { preferencePanel->mini_hist_enabled = enabled; }
+void Preferences_API::setMiniHist(const bool& enabled) { preferencePanel->mini_hist_enabled = enabled; }
 
 bool Preferences_API::getDigitalDecoders() const { return preferencePanel->digital_decoders_enabled; }
 

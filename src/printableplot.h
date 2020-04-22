@@ -29,20 +29,21 @@
 #include <QWidget>
 
 namespace adiscope {
-class PrintablePlot : public QwtPlot {
+class PrintablePlot : public QwtPlot
+{
 	Q_OBJECT
 public:
-	PrintablePlot(QWidget *parent);
+	PrintablePlot(QWidget* parent);
 
 	void dropBackground(bool drop);
 	void setUseNativeDialog(bool nativeDialog);
 
 public Q_SLOTS:
-	void printPlot(const QString &toolName = "");
+	void printPlot(const QString& toolName = "");
 
 private:
 	QwtPlotRenderer d_plotRenderer;
-	QwtLegend *legendDisplay;
+	QwtLegend* legendDisplay;
 	bool d_useNativeDialog;
 };
 } // namespace adiscope

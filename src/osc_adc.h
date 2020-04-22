@@ -8,28 +8,32 @@
 #include <map>
 #include <memory>
 
-extern "C" {
-struct iio_context;
-struct iio_device;
-struct iio_channel;
+extern "C"
+{
+	struct iio_context;
+	struct iio_device;
+	struct iio_channel;
 }
 
 namespace adiscope {
 
 class HardwareTrigger;
 
-class IioUtils {
+class IioUtils
+{
 public:
-	static QStringList available_options_list(struct iio_device *dev, const char *attr_name);
-	static QList<struct iio_channel *> scan_elem_channel_list(struct iio_device *dev);
-	static QList<struct iio_channel *> pick_channels_with_direction(const QList<struct iio_channel *> &list,
-									bool output);
-	static std::string hardware_revision(struct iio_context *);
+	static QStringList available_options_list(struct iio_device* dev, const char* attr_name);
+	static QList<struct iio_channel*> scan_elem_channel_list(struct iio_device* dev);
+	static QList<struct iio_channel*> pick_channels_with_direction(const QList<struct iio_channel*>& list,
+								       bool output);
+	static std::string hardware_revision(struct iio_context*);
 };
 
-class GenericAdc {
+class GenericAdc
+{
 public:
-	struct Settings {
+	struct Settings
+	{
 		double sample_rate;
 
 		virtual ~Settings() {}
@@ -38,15 +42,15 @@ public:
 	typedef std::unique_ptr<GenericAdc::Settings> settings_uptr;
 
 public:
-	GenericAdc(struct iio_context *ctx, struct iio_device *adc_dev);
+	GenericAdc(struct iio_context* ctx, struct iio_device* adc_dev);
 	virtual ~GenericAdc();
 
-	struct iio_context *iio_context() const;
-	struct iio_device *iio_adc_dev() const;
+	struct iio_context* iio_context() const;
+	struct iio_device* iio_adc_dev() const;
 	std::shared_ptr<HardwareTrigger> getTrigger() const;
 
 	uint numAdcChannels() const;
-	QList<struct iio_channel *> adcChannelList() const;
+	QList<struct iio_channel*> adcChannelList() const;
 	uint numAdcBits() const;
 
 	double sampleRate() const;
@@ -59,33 +63,36 @@ public:
 	virtual double convVoltsDiffToSampleDiff(uint chnIdx, double v) const;
 
 	virtual std::unique_ptr<Settings> getCurrentHwSettings();
-	virtual void setHwSettings(Settings *settings);
+	virtual void setHwSettings(Settings* settings);
 
 protected:
 	std::shared_ptr<HardwareTrigger> m_trigger;
-	struct iio_context *m_ctx;
-	struct iio_device *m_adc;
-	QList<struct iio_channel *> m_adc_channels;
+	struct iio_context* m_ctx;
+	struct iio_device* m_adc;
+	QList<struct iio_channel*> m_adc_channels;
 
 private:
 	uint m_adc_bits;
 	double m_sample_rate;
 };
 
-class M2kAdc : public GenericAdc {
+class M2kAdc : public GenericAdc
+{
 public:
-	enum GainMode {
+	enum GainMode
+	{
 		LOW_GAIN_MODE = 0,
 		HIGH_GAIN_MODE = 1,
 	};
 
-	struct M2KSettings : public Settings {
+	struct M2KSettings : public Settings
+	{
 		QList<GainMode> channel_hw_gain_mode;
 		QList<double> channel_hw_offset;
 	};
 
 public:
-	M2kAdc(struct iio_context *, struct iio_device *adc_dev);
+	M2kAdc(struct iio_context*, struct iio_device* adc_dev);
 	~M2kAdc();
 
 	void apply_m2k_fixes();
@@ -123,11 +130,11 @@ public:
 	virtual double convVoltsDiffToSampleDiff(uint chnIdx, double v) const;
 
 	virtual std::unique_ptr<struct Settings> getCurrentHwSettings();
-	virtual void setHwSettings(struct Settings *settings);
+	virtual void setHwSettings(struct Settings* settings);
 
 private:
-	QList<struct iio_channel *> m_offset_channels;
-	QList<struct iio_channel *> m_gain_channels;
+	QList<struct iio_channel*> m_offset_channels;
+	QList<struct iio_channel*> m_gain_channels;
 
 	QList<double> m_availSampRates;
 	std::map<double, double> m_filt_comp_table;
@@ -140,14 +147,17 @@ private:
 	double m2k_sample_rate;
 };
 
-class AdcBuilder {
+class AdcBuilder
+{
 public:
-	enum AdcType {
+	enum AdcType
+	{
 		GENERIC = 0,
 		M2K = 1,
 	};
 
-	static std::shared_ptr<GenericAdc> newAdc(AdcType adc_type, struct iio_context *ctx, struct iio_device *adc) {
+	static std::shared_ptr<GenericAdc> newAdc(AdcType adc_type, struct iio_context* ctx, struct iio_device* adc)
+	{
 		switch (adc_type) {
 		case GENERIC:
 			return std::make_shared<GenericAdc>(ctx, adc);

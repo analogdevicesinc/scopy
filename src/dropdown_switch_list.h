@@ -28,32 +28,33 @@ class QStandardItemModel;
 class QTreeView;
 
 namespace adiscope {
-class DropdownSwitchList : public QComboBox {
+class DropdownSwitchList : public QComboBox
+{
 	Q_OBJECT
 
 public:
-	DropdownSwitchList(int switchColCount = 1, QWidget *parent = 0);
+	DropdownSwitchList(int switchColCount = 1, QWidget* parent = 0);
 
 	QString title() const;
-	void setTitle(const QString &title);
+	void setTitle(const QString& title);
 
 	QString columnTitle(int col) const;
-	void setColumnTitle(int col, const QString &title);
+	void setColumnTitle(int col, const QString& title);
 
 	int switchColumnCount() const;
 
-	void addDropdownElement(const QIcon &, const QString &);
-	void addDropdownElement(const QIcon &, const QString &, const QVariant &user_data);
+	void addDropdownElement(const QIcon&, const QString&);
+	void addDropdownElement(const QIcon&, const QString&, const QVariant& user_data);
 
 	void removeItem(int index);
 	void showPopup() override;
 	void hidePopup() override;
 
 protected Q_SLOTS:
-	void mousePressEvent(QMouseEvent *event);
-	void mouseReleaseEvent(QMouseEvent *event);
-	void enterEvent(QEvent *event);
-	void leaveEvent(QEvent *event);
+	void mousePressEvent(QMouseEvent* event);
+	void mouseReleaseEvent(QMouseEvent* event);
+	void enterEvent(QEvent* event);
+	void leaveEvent(QEvent* event);
 
 private Q_SLOTS:
 	void resetIndex(int);
@@ -62,13 +63,13 @@ private:
 	QString m_title;
 	int m_rows;
 	int m_columns;
-	QStandardItemModel *m_model;
-	QTreeView *m_treeView;
+	QStandardItemModel* m_model;
+	QTreeView* m_treeView;
 	QStringList m_colTitles;
 	bool m_popVisible;
 	bool m_mouseInside;
 	bool m_mousePressed;
-	ComboBoxLineEdit *m_lineEdit;
+	ComboBoxLineEdit* m_lineEdit;
 };
 } // namespace adiscope
 

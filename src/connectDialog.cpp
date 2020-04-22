@@ -32,7 +32,11 @@
 
 using namespace adiscope;
 
-ConnectDialog::ConnectDialog(QWidget *widget) : QWidget(widget), ui(new Ui::Connect), connected(false) {
+ConnectDialog::ConnectDialog(QWidget* widget)
+	: QWidget(widget)
+	, ui(new Ui::Connect)
+	, connected(false)
+{
 	ui->setupUi(this);
 	ui->connectBtn->setText("Connect");
 	// The connect button will be disabled untill we write something in the
@@ -41,8 +45,8 @@ ConnectDialog::ConnectDialog(QWidget *widget) : QWidget(widget), ui(new Ui::Conn
 
 	connect(ui->connectBtn, SIGNAL(clicked()), this, SLOT(btnClicked()));
 	connect(ui->hostname, SIGNAL(returnPressed()), this, SLOT(btnClicked()));
-	connect(ui->hostname, SIGNAL(textChanged(const QString &)), this, SLOT(discardSettings()));
-	connect(this, SIGNAL(finished(struct iio_context *)), this, SLOT(updatePopUp(struct iio_context *)));
+	connect(ui->hostname, SIGNAL(textChanged(const QString&)), this, SLOT(discardSettings()));
+	connect(this, SIGNAL(finished(struct iio_context*)), this, SLOT(updatePopUp(struct iio_context*)));
 	ui->hostname->activateWindow();
 	ui->hostname->setFocus();
 	setDynamicProperty(ui->hostname, "invalid", false);
@@ -52,7 +56,8 @@ ConnectDialog::ConnectDialog(QWidget *widget) : QWidget(widget), ui(new Ui::Conn
 
 ConnectDialog::~ConnectDialog() { delete ui; }
 
-void ConnectDialog::btnClicked() {
+void ConnectDialog::btnClicked()
+{
 	if (!ui->connectBtn->isEnabled()) {
 		return;
 	} else {
@@ -67,7 +72,8 @@ void ConnectDialog::btnClicked() {
 	}
 }
 
-void ConnectDialog::discardSettings() {
+void ConnectDialog::discardSettings()
+{
 	if (!ui->hostname->text().isEmpty()) {
 		ui->connectBtn->setDisabled(false);
 	} else {
@@ -85,7 +91,8 @@ void ConnectDialog::discardSettings() {
 	this->connected = false;
 }
 
-void ConnectDialog::validateInput() {
+void ConnectDialog::validateInput()
+{
 	ui->connectBtn->setDisabled(true);
 
 	QString new_uri = "ip:" + ui->hostname->text();
@@ -93,17 +100,19 @@ void ConnectDialog::validateInput() {
 	QtConcurrent::run(std::bind(&ConnectDialog::createContext, this, new_uri));
 }
 
-void ConnectDialog::createContext(const QString &uri) {
+void ConnectDialog::createContext(const QString& uri)
+{
 
 	this->parent()->installEventFilter(this);
 
-	struct iio_context *ctx_from_uri = iio_create_context_from_uri(uri.toStdString().c_str());
+	struct iio_context* ctx_from_uri = iio_create_context_from_uri(uri.toStdString().c_str());
 
 	this->parent()->removeEventFilter(this);
 
 	Q_EMIT finished(ctx_from_uri);
 }
-void ConnectDialog::updatePopUp(struct iio_context *ctx) {
+void ConnectDialog::updatePopUp(struct iio_context* ctx)
+{
 	this->ui->hostname->setDisabled(false);
 	this->connected = !!ctx;
 
@@ -125,7 +134,8 @@ void ConnectDialog::updatePopUp(struct iio_context *ctx) {
 		ui->description->setText("Error: Unable to find host: No such host is known!");
 	}
 }
-bool ConnectDialog::eventFilter(QObject *watched, QEvent *event) {
+bool ConnectDialog::eventFilter(QObject* watched, QEvent* event)
+{
 	if (event->type() == QEvent::MouseButtonPress || event->type() == QEvent::MouseButtonDblClick ||
 	    event->type() == QEvent::MouseButtonRelease) {
 		return true;

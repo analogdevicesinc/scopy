@@ -21,7 +21,9 @@
 
 using namespace adiscope;
 
-ImportSettings::ImportSettings(QWidget *parent) : ExportSettings(parent) {
+ImportSettings::ImportSettings(QWidget* parent)
+	: ExportSettings(parent)
+{
 	getExportButton()->setVisible(false);
 	exportChannels->setColumnTitle(1, "Import");
 	setTitleLabelVisible(false);

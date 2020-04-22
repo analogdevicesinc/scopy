@@ -24,7 +24,11 @@
 
 using namespace adiscope;
 
-Sismograph::Sismograph(QWidget *parent) : QwtPlot(parent), curve("data"), sampleRate(10.0) {
+Sismograph::Sismograph(QWidget* parent)
+	: QwtPlot(parent)
+	, curve("data")
+	, sampleRate(10.0)
+{
 	enableAxis(QwtPlot::xBottom, false);
 	enableAxis(QwtPlot::xTop, true);
 
@@ -37,7 +41,7 @@ Sismograph::Sismograph(QWidget *parent) : QwtPlot(parent), curve("data"), sample
 	setAxisScale(QwtPlot::xTop, -0.1, +0.1);
 
 	QVector<QwtScaleDiv> divs;
-	QwtScaleEngine *engine = axisScaleEngine(QwtPlot::xTop);
+	QwtScaleEngine* engine = axisScaleEngine(QwtPlot::xTop);
 	divs.push_back(engine->divideScale(-0.1, +0.1, 5, 5));
 	divs.push_back(engine->divideScale(-1.0, +1.0, 5, 5));
 	divs.push_back(engine->divideScale(-5.0, +5.0, 10, 2));
@@ -57,7 +61,8 @@ Sismograph::Sismograph(QWidget *parent) : QwtPlot(parent), curve("data"), sample
 
 Sismograph::~Sismograph() { delete scaler; }
 
-void Sismograph::plot(double sample) {
+void Sismograph::plot(double sample)
+{
 	if (xdata.size() == numSamples + 1)
 		xdata.pop();
 
@@ -70,7 +75,8 @@ void Sismograph::plot(double sample) {
 
 int Sismograph::getNumSamples() const { return numSamples; }
 
-void Sismograph::setNumSamples(int num) {
+void Sismograph::setNumSamples(int num)
+{
 	numSamples = (unsigned int)num;
 
 	reset();
@@ -87,18 +93,20 @@ void Sismograph::setNumSamples(int num) {
 
 double Sismograph::getSampleRate() const { return sampleRate; }
 
-void Sismograph::setSampleRate(double rate) {
+void Sismograph::setSampleRate(double rate)
+{
 	sampleRate = rate;
 
 	for (unsigned int i = 0; i <= numSamples; i++)
 		ydata[i] = (double)(numSamples - i) / sampleRate;
 }
 
-void Sismograph::reset() {
+void Sismograph::reset()
+{
 	xdata.clear();
 	scaler->startTimer();
 }
 
-void Sismograph::setColor(const QColor &color) { curve.setPen(QPen(color)); }
+void Sismograph::setColor(const QColor& color) { curve.setPen(QPen(color)); }
 
 void Sismograph::updateScale(const QwtScaleDiv div) { setAxisScale(QwtPlot::xTop, div.lowerBound(), div.upperBound()); }

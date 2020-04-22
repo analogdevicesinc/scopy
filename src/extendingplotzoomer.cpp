@@ -4,12 +4,13 @@
 
 using namespace adiscope;
 
-ExtendingPlotZoomer::ExtendingPlotZoomer(QWidget *parent, bool doReplot)
+ExtendingPlotZoomer::ExtendingPlotZoomer(QWidget* parent, bool doReplot)
 	: LimitedPlotZoomer(parent, doReplot)
 	, widthPass(false)
 	, heightPass(false)
 	, extendWidth(false)
-	, extendHeight(false) {
+	, extendHeight(false)
+{
 	extendMarkers.push_back(new QwtPlotShapeItem());
 	extendMarkers.push_back(new QwtPlotShapeItem());
 
@@ -19,7 +20,8 @@ ExtendingPlotZoomer::ExtendingPlotZoomer(QWidget *parent, bool doReplot)
 	cornerMarkers.push_back(new QwtPlotShapeItem());
 }
 
-ExtendingPlotZoomer::~ExtendingPlotZoomer() {
+ExtendingPlotZoomer::~ExtendingPlotZoomer()
+{
 	for (auto it = extendMarkers.begin(); it != extendMarkers.end(); ++it) {
 		delete *it;
 	}
@@ -29,7 +31,8 @@ ExtendingPlotZoomer::~ExtendingPlotZoomer() {
 	}
 }
 
-void ExtendingPlotZoomer::zoom(const QRectF &rect) {
+void ExtendingPlotZoomer::zoom(const QRectF& rect)
+{
 	widthPass = false;
 	heightPass = false;
 	extendHeight = false;
@@ -44,7 +47,8 @@ void ExtendingPlotZoomer::zoom(const QRectF &rect) {
 	LimitedPlotZoomer::zoom(rect);
 }
 
-QPolygon ExtendingPlotZoomer::adjustedPoints(const QPolygon &points) const {
+QPolygon ExtendingPlotZoomer::adjustedPoints(const QPolygon& points) const
+{
 	QPolygon adjusted;
 	if (points.size() < 2)
 		return points;
@@ -54,7 +58,7 @@ QPolygon ExtendingPlotZoomer::adjustedPoints(const QPolygon &points) const {
 		cornerMarkers[1]->detach();
 		cornerMarkers[2]->detach();
 		cornerMarkers[3]->detach();
-		static_cast<CapturePlot *>((QwtPlot *)plot())->replot();
+		static_cast<CapturePlot*>((QwtPlot*)plot())->replot();
 		return points;
 	}
 
@@ -107,7 +111,7 @@ QPolygon ExtendingPlotZoomer::adjustedPoints(const QPolygon &points) const {
 			extendMarkers[0]->setShape(path1);
 			extendMarkers[0]->setPen(Qt::white, 3, Qt::SolidLine);
 			extendMarkers[0]->setZ(1000);
-			extendMarkers[0]->attach((QwtPlot *)plot());
+			extendMarkers[0]->attach((QwtPlot*)plot());
 
 			QPointF x12 = invTransform(QPoint(points[0].x() - 40, points[0].y()));
 			QPointF x22 = invTransform(QPoint(points[0].x() + 40, points[0].y()));
@@ -119,9 +123,9 @@ QPolygon ExtendingPlotZoomer::adjustedPoints(const QPolygon &points) const {
 			extendMarkers[1]->setShape(path2);
 			extendMarkers[1]->setPen(Qt::white, 3, Qt::SolidLine);
 			extendMarkers[1]->setZ(1000);
-			extendMarkers[1]->attach((QwtPlot *)plot());
+			extendMarkers[1]->attach((QwtPlot*)plot());
 
-			static_cast<CapturePlot *>((QwtPlot *)plot())->replot();
+			static_cast<CapturePlot*>((QwtPlot*)plot())->replot();
 		}
 
 		return adjusted;
@@ -149,7 +153,7 @@ QPolygon ExtendingPlotZoomer::adjustedPoints(const QPolygon &points) const {
 			extendMarkers[0]->setShape(path1);
 			extendMarkers[0]->setPen(Qt::white, 3, Qt::SolidLine);
 			extendMarkers[0]->setZ(1000);
-			extendMarkers[0]->attach((QwtPlot *)plot());
+			extendMarkers[0]->attach((QwtPlot*)plot());
 
 			QPointF x12 = invTransform(QPoint(points[1].x(), points[0].y() - 40));
 			QPointF x22 = invTransform(QPoint(points[1].x(), points[0].y() + 40));
@@ -161,9 +165,9 @@ QPolygon ExtendingPlotZoomer::adjustedPoints(const QPolygon &points) const {
 			extendMarkers[1]->setShape(path2);
 			extendMarkers[1]->setPen(Qt::white, 3, Qt::SolidLine);
 			extendMarkers[1]->setZ(1000);
-			extendMarkers[1]->attach((QwtPlot *)plot());
+			extendMarkers[1]->attach((QwtPlot*)plot());
 
-			static_cast<CapturePlot *>((QwtPlot *)plot())->replot();
+			static_cast<CapturePlot*>((QwtPlot*)plot())->replot();
 		}
 
 		return adjusted;
@@ -225,7 +229,6 @@ QPolygon ExtendingPlotZoomer::adjustedPoints(const QPolygon &points) const {
 			path4.moveTo(bottom4);
 			path4.lineTo(origin4);
 			path4.lineTo(right4);
-
 		} else {
 
 			QPointF origin1 = invTransform(points[0]);
@@ -280,24 +283,24 @@ QPolygon ExtendingPlotZoomer::adjustedPoints(const QPolygon &points) const {
 		cornerMarkers[0]->setShape(path1);
 		cornerMarkers[0]->setPen(Qt::white, 3, Qt::SolidLine);
 		cornerMarkers[0]->setZ(1000);
-		cornerMarkers[0]->attach((QwtPlot *)plot());
+		cornerMarkers[0]->attach((QwtPlot*)plot());
 
 		cornerMarkers[1]->setShape(path2);
 		cornerMarkers[1]->setPen(Qt::white, 3, Qt::SolidLine);
 		cornerMarkers[1]->setZ(1000);
-		cornerMarkers[1]->attach((QwtPlot *)plot());
+		cornerMarkers[1]->attach((QwtPlot*)plot());
 
 		cornerMarkers[2]->setShape(path3);
 		cornerMarkers[2]->setPen(Qt::white, 3, Qt::SolidLine);
 		cornerMarkers[2]->setZ(1000);
-		cornerMarkers[2]->attach((QwtPlot *)plot());
+		cornerMarkers[2]->attach((QwtPlot*)plot());
 
 		cornerMarkers[3]->setShape(path4);
 		cornerMarkers[3]->setPen(Qt::white, 3, Qt::SolidLine);
 		cornerMarkers[3]->setZ(1000);
-		cornerMarkers[3]->attach((QwtPlot *)plot());
+		cornerMarkers[3]->attach((QwtPlot*)plot());
 
-		static_cast<CapturePlot *>((QwtPlot *)plot())->replot();
+		static_cast<CapturePlot*>((QwtPlot*)plot())->replot();
 	}
 	return points;
 }

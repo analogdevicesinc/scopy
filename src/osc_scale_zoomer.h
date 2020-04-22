@@ -25,22 +25,23 @@
 #include <qwt_plot_zoomer.h>
 
 namespace adiscope {
-class OscScaleZoomer : public LimitedPlotZoomer {
+class OscScaleZoomer : public LimitedPlotZoomer
+{
 	Q_OBJECT
 
 	Q_PROPERTY(QColor color READ getColor WRITE setColor);
 
 public:
-	explicit OscScaleZoomer(QWidget *parent);
+	explicit OscScaleZoomer(QWidget* parent);
 	~OscScaleZoomer();
 
 	void cancel();
 
 	QColor getColor() const;
-	void setColor(const QColor &color);
+	void setColor(const QColor& color);
 
 private:
-	QwtText trackerText(const QPoint &pos) const;
+	QwtText trackerText(const QPoint& pos) const;
 };
 } // namespace adiscope
 

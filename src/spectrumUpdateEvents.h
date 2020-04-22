@@ -38,20 +38,21 @@ static const int SpectrumWindowCaptionEventType = 10008;
 static const int SpectrumWindowResetEventType = 10009;
 static const int SpectrumFrequencyRangeEventType = 10010;
 
-class SpectrumUpdateEvent : public QEvent {
+class SpectrumUpdateEvent : public QEvent
+{
 
 public:
-	SpectrumUpdateEvent(const float *fftPoints, const uint64_t numFFTDataPoints, const double *realTimeDomainPoints,
-			    const double *imagTimeDomainPoints, const uint64_t numTimeDomainDataPoints,
+	SpectrumUpdateEvent(const float* fftPoints, const uint64_t numFFTDataPoints, const double* realTimeDomainPoints,
+			    const double* imagTimeDomainPoints, const uint64_t numTimeDomainDataPoints,
 			    const gr::high_res_timer_type dataTimestamp, const bool repeatDataFlag,
 			    const bool lastOfMultipleUpdateFlag, const gr::high_res_timer_type generatedTimestamp,
 			    const int droppedFFTFrames);
 
 	~SpectrumUpdateEvent();
 
-	const float *getFFTPoints() const;
-	const double *getRealTimeDomainPoints() const;
-	const double *getImagTimeDomainPoints() const;
+	const float* getFFTPoints() const;
+	const double* getRealTimeDomainPoints() const;
+	const double* getImagTimeDomainPoints() const;
 	uint64_t getNumFFTDataPoints() const;
 	uint64_t getNumTimeDomainDataPoints() const;
 	gr::high_res_timer_type getDataTimestamp() const;
@@ -62,9 +63,9 @@ public:
 
 protected:
 private:
-	float *_fftPoints;
-	double *_realDataTimeDomainPoints;
-	double *_imagDataTimeDomainPoints;
+	float* _fftPoints;
+	double* _realDataTimeDomainPoints;
+	double* _imagDataTimeDomainPoints;
 	uint64_t _numFFTDataPoints;
 	uint64_t _numTimeDomainDataPoints;
 	gr::high_res_timer_type _dataTimestamp;
@@ -74,9 +75,10 @@ private:
 	int _droppedFFTFrames;
 };
 
-class SpectrumWindowCaptionEvent : public QEvent {
+class SpectrumWindowCaptionEvent : public QEvent
+{
 public:
-	SpectrumWindowCaptionEvent(const QString &);
+	SpectrumWindowCaptionEvent(const QString&);
 	~SpectrumWindowCaptionEvent();
 	QString getLabel();
 
@@ -85,7 +87,8 @@ private:
 	QString _labelString;
 };
 
-class SpectrumWindowResetEvent : public QEvent {
+class SpectrumWindowResetEvent : public QEvent
+{
 public:
 	SpectrumWindowResetEvent();
 	~SpectrumWindowResetEvent();
@@ -94,7 +97,8 @@ protected:
 private:
 };
 
-class SpectrumFrequencyRangeEvent : public QEvent {
+class SpectrumFrequencyRangeEvent : public QEvent
+{
 public:
 	SpectrumFrequencyRangeEvent(const double, const double, const double);
 	~SpectrumFrequencyRangeEvent();
@@ -109,15 +113,16 @@ private:
 	double _stopFrequency;
 };
 
-class TimeUpdateEvent : public QEvent {
+class TimeUpdateEvent : public QEvent
+{
 public:
-	TimeUpdateEvent(const std::vector<double *> &timeDomainPoints, const uint64_t numTimeDomainDataPoints,
-			const std::vector<std::vector<gr::tag_t>> &tags);
+	TimeUpdateEvent(const std::vector<double*>& timeDomainPoints, const uint64_t numTimeDomainDataPoints,
+			const std::vector<std::vector<gr::tag_t>>& tags);
 
 	~TimeUpdateEvent();
 
 	int which() const;
-	const std::vector<double *> getTimeDomainPoints() const;
+	const std::vector<double*> getTimeDomainPoints() const;
 	uint64_t getNumTimeDomainDataPoints() const;
 	bool getRepeatDataFlag() const;
 
@@ -128,18 +133,19 @@ public:
 protected:
 private:
 	size_t _nplots;
-	std::vector<double *> _dataTimeDomainPoints;
+	std::vector<double*> _dataTimeDomainPoints;
 	uint64_t _numTimeDomainDataPoints;
 	std::vector<std::vector<gr::tag_t>> _tags;
 };
 
 /********************************************************************/
 
-class IdentifiableTimeUpdateEvent : public TimeUpdateEvent {
+class IdentifiableTimeUpdateEvent : public TimeUpdateEvent
+{
 public:
-	IdentifiableTimeUpdateEvent(const std::vector<double *> &timeDomainPoints,
+	IdentifiableTimeUpdateEvent(const std::vector<double*>& timeDomainPoints,
 				    const uint64_t numTimeDomainDataPoints,
-				    const std::vector<std::vector<gr::tag_t>> &tags, const std::string &senderName);
+				    const std::vector<std::vector<gr::tag_t>>& tags, const std::string& senderName);
 
 	~IdentifiableTimeUpdateEvent();
 
@@ -152,14 +158,15 @@ private:
 
 /********************************************************************/
 
-class FreqUpdateEvent : public QEvent {
+class FreqUpdateEvent : public QEvent
+{
 public:
-	FreqUpdateEvent(const std::vector<double *> &dataPoints, const uint64_t numDataPoints);
+	FreqUpdateEvent(const std::vector<double*>& dataPoints, const uint64_t numDataPoints);
 
 	~FreqUpdateEvent();
 
 	int which() const;
-	const std::vector<double *> getPoints() const;
+	const std::vector<double*> getPoints() const;
 	uint64_t getNumDataPoints() const;
 	bool getRepeatDataFlag() const;
 
@@ -168,11 +175,12 @@ public:
 protected:
 private:
 	size_t _nplots;
-	std::vector<double *> _dataPoints;
+	std::vector<double*> _dataPoints;
 	uint64_t _numDataPoints;
 };
 
-class SetFreqEvent : public QEvent {
+class SetFreqEvent : public QEvent
+{
 public:
 	SetFreqEvent(const double, const double);
 	~SetFreqEvent();
@@ -186,16 +194,17 @@ private:
 
 /********************************************************************/
 
-class ConstUpdateEvent : public QEvent {
+class ConstUpdateEvent : public QEvent
+{
 public:
-	ConstUpdateEvent(const std::vector<double *> &realDataPoints, const std::vector<double *> &imagDataPoints,
+	ConstUpdateEvent(const std::vector<double*>& realDataPoints, const std::vector<double*>& imagDataPoints,
 			 const uint64_t numDataPoints);
 
 	~ConstUpdateEvent();
 
 	int which() const;
-	const std::vector<double *> getRealPoints() const;
-	const std::vector<double *> getImagPoints() const;
+	const std::vector<double*> getRealPoints() const;
+	const std::vector<double*> getImagPoints() const;
 	uint64_t getNumDataPoints() const;
 	bool getRepeatDataFlag() const;
 
@@ -204,22 +213,23 @@ public:
 protected:
 private:
 	size_t _nplots;
-	std::vector<double *> _realDataPoints;
-	std::vector<double *> _imagDataPoints;
+	std::vector<double*> _realDataPoints;
+	std::vector<double*> _imagDataPoints;
 	uint64_t _numDataPoints;
 };
 
 /********************************************************************/
 
-class WaterfallUpdateEvent : public QEvent {
+class WaterfallUpdateEvent : public QEvent
+{
 public:
-	WaterfallUpdateEvent(const std::vector<double *> &dataPoints, const uint64_t numDataPoints,
+	WaterfallUpdateEvent(const std::vector<double*>& dataPoints, const uint64_t numDataPoints,
 			     const gr::high_res_timer_type dataTimestamp);
 
 	~WaterfallUpdateEvent();
 
 	int which() const;
-	const std::vector<double *> getPoints() const;
+	const std::vector<double*> getPoints() const;
 	uint64_t getNumDataPoints() const;
 	bool getRepeatDataFlag() const;
 
@@ -230,7 +240,7 @@ public:
 protected:
 private:
 	size_t _nplots;
-	std::vector<double *> _dataPoints;
+	std::vector<double*> _dataPoints;
 	uint64_t _numDataPoints;
 
 	gr::high_res_timer_type _dataTimestamp;
@@ -238,13 +248,14 @@ private:
 
 /********************************************************************/
 
-class TimeRasterUpdateEvent : public QEvent {
+class TimeRasterUpdateEvent : public QEvent
+{
 public:
-	TimeRasterUpdateEvent(const std::vector<double *> &dataPoints, const uint64_t numDataPoints);
+	TimeRasterUpdateEvent(const std::vector<double*>& dataPoints, const uint64_t numDataPoints);
 	~TimeRasterUpdateEvent();
 
 	int which() const;
-	const std::vector<double *> getPoints() const;
+	const std::vector<double*> getPoints() const;
 	uint64_t getNumDataPoints() const;
 	bool getRepeatDataFlag() const;
 
@@ -253,20 +264,21 @@ public:
 protected:
 private:
 	size_t _nplots;
-	std::vector<double *> _dataPoints;
+	std::vector<double*> _dataPoints;
 	uint64_t _numDataPoints;
 };
 
 /********************************************************************/
 
-class HistogramUpdateEvent : public QEvent {
+class HistogramUpdateEvent : public QEvent
+{
 public:
-	HistogramUpdateEvent(const std::vector<double *> &points, const uint64_t npoints);
+	HistogramUpdateEvent(const std::vector<double*>& points, const uint64_t npoints);
 
 	~HistogramUpdateEvent();
 
 	int which() const;
-	const std::vector<double *> getDataPoints() const;
+	const std::vector<double*> getDataPoints() const;
 	uint64_t getNumDataPoints() const;
 	bool getRepeatDataFlag() const;
 
@@ -275,15 +287,16 @@ public:
 protected:
 private:
 	size_t _nplots;
-	std::vector<double *> _points;
+	std::vector<double*> _points;
 	uint64_t _npoints;
 };
 
 /********************************************************************/
 
-class NumberUpdateEvent : public QEvent {
+class NumberUpdateEvent : public QEvent
+{
 public:
-	NumberUpdateEvent(const std::vector<float> &samples);
+	NumberUpdateEvent(const std::vector<float>& samples);
 	~NumberUpdateEvent();
 
 	int which() const;

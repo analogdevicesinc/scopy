@@ -23,9 +23,10 @@
 #include <QWidget>
 
 namespace adiscope {
-class ColoredQWidget : public QWidget {
+class ColoredQWidget : public QWidget
+{
 public:
-	explicit ColoredQWidget(QWidget *parent = nullptr);
+	explicit ColoredQWidget(QWidget* parent = nullptr);
 	virtual ~ColoredQWidget();
 };
 } // namespace adiscope

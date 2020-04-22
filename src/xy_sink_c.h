@@ -34,12 +34,13 @@
 
 namespace adiscope {
 
-class xy_sink_c : virtual public gr::sync_block {
+class xy_sink_c : virtual public gr::sync_block
+{
 public:
 	// gr::qtgui::xy_sink_c::sptr
 	typedef boost::shared_ptr<xy_sink_c> sptr;
 
-	static sptr make(int size, const std::string &name, int nconnections = 1, QObject *plot = NULL);
+	static sptr make(int size, const std::string& name, int nconnections = 1, QObject* plot = NULL);
 
 	virtual void exec_() = 0;
 
@@ -49,7 +50,7 @@ public:
 	virtual int nsamps() const = 0;
 	virtual void reset() = 0;
 
-	QApplication *d_qApplication;
+	QApplication* d_qApplication;
 };
 
 } /* namespace adiscope */

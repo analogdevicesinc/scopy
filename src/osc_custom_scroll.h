@@ -7,17 +7,18 @@
 #include <QTimer>
 
 namespace adiscope {
-class OscCustomScrollArea : public QScrollArea {
+class OscCustomScrollArea : public QScrollArea
+{
 	Q_OBJECT
 public:
-	OscCustomScrollArea(QWidget *parent = 0);
+	OscCustomScrollArea(QWidget* parent = 0);
 
 public Q_SLOTS:
-	void enterEvent(QEvent *);
-	void leaveEvent(QEvent *);
+	void enterEvent(QEvent*);
+	void leaveEvent(QEvent*);
 
 private:
-	QScroller *scroll;
+	QScroller* scroll;
 	bool inside;
 	// QScrollBar *bar;
 	bool disableCursor;

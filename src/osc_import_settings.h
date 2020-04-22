@@ -27,11 +27,12 @@ class ExportSettings;
 }
 
 namespace adiscope {
-class ImportSettings : public ExportSettings {
+class ImportSettings : public ExportSettings
+{
 	Q_OBJECT
 
 public:
-	ImportSettings(QWidget *parent = 0);
+	ImportSettings(QWidget* parent = 0);
 	~ImportSettings();
 };
 } // namespace adiscope

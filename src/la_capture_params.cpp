@@ -35,9 +35,11 @@ LogicAnalyzerSymmetricBufferMode::LogicAnalyzerSymmetricBufferMode()
 	, m_sampleRate(0.0)
 	, m_triggPosSR(0.0)
 	, m_visibleBufferSize(0)
-	, m_triggerBufferSize(0) {}
+	, m_triggerBufferSize(0)
+{}
 
-LogicAnalyzerSymmetricBufferMode::capture_parameters LogicAnalyzerSymmetricBufferMode::captureParameters() const {
+LogicAnalyzerSymmetricBufferMode::capture_parameters LogicAnalyzerSymmetricBufferMode::captureParameters() const
+{
 	struct capture_parameters params;
 	double sampleRate;
 	unsigned long bufferSize;
@@ -70,31 +72,36 @@ LogicAnalyzerSymmetricBufferMode::~LogicAnalyzerSymmetricBufferMode() {}
 
 void LogicAnalyzerSymmetricBufferMode::setMaxSampleRate(double value) { m_maxSampleRate = value; }
 
-void LogicAnalyzerSymmetricBufferMode::setEntireBufferMaxSize(unsigned long maxSize) {
+void LogicAnalyzerSymmetricBufferMode::setEntireBufferMaxSize(unsigned long maxSize)
+{
 	m_entireBufferMaxSize = maxSize;
 }
 
-void LogicAnalyzerSymmetricBufferMode::setTriggerBufferMaxSize(unsigned long maxSize) {
+void LogicAnalyzerSymmetricBufferMode::setTriggerBufferMaxSize(unsigned long maxSize)
+{
 	m_triggerBufferMaxSize = maxSize;
 }
 
 void LogicAnalyzerSymmetricBufferMode::setTimeDivisionCount(int count) { m_timeDivsCount = count; }
 
-void LogicAnalyzerSymmetricBufferMode::setTimeBase(double secsPerDiv) {
+void LogicAnalyzerSymmetricBufferMode::setTimeBase(double secsPerDiv)
+{
 	if (m_timeBase != secsPerDiv) {
 		m_timeBase = secsPerDiv;
 		configParamsOnTimeBaseChanged();
 	}
 }
 
-void LogicAnalyzerSymmetricBufferMode::setTriggerPos(double pos) {
+void LogicAnalyzerSymmetricBufferMode::setTriggerPos(double pos)
+{
 	if (m_triggerPos != pos) {
 		m_triggerPos = pos;
 		configParamsOnTriggPosChanged();
 	}
 }
 
-void LogicAnalyzerSymmetricBufferMode::configParamsOnTimeBaseChanged() {
+void LogicAnalyzerSymmetricBufferMode::configParamsOnTimeBaseChanged()
+{
 	double sampleRate;
 
 	// Get highest sample rate
@@ -139,7 +146,8 @@ void LogicAnalyzerSymmetricBufferMode::configParamsOnTimeBaseChanged() {
 	m_current_divider = sr_divider;
 }
 
-void LogicAnalyzerSymmetricBufferMode::configParamsOnTriggPosChanged() {
+void LogicAnalyzerSymmetricBufferMode::configParamsOnTriggPosChanged()
+{
 	m_visibleBufferSize = getVisibleBufferSize(m_sampleRate);
 
 	// The zero value of the trigger position (seconds) starts at the middle

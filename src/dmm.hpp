@@ -46,19 +46,20 @@ namespace adiscope {
 class DMM_API;
 class GenericAdc;
 
-class DMM : public Tool {
+class DMM : public Tool
+{
 	friend class DMM_API;
 	friend class ToolLauncher_API;
 
 	Q_OBJECT
 
 public:
-	explicit DMM(struct iio_context *ctx, Filter *filt, std::shared_ptr<GenericAdc> adc, ToolMenuItem *toolMenuItem,
-		     QJSEngine *engine, ToolLauncher *parent);
+	explicit DMM(struct iio_context* ctx, Filter* filt, std::shared_ptr<GenericAdc> adc, ToolMenuItem* toolMenuItem,
+		     QJSEngine* engine, ToolLauncher* parent);
 	~DMM();
 
 private:
-	Ui::DMM *ui;
+	Ui::DMM* ui;
 	boost::shared_ptr<iio_manager> manager;
 	iio_manager::port_id id_ch1, id_ch2;
 	std::shared_ptr<GenericAdc> adc;
@@ -71,11 +72,11 @@ private:
 	std::thread data_logging_thread;
 	bool use_timer;
 	unsigned long logging_refresh_rate;
-	PositionSpinButton *data_logging_timer;
+	PositionSpinButton* data_logging_timer;
 
 	boost::mutex data_mutex;
 	boost::condition_variable data_cond;
-	MouseWheelWidgetGuard *wheelEventGuard;
+	MouseWheelWidgetGuard* wheelEventGuard;
 
 	std::vector<double> m_min, m_max;
 

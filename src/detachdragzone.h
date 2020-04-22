@@ -10,24 +10,25 @@
 #include <QWidget>
 
 namespace adiscope {
-class DetachDragZone : public ColoredQWidget {
+class DetachDragZone : public ColoredQWidget
+{
 	Q_OBJECT
 
 public:
-	explicit DetachDragZone(QWidget *parent = 0);
+	explicit DetachDragZone(QWidget* parent = 0);
 	~DetachDragZone();
 
-	bool eventFilter(QObject *watched, QEvent *event);
+	bool eventFilter(QObject* watched, QEvent* event);
 
 Q_SIGNALS:
 	void detachWidget(int);
 	void changeText(QString);
 
 private Q_SLOTS:
-	void dragEnterEvent(QDragEnterEvent *event);
-	void dragMoveEvent(QDragMoveEvent *event);
-	void dragLeaveEvent(QDragLeaveEvent *event);
-	void dropEvent(QDropEvent *event);
+	void dragEnterEvent(QDragEnterEvent* event);
+	void dragMoveEvent(QDragMoveEvent* event);
+	void dragLeaveEvent(QDragLeaveEvent* event);
+	void dropEvent(QDropEvent* event);
 };
 } // namespace adiscope
 

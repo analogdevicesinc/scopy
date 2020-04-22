@@ -57,7 +57,8 @@
 using namespace adiscope;
 using namespace gr;
 
-void NetworkAnalyzer::_configureDacFlowgraph() {
+void NetworkAnalyzer::_configureDacFlowgraph()
+{
 	// Create the blocks that are used to generate sine waves
 	top_block = make_top_block("Signal Generator");
 	source_block = analog::sig_source_f::make(1, analog::GR_SIN_WAVE, 1, 1, 1);
@@ -71,7 +72,8 @@ void NetworkAnalyzer::_configureDacFlowgraph() {
 	top_block->connect(head_block, 0, vector_block, 0);
 }
 
-void NetworkAnalyzer::_configureAdcFlowgraph(size_t buffer_size) {
+void NetworkAnalyzer::_configureAdcFlowgraph(size_t buffer_size)
+{
 	if (m_initFlowgraph) {
 
 		capture_top_block = make_top_block("Network capture processing");
@@ -144,9 +146,9 @@ void NetworkAnalyzer::_configureAdcFlowgraph(size_t buffer_size) {
 	m_initFlowgraph = false;
 }
 
-NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt, std::shared_ptr<GenericAdc> &adc_dev,
-				 QList<std::shared_ptr<GenericDac>> dacs, ToolMenuItem *toolMenuItem, QJSEngine *engine,
-				 ToolLauncher *parent)
+NetworkAnalyzer::NetworkAnalyzer(struct iio_context* ctx, Filter* filt, std::shared_ptr<GenericAdc>& adc_dev,
+				 QList<std::shared_ptr<GenericDac>> dacs, ToolMenuItem* toolMenuItem, QJSEngine* engine,
+				 ToolLauncher* parent)
 	: Tool(ctx, toolMenuItem, new NetworkAnalyzer_API(this), "Network Analyzer", parent)
 	, ui(new Ui::NetworkAnalyzer)
 	, adc_dev(adc_dev)
@@ -165,7 +167,8 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt, std::sha
 	, filterDc(false)
 	, m_initFlowgraph(true)
 	, m_hasReference(false)
-	, m_importDataLoaded(false) {
+	, m_importDataLoaded(false)
+{
 	iio = iio_manager::get_instance(ctx, filt->device_name(TOOL_NETWORK_ANALYZER, 2));
 
 	adc = filt->find_device(ctx, TOOL_NETWORK_ANALYZER, 2);
@@ -173,14 +176,14 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt, std::sha
 	dac_channels.push_back(filt->find_channel(ctx, TOOL_NETWORK_ANALYZER, 0, true));
 	dac_channels.push_back(filt->find_channel(ctx, TOOL_NETWORK_ANALYZER, 1, true));
 
-	for (const auto &channel : dac_channels) {
+	for (const auto& channel : dac_channels) {
 		if (!channel) {
 			throw std::runtime_error("Unable to find channels in filter file");
 		}
 	}
 
 	/* FIXME: TODO: Move this into a HW class / lib M2k */
-	struct iio_device *fabric = iio_context_find_device(ctx, "m2k-fabric");
+	struct iio_device* fabric = iio_context_find_device(ctx, "m2k-fabric");
 
 	if (fabric) {
 		this->amp1 = iio_device_find_channel(fabric, "voltage0", true);
@@ -207,7 +210,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt, std::sha
 		&NetworkAnalyzerBufferViewer::sendBufferToOscilloscope);
 
 	connect(ui->runSingleWidget, &RunSingleWidget::toggled, [=](bool checked) {
-		auto btn = dynamic_cast<CustomPushButton *>(runButton());
+		auto btn = dynamic_cast<CustomPushButton*>(runButton());
 		btn->setChecked(checked);
 	});
 	connect(runButton(), &QPushButton::toggled, ui->runSingleWidget, &RunSingleWidget::toggle);
@@ -219,7 +222,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt, std::sha
 			return;
 		}
 
-		dynamic_cast<CustomPushButton *>(this->runButton())->setChecked(false);
+		dynamic_cast<CustomPushButton*>(this->runButton())->setChecked(false);
 	});
 
 	startStopRange = new StartStopRangeWidget(1.0, 25e06);
@@ -239,7 +242,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt, std::sha
 
 	std::vector<unsigned long> rates;
 	rates.resize(dac_channels.size());
-	std::transform(dac_channels.begin(), dac_channels.end(), rates.begin(), [](struct iio_channel *ch) {
+	std::transform(dac_channels.begin(), dac_channels.end(), rates.begin(), [](struct iio_channel* ch) {
 		return SignalGenerator::get_max_sample_rate(iio_channel_get_device(ch));
 	});
 
@@ -475,7 +478,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt, std::sha
 	wheelEventGuard->installEventRecursively(ui->mainWidget);
 
 	connect(ui->btnPrint, &QPushButton::clicked, [=]() {
-		QWidget *widget = ui->stackedWidget->currentWidget();
+		QWidget* widget = ui->stackedWidget->currentWidget();
 		QImage img(widget->width(), widget->height(), QImage::Format_ARGB32);
 		QPainter painter(&img);
 		img.fill(Qt::black);
@@ -566,7 +569,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt, std::sha
 
 			m_hasReference = true;
 			ui->removeReferenceBtn->setEnabled(true);
-		} catch (FileManagerException &e) {
+		} catch (FileManagerException& e) {
 			ui->importFileLineEdit->setText(e.what());
 		}
 	});
@@ -575,7 +578,8 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt, std::sha
 	_configureAdcFlowgraph();
 }
 
-NetworkAnalyzer::~NetworkAnalyzer() {
+NetworkAnalyzer::~NetworkAnalyzer()
+{
 	disconnect(prefPanel, &Preferences::notify, this, &NetworkAnalyzer::readPreferences);
 	startStop(false);
 	ui->runSingleWidget->toggle(false);
@@ -601,13 +605,14 @@ NetworkAnalyzer::~NetworkAnalyzer() {
 	delete ui;
 }
 
-void NetworkAnalyzer::setOscilloscope(Oscilloscope *osc) { bufferPreviewer->setOscilloscope(osc); }
+void NetworkAnalyzer::setOscilloscope(Oscilloscope* osc) { bufferPreviewer->setOscilloscope(osc); }
 
 bool NetworkAnalyzer::isIterationsThreadReady() { return iterationsThreadReady; }
 
 bool NetworkAnalyzer::isIterationsThreadCanceled() { return iterationsThreadCanceled; }
 
-void NetworkAnalyzer::onMinMaxPhaseChanged(double value) {
+void NetworkAnalyzer::onMinMaxPhaseChanged(double value)
+{
 
 	if (QObject::sender() == phaseMin) {
 		double phaseMaxValue = phaseMax->value();
@@ -625,7 +630,8 @@ void NetworkAnalyzer::onMinMaxPhaseChanged(double value) {
 	m_phaseGraph.setYAxisInterval(interval.first, interval.second, 360);
 }
 
-void NetworkAnalyzer::computeIterations() {
+void NetworkAnalyzer::computeIterations()
+{
 	if (iterationsThread) {
 		if (iterationsThread->joinable()) {
 			iterationsThreadCanceled = true;
@@ -645,7 +651,8 @@ void NetworkAnalyzer::computeIterations() {
 	iterationsThread = new boost::thread(boost::bind(&NetworkAnalyzer::computeFrequencyArray, this));
 }
 
-void NetworkAnalyzer::setMinimumDistanceBetween(SpinBoxA *min, SpinBoxA *max, double distance) {
+void NetworkAnalyzer::setMinimumDistanceBetween(SpinBoxA* min, SpinBoxA* max, double distance)
+{
 
 	connect(max, &SpinBoxA::valueChanged, [=](double value) {
 		min->setMaxValue(value - distance);
@@ -657,15 +664,17 @@ void NetworkAnalyzer::setMinimumDistanceBetween(SpinBoxA *min, SpinBoxA *max, do
 	});
 }
 
-void NetworkAnalyzer::triggerRightMenuToggle(CustomPushButton *btn, bool checked) {
+void NetworkAnalyzer::triggerRightMenuToggle(CustomPushButton* btn, bool checked)
+{
 	if (ui->rightMenu->animInProgress()) {
-		menuButtonActions.enqueue(QPair<CustomPushButton *, bool>(btn, checked));
+		menuButtonActions.enqueue(QPair<CustomPushButton*, bool>(btn, checked));
 	} else {
 		toggleRightMenu(btn, checked);
 	}
 }
 
-void NetworkAnalyzer::toggleRightMenu(CustomPushButton *btn, bool checked) {
+void NetworkAnalyzer::toggleRightMenu(CustomPushButton* btn, bool checked)
+{
 	int id = btn->property("id").toInt();
 
 	if (checked) {
@@ -675,7 +684,8 @@ void NetworkAnalyzer::toggleRightMenu(CustomPushButton *btn, bool checked) {
 	ui->rightMenu->toggleMenu(checked);
 }
 
-void NetworkAnalyzer::rightMenuFinished(bool opened) {
+void NetworkAnalyzer::rightMenuFinished(bool opened)
+{
 	Q_UNUSED(opened)
 
 	while (menuButtonActions.size()) {
@@ -684,7 +694,8 @@ void NetworkAnalyzer::rightMenuFinished(bool opened) {
 	}
 }
 
-void NetworkAnalyzer::showEvent(QShowEvent *event) {
+void NetworkAnalyzer::showEvent(QShowEvent* event)
+{
 	d_bottomHandlesArea->setLeftPadding(m_dBgraph.axisWidget(QwtAxisId(QwtPlot::yLeft, 0))->width() +
 					    ui->gridLayout_plots->margin() +
 					    ui->widgetPlotContainer->layout()->margin() + 1);
@@ -697,7 +708,8 @@ void NetworkAnalyzer::showEvent(QShowEvent *event) {
 	Tool::showEvent(event);
 }
 
-void NetworkAnalyzer::on_btnExport_clicked() {
+void NetworkAnalyzer::on_btnExport_clicked()
+{
 	QString fileName = QFileDialog::getSaveFileName(
 		this, tr("Export"), "",
 		tr("Comma-separated values files (*.csv)", "Tab-delimited values files (*.txt)"), nullptr,
@@ -719,7 +731,8 @@ void NetworkAnalyzer::on_btnExport_clicked() {
 	}
 }
 
-void NetworkAnalyzer::updateNumSamples(bool force) {
+void NetworkAnalyzer::updateNumSamples(bool force)
+{
 	unsigned int num_samples;
 
 	if (force) {
@@ -739,7 +752,8 @@ void NetworkAnalyzer::updateNumSamples(bool force) {
 	}
 }
 
-void NetworkAnalyzer::updateGainMode() {
+void NetworkAnalyzer::updateGainMode()
+{
 	auto m2k_adc = std::dynamic_pointer_cast<M2kAdc>(adc_dev);
 
 	int responseGainCmbIndex = ui->responseGainCmb->currentIndex();
@@ -775,12 +789,13 @@ void NetworkAnalyzer::updateGainMode() {
 	}
 }
 
-unsigned long NetworkAnalyzer::_getBestSampleRate(double frequency, const struct iio_device *dev) {
+unsigned long NetworkAnalyzer::_getBestSampleRate(double frequency, const struct iio_device* dev)
+{
 	QVector<unsigned long> values = SignalGenerator::get_available_sample_rates(dev);
 
 	qSort(values.begin(), values.end(), qLess<unsigned long>());
 
-	for (const auto &rate : values) {
+	for (const auto& rate : values) {
 		if (rate == values[0]) {
 			continue;
 		}
@@ -792,7 +807,7 @@ unsigned long NetworkAnalyzer::_getBestSampleRate(double frequency, const struct
 		}
 	}
 
-	for (const auto &rate : values) {
+	for (const auto& rate : values) {
 		if (rate == values[0]) {
 			continue;
 		}
@@ -807,7 +822,8 @@ unsigned long NetworkAnalyzer::_getBestSampleRate(double frequency, const struct
 	return 0;
 }
 
-size_t NetworkAnalyzer::_getSamplesCount(double frequency, unsigned long rate, bool perfect) {
+size_t NetworkAnalyzer::_getSamplesCount(double frequency, unsigned long rate, bool perfect)
+{
 	size_t minBufferSize = SignalGenerator::min_buffer_size;
 	size_t maxBufferSize = 128 * 1024;
 
@@ -847,7 +863,8 @@ size_t NetworkAnalyzer::_getSamplesCount(double frequency, unsigned long rate, b
 	return size;
 }
 
-void NetworkAnalyzer::computeFrequencyArray() {
+void NetworkAnalyzer::computeFrequencyArray()
+{
 	boost::unique_lock<boost::mutex> lock(iterationsReadyMutex);
 
 	iterations.clear();
@@ -895,12 +912,13 @@ void NetworkAnalyzer::computeFrequencyArray() {
 	iterationsReadyCv.notify_one();
 }
 
-void NetworkAnalyzer::goertzel() {
+void NetworkAnalyzer::goertzel()
+{
 	// Network Analyzer run method using the Goertzel Algorithm (single bin
 	// DFT)
 
 	// Enable the available dac channels
-	for (auto &channel : dac_channels) {
+	for (auto& channel : dac_channels) {
 		iio_channel_enable(channel);
 	}
 
@@ -929,12 +947,12 @@ void NetworkAnalyzer::goertzel() {
 		double offsetValue = offset->value();
 
 		// Create and push the generated sine waves to the DACs
-		QVector<struct iio_buffer *> buffers;
+		QVector<struct iio_buffer*> buffers;
 
-		for (const auto &channel : dac_channels) {
-			const struct iio_device *dev = iio_channel_get_device(channel);
+		for (const auto& channel : dac_channels) {
+			const struct iio_device* dev = iio_channel_get_device(channel);
 			iio_device_attr_write_bool(dev, "dma_sync", true);
-			struct iio_buffer *buf_dac =
+			struct iio_buffer* buf_dac =
 				generateSinWave(dev, frequency, amplitudeValue, offsetValue, rate, samples_count);
 			buffers.push_back(buf_dac);
 
@@ -946,8 +964,8 @@ void NetworkAnalyzer::goertzel() {
 
 		// Sleep before DACs start
 		QThread::msleep(pushDelay->value());
-		for (const auto &channel : dac_channels) {
-			const struct iio_device *dev = iio_channel_get_device(channel);
+		for (const auto& channel : dac_channels) {
+			const struct iio_device* dev = iio_channel_get_device(channel);
 			iio_device_attr_write_bool(dev, "dma_sync", false);
 		}
 
@@ -984,14 +1002,14 @@ void NetworkAnalyzer::goertzel() {
 
 		// TODO: Use libm2k here
 
-		std::vector<struct iio_channel *> adc_channels;
+		std::vector<struct iio_channel*> adc_channels;
 
 		unsigned int nb_channels = iio_device_get_channels_count(adc);
 		for (unsigned int i = 0; i < nb_channels; i++) {
 			iio_channel_disable(iio_device_get_channel(adc, i));
 		}
 		for (unsigned int i = 0; i < nb_channels; i++) {
-			struct iio_channel *chn = iio_device_get_channel(adc, i);
+			struct iio_channel* chn = iio_device_get_channel(adc, i);
 			iio_channel_enable(chn);
 			adc_channels.push_back(chn);
 		}
@@ -1002,7 +1020,7 @@ void NetworkAnalyzer::goertzel() {
 		if (m_stop) {
 			iio_buffer_destroy(adc_buffer);
 			adc_buffer = nullptr;
-			for (auto &buffer : buffers) {
+			for (auto& buffer : buffers) {
 				iio_buffer_destroy(buffer);
 			}
 			return;
@@ -1026,7 +1044,7 @@ void NetworkAnalyzer::goertzel() {
 			for (i = 0, p_dat = (uintptr_t)iio_buffer_first(adc_buffer, adc_channels[0]); p_dat < p_end;
 			     p_dat += p_inc, i++) {
 				for (unsigned int ch = 0; ch < data.size(); ch++) {
-					data[ch][i] = ((int16_t *)p_dat)[ch];
+					data[ch][i] = ((int16_t*)p_dat)[ch];
 				}
 			}
 		}
@@ -1056,7 +1074,7 @@ void NetworkAnalyzer::goertzel() {
 		dcOffset = adc_sample_conv::convSampleToVolts(dcOffset, corr_gain, 1, 0, hw_gain);
 
 		// Clear the iio_buffers that were created
-		for (auto &buffer : buffers) {
+		for (auto& buffer : buffers) {
 			iio_buffer_destroy(buffer);
 		}
 
@@ -1083,7 +1101,8 @@ void NetworkAnalyzer::goertzel() {
 
 void NetworkAnalyzer::onFrequencyBarMoved(int pos) { d_frequencyHandle->setPositionSilenty(pos); }
 
-void NetworkAnalyzer::toggleBufferPreview(bool toggle) {
+void NetworkAnalyzer::toggleBufferPreview(bool toggle)
+{
 	bufferPreviewer->setVisible(toggle);
 
 	ui->viewInOscBtn->setEnabled(toggle);
@@ -1092,7 +1111,8 @@ void NetworkAnalyzer::toggleBufferPreview(bool toggle) {
 }
 
 void NetworkAnalyzer::_saveChannelBuffers(double frequency, double sample_rate, std::vector<float> data1,
-					  std::vector<float> data2) {
+					  std::vector<float> data2)
+{
 	boost::unique_lock<boost::mutex> lock(bufferMutex);
 
 	Buffer buffer1 = Buffer(frequency, sample_rate, data1.size(), data1);
@@ -1101,10 +1121,11 @@ void NetworkAnalyzer::_saveChannelBuffers(double frequency, double sample_rate, 
 	bufferPreviewer->pushBuffers(QPair<Buffer, Buffer>(buffer1, buffer2));
 }
 
-void NetworkAnalyzer::computeCaptureParams(double frequency, size_t &buffer_size, size_t &adc_rate) {
+void NetworkAnalyzer::computeCaptureParams(double frequency, size_t& buffer_size, size_t& adc_rate)
+{
 	size_t nrOfPeriods = 2;
 
-	for (const auto &rate : sampleRates) {
+	for (const auto& rate : sampleRates) {
 
 		if (rate == sampleRates[0]) {
 			continue;
@@ -1132,7 +1153,8 @@ void NetworkAnalyzer::computeCaptureParams(double frequency, size_t &buffer_size
 	}
 }
 
-QPair<double, double> NetworkAnalyzer::getPhaseInterval() {
+QPair<double, double> NetworkAnalyzer::getPhaseInterval()
+{
 	double maxValue = phaseMax->value();
 
 	double lo = -360;
@@ -1151,7 +1173,8 @@ QPair<double, double> NetworkAnalyzer::getPhaseInterval() {
 	return QPair<double, double>(intervalMin, intervalMax);
 }
 
-void NetworkAnalyzer::plot(double frequency, double mag1, double mag2, double phase, float dcVoltage) {
+void NetworkAnalyzer::plot(double frequency, double mag1, double mag2, double phase, float dcVoltage)
+{
 	double mag;
 	static double magBonus = 0;
 	static int currentSample = 0;
@@ -1226,7 +1249,8 @@ void NetworkAnalyzer::plot(double frequency, double mag1, double mag2, double ph
 	magBonus = autoUpdateGainMode(mag, magBonus, dcVoltage);
 }
 
-bool NetworkAnalyzer::_checkMagForOverrange(double magnitude) {
+bool NetworkAnalyzer::_checkMagForOverrange(double magnitude)
+{
 	auto m2k_adc = std::dynamic_pointer_cast<M2kAdc>(adc_dev);
 	double corr_gain = 1.0;
 	double hw_gain = 1.0;
@@ -1252,7 +1276,8 @@ bool NetworkAnalyzer::_checkMagForOverrange(double magnitude) {
 	return false;
 }
 
-double NetworkAnalyzer::autoUpdateGainMode(double magnitude, double magnitudeGain, float dcVoltage) {
+double NetworkAnalyzer::autoUpdateGainMode(double magnitude, double magnitudeGain, float dcVoltage)
+{
 	auto m2k_adc = std::dynamic_pointer_cast<M2kAdc>(adc_dev);
 
 	// compute Vout knowing that magnitude = 20 * log(Vout / Vin);
@@ -1324,7 +1349,8 @@ double NetworkAnalyzer::autoUpdateGainMode(double magnitude, double magnitudeGai
 void NetworkAnalyzer::run() { startStop(true); }
 void NetworkAnalyzer::stop() { startStop(false); }
 
-void NetworkAnalyzer::startStop(bool pressed) {
+void NetworkAnalyzer::startStop(bool pressed)
+{
 	m_stop = !pressed;
 
 	if (amp1 && amp2) {
@@ -1383,10 +1409,11 @@ void NetworkAnalyzer::startStop(bool pressed) {
 	}
 }
 
-struct iio_buffer *NetworkAnalyzer::generateSinWave(const struct iio_device *dev, double frequency, double amplitude,
-						    double offset, unsigned long rate, size_t samples_count) {
+struct iio_buffer* NetworkAnalyzer::generateSinWave(const struct iio_device* dev, double frequency, double amplitude,
+						    double offset, unsigned long rate, size_t samples_count)
+{
 	/* Create the IIO buffer */
-	struct iio_buffer *buf = iio_device_create_buffer(dev, samples_count, true);
+	struct iio_buffer* buf = iio_device_create_buffer(dev, samples_count, true);
 
 	if (!buf) {
 		return buf;
@@ -1423,11 +1450,11 @@ struct iio_buffer *NetworkAnalyzer::generateSinWave(const struct iio_device *dev
 	head_block->set_length(samples_count);
 	top_block->run();
 
-	const std::vector<short> &samples = vector_block->data();
-	const short *data = samples.data();
+	const std::vector<short>& samples = vector_block->data();
+	const short* data = samples.data();
 
 	for (unsigned int i = 0; i < iio_device_get_channels_count(dev); i++) {
-		struct iio_channel *chn = iio_device_get_channel(dev, i);
+		struct iio_channel* chn = iio_device_get_channel(dev, i);
 
 		if (iio_channel_is_enabled(chn)) {
 			iio_channel_write(chn, buf, data, samples_count * sizeof(short));
@@ -1441,7 +1468,8 @@ struct iio_buffer *NetworkAnalyzer::generateSinWave(const struct iio_device *dev
 	return buf;
 }
 
-void NetworkAnalyzer::configHwForNetworkAnalyzing() {
+void NetworkAnalyzer::configHwForNetworkAnalyzing()
+{
 	auto trigger = adc_dev->getTrigger();
 
 	if (trigger) {
@@ -1464,7 +1492,8 @@ void NetworkAnalyzer::onVbar1PixelPosChanged(int pos) { d_hCursorHandle1->setPos
 
 void NetworkAnalyzer::onVbar2PixelPosChanged(int pos) { d_hCursorHandle2->setPositionSilenty(pos); }
 
-void NetworkAnalyzer::toggleCursors(bool en) {
+void NetworkAnalyzer::toggleCursors(bool en)
+{
 	if (!en) {
 		ui->btnCursors->setChecked(en);
 	}
@@ -1479,7 +1508,8 @@ void NetworkAnalyzer::toggleCursors(bool en) {
 	}
 }
 
-void NetworkAnalyzer::readPreferences() {
+void NetworkAnalyzer::readPreferences()
+{
 	m_dBgraph.setShowZero(prefPanel->getNa_show_zero());
 	m_phaseGraph.setShowZero(prefPanel->getNa_show_zero());
 	//	autoAdjustGain = prefPanel->getNaGainUpdateEnabled();

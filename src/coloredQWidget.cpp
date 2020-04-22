@@ -21,7 +21,9 @@
 
 using namespace adiscope;
 
-ColoredQWidget::ColoredQWidget(QWidget *parent) : QWidget(parent) {
+ColoredQWidget::ColoredQWidget(QWidget* parent)
+	: QWidget(parent)
+{
 	/* Permits the QWidget to have a visible background */
 	setAttribute(Qt::WA_StyledBackground, true);
 }

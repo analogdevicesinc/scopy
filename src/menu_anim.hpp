@@ -27,11 +27,12 @@
 #include <QWidget>
 
 namespace adiscope {
-class MenuAnim : public ColoredQWidget {
+class MenuAnim : public ColoredQWidget
+{
 	Q_OBJECT
 
 public:
-	explicit MenuAnim(QWidget *parent = nullptr);
+	explicit MenuAnim(QWidget* parent = nullptr);
 	~MenuAnim() {}
 
 	void setMinimumSize(QSize size);

@@ -28,48 +28,51 @@
 
 using namespace adiscope;
 
-Math::Math(QWidget *parent, unsigned int num_inputs) : QWidget(parent), num_inputs(num_inputs) {
+Math::Math(QWidget* parent, unsigned int num_inputs)
+	: QWidget(parent)
+	, num_inputs(num_inputs)
+{
 	if (num_inputs == 0)
 		throw std::runtime_error("Math widget used with zero inputs");
 
 	ui.setupUi(this);
 
-	QMenu *menuCos = new QMenu(ui.btnCos);
+	QMenu* menuCos = new QMenu(ui.btnCos);
 	menuCos->addAction("cos");
 	menuCos->addAction("acos");
 	menuCos->addAction("cosh");
 	ui.btnCos->setMenu(menuCos);
 
-	QMenu *menuSin = new QMenu(ui.btnSin);
+	QMenu* menuSin = new QMenu(ui.btnSin);
 	menuSin->addAction("sin");
 	menuSin->addAction("asin");
 	menuSin->addAction("sinh");
 	ui.btnSin->setMenu(menuSin);
 
-	QMenu *menuTan = new QMenu(ui.btnTan);
+	QMenu* menuTan = new QMenu(ui.btnTan);
 	menuTan->addAction("tan");
 	menuTan->addAction("atan");
 	menuTan->addAction("tanh");
 	ui.btnTan->setMenu(menuTan);
 
-	QMenu *menuLog = new QMenu(ui.btnLog);
+	QMenu* menuLog = new QMenu(ui.btnLog);
 	menuLog->addAction("log");
 	menuLog->addAction("log10");
 	ui.btnLog->setMenu(menuLog);
 
-	QMenu *menuExp = new QMenu(ui.btnExp);
+	QMenu* menuExp = new QMenu(ui.btnExp);
 	menuExp->addAction("exp");
 	menuExp->addAction("sqrt");
 	ui.btnExp->setMenu(menuExp);
 
 	if (num_inputs > 1) {
-		QMenu *menuT = new QMenu(ui.btnT);
+		QMenu* menuT = new QMenu(ui.btnT);
 
 		for (unsigned int i = 0; i < num_inputs; i++)
 			menuT->addAction(QString("t%1").arg(i));
 		ui.btnT->setMenu(menuT);
 
-		connect(menuT, SIGNAL(triggered(QAction *)), this, SLOT(handleMenuButtonT(QAction *)));
+		connect(menuT, SIGNAL(triggered(QAction*)), this, SLOT(handleMenuButtonT(QAction*)));
 	} else {
 		ui.btnT->setProperty("token", QVariant("t"));
 		connect(ui.btnT, SIGNAL(clicked()), this, SLOT(handleButton()));
@@ -121,11 +124,11 @@ Math::Math(QWidget *parent, unsigned int num_inputs) : QWidget(parent), num_inpu
 	connect(ui.btnDiv, SIGNAL(clicked()), this, SLOT(handleButton()));
 	connect(ui.btnPow, SIGNAL(clicked()), this, SLOT(handleButton()));
 
-	connect(menuCos, SIGNAL(triggered(QAction *)), this, SLOT(handleMenuButton(QAction *)));
-	connect(menuSin, SIGNAL(triggered(QAction *)), this, SLOT(handleMenuButton(QAction *)));
-	connect(menuTan, SIGNAL(triggered(QAction *)), this, SLOT(handleMenuButton(QAction *)));
-	connect(menuLog, SIGNAL(triggered(QAction *)), this, SLOT(handleMenuButton(QAction *)));
-	connect(menuExp, SIGNAL(triggered(QAction *)), this, SLOT(handleMenuButton(QAction *)));
+	connect(menuCos, SIGNAL(triggered(QAction*)), this, SLOT(handleMenuButton(QAction*)));
+	connect(menuSin, SIGNAL(triggered(QAction*)), this, SLOT(handleMenuButton(QAction*)));
+	connect(menuTan, SIGNAL(triggered(QAction*)), this, SLOT(handleMenuButton(QAction*)));
+	connect(menuLog, SIGNAL(triggered(QAction*)), this, SLOT(handleMenuButton(QAction*)));
+	connect(menuExp, SIGNAL(triggered(QAction*)), this, SLOT(handleMenuButton(QAction*)));
 
 	connect(ui.btnClear, SIGNAL(clicked()), ui.function, SLOT(clear()));
 	connect(ui.btnBackspace, SIGNAL(clicked()), this, SLOT(delLastChar()));
@@ -133,21 +136,23 @@ Math::Math(QWidget *parent, unsigned int num_inputs) : QWidget(parent), num_inpu
 	connect(ui.btnApply, SIGNAL(clicked()), this, SLOT(validateFunction()));
 	connect(ui.function, SIGNAL(returnPressed()), this, SLOT(validateFunction()));
 
-	connect(ui.function, SIGNAL(textChanged(const QString &)), this, SLOT(resetState()));
+	connect(ui.function, SIGNAL(textChanged(const QString&)), this, SLOT(resetState()));
 }
 
-void Math::handleButton() {
-	QPushButton *btn = static_cast<QPushButton *>(QObject::sender());
+void Math::handleButton()
+{
+	QPushButton* btn = static_cast<QPushButton*>(QObject::sender());
 	QString token = btn->property("token").toString();
 
 	ui.function->insert(token);
 }
 
-void Math::handleMenuButton(QAction *action) { ui.function->insert(action->text() + "("); }
+void Math::handleMenuButton(QAction* action) { ui.function->insert(action->text() + "("); }
 
-void Math::handleMenuButtonT(QAction *action) { ui.function->insert(action->text()); }
+void Math::handleMenuButtonT(QAction* action) { ui.function->insert(action->text()); }
 
-void Math::validateFunction() {
+void Math::validateFunction()
+{
 	QString function = ui.function->text();
 
 	try {
@@ -163,7 +168,8 @@ void Math::validateFunction() {
 	}
 }
 
-void Math::resetState() {
+void Math::resetState()
+{
 	setDynamicProperty(ui.function, "valid", false);
 	setDynamicProperty(ui.btnApply, "valid", false);
 	setDynamicProperty(ui.function, "invalid", false);
@@ -172,6 +178,6 @@ void Math::resetState() {
 	Q_EMIT stateReseted();
 }
 
-void Math::setFunction(const QString &function) { ui.function->setText(function); }
+void Math::setFunction(const QString& function) { ui.function->setText(function); }
 
 void Math::delLastChar() { ui.function->backspace(); }

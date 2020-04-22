@@ -31,7 +31,8 @@ namespace adiscope {
 
 class ApiObject;
 class ManualCalibration;
-class ManualCalibration_API : public ApiObject {
+class ManualCalibration_API : public ApiObject
+{
 	Q_OBJECT
 
 	Q_PROPERTY(double offset_pos_dac READ getOffsetPosDac)
@@ -45,7 +46,7 @@ class ManualCalibration_API : public ApiObject {
 	Q_PROPERTY(double gain_neg_adc READ getGainNegAdc)
 
 public:
-	explicit ManualCalibration_API(ManualCalibration *m_calib);
+	explicit ManualCalibration_API(ManualCalibration* m_calib);
 	~ManualCalibration_API() {}
 
 	Q_INVOKABLE void autoCalibration();
@@ -91,7 +92,7 @@ private:
 	double getGainPosAdc() const;
 	double getGainNegAdc() const;
 
-	ManualCalibration *calib;
+	ManualCalibration* calib;
 	int step_in_progress;
 };
 

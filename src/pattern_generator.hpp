@@ -34,11 +34,12 @@
 #include <string>
 #include <vector>
 
-extern "C" {
-struct iio_context;
-struct iio_device;
-struct iio_channel;
-struct iio_buffer;
+extern "C"
+{
+	struct iio_context;
+	struct iio_device;
+	struct iio_channel;
+	struct iio_buffer;
 }
 
 namespace pv {
@@ -80,7 +81,8 @@ class Filter;
 
 const uint32_t PGMaxSampleRate = 100000000;
 
-class PatternGenerator : public Tool {
+class PatternGenerator : public Tool
+{
 	friend class PatternGenerator_API;
 	friend class PatternGeneratorChannelGroup_API;
 	friend class PatternGeneratorChannel_API;
@@ -90,11 +92,11 @@ class PatternGenerator : public Tool {
 
 public:
 	static const int channelGroupLabelMaxLength = 13;
-	explicit PatternGenerator(struct iio_context *ctx, Filter *filt, ToolMenuItem *toolMenuItem, QJSEngine *engine,
-				  DIOManager *diom, ToolLauncher *parent, bool offline_mode_ = 0);
+	explicit PatternGenerator(struct iio_context* ctx, Filter* filt, ToolMenuItem* toolMenuItem, QJSEngine* engine,
+				  DIOManager* diom, ToolLauncher* parent, bool offline_mode_ = 0);
 	~PatternGenerator();
 	void updateCGSettings();
-	PatternUI *getCurrentPatternUI();
+	PatternUI* getCurrentPatternUI();
 	void enableBufferUpdates(bool enabled);
 	void settingsLoaded();
 	bool suppressCGSettingsUpdate;
@@ -117,19 +119,25 @@ private Q_SLOTS:
 
 private:
 	// UI
-	static const char *channelNames[];
-	Ui::PatternGenerator *ui;
-	Ui::PGSettings *pgSettings;
-	Ui::PGCGSettings *cgSettings;
-	MouseWheelWidgetGuard *wheelEventGuard;
+	static const char* channelNames[];
+	Ui::PatternGenerator* ui;
+	Ui::PGSettings* pgSettings;
+	Ui::PGCGSettings* cgSettings;
+	MouseWheelWidgetGuard* wheelEventGuard;
 
-	QButtonGroup *settings_group;
+	QButtonGroup* settings_group;
 
 	pv::widgets::ColourButton *colour_button_edge, *colour_button_high, *colour_button_BG, *colour_button_low;
 
-	typedef enum rightMenuState_t { CLOSED, OPENED_PG, OPENED_CG } rightMenuState;
+	typedef enum rightMenuState_t
+	{
+		CLOSED,
+		OPENED_PG,
+		OPENED_CG
+	} rightMenuState;
 
-	typedef enum runState_t {
+	typedef enum runState_t
+	{
 		STOPPED,
 		CONFIG,
 		RUNNING,
@@ -138,36 +146,36 @@ private:
 
 	runState _pgStatus;
 	static QStringList strStatus;
-	QTimer *singleRunTimer;
+	QTimer* singleRunTimer;
 	// Q_PROPERTY(runState pgStatus READ pgStatus WRITE setPGStatus)
 
 	void setPGStatus(runState _val);
 	runState pgStatus();
 
-	PatternUI *currentUI;
+	PatternUI* currentUI;
 	bool offline_mode;
 
-	PatternGeneratorChannelGroup *selected_channel_group;
+	PatternGeneratorChannelGroup* selected_channel_group;
 	PatternGeneratorChannelManager chm;
-	PatternGeneratorChannelManagerUI *chmui;
-	PatternGeneratorBufferManager *bufman;
-	PatternGeneratorBufferManagerUi *bufui;
+	PatternGeneratorChannelManagerUI* chmui;
+	PatternGeneratorBufferManager* bufman;
+	PatternGeneratorBufferManagerUi* bufui;
 
 	bool buffer_created;
 	int no_channels;
-	pv::MainWindow *main_win;
+	pv::MainWindow* main_win;
 
 	// IIO
 
-	struct iio_device *dev;
-	struct iio_buffer *txbuf;
-	DIOManager *diom;
+	struct iio_device* dev;
+	struct iio_buffer* txbuf;
+	DIOManager* diom;
 
 	bool startPatternGeneration(bool cyclic);
 	void stopPatternGeneration();
-	void toggleRightMenu(QPushButton *btn);
+	void toggleRightMenu(QPushButton* btn);
 
-	std::vector<PatternUI *> patterns;
+	std::vector<PatternUI*> patterns;
 	static QStringList digital_trigger_conditions;
 	static QStringList possibleSampleRates;
 

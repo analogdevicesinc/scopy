@@ -32,27 +32,28 @@ class MeasurementData;
 class Statistic;
 class Formatter;
 
-class StatisticWidget : public QWidget {
+class StatisticWidget : public QWidget
+{
 public:
-	explicit StatisticWidget(QWidget *parent = nullptr);
+	explicit StatisticWidget(QWidget* parent = nullptr);
 	~StatisticWidget();
 
 	QString title() const;
 	int channelId() const;
 	int positionIndex() const;
 
-	void setTitleColor(const QColor &color);
+	void setTitleColor(const QColor& color);
 	void setPositionIndex(int pos);
 
-	void initForMeasurement(const MeasurementData &data);
-	void updateStatistics(const Statistic &data);
+	void initForMeasurement(const MeasurementData& data);
+	void updateStatistics(const Statistic& data);
 
 private:
-	Ui::Statistic *m_ui;
+	Ui::Statistic* m_ui;
 	QString m_title;
 	int m_channelId;
 	int m_posIndex;
-	Formatter *m_formatter;
+	Formatter* m_formatter;
 	int m_valueLabelWidth;
 };
 

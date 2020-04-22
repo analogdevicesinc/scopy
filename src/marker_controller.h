@@ -13,15 +13,16 @@ namespace adiscope {
 
 class SpectrumMarker;
 
-class MarkerController : public QObject {
+class MarkerController : public QObject
+{
 	Q_OBJECT
 
 public:
 	typedef std::shared_ptr<SpectrumMarker> marker_sptr;
 
-	explicit MarkerController(QwtPlot *plot);
-	MarkerController(const MarkerController &) = delete;
-	void operator=(const MarkerController &) = delete;
+	explicit MarkerController(QwtPlot* plot);
+	MarkerController(const MarkerController&) = delete;
+	void operator=(const MarkerController&) = delete;
 
 	bool enabled() const;
 	void setEnabled(bool en);
@@ -32,13 +33,13 @@ public:
 	marker_sptr selectedMarker() const;
 	void markerBringToFront(marker_sptr marker);
 
-	const QwtPlot *plot() const;
-	QwtPlot *plot();
+	const QwtPlot* plot() const;
+	QwtPlot* plot();
 
 Q_SIGNALS:
-	void markerSelected(std::shared_ptr<SpectrumMarker> &);
-	void markerPositionChanged(std::shared_ptr<SpectrumMarker> &);
-	void markerReleased(std::shared_ptr<SpectrumMarker> &);
+	void markerSelected(std::shared_ptr<SpectrumMarker>&);
+	void markerPositionChanged(std::shared_ptr<SpectrumMarker>&);
+	void markerReleased(std::shared_ptr<SpectrumMarker>&);
 
 private Q_SLOTS:
 	void onPickerSelected(QPointF);
@@ -48,7 +49,7 @@ private:
 	void selectMarker(marker_sptr marker);
 
 private:
-	QwtPlotPicker *d_picker;
+	QwtPlotPicker* d_picker;
 
 	QList<marker_sptr> d_markers;
 	QList<marker_sptr> d_mrks_overlap_order;

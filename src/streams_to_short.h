@@ -6,7 +6,8 @@
 
 namespace adiscope {
 
-class streams_to_short : virtual public gr::sync_block {
+class streams_to_short : virtual public gr::sync_block
+{
 public:
 	// gr::blocks::streams_to_vector::sptr
 	typedef boost::shared_ptr<streams_to_short> sptr;

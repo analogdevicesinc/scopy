@@ -53,8 +53,9 @@
 
 #include <info_widget.h>
 
-extern "C" {
-struct iio_context;
+extern "C"
+{
+	struct iio_context;
 }
 
 namespace Ui {
@@ -71,21 +72,22 @@ class Debugger;
 class ManualCalibration;
 class UserNotes;
 
-class ToolLauncher : public QMainWindow {
+class ToolLauncher : public QMainWindow
+{
 	friend class ToolLauncher_API;
 
 	Q_OBJECT
 
 public:
-	explicit ToolLauncher(QString prevCrashDump = "", QWidget *parent = 0);
+	explicit ToolLauncher(QString prevCrashDump = "", QWidget* parent = 0);
 	~ToolLauncher();
 
-	Q_INVOKABLE void runProgram(const QString &program, const QString &fn);
-	InfoWidget *infoWidget;
+	Q_INVOKABLE void runProgram(const QString& program, const QString& fn);
+	InfoWidget* infoWidget;
 
-	Preferences *getPrefPanel() const;
-	Calibration *getCalibration() const;
-	bool eventFilter(QObject *watched, QEvent *event);
+	Preferences* getPrefPanel() const;
+	Calibration* getCalibration() const;
+	bool eventFilter(QObject* watched, QEvent* event);
 
 	bool getUseDecoders() const;
 	void setUseDecoders(bool use_decoders);
@@ -148,9 +150,9 @@ private Q_SLOTS:
 	void btnDigitalIO_clicked();
 
 	void resetSession();
-	DeviceWidget *getConnectedDevice();
-	DeviceWidget *getSelectedDevice();
-	int getDeviceIndex(DeviceWidget *);
+	DeviceWidget* getConnectedDevice();
+	DeviceWidget* getSelectedDevice();
+	int getDeviceIndex(DeviceWidget*);
 	void pageMoved(int);
 	void stopSearching(bool);
 	void _toolSelected(tool tool);
@@ -159,46 +161,46 @@ private Q_SLOTS:
 	void calibrationThreadWatcherFinished();
 
 private:
-	QList<Tool *> calibration_saved_tools;
+	QList<Tool*> calibration_saved_tools;
 	void loadToolTips(bool connected);
 	QVector<QString> searchDevices();
-	void swapMenu(QWidget *menu);
+	void swapMenu(QWidget* menu);
 	void destroyContext();
 	bool loadDecoders(QString path);
-	bool switchContext(const QString &uri);
+	bool switchContext(const QString& uri);
 	void resetStylesheets();
 	void initialCalibration();
 	bool calibrate();
-	void checkIp(const QString &ip);
+	void checkIp(const QString& ip);
 	void disconnect();
 	void saveSettings();
-	Q_INVOKABLE QPushButton *addContext(const QString &hostname);
+	Q_INVOKABLE QPushButton* addContext(const QString& hostname);
 
-	void updateListOfDevices(const QVector<QString> &uris);
+	void updateListOfDevices(const QVector<QString>& uris);
 	QStringList tools;
 	QStringList toolIcons;
-	void closeEvent(QCloseEvent *event);
-	void highlightDevice(QPushButton *btn);
+	void closeEvent(QCloseEvent* event);
+	void highlightDevice(QPushButton* btn);
 	void setupHomepage();
 	void updateHomepage();
 	void readPreferences();
 	void loadIndexPageFromContent(QString fileLocation);
-	DeviceWidget *getDevice(QString uri);
+	DeviceWidget* getDevice(QString uri);
 	void setupAddPage();
 	void allowExternalScript(bool);
 
 private:
-	Ui::ToolLauncher *ui;
-	struct iio_context *ctx;
+	Ui::ToolLauncher* ui;
+	struct iio_context* ctx;
 
-	ToolMenu *menu;
+	ToolMenu* menu;
 
 	QVector<int> position;
-	QVector<Debugger *> debugInstances;
-	QVector<DetachedWindow *> debugWindows;
+	QVector<Debugger*> debugInstances;
+	QVector<DetachedWindow*> debugWindows;
 
-	std::vector<DeviceWidget *> devices;
-	QVector<Tool *> toolList;
+	std::vector<DeviceWidget*> devices;
+	QVector<Tool*> toolList;
 
 	QTimer *search_timer, *alive_timer;
 	QFutureWatcher<QVector<QString>> watcher;
@@ -206,40 +208,40 @@ private:
 	QFuture<void> calibration_thread;
 	QFutureWatcher<void> calibration_thread_watcher;
 
-	DMM *dmm;
-	PowerController *power_control;
-	SignalGenerator *signal_generator;
-	Oscilloscope *oscilloscope;
-	LogicAnalyzer *logic_analyzer;
-	DigitalIO *dio;
-	DIOManager *dioManager;
-	PatternGenerator *pattern_generator;
-	NetworkAnalyzer *network_analyzer;
-	SpectrumAnalyzer *spectrum_analyzer;
-	Debugger *debugger;
-	ManualCalibration *manual_calibration;
-	QWidget *current;
-	QSettings *settings;
-	Preferences *prefPanel;
-	UserNotes *notesPanel;
+	DMM* dmm;
+	PowerController* power_control;
+	SignalGenerator* signal_generator;
+	Oscilloscope* oscilloscope;
+	LogicAnalyzer* logic_analyzer;
+	DigitalIO* dio;
+	DIOManager* dioManager;
+	PatternGenerator* pattern_generator;
+	NetworkAnalyzer* network_analyzer;
+	SpectrumAnalyzer* spectrum_analyzer;
+	Debugger* debugger;
+	ManualCalibration* manual_calibration;
+	QWidget* current;
+	QSettings* settings;
+	Preferences* prefPanel;
+	UserNotes* notesPanel;
 
 	QButtonGroup adc_users_group;
 
-	Calibration *calib;
+	Calibration* calib;
 	std::shared_ptr<GenericAdc> adc;
 	QList<std::shared_ptr<GenericDac>> dacs;
 
-	Filter *filter;
-	ToolLauncher_API *tl_api;
+	Filter* filter;
+	ToolLauncher_API* tl_api;
 
 	QJSEngine js_engine;
 	QString js_cmd;
 	QSocketNotifier notifier;
 	QString previousIp;
 
-	ConnectDialog *connectWidget;
-	QTextBrowser *welcome;
-	QTextBrowser *index;
+	ConnectDialog* connectWidget;
+	QTextBrowser* welcome;
+	QTextBrowser* index;
 
 	bool calibrating;
 	bool skip_calibration;
@@ -251,9 +253,9 @@ private:
 	QString deviceInfo;
 	QString pathToFile;
 
-	QButtonGroup *devices_btn_group;
+	QButtonGroup* devices_btn_group;
 
-	DeviceWidget *selectedDev;
+	DeviceWidget* selectedDev;
 	bool m_use_decoders;
 
 	bool m_useNativeDialogs;

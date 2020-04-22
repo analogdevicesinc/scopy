@@ -6,7 +6,8 @@
 #include <gnuradio/hier_block2.h>
 
 namespace adiscope {
-class cancel_dc_offset_block : public gr::hier_block2, public QObject {
+class cancel_dc_offset_block : public gr::hier_block2, public QObject
+{
 public:
 	cancel_dc_offset_block(size_t buffer_size, bool enabled);
 	~cancel_dc_offset_block();

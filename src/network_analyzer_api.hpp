@@ -5,7 +5,8 @@
 
 namespace adiscope {
 
-class NetworkAnalyzer_API : public ApiObject {
+class NetworkAnalyzer_API : public ApiObject
+{
 	Q_OBJECT
 
 	Q_PROPERTY(double min_freq READ getMinFreq WRITE setMinFreq);
@@ -33,7 +34,10 @@ class NetworkAnalyzer_API : public ApiObject {
 	Q_PROPERTY(QList<double> phase READ phase STORED false)
 	Q_PROPERTY(QList<double> freq READ freq STORED false)
 public:
-	explicit NetworkAnalyzer_API(NetworkAnalyzer *net) : ApiObject(), net(net) {}
+	explicit NetworkAnalyzer_API(NetworkAnalyzer* net)
+		: ApiObject()
+		, net(net)
+	{}
 	~NetworkAnalyzer_API() {}
 
 	double getMinFreq() const;
@@ -88,7 +92,7 @@ public:
 	QList<double> phase() const;
 
 private:
-	NetworkAnalyzer *net;
+	NetworkAnalyzer* net;
 };
 } // namespace adiscope
 #endif // NETWORK_ANALYZER_API_HPP

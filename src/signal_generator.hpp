@@ -40,11 +40,12 @@
 #include <QTreeWidgetItem>
 #include <QWidget>
 
-extern "C" {
-struct iio_buffer;
-struct iio_context;
-struct iio_device;
-struct iio_channel;
+extern "C"
+{
+	struct iio_buffer;
+	struct iio_context;
+	struct iio_device;
+	struct iio_channel;
 }
 
 namespace Ui {
@@ -63,7 +64,8 @@ class PhaseSpinButton;
 class PositionSpinButton;
 class ScaleSpinButton;
 
-enum sg_noise {
+enum sg_noise
+{
 	SG_NO_NOISE = 0,
 	SG_UNIFORM_NOISE = 1,
 	SG_GAUSSIAN_NOISE = 2,
@@ -71,7 +73,8 @@ enum sg_noise {
 	SG_IMPULSE_NOISE = 4,
 };
 
-enum sg_waveform {
+enum sg_waveform
+{
 	SG_SIN_WAVE = gr::analog::GR_SIN_WAVE,
 	SG_SQR_WAVE = gr::analog::GR_SQR_WAVE,
 	SG_TRI_WAVE = gr::analog::GR_TRI_WAVE,
@@ -81,10 +84,19 @@ enum sg_waveform {
 
 };
 
-enum sg_file_format { FORMAT_NO_FILE, FORMAT_BIN_FLOAT, FORMAT_CSV, FORMAT_WAVE, FORMAT_MAT };
+enum sg_file_format
+{
+	FORMAT_NO_FILE,
+	FORMAT_BIN_FLOAT,
+	FORMAT_CSV,
+	FORMAT_WAVE,
+	FORMAT_MAT
+};
 
-typedef union {
-	struct {
+typedef union
+{
+	struct
+	{
 		uint16_t format;	// Audio format 1=PCM,6=mulaw,7=alaw, 257=IBM
 					// Mu-Law, 258=IBM A-Law, 259=ADPCM
 		uint16_t noChan;	// Number of channels 1=Mono 2=Sterio
@@ -96,8 +108,10 @@ typedef union {
 	char header_data[16];
 } wav_header_t;
 
-typedef union {
-	struct {
+typedef union
+{
+	struct
+	{
 		uint8_t riff[4];
 		uint32_t size;
 		uint8_t id[4];
@@ -105,41 +119,44 @@ typedef union {
 	char data[12];
 } riff_header_t;
 
-typedef union {
-	struct {
+typedef union
+{
+	struct
+	{
 		uint8_t id[4];
 		uint32_t size;
 	};
 	char data[8];
 } chunk_header_t;
 
-class SignalGenerator : public Tool {
+class SignalGenerator : public Tool
+{
 	friend class SignalGenerator_API;
 	friend class ToolLauncher_API;
 
 	Q_OBJECT
 
 public:
-	explicit SignalGenerator(struct iio_context *ctx, QList<std::shared_ptr<GenericDac>> dacs, Filter *filt,
-				 ToolMenuItem *toolMenuItem, QJSEngine *engine, ToolLauncher *parent);
+	explicit SignalGenerator(struct iio_context* ctx, QList<std::shared_ptr<GenericDac>> dacs, Filter* filt,
+				 ToolMenuItem* toolMenuItem, QJSEngine* engine, ToolLauncher* parent);
 	~SignalGenerator();
 
 	static const size_t min_buffer_size = 1024;
 	static const unsigned long default_sample_rate = 1000000;
 	static constexpr float max_frequency = 30000000;
 
-	static QVector<unsigned long> get_available_sample_rates(const struct iio_device *dev);
-	static unsigned long get_max_sample_rate(const struct iio_device *dev);
+	static QVector<unsigned long> get_available_sample_rates(const struct iio_device* dev);
+	static unsigned long get_max_sample_rate(const struct iio_device* dev);
 
-	static double get_best_ratio(double ratio, double max, double *fract);
+	static double get_best_ratio(double ratio, double max, double* fract);
 
 	void settingsLoaded();
 
 private:
-	Ui::SignalGenerator *ui;
-	OscilloscopePlot *plot;
+	Ui::SignalGenerator* ui;
+	OscilloscopePlot* plot;
 	gr::top_block_sptr top_block;
-	struct time_block_data *time_block_data;
+	struct time_block_data* time_block_data;
 	struct iio_channel *amp1, *amp2;
 	QList<std::shared_ptr<GenericDac>> dacs;
 
@@ -152,7 +169,7 @@ private:
 	ScaleSpinButton *fileSampleRate, *fileAmplitude;
 	ScaleSpinButton *mathFrequency, *noiseAmplitude;
 
-	FileManager *fileManager;
+	FileManager* fileManager;
 
 	int currentChannel;
 	double sample_rate;
@@ -160,15 +177,15 @@ private:
 	unsigned long nb_points;
 	double nr_of_periods;
 
-	QButtonGroup *settings_group;
-	QButtonGroup *channels_group;
+	QButtonGroup* settings_group;
+	QButtonGroup* channels_group;
 	QQueue<QPair<int, bool>> menuButtonActions;
 
-	QVector<struct iio_buffer *> buffers;
-	QVector<ChannelWidget *> channels;
-	QVector<QPair<struct iio_channel *, std::shared_ptr<adiscope::GenericDac>>> channel_dac;
+	QVector<struct iio_buffer*> buffers;
+	QVector<ChannelWidget*> channels;
+	QVector<QPair<struct iio_channel*, std::shared_ptr<adiscope::GenericDac>>> channel_dac;
 
-	QSharedPointer<signal_generator_data> getData(QWidget *obj);
+	QSharedPointer<signal_generator_data> getData(QWidget* obj);
 	QSharedPointer<signal_generator_data> getCurrentData();
 	void renameConfigPanel();
 
@@ -183,27 +200,27 @@ private:
 	void reloadFileFromPath();
 
 	gr::basic_block_sptr getSignalSource(gr::top_block_sptr top, double sample_rate,
-					     struct signal_generator_data &data, double phase_correction = 0.0);
+					     struct signal_generator_data& data, double phase_correction = 0.0);
 
-	gr::basic_block_sptr getNoise(QWidget *obj, gr::top_block_sptr top);
-	gr::basic_block_sptr getSource(QWidget *obj, double sample_rate, gr::top_block_sptr top,
+	gr::basic_block_sptr getNoise(QWidget* obj, gr::top_block_sptr top);
+	gr::basic_block_sptr getSource(QWidget* obj, double sample_rate, gr::top_block_sptr top,
 				       bool phase_correction = false);
 
-	static void reduceFraction(double input, long *numerator, long *denominator, long precision = 1000000);
+	static void reduceFraction(double input, long* numerator, long* denominator, long precision = 1000000);
 	static size_t gcd(size_t a, size_t b);
 	static size_t lcm(size_t a, size_t b);
 	static int sg_waveform_to_idx(enum sg_waveform wave);
 
-	size_t get_samples_count(const struct iio_device *dev, double sample_rate, bool perfect = false);
-	double get_best_sample_rate(const struct iio_device *dev);
+	size_t get_samples_count(const struct iio_device* dev, double sample_rate, bool perfect = false);
+	double get_best_sample_rate(const struct iio_device* dev);
 	// int set_sample_rate(const struct iio_device *dev,
 	//		unsigned long sample_rate);
-	void calc_sampling_params(const struct iio_device *dev, double sample_rate, unsigned long &out_sample_rate,
-				  unsigned long &out_oversampling_ratio);
-	bool use_oversampling(const struct iio_device *dev);
+	void calc_sampling_params(const struct iio_device* dev, double sample_rate, unsigned long& out_sample_rate,
+				  unsigned long& out_oversampling_ratio);
+	bool use_oversampling(const struct iio_device* dev);
 
-	bool sample_rate_forced(const struct iio_device *dev);
-	double get_forced_sample_rate(const struct iio_device *dev);
+	bool sample_rate_forced(const struct iio_device* dev);
+	double get_forced_sample_rate(const struct iio_device* dev);
 
 	double zoomT1;
 	double zoomT2;
@@ -214,8 +231,8 @@ private:
 	enum sg_file_format getFileFormat(QString filePath);
 	bool loadParametersFromFile(QSharedPointer<signal_generator_data> ptr, QString filePath);
 	void loadFileChannelData(int chIdx);
-	bool riffCompare(riff_header_t &ptr, const char *id2);
-	bool chunkCompare(chunk_header_t &ptr, const char *id2);
+	bool riffCompare(riff_header_t& ptr, const char* id2);
+	bool chunkCompare(chunk_header_t& ptr, const char* id2);
 public Q_SLOTS:
 	void run() override;
 	void stop() override;
@@ -255,21 +272,23 @@ private Q_SLOTS:
 	void rescale();
 
 	void startStop(bool start);
-	void setFunction(const QString &function);
+	void setFunction(const QString& function);
 	void readPreferences();
 Q_SIGNALS:
 	void showTool();
 };
 
-enum SIGNAL_TYPE {
+enum SIGNAL_TYPE
+{
 	SIGNAL_TYPE_CONSTANT = 0,
 	SIGNAL_TYPE_WAVEFORM = 1,
 	SIGNAL_TYPE_BUFFER = 2,
 	SIGNAL_TYPE_MATH = 3,
 };
 
-struct signal_generator_data {
-	iio_channel *iio_ch;
+struct signal_generator_data
+{
+	iio_channel* iio_ch;
 	enum SIGNAL_TYPE type;
 	unsigned int id;
 	bool enabled;
@@ -311,7 +330,8 @@ struct signal_generator_data {
 	float noiseAmplitude;
 };
 
-struct time_block_data {
+struct time_block_data
+{
 	scope_sink_f::sptr time_block;
 	unsigned long nb_channels;
 };

@@ -23,10 +23,11 @@
 #include <QPropertyAnimation>
 
 namespace adiscope {
-class CustomAnimation : public QPropertyAnimation {
+class CustomAnimation : public QPropertyAnimation
+{
 public:
-	CustomAnimation(QObject *target = nullptr);
-	CustomAnimation(QObject *target, const QByteArray &propertyName, QObject *parent = nullptr);
+	CustomAnimation(QObject* target = nullptr);
+	CustomAnimation(QObject* target, const QByteArray& propertyName, QObject* parent = nullptr);
 	~CustomAnimation();
 
 	void setDuration(int msec);

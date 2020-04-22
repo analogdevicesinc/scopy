@@ -8,7 +8,11 @@
 
 using namespace adiscope;
 
-OscCustomScrollArea::OscCustomScrollArea(QWidget *parent) : QScrollArea(parent), inside(false), disableCursor(true) {
+OscCustomScrollArea::OscCustomScrollArea(QWidget* parent)
+	: QScrollArea(parent)
+	, inside(false)
+	, disableCursor(true)
+{
 	QScroller::grabGesture(this->viewport(), QScroller::LeftMouseButtonGesture);
 
 	scroll = QScroller::scroller(this->viewport());
@@ -53,13 +57,15 @@ OscCustomScrollArea::OscCustomScrollArea(QWidget *parent) : QScrollArea(parent),
 	});
 }
 
-void OscCustomScrollArea::enterEvent(QEvent *event) {
+void OscCustomScrollArea::enterEvent(QEvent* event)
+{
 	if (!disableCursor)
 		setCursor(Qt::OpenHandCursor);
 	inside = true;
 }
 
-void OscCustomScrollArea::leaveEvent(QEvent *event) {
+void OscCustomScrollArea::leaveEvent(QEvent* event)
+{
 	if (!disableCursor)
 		setCursor(Qt::ArrowCursor);
 	inside = false;

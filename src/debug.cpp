@@ -23,15 +23,18 @@ static const size_t maxAttrSize = 512;
 
 using namespace adiscope;
 
-Debug::Debug(QObject *parent) : QObject(parent) {}
+Debug::Debug(QObject* parent)
+	: QObject(parent)
+{}
 
 Debug::~Debug() {}
 
-void Debug::scanDevices(void) {
+void Debug::scanDevices(void)
+{
 	size_t Size;
-	struct iio_context_info **info;
-	struct iio_scan_context *scan_ctx;
-	struct iio_device *device;
+	struct iio_context_info** info;
+	struct iio_scan_context* scan_ctx;
+	struct iio_device* device;
 
 	scan_ctx = iio_create_scan_context(NULL, 0);
 	Size = iio_scan_context_get_info_list(scan_ctx, &info);
@@ -60,8 +63,9 @@ void Debug::scanDevices(void) {
 	}
 }
 
-void Debug::setIioContext(struct iio_context *ctx) {
-	struct iio_device *device;
+void Debug::setIioContext(struct iio_context* ctx)
+{
+	struct iio_device* device;
 	int Size;
 
 	this->ctx = ctx;
@@ -86,10 +90,11 @@ QStringList Debug::getFileName() const { return filename; }
 
 QVector<QString> Debug::getAttributeVector() const { return attributeAvailable; }
 
-void Debug::scanChannels(const QString &devName) {
+void Debug::scanChannels(const QString& devName)
+{
 	int nb_channels;
-	struct iio_device *device;
-	struct iio_channel *ch;
+	struct iio_device* device;
+	struct iio_channel* ch;
 	QString type;
 
 	if (connected) {
@@ -117,10 +122,11 @@ void Debug::scanChannels(const QString &devName) {
 	}
 }
 
-void Debug::scanChannelAttributes(QString devName, QString &channel) {
-	struct iio_device *device;
-	struct iio_channel *ch;
-	const char *attr;
+void Debug::scanChannelAttributes(QString devName, QString& channel)
+{
+	struct iio_device* device;
+	struct iio_channel* ch;
+	const char* attr;
 	unsigned int nb_attrs;
 	bool isOutput;
 
@@ -170,9 +176,10 @@ void Debug::scanChannelAttributes(QString devName, QString &channel) {
 	}
 }
 
-QStringList Debug::getAvailableValues(const QString &devName, QString &channel, QString &attribute) const {
-	struct iio_device *device;
-	struct iio_channel *ch;
+QStringList Debug::getAvailableValues(const QString& devName, QString& channel, QString& attribute) const
+{
+	struct iio_device* device;
+	struct iio_channel* ch;
 	char value[maxAttrSize];
 	QStringList values;
 	bool isOutput;
@@ -211,9 +218,10 @@ QStringList Debug::getAvailableValues(const QString &devName, QString &channel, 
 	}
 }
 
-QString Debug::readAttribute(const QString &devName, QString &channel, const QString &attribute) {
-	struct iio_device *device;
-	struct iio_channel *ch;
+QString Debug::readAttribute(const QString& devName, QString& channel, const QString& attribute)
+{
+	struct iio_device* device;
+	struct iio_channel* ch;
 	char value[maxAttrSize];
 	bool isOutput;
 
@@ -239,9 +247,10 @@ QString Debug::readAttribute(const QString &devName, QString &channel, const QSt
 	return QString(value);
 }
 
-void Debug::writeAttribute(const QString &devName, QString &channel, const QString &attribute, const QString &value) {
-	struct iio_device *device;
-	struct iio_channel *ch;
+void Debug::writeAttribute(const QString& devName, QString& channel, const QString& attribute, const QString& value)
+{
+	struct iio_device* device;
+	struct iio_channel* ch;
 	bool isOutput;
 
 	if (connected) {
@@ -249,7 +258,6 @@ void Debug::writeAttribute(const QString &devName, QString &channel, const QStri
 
 		if (channel.isNull()) {
 			iio_device_attr_write(device, attribute.toLatin1().data(), value.toLatin1().data());
-
 		} else {
 			isOutput = channel.contains("output", Qt::CaseInsensitive);
 
@@ -265,6 +273,4 @@ void Debug::writeAttribute(const QString &devName, QString &channel, const QStri
 	}
 }
 
-struct iio_context *Debug::getIioContext(void) {
-	return ctx;
-}
+struct iio_context* Debug::getIioContext(void) { return ctx; }

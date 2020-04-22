@@ -24,25 +24,32 @@
 
 using namespace adiscope;
 
-SpectrumMarker::SpectrumMarker(const QString &title, bool movable)
+SpectrumMarker::SpectrumMarker(const QString& title, bool movable)
 	: QwtPlotMarker(title)
 	, m_xAxis(QwtPlot::xBottom)
 	, m_yAxis(QwtPlot::yLeft)
 	, m_movable(movable)
-	, m_selected(false) {}
+	, m_selected(false)
+{}
 
-SpectrumMarker::SpectrumMarker(const QString &title, QwtAxisId xAxis, QwtAxisId yAxis, bool movable)
-	: QwtPlotMarker(title), m_xAxis(xAxis), m_yAxis(yAxis), m_movable(movable), m_selected(false) {}
+SpectrumMarker::SpectrumMarker(const QString& title, QwtAxisId xAxis, QwtAxisId yAxis, bool movable)
+	: QwtPlotMarker(title)
+	, m_xAxis(xAxis)
+	, m_yAxis(yAxis)
+	, m_movable(movable)
+	, m_selected(false)
+{}
 
 SpectrumMarker::~SpectrumMarker() {}
 
 QColor SpectrumMarker::defaultColor() const { return m_default_color; }
 
-void SpectrumMarker::setDefaultColor(const QColor &color) { m_default_color = color; }
+void SpectrumMarker::setDefaultColor(const QColor& color) { m_default_color = color; }
 
 bool SpectrumMarker::selected() const { return m_selected; }
 
-void SpectrumMarker::setSelected(bool on) {
+void SpectrumMarker::setSelected(bool on)
+{
 	if (m_selected != on) {
 		m_selected = on;
 
@@ -53,7 +60,7 @@ void SpectrumMarker::setSelected(bool on) {
 			brush.setColor(symbol()->pen().color());
 		}
 
-		QwtSymbol *new_sym = new QwtSymbol(symbol()->style(), brush, symbol()->pen(), symbol()->size());
+		QwtSymbol* new_sym = new QwtSymbol(symbol()->style(), brush, symbol()->pen(), symbol()->size());
 		setSymbol(new_sym);
 	}
 }
@@ -62,7 +69,8 @@ bool SpectrumMarker::movable() const { return m_movable; }
 
 void SpectrumMarker::setMovable(bool on) { m_movable = on; }
 
-QPoint SpectrumMarker::plotValueToPixels(const QPointF &point) const {
+QPoint SpectrumMarker::plotValueToPixels(const QPointF& point) const
+{
 	QPoint pixelPoint(0, 0);
 
 	if (plot()) {
@@ -75,7 +83,8 @@ QPoint SpectrumMarker::plotValueToPixels(const QPointF &point) const {
 	return pixelPoint;
 }
 
-QPointF SpectrumMarker::plotPixelsToValue(const QPoint &point) const {
+QPointF SpectrumMarker::plotPixelsToValue(const QPoint& point) const
+{
 	QPointF valuePoint(0.0, 0.0);
 
 	if (plot()) {
@@ -88,7 +97,8 @@ QPointF SpectrumMarker::plotPixelsToValue(const QPoint &point) const {
 	return valuePoint;
 }
 
-QRect SpectrumMarker::boundingRectPixels() const {
+QRect SpectrumMarker::boundingRectPixels() const
+{
 	QPoint markerPixPos = plotValueToPixels(value());
 	QRect symbolRect = symbol()->boundingRect();
 

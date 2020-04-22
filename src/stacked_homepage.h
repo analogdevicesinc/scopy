@@ -31,18 +31,23 @@ class StackedHomepage;
 }
 
 namespace adiscope {
-class StackedHomepage : public QStackedWidget {
+class StackedHomepage : public QStackedWidget
+{
 	Q_OBJECT
 
 public:
-	enum s_directions { LEFT2RIGHT, RIGHT2LEFT };
+	enum s_directions
+	{
+		LEFT2RIGHT,
+		RIGHT2LEFT
+	};
 
-	explicit StackedHomepage(QWidget *parent = 0);
+	explicit StackedHomepage(QWidget* parent = 0);
 	~StackedHomepage();
 
-	void insertWidget(int pos, QWidget *widget);
-	void addWidget(QWidget *widget);
-	void removeWidget(QWidget *widget);
+	void insertWidget(int pos, QWidget* widget);
+	void addWidget(QWidget* widget);
+	void removeWidget(QWidget* widget);
 
 	void slideToIndex(int index);
 
@@ -69,9 +74,9 @@ Q_SIGNALS:
 	void moved(int);
 
 private:
-	void slideInWidget(QWidget *newWidget, enum s_directions direction);
+	void slideInWidget(QWidget* newWidget, enum s_directions direction);
 
-	HomepageControls *s_hc;
+	HomepageControls* s_hc;
 	enum QEasingCurve::Type s_animationType;
 	int s_speed;
 	bool s_wrap;

@@ -16,7 +16,7 @@ using namespace adiscope;
  * thin line which is visible only when the channel is selected, thus increasing
  * the visibility of the selected state of the channel.
  */
-ChannelWidget::ChannelWidget(int id, bool deletable, bool simplified, QColor color, QWidget *parent)
+ChannelWidget::ChannelWidget(int id, bool deletable, bool simplified, QColor color, QWidget* parent)
 	: QWidget(parent)
 	, m_ui(new Ui::Channel())
 	, m_id(id)
@@ -25,12 +25,14 @@ ChannelWidget::ChannelWidget(int id, bool deletable, bool simplified, QColor col
 	, m_color(color)
 	, m_math(false)
 	, m_function("")
-	, m_ref(false) {
+	, m_ref(false)
+{
 	init();
 	nameButton()->installEventFilter(this);
 }
 
-ChannelWidget::~ChannelWidget() {
+ChannelWidget::~ChannelWidget()
+{
 	setButtonNoGroup(m_ui->box);
 	setButtonNoGroup(m_ui->name);
 	setButtonNoGroup(m_ui->btn);
@@ -38,7 +40,8 @@ ChannelWidget::~ChannelWidget() {
 	delete m_ui;
 }
 
-void ChannelWidget::init() {
+void ChannelWidget::init()
+{
 	m_ui->setupUi(this);
 	setId(m_id);
 	m_ui->delBtn->setVisible(m_deletable);
@@ -59,17 +62,18 @@ void ChannelWidget::init() {
 	}
 }
 
-QAbstractButton *ChannelWidget::enableButton() const { return m_ui->box; }
+QAbstractButton* ChannelWidget::enableButton() const { return m_ui->box; }
 
-QAbstractButton *ChannelWidget::nameButton() const { return m_ui->name; }
+QAbstractButton* ChannelWidget::nameButton() const { return m_ui->name; }
 
-QAbstractButton *ChannelWidget::menuButton() const { return m_ui->btn; }
+QAbstractButton* ChannelWidget::menuButton() const { return m_ui->btn; }
 
-QAbstractButton *ChannelWidget::deleteButton() const { return m_ui->delBtn; }
+QAbstractButton* ChannelWidget::deleteButton() const { return m_ui->delBtn; }
 
 int ChannelWidget::id() const { return m_id; }
 
-void ChannelWidget::setId(int id) {
+void ChannelWidget::setId(int id)
+{
 	m_ui->box->setProperty("id", QVariant(id));
 	m_ui->name->setProperty("id", QVariant(id));
 	m_ui->btn->setProperty("id", QVariant(id));
@@ -80,7 +84,8 @@ void ChannelWidget::setId(int id) {
 
 QColor ChannelWidget::color() const { return m_color; }
 
-void ChannelWidget::setColor(QColor color) {
+void ChannelWidget::setColor(QColor color)
+{
 	QString boxStyleSheet = QString("QCheckBox#box::indicator {"
 					"border: 2px solid %1;"
 					"}"
@@ -101,28 +106,30 @@ void ChannelWidget::setColor(QColor color) {
 
 QString ChannelWidget::fullName() const { return m_fullName; }
 
-void ChannelWidget::setFullName(const QString &name) { m_fullName = name; }
+void ChannelWidget::setFullName(const QString& name) { m_fullName = name; }
 
 QString ChannelWidget::shortName() const { return m_shortName; }
 
-void ChannelWidget::setShortName(const QString &name) { m_shortName = name; }
+void ChannelWidget::setShortName(const QString& name) { m_shortName = name; }
 
 QString ChannelWidget::function() const { return m_function; }
 
-void ChannelWidget::setFunction(const QString &function) {
+void ChannelWidget::setFunction(const QString& function)
+{
 	m_function = function;
 	setProperty("function", QVariant(function));
 }
 
 bool ChannelWidget::isMathChannel() const { return m_math; }
 
-void ChannelWidget::setMathChannel(const bool &math) { m_math = math; }
+void ChannelWidget::setMathChannel(const bool& math) { m_math = math; }
 
 bool ChannelWidget::isReferenceChannel() const { return m_ref; }
 
-void ChannelWidget::setReferenceChannel(const bool &ref) { m_ref = ref; }
+void ChannelWidget::setReferenceChannel(const bool& ref) { m_ref = ref; }
 
-bool ChannelWidget::eventFilter(QObject *object, QEvent *event) {
+bool ChannelWidget::eventFilter(QObject* object, QEvent* event)
+{
 	if (event->type() == QEvent::MouseButtonPress) {
 		if (!m_ui->box->isChecked()) {
 			m_ui->box->setChecked(true);
@@ -141,7 +148,8 @@ bool ChannelWidget::eventFilter(QObject *object, QEvent *event) {
 	return QObject::eventFilter(object, event);
 }
 
-void ChannelWidget::on_box_toggled(bool checked) {
+void ChannelWidget::on_box_toggled(bool checked)
+{
 	if (checked) {
 		if (!m_simplified)
 			m_ui->name->setEnabled(true);
@@ -149,11 +157,10 @@ void ChannelWidget::on_box_toggled(bool checked) {
 		// When enabling ChannelWidget select it as well
 		if (!m_simplified)
 			m_ui->name->setChecked(true);
-
 	} else {
 		// Unselect the ChannelWidget when it's about to be disabled
 		if (!m_simplified) {
-			QButtonGroup *group = m_ui->name->group();
+			QButtonGroup* group = m_ui->name->group();
 			bool exclusive;
 			if (group) {
 				exclusive = group->exclusive();
@@ -183,7 +190,8 @@ void ChannelWidget::on_name_toggled(bool checked) { Q_EMIT selected(checked); }
 
 void ChannelWidget::on_btn_toggled(bool checked) { Q_EMIT menuToggled(checked); }
 
-void ChannelWidget::on_delBtn_clicked() {
+void ChannelWidget::on_delBtn_clicked()
+{
 	setButtonNoGroup(m_ui->box);
 	setButtonNoGroup(m_ui->name);
 	setButtonNoGroup(m_ui->btn);
@@ -191,8 +199,9 @@ void ChannelWidget::on_delBtn_clicked() {
 	Q_EMIT deleteClicked();
 }
 
-void ChannelWidget::setButtonNoGroup(QAbstractButton *btn) {
-	QButtonGroup *group = btn->group();
+void ChannelWidget::setButtonNoGroup(QAbstractButton* btn)
+{
+	QButtonGroup* group = btn->group();
 	if (group) {
 		group->removeButton(btn);
 	}

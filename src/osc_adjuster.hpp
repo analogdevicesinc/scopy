@@ -29,14 +29,15 @@ class QWidget;
 class QMouseEvent;
 class QWheelEvent;
 
-class OscAdjuster : public QObject {
+class OscAdjuster : public QObject
+{
 	Q_OBJECT
 public:
-	explicit OscAdjuster(QWidget *, QwtAxisId axisId);
+	explicit OscAdjuster(QWidget*, QwtAxisId axisId);
 	virtual ~OscAdjuster();
 
-	QWidget *parentWidget();
-	const QWidget *parentWidget() const;
+	QWidget* parentWidget();
+	const QWidget* parentWidget() const;
 
 	QwtAxisId axisId();
 
@@ -47,9 +48,9 @@ public:
 	bool isEnabled() const;
 
 	void setMouseButton(Qt::MouseButton button);
-	void getMouseButton(Qt::MouseButton &button) const;
+	void getMouseButton(Qt::MouseButton& button) const;
 
-	virtual bool eventFilter(QObject *object, QEvent *event);
+	virtual bool eventFilter(QObject* object, QEvent* event);
 
 Q_SIGNALS:
 	void wheelUp(int);
@@ -58,10 +59,10 @@ Q_SIGNALS:
 protected:
 	virtual void rescale(double factor) = 0;
 
-	virtual void widgetMousePressEvent(QMouseEvent *mouseEvent);
-	virtual void widgetMouseReleaseEvent(QMouseEvent *mouseEvent);
-	virtual void widgetMouseMoveEvent(QMouseEvent *mouseEvent) = 0;
-	virtual void widgetMouseWheelEvent(QWheelEvent *wheelEvent);
+	virtual void widgetMousePressEvent(QMouseEvent* mouseEvent);
+	virtual void widgetMouseReleaseEvent(QMouseEvent* mouseEvent);
+	virtual void widgetMouseMoveEvent(QMouseEvent* mouseEvent) = 0;
+	virtual void widgetMouseWheelEvent(QWheelEvent* wheelEvent);
 
 	double d_mouseFactor;
 	bool d_mousePressed;
@@ -72,10 +73,13 @@ protected:
 	QwtAxisId d_axisId;
 };
 
-class VertMouseGestures : public OscAdjuster {
+class VertMouseGestures : public OscAdjuster
+{
 	Q_OBJECT
 public:
-	explicit VertMouseGestures(QWidget *parent, QwtAxisId axisId) : OscAdjuster(parent, axisId) {}
+	explicit VertMouseGestures(QWidget* parent, QwtAxisId axisId)
+		: OscAdjuster(parent, axisId)
+	{}
 
 	virtual ~VertMouseGestures() {}
 
@@ -84,7 +88,8 @@ Q_SIGNALS:
 	void downMovement(double);
 
 protected:
-	virtual void rescale(double factor) {
+	virtual void rescale(double factor)
+	{
 		factor = qAbs(factor);
 		if (factor == 1.0 || factor == 0.0)
 			return;
@@ -94,7 +99,8 @@ protected:
 		else
 			Q_EMIT downMovement(factor);
 	}
-	virtual void widgetMouseMoveEvent(QMouseEvent *mouseEvent) {
+	virtual void widgetMouseMoveEvent(QMouseEvent* mouseEvent)
+	{
 		if (!d_mousePressed)
 			return;
 
@@ -111,10 +117,13 @@ protected:
 	}
 };
 
-class HorizMouseGestures : public OscAdjuster {
+class HorizMouseGestures : public OscAdjuster
+{
 	Q_OBJECT
 public:
-	explicit HorizMouseGestures(QWidget *parent, QwtAxisId axisId) : OscAdjuster(parent, axisId) {}
+	explicit HorizMouseGestures(QWidget* parent, QwtAxisId axisId)
+		: OscAdjuster(parent, axisId)
+	{}
 
 	virtual ~HorizMouseGestures() {}
 
@@ -123,7 +132,8 @@ Q_SIGNALS:
 	void rightMovement(double);
 
 protected:
-	virtual void rescale(double factor) {
+	virtual void rescale(double factor)
+	{
 		factor = qAbs(factor);
 		if (factor == 1.0 || factor == 0.0)
 			return;
@@ -134,7 +144,8 @@ protected:
 			Q_EMIT rightMovement(factor);
 	}
 
-	virtual void widgetMouseMoveEvent(QMouseEvent *mouseEvent) {
+	virtual void widgetMouseMoveEvent(QMouseEvent* mouseEvent)
+	{
 		if (!d_mousePressed)
 			return;
 

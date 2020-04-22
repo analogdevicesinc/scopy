@@ -29,7 +29,8 @@
 using namespace adiscope;
 
 namespace adiscope {
-class CrossPoint {
+class CrossPoint
+{
 public:
 	CrossPoint(float value, size_t bufIndex, bool onRising, QString name)
 		: m_value(value)
@@ -46,9 +47,11 @@ public:
 	QString m_name;
 };
 
-class HystLevelCross {
+class HystLevelCross
+{
 public:
-	enum crossEvents {
+	enum crossEvents
+	{
 		NO_CROSS = 0,
 		POS_CROSS_LOW,
 		POS_CROSS_HIGH,
@@ -58,14 +61,19 @@ public:
 		NEG_CROSS_FULL,
 	};
 
-	HystLevelCross() : m_low_trhold_crossed(false), m_high_trhold_crossed(false), m_is_between_trholds(false) {}
+	HystLevelCross()
+		: m_low_trhold_crossed(false)
+		, m_high_trhold_crossed(false)
+		, m_is_between_trholds(false)
+	{}
 
 	bool isBetweenThresholds() { return m_is_between_trholds; }
 
 	virtual inline bool updateState(enum crossEvents crsEvent) = 0;
 
 	static inline enum crossEvents get_crossing_type(double samp, double prevSamp, double low_trhold,
-							 double high_trhold) {
+							 double high_trhold)
+	{
 		enum crossEvents cross_type = NO_CROSS;
 
 		if (samp > prevSamp) {
@@ -91,7 +99,8 @@ public:
 		return cross_type;
 	}
 
-	void resetState() {
+	void resetState()
+	{
 		m_low_trhold_crossed = false;
 		m_high_trhold_crossed = false;
 		m_is_between_trholds = false;
@@ -103,11 +112,15 @@ protected:
 	bool m_is_between_trholds;
 };
 
-class HystLevelPosCross : public HystLevelCross {
+class HystLevelPosCross : public HystLevelCross
+{
 public:
-	HystLevelPosCross() : HystLevelCross() {}
+	HystLevelPosCross()
+		: HystLevelCross()
+	{}
 
-	inline bool updateState(enum crossEvents crsEvent) {
+	inline bool updateState(enum crossEvents crsEvent)
+	{
 		bool level_crossed = false;
 
 		switch (crsEvent) {
@@ -133,11 +146,15 @@ public:
 	}
 };
 
-class HystLevelNegCross : public HystLevelCross {
+class HystLevelNegCross : public HystLevelCross
+{
 public:
-	HystLevelNegCross() : HystLevelCross() {}
+	HystLevelNegCross()
+		: HystLevelCross()
+	{}
 
-	inline bool updateState(enum crossEvents crsEvent) {
+	inline bool updateState(enum crossEvents crsEvent)
+	{
 		bool level_crossed = false;
 
 		switch (crsEvent) {
@@ -163,9 +180,10 @@ public:
 	}
 };
 
-class CrossingDetection {
+class CrossingDetection
+{
 public:
-	CrossingDetection(double level, double hysteresis_span, const QString &name)
+	CrossingDetection(double level, double hysteresis_span, const QString& name)
 		: m_posCrossFound(false)
 		, m_negCrossFound(false)
 		, m_crossed(false)
@@ -176,11 +194,13 @@ public:
 		, m_low_level(level - hysteresis_span / 2)
 		, m_high_level(level + hysteresis_span / 2)
 		, m_name(name)
-		, m_externList(NULL) {}
+		, m_externList(NULL)
+	{}
 
 	double level() { return m_level; }
 
-	void setLevel(double level) {
+	void setLevel(double level)
+	{
 		if (m_level != level) {
 			m_level = level;
 			m_low_level = level - m_hysteresis_span / 2;
@@ -190,7 +210,8 @@ public:
 
 	double hysteresisSpan() { return m_hysteresis_span; }
 
-	void setHysteresisSpan(double span) {
+	void setHysteresisSpan(double span)
+	{
 		if (m_hysteresis_span != span) {
 			m_hysteresis_span = span;
 			m_low_level = m_level - span / 2;
@@ -198,11 +219,12 @@ public:
 		}
 	}
 
-	void setExternalList(QList<CrossPoint> *externList) { m_externList = externList; }
+	void setExternalList(QList<CrossPoint>* externList) { m_externList = externList; }
 
 	QList<CrossPoint> detectedCrossings() { return m_detectedCrossings; }
 
-	inline void store_closest_val_to_cross_lvl(double *data, size_t i, size_t &point) {
+	inline void store_closest_val_to_cross_lvl(double* data, size_t i, size_t& point)
+	{
 		double diff1 = qAbs(data[i - 1] - m_level);
 		double diff2 = qAbs(data[i] - m_level);
 		double diff;
@@ -221,7 +243,8 @@ public:
 			point = idx;
 	}
 
-	inline void store_first_closest_val_to_cross_lvl(double *data, size_t i, size_t &point) {
+	inline void store_first_closest_val_to_cross_lvl(double* data, size_t i, size_t& point)
+	{
 		double diff1 = qAbs(data[i - 1] - m_level);
 		double diff2 = qAbs(data[i] - m_level);
 
@@ -231,7 +254,8 @@ public:
 			point = i;
 	}
 
-	inline void crossDetectStep(double *data, size_t i) {
+	inline void crossDetectStep(double* data, size_t i)
+	{
 		auto cross_type = HystLevelCross::get_crossing_type(data[i], data[i - 1], m_low_level, m_high_level);
 
 		if (m_posCross.isBetweenThresholds())
@@ -295,13 +319,13 @@ private:
 	size_t m_negCrossPoint;
 
 	QList<CrossPoint> m_detectedCrossings;
-	QList<CrossPoint> *m_externList;
+	QList<CrossPoint>* m_externList;
 
 	QString m_name;
 };
 } // namespace adiscope
 
-Measure::Measure(int channel, double *buffer, size_t length)
+Measure::Measure(int channel, double* buffer, size_t length)
 	: m_channel(channel)
 	, m_buffer(buffer)
 	, m_buf_length(length)
@@ -311,7 +335,8 @@ Measure::Measure(int channel, double *buffer, size_t length)
 	, m_hysteresis_span(0)
 	, m_histogram(nullptr)
 	, m_cross_detect(nullptr)
-	, m_gatingEnabled(false) {
+	, m_gatingEnabled(false)
+{
 
 	// Create a set of measurements
 	m_measurements.push_back(
@@ -349,9 +374,10 @@ Measure::Measure(int channel, double *buffer, size_t length)
 	m_measurements.push_back(std::make_shared<MeasurementData>("-Duty", MeasurementData::HORIZONTAL, "%", channel));
 }
 
-bool Measure::highLowFromHistogram(double &low, double &high, double min, double max) {
+bool Measure::highLowFromHistogram(double& low, double& high, double min, double max)
+{
 	bool success = false;
-	int *hist = m_histogram;
+	int* hist = m_histogram;
 	int adc_span = 1 << m_adc_bit_count;
 	int hlf_scale = adc_span / 2;
 
@@ -378,17 +404,20 @@ bool Measure::highLowFromHistogram(double &low, double &high, double min, double
 	return success;
 }
 
-void Measure::clearMeasurements() {
+void Measure::clearMeasurements()
+{
 	for (int i = 0; i < m_measurements.size(); i++)
 		m_measurements[i]->setMeasured(false);
 }
 
-void Measure::setDataSource(double *buffer, size_t length) {
+void Measure::setDataSource(double* buffer, size_t length)
+{
 	m_buffer = buffer;
 	m_buf_length = length;
 }
 
-void Measure::measure() {
+void Measure::measure()
+{
 	clearMeasurements();
 
 	if (!m_buffer || m_buf_length == 0)
@@ -422,7 +451,7 @@ void Measure::measure() {
 	double sqr_sum;
 
 	// Cache buffer address, length, ADC bit count
-	double *data = m_buffer;
+	double* data = m_buffer;
 	size_t data_length = m_buf_length;
 	size_t count = data_length;
 	int adc_span = 1 << m_adc_bit_count;
@@ -610,8 +639,8 @@ void Measure::measure() {
 		}
 
 		for (int i = 1; i < crossSequence.size(); i++) {
-			CrossPoint &p0 = crossSequence[i - 1];
-			CrossPoint &p1 = crossSequence[i];
+			CrossPoint& p0 = crossSequence[i - 1];
+			CrossPoint& p1 = crossSequence[i];
 			if ((p1.m_bufIdx == p0.m_bufIdx) && (p1.m_onRising == p0.m_onRising)) {
 				if ((p0.m_name == "MR" && p1.m_name == "LR") ||
 				    (p0.m_name == "HR" && p1.m_name == "MR"))
@@ -634,12 +663,12 @@ void Measure::measure() {
 				    "the 10%, 50%, 90% levels";
 		} else {
 			pos /= 2;
-			CrossPoint &lowRising = crossSequence[pos];
-			CrossPoint &midRising = crossSequence[pos + 1];
-			CrossPoint &highRising = crossSequence[pos + 2];
-			CrossPoint &highFalling = crossSequence[pos + 3];
-			CrossPoint &midFalling = crossSequence[pos + 4];
-			CrossPoint &lowFalling = crossSequence[pos + 5];
+			CrossPoint& lowRising = crossSequence[pos];
+			CrossPoint& midRising = crossSequence[pos + 1];
+			CrossPoint& highRising = crossSequence[pos + 2];
+			CrossPoint& highFalling = crossSequence[pos + 3];
+			CrossPoint& midFalling = crossSequence[pos + 4];
+			CrossPoint& lowFalling = crossSequence[pos + 5];
 
 			// Cycle Mean
 			cycle_mean = period_sum / length;
@@ -714,7 +743,8 @@ void Measure::setHysteresisSpan(double value) { m_hysteresis_span = value; }
 
 int Measure::channel() const { return m_channel; }
 
-void Measure::setChannel(int channel) {
+void Measure::setChannel(int channel)
+{
 	if (m_channel != channel) {
 		for (int i = 0; i < m_measurements.size(); i++) {
 			m_measurements[i]->setChannel(channel);
@@ -733,7 +763,8 @@ QList<std::shared_ptr<MeasurementData>> Measure::measurments() { return m_measur
 
 std::shared_ptr<MeasurementData> Measure::measurement(int id) { return m_measurements[id]; }
 
-int Measure::activeMeasurementsCount() const {
+int Measure::activeMeasurementsCount() const
+{
 	int count = 0;
 
 	for (int i = 0; i < m_measurements.size(); i++)
@@ -747,7 +778,7 @@ int Measure::activeMeasurementsCount() const {
  * Class MeasurementData implementation
  */
 
-MeasurementData::MeasurementData(const QString &name, axisType axis, const QString &unit, int channel)
+MeasurementData::MeasurementData(const QString& name, axisType axis, const QString& unit, int channel)
 	: m_name(name)
 	, m_value(0)
 	, m_measured(false)
@@ -755,7 +786,8 @@ MeasurementData::MeasurementData(const QString &name, axisType axis, const QStri
 	, m_unit(unit)
 	, m_unitType(DIMENSIONLESS)
 	, m_channel(channel)
-	, m_axis(axis) {
+	, m_axis(axis)
+{
 	if (unit.isEmpty())
 		m_unitType = DIMENSIONLESS;
 	else if (unit == "%")
@@ -770,7 +802,8 @@ QString MeasurementData::name() const { return m_name; }
 
 double MeasurementData::value() const { return m_value; }
 
-void MeasurementData::setValue(double value) {
+void MeasurementData::setValue(double value)
+{
 	m_value = value;
 	m_measured = true;
 }
@@ -797,9 +830,16 @@ MeasurementData::axisType MeasurementData::axis() const { return m_axis; }
  * Class Statistic implementation
  */
 
-Statistic::Statistic() : m_sum(0), m_min(0), m_max(0), m_dataCount(0), m_average(0) {}
+Statistic::Statistic()
+	: m_sum(0)
+	, m_min(0)
+	, m_max(0)
+	, m_dataCount(0)
+	, m_average(0)
+{}
 
-void Statistic::pushNewData(double data) {
+void Statistic::pushNewData(double data)
+{
 	m_sum += data;
 
 	if (!m_dataCount) {
@@ -816,7 +856,8 @@ void Statistic::pushNewData(double data) {
 	m_average = m_sum / m_dataCount;
 }
 
-void Statistic::clear() {
+void Statistic::clear()
+{
 	m_sum = 0;
 	m_min = 0;
 	m_max = 0;

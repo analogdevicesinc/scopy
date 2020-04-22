@@ -25,12 +25,13 @@
 
 namespace adiscope {
 
-class BufferPreviewer : public QFrame {
+class BufferPreviewer : public QFrame
+{
 	Q_OBJECT
 
 public:
-	explicit BufferPreviewer(QWidget *parent = 0);
-	explicit BufferPreviewer(int pixelsPerPeriod, double wavePhase, QWidget *parent = 0);
+	explicit BufferPreviewer(QWidget* parent = 0);
+	explicit BufferPreviewer(int pixelsPerPeriod, double wavePhase, QWidget* parent = 0);
 	virtual ~BufferPreviewer();
 
 	double waveformPos() const;
@@ -59,15 +60,15 @@ Q_SIGNALS:
 	void bufferResetPosition();
 
 protected:
-	void paintEvent(QPaintEvent *) Q_DECL_OVERRIDE;
-	void resizeEvent(QResizeEvent *) Q_DECL_OVERRIDE;
-	virtual void buildFullWaveform(QPointF *wavePoints, int numPts) = 0;
+	void paintEvent(QPaintEvent*) Q_DECL_OVERRIDE;
+	void resizeEvent(QResizeEvent*) Q_DECL_OVERRIDE;
+	virtual void buildFullWaveform(QPointF* wavePoints, int numPts) = 0;
 
-	void mousePressEvent(QMouseEvent *event);
-	void mouseMoveEvent(QMouseEvent *event);
-	void mouseReleaseEvent(QMouseEvent *event);
-	void enterEvent(QEvent *event);
-	void leaveEvent(QEvent *event);
+	void mousePressEvent(QMouseEvent* event);
+	void mouseMoveEvent(QMouseEvent* event);
+	void mouseReleaseEvent(QMouseEvent* event);
+	void enterEvent(QEvent* event);
+	void leaveEvent(QEvent* event);
 
 private:
 	double m_waveformPos;
@@ -81,7 +82,7 @@ private:
 	double m_startingPhase;
 
 	int m_fullWaveNumPoints;
-	QPointF *m_fullWavePoints;
+	QPointF* m_fullWavePoints;
 
 	QPoint m_offset;
 	int m_pixelLeft;
@@ -93,24 +94,26 @@ private:
 	double m_rightGateWidth;
 };
 
-class AnalogBufferPreviewer : public BufferPreviewer {
+class AnalogBufferPreviewer : public BufferPreviewer
+{
 public:
-	explicit AnalogBufferPreviewer(QWidget *parent = 0);
-	explicit AnalogBufferPreviewer(int pixelsPerPeriod, double wavePhase, QWidget *parent = 0);
+	explicit AnalogBufferPreviewer(QWidget* parent = 0);
+	explicit AnalogBufferPreviewer(int pixelsPerPeriod, double wavePhase, QWidget* parent = 0);
 
 protected:
-	virtual void buildFullWaveform(QPointF *wavePoints, int numPts);
+	virtual void buildFullWaveform(QPointF* wavePoints, int numPts);
 };
 
-class DigitalBufferPreviewer : public BufferPreviewer {
+class DigitalBufferPreviewer : public BufferPreviewer
+{
 public:
-	explicit DigitalBufferPreviewer(QWidget *parent = 0);
-	explicit DigitalBufferPreviewer(int pixelsPerPeriod, QWidget *parent = 0);
+	explicit DigitalBufferPreviewer(QWidget* parent = 0);
+	explicit DigitalBufferPreviewer(int pixelsPerPeriod, QWidget* parent = 0);
 	void setNoOfSteps(double val);
 	double noOfSteps();
 
 protected:
-	virtual void buildFullWaveform(QPointF *wavePoints, int numPts);
+	virtual void buildFullWaveform(QPointF* wavePoints, int numPts);
 
 private:
 	double m_noOfSteps;

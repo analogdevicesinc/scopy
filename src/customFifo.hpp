@@ -25,29 +25,30 @@
 
 namespace adiscope {
 template <typename T>
-class CustomFifo {
+class CustomFifo
+{
 public:
 	explicit CustomFifo();
 	~CustomFifo();
 
-	void push(T &data);
-	T &pop();
+	void push(T& data);
+	T& pop();
 
 	void reserve(int size);
 	int size() const;
 	void clear();
 
-	T *data();
+	T* data();
 
 private:
 #if HAS_CONSTEXPR
-	static constexpr bool useQQueue = sizeof(T) <= sizeof(void *);
+	static constexpr bool useQQueue = sizeof(T) <= sizeof(void*);
 #else
 	static const bool useQQueue = false;
 #endif
 
-	QQueue<T> *queue;
-	QVector<T> *vector;
+	QQueue<T>* queue;
+	QVector<T>* vector;
 };
 } // namespace adiscope
 

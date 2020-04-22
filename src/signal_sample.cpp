@@ -23,18 +23,20 @@ using namespace adiscope;
 
 signal_sample::signal_sample()
 	: gr::sync_block("signal_sample", gr::io_signature::make(1, -1, sizeof(float)), gr::io_signature::make(0, 0, 0))
-	, QObject() {
+	, QObject()
+{
 	qRegisterMetaType<std::vector<float>>();
 	set_max_noutput_items(1);
 }
 
 signal_sample::~signal_sample() {}
 
-int signal_sample::work(int noutput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items) {
+int signal_sample::work(int noutput_items, gr_vector_const_void_star& input_items, gr_vector_void_star& output_items)
+{
 	std::vector<float> values;
 
 	for (unsigned int i = 0; i < input_items.size(); i++) {
-		const float *vect = (const float *)input_items[i];
+		const float* vect = (const float*)input_items[i];
 		values.push_back(*vect);
 	}
 

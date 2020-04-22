@@ -9,16 +9,19 @@
 
 #include <memory>
 
-extern "C" {
-struct iio_device;
-struct iio_channel;
+extern "C"
+{
+	struct iio_device;
+	struct iio_channel;
 }
 
 namespace adiscope {
 
-class HardwareTrigger {
+class HardwareTrigger
+{
 public:
-	enum condition {
+	enum condition
+	{
 		RISING_EDGE = 0,
 		FALLING_EDGE = 1,
 		LOW = 3,
@@ -26,7 +29,8 @@ public:
 		ANY_EDGE = 5,
 	};
 
-	enum mode {
+	enum mode
+	{
 		ALWAYS = 0,
 		ANALOG = 1,
 		DIGITAL = 2,
@@ -39,12 +43,14 @@ public:
 		DIGITAL_OR_ANALOG_OR_TRIGGER_IN = 9,
 	};
 
-	enum direction {
+	enum direction
+	{
 		TRIGGER_INPUT = 0,
 		TRIGGER_OUT = 1,
 	};
 
-	enum out_select {
+	enum out_select
+	{
 		sw_trigger = 0,
 		trigger_i_same_channel = 1,
 		trigger_i_swap_channel = 2,
@@ -52,7 +58,8 @@ public:
 		trigger_in = 4,
 	};
 
-	struct Settings {
+	struct Settings
+	{
 		QList<condition> analog_condition;
 		QList<condition> digital_condition;
 		QList<int> level;
@@ -65,7 +72,7 @@ public:
 	typedef std::unique_ptr<HardwareTrigger::Settings> settings_uptr;
 
 public:
-	HardwareTrigger(struct iio_device *trigger_dev);
+	HardwareTrigger(struct iio_device* trigger_dev);
 
 	uint numChannels() const;
 
@@ -85,7 +92,7 @@ public:
 	void setTriggerMode(uint chnIdx, mode mode);
 
 	QString source() const;
-	void setSource(const QString &source);
+	void setSource(const QString& source);
 
 	int sourceChannel() const;
 	void setSourceChannel(uint chnIdx, bool intern_checked, bool extern_trigger_in_checked);
@@ -97,7 +104,7 @@ public:
 	void setDelay(int delay);
 
 	std::unique_ptr<struct Settings> getCurrentHwSettings();
-	void setHwTriggerSettings(struct Settings *settings);
+	void setHwTriggerSettings(struct Settings* settings);
 
 	void setStreamingFlag(bool);
 	bool getStreamingFlag();
@@ -109,11 +116,11 @@ public:
 	void setExternalOutSelect(uint chnIdx, out_select out);
 
 private:
-	struct iio_device *m_trigger_device;
-	QList<struct iio_channel *> m_analog_channels;
-	QList<struct iio_channel *> m_digital_channels;
-	QList<struct iio_channel *> m_logic_channels;
-	struct iio_channel *m_delay_trigger;
+	struct iio_device* m_trigger_device;
+	QList<struct iio_channel*> m_analog_channels;
+	QList<struct iio_channel*> m_digital_channels;
+	QList<struct iio_channel*> m_logic_channels;
+	struct iio_channel* m_delay_trigger;
 	bool m_streaming_flag;
 	bool m_trigger_in;
 

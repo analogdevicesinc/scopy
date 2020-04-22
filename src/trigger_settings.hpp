@@ -29,10 +29,11 @@
 #include <string>
 #include <vector>
 
-extern "C" {
-struct iio_context;
-struct iio_device;
-struct iio_channel;
+extern "C"
+{
+	struct iio_context;
+	struct iio_device;
+	struct iio_channel;
 }
 
 namespace Ui {
@@ -46,15 +47,20 @@ class PositionSpinButton;
 } // namespace adiscope
 
 namespace adiscope {
-class TriggerSettings : public QWidget {
+class TriggerSettings : public QWidget
+{
 	friend class Oscilloscope_API;
 
 	Q_OBJECT
 
 public:
-	enum TriggerMode { NORMAL, AUTO };
+	enum TriggerMode
+	{
+		NORMAL,
+		AUTO
+	};
 
-	explicit TriggerSettings(std::shared_ptr<GenericAdc> adc, QWidget *parent = nullptr);
+	explicit TriggerSettings(std::shared_ptr<GenericAdc> adc, QWidget* parent = nullptr);
 	~TriggerSettings();
 
 	int currentChannel() const;
@@ -83,8 +89,8 @@ public Q_SLOTS:
 	void setDaisyChainCompensation();
 	void setTriggerLevel(double);
 	void setTriggerHysteresis(double);
-	void setTriggerLevelRange(int chn, const QPair<double, double> &range);
-	void setTriggerHystRange(int chn, const QPair<double, double> &range);
+	void setTriggerLevelRange(int chn, const QPair<double, double>& range);
+	void setTriggerHystRange(int chn, const QPair<double, double>& range);
 	void setTriggerEnable(bool);
 	void setTriggerSource(int);
 	void setTriggerLevelStep(int chn, double step);
@@ -130,15 +136,15 @@ private:
 private:
 	struct trigg_channel_config;
 
-	Ui::TriggerSettings *ui;
+	Ui::TriggerSettings* ui;
 	std::shared_ptr<GenericAdc> adc;
 	std::shared_ptr<HardwareTrigger> trigger;
 
 	static const std::vector<std::pair<std::string, HardwareTrigger::out_select>> externalTriggerOutMapping;
 
 	QList<trigg_channel_config> trigg_configs;
-	PositionSpinButton *trigger_level;
-	PositionSpinButton *trigger_hysteresis;
+	PositionSpinButton* trigger_level;
+	PositionSpinButton* trigger_hysteresis;
 	int current_channel;
 	bool temporarily_disabled;
 	bool trigger_auto_mode;

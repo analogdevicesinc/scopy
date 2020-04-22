@@ -66,7 +66,7 @@
 
 using namespace adiscope;
 
-ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent)
+ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget* parent)
 	: QMainWindow(parent)
 	, ui(new Ui::ToolLauncher)
 	, ctx(nullptr)
@@ -99,7 +99,8 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent)
 	, selectedDev(nullptr)
 	, m_use_decoders(true)
 	, menu(nullptr)
-	, m_useNativeDialogs(true) {
+	, m_useNativeDialogs(true)
+{
 	if (!isatty(STDIN_FILENO))
 		notifier.setEnabled(false);
 
@@ -119,14 +120,14 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent)
 
 	notesPanel->setVisible(false);
 
-	connect(ui->prefBtn, &QPushButton::clicked, [=]() { swapMenu(static_cast<QWidget *>(prefPanel)); });
-	connect(ui->btnNotes, &QPushButton::clicked, [=]() { swapMenu(static_cast<QWidget *>(notesPanel)); });
+	connect(ui->prefBtn, &QPushButton::clicked, [=]() { swapMenu(static_cast<QWidget*>(prefPanel)); });
+	connect(ui->btnNotes, &QPushButton::clicked, [=]() { swapMenu(static_cast<QWidget*>(notesPanel)); });
 
 	connect(prefPanel, &Preferences::reset, this, &ToolLauncher::resetSession);
 	connect(prefPanel, &Preferences::notify, this, &ToolLauncher::readPreferences);
 
-	const QVector<QString> &uris = searchDevices();
-	for (const QString &each : uris)
+	const QVector<QString>& uris = searchDevices();
+	for (const QString& each : uris)
 		addContext(each);
 
 	current = ui->homeWidget;
@@ -155,7 +156,7 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent)
 #if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
 	js_engine.installExtensions(QJSEngine::ConsoleExtension);
 #endif
-	QtJs *js_object = new QtJs(&js_engine);
+	QtJs* js_object = new QtJs(&js_engine);
 	js_engine.globalObject().setProperty("fileIO", js_engine.newQObject(new JsFileIo(this)));
 	tl_api->js_register(&js_engine);
 
@@ -210,7 +211,8 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent)
 	_setupToolMenu();
 }
 
-void ToolLauncher::_setupToolMenu() {
+void ToolLauncher::_setupToolMenu()
+{
 	menu = new ToolMenu(prefPanel, ui->menuContainer);
 	ui->menuContainerLayout->addWidget(menu);
 
@@ -234,8 +236,9 @@ void ToolLauncher::_setupToolMenu() {
 	connect(menu, &ToolMenu::enableInfoWidget, infoWidget, &InfoWidget::enable);
 }
 
-void ToolLauncher::_toolSelected(enum tool tool) {
-	Tool *selectedTool = nullptr;
+void ToolLauncher::_toolSelected(enum tool tool)
+{
+	Tool* selectedTool = nullptr;
 	switch (tool) {
 	case TOOL_OSCILLOSCOPE:
 		selectedTool = oscilloscope;
@@ -279,7 +282,8 @@ void ToolLauncher::_toolSelected(enum tool tool) {
 	}
 }
 
-void ToolLauncher::readPreferences() {
+void ToolLauncher::readPreferences()
+{
 	m_use_decoders = prefPanel->getDigital_decoders_enabled();
 
 	ui->btnNotes->setVisible(prefPanel->getUser_notes_active());
@@ -292,7 +296,8 @@ void ToolLauncher::readPreferences() {
 	AnimationManager::getInstance().toggleAnimations(prefPanel->getAnimations_enabled());
 }
 
-void ToolLauncher::loadIndexPageFromContent(QString fileLocation) {
+void ToolLauncher::loadIndexPageFromContent(QString fileLocation)
+{
 	QFileInfo fileInfo(fileLocation);
 	if (fileInfo.exists()) {
 		QFile indexFile(fileInfo.filePath());
@@ -309,7 +314,8 @@ void ToolLauncher::loadIndexPageFromContent(QString fileLocation) {
 	}
 }
 
-void ToolLauncher::pageMoved(int direction) {
+void ToolLauncher::pageMoved(int direction)
+{
 	if (ui->btnAdd->isChecked()) {
 		if (!devices.size() && direction > 0) {
 			return;
@@ -329,7 +335,8 @@ void ToolLauncher::pageMoved(int direction) {
 	}
 }
 
-void ToolLauncher::saveSession() {
+void ToolLauncher::saveSession()
+{
 	if (ctx) {
 		QString fileName = QFileDialog::getSaveFileName(
 			this, tr("Save session"), "", tr("Scopy-Files (*.ini)"), nullptr,
@@ -340,7 +347,8 @@ void ToolLauncher::saveSession() {
 	}
 }
 
-void ToolLauncher::allowExternalScript(bool prefEnabled) {
+void ToolLauncher::allowExternalScript(bool prefEnabled)
+{
 	if (prefEnabled && debugger_enabled) {
 		js_engine.globalObject().setProperty("extern", js_engine.newQObject(new ExternalScript_API(this)));
 	} else {
@@ -352,7 +360,8 @@ void ToolLauncher::allowExternalScript(bool prefEnabled) {
 
 bool ToolLauncher::getUseDecoders() const { return m_use_decoders; }
 
-void ToolLauncher::setUseDecoders(bool use_decoders) {
+void ToolLauncher::setUseDecoders(bool use_decoders)
+{
 	m_use_decoders = use_decoders;
 	prefPanel->setDigital_decoders_enabled(use_decoders);
 }
@@ -361,7 +370,8 @@ bool ToolLauncher::hasNativeDialogs() const { return m_useNativeDialogs; }
 
 void ToolLauncher::setNativeDialogs(bool nativeDialogs) { m_useNativeDialogs = nativeDialogs; }
 
-void ToolLauncher::loadSession() {
+void ToolLauncher::loadSession()
+{
 	QString fileName = QFileDialog::getOpenFileName(
 		this, tr("Load session"), "", tr("Scopy-Files (*.ini)"), nullptr,
 		(m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
@@ -372,7 +382,8 @@ void ToolLauncher::loadSession() {
 	}
 }
 
-DeviceWidget *ToolLauncher::getConnectedDevice() {
+DeviceWidget* ToolLauncher::getConnectedDevice()
+{
 	for (auto dev : devices) {
 		if (dev->connected()) {
 			return dev;
@@ -381,7 +392,8 @@ DeviceWidget *ToolLauncher::getConnectedDevice() {
 	return nullptr;
 }
 
-DeviceWidget *ToolLauncher::getSelectedDevice() {
+DeviceWidget* ToolLauncher::getSelectedDevice()
+{
 	for (int i = 0; i < devices.size(); i++) {
 		auto dev = devices.at(i);
 		if (dev->isChecked()) {
@@ -391,7 +403,8 @@ DeviceWidget *ToolLauncher::getSelectedDevice() {
 	return nullptr;
 }
 
-int ToolLauncher::getDeviceIndex(DeviceWidget *device) {
+int ToolLauncher::getDeviceIndex(DeviceWidget* device)
+{
 	for (int i = 0; i < devices.size(); i++) {
 		if (devices.at(i) == device) {
 			return i;
@@ -400,9 +413,10 @@ int ToolLauncher::getDeviceIndex(DeviceWidget *device) {
 	return -1;
 }
 
-void ToolLauncher::resetSession() {
+void ToolLauncher::resetSession()
+{
 	QString uri;
-	DeviceWidget *connectedDev = nullptr;
+	DeviceWidget* connectedDev = nullptr;
 	if (ctx) {
 		connectedDev = getConnectedDevice();
 		uri = connectedDev->uri();
@@ -428,7 +442,8 @@ void ToolLauncher::resetSession() {
 	}
 }
 
-void ToolLauncher::saveSettings() {
+void ToolLauncher::saveSettings()
+{
 	QSettings settings;
 	QFile tempFile(settings.fileName() + ".bak");
 	QSettings tempSettings(tempFile.fileName(), QSettings::IniFormat);
@@ -439,7 +454,8 @@ void ToolLauncher::saveSettings() {
 	QFile::copy(tempFile.fileName(), scopyFile.fileName());
 }
 
-void ToolLauncher::runProgram(const QString &program, const QString &fn) {
+void ToolLauncher::runProgram(const QString& program, const QString& fn)
+{
 	QJSValue val = js_engine.evaluate(program, fn);
 
 	int ret = EXIT_SUCCESS;
@@ -454,18 +470,20 @@ void ToolLauncher::runProgram(const QString &program, const QString &fn) {
 	qApp->exit(ret);
 }
 
-void ToolLauncher::search() {
+void ToolLauncher::search()
+{
 	search_timer->stop();
 	future = QtConcurrent::run(this, &ToolLauncher::searchDevices);
 	watcher.setFuture(future);
 }
 
-QVector<QString> ToolLauncher::searchDevices() {
-	struct iio_context_info **info;
+QVector<QString> ToolLauncher::searchDevices()
+{
+	struct iio_context_info** info;
 	unsigned int nb_contexts;
 	QVector<QString> uris;
 
-	struct iio_scan_context *scan_ctx = iio_create_scan_context("usb", 0);
+	struct iio_scan_context* scan_ctx = iio_create_scan_context("usb", 0);
 
 	if (!scan_ctx) {
 		std::cerr << "Unable to create scan context!" << std::endl;
@@ -490,7 +508,8 @@ out_destroy_context:
 	return uris;
 }
 
-void ToolLauncher::updateListOfDevices(const QVector<QString> &uris) {
+void ToolLauncher::updateListOfDevices(const QVector<QString>& uris)
+{
 	// Delete devices that are in the devices list but not found anymore
 	// when scanning
 
@@ -519,7 +538,7 @@ void ToolLauncher::updateListOfDevices(const QVector<QString> &uris) {
 		}
 	}
 
-	for (const QString &uri : uris) {
+	for (const QString& uri : uris) {
 		if (!uri.startsWith("usb:"))
 			continue;
 
@@ -532,7 +551,8 @@ void ToolLauncher::updateListOfDevices(const QVector<QString> &uris) {
 	search_timer->start(TIMER_TIMEOUT_MS);
 }
 
-void ToolLauncher::loadToolTips(bool connected) {
+void ToolLauncher::loadToolTips(bool connected)
+{
 	if (connected) {
 		ui->btnHome->setToolTip(QString("Click to open the home menu"));
 		ui->btnConnect->setToolTip(QString("Click to disconnect the device"));
@@ -548,7 +568,8 @@ void ToolLauncher::loadToolTips(bool connected) {
 
 void ToolLauncher::update() { updateListOfDevices(watcher.result()); }
 
-ToolLauncher::~ToolLauncher() {
+ToolLauncher::~ToolLauncher()
+{
 
 	disconnect();
 	this->removeEventFilter(this);
@@ -573,17 +594,19 @@ ToolLauncher::~ToolLauncher() {
 	saveSettings();
 }
 
-void ToolLauncher::destroyPopup() {
-	auto *popup = static_cast<pv::widgets::Popup *>(QObject::sender());
+void ToolLauncher::destroyPopup()
+{
+	auto* popup = static_cast<pv::widgets::Popup*>(QObject::sender());
 
 	popup->deleteLater();
 }
 
-void ToolLauncher::forgetDeviceBtn_clicked(QString uri) {
+void ToolLauncher::forgetDeviceBtn_clicked(QString uri)
+{
 	if (previousIp == uri.mid(3)) {
 		previousIp = "";
 	}
-	DeviceWidget *dev = nullptr;
+	DeviceWidget* dev = nullptr;
 	for (auto d : devices) {
 		if (d == sender()) {
 			dev = d;
@@ -624,7 +647,8 @@ void ToolLauncher::forgetDeviceBtn_clicked(QString uri) {
 	}
 }
 
-QPushButton *ToolLauncher::addContext(const QString &uri) {
+QPushButton* ToolLauncher::addContext(const QString& uri)
+{
 	auto tempCtx = iio_create_context_from_uri(uri.toStdString().c_str());
 	if (!tempCtx)
 		return nullptr;
@@ -633,7 +657,7 @@ QPushButton *ToolLauncher::addContext(const QString &uri) {
 	if (!tempFilter)
 		return nullptr;
 
-	DeviceWidget *deviceWidget = nullptr;
+	DeviceWidget* deviceWidget = nullptr;
 	if (tempFilter->hw_name().compare("M2K") == 0) {
 		deviceWidget = DeviceBuilder::newDevice(DeviceBuilder::M2K, uri, tempFilter->hw_name(), this);
 	} else {
@@ -664,7 +688,8 @@ QPushButton *ToolLauncher::addContext(const QString &uri) {
 	return deviceWidget->deviceButton();
 }
 
-void ToolLauncher::stopSearching(bool stop) {
+void ToolLauncher::stopSearching(bool stop)
+{
 	if (stop) {
 		search_timer->stop();
 	} else {
@@ -673,7 +698,8 @@ void ToolLauncher::stopSearching(bool stop) {
 	}
 }
 
-void ToolLauncher::btnHomepage_toggled(bool toggled) {
+void ToolLauncher::btnHomepage_toggled(bool toggled)
+{
 	setDynamicProperty(ui->homepageWidget, "selected", toggled);
 	if (toggled) {
 		ui->stackedWidget->slideToIndex(0);
@@ -683,7 +709,8 @@ void ToolLauncher::btnHomepage_toggled(bool toggled) {
 	}
 }
 
-void ToolLauncher::btnAdd_toggled(bool toggled) {
+void ToolLauncher::btnAdd_toggled(bool toggled)
+{
 	setDynamicProperty(ui->addWidget, "selected", toggled);
 	if (toggled) {
 		ui->stackedWidget->slideToIndex(1);
@@ -697,7 +724,8 @@ void ToolLauncher::btnAdd_toggled(bool toggled) {
 	}
 }
 
-DeviceWidget *ToolLauncher::getDevice(QString uri) {
+DeviceWidget* ToolLauncher::getDevice(QString uri)
+{
 	for (auto dev : devices) {
 		if (dev->uri() == uri) {
 			return dev;
@@ -706,7 +734,8 @@ DeviceWidget *ToolLauncher::getDevice(QString uri) {
 	return nullptr;
 }
 
-void ToolLauncher::highlightDevice(QPushButton *btn) {
+void ToolLauncher::highlightDevice(QPushButton* btn)
+{
 	bool initialBtnState = btn->property("checked").toBool();
 
 	QTimer::singleShot(200, [=]() { setDynamicProperty(btn, "checked", !initialBtnState); });
@@ -715,20 +744,21 @@ void ToolLauncher::highlightDevice(QPushButton *btn) {
 	QTimer::singleShot(800, [=]() { setDynamicProperty(btn, "checked", initialBtnState); });
 }
 
-void ToolLauncher::setupHomepage() {
+void ToolLauncher::setupHomepage()
+{
 	// Welcome page
 
-	QWidget *homepage = new QWidget(ui->stackedWidget);
-	QVBoxLayout *layout = new QVBoxLayout(homepage);
+	QWidget* homepage = new QWidget(ui->stackedWidget);
+	QVBoxLayout* layout = new QVBoxLayout(homepage);
 	welcome = new QTextBrowser(homepage);
 	welcome->setFrameShape(QFrame::NoFrame);
 	welcome->setOpenExternalLinks(true);
 	welcome->setSource(QUrl("qrc:/scopy.html"));
 	layout->addWidget(welcome);
 
-	QWidget *reportRegion = new QWidget(homepage);
-	QHBoxLayout *reportLayout = new QHBoxLayout(reportRegion);
-	QPushButton *reportBtn = new QPushButton(reportRegion);
+	QWidget* reportRegion = new QWidget(homepage);
+	QHBoxLayout* reportLayout = new QHBoxLayout(reportRegion);
+	QPushButton* reportBtn = new QPushButton(reportRegion);
 	reportBtn->setText("Report a bug!");
 	reportBtn->setStyleSheet("QPushButton {"
 				 "border: 0px;"
@@ -789,9 +819,10 @@ void ToolLauncher::setupHomepage() {
 	loadIndexPageFromContent(indexFile);
 }
 
-void ToolLauncher::setupAddPage() {
+void ToolLauncher::setupAddPage()
+{
 	connectWidget = new ConnectDialog(ui->stackedWidget);
-	connect(connectWidget, &ConnectDialog::newContext, [=](const QString &uri) {
+	connect(connectWidget, &ConnectDialog::newContext, [=](const QString& uri) {
 		auto dev = getDevice(uri);
 		if (dev) {
 			highlightDevice(dev->deviceButton());
@@ -808,8 +839,9 @@ void ToolLauncher::setupAddPage() {
 
 void ToolLauncher::updateHomepage() { ui->stackedWidget->removeWidget(ui->stackedWidget->widget(0)); }
 
-void ToolLauncher::swapMenu(QWidget *menu) {
-	Tool *tl = dynamic_cast<Tool *>(menu);
+void ToolLauncher::swapMenu(QWidget* menu)
+{
+	Tool* tl = dynamic_cast<Tool*>(menu);
 
 	if (current) {
 		current->setVisible(false);
@@ -822,37 +854,39 @@ void ToolLauncher::swapMenu(QWidget *menu) {
 	current->setVisible(true);
 }
 
-void ToolLauncher::setButtonBackground(bool on) {
-	auto *btn = static_cast<QPushButton *>(QObject::sender());
+void ToolLauncher::setButtonBackground(bool on)
+{
+	auto* btn = static_cast<QPushButton*>(QObject::sender());
 
 	setDynamicProperty(btn->parentWidget(), "selected", on);
 }
 
-void ToolLauncher::btnOscilloscope_clicked() { swapMenu(static_cast<QWidget *>(oscilloscope)); }
+void ToolLauncher::btnOscilloscope_clicked() { swapMenu(static_cast<QWidget*>(oscilloscope)); }
 
-void ToolLauncher::btnSignalGenerator_clicked() { swapMenu(static_cast<QWidget *>(signal_generator)); }
+void ToolLauncher::btnSignalGenerator_clicked() { swapMenu(static_cast<QWidget*>(signal_generator)); }
 
-void ToolLauncher::btnDMM_clicked() { swapMenu(static_cast<QWidget *>(dmm)); }
+void ToolLauncher::btnDMM_clicked() { swapMenu(static_cast<QWidget*>(dmm)); }
 
-void ToolLauncher::btnPowerControl_clicked() { swapMenu(static_cast<QWidget *>(power_control)); }
+void ToolLauncher::btnPowerControl_clicked() { swapMenu(static_cast<QWidget*>(power_control)); }
 
-void ToolLauncher::btnLogicAnalyzer_clicked() { swapMenu(static_cast<QWidget *>(logic_analyzer)); }
+void ToolLauncher::btnLogicAnalyzer_clicked() { swapMenu(static_cast<QWidget*>(logic_analyzer)); }
 
-void adiscope::ToolLauncher::btnPatternGenerator_clicked() { swapMenu(static_cast<QWidget *>(pattern_generator)); }
+void adiscope::ToolLauncher::btnPatternGenerator_clicked() { swapMenu(static_cast<QWidget*>(pattern_generator)); }
 
-void adiscope::ToolLauncher::btnNetworkAnalyzer_clicked() { swapMenu(static_cast<QWidget *>(network_analyzer)); }
+void adiscope::ToolLauncher::btnNetworkAnalyzer_clicked() { swapMenu(static_cast<QWidget*>(network_analyzer)); }
 
-void adiscope::ToolLauncher::btnSpectrumAnalyzer_clicked() { swapMenu(static_cast<QWidget *>(spectrum_analyzer)); }
+void adiscope::ToolLauncher::btnSpectrumAnalyzer_clicked() { swapMenu(static_cast<QWidget*>(spectrum_analyzer)); }
 
-void adiscope::ToolLauncher::btnDigitalIO_clicked() { swapMenu(static_cast<QWidget *>(dio)); }
+void adiscope::ToolLauncher::btnDigitalIO_clicked() { swapMenu(static_cast<QWidget*>(dio)); }
 
 void adiscope::ToolLauncher::on_btnHome_clicked() { swapMenu(ui->homeWidget); }
 
-void adiscope::ToolLauncher::btnDebugger_clicked() { swapMenu(static_cast<QWidget *>(debugger)); }
+void adiscope::ToolLauncher::btnDebugger_clicked() { swapMenu(static_cast<QWidget*>(debugger)); }
 
-void adiscope::ToolLauncher::btnCalibration_clicked() { swapMenu(static_cast<QWidget *>(manual_calibration)); }
+void adiscope::ToolLauncher::btnCalibration_clicked() { swapMenu(static_cast<QWidget*>(manual_calibration)); }
 
-void adiscope::ToolLauncher::resetStylesheets() {
+void adiscope::ToolLauncher::resetStylesheets()
+{
 	setDynamicProperty(ui->btnConnect, "connected", false);
 	setDynamicProperty(ui->btnConnect, "failed", false);
 
@@ -861,8 +895,9 @@ void adiscope::ToolLauncher::resetStylesheets() {
 	}
 }
 
-void adiscope::ToolLauncher::deviceBtn_clicked(bool pressed) {
-	DeviceWidget *dev = nullptr;
+void adiscope::ToolLauncher::deviceBtn_clicked(bool pressed)
+{
+	DeviceWidget* dev = nullptr;
 	for (auto d : devices) {
 		if (d == sender()) {
 			dev = d;
@@ -894,7 +929,8 @@ void adiscope::ToolLauncher::deviceBtn_clicked(bool pressed) {
 	}
 }
 
-void adiscope::ToolLauncher::disconnect() {
+void adiscope::ToolLauncher::disconnect()
+{
 	/* Switch back to home screen */
 	ui->btnHome->click();
 
@@ -922,14 +958,16 @@ void adiscope::ToolLauncher::disconnect() {
 	updateListOfDevices(searchDevices());
 }
 
-void adiscope::ToolLauncher::ping() {
+void adiscope::ToolLauncher::ping()
+{
 	int ret = iio_context_get_version(ctx, nullptr, nullptr, nullptr);
 
 	if (ret < 0)
 		disconnect();
 }
 
-void adiscope::ToolLauncher::connectBtn_clicked(bool pressed) {
+void adiscope::ToolLauncher::connectBtn_clicked(bool pressed)
+{
 	auto connectedDev = getConnectedDevice();
 	for (auto d : devices) {
 		if (d->connectButton() == sender()) {
@@ -974,7 +1012,6 @@ void adiscope::ToolLauncher::connectBtn_clicked(bool pressed) {
 				search_timer->stop();
 
 				ui->saveBtn->parentWidget()->setEnabled(true);
-
 			} else {
 				setDynamicProperty(ui->btnConnect, "failed", true);
 				selectedDev->setConnected(false, true);
@@ -993,7 +1030,8 @@ void adiscope::ToolLauncher::connectBtn_clicked(bool pressed) {
 	}
 }
 
-void adiscope::ToolLauncher::destroyContext() {
+void adiscope::ToolLauncher::destroyContext()
+{
 	if (dio) {
 		delete dio;
 		dio = nullptr;
@@ -1075,7 +1113,8 @@ void adiscope::ToolLauncher::destroyContext() {
 	toolList.clear();
 }
 
-bool ToolLauncher::loadDecoders(QString path) {
+bool ToolLauncher::loadDecoders(QString path)
+{
 	static bool srd_loaded = false;
 
 	if (srd_loaded) {
@@ -1099,7 +1138,8 @@ bool ToolLauncher::loadDecoders(QString path) {
 	return true;
 }
 
-void adiscope::ToolLauncher::saveRunningToolsBeforeCalibration() {
+void adiscope::ToolLauncher::saveRunningToolsBeforeCalibration()
+{
 	if (dmm->isRunning())
 		calibration_saved_tools.push_back(dmm);
 	if (oscilloscope->isRunning())
@@ -1112,38 +1152,44 @@ void adiscope::ToolLauncher::saveRunningToolsBeforeCalibration() {
 		calibration_saved_tools.push_back(network_analyzer);
 }
 
-void adiscope::ToolLauncher::stopToolsBeforeCalibration() {
-	for (Tool *tool : calibration_saved_tools)
+void adiscope::ToolLauncher::stopToolsBeforeCalibration()
+{
+	for (Tool* tool : calibration_saved_tools)
 		tool->stop();
 }
-void adiscope::ToolLauncher::restartToolsAfterCalibration() {
+void adiscope::ToolLauncher::restartToolsAfterCalibration()
+{
 	getConnectedDevice()->calibrateButton()->setEnabled(true);
 	while (!calibration_saved_tools.empty()) {
-		Tool *tool = calibration_saved_tools.back();
+		Tool* tool = calibration_saved_tools.back();
 		calibration_saved_tools.pop_back();
 		tool->run();
 	}
 }
-void adiscope::ToolLauncher::requestCalibration() {
+void adiscope::ToolLauncher::requestCalibration()
+{
 	getConnectedDevice()->calibrateButton()->setEnabled(false);
 	saveRunningToolsBeforeCalibration();
 	stopToolsBeforeCalibration();
 	calibration_thread = QtConcurrent::run(std::bind(&ToolLauncher::calibrate, this));
 }
 
-void adiscope::ToolLauncher::requestCalibrationCancel() {
+void adiscope::ToolLauncher::requestCalibrationCancel()
+{
 	calib->cancelCalibration();
 	getConnectedDevice()->calibrateButton()->setEnabled(true);
 }
 
-void adiscope::ToolLauncher::calibrationFailedCallback() {
+void adiscope::ToolLauncher::calibrationFailedCallback()
+{
 	selectedDev->infoPage()->setStatusLabel("Calibration Failed");
 	selectedDev->connectButton()->setText("Disconnect");
 	selectedDev->connectButton()->setEnabled(true);
 	getConnectedDevice()->calibrateButton()->setEnabled(true);
 }
 
-void adiscope::ToolLauncher::initialCalibration() {
+void adiscope::ToolLauncher::initialCalibration()
+{
 	bool ok = true;
 
 	if (!skip_calibration) {
@@ -1151,15 +1197,16 @@ void adiscope::ToolLauncher::initialCalibration() {
 	}
 }
 
-bool adiscope::ToolLauncher::calibrate() {
+bool adiscope::ToolLauncher::calibrate()
+{
 	bool ok = false;
 	calibrating = true;
 
-	QPushButton *dmm_btn = menu->getToolMenuItemFor(TOOL_DMM)->getToolBtn();
-	QPushButton *osc_btn = menu->getToolMenuItemFor(TOOL_OSCILLOSCOPE)->getToolBtn();
-	QPushButton *siggen_btn = menu->getToolMenuItemFor(TOOL_SIGNAL_GENERATOR)->getToolBtn();
-	QPushButton *spectrum_btn = menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER)->getToolBtn();
-	QPushButton *network_btn = menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER)->getToolBtn();
+	QPushButton* dmm_btn = menu->getToolMenuItemFor(TOOL_DMM)->getToolBtn();
+	QPushButton* osc_btn = menu->getToolMenuItemFor(TOOL_OSCILLOSCOPE)->getToolBtn();
+	QPushButton* siggen_btn = menu->getToolMenuItemFor(TOOL_SIGNAL_GENERATOR)->getToolBtn();
+	QPushButton* spectrum_btn = menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER)->getToolBtn();
+	QPushButton* network_btn = menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER)->getToolBtn();
 	auto old_dmm_text = dmm_btn->text();
 	auto old_osc_text = osc_btn->text();
 	auto old_siggen_text = siggen_btn->text();
@@ -1197,7 +1244,8 @@ bool adiscope::ToolLauncher::calibrate() {
 	return ok;
 }
 
-void adiscope::ToolLauncher::enableAdcBasedTools() {
+void adiscope::ToolLauncher::enableAdcBasedTools()
+{
 	if (filter->compatible(TOOL_OSCILLOSCOPE)) {
 		oscilloscope = new Oscilloscope(ctx, filter, adc, menu->getToolMenuItemFor(TOOL_OSCILLOSCOPE),
 						&js_engine, this);
@@ -1250,7 +1298,8 @@ void adiscope::ToolLauncher::enableAdcBasedTools() {
 	Q_EMIT adcToolsCreated();
 }
 
-void adiscope::ToolLauncher::enableDacBasedTools() {
+void adiscope::ToolLauncher::enableDacBasedTools()
+{
 	if (filter->compatible(TOOL_SIGNAL_GENERATOR)) {
 		signal_generator = new SignalGenerator(
 			ctx, dacs, filter, menu->getToolMenuItemFor(TOOL_SIGNAL_GENERATOR), &js_engine, this);
@@ -1266,13 +1315,14 @@ void adiscope::ToolLauncher::enableDacBasedTools() {
 	selectedDev->connectButton()->setText("Disconnect");
 	selectedDev->connectButton()->setEnabled(true);
 
-	for (auto &tool : toolList) {
+	for (auto& tool : toolList) {
 		tool->setNativeDialogs(m_useNativeDialogs);
 		qDebug() << tool << " will use native dialogs: " << m_useNativeDialogs;
 	}
 }
 
-bool adiscope::ToolLauncher::switchContext(const QString &uri) {
+bool adiscope::ToolLauncher::switchContext(const QString& uri)
+{
 	destroyContext();
 
 	if (uri.startsWith("ip:")) {
@@ -1297,12 +1347,12 @@ bool adiscope::ToolLauncher::switchContext(const QString &uri) {
 	dacs.clear();
 
 	// Find available DACs
-	QList<struct iio_device *> iio_dacs;
+	QList<struct iio_device*> iio_dacs;
 	for (unsigned int dev_id = 0;; dev_id++) {
-		struct iio_device *dev;
+		struct iio_device* dev;
 		try {
 			dev = filter->find_device(ctx, TOOL_SIGNAL_GENERATOR, dev_id);
-		} catch (std::exception &ex) {
+		} catch (std::exception& ex) {
 			break;
 		}
 		iio_dacs.push_back(dev);
@@ -1408,7 +1458,7 @@ bool adiscope::ToolLauncher::switchContext(const QString &uri) {
 		if (en) {
 			if (adc_users_group.checkedId() ==
 			    adc_users_group.id(menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER)->getToolStopBtn())) {
-				auto btn = dynamic_cast<CustomPushButton *>(
+				auto btn = dynamic_cast<CustomPushButton*>(
 					menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER)->getToolStopBtn());
 				btn->setChecked(false);
 			}
@@ -1433,7 +1483,8 @@ bool adiscope::ToolLauncher::switchContext(const QString &uri) {
 	return true;
 }
 
-void ToolLauncher::calibrationThreadWatcherFinished() {
+void ToolLauncher::calibrationThreadWatcherFinished()
+{
 	QObject::disconnect(this, SIGNAL(adcCalibrationDone()), this, SLOT(enableAdcBasedTools()));
 	QObject::disconnect(this, SIGNAL(dacCalibrationDone()), this, SLOT(enableDacBasedTools()));
 
@@ -1441,7 +1492,8 @@ void ToolLauncher::calibrationThreadWatcherFinished() {
 	connect(getConnectedDevice()->calibrateButton(), SIGNAL(clicked()), this, SLOT(requestCalibration()));
 }
 
-void ToolLauncher::hasText() {
+void ToolLauncher::hasText()
+{
 	QTextStream in(stdin);
 	QTextStream out(stdout);
 
@@ -1470,7 +1522,8 @@ void ToolLauncher::hasText() {
 	out.flush();
 }
 
-void ToolLauncher::checkIp(const QString &ip) {
+void ToolLauncher::checkIp(const QString& ip)
+{
 	if (iio_create_network_context(ip.toStdString().c_str())) {
 		previousIp = ip;
 
@@ -1485,19 +1538,19 @@ void ToolLauncher::checkIp(const QString &ip) {
 		}
 
 		if (!found)
-			QMetaObject::invokeMethod(this, "addContext", Qt::QueuedConnection,
-						  Q_ARG(const QString &, uri));
+			QMetaObject::invokeMethod(this, "addContext", Qt::QueuedConnection, Q_ARG(const QString&, uri));
 	} else {
 		previousIp = "";
 	}
 }
 
-void ToolLauncher::toolDetached(bool detached) {
-	Tool *tool = static_cast<Tool *>(QObject::sender());
+void ToolLauncher::toolDetached(bool detached)
+{
+	Tool* tool = static_cast<Tool*>(QObject::sender());
 
 	if (detached) {
 		/* Switch back to the home screen */
-		if (current == static_cast<QWidget *>(tool))
+		if (current == static_cast<QWidget*>(tool))
 			ui->btnHome->click();
 
 		setDynamicProperty(tool->runButton()->parentWidget(), "selected", false);
@@ -1506,7 +1559,8 @@ void ToolLauncher::toolDetached(bool detached) {
 	tool->setVisible(detached);
 }
 
-void ToolLauncher::closeEvent(QCloseEvent *event) {
+void ToolLauncher::closeEvent(QCloseEvent* event)
+{
 	// Notify tools that the launcher is closing
 	Q_EMIT launcherClosed();
 
@@ -1525,13 +1579,14 @@ void ToolLauncher::closeEvent(QCloseEvent *event) {
 	debugWindows.clear();
 }
 
-Preferences *ToolLauncher::getPrefPanel() const { return prefPanel; }
+Preferences* ToolLauncher::getPrefPanel() const { return prefPanel; }
 
-Calibration *ToolLauncher::getCalibration() const { return calib; }
+Calibration* ToolLauncher::getCalibration() const { return calib; }
 
-bool ToolLauncher::eventFilter(QObject *watched, QEvent *event) {
+bool ToolLauncher::eventFilter(QObject* watched, QEvent* event)
+{
 	if (event->type() == QEvent::MouseButtonRelease) {
-		QMouseEvent *me = static_cast<QMouseEvent *>(event);
+		QMouseEvent* me = static_cast<QMouseEvent*>(event);
 		QPoint mousePosLoad = ui->Load->mapFromGlobal(QCursor::pos());
 		QPoint mousePosSave = ui->Save->mapFromGlobal(QCursor::pos());
 		QPoint mousePosPref = ui->preference->mapFromGlobal(QCursor::pos());

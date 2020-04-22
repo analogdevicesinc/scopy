@@ -27,7 +27,8 @@
 namespace adiscope {
 
 class M2kAdc;
-class adc_sample_conv : public gr::sync_block {
+class adc_sample_conv : public gr::sync_block
+{
 private:
 	int d_nconnections;
 	bool inverse;
@@ -59,7 +60,7 @@ public:
 	void setHardwareGain(int connection, float gain);
 	float hardwareGain(int connection) const;
 
-	int work(int noutput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items);
+	int work(int noutput_items, gr_vector_const_void_star& input_items, gr_vector_void_star& output_items);
 };
 } // namespace adiscope
 

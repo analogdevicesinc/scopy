@@ -29,13 +29,14 @@
 class QShowEvent;
 
 namespace adiscope {
-class CustomSwitch : public QPushButton {
+class CustomSwitch : public QPushButton
+{
 	Q_OBJECT
 
 	Q_PROPERTY(int duration_ms MEMBER duration_ms WRITE setDuration);
 
 public:
-	explicit CustomSwitch(QWidget *parent = nullptr);
+	explicit CustomSwitch(QWidget* parent = nullptr);
 	~CustomSwitch();
 
 private:
@@ -48,8 +49,8 @@ private:
 	void setDuration(int ms);
 	void updateOnOffLabels();
 
-	void showEvent(QShowEvent *event);
-	bool event(QEvent *);
+	void showEvent(QShowEvent* event);
+	bool event(QEvent*);
 
 private Q_SLOTS:
 	void toggleAnim(bool enabled);

@@ -43,14 +43,16 @@ class CalibrationTemplate;
 
 namespace adiscope {
 
-struct stCalibStory {
+struct stCalibStory
+{
 	int calibProcedure;
 	int calibStep;
 	QStringList story;
 	QString storyName;
 };
 
-struct stCalibParam {
+struct stCalibParam
+{
 	double offset_pos_dac;
 	double offset_neg_dac;
 	double gain_pos_dac;
@@ -62,25 +64,38 @@ struct stCalibParam {
 	double gain_neg_adc;
 };
 
-enum calibrations { POSITIVE_OFFSET = 0, NEGATIVE_OFFSET, CALIB_PARAM, START_CALIB_PARAM };
+enum calibrations
+{
+	POSITIVE_OFFSET = 0,
+	NEGATIVE_OFFSET,
+	CALIB_PARAM,
+	START_CALIB_PARAM
+};
 
-enum steps { STEP1 = 0, STEP2, STEP3, STEP4 };
+enum steps
+{
+	STEP1 = 0,
+	STEP2,
+	STEP3,
+	STEP4
+};
 
 class ManualCalibration_API;
-class ManualCalibration : public Tool {
+class ManualCalibration : public Tool
+{
 	friend class ManualCalibration_API;
 	friend class ToolLauncher_API;
 
 	Q_OBJECT
 
 public:
-	explicit ManualCalibration(struct iio_context *ctx, Filter *filt, ToolMenuItem *toolMenuItem, QJSEngine *engine,
-				   ToolLauncher *parent = 0, Calibration *cal = 0);
+	explicit ManualCalibration(struct iio_context* ctx, Filter* filt, ToolMenuItem* toolMenuItem, QJSEngine* engine,
+				   ToolLauncher* parent = 0, Calibration* cal = 0);
 
 	~ManualCalibration();
 
 	void startCalibration();
-	void setCalibration(Calibration *cal);
+	void setCalibration(Calibration* cal);
 	void allowManualCalibScript(bool calib_en, bool calib_pref_en);
 
 private:
@@ -102,7 +117,7 @@ private:
 	void setCalibrationFilePath(QString path);
 
 private Q_SLOTS:
-	void on_calibList_itemClicked(QListWidgetItem *item);
+	void on_calibList_itemClicked(QListWidgetItem* item);
 
 	void on_nextButton_clicked();
 	void nextStep();
@@ -118,18 +133,18 @@ private Q_SLOTS:
 	void on_autoButton_clicked();
 
 private:
-	Ui::ManualCalibration *ui;
+	Ui::ManualCalibration* ui;
 	struct iio_channel *ch1w, *ch2w, *ch1r, *ch2r, *pd_pos, *pd_neg;
-	Ui::CalibrationTemplate *TempUi;
-	QWidget *TempWidget;
-	QTableWidget *paramTable;
-	QTableWidget *startParamTable;
+	Ui::CalibrationTemplate* TempUi;
+	QWidget* TempWidget;
+	QTableWidget* paramTable;
+	QTableWidget* startParamTable;
 
-	QPushButton *menuRunButton;
-	Filter *filter;
-	QJSEngine *eng;
+	QPushButton* menuRunButton;
+	Filter* filter;
+	QJSEngine* eng;
 
-	Calibration *calib;
+	Calibration* calib;
 
 	struct stCalibStory stCalibrationStory;
 	struct stCalibParam stParameters;

@@ -32,23 +32,24 @@ class BaseMenuItem;
 }
 
 namespace adiscope {
-class BaseMenuItem : public ColoredQWidget {
+class BaseMenuItem : public ColoredQWidget
+{
 	Q_OBJECT
 
 public:
-	explicit BaseMenuItem(QWidget *parent = nullptr);
+	explicit BaseMenuItem(QWidget* parent = nullptr);
 	virtual ~BaseMenuItem();
 
-	void setWidget(QWidget *widget);
+	void setWidget(QWidget* widget);
 
 	int position() const;
 	void setPosition(int position);
 
-	void setDragWidget(QWidget *widget);
+	void setDragWidget(QWidget* widget);
 
-	static const char *menuItemMimeDataType;
+	static const char* menuItemMimeDataType;
 
-	bool eventFilter(QObject *watched, QEvent *event);
+	bool eventFilter(QObject* watched, QEvent* event);
 
 Q_SIGNALS:
 	void moveItem(short from, short to);
@@ -61,21 +62,21 @@ Q_SIGNALS:
 	void enableInfoWidget(bool);
 
 protected:
-	void mousePressEvent(QMouseEvent *event);
-	void mouseMoveEvent(QMouseEvent *event);
-	void dragLeaveEvent(QDragLeaveEvent *event);
-	void dragEnterEvent(QDragEnterEvent *event);
-	void dragMoveEvent(QDragMoveEvent *event);
-	void dropEvent(QDropEvent *event);
-	void enterEvent(QEvent *event);
-	void leaveEvent(QEvent *event);
+	void mousePressEvent(QMouseEvent* event);
+	void mouseMoveEvent(QMouseEvent* event);
+	void dragLeaveEvent(QDragLeaveEvent* event);
+	void dragEnterEvent(QDragEnterEvent* event);
+	void dragMoveEvent(QDragMoveEvent* event);
+	void dropEvent(QDropEvent* event);
+	void enterEvent(QEvent* event);
+	void leaveEvent(QEvent* event);
 
 private:
 	void _enableBotSeparator(bool enable);
 	void _enableTopSeparator(bool enable);
 
 private:
-	Ui::BaseMenuItem *d_ui;
+	Ui::BaseMenuItem* d_ui;
 
 	int d_position;
 
@@ -84,7 +85,7 @@ private:
 	QRect d_centerDragBox;
 	QRect d_botDragbox;
 
-	QWidget *d_dragWidget;
+	QWidget* d_dragWidget;
 	bool d_allowDrag;
 };
 } // namespace adiscope

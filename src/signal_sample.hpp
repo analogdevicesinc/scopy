@@ -29,17 +29,18 @@
 Q_DECLARE_METATYPE(std::vector<float>);
 
 namespace adiscope {
-class signal_sample : public QObject, public gr::sync_block {
+class signal_sample : public QObject, public gr::sync_block
+{
 	Q_OBJECT
 
 public:
 	explicit signal_sample();
 	~signal_sample();
 
-	int work(int noutput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items);
+	int work(int noutput_items, gr_vector_const_void_star& input_items, gr_vector_void_star& output_items);
 
 Q_SIGNALS:
-	void triggered(const std::vector<float> &values);
+	void triggered(const std::vector<float>& values);
 };
 } // namespace adiscope
 

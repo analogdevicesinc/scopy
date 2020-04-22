@@ -4,7 +4,8 @@
 #include "pattern_generator.hpp"
 
 namespace adiscope {
-class PatternGeneratorChannel_API : public ApiObject {
+class PatternGeneratorChannel_API : public ApiObject
+{
 	Q_OBJECT
 	Q_PROPERTY(QString label READ label WRITE setLabel);
 	Q_PROPERTY(int id READ id WRITE setId);
@@ -12,14 +13,18 @@ class PatternGeneratorChannel_API : public ApiObject {
 	Q_PROPERTY(bool outputMode READ outputMode WRITE setOutputMode)
 	Q_PROPERTY(QList<int> color READ color WRITE setColor);
 	Q_PROPERTY(double thickness READ thickness WRITE setThickness);
-	PatternGeneratorChannel *ch;
-	PatternGenerator *pg;
-	PatternGeneratorChannelManagerUI *chmui;
-	PatternGeneratorChannelManager *chm;
+	PatternGeneratorChannel* ch;
+	PatternGenerator* pg;
+	PatternGeneratorChannelManagerUI* chmui;
+	PatternGeneratorChannelManager* chm;
 
 public:
-	PatternGeneratorChannel_API(PatternGeneratorChannel *_ch, PatternGeneratorChannelManagerUI *_chmui)
-		: ch(_ch), chmui(_chmui), chm(_chmui->chm), pg(_chmui->pg) {}
+	PatternGeneratorChannel_API(PatternGeneratorChannel* _ch, PatternGeneratorChannelManagerUI* _chmui)
+		: ch(_ch)
+		, chmui(_chmui)
+		, chm(_chmui->chm)
+		, pg(_chmui->pg)
+	{}
 
 	QList<int> color();
 	void setColor(QList<int>);
@@ -27,12 +32,14 @@ public:
 	QString label() { return QString::fromStdString(ch->get_label()); }
 	void setLabel(QString _str) { ch->set_label(_str.toStdString()); }
 	int id() { return ch->get_id(); }
-	void setId(int val) {
+	void setId(int val)
+	{
 		//	ch->set_id(val);
 	}
 	int mask() { return ch->get_mask(); }
 	bool outputMode() { return ch->getOutputMode(); }
-	void setOutputMode(bool val) {
+	void setOutputMode(bool val)
+	{
 		ch->setOutputMode(val);
 		pg->diom->setOutputMode(id(), val);
 	}
@@ -41,7 +48,8 @@ public:
 	double thickness() { return ch->getCh_thickness(); }
 };
 
-class PatternGeneratorChannelGroup_API : public ApiObject {
+class PatternGeneratorChannelGroup_API : public ApiObject
+{
 	Q_OBJECT
 	Q_PROPERTY(QString label READ label WRITE setLabel);
 	Q_PROPERTY(bool grouped READ grouped WRITE setGrouped);
@@ -53,15 +61,18 @@ class PatternGeneratorChannelGroup_API : public ApiObject {
 	Q_PROPERTY(double thickness READ thickness WRITE setThickness);
 	Q_PROPERTY(QList<int> color READ color WRITE setColor);
 
-	PatternGeneratorChannelGroup *chg;
+	PatternGeneratorChannelGroup* chg;
 	QList<int> channel_list_;
 
-	PatternGeneratorChannelManagerUI *chmui;
-	PatternGeneratorChannelManager *chm;
+	PatternGeneratorChannelManagerUI* chmui;
+	PatternGeneratorChannelManager* chm;
 
 public:
-	PatternGeneratorChannelGroup_API(PatternGeneratorChannelGroup *_chg, PatternGeneratorChannelManagerUI *chmui)
-		: chg(_chg), chmui(chmui), chm(chmui->chm) {}
+	PatternGeneratorChannelGroup_API(PatternGeneratorChannelGroup* _chg, PatternGeneratorChannelManagerUI* chmui)
+		: chg(_chg)
+		, chmui(chmui)
+		, chm(chmui->chm)
+	{}
 
 	QString label() { return QString::fromStdString(chg->get_label()); }
 	void setLabel(QString _str) { chg->set_label(_str.toStdString()); }
@@ -87,7 +98,8 @@ public:
 	double thickness() { return chg->getCh_thickness(); }
 };
 
-class PatternGenerator_API : public ApiObject {
+class PatternGenerator_API : public ApiObject
+{
 	Q_OBJECT
 
 	Q_PROPERTY(int channel_size READ channel_size WRITE set_channel_size SCRIPTABLE false);
@@ -101,10 +113,13 @@ class PatternGenerator_API : public ApiObject {
 	Q_PROPERTY(bool inactive_hidden READ inactiveHidden WRITE setInactiveHidden);
 
 public:
-	explicit PatternGenerator_API(PatternGenerator *pg) : ApiObject(), pg(pg) {}
+	explicit PatternGenerator_API(PatternGenerator* pg)
+		: ApiObject()
+		, pg(pg)
+	{}
 	~PatternGenerator_API();
 
-	void save(QSettings &settings);
+	void save(QSettings& settings);
 
 	int channel_groups_size();
 	void set_channel_groups_size(int val);
@@ -125,9 +140,9 @@ public:
 
 private:
 	void refreshApi();
-	PatternGenerator *pg;
-	QList<PatternGeneratorChannelGroup_API *> pg_cga;
-	QList<PatternGeneratorChannel_API *> pg_cha;
+	PatternGenerator* pg;
+	QList<PatternGeneratorChannelGroup_API*> pg_cga;
+	QList<PatternGeneratorChannel_API*> pg_cha;
 };
 } // namespace adiscope
 

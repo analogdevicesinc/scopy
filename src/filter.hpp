@@ -25,15 +25,17 @@
 
 #include <string>
 
-extern "C" {
-struct iio_channel;
-struct iio_context;
-struct iio_device;
+extern "C"
+{
+	struct iio_channel;
+	struct iio_context;
+	struct iio_device;
 }
 
 namespace adiscope {
 
-enum tool {
+enum tool
+{
 	TOOL_OSCILLOSCOPE = 0,
 	TOOL_SPECTRUM_ANALYZER,
 	TOOL_NETWORK_ANALYZER,
@@ -48,26 +50,27 @@ enum tool {
 	TOOL_LAUNCHER,
 };
 
-class Filter {
+class Filter
+{
 private:
 	QJsonObject root;
 	QString hwname;
 
 public:
-	Filter(const struct iio_context *ctx);
+	Filter(const struct iio_context* ctx);
 	~Filter();
 
-	QString &hw_name();
+	QString& hw_name();
 
 	bool compatible(enum tool tool) const;
-	bool usable(enum tool tool, const std::string &dev) const;
+	bool usable(enum tool tool, const std::string& dev) const;
 	const std::string device_name(enum tool tool, int idx = 0) const;
 
-	struct iio_device *find_device(const struct iio_context *ctx, enum tool tool, int idx = 0) const;
-	struct iio_channel *find_channel(const struct iio_context *ctx, enum tool tool, int idx = 0,
+	struct iio_device* find_device(const struct iio_context* ctx, enum tool tool, int idx = 0) const;
+	struct iio_channel* find_channel(const struct iio_context* ctx, enum tool tool, int idx = 0,
 					 bool output = false) const;
 
-	static const std::string &tool_name(enum tool tool);
+	static const std::string& tool_name(enum tool tool);
 };
 } // namespace adiscope
 

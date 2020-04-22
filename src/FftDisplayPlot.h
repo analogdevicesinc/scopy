@@ -33,12 +33,14 @@ class MarkerController;
 
 namespace adiscope {
 
-struct marker {
+struct marker
+{
 	std::shared_ptr<struct marker_data> data;
 	std::shared_ptr<SpectrumMarker> ui;
 };
 
-struct marker_data {
+struct marker_data
+{
 	int type;
 	float x;
 	float y;
@@ -48,11 +50,13 @@ struct marker_data {
 	QString label;
 };
 
-class FftDisplayPlot : public DisplayPlot {
+class FftDisplayPlot : public DisplayPlot
+{
 	Q_OBJECT
 
 public:
-	enum AverageType {
+	enum AverageType
+	{
 		SAMPLE = 0,
 		PEAK_HOLD = 1,
 		PEAK_HOLD_CONTINUOUS = 2,
@@ -64,7 +68,8 @@ public:
 		EXPONENTIAL_DB = 8,
 	};
 
-	enum MagnitudeType {
+	enum MagnitudeType
+	{
 		DBFS = 0,
 		DBV = 1,
 		DBU = 2,
@@ -72,7 +77,8 @@ public:
 		VRMS = 4,
 	};
 
-	enum MarkerType {
+	enum MarkerType
+	{
 		MANUAL = 0,
 		PEAK = 1,
 		DELTA = 2,
@@ -83,9 +89,9 @@ public:
 
 private:
 	QList<QList<marker>> d_markers;
-	double *x_data;
-	std::vector<double *> y_data;
-	std::vector<double *> y_original_data;
+	double* x_data;
+	std::vector<double*> y_data;
+	std::vector<double*> y_original_data;
 
 	std::vector<double> y_scale_factor;
 
@@ -110,7 +116,7 @@ private:
 	enum MagnitudeType d_presetMagType;
 	enum MagnitudeType d_magType;
 
-	MarkerController *d_mrkCtrl;
+	MarkerController* d_mrkCtrl;
 	QList<int> d_num_markers;
 
 	QList<QList<std::shared_ptr<struct marker_data>>> d_peaks;
@@ -119,37 +125,37 @@ private:
 
 	QList<QColor> d_markerColors;
 
-	QMap<QString, QwtPlotCurve *> d_ref_curves;
+	QMap<QString, QwtPlotCurve*> d_ref_curves;
 	unsigned int n_ref_curves;
-	std::vector<double *> d_refXdata;
-	std::vector<double *> d_refYdata;
+	std::vector<double*> d_refXdata;
+	std::vector<double*> d_refYdata;
 
-	void plotData(const std::vector<double *> &pts, uint64_t num_points);
+	void plotData(const std::vector<double*>& pts, uint64_t num_points);
 	void _resetXAxisPoints();
 
 	void resetAverages();
-	void averageDataAndComputeMagnitude(std::vector<double *> in_data, std::vector<double *> out_data,
+	void averageDataAndComputeMagnitude(std::vector<double*> in_data, std::vector<double*> out_data,
 					    uint64_t nb_points);
 	average_sptr getNewAvgObject(enum AverageType avg_type, uint data_width, uint history);
 
 	void add_marker(int chn);
 	void remove_marker(int chn, int which);
-	void marker_set_pos_source(uint chIdx, uint mkIdx, std::shared_ptr<struct marker_data> &source_sptr);
+	void marker_set_pos_source(uint chIdx, uint mkIdx, std::shared_ptr<struct marker_data>& source_sptr);
 	void findPeaks(int chn);
 	void calculate_fixed_markers(int chn);
-	int getMarkerPos(const QList<marker> &marker_list, std::shared_ptr<SpectrumMarker> &marker) const;
+	int getMarkerPos(const QList<marker>& marker_list, std::shared_ptr<SpectrumMarker>& marker) const;
 	void detectMarkers();
 
 	void _editFirstPoint();
 	QColor getChannelColor();
 
 private Q_SLOTS:
-	void onMrkCtrlMarkerSelected(std::shared_ptr<SpectrumMarker> &);
-	void onMrkCtrlMarkerPosChanged(std::shared_ptr<SpectrumMarker> &);
-	void onMrkCtrlMarkerReleased(std::shared_ptr<SpectrumMarker> &);
+	void onMrkCtrlMarkerSelected(std::shared_ptr<SpectrumMarker>&);
+	void onMrkCtrlMarkerPosChanged(std::shared_ptr<SpectrumMarker>&);
+	void onMrkCtrlMarkerReleased(std::shared_ptr<SpectrumMarker>&);
 
 public:
-	explicit FftDisplayPlot(int nplots, QWidget *parent = nullptr);
+	explicit FftDisplayPlot(int nplots, QWidget* parent = nullptr);
 	~FftDisplayPlot();
 
 	// Scaling factors for plot samples (one per channel)
@@ -158,7 +164,7 @@ public:
 
 	int64_t posAtFrequency(double freq, int chIdx = -1) const;
 	QString leftVerAxisUnit() const;
-	void setLeftVertAxisUnit(const QString &unit);
+	void setLeftVertAxisUnit(const QString& unit);
 
 	enum MagnitudeType magnitudeType() const;
 	void setMagnitudeType(enum MagnitudeType);
@@ -218,10 +224,10 @@ Q_SIGNALS:
 	void markerSelected(uint chIdx, uint mkIdx);
 
 public Q_SLOTS:
-	void setSampleRate(double sr, double units, const std::string &strunits);
+	void setSampleRate(double sr, double units, const std::string& strunits);
 	void presetSampleRate(double sr);
 	void useLogFreq(bool use_log_freq);
-	void customEvent(QEvent *e);
+	void customEvent(QEvent* e);
 	bool getLogScale() const;
 };
 } // namespace adiscope

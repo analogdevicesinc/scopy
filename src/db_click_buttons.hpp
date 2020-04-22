@@ -12,11 +12,12 @@ class DbClickButtons;
 
 namespace adiscope {
 
-class DbClickButtons : public QWidget {
+class DbClickButtons : public QWidget
+{
 	Q_OBJECT
 
 public:
-	explicit DbClickButtons(QWidget *parent = 0, int maxRowBtnCount = 5);
+	explicit DbClickButtons(QWidget* parent = 0, int maxRowBtnCount = 5);
 	~DbClickButtons();
 
 	int selectedButton() const;
@@ -39,8 +40,8 @@ private:
 	void toggleButton(int btnId);
 
 private:
-	Ui::DbClickButtons *ui;
-	QList<QPushButton *> btn_list;
+	Ui::DbClickButtons* ui;
+	QList<QPushButton*> btn_list;
 	QList<bool> btn_states;
 	int selected_btn;
 	int max_row_btn_cnt;

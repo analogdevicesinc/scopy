@@ -27,11 +27,12 @@ class RunSingleWidget;
 }
 
 namespace adiscope {
-class RunSingleWidget : public QWidget {
+class RunSingleWidget : public QWidget
+{
 	Q_OBJECT
 
 public:
-	explicit RunSingleWidget(QWidget *parent = nullptr);
+	explicit RunSingleWidget(QWidget* parent = nullptr);
 	~RunSingleWidget();
 
 	void enableSingleButton(bool enable);
@@ -51,7 +52,7 @@ private Q_SLOTS:
 	void _toggle(bool checked);
 
 private:
-	Ui::RunSingleWidget *d_ui;
+	Ui::RunSingleWidget* d_ui;
 	bool d_singleButtonEnabled;
 };
 } // namespace adiscope

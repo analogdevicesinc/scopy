@@ -23,25 +23,34 @@
 
 using namespace adiscope;
 
-CustomAnimation::CustomAnimation(QObject *target) : QPropertyAnimation(target), m_enabled(true), m_duration(0) {
+CustomAnimation::CustomAnimation(QObject* target)
+	: QPropertyAnimation(target)
+	, m_enabled(true)
+	, m_duration(0)
+{
 	AnimationManager::getInstance().registerAnimation(this);
 }
 
-CustomAnimation::CustomAnimation(QObject *target, const QByteArray &propertyName, QObject *parent)
-	: QPropertyAnimation(target, propertyName, parent), m_enabled(true), m_duration(0) {
+CustomAnimation::CustomAnimation(QObject* target, const QByteArray& propertyName, QObject* parent)
+	: QPropertyAnimation(target, propertyName, parent)
+	, m_enabled(true)
+	, m_duration(0)
+{
 	AnimationManager::getInstance().registerAnimation(this);
 }
 
 CustomAnimation::~CustomAnimation() {}
 
-void CustomAnimation::setDuration(int msec) {
+void CustomAnimation::setDuration(int msec)
+{
 	m_duration = msec;
 	if (m_enabled) {
 		QPropertyAnimation::setDuration(msec);
 	}
 }
 
-void CustomAnimation::toggle(bool enabled) {
+void CustomAnimation::toggle(bool enabled)
+{
 	m_enabled = enabled;
 	QPropertyAnimation::setDuration(enabled ? m_duration : 0);
 }

@@ -25,14 +25,15 @@
 #include <customanimation.h>
 
 namespace adiscope {
-class AnimationManager : public QObject {
+class AnimationManager : public QObject
+{
 	Q_OBJECT
 
 public:
-	static AnimationManager &getInstance();
+	static AnimationManager& getInstance();
 	void toggleAnimations(bool on);
 
-	void registerAnimation(CustomAnimation *animation);
+	void registerAnimation(CustomAnimation* animation);
 
 Q_SIGNALS:
 	void toggle(bool);

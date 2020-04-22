@@ -18,7 +18,9 @@
 using std::cout;
 using namespace adiscope;
 
-QtJs::QtJs(QJSEngine *engine) : QObject(engine) {
+QtJs::QtJs(QJSEngine* engine)
+	: QObject(engine)
+{
 	QJSValue js_obj = engine->newQObject(this);
 	auto meta = metaObject();
 	input = "";
@@ -37,7 +39,8 @@ void QtJs::exit() { QApplication::closeAllWindows(); }
 
 void QtJs::sleep(unsigned long s) { msleep(s * 1000); }
 
-void QtJs::msleep(unsigned long ms) {
+void QtJs::msleep(unsigned long ms)
+{
 	QElapsedTimer timer;
 
 	timer.start();
@@ -47,9 +50,10 @@ void QtJs::msleep(unsigned long ms) {
 	}
 }
 
-void QtJs::printToConsole(const QString &text) { cout << text.toStdString() << std::endl; }
+void QtJs::printToConsole(const QString& text) { cout << text.toStdString() << std::endl; }
 
-QString QtJs::readFromConsole(const QString &request) {
+QString QtJs::readFromConsole(const QString& request)
+{
 	bool done = false;
 	input = "";
 
@@ -69,7 +73,8 @@ QString QtJs::readFromConsole(const QString &request) {
 	return input;
 }
 
-QString QtJs::readInput() {
+QString QtJs::readInput()
+{
 	std::string in;
 	std::cin >> in;
 	return QString::fromStdString(in);

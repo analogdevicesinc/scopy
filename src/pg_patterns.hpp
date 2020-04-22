@@ -96,43 +96,47 @@ namespace adiscope {
 #define ImportPatternName "Import"
 #define ImportPatternDescription "Import pattern generator"
 
-enum { ClockPatternId = 0,
-       NumberPatternId,
-       RandomPatternId,
-       BinaryCounterId,
-       UARTPatternId,
-       SPIPatternId,
-       I2CPatternId,
-       GrayCounterId,
-       ImportPatternId };
+enum
+{
+	ClockPatternId = 0,
+	NumberPatternId,
+	RandomPatternId,
+	BinaryCounterId,
+	UARTPatternId,
+	SPIPatternId,
+	I2CPatternId,
+	GrayCounterId,
+	ImportPatternId
+};
 
 // http://stackoverflow.com/questions/32040101/qjsengine-print-to-console
 class JSConsole : public QObject // for logging purposes in QJSEngine
 {
 	Q_OBJECT
 public:
-	explicit JSConsole(QObject *parent = 0);
+	explicit JSConsole(QObject* parent = 0);
 	Q_INVOKABLE void log(QString msg);
 };
 
-class Pattern {
+class Pattern
+{
 private:
 	std::string name;
 	std::string description;
 	bool periodic;
 
 protected: // temp
-	short *buffer;
+	short* buffer;
 
 public:
 	Pattern(/*string name_, string description_*/);
 	virtual ~Pattern();
 	std::string get_name();
-	void set_name(const std::string &name_);
+	void set_name(const std::string& name_);
 	std::string get_description();
-	void set_description(const std::string &description_);
+	void set_description(const std::string& description_);
 	void set_periodic(bool periodic_);
-	short *get_buffer();
+	short* get_buffer();
 	void delete_buffer();
 	virtual void init();
 	virtual uint8_t pre_generate();
@@ -148,27 +152,29 @@ public:
 };
 
 uint32_t changeBit(uint32_t number, uint8_t n, bool x);
-class Pattern_API : public QObject {
+class Pattern_API : public QObject
+{
 	Q_OBJECT
 public:
-	static QJsonValue toJson(Pattern *p);
-	static Pattern *fromJson(QJsonObject j);
+	static QJsonValue toJson(Pattern* p);
+	static Pattern* fromJson(QJsonObject j);
 
-	static Pattern *fromString(QString);
-	static QString toString(Pattern *p);
+	static Pattern* fromString(QString);
+	static QString toString(Pattern* p);
 
 private:
 	Pattern_API() {}
 };
 
-class PatternUI : public QWidget {
+class PatternUI : public QWidget
+{
 	Q_OBJECT
 public:
-	PatternUI(QWidget *parent = 0);
+	PatternUI(QWidget* parent = 0);
 	virtual ~PatternUI();
 	// static PatternUI *create_ui(int index, QWidget *parent = 0);
-	virtual void build_ui(QWidget *parent = 0, uint16_t number_of_channels = 0);
-	virtual Pattern *get_pattern() = 0;
+	virtual void build_ui(QWidget* parent = 0, uint16_t number_of_channels = 0);
+	virtual Pattern* get_pattern() = 0;
 	virtual void post_load_ui();
 	virtual void parse_ui();
 	virtual void destroy_ui();
@@ -177,7 +183,8 @@ Q_SIGNALS:
 	void decoderChanged();
 };
 
-class ClockPattern : virtual public Pattern {
+class ClockPattern : virtual public Pattern
+{
 	int duty_cycle_granularity = 20;
 	int phase_granularity = 20;
 	float frequency;
@@ -198,28 +205,30 @@ public:
 	uint32_t get_required_nr_of_samples(uint32_t sample_rate, uint32_t number_of_channels);
 };
 
-class ClockPatternUI : public PatternUI {
+class ClockPatternUI : public PatternUI
+{
 	Q_OBJECT
-	Ui::EmptyPatternUI *ui;
-	QWidget *parent_;
-	ClockPattern *pattern;
-	ScaleSpinButton *frequencySpinButton;
-	PhaseSpinButton *phaseSpinButton;
-	PositionSpinButton *dutySpinButton;
+	Ui::EmptyPatternUI* ui;
+	QWidget* parent_;
+	ClockPattern* pattern;
+	ScaleSpinButton* frequencySpinButton;
+	PhaseSpinButton* phaseSpinButton;
+	PositionSpinButton* dutySpinButton;
 	double requestedFrequency, requestedDuty, requestedPhase;
 
 public:
-	ClockPatternUI(ClockPattern *pattern, QWidget *parent = 0);
+	ClockPatternUI(ClockPattern* pattern, QWidget* parent = 0);
 	virtual ~ClockPatternUI();
-	Pattern *get_pattern();
-	void build_ui(QWidget *parent = 0, uint16_t number_of_channels = 0);
+	Pattern* get_pattern();
+	void build_ui(QWidget* parent = 0, uint16_t number_of_channels = 0);
 	void destroy_ui();
 
 private Q_SLOTS:
 	void parse_ui();
 };
 
-class RandomPattern : virtual public Pattern {
+class RandomPattern : virtual public Pattern
+{
 protected:
 	uint32_t frequency;
 
@@ -231,28 +240,30 @@ public:
 	uint8_t generate_pattern(uint32_t sample_rate, uint32_t number_of_samples, uint16_t number_of_channels);
 
 	uint32_t get_frequency() const;
-	void set_frequency(const uint32_t &value);
+	void set_frequency(const uint32_t& value);
 };
 
-class RandomPatternUI : public PatternUI {
+class RandomPatternUI : public PatternUI
+{
 	Q_OBJECT
-	Ui::EmptyPatternUI *ui;
-	QWidget *parent_;
-	RandomPattern *pattern;
-	ScaleSpinButton *frequencySpinButton;
+	Ui::EmptyPatternUI* ui;
+	QWidget* parent_;
+	RandomPattern* pattern;
+	ScaleSpinButton* frequencySpinButton;
 
 public:
-	RandomPatternUI(RandomPattern *pattern, QWidget *parent = 0);
+	RandomPatternUI(RandomPattern* pattern, QWidget* parent = 0);
 	~RandomPatternUI();
-	Pattern *get_pattern();
-	void build_ui(QWidget *parent = 0, uint16_t number_of_channels = 0);
+	Pattern* get_pattern();
+	void build_ui(QWidget* parent = 0, uint16_t number_of_channels = 0);
 	void destroy_ui();
 
 private Q_SLOTS:
 	void parse_ui();
 };
 
-class BinaryCounterPattern : virtual public Pattern {
+class BinaryCounterPattern : virtual public Pattern
+{
 protected:
 	uint32_t frequency;
 	uint16_t start_value;
@@ -268,65 +279,70 @@ public:
 	uint32_t get_required_nr_of_samples(uint32_t sample_rate, uint32_t number_of_channels);
 
 	uint32_t get_frequency() const;
-	void set_frequency(const uint32_t &value);
+	void set_frequency(const uint32_t& value);
 	uint16_t get_start_value() const;
-	void set_start_value(const uint16_t &value);
+	void set_start_value(const uint16_t& value);
 	uint16_t get_end_value() const;
-	void set_end_value(const uint16_t &value);
+	void set_end_value(const uint16_t& value);
 	uint16_t get_increment() const;
-	void set_increment(const uint16_t &value);
+	void set_increment(const uint16_t& value);
 	uint16_t get_init_value() const;
-	void set_init_value(const uint16_t &value);
+	void set_init_value(const uint16_t& value);
 };
 
-class BinaryCounterPatternUI : public PatternUI {
+class BinaryCounterPatternUI : public PatternUI
+{
 	Q_OBJECT
-	Ui::EmptyPatternUI *ui;
-	QWidget *parent_;
-	BinaryCounterPattern *pattern;
-	ScaleSpinButton *frequencySpinButton;
+	Ui::EmptyPatternUI* ui;
+	QWidget* parent_;
+	BinaryCounterPattern* pattern;
+	ScaleSpinButton* frequencySpinButton;
 
 public:
-	BinaryCounterPatternUI(BinaryCounterPattern *pattern, QWidget *parent = 0);
+	BinaryCounterPatternUI(BinaryCounterPattern* pattern, QWidget* parent = 0);
 	~BinaryCounterPatternUI();
-	Pattern *get_pattern();
-	void build_ui(QWidget *parent = 0, uint16_t number_of_channels = 0);
+	Pattern* get_pattern();
+	void build_ui(QWidget* parent = 0, uint16_t number_of_channels = 0);
 	void destroy_ui();
 
 private Q_SLOTS:
 	void parse_ui();
 };
 
-class GrayCounterPattern : virtual public BinaryCounterPattern {
+class GrayCounterPattern : virtual public BinaryCounterPattern
+{
 public:
 	GrayCounterPattern();
 	virtual ~GrayCounterPattern() {}
 	uint8_t generate_pattern(uint32_t sample_rate, uint32_t number_of_samples, uint16_t number_of_channels);
 };
 
-class GrayCounterPatternUI : public PatternUI {
+class GrayCounterPatternUI : public PatternUI
+{
 	Q_OBJECT
-	Ui::EmptyPatternUI *ui;
-	QWidget *parent_;
-	GrayCounterPattern *pattern;
-	ScaleSpinButton *frequencySpinButton;
+	Ui::EmptyPatternUI* ui;
+	QWidget* parent_;
+	GrayCounterPattern* pattern;
+	ScaleSpinButton* frequencySpinButton;
 
 public:
-	GrayCounterPatternUI(GrayCounterPattern *pattern, QWidget *parent = 0);
+	GrayCounterPatternUI(GrayCounterPattern* pattern, QWidget* parent = 0);
 	~GrayCounterPatternUI();
-	Pattern *get_pattern();
-	void build_ui(QWidget *parent = 0, uint16_t number_of_channels = 0);
+	Pattern* get_pattern();
+	void build_ui(QWidget* parent = 0, uint16_t number_of_channels = 0);
 	void destroy_ui();
 
 private Q_SLOTS:
 	void parse_ui();
 };
 
-class UARTPattern : virtual public Pattern {
+class UARTPattern : virtual public Pattern
+{
 
 public:
 	/** Parity settings. */
-	enum sp_parity {
+	enum sp_parity
+	{
 		/** Special value to indicate setting should be left alone. */
 		SP_PARITY_INVALID = -1,
 		/** No parity. */
@@ -352,12 +368,12 @@ public:
 	unsigned int get_stop_bits();
 	enum sp_parity get_parity();
 
-	void set_string(const std::string &str_);
+	void set_string(const std::string& str_);
 	std::string get_string();
 	std::string get_params();
 	int set_params(std::string params_);
 	void set_msb_first(bool msb_first_);
-	uint16_t encapsulateUartFrame(char chr, uint16_t *bits_per_frame);
+	uint16_t encapsulateUartFrame(char chr, uint16_t* bits_per_frame);
 
 protected:
 	std::string str;
@@ -369,23 +385,25 @@ protected:
 	enum sp_parity parity;
 };
 
-class UARTPatternUI : public PatternUI {
+class UARTPatternUI : public PatternUI
+{
 	Q_OBJECT
-	Ui::UARTPatternUI *ui;
-	QWidget *parent_;
-	UARTPattern *pattern;
+	Ui::UARTPatternUI* ui;
+	QWidget* parent_;
+	UARTPattern* pattern;
 
 public:
-	UARTPatternUI(UARTPattern *pattern, QWidget *parent = 0);
+	UARTPatternUI(UARTPattern* pattern, QWidget* parent = 0);
 	~UARTPatternUI();
-	Pattern *get_pattern();
-	void build_ui(QWidget *parent = 0, uint16_t number_of_channels = 0);
+	Pattern* get_pattern();
+	void build_ui(QWidget* parent = 0, uint16_t number_of_channels = 0);
 	void destroy_ui();
 private Q_SLOTS:
 	void parse_ui();
 };
 
-class I2CPattern : virtual public Pattern {
+class I2CPattern : virtual public Pattern
+{
 	bool tenbit;
 	uint8_t address;
 	bool read;
@@ -396,7 +414,7 @@ class I2CPattern : virtual public Pattern {
 	uint8_t interFrameSpace;
 	uint8_t bytesPerFrame;
 
-	short *buf_ptr;
+	short* buf_ptr;
 
 	const int SDA = 1;
 	const int SCL = 0;
@@ -418,37 +436,39 @@ public:
 	bool getTenbit() const;
 	void setTenbit(bool value);
 	uint8_t getAddress() const;
-	void setAddress(const uint8_t &value);
+	void setAddress(const uint8_t& value);
 	bool getWrite() const;
 	void setWrite(bool value);
 	bool getMsbFirst() const;
 	void setMsbFirst(bool value);
 	uint8_t getInterFrameSpace() const;
-	void setInterFrameSpace(const uint8_t &value);
+	void setInterFrameSpace(const uint8_t& value);
 	uint32_t getClkFrequency() const;
-	void setClkFrequency(const uint32_t &value);
+	void setClkFrequency(const uint32_t& value);
 	uint8_t getBytesPerFrame() const;
-	void setBytesPerFrame(const uint8_t &value);
+	void setBytesPerFrame(const uint8_t& value);
 };
 
-class I2CPatternUI : public PatternUI {
+class I2CPatternUI : public PatternUI
+{
 	Q_OBJECT
-	Ui::I2CPatternUI *ui;
-	QWidget *parent_;
-	I2CPattern *pattern;
-	ScaleSpinButton *frequencySpinButton;
+	Ui::I2CPatternUI* ui;
+	QWidget* parent_;
+	I2CPattern* pattern;
+	ScaleSpinButton* frequencySpinButton;
 
 public:
-	I2CPatternUI(I2CPattern *pattern, QWidget *parent = 0);
+	I2CPatternUI(I2CPattern* pattern, QWidget* parent = 0);
 	~I2CPatternUI();
-	Pattern *get_pattern();
-	void build_ui(QWidget *parent = 0, uint16_t number_of_channels = 0);
+	Pattern* get_pattern();
+	void build_ui(QWidget* parent = 0, uint16_t number_of_channels = 0);
 	void destroy_ui();
 private Q_SLOTS:
 	void parse_ui();
 };
 
-class SPIPattern : virtual public Pattern {
+class SPIPattern : virtual public Pattern
+{
 private:
 	bool CSPOL;
 	uint8_t bytesPerFrame;
@@ -473,33 +493,35 @@ public:
 	bool getCPHA() const;
 	void setCPHA(bool value);
 	uint32_t getClkFrequency() const;
-	void setClkFrequency(const uint32_t &value);
+	void setClkFrequency(const uint32_t& value);
 	uint8_t getWaitClocks() const;
-	void setWaitClocks(const uint8_t &value);
+	void setWaitClocks(const uint8_t& value);
 	uint8_t getBytesPerFrame() const;
-	void setBytesPerFrame(const uint8_t &value);
+	void setBytesPerFrame(const uint8_t& value);
 	bool getMsbFirst() const;
 	void setMsbFirst(bool value);
 };
 
-class SPIPatternUI : public PatternUI {
+class SPIPatternUI : public PatternUI
+{
 	Q_OBJECT
-	Ui::SPIPatternUI *ui;
-	QWidget *parent_;
-	SPIPattern *pattern;
-	ScaleSpinButton *frequencySpinButton;
+	Ui::SPIPatternUI* ui;
+	QWidget* parent_;
+	SPIPattern* pattern;
+	ScaleSpinButton* frequencySpinButton;
 
 public:
-	SPIPatternUI(SPIPattern *pattern, QWidget *parent = 0);
+	SPIPatternUI(SPIPattern* pattern, QWidget* parent = 0);
 	~SPIPatternUI();
-	Pattern *get_pattern();
-	void build_ui(QWidget *parent = 0, uint16_t number_of_channels = 0);
+	Pattern* get_pattern();
+	void build_ui(QWidget* parent = 0, uint16_t number_of_channels = 0);
 	void destroy_ui();
 private Q_SLOTS:
 	void parse_ui();
 };
 
-class NumberPattern : virtual public Pattern {
+class NumberPattern : virtual public Pattern
+{
 private:
 	uint16_t nr;
 
@@ -508,34 +530,36 @@ public:
 	virtual ~NumberPattern() {}
 	virtual uint8_t generate_pattern(uint32_t sample_rate, uint32_t number_of_samples, uint16_t number_of_channels);
 	uint16_t get_nr() const;
-	void set_nr(const uint16_t &value);
+	void set_nr(const uint16_t& value);
 };
 
-class NumberPatternUI : public PatternUI {
+class NumberPatternUI : public PatternUI
+{
 	Q_OBJECT
-	Ui::NumberPatternUI *ui;
-	QWidget *parent_;
-	NumberPattern *pattern;
+	Ui::NumberPatternUI* ui;
+	QWidget* parent_;
+	NumberPattern* pattern;
 	uint16_t max;
 
 public:
-	NumberPatternUI(NumberPattern *pattern, QWidget *parent = 0);
+	NumberPatternUI(NumberPattern* pattern, QWidget* parent = 0);
 	~NumberPatternUI();
-	Pattern *get_pattern();
-	void build_ui(QWidget *parent = 0, uint16_t number_of_channels = 0);
+	Pattern* get_pattern();
+	void build_ui(QWidget* parent = 0, uint16_t number_of_channels = 0);
 	void destroy_ui();
 private Q_SLOTS:
 	void parse_ui();
 };
 
-class JSPattern : public QObject, virtual public Pattern {
+class JSPattern : public QObject, virtual public Pattern
+{
 	Q_OBJECT
 private:
 protected:
 public:
-	QJSEngine *qEngine;
-	JSConsole *console;
-	QWidget *ui_form;
+	QJSEngine* qEngine;
+	JSConsole* console;
+	QWidget* ui_form;
 
 	QJsonObject obj;
 	JSPattern(QJsonObject obj_);
@@ -558,49 +582,52 @@ public:
 	virtual bool handle_result(QJSValue result, QString str = "");
 };
 
-class JSPatternUIStatusWindow : public QObject {
+class JSPatternUIStatusWindow : public QObject
+{
 	Q_OBJECT
-	QTextEdit *con;
+	QTextEdit* con;
 
 public:
-	JSPatternUIStatusWindow(QTextEdit *textedit);
+	JSPatternUIStatusWindow(QTextEdit* textedit);
 	Q_INVOKABLE void clear();
 	Q_INVOKABLE void print(QString str);
 };
 
 class JSPatternUIScript_API;
 
-class JSPatternUI : public PatternUI {
+class JSPatternUI : public PatternUI
+{
 	Q_OBJECT
-	QUiLoader *loader;
-	Ui::GenericJSPatternUI *ui;
+	QUiLoader* loader;
+	Ui::GenericJSPatternUI* ui;
 	//	QWidget *ui_form;
-	JSPattern *pattern;
+	JSPattern* pattern;
 	QString form_name;
-	QWidget *parent_;
-	JSPatternUIScript_API *jspat_api;
-	JSPatternUIStatusWindow *textedit;
+	QWidget* parent_;
+	JSPatternUIScript_API* jspat_api;
+	JSPatternUIStatusWindow* textedit;
 
 public:
-	JSPatternUI(JSPattern *pat, QJsonObject obj_, QWidget *parent = 0);
+	JSPatternUI(JSPattern* pat, QJsonObject obj_, QWidget* parent = 0);
 	~JSPatternUI();
 
-	Pattern *get_pattern();
+	Pattern* get_pattern();
 	bool handle_result(QJSValue result, QString str = "");
-	void find_all_children(QObject *parent, QJSValue property);
-	void build_ui(QWidget *parent = 0, uint16_t number_of_channels = 0);
+	void find_all_children(QObject* parent, QJSValue property);
+	void build_ui(QWidget* parent = 0, uint16_t number_of_channels = 0);
 	void post_load_ui();
 	void destroy_ui();
 public Q_SLOTS:
 	void parse_ui();
 };
 
-class JSPatternUIScript_API : public QObject {
+class JSPatternUIScript_API : public QObject
+{
 	Q_OBJECT
-	JSPatternUI *pattern;
+	JSPatternUI* pattern;
 
 public:
-	JSPatternUIScript_API(QObject *parent, JSPatternUI *pat);
+	JSPatternUIScript_API(QObject* parent, JSPatternUI* pat);
 	Q_INVOKABLE void parse_ui();
 };
 #if 0
@@ -767,7 +794,8 @@ public:
 };
 #endif
 
-class ImportPattern : virtual public Pattern {
+class ImportPattern : virtual public Pattern
+{
 	float frequency;
 	bool nativeDialog;
 
@@ -790,27 +818,28 @@ public:
 	void setNativeDialog(bool nativeDialog);
 };
 
-class ImportPatternUI : public PatternUI {
+class ImportPatternUI : public PatternUI
+{
 	Q_OBJECT
-	Ui::EmptyPatternUI *ui;
-	QWidget *parent_;
-	ImportPattern *pattern;
-	ScaleSpinButton *frequencySpinButton;
+	Ui::EmptyPatternUI* ui;
+	QWidget* parent_;
+	ImportPattern* pattern;
+	ScaleSpinButton* frequencySpinButton;
 	double requestedFrequency;
-	ImportSettings *import_settings;
-	QLineEdit *fileLineEdit;
-	QPushButton *openFileBtn;
-	QPushButton *importBtn;
+	ImportSettings* import_settings;
+	QLineEdit* fileLineEdit;
+	QPushButton* openFileBtn;
+	QPushButton* importBtn;
 	QString fileName;
 	QVector<QVector<double>> data;
 
 	void setStylesheet();
 
 public:
-	ImportPatternUI(ImportPattern *pattern, QWidget *parent = 0);
+	ImportPatternUI(ImportPattern* pattern, QWidget* parent = 0);
 	virtual ~ImportPatternUI();
-	Pattern *get_pattern();
-	void build_ui(QWidget *parent = 0, uint16_t number_of_channels = 0);
+	Pattern* get_pattern();
+	void build_ui(QWidget* parent = 0, uint16_t number_of_channels = 0);
 	void destroy_ui();
 
 private Q_SLOTS:
@@ -819,7 +848,8 @@ private Q_SLOTS:
 	void loadFileData();
 };
 
-class PatternFactory {
+class PatternFactory
+{
 	static QStringList ui_list;
 	static QStringList description_list;
 	static int static_ui_limit;
@@ -827,10 +857,10 @@ class PatternFactory {
 
 public:
 	static void init();
-	static Pattern *create(QString name);
-	static Pattern *create(int index);
-	static PatternUI *create_ui(Pattern *pattern, int index, QWidget *parent = 0);
-	static PatternUI *create_ui(Pattern *pattern, QWidget *parent = 0);
+	static Pattern* create(QString name);
+	static Pattern* create(int index);
+	static PatternUI* create_ui(Pattern* pattern, int index, QWidget* parent = 0);
+	static PatternUI* create_ui(Pattern* pattern, QWidget* parent = 0);
 	static QStringList get_ui_list();
 	static QStringList get_description_list();
 

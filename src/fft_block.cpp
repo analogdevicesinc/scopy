@@ -31,7 +31,8 @@ using namespace gr;
 fft_block::fft_block(bool use_complex, size_t fft_size, unsigned int nbthreads)
 	: hier_block2("FFT", io_signature::make(1, 1, use_complex ? sizeof(gr_complex) : sizeof(float)),
 		      io_signature::make(1, 1, sizeof(gr_complex)))
-	, d_complex(use_complex) {
+	, d_complex(use_complex)
+{
 	auto s2v = blocks::stream_to_vector::make(use_complex ? sizeof(gr_complex) : sizeof(float), fft_size);
 	auto v2s = blocks::vector_to_stream::make(sizeof(gr_complex), fft_size);
 
@@ -53,7 +54,8 @@ fft_block::fft_block(bool use_complex, size_t fft_size, unsigned int nbthreads)
 
 fft_block::~fft_block() {}
 
-void fft_block::set_window(const std::vector<float> &window) {
+void fft_block::set_window(const std::vector<float>& window)
+{
 	if (d_complex) {
 		boost::dynamic_pointer_cast<fft::fft_vcc>(d_fft)->set_window(window);
 	} else {

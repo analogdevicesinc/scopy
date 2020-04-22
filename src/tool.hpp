@@ -34,25 +34,27 @@
 class QJSEngine;
 class QPushButton;
 
-extern "C" {
-struct iio_context;
+extern "C"
+{
+	struct iio_context;
 }
 
 namespace adiscope {
 class ApiObject;
 class ToolLauncher;
 
-class Tool : public QWidget {
+class Tool : public QWidget
+{
 	Q_OBJECT
 
 public:
-	explicit Tool(struct iio_context *ctx, ToolMenuItem *toolMenuItem, ApiObject *api, const QString &name,
-		      ToolLauncher *parent);
+	explicit Tool(struct iio_context* ctx, ToolMenuItem* toolMenuItem, ApiObject* api, const QString& name,
+		      ToolLauncher* parent);
 	~Tool();
 
-	QPushButton *runButton() { return toolMenuItem->getToolStopBtn(); }
-	const QString &getName();
-	void setName(const QString &name);
+	QPushButton* runButton() { return toolMenuItem->getToolStopBtn(); }
+	const QString& getName();
+	void setName(const QString& name);
 	virtual void settingsLoaded();
 	virtual void setNativeDialogs(bool nativeDialogs);
 
@@ -73,17 +75,17 @@ private Q_SLOTS:
 	void loadState();
 
 protected:
-	struct iio_context *ctx;
-	QPushButton *run_button;
-	ApiObject *api;
-	QSettings *settings;
+	struct iio_context* ctx;
+	QPushButton* run_button;
+	ApiObject* api;
+	QSettings* settings;
 	QString name;
-	Preferences *prefPanel;
+	Preferences* prefPanel;
 	bool saveOnExit;
 	bool isDetached;
 	bool m_running;
-	QMainWindow *window;
-	ToolMenuItem *toolMenuItem;
+	QMainWindow* window;
+	ToolMenuItem* toolMenuItem;
 	bool m_useNativeDialogs;
 };
 } // namespace adiscope

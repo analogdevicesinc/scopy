@@ -24,8 +24,13 @@
 using namespace adiscope;
 
 StartStopRangeWidget::StartStopRangeWidget(double min, double max, double minSpan, bool hasProgressWidget,
-					   QWidget *parent)
-	: QWidget(parent), ui(new Ui::StartStopRangeWidget), minValue(min), maxValue(max), minSpan(minSpan) {
+					   QWidget* parent)
+	: QWidget(parent)
+	, ui(new Ui::StartStopRangeWidget)
+	, minValue(min)
+	, maxValue(max)
+	, minSpan(minSpan)
+{
 	ui->setupUi(this);
 
 	_createSpinButtons(hasProgressWidget);
@@ -44,16 +49,19 @@ void StartStopRangeWidget::setStopValue(double value) { stop_freq->setValue(valu
 
 double StartStopRangeWidget::getCenterValue() const { return center_freq->value(); }
 
-void StartStopRangeWidget::insertWidgetIntoLayout(QWidget *widget, int row, int column) {
+void StartStopRangeWidget::insertWidgetIntoLayout(QWidget* widget, int row, int column)
+{
 	ui->gridLayout->addWidget(widget, row, column);
 }
 
-void StartStopRangeWidget::setMinimumSpanValue(double value) {
+void StartStopRangeWidget::setMinimumSpanValue(double value)
+{
 	minSpan = value;
 	span_freq->setMinValue(value);
 }
 
-void StartStopRangeWidget::_onStartStopFrequencyChanged() {
+void StartStopRangeWidget::_onStartStopFrequencyChanged()
+{
 	double start = start_freq->value();
 	double stop = stop_freq->value();
 
@@ -69,7 +77,8 @@ void StartStopRangeWidget::_onStartStopFrequencyChanged() {
 	Q_EMIT rangeChanged(start, stop);
 }
 
-void StartStopRangeWidget::_onCenterSpanFrequencyChanged() {
+void StartStopRangeWidget::_onCenterSpanFrequencyChanged()
+{
 	double span = span_freq->value();
 	double center = center_freq->value();
 	double start = center - (span / 2);
@@ -116,7 +125,8 @@ void StartStopRangeWidget::_onCenterSpanFrequencyChanged() {
 	Q_EMIT rangeChanged(start, stop);
 }
 
-void StartStopRangeWidget::_createSpinButtons(bool hasProgressWidget) {
+void StartStopRangeWidget::_createSpinButtons(bool hasProgressWidget)
+{
 	// Create spin buttons
 	start_freq = new ScaleSpinButton({{"Hz", 1e0}, {"kHz", 1e3}, {"MHz", 1e6}}, "Start", minValue, maxValue,
 					 hasProgressWidget, false, this, {1, 2.5, 5, 7.5});
@@ -142,7 +152,8 @@ void StartStopRangeWidget::_createSpinButtons(bool hasProgressWidget) {
 	ui->spanValueLayout->addWidget(span_freq);
 }
 
-void StartStopRangeWidget::_setupSignalsAndSlots() {
+void StartStopRangeWidget::_setupSignalsAndSlots()
+{
 	connect(start_freq, &ScaleSpinButton::valueChanged, this, &StartStopRangeWidget::_onStartStopFrequencyChanged);
 	connect(stop_freq, &ScaleSpinButton::valueChanged, this, &StartStopRangeWidget::_onStartStopFrequencyChanged);
 	connect(center_freq, &ScaleSpinButton::valueChanged, this,

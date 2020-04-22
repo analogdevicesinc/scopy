@@ -25,19 +25,20 @@
 #include <vector>
 
 namespace adiscope {
-class ApiObjectManager {
+class ApiObjectManager
+{
 public:
-	void registerApiObject(ApiObject *apiObject);
-	void unregisterApiObject(ApiObject *apiObject);
+	void registerApiObject(ApiObject* apiObject);
+	void unregisterApiObject(ApiObject* apiObject);
 
-	void save(QSettings &settings);
-	void load(QSettings &settings);
+	void save(QSettings& settings);
+	void load(QSettings& settings);
 
-	static ApiObjectManager &getInstance();
+	static ApiObjectManager& getInstance();
 
 private:
 	ApiObjectManager();
-	std::vector<ApiObject *> api_objects;
+	std::vector<ApiObject*> api_objects;
 };
 } // namespace adiscope
 

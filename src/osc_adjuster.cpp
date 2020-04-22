@@ -22,21 +22,22 @@
 #include <qdebug.h>
 #include <qevent.h>
 
-OscAdjuster::OscAdjuster(QWidget *parent, QwtAxisId axisId)
+OscAdjuster::OscAdjuster(QWidget* parent, QwtAxisId axisId)
 	: QObject(parent)
 	, d_isEnabled(false)
 	, d_mousePressed(false)
 	, d_mouseFactor(0.95)
 	, d_mouseButton(Qt::LeftButton)
-	, d_axisId(axisId) {
+	, d_axisId(axisId)
+{
 	setEnabled(true);
 }
 
 OscAdjuster::~OscAdjuster() {}
 
-QWidget *OscAdjuster::parentWidget() { return qobject_cast<QWidget *>(parent()); }
+QWidget* OscAdjuster::parentWidget() { return qobject_cast<QWidget*>(parent()); }
 
-const QWidget *OscAdjuster::parentWidget() const { return qobject_cast<const QWidget *>(parent()); }
+const QWidget* OscAdjuster::parentWidget() const { return qobject_cast<const QWidget*>(parent()); }
 
 QwtAxisId OscAdjuster::axisId() { return d_axisId; }
 
@@ -44,11 +45,12 @@ void OscAdjuster::setMouseFactor(double factor) { d_mouseFactor = factor; }
 
 double OscAdjuster::mouseFactor() const { return d_mouseFactor; }
 
-void OscAdjuster::setEnabled(bool on) {
+void OscAdjuster::setEnabled(bool on)
+{
 	if (d_isEnabled != on) {
 		d_isEnabled = on;
 
-		QObject *o = parent();
+		QObject* o = parent();
 		if (o) {
 			if (d_isEnabled)
 				o->installEventFilter(this);
@@ -62,25 +64,26 @@ bool OscAdjuster::isEnabled() const { return d_isEnabled; }
 
 void OscAdjuster::setMouseButton(Qt::MouseButton button) { d_mouseButton = button; }
 
-void OscAdjuster::getMouseButton(Qt::MouseButton &button) const { button = d_mouseButton; }
+void OscAdjuster::getMouseButton(Qt::MouseButton& button) const { button = d_mouseButton; }
 
-bool OscAdjuster::eventFilter(QObject *object, QEvent *event) {
+bool OscAdjuster::eventFilter(QObject* object, QEvent* event)
+{
 	if (object && object == parent()) {
 		switch (event->type()) {
 		case QEvent::MouseButtonPress: {
-			widgetMousePressEvent(static_cast<QMouseEvent *>(event));
+			widgetMousePressEvent(static_cast<QMouseEvent*>(event));
 			break;
 		}
 		case QEvent::MouseMove: {
-			widgetMouseMoveEvent(static_cast<QMouseEvent *>(event));
+			widgetMouseMoveEvent(static_cast<QMouseEvent*>(event));
 			break;
 		}
 		case QEvent::MouseButtonRelease: {
-			widgetMouseReleaseEvent(static_cast<QMouseEvent *>(event));
+			widgetMouseReleaseEvent(static_cast<QMouseEvent*>(event));
 			break;
 		}
 		case QEvent::Wheel: {
-			widgetMouseWheelEvent(static_cast<QWheelEvent *>(event));
+			widgetMouseWheelEvent(static_cast<QWheelEvent*>(event));
 			break;
 		}
 		default:;
@@ -89,7 +92,8 @@ bool OscAdjuster::eventFilter(QObject *object, QEvent *event) {
 	return QObject::eventFilter(object, event);
 }
 
-void OscAdjuster::widgetMousePressEvent(QMouseEvent *mouseEvent) {
+void OscAdjuster::widgetMousePressEvent(QMouseEvent* mouseEvent)
+{
 	if (parentWidget() == NULL)
 		return;
 
@@ -104,7 +108,8 @@ void OscAdjuster::widgetMousePressEvent(QMouseEvent *mouseEvent) {
 	d_mousePressed = true;
 }
 
-void OscAdjuster::widgetMouseReleaseEvent(QMouseEvent *mouseEvent) {
+void OscAdjuster::widgetMouseReleaseEvent(QMouseEvent* mouseEvent)
+{
 	Q_UNUSED(mouseEvent);
 
 	if (d_mousePressed && parentWidget()) {
@@ -113,7 +118,8 @@ void OscAdjuster::widgetMouseReleaseEvent(QMouseEvent *mouseEvent) {
 	}
 }
 
-void OscAdjuster::widgetMouseWheelEvent(QWheelEvent *wheelEvent) {
+void OscAdjuster::widgetMouseWheelEvent(QWheelEvent* wheelEvent)
+{
 	const int y = wheelEvent->angleDelta().y();
 
 	// Only y value changes if a mouse with wheel is used.

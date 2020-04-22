@@ -4,7 +4,8 @@
 #include "digitalio.hpp"
 
 namespace adiscope {
-class DigitalIO_API : public ApiObject {
+class DigitalIO_API : public ApiObject
+{
 	Q_OBJECT
 
 	Q_PROPERTY(QList<bool> group READ grouped WRITE setGrouped SCRIPTABLE false);
@@ -16,16 +17,19 @@ class DigitalIO_API : public ApiObject {
 	Q_PROPERTY(bool running READ running WRITE run STORED false);
 
 public:
-	explicit DigitalIO_API(DigitalIO *dio) : ApiObject(), dio(dio) {}
+	explicit DigitalIO_API(DigitalIO* dio)
+		: ApiObject()
+		, dio(dio)
+	{}
 	~DigitalIO_API() {}
 
 	QList<bool> direction() const;
-	void setDirection(const QList<bool> &list);
+	void setDirection(const QList<bool>& list);
 	QList<bool> output() const;
-	void setOutput(const QList<bool> &list);
+	void setOutput(const QList<bool>& list);
 	void setOutput(int ch, int direction);
 	QList<bool> grouped() const;
-	void setGrouped(const QList<bool> &grouped);
+	void setGrouped(const QList<bool>& grouped);
 
 	QList<bool> gpi() const;
 	QList<bool> locked() const;
@@ -35,7 +39,7 @@ public:
 	Q_INVOKABLE void show();
 
 private:
-	DigitalIO *dio;
+	DigitalIO* dio;
 };
 } // namespace adiscope
 

@@ -43,16 +43,17 @@ class UserNotes_API;
 class Note;
 class Note_API;
 
-class UserNotes : public QWidget {
+class UserNotes : public QWidget
+{
 	friend class UserNotes_API;
 
 	Q_OBJECT
 
 public:
-	explicit UserNotes(QWidget *parent = 0);
+	explicit UserNotes(QWidget* parent = 0);
 	~UserNotes();
 
-	ApiObject *api();
+	ApiObject* api();
 
 public Q_SLOTS:
 	void add_btn_clicked(bool);
@@ -65,43 +66,44 @@ private Q_SLOTS:
 	void pageMoved(int);
 
 private:
-	void loadPageForNote(Note *note, QString path);
-	Note *getSelectedNote();
-	int getNoteIndex(Note *note);
+	void loadPageForNote(Note* note, QString path);
+	Note* getSelectedNote();
+	int getNoteIndex(Note* note);
 
-	Note *addNote(QString name, QString path);
+	Note* addNote(QString name, QString path);
 	void clearAllNotes();
 
 private:
-	Ui::UserNotes *ui;
-	UserNotes_API *notes_api;
-	vector<Note *> m_notes;
-	QButtonGroup *notes_group;
+	Ui::UserNotes* ui;
+	UserNotes_API* notes_api;
+	vector<Note*> m_notes;
+	QButtonGroup* notes_group;
 	int m_note_count;
 };
 
-class Note : public QWidget {
+class Note : public QWidget
+{
 	Q_OBJECT
 
 public:
-	explicit Note(QString name, QString path, QWidget *parent = 0);
+	explicit Note(QString name, QString path, QWidget* parent = 0);
 	~Note();
 
 	QString getName() const;
-	void setName(const QString &name);
+	void setName(const QString& name);
 
 	QString getPath() const;
-	void setPath(const QString &path);
+	void setPath(const QString& path);
 
 	bool getSelected() const;
-	QPushButton *noteButton();
+	QPushButton* noteButton();
 
 	void click();
 
-	QWidget *getPage() const;
-	void setPage(QWidget *page);
+	QWidget* getPage() const;
+	void setPage(QWidget* page);
 
-	Ui::UserNotePage *getPageUi();
+	Ui::UserNotePage* getPageUi();
 
 public Q_SLOTS:
 	void setSelected(bool selected);
@@ -110,12 +112,12 @@ Q_SIGNALS:
 	void selected(bool);
 
 private:
-	Ui::Note *ui;
+	Ui::Note* ui;
 	QString m_name;
 	QString m_path;
 	bool m_selected;
-	QWidget *m_page;
-	Ui::UserNotePage *pageUi;
+	QWidget* m_page;
+	Ui::UserNotePage* pageUi;
 };
 } // namespace adiscope
 #endif // USER_NOTES_HPP

@@ -4,7 +4,9 @@
 
 namespace adiscope {
 
-PatternGeneratorBufferManager::PatternGeneratorBufferManager(PatternGeneratorChannelManager *chman) : chm(chman) {
+PatternGeneratorBufferManager::PatternGeneratorBufferManager(PatternGeneratorChannelManager* chman)
+	: chm(chman)
+{
 	autoSet = true;
 	bufferSize = 1;
 	buffer = new short[bufferSize];
@@ -16,7 +18,8 @@ PatternGeneratorBufferManager::PatternGeneratorBufferManager(PatternGeneratorCha
 
 PatternGeneratorBufferManager::~PatternGeneratorBufferManager() { delete[] buffer; }
 
-void PatternGeneratorBufferManager::update(PatternGeneratorChannelGroup *chg) {
+void PatternGeneratorBufferManager::update(PatternGeneratorChannelGroup* chg)
+{
 	bool sampleRateChanged = false;
 
 	chm->preGenerate();
@@ -59,7 +62,8 @@ void PatternGeneratorBufferManager::update(PatternGeneratorChannelGroup *chg) {
 
 void PatternGeneratorBufferManager::enableAutoSet(bool val) { autoSet = val; }
 
-uint32_t PatternGeneratorBufferManager::adjustSampleRate(uint32_t suggestedSampleRate) {
+uint32_t PatternGeneratorBufferManager::adjustSampleRate(uint32_t suggestedSampleRate)
+{
 	if (suggestedSampleRate == 0)
 		return PGMaxSampleRate;
 	if (suggestedSampleRate > PGMaxSampleRate) {
@@ -71,7 +75,8 @@ uint32_t PatternGeneratorBufferManager::adjustSampleRate(uint32_t suggestedSampl
 	return suggestedSampleRate;
 }
 
-uint32_t PatternGeneratorBufferManager::adjustBufferSize(uint32_t suggestedBufferSize) {
+uint32_t PatternGeneratorBufferManager::adjustBufferSize(uint32_t suggestedBufferSize)
+{
 	if (suggestedBufferSize > 1048576) {
 		suggestedBufferSize = 1048576;
 	}
@@ -87,19 +92,23 @@ void PatternGeneratorBufferManager::setSampleRate(uint32_t val) { sampleRate = v
 
 void PatternGeneratorBufferManager::setBufferSize(uint32_t val) { bufferSize = val; }
 
-PatternGeneratorBufferManagerUi::PatternGeneratorBufferManagerUi(QWidget *parent,
-								 PatternGeneratorBufferManager *bufmanager,
-								 QWidget *settingsWidget, PatternGenerator *pg)
-	: QWidget(parent), settingsWidget(settingsWidget), bufman(bufmanager), pg(pg) {
+PatternGeneratorBufferManagerUi::PatternGeneratorBufferManagerUi(QWidget* parent,
+								 PatternGeneratorBufferManager* bufmanager,
+								 QWidget* settingsWidget, PatternGenerator* pg)
+	: QWidget(parent)
+	, settingsWidget(settingsWidget)
+	, bufman(bufmanager)
+	, pg(pg)
+{
 	// sigrok and sigrokdecode initialisation
 	context = sigrok::Context::create();
 	pv::DeviceManager device_manager(context);
-	pv::MainWindow *w = new pv::MainWindow(device_manager, nullptr, "pattern_generator", "", parent);
+	pv::MainWindow* w = new pv::MainWindow(device_manager, nullptr, "pattern_generator", "", parent);
 	binary_format = w->get_format_from_string("binary");
 	/* setup PV plot view */
 	main_win = w;
 
-	parent->layout()->addWidget(static_cast<QWidget *>(main_win));
+	parent->layout()->addWidget(static_cast<QWidget*>(main_win));
 	/* setup toolbar */
 	main_win->main_bar_->setVisible(false);
 	main_win->view_->ruler_->set_offset(0);
@@ -107,7 +116,8 @@ PatternGeneratorBufferManagerUi::PatternGeneratorBufferManagerUi(QWidget *parent
 	createBinaryBuffer();
 }
 
-void PatternGeneratorBufferManagerUi::updateUi() {
+void PatternGeneratorBufferManagerUi::updateUi()
+{
 	bufman->update();
 	reloadPVDevice();
 
@@ -119,7 +129,8 @@ void PatternGeneratorBufferManagerUi::updateUi() {
 
 PatternGeneratorBufferManagerUi::~PatternGeneratorBufferManagerUi() {}
 
-void PatternGeneratorBufferManagerUi::createBinaryBuffer() {
+void PatternGeneratorBufferManagerUi::createBinaryBuffer()
+{
 	options["numchannels"] = Glib::Variant<gint32>(g_variant_new_int32(16),
 						       true); //(Glib::VariantBase)(gint32(16));
 	options["samplerate"] = Glib::Variant<guint64>(g_variant_new_uint64(bufman->getSampleRate()),
@@ -129,9 +140,10 @@ void PatternGeneratorBufferManagerUi::createBinaryBuffer() {
 	main_win->select_device(pattern_generator_ptr);
 }
 
-pv::MainWindow *PatternGeneratorBufferManagerUi::getPVWindow() { return main_win; }
+pv::MainWindow* PatternGeneratorBufferManagerUi::getPVWindow() { return main_win; }
 
-void PatternGeneratorBufferManagerUi::reloadPVDevice() {
+void PatternGeneratorBufferManagerUi::reloadPVDevice()
+{
 	pattern_generator_ptr->close();
 	options["samplerate"] = Glib::Variant<guint64>(g_variant_new_uint64(bufman->getSampleRate()),
 						       true); //(Glib::VariantBase)(gint64(1000000));

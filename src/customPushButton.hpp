@@ -29,15 +29,16 @@ namespace adiscope {
  * difference is, when it's part of a button group and is the active
  * button, it is possible to disactivate it by clicking on it. */
 
-class CustomPushButton : public QPushButton {
+class CustomPushButton : public QPushButton
+{
 	Q_OBJECT
 
 public:
-	explicit CustomPushButton(QWidget *parent = Q_NULLPTR);
+	explicit CustomPushButton(QWidget* parent = Q_NULLPTR);
 	~CustomPushButton();
 
 protected:
-	void mouseReleaseEvent(QMouseEvent *event);
+	void mouseReleaseEvent(QMouseEvent* event);
 
 public Q_SLOTS:
 	void setChecked(bool checked);

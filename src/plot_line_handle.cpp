@@ -25,7 +25,7 @@
 #include <QMoveEvent>
 #include <QPainter>
 
-PlotLineHandle::PlotLineHandle(const QPixmap &handleIcon, QWidget *parent)
+PlotLineHandle::PlotLineHandle(const QPixmap& handleIcon, QWidget* parent)
 	: QWidget(parent)
 	, m_enable_silent_move(false)
 	, m_innerSpacing(0)
@@ -34,26 +34,30 @@ PlotLineHandle::PlotLineHandle(const QPixmap &handleIcon, QWidget *parent)
 	, m_grabbed(false)
 	, m_current_pos(0)
 	, m_width(20)
-	, m_height(20) {}
+	, m_height(20)
+{}
 
-void PlotLineHandle::moveSilently(QPoint pos) {
+void PlotLineHandle::moveSilently(QPoint pos)
+{
 	m_enable_silent_move = true;
 	moveWithinParent(pos.x(), pos.y());
 }
 
 int PlotLineHandle::position() { return m_current_pos; }
 
-void PlotLineHandle::setPen(const QPen &pen) { m_pen = pen; }
+void PlotLineHandle::setPen(const QPen& pen) { m_pen = pen; }
 
-const QPen &PlotLineHandle::pen() { return m_pen; }
+const QPen& PlotLineHandle::pen() { return m_pen; }
 
-void PlotLineHandle::enterEvent(QEvent *event) {
+void PlotLineHandle::enterEvent(QEvent* event)
+{
 	setCursor(Qt::OpenHandCursor);
 	QWidget::enterEvent(event);
 }
 
-void PlotLineHandle::mousePressEvent(QMouseEvent *event) {
-	QWidget *parent = static_cast<QWidget *>(this->parent());
+void PlotLineHandle::mousePressEvent(QMouseEvent* event)
+{
+	QWidget* parent = static_cast<QWidget*>(this->parent());
 
 	setCursor(Qt::ClosedHandCursor);
 	parent->raise();
@@ -61,21 +65,27 @@ void PlotLineHandle::mousePressEvent(QMouseEvent *event) {
 	QWidget::mousePressEvent(event);
 }
 
-void PlotLineHandle::mouseReleaseEvent(QMouseEvent *event) {
+void PlotLineHandle::mouseReleaseEvent(QMouseEvent* event)
+{
 	Q_EMIT mouseReleased();
 	setCursor(Qt::OpenHandCursor);
 	QWidget::mouseReleaseEvent(event);
 }
 
-void PlotLineHandle::setGrabbed(bool grabbed) {
+void PlotLineHandle::setGrabbed(bool grabbed)
+{
 	if (m_grabbed != grabbed) {
 		m_grabbed = grabbed;
 		Q_EMIT grabbedChanged(grabbed);
 	}
 }
 
-PlotGateHandle::PlotGateHandle(const QPixmap &handleIcon, QWidget *parent)
-	: PlotLineHandle(handleIcon, parent), m_alignLeft(true), m_reachLimit(false), m_timeValue(0) {
+PlotGateHandle::PlotGateHandle(const QPixmap& handleIcon, QWidget* parent)
+	: PlotLineHandle(handleIcon, parent)
+	, m_alignLeft(true)
+	, m_reachLimit(false)
+	, m_timeValue(0)
+{
 	m_width = m_image.width();
 	m_height = m_image.height();
 	setMinimumSize(m_width, m_height);
@@ -84,22 +94,25 @@ PlotGateHandle::PlotGateHandle(const QPixmap &handleIcon, QWidget *parent)
 
 void PlotGateHandle::triggerMove() { Q_EMIT positionChanged(m_current_pos); }
 
-void PlotGateHandle::setPosition(int pos) {
+void PlotGateHandle::setPosition(int pos)
+{
 	if (m_current_pos != pos)
 		moveWithinParent(centerPosToOrigin(pos), 0);
 }
 
-void PlotGateHandle::setPositionSilenty(int pos) {
+void PlotGateHandle::setPositionSilenty(int pos)
+{
 	if (m_current_pos != pos)
 		moveSilently(QPoint(centerPosToOrigin(pos), 0));
 }
 
 void PlotGateHandle::updatePosition() { moveSilently(QPoint(0, centerPosToOrigin(m_current_pos))); }
 
-void PlotGateHandle::moveWithinParent(int x, int y) {
+void PlotGateHandle::moveWithinParent(int x, int y)
+{
 	Q_UNUSED(y);
 
-	HorizHandlesArea *area = static_cast<HorizHandlesArea *>(parent());
+	HorizHandlesArea* area = static_cast<HorizHandlesArea*>(parent());
 
 	int lower_limit = 0 + area->leftPadding() - width() / 2;
 	int upper_limit = area->width() - area->rightPadding() - width() / 2 - 1;
@@ -150,7 +163,6 @@ void PlotGateHandle::moveWithinParent(int x, int y) {
 		}
 		if (!m_enable_silent_move)
 			Q_EMIT positionChanged(centerPos);
-
 	} else {
 		if (m_reachLimit) { // update only the bar position if the
 				    // handle reached a margin
@@ -162,34 +174,40 @@ void PlotGateHandle::moveWithinParent(int x, int y) {
 
 void PlotGateHandle::setInnerSpacing(int value) { m_innerSpacing = value; }
 
-int PlotGateHandle::position() {
+int PlotGateHandle::position()
+{
 	if (m_reachLimit) // if the handle reached the limit return the position
 			  // of the bar
 		return originPosToCenter(m_position);
 	return m_current_pos;
 }
 
-void PlotGateHandle::setTimeValue(double val) {
+void PlotGateHandle::setTimeValue(double val)
+{
 	m_timeValue = val;
 	repaint();
 }
 
-void PlotGateHandle::setCenterLeft(bool val) { /* align the bar to the left or
-						  the right part of the handle*/
+void PlotGateHandle::setCenterLeft(bool val)
+{ /* align the bar to the left or
+     the right part of the handle*/
 	m_alignLeft = val;
 }
 
 int PlotGateHandle::getCurrentPos() { return m_position; }
 
-bool PlotGateHandle::reachedLimit() {
+bool PlotGateHandle::reachedLimit()
+{
 	return m_reachLimit; // cursor handle reached the plot margin
 }
 
-void PlotGateHandle::setOtherCursorPosition(int position) {
+void PlotGateHandle::setOtherCursorPosition(int position)
+{
 	m_otherCursorPos = position; // position of the other handle cursor
 }
 
-void PlotGateHandle::paintEvent(QPaintEvent *event) {
+void PlotGateHandle::paintEvent(QPaintEvent* event)
+{
 	QPainter p(this);
 	QPoint imageTopLeft;
 
@@ -206,22 +224,26 @@ void PlotGateHandle::paintEvent(QPaintEvent *event) {
 	p.drawText(QPoint((width() - textWidth) / 2, height() - textHeight / 2), handleText);
 }
 
-int PlotGateHandle::originPosToCenter(int origin) {
-	HorizHandlesArea *area = static_cast<HorizHandlesArea *>(parent());
+int PlotGateHandle::originPosToCenter(int origin)
+{
+	HorizHandlesArea* area = static_cast<HorizHandlesArea*>(parent());
 	int offset = -area->leftPadding() + width() / 2 + (m_alignLeft ? 0 : width());
 
 	return (origin + offset);
 }
 
-int PlotGateHandle::centerPosToOrigin(int center) {
-	HorizHandlesArea *area = static_cast<HorizHandlesArea *>(parent());
+int PlotGateHandle::centerPosToOrigin(int center)
+{
+	HorizHandlesArea* area = static_cast<HorizHandlesArea*>(parent());
 	int offset = -area->leftPadding() + width() / 2 + (m_alignLeft ? 0 : width());
 
 	return (center - offset);
 }
 
-PlotLineHandleH::PlotLineHandleH(const QPixmap &handleIcon, QWidget *parent, bool facingBottom)
-	: PlotLineHandle(handleIcon, parent), m_facingBottom(facingBottom) {
+PlotLineHandleH::PlotLineHandleH(const QPixmap& handleIcon, QWidget* parent, bool facingBottom)
+	: PlotLineHandle(handleIcon, parent)
+	, m_facingBottom(facingBottom)
+{
 	m_innerSpacing = m_image.width() / 2;
 	m_width = m_image.width();
 	m_height = m_innerSpacing + m_image.height() + m_outerSpacing;
@@ -231,12 +253,14 @@ PlotLineHandleH::PlotLineHandleH(const QPixmap &handleIcon, QWidget *parent, boo
 
 void PlotLineHandleH::triggerMove() { Q_EMIT positionChanged(m_current_pos); }
 
-void PlotLineHandleH::setPosition(int pos) {
+void PlotLineHandleH::setPosition(int pos)
+{
 	if (m_current_pos != pos)
 		moveWithinParent(centerPosToOrigin(pos), 0);
 }
 
-void PlotLineHandleH::setPositionSilenty(int pos) {
+void PlotLineHandleH::setPositionSilenty(int pos)
+{
 	if (m_current_pos != pos)
 		moveSilently(QPoint(centerPosToOrigin(pos), 0));
 }
@@ -245,10 +269,11 @@ void PlotLineHandleH::updatePosition() { moveSilently(QPoint(centerPosToOrigin(m
 
 void PlotLineHandleH::setInnerSpacing(int value) { m_innerSpacing = value; }
 
-void PlotLineHandleH::moveWithinParent(int x, int y) {
+void PlotLineHandleH::moveWithinParent(int x, int y)
+{
 	Q_UNUSED(y);
 
-	HorizHandlesArea *area = static_cast<HorizHandlesArea *>(parent());
+	HorizHandlesArea* area = static_cast<HorizHandlesArea*>(parent());
 
 	int lower_limit = 0 + area->leftPadding() - width() / 2;
 	int upper_limit = area->width() - area->rightPadding() - width() / 2 - 1;
@@ -271,7 +296,8 @@ void PlotLineHandleH::moveWithinParent(int x, int y) {
 	m_current_pos = centerPos;
 }
 
-void PlotLineHandleH::paintEvent(QPaintEvent *) {
+void PlotLineHandleH::paintEvent(QPaintEvent*)
+{
 	QPainter p(this);
 	QPoint lineStart;
 	QPoint imageTopLeft;
@@ -290,30 +316,35 @@ void PlotLineHandleH::paintEvent(QPaintEvent *) {
 	p.drawPixmap(imageTopLeft, m_image);
 }
 
-int PlotLineHandleH::originPosToCenter(int origin) {
-	HorizHandlesArea *area = static_cast<HorizHandlesArea *>(parent());
+int PlotLineHandleH::originPosToCenter(int origin)
+{
+	HorizHandlesArea* area = static_cast<HorizHandlesArea*>(parent());
 	int offset = -area->leftPadding() + width() / 2;
 
 	return (origin + offset);
 }
 
-int PlotLineHandleH::centerPosToOrigin(int center) {
-	HorizHandlesArea *area = static_cast<HorizHandlesArea *>(parent());
+int PlotLineHandleH::centerPosToOrigin(int center)
+{
+	HorizHandlesArea* area = static_cast<HorizHandlesArea*>(parent());
 	int offset = -area->leftPadding() + width() / 2;
 
 	return (center - offset);
 }
 
-void PlotLineHandleH::mouseDoubleClickEvent(QMouseEvent *event) {
-	HorizHandlesArea *area = static_cast<HorizHandlesArea *>(parent());
+void PlotLineHandleH::mouseDoubleClickEvent(QMouseEvent* event)
+{
+	HorizHandlesArea* area = static_cast<HorizHandlesArea*>(parent());
 	int center = (area->width() - area->leftPadding() - area->rightPadding()) / 2;
 	setPosition(center);
 
 	Q_EMIT reset();
 }
 
-PlotLineHandleV::PlotLineHandleV(const QPixmap &handleIcon, QWidget *parent, bool facingRight)
-	: PlotLineHandle(handleIcon, parent), m_facingRight(facingRight) {
+PlotLineHandleV::PlotLineHandleV(const QPixmap& handleIcon, QWidget* parent, bool facingRight)
+	: PlotLineHandle(handleIcon, parent)
+	, m_facingRight(facingRight)
+{
 	m_innerSpacing = m_image.height() / 2;
 	m_width = m_innerSpacing + m_image.width() + m_outerSpacing;
 	m_height = m_image.height();
@@ -323,22 +354,25 @@ PlotLineHandleV::PlotLineHandleV(const QPixmap &handleIcon, QWidget *parent, boo
 
 void PlotLineHandleV::triggerMove() { Q_EMIT positionChanged(m_current_pos); }
 
-void PlotLineHandleV::setPosition(int pos) {
+void PlotLineHandleV::setPosition(int pos)
+{
 	if (m_current_pos != pos)
 		moveWithinParent(0, centerPosToOrigin(pos));
 }
 
-void PlotLineHandleV::setPositionSilenty(int pos) {
+void PlotLineHandleV::setPositionSilenty(int pos)
+{
 	if (m_current_pos != pos)
 		moveSilently(QPoint(0, centerPosToOrigin(pos)));
 }
 
 void PlotLineHandleV::updatePosition() { moveSilently(QPoint(0, centerPosToOrigin(m_current_pos))); }
 
-void PlotLineHandleV::moveWithinParent(int x, int y) {
+void PlotLineHandleV::moveWithinParent(int x, int y)
+{
 	Q_UNUSED(x);
 
-	VertHandlesArea *area = static_cast<VertHandlesArea *>(parent());
+	VertHandlesArea* area = static_cast<VertHandlesArea*>(parent());
 
 	int lower_limit = 0 + area->topPadding() - height() / 2;
 	int upper_limit = area->height() - area->bottomPadding() - height() / 2 - 1;
@@ -360,7 +394,8 @@ void PlotLineHandleV::moveWithinParent(int x, int y) {
 	m_current_pos = centerPos;
 }
 
-void PlotLineHandleV::paintEvent(QPaintEvent *) {
+void PlotLineHandleV::paintEvent(QPaintEvent*)
+{
 	QPainter p(this);
 	QPoint lineStart;
 	QPoint imageTopLeft;
@@ -379,40 +414,45 @@ void PlotLineHandleV::paintEvent(QPaintEvent *) {
 	p.drawPixmap(imageTopLeft, m_image);
 }
 
-int PlotLineHandleV::originPosToCenter(int origin) {
-	VertHandlesArea *area = static_cast<VertHandlesArea *>(parent());
+int PlotLineHandleV::originPosToCenter(int origin)
+{
+	VertHandlesArea* area = static_cast<VertHandlesArea*>(parent());
 	int offset = -area->topPadding() + height() / 2;
 
 	return (origin + offset);
 }
 
-int PlotLineHandleV::centerPosToOrigin(int center) {
-	VertHandlesArea *area = static_cast<VertHandlesArea *>(parent());
+int PlotLineHandleV::centerPosToOrigin(int center)
+{
+	VertHandlesArea* area = static_cast<VertHandlesArea*>(parent());
 	int offset = -area->topPadding() + height() / 2;
 
 	return (center - offset);
 }
 
-void PlotLineHandleV::mouseDoubleClickEvent(QMouseEvent *event) {
-	VertHandlesArea *area = static_cast<VertHandlesArea *>(parent());
+void PlotLineHandleV::mouseDoubleClickEvent(QMouseEvent* event)
+{
+	VertHandlesArea* area = static_cast<VertHandlesArea*>(parent());
 	int center = (area->height() - area->topPadding() - area->bottomPadding()) / 2;
 	setPosition(center);
 
 	Q_EMIT reset();
 }
 
-FreePlotLineHandleH::FreePlotLineHandleH(const QPixmap &handleIcon, const QPixmap &beyondLeftIcon,
-					 const QPixmap &beyondRightIcon, QWidget *parent, bool facingRight)
+FreePlotLineHandleH::FreePlotLineHandleH(const QPixmap& handleIcon, const QPixmap& beyondLeftIcon,
+					 const QPixmap& beyondRightIcon, QWidget* parent, bool facingRight)
 	: PlotLineHandleH(handleIcon, parent, facingRight)
 	, m_beyondLeftImage(beyondLeftIcon)
 	, m_beyondRightImage(beyondRightIcon)
 	, m_isBeyondLeft(false)
-	, m_isBeyondRight(false) {}
+	, m_isBeyondRight(false)
+{}
 
-void FreePlotLineHandleH::moveWithinParent(int x, int y) {
+void FreePlotLineHandleH::moveWithinParent(int x, int y)
+{
 	Q_UNUSED(y);
 
-	HorizHandlesArea *area = static_cast<HorizHandlesArea *>(parent());
+	HorizHandlesArea* area = static_cast<HorizHandlesArea*>(parent());
 
 	int lower_limit = 0 + area->leftPadding() - width() / 2;
 	int upper_limit = area->width() - area->rightPadding() - width() / 2 - 1;
@@ -441,7 +481,8 @@ void FreePlotLineHandleH::moveWithinParent(int x, int y) {
 	m_enable_silent_move = false;
 }
 
-void FreePlotLineHandleH::paintEvent(QPaintEvent *) {
+void FreePlotLineHandleH::paintEvent(QPaintEvent*)
+{
 	QPainter p(this);
 	QPoint lineStart;
 	QPoint imageTopLeft;
@@ -466,18 +507,20 @@ void FreePlotLineHandleH::paintEvent(QPaintEvent *) {
 	}
 }
 
-FreePlotLineHandleV::FreePlotLineHandleV(const QPixmap &handleIcon, const QPixmap &beyondTopIcon,
-					 const QPixmap &beyondBottomIcon, QWidget *parent, bool facingRight)
+FreePlotLineHandleV::FreePlotLineHandleV(const QPixmap& handleIcon, const QPixmap& beyondTopIcon,
+					 const QPixmap& beyondBottomIcon, QWidget* parent, bool facingRight)
 	: PlotLineHandleV(handleIcon, parent, facingRight)
 	, m_beyondTopImage(beyondTopIcon)
 	, m_beyondBottomImage(beyondBottomIcon)
 	, m_isBeyondTop(false)
-	, m_isBeyondBottom(false) {}
+	, m_isBeyondBottom(false)
+{}
 
-void FreePlotLineHandleV::moveWithinParent(int x, int y) {
+void FreePlotLineHandleV::moveWithinParent(int x, int y)
+{
 	Q_UNUSED(x);
 
-	VertHandlesArea *area = static_cast<VertHandlesArea *>(parent());
+	VertHandlesArea* area = static_cast<VertHandlesArea*>(parent());
 
 	int lower_limit = 0 + area->topPadding() - height() / 2;
 	int upper_limit = area->height() - area->bottomPadding() - height() / 2 - 1;
@@ -506,7 +549,8 @@ void FreePlotLineHandleV::moveWithinParent(int x, int y) {
 	m_enable_silent_move = false;
 }
 
-void FreePlotLineHandleV::paintEvent(QPaintEvent *) {
+void FreePlotLineHandleV::paintEvent(QPaintEvent*)
+{
 	QPainter p(this);
 	QPoint lineStart;
 	QPoint imageTopLeft;
@@ -531,9 +575,10 @@ void FreePlotLineHandleV::paintEvent(QPaintEvent *) {
 	}
 }
 
-RoundedHandleV::RoundedHandleV(const QPixmap &handleIcon, const QPixmap &beyondTopIcon, const QPixmap &beyondBottomIcon,
-			       QWidget *parent, bool facingRight)
-	: FreePlotLineHandleV(handleIcon, beyondTopIcon, beyondBottomIcon, parent, facingRight) {
+RoundedHandleV::RoundedHandleV(const QPixmap& handleIcon, const QPixmap& beyondTopIcon, const QPixmap& beyondBottomIcon,
+			       QWidget* parent, bool facingRight)
+	: FreePlotLineHandleV(handleIcon, beyondTopIcon, beyondBottomIcon, parent, facingRight)
+{
 	m_innerSpacing = m_image.height();
 	m_width = m_innerSpacing + m_image.width() + m_outerSpacing;
 	m_height = m_image.height();
@@ -543,14 +588,16 @@ RoundedHandleV::RoundedHandleV(const QPixmap &handleIcon, const QPixmap &beyondT
 
 QColor RoundedHandleV::roundRectColor() { return m_roundRectColor; }
 
-void RoundedHandleV::setRoundRectColor(const QColor &newColor) {
+void RoundedHandleV::setRoundRectColor(const QColor& newColor)
+{
 	if (m_roundRectColor != newColor) {
 		m_roundRectColor = newColor;
 		this->update();
 	}
 }
 
-void RoundedHandleV::paintEvent(QPaintEvent *pv) {
+void RoundedHandleV::paintEvent(QPaintEvent* pv)
+{
 	QPainter p(this);
 	QRect rect(0, 0, m_image.width() - 1, m_image.height() - 1);
 

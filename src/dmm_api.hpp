@@ -4,7 +4,8 @@
 #include "dmm.hpp"
 
 namespace adiscope {
-class DMM_API : public ApiObject {
+class DMM_API : public ApiObject
+{
 	friend class ToolLauncher_API;
 
 	Q_OBJECT
@@ -69,11 +70,14 @@ public:
 
 	Q_INVOKABLE void show();
 
-	explicit DMM_API(DMM *dmm) : ApiObject(), dmm(dmm) {}
+	explicit DMM_API(DMM* dmm)
+		: ApiObject()
+		, dmm(dmm)
+	{}
 	~DMM_API() {}
 
 private:
-	DMM *dmm;
+	DMM* dmm;
 };
 } // namespace adiscope
 #endif // DMM_API_HPP

@@ -28,13 +28,24 @@
 namespace adiscope {
 class CrossingDetection;
 
-class MeasurementData {
+class MeasurementData
+{
 public:
-	enum unitTypes { METRIC, TIME, PERCENTAGE, DIMENSIONLESS };
+	enum unitTypes
+	{
+		METRIC,
+		TIME,
+		PERCENTAGE,
+		DIMENSIONLESS
+	};
 
-	enum axisType { HORIZONTAL, VERTICAL };
+	enum axisType
+	{
+		HORIZONTAL,
+		VERTICAL
+	};
 
-	MeasurementData(const QString &name, axisType axis, const QString &unit = "", int channel = -1);
+	MeasurementData(const QString& name, axisType axis, const QString& unit = "", int channel = -1);
 
 	QString name() const;
 	double value() const;
@@ -60,9 +71,11 @@ private:
 	enum axisType m_axis;
 };
 
-class Measure {
+class Measure
+{
 public:
-	enum defaultMeasurements {
+	enum defaultMeasurements
+	{
 		PERIOD = 0,
 		FREQUENCY,
 		MIN,
@@ -90,9 +103,9 @@ public:
 		DEFAULT_MEASUREMENT_COUNT
 	};
 
-	Measure(int channel, double *buffer = NULL, size_t length = 0);
+	Measure(int channel, double* buffer = NULL, size_t length = 0);
 
-	void setDataSource(double *buffer, size_t length);
+	void setDataSource(double* buffer, size_t length);
 	void measure();
 	double sampleRate();
 	void setSampleRate(double);
@@ -113,12 +126,12 @@ public:
 	int activeMeasurementsCount() const;
 
 private:
-	bool highLowFromHistogram(double &low, double &high, double min, double max);
+	bool highLowFromHistogram(double& low, double& high, double min, double max);
 	void clearMeasurements();
 
 private:
 	int m_channel;
-	double *m_buffer;
+	double* m_buffer;
 	ssize_t m_buf_length;
 	double m_sample_rate;
 	unsigned int m_adc_bit_count;
@@ -127,13 +140,14 @@ private:
 	int m_startIndex;
 	int m_endIndex;
 	int m_gatingEnabled;
-	int *m_histogram;
-	CrossingDetection *m_cross_detect;
+	int* m_histogram;
+	CrossingDetection* m_cross_detect;
 
 	QList<std::shared_ptr<MeasurementData>> m_measurements;
 };
 
-class Statistic {
+class Statistic
+{
 public:
 	Statistic();
 

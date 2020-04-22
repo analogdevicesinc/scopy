@@ -23,24 +23,25 @@
 #include <qwt_painter.h>
 #include <qwt_plot.h>
 
-class Symbol : public QObject {
+class Symbol : public QObject
+{
 	Q_OBJECT
 
 public:
-	Symbol(QObject *parent, const QSize &size, QwtAxisId fixedAxis, QwtAxisId mobileAxis,
+	Symbol(QObject* parent, const QSize& size, QwtAxisId fixedAxis, QwtAxisId mobileAxis,
 	       bool opposedToFixed = false, bool floats = false);
 	virtual ~Symbol();
 
-	const QwtPlot *plot() const;
-	QwtPlot *plot();
+	const QwtPlot* plot() const;
+	QwtPlot* plot();
 
-	void setSurface(const QRect &rect);
+	void setSurface(const QRect& rect);
 	QRect surface();
 
-	void setAnchor(const QPoint &anchor);
+	void setAnchor(const QPoint& anchor);
 	QPoint anchor();
 
-	void setPlotCoord(const QPointF &pos);
+	void setPlotCoord(const QPointF& pos);
 	QPointF plotCoord();
 
 	void setSelected(bool selected);
@@ -64,16 +65,16 @@ public:
 	void setVisible(bool en);
 	bool isVisible();
 
-	void setPen(const QPen &);
-	const QPen &pen();
+	void setPen(const QPen&);
+	const QPen& pen();
 
-	QPointF invTransform(const QPointF &) const;
-	QPointF transform(const QPointF &) const;
+	QPointF invTransform(const QPointF&) const;
+	QPointF transform(const QPointF&) const;
 
 	void updateSurfacePos();
 	void updatePlotCoordFromSurfacePos();
 
-	virtual void draw(QPainter *painter) const = 0;
+	virtual void draw(QPainter* painter) const = 0;
 	virtual bool moveWith(double plotDeltaX, double plotDeltaY) = 0;
 
 	void triggerMove();
@@ -112,13 +113,14 @@ protected:
 	QPen d_pen;
 };
 
-class VertDebugSymbol : public Symbol {
+class VertDebugSymbol : public Symbol
+{
 	Q_OBJECT
 
 public:
-	VertDebugSymbol(QObject *parent, const QSize &size, bool opposedToFixed = false, bool floats = false);
+	VertDebugSymbol(QObject* parent, const QSize& size, bool opposedToFixed = false, bool floats = false);
 
-	void draw(QPainter *painter) const;
+	void draw(QPainter* painter) const;
 
 	virtual bool moveWith(double plotDeltaX, double plotDeltaY);
 
@@ -135,13 +137,14 @@ private Q_SLOTS:
 	void onBasePixelPositionChanged(int, int);
 };
 
-class HorizDebugSymbol : public Symbol {
+class HorizDebugSymbol : public Symbol
+{
 	Q_OBJECT
 
 public:
-	HorizDebugSymbol(QObject *parent, const QSize &size, bool opposedToFixed = false, bool floats = false);
+	HorizDebugSymbol(QObject* parent, const QSize& size, bool opposedToFixed = false, bool floats = false);
 
-	void draw(QPainter *painter) const;
+	void draw(QPainter* painter) const;
 
 	virtual bool moveWith(double plotDeltaX, double plotDeltaY);
 
@@ -158,46 +161,50 @@ private Q_SLOTS:
 	void onBasePixelPositionChanged(int, int);
 };
 
-class TriggerLevelCursor : public VertDebugSymbol {
+class TriggerLevelCursor : public VertDebugSymbol
+{
 	Q_OBJECT
 
 public:
-	TriggerLevelCursor(QObject *parent, const QPixmap &pixmap);
+	TriggerLevelCursor(QObject* parent, const QPixmap& pixmap);
 
-	void draw(QPainter *painter) const;
+	void draw(QPainter* painter) const;
 
 private:
 	QPixmap d_cursorPixmap;
 };
 
-class TriggerDelayCursor : public HorizDebugSymbol {
+class TriggerDelayCursor : public HorizDebugSymbol
+{
 	Q_OBJECT
 
 public:
-	TriggerDelayCursor(QObject *parent, const QPixmap &pixmap);
+	TriggerDelayCursor(QObject* parent, const QPixmap& pixmap);
 
-	void draw(QPainter *painter) const;
+	void draw(QPainter* painter) const;
 
 private:
 	QPixmap d_cursorPixmap;
 };
 
-class HorizBar : public VertDebugSymbol {
+class HorizBar : public VertDebugSymbol
+{
 	Q_OBJECT
 
 public:
-	HorizBar(QObject *parent, bool floats = false);
+	HorizBar(QObject* parent, bool floats = false);
 
-	void draw(QPainter *painter) const;
+	void draw(QPainter* painter) const;
 };
 
-class VertBar : public HorizDebugSymbol {
+class VertBar : public HorizDebugSymbol
+{
 	Q_OBJECT
 
 public:
-	VertBar(QObject *parent, bool floats = false);
+	VertBar(QObject* parent, bool floats = false);
 
-	void draw(QPainter *painter) const;
+	void draw(QPainter* painter) const;
 };
 
 #endif /* M2K_SYMBOL_H */

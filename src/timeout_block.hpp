@@ -25,14 +25,15 @@
 #include <QObject>
 
 namespace adiscope {
-class timeout_block : public QObject, public gr::block {
+class timeout_block : public QObject, public gr::block
+{
 	Q_OBJECT
 
 private:
 	void pmt_received(pmt::pmt_t pmt);
 
 public:
-	explicit timeout_block(const std::string &pmt_name, QObject *parent = nullptr);
+	explicit timeout_block(const std::string& pmt_name, QObject* parent = nullptr);
 	~timeout_block();
 
 Q_SIGNALS:

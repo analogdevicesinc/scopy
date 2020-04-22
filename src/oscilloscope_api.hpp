@@ -10,7 +10,8 @@ class Oscilloscope;
 /**
  * @brief osc object
  */
-class Oscilloscope_API : public ApiObject {
+class Oscilloscope_API : public ApiObject
+{
 	Q_OBJECT
 
 	Q_PROPERTY(QVariantList channels READ getChannels);
@@ -77,7 +78,10 @@ class Oscilloscope_API : public ApiObject {
 	Q_PROPERTY(int memory_depth READ getMemoryDepth WRITE setMemoryDepth)
 
 public:
-	explicit Oscilloscope_API(Oscilloscope *osc) : ApiObject(), osc(osc) {}
+	explicit Oscilloscope_API(Oscilloscope* osc)
+		: ApiObject()
+		, osc(osc)
+	{}
 	~Oscilloscope_API() {}
 
 	QVariantList getChannels();
@@ -171,7 +175,7 @@ public:
 	void setInternExtern(int option);
 
 	QList<QString> getMathChannels() const;
-	void setMathChannels(const QList<QString> &list);
+	void setMathChannels(const QList<QString>& list);
 
 	double getTimePos() const;
 	void setTimePos(double pos);
@@ -180,10 +184,10 @@ public:
 	void setTimeBase(double base);
 
 	QList<int> measureEn() const;
-	void setMeasureEn(const QList<int> &list);
+	void setMeasureEn(const QList<int>& list);
 
 	QList<int> statisticEn() const;
-	void setStatisticEn(const QList<int> &list);
+	void setStatisticEn(const QList<int>& list);
 
 	int getCurrentChannel() const;
 	void setCurrentChannel(int chn_id);
@@ -212,10 +216,11 @@ public:
 	Q_INVOKABLE void show();
 
 private:
-	Oscilloscope *osc;
+	Oscilloscope* osc;
 };
 
-class Channel_API : public ApiObject {
+class Channel_API : public ApiObject
+{
 	Q_OBJECT
 
 	Q_PROPERTY(bool enabled READ channelEn WRITE setChannelEn)
@@ -256,7 +261,10 @@ class Channel_API : public ApiObject {
 	Q_PROPERTY(double neg_duty READ measured_neg_duty)
 	Q_PROPERTY(QList<double> data READ data STORED false)
 public:
-	explicit Channel_API(Oscilloscope *osc) : ApiObject(), osc(osc) {}
+	explicit Channel_API(Oscilloscope* osc)
+		: ApiObject()
+		, osc(osc)
+	{}
 	~Channel_API() {}
 
 	bool channelEn() const;
@@ -306,7 +314,7 @@ public:
 	Q_INVOKABLE void setColor(int, int, int, int a = 255);
 
 private:
-	Oscilloscope *osc;
+	Oscilloscope* osc;
 };
 } // namespace adiscope
 

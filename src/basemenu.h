@@ -29,19 +29,20 @@ class BaseMenu;
 }
 
 namespace adiscope {
-class BaseMenu : public QWidget {
+class BaseMenu : public QWidget
+{
 	Q_OBJECT
 
 public:
-	explicit BaseMenu(QWidget *parent = nullptr);
+	explicit BaseMenu(QWidget* parent = nullptr);
 	virtual ~BaseMenu();
 
-	void insertMenuItem(BaseMenuItem *menuItem, int position = -1);
-	void insertMenuItem(QVector<BaseMenuItem *> items, QVector<int> positions = QVector<int>());
-	void removeMenuItem(BaseMenuItem *menuItem);
-	void removeMenuItem(QVector<BaseMenuItem *> items);
+	void insertMenuItem(BaseMenuItem* menuItem, int position = -1);
+	void insertMenuItem(QVector<BaseMenuItem*> items, QVector<int> positions = QVector<int>());
+	void removeMenuItem(BaseMenuItem* menuItem);
+	void removeMenuItem(QVector<BaseMenuItem*> items);
 
-	int positionOf(BaseMenuItem *menuItem);
+	int positionOf(BaseMenuItem* menuItem);
 
 	void setMargins(int left, int top, int right, int bottom);
 
@@ -52,15 +53,15 @@ Q_SIGNALS:
 	void itemMovedFromTo(short, short);
 
 protected:
-	void dragEnterEvent(QDragEnterEvent *event);
-	void dragLeaveEvent(QDragLeaveEvent *event);
-	void dropEvent(QDropEvent *event);
+	void dragEnterEvent(QDragEnterEvent* event);
+	void dragLeaveEvent(QDragLeaveEvent* event);
+	void dropEvent(QDropEvent* event);
 
 public Q_SLOTS:
 	void moveItem(short from, short to);
 
 protected:
-	Ui::BaseMenu *d_ui;
+	Ui::BaseMenu* d_ui;
 	int d_items;
 	void _updateItemsPosition();
 };

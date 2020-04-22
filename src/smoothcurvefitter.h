@@ -26,12 +26,13 @@
 #include <memory>
 
 namespace adiscope {
-class SmoothCurveFitter : public QwtCurveFitter {
+class SmoothCurveFitter : public QwtCurveFitter
+{
 public:
 	SmoothCurveFitter();
 
-	virtual QPolygonF fitCurve(const QPolygonF &points) const;
-	virtual QPainterPath fitCurvePath(const QPolygonF &points) const;
+	virtual QPolygonF fitCurve(const QPolygonF& points) const;
+	virtual QPainterPath fitCurvePath(const QPolygonF& points) const;
 
 private:
 	std::unique_ptr<QwtSpline> d_spline;

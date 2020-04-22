@@ -18,16 +18,18 @@ void SpectrumChannel_API::enable(bool en) { spch->widget()->enableButton()->setC
 
 void SpectrumChannel_API::setType(int type) { spch->setAverageType((adiscope::FftDisplayPlot::AverageType)type); }
 
-void SpectrumChannel_API::setWindow(int win) {
+void SpectrumChannel_API::setWindow(int win)
+{
 	auto taps = sp->fft_size;
 	spch->setFftWindow((adiscope::SpectrumAnalyzer::FftWinType)win, taps);
 }
 
 void SpectrumChannel_API::setAveraging(int avg) { spch->setAveraging(avg); }
 
-QList<double> SpectrumChannel_API::data() const {
+QList<double> SpectrumChannel_API::data() const
+{
 	QList<double> list;
-	int i = sp->ch_api.indexOf(const_cast<SpectrumChannel_API *>(this));
+	int i = sp->ch_api.indexOf(const_cast<SpectrumChannel_API*>(this));
 	int nr_samples = sp->fft_plot->Curve(0)->data()->size();
 	for (int j = 0; j < nr_samples; ++j) {
 		list.push_back(sp->fft_plot->Curve(i)->sample(j).y());
@@ -35,7 +37,8 @@ QList<double> SpectrumChannel_API::data() const {
 	return list;
 }
 
-QList<double> SpectrumChannel_API::freq() const {
+QList<double> SpectrumChannel_API::freq() const
+{
 	QList<double> frequency_data;
 	int nr_samples = sp->fft_plot->Curve(0)->data()->size();
 	for (int i = 0; i < nr_samples; ++i) {
@@ -52,14 +55,16 @@ int SpectrumMarker_API::mkId() { return m_mkid; }
 
 void SpectrumMarker_API::setMkId(int val) { m_mkid = val; }
 
-int SpectrumMarker_API::type() {
+int SpectrumMarker_API::type()
+{
 	if (sp->fft_plot->markerEnabled(m_chid, m_mkid)) {
 		return sp->fft_plot->markerType(m_chid, m_mkid);
 	}
 	return -1;
 }
 
-void SpectrumMarker_API::setType(int val) {
+void SpectrumMarker_API::setType(int val)
+{
 	if (val > SpectrumAnalyzer::markerTypes.size()) {
 		val = 0;
 	}
@@ -71,7 +76,8 @@ void SpectrumMarker_API::setType(int val) {
 	}
 }
 
-double SpectrumMarker_API::freq() {
+double SpectrumMarker_API::freq()
+{
 	if (sp->fft_plot->markerEnabled(m_chid, m_mkid)) {
 		return sp->fft_plot->markerFrequency(m_chid, m_mkid);
 	} else {
@@ -79,7 +85,8 @@ double SpectrumMarker_API::freq() {
 	}
 }
 
-void SpectrumMarker_API::setFreq(double pos) {
+void SpectrumMarker_API::setFreq(double pos)
+{
 	if (sp->fft_plot->markerEnabled(m_chid, m_mkid)) {
 		if (m_type != 1) { // if type is not peak
 			sp->fft_plot->setMarkerAtFreq(m_chid, m_mkid, pos);
@@ -103,7 +110,8 @@ void SpectrumMarker_API::setFreq(double pos) {
 	}
 }
 
-double SpectrumMarker_API::magnitude() {
+double SpectrumMarker_API::magnitude()
+{
 	if (sp->fft_plot->markerEnabled(m_chid, m_mkid)) {
 		return sp->fft_plot->markerMagnitude(m_chid, m_mkid);
 	} else {
@@ -113,7 +121,8 @@ double SpectrumMarker_API::magnitude() {
 
 bool SpectrumMarker_API::enabled() { return sp->fft_plot->markerEnabled(m_chid, m_mkid); }
 
-void SpectrumMarker_API::setEnabled(bool en) {
+void SpectrumMarker_API::setEnabled(bool en)
+{
 	bool enabled = sp->channels[m_chid]->widget()->enableButton()->isChecked();
 	sp->channels[m_chid]->widget()->enableButton()->setChecked(true);
 	sp->channels[m_chid]->widget()->nameButton()->setChecked(true);
@@ -130,10 +139,11 @@ void SpectrumMarker_API::setVisible(bool en) { sp->fft_plot->setMarkerVisible(m_
 
 void SpectrumAnalyzer_API::show() { Q_EMIT sp->showTool(); }
 
-QVariantList SpectrumAnalyzer_API::getMarkers() {
+QVariantList SpectrumAnalyzer_API::getMarkers()
+{
 	QVariantList list;
 
-	for (SpectrumMarker_API *each : sp->marker_api) {
+	for (SpectrumMarker_API* each : sp->marker_api) {
 		list.append(QVariant::fromValue(each));
 	}
 
@@ -147,10 +157,11 @@ void SpectrumAnalyzer_API::run(bool chk) { sp->ui->runSingleWidget->toggle(chk);
 bool SpectrumAnalyzer_API::isSingle() { return sp->ui->runSingleWidget->singleButtonChecked(); }
 void SpectrumAnalyzer_API::single(bool chk) { sp->ui->runSingleWidget->single(); }
 
-QVariantList SpectrumAnalyzer_API::getChannels() {
+QVariantList SpectrumAnalyzer_API::getChannels()
+{
 	QVariantList list;
 
-	for (SpectrumChannel_API *each : sp->ch_api) {
+	for (SpectrumChannel_API* each : sp->ch_api) {
 		list.append(QVariant::fromValue(each));
 	}
 
@@ -159,7 +170,8 @@ QVariantList SpectrumAnalyzer_API::getChannels() {
 
 int SpectrumAnalyzer_API::currentChannel() { return (sp->crt_channel_id < 2 ? sp->crt_channel_id : 0); }
 
-void SpectrumAnalyzer_API::setCurrentChannel(int ch) {
+void SpectrumAnalyzer_API::setCurrentChannel(int ch)
+{
 	sp->channels[ch]->widget()->nameButton()->setChecked(true);
 	sp->channels[ch]->widget()->selected(true);
 }

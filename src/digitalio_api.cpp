@@ -7,7 +7,8 @@
 namespace adiscope {
 void DigitalIO_API::show() { Q_EMIT dio->showTool(); }
 
-QList<bool> DigitalIO_API::direction() const {
+QList<bool> DigitalIO_API::direction() const
+{
 	QList<bool> list;
 	unsigned int i;
 
@@ -19,7 +20,8 @@ QList<bool> DigitalIO_API::direction() const {
 	return list;
 }
 
-void DigitalIO_API::setDirection(const QList<bool> &list) {
+void DigitalIO_API::setDirection(const QList<bool>& list)
+{
 	unsigned int i;
 
 	for (i = 0; i < 16; i++) {
@@ -29,7 +31,8 @@ void DigitalIO_API::setDirection(const QList<bool> &list) {
 	}
 }
 
-QList<bool> DigitalIO_API::output() const {
+QList<bool> DigitalIO_API::output() const
+{
 	QList<bool> list;
 	unsigned int i;
 
@@ -41,7 +44,8 @@ QList<bool> DigitalIO_API::output() const {
 	return list;
 }
 
-QList<bool> DigitalIO_API::gpi() const {
+QList<bool> DigitalIO_API::gpi() const
+{
 	QList<bool> list;
 	unsigned int i;
 	for (i = 0; i < 16; i++) {
@@ -55,7 +59,8 @@ bool DigitalIO_API::running() const { return dio->ui->btnRunStop->isChecked(); }
 
 void DigitalIO_API::run(bool en) { dio->ui->btnRunStop->setChecked(en); }
 
-void DigitalIO_API::setOutput(const QList<bool> &list) {
+void DigitalIO_API::setOutput(const QList<bool>& list)
+{
 	unsigned int i;
 
 	for (i = 0; i < 16; i++) {
@@ -65,7 +70,8 @@ void DigitalIO_API::setOutput(const QList<bool> &list) {
 	}
 }
 
-QList<bool> DigitalIO_API::grouped() const {
+QList<bool> DigitalIO_API::grouped() const
+{
 
 	QList<bool> list;
 	for (int i = 0; i < dio->groups.size(); ++i) {
@@ -75,7 +81,8 @@ QList<bool> DigitalIO_API::grouped() const {
 	return list;
 }
 
-void DigitalIO_API::setGrouped(const QList<bool> &grouped) {
+void DigitalIO_API::setGrouped(const QList<bool>& grouped)
+{
 	for (int i = 0; i < grouped.size(); ++i) {
 		int index = grouped[i] ? 1 : 0;
 		dio->groups[i]->ui->stackedWidget->setCurrentIndex(index);
@@ -84,7 +91,8 @@ void DigitalIO_API::setGrouped(const QList<bool> &grouped) {
 	}
 }
 
-QList<bool> DigitalIO_API::locked() const {
+QList<bool> DigitalIO_API::locked() const
+{
 	QList<bool> list;
 	unsigned int i;
 	for (i = 0; i < 16; i++) {

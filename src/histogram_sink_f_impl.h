@@ -30,7 +30,8 @@
 
 namespace adiscope {
 
-class histogram_sink_f_impl : public histogram_sink_f {
+class histogram_sink_f_impl : public histogram_sink_f
+{
 private:
 	void initialize();
 
@@ -41,16 +42,16 @@ private:
 	int d_nconnections;
 
 	int d_index;
-	std::vector<double *> d_residbufs;
+	std::vector<double*> d_residbufs;
 
-	HistogramDisplayPlot *plot;
+	HistogramDisplayPlot* plot;
 
 	gr::high_res_timer_type d_update_time;
 	gr::high_res_timer_type d_last_time;
 
 public:
-	histogram_sink_f_impl(int size, int bins, double xmin, double xmax, const std::string &name, int nconnections,
-			      QObject *plot = NULL);
+	histogram_sink_f_impl(int size, int bins, double xmin, double xmax, const std::string& name, int nconnections,
+			      QObject* plot = NULL);
 	~histogram_sink_f_impl();
 
 	bool check_topology(int ninputs, int noutputs);
@@ -65,7 +66,7 @@ public:
 	int bins() const;
 	void reset();
 
-	int work(int noutput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items);
+	int work(int noutput_items, gr_vector_const_void_star& input_items, gr_vector_void_star& output_items);
 };
 
 } /* namespace adiscope */

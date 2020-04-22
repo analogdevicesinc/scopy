@@ -23,11 +23,12 @@
 #include <QLCDNumber>
 
 namespace adiscope {
-class LcdNumber : public QLCDNumber {
+class LcdNumber : public QLCDNumber
+{
 	Q_OBJECT
 
 public:
-	explicit LcdNumber(QWidget *parent = 0, unsigned precision = 3);
+	explicit LcdNumber(QWidget* parent = 0, unsigned precision = 3);
 	~LcdNumber() {}
 
 public Q_SLOTS:

@@ -36,7 +36,7 @@ using namespace adiscope;
  *       QCheckBox widgets on its right side. As opposed to a QCombobox the
  *       items of this widget cannot be selected.
  */
-DropdownSwitchList::DropdownSwitchList(int switchColCount, QWidget *parent)
+DropdownSwitchList::DropdownSwitchList(int switchColCount, QWidget* parent)
 	: QComboBox(parent)
 	, m_title("Title")
 	, m_rows(0)
@@ -45,7 +45,8 @@ DropdownSwitchList::DropdownSwitchList(int switchColCount, QWidget *parent)
 	, m_treeView(NULL)
 	, m_popVisible(false)
 	, m_mouseInside(false)
-	, m_mousePressed(false) {
+	, m_mousePressed(false)
+{
 	if (m_columns < 2)
 		m_columns = 2;
 
@@ -74,7 +75,7 @@ DropdownSwitchList::DropdownSwitchList(int switchColCount, QWidget *parent)
 	m_model->setHorizontalHeaderLabels(m_colTitles);
 
 	// Use checkboxes instead of the default editor (spinbuttons)
-	CheckboxDelegate *delegate = new CheckboxDelegate(m_treeView);
+	CheckboxDelegate* delegate = new CheckboxDelegate(m_treeView);
 	for (int col = 1; col < m_columns; col++)
 		m_treeView->setItemDelegateForColumn(col, delegate);
 
@@ -96,18 +97,21 @@ DropdownSwitchList::DropdownSwitchList(int switchColCount, QWidget *parent)
 
 QString DropdownSwitchList::title() const { return m_title; }
 
-void DropdownSwitchList::setTitle(const QString &title) {
+void DropdownSwitchList::setTitle(const QString& title)
+{
 	m_title = title;
 	lineEdit()->setPlaceholderText(title);
 }
 
-QString DropdownSwitchList::columnTitle(int col) const {
+QString DropdownSwitchList::columnTitle(int col) const
+{
 	if (col < m_columns)
 		return m_colTitles[col];
 	else
 		return "";
 }
-void DropdownSwitchList::setColumnTitle(int col, const QString &title) {
+void DropdownSwitchList::setColumnTitle(int col, const QString& title)
+{
 	if (col >= 0 && col < m_columns) {
 		m_colTitles[col] = title;
 		m_model->setHorizontalHeaderLabels(m_colTitles);
@@ -116,8 +120,9 @@ void DropdownSwitchList::setColumnTitle(int col, const QString &title) {
 
 int DropdownSwitchList::switchColumnCount() const { return m_columns - 1; }
 
-void DropdownSwitchList::addDropdownElement(const QIcon &icon, const QString &name) {
-	QStandardItem *item = new QStandardItem(icon, name);
+void DropdownSwitchList::addDropdownElement(const QIcon& icon, const QString& name)
+{
+	QStandardItem* item = new QStandardItem(icon, name);
 	m_model->setItem(m_rows, 0, item);
 	item->setFlags(item->flags() & ~Qt::ItemIsEditable);
 	item->setFlags(item->flags() & ~Qt::ItemIsSelectable);
@@ -125,7 +130,7 @@ void DropdownSwitchList::addDropdownElement(const QIcon &icon, const QString &na
 	for (int col = 1; col < m_columns; col++) {
 		QModelIndex index = m_model->index(m_rows, col, QModelIndex());
 		m_model->setData(index, QVariant(1));
-		QStandardItem *item = m_model->item(m_rows, col);
+		QStandardItem* item = m_model->item(m_rows, col);
 		item->setFlags(item->flags() & ~Qt::ItemIsSelectable);
 
 		m_treeView->openPersistentEditor(index);
@@ -134,34 +139,40 @@ void DropdownSwitchList::addDropdownElement(const QIcon &icon, const QString &na
 	m_rows++;
 }
 
-void DropdownSwitchList::addDropdownElement(const QIcon &icon, const QString &name, const QVariant &user_data) {
+void DropdownSwitchList::addDropdownElement(const QIcon& icon, const QString& name, const QVariant& user_data)
+{
 	addDropdownElement(icon, name);
 	QModelIndex index = m_model->index(m_rows - 1, 0, QModelIndex());
 	m_model->setData(index, user_data, Qt::UserRole);
 }
 
-void DropdownSwitchList::removeItem(int index) {
+void DropdownSwitchList::removeItem(int index)
+{
 	QComboBox::removeItem(index);
 	m_rows--;
 }
 
-void DropdownSwitchList::showPopup() {
+void DropdownSwitchList::showPopup()
+{
 	m_popVisible = true;
 	QComboBox::showPopup();
 }
 
-void DropdownSwitchList::hidePopup() {
+void DropdownSwitchList::hidePopup()
+{
 	m_popVisible = false;
 	QComboBox::hidePopup();
 }
 
-void DropdownSwitchList::mousePressEvent(QMouseEvent *event) {
+void DropdownSwitchList::mousePressEvent(QMouseEvent* event)
+{
 	if (m_mouseInside) {
 		m_mousePressed = true;
 	}
 }
 
-void DropdownSwitchList::mouseReleaseEvent(QMouseEvent *event) {
+void DropdownSwitchList::mouseReleaseEvent(QMouseEvent* event)
+{
 	if (!rect().contains(event->localPos().toPoint())) {
 		return;
 	}
@@ -176,8 +187,8 @@ void DropdownSwitchList::mouseReleaseEvent(QMouseEvent *event) {
 	}
 }
 
-void DropdownSwitchList::enterEvent(QEvent *event) { m_mouseInside = true; }
+void DropdownSwitchList::enterEvent(QEvent* event) { m_mouseInside = true; }
 
-void DropdownSwitchList::leaveEvent(QEvent *event) { m_mouseInside = false; }
+void DropdownSwitchList::leaveEvent(QEvent* event) { m_mouseInside = false; }
 
 void DropdownSwitchList::resetIndex(int) { setCurrentIndex(-1); }

@@ -56,7 +56,8 @@ namespace adiscope {
  * activated, the y-axis autoscaling is turned on by default as
  * the values will quickly grow in the this direction.
  */
-class histogram_sink_f : virtual public gr::sync_block {
+class histogram_sink_f : virtual public gr::sync_block
+{
 public:
 	// adiscope::histogram_sink_f::sptr
 	typedef boost::shared_ptr<histogram_sink_f> sptr;
@@ -72,8 +73,8 @@ public:
 	 * \param nconnections number of signals connected to sink
 	 * \param parent a QWidget parent object, if any
 	 */
-	static sptr make(int size, int bins, double xmin, double xmax, const std::string &name, int nconnections = 1,
-			 QObject *plot = NULL);
+	static sptr make(int size, int bins, double xmin, double xmax, const std::string& name, int nconnections = 1,
+			 QObject* plot = NULL);
 
 	virtual void exec_() = 0;
 
@@ -82,7 +83,7 @@ public:
 	virtual int bins() const = 0;
 	virtual void reset() = 0;
 
-	QApplication *d_qApplication;
+	QApplication* d_qApplication;
 
 	virtual void set_update_time(double t) = 0;
 	virtual void set_nsamps(const int newsize) = 0;

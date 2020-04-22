@@ -27,7 +27,9 @@
 #include <QTextBrowser>
 
 using namespace adiscope;
-StackedHomepage::StackedHomepage(QWidget *parent) : QStackedWidget(parent) {
+StackedHomepage::StackedHomepage(QWidget* parent)
+	: QStackedWidget(parent)
+{
 	s_hc = new HomepageControls(this);
 	this->installEventFilter(s_hc);
 	connect(s_hc, &HomepageControls::goLeft, this, &StackedHomepage::moveLeft);
@@ -46,7 +48,8 @@ StackedHomepage::StackedHomepage(QWidget *parent) : QStackedWidget(parent) {
 
 StackedHomepage::~StackedHomepage() { this->removeEventFilter(s_hc); }
 
-void StackedHomepage::addWidget(QWidget *widget) {
+void StackedHomepage::addWidget(QWidget* widget)
+{
 	QStackedWidget::addWidget(widget);
 	s_hc->setVisible(count() > 1);
 	s_hc->raise();
@@ -55,13 +58,15 @@ void StackedHomepage::addWidget(QWidget *widget) {
 	}
 }
 
-void StackedHomepage::removeWidget(QWidget *widget) {
+void StackedHomepage::removeWidget(QWidget* widget)
+{
 	QStackedWidget::removeWidget(widget);
 	s_hc->setVisible(count() > 1);
 	s_hc->raise();
 }
 
-void StackedHomepage::insertWidget(int pos, QWidget *widget) {
+void StackedHomepage::insertWidget(int pos, QWidget* widget)
+{
 	QStackedWidget::insertWidget(pos, widget);
 	s_hc->setVisible(count() > 1);
 	s_hc->enableRight(currentIndex() < count() - 1);
@@ -69,7 +74,8 @@ void StackedHomepage::insertWidget(int pos, QWidget *widget) {
 	s_hc->raise();
 }
 
-void StackedHomepage::moveLeft() {
+void StackedHomepage::moveLeft()
+{
 	if (s_controls_enabled) {
 		slideInPrev();
 		s_hc->raise();
@@ -77,7 +83,8 @@ void StackedHomepage::moveLeft() {
 	Q_EMIT moved(-1);
 }
 
-void StackedHomepage::moveRight() {
+void StackedHomepage::moveRight()
+{
 	if (s_controls_enabled) {
 		slideInNext();
 		s_hc->raise();
@@ -85,7 +92,8 @@ void StackedHomepage::moveRight() {
 	Q_EMIT moved(1);
 }
 
-void StackedHomepage::openFile() {
+void StackedHomepage::openFile()
+{
 	auto export_dialog(new QFileDialog(this));
 	export_dialog->setWindowModality(Qt::WindowModal);
 	export_dialog->setFileMode(QFileDialog::AnyFile);
@@ -93,7 +101,7 @@ void StackedHomepage::openFile() {
 	if (export_dialog->exec()) {
 		QFile f(export_dialog->selectedFiles().at(0));
 		QFileInfo f_info(f);
-		QTextBrowser *newWindow = new QTextBrowser(this);
+		QTextBrowser* newWindow = new QTextBrowser(this);
 		newWindow->setOpenExternalLinks(true);
 		newWindow->setFrameShape(QFrame::NoFrame);
 		QString path = f_info.absoluteFilePath().remove(f_info.fileName());
@@ -110,19 +118,22 @@ void StackedHomepage::setAnimation(QEasingCurve::Type animationType) { s_animati
 
 void StackedHomepage::setWrap(bool wrap) { s_wrap = wrap; }
 
-void StackedHomepage::slideInNext() {
+void StackedHomepage::slideInNext()
+{
 	int now = currentIndex();
 	if (s_wrap || now < count() - 1)
 		slideToIndex(now + 1);
 }
 
-void StackedHomepage::slideInPrev() {
+void StackedHomepage::slideInPrev()
+{
 	int now = currentIndex();
 	if (s_wrap || now > 0)
 		slideToIndex(now - 1);
 }
 
-void StackedHomepage::animationDone() {
+void StackedHomepage::animationDone()
+{
 	setCurrentIndex(s_next);
 	widget(s_current)->hide();
 	widget(s_current)->move(s_now);
@@ -133,7 +144,8 @@ void StackedHomepage::animationDone() {
 	s_hc->enableRight(!(currentIndex() == (count() - 1)));
 }
 
-void StackedHomepage::slideToIndex(int index) {
+void StackedHomepage::slideToIndex(int index)
+{
 	s_directions direction;
 
 	if (index > currentIndex()) {
@@ -151,7 +163,8 @@ void StackedHomepage::slideToIndex(int index) {
 	slideInWidget(widget(index), direction);
 }
 
-void StackedHomepage::slideInWidget(QWidget *newWidget, StackedHomepage::s_directions direction) {
+void StackedHomepage::slideInWidget(QWidget* newWidget, StackedHomepage::s_directions direction)
+{
 	if (s_active) {
 		if (s_next != indexOf(newWidget)) {
 			animationDone();
@@ -192,17 +205,17 @@ void StackedHomepage::slideInWidget(QWidget *newWidget, StackedHomepage::s_direc
 	widget(next)->show();
 	widget(next)->raise();
 
-	CustomAnimation *animNow = new CustomAnimation(widget(current), "pos");
+	CustomAnimation* animNow = new CustomAnimation(widget(current), "pos");
 	animNow->setDuration(s_speed);
 	animNow->setEasingCurve(s_animationType);
 	animNow->setStartValue(QPoint(pcurrent.x(), pcurrent.y()));
 	animNow->setEndValue(QPoint(offsetx + pcurrent.x(), offsety + pcurrent.y()));
-	CustomAnimation *animNext = new CustomAnimation(widget(next), "pos");
+	CustomAnimation* animNext = new CustomAnimation(widget(next), "pos");
 	animNext->setDuration(s_speed);
 	animNext->setEasingCurve(s_animationType);
 	animNext->setStartValue(QPoint(-offsetx + pnext.x(), offsety + pnext.y()));
 	animNext->setEndValue(QPoint(pnext.x(), pnext.y()));
-	QParallelAnimationGroup *animGroup = new QParallelAnimationGroup(this);
+	QParallelAnimationGroup* animGroup = new QParallelAnimationGroup(this);
 
 	animGroup->addAnimation(animNow);
 	animGroup->addAnimation(animNext);

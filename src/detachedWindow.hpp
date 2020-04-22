@@ -26,41 +26,43 @@
 class QCloseEvent;
 
 namespace adiscope {
-class DetachedWindow : public QMainWindow {
+class DetachedWindow : public QMainWindow
+{
 	Q_OBJECT
 
 Q_SIGNALS:
 	void closed();
 
 public:
-	explicit DetachedWindow(QWidget *parent = Q_NULLPTR);
+	explicit DetachedWindow(QWidget* parent = Q_NULLPTR);
 	~DetachedWindow();
 
-	void setCentralWidget(QWidget *widget);
+	void setCentralWidget(QWidget* widget);
 	void showWindow();
 
 	QString getName() const;
-	void setName(const QString &value);
+	void setName(const QString& value);
 
 private:
-	void closeEvent(QCloseEvent *event);
-	void hideEvent(QHideEvent *event);
+	void closeEvent(QCloseEvent* event);
+	void hideEvent(QHideEvent* event);
 	Qt::WindowState state;
 	QString name;
 };
 
-class DetachedWindowState {
+class DetachedWindowState
+{
 public:
 	DetachedWindowState();
 	~DetachedWindowState() {}
 
-	DetachedWindowState(DetachedWindow *detachedWindow);
+	DetachedWindowState(DetachedWindow* detachedWindow);
 
 	QString getName() const;
-	void setName(const QString &value);
+	void setName(const QString& value);
 
 	QRect getGeometry() const;
-	void setGeometry(const QRect &value);
+	void setGeometry(const QRect& value);
 
 	bool getMaximized() const;
 	void setMaximized(bool value);

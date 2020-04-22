@@ -26,23 +26,24 @@
 #include <QWidget>
 
 namespace adiscope {
-class Math : public QWidget {
+class Math : public QWidget
+{
 	Q_OBJECT
 
 public:
-	explicit Math(QWidget *parent = nullptr, unsigned int num_inputs = 1);
+	explicit Math(QWidget* parent = nullptr, unsigned int num_inputs = 1);
 
 public Q_SLOTS:
-	void setFunction(const QString &function);
+	void setFunction(const QString& function);
 
 Q_SIGNALS:
-	void functionValid(const QString &function);
+	void functionValid(const QString& function);
 	void stateReseted();
 
 private Q_SLOTS:
 	void handleButton();
-	void handleMenuButton(QAction *action);
-	void handleMenuButtonT(QAction *action);
+	void handleMenuButton(QAction* action);
+	void handleMenuButtonT(QAction* action);
 	void validateFunction();
 	void resetState();
 	void delLastChar();

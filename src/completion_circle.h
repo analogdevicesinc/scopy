@@ -23,13 +23,14 @@
 #include <QDial>
 
 namespace adiscope {
-class CompletionCircle : public QDial {
+class CompletionCircle : public QDial
+{
 	Q_OBJECT
 
 	Q_PROPERTY(bool inverted MEMBER invert_circle);
 
 public:
-	explicit CompletionCircle(QWidget *parent = 0, bool invert_circle = false);
+	explicit CompletionCircle(QWidget* parent = 0, bool invert_circle = false);
 
 	double valueDouble();
 	double minimumDouble();
@@ -52,14 +53,14 @@ Q_SIGNALS:
 	void toggled(bool);
 
 protected:
-	void paintEvent(QPaintEvent *event);
-	void mousePressEvent(QMouseEvent *me);
-	void mouseReleaseEvent(QMouseEvent *me);
-	void mouseMoveEvent(QMouseEvent *me);
-	void keyPressEvent(QKeyEvent *ev);
-	void wheelEvent(QWheelEvent *e);
+	void paintEvent(QPaintEvent* event);
+	void mousePressEvent(QMouseEvent* me);
+	void mouseReleaseEvent(QMouseEvent* me);
+	void mouseMoveEvent(QMouseEvent* me);
+	void keyPressEvent(QKeyEvent* ev);
+	void wheelEvent(QWheelEvent* e);
 
-	bool pointInsideCircle(const QPoint &, int xc, int yc, int r);
+	bool pointInsideCircle(const QPoint&, int xc, int yc, int r);
 
 	// Hide setter/getter of the int value
 	using QAbstractSlider::maximum;

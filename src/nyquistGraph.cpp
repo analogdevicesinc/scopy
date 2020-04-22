@@ -33,11 +33,14 @@
 #include <qwt_symbol.h>
 
 namespace adiscope {
-class NyquistSamplesArray : public QwtArraySeriesData<QwtPointPolar> {
+class NyquistSamplesArray : public QwtArraySeriesData<QwtPointPolar>
+{
 public:
-	NyquistSamplesArray() : QwtArraySeriesData<QwtPointPolar>() {}
+	NyquistSamplesArray()
+		: QwtArraySeriesData<QwtPointPolar>()
+	{}
 
-	void addSample(const QwtPointPolar &point) { d_samples.push_back(point); }
+	void addSample(const QwtPointPolar& point) { d_samples.push_back(point); }
 	void clear() { d_samples.clear(); }
 	void reserve(unsigned int nb) { d_samples.reserve(nb); }
 	QRectF boundingRect() const;
@@ -51,7 +54,8 @@ using namespace adiscope;
 const QwtInterval radialInterval(0.0, 10.0);
 const QwtInterval azimuthInterval(0.0, 360.0);
 
-QRectF NyquistSamplesArray::boundingRect() const {
+QRectF NyquistSamplesArray::boundingRect() const
+{
 	double xmin = 0.0, xmax = 0.0, ymin = 0.0, ymax = 0.0;
 
 	for (auto it = d_samples.begin(); it != d_samples.end(); ++it) {
@@ -71,14 +75,15 @@ QRectF NyquistSamplesArray::boundingRect() const {
 	return QRectF(QPointF(xmin, ymin), QPointF(xmax, ymax));
 }
 
-NyquistGraph::NyquistGraph(QWidget *parent)
+NyquistGraph::NyquistGraph(QWidget* parent)
 	: QwtPolarPlot(parent)
 	, mag_min(0.0)
 	, mag_max(0.0)
 	, samples(new NyquistSamplesArray)
 	, grid(new QwtPolarGrid)
 	, numSamples(0)
-	, m_thickness(1) {
+	, m_thickness(1)
+{
 	setAutoReplot(false);
 	setScale(QwtPolar::Azimuth, 0.0, 360.0, 45.0);
 	grid->setPen(QPen(Qt::white));
@@ -112,7 +117,8 @@ NyquistGraph::NyquistGraph(QWidget *parent)
 
 NyquistGraph::~NyquistGraph() {}
 
-void NyquistGraph::enableZooming(QPushButton *btnZoomIn, QPushButton *btnZoomOut) {
+void NyquistGraph::enableZooming(QPushButton* btnZoomIn, QPushButton* btnZoomOut)
+{
 	connect(btnZoomIn, &QPushButton::clicked, [=]() {
 		zoomer->zoomIn();
 		if (zoomer->isZoomed())
@@ -135,17 +141,19 @@ void NyquistGraph::enableZooming(QPushButton *btnZoomIn, QPushButton *btnZoomOut
 
 const QColor NyquistGraph::getColor() const { return curve.pen().color(); }
 
-const QColor &NyquistGraph::getBgColor() const { return plotBackground().color(); }
+const QColor& NyquistGraph::getBgColor() const { return plotBackground().color(); }
 
-void NyquistGraph::setColor(const QColor &color) {
+void NyquistGraph::setColor(const QColor& color)
+{
 	QPen pen(color);
 	pen.setWidthF(m_thickness);
 	curve.setPen(pen);
 }
 
-void NyquistGraph::setBgColor(const QColor &color) { setPlotBackground(QBrush(color)); }
+void NyquistGraph::setBgColor(const QColor& color) { setPlotBackground(QBrush(color)); }
 
-void NyquistGraph::plot(double azimuth, double radius) {
+void NyquistGraph::plot(double azimuth, double radius)
+{
 	if (curve.dataSize() == numSamples + 1)
 		return;
 
@@ -155,7 +163,8 @@ void NyquistGraph::plot(double azimuth, double radius) {
 
 int NyquistGraph::getNumSamples() const { return numSamples; }
 
-void NyquistGraph::setNumSamples(int num) {
+void NyquistGraph::setNumSamples(int num)
+{
 	numSamples = (unsigned int)num;
 
 	reset();
@@ -166,7 +175,8 @@ void NyquistGraph::setNumSamples(int num) {
 
 void NyquistGraph::reset() { samples->clear(); }
 
-void NyquistGraph::setThickness(int index) {
+void NyquistGraph::setThickness(int index)
+{
 	double thickness = 0.5 * (index + 1);
 	m_thickness = thickness;
 
@@ -178,13 +188,15 @@ void NyquistGraph::setThickness(int index) {
 }
 double NyquistGraph::getThickness() const { return m_thickness; }
 
-void NyquistGraph::setMin(double min) {
+void NyquistGraph::setMin(double min)
+{
 	mag_min = min;
 	setScale(QwtPolar::Radius, mag_max, min);
 	replot();
 }
 
-void NyquistGraph::setMax(double max) {
+void NyquistGraph::setMax(double max)
+{
 	mag_max = max;
 	setScale(QwtPolar::Radius, max, mag_min);
 	replot();
@@ -194,14 +206,16 @@ QFont NyquistGraph::getFontAzimuth() const { return grid->axisFont(QwtPolar::Axi
 
 QFont NyquistGraph::getFontRadius() const { return grid->axisFont(QwtPolar::AxisRight); }
 
-void NyquistGraph::setFontAzimuth(const QFont &font) { grid->setAxisFont(QwtPolar::AxisAzimuth, font); }
+void NyquistGraph::setFontAzimuth(const QFont& font) { grid->setAxisFont(QwtPolar::AxisAzimuth, font); }
 
-void NyquistGraph::setFontRadius(const QFont &font) {
+void NyquistGraph::setFontRadius(const QFont& font)
+{
 	grid->setAxisFont(QwtPolar::AxisRight, font);
 	grid->setAxisFont(QwtPolar::AxisTop, font);
 }
 
-void NyquistGraph::mousePressEvent(QMouseEvent *event) {
+void NyquistGraph::mousePressEvent(QMouseEvent* event)
+{
 	if (event->button() == Qt::RightButton) {
 		zoomer->cancelZoom();
 		QApplication::setOverrideCursor(Qt::CrossCursor);
@@ -215,13 +229,15 @@ void NyquistGraph::mousePressEvent(QMouseEvent *event) {
 	QwtPolarPlot::mousePressEvent(event);
 }
 
-void NyquistGraph::mouseReleaseEvent(QMouseEvent *event) {
+void NyquistGraph::mouseReleaseEvent(QMouseEvent* event)
+{
 	if (zoomer->isZoomed())
 		QApplication::setOverrideCursor(Qt::OpenHandCursor);
 	QwtPolarPlot::mouseReleaseEvent(event);
 }
 
-void NyquistGraph::enterEvent(QEvent *event) {
+void NyquistGraph::enterEvent(QEvent* event)
+{
 	if (zoomer->isZoomed())
 		QApplication::setOverrideCursor(Qt::OpenHandCursor);
 	else
@@ -229,7 +245,8 @@ void NyquistGraph::enterEvent(QEvent *event) {
 	QwtPolarPlot::enterEvent(event);
 }
 
-void NyquistGraph::leaveEvent(QEvent *event) {
+void NyquistGraph::leaveEvent(QEvent* event)
+{
 	QApplication::setOverrideCursor(Qt::ArrowCursor);
 	QwtPolarPlot::leaveEvent(event);
 }

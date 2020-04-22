@@ -22,8 +22,9 @@
 
 #include <QWidget>
 
-extern "C" {
-struct iio_context;
+extern "C"
+{
+	struct iio_context;
 }
 
 namespace Ui {
@@ -31,16 +32,17 @@ class Connect;
 }
 
 namespace adiscope {
-class ConnectDialog : public QWidget {
+class ConnectDialog : public QWidget
+{
 	Q_OBJECT
 
 public:
-	explicit ConnectDialog(QWidget *widget = 0);
+	explicit ConnectDialog(QWidget* widget = 0);
 	~ConnectDialog();
 
 Q_SIGNALS:
-	void newContext(const QString &uri);
-	void finished(struct iio_context *ctx);
+	void newContext(const QString& uri);
+	void finished(struct iio_context* ctx);
 
 public Q_SLOTS:
 	void discardSettings();
@@ -48,13 +50,13 @@ public Q_SLOTS:
 private Q_SLOTS:
 	void btnClicked();
 	void validateInput();
-	void updatePopUp(struct iio_context *ctx);
+	void updatePopUp(struct iio_context* ctx);
 
 private:
-	Ui::Connect *ui;
+	Ui::Connect* ui;
 	bool connected;
-	void createContext(const QString &uri);
-	bool eventFilter(QObject *watched, QEvent *event);
+	void createContext(const QString& uri);
+	bool eventFilter(QObject* watched, QEvent* event);
 };
 } // namespace adiscope
 

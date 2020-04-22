@@ -28,37 +28,38 @@
 
 namespace adiscope {
 
-class Debug : public QObject {
+class Debug : public QObject
+{
 	Q_OBJECT
 
 public:
-	explicit Debug(QObject *parent = nullptr);
+	explicit Debug(QObject* parent = nullptr);
 	QStringList getDeviceList(void) const;
 	QStringList getChannelList(void) const;
 	QStringList getAttributeList(void) const;
 	QStringList getFileName(void) const;
 	QVector<QString> getAttributeVector(void) const;
-	struct iio_context *getIioContext(void);
-	void setIioContext(struct iio_context *ctx);
+	struct iio_context* getIioContext(void);
+	void setIioContext(struct iio_context* ctx);
 	~Debug();
 
-	QString readAttribute(const QString &devName, QString &channel, const QString &attribute);
-	void writeAttribute(const QString &devName, QString &channel, const QString &attribute, const QString &value);
-	QStringList getAvailableValues(const QString &devName, QString &channel, QString &attribute) const;
-	QString getAttributeValue(const QString &devName, const QString &channel, const QString &attribute) const;
-	void setAttributeValue(const QString &devName, const QString &channel, const QString &attribute,
-			       const QString &value);
+	QString readAttribute(const QString& devName, QString& channel, const QString& attribute);
+	void writeAttribute(const QString& devName, QString& channel, const QString& attribute, const QString& value);
+	QStringList getAvailableValues(const QString& devName, QString& channel, QString& attribute) const;
+	QString getAttributeValue(const QString& devName, const QString& channel, const QString& attribute) const;
+	void setAttributeValue(const QString& devName, const QString& channel, const QString& attribute,
+			       const QString& value);
 
 Q_SIGNALS:
 	void channelsChanged(const QStringList channelList);
 
 public Q_SLOTS:
 	void scanDevices(void);
-	void scanChannels(const QString &devName);
-	void scanChannelAttributes(QString devName, QString &channel);
+	void scanChannels(const QString& devName);
+	void scanChannelAttributes(QString devName, QString& channel);
 
 private:
-	struct iio_context *ctx;
+	struct iio_context* ctx;
 	QStringList deviceList;
 	QStringList channelList;
 	QStringList attributeList;

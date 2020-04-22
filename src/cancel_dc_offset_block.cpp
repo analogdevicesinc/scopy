@@ -15,7 +15,8 @@ cancel_dc_offset_block::cancel_dc_offset_block(size_t buffer_size, bool enabled)
 	, d_enabled(enabled)
 	, d_buffer_size(buffer_size)
 	, d_dc_offset(0.0)
-	, d_signal(boost::make_shared<signal_sample>()) {
+	, d_signal(boost::make_shared<signal_sample>())
+{
 	_build_and_connect_blocks();
 
 	QObject::connect(&*d_signal, &signal_sample::triggered,
@@ -24,14 +25,16 @@ cancel_dc_offset_block::cancel_dc_offset_block(size_t buffer_size, bool enabled)
 
 cancel_dc_offset_block::~cancel_dc_offset_block() {}
 
-void cancel_dc_offset_block::set_enabled(bool enabled) {
+void cancel_dc_offset_block::set_enabled(bool enabled)
+{
 	if (d_enabled != enabled) {
 		d_enabled = enabled;
 		_build_and_connect_blocks();
 	}
 }
 
-void cancel_dc_offset_block::set_buffer_size(size_t buffer_size) {
+void cancel_dc_offset_block::set_buffer_size(size_t buffer_size)
+{
 	if (d_buffer_size != buffer_size) {
 		d_buffer_size = buffer_size;
 		_build_and_connect_blocks();
@@ -40,7 +43,8 @@ void cancel_dc_offset_block::set_buffer_size(size_t buffer_size) {
 
 float cancel_dc_offset_block::get_dc_offset() const { return d_dc_offset; }
 
-void cancel_dc_offset_block::_build_and_connect_blocks() {
+void cancel_dc_offset_block::_build_and_connect_blocks()
+{
 	// Remove all connections
 	hier_block2::disconnect_all();
 

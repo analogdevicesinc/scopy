@@ -6,7 +6,8 @@
 namespace adiscope {
 
 struct signal_generator_data;
-class SignalGenerator_API : public ApiObject {
+class SignalGenerator_API : public ApiObject
+{
 	Q_OBJECT
 
 	Q_PROPERTY(bool running READ running WRITE run STORED false);
@@ -41,70 +42,73 @@ public:
 	void run(bool en);
 
 	QList<int> getMode() const;
-	void setMode(const QList<int> &list);
+	void setMode(const QList<int>& list);
 
 	QList<bool> enabledChannels() const;
-	void enableChannels(const QList<bool> &list);
+	void enableChannels(const QList<bool>& list);
 
 	QList<double> getConstantValue() const;
-	void setConstantValue(const QList<double> &list);
+	void setConstantValue(const QList<double>& list);
 
 	QList<int> getWaveformType() const;
-	void setWaveformType(const QList<int> &list);
+	void setWaveformType(const QList<int>& list);
 
 	QList<double> getWaveformAmpl() const;
-	void setWaveformAmpl(const QList<double> &list);
+	void setWaveformAmpl(const QList<double>& list);
 
 	QList<double> getWaveformFreq() const;
-	void setWaveformFreq(const QList<double> &list);
+	void setWaveformFreq(const QList<double>& list);
 
 	QList<double> getWaveformOfft() const;
-	void setWaveformOfft(const QList<double> &list);
+	void setWaveformOfft(const QList<double>& list);
 
 	QList<double> getWaveformPhase() const;
-	void setWaveformPhase(const QList<double> &list);
+	void setWaveformPhase(const QList<double>& list);
 
 	QList<double> getWaveformDuty() const;
-	void setWaveformDuty(const QList<double> &list);
+	void setWaveformDuty(const QList<double>& list);
 
 	QList<int> getNoiseType() const;
-	void setNoiseType(const QList<int> &list);
+	void setNoiseType(const QList<int>& list);
 	QList<double> getNoiseAmpl() const;
-	void setNoiseAmpl(const QList<double> &list);
+	void setNoiseAmpl(const QList<double>& list);
 
 	QList<double> getWaveformHoldLow() const;
-	void setWaveformHoldLow(const QList<double> &list);
+	void setWaveformHoldLow(const QList<double>& list);
 	QList<double> getWaveformHoldHigh() const;
-	void setWaveformHoldHigh(const QList<double> &list);
+	void setWaveformHoldHigh(const QList<double>& list);
 	QList<double> getWaveformFall() const;
-	void setWaveformFall(const QList<double> &list);
+	void setWaveformFall(const QList<double>& list);
 	QList<double> getWaveformRise() const;
-	void setWaveformRise(const QList<double> &list);
+	void setWaveformRise(const QList<double>& list);
 
 	QList<double> getMathFreq() const;
-	void setMathFreq(const QList<double> &list);
+	void setMathFreq(const QList<double>& list);
 
 	QList<QString> getMathFunction() const;
-	void setMathFunction(const QList<QString> &list);
+	void setMathFunction(const QList<QString>& list);
 
 	QList<QString> getBufferFilePath() const;
-	void setBufferFilePath(const QList<QString> &list);
+	void setBufferFilePath(const QList<QString>& list);
 	QList<double> getBufferAmplitude() const;
-	void setBufferAmplitude(const QList<double> &list);
+	void setBufferAmplitude(const QList<double>& list);
 	QList<double> getBufferOffset() const;
-	void setBufferOffset(const QList<double> &list);
+	void setBufferOffset(const QList<double>& list);
 	QList<double> getBufferSampleRate() const;
-	void setBufferSampleRate(const QList<double> &list);
+	void setBufferSampleRate(const QList<double>& list);
 	QList<double> getBufferPhase() const;
-	void setBufferPhase(const QList<double> &list);
+	void setBufferPhase(const QList<double>& list);
 
 	Q_INVOKABLE void show();
 
-	explicit SignalGenerator_API(SignalGenerator *gen) : ApiObject(), gen(gen) {}
+	explicit SignalGenerator_API(SignalGenerator* gen)
+		: ApiObject()
+		, gen(gen)
+	{}
 	~SignalGenerator_API() {}
 
 private:
-	SignalGenerator *gen;
+	SignalGenerator* gen;
 };
 } // namespace adiscope
 

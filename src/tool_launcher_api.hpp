@@ -5,7 +5,8 @@
 
 namespace adiscope {
 
-class ToolLauncher_API : public ApiObject {
+class ToolLauncher_API : public ApiObject
+{
 	Q_OBJECT
 
 	Q_PROPERTY(bool menu_opened READ menu_opened WRITE open_menu STORED false);
@@ -27,11 +28,14 @@ class ToolLauncher_API : public ApiObject {
 	Q_PROPERTY(bool manual_calibration READ manual_calibration_enabled WRITE enable_manual_calibration)
 
 public:
-	explicit ToolLauncher_API(ToolLauncher *tl) : ApiObject(), tl(tl) {}
+	explicit ToolLauncher_API(ToolLauncher* tl)
+		: ApiObject()
+		, tl(tl)
+	{}
 	~ToolLauncher_API() {}
 
 	QString getIndexFile() const;
-	void setIndexFile(const QString &indexFile);
+	void setIndexFile(const QString& indexFile);
 
 	bool menu_opened() const;
 	void open_menu(bool open);
@@ -48,11 +52,12 @@ public:
 	bool manual_calibration_enabled() const;
 	void enable_manual_calibration(bool);
 
-	const QString &getPreviousIp() { return tl->previousIp; }
-	void addIp(const QString &ip);
+	const QString& getPreviousIp() { return tl->previousIp; }
+	void addIp(const QString& ip);
 
 	bool maximized() { return tl->isMaximized(); }
-	void setMaximized(bool m) {
+	void setMaximized(bool m)
+	{
 		if (m) {
 			tl->showMaximized();
 		} else {
@@ -61,23 +66,24 @@ public:
 	}
 
 	bool alwaysOnTop() const { return !!(tl->windowFlags() & Qt::WindowStaysOnTopHint); }
-	void setAlwaysOnTop(bool on) {
+	void setAlwaysOnTop(bool on)
+	{
 		tl->setWindowFlag(Qt::WindowStaysOnTopHint, on);
 		tl->show();
 	}
 
 	Q_INVOKABLE QList<QString> usb_uri_list();
-	Q_INVOKABLE bool connect(const QString &uri);
+	Q_INVOKABLE bool connect(const QString& uri);
 	Q_INVOKABLE void disconnect();
 
-	Q_INVOKABLE void load(const QString &file);
-	Q_INVOKABLE void save(const QString &file);
+	Q_INVOKABLE void load(const QString& file);
+	Q_INVOKABLE void save(const QString& file);
 	Q_INVOKABLE bool reset();
 	Q_INVOKABLE bool enableExtern(bool);
 	Q_INVOKABLE bool enableCalibScript(bool);
 
 private:
-	ToolLauncher *tl;
+	ToolLauncher* tl;
 };
 } // namespace adiscope
 #endif // TOOL_LAUNCHER_API_HPP

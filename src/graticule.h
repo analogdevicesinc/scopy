@@ -26,10 +26,11 @@
 
 namespace adiscope {
 
-class Graticule : public QObject {
+class Graticule : public QObject
+{
 	Q_OBJECT
 public:
-	Graticule(QwtPlot *plot);
+	Graticule(QwtPlot* plot);
 	~Graticule();
 	void toggleGraticule();
 	void enableGraticule(bool enable);
@@ -38,17 +39,18 @@ public Q_SLOTS:
 
 private:
 	bool enabled;
-	QwtPlot *plot;
-	QwtPlotScaleItem *vertScale;
-	QwtPlotScaleItem *horizScale;
-	QwtPlotScaleItem *vertScale2;
-	QwtPlotScaleItem *horizScale2;
+	QwtPlot* plot;
+	QwtPlotScaleItem* vertScale;
+	QwtPlotScaleItem* horizScale;
+	QwtPlotScaleItem* vertScale2;
+	QwtPlotScaleItem* horizScale2;
 };
 
-class GraticulePlotScaleItem : public QwtPlotScaleItem {
+class GraticulePlotScaleItem : public QwtPlotScaleItem
+{
 public:
 	explicit GraticulePlotScaleItem(QwtScaleDraw::Alignment = QwtScaleDraw::BottomScale, const double pos = 0.0);
-	virtual void updateScaleDiv(const QwtScaleDiv &, const QwtScaleDiv &);
+	virtual void updateScaleDiv(const QwtScaleDiv&, const QwtScaleDiv&);
 };
 
 } // namespace adiscope

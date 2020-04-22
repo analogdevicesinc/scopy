@@ -23,13 +23,15 @@
 
 using namespace adiscope;
 
-DetachedWindowsManager &DetachedWindowsManager::getInstance() {
+DetachedWindowsManager& DetachedWindowsManager::getInstance()
+{
 	static DetachedWindowsManager INSTANCE;
 
 	return INSTANCE;
 }
 
-DetachedWindow *DetachedWindowsManager::getWindow() {
+DetachedWindow* DetachedWindowsManager::getWindow()
+{
 	// If the pool is empty create a new DetachedWindow
 	// else get one from the pool
 	if (pool.empty()) {
@@ -41,14 +43,16 @@ DetachedWindow *DetachedWindowsManager::getWindow() {
 	}
 }
 
-void DetachedWindowsManager::returnWindow(DetachedWindow *window) {
+void DetachedWindowsManager::returnWindow(DetachedWindow* window)
+{
 	// Return window to the pool and make sure it
 	// has no central widget
 	window->takeCentralWidget();
 	pool.push_back(window);
 }
 
-DetachedWindowsManager::DetachedWindowsManager() {
+DetachedWindowsManager::DetachedWindowsManager()
+{
 	// Create an initial pool of size equal to the number of
 	// screens available to the user
 	int initialSize = QApplication::screens().size();
@@ -58,7 +62,8 @@ DetachedWindowsManager::DetachedWindowsManager() {
 	}
 }
 
-DetachedWindowsManager::~DetachedWindowsManager() {
+DetachedWindowsManager::~DetachedWindowsManager()
+{
 	for (auto iterator : pool) {
 		delete iterator;
 	}

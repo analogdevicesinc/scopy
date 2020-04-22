@@ -23,14 +23,16 @@
 #ifndef M2K_TRIGGER_MODE_H
 #define M2K_TRIGGER_MODE_H
 
-enum trigger_mode {
+enum trigger_mode
+{
 	TRIG_MODE_FREE,
 	TRIG_MODE_AUTO,
 	TRIG_MODE_NORM,
 	TRIG_MODE_TAG,
 };
 
-enum trigger_slope {
+enum trigger_slope
+{
 	TRIG_SLOPE_POS,
 	TRIG_SLOPE_NEG,
 };

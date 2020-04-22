@@ -24,16 +24,21 @@
 
 using namespace adiscope;
 
-DetachedWindow::DetachedWindow(QWidget *parent) : QMainWindow(parent), state(Qt::WindowState::WindowNoState), name("") {
+DetachedWindow::DetachedWindow(QWidget* parent)
+	: QMainWindow(parent)
+	, state(Qt::WindowState::WindowNoState)
+	, name("")
+{
 	this->setWindowIcon(QApplication::windowIcon());
 	this->setWindowTitle("Scopy - " + getName());
 }
 
 DetachedWindow::~DetachedWindow() {}
 
-void DetachedWindow::closeEvent(QCloseEvent *event) { Q_EMIT closed(); }
+void DetachedWindow::closeEvent(QCloseEvent* event) { Q_EMIT closed(); }
 
-void DetachedWindow::hideEvent(QHideEvent *event) {
+void DetachedWindow::hideEvent(QHideEvent* event)
+{
 	if (isMaximized())
 		state = Qt::WindowState::WindowMaximized;
 	else
@@ -42,11 +47,12 @@ void DetachedWindow::hideEvent(QHideEvent *event) {
 
 QString DetachedWindow::getName() const { return name; }
 
-void DetachedWindow::setName(const QString &value) { name = value; }
+void DetachedWindow::setName(const QString& value) { name = value; }
 
-void DetachedWindow::setCentralWidget(QWidget *widget) {
-	QWidget *child = new QWidget(this);
-	QHBoxLayout *layout = new QHBoxLayout(child);
+void DetachedWindow::setCentralWidget(QWidget* widget)
+{
+	QWidget* child = new QWidget(this);
+	QHBoxLayout* layout = new QHBoxLayout(child);
 
 	layout->setSpacing(0);
 	layout->setContentsMargins(0, 0, 0, 0);
@@ -55,15 +61,22 @@ void DetachedWindow::setCentralWidget(QWidget *widget) {
 	QMainWindow::setCentralWidget(child);
 }
 
-void DetachedWindow::showWindow() {
+void DetachedWindow::showWindow()
+{
 	if (isMinimized())
 		setWindowState(state);
 	activateWindow();
 }
 
-DetachedWindowState::DetachedWindowState() : name(""), geometry(QRect()), maximized(false), minimized(true) {}
+DetachedWindowState::DetachedWindowState()
+	: name("")
+	, geometry(QRect())
+	, maximized(false)
+	, minimized(true)
+{}
 
-DetachedWindowState::DetachedWindowState(DetachedWindow *detachedWindow) {
+DetachedWindowState::DetachedWindowState(DetachedWindow* detachedWindow)
+{
 	name = detachedWindow->getName();
 	geometry = detachedWindow->geometry();
 	minimized = detachedWindow->isMinimized();
@@ -72,11 +85,11 @@ DetachedWindowState::DetachedWindowState(DetachedWindow *detachedWindow) {
 
 QString DetachedWindowState::getName() const { return name; }
 
-void DetachedWindowState::setName(const QString &value) { name = value; }
+void DetachedWindowState::setName(const QString& value) { name = value; }
 
 QRect DetachedWindowState::getGeometry() const { return geometry; }
 
-void DetachedWindowState::setGeometry(const QRect &value) { geometry = value; }
+void DetachedWindowState::setGeometry(const QRect& value) { geometry = value; }
 
 bool DetachedWindowState::getMaximized() const { return maximized; }
 

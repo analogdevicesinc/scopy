@@ -25,11 +25,12 @@
 #include <qwt_thermo.h>
 
 namespace adiscope {
-class CustomScale : public QwtThermo {
+class CustomScale : public QwtThermo
+{
 	Q_OBJECT
 
 public:
-	explicit CustomScale(QWidget *parent = nullptr);
+	explicit CustomScale(QWidget* parent = nullptr);
 	~CustomScale();
 
 public Q_SLOTS:
@@ -41,7 +42,7 @@ private Q_SLOTS:
 	void updateScale(const QwtScaleDiv);
 
 private:
-	AutoScaler *scaler;
+	AutoScaler* scaler;
 };
 } // namespace adiscope
 

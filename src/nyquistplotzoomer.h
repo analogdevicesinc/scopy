@@ -4,9 +4,10 @@
 #include <qwt_polar_magnifier.h>
 
 namespace adiscope {
-class NyquistPlotZoomer : public QwtPolarMagnifier {
+class NyquistPlotZoomer : public QwtPolarMagnifier
+{
 public:
-	NyquistPlotZoomer(QwtPolarCanvas *parent);
+	NyquistPlotZoomer(QwtPolarCanvas* parent);
 
 public:
 	void zoomIn();

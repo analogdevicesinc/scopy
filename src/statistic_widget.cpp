@@ -25,7 +25,8 @@
 #include "ui_statistic.h"
 
 namespace adiscope {
-class Formatter {
+class Formatter
+{
 public:
 	Formatter() {}
 
@@ -34,9 +35,12 @@ public:
 	virtual QString format(double value) const = 0;
 };
 
-class MetricFormatter : public Formatter {
+class MetricFormatter : public Formatter
+{
 public:
-	MetricFormatter(QString unit = "") : m_unit(unit) {}
+	MetricFormatter(QString unit = "")
+		: m_unit(unit)
+	{}
 
 	void setUnit(QString unit) { m_unit = unit; }
 
@@ -47,7 +51,8 @@ private:
 	QString m_unit;
 };
 
-class TimeFormatter : public Formatter {
+class TimeFormatter : public Formatter
+{
 public:
 	TimeFormatter() {}
 
@@ -57,11 +62,13 @@ private:
 	TimePrefixFormatter m_formatter;
 };
 
-class PercentageFormatter : public Formatter {
+class PercentageFormatter : public Formatter
+{
 public:
 	PercentageFormatter() {}
 
-	QString format(double value) const {
+	QString format(double value) const
+	{
 		QString text;
 
 		text.setNum(value, 'f', 2);
@@ -71,11 +78,13 @@ public:
 	}
 };
 
-class DimensionlessFormatter : public Formatter {
+class DimensionlessFormatter : public Formatter
+{
 public:
 	DimensionlessFormatter() {}
 
-	QString format(double value) const {
+	QString format(double value) const
+	{
 		QString text;
 
 		text.setNum(value, 'f', 3);
@@ -88,18 +97,20 @@ public:
 
 using namespace adiscope;
 
-StatisticWidget::StatisticWidget(QWidget *parent)
+StatisticWidget::StatisticWidget(QWidget* parent)
 	: QWidget(parent)
 	, m_ui(new Ui::Statistic)
 	, m_title("")
 	, m_channelId(-1)
 	, m_posIndex(-1)
 	, m_formatter(new DimensionlessFormatter())
-	, m_valueLabelWidth(0) {
+	, m_valueLabelWidth(0)
+{
 	m_ui->setupUi(this);
 }
 
-StatisticWidget::~StatisticWidget() {
+StatisticWidget::~StatisticWidget()
+{
 	delete m_formatter;
 	delete m_ui;
 }
@@ -108,7 +119,8 @@ QString StatisticWidget::title() const { return m_title; }
 
 int StatisticWidget::channelId() const { return m_channelId; }
 
-void StatisticWidget::setTitleColor(const QColor &color) {
+void StatisticWidget::setTitleColor(const QColor& color)
+{
 	QString stylesheet = QString(""
 				     "font-size: 14px;"
 				     "font-weight: bold;"
@@ -119,7 +131,8 @@ void StatisticWidget::setTitleColor(const QColor &color) {
 	m_ui->label_title->setStyleSheet(stylesheet);
 }
 
-void StatisticWidget::setPositionIndex(int pos) {
+void StatisticWidget::setPositionIndex(int pos)
+{
 	if (m_posIndex != pos) {
 		m_posIndex = pos;
 		QString posText;
@@ -128,7 +141,8 @@ void StatisticWidget::setPositionIndex(int pos) {
 	}
 }
 
-void StatisticWidget::initForMeasurement(const MeasurementData &data) {
+void StatisticWidget::initForMeasurement(const MeasurementData& data)
+{
 	m_title = data.name();
 	m_channelId = data.channel();
 
@@ -137,7 +151,7 @@ void StatisticWidget::initForMeasurement(const MeasurementData &data) {
 	delete m_formatter;
 	m_formatter = nullptr;
 
-	QLabel *label = new QLabel(m_ui->label_avg);
+	QLabel* label = new QLabel(m_ui->label_avg);
 
 	switch (data.unitType()) {
 	case MeasurementData::METRIC:
@@ -177,7 +191,8 @@ void StatisticWidget::initForMeasurement(const MeasurementData &data) {
 	delete label;
 }
 
-void StatisticWidget::updateStatistics(const Statistic &data) {
+void StatisticWidget::updateStatistics(const Statistic& data)
+{
 	QString avg_text;
 	QString min_text;
 	QString max_text;

@@ -11,17 +11,18 @@ class Channel;
 
 namespace adiscope {
 
-class ChannelWidget : public QWidget {
+class ChannelWidget : public QWidget
+{
 	Q_OBJECT
 
 public:
-	explicit ChannelWidget(int id, bool deletable, bool simplified, QColor color, QWidget *parent = 0);
+	explicit ChannelWidget(int id, bool deletable, bool simplified, QColor color, QWidget* parent = 0);
 	~ChannelWidget();
 
-	QAbstractButton *enableButton() const;
-	QAbstractButton *nameButton() const;
-	QAbstractButton *menuButton() const;
-	QAbstractButton *deleteButton() const;
+	QAbstractButton* enableButton() const;
+	QAbstractButton* nameButton() const;
+	QAbstractButton* menuButton() const;
+	QAbstractButton* deleteButton() const;
 
 	int id() const;
 	void setId(int);
@@ -29,22 +30,22 @@ public:
 	QColor color() const;
 
 	QString fullName() const;
-	void setFullName(const QString &);
+	void setFullName(const QString&);
 
 	QString shortName() const;
-	void setShortName(const QString &);
+	void setShortName(const QString&);
 
 	QString function() const;
-	void setFunction(const QString &);
+	void setFunction(const QString&);
 
 	bool isMathChannel() const;
-	void setMathChannel(const bool &);
+	void setMathChannel(const bool&);
 
 	bool isReferenceChannel() const;
-	void setReferenceChannel(const bool &);
+	void setReferenceChannel(const bool&);
 
 protected:
-	bool eventFilter(QObject *object, QEvent *event) override;
+	bool eventFilter(QObject* object, QEvent* event) override;
 
 Q_SIGNALS:
 	void enabled(bool en);
@@ -62,7 +63,7 @@ private Q_SLOTS:
 	void on_delBtn_clicked();
 
 private:
-	Ui::Channel *m_ui;
+	Ui::Channel* m_ui;
 	int m_id;
 	bool m_deletable;
 	bool m_simplified;
@@ -74,7 +75,7 @@ private:
 	bool m_ref;
 
 	void init();
-	void setButtonNoGroup(QAbstractButton *btn);
+	void setButtonNoGroup(QAbstractButton* btn);
 };
 
 } /* namespace adiscope */

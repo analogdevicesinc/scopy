@@ -34,11 +34,12 @@
 
 namespace adiscope {
 
-class HistogramScaleDraw : public QwtScaleDraw {
+class HistogramScaleDraw : public QwtScaleDraw
+{
 public:
 	HistogramScaleDraw();
 	QwtText label(double) const;
-	void setColor(const QColor &color);
+	void setColor(const QColor& color);
 	void setTotalSamples(unsigned int totalSamples);
 
 private:
@@ -46,11 +47,12 @@ private:
 	QColor m_color;
 };
 
-class Histogram : public QwtPlotHistogram {
+class Histogram : public QwtPlotHistogram
+{
 public:
-	Histogram(const QString &title, const QColor &color);
-	void setColor(const QColor &color);
-	void setValues(const double *xData, const double *yData, unsigned int nr_bins);
+	Histogram(const QString& title, const QColor& color);
+	void setColor(const QColor& color);
+	void setValues(const double* xData, const double* yData, unsigned int nr_bins);
 	void setOrientation(Qt::Orientation orientation);
 	int getMaxHeight();
 
@@ -62,15 +64,15 @@ private:
  * \brief QWidget for displaying time domain plots.
  * \ingroup qtgui_blk
  */
-class HistogramDisplayPlot : public DisplayPlot {
+class HistogramDisplayPlot : public DisplayPlot
+{
 	Q_OBJECT
 
 public:
-	HistogramDisplayPlot(int nplots, QWidget *);
+	HistogramDisplayPlot(int nplots, QWidget*);
 	virtual ~HistogramDisplayPlot();
 
-	void plotNewData(const std::vector<double *> dataPoints, const int64_t numDataPoints,
-			 const double timeInterval);
+	void plotNewData(const std::vector<double*> dataPoints, const int64_t numDataPoints, const double timeInterval);
 
 	void replot();
 
@@ -94,16 +96,16 @@ public Q_SLOTS:
 	void setNumBins(int bins);
 	void setXaxis(double min, double max);
 
-	void customEvent(QEvent *e);
+	void customEvent(QEvent* e);
 
 	void enableChannel(unsigned int chIdx, bool enable);
 	void setYaxisSpan(unsigned int chIdx, double bot, double top);
 	void setSelectedChannel(unsigned int value);
 
 private Q_SLOTS:
-	void newData(const QEvent *);
+	void newData(const QEvent*);
 
-	void _onZoom(const QRectF &rect);
+	void _onZoom(const QRectF& rect);
 
 private:
 	void _resetXAxisPoints(double left, double right);
@@ -112,13 +114,13 @@ private:
 	void _orientationChanged();
 	void _resetZoom();
 
-	std::vector<Histogram *> d_histograms;
-	std::vector<PlotAxisConfiguration *> rightVertAxes;
+	std::vector<Histogram*> d_histograms;
+	std::vector<PlotAxisConfiguration*> rightVertAxes;
 	double d_height;
-	PrefixFormatter *d_pf;
+	PrefixFormatter* d_pf;
 
-	double *d_xdata;
-	std::vector<double *> d_ydata;
+	double* d_xdata;
+	std::vector<double*> d_ydata;
 
 	int d_bins;
 	bool d_accum;
@@ -133,7 +135,7 @@ private:
 	bool d_zoomed;
 
 	Qt::Orientation d_orientation;
-	std::vector<PlotAxisConfiguration *> horizAxes;
+	std::vector<PlotAxisConfiguration*> horizAxes;
 	unsigned int d_selected_channel;
 };
 } // namespace adiscope

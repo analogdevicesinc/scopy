@@ -27,7 +27,11 @@
 
 using namespace adiscope;
 
-BaseMenu::BaseMenu(QWidget *parent) : QWidget(parent), d_ui(new Ui::BaseMenu), d_items(0) {
+BaseMenu::BaseMenu(QWidget* parent)
+	: QWidget(parent)
+	, d_ui(new Ui::BaseMenu)
+	, d_items(0)
+{
 	d_ui->setupUi(this);
 	setAcceptDrops(true);
 
@@ -37,7 +41,8 @@ BaseMenu::BaseMenu(QWidget *parent) : QWidget(parent), d_ui(new Ui::BaseMenu), d
 
 BaseMenu::~BaseMenu() { delete d_ui; }
 
-void BaseMenu::insertMenuItem(BaseMenuItem *menuItem, int position) {
+void BaseMenu::insertMenuItem(BaseMenuItem* menuItem, int position)
+{
 	for (int i = 0; i < d_ui->mainLayout->count(); ++i) {
 		if (menuItem == d_ui->mainLayout->itemAt(i)->widget()) {
 			return;
@@ -54,7 +59,8 @@ void BaseMenu::insertMenuItem(BaseMenuItem *menuItem, int position) {
 	_updateItemsPosition();
 }
 
-void BaseMenu::insertMenuItem(QVector<BaseMenuItem *> items, QVector<int> positions) {
+void BaseMenu::insertMenuItem(QVector<BaseMenuItem*> items, QVector<int> positions)
+{
 	if (!positions.empty()) {
 		int i = 0;
 		while (i < items.size() && positions.size()) {
@@ -72,7 +78,8 @@ void BaseMenu::insertMenuItem(QVector<BaseMenuItem *> items, QVector<int> positi
 	}
 }
 
-void BaseMenu::removeMenuItem(BaseMenuItem *menuItem) {
+void BaseMenu::removeMenuItem(BaseMenuItem* menuItem)
+{
 	d_ui->mainLayout->removeWidget(menuItem);
 	disconnect(menuItem, &BaseMenuItem::moveItem, this, &BaseMenu::moveItem);
 	d_items = d_ui->mainLayout->count();
@@ -81,18 +88,21 @@ void BaseMenu::removeMenuItem(BaseMenuItem *menuItem) {
 	_updateItemsPosition();
 }
 
-void BaseMenu::removeMenuItem(QVector<BaseMenuItem *> items) {
-	for (auto const &item : items) {
+void BaseMenu::removeMenuItem(QVector<BaseMenuItem*> items)
+{
+	for (auto const& item : items) {
 		removeMenuItem(item);
 	}
 }
 
-int BaseMenu::positionOf(BaseMenuItem *menuItem) {
+int BaseMenu::positionOf(BaseMenuItem* menuItem)
+{
 	// return the position of a menuItem in the menu
 	return d_ui->mainLayout->indexOf(menuItem);
 }
 
-void BaseMenu::setMargins(int left, int top, int right, int bottom) {
+void BaseMenu::setMargins(int left, int top, int right, int bottom)
+{
 	d_ui->mainLayout->setContentsMargins(left, top, right, bottom);
 }
 
@@ -100,7 +110,8 @@ int BaseMenu::spacing() const { return d_ui->mainLayout->spacing(); }
 
 void BaseMenu::setSpacing(int spacing) { d_ui->mainLayout->setSpacing(spacing); }
 
-void BaseMenu::dragEnterEvent(QDragEnterEvent *event) {
+void BaseMenu::dragEnterEvent(QDragEnterEvent* event)
+{
 	if (!event->source()) {
 		event->ignore();
 		return;
@@ -115,9 +126,10 @@ void BaseMenu::dragEnterEvent(QDragEnterEvent *event) {
 	event->accept();
 }
 
-void BaseMenu::dragLeaveEvent(QDragLeaveEvent *event) { d_ui->bottomSeparator->setVisible(false); }
+void BaseMenu::dragLeaveEvent(QDragLeaveEvent* event) { d_ui->bottomSeparator->setVisible(false); }
 
-void BaseMenu::dropEvent(QDropEvent *event) {
+void BaseMenu::dropEvent(QDropEvent* event)
+{
 	d_ui->bottomSeparator->setVisible(false);
 
 	if (!event->source()) {
@@ -130,16 +142,18 @@ void BaseMenu::dropEvent(QDropEvent *event) {
 	}
 }
 
-void BaseMenu::_updateItemsPosition() {
-	for (auto &item : findChildren<BaseMenuItem *>()) {
+void BaseMenu::_updateItemsPosition()
+{
+	for (auto& item : findChildren<BaseMenuItem*>()) {
 		item->setPosition(positionOf(item));
 	}
 }
 
-void BaseMenu::moveItem(short from, short to) {
+void BaseMenu::moveItem(short from, short to)
+{
 	if (to > from)
 		to--;
-	QWidget *widget = d_ui->mainLayout->itemAt(from)->widget();
+	QWidget* widget = d_ui->mainLayout->itemAt(from)->widget();
 	d_ui->mainLayout->removeWidget(widget);
 	d_ui->mainLayout->insertWidget(to, widget);
 

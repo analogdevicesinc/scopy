@@ -9,8 +9,11 @@
 #if BREAKPAD_HANDLER
 using namespace google_breakpad;
 
-ScopyApplication::ScopyApplication(int &argc, char **argv) : QApplication(argc, argv) {}
-QString ScopyApplication::initBreakPadHandler(QString crashDumpPath) {
+ScopyApplication::ScopyApplication(int& argc, char** argv)
+	: QApplication(argc, argv)
+{}
+QString ScopyApplication::initBreakPadHandler(QString crashDumpPath)
+{
 	QString prevCrashDump = "";
 	QString appDir = crashDumpPath;
 	QDir qd(appDir);
@@ -41,14 +44,16 @@ QString ScopyApplication::initBreakPadHandler(QString crashDumpPath) {
 	return prevCrashDump;
 }
 
-ScopyApplication::~ScopyApplication() {
+ScopyApplication::~ScopyApplication()
+{
 #ifdef Q_OS_LINUX
 	delete descriptor;
 #endif
 }
 
 #ifdef CATCH_UNHANDLED_EXCEPTIONS
-bool ScopyApplication::notify(QObject *receiver, QEvent *e) {
+bool ScopyApplication::notify(QObject* receiver, QEvent* e)
+{
 
 	try {
 		return QApplication::notify(receiver, e);
@@ -63,19 +68,21 @@ bool ScopyApplication::notify(QObject *receiver, QEvent *e) {
 #endif
 
 #ifdef Q_OS_WIN
-bool ScopyApplication::dumpCallback(const wchar_t *dump_path, const wchar_t *minidump_id, void *context,
-				    EXCEPTION_POINTERS *exinfo, MDRawAssertionInfo *assertion, bool succeeded) {
+bool ScopyApplication::dumpCallback(const wchar_t* dump_path, const wchar_t* minidump_id, void* context,
+				    EXCEPTION_POINTERS* exinfo, MDRawAssertionInfo* assertion, bool succeeded)
+{
 	printf("Dump path: %s\n", dump_path);
 	return succeeded;
 }
 #endif
-ExceptionHandler *ScopyApplication::getExceptionHandler() const { return handler; }
+ExceptionHandler* ScopyApplication::getExceptionHandler() const { return handler; }
 
-void ScopyApplication::setExceptionHandler(ExceptionHandler *value) { handler = value; }
+void ScopyApplication::setExceptionHandler(ExceptionHandler* value) { handler = value; }
 
 #ifdef Q_OS_LINUX
-bool ScopyApplication::dumpCallback(const google_breakpad::MinidumpDescriptor &descriptor, void *context,
-				    bool succeeded) {
+bool ScopyApplication::dumpCallback(const google_breakpad::MinidumpDescriptor& descriptor, void* context,
+				    bool succeeded)
+{
 	printf("Dump path: %s\n", descriptor.path());
 	return succeeded;
 }

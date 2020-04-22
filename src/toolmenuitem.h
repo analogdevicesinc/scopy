@@ -24,14 +24,15 @@
 #include "customPushButton.hpp"
 
 namespace adiscope {
-class ToolMenuItem : public BaseMenuItem {
+class ToolMenuItem : public BaseMenuItem
+{
 	Q_OBJECT
 public:
-	explicit ToolMenuItem(QString name, QString iconPath, QWidget *parent = nullptr);
+	explicit ToolMenuItem(QString name, QString iconPath, QWidget* parent = nullptr);
 	virtual ~ToolMenuItem();
 
-	QPushButton *getToolBtn() const;
-	QPushButton *getToolStopBtn() const;
+	QPushButton* getToolBtn() const;
+	QPushButton* getToolStopBtn() const;
 
 	void setToolDisabled(bool disabled);
 	void setVisible(bool visible);
@@ -40,7 +41,7 @@ public:
 
 	void enableDoubleClickToDetach(bool enable);
 
-	bool eventFilter(QObject *watched, QEvent *event);
+	bool eventFilter(QObject* watched, QEvent* event);
 
 Q_SIGNALS:
 	void detach();
@@ -51,17 +52,17 @@ public Q_SLOTS:
 	void setDetached(bool detached);
 
 protected:
-	void enterEvent(QEvent *event);
-	void leaveEvent(QEvent *event);
+	void enterEvent(QEvent* event);
+	void leaveEvent(QEvent* event);
 
-	void dragMoveEvent(QDragMoveEvent *event);
-	void dragLeaveEvent(QDragLeaveEvent *event);
+	void dragMoveEvent(QDragMoveEvent* event);
+	void dragLeaveEvent(QDragLeaveEvent* event);
 
-	void mouseMoveEvent(QMouseEvent *event);
+	void mouseMoveEvent(QMouseEvent* event);
 
 private:
-	QPushButton *d_toolBtn;
-	CustomPushButton *d_toolStopBtn;
+	QPushButton* d_toolBtn;
+	CustomPushButton* d_toolStopBtn;
 
 	QString d_name;
 	QString d_iconPath;

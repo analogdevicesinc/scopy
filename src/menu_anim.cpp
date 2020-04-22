@@ -24,14 +24,15 @@
 
 using namespace adiscope;
 
-MenuAnim::MenuAnim(QWidget *parent)
+MenuAnim::MenuAnim(QWidget* parent)
 	: ColoredQWidget(parent)
 	, open_anim_max(this, "maximumWidth")
 	, open_anim_min(this, "minimumWidth")
 	, close_anim_max(this, "maximumWidth")
 	, close_anim_min(this, "minimumWidth")
 	, min_width(-1)
-	, animInProg(false) {
+	, animInProg(false)
+{
 	open_anim_max.setDuration(500);
 	open_anim_max.setEasingCurve(QEasingCurve::InOutExpo);
 
@@ -48,7 +49,8 @@ MenuAnim::MenuAnim(QWidget *parent)
 	connect(&close_anim_max, SIGNAL(finished()), this, SLOT(closeAnimFinished()));
 }
 
-void MenuAnim::toggleMenu(bool open) {
+void MenuAnim::toggleMenu(bool open)
+{
 	int start, stop;
 
 	animInProg = true;
@@ -87,7 +89,8 @@ void MenuAnim::toggleMenu(bool open) {
 	}
 }
 
-void MenuAnim::setMinimumSize(QSize size) {
+void MenuAnim::setMinimumSize(QSize size)
+{
 	QWidget::setMinimumSize(size);
 
 	/* Memorize the min width set in the .ui file */
@@ -97,12 +100,14 @@ void MenuAnim::setMinimumSize(QSize size) {
 
 bool MenuAnim::animInProgress() const { return animInProg; }
 
-void MenuAnim::closeAnimFinished() {
+void MenuAnim::closeAnimFinished()
+{
 	animInProg = false;
 	Q_EMIT finished(false);
 }
 
-void MenuAnim::openAnimFinished() {
+void MenuAnim::openAnimFinished()
+{
 	animInProg = false;
 	Q_EMIT finished(true);
 }

@@ -28,13 +28,26 @@
 #include <iostream>
 
 namespace adiscope {
-class FileManager {
+class FileManager
+{
 public:
-	enum FilePurpose { EXPORT, IMPORT };
+	enum FilePurpose
+	{
+		EXPORT,
+		IMPORT
+	};
 
-	enum FileFormat { RAW, SCOPY };
+	enum FileFormat
+	{
+		RAW,
+		SCOPY
+	};
 
-	enum FileType { CSV, TXT };
+	enum FileType
+	{
+		CSV,
+		TXT
+	};
 
 	FileManager(QString toolName);
 	~FileManager();
@@ -59,10 +72,10 @@ public:
 	void performWrite();
 
 	QStringList getAdditionalInformation() const;
-	void setAdditionalInformation(const QString &value);
+	void setAdditionalInformation(const QString& value);
 
 	FileFormat getFormat() const;
-	void setFormat(const FileFormat &value);
+	void setFormat(const FileFormat& value);
 
 private:
 	QVector<QVector<double>> data;
@@ -79,15 +92,19 @@ private:
 	QStringList additionalInformation;
 };
 
-class ScopyFileHeader {
+class ScopyFileHeader
+{
 public:
 	static bool hasValidHeader(QVector<QVector<QString>> data);
 	static QStringList getHeader();
 };
 
-class FileManagerException : public std::runtime_error {
+class FileManagerException : public std::runtime_error
+{
 public:
-	FileManagerException(const char *msg) : std::runtime_error(msg) {}
+	FileManagerException(const char* msg)
+		: std::runtime_error(msg)
+	{}
 	~FileManagerException() throw() {}
 };
 } // namespace adiscope

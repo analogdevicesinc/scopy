@@ -34,13 +34,14 @@ class CursorReadouts;
 }
 
 namespace adiscope {
-class CursorReadouts : public QWidget {
+class CursorReadouts : public QWidget
+{
 public:
-	CursorReadouts(QwtPlot *plot);
+	CursorReadouts(QwtPlot* plot);
 	~CursorReadouts();
 
-	const QwtPlot *plot() const;
-	QwtPlot *plot();
+	const QwtPlot* plot() const;
+	QwtPlot* plot();
 
 	void setVoltageReadoutVisible(bool on);
 	bool isVoltageReadoutVisible();
@@ -51,47 +52,47 @@ public:
 	void setTopLeftStartingPoint(QPoint point);
 	QPoint topLeftStartingPoint();
 
-	void setTimeCursor1Text(const QString &);
+	void setTimeCursor1Text(const QString&);
 	QString timeCursor1Text();
-	void setTimeCursor2Text(const QString &);
+	void setTimeCursor2Text(const QString&);
 	QString timeCursor2Text();
-	void setTimeDeltaText(const QString &);
+	void setTimeDeltaText(const QString&);
 	QString timeDeltaText();
-	void setFreqDeltaText(const QString &);
+	void setFreqDeltaText(const QString&);
 	QString freqDeltaText();
-	void setVoltageCursor1Text(const QString &);
+	void setVoltageCursor1Text(const QString&);
 	QString voltageCursor1Text();
-	void setVoltageCursor2Text(const QString &);
+	void setVoltageCursor2Text(const QString&);
 	QString voltageCursor2Text();
-	void setVoltageDeltaText(const QString &);
+	void setVoltageDeltaText(const QString&);
 	QString voltageDeltaText();
 	void setTimeDeltaVisible(bool);
 	void setFrequencyDeltaVisible(bool);
-	void setTimeCursor1LabelText(const QString &);
+	void setTimeCursor1LabelText(const QString&);
 	QString timeCursor1LabelText();
-	void setTimeCursor2LabelText(const QString &);
+	void setTimeCursor2LabelText(const QString&);
 	QString timeCursor2LabelText();
-	void setVoltageCursor1LabelText(const QString &);
+	void setVoltageCursor1LabelText(const QString&);
 	QString voltageCursor1LabelText();
-	void setVoltageCursor2LabelText(const QString &);
+	void setVoltageCursor2LabelText(const QString&);
 	QString voltageCursor2LabelText();
-	void setDeltaVoltageLabelText(const QString &);
+	void setDeltaVoltageLabelText(const QString&);
 	QString deltaVoltageLabelText();
 	void setAxis(QwtAxisId hAxis, QwtAxisId vAxis);
-	virtual bool eventFilter(QObject *, QEvent *);
+	virtual bool eventFilter(QObject*, QEvent*);
 
 	void setTransparency(int value);
 	void moveToPosition(CustomPlotPositionButton::ReadoutsPosition position);
 	CustomPlotPositionButton::ReadoutsPosition getCurrentPosition();
 
-	void showEvent(QShowEvent *event);
+	void showEvent(QShowEvent* event);
 
 private:
-	QPoint plotPointToPixelPoint(const QPointF &point) const;
+	QPoint plotPointToPixelPoint(const QPointF& point) const;
 	void updateSizeAndPosition(bool resize = false);
 
 private:
-	Ui::CursorReadouts *ui;
+	Ui::CursorReadouts* ui;
 	bool d_voltage_rd_visible;
 	bool d_time_rd_visible;
 	QPoint d_topLeft;

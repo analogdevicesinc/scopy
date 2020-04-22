@@ -35,7 +35,8 @@ class QwtPolarGrid;
 namespace adiscope {
 class NyquistSamplesArray;
 
-class NyquistGraph : public QwtPolarPlot {
+class NyquistGraph : public QwtPolarPlot
+{
 	Q_OBJECT
 
 	Q_PROPERTY(int numSamples READ getNumSamples WRITE setNumSamples);
@@ -48,22 +49,22 @@ class NyquistGraph : public QwtPolarPlot {
 	Q_PROPERTY(QFont font_radius READ getFontRadius WRITE setFontRadius);
 
 public:
-	explicit NyquistGraph(QWidget *parent = nullptr);
+	explicit NyquistGraph(QWidget* parent = nullptr);
 	~NyquistGraph();
 
 	const QColor getColor() const;
-	const QColor &getBgColor() const;
+	const QColor& getBgColor() const;
 	int getNumSamples() const;
 	double getThickness() const;
 
 	QFont getFontAzimuth() const;
 	QFont getFontRadius() const;
 
-	void enableZooming(QPushButton *bntZoomIn, QPushButton *btnZoomOut);
+	void enableZooming(QPushButton* bntZoomIn, QPushButton* btnZoomOut);
 
 public Q_SLOTS:
-	void setColor(const QColor &color);
-	void setBgColor(const QColor &color);
+	void setColor(const QColor& color);
+	void setBgColor(const QColor& color);
 	void setNumSamples(int num);
 	void plot(double x, double y);
 	void reset();
@@ -72,22 +73,22 @@ public Q_SLOTS:
 	void setMin(double min);
 	void setMax(double max);
 
-	void setFontAzimuth(const QFont &font);
-	void setFontRadius(const QFont &font);
+	void setFontAzimuth(const QFont& font);
+	void setFontRadius(const QFont& font);
 
-	void mousePressEvent(QMouseEvent *event);
-	void mouseReleaseEvent(QMouseEvent *event);
-	void enterEvent(QEvent *event);
-	void leaveEvent(QEvent *event);
+	void mousePressEvent(QMouseEvent* event);
+	void mouseReleaseEvent(QMouseEvent* event);
+	void enterEvent(QEvent* event);
+	void leaveEvent(QEvent* event);
 
 private:
 	double mag_min, mag_max;
 	unsigned int numSamples;
-	NyquistSamplesArray *samples;
-	QwtPolarGrid *grid;
+	NyquistSamplesArray* samples;
+	QwtPolarGrid* grid;
 	QwtPolarCurve curve;
-	QwtPolarPanner *panner;
-	NyquistPlotZoomer *zoomer;
+	QwtPolarPanner* panner;
+	NyquistPlotZoomer* zoomer;
 	double m_thickness;
 };
 } // namespace adiscope

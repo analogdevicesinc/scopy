@@ -12,11 +12,15 @@ using namespace adiscope;
 /*
  * Class FrequencyDelegate
  */
-class FrequencyDelegate : public QStyledItemDelegate {
+class FrequencyDelegate : public QStyledItemDelegate
+{
 public:
-	FrequencyDelegate(QObject *parent = 0) : QStyledItemDelegate(parent) {}
+	FrequencyDelegate(QObject* parent = 0)
+		: QStyledItemDelegate(parent)
+	{}
 
-	virtual QString displayText(const QVariant &value, const QLocale &locale) const {
+	virtual QString displayText(const QVariant& value, const QLocale& locale) const
+	{
 		Q_UNUSED(locale)
 
 		double freq = value.toDouble();
@@ -30,11 +34,15 @@ private:
 /*
  * Class ChannelDelegate
  */
-class ChannelDelegate : public QStyledItemDelegate {
+class ChannelDelegate : public QStyledItemDelegate
+{
 public:
-	ChannelDelegate(QObject *parent = 0) : QStyledItemDelegate(parent) {}
+	ChannelDelegate(QObject* parent = 0)
+		: QStyledItemDelegate(parent)
+	{}
 
-	virtual QString displayText(const QVariant &value, const QLocale &locale) const {
+	virtual QString displayText(const QVariant& value, const QLocale& locale) const
+	{
 		Q_UNUSED(locale)
 
 		int mkId = value.toInt();
@@ -46,7 +54,10 @@ public:
  * Class MarkerTable
  */
 
-MarkerTable::MarkerTable(QWidget *parent) : QWidget(parent), ui(new Ui::MarkerTable) {
+MarkerTable::MarkerTable(QWidget* parent)
+	: QWidget(parent)
+	, ui(new Ui::MarkerTable)
+{
 	ui->setupUi(this);
 
 	model = new QStandardItemModel(0, Columns::NUM_COLUMNS, this);
@@ -71,16 +82,17 @@ MarkerTable::MarkerTable(QWidget *parent) : QWidget(parent), ui(new Ui::MarkerTa
 	ui->tableView->setSelectionMode(QAbstractItemView::NoSelection);
 	ui->tableView->setStyleSheet("font-size: 14px;");
 
-	FrequencyDelegate *freqDelegate = new FrequencyDelegate(this);
+	FrequencyDelegate* freqDelegate = new FrequencyDelegate(this);
 	ui->tableView->setItemDelegateForColumn(COL_FREQ, freqDelegate);
 
-	ChannelDelegate *chnDelegate = new ChannelDelegate(this);
+	ChannelDelegate* chnDelegate = new ChannelDelegate(this);
 	ui->tableView->setItemDelegateForColumn(COL_CH, chnDelegate);
 }
 
 MarkerTable::~MarkerTable() { delete ui; }
 
-int MarkerTable::rowOfMarker(int mkIdx, int chIdx) const {
+int MarkerTable::rowOfMarker(int mkIdx, int chIdx) const
+{
 	int markerRow = -1;
 
 	for (int r = 0; r < model->rowCount(); r++) {
@@ -96,8 +108,9 @@ int MarkerTable::rowOfMarker(int mkIdx, int chIdx) const {
 	return markerRow;
 }
 
-void MarkerTable::addMarker(int mkIdx, int chIdx, const QString &name, double frequency, double magnitude,
-			    const QString &type) {
+void MarkerTable::addMarker(int mkIdx, int chIdx, const QString& name, double frequency, double magnitude,
+			    const QString& type)
+{
 	model->insertRow(0);
 	model->setData(model->index(0, COL_ID), mkIdx);
 	model->setData(model->index(0, COL_NAME), name);
@@ -107,7 +120,8 @@ void MarkerTable::addMarker(int mkIdx, int chIdx, const QString &name, double fr
 	model->setData(model->index(0, COL_TYPE), type);
 }
 
-void MarkerTable::removeMarker(int mkIdx, int chIdx) {
+void MarkerTable::removeMarker(int mkIdx, int chIdx)
+{
 	int row = rowOfMarker(mkIdx, chIdx);
 
 	if (row < 0) {
@@ -117,7 +131,8 @@ void MarkerTable::removeMarker(int mkIdx, int chIdx) {
 	model->removeRow(row);
 }
 
-void MarkerTable::updateMarker(int mkIdx, int chIdx, double frequency, double magnitude, const QString &type) {
+void MarkerTable::updateMarker(int mkIdx, int chIdx, double frequency, double magnitude, const QString& type)
+{
 	int row = rowOfMarker(mkIdx, chIdx);
 
 	if (row < 0) {
@@ -129,7 +144,8 @@ void MarkerTable::updateMarker(int mkIdx, int chIdx, double frequency, double ma
 	model->item(row, COL_TYPE)->setData(type, Qt::DisplayRole);
 }
 
-bool MarkerTable::isMarker(int mkIdx, int chIdx) {
+bool MarkerTable::isMarker(int mkIdx, int chIdx)
+{
 	if (rowOfMarker(mkIdx, chIdx) > 0) {
 		return true;
 	}

@@ -35,15 +35,17 @@ namespace adiscope {
 class Oscilloscope_API;
 class PlotWidget;
 
-class OscilloscopePlot : public TimeDomainDisplayPlot {
+class OscilloscopePlot : public TimeDomainDisplayPlot
+{
 	Q_OBJECT
 
 public:
-	OscilloscopePlot(QWidget *parent, unsigned int xNumDivs = 10, unsigned int yNumDiv = 10);
+	OscilloscopePlot(QWidget* parent, unsigned int xNumDivs = 10, unsigned int yNumDiv = 10);
 	~OscilloscopePlot();
 };
 
-struct cursorReadoutsText {
+struct cursorReadoutsText
+{
 	QString t1;
 	QString t2;
 	QString tDelta;
@@ -53,14 +55,16 @@ struct cursorReadoutsText {
 	QString vDelta;
 };
 
-class CapturePlot : public OscilloscopePlot {
+class CapturePlot : public OscilloscopePlot
+{
 	friend class Oscilloscope_API;
 	friend class Channel_API;
 
 	Q_OBJECT
 
 public:
-	enum TriggerState {
+	enum TriggerState
+	{
 		Waiting,
 		Triggered,
 		Stop,
@@ -68,17 +72,17 @@ public:
 	};
 
 public:
-	CapturePlot(QWidget *parent, unsigned int xNumDivs = 10, unsigned int yNumDivs = 10);
+	CapturePlot(QWidget* parent, unsigned int xNumDivs = 10, unsigned int yNumDivs = 10);
 	~CapturePlot();
 
-	HorizBar *levelTriggerA();
-	HorizBar *levelTriggerB();
+	HorizBar* levelTriggerA();
+	HorizBar* levelTriggerB();
 
-	QWidget *topArea();
-	QWidget *topHandlesArea();
-	QWidget *bottomHandlesArea();
-	QWidget *leftHandlesArea();
-	QWidget *rightHandlesArea();
+	QWidget* topArea();
+	QWidget* topHandlesArea();
+	QWidget* bottomHandlesArea();
+	QWidget* leftHandlesArea();
+	QWidget* rightHandlesArea();
 
 	void setBonusWidthForHistogram(int width);
 
@@ -99,7 +103,7 @@ public:
 	QList<std::shared_ptr<MeasurementData>> measurements(int chnIdx);
 	std::shared_ptr<MeasurementData> measurement(int id, int chnIdx);
 
-	OscPlotZoomer *getZoomer();
+	OscPlotZoomer* getZoomer();
 	void setOffsetInterval(double minValue, double maxValue);
 	double getMaxOffsetValue();
 	double getMinOffsetValue();
@@ -109,7 +113,7 @@ public:
 	void setTimeBaseZoomed(bool zoomed);
 
 	void enableLabels(bool enabled);
-	bool eventFilter(QObject *, QEvent *);
+	bool eventFilter(QObject*, QEvent*);
 	void setActiveVertAxis(unsigned int axisIdx, bool selected = true);
 	void showYAxisWidget(unsigned int axisIdx, bool en);
 	void enableAxisLabels(bool enabled);
@@ -153,14 +157,14 @@ public Q_SLOTS:
 	void moveCursorReadouts(CustomPlotPositionButton::ReadoutsPosition position);
 	void setHorizCursorsLocked(bool value);
 	void setVertCursorsLocked(bool value);
-	void showEvent(QShowEvent *event);
-	void printWithNoBackground(const QString &toolName = "", bool editScaleDraw = true);
+	void showEvent(QShowEvent* event);
+	void printWithNoBackground(const QString& toolName = "", bool editScaleDraw = true);
 
 protected:
 	virtual void cleanUpJustBeforeChannelRemoval(int chnIdx);
 
 private:
-	Measure *measureOfChannel(int chnIdx) const;
+	Measure* measureOfChannel(int chnIdx) const;
 	void updateBufferSizeSampleRateLabel(int nsamples, double sr);
 	void updateHandleAreaPadding(bool);
 	double getHorizontalCursorIntersection(double time);
@@ -194,7 +198,7 @@ private Q_SLOTS:
 	void onTriggerBHandleGrabbed(bool);
 
 private:
-	SymbolController *d_symbolCtrl;
+	SymbolController* d_symbolCtrl;
 
 	bool d_triggerAEnabled;
 	bool d_triggerBEnabled;
@@ -205,47 +209,47 @@ private:
 
 	int d_selected_channel;
 
-	QWidget *d_topWidget;
-	GateHandlesArea *d_topHandlesArea;
-	HorizHandlesArea *d_bottomHandlesArea;
-	VertHandlesArea *d_leftHandlesArea;
-	VertHandlesArea *d_rightHandlesArea;
+	QWidget* d_topWidget;
+	GateHandlesArea* d_topHandlesArea;
+	HorizHandlesArea* d_bottomHandlesArea;
+	VertHandlesArea* d_leftHandlesArea;
+	VertHandlesArea* d_rightHandlesArea;
 	int d_bonusWidth;
 
-	QLabel *d_timeBaseLabel;
-	QLabel *d_sampleRateLabel;
-	QLabel *d_triggerStateLabel;
+	QLabel* d_timeBaseLabel;
+	QLabel* d_sampleRateLabel;
+	QLabel* d_triggerStateLabel;
 
 	int d_bufferSizeLabelVal;
 	double d_sampleRateLabelVal;
 
-	QList<HorizBar *> d_offsetBars;
-	QList<RoundedHandleV *> d_offsetHandles;
+	QList<HorizBar*> d_offsetBars;
+	QList<RoundedHandleV*> d_offsetHandles;
 
-	PlotLineHandleV *d_vCursorHandle1;
-	PlotLineHandleV *d_vCursorHandle2;
-	PlotLineHandleH *d_hCursorHandle1;
-	PlotLineHandleH *d_hCursorHandle2;
+	PlotLineHandleV* d_vCursorHandle1;
+	PlotLineHandleV* d_vCursorHandle2;
+	PlotLineHandleH* d_hCursorHandle1;
+	PlotLineHandleH* d_hCursorHandle2;
 
-	PlotGateHandle *d_hGatingHandle1;
-	PlotGateHandle *d_hGatingHandle2;
+	PlotGateHandle* d_hGatingHandle1;
+	PlotGateHandle* d_hGatingHandle2;
 
-	VertBar *d_vBar1;
-	VertBar *d_vBar2;
-	HorizBar *d_hBar1;
-	HorizBar *d_hBar2;
+	VertBar* d_vBar1;
+	VertBar* d_vBar2;
+	HorizBar* d_hBar1;
+	HorizBar* d_hBar2;
 
-	VertBar *d_gateBar1;
-	VertBar *d_gateBar2;
+	VertBar* d_gateBar1;
+	VertBar* d_gateBar2;
 
-	VertBar *d_timeTriggerBar;
-	HorizBar *d_levelTriggerABar;
-	HorizBar *d_levelTriggerBBar;
-	FreePlotLineHandleH *d_timeTriggerHandle;
-	FreePlotLineHandleV *d_levelTriggerAHandle;
-	FreePlotLineHandleV *d_levelTriggerBHandle;
+	VertBar* d_timeTriggerBar;
+	HorizBar* d_levelTriggerABar;
+	HorizBar* d_levelTriggerBBar;
+	FreePlotLineHandleH* d_timeTriggerHandle;
+	FreePlotLineHandleV* d_levelTriggerAHandle;
+	FreePlotLineHandleV* d_levelTriggerBHandle;
 
-	CursorReadouts *d_cursorReadouts;
+	CursorReadouts* d_cursorReadouts;
 	MetricPrefixFormatter d_cursorMetricFormatter;
 	TimePrefixFormatter d_cursorTimeFormatter;
 	struct cursorReadoutsText d_cursorReadoutsText;
@@ -258,7 +262,7 @@ private:
 	QPen d_timeTriggerInactiveLinePen;
 	QPen d_timeTriggerActiveLinePen;
 
-	QList<Measure *> d_measureObjs;
+	QList<Measure*> d_measureObjs;
 
 	double value_v1, value_v2, value_h1, value_h2;
 	double value_gateLeft, value_gateRight;
@@ -266,11 +270,11 @@ private:
 	double d_timeTriggerMinValue, d_timeTriggerMaxValue;
 
 	bool displayGraticule;
-	Graticule *graticule;
+	Graticule* graticule;
 
 	bool d_trackMode;
-	QwtPlotMarker *markerIntersection1;
-	QwtPlotMarker *markerIntersection2;
+	QwtPlotMarker* markerIntersection1;
+	QwtPlotMarker* markerIntersection2;
 	bool horizCursorsLocked;
 	bool vertCursorsLocked;
 	int pixelPosHandleHoriz1;

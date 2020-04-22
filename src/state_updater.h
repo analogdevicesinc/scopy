@@ -25,11 +25,12 @@
 
 namespace adiscope {
 
-class StateUpdater : public QObject {
+class StateUpdater : public QObject
+{
 	Q_OBJECT
 
 public:
-	StateUpdater(int msecTimeout, QObject *parent = 0);
+	StateUpdater(int msecTimeout, QObject* parent = 0);
 
 	bool enabled() const;
 	int timeout() const;

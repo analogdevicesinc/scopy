@@ -78,7 +78,8 @@ class PositionSpinButton;
 class StateUpdater;
 class ExportSettings;
 
-class LogicAnalyzer : public Tool {
+class LogicAnalyzer : public Tool
+{
 	friend class LogicAnalyzer_API;
 	friend class ToolLauncher_API;
 	friend class ChannelGroup_API;
@@ -87,9 +88,15 @@ class LogicAnalyzer : public Tool {
 	Q_OBJECT
 
 public:
-	enum AcquisitionMode { REPEATED, STREAM, SCREEN };
+	enum AcquisitionMode
+	{
+		REPEATED,
+		STREAM,
+		SCREEN
+	};
 
-	enum TriggerState {
+	enum TriggerState
+	{
 		Stop,
 		Waiting,
 		Triggered,
@@ -97,8 +104,8 @@ public:
 		Stream,
 	};
 
-	explicit LogicAnalyzer(struct iio_context *ctx, Filter *filt, ToolMenuItem *toolMenuItem, QJSEngine *engine,
-			       ToolLauncher *parent, bool offline_mode_ = 0);
+	explicit LogicAnalyzer(struct iio_context* ctx, Filter* filt, ToolMenuItem* toolMenuItem, QJSEngine* engine,
+			       ToolLauncher* parent, bool offline_mode_ = 0);
 	~LogicAnalyzer();
 	void updateAreaTimeTrigger();
 
@@ -107,7 +114,7 @@ public:
 	std::string get_trigger_from_device(int chid);
 	void startTimeout();
 	void stopTimeout();
-	void setTriggerCache(int chid, const std::string &trigger_value);
+	void setTriggerCache(int chid, const std::string& trigger_value);
 	void get_channel_groups_api();
 	void installWheelEventGuard();
 	void bufferSentSignal(bool lastBuffer);
@@ -171,13 +178,13 @@ Q_SIGNALS:
 
 private:
 	std::shared_ptr<sigrok::Context> context;
-	pv::DeviceManager *device_manager;
-	Ui::LogicAnalyzer *ui;
-	Ui::DigitalTriggerSettings *trigger_settings_ui;
-	QButtonGroup *settings_group;
-	QPushButton *active_settings_btn;
-	QPushButton *triggerBtn;
-	QQueue<QPair<CustomPushButton *, bool>> menuButtonActions;
+	pv::DeviceManager* device_manager;
+	Ui::LogicAnalyzer* ui;
+	Ui::DigitalTriggerSettings* trigger_settings_ui;
+	QButtonGroup* settings_group;
+	QPushButton* active_settings_btn;
+	QPushButton* triggerBtn;
+	QQueue<QPair<CustomPushButton*, bool>> menuButtonActions;
 
 	bool reset_horiz_offset;
 	double horiz_offset_after_drop;
@@ -188,24 +195,24 @@ private:
 	static std::vector<std::pair<std::string, std::string>> externalTriggerSourceMap;
 	std::vector<std::string> trigger_cache;
 
-	ScaleSpinButton *timeBase;
-	PositionSpinButton *timePosition;
-	ScaleSpinButton *frequencySpinButton;
+	ScaleSpinButton* timeBase;
+	PositionSpinButton* timePosition;
+	ScaleSpinButton* frequencySpinButton;
 
 	std::string dev_name;
 
-	struct iio_device *dev;
+	struct iio_device* dev;
 	unsigned int no_channels;
 	unsigned int itemsize;
-	pv::MainWindow *main_win;
+	pv::MainWindow* main_win;
 
-	QList<ChannelGroup_API *> channel_groups_api;
+	QList<ChannelGroup_API*> channel_groups_api;
 	LogicAnalyzerChannelManager chm;
-	LogicAnalyzerChannelManagerUI *chm_ui;
+	LogicAnalyzerChannelManagerUI* chm_ui;
 	bool apiLoading;
 
 	void disconnectAll();
-	static unsigned int get_no_channels(struct iio_device *dev);
+	static unsigned int get_no_channels(struct iio_device* dev);
 
 	static const unsigned long maxBuffersize;
 	long long maxSamplingFrequency;
@@ -221,26 +228,26 @@ private:
 	double active_timePos;
 
 	void settings_panel_update(int id);
-	void toggleRightMenu(QPushButton *btn, bool checked);
+	void toggleRightMenu(QPushButton* btn, bool checked);
 
 	bool menuOpened;
 
 	std::map<std::string, Glib::VariantBase> options;
 	std::shared_ptr<pv::devices::BinaryStream> logic_analyzer_ptr;
 
-	Ui::LChannelSettings *lachannelsettings;
+	Ui::LChannelSettings* lachannelsettings;
 
-	void clearLayout(QLayout *layout);
+	void clearLayout(QLayout* layout);
 
-	HorizHandlesArea *d_bottomHandlesArea;
-	FreePlotLineHandleH *d_timeTriggerHandle;
-	QWidget *bottomHandlesArea();
+	HorizHandlesArea* d_bottomHandlesArea;
+	FreePlotLineHandleH* d_timeTriggerHandle;
+	QWidget* bottomHandlesArea();
 
 	MetricPrefixFormatter d_cursorMetricFormatter;
 	TimePrefixFormatter d_cursorTimeFormatter;
 
-	PlotLineHandleH *d_hCursorHandle1;
-	PlotLineHandleH *d_hCursorHandle2;
+	PlotLineHandleH* d_hCursorHandle1;
+	PlotLineHandleH* d_hCursorHandle2;
 
 	void updateBuffersizeSamplerateLabel(int samples, double samplerate);
 	void setBuffersizeLabelValue(double value);
@@ -259,7 +266,7 @@ private:
 	int timeToPixel(double time);
 
 	std::shared_ptr<LogicAnalyzerSymmetricBufferMode> symmBufferMode;
-	QWidget *trigger_settings;
+	QWidget* trigger_settings;
 	double active_plot_timebase;
 
 	double value_cursor1;
@@ -270,29 +277,29 @@ private:
 
 	void recomputeCursorsValue(bool zoom);
 	bool initialised;
-	QTimer *timer;
+	QTimer* timer;
 	int timer_timeout_ms;
 	std::atomic<bool> armed;
 	void autoCaptureEnable(bool);
 
-	DigitalBufferPreviewer *buffer_previewer;
+	DigitalBufferPreviewer* buffer_previewer;
 	void set_buffersize();
-	MouseWheelWidgetGuard *wheelEventGuard;
+	MouseWheelWidgetGuard* wheelEventGuard;
 	bool offline_mode;
 	int acquisition_mode;
 	bool zoomed_in;
 	int min_detached_width;
 
 	void configParams(double timebase, double timepos);
-	StateUpdater *triggerUpdater;
+	StateUpdater* triggerUpdater;
 	bool trigger_is_forced;
-	ExportSettings *exportSettings;
+	ExportSettings* exportSettings;
 	QMap<int, bool> exportConfig;
 	void init_export_settings();
 	bool exportTabCsv(QString separator, QString);
 	bool exportVCD(QString, QString, QString);
 	void init_buffer_scrolling();
-	void triggerRightMenuToggle(CustomPushButton *btn, bool checked);
+	void triggerRightMenuToggle(CustomPushButton* btn, bool checked);
 };
 } // namespace adiscope
 Q_DECLARE_METATYPE(std::shared_ptr<sigrok::OutputFormat>);
