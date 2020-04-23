@@ -132,7 +132,7 @@ private:
 	struct iio_device *m2k_ad5625;
 	struct iio_device *m_m2k_fabric;
 
-	libm2k::contexts::M2k *m2k;
+	libm2k::context::M2k *m2k;
 
 	struct iio_channel *m_adc_channel0;
 	struct iio_channel *m_adc_channel1;

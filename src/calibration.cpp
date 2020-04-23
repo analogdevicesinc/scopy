@@ -49,7 +49,7 @@ Calibration::Calibration(struct iio_context *ctx, QJSEngine *engine,
 {
 	m_api->setObjectName("calib");
 	m_api->js_register(engine);
-	m2k = libm2k::contexts::m2kOpen(ctx,"");
+	m2k = libm2k::context::m2kOpen(ctx,"");
 }
 
 Calibration::~Calibration()

@@ -133,7 +133,7 @@ namespace adiscope {
 
 	Q_SIGNALS:
 		void timeTriggerValueChanged(double);
-		void channelOffsetChanged(double);
+		void channelOffsetChanged(unsigned int, double);
 		void measurementsAvailable();
 		void cursorReadoutsChanged(struct cursorReadoutsText);
 		void canvasSizeChanged();

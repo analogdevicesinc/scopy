@@ -1388,7 +1388,7 @@ void CapturePlot::onChannelAdded(int chnIdx)
 			this->setVertOffset(-offset, chn_id);
 			this->replot();
 
-			Q_EMIT channelOffsetChanged(-offset);
+			Q_EMIT channelOffsetChanged(chn_id, -offset);
 		});
 	/* When bar position changes due to plot resizes update the handle */
 	connect(chOffsetBar, &HorizBar::pixelPositionChanged,
@@ -1405,14 +1405,14 @@ void CapturePlot::onChannelAdded(int chnIdx)
 				this->setVertOffset(offset, chn_id);
 				this->replot();
 
-				Q_EMIT channelOffsetChanged(offset);
+				Q_EMIT channelOffsetChanged(chn_id, offset);
 			}
 			if (offset < d_minOffsetValue){
 				offset = d_minOffsetValue;
 				this->setVertOffset(offset, chn_id);
 				this->replot();
 
-				Q_EMIT channelOffsetChanged(offset);
+				Q_EMIT channelOffsetChanged(chn_id, offset);
 			}
 	});
 
@@ -1421,7 +1421,7 @@ void CapturePlot::onChannelAdded(int chnIdx)
 		this->setVertOffset(0, chn_id);
 		this->replot();
 
-		Q_EMIT channelOffsetChanged(0);
+		Q_EMIT channelOffsetChanged(chn_id, 0);
 	});
 
 	/* Add Measure ojbect that handles all channel measurements */
@@ -1532,7 +1532,7 @@ void CapturePlot::onNewDataReceived()
 		}
 
 		measure->setSampleRate(this->sampleRate());
-		measure->measure();
+//		measure->measure();
 	}
 
 	Q_EMIT measurementsAvailable();

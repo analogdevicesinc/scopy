@@ -62,6 +62,8 @@
 
 #include <QElapsedTimer>
 
+#include "adc_sample_conv.hpp"
+
 using namespace adiscope;
 using namespace gr;
 
@@ -121,7 +123,7 @@ void NetworkAnalyzer::_configureAdcFlowgraph(size_t buffer_size)
 		conj = gr::blocks::multiply_conjugate_cc::make();
 		c2a = gr::blocks::complex_to_arg::make();
 		signal = boost::make_shared<signal_sample>();
-		adc_conv = boost::make_shared<adc_sample_conv>(2, m2k_adc);
+		adc_conv = boost::make_shared<adc_sample_conv>(2, nullptr);
 
 		adc_conv->setCorrectionGain(0,
 			m2k_adc->chnCorrectionGain(0));

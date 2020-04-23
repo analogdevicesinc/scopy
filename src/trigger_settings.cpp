@@ -18,10 +18,15 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <libm2k/context.hpp>
+#include <libm2k/m2k.hpp>
+#include <libm2k/analog/m2kanalogin.hpp>
+#include <libm2k/m2khardwaretrigger.hpp>
+#include <libm2k/contextbuilder.hpp>
+
 #include "trigger_settings.hpp"
 #include "adc_sample_conv.hpp"
 #include "spinbox_a.hpp"
-#include "osc_adc.h"
 #include "scroll_filter.hpp"
 
 #include "ui_trigger_settings.h"
@@ -31,6 +36,9 @@
 
 using namespace adiscope;
 using namespace std;
+using namespace libm2k;
+using namespace libm2k::context;
+using namespace libm2k::analog;
 
 struct TriggerSettings::trigg_channel_config {
 	double level_min;
@@ -44,27 +52,28 @@ struct TriggerSettings::trigg_channel_config {
 	double dc_level;
 };
 
-const std::vector<std::pair<std::string, HardwareTrigger::out_select>> TriggerSettings::externalTriggerOutMapping = {
-//{"None", HardwareTrigger::out_select::sw_trigger},
-{"Forward Trigger In", HardwareTrigger::out_select::trigger_i_swap_channel},
-{"Oscilloscope", HardwareTrigger::out_select::trigger_adc},
-{"Logic Analyzer", HardwareTrigger::out_select::trigger_in},
+const std::vector<std::pair<std::string, libm2k::M2K_TRIGGER_OUT_SELECT>> TriggerSettings::externalTriggerOutMapping = {
+	{"Forward Trigger In", libm2k::SELECT_TRIGGER_IN},
+	{"Oscilloscope",  libm2k::SELECT_ANALOG_IN},
+	{"Logic Analyzer", libm2k::SELECT_DIGITAL_IN}
 };
 
-TriggerSettings::TriggerSettings(std::shared_ptr<GenericAdc> adc,
+TriggerSettings::TriggerSettings(M2kAnalogIn* libm2k_adc,
 		QWidget *parent) :
 	QWidget(parent), ui(new Ui::TriggerSettings),
-	adc(adc),
-	trigger(adc->getTrigger()),
+	m_m2k_adc(libm2k_adc),
+	m_trigger(nullptr),
 	current_channel(0),
 	temporarily_disabled(false),
 	adc_running(false),
 	trigger_raw_delay(0),
-	daisyChainCompensation(0)
+	daisyChainCompensation(0),
+	m_trigger_in(false)
 {
 	ui->setupUi(this);
+	m_trigger = (m_m2k_adc) ? m_m2k_adc->getTrigger() : nullptr;
 
-	for (uint i = 0; i < trigger->numChannels(); i++) {
+	for (uint i = 0; i < m_m2k_adc->getNbChannels(); i++) {
 		struct trigg_channel_config config = {};
 		trigg_configs.push_back(config);
 	}
@@ -84,25 +93,21 @@ TriggerSettings::TriggerSettings(std::shared_ptr<GenericAdc> adc,
 	ui->controlsLayout->addWidget(trigger_level);
 	ui->controlsLayout->addWidget(trigger_hysteresis);
 
-	// Populate UI source comboboxes with the available channels
-	for (uint i = 0; i < trigger->numChannels(); i++) {
-		ui->cmb_source->addItem(QString("Channel %1").arg(i + 1));
-	}
-
 	trigger_auto_mode = ui->btnTrigger->isChecked();
 
-	auto m2k_adc = dynamic_pointer_cast<M2kAdc>(adc);
-	if (m2k_adc) {
-		auto adc_range = m2k_adc->inputRange(
-			m2k_adc->chnHwGainMode(current_channel));
-		auto hyst_range = QPair<double, double>(
-			0, adc_range.second / 10);
-		setTriggerLevelRange(current_channel, adc_range);
-		setTriggerHystRange(current_channel, hyst_range);
-		if(trigger->hasExternalTriggerIn())
-			trigger->setExternalDirection(0,HardwareTrigger::direction::TRIGGER_INPUT);
-		if(trigger->hasExternalTriggerOut())
-			trigger->setExternalDirection(1,HardwareTrigger::direction::TRIGGER_OUT);
+	if (m_m2k_adc) {
+		// Populate UI source comboboxes with the available channels
+		for (uint i = 0; i < m_m2k_adc->getNbChannels(); i++) {
+			ui->cmb_source->addItem(QString("Channel %1").arg(i + 1));
+		}
+
+		auto chn = static_cast<libm2k::analog::ANALOG_IN_CHANNEL>(currentChannel());
+		libm2k::analog::M2K_RANGE adc_range = m_m2k_adc->getRange(chn);
+		std::pair<double, double> adc_range_limits = m_m2k_adc->getRangeLimits(adc_range);
+		std::pair<double, double> hyst_range_limits = m_m2k_adc->getHysteresisRange(chn);
+
+		setTriggerLevelRange(currentChannel(), adc_range_limits);
+		setTriggerHystRange(currentChannel(), hyst_range_limits);
 	}
 
 	connect(trigger_level, SIGNAL(valueChanged(double)),
@@ -129,20 +134,20 @@ TriggerSettings::TriggerSettings(std::shared_ptr<GenericAdc> adc,
 	ui->label_daisyChain->setVisible(false);
 	ui->spin_daisyChain->setVisible(false);
 
-	if(trigger->hasExternalTriggerIn())
+	if (m_trigger->hasExternalTriggerIn()) {
 		ui->cmb_extern_src->addItem("External Trigger In");
-	if(trigger->hasCrossInstrumentTrigger())
+	}
+	if (m_trigger->hasCrossInstrumentTrigger()) {
 		ui->cmb_extern_src->addItem("Logic Analyzer");
+	}
 
-	if(trigger->hasExternalTriggerOut()){
-		for(const auto &val : externalTriggerOutMapping)
+	if (m_trigger->hasExternalTriggerOut()) {
+		for (const auto &val : externalTriggerOutMapping)
 		{
 			ui->cmb_extern_to_src->addItem(QString::fromStdString(val.first));
 			connect(ui->extern_to_en,SIGNAL(toggled(bool)),ui->cmb_extern_to_src,SLOT(setEnabled(bool)));
 		}
-	}
-	else
-	{
+	} else {
 		ui->cmb_extern_to_src->addItem("None");
 		ui->cmb_extern_to_src->setEnabled(false);
 		ui->extern_to_en->setEnabled(false);
@@ -215,7 +220,7 @@ void TriggerSettings::setTriggerDelay(long long raw_delay)
 	if ((trigger_raw_delay + oldCompensation) != (raw_delay + daisyChainCompensation)) {
 		trigger_raw_delay = raw_delay;
 		oldCompensation = daisyChainCompensation;
-		delay_hw_write(raw_delay + daisyChainCompensation);
+		writeHwDelay(raw_delay + daisyChainCompensation);
 	}
 }
 
@@ -255,7 +260,7 @@ void TriggerSettings::setTriggerHysteresis(double hyst)
 
 	if (current_hyst != hyst) {
 		trigger_hysteresis->setValue(hyst);
-		trigg_configs[current_channel].hyst_val = hyst;
+		trigg_configs[currentChannel()].hyst_val = hyst;
 	}
 }
 
@@ -272,32 +277,32 @@ void TriggerSettings::on_cmb_source_currentIndexChanged(int index)
 	trigger_hysteresis->setStep(trigg_configs[index].hyst_step);
 
 	if (adc_running)
-		write_ui_settings_to_hawrdware();
+		write_ui_settings_to_hardware();
 
 	Q_EMIT sourceChanged(index);
 }
 
 void TriggerSettings::onSpinboxTriggerLevelChanged(double value)
 {
-	level_hw_write(value);
-	trigg_configs[current_channel].level_val = value;
+	writeHwLevel(value);
+	trigg_configs[currentChannel()].level_val = value;
 	Q_EMIT levelChanged(value);
 }
 
 void TriggerSettings::onSpinboxTriggerHystChanged(double value)
 {
-	hysteresis_hw_write(value);
-	trigg_configs[current_channel].hyst_val = value;
+	writeHwHysteresis(value);
+	trigg_configs[currentChannel()].hyst_val = value;
 }
 
 void TriggerSettings::on_cmb_condition_currentIndexChanged(int index)
 {
-	analog_cond_hw_write(index);
+	writeHwAnalogCondition(index);
 }
 
 void TriggerSettings::on_cmb_extern_condition_currentIndexChanged(int index)
 {
-	digital_cond_hw_write(index);
+	writeHwDigitalCondition(index);
 }
 
 void TriggerSettings::on_cmb_extern_to_src_currentIndexChanged(int index)
@@ -307,7 +312,7 @@ void TriggerSettings::on_cmb_extern_to_src_currentIndexChanged(int index)
 
 void TriggerSettings::on_intern_en_toggled(bool checked)
 {
-	write_ui_settings_to_hawrdware();
+	write_ui_settings_to_hardware();
 
 	ui_reconf_on_intern_toggled(checked);
 
@@ -316,7 +321,7 @@ void TriggerSettings::on_intern_en_toggled(bool checked)
 
 void TriggerSettings::on_extern_en_toggled(bool checked)
 {
-	write_ui_settings_to_hawrdware();
+	write_ui_settings_to_hardware();
 	setTriggerDelay(trigger_raw_delay);
 	ui_reconf_on_extern_toggled(checked);
 }
@@ -328,25 +333,24 @@ void TriggerSettings::on_extern_to_en_toggled(bool checked)
 	setTriggerDelay(trigger_raw_delay);
 }
 
-HardwareTrigger::mode TriggerSettings::determineTriggerMode(bool intern_checked,
+libm2k::M2K_TRIGGER_MODE TriggerSettings::determineTriggerMode(bool intern_checked,
 			bool extern_checked) const
 {
-	HardwareTrigger::mode mode;
+	libm2k::M2K_TRIGGER_MODE mode;
 
 	if (intern_checked) {
 		if (extern_checked) {
-			int n = static_cast<int>(HardwareTrigger::DIGITAL) + 1;
-			int i = ui->cmb_analog_extern->currentIndex();
-
-			mode = static_cast<HardwareTrigger::mode>(n + i);
+			int start_idx = static_cast<int>(libm2k::EXTERNAL) + 1;
+			int extern_idx = ui->cmb_analog_extern->currentIndex();
+			mode = static_cast<libm2k::M2K_TRIGGER_MODE>(start_idx + extern_idx);
 		} else {
-			mode = HardwareTrigger::ANALOG;
+			mode = libm2k::ANALOG;
 		}
 	} else {
 		if (extern_checked) {
-			mode = HardwareTrigger::DIGITAL;
+			mode = libm2k::EXTERNAL;
 		} else {
-			mode = HardwareTrigger::ALWAYS;
+			mode = libm2k::ALWAYS;
 		}
 	}
 
@@ -357,10 +361,15 @@ void TriggerSettings::enableExternalTriggerOut(bool enabled)
 {
 	const int TRIGGER_OUT_PIN = 1;
 
-	if(enabled)
-		trigger->setExternalOutSelect(TRIGGER_OUT_PIN, externalTriggerOutMapping[ui->cmb_extern_to_src->currentIndex()].second);
-	else
-		trigger->setExternalOutSelect(TRIGGER_OUT_PIN, HardwareTrigger::out_select::sw_trigger);
+	try {
+		if(enabled) {
+			m_trigger->setAnalogExternalOutSelect(externalTriggerOutMapping[ui->cmb_extern_to_src->currentIndex()].second);
+		} else {
+			m_trigger->setAnalogExternalOutSelect(libm2k::SELECT_NONE);
+		}
+	} catch (std::exception& e) {
+		qDebug() << e.what();
+	}
 }
 
 void TriggerSettings::ui_reconf_on_intern_toggled(bool checked)
@@ -384,15 +393,12 @@ void TriggerSettings::ui_reconf_on_extern_toggled(bool checked)
 void TriggerSettings::on_cmb_analog_extern_currentIndexChanged(int index)
 {
 	if (adc_running) {
-		HardwareTrigger::mode mode;
-		int n = static_cast<int>(HardwareTrigger::DIGITAL) + 1;
-
-		mode = static_cast<HardwareTrigger::mode>(n + index);
+		libm2k::M2K_TRIGGER_MODE mode;
+		int start_idx = static_cast<int>(libm2k::EXTERNAL) + 1;
+		mode = static_cast<libm2k::M2K_TRIGGER_MODE>(start_idx + index);
 		try {
-			trigger->setTriggerMode(current_channel, mode);
-		}
-		catch (std::exception& e)
-		{
+			m_trigger->setAnalogMode(currentChannel(), mode);
+		} catch (std::exception& e){
 			qDebug() << e.what();
 		}
 	}
@@ -401,8 +407,7 @@ void TriggerSettings::on_cmb_analog_extern_currentIndexChanged(int index)
 void TriggerSettings::autoTriggerDisable()
 {
 	if (!ui->btnTrigger->isChecked()) {
-		mode_hw_write(HardwareTrigger::ALWAYS);
-
+		writeHwMode(libm2k::ALWAYS);
 		temporarily_disabled = true;
 	}
 }
@@ -411,8 +416,8 @@ void TriggerSettings::autoTriggerEnable()
 {
 	if (!ui->btnTrigger->isChecked()) {
 		if (temporarily_disabled) {
-			mode_hw_write(determineTriggerMode(ui->intern_en->isChecked(),
-			                                   ui->extern_en->isChecked()));
+			writeHwMode(determineTriggerMode(ui->intern_en->isChecked(),
+							 ui->extern_en->isChecked()));
 
 			temporarily_disabled = false;
 		}
@@ -444,12 +449,8 @@ void TriggerSettings::updateHwVoltLevels(int chnIdx)
 		if (m_ac_coupled) {
 			level = level + trigg_configs[current_channel].dc_level;
 		}
-		int rawValue = (int)adc->convVoltsToSample(chnIdx, level);
-		trigger->setLevel(chnIdx, rawValue);
-
-		rawValue = (int)adc->convVoltsDiffToSampleDiff(chnIdx,
-		trigg_configs[chnIdx].hyst_val);
-		trigger->setHysteresis(chnIdx, rawValue);
+		m_trigger->setAnalogLevel(chnIdx, level);
+		m_trigger->setAnalogHysteresis(chnIdx, trigg_configs[chnIdx].hyst_val);
 	}
 	catch (std::exception& e)
 	{
@@ -458,7 +459,7 @@ void TriggerSettings::updateHwVoltLevels(int chnIdx)
 }
 
 void TriggerSettings::setTriggerLevelRange(int chn,
-	const QPair<double, double>& range)
+	const std::pair<double, double>& range)
 {
 	trigg_configs[chn].level_min = range.first;
 	trigg_configs[chn].level_max = range.second;
@@ -470,7 +471,7 @@ void TriggerSettings::setTriggerLevelRange(int chn,
 }
 
 void TriggerSettings::setTriggerHystRange(int chn,
-	const QPair<double, double>& range)
+	const std::pair<double, double>& range)
 {
 	trigg_configs[chn].hyst_min = range.first;
 	trigg_configs[chn].hyst_max = range.second;
@@ -514,45 +515,36 @@ void TriggerSettings::setAdcRunningState(bool on)
 	adc_running = on;
 
 	if (on) {
-		write_ui_settings_to_hawrdware();
+		write_ui_settings_to_hardware();
 	}
 }
 
-void TriggerSettings::write_ui_settings_to_hawrdware()
+void TriggerSettings::write_ui_settings_to_hardware()
 {
 	int extern_cnd;
 
 	setDaisyChainCompensation();
-	source_hw_write(ui->cmb_source->currentIndex());
-	mode_hw_write(determineTriggerMode(ui->intern_en->isChecked(),
+	writeHwSource(ui->cmb_source->currentIndex());
+	writeHwMode(determineTriggerMode(ui->intern_en->isChecked(),
 		ui->extern_en->isChecked()));
-	analog_cond_hw_write(ui->cmb_condition->currentIndex());
-	if(ui->cmb_extern_src->currentIndex() == 0)
+	writeHwAnalogCondition(ui->cmb_condition->currentIndex());
+	if(ui->cmb_extern_src->currentIndex() == 0) { /* case of External Trigger In */
 		extern_cnd = ui->cmb_extern_condition->currentIndex();
-	else
-		extern_cnd = HardwareTrigger::FALLING_EDGE; // when logic analyzer is selected set condition to falling edge
-	digital_cond_hw_write(extern_cnd);
-	level_hw_write(trigger_level->value());
-	hysteresis_hw_write(trigger_hysteresis->value());
-	delay_hw_write(trigger_raw_delay + daisyChainCompensation);
+	} else {
+		/* When logic analyzer is selected set condition to falling edge */
+		extern_cnd = libm2k::FALLING_EDGE_DIGITAL;
+	}
+	writeHwDigitalCondition(extern_cnd);
+	writeHwLevel(trigger_level->value());
+	writeHwHysteresis(trigger_hysteresis->value());
+	writeHwDelay(trigger_raw_delay + daisyChainCompensation);
 }
 
-void TriggerSettings::setupExternalTriggerDirection()
-{
-	try {
-		trigger->setExternalDirection(0,HardwareTrigger::direction::TRIGGER_INPUT);
-		trigger->setExternalDirection(1,HardwareTrigger::direction::TRIGGER_OUT);
-	}
-	catch (std::exception& e) {
-		qDebug() << e.what();
-	}
-}
-
-void TriggerSettings:: delay_hw_write(long long raw_delay)
+void TriggerSettings::writeHwDelay(long long raw_delay)
 {
 	if (adc_running) {
 		try {
-			trigger->setDelay(raw_delay);
+			m_trigger->setAnalogDelay(raw_delay);
 		}
 		catch (std::exception& e) {
 			qDebug() << e.what();
@@ -560,17 +552,15 @@ void TriggerSettings:: delay_hw_write(long long raw_delay)
 	}
 }
 
-void TriggerSettings:: level_hw_write(double level)
+void TriggerSettings::writeHwLevel(double level)
 {
 	if (adc_running) {
 		if (m_ac_coupled) {
 			level = level + trigg_configs[current_channel].dc_level;
 		}
-		int rawValue = (int)adc->convVoltsToSample(current_channel,
-			level);
 
 		try {
-			trigger->setLevel(current_channel, rawValue);
+			m_trigger->setAnalogLevel(currentChannel(), level);
 		}
 		catch (std::exception& e) {
 			qDebug() << e.what();
@@ -578,14 +568,11 @@ void TriggerSettings:: level_hw_write(double level)
 	}
 }
 
-void TriggerSettings:: hysteresis_hw_write(double level)
+void TriggerSettings::writeHwHysteresis(double level)
 {
 	if (adc_running) {
-		int rawValue = (int)adc->convVoltsDiffToSampleDiff(
-			current_channel, level);
-
 		try {
-			trigger->setHysteresis(current_channel, rawValue);
+			m_trigger->setAnalogHysteresis(currentChannel(), level);
 		}
 		catch (std::exception& e) {
 			qDebug() << e.what();
@@ -593,14 +580,14 @@ void TriggerSettings:: hysteresis_hw_write(double level)
 	}
 }
 
-void TriggerSettings:: analog_cond_hw_write(int cond)
+void TriggerSettings::writeHwAnalogCondition(int cond)
 {
 	if (adc_running) {
-		HardwareTrigger::condition t_cond =
-			static_cast<HardwareTrigger::condition>(cond);
+		libm2k::M2K_TRIGGER_CONDITION_ANALOG t_cond =
+			static_cast<libm2k::M2K_TRIGGER_CONDITION_ANALOG>(cond);
 
 		try {
-			trigger->setAnalogCondition(current_channel, t_cond);
+			m_trigger->setAnalogCondition(currentChannel(), t_cond);
 		}
 		catch (std::exception& e) {
 			qDebug() << e.what();
@@ -608,14 +595,14 @@ void TriggerSettings:: analog_cond_hw_write(int cond)
 	}
 }
 
-void TriggerSettings:: digital_cond_hw_write(int cond)
+void TriggerSettings::writeHwDigitalCondition(int cond)
 {
 	if (adc_running) {
-		HardwareTrigger::condition t_cond =
-			static_cast<HardwareTrigger::condition>(cond);
+		libm2k::M2K_TRIGGER_CONDITION_DIGITAL t_cond =
+			static_cast<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>(cond);
 
 		try {
-			trigger->setDigitalCondition(current_channel, t_cond);
+			m_trigger->setAnalogExternalCondition(currentChannel(), t_cond);
 		}
 		catch (std::exception& e) {
 			qDebug() << e.what();
@@ -623,12 +610,12 @@ void TriggerSettings:: digital_cond_hw_write(int cond)
 	}
 }
 
-void TriggerSettings:: mode_hw_write(int mode)
+void TriggerSettings::writeHwMode(int mode)
 {
 	if (adc_running) {
 		try {
-			trigger->setTriggerMode(current_channel,
-				static_cast<HardwareTrigger::mode>(mode));
+			m_trigger->setAnalogMode(currentChannel(),
+				static_cast<libm2k::M2K_TRIGGER_MODE>(mode));
 		}
 		catch (std::exception& e)
 		{
@@ -639,20 +626,40 @@ void TriggerSettings:: mode_hw_write(int mode)
 
 void TriggerSettings::on_cmb_extern_src_currentIndexChanged(int idx)
 {
+	// mode: digital_OR_analog
+	// logic mode (src) a without trigger_in -> for External Trigger In
+	// logic_mode (src) a_OR_trigger_in -> for logic analyzer
 	// set trigger in when both logic analyzer src and extern trig is on
-	trigger->setTriggerIn(idx && ui->extern_en->isChecked());
+	setTriggerIn(idx && ui->extern_en->isChecked());
 	ui->cmb_extern_condition->setEnabled(idx==0);
-	if (adc_running)
-		write_ui_settings_to_hawrdware();
+	if (adc_running) {
+		write_ui_settings_to_hardware();
+	}
 }
 
-void TriggerSettings::source_hw_write(int source)
+void TriggerSettings::setTriggerIn(bool enable)
+{
+	m_trigger_in = enable;
+}
+
+void TriggerSettings::writeHwSource(int source_chn)
 {
 	if (adc_running) {
 		try {
-			trigger->setSourceChannel(source,
-						  ui->intern_en->isChecked(), // analog trigger on
-						  (ui->extern_en->isChecked() && ui->cmb_extern_src->currentIndex()==0)); // extern trigger on & ext trigger in
+			libm2k::M2K_TRIGGER_SOURCE_ANALOG source = static_cast<M2K_TRIGGER_SOURCE_ANALOG>(source_chn);
+			/* analog trigger on */
+			bool intern_checked = ui->intern_en->isChecked();
+			/* extern trigger on & ext trigger in */
+			bool extern_trigger_in_checked = (ui->extern_en->isChecked() && ui->cmb_extern_src->currentIndex() == 0);
+			if(m_trigger_in) {
+				if (!intern_checked && !extern_trigger_in_checked) {
+					source = libm2k::SRC_DIGITAL_IN;
+				} else {
+					source = static_cast<libm2k::M2K_TRIGGER_SOURCE_ANALOG>(
+							(source_chn + 1) + libm2k::SRC_DIGITAL_IN);
+				}
+			}
+			m_trigger->setAnalogSource(source);
 		}
 		catch (std::exception& e) {
 			qDebug() << e.what();

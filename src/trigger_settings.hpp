@@ -21,19 +21,12 @@
 #ifndef TRIGGER_SETTINGS_HPP
 #define TRIGGER_SETTINGS_HPP
 
-#include "hardware_trigger.hpp"
-
 #include <QWidget>
 #include <string>
 #include <vector>
 #include <map>
 #include <memory>
-
-extern "C" {
-	struct iio_context;
-	struct iio_device;
-	struct iio_channel;
-}
+#include <libm2k/enums.hpp>
 
 namespace Ui {
 	class TriggerSettings;
@@ -45,6 +38,12 @@ namespace adiscope {
 	class PositionSpinButton;
 }
 
+namespace libm2k {
+	class M2kHardwareTrigger;
+	namespace analog {
+		class M2kAnalogIn;
+	}
+}
 namespace adiscope {
 	class TriggerSettings : public QWidget
 	{
@@ -59,7 +58,7 @@ namespace adiscope {
 			AUTO
 		};
 
-		explicit TriggerSettings(std::shared_ptr<GenericAdc> adc,
+		explicit TriggerSettings(libm2k::analog::M2kAnalogIn* libm2k_adc,
 					QWidget *parent = nullptr);
 		~TriggerSettings();
 
@@ -90,9 +89,9 @@ namespace adiscope {
 		void setTriggerLevel(double);
 		void setTriggerHysteresis(double);
 		void setTriggerLevelRange(int chn,
-			const QPair<double, double>& range);
+			const std::pair<double, double>& range);
 		void setTriggerHystRange(int chn,
-			const QPair<double, double>& range);
+			const std::pair<double, double>& range);
 		void setTriggerEnable(bool);
 		void setTriggerSource(int);
 		void setTriggerLevelStep(int chn, double step);
@@ -119,20 +118,19 @@ namespace adiscope {
 		void on_spin_daisyChain_valueChanged(int arg1);
 
 	private:
-		void setupExternalTriggerDirection();
-		void delay_hw_write(long long delay);
-		void level_hw_write(double level);
-		void hysteresis_hw_write(double level);
-		void analog_cond_hw_write(int cond);
-		void digital_cond_hw_write(int cond);
-		void mode_hw_write(int mode);
-		void source_hw_write(int source);
+		void writeHwDelay(long long delay);
+		void writeHwLevel(double level);
+		void writeHwHysteresis(double level);
+		void writeHwAnalogCondition(int cond);
+		void writeHwDigitalCondition(int cond);
+		void writeHwMode(int mode);
+		void writeHwSource(int source);
 
 		void ui_reconf_on_intern_toggled(bool);
 		void ui_reconf_on_extern_toggled(bool);
-		void write_ui_settings_to_hawrdware();
+		void write_ui_settings_to_hardware();
 		void trigg_level_write_hardware(int chn, double value);
-		HardwareTrigger::mode determineTriggerMode(bool intern_checked,
+		libm2k::M2K_TRIGGER_MODE determineTriggerMode(bool intern_checked,
 			bool extern_checked) const;
 		void enableExternalTriggerOut(bool);
 
@@ -140,10 +138,11 @@ namespace adiscope {
 		struct trigg_channel_config;
 
 		Ui::TriggerSettings *ui;
-		std::shared_ptr<GenericAdc> adc;
-		std::shared_ptr<HardwareTrigger> trigger;
+		libm2k::analog::M2kAnalogIn* m_m2k_adc;
+		libm2k::M2kHardwareTrigger* m_trigger;
+		bool m_trigger_in;
 
-		static const std::vector<std::pair<std::string, HardwareTrigger::out_select>> externalTriggerOutMapping;
+		static const std::vector<std::pair<std::string, libm2k::M2K_TRIGGER_OUT_SELECT>> externalTriggerOutMapping;
 
 		QList<trigg_channel_config> trigg_configs;
 		PositionSpinButton *trigger_level;
@@ -156,6 +155,7 @@ namespace adiscope {
 		bool adc_running;
 		bool m_ac_coupled;
 		double m_displayScale;
+		void setTriggerIn(bool bo);
 	};
 
 }
