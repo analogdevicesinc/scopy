@@ -59,6 +59,7 @@
 #include "networkanalyzerbufferviewer.h"
 #include "startstoprangewidget.h"
 #include "adc_sample_conv.hpp"
+#include "osc_adc.h"
 
 extern "C" {
 	struct iio_buffer;

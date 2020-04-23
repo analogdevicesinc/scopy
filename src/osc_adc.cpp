@@ -18,11 +18,11 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 #include "osc_adc.h"
-#include "hardware_trigger.hpp"
 #include <iio.h>
 #include <QString>
 #include <QDebug>
 
+#include "hardware_trigger.hpp"
 using namespace adiscope;
 
 /*
@@ -487,9 +487,8 @@ void M2kAdc::setFilteringEnabled(bool set)
 		GenericAdc::setSampleRate(m2k_sample_rate);
 		setOversamplingRatio(1);
 	}
-
-
 }
+
 bool M2kAdc::filteringEnabled() const
 {
 	return filtering_enabled;

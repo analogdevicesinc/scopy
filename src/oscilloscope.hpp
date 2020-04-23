@@ -58,7 +58,6 @@
 #include "spinbox_a.hpp"
 #include "trigger_settings.hpp"
 #include "plot_utils.hpp"
-#include "osc_adc.h"
 #include "tool.hpp"
 #include "osc_import_settings.h"
 #include "math.hpp"
@@ -66,6 +65,10 @@
 #include "cancel_dc_offset_block.h"
 #include "frequency_compensation_filter.h"
 #include "oscilloscope_api.hpp"
+
+/* libm2k includes */
+#include <libm2k/analog/m2kanalogin.hpp>
+#include <libm2k/m2k.hpp>
 
 /*Generated UI */
 #include "ui_math_panel.h"
@@ -160,7 +163,7 @@ namespace adiscope {
 
 
 		void onChannelCouplingChanged(bool en);
-		void onChannelOffsetChanged(double value);
+		void onChannelOffsetChanged(unsigned int chnIdx, double value);
 
 		void onChannelWidgetEnabled(bool);
 		void onChannelWidgetSelected(bool);
@@ -205,7 +208,7 @@ namespace adiscope {
 		void update_chn_settings_panel(int id);
 
 		void updateGainMode();
-		void setGainMode(uint chnIdx, M2kAdc::GainMode gain_mode);
+		void setGainMode(uint chnIdx, libm2k::analog::M2K_RANGE gain_mode);
 		void setChannelHwOffset(uint chnIdx, double offset);
 
 		void on_xyPlotLineType_toggled(bool checked);
@@ -226,6 +229,7 @@ namespace adiscope {
 
 		void toggleCursorsMode(bool toggled);
 		void toolDetached(bool);
+		void setFilteringEnabled(bool set);
 	public Q_SLOTS:
 		void requestAutoset();
 		void enableLabels(bool);
@@ -234,8 +238,10 @@ namespace adiscope {
 		void stop() override;
 
 	private:
-		std::shared_ptr<GenericAdc> adc;
-		std::shared_ptr<M2kAdc> m2k_adc;
+		libm2k::context::M2k* m_m2k_context;
+		libm2k::analog::M2kAnalogIn* m_m2k_analogin;
+		bool m_filtering_enabled;
+
 		unsigned int nb_channels, nb_math_channels;
 		unsigned int nb_ref_channels;
 		double active_sample_rate;
@@ -452,6 +458,8 @@ namespace adiscope {
 		void resetHistogramDataPoints();
 		bool isIioManagerStarted() const;
 		void updateXyPlotScales();
+		void setSampleRate(double sample_rate);
+		double getSampleRate();
 	};
 }
 #endif /* M2K_OSCILLOSCOPE_H */
