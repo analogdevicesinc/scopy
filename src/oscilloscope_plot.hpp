@@ -78,6 +78,8 @@ namespace adiscope {
 			    unsigned int yNumDivs = 10);
 		~CapturePlot();
 
+		void replot();
+
 		HorizBar *levelTriggerA();
 		HorizBar *levelTriggerB();
 
@@ -310,6 +312,8 @@ namespace adiscope {
 		QwtPlotShapeItem *leftGate, *rightGate;
 		QRectF leftGateRect, rightGateRect;
 		bool d_gatingEnabled;
+
+		QPair<double, double> d_xAxisInterval;
 	};
 }
 

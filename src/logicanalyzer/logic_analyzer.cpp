@@ -511,7 +511,7 @@ void LogicAnalyzer::setupUi()
 
 
 	ui->gridLayoutPlot->addWidget(&m_plot, 2, 1, 1, 1);
-	ui->gridLayoutPlot->addWidget(m_plotScrollBar, 2, 2, 1, 1);
+	ui->gridLayoutPlot->addWidget(m_plotScrollBar, 2, 5, 1, 1);
 
 	ui->gridLayoutPlot->addWidget(m_plot.bottomHandlesArea(), 3, 0, 1, 4);
 	ui->gridLayoutPlot->addItem(plotSpacer, 4, 0, 1, 4);

@@ -497,8 +497,8 @@ public Q_SLOTS:
   void onPickerPointSelected(const QwtDoublePoint & p);
   void onPickerPointSelected6(const QPointF & p);
 
-  unsigned int xAxisNumDiv();
-  unsigned int yAxisNumDiv();
+  unsigned int xAxisNumDiv() const;
+  unsigned int yAxisNumDiv() const;
 
 Q_SIGNALS:
   void horizScaleDivisionChanged(double);

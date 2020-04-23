@@ -77,7 +77,9 @@ CapturePlot::CapturePlot(QWidget *parent,
 	d_vertCursorsEnabled(false),
 	d_bonusWidth(0),
 	d_gatingEnabled(false),
-	d_startedGrouping(false)
+	d_startedGrouping(false),
+	d_bottomHandlesArea(nullptr),
+	d_xAxisInterval{0.0, 0.0}
 {
 	setMinimumHeight(250);
 	setMinimumWidth(500);
@@ -559,6 +561,26 @@ CapturePlot::~CapturePlot()
 	delete graticule;
 	delete leftGate;
 	delete rightGate;
+}
+
+void CapturePlot::replot()
+{
+
+	TimeDomainDisplayPlot::replot();
+
+	if (!d_bottomHandlesArea) {
+		return;
+	}
+
+	const QwtInterval interval = axisInterval(QwtPlot::xBottom);
+	if (interval.minValue() != d_xAxisInterval.first
+			|| interval.maxValue() != d_xAxisInterval.second) {
+
+		d_bottomHandlesArea->repaint();
+
+		d_xAxisInterval.first = interval.minValue();
+		d_xAxisInterval.second = interval.maxValue();
+	}
 }
 
 HorizBar *CapturePlot::levelTriggerA()
@@ -1056,7 +1078,7 @@ void CapturePlot::enableLabels(bool enabled)
 
 void CapturePlot::enableXaxisLabels()
 {
-    enableAxis(QwtPlot::xBottom, true);
+	d_bottomHandlesArea->installExtension(std::unique_ptr<HandlesAreaExtension>(new XBottomRuller(this)));
 }
 
 void CapturePlot::enableAxisLabels(bool enabled)

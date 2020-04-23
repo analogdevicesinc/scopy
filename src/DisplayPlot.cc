@@ -1531,7 +1531,7 @@ static QwtScaleDiv getEdgelessScaleDiv(const QwtScaleDiv& from_scaleDiv)
 	return QwtScaleDiv(lowerBound, upperBound, minorTicks, mediumTicks, majorTicks);
 }
 
-unsigned int DisplayPlot::xAxisNumDiv()
+unsigned int DisplayPlot::xAxisNumDiv() const
 {
 	return d_xAxisNumDiv;
 }
@@ -1545,7 +1545,7 @@ void DisplayPlot::setXaxisNumDiv(unsigned int num)
 	}
 }
 
-unsigned int DisplayPlot::yAxisNumDiv()
+unsigned int DisplayPlot::yAxisNumDiv() const
 {
 	return d_yAxisNumDiv;
 }
