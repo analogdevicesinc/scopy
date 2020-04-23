@@ -3,14 +3,12 @@ FROM ubuntu:18.04
 RUN apt-get update -y
 
 # Install base dependencies
-RUN apt-get install -y software-properties-common build-essential git
-RUN apt-get install -y sudo apt-utils
+RUN apt-get install -y software-properties-common build-essential git sudo apt-utils
 
 # Install flatpak
 RUN add-apt-repository ppa:alexlarsson/flatpak -y
 RUN apt-get update -y
-RUN apt install flatpak -y
-RUN apt install flatpak-builder -y
+RUN apt install flatpak flatpak-builder -y
 
 # Install remote
 RUN flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
