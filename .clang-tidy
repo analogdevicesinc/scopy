@@ -1,0 +1,5 @@
+---
+Checks:          '-*, readability-isolate-declaration, readability-braces-around-statements'
+WarningsAsErrors: '*'
+HeaderFilterRegex: ''
+FormatStyle:     file
