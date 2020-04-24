@@ -88,25 +88,28 @@ bool SignalGenerator::riffCompare(riff_header_t& ptr, const char* id2)
 {
 	const char riff[] = "RIFF";
 
-	for (uint8_t i = 0; i < 4; i++)
+	for (uint8_t i = 0; i < 4; i++) {
 		if (ptr.riff[i] != riff[i]) {
 			return false;
 		}
+	}
 
-	for (uint8_t i = 0; i < 4; i++)
+	for (uint8_t i = 0; i < 4; i++) {
 		if (ptr.id[i] != id2[i]) {
 			return false;
 		}
+	}
 
 	return true;
 }
 
 bool SignalGenerator::chunkCompare(chunk_header_t& ptr, const char* id2)
 {
-	for (uint8_t i = 0; i < 4; i++)
+	for (uint8_t i = 0; i < 4; i++) {
 		if (ptr.id[i] != id2[i]) {
 			return false;
 		}
+	}
 
 	return true;
 }
@@ -824,9 +827,11 @@ QSharedPointer<signal_generator_data> SignalGenerator::getData(QWidget* obj)
 
 void SignalGenerator::resizeTabWidget(int index)
 {
-	for (int i = 0; i < ui->tabWidget->count(); i++)
-		if (i != index)
+	for (int i = 0; i < ui->tabWidget->count(); i++) {
+		if (i != index) {
 			ui->tabWidget->widget(i)->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+		}
+	}
 	ui->tabWidget->widget(index)->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 	ui->tabWidget->widget(index)->resize(ui->tabWidget->widget(index)->minimumSizeHint());
 	ui->tabWidget->widget(index)->adjustSize();
@@ -952,8 +957,9 @@ bool SignalGenerator::loadParametersFromFile(QSharedPointer<signal_generator_dat
 			ptr->file_nr_of_samples.push_back(0);
 			ptr->file_type = FORMAT_NO_FILE;
 		}
-		if (!ok)
+		if (!ok) {
 			return false;
+		}
 
 		riff_header_t riff;
 		chunk_header_t chunk;
@@ -1011,8 +1017,9 @@ bool SignalGenerator::loadParametersFromFile(QSharedPointer<signal_generator_dat
 		ptr->file_data.clear();
 		ptr->file_nr_of_channels = fileManager->getNrOfChannels();
 
-		if (fileManager->getSampleRate())
+		if (fileManager->getSampleRate()) {
 			ptr->file_sr = fileManager->getSampleRate();
+		}
 
 		ptr->file_channel = 0; // autoselect channel 0
 		for (auto i = 0; i < ptr->file_nr_of_channels; i++) {
@@ -1069,11 +1076,12 @@ bool SignalGenerator::loadParametersFromFile(QSharedPointer<signal_generator_dat
 	ui->fileChannel->setEnabled(ptr->file_nr_of_channels > 1);
 
 	std::shared_ptr<GenericDac> dac;
-	for (auto ch : channel_dac)
+	for (auto ch : channel_dac) {
 		if (ptr->iio_ch == ch.first) {
 			dac = ch.second;
 			break;
 		}
+	}
 
 	for (auto ch_samples : ptr->file_nr_of_samples) {
 		if (ch_samples > dac->maxNumberOfSamples()) {
@@ -1365,8 +1373,10 @@ basic_block_sptr SignalGenerator::getSignalSource(gr::top_block_sptr top, double
 	analog::gr_waveform_t waveform;
 	double phase;
 	double amplitude;
-	double rise = 0.5, fall = 0.5;
-	double holdh = 0.0, holdl = 0.0;
+	double rise = 0.5;
+	double fall = 0.5;
+	double holdh = 0.0;
+	double holdl = 0.0;
 	float offset;
 
 	amplitude = data.amplitude / 2.0;
@@ -1381,10 +1391,11 @@ basic_block_sptr SignalGenerator::getSignalSource(gr::top_block_sptr top, double
 		phase = phase + 360.0;
 	}
 
-	if (data.waveform == SG_SIN_WAVE)
+	if (data.waveform == SG_SIN_WAVE) {
 		waveform = analog::GR_SIN_WAVE;
-	else
+	} else {
 		waveform = analog::GR_TRA_WAVE;
+	}
 
 	boost::shared_ptr<analog::sig_source_f> src =
 		analog::sig_source_f::make(samp_rate, waveform, data.frequency, amplitude, offset, phase * 0.01745329);
@@ -1441,8 +1452,9 @@ void SignalGenerator::loadFileChannelData(int chIdx)
 	}
 
 	ptr->file_data.clear();
-	if (ptr->file_type == FORMAT_WAVE || ptr->file_type == FORMAT_MAT) // let GR flow load data
+	if (ptr->file_type == FORMAT_WAVE || ptr->file_type == FORMAT_MAT) { // let GR flow load data
 		return;
+	}
 	try {
 		fileManager->open(ptr->file, FileManager::IMPORT);
 
@@ -1597,7 +1609,8 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget* obj, double samp_rate, 
 
 			if (preview) {
 				auto ratio = sample_rate / ptr->file_sr;
-				long m, n;
+				long m;
+				long n;
 				bool ok = false;
 				for (auto precision = 8; precision < 2048; precision <<= 1) {
 					reduceFraction(ratio, &m, &n, precision);
@@ -1793,8 +1806,9 @@ void SignalGenerator::updateRightMenuForChn(int chIdx)
 
 	ui->label_path->setText(ptr->file);
 	ui->label_format->setText(ptr->file_message);
-	if (!ptr->file_nr_of_samples.empty())
+	if (!ptr->file_nr_of_samples.empty()) {
 		ui->label_size->setText(QString::number(ptr->file_nr_of_samples[ptr->file_channel]) + tr(" samples"));
+	}
 	ui->mathWidget->setFunction(ptr->function);
 	mathFrequency->setValue(ptr->math_freq);
 	fileSampleRate->setValue(ptr->file_sr);
@@ -2056,7 +2070,8 @@ double SignalGenerator::get_best_ratio(double ratio, double max, double* fract)
 	double best_fract = 1.0;
 
 	for (double i = 1.0; i < max_it; i += 1.0) {
-		double integral, new_ratio = i * ratio;
+		double integral;
+		double new_ratio = i * ratio;
 		double new_fract = modf(new_ratio, &integral);
 
 		if (new_fract < best_fract) {
@@ -2104,7 +2119,8 @@ size_t SignalGenerator::get_samples_count(const struct iio_device* dev, double r
 
 		QWidget* w = static_cast<QWidget*>(iio_channel_get_data(chn));
 		auto ptr = getData(w);
-		double ratio, fract;
+		double ratio;
+		double fract;
 
 		switch (ptr->type) {
 		case SIGNAL_TYPE_WAVEFORM:
@@ -2125,8 +2141,9 @@ size_t SignalGenerator::get_samples_count(const struct iio_device* dev, double r
 
 			// for less than max sample rates, generate at least 10
 			// samples per period
-			if (ratio < 10.0 && rate < max_sample_rate)
+			if (ratio < 10.0 && rate < max_sample_rate) {
 				return 0;
+			}
 			if (ratio < 2.0) {
 				return 0; /* rate too low */
 			}
