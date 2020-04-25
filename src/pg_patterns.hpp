@@ -433,7 +433,8 @@ class I2CPattern: virtual public Pattern
 	void sample_bit(bool bit);
 	void sample_start_bit();
 	void sample_address();
-	void sample_ack();
+	void sample_send_ack();
+	void sample_await_ack();
 	void sample_payload();
 	void sample_stop();
 public:
