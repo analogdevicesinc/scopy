@@ -1616,9 +1616,14 @@ void I2CPattern::sample_address()
 
 }
 
-void I2CPattern::sample_ack()
+void I2CPattern::sample_send_ack()
 {
 	sample_bit(0);
+}
+
+void I2CPattern::sample_await_ack()
+{
+	sample_bit(1);
 }
 
 void I2CPattern::sample_payload()
@@ -1647,7 +1652,11 @@ void I2CPattern::sample_payload()
 			sample_bit(bit);
 		}
 
-		sample_ack();
+		if (read) {
+			sample_send_ack();
+		} else {
+			sample_await_ack();
+		}
 	}
 }
 
@@ -1677,7 +1686,7 @@ uint8_t I2CPattern::generate_pattern(uint32_t sample_rate,
 
 	sample_start_bit();
 	sample_address();
-	sample_ack();
+	sample_await_ack();
 	sample_payload();
 	sample_stop();
 	return 0;
