@@ -1,7 +1,5 @@
 #!/usr/bin/bash.exe
 
-set -e
-
 SCOPY_MINGW_BUILD_DEPS_FORK=analogdevicesinc
 SCOPY_MINGW_BUILD_DEPS_BRANCH=master
 
