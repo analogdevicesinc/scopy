@@ -125,7 +125,12 @@ find_package(Boost COMPONENTS system filesystem thread REQUIRED)
 set(VC_PATH "$ENV{VS120COMNTOOLS}/../../VC")
 find_library(IIO_LIBRARIES NAMES iio libiio PATHS ${VC_PATH}/lib ${VC_PATH}/lib/amd64)
 find_library(M2K_LIBRARIES NAMES m2k libm2k)
-find_library(MATIO_LIBRARIES NAMES matio)
+
+if (ENABLE_MATIO)
+	message("-- Building with MATLAB support for SignalGenerator")
+	find_library(MATIO_LIBRARIES REQUIRED NAMES matio)
+	add_definitions(-DMATLAB_SUPPORT_SIGGEN)
+endif()
 
 find_path(IIO_INCLUDE_DIRS iio.h PATHS ${VC_PATH}/include)
 find_path(M2K_INCLUDE_DIRS libm2k/m2k.hpp)
