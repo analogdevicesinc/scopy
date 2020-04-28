@@ -61,7 +61,10 @@
 #include <iio/device_sink.h>
 #include <scopy/math.h>
 #include <scopy/trapezoidal.h>
+
+#ifdef MATLAB_SUPPORT_SIGGEN
 #include <matio.h>
+#endif
 
 #include <iio.h>
 
@@ -1146,6 +1149,7 @@ bool SignalGenerator::loadParametersFromFile(
 		ptr->file_message="CSV";
 	}
 
+#ifdef MATLAB_SUPPORT_SIGGEN
 	if (ptr->file_type==FORMAT_MAT) {
 		mat_t *matfp;
 		matvar_t *matvar;
@@ -1180,7 +1184,7 @@ bool SignalGenerator::loadParametersFromFile(
 
 		Mat_Close(matfp);
 	}
-
+#endif
 
 	if (ptr->file_nr_of_channels==0) {
 		ptr->file_message+="File not loaded due to errors";
@@ -1590,6 +1594,7 @@ void SignalGenerator::loadFileChannelData(int chIdx)
 			}
 		}
 
+#ifdef MATLAB_SUPPORT_SIGGEN
 		if (ptr->file_type==FORMAT_MAT) {
 			mat_t *matfp;
 			matvar_t *matvar;
@@ -1612,6 +1617,7 @@ void SignalGenerator::loadFileChannelData(int chIdx)
 			Mat_Close(matfp);
 			return;
 		}
+#endif
 
 	} catch(FileManagerException &e) {
 		ptr->file_message=QString::fromLocal8Bit(e.what());
