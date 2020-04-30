@@ -36,11 +36,6 @@ DEBUG_FOLDER=debug_$ARCH_BIT
 cd /c
 source ${WORKDIR}/CI/appveyor/install_msys_deps.sh
 
-# Download a 32-bit version of windres.exe
-cd ${WORKDIR}
-wget http://swdownloads.analog.com/cse/build/windres.exe.gz
-gunzip windres.exe.gz
-
 echo "### Building Scopy ..."
 /$MINGW_VERSION/bin/python3.exe --version
 mkdir /c/$BUILD_FOLDER
