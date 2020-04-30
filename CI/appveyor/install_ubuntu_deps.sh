@@ -19,11 +19,13 @@ WORKDIR=${PWD}
 
 sudo add-apt-repository -y ppa:gnuradio/gnuradio-releases
 
-sudo apt-get -y install libxml2-dev libxml2 flex bison swig libpython3-all-dev python3 python3-numpy libfftw3-bin libfftw3-dev libfftw3-3 liblog4cpp5v5 liblog4cpp5-dev libboost1.65-dev libboost1.65 g++ git cmake autoconf libzip4 libzip-dev libglib2.0-dev libsigc++-2.0-dev libglibmm-2.4-dev doxygen qt5-default qtcreator qttools5-dev qttools5-dev-tools curl libvolk1-bin libvolk1-dev libvolk1.3 libgmp-dev libqt5svg5-dev libmatio-dev liborc-0.4-dev qtdeclarative5-dev
+sudo apt-get -y install libxml2-dev libxml2 flex bison swig libpython3-all-dev python3 python3-numpy libfftw3-bin libfftw3-dev libfftw3-3 liblog4cpp5v5 liblog4cpp5-dev libboost1.65-dev libboost1.65 g++ git cmake autoconf libzip4 libzip-dev libglib2.0-dev libsigc++-2.0-dev libglibmm-2.4-dev doxygen curl libvolk1-bin libvolk1-dev libvolk1.3 libgmp-dev libqt5svg5-dev libmatio-dev liborc-0.4-dev # libsigrokdecode-dev libsigrokdecode4
 
 sudo apt-get -y update
 sudo apt-get -y install gnuradio
 
+wget download.qt.io/official_releases/qt/5.14/5.14.2/qt-opensource-linux-x64-5.14.2.run
+./qt-opensource-linux-x64-5.14.2.run
 
 build_libiio() {
 	echo "### Building libiio - branch $LIBIIO_BRANCH"

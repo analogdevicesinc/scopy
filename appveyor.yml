@@ -25,17 +25,18 @@ environment:
         - ARCH: x86_64
           ARCH_BIT: 64
           APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu1804
-          BUILD_DEPS_CMD: "/home/appveyor/projects/scopy/CI/appveyor/install_ubuntu_deps.sh"
-          BUILD_CMD: "/home/appveyor/projects/scopy/CI/appveyor/build_appveyor_ubuntu.sh"
-          DEPLOY_FILE: ""
-
-        - ARCH: x86_64
-          ARCH_BIT: 64
-          APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu1804
           BUILD_DEPS_CMD: "/home/appveyor/projects/scopy/CI/appveyor/build_appveyor_flatpak.sh $BRANCH $REPO"
           BUILD_CMD: ""
           DEPLOY_FILE: "/home/appveyor/projects/scopy/Scopy.flatpak"
-         
+
+#        - ARCH: x86_64
+#          ARCH_BIT: 64
+#          APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu1804
+#          BUILD_DEPS_CMD: "/home/appveyor/projects/scopy/CI/appveyor/install_ubuntu_deps.sh"
+#          BUILD_CMD: "/home/appveyor/projects/scopy/CI/appveyor/build_appveyor_ubuntu.sh"
+#          DEPLOY_FILE: ""
+
+                 
 matrix:
     fast_finish: true
 
