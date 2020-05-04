@@ -90,7 +90,7 @@ private:
 	void triggerRightMenuToggle(CustomPushButton *, bool checked);
 	void toggleRightMenu(CustomPushButton *, bool checked);
 	void settingsPanelUpdate(int id);
-	void updateBufferPreviewer();
+	void updateBufferPreviewer(int64_t min, int64_t max);
 	void initBufferScrolling();
 
 	void startStop(bool start);

@@ -126,20 +126,15 @@ LogicAnalyzer::LogicAnalyzer(iio_context *ctx, adiscope::Filter *filt,
 	m_plot.zoomBaseUpdate();
 
 	connect(&m_plot, &CapturePlot::timeTriggerValueChanged, [=](double value){
-		double delay = value / (1.0 / m_sampleRate);
+		double delay = (value - 1.0 / m_sampleRate * m_bufferSize / 2.0 ) / (1.0 / m_sampleRate);
 		onTimeTriggerValueChanged(static_cast<int>(delay));
 	});
 
 
 	m_plot.enableXaxisLabels();
 
-//	m_plot.setTimeTriggerInterval(-500000, 500000);
-
 	initBufferScrolling();
 
-
-	// TODO: scroll area on plot canvas
-	// TODO: channel groups
 	m_plotScrollBar->setRange(0, 100);
 
 	// setup decoders
@@ -284,17 +279,18 @@ void LogicAnalyzer::onTimeTriggerValueChanged(double value)
 	m_plot.cancelZoom();
 	m_plot.zoomBaseUpdate();
 
-//	qDebug() << "timeTriggermoved sample: " << value << "  time: " << value * (1.0 / m_sampleRate);
-	m_plot.setHorizOffset(value * (1.0 / m_sampleRate));
+	m_timeTriggerOffset = value * (1.0 / m_sampleRate);
+
+	m_plot.setHorizOffset(1.0 / m_sampleRate * m_bufferSize / 2.0 + m_timeTriggerOffset);
 	m_plot.replot();
 
 	if (m_resetHorizAxisOffset) {
-		m_horizOffset = value * (1.0 / m_sampleRate);
+		m_horizOffset = 1.0 / m_sampleRate * m_bufferSize / 2.0 + m_timeTriggerOffset;
 	}
 
 	m_m2kDigital->getTrigger()->setDigitalDelay(value);
 
-	updateBufferPreviewer();
+	updateBufferPreviewer(0, m_lastCapturedSample);
 }
 
 void LogicAnalyzer::onSampleRateValueChanged(double value)
@@ -304,8 +300,8 @@ void LogicAnalyzer::onSampleRateValueChanged(double value)
 
 	if (ui->btnStreamOneShot->isChecked()) { // oneshot
 		m_plot.cancelZoom();
-		m_timePositionButton->setValue(0);
-		m_plot.setHorizOffset(value * (1.0 / m_sampleRate));
+		m_timePositionButton->setValue(m_timeTriggerOffset);
+		m_plot.setHorizOffset(1.0 / m_sampleRate * m_bufferSize / 2.0 + m_timeTriggerOffset);
 		m_plot.replot();
 		m_plot.zoomBaseUpdate();
 	} else { // streaming
@@ -323,22 +319,21 @@ void LogicAnalyzer::onSampleRateValueChanged(double value)
 	m_plot.zoomBaseUpdate();
 	m_plot.replot();
 
-	updateBufferPreviewer();
+	updateBufferPreviewer(0, m_lastCapturedSample);
 
-	double minT = -(1 << 13) * (1.0 / m_sampleRate); // 8192 * time between samples
-	double maxT = ((1 << 13) - 1) * (1.0 / m_sampleRate); // (2 << 13) - 1 max hdl fifo depth
-	m_plot.setTimeTriggerInterval(-maxT, -minT);
+	double maxT = (1 << 13) * (1.0 / m_sampleRate) - 1.0 / m_sampleRate * m_bufferSize / 2.0; // 8192 * time between samples
+	double minT = -((1 << 13) - 1) * (1.0 / m_sampleRate) - 1.0 / m_sampleRate * m_bufferSize / 2.0; // (2 << 13) - 1 max hdl fifo depth
+	m_plot.setTimeTriggerInterval(minT, maxT);
 }
 
 void LogicAnalyzer::onBufferSizeChanged(double value)
 {
-	qDebug() << "Buffer size: " << value;
 	m_bufferSize = value;
 
 	if (ui->btnStreamOneShot->isChecked()) { // oneshot
 		m_plot.cancelZoom();
-		m_timePositionButton->setValue(0);
-		m_plot.setHorizOffset(value * (1.0 / m_sampleRate));
+		m_timePositionButton->setValue(m_timeTriggerOffset);
+		m_plot.setHorizOffset(1.0 / m_sampleRate * m_bufferSize / 2.0 + m_timeTriggerOffset);
 		m_plot.replot();
 		m_plot.zoomBaseUpdate();
 	} else { // streaming
@@ -355,7 +350,11 @@ void LogicAnalyzer::onBufferSizeChanged(double value)
 	m_plot.zoomBaseUpdate();
 	m_plot.replot();
 
-	updateBufferPreviewer();
+	updateBufferPreviewer(0, m_lastCapturedSample);
+
+	double maxT = (1 << 13) * (1.0 / m_sampleRate) - 1.0 / m_sampleRate * m_bufferSize / 2.0; // 8192 * time between samples
+	double minT = -((1 << 13) - 1) * (1.0 / m_sampleRate) - 1.0 / m_sampleRate * m_bufferSize / 2.0; // (2 << 13) - 1 max hdl fifo depth
+	m_plot.setTimeTriggerInterval(minT, maxT);
 }
 
 void LogicAnalyzer::on_btnStreamOneShot_toggled(bool toggled)
@@ -369,8 +368,8 @@ void LogicAnalyzer::on_btnStreamOneShot_toggled(bool toggled)
 
 	if (toggled) { // oneshot
 		m_plot.cancelZoom();
-		m_timePositionButton->setValue(0);
-		m_plot.setHorizOffset(0);
+		m_timePositionButton->setValue(m_timeTriggerOffset);
+		m_plot.setHorizOffset(1.0 / m_sampleRate * m_bufferSize / 2.0 - m_timeTriggerOffset);
 		m_plot.replot();
 		m_plot.zoomBaseUpdate();
 	} else { // streaming
@@ -650,7 +649,7 @@ void LogicAnalyzer::connectSignalsAndSlots()
 	cr_ui->horizontalSlider->setSliderPosition(100);
 
 	connect(m_plot.getZoomer(), &OscPlotZoomer::zoomFinished, [=](bool isZoomOut){
-		updateBufferPreviewer();
+		updateBufferPreviewer(0, m_lastCapturedSample);
 	});
 
 	connect(m_sampleRateButton, &ScaleSpinButton::valueChanged,
@@ -659,7 +658,7 @@ void LogicAnalyzer::connectSignalsAndSlots()
 		this, &LogicAnalyzer::onBufferSizeChanged);
 
 	connect(&m_plot, &CapturePlot::timeTriggerValueChanged, [=](double value){
-		double delay = value / (1.0 / m_sampleRate);
+		double delay = (value - 1.0 / m_sampleRate * m_bufferSize / 2.0 ) / (1.0 / m_sampleRate);
 		m_timePositionButton->setValue(static_cast<int>(delay));
 	});
 
@@ -818,7 +817,7 @@ void LogicAnalyzer::settingsPanelUpdate(int id)
 	ui->stackedWidget->adjustSize();
 }
 
-void LogicAnalyzer::updateBufferPreviewer()
+void LogicAnalyzer::updateBufferPreviewer(int64_t min, int64_t max)
 {
 	// Time interval within the plot canvas
 	QwtInterval plotInterval = m_plot.axisInterval(QwtPlot::xBottom);
@@ -828,8 +827,8 @@ void LogicAnalyzer::updateBufferPreviewer()
 	long long totalSamples = m_bufferSize;
 
 	if (totalSamples > 0) {
-		dataInterval.setMinValue(-((m_bufferSize / m_sampleRate) / 2.0 - (m_timePositionButton->value() * (1.0 / m_sampleRate))));
-		dataInterval.setMaxValue((m_bufferSize / m_sampleRate) / 2.0 + (m_timePositionButton->value() * (1.0 / m_sampleRate)));
+		dataInterval.setMinValue(-((min / m_sampleRate) - (m_timePositionButton->value() * (1.0 / m_sampleRate))));
+		dataInterval.setMaxValue((max / m_sampleRate) + (m_timePositionButton->value() * (1.0 / m_sampleRate)));
 	}
 
 	// Use the two intervals to determine the width and position of the
@@ -862,8 +861,6 @@ void LogicAnalyzer::updateBufferPreviewer()
 
 void LogicAnalyzer::initBufferScrolling()
 {
-	// TODO: remove extra signal for plot size changeee!!!!!!!
-
 	connect(m_plot.getZoomer(), &OscPlotZoomer::zoomFinished, [=](bool isZoomOut){
 		m_horizOffset = m_plot.HorizOffset();
 	});
@@ -880,16 +877,16 @@ void LogicAnalyzer::initBufferScrolling()
 		moveTo = value * xAxisWidth / width;
 		m_plot.setHorizOffset(moveTo + m_horizOffset);
 		m_plot.replot();
-		updateBufferPreviewer();
+		updateBufferPreviewer(0, m_lastCapturedSample);
 	});
 	connect(m_bufferPreviewer, &BufferPreviewer::bufferStopDrag, [=](){
 		m_horizOffset = m_plot.HorizOffset();
 		m_resetHorizAxisOffset = true;
 	});
 	connect(m_bufferPreviewer, &BufferPreviewer::bufferResetPosition, [=](){
-		m_plot.setHorizOffset(m_timeTriggerOffset);
+		m_plot.setHorizOffset(1.0 / m_sampleRate * m_bufferSize / 2.0  + m_timeTriggerOffset);
 		m_plot.replot();
-		updateBufferPreviewer();
+		updateBufferPreviewer(0, m_lastCapturedSample);
 		m_horizOffset = m_timeTriggerOffset;
 	});
 }
@@ -915,8 +912,8 @@ void LogicAnalyzer::startStop(bool start)
 		const bool oneShotOrStream = ui->btnStreamOneShot->isChecked();
 		qDebug() << "stream one shot is set to: " << oneShotOrStream;
 
-		const double delay = oneShotOrStream ? m_timePositionButton->value()
-					       : (m_bufferSize / 2.0);
+		const double delay = oneShotOrStream ? m_timeTriggerOffset * m_sampleRate
+					       : 0;
 
 		const double setSampleRate = m_m2kDigital->setSampleRateIn(sampleRate);
 		m_sampleRateButton->setValue(setSampleRate);
@@ -980,9 +977,9 @@ void LogicAnalyzer::startStop(bool start)
 				} catch (std::invalid_argument &e) {
 					qDebug() << e.what();
 				}
-
+				m_lastCapturedSample = bufferSize;
 				Q_EMIT dataAvailable(0, bufferSize);
-
+				updateBufferPreviewer(0, m_lastCapturedSample);
 			} else {
 				uint64_t chunks = 4;
 				while ((bufferSizeAdjusted >> chunks) > (1 << 19)) {
@@ -1020,6 +1017,7 @@ void LogicAnalyzer::startStop(bool start)
 								  "replot",
 								  Qt::QueuedConnection);
 					m_lastCapturedSample = absIndex;
+					updateBufferPreviewer(0, m_lastCapturedSample);
 
 				} while (totalSamples);
 			}
@@ -1134,7 +1132,10 @@ void LogicAnalyzer::setupDecoders()
 
 		curve->setSampleRate(m_sampleRate);
 		curve->setBufferSize(m_bufferSize);
-		curve->setTimeTriggerOffset(m_timeTriggerOffset);
+
+		const double delay = ui->btnStreamOneShot ? m_timeTriggerOffset * m_sampleRate
+					       : 0;
+		curve->setTimeTriggerOffset(delay);
 
 		curve->dataAvailable(0, m_lastCapturedSample);
 
@@ -1337,15 +1338,6 @@ void LogicAnalyzer::updateChannelGroupWidget(bool visible)
 
 void LogicAnalyzer::setupTriggerMenu()
 {
-	/*
-	 * TODO: explain some things maybe
-	 *
-	 *
-	 *
-	 *
-	 * */
-
-
 	connect(ui->btnTriggerMode, &CustomSwitch::toggled, [=](bool toggled){
 		m_autoMode = toggled;
 

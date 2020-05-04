@@ -101,8 +101,8 @@ void GenericLogicPlotCurve::setBufferSize(uint64_t bufferSize)
 uint64_t GenericLogicPlotCurve::fromTimeToSample(double time) const
 {
 	const double totalTime = static_cast<double>(m_bufferSize) / m_sampleRate;
-	const double tmin = -(totalTime / 2.0 - (m_timeTriggerOffset * (1.0 / m_sampleRate)));
-	const double tmax = totalTime / 2.0 + (m_timeTriggerOffset * (1.0 / m_sampleRate));
+	const double tmin = (m_timeTriggerOffset * (1.0 / m_sampleRate));
+	const double tmax = totalTime + (m_timeTriggerOffset * (1.0 / m_sampleRate));
 	const double smin = 0;
 	const double smax = m_bufferSize;
 
@@ -120,8 +120,8 @@ uint64_t GenericLogicPlotCurve::fromTimeToSample(double time) const
 double GenericLogicPlotCurve::fromSampleToTime(uint64_t sample) const
 {
 	const double totalTime = static_cast<double>(m_bufferSize) / m_sampleRate;
-	const double tmin = -(totalTime / 2.0 - (m_timeTriggerOffset * (1.0 / m_sampleRate)));
-	const double tmax = totalTime / 2.0 + (m_timeTriggerOffset * (1.0 / m_sampleRate));
+	const double tmin = (m_timeTriggerOffset * (1.0 / m_sampleRate));
+	const double tmax = totalTime + (m_timeTriggerOffset * (1.0 / m_sampleRate));
 	const double smin = 0;
 	const double smax = m_bufferSize;
 
