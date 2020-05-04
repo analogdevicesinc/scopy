@@ -54,7 +54,7 @@ std::pair<uint64_t, uint64_t> RowData::get_annotation_subset(uint64_t start_samp
         }
     }
 
-    if (!last && first > 0) {
+    if (!last && first > 0 && first < annotations_.size() - 1) {
         last = first + 1;
     }
 
