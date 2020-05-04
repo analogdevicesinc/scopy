@@ -27,10 +27,11 @@
 #include <QDateTime>
 #include <QFontDatabase>
 #include <QTranslator>
-
+#include <QLocale>
 #include "config.h"
 #include "tool_launcher.hpp"
 #include "scopyApplication.hpp"
+
 
 using namespace adiscope;
 
@@ -111,19 +112,34 @@ int main(int argc, char **argv)
 	QFile f(path+"Preferences.ini");
 	f.open(QFile::ReadOnly);
 	QTextStream in (&f);
-	const QStringList content = in.readAll().split("\n");
+    const QStringList content = in.readAll().split("\n");
 	QString language="default";
-	for(auto s : content)
-	{
-		if(s.startsWith("language"))
-		{
-			language=s.split("=")[1];
+	for(auto s : content) {
+		if(s.startsWith("language")) {
+			language=s.split("=")[1].trimmed();
 		}
 	}
 
-	qDebug()<<language;
+	QString languageFileName;
+	QString osLanguage = QLocale::system().name().split("_")[0];
+	QDir directory(QCoreApplication::applicationDirPath()+"/resources/languages");
+	QStringList languages = directory.entryList(QStringList() << "*.qm",QDir::Files);
+	if(language == "auto"){
+		if(languages.contains("scopy_"+osLanguage+".qm")) {
+			languageFileName = QDir(QCoreApplication::applicationDirPath()+"/resources/languages/scopy_"+osLanguage+".qm").path();
+		}
+		else{
+			languageFileName = QDir(QCoreApplication::applicationDirPath()+"/resources/languages/scopy_en.qm").path();
+		}
+	}
+	else if(languages.contains(language+".qm")) {
+		languageFileName=QDir(QCoreApplication::applicationDirPath()+"/resources/languages/"+language+".qm").path();
+	}
+	else { 
+		languageFileName = language;
+	}
 
-	QString languageFileName=QDir(QCoreApplication::applicationDirPath()+"/resources/languages/"+language+".qm").path();
+	f.close();
 	myappTranslator.load(languageFileName);
 	app.installTranslator(&myappTranslator);
 
@@ -173,3 +189,4 @@ int main(int argc, char **argv)
 	}
 	return app.exec();
 }
+
