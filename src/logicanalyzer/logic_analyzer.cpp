@@ -24,7 +24,7 @@ using namespace adiscope;
 using namespace adiscope::logic;
 
 constexpr int MAX_BUFFER_SIZE_ONESHOT = 4 * 1024 * 1024; // 4M
-constexpr int MAX_BUFFER_SIZE_STREAM = 1 * 1024 * 1024 * 1024; // 1G
+constexpr int MAX_BUFFER_SIZE_STREAM = 64 * 4 * 1024 * 1024; // 64 x 4M
 
 LogicAnalyzer::LogicAnalyzer(iio_context *ctx, adiscope::Filter *filt,
 			     adiscope::ToolMenuItem *toolMenuItem,
@@ -383,6 +383,7 @@ void LogicAnalyzer::on_btnStreamOneShot_toggled(bool toggled)
 
 	m_bufferSizeButton->setMaxValue(toggled ? MAX_BUFFER_SIZE_ONESHOT
 						: MAX_BUFFER_SIZE_STREAM);
+	m_bufferPreviewer->setCursorVisible(toggled);
 }
 
 void LogicAnalyzer::on_btnGroupChannels_toggled(bool checked)
