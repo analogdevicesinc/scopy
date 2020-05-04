@@ -98,12 +98,21 @@ public:
 
 	bool getShowADCFilters() const ;
 	void setShowADCFilters(bool value);
+ 
 	QStringList getLanguageList();
+	QStringList getOptionsList();
+	bool hasNativeDialogs() const ;
+	void setNativeDialogs(bool value);
 
 Q_SIGNALS:
 
 	void notify();
 	void reset();
+
+public Q_SLOTS:
+	
+	QString loadLanguage();
+
 
 private Q_SLOTS:
 
@@ -132,6 +141,7 @@ private:
 	bool mini_hist_enabled;
 	bool digital_decoders_enabled;
 	bool m_initialized;
+	bool m_useNativeDialogs;
 	QString language;
 
 	Preferences_API *pref_api;

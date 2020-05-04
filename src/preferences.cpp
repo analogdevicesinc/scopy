@@ -23,9 +23,12 @@
 #include "dynamicWidget.hpp"
 
 #include <QElapsedTimer>
-#include <QDebug>
 #include <QDir>
 #include <QMessageBox>
+#include <QFileDialog>
+#include <QFile>
+#include <QFileInfo>
+#include <QTextStream>
 
 using namespace adiscope;
 
@@ -52,7 +55,8 @@ Preferences::Preferences(QWidget *parent) :
 	digital_decoders_enabled(true),
 	m_initialized(false),
 	show_ADC_digital_filters(false),
-	language("english")
+	m_useNativeDialogs(true),
+	language("auto")
 {
 	ui->setupUi(this);
 
@@ -152,24 +156,68 @@ Preferences::Preferences(QWidget *parent) :
 	});
 
 	ui->label_restart->setVisible(false);
-	ui->languageCombo->addItems(getLanguageList());
+	ui->languageCombo->addItems(getOptionsList());
 
 	QString preference_ini_file = getPreferenceIniFile();
 	QSettings settings(preference_ini_file, QSettings::IniFormat);
 
 	pref_api->setObjectName(QString("Preferences"));
 	pref_api->load(settings);
-
 	connect(ui->languageCombo, &QComboBox::currentTextChanged, [=](QString lang) {
-		language = lang;
-		if (m_initialized)
-			ui->label_restart->setVisible(true);
-		else
-			m_initialized = true;
-		Q_EMIT notify();
+			if(lang=="browse"){
+				QString langtemp = loadLanguage();
+				if(!langtemp.isEmpty()){
+					language=langtemp;
+					ui->languageCombo->addItem(language);
+					ui->languageCombo->setCurrentText(language);
+					if (m_initialized)
+						ui->label_restart->setVisible(true);
+					else
+						m_initialized = true;
+						}
+				else{
+					if(!getLanguageList().contains(language)){
+						QFileInfo info(language);
+						language = info.fileName().remove(".qm");
+						}
+					ui->languageCombo->setCurrentText(language);
+					ui->label_restart->setVisible(false);
+				}
+				}
+			else{
+				language = lang;
+				if (m_initialized)
+					ui->label_restart->setVisible(true);
+				else
+					m_initialized = true;
+        			}
+			Q_EMIT notify();
 	});
 }
 
+QStringList Preferences::getOptionsList()
+{   
+	QFile f(getPreferenceIniFile());
+	f.open(QFile::ReadOnly);
+    QTextStream in (&f);
+	const QStringList content = in.readAll().split("\n");
+	QString language;
+	for(auto s : content) {
+		if(s.startsWith("language")){
+			language=s.split("=")[1].trimmed();
+        		}
+    	}
+
+	QStringList options; 
+	if(!getLanguageList().contains(language) && language.endsWith(".qm")){
+		QFileInfo info(language);
+		options<<info.fileName().remove(".qm")<<getLanguageList()<<"auto"<<"browse";
+		ui->languageCombo->setCurrentText(info.fileName().remove(".qm"));
+	}
+	else
+		options<<getLanguageList()<<"auto"<<"browse";
+	return options;
+}
 
 QStringList Preferences::getLanguageList()
 {
@@ -198,6 +246,7 @@ void Preferences::notifyChange()
 
 void Preferences::showEvent(QShowEvent *event)
 {
+
 	setDynamicProperty(ui->sigGenNrPeriods, "invalid", false);
 	setDynamicProperty(ui->sigGenNrPeriods, "valid", true);
 
@@ -587,6 +636,27 @@ bool Preferences_API::getDigitalDecoders() const
 void Preferences_API::setDigitalDecoders(bool enabled)
 {
 	preferencePanel->digital_decoders_enabled = enabled;
+}
+bool Preferences::hasNativeDialogs() const
+{
+    return m_useNativeDialogs;
+}
+
+void Preferences::setNativeDialogs(bool nativeDialogs)
+{
+    m_useNativeDialogs = nativeDialogs;
+}
+
+QString Preferences::loadLanguage()
+{
+	QString validFile;
+	QString filePath = QFileDialog::getOpenFileName(this,
+			tr("Load language"), "", tr("Language files (*.qm)"),
+			nullptr, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+	if(!filePath.isEmpty())
+		validFile = filePath;
+	return validFile;
+
 }
 
 QString Preferences_API::getLanguage() const
