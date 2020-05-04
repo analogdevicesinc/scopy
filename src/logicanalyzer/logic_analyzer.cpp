@@ -46,7 +46,7 @@ LogicAnalyzer::LogicAnalyzer(iio_context *ctx, adiscope::Filter *filt,
 					{"k samples", 1E+3},
 					{"M samples", 1E+6},
 					{"G samples", 1E+9},
-					}, tr("Samples"), 1,
+					}, tr("Nr of samples"), 1,
 					MAX_BUFFER_SIZE_ONESHOT,
 					true, false, this, {1, 2, 5})),
 	m_timePositionButton(new PositionSpinButton({
@@ -54,8 +54,8 @@ LogicAnalyzer::LogicAnalyzer(iio_context *ctx, adiscope::Filter *filt,
 					 }, tr("Delay"), - (1 << 13),
 					 (1 << 13) - 1,
 					 true, false, this)),
-	m_sampleRate(1.0),
-	m_bufferSize(1),
+	m_sampleRate(1000000),
+	m_bufferSize(1000),
 	m_m2kContext(m2kOpen(ctx, "")),
 	m_m2kDigital(m_m2kContext->getDigital()),
 	m_nbChannels(m_m2kDigital->getNbChannelsIn()),
@@ -149,6 +149,12 @@ LogicAnalyzer::LogicAnalyzer(iio_context *ctx, adiscope::Filter *filt,
 	setupTriggerMenu();
 
 	m_timePositionButton->setStep(1);
+
+	// default: stream
+	ui->btnStreamOneShot->setChecked(false);
+
+	// default: cursors
+
 
 	api->setObjectName(QString::fromStdString(Filter::tool_name(
 							  TOOL_LOGIC_ANALYZER)));
@@ -563,6 +569,8 @@ void LogicAnalyzer::setupUi()
 		m_plot.moveCursorReadouts(position);
 	});
 
+	cursorsPositionButton->setPosition(CustomPlotPositionButton::ReadoutsPosition::bottomRight);
+
 	// Disable some options we don't need for this cursor settings panel
 	cr_ui->btnNormalTrack->setVisible(false);
 	cr_ui->label_3->setVisible(false);
@@ -573,7 +581,6 @@ void LogicAnalyzer::setupUi()
 	cr_ui->horizontalSlider->setMaximum(100);
 	cr_ui->horizontalSlider->setMinimum(0);
 	cr_ui->horizontalSlider->setSingleStep(1);
-	cr_ui->horizontalSlider->setSliderPosition(0);
 
 	ui->triggerComboBox->setDisabled(true);
 	ui->nameLineEdit->setDisabled(true);
@@ -638,6 +645,8 @@ void LogicAnalyzer::connectSignalsAndSlots()
 		cr_ui->transLabel->setText(tr("Transparency ") + QString::number(value) + "%");
 		m_plot.setCursorReadoutsTransparency(value);
 	});
+	// default: full transparency
+	cr_ui->horizontalSlider->setSliderPosition(100);
 
 	connect(m_plot.getZoomer(), &OscPlotZoomer::zoomFinished, [=](bool isZoomOut){
 		updateBufferPreviewer();
