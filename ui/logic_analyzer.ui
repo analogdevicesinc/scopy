@@ -620,6 +620,9 @@ image: url(:/icons/setup3_checked_hover.svg);
               <height>0</height>
              </size>
             </property>
+            <property name="styleSheet">
+             <string notr="true">QWidget {border:none;}</string>
+            </property>
             <layout class="QVBoxLayout" name="verticalLayout">
              <property name="spacing">
               <number>0</number>
@@ -648,7 +651,7 @@ image: url(:/icons/setup3_checked_hover.svg);
                 <string notr="true"/>
                </property>
                <property name="currentIndex">
-                <number>2</number>
+                <number>0</number>
                </property>
                <widget class="QWidget" name="channelSettings">
                 <property name="minimumSize">
@@ -696,7 +699,7 @@ image: url(:/icons/setup3_checked_hover.svg);
                       <x>0</x>
                       <y>0</y>
                       <width>310</width>
-                      <height>467</height>
+                      <height>469</height>
                      </rect>
                     </property>
                     <property name="sizePolicy">
@@ -1540,7 +1543,7 @@ font-weight: normal;
                       <x>0</x>
                       <y>0</y>
                       <width>300</width>
-                      <height>467</height>
+                      <height>242</height>
                      </rect>
                     </property>
                     <property name="sizePolicy">
