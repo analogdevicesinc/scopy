@@ -74,11 +74,12 @@ AnnotationDecoder::~AnnotationDecoder()
 	    m_decodeCanceled = true;
 	    srd_session_terminate_reset(m_srdSession);
 	    {
-		std::unique_lock<std::mutex> lock(m_newDataMutex);
-		m_newDataCv.notify_one();
+            std::unique_lock<std::mutex> lock(m_newDataMutex);
+            m_newDataCv.notify_one();
 	    }
 
-	    // TODO: set samplerate
+        srd_session_metadata_set(m_srdSession, SRD_CONF_SAMPLERATE,
+                                 g_variant_new_uint64(m_annotationCurve->getSampleRate()));
 	    for (const std::shared_ptr<logic::Decoder> &dec : m_stack) {
 		dec->apply_all_options();
 	    }
@@ -96,7 +97,9 @@ void AnnotationDecoder::stackDecoder(std::shared_ptr<logic::Decoder> decoder)
             m_newDataCv.notify_one();
         }
 
-        // TODO: set samplerate
+        srd_session_metadata_set(m_srdSession, SRD_CONF_SAMPLERATE,
+                                 g_variant_new_uint64(m_annotationCurve->getSampleRate()));
+        qDebug() << "SampleRate: " << m_annotationCurve->getSampleRate();
         for (const std::shared_ptr<logic::Decoder> &dec : m_stack) {
             dec->apply_all_options();
         }
@@ -122,7 +125,9 @@ void AnnotationDecoder::startDecode()
             m_newDataCv.notify_one();
         }
 
-        // TODO: set samplerate
+        srd_session_metadata_set(m_srdSession, SRD_CONF_SAMPLERATE,
+                                 g_variant_new_uint64(m_annotationCurve->getSampleRate()));
+                qDebug() << "SampleRate: " << m_annotationCurve->getSampleRate();
         for (const std::shared_ptr<logic::Decoder> &dec : m_stack) {
             dec->apply_all_options();
         }
@@ -203,7 +208,6 @@ void AnnotationDecoder::dataAvailable(uint64_t from, uint64_t to)
 //	Emplace new data segment in a queue as new data might arrive
 //	faster than libsigrokdecode can process
 
-	qDebug() << "Data segment: ( " << from << " , " << to << " ) available";
 	if (from != to) {
 		std::unique_lock<std::mutex> lock(m_newDataMutex);
 
@@ -223,7 +227,6 @@ std::vector<std::shared_ptr<logic::Decoder> > AnnotationDecoder::getDecoderStack
 
 void AnnotationDecoder::unassignChannel(uint16_t chId)
 {
-    // BUUUUG
     if (m_srdSession) {
         m_decodeCanceled = true;
         srd_session_terminate_reset(m_srdSession);
@@ -232,7 +235,9 @@ void AnnotationDecoder::unassignChannel(uint16_t chId)
             m_newDataCv.notify_one();
         }
 
-        // TODO: set samplerate
+        srd_session_metadata_set(m_srdSession, SRD_CONF_SAMPLERATE,
+                                 g_variant_new_uint64(m_annotationCurve->getSampleRate()));
+                qDebug() << "SampleRate: " << m_annotationCurve->getSampleRate();
         for (const std::shared_ptr<logic::Decoder> &dec : m_stack) {
             dec->apply_all_options();
         }
@@ -269,7 +274,6 @@ void AnnotationDecoder::reset()
 
 void AnnotationDecoder::assignChannel(uint16_t chId, uint16_t bitId)
 {
-    // BUUUUG
     if (m_srdSession) {
         m_decodeCanceled = true;
         srd_session_terminate_reset(m_srdSession);
@@ -278,7 +282,9 @@ void AnnotationDecoder::assignChannel(uint16_t chId, uint16_t bitId)
             m_newDataCv.notify_one();
         }
 
-        // TODO: set samplerate
+        srd_session_metadata_set(m_srdSession, SRD_CONF_SAMPLERATE,
+                                 g_variant_new_uint64(m_annotationCurve->getSampleRate()));
+                qDebug() << "SampleRate: " << m_annotationCurve->getSampleRate();
         for (const std::shared_ptr<logic::Decoder> &dec : m_stack) {
             dec->apply_all_options();
         }
