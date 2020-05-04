@@ -667,7 +667,7 @@ void FreePlotLineHandleV::paintEvent(QPaintEvent *)
 			QPointF textPos(0.0, m_height / 2.0 + textHeight / 4.0);
 
 			p.save();
-			p.setPen(QPen(QBrush(Qt::black), 20));
+			p.setPen(QPen(QBrush(Qt::white), 20));
 			p.setFont(QFont(fontFamily, fontSize));
 			p.drawText(textPos, m_name);
 			p.restore();
