@@ -25,7 +25,6 @@ using namespace adiscope::logic;
 
 constexpr int MAX_BUFFER_SIZE_ONESHOT = 4 * 1024 * 1024; // 4M
 constexpr int MAX_BUFFER_SIZE_STREAM = 64 * 4 * 1024 * 1024; // 64 x 4M
-constexpr int DIGITAL_NR_CHANNELS = 16;
 
 LogicAnalyzer::LogicAnalyzer(iio_context *ctx, adiscope::Filter *filt,
 			     adiscope::ToolMenuItem *toolMenuItem,
@@ -59,7 +58,7 @@ LogicAnalyzer::LogicAnalyzer(iio_context *ctx, adiscope::Filter *filt,
 	m_bufferSize(1000),
 	m_m2kContext(m2kOpen(ctx, "")),
 	m_m2kDigital(m_m2kContext->getDigital()),
-	m_nbChannels(DIGITAL_NR_CHANNELS),
+	m_nbChannels(m_m2kDigital->getNbChannelsIn()),
 	m_buffer(nullptr),
 	m_horizOffset(0.0),
 	m_timeTriggerOffset(0.0),
@@ -77,6 +76,8 @@ LogicAnalyzer::LogicAnalyzer(iio_context *ctx, adiscope::Filter *filt,
 	m_timer(new QTimer(this)),
 	m_timerTimeout(1000)
 {
+	qDebug() << m_m2kDigital << " " << m_m2kContext;
+
 	// setup ui
 	setupUi();
 
@@ -174,7 +175,7 @@ LogicAnalyzer::~LogicAnalyzer()
 
 	if (m_captureThread) {
 		m_stopRequested = true;
-		m_m2kDigital->cancelAcquisition();
+		m_m2kDigital->cancelBufferIn();
 		m_captureThread->join();
 		delete m_captureThread;
 		m_captureThread = nullptr;
@@ -913,11 +914,8 @@ void LogicAnalyzer::startStop(bool start)
 
 		m_stopRequested = false;
 
-		try {
-			m_m2kDigital->stopAcquisition();
-		} catch (std::invalid_argument &e) {
-			qDebug() << e.what();
-		}
+		m_m2kDigital->flushBufferIn();
+
 
 		const double sampleRate = m_sampleRateButton->value();
 		const uint64_t bufferSize = m_bufferSizeButton->value();
@@ -1062,7 +1060,7 @@ void LogicAnalyzer::startStop(bool start)
 	} else {
 		if (m_captureThread) {
 			m_stopRequested = true;
-			m_m2kDigital->cancelAcquisition();
+			m_m2kDigital->cancelBufferIn();
 			m_captureThread->join();
 			delete m_captureThread;
 			m_captureThread = nullptr;
