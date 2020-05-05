@@ -31,6 +31,7 @@ class OscCustomScrollArea : public QScrollArea
 	Q_OBJECT
 public:
 	OscCustomScrollArea(QWidget *parent = 0);
+	~OscCustomScrollArea();
 
 public Q_SLOTS:
 	void enterEvent(QEvent *);

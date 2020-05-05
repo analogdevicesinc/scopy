@@ -218,11 +218,16 @@ void LogicDataCurve::getSubsampledEdges(std::vector<std::pair<uint64_t, bool>> &
 //    qDebug() << "first edge: " << firstEdge;
 //    qDebug() << "last edge: " << lastEdge;
 
+    if (m_edges.size() == 0) {
+//	    qDebug() << "first edge: " << firstEdge << " last edge: " << lastEdge;
+    }
+
     if (firstEdge > 0) {
         firstEdge--;
     }
 
     if (lastEdge < m_edges.size() - 1) {
+//	    qDebug() << "lastEdge: " << lastEdge << " < " << "m_edges.size() - 1: " << m_edges.size() - 1;
         lastEdge++;
     }
 
@@ -250,15 +255,12 @@ void LogicDataCurve::getSubsampledEdges(std::vector<std::pair<uint64_t, bool>> &
                 return lhs.first < rhs.first;
             });
 
+		if (next == m_edges.end()) {
+			next = m_edges.end() - 1;
+		}
 
-            auto previous = next;
-            std::advance(previous, -1);
-
-//            // If we reached the end just insert the last edge from the subset
-//            if (next == m_edges.end()) {
-//                edges.emplace_back(m_edges[lastEdge]);
-//                break;
-//            }
+		auto previous = next;
+		std::advance(previous, -1);
 
             const int64_t a1 = (*next).first;
             const int64_t a2 = (*previous).first;
@@ -277,10 +279,6 @@ void LogicDataCurve::getSubsampledEdges(std::vector<std::pair<uint64_t, bool>> &
                 }
             }
 
-//            if (edges.back().second == (*next).second) {
-//                edges.emplace_back(m_edges[lastEdge]);
-//            }
-
             firstEdge = std::distance(m_edges.begin(), next);
 
             lastTransition = (*next).second;
@@ -293,12 +291,16 @@ uint64_t LogicDataCurve::edgeAtX(int x, const std::vector<std::pair<uint64_t, bo
     // O(log N)
 
     int64_t start = 0;
-    int64_t end = edges.size();
+    int64_t end = edges.size() - 1;
 
     int64_t mid = 0;
 
     while (end >= start) {
         mid = start + (end - start) / 2;
+
+	if (mid >= m_edges.size()) {
+		qDebug() << "mid: " << mid << " m_edges.size():" << m_edges.size();
+	}
 
         if (edges[mid].first < x) {
             start = mid + 1;

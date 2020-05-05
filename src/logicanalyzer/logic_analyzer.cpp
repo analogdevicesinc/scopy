@@ -149,6 +149,7 @@ LogicAnalyzer::LogicAnalyzer(iio_context *ctx, adiscope::Filter *filt,
 
 	// default: cursors
 
+	readPreferences();
 
 	api->setObjectName(QString::fromStdString(Filter::tool_name(
 							  TOOL_LOGIC_ANALYZER)));
@@ -604,6 +605,9 @@ void LogicAnalyzer::connectSignalsAndSlots()
 		[=](bool checked){
 		auto btn = dynamic_cast<CustomPushButton *>(run_button);
 		btn->setChecked(checked);
+//		if (!checked) {
+//			m_plot.setTriggerState(CapturePlot::Stop);
+//		}
 	});
 	connect(run_button, &QPushButton::toggled,
 		ui->runSingleWidget, &RunSingleWidget::toggle);
@@ -883,7 +887,8 @@ void LogicAnalyzer::initBufferScrolling()
 		m_resetHorizAxisOffset = true;
 	});
 	connect(m_bufferPreviewer, &BufferPreviewer::bufferResetPosition, [=](){
-		m_plot.setHorizOffset(1.0 / m_sampleRate * m_bufferSize / 2.0  + m_timeTriggerOffset);
+		m_plot.setHorizOffset(1.0 / m_sampleRate * m_bufferSize / 2.0 +
+				      (ui->btnStreamOneShot ? 0 : m_timeTriggerOffset));
 		m_plot.replot();
 		updateBufferPreviewer(0, m_lastCapturedSample);
 		m_horizOffset = m_timeTriggerOffset;
@@ -899,9 +904,20 @@ void LogicAnalyzer::startStop(bool start)
 	m_started = start;
 
 	if (start) {
+		if (m_captureThread) {
+			m_stopRequested = true;
+			m_captureThread->join();
+			delete m_captureThread;
+			m_captureThread = nullptr;
+		}
+
 		m_stopRequested = false;
 
-		m_m2kDigital->stopAcquisition();
+		try {
+			m_m2kDigital->stopAcquisition();
+		} catch (std::invalid_argument &e) {
+			qDebug() << e.what();
+		}
 
 		const double sampleRate = m_sampleRateButton->value();
 		const uint64_t bufferSize = m_bufferSizeButton->value();
@@ -960,18 +976,18 @@ void LogicAnalyzer::startStop(bool start)
 
 			m_buffer = new uint16_t[bufferSize];
 
-			QMetaObject::invokeMethod(this, [=](){
-				m_plot.setTriggerState(CapturePlot::Waiting);
-			}, Qt::QueuedConnection);
+//			QMetaObject::invokeMethod(this, [=](){
+//				m_plot.setTriggerState(CapturePlot::Waiting);
+//			}, Qt::QueuedConnection);
 
 			if (ui->btnStreamOneShot->isChecked()) {
 				try {
 					const uint16_t * const temp = m_m2kDigital->getSamplesP(bufferSize);
 					memcpy(m_buffer, temp, bufferSizeAdjusted * sizeof(uint16_t));
 
-					QMetaObject::invokeMethod(this, [=](){
-						m_plot.setTriggerState(CapturePlot::Triggered);
-					}, Qt::QueuedConnection);
+//					QMetaObject::invokeMethod(this, [=](){
+//						m_plot.setTriggerState(CapturePlot::Triggered);
+//					}, Qt::QueuedConnection);
 
 				} catch (std::invalid_argument &e) {
 					qDebug() << e.what();
@@ -998,12 +1014,13 @@ void LogicAnalyzer::startStop(bool start)
 						absIndex += captureSize;
 						totalSamples -= captureSize;
 
-						QMetaObject::invokeMethod(this, [=](){
-							m_plot.setTriggerState(CapturePlot::Triggered);
-						}, Qt::QueuedConnection);
+//						QMetaObject::invokeMethod(this, [=](){
+//							m_plot.setTriggerState(CapturePlot::Triggered);
+//						}, Qt::QueuedConnection);
 
 					} catch (std::invalid_argument &e) {
 						qDebug() << e.what();
+						break;
 					}
 
 					if (m_stopRequested) {
@@ -1036,9 +1053,9 @@ void LogicAnalyzer::startStop(bool start)
 			QMetaObject::invokeMethod(&m_plot,
 						  "replot");
 
-			QMetaObject::invokeMethod(this, [=](){
-				m_plot.setTriggerState(CapturePlot::Stop);
-			}, Qt::QueuedConnection);
+//			QMetaObject::invokeMethod(this, [=](){
+//				m_plot.setTriggerState(CapturePlot::Stop);
+//			}, Qt::QueuedConnection);
 
 		});
 
@@ -1050,9 +1067,12 @@ void LogicAnalyzer::startStop(bool start)
 			delete m_captureThread;
 			m_captureThread = nullptr;
 			restoreTriggerState();
-
-			m_plot.setTriggerState(CapturePlot::Stop);
 		}
+
+//		QMetaObject::invokeMethod(this, [=](){
+//			m_plot.setTriggerState(CapturePlot::Stop);
+//		}, Qt::QueuedConnection);
+
 	}
 
 }
@@ -1068,9 +1088,9 @@ static gint sort_pds(gconstpointer a, gconstpointer b)
 
 void LogicAnalyzer::setupDecoders()
 {
-	if (srd_init(nullptr) != SRD_OK) {
-		qDebug() << "Error: libsigrokdecode init failed!";
-	}
+//	if (srd_init(nullptr) != SRD_OK) {
+//		qDebug() << "Error: libsigrokdecode init failed!";
+//	}
 
 	if (srd_decoder_load_all() != SRD_OK) {
 		qDebug() << "Error: srd_decoder_load_all failed!";
