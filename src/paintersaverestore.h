@@ -2,15 +2,13 @@
 #define PAINTERSAVERESTORE_H
 
 #include <QtGlobal>
-
-class QPainter;
+#include <QPainter>
 
 /*
 * RAII class for saving and restoring a QPainter
 */
 class PainterSaveRestore
 {
-	Q_DISABLE_COPY_MOVE(PainterSaveRestore)
 public:
 	PainterSaveRestore(QPainter *painter);
 	~PainterSaveRestore();
