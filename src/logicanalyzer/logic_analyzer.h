@@ -26,7 +26,7 @@
 // TODO
 using namespace libm2k;
 using namespace libm2k::digital;
-using namespace libm2k::contexts;
+using namespace libm2k::context;
 
 namespace Ui {
 class LogicAnalyzer;
