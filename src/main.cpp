@@ -82,11 +82,6 @@ int main(int argc, char **argv)
 	QCoreApplication::setApplicationVersion(SCOPY_VERSION_GIT);
 	QSettings::setDefaultFormat(QSettings::IniFormat);
 
-	QSettings test;
-	QString path = test.fileName();
-	QString fn("Scopy.ini");
-	path.chop(fn.length());
-
 #if BREAKPAD_HANDLER
 	QString prevCrashDump = app.initBreakPadHandler(path);
 #else
@@ -109,20 +104,14 @@ int main(int argc, char **argv)
 	parser.process(app);
 
 	QTranslator myappTranslator;
-	QFile f(path+"Preferences.ini");
-	f.open(QFile::ReadOnly);
-	QTextStream in (&f);
-    const QStringList content = in.readAll().split("\n");
-	QString language="default";
-	for(auto s : content) {
-		if(s.startsWith("language")) {
-			language=s.split("=")[1].trimmed();
-		}
-	}
+
+	QSettings pref(Preferences::getPreferenceIniFile(), QSettings::IniFormat);
+	QString language = pref.value(QString("Preferences/language")).toString();
 
 	QString languageFileName;
 	QString osLanguage = QLocale::system().name().split("_")[0];
 	QDir directory(QCoreApplication::applicationDirPath()+"/resources/languages");
+
 	QStringList languages = directory.entryList(QStringList() << "*.qm",QDir::Files);
 	if(language == "auto"){
 		if(languages.contains("scopy_"+osLanguage+".qm")) {
@@ -139,7 +128,6 @@ int main(int argc, char **argv)
 		languageFileName = language;
 	}
 
-	f.close();
 	myappTranslator.load(languageFileName);
 	app.installTranslator(&myappTranslator);
 

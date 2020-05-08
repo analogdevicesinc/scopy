@@ -270,7 +270,7 @@ void Preferences::showEvent(QShowEvent *event)
 	QWidget::showEvent(event);
 }
 
-QString Preferences::getPreferenceIniFile() const
+QString Preferences::getPreferenceIniFile()
 {
 	QSettings settings;
 	QFileInfo fileInfo(settings.fileName());
