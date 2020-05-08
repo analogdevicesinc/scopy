@@ -45,6 +45,8 @@ public:
 	explicit Preferences(QWidget *parent = 0);
 	~Preferences();
 
+	static QString getPreferenceIniFile();
+
 	void notifyChange();
 	void showEvent(QShowEvent *event);
 
@@ -145,7 +147,6 @@ private:
 	QString language;
 
 	Preferences_API *pref_api;
-	QString getPreferenceIniFile() const;
 };
 
 class Preferences_API : public ApiObject
