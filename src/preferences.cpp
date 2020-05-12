@@ -30,6 +30,7 @@
 #include <QFileInfo>
 #include <QTextStream>
 
+
 using namespace adiscope;
 
 Preferences::Preferences(QWidget *parent) :
@@ -155,14 +156,16 @@ Preferences::Preferences(QWidget *parent) :
 		}
 	});
 
-	ui->label_restart->setVisible(false);
-	ui->languageCombo->addItems(getOptionsList());
-
 	QString preference_ini_file = getPreferenceIniFile();
 	QSettings settings(preference_ini_file, QSettings::IniFormat);
 
 	pref_api->setObjectName(QString("Preferences"));
 	pref_api->load(settings);
+
+	ui->label_restart->setVisible(false);
+	ui->languageCombo->addItems(getOptionsList());
+
+
 	connect(ui->languageCombo, &QComboBox::currentTextChanged, [=](QString lang) {
 			if(lang=="browse"){
 				QString langtemp = loadLanguage();
@@ -197,20 +200,10 @@ Preferences::Preferences(QWidget *parent) :
 
 QStringList Preferences::getOptionsList()
 {   
-	QFile f(getPreferenceIniFile());
-	f.open(QFile::ReadOnly);
-    QTextStream in (&f);
-	const QStringList content = in.readAll().split("\n");
-	QString language;
-	for(auto s : content) {
-		if(s.startsWith("language")){
-			language=s.split("=")[1].trimmed();
-        		}
-    	}
-
+	QString currentLanguage = pref_api->getLanguage();
 	QStringList options; 
-	if(!getLanguageList().contains(language) && language.endsWith(".qm")){
-		QFileInfo info(language);
+	if(!getLanguageList().contains(currentLanguage) && currentLanguage.endsWith(".qm")) {
+		QFileInfo info(currentLanguage);
 		options<<info.fileName().remove(".qm")<<getLanguageList()<<"auto"<<"browse";
 		ui->languageCombo->setCurrentText(info.fileName().remove(".qm"));
 	}
@@ -221,14 +214,14 @@ QStringList Preferences::getOptionsList()
 
 QStringList Preferences::getLanguageList()
 {
-	QDir directory("resources/languages");
-	QStringList languages = directory.entryList(QStringList() << "*.qm",QDir::Files);
-	for(auto &s : languages)
-	{
+	QDir directory(":/translations");
+	QStringList languages = directory.entryList(QStringList() << "*.qm" << "*.QM", QDir::Files);
+	for(auto &s : languages) {
 		s.remove(".qm");
 	}
 	return languages;
 }
+
 
 Preferences::~Preferences()
 {
