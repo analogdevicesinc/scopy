@@ -92,8 +92,9 @@ void NetworkAnalyzer::_configureAdcFlowgraph(size_t buffer_size)
 
 		// Get the available sample rates for the m2k-adc
 		// Make sure the values are sorted in ascending order (1000,..,100e6)
-		sampleRates = SignalGenerator::get_available_sample_rates(adc);
-		qSort(sampleRates.begin(), sampleRates.end(), qLess<unsigned long>());
+		sampleRates = {75000};
+//				SignalGenerator::get_available_sample_rates(adc);
+//		qSort(sampleRates.begin(), sampleRates.end(), qLess<unsigned long>());
 
 		auto m2k_adc = std::dynamic_pointer_cast<M2kAdc>(adc_dev);
 
@@ -271,12 +272,11 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	std::vector<unsigned long> rates;
 	rates.resize(dac_channels.size());
-	std::transform(dac_channels.begin(), dac_channels.end(),
-		       rates.begin(),
-	[](struct iio_channel *ch) {
-		return SignalGenerator::get_max_sample_rate(
-			       iio_channel_get_device(ch));
-	});
+//	std::transform(dac_channels.begin(), dac_channels.end(),
+//		       rates.begin(),
+//	[](unsigned int chnIdx) {
+//		return SignalGenerator::get_max_sample_rate(chnIdx);
+//	});
 
 	unsigned long max_samplerate = *std::max_element(rates.begin(), rates.end());
 
@@ -936,7 +936,8 @@ void NetworkAnalyzer::updateGainMode()
 
 unsigned long NetworkAnalyzer::_getBestSampleRate(double frequency, const struct iio_device *dev)
 {
-	QVector<unsigned long> values = SignalGenerator::get_available_sample_rates(dev);
+	QVector<unsigned long> values = {75000};
+//			SignalGenerator::get_available_sample_rates(dev);
 
 	qSort(values.begin(), values.end(), qLess<unsigned long>());
 
