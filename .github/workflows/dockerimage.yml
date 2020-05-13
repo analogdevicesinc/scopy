@@ -1,0 +1,23 @@
+name: Docker Image CI
+
+on: [push, pull_request]
+
+jobs:
+
+  make-flatpak:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Pull the Docker Image
+      run: docker pull alexandratr/scopy-flatpak-bionic:clean
+    - name: Run Docker Image
+      run: |
+            docker run --privileged \
+                -v `pwd`:$GITHUB_WORKSPACE:rw \
+                -e "GITHUB_WORKSPACE=$GITHUB_WORKSPACE" \
+                alexandratr/scopy-flatpak-bionic:clean /bin/bash -xe $GITHUB_WORKSPACE/CI/appveyor/inside_flatpak_docker.sh
+    - uses: actions/upload-artifact@v2
+      with:
+        name: Scopy.flatpak
+        path: ${{ github.workspace }}/Scopy.flatpak
