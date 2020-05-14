@@ -22,9 +22,8 @@
 #include "dynamicWidget.hpp"
 #include "ui_dmm.h"
 #include <config.h>
-#include "osc_adc.h"
-#include "hardware_trigger.hpp"
 #include "utils.h"
+#include "logging_categories.h"
 
 #include <gnuradio/blocks/keep_one_in_n.h>
 #include <gnuradio/blocks/moving_average.h>
@@ -44,16 +43,23 @@
 #include <QThread>
 #include <QJSEngine>
 
+/* libm2k includes */
+#include <libm2k/contextbuilder.hpp>
+
 #include "dmm_api.hpp"
 
 using namespace adiscope;
+using namespace libm2k;
+using namespace libm2k::context;
 
 DMM::DMM(struct iio_context *ctx, Filter *filt, std::shared_ptr<GenericAdc> adc,
 		ToolMenuItem *toolMenuItem, QJSEngine *engine, ToolLauncher *parent)
 	: Tool(ctx, toolMenuItem, new DMM_API(this), "Voltmeter", parent),
 	ui(new Ui::DMM), signal(boost::make_shared<signal_sample>()),
 	manager(iio_manager::get_instance(ctx, filt->device_name(TOOL_DMM))),
-	adc(adc),
+	m_m2k_context(m2kOpen(ctx, "")),
+	m_m2k_analogin(m_m2k_context->getAnalogIn()),
+	m_adc_nb_channels(m_m2k_analogin->getNbChannels()),
 	interrupt_data_logging(false),
 	data_logging(false),
 	filename(""),
@@ -78,7 +84,7 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, std::shared_ptr<GenericAdc> adc,
 
 	ui->horizontalLayout_2->addWidget(data_logging_timer);
 
-	for (unsigned int i = 0; i < adc->numAdcChannels(); i++)
+	for (unsigned int i = 0; i < m_adc_nb_channels; i++)
 	{
 		m_min.push_back(Q_INFINITY);
 		m_max.push_back(-Q_INFINITY);
@@ -205,8 +211,8 @@ void DMM::updateValuesList(std::vector<float> values)
 	if(!use_timer)
 		boost::unique_lock<boost::mutex> lock(data_mutex);
 
-	double volts_ch1 = adc->convSampleToVolts(0, (double) values[0]);
-	double volts_ch2 = adc->convSampleToVolts(1, (double) values[1]);
+	double volts_ch1 = m_m2k_analogin->convertRawToVolts(0, (int)values[0]);
+	double volts_ch2 = m_m2k_analogin->convertRawToVolts(1, (int)values[1]);
 
 	ui->lcdCh1->display(volts_ch1);
 	ui->lcdCh2->display(volts_ch2);
@@ -277,7 +283,7 @@ void DMM::displayPeakHold(bool checked)
 
 void DMM::resetPeakHold(bool clicked)
 {
-	for(unsigned int ch = 0; ch < adc->numAdcChannels(); ch++) {
+	for(unsigned int ch = 0; ch < m_adc_nb_channels; ch++) {
 		m_min[ch] = Q_INFINITY;
 		m_max[ch] = -Q_INFINITY;
 		if(ch == 0) {
@@ -632,20 +638,21 @@ void DMM::setHistorySizeCh2(int idx)
 
 void DMM::writeAllSettingsToHardware()
 {
-	adc->setSampleRate(sample_rate);
-
-	auto m2k_adc = std::dynamic_pointer_cast<M2kAdc>(adc);
-	if (m2k_adc) {
-		for (uint i = 0; i < adc->numAdcChannels(); i++) {
-			m2k_adc->setChnHwOffset(i, 0.0);
-			m2k_adc->setChnHwGainMode(i, M2kAdc::LOW_GAIN_MODE);
+	if (m_m2k_analogin) {
+		try {
+			m_m2k_analogin->setSampleRate(sample_rate);
+			auto trigger = m_m2k_analogin->getTrigger();
+			for (unsigned int i = 0; i < m_adc_nb_channels; i++) {
+				auto chn = static_cast<libm2k::analog::ANALOG_IN_CHANNEL>(i);
+				m_m2k_analogin->setVerticalOffset(chn, 0.0);
+				m_m2k_analogin->setRange(chn, libm2k::analog::PLUS_MINUS_25V);
+				if (trigger) {
+					trigger->setAnalogMode(i, libm2k::ALWAYS);
+				}
+			}
+		} catch (std::exception &e) {
+			qDebug(CAT_VOLTMETER) << "Can't write to hardware: " << e.what();
 		}
-	}
-
-	auto trigger = adc->getTrigger();
-	if (trigger) {
-		for (uint i = 0; i < trigger->numChannels(); i++)
-			trigger->setTriggerMode(i, HardwareTrigger::ALWAYS);
 	}
 }
 
