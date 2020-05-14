@@ -36,6 +36,10 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition_variable.hpp>
 
+/* libm2k includes */
+#include <libm2k/analog/m2kanalogin.hpp>
+#include <libm2k/m2k.hpp>
+
 namespace Ui {
 	class DMM;
 }
@@ -61,10 +65,12 @@ namespace adiscope {
 		~DMM();
 
 	private:
+		libm2k::context::M2k* m_m2k_context;
+		libm2k::analog::M2kAnalogIn* m_m2k_analogin;
+		unsigned int m_adc_nb_channels;
 		Ui::DMM *ui;
 		boost::shared_ptr<iio_manager> manager;
 		iio_manager::port_id id_ch1, id_ch2;
-		std::shared_ptr<GenericAdc> adc;
 		boost::shared_ptr<signal_sample> signal;
 		unsigned long sample_rate;
 
