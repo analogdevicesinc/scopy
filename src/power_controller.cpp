@@ -26,62 +26,35 @@
 
 #include <iio.h>
 #include "power_controller_api.hpp"
+#include "logging_categories.h"
+
+/* libm2k includes */
+#include <libm2k/contextbuilder.hpp>
+#include <libm2k/m2k.hpp>
+#include <libm2k/analog/m2kpowersupply.hpp>
 
 #define TIMER_TIMEOUT_MS	200
 
 using namespace adiscope;
+using namespace libm2k::context;
+using namespace libm2k::analog;
 
 PowerController::PowerController(struct iio_context *ctx,
 		ToolMenuItem *toolMenuItem, QJSEngine *engine,
 		ToolLauncher *parent) :
 	Tool(ctx, toolMenuItem, new PowerController_API(this), "Power Supply", parent),
-	ui(new Ui::PowerController), in_sync(false)
+	ui(new Ui::PowerController), in_sync(false),
+	m_m2k_context(m2kOpen(ctx, "")),
+	m_m2k_powersupply(m_m2k_context->getPowerSupply())
 {
 	ui->setupUi(this);
-	struct iio_device *dev1 = iio_context_find_device(ctx, "ad5627");
-	struct iio_device *dev2 = iio_context_find_device(ctx, "ad9963");
-	struct iio_device *dev3 = iio_context_find_device(ctx, "m2k-fabric");
 
-	if (!dev1 || !dev2 || !dev3)
-		throw std::runtime_error("Unable to find device\n");
-
-	this->ch1w = iio_device_find_channel(dev1, "voltage0", true);
-	this->ch2w = iio_device_find_channel(dev1, "voltage1", true);
-	this->ch1r = iio_device_find_channel(dev2, "voltage2", false);
-	this->ch2r = iio_device_find_channel(dev2, "voltage1", false);
-	this->pd_pos = iio_device_find_channel(dev3, "voltage2", true);
-	this->pd_neg = iio_device_find_channel(dev3, "voltage3", true); /* For HW Rev. >= C */
-
-	if (!ch1w || !ch2w || !ch1r || !ch2r || !pd_pos)
-		throw std::runtime_error("Unable to find channels\n");
-
-	/* FIXME: TODO: Move this into a HW class / lib M2k
-	 * This should be part of some pre-init call, where*/
-	if (1) {
-		struct iio_channel *chan;
-		/* These are the two ADC amplifiers */
-		chan = iio_device_find_channel(dev3, "voltage0", false);
-		if (chan)
-			iio_channel_attr_write_bool(chan, "powerdown", false);
-
-		chan = iio_device_find_channel(dev3, "voltage1", false);
-		if (chan)
-			iio_channel_attr_write_bool(chan, "powerdown", false);
-
-		/* ADF4360 globaal clock power down */
-		iio_device_attr_write(dev3, "clk_powerdown", "0");
+	try {
+		m_m2k_powersupply->pushChannel(0, 0.0);
+		m_m2k_powersupply->pushChannel(1, 0.0);
+	} catch (std::exception &e) {
+		qDebug(CAT_POWER_CONTROLLER) << "Can't write push value: " << e.what();
 	}
-
-	/* Power down DACs by default */
-	iio_channel_attr_write_bool(pd_pos, "user_supply_powerdown", true);
-	if (pd_neg)
-		iio_channel_attr_write_bool(pd_neg, "user_supply_powerdown", true);
-	iio_channel_attr_write_bool(ch1w, "powerdown", true);
-	iio_channel_attr_write_bool(ch2w, "powerdown", true);
-
-	/* Set the default values */
-	iio_channel_attr_write_longlong(ch1w, "raw", 0LL);
-	iio_channel_attr_write_longlong(ch2w, "raw", 0LL);
 
 	ui->btnSync->click();
 
@@ -126,14 +99,6 @@ PowerController::PowerController(struct iio_context *ctx,
 	connect(ui->dac1, &QPushButton::toggled, this, &PowerController::toggleRunButton);
 	connect(ui->dac2, &QPushButton::toggled, this, &PowerController::toggleRunButton);
 
-	/*Load calibration parameters from iio context*/
-	const char *name;
-	const char *value;
-	for (int i = 4; i < 12; i++) {
-		if (!iio_context_get_attr(ctx, i, &name, &value))
-			calibrationParam[QString(name + 4)] = QString(value).toDouble();
-	}
-
 	api->setObjectName(QString::fromStdString(Filter::tool_name(
 							  TOOL_POWER_CONTROLLER)));
 	api->load(*settings);
@@ -146,29 +111,7 @@ PowerController::~PowerController()
 	ui->dac1->setChecked(false);
 	ui->dac2->setChecked(false);
 
-	/* Power down DACs */
-	iio_channel_attr_write_bool(ch1w, "powerdown", true);
-	iio_channel_attr_write_bool(ch2w, "powerdown", true);
-	iio_channel_attr_write_bool(pd_pos, "user_supply_powerdown", true);
-	if (pd_neg)
-		iio_channel_attr_write_bool(pd_neg, "user_supply_powerdown", true);
-
-	/* FIXME: TODO: Move this into a HW class / lib M2k */
-	struct iio_device *dev3 = iio_context_find_device(ctx, "m2k-fabric");
-	if (dev3) {
-		struct iio_channel *chan;
-		/* These are the two ADC amplifiers */
-		chan = iio_device_find_channel(dev3, "voltage0", false);
-		if (chan)
-			iio_channel_attr_write_bool(chan, "powerdown", true);
-
-		chan = iio_device_find_channel(dev3, "voltage1", false);
-		if (chan)
-			iio_channel_attr_write_bool(chan, "powerdown", true);
-
-		/* ADF4360 globaal clock power down */
-		iio_device_attr_write(dev3, "clk_powerdown", "1");
-	}
+	m_m2k_powersupply->powerDownDacs(true);
 
 	if (saveOnExit) {
 		api->save(*settings);
@@ -201,15 +144,11 @@ void PowerController::hideEvent(QHideEvent *event)
 
 void PowerController::dac1_set_value(double value)
 {
-	double offset = calibrationParam[QString("offset_pos_dac")];
-	double gain = calibrationParam[QString("gain_pos_dac")];
-
-	long long val = (value * gain + offset)  * 4095.0 / (5.02 * 1.2 ) ;
-
-	if (val < 0 )
-		val = 0;
-
-	iio_channel_attr_write_longlong(ch1w, "raw", val);
+	try {
+		m_m2k_powersupply->pushChannel(0, value);
+	} catch (std::exception &e) {
+		qDebug(CAT_POWER_CONTROLLER) << "Can't write push value: " << e.what();
+	}
 	averageVoltageCh1.clear();
 
 	if (in_sync) {
@@ -222,54 +161,37 @@ void PowerController::dac1_set_value(double value)
 
 void PowerController::dac2_set_value(double value)
 {
-	double offset = calibrationParam[QString("offset_neg_dac")];
-	double gain = calibrationParam[QString("gain_neg_dac")];
-
-	long long val = (value * gain + offset) * 4095.0 / (-5.1 * 1.2 );
-
-	if (val < 0 )
-		val = 0;
-
-	iio_channel_attr_write_longlong(ch2w, "raw", val);
+	try {
+		m_m2k_powersupply->pushChannel(1, value);
+	} catch (std::exception &e) {
+		qDebug(CAT_POWER_CONTROLLER) << "Can't write push value: " << e.what();
+	}
 	averageVoltageCh2.clear();
 }
 
 void PowerController::dac1_set_enabled(bool enabled)
 {
-	iio_channel_attr_write_bool(ch1w, "powerdown", !enabled);
+	try {
+		m_m2k_powersupply->enableChannel(0, enabled);
+	} catch (std::exception &e) {
+		qDebug(CAT_POWER_CONTROLLER) << "Can't enable channel: " << e.what();
+	}
 	averageVoltageCh1.clear();
 
 	if (in_sync)
 		dac2_set_enabled(enabled);
-
-	if (pd_neg) { /* For HW Rev. >= C */
-		iio_channel_attr_write_bool(pd_pos, "user_supply_powerdown", !enabled);
-	} else {
-		if (enabled) {
-			iio_channel_attr_write_bool(pd_pos, "user_supply_powerdown", false);
-		} else if (!ui->dac2->isChecked()) {
-			iio_channel_attr_write_bool(pd_pos, "user_supply_powerdown", true);
-		}
-	}
 
 	setDynamicProperty(ui->dac1, "running", enabled);
 }
 
 void PowerController::dac2_set_enabled(bool enabled)
 {
-	iio_channel_attr_write_bool(ch2w, "powerdown", !enabled);
-	averageVoltageCh2.clear();
-
-	if (pd_neg) { /* For HW Rev. >= C */
-		iio_channel_attr_write_bool(pd_neg, "user_supply_powerdown", !enabled);
-	} else {
-		if (enabled) {
-			iio_channel_attr_write_bool(pd_pos, "user_supply_powerdown", false);
-		} else if (!ui->dac1->isChecked()) {
-			iio_channel_attr_write_bool(pd_pos, "user_supply_powerdown", true);
-		}
+	try {
+		m_m2k_powersupply->enableChannel(1, enabled);
+	} catch (std::exception &e) {
+		qDebug(CAT_POWER_CONTROLLER) << "Can't enable channel: " << e.what();
 	}
-
+	averageVoltageCh2.clear();
 	setDynamicProperty(ui->dac2, "running", enabled);
 }
 
@@ -294,19 +216,18 @@ void PowerController::ratioChanged(int percent)
 
 void PowerController::update_lcd()
 {
-	double offset1 = calibrationParam[QString("offset_pos_adc")];
-	double gain1 = calibrationParam[QString("gain_pos_adc")];
-	double offset2 = calibrationParam[QString("offset_neg_adc")];
-	double gain2 = calibrationParam[QString("gain_neg_adc")];
-
-	long long val1 = 0, val2 = 0;
 	double average1 = 0, average2 = 0;
+	double value1 = 0.0, value2 = 0.0;
 
-	iio_channel_attr_read_longlong(ch1r, "raw", &val1);
-	iio_channel_attr_read_longlong(ch2r, "raw", &val2);
+	try {
+		value1 = m_m2k_powersupply->readChannel(0);
+		value2 = m_m2k_powersupply->readChannel(1);
+	} catch (std::exception &e) {
+		qDebug(CAT_POWER_CONTROLLER) << "Can't read value: " << e.what();
+	}
 
-	averageVoltageCh1.push_back(val1);
-	averageVoltageCh2.push_back(val2);
+	averageVoltageCh1.push_back(value1);
+	averageVoltageCh2.push_back(value2);
 
 	if(averageVoltageCh1.length() > AVERAGE_COUNT)
 		averageVoltageCh1.pop_front();
@@ -321,13 +242,11 @@ void PowerController::update_lcd()
 	average1  /= averageVoltageCh1.length();
 	average2  /= averageVoltageCh2.length();
 
-	double value1 = (((double) average1 * 6.4 / 4095.0) + offset1) * gain1;
-	ui->lcd1->display(value1);
-	ui->scale_dac1->setValue(value1);
+	ui->lcd1->display(average1);
+	ui->scale_dac1->setValue(average1);
 
-	double value2 = (((double) average2 * (-6.4)  / 4095.0) + offset2) * gain2;
-	ui->lcd2->display(value2);
-	ui->scale_dac2->setValue(value2);
+	ui->lcd2->display(average2);
+	ui->scale_dac2->setValue(average2);
 
 	timer.start(TIMER_TIMEOUT_MS);
 }
