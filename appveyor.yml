@@ -45,7 +45,7 @@ install:
     - sh: docker version
 
 build_script:
-    - cmd: C:\msys64\usr\bin\bash -lc "pacman --noconfirm -Sy pacman"
+    - cmd: C:\msys64\usr\bin\bash -lc "pacman --noconfirm -U http://repo.msys2.org/msys/x86_64/pacman-5.2.1-6-x86_64.pkg.tar.xz"
     - cmd: C:\msys64\usr\bin\bash -lc "pacman --noconfirm -Syu"
     - cmd: set PATH=%PATH%;"C:\Program Files (x86)\Inno Setup 5"
     - cmd: "%BUILD_DEPS_CMD%"
