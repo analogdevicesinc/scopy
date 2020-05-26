@@ -37,6 +37,14 @@
 
 class QJSEngine;
 
+namespace libm2k {
+namespace context {
+	class M2k;
+}
+namespace analog {
+	class M2kPowerSupply;
+}
+}
 namespace Ui {
 class ManualCalibration;
 class CalibrationTemplate;
@@ -97,8 +105,6 @@ public:
 	void allowManualCalibScript(bool calib_en, bool calib_pref_en);
 
 private:
-	void setupPowerSupplyIio(void);
-
 	void positivePowerSupplySetup();
 	void positivePowerSupplyParam(const int step);
 	void setEnablePositiveSuppply(bool enabled);
@@ -132,7 +138,6 @@ private Q_SLOTS:
 
 private:
 	Ui::ManualCalibration *ui;
-	struct iio_channel *ch1w, *ch2w, *ch1r, *ch2r, *pd_pos, *pd_neg;
 	Ui::CalibrationTemplate *TempUi;
 	QWidget *TempWidget;
 	QTableWidget *paramTable;
@@ -150,7 +155,10 @@ private:
 	QMap<QString, int> calibOption;
 
 	QString calibrationFilePath;
-
+	libm2k::context::M2k* m_m2k_context;
+	libm2k::analog::M2kPowerSupply* m_m2k_powersupply;
+	libm2k::analog::DMM* m_dmm_ad9963;
+	libm2k::analog::DMM* m_dmm_xadc;
 };
 }
 #endif // MANUALCALIBRATION_H
