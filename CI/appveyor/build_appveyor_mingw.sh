@@ -25,7 +25,8 @@ SCOPY_CMAKE_OPTS="
 	-DGIT_EXECUTABLE=/c/Program\\ Files/Git/cmd/git.exe \
 	-DPYTHON_EXECUTABLE=/$MINGW_VERSION/bin/python3.exe \
 	"
-DLL_DEPS="libmatio-*.dll libhdf5-*.dll libszip*.dll libpcre*.dll libdouble-conversion*.dll libwinpthread-*.dll libgcc_*.dll libstdc++-*.dll libboost_*.dll libglib-*.dll libintl-*.dll libiconv-*.dll libglibmm-2.*.dll libgmodule-2.*.dll libgobject-2.*.dll libffi-*.dll libsigc-2.*.dll libfftw3f-*.dll libicu*.dll zlib*.dll libharfbuzz-*.dll libfreetype-*.dll libbz2-*.dll libpng16-*.dll libgraphite2.dll libjpeg-*.dll libsqlite3-*.dll libwebp-*.dll libxml2-*.dll liblzma-*.dll libxslt-*.dll libzip*.dll libpython3.*.dll libgnutls*.dll libnettle*.dll libhogweed*.dll libgmp*.dll libidn*.dll libp11*.dll libtasn*.dll libunistring*.dll libusb-*.dll libzstd*.dll libgnuradio-*.dll /$MINGW_VERSION/lib/python3.* libiio*.dll libvolk*.dll liblog4cpp*.dll libad9361*.dll liborc*.dll libsigrok*.dll qwt*.dll libm2k*.dll"
+
+DLL_DEPS="libmatio-*.dll libhdf5-*.dll libszip*.dll libpcre*.dll libdouble-conversion*.dll libwinpthread-*.dll libgcc_*.dll libstdc++-*.dll libboost_*.dll libglib-*.dll libintl-*.dll libiconv-*.dll libglibmm-2.*.dll libgmodule-2.*.dll libgobject-2.*.dll libffi-*.dll libsigc-2.*.dll libfftw3f-*.dll libicu*.dll zlib*.dll libharfbuzz-*.dll libfreetype-*.dll libbz2-*.dll libpng16-*.dll libgraphite2.dll libjpeg-*.dll libsqlite3-*.dll libwebp-*.dll libxml2-*.dll liblzma-*.dll libxslt-*.dll libzip*.dll libpython3.*.dll libgnutls*.dll libnettle*.dll libhogweed*.dll libgmp*.dll libidn*.dll libp11*.dll libtasn*.dll libunistring*.dll libusb-*.dll libzstd*.dll libgnuradio-*.dll /$MINGW_VERSION/lib/python3.* libiio*.dll libvolk*.dll liblog4cpp*.dll libad9361*.dll liborc*.dll libsigrok*.dll qwt*.dll libm2k*.dll libbrotli*.dll"
 
 OLD_PATH=$PATH
 DEST_FOLDER=scopy_$ARCH_BIT
