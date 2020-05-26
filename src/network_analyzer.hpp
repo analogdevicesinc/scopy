@@ -58,14 +58,9 @@
 
 #include "networkanalyzerbufferviewer.h"
 #include "startstoprangewidget.h"
-#include "adc_sample_conv.hpp"
-#include "osc_adc.h"
 
 extern "C" {
-	struct iio_buffer;
-	struct iio_channel;
 	struct iio_context;
-	struct iio_device;
 }
 
 namespace Ui {
@@ -78,8 +73,6 @@ class QJSEngine;
 namespace adiscope {
 class NetworkAnalyzer_API;
 class Filter;
-class GenericAdc;
-class GenericDac;
 
 class NetworkAnalyzer : public Tool
 {
@@ -90,8 +83,6 @@ class NetworkAnalyzer : public Tool
 
 public:
 	explicit NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
-				 std::shared_ptr<GenericAdc>& adc_dev,
-				 QList<std::shared_ptr<GenericDac>> dacs,
 				 ToolMenuItem *toolMenuItem, QJSEngine *engine,
 				 ToolLauncher *parent);
 	~NetworkAnalyzer();
@@ -100,23 +91,20 @@ public:
 
 private:
 	Ui::NetworkAnalyzer *ui;
-	struct iio_channel *amp1, *amp2;
-	std::vector<iio_channel *> dac_channels;
-	iio_buffer *adc_buffer;
-	struct iio_device *adc;
-	std::shared_ptr<GenericAdc> adc_dev;
+	libm2k::context::M2k* m_m2k_context;
+	libm2k::analog::M2kAnalogOut* m_m2k_analogout;
+	libm2k::analog::M2kAnalogIn* m_m2k_analogin;
+	unsigned int m_adc_nb_channels, m_dac_nb_channels;
 	boost::shared_ptr<iio_manager> iio;
-	QList<std::shared_ptr<GenericDac>> dacs;
 	bool m_initFlowgraph;
 
 	// Sine generation blocks
 	gr::top_block_sptr top_block;
 	gr::analog::sig_source_f::sptr source_block;
-	gr::blocks::float_to_short::sptr f2s_block;
 	gr::blocks::head::sptr head_block;
-	gr::blocks::vector_sink_s::sptr vector_block;
+	gr::blocks::vector_sink_f::sptr vector_block;
 
-	QVector<unsigned long> sampleRates;
+	std::vector<double> sampleRates;
 
 	dBgraph m_dBgraph;
 	dBgraph m_phaseGraph;
@@ -141,18 +129,18 @@ private:
 
 	typedef struct NetworkAnalyzerIterationStats {
 		NetworkAnalyzerIterationStats(double dcVoltage,
-					      M2kAdc::GainMode gain,
+					      libm2k::analog::M2K_RANGE gain,
 					      bool hasError):
 			dcVoltage(dcVoltage),
 			gain(gain),
 			hasError(hasError) {}
 		NetworkAnalyzerIterationStats():
 			dcVoltage(0),
-			gain(M2kAdc::LOW_GAIN_MODE),
+			gain(libm2k::analog::PLUS_MINUS_25V),
 			hasError(false) {}
 
 		double dcVoltage;
-		M2kAdc::GainMode gain;
+		libm2k::analog::M2K_RANGE gain;
 		bool hasError;
 	} NetworkIterationStats;
 
@@ -189,7 +177,7 @@ private:
 	gr::filter::dc_blocker_ff::sptr dcBlocker2;
 	gr::blocks::complex_to_arg::sptr c2a;
 	boost::shared_ptr<signal_sample> signal;
-	boost::shared_ptr<adc_sample_conv> adc_conv;
+	gr::blocks::multiply_const_ff::sptr adc_conv1, adc_conv2;
 	boost::shared_ptr<cancel_dc_offset_block> dc_cancel1;
 	boost::shared_ptr<cancel_dc_offset_block> dc_cancel2;
 	float mag1, mag2, phase;
@@ -242,13 +230,10 @@ private:
 	void goertzel();
 	void setFilterParameters();
 
-	struct iio_buffer *generateSinWave(
-		const struct iio_device *dev,
-		double frequency,
-		double amplitude,
-		double offset,
-		unsigned long rate,
-		size_t samples_count);
+	std::vector<double> generateSinWave(unsigned int chn_idx,
+					    double frequency,
+					    double amplitude, double offset,
+					    unsigned long rate, size_t samples_count);
 
 	void configHwForNetworkAnalyzing();
 
@@ -266,7 +251,7 @@ private:
 	void _configureDacFlowgraph();
 
 	void _configureAdcFlowgraph(size_t bufferSize = 0);
-	unsigned long _getBestSampleRate(double frequency, const iio_device *dev);
+	unsigned long _getBestSampleRate(double frequency, unsigned int chn_idx);
 	size_t _getSamplesCount(double frequency, unsigned long rate, bool perfect = false);
 	void computeFrequencyArray();
 
