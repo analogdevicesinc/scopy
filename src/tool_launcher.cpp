@@ -1469,7 +1469,7 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 			m2k_dac_b = std::dynamic_pointer_cast<M2kDac>(dacs.at(i));
 		}
 	}
-	calib = new Calibration(ctx, &js_engine, m2k_adc, m2k_dac_a, m2k_dac_b);
+	calib = new Calibration(ctx, &js_engine);
 	calib->initialize();
 
 
