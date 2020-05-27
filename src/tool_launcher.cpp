@@ -27,8 +27,6 @@
 #include "tool_launcher.hpp"
 #include "qtjs.hpp"
 #include "jsfileio.h"
-#include "osc_adc.h"
-#include "hw_dac.h"
 #include "dragzone.h"
 #include "debugger.h"
 #include "manualcalibration.h"
@@ -1316,8 +1314,7 @@ bool adiscope::ToolLauncher::calibrate()
 void adiscope::ToolLauncher::enableAdcBasedTools()
 {
 	if (filter->compatible(TOOL_OSCILLOSCOPE)) {
-		oscilloscope = new Oscilloscope(ctx, filter, adc,
-						menu->getToolMenuItemFor(TOOL_OSCILLOSCOPE),
+		oscilloscope = new Oscilloscope(ctx, filter, menu->getToolMenuItemFor(TOOL_OSCILLOSCOPE),
 						&js_engine, this);
 		toolList.push_back(oscilloscope);
 		adc_users_group.addButton(menu->getToolMenuItemFor(TOOL_OSCILLOSCOPE)->getToolStopBtn());
@@ -1327,7 +1324,7 @@ void adiscope::ToolLauncher::enableAdcBasedTools()
 	}
 
 	if (filter->compatible(TOOL_DMM)) {
-		dmm = new DMM(ctx, filter, adc, menu->getToolMenuItemFor(TOOL_DMM),
+		dmm = new DMM(ctx, filter, menu->getToolMenuItemFor(TOOL_DMM),
 				&js_engine, this);
 		adc_users_group.addButton(menu->getToolMenuItemFor(TOOL_DMM)->getToolStopBtn());
 		toolList.push_back(dmm);
@@ -1352,8 +1349,7 @@ void adiscope::ToolLauncher::enableAdcBasedTools()
 	}
 
 	if (filter->compatible(TOOL_SPECTRUM_ANALYZER)) {
-		spectrum_analyzer = new SpectrumAnalyzer(ctx, filter, adc,
-			menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER),&js_engine, this);
+		spectrum_analyzer = new SpectrumAnalyzer(ctx, filter, menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER),&js_engine, this);
 		toolList.push_back(spectrum_analyzer);
 		adc_users_group.addButton(menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER)->getToolStopBtn());
 		connect(spectrum_analyzer, &SpectrumAnalyzer::showTool, [=]() {
@@ -1363,8 +1359,7 @@ void adiscope::ToolLauncher::enableAdcBasedTools()
 
 	if (filter->compatible((TOOL_NETWORK_ANALYZER))) {
 
-		network_analyzer = new NetworkAnalyzer(ctx, filter, adc, dacs,
-			menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER), &js_engine, this);
+		network_analyzer = new NetworkAnalyzer(ctx, filter, menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER), &js_engine, this);
 		adc_users_group.addButton(menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER)->getToolStopBtn());
 		toolList.push_back(network_analyzer);
 		connect(network_analyzer, &NetworkAnalyzer::showTool, [=]() {
@@ -1380,7 +1375,7 @@ void adiscope::ToolLauncher::enableAdcBasedTools()
 void adiscope::ToolLauncher::enableDacBasedTools()
 {
 	if (filter->compatible(TOOL_SIGNAL_GENERATOR)) {
-		signal_generator = new SignalGenerator(ctx, dacs, filter,
+		signal_generator = new SignalGenerator(ctx, filter,
 			menu->getToolMenuItemFor(TOOL_SIGNAL_GENERATOR), &js_engine, this);
 		toolList.push_back(signal_generator);
 		connect(signal_generator, &SignalGenerator::showTool, [=]() {
@@ -1424,54 +1419,8 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 
 	filter = new Filter(ctx);
 
-	dacs.clear();
-
-	// Find available DACs
-	QList<struct iio_device *> iio_dacs;
-	for (unsigned int dev_id = 0; ; dev_id++) {
-		struct iio_device *dev;
-		try {
-			dev = filter->find_device(ctx,
-					TOOL_SIGNAL_GENERATOR, dev_id);
-		} catch (std::exception &ex) {
-			break;
-		}
-		iio_dacs.push_back(dev);
-	}
-
-	if (filter->hw_name().compare("M2K") == 0) {
-		adc = AdcBuilder::newAdc(AdcBuilder::M2K, ctx,
-			filter->find_device(ctx, TOOL_OSCILLOSCOPE));
-
-		for (int i = 0; i < iio_dacs.size(); i++) {
-			auto dac = DacBuilder::newDac(DacBuilder::M2K, ctx,
-				iio_dacs[i]);
-			dacs.push_back(dac);
-		}
-	} else {
-		adc = AdcBuilder::newAdc(AdcBuilder::GENERIC, ctx,
-			filter->find_device(ctx, TOOL_OSCILLOSCOPE));
-		for (int i = 0; i < iio_dacs.size(); i++) {
-			auto dac = DacBuilder::newDac(DacBuilder::GENERIC, ctx,
-				iio_dacs[i]);
-			dacs.push_back(dac);
-		}
-	}
-
-	auto m2k_adc = std::dynamic_pointer_cast<M2kAdc>(adc);
-	std::shared_ptr<M2kDac> m2k_dac_a;
-	std::shared_ptr<M2kDac> m2k_dac_b;
-	for(int i = 0; i < dacs.size(); i++) {
-		if(i == 0) {
-			m2k_dac_a = std::dynamic_pointer_cast<M2kDac>(dacs.at(i));
-		}
-		if(i == 1 ){
-			m2k_dac_b = std::dynamic_pointer_cast<M2kDac>(dacs.at(i));
-		}
-	}
 	calib = new Calibration(ctx, &js_engine);
 	calib->initialize();
-
 
 	if (filter->compatible(TOOL_PATTERN_GENERATOR)
 	    || filter->compatible(TOOL_DIGITALIO)) {

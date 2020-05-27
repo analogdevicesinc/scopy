@@ -60,8 +60,6 @@ extern "C" {
 namespace Ui {
 class ToolLauncher;
 class Device;
-class GenericAdc;
-class GenericDac;
 }
 
 namespace adiscope {
@@ -226,8 +224,6 @@ private:
 	QButtonGroup adc_users_group;
 
 	Calibration *calib;
-	std::shared_ptr<GenericAdc> adc;
-	QList<std::shared_ptr<GenericDac>> dacs;
 
 	Filter *filter;
 	ToolLauncher_API *tl_api;

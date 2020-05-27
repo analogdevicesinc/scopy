@@ -30,7 +30,6 @@
 #include "scope_sink_f.h"
 #include "fft_block.hpp"
 #include "FftDisplayPlot.h"
-#include "osc_adc.h"
 #include "tool.hpp"
 #include "plot_utils.hpp"
 #include "spinbox_a.hpp"
@@ -97,7 +96,7 @@ public:
 	typedef boost::shared_ptr<SpectrumChannel> channel_sptr;
 
 	explicit SpectrumAnalyzer(struct iio_context *iio, Filter *filt,
-	                          std::shared_ptr<GenericAdc> adc, ToolMenuItem *toolMenuItem,
+				  ToolMenuItem *toolMenuItem,
 	                          QJSEngine *engine, ToolLauncher *parent);
 	~SpectrumAnalyzer();
 

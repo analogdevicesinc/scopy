@@ -81,7 +81,6 @@
 
 using namespace adiscope;
 using namespace gr;
-//using namespace libm2k;
 using namespace libm2k::context;
 using namespace libm2k::analog;
 
@@ -120,8 +119,7 @@ bool SignalGenerator::chunkCompare(chunk_header_t& ptr,const char *id2)
 	return true;
 }
 
-SignalGenerator::SignalGenerator(struct iio_context *_ctx,
-                                 QList<std::shared_ptr<GenericDac>> dacs, Filter *filt,
+SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 				 ToolMenuItem *toolMenuItem, QJSEngine *engine, ToolLauncher *parent) :
 	Tool(_ctx, toolMenuItem, new SignalGenerator_API(this), "Signal Generator",
 	     parent),

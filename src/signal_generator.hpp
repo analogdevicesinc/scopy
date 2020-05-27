@@ -38,7 +38,6 @@
 #include "oscilloscope_plot.hpp"
 #include "scope_sink_f.h"
 #include "tool.hpp"
-#include "hw_dac.h"
 #include "filemanager.h"
 
 #include "gnuradio/analog/noise_type.h"
@@ -61,7 +60,6 @@ namespace adiscope {
 struct signal_generator_data;
 struct time_block_data;
 class SignalGenerator_API;
-class GenericDac;
 class ChannelWidget;
 class PhaseSpinButton;
 class PositionSpinButton;
@@ -131,7 +129,6 @@ class SignalGenerator : public Tool
 
 public:
 	explicit SignalGenerator(struct iio_context *ctx,
-	                         QList<std::shared_ptr<GenericDac>> dacs,
 	                         Filter *filt, ToolMenuItem *toolMenuItem,
 	                         QJSEngine *engine, ToolLauncher *parent);
 	~SignalGenerator();
@@ -153,8 +150,6 @@ private:
 	OscilloscopePlot *plot;
 	gr::top_block_sptr top_block;
 	struct time_block_data *time_block_data;
-	struct iio_channel *amp1, *amp2;
-	QList<std::shared_ptr<GenericDac>> dacs;
 
 	PhaseSpinButton *phase, *filePhase;
 	PositionSpinButton *offset, *fileOffset;

@@ -36,12 +36,6 @@ namespace adiscope {
 		bool inverse;
 		libm2k::analog::M2kAnalogIn* m2k_adc;
 
-
-		std::vector<float> d_correction_gains;
-		std::vector<float> d_filter_compensations;
-		std::vector<float> d_offsets;
-		std::vector<float> d_hardware_gains;
-
 	public:
 		explicit adc_sample_conv(int nconnections,
 					 libm2k::analog::M2kAnalogIn* m2k_adc,
@@ -49,17 +43,6 @@ namespace adiscope {
 
 		~adc_sample_conv();
 
-		void setCorrectionGain(int connection, float gain);
-		float correctionGain(int connection);
-
-		void setFilterCompensation(int connection, float val);
-		float filterCompensation(int connection);
-
-		void setOffset(int connection, float offset);
-		float offset(int connection) const;
-
-		void setHardwareGain(int connection, float gain);
-		float hardwareGain(int connection) const;
 		int work(int noutput_items,
 				gr_vector_const_void_star &input_items,
 			 gr_vector_void_star &output_items);
