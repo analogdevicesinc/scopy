@@ -49,10 +49,13 @@ void NetworkAnalyzerBufferViewer::setNumBuffers(unsigned int numBuffers)
 
 void NetworkAnalyzerBufferViewer::pushBuffers(QPair<Buffer, Buffer> buffers)
 {
+	static int currentBuffer = 0;
+	if (d_data.size() == 0) {
+		currentBuffer = 0;
+	}
 	if (d_data.size() < d_numBuffers) {
 		d_data.push_back(buffers);
 	} else {
-		static int currentBuffer = 0;
 		d_data[currentBuffer++] = buffers;
 		if (currentBuffer == d_numBuffers) {
 			currentBuffer = 0;
