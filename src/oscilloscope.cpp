@@ -76,6 +76,8 @@
 #include "ui_oscilloscope.h"
 #include "ui_trigger_settings.h"
 
+#include <functional>
+
 #define MAX_MATH_CHANNELS 4
 #define MAX_MATH_RANGE SHRT_MAX
 #define MIN_MATH_RANGE SHRT_MIN
@@ -86,6 +88,7 @@ using namespace gr;
 using namespace std;
 using namespace libm2k;
 using namespace libm2k::context;
+using namespace std::placeholders;
 
 Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 			   std::shared_ptr<GenericAdc> adc, ToolMenuItem *toolMenuItem,
@@ -263,20 +266,23 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	if (started)
 		iio->lock();
 
-	auto adc_samp_conv = gnuradio::get_initial_sptr(
-			new adc_sample_conv(nb_channels, m_m2k_analogin));
+	auto adc_samp_conv = new adc_sample_conv(nb_channels, m_m2k_analogin);
+	adc_samp_conv_block = gnuradio::get_initial_sptr(adc_samp_conv);
 
 
 	for (unsigned int i = 0; i < nb_channels; i++) {
-		ids[i] = iio->connect(adc_samp_conv, i, i,
+		ids[i] = iio->connect(adc_samp_conv_block, i, i,
 				true, qt_time_block->nsamps());
 
-		iio->connect(adc_samp_conv, i, qt_time_block, i);
+		iio->connect(adc_samp_conv_block, i, qt_time_block, i);
 
-		iio->connect(adc_samp_conv, i, qt_hist_block, i);
+		iio->connect(adc_samp_conv_block, i, qt_hist_block, i);
 	}
 
-	adc_samp_conv_block = adc_samp_conv;
+	const std::function<double(unsigned int, double, bool)> fp = std::bind(
+				&adc_sample_conv::conversionWrapper, adc_samp_conv,
+				std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+	plot.setConversionFunction(fp);
 
 	if (started)
 		iio->unlock();

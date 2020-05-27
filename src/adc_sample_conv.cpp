@@ -47,20 +47,17 @@ adc_sample_conv::~adc_sample_conv()
 {
 }
 
-float adc_sample_conv::convSampleToVolts(float sample, float correctionGain,
-	float filterCompensation, float offset, float hw_gain)
+double adc_sample_conv::conversionWrapper(unsigned int chn_idx, double sample, bool raw_to_volts)
 {
-	// TO DO: explain this formula
-	return ((sample * 0.78) / ((1 << 11) * 1.3 * hw_gain) *
-		correctionGain * filterCompensation) + offset;
-}
-
-float adc_sample_conv::convVoltsToSample(float voltage, float correctionGain,
-	float filterCompensation, float offset, float hw_gain)
-{
-	// TO DO: explain this formula
-	return ((voltage - offset) / (correctionGain * filterCompensation) *
-			(2048 * 1.3 * hw_gain) / 0.78);
+	try {
+		if (raw_to_volts) {
+			return m2k_adc->convertRawToVolts(chn_idx, (short)sample);
+		} else {
+			return m2k_adc->convertVoltsToRaw(chn_idx, sample);
+		}
+	} catch (std::exception &e) {
+		return 0;
+	}
 }
 
 int adc_sample_conv::work(int noutput_items,

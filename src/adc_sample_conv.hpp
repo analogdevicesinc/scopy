@@ -49,18 +49,6 @@ namespace adiscope {
 
 		~adc_sample_conv();
 
-
-		static float convSampleToVolts(float sample,
-					       float correctionGain = 1,
-					       float filterCompensation = 1,
-					       float offset = 0,
-					       float hw_gain = 0.02);
-		static float convVoltsToSample(float sample,
-					       float correctionGain = 1,
-					       float filterCompensation = 1,
-					       float offset = 0,
-					       float hw_gain = 0.02);
-
 		void setCorrectionGain(int connection, float gain);
 		float correctionGain(int connection);
 
@@ -72,10 +60,10 @@ namespace adiscope {
 
 		void setHardwareGain(int connection, float gain);
 		float hardwareGain(int connection) const;
-
 		int work(int noutput_items,
 				gr_vector_const_void_star &input_items,
-				gr_vector_void_star &output_items);
+			 gr_vector_void_star &output_items);
+		double conversionWrapper(unsigned int chn_idx, double sample, bool raw_to_volts);
 	};
 }
 
