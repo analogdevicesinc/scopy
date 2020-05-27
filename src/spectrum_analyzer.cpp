@@ -104,7 +104,7 @@ std::vector<QString> SpectrumAnalyzer::markerTypes = {
 };
 
 SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
-				   std::shared_ptr<GenericAdc> adc, ToolMenuItem *toolMenuItem,
+				   ToolMenuItem *toolMenuItem,
                                    QJSEngine *engine, ToolLauncher *parent):
 	Tool(ctx, toolMenuItem, new SpectrumAnalyzer_API(this), "Spectrum Analyzer",
 	     parent),

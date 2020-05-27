@@ -91,7 +91,7 @@ using namespace libm2k::context;
 using namespace std::placeholders;
 
 Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
-			   std::shared_ptr<GenericAdc> adc, ToolMenuItem *toolMenuItem,
+			   ToolMenuItem *toolMenuItem,
 			   QJSEngine *engine, ToolLauncher *parent) :
 	Tool(ctx, toolMenuItem, new Oscilloscope_API(this), "Oscilloscope", parent),
 	m_m2k_context(m2kOpen(ctx, "")),
@@ -138,7 +138,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	reset_horiz_offset(true),
 	wheelEventGuard(nullptr),
 	miniHistogram(true),
-	gatingEnabled(false)
+	gatingEnabled(false),
+	m_filtering_enabled(true)
 {
 	ui->setupUi(this);
 	int triggers_panel = ui->stackedWidget->insertWidget(-1, &trigger_settings);
@@ -198,10 +199,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	qDebug(CAT_OSCILLOSCOPE) << "Manager created:\n" << gr::dot_graph(hier).c_str();
 
 	for (unsigned int i = 0; i < nb_channels; i++) {
-		string name = m_m2k_analogin->getChannelName(i);
-		if (name == "") {
-			name = "Channel " + to_string(i + 1);
-		}
+		string name = "Channel " + to_string(i + 1);
 
 		ChannelWidget *ch_widget = new ChannelWidget(i, false, false,
 			plot.getLineColor(i).name(), this);
@@ -2815,7 +2813,7 @@ void adiscope::Oscilloscope::onChannelWidgetEnabled(bool en)
 
 	hist_plot.enableChannel(id, en);
 
-	if (id < m_m2k_analogin->getNbChannels()) {
+	if (id < nb_channels) {
 		m_m2k_analogin->enableChannel(id, en);
 	}
 
@@ -2994,7 +2992,7 @@ void adiscope::Oscilloscope::onVertScaleValueChanged(double value)
 	xy_plot.replot();
 	xy_plot.zoomBaseUpdate();
 
-	if (current_ch_widget < m_m2k_analogin->getNbChannels()) {
+	if (current_ch_widget < nb_channels) {
 		trigger_settings.setTriggerLevelStep(current_ch_widget, value);
 		trigger_settings.setTriggerHystStep(current_ch_widget, value / 10);
 	}
@@ -3490,15 +3488,6 @@ void Oscilloscope::onChannelOffsetChanged(unsigned int chnIdx, double value)
 
 	scaleHistogramPlot();
 	updateXyPlotScales();
-
-	if (chnIdx != current_ch_widget) {
-		if (gainUpdateNeeded()) {
-			updateGainMode();
-		}
-		setChannelHwOffset(chnIdx, value);
-
-		trigger_settings.updateHwVoltLevels(chnIdx);
-	}
 }
 
 ChannelWidget *Oscilloscope::channelWidgetAtId(int id)
@@ -4472,15 +4461,23 @@ void Oscilloscope::resetStreamingFlag(bool enable)
 	if (started)
 		iio->lock();
 
-	m_m2k_analogin->getTrigger()->setAnalogStreamingFlag(false);
+	try {
+		m_m2k_analogin->getTrigger()->setAnalogStreamingFlag(false);
+	} catch (std::exception &e) {
+		qDebug(CAT_OSCILLOSCOPE) << e.what();
+	}
 	cleanBuffersAllSinks();
 
 	if (started)
 		iio->unlock();
 
-	if (enable && !d_displayOneBuffer) {
-		m_m2k_analogin->getTrigger()->setAnalogStreamingFlag(true);
-        }
+	try {
+		if (enable && !d_displayOneBuffer) {
+			m_m2k_analogin->getTrigger()->setAnalogStreamingFlag(true);
+		}
+	} catch (std::exception &e) {
+		qDebug(CAT_OSCILLOSCOPE) << e.what();
+	}
 
 	/* Single capture done */
 	if ((symmBufferMode->isEnhancedMemDepth() || plot_samples_sequentially)
@@ -4666,15 +4663,16 @@ void Oscilloscope::updateGainMode()
 void Oscilloscope::setGainMode(uint chnIdx, libm2k::analog::M2K_RANGE gain_mode)
 {
 	if (ui->runSingleWidget->runButtonChecked()) {
-		libm2k::analog::ANALOG_IN_CHANNEL chn = static_cast<libm2k::analog::ANALOG_IN_CHANNEL>(chnIdx);
-		m_m2k_analogin->setRange(chn, gain_mode);
+		try {
+			libm2k::analog::ANALOG_IN_CHANNEL chn = static_cast<libm2k::analog::ANALOG_IN_CHANNEL>(chnIdx);
+			m_m2k_analogin->setRange(chn, gain_mode);
+		} catch (std::exception &e) {
+			qDebug(CAT_OSCILLOSCOPE) << e.what();
+		}
 	}
 
-	boost::shared_ptr<adc_sample_conv> block =
-	dynamic_pointer_cast<adc_sample_conv>(
-					adc_samp_conv_block);
+	boost::shared_ptr<adc_sample_conv> block = dynamic_pointer_cast<adc_sample_conv>(adc_samp_conv_block);
 
-	block->setHardwareGain(chnIdx, m_m2k_analogin->getValueForRange(gain_mode));
 	iio->freq_comp_filt[chnIdx][0]->set_high_gain(gain_mode);
 	iio->freq_comp_filt[chnIdx][1]->set_high_gain(gain_mode);
 	update_chn_settings_panel(chnIdx);
@@ -4685,9 +4683,14 @@ void Oscilloscope::setChannelHwOffset(uint chnIdx, double offset)
 {
 	channel_offset[chnIdx] = offset;
 	if (ui->runSingleWidget->runButtonChecked()) {
-		libm2k::analog::ANALOG_IN_CHANNEL chn = static_cast<libm2k::analog::ANALOG_IN_CHANNEL>(chnIdx);
-		m_m2k_analogin->setVerticalOffset(chn, offset);
+		try {
+			libm2k::analog::ANALOG_IN_CHANNEL chn = static_cast<libm2k::analog::ANALOG_IN_CHANNEL>(chnIdx);
+			m_m2k_analogin->setVerticalOffset(chn, offset);
+		} catch (std::exception &e) {
+			qDebug(CAT_OSCILLOSCOPE) << e.what();
+		}
 	}
+
 }
 
 void Oscilloscope::setAllSinksSampleCount(unsigned long sample_count)
@@ -4716,12 +4719,15 @@ void Oscilloscope::writeAllSettingsToHardware()
 	// Offset and Gain
 	if (m_m2k_analogin) {
 		for (uint i = 0; i < nb_channels; i++) {
-			libm2k::analog::M2K_RANGE mode = high_gain_modes[i] ?
-				libm2k::analog::PLUS_MINUS_2_5V : libm2k::analog::PLUS_MINUS_25V;
-			libm2k::analog::ANALOG_IN_CHANNEL chn = static_cast<libm2k::analog::ANALOG_IN_CHANNEL>(i);
-			m_m2k_analogin->setRange(chn, mode);
-			m_m2k_analogin->setVerticalOffset(chn, channel_offset[i]);
-
+			try {
+				libm2k::analog::M2K_RANGE mode = high_gain_modes[i] ?
+					libm2k::analog::PLUS_MINUS_2_5V : libm2k::analog::PLUS_MINUS_25V;
+				libm2k::analog::ANALOG_IN_CHANNEL chn = static_cast<libm2k::analog::ANALOG_IN_CHANNEL>(i);
+				m_m2k_analogin->setRange(chn, mode);
+				m_m2k_analogin->setVerticalOffset(chn, channel_offset[i]);
+			} catch (std::exception &e) {
+				qDebug(CAT_OSCILLOSCOPE) << e.what();
+			}
 		}
 		setSampleRate(active_sample_rate);
 	}
@@ -4812,19 +4818,29 @@ void Oscilloscope::channelLineWidthChanged(int id)
 
 void Oscilloscope::setSampleRate(double sample_rate)
 {
-	auto maxSampleRate = 100000000;
-	if (m_filtering_enabled == false) {
-		m_m2k_analogin->setSampleRate(maxSampleRate);
-		m_m2k_analogin->setOversamplingRatio(maxSampleRate / sample_rate);
-	} else {
-		m_m2k_analogin->setSampleRate(sample_rate);
-		m_m2k_analogin->setOversamplingRatio(1);
+	if (!m_m2k_analogin) {
+		return;
+	}
+	try {
+		auto maxSampleRate = m_m2k_analogin->getMaximumSamplerate();
+		if (m_filtering_enabled == false) {
+			m_m2k_analogin->setSampleRate(maxSampleRate);
+			m_m2k_analogin->setOversamplingRatio(maxSampleRate / sample_rate);
+		} else {
+			m_m2k_analogin->setSampleRate(sample_rate);
+			m_m2k_analogin->setOversamplingRatio(1);
+		}
+	} catch (std::exception &e) {
+		qDebug(CAT_OSCILLOSCOPE) << e.what();
 	}
 }
 
 
 double Oscilloscope::getSampleRate()
 {
+	if (!m_m2k_analogin) {
+		return 0;
+	}
 	try {
 		double sr = m_m2k_analogin->getSampleRate();
 		if (m_filtering_enabled == false) {
@@ -4833,6 +4849,7 @@ double Oscilloscope::getSampleRate()
 		}
 		return sr;
 	} catch (std::exception &e) {
+		qDebug(CAT_OSCILLOSCOPE) << e.what();
 		return 0;
 	}
 }

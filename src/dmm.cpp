@@ -52,8 +52,8 @@ using namespace adiscope;
 using namespace libm2k;
 using namespace libm2k::context;
 
-DMM::DMM(struct iio_context *ctx, Filter *filt, std::shared_ptr<GenericAdc> adc,
-		ToolMenuItem *toolMenuItem, QJSEngine *engine, ToolLauncher *parent)
+DMM::DMM(struct iio_context *ctx, Filter *filt, ToolMenuItem *toolMenuItem,
+	 QJSEngine *engine, ToolLauncher *parent)
 	: Tool(ctx, toolMenuItem, new DMM_API(this), "Voltmeter", parent),
 	ui(new Ui::DMM), signal(boost::make_shared<signal_sample>()),
 	manager(iio_manager::get_instance(ctx, filt->device_name(TOOL_DMM))),

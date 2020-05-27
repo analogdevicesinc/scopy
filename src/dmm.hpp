@@ -48,7 +48,6 @@ class QJSEngine;
 
 namespace adiscope {
 	class DMM_API;
-	class GenericAdc;
 
 	class DMM : public Tool
 	{
@@ -59,7 +58,6 @@ namespace adiscope {
 
 	public:
 		explicit DMM(struct iio_context *ctx, Filter *filt,
-				std::shared_ptr<GenericAdc> adc,
 				ToolMenuItem *toolMenuItem, QJSEngine *engine,
 				ToolLauncher *parent);
 		~DMM();

@@ -33,7 +33,6 @@ namespace Ui {
 }
 
 namespace adiscope {
-	class GenericAdc;
 	class Oscilloscope_API;
 	class PositionSpinButton;
 }
