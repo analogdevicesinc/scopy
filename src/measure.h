@@ -101,7 +101,8 @@ namespace adiscope {
 			DEFAULT_MEASUREMENT_COUNT
 		};
 
-		Measure(int channel, double *buffer = NULL, size_t length = 0);
+		Measure(int channel, double *buffer = NULL, size_t length = 0,
+			const std::function<double(unsigned int, double, bool)> &conversion = nullptr);
 
 		void setDataSource(double *buffer, size_t length);
 		void measure();
@@ -123,6 +124,7 @@ namespace adiscope {
 		std::shared_ptr<MeasurementData> measurement(int id);
 		int activeMeasurementsCount() const;
 
+		void setConversionFunction(const std::function<double (unsigned int, double, bool)> &fp);
 	private:
 		bool highLowFromHistogram(double &low, double &high,
 			double min, double max);
@@ -143,6 +145,7 @@ namespace adiscope {
 		CrossingDetection *m_cross_detect;
 
 		QList<std::shared_ptr<MeasurementData>> m_measurements;
+		std::function<double(unsigned int, double, bool)> m_conversion_function;
 	};
 
 	class Statistic

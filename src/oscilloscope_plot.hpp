@@ -30,6 +30,8 @@
 #include "customplotpositionbutton.h"
 #include "graticule.h"
 
+#include <functional>
+
 class QLabel;
 
 namespace adiscope {
@@ -131,6 +133,8 @@ namespace adiscope {
 
 		void computeMeasurementsForChannel(unsigned int chnIdx, unsigned int sampleRate);
 
+		void setConversionFunction(const std::function<double(unsigned int, double, bool)> &fp);
+
 	Q_SIGNALS:
 		void timeTriggerValueChanged(double);
 		void channelOffsetChanged(unsigned int, double);
@@ -200,6 +204,7 @@ namespace adiscope {
 		void onTriggerBHandleGrabbed(bool);
 
 	private:
+		std::function<double(unsigned int, double, bool)> m_conversion_function;
 		SymbolController *d_symbolCtrl;
 
 		bool d_triggerAEnabled;

@@ -71,7 +71,8 @@ CapturePlot::CapturePlot(QWidget *parent,
 	d_horizCursorsEnabled(false),
 	d_vertCursorsEnabled(false),
 	d_bonusWidth(0),
-	d_gatingEnabled(false)
+	d_gatingEnabled(false),
+	m_conversion_function(nullptr)
 {
 	setMinimumHeight(250);
 	setMinimumWidth(500);
@@ -1431,11 +1432,11 @@ void CapturePlot::onChannelAdded(int chnIdx)
 	if (isReferenceWaveform(Curve(chnIdx))) {
 		int idx = chnIdx - d_ydata.size();
 		measure = new Measure(chnIdx, d_ref_ydata[idx],
-			Curve(chnIdx)->data()->size());
+			Curve(chnIdx)->data()->size(), nullptr);
 	} else {
 		int count = countReferenceWaveform(chnIdx);
 		measure = new Measure(chnIdx, d_ydata[chnIdx - count],
-			Curve(chnIdx)->data()->size());
+			Curve(chnIdx)->data()->size(), m_conversion_function);
 	}
 
 	measure->setAdcBitCount(12);
@@ -1453,6 +1454,15 @@ void CapturePlot::computeMeasurementsForChannel(unsigned int chnIdx, unsigned in
 	measure->measure();
 
 	Q_EMIT measurementsAvailable();
+}
+
+void CapturePlot::setConversionFunction(const std::function<double(unsigned int, double, bool)> &fp)
+{
+	m_conversion_function = fp;
+	for (int i = 0; i < d_measureObjs.size(); i++) {
+		Measure *measure = d_measureObjs[i];
+		measure->setConversionFunction(fp);
+	}
 }
 
 void CapturePlot::cleanUpJustBeforeChannelRemoval(int chnIdx)
@@ -1532,7 +1542,7 @@ void CapturePlot::onNewDataReceived()
 		}
 
 		measure->setSampleRate(this->sampleRate());
-//		measure->measure();
+		measure->measure();
 	}
 
 	Q_EMIT measurementsAvailable();
