@@ -409,14 +409,17 @@ QPushButton:checked:hover {
            <property name="verticalSpacing">
             <number>10</number>
            </property>
-           <item row="3" column="0">
+           <item row="4" column="0">
             <layout class="QHBoxLayout" name="hLayout_plotBottomBar">
              <property name="spacing">
               <number>0</number>
              </property>
             </layout>
            </item>
-           <item row="1" column="0">
+           <item row="3" column="0">
+            <widget class="adiscope::MarkerTable" name="markerTable" native="true"/>
+           </item>
+           <item row="2" column="0">
             <widget class="QWidget" name="plot_placeholder" native="true">
              <property name="minimumSize">
               <size>
@@ -426,7 +429,7 @@ QPushButton:checked:hover {
              </property>
             </widget>
            </item>
-           <item row="0" column="0">
+           <item row="1" column="0">
             <layout class="QHBoxLayout" name="hLayout_plotTopBar">
              <property name="spacing">
               <number>0</number>
@@ -518,11 +521,28 @@ QPushButton:checked:hover {
              </item>
             </layout>
            </item>
-           <item row="2" column="0">
-            <widget class="adiscope::MarkerTable" name="markerTable" native="true"/>
-           </item>
-           <item row="4" column="0">
+           <item row="5" column="0">
             <widget class="adiscope::InstrumentNotes" name="instrumentNotes" native="true"/>
+           </item>
+           <item row="0" column="0">
+            <layout class="QVBoxLayout" name="vLayout_plot_and_scales">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <item>
+              <layout class="QGridLayout" name="gridLayoutPlot">
+               <property name="leftMargin">
+                <number>25</number>
+               </property>
+               <property name="rightMargin">
+                <number>25</number>
+               </property>
+               <property name="horizontalSpacing">
+                <number>0</number>
+               </property>
+              </layout>
+             </item>
+            </layout>
            </item>
           </layout>
          </widget>
@@ -2367,6 +2387,67 @@ background-color: #727273;
                </item>
               </layout>
              </widget>
+             <widget class="QWidget" name="measureSettings">
+              <widget class="QWidget" name="verticalLayoutWidget">
+               <property name="geometry">
+                <rect>
+                 <x>10</x>
+                 <y>10</y>
+                 <width>291</width>
+                 <height>511</height>
+                </rect>
+               </property>
+               <layout class="QVBoxLayout" name="vLayout_measure" stretch="0">
+                <property name="spacing">
+                 <number>0</number>
+                </property>
+                <item>
+                 <layout class="QHBoxLayout" name="hLayout_titleBar">
+                  <property name="spacing">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QLabel" name="label_Measure">
+                    <property name="font">
+                     <font>
+                      <pointsize>1</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Measure</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="hSpacer_titleBar">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_ChanNameMeasure">
+                    <property name="font">
+                     <font>
+                      <pointsize>1</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Channel</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </widget>
+             </widget>
             </widget>
            </item>
           </layout>
@@ -2475,6 +2556,32 @@ QLabel {
 }</string>
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout">
+           <item>
+            <widget class="QCheckBox" name="boxMeasure">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+             <property name="text">
+              <string>Measure</string>
+             </property>
+             <property name="checked">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="adiscope::CustomPushButton" name="btnMeasure">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
            <item>
             <widget class="QLabel" name="label_2">
              <property name="text">
@@ -2586,5 +2693,70 @@ QLabel {
  <resources>
   <include location="../resources/resources.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>boxMeasure</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>btnMeasure</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>506</x>
+     <y>637</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>579</x>
+     <y>637</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnMeasure</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>btnSettings</receiver>
+   <slot>setChecked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>577</x>
+     <y>635</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>808</x>
+     <y>43</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnMarkers</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>btnSettings</receiver>
+   <slot>setChecked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>825</x>
+     <y>638</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>827</x>
+     <y>48</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnSweep</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>btnSettings</receiver>
+   <slot>setChecked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>674</x>
+     <y>635</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>799</x>
+     <y>50</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

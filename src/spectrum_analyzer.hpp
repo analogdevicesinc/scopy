@@ -54,6 +54,7 @@ extern "C" {
 
 namespace Ui {
 class SpectrumAnalyzer;
+class MeasurementsPanel;
 }
 
 namespace adiscope {
@@ -61,6 +62,12 @@ class SpectrumChannel;
 class Filter;
 class ChannelWidget;
 class DbClickButtons;
+
+
+
+class MeasurementData;
+class MeasurementGui;
+class MeasureSettings;
 }
 
 class QPushButton;
@@ -119,6 +126,8 @@ private Q_SLOTS:
 	void on_btnSettings_clicked(bool checked);
 	void on_btnSweep_toggled(bool checked);
 	void on_btnMarkers_toggled(bool checked);
+    void on_btnMeasure_toggled(bool);
+    void on_boxMeasure_toggled(bool);
 	void on_comboBox_type_currentIndexChanged(const QString&);
 	void on_comboBox_window_currentIndexChanged(const QString&);
     void on_comboBox_line_thickness_currentIndexChanged(int index);
@@ -197,6 +206,14 @@ private:
 	libm2k::context::Generic* m_generic_context;
 	libm2k::analog::GenericAnalogIn* m_generic_analogin;
 	Ui::SpectrumAnalyzer *ui;
+
+
+
+    QWidget *measurePanel;
+    Ui::MeasurementsPanel *measure_panel_ui;
+    adiscope::MeasureSettings *measure_settings;
+
+
 	adiscope::DbClickButtons *marker_selector;
 	unsigned int m_nb_overlapping_avg;
 
@@ -255,6 +272,11 @@ private:
 	void setCurrentSampleLabel(double);
 
 	bool canSwitchAverageHistory(FftDisplayPlot::AverageType avg_type);
+
+
+    //void measure_settings_init();
+    void measure_panel_init();
+    void init_selected_measurements(int, std::vector<int>);
 };
 
 class SpectrumChannel: public QObject
