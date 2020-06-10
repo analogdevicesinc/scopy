@@ -156,6 +156,10 @@ if (NOT QWTPOLAR_LIBRARIES OR NOT QWTPOLAR_INCLUDE_DIRS)
 	message(SEND_ERROR "QwtPolar not found")
 endif()
 
+# Find libm2k
+find_library(LIBM2K_LIBRARIES NAMES m2k libm2k REQUIRED)
+find_path(LIBM2K_INCLUDE_DIRS libm2k/m2k.hpp)
+
 find_package(PkgConfig)
 pkg_check_modules(GLIB REQUIRED glib-2.0)
 pkg_check_modules(GLIBMM REQUIRED glibmm-2.4)
@@ -194,6 +198,10 @@ link_directories(
 	)
 
 FILE(GLOB SRC_LIST  src/*.cpp src/*.cc
+	src/patterngenerator/*.cpp
+	src/patterngenerator/*/*.cpp
+	src/logicanalyzer/*.cpp
+	src/logicanalyzer/*/*.cpp
 )
 
 FILE(GLOB M2KSCOPE_UIS ui/patterns/*.ui ui/*.ui)

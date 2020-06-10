@@ -61,10 +61,18 @@
 #include "toolmenu.h"
 #include "toolmenuitem.h"
 
+#include <libsigrokdecode/libsigrokdecode.h>
+
+#include <libm2k/m2k.hpp>
+#include <libm2k/contextbuilder.hpp>
+#include <libm2k/digital/m2kdigital.hpp>
+
 #define TIMER_TIMEOUT_MS 5000
 #define ALIVE_TIMER_TIMEOUT_MS 5000
 
 using namespace adiscope;
+using namespace libm2k::context;
+using namespace libm2k::digital;
 
 ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 	QMainWindow(parent),
@@ -605,13 +613,6 @@ ToolLauncher::~ToolLauncher()
 	delete ui;
 
 	saveSettings();
-}
-
-void ToolLauncher::destroyPopup()
-{
-	auto *popup = static_cast<pv::widgets::Popup *>(QObject::sender());
-
-	popup->deleteLater();
 }
 
 void ToolLauncher::forgetDeviceBtn_clicked(QString uri)
@@ -1422,10 +1423,12 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 	calib = new Calibration(ctx, &js_engine);
 	calib->initialize();
 
+	// TODO: move me from here when tool launcher will only use libm2k
+	M2k *m2k = m2kOpen(ctx, "");
+
 	if (filter->compatible(TOOL_PATTERN_GENERATOR)
 	    || filter->compatible(TOOL_DIGITALIO)) {
-		dioManager = new DIOManager(ctx,filter);
-
+		dioManager = new DIOManager(m2k->getDigital(), filter);
 	}
 
 	if (filter->compatible(TOOL_LOGIC_ANALYZER)
@@ -1452,7 +1455,7 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 	}
 
 	if (filter->compatible(TOOL_DIGITALIO)) {
-		dio = new DigitalIO(ctx, filter, menu->getToolMenuItemFor(TOOL_DIGITALIO),
+		dio = new DigitalIO(nullptr, filter, menu->getToolMenuItemFor(TOOL_DIGITALIO),
 				dioManager, &js_engine, this);
 		toolList.push_back(dio);
 		connect(dio, &DigitalIO::showTool, [=]() {
@@ -1471,20 +1474,20 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 	}
 
 	if (filter->compatible(TOOL_LOGIC_ANALYZER)) {
-		logic_analyzer = new LogicAnalyzer(ctx, filter, menu->getToolMenuItemFor(TOOL_LOGIC_ANALYZER),
-				&js_engine, this);
+		logic_analyzer = new logic::LogicAnalyzer(m2k->getDigital(), filter, menu->getToolMenuItemFor(TOOL_LOGIC_ANALYZER),
+		&js_engine, this);
 		toolList.push_back(logic_analyzer);
-		connect(logic_analyzer, &LogicAnalyzer::showTool, [=]() {
-			 menu->getToolMenuItemFor(TOOL_LOGIC_ANALYZER)->getToolBtn()->click();
+		connect(logic_analyzer, &logic::LogicAnalyzer::showTool, [=]() {
+		     menu->getToolMenuItemFor(TOOL_LOGIC_ANALYZER)->getToolBtn()->click();
 		});
 	}
 
 
 	if (filter->compatible((TOOL_PATTERN_GENERATOR))) {
-		pattern_generator = new PatternGenerator(ctx, filter,
-				 menu->getToolMenuItemFor(TOOL_PATTERN_GENERATOR), &js_engine,dioManager, this);
+		pattern_generator = new logic::PatternGenerator(m2k->getDigital(), filter,
+				 menu->getToolMenuItemFor(TOOL_PATTERN_GENERATOR), &js_engine, dioManager, this);
 		toolList.push_back(pattern_generator);
-		connect(pattern_generator, &PatternGenerator::showTool, [=]() {
+		connect(pattern_generator, &logic::PatternGenerator::showTool, [=]() {
 			 menu->getToolMenuItemFor(TOOL_PATTERN_GENERATOR)->getToolBtn()->click();
 		});
 	}
