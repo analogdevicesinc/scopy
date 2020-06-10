@@ -32,6 +32,8 @@
 
 #include <functional>
 
+#include <qwt_plot_zoneitem.h>
+
 class QLabel;
 
 namespace adiscope {
@@ -77,6 +79,8 @@ namespace adiscope {
 		CapturePlot(QWidget *parent, unsigned int xNumDivs = 10,
 			    unsigned int yNumDivs = 10);
 		~CapturePlot();
+
+		void replot();
 
 		HorizBar *levelTriggerA();
 		HorizBar *levelTriggerB();
@@ -135,6 +139,11 @@ namespace adiscope {
 
 		void setConversionFunction(const std::function<double(unsigned int, double, bool)> &fp);
 
+		void enableXaxisLabels();
+		void enableTimeTrigger(bool enable);
+		QString getChannelName(int chIdx) const;
+		void setChannelName(const QString &name, int chIdx);
+
 	Q_SIGNALS:
 		void timeTriggerValueChanged(double);
 		void channelOffsetChanged(unsigned int, double);
@@ -143,6 +152,7 @@ namespace adiscope {
 		void canvasSizeChanged();
 		void leftGateChanged(double);
 		void rightGateChanged(double);
+		void channelSelected(int, bool);
 
 	public Q_SLOTS:
 		void setTriggerAEnabled(bool en);
@@ -164,6 +174,18 @@ namespace adiscope {
 		void setVertCursorsLocked(bool value);
 		void showEvent(QShowEvent *event);
 		void printWithNoBackground(const QString& toolName = "", bool editScaleDraw = true);
+		void onDigitalChannelAdded(int chnIdx);
+		void setChannelSelectable(int chnIdx, bool selectable);
+		void removeDigitalPlotCurve(QwtPlotCurve *curve);
+		void setOffsetHandleVisible(int chIdx, bool visible);
+		void addToGroup(int currentGroup, int toAdd);
+		void beginGroupSelection();
+		bool endGroupSelection(bool moveAnnotationCurvesLast = false);    // TODO: toggle group selection
+		QVector<int> getGroupOfChannel(int chnIdx);
+		QVector<QVector<int>> getAllGroups();
+		void removeFromGroup(int chnIdx, int removedChnIdx, bool &didGroupVanish);
+		void positionInGroupChanged(int chnIdx, int from, int to);
+		void setGroups(const QVector<QVector<int>> &groups);
 
 	protected:
 		virtual void cleanUpJustBeforeChannelRemoval(int chnIdx);
@@ -203,6 +225,7 @@ namespace adiscope {
 		void onTriggerAHandleGrabbed(bool);
 		void onTriggerBHandleGrabbed(bool);
 
+		void handleInGroupChangedPosition(int position);
 	private:
 		std::function<double(unsigned int, double, bool)> m_conversion_function;
 		SymbolController *d_symbolCtrl;
@@ -232,6 +255,11 @@ namespace adiscope {
 
 		QList<HorizBar*> d_offsetBars;
 		QList<RoundedHandleV*> d_offsetHandles;
+
+		// Channel grouping
+		QVector<QList<RoundedHandleV*>> d_groupHandles;
+		bool d_startedGrouping;
+		QVector<QwtPlotZoneItem *> d_groupMarkers;
 
 		PlotLineHandleV *d_vCursorHandle1;
 		PlotLineHandleV *d_vCursorHandle2;
@@ -294,6 +322,9 @@ namespace adiscope {
 		QwtPlotShapeItem *leftGate, *rightGate;
 		QRectF leftGateRect, rightGateRect;
 		bool d_gatingEnabled;
+
+		QPair<double, double> d_xAxisInterval;
+		int d_currentHandleInitPx;
 	};
 }
 

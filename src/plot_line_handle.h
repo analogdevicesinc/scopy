@@ -169,8 +169,12 @@ public:
 	FreePlotLineHandleV(const QPixmap &handleIcon,
 			const QPixmap &beyondTopIcon,
 			const QPixmap &beyondBottomIcon,
-			QWidget *parent = 0, bool facingRight = false);
+			QWidget *parent = 0, bool facingRight = false,
+			const QString &name = {});
 	void moveWithinParent(int x, int y);
+
+	void setName(const QString &name);
+	QString getName() const;
 
 protected:
 	void paintEvent(QPaintEvent *event);
@@ -180,24 +184,40 @@ private:
 	QPixmap m_beyondBottomImage;
 	bool m_isBeyondTop;
 	bool m_isBeyondBottom;
+	QString m_name;
 };
 
 class RoundedHandleV: public FreePlotLineHandleV
 {
+	Q_OBJECT
 public:
 	RoundedHandleV(const QPixmap &handleIcon,
-			const QPixmap &beyondTopIcon,
-			const QPixmap &beyondBottomIcon,
-			QWidget *parent = 0, bool facingRight = false);
+		       const QPixmap &beyondTopIcon,
+		       const QPixmap &beyondBottomIcon,
+		       QWidget *parent = 0, bool facingRight = false,
+		       const QString& name = {},
+		       bool selectable = false);
 
 	QColor roundRectColor();
 	void setRoundRectColor(const QColor &);
 
+	void setSelected(bool selected);
+	bool isSelected() const;
+
+	void setSelectable(bool selectable);
+
+Q_SIGNALS:
+	void selected(bool);
+
 protected:
 	void paintEvent(QPaintEvent *event);
 
+	void mouseDoubleClickEvent(QMouseEvent *event);
+
 private:
 	QColor m_roundRectColor;
+	bool m_selected;
+	bool m_selectable;
 };
 
 #endif // PLOT_LINE_HANDLE_H

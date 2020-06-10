@@ -52,7 +52,8 @@ BufferPreviewer::BufferPreviewer(int pixelsPerPeriod, double wavePhase,
 	m_rightBtnClick(false),
 	m_gatingEnabled(false),
 	m_leftGateWidth(0),
-	m_rightGateWidth(0)
+	m_rightGateWidth(0),
+	m_cursorVisible(true)
 {
 }
 
@@ -176,6 +177,14 @@ void BufferPreviewer::setRightGateWidth(double width)
 	update();
 }
 
+void BufferPreviewer::setCursorVisible(bool visible)
+{
+	if (m_cursorVisible != visible) {
+		m_cursorVisible = visible;
+		update();
+	}
+}
+
 void BufferPreviewer::paintEvent(QPaintEvent *)
 {
 	QPainter p(this);
@@ -238,14 +247,16 @@ void BufferPreviewer::paintEvent(QPaintEvent *)
 		p.drawRect(hlight_start + hlight_width, 0, line_w, h);
 	}
 
-	//Draw Cursor
-	p.setRenderHint(QPainter::Antialiasing, false);
-	int cur_head_w = 8;
-	int cur_head_h = 4;
-	p.setPen(rectPen);
-	p.setBrush(palette().color(QPalette::AlternateBase));
-	p.drawRect((cursor_start - 1) - cur_head_w / 2 + 1, 0, cur_head_w, cur_head_h);
-	p.drawRect((cursor_start - 1), cur_head_h, 2, h - cur_head_h);
+	if (m_cursorVisible) {
+		//Draw Cursor
+		p.setRenderHint(QPainter::Antialiasing, false);
+		int cur_head_w = 8;
+		int cur_head_h = 4;
+		p.setPen(rectPen);
+		p.setBrush(palette().color(QPalette::AlternateBase));
+		p.drawRect((cursor_start - 1) - cur_head_w / 2 + 1, 0, cur_head_w, cur_head_h);
+		p.drawRect((cursor_start - 1), cur_head_h, 2, h - cur_head_h);
+	}
 
 	//Draw gatings if enabled
 	if(m_gatingEnabled){
