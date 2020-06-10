@@ -100,6 +100,11 @@ void Tool::setNativeDialogs(bool nativeDialogs)
 	m_useNativeDialogs = nativeDialogs;
 }
 
+ApiObject *Tool::getApi()
+{
+	return api;
+}
+
 void Tool::readPreferences()
 {
 	saveOnExit = prefPanel->getSave_session_on_exit();
