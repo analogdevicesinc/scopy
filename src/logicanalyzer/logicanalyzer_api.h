@@ -1,0 +1,104 @@
+#ifndef LOGICANALYZER_API_H
+#define LOGICANALYZER_API_H
+
+#include "logic_analyzer.h"
+#include "apiObject.hpp"
+
+namespace adiscope {
+namespace logic {
+class LogicAnalyzer_API : public ApiObject
+{
+	Q_OBJECT
+
+	/* sweep settings */
+	Q_PROPERTY(double sampleRate READ getSampleRate WRITE setSampleRate)
+	Q_PROPERTY(int bufferSize READ getBufferSize WRITE setBufferSize)
+	Q_PROPERTY(bool streamOneShot READ getStreamOrOneShot WRITE setStreamOrOneShot)
+	Q_PROPERTY(int delay READ getDelay WRITE setDelay)
+
+	/* channel settings */
+	Q_PROPERTY(QList<int> enabledChannels READ getEnabledChannels WRITE setEnabledChannels)
+
+	/* decoders */
+	Q_PROPERTY(QStringList enabledDecoders READ getEnabledDecoders WRITE setEnabledDecoders)
+	Q_PROPERTY(QList<QList<QPair<int, int>>> assignedDecoderChannels READ getAssignedDecoderChannels
+								WRITE setAssignedDecoderChannels)
+	Q_PROPERTY(QList<QStringList> decoderStack READ getDecoderStack WRITE setDecoderStack)
+	Q_PROPERTY(QList<QStringList> decoderSettings READ getDecoderSettings WRITE setDecoderSettings)
+
+	/* common decoders + channels */
+	Q_PROPERTY(QStringList channelNames READ getChannelNames WRITE setChannelNames)
+	Q_PROPERTY(QList<double> channelHeights READ getChannelHeights WRITE setChannelHeights)
+	Q_PROPERTY(QList<double> channelPosition READ getChannelPosition WRITE setChannelPosition)
+
+	/* groups */
+	Q_PROPERTY(QVector<QVector<int>> currentGroups READ getCurrentGroups WRITE setCurrentGroups)
+
+public:
+	explicit LogicAnalyzer_API(logic::LogicAnalyzer *logic):
+	ApiObject(), m_logic(logic) {
+		// Register type. TODO: maybe a cleaner way of doing this
+		// QVariant needs qRegisterMetaTypeStreamOperators for serialization/deserialization
+		qRegisterMetaType<QPair<int, int>>("pair");
+		qRegisterMetaTypeStreamOperators<QPair<int, int>>("pair");
+		qRegisterMetaType<QList<QPair<int, int>>>("list(pair)");
+		qRegisterMetaTypeStreamOperators<QList<QPair<int, int>>>("list(pair)");
+		qRegisterMetaType<QList<QList<QPair<int, int>>>>("list(list(pair))");
+		qRegisterMetaTypeStreamOperators<QList<QList<QPair<int, int>>>>("list(list(pair))");
+
+		qRegisterMetaType<QList<QStringList>>("list(stringlist)");
+		qRegisterMetaTypeStreamOperators<QList<QStringList>>("list(stringlist)");
+
+		qRegisterMetaType<QVector<int>>("vector(int)");
+		qRegisterMetaTypeStreamOperators<QVector<int>>("vector(int)");
+		qRegisterMetaType<QVector<QVector<int>>>("vector(vector(int))");
+		qRegisterMetaTypeStreamOperators<QVector<QVector<int>>>("vector(vector(int))");
+	}
+	~LogicAnalyzer_API() {}
+
+	double getSampleRate() const;
+	void setSampleRate(double sampleRate);
+
+	int getBufferSize() const;
+	void setBufferSize(int bufferSize);
+
+	QList<int> getEnabledChannels() const;
+	void setEnabledChannels(const QList<int> &enabledChannels);
+
+	QStringList getEnabledDecoders() const;
+	void setEnabledDecoders(const QStringList &decoders);
+
+	bool getStreamOrOneShot() const;
+	void setStreamOrOneShot(bool streamOrOneShot);
+
+	int getDelay() const;
+	void setDelay(int delay);
+
+	QStringList getChannelNames() const;
+	void setChannelNames(const QStringList &channelNames);
+
+	QList<double> getChannelHeights() const;
+	void setChannelHeights(const QList<double> &channelHeights);
+
+	QList<double> getChannelPosition() const;
+	void setChannelPosition(const QList<double> &channelPosition);
+
+	QList<QList<QPair<int, int>>> getAssignedDecoderChannels() const;
+	void setAssignedDecoderChannels(const QList<QList<QPair<int, int>>> &assignedDecoderChannels);
+
+	QList<QStringList> getDecoderStack() const;
+	void setDecoderStack(const QList<QStringList> &decoderStack);
+
+	QList<QStringList> getDecoderSettings() const;
+	void setDecoderSettings(const QList<QStringList> &decoderSettings);
+
+	QVector<QVector<int>> getCurrentGroups() const;
+	void setCurrentGroups(const QVector<QVector<int> > &groups);
+
+private:
+	logic::LogicAnalyzer *m_logic;
+};
+}
+}
+
+#endif // LOGICANALYZER_API_H
