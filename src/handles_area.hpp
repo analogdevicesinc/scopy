@@ -22,6 +22,10 @@
 #define HANDLES_AREA_H
 
 #include <QWidget>
+#include <memory>
+#include <vector>
+
+#include "handlesareaextension.h"
 
 class QPoint;
 class PlotLineHandle;
@@ -32,6 +36,7 @@ class HandlesArea: public QWidget
 
 public:
 	HandlesArea(QWidget *parent);
+	void installExtension(std::unique_ptr<HandlesAreaExtension> extension);
 
 Q_SIGNALS:
 	void sizeChanged(QSize);
@@ -43,14 +48,19 @@ protected:
 	void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
 	virtual void resizeMask(QSize) = 0;
 
+	void paintEvent(QPaintEvent* event) Q_DECL_OVERRIDE;
+
 protected:
 	QWidget *canvas;
 	PlotLineHandle *selectedItem;
 	QPoint hotspot;
+
+	std::vector<std::unique_ptr<HandlesAreaExtension>> m_extensions;
 };
 
 class VertHandlesArea: public HandlesArea
 {
+	Q_OBJECT
 public:
 	VertHandlesArea(QWidget *parent = 0);
 
@@ -72,6 +82,7 @@ private:
 
 class HorizHandlesArea: public HandlesArea
 {
+	Q_OBJECT
 public:
 	HorizHandlesArea(QWidget *parent = 0);
 
@@ -99,6 +110,5 @@ protected:
 	void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 private:
 };
-
 
 #endif // HANDLES_AREA_H

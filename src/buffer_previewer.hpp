@@ -56,6 +56,8 @@ public:
 	void setLeftGateWidth(double);
 	void setRightGateWidth(double);
 
+	void setCursorVisible(bool visible);
+
 Q_SIGNALS:
 	void bufferMovedBy(int);
 	void bufferStopDrag();
@@ -94,6 +96,8 @@ private:
 	bool m_gatingEnabled;
 	double m_leftGateWidth;
 	double m_rightGateWidth;
+
+	bool m_cursorVisible;
 };
 
 class AnalogBufferPreviewer: public BufferPreviewer

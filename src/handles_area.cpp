@@ -23,6 +23,8 @@
 #include <QtWidgets>
 #include <QDebug>
 
+#include "handlesareaextension.h"
+
 /*
  * Class HandlesArea implementation
  */
@@ -33,6 +35,11 @@ HandlesArea::HandlesArea(QWidget *parent):
 	selectedItem(NULL)
 {
 	this->setStyleSheet("QWidget {background-color: transparent}");
+}
+
+void HandlesArea::installExtension(std::unique_ptr<HandlesAreaExtension> extension)
+{
+	m_extensions.push_back(std::move(extension));
 }
 
 void HandlesArea::mousePressEvent(QMouseEvent *event)
@@ -71,6 +78,19 @@ void HandlesArea::resizeEvent(QResizeEvent *event)
 	resizeMask(event->size());
 
 	Q_EMIT sizeChanged(event->size());
+}
+
+void HandlesArea::paintEvent(QPaintEvent *event)
+{
+	QPainter p(this);
+
+	for (std::unique_ptr<HandlesAreaExtension> &extension : m_extensions) {
+		if (extension->draw(&p, this)) {
+			break;
+		}
+	}
+
+	QWidget::paintEvent(event);
 }
 
 /*

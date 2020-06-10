@@ -378,6 +378,7 @@ public:
   // class:
   // void PlotNewData(...);
   QwtPlotZoomer *getZoomer() const;
+  void setZoomerParams(bool bounded, int maxStackDepth);
 
 
 
@@ -496,8 +497,8 @@ public Q_SLOTS:
   void onPickerPointSelected(const QwtDoublePoint & p);
   void onPickerPointSelected6(const QPointF & p);
 
-  unsigned int xAxisNumDiv();
-  unsigned int yAxisNumDiv();
+  unsigned int xAxisNumDiv() const;
+  unsigned int yAxisNumDiv() const;
 
 Q_SIGNALS:
   void horizScaleDivisionChanged(double);
@@ -506,6 +507,9 @@ Q_SIGNALS:
   void vertScaleOffsetChanged(double);
 
   void plotPointSelected(const QPointF p);
+
+  // signals that the plot size changed
+  void plotSizeChanged();
 
 protected Q_SLOTS:
   virtual void legendEntryChecked(QwtPlotItem *plotItem, bool on);
@@ -573,6 +577,8 @@ protected:
   void setYaxisNumDiv(unsigned int);
   void bottomHorizAxisInit();
   virtual void configureAxis(int axisPos, int axisIdx);
+
+  void resizeEvent(QResizeEvent *event);
 
 private:
   void AddAxisOffset(int axisPos, int axisIdx, double offset);

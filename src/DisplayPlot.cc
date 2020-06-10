@@ -594,6 +594,7 @@ DisplayPlot::DisplayPlot(int nplots, QWidget* parent,
 	scaleItem->setBorderDistance(0);
 	scaleItem->attach(this);
 	scaleItems.push_back(scaleItem);
+	scaleItem->setZ(200);
   }
 
   this->plotLayout()->setCanvasMargin(0, QwtPlot::yLeft);
@@ -1354,6 +1355,17 @@ QwtPlotZoomer *DisplayPlot::getZoomer() const
 	return d_zoomer[0];
 }
 
+void DisplayPlot::setZoomerParams(bool bounded, int maxStackDepth)
+{
+	if (d_zoomer.isEmpty()) {
+		return;
+	}
+
+	auto zoomer = dynamic_cast<LimitedPlotZoomer*>(d_zoomer[0]);
+	zoomer->setMaxStackDepth(maxStackDepth);
+	zoomer->setBoundVertical(bounded);
+}
+
 void DisplayPlot::horizAxisScaleIncrease()
 {
 	double div = HorizUnitsPerDiv();
@@ -1483,6 +1495,13 @@ void DisplayPlot::configureAxis(int axisPos, int axisIdx)
 	this->setAxisScaleDraw(axis, scaleDraw);
 }
 
+void DisplayPlot::resizeEvent(QResizeEvent *event)
+{
+	PrintablePlot::resizeEvent(event);
+
+	Q_EMIT plotSizeChanged();
+}
+
 void DisplayPlot::bottomHorizAxisInit()
 {
 	horizAxis = new PlotAxisConfiguration(QwtPlot::xBottom, 0, this);
@@ -1512,7 +1531,7 @@ static QwtScaleDiv getEdgelessScaleDiv(const QwtScaleDiv& from_scaleDiv)
 	return QwtScaleDiv(lowerBound, upperBound, minorTicks, mediumTicks, majorTicks);
 }
 
-unsigned int DisplayPlot::xAxisNumDiv()
+unsigned int DisplayPlot::xAxisNumDiv() const
 {
 	return d_xAxisNumDiv;
 }
@@ -1526,7 +1545,7 @@ void DisplayPlot::setXaxisNumDiv(unsigned int num)
 	}
 }
 
-unsigned int DisplayPlot::yAxisNumDiv()
+unsigned int DisplayPlot::yAxisNumDiv() const
 {
 	return d_yAxisNumDiv;
 }
