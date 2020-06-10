@@ -160,8 +160,6 @@ find_package(PkgConfig)
 pkg_check_modules(GLIB REQUIRED glib-2.0)
 pkg_check_modules(GLIBMM REQUIRED glibmm-2.4)
 pkg_check_modules(SIGCPP REQUIRED sigc++-2.0)
-pkg_check_modules(LIBSIGROK REQUIRED libsigrok)
-pkg_check_modules(LIBSIGROKCXX REQUIRED libsigrokcxx)
 pkg_check_modules(LIBSIGROK_DECODE REQUIRED libsigrokdecode)
 message(CMAKE_PATH ${CMAKE_PREFIX_PATH})
 include_directories(
@@ -177,8 +175,6 @@ include_directories(
 	${IIO_INCLUDE_DIRS}
 	${SCOPY_INCLUDE_DIRS}
 	${LIBSIGROK_DECODE_INCLUDE_DIRS}
-	${LIBSIGROKCXX_INCLUDE_DIRS}
-	${LIBSIGROK_INCLUDE_DIRS}
 	${GLIB_INCLUDE_DIRS}
 	${GLIBCONFIG_INCLUDE_DIRS}
 	${GLIBMM_INCLUDE_DIRS}
@@ -198,20 +194,9 @@ link_directories(
 	)
 
 FILE(GLOB SRC_LIST  src/*.cpp src/*.cc
-	src/pulseview/pv/*.cpp
-	src/pulseview/pv/binding/*.cpp
-	src/pulseview/pv/data/*.cpp
-	src/pulseview/pv/data/decode/*.cpp
-	src/pulseview/pv/devices/*.cpp
-	src/pulseview/pv/dialogs/*.cpp
-	src/pulseview/pv/popups/*.cpp
-	src/pulseview/pv/prop/*.cpp
-	src/pulseview/pv/toolbars/*.cpp
-	src/pulseview/pv/view/*.cpp
-	src/pulseview/pv/widgets/*.cpp
 )
 
-FILE(GLOB M2KSCOPE_UIS ui/patterns/*.ui ui/*.ui src/pulseview/pv/dialogs/*.ui)
+FILE(GLOB M2KSCOPE_UIS ui/patterns/*.ui ui/*.ui)
 qt5_wrap_ui (m2kscope_FORMS_HEADERS ${M2KSCOPE_UIS})
 
 FILE(GLOB M2KSCOPE_RESOURCES resources/*.qrc)
@@ -310,8 +295,6 @@ target_link_libraries(${PROJECT_NAME} LINK_PRIVATE
 		${Qt5Xml_LIBRARIES}
 		${IIO_LIBRARIES}
 		${MATIO_LIBRARIES}
-		${LIBSIGROK_LIBRARIES}
-		${LIBSIGROKCXX_LIBRARIES}
 		${LIBSIGROK_DECODE_LIBRARIES}
 		${GLIBMM_LIBRARIES}
 		${SIGCPP_LIBRARIES}
