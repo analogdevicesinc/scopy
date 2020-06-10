@@ -177,23 +177,23 @@ void ToolLauncher_API::load(const QString& file)
 	if (tl->notesPanel)
 		tl->notesPanel->api()->load(settings);
 	if (tl->oscilloscope)
-		tl->oscilloscope->api->load(settings);
+		tl->oscilloscope->getApi()->load(settings);
 	if (tl->dmm)
-		tl->dmm->api->load(settings);
+		tl->dmm->getApi()->load(settings);
 	if (tl->power_control)
-		tl->power_control->api->load(settings);
+		tl->power_control->getApi()->load(settings);
 	if (tl->signal_generator)
-		tl->signal_generator->api->load(settings);
+		tl->signal_generator->getApi()->load(settings);
 	if (tl->logic_analyzer)
-		tl->logic_analyzer->api->load(settings);
+		tl->logic_analyzer->getApi()->load(settings);
 	if (tl->dio)
-		tl->dio->api->load(settings);
+		tl->dio->getApi()->load(settings);
 	if (tl->pattern_generator)
-		tl->pattern_generator->api->load(settings);
+		tl->pattern_generator->getApi()->load(settings);
 	if (tl->network_analyzer)
-		tl->network_analyzer->api->load(settings);
+		tl->network_analyzer->getApi()->load(settings);
 	if (tl->spectrum_analyzer)
-		tl->spectrum_analyzer->api->load(settings);
+		tl->spectrum_analyzer->getApi()->load(settings);
 
 	ApiObjectManager::getInstance().load(settings);
 
@@ -253,23 +253,23 @@ void ToolLauncher_API::save(const QString& file)
 	if (tl->notesPanel)
 		tl->notesPanel->api()->save(settings);
 	if (tl->oscilloscope)
-		tl->oscilloscope->api->save(settings);
+		tl->oscilloscope->getApi()->save(settings);
 	if (tl->dmm)
-		tl->dmm->api->save(settings);
+		tl->dmm->getApi()->save(settings);
 	if (tl->power_control)
-		tl->power_control->api->save(settings);
+		tl->power_control->getApi()->save(settings);
 	if (tl->signal_generator)
-		tl->signal_generator->api->save(settings);
+		tl->signal_generator->getApi()->save(settings);
 	if (tl->logic_analyzer)
-		tl->logic_analyzer->api->save(settings);
+		tl->logic_analyzer->getApi()->save(settings);
 	if (tl->dio)
-		tl->dio->api->save(settings);
+		tl->dio->getApi()->save(settings);
 	if (tl->pattern_generator)
-		tl->pattern_generator->api->save(settings);
+		tl->pattern_generator->getApi()->save(settings);
 	if (tl->network_analyzer)
-		tl->network_analyzer->api->save(settings);
+		tl->network_analyzer->getApi()->save(settings);
 	if (tl->spectrum_analyzer)
-		tl->spectrum_analyzer->api->save(settings);
+		tl->spectrum_analyzer->getApi()->save(settings);
 
 	ApiObjectManager::getInstance().save(settings);
 }
