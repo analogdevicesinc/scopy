@@ -111,7 +111,11 @@ PowerController::~PowerController()
 	ui->dac1->setChecked(false);
 	ui->dac2->setChecked(false);
 
-	m_m2k_powersupply->powerDownDacs(true);
+	try {
+		m_m2k_powersupply->powerDownDacs(true);
+	} catch (std::exception &e) {
+		qDebug(CAT_POWER_CONTROLLER) << e.what();
+	}
 
 	if (saveOnExit) {
 		api->save(*settings);
