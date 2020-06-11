@@ -1391,7 +1391,15 @@ void NetworkAnalyzer::plot(double frequency, double mag1, double mag2,
 bool NetworkAnalyzer::_checkMagForOverrange(double magnitude)
 {
 	int responseChannel = ui->btnRefChn->isChecked() ? 1 : 0;
-	double vlsb = m_m2k_analogin->getScalingFactor(static_cast<ANALOG_IN_CHANNEL>(responseChannel));
+	double vlsb = 0.0;
+
+	try {
+		vlsb = m_m2k_analogin->getScalingFactor(static_cast<ANALOG_IN_CHANNEL>(responseChannel));
+	} catch (std::exception &e) {
+		qDebug(CAT_NETWORK_ANALYZER) << e.what();
+		return false;
+	}
+
 	double magnitudeThreshold = 20 * std::log10(3 * vlsb / amplitude->value());
 
 	if (magnitude < magnitudeThreshold) {
@@ -1535,11 +1543,15 @@ void NetworkAnalyzer::startStop(bool pressed)
 		ui->statusLabel->setText(tr("Stopping..."));
 		QCoreApplication::processEvents();
 		m_stop = true;
-		m_m2k_analogin->cancelAcquisition();
-		m_m2k_analogout->cancelBuffer();
-		thd.waitForFinished();
-		m_m2k_analogin->stopAcquisition();
-		m_m2k_analogout->stop();
+		try {
+			m_m2k_analogin->cancelAcquisition();
+			m_m2k_analogout->cancelBuffer();
+			thd.waitForFinished();
+			m_m2k_analogin->stopAcquisition();
+			m_m2k_analogout->stop();
+		} catch (std::exception &e) {
+			qDebug(CAT_NETWORK_ANALYZER) << e.what();
+		}
 		m_dBgraph.sweepDone();
 		m_phaseGraph.sweepDone();
 		ui->statusLabel->setText(tr("Stopped"));

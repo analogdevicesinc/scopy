@@ -1335,9 +1335,13 @@ void SignalGenerator::run()
 
 void SignalGenerator::stop()
 {
-	buffers.clear();
-	m_m2k_analogout->stop();
-	m_running = false;
+	try {
+		buffers.clear();
+		m_running = false;
+		m_m2k_analogout->stop();
+	} catch (std::exception &e) {
+		qDebug(CAT_SIGNAL_GENERATOR) << e.what();
+	}
 }
 
 void SignalGenerator::startStop(bool pressed)
