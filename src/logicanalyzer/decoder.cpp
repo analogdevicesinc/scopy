@@ -42,6 +42,7 @@
 #include <libsigrokdecode/libsigrokdecode.h>
 
 #include <QDebug>
+#include <cassert>
 
 using std::map;
 using std::string;

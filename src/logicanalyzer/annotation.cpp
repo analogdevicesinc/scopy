@@ -39,6 +39,7 @@
 
 
 #include "annotation.h"
+#include <cassert>
 
 extern "C" {
 #include <libsigrokdecode/libsigrokdecode.h>
