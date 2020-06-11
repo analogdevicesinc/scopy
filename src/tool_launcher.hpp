@@ -188,6 +188,7 @@ private:
 private:
 	Ui::ToolLauncher *ui;
 	struct iio_context *ctx;
+	libm2k::context::M2k *m_m2k;
 
 	ToolMenu *menu;
 

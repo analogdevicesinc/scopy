@@ -95,7 +95,8 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 	selectedDev(nullptr),
 	m_use_decoders(true),
 	menu(nullptr),
-	m_useNativeDialogs(true)
+	m_useNativeDialogs(true),
+	m_m2k(nullptr)
 {
 	if (!isatty(STDIN_FILENO))
 		notifier.setEnabled(false);
@@ -1416,6 +1417,8 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 		return false;
 	}
 
+	m_m2k = m2kOpen(ctx, "");
+
 	alive_timer->start(ALIVE_TIMER_TIMEOUT_MS);
 
 	filter = new Filter(ctx);
@@ -1423,12 +1426,9 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 	calib = new Calibration(ctx, &js_engine);
 	calib->initialize();
 
-	// TODO: move me from here when tool launcher will only use libm2k
-	M2k *m2k = m2kOpen(ctx, "");
-
 	if (filter->compatible(TOOL_PATTERN_GENERATOR)
 	    || filter->compatible(TOOL_DIGITALIO)) {
-		dioManager = new DIOManager(m2k->getDigital(), filter);
+		dioManager = new DIOManager(ctx, filter);
 	}
 
 	if (filter->compatible(TOOL_LOGIC_ANALYZER)
@@ -1474,7 +1474,7 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 	}
 
 	if (filter->compatible(TOOL_LOGIC_ANALYZER)) {
-		logic_analyzer = new logic::LogicAnalyzer(m2k->getDigital(), filter, menu->getToolMenuItemFor(TOOL_LOGIC_ANALYZER),
+		logic_analyzer = new logic::LogicAnalyzer(ctx, filter, menu->getToolMenuItemFor(TOOL_LOGIC_ANALYZER),
 		&js_engine, this);
 		toolList.push_back(logic_analyzer);
 		connect(logic_analyzer, &logic::LogicAnalyzer::showTool, [=]() {
@@ -1484,7 +1484,7 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 
 
 	if (filter->compatible((TOOL_PATTERN_GENERATOR))) {
-		pattern_generator = new logic::PatternGenerator(m2k->getDigital(), filter,
+		pattern_generator = new logic::PatternGenerator(ctx, filter,
 				 menu->getToolMenuItemFor(TOOL_PATTERN_GENERATOR), &js_engine, dioManager, this);
 		toolList.push_back(pattern_generator);
 		connect(pattern_generator, &logic::PatternGenerator::showTool, [=]() {

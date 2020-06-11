@@ -48,7 +48,7 @@ constexpr int MAX_BUFFER_SIZE_ONESHOT = 4 * 1024 * 1024; // 4M
 constexpr int MAX_BUFFER_SIZE_STREAM = 64 * 4 * 1024 * 1024; // 64 x 4M
 constexpr int DIGITAL_NR_CHANNELS = 16;
 
-LogicAnalyzer::LogicAnalyzer(M2kDigital *m2kDigital, adiscope::Filter *filt,
+LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, adiscope::Filter *filt,
 			     adiscope::ToolMenuItem *toolMenuItem,
 			     QJSEngine *engine, adiscope::ToolLauncher *parent,
 			     bool offline_mode_):
@@ -56,6 +56,8 @@ LogicAnalyzer::LogicAnalyzer(M2kDigital *m2kDigital, adiscope::Filter *filt,
 	ui(new Ui::LogicAnalyzer),
 	m_plot(this, 16, 10),
 	m_bufferPreviewer(new DigitalBufferPreviewer(40, this)),
+	m_m2k_context(m2kOpen(ctx, "")),
+	m_m2kDigital(m_m2k_context->getDigital()),
 	m_sampleRateButton(new ScaleSpinButton({
 					{"Hz", 1E0},
 					{"kHz", 1E+3},
@@ -78,7 +80,6 @@ LogicAnalyzer::LogicAnalyzer(M2kDigital *m2kDigital, adiscope::Filter *filt,
 					 true, false, this)),
 	m_sampleRate(1000000),
 	m_bufferSize(1000),
-	m_m2kDigital(m2kDigital),
 	m_nbChannels(DIGITAL_NR_CHANNELS),
 	m_horizOffset(0.0),
 	m_timeTriggerOffset(0.0),

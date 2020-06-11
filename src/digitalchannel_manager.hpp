@@ -54,11 +54,12 @@ class DIOManager : public QObject
 	int gpo;
 	int gpi;
 	bool outputEnabled;
+	M2k* m_m2k_context;
 	M2kDigital *digital;
 
 public:
 	void init();
-	DIOManager(M2kDigital *digital, Filter *filt);
+	DIOManager(struct iio_context *ctx, Filter *filt);
 	~DIOManager();
 	bool getOutputEnabled();
 	void enableOutput(bool output);
