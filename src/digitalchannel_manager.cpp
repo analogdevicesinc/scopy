@@ -55,7 +55,9 @@ void DIOManager::init()
 
 }
 
-DIOManager::DIOManager(M2kDigital *digital, Filter *filt) : digital(digital)
+DIOManager::DIOManager(struct iio_context *ctx, Filter *filt)
+	: m_m2k_context(m2kOpen(ctx, ""))
+	, digital(m_m2k_context->getDigital())
 {
 	outputEnabled = false;
 

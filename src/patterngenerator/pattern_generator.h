@@ -62,7 +62,7 @@ class PatternGenerator : public LogicTool
 
 	friend class PatternGenerator_API;
 public:
-	explicit PatternGenerator(M2kDigital *m2kDigital, Filter *filt,
+	explicit PatternGenerator(struct iio_context *ctx, Filter *filt,
 				  ToolMenuItem *toolMenuItem, QJSEngine *engine,
 				  DIOManager *diom, ToolLauncher *parent);
 	~PatternGenerator();
@@ -126,6 +126,7 @@ private:
 
 	QVector<QPair<QVector<int>, PatternUI *>> m_enabledPatterns;
 
+	M2k* m_m2k_context;
 	M2kDigital *m_m2kDigital;
 	uint64_t m_bufferSize;
 	uint64_t m_sampleRate;

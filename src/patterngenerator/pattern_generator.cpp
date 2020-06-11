@@ -60,7 +60,7 @@ int lcm(int a, int b)
 
 } // namespace detail
 
-PatternGenerator::PatternGenerator(M2kDigital *m2kDigital, Filter *filt,
+PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 				   ToolMenuItem *toolMenuItem, QJSEngine *engine,
 				   DIOManager *diom, ToolLauncher *parent)
 	: LogicTool(nullptr, toolMenuItem, new PatternGenerator_API(this), "Pattern Generator", parent)
@@ -70,7 +70,8 @@ PatternGenerator::PatternGenerator(M2kDigital *m2kDigital, Filter *filt,
 	, m_selectedChannel(-1)
 	, m_nbChannels(DIGITAL_NR_CHANNELS)
 	, m_currentGroupMenu(nullptr)
-	, m_m2kDigital(m2kDigital)
+	, m_m2k_context(m2kOpen(ctx, ""))
+	, m_m2kDigital(m_m2k_context->getDigital())
 	, m_bufferSize(1)
 	, m_sampleRate(1)
 	, m_diom(diom)
@@ -167,7 +168,6 @@ PatternGenerator::~PatternGenerator()
 
 	delete m_ui;
 }
-
 void PatternGenerator::setupUi()
 {
 	m_ui->setupUi(this);
