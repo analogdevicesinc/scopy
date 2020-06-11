@@ -43,7 +43,6 @@ Calibration::Calibration(struct iio_context *ctx, QJSEngine *engine):
 
 Calibration::~Calibration()
 {
-	// TODO m2k.contextClose()
 	delete m_api;
 }
 
@@ -118,7 +117,6 @@ void Calibration::cancelCalibration()
 {
 	m_cancel = true;
 }
-
 
 /* FIXME: TODO: Move this into a HW class / lib M2k */
 double Calibration::getIioDevTemp(const QString& devName) const

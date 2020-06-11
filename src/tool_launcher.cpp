@@ -1173,7 +1173,16 @@ void adiscope::ToolLauncher::destroyContext()
 		auto dev = getConnectedDevice();
 		if (dev)
 			dev->setConnected(false, false);
-		iio_context_destroy(ctx);
+		if (m_m2k) {
+			try {
+				libm2k::context::contextClose(m_m2k);
+			} catch (std::exception &e) {
+				qDebug() << e.what();
+			}
+			m_m2k = nullptr;
+		} else {
+			iio_context_destroy(ctx);
+		}
 		ctx = nullptr;
 	}
 
