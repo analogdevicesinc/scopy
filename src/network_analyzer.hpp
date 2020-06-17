@@ -52,6 +52,7 @@
 #include <gnuradio/blocks/vector_source.h>
 #include "frequency_compensation_filter.h"
 
+#include <QStackedWidget>
 #include "oscilloscope.hpp"
 
 #include "TimeDomainDisplayPlot.h"
@@ -202,6 +203,9 @@ private:
 	bool d_cursorsEnabled;
 
 	ScaleSpinButton *samplesCount;
+	ScaleSpinButton *samplesPerDecadeCount;
+	ScaleSpinButton *samplesStepSize;
+	QStackedWidget *sampleStackedWidget;
 	ScaleSpinButton *amplitude;
 	PositionSpinButton *offset;
 	PositionSpinButton *magMax;
@@ -259,6 +263,8 @@ private:
 private Q_SLOTS:
 	void startStop(bool start);
 	void updateNumSamples(bool force = false);
+	void updateNumSamplesPerDecade(bool force = false);
+	void updateSampleStepSize(bool force = false);
 	void plot(double frequency, double mag, double mag2, double phase, float dcVoltage);
 	void _saveChannelBuffers(double frequency, double sample_rate, std::vector<float> data1, std::vector<float> data2);
 

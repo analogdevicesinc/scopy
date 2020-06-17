@@ -274,10 +274,28 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	m_phaseGraph.setYMax(180.000000);
 	m_phaseGraph.useLogFreq(true);
 
+	sampleStackedWidget = new QStackedWidget(this);
 	samplesCount = new ScaleSpinButton({
 		{"samples",1e0},
-	}, tr("Samples count"), 10, 1000, false, false, this);
+	}, tr("Samples count"), 10, 10000, false, false, this);
 	samplesCount->setValue(1000);
+
+	samplesPerDecadeCount = new ScaleSpinButton({
+		{"samples",1e0},
+	}, tr("Samps/decade"), 1, 10000, false, false, this);
+	samplesPerDecadeCount->setValue(1000);
+
+	samplesStepSize = new ScaleSpinButton({
+		{"Hz",1e0},
+		{"kHz",1e3},
+		{"MHz",1e6}
+	},tr("Step"), 1.0, 25e06,
+	false, false, this,
+	{1, 2.5, 5, 7.5});
+
+	sampleStackedWidget->addWidget(samplesStepSize);
+	sampleStackedWidget->addWidget(samplesPerDecadeCount);
+	startStopRange->insertWidgetIntoLayout(sampleStackedWidget, 2, 0);
 
 	amplitude = new ScaleSpinButton({
 		{"μVolts",1e-6},
@@ -340,6 +358,8 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	ui->phaseMaxLayout->addWidget(phaseMax);
 	ui->phaseMinLayout->addWidget(phaseMin);
 
+	sampleStackedWidget->setCurrentIndex(ui->btnIsLog->isChecked());
+
 	setMinimumDistanceBetween(magMin, magMax, 1);
 	setMinimumDistanceBetween(phaseMin, phaseMax, 1);
 
@@ -370,7 +390,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	connect(ui->btnIsLog, SIGNAL(toggled(bool)),
 		&m_phaseGraph, SLOT(useLogFreq(bool)));
 	connect(ui->btnIsLog, &CustomSwitch::toggled, [=](bool value) {
-		Q_UNUSED(value);
+		sampleStackedWidget->setCurrentIndex(value);
 		computeIterations();
 	});
 
@@ -488,6 +508,11 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	connect(samplesCount, SIGNAL(valueChanged(double)),
 		this, SLOT(updateNumSamples()));
+	connect(samplesPerDecadeCount, SIGNAL(valueChanged(double)),
+		this, SLOT(updateNumSamplesPerDecade()));
+	connect(samplesStepSize, SIGNAL(valueChanged(double)),
+		this, SLOT(updateSampleStepSize()));
+
 	connect(ui->boxCursors,SIGNAL(toggled(bool)),
 		SLOT(toggleCursors(bool)));
 
@@ -867,8 +892,51 @@ void NetworkAnalyzer::updateNumSamples(bool force)
 	ui->nicholsgraph->setNumSamples(num_samples);
 	bufferPreviewer->setNumBuffers(num_samples);
 
+	if (ui->btnIsLog->isChecked()) {
+		double num_of_decades = log10(startStopRange->getStopValue() / startStopRange->getStartValue());
+		samplesPerDecadeCount->blockSignals(true);
+		samplesPerDecadeCount->setValue(num_samples / num_of_decades);
+		samplesPerDecadeCount->blockSignals(false);
+		updateNumSamplesPerDecade();
+	} else {
+		double stop_freq = startStopRange->getStopValue();
+		double start_freq = startStopRange->getStartValue();
+		double step = (stop_freq - start_freq) / (double)(num_samples - 1);
+		samplesStepSize->blockSignals(true);
+		samplesStepSize->setValue(step);
+		samplesStepSize->blockSignals(false);
+		updateSampleStepSize();
+	}
+
 	if (QObject::sender() == samplesCount) {
 		computeIterations();
+	}
+}
+
+void NetworkAnalyzer::updateNumSamplesPerDecade(bool force)
+{
+	unsigned int num_samples;
+	unsigned int num_samples_per_decade;
+	double num_of_decades;
+	num_samples_per_decade = (unsigned int) samplesPerDecadeCount->value();
+	num_of_decades = log10(startStopRange->getStopValue() / startStopRange->getStartValue());
+
+	num_samples = num_samples_per_decade * num_of_decades;
+
+	if (QObject::sender() == samplesPerDecadeCount) {
+		samplesCount->setValue(num_samples);
+	}
+}
+
+void NetworkAnalyzer::updateSampleStepSize(bool force)
+{
+	double step = samplesStepSize->value();
+	double stop_freq = startStopRange->getStopValue();
+	double start_freq = startStopRange->getStartValue();
+	unsigned int new_num_samples = (unsigned int) (stop_freq - start_freq) / step + 1;
+
+	if (QObject::sender() == samplesStepSize) {
+		samplesCount->setValue(new_num_samples);
 	}
 }
 
