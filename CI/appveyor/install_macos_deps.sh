@@ -261,7 +261,9 @@ EOF
 }
 
 build_qwt() {
-	qmake_build_git "qwt" "https://github.com/osakared/qwt.git" "qwt-6.1-multiaxes" "qwt.pro" "patch_qwt"
+	echo "### Building qwt - branch qwt-6.1-multiaxes"
+	svn checkout https://svn.code.sf.net/p/qwt/code/branches/qwt-6.1-multiaxes ${WORKDIR}/qwt
+	qmake_build_local "qwt" "qwt.pro" "patch_qwt"
 }
 
 build_qwtpolar() {

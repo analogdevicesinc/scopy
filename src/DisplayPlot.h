@@ -44,6 +44,7 @@
 
 #include <stdint.h>
 #include <cstdio>
+#include <cmath>
 #include <vector>
 #include <qwt_plot.h>
 #include <qwt_painter.h>
@@ -64,10 +65,6 @@
 #include "plot_utils.hpp"
 #include "extendingplotzoomer.h"
 #include "printableplot.h"
-
-#if QWT_VERSION >= 0x060000
-#include <qwt_compat.h>
-#endif
 
 typedef QList<QColor> QColorList;
 Q_DECLARE_METATYPE ( QColorList )
@@ -494,7 +491,7 @@ public Q_SLOTS:
   // Because of the preprocessing of slots in QT, these are not
   // easily separated by the version check. Make one for each
   // version until it's worked out.
-  void onPickerPointSelected(const QwtDoublePoint & p);
+  void onPickerPointSelected(const QPointF & p);
   void onPickerPointSelected6(const QPointF & p);
 
   unsigned int xAxisNumDiv() const;

@@ -27,6 +27,7 @@
 #include "limitedplotzoomer.h"
 #include "osc_scale_engine.h"
 
+#include <QDebug>
 #include <qwt_symbol.h>
 #include <boost/make_shared.hpp>
 
@@ -57,7 +58,7 @@ protected:
   using QwtPlotZoomer::trackerText;
   virtual QwtText trackerText( const QPoint& p ) const
   {
-    QwtDoublePoint dp = QwtPlotZoomer::invTransform(p);
+    QPointF dp = QwtPlotZoomer::invTransform(p);
     QwtText t(QString("(%1, %2)").arg(dp.x(), 0, 'f', 4).
               arg(dp.y(), 0, 'f', 4));
     return t;

@@ -47,7 +47,10 @@
 #include <qwt_plot_zoomer.h>
 #include <qwt_legend.h>
 #include <qwt_plot_layout.h>
+#include <qwt_math.h>
 
+#include <QStack>
+#include <QPainter>
 #include <QColor>
 #include <cmath>
 #include <iostream>
@@ -558,8 +561,8 @@ DisplayPlot::DisplayPlot(int nplots, QWidget* parent,
   d_picker = new QwtDblClickPlotPicker(canvas());
 
 #if QWT_VERSION < 0x060000
-  connect(d_picker, SIGNAL(selected(const QwtDoublePoint &)),
-      this, SLOT(onPickerPointSelected(const QwtDoublePoint &)));
+  connect(d_picker, SIGNAL(selected(const QPointF &)),
+      this, SLOT(onPickerPointSelected(const QPointF &)));
 #else
   d_picker->setStateMachine(new QwtPickerDblClickPointMachine());
   connect(d_picker, SIGNAL(selected(const QPointF &)),
@@ -1022,7 +1025,7 @@ void DisplayPlot::legendEntryChecked(const QVariant &plotItem, bool on, int inde
 }
 
 void
-DisplayPlot::onPickerPointSelected(const QwtDoublePoint & p)
+DisplayPlot::onPickerPointSelected(const QPointF & p)
 {
   QPointF point = p;
   //fprintf(stderr,"onPickerPointSelected %f %f\n", point.x(), point.y());

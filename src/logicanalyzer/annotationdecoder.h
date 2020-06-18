@@ -78,7 +78,7 @@ private:
     struct srd_session *m_srdSession;
     std::vector<std::shared_ptr<logic::Decoder>> m_stack;
     std::map<std::pair<const srd_decoder*, int>, Row> m_class_rows;
-    std::map<const Row, RowData> m_annotation_rows;
+    std::map<Row, RowData> m_annotation_rows;
     std::vector<DecodeChannel> m_channels;
 
     std::thread *m_decodeThread;
