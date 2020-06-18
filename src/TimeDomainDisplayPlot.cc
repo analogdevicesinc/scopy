@@ -84,7 +84,7 @@ protected:
   virtual QwtText trackerText( const QPoint& p ) const
   {
     QwtText t;
-    QwtDoublePoint dp = QwtPlotZoomer::invTransform(p);
+    QPointF dp = QwtPlotZoomer::invTransform(p);
     const TimeDomainDisplayPlot* plt = (const TimeDomainDisplayPlot *)plot();
     t.setText(plt->timeScaleValueFormat(dp.x(), 3) + "," +
 	      plt->yAxisScaleValueFormat(dp.y(), 3));
@@ -541,7 +541,7 @@ TimeDomainDisplayPlot::_resetXAxisPoints(double*& xAxis, unsigned long long numP
 
   // Set up zoomer base for maximum unzoom x-axis
   // and reset to maximum unzoom level
-//  QwtDoubleRect zbase = d_zoomer->zoomBase();
+//  QRectF zbase = d_zoomer->zoomBase();
 
 //  if(d_semilogx) {
 //    setAxisScale(QwtPlot::xBottom, 1e-1, d_numPoints*delt);

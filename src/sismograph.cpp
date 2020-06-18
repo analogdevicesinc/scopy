@@ -20,6 +20,7 @@
 
 #include "sismograph.hpp"
 
+#include <QPen>
 #include <qwt_plot_layout.h>
 #include <qwt_scale_engine.h>
 

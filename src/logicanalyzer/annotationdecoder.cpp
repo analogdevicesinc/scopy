@@ -20,9 +20,9 @@
 
 
 #include "annotationdecoder.h"
-
+#include <libsigrokdecode/libsigrokdecode.h>
 #include "logic_analyzer.h"
-
+#include <QDebug>
 #include <algorithm>
 
 using namespace adiscope;

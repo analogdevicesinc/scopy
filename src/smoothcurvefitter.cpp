@@ -20,6 +20,8 @@
 
 #include "smoothcurvefitter.h"
 
+#include <QPolygonF>
+#include <QPainterPath>
 #include <qwt_spline_cubic.h>
 #include <qwt_spline_parametrization.h>
 

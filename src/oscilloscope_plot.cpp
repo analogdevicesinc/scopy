@@ -29,6 +29,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QThread>
+#include <QDebug>
 
 #include <algorithm>
 

@@ -28,6 +28,9 @@
 #include <qwt_point_mapper.h>
 #include <qwt_painter.h>
 #include <qwt_series_data.h>
+#include <qwt_scale_map.h>
+
+#include <QPainter>
 
 static const QColor EdgeColor(0x80, 0x80, 0x80);
 static const QColor HighColor(0x00, 0xC0, 0x00);
@@ -48,7 +51,7 @@ LogicDataCurve::LogicDataCurve(uint16_t *data, uint8_t bit, adiscope::logic::Log
 
     // TODO: maybe custom plot with reimplemented replot() ?
 
-    setSamples({0.0}, {0.0});
+    setSamples(QVector<double>({0.0}), QVector<double>({0.0}));
     setBrush(QBrush(Qt::black));
 }
 
