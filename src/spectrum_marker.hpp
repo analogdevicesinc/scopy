@@ -22,6 +22,7 @@
 #define SPECTRUM_MARKER_H
 
 #include <qwt_plot_marker.h>
+#include <QColor>
 
 namespace adiscope {
 

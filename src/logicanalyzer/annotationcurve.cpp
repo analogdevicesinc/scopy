@@ -32,11 +32,15 @@
 #include <qwt_painter.h>
 #include <qwt_series_data.h>
 #include <qwt_text.h>
+#include <qwt_scale_map.h>
 #include <QStaticText>
 #include <QFormLayout>
 #include <QComboBox>
 #include <QLabel>
 #include <QSpacerItem>
+#include <QPainter>
+#include <QDebug>
+#include <map>
 
 #include <QElapsedTimer>
 
@@ -49,7 +53,7 @@ AnnotationCurve::AnnotationCurve(logic::LogicTool *logic, std::shared_ptr<logic:
 	: GenericLogicPlotCurve(initialDecoder->decoder()->name, initialDecoder->decoder()->id, LogicPlotCurveType::Annotations)
 	, m_visibleRows(0)
 {
-    setSamples({0.0}, {0.0});
+    setSamples(QVector<double>({0.0}), QVector<double>({0.0})),
     setRenderHint(RenderAntialiased, true);
     setBrush(QBrush(Qt::red));
     setBaseline(0.0);
@@ -136,12 +140,12 @@ void AnnotationCurve::dataAvailable(uint64_t from, uint64_t to)
     m_annotationDecoder->dataAvailable(from, to);
 }
 
-void AnnotationCurve::setClassRows(const map<std::pair<const srd_decoder *, int>, Row> &classRows)
+void AnnotationCurve::setClassRows(const std::map<std::pair<const srd_decoder *, int>, Row> &classRows)
 {
     m_classRows = classRows;
 }
 
-void AnnotationCurve::setAnnotationRows(const map<const Row, RowData> &annotationRows)
+void AnnotationCurve::setAnnotationRows(const std::map<Row, RowData> &annotationRows)
 {
     m_annotationRows = annotationRows;
 }

@@ -21,6 +21,7 @@
 
 #include "pattern_generator.h"
 
+#include <QDebug>
 #include "ui_pattern_generator.h"
 #include "digitalchannel_manager.hpp"
 #include "dynamicWidget.hpp"

@@ -24,8 +24,6 @@
 
 #include <qwt_point_mapper.h>
 
-#include <map>
-
 #include <libsigrokdecode/libsigrokdecode.h>
 
 #include <memory>
@@ -72,7 +70,7 @@ public:
     virtual void dataAvailable(uint64_t from, uint64_t to) override;
 
     void setClassRows(const std::map<std::pair<const srd_decoder*, int>, Row> &classRows);
-    void setAnnotationRows(const std::map<const Row, RowData> &annotationRows);
+    void setAnnotationRows(const std::map<Row, RowData> &annotationRows);
 
     void sort_rows();
 
@@ -129,7 +127,7 @@ private:
     mutable std::mutex m_mutex;
 
     std::map<std::pair<const srd_decoder*, int>, Row> m_classRows;
-    std::map<const Row, RowData> m_annotationRows;
+    std::map<Row, RowData> m_annotationRows;
 
 	std::vector<std::shared_ptr<adiscope::bind::Decoder>> m_bindings;
 

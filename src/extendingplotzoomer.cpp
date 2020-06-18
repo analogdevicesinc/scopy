@@ -19,6 +19,7 @@
  */
 #include "extendingplotzoomer.h"
 #include "oscilloscope_plot.hpp"
+#include <QPainterPath>
 
 using namespace adiscope;
 

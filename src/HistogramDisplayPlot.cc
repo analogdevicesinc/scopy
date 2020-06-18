@@ -50,6 +50,7 @@
 #include <volk/volk.h>
 #include <gnuradio/math.h>
 #include <boost/math/special_functions/round.hpp>
+#include <QLocale>
 
 #include "HistogramDisplayPlot.h"
 
@@ -132,7 +133,7 @@ protected:
   virtual QwtText trackerText(const QPoint& p) const
   {
     QwtText t;
-    QwtDoublePoint dp = QwtPlotZoomer::invTransform(p);
+    QPointF dp = QwtPlotZoomer::invTransform(p);
     if((dp.y() > 0.0001) && (dp.y() < 10000)) {
       t.setText(QString("%1 V, %2 pts").
 		arg(dp.x(), 0, 'f', 2).
@@ -625,7 +626,7 @@ HistogramDisplayPlot::_resetXAxisPoints(double left, double right)
 
   // Set up zoomer base for maximum unzoom x-axis
   // and reset to maximum unzoom level
-  QwtDoubleRect zbase = d_zoomer[0]->zoomBase();
+  QRectF zbase = d_zoomer[0]->zoomBase();
 
   if(d_semilogx) {
     setAxisScale(QwtPlot::xBottom, 1e-1, d_right);

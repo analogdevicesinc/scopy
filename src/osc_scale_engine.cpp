@@ -20,6 +20,8 @@
 
 #include "osc_scale_engine.h"
 #include "qwt_math.h"
+#include <qwt_interval.h>
+#include <QDebug>
 #include <limits>
 
 static inline long double qwtIntervalWidthL( const QwtInterval &interval )
