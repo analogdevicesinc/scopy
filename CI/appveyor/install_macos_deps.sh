@@ -251,7 +251,7 @@ EOF
 
 build_qwt() {
 	echo "### Building qwt - branch qwt-6.1-multiaxes"
-	svn checkout https://svn.code.sf.net/p/qwt/code/branches/qwt-6.1-multiaxes ${WORKDIR}/qwt
+	svn checkout https://svn.code.sf.net/p/qwt/code/branches/$QWT_BRANCH ${WORKDIR}/qwt
 	qmake_build_local "qwt" "qwt.pro" "patch_qwt"
 }
 
