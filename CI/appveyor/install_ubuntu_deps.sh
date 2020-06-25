@@ -174,7 +174,7 @@ build_libsigrokdecode() {
 build_qwt() {
 	echo "### Building qwt - branch $QWT_BRANCH"
 
-	git clone --depth 1 https://github.com/osakared/qwt.git -b $QWT_BRANCH ${WORKDIR}/qwt
+	svn checkout https://svn.code.sf.net/p/qwt/code/branches/$QWT_BRANCH ${WORKDIR}/qwt
 	cd ${WORKDIR}/qwt
 
 	# Disable components that we won't build
@@ -199,6 +199,7 @@ build_qwtpolar() {
 		| tar xj --strip-components=1 -C ${WORKDIR}/qwtpolar
 
 	cd ~/qwtpolar
+	patch -p1 <  ${WORKDIR}/projects/scopy/CI/appveyor/patches/qt_5.15_qwtpolar.patch
 	curl -o qwtpolar-qwt-6.1-compat.patch https://raw.githubusercontent.com/analogdevicesinc/scopy-flatpak/master/qwtpolar-qwt-6.1-compat.patch
 	patch -p1 < qwtpolar-qwt-6.1-compat.patch
 	sed -i 's/\/usr\/local\/qwtpolar-$$QWT_POLAR_VERSION/\/usr\/local/g' qwtpolarconfig.pri
