@@ -16,13 +16,16 @@ BOOST_VERSION_FILE=1_65_1
 BOOST_VERSION=1.65.1
 
 PYTHON="python3"
-PACKAGES="pkg-config qt cmake fftw bison gettext autoconf automake libtool libzip glib libusb $PYTHON"
+PACKAGES="pkg-config cmake fftw bison gettext autoconf automake libtool libzip glib libusb $PYTHON"
 PACKAGES="$PACKAGES glibmm doxygen wget gnu-sed libmatio dylibbundler libxml2"
 
 set -e
 cd ~
 WORKDIR=${PWD}
 NUM_JOBS=4
+
+brew install https://raw.githubusercontent.com/Homebrew/homebrew-core/8846805afc0cb8e5d114d5e222af1de3b35289df/Formula/qt.rb
+export PATH="/usr/local/opt/qt/bin:$PATH"
 
 brew_install_or_upgrade() {
 	brew install $1 || \
@@ -39,7 +42,7 @@ for pak in $PACKAGES ; do
 	brew_install $pak
 done
 
-for pkg in qt gcc bison gettext cmake python; do
+for pkg in gcc bison gettext cmake python; do
 	brew link --overwrite --force $pkg
 done
 
