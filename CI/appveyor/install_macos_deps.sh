@@ -213,29 +213,14 @@ build_grscopy() {
 	sudo make $JOBS install
 }
 
-build_libsigrok() {
-	echo "### Building libsigrok - branch $LIBSIGROK_BRANCH"
-
-	git clone --depth 1 https://github.com/sigrokproject/libsigrok.git -b $LIBSIGROK_BRANCH ${WORKDIR}/libsigrok
-
-	mkdir ${WORKDIR}/libsigrok/build-${ARCH}
-	cd ${WORKDIR}/libsigrok
-
-	./autogen.sh
-	./configure --disable-all-drivers --enable-bindings --enable-cxx
-
-	sudo make $JOBS install
-}
-
 build_libsigrokdecode() {
 	echo "### Building libsigrokdecode - branch $LIBSIGROKDECODE_BRANCH"
 
+	git clone --depth 1 https://github.com/sigrokproject/libsigrokdecode.git -b $LIBSIGROKDECODE_BRANCH ${WORKDIR}/libsigrokdecode
 	mkdir -p ${WORKDIR}/libsigrokdecode/build-${ARCH}
 	cd ${WORKDIR}/libsigrokdecode
 
-	wget http://sigrok.org/download/source/libsigrokdecode/libsigrokdecode-0.4.1.tar.gz -O- \
-		| tar xz --strip-components=1 -C ${WORKDIR}/libsigrokdecode
-
+	./autogen.sh
 	./configure
 	sudo make $JOBS install
 }
@@ -282,7 +267,6 @@ build_grscopy
 build_grm2k
 build_qwt
 build_qwtpolar
-build_libsigrok
 build_libsigrokdecode
 
 
