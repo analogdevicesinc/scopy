@@ -199,9 +199,7 @@ build_qwtpolar() {
 		| tar xj --strip-components=1 -C ${WORKDIR}/qwtpolar
 
 	cd ~/qwtpolar
-	patch -p1 <  ${WORKDIR}/projects/scopy/CI/appveyor/patches/qt_5.15_qwtpolar.patch
-	curl -o qwtpolar-qwt-6.1-compat.patch https://raw.githubusercontent.com/analogdevicesinc/scopy-flatpak/master/qwtpolar-qwt-6.1-compat.patch
-	patch -p1 < qwtpolar-qwt-6.1-compat.patch
+	patch -p1 <  ${WORKDIR}/projects/scopy/CI/appveyor/patches/qwtpolar-qwt-qt-compat.patch
 	sed -i 's/\/usr\/local\/qwtpolar-$$QWT_POLAR_VERSION/\/usr\/local/g' qwtpolarconfig.pri
 	sed -i 's/QWT_POLAR_CONFIG     += QwtPolarExamples/ /g' qwtpolarconfig.pri
 	sed -i 's/QWT_POLAR_CONFIG     += QwtPolarDesigner/ /g' qwtpolarconfig.pri

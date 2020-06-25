@@ -223,8 +223,7 @@ EOF
 }
 
 patch_qwtpolar() {
-	patch -p1 <  ${WORKDIR}/projects/scopy/CI/appveyor/patches/qt_5.15_qwtpolar.patch
-	wget https://raw.githubusercontent.com/analogdevicesinc/scopy-flatpak/master/qwtpolar-qwt-6.1-compat.patch -O - | patch -p1
+	patch -p1 <  ${WORKDIR}/projects/scopy/CI/appveyor/patches/qwtpolar-qwt-qt-compat.patch
 
 	patch -p1 <<-EOF
 --- a/qwtpolarconfig.pri
