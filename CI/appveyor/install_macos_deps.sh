@@ -137,6 +137,7 @@ build_boost() {
 	wget https://dl.bintray.com/boostorg/release/$BOOST_VERSION/source/boost_$BOOST_VERSION_FILE.tar.gz
 	tar -xzf boost_$BOOST_VERSION_FILE.tar.gz
 	cd boost_$BOOST_VERSION_FILE
+	patch -p1 <  ${WORKDIR}/projects/scopy/CI/appveyor/patches/boost-darwin.patch
 	./bootstrap.sh --with-libraries=atomic,date_time,filesystem,program_options,system,chrono,thread,regex,test
 	./b2
 	./b2 install
