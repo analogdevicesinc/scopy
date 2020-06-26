@@ -1161,6 +1161,9 @@ void NetworkAnalyzer::goertzel()
 
 		setFilterParameters();
 
+		// Sleep before ADC capture
+		QThread::msleep(captureDelay->value());
+
 		const short* buffer_p = nullptr;
 		if (m_m2k_analogin) {
 			try {
@@ -1195,8 +1198,6 @@ void NetworkAnalyzer::goertzel()
 
 		QElapsedTimer t;
 		t.start();
-		// Sleep before ADC capture
-		QThread::msleep(captureDelay->value());
 
 		capture_top_block->run();
 
