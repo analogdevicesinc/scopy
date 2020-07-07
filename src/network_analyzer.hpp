@@ -230,6 +230,7 @@ private:
 	bool m_hasReference;
 	bool m_importDataLoaded;
 	QVector<QVector<double>> m_importData;
+	unsigned int m_nb_periods;
 
 	void goertzel();
 	void setFilterParameters();
@@ -279,6 +280,8 @@ private Q_SLOTS:
 	void onFrequencyBarMoved(int pos);
 	void toggleBufferPreview(bool toggle = false);
 
+	void on_spinBox_periods_valueChanged(int n);
+	void validateSpinboxPeriods();
 public Q_SLOTS:
 
 	void showEvent(QShowEvent *event);

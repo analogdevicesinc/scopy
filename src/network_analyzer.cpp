@@ -180,7 +180,8 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	iterationsThreadCanceled(false), iterationsThreadReady(false),
 	iterationsThread(nullptr), autoAdjustGain(true),
 	filterDc(false), m_initFlowgraph(true), m_hasReference(false),
-	m_importDataLoaded(false)
+	m_importDataLoaded(false),
+	m_nb_periods(2)
 {
 	if (ctx) {
 		iio = iio_manager::get_instance(ctx,
@@ -550,6 +551,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	connect(ui->btnCursors, &CustomPushButton::toggled, [=](bool checked) {
 		triggerRightMenuToggle(ui->btnCursors, checked);
 	});
+	connect(ui->btnApplyPeriod, SIGNAL(clicked()), this, SLOT(validateSpinboxPeriods()));
 
 	ui->btnSettings->setProperty("id",QVariant(-1));
 	ui->btnGeneralSettings->setProperty("id",QVariant(-2));
@@ -1332,7 +1334,7 @@ void NetworkAnalyzer::_saveChannelBuffers(double frequency, double sample_rate, 
 void NetworkAnalyzer::computeCaptureParams(double frequency,
 		size_t& buffer_size, size_t& adc_rate)
 {
-	size_t nrOfPeriods = 2;
+	size_t nrOfPeriods = m_nb_periods;
 
 	for (const auto& rate : sampleRates) {
 
@@ -1593,6 +1595,8 @@ void NetworkAnalyzer::startStop(bool pressed)
 	ui->responseGainCmb->setEnabled(!pressed);
 	pushDelay->setEnabled(!pressed);
 	captureDelay->setEnabled(!pressed);
+	ui->btnApplyPeriod->setEnabled(!pressed);
+	ui->spinBox_periods->setEnabled(!pressed);
 
 	if (pressed) {
 		if (shouldClear) {
@@ -1726,4 +1730,13 @@ void NetworkAnalyzer::readPreferences()
 void NetworkAnalyzer::onGraphIndexChanged(int index)
 {
 	ui->stackedWidget->setCurrentIndex(index);
+}
+void NetworkAnalyzer::on_spinBox_periods_valueChanged(int n)
+{
+	m_nb_periods = n;
+}
+
+void NetworkAnalyzer::validateSpinboxPeriods()
+{
+	on_spinBox_periods_valueChanged(ui->spinBox_periods->value());
 }
