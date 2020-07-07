@@ -38,6 +38,7 @@
 
 #include <QWidget>
 #include <QQueue>
+#include <QTimer>
 
 /* libm2k includes */
 #include <libm2k/analog/genericanalogin.hpp>
@@ -148,6 +149,7 @@ private Q_SLOTS:
 	void on_btnBrowseFile_clicked();
 	void on_btnImport_clicked();
 	void onReferenceChannelDeleted();
+	void refreshCurrentSampleLabel();
 
 private:
 	void initInstrumentStrings();
@@ -203,6 +205,8 @@ private:
 	StartStopRangeWidget *startStopRange;
 
 	QList<channel_sptr> channels;
+	QTimer *sample_timer;
+	std::chrono::time_point<std::chrono::system_clock>  m_time_start;
 
 	adiscope::scope_sink_f::sptr fft_sink;
 	iio_manager::port_id *fft_ids;
@@ -238,6 +242,7 @@ private:
 	ChannelWidget *getChannelWidgetAt(unsigned int id);
 	void updateMarkerMenu(unsigned int id);
 	bool isIioManagerStarted() const;
+	void setCurrentSampleLabel(double);
 };
 
 class SpectrumChannel: public QObject
