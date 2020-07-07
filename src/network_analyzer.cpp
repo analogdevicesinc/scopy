@@ -181,6 +181,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	iterationsThread(nullptr), autoAdjustGain(true),
 	filterDc(false), m_initFlowgraph(true), m_hasReference(false),
 	m_importDataLoaded(false),
+	m_nb_averaging(1),
 	m_nb_periods(2)
 {
 	if (ctx) {
@@ -423,6 +424,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	ui->currentFrequencyLabel->setVisible(false);
 	ui->currentSampleLabel->setVisible(false);
+	ui->currentAverageLabel->setVisible(false);
 
 	d_frequencyHandle = new FreePlotLineHandleH(
 				QPixmap(":/icons/time_trigger_handle.svg"),
@@ -460,6 +462,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 		ui->currentSampleLabel->setVisible(true);
 		ui->currentSampleLabel->setText(QString(tr("Sample: ") + QString::number(1 + value)
 							+ " / " + QString::number(m_dBgraph.getNumSamples()) + " "));
+		ui->currentAverageLabel->setVisible(true);
 		MetricPrefixFormatter d_cursorTimeFormatter;
 		d_cursorTimeFormatter.setTwoDecimalMode(false);
 		QString text = d_cursorTimeFormatter.format(iterations[value].frequency, "Hz", 3);
@@ -551,6 +554,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	connect(ui->btnCursors, &CustomPushButton::toggled, [=](bool checked) {
 		triggerRightMenuToggle(ui->btnCursors, checked);
 	});
+	connect(ui->btnApplyAverage, SIGNAL(clicked()), this, SLOT(validateSpinboxAveraging()));
 	connect(ui->btnApplyPeriod, SIGNAL(clicked()), this, SLOT(validateSpinboxPeriods()));
 
 	ui->btnSettings->setProperty("id",QVariant(-1));
@@ -1143,6 +1147,10 @@ void NetworkAnalyzer::setFilterParameters()
 
 void NetworkAnalyzer::goertzel()
 {
+	float mag1_averaged_sum = 0;
+	float mag2_averaged_sum = 0;
+	float dcOffset_averaged_sum = 0;
+	unsigned int m_averaged_count = 0;
 	// Network Analyzer run method using the Goertzel Algorithm (single bin DFT)
 
 	// Adjust the gain of the ADC channels based on sweep settings
@@ -1234,46 +1242,84 @@ void NetworkAnalyzer::goertzel()
 		// Sleep before ADC capture
 		QThread::msleep(captureDelay->value());
 
-		const short* buffer_p = nullptr;
-		if (m_m2k_analogin) {
-			try {
-				buffer_p = m_m2k_analogin->getSamplesRawInterleaved(buffer_size);
-			} catch (std::exception &e) {
-				qDebug(CAT_NETWORK_ANALYZER) << e.what();
-				return;
+		for (unsigned int avg = 1; avg <= m_nb_averaging; avg++) {
+			const short* buffer_p = nullptr;
+			if (m_m2k_analogin) {
+				try {
+					buffer_p = m_m2k_analogin->getSamplesRawInterleaved(buffer_size);
+				} catch (std::exception &e) {
+					qDebug(CAT_NETWORK_ANALYZER) << e.what();
+					return;
+				}
+				if (m_stop) {
+					return;
+				}
 			}
-			if (m_stop) {
-				return;
+
+			std::vector<short> data0;
+			std::vector<short> data1;
+			for (unsigned int data_i = 0; data_i < buffer_size; data_i++) {
+				data0.push_back(buffer_p[data_i * 2]);
+				data1.push_back(buffer_p[data_i * 2 + 1]);
+			}
+
+			capture1->rewind();
+			capture1->set_data(data0);
+			capture2->rewind();
+			capture2->set_data(data1);
+			{
+				boost::unique_lock<boost::mutex> lock(bufferMutex);
+				sink1->reset();
+				sink2->reset();
+			}
+
+			captureDone = false;
+
+			QElapsedTimer t;
+			t.start();
+
+			capture_top_block->run();
+
+			float dcOffset = 0.0;
+			dcOffset = dc_cancel2->get_dc_offset();
+
+			mag1_averaged_sum += mag1;
+			mag2_averaged_sum += mag2;
+			dcOffset_averaged_sum += dcOffset;
+			ui->currentAverageLabel->setText(QString(tr("Average: ") + QString::number(avg)
+								 + " / " + QString::number(m_nb_averaging)));
+			if (avg == m_nb_averaging) {
+				mag1 = mag1_averaged_sum / m_nb_averaging;
+				mag2 = mag2_averaged_sum / m_nb_averaging;
+				dcOffset = dcOffset_averaged_sum / m_nb_averaging;
+
+				dcOffset = m_m2k_analogin->convertRawToVolts(1, dcOffset);
+
+				QMetaObject::invokeMethod(this,
+							  "_saveChannelBuffers",
+							  Qt::QueuedConnection,
+							  Q_ARG(double, frequency),
+							  Q_ARG(double, adc_rate),
+							  Q_ARG(std::vector<float>, sink1->data()),
+							  Q_ARG(std::vector<float>, sink2->data()));
+
+				// Plot the data captured for this iteration
+				QMetaObject::invokeMethod(this,
+							  "plot",
+							  Qt::QueuedConnection,
+							  Q_ARG(double, frequency),
+							  Q_ARG(double, mag1),
+							  Q_ARG(double, mag2),
+							  Q_ARG(double, phase),
+							  Q_ARG(float, dcOffset));
+
+				mag1_averaged_sum = 0;
+				mag2_averaged_sum = 0;
+				dcOffset_averaged_sum = 0;
+				m_averaged_count = 0;
+
 			}
 		}
-
-		std::vector<short> data0;
-		std::vector<short> data1;
-		for (unsigned int i = 0; i < buffer_size; i++) {
-			data0.push_back(buffer_p[i * 2]);
-			data1.push_back(buffer_p[i * 2 + 1]);
-		}
-
-		capture1->rewind();
-		capture1->set_data(data0);
-		capture2->rewind();
-		capture2->set_data(data1);
-		{
-			boost::unique_lock<boost::mutex> lock(bufferMutex);
-			sink1->reset();
-			sink2->reset();
-		}
-
-		captureDone = false;
-
-		QElapsedTimer t;
-		t.start();
-
-		capture_top_block->run();
-
-		float dcOffset = 0.0;
-		dcOffset = dc_cancel2->get_dc_offset();
-		dcOffset = m_m2k_analogin->convertRawToVolts(1, dcOffset);
 
 		m_m2k_analogout->stop();
 
@@ -1282,29 +1328,8 @@ void NetworkAnalyzer::goertzel()
 			return;
 		}
 
-		QMetaObject::invokeMethod(this,
-					  "_saveChannelBuffers",
-					  Qt::QueuedConnection,
-					  Q_ARG(double, frequency),
-					  Q_ARG(double, adc_rate),
-					  Q_ARG(std::vector<float>, sink1->data()),
-					  Q_ARG(std::vector<float>, sink2->data()));
-
-		// Plot the data captured for this iteration
-		QMetaObject::invokeMethod(this,
-					  "plot",
-					  Qt::QueuedConnection,
-					  Q_ARG(double, frequency),
-					  Q_ARG(double, mag1),
-					  Q_ARG(double, mag2),
-					  Q_ARG(double, phase),
-					  Q_ARG(float, dcOffset));
-
-
-
-
+		Q_EMIT sweepDone();
 	}
-	Q_EMIT sweepDone();
 }
 
 void NetworkAnalyzer::onFrequencyBarMoved(int pos)
@@ -1417,6 +1442,7 @@ void NetworkAnalyzer::plot(double frequency, double mag1, double mag2,
 		justStarted = false;
 		ui->currentFrequencyLabel->setVisible(true);
 		ui->currentSampleLabel->setVisible(true);
+		ui->currentAverageLabel->setVisible(true);
 		index = 0;
 		magBonus = autoUpdateGainMode(mag, magBonus, dcVoltage);
 	}
@@ -1595,7 +1621,9 @@ void NetworkAnalyzer::startStop(bool pressed)
 	ui->responseGainCmb->setEnabled(!pressed);
 	pushDelay->setEnabled(!pressed);
 	captureDelay->setEnabled(!pressed);
+	ui->btnApplyAverage->setEnabled(!pressed);
 	ui->btnApplyPeriod->setEnabled(!pressed);
+	ui->spinBox_averaging->setEnabled(!pressed);
 	ui->spinBox_periods->setEnabled(!pressed);
 
 	if (pressed) {
@@ -1731,6 +1759,17 @@ void NetworkAnalyzer::onGraphIndexChanged(int index)
 {
 	ui->stackedWidget->setCurrentIndex(index);
 }
+
+void NetworkAnalyzer::on_spinBox_averaging_valueChanged(int n)
+{
+	m_nb_averaging = n;
+}
+
+void NetworkAnalyzer::validateSpinboxAveraging()
+{
+	on_spinBox_averaging_valueChanged(ui->spinBox_averaging->value());
+}
+
 void NetworkAnalyzer::on_spinBox_periods_valueChanged(int n)
 {
 	m_nb_periods = n;
