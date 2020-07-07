@@ -21,6 +21,8 @@
 #ifndef AVERAGE_H
 #define AVERAGE_H
 
+#include <boost/thread/mutex.hpp>
+
 namespace adiscope {
 
 
@@ -34,6 +36,7 @@ public:
 	virtual void reset() = 0;
 	unsigned int dataWidth() const;
 	unsigned int history() const;
+	virtual void setHistory(unsigned int);
 
 protected:
 	unsigned int m_data_width;
@@ -63,10 +66,12 @@ protected:
 	double **m_history;
 	unsigned int m_insert_index;
 	unsigned int m_inserted_count;
+	boost::mutex m_history_mutex;
 
 private:
 	void alloc_history(unsigned int data_width, unsigned int history_size);
 	void free_history();
+	void setHistory(unsigned int) override;
 };
 
 class PeakHoldContinuous: public AverageHistoryOne

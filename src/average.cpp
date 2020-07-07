@@ -21,6 +21,7 @@
 #include "average.h"
 #include <algorithm>
 #include <cstring>
+#include <boost/make_shared.hpp>
 
 using namespace adiscope;
 
@@ -62,6 +63,11 @@ unsigned int SpectrumAverage::history() const
 	return m_history_size;
 }
 
+void SpectrumAverage::setHistory(unsigned int history)
+{
+	m_history_size = history;
+}
+
 /*
  * class AverageHistoryOne
  */
@@ -99,6 +105,7 @@ void AverageHistoryN::reset()
 void AverageHistoryN::alloc_history(unsigned int data_width,
 	unsigned int history_size)
 {
+	boost::unique_lock<boost::mutex> lock(m_history_mutex);
 	m_history = new double*[history_size];
 	for (unsigned int i = 0; i < history_size; i++)
 		m_history[i] = new double[data_width];
@@ -107,13 +114,60 @@ void AverageHistoryN::alloc_history(unsigned int data_width,
 
 void AverageHistoryN::free_history()
 {
+	boost::unique_lock<boost::mutex> lock(m_history_mutex);
 	for (unsigned int i = 0; i < m_history_size; i++)
 		delete[] m_history[i];
 	delete[] m_history;
 }
 
+void AverageHistoryN::setHistory(unsigned int history)
+{
+	double **tmp_history;
+	tmp_history = new double*[history];
+
+	for (unsigned int i = 0; i < history; i++) {
+		tmp_history[i] = new double[m_data_width];
+	}
+
+	if (history > m_history_size) {
+		for (unsigned int i = 0; i < m_history_size; i++) {
+			std::memcpy(tmp_history[i], m_history[i],
+				    m_data_width * sizeof(double));
+		}
+	} else {
+		int start_index = (m_insert_index > history) ? (m_insert_index - history) : 0;
+		int remaining_samples = std::min(m_inserted_count, history);
+		int tmp_i = 0;
+
+		for (unsigned int i = start_index; i < m_insert_index; i++) {
+			std::memcpy(tmp_history[tmp_i], m_history[i],
+				    m_data_width * sizeof(double));
+			remaining_samples--;
+			tmp_i++;
+		}
+
+		for (unsigned int i = m_history_size - remaining_samples; i < m_history_size; i++) {
+			std::memcpy(tmp_history[tmp_i], m_history[i],
+				    m_data_width * sizeof(double));
+			tmp_i++;
+		}
+
+		if (m_insert_index > history) {
+			m_insert_index = 0;
+		}
+		m_inserted_count = std::min(m_inserted_count, history);
+	}
+
+	free_history();
+
+	boost::unique_lock<boost::mutex> lock(m_history_mutex);
+	m_history = tmp_history;
+	SpectrumAverage::setHistory(history);
+}
+
 void AverageHistoryN::pushNewData(double *data)
 {
+	boost::unique_lock<boost::mutex> lock(m_history_mutex);
 	std::memcpy(m_history[m_insert_index], data,
 		m_data_width * sizeof(double));
 	m_insert_index = (m_insert_index + 1) % m_history_size;
