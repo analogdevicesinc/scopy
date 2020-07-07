@@ -28,8 +28,10 @@ using namespace adiscope;
 /*
  * class SpectrumAverage
  */
-SpectrumAverage::SpectrumAverage(unsigned int data_width, unsigned int history):
-	m_data_width(data_width), m_history_size(history)
+SpectrumAverage::SpectrumAverage(unsigned int data_width, unsigned int history,
+				 bool history_en):
+	m_data_width(data_width), m_history_size(history),
+	m_history_enabled(history_en)
 {
 	if (data_width < 1)
 		m_data_width = 1;
@@ -68,11 +70,17 @@ void SpectrumAverage::setHistory(unsigned int history)
 	m_history_size = history;
 }
 
+bool SpectrumAverage::historyEnabled() const
+{
+	return m_history_enabled;
+}
+
+
 /*
  * class AverageHistoryOne
  */
 AverageHistoryOne::AverageHistoryOne(unsigned int data_width, unsigned history):
-	SpectrumAverage(data_width, history), m_anyDataPushed(false)
+	SpectrumAverage(data_width, history, false), m_anyDataPushed(false)
 {
 }
 
@@ -85,7 +93,7 @@ void AverageHistoryOne::reset()
  * class AverageHistoryN
  */
 AverageHistoryN::AverageHistoryN(unsigned int data_width, unsigned int history):
-	SpectrumAverage(data_width, history), m_insert_index(0),
+	SpectrumAverage(data_width, history, true), m_insert_index(0),
 	m_inserted_count(0)
 {
 	alloc_history(m_data_width, m_history_size);
@@ -350,6 +358,81 @@ double MinHold::getMinFromHistoryColumn(unsigned int col)
 
 	return min;
 }
+
+/*
+ * class LinearRMSOne
+ */
+LinearRMSOne::LinearRMSOne(unsigned int data_width, unsigned int history):
+	AverageHistoryOne(data_width, history)
+{
+	m_sqr_sums = new double[m_data_width];
+	m_inserted_count = 0;
+}
+
+LinearRMSOne::~LinearRMSOne()
+{
+	delete[] m_sqr_sums;
+}
+
+void LinearRMSOne::pushNewData(double *data)
+{
+	if (m_anyDataPushed) {
+		if (m_inserted_count < m_history_size) {
+			for (unsigned int i = 0; i < m_data_width; i++) {
+				m_sqr_sums[i] += (data[i] * data[i]);
+			}
+			m_inserted_count++;
+		} else if (m_inserted_count != 0) {
+			for (unsigned int i = 0; i < m_data_width; i++) {
+				m_average[i] = m_sqr_sums[i] / m_inserted_count;
+				m_sqr_sums[i] = 0;
+			}
+			m_inserted_count = 0;
+		}
+	} else {
+		std::memcpy(m_average, data, m_data_width * sizeof(double));
+		m_anyDataPushed = true;
+	}
+
+}
+
+
+/*
+ * class LinearAverageOne
+ */
+LinearAverageOne::LinearAverageOne(unsigned int data_width, unsigned int history):
+	AverageHistoryOne(data_width, history)
+{
+	m_sums = new double[m_data_width];
+	m_inserted_count = 0;
+}
+
+LinearAverageOne::~LinearAverageOne()
+{
+	delete[] m_sums;
+}
+
+void LinearAverageOne::pushNewData(double *data)
+{
+	if (m_anyDataPushed) {
+		if (m_inserted_count < m_history_size) {
+			for (unsigned int i = 0; i < m_data_width; i++) {
+				m_sums[i] += data[i];
+			}
+			m_inserted_count++;
+		} else if (m_inserted_count != 0) {
+			for (unsigned int i = 0; i < m_data_width; i++) {
+				m_average[i] = m_sums[i] / m_inserted_count;
+				m_sums[i] = 0;
+			}
+			m_inserted_count = 0;
+		}
+	} else {
+		std::memcpy(m_average, data, m_data_width * sizeof(double));
+		m_anyDataPushed = true;
+	}
+}
+
 
 /*
  * class LinearRMS
