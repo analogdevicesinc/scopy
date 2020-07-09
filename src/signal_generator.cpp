@@ -736,6 +736,7 @@ void SignalGenerator::fileChannelChanged(int value)
 
 	if (ptr->file_channel != (int) value) {
 		ptr->file_channel = (int) value;
+		loadFileChannelData(currentChannel);
 		this->ui->label_size->setText(QString::number(
 		                                      ptr->file_nr_of_samples[ptr->file_channel]) +
 					      tr(" samples"));
