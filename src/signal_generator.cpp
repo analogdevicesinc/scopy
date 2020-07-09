@@ -1812,6 +1812,21 @@ void SignalGenerator::updateRightMenuForChn(int chIdx)
 	filePhase->setEnabled(ptr->file_type != FORMAT_NO_FILE);
 	fileOffset->setEnabled(ptr->file_type != FORMAT_NO_FILE);
 
+	ui->fileChannel->blockSignals(true);
+	ui->fileChannel->clear();
+
+	if (ptr->file_channel_names.isEmpty()) {
+		for (auto i=0; i<ptr->file_nr_of_channels; i++) {
+			ui->fileChannel->addItem(QString::number(i));
+		}
+	} else {
+		ui->fileChannel->addItems(ptr->file_channel_names);
+	}
+
+	ui->fileChannel->setEnabled(ptr->file_nr_of_channels>1);
+	ui->fileChannel->setCurrentIndex(ptr->file_channel);
+	ui->fileChannel->blockSignals(false);
+
 	offset->setValue(ptr->offset);
 	amplitude->setValue(ptr->amplitude);
 	dutycycle->setValue(ptr->dutycycle);
@@ -1827,15 +1842,18 @@ void SignalGenerator::updateRightMenuForChn(int chIdx)
 
 	ui->label_path->setText(ptr->file);
 	ui->label_format->setText(ptr->file_message);
-	if(!ptr->file_nr_of_samples.empty())
-		ui->label_size->setText(QString::number(ptr->file_nr_of_samples[ptr->file_channel]) +
-				tr(" samples"));
+	if(!ptr->file_nr_of_samples.empty()) {
+        ui->label_size->setText(QString::number(ptr->file_nr_of_samples[ptr->file_channel]) +
+                                tr(" samples"));
+	} else {
+		ui->label_size->setText("");
+	}
+
 	ui->mathWidget->setFunction(ptr->function);
 	mathFrequency->setValue(ptr->math_freq);
 	fileSampleRate->setValue(ptr->file_sr);
 	fileOffset->setValue(ptr->file_offset);
 	filePhase->setValue(ptr->file_phase);
-	ui->fileChannel->setCurrentIndex(ptr->file_channel);
 	fileAmplitude->setValue(ptr->file_amplitude);
 
 	ui->type->setCurrentIndex(sg_waveform_to_idx(ptr->waveform));
