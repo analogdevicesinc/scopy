@@ -306,7 +306,7 @@ void SpinBoxA::setValue(double value)
 
 	// Update line edit
 	int index;
-	double scale = findUnitOfValue(m_value, &index);
+	double scale = findUnitOfValue(m_value * m_displayScale, &index);
 	double number = m_value / scale;
 	double abs_number = qAbs(number);
 	int significant_digits = m_decimal_count;
