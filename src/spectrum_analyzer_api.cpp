@@ -298,20 +298,53 @@ void SpectrumAnalyzer_API::setUnits(QString s)
 
 double SpectrumAnalyzer_API::topScale()
 {
-	return sp->top->value();
+	if (sp->ui->topWidget->currentIndex() == 0) {
+		return sp->top->value();
+	} else {
+		return sp->top_scale->value();
+	}
 }
 void SpectrumAnalyzer_API::setTopScale(double val)
 {
-	sp->top->setValue(val);
+	if (sp->ui->topWidget->currentIndex() == 0) {
+		sp->top->setValue(val);
+	} else {
+		sp->top_scale->setValue(val);
+	}
 }
 
-double SpectrumAnalyzer_API::range()
+double SpectrumAnalyzer_API::bottomScale()
 {
-	return sp->range->value();
+	if (sp->ui->topWidget->currentIndex() == 0) {
+		return sp->bottom->value();
+	} else {
+		return sp->bottom_scale->value();
+	}
 }
-void SpectrumAnalyzer_API::setRange(double val)
+void SpectrumAnalyzer_API::setBottomScale(double val)
 {
-	sp->range->setValue(val);
+	if (sp->ui->topWidget->currentIndex() == 0) {
+		sp->bottom->setValue(val);
+	} else {
+		sp->bottom_scale->setValue(val);
+	}
+}
+
+double SpectrumAnalyzer_API::unitPerDiv()
+{
+	if (sp->ui->topWidget->currentIndex() == 0) {
+		return sp->unit_per_div->value();
+	} else {
+		return sp->unit_per_div_scale->value();
+	}
+}
+void SpectrumAnalyzer_API::setunitPerDiv(double val)
+{
+	if (sp->ui->topWidget->currentIndex() == 0) {
+		sp->unit_per_div->setValue(val);
+	} else {
+		sp->unit_per_div_scale->setValue(val);
+	}
 }
 
 bool SpectrumAnalyzer_API::markerTableVisible()

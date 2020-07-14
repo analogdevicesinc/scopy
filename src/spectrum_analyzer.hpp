@@ -103,6 +103,7 @@ public:
 
 	void setNativeDialogs(bool nativeDialogs) override;
 
+	void setCurrentAverageIndexLabel(uint chnIdx);
 public Q_SLOTS:
 	void readPreferences();	
 	void run() override;
@@ -113,6 +114,8 @@ Q_SIGNALS:
 	void showTool();
 
 private Q_SLOTS:
+	void on_btnHistory_toggled(bool checked);
+	void onCurrentAverageIndexChanged(uint chnIdx, uint avgIdx);
 	void on_btnToolSettings_toggled(bool checked);
 	void on_btnSettings_clicked(bool checked);
 	void on_btnSweep_toggled(bool checked);
@@ -141,7 +144,8 @@ private Q_SLOTS:
 	void singleCaptureDone();
 	void on_btnMarkerTable_toggled(bool checked);
 	void onTopValueChanged(double);
-	void onRangeValueChanged(double);
+	void onUnitPerDivValueChanged(double);
+	void onBottomValueChanged(double);
 	void rightMenuFinished(bool opened);	
 	void btnExportClicked();
 	void updateRunButton(bool);
@@ -150,6 +154,7 @@ private Q_SLOTS:
 	void on_btnImport_clicked();
 	void onReferenceChannelDeleted();
 	void refreshCurrentSampleLabel();
+	void validateSpinboxAveraging();
 
 private:
 	void initInstrumentStrings();
@@ -198,8 +203,12 @@ private:
 	QButtonGroup *channels_group;
 	FftDisplayPlot *fft_plot;
 
-	PositionSpinButton *range;
+	ScaleSpinButton *unit_per_div_scale;
+	ScaleSpinButton *top_scale;
+	ScaleSpinButton *bottom_scale;
+	PositionSpinButton *unit_per_div;
 	PositionSpinButton *top;
+	PositionSpinButton *bottom;
 	PositionSpinButton *marker_freq_pos;
 
 	StartStopRangeWidget *startStopRange;
@@ -243,6 +252,8 @@ private:
 	void updateMarkerMenu(unsigned int id);
 	bool isIioManagerStarted() const;
 	void setCurrentSampleLabel(double);
+
+	bool canSwitchAverageHistory(FftDisplayPlot::AverageType avg_type);
 };
 
 class SpectrumChannel: public QObject
@@ -281,18 +292,26 @@ public:
 	uint averaging() const;
 	void setAveraging(uint);
 
+	uint averageIdx() const;
+	void setAverageIdx(uint);
+
 	FftDisplayPlot::AverageType averageType() const;
 	void setAverageType(FftDisplayPlot::AverageType);
 
 	SpectrumAnalyzer::FftWinType fftWindow() const;
 	void setFftWindow(SpectrumAnalyzer::FftWinType win, int taps);
 
+	bool isAverageHistoryEnabled() const;
+	void setAverageHistoryEnabled(bool enabled);
+	bool canStoreAverageHistory() const;
 private:
 	int m_id;
 	QString m_name;
 	float m_line_width;
 	QColor m_color;
 	uint m_averaging;
+	uint m_average_current_index;
+	bool m_average_history;
 	FftDisplayPlot::AverageType m_avg_type;
 	SpectrumAnalyzer::FftWinType m_fft_win;
 	FftDisplayPlot *m_plot;

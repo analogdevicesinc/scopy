@@ -471,7 +471,7 @@ void LinearRMS::getAverage(double *out_data, unsigned int num_samples) const
 	unsigned int num = std::min(m_data_width, num_samples);
 
 	for (unsigned int i = 0; i < num; i++)
-		out_data[i] = m_sqr_sums[i] / m_inserted_count;
+		out_data[i] = sqrt(m_sqr_sums[i] / m_inserted_count);
 }
 
 void LinearRMS::reset()

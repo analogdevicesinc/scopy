@@ -65,7 +65,6 @@ using namespace std;
 using namespace libm2k;
 using namespace libm2k::context;
 
-
 void SpectrumAnalyzer::initInstrumentStrings() {
 
 	mag_types = {
@@ -74,6 +73,7 @@ void SpectrumAnalyzer::initInstrumentStrings() {
 	    {tr("dBu"), FftDisplayPlot::DBU},
 	    {tr("Vpeak"), FftDisplayPlot::VPEAK},
 	    {tr("Vrms"), FftDisplayPlot::VRMS},
+	    {tr("V/√Hz"), FftDisplayPlot::VROOTHZ},
 	};
 
 	avg_types = {
@@ -132,7 +132,8 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	bin_sizes({
 	256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144
 	}), nb_ref_channels(0),
-	selected_ch_settings(-1)
+	selected_ch_settings(-1),
+	fft_ids(nullptr)
 {
 	initInstrumentStrings();
 	// Get the list of names of the available channels
@@ -241,16 +242,49 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 		setChecked(true);
 
 	// Initialize Sweep controls
+	unit_per_div = new PositionSpinButton({
+		{" ",1e0},
+	}, tr("UM/Div"), 0.0, 0.0, false, false, this);
 
-	range = new PositionSpinButton({
-	{" ",1e0},
-	}, tr("Range"), 0.0, 0.0, false, false, this);
-	ui->rangeLayout->addWidget(range);
+	unit_per_div_scale = new ScaleSpinButton({
+			 {{"pV/√Hz",1e-12},
+			  {"nV/√Hz",1e-9},
+			  {"μV/√Hz",1e-6},
+			  {"mV/√Hz",1e-3},
+			  {"V/√Hz",1e0}}
+	}, tr("UM/Div"), 1e-12, 25/10, false, false, this,
+	{1, 2.5, 5, 7.5});
+	ui->divisionWidget->addWidget(unit_per_div);
+	ui->divisionWidget->addWidget(unit_per_div_scale);
 
 	top = new PositionSpinButton({
-	{" ",1e0},
-	}, tr("Top"), -100.0, 100.0, false, false, this);
-	ui->topLayout->addWidget(top);
+		{" ",1e0},
+	}, tr("Top"), -100.0, 300.0, false, false, this);
+	top_scale = new ScaleSpinButton({
+			{{"pV/√Hz",1e-12},
+			 {"nV/√Hz",1e-9},
+			 {"μV/√Hz",1e-6},
+			 {"mV/√Hz",1e-3},
+			 {"V/√Hz",1e0}}
+	}, tr("Top"), 1e-12, 25.0, false, false, this,
+	{1, 2.5, 5, 7.5});
+	ui->topWidget->addWidget(top);
+	ui->topWidget->addWidget(top_scale);
+
+
+	bottom = new PositionSpinButton({
+		{" ",1e0},
+	}, tr("Bottom"), -300.0, 100.0, false, false, this);
+	bottom_scale = new ScaleSpinButton({
+			   {{"pV/√Hz",1e-12},
+			    {"nV/√Hz",1e-9},
+			    {"μV/√Hz",1e-6},
+			    {"mV/√Hz",1e-3},
+			    {"V/√Hz",1e0}}
+	}, tr("Bottom"), 0.0, 25.0, false, false, this,
+	{1, 2.5, 5, 7.5});
+	ui->bottomWidget->addWidget(bottom);
+	ui->bottomWidget->addWidget(bottom_scale);
 
 	marker_freq_pos = new PositionSpinButton({
 	{tr("Hz"),1e0},
@@ -287,6 +321,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 		marker_freq_pos->setMaxValue(stop);
 		marker_freq_pos->setStep(2 * (stop -
 						  start) / bin_sizes[ui->cmb_rbw->currentIndex()]);
+
 	});
 
 	connect(ui->cmb_rbw, QOverload<int>::of(&QComboBox::currentIndexChanged),
@@ -295,8 +330,8 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	});
 
 	// Initialize vertical axis controls
-	range->setMinValue(1);
-	range->setMaxValue(200);
+	unit_per_div->setMinValue(1);
+	unit_per_div->setMaxValue(200/10);
 
 	// Configure plot peak capabilities
 	for (uint i = 0; i < m_adc_nb_channels; i++) {
@@ -345,6 +380,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 		build_gnuradio_block_chain_no_ctx();
 	}
 
+	connect(ui->btnApply, SIGNAL(clicked()), this, SLOT(validateSpinboxAveraging()));
 	connect(ui->runSingleWidget, &RunSingleWidget::toggled,
 		[=](bool checked){
 		auto btn = dynamic_cast<CustomPushButton *>(run_button);
@@ -361,10 +397,24 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	connect(fft_plot, SIGNAL(newData()),
 	        SLOT(singleCaptureDone()));
 
+	connect(fft_plot, SIGNAL(currentAverageIndex(unsigned int, unsigned int)),
+		SLOT(onCurrentAverageIndexChanged(unsigned int, unsigned int)));
+	const bool visible = (channels[crt_channel_id]->averageType() != FftDisplayPlot::AverageType::SAMPLE);
+	ui->lbl_crtAvgSample->setVisible(visible);
+	setCurrentAverageIndexLabel(crt_channel_id);
+
 	connect(top, SIGNAL(valueChanged(double)),
 	        SLOT(onTopValueChanged(double)));
-	connect(range, SIGNAL(valueChanged(double)),
-	        SLOT(onRangeValueChanged(double)));
+	connect(unit_per_div, SIGNAL(valueChanged(double)),
+		SLOT(onUnitPerDivValueChanged(double)));
+	connect(bottom, SIGNAL(valueChanged(double)),
+		SLOT(onBottomValueChanged(double)));
+	connect(top_scale, SIGNAL(valueChanged(double)),
+		SLOT(onTopValueChanged(double)));
+	connect(unit_per_div_scale, SIGNAL(valueChanged(double)),
+		SLOT(onUnitPerDivValueChanged(double)));
+	connect(bottom_scale, SIGNAL(valueChanged(double)),
+		SLOT(onBottomValueChanged(double)));
 
 	// UI default
 	ui->comboBox_window->setCurrentText("Hamming");
@@ -374,8 +424,8 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	ui->gridSweepControls->addWidget(startStopRange, 0, 0, 2, 2);
 
+	unit_per_div->setValue(20);
 	top->setValue(0);
-	range->setValue(200);
 
 	marker_freq_pos->setMinValue(1);
 	marker_freq_pos->setMaxValue(startStopRange->getStopValue());
@@ -391,6 +441,10 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	connect(ui->logBtn, &QPushButton::toggled,
 		fft_plot, &FftDisplayPlot::useLogFreq);
+
+	ui->btnHistory->setEnabled(true);
+	ui->btnHistory->setChecked(true);
+	ui->btnHistory->setVisible(false);
 
 	api->setObjectName(QString::fromStdString(Filter::tool_name(
 	                           TOOL_SPECTRUM_ANALYZER)));
@@ -1137,8 +1191,23 @@ void SpectrumAnalyzer::on_comboBox_type_currentIndexChanged(const QString& s)
 
 	auto avg_type = (*it).second;
 
+	ui->btnHistory->setVisible(canSwitchAverageHistory(avg_type));
+	ui->btnHistory->setChecked(true);
+	ui->lbl_history->setVisible(ui->btnHistory->isVisible());
+	ui->btnApply->setVisible(visible);
+	ui->lbl_crtAvgSample->setVisible(visible);
+
 	if (avg_type != channels[crt_channel]->averageType()) {
 		channels[crt_channel]->setAverageType(avg_type);
+		if (channels[crt_channel]->canStoreAverageHistory()) {
+			if (ui->btnHistory->isChecked()) {
+				ui->spinBox_averaging->setMaximum(10000);
+			} else {
+				ui->spinBox_averaging->setMaximum(1000000);
+			}
+		} else {
+			ui->spinBox_averaging->setMaximum(1000000);
+		}
 	}
 }
 
@@ -1216,12 +1285,15 @@ void SpectrumAnalyzer::updateChannelSettingsPanel(unsigned int id)
 		ui->comboBox_type->setEnabled(true);
 		ui->comboBox_window->setEnabled(true);
 		ui->spinBox_averaging->setEnabled(true);
+		ui->btnHistory->setEnabled(true);
 
 		/* Migh be hidden */
 		ui->comboBox_type->setVisible(true);
 		ui->comboBox_window->setVisible(true);
 		ui->spinBox_averaging->setVisible(true);
+		ui->btnHistory->setVisible(true);
 
+		ui->lbl_history->setVisible(true);
 		ui->label_type->setVisible(true);
 		ui->label_window->setVisible(true);
 		ui->label_averaging->setVisible(true);
@@ -1234,6 +1306,11 @@ void SpectrumAnalyzer::updateChannelSettingsPanel(unsigned int id)
 		const bool visible = (sc->averageType() != FftDisplayPlot::AverageType::SAMPLE);
 		ui->spinBox_averaging->setVisible(visible);
 		ui->label_averaging->setVisible(visible);
+		ui->btnApply->setVisible(visible);
+
+		ui->btnHistory->setVisible(canSwitchAverageHistory(sc->averageType()));
+		ui->btnHistory->setChecked(sc->isAverageHistoryEnabled());
+		ui->lbl_history->setVisible(ui->btnHistory->isVisible());
 
 		if (it != avg_types.end()) {
 			ui->comboBox_type->setCurrentText((*it).first);
@@ -1264,11 +1341,15 @@ void SpectrumAnalyzer::updateChannelSettingsPanel(unsigned int id)
 			ui->comboBox_type->setDisabled(true);
 			ui->comboBox_window->setDisabled(true);
 			ui->spinBox_averaging->setDisabled(true);
+			ui->btnHistory->setDisabled(true);
+			ui->btnApply->setDisabled(true);
 		} else {
 			ui->comboBox_type->setVisible(false);
 			ui->comboBox_window->setVisible(false);
 			ui->spinBox_averaging->setVisible(false);
+			ui->btnHistory->setVisible(false);
 
+			ui->lbl_history->setVisible(false);
 			ui->label_type->setVisible(false);
 			ui->label_window->setVisible(false);
 			ui->label_averaging->setVisible(false);
@@ -1306,6 +1387,15 @@ void SpectrumAnalyzer::onChannelSelected(bool en)
 
 	crt_channel_id = chIdx;
 
+	if (!cw->isReferenceChannel()) {
+		const bool visible = (channels[crt_channel_id]->averageType() != FftDisplayPlot::AverageType::SAMPLE);
+		ui->lbl_crtAvgSample->setVisible(visible);
+		setCurrentAverageIndexLabel(crt_channel_id);
+	} else {
+		ui->lbl_crtAvgSample->setVisible(false);
+	}
+
+	fft_plot->bringCurveToFront(chIdx);
 	if (marker_menu_opened) {
 		triggerRightMenuToggle(
 			static_cast<CustomPushButton *>(ui->btnMarkers), en);
@@ -1623,6 +1713,12 @@ void SpectrumAnalyzer::refreshCurrentSampleLabel()
 	}
 	setCurrentSampleLabel(time_percentage);
 }
+
+void SpectrumAnalyzer::validateSpinboxAveraging()
+{
+	on_spinBox_averaging_valueChanged(ui->spinBox_averaging->value());
+}
+
 void SpectrumAnalyzer::setCurrentSampleLabel(double percentage)
 {
 	QString percentage_str = QString::number(percentage, 'f', 2);
@@ -1630,6 +1726,15 @@ void SpectrumAnalyzer::setCurrentSampleLabel(double percentage)
 	ui->lbl_crtSampleNb->setText(txt);
 }
 
+bool SpectrumAnalyzer::canSwitchAverageHistory(FftDisplayPlot::AverageType avg_type)
+{
+	switch (avg_type) {
+	case FftDisplayPlot::LINEAR_RMS:
+	case FftDisplayPlot::LINEAR_DB:
+		return true;
+	default:
+		return false;
+	}
 }
 
 void SpectrumAnalyzer::on_btnDnAmplPeak_clicked()
@@ -1863,27 +1968,58 @@ void SpectrumAnalyzer::on_cmb_units_currentIndexChanged(const QString& unit)
 	}
 
 	FftDisplayPlot::MagnitudeType magType = (*it).second;
+	unsigned int stackedWidgetCurrentIdx = 0;
 
 	switch (magType) {
 	case FftDisplayPlot::VPEAK:
 	case FftDisplayPlot::VRMS:
 		fft_plot->setAxisScale(QwtPlot::yLeft, 0, 25, 10);
 		top->setValue(25);
-		range->setValue(25);
+		bottom->setValue(0);
 		break;
-
+	case FftDisplayPlot::VROOTHZ:
+		stackedWidgetCurrentIdx = 1;
+		fft_plot->setAxisScale(QwtPlot::yLeft, 0, 25, 10);
+		top_scale->setValue(25);
+		bottom_scale->setValue(0);
+		break;
 	default:
 		fft_plot->setAxisScale(QwtPlot::yLeft, -200, 0, 10);
 		top->setValue(0);
-		range->setValue(200);
+		bottom->setValue(-200);
 		break;
 	}
 
+	ui->topWidget->setCurrentIndex(stackedWidgetCurrentIdx);
+	ui->bottomWidget->setCurrentIndex(stackedWidgetCurrentIdx);
+	ui->divisionWidget->setCurrentIndex(stackedWidgetCurrentIdx);
 	fft_plot->setMagnitudeType((*it).second);
 	fft_plot->recalculateMagnitudes();
 	fft_plot->replot();
 
 	ui->lblMagUnit->setText(unit);
+}
+
+void SpectrumAnalyzer::on_btnHistory_toggled(bool checked)
+{
+	int crt_channel = channelIdOfOpenedSettings();
+
+	if (crt_channel < 0) {
+		qDebug(CAT_SPECTRUM_ANALYZER) << "invalid channel ID for the opened Settings menu";
+		return;
+	}
+
+	channels[crt_channel]->setAverageHistoryEnabled(checked);
+
+	if (channels[crt_channel]->canStoreAverageHistory()) {
+		if (ui->btnHistory->isChecked()) {
+			ui->spinBox_averaging->setMaximum(10000);
+		} else {
+			ui->spinBox_averaging->setMaximum(1000000);
+		}
+	} else {
+		ui->spinBox_averaging->setMaximum(1000000);
+	}
 }
 
 void SpectrumAnalyzer::on_btnMarkerTable_toggled(bool checked)
@@ -1924,17 +2060,84 @@ QPair<int, int> SpectrumAnalyzer::getGridLayoutPosFromIndex(QGridLayout *layout,
 
 void SpectrumAnalyzer::onTopValueChanged(double top)
 {
-	double rangeValue = range->value();
-	fft_plot->setAxisScale(QwtPlot::yLeft, top - rangeValue, top);
+	bool isScaleBtn = ui->topWidget->currentIndex();
+	double perDiv = isScaleBtn ? unit_per_div_scale->value() : unit_per_div->value();
+	double bottomValue = top - perDiv * 10;
+	if (!isScaleBtn) {
+		bottom->blockSignals(true);
+		bottom->setValue(bottomValue);
+		bottom->blockSignals(false);
+	} else {
+		bottom_scale->blockSignals(true);
+		bottom_scale->setValue(bottomValue);
+		bottom_scale->blockSignals(false);
+	}
+	fft_plot->setAxisScale(QwtPlot::yLeft, bottomValue, top);
 	fft_plot->replot();
 }
 
-void SpectrumAnalyzer::onRangeValueChanged(double range)
+void SpectrumAnalyzer::onUnitPerDivValueChanged(double perDiv)
 {
-	double topValue = top->value();
-	fft_plot->setAxisScale(QwtPlot::yLeft, topValue - range, topValue);
+	bool isScaleBtn = ui->topWidget->currentIndex();
+	if (isScaleBtn) {
+		double bottomValue = top_scale->value() - perDiv * 10;
+		bottom_scale->setValue(bottomValue);
+		double topValue = bottom_scale->value() + perDiv * 10;
+		if (topValue != top_scale->value()) {
+			top_scale->setValue(topValue);
+		}
+	} else {
+		double bottomValue = top->value() - perDiv * 10;
+		bottom->setValue(bottomValue);
+		double topValue = bottom->value() + perDiv * 10;
+		if (topValue != top->value()) {
+			top->setValue(topValue);
+		}
+	}
+}
+
+void SpectrumAnalyzer::onBottomValueChanged(double bottom)
+{
+	bool isScaleBtn = ui->topWidget->currentIndex();
+	double perDiv = isScaleBtn ? unit_per_div_scale->value() : unit_per_div->value();
+	double topValue = bottom + perDiv * 10;
+	if (!isScaleBtn) {
+		top->blockSignals(true);
+		top->setValue(topValue);
+		top->blockSignals(false);
+	} else {
+		top_scale->blockSignals(true);
+		top_scale->setValue(topValue);
+		top_scale->blockSignals(false);
+	}
+	fft_plot->setAxisScale(QwtPlot::yLeft, bottom, topValue);
 	fft_plot->replot();
 }
+
+void SpectrumAnalyzer::onCurrentAverageIndexChanged(uint chnIdx, uint avgIdx)
+{
+	channels[chnIdx]->setAverageIdx(avgIdx);
+	setCurrentAverageIndexLabel(chnIdx);
+}
+
+void SpectrumAnalyzer::setCurrentAverageIndexLabel(uint chnIdx)
+{
+	if (chnIdx == crt_channel_id) {
+		if (channels[chnIdx]->averaging() != 1) {
+			ui->lbl_crtAvgSample->setVisible(true);
+			QString txt = QString("Average Sample: %1 / %2 ").arg(channels[chnIdx]->averageIdx())
+					.arg(channels[chnIdx]->averaging());
+			ui->lbl_crtAvgSample->setText(txt);
+			ui->lbl_crtAvgSample->setStyleSheet(QString("QLabel {"
+								    "color: %1;"
+								    "font-weight: bold;"
+								    "}").arg(fft_plot->getLineColor(chnIdx).name()));
+		} else {
+			ui->lbl_crtAvgSample->setVisible(false);
+		}
+	}
+}
+
 
 /*
  * class SpectrumChannel
@@ -1946,10 +2149,12 @@ SpectrumChannel::SpectrumChannel(int id, const QString& name,
 	m_line_width(1.0),
 	m_color(plot->getLineColor(id).name()),
 	m_averaging(1),
+	m_average_current_index(0),
 	m_avg_type(FftDisplayPlot::SAMPLE),
 	m_fft_win(SpectrumAnalyzer::HAMMING),
 	m_plot(plot),
-	m_widget(new ChannelWidget(id, false, false, m_color))
+	m_widget(new ChannelWidget(id, false, false, m_color)),
+	m_average_history(true)
 {
 	m_widget->setFullName(name);
 	m_widget->setShortName(QString("CH %1").arg(id + 1));
@@ -1995,7 +2200,17 @@ uint SpectrumChannel::averaging() const
 void SpectrumChannel::setAveraging(uint averaging)
 {
 	m_averaging = averaging;
-	m_plot->setAverage(m_id, m_avg_type, averaging);
+	m_plot->setAverage(m_id, m_avg_type, averaging, m_average_history);
+}
+
+uint SpectrumChannel::averageIdx() const
+{
+	return m_average_current_index;
+}
+
+void SpectrumChannel::setAverageIdx(uint avg)
+{
+	m_average_current_index = avg;
 }
 
 FftDisplayPlot::AverageType SpectrumChannel::averageType() const
@@ -2003,10 +2218,35 @@ FftDisplayPlot::AverageType SpectrumChannel::averageType() const
 	return m_avg_type;
 }
 
+bool SpectrumChannel::canStoreAverageHistory() const
+{
+	switch (m_avg_type) {
+	case FftDisplayPlot::LINEAR_RMS:
+	case FftDisplayPlot::LINEAR_DB:
+	case FftDisplayPlot::PEAK_HOLD:
+	case FftDisplayPlot::MIN_HOLD:
+		return true;
+	default:
+		return false;
+	}
+}
+
+bool SpectrumChannel::isAverageHistoryEnabled() const
+{
+	return m_average_history;
+}
+
+void SpectrumChannel::setAverageHistoryEnabled(bool enabled)
+{
+	m_average_history = enabled;
+	m_plot->setAverage(m_id, m_avg_type, m_averaging, enabled);
+}
+
 void SpectrumChannel::setAverageType(FftDisplayPlot::AverageType avg_type)
 {
 	m_avg_type = avg_type;
-	m_plot->setAverage(m_id, avg_type, m_averaging);
+	m_average_history = canStoreAverageHistory();
+	m_plot->setAverage(m_id, avg_type, m_averaging, m_average_history);
 }
 
 void SpectrumChannel::setFftWindow(SpectrumAnalyzer::FftWinType win, int taps)
@@ -2014,6 +2254,13 @@ void SpectrumChannel::setFftWindow(SpectrumAnalyzer::FftWinType win, int taps)
 	m_fft_win = win;
 
 	std::vector<float> window = build_win(win, taps);
+	float sum = 0;
+	float sqr_sum = 0;
+	for (auto elem : window) {
+		sum += elem;
+		sqr_sum += (elem * elem);
+	}
+	m_plot->setWindowCoefficientSum(sum, sqr_sum);
 	float gain = calcCoherentPowerGain(window);
 	scaletFftWindow(window, 1 / gain);
 	fft_block->set_window(window);
