@@ -27,57 +27,29 @@ void DMM_API::show()
 	Q_EMIT dmm->showTool();
 }
 
-bool DMM_API::get_mode_ac_high_ch1() const
-{
-	return dmm->ui->btn_ch1_ac2->isChecked();
-}
-
-bool DMM_API::get_mode_ac_low_ch1() const
+bool DMM_API::get_mode_ac_ch1() const
 {
 	return dmm->ui->btn_ch1_ac->isChecked();
 }
 
-bool DMM_API::get_mode_ac_high_ch2() const
-{
-	return dmm->ui->btn_ch2_ac2->isChecked();
-}
-
-bool DMM_API::get_mode_ac_low_ch2() const
+bool DMM_API::get_mode_ac_ch2() const
 {
 	return dmm->ui->btn_ch2_ac->isChecked();
 }
 
-void DMM_API::set_mode_ac_high_ch1(bool en)
+void DMM_API::set_mode_ac_ch1(bool en)
 {
 	/* Set DC mode as default */
-	if (!get_mode_ac_low_ch1() && !en) {
-		dmm->ui->btn_ch1_dc->setChecked(!en);
-	}
-	dmm->ui->btn_ch1_ac2->setChecked(en);
-}
-
-void DMM_API::set_mode_ac_low_ch1(bool en)
-{
-	/* Set DC mode as default */
-	if (!get_mode_ac_high_ch1() && !en) {
+	if (!get_mode_ac_ch1() && !en) {
 		dmm->ui->btn_ch1_dc->setChecked(!en);
 	}
 	dmm->ui->btn_ch1_ac->setChecked(en);
 }
 
-void DMM_API::set_mode_ac_high_ch2(bool en)
+void DMM_API::set_mode_ac_ch2(bool en)
 {
 	/* Set DC mode as default */
-	if (!get_mode_ac_low_ch2() && !en) {
-		dmm->ui->btn_ch2_dc->setChecked(!en);
-	}
-	dmm->ui->btn_ch2_ac2->setChecked(en);
-}
-
-void DMM_API::set_mode_ac_low_ch2(bool en)
-{
-	/* Set DC mode as default */
-	if (!get_mode_ac_high_ch2() && !en) {
+	if (!get_mode_ac_ch2() && !en) {
 		dmm->ui->btn_ch2_dc->setChecked(!en);
 	}
 	dmm->ui->btn_ch2_ac->setChecked(en);

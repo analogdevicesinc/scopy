@@ -311,17 +311,17 @@ QLabel[ac=true] { qproperty-text: &quot;VRMS&quot;; }</string>
              </layout>
             </item>
             <item>
-             <widget class="adiscope::CustomScale" name="scaleCh1">
-              <property name="lowerBound">
+             <widget class="adiscope::CustomScale" name="scaleCh1" native="true">
+              <property name="lowerBound" stdset="0">
                <double>-0.100000000000000</double>
               </property>
-              <property name="upperBound">
+              <property name="upperBound" stdset="0">
                <double>0.100000000000000</double>
               </property>
-              <property name="scaleMaxMajor">
+              <property name="scaleMaxMajor" stdset="0">
                <number>5</number>
               </property>
-              <property name="scaleMaxMinor">
+              <property name="scaleMaxMinor" stdset="0">
                <number>5</number>
               </property>
               <property name="orientation">
@@ -333,7 +333,7 @@ QLabel[ac=true] { qproperty-text: &quot;VRMS&quot;; }</string>
               <property name="originMode">
                <enum>QwtThermo::OriginCustom</enum>
               </property>
-              <property name="borderWidth">
+              <property name="borderWidth" stdset="0">
                <number>0</number>
               </property>
              </widget>
@@ -597,19 +597,22 @@ QLabel[ac=true] { qproperty-text: &quot;VRMS&quot;; }</string>
              </layout>
             </item>
             <item>
-             <widget class="adiscope::CustomScale" name="scaleCh2">
-              <property name="lowerBound">
+             <widget class="adiscope::CustomScale" name="scaleCh2" native="true">
+              <property name="lowerBound" stdset="0">
                <double>-0.100000000000000</double>
               </property>
-              <property name="upperBound">
+              <property name="upperBound" stdset="0">
                <double>0.100000000000000</double>
               </property>
-              <property name="scaleMaxMajor">
+              <property name="scaleMaxMajor" stdset="0">
                <number>5</number>
               </property>
-              <property name="scaleMaxMinor">
+              <property name="scaleMaxMinor" stdset="0">
                <number>5</number>
               </property>
+              <property name="borderWidth" stdset="0">
+	       <number>0</number>
+	      </property>
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>
@@ -774,9 +777,9 @@ QPushButton:disabled {
          <property name="geometry">
           <rect>
            <x>0</x>
-           <y>-152</y>
+           <y>0</y>
            <width>186</width>
-           <height>889</height>
+           <height>888</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -861,17 +864,7 @@ QPushButton:disabled {
             <item>
              <widget class="QRadioButton" name="btn_ch1_ac">
               <property name="text">
-               <string>AC (20 Hz - 800 Hz)</string>
-              </property>
-              <attribute name="buttonGroup">
-               <string notr="true">buttonGroup</string>
-              </attribute>
-             </widget>
-            </item>
-            <item>
-             <widget class="QRadioButton" name="btn_ch1_ac2">
-              <property name="text">
-               <string>AC (800 Hz - 40 kHz)</string>
+               <string>AC (20 Hz - 40 kHz)</string>
               </property>
               <attribute name="buttonGroup">
                <string notr="true">buttonGroup</string>
@@ -1027,17 +1020,7 @@ QPushButton:disabled {
             <item>
              <widget class="QRadioButton" name="btn_ch2_ac">
               <property name="text">
-               <string>AC (20 Hz - 800 Hz)</string>
-              </property>
-              <attribute name="buttonGroup">
-               <string notr="true">buttonGroup_2</string>
-              </attribute>
-             </widget>
-            </item>
-            <item>
-             <widget class="QRadioButton" name="btn_ch2_ac2">
-              <property name="text">
-               <string>AC (800 Hz - 40 kHz)</string>
+               <string>AC (20 Hz - 40 kHz)</string>
               </property>
               <attribute name="buttonGroup">
                <string notr="true">buttonGroup_2</string>
