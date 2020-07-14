@@ -34,7 +34,8 @@ class SpectrumAnalyzer_API : public ApiObject
 	Q_PROPERTY(QString units READ units WRITE setUnits);
 	Q_PROPERTY(QString resBW READ resBW WRITE setResBW);
 	Q_PROPERTY(double topScale READ topScale WRITE setTopScale);
-	Q_PROPERTY(double range READ range WRITE setRange);
+	Q_PROPERTY(double bottomScale READ bottomScale WRITE setBottomScale);
+	Q_PROPERTY(double unitPerDiv READ unitPerDiv WRITE setunitPerDiv);
 	Q_PROPERTY(QVariantList channels READ getChannels);
 	Q_PROPERTY(int currentChannel READ currentChannel WRITE setCurrentChannel);
 	Q_PROPERTY(bool markerTableVisible READ markerTableVisible WRITE
@@ -76,8 +77,11 @@ private:
 	double topScale();
 	void setTopScale(double);
 
-	double range();
-	void setRange(double);
+	double bottomScale();
+	void setBottomScale(double);
+
+	double unitPerDiv();
+	void setunitPerDiv(double);
 
 	bool markerTableVisible();
 	void setMarkerTableVisible(bool);

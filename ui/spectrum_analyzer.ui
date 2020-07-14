@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>857</width>
+    <width>969</width>
     <height>661</height>
    </rect>
   </property>
@@ -466,6 +466,31 @@ QPushButton:checked:hover {
                </property>
               </widget>
              </item>
+             <item>
+              <spacer name="horizontalSpacer_14">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Fixed</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>0</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QLabel" name="lbl_crtAvgSample">
+               <property name="text">
+                <string>Average Sample: </string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_13">
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
                </property>
@@ -663,14 +688,17 @@ QWidget {
                 </layout>
                </item>
                <item>
-                <layout class="QVBoxLayout" name="verticalLayout_12">
-                 <property name="spacing">
-                  <number>0</number>
-                 </property>
+                <layout class="QGridLayout" name="gridLayout_6">
                  <property name="topMargin">
                   <number>0</number>
                  </property>
-                 <item>
+                 <property name="horizontalSpacing">
+                  <number>3</number>
+                 </property>
+                 <property name="verticalSpacing">
+                  <number>0</number>
+                 </property>
+                 <item row="0" column="0">
                   <widget class="QLabel" name="label_averaging">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -686,23 +714,104 @@ QWidget {
                    </property>
                   </widget>
                  </item>
-                 <item>
+                 <item row="1" column="0">
                   <widget class="QSpinBox" name="spinBox_averaging">
                    <property name="styleSheet">
                     <string notr="true">font-size: 14px;
 height:24px;
 color: white;
 border: 0px;
-border-bottom: 1px solid rgba(255,255,255,100);</string>
+border-bottom: 1px solid rgba(255,255,255,100);
+
+
+QSpinBox[invalid=true] {
+border-color: red;
+}
+QSpinBox[valid=true] {
+border-color: green;
+}</string>
                    </property>
                    <property name="buttonSymbols">
                     <enum>QAbstractSpinBox::NoButtons</enum>
+                   </property>
+                   <property name="keyboardTracking">
+                    <bool>false</bool>
                    </property>
                    <property name="minimum">
                     <number>1</number>
                    </property>
                    <property name="maximum">
-                    <number>100</number>
+                    <number>10000</number>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QPushButton" name="btnApply">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>64</width>
+                     <height>25</height>
+                    </size>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">QPushButton {
+color: white;
+background-color: #4a64ff;
+font-family:  14pt;
+border-width: 0px;
+border-radius: 3px;
+min-width: 64px;
+}
+QPushButton:disabled {
+background-color: grey;
+}
+QPushButton:pressed {
+background-color: #F45000;
+}
+
+QPushButton:enabled:!pressed { background-color: #4a64ff; }
+QPushButton[valid=true]:enabled:!pressed { background-color: #4a64ff; }
+QPushButton[invalid=true]:enabled:!pressed { background-color: #4a64ff; }
+QPushButton:pressed {
+background-color: #4a64ff;
+}
+QPushButton:hover
+{
+	 background-color: #4a34ff;
+}</string>
+                   </property>
+                   <property name="text">
+                    <string>Apply</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QVBoxLayout" name="verticalLayout_15">
+                 <property name="spacing">
+                  <number>5</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="QLabel" name="lbl_history">
+                   <property name="text">
+                    <string>History</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="adiscope::CustomSwitch" name="btnHistory">
+                   <property name="text">
+                    <string/>
                    </property>
                   </widget>
                  </item>
@@ -1221,11 +1330,20 @@ color: rgba(255,255,255,51);
                     <number>2</number>
                    </property>
                    <item>
-                    <layout class="QHBoxLayout" name="rangeLayout">
-                     <property name="spacing">
-                      <number>0</number>
+                    <widget class="QStackedWidget" name="bottomWidget"/>
+                   </item>
+                   <item>
+                    <spacer name="verticalSpacer_11">
+                     <property name="orientation">
+                      <enum>Qt::Vertical</enum>
                      </property>
-                    </layout>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>0</width>
+                       <height>0</height>
+                      </size>
+                     </property>
+                    </spacer>
                    </item>
                    <item>
                     <widget class="QLabel" name="lbl_rbw">
@@ -1248,7 +1366,10 @@ color: rgba(255,255,255,51);
                     <number>2</number>
                    </property>
                    <item>
-                    <layout class="QHBoxLayout" name="topLayout"/>
+                    <widget class="QStackedWidget" name="topWidget"/>
+                   </item>
+                   <item>
+                    <widget class="QStackedWidget" name="divisionWidget"/>
                    </item>
                    <item>
                     <widget class="QLabel" name="lbl_units">
