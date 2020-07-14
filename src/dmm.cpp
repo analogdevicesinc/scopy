@@ -30,6 +30,8 @@
 #include <gnuradio/blocks/rms_ff.h>
 #include <gnuradio/blocks/short_to_float.h>
 #include <gnuradio/blocks/sub.h>
+#include <gnuradio/blocks/skiphead.h>
+#include <gnuradio/blocks/delay.h>
 #include <gnuradio/filter/dc_blocker_ff.h>
 
 #include <boost/make_shared.hpp>
@@ -70,7 +72,7 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, ToolMenuItem *toolMenuItem,
 	ui->setupUi(this);
 
 	/* TODO: avoid hardcoding sample rate */
-	sample_rate = 1e6;
+	sample_rate = 1e5;
 
 	ui->sismograph_ch1->setColor(QColor("#ff7200"));
 	ui->sismograph_ch2->setColor(QColor("#9013fe"));
@@ -129,9 +131,6 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, ToolMenuItem *toolMenuItem,
 
 	connect(ui->btn_ch1_ac, SIGNAL(toggled(bool)), this, SLOT(toggleAC()));
 	connect(ui->btn_ch2_ac, SIGNAL(toggled(bool)), this, SLOT(toggleAC()));
-
-	connect(ui->btn_ch1_ac2, SIGNAL(toggled(bool)), this, SLOT(toggleAC()));
-	connect(ui->btn_ch2_ac2, SIGNAL(toggled(bool)), this, SLOT(toggleAC()));
 
 	connect(ui->btn_ch1_dc, &QPushButton::toggled, [&](bool en) {
 		setDynamicProperty(ui->labelCh1, "ac", !en);
@@ -320,29 +319,29 @@ void DMM::toggleTimer(bool start)
 
 
 gr::basic_block_sptr DMM::configureGraph(gr::basic_block_sptr s2f,
-		bool is_low_ac, bool is_high_ac)
+		bool is_ac)
 {
 	/* 10 fps refresh rate for the plot */
 	auto keep_one = gr::blocks::keep_one_in_n::make(sizeof(float),
-			is_high_ac ? (sample_rate / 10.0) : 1000.0);
+			sample_rate / 10.0);
 
-	/* TODO: figure out best value for the blocker parameter */
-	auto blocker = gr::filter::dc_blocker_ff::make(1000, true);
+	auto blocker_val = 4000;
+	auto blocker = gr::filter::dc_blocker_ff::make(blocker_val, true);
 
 	manager->connect(s2f, 0, blocker, 0);
 
-	if (is_low_ac || is_high_ac) {
+	if (is_ac) {
 		/* TODO: figure out best value for the RMS parameter */
 		auto rms = gr::blocks::rms_ff::make(0.0001);
 		manager->connect(blocker, 0, rms, 0);
-
 		manager->connect(rms, 0, keep_one, 0);
 	} else {
 		auto sub = gr::blocks::sub_ff::make();
-
 		manager->connect(s2f, 0, sub, 0);
 		manager->connect(blocker, 0, sub, 1);
-		manager->connect(sub, 0, keep_one, 0);
+		auto moving = gr::blocks::moving_average_ff::make(4000,1.0/4000);
+		manager->connect(sub, 0, moving,0 );
+		manager->connect(moving, 0, keep_one, 0);
 	}
 
 	return keep_one;
@@ -353,37 +352,14 @@ void DMM::configureModes()
 	auto s2f1 = gr::blocks::short_to_float::make();
 	auto s2f2 = gr::blocks::short_to_float::make();
 
-	bool is_low_ac_ch1 = ui->btn_ch1_ac->isChecked();
-	bool is_low_ac_ch2 = ui->btn_ch2_ac->isChecked();
-	bool is_high_ac_ch1 = ui->btn_ch1_ac2->isChecked();
-	bool is_high_ac_ch2 = ui->btn_ch2_ac2->isChecked();
+	bool is_ac_ch1 = ui->btn_ch1_ac->isChecked();
+	bool is_ac_ch2 = ui->btn_ch2_ac->isChecked();
 
-	if (is_high_ac_ch1) {
-		id_ch1 = manager->connect(s2f1, 0, 0, false, sample_rate / 10);
-	} else {
-		/* Low-frequency AC: decimate data rate */
-		auto keep_one1 = gr::blocks::keep_one_in_n::make(
-				sizeof(short), sample_rate / 1e4);
-		id_ch1 = manager->connect(keep_one1, 0, 0, false,
-				sample_rate / 10);
+	id_ch1 = manager->connect(s2f1, 0, 0, false, sample_rate / 10);
+	id_ch2 = manager->connect(s2f2, 1, 0, false, sample_rate / 10);
 
-		manager->connect(keep_one1, 0, s2f1, 0);
-	}
-
-	if (is_high_ac_ch2) {
-		id_ch2 = manager->connect(s2f2, 1, 0, false, sample_rate / 10);
-	} else {
-		/* Low-frequency AC: decimate data rate */
-		auto keep_one2 = gr::blocks::keep_one_in_n::make(
-				sizeof(short), sample_rate / 1e4);
-		id_ch2 = manager->connect(keep_one2, 1, 0, false,
-				sample_rate / 10);
-
-		manager->connect(keep_one2, 0, s2f2, 0);
-	}
-
-	auto block1 = configureGraph(s2f1, is_low_ac_ch1, is_high_ac_ch1);
-	auto block2 = configureGraph(s2f2, is_low_ac_ch2, is_high_ac_ch2);
+	auto block1 = configureGraph(s2f1, is_ac_ch1);
+	auto block2 = configureGraph(s2f2, is_ac_ch2);
 
 	manager->connect(block1, 0, signal, 0);
 	manager->connect(block2, 0, signal, 1);
@@ -542,10 +518,9 @@ void DMM::dataLoggingThread()
 				ui->lblFileStatus->setText(tr("Choose a file"));
 			}
 		}
-		bool is_low_ac_ch1 = ui->btn_ch1_ac->isChecked();
-		bool is_low_ac_ch2 = ui->btn_ch2_ac->isChecked();
-		bool is_high_ac_ch1 = ui->btn_ch1_ac2->isChecked();
-		bool is_high_ac_ch2 = ui->btn_ch2_ac2->isChecked();
+		bool is_ac_ch1 = ui->btn_ch1_ac->isChecked();
+		bool is_ac_ch2 = ui->btn_ch2_ac->isChecked();
+
 		QString ch1_dc_rms="-", ch2_dc_rms="-", ch1_ac_rms="-", ch2_ac_rms="-";
 
 		out << QDateTime::currentDateTime().time().toString() << separator;
@@ -556,7 +531,7 @@ void DMM::dataLoggingThread()
 		}
 
 
-		if(!is_low_ac_ch1 && !is_high_ac_ch1) {
+		if(!is_ac_ch1) {
 			ch1_dc_rms = QString::number(ui->lcdCh1->value());
 		}
 		else {
@@ -564,7 +539,7 @@ void DMM::dataLoggingThread()
 		}
 
 
-		if(!is_low_ac_ch2 && !is_high_ac_ch2) {
+		if(!is_ac_ch2) {
 			ch2_dc_rms = QString::number(ui->lcdCh2->value());
 		}
 		else {
@@ -641,6 +616,7 @@ void DMM::writeAllSettingsToHardware()
 	if (m_m2k_analogin) {
 		try {
 			m_m2k_analogin->setSampleRate(sample_rate);
+			m_m2k_analogin->setOversamplingRatio(1);
 			auto trigger = m_m2k_analogin->getTrigger();
 			for (unsigned int i = 0; i < m_adc_nb_channels; i++) {
 				auto chn = static_cast<libm2k::analog::ANALOG_IN_CHANNEL>(i);

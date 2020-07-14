@@ -29,14 +29,11 @@ class DMM_API : public ApiObject
 
 	Q_OBJECT
 
-	Q_PROPERTY(bool mode_ac_high_ch1
-			READ get_mode_ac_high_ch1 WRITE set_mode_ac_high_ch1);
-	Q_PROPERTY(bool mode_ac_low_ch1
-			READ get_mode_ac_low_ch1 WRITE set_mode_ac_low_ch1);
-	Q_PROPERTY(bool mode_ac_high_ch2
-			READ get_mode_ac_high_ch2 WRITE set_mode_ac_high_ch2);
-	Q_PROPERTY(bool mode_ac_low_ch2
-			READ get_mode_ac_low_ch2 WRITE set_mode_ac_low_ch2);
+	Q_PROPERTY(bool mode_ac_ch1
+			READ get_mode_ac_ch1 WRITE set_mode_ac_ch1);
+	Q_PROPERTY(bool mode_ac_ch2
+			READ get_mode_ac_ch2 WRITE set_mode_ac_ch1);
+
 	Q_PROPERTY(bool running READ running WRITE run STORED false);
 
 	Q_PROPERTY(bool histogram_ch1
@@ -65,15 +62,11 @@ class DMM_API : public ApiObject
 		  WRITE setPeakHoldEn)
 
 public:
-	bool get_mode_ac_high_ch1() const;
-	bool get_mode_ac_low_ch1() const;
-	bool get_mode_ac_high_ch2() const;
-	bool get_mode_ac_low_ch2() const;
+	bool get_mode_ac_ch1() const;
+	bool get_mode_ac_ch2() const;
 
-	void set_mode_ac_high_ch1(bool en);
-	void set_mode_ac_low_ch1(bool en);
-	void set_mode_ac_high_ch2(bool en);
-	void set_mode_ac_low_ch2(bool en);
+	void set_mode_ac_ch1(bool en);
+	void set_mode_ac_ch2(bool en);
 
 
 	bool get_histogram_ch1() const;
