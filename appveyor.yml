@@ -8,6 +8,20 @@ environment:
     BRANCH: $(APPVEYOR_REPO_BRANCH)
     REPO: $(APPVEYOR_REPO_NAME)
     matrix:
+        - MINGW_VERSION: mingw64
+          ARCH: x86_64
+          ARCH_BIT: 64
+          APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+          BUILD_DEPS_CMD: "C:\\msys64\\usr\\bin\\bash CI\\appveyor\\build_appveyor_mingw.sh"
+          DEPLOY_FILE: "C:\\scopy-%ARCH_BIT%-setup.exe"
+
+        - MINGW_VERSION: mingw32
+          ARCH: i686
+          ARCH_BIT: 32
+          APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+          BUILD_DEPS_CMD: "C:\\msys64\\usr\\bin\\bash CI\\appveyor\\build_appveyor_mingw.sh"
+          DEPLOY_FILE: "C:\\scopy-%ARCH_BIT%-setup.exe"
+
         - ARCH: x86_64
           ARCH_BIT: 64
           APPVEYOR_BUILD_WORKER_IMAGE: macos
@@ -28,28 +42,6 @@ environment:
           C_COMPILER: -DCMAKE_C_COMPILER=/usr/bin/gcc
           CXX_COMPILER: -DCMAKE_CXX_COMPILER=/usr/bin/g++
 
-        - MINGW_VERSION: mingw64
-          ARCH: x86_64
-          ARCH_BIT: 64
-          APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-          BUILD_DEPS_CMD: "C:\\msys64\\usr\\bin\\bash CI\\appveyor\\build_appveyor_mingw.sh"
-          DEPLOY_FILE: "C:\\scopy-%ARCH_BIT%-setup.exe"
-
-        - MINGW_VERSION: mingw32
-          ARCH: i686
-          ARCH_BIT: 32
-          APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-          BUILD_DEPS_CMD: "C:\\msys64\\usr\\bin\\bash CI\\appveyor\\build_appveyor_mingw.sh"
-          DEPLOY_FILE: "C:\\scopy-%ARCH_BIT%-setup.exe"
-
-        - ARCH: x86_64
-          ARCH_BIT: 64
-          APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu1804
-          BUILD_DEPS_CMD: "/home/appveyor/projects/scopy/CI/appveyor/install_ubuntu_deps.sh"
-          BUILD_CMD: "/home/appveyor/projects/scopy/CI/appveyor/build_appveyor_ubuntu.sh"
-          PACKAGE_CMD: ""
-          DEPLOY_FILE: ""
-
         - ARCH: x86_64
           ARCH_BIT: 64
           APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu1804
@@ -57,6 +49,14 @@ environment:
           BUILD_CMD: ""
           PACKAGE_CMD: ""
           DEPLOY_FILE: "/home/appveyor/projects/scopy/Scopy.flatpak"
+
+          #- ARCH: x86_64
+          #ARCH_BIT: 64
+          #APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu1804
+          #BUILD_DEPS_CMD: "/home/appveyor/projects/scopy/CI/appveyor/install_ubuntu_deps.sh"
+          #BUILD_CMD: "/home/appveyor/projects/scopy/CI/appveyor/build_appveyor_ubuntu.sh"
+          #PACKAGE_CMD: ""
+          #DEPLOY_FILE: ""
 
 
 matrix:
