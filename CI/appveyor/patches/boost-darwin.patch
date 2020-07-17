@@ -1,0 +1,18 @@
+diff --git a/darwin.jam b/darwin.jam
+--- a/tools/build/src/tools/darwin.jam
++++ b/tools/build/src/tools/darwin.jam
+@@ -138,10 +138,10 @@
+     common.handle-options darwin : $(condition) : $(command) : $(options) ;
+
+     # - GCC 4.0 and higher in Darwin does not have -fcoalesce-templates.
+-    if $(real-version) < "4.0.0"
+-    {
+-        flags darwin.compile.c++ OPTIONS $(condition) : -fcoalesce-templates ;
+-    }
++#    if $(real-version) < "4.0.0"
++#    {
++#        flags darwin.compile.c++ OPTIONS $(condition) : -fcoalesce-templates ;
++#    }
+     # - GCC 4.2 and higher in Darwin does not have -Wno-long-double.
+     if $(real-version) < "4.2.0"
+     {

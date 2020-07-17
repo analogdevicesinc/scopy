@@ -22,6 +22,7 @@
 
 #include <qwt_plot.h>
 #include <qwt_symbol.h>
+#include <qwt_scale_map.h>
 
 using namespace adiscope;
 

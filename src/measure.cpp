@@ -348,7 +348,8 @@ namespace adiscope {
 	};
 }
 
-Measure::Measure(int channel, double *buffer, size_t length):
+Measure::Measure(int channel, double *buffer, size_t length,
+		 const std::function<double(unsigned int, double, bool)> &conversion_fct):
 	m_channel(channel),
 	m_buffer(buffer),
 	m_buf_length(length),
@@ -358,7 +359,8 @@ Measure::Measure(int channel, double *buffer, size_t length):
 	m_hysteresis_span(0),
 	m_histogram(nullptr),
 	m_cross_detect(nullptr),
-	m_gatingEnabled(false)
+	m_gatingEnabled(false),
+	m_conversion_function(conversion_fct)
 {
 
 	// Create a set of measurements
@@ -413,6 +415,12 @@ Measure::Measure(int channel, double *buffer, size_t length):
 
 }
 
+void Measure::setConversionFunction(const std::function<double(unsigned int, double, bool)> &fp)
+{
+	m_conversion_function = fp;
+
+}
+
 bool Measure::highLowFromHistogram(double &low, double &high,
 		double min, double max)
 {
@@ -420,9 +428,17 @@ bool Measure::highLowFromHistogram(double &low, double &high,
 	int *hist = m_histogram;
 	int adc_span = 1 << m_adc_bit_count;
 	int hlf_scale = adc_span / 2;
+	int minRaw = min;
+	int maxRaw = max;
 
-	int minRaw = adc_sample_conv::convVoltsToSample(min) + hlf_scale;
-	int maxRaw = adc_sample_conv::convVoltsToSample(max) + hlf_scale;
+	if (m_conversion_function) {
+		minRaw = m_conversion_function(m_channel, min, false);
+		maxRaw = m_conversion_function(m_channel, max, false);
+	}
+
+	minRaw += hlf_scale;
+	maxRaw += hlf_scale;
+
 	int middleRaw = minRaw + (maxRaw - minRaw)  / 2;
 
 	auto lowIt = std::max_element(hist + minRaw, hist + middleRaw + 1);
@@ -437,8 +453,13 @@ bool Measure::highLowFromHistogram(double &low, double &high,
 
 	if (hist[lowRaw] / 5.0 >= hist[minRaw] &&
 		hist[highRaw] / 5.0 >= hist[maxRaw]) {
-		low = adc_sample_conv::convSampleToVolts(lowRaw - hlf_scale);
-		high = adc_sample_conv::convSampleToVolts(highRaw - hlf_scale);
+		int lowTmp = lowRaw - hlf_scale;
+		int highTmp = highRaw - hlf_scale;
+
+		if (m_conversion_function) {
+			low = m_conversion_function(m_channel, lowTmp, true);
+			high = m_conversion_function(m_channel, highTmp, true);
+		}
 		success = true;
 	}
 
@@ -566,8 +587,13 @@ void Measure::measure()
 
 		// Build histogram
 		if (using_histogram_method) {
-			int raw = hlf_scale + (int)adiscope::adc_sample_conv::
-						convVoltsToSample(data[i]);
+			double rawTmp = data[i];
+			int raw = 0;
+			if (m_conversion_function) {
+				raw = (int)m_conversion_function(m_channel, rawTmp, false);
+			}
+			raw += hlf_scale;
+
 			if (raw >= 0 && raw  < adc_span)
 				m_histogram[raw] += 1;
 		}

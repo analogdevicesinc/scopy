@@ -21,6 +21,8 @@
 #include "basemenuitem.h"
 #include "ui_basemenuitem.h"
 
+#include "basemenu.h"
+
 #include "utils.h"
 
 #include <QDebug>
@@ -34,6 +36,7 @@ const char *BaseMenuItem::menuItemMimeDataType = "menuItem";
 BaseMenuItem::BaseMenuItem(QWidget *parent) :
 	ColoredQWidget(parent),
 	d_ui(new Ui::BaseMenuItem),
+	d_menu(nullptr),
 	d_position(0),
 	d_dragStartPosition(QPoint()),
 	d_topDragBox(QRect()),
@@ -117,6 +120,7 @@ void BaseMenuItem::mouseMoveEvent(QMouseEvent *event)
 
 	drag->setPixmap(pix);
 	drag->setMimeData(mimeData);
+	drag->setHotSpot(event->pos());
 
 	Q_EMIT enableInfoWidget(true);
 
@@ -231,6 +235,16 @@ bool BaseMenuItem::eventFilter(QObject *watched, QEvent *event)
 		d_allowDrag = true;
 	}
 	return QWidget::eventFilter(watched, event);
+}
+
+BaseMenu *BaseMenuItem::getOwner() const
+{
+	return d_menu;
+}
+
+void BaseMenuItem::setOwner(BaseMenu *menu)
+{
+	d_menu = menu;
 }
 
 void BaseMenuItem::_enableBotSeparator(bool enable)

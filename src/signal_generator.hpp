@@ -38,16 +38,16 @@
 #include "oscilloscope_plot.hpp"
 #include "scope_sink_f.h"
 #include "tool.hpp"
-#include "hw_dac.h"
 #include "filemanager.h"
 
 #include "gnuradio/analog/noise_type.h"
 
+/* libm2k includes */
+#include <libm2k/analog/m2kanalogout.hpp>
+#include <libm2k/m2k.hpp>
+
 extern "C" {
-	struct iio_buffer;
 	struct iio_context;
-	struct iio_device;
-	struct iio_channel;
 }
 
 namespace Ui {
@@ -60,7 +60,6 @@ namespace adiscope {
 struct signal_generator_data;
 struct time_block_data;
 class SignalGenerator_API;
-class GenericDac;
 class ChannelWidget;
 class PhaseSpinButton;
 class PositionSpinButton;
@@ -130,7 +129,6 @@ class SignalGenerator : public Tool
 
 public:
 	explicit SignalGenerator(struct iio_context *ctx,
-	                         QList<std::shared_ptr<GenericDac>> dacs,
 	                         Filter *filt, ToolMenuItem *toolMenuItem,
 	                         QJSEngine *engine, ToolLauncher *parent);
 	~SignalGenerator();
@@ -139,23 +137,19 @@ public:
 	static const unsigned long default_sample_rate = 1000000;
 	static constexpr float max_frequency = 30000000;
 
-	static QVector<unsigned long> get_available_sample_rates(
-	        const struct iio_device *dev);
-	static unsigned long get_max_sample_rate(
-	        const struct iio_device *dev);
-
-	static double get_best_ratio(double ratio,
-	                             double max, double *fract);
+	static double get_best_ratio(double ratio, double max, double *fract);
 
 	void settingsLoaded();
 
 private:
+	const size_t m_maxNbOfSamples;
+	libm2k::context::M2k* m_m2k_context;
+	libm2k::analog::M2kAnalogOut* m_m2k_analogout;
+
 	Ui::SignalGenerator *ui;
 	OscilloscopePlot *plot;
 	gr::top_block_sptr top_block;
 	struct time_block_data *time_block_data;
-	struct iio_channel *amp1, *amp2;
-	QList<std::shared_ptr<GenericDac>> dacs;
 
 	PhaseSpinButton *phase, *filePhase;
 	PositionSpinButton *offset, *fileOffset;
@@ -178,10 +172,8 @@ private:
 	QButtonGroup *channels_group;
 	QQueue<QPair<int, bool>> menuButtonActions;
 
-	QVector<struct iio_buffer *> buffers;
+	std::vector<std::vector<double>> buffers;
 	QVector<ChannelWidget *> channels;
-	QVector<QPair<struct iio_channel *,
-		        std::shared_ptr<adiscope::GenericDac>>> channel_dac;
 
 	QSharedPointer<signal_generator_data> getData(QWidget *obj);
 	QSharedPointer<signal_generator_data> getCurrentData();
@@ -212,20 +204,16 @@ private:
 	static size_t lcm(size_t a, size_t b);
 	static int sg_waveform_to_idx(enum sg_waveform wave);
 
-	size_t get_samples_count(const struct iio_device *dev,
-				 double sample_rate, bool perfect = false);
-	double get_best_sample_rate(
-	        const struct iio_device *dev);
-	//int set_sample_rate(const struct iio_device *dev,
-	//		unsigned long sample_rate);
-	void calc_sampling_params(const struct iio_device *dev,
+	size_t get_samples_count(unsigned int chnIdx, double sample_rate, bool perfect = false);
+	double get_best_sample_rate(unsigned int chnIdx);
+	void calc_sampling_params(unsigned int chnIdx,
 				  double sample_rate,
 	                          unsigned long& out_sample_rate,
 	                          unsigned long& out_oversampling_ratio);
-	bool use_oversampling(const struct iio_device *dev);
+	bool use_oversampling(unsigned int chnIdx);
 
-	bool sample_rate_forced(const struct iio_device *dev);
-	double get_forced_sample_rate(const struct iio_device *dev);
+	bool sample_rate_forced(unsigned int chnIdx);
+	double get_forced_sample_rate(unsigned int chnIdx);
 
 	double zoomT1;
 	double zoomT2;
@@ -293,7 +281,6 @@ enum SIGNAL_TYPE {
 };
 
 struct signal_generator_data {
-	iio_channel* iio_ch;
 	enum SIGNAL_TYPE type;
 	unsigned int id;
 	bool enabled;

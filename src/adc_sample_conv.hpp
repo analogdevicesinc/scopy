@@ -23,55 +23,30 @@
 
 #include <gnuradio/sync_block.h>
 #include <memory>
-
+namespace libm2k {
+namespace analog {
+class M2kAnalogIn;
+}
+}
 namespace adiscope {
-
-	class M2kAdc;
 	class adc_sample_conv : public gr::sync_block
 	{
 	private:
 		int d_nconnections;
 		bool inverse;
-		std::vector<float> d_correction_gains;
-		std::vector<float> d_filter_compensations;
-		std::vector<float> d_offsets;
-		std::vector<float> d_hardware_gains;
-		std::shared_ptr<M2kAdc> m2k_adc;
-		void updateCorrectionGain();
+		libm2k::analog::M2kAnalogIn* m2k_adc;
 
 	public:
 		explicit adc_sample_conv(int nconnections,
-					 std::shared_ptr<M2kAdc> m2k_adc,
+					 libm2k::analog::M2kAnalogIn* m2k_adc,
 					 bool inverse = false);
+
 		~adc_sample_conv();
-
-		static float convSampleToVolts(float sample,
-				float correctionGain = 1,
-				float filterCompensation = 1,
-				float offset = 0,
-				float hw_gain = 0.02);
-		static float convVoltsToSample(float sample,
-				float correctionGain = 1,
-				float filterCompensation = 1,
-				float offset = 0,
-				float hw_gain = 0.02);
-
-		void setCorrectionGain(int connection, float gain);
-		float correctionGain(int connection);
-
-		void setFilterCompensation(int connection, float val);
-		float filterCompensation(int connection);
-
-		void setOffset(int connection, float offset);
-		float offset(int connection) const;
-
-		void setHardwareGain(int connection, float gain);
-		float hardwareGain(int connection) const;
 
 		int work(int noutput_items,
 				gr_vector_const_void_star &input_items,
-				gr_vector_void_star &output_items);
-
+			 gr_vector_void_star &output_items);
+		double conversionWrapper(unsigned int chn_idx, double sample, bool raw_to_volts);
 	};
 }
 

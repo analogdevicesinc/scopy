@@ -27,8 +27,6 @@
 #include "tool_launcher.hpp"
 #include "qtjs.hpp"
 #include "jsfileio.h"
-#include "osc_adc.h"
-#include "hw_dac.h"
 #include "dragzone.h"
 #include "debugger.h"
 #include "manualcalibration.h"
@@ -63,10 +61,18 @@
 #include "toolmenu.h"
 #include "toolmenuitem.h"
 
+#include <libsigrokdecode/libsigrokdecode.h>
+
+#include <libm2k/m2k.hpp>
+#include <libm2k/contextbuilder.hpp>
+#include <libm2k/digital/m2kdigital.hpp>
+
 #define TIMER_TIMEOUT_MS 5000
 #define ALIVE_TIMER_TIMEOUT_MS 5000
 
 using namespace adiscope;
+using namespace libm2k::context;
+using namespace libm2k::digital;
 
 ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 	QMainWindow(parent),
@@ -89,7 +95,8 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 	selectedDev(nullptr),
 	m_use_decoders(true),
 	menu(nullptr),
-	m_useNativeDialogs(true)
+	m_useNativeDialogs(true),
+	m_m2k(nullptr)
 {
 	if (!isatty(STDIN_FILENO))
 		notifier.setEnabled(false);
@@ -607,13 +614,6 @@ ToolLauncher::~ToolLauncher()
 	delete ui;
 
 	saveSettings();
-}
-
-void ToolLauncher::destroyPopup()
-{
-	auto *popup = static_cast<pv::widgets::Popup *>(QObject::sender());
-
-	popup->deleteLater();
 }
 
 void ToolLauncher::forgetDeviceBtn_clicked(QString uri)
@@ -1173,7 +1173,16 @@ void adiscope::ToolLauncher::destroyContext()
 		auto dev = getConnectedDevice();
 		if (dev)
 			dev->setConnected(false, false);
-		iio_context_destroy(ctx);
+		if (m_m2k) {
+			try {
+				libm2k::context::contextClose(m_m2k);
+			} catch (std::exception &e) {
+				qDebug() << e.what();
+			}
+			m_m2k = nullptr;
+		} else {
+			iio_context_destroy(ctx);
+		}
 		ctx = nullptr;
 	}
 
@@ -1290,9 +1299,7 @@ bool adiscope::ToolLauncher::calibrate()
 	network_btn->setText(status);
 
 	if (calib->isInitialized()) {
-		calib->setHardwareInCalibMode();
 		ok = calib->calibrateAll();
-		calib->restoreHardwareFromCalibMode();
 	}
 
 	dmm_btn->setText(old_dmm_text);
@@ -1318,8 +1325,7 @@ bool adiscope::ToolLauncher::calibrate()
 void adiscope::ToolLauncher::enableAdcBasedTools()
 {
 	if (filter->compatible(TOOL_OSCILLOSCOPE)) {
-		oscilloscope = new Oscilloscope(ctx, filter, adc,
-						menu->getToolMenuItemFor(TOOL_OSCILLOSCOPE),
+		oscilloscope = new Oscilloscope(ctx, filter, menu->getToolMenuItemFor(TOOL_OSCILLOSCOPE),
 						&js_engine, this);
 		toolList.push_back(oscilloscope);
 		adc_users_group.addButton(menu->getToolMenuItemFor(TOOL_OSCILLOSCOPE)->getToolStopBtn());
@@ -1329,7 +1335,7 @@ void adiscope::ToolLauncher::enableAdcBasedTools()
 	}
 
 	if (filter->compatible(TOOL_DMM)) {
-		dmm = new DMM(ctx, filter, adc, menu->getToolMenuItemFor(TOOL_DMM),
+		dmm = new DMM(ctx, filter, menu->getToolMenuItemFor(TOOL_DMM),
 				&js_engine, this);
 		adc_users_group.addButton(menu->getToolMenuItemFor(TOOL_DMM)->getToolStopBtn());
 		toolList.push_back(dmm);
@@ -1354,8 +1360,7 @@ void adiscope::ToolLauncher::enableAdcBasedTools()
 	}
 
 	if (filter->compatible(TOOL_SPECTRUM_ANALYZER)) {
-		spectrum_analyzer = new SpectrumAnalyzer(ctx, filter, adc,
-			menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER),&js_engine, this);
+		spectrum_analyzer = new SpectrumAnalyzer(ctx, filter, menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER),&js_engine, this);
 		toolList.push_back(spectrum_analyzer);
 		adc_users_group.addButton(menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER)->getToolStopBtn());
 		connect(spectrum_analyzer, &SpectrumAnalyzer::showTool, [=]() {
@@ -1365,8 +1370,7 @@ void adiscope::ToolLauncher::enableAdcBasedTools()
 
 	if (filter->compatible((TOOL_NETWORK_ANALYZER))) {
 
-		network_analyzer = new NetworkAnalyzer(ctx, filter, adc, dacs,
-			menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER), &js_engine, this);
+		network_analyzer = new NetworkAnalyzer(ctx, filter, menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER), &js_engine, this);
 		adc_users_group.addButton(menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER)->getToolStopBtn());
 		toolList.push_back(network_analyzer);
 		connect(network_analyzer, &NetworkAnalyzer::showTool, [=]() {
@@ -1382,7 +1386,7 @@ void adiscope::ToolLauncher::enableAdcBasedTools()
 void adiscope::ToolLauncher::enableDacBasedTools()
 {
 	if (filter->compatible(TOOL_SIGNAL_GENERATOR)) {
-		signal_generator = new SignalGenerator(ctx, dacs, filter,
+		signal_generator = new SignalGenerator(ctx, filter,
 			menu->getToolMenuItemFor(TOOL_SIGNAL_GENERATOR), &js_engine, this);
 		toolList.push_back(signal_generator);
 		connect(signal_generator, &SignalGenerator::showTool, [=]() {
@@ -1422,63 +1426,18 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 		return false;
 	}
 
+	m_m2k = m2kOpen(ctx, "");
+
 	alive_timer->start(ALIVE_TIMER_TIMEOUT_MS);
 
 	filter = new Filter(ctx);
 
-	dacs.clear();
-
-	// Find available DACs
-	QList<struct iio_device *> iio_dacs;
-	for (unsigned int dev_id = 0; ; dev_id++) {
-		struct iio_device *dev;
-		try {
-			dev = filter->find_device(ctx,
-					TOOL_SIGNAL_GENERATOR, dev_id);
-		} catch (std::exception &ex) {
-			break;
-		}
-		iio_dacs.push_back(dev);
-	}
-
-	if (filter->hw_name().compare("M2K") == 0) {
-		adc = AdcBuilder::newAdc(AdcBuilder::M2K, ctx,
-			filter->find_device(ctx, TOOL_OSCILLOSCOPE));
-
-		for (int i = 0; i < iio_dacs.size(); i++) {
-			auto dac = DacBuilder::newDac(DacBuilder::M2K, ctx,
-				iio_dacs[i]);
-			dacs.push_back(dac);
-		}
-	} else {
-		adc = AdcBuilder::newAdc(AdcBuilder::GENERIC, ctx,
-			filter->find_device(ctx, TOOL_OSCILLOSCOPE));
-		for (int i = 0; i < iio_dacs.size(); i++) {
-			auto dac = DacBuilder::newDac(DacBuilder::GENERIC, ctx,
-				iio_dacs[i]);
-			dacs.push_back(dac);
-		}
-	}
-
-	auto m2k_adc = std::dynamic_pointer_cast<M2kAdc>(adc);
-	std::shared_ptr<M2kDac> m2k_dac_a;
-	std::shared_ptr<M2kDac> m2k_dac_b;
-	for(int i = 0; i < dacs.size(); i++) {
-		if(i == 0) {
-			m2k_dac_a = std::dynamic_pointer_cast<M2kDac>(dacs.at(i));
-		}
-		if(i == 1 ){
-			m2k_dac_b = std::dynamic_pointer_cast<M2kDac>(dacs.at(i));
-		}
-	}
-	calib = new Calibration(ctx, &js_engine, m2k_adc, m2k_dac_a, m2k_dac_b);
+	calib = new Calibration(ctx, &js_engine);
 	calib->initialize();
-
 
 	if (filter->compatible(TOOL_PATTERN_GENERATOR)
 	    || filter->compatible(TOOL_DIGITALIO)) {
-		dioManager = new DIOManager(ctx,filter);
-
+		dioManager = new DIOManager(ctx, filter);
 	}
 
 	if (filter->compatible(TOOL_LOGIC_ANALYZER)
@@ -1505,7 +1464,7 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 	}
 
 	if (filter->compatible(TOOL_DIGITALIO)) {
-		dio = new DigitalIO(ctx, filter, menu->getToolMenuItemFor(TOOL_DIGITALIO),
+		dio = new DigitalIO(nullptr, filter, menu->getToolMenuItemFor(TOOL_DIGITALIO),
 				dioManager, &js_engine, this);
 		toolList.push_back(dio);
 		connect(dio, &DigitalIO::showTool, [=]() {
@@ -1524,20 +1483,20 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 	}
 
 	if (filter->compatible(TOOL_LOGIC_ANALYZER)) {
-		logic_analyzer = new LogicAnalyzer(ctx, filter, menu->getToolMenuItemFor(TOOL_LOGIC_ANALYZER),
-				&js_engine, this);
+		logic_analyzer = new logic::LogicAnalyzer(ctx, filter, menu->getToolMenuItemFor(TOOL_LOGIC_ANALYZER),
+		&js_engine, this);
 		toolList.push_back(logic_analyzer);
-		connect(logic_analyzer, &LogicAnalyzer::showTool, [=]() {
-			 menu->getToolMenuItemFor(TOOL_LOGIC_ANALYZER)->getToolBtn()->click();
+		connect(logic_analyzer, &logic::LogicAnalyzer::showTool, [=]() {
+		     menu->getToolMenuItemFor(TOOL_LOGIC_ANALYZER)->getToolBtn()->click();
 		});
 	}
 
 
 	if (filter->compatible((TOOL_PATTERN_GENERATOR))) {
-		pattern_generator = new PatternGenerator(ctx, filter,
-				 menu->getToolMenuItemFor(TOOL_PATTERN_GENERATOR), &js_engine,dioManager, this);
+		pattern_generator = new logic::PatternGenerator(ctx, filter,
+				 menu->getToolMenuItemFor(TOOL_PATTERN_GENERATOR), &js_engine, dioManager, this);
 		toolList.push_back(pattern_generator);
-		connect(pattern_generator, &PatternGenerator::showTool, [=]() {
+		connect(pattern_generator, &logic::PatternGenerator::showTool, [=]() {
 			 menu->getToolMenuItemFor(TOOL_PATTERN_GENERATOR)->getToolBtn()->click();
 		});
 	}

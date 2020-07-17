@@ -19,6 +19,7 @@
  */
 #include "x_axis_scale_zoomer.h"
 #include "qwt_scale_draw.h"
+#include <qwt_text.h>
 
 #include <dbgraph.hpp>
 

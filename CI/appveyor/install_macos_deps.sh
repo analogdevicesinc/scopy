@@ -16,13 +16,16 @@ BOOST_VERSION_FILE=1_65_1
 BOOST_VERSION=1.65.1
 
 PYTHON="python3"
-PACKAGES="pkg-config qt cmake fftw bison gettext autoconf automake libtool libzip glib libusb $PYTHON"
+PACKAGES="pkg-config cmake fftw bison gettext autoconf automake libtool libzip glib libusb $PYTHON"
 PACKAGES="$PACKAGES glibmm doxygen wget gnu-sed libmatio dylibbundler libxml2"
 
 set -e
 cd ~
 WORKDIR=${PWD}
 NUM_JOBS=4
+
+brew install https://raw.githubusercontent.com/Homebrew/homebrew-core/8846805afc0cb8e5d114d5e222af1de3b35289df/Formula/qt.rb
+export PATH="/usr/local/opt/qt/bin:$PATH"
 
 brew_install_or_upgrade() {
 	brew install $1 || \
@@ -39,7 +42,7 @@ for pak in $PACKAGES ; do
 	brew_install $pak
 done
 
-for pkg in qt gcc bison gettext cmake python; do
+for pkg in gcc bison gettext cmake python; do
 	brew link --overwrite --force $pkg
 done
 
@@ -137,6 +140,7 @@ build_boost() {
 	wget https://dl.bintray.com/boostorg/release/$BOOST_VERSION/source/boost_$BOOST_VERSION_FILE.tar.gz
 	tar -xzf boost_$BOOST_VERSION_FILE.tar.gz
 	cd boost_$BOOST_VERSION_FILE
+	patch -p1 <  ${WORKDIR}/projects/scopy/CI/appveyor/patches/boost-darwin.patch
 	./bootstrap.sh --with-libraries=atomic,date_time,filesystem,program_options,system,chrono,thread,regex,test
 	./b2
 	./b2 install
@@ -212,29 +216,14 @@ build_grscopy() {
 	sudo make $JOBS install
 }
 
-build_libsigrok() {
-	echo "### Building libsigrok - branch $LIBSIGROK_BRANCH"
-
-	git clone --depth 1 https://github.com/sigrokproject/libsigrok.git -b $LIBSIGROK_BRANCH ${WORKDIR}/libsigrok
-
-	mkdir ${WORKDIR}/libsigrok/build-${ARCH}
-	cd ${WORKDIR}/libsigrok
-
-	./autogen.sh
-	./configure --disable-all-drivers --enable-bindings --enable-cxx
-
-	sudo make $JOBS install
-}
-
 build_libsigrokdecode() {
 	echo "### Building libsigrokdecode - branch $LIBSIGROKDECODE_BRANCH"
 
+	git clone --depth 1 https://github.com/sigrokproject/libsigrokdecode.git -b $LIBSIGROKDECODE_BRANCH ${WORKDIR}/libsigrokdecode
 	mkdir -p ${WORKDIR}/libsigrokdecode/build-${ARCH}
 	cd ${WORKDIR}/libsigrokdecode
 
-	wget http://sigrok.org/download/source/libsigrokdecode/libsigrokdecode-0.4.1.tar.gz -O- \
-		| tar xz --strip-components=1 -C ${WORKDIR}/libsigrokdecode
-
+	./autogen.sh
 	./configure
 	sudo make $JOBS install
 }
@@ -261,7 +250,9 @@ EOF
 }
 
 build_qwt() {
-	qmake_build_git "qwt" "https://github.com/osakared/qwt.git" "qwt-6.1-multiaxes" "qwt.pro" "patch_qwt"
+	echo "### Building qwt - branch qwt-6.1-multiaxes"
+	svn checkout https://svn.code.sf.net/p/qwt/code/branches/$QWT_BRANCH ${WORKDIR}/qwt
+	qmake_build_local "qwt" "qwt.pro" "patch_qwt"
 }
 
 build_qwtpolar() {
@@ -279,7 +270,6 @@ build_grscopy
 build_grm2k
 build_qwt
 build_qwtpolar
-build_libsigrok
 build_libsigrokdecode
 
 

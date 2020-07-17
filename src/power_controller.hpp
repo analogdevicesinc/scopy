@@ -30,9 +30,16 @@
 
 extern "C" {
 	struct iio_context;
-	struct iio_channel;
 }
 
+namespace libm2k {
+namespace context {
+	class M2k;
+}
+namespace analog {
+	class M2kPowerSupply;
+}
+}
 namespace Ui {
 	class PowerController;
 }
@@ -78,12 +85,12 @@ namespace adiscope {
 		Ui::PowerController *ui;
 		PositionSpinButton *valuePos;
 		PositionSpinButton *valueNeg;
-		struct iio_channel *ch1w, *ch2w, *ch1r, *ch2r, *pd_pos, *pd_neg;
 		QTimer timer;
 		bool in_sync;
-		QList<long long> averageVoltageCh1;
-		QList<long long> averageVoltageCh2;
-		QMap<QString, double> calibrationParam;
+		QList<double> averageVoltageCh1;
+		QList<double> averageVoltageCh2;
+		libm2k::context::M2k* m_m2k_context;
+		libm2k::analog::M2kPowerSupply* m_m2k_powersupply;
 
 		void showEvent(QShowEvent *event);
 		void hideEvent(QHideEvent *event);

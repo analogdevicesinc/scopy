@@ -23,6 +23,7 @@
 #include <qwt_plot_picker.h>
 #include <qwt_picker_machine.h>
 #include <qwt_scale_div.h>
+#include <qwt_interval.h>
 
 using namespace adiscope;
 

@@ -45,6 +45,8 @@ BaseMenu::~BaseMenu()
 
 void BaseMenu::insertMenuItem(BaseMenuItem *menuItem, int position)
 {
+	menuItem->setOwner(this);
+
 	for (int i = 0; i < d_ui->mainLayout->count(); ++i) {
 		if (menuItem == d_ui->mainLayout->itemAt(i)->widget()) {
 			return;

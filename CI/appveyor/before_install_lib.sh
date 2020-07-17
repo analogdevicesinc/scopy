@@ -158,6 +158,21 @@ qmake_build_git() {
 	__build_common "$dir" "__qmake" "git_clone_update"
 }
 
+qmake_build_local() {
+	local dir="$1"
+	local qtarget="$2"
+	local patchfunc="$3"
+
+	[ ! -d "$WORKDIR/$dir" ] || {
+		[ -z "$patchfunc" ] || {
+			pushd $WORKDIR/$dir
+			$patchfunc
+			popd
+		}
+	}
+	__build_common "$dir" "__qmake"
+}
+
 patch_qwt() {
 	patch -p1 <<-EOF
 --- a/qwtconfig.pri
@@ -177,7 +192,7 @@ patch_qwt() {
  
 -    QWT_CONFIG += QwtFramework
 +    #QWT_CONFIG += QwtFramework
- }  
+ }
  
  ######################################################################
 --- a/src/src.pro
@@ -203,12 +218,12 @@ patch_qwt() {
 +        macx: QWT_SONAME=\$\${QWT_INSTALL_LIBS}/libqwtmathml.dylib
          QMAKE_LFLAGS *= \$\${QMAKE_LFLAGS_SONAME}\$\${QWT_SONAME}
          QMAKE_LFLAGS_SONAME=
-     }   
+     }
 EOF
 }
 
 patch_qwtpolar() {
-	wget https://raw.githubusercontent.com/analogdevicesinc/scopy-flatpak/master/qwtpolar-qwt-6.1-compat.patch -O - | patch -p1
+	patch -p1 <  ${WORKDIR}/projects/scopy/CI/appveyor/patches/qwtpolar-qwt-qt-compat.patch
 
 	patch -p1 <<-EOF
 --- a/qwtpolarconfig.pri

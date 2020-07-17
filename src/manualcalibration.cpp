@@ -31,7 +31,15 @@
 #include <QDate>
 #include <QTime>
 
+/* libm2k includes */
+#include <libm2k/contextbuilder.hpp>
+#include <libm2k/m2k.hpp>
+#include <libm2k/analog/m2kpowersupply.hpp>
+#include <libm2k/analog/dmm.hpp>
+
 using namespace adiscope;
+using namespace libm2k::context;
+using namespace libm2k::analog;
 
 static const double SUPPLY_100MV_VALUE = 0.1;
 static const double SUPPLY_4_5V_VALUE = 4.5;
@@ -64,7 +72,9 @@ ManualCalibration::ManualCalibration(struct iio_context *ctx, Filter *filt,
 	Tool(ctx, toolMenuItem, new ManualCalibration_API(this), "Calibration", parent),
 	ui(new Ui::ManualCalibration), filter(filt),
 	eng(engine), calib(cal),
-	calibrationFilePath("")
+	calibrationFilePath(""),
+	m_m2k_context(m2kOpen(ctx, "")),
+	m_m2k_powersupply(m_m2k_context->getPowerSupply())
 {
 	ui->setupUi(this);
 	calibListString << "Positive supply"
@@ -102,10 +112,11 @@ ManualCalibration::ManualCalibration(struct iio_context *ctx, Filter *filt,
 	connect(TempUi->finishButton, &QPushButton::clicked, this,
 		&ManualCalibration::on_finishButton_clicked);
 
-	setupPowerSupplyIio();
-
 	ui->calibList->setCurrentRow(3); //set to autocalibration parameters
 	on_calibList_itemClicked(ui->calibList->currentItem());
+
+	m_dmm_ad9963 = m_m2k_context->getDMM("ad9963");
+	m_dmm_xadc = m_m2k_context->getDMM("xadc");
 }
 
 ManualCalibration::~ManualCalibration()
@@ -212,52 +223,9 @@ void ManualCalibration::positivePowerSupplySetup()
 	setPositiveValue(0.1);
 }
 
-void ManualCalibration::setupPowerSupplyIio()
-{
-	/*For power supply calibration*/
-	struct iio_device *dev1 = iio_context_find_device(ctx, "ad5627");
-	struct iio_device *dev2 = iio_context_find_device(ctx, "ad9963");
-	struct iio_device *dev3 = iio_context_find_device(ctx, "m2k-fabric");
-
-	if (!dev1 || !dev2 || !dev3) {
-		throw std::runtime_error("Unable to find device\n");
-	}
-
-	this->ch1w = iio_device_find_channel(dev1, "voltage0", true);
-	this->ch2w = iio_device_find_channel(dev1, "voltage1", true);
-	this->ch1r = iio_device_find_channel(dev2, "voltage2", false);
-	this->ch2r = iio_device_find_channel(dev2, "voltage1", false);
-	this->pd_pos = iio_device_find_channel(dev3, "voltage2", true);
-	this->pd_neg = iio_device_find_channel(dev3, "voltage3",
-					       true); /* For HW Rev. >= C */
-
-	if (!ch1w || !ch2w || !ch1r || !ch2r || !pd_pos) {
-		throw std::runtime_error("Unable to find channels\n");
-	}
-
-	/*enable ADCs*/
-	struct iio_channel *chan;
-	/* These are the two ADC amplifiers */
-	chan = iio_device_find_channel(dev3, "voltage0", false);
-
-	if (chan) {
-		iio_channel_attr_write_bool(chan, "powerdown", false);
-	}
-
-	chan = iio_device_find_channel(dev3, "voltage1", false);
-
-	if (chan) {
-		iio_channel_attr_write_bool(chan, "powerdown", false);
-	}
-
-	/* ADF4360 globaal clock power down */
-	iio_device_attr_write(dev3, "clk_powerdown", "0");
-}
-
 void ManualCalibration::positivePowerSupplyParam(const int step)
 {
 	double offset_Value;
-	long long val = 0;
 	double value = 0;
 
 	qDebug(CAT_CALIBRATION_MANUAL) << "Set positive supply parameters";
@@ -271,8 +239,12 @@ void ManualCalibration::positivePowerSupplyParam(const int step)
 		qDebug(CAT_CALIBRATION_MANUAL) << "Positive offset DAC value: " << stParameters.offset_pos_dac;
 
 		/*adc offset calibration*/
-		iio_channel_attr_read_longlong(ch1r, "raw", &val);
-		value = (double) val * 6.4 / 4095.0;
+		try {
+			value = m_m2k_powersupply->readChannel(0);
+		} catch (std::exception &e) {
+			qDebug(CAT_CALIBRATION_MANUAL) << "Can't read value: " << e.what();
+		}
+
 		stParameters.offset_pos_adc = offset_Value - value;
 		qDebug(CAT_CALIBRATION_MANUAL) << "Positive offset ADC value: " << stParameters.offset_pos_adc;
 
@@ -300,8 +272,11 @@ void ManualCalibration::positivePowerSupplyParam(const int step)
 			qDebug(CAT_CALIBRATION_MANUAL) << "Positive gain DAC value: " << stParameters.gain_pos_dac;
 
 			/*adc gain calibration*/
-			iio_channel_attr_read_longlong(ch1r, "raw", &val);
-			value = (double) val * 6.4 / 4095.0;
+			try {
+				value = m_m2k_powersupply->readChannel(0);
+			} catch (std::exception &e) {
+				qDebug(CAT_CALIBRATION_MANUAL) << "Can't read value: " << e.what();
+			}
 			stParameters.gain_pos_adc = offset_Value / (value +
 						    stParameters.offset_pos_adc);
 			qDebug(CAT_CALIBRATION_MANUAL) << "Positive gain ADC value: " << stParameters.gain_pos_adc;
@@ -329,15 +304,20 @@ void ManualCalibration::positivePowerSupplyParam(const int step)
 
 void ManualCalibration::setEnablePositiveSuppply(bool enabled)
 {
-	iio_channel_attr_write_bool(ch1w, "powerdown", !enabled);
-	iio_channel_attr_write_bool(pd_pos, "user_supply_powerdown", !enabled);
+	try {
+		m_m2k_powersupply->enableChannel(0, enabled);
+	} catch (std::exception &e) {
+		qDebug(CAT_CALIBRATION_MANUAL) << "Can't enable channel: " << e.what();
+	}
 }
 
 void ManualCalibration::setPositiveValue(double value)
 {
-	long long val = value * 4095.0 / (5.02 * 1.2);
-
-	iio_channel_attr_write_longlong(ch1w, "raw", val);
+	try {
+		m_m2k_powersupply->pushChannel(0, value);
+	} catch (std::exception &e) {
+		qDebug(CAT_CALIBRATION_MANUAL) << "Can't write value: " << e.what();
+	}
 }
 
 void ManualCalibration::negativePowerSupplySetup()
@@ -363,7 +343,6 @@ void ManualCalibration::negativePowerSupplySetup()
 void ManualCalibration::negativePowerSupplyParam(const int step)
 {
 	double offset_Value;
-	long long val = 0;
 	double value = 0;
 
 	qDebug(CAT_CALIBRATION_MANUAL) << "Set negative supply parameters";
@@ -377,8 +356,11 @@ void ManualCalibration::negativePowerSupplyParam(const int step)
 		qDebug(CAT_CALIBRATION_MANUAL) << "Negative offset DAC value: " << stParameters.offset_neg_dac;
 
 		/*adc offset calibration*/
-		iio_channel_attr_read_longlong(ch2r, "raw", &val);
-		value = (double) val * (-6.4) / 4095.0;
+		try {
+			value = m_m2k_powersupply->readChannel(1);
+		} catch (std::exception &e) {
+			qDebug(CAT_CALIBRATION_MANUAL) << "Can't read value: " << e.what();
+		}
 		stParameters.offset_neg_adc = offset_Value - value;
 		qDebug(CAT_CALIBRATION_MANUAL) << "Negative offset ADC value: " << stParameters.offset_neg_adc;
 
@@ -406,8 +388,11 @@ void ManualCalibration::negativePowerSupplyParam(const int step)
 			qDebug(CAT_CALIBRATION_MANUAL) << "Negative gain DAC value: " << stParameters.gain_neg_dac;
 
 			/*adc gain calibration*/
-			iio_channel_attr_read_longlong(ch2r, "raw", &val);
-			value = (double) val * (-6.4) / 4095.0;
+			try {
+				value = m_m2k_powersupply->readChannel(1);
+			} catch (std::exception &e) {
+				qDebug(CAT_CALIBRATION_MANUAL) << "Can't read value: " << e.what();
+			}
 			stParameters.gain_neg_adc =  offset_Value / (value +
 						     stParameters.offset_neg_adc);
 			qDebug(CAT_CALIBRATION_MANUAL) << "Negative gain ADC value: " << stParameters.gain_neg_adc;
@@ -434,20 +419,20 @@ void ManualCalibration::negativePowerSupplyParam(const int step)
 
 void ManualCalibration::setEnableNegativeSuppply(bool enabled)
 {
-	iio_channel_attr_write_bool(ch2w, "powerdown", !enabled);
-
-	if (pd_neg) {
-		iio_channel_attr_write_bool(pd_neg, "user_supply_powerdown", !enabled);
-	} else {
-		iio_channel_attr_write_bool(pd_pos, "user_supply_powerdown", !enabled);
+	try {
+		m_m2k_powersupply->enableChannel(1, enabled);
+	} catch (std::exception &e) {
+		qDebug(CAT_CALIBRATION_MANUAL) << "Can't enable channel: " << e.what();
 	}
 }
 
 void ManualCalibration::setNegativeValue(double value)
 {
-	long long val = value * 4095.0 / (-5.1 * 1.2);
-
-	iio_channel_attr_write_longlong(ch2w, "raw", val);
+	try {
+		m_m2k_powersupply->pushChannel(1, value);
+	} catch (std::exception &e) {
+		qDebug(CAT_CALIBRATION_MANUAL) << "Can't write value: " << e.what();
+	}
 }
 
 void ManualCalibration::on_nextButton_clicked()
@@ -483,33 +468,35 @@ void ManualCalibration::displayStartUpCalibrationValues(void)
 
 	startParamTable->setItem(0, 0, new QTableWidgetItem("ADC offset Ch0"));
 	startParamTable->setItem(0, 1, new QTableWidgetItem(QString::number(
-				calib->adcOffsetChannel0())));
+				m_m2k_context->getAdcCalibrationOffset(0))));
 
 	startParamTable->setItem(1, 0, new QTableWidgetItem("ADC offset Ch1"));
 	startParamTable->setItem(1, 1, new QTableWidgetItem(QString::number(
-				calib->adcOffsetChannel1())));
+				m_m2k_context->getAdcCalibrationOffset(1))));
 
 	startParamTable->setItem(2, 0, new QTableWidgetItem("ADC gain Ch0"));
 	startParamTable->setItem(2, 1, new QTableWidgetItem(QString::number(
-				calib->adcGainChannel0())));
+				m_m2k_context->getAdcCalibrationGain(0))));
 
 	startParamTable->setItem(3, 0, new QTableWidgetItem("ADC gain Ch1"));
 	startParamTable->setItem(3, 1, new QTableWidgetItem(QString::number(
-				calib->adcGainChannel1())));
+				m_m2k_context->getAdcCalibrationGain(1))));
 
 	startParamTable->setItem(4, 0, new QTableWidgetItem("DAC A offset"));
 	startParamTable->setItem(4, 1, new QTableWidgetItem(QString::number(
-				calib->dacAoffset())));
+				m_m2k_context->getDacCalibrationOffset(0))));
 
 	startParamTable->setItem(5, 0, new QTableWidgetItem("DAC B offset"));
 	startParamTable->setItem(5, 1, new QTableWidgetItem(QString::number(
-				calib->dacBoffset())));
+				m_m2k_context->getDacCalibrationOffset(1))));
 
 	startParamTable->setItem(6, 0, new QTableWidgetItem("DAC A vlsb"));
-	startParamTable->setItem(6, 1, new QTableWidgetItem(QString::number(calib->dacAvlsb())));
+	startParamTable->setItem(6, 1, new QTableWidgetItem(QString::number(
+				m_m2k_context->getDacCalibrationGain(0))));
 
 	startParamTable->setItem(7, 0, new QTableWidgetItem("DAC B vlsb"));
-	startParamTable->setItem(7, 1, new QTableWidgetItem(QString::number(calib->dacBvlsb())));
+	startParamTable->setItem(7, 1, new QTableWidgetItem(QString::number(
+				m_m2k_context->getDacCalibrationGain(1))));
 
 	startParamTable->resizeColumnsToContents();
 }
@@ -560,8 +547,13 @@ void ManualCalibration::on_saveButton_clicked()
 	}
 
 	QFile file(fileName);
-	QString temp_ad9963 = QString::number(calib->getIioDevTemp(QString("ad9963")));
-	QString temp_fpga = QString::number(calib->getIioDevTemp(QString("xadc")));
+	QString temp_ad9963, temp_fpga;
+	if (m_dmm_ad9963) {
+		temp_ad9963 = m_dmm_ad9963->readChannel("temp0").value;
+	}
+	if (m_dmm_xadc) {
+		temp_fpga = m_dmm_xadc->readChannel("temp0").value;
+	}
 
 	if (file.open(QFile::WriteOnly | QFile::Truncate)) {
 		QTextStream stream(&file);
@@ -622,9 +614,7 @@ void ManualCalibration::on_finishButton_clicked()
 void ManualCalibration::on_autoButton_clicked()
 {
 	if (calib->isInitialized()) {
-		calib->setHardwareInCalibMode();
 		calib->calibrateAll();
-		calib->restoreHardwareFromCalibMode();
 	}
 	displayStartUpCalibrationValues();
 }
