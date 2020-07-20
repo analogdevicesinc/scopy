@@ -143,6 +143,7 @@ void SignalGenerator_API::setWaveformType(const QList<int>& list)
 		SG_TRA_WAVE,
 		SG_SAW_WAVE,
 		SG_INV_SAW_WAVE,
+		SG_STAIR_WAVE,
 	};
 
 	for (int i = 0; i < gen->channels.size(); i++) {
@@ -239,6 +240,89 @@ void SignalGenerator_API::setWaveformOfft(const QList<double>& list)
 	}
 
 	gen->offset->setValue(gen->getCurrentData()->offset);
+}
+
+QList<int> SignalGenerator_API::getStairWaveformStepsUp() const
+{
+	QList<int> list;
+
+	for (int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(gen->channels[i]);
+
+		list.append(static_cast<int>(ptr->steps_up));
+	}
+
+	return list;
+}
+
+void SignalGenerator_API::setStairWaveformStepsUp(const QList<int>& list)
+{
+	if (list.size() != gen->channels.size()) {
+		return;
+	}
+
+	for (int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(gen->channels[i]);
+
+		ptr->steps_up = static_cast<int>(list.at(i));
+	}
+
+	gen->stepsUp->setValue(gen->getCurrentData()->steps_up);
+}
+
+QList<int> SignalGenerator_API::getStairWaveformStepsDown() const
+{
+	QList<int> list;
+
+	for (int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(gen->channels[i]);
+
+		list.append(static_cast<int>(ptr->steps_down));
+	}
+
+	return list;
+}
+
+void SignalGenerator_API::setStairWaveformStepsDown(const QList<int>& list)
+{
+	if (list.size() != gen->channels.size()) {
+		return;
+	}
+
+	for (int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(gen->channels[i]);
+
+		ptr->steps_down = static_cast<int>(list.at(i));
+	}
+
+	gen->stepsDown->setValue(gen->getCurrentData()->steps_down);
+}
+QList<int> SignalGenerator_API::getStairWaveformPhase() const
+{
+	QList<int> list;
+
+	for (int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(gen->channels[i]);
+
+		list.append(static_cast<int>(ptr->stairphase));
+	}
+
+	return list;
+}
+
+void SignalGenerator_API::setStairWaveformPhase(const QList<int>& list)
+{
+	if (list.size() != gen->channels.size()) {
+		return;
+	}
+
+	for (int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(gen->channels[i]);
+
+		ptr->stairphase = static_cast<int>(list.at(i));
+	}
+
+	gen->stairPhase->setValue(gen->getCurrentData()->stairphase);
 }
 
 QList<double> SignalGenerator_API::getWaveformPhase() const

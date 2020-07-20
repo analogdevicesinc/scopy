@@ -53,6 +53,15 @@ class SignalGenerator_API : public ApiObject
 	Q_PROPERTY(QList<double> waveform_duty
 		   READ getWaveformDuty WRITE setWaveformDuty);
 
+	Q_PROPERTY(QList<int> steps_up
+		   READ getStairWaveformStepsUp WRITE setStairWaveformStepsUp);
+	Q_PROPERTY(QList<int> steps_down
+		   READ getStairWaveformStepsDown WRITE setStairWaveformStepsDown);
+	Q_PROPERTY(QList<int> stairphase
+		   READ getStairWaveformPhase WRITE setStairWaveformPhase);
+
+
+
 	Q_PROPERTY(QList<int> noise_type
 		   READ getNoiseType WRITE setNoiseType);
 	Q_PROPERTY(QList<double> noise_amplitude
@@ -122,6 +131,13 @@ public:
 	void setWaveformFall(const QList<double>& list);
 	QList<double> getWaveformRise() const;
 	void setWaveformRise(const QList<double>& list);
+	QList<int> getStairWaveformStepsUp() const;
+	void setStairWaveformStepsUp(const QList<int>& list);
+	QList<int> getStairWaveformStepsDown() const;
+	void setStairWaveformStepsDown(const QList<int>& list);
+	QList<int> getStairWaveformPhase() const;
+	void setStairWaveformPhase(const QList<int>& list);
+
 
 	QList<double> getMathFreq() const;
 	void setMathFreq(const QList<double>& list);
