@@ -13,18 +13,28 @@ QWTPOLAR_BRANCH=master # not used
 LIBSIGROK_BRANCH=master
 LIBSIGROKDECODE_BRANCH=master #not used
 
-QMAKE=/home/adi/Qt/5.15.0/gcc_64/bin/qmake
 set -e
+if [ $# -eq 0 ]; then
+	echo "Using default qmake"
+	QMAKE=qmake
+	$QMAKE --version
+else
+	QMAKE=$1/gcc_64/bin/qmake
+	$QMAKE --version
+
+fi
+
 cd ~
 WORKDIR=${PWD}
 
-sudo add-apt-repository -y ppa:gnuradio/gnuradio-releases
+install_apt() {
+	sudo add-apt-repository -y ppa:gnuradio/gnuradio-releases
 
-sudo apt-get -y install libxml2-dev libxml2 flex bison swig libpython3-all-dev python3 python3-numpy libfftw3-bin libfftw3-dev libfftw3-3 liblog4cpp5v5 liblog4cpp5-dev libboost1.65-dev libboost1.65 g++ git cmake autoconf libzip4 libzip-dev libglib2.0-dev libsigc++-2.0-dev libglibmm-2.4-dev doxygen curl libvolk1-bin libvolk1-dev libvolk1.3 libgmp-dev libmatio-dev liborc-0.4-dev subversion mesa-common-dev libgl1-mesa-dev
+	sudo apt-get -y install libxml2-dev libxml2 flex bison swig libpython3-all-dev python3 python3-numpy libfftw3-bin libfftw3-dev libfftw3-3 liblog4cpp5v5 liblog4cpp5-dev libboost1.65-dev libboost1.65 g++ git cmake autoconf libzip4 libzip-dev libglib2.0-dev libsigc++-2.0-dev libglibmm-2.4-dev doxygen curl libvolk1-bin libvolk1-dev libvolk1.3 libgmp-dev libmatio-dev liborc-0.4-dev subversion mesa-common-dev libgl1-mesa-dev
 
-sudo apt-get -y update
-sudo apt-get -y install gnuradio
-
+	sudo apt-get -y update
+	sudo apt-get -y install gnuradio
+}
 
 build_libiio() {
 	echo "### Building libiio - branch $LIBIIO_BRANCH"
@@ -211,6 +221,7 @@ build_qwtpolar() {
 
 }
 
+install_apt
 build_libiio
 build_libad9361
 build_libm2k
