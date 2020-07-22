@@ -2155,8 +2155,15 @@ size_t SignalGenerator::get_samples_count(unsigned int chnIdx,
 
 out_cleanup:
 	/* The buffer size must be a multiple of 4 */
-	while (size & 0x3) {
-		size <<= 1;
+	if(ptr->type == SIGNAL_TYPE_BUFFER)
+	{
+		size = size + size % 0x04;
+	}
+	else
+		{
+		while (size & 0x3) {
+			size <<= 1;
+		}
 	}
 
 	/* The buffer size shouldn't be too small */
