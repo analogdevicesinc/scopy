@@ -23,6 +23,7 @@
 #include <gnuradio/fft/fft_vcc.h>
 #include <gnuradio/fft/fft_vfc.h>
 #include <gnuradio/fft/window.h>
+#include "stream_to_vector_overlap.h"
 
 #include "fft_block.hpp"
 
@@ -41,6 +42,10 @@ fft_block::fft_block(bool use_complex, size_t fft_size, unsigned int nbthreads)
 			fft_size);
 	auto v2s = blocks::vector_to_stream::make(sizeof(gr_complex), fft_size);
 
+	d_s2v_overlap = adiscope::stream_to_vector_overlap::make(
+				use_complex ? sizeof(gr_complex) : sizeof(float),
+				fft_size, 0.0);
+
 	/* We use a Hamming window for now */
 	auto window = fft::window::hamming(fft_size);
 
@@ -53,14 +58,20 @@ fft_block::fft_block(bool use_complex, size_t fft_size, unsigned int nbthreads)
 				window, nbthreads);
 
 	/* Connect everything */
-	hier_block2::connect(this->self(), 0, s2v, 0);
-	hier_block2::connect(s2v, 0, d_fft, 0);
+	hier_block2::connect(this->self(), 0, d_s2v_overlap, 0);
+	hier_block2::connect(d_s2v_overlap, 0, d_fft, 0);
 	hier_block2::connect(d_fft, 0, v2s, 0);
 	hier_block2::connect(v2s, 0, this->self(), 0);
 }
 
 fft_block::~fft_block()
 {
+}
+
+void fft_block::set_overlap_factor(double overlap_factor)
+{
+	boost::dynamic_pointer_cast<adiscope::stream_to_vector_overlap>(
+				d_s2v_overlap)->set_overlap_factor(overlap_factor);
 }
 
 void fft_block::set_window(const std::vector<float>& window)
