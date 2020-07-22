@@ -76,6 +76,8 @@ FftDisplayPlot::FftDisplayPlot(int nplots, QWidget *parent) :
 	d_emitNewMkrData(true),
 	m_visiblePeakSearch(true),
 	d_logScaleEnabled(false),
+	d_buffer_idx(0),
+	d_nb_overlapping_avg(1),
 	n_ref_curves(0)
 {
 	// TO DO: Add more colors
@@ -104,6 +106,8 @@ FftDisplayPlot::FftDisplayPlot(int nplots, QWidget *parent) :
 	}
 	y_scale_factor.resize(nplots);
 	d_ch_avg_obj.resize(nplots);
+	d_win_coefficient_sum_sqr.resize(nplots);
+	d_win_coefficient_sum.resize(nplots);
 
 	m_sweepStart = 0;
 	m_sweepStop = 1000;
@@ -310,10 +314,10 @@ void FftDisplayPlot::unregisterReferenceWaveform(QString name)
 	replot();
 }
 
-void FftDisplayPlot::setWindowCoefficientSum(float sum, float sqr_sum)
+void FftDisplayPlot::setWindowCoefficientSum(unsigned int ch, float sum, float sqr_sum)
 {
-	d_win_coefficient_sum = sum;
-	d_win_coefficient_sum_sqr = sqr_sum;
+	d_win_coefficient_sum[ch] = sum;
+	d_win_coefficient_sum_sqr[ch] = sqr_sum;
 }
 
 void FftDisplayPlot::useLogFreq(bool use_log_freq)
@@ -485,6 +489,9 @@ void FftDisplayPlot::averageDataAndComputeMagnitude(std::vector<double *>
 {
 	std::vector<double *> source;
 
+	if (d_buffer_idx == 0) {
+		d_ps_avg.resize(d_nplots);
+	}
 	for (unsigned int i = 0; i < d_nplots; i++) {
 		bool needs_dB_avg = false;
 
@@ -509,6 +516,10 @@ void FftDisplayPlot::averageDataAndComputeMagnitude(std::vector<double *>
 			break;
 		}
 
+
+		if (d_buffer_idx == 0) {
+			d_ps_avg[i].resize(nb_points);
+		}
 		for (int s = 0; s < nb_points; s++) {
 			//dB Full-Scale
 			switch (d_magType) {
@@ -534,26 +545,29 @@ void FftDisplayPlot::averageDataAndComputeMagnitude(std::vector<double *>
 					y_scale_factor[i] / nb_points;
 				break;
 			case VRMS:
+				/* Another formula for this would be
+				 * sqrt(2 * (sqrt(source[i][s]) * sqrt(source[i][s])) /
+				 * (d_win_coefficient_sum * d_win_coefficient_sum));
+				 * This are equivalent (the only difference is the moment
+				 * when we apply the window compensation (before the FFT, or after.
+				 * With the current version, this is applied before (in calcCoherentPowerGain)
+				 */
 				out_data[i][s] = sqrt(source[i][s]) *
 					y_scale_factor[i] / sqrt(2) / nb_points;
 				break;
 			case VROOTHZ:
-				auto fft_sample = sqrt(source[i][s]) * y_scale_factor[i] / nb_points;
-				auto ps_rms = 2 * (fft_sample * fft_sample) / (d_win_coefficient_sum * d_win_coefficient_sum);
+				auto ps_rms = sqrt(source[i][s]) * y_scale_factor[i] /  sqrt(2) / nb_points;
+				d_ps_avg[i][s] = sqrt((d_ps_avg[i][s] * d_ps_avg[i][s]) + (ps_rms * ps_rms));
 
-				/* TODO for overlapping
-				auto ps_avg_current = sqrt((d_ps_avg[i][s] * d_ps_avg[i][s]) + (ps_rms * ps_rms));
-				d_ps_avg[i][s] = ps_avg_current;
-				*/
-
-				auto ps_avg = sqrt(ps_rms * ps_rms);
-				auto ls_rms = sqrt(ps_avg);
-				auto enbw = d_sampl_rate * d_win_coefficient_sum_sqr /
-						(d_win_coefficient_sum * d_win_coefficient_sum);
-				auto ls_d_rms = ls_rms / sqrt(enbw);
-				out_data[i][s] = ls_d_rms;
+				if (d_buffer_idx == (d_nb_overlapping_avg - 1)) {
+					d_ps_avg[i][s] = d_ps_avg[i][s] / sqrt(d_nb_overlapping_avg);
+					auto ls_rms = d_ps_avg[i][s];
+					auto enbw = d_sampl_rate * d_win_coefficient_sum_sqr[i] /
+							(d_win_coefficient_sum[i] * d_win_coefficient_sum[i]);
+					auto ls_d_rms = ls_rms / sqrt(enbw);
+					out_data[i][s] = ls_d_rms;
+				}
 				break;
-
 			};
 		}
 
@@ -561,6 +575,12 @@ void FftDisplayPlot::averageDataAndComputeMagnitude(std::vector<double *>
 			d_ch_avg_obj[i]->pushNewData(out_data[i]);
 			d_ch_avg_obj[i]->getAverage(out_data[i], nb_points);
 		}
+	}
+	if (d_buffer_idx == (d_nb_overlapping_avg - 1)) {
+		d_ps_avg.clear();
+		d_buffer_idx = 0;
+	} else {
+		d_buffer_idx++;
 	}
 }
 
@@ -1403,6 +1423,15 @@ FftDisplayPlot::MagnitudeType FftDisplayPlot::magnitudeType() const
 void FftDisplayPlot::setMagnitudeType(enum MagnitudeType type)
 {
 	d_presetMagType = type;
+	d_buffer_idx = 0;
+	d_ps_avg.clear();
+}
+
+void FftDisplayPlot::setNbOverlappingAverages(unsigned int nb_avg)
+{
+	d_buffer_idx = 0;
+	d_ps_avg.clear();
+	d_nb_overlapping_avg = nb_avg;
 }
 
 /*

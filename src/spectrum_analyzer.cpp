@@ -33,6 +33,7 @@
 #include <QDebug>
 #include <QFileDialog>
 #include <QCheckBox>
+#include <QTimer>
 
 /* Local includes */
 #include "logging_categories.h"
@@ -45,6 +46,7 @@
 #include "db_click_buttons.hpp"
 #include "filemanager.h"
 #include "spectrum_analyzer_api.hpp"
+#include "stream_to_vector_overlap.h"
 
 /* Generated UI */
 #include "ui_spectrum_analyzer.h"
@@ -133,7 +135,8 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144
 	}), nb_ref_channels(0),
 	selected_ch_settings(-1),
-	fft_ids(nullptr)
+	fft_ids(nullptr),
+	m_nb_overlapping_avg(1)
 {
 	initInstrumentStrings();
 	// Get the list of names of the available channels
@@ -244,7 +247,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	// Initialize Sweep controls
 	unit_per_div = new PositionSpinButton({
 		{" ",1e0},
-	}, tr("UM/Div"), 0.0, 0.0, false, false, this);
+	}, tr("Scale/Div"), 0.0, 0.0, false, false, this);
 
 	unit_per_div_scale = new ScaleSpinButton({
 			 {{"pV/√Hz",1e-12},
@@ -252,7 +255,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 			  {"μV/√Hz",1e-6},
 			  {"mV/√Hz",1e-3},
 			  {"V/√Hz",1e0}}
-	}, tr("UM/Div"), 1e-12, 25/10, false, false, this,
+	}, tr("Scale/Div"), 1e-12, 25/10, false, false, this,
 	{1, 2.5, 5, 7.5});
 	ui->divisionWidget->addWidget(unit_per_div);
 	ui->divisionWidget->addWidget(unit_per_div_scale);
@@ -329,6 +332,39 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 		startStopRange->setMinimumSpanValue(10 * sample_rate / bin_sizes[index]);
 	});
 
+	connect(ui->cmbGainMode, QOverload<int>::of(&QComboBox::currentIndexChanged),
+		[=](int index){
+
+		int crt_channel = channelIdOfOpenedSettings();
+		if (crt_channel >= m_adc_nb_channels || crt_channel < 0) {
+			return;
+		}
+		channels[crt_channel]->setGainMode(index);
+
+		bool started = isIioManagerStarted();
+		if (started) {
+			iio->lock();
+		}
+
+		try {
+			libm2k::analog::ANALOG_IN_CHANNEL chn = static_cast<libm2k::analog::ANALOG_IN_CHANNEL>(crt_channel);
+			m_m2k_analogin->setRange(chn, channels[crt_channel]->getGainMode());
+
+			bool canConvRawToVolts = m_m2k_analogin ? true : false;
+			if (canConvRawToVolts) {
+				fft_plot->setScaleFactor(crt_channel, m_m2k_analogin->getScalingFactor(chn));
+			}
+		} catch (std::exception &e) {
+			qDebug(CAT_SPECTRUM_ANALYZER) << e.what();
+		}
+
+		if (started) {
+			iio->unlock();
+		}
+	});
+
+	ui->cmbGainMode->setCurrentIndex(0);
+
 	// Initialize vertical axis controls
 	unit_per_div->setMinValue(1);
 	unit_per_div->setMaxValue(200/10);
@@ -400,19 +436,18 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	connect(fft_plot, SIGNAL(currentAverageIndex(unsigned int, unsigned int)),
 		SLOT(onCurrentAverageIndexChanged(unsigned int, unsigned int)));
 	const bool visible = (channels[crt_channel_id]->averageType() != FftDisplayPlot::AverageType::SAMPLE);
-	ui->lbl_crtAvgSample->setVisible(visible);
 	setCurrentAverageIndexLabel(crt_channel_id);
 
 	connect(top, SIGNAL(valueChanged(double)),
 	        SLOT(onTopValueChanged(double)));
 	connect(unit_per_div, SIGNAL(valueChanged(double)),
-		SLOT(onUnitPerDivValueChanged(double)));
+		SLOT(onScalePerDivValueChanged(double)));
 	connect(bottom, SIGNAL(valueChanged(double)),
 		SLOT(onBottomValueChanged(double)));
 	connect(top_scale, SIGNAL(valueChanged(double)),
 		SLOT(onTopValueChanged(double)));
 	connect(unit_per_div_scale, SIGNAL(valueChanged(double)),
-		SLOT(onUnitPerDivValueChanged(double)));
+		SLOT(onScalePerDivValueChanged(double)));
 	connect(bottom_scale, SIGNAL(valueChanged(double)),
 		SLOT(onBottomValueChanged(double)));
 
@@ -579,6 +614,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 SpectrumAnalyzer::~SpectrumAnalyzer()
 {
+	delete sample_timer;
 	ui->runSingleWidget->toggle(false);
 	setDynamicProperty(runButton(), "disabled", false);
 
@@ -1191,11 +1227,12 @@ void SpectrumAnalyzer::on_comboBox_type_currentIndexChanged(const QString& s)
 
 	auto avg_type = (*it).second;
 
-	ui->btnHistory->setVisible(canSwitchAverageHistory(avg_type));
+	auto history_visible = canSwitchAverageHistory(avg_type);
+	ui->btnHistory->setVisible(history_visible);
 	ui->btnHistory->setChecked(true);
-	ui->lbl_history->setVisible(ui->btnHistory->isVisible());
+	ui->lbl_history->setVisible(history_visible);
 	ui->btnApply->setVisible(visible);
-	ui->lbl_crtAvgSample->setVisible(visible);
+	setCurrentAverageIndexLabel(crt_channel);
 
 	if (avg_type != channels[crt_channel]->averageType()) {
 		channels[crt_channel]->setAverageType(avg_type);
@@ -1308,9 +1345,10 @@ void SpectrumAnalyzer::updateChannelSettingsPanel(unsigned int id)
 		ui->label_averaging->setVisible(visible);
 		ui->btnApply->setVisible(visible);
 
-		ui->btnHistory->setVisible(canSwitchAverageHistory(sc->averageType()));
+		auto history_visible = canSwitchAverageHistory(sc->averageType());
+		ui->btnHistory->setVisible(history_visible);
 		ui->btnHistory->setChecked(sc->isAverageHistoryEnabled());
-		ui->lbl_history->setVisible(ui->btnHistory->isVisible());
+		ui->lbl_history->setVisible(history_visible);
 
 		if (it != avg_types.end()) {
 			ui->comboBox_type->setCurrentText((*it).first);
@@ -1326,6 +1364,8 @@ void SpectrumAnalyzer::updateChannelSettingsPanel(unsigned int id)
 		}
 
 		ui->spinBox_averaging->setValue(sc->averaging());
+		int gainIdx = (sc->getGainMode() == libm2k::analog::PLUS_MINUS_25V) ? 0 : 1;
+		ui->cmbGainMode->setCurrentIndex(gainIdx);
 	} else {
 		QString style = QString("border: 2px solid %1").arg(cw->color().name());
 		ui->lineChannelSettingsTitle->setStyleSheet(style);
@@ -1389,7 +1429,6 @@ void SpectrumAnalyzer::onChannelSelected(bool en)
 
 	if (!cw->isReferenceChannel()) {
 		const bool visible = (channels[crt_channel_id]->averageType() != FftDisplayPlot::AverageType::SAMPLE);
-		ui->lbl_crtAvgSample->setVisible(visible);
 		setCurrentAverageIndexLabel(crt_channel_id);
 	} else {
 		ui->lbl_crtAvgSample->setVisible(false);
@@ -1508,17 +1547,19 @@ void SpectrumAnalyzer::writeAllSettingsToHardware()
 {
 	try {
 		if (m_m2k_analogin) {
+			bool canConvRawToVolts = m_m2k_analogin ? true : false;
 			m_m2k_analogin->setSampleRate(m_max_sample_rate);
 
 			for (unsigned int i = 0; i < m_adc_nb_channels; i++) {
 				libm2k::analog::ANALOG_IN_CHANNEL chn = static_cast<libm2k::analog::ANALOG_IN_CHANNEL>(i);
 				m_m2k_analogin->setVerticalOffset(chn, 0.0);
-				m_m2k_analogin->setRange(chn, libm2k::analog::PLUS_MINUS_25V);
+				m_m2k_analogin->setRange(chn, channels[i]->getGainMode());
+				if (canConvRawToVolts) {
+					fft_plot->setScaleFactor(i, m_m2k_analogin->getScalingFactor(chn));
+				}
 			}
 			m_m2k_analogin->setOversamplingRatio(sample_rate_divider);
-
 			auto trigger = m_m2k_analogin->getTrigger();
-
 			if (trigger) {
 				for (unsigned int i = 0; i < m_adc_nb_channels; i++) {
 					trigger->setAnalogMode(i, libm2k::ALWAYS);
@@ -1660,12 +1701,18 @@ void SpectrumAnalyzer::setFftSize(uint size)
 	fft_size = size;
 	fft_sink->set_nsamps(size);
 
+	if (fft_plot->magnitudeType() == FftDisplayPlot::VROOTHZ) {
+		fft_plot->setNbOverlappingAverages(m_nb_overlapping_avg);
+	}
+
 	for (int i = 0; i < channels.size(); i++) {
 		auto fft = gnuradio::get_initial_sptr(
 		                   new fft_block(false, size));
 
 		iio->disconnect(fft_ids[i]);
-		fft_ids[i] = iio->connect(fft, i, 0, true, size);
+
+		fft_ids[i] = iio->connect(fft, i, 0, true, fft_size * m_nb_overlapping_avg);
+
 		iio->connect(fft, 0, channels[i]->ctm_block, 0);
 		iio->connect(channels[i]->ctm_block, 0, fft_sink, i);
 
@@ -1676,7 +1723,7 @@ void SpectrumAnalyzer::setFftSize(uint size)
 		channels[i]->fft_block = fft;
 		channels[i]->setFftWindow(channels[i]->fftWindow(), size);
 
-		iio->set_buffer_size(fft_ids[i], size);
+		iio->set_buffer_size(fft_ids[i], size * m_nb_overlapping_avg);
 	}
 
 	if (started) {
@@ -1967,8 +2014,26 @@ void SpectrumAnalyzer::on_cmb_units_currentIndexChanged(const QString& unit)
 		return;
 	}
 
+
 	FftDisplayPlot::MagnitudeType magType = (*it).second;
 	unsigned int stackedWidgetCurrentIdx = 0;
+
+	bool started = isIioManagerStarted();
+	if (started) {
+		iio->lock();
+	}
+	for (unsigned int i = 0; i < m_adc_nb_channels; i++) {
+		auto ov_factor = SpectrumChannel::win_overlap_factor(channels[i]->fftWindow());
+		if (magType == FftDisplayPlot::VROOTHZ) {
+			channels[i]->fft_block->set_overlap_factor(ov_factor);
+		} else {
+			channels[i]->fft_block->set_overlap_factor(0.0);
+		}
+	}
+
+	if (started) {
+		iio->unlock();
+	}
 
 	switch (magType) {
 	case FftDisplayPlot::VPEAK:
@@ -2076,22 +2141,24 @@ void SpectrumAnalyzer::onTopValueChanged(double top)
 	fft_plot->replot();
 }
 
-void SpectrumAnalyzer::onUnitPerDivValueChanged(double perDiv)
+void SpectrumAnalyzer::onScalePerDivValueChanged(double perDiv)
 {
 	bool isScaleBtn = ui->topWidget->currentIndex();
 	if (isScaleBtn) {
-		double bottomValue = top_scale->value() - perDiv * 10;
-		bottom_scale->setValue(bottomValue);
 		double topValue = bottom_scale->value() + perDiv * 10;
-		if (topValue != top_scale->value()) {
-			top_scale->setValue(topValue);
+		top_scale->setValue(topValue);
+
+		double bottomValue = top_scale->value() - perDiv * 10;
+		if (bottomValue != bottom_scale->value()) {
+			bottom_scale->setValue(bottomValue);
 		}
 	} else {
-		double bottomValue = top->value() - perDiv * 10;
-		bottom->setValue(bottomValue);
 		double topValue = bottom->value() + perDiv * 10;
-		if (topValue != top->value()) {
-			top->setValue(topValue);
+		top->setValue(topValue);
+
+		double bottomValue = top->value() - perDiv * 10;
+		if (bottomValue != bottom->value()) {
+			bottom->setValue(bottomValue);
 		}
 	}
 }
@@ -2154,7 +2221,8 @@ SpectrumChannel::SpectrumChannel(int id, const QString& name,
 	m_fft_win(SpectrumAnalyzer::HAMMING),
 	m_plot(plot),
 	m_widget(new ChannelWidget(id, false, false, m_color)),
-	m_average_history(true)
+	m_average_history(true),
+	m_gain_mode(libm2k::analog::PLUS_MINUS_25V)
 {
 	m_widget->setFullName(name);
 	m_widget->setShortName(QString("CH %1").arg(id + 1));
@@ -2231,6 +2299,17 @@ bool SpectrumChannel::canStoreAverageHistory() const
 	}
 }
 
+void SpectrumChannel::setGainMode(int index)
+{
+	m_gain_mode = index == 0 ? libm2k::analog::PLUS_MINUS_25V
+				: libm2k::analog::PLUS_MINUS_2_5V;
+}
+
+libm2k::analog::M2K_RANGE  SpectrumChannel::getGainMode()
+{
+	return m_gain_mode;
+}
+
 bool SpectrumChannel::isAverageHistoryEnabled() const
 {
 	return m_average_history;
@@ -2260,9 +2339,17 @@ void SpectrumChannel::setFftWindow(SpectrumAnalyzer::FftWinType win, int taps)
 		sum += elem;
 		sqr_sum += (elem * elem);
 	}
-	m_plot->setWindowCoefficientSum(sum, sqr_sum);
+	m_plot->setWindowCoefficientSum(m_id, round(sum), round(sqr_sum));
+
+
+	/* We scale the window coefficients using the
+	 * coeff average in order to compensate for the
+	 * loss in the FFT.
+	 * After the FFT we no longer have to compensate
+	 * for the changes determined by the window.*/
 	float gain = calcCoherentPowerGain(window);
 	scaletFftWindow(window, 1 / gain);
+
 	fft_block->set_window(window);
 }
 
@@ -2302,6 +2389,31 @@ std::vector<float> SpectrumChannel::build_win(SpectrumAnalyzer::FftWinType type,
 	}
 }
 
+double SpectrumChannel::win_overlap_factor(SpectrumAnalyzer::FftWinType type)
+{
+	switch (type) {
+	case SpectrumAnalyzer::FLAT_TOP:
+		return 0.656;
+
+	case SpectrumAnalyzer::RECTANGULAR:
+		return 0.0;
+
+	case SpectrumAnalyzer::TRIANGULAR:
+	case SpectrumAnalyzer::HAMMING:
+	case SpectrumAnalyzer::HANN:
+		return 0.5;
+
+	case SpectrumAnalyzer::BLACKMAN_HARRIS:
+		return 0.66;
+
+	case SpectrumAnalyzer::KAISER:
+		return 0.6;
+
+	default:
+		return 0.0;
+	}
+}
+
 float
 SpectrumChannel::calcCoherentPowerGain(const std::vector<float>& win) const
 {
@@ -2320,4 +2432,3 @@ void SpectrumChannel::scaletFftWindow(std::vector<float>& win, float gain)
 		win[i] *= gain;
 	}
 }
-

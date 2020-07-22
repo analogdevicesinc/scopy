@@ -32,10 +32,12 @@ namespace adiscope {
 		~fft_block();
 
 		void set_window(const std::vector<float>& window);
+		void set_overlap_factor(double overlap_factor);
 
 	private:
 		bool d_complex;
 		gr::basic_block_sptr d_fft;
+		gr::basic_block_sptr d_s2v_overlap;
 	};
 }
 

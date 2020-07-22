@@ -38,7 +38,6 @@
 
 #include <QWidget>
 #include <QQueue>
-#include <QTimer>
 
 /* libm2k includes */
 #include <libm2k/analog/genericanalogin.hpp>
@@ -144,7 +143,7 @@ private Q_SLOTS:
 	void singleCaptureDone();
 	void on_btnMarkerTable_toggled(bool checked);
 	void onTopValueChanged(double);
-	void onUnitPerDivValueChanged(double);
+	void onScalePerDivValueChanged(double);
 	void onBottomValueChanged(double);
 	void rightMenuFinished(bool opened);	
 	void btnExportClicked();
@@ -198,6 +197,7 @@ private:
 	libm2k::analog::GenericAnalogIn* m_generic_analogin;
 	Ui::SpectrumAnalyzer *ui;
 	adiscope::DbClickButtons *marker_selector;
+	unsigned int m_nb_overlapping_avg;
 
 	QButtonGroup *settings_group;
 	QButtonGroup *channels_group;
@@ -304,6 +304,10 @@ public:
 	bool isAverageHistoryEnabled() const;
 	void setAverageHistoryEnabled(bool enabled);
 	bool canStoreAverageHistory() const;
+
+	void setGainMode(int index);
+	libm2k::analog::M2K_RANGE getGainMode();
+	static double win_overlap_factor(SpectrumAnalyzer::FftWinType type);
 private:
 	int m_id;
 	QString m_name;
@@ -311,6 +315,7 @@ private:
 	QColor m_color;
 	uint m_averaging;
 	uint m_average_current_index;
+	libm2k::analog::M2K_RANGE m_gain_mode;
 	bool m_average_history;
 	FftDisplayPlot::AverageType m_avg_type;
 	SpectrumAnalyzer::FftWinType m_fft_win;

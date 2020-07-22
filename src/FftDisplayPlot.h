@@ -126,11 +126,11 @@ namespace adiscope {
 		std::vector<double *> d_refXdata;
 		std::vector<double *> d_refYdata;
 
-		double d_win_coefficient_sum;
-		double d_win_coefficient_sum_sqr;
-		unsigned int d_spectral_density_avg_idx;
-		double d_overlapping;
-		std::vector<double *> d_overlapping_data;
+		std::vector<double> d_win_coefficient_sum;
+		std::vector<double> d_win_coefficient_sum_sqr;
+		unsigned int d_buffer_idx;
+		unsigned int d_nb_overlapping_avg;
+		std::vector<std::vector<double>> d_ps_avg;
 
 
 		void plotData(const std::vector<double *> &pts,
@@ -225,8 +225,8 @@ namespace adiscope {
 		void registerReferenceWaveform(QString name, QVector<double> xData, QVector<double> yData);
 		void unregisterReferenceWaveform(QString name);
 
-		void setWindowCoefficientSum(float sum, float sqr_sum);
-
+		void setWindowCoefficientSum(unsigned int ch, float sum, float sqr_sum);
+		void setNbOverlappingAverages(unsigned int nb_avg);
 	Q_SIGNALS:
 		void newData();
 		void sampleRateUpdated(double);
