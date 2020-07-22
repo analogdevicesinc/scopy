@@ -131,7 +131,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 	currentChannel(0), sample_rate(0),
 	settings_group(new QButtonGroup(this)),nb_points(NB_POINTS),
 	channels_group(new QButtonGroup(this)),
-	m_maxNbOfSamples(4 * 1024 * 1024 / 2)
+	m_maxNbOfSamples(4 * 1024 * 1024)
 {
 	zoomT1=0;
 	zoomT2=1;
@@ -1172,12 +1172,12 @@ bool SignalGenerator::loadParametersFromFile(
 
 	ui->fileChannel->setEnabled(ptr->file_nr_of_channels > 1);
 
-	for(auto ch_samples : ptr->file_nr_of_samples)
+	for(auto i = 0; i < ptr->file_nr_of_samples.size(); i++)
 	{
-		if(ch_samples > m_maxNbOfSamples)
+		if(ptr->file_nr_of_samples[i] > m_maxNbOfSamples)
 		{
-			ptr->file_message = "File too big. Too many samples";
-			ptr->file_type=FORMAT_NO_FILE;
+			ptr->file_nr_of_samples[i] = m_maxNbOfSamples;
+			ptr->file_message = "File truncated. Max 4MS";
 		}
 	}
 
@@ -1571,7 +1571,7 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
 			boost::shared_ptr<basic_block> fs;
 
 			auto null = blocks::null_sink::make(sizeof(float));
-			auto buffer=blocks::copy::make(sizeof(float)); // will act as multiplexer
+			auto buffer=blocks::head::make(sizeof(float),(4*1024*1024));
 
 			switch (ptr->file_type) {
 			case FORMAT_BIN_FLOAT:
