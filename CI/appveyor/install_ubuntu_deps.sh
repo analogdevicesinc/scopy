@@ -13,13 +13,14 @@ QWTPOLAR_BRANCH=master # not used
 LIBSIGROK_BRANCH=master
 LIBSIGROKDECODE_BRANCH=master #not used
 
+QMAKE=/home/adi/Qt/5.15.0/gcc_64/bin/qmake
 set -e
 cd ~
 WORKDIR=${PWD}
 
 sudo add-apt-repository -y ppa:gnuradio/gnuradio-releases
 
-sudo apt-get -y install libxml2-dev libxml2 flex bison swig libpython3-all-dev python3 python3-numpy libfftw3-bin libfftw3-dev libfftw3-3 liblog4cpp5v5 liblog4cpp5-dev libboost1.65-dev libboost1.65 g++ git cmake autoconf libzip4 libzip-dev libglib2.0-dev libsigc++-2.0-dev libglibmm-2.4-dev doxygen qt5-default qtcreator qttools5-dev qttools5-dev-tools curl libvolk1-bin libvolk1-dev libvolk1.3 libgmp-dev libqt5svg5-dev libmatio-dev liborc-0.4-dev qtdeclarative5-dev
+sudo apt-get -y install libxml2-dev libxml2 flex bison swig libpython3-all-dev python3 python3-numpy libfftw3-bin libfftw3-dev libfftw3-3 liblog4cpp5v5 liblog4cpp5-dev libboost1.65-dev libboost1.65 g++ git cmake autoconf libzip4 libzip-dev libglib2.0-dev libsigc++-2.0-dev libglibmm-2.4-dev doxygen curl libvolk1-bin libvolk1-dev libvolk1.3 libgmp-dev libmatio-dev liborc-0.4-dev subversion mesa-common-dev libgl1-mesa-dev
 
 sudo apt-get -y update
 sudo apt-get -y install gnuradio
@@ -161,7 +162,7 @@ build_libsigrokdecode() {
 	mkdir -p ${WORKDIR}/libsigrokdecode/build-${ARCH}
 	cd ${WORKDIR}/libsigrokdecode
 
-	wget http://sigrok.org/download/source/libsigrokdecode/libsigrokdecode-0.4.1.tar.gz -O- \
+	wget http://sigrok.org/download/source/libsigrokdecode/libsigrokdecode-0.5.3.tar.gz -O- \
 		| tar xz --strip-components=1 -C ${WORKDIR}/libsigrokdecode
 
 #	cd build-${ARCH}
@@ -185,7 +186,7 @@ build_qwt() {
 	# Fix prefix
 	sed -i 's/\/usr\/local\/qwt-$$QWT_VERSION-svn/\/usr\/local/g' qwtconfig.pri
 
-	qmake qwt.pro
+	$QMAKE qwt.pro
 	make $JOBS
 	sudo make install
 }
@@ -199,11 +200,12 @@ build_qwtpolar() {
 		| tar xj --strip-components=1 -C ${WORKDIR}/qwtpolar
 
 	cd ~/qwtpolar
-	patch -p1 <  ${WORKDIR}/projects/scopy/CI/appveyor/patches/qwtpolar-qwt-qt-compat.patch
+	wget https://raw.githubusercontent.com/analogdevicesinc/scopy/master/CI/appveyor/patches/qwtpolar-qwt-qt-compat.patch
+	patch -p1 < qwtpolar-qwt-qt-compat.patch
 	sed -i 's/\/usr\/local\/qwtpolar-$$QWT_POLAR_VERSION/\/usr\/local/g' qwtpolarconfig.pri
 	sed -i 's/QWT_POLAR_CONFIG     += QwtPolarExamples/ /g' qwtpolarconfig.pri
 	sed -i 's/QWT_POLAR_CONFIG     += QwtPolarDesigner/ /g' qwtpolarconfig.pri
-	qmake qwtpolar.pro
+	$QMAKE qwtpolar.pro
 	make $JOBS
 	sudo make install
 
@@ -217,5 +219,5 @@ build_grscopy
 build_grm2k
 build_qwt
 build_qwtpolar
-build_libsigrok
+#build_libsigrok
 build_libsigrokdecode
