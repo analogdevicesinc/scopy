@@ -558,20 +558,20 @@ void SignalGenerator_API::setWaveformHoldLow(const QList<double>& list)
 
 
 
-QList<double> SignalGenerator_API::getMathFreq() const
+QList<double> SignalGenerator_API::getMathRecordLength() const
 {
 	QList<double> list;
 
 	for (int i = 0; i < gen->channels.size(); i++) {
 		auto ptr = gen->getData(gen->channels[i]);
 
-		list.append(ptr->math_freq);
+		list.append(ptr->math_record_length);
 	}
 
 	return list;
 }
 
-void SignalGenerator_API::setMathFreq(const QList<double>& list)
+void SignalGenerator_API::setMathRecordLength(const QList<double>& list)
 {
 	if (list.size() != gen->channels.size()) {
 		return;
@@ -580,11 +580,42 @@ void SignalGenerator_API::setMathFreq(const QList<double>& list)
 	for (int i = 0; i < gen->channels.size(); i++) {
 		auto ptr = gen->getData(gen->channels[i]);
 
-		ptr->math_freq = list.at(i);
+		ptr->math_record_length = list.at(i);
 	}
 
-	gen->mathFrequency->setValue(gen->getCurrentData()->math_freq);
+	gen->mathRecordLength->setValue(gen->getCurrentData()->math_record_length);
 }
+
+
+
+QList<double> SignalGenerator_API::getMathSampleRate() const
+{
+	QList<double> list;
+
+	for (int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(gen->channels[i]);
+
+		list.append(ptr->math_sr);
+	}
+
+	return list;
+}
+
+void SignalGenerator_API::setMathSampleRate(const QList<double>& list)
+{
+	if (list.size() != gen->channels.size()) {
+		return;
+	}
+
+	for (int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(gen->channels[i]);
+
+		ptr->math_sr = list.at(i);
+	}
+
+	gen->mathSampleRate->setValue(gen->getCurrentData()->math_sr);
+}
+
 
 QList<QString> SignalGenerator_API::getMathFunction() const
 {
