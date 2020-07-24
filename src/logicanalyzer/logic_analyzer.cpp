@@ -1236,10 +1236,16 @@ void LogicAnalyzer::setupDecoders()
 		deleteBtn->setVisible(true);
 
 		connect(deleteBtn, &QPushButton::clicked, [=](){
-			ui->decoderEnumeratorLayout->addWidget(decoderMenuItem);
 			decoderMenuItem->deleteLater();
 
 			int chIdx = m_plotCurves.indexOf(curve);
+
+			if (chIdx == m_selectedChannel) {
+				channelSelectedChanged(chIdx, false);
+			} else if (chIdx < m_selectedChannel) {
+				m_selectedChannel--;
+			}
+
 			bool groupDeleted = false;
 			m_plot.removeFromGroup(chIdx,
 					       m_plot.getGroupOfChannel(chIdx).indexOf(chIdx),
@@ -1258,8 +1264,15 @@ void LogicAnalyzer::setupDecoders()
 
 			disconnect(connectionHandle);
 
-
 			delete curve;
+
+			// reposition decoder menu items after deleting one
+			for (int i = chIdx; i < m_plotCurves.size(); ++i) {
+				const int index = i - 16; // subtract logic channels count
+				QLayoutItem *next = ui->decoderEnumeratorLayout->itemAtPosition((index + 1) / 2, (index + 1) % 2);
+				ui->decoderEnumeratorLayout->removeItem(next);
+				ui->decoderEnumeratorLayout->addItem(next, index / 2, index % 2);
+			}
 		});
 
 		const int itemsInLayout = ui->decoderEnumeratorLayout->count();
