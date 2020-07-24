@@ -217,6 +217,8 @@ public:
 	                         double min_value = 0.0, double max_value = 0.0,
 	                         bool hasProgressWidget = true,
 	                         bool invertCircle = false, QWidget *parent = 0, std::vector<double> steps = {1,2,5});
+	int getIntegerDivider();
+	void setIntegerDivider(int integer = 0);
 
 public Q_SLOTS:
 	void stepUp();
@@ -224,6 +226,7 @@ public Q_SLOTS:
 
 	void setMinValue(double);
 	void setMaxValue(double);
+	void setValue(double);
 
 	void enableNumberSeriesRebuild(bool enable);
 
@@ -231,6 +234,8 @@ protected:
 	adiscope::NumberSeries m_steps;
 	double m_fine_increment;
 	bool m_numberSeriesRebuild;
+	int integer_divider;
+	int integer_step;
 };
 
 class PositionSpinButton: public SpinBoxA
