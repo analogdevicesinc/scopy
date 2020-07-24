@@ -51,8 +51,10 @@ Tool::Tool(struct iio_context *ctx, ToolMenuItem *toolMenuItem,
 
 	readPreferences();
 
-	connect(api, &ApiObject::loadingFinished,
-		this, &Tool::loadState);
+	if (api) {
+		connect(api, &ApiObject::loadingFinished,
+			this, &Tool::loadState);
+	}
 
 	connect(toolMenuItem, &ToolMenuItem::detach,
 		this, &Tool::detached);
@@ -96,6 +98,11 @@ to ensure their file dialogs are configured correspondingly */
 void Tool::setNativeDialogs(bool nativeDialogs)
 {
 	m_useNativeDialogs = nativeDialogs;
+}
+
+ApiObject *Tool::getApi()
+{
+	return api;
 }
 
 void Tool::readPreferences()

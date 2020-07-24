@@ -23,7 +23,6 @@
 #include "network_analyzer.hpp"
 #include "signal_generator.hpp"
 #include "spinbox_a.hpp"
-#include "osc_adc.h"
 #include "hardware_trigger.hpp"
 #include "ui_network_analyzer.h"
 #include "filemanager.h"
@@ -47,8 +46,6 @@
 #include <gnuradio/blocks/vector_to_stream.h>
 #include <scopy/goertzel_scopy_fc.h>
 
-#include "hw_dac.h"
-
 #include <algorithm>
 
 #include <QThread>
@@ -62,8 +59,13 @@
 
 #include <QElapsedTimer>
 
+/* libm2k includes */
+#include <libm2k/contextbuilder.hpp>
+
 using namespace adiscope;
 using namespace gr;
+using namespace libm2k::context;
+using namespace libm2k::analog;
 
 void NetworkAnalyzer::_configureDacFlowgraph()
 {
@@ -71,13 +73,11 @@ void NetworkAnalyzer::_configureDacFlowgraph()
 	top_block = make_top_block("Signal Generator");
 	source_block = analog::sig_source_f::make(1, analog::GR_SIN_WAVE,
 			1, 1, 1);
-	f2s_block = blocks::float_to_short::make(1, 1);
-	head_block = blocks::head::make(sizeof(short), 1);
-	vector_block = blocks::vector_sink_s::make();
+	head_block = blocks::head::make(sizeof(float), 1);
+	vector_block = blocks::vector_sink_f::make();
 
 	// Connect the blocks for the sine wave generation
-	top_block->connect(source_block, 0, f2s_block, 0);
-	top_block->connect(f2s_block, 0, head_block, 0);
+	top_block->connect(source_block, 0, head_block, 0);
 	top_block->connect(head_block, 0, vector_block, 0);
 }
 
@@ -90,10 +90,7 @@ void NetworkAnalyzer::_configureAdcFlowgraph(size_t buffer_size)
 
 		// Get the available sample rates for the m2k-adc
 		// Make sure the values are sorted in ascending order (1000,..,100e6)
-		sampleRates = SignalGenerator::get_available_sample_rates(adc);
-		qSort(sampleRates.begin(), sampleRates.end(), qLess<unsigned long>());
-
-		auto m2k_adc = std::dynamic_pointer_cast<M2kAdc>(adc_dev);
+		sampleRates = m_m2k_analogin->getAvailableSampleRates();
 
 		dc_cancel1 = gnuradio::get_initial_sptr(
 					new cancel_dc_offset_block(1, false));
@@ -121,12 +118,10 @@ void NetworkAnalyzer::_configureAdcFlowgraph(size_t buffer_size)
 		conj = gr::blocks::multiply_conjugate_cc::make();
 		c2a = gr::blocks::complex_to_arg::make();
 		signal = boost::make_shared<signal_sample>();
-		adc_conv = boost::make_shared<adc_sample_conv>(2, m2k_adc);
-
-		adc_conv->setCorrectionGain(0,
-			m2k_adc->chnCorrectionGain(0));
-		adc_conv->setCorrectionGain(1,
-			m2k_adc->chnCorrectionGain(1));
+		adc_conv1 = gr::blocks::multiply_const_ff::make(
+			m_m2k_analogin->getScalingFactor(static_cast<ANALOG_IN_CHANNEL>(0)));
+		adc_conv2 = gr::blocks::multiply_const_ff::make(
+			m_m2k_analogin->getScalingFactor(static_cast<ANALOG_IN_CHANNEL>(1)));
 
 		capture_top_block->connect(capture1, 0, f11, 0);
 		capture_top_block->connect(capture2, 0, f21, 0);
@@ -158,10 +153,10 @@ void NetworkAnalyzer::_configureAdcFlowgraph(size_t buffer_size)
 			captureDone = true;
 		});
 
-		capture_top_block->connect(dc_cancel1, 0, adc_conv, 0);
-		capture_top_block->connect(dc_cancel2, 0, adc_conv, 1);
-		capture_top_block->connect(adc_conv, 0, sink1, 0);
-		capture_top_block->connect(adc_conv, 1, sink2, 0);
+		capture_top_block->connect(dc_cancel1, 0, adc_conv1, 0);
+		capture_top_block->connect(dc_cancel2, 0, adc_conv2, 0);
+		capture_top_block->connect(adc_conv1, 0, sink1, 0);
+		capture_top_block->connect(adc_conv2, 0, sink2, 0);
 	}
 
 	// Build the flowgraph only once
@@ -169,46 +164,37 @@ void NetworkAnalyzer::_configureAdcFlowgraph(size_t buffer_size)
 }
 
 NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
-				 std::shared_ptr<GenericAdc>& adc_dev,
-				 QList<std::shared_ptr<GenericDac>> dacs,
 				 ToolMenuItem *toolMenuItem, QJSEngine *engine,
 				 ToolLauncher *parent) :
 	Tool(ctx, toolMenuItem, new NetworkAnalyzer_API(this), "Network Analyzer", parent),
 	ui(new Ui::NetworkAnalyzer),
-	adc_dev(adc_dev),
+	m_m2k_context(nullptr),
+	m_m2k_analogin(nullptr),
+	m_m2k_analogout(nullptr),
+	m_adc_nb_channels(0),
+	m_dac_nb_channels(0),
 	d_cursorsEnabled(false),
-	m_stop(true), amp1(nullptr), amp2(nullptr),
+	m_stop(true),
 	wheelEventGuard(nullptr), wasChecked(false),
-	dacs(dacs), justStarted(false),
+	justStarted(false),
 	iterationsThreadCanceled(false), iterationsThreadReady(false),
 	iterationsThread(nullptr), autoAdjustGain(true),
 	filterDc(false), m_initFlowgraph(true), m_hasReference(false),
 	m_importDataLoaded(false)
 {
-	iio = iio_manager::get_instance(ctx,
-					filt->device_name(TOOL_NETWORK_ANALYZER, 2));
+	if (ctx) {
+		iio = iio_manager::get_instance(ctx,
+						filt->device_name(TOOL_NETWORK_ANALYZER, 2));
 
-	adc = filt->find_device(ctx, TOOL_NETWORK_ANALYZER, 2);
-
-	dac_channels.push_back(filt->find_channel(ctx, TOOL_NETWORK_ANALYZER, 0, true));
-	dac_channels.push_back(filt->find_channel(ctx, TOOL_NETWORK_ANALYZER, 1, true));
-
-	for (const auto& channel : dac_channels) {
-		if (!channel) {
-			throw std::runtime_error("Unable to find channels in filter file");
-		}
-	}
-
-	/* FIXME: TODO: Move this into a HW class / lib M2k */
-	struct iio_device *fabric = iio_context_find_device(ctx, "m2k-fabric");
-
-	if (fabric) {
-		this->amp1 = iio_device_find_channel(fabric, "voltage0", true);
-		this->amp2 = iio_device_find_channel(fabric, "voltage1", true);
-
-		if (amp1 && amp2) {
-			iio_channel_attr_write_bool(amp1, "powerdown", true);
-			iio_channel_attr_write_bool(amp2, "powerdown", true);
+		m_m2k_context = m2kOpen(ctx, "");
+		if (m_m2k_context) {
+			m_m2k_analogin = m_m2k_context->getAnalogIn();
+			m_m2k_analogout = m_m2k_context->getAnalogOut();
+			m_adc_nb_channels = m_m2k_analogin->getNbChannels();
+			m_dac_nb_channels = m_m2k_analogout->getNbChannels();
+			m_m2k_analogin->setKernelBuffersCount(1);
+			m_m2k_analogout->setKernelBuffersCount(0, 1);
+			m_m2k_analogout->setKernelBuffersCount(1, 1);
 		}
 	}
 
@@ -267,16 +253,8 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	});
 
 
-	std::vector<unsigned long> rates;
-	rates.resize(dac_channels.size());
-	std::transform(dac_channels.begin(), dac_channels.end(),
-		       rates.begin(),
-	[](struct iio_channel *ch) {
-		return SignalGenerator::get_max_sample_rate(
-			       iio_channel_get_device(ch));
-	});
-
-	unsigned long max_samplerate = *std::max_element(rates.begin(), rates.end());
+	std::vector<double> values = m_m2k_analogout->getAvailableSampleRates(0);
+	double max_samplerate = values.back();
 
 	m_dBgraph.setColor(QColor(255,114,0));
 	m_dBgraph.setXTitle(tr("Frequency (Hz)"));
@@ -896,47 +874,44 @@ void NetworkAnalyzer::updateNumSamples(bool force)
 
 void NetworkAnalyzer::updateGainMode()
 {
-	auto m2k_adc = std::dynamic_pointer_cast<M2kAdc>(adc_dev);
-
 	int responseGainCmbIndex = ui->responseGainCmb->currentIndex();
 	int responseChannel = ui->btnRefChn->isChecked() ? 1 : 0;
 	int referenceChannel = 1 - responseChannel;
 
-	if (m2k_adc) {
+	if (m_m2k_analogin) {
 		double sweep_ampl = amplitude->value();
-		QPair<double, double> range = m2k_adc->inputRange(
-						      M2kAdc::HIGH_GAIN_MODE);
-		double threshold = range.second; // - range.first
-		M2kAdc::GainMode gain_mode;
+		auto adc_range_limits = m_m2k_analogin->getRangeLimits(libm2k::analog::PLUS_MINUS_2_5V);
+		double threshold = adc_range_limits.second; // - range.first
+		libm2k::analog::M2K_RANGE gain_mode;
 
 		if ((sweep_ampl / 2.0) + offset->value() > threshold
 				|| -(sweep_ampl / 2.0) + offset->value() < -threshold) {
-			gain_mode = M2kAdc::LOW_GAIN_MODE;
+			gain_mode = libm2k::analog::PLUS_MINUS_25V;
 		} else {
-			gain_mode = M2kAdc::HIGH_GAIN_MODE;
+			gain_mode = libm2k::analog::PLUS_MINUS_2_5V;
 		}
 
-		for (int chn = 0; chn < static_cast<int>(m2k_adc->numAdcChannels()); chn++) {
+		for (unsigned int chn = 0; chn < m_adc_nb_channels; chn++) {
+			libm2k::analog::ANALOG_IN_CHANNEL channel = static_cast<libm2k::analog::ANALOG_IN_CHANNEL>(chn);
 			if (chn == referenceChannel) {
-				m2k_adc->setChnHwGainMode(chn, gain_mode);
+				m_m2k_analogin->setRange(channel, gain_mode);
 			} else if (chn == responseChannel) {
 				if (!autoAdjustGain) {
-					auto gain = responseGainCmbIndex == 1 ? M2kAdc::LOW_GAIN_MODE
-									      : M2kAdc::HIGH_GAIN_MODE;
-					m2k_adc->setChnHwGainMode(chn, gain);
+					auto gain = responseGainCmbIndex == 1 ? libm2k::analog::PLUS_MINUS_25V
+									      : libm2k::analog::PLUS_MINUS_2_5V;
+					m_m2k_analogin->setRange(channel, gain);
 				} else {
-					m2k_adc->setChnHwGainMode(chn, gain_mode);
+					m_m2k_analogin->setRange(channel, gain_mode);
 				}
 			}
 		}
 	}
 }
 
-unsigned long NetworkAnalyzer::_getBestSampleRate(double frequency, const struct iio_device *dev)
+unsigned long NetworkAnalyzer::_getBestSampleRate(double frequency, unsigned int chn_idx)
 {
-	QVector<unsigned long> values = SignalGenerator::get_available_sample_rates(dev);
-
-	qSort(values.begin(), values.end(), qLess<unsigned long>());
+	std::vector<double> values = m_m2k_analogout->getAvailableSampleRates(chn_idx);
+	std::sort(values.begin(), values.end(), std::less<double>());
 
 	for (const auto &rate : values) {
 		if (rate == values[0]) {
@@ -1042,7 +1017,7 @@ void NetworkAnalyzer::computeFrequencyArray()
 			frequency = min_freq + (double) i * step;
 		}
 
-		unsigned long rate = _getBestSampleRate(frequency, iio_channel_get_device(dac_channels[0]));
+		unsigned long rate = _getBestSampleRate(frequency, 0);
 		size_t bufferSize = _getSamplesCount(frequency, rate);
 
 		iterations.push_back(networkIteration(frequency, rate, bufferSize));
@@ -1061,9 +1036,6 @@ void NetworkAnalyzer::computeFrequencyArray()
 
 void NetworkAnalyzer::setFilterParameters()
 {
-
-	auto m2k_adc = std::dynamic_pointer_cast<M2kAdc>(adc_dev);
-
 	f11->set_enable(iio->freq_comp_filt[0][0]->get_enable());
 	f12->set_enable(iio->freq_comp_filt[0][1]->get_enable());
 	f21->set_enable(iio->freq_comp_filt[1][0]->get_enable());
@@ -1079,25 +1051,29 @@ void NetworkAnalyzer::setFilterParameters()
 	f21->set_filter_gain(iio->freq_comp_filt[1][0]->get_filter_gain());
 	f22->set_filter_gain(iio->freq_comp_filt[1][1]->get_filter_gain());
 
-	f11->set_sample_rate(m2k_adc->sampleRate());
-	f12->set_sample_rate(m2k_adc->sampleRate());
-	f21->set_sample_rate(m2k_adc->sampleRate());
-	f22->set_sample_rate(m2k_adc->sampleRate());
+	if (m_m2k_analogin) {
+		try {
+			double adc_samplerate = m_m2k_analogin->getSampleRate();
+			f11->set_sample_rate(adc_samplerate);
+			f12->set_sample_rate(adc_samplerate);
+			f21->set_sample_rate(adc_samplerate);
+			f22->set_sample_rate(adc_samplerate);
 
-	f11->set_high_gain(m2k_adc->chnHwGainMode(0));
-	f12->set_high_gain(m2k_adc->chnHwGainMode(0));
-	f21->set_high_gain(m2k_adc->chnHwGainMode(1));
-	f22->set_high_gain(m2k_adc->chnHwGainMode(1));
+			libm2k::analog::M2K_RANGE range0 = m_m2k_analogin->getRange(static_cast<ANALOG_IN_CHANNEL>(0));
+			libm2k::analog::M2K_RANGE range1 = m_m2k_analogin->getRange(static_cast<ANALOG_IN_CHANNEL>(1));
+			f11->set_high_gain(range0);
+			f12->set_high_gain(range0);
+			f21->set_high_gain(range1);
+			f22->set_high_gain(range1);
+		} catch (std::exception &e) {
+			qDebug(CAT_NETWORK_ANALYZER) << e.what();
+		}
+	}
 }
 
 void NetworkAnalyzer::goertzel()
 {
 	// Network Analyzer run method using the Goertzel Algorithm (single bin DFT)
-
-	// Enable the available dac channels
-	for (auto& channel : dac_channels) {
-		iio_channel_enable(channel);
-	}
 
 	// Adjust the gain of the ADC channels based on sweep settings
 	updateGainMode();
@@ -1114,6 +1090,12 @@ void NetworkAnalyzer::goertzel()
 
 	justStarted = true;
 
+	if (m_m2k_analogin) {
+		for (unsigned int chn_idx = 0; chn_idx < m_adc_nb_channels; chn_idx++) {
+			m_m2k_analogin->enableChannel(chn_idx, true);
+		}
+	}
+
 	for (int i = 0; !m_stop && i < iterations.size(); ++i) {
 
 		// Get current sweep settings
@@ -1125,27 +1107,23 @@ void NetworkAnalyzer::goertzel()
 		double offsetValue = offset->value();
 
 		// Create and push the generated sine waves to the DACs
-		QVector<struct iio_buffer *> buffers;
+		std::vector<std::vector<double>> buffers;
 
-		for (const auto& channel : dac_channels) {
-			const struct iio_device *dev = iio_channel_get_device(channel);
-			iio_device_attr_write_bool(dev, "dma_sync", true);
-			struct iio_buffer *buf_dac = generateSinWave(dev,
-						     frequency, amplitudeValue, offsetValue,
-						     rate, samples_count);
-			buffers.push_back(buf_dac);
-
-			if (!buf_dac) {
-				qCritical() << "Unable to create DAC buffer";
-				break;
+		if (m_m2k_analogout) {
+			try {
+				for (unsigned int chn_idx = 0; chn_idx < m_dac_nb_channels; chn_idx++) {
+					m_m2k_analogout->enableChannel(chn_idx, true);
+					std::vector<double> buf_dac = generateSinWave(chn_idx,
+										      frequency, amplitudeValue, offsetValue,
+										      rate, samples_count);
+					buffers.push_back(buf_dac);
+				}
+				// Sleep before DACs start
+				QThread::msleep(pushDelay->value());
+				m_m2k_analogout->push(buffers);
+			} catch (std::exception &e) {
+				return;
 			}
-		}
-
-		// Sleep before DACs start
-		QThread::msleep(pushDelay->value());
-		for (const auto& channel : dac_channels) {
-			const struct iio_device *dev = iio_channel_get_device(channel);
-			iio_device_attr_write_bool(dev, "dma_sync", false);
 		}
 
 
@@ -1154,16 +1132,6 @@ void NetworkAnalyzer::goertzel()
 
 		// Compute capture params for the ADC
 		computeCaptureParams(frequency, buffer_size, adc_rate);
-
-		iio_device_attr_write_double(adc, "oversampling_ratio", 1);
-		adc_dev->setSampleRate(adc_rate);
-
-		auto m2k_adc = std::dynamic_pointer_cast<M2kAdc>(adc_dev);
-		double corr_gain = 1.0;
-		double hw_gain = 1.0;
-
-		corr_gain = m2k_adc->chnCorrectionGain(1);
-		hw_gain = m2k_adc->gainAt(m2k_adc->chnHwGainMode(1));
 
 		if (buffer_size == 0) {
 			qDebug(CAT_NETWORK_ANALYZER) << "buffer size 0";
@@ -1181,64 +1149,45 @@ void NetworkAnalyzer::goertzel()
 		goertzel2->set_rate(adc_rate);
 
 
+		if (m_m2k_analogin) {
+			try {
+				m_m2k_analogin->setOversamplingRatio(1);
+				m_m2k_analogin->setSampleRate(adc_rate);
+			} catch (std::exception &e) {
+				qDebug(CAT_NETWORK_ANALYZER) << e.what();
+			}
+		}
+
+
 		setFilterParameters();
-		// TODO: Use libm2k here
 
-		std::vector<struct iio_channel *> adc_channels;
+		// Sleep before ADC capture
+		QThread::msleep(captureDelay->value());
 
-		unsigned int nb_channels = iio_device_get_channels_count(adc);
-		for (unsigned int i = 0; i < nb_channels; i++) {
-			iio_channel_disable(iio_device_get_channel(adc, i));
-		}
-		for (unsigned int i = 0; i < nb_channels; i++) {
-			struct iio_channel *chn =
-					iio_device_get_channel(adc, i);
-			iio_channel_enable(chn);
-			adc_channels.push_back(chn);
-		}
-
-
-		adc_buffer = iio_device_create_buffer(adc, buffer_size, false);
-
-		size_t ret = iio_buffer_refill(adc_buffer);
-		if (m_stop) {
-			iio_buffer_destroy(adc_buffer);
-			adc_buffer = nullptr;
-			for (auto& buffer : buffers) {
-				iio_buffer_destroy(buffer);
+		const short* buffer_p = nullptr;
+		if (m_m2k_analogin) {
+			try {
+				buffer_p = m_m2k_analogin->getSamplesRawInterleaved(buffer_size);
+			} catch (std::exception &e) {
+				qDebug(CAT_NETWORK_ANALYZER) << e.what();
+				return;
 			}
-			return;
+			if (m_stop) {
+				return;
+			}
 		}
 
-		std::vector<std::vector<short>> data;
-
-		for (int i = 0; i < 2; ++i) {
-			std::vector<short> d;
-			for (int j = 0; j < buffer_size; ++j) {
-				d.push_back(j);
-			}
-			data.push_back(d);
-		}
-
-		for (auto chn : adc_channels) {
-			ptrdiff_t p_inc = iio_buffer_step(adc_buffer);
-			uintptr_t p_dat;
-			uintptr_t p_end = (uintptr_t)iio_buffer_end(adc_buffer);
-			unsigned int i;
-			for (i = 0, p_dat = (uintptr_t)iio_buffer_first(adc_buffer, adc_channels[0]);
-					p_dat < p_end; p_dat += p_inc, i++)
-			{
-				for (unsigned int ch = 0; ch < data.size(); ch++) {
-					data[ch][i] = ((int16_t*)p_dat)[ch];
-				}
-			}
+		std::vector<short> data0;
+		std::vector<short> data1;
+		for (unsigned int i = 0; i < buffer_size; i++) {
+			data0.push_back(buffer_p[i * 2]);
+			data1.push_back(buffer_p[i * 2 + 1]);
 		}
 
 		capture1->rewind();
-		capture1->set_data(data[0]);
+		capture1->set_data(data0);
 		capture2->rewind();
-		capture2->set_data(data[1]);
-
+		capture2->set_data(data1);
 		{
 			boost::unique_lock<boost::mutex> lock(bufferMutex);
 			sink1->reset();
@@ -1249,24 +1198,14 @@ void NetworkAnalyzer::goertzel()
 
 		QElapsedTimer t;
 		t.start();
-		// Sleep before ADC capture
-		QThread::msleep(captureDelay->value());
 
 		capture_top_block->run();
 
 		float dcOffset = 0.0;
 		dcOffset = dc_cancel2->get_dc_offset();
-		dcOffset = adc_sample_conv::convSampleToVolts(dcOffset,
-							corr_gain, 1, 0, hw_gain);
+		dcOffset = m_m2k_analogin->convertRawToVolts(1, dcOffset);
 
-
-		// Clear the iio_buffers that were created
-		for (auto& buffer : buffers) {
-			iio_buffer_destroy(buffer);
-		}
-
-		iio_buffer_destroy(adc_buffer);
-		adc_buffer = nullptr;
+		m_m2k_analogout->stop();
 
 		// Process was cancelled
 		if (m_stop) {
@@ -1295,7 +1234,6 @@ void NetworkAnalyzer::goertzel()
 
 
 	}
-
 	Q_EMIT sweepDone();
 }
 
@@ -1435,14 +1373,14 @@ void NetworkAnalyzer::plot(double frequency, double mag1, double mag2,
 	d_frequencyHandle->triggerMove();
 
 	int responseChanel = ui->btnRefChn->isChecked() ? 1 : 0;
-	auto m2k_adc = std::dynamic_pointer_cast<M2kAdc>(adc_dev);
-	QString gain = !m2k_adc->chnHwGainMode(responseChanel) ? tr("Low") : tr("High");
+	libm2k::analog::ANALOG_IN_CHANNEL chn = static_cast<libm2k::analog::ANALOG_IN_CHANNEL>(responseChanel);
+	QString gain = !m_m2k_analogin->getRange(chn) ? tr("Low") : tr("High");
 	ui->gainLabel->setText(tr("Gain Mode: ") + gain);
 
 	if (iterationStats.size() < samplesCount->value()) {
-		iterationStats.push_back(NetworkIterationStats(dcVoltage, m2k_adc->chnHwGainMode(responseChanel), hasError));
+		iterationStats.push_back(NetworkIterationStats(dcVoltage, m_m2k_analogin->getRange(chn), hasError));
 	} else {
-		iterationStats[index++] = NetworkIterationStats(dcVoltage, m2k_adc->chnHwGainMode(responseChanel), hasError);
+		iterationStats[index++] = NetworkIterationStats(dcVoltage, m_m2k_analogin->getRange(chn), hasError);
 		if (index == iterationStats.size()) {
 			index = 0;
 		}
@@ -1453,15 +1391,15 @@ void NetworkAnalyzer::plot(double frequency, double mag1, double mag2,
 
 bool NetworkAnalyzer::_checkMagForOverrange(double magnitude)
 {
-	auto m2k_adc = std::dynamic_pointer_cast<M2kAdc>(adc_dev);
-	double corr_gain = 1.0;
-	double hw_gain = 1.0;
+	int responseChannel = ui->btnRefChn->isChecked() ? 1 : 0;
+	double vlsb = 0.0;
 
-	corr_gain = m2k_adc->chnCorrectionGain(1);
-	hw_gain = m2k_adc->gainAt(m2k_adc->chnHwGainMode(1));
-
-	double vlsb = adc_sample_conv::convSampleToVolts(1,
-							 corr_gain, 1, 0, hw_gain);
+	try {
+		vlsb = m_m2k_analogin->getScalingFactor(static_cast<ANALOG_IN_CHANNEL>(responseChannel));
+	} catch (std::exception &e) {
+		qDebug(CAT_NETWORK_ANALYZER) << e.what();
+		return false;
+	}
 
 	double magnitudeThreshold = 20 * std::log10(3 * vlsb / amplitude->value());
 
@@ -1481,23 +1419,20 @@ bool NetworkAnalyzer::_checkMagForOverrange(double magnitude)
 
 double NetworkAnalyzer::autoUpdateGainMode(double magnitude, double magnitudeGain, float dcVoltage)
 {
-	auto m2k_adc = std::dynamic_pointer_cast<M2kAdc>(adc_dev);
-
 	// compute Vout knowing that magnitude = 20 * log(Vout / Vin);
 	double Vin = amplitude->value();
 	double Vout = pow(10.0, (magnitude + magnitudeGain) / 20.0) * Vin;
 
-	QPair<double, double> range = m2k_adc->inputRange(
-					      M2kAdc::HIGH_GAIN_MODE);
-	double hi = range.second;
-	double lo = range.first;
+	std::pair<double, double> adc_range_limits = m_m2k_analogin->getRangeLimits(libm2k::analog::PLUS_MINUS_2_5V);
+	double hi = adc_range_limits.second;
+	double lo = adc_range_limits.first;
 
 	double hi_hi = hi + 0.1;
 	double hi_lo = hi - 0.1;
 	double lo_hi = lo + 0.1;
 	double lo_lo = lo - 0.1;
 
-	M2kAdc::GainMode gain;
+	libm2k::analog::M2K_RANGE gain;
 
 	auto insideDeltaZone = [&](double voltage) {
 		return (voltage > hi_lo && voltage < hi_hi)
@@ -1511,38 +1446,40 @@ double NetworkAnalyzer::autoUpdateGainMode(double magnitude, double magnitudeGai
 		if (noAdjustAllowedDown && noAdjustAllowedUp) {
 			return magnitudeGain;
 		}
-		gain = M2kAdc::LOW_GAIN_MODE;
+		gain = libm2k::analog::PLUS_MINUS_25V;
 	}
 	if (Vout / 2.0 + dcVoltage < hi_hi && -Vout / 2.0 + dcVoltage > lo_lo) {
 		if (noAdjustAllowedDown || noAdjustAllowedUp) {
 			return magnitudeGain;
 		}
-		gain = M2kAdc::HIGH_GAIN_MODE;
+		gain = libm2k::analog::PLUS_MINUS_2_5V;
 	}
 
 	int responseChannel = ui->btnRefChn->isChecked() ? 1 : 0;
+	libm2k::analog::ANALOG_IN_CHANNEL chn = static_cast<libm2k::analog::ANALOG_IN_CHANNEL>(responseChannel);
 
-	double value = m2k_adc->gainAt(M2kAdc::LOW_GAIN_MODE) / m2k_adc->gainAt(M2kAdc::HIGH_GAIN_MODE);
+	double value = m_m2k_analogin->getValueForRange(PLUS_MINUS_25V) /
+			m_m2k_analogin->getValueForRange(PLUS_MINUS_2_5V);
 	double magnitudeGainBetweenGainModes = 10.0 * log10(1.0 / value) - 10.0 * log10(1.0 * value);
 
 
-	if (m2k_adc->chnHwGainMode(responseChannel) != gain) {
+	if (m_m2k_analogin->getRange(chn) != gain) {
 		if (autoAdjustGain) {
-			m2k_adc->setChnHwGainMode(responseChannel, gain);
+			m_m2k_analogin->setRange(chn, gain);
 		} else {
 			int selectedResponseGain = ui->responseGainCmb->currentIndex();
-			gain = (selectedResponseGain == 1 ? M2kAdc::LOW_GAIN_MODE
-							  : M2kAdc::HIGH_GAIN_MODE);
+			gain = (selectedResponseGain == 1 ? libm2k::analog::PLUS_MINUS_25V
+							  : libm2k::analog::PLUS_MINUS_2_5V);
 		}
 
-		if (gain == M2kAdc::LOW_GAIN_MODE) {
-			if (gain != m2k_adc->chnHwGainMode(1 - responseChannel)) {
+		if (gain == libm2k::analog::PLUS_MINUS_25V) {
+			if (gain != m_m2k_analogin->getRange(static_cast<libm2k::analog::ANALOG_IN_CHANNEL>(1 - responseChannel))) {
 				return magnitudeGainBetweenGainModes;
 			} else {
 				return 0.0;
 			}
 		} else {
-			if (gain != m2k_adc->chnHwGainMode(1 - responseChannel)) {
+			if (gain != m_m2k_analogin->getRange(static_cast<libm2k::analog::ANALOG_IN_CHANNEL>(1 - responseChannel))) {
 				return -magnitudeGainBetweenGainModes;
 			} else {
 				return 0.0;
@@ -1566,12 +1503,6 @@ void NetworkAnalyzer::stop()
 void NetworkAnalyzer::startStop(bool pressed)
 {
 	m_stop = !pressed;
-
-	if (amp1 && amp2) {
-		/* FIXME: TODO: Move this into a HW class / lib M2k */
-		iio_channel_attr_write_bool(amp1, "powerdown", !pressed);
-		iio_channel_attr_write_bool(amp2, "powerdown", !pressed);
-	}
 
 	if (m_running == pressed) {
 		return;
@@ -1613,52 +1544,43 @@ void NetworkAnalyzer::startStop(bool pressed)
 		ui->statusLabel->setText(tr("Stopping..."));
 		QCoreApplication::processEvents();
 		m_stop = true;
-		if (adc_buffer) {
-			iio_buffer_cancel(adc_buffer);
+		try {
+			m_m2k_analogin->cancelAcquisition();
+			m_m2k_analogout->cancelBuffer();
+			thd.waitForFinished();
+			m_m2k_analogin->stopAcquisition();
+			m_m2k_analogout->stop();
+		} catch (std::exception &e) {
+			qDebug(CAT_NETWORK_ANALYZER) << e.what();
 		}
-		thd.waitForFinished();
 		m_dBgraph.sweepDone();
 		m_phaseGraph.sweepDone();
 		ui->statusLabel->setText(tr("Stopped"));
 	}
 }
 
-struct iio_buffer *NetworkAnalyzer::generateSinWave(
-	const struct iio_device *dev, double frequency,
+std::vector<double> NetworkAnalyzer::generateSinWave(
+	unsigned int chn_idx, double frequency,
 	double amplitude, double offset,
 	unsigned long rate, size_t samples_count)
 {
-	/* Create the IIO buffer */
-	struct iio_buffer *buf = iio_device_create_buffer(
-					 dev, samples_count, true);
 
-	if (!buf) {
-		return buf;
-	}
-
-	double vlsb = 1;
-	double corr = 1;
-	for (auto dac : dacs) {
-		if (dac->iio_dac_dev() == dev) {
-			vlsb = dac->vlsb();
-			auto m2k_dac = std::dynamic_pointer_cast<M2kDac>
-				       (dac);
-			if (m2k_dac) {
-				corr = m2k_dac->compTable(rate);
+	if (m_m2k_analogout) {
+		try {
+			m_m2k_analogout->setSampleRate(chn_idx, rate);
+			m_m2k_analogout->setOversamplingRatio(chn_idx, 1);
+			if (!m_m2k_analogout->isChannelEnabled(chn_idx)) {
+				return {};
 			}
-			break;
+		} catch (std::exception &e) {
+			qDebug(CAT_NETWORK_ANALYZER) << e.what();
 		}
 	}
-
-	float volts_to_raw_coef = (-1 * (1 / vlsb) * 16) / corr;
-
-	iio_device_attr_write_longlong(dev, "oversampling_ratio", 1);
 
 	// Make sure to clear everything left from the last
 	// sine generation iteration
 	vector_block->reset();
 	head_block->reset();
-	f2s_block->set_scale(volts_to_raw_coef);
 
 	// Setup params for sine wave generation and run
 	source_block->set_sampling_freq(rate);
@@ -1669,42 +1591,32 @@ struct iio_buffer *NetworkAnalyzer::generateSinWave(
 	head_block->set_length(samples_count);
 	top_block->run();
 
-	const std::vector<short>& samples = vector_block->data();
-	const short *data = samples.data();
+	const std::vector<float>& f_samples = vector_block->data();
+	std::vector<double> samples(f_samples.begin(), f_samples.end());
 
-	for (unsigned int i = 0; i < iio_device_get_channels_count(dev); i++) {
-		struct iio_channel *chn = iio_device_get_channel(dev, i);
-
-		if (iio_channel_is_enabled(chn)) {
-			iio_channel_write(chn, buf, data,
-					  samples_count * sizeof(short));
-		}
-	}
-
-	iio_device_attr_write_longlong(dev, "sampling_frequency", rate);
-
-	iio_buffer_push(buf);
-
-	return buf;
+	return samples;
 }
 
 void NetworkAnalyzer::configHwForNetworkAnalyzing()
 {
-	auto trigger = adc_dev->getTrigger();
+	if (m_m2k_analogin) {
+		try {
+			m_m2k_analogin->setOversamplingRatio(1);
+			for (unsigned int i = 0; i < m_m2k_analogin->getNbChannels(); i++) {
+				m_m2k_analogin->setVerticalOffset(static_cast<ANALOG_IN_CHANNEL>(i), 0);
+			}
 
-	if (trigger) {
-		for (uint i = 0; i < trigger->numChannels(); i++) {
-			trigger->setTriggerMode(i, HardwareTrigger::ALWAYS);
-			trigger->setDelay(0);
-		}
-	}
+			auto trigger = m_m2k_analogin->getTrigger();
+			if (!trigger) {
+				return;
+			}
+			for (unsigned int i = 0; i < m_m2k_analogin->getNbChannels(); i++) {
+				trigger->setAnalogMode(i, libm2k::ALWAYS);
+				trigger->setAnalogDelay(0);
+			}
 
-	auto m2k_adc = std::dynamic_pointer_cast<M2kAdc>(adc_dev);
-	if (m2k_adc) {
-		iio_device_attr_write_longlong(m2k_adc->iio_adc_dev(),
-			"oversampling_ratio", 1);
-		for (int i = 0; i < m2k_adc->numAdcChannels(); ++i) {
-			m2k_adc->setChnHwOffset(i, 0);
+		} catch (std::exception &e) {
+			qDebug(CAT_NETWORK_ANALYZER) << e.what();
 		}
 	}
 }

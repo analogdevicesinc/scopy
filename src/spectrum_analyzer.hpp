@@ -30,7 +30,6 @@
 #include "scope_sink_f.h"
 #include "fft_block.hpp"
 #include "FftDisplayPlot.h"
-#include "osc_adc.h"
 #include "tool.hpp"
 #include "plot_utils.hpp"
 #include "spinbox_a.hpp"
@@ -39,6 +38,12 @@
 
 #include <QWidget>
 #include <QQueue>
+
+/* libm2k includes */
+#include <libm2k/analog/genericanalogin.hpp>
+#include <libm2k/analog/m2kanalogin.hpp>
+#include <libm2k/m2k.hpp>
+#include <libm2k/generic.hpp>
 
 extern "C" {
 	struct iio_buffer;
@@ -91,7 +96,7 @@ public:
 	typedef boost::shared_ptr<SpectrumChannel> channel_sptr;
 
 	explicit SpectrumAnalyzer(struct iio_context *iio, Filter *filt,
-	                          std::shared_ptr<GenericAdc> adc, ToolMenuItem *toolMenuItem,
+				  ToolMenuItem *toolMenuItem,
 	                          QJSEngine *engine, ToolLauncher *parent);
 	~SpectrumAnalyzer();
 
@@ -179,6 +184,10 @@ private:
 	QVector<QStringList> importedChannelDetails;
 
 private:
+	libm2k::context::M2k* m_m2k_context;
+	libm2k::analog::M2kAnalogIn* m_m2k_analogin;
+	libm2k::context::Generic* m_generic_context;
+	libm2k::analog::GenericAnalogIn* m_generic_analogin;
 	Ui::SpectrumAnalyzer *ui;
 	adiscope::DbClickButtons *marker_selector;
 
@@ -198,15 +207,15 @@ private:
 	iio_manager::port_id *fft_ids;
 
 	boost::shared_ptr<iio_manager> iio;
-	std::shared_ptr<GenericAdc> adc;
 	const std::string adc_name;
-	int num_adc_channels;
+	unsigned int m_adc_nb_channels;
 	int adc_bits_count;
 	int crt_channel_id;
 	bool searchVisiblePeaks;
 	int crt_peak;
 	uint max_peak_count;
 	double sample_rate;
+	double m_max_sample_rate;
 	int sample_rate_divider;
 	uint fft_size;
 	QList<uint> bin_sizes;

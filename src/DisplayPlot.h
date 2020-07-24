@@ -44,6 +44,7 @@
 
 #include <stdint.h>
 #include <cstdio>
+#include <cmath>
 #include <vector>
 #include <qwt_plot.h>
 #include <qwt_painter.h>
@@ -64,10 +65,6 @@
 #include "plot_utils.hpp"
 #include "extendingplotzoomer.h"
 #include "printableplot.h"
-
-#if QWT_VERSION >= 0x060000
-#include <qwt_compat.h>
-#endif
 
 typedef QList<QColor> QColorList;
 Q_DECLARE_METATYPE ( QColorList )
@@ -378,6 +375,7 @@ public:
   // class:
   // void PlotNewData(...);
   QwtPlotZoomer *getZoomer() const;
+  void setZoomerParams(bool bounded, int maxStackDepth);
 
 
 
@@ -493,11 +491,11 @@ public Q_SLOTS:
   // Because of the preprocessing of slots in QT, these are not
   // easily separated by the version check. Make one for each
   // version until it's worked out.
-  void onPickerPointSelected(const QwtDoublePoint & p);
+  void onPickerPointSelected(const QPointF & p);
   void onPickerPointSelected6(const QPointF & p);
 
-  unsigned int xAxisNumDiv();
-  unsigned int yAxisNumDiv();
+  unsigned int xAxisNumDiv() const;
+  unsigned int yAxisNumDiv() const;
 
 Q_SIGNALS:
   void horizScaleDivisionChanged(double);
@@ -506,6 +504,9 @@ Q_SIGNALS:
   void vertScaleOffsetChanged(double);
 
   void plotPointSelected(const QPointF p);
+
+  // signals that the plot size changed
+  void plotSizeChanged();
 
 protected Q_SLOTS:
   virtual void legendEntryChecked(QwtPlotItem *plotItem, bool on);
@@ -573,6 +574,8 @@ protected:
   void setYaxisNumDiv(unsigned int);
   void bottomHorizAxisInit();
   virtual void configureAxis(int axisPos, int axisIdx);
+
+  void resizeEvent(QResizeEvent *event);
 
 private:
   void AddAxisOffset(int axisPos, int axisIdx, double offset);

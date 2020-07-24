@@ -60,6 +60,8 @@ public:
 	virtual void settingsLoaded();
 	virtual void setNativeDialogs(bool nativeDialogs);
 
+	ApiObject* getApi();
+
 Q_SIGNALS:
 	void detachedState(bool detached);
 

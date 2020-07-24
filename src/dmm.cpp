@@ -22,15 +22,16 @@
 #include "dynamicWidget.hpp"
 #include "ui_dmm.h"
 #include <config.h>
-#include "osc_adc.h"
-#include "hardware_trigger.hpp"
 #include "utils.h"
+#include "logging_categories.h"
 
 #include <gnuradio/blocks/keep_one_in_n.h>
 #include <gnuradio/blocks/moving_average.h>
 #include <gnuradio/blocks/rms_ff.h>
 #include <gnuradio/blocks/short_to_float.h>
 #include <gnuradio/blocks/sub.h>
+#include <gnuradio/blocks/skiphead.h>
+#include <gnuradio/blocks/delay.h>
 #include <gnuradio/filter/dc_blocker_ff.h>
 
 #include <boost/make_shared.hpp>
@@ -44,16 +45,23 @@
 #include <QThread>
 #include <QJSEngine>
 
+/* libm2k includes */
+#include <libm2k/contextbuilder.hpp>
+
 #include "dmm_api.hpp"
 
 using namespace adiscope;
+using namespace libm2k;
+using namespace libm2k::context;
 
-DMM::DMM(struct iio_context *ctx, Filter *filt, std::shared_ptr<GenericAdc> adc,
-		ToolMenuItem *toolMenuItem, QJSEngine *engine, ToolLauncher *parent)
+DMM::DMM(struct iio_context *ctx, Filter *filt, ToolMenuItem *toolMenuItem,
+	 QJSEngine *engine, ToolLauncher *parent)
 	: Tool(ctx, toolMenuItem, new DMM_API(this), "Voltmeter", parent),
 	ui(new Ui::DMM), signal(boost::make_shared<signal_sample>()),
 	manager(iio_manager::get_instance(ctx, filt->device_name(TOOL_DMM))),
-	adc(adc),
+	m_m2k_context(m2kOpen(ctx, "")),
+	m_m2k_analogin(m_m2k_context->getAnalogIn()),
+	m_adc_nb_channels(m_m2k_analogin->getNbChannels()),
 	interrupt_data_logging(false),
 	data_logging(false),
 	filename(""),
@@ -64,7 +72,7 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, std::shared_ptr<GenericAdc> adc,
 	ui->setupUi(this);
 
 	/* TODO: avoid hardcoding sample rate */
-	sample_rate = 1e6;
+	sample_rate = 1e5;
 
 	ui->sismograph_ch1->setColor(QColor("#ff7200"));
 	ui->sismograph_ch2->setColor(QColor("#9013fe"));
@@ -78,7 +86,7 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, std::shared_ptr<GenericAdc> adc,
 
 	ui->horizontalLayout_2->addWidget(data_logging_timer);
 
-	for (unsigned int i = 0; i < adc->numAdcChannels(); i++)
+	for (unsigned int i = 0; i < m_adc_nb_channels; i++)
 	{
 		m_min.push_back(Q_INFINITY);
 		m_max.push_back(-Q_INFINITY);
@@ -123,9 +131,6 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, std::shared_ptr<GenericAdc> adc,
 
 	connect(ui->btn_ch1_ac, SIGNAL(toggled(bool)), this, SLOT(toggleAC()));
 	connect(ui->btn_ch2_ac, SIGNAL(toggled(bool)), this, SLOT(toggleAC()));
-
-	connect(ui->btn_ch1_ac2, SIGNAL(toggled(bool)), this, SLOT(toggleAC()));
-	connect(ui->btn_ch2_ac2, SIGNAL(toggled(bool)), this, SLOT(toggleAC()));
 
 	connect(ui->btn_ch1_dc, &QPushButton::toggled, [&](bool en) {
 		setDynamicProperty(ui->labelCh1, "ac", !en);
@@ -205,8 +210,8 @@ void DMM::updateValuesList(std::vector<float> values)
 	if(!use_timer)
 		boost::unique_lock<boost::mutex> lock(data_mutex);
 
-	double volts_ch1 = adc->convSampleToVolts(0, (double) values[0]);
-	double volts_ch2 = adc->convSampleToVolts(1, (double) values[1]);
+	double volts_ch1 = m_m2k_analogin->convertRawToVolts(0, (int)values[0]);
+	double volts_ch2 = m_m2k_analogin->convertRawToVolts(1, (int)values[1]);
 
 	ui->lcdCh1->display(volts_ch1);
 	ui->lcdCh2->display(volts_ch2);
@@ -277,7 +282,7 @@ void DMM::displayPeakHold(bool checked)
 
 void DMM::resetPeakHold(bool clicked)
 {
-	for(unsigned int ch = 0; ch < adc->numAdcChannels(); ch++) {
+	for(unsigned int ch = 0; ch < m_adc_nb_channels; ch++) {
 		m_min[ch] = Q_INFINITY;
 		m_max[ch] = -Q_INFINITY;
 		if(ch == 0) {
@@ -314,29 +319,29 @@ void DMM::toggleTimer(bool start)
 
 
 gr::basic_block_sptr DMM::configureGraph(gr::basic_block_sptr s2f,
-		bool is_low_ac, bool is_high_ac)
+		bool is_ac)
 {
 	/* 10 fps refresh rate for the plot */
 	auto keep_one = gr::blocks::keep_one_in_n::make(sizeof(float),
-			is_high_ac ? (sample_rate / 10.0) : 1000.0);
+			sample_rate / 10.0);
 
-	/* TODO: figure out best value for the blocker parameter */
-	auto blocker = gr::filter::dc_blocker_ff::make(1000, true);
+	auto blocker_val = 4000;
+	auto blocker = gr::filter::dc_blocker_ff::make(blocker_val, true);
 
 	manager->connect(s2f, 0, blocker, 0);
 
-	if (is_low_ac || is_high_ac) {
+	if (is_ac) {
 		/* TODO: figure out best value for the RMS parameter */
 		auto rms = gr::blocks::rms_ff::make(0.0001);
 		manager->connect(blocker, 0, rms, 0);
-
 		manager->connect(rms, 0, keep_one, 0);
 	} else {
 		auto sub = gr::blocks::sub_ff::make();
-
 		manager->connect(s2f, 0, sub, 0);
 		manager->connect(blocker, 0, sub, 1);
-		manager->connect(sub, 0, keep_one, 0);
+		auto moving = gr::blocks::moving_average_ff::make(4000,1.0/4000);
+		manager->connect(sub, 0, moving,0 );
+		manager->connect(moving, 0, keep_one, 0);
 	}
 
 	return keep_one;
@@ -347,37 +352,14 @@ void DMM::configureModes()
 	auto s2f1 = gr::blocks::short_to_float::make();
 	auto s2f2 = gr::blocks::short_to_float::make();
 
-	bool is_low_ac_ch1 = ui->btn_ch1_ac->isChecked();
-	bool is_low_ac_ch2 = ui->btn_ch2_ac->isChecked();
-	bool is_high_ac_ch1 = ui->btn_ch1_ac2->isChecked();
-	bool is_high_ac_ch2 = ui->btn_ch2_ac2->isChecked();
+	bool is_ac_ch1 = ui->btn_ch1_ac->isChecked();
+	bool is_ac_ch2 = ui->btn_ch2_ac->isChecked();
 
-	if (is_high_ac_ch1) {
-		id_ch1 = manager->connect(s2f1, 0, 0, false, sample_rate / 10);
-	} else {
-		/* Low-frequency AC: decimate data rate */
-		auto keep_one1 = gr::blocks::keep_one_in_n::make(
-				sizeof(short), sample_rate / 1e4);
-		id_ch1 = manager->connect(keep_one1, 0, 0, false,
-				sample_rate / 10);
+	id_ch1 = manager->connect(s2f1, 0, 0, false, sample_rate / 10);
+	id_ch2 = manager->connect(s2f2, 1, 0, false, sample_rate / 10);
 
-		manager->connect(keep_one1, 0, s2f1, 0);
-	}
-
-	if (is_high_ac_ch2) {
-		id_ch2 = manager->connect(s2f2, 1, 0, false, sample_rate / 10);
-	} else {
-		/* Low-frequency AC: decimate data rate */
-		auto keep_one2 = gr::blocks::keep_one_in_n::make(
-				sizeof(short), sample_rate / 1e4);
-		id_ch2 = manager->connect(keep_one2, 1, 0, false,
-				sample_rate / 10);
-
-		manager->connect(keep_one2, 0, s2f2, 0);
-	}
-
-	auto block1 = configureGraph(s2f1, is_low_ac_ch1, is_high_ac_ch1);
-	auto block2 = configureGraph(s2f2, is_low_ac_ch2, is_high_ac_ch2);
+	auto block1 = configureGraph(s2f1, is_ac_ch1);
+	auto block2 = configureGraph(s2f2, is_ac_ch2);
 
 	manager->connect(block1, 0, signal, 0);
 	manager->connect(block2, 0, signal, 1);
@@ -536,10 +518,9 @@ void DMM::dataLoggingThread()
 				ui->lblFileStatus->setText(tr("Choose a file"));
 			}
 		}
-		bool is_low_ac_ch1 = ui->btn_ch1_ac->isChecked();
-		bool is_low_ac_ch2 = ui->btn_ch2_ac->isChecked();
-		bool is_high_ac_ch1 = ui->btn_ch1_ac2->isChecked();
-		bool is_high_ac_ch2 = ui->btn_ch2_ac2->isChecked();
+		bool is_ac_ch1 = ui->btn_ch1_ac->isChecked();
+		bool is_ac_ch2 = ui->btn_ch2_ac->isChecked();
+
 		QString ch1_dc_rms="-", ch2_dc_rms="-", ch1_ac_rms="-", ch2_ac_rms="-";
 
 		out << QDateTime::currentDateTime().time().toString() << separator;
@@ -550,7 +531,7 @@ void DMM::dataLoggingThread()
 		}
 
 
-		if(!is_low_ac_ch1 && !is_high_ac_ch1) {
+		if(!is_ac_ch1) {
 			ch1_dc_rms = QString::number(ui->lcdCh1->value());
 		}
 		else {
@@ -558,7 +539,7 @@ void DMM::dataLoggingThread()
 		}
 
 
-		if(!is_low_ac_ch2 && !is_high_ac_ch2) {
+		if(!is_ac_ch2) {
 			ch2_dc_rms = QString::number(ui->lcdCh2->value());
 		}
 		else {
@@ -632,20 +613,22 @@ void DMM::setHistorySizeCh2(int idx)
 
 void DMM::writeAllSettingsToHardware()
 {
-	adc->setSampleRate(sample_rate);
-
-	auto m2k_adc = std::dynamic_pointer_cast<M2kAdc>(adc);
-	if (m2k_adc) {
-		for (uint i = 0; i < adc->numAdcChannels(); i++) {
-			m2k_adc->setChnHwOffset(i, 0.0);
-			m2k_adc->setChnHwGainMode(i, M2kAdc::LOW_GAIN_MODE);
+	if (m_m2k_analogin) {
+		try {
+			m_m2k_analogin->setSampleRate(sample_rate);
+			m_m2k_analogin->setOversamplingRatio(1);
+			auto trigger = m_m2k_analogin->getTrigger();
+			for (unsigned int i = 0; i < m_adc_nb_channels; i++) {
+				auto chn = static_cast<libm2k::analog::ANALOG_IN_CHANNEL>(i);
+				m_m2k_analogin->setVerticalOffset(chn, 0.0);
+				m_m2k_analogin->setRange(chn, libm2k::analog::PLUS_MINUS_25V);
+				if (trigger) {
+					trigger->setAnalogMode(i, libm2k::ALWAYS);
+				}
+			}
+		} catch (std::exception &e) {
+			qDebug(CAT_VOLTMETER) << "Can't write to hardware: " << e.what();
 		}
-	}
-
-	auto trigger = adc->getTrigger();
-	if (trigger) {
-		for (uint i = 0; i < trigger->numChannels(); i++)
-			trigger->setTriggerMode(i, HardwareTrigger::ALWAYS);
 	}
 }
 

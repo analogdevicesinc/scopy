@@ -40,9 +40,7 @@
 #include "filter.hpp"
 #include "math.hpp"
 #include "fft_block.hpp"
-#include "adc_sample_conv.hpp"
 #include "dynamicWidget.hpp"
-#include "hardware_trigger.hpp"
 #include "channel_widget.hpp"
 #include "db_click_buttons.hpp"
 #include "filemanager.h"
@@ -55,10 +53,15 @@
 #include <iio.h>
 #include <iostream>
 
+/* libm2k includes */
+#include <libm2k/contextbuilder.hpp>
+
 static const int MAX_REF_CHANNELS = 4;
 
 using namespace adiscope;
 using namespace std;
+using namespace libm2k;
+using namespace libm2k::context;
 
 std::vector<std::pair<QString, FftDisplayPlot::MagnitudeType>>
 SpectrumAnalyzer::mag_types = {
@@ -101,23 +104,26 @@ std::vector<QString> SpectrumAnalyzer::markerTypes = {
 };
 
 SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
-				   std::shared_ptr<GenericAdc> adc, ToolMenuItem *toolMenuItem,
+				   ToolMenuItem *toolMenuItem,
                                    QJSEngine *engine, ToolLauncher *parent):
 	Tool(ctx, toolMenuItem, new SpectrumAnalyzer_API(this), "Spectrum Analyzer",
 	     parent),
 	ui(new Ui::SpectrumAnalyzer),
+	m_m2k_context(nullptr),
+	m_m2k_analogin(nullptr),
+	m_generic_context(nullptr),
+	m_generic_analogin(nullptr),
 	marker_selector(new DbClickButtons(this)),
 	fft_plot(nullptr),
 	settings_group(new QButtonGroup(this)),
 	channels_group(new QButtonGroup(this)),
-	adc(adc),
 	adc_name(ctx ? filt->device_name(TOOL_SPECTRUM_ANALYZER) : ""),
 	crt_channel_id(0),
 	crt_peak(0),
 	max_peak_count(10),
 	fft_size(32768),
 	searchVisiblePeaks(true),
-	sample_rate(100e6),
+	m_max_sample_rate(100e6),
 	sample_rate_divider(1),
 	marker_menu_opened(false),
 	bin_sizes({
@@ -130,30 +136,25 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	QList<QString> channel_names;
 
 	if (ctx) {
-		iio = iio_manager::get_instance(ctx, adc_name);
-		num_adc_channels = adc->numAdcChannels();
-		adc_bits_count = adc->numAdcBits();
-
-		auto adc_channels = adc->adcChannelList();
-
-		for (unsigned int i = 0; i < adc_channels.size(); i++) {
-			const char *id = iio_channel_get_name(adc_channels[i]);
-
-			if (!id) {
-				channel_names.push_back(
-				        QString("Channel %1").arg(i + 1));
-			} else {
-				channel_names.push_back(QString(id));
-			}
+		auto libm2k_ctx = contextOpen(ctx, "");
+		if (libm2k_ctx->toM2k()) {
+			m_m2k_context = libm2k_ctx->toM2k();
+			m_m2k_analogin = m_m2k_context->getAnalogIn();
+			m_adc_nb_channels = m_m2k_analogin->getNbChannels();
+			m_max_sample_rate = m_m2k_analogin->getMaximumSamplerate();
+		} else {
+			m_generic_context = libm2k_ctx->toGeneric();
+			m_generic_analogin = m_generic_context->getAnalogIn(0);
+			m_adc_nb_channels = m_generic_analogin->getNbChannels();
 		}
-	} else {
-		num_adc_channels = 2;
-		adc_bits_count = 12;
+		iio = iio_manager::get_instance(ctx, adc_name);
 
-		for (int i = 0; i < num_adc_channels; i++)
+		for (unsigned int i = 0; i < m_adc_nb_channels; i++) {
 			channel_names.push_back(
-			        QString("Channel %1").arg(i + 1));
+				QString("Channel %1").arg(i + 1));
+		}
 	}
+	sample_rate = m_max_sample_rate;
 
 	ui->setupUi(this);
 	// Temporarily disable the delta marker button
@@ -195,7 +196,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	settings_group->addButton(ui->btnAddRef);
 	settings_group->setExclusive(true);
 
-	fft_plot = new FftDisplayPlot(num_adc_channels, this);
+	fft_plot = new FftDisplayPlot(m_adc_nb_channels, this);
 	fft_plot->canvas()->setStyleSheet(QString("QwtPlotCanvas { "
 	                                  "background-color: #141416; }"));
 	fft_plot->disableLegend();
@@ -203,7 +204,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	// Disable mouse interactions with the axes until they are in a working state
 	fft_plot->setXaxisMouseGesturesEnabled(false);
 
-	for (uint i = 0; i < num_adc_channels; i++) {
+	for (uint i = 0; i < m_adc_nb_channels; i++) {
 		fft_plot->setYaxisMouseGesturesEnabled(i, false);
 	}
 
@@ -212,7 +213,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	gLayout->addWidget(fft_plot, 1, 0, 1, 1);
 
 	// Initialize spectrum channels
-	for (int i = 0 ; i < num_adc_channels; i++) {
+	for (int i = 0 ; i < m_adc_nb_channels; i++) {
 		channel_sptr channel = boost::make_shared<SpectrumChannel>(i,
 		                       channel_names[i], fft_plot);
 		channel->setColor(fft_plot->getLineColor(i));
@@ -232,7 +233,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 		ch_api.append(new SpectrumChannel_API(this,channel));
 	}
 
-	if (num_adc_channels > 0)
+	if (m_adc_nb_channels > 0)
 		channels[crt_channel_id]->widget()->nameButton()->
 		setChecked(true);
 
@@ -292,12 +293,12 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	range->setMaxValue(200);
 
 	// Configure plot peak capabilities
-	for (uint i = 0; i < num_adc_channels; i++) {
+	for (uint i = 0; i < m_adc_nb_channels; i++) {
 		fft_plot->setPeakCount(i, max_peak_count);
 	}
 
 	// Configure markers
-	for (int i = 0; i < num_adc_channels; i++) {
+	for (int i = 0; i < m_adc_nb_channels; i++) {
 		fft_plot->setMarkerCount(i, 5);
 
 		for (int m = 0; m < 5; m++) {
@@ -477,14 +478,14 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 				QString unit = ui->lblMagUnit->text();
 				fm.save(freq_data, "Frequency(Hz)");
-				fm.save(mag_data, "REF" + QString::number(selected_ch_settings - num_adc_channels + 1)
+				fm.save(mag_data, "REF" + QString::number(selected_ch_settings - m_adc_nb_channels + 1)
 					+ "(" + unit + ")");
 
 				QString channelDetails;
 
 				auto iterAvg = std::find_if(avg_types.begin(), avg_types.end(),
 				[&](const std::pair<QString, FftDisplayPlot::AverageType>& p) {
-					return p.first == importedChannelDetails[selected_ch_settings - num_adc_channels][0];
+					return p.first == importedChannelDetails[selected_ch_settings - m_adc_nb_channels][0];
 				});
 
 				if (iterAvg != avg_types.end()) {
@@ -494,7 +495,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 				auto iterWin = std::find_if(win_types.begin(), win_types.end(),
 				[&](const std::pair<QString, FftWinType>& p) {
-					return p.first == importedChannelDetails[selected_ch_settings - num_adc_channels][1];
+					return p.first == importedChannelDetails[selected_ch_settings - m_adc_nb_channels][1];
 				});
 
 				if (iterWin != win_types.end()) {
@@ -502,7 +503,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 					channelDetails += ",";
 				}
 
-				channelDetails += importedChannelDetails[selected_ch_settings - num_adc_channels][2];
+				channelDetails += importedChannelDetails[selected_ch_settings - m_adc_nb_channels][2];
 				channelDetails += ",";
 
 				fm.setAdditionalInformation(channelDetails);
@@ -540,7 +541,7 @@ SpectrumAnalyzer::~SpectrumAnalyzer()
 			iio->lock();
 		}
 
-		for (unsigned int i = 0; i < num_adc_channels; i++) {
+		for (unsigned int i = 0; i < m_adc_nb_channels; i++) {
 			iio->disconnect(fft_ids[i]);
 		}
 
@@ -856,7 +857,7 @@ void SpectrumAnalyzer::add_ref_waveform(QVector<double> xData, QVector<double> y
 		return;
 	}
 
-	unsigned int curve_id = num_adc_channels + nb_ref_channels;
+	unsigned int curve_id = m_adc_nb_channels + nb_ref_channels;
 
 	QString qname = getReferenceChannelName();
 
@@ -931,7 +932,7 @@ void SpectrumAnalyzer::onReferenceChannelDeleted()
 					  channelWidget));
 
 	/* Update the id of the remaining channels */
-	int id = num_adc_channels;
+	int id = m_adc_nb_channels;
 	for (auto iter = referenceChannels.begin();
 	     iter != referenceChannels.end(); ++iter) {
 		(*iter)->setId(id++);
@@ -942,7 +943,7 @@ void SpectrumAnalyzer::onReferenceChannelDeleted()
 	if (channelWidget->id() < crt_channel_id) {
 		crt_channel_id--;
 	} else if (channelWidget->id() == crt_channel_id) {
-		for (int i = 0; i < num_adc_channels + nb_ref_channels; ++i) {
+		for (int i = 0; i < m_adc_nb_channels + nb_ref_channels; ++i) {
 			auto cw = getChannelWidgetAt(i);
 			if (cw == channelWidget) {
 				continue;
@@ -1007,9 +1008,8 @@ void SpectrumAnalyzer::runStopToggled(bool checked)
 
 void SpectrumAnalyzer::build_gnuradio_block_chain()
 {
-	// TO DO: don't use the 100e6 hardcoded value anymore
-	fft_sink = adiscope::scope_sink_f::make(fft_size, 100e6,
-	                                        "Osc Frequency", num_adc_channels,
+	fft_sink = adiscope::scope_sink_f::make(fft_size, m_max_sample_rate,
+						"Osc Frequency", m_adc_nb_channels,
 	                                        (QObject *)fft_plot);
 	fft_sink->set_trigger_mode(TRIG_MODE_TAG, 0, "buffer_start");
 
@@ -1019,31 +1019,18 @@ void SpectrumAnalyzer::build_gnuradio_block_chain()
 		iio->lock();
 	}
 
-	bool canConvRawToVolts = (adc_name == "m2k-adc");
+	bool canConvRawToVolts = m_m2k_analogin ? true : false;
 
 	if (canConvRawToVolts) {
-		auto m2k_adc = dynamic_pointer_cast<M2kAdc>(adc);
-
-		for (int i = 0; i < adc->numAdcChannels(); i++) {
-			double corr_gain = 1.0;
-			double hw_gain = 1.0;
-
-			if (m2k_adc) {
-				corr_gain = m2k_adc->chnCorrectionGain(i);
-				hw_gain = m2k_adc->gainAt(
-				                  m2k_adc->chnHwGainMode(i));
-			}
-
-			// Calculate the VLSB for current channel
-			double vlsb = adc_sample_conv::convSampleToVolts(1,
-			                corr_gain, 1, 0, hw_gain);
-			fft_plot->setScaleFactor(i, vlsb);
+		for (int i = 0; i < m_adc_nb_channels; i++) {
+			libm2k::analog::ANALOG_IN_CHANNEL chn = static_cast<libm2k::analog::ANALOG_IN_CHANNEL>(i);
+			fft_plot->setScaleFactor(i, m_m2k_analogin->getScalingFactor(chn));
 		}
 	}
 
-	fft_ids = new iio_manager::port_id[num_adc_channels];
+	fft_ids = new iio_manager::port_id[m_adc_nb_channels];
 
-	for (int i = 0; i < num_adc_channels; i++) {
+	for (int i = 0; i < m_adc_nb_channels; i++) {
 		auto fft = gnuradio::get_initial_sptr(
 		                   new fft_block(false, fft_size));
 		auto ctm = gr::blocks::complex_to_mag_squared::make(1);
@@ -1064,19 +1051,18 @@ void SpectrumAnalyzer::build_gnuradio_block_chain()
 
 void SpectrumAnalyzer::build_gnuradio_block_chain_no_ctx()
 {
-	// TO DO: don't use the 100e6 hardcoded value anymore
-	fft_sink = adiscope::scope_sink_f::make(fft_size, 100e6,
-	                                        "Osc Frequency", num_adc_channels,
+	fft_sink = adiscope::scope_sink_f::make(fft_size, m_max_sample_rate,
+						"Osc Frequency", m_adc_nb_channels,
 	                                        (QObject *)fft_plot);
 
 	top_block = gr::make_top_block("spectrum_analyzer");
 
-	for (int i = 0; i < num_adc_channels; i++) {
+	for (int i = 0; i < m_adc_nb_channels; i++) {
 		auto fft = gnuradio::get_initial_sptr(
 		                   new fft_block(false, fft_size));
 		auto ctm = gr::blocks::complex_to_mag_squared::make(1);
 
-		auto siggen = gr::analog::sig_source_f::make(100e6,
+		auto siggen = gr::analog::sig_source_f::make(m_max_sample_rate,
 		                gr::analog::GR_SIN_WAVE, 5e6 + i * 5e6, 2048);
 		auto noise = gr::analog::fastnoise_source_f::make(
 		                     gr::analog::GR_GAUSSIAN, 1, 0, 8192);
@@ -1098,7 +1084,7 @@ void SpectrumAnalyzer::build_gnuradio_block_chain_no_ctx()
 void SpectrumAnalyzer::start_blockchain_flow()
 {
 	if (iio) {
-		for (int i = 0; i < num_adc_channels; i++) {
+		for (int i = 0; i < m_adc_nb_channels; i++) {
 			iio->start(fft_ids[i]);
 		}
 	} else {
@@ -1110,7 +1096,7 @@ void SpectrumAnalyzer::start_blockchain_flow()
 void SpectrumAnalyzer::stop_blockchain_flow()
 {
 	if (iio) {
-		for (int i = 0; i < num_adc_channels; i++) {
+		for (int i = 0; i < m_adc_nb_channels; i++) {
 			iio->stop(fft_ids[i]);
 		}
 	} else {
@@ -1210,7 +1196,7 @@ void SpectrumAnalyzer::updateChannelSettingsPanel(unsigned int id)
 		ui->btnSnapshot->setText(tr("Snapshot"));
 	}
 
-	if (id < num_adc_channels) {
+	if (id < m_adc_nb_channels) {
 		channel_sptr sc = channels.at(id);
 
 		QString style = QString("border: 2px solid %1").arg(cw->color().name());
@@ -1260,11 +1246,11 @@ void SpectrumAnalyzer::updateChannelSettingsPanel(unsigned int id)
 		ui->channelSettingsTitle->setText(cw->nameButton()->text());
 
 
-		if ((id - num_adc_channels) < importedChannelDetails.size() &&
-				importedChannelDetails[id - num_adc_channels].size() == 3) {
-			ui->comboBox_type->setCurrentText(importedChannelDetails[id - num_adc_channels][0]);
-			ui->comboBox_window->setCurrentText(importedChannelDetails[id - num_adc_channels][1]);
-			ui->spinBox_averaging->setValue(importedChannelDetails[id - num_adc_channels][2].toInt());
+		if ((id - m_adc_nb_channels) < importedChannelDetails.size() &&
+				importedChannelDetails[id - m_adc_nb_channels].size() == 3) {
+			ui->comboBox_type->setCurrentText(importedChannelDetails[id - m_adc_nb_channels][0]);
+			ui->comboBox_window->setCurrentText(importedChannelDetails[id - m_adc_nb_channels][1]);
+			ui->spinBox_averaging->setValue(importedChannelDetails[id - m_adc_nb_channels][2].toInt());
 
 			ui->comboBox_type->setDisabled(true);
 			ui->comboBox_window->setDisabled(true);
@@ -1403,7 +1389,7 @@ void SpectrumAnalyzer::onChannelEnabled(bool en)
 
 void SpectrumAnalyzer::updateRunButton(bool ch_en)
 {
-	for (unsigned int i = 0; !ch_en && i < num_adc_channels; i++) {
+	for (unsigned int i = 0; !ch_en && i < m_adc_nb_channels; i++) {
 		QWidget *parent = ui->channelsList->itemAt(i)->widget();
 		QCheckBox *box = parent->findChild<QCheckBox *>("box");
 		ch_en = box->isChecked();
@@ -1421,26 +1407,31 @@ void SpectrumAnalyzer::updateRunButton(bool ch_en)
 
 void SpectrumAnalyzer::writeAllSettingsToHardware()
 {
-	adc->setSampleRate(100e6);
+	try {
+		if (m_m2k_analogin) {
+			m_m2k_analogin->setSampleRate(m_max_sample_rate);
 
-	auto m2k_adc = std::dynamic_pointer_cast<M2kAdc>(adc);
+			for (unsigned int i = 0; i < m_adc_nb_channels; i++) {
+				libm2k::analog::ANALOG_IN_CHANNEL chn = static_cast<libm2k::analog::ANALOG_IN_CHANNEL>(i);
+				m_m2k_analogin->setVerticalOffset(chn, 0.0);
+				m_m2k_analogin->setRange(chn, libm2k::analog::PLUS_MINUS_25V);
+			}
+			m_m2k_analogin->setOversamplingRatio(sample_rate_divider);
 
-	if (m2k_adc) {
-		for (uint i = 0; i < adc->numAdcChannels(); i++) {
-			m2k_adc->setChnHwOffset(i, 0.0);
-			m2k_adc->setChnHwGainMode(i, M2kAdc::LOW_GAIN_MODE);
+			auto trigger = m_m2k_analogin->getTrigger();
+
+			if (trigger) {
+				for (unsigned int i = 0; i < m_adc_nb_channels; i++) {
+					trigger->setAnalogMode(i, libm2k::ALWAYS);
+				}
+			}
+		} else {
+			for (unsigned int i = 0; i < m_adc_nb_channels; i++) {
+				m_generic_analogin->setSampleRate(i, m_generic_analogin->getMaximumSamplerate(i));
+			}
 		}
-
-		iio_device_attr_write_longlong(adc->iio_adc_dev(),
-		                               "oversampling_ratio", sample_rate_divider);
-	}
-
-	auto trigger = adc->getTrigger();
-
-	if (trigger) {
-		for (uint i = 0; i < trigger->numChannels(); i++) {
-			trigger->setTriggerMode(i, HardwareTrigger::ALWAYS);
-		}
+	} catch (std::exception &e) {
+		qDebug(CAT_SPECTRUM_ANALYZER) << "Can't write settings to hardware: " << e.what();
 	}
 }
 
@@ -1516,10 +1507,8 @@ void SpectrumAnalyzer::on_cmb_rbw_currentIndexChanged(int index)
 
 void SpectrumAnalyzer::setSampleRate(double sr)
 {
-	double max_sr = 100E6; // TO DO: make OscAdc figure out the max sr of an ADC
-
-	sample_rate_divider = (int)(max_sr / sr);
-	double new_sr = max_sr / sample_rate_divider;
+	sample_rate_divider = (int)(m_max_sample_rate / sr);
+	double new_sr = m_max_sample_rate / sample_rate_divider;
 
 	if (new_sr == sample_rate) {
 		return;
@@ -1528,13 +1517,20 @@ void SpectrumAnalyzer::setSampleRate(double sr)
 	if (isIioManagerStarted()) {
 		stop_blockchain_flow();
 
-		auto m2k_adc = std::dynamic_pointer_cast<M2kAdc>(adc);
-
-		if (m2k_adc) {
-			iio_device_attr_write_longlong(adc->iio_adc_dev(),
-			                               "oversampling_ratio", sample_rate_divider);
+		if (m_m2k_analogin) {
+			try {
+				m_m2k_analogin->setOversamplingRatio(sample_rate_divider);
+			} catch (std::exception &e) {
+				qDebug(CAT_SPECTRUM_ANALYZER) << "Can't write oversampling ratio: " << e.what();
+			}
 		} else {
-			adc->setSampleRate(sr);
+			try {
+				for (unsigned int i = 0; i < m_adc_nb_channels; i++) {
+					m_generic_analogin->setSampleRate(i, sr);
+				}
+			} catch (std::exception &e) {
+				qDebug(CAT_SPECTRUM_ANALYZER) << "Can't write sampling frequency: " << e.what();
+			}
 		}
 
 		fft_plot->presetSampleRate(new_sr);
@@ -1713,7 +1709,7 @@ void SpectrumAnalyzer::onPlotNewMarkerData()
 	}
 
 	// Update the markers in the marker table
-	for (int c = 0; c < num_adc_channels; c++) {
+	for (int c = 0; c < m_adc_nb_channels; c++) {
 		for (int m = 0; m < fft_plot->markerCount(c); m++) {
 			if (fft_plot->markerEnabled(c, m)) {
 				int mkType = fft_plot->markerType(c, m);

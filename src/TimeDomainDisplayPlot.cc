@@ -84,7 +84,7 @@ protected:
   virtual QwtText trackerText( const QPoint& p ) const
   {
     QwtText t;
-    QwtDoublePoint dp = QwtPlotZoomer::invTransform(p);
+    QPointF dp = QwtPlotZoomer::invTransform(p);
     const TimeDomainDisplayPlot* plt = (const TimeDomainDisplayPlot *)plot();
     t.setText(plt->timeScaleValueFormat(dp.x(), 3) + "," +
 	      plt->yAxisScaleValueFormat(dp.y(), 3));
@@ -541,7 +541,7 @@ TimeDomainDisplayPlot::_resetXAxisPoints(double*& xAxis, unsigned long long numP
 
   // Set up zoomer base for maximum unzoom x-axis
   // and reset to maximum unzoom level
-//  QwtDoubleRect zbase = d_zoomer->zoomBase();
+//  QRectF zbase = d_zoomer->zoomBase();
 
 //  if(d_semilogx) {
 //    setAxisScale(QwtPlot::xBottom, 1e-1, d_numPoints*delt);
@@ -1052,6 +1052,45 @@ void TimeDomainDisplayPlot::unregisterReferenceWaveform(QString name)
 	delete curve;
 
 	d_nb_ref_curves--;
+}
+
+void TimeDomainDisplayPlot::addDigitalPlotCurve(QwtPlotCurve *curve, bool visible)
+{
+	d_logic_curves.push_back(curve);
+
+	if (visible) {
+		curve->attach(this);
+	}
+
+	Q_EMIT digitalPlotCurveAdded(d_logic_curves.size() - 1);
+}
+
+void TimeDomainDisplayPlot::removeDigitalPlotCurve(QwtPlotCurve *curve)
+{
+	curve->detach();
+	d_logic_curves.erase(std::find(d_logic_curves.begin(), d_logic_curves.end(), curve));
+}
+
+void TimeDomainDisplayPlot::enableDigitalPlotCurve(int curveId, bool enable)
+{
+	if (curveId < 0 || curveId > d_logic_curves.size() - 1) {
+		return;
+	}
+
+	if (enable)  {
+		d_logic_curves[curveId]->attach(this);
+	} else {
+		d_logic_curves[curveId]->detach();
+	}
+}
+
+QwtPlotCurve * TimeDomainDisplayPlot::getDigitalPlotCurve(int curveId)
+{
+	if (curveId < 0 || curveId > d_logic_curves.size() - 1) {
+		return nullptr;
+	}
+
+	return d_logic_curves[curveId];
 }
 
 void TimeDomainDisplayPlot::addPreview(QVector<QVector<double> > curvesToBePreviewed, double reftimebase,

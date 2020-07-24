@@ -39,11 +39,12 @@
 #include "filter.hpp"
 #include "calibration.hpp"
 #include "oscilloscope.hpp"
-#include "pulseview/pv/widgets/popup.hpp"
 #include "power_controller.hpp"
 #include "signal_generator.hpp"
-#include "logic_analyzer.hpp"
-#include "pattern_generator.hpp"
+
+#include "logicanalyzer/logic_analyzer.h"
+#include "patterngenerator/pattern_generator.h"
+
 #include "network_analyzer.hpp"
 #include "digitalio.hpp"
 #include "detachedWindow.hpp"
@@ -60,8 +61,6 @@ extern "C" {
 namespace Ui {
 class ToolLauncher;
 class Device;
-class GenericAdc;
-class GenericDac;
 }
 
 namespace adiscope {
@@ -139,7 +138,6 @@ private Q_SLOTS:
 	void btnAdd_toggled(bool);
 	void btnHomepage_toggled(bool);
 	void forgetDeviceBtn_clicked(QString);
-	void destroyPopup();
 
 	void enableAdcBasedTools();
 	void enableDacBasedTools();
@@ -190,6 +188,7 @@ private:
 private:
 	Ui::ToolLauncher *ui;
 	struct iio_context *ctx;
+	libm2k::context::M2k *m_m2k;
 
 	ToolMenu *menu;
 
@@ -210,10 +209,12 @@ private:
 	PowerController *power_control;
 	SignalGenerator *signal_generator;
 	Oscilloscope *oscilloscope;
-	LogicAnalyzer *logic_analyzer;
+
+	logic::LogicAnalyzer *logic_analyzer;
+
 	DigitalIO *dio;
 	DIOManager *dioManager;
-	PatternGenerator *pattern_generator;
+	logic::PatternGenerator *pattern_generator;
 	NetworkAnalyzer *network_analyzer;
 	SpectrumAnalyzer *spectrum_analyzer;
 	Debugger *debugger;
@@ -226,8 +227,6 @@ private:
 	QButtonGroup adc_users_group;
 
 	Calibration *calib;
-	std::shared_ptr<GenericAdc> adc;
-	QList<std::shared_ptr<GenericDac>> dacs;
 
 	Filter *filter;
 	ToolLauncher_API *tl_api;

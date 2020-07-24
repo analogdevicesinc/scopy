@@ -33,6 +33,10 @@ class BaseMenuItem;
 }
 
 namespace adiscope {
+class BaseMenu;
+}
+
+namespace adiscope {
 class BaseMenuItem : public ColoredQWidget
 {
 	Q_OBJECT
@@ -51,6 +55,9 @@ public:
 	static const char *menuItemMimeDataType;
 
 	bool eventFilter(QObject *watched, QEvent *event);
+
+	BaseMenu *getOwner() const;
+	void setOwner(BaseMenu *menu);
 
 Q_SIGNALS:
 	void moveItem(short from, short to);
@@ -79,6 +86,7 @@ private:
 
 private:
         Ui::BaseMenuItem *d_ui;
+	BaseMenu *d_menu;
 
 	int d_position;
 

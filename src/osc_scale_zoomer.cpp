@@ -52,7 +52,7 @@ QwtText OscScaleZoomer::trackerText(const QPoint& pos) const
 	                                     plot()->axisScaleDraw(QwtPlot::xTop));
 	const OscScaleDraw *draw_y = static_cast<const OscScaleDraw *>(
 	                                     plot()->axisScaleDraw(QwtPlot::yLeft));
-	QwtDoublePoint dp = QwtPlotZoomer::invTransform(pos);
+	QPointF dp = QwtPlotZoomer::invTransform(pos);
 	QString text;
 
 	text += draw_x->label(dp.x()).text();

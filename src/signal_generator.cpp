@@ -70,6 +70,9 @@
 
 #include "signal_generator_api.hpp"
 
+/* libm2k includes */
+#include <libm2k/contextbuilder.hpp>
+
 #define NB_POINTS	32768
 #define DAC_BIT_COUNT   12
 #define INTERP_BY_100_CORR 1.168 // correction value at an interpolation by 100
@@ -78,6 +81,8 @@
 
 using namespace adiscope;
 using namespace gr;
+using namespace libm2k::context;
+using namespace libm2k::analog;
 
 enum {
 	DATA_IIO_PTR,
@@ -114,18 +119,19 @@ bool SignalGenerator::chunkCompare(chunk_header_t& ptr,const char *id2)
 	return true;
 }
 
-SignalGenerator::SignalGenerator(struct iio_context *_ctx,
-                                 QList<std::shared_ptr<GenericDac>> dacs, Filter *filt,
+SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 				 ToolMenuItem *toolMenuItem, QJSEngine *engine, ToolLauncher *parent) :
 	Tool(_ctx, toolMenuItem, new SignalGenerator_API(this), "Signal Generator",
 	     parent),
 	ui(new Ui::SignalGenerator),
 	time_block_data(new adiscope::time_block_data),
-	dacs(dacs),
+	m_m2k_context(m2kOpen(ctx, "")),
+	m_m2k_analogout(m_m2k_context->getAnalogOut()),
 	nr_of_periods(2),
 	currentChannel(0), sample_rate(0),
 	settings_group(new QButtonGroup(this)),nb_points(NB_POINTS),
-	channels_group(new QButtonGroup(this))
+	channels_group(new QButtonGroup(this)),
+	m_maxNbOfSamples(4 * 1024 * 1024 / 2)
 {
 	zoomT1=0;
 	zoomT2=1;
@@ -136,40 +142,16 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 
 	QVector<struct iio_channel *> iio_channels;
 
-	for (int i = 0; i < dacs.size(); i++) {
-		struct iio_device *dev = dacs[i]->iio_dac_dev();
+	for (int i = 0; i < m_m2k_analogout->getNbChannels(); i++) {
 
-		unsigned long dev_sample_rate = get_max_sample_rate(dev);
+		unsigned long dev_sample_rate = m_m2k_analogout->getMaximumSamplerate(i);
 
 		if (dev_sample_rate > sample_rate) {
 			sample_rate = dev_sample_rate;
 		}
-
-		QList<struct iio_channel *> dac_channels =
-		        dacs[i]->dacChannelList();
-
-		for (int j = 0; j < dac_channels.size(); j++) {
-			iio_channels.append(dac_channels[j]);
-			channel_dac.push_back(QPair<struct iio_channel *,
-			                      std::shared_ptr<GenericDac>>(dac_channels[j],
-			                                      dacs[i]));
-		}
 	}
 
 	max_sample_rate = sample_rate;
-
-	/* FIXME: TODO: Move this into a HW class / lib M2k */
-	struct iio_device *fabric = iio_context_find_device(ctx, "m2k-fabric");
-
-	if (fabric) {
-		this->amp1 = iio_device_find_channel(fabric, "voltage0", true);
-		this->amp2 = iio_device_find_channel(fabric, "voltage1", true);
-
-		if (amp1 && amp2) {
-			iio_channel_attr_write_bool(amp1, "powerdown", true);
-			iio_channel_attr_write_bool(amp2, "powerdown", true);
-		}
-	}
 
 	/* Create waveform control widgets */
 	phase = new PhaseSpinButton({
@@ -345,14 +327,11 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 		[=](bool check) {
 			ui->wNoise->setVisible(!check);
 		});
-	unsigned int nb_channels = iio_channels.size();
 
+	unsigned int nb_channels = m_m2k_analogout->getNbChannels();
 	for (unsigned int i = 0; i < nb_channels; i++) {
-		struct iio_channel *chn = iio_channels[i];
-
 		auto ptr = QSharedPointer<signal_generator_data>(
 		                   new signal_generator_data);
-		ptr->iio_ch = chn;
 		ptr->amplitude = amplitude->value();
 		ptr->offset = offset->value();
 		ptr->frequency = frequency->value();
@@ -383,21 +362,20 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 		cw->setShortName(QString("CH %1").arg(i + 1));
 		cw->nameButton()->setText(cw->shortName());
 
-		const char *ch_name = iio_channel_get_name(chn);
-		std::string s = "Channel ";
+		std::string ch_name = m_m2k_analogout->getChannelName(i);
 
-		if (!ch_name) {
-			s += std::to_string(i + 1);
-			ch_name = s.c_str();
+		if (ch_name == "") {
+			ch_name += "Channel ";
+			ch_name += std::to_string(i + 1);
 		}
 
-		cw->setFullName(ch_name);
+		cw->setFullName(ch_name.c_str());
 
 		cw->setProperty("signal_generator_data",
 		                QVariant::fromValue(ptr));
 		cw->setProperty("channel",
-		                qVariantFromValue((void *) chn));
-		iio_channel_set_data(chn, cw);
+				qVariantFromValue(i));
+		channels.append(cw);
 
 		ui->channelsList->addWidget(cw);
 
@@ -409,8 +387,6 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx,
 
 		channels_group->addButton(cw->nameButton());
 		settings_group->addButton(cw->menuButton());
-
-		channels.append(cw);
 
 		connect(cw->nameButton(), &QAbstractButton::toggled,
 			cw->menuButton(), &QAbstractButton::setChecked);
@@ -760,6 +736,7 @@ void SignalGenerator::fileChannelChanged(int value)
 
 	if (ptr->file_channel != (int) value) {
 		ptr->file_channel = (int) value;
+		loadFileChannelData(currentChannel);
 		this->ui->label_size->setText(QString::number(
 		                                      ptr->file_nr_of_samples[ptr->file_channel]) +
 					      tr(" samples"));
@@ -1195,15 +1172,9 @@ bool SignalGenerator::loadParametersFromFile(
 
 	ui->fileChannel->setEnabled(ptr->file_nr_of_channels > 1);
 
-	std::shared_ptr<GenericDac> dac ;
-	for(auto ch : channel_dac)
-		if(ptr->iio_ch==ch.first){
-			dac=ch.second;
-			break;}
-
 	for(auto ch_samples : ptr->file_nr_of_samples)
 	{
-		if(ch_samples > dac->maxNumberOfSamples())
+		if(ch_samples > m_maxNbOfSamples)
 		{
 			ptr->file_message = "File too big. Too many samples";
 			ptr->file_type=FORMAT_NO_FILE;
@@ -1287,165 +1258,74 @@ void SignalGenerator::loadFile()
 
 void SignalGenerator::start()
 {
-	QVector<struct iio_channel *> enabled_channels;
-
 	m_running = true;
-	if (amp1 && amp2) {
-		/* FIXME: TODO: Move this into a HW class / lib M2k */
-		iio_channel_attr_write_bool(amp1, "powerdown", /*!(ui->run_button->isChecked() && */ !channels[0]->enableButton()->isChecked());
-		iio_channel_attr_write_bool(amp2, "powerdown", /*!(ui->run_button->isChecked() && */ !channels[1]->enableButton()->isChecked());
-	}
 
 	/* Avoid from being started twice */
 	if (buffers.size() > 0) {
 		return;
 	}
 
+	m_m2k_analogout->cancelBuffer();
+
 	for (auto it = channels.begin(); it != channels.end(); ++it) {
 		if (!(*it)->enableButton()->isChecked()) {
+			m_m2k_analogout->enableChannel((*it)->id(), false);
 			continue;
 		}
 
+		m_m2k_analogout->enableChannel((*it)->id(), true);
 		auto chn_data = getData(*it);
 
 		if (chn_data->file_type==FORMAT_NO_FILE && chn_data->type==SIGNAL_TYPE_BUFFER) {
 			continue;
 		}
-
-		void *ptr = (*it)->property("channel").value<void *>();
-		enabled_channels.append(static_cast<struct iio_channel *>(ptr));
 	}
 
-	if (enabled_channels.size()==0) {
-		return;
+	unsigned long final_rate;
+	unsigned long oversampling;
+
+	for (int i = 0; i < m_m2k_analogout->getNbChannels(); i++) {
+		buffers.push_back({});
+		if (!m_m2k_analogout->isChannelEnabled(i)) {
+			continue;
+		}
+
+		top_block = gr::make_top_block("Signal Generator");
+		double best_rate = get_best_sample_rate(i);
+
+		/* Do not generate anything if samplerate can't be determined */
+		if (best_rate <= 0) {
+			continue;
+		}
+		size_t samples_count = get_samples_count(i, best_rate);
+
+		calc_sampling_params(i, best_rate, final_rate,
+				     oversampling);
+
+		QWidget* w = channels[i];
+		auto source = getSource(w, best_rate, top_block);
+		auto head = blocks::head::make(sizeof(float), samples_count);
+		auto vector = blocks::vector_sink_f::make();
+		auto clamp = analog::rail_ff::make(-AMPLITUDE_VOLTS, AMPLITUDE_VOLTS);
+
+		top_block->connect(source, 0, clamp, 0);
+		top_block->connect(clamp,0, head,0);
+		top_block->connect(head, 0, vector, 0);
+		top_block->run();
+
+		const std::vector<float>& f_samples = vector->data();
+		std::vector<double> samples(f_samples.begin(), f_samples.end());
+
+		buffers.at(i) = samples;
+
+		m_m2k_analogout->setOversamplingRatio(i, oversampling);
+		m_m2k_analogout->setSampleRate(i, final_rate);
 	}
 
-	do {
-		const struct iio_device *dev =
-		        iio_channel_get_device(enabled_channels[0]);
+	qDebug(CAT_SIGNAL_GENERATOR) << "Pushed cyclic buffer";
 
-		/* First, disable all the channels of this device */
-		unsigned int nb = iio_device_get_channels_count(dev);
-
-		for (unsigned int i = 0; i < nb; i++) {
-			iio_channel_disable(iio_device_get_channel(dev, i));
-		}
-
-		/* Then enable the channels that we want */
-		for (auto each : enabled_channels) {
-			if (dev == iio_channel_get_device(each)) {
-				iio_channel_enable(each);
-			}
-		}
-
-		/* Enable the (optional) DMA sync */
-		iio_device_attr_write_bool(dev, "dma_sync", true);
-
-		double best_rate = get_best_sample_rate(dev);
-		size_t samples_count = get_samples_count(dev, best_rate);
-
-		/* Create the IIO buffer */
-		struct iio_buffer *buf = iio_device_create_buffer(
-		                                 dev, samples_count, true);
-
-		if (!buf || best_rate == 0) {
-			throw std::runtime_error("Unable to create buffer");
-		}
-
-		qDebug(CAT_SIGNAL_GENERATOR) << QString("Created buffer with %1 samples at %2 SPS for device %3")
-		         .arg(samples_count).arg(best_rate).arg(
-		                 iio_device_get_name(dev) ?:
-		                 iio_device_get_id(dev));
-
-		unsigned long final_rate;
-		unsigned long oversampling;
-
-		calc_sampling_params(dev, best_rate, final_rate,
-		                     oversampling);
-
-		for (auto each : enabled_channels) {
-			if (dev != iio_channel_get_device(each)) {
-				continue;
-			}
-
-			enabled_channels.remove(enabled_channels.indexOf(each));
-
-			top_block = gr::make_top_block("Signal Generator");
-
-			void *ptr = iio_channel_get_data(each);
-			QWidget *w = static_cast<QWidget *>(ptr);
-			auto source = getSource(w, best_rate, top_block);
-			float volts_to_raw_coef;
-			double vlsb = 1;
-			double corr = 1; // interpolation correction
-			auto pair_it = std::find_if(channel_dac.begin(),
-			                            channel_dac.end(),
-			                            [&each](const QPair<struct iio_channel *,
-			std::shared_ptr<GenericDac>>& element) {
-				return element.first == each;
-			});
-
-			std::shared_ptr<GenericDac> dac =(*pair_it).second;
-
-			if (pair_it != channel_dac.end()) {
-				vlsb = dac->vlsb();
-				auto m2k_dac = std::dynamic_pointer_cast<M2kDac>
-				               (dac);
-
-				if (m2k_dac) {
-					corr = m2k_dac->compTable(final_rate);
-				}
-			}
-
-			// DAC_RAW = (-Vout / (voltage corresponding to a LSB));
-			// Multiplying with 16 because the HDL considers the DAC data as 16 bit
-			// instead of 12 bit(data is shifted to the left)
-			// Divide by corr when interpolation is used
-			volts_to_raw_coef = (-1 * (1 / vlsb) * 16) / corr;
-			auto f2s = blocks::float_to_short::make(1,
-			                                        volts_to_raw_coef);
-			auto head = blocks::head::make(
-			                    sizeof(short), samples_count);
-			auto vector = blocks::vector_sink_s::make();
-			auto clamp = analog::rail_ff::make(dac->vOutL(), dac->vOutH());
-
-			top_block->connect(source, 0, clamp, 0);
-			top_block->connect(clamp,0, f2s,0);
-			top_block->connect(f2s, 0, head, 0);
-			top_block->connect(head, 0, vector, 0);
-			top_block->run();
-
-			const std::vector<short>& samples = vector->data();
-			const short *data = samples.data();
-
-			if (samples.size()) {
-				iio_channel_write(each, buf, data,
-			                  samples_count * sizeof(short));
-			}
-		}
-
-		if (iio_device_find_attr(dev, "oversampling_ratio")) {
-			iio_device_attr_write_longlong(dev,
-			                               "oversampling_ratio", oversampling);
-		}
-
-		iio_device_attr_write_longlong(dev, "sampling_frequency",
-		                               final_rate);
-
-		qDebug(CAT_SIGNAL_GENERATOR) << "Pushed cyclic buffer";
-
-		iio_buffer_push_partial(buf, samples_count);
-		buffers.append(buf);
-
-	} while (!enabled_channels.empty());
-
-	/* Now that we pushed all the buffers, disable the (optional) DMA sync
-	 * for the devices that support it. */
-	for (auto buf : buffers) {
-		const struct iio_device *dev = iio_buffer_get_device(buf);
-
-		iio_device_attr_write_bool(dev, "dma_sync", false);
-	}
+	m_m2k_analogout->setCyclic(true);
+	m_m2k_analogout->push(buffers);
 }
 
 
@@ -1456,20 +1336,13 @@ void SignalGenerator::run()
 
 void SignalGenerator::stop()
 {
-
-	for (auto each : buffers) {
-		iio_buffer_destroy(each);
+	try {
+		buffers.clear();
+		m_running = false;
+		m_m2k_analogout->stop();
+	} catch (std::exception &e) {
+		qDebug(CAT_SIGNAL_GENERATOR) << e.what();
 	}
-
-	buffers.clear();
-
-
-	if (amp1 && amp2) {
-		/* FIXME: TODO: Move this into a HW class / lib M2k */
-		iio_channel_attr_write_bool(amp1, "powerdown", true);//!(ui->run_button->isChecked() && channels[0]->enableButton()->isChecked()));
-		iio_channel_attr_write_bool(amp2, "powerdown", true);//!(ui->run_button->isChecked() && channels[1]->enableButton()->isChecked()));
-	}
-	m_running = false;
 }
 
 void SignalGenerator::startStop(bool pressed)
@@ -1831,6 +1704,8 @@ void adiscope::SignalGenerator::channelWidgetEnabled(bool en)
 	ChannelWidget *cw = static_cast<ChannelWidget *>(QObject::sender());
 	int id = cw->id();
 
+	m_m2k_analogout->enableChannel(id, en);
+
 	if (en) {
 		plot->AttachCurve(id);
 	} else {
@@ -1848,6 +1723,7 @@ void adiscope::SignalGenerator::channelWidgetEnabled(bool en)
 			enable_run = (*it)->enableButton()->isChecked();
 		}
 	}
+
 
 	ui->run_button->setEnabled(enable_run);
 	run_button->setEnabled(enable_run);
@@ -1936,6 +1812,21 @@ void SignalGenerator::updateRightMenuForChn(int chIdx)
 	filePhase->setEnabled(ptr->file_type != FORMAT_NO_FILE);
 	fileOffset->setEnabled(ptr->file_type != FORMAT_NO_FILE);
 
+	ui->fileChannel->blockSignals(true);
+	ui->fileChannel->clear();
+
+	if (ptr->file_channel_names.isEmpty()) {
+		for (auto i=0; i<ptr->file_nr_of_channels; i++) {
+			ui->fileChannel->addItem(QString::number(i));
+		}
+	} else {
+		ui->fileChannel->addItems(ptr->file_channel_names);
+	}
+
+	ui->fileChannel->setEnabled(ptr->file_nr_of_channels>1);
+	ui->fileChannel->setCurrentIndex(ptr->file_channel);
+	ui->fileChannel->blockSignals(false);
+
 	offset->setValue(ptr->offset);
 	amplitude->setValue(ptr->amplitude);
 	dutycycle->setValue(ptr->dutycycle);
@@ -1951,15 +1842,18 @@ void SignalGenerator::updateRightMenuForChn(int chIdx)
 
 	ui->label_path->setText(ptr->file);
 	ui->label_format->setText(ptr->file_message);
-	if(!ptr->file_nr_of_samples.empty())
-		ui->label_size->setText(QString::number(ptr->file_nr_of_samples[ptr->file_channel]) +
-				tr(" samples"));
+	if(!ptr->file_nr_of_samples.empty()) {
+        ui->label_size->setText(QString::number(ptr->file_nr_of_samples[ptr->file_channel]) +
+                                tr(" samples"));
+	} else {
+		ui->label_size->setText("");
+	}
+
 	ui->mathWidget->setFunction(ptr->function);
 	mathFrequency->setValue(ptr->math_freq);
 	fileSampleRate->setValue(ptr->file_sr);
 	fileOffset->setValue(ptr->file_offset);
 	filePhase->setValue(ptr->file_phase);
-	ui->fileChannel->setCurrentIndex(ptr->file_channel);
 	fileAmplitude->setValue(ptr->file_amplitude);
 
 	ui->type->setCurrentIndex(sg_waveform_to_idx(ptr->waveform));
@@ -1995,94 +1889,56 @@ void adiscope::SignalGenerator::rightMenuFinished(bool opened)
 	}
 }
 
-bool SignalGenerator::use_oversampling(const struct iio_device *dev)
+bool SignalGenerator::use_oversampling(unsigned int chnIdx)
 {
-	if (!iio_device_find_attr(dev, "oversampling_ratio")) {
+	if (!m_m2k_analogout->isChannelEnabled(chnIdx)) {
 		return false;
 	}
 
-	for (unsigned int i = 0; i < iio_device_get_channels_count(dev); i++) {
-		struct iio_channel *chn = iio_device_get_channel(dev, i);
+	QWidget *w = channels.at(chnIdx);
+	auto ptr = getData(w);
 
-		if (!iio_channel_is_enabled(chn)) {
-			continue;
-		}
+	switch (ptr->type) {
+	case SIGNAL_TYPE_WAVEFORM:
 
-		QWidget *w = static_cast<QWidget *>(iio_channel_get_data(chn));
-		auto ptr = getData(w);
-
-		switch (ptr->type) {
-		case SIGNAL_TYPE_WAVEFORM:
-
-			/* We only want oversampling for square waveforms */
-			if (ptr->waveform == SG_SQR_WAVE) {
-				return true;
-			}
-
-			break;
-
-		case SIGNAL_TYPE_BUFFER:
+		/* We only want oversampling for square waveforms */
+		if (ptr->waveform == SG_SQR_WAVE) {
 			return true;
-
-		default:
-			break;
 		}
+
+		break;
+
+	case SIGNAL_TYPE_BUFFER:
+		return true;
+
+	default:
+		break;
 	}
 
 	return false;
 }
 
-QVector<unsigned long> SignalGenerator::get_available_sample_rates(
-        const struct iio_device *dev)
+
+double SignalGenerator::get_best_sample_rate(unsigned int chnIdx)
 {
-	QVector<unsigned long> values;
-	char buf[1024];
-	int ret;
+	std::vector<double> values = m_m2k_analogout->getAvailableSampleRates(chnIdx);
 
-	ret = iio_device_attr_read(dev, "sampling_frequency_available",
-	                           buf, sizeof(buf));
-
-	if (ret > 0) {
-		QStringList list = QString::fromUtf8(buf).split(' ');
-
-		for (auto it = list.cbegin(); it != list.cend(); ++it) {
-			values.append(it->toULong());
-		}
-	}
-
-	if (values.empty()) {
-		ret = iio_device_attr_read(dev, "sampling_frequency",
-		                           buf, sizeof(buf));
-
-		if (!ret) {
-			values.append(QString::fromUtf8(buf).toULong());
-		}
-	}
-
-	qSort(values.begin(), values.end(), qGreater<unsigned long>());
-
-	return values;
-}
-
-double SignalGenerator::get_best_sample_rate(
-        const struct iio_device *dev)
-{
-	QVector<unsigned long> values = get_available_sample_rates(dev);
+	std::sort(values.begin(), values.end(), std::greater<double>());
 
 	/* When using oversampling, we actually want to generate the
 	 * signal with the lowest sample rate possible. */
 
-	if (sample_rate_forced(dev)) {
-		return get_forced_sample_rate(dev);
+	if (sample_rate_forced(chnIdx)) {
+		return get_forced_sample_rate(chnIdx);
 	}
 
-	if (use_oversampling(dev)) {
-		qSort(values.begin(), values.end(), qLess<unsigned long>());
+	if (use_oversampling(chnIdx)) {
+		qSort(values.begin(), values.end(), qLess<double>());
 	}
 
 	/* Return the best sample rate that we can create a buffer for */
 	for (unsigned long rate : values) {
-		size_t buf_size = get_samples_count(dev, rate, true);
+		size_t buf_size = get_samples_count(chnIdx, rate, true);
 
 		if (buf_size) {
 			return rate;
@@ -2092,13 +1948,13 @@ double SignalGenerator::get_best_sample_rate(
 	}
 
 	/* If we can't find a perfect sample rate, use the highest one */
-	if (use_oversampling(dev)) {
-		qSort(values.begin(), values.end(), qGreater<unsigned long>());
+	if (use_oversampling(chnIdx)) {
+		qSort(values.begin(), values.end(), qGreater<double>());
 	}
 
 
 	for (unsigned long rate : values) {
-		size_t buf_size = get_samples_count(dev, rate);
+		size_t buf_size = get_samples_count(chnIdx, rate);
 
 		if (buf_size) {
 			return rate;
@@ -2107,67 +1963,42 @@ double SignalGenerator::get_best_sample_rate(
 		qDebug(CAT_SIGNAL_GENERATOR) << QString("Rate %1 not possible").arg(rate);
 	}
 
-	throw std::runtime_error("Unable to calculate best sample rate");
+	return -1;
 }
 
-bool SignalGenerator::sample_rate_forced(const struct iio_device *dev)
+bool SignalGenerator::sample_rate_forced(unsigned int chnIdx)
 {
-	for (unsigned int i = 0; i < iio_device_get_channels_count(dev); i++) {
-		struct iio_channel *chn = iio_device_get_channel(dev, i);
-
-		if (!iio_channel_is_enabled(chn)) {
-			continue;
-		}
-
-		QWidget *w = static_cast<QWidget *>(iio_channel_get_data(chn));
-		auto ptr = getData(w);
-
-		if (ptr->file_type && ptr->file_sr && ptr->type==SIGNAL_TYPE_BUFFER) {
-			return true;
-		}
+	if (!m_m2k_analogout->isChannelEnabled(chnIdx)) {
+		return false;
 	}
 
+	QWidget *w = channels.at(chnIdx);
+	auto ptr = getData(w);
+
+	if (ptr->file_type && ptr->file_sr && ptr->type==SIGNAL_TYPE_BUFFER) {
+		return true;
+	}
 	return false;
 }
 
-double SignalGenerator::get_forced_sample_rate(const struct iio_device
-                *dev)
+double SignalGenerator::get_forced_sample_rate(unsigned int chnIdx)
 {
-
-	for (unsigned int i = 0; i < iio_device_get_channels_count(dev); i++) {
-		struct iio_channel *chn = iio_device_get_channel(dev, i);
-
-		if (!iio_channel_is_enabled(chn)) {
-			continue;
-		}
-
-		QWidget *w = static_cast<QWidget *>(iio_channel_get_data(chn));
+	if (sample_rate_forced(chnIdx)) {
+		QWidget *w = channels.at(chnIdx);
 		auto ptr = getData(w);
 
 		if (ptr->file_type && ptr->file_sr && ptr->type==SIGNAL_TYPE_BUFFER) {
 			return ptr->file_sr;
 		}
 	}
-
 	return false;
 }
 
-unsigned long SignalGenerator::get_max_sample_rate(const struct iio_device *dev)
-{
-	QVector<unsigned long> values = get_available_sample_rates(dev);
-
-	if (values.empty()) {
-		return default_sample_rate;
-	}
-
-	return values.takeFirst();
-}
-
-void SignalGenerator::calc_sampling_params(const iio_device *dev,
+void SignalGenerator::calc_sampling_params(unsigned int chnIdx,
 		double rate, unsigned long& out_sample_rate,
                 unsigned long& out_oversampling_ratio)
 {
-	if (use_oversampling(dev)) {
+	if (use_oversampling(chnIdx)) {
 		/* We assume that the rate requested here will always be a
 		 * divider of the max sample rate */
 		out_oversampling_ratio = max_sample_rate / rate;
@@ -2245,96 +2076,84 @@ double SignalGenerator::get_best_ratio(double ratio, double max, double *fract)
 	return best_ratio;
 }
 
-size_t SignalGenerator::get_samples_count(const struct iio_device *dev,
+size_t SignalGenerator::get_samples_count(unsigned int chnIdx,
 		double rate, bool perfect)
 {
-
 	size_t size = 1;
 	size_t max_buffer_size=min_buffer_size<<1;
+	max_buffer_size = m_maxNbOfSamples;
+	QWidget *w;
+	QSharedPointer<signal_generator_data>  ptr;
 
-	for (unsigned int i = 0; i < iio_device_get_channels_count(dev); i++) {
-		struct iio_channel *chn = iio_device_get_channel(dev, i);
+	if (!m_m2k_analogout->isChannelEnabled(chnIdx)) {
+		goto out_cleanup;
+	}
 
-		auto pair_it = std::find_if(channel_dac.begin(),
-					    channel_dac.end(),
-					    [&chn](const QPair<struct iio_channel *,
-		std::shared_ptr<GenericDac>>& element) {
-			return element.first == chn;
-		});
+	w = channels.at(chnIdx);
+	ptr = getData(w);
+	double ratio, fract;
 
-		std::shared_ptr<GenericDac> dac =(*pair_it).second;
-
-		max_buffer_size = dac->maxNumberOfSamples();
-
-		if (!iio_channel_is_enabled(chn)) {
-			continue;
+	switch (ptr->type) {
+	case SIGNAL_TYPE_WAVEFORM:
+	case SIGNAL_TYPE_MATH:
+		if (ptr->type == SIGNAL_TYPE_WAVEFORM) {
+			ratio = (double) rate / ptr->frequency;
+		} else {
+			ratio = (double) rate / ptr->math_freq;
 		}
 
-		QWidget *w = static_cast<QWidget *>(iio_channel_get_data(chn));
-		auto ptr = getData(w);
-		double ratio, fract;
-
-		switch (ptr->type) {
-		case SIGNAL_TYPE_WAVEFORM:
-		case SIGNAL_TYPE_MATH:
-			if (ptr->type == SIGNAL_TYPE_WAVEFORM) {
-				ratio = (double) rate / ptr->frequency;
-			} else {
-				ratio = (double) rate / ptr->math_freq;
-			}
-
-			// TODO: Figure out what the limit is on the generated signals
-			/*if (ptr->type == SIGNAL_TYPE_WAVEFORM
+		// TODO: Figure out what the limit is on the generated signals
+		/*if (ptr->type == SIGNAL_TYPE_WAVEFORM
 					&& ptr->waveform == SG_SIN_WAVE
 					&& ratio < 2.5)
 				return 0; /* rate too low */
-			//else
+		//else
 
-			// for less than max sample rates, generate at least 10 samples per period
-			if (ratio < 10.0 && rate < max_sample_rate)
-				return 0;
-			if (ratio < 2.0) {
-				return 0;        /* rate too low */
-			}
-
-			/* The ratio must be even for square waveforms */
-			if (perfect && (ptr->type == SIGNAL_TYPE_WAVEFORM)
-			    && (ptr->waveform == SG_SQR_WAVE)
-			    && (fmod(ratio, 2.0) != 0.0)) {
-				return 0;
-			}
-
-			ratio = get_best_ratio(ratio,
-			                       (double)(max_buffer_size / 4), &fract);
-
-			if (perfect && fract != 0.0) {
-				return 0;
-			}
-
-			size = lcm(size, (size_t) ratio);
-			break;
-
-		case SIGNAL_TYPE_BUFFER:
-			if (!ptr->file_type) {
-				return 0;
-			}
-
-			if (perfect && rate!=ptr->file_sr) {
-				return 0;
-			}
-
-			ratio = rate/ptr->file_sr;
-			if (ptr->file_nr_of_samples.size() > 0) {
-				size=(ptr->file_nr_of_samples[ptr->file_channel] * ratio);
-			}
-			break;
-
-		case SIGNAL_TYPE_CONSTANT:
-		default:
-			break;
+		// for less than max sample rates, generate at least 10 samples per period
+		if (ratio < 10.0 && rate < max_sample_rate)
+			return 0;
+		if (ratio < 2.0) {
+			return 0;        /* rate too low */
 		}
+
+		/* The ratio must be even for square waveforms */
+		if (perfect && (ptr->type == SIGNAL_TYPE_WAVEFORM)
+				&& (ptr->waveform == SG_SQR_WAVE)
+				&& (fmod(ratio, 2.0) != 0.0)) {
+			return 0;
+		}
+
+		ratio = get_best_ratio(ratio,
+				       (double)(max_buffer_size / 4), &fract);
+
+		if (perfect && fract != 0.0) {
+			return 0;
+		}
+
+		size = lcm(size, (size_t) ratio);
+		break;
+
+	case SIGNAL_TYPE_BUFFER:
+		if (!ptr->file_type) {
+			return 0;
+		}
+
+		if (perfect && rate!=ptr->file_sr) {
+			return 0;
+		}
+
+		ratio = rate/ptr->file_sr;
+		if (ptr->file_nr_of_samples.size() > 0) {
+			size=(ptr->file_nr_of_samples[ptr->file_channel] * ratio);
+		}
+		break;
+
+	case SIGNAL_TYPE_CONSTANT:
+	default:
+		break;
 	}
 
+out_cleanup:
 	/* The buffer size must be a multiple of 4 */
 	while (size & 0x3) {
 		size <<= 1;

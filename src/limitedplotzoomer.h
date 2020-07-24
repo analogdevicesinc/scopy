@@ -29,8 +29,13 @@ public:
 	LimitedPlotZoomer(QWidget*, bool doReplot = false);
 	void resetZoom();
 
+	void setBoundVertical(bool bound);
+
 protected:
         virtual void zoom(const QRectF &);
+
+private:
+	bool m_boundVertical;
 };
 }
 
