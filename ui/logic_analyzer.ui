@@ -828,7 +828,7 @@ font-weight: normal;
                            </property>
                            <property name="icon">
                             <iconset>
-                             <normalon>:/icons/trigger_high_enabled.svg</normalon>
+                             <normalon>:/icons/trigger_low_enabled.svg</normalon>
                             </iconset>
                            </property>
                           </item>
@@ -838,7 +838,7 @@ font-weight: normal;
                            </property>
                            <property name="icon">
                             <iconset>
-                             <normalon>:/icons/trigger_low_enabled.svg</normalon>
+                             <normalon>:/icons/trigger_high_enabled.svg</normalon>
                             </iconset>
                            </property>
                           </item>
@@ -1581,7 +1581,7 @@ font-weight: normal;
                       <x>0</x>
                       <y>0</y>
                       <width>300</width>
-                      <height>469</height>
+                      <height>242</height>
                      </rect>
                     </property>
                     <property name="sizePolicy">
@@ -2224,11 +2224,6 @@ color: rgba(255, 255, 255, 153);
  </widget>
  <customwidgets>
   <customwidget>
-   <class>adiscope::CustomSwitch</class>
-   <extends>QPushButton</extends>
-   <header>customSwitch.hpp</header>
-  </customwidget>
-  <customwidget>
    <class>adiscope::DetachDragZone</class>
    <extends>QWidget</extends>
    <header>detachdragzone.h</header>
@@ -2250,6 +2245,11 @@ color: rgba(255, 255, 255, 153);
    <extends>QWidget</extends>
    <header>runsinglewidget.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::CustomSwitch</class>
+   <extends>QPushButton</extends>
+   <header>customSwitch.hpp</header>
   </customwidget>
  </customwidgets>
  <resources>
