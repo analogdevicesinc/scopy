@@ -193,9 +193,10 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 		{"steps",1e0},
 		}, tr("Falling"),1,1024,true,false,this);
 
-	stairPhase = new PhaseSpinButton({
+	stairPhase = new PositionSpinButton({
 		{"samples",1e0}
-	}, tr("Phase"), 0, 360, true, true, this);
+	}, tr("Phase"), 0, 1024, true, false, this);
+	stairPhase->setFineModeAvailable(false);
 
 
 
@@ -229,9 +230,10 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 	},tr("Low Time"), 0, 10, true, false, this);
 
 	/* Create file control widgets */
-	filePhase = new PhaseSpinButton({
+	filePhase = new PositionSpinButton({
 		{"samples",1e0}
 	}, tr("Phase"), 0.0, 360.0, true, false, this);
+	filePhase->setFineModeAvailable(false);
 
 	fileOffset = new PositionSpinButton({
 		{"μVolts",1e-6},

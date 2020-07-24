@@ -152,7 +152,8 @@ private:
 	gr::top_block_sptr top_block;
 	struct time_block_data *time_block_data;
 
-	PhaseSpinButton *phase, *filePhase, *stairPhase;
+	PhaseSpinButton *phase;
+	PositionSpinButton  *filePhase, *stairPhase;
 	PositionSpinButton *offset, *fileOffset;
 	PositionSpinButton *constantValue, *dutycycle;
 	ScaleSpinButton *amplitude, *frequency;
