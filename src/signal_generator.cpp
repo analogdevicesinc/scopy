@@ -247,6 +247,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 		{"kHz",1e3},
 		{"MHz",1e6}
 	},tr("SampleRate"), 0.001, 0.0, true, false, this);
+	fileSampleRate->setIntegerDivider(75000000);
 
 	fileAmplitude = new ScaleSpinButton({
 		{"μVolts",1e-6},
@@ -254,12 +255,21 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 		{"Volts",1e0}
 	}, tr("Amplitude"), 0.000001, 10, true, true, this);
 
-	mathFrequency = new ScaleSpinButton({
+	mathSampleRate =  new ScaleSpinButton({
 		{"mHz",1e-3},
 		{"Hz",1e0},
 		{"kHz",1e3},
 		{"MHz",1e6}
-	}, tr("Frequency"), 0.001, 0.0, true, false, this);
+	},tr("SampleRate"), 0.001, 75000000.0, true, false, this);
+
+	mathSampleRate->setIntegerDivider(75000000);
+
+	mathRecordLength = new ScaleSpinButton({
+		{"ns",1e-9},
+		{"μs",1e-6},
+		{"ms",1e-3},
+		{"s",1}
+		}, tr("Record Length"), 1e-9, 100.0, true, false, this, {1,2,5});
 
 	noiseAmplitude = new ScaleSpinButton({
 		{"μVolts",1e-6},
@@ -296,7 +306,9 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 	ui->waveformGrid_2->addWidget(fileSampleRate, 1, 0, 1, 1);
 	ui->waveformGrid_2->addWidget(filePhase, 1, 1, 1, 1);
 
-	ui->verticalLayout_3->insertWidget(0, mathFrequency);
+	ui->verticalLayout_3->insertWidget(0, mathRecordLength);
+	ui->verticalLayout_3->insertWidget(1, mathSampleRate);
+
 	ui->horizontalLayout_5->insertWidget(1, noiseAmplitude);
 	ui->gridLayout->addWidget(constantValue,0,0,1,1);
 
@@ -306,8 +318,11 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 	/* Set max frequency according to max sample rate */
 	fileSampleRate->setMinValue(0.1);
 	frequency->setMaxValue(max_frequency);
-	mathFrequency->setMaxValue(max_frequency);
-	fileSampleRate->setMaxValue((sample_rate / 2) - 1);
+	fileSampleRate->setMaxValue(sample_rate);
+
+	mathSampleRate->setMinValue(1);
+	mathSampleRate->setMaxValue(sample_rate);
+	mathSampleRate->setValue(1000000);
 
 	/* (lowest freq * 100 * 1000) frequency by default */
 	frequency->setValue(frequency->minValue() * 1000 * 1000.0);
@@ -345,7 +360,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 	dutycycle->setValue(50);
 	dutycycle->setVisible(false);
 	ui->wtrapezparams->setVisible(false);
-	mathFrequency->setValue(mathFrequency->minValue() * 100 * 1000.0);
+	mathRecordLength->setValue(mathRecordLength->minValue() * 100 * 1000.0);
 
 	ui->cbNoiseType->setCurrentIndex(0);
 	noiseAmplitude->setMinValue(1e-06);
@@ -381,7 +396,8 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 		ptr->stairphase = stairPhase->value();
 		ptr->dutycycle = dutycycle->value();
 		ptr->waveform = SG_SIN_WAVE;
-		ptr->math_freq = mathFrequency->value();
+		ptr->math_record_length = mathRecordLength->value();
+		ptr->math_sr = mathSampleRate->value();
 		ptr->noiseType = (gr::analog::noise_type_t)0;
 		ptr->noiseAmplitude=noiseAmplitude->value();
 		ptr->file_sr = fileSampleRate->value();
@@ -507,6 +523,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 	connect(dutycycle, SIGNAL(valueChanged(double)),
 		this, SLOT(dutyChanged(double)));
 
+
 	connect(fallTime, SIGNAL(valueChanged(double)),
 		this, SLOT(fallChanged(double)));
 	connect(holdHighTime, SIGNAL(valueChanged(double)),
@@ -525,8 +542,10 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 	connect(stairPhase,SIGNAL(valueChanged(double)),
 		this,SLOT(stairPhaseChanged(double)));
 
-	connect(mathFrequency, SIGNAL(valueChanged(double)),
-	        this, SLOT(mathFreqChanged(double)));
+	connect(mathRecordLength, SIGNAL(valueChanged(double)),
+			this, SLOT(mathRecordLengthChanged(double)));
+	connect(mathSampleRate, SIGNAL(valueChanged(double)),
+			this, SLOT(mathSampleRateChanged(double)));
 
 	connect(ui->type, SIGNAL(currentIndexChanged(int)),
 	        this, SLOT(waveformTypeChanged(int)));
@@ -640,16 +659,16 @@ void SignalGenerator::resetZoom()
 				break;
 
 			case SIGNAL_TYPE_WAVEFORM:
-				if (period< 1 / (ptr->frequency)) {
-					period=(1/ptr->frequency);
+				if (period< 1.0 / (ptr->frequency)) {
+					period=(1.0/ptr->frequency);
 					slowSignalId = ptr->id;
 				}
 
 				break;
 
 			case SIGNAL_TYPE_MATH:
-				if (period< 1 / (ptr->math_freq)) {
-					period=(1/ptr->math_freq);
+				if (period< (ptr->math_record_length)) {
+					period=(ptr->math_record_length);
 					slowSignalId = ptr->id;
 				}
 
@@ -696,7 +715,7 @@ void SignalGenerator::rescale()
 
 	double max_sample_rate=750000000;
 	nb_points=NB_POINTS;
-	sample_rate=nb_points/deltaT;
+	sample_rate=(double)nb_points/deltaT;
 
 	if (sample_rate>max_sample_rate) {
 		nb_points=nb_points / (long)(sample_rate/max_sample_rate);
@@ -784,8 +803,9 @@ void SignalGenerator::fileChannelChanged(int value)
 		ptr->file_channel = (int) value;
 		loadFileChannelData(currentChannel);
 		this->ui->label_size->setText(QString::number(
-		                                      ptr->file_nr_of_samples[ptr->file_channel]) +
+						      ptr->file_nr_of_samples[ptr->file_channel]) +
 					      tr(" samples"));
+
 		resetZoom();
 	}
 }
@@ -815,16 +835,25 @@ void SignalGenerator::frequencyChanged(double value)
 	}
 }
 
-void SignalGenerator::mathFreqChanged(double value)
+void SignalGenerator::mathRecordLengthChanged(double value)
 {
 	auto ptr = getCurrentData();
 
-	if (ptr->math_freq != value) {
-		ptr->math_freq = value;
+	if (ptr->math_record_length != value) {
+		ptr->math_record_length = value;
 		resetZoom();
 	}
 }
 
+
+void SignalGenerator::mathSampleRateChanged(double value)
+{
+	auto ptr = getCurrentData();
+	if (ptr->math_sr != value) {
+		ptr->math_sr = value;
+		resetZoom();
+	}
+}
 
 void SignalGenerator::noiseTypeChanged(int index)
 {
@@ -911,6 +940,7 @@ void SignalGenerator::stepsUpChanged(double value)
 	auto ptr = getCurrentData();
 	if(ptr->steps_up != (int)value) {
 		ptr->steps_up =(int) value;
+		stairPhase->setMaxValue(ptr->steps_up + ptr->steps_down);
 		resetZoom();
 	}
 }
@@ -921,6 +951,7 @@ void SignalGenerator::stepsDownChanged(double value)
 
 	if(ptr->steps_down != (int)value) {
 		ptr->steps_down =(int) value;
+		stairPhase->setMaxValue(ptr->steps_up + ptr->steps_down);
 		resetZoom();
 	}
 }
@@ -1643,7 +1674,7 @@ gr::basic_block_sptr SignalGenerator::displayResampler(double samp_rate,
 	auto ratio = samp_rate/freq;
 	long m,n;
 	bool ok=false;
-	for(auto precision=8;precision<2048;precision<<=1)
+	for(auto precision = 128;precision > 8 ;precision>>=1)
 	{
 		reduceFraction(ratio,&m,&n,precision);
 		if(m!=0 && n!=0)
@@ -1652,6 +1683,7 @@ gr::basic_block_sptr SignalGenerator::displayResampler(double samp_rate,
 			break;
 		}
 	}
+	ok = true;
 	if(!ok)
 	{
 		return blocks::nop::make(sizeof(float));
@@ -1787,22 +1819,31 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
 	case SIGNAL_TYPE_MATH:
 		if (!ptr->function.isEmpty()) {
 			auto str = ptr->function.toStdString();
+			double math_record_freq = (1.0/ptr->math_record_length);
 
 			if (preview) {
-				int full_periods=(int)((double)zoomT1OnScreen*ptr->math_freq);
-				double phase_in_time = zoomT1OnScreen - full_periods/ptr->math_freq;
-				phase = (phase_in_time*ptr->math_freq) * 360.0;
-				auto src = scopy::iio_math_gen::make(samp_rate,
-								   ptr->math_freq, str);
 
-				uint64_t to_skip = samp_rate * phase / (ptr->math_freq * 360.0);
+				int full_periods=(int)((double)zoomT1OnScreen * math_record_freq);
+				double phase_in_time = zoomT1OnScreen - full_periods/math_record_freq;
+				phase = (phase_in_time*math_record_freq) * 360.0;
+				uint64_t to_skip = samp_rate * phase / (math_record_freq * 360.0);
 				auto skip_head = blocks::skiphead::make(sizeof(float),(uint64_t)to_skip);
-				top->connect(src, 0, skip_head, 0);
-				generated_wave = skip_head;
 
+				if(ptr->math_sr < samp_rate)
+				{
+					auto src = scopy::iio_math_gen::make(ptr->math_sr, str);
+					auto resamp = displayResampler(samp_rate, ptr->math_sr, top, src, noiseSrc, noiseAdd);
+					top->connect(resamp, 0, skip_head, 0);
+					return skip_head;
+				}
+				else
+				{
+					auto src = scopy::iio_math_gen::make(samp_rate, str);
+					top->connect(src, 0, skip_head, 0);
+					generated_wave = skip_head;
+				}
 			} else {
-				generated_wave = scopy::iio_math_gen::make(samp_rate,
-							       ptr->math_freq, str);
+				generated_wave = scopy::iio_math_gen::make(samp_rate, str);
 			}
 			break;
 		}
@@ -1974,7 +2015,7 @@ void SignalGenerator::updateRightMenuForChn(int chIdx)
 	}
 
 	ui->mathWidget->setFunction(ptr->function);
-	mathFrequency->setValue(ptr->math_freq);
+	mathRecordLength->setValue(ptr->math_record_length);
 	fileSampleRate->setValue(ptr->file_sr);
 	fileOffset->setValue(ptr->file_offset);
 	filePhase->setValue(ptr->file_phase);
@@ -2033,6 +2074,8 @@ bool SignalGenerator::use_oversampling(unsigned int chnIdx)
 		break;
 
 	case SIGNAL_TYPE_BUFFER:
+		return true;
+	case SIGNAL_TYPE_MATH:
 		return true;
 
 	default:
@@ -2104,6 +2147,9 @@ bool SignalGenerator::sample_rate_forced(unsigned int chnIdx)
 	}
 	if (ptr->type == SIGNAL_TYPE_WAVEFORM && ptr->waveform == SG_STAIR_WAVE)
 		return true;
+
+	if(ptr->type==SIGNAL_TYPE_MATH)
+		return true;
 	return false;
 }
 
@@ -2116,9 +2162,13 @@ double SignalGenerator::get_forced_sample_rate(unsigned int chnIdx)
 		if (ptr->file_type && ptr->file_sr && ptr->type==SIGNAL_TYPE_BUFFER) {
 			return ptr->file_sr;
 		}
+
 		if (ptr->type == SIGNAL_TYPE_WAVEFORM && ptr->waveform == SG_STAIR_WAVE)
 			return (ptr->frequency * (ptr->steps_up + ptr->steps_down));
 
+		if(ptr->type==SIGNAL_TYPE_MATH)	{
+			return ptr->math_sr;
+		}
 	}
 	return false;
 }
@@ -2267,24 +2317,7 @@ size_t SignalGenerator::get_samples_count(unsigned int chnIdx,
 
 	switch (ptr->type) {
 	case SIGNAL_TYPE_WAVEFORM:
-	case SIGNAL_TYPE_MATH:
-		if(ptr->waveform == SG_STAIR_WAVE)
-		{
-			return (ptr->steps_up+ptr->steps_down)*MULTIPLY_CT;
-		}
-
-		if (ptr->type == SIGNAL_TYPE_WAVEFORM) {
-			ratio = (double) rate / ptr->frequency;
-		} else {
-			ratio = (double) rate / ptr->math_freq;
-		}
-
-		// TODO: Figure out what the limit is on the generated signals
-		/*if (ptr->type == SIGNAL_TYPE_WAVEFORM
-					&& ptr->waveform == SG_SIN_WAVE
-					&& ratio < 2.5)
-				return 0; /* rate too low */
-		//else
+		ratio = (double) rate / ptr->frequency;
 
 		// for less than max sample rates, generate at least 10 samples per period
 		if (ratio < 10.0 && rate < max_sample_rate)
@@ -2294,8 +2327,7 @@ size_t SignalGenerator::get_samples_count(unsigned int chnIdx,
 		}
 
 		/* The ratio must be even for square waveforms */
-		if (perfect && (ptr->type == SIGNAL_TYPE_WAVEFORM)
-				&& (ptr->waveform == SG_SQR_WAVE)
+		if (perfect	&& (ptr->waveform == SG_SQR_WAVE)
 				&& (fmod(ratio, 2.0) != 0.0)) {
 			return 0;
 		}
@@ -2309,6 +2341,9 @@ size_t SignalGenerator::get_samples_count(unsigned int chnIdx,
 		}
 
 		size = lcm(size, (size_t) ratio);
+		break;
+	case SIGNAL_TYPE_MATH:
+		size = (size_t)ptr->math_sr * ptr->math_record_length;
 		break;
 
 	case SIGNAL_TYPE_BUFFER:

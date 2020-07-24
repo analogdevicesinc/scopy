@@ -161,7 +161,7 @@ private:
 	PositionSpinButton *stepsUp, *stepsDown;
 	ScaleSpinButton *holdHighTime, *holdLowTime;
 	ScaleSpinButton *fileSampleRate, *fileAmplitude;
-	ScaleSpinButton *mathFrequency, *noiseAmplitude;
+	ScaleSpinButton *mathRecordLength, *noiseAmplitude, *mathSampleRate;
 
 	FileManager *fileManager;
 
@@ -269,7 +269,8 @@ private Q_SLOTS:
 	void stairPhaseChanged(double value);
 
 
-	void mathFreqChanged(double val);
+	void mathRecordLengthChanged(double val);
+	void mathSampleRateChanged(double value);
 
 	void waveformUpdateUi(int val);
 	void waveformTypeChanged(int val);
@@ -335,7 +336,8 @@ struct signal_generator_data {
 	//bool file_loaded;
 	// SIGNAL_TYPE_MATH
 	QString function;
-	double math_freq;
+	double math_record_length;
+	double math_sr;
 	// NOISE
 	gr::analog::noise_type_t noiseType;
 	float noiseAmplitude;
