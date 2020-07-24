@@ -193,6 +193,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, adiscope::Filter *filt,
 
 	// default
 	m_sampleRateButton->setValue(m_sampleRate);
+	m_sampleRateButton->setIntegerDivider(m_sampleRateButton->maxValue());
 	m_bufferSizeButton->setValue(m_bufferSize);
 
 	readPreferences();
@@ -984,7 +985,7 @@ void LogicAnalyzer::startStop(bool start)
 		const double delay = oneShotOrStream ? m_timeTriggerOffset * m_sampleRate
 					       : 0;
 
-		const double setSampleRate = m_m2kDigital->setSampleRateIn(sampleRate);
+		const double setSampleRate = m_m2kDigital->setSampleRateIn((sampleRate+1));
 		m_sampleRateButton->setValue(setSampleRate);
 
 		m_m2kDigital->getTrigger()->setDigitalStreamingFlag(!oneShotOrStream);
