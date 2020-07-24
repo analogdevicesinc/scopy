@@ -204,6 +204,10 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, adiscope::Filter *filt,
 							  TOOL_LOGIC_ANALYZER)));
 	api->load(*settings);
 	api->js_register(engine);
+
+	// Scroll wheel event filter
+	m_wheelEventGuard = new MouseWheelWidgetGuard(ui->mainWidget);
+	m_wheelEventGuard->installEventRecursively(ui->mainWidget);
 }
 
 LogicAnalyzer::~LogicAnalyzer()
@@ -638,10 +642,6 @@ void LogicAnalyzer::setupUi()
 
 	ui->traceHeightLineEdit->setValidator(new QIntValidator(1, 100, ui->traceHeightLineEdit));
 	ui->traceHeightLineEdit->setText(QString::number(1));
-
-	// Scroll wheel event filter
-	m_wheelEventGuard = new MouseWheelWidgetGuard(ui->mainWidget);
-	m_wheelEventGuard->installEventRecursively(ui->mainWidget);
 
 	ui->groupWidget->setVisible(false);
 	ui->stackDecoderWidget->setVisible(false);
