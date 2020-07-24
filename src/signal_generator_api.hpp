@@ -46,8 +46,10 @@ class SignalGenerator_API : public ApiObject
 	           READ getWaveformOfft WRITE setWaveformOfft);
 	Q_PROPERTY(QList<double> waveform_phase
 	           READ getWaveformPhase WRITE setWaveformPhase);
-	Q_PROPERTY(QList<double> math_frequency
-	           READ getMathFreq WRITE setMathFreq);
+	Q_PROPERTY(QList<double> math_record_length
+			   READ getMathRecordLength WRITE setMathRecordLength);
+	Q_PROPERTY(QList<double> math_sample_rate
+			   READ getMathSampleRate WRITE setMathSampleRate);
 	Q_PROPERTY(QList<QString> math_function
 	           READ getMathFunction WRITE setMathFunction);
 	Q_PROPERTY(QList<double> waveform_duty
@@ -139,8 +141,10 @@ public:
 	void setStairWaveformPhase(const QList<int>& list);
 
 
-	QList<double> getMathFreq() const;
-	void setMathFreq(const QList<double>& list);
+	QList<double> getMathRecordLength() const;
+	void setMathRecordLength(const QList<double>& list);
+	QList<double> getMathSampleRate() const;
+	void setMathSampleRate(const QList<double>& list);
 
 	QList<QString> getMathFunction() const;
 	void setMathFunction(const QList<QString>& list);
