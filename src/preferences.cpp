@@ -86,7 +86,7 @@ Preferences::Preferences(QWidget *parent) :
 		if (!isNumber) {
 			setDynamicProperty(ui->sigGenNrPeriods, "valid", false);
 			setDynamicProperty(ui->sigGenNrPeriods, "invalid", true);
-		} else if (nr_of_periods > 1 && nr_of_periods < 10) {
+		} else if (nr_of_periods >= 1 && nr_of_periods < 10) {
 			setDynamicProperty(ui->sigGenNrPeriods, "invalid", false);
 			setDynamicProperty(ui->sigGenNrPeriods, "valid", true);
 			sig_gen_periods_nr = nr_of_periods;
