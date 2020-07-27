@@ -1080,8 +1080,8 @@ void PatternGenerator::channelInGroupRemoved(int position)
 	generateBuffer();
 	regenerate();
 
-//	qDebug() << "#### channel in group removed ####";
-	//	qDebug() << m_enabledPatterns;
+	updateChannelGroupWidget(true);
+	updateChannelGroupPattern(true);
 }
 
 void PatternGenerator::loadTriggerMenu()
