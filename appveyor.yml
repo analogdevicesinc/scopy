@@ -67,7 +67,12 @@ install:
     - cmd: choco install InnoSetup
 
 build_script:
-    - cmd: C:\msys64\usr\bin\bash -lc "pacman --noconfirm -U http://repo.msys2.org/msys/x86_64/pacman-5.2.1-6-x86_64.pkg.tar.xz"
+    - cmd: C:\msys64\usr\bin\bash -lc "pacman --noconfirm -U http://repo.msys2.org/msys/x86_64/pacman-5.2.2-1-x86_64.pkg.tar.xz"
+    - cmd: C:\msys64\usr\bin\bash -lc "curl -O http://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
+    - cmd: C:\msys64\usr\bin\bash -lc "curl -O http://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz.sig"
+    - cmd: C:\msys64\usr\bin\bash -lc "pacman-key --verify msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz{.sig,}"
+    - cmd: C:\msys64\usr\bin\bash -lc "pacman-key --populate"
+    - cmd: C:\msys64\usr\bin\bash -lc "pacman --noconfirm -U msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
     - cmd: C:\msys64\usr\bin\bash -lc "pacman --noconfirm -Syu"
     - cmd: set PATH=%PATH%;"C:\Program Files (x86)\Inno Setup 5"
     - cmd: "%BUILD_DEPS_CMD%"
