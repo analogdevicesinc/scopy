@@ -1831,19 +1831,19 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
 
 				if(ptr->math_sr < samp_rate)
 				{
-					auto src = scopy::iio_math_gen::make(ptr->math_sr, str);
+					auto src = scopy::iio_math_gen::make(ptr->math_sr, str, (uint64_t)ptr->math_sr * ptr->math_record_length);
 					auto resamp = displayResampler(samp_rate, ptr->math_sr, top, src, noiseSrc, noiseAdd);
 					top->connect(resamp, 0, skip_head, 0);
 					return skip_head;
 				}
 				else
 				{
-					auto src = scopy::iio_math_gen::make(samp_rate, str);
+					auto src = scopy::iio_math_gen::make(samp_rate, str, (uint64_t)samp_rate * ptr->math_record_length);
 					top->connect(src, 0, skip_head, 0);
 					generated_wave = skip_head;
 				}
 			} else {
-				generated_wave = scopy::iio_math_gen::make(samp_rate, str);
+				generated_wave = scopy::iio_math_gen::make(samp_rate, str, (uint64_t)samp_rate * ptr->math_record_length);
 			}
 			break;
 		}
