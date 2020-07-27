@@ -647,7 +647,6 @@ void PatternGenerator::checkEnabledChannels()
 
 	m_ui->runSingleWidget->setEnabled(foundOneEnabled);
 	runButton()->setEnabled(foundOneEnabled);
-	setDynamicProperty(runButton(), "disabled", !foundOneEnabled);
 }
 
 void PatternGenerator::regenerate()
