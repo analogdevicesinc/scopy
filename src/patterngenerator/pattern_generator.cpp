@@ -451,6 +451,8 @@ void PatternGenerator::patternSelected(const QString &pattern, int ch, const QSt
 				patternUi->get_pattern()->init();
 				patternUi->post_load_ui();
 
+				updateChannelGroupPattern(true);
+
 				break;
 			}
 		}
