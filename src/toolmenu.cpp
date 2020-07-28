@@ -24,30 +24,29 @@
 
 using namespace adiscope;
 
-const QStringList ToolMenu::d_availableTools = QStringList() << "Oscilloscope" << "Spectrum Analyzer"
-							     << "Network Analyzer" << "Signal Generator"
-							     << "Logic Analyzer" << "Pattern Generator"
-							     << "Digital IO" << "Voltmeter"
-							     << "Power Supply" << "Debugger" << "Calibration";
-
-const QStringList ToolMenu::d_availableIcons = QStringList() << ":/menu/oscilloscope.png"
-							     << ":/menu/spectrum_analyzer.png"
-							     << ":/menu/network_analyzer.png"
-							     << ":/menu/signal_generator.png"
-							     << ":/menu/logic_analyzer.png"
-							     << ":/menu/pattern_generator.png"
-							     << ":/menu/io.png"
-							     << ":/menu/voltmeter.png"
-							     << ":/menu/power_supply.png"
-							     << ":/menu/debugger.png"
-							     << ":/menu/calibration.png";
-
 ToolMenu::ToolMenu(Preferences *preferences, QWidget *parent):
 	BaseMenu(parent),
 	d_current_hw_name(""),
 	d_buttonGroup(nullptr),
 	d_preferences(preferences)
 {
+	d_availableTools = QStringList() << tr("Oscilloscope") << tr("Spectrum Analyzer")
+								     << tr("Network Analyzer") << tr("Signal Generator")
+								     << tr("Logic Analyzer") << tr("Pattern Generator")
+								     << tr("Digital IO") << tr("Voltmeter")
+								     << tr("Power Supply") << tr("Debugger") << tr("Calibration");
+
+	d_availableIcons = QStringList() << ":/menu/oscilloscope.png"
+								     << ":/menu/spectrum_analyzer.png"
+								     << ":/menu/network_analyzer.png"
+								     << ":/menu/signal_generator.png"
+								     << ":/menu/logic_analyzer.png"
+								     << ":/menu/pattern_generator.png"
+								     << ":/menu/io.png"
+								     << ":/menu/voltmeter.png"
+								     << ":/menu/power_supply.png"
+								     << ":/menu/debugger.png"
+								     << ":/menu/calibration.png";
 	_loadState();
 
 	d_buttonGroup = new QButtonGroup(this);

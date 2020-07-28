@@ -59,11 +59,9 @@
   text-align: left;
   padding-left: 20px;
   padding-right: 20px;
-  qproperty-text: &quot;Run&quot;;
 }
 
 QPushButton[running=true] {
-  qproperty-text: &quot;Stop&quot;;
   background-color: #F45000;
 }
 
@@ -120,11 +118,9 @@ QPushButton:disabled {
   text-align: left;
   padding-left: 20px;
   padding-right: 20px;
-  qproperty-text: &quot;Single&quot;;
 }
 
 QPushButton[running=true] {
-  qproperty-text: &quot;Stop&quot;;
   background-color: #F45000;
 }
 

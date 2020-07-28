@@ -243,18 +243,9 @@ qproperty-alignment: AlignCenter;
          <string notr="true">QLabel {
 color: transparent;
 font-size: 10px;
-qproperty-text: &quot;&quot;;
 qproperty-alignment: AlignCenter;
 }
-/*
-QLabel[connected=true] {
-color: green;
-qproperty-text: &quot;CONNECTED&quot;;
-}
-QLabel[failed=true] {
-color: red;
-qproperty-text: &quot;FAILED&quot;;
-}*/</string>
+</string>
         </property>
         <property name="text">
          <string/>

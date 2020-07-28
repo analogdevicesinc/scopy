@@ -136,10 +136,7 @@ QPushButton {
   font-weight: bold;
   padding-left: 15px;
   padding-right: 15px;
-  qproperty-text: &quot;Print&quot;;
-
   border-radius: 4px;
-
   background-color: #4a64ff;
   color: #ffffff;
 
@@ -2256,6 +2253,11 @@ QLabel {
  </widget>
  <customwidgets>
   <customwidget>
+   <class>adiscope::CustomSwitch</class>
+   <extends>QPushButton</extends>
+   <header>customSwitch.hpp</header>
+  </customwidget>
+  <customwidget>
    <class>adiscope::DetachDragZone</class>
    <extends>QWidget</extends>
    <header>detachdragzone.h</header>
@@ -2277,11 +2279,6 @@ QLabel {
    <extends>QWidget</extends>
    <header>runsinglewidget.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>adiscope::CustomSwitch</class>
-   <extends>QPushButton</extends>
-   <header>customSwitch.hpp</header>
   </customwidget>
   <customwidget>
    <class>adiscope::MarkerTable</class>

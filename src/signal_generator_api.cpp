@@ -30,12 +30,12 @@ void SignalGenerator_API::show()
 
 bool SignalGenerator_API::running() const
 {
-	return gen->ui->run_button->isChecked();
+	return gen->ui->run_button->runButtonChecked();
 }
 
 void SignalGenerator_API::run(bool en)
 {
-	gen->ui->run_button->setChecked(en);
+	gen->ui->run_button->toggle(en);
 }
 
 QList<int> SignalGenerator_API::getMode() const

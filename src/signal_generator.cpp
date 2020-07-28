@@ -138,6 +138,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 	zoomT1=0;
 	zoomT2=1;
 	ui->setupUi(this);
+	ui->run_button->enableSingleButton(false);
 	this->setAttribute(Qt::WA_DeleteOnClose, true);
 
 	this->plot = new OscilloscopePlot(this);
@@ -157,31 +158,31 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 
 	/* Create waveform control widgets */
 	phase = new PhaseSpinButton({
-		{"deg",1},
-		{"π rad",180},
-		{"ns",1e-9},
-		{"μs",1e-6},
-		{"ms",1e-3},
-		{"s",1e0}
+	{tr("deg"),1},
+	{tr("π rad"),180},
+	{tr("ns"),1e-9},
+	{tr("μs"),1e-6},
+	{tr("ms"),1e-3},
+	{tr("s"),1e0}
 	}, tr("Phase"), 0, 360, true, true, this);
 
 	amplitude = new ScaleSpinButton({
-		{"μVolts p-p",1e-6},
-		{"mVolts p-p",1e-3},
-		{"Volts p-p",1e0}
+	{tr("μVolts p-p"),1e-6},
+	{tr("mVolts p-p"),1e-3},
+	{tr("Volts p-p"),1e0}
 	}, tr("Amplitude"), 0.000001, 10, true, true, this);
 
 	offset = new PositionSpinButton({
-		{"μVolts",1e-6},
-		{"mVolts",1e-3},
-		{"Volts",1e0}
+	{tr("μVolts"),1e-6},
+	{tr("mVolts"),1e-3},
+	{tr("Volts"),1e0}
 	}, tr("Offset"), -5, 5, true, true, this);
 
 	frequency = new ScaleSpinButton({
-		{"mHz",1e-3},
-		{"Hz",1e0},
-		{"kHz",1e3},
-		{"MHz",1e6}
+	{tr("mHz"),1e-3},
+	{tr("Hz"),1e0},
+	{tr("kHz"),1e3},
+	{tr("MHz"),1e6}
 	},tr("Frequency"), 0.001, 0.0, true, false, this);
 
 	/* Create stairstep waveform control widgets*/
@@ -202,43 +203,44 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 
 	/* Create trapezoidal waveform control widgets */
 	riseTime = new ScaleSpinButton({
-		{"ns",1e-9},
-		{"μs",1e-6},
-		{"ms",1e-3},
-		{"s",1e0}
+	{tr("ns"),1e-9},
+	{tr("μs"),1e-6},
+	{tr("ms"),1e-3},
+	{tr("s"),1e0}
 	},tr("Rise Time"), 0, 10, true, false, this);
 
 	fallTime = new ScaleSpinButton({
-		{"ns",1e-9},
-		{"μs",1e-6},
-		{"ms",1e-3},
-		{"s",1e0}
+	{tr("ns"),1e-9},
+	{tr("μs"),1e-6},
+	{tr("ms"),1e-3},
+	{tr("s"),1e0}
 	},tr("Fall Time"), 0, 10, true, false, this);
 
 	holdHighTime = new ScaleSpinButton({
-		{"ns",1e-9},
-		{"μs",1e-6},
-		{"ms",1e-3},
-		{"s",1e0}
+	{tr("ns"),1e-9},
+	{tr("μs"),1e-6},
+	{tr("ms"),1e-3},
+	{tr("s"),1e0}
 	},tr("High Time"), 0, 10, true, false, this);
 
 	holdLowTime = new ScaleSpinButton({
-		{"ns",1e-9},
-		{"μs",1e-6},
-		{"ms",1e-3},
-		{"s",1e0}
+	{tr("ns"),1e-9},
+	{tr("μs"),1e-6},
+	{tr("ms"),1e-3},
+	{tr("s"),1e0}
 	},tr("Low Time"), 0, 10, true, false, this);
 
 	/* Create file control widgets */
+
 	filePhase = new PositionSpinButton({
 		{"samples",1e0}
 	}, tr("Phase"), 0.0, 360.0, true, false, this);
 	filePhase->setFineModeAvailable(false);
 
 	fileOffset = new PositionSpinButton({
-		{"μVolts",1e-6},
-		{"mVolts",1e-3},
-		{"Volts",1e0}
+	{tr("μVolts"),1e-6},
+	{tr("mVolts"),1e-3},
+	{tr("Volts"),1e0}
 	}, tr("Offset"), -5, 5, true, true, this);
 
 	fileSampleRate = new ScaleSpinButton({
@@ -250,9 +252,9 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 	fileSampleRate->setIntegerDivider(75000000);
 
 	fileAmplitude = new ScaleSpinButton({
-		{"μVolts",1e-6},
-		{"mVolts",1e-3},
-		{"Volts",1e0}
+	{tr("μVolts"),1e-6},
+	{tr("mVolts"),1e-3},
+	{tr("Volts"),1e0}
 	}, tr("Amplitude"), 0.000001, 10, true, true, this);
 
 	mathSampleRate =  new ScaleSpinButton({
@@ -272,14 +274,14 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 		}, tr("Record Length"), 1e-9, 100.0, true, false, this, {1,2,5});
 
 	noiseAmplitude = new ScaleSpinButton({
-		{"μVolts",1e-6},
-		{"mVolts",1e-3},
-		{"Volts",1e0}
+	{tr("μVolts"),1e-6},
+	{tr("mVolts"),1e-3},
+	{tr("Volts"),1e0}
 	}, tr("Amplitude"), 0.000001, 10, true, true, this);
 
 	constantValue = new PositionSpinButton({
-		{"mVolts",1e-3},
-		{"Volts",1e0}
+	{tr("mVolts"),1e-3},
+	{tr("Volts"),1e0}
 	}, tr("Value"), -5, 5, true, true, this);
 
 	dutycycle = new PositionSpinButton({
@@ -562,9 +564,9 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 	connect(ui->run_button, SIGNAL(toggled(bool)), runButton(),
 	        SLOT(setChecked(bool)));
 	connect(runButton(), SIGNAL(toggled(bool)), ui->run_button,
-	        SLOT(setChecked(bool)));
+		SLOT(toggle(bool)));
 	connect(runButton(), SIGNAL(toggled(bool)),
-	        this, SLOT(startStop(bool)));
+		this, SLOT(startStop(bool)));
 
 	connect(ui->refreshBtn, SIGNAL(clicked()),
 		this, SLOT(loadFileCurrentChannelData()));
@@ -586,7 +588,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 SignalGenerator::~SignalGenerator()
 {
 	disconnect(prefPanel, &Preferences::notify, this, &SignalGenerator::readPreferences);
-	ui->run_button->setChecked(false);
+	ui->run_button->toggle(false);
 	setDynamicProperty(runButton(), "disabled", false);
 	if (saveOnExit) {
 		api->save(*settings);
@@ -1093,12 +1095,12 @@ void SignalGenerator::updatePreview()
 	qDebug(CAT_SIGNAL_GENERATOR) << "The slow operation took" << timer.elapsed() << "milliseconds";
 	top->disconnect_all();
 
-	if (ui->run_button->isChecked()) {
+	if (ui->run_button->runButtonChecked()) {
 		if (enabled) {
 			stop();
 			start();
 		} else {
-			ui->run_button->setChecked(false);
+			ui->run_button->toggle(false);
 		}
 	}
 }
