@@ -32,7 +32,8 @@ public:
 	void setBoundVertical(bool bound);
 
 protected:
-        virtual void zoom(const QRectF &);
+	virtual void zoom(const QRectF &);
+	virtual QSizeF minZoomSize() const override;
 
 private:
 	bool m_boundVertical;

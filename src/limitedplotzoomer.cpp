@@ -53,3 +53,10 @@ void LimitedPlotZoomer::zoom(const QRectF &rect)
 
 	QwtPlotZoomer::zoom(boundedRect);
 }
+
+QSizeF LimitedPlotZoomer::minZoomSize() const
+{
+	const double eps = 10e12;
+
+	return {zoomBase().width() / eps, zoomBase().height() / eps};
+}
