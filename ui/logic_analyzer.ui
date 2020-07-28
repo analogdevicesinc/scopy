@@ -1581,7 +1581,7 @@ font-weight: normal;
                       <x>0</x>
                       <y>0</y>
                       <width>300</width>
-                      <height>242</height>
+                      <height>469</height>
                      </rect>
                     </property>
                     <property name="sizePolicy">
@@ -1972,6 +1972,9 @@ color: rgba(255, 255, 255, 153);
                         </item>
                        </layout>
                       </widget>
+                     </item>
+                     <item>
+                      <layout class="QVBoxLayout" name="exportLayout"/>
                      </item>
                      <item>
                       <spacer name="verticalSpacer">
