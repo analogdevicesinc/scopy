@@ -38,8 +38,14 @@
 #include "dynamicWidget.hpp"
 
 #include <QDebug>
+#include <QFileDialog>
+#include <QDateTime>
 
 #include "filter.hpp"
+
+#include "osc_export_settings.h"
+#include "filemanager.h"
+#include "config.h"
 
 using namespace adiscope;
 using namespace adiscope::logic;
@@ -95,7 +101,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, adiscope::Filter *filt,
 	m_currentGroupMenu(nullptr),
 	m_autoMode(false),
 	m_timer(new QTimer(this)),
-	m_timerTimeout(1000)
+	m_timerTimeout(1000),
+	m_exportSettings(nullptr)
 {
 	// setup ui
 	setupUi();
@@ -645,6 +652,17 @@ void LogicAnalyzer::setupUi()
 
 	ui->groupWidget->setVisible(false);
 	ui->stackDecoderWidget->setVisible(false);
+
+	// Export Settings
+	m_exportSettings = new ExportSettings(this);
+	m_exportSettings->enableExportButton(false);
+	ui->exportLayout->addWidget(m_exportSettings);
+	for (int i = 0; i < DIGITAL_NR_CHANNELS; ++i) {
+		m_exportSettings->addChannel(i, "DIO" + QString::number(i));
+	}
+	m_exportSettings->disableUIMargins();
+	connect(m_exportSettings->getExportButton(), &QPushButton::clicked,
+		this, &LogicAnalyzer::exportData);
 }
 
 void LogicAnalyzer::connectSignalsAndSlots()
@@ -1030,6 +1048,9 @@ void LogicAnalyzer::startStop(bool start)
 			}
 
 			m_buffer = new uint16_t[bufferSize];
+			QMetaObject::invokeMethod(this, [=](){
+				m_exportSettings->enableExportButton(true);
+			}, Qt::DirectConnection);
 
 			QMetaObject::invokeMethod(this, [=](){
 				m_plot.setTriggerState(CapturePlot::Waiting);
@@ -1112,6 +1133,10 @@ void LogicAnalyzer::startStop(bool start)
 			QMetaObject::invokeMethod(this, [=](){
 				m_plot.setTriggerState(CapturePlot::Stop);
 			}, Qt::QueuedConnection);
+
+			QMetaObject::invokeMethod(this, [=](){
+				m_exportSettings->enableExportButton(true);
+			}, Qt::DirectConnection);
 
 		});
 
@@ -1573,4 +1598,211 @@ void LogicAnalyzer::readPreferences()
 	}
 
 	m_plot.replot();
+}
+
+void LogicAnalyzer::exportData()
+{
+	QString separator = "";
+	QString startRow = ";";
+	QString endRow = "\n";
+	QString selectedFilter;
+	bool done = false;
+	bool noChannelEnabled = true;
+
+	m_exportConfig = m_exportSettings->getExportConfig();
+	for (auto x : m_exportConfig.keys()) {
+		if(m_exportConfig[x]) {
+			noChannelEnabled =  false;
+			break;
+		}
+	}
+
+	if (noChannelEnabled)
+		return;
+
+	QStringList filter;
+	filter += QString(tr("Comma-separated values files (*.csv)"));
+	filter += QString(tr("Tab-delimited values files (*.txt)"));
+	filter += QString(tr("Value Change Dump(*.vcd)"));
+	filter += QString(tr("All Files(*)"));
+
+	QString fileName = QFileDialog::getSaveFileName(this,
+	tr("Export"), "", filter.join(";;"),
+	    &selectedFilter, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+
+	if (fileName.isEmpty()) {
+		return;
+	}
+
+	// Check the selected file type
+	if (selectedFilter != "") {
+		if(selectedFilter.contains("comma", Qt::CaseInsensitive)) {
+			fileName += ".csv";
+			separator = ",";
+		}
+		if(selectedFilter.contains("tab", Qt::CaseInsensitive)) {
+			fileName += ".txt";
+			separator = "\t";
+		}
+		if(selectedFilter.contains("Change Dump", Qt::CaseInsensitive)) {
+			endRow = " $end\n";
+			startRow = "$";
+			fileName += ".vcd";
+		}
+	}
+
+
+	if (separator != "") {
+		done = exportTabCsv(separator, fileName);
+	} else {
+		QFile file(fileName);
+		if (!file.open(QIODevice::WriteOnly)) {
+			return;
+		}
+
+		QTextStream out(&file);
+
+		/* Write the general information */
+		out << startRow << "date " << QDateTime::currentDateTime().toString() << endRow;
+		out << startRow << "version Scopy - " << QString(SCOPY_VERSION_GIT) << endRow;
+		out << startRow << "comment " << QString::number(m_bufferSize) <<
+		       " samples acquired at " << QString::number(m_sampleRate) <<
+		       " Hz " << endRow;
+
+
+		file.close();
+
+		done = exportVcd(fileName, startRow, endRow);
+	}
+}
+
+bool LogicAnalyzer::exportTabCsv(const QString &separator, const QString &fileName)
+{
+	FileManager fm("Logic Analyzer");
+	fm.open(fileName, FileManager::EXPORT);
+
+	QStringList chNames;
+	for (unsigned int ch = 0; ch < DIGITAL_NR_CHANNELS; ch++) {
+		if (m_exportConfig[ch]) {
+			chNames.push_back("Channel " + QString::number(ch));
+		}
+	}
+
+	QVector<QVector<double>> data;
+
+	if (!m_buffer) {
+		return false;
+	} else {
+		for (unsigned int i = 0; i < m_lastCapturedSample; ++i) {
+			uint64_t sample = m_buffer[i];
+			QVector<double> line;
+			for (unsigned int ch = 0; ch < DIGITAL_NR_CHANNELS; ++ch) {
+				int bit = (sample >> ch) & 1;
+				if(m_exportConfig[ch]) {
+					line.push_back(bit);
+				}
+			}
+			data.push_back(line);
+		}
+	}
+
+	fm.setSampleRate(m_sampleRate);
+
+	fm.save(data, chNames);
+
+	fm.performWrite();
+
+	return true;
+}
+
+bool LogicAnalyzer::exportVcd(const QString &fileName, const QString &startSep, const QString &endSep)
+{
+	uint64_t current_sample, prev_sample;
+	int current_bit, prev_bit, p;
+	QString timescaleFormat;
+	double timescale;
+	bool timestamp_written = false;
+
+	if (m_sampleRate == 0) {
+		return false;
+	}
+
+
+	QFile file(fileName);
+	if (!file.open(QIODevice::Append)) {
+		return false;
+	}
+
+	QTextStream out(&file);
+
+	/* Write the specific header */
+	timescale = 1 / m_sampleRate;
+	if (timescale < 1e-6) {
+		timescaleFormat = "ns";
+		timescale *= 1e9;
+	} else if (timescale < 1e-3) {
+		timescaleFormat = "us";
+		timescale *= 1e6;
+	} else if (timescale < 1) {
+		timescaleFormat = "ms";
+		timescale *= 1e3;
+	} else {
+		timescaleFormat = "s";
+	}
+
+	out << startSep << "timescale " << QString::number(timescale) << " " << timescaleFormat << endSep;
+	out << startSep << "scope module Scopy" << endSep;
+	int counter = 0;
+	for (unsigned int ch = 0; ch < DIGITAL_NR_CHANNELS; ++ch) {
+		if (m_exportConfig[ch]) {
+			char c = '!' + counter;
+			out << startSep << "var wire 1 " << c << " DIO" <<
+			       QString::number(ch) << endSep;
+			counter++;
+		}
+	}
+	out << startSep << "upscope" << endSep;
+	out << startSep << "enddefinitions" << endSep;
+
+	/* Write the values */
+	if (m_buffer) {
+		for (uint64_t i = 0; i < m_lastCapturedSample; i++) {
+			current_sample = m_buffer[i];
+			if (i == 0) {
+				prev_sample = current_sample;
+			} else {
+				prev_sample = m_buffer[i - 1];
+			}
+			timestamp_written = false;
+			p = 0;
+			for (unsigned int ch = 0; ch < DIGITAL_NR_CHANNELS; ch++) {
+
+				current_bit = (current_sample >> ch) & 1;
+				prev_bit = (prev_sample >> ch) & 1;
+
+				if ((current_bit == prev_bit) && (i != 0)) {
+					p++;
+					continue;
+				}
+				if (!timestamp_written)
+					out << "#" << QString::number(i);
+				if (m_exportConfig[ch]) {
+					char c = '0' + current_bit;
+					char c2 = '!' + p;
+					out << ' ' << c << c2;
+					p++;
+					timestamp_written = true;
+				}
+			}
+			if (timestamp_written) {
+				out << "\n";
+			}
+		}
+	} else {
+		file.close();
+		return false;
+	}
+
+	file.close();
+	return true;
 }
