@@ -200,7 +200,7 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 	connect(ui->menu, &MenuAnim::finished, [=](bool opened) {
 		ui->saveLbl->setVisible(opened);
 		ui->loadLbl->setVisible(opened);
-		ui->prefBtn->setText(opened ? "Preferences" : "");
+		ui->prefBtn->setText(opened ? tr("Preferences") : "");
 	});
 
 	connect(ui->stackedWidget, SIGNAL(moved(int)),
@@ -1291,7 +1291,7 @@ bool adiscope::ToolLauncher::calibrate()
 	auto old_siggen_text = siggen_btn->text();
 	auto old_spectrum_text = spectrum_btn->text();
 	auto old_network_text = network_btn->text();
-	QString status = "Calibrating...";
+	QString status = tr("Calibrating...");
 	dmm_btn->setText(status);
 	osc_btn->setText(status);
 	siggen_btn->setText(status);

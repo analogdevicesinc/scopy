@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1027</width>
+    <width>1059</width>
     <height>582</height>
    </rect>
   </property>
@@ -259,20 +259,14 @@ color: #ff7200;
        </layout>
       </item>
       <item>
-       <widget class="QwtThermo" name="scale_dac1">
-        <property name="upperBound">
+       <widget class="QwtThermo" name="scale_dac1" native="true">
+        <property name="upperBound" stdset="0">
          <double>5.000000000000000</double>
         </property>
-        <property name="scaleMaxMinor">
+        <property name="scaleMaxMinor" stdset="0">
          <number>10</number>
         </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="scalePosition">
-         <enum>QwtThermo::LeadingScale</enum>
-        </property>
-        <property name="borderWidth">
+        <property name="borderWidth" stdset="0">
          <number>0</number>
         </property>
        </widget>
@@ -482,26 +476,17 @@ color: #9013fe;
        </layout>
       </item>
       <item>
-       <widget class="QwtThermo" name="scale_dac2">
-        <property name="lowerBound">
+       <widget class="QwtThermo" name="scale_dac2" native="true">
+        <property name="lowerBound" stdset="0">
          <double>-5.000000000000000</double>
         </property>
-        <property name="upperBound">
+        <property name="upperBound" stdset="0">
          <double>0.000000000000000</double>
         </property>
-        <property name="scaleMaxMinor">
+        <property name="scaleMaxMinor" stdset="0">
          <number>10</number>
         </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="scalePosition">
-         <enum>QwtThermo::LeadingScale</enum>
-        </property>
-        <property name="originMode">
-         <enum>QwtThermo::OriginMaximum</enum>
-        </property>
-        <property name="borderWidth">
+        <property name="borderWidth" stdset="0">
          <number>0</number>
         </property>
        </widget>
@@ -850,11 +835,11 @@ QSlider::sub-page:horizontal {
   text-align: left;
   padding-left: 20px;
   padding-right: 20px;
-  qproperty-text: &quot;Enable&quot;;
+  qproperty-text: tr(&quot;Enable&quot;);
 }
 
 QPushButton[running=true] {
-  qproperty-text: &quot;Disable&quot;;
+  qproperty-text: tr(&quot;Disable&quot;);
   background-color: #F45000;
 }
 
@@ -981,11 +966,11 @@ QPushButton:disabled {
   text-align: left;
   padding-left: 20px;
   padding-right: 20px;
-  qproperty-text: &quot;Enable&quot;;
+  qproperty-text: tr(&quot;Enable&quot;);
 }
 
 QPushButton[running=true] {
-  qproperty-text: &quot;Disable&quot;;
+  qproperty-text: tr(&quot;Disable&quot;);
   background-color: #F45000;
 }
 
@@ -1053,40 +1038,10 @@ QPushButton:disabled {
    <header>lcdNumber.hpp</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../resources/resources.qrc"/>
+ </resources>
  <connections>
-  <connection>
-   <sender>valuePos</sender>
-   <signal>valueChanged(double)</signal>
-   <receiver>lcd1_set</receiver>
-   <slot>display(double)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>917</x>
-     <y>233</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>281</x>
-     <y>105</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>valueNeg</sender>
-   <signal>valueChanged(double)</signal>
-   <receiver>lcd2_set</receiver>
-   <slot>display(double)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>917</x>
-     <y>380</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>260</x>
-     <y>335</y>
-    </hint>
-   </hints>
-  </connection>
   <connection>
    <sender>btnSync</sender>
    <signal>toggled(bool)</signal>

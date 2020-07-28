@@ -137,31 +137,31 @@ QPair<bool, QString> InfoPage::translateInfoParams(QString key)
 {
 	bool advanced = false;
 	if (key.contains("fw_version")) {
-		key = "Firmware version";
+		key = tr("Firmware version");
 	} else if (key == "hw_model") {
-		key = "Model";
+		key = tr("Model");
 	} else if (key.contains("hw_model_variant")) {
-		key = "Model variant";
+		key = tr("Model variant");
 		advanced = true;
 	} else if (key.contains("serial")) {
-		key = "Serial";
+		key = tr("Serial");
 	} else if (key.contains("local,kernel")) {
 		key = "";
 	} else if (key.contains("idProduct")) {
-		key = "Product ID";
+		key = tr("Product ID");
 		advanced = true;
 	} else if (key.contains("idVendor")) {
-		key = "Vendor ID";
+		key = tr("Vendor ID");
 		advanced = true;
 	} else if (key.contains("usb,product")) {
-		key = "Product name";
+		key = tr("Product name");
 	} else if (key.contains("usb,vendor")) {
-		key = "Vendor";
+		key = tr("Vendor");
 	} else if (key.contains("release")) {
-		key = "Release";
+		key = tr("Release");
 		advanced = true;
 	} else if (key.contains("ip")) {
-		key = "IP Address";
+		key = tr("IP Address");
 	} else if (key.startsWith("cal,gain") ||
 		   key.startsWith("cal,offset")) {
 		key = "";

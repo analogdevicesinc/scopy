@@ -86,57 +86,12 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 r
          </spacer>
         </item>
         <item>
-         <widget class="QPushButton" name="run_button">
+         <widget class="adiscope::RunSingleWidget" name="run_button" native="true">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+           <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
-          </property>
-          <property name="layoutDirection">
-           <enum>Qt::RightToLeft</enum>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">QPushButton {
-  width: 80px;
-  height: 40px;
-  border-radius: 4px;
-  background-color: #27b34f;
-  color: white;
-  
-  font-weight: bold;
-
-  text-align: left;
-  padding-left: 20px;
-  padding-right: 20px;
-  qproperty-text: &quot;Run&quot;;
-}
-
-QPushButton[running=true] {
-  qproperty-text: &quot;Stop&quot;;
-}
-
-QPushButton:checked {
-  background-color: #F45000;
-}
-
-QPushButton:disabled {
-  background-color: grey;
-}</string>
-          </property>
-          <property name="icon">
-           <iconset resource="../resources/resources.qrc">
-            <normaloff>:/icons/ico-play.svg</normaloff>
-            <normalon>:/icons/ico-stop.svg</normalon>:/icons/ico-play.svg</iconset>
-          </property>
-          <property name="iconSize">
-           <size>
-            <width>8</width>
-            <height>10</height>
-           </size>
-          </property>
-          <property name="checkable">
-           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -233,7 +188,7 @@ QPushButton:disabled {
                 <x>0</x>
                 <y>0</y>
                 <width>380</width>
-                <height>577</height>
+                <height>597</height>
                </rect>
               </property>
               <property name="sizePolicy">
@@ -1255,14 +1210,18 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
    <container>1</container>
   </customwidget>
   <customwidget>
+   <class>adiscope::RunSingleWidget</class>
+   <extends>QWidget</extends>
+   <header>runsinglewidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>adiscope::Math</class>
    <extends>QWidget</extends>
    <header>math.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="../resources/resources.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

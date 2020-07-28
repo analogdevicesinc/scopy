@@ -1151,7 +1151,7 @@ void LogicAnalyzer::setupDecoders()
 		qDebug() << "Error: srd_decoder_load_all failed!";
 	}
 
-	ui->addDecoderComboBox->addItem("Select a decoder to add");
+	ui->addDecoderComboBox->addItem(tr("Select a decoder to add"));
 
 
 	GSList *decoderList = g_slist_copy((GSList *)srd_decoder_list());
@@ -1453,8 +1453,8 @@ void LogicAnalyzer::setupTriggerMenu()
 		m_m2kDigital->getTrigger()->setDigitalMode(static_cast<libm2k::digital::DIO_TRIGGER_MODE>(index));
 	});
 
-	ui->externalTriggerSourceComboBox->addItem("External Trigger In");
-	ui->externalTriggerSourceComboBox->addItem("Oscilloscope");
+	ui->externalTriggerSourceComboBox->addItem(tr("External Trigger In"));
+	ui->externalTriggerSourceComboBox->addItem(tr("Oscilloscope"));
 
 	connect(ui->externalTriggerSourceComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index){
 		m_m2kDigital->getTrigger()->setDigitalSource(static_cast<M2K_TRIGGER_SOURCE_DIGITAL>(index));

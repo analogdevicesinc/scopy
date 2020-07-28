@@ -179,7 +179,6 @@ QPushButton:disabled {
   	background-color: #4a64ff;
 	color: #ffffff;
   	font-size: 14px;
-	qproperty-text: &quot;Connect&quot;;
 }
 
 QPushButton:hover
@@ -190,10 +189,6 @@ background-color: #4a34ff;
 QPushButton:disabled {
 background-color: gray;
 color:white;
-}
-
-QPushButton[connected=true] {
-qproperty-text: &quot;Disconnect&quot;;
 }
 
 QPushButton:disabled {
