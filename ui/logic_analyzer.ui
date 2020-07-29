@@ -697,7 +697,7 @@ image: url(:/icons/setup3_checked_hover.svg);
                       <x>0</x>
                       <y>0</y>
                       <width>310</width>
-                      <height>469</height>
+                      <height>466</height>
                      </rect>
                     </property>
                     <property name="sizePolicy">
@@ -1031,7 +1031,11 @@ font-weight: normal;
                          </widget>
                         </item>
                         <item>
-                         <widget class="QComboBox" name="stackDecoderComboBox"/>
+                         <widget class="QComboBox" name="stackDecoderComboBox">
+                          <property name="minimumContentsLength">
+                           <number>15</number>
+                          </property>
+                         </widget>
                         </item>
                        </layout>
                       </widget>
@@ -1581,7 +1585,7 @@ font-weight: normal;
                       <x>0</x>
                       <y>0</y>
                       <width>300</width>
-                      <height>469</height>
+                      <height>241</height>
                      </rect>
                     </property>
                     <property name="sizePolicy">

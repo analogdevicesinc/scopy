@@ -215,6 +215,7 @@ QWidget *AnnotationCurve::getCurrentDecoderStackMenu()
         label->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
         lay->insertWidget(0, label);
         QComboBox *box = new QComboBox(chls);
+        box->setMinimumContentsLength(5);
 	lay->insertSpacerItem(1, new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 	lay->insertWidget(2, box);
         box->addItem(QString("x"));
