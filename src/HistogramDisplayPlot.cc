@@ -51,7 +51,7 @@
 #include <gnuradio/math.h>
 #include <boost/math/special_functions/round.hpp>
 #include <QLocale>
-
+#include <QDebug>
 #include "HistogramDisplayPlot.h"
 
 #ifdef _MSC_VER
@@ -607,12 +607,23 @@ HistogramDisplayPlot::setXaxis(double min, double max)
 void
 HistogramDisplayPlot::_resetXAxisPoints(double left, double right)
 {
-  // Something's wrong with the data (NaN, Inf, or something else)
-  if((left == right) || (left > right))
-    throw std::runtime_error("HistogramDisplayPlot::_resetXAxisPoints left and/or right values are invalid");
+	// Something's wrong with the data (NaN, Inf, or something else)
+	if((left == 0 && right == 0) || (left > right))
+	{
+		// assume some default values
+		d_left = -0.01;
+		d_right = 0.01;
+		qDebug() << "Using default values for histogram";
+		// throw std::runtime_error("HistogramDisplayPlot::_resetXAxisPoints left and/or right values are invalid");
+	}
+	else
+	{
+		d_left  = left *(1 - copysign(0.1, left));
+		d_right = right*(1 + copysign(0.1, right));
+	}
 
-  d_left  = left *(1 - copysign(0.1, left));
-  d_right = right*(1 + copysign(0.1, right));
+	// when both left & right are 0
+
   d_width = (d_right - d_left)/(d_bins);
   for(long loc = 0; loc < d_bins; loc++){
     d_xdata[loc] = d_left + loc*d_width;
