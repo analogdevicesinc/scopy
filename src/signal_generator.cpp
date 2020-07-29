@@ -1492,7 +1492,7 @@ basic_block_sptr SignalGenerator::getSignalSource(gr::top_block_sptr top,
 	float offset;
 	int rising_steps=1;
 	int falling_steps=1;
-	int stairphase;
+	int stairphase=0;
 
 	amplitude = data.amplitude / 2.0;
 	offset = data.offset;
