@@ -67,6 +67,49 @@ bool XBottomRuller::draw(QPainter *painter, QWidget *owner)
 		currentTime += timeBetween2Labels;
 	}
 
+	bool allLabelsTheSame = true;
+	for (int i = 1; i < labelTexts.size(); ++i) {
+		if (labelTexts[i] != labelTexts[i - 1]) {
+			allLabelsTheSame = false;
+			break;
+		}
+	}
+
+	// get nr of major ticks
+	const int nrMajorTicks = plot->axisScaleDiv(QwtPlot::xBottom).ticks(QwtScaleDiv::MajorTick).size();
+	const int midLabelTick = nrMajorTicks / 2;
+
+	if (allLabelsTheSame) {
+		// draw delta as middle label
+		labelRectangles.clear();
+		labelTexts.clear();
+		midPoint = leftP;
+		currentTime = interval.minValue();
+		for (int i = 0; i < labels; ++i) {
+			QString text;
+			if (i == midLabelTick) {
+				text = plot->timeScaleValueFormat(currentTime, 6);
+			} else {
+				text = plot->timeScaleValueFormat(currentTime - (interval.minValue() + midLabelTick * timeBetween2Labels), 2);
+				if (i > midLabelTick) {
+					text = "+" + text;
+				}
+			}
+
+			const QSizeF textSize = QwtText(text).textSize(painter->font());
+			QRectF textRect(QPointF(0.0, 0.0), textSize);
+
+			textRect.moveCenter(QPointF(midPoint, textSize.height() / 2.0));
+
+			labelRectangles.push_back(textRect);
+			labelTexts.push_back(text);
+
+			midPoint += distBetween2Labels;
+			currentTime += timeBetween2Labels;
+		}
+
+	}
+
 	// adjust labels to fit visible area of the handle area
 	// mainly the first and last label
 	if (labelRectangles.first().topLeft().x() < owner->mask().boundingRect().bottomLeft().x()) {
@@ -99,14 +142,29 @@ bool XBottomRuller::draw(QPainter *painter, QWidget *owner)
 		if (!overlaping) {
 			break;
 		}
+		if (allLabelsTheSame) {
+			int center = midLabelTick;
+			for (int i = center - 1; i >= 0; i -= 2) {
+				// Remove the tick and make sure to update the center
+				// label position
+				labelRectangles.removeAt(i);
+				labelTexts.removeAt(i);
+				--center;
+			}
+			for (int j = center + 1; j < labelRectangles.size(); j += 1) {
+				labelRectangles.removeAt(j);
+				labelTexts.removeAt(j);
+			}
 
-		// remove overlaping
-		if (i + 1 == labelRectangles.size() - 1) {
-			labelRectangles.removeAt(i);
-			labelTexts.removeAt(i);
 		} else {
-			labelRectangles.removeAt(i + 1);
-			labelTexts.removeAt(i + 1);
+			// remove overlaping
+			if (i + 1 == labelRectangles.size() - 1) {
+				labelRectangles.removeAt(i);
+				labelTexts.removeAt(i);
+			} else {
+				labelRectangles.removeAt(i + 1);
+				labelTexts.removeAt(i + 1);
+			}
 		}
 	} while(overlaping);
 
