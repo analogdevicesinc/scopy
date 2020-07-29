@@ -303,8 +303,7 @@ Attenuation</source>
     </message>
     <message>
         <location filename="../../ui/channel_settings.ui" line="933"/>
-        <source>Software 
-AC Coupling</source>
+        <source>Software AC Coupling</source>
         <translation>软件交流耦合</translation>
     </message>
     <message>
@@ -1345,7 +1344,7 @@ AC Coupling</source>
     <message>
         <location filename="../../ui/logic_analyzer.ui" line="907"/>
         <source>Trace Height</source>
-        <translation>走线高度</translation>
+        <translation>跟踪高度</translation>
     </message>
     <message>
         <location filename="../../ui/logic_analyzer.ui" line="962"/>
@@ -2424,7 +2423,7 @@ AC Coupling</source>
     <message>
         <location filename="../../ui/pattern_generator.ui" line="826"/>
         <source>Trace Height</source>
-        <translation type="unfinished">走线高度</translation>
+        <translation type="unfinished">跟踪高度</translation>
     </message>
     <message>
         <location filename="../../ui/pattern_generator.ui" line="842"/>
@@ -3491,7 +3490,7 @@ AC Coupling</source>
     <message>
         <location filename="../../ui/patterns/uartpatternui.ui" line="62"/>
         <source>Stop</source>
-        <translation>停止</translation>
+        <translation>停止频率</translation>
     </message>
     <message>
         <location filename="../../ui/patterns/uartpatternui.ui" line="70"/>
@@ -3744,7 +3743,7 @@ AC Coupling</source>
     <message>
         <location filename="../../src/oscilloscope_plot.cpp" line="2338"/>
         <source>Stop</source>
-        <translation>停止</translation>
+        <translation>停止频率</translation>
     </message>
     <message>
         <location filename="../../src/oscilloscope_plot.cpp" line="2341"/>
@@ -3866,7 +3865,7 @@ AC Coupling</source>
     <message>
         <location filename="../../src/digitalio.cpp" line="355"/>
         <source>Stop</source>
-        <translation>停止</translation>
+        <translation>停止频率</translation>
     </message>
     <message>
         <location filename="../../src/digitalio.cpp" line="358"/>
@@ -3987,7 +3986,7 @@ AC Coupling</source>
     </message>
     <message>
         <source>Stop</source>
-        <translation type="vanished">停止</translation>
+        <translation type="vanished">停止频率</translation>
     </message>
     <message>
         <source>Auto</source>
@@ -4405,7 +4404,7 @@ AC Coupling</source>
     <name>adiscope::PatternGenerator</name>
     <message>
         <source>Stop</source>
-        <translation type="vanished">停止</translation>
+        <translation type="vanished">停止频率</translation>
     </message>
     <message>
         <source>Run</source>
@@ -4639,22 +4638,22 @@ AC Coupling</source>
     <message>
         <location filename="../../src/startstoprangewidget.cpp" line="154"/>
         <source>Start</source>
-        <translation>启动</translation>
+        <translation>启动频率</translation>
     </message>
     <message>
         <location filename="../../src/startstoprangewidget.cpp" line="161"/>
         <source>Stop</source>
-        <translation>停止</translation>
+        <translation>停止频率</translation>
     </message>
     <message>
         <location filename="../../src/startstoprangewidget.cpp" line="168"/>
         <source>Center</source>
-        <translation>中心</translation>
+        <translation>中心频率</translation>
     </message>
     <message>
         <location filename="../../src/startstoprangewidget.cpp" line="175"/>
         <source>Span</source>
-        <translation>宽度</translation>
+        <translation>扫描宽度</translation>
     </message>
 </context>
 <context>
