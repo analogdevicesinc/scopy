@@ -181,6 +181,9 @@ QWidget *AnnotationCurve::getCurrentDecoderStackMenu()
     grid->setColumnStretch(0, 1);
     widget->setLayout(grid);
     QFormLayout *layout = new QFormLayout();
+    layout->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
+    layout->setFormAlignment(Qt::AlignTop);
+    layout->setLabelAlignment(Qt::AlignLeft);
     grid->addLayout(layout, 1, 0, 1, 2);
 
 
@@ -215,7 +218,6 @@ QWidget *AnnotationCurve::getCurrentDecoderStackMenu()
         label->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
         lay->insertWidget(0, label);
         QComboBox *box = new QComboBox(chls);
-        box->setMinimumContentsLength(5);
 	lay->insertSpacerItem(1, new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 	lay->insertWidget(2, box);
         box->addItem(QString("x"));
