@@ -58,6 +58,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 Source: "c:\scopy_32\*"; DestDir: "{app}"; Check: not Is64BitInstallMode; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\scopy_32\Scopy.ini"; DestDir: "{userappdata}\ADI"; Check: DeleteIniFile;
 
 [Icons]
 Name: "{group}\{#AppName}"; Filename: "{app}\{#AppExeName}"
@@ -66,3 +67,29 @@ Name: "{commondesktop}\{#AppName}"; Filename: "{app}\{#AppExeName}"; Tasks: desk
 
 [Registry]
 Root: HKLM; Subkey: "System\CurrentControlSet\Control\Session Manager\Environment"; ValueType:string; ValueName: "SCOPY_PYTHONPATH"; ValueData: "{app}\{#Python};{app}\{#Python}\plat-win;{app}\{#Python}\lib-dynload;{app}\{#Python}\site-packages"; Flags: uninsdeletevalue
+
+[Code]
+var
+  DeleteIniCheckBox: TNewCheckBox;
+
+procedure InitializeWizard;
+var
+  MainPage: TWizardPage;
+begin
+  MainPage := PageFromId(wpSelectDir)//CreateCustomPage(wpWelcome, '', '');
+  DeleteIniCheckBox := TNewCheckBox.Create(MainPage);
+  DeleteIniCheckBox.Checked := True;
+  DeleteIniCheckBox.Parent := MainPage.Surface;
+  DeleteIniCheckBox.Top := 195
+  DeleteIniCheckBox.Left := 0
+  DeleteIniCheckBox.Width := 200
+  DeleteIniCheckBox.Caption := 'Delete previous settings (Scopy.ini)';
+end;
+
+function DeleteIniFile: Boolean;
+begin
+  { here is the Check function used above; if you return True to this }
+  { function, the file will be installed, when False, the file won't }
+  { be installed }
+  Result := DeleteIniCheckBox.Checked;
+end;
