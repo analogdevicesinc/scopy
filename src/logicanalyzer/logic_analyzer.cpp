@@ -1453,50 +1453,59 @@ void LogicAnalyzer::setupTriggerMenu()
 		m_m2kDigital->getTrigger()->setDigitalMode(static_cast<libm2k::digital::DIO_TRIGGER_MODE>(index));
 	});
 
-	ui->externalTriggerSourceComboBox->addItem(tr("External Trigger In"));
-	ui->externalTriggerSourceComboBox->addItem(tr("Oscilloscope"));
+	if (m_m2kDigital->getTrigger()->hasCrossInstrumentTrigger()) {
+		ui->externalWidget->setEnabled(true);
+		ui->lblWarningFw->setVisible(false);
 
-	connect(ui->externalTriggerSourceComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index){
-		m_m2kDigital->getTrigger()->setDigitalSource(static_cast<M2K_TRIGGER_SOURCE_DIGITAL>(index));
-		if (index) { // oscilloscope
+		ui->externalTriggerSourceComboBox->addItem(tr("External Trigger In"));
+		ui->externalTriggerSourceComboBox->addItem(tr("Oscilloscope"));
+
+		connect(ui->externalTriggerSourceComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index){
+			m_m2kDigital->getTrigger()->setDigitalSource(static_cast<M2K_TRIGGER_SOURCE_DIGITAL>(index));
+			if (index) { // oscilloscope
 			/* set external trigger condition to none if the source is
 			* set to oscilloscope (trigger in)
 			* */
-			ui->externalTriggerConditionComboBox->setCurrentIndex(0); // None
-		}
+				ui->externalTriggerConditionComboBox->setCurrentIndex(0); // None
+			}
 
 		/*
 		 * Disable the condition combo box if oscilloscope (trigger in) is selected
 		 * and enable it if external trigger in is selected (trigger logic)
 		 * */
-		ui->externalTriggerConditionComboBox->setDisabled(index);
-	});
+			ui->externalTriggerConditionComboBox->setDisabled(index);
+		});
 
-	connect(ui->externalTriggerConditionComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index) {
-		m_m2kDigital->getTrigger()->setDigitalExternalCondition(
-								static_cast<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>((index + 5) % 6));
-	});
-
-	connect(ui->btnEnableExternalTrigger, &CustomSwitch::toggled, [=](bool on){
-		if (on) {
-			int source = ui->externalTriggerSourceComboBox->currentIndex();
-			int condition = ui->externalTriggerConditionComboBox->currentIndex();
-			m_m2kDigital->getTrigger()->setDigitalSource(static_cast<M2K_TRIGGER_SOURCE_DIGITAL>(source));
+		connect(ui->externalTriggerConditionComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index) {
 			m_m2kDigital->getTrigger()->setDigitalExternalCondition(
-						static_cast<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>((condition + 5) % 6));
-		} else {
-			m_m2kDigital->getTrigger()->setDigitalSource(M2K_TRIGGER_SOURCE_DIGITAL::SRC_NONE);
-		}
-	});
+						static_cast<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>((index + 5) % 6));
+		});
 
-	QSignalBlocker blockerExternalTriggerConditionComboBox(ui->externalTriggerConditionComboBox);
-	const int condition = static_cast<int>(
-				m_m2kDigital->getTrigger()->getDigitalExternalCondition());
-	ui->externalTriggerConditionComboBox->setCurrentIndex((condition + 1) % 6);
 
-	QSignalBlocker blockerExternalTriggerSourceComboBox(ui->externalTriggerSourceComboBox);
-	ui->externalTriggerSourceComboBox->setCurrentIndex(0);
-	m_m2kDigital->getTrigger()->setDigitalSource(M2K_TRIGGER_SOURCE_DIGITAL::SRC_NONE);
+		connect(ui->btnEnableExternalTrigger, &CustomSwitch::toggled, [=](bool on){
+			if (on) {
+				int source = ui->externalTriggerSourceComboBox->currentIndex();
+				int condition = ui->externalTriggerConditionComboBox->currentIndex();
+				m_m2kDigital->getTrigger()->setDigitalSource(static_cast<M2K_TRIGGER_SOURCE_DIGITAL>(source));
+				m_m2kDigital->getTrigger()->setDigitalExternalCondition(
+							static_cast<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>((condition + 5) % 6));
+			} else {
+				m_m2kDigital->getTrigger()->setDigitalSource(M2K_TRIGGER_SOURCE_DIGITAL::SRC_NONE);
+			}
+		});
+
+		QSignalBlocker blockerExternalTriggerConditionComboBox(ui->externalTriggerConditionComboBox);
+		const int condition = static_cast<int>(
+					m_m2kDigital->getTrigger()->getDigitalExternalCondition());
+		ui->externalTriggerConditionComboBox->setCurrentIndex((condition + 1) % 6);
+
+		QSignalBlocker blockerExternalTriggerSourceComboBox(ui->externalTriggerSourceComboBox);
+		ui->externalTriggerSourceComboBox->setCurrentIndex(0);
+		m_m2kDigital->getTrigger()->setDigitalSource(M2K_TRIGGER_SOURCE_DIGITAL::SRC_NONE);
+	} else {
+		ui->externalWidget->setEnabled(false);
+		ui->lblWarningFw->setVisible(true);
+	}
 
 	m_timer->setSingleShot(true);
 	connect(m_timer, &QTimer::timeout,
