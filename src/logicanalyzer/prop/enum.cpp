@@ -170,7 +170,6 @@ QWidget* Enum::get_widget(QWidget *parent, bool auto_commit)
 			return selector_;
 
 		selector_ = new QComboBox(parent);
-        selector_->setMinimumContentsLength(15);
 		for (unsigned int i = 0; i < values_.size(); i++) {
 			const pair<Glib::VariantBase, QString> &v = values_[i];
 			selector_->addItem(v.second, qVariantFromValue(v.first));
