@@ -109,8 +109,6 @@ QPushButton {
   font-weight: bold;
   padding-left: 15px;
   padding-right: 15px;
-  qproperty-text: &quot;Print&quot;;
-
   border-radius: 4px;
 
   background-color: #4a64ff;

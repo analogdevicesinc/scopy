@@ -30,12 +30,12 @@ void SignalGenerator_API::show()
 
 bool SignalGenerator_API::running() const
 {
-	return gen->ui->run_button->isChecked();
+	return gen->ui->run_button->runButtonChecked();
 }
 
 void SignalGenerator_API::run(bool en)
 {
-	gen->ui->run_button->setChecked(en);
+	gen->ui->run_button->toggle(en);
 }
 
 QList<int> SignalGenerator_API::getMode() const
@@ -143,6 +143,7 @@ void SignalGenerator_API::setWaveformType(const QList<int>& list)
 		SG_TRA_WAVE,
 		SG_SAW_WAVE,
 		SG_INV_SAW_WAVE,
+		SG_STAIR_WAVE,
 	};
 
 	for (int i = 0; i < gen->channels.size(); i++) {
@@ -239,6 +240,89 @@ void SignalGenerator_API::setWaveformOfft(const QList<double>& list)
 	}
 
 	gen->offset->setValue(gen->getCurrentData()->offset);
+}
+
+QList<int> SignalGenerator_API::getStairWaveformStepsUp() const
+{
+	QList<int> list;
+
+	for (int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(gen->channels[i]);
+
+		list.append(static_cast<int>(ptr->steps_up));
+	}
+
+	return list;
+}
+
+void SignalGenerator_API::setStairWaveformStepsUp(const QList<int>& list)
+{
+	if (list.size() != gen->channels.size()) {
+		return;
+	}
+
+	for (int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(gen->channels[i]);
+
+		ptr->steps_up = static_cast<int>(list.at(i));
+	}
+
+	gen->stepsUp->setValue(gen->getCurrentData()->steps_up);
+}
+
+QList<int> SignalGenerator_API::getStairWaveformStepsDown() const
+{
+	QList<int> list;
+
+	for (int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(gen->channels[i]);
+
+		list.append(static_cast<int>(ptr->steps_down));
+	}
+
+	return list;
+}
+
+void SignalGenerator_API::setStairWaveformStepsDown(const QList<int>& list)
+{
+	if (list.size() != gen->channels.size()) {
+		return;
+	}
+
+	for (int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(gen->channels[i]);
+
+		ptr->steps_down = static_cast<int>(list.at(i));
+	}
+
+	gen->stepsDown->setValue(gen->getCurrentData()->steps_down);
+}
+QList<int> SignalGenerator_API::getStairWaveformPhase() const
+{
+	QList<int> list;
+
+	for (int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(gen->channels[i]);
+
+		list.append(static_cast<int>(ptr->stairphase));
+	}
+
+	return list;
+}
+
+void SignalGenerator_API::setStairWaveformPhase(const QList<int>& list)
+{
+	if (list.size() != gen->channels.size()) {
+		return;
+	}
+
+	for (int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(gen->channels[i]);
+
+		ptr->stairphase = static_cast<int>(list.at(i));
+	}
+
+	gen->stairPhase->setValue(gen->getCurrentData()->stairphase);
 }
 
 QList<double> SignalGenerator_API::getWaveformPhase() const
@@ -474,20 +558,20 @@ void SignalGenerator_API::setWaveformHoldLow(const QList<double>& list)
 
 
 
-QList<double> SignalGenerator_API::getMathFreq() const
+QList<double> SignalGenerator_API::getMathRecordLength() const
 {
 	QList<double> list;
 
 	for (int i = 0; i < gen->channels.size(); i++) {
 		auto ptr = gen->getData(gen->channels[i]);
 
-		list.append(ptr->math_freq);
+		list.append(ptr->math_record_length);
 	}
 
 	return list;
 }
 
-void SignalGenerator_API::setMathFreq(const QList<double>& list)
+void SignalGenerator_API::setMathRecordLength(const QList<double>& list)
 {
 	if (list.size() != gen->channels.size()) {
 		return;
@@ -496,11 +580,42 @@ void SignalGenerator_API::setMathFreq(const QList<double>& list)
 	for (int i = 0; i < gen->channels.size(); i++) {
 		auto ptr = gen->getData(gen->channels[i]);
 
-		ptr->math_freq = list.at(i);
+		ptr->math_record_length = list.at(i);
 	}
 
-	gen->mathFrequency->setValue(gen->getCurrentData()->math_freq);
+	gen->mathRecordLength->setValue(gen->getCurrentData()->math_record_length);
 }
+
+
+
+QList<double> SignalGenerator_API::getMathSampleRate() const
+{
+	QList<double> list;
+
+	for (int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(gen->channels[i]);
+
+		list.append(ptr->math_sr);
+	}
+
+	return list;
+}
+
+void SignalGenerator_API::setMathSampleRate(const QList<double>& list)
+{
+	if (list.size() != gen->channels.size()) {
+		return;
+	}
+
+	for (int i = 0; i < gen->channels.size(); i++) {
+		auto ptr = gen->getData(gen->channels[i]);
+
+		ptr->math_sr = list.at(i);
+	}
+
+	gen->mathSampleRate->setValue(gen->getCurrentData()->math_sr);
+}
+
 
 QList<QString> SignalGenerator_API::getMathFunction() const
 {

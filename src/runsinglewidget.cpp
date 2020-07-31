@@ -52,6 +52,9 @@ void RunSingleWidget::enableSingleButton(bool enable)
 	d_ui->singleButton->setEnabled(enable);
 	d_ui->singleButton->setVisible(enable);
 	d_singleButtonEnabled = enable;
+	if(!enable) {
+		setMinimumSize(150, 0);
+	}
 }
 
 bool RunSingleWidget::singleButtonEnabled() const
@@ -90,15 +93,20 @@ void RunSingleWidget::toggle(bool checked)
 		d_ui->singleButton->setChecked(false);
 		setDynamicProperty(d_ui->runButton, "running", false);
 		setDynamicProperty(d_ui->singleButton, "running", false);
+		d_ui->runButton->setText(tr("Run"));
+		d_ui->singleButton->setText(tr("Single"));
 
 	} else if (!d_ui->singleButton->isChecked()) {
 		QSignalBlocker blockerRunButton(d_ui->runButton);
 		if (runButtonEnabled()) {
 			d_ui->runButton->setChecked(true);
+			d_ui->runButton->setText(tr("Stop"));
 		} else if (singleButtonEnabled()) {
 			d_ui->singleButton->setChecked(true);
+			d_ui->runButton->setText(tr("Stop"));
 		}
 		setDynamicProperty(d_ui->runButton, "running", true);
+		d_ui->runButton->setText(tr("Stop"));
 	}
 
 	Q_EMIT toggled(checked);
@@ -118,10 +126,12 @@ void RunSingleWidget::_toggle(bool checked)
 		QSignalBlocker blocker(d_ui->runButton);
 		d_ui->runButton->setChecked(false);
 		setDynamicProperty(d_ui->runButton, "running", false);
+		d_ui->runButton->setText(tr("Stop"));
 	} else if (btn == d_ui->runButton && d_ui->singleButton->isChecked()) {
 		QSignalBlocker blocker(d_ui->singleButton);
 		d_ui->singleButton->setChecked(false);
 		setDynamicProperty(d_ui->singleButton, "running", false);
+		d_ui->singleButton->setText(tr("Stop"));
 	} else {
 		Q_EMIT toggled(checked);
 	}

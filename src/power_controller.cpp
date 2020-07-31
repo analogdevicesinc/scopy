@@ -42,7 +42,7 @@ using namespace libm2k::analog;
 PowerController::PowerController(struct iio_context *ctx,
 		ToolMenuItem *toolMenuItem, QJSEngine *engine,
 		ToolLauncher *parent) :
-	Tool(ctx, toolMenuItem, new PowerController_API(this), "Power Supply", parent),
+    Tool(ctx, toolMenuItem, new PowerController_API(this), "Power Supply", parent),
 	ui(new Ui::PowerController), in_sync(false),
 	m_m2k_context(m2kOpen(ctx, "")),
 	m_m2k_powersupply(m_m2k_context->getPowerSupply())
@@ -59,14 +59,14 @@ PowerController::PowerController(struct iio_context *ctx,
 	ui->btnSync->click();
 
 	valuePos = new PositionSpinButton({
-		{"mVolts",1e-3},
-		{"Volts",1e0}
-	}, "Value", 0, 5, true, true, this);
+	{tr("mVolts"),1e-3},
+	{tr("Volts"),1e0}
+	}, tr("Value"), 0, 5, true, true, this);
 
 	valueNeg = new PositionSpinButton({
-		{"mVolts",1e-3},
-		{"Volts",1e0}
-	}, "Value", -5, 0, true, true, this);
+	{tr("mVolts"),1e-3},
+	{tr("Volts"),1e0}
+	}, tr("Value"), -5, 0, true, true, this);
 
 	ui->valuePosLayout->addWidget(valuePos);
 	ui->valueNegLayout->addWidget(valueNeg);

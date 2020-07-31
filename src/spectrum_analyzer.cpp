@@ -65,47 +65,47 @@ using namespace libm2k::context;
 
 std::vector<std::pair<QString, FftDisplayPlot::MagnitudeType>>
 SpectrumAnalyzer::mag_types = {
-	{"dBFS", FftDisplayPlot::DBFS},
-	{"dBV", FftDisplayPlot::DBV},
-	{"dBu", FftDisplayPlot::DBU},
-	{"Vpeak", FftDisplayPlot::VPEAK},
-	{"Vrms", FftDisplayPlot::VRMS},
+    {tr("dBFS"), FftDisplayPlot::DBFS},
+    {tr("dBV"), FftDisplayPlot::DBV},
+    {tr("dBu"), FftDisplayPlot::DBU},
+    {tr("Vpeak"), FftDisplayPlot::VPEAK},
+    {tr("Vrms"), FftDisplayPlot::VRMS},
 };
 
 std::vector<std::pair<QString, FftDisplayPlot::AverageType>>
 SpectrumAnalyzer::avg_types = {
-	{"Sample", FftDisplayPlot::SAMPLE},
-	{"Peak Hold", FftDisplayPlot::PEAK_HOLD},
-	{"Peak Hold Continous", FftDisplayPlot::PEAK_HOLD_CONTINUOUS},
-	{"Min Hold", FftDisplayPlot::MIN_HOLD},
-	{"Min Hold Continous", FftDisplayPlot::MIN_HOLD_CONTINUOUS},
-	{"Linear RMS", FftDisplayPlot::LINEAR_RMS},
-	{"Linear dB", FftDisplayPlot::LINEAR_DB},
-	{"Exponential RMS", FftDisplayPlot::EXPONENTIAL_RMS},
-	{"Exponential dB", FftDisplayPlot::EXPONENTIAL_DB},
+    {tr("Sample"), FftDisplayPlot::SAMPLE},
+    {tr("Peak Hold"), FftDisplayPlot::PEAK_HOLD},
+    {tr("Peak Hold Continous"), FftDisplayPlot::PEAK_HOLD_CONTINUOUS},
+    {tr("Min Hold"), FftDisplayPlot::MIN_HOLD},
+    {tr("Min Hold Continous"), FftDisplayPlot::MIN_HOLD_CONTINUOUS},
+    {tr("Linear RMS"), FftDisplayPlot::LINEAR_RMS},
+    {tr("Linear dB"), FftDisplayPlot::LINEAR_DB},
+    {tr("Exponential RMS"), FftDisplayPlot::EXPONENTIAL_RMS},
+    {tr("Exponential dB"), FftDisplayPlot::EXPONENTIAL_DB},
 };
 
 std::vector<std::pair<QString, SpectrumAnalyzer::FftWinType>>
 SpectrumAnalyzer::win_types = {
-	{"Flat top", FftWinType::FLAT_TOP},
-	{"Rectangular", FftWinType::RECTANGULAR},
-	{"Triangular (Bartlett)", FftWinType::TRIANGULAR},
-	{"Hamming", FftWinType::HAMMING},
-	{"Hann", FftWinType::HANN},
-	{"Blackman-Harris", FftWinType::BLACKMAN_HARRIS},
-	{"Kaiser", FftWinType::KAISER},
+    {tr("Flat top"), FftWinType::FLAT_TOP},
+    {tr("Rectangular"), FftWinType::RECTANGULAR},
+    {tr("Triangular (Bartlett)"), FftWinType::TRIANGULAR},
+    {tr("Hamming"), FftWinType::HAMMING},
+    {tr("Hann"), FftWinType::HANN},
+    {tr("Blackman-Harris"), FftWinType::BLACKMAN_HARRIS},
+    {tr("Kaiser"), FftWinType::KAISER},
 };
 
 std::vector<QString> SpectrumAnalyzer::markerTypes = {
-	"Manual",
-	"Peak",
-	"Delta",
-	"Fixed",
+    tr("Manual"),
+    tr("Peak"),
+    tr("Delta"),
+    tr("Fixed"),
 };
 
 SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 				   ToolMenuItem *toolMenuItem,
-                                   QJSEngine *engine, ToolLauncher *parent):
+				   QJSEngine *engine, ToolLauncher *parent):
 	Tool(ctx, toolMenuItem, new SpectrumAnalyzer_API(this), "Spectrum Analyzer",
 	     parent),
 	ui(new Ui::SpectrumAnalyzer),
@@ -240,20 +240,20 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	// Initialize Sweep controls
 
 	range = new PositionSpinButton({
-		{" ",1e0},
-	}, "Range", 0.0, 0.0, false, false, this);
+	{" ",1e0},
+	}, tr("Range"), 0.0, 0.0, false, false, this);
 	ui->rangeLayout->addWidget(range);
 
 	top = new PositionSpinButton({
-		{" ",1e0},
-	}, "Top", -100.0, 100.0, false, false, this);
+	{" ",1e0},
+	}, tr("Top"), -100.0, 100.0, false, false, this);
 	ui->topLayout->addWidget(top);
 
 	marker_freq_pos = new PositionSpinButton({
-		{"Hz",1e0},
-		{"kHz",1e3},
-		{"MHz",1e6}
-	}, "Frequency Position", 0.0, 5e7, true, false, this);
+	{tr("Hz"),1e0},
+	{tr("kHz"),1e3},
+	{tr("MHz"),1e6}
+	}, tr("Frequency Position"), 0.0, 5e7, true, false, this);
 	ui->markerFreqPosLayout->addWidget(marker_freq_pos);
 	marker_freq_pos->setFineModeAvailable(false);
 

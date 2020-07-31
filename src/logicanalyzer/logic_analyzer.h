@@ -59,6 +59,7 @@ namespace adiscope {
 class Filter;
 class BaseMenu;
 class LogicAnalyzer_API;
+class ExportSettings;
 
 namespace logic {
 
@@ -101,6 +102,10 @@ private Q_SLOTS:
 	void restoreTriggerState();
 
 	void readPreferences();
+
+	void exportData();
+	bool exportTabCsv(const QString &separator, const QString &fileName);
+	bool exportVcd(const QString &fileName, const QString &startSep, const QString &endSep);
 
 private:
 	void setupUi();
@@ -169,6 +174,9 @@ private:
 	QTimer *m_timer;
 	double m_timerTimeout;
 	QVector<M2K_TRIGGER_CONDITION_DIGITAL> m_triggerState;
+
+	ExportSettings *m_exportSettings;
+	QMap<int, bool> m_exportConfig;
 
 };
 } // namespace logic

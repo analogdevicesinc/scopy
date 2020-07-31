@@ -46,12 +46,23 @@ class SignalGenerator_API : public ApiObject
 	           READ getWaveformOfft WRITE setWaveformOfft);
 	Q_PROPERTY(QList<double> waveform_phase
 	           READ getWaveformPhase WRITE setWaveformPhase);
-	Q_PROPERTY(QList<double> math_frequency
-	           READ getMathFreq WRITE setMathFreq);
+	Q_PROPERTY(QList<double> math_record_length
+			   READ getMathRecordLength WRITE setMathRecordLength);
+	Q_PROPERTY(QList<double> math_sample_rate
+			   READ getMathSampleRate WRITE setMathSampleRate);
 	Q_PROPERTY(QList<QString> math_function
 	           READ getMathFunction WRITE setMathFunction);
 	Q_PROPERTY(QList<double> waveform_duty
 		   READ getWaveformDuty WRITE setWaveformDuty);
+
+	Q_PROPERTY(QList<int> steps_up
+		   READ getStairWaveformStepsUp WRITE setStairWaveformStepsUp);
+	Q_PROPERTY(QList<int> steps_down
+		   READ getStairWaveformStepsDown WRITE setStairWaveformStepsDown);
+	Q_PROPERTY(QList<int> stairphase
+		   READ getStairWaveformPhase WRITE setStairWaveformPhase);
+
+
 
 	Q_PROPERTY(QList<int> noise_type
 		   READ getNoiseType WRITE setNoiseType);
@@ -122,9 +133,18 @@ public:
 	void setWaveformFall(const QList<double>& list);
 	QList<double> getWaveformRise() const;
 	void setWaveformRise(const QList<double>& list);
+	QList<int> getStairWaveformStepsUp() const;
+	void setStairWaveformStepsUp(const QList<int>& list);
+	QList<int> getStairWaveformStepsDown() const;
+	void setStairWaveformStepsDown(const QList<int>& list);
+	QList<int> getStairWaveformPhase() const;
+	void setStairWaveformPhase(const QList<int>& list);
 
-	QList<double> getMathFreq() const;
-	void setMathFreq(const QList<double>& list);
+
+	QList<double> getMathRecordLength() const;
+	void setMathRecordLength(const QList<double>& list);
+	QList<double> getMathSampleRate() const;
+	void setMathSampleRate(const QList<double>& list);
 
 	QList<QString> getMathFunction() const;
 	void setMathFunction(const QList<QString>& list);
