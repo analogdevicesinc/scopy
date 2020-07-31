@@ -729,7 +729,7 @@ Measure::Measure(int channel, double *buffer, size_t length,
 	m_gatingEnabled(false),
     m_conversion_function(conversion_fct),
     m_isTimeDomain(isTimeDomain),
-    m_harmonics_number(7)
+    m_harmonics_number(5)
 {
     if(m_isTimeDomain)
     {

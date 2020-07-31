@@ -122,6 +122,7 @@ public Q_SLOTS:
 	void onChannelRemoved(int);
 	void setSelectedChannel(int);
 	void onMeasurementActivated(int chnIdx, int id, bool en);
+    void onharmValueChanged(int id);
 private Q_SLOTS:
 	void onMeasurementPropertyChanged(QStandardItem *item);
 	void on_button_measDisplayAll_toggled(bool checked);

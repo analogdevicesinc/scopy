@@ -168,7 +168,13 @@ namespace adiscope {
 
         void initChannelMeasurement(int nplots);
         std::vector<double*> getOrginal_data();
+        std::vector<double*> getRef_data();
+        int64_t getYdata_size();
+        std::vector<double> getScaleFactor();
         int64_t getNumPoints();
+
+        bool isReferenceWaveform(unsigned int chnIdx);
+        size_t getCurveSize(unsigned int chnIdx);
 
 		// Scaling factors for plot samples (one per channel)
 		double channelScaleFactor(int chIdx) const;

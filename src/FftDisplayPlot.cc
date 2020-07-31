@@ -104,6 +104,7 @@ FftDisplayPlot::FftDisplayPlot(int nplots, QWidget *parent) :
 			QList<std::shared_ptr<marker_data>>());
 		d_current_avg_index.push_back(0);
 	}
+
 	y_scale_factor.resize(nplots);
 	d_ch_avg_obj.resize(nplots);
 	d_win_coefficient_sum_sqr.resize(nplots);
@@ -223,6 +224,17 @@ void FftDisplayPlot::setNumPoints(uint64_t num_points)
 	d_numPoints = num_points;
 }
 
+bool FftDisplayPlot::isReferenceWaveform(unsigned int chnIdx)
+{
+    QwtPlotCurve *curve = Curve(chnIdx);
+    return d_ref_curves.values().contains(curve);
+}
+
+size_t FftDisplayPlot::getCurveSize(unsigned int chnIdx)
+{
+    return Curve(chnIdx)->data()->size();
+}
+
 QColor FftDisplayPlot::getChannelColor()
 {
 	for (QList<QColor>::const_iterator it = d_CurveColors.cbegin();
@@ -263,7 +275,6 @@ void FftDisplayPlot::registerReferenceWaveform(QString name, QVector<double> xDa
 
 	d_ref_curves.insert(name, curve);
 	d_plot_curve.push_back(curve);
-	n_ref_curves++;
 
 	d_num_markers.push_back(0);
 	d_markers.push_back(QList<marker>());
@@ -281,6 +292,7 @@ void FftDisplayPlot::registerReferenceWaveform(QString name, QVector<double> xDa
 	findPeaks(d_plot_curve.size() - 1);
 
     Q_EMIT channelAdded(y_data.size() + n_ref_curves);
+    n_ref_curves++;
 
 	replot();
 }
@@ -366,6 +378,18 @@ void FftDisplayPlot::useLogFreq(bool use_log_freq)
 
 std::vector<double*> FftDisplayPlot::getOrginal_data() {
     return y_original_data;
+}
+
+int64_t FftDisplayPlot::getYdata_size() {
+    return y_data.size();
+}
+
+std::vector<double*> FftDisplayPlot::getRef_data() {
+    return d_refYdata;
+}
+
+std::vector<double> FftDisplayPlot::getScaleFactor() {
+    return y_scale_factor;
 }
 
 int64_t FftDisplayPlot::getNumPoints()
@@ -1487,7 +1511,7 @@ void FftDisplayPlot::recalculateMagnitudes()
 	averageDataAndComputeMagnitude(y_original_data, y_data, d_numPoints);
 	detectMarkers();
 
-	Q_EMIT newData();
+    Q_EMIT newData();
 }
 
 /*

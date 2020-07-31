@@ -129,6 +129,8 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	m_generic_analogin(nullptr),
 	marker_selector(new DbClickButtons(this)),
 	fft_plot(nullptr),
+    first_two_times(0),
+    counter_ref(0),
 	settings_group(new QButtonGroup(this)),
 	channels_group(new QButtonGroup(this)),
 	adc_name(ctx ? filt->device_name(TOOL_SPECTRUM_ANALYZER) : ""),
@@ -177,10 +179,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	ui->pushButton_4->hide();
 
 	// Hide Single and Preset buttons until functionality is added
-	ui->btnPreset->hide();
-
-    /* Measurements Settings */
-    measure_settings_init();
+    ui->btnPreset->hide();
 
 
 	ui->cmb_units->blockSignals(true);
@@ -231,6 +230,12 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
         ui->gridLayoutPlot->addWidget(measurePanel, 0, 1, 1, 1);
 		fft_plot->setYaxisMouseGesturesEnabled(i, false);
     }
+
+    connect(fft_plot, SIGNAL(channelAdded(int)),
+            SLOT(onChannelAdded(int)));
+
+    /* Measurements Settings */
+    measure_settings_init();
 
 	QGridLayout *gLayout = static_cast<QGridLayout *>
 	                       (ui->widgetPlotContainer->layout());
@@ -449,11 +454,9 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
     connect(fft_plot, SIGNAL(newData()),
         SLOT(onNewDataReceived()));
 
-    connect(fft_plot, SIGNAL(channelAdded(int)),
-            SLOT(onChannelAdded(int)));
-
-    fft_plot->initChannelMeasurement(0);
-    fft_plot->initChannelMeasurement(1);//prima data de 0, ulterior de cat ii zic eu
+    for (int i = 0; i < m_adc_nb_channels; i++) {
+        fft_plot->initChannelMeasurement(i);
+    }
 
 	connect(top, SIGNAL(valueChanged(double)),
 	        SLOT(onTopValueChanged(double)));
@@ -935,12 +938,26 @@ void SpectrumAnalyzer::onChannelAdded(int chnIdx)
 {
     Measure *measure = nullptr;
 
-    std::vector<double*> data = fft_plot->getOrginal_data();
-    int64_t numPoints = fft_plot->getNumPoints();
-    measure = new Measure(chnIdx, data[chnIdx],
-            numPoints / 2, nullptr, false); //nr de puncte??? 1000 tre schimbat
+    if(fft_plot->isReferenceWaveform(chnIdx))
+    {
+         int idx = chnIdx - fft_plot->getYdata_size();
+         size_t curve_size = fft_plot->getCurveSize(chnIdx);
+         double* data = new double [curve_size]();
+         measure = new Measure(chnIdx, data, curve_size,
+                               nullptr, false);
+    }
+    else
+    {
+        int64_t numPoints = fft_plot->getNumPoints() / 2;
+        std::vector<double> scale_factor = fft_plot->getScaleFactor();
+
+        double* data = new double [numPoints]();
+        measure = new Measure(chnIdx, data,
+                numPoints, nullptr, false);
+    }
     measure->setAdcBitCount(12);
     d_measureObjs.push_back(measure);
+
 }
 
 
@@ -974,16 +991,6 @@ void SpectrumAnalyzer::measure_panel_init() {
 
     connect(this, SIGNAL(measurementsAvailable()),
             SLOT(onMeasuremetsAvailable()));
-
-//    QHBoxLayout *layout = new QHBoxLayout();
-//    QLabel *label= new QLabel(this);
-
-//    label->setText("");
-//    label->setStyleSheet( "QWidget{ background-color : rgba( 160, 160, 160, 255); border-radius : 7px;  }" );
-//    layout->addWidget(label);
-//    measurePanel->setLayout(layout);
-//    measure_panel_ui = new Ui::MeasurementsPanel();
-//    measure_panel_ui->setupUi(measurePanel);
 
 }
 
@@ -1225,18 +1232,62 @@ void SpectrumAnalyzer::measure()
 void SpectrumAnalyzer::onNewDataReceived()
 {
     int ref_idx = 0;
-    std::vector<double*> data = fft_plot->getOrginal_data();
-    int64_t numPoints = fft_plot->getNumPoints();
     for (int i = 0; i < d_measureObjs.size(); i++) {
         Measure *measure = d_measureObjs[i];
         int chn = measure->channel();
-//        if (isReferenceWaveform(Curve(chn))) {
-//            measure->setDataSource(fft_plot->getRef_data()[ref_idx],
-//                           Curve(chn)->data()->size());
-//            ref_idx++;
-//        }
+        if (fft_plot->isReferenceWaveform(chn)) {
+            size_t curve_size = fft_plot->getCurveSize(chn);
+            measure->setDataSource(fft_plot->getRef_data()[ref_idx],
+                           curve_size / 2);
+            ref_idx++;
+            counter_ref++;
+        }
+        else {
+            int64_t numPoints = fft_plot->getNumPoints() / 2;
+            std::vector<double*> data = fft_plot->getOrginal_data();
+            std::vector<double> scale_factor = fft_plot->getScaleFactor();
 
-        measure->setDataSource(data[chn], numPoints / 2);
+            for (int s = 0; s < numPoints; s++) {
+                data[chn][s] = sqrt(data[chn][s]) * scale_factor[chn] / numPoints;
+            }
+
+            /*
+            if(first_two_times == 0)
+            {
+                  std::ofstream myFile1("canal_1.csv");
+                  for(int j = 0; j < numPoints; j++)
+                  {
+                      myFile1 << data[chn][j] << std::endl;
+                  }
+                  first_two_times = 1;
+            } else if (first_two_times == 1)
+            {
+                 std::ofstream myFile2("canal_2.csv");
+                 for(int j = 0; j < numPoints; j++)
+                 {
+                     myFile2 << data[chn][j] << std::endl;
+                 }
+                 first_two_times = 2;
+            } else if (first_two_times == 2)
+            {
+                 std::ofstream myFile2("canal_3.csv");
+                 for(int j = 0; j < numPoints; j++)
+                 {
+                     myFile2 << data[chn][j] << std::endl;
+                 }
+                 first_two_times = 3;
+            } else if (first_two_times == 3)
+            {
+                 std::ofstream myFile2("canal_4.csv");
+                 for(int j = 0; j < numPoints; j++)
+                 {
+                     myFile2 << data[chn][j] << std::endl;
+                 }
+                 first_two_times = 4;
+            }
+            */
+            measure->setDataSource(data[chn], numPoints);
+        }
         measure->setSampleRate(sample_rate);
         measure->measure();
     }
@@ -1259,7 +1310,7 @@ void SpectrumAnalyzer::measureUpdateValues()
             continue;
         }
         measurements_gui[i]->update(*(measurements_data[i]),
-                        50.0f); // de modificat scale-ul
+                        1.0f); // de modificat scale-ul
     }
 }
 

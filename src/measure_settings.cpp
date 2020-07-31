@@ -87,11 +87,14 @@ MeasureSettings::MeasureSettings( QList<Measure *>* measures_list, QWidget *pare
 
     if(m_is_time_domain)
     {
+        m_ui->comboBox_harm->hide();
+        m_ui->label_9->hide();
+        m_ui->line_6->hide();
+
         m_horizMeasurements = new DropdownSwitchList(2, this);
         m_vertMeasurements = new DropdownSwitchList(2, this);
         m_ui->hLayout_hMeasurements->addWidget(m_horizMeasurements);
         m_ui->hLayout_vMeasurements->addWidget(m_vertMeasurements);
-
 
         m_horizMeasurements->setTitle(tr("Horizontal"));
         m_horizMeasurements->setColumnTitle(0, tr("Name"));
@@ -121,9 +124,13 @@ MeasureSettings::MeasureSettings( QList<Measure *>* measures_list, QWidget *pare
     }
     else
     {
-        m_horizMeasurements = new DropdownSwitchList(2, this);
-        m_vertMeasurements = new DropdownSwitchList(2, this);
+        m_horizMeasurements = new DropdownSwitchList(1, this);
+        m_vertMeasurements = new DropdownSwitchList(1, this);
         hide_measure_settings(is_time_domain);
+        m_ui->comboBox_harm->setCurrentIndex(1);
+
+        connect(m_ui->comboBox_harm, SIGNAL(currentIndexChanged(int)),
+            SLOT(onharmValueChanged(int)));
 
         m_ui->hLayout_hMeasurements->addWidget(m_horizMeasurements);
         m_ui->hLayout_vMeasurements->addWidget(m_vertMeasurements);
@@ -131,10 +138,9 @@ MeasureSettings::MeasureSettings( QList<Measure *>* measures_list, QWidget *pare
         m_horizMeasurements->setTitle(tr("Horizontals"));
         m_horizMeasurements->setColumnTitle(0, tr("Name"));
         m_horizMeasurements->setColumnTitle(1, tr("Measure"));
-        m_horizMeasurements->setColumnTitle(2, tr("Stats"));
         m_horizMeasurements->setMaxVisibleItems(4);
         treeView = static_cast<QTreeView *>(m_horizMeasurements->view());
-        treeView->header()->resizeSection(0, 122);
+        treeView->header()->resizeSection(0, 150);
         treeView->setIconSize(QSize(30, 20));
 
         connect(m_horizMeasurements->model(),
@@ -144,11 +150,10 @@ MeasureSettings::MeasureSettings( QList<Measure *>* measures_list, QWidget *pare
         m_vertMeasurements->setTitle(tr("Verticals"));
         m_vertMeasurements->setColumnTitle(0, tr("Name"));
         m_vertMeasurements->setColumnTitle(1, tr("Measure"));
-        m_vertMeasurements->setColumnTitle(2, tr("Stats"));
 
         m_vertMeasurements->setMaxVisibleItems(4);
         treeView = static_cast<QTreeView *>(m_vertMeasurements->view());
-        treeView->header()->resizeSection(0, 122);
+        treeView->header()->resizeSection(0, 150);
         treeView->setIconSize(QSize(30, 20));
 
         connect(m_vertMeasurements->model(),
@@ -160,6 +165,12 @@ MeasureSettings::MeasureSettings( QList<Measure *>* measures_list, QWidget *pare
 MeasureSettings::~MeasureSettings()
 {
     delete m_ui;
+}
+
+void MeasureSettings::onharmValueChanged(int id)
+{
+     Measure *measure = measureOfChannel(m_selectedChannel);
+     measure->setHarmonicNumber(id);
 }
 
 void MeasureSettings::hide_measure_settings(bool is_time_domain) {
@@ -378,7 +389,8 @@ void MeasureSettings::setSelectedChannel(int chnIdx)
     if (m_selectedChannel != chnIdx) {
         m_selectedChannel = chnIdx;
         loadMeasurementStatesFromData();
-        loadStatisticStatesForChannel(chnIdx);
+        if(m_is_time_domain)
+            loadStatisticStatesForChannel(chnIdx);
         if (m_ui->button_measDisplayAll->isChecked()){
             disableDisplayAllMeasurements();
             displayAllMeasurements();
@@ -421,7 +433,7 @@ void MeasureSettings::loadMeasurementStatesFromData()
     else
     {
         for (int i = 0; i < measurements.size(); i++) {
-            int axis = measurements[i]->axis() + 2;
+            enum MeasurementData::axisType axis = measurements[i]->axis();
             int state = measurements[i]->enabled();
 
             if (axis == MeasurementData::HORIZONTAL_F) {
