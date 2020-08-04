@@ -121,7 +121,8 @@ private Q_SLOTS:
 	void on_btnMarkers_toggled(bool checked);
 	void on_comboBox_type_currentIndexChanged(const QString&);
 	void on_comboBox_window_currentIndexChanged(const QString&);
-	void on_spinBox_averaging_valueChanged(int);
+    void on_comboBox_line_thickness_currentIndexChanged(int index);
+    void on_spinBox_averaging_valueChanged(int);
 	void runStopToggled(bool);
 	void onChannelSettingsToggled(bool);
 	void onChannelSelected(bool);
