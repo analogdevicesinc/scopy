@@ -88,6 +88,9 @@ class SignalGenerator_API : public ApiObject
     Q_PROPERTY(QList<double> buffer_phase
            READ getBufferPhase WRITE setBufferPhase)
 
+        Q_PROPERTY(QList<int> line_thickness
+                   READ getLineThickness WRITE setLineThickness)
+
 
 public:
 	bool running() const;
@@ -159,6 +162,8 @@ public:
     void setBufferSampleRate(const QList<double>& list);
     QList<double> getBufferPhase() const;
     void setBufferPhase(const QList<double>& list);
+    QList<int> getLineThickness() const;
+    void setLineThickness(const QList<int>& list);
 
         Q_INVOKABLE void show();
 

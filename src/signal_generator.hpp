@@ -258,6 +258,7 @@ private Q_SLOTS:
 	void phaseIndexChanged();
 	void noiseAmplitudeChanged(double val);
 	void noiseTypeChanged(int val);
+	void lineThicknessChanged(int index);
 	void trapezoidalComputeFrequency();
 	void riseChanged(double value);
 	void fallChanged(double value);
@@ -341,6 +342,7 @@ struct signal_generator_data {
 	// NOISE
 	gr::analog::noise_type_t noiseType;
 	float noiseAmplitude;
+	float lineThickness;
 };
 
 struct time_block_data {
