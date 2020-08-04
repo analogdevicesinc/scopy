@@ -127,3 +127,10 @@ void Sismograph::updateScale(const QwtScaleDiv div)
 {
 	setAxisScale(QwtPlot::xTop, div.lowerBound(), div.upperBound());
 }
+
+void Sismograph::setLineWidth(qreal width)
+{
+        QPen pen(curve.pen());
+        pen.setWidthF(width);
+        curve.setPen(QPen(pen));
+}
