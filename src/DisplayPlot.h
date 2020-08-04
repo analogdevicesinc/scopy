@@ -395,7 +395,7 @@ public Q_SLOTS:
   virtual void setLineColor(int which, QColor color);
   void setLineColor(int chnIdx, int colorIdx);
   virtual QColor getLineColor(int which) const;
-  virtual void setLineWidth(int which, int width);
+  virtual void setLineWidth(int which, qreal width);
   virtual int getLineWidth(int which) const;
   virtual void setLineStyle(int which, Qt::PenStyle style);
   virtual const Qt::PenStyle getLineStyle(int which) const;

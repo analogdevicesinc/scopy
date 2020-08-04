@@ -863,12 +863,12 @@ DisplayPlot::getAxesLabelFontSize() const {
 }
 
 void
-DisplayPlot::setLineWidth(int which, int width)
+DisplayPlot::setLineWidth(int which, qreal width)
 {
   if(which < d_nplots) {
     // Set the new line width
     QPen pen(d_plot_curve[which]->pen());
-    pen.setWidth(width);
+    pen.setWidthF(width);
     d_plot_curve[which]->setPen(pen);
 
     // Scale the marker size proportionally

@@ -115,6 +115,30 @@ void DMM_API::set_history_ch2_size_idx(int index)
 	dmm->ui->historySizeCh2->setCurrentIndex(index);
 }
 
+float DMM_API::get_line_thickness_ch1() const
+{
+        int index = dmm->ui->cbLineThicknessCh1->currentIndex();
+        return 0.5 * (index + 1);
+}
+
+float DMM_API::get_line_thickness_ch2() const
+{
+        int index = dmm->ui->cbLineThicknessCh2->currentIndex();
+        return 0.5 * (index + 1);
+}
+
+void DMM_API::set_line_thickness_ch1(float thickness)
+{
+        int thicknessIdx = (int)(thickness / 0.5) - 1;
+        dmm->ui->cbLineThicknessCh1->setCurrentIndex(thicknessIdx);
+}
+
+void DMM_API::set_line_thickness_ch2(float thickness)
+{
+        int thicknessIdx = (int)(thickness / 0.5) - 1;
+        dmm->ui->cbLineThicknessCh2->setCurrentIndex(thicknessIdx);
+}
+
 bool DMM_API::getDataLoggingEn() const
 {
 	return dmm->ui->btnDataLogging->isChecked();

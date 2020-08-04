@@ -144,6 +144,11 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, ToolMenuItem *toolMenuItem,
 	connect(ui->historySizeCh2, SIGNAL(currentIndexChanged(int)),
 			this, SLOT(setHistorySizeCh2(int)));
 
+        connect(ui->cbLineThicknessCh1, SIGNAL(currentIndexChanged(int)),
+                this, SLOT(setLineThicknessCh1(int)));
+        connect(ui->cbLineThicknessCh2, SIGNAL(currentIndexChanged(int)),
+                this, SLOT(setLineThicknessCh2(int)));
+
 	connect(ui->btnResetPeakHold, SIGNAL(clicked(bool)),
 		SLOT(resetPeakHold(bool)));
 	connect(ui->btnDisplayPeakHold, SIGNAL(toggled(bool)),
@@ -156,7 +161,10 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, ToolMenuItem *toolMenuItem,
 	setHistorySizeCh1(ui->historySizeCh1->currentIndex());
 	setHistorySizeCh2(ui->historySizeCh2->currentIndex());
 
-	/* Lock the flowgraph if we are already started */
+	setLineThicknessCh1(ui->cbLineThicknessCh1->currentIndex());
+        setLineThicknessCh2(ui->cbLineThicknessCh2->currentIndex());
+
+        /* Lock the flowgraph if we are already started */
 	bool started = isIioManagerStarted();
 	if (started)
 		manager->lock();
@@ -609,6 +617,24 @@ void DMM::setHistorySizeCh2(int idx)
 	int num_samples = numSamplesFromIdx(idx);
 
 	ui->sismograph_ch2->setNumSamples(num_samples);
+}
+
+void DMM::setLineThicknessCh1(int idx)
+{
+        float thickness = 0.5 * (idx + 1);
+
+        ui->cbLineThicknessCh1->setCurrentIndex(idx);
+        ui->sismograph_ch1->setLineWidth(thickness);
+        ui->sismograph_ch1->replot();
+}
+
+void DMM::setLineThicknessCh2(int idx)
+{
+        float thickness = 0.5 * (idx + 1);
+
+        ui->cbLineThicknessCh2->setCurrentIndex(idx);
+        ui->sismograph_ch2->setLineWidth(thickness);
+        ui->sismograph_ch2->replot();
 }
 
 void DMM::writeAllSettingsToHardware()
