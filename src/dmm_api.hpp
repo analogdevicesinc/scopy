@@ -50,6 +50,13 @@ class DMM_API : public ApiObject
 			READ get_history_ch2_size_idx
 			WRITE set_history_ch2_size_idx);
 
+        Q_PROPERTY(float line_thickness_ch1
+                         READ get_line_thickness_ch1
+                         WRITE set_line_thickness_ch1);
+        Q_PROPERTY(float line_thickness_ch2
+                           READ get_line_thickness_ch2
+                           WRITE set_line_thickness_ch2);
+
 	Q_PROPERTY(double value_ch1 READ read_ch1);
 	Q_PROPERTY(double value_ch2 READ read_ch2);
 	Q_PROPERTY(bool data_logging_en READ getDataLoggingEn
@@ -74,6 +81,11 @@ public:
 	bool get_histogram_ch2() const;
 	void set_histogram_ch1(bool en);
 	void set_histogram_ch2(bool en);
+
+	float get_line_thickness_ch1() const;
+	float get_line_thickness_ch2() const;
+	void set_line_thickness_ch1(float thickness);
+	void set_line_thickness_ch2(float thickness);
 
 	int get_history_ch1_size_idx() const;
 	int get_history_ch2_size_idx() const;
