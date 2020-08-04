@@ -38,6 +38,11 @@ int SpectrumChannel_API::averaging()
 	return spch->averaging();
 }
 
+float SpectrumChannel_API::lineThickness()
+{
+    return spch->lineWidth();
+}
+
 bool SpectrumChannel_API::enabled()
 {
 	return spch->widget()->enableButton()->isChecked();
@@ -62,6 +67,11 @@ void SpectrumChannel_API::setWindow(int win)
 void SpectrumChannel_API::setAveraging(int avg)
 {
 	spch->setAveraging(avg);
+}
+
+void SpectrumChannel_API::setLineThickness(float val)
+{
+    spch->setLinewidth(val);
 }
 
 QList<double> SpectrumChannel_API::data() const
