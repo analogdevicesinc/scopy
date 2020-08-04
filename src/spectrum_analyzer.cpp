@@ -439,6 +439,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	// UI default
 	ui->comboBox_window->setCurrentText("Hamming");
+	ui->comboBox_line_thickness->setCurrentText("1");
 
 	startStopRange->setStartValue(0);
 	startStopRange->setStopValue(50e6);
@@ -1266,6 +1267,24 @@ void SpectrumAnalyzer::on_comboBox_window_currentIndexChanged(const QString& s)
 	}
 }
 
+void SpectrumAnalyzer::on_comboBox_line_thickness_currentIndexChanged(int index)
+{
+    int crt_channel = channelIdOfOpenedSettings();
+
+    if (crt_channel < 0) {
+        qDebug(CAT_SPECTRUM_ANALYZER) << "invalid channel ID for the opened Settings menu";
+        return;
+    }
+
+    qreal width = 0.5 * (index + 1);
+
+    if (width != channels[crt_channel]->lineWidth()) {
+        channels[crt_channel]->setLinewidth(width);
+        fft_plot->setLineWidth(crt_channel, width);
+        fft_plot->replot();
+    }
+}
+
 void SpectrumAnalyzer::on_spinBox_averaging_valueChanged(int n)
 {
 	int crt_channel = channelIdOfOpenedSettings();
@@ -1312,17 +1331,20 @@ void SpectrumAnalyzer::updateChannelSettingsPanel(unsigned int id)
 		ui->comboBox_window->setEnabled(true);
 		ui->spinBox_averaging->setEnabled(true);
 		ui->btnHistory->setEnabled(true);
+		ui->comboBox_line_thickness->setEnabled(true);
 
 		/* Migh be hidden */
 		ui->comboBox_type->setVisible(true);
 		ui->comboBox_window->setVisible(true);
 		ui->spinBox_averaging->setVisible(true);
 		ui->btnHistory->setVisible(true);
+		ui->comboBox_line_thickness->setVisible(true);
 
 		ui->lbl_history->setVisible(true);
 		ui->label_type->setVisible(true);
 		ui->label_window->setVisible(true);
 		ui->label_averaging->setVisible(true);
+		ui->label_thickness->setVisible(true);
 
 		auto it = std::find_if(avg_types.begin(), avg_types.end(),
 		[&](const std::pair<QString, FftDisplayPlot::AverageType>& p) {
@@ -1355,6 +1377,9 @@ void SpectrumAnalyzer::updateChannelSettingsPanel(unsigned int id)
 		ui->spinBox_averaging->setValue(sc->averaging());
 		int gainIdx = (sc->getGainMode() == libm2k::analog::PLUS_MINUS_25V) ? 0 : 1;
 		ui->cmbGainMode->setCurrentIndex(gainIdx);
+
+        int thicknessIdx = (int)(sc->lineWidth() / 0.5) - 1;
+        ui->comboBox_line_thickness->setCurrentIndex(thicknessIdx);
 	} else {
 		QString style = QString("border: 2px solid %1").arg(cw->color().name());
 		ui->lineChannelSettingsTitle->setStyleSheet(style);
@@ -1372,6 +1397,7 @@ void SpectrumAnalyzer::updateChannelSettingsPanel(unsigned int id)
 			ui->spinBox_averaging->setDisabled(true);
 			ui->btnHistory->setDisabled(true);
 			ui->btnApply->setDisabled(true);
+			ui->comboBox_line_thickness->setDisabled(true);
 		} else {
 			ui->comboBox_type->setVisible(false);
 			ui->comboBox_window->setVisible(false);
@@ -1380,8 +1406,12 @@ void SpectrumAnalyzer::updateChannelSettingsPanel(unsigned int id)
 
 			ui->lbl_history->setVisible(false);
 			ui->label_type->setVisible(false);
+                        ui->comboBox_line_thickness->setDisabled(false);
+
+                        ui->label_type->setVisible(false);
 			ui->label_window->setVisible(false);
 			ui->label_averaging->setVisible(false);
+			ui->label_thickness->setVisible(false);
 		}
 	}
 
