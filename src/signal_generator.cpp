@@ -1546,9 +1546,9 @@ basic_block_sptr SignalGenerator::getSignalSource(gr::top_block_sptr top,
 		src = analog::sig_source_f::make(samp_rate, analog::GR_SIN_WAVE,
 			data.frequency, amplitude, offset, phase*0.01745329);
 	else if(data.waveform==SG_STAIR_WAVE) {
-		std::vector<float> stairdata = get_stairstep(rising_steps, falling_steps,
+		data.stairdata = get_stairstep(rising_steps, falling_steps,
 					  amplitude, offset, stairphase);
-		src = blocks::vector_source_f::make(stairdata, true);
+		src = blocks::vector_source_f::make(data.stairdata, true);
 
 	}
 	else
@@ -2319,6 +2319,11 @@ size_t SignalGenerator::get_samples_count(unsigned int chnIdx,
 
 	switch (ptr->type) {
 	case SIGNAL_TYPE_WAVEFORM:
+		if(ptr->waveform == SG_STAIR_WAVE)
+		{
+			return (ptr->steps_up+ptr->steps_down)*MULTIPLY_CT;
+		}
+
 		ratio = (double) rate / ptr->frequency;
 
 		// for less than max sample rates, generate at least 10 samples per period
@@ -2329,7 +2334,8 @@ size_t SignalGenerator::get_samples_count(unsigned int chnIdx,
 		}
 
 		/* The ratio must be even for square waveforms */
-		if (perfect	&& (ptr->waveform == SG_SQR_WAVE)
+		if (perfect && (ptr->type == SIGNAL_TYPE_WAVEFORM)
+				&& (ptr->waveform == SG_SQR_WAVE)
 				&& (fmod(ratio, 2.0) != 0.0)) {
 			return 0;
 		}

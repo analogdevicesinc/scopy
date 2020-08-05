@@ -328,6 +328,7 @@ struct signal_generator_data {
 	unsigned long file_channel;
 	std::vector<uint32_t> file_nr_of_samples;
 	std::vector<float> file_data; // vector for each channel
+	std::vector<float> stairdata;
 	QString file;
 	QString file_message;
 	QStringList file_channel_names;
