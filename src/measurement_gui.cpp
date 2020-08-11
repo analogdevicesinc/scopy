@@ -183,6 +183,86 @@ void PercentageMeasurementGui::update(const MeasurementData& data, double displa
 }
 
 /*
+ * Class DecibelsMeasurementGui implementation
+ */
+
+ DecibelsMeasurementGui::DecibelsMeasurementGui():
+        MeasurementGui()
+{
+}
+
+void DecibelsMeasurementGui::init(QLabel *name, QLabel *value)
+{
+    // Get the necessary label width so that the label will never resize
+    QLabel *label = new QLabel(value);
+    label->setText("-999.999 dB");
+    m_minValLableWidth = label->minimumSizeHint().width();
+    value->setMinimumWidth(m_minValLableWidth);
+    delete label;
+
+    MeasurementGui::init(name, value);
+}
+
+void DecibelsMeasurementGui::update(const MeasurementData& data, double displayScale)
+{
+    m_name = data.name() + ":";
+
+    if (data.measured() && data.enabled()) {
+        double value = data.value();
+        if (data.axis() == MeasurementData::VERTICAL_F) {
+            value *= displayScale;
+        }
+        m_value.setNum(value, 'f', 3);
+        m_value += "dB";
+    } else {
+        m_value = "--";
+    }
+
+    m_nameLabel->setText(m_name);
+    m_valueLabel->setText(m_value);
+}
+
+/*
+ * Class DecibelstoCarrierMeasurementGui implementation
+ */
+
+ DecibelstoCarrierMeasurementGui::DecibelstoCarrierMeasurementGui():
+        MeasurementGui()
+{
+}
+
+void DecibelstoCarrierMeasurementGui::init(QLabel *name, QLabel *value)
+{
+    // Get the necessary label width so that the label will never resize
+    QLabel *label = new QLabel(value);
+    label->setText("-999.999 dB");
+    m_minValLableWidth = label->minimumSizeHint().width();
+    value->setMinimumWidth(m_minValLableWidth);
+    delete label;
+
+    MeasurementGui::init(name, value);
+}
+
+void DecibelstoCarrierMeasurementGui::update(const MeasurementData& data, double displayScale)
+{
+    m_name = data.name() + ":";
+
+    if (data.measured() && data.enabled()) {
+        double value = data.value();
+        if (data.axis() == MeasurementData::VERTICAL_F) {
+            value *= displayScale;
+        }
+        m_value.setNum(value, 'f', 3);
+        m_value += "dB";
+    } else {
+        m_value = "--";
+    }
+
+    m_nameLabel->setText(m_name);
+    m_valueLabel->setText(m_value);
+}
+
+/*
  * Class DimensionlessMeasurementGui implementation
  */
 

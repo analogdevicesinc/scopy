@@ -143,9 +143,9 @@ font-weight: normal;</string>
         <property name="geometry">
          <rect>
           <x>0</x>
-          <y>-10</y>
+          <y>0</y>
           <width>252</width>
-          <height>545</height>
+          <height>645</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -190,7 +190,7 @@ font-weight: normal;</string>
 	}</string>
              </property>
              <property name="text">
-              <string>MEASUREMENTS </string>
+              <string>MEASUREMENTS</string>
              </property>
             </widget>
            </item>
@@ -346,6 +346,22 @@ QPushButton:hover {
            <property name="horizontalSpacing">
             <number>0</number>
            </property>
+           <item row="2" column="0" colspan="2">
+            <spacer name="verticalSpacer_7">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Fixed</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>0</width>
+               <height>15</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
            <item row="1" column="0">
             <widget class="QLabel" name="label_7">
              <property name="sizePolicy">
@@ -371,6 +387,22 @@ QPushButton:hover {
              </property>
             </widget>
            </item>
+           <item row="0" column="0" colspan="2">
+            <spacer name="verticalSpacer_6">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Fixed</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>0</width>
+               <height>25</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
            <item row="1" column="1">
             <widget class="Line" name="line_3">
              <property name="minimumSize">
@@ -392,38 +424,6 @@ QPushButton:hover {
               <enum>Qt::Horizontal</enum>
              </property>
             </widget>
-           </item>
-           <item row="2" column="0" colspan="2">
-            <spacer name="verticalSpacer_7">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Fixed</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>0</width>
-               <height>15</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="0" column="0" colspan="2">
-            <spacer name="verticalSpacer_6">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Fixed</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>0</width>
-               <height>25</height>
-              </size>
-             </property>
-            </spacer>
            </item>
           </layout>
          </item>
@@ -590,6 +590,13 @@ QPushButton:hover {
           </layout>
          </item>
          <item>
+          <layout class="QHBoxLayout" name="hLayout_hMeasurementsS">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+          </layout>
+         </item>
+         <item>
           <spacer name="verticalSpacer_5">
            <property name="orientation">
             <enum>Qt::Vertical</enum>
@@ -604,6 +611,13 @@ QPushButton:hover {
             </size>
            </property>
           </spacer>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="hLayout_vMeasurementsS">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+          </layout>
          </item>
          <item>
           <layout class="QHBoxLayout" name="hLayout_vMeasurements">

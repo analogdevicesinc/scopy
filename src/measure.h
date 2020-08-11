@@ -35,12 +35,16 @@ namespace adiscope {
 			METRIC,
 			TIME,
 			PERCENTAGE,
-			DIMENSIONLESS
+            DIMENSIONLESS,
+            DECIBELS,
+            DECIBELS_TO_CARRIER
 		};
 
 		enum axisType {
 			HORIZONTAL,
-			VERTICAL
+            VERTICAL,
+            HORIZONTAL_F,
+            VERTICAL_F
 		};
 
 		MeasurementData(const QString& name, axisType axis,
@@ -101,11 +105,24 @@ namespace adiscope {
 			DEFAULT_MEASUREMENT_COUNT
 		};
 
-		Measure(int channel, double *buffer = NULL, size_t length = 0,
-			const std::function<double(unsigned int, double, bool)> &conversion = nullptr);
+        enum defaultSpectralMeasurements {
+            NOISE_FLOOR = 0,
+            SINAD,
+            SNR,
+            THD,
+            THDN,
+            SFDR,
+            DEFAULT_SPECTRAL_MEASUREMENT_COUNT
+        };
 
-		void setDataSource(double *buffer, size_t length);
+		Measure(int channel, double *buffer = NULL, size_t length = 0,
+            const std::function<double(unsigned int, double, bool)> &conversion = nullptr, bool isTimeDomain = true);
+
 		void measure();
+        void measureTimeDomain();
+        void measureSpectral();
+
+        void setDataSource(double *buffer, size_t length);
 		double sampleRate();
 		void setSampleRate(double);
 		unsigned int adcBitCount();
@@ -120,12 +137,18 @@ namespace adiscope {
 		void setEndIndex(int);
 		void setGatingEnabled(bool);
 
+        void setHarmonicNumber(int harmonics_number);
+        void setMask(std::vector<int> mask);
+
 		QList<std::shared_ptr<MeasurementData>> measurments();
 		std::shared_ptr<MeasurementData> measurement(int id);
 		int activeMeasurementsCount() const;
 
 		void setConversionFunction(const std::function<double (unsigned int, double, bool)> &fp);
-	private:
+
+        std::vector<int> LoadMaskfromFile(std::string file_name);
+
+    private:
 		bool highLowFromHistogram(double &low, double &high,
 			double min, double max);
 		void clearMeasurements();
@@ -143,6 +166,10 @@ namespace adiscope {
 		int m_gatingEnabled;
 		int *m_histogram;
 		CrossingDetection *m_cross_detect;
+
+        int m_harmonics_number;
+        std::vector<int> m_mask;
+        bool m_isTimeDomain;
 
 		QList<std::shared_ptr<MeasurementData>> m_measurements;
 		std::function<double(unsigned int, double, bool)> m_conversion_function;

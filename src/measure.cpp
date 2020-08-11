@@ -36,8 +36,6 @@ namespace adiscope {
 			m_bufIdx(bufIndex),
 			m_onRising(onRising),
 			m_name(name)
-
-
 		{
 		}
 
@@ -347,10 +345,378 @@ namespace adiscope {
 
 		QString m_name;
 	};
+
+    class SpectralDetection {
+    public:
+        SpectralDetection(double *data, ssize_t data_length, int harmonics_number):
+        m_data(data),
+        m_data_length(data_length),
+        m_harmonics_number(harmonics_number)
+        {
+        }
+
+        void calculateSpectralDetectionParameters(double &spur, double &harm_dist, double &noise,
+                                                  double &average_noise, double &signal) {
+            struct harmonic_tuple {
+                double harm_value;
+                int harm_bin;
+            };
+
+            findHarmonics(m_harmonics_number);
+
+            int spur_bw;
+            findSpur(spur, spur_bw, false, m_harmonic_bins[0]);
+
+            if(m_mask.empty())
+                m_mask = calculateAutoMask();
+            int noise_bins;
+            maskedSumOfSquares(noise_bins, noise, m_mask);
+
+            noise_bins = noise_bins > 1 ? noise_bins : 1;
+            noise = average_noise * (m_data_length - 1);
+
+            std::map<int, harmonic_tuple> harmonic;
+            for(int i = 0; i < m_harmonics_number; i++)
+            {
+                struct harmonic_tuple harm;
+                harm.harm_bin = m_harmonic_bins[i];
+                harm.harm_value = m_harmonics[i];
+                harm.harm_value -= average_noise * m_harmonic_bw[i];
+                harmonic[i+1] = harm;
+            }
+
+            spur -= average_noise * spur_bw;
+            signal = harmonic[1].harm_value;
+
+            harm_dist = harmonic[2].harm_value + harmonic[3].harm_value +
+                harmonic[4].harm_value + harmonic[5].harm_value;
+
+        }
+
+    private:
+
+        std::vector<int> calculateAutoMask() {
+            const int BANDWIDTH_DIVIDER = 80;
+            const int NUM_INITAL_NOISE_HARMS = 5;
+
+            int bw = int(m_data_length / BANDWIDTH_DIVIDER);
+            std::vector<int> mask;
+            mask.resize(m_data_length, 1);
+            for (int i = 0; i < NUM_INITAL_NOISE_HARMS; i++)
+                    clearMask(mask, m_harmonic_bins[i] - bw, m_harmonic_bins[i] + bw);
+            mask[0] = 0;
+
+            double noise_est;
+            int noise_bins;
+            maskedSum(noise_bins, noise_est, mask);
+            noise_est /= noise_bins;
+
+             std::fill(mask.begin(), mask.end(), 1);
+             //clear mask la dc.
+             clearMask(mask, 0, 1);
+             int j;
+             int low, high;
+
+             double sum;
+
+             for(int i = 0; i < m_harmonic_bins.size(); i++)
+             {
+                 int h = m_harmonic_bins.at(i);
+                 if(mask[h] == 0)
+                     continue;
+                 j = 1;
+                 sum = 0.0F;
+                 for(int s = h-j; s < h-j+3; s++)
+                 {
+                     sum += m_data[s];
+                 }
+                 sum /= 3;
+                 while ( h - j > 0 && mask[h-j] == 1 &&
+                                sum > noise_est ) {
+                     j++;
+                     sum = 0.0F;
+                     for(int s = h-j; s < h-j+3; s++)
+                     {
+                         sum += m_data[s];
+                     }
+                     sum /= 3;
+                 }
+                 low = h - j + 1;
+
+                 j = 1;
+                 sum = 0.0F;
+                 for(int s = h+j-2; s < h+j+1; s++)
+                 {
+                     sum += m_data[s];
+                 }
+                 sum /= 3;
+                 while ( h + j < m_data_length && mask[h+j] == 1 &&
+                                 sum > noise_est ) {
+                     j++;
+                     sum = 0.0F;
+                     for(int s = h+j-2; s < h+j+1; s++)
+                     {
+                         sum += m_data[s];
+                     }
+                     sum /= 3;
+                 }
+                 high = h + j - 1;
+                 clearMask(mask, low, high);
+             }
+
+            return mask;
+        }
+
+        void setMask(std::vector<int> &mask, int start, int end, int value)
+        {
+            int nyq = mask.size();
+            int n = 2 * (nyq - 1);
+            std::vector<int> indices;
+            for(int i = start; i <= end; i++)
+            {
+                int index_value = (i + n) % n;
+                if (index_value > nyq)
+                    index_value = n - index_value;
+                indices.push_back(index_value);
+            }
+
+            for(std::vector<int>::iterator it = indices.begin(); it != indices.end(); ++it)
+            {
+                mask.at(*it) = value;
+            }
+        }
+
+        void clearMask(std::vector<int> &mask, int start, int end)
+        {
+            setMask(mask, start, end, 0);
+        }
+
+        void maskedSubset(std::vector<int> &indices, std::vector<int> &new_mask, std::vector<int> mask, int start, int end)
+        {
+            int nyq = mask.size();
+            int n = 2 * (nyq - 1);
+            std::vector<int> mapped_subset;
+            for(int i = start; i < end; i++)
+            {
+                int index_value = (i + n) % n;
+                if (index_value > nyq)
+                    index_value = n - index_value;
+                mapped_subset.push_back(index_value);
+            }
+
+            for(int i = 0; i < mapped_subset.size(); i++)
+            {
+                if(mask.at(mapped_subset.at(i)) == 1)
+                {
+                    indices.push_back(mapped_subset.at(i));
+                    new_mask.push_back(mask.at(mapped_subset.at(i)));
+                }
+
+            }
+        }
+
+        void maskedSumOfSquares(int &index, double &value, std::vector<int> mask, int start = 0, int end = 0)
+        {
+             if(end == 0 || end >= m_data_length)
+                 end = m_data_length - 1;
+
+             std::vector<int> indices;
+             std::vector<int> new_mask;
+             maskedSubset(indices, new_mask, mask, start, end);
+             double sum = 0;
+
+
+             for(std::vector<int>::iterator it = indices.begin(); it != indices.end(); ++it)
+             {
+                sum = sum + (m_data[*it] * m_data[*it]);
+             }
+
+             index = indices.size();
+             value = sum;
+        }
+
+        void maskedSum(int &index, double &value, std::vector<int> mask, int start = 0, int end = 0)
+        {
+             if(end == 0 || end >= m_data_length)
+                 end = m_data_length - 1;
+
+             std::vector<int> indices;
+             std::vector<int> new_mask;
+             maskedSubset(indices, new_mask, mask, start, end);
+             double sum = 0;
+
+
+             for(std::vector<int>::iterator it = indices.begin(); it != indices.end(); ++it)
+             {
+                sum = sum + (m_data[*it]);
+             }
+
+             index = indices.size();
+             value = sum;
+        }
+
+        void maskedMax(int &index, double &value, std::vector<int> mask, int start = 0, int end = 0)
+        {
+            if(end == 0)
+                end = m_data_length - 1;
+            double *data_at_index = new double[end]();
+            double data_at_index_size;
+            int i = 0;
+
+            std::vector<int> indices;
+            std::vector<int> new_mask;
+            maskedSubset(indices, new_mask, mask, start, end);
+
+            for(int i=0; i<indices.size(); i++)
+            {
+                data_at_index[i] = m_data[indices.at(i)];
+            }
+            data_at_index_size = indices.size();
+
+            getMax(data_at_index, data_at_index_size, index, value);
+            if(!indices.empty())
+                index = indices.at(index);
+            else
+                index = 0;
+            delete[] data_at_index;
+        }
+
+        void getMax(double *data, int size, int &index, double &value)
+        {
+            index = 0;
+            value = data[0];
+            for (int i = 0; i < size; i++)
+            {
+                if (data[i] > value)
+                     {
+                        index = i;
+                        value = data[i];
+                     }
+            }
+        }
+
+        void findHarmonics(int max_harmonics)
+        {
+            m_harmonic_bins.resize(max_harmonics);
+            m_harmonic_bw.resize(max_harmonics);
+            m_harmonics.resize(max_harmonics);
+
+            std::fill(m_harmonic_bins.begin(), m_harmonic_bins.end(), 0);
+            std::fill(m_harmonic_bw.begin(), m_harmonic_bw.end(), 0);
+            std::fill(m_harmonics.begin(), m_harmonics.end(), 0.0);
+
+            //find the fundamental bin (max value) from the data
+            int fund_bin = 0;
+            double max = 0;
+            getMax(m_data, m_data_length, fund_bin, max);
+
+            m_harmonic_bins.at(0) = fund_bin;
+
+            for(int h = 1; h < max_harmonics + 1; h++)
+            {
+                std::vector<int> mask;
+                mask.resize(m_data_length, 0);
+
+                int nominal_bin = h * fund_bin;
+                int h_2 = static_cast<int>(h / 2);
+                if(h > 1)
+                {
+                    setMask(mask, nominal_bin - h_2, nominal_bin + h_2, 1);
+                    for(int i = 0; i < h - 1; i++)
+                    {
+                        clearMask(mask, m_harmonic_bins.at(i), m_harmonic_bins.at(i));
+                    }
+                    int index;
+                    double value;
+                    maskedMax(index, value, mask);
+                    m_harmonic_bins.at(h-1) = index;
+                }
+                clearMask(mask, nominal_bin - h_2, nominal_bin + h_2);
+                setMask(mask,  m_harmonic_bins.at(h-1) - BW, m_harmonic_bins.at(h-1) + BW, 1);
+                for(int i = 0; i < h - 1; i++)
+                {
+                    clearMask(mask, m_harmonic_bins.at(i) - BW, m_harmonic_bins.at(i) + BW);
+                }
+                double val_harm;
+                int val_hbws;
+                maskedSumOfSquares(val_hbws, val_harm, mask);
+                m_harmonics[h-1] = val_harm;
+                m_harmonic_bw[h-1] = val_hbws;
+
+            }
+
+        }
+
+        void findSpur(double &spur, int& spur_bw, bool find_in_harmonics, int fund_bin) {
+            if(find_in_harmonics == true) {
+                int index = std::max_element(m_harmonics.begin() + 1, m_harmonics.end()) - m_harmonics.begin();
+                spur = *std::max_element(m_harmonics.begin() + 1, m_harmonics.end());
+                spur_bw = m_harmonic_bw[index + 1];
+            }
+            else
+            {
+                findSpurInData(spur, spur_bw, fund_bin);
+            }
+        }
+
+        void findSpurInData(double &spur, int& spur_bw, int fund_bin) {
+            std::vector<int> mask;
+            mask.resize(m_data_length, 1);
+            //clear mask la dc.
+            clearMask(mask, 0, 1);
+            clearMask(mask, fund_bin - BW, fund_bin + BW);
+            int index = 0;
+            for(int i = 0; i < mask.size(); i++)
+            {
+                if(mask.at(i) == 1)
+                {
+                    index = i;
+                    break;
+                }
+            }
+            double max_value;
+            int max_index;
+            maskedSumOfSquares(max_index, max_value, mask, index - BW, index + BW);
+            max_index = index;
+            int masked_index = 0;
+
+            double value;
+            while(index < m_data_length)
+            {
+                if(mask.at(index) == 1)
+                {
+                    maskedSumOfSquares(masked_index, value, mask, index - BW, index + BW);
+                    if(value > max_value)
+                    {
+                        max_value = value;
+                        max_index = index;
+                    }
+                }
+                index++;
+            }
+
+            int spur_bin;
+            double spur_value;
+            maskedMax(spur_bin, spur_value, mask, max_index - BW, max_index + BW);
+            maskedSumOfSquares(spur_bw, spur, mask, spur_bin - BW, spur_bin + BW);
+        }
+
+    private:
+        double *m_data;
+        ssize_t m_data_length;
+
+        const int BW = 3;
+        std::vector<int> m_harmonic_bins;
+        std::vector<int> m_harmonic_bw;
+        std::vector<double> m_harmonics;
+        int m_harmonics_number;
+        std::vector<int> m_mask;
+
+    };
 }
 
 Measure::Measure(int channel, double *buffer, size_t length,
-		 const std::function<double(unsigned int, double, bool)> &conversion_fct):
+         const std::function<double(unsigned int, double, bool)> &conversion_fct, bool isTimeDomain):
 	m_channel(channel),
 	m_buffer(buffer),
 	m_buf_length(length),
@@ -361,59 +727,78 @@ Measure::Measure(int channel, double *buffer, size_t length,
 	m_histogram(nullptr),
 	m_cross_detect(nullptr),
 	m_gatingEnabled(false),
-	m_conversion_function(conversion_fct)
+    m_conversion_function(conversion_fct),
+    m_isTimeDomain(isTimeDomain),
+    m_harmonics_number(7)
 {
-
-	// Create a set of measurements
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Period"),
-								   MeasurementData::HORIZONTAL, "s",  channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Frequency"),
-								   MeasurementData::HORIZONTAL, "Hz", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Min"),
-								   MeasurementData::VERTICAL, "V", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Max"),
-								   MeasurementData::VERTICAL, "V", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Peak-peak"),
-								   MeasurementData::VERTICAL, "V", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Mean"),
-								   MeasurementData::VERTICAL, "V", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Cycle Mean"),
-								   MeasurementData::VERTICAL, "V", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("RMS"),
-								   MeasurementData::VERTICAL, "V", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Cycle RMS"),
-								   MeasurementData::VERTICAL, "V", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("AC RMS"),
-								   MeasurementData::VERTICAL, "V", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Area"),
-								   MeasurementData::VERTICAL, "Vs", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Cycle Area"),
-								   MeasurementData::VERTICAL, "Vs", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Low"),
-								   MeasurementData::VERTICAL, "V", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("High"),
-								   MeasurementData::VERTICAL, "V", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Amplitude"),
-								   MeasurementData::VERTICAL, "V", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Middle"),
-								   MeasurementData::VERTICAL, "V", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("+Over"),
-								   MeasurementData::VERTICAL, "%", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("-Over"),
-								   MeasurementData::VERTICAL, "%", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Rise"),
-								   MeasurementData::HORIZONTAL, "s", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Fall"),
-								   MeasurementData::HORIZONTAL, "s", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("+Width"),
-								   MeasurementData::HORIZONTAL, "s", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("-Width"),
-								   MeasurementData::HORIZONTAL, "s", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("+Duty"),
-								   MeasurementData::HORIZONTAL, "%", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("-Duty"),
-								   MeasurementData::HORIZONTAL, "%", channel));
-
+    if(m_isTimeDomain)
+    {
+        // Create a set of Time measurements
+        m_measurements.push_back(std::make_shared<MeasurementData>("Period",
+            MeasurementData::HORIZONTAL, "s",  channel));
+        m_measurements.push_back(std::make_shared<MeasurementData>("Frequency",
+            MeasurementData::HORIZONTAL, "Hz", channel));
+        m_measurements.push_back(std::make_shared<MeasurementData>("Min",
+            MeasurementData::VERTICAL, "V", channel));
+        m_measurements.push_back(std::make_shared<MeasurementData>("Max",
+            MeasurementData::VERTICAL, "V", channel));
+        m_measurements.push_back(std::make_shared<MeasurementData>("Peak-peak",
+            MeasurementData::VERTICAL, "V", channel));
+        m_measurements.push_back(std::make_shared<MeasurementData>("Mean",
+            MeasurementData::VERTICAL, "V", channel));
+        m_measurements.push_back(std::make_shared<MeasurementData>("Cycle Mean",
+            MeasurementData::VERTICAL, "V", channel));
+        m_measurements.push_back(std::make_shared<MeasurementData>("RMS",
+            MeasurementData::VERTICAL, "V", channel));
+        m_measurements.push_back(std::make_shared<MeasurementData>("Cycle RMS",
+            MeasurementData::VERTICAL, "V", channel));
+        m_measurements.push_back(std::make_shared<MeasurementData>("AC RMS",
+            MeasurementData::VERTICAL, "V", channel));
+        m_measurements.push_back(std::make_shared<MeasurementData>("Area",
+            MeasurementData::VERTICAL, "Vs", channel));
+        m_measurements.push_back(std::make_shared<MeasurementData>("Cycle Area",
+            MeasurementData::VERTICAL, "Vs", channel));
+        m_measurements.push_back(std::make_shared<MeasurementData>("Low",
+            MeasurementData::VERTICAL, "V", channel));
+        m_measurements.push_back(std::make_shared<MeasurementData>("High",
+            MeasurementData::VERTICAL, "V", channel));
+        m_measurements.push_back(std::make_shared<MeasurementData>("Amplitude",
+            MeasurementData::VERTICAL, "V", channel));
+        m_measurements.push_back(std::make_shared<MeasurementData>("Middle",
+            MeasurementData::VERTICAL, "V", channel));
+        m_measurements.push_back(std::make_shared<MeasurementData>("+Over",
+            MeasurementData::VERTICAL, "%", channel));
+        m_measurements.push_back(std::make_shared<MeasurementData>("-Over",
+            MeasurementData::VERTICAL, "%", channel));
+        m_measurements.push_back(std::make_shared<MeasurementData>("Rise",
+            MeasurementData::HORIZONTAL, "s", channel));
+        m_measurements.push_back(std::make_shared<MeasurementData>("Fall",
+            MeasurementData::HORIZONTAL, "s", channel));
+        m_measurements.push_back(std::make_shared<MeasurementData>("+Width",
+            MeasurementData::HORIZONTAL, "s", channel));
+        m_measurements.push_back(std::make_shared<MeasurementData>("-Width",
+            MeasurementData::HORIZONTAL, "s", channel));
+        m_measurements.push_back(std::make_shared<MeasurementData>("+Duty",
+            MeasurementData::HORIZONTAL, "%", channel));
+        m_measurements.push_back(std::make_shared<MeasurementData>("-Duty",
+            MeasurementData::HORIZONTAL, "%", channel));
+    }
+    else
+    {
+        //Spectral Measurements
+        m_measurements.push_back(std::make_shared<MeasurementData>("Noise_Floor",
+            MeasurementData::HORIZONTAL_F, "dB", channel));
+        m_measurements.push_back(std::make_shared<MeasurementData>("SINAD",
+            MeasurementData::HORIZONTAL_F, "dB", channel));
+        m_measurements.push_back(std::make_shared<MeasurementData>("SNR",
+            MeasurementData::HORIZONTAL_F, "dB", channel));
+        m_measurements.push_back(std::make_shared<MeasurementData>("THD",
+            MeasurementData::HORIZONTAL_F, "dB", channel));
+        m_measurements.push_back(std::make_shared<MeasurementData>("THDN",
+            MeasurementData::HORIZONTAL_F, "dB", channel));
+        m_measurements.push_back(std::make_shared<MeasurementData>("SFDR",
+            MeasurementData::VERTICAL_F, "dBc", channel));
+    }
 }
 
 void Measure::setConversionFunction(const std::function<double(unsigned int, double, bool)> &fp)
@@ -481,11 +866,18 @@ void Measure::setDataSource(double *buffer, size_t length)
 
 void Measure::measure()
 {
-	clearMeasurements();
+    clearMeasurements();
+    if (!m_buffer || m_buf_length == 0)
+        return;
 
-	if (!m_buffer || m_buf_length == 0)
-		return;
+    if(m_isTimeDomain)
+        measureTimeDomain();
+    else
+        measureSpectral();
+}
 
+void Measure::measureTimeDomain()
+{
 	double period;
 	double frequency;
 	double rise_time;
@@ -803,6 +1195,33 @@ void Measure::measure()
 
 }
 
+void Measure::measureSpectral() {
+    double spur, harm_dist, noise, average_noise, signal;
+
+    SpectralDetection detection(m_buffer, m_buf_length, m_harmonics_number);
+
+    detection.calculateSpectralDetectionParameters(spur, harm_dist, noise, average_noise, signal);
+
+    double noise_floor, snr, thd, thdn, sinad, sfdr;
+    noise_floor = 10 * log10(average_noise / signal);
+    m_measurements[NOISE_FLOOR]->setValue(noise_floor);
+
+    snr = 10 * log10(signal / noise);
+    m_measurements[SNR]->setValue(snr);
+
+    thd = harm_dist > 0 ? 10 * log10(harm_dist / signal) : 0;
+    m_measurements[THD]->setValue(thd);
+
+    sinad = 10 * log10(signal / (harm_dist + noise));
+    m_measurements[SINAD]->setValue(sinad);
+
+    thdn = harm_dist > 0 ? 10 * log10((harm_dist + noise) / signal) : 0;
+    m_measurements[THDN]->setValue(thdn);
+
+    sfdr = spur > 0 ? 10 * log10(signal / spur) : 0;
+    m_measurements[SFDR]->setValue(sfdr);
+}
+
 double Measure::sampleRate()
 {
 	return m_sample_rate;
@@ -872,6 +1291,31 @@ void Measure::setGatingEnabled(bool enable){
 	m_gatingEnabled = enable;
 }
 
+std::vector<int> Measure::LoadMaskfromFile(std::string file_name)
+{
+    std::vector<int> mask;
+    std::ifstream mask_file(file_name.c_str());
+    if(!mask_file.is_open()) throw std::runtime_error("Could not open freq file");
+
+    std::string line = "";
+    while(std::getline(mask_file, line)) {
+
+        int val = std::atoi(line.c_str());
+        mask.push_back(val);
+    }
+    return mask;
+}
+
+void Measure::setHarmonicNumber(int harmonics_number)
+{
+    m_harmonics_number = harmonics_number;
+}
+
+void Measure::setMask(std::vector<int> mask)
+{
+    std::vector<int> m_mask = mask;
+}
+
 QList<std::shared_ptr<MeasurementData>> Measure::measurments()
 {
 	return m_measurements;
@@ -914,6 +1358,10 @@ MeasurementData::MeasurementData(const QString& name, axisType axis,
 		m_unitType = PERCENTAGE;
 	else if (unit.toLower() == "s" || unit.toLower() == "seconds")
 		m_unitType = TIME;
+    else if ((unit.toLower() == "db" || unit.toLower() == "decibels"))
+        m_unitType = DECIBELS;
+    else if ((unit.toLower() == "dbc" || unit.toLower() == "decibels_to_carrier"))
+        m_unitType = DECIBELS_TO_CARRIER;
 	else
 		m_unitType = METRIC;
 }

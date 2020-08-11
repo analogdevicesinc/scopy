@@ -22,6 +22,7 @@
 
 #include <QWidget>
 #include <memory>
+#include <measure.h>
 
 namespace Ui {
 	class MeasureSettings;
@@ -72,11 +73,13 @@ struct StatisticSelection {
 class MeasureSettings : public QWidget
 {
 	friend class Oscilloscope_API;
+    friend class SpectrumAnalyzer_API;
 
 	Q_OBJECT
 
 public:
-	explicit MeasureSettings(CapturePlot *plot, QWidget *parent = 0);
+
+    explicit MeasureSettings(QList<Measure *>* measures_list, QWidget *parent = 0, bool is_time_domain = true);
 	~MeasureSettings();
 
 	QString channelName() const;
@@ -131,7 +134,9 @@ private Q_SLOTS:
 	void on_button_GatingEnable_toggled(bool checked);
 
 private:
+    void hide_measure_settings(bool is_time_domain);
 	void deleteAllMeasurements();
+    Measure* measureOfChannel(int chnIdx) const;
 	void recoverAllMeasurements();
 	void displayAllMeasurements();
 	void disableDisplayAllMeasurements();
@@ -161,13 +166,16 @@ private:
 	bool m_emitStatsDeleteAll;
 	bool m_are_dropdowns_filled;
 	bool m_enableDisplayAll;
+    bool m_is_time_domain;
 
-	CapturePlot* m_plot;
+    QList<Measure *>* m_measures_list;
+
 	int m_selectedChannel;
 	QList<MeasurementItem> m_selectedMeasurements;
 	QList<MeasurementItem> m_deleteAllBackup;
 	QList<MeasurementItem> m_displayAllBackup;
 	QList<int> m_measurePosInDropdowns;
+  //  QList<int> m_measurePosInDropdownsSpectrum;
 
 	QList<struct StatisticSelection> m_selectedStatistics;
 	QList<struct StatisticSelection> m_statsDeleteAllBackup;

@@ -35,6 +35,7 @@
 #include "spinbox_a.hpp"
 #include "customPushButton.hpp"
 #include "startstoprangewidget.h"
+#include <measure.h>
 
 #include <QWidget>
 #include <QQueue>
@@ -44,6 +45,7 @@
 #include <libm2k/analog/m2kanalogin.hpp>
 #include <libm2k/m2k.hpp>
 #include <libm2k/generic.hpp>
+
 
 extern "C" {
 	struct iio_buffer;
@@ -62,12 +64,8 @@ class SpectrumChannel;
 class Filter;
 class ChannelWidget;
 class DbClickButtons;
-
-
-
 class MeasurementData;
 class MeasurementGui;
-class MeasureSettings;
 }
 
 class QPushButton;
@@ -78,6 +76,7 @@ namespace adiscope {
 class SpectrumAnalyzer_API;
 class SpectrumChannel_API;
 class SpectrumMarker_API;
+class MeasureSettings;
 
 class SpectrumAnalyzer: public Tool
 {
@@ -118,6 +117,10 @@ public Q_SLOTS:
 Q_SIGNALS:
 	void started(bool);
 	void showTool();
+    //measure_din plot
+    void measurementsAvailable();
+    //din osc, nu trebe asta //ba cred ca da
+    void selectedChannelChanged(int);
 
 private Q_SLOTS:
 	void on_btnHistory_toggled(bool checked);
@@ -128,6 +131,17 @@ private Q_SLOTS:
 	void on_btnMarkers_toggled(bool checked);
     void on_btnMeasure_toggled(bool);
     void on_boxMeasure_toggled(bool);
+
+    //Pt masuratori!!!!!!!!!!!!!!!
+    void onMeasuremetsAvailable();
+    void onMeasurementActivated(int id, int chnIdx);
+    void onMeasurementDeactivated(int id, int chnIdx);
+    void onMeasurementSelectionListChanged();
+
+    void setMeasuremensEnabled(bool en);
+    void onChannelAdded(int);
+    void onNewDataReceived();
+
 	void on_comboBox_type_currentIndexChanged(const QString&);
 	void on_comboBox_window_currentIndexChanged(const QString&);
     void on_comboBox_line_thickness_currentIndexChanged(int index);
@@ -207,12 +221,13 @@ private:
 	libm2k::analog::GenericAnalogIn* m_generic_analogin;
 	Ui::SpectrumAnalyzer *ui;
 
-
-
     QWidget *measurePanel;
     Ui::MeasurementsPanel *measure_panel_ui;
     adiscope::MeasureSettings *measure_settings;
-
+    QList<std::shared_ptr<MeasurementData>> measurements_data;
+    QList<std::shared_ptr<MeasurementGui>> measurements_gui;
+    QList<Measure *> d_measureObjs;
+    bool d_measurementsEnabled;
 
 	adiscope::DbClickButtons *marker_selector;
 	unsigned int m_nb_overlapping_avg;
@@ -274,9 +289,28 @@ private:
 	bool canSwitchAverageHistory(FftDisplayPlot::AverageType avg_type);
 
 
-    //void measure_settings_init();
+    //din capture plot
+    QList<std::shared_ptr<MeasurementData>> measurements(int chnIdx);
+    std::shared_ptr<MeasurementData> measurement(int id, int chnIdx);
+    void measure();
+    int activeMeasurementsCount(int chnIdx);
+    Measure* measureOfChannel(int chnIdx) const;
+    bool measurementsEnabled();
+    void computeMeasurementsForChannel(unsigned int chnIdx, unsigned int sampleRate);
+
+    //functii normale
+
+    void settings_panel_update(int id);
+    void settings_panel_size_adjust();
+    void update_measure_for_channel(int ch_idx);
+
     void measure_panel_init();
+    void measure_settings_init();
     void init_selected_measurements(int, std::vector<int>);
+    void measureUpdateValues();
+    void measureLabelsRearrange();
+    void measureCreateAndAppendGuiFrom(const MeasurementData&);
+
 };
 
 class SpectrumChannel: public QObject

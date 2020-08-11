@@ -184,6 +184,10 @@ FftDisplayPlot::~FftDisplayPlot()
 	d_refYdata.clear();
 }
 
+void FftDisplayPlot::initChannelMeasurement(int nplots) {
+     Q_EMIT channelAdded(nplots);
+}
+
 void FftDisplayPlot::replot()
 {
 	QwtPlot::replot();
@@ -276,6 +280,8 @@ void FftDisplayPlot::registerReferenceWaveform(QString name, QVector<double> xDa
 
 	findPeaks(d_plot_curve.size() - 1);
 
+    Q_EMIT channelAdded(y_data.size() + n_ref_curves);
+
 	replot();
 }
 
@@ -356,6 +362,15 @@ void FftDisplayPlot::useLogFreq(bool use_log_freq)
 
 	d_logScaleEnabled = use_log_freq;
 	replot();
+}
+
+std::vector<double*> FftDisplayPlot::getOrginal_data() {
+    return y_original_data;
+}
+
+int64_t FftDisplayPlot::getNumPoints()
+{
+    return d_numPoints;
 }
 
 void FftDisplayPlot::plotData(const std::vector<double *> &pts,
