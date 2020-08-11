@@ -272,6 +272,12 @@ Attenuation</source>
         <translation></translation>
     </message>
     <message>
+        <location filename="../../ui/channel_settings.ui" line="933"/>
+        <source>Software 
+AC Coupling</source>
+        <translation>软件AC耦合</translation>
+    </message>
+    <message>
         <location filename="../../ui/channel_settings.ui" line="794"/>
         <source>Curve Style</source>
         <translation>曲线样式</translation>
@@ -302,9 +308,8 @@ Attenuation</source>
         <translation>平滑</translation>
     </message>
     <message>
-        <location filename="../../ui/channel_settings.ui" line="933"/>
         <source>Software AC Coupling</source>
-        <translation>软件交流耦合</translation>
+        <translation type="vanished">软件交流耦合</translation>
     </message>
     <message>
         <location filename="../../ui/channel_settings.ui" line="1012"/>
@@ -1055,12 +1060,12 @@ Attenuation</source>
         <translation>识别</translation>
     </message>
     <message>
-        <location filename="../../ui/info_page.ui" line="205"/>
+        <location filename="../../ui/info_page.ui" line="200"/>
         <source>Connect</source>
         <translation>连接</translation>
     </message>
     <message>
-        <location filename="../../ui/info_page.ui" line="400"/>
+        <location filename="../../ui/info_page.ui" line="395"/>
         <source>Calibrate</source>
         <translation>校准</translation>
     </message>
@@ -1315,109 +1320,109 @@ Attenuation</source>
         <translation>Scopy逻辑分析仪</translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="176"/>
+        <location filename="../../ui/logic_analyzer.ui" line="174"/>
         <source>Group</source>
         <translation>组</translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="754"/>
-        <location filename="../../ui/logic_analyzer.ui" line="2060"/>
+        <location filename="../../ui/logic_analyzer.ui" line="752"/>
+        <location filename="../../ui/logic_analyzer.ui" line="2058"/>
         <source>Channel Settings</source>
         <translation>通道设置</translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="805"/>
-        <location filename="../../ui/logic_analyzer.ui" line="1428"/>
+        <location filename="../../ui/logic_analyzer.ui" line="803"/>
+        <location filename="../../ui/logic_analyzer.ui" line="1426"/>
         <source>-</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="875"/>
+        <location filename="../../ui/logic_analyzer.ui" line="873"/>
         <source>Name</source>
         <translation>名称</translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="891"/>
+        <location filename="../../ui/logic_analyzer.ui" line="889"/>
         <source>1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="907"/>
+        <location filename="../../ui/logic_analyzer.ui" line="905"/>
         <source>Trace Height</source>
         <translation>跟踪高度</translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="962"/>
+        <location filename="../../ui/logic_analyzer.ui" line="960"/>
         <source>GROUP </source>
         <translation>组</translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="1031"/>
+        <location filename="../../ui/logic_analyzer.ui" line="1029"/>
         <source>Stack Decoder:</source>
         <translation>堆栈解码器：</translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="1135"/>
+        <location filename="../../ui/logic_analyzer.ui" line="1133"/>
         <source>Trigger Settings</source>
         <translation>触发设置</translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="1188"/>
+        <location filename="../../ui/logic_analyzer.ui" line="1186"/>
         <source>Trigger mode</source>
         <translation>触发模式</translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="1283"/>
+        <location filename="../../ui/logic_analyzer.ui" line="1281"/>
         <source>auto</source>
         <translation>自动</translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="1286"/>
+        <location filename="../../ui/logic_analyzer.ui" line="1284"/>
         <source>normal</source>
         <translation>普通</translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="1304"/>
+        <location filename="../../ui/logic_analyzer.ui" line="1302"/>
         <source>Trigger Logic</source>
         <translation>触发逻辑</translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="1337"/>
+        <location filename="../../ui/logic_analyzer.ui" line="1335"/>
         <source>EXTERNAL TRIGGER </source>
         <translation>外部触发</translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="1403"/>
+        <location filename="../../ui/logic_analyzer.ui" line="1401"/>
         <source>Source</source>
         <translation>源</translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="1410"/>
+        <location filename="../../ui/logic_analyzer.ui" line="1408"/>
         <source>Condition</source>
         <translation>触发条件</translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="1580"/>
+        <location filename="../../ui/logic_analyzer.ui" line="1578"/>
         <source>General Settings</source>
         <translation>通用设置</translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="1689"/>
+        <location filename="../../ui/logic_analyzer.ui" line="1687"/>
         <source>OneShot</source>
         <translation>单次</translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="1717"/>
+        <location filename="../../ui/logic_analyzer.ui" line="1715"/>
         <source>AVAILABLE CHANNELS </source>
         <translation>可以获取的通道</translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="1836"/>
+        <location filename="../../ui/logic_analyzer.ui" line="1834"/>
         <source>DECODERS </source>
         <translation>解码器</translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="2183"/>
+        <location filename="../../ui/logic_analyzer.ui" line="2181"/>
         <source>Close</source>
         <translation>关闭</translation>
     </message>
@@ -1430,7 +1435,7 @@ Attenuation</source>
         <translation type="vanished">将已选择通道合并为组</translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="133"/>
+        <location filename="../../ui/logic_analyzer.ui" line="131"/>
         <source>Print</source>
         <translation>打印</translation>
     </message>
@@ -1455,7 +1460,7 @@ Attenuation</source>
         <translation type="vanished">重复触发</translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="1692"/>
+        <location filename="../../ui/logic_analyzer.ui" line="1690"/>
         <source>Stream</source>
         <translation>数据流</translation>
     </message>
@@ -1464,13 +1469,13 @@ Attenuation</source>
         <translation type="vanished">复位仪器</translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="2107"/>
+        <location filename="../../ui/logic_analyzer.ui" line="2105"/>
         <source>Cursors</source>
         <translation>游标</translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="862"/>
-        <location filename="../../ui/logic_analyzer.ui" line="2155"/>
+        <location filename="../../ui/logic_analyzer.ui" line="860"/>
+        <location filename="../../ui/logic_analyzer.ui" line="2153"/>
         <source>Trigger</source>
         <translation>触发</translation>
     </message>
@@ -1584,82 +1589,82 @@ Attenuation</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../ui/math.ui" line="525"/>
+        <location filename="../../ui/math.ui" line="522"/>
         <source>e</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../ui/math.ui" line="575"/>
+        <location filename="../../ui/math.ui" line="572"/>
         <source>C</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../ui/math.ui" line="600"/>
+        <location filename="../../ui/math.ui" line="597"/>
         <source>0</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../ui/math.ui" line="625"/>
+        <location filename="../../ui/math.ui" line="622"/>
         <source>6</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../ui/math.ui" line="653"/>
+        <location filename="../../ui/math.ui" line="650"/>
         <source>)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../ui/math.ui" line="681"/>
+        <location filename="../../ui/math.ui" line="678"/>
         <source>log</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../ui/math.ui" line="709"/>
+        <location filename="../../ui/math.ui" line="706"/>
         <source>t</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../ui/math.ui" line="737"/>
+        <location filename="../../ui/math.ui" line="734"/>
         <source>+</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../ui/math.ui" line="762"/>
+        <location filename="../../ui/math.ui" line="759"/>
         <source>9</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../ui/math.ui" line="790"/>
+        <location filename="../../ui/math.ui" line="787"/>
         <source>tan</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../ui/math.ui" line="818"/>
+        <location filename="../../ui/math.ui" line="815"/>
         <source>^</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../ui/math.ui" line="843"/>
+        <location filename="../../ui/math.ui" line="840"/>
         <source>4</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../ui/math.ui" line="880"/>
+        <location filename="../../ui/math.ui" line="877"/>
         <source>Apply</source>
         <translation>启用</translation>
     </message>
     <message>
-        <location filename="../../ui/math.ui" line="908"/>
-        <source>π</source>
+        <location filename="../../ui/math.ui" line="902"/>
+        <source>pi</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../ui/math.ui" line="933"/>
+        <location filename="../../ui/math.ui" line="927"/>
         <source>5</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../ui/math.ui" line="961"/>
+        <location filename="../../ui/math.ui" line="955"/>
         <source>sin</source>
         <translation></translation>
     </message>
@@ -1752,42 +1757,42 @@ Attenuation</source>
 <context>
     <name>NetworkAnalyzer</name>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="111"/>
+        <location filename="../../ui/network_analyzer.ui" line="109"/>
         <source>Print</source>
         <translation>打印</translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="386"/>
+        <location filename="../../ui/network_analyzer.ui" line="384"/>
         <source>Current Frequency:</source>
         <translation>电流频率:</translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="412"/>
+        <location filename="../../ui/network_analyzer.ui" line="410"/>
         <source>Sample: </source>
         <translation>采样:</translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="744"/>
+        <location filename="../../ui/network_analyzer.ui" line="742"/>
         <source>Phase (°)</source>
         <translation>相位(°)</translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="747"/>
+        <location filename="../../ui/network_analyzer.ui" line="745"/>
         <source>Magnitude (dB)</source>
         <translation>幅度(dB)</translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="750"/>
+        <location filename="../../ui/network_analyzer.ui" line="748"/>
         <source>°</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="762"/>
+        <location filename="../../ui/network_analyzer.ui" line="760"/>
         <source>10</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="906"/>
+        <location filename="../../ui/network_analyzer.ui" line="904"/>
         <source>Settings</source>
         <translation>设置</translation>
     </message>
@@ -1796,245 +1801,245 @@ Attenuation</source>
         <translation type="vanished">参考</translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="969"/>
-        <location filename="../../ui/network_analyzer.ui" line="2406"/>
+        <location filename="../../ui/network_analyzer.ui" line="967"/>
+        <location filename="../../ui/network_analyzer.ui" line="2404"/>
         <source>REFERENCE </source>
         <translation>参考</translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="1076"/>
+        <location filename="../../ui/network_analyzer.ui" line="1074"/>
         <source>Channel 1</source>
         <translation>通道 1</translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="1079"/>
+        <location filename="../../ui/network_analyzer.ui" line="1077"/>
         <source>Channel 2</source>
         <translation>通道 2</translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="1082"/>
+        <location filename="../../ui/network_analyzer.ui" line="1080"/>
         <source>0</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="1147"/>
+        <location filename="../../ui/network_analyzer.ui" line="1145"/>
         <source>Gain Mode</source>
         <translation>增益模式</translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="1155"/>
+        <location filename="../../ui/network_analyzer.ui" line="1153"/>
         <source>Automatic</source>
         <translation>自动</translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="1160"/>
+        <location filename="../../ui/network_analyzer.ui" line="1158"/>
         <source>Low</source>
         <translation>低电平</translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="1165"/>
+        <location filename="../../ui/network_analyzer.ui" line="1163"/>
         <source>High</source>
         <translation>高电平</translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="1199"/>
+        <location filename="../../ui/network_analyzer.ui" line="1197"/>
         <source>RESPONSE </source>
         <translation>响应</translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="1232"/>
+        <location filename="../../ui/network_analyzer.ui" line="1230"/>
         <source>DC Filtering</source>
         <translation>直流滤波</translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="1248"/>
-        <location filename="../../ui/network_analyzer.ui" line="1620"/>
+        <location filename="../../ui/network_analyzer.ui" line="1246"/>
+        <location filename="../../ui/network_analyzer.ui" line="1618"/>
         <source>On</source>
         <translation>开</translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="1251"/>
-        <location filename="../../ui/network_analyzer.ui" line="1623"/>
+        <location filename="../../ui/network_analyzer.ui" line="1249"/>
+        <location filename="../../ui/network_analyzer.ui" line="1621"/>
         <source>Off</source>
         <translation>关</translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="1317"/>
+        <location filename="../../ui/network_analyzer.ui" line="1315"/>
         <source>SWEEP </source>
         <translation>扫描</translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="1458"/>
+        <location filename="../../ui/network_analyzer.ui" line="1456"/>
         <source>Logarithmic</source>
         <translation>对数</translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="1461"/>
+        <location filename="../../ui/network_analyzer.ui" line="1459"/>
         <source>Linear</source>
         <translation>线性</translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="1530"/>
+        <location filename="../../ui/network_analyzer.ui" line="1528"/>
         <source>DISPLAY </source>
         <translation>显示</translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="1610"/>
+        <location filename="../../ui/network_analyzer.ui" line="1608"/>
         <source>Delta Label</source>
         <translation>Delta标签</translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="1656"/>
+        <location filename="../../ui/network_analyzer.ui" line="1654"/>
         <source>BUFFER PREVIEWER </source>
         <translation>缓冲预览</translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="1789"/>
+        <location filename="../../ui/network_analyzer.ui" line="1787"/>
         <source>ViewInOsc</source>
         <translation>在示波器中查看</translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="1837"/>
+        <location filename="../../ui/network_analyzer.ui" line="1835"/>
         <source>Previous</source>
         <translation>上一步</translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="1906"/>
+        <location filename="../../ui/network_analyzer.ui" line="1904"/>
         <source>     Next</source>
         <translation>下一步</translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="1968"/>
+        <location filename="../../ui/network_analyzer.ui" line="1966"/>
         <source>General Settings</source>
         <translation>通用设置</translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2044"/>
+        <location filename="../../ui/network_analyzer.ui" line="2042"/>
         <source>PLOT </source>
         <translation>绘图</translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2108"/>
+        <location filename="../../ui/network_analyzer.ui" line="2106"/>
         <source>Type</source>
         <translation>类型</translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2122"/>
+        <location filename="../../ui/network_analyzer.ui" line="2120"/>
         <source>Bode</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2127"/>
+        <location filename="../../ui/network_analyzer.ui" line="2125"/>
         <source>Nyquist</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2132"/>
+        <location filename="../../ui/network_analyzer.ui" line="2130"/>
         <source>Nichols</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2180"/>
+        <location filename="../../ui/network_analyzer.ui" line="2178"/>
         <source>Line thickness</source>
         <translation>线宽</translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2199"/>
+        <location filename="../../ui/network_analyzer.ui" line="2197"/>
         <source>0.5</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2204"/>
+        <location filename="../../ui/network_analyzer.ui" line="2202"/>
         <source>1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2209"/>
+        <location filename="../../ui/network_analyzer.ui" line="2207"/>
         <source>1.5</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2214"/>
+        <location filename="../../ui/network_analyzer.ui" line="2212"/>
         <source>2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2219"/>
+        <location filename="../../ui/network_analyzer.ui" line="2217"/>
         <source>2.5</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2224"/>
+        <location filename="../../ui/network_analyzer.ui" line="2222"/>
         <source>3</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2229"/>
+        <location filename="../../ui/network_analyzer.ui" line="2227"/>
         <source>3.5</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2234"/>
+        <location filename="../../ui/network_analyzer.ui" line="2232"/>
         <source>4</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2239"/>
+        <location filename="../../ui/network_analyzer.ui" line="2237"/>
         <source>4.5</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2244"/>
+        <location filename="../../ui/network_analyzer.ui" line="2242"/>
         <source>5</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2290"/>
+        <location filename="../../ui/network_analyzer.ui" line="2288"/>
         <source>EXPORT </source>
         <translation>导出</translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2353"/>
+        <location filename="../../ui/network_analyzer.ui" line="2351"/>
         <source>Export</source>
         <translation>导出</translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2499"/>
+        <location filename="../../ui/network_analyzer.ui" line="2497"/>
         <source>Import</source>
         <translation>导入</translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2548"/>
+        <location filename="../../ui/network_analyzer.ui" line="2546"/>
         <source>Snapshot</source>
         <translation>快照</translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2600"/>
+        <location filename="../../ui/network_analyzer.ui" line="2598"/>
         <source>Remove Reference</source>
         <translation>移除参考</translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2640"/>
+        <location filename="../../ui/network_analyzer.ui" line="2638"/>
         <source>Cursors</source>
         <translation>游标</translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2723"/>
+        <location filename="../../ui/network_analyzer.ui" line="2721"/>
         <source>CURSOR READOUTS</source>
         <translation>游标读数</translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2778"/>
+        <location filename="../../ui/network_analyzer.ui" line="2776"/>
         <source>Transparency 0%</source>
         <translation>透明度 0%</translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2820"/>
+        <location filename="../../ui/network_analyzer.ui" line="2818"/>
         <source>Position</source>
         <translation>坐标</translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2957"/>
+        <location filename="../../ui/network_analyzer.ui" line="2955"/>
         <source>Cursors </source>
         <translation>游标</translation>
     </message>
@@ -2134,27 +2139,27 @@ Attenuation</source>
         <translation>Scopy示波器</translation>
     </message>
     <message>
-        <location filename="../../ui/oscilloscope.ui" line="130"/>
+        <location filename="../../ui/oscilloscope.ui" line="128"/>
         <source>Print</source>
         <translation>打印</translation>
     </message>
     <message>
-        <location filename="../../ui/oscilloscope.ui" line="895"/>
+        <location filename="../../ui/oscilloscope.ui" line="893"/>
         <source>Cursors</source>
         <translation>游标</translation>
     </message>
     <message>
-        <location filename="../../ui/oscilloscope.ui" line="934"/>
+        <location filename="../../ui/oscilloscope.ui" line="932"/>
         <source>Measure</source>
         <translation>测量</translation>
     </message>
     <message>
-        <location filename="../../ui/oscilloscope.ui" line="973"/>
+        <location filename="../../ui/oscilloscope.ui" line="971"/>
         <source>Trigger</source>
         <translation>触发</translation>
     </message>
     <message>
-        <location filename="../../ui/oscilloscope.ui" line="1001"/>
+        <location filename="../../ui/oscilloscope.ui" line="999"/>
         <source>Close</source>
         <translation>关闭</translation>
     </message>
@@ -2400,123 +2405,123 @@ Attenuation</source>
         <translation>Scopy模式发生器</translation>
     </message>
     <message>
-        <location filename="../../ui/pattern_generator.ui" line="133"/>
+        <location filename="../../ui/pattern_generator.ui" line="131"/>
         <source>Print</source>
         <translation>打印</translation>
     </message>
     <message>
-        <location filename="../../ui/pattern_generator.ui" line="176"/>
+        <location filename="../../ui/pattern_generator.ui" line="174"/>
         <source>Group</source>
         <translation>组</translation>
     </message>
     <message>
-        <location filename="../../ui/pattern_generator.ui" line="754"/>
-        <location filename="../../ui/pattern_generator.ui" line="1886"/>
+        <location filename="../../ui/pattern_generator.ui" line="752"/>
+        <location filename="../../ui/pattern_generator.ui" line="1884"/>
         <source>Channel Settings</source>
         <translation>通道设置</translation>
     </message>
     <message>
-        <location filename="../../ui/pattern_generator.ui" line="813"/>
+        <location filename="../../ui/pattern_generator.ui" line="811"/>
         <source>1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../ui/pattern_generator.ui" line="826"/>
+        <location filename="../../ui/pattern_generator.ui" line="824"/>
         <source>Trace Height</source>
-        <translation type="unfinished">跟踪高度</translation>
+        <translation>跟踪高度</translation>
     </message>
     <message>
-        <location filename="../../ui/pattern_generator.ui" line="842"/>
+        <location filename="../../ui/pattern_generator.ui" line="840"/>
         <source>Name</source>
         <translation>名称</translation>
     </message>
     <message>
-        <location filename="../../ui/pattern_generator.ui" line="922"/>
+        <location filename="../../ui/pattern_generator.ui" line="920"/>
         <source>Open-Drain</source>
         <translation>开漏</translation>
     </message>
     <message>
-        <location filename="../../ui/pattern_generator.ui" line="925"/>
+        <location filename="../../ui/pattern_generator.ui" line="923"/>
         <source>Push-Pull</source>
         <translation>推挽</translation>
     </message>
     <message>
-        <location filename="../../ui/pattern_generator.ui" line="983"/>
+        <location filename="../../ui/pattern_generator.ui" line="981"/>
         <source>GROUP </source>
         <translation>组</translation>
     </message>
     <message>
-        <location filename="../../ui/pattern_generator.ui" line="1032"/>
+        <location filename="../../ui/pattern_generator.ui" line="1030"/>
         <source>Pattern</source>
         <translation>模式码</translation>
     </message>
     <message>
-        <location filename="../../ui/pattern_generator.ui" line="1164"/>
+        <location filename="../../ui/pattern_generator.ui" line="1162"/>
         <source>Trigger Settings</source>
         <translation>触发设置</translation>
     </message>
     <message>
-        <location filename="../../ui/pattern_generator.ui" line="1217"/>
+        <location filename="../../ui/pattern_generator.ui" line="1215"/>
         <source>Trigger mode</source>
         <translation>触发模式</translation>
     </message>
     <message>
-        <location filename="../../ui/pattern_generator.ui" line="1312"/>
+        <location filename="../../ui/pattern_generator.ui" line="1310"/>
         <source>auto</source>
         <translation>自动</translation>
     </message>
     <message>
-        <location filename="../../ui/pattern_generator.ui" line="1315"/>
+        <location filename="../../ui/pattern_generator.ui" line="1313"/>
         <source>normal</source>
         <translation>普通</translation>
     </message>
     <message>
-        <location filename="../../ui/pattern_generator.ui" line="1333"/>
+        <location filename="../../ui/pattern_generator.ui" line="1331"/>
         <source>Trigger Logic</source>
         <translation>触发逻辑</translation>
     </message>
     <message>
-        <location filename="../../ui/pattern_generator.ui" line="1366"/>
+        <location filename="../../ui/pattern_generator.ui" line="1364"/>
         <source>EXTERNAL TRIGGER </source>
         <translation>外部触发</translation>
     </message>
     <message>
-        <location filename="../../ui/pattern_generator.ui" line="1432"/>
+        <location filename="../../ui/pattern_generator.ui" line="1430"/>
         <source>Source</source>
         <translation>源</translation>
     </message>
     <message>
-        <location filename="../../ui/pattern_generator.ui" line="1439"/>
+        <location filename="../../ui/pattern_generator.ui" line="1437"/>
         <source>Condition</source>
         <translation>触发条件</translation>
     </message>
     <message>
-        <location filename="../../ui/pattern_generator.ui" line="1457"/>
+        <location filename="../../ui/pattern_generator.ui" line="1455"/>
         <source>-</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../ui/pattern_generator.ui" line="1609"/>
+        <location filename="../../ui/pattern_generator.ui" line="1607"/>
         <source>General Settings</source>
         <translation>通用设置</translation>
     </message>
     <message>
-        <location filename="../../ui/pattern_generator.ui" line="1653"/>
+        <location filename="../../ui/pattern_generator.ui" line="1651"/>
         <source>AVAILABLE CHANNELS </source>
         <translation>可以获取的通道</translation>
     </message>
     <message>
-        <location filename="../../ui/pattern_generator.ui" line="1933"/>
+        <location filename="../../ui/pattern_generator.ui" line="1931"/>
         <source>Cursors</source>
         <translation>游标</translation>
     </message>
     <message>
-        <location filename="../../ui/pattern_generator.ui" line="1981"/>
+        <location filename="../../ui/pattern_generator.ui" line="1979"/>
         <source>Trigger</source>
         <translation>触发器</translation>
     </message>
     <message>
-        <location filename="../../ui/pattern_generator.ui" line="2009"/>
+        <location filename="../../ui/pattern_generator.ui" line="2007"/>
         <source>Close</source>
         <translation>关闭</translation>
     </message>
@@ -2550,62 +2555,62 @@ Attenuation</source>
     </message>
     <message>
         <location filename="../../ui/powercontrol.ui" line="96"/>
-        <location filename="../../ui/powercontrol.ui" line="382"/>
+        <location filename="../../ui/powercontrol.ui" line="376"/>
         <source>Set</source>
         <translation>设置</translation>
     </message>
     <message>
         <location filename="../../ui/powercontrol.ui" line="144"/>
-        <location filename="../../ui/powercontrol.ui" line="316"/>
+        <location filename="../../ui/powercontrol.ui" line="310"/>
         <source>Measure</source>
         <translation>测量</translation>
     </message>
     <message>
         <location filename="../../ui/powercontrol.ui" line="154"/>
         <location filename="../../ui/powercontrol.ui" line="223"/>
-        <location filename="../../ui/powercontrol.ui" line="436"/>
-        <location filename="../../ui/powercontrol.ui" line="446"/>
+        <location filename="../../ui/powercontrol.ui" line="430"/>
+        <location filename="../../ui/powercontrol.ui" line="440"/>
         <source>VDC</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../ui/powercontrol.ui" line="546"/>
+        <location filename="../../ui/powercontrol.ui" line="531"/>
         <source>Tracking ratio control</source>
         <translation>跟踪比率控制</translation>
     </message>
     <message>
-        <location filename="../../ui/powercontrol.ui" line="651"/>
+        <location filename="../../ui/powercontrol.ui" line="636"/>
         <source>Independent</source>
         <translation>独立模式</translation>
     </message>
     <message>
-        <location filename="../../ui/powercontrol.ui" line="654"/>
+        <location filename="../../ui/powercontrol.ui" line="639"/>
         <source>Tracking</source>
         <translation>跟踪模式</translation>
     </message>
     <message>
-        <location filename="../../ui/powercontrol.ui" line="728"/>
+        <location filename="../../ui/powercontrol.ui" line="713"/>
         <source>100</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../ui/powercontrol.ui" line="747"/>
+        <location filename="../../ui/powercontrol.ui" line="732"/>
         <source>%</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../ui/powercontrol.ui" line="785"/>
+        <location filename="../../ui/powercontrol.ui" line="770"/>
         <source>Positive output</source>
         <translation>输出正电压</translation>
     </message>
     <message>
-        <location filename="../../ui/powercontrol.ui" line="866"/>
-        <location filename="../../ui/powercontrol.ui" line="997"/>
+        <location filename="../../ui/powercontrol.ui" line="851"/>
+        <location filename="../../ui/powercontrol.ui" line="982"/>
         <source>Enable</source>
         <translation>使能</translation>
     </message>
     <message>
-        <location filename="../../ui/powercontrol.ui" line="916"/>
+        <location filename="../../ui/powercontrol.ui" line="901"/>
         <source>Negative output</source>
         <translation>输出负电压</translation>
     </message>
@@ -2660,6 +2665,11 @@ Attenuation</source>
         <location filename="../../ui/preferences.ui" line="479"/>
         <source>Enable animations</source>
         <translation>使能动画</translation>
+    </message>
+    <message>
+        <location filename="../../ui/preferences.ui" line="764"/>
+        <source>1</source>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../ui/preferences.ui" line="984"/>
@@ -2732,11 +2742,6 @@ Attenuation</source>
         <translation>显示的周期数</translation>
     </message>
     <message>
-        <location filename="../../ui/preferences.ui" line="764"/>
-        <source>2</source>
-        <translation></translation>
-    </message>
-    <message>
         <location filename="../../ui/preferences.ui" line="1041"/>
         <source>Enable digital decoders</source>
         <translation>使能数字解码器</translation>
@@ -2790,7 +2795,7 @@ Attenuation</source>
     <message>
         <location filename="../../ui/patterns/pulsepattern.ui" line="63"/>
         <source>Counter Init</source>
-        <translation type="unfinished">初始化计数器</translation>
+        <translation>初始化计数器</translation>
     </message>
     <message>
         <location filename="../../ui/patterns/pulsepattern.ui" line="84"/>
@@ -2815,6 +2820,129 @@ Attenuation</source>
     </message>
 </context>
 <context>
+    <name>QObject</name>
+    <message>
+        <location filename="../../src/measure.cpp" line="368"/>
+        <source>Period</source>
+        <translation>周期</translation>
+    </message>
+    <message>
+        <location filename="../../src/measure.cpp" line="370"/>
+        <source>Frequency</source>
+        <translation>频率</translation>
+    </message>
+    <message>
+        <location filename="../../src/measure.cpp" line="372"/>
+        <source>Min</source>
+        <translation>最小值</translation>
+    </message>
+    <message>
+        <location filename="../../src/measure.cpp" line="374"/>
+        <source>Max</source>
+        <translation>最大值</translation>
+    </message>
+    <message>
+        <location filename="../../src/measure.cpp" line="376"/>
+        <source>Peak-peak</source>
+        <translation>峰峰值</translation>
+    </message>
+    <message>
+        <location filename="../../src/measure.cpp" line="378"/>
+        <source>Mean</source>
+        <translation>平均值</translation>
+    </message>
+    <message>
+        <location filename="../../src/measure.cpp" line="380"/>
+        <source>Cycle Mean</source>
+        <translation type="unfinished">周期平均值</translation>
+    </message>
+    <message>
+        <location filename="../../src/measure.cpp" line="382"/>
+        <source>RMS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/measure.cpp" line="384"/>
+        <source>Cycle RMS</source>
+        <translation type="unfinished">周期RMS</translation>
+    </message>
+    <message>
+        <location filename="../../src/measure.cpp" line="386"/>
+        <source>AC RMS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/measure.cpp" line="388"/>
+        <source>Area</source>
+        <translation>区域</translation>
+    </message>
+    <message>
+        <location filename="../../src/measure.cpp" line="390"/>
+        <source>Cycle Area</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/measure.cpp" line="392"/>
+        <source>Low</source>
+        <translation>低电平</translation>
+    </message>
+    <message>
+        <location filename="../../src/measure.cpp" line="394"/>
+        <source>High</source>
+        <translation>高电平</translation>
+    </message>
+    <message>
+        <location filename="../../src/measure.cpp" line="396"/>
+        <source>Amplitude</source>
+        <translation>幅度</translation>
+    </message>
+    <message>
+        <location filename="../../src/measure.cpp" line="398"/>
+        <source>Middle</source>
+        <translation>中值</translation>
+    </message>
+    <message>
+        <location filename="../../src/measure.cpp" line="400"/>
+        <source>+Over</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/measure.cpp" line="402"/>
+        <source>-Over</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/measure.cpp" line="404"/>
+        <source>Rise</source>
+        <translation>上升沿</translation>
+    </message>
+    <message>
+        <location filename="../../src/measure.cpp" line="406"/>
+        <source>Fall</source>
+        <translation>下降沿</translation>
+    </message>
+    <message>
+        <location filename="../../src/measure.cpp" line="408"/>
+        <source>+Width</source>
+        <translation>+宽度</translation>
+    </message>
+    <message>
+        <location filename="../../src/measure.cpp" line="410"/>
+        <source>-Width</source>
+        <translation>-宽度</translation>
+    </message>
+    <message>
+        <location filename="../../src/measure.cpp" line="412"/>
+        <source>+Duty</source>
+        <translation>+占空比</translation>
+    </message>
+    <message>
+        <location filename="../../src/measure.cpp" line="414"/>
+        <source>-Duty</source>
+        <translation>-占空比</translation>
+    </message>
+</context>
+<context>
     <name>RegisterWidget</name>
     <message>
         <location filename="../../ui/registerwidget.ui" line="20"/>
@@ -2830,12 +2958,12 @@ Attenuation</source>
         <translation>表格</translation>
     </message>
     <message>
-        <location filename="../../ui/runsinglewidget.ui" line="75"/>
+        <location filename="../../ui/runsinglewidget.ui" line="73"/>
         <source>Run</source>
         <translation>运行</translation>
     </message>
     <message>
-        <location filename="../../ui/runsinglewidget.ui" line="136"/>
+        <location filename="../../ui/runsinglewidget.ui" line="132"/>
         <source>Single</source>
         <translation>单次运行</translation>
     </message>
@@ -2905,138 +3033,143 @@ Attenuation</source>
         <translation>Scopy信号发生器</translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="311"/>
+        <location filename="../../ui/signal_generator.ui" line="266"/>
         <source>Constant</source>
         <translation>常数</translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="378"/>
+        <location filename="../../ui/signal_generator.ui" line="333"/>
         <source>Waveform</source>
         <translation>波形</translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="406"/>
+        <location filename="../../ui/signal_generator.ui" line="361"/>
         <source>Sine</source>
         <translation>正弦波</translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="411"/>
+        <location filename="../../ui/signal_generator.ui" line="366"/>
         <source>Square</source>
         <translation>方波</translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="416"/>
+        <location filename="../../ui/signal_generator.ui" line="371"/>
         <source>Triangle</source>
         <translation>三角波</translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="421"/>
+        <location filename="../../ui/signal_generator.ui" line="376"/>
         <source>Trapezoidal</source>
         <translation>梯形波</translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="426"/>
+        <location filename="../../ui/signal_generator.ui" line="381"/>
         <source>Rising Ramp Sawtooth</source>
         <translation>上升斜坡锯齿波</translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="431"/>
+        <location filename="../../ui/signal_generator.ui" line="386"/>
         <source>Falling Ramp Sawtooth</source>
         <translation>下降斜坡锯齿波</translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="487"/>
+        <location filename="../../ui/signal_generator.ui" line="391"/>
+        <source>Stair Step</source>
+        <translation type="unfinished">楼梯台阶</translation>
+    </message>
+    <message>
+        <location filename="../../ui/signal_generator.ui" line="447"/>
         <source>TIMING </source>
         <translation>时序</translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="574"/>
+        <location filename="../../ui/signal_generator.ui" line="534"/>
         <source>Buffer</source>
         <translation>缓冲器</translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="606"/>
+        <location filename="../../ui/signal_generator.ui" line="566"/>
         <source>FILE </source>
         <translation>文件</translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="676"/>
+        <location filename="../../ui/signal_generator.ui" line="636"/>
         <source>Path</source>
         <translation>路径</translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="692"/>
-        <location filename="../../ui/signal_generator.ui" line="723"/>
+        <location filename="../../ui/signal_generator.ui" line="652"/>
+        <location filename="../../ui/signal_generator.ui" line="683"/>
         <source>No file loaded</source>
         <translation>未加载文件</translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="707"/>
+        <location filename="../../ui/signal_generator.ui" line="667"/>
         <source>Format</source>
         <translation>格式</translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="738"/>
+        <location filename="../../ui/signal_generator.ui" line="698"/>
         <source>Size</source>
         <translation>尺寸</translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="754"/>
+        <location filename="../../ui/signal_generator.ui" line="714"/>
         <source>0 samples</source>
         <translation>0采样点</translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="823"/>
+        <location filename="../../ui/signal_generator.ui" line="783"/>
         <source>Load file</source>
         <translation>加载文件</translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="884"/>
+        <location filename="../../ui/signal_generator.ui" line="844"/>
         <source>Channel</source>
         <translation>通道</translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="933"/>
+        <location filename="../../ui/signal_generator.ui" line="893"/>
         <source>SCALING </source>
         <translation>缩放比例</translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="1008"/>
+        <location filename="../../ui/signal_generator.ui" line="968"/>
         <source>Math</source>
         <translation>计算</translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="1101"/>
+        <location filename="../../ui/signal_generator.ui" line="1061"/>
         <source>NOISE </source>
         <translation>噪声</translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="1139"/>
+        <location filename="../../ui/signal_generator.ui" line="1099"/>
         <source>None</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="1144"/>
+        <location filename="../../ui/signal_generator.ui" line="1104"/>
         <source>Uniform</source>
         <translation>均匀</translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="1149"/>
+        <location filename="../../ui/signal_generator.ui" line="1109"/>
         <source>Gaussian</source>
         <translation>高斯</translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="1154"/>
+        <location filename="../../ui/signal_generator.ui" line="1114"/>
         <source>Laplacian</source>
         <translation>拉普拉斯</translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="1159"/>
+        <location filename="../../ui/signal_generator.ui" line="1119"/>
         <source>Impulse</source>
         <translation>脉冲</translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="1235"/>
+        <location filename="../../ui/signal_generator.ui" line="1195"/>
         <source>Close</source>
         <translation>关闭</translation>
     </message>
@@ -3049,187 +3182,187 @@ Attenuation</source>
         <translation>表格</translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="158"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="155"/>
         <source>Print</source>
         <translation>打印</translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="242"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="239"/>
         <source>Preset</source>
         <translation>预先设置</translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="433"/>
-        <location filename="../../ui/spectrum_analyzer.ui" line="1237"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="430"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="1234"/>
         <source>dBFS</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="453"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="450"/>
         <source>Marker_n 0.000 Hz 0dB</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="535"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="532"/>
         <source>Channel</source>
         <translation>通道</translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="581"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="578"/>
         <source>Type</source>
         <translation>类型</translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="589"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="586"/>
         <source>Sample</source>
         <translation>采样</translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="594"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="591"/>
         <source>and other types</source>
         <translation>其他类型</translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="615"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="612"/>
         <source>Window</source>
         <translation>窗口</translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="623"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="620"/>
         <source>Uniform (none)</source>
         <translation>均匀</translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="628"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="625"/>
         <source>and others windows</source>
         <translation>其他窗口</translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="655"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="652"/>
         <source>Averaging</source>
         <translation>均值</translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="712"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="709"/>
         <source>Snapshot</source>
         <translation>快照</translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="772"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="769"/>
         <source>General settings</source>
         <translation>通用设置</translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="861"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="858"/>
         <source>Export</source>
         <translation>导出</translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="910"/>
-        <location filename="../../ui/spectrum_analyzer.ui" line="2200"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="907"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="2197"/>
         <source>Sweep</source>
         <translation>扫描</translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="1043"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="1040"/>
         <source>Logarithmic</source>
         <translation>对数</translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="1046"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="1043"/>
         <source>Linear</source>
         <translation>线性</translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="1076"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="1073"/>
         <source>FREQUENCY </source>
         <translation>频率</translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="1143"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="1140"/>
         <source>AMPLITUDE </source>
         <translation>幅度</translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="1206"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="1203"/>
         <source>Resolution BW</source>
         <translation>分辨率带宽</translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="1229"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="1226"/>
         <source>Units</source>
         <translation>单位</translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="1294"/>
-        <location filename="../../ui/spectrum_analyzer.ui" line="2233"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="1291"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="2230"/>
         <source>Markers</source>
         <translation>标记</translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="1319"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="1316"/>
         <source>Settings</source>
         <translation>设置</translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="1386"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="1383"/>
         <source>MARKER </source>
         <translation>标记</translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="1460"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="1457"/>
         <source>Normal</source>
         <translation>普通</translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="1490"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="1487"/>
         <source>Delta</source>
         <translation>差值</translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="1571"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="1568"/>
         <source> Peak</source>
         <translation>峰值</translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="1618"/>
-        <location filename="../../ui/spectrum_analyzer.ui" line="1751"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="1615"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="1748"/>
         <source>Peak</source>
         <translation>峰值</translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="1661"/>
-        <location filename="../../ui/spectrum_analyzer.ui" line="1704"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="1658"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="1701"/>
         <source>Ampl</source>
         <translation>振幅</translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="1798"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="1795"/>
         <source>GENERAL </source>
         <translation>通用</translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="1844"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="1841"/>
         <source>Marker Table</source>
         <translation>标记表</translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="1928"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="1925"/>
         <source>Import Reference Channels</source>
         <translation>导入参考通道</translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="1989"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="1986"/>
         <source>No file selected!</source>
         <translation>未选择文件！</translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="2025"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="2022"/>
         <source>Browse</source>
         <translation>浏览</translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="2068"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="2065"/>
         <source>Import</source>
         <translation>导入</translation>
     </message>
@@ -3820,6 +3953,11 @@ Attenuation</source>
 <context>
     <name>adiscope::DMM</name>
     <message>
+        <location filename="../../src/dmm.cpp" line="84"/>
+        <source>Timer</source>
+        <translation>计时器</translation>
+    </message>
+    <message>
         <location filename="../../src/dmm.cpp" line="373"/>
         <source>Export</source>
         <translation>导出</translation>
@@ -3902,7 +4040,7 @@ Attenuation</source>
 <context>
     <name>adiscope::I2CPatternUI</name>
     <message>
-        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="1835"/>
+        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="1874"/>
         <source>Frequency</source>
         <translation></translation>
     </message>
@@ -3910,32 +4048,32 @@ Attenuation</source>
 <context>
     <name>adiscope::ImportPatternUI</name>
     <message>
-        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="3446"/>
+        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="3485"/>
         <source>Frequency</source>
         <translation>频率</translation>
     </message>
     <message>
-        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="3449"/>
+        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="3488"/>
         <source>Open file</source>
         <translation>打开文件</translation>
     </message>
     <message>
-        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="3450"/>
+        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="3489"/>
         <source>Import selected channels</source>
         <translation>导入所选的通道</translation>
     </message>
     <message>
-        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="3452"/>
+        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="3491"/>
         <source>No file selected</source>
         <translation>未选择文件</translation>
     </message>
     <message>
-        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="3562"/>
+        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="3601"/>
         <source>Export</source>
         <translation>导出</translation>
     </message>
     <message>
-        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="3562"/>
+        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="3601"/>
         <source>Comma-separated values files (*.csv);;Tab-delimited values files (*.txt)</source>
         <translation>逗号分隔值文件(*.csv);;标签分隔的值文件(*.txt)</translation>
     </message>
@@ -3951,6 +4089,59 @@ Attenuation</source>
         <location filename="../../src/osc_import_settings.cpp" line="31"/>
         <source>Import all</source>
         <translation>全部导入</translation>
+    </message>
+</context>
+<context>
+    <name>adiscope::InfoPage</name>
+    <message>
+        <location filename="../../src/info_page.cpp" line="140"/>
+        <source>Firmware version</source>
+        <translation>固件版本</translation>
+    </message>
+    <message>
+        <location filename="../../src/info_page.cpp" line="142"/>
+        <source>Model</source>
+        <translation>型号</translation>
+    </message>
+    <message>
+        <location filename="../../src/info_page.cpp" line="144"/>
+        <source>Model variant</source>
+        <translation>型号变化</translation>
+    </message>
+    <message>
+        <location filename="../../src/info_page.cpp" line="147"/>
+        <source>Serial</source>
+        <translation>序号</translation>
+    </message>
+    <message>
+        <location filename="../../src/info_page.cpp" line="151"/>
+        <source>Product ID</source>
+        <translation>产品ID</translation>
+    </message>
+    <message>
+        <location filename="../../src/info_page.cpp" line="154"/>
+        <source>Vendor ID</source>
+        <translation>供应商ID</translation>
+    </message>
+    <message>
+        <location filename="../../src/info_page.cpp" line="157"/>
+        <source>Product name</source>
+        <translation>产品名称</translation>
+    </message>
+    <message>
+        <location filename="../../src/info_page.cpp" line="159"/>
+        <source>Vendor</source>
+        <translation>供应商</translation>
+    </message>
+    <message>
+        <location filename="../../src/info_page.cpp" line="161"/>
+        <source>Release</source>
+        <translation>发布</translation>
+    </message>
+    <message>
+        <location filename="../../src/info_page.cpp" line="164"/>
+        <source>IP Address</source>
+        <translation>IP地址</translation>
     </message>
 </context>
 <context>
@@ -4420,6 +4611,27 @@ Attenuation</source>
     </message>
 </context>
 <context>
+    <name>adiscope::PowerController</name>
+    <message>
+        <location filename="../../src/power_controller.cpp" line="62"/>
+        <location filename="../../src/power_controller.cpp" line="67"/>
+        <source>mVolts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/power_controller.cpp" line="63"/>
+        <location filename="../../src/power_controller.cpp" line="68"/>
+        <source>Volts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/power_controller.cpp" line="64"/>
+        <location filename="../../src/power_controller.cpp" line="69"/>
+        <source>Value</source>
+        <translation>值：</translation>
+    </message>
+</context>
+<context>
     <name>adiscope::Preferences</name>
     <message>
         <location filename="../../src/preferences.cpp" line="154"/>
@@ -4475,7 +4687,7 @@ Attenuation</source>
 <context>
     <name>adiscope::PulsePatternUI</name>
     <message>
-        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="4069"/>
+        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="4108"/>
         <source>Sample Rate</source>
         <translation>采样率</translation>
     </message>
@@ -4489,9 +4701,31 @@ Attenuation</source>
     </message>
 </context>
 <context>
+    <name>adiscope::RunSingleWidget</name>
+    <message>
+        <location filename="../../src/runsinglewidget.cpp" line="96"/>
+        <source>Run</source>
+        <translation>运行</translation>
+    </message>
+    <message>
+        <location filename="../../src/runsinglewidget.cpp" line="97"/>
+        <source>Single</source>
+        <translation>单次运行</translation>
+    </message>
+    <message>
+        <location filename="../../src/runsinglewidget.cpp" line="103"/>
+        <location filename="../../src/runsinglewidget.cpp" line="106"/>
+        <location filename="../../src/runsinglewidget.cpp" line="109"/>
+        <location filename="../../src/runsinglewidget.cpp" line="129"/>
+        <location filename="../../src/runsinglewidget.cpp" line="134"/>
+        <source>Stop</source>
+        <translation>停止频率</translation>
+    </message>
+</context>
+<context>
     <name>adiscope::SPIPatternUI</name>
     <message>
-        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="2197"/>
+        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="2236"/>
         <source>Frequency</source>
         <translation>频率</translation>
     </message>
@@ -4499,79 +4733,202 @@ Attenuation</source>
 <context>
     <name>adiscope::SignalGenerator</name>
     <message>
+        <location filename="../../src/signal_generator.cpp" line="161"/>
+        <source>deg</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../src/signal_generator.cpp" line="162"/>
+        <source>π rad</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../src/signal_generator.cpp" line="163"/>
+        <location filename="../../src/signal_generator.cpp" line="206"/>
+        <location filename="../../src/signal_generator.cpp" line="213"/>
+        <location filename="../../src/signal_generator.cpp" line="220"/>
+        <location filename="../../src/signal_generator.cpp" line="227"/>
+        <source>ns</source>
+        <translation></translation>
+    </message>
+    <message>
         <location filename="../../src/signal_generator.cpp" line="164"/>
-        <location filename="../../src/signal_generator.cpp" line="217"/>
+        <location filename="../../src/signal_generator.cpp" line="207"/>
+        <location filename="../../src/signal_generator.cpp" line="214"/>
+        <location filename="../../src/signal_generator.cpp" line="221"/>
+        <location filename="../../src/signal_generator.cpp" line="228"/>
+        <source>μs</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../src/signal_generator.cpp" line="165"/>
+        <location filename="../../src/signal_generator.cpp" line="208"/>
+        <location filename="../../src/signal_generator.cpp" line="215"/>
+        <location filename="../../src/signal_generator.cpp" line="222"/>
+        <location filename="../../src/signal_generator.cpp" line="229"/>
+        <source>ms</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../src/signal_generator.cpp" line="166"/>
+        <location filename="../../src/signal_generator.cpp" line="209"/>
+        <location filename="../../src/signal_generator.cpp" line="216"/>
+        <location filename="../../src/signal_generator.cpp" line="223"/>
+        <location filename="../../src/signal_generator.cpp" line="230"/>
+        <source>s</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../src/signal_generator.cpp" line="167"/>
+        <location filename="../../src/signal_generator.cpp" line="199"/>
+        <location filename="../../src/signal_generator.cpp" line="237"/>
         <source>Phase</source>
         <translation>相位</translation>
     </message>
     <message>
         <location filename="../../src/signal_generator.cpp" line="170"/>
-        <location filename="../../src/signal_generator.cpp" line="236"/>
-        <location filename="../../src/signal_generator.cpp" line="249"/>
+        <source>μVolts p-p</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../src/signal_generator.cpp" line="171"/>
+        <source>mVolts p-p</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../src/signal_generator.cpp" line="172"/>
+        <source>Volts p-p</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../src/signal_generator.cpp" line="173"/>
+        <location filename="../../src/signal_generator.cpp" line="258"/>
+        <location filename="../../src/signal_generator.cpp" line="280"/>
         <source>Amplitude</source>
         <translation>幅度</translation>
     </message>
     <message>
         <location filename="../../src/signal_generator.cpp" line="176"/>
-        <location filename="../../src/signal_generator.cpp" line="223"/>
+        <location filename="../../src/signal_generator.cpp" line="241"/>
+        <location filename="../../src/signal_generator.cpp" line="255"/>
+        <location filename="../../src/signal_generator.cpp" line="277"/>
+        <source>μVolts</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../src/signal_generator.cpp" line="177"/>
+        <location filename="../../src/signal_generator.cpp" line="242"/>
+        <location filename="../../src/signal_generator.cpp" line="256"/>
+        <location filename="../../src/signal_generator.cpp" line="278"/>
+        <location filename="../../src/signal_generator.cpp" line="283"/>
+        <source>mVolts</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../src/signal_generator.cpp" line="178"/>
+        <location filename="../../src/signal_generator.cpp" line="243"/>
+        <location filename="../../src/signal_generator.cpp" line="257"/>
+        <location filename="../../src/signal_generator.cpp" line="279"/>
+        <location filename="../../src/signal_generator.cpp" line="284"/>
+        <source>Volts</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../src/signal_generator.cpp" line="179"/>
+        <location filename="../../src/signal_generator.cpp" line="244"/>
         <source>Offset</source>
         <translation>偏移</translation>
     </message>
     <message>
+        <location filename="../../src/signal_generator.cpp" line="182"/>
+        <source>mHz</source>
+        <translation></translation>
+    </message>
+    <message>
         <location filename="../../src/signal_generator.cpp" line="183"/>
-        <location filename="../../src/signal_generator.cpp" line="243"/>
+        <source>Hz</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../src/signal_generator.cpp" line="184"/>
+        <source>kHz</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../src/signal_generator.cpp" line="185"/>
+        <source>MHz</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../src/signal_generator.cpp" line="186"/>
         <source>Frequency</source>
         <translation>频率</translation>
     </message>
     <message>
         <location filename="../../src/signal_generator.cpp" line="191"/>
+        <source>Rising</source>
+        <translation>上升沿</translation>
+    </message>
+    <message>
+        <location filename="../../src/signal_generator.cpp" line="195"/>
+        <source>Falling</source>
+        <translation>下降沿</translation>
+    </message>
+    <message>
+        <location filename="../../src/signal_generator.cpp" line="210"/>
         <source>Rise Time</source>
         <translation>上升时间</translation>
     </message>
     <message>
-        <location filename="../../src/signal_generator.cpp" line="198"/>
+        <location filename="../../src/signal_generator.cpp" line="217"/>
         <source>Fall Time</source>
         <translation>下降时间</translation>
     </message>
     <message>
-        <location filename="../../src/signal_generator.cpp" line="205"/>
+        <location filename="../../src/signal_generator.cpp" line="224"/>
         <source>High Time</source>
         <translation>高电平时间</translation>
     </message>
     <message>
-        <location filename="../../src/signal_generator.cpp" line="212"/>
+        <location filename="../../src/signal_generator.cpp" line="231"/>
         <source>Low Time</source>
         <translation>低电平时间</translation>
     </message>
     <message>
-        <location filename="../../src/signal_generator.cpp" line="230"/>
+        <location filename="../../src/signal_generator.cpp" line="251"/>
+        <location filename="../../src/signal_generator.cpp" line="265"/>
         <source>SampleRate</source>
         <translation>采样率</translation>
     </message>
     <message>
-        <location filename="../../src/signal_generator.cpp" line="254"/>
+        <location filename="../../src/signal_generator.cpp" line="274"/>
+        <source>Record Length</source>
+        <translation>记录长度</translation>
+    </message>
+    <message>
+        <location filename="../../src/signal_generator.cpp" line="285"/>
         <source>Value</source>
         <translation>值：</translation>
     </message>
     <message>
-        <location filename="../../src/signal_generator.cpp" line="258"/>
+        <location filename="../../src/signal_generator.cpp" line="289"/>
         <source>Duty Cycle</source>
         <translation>占空比</translation>
     </message>
     <message>
-        <location filename="../../src/signal_generator.cpp" line="742"/>
-        <location filename="../../src/signal_generator.cpp" line="1234"/>
-        <location filename="../../src/signal_generator.cpp" line="1847"/>
+        <location filename="../../src/signal_generator.cpp" line="809"/>
+        <location filename="../../src/signal_generator.cpp" line="1346"/>
+        <location filename="../../src/signal_generator.cpp" line="2014"/>
         <source> samples</source>
         <translation>采样</translation>
     </message>
     <message>
-        <location filename="../../src/signal_generator.cpp" line="1245"/>
+        <location filename="../../src/signal_generator.cpp" line="1357"/>
         <source>Open File</source>
         <translation>打开文件</translation>
     </message>
     <message>
-        <location filename="../../src/signal_generator.cpp" line="1245"/>
+        <location filename="../../src/signal_generator.cpp" line="1357"/>
         <source>Comma-separated values files (*.csv);;Tab-delimited values files (*.txt);;Waveform Audio File Format (*.wav);;Matlab files (*.mat)</source>
         <translation>逗号分隔值文件(*.csv);;制表符分隔值文件(*.txt);;波形音频文件格式(*.wav);;Matlab文件(*.mat)</translation>
     </message>
@@ -4603,6 +4960,161 @@ Attenuation</source>
         <source>Comma-separated values files (*.csv)</source>
         <comment>Tab-delimited values files (*.txt)</comment>
         <translation type="vanished">逗号分隔值文件(*.csv)</translation>
+    </message>
+    <message>
+        <location filename="../../src/spectrum_analyzer.cpp" line="68"/>
+        <source>dBFS</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../src/spectrum_analyzer.cpp" line="69"/>
+        <source>dBV</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../src/spectrum_analyzer.cpp" line="70"/>
+        <source>dBu</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../src/spectrum_analyzer.cpp" line="71"/>
+        <source>Vpeak</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../src/spectrum_analyzer.cpp" line="72"/>
+        <source>Vrms</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../src/spectrum_analyzer.cpp" line="77"/>
+        <source>Sample</source>
+        <translation>采样</translation>
+    </message>
+    <message>
+        <location filename="../../src/spectrum_analyzer.cpp" line="78"/>
+        <source>Peak Hold</source>
+        <translation>峰值保持</translation>
+    </message>
+    <message>
+        <location filename="../../src/spectrum_analyzer.cpp" line="79"/>
+        <source>Peak Hold Continous</source>
+        <translation>峰值保持 连续</translation>
+    </message>
+    <message>
+        <location filename="../../src/spectrum_analyzer.cpp" line="80"/>
+        <source>Min Hold</source>
+        <translation>最短保持时间</translation>
+    </message>
+    <message>
+        <location filename="../../src/spectrum_analyzer.cpp" line="81"/>
+        <source>Min Hold Continous</source>
+        <translation>最短保持时间 连续</translation>
+    </message>
+    <message>
+        <location filename="../../src/spectrum_analyzer.cpp" line="82"/>
+        <source>Linear RMS</source>
+        <translation>线性RMS</translation>
+    </message>
+    <message>
+        <location filename="../../src/spectrum_analyzer.cpp" line="83"/>
+        <source>Linear dB</source>
+        <translation>线性 dB</translation>
+    </message>
+    <message>
+        <location filename="../../src/spectrum_analyzer.cpp" line="84"/>
+        <source>Exponential RMS</source>
+        <translation>指数RMS</translation>
+    </message>
+    <message>
+        <location filename="../../src/spectrum_analyzer.cpp" line="85"/>
+        <source>Exponential dB</source>
+        <translation>指数dB</translation>
+    </message>
+    <message>
+        <location filename="../../src/spectrum_analyzer.cpp" line="90"/>
+        <source>Flat top</source>
+        <translation>平顶型</translation>
+    </message>
+    <message>
+        <location filename="../../src/spectrum_analyzer.cpp" line="91"/>
+        <source>Rectangular</source>
+        <translation>矩形</translation>
+    </message>
+    <message>
+        <location filename="../../src/spectrum_analyzer.cpp" line="92"/>
+        <source>Triangular (Bartlett)</source>
+        <translation>三角形(Bartlett)</translation>
+    </message>
+    <message>
+        <location filename="../../src/spectrum_analyzer.cpp" line="93"/>
+        <source>Hamming</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../src/spectrum_analyzer.cpp" line="94"/>
+        <source>Hann</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../src/spectrum_analyzer.cpp" line="95"/>
+        <source>Blackman-Harris</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../src/spectrum_analyzer.cpp" line="96"/>
+        <source>Kaiser</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../src/spectrum_analyzer.cpp" line="100"/>
+        <source>Manual</source>
+        <translation>手册</translation>
+    </message>
+    <message>
+        <location filename="../../src/spectrum_analyzer.cpp" line="101"/>
+        <source>Peak</source>
+        <translation>峰值</translation>
+    </message>
+    <message>
+        <location filename="../../src/spectrum_analyzer.cpp" line="102"/>
+        <source>Delta</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/spectrum_analyzer.cpp" line="103"/>
+        <source>Fixed</source>
+        <translation>固定</translation>
+    </message>
+    <message>
+        <location filename="../../src/spectrum_analyzer.cpp" line="244"/>
+        <source>Range</source>
+        <translation>范围</translation>
+    </message>
+    <message>
+        <location filename="../../src/spectrum_analyzer.cpp" line="249"/>
+        <source>Top</source>
+        <translation>顶端值</translation>
+    </message>
+    <message>
+        <location filename="../../src/spectrum_analyzer.cpp" line="253"/>
+        <source>Hz</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../src/spectrum_analyzer.cpp" line="254"/>
+        <source>kHz</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../src/spectrum_analyzer.cpp" line="255"/>
+        <source>MHz</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../src/spectrum_analyzer.cpp" line="256"/>
+        <source>Frequency Position</source>
+        <translation>頻率位置</translation>
     </message>
     <message>
         <location filename="../../src/spectrum_analyzer.cpp" line="452"/>
@@ -4658,6 +5170,11 @@ Attenuation</source>
 </context>
 <context>
     <name>adiscope::ToolLauncher</name>
+    <message>
+        <location filename="../../src/tool_launcher.cpp" line="203"/>
+        <source>Preferences</source>
+        <translation>首选项</translation>
+    </message>
     <message>
         <location filename="../../src/tool_launcher.cpp" line="353"/>
         <source>Save session</source>
@@ -4725,6 +5242,7 @@ Attenuation</source>
     </message>
     <message>
         <location filename="../../src/tool_launcher.cpp" line="1078"/>
+        <location filename="../../src/tool_launcher.cpp" line="1294"/>
         <source>Calibrating...</source>
         <translation>校准中...</translation>
     </message>
@@ -4748,6 +5266,121 @@ Attenuation</source>
         <location filename="../../src/tool_launcher.cpp" line="1460"/>
         <source>There was a problem initializing libsigrokdecode. Some features may be missing</source>
         <translation>初始化 libsigrokdecode 时出现了问题.可能缺少一些功能</translation>
+    </message>
+</context>
+<context>
+    <name>adiscope::ToolMenu</name>
+    <message>
+        <location filename="../../src/toolmenu.cpp" line="33"/>
+        <source>Oscilloscope</source>
+        <translation>示波器</translation>
+    </message>
+    <message>
+        <location filename="../../src/toolmenu.cpp" line="33"/>
+        <source>Spectrum Analyzer</source>
+        <translation>频谱分析仪</translation>
+    </message>
+    <message>
+        <location filename="../../src/toolmenu.cpp" line="34"/>
+        <source>Network Analyzer</source>
+        <translation>网络分析仪</translation>
+    </message>
+    <message>
+        <location filename="../../src/toolmenu.cpp" line="34"/>
+        <source>Signal Generator</source>
+        <translation>信号发生器</translation>
+    </message>
+    <message>
+        <location filename="../../src/toolmenu.cpp" line="35"/>
+        <source>Logic Analyzer</source>
+        <translation>逻辑分析仪</translation>
+    </message>
+    <message>
+        <location filename="../../src/toolmenu.cpp" line="35"/>
+        <source>Pattern Generator</source>
+        <translation>模式生成器</translation>
+    </message>
+    <message>
+        <location filename="../../src/toolmenu.cpp" line="36"/>
+        <source>Digital IO</source>
+        <translation>数字IO</translation>
+    </message>
+    <message>
+        <location filename="../../src/toolmenu.cpp" line="36"/>
+        <source>Voltmeter</source>
+        <translation>电压表</translation>
+    </message>
+    <message>
+        <location filename="../../src/toolmenu.cpp" line="37"/>
+        <source>Power Supply</source>
+        <translation>电源供应器</translation>
+    </message>
+    <message>
+        <location filename="../../src/toolmenu.cpp" line="37"/>
+        <source>Debugger</source>
+        <translation>调试器</translation>
+    </message>
+    <message>
+        <location filename="../../src/toolmenu.cpp" line="37"/>
+        <source>Calibration</source>
+        <translation>校准</translation>
+    </message>
+</context>
+<context>
+    <name>adiscope::TriggerSettings</name>
+    <message>
+        <location filename="../../src/trigger_settings.cpp" line="56"/>
+        <source>Forward Trigger In</source>
+        <translation>正向触发</translation>
+    </message>
+    <message>
+        <location filename="../../src/trigger_settings.cpp" line="57"/>
+        <source>Oscilloscope</source>
+        <translation>示波器</translation>
+    </message>
+    <message>
+        <location filename="../../src/trigger_settings.cpp" line="58"/>
+        <location filename="../../src/trigger_settings.cpp" line="141"/>
+        <source>Logic Analyzer</source>
+        <translation>逻辑分析仪</translation>
+    </message>
+    <message>
+        <location filename="../../src/trigger_settings.cpp" line="82"/>
+        <location filename="../../src/trigger_settings.cpp" line="88"/>
+        <source>μVolts</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../src/trigger_settings.cpp" line="83"/>
+        <location filename="../../src/trigger_settings.cpp" line="89"/>
+        <source>mVolts</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../src/trigger_settings.cpp" line="84"/>
+        <location filename="../../src/trigger_settings.cpp" line="90"/>
+        <source>Volts</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../src/trigger_settings.cpp" line="85"/>
+        <source>Level</source>
+        <translation>触发等级</translation>
+    </message>
+    <message>
+        <location filename="../../src/trigger_settings.cpp" line="91"/>
+        <source>Hysteresis</source>
+        <translation>触发滞后</translation>
+    </message>
+    <message>
+        <location filename="../../src/trigger_settings.cpp" line="138"/>
+        <source>External Trigger In</source>
+        <translation>外部触发</translation>
+    </message>
+    <message>
+        <location filename="../../src/trigger_settings.cpp" line="151"/>
+        <source>None</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -4796,9 +5429,24 @@ Attenuation</source>
         <translation>延时</translation>
     </message>
     <message>
-        <location filename="../../src/logicanalyzer/logic_analyzer.cpp" line="697"/>
+        <location filename="../../src/logicanalyzer/logic_analyzer.cpp" line="698"/>
         <source>Transparency </source>
         <translation>透明度</translation>
+    </message>
+    <message>
+        <location filename="../../src/logicanalyzer/logic_analyzer.cpp" line="1154"/>
+        <source>Select a decoder to add</source>
+        <translation>选择一个要添加的解码器</translation>
+    </message>
+    <message>
+        <location filename="../../src/logicanalyzer/logic_analyzer.cpp" line="1456"/>
+        <source>External Trigger In</source>
+        <translation>外部触发</translation>
+    </message>
+    <message>
+        <location filename="../../src/logicanalyzer/logic_analyzer.cpp" line="1457"/>
+        <source>Oscilloscope</source>
+        <translation>示波器</translation>
     </message>
 </context>
 <context>
@@ -4933,7 +5581,7 @@ Attenuation</source>
     <message>
         <location filename="../../js/patterngenerator/pulsegen/scriptpulsegen.ui" line="61"/>
         <source>Samples/Pulse</source>
-        <translation type="unfinished"></translation>
+        <translation>采样/脉冲</translation>
     </message>
     <message>
         <location filename="../../js/patterngenerator/pulsegen/scriptpulsegen.ui" line="71"/>
