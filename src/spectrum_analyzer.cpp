@@ -129,8 +129,6 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	m_generic_analogin(nullptr),
 	marker_selector(new DbClickButtons(this)),
 	fft_plot(nullptr),
-    first_two_times(0),
-    counter_ref(0),
 	settings_group(new QButtonGroup(this)),
 	channels_group(new QButtonGroup(this)),
 	adc_name(ctx ? filt->device_name(TOOL_SPECTRUM_ANALYZER) : ""),
@@ -923,7 +921,6 @@ void SpectrumAnalyzer::measure_settings_init()
         SIGNAL(measurementSelectionListChanged()),
         SLOT(onMeasurementSelectionListChanged()));
 
-    //era this inainte
     connect(fft_plot, SIGNAL(channelAdded(int)),
         measure_settings, SLOT(onChannelAdded(int)));
 
@@ -932,6 +929,7 @@ void SpectrumAnalyzer::measure_settings_init()
 
     connect(ui->boxMeasure, SIGNAL(toggled(bool)),
          SLOT(setMeasuremensEnabled(bool)));
+
 }
 
 void SpectrumAnalyzer::onChannelAdded(int chnIdx)
@@ -951,6 +949,8 @@ void SpectrumAnalyzer::onChannelAdded(int chnIdx)
         int64_t numPoints = fft_plot->getNumPoints() / 2;
         std::vector<double> scale_factor = fft_plot->getScaleFactor();
 
+        //std::vector<double*> data = fft_plot->getOrginal_data();
+        //int count = fft_plot->countReferenceWaveform(chnIdx);
         double* data = new double [numPoints]();
         measure = new Measure(chnIdx, data,
                 numPoints, nullptr, false);
@@ -1240,52 +1240,17 @@ void SpectrumAnalyzer::onNewDataReceived()
             measure->setDataSource(fft_plot->getRef_data()[ref_idx],
                            curve_size / 2);
             ref_idx++;
-            counter_ref++;
         }
         else {
             int64_t numPoints = fft_plot->getNumPoints() / 2;
             std::vector<double*> data = fft_plot->getOrginal_data();
             std::vector<double> scale_factor = fft_plot->getScaleFactor();
 
+            //int count = fft_plot->countReferenceWaveform(chn);
+            //chn = chn - count;
             for (int s = 0; s < numPoints; s++) {
                 data[chn][s] = sqrt(data[chn][s]) * scale_factor[chn] / numPoints;
             }
-
-            /*
-            if(first_two_times == 0)
-            {
-                  std::ofstream myFile1("canal_1.csv");
-                  for(int j = 0; j < numPoints; j++)
-                  {
-                      myFile1 << data[chn][j] << std::endl;
-                  }
-                  first_two_times = 1;
-            } else if (first_two_times == 1)
-            {
-                 std::ofstream myFile2("canal_2.csv");
-                 for(int j = 0; j < numPoints; j++)
-                 {
-                     myFile2 << data[chn][j] << std::endl;
-                 }
-                 first_two_times = 2;
-            } else if (first_two_times == 2)
-            {
-                 std::ofstream myFile2("canal_3.csv");
-                 for(int j = 0; j < numPoints; j++)
-                 {
-                     myFile2 << data[chn][j] << std::endl;
-                 }
-                 first_two_times = 3;
-            } else if (first_two_times == 3)
-            {
-                 std::ofstream myFile2("canal_4.csv");
-                 for(int j = 0; j < numPoints; j++)
-                 {
-                     myFile2 << data[chn][j] << std::endl;
-                 }
-                 first_two_times = 4;
-            }
-            */
             measure->setDataSource(data[chn], numPoints);
         }
         measure->setSampleRate(sample_rate);
@@ -1478,6 +1443,21 @@ void SpectrumAnalyzer::add_ref_waveform(unsigned int chIdx)
 	add_ref_waveform(xData, yData);
 }
 
+void SpectrumAnalyzer::cleanUpMeasurementsBeforeChannelRemoval(int chnIdx)
+{
+    Measure *measure = measureOfChannel(chnIdx);
+    if (measure) {
+        int pos = d_measureObjs.indexOf(measure);
+        for (int i = pos + 1; i < d_measureObjs.size(); i++) {
+            d_measureObjs[i]->setChannel(
+                d_measureObjs[i]->channel() - 1);
+        }
+        d_measureObjs.removeOne(measure);
+        delete measure;
+    }
+}
+
+
 void SpectrumAnalyzer::onReferenceChannelDeleted()
 {
 	if (nb_ref_channels - 1 < MAX_REF_CHANNELS) {
@@ -1487,13 +1467,34 @@ void SpectrumAnalyzer::onReferenceChannelDeleted()
 	ChannelWidget *channelWidget = static_cast<ChannelWidget *>(QObject::sender());
 	QAbstractButton *delBtn = channelWidget->deleteButton();
 	QString qname = delBtn->property("curve_name").toString();
+    int curve_id = channelWidget->id();
 
-	fft_plot->unregisterReferenceWaveform(qname);
-	ui->channelsList->removeWidget(channelWidget);
+    /*If there are no more channels enabled, we should
+    disable the measurements.*/
+    bool shouldDisable = true;
+
+    for (unsigned int i = 0; i < m_adc_nb_channels + nb_ref_channels;
+         i++) {
+        ChannelWidget *cw = static_cast<ChannelWidget *>(
+            ui->channelsList->itemAt(i)->widget());
+        if (curve_id == cw->id())
+            continue;
+        if (cw->enableButton()->isChecked())
+            shouldDisable = false;
+    }
+
+    if (shouldDisable)
+        measure_settings->disableDisplayAll();
+
+    measure_settings->onChannelRemoved(channelWidget->id());
+
+    cleanUpMeasurementsBeforeChannelRemoval(channelWidget->id());
+
+    fft_plot->unregisterReferenceWaveform(qname);
+    ui->channelsList->removeWidget(channelWidget);
 
 	/* Check if there are other channel widgets that are enabled */
 	bool channelsEnabled = false;
-
 	referenceChannels.erase(std::find(referenceChannels.begin(),
 					  referenceChannels.end(),
 					  channelWidget));
@@ -1505,8 +1506,7 @@ void SpectrumAnalyzer::onReferenceChannelDeleted()
 		(*iter)->setId(id++);
 	}
 
-	nb_ref_channels--;
-    bool shouldDisable = true;
+    nb_ref_channels--;
 
 	if (channelWidget->id() < crt_channel_id) {
 		crt_channel_id--;
@@ -1520,7 +1520,6 @@ void SpectrumAnalyzer::onReferenceChannelDeleted()
 			}
 			if (cw->enableButton()->isChecked()) {
 				channelsEnabled = true;
-                shouldDisable = false;
                 Q_EMIT selectedChannelChanged(0);
                 update_measure_for_channel(0);
 				cw->nameButton()->setChecked(true);
@@ -1529,12 +1528,12 @@ void SpectrumAnalyzer::onReferenceChannelDeleted()
 				break;
 			}
 		}
+        if (!channelsEnabled) {
+            crt_channel_id = 0;
+            Q_EMIT selectedChannelChanged(0);
+        }
+
 	}
-
-    if (shouldDisable)
-        measure_settings->disableDisplayAll();
-
-    measure_settings->onChannelRemoved(channelWidget->id());
 
 	if (ui->btnMarkers->isChecked() && !channelsEnabled) {
 		ui->btnMarkers->setChecked(false);

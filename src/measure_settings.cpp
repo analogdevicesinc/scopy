@@ -84,13 +84,10 @@ MeasureSettings::MeasureSettings( QList<Measure *>* measures_list, QWidget *pare
     QTreeView *treeView;
 
     m_ui->setupUi(this);
+    hide_measure_settings(m_is_time_domain);
 
     if(m_is_time_domain)
     {
-        m_ui->comboBox_harm->hide();
-        m_ui->label_9->hide();
-        m_ui->line_6->hide();
-
         m_horizMeasurements = new DropdownSwitchList(2, this);
         m_vertMeasurements = new DropdownSwitchList(2, this);
         m_ui->hLayout_hMeasurements->addWidget(m_horizMeasurements);
@@ -126,8 +123,6 @@ MeasureSettings::MeasureSettings( QList<Measure *>* measures_list, QWidget *pare
     {
         m_horizMeasurements = new DropdownSwitchList(1, this);
         m_vertMeasurements = new DropdownSwitchList(1, this);
-        hide_measure_settings(is_time_domain);
-        m_ui->comboBox_harm->setCurrentIndex(1);
 
         connect(m_ui->comboBox_harm, SIGNAL(currentIndexChanged(int)),
             SLOT(onharmValueChanged(int)));
@@ -170,10 +165,19 @@ MeasureSettings::~MeasureSettings()
 void MeasureSettings::onharmValueChanged(int id)
 {
      Measure *measure = measureOfChannel(m_selectedChannel);
-     measure->setHarmonicNumber(id);
+     measure->setHarmonicNumber(id + 1);
 }
 
 void MeasureSettings::hide_measure_settings(bool is_time_domain) {
+    if(is_time_domain)
+    {
+        m_ui->comboBox_harm->hide();
+        m_ui->label_9->hide();
+        m_ui->line_6->hide();
+        m_ui->label_10->hide();
+    }
+    else
+    {
         m_ui->label_7->hide();
         m_ui->line_3->hide();
         m_ui->verticalSpacer_6->changeSize(0,0);
@@ -187,6 +191,19 @@ void MeasureSettings::hide_measure_settings(bool is_time_domain) {
         m_ui->label_4->hide();
         m_ui->label_5->hide();
         m_ui->line_5->hide();
+
+        m_ui->comboBox_harm->addItem("1");
+        m_ui->comboBox_harm->addItem("2");
+        m_ui->comboBox_harm->addItem("3");
+        m_ui->comboBox_harm->addItem("4");
+        m_ui->comboBox_harm->addItem("5");
+        m_ui->comboBox_harm->addItem("6");
+        m_ui->comboBox_harm->addItem("7");
+        m_ui->comboBox_harm->addItem("8");
+        m_ui->comboBox_harm->addItem("9");
+
+        m_ui->comboBox_harm->setCurrentIndex(6);
+    }
 }
 
 QString MeasureSettings::channelName() const

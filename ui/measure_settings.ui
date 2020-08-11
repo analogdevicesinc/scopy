@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>403</width>
-    <height>788</height>
+    <height>1090</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -143,9 +143,9 @@ font-weight: normal;</string>
         <property name="geometry">
          <rect>
           <x>0</x>
-          <y>-24</y>
-          <width>347</width>
-          <height>759</height>
+          <y>0</y>
+          <width>375</width>
+          <height>1037</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -758,7 +758,7 @@ QPushButton:hover {
            <property name="verticalSpacing">
             <number>16</number>
            </property>
-           <item row="0" column="0">
+           <item row="1" column="0">
             <widget class="QComboBox" name="comboBox_harm">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -776,6 +776,22 @@ QPushButton:hover {
              </property>
              <property name="currentIndex">
               <number>-1</number>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_10">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">font-size: 13px;</string>
+             </property>
+             <property name="text">
+              <string>Harmonics Number</string>
              </property>
             </widget>
            </item>
