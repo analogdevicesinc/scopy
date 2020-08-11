@@ -117,6 +117,7 @@ namespace adiscope {
 		void on_spin_daisyChain_valueChanged(int arg1);
 
 	private:
+		void initInstrumentStrings();
 		void writeHwDelay(long long delay);
 		void writeHwLevel(double level);
 		void writeHwHysteresis(double level);
@@ -141,7 +142,7 @@ namespace adiscope {
 		libm2k::M2kHardwareTrigger* m_trigger;
 		bool m_trigger_in;
 
-		static const std::vector<std::pair<QString, libm2k::M2K_TRIGGER_OUT_SELECT>> externalTriggerOutMapping;
+		std::vector<std::pair<QString, libm2k::M2K_TRIGGER_OUT_SELECT>> externalTriggerOutMapping;
 
 		QList<trigg_channel_config> trigg_configs;
 		PositionSpinButton *trigger_level;

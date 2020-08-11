@@ -150,6 +150,7 @@ private Q_SLOTS:
 	void onReferenceChannelDeleted();
 
 private:
+	void initInstrumentStrings();
 	void build_gnuradio_block_chain();
 	void build_gnuradio_block_chain_no_ctx();
 	void start_blockchain_flow();
@@ -225,12 +226,12 @@ private:
 
 	bool marker_menu_opened;
 
-	static std::vector<std::pair<QString,
+	std::vector<std::pair<QString,
 	       FftDisplayPlot::MagnitudeType>> mag_types;
-	static std::vector<std::pair<QString,
+	std::vector<std::pair<QString,
 	       FftDisplayPlot::AverageType>> avg_types;
-	static std::vector<std::pair<QString, FftWinType>> win_types;
-	static std::vector<QString> markerTypes;
+	std::vector<std::pair<QString, FftWinType>> win_types;
+	std::vector<QString> markerTypes;
 	void triggerRightMenuToggle(CustomPushButton *btn, bool checked);
 	void toggleRightMenu(CustomPushButton *btn, bool checked);
 	void updateChannelSettingsPanel(unsigned int id);
