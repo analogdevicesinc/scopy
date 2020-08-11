@@ -38,8 +38,14 @@
 #include "dynamicWidget.hpp"
 
 #include <QDebug>
+#include <QFileDialog>
+#include <QDateTime>
 
 #include "filter.hpp"
+
+#include "osc_export_settings.h"
+#include "filemanager.h"
+#include "config.h"
 
 using namespace adiscope;
 using namespace adiscope::logic;
@@ -95,7 +101,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, adiscope::Filter *filt,
 	m_currentGroupMenu(nullptr),
 	m_autoMode(false),
 	m_timer(new QTimer(this)),
-	m_timerTimeout(1000)
+	m_timerTimeout(1000),
+	m_exportSettings(nullptr)
 {
 	// setup ui
 	setupUi();
@@ -193,6 +200,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, adiscope::Filter *filt,
 
 	// default
 	m_sampleRateButton->setValue(m_sampleRate);
+	m_sampleRateButton->setIntegerDivider(m_sampleRateButton->maxValue());
 	m_bufferSizeButton->setValue(m_bufferSize);
 
 	readPreferences();
@@ -203,6 +211,10 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, adiscope::Filter *filt,
 							  TOOL_LOGIC_ANALYZER)));
 	api->load(*settings);
 	api->js_register(engine);
+
+	// Scroll wheel event filter
+	m_wheelEventGuard = new MouseWheelWidgetGuard(ui->mainWidget);
+	m_wheelEventGuard->installEventRecursively(ui->mainWidget);
 }
 
 LogicAnalyzer::~LogicAnalyzer()
@@ -638,12 +650,19 @@ void LogicAnalyzer::setupUi()
 	ui->traceHeightLineEdit->setValidator(new QIntValidator(1, 100, ui->traceHeightLineEdit));
 	ui->traceHeightLineEdit->setText(QString::number(1));
 
-	// Scroll wheel event filter
-	m_wheelEventGuard = new MouseWheelWidgetGuard(ui->mainWidget);
-	m_wheelEventGuard->installEventRecursively(ui->mainWidget);
-
 	ui->groupWidget->setVisible(false);
 	ui->stackDecoderWidget->setVisible(false);
+
+	// Export Settings
+	m_exportSettings = new ExportSettings(this);
+	m_exportSettings->enableExportButton(false);
+	ui->exportLayout->addWidget(m_exportSettings);
+	for (int i = 0; i < DIGITAL_NR_CHANNELS; ++i) {
+		m_exportSettings->addChannel(i, "DIO" + QString::number(i));
+	}
+	m_exportSettings->disableUIMargins();
+	connect(m_exportSettings->getExportButton(), &QPushButton::clicked,
+		this, &LogicAnalyzer::exportData);
 }
 
 void LogicAnalyzer::connectSignalsAndSlots()
@@ -984,7 +1003,7 @@ void LogicAnalyzer::startStop(bool start)
 		const double delay = oneShotOrStream ? m_timeTriggerOffset * m_sampleRate
 					       : 0;
 
-		const double setSampleRate = m_m2kDigital->setSampleRateIn(sampleRate);
+		const double setSampleRate = m_m2kDigital->setSampleRateIn((sampleRate+1));
 		m_sampleRateButton->setValue(setSampleRate);
 
 		m_m2kDigital->getTrigger()->setDigitalStreamingFlag(!oneShotOrStream);
@@ -1029,6 +1048,9 @@ void LogicAnalyzer::startStop(bool start)
 			}
 
 			m_buffer = new uint16_t[bufferSize];
+			QMetaObject::invokeMethod(this, [=](){
+				m_exportSettings->enableExportButton(true);
+			}, Qt::DirectConnection);
 
 			QMetaObject::invokeMethod(this, [=](){
 				m_plot.setTriggerState(CapturePlot::Waiting);
@@ -1112,6 +1134,10 @@ void LogicAnalyzer::startStop(bool start)
 				m_plot.setTriggerState(CapturePlot::Stop);
 			}, Qt::QueuedConnection);
 
+			QMetaObject::invokeMethod(this, [=](){
+				m_exportSettings->enableExportButton(true);
+			}, Qt::DirectConnection);
+
 		});
 
 	} else {
@@ -1150,7 +1176,7 @@ void LogicAnalyzer::setupDecoders()
 		qDebug() << "Error: srd_decoder_load_all failed!";
 	}
 
-	ui->addDecoderComboBox->addItem("Select a decoder to add");
+	ui->addDecoderComboBox->addItem(tr("Select a decoder to add"));
 
 
 	GSList *decoderList = g_slist_copy((GSList *)srd_decoder_list());
@@ -1235,10 +1261,16 @@ void LogicAnalyzer::setupDecoders()
 		deleteBtn->setVisible(true);
 
 		connect(deleteBtn, &QPushButton::clicked, [=](){
-			ui->decoderEnumeratorLayout->addWidget(decoderMenuItem);
 			decoderMenuItem->deleteLater();
 
 			int chIdx = m_plotCurves.indexOf(curve);
+
+			if (chIdx == m_selectedChannel) {
+				channelSelectedChanged(chIdx, false);
+			} else if (chIdx < m_selectedChannel) {
+				m_selectedChannel--;
+			}
+
 			bool groupDeleted = false;
 			m_plot.removeFromGroup(chIdx,
 					       m_plot.getGroupOfChannel(chIdx).indexOf(chIdx),
@@ -1257,8 +1289,15 @@ void LogicAnalyzer::setupDecoders()
 
 			disconnect(connectionHandle);
 
-
 			delete curve;
+
+			// reposition decoder menu items after deleting one
+			for (int i = chIdx; i < m_plotCurves.size(); ++i) {
+				const int index = i - 16; // subtract logic channels count
+				QLayoutItem *next = ui->decoderEnumeratorLayout->itemAtPosition((index + 1) / 2, (index + 1) % 2);
+				ui->decoderEnumeratorLayout->removeItem(next);
+				ui->decoderEnumeratorLayout->addItem(next, index / 2, index % 2);
+			}
 		});
 
 		const int itemsInLayout = ui->decoderEnumeratorLayout->count();
@@ -1452,50 +1491,59 @@ void LogicAnalyzer::setupTriggerMenu()
 		m_m2kDigital->getTrigger()->setDigitalMode(static_cast<libm2k::digital::DIO_TRIGGER_MODE>(index));
 	});
 
-	ui->externalTriggerSourceComboBox->addItem("External Trigger In");
-	ui->externalTriggerSourceComboBox->addItem("Oscilloscope");
+	if (m_m2kDigital->getTrigger()->hasCrossInstrumentTrigger()) {
+		ui->externalWidget->setEnabled(true);
+		ui->lblWarningFw->setVisible(false);
 
-	connect(ui->externalTriggerSourceComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index){
-		m_m2kDigital->getTrigger()->setDigitalSource(static_cast<M2K_TRIGGER_SOURCE_DIGITAL>(index));
-		if (index) { // oscilloscope
+		ui->externalTriggerSourceComboBox->addItem(tr("External Trigger In"));
+		ui->externalTriggerSourceComboBox->addItem(tr("Oscilloscope"));
+
+		connect(ui->externalTriggerSourceComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index){
+			m_m2kDigital->getTrigger()->setDigitalSource(static_cast<M2K_TRIGGER_SOURCE_DIGITAL>(index));
+			if (index) { // oscilloscope
 			/* set external trigger condition to none if the source is
 			* set to oscilloscope (trigger in)
 			* */
-			ui->externalTriggerConditionComboBox->setCurrentIndex(0); // None
-		}
+				ui->externalTriggerConditionComboBox->setCurrentIndex(0); // None
+			}
 
 		/*
 		 * Disable the condition combo box if oscilloscope (trigger in) is selected
 		 * and enable it if external trigger in is selected (trigger logic)
 		 * */
-		ui->externalTriggerConditionComboBox->setDisabled(index);
-	});
+			ui->externalTriggerConditionComboBox->setDisabled(index);
+		});
 
-	connect(ui->externalTriggerConditionComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index) {
-		m_m2kDigital->getTrigger()->setDigitalExternalCondition(
-								static_cast<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>((index + 5) % 6));
-	});
-
-	connect(ui->btnEnableExternalTrigger, &CustomSwitch::toggled, [=](bool on){
-		if (on) {
-			int source = ui->externalTriggerSourceComboBox->currentIndex();
-			int condition = ui->externalTriggerConditionComboBox->currentIndex();
-			m_m2kDigital->getTrigger()->setDigitalSource(static_cast<M2K_TRIGGER_SOURCE_DIGITAL>(source));
+		connect(ui->externalTriggerConditionComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index) {
 			m_m2kDigital->getTrigger()->setDigitalExternalCondition(
-						static_cast<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>((condition + 5) % 6));
-		} else {
-			m_m2kDigital->getTrigger()->setDigitalSource(M2K_TRIGGER_SOURCE_DIGITAL::SRC_NONE);
-		}
-	});
+						static_cast<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>((index + 5) % 6));
+		});
 
-	QSignalBlocker blockerExternalTriggerConditionComboBox(ui->externalTriggerConditionComboBox);
-	const int condition = static_cast<int>(
-				m_m2kDigital->getTrigger()->getDigitalExternalCondition());
-	ui->externalTriggerConditionComboBox->setCurrentIndex((condition + 1) % 6);
 
-	QSignalBlocker blockerExternalTriggerSourceComboBox(ui->externalTriggerSourceComboBox);
-	ui->externalTriggerSourceComboBox->setCurrentIndex(0);
-	m_m2kDigital->getTrigger()->setDigitalSource(M2K_TRIGGER_SOURCE_DIGITAL::SRC_NONE);
+		connect(ui->btnEnableExternalTrigger, &CustomSwitch::toggled, [=](bool on){
+			if (on) {
+				int source = ui->externalTriggerSourceComboBox->currentIndex();
+				int condition = ui->externalTriggerConditionComboBox->currentIndex();
+				m_m2kDigital->getTrigger()->setDigitalSource(static_cast<M2K_TRIGGER_SOURCE_DIGITAL>(source));
+				m_m2kDigital->getTrigger()->setDigitalExternalCondition(
+							static_cast<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>((condition + 5) % 6));
+			} else {
+				m_m2kDigital->getTrigger()->setDigitalSource(M2K_TRIGGER_SOURCE_DIGITAL::SRC_NONE);
+			}
+		});
+
+		QSignalBlocker blockerExternalTriggerConditionComboBox(ui->externalTriggerConditionComboBox);
+		const int condition = static_cast<int>(
+					m_m2kDigital->getTrigger()->getDigitalExternalCondition());
+		ui->externalTriggerConditionComboBox->setCurrentIndex((condition + 1) % 6);
+
+		QSignalBlocker blockerExternalTriggerSourceComboBox(ui->externalTriggerSourceComboBox);
+		ui->externalTriggerSourceComboBox->setCurrentIndex(0);
+		m_m2kDigital->getTrigger()->setDigitalSource(M2K_TRIGGER_SOURCE_DIGITAL::SRC_NONE);
+	} else {
+		ui->externalWidget->setEnabled(false);
+		ui->lblWarningFw->setVisible(true);
+	}
 
 	m_timer->setSingleShot(true);
 	connect(m_timer, &QTimer::timeout,
@@ -1550,4 +1598,211 @@ void LogicAnalyzer::readPreferences()
 	}
 
 	m_plot.replot();
+}
+
+void LogicAnalyzer::exportData()
+{
+	QString separator = "";
+	QString startRow = ";";
+	QString endRow = "\n";
+	QString selectedFilter;
+	bool done = false;
+	bool noChannelEnabled = true;
+
+	m_exportConfig = m_exportSettings->getExportConfig();
+	for (auto x : m_exportConfig.keys()) {
+		if(m_exportConfig[x]) {
+			noChannelEnabled =  false;
+			break;
+		}
+	}
+
+	if (noChannelEnabled)
+		return;
+
+	QStringList filter;
+	filter += QString(tr("Comma-separated values files (*.csv)"));
+	filter += QString(tr("Tab-delimited values files (*.txt)"));
+	filter += QString(tr("Value Change Dump(*.vcd)"));
+	filter += QString(tr("All Files(*)"));
+
+	QString fileName = QFileDialog::getSaveFileName(this,
+	tr("Export"), "", filter.join(";;"),
+	    &selectedFilter, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+
+	if (fileName.isEmpty()) {
+		return;
+	}
+
+	// Check the selected file type
+	if (selectedFilter != "") {
+		if(selectedFilter.contains("comma", Qt::CaseInsensitive)) {
+			fileName += ".csv";
+			separator = ",";
+		}
+		if(selectedFilter.contains("tab", Qt::CaseInsensitive)) {
+			fileName += ".txt";
+			separator = "\t";
+		}
+		if(selectedFilter.contains("Change Dump", Qt::CaseInsensitive)) {
+			endRow = " $end\n";
+			startRow = "$";
+			fileName += ".vcd";
+		}
+	}
+
+
+	if (separator != "") {
+		done = exportTabCsv(separator, fileName);
+	} else {
+		QFile file(fileName);
+		if (!file.open(QIODevice::WriteOnly)) {
+			return;
+		}
+
+		QTextStream out(&file);
+
+		/* Write the general information */
+		out << startRow << "date " << QDateTime::currentDateTime().toString() << endRow;
+		out << startRow << "version Scopy - " << QString(SCOPY_VERSION_GIT) << endRow;
+		out << startRow << "comment " << QString::number(m_bufferSize) <<
+		       " samples acquired at " << QString::number(m_sampleRate) <<
+		       " Hz " << endRow;
+
+
+		file.close();
+
+		done = exportVcd(fileName, startRow, endRow);
+	}
+}
+
+bool LogicAnalyzer::exportTabCsv(const QString &separator, const QString &fileName)
+{
+	FileManager fm("Logic Analyzer");
+	fm.open(fileName, FileManager::EXPORT);
+
+	QStringList chNames;
+	for (unsigned int ch = 0; ch < DIGITAL_NR_CHANNELS; ch++) {
+		if (m_exportConfig[ch]) {
+			chNames.push_back("Channel " + QString::number(ch));
+		}
+	}
+
+	QVector<QVector<double>> data;
+
+	if (!m_buffer) {
+		return false;
+	} else {
+		for (unsigned int i = 0; i < m_lastCapturedSample; ++i) {
+			uint64_t sample = m_buffer[i];
+			QVector<double> line;
+			for (unsigned int ch = 0; ch < DIGITAL_NR_CHANNELS; ++ch) {
+				int bit = (sample >> ch) & 1;
+				if(m_exportConfig[ch]) {
+					line.push_back(bit);
+				}
+			}
+			data.push_back(line);
+		}
+	}
+
+	fm.setSampleRate(m_sampleRate);
+
+	fm.save(data, chNames);
+
+	fm.performWrite();
+
+	return true;
+}
+
+bool LogicAnalyzer::exportVcd(const QString &fileName, const QString &startSep, const QString &endSep)
+{
+	uint64_t current_sample, prev_sample;
+	int current_bit, prev_bit, p;
+	QString timescaleFormat;
+	double timescale;
+	bool timestamp_written = false;
+
+	if (m_sampleRate == 0) {
+		return false;
+	}
+
+
+	QFile file(fileName);
+	if (!file.open(QIODevice::Append)) {
+		return false;
+	}
+
+	QTextStream out(&file);
+
+	/* Write the specific header */
+	timescale = 1 / m_sampleRate;
+	if (timescale < 1e-6) {
+		timescaleFormat = "ns";
+		timescale *= 1e9;
+	} else if (timescale < 1e-3) {
+		timescaleFormat = "us";
+		timescale *= 1e6;
+	} else if (timescale < 1) {
+		timescaleFormat = "ms";
+		timescale *= 1e3;
+	} else {
+		timescaleFormat = "s";
+	}
+
+	out << startSep << "timescale " << QString::number(timescale) << " " << timescaleFormat << endSep;
+	out << startSep << "scope module Scopy" << endSep;
+	int counter = 0;
+	for (unsigned int ch = 0; ch < DIGITAL_NR_CHANNELS; ++ch) {
+		if (m_exportConfig[ch]) {
+			char c = '!' + counter;
+			out << startSep << "var wire 1 " << c << " DIO" <<
+			       QString::number(ch) << endSep;
+			counter++;
+		}
+	}
+	out << startSep << "upscope" << endSep;
+	out << startSep << "enddefinitions" << endSep;
+
+	/* Write the values */
+	if (m_buffer) {
+		for (uint64_t i = 0; i < m_lastCapturedSample; i++) {
+			current_sample = m_buffer[i];
+			if (i == 0) {
+				prev_sample = current_sample;
+			} else {
+				prev_sample = m_buffer[i - 1];
+			}
+			timestamp_written = false;
+			p = 0;
+			for (unsigned int ch = 0; ch < DIGITAL_NR_CHANNELS; ch++) {
+
+				current_bit = (current_sample >> ch) & 1;
+				prev_bit = (prev_sample >> ch) & 1;
+
+				if ((current_bit == prev_bit) && (i != 0)) {
+					p++;
+					continue;
+				}
+				if (!timestamp_written)
+					out << "#" << QString::number(i);
+				if (m_exportConfig[ch]) {
+					char c = '0' + current_bit;
+					char c2 = '!' + p;
+					out << ' ' << c << c2;
+					p++;
+					timestamp_written = true;
+				}
+			}
+			if (timestamp_written) {
+				out << "\n";
+			}
+		}
+	} else {
+		file.close();
+		return false;
+	}
+
+	file.close();
+	return true;
 }

@@ -23,6 +23,7 @@
 #include "adc_sample_conv.hpp"
 #include <qmath.h>
 #include <QDebug>
+#include <QObject>
 
 using namespace adiscope;
 
@@ -364,54 +365,54 @@ Measure::Measure(int channel, double *buffer, size_t length,
 {
 
 	// Create a set of measurements
-	m_measurements.push_back(std::make_shared<MeasurementData>("Period",
-		MeasurementData::HORIZONTAL, "s",  channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>("Frequency",
-		MeasurementData::HORIZONTAL, "Hz", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>("Min",
-		MeasurementData::VERTICAL, "V", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>("Max",
-		MeasurementData::VERTICAL, "V", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>("Peak-peak",
-		MeasurementData::VERTICAL, "V", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>("Mean",
-		MeasurementData::VERTICAL, "V", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>("Cycle Mean",
-		MeasurementData::VERTICAL, "V", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>("RMS",
-		MeasurementData::VERTICAL, "V", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>("Cycle RMS",
-		MeasurementData::VERTICAL, "V", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>("AC RMS",
-		MeasurementData::VERTICAL, "V", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>("Area",
-		MeasurementData::VERTICAL, "Vs", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>("Cycle Area",
-		MeasurementData::VERTICAL, "Vs", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>("Low",
-		MeasurementData::VERTICAL, "V", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>("High",
-		MeasurementData::VERTICAL, "V", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>("Amplitude",
-		MeasurementData::VERTICAL, "V", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>("Middle",
-		MeasurementData::VERTICAL, "V", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>("+Over",
-		MeasurementData::VERTICAL, "%", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>("-Over",
-		MeasurementData::VERTICAL, "%", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>("Rise",
-		MeasurementData::HORIZONTAL, "s", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>("Fall",
-		MeasurementData::HORIZONTAL, "s", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>("+Width",
-		MeasurementData::HORIZONTAL, "s", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>("-Width",
-		MeasurementData::HORIZONTAL, "s", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>("+Duty",
-		MeasurementData::HORIZONTAL, "%", channel));
-	m_measurements.push_back(std::make_shared<MeasurementData>("-Duty",
-		MeasurementData::HORIZONTAL, "%", channel));
+	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Period"),
+								   MeasurementData::HORIZONTAL, "s",  channel));
+	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Frequency"),
+								   MeasurementData::HORIZONTAL, "Hz", channel));
+	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Min"),
+								   MeasurementData::VERTICAL, "V", channel));
+	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Max"),
+								   MeasurementData::VERTICAL, "V", channel));
+	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Peak-peak"),
+								   MeasurementData::VERTICAL, "V", channel));
+	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Mean"),
+								   MeasurementData::VERTICAL, "V", channel));
+	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Cycle Mean"),
+								   MeasurementData::VERTICAL, "V", channel));
+	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("RMS"),
+								   MeasurementData::VERTICAL, "V", channel));
+	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Cycle RMS"),
+								   MeasurementData::VERTICAL, "V", channel));
+	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("AC RMS"),
+								   MeasurementData::VERTICAL, "V", channel));
+	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Area"),
+								   MeasurementData::VERTICAL, "Vs", channel));
+	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Cycle Area"),
+								   MeasurementData::VERTICAL, "Vs", channel));
+	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Low"),
+								   MeasurementData::VERTICAL, "V", channel));
+	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("High"),
+								   MeasurementData::VERTICAL, "V", channel));
+	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Amplitude"),
+								   MeasurementData::VERTICAL, "V", channel));
+	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Middle"),
+								   MeasurementData::VERTICAL, "V", channel));
+	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("+Over"),
+								   MeasurementData::VERTICAL, "%", channel));
+	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("-Over"),
+								   MeasurementData::VERTICAL, "%", channel));
+	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Rise"),
+								   MeasurementData::HORIZONTAL, "s", channel));
+	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Fall"),
+								   MeasurementData::HORIZONTAL, "s", channel));
+	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("+Width"),
+								   MeasurementData::HORIZONTAL, "s", channel));
+	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("-Width"),
+								   MeasurementData::HORIZONTAL, "s", channel));
+	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("+Duty"),
+								   MeasurementData::HORIZONTAL, "%", channel));
+	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("-Duty"),
+								   MeasurementData::HORIZONTAL, "%", channel));
 
 }
 

@@ -32,6 +32,7 @@
 
 #include <iio.h>
 #include <QDebug>
+#include <QTranslator>
 
 using namespace adiscope;
 using namespace std;
@@ -51,10 +52,10 @@ struct TriggerSettings::trigg_channel_config {
 	double dc_level;
 };
 
-const std::vector<std::pair<std::string, libm2k::M2K_TRIGGER_OUT_SELECT>> TriggerSettings::externalTriggerOutMapping = {
-	{"Forward Trigger In", libm2k::SELECT_TRIGGER_IN},
-	{"Oscilloscope",  libm2k::SELECT_ANALOG_IN},
-	{"Logic Analyzer", libm2k::SELECT_DIGITAL_IN}
+const std::vector<std::pair<QString, libm2k::M2K_TRIGGER_OUT_SELECT>> TriggerSettings::externalTriggerOutMapping = {
+	{tr("Forward Trigger In"), libm2k::SELECT_TRIGGER_IN},
+	{tr("Oscilloscope"),  libm2k::SELECT_ANALOG_IN},
+	{tr("Logic Analyzer"), libm2k::SELECT_DIGITAL_IN}
 };
 
 TriggerSettings::TriggerSettings(M2kAnalogIn* libm2k_adc,
@@ -78,16 +79,16 @@ TriggerSettings::TriggerSettings(M2kAnalogIn* libm2k_adc,
 	}
 
 	trigger_level = new PositionSpinButton({
-		{"μVolts",1e-6},
-		{"mVolts",1e-3},
-		{"Volts",1e0}
-	}, "Level", 0.0, 0.0, true, false, this);
+	{tr("μVolts"),1e-6},
+	{tr("mVolts"),1e-3},
+	{tr("Volts"),1e0}
+	}, tr("Level"), 0.0, 0.0, true, false, this);
 
 	trigger_hysteresis = new PositionSpinButton({
-		{"μVolts",1e-6},
-		{"mVolts",1e-3},
-		{"Volts",1e0}
-	}, "Hysteresis", 0.0, 0.0, true, false, this);
+	{tr("μVolts"),1e-6},
+	{tr("mVolts"),1e-3},
+	{tr("Volts"),1e0}
+	}, tr("Hysteresis"), 0.0, 0.0, true, false, this);
 
 	ui->controlsLayout->addWidget(trigger_level);
 	ui->controlsLayout->addWidget(trigger_hysteresis);
@@ -134,20 +135,20 @@ TriggerSettings::TriggerSettings(M2kAnalogIn* libm2k_adc,
 	ui->spin_daisyChain->setVisible(false);
 
 	if (m_trigger->hasExternalTriggerIn()) {
-		ui->cmb_extern_src->addItem("External Trigger In");
+		ui->cmb_extern_src->addItem(tr("External Trigger In"));
 	}
 	if (m_trigger->hasCrossInstrumentTrigger()) {
-		ui->cmb_extern_src->addItem("Logic Analyzer");
+		ui->cmb_extern_src->addItem(tr("Logic Analyzer"));
 	}
 
 	if (m_trigger->hasExternalTriggerOut()) {
 		for (const auto &val : externalTriggerOutMapping)
 		{
-			ui->cmb_extern_to_src->addItem(QString::fromStdString(val.first));
+			ui->cmb_extern_to_src->addItem(val.first);
 			connect(ui->extern_to_en,SIGNAL(toggled(bool)),ui->cmb_extern_to_src,SLOT(setEnabled(bool)));
 		}
 	} else {
-		ui->cmb_extern_to_src->addItem("None");
+		ui->cmb_extern_to_src->addItem(tr("None"));
 		ui->cmb_extern_to_src->setEnabled(false);
 		ui->extern_to_en->setEnabled(false);
 	}

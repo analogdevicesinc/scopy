@@ -621,7 +621,8 @@ ScaleSpinButton::ScaleSpinButton(vector<pair<QString, double> >units,
 	m_steps(1E-3, 1E+3, 10,
 	        steps),
 	m_fine_increment(1),
-	m_numberSeriesRebuild(true)
+	m_numberSeriesRebuild(true),
+	integer_divider(0)
 {
 	ui->SBA_CompletionCircle->setIsLogScale(true);
 
@@ -662,6 +663,27 @@ void ScaleSpinButton::enableNumberSeriesRebuild(bool enable)
 	m_numberSeriesRebuild = enable;
 }
 
+void ScaleSpinButton::setIntegerDivider(int val)
+{
+	integer_divider = val;
+}
+
+int ScaleSpinButton::getIntegerDivider()
+{
+	return integer_divider;
+}
+
+
+void ScaleSpinButton::setValue(double newVal)
+{
+	if(integer_divider)
+	{
+		integer_step = round(integer_divider / newVal);
+		newVal = integer_divider/integer_step;
+	}
+	SpinBoxA::setValue(newVal);
+}
+
 void ScaleSpinButton::stepUp()
 {
 	double current_val = ui->SBA_LineEdit->text().toDouble();
@@ -681,6 +703,15 @@ void ScaleSpinButton::stepUp()
 			newVal = maxValue();
 		}
 
+	}
+	if(integer_divider)
+	{
+		auto new_integer_step = ceil(integer_divider / newVal);
+		if(new_integer_step == integer_step && new_integer_step > 1)
+			integer_step--;
+		else
+			integer_step = new_integer_step;
+		newVal = integer_divider / integer_step;
 	}
 
 	setValue(newVal);
@@ -717,6 +748,15 @@ void ScaleSpinButton::stepDown()
 		newVal = m_steps.getNumberBefore(current_val * current_scale - epsilon);
 	}
 
+	if(integer_divider)
+	{
+		auto new_integer_step = floor(integer_divider / newVal);
+		if(new_integer_step == integer_step)
+			integer_step++;
+		else
+			integer_step = new_integer_step;
+		newVal = integer_divider / integer_step;
+	}
 	setValue(newVal);
 }
 

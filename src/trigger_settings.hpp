@@ -141,7 +141,7 @@ namespace adiscope {
 		libm2k::M2kHardwareTrigger* m_trigger;
 		bool m_trigger_in;
 
-		static const std::vector<std::pair<std::string, libm2k::M2K_TRIGGER_OUT_SELECT>> externalTriggerOutMapping;
+		static const std::vector<std::pair<QString, libm2k::M2K_TRIGGER_OUT_SELECT>> externalTriggerOutMapping;
 
 		QList<trigg_channel_config> trigg_configs;
 		PositionSpinButton *trigger_level;

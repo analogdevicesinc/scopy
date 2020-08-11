@@ -80,6 +80,7 @@ enum sg_waveform {
 	SG_TRA_WAVE = 109,
 	SG_SAW_WAVE = gr::analog::GR_SAW_WAVE,
 	SG_INV_SAW_WAVE = 108,
+	SG_STAIR_WAVE =110,
 
 };
 
@@ -151,14 +152,16 @@ private:
 	gr::top_block_sptr top_block;
 	struct time_block_data *time_block_data;
 
-	PhaseSpinButton *phase, *filePhase;
+	PhaseSpinButton *phase;
+	PositionSpinButton  *filePhase, *stairPhase;
 	PositionSpinButton *offset, *fileOffset;
 	PositionSpinButton *constantValue, *dutycycle;
 	ScaleSpinButton *amplitude, *frequency;
 	ScaleSpinButton *riseTime, *fallTime;
+	PositionSpinButton *stepsUp, *stepsDown;
 	ScaleSpinButton *holdHighTime, *holdLowTime;
 	ScaleSpinButton *fileSampleRate, *fileAmplitude;
-	ScaleSpinButton *mathFrequency, *noiseAmplitude;
+	ScaleSpinButton *mathRecordLength, *noiseAmplitude, *mathSampleRate;
 
 	FileManager *fileManager;
 
@@ -198,6 +201,12 @@ private:
 	gr::basic_block_sptr getSource(QWidget *obj,
 				       double sample_rate,
 	                               gr::top_block_sptr top, bool     phase_correction=false);
+	gr::basic_block_sptr displayResampler(double samp_rate,
+					      double freq,
+					      gr::top_block_sptr top,
+					      gr::basic_block_sptr generated_wave,
+					      gr::basic_block_sptr noiseSrc,
+					      gr::basic_block_sptr noiseAdd);
 
 	static void reduceFraction(double input,long *numerator, long *denominator, long precision=1000000);
 	static size_t gcd(size_t a, size_t b);
@@ -221,12 +230,15 @@ private:
 	double zoomT1OnScreen;
 	double zoomT2OnScreen;
 
+	std::vector<float>get_stairstep(int rise, int fall, float amplitude, float offset, int phase);
+
 	enum sg_file_format getFileFormat(QString filePath);
 	bool loadParametersFromFile(QSharedPointer<signal_generator_data> ptr,
 	                            QString filePath);
 	void loadFileChannelData(int chIdx);
 	bool riffCompare(riff_header_t& ptr, const char *id2);
 	bool chunkCompare(chunk_header_t& ptr, const char *id2);
+
 public Q_SLOTS:
 	void run() override;
 	void stop() override;
@@ -252,9 +264,13 @@ private Q_SLOTS:
 	void holdHighChanged(double value);
 	void holdLowChanged(double value);
 	void loadFileCurrentChannelData();
+	void stepsUpChanged(double value);
+	void stepsDownChanged(double value);
+	void stairPhaseChanged(double value);
 
 
-	void mathFreqChanged(double val);
+	void mathRecordLengthChanged(double val);
+	void mathSampleRateChanged(double value);
 
 	void waveformUpdateUi(int val);
 	void waveformTypeChanged(int val);
@@ -299,6 +315,10 @@ struct signal_generator_data {
 	double holdh;
 	double fall;
 	double holdl;
+
+	int steps_up;
+	int steps_down;
+	int stairphase;
 	// SIGNAL_TYPE_BUFFER
 	double file_sr;
 	double file_amplitude;
@@ -316,7 +336,8 @@ struct signal_generator_data {
 	//bool file_loaded;
 	// SIGNAL_TYPE_MATH
 	QString function;
-	double math_freq;
+	double math_record_length;
+	double math_sr;
 	// NOISE
 	gr::analog::noise_type_t noiseType;
 	float noiseAmplitude;

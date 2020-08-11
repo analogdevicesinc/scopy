@@ -57,8 +57,8 @@ private:
 	void _readPreferences();
 private:
 
-	static const QStringList d_availableTools;
-	static const QStringList d_availableIcons;
+	QStringList d_availableTools;
+	QStringList d_availableIcons;
 
 	QVector<QPair<BaseMenuItem *, tool>> d_tools;
 	QVector<int> d_positions;

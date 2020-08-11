@@ -451,6 +451,8 @@ void PatternGenerator::patternSelected(const QString &pattern, int ch, const QSt
 				patternUi->get_pattern()->init();
 				patternUi->post_load_ui();
 
+				updateChannelGroupPattern(true);
+
 				break;
 			}
 		}
@@ -647,7 +649,6 @@ void PatternGenerator::checkEnabledChannels()
 
 	m_ui->runSingleWidget->setEnabled(foundOneEnabled);
 	runButton()->setEnabled(foundOneEnabled);
-	setDynamicProperty(runButton(), "disabled", !foundOneEnabled);
 }
 
 void PatternGenerator::regenerate()
@@ -1079,8 +1080,8 @@ void PatternGenerator::channelInGroupRemoved(int position)
 	generateBuffer();
 	regenerate();
 
-//	qDebug() << "#### channel in group removed ####";
-	//	qDebug() << m_enabledPatterns;
+	updateChannelGroupWidget(true);
+	updateChannelGroupPattern(true);
 }
 
 void PatternGenerator::loadTriggerMenu()

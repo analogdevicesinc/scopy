@@ -76,6 +76,8 @@ void cancel_dc_offset_block::_build_and_connect_blocks()
 	hier_block2::disconnect_all();
 
 	if (d_enabled) {
+		if(d_buffer_size == 0)
+			d_buffer_size = 1;
 		auto avg = gr::blocks::moving_average_ff::make(d_buffer_size, 1.0 / d_buffer_size, d_buffer_size);
 		auto keep = gr::blocks::keep_one_in_n::make(sizeof(float), d_buffer_size);
 		auto repeat = gr::blocks::repeat::make(sizeof(float), d_buffer_size);
