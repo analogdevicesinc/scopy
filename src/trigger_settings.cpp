@@ -52,11 +52,13 @@ struct TriggerSettings::trigg_channel_config {
 	double dc_level;
 };
 
-const std::vector<std::pair<QString, libm2k::M2K_TRIGGER_OUT_SELECT>> TriggerSettings::externalTriggerOutMapping = {
-	{tr("Forward Trigger In"), libm2k::SELECT_TRIGGER_IN},
-	{tr("Oscilloscope"),  libm2k::SELECT_ANALOG_IN},
-	{tr("Logic Analyzer"), libm2k::SELECT_DIGITAL_IN}
-};
+void TriggerSettings::initInstrumentStrings() {
+	externalTriggerOutMapping = {
+		{tr("Forward Trigger In"), libm2k::SELECT_TRIGGER_IN},
+		{tr("Oscilloscope"),  libm2k::SELECT_ANALOG_IN},
+		{tr("Logic Analyzer"), libm2k::SELECT_DIGITAL_IN}
+	};
+}
 
 TriggerSettings::TriggerSettings(M2kAnalogIn* libm2k_adc,
 		QWidget *parent) :
@@ -70,6 +72,7 @@ TriggerSettings::TriggerSettings(M2kAnalogIn* libm2k_adc,
 	daisyChainCompensation(0),
 	m_trigger_in(false)
 {
+	initInstrumentStrings();
 	ui->setupUi(this);
 	m_trigger = (m_m2k_adc) ? m_m2k_adc->getTrigger() : nullptr;
 

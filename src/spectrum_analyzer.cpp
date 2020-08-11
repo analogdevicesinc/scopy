@@ -63,45 +63,46 @@ using namespace std;
 using namespace libm2k;
 using namespace libm2k::context;
 
-std::vector<std::pair<QString, FftDisplayPlot::MagnitudeType>>
-SpectrumAnalyzer::mag_types = {
-    {tr("dBFS"), FftDisplayPlot::DBFS},
-    {tr("dBV"), FftDisplayPlot::DBV},
-    {tr("dBu"), FftDisplayPlot::DBU},
-    {tr("Vpeak"), FftDisplayPlot::VPEAK},
-    {tr("Vrms"), FftDisplayPlot::VRMS},
-};
 
-std::vector<std::pair<QString, FftDisplayPlot::AverageType>>
-SpectrumAnalyzer::avg_types = {
-    {tr("Sample"), FftDisplayPlot::SAMPLE},
-    {tr("Peak Hold"), FftDisplayPlot::PEAK_HOLD},
-    {tr("Peak Hold Continous"), FftDisplayPlot::PEAK_HOLD_CONTINUOUS},
-    {tr("Min Hold"), FftDisplayPlot::MIN_HOLD},
-    {tr("Min Hold Continous"), FftDisplayPlot::MIN_HOLD_CONTINUOUS},
-    {tr("Linear RMS"), FftDisplayPlot::LINEAR_RMS},
-    {tr("Linear dB"), FftDisplayPlot::LINEAR_DB},
-    {tr("Exponential RMS"), FftDisplayPlot::EXPONENTIAL_RMS},
-    {tr("Exponential dB"), FftDisplayPlot::EXPONENTIAL_DB},
-};
+void SpectrumAnalyzer::initInstrumentStrings() {
 
-std::vector<std::pair<QString, SpectrumAnalyzer::FftWinType>>
-SpectrumAnalyzer::win_types = {
-    {tr("Flat top"), FftWinType::FLAT_TOP},
-    {tr("Rectangular"), FftWinType::RECTANGULAR},
-    {tr("Triangular (Bartlett)"), FftWinType::TRIANGULAR},
-    {tr("Hamming"), FftWinType::HAMMING},
-    {tr("Hann"), FftWinType::HANN},
-    {tr("Blackman-Harris"), FftWinType::BLACKMAN_HARRIS},
-    {tr("Kaiser"), FftWinType::KAISER},
-};
+	mag_types = {
+	    {tr("dBFS"), FftDisplayPlot::DBFS},
+	    {tr("dBV"), FftDisplayPlot::DBV},
+	    {tr("dBu"), FftDisplayPlot::DBU},
+	    {tr("Vpeak"), FftDisplayPlot::VPEAK},
+	    {tr("Vrms"), FftDisplayPlot::VRMS},
+	};
 
-std::vector<QString> SpectrumAnalyzer::markerTypes = {
-    tr("Manual"),
-    tr("Peak"),
-    tr("Delta"),
-    tr("Fixed"),
-};
+	avg_types = {
+	    {tr("Sample"), FftDisplayPlot::SAMPLE},
+	    {tr("Peak Hold"), FftDisplayPlot::PEAK_HOLD},
+	    {tr("Peak Hold Continous"), FftDisplayPlot::PEAK_HOLD_CONTINUOUS},
+	    {tr("Min Hold"), FftDisplayPlot::MIN_HOLD},
+	    {tr("Min Hold Continous"), FftDisplayPlot::MIN_HOLD_CONTINUOUS},
+	    {tr("Linear RMS"), FftDisplayPlot::LINEAR_RMS},
+	    {tr("Linear dB"), FftDisplayPlot::LINEAR_DB},
+	    {tr("Exponential RMS"), FftDisplayPlot::EXPONENTIAL_RMS},
+	    {tr("Exponential dB"), FftDisplayPlot::EXPONENTIAL_DB},
+	};
+
+	win_types = {
+	    {tr("Flat top"), FftWinType::FLAT_TOP},
+	    {tr("Rectangular"), FftWinType::RECTANGULAR},
+	    {tr("Triangular (Bartlett)"), FftWinType::TRIANGULAR},
+	    {tr("Hamming"), FftWinType::HAMMING},
+	    {tr("Hann"), FftWinType::HANN},
+	    {tr("Blackman-Harris"), FftWinType::BLACKMAN_HARRIS},
+	    {tr("Kaiser"), FftWinType::KAISER},
+	};
+
+	markerTypes = {
+	    tr("Manual"),
+	    tr("Peak"),
+	    tr("Delta"),
+	    tr("Fixed"),
+	};
+}
 
 SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 				   ToolMenuItem *toolMenuItem,
@@ -131,7 +132,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	}), nb_ref_channels(0),
 	selected_ch_settings(-1)
 {
-
+	initInstrumentStrings();
 	// Get the list of names of the available channels
 	QList<QString> channel_names;
 
