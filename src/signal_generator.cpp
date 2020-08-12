@@ -72,6 +72,7 @@
 
 /* libm2k includes */
 #include <libm2k/contextbuilder.hpp>
+#include <libm2k/m2kexceptions.hpp>
 
 #define NB_POINTS	32768
 #define DAC_BIT_COUNT   12
@@ -1452,7 +1453,7 @@ void SignalGenerator::stop()
 		buffers.clear();
 		m_running = false;
 		m_m2k_analogout->stop();
-	} catch (std::exception &e) {
+	} catch (libm2k::m2k_exception &e) {
 		qDebug(CAT_SIGNAL_GENERATOR) << e.what();
 	}
 }

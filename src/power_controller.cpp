@@ -31,6 +31,7 @@
 /* libm2k includes */
 #include <libm2k/contextbuilder.hpp>
 #include <libm2k/m2k.hpp>
+#include <libm2k/m2kexceptions.hpp>
 #include <libm2k/analog/m2kpowersupply.hpp>
 
 #define TIMER_TIMEOUT_MS	200
@@ -52,7 +53,7 @@ PowerController::PowerController(struct iio_context *ctx,
 	try {
 		m_m2k_powersupply->pushChannel(0, 0.0);
 		m_m2k_powersupply->pushChannel(1, 0.0);
-	} catch (std::exception &e) {
+	} catch (libm2k::m2k_exception &e) {
 		qDebug(CAT_POWER_CONTROLLER) << "Can't write push value: " << e.what();
 	}
 
@@ -113,7 +114,7 @@ PowerController::~PowerController()
 
 	try {
 		m_m2k_powersupply->powerDownDacs(true);
-	} catch (std::exception &e) {
+	} catch (libm2k::m2k_exception &e) {
 		qDebug(CAT_POWER_CONTROLLER) << e.what();
 	}
 
@@ -150,7 +151,7 @@ void PowerController::dac1_set_value(double value)
 {
 	try {
 		m_m2k_powersupply->pushChannel(0, value);
-	} catch (std::exception &e) {
+	} catch (libm2k::m2k_exception &e) {
 		qDebug(CAT_POWER_CONTROLLER) << "Can't write push value: " << e.what();
 	}
 	averageVoltageCh1.clear();
@@ -167,7 +168,7 @@ void PowerController::dac2_set_value(double value)
 {
 	try {
 		m_m2k_powersupply->pushChannel(1, value);
-	} catch (std::exception &e) {
+	} catch (libm2k::m2k_exception &e) {
 		qDebug(CAT_POWER_CONTROLLER) << "Can't write push value: " << e.what();
 	}
 	averageVoltageCh2.clear();
@@ -177,7 +178,7 @@ void PowerController::dac1_set_enabled(bool enabled)
 {
 	try {
 		m_m2k_powersupply->enableChannel(0, enabled);
-	} catch (std::exception &e) {
+	} catch (libm2k::m2k_exception &e) {
 		qDebug(CAT_POWER_CONTROLLER) << "Can't enable channel: " << e.what();
 	}
 	averageVoltageCh1.clear();
@@ -192,7 +193,7 @@ void PowerController::dac2_set_enabled(bool enabled)
 {
 	try {
 		m_m2k_powersupply->enableChannel(1, enabled);
-	} catch (std::exception &e) {
+	} catch (libm2k::m2k_exception &e) {
 		qDebug(CAT_POWER_CONTROLLER) << "Can't enable channel: " << e.what();
 	}
 	averageVoltageCh2.clear();
@@ -226,7 +227,7 @@ void PowerController::update_lcd()
 	try {
 		value1 = m_m2k_powersupply->readChannel(0);
 		value2 = m_m2k_powersupply->readChannel(1);
-	} catch (std::exception &e) {
+	} catch (libm2k::m2k_exception &e) {
 		qDebug(CAT_POWER_CONTROLLER) << "Can't read value: " << e.what();
 	}
 
