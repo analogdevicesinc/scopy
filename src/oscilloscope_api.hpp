@@ -124,6 +124,9 @@ class Oscilloscope_API : public ApiObject
 	Q_PROPERTY(int memory_depth READ getMemoryDepth
 		   WRITE setMemoryDepth)
 
+	Q_PROPERTY(bool notes_enable READ getNotesEnable WRITE setNotesEnable)
+	Q_PROPERTY(QString notes READ getNotes WRITE setNotes)
+
 public:
 	explicit Oscilloscope_API(Oscilloscope *osc) :
 		ApiObject(), osc(osc) {}
@@ -257,6 +260,12 @@ public:
 
 	int getMemoryDepth();
 	void setMemoryDepth(int val);
+
+	bool getNotesEnable();
+	void setNotesEnable(bool);
+
+	QString getNotes();
+	void setNotes(QString);
 
 	Q_INVOKABLE void show();
 

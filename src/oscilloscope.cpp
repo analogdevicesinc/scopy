@@ -765,6 +765,9 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	gsettings_ui->xySettings->hide();
 	timePosition->setValue(0);
 
+	connect(gsettings_ui->notesEnable,SIGNAL(toggled(bool)),ui->oscNotes,SLOT(setVisible(bool)));
+	ui->oscNotes->hide();
+
 	api->setObjectName(QString::fromStdString(Filter::tool_name(
 			TOOL_OSCILLOSCOPE)));
 	api->load(*settings);
