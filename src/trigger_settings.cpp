@@ -20,6 +20,7 @@
 
 #include <libm2k/context.hpp>
 #include <libm2k/m2k.hpp>
+#include <libm2k/m2kexceptions.hpp>
 #include <libm2k/analog/m2kanalogin.hpp>
 #include <libm2k/m2khardwaretrigger.hpp>
 #include <libm2k/contextbuilder.hpp>
@@ -370,7 +371,7 @@ void TriggerSettings::enableExternalTriggerOut(bool enabled)
 		} else {
 			m_trigger->setAnalogExternalOutSelect(libm2k::SELECT_NONE);
 		}
-	} catch (std::exception& e) {
+	} catch (libm2k::m2k_exception& e) {
 		qDebug() << e.what();
 	}
 }
@@ -401,7 +402,7 @@ void TriggerSettings::on_cmb_analog_extern_currentIndexChanged(int index)
 		mode = static_cast<libm2k::M2K_TRIGGER_MODE>(start_idx + index);
 		try {
 			m_trigger->setAnalogMode(currentChannel(), mode);
-		} catch (std::exception& e){
+		} catch (libm2k::m2k_exception& e){
 			qDebug() << e.what();
 		}
 	}
@@ -455,7 +456,7 @@ void TriggerSettings::updateHwVoltLevels(int chnIdx)
 		m_trigger->setAnalogLevel(chnIdx, level);
 		m_trigger->setAnalogHysteresis(chnIdx, trigg_configs[chnIdx].hyst_val);
 	}
-	catch (std::exception& e)
+	catch (libm2k::m2k_exception& e)
 	{
 		qDebug() << e.what();
 	}
@@ -549,7 +550,7 @@ void TriggerSettings::writeHwDelay(long long raw_delay)
 		try {
 			m_trigger->setAnalogDelay(raw_delay);
 		}
-		catch (std::exception& e) {
+		catch (libm2k::m2k_exception& e) {
 			qDebug() << e.what();
 		}
 	}
@@ -565,7 +566,7 @@ void TriggerSettings::writeHwLevel(double level)
 		try {
 			m_trigger->setAnalogLevel(currentChannel(), level);
 		}
-		catch (std::exception& e) {
+		catch (libm2k::m2k_exception& e) {
 			qDebug() << e.what();
 		}
 	}
@@ -577,7 +578,7 @@ void TriggerSettings::writeHwHysteresis(double level)
 		try {
 			m_trigger->setAnalogHysteresis(currentChannel(), level);
 		}
-		catch (std::exception& e) {
+		catch (libm2k::m2k_exception& e) {
 			qDebug() << e.what();
 		}
 	}
@@ -592,7 +593,7 @@ void TriggerSettings::writeHwAnalogCondition(int cond)
 		try {
 			m_trigger->setAnalogCondition(currentChannel(), t_cond);
 		}
-		catch (std::exception& e) {
+		catch (libm2k::m2k_exception& e) {
 			qDebug() << e.what();
 		}
 	}
@@ -607,7 +608,7 @@ void TriggerSettings::writeHwDigitalCondition(int cond)
 		try {
 			m_trigger->setAnalogExternalCondition(currentChannel(), t_cond);
 		}
-		catch (std::exception& e) {
+		catch (libm2k::m2k_exception& e) {
 			qDebug() << e.what();
 		}
 	}
@@ -620,7 +621,7 @@ void TriggerSettings::writeHwMode(int mode)
 			m_trigger->setAnalogMode(currentChannel(),
 				static_cast<libm2k::M2K_TRIGGER_MODE>(mode));
 		}
-		catch (std::exception& e)
+		catch (libm2k::m2k_exception& e)
 		{
 			qDebug() << e.what();
 		}
@@ -664,7 +665,7 @@ void TriggerSettings::writeHwSource(int source_chn)
 			}
 			m_trigger->setAnalogSource(source);
 		}
-		catch (std::exception& e) {
+		catch (libm2k::m2k_exception& e) {
 			qDebug() << e.what();
 		}
 	}

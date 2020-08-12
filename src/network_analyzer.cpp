@@ -61,6 +61,7 @@
 
 /* libm2k includes */
 #include <libm2k/contextbuilder.hpp>
+#include <libm2k/m2kexceptions.hpp>
 
 using namespace adiscope;
 using namespace gr;
@@ -1139,7 +1140,7 @@ void NetworkAnalyzer::setFilterParameters()
 			f12->set_high_gain(range0);
 			f21->set_high_gain(range1);
 			f22->set_high_gain(range1);
-		} catch (std::exception &e) {
+		} catch (libm2k::m2k_exception &e) {
 			qDebug(CAT_NETWORK_ANALYZER) << e.what();
 		}
 	}
@@ -1199,7 +1200,7 @@ void NetworkAnalyzer::goertzel()
 				// Sleep before DACs start
 				QThread::msleep(pushDelay->value());
 				m_m2k_analogout->push(buffers);
-			} catch (std::exception &e) {
+			} catch (libm2k::m2k_exception &e) {
 				return;
 			}
 		}
@@ -1231,7 +1232,7 @@ void NetworkAnalyzer::goertzel()
 			try {
 				m_m2k_analogin->setOversamplingRatio(1);
 				m_m2k_analogin->setSampleRate(adc_rate);
-			} catch (std::exception &e) {
+			} catch (libm2k::m2k_exception &e) {
 				qDebug(CAT_NETWORK_ANALYZER) << e.what();
 			}
 		}
@@ -1247,7 +1248,7 @@ void NetworkAnalyzer::goertzel()
 			if (m_m2k_analogin) {
 				try {
 					buffer_p = m_m2k_analogin->getSamplesRawInterleaved(buffer_size);
-				} catch (std::exception &e) {
+				} catch (libm2k::m2k_exception &e) {
 					qDebug(CAT_NETWORK_ANALYZER) << e.what();
 					return;
 				}
@@ -1492,7 +1493,7 @@ bool NetworkAnalyzer::_checkMagForOverrange(double magnitude)
 
 	try {
 		vlsb = m_m2k_analogin->getScalingFactor(static_cast<ANALOG_IN_CHANNEL>(responseChannel));
-	} catch (std::exception &e) {
+	} catch (libm2k::m2k_exception &e) {
 		qDebug(CAT_NETWORK_ANALYZER) << e.what();
 		return false;
 	}
@@ -1650,7 +1651,7 @@ void NetworkAnalyzer::startStop(bool pressed)
 			thd.waitForFinished();
 			m_m2k_analogin->stopAcquisition();
 			m_m2k_analogout->stop();
-		} catch (std::exception &e) {
+		} catch (libm2k::m2k_exception &e) {
 			qDebug(CAT_NETWORK_ANALYZER) << e.what();
 		}
 		m_dBgraph.sweepDone();
@@ -1672,7 +1673,7 @@ std::vector<double> NetworkAnalyzer::generateSinWave(
 			if (!m_m2k_analogout->isChannelEnabled(chn_idx)) {
 				return {};
 			}
-		} catch (std::exception &e) {
+		} catch (libm2k::m2k_exception &e) {
 			qDebug(CAT_NETWORK_ANALYZER) << e.what();
 		}
 	}
@@ -1715,7 +1716,7 @@ void NetworkAnalyzer::configHwForNetworkAnalyzing()
 				trigger->setAnalogDelay(0);
 			}
 
-		} catch (std::exception &e) {
+		} catch (libm2k::m2k_exception &e) {
 			qDebug(CAT_NETWORK_ANALYZER) << e.what();
 		}
 	}
