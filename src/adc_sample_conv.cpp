@@ -19,6 +19,7 @@
  */
 
 #include "adc_sample_conv.hpp"
+#include <libm2k/m2kexceptions.hpp>
 #include <libm2k/analog/m2kanalogin.hpp>
 
 using namespace gr;
@@ -49,7 +50,7 @@ double adc_sample_conv::conversionWrapper(unsigned int chn_idx, double sample, b
 		} else {
 			return m2k_adc->convertVoltsToRaw(chn_idx, sample);
 		}
-	} catch (std::exception &e) {
+	} catch (libm2k::m2k_exception &e) {
 		return 0;
 	}
 }

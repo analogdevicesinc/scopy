@@ -34,6 +34,8 @@
 #include "../logicanalyzer/annotationdecoder.h"
 #include "pattern_generator_api.h"
 
+#include <libm2k/m2kexceptions.hpp>
+
 using namespace adiscope;
 using namespace adiscope::logic;
 
@@ -718,13 +720,13 @@ void PatternGenerator::startStop(bool start)
 								m_m2kDigital->enableChannel(i, false);
 							}
 						}
-					} catch (std::exception &e) {
+					} catch (libm2k::m2k_exception &e) {
 						qDebug() << e.what();
 					}
 				});
 			}
 
-		} catch (std::exception &e) {
+		} catch (libm2k::m2k_exception &e) {
 			qDebug() << e.what();
 		}
 
@@ -740,7 +742,7 @@ void PatternGenerator::startStop(bool start)
 					m_m2kDigital->enableChannel(i, false);
 				}
 			}
-		} catch (std::exception &e) {
+		} catch (libm2k::m2k_exception &e) {
 			qDebug() << e.what();
 		}
 	}

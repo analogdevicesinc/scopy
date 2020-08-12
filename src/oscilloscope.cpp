@@ -42,6 +42,7 @@
 
 /* libm2k includes */
 #include <libm2k/contextbuilder.hpp>
+#include <libm2k/m2kexceptions.hpp>
 
 /* Local includes */
 #include "logging_categories.h"
@@ -4468,7 +4469,7 @@ void Oscilloscope::resetStreamingFlag(bool enable)
 
 	try {
 		m_m2k_analogin->getTrigger()->setAnalogStreamingFlag(false);
-	} catch (std::exception &e) {
+	} catch (libm2k::m2k_exception &e) {
 		qDebug(CAT_OSCILLOSCOPE) << e.what();
 	}
 	cleanBuffersAllSinks();
@@ -4480,7 +4481,7 @@ void Oscilloscope::resetStreamingFlag(bool enable)
 		if (enable && !d_displayOneBuffer) {
 			m_m2k_analogin->getTrigger()->setAnalogStreamingFlag(true);
 		}
-	} catch (std::exception &e) {
+	} catch (libm2k::m2k_exception &e) {
 		qDebug(CAT_OSCILLOSCOPE) << e.what();
 	}
 
@@ -4671,7 +4672,7 @@ void Oscilloscope::setGainMode(uint chnIdx, libm2k::analog::M2K_RANGE gain_mode)
 		try {
 			libm2k::analog::ANALOG_IN_CHANNEL chn = static_cast<libm2k::analog::ANALOG_IN_CHANNEL>(chnIdx);
 			m_m2k_analogin->setRange(chn, gain_mode);
-		} catch (std::exception &e) {
+		} catch (libm2k::m2k_exception &e) {
 			qDebug(CAT_OSCILLOSCOPE) << e.what();
 		}
 	}
@@ -4691,7 +4692,7 @@ void Oscilloscope::setChannelHwOffset(uint chnIdx, double offset)
 		try {
 			libm2k::analog::ANALOG_IN_CHANNEL chn = static_cast<libm2k::analog::ANALOG_IN_CHANNEL>(chnIdx);
 			m_m2k_analogin->setVerticalOffset(chn, offset);
-		} catch (std::exception &e) {
+		} catch (libm2k::m2k_exception &e) {
 			qDebug(CAT_OSCILLOSCOPE) << e.what();
 		}
 	}
@@ -4730,7 +4731,7 @@ void Oscilloscope::writeAllSettingsToHardware()
 				libm2k::analog::ANALOG_IN_CHANNEL chn = static_cast<libm2k::analog::ANALOG_IN_CHANNEL>(i);
 				m_m2k_analogin->setRange(chn, mode);
 				m_m2k_analogin->setVerticalOffset(chn, channel_offset[i]);
-			} catch (std::exception &e) {
+			} catch (libm2k::m2k_exception &e) {
 				qDebug(CAT_OSCILLOSCOPE) << e.what();
 			}
 		}
@@ -4839,7 +4840,7 @@ void Oscilloscope::setSampleRate(double sample_rate)
 			m_m2k_analogin->setSampleRate(sample_rate);
 			m_m2k_analogin->setOversamplingRatio(1);
 		}
-	} catch (std::exception &e) {
+	} catch (libm2k::m2k_exception &e) {
 		qDebug(CAT_OSCILLOSCOPE) << e.what();
 	}
 }
@@ -4857,7 +4858,7 @@ double Oscilloscope::getSampleRate()
 			sr = (double)(sr / osr);
 		}
 		return sr;
-	} catch (std::exception &e) {
+	} catch (libm2k::m2k_exception &e) {
 		qDebug(CAT_OSCILLOSCOPE) << e.what();
 		return 0;
 	}

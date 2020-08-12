@@ -43,6 +43,8 @@
 
 #include "filter.hpp"
 
+#include <libm2k/m2kexceptions.hpp>
+
 #include "osc_export_settings.h"
 #include "filemanager.h"
 #include "config.h"
@@ -1069,7 +1071,7 @@ void LogicAnalyzer::startStop(bool start)
 					Q_EMIT dataAvailable(0, bufferSize);
 					updateBufferPreviewer(0, m_lastCapturedSample);
 
-				} catch (std::invalid_argument &e) {
+				} catch (libm2k::m2k_exception &e) {
 					qDebug() << e.what();
 				}
 			} else {
@@ -1095,7 +1097,7 @@ void LogicAnalyzer::startStop(bool start)
 							m_plot.setTriggerState(CapturePlot::Triggered);
 						}, Qt::QueuedConnection);
 
-					} catch (std::invalid_argument &e) {
+					} catch (libm2k::m2k_exception &e) {
 						qDebug() << e.what();
 						break;
 					}

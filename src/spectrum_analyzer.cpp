@@ -57,6 +57,7 @@
 
 /* libm2k includes */
 #include <libm2k/contextbuilder.hpp>
+#include <libm2k/m2kexceptions.hpp>
 
 #define TIMER_TIMEOUT_MS 100
 
@@ -342,7 +343,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 			if (canConvRawToVolts) {
 				fft_plot->setScaleFactor(crt_channel, m_m2k_analogin->getScalingFactor(chn));
 			}
-		} catch (std::exception &e) {
+		} catch (libm2k::m2k_exception &e) {
 			qDebug(CAT_SPECTRUM_ANALYZER) << e.what();
 		}
 
@@ -1599,7 +1600,7 @@ void SpectrumAnalyzer::writeAllSettingsToHardware()
 				m_generic_analogin->setSampleRate(i, m_generic_analogin->getMaximumSamplerate(i));
 			}
 		}
-	} catch (std::exception &e) {
+	} catch (libm2k::m2k_exception &e) {
 		qDebug(CAT_SPECTRUM_ANALYZER) << "Can't write settings to hardware: " << e.what();
 	}
 }
@@ -1690,7 +1691,7 @@ void SpectrumAnalyzer::setSampleRate(double sr)
 		if (m_m2k_analogin) {
 			try {
 				m_m2k_analogin->setOversamplingRatio(sample_rate_divider);
-			} catch (std::exception &e) {
+			} catch (libm2k::m2k_exception &e) {
 				qDebug(CAT_SPECTRUM_ANALYZER) << "Can't write oversampling ratio: " << e.what();
 			}
 		} else {
@@ -1698,7 +1699,7 @@ void SpectrumAnalyzer::setSampleRate(double sr)
 				for (unsigned int i = 0; i < m_adc_nb_channels; i++) {
 					m_generic_analogin->setSampleRate(i, sr);
 				}
-			} catch (std::exception &e) {
+			} catch (libm2k::m2k_exception &e) {
 				qDebug(CAT_SPECTRUM_ANALYZER) << "Can't write sampling frequency: " << e.what();
 			}
 		}
