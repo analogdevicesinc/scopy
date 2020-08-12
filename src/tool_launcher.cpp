@@ -65,6 +65,7 @@
 
 #include <libm2k/m2k.hpp>
 #include <libm2k/contextbuilder.hpp>
+#include <libm2k/m2kexceptions.hpp>
 #include <libm2k/digital/m2kdigital.hpp>
 
 #define TIMER_TIMEOUT_MS 5000
@@ -1176,7 +1177,7 @@ void adiscope::ToolLauncher::destroyContext()
 		if (m_m2k) {
 			try {
 				libm2k::context::contextClose(m_m2k);
-			} catch (std::exception &e) {
+			} catch (libm2k::m2k_exception &e) {
 				qDebug() << e.what();
 			}
 			m_m2k = nullptr;

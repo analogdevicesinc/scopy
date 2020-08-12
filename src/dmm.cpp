@@ -48,6 +48,7 @@
 /* libm2k includes */
 #include <libm2k/contextbuilder.hpp>
 #include <scopyExceptionHandler.h>
+#include <libm2k/m2kexceptions.hpp>
 
 #include "dmm_api.hpp"
 
@@ -661,7 +662,7 @@ void DMM::writeAllSettingsToHardware()
 					trigger->setAnalogMode(i, libm2k::ALWAYS);
 				}
 			}
-		} catch (std::exception &e) {
+		} catch (libm2k::m2k_exception &e) {
 			qDebug(CAT_VOLTMETER) << "Can't write to hardware: " << e.what();
 		}
 	}
