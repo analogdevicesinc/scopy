@@ -45,6 +45,7 @@
 
 #include <libm2k/m2kexceptions.hpp>
 #include "scopyExceptionHandler.h"
+
 #include "osc_export_settings.h"
 #include "filemanager.h"
 #include "config.h"

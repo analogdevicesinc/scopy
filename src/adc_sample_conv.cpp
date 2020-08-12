@@ -19,8 +19,10 @@
  */
 
 #include "adc_sample_conv.hpp"
+
 #include <libm2k/m2k.hpp>
 #include <libm2k/contextbuilder.hpp>
+
 #include <libm2k/m2kexceptions.hpp>
 #include <libm2k/analog/m2kanalogin.hpp>
 #include "scopyExceptionHandler.h"
