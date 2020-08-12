@@ -25,6 +25,7 @@
 #include "hardware_trigger.hpp"
 #include <libm2k/m2kexceptions.hpp>
 #include "scopyExceptionHandler.h"
+
 using namespace adiscope;
 
 /*
