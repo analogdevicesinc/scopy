@@ -77,16 +77,19 @@ class SignalGenerator_API : public ApiObject
 	Q_PROPERTY(QList<double> waveform_holdlow
 		   READ getWaveformHoldLow WRITE setWaveformHoldLow);
 
-    Q_PROPERTY(QList<QString> buffer_file_path
-               READ getBufferFilePath WRITE setBufferFilePath)
-    Q_PROPERTY(QList<double> buffer_amplitude
-           READ getBufferAmplitude WRITE setBufferAmplitude)
-    Q_PROPERTY(QList<double> buffer_offset
-           READ getBufferOffset WRITE setBufferOffset)
-    Q_PROPERTY(QList<double> buffer_sample_rate
-           READ getBufferSampleRate WRITE setBufferSampleRate)
-    Q_PROPERTY(QList<double> buffer_phase
-           READ getBufferPhase WRITE setBufferPhase)
+	Q_PROPERTY(QList<QString> buffer_file_path
+		   READ getBufferFilePath WRITE setBufferFilePath)
+	Q_PROPERTY(QList<double> buffer_amplitude
+		   READ getBufferAmplitude WRITE setBufferAmplitude)
+	Q_PROPERTY(QList<double> buffer_offset
+		   READ getBufferOffset WRITE setBufferOffset)
+	Q_PROPERTY(QList<double> buffer_sample_rate
+		   READ getBufferSampleRate WRITE setBufferSampleRate)
+	Q_PROPERTY(QList<double> buffer_phase
+		   READ getBufferPhase WRITE setBufferPhase)
+
+	Q_PROPERTY(bool notes_enable READ getNotesEnable WRITE setNotesEnable)
+	Q_PROPERTY(QString notes READ getNotes WRITE setNotes)
 
 
 public:
@@ -149,16 +152,23 @@ public:
 	QList<QString> getMathFunction() const;
 	void setMathFunction(const QList<QString>& list);
 
-    QList<QString> getBufferFilePath() const;
-    void setBufferFilePath(const QList<QString>& list);
-    QList<double> getBufferAmplitude() const;
-    void setBufferAmplitude(const QList<double>& list);
-    QList<double> getBufferOffset() const;
-    void setBufferOffset(const QList<double>& list);
-    QList<double> getBufferSampleRate() const;
-    void setBufferSampleRate(const QList<double>& list);
-    QList<double> getBufferPhase() const;
-    void setBufferPhase(const QList<double>& list);
+	QList<QString> getBufferFilePath() const;
+	void setBufferFilePath(const QList<QString>& list);
+	QList<double> getBufferAmplitude() const;
+	void setBufferAmplitude(const QList<double>& list);
+	QList<double> getBufferOffset() const;
+	void setBufferOffset(const QList<double>& list);
+	QList<double> getBufferSampleRate() const;
+	void setBufferSampleRate(const QList<double>& list);
+	QList<double> getBufferPhase() const;
+	void setBufferPhase(const QList<double>& list);
+
+
+	bool getNotesEnable();
+	void setNotesEnable(bool val);
+
+	QString getNotes();
+	void setNotes(QString str);
 
         Q_INVOKABLE void show();
 
