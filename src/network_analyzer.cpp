@@ -523,6 +523,9 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	connect(ui->cmb_graphs,SIGNAL(currentIndexChanged(int)),
 		SLOT(onGraphIndexChanged(int)));
 
+	connect(ui->notesEnable,SIGNAL(toggled(bool)),ui->netNotes,SLOT(setVisible(bool)));
+	ui->netNotes->hide();
+
 	readPreferences();
 
 	api->setObjectName(QString::fromStdString(Filter::tool_name(
