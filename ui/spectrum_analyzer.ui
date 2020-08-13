@@ -409,15 +409,22 @@ QPushButton:checked:hover {
            <property name="verticalSpacing">
             <number>10</number>
            </property>
-           <item row="2" column="0">
-            <widget class="adiscope::MarkerTable" name="markerTable" native="true"/>
-           </item>
            <item row="3" column="0">
             <layout class="QHBoxLayout" name="hLayout_plotBottomBar">
              <property name="spacing">
               <number>0</number>
              </property>
             </layout>
+           </item>
+           <item row="1" column="0">
+            <widget class="QWidget" name="plot_placeholder" native="true">
+             <property name="minimumSize">
+              <size>
+               <width>200</width>
+               <height>200</height>
+              </size>
+             </property>
+            </widget>
            </item>
            <item row="0" column="0">
             <layout class="QHBoxLayout" name="hLayout_plotTopBar">
@@ -511,15 +518,11 @@ QPushButton:checked:hover {
              </item>
             </layout>
            </item>
-           <item row="1" column="0">
-            <widget class="QWidget" name="plot_placeholder" native="true">
-             <property name="minimumSize">
-              <size>
-               <width>200</width>
-               <height>200</height>
-              </size>
-             </property>
-            </widget>
+           <item row="2" column="0">
+            <widget class="adiscope::MarkerTable" name="markerTable" native="true"/>
+           </item>
+           <item row="4" column="0">
+            <widget class="adiscope::InstrumentNotes" name="specNotes" native="true"/>
            </item>
           </layout>
          </widget>
@@ -560,7 +563,7 @@ QWidget {
               </sizepolicy>
              </property>
              <property name="currentIndex">
-              <number>2</number>
+              <number>1</number>
              </property>
              <widget class="QWidget" name="channelSettings">
               <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -918,6 +921,25 @@ QPushButton:hover {
               </layout>
              </widget>
              <widget class="QWidget" name="generalSettings">
+              <property name="styleSheet">
+               <string notr="true">
+QCheckBox {
+  spacing: 8px;
+  background-color: transparent;
+  font-size: 14px;
+  font-weight: bold;
+  color: rgba(255, 255, 255, 153);
+}
+
+QCheckBox::indicator {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgb(74,100,255);
+  border-radius: 4px;
+}
+QCheckBox::indicator:unchecked { background-color: transparent; }
+QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
+              </property>
               <layout class="QVBoxLayout" name="verticalLayout_3">
                <property name="spacing">
                 <number>0</number>
@@ -991,6 +1013,34 @@ QPushButton:hover {
                 </widget>
                </item>
                <item>
+                <spacer name="verticalSpacer_11">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::Fixed</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>0</width>
+                   <height>10</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="notesEnable">
+                 <property name="styleSheet">
+                  <string notr="true">font-size: 13px;
+font-weight: normal;
+</string>
+                 </property>
+                 <property name="text">
+                  <string>Enable notes</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
                 <spacer name="verticalSpacer_9">
                  <property name="orientation">
                   <enum>Qt::Vertical</enum>
@@ -1001,7 +1051,7 @@ QPushButton:hover {
                  <property name="sizeHint" stdset="0">
                   <size>
                    <width>20</width>
-                   <height>20</height>
+                   <height>10</height>
                   </size>
                  </property>
                 </spacer>
@@ -2441,11 +2491,6 @@ QLabel {
  </widget>
  <customwidgets>
   <customwidget>
-   <class>adiscope::CustomSwitch</class>
-   <extends>QPushButton</extends>
-   <header>customSwitch.hpp</header>
-  </customwidget>
-  <customwidget>
    <class>adiscope::DetachDragZone</class>
    <extends>QWidget</extends>
    <header>detachdragzone.h</header>
@@ -2458,15 +2503,20 @@ QLabel {
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>adiscope::CustomPushButton</class>
-   <extends>QPushButton</extends>
-   <header>customPushButton.hpp</header>
-  </customwidget>
-  <customwidget>
    <class>adiscope::RunSingleWidget</class>
    <extends>QWidget</extends>
    <header>runsinglewidget.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::CustomSwitch</class>
+   <extends>QPushButton</extends>
+   <header>customSwitch.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::CustomPushButton</class>
+   <extends>QPushButton</extends>
+   <header>customPushButton.hpp</header>
   </customwidget>
   <customwidget>
    <class>adiscope::MarkerTable</class>
@@ -2478,6 +2528,12 @@ QLabel {
    <class>adiscope::ImportSettings</class>
    <extends>QWidget</extends>
    <header>osc_import_settings.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::InstrumentNotes</class>
+   <extends>QWidget</extends>
+   <header>instrumentnotes.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

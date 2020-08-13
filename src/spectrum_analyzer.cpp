@@ -466,6 +466,8 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	ui->btnHistory->setEnabled(true);
 	ui->btnHistory->setChecked(true);
 	ui->btnHistory->setVisible(false);
+	connect(ui->notesEnable, SIGNAL(toggled(bool)), ui->specNotes, SLOT(setVisible(bool)));
+	ui->specNotes->hide();
 
 	api->setObjectName(QString::fromStdString(Filter::tool_name(
 	                           TOOL_SPECTRUM_ANALYZER)));
