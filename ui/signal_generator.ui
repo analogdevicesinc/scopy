@@ -103,23 +103,33 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 r
          <number>0</number>
         </property>
         <item>
-         <widget class="QWidget" name="plot_2" native="true">
+         <widget class="QWidget" name="plot_and_notes" native="true">
+          <property name="styleSheet">
+           <string notr="true">background-color: rgb(0, 0, 0);</string>
+          </property>
           <layout class="QVBoxLayout" name="plot">
            <property name="spacing">
             <number>0</number>
            </property>
            <property name="leftMargin">
-            <number>9</number>
+            <number>0</number>
            </property>
            <property name="topMargin">
-            <number>25</number>
+            <number>0</number>
            </property>
            <property name="rightMargin">
-            <number>9</number>
+            <number>0</number>
            </property>
            <property name="bottomMargin">
-            <number>9</number>
+            <number>0</number>
            </property>
+           <item>
+            <widget class="adiscope::InstrumentNotes" name="siggenNotes" native="true">
+             <property name="styleSheet">
+              <string notr="true"/>
+             </property>
+            </widget>
+           </item>
           </layout>
          </widget>
         </item>
@@ -989,21 +999,36 @@ QPushButton:hover
                 </widget>
                </item>
                <item>
-                <widget class="QWidget" name="wNoise" native="true">
-                 <layout class="QVBoxLayout" name="verticalLayout_9">
-                  <item>
-                   <spacer name="verticalSpacer_2">
-                    <property name="orientation">
-                     <enum>Qt::Vertical</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>20</width>
-                      <height>40</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
+                <spacer name="verticalSpacer_2">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QWidget" name="wNoiseContainer" native="true">
+                 <layout class="QVBoxLayout" name="verticalLayout_14">
+                  <property name="spacing">
+                   <number>6</number>
+                  </property>
+                  <property name="leftMargin">
+                   <number>9</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>9</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>9</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>9</number>
+                  </property>
                   <item>
                    <layout class="QHBoxLayout" name="horizontalLayout_8">
                     <property name="spacing">
@@ -1027,9 +1052,6 @@ QPushButton:checked
   max-width:  6px;
 border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
 }
-
-
-
 </string>
                       </property>
                       <property name="text">
@@ -1058,7 +1080,7 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
     }</string>
                       </property>
                       <property name="text">
-                       <string>NOISE </string>
+                       <string> NOISE </string>
                       </property>
                      </widget>
                     </item>
@@ -1093,53 +1115,221 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
                    </layout>
                   </item>
                   <item>
-                   <widget class="QComboBox" name="cbNoiseType">
-                    <item>
-                     <property name="text">
-                      <string>None</string>
+                   <widget class="QWidget" name="wNoise" native="true">
+                    <layout class="QVBoxLayout" name="verticalLayout_9">
+                     <property name="spacing">
+                      <number>6</number>
                      </property>
-                    </item>
-                    <item>
-                     <property name="text">
-                      <string>Uniform</string>
+                     <property name="leftMargin">
+                      <number>0</number>
                      </property>
-                    </item>
-                    <item>
-                     <property name="text">
-                      <string>Gaussian</string>
+                     <property name="topMargin">
+                      <number>0</number>
                      </property>
-                    </item>
-                    <item>
-                     <property name="text">
-                      <string>Laplacian</string>
+                     <property name="rightMargin">
+                      <number>0</number>
                      </property>
-                    </item>
-                    <item>
-                     <property name="text">
-                      <string>Impulse</string>
+                     <property name="bottomMargin">
+                      <number>0</number>
                      </property>
-                    </item>
+                     <item>
+                      <widget class="QComboBox" name="cbNoiseType">
+                       <item>
+                        <property name="text">
+                         <string>None</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>Uniform</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>Gaussian</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>Laplacian</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>Impulse</string>
+                        </property>
+                       </item>
+                      </widget>
+                     </item>
+                     <item>
+                      <layout class="QHBoxLayout" name="horizontalLayout_5">
+                       <property name="topMargin">
+                        <number>0</number>
+                       </property>
+                       <item>
+                        <spacer name="horizontalSpacer">
+                         <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                         </property>
+                         <property name="sizeHint" stdset="0">
+                          <size>
+                           <width>40</width>
+                           <height>20</height>
+                          </size>
+                         </property>
+                        </spacer>
+                       </item>
+                      </layout>
+                     </item>
+                    </layout>
                    </widget>
                   </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QWidget" name="wAppearanceContainer" native="true">
+                 <layout class="QVBoxLayout" name="verticalLayout_13">
                   <item>
-                   <layout class="QHBoxLayout" name="horizontalLayout_5">
+                   <layout class="QHBoxLayout" name="horizontalLayout_11">
                     <property name="topMargin">
                      <number>0</number>
                     </property>
                     <item>
-                     <spacer name="horizontalSpacer">
+                     <widget class="QPushButton" name="btnAppearanceCollapse">
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>0</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>10</width>
+                        <height>6</height>
+                       </size>
+                      </property>
+                      <property name="styleSheet">
+                       <string notr="true">QPushButton {
+  max-height: 6px;
+  max-width: 10px;
+border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
+}
+
+QPushButton:checked
+{
+  max-height: 10px;
+  max-width:  6px;
+  border-image: url(:/icons/sba_cmb_box_arrow.svg);
+}</string>
+                      </property>
+                      <property name="text">
+                       <string/>
+                      </property>
+                      <property name="checkable">
+                       <bool>true</bool>
+                      </property>
+                      <property name="checked">
+                       <bool>false</bool>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QLabel" name="label_8">
+                      <property name="styleSheet">
+                       <string notr="true">  QLabel {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 70);
+    }</string>
+                      </property>
+                      <property name="text">
+                       <string>OTHER</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="Line" name="line_5">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>1</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>1</height>
+                       </size>
+                      </property>
+                      <property name="styleSheet">
+                       <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
+                      </property>
                       <property name="orientation">
                        <enum>Qt::Horizontal</enum>
                       </property>
-                      <property name="sizeHint" stdset="0">
-                       <size>
-                        <width>40</width>
-                        <height>20</height>
-                       </size>
-                      </property>
-                     </spacer>
+                     </widget>
                     </item>
                    </layout>
+                  </item>
+                  <item>
+                   <widget class="QWidget" name="wAppearance" native="true">
+                    <layout class="QVBoxLayout" name="verticalLayout_6">
+                     <property name="spacing">
+                      <number>0</number>
+                     </property>
+                     <property name="leftMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="topMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="rightMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="bottomMargin">
+                      <number>0</number>
+                     </property>
+                     <item>
+                      <widget class="QCheckBox" name="notesEnable">
+                       <property name="styleSheet">
+                        <string notr="true">
+QCheckBox {
+  spacing: 8px;
+  background-color: transparent;
+  font-size: 13px;
+  font-weight: normal;
+  color: rgba(255, 255, 255, 153);
+}
+
+QCheckBox::indicator {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgb(74,100,255);
+  border-radius: 4px;
+}
+QCheckBox::indicator:unchecked { background-color: transparent; }
+QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
+                       </property>
+                       <property name="text">
+                        <string>Enable Notes</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <layout class="QHBoxLayout" name="horizontalLayout_13">
+                       <property name="topMargin">
+                        <number>0</number>
+                       </property>
+                      </layout>
+                     </item>
+                    </layout>
+                   </widget>
                   </item>
                  </layout>
                 </widget>
@@ -1219,6 +1409,12 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
    <class>adiscope::Math</class>
    <extends>QWidget</extends>
    <header>math.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::InstrumentNotes</class>
+   <extends>QWidget</extends>
+   <header>instrumentnotes.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

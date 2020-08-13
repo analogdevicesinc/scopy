@@ -367,7 +367,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 	ui->cbNoiseType->setCurrentIndex(0);
 	noiseAmplitude->setMinValue(1e-06);
 	noiseAmplitude->setValue(noiseAmplitude->minValue());
-	ui->btnNoiseCollapse->setVisible(false);
+	ui->btnNoiseCollapse->setVisible(true);
 	ui->cbNoiseType->setItemData(SG_NO_NOISE,0);
 	ui->cbNoiseType->setItemData(SG_UNIFORM_NOISE, analog::GR_UNIFORM);
 	ui->cbNoiseType->setItemData(SG_GAUSSIAN_NOISE, analog::GR_GAUSSIAN);
@@ -485,7 +485,16 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 	plot->setHorizOffset((double) nb_points /
 	                     ((double) sample_rate * 2.0));
 	plot->zoomBaseUpdate();
-	ui->plot->addWidget(plot, 0, 0);
+	ui->plot->insertWidget(0,plot, 0, 0);
+
+	connect(ui->notesEnable,SIGNAL(toggled(bool)),ui->siggenNotes,SLOT(setVisible(bool)));
+	ui->siggenNotes->hide();
+
+	connect(ui->btnAppearanceCollapse, SIGNAL(toggled(bool)),ui->wAppearance, SLOT(setVisible(bool)));
+	ui->wAppearance->hide();
+
+
+
 	fileManager = new FileManager("Signal Generator");
 
 	api->setObjectName(QString::fromStdString(Filter::tool_name(
