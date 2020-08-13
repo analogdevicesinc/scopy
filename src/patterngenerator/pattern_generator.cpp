@@ -136,6 +136,9 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 
 	m_ui->btnGeneralSettings->setChecked(true);
 
+	connect(m_ui->notesEnable,SIGNAL(toggled(bool)),m_ui->patternNotes,SLOT(setVisible(bool)));
+	m_ui->patternNotes->hide();
+
 	// API load
 	api->setObjectName(QString::fromStdString(Filter::tool_name(
 							  TOOL_PATTERN_GENERATOR)));
