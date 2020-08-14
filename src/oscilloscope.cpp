@@ -765,6 +765,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	gsettings_ui->xySettings->hide();
 	timePosition->setValue(0);
 
+	connect(gsettings_ui->xyLineThickness,SIGNAL(currentIndexChanged(int)),this, SLOT(on_xyLineThickness_currentIndexChanged(int)));
+
 	api->setObjectName(QString::fromStdString(Filter::tool_name(
 			TOOL_OSCILLOSCOPE)));
 	api->load(*settings);
@@ -821,6 +823,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 
 	connect(&plot,SIGNAL(leftGateChanged(double)),SLOT(onLeftGateChanged(double)));
 	connect(&plot,SIGNAL(rightGateChanged(double)),SLOT(onRightGateChanged(double)));
+
 }
 
 int Oscilloscope::binSearchPointOnXaxis(double time)
@@ -4746,13 +4749,17 @@ void Oscilloscope::writeAllSettingsToHardware()
 void Oscilloscope::on_xyPlotLineType_toggled(bool checked)
 {
 	if (checked) {
-		xy_plot.setLineStyle(0, Qt::NoPen);
-		xy_plot.setLineMarker(0, QwtSymbol::Ellipse);
+		xy_plot.setLineStyle(0, Qt::DotLine);
 	} else {
 		xy_plot.setLineStyle(0, Qt::SolidLine);
-		xy_plot.setLineMarker(0, QwtSymbol::NoSymbol);
 	}
 	xy_plot.replot();
+}
+
+
+void adiscope::Oscilloscope::on_xyLineThickness_currentIndexChanged(int idx)
+{
+	 xy_plot.setLineWidth(0,idx);
 }
 
 void Oscilloscope::setup_xy_channels()
