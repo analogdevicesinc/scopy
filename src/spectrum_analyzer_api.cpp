@@ -364,22 +364,12 @@ void SpectrumAnalyzer_API::setLogScale(bool useLogScale)
 	sp->ui->logBtn->setChecked(useLogScale);
 }
 
-
-bool SpectrumAnalyzer_API::getNotesEnable()
-{
-	return sp->ui->notesEnable->isChecked();
-}
-void SpectrumAnalyzer_API::setNotesEnable(bool val)
-{
-	sp->ui->notesEnable->setChecked(val);
-}
-
 QString SpectrumAnalyzer_API::getNotes()
 {
-	return sp->ui->specNotes->getNotes();
+	return sp->ui->instrumentNotes->getNotes();
 }
 void SpectrumAnalyzer_API::setNotes(QString str)
 {
-	sp->ui->specNotes->setNotes(str);
+	sp->ui->instrumentNotes->setNotes(str);
 }
 }

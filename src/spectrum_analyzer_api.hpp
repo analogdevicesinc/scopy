@@ -43,7 +43,6 @@ class SpectrumAnalyzer_API : public ApiObject
 	Q_PROPERTY(QVariantList markers READ getMarkers);
 	Q_PROPERTY(bool logScale READ getLogScale WRITE setLogScale)
 
-	Q_PROPERTY(bool notes_enable READ getNotesEnable WRITE setNotesEnable)
 	Q_PROPERTY(QString notes READ getNotes WRITE setNotes)
 public:
 	Q_INVOKABLE void show();
@@ -91,9 +90,6 @@ private:
 
 	bool getLogScale() const;
 	void setLogScale(bool useLogScale);
-
-	bool getNotesEnable();
-	void setNotesEnable(bool val);
 
 	QString getNotes();
 	void setNotes(QString str);

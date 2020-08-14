@@ -132,18 +132,20 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 	checkEnabledChannels();
 
 	// TODO:
-	// readPreferences()
+	readPreferences();
 
 	m_ui->btnGeneralSettings->setChecked(true);
-
-	connect(m_ui->notesEnable,SIGNAL(toggled(bool)),m_ui->patternNotes,SLOT(setVisible(bool)));
-	m_ui->patternNotes->hide();
 
 	// API load
 	api->setObjectName(QString::fromStdString(Filter::tool_name(
 							  TOOL_PATTERN_GENERATOR)));
 	api->load(*settings);
 	api->js_register(engine);
+}
+
+void PatternGenerator::readPreferences()
+{
+	m_ui->instrumentNotes->setVisible(prefPanel->getInstrumentNotesActive());
 }
 
 PatternGenerator::~PatternGenerator()

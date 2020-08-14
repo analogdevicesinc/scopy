@@ -495,7 +495,7 @@ color:  red;</string>
                   <layout class="QGridLayout" name="gridLayout_plots"/>
                  </item>
                  <item>
-                  <widget class="adiscope::InstrumentNotes" name="netNotes" native="true"/>
+                  <widget class="adiscope::InstrumentNotes" name="instrumentNotes" native="true"/>
                  </item>
                 </layout>
                </widget>
@@ -2457,48 +2457,6 @@ background-color: #727273;
                     </layout>
                    </item>
                    <item>
-                    <spacer name="verticalSpacer_23">
-                     <property name="orientation">
-                      <enum>Qt::Vertical</enum>
-                     </property>
-                     <property name="sizeType">
-                      <enum>QSizePolicy::Fixed</enum>
-                     </property>
-                     <property name="sizeHint" stdset="0">
-                      <size>
-                       <width>0</width>
-                       <height>15</height>
-                      </size>
-                     </property>
-                    </spacer>
-                   </item>
-                   <item>
-                    <widget class="QCheckBox" name="notesEnable">
-                     <property name="styleSheet">
-                      <string notr="true">
-QCheckBox {
-  spacing: 8px;
-  background-color: transparent;
-  font-size: 13px;
-  font-weight: normal;
-  color: rgba(255, 255, 255, 153);
-}
-
-QCheckBox::indicator {
-  width: 14px;
-  height: 14px;
-  border: 2px solid rgb(74,100,255);
-  border-radius: 4px;
-}
-QCheckBox::indicator:unchecked { background-color: transparent; }
-QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
-                     </property>
-                     <property name="text">
-                      <string>Enable notes</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
                     <spacer name="verticalSpacer_16">
                      <property name="orientation">
                       <enum>Qt::Vertical</enum>
@@ -3265,6 +3223,11 @@ QLabel {
    <container>1</container>
   </customwidget>
   <customwidget>
+   <class>adiscope::CustomPushButton</class>
+   <extends>QPushButton</extends>
+   <header>customPushButton.hpp</header>
+  </customwidget>
+  <customwidget>
    <class>adiscope::RunSingleWidget</class>
    <extends>QWidget</extends>
    <header>runsinglewidget.h</header>
@@ -3274,11 +3237,6 @@ QLabel {
    <class>adiscope::CustomSwitch</class>
    <extends>QPushButton</extends>
    <header>customSwitch.hpp</header>
-  </customwidget>
-  <customwidget>
-   <class>adiscope::CustomPushButton</class>
-   <extends>QPushButton</extends>
-   <header>customPushButton.hpp</header>
   </customwidget>
   <customwidget>
    <class>adiscope::InstrumentNotes</class>

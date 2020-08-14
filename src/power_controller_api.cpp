@@ -87,4 +87,13 @@ void PowerController_API::setDac2Enabled(bool enable)
 {
 	pw->ui->dac2->setChecked(enable);
 }
+
+QString PowerController_API::getNotes()
+{
+	return pw->ui->instrumentNotes->getNotes();
+}
+void PowerController_API::setNotes(QString str)
+{
+	pw->ui->instrumentNotes->setNotes(str);
+}
 }

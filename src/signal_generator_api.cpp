@@ -796,24 +796,13 @@ void SignalGenerator_API::setBufferPhase(const QList<double>& list){
     gen->filePhase->setValue(gen->getCurrentData()->file_phase);
 }
 
-
-
-bool SignalGenerator_API::getNotesEnable()
-{
-	return gen->ui->notesEnable->isChecked();
-}
-void SignalGenerator_API::setNotesEnable(bool val)
-{
-	gen->ui->notesEnable->setChecked(val);
-}
-
 QString SignalGenerator_API::getNotes()
 {
-	return gen->ui->siggenNotes->getNotes();
+	return gen->ui->instrumentNotes->getNotes();
 }
 void SignalGenerator_API::setNotes(QString str)
 {
-	gen->ui->siggenNotes->setNotes(str);
+	gen->ui->instrumentNotes->setNotes(str);
 }
 
 }

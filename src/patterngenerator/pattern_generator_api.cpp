@@ -140,23 +140,12 @@ void logic::PatternGenerator_API::setEnabledPatterns(const QVector<QPair<QVector
 	}
 }
 
-
-
-bool logic::PatternGenerator_API::getNotesEnable()
-{
-	return m_pattern->m_ui->notesEnable->isChecked();
-}
-void logic::PatternGenerator_API::setNotesEnable(bool val)
-{
-	m_pattern->m_ui->notesEnable->setChecked(val);
-}
-
 QString logic::PatternGenerator_API::getNotes()
 {
-	return m_pattern->m_ui->patternNotes->getNotes();
+	return m_pattern->m_ui->instrumentNotes->getNotes();
 }
 void logic::PatternGenerator_API::setNotes(QString str)
 {
-	m_pattern->m_ui->patternNotes->setNotes(str);
+	m_pattern->m_ui->instrumentNotes->setNotes(str);
 }
 

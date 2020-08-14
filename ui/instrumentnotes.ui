@@ -32,28 +32,8 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">
-QCheckBox {
-  spacing: 8px;
-  background-color: transparent;
-  font-size: 14px;
-  font-weight: bold;
-  color: rgba(255, 255, 255, 153);
-}
-
-QCheckBox::indicator {
-  width: 14px;
-  height: 14px;
-  border: 2px solid rgb(74,100,255);
-  border-radius: 4px;
-}
-QCheckBox::indicator:unchecked { background-color: transparent; }
-QCheckBox::indicator:checked { background-color: rgb(74,100,255); }
-
-
-Line
+   <string notr="true">Line
 {
-background-color: rgb(255, 39, 48);
 color: rgb(255, 190, 190);
 border: 1px solid rgba(255, 255, 255, 70);
 }
@@ -61,10 +41,6 @@ border: 1px solid rgba(255, 255, 255, 70);
 QLabel {
 	font-size: 12px;
 	color: rgba(255, 255, 255, 70);
-}
-
-QTextEdit {
- background-color: rgb(0,0,0)
 }
 </string>
   </property>

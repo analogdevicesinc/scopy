@@ -88,7 +88,6 @@ class SignalGenerator_API : public ApiObject
 	Q_PROPERTY(QList<double> buffer_phase
 		   READ getBufferPhase WRITE setBufferPhase)
 
-	Q_PROPERTY(bool notes_enable READ getNotesEnable WRITE setNotesEnable)
 	Q_PROPERTY(QString notes READ getNotes WRITE setNotes)
 
 
@@ -162,10 +161,6 @@ public:
 	void setBufferSampleRate(const QList<double>& list);
 	QList<double> getBufferPhase() const;
 	void setBufferPhase(const QList<double>& list);
-
-
-	bool getNotesEnable();
-	void setNotesEnable(bool val);
 
 	QString getNotes();
 	void setNotes(QString str);

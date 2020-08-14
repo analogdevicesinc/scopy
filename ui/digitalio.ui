@@ -234,6 +234,9 @@ background-color: grey;
         </item>
        </layout>
       </item>
+      <item>
+       <widget class="adiscope::InstrumentNotes" name="instrumentNotes" native="true"/>
+      </item>
      </layout>
     </widget>
    </item>
@@ -244,6 +247,12 @@ background-color: grey;
    <class>adiscope::DetachDragZone</class>
    <extends>QWidget</extends>
    <header>detachdragzone.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::InstrumentNotes</class>
+   <extends>QWidget</extends>
+   <header>instrumentnotes.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -109,6 +109,10 @@ public:
 	bool getDisplaySamplingPoints() const;
 	void setDisplaySamplingPoints(bool display);
 
+	bool getInstrumentNotesActive() const;
+	void setInstrumentNotesActive(bool display);
+
+
 Q_SIGNALS:
 
 	void notify();
@@ -148,6 +152,7 @@ private:
 	bool m_initialized;
 	bool m_useNativeDialogs;
 	QString language;
+	bool m_instrument_notes_active;
 	bool m_displaySamplingPoints;
 
 	Preferences_API *pref_api;
@@ -176,6 +181,8 @@ class Preferences_API : public ApiObject
 	Q_PROPERTY(bool show_ADC_digital_filters READ getShowADCDigitalFilters WRITE setShowADCDigitalFilters)
 	Q_PROPERTY(QString language READ getLanguage WRITE setLanguage);
 	Q_PROPERTY(bool displaySamplingPoints READ getDisplaySampling WRITE setDisplaySampling)
+	Q_PROPERTY(bool instrument_notes_active READ getInstrumentNotesActive WRITE setInstrumentNotesActive)
+
 
 public:
 
@@ -236,6 +243,10 @@ public:
 
 	bool getDisplaySampling() const;
 	void setDisplaySampling(bool display);
+
+
+	bool getInstrumentNotesActive() const;
+	void setInstrumentNotesActive(bool display);
 
 private:
 	Preferences *preferencePanel;

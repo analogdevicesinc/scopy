@@ -522,7 +522,7 @@ QPushButton:checked:hover {
             <widget class="adiscope::MarkerTable" name="markerTable" native="true"/>
            </item>
            <item row="4" column="0">
-            <widget class="adiscope::InstrumentNotes" name="specNotes" native="true"/>
+            <widget class="adiscope::InstrumentNotes" name="instrumentNotes" native="true"/>
            </item>
           </layout>
          </widget>
@@ -1009,34 +1009,6 @@ QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
                  </property>
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <spacer name="verticalSpacer_11">
-                 <property name="orientation">
-                  <enum>Qt::Vertical</enum>
-                 </property>
-                 <property name="sizeType">
-                  <enum>QSizePolicy::Fixed</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>0</width>
-                   <height>10</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item>
-                <widget class="QCheckBox" name="notesEnable">
-                 <property name="styleSheet">
-                  <string notr="true">font-size: 13px;
-font-weight: normal;
-</string>
-                 </property>
-                 <property name="text">
-                  <string>Enable notes</string>
                  </property>
                 </widget>
                </item>
@@ -2503,6 +2475,11 @@ QLabel {
    <container>1</container>
   </customwidget>
   <customwidget>
+   <class>adiscope::CustomPushButton</class>
+   <extends>QPushButton</extends>
+   <header>customPushButton.hpp</header>
+  </customwidget>
+  <customwidget>
    <class>adiscope::RunSingleWidget</class>
    <extends>QWidget</extends>
    <header>runsinglewidget.h</header>
@@ -2514,9 +2491,10 @@ QLabel {
    <header>customSwitch.hpp</header>
   </customwidget>
   <customwidget>
-   <class>adiscope::CustomPushButton</class>
-   <extends>QPushButton</extends>
-   <header>customPushButton.hpp</header>
+   <class>adiscope::InstrumentNotes</class>
+   <extends>QWidget</extends>
+   <header>instrumentnotes.h</header>
+   <container>1</container>
   </customwidget>
   <customwidget>
    <class>adiscope::MarkerTable</class>
@@ -2528,12 +2506,6 @@ QLabel {
    <class>adiscope::ImportSettings</class>
    <extends>QWidget</extends>
    <header>osc_import_settings.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>adiscope::InstrumentNotes</class>
-   <extends>QWidget</extends>
-   <header>instrumentnotes.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

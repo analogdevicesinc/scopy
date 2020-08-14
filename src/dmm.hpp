@@ -125,6 +125,8 @@ namespace adiscope {
 		void collapsePeakHold(bool);
 		void collapseDataLog(bool);
 
+		void readPreferences();
+
 	Q_SIGNALS:
 		void showTool();
 	};

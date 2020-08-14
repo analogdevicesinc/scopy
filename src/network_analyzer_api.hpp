@@ -61,7 +61,6 @@ class NetworkAnalyzer_API : public ApiObject
 	Q_PROPERTY(QList<double> freq READ freq STORED false)
 	Q_PROPERTY(int averaging READ getAveraging WRITE setAveraging)
 	Q_PROPERTY(int periods READ getPeriods WRITE setPeriods)
-	Q_PROPERTY(bool notes_enable READ getNotesEnable WRITE setNotesEnable)
 	Q_PROPERTY(QString notes READ getNotes WRITE setNotes)
 public:
 	explicit NetworkAnalyzer_API(NetworkAnalyzer *net) :
@@ -124,9 +123,6 @@ public:
 	QList<double> data() const;
 	QList<double> freq() const;
 	QList<double> phase() const;
-
-	bool getNotesEnable();
-	void setNotesEnable(bool val);
 
 	QString getNotes();
 	void setNotes(QString str);

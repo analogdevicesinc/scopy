@@ -506,6 +506,9 @@ color: #9013fe;
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="adiscope::InstrumentNotes" name="instrumentNotes" native="true"/>
+      </item>
      </layout>
     </widget>
    </item>
@@ -1032,14 +1035,20 @@ QPushButton:disabled {
  </widget>
  <customwidgets>
   <customwidget>
+   <class>adiscope::DetachDragZone</class>
+   <extends>QWidget</extends>
+   <header>detachdragzone.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>adiscope::CustomSwitch</class>
    <extends>QPushButton</extends>
    <header>customSwitch.hpp</header>
   </customwidget>
   <customwidget>
-   <class>adiscope::DetachDragZone</class>
+   <class>adiscope::InstrumentNotes</class>
    <extends>QWidget</extends>
-   <header>detachdragzone.h</header>
+   <header>instrumentnotes.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

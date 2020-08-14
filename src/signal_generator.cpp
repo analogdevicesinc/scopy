@@ -487,9 +487,6 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 	plot->zoomBaseUpdate();
 	ui->plot->insertWidget(0,plot, 0, 0);
 
-	connect(ui->notesEnable,SIGNAL(toggled(bool)),ui->siggenNotes,SLOT(setVisible(bool)));
-	ui->siggenNotes->hide();
-
 	connect(ui->btnAppearanceCollapse, SIGNAL(toggled(bool)),ui->wAppearance, SLOT(setVisible(bool)));
 	ui->wAppearance->hide();
 
@@ -597,7 +594,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 SignalGenerator::~SignalGenerator()
 {
 	disconnect(prefPanel, &Preferences::notify, this, &SignalGenerator::readPreferences);
-	ui->run_button->toggle(false);
+	ui->run_button->toggle(false);	
 	setDynamicProperty(runButton(), "disabled", false);
 	if (saveOnExit) {
 		api->save(*settings);
@@ -623,6 +620,7 @@ void SignalGenerator::readPreferences()
 		nr_of_periods = prefered_periods_nr;
 		resetZoom();
 	}
+	ui->instrumentNotes->setVisible(prefPanel->getInstrumentNotesActive());
 }
 
 void SignalGenerator::resetZoom()

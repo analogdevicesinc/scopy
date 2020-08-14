@@ -289,23 +289,13 @@ QList<double> NetworkAnalyzer_API::phase() const
 	return list;
 }
 
-
-bool NetworkAnalyzer_API::getNotesEnable()
-{
-	return net->ui->notesEnable->isChecked();
-}
-void NetworkAnalyzer_API::setNotesEnable(bool val)
-{
-	net->ui->notesEnable->setChecked(val);
-}
-
 QString NetworkAnalyzer_API::getNotes()
 {
-	return net->ui->netNotes->getNotes();
+	return net->ui->instrumentNotes->getNotes();
 }
 void NetworkAnalyzer_API::setNotes(QString str)
 {
-	net->ui->netNotes->setNotes(str);
+	net->ui->instrumentNotes->setNotes(str);
 }
 
 }
