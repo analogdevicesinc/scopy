@@ -518,6 +518,16 @@ void Oscilloscope_API::setCurrentChannel(int chn_id)
 	}
 }
 
+int Oscilloscope_API::getXyThickness() const
+{
+	return osc->xy_plot.getLineWidth(0);
+}
+void Oscilloscope_API::setXyThickness(int val)
+{
+	osc->gsettings_ui->xyLineThickness->setCurrentIndex(val);
+	osc->xy_plot.setLineWidth(0,val);
+}
+
 bool Oscilloscope_API::getFftEn() const
 {
 	return osc->fft_is_visible;

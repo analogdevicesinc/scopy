@@ -163,6 +163,7 @@ namespace adiscope {
 
 		void onChannelCouplingChanged(bool en);
 		void onChannelOffsetChanged(unsigned int chnIdx, double value);
+		void on_xyLineThickness_currentIndexChanged(int idx);
 
 		void onChannelWidgetEnabled(bool);
 		void onChannelWidgetSelected(bool);
