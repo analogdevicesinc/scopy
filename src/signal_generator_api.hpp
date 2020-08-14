@@ -90,6 +90,9 @@ class SignalGenerator_API : public ApiObject
 
 	Q_PROPERTY(QString notes READ getNotes WRITE setNotes)
 
+        Q_PROPERTY(QList<int> line_thickness
+                   READ getLineThickness WRITE setLineThickness)
+
 
 public:
 	bool running() const;
@@ -164,6 +167,10 @@ public:
 
 	QString getNotes();
 	void setNotes(QString str);
+
+	QList<int> getLineThickness() const;
+	void setLineThickness(const QList<int>& list);
+
 
         Q_INVOKABLE void show();
 

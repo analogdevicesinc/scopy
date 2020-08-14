@@ -379,6 +379,8 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 			ui->wNoise->setVisible(!check);
 		});
 
+	ui->cbLineThickness->setCurrentIndex(1);
+
 	unsigned int nb_channels = m_m2k_analogout->getNbChannels();
 	for (unsigned int i = 0; i < nb_channels; i++) {
 		auto ptr = QSharedPointer<signal_generator_data>(
@@ -559,6 +561,9 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 	        this, SLOT(waveformTypeChanged(int)));
 	connect(ui->cbNoiseType, SIGNAL(currentIndexChanged(int)),
 		this, SLOT(noiseTypeChanged(int)));
+
+        connect(ui->cbLineThickness, SIGNAL(currentIndexChanged(int)),
+                this, SLOT(lineThicknessChanged(int)));
 
 	connect(ui->tabWidget, SIGNAL(currentChanged(int)),
 	        this, SLOT(tabChanged(int)));
@@ -884,6 +889,17 @@ void SignalGenerator::noiseAmplitudeChanged(double value)
 		ptr->noiseAmplitude = value;
 		resetZoom();
 	}
+}
+
+void SignalGenerator::lineThicknessChanged(int index)
+{
+        auto ptr = getCurrentData();
+        int lineThickness = (int)(ptr->lineThickness / 0.5) - 1;
+        if (lineThickness != index) {
+                ptr->lineThickness = 0.5 * (index + 1);
+                plot->setLineWidth(ptr->id, ptr->lineThickness);
+                plot->replot();
+        }
 }
 
 void SignalGenerator::dutyChanged(double value)
@@ -2005,6 +2021,9 @@ void SignalGenerator::updateRightMenuForChn(int chIdx)
 	noiseAmplitude->setValue(ptr->noiseAmplitude);
 	auto noiseIndex = ui->cbNoiseType->findData(ptr->noiseType);
 	ui->cbNoiseType->setCurrentIndex(noiseIndex);
+
+	int lineThicknessIndex = (int)(ptr->lineThickness / 0.5) - 1;
+	ui->cbLineThickness->setCurrentIndex(lineThicknessIndex);
 
 	fallTime->setValue(ptr->fall);
 	riseTime->setValue(ptr->rise);
