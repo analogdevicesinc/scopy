@@ -379,23 +379,13 @@ int Oscilloscope_API::getMemoryDepth()
 	return bufferSize;
 }
 
-
-bool Oscilloscope_API::getNotesEnable()
-{
-	return osc->gsettings_ui->notesEnable->isChecked();
-}
-void Oscilloscope_API::setNotesEnable(bool val)
-{
-	osc->gsettings_ui->notesEnable->setChecked(val);
-}
-
 QString Oscilloscope_API::getNotes()
 {
-	return osc->ui->oscNotes->getNotes();
+	return osc->ui->instrumentNotes->getNotes();
 }
 void Oscilloscope_API::setNotes(QString str)
 {
-	osc->ui->oscNotes->setNotes(str);
+	osc->ui->instrumentNotes->setNotes(str);
 }
 
 void Oscilloscope_API::show()

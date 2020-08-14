@@ -177,6 +177,12 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, ToolMenuItem *toolMenuItem,
 	if(!wheelEventGuard)
 		wheelEventGuard = new MouseWheelWidgetGuard(ui->widget_2);
 	wheelEventGuard->installEventRecursively(ui->widget_2);
+	readPreferences();
+}
+
+void DMM::readPreferences()
+{
+	ui->instrumentNotes->setVisible(prefPanel->getInstrumentNotesActive());
 }
 
 void DMM::disconnectAll()
@@ -194,6 +200,7 @@ void DMM::disconnectAll()
 
 DMM::~DMM()
 {
+	disconnect(prefPanel, &Preferences::notify, this, &DMM::readPreferences);
 	ui->run_button->setChecked(false);
 	disconnectAll();
 

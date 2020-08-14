@@ -56,7 +56,6 @@ class LogicAnalyzer_API : public ApiObject
 	Q_PROPERTY(QVector<QVector<int>> currentGroups READ getCurrentGroups WRITE setCurrentGroups)
 
 	/* notes */
-	Q_PROPERTY(bool notes_enable READ getNotesEnable WRITE setNotesEnable)
 	Q_PROPERTY(QString notes READ getNotes WRITE setNotes)
 
 public:
@@ -119,9 +118,6 @@ public:
 
 	QVector<QVector<int>> getCurrentGroups() const;
 	void setCurrentGroups(const QVector<QVector<int> > &groups);
-
-	bool getNotesEnable();
-	void setNotesEnable(bool val);
 
 	QString getNotes();
 	void setNotes(QString str);

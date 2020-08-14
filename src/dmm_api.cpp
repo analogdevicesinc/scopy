@@ -156,4 +156,13 @@ void DMM_API::setDataLoggingAppend(bool val)
 	dmm->ui->btn_overwrite->setChecked(!val);
 }
 
+QString DMM_API::getNotes()
+{
+	return dmm->ui->instrumentNotes->getNotes();
+}
+void DMM_API::setNotes(QString str)
+{
+	dmm->ui->instrumentNotes->setNotes(str);
+}
+
 }

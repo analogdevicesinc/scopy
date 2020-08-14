@@ -466,8 +466,6 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	ui->btnHistory->setEnabled(true);
 	ui->btnHistory->setChecked(true);
 	ui->btnHistory->setVisible(false);
-	connect(ui->notesEnable, SIGNAL(toggled(bool)), ui->specNotes, SLOT(setVisible(bool)));
-	ui->specNotes->hide();
 
 	api->setObjectName(QString::fromStdString(Filter::tool_name(
 	                           TOOL_SPECTRUM_ANALYZER)));
@@ -598,11 +596,13 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	connect(ui->btnExport, &QPushButton::clicked,
 		this, &SpectrumAnalyzer::btnExportClicked);
+	readPreferences();
 }
 
 SpectrumAnalyzer::~SpectrumAnalyzer()
 {
 	delete sample_timer;
+	disconnect(prefPanel, &Preferences::notify, this, &SpectrumAnalyzer::readPreferences);
 	ui->runSingleWidget->toggle(false);
 	setDynamicProperty(runButton(), "disabled", false);
 
@@ -647,6 +647,7 @@ void SpectrumAnalyzer::setNativeDialogs(bool nativeDialogs)
 
 void SpectrumAnalyzer::readPreferences() {
 	fft_plot->setVisiblePeakSearch(prefPanel->getSpectrum_visible_peak_search());
+	ui->instrumentNotes->setVisible(prefPanel->getInstrumentNotesActive());
 }
 
 void SpectrumAnalyzer::btnExportClicked()

@@ -80,7 +80,7 @@ DigitalIoGroup::DigitalIoGroup(QString label, int ch_mask,int io_mask,
 	auto max = (1<<nr_of_channels) -1;
 	ui->lineEdit->setValidator(new QIntValidator(0, max, this));
 	ui->lineEdit->setText(QString::number(max/2));
-	ui->horizontalSlider->setValue(max/2);
+	ui->horizontalSlider->setValue(max/2);	
 }
 DigitalIoGroup::~DigitalIoGroup()
 {
@@ -182,11 +182,19 @@ DigitalIO::DigitalIO(struct iio_context *ctx, Filter *filt, ToolMenuItem *toolMe
 	api->load(*settings);
 	api->js_register(engine);
 	updateUi();
+	readPreferences();
 
+}
+
+void DigitalIO::readPreferences()
+{
+	ui->instrumentNotes->setVisible(prefPanel->getInstrumentNotesActive());
 }
 
 DigitalIO::~DigitalIO()
 {
+	disconnect(prefPanel, &Preferences::notify, this, &DigitalIO::readPreferences);
+
 	if (!offline_mode) {
 	}
 

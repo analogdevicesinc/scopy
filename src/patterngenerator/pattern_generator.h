@@ -83,6 +83,7 @@ private Q_SLOTS:
 	void patternSelected(const QString& pattern, int ch = -1, const QString &json = {});
 	void on_btnOutputMode_toggled(bool);
 	void regenerate();
+	void readPreferences();
 
 private:
 	void setupUi();

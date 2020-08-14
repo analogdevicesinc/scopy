@@ -207,9 +207,6 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, adiscope::Filter *filt,
 
 	ui->btnGeneralSettings->setChecked(true);
 
-	connect(ui->notesEnable,SIGNAL(toggled(bool)),ui->logicNotes,SLOT(setVisible(bool)));
-	ui->logicNotes->hide();
-
 	api->setObjectName(QString::fromStdString(Filter::tool_name(
 							  TOOL_LOGIC_ANALYZER)));
 	api->load(*settings);
@@ -1599,6 +1596,7 @@ void LogicAnalyzer::readPreferences()
 			ldc->setDisplaySampling(prefPanel->getDisplaySamplingPoints());
 		}
 	}
+	ui->instrumentNotes->setVisible(prefPanel->getInstrumentNotesActive());
 
 	m_plot.replot();
 }

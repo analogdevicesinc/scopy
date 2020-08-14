@@ -130,4 +130,13 @@ QList<bool> DigitalIO_API::locked() const
 	}
 	return list;
 }
+
+QString DigitalIO_API::getNotes()
+{
+	return dio->ui->instrumentNotes->getNotes();
+}
+void DigitalIO_API::setNotes(QString str)
+{
+	dio->ui->instrumentNotes->setNotes(str);
+}
 }

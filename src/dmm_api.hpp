@@ -60,6 +60,7 @@ class DMM_API : public ApiObject
 		   WRITE setDataLoggingAppend)
 	Q_PROPERTY(bool peak_hold_en READ getPeakHoldEn
 		  WRITE setPeakHoldEn)
+	Q_PROPERTY(QString notes READ getNotes WRITE setNotes)
 
 public:
 	bool get_mode_ac_ch1() const;
@@ -96,6 +97,9 @@ public:
 
 	bool getPeakHoldEn() const;
 	void setPeakHoldEn(bool);
+
+	QString getNotes();
+	void setNotes(QString);
 
 	Q_INVOKABLE void show();
 

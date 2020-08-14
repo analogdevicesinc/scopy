@@ -478,7 +478,7 @@ image: url(:/icons/setup3_checked_hover.svg);
               </layout>
              </item>
              <item row="1" column="0">
-              <widget class="adiscope::InstrumentNotes" name="patternNotes" native="true">
+              <widget class="adiscope::InstrumentNotes" name="instrumentNotes" native="true">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
                  <horstretch>0</horstretch>
@@ -1524,32 +1524,6 @@ font-weight: normal;
                       </widget>
                      </item>
                      <item>
-                      <widget class="QCheckBox" name="notesEnable">
-                       <property name="styleSheet">
-                        <string notr="true">
-QCheckBox {
-  spacing: 8px;
-  background-color: transparent;
-  font-size: 13px;
-  font-weight: normal;
-  color: rgba(255, 255, 255, 153);
-}
-
-QCheckBox::indicator {
-  width: 14px;
-  height: 14px;
-  border: 2px solid rgb(74,100,255);
-  border-radius: 4px;
-}
-QCheckBox::indicator:unchecked { background-color: transparent; }
-QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
-                       </property>
-                       <property name="text">
-                        <string>Enable Notes</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
                       <layout class="QHBoxLayout" name="subTitleLayout">
                        <property name="spacing">
                         <number>0</number>
@@ -1941,6 +1915,11 @@ color: rgba(255, 255, 255, 153);
    <container>1</container>
   </customwidget>
   <customwidget>
+   <class>adiscope::CustomPushButton</class>
+   <extends>QPushButton</extends>
+   <header>customPushButton.hpp</header>
+  </customwidget>
+  <customwidget>
    <class>adiscope::RunSingleWidget</class>
    <extends>QWidget</extends>
    <header>runsinglewidget.h</header>
@@ -1950,11 +1929,6 @@ color: rgba(255, 255, 255, 153);
    <class>adiscope::CustomSwitch</class>
    <extends>QPushButton</extends>
    <header>customSwitch.hpp</header>
-  </customwidget>
-  <customwidget>
-   <class>adiscope::CustomPushButton</class>
-   <extends>QPushButton</extends>
-   <header>customPushButton.hpp</header>
   </customwidget>
   <customwidget>
    <class>adiscope::InstrumentNotes</class>

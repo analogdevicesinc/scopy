@@ -36,6 +36,7 @@ class PowerController_API : public ApiObject
 	Q_PROPERTY(double dac2_value READ valueDac2 WRITE setValueDac2);
 	Q_PROPERTY(bool dac1_enabled READ Dac1Enabled WRITE setDac1Enabled);
 	Q_PROPERTY(bool dac2_enabled READ Dac2Enabled WRITE setDac2Enabled);
+	Q_PROPERTY(QString notes READ getNotes WRITE setNotes)
 
 public:
 	explicit PowerController_API(PowerController *pw) :
@@ -59,6 +60,9 @@ public:
 
 	bool Dac2Enabled() const;
 	void setDac2Enabled(bool enable);
+
+	QString getNotes();
+	void setNotes(QString str);
 
 	Q_INVOKABLE void show();
 

@@ -58,7 +58,8 @@ Preferences::Preferences(QWidget *parent) :
 	show_ADC_digital_filters(false),
 	m_useNativeDialogs(true),
 	language("auto"),
-	m_displaySamplingPoints(false)
+	m_displaySamplingPoints(false),
+	m_instrument_notes_active(false)
 
 {
 	ui->setupUi(this);
@@ -158,6 +159,11 @@ Preferences::Preferences(QWidget *parent) :
 		}
 	});
 
+	connect(ui->instrumentNotesCheckbox, &QCheckBox::stateChanged, [=](int state) {
+		m_instrument_notes_active = (!state ? false : true);
+		Q_EMIT notify();
+	});
+
 	QString preference_ini_file = getPreferenceIniFile();
 	QSettings settings(preference_ini_file, QSettings::IniFormat);
 
@@ -239,6 +245,15 @@ void Preferences::setDisplaySamplingPoints(bool display)
 	m_displaySamplingPoints = display;
 }
 
+bool Preferences::getInstrumentNotesActive() const
+{
+	return m_instrument_notes_active;
+}
+void Preferences::setInstrumentNotesActive(bool en)
+{
+	m_instrument_notes_active = en;
+}
+
 Preferences::~Preferences()
 {
 	QString preference_ini_file = getPreferenceIniFile();
@@ -276,6 +291,7 @@ void Preferences::showEvent(QShowEvent *event)
 	ui->oscADCFiltersCheckBox->setChecked(show_ADC_digital_filters);
 	ui->languageCombo->setCurrentText(language);
 	ui->logicAnalyzerDisplaySamplingPoints->setChecked(m_displaySamplingPoints);
+	ui->instrumentNotesCheckbox->setChecked(m_instrument_notes_active);
 
 	QWidget::showEvent(event);
 }
@@ -586,6 +602,15 @@ bool Preferences_API::getGraticuleEnabled() const
 void Preferences_API::setGraticuleEnabled(const bool& enabled)
 {
 	preferencePanel->graticule_enabled = enabled;
+}
+
+bool Preferences_API::getInstrumentNotesActive() const
+{
+	return preferencePanel->m_instrument_notes_active;
+}
+void Preferences_API::setInstrumentNotesActive(bool en)
+{
+	preferencePanel->m_instrument_notes_active = en;
 }
 
 bool Preferences_API::getExternalScript() const

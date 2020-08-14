@@ -80,6 +80,7 @@ namespace adiscope {
 		void startStop(bool start);
 		void ratioChanged(int percent);
 		void toggleRunButton(bool enabled);
+		void readPreferences();
 
 	private:
 		Ui::PowerController *ui;

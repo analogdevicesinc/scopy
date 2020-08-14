@@ -124,7 +124,7 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 r
             <number>0</number>
            </property>
            <item>
-            <widget class="adiscope::InstrumentNotes" name="siggenNotes" native="true">
+            <widget class="adiscope::InstrumentNotes" name="instrumentNotes" native="true">
              <property name="styleSheet">
               <string notr="true"/>
              </property>
@@ -1296,32 +1296,6 @@ QPushButton:checked
                       <number>0</number>
                      </property>
                      <item>
-                      <widget class="QCheckBox" name="notesEnable">
-                       <property name="styleSheet">
-                        <string notr="true">
-QCheckBox {
-  spacing: 8px;
-  background-color: transparent;
-  font-size: 13px;
-  font-weight: normal;
-  color: rgba(255, 255, 255, 153);
-}
-
-QCheckBox::indicator {
-  width: 14px;
-  height: 14px;
-  border: 2px solid rgb(74,100,255);
-  border-radius: 4px;
-}
-QCheckBox::indicator:unchecked { background-color: transparent; }
-QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
-                       </property>
-                       <property name="text">
-                        <string>Enable Notes</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
                       <layout class="QHBoxLayout" name="horizontalLayout_13">
                        <property name="topMargin">
                         <number>0</number>
@@ -1406,15 +1380,15 @@ QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>adiscope::Math</class>
-   <extends>QWidget</extends>
-   <header>math.hpp</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>adiscope::InstrumentNotes</class>
    <extends>QWidget</extends>
    <header>instrumentnotes.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::Math</class>
+   <extends>QWidget</extends>
+   <header>math.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -104,10 +104,13 @@ PowerController::PowerController(struct iio_context *ctx,
 	api->load(*settings);
 	api->js_register(engine);
 
+	readPreferences();
+
 }
 
 PowerController::~PowerController()
 {
+	disconnect(prefPanel, &Preferences::notify, this, &PowerController::readPreferences);
 	ui->dac1->setChecked(false);
 	ui->dac2->setChecked(false);
 
@@ -123,6 +126,11 @@ PowerController::~PowerController()
 	delete api;
 
 	delete ui;
+}
+
+void PowerController::readPreferences()
+{
+	ui->instrumentNotes->setVisible(prefPanel->getInstrumentNotesActive());
 }
 
 void PowerController::toggleRunButton(bool enabled)
