@@ -320,6 +320,25 @@ void FftDisplayPlot::setWindowCoefficientSum(unsigned int ch, float sum, float s
 	d_win_coefficient_sum_sqr[ch] = sqr_sum;
 }
 
+void FftDisplayPlot::useLogScaleY(bool log_scale)
+{
+	if (log_scale) {
+		QwtLogScaleEngine *scaleEngine = new QwtLogScaleEngine();
+		setAxisScaleEngine(QwtPlot::yLeft,  (QwtScaleEngine *)scaleEngine);
+		OscScaleDraw *yScaleDraw = new OscScaleDraw(&dBFormatter, "V/√Hz");
+		yScaleDraw->enableComponent(QwtAbstractScaleDraw::Ticks, true);
+		yScaleDraw->setFloatPrecision(2);
+		setAxisScaleDraw(QwtPlot::yLeft, yScaleDraw);
+	} else {
+		OscScaleEngine *scaleEngine = new OscScaleEngine();
+		this->setAxisScaleEngine(QwtPlot::yLeft, (QwtScaleEngine *)scaleEngine);
+		OscScaleDraw *yScaleDraw = new OscScaleDraw(&dBFormatter, "");
+		yScaleDraw->setFloatPrecision(2);
+		setAxisScaleDraw(QwtPlot::yLeft, yScaleDraw);
+	}
+	replot();
+}
+
 void FftDisplayPlot::useLogFreq(bool use_log_freq)
 {
 	if (use_log_freq) {

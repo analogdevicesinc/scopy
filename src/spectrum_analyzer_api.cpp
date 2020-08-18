@@ -334,16 +334,13 @@ double SpectrumAnalyzer_API::unitPerDiv()
 {
 	if (sp->ui->topWidget->currentIndex() == 0) {
 		return sp->unit_per_div->value();
-	} else {
-		return sp->unit_per_div_scale->value();
 	}
+	return 0;
 }
 void SpectrumAnalyzer_API::setunitPerDiv(double val)
 {
 	if (sp->ui->topWidget->currentIndex() == 0) {
 		sp->unit_per_div->setValue(val);
-	} else {
-		sp->unit_per_div_scale->setValue(val);
 	}
 }
 

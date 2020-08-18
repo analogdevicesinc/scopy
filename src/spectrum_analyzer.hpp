@@ -203,7 +203,6 @@ private:
 	QButtonGroup *channels_group;
 	FftDisplayPlot *fft_plot;
 
-	ScaleSpinButton *unit_per_div_scale;
 	ScaleSpinButton *top_scale;
 	ScaleSpinButton *bottom_scale;
 	PositionSpinButton *unit_per_div;

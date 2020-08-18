@@ -227,6 +227,7 @@ namespace adiscope {
 
 		void setWindowCoefficientSum(unsigned int ch, float sum, float sqr_sum);
 		void setNbOverlappingAverages(unsigned int nb_avg);
+		void useLogScaleY(bool log_scale);
 	Q_SIGNALS:
 		void newData();
 		void sampleRateUpdated(double);
