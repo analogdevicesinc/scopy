@@ -691,7 +691,7 @@ void ScaleSpinButton::stepUp()
 	double current_scale = m_units[ui->SBA_Combobox->currentIndex()].second;
 	double newVal;
 
-	double epsilon = 1E-15;
+	double epsilon = 1E-12;
 
 	if (isInFineMode()) {
 		newVal = (current_val + m_fine_increment) * current_scale;
@@ -724,7 +724,7 @@ void ScaleSpinButton::stepDown()
 	double current_scale = m_units[ui->SBA_Combobox->currentIndex()].second;
 	double newVal;
 
-	double epsilon = 1E-15;
+	double epsilon = 1E-12;
 
 	if (isInFineMode()) {
 		newVal = (current_val - m_fine_increment) * current_scale;
