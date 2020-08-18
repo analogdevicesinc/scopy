@@ -249,16 +249,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 		{" ",1e0},
 	}, tr("Scale/Div"), 0.0, 0.0, false, false, this);
 
-	unit_per_div_scale = new ScaleSpinButton({
-			 {{"pV/√Hz",1e-12},
-			  {"nV/√Hz",1e-9},
-			  {"μV/√Hz",1e-6},
-			  {"mV/√Hz",1e-3},
-			  {"V/√Hz",1e0}}
-	}, tr("Scale/Div"), 1e-12, 25/10, false, false, this,
-	{1, 2.5, 5, 7.5});
 	ui->divisionWidget->addWidget(unit_per_div);
-	ui->divisionWidget->addWidget(unit_per_div_scale);
 
 	top = new PositionSpinButton({
 		{" ",1e0},
@@ -269,11 +260,9 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 			 {"μV/√Hz",1e-6},
 			 {"mV/√Hz",1e-3},
 			 {"V/√Hz",1e0}}
-	}, tr("Top"), 1e-12, 25.0, false, false, this,
-	{1, 2.5, 5, 7.5});
+	}, tr("Top"), 1e-12, 10e1, false, false, this);
 	ui->topWidget->addWidget(top);
 	ui->topWidget->addWidget(top_scale);
-
 
 	bottom = new PositionSpinButton({
 		{" ",1e0},
@@ -284,8 +273,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 			    {"μV/√Hz",1e-6},
 			    {"mV/√Hz",1e-3},
 			    {"V/√Hz",1e0}}
-	}, tr("Bottom"), 0.0, 25.0, false, false, this,
-	{1, 2.5, 5, 7.5});
+	}, tr("Bottom"), 1e-12, 10e1, false, false, this);
 	ui->bottomWidget->addWidget(bottom);
 	ui->bottomWidget->addWidget(bottom_scale);
 
@@ -446,8 +434,6 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 		SLOT(onBottomValueChanged(double)));
 	connect(top_scale, SIGNAL(valueChanged(double)),
 		SLOT(onTopValueChanged(double)));
-	connect(unit_per_div_scale, SIGNAL(valueChanged(double)),
-		SLOT(onScalePerDivValueChanged(double)));
 	connect(bottom_scale, SIGNAL(valueChanged(double)),
 		SLOT(onBottomValueChanged(double)));
 
@@ -2038,26 +2024,36 @@ void SpectrumAnalyzer::on_cmb_units_currentIndexChanged(const QString& unit)
 	switch (magType) {
 	case FftDisplayPlot::VPEAK:
 	case FftDisplayPlot::VRMS:
+		ui->divisionWidget->setVisible(true);
+		fft_plot->useLogScaleY(false);
 		fft_plot->setAxisScale(QwtPlot::yLeft, 0, 25, 10);
+		ui->topWidget->setCurrentIndex(stackedWidgetCurrentIdx);
+		ui->bottomWidget->setCurrentIndex(stackedWidgetCurrentIdx);
+		ui->divisionWidget->setCurrentIndex(stackedWidgetCurrentIdx);
 		top->setValue(25);
 		bottom->setValue(0);
 		break;
 	case FftDisplayPlot::VROOTHZ:
+		ui->divisionWidget->setVisible(false);
+		fft_plot->useLogScaleY(true);
 		stackedWidgetCurrentIdx = 1;
-		fft_plot->setAxisScale(QwtPlot::yLeft, 0, 25, 10);
-		top_scale->setValue(25);
-		bottom_scale->setValue(0);
+		ui->topWidget->setCurrentIndex(stackedWidgetCurrentIdx);
+		ui->bottomWidget->setCurrentIndex(stackedWidgetCurrentIdx);
+		ui->divisionWidget->setCurrentIndex(stackedWidgetCurrentIdx);
+		top_scale->setValue(2.5E1);
+		bottom_scale->setValue(1E-12);
 		break;
 	default:
+		ui->divisionWidget->setVisible(true);
+		fft_plot->useLogScaleY(false);
 		fft_plot->setAxisScale(QwtPlot::yLeft, -200, 0, 10);
+		ui->topWidget->setCurrentIndex(stackedWidgetCurrentIdx);
+		ui->bottomWidget->setCurrentIndex(stackedWidgetCurrentIdx);
+		ui->divisionWidget->setCurrentIndex(stackedWidgetCurrentIdx);
 		top->setValue(0);
 		bottom->setValue(-200);
 		break;
 	}
-
-	ui->topWidget->setCurrentIndex(stackedWidgetCurrentIdx);
-	ui->bottomWidget->setCurrentIndex(stackedWidgetCurrentIdx);
-	ui->divisionWidget->setCurrentIndex(stackedWidgetCurrentIdx);
 	fft_plot->setMagnitudeType((*it).second);
 	fft_plot->recalculateMagnitudes();
 	fft_plot->replot();
@@ -2126,16 +2122,14 @@ QPair<int, int> SpectrumAnalyzer::getGridLayoutPosFromIndex(QGridLayout *layout,
 void SpectrumAnalyzer::onTopValueChanged(double top)
 {
 	bool isScaleBtn = ui->topWidget->currentIndex();
-	double perDiv = isScaleBtn ? unit_per_div_scale->value() : unit_per_div->value();
+	double perDiv = unit_per_div->value();
 	double bottomValue = top - perDiv * 10;
 	if (!isScaleBtn) {
 		bottom->blockSignals(true);
 		bottom->setValue(bottomValue);
 		bottom->blockSignals(false);
 	} else {
-		bottom_scale->blockSignals(true);
-		bottom_scale->setValue(bottomValue);
-		bottom_scale->blockSignals(false);
+		bottomValue = bottom_scale->value();
 	}
 	fft_plot->setAxisScale(QwtPlot::yLeft, bottomValue, top);
 	fft_plot->replot();
@@ -2166,16 +2160,14 @@ void SpectrumAnalyzer::onScalePerDivValueChanged(double perDiv)
 void SpectrumAnalyzer::onBottomValueChanged(double bottom)
 {
 	bool isScaleBtn = ui->topWidget->currentIndex();
-	double perDiv = isScaleBtn ? unit_per_div_scale->value() : unit_per_div->value();
+	double perDiv = unit_per_div->value();
 	double topValue = bottom + perDiv * 10;
 	if (!isScaleBtn) {
 		top->blockSignals(true);
 		top->setValue(topValue);
 		top->blockSignals(false);
 	} else {
-		top_scale->blockSignals(true);
-		top_scale->setValue(topValue);
-		top_scale->blockSignals(false);
+		topValue = top_scale->value();
 	}
 	fft_plot->setAxisScale(QwtPlot::yLeft, bottom, topValue);
 	fft_plot->replot();
